@@ -3,7 +3,12 @@ export class ApiError extends Error {
 }
 
 let csrfToken: string | null = null;
-const API = '/api/v1';
+const API = import.meta.env.VITE_API_BASE || '/api/v1';
+function errorMessage(detail: unknown) {
+  if (typeof detail === 'string') return detail;
+  if (Array.isArray(detail)) return detail.map(x => typeof x?.msg === 'string' ? x.msg : '请求字段无效').join('；');
+  return '请求未能完成，请检查输入后重试。';
+}
 
 export function setCsrfToken(value: string | null) { csrfToken = value; }
 export function getCsrfToken() { return csrfToken; }
@@ -16,7 +21,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   try {
     const response = await fetch(`${API}${path}`, { ...init, headers, credentials: 'include', signal: controller.signal });
     const body = response.headers.get('content-type')?.includes('application/json') ? await response.json() : null;
-    if (!response.ok) throw new ApiError(response.status, body?.detail || '请求未能完成，请稍后重试。');
+    if (!response.ok) throw new ApiError(response.status, errorMessage(body?.detail));
     return body as T;
   } catch (error) {
     if (error instanceof ApiError) throw error;
@@ -25,17 +30,17 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   } finally { window.clearTimeout(timer); }
 }
 
-export type User = { id: string; email: string; display_name: string; role: string };
+export type User = { id: string; email: string; display_name: string; role: string; csrf_token?: string };
 export type Organization = { id: string; legal_name: string; status: string; membership_role: string };
 export type Requirement = { id: string; organization_id: string; title: string; description: string; location?: string | null; work_mode?: string | null; status: 'draft' | 'archived' };
 
 export const api = {
-  me: () => request<User>('/auth/me'),
+  me: async () => { const user=await request<User>('/auth/me'); setCsrfToken(user.csrf_token || null); return user; },
   register: (email: string, password: string, displayName: string) => request<{ id: string }>('/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, display_name: displayName }) }),
   login: async (email: string, password: string) => { const data = await request<{ csrf_token: string }>('/auth/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) }); setCsrfToken(data.csrf_token); return data; },
   logout: async () => { await request('/auth/session', { method: 'DELETE' }); setCsrfToken(null); },
   upload: (file: File) => { const form = new FormData(); form.append('file', file); return request<{ resume_id: string; job_id: string; state: string }>('/me/resumes', { method: 'POST', body: form }); },
-  resume: (id: string) => request<{ resume_id: string; filename: string; status: string; job_state: string | null }>(`/me/resumes/${id}`),
+  resume: (id: string) => request<{ resume_id: string; filename: string; status: string; job_id?: string; job_state: string | null; error?: string | null; result?: ParseResult | null }>(`/me/resumes/${id}`),
   parse: (id: string) => request<{ job_id: string; state: string; result?: ParseResult; error?: string }>(`/me/resumes/${id}/parse`, { method: 'POST' }),
   retryParse: (id: string) => request<{ state: string }>(`/me/resumes/${id}/retry-parse`, { method: 'POST' }),
   applyDraft: (id: string) => request('/me/parsing-jobs/' + id + '/apply-draft', { method: 'POST' }),

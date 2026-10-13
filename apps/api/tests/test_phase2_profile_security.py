@@ -40,8 +40,10 @@ def test_synthetic_docx_upload_and_local_parse_state():
  csrf=login(c,email);up=c.post('/api/v1/me/resumes',files={'file':('synthetic.docx',buf.getvalue(),'application/vnd.openxmlformats-officedocument.wordprocessingml.document')},headers={'X-CSRF-Token':csrf});assert up.status_code==201
  rid=up.json()['resume_id'];assert c.get('/api/v1/me/resumes/'+rid+'/download').status_code==200
  parsed=c.post('/api/v1/me/resumes/'+rid+'/parse',headers={'X-CSRF-Token':csrf});assert parsed.status_code==200
- assert parsed.json()['state']=='parsed', parsed.json()
- assert parsed.json()['result']['source']=='docling_local'
+ assert parsed.json()['state']=='queued', parsed.json()
+ from app.docling_worker import run_once
+ assert run_once() is True
+ status=c.get('/api/v1/me/resumes/'+rid);assert status.json()['job_state']=='parsed',status.json()
  applied=c.post('/api/v1/me/parsing-jobs/'+up.json()['job_id']+'/apply-draft',headers={'X-CSRF-Token':csrf});assert applied.status_code==200
  assert c.get('/api/v1/me/profile').json()['profile']['status']=='draft'
 
@@ -53,4 +55,7 @@ def test_synthetic_pdf_upload_and_local_parse_state():
  assert c.post('/api/v1/auth/register',json={'email':email,'password':'SyntheticOnly123!','display_name':'模拟'}).status_code==201
  csrf=login(c,email);up=c.post('/api/v1/me/resumes',files={'file':('synthetic.pdf',buf.getvalue(),'application/pdf')},headers={'X-CSRF-Token':csrf});assert up.status_code==201
  parsed=c.post('/api/v1/me/resumes/'+up.json()['resume_id']+'/parse',headers={'X-CSRF-Token':csrf});assert parsed.status_code==200
- assert parsed.json()['state']=='parsed',parsed.json()
+ assert parsed.json()['state']=='queued',parsed.json()
+ from app.docling_worker import run_once
+ assert run_once() is True
+ assert c.get('/api/v1/me/resumes/'+up.json()['resume_id']).json()['job_state']=='parsed'

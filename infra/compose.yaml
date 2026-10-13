@@ -17,5 +17,36 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks: [default, worker_internal]
+  worker:
+    build:
+      context: ../apps/api
+      dockerfile: Dockerfile
+    restart: "no"
+    user: "10001:10001"
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-hhba_app}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/${POSTGRES_DB:-hhba_dev}
+      HHBA_UPLOAD_ROOT: /data/uploads
+      HHBA_PARSE_TIMEOUT_SECONDS: ${HHBA_PARSE_TIMEOUT_SECONDS:-120}
+      HHBA_PARSE_MAX_ATTEMPTS: ${HHBA_PARSE_MAX_ATTEMPTS:-3}
+      HHBA_PARSE_MAX_CONCURRENT: "1"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ../apps/api/private_uploads:/data/uploads:ro
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=256m
+    read_only: true
+    cap_drop: ["ALL"]
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    mem_limit: 2g
+    cpus: 1.0
+    networks: [worker_internal]
+networks:
+  worker_internal:
+    internal: true
 volumes:
   hhba_postgres_data:

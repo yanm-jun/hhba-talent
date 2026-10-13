@@ -1,6 +1,5 @@
 """Phase 1 identity, organization, consent and audit API."""
 import hashlib, os, secrets
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout
 from datetime import datetime, timedelta, timezone
 from uuid import UUID, uuid4
 from fastapi import FastAPI, Depends, HTTPException, Request, Response, UploadFile, File
@@ -28,7 +27,7 @@ class Audit(Base):
 class Resume(Base):
  __tablename__='resumes'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); owner_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); storage_key: Mapped[str]=mapped_column(String(255),unique=True); original_filename: Mapped[str]=mapped_column(String(255)); mime_type: Mapped[str]=mapped_column(String(100)); size_bytes: Mapped[int]=mapped_column(); sha256: Mapped[str]=mapped_column(String(64)); status: Mapped[str]=mapped_column(String(32)); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class ParseJob(Base):
- __tablename__='parsing_jobs'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); resume_id: Mapped[UUID]=mapped_column(ForeignKey('resumes.id')); state: Mapped[str]=mapped_column(String(32)); error_code: Mapped[str|None]=mapped_column(String(64)); error_safe_message: Mapped[str|None]=mapped_column(String(300)); result_json: Mapped[dict|None]=mapped_column(JSON); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+ __tablename__='parsing_jobs'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); resume_id: Mapped[UUID]=mapped_column(ForeignKey('resumes.id')); state: Mapped[str]=mapped_column(String(32)); attempt_count: Mapped[int]=mapped_column(default=0); worker_id: Mapped[str|None]=mapped_column(String(100)); started_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); finished_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); lease_expires_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); cancel_requested: Mapped[bool]=mapped_column(Boolean,default=False); error_code: Mapped[str|None]=mapped_column(String(64)); error_safe_message: Mapped[str|None]=mapped_column(String(300)); result_json: Mapped[dict|None]=mapped_column(JSON); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class Profile(Base):
  __tablename__='profiles'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); owner_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id'),unique=True); status: Mapped[str]=mapped_column(String(32),default='draft'); display_name: Mapped[str|None]=mapped_column(String(100)); content_json: Mapped[dict]=mapped_column(JSON,default=dict); public_slug: Mapped[str|None]=mapped_column(String(100),unique=True); published_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class ProfileVersion(Base):
@@ -49,7 +48,7 @@ class HiringRequirement(Base):
 DATABASE_URL=os.getenv('DATABASE_URL','postgresql+psycopg://hhba_app:CHANGE_ME_LOCAL_ONLY@127.0.0.1:5432/hhba_dev')
 if DATABASE_URL.startswith('postgresql://'):DATABASE_URL='postgresql+psycopg://'+DATABASE_URL.removeprefix('postgresql://')
 engine=create_engine(DATABASE_URL,pool_pre_ping=True); SessionLocal=sessionmaker(bind=engine,expire_on_commit=False); pwd=PasswordHash.recommended(); app=FastAPI(title='HHBA API',version='0.1.0')
-app.add_middleware(CORSMiddleware,allow_origins=['http://127.0.0.1:3000','http://127.0.0.1:5173'],allow_credentials=True,allow_methods=['GET','POST','PUT','PATCH','DELETE'],allow_headers=['Content-Type','X-CSRF-Token'])
+app.add_middleware(CORSMiddleware,allow_origins=['http://127.0.0.1:3000','http://127.0.0.1:3001','http://127.0.0.1:3002','http://127.0.0.1:3003','http://127.0.0.1:5173'],allow_credentials=True,allow_methods=['GET','POST','PUT','PATCH','DELETE'],allow_headers=['Content-Type','X-CSRF-Token'])
 def db():
  s=SessionLocal()
  try: yield s
@@ -91,7 +90,7 @@ def login(x:Login,res:Response,r:Request,s:Session=Depends(db)):
  t=secrets.token_urlsafe(32);q=AuthSession(user_id=u.id,token_hash=hashlib.sha256(t.encode()).hexdigest(),csrf=secrets.token_urlsafe(32),expires_at=now()+timedelta(hours=8));s.add(q);audit(s,r,'auth.login','success','session',u.id);s.commit();res.set_cookie('hhba_session',t,httponly=True,samesite='lax');return {'csrf_token':q.csrf,'role':u.role}
 @app.get('/api/v1/auth/me')
 def me(a=Depends(auth)):
- return {'id':str(a[0].id),'email':a[0].email,'display_name':a[0].name,'role':a[0].role}
+ return {'id':str(a[0].id),'email':a[0].email,'display_name':a[0].name,'role':a[0].role,'csrf_token':a[1].csrf}
 @app.delete('/api/v1/auth/session')
 def logout(res:Response,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  a[1].revoked_at=now();audit(s,r,'auth.logout','success','session',a[0].id);s.commit();res.delete_cookie('hhba_session');return {'ok':True}
@@ -181,6 +180,7 @@ def events(a=Depends(auth),s:Session=Depends(db)):
  if a[0].role!='admin':raise HTTPException(403,'administrator role required')
  return {'events':[{'action':e.action,'outcome':e.outcome,'resource':e.resource} for e in s.scalars(select(Audit))]}
 UPLOAD_ROOT=os.path.abspath(os.getenv('HHBA_UPLOAD_ROOT','./private_uploads'))
+MAX_PARSE_ATTEMPTS=int(os.getenv('HHBA_PARSE_MAX_ATTEMPTS','3'))
 @app.post('/api/v1/me/resumes',status_code=201)
 async def upload_resume(r:Request,file:UploadFile=File(...),a=Depends(csrf),s:Session=Depends(db)):
  name=os.path.basename(file.filename or ''); ext=os.path.splitext(name)[1].lower(); data=await file.read()
@@ -192,7 +192,7 @@ async def upload_resume(r:Request,file:UploadFile=File(...),a=Depends(csrf),s:Se
 def resume_status(rid:UUID,a=Depends(auth),s:Session=Depends(db)):
  x=s.get(Resume,rid)
  if not x or x.owner_user_id!=a[0].id:raise HTTPException(404,'resource not found')
- j=s.scalar(select(ParseJob).where(ParseJob.resume_id==rid));return {'resume_id':str(x.id),'filename':x.original_filename,'status':x.status,'job_state':j.state if j else None}
+ j=s.scalar(select(ParseJob).where(ParseJob.resume_id==rid));return {'resume_id':str(x.id),'filename':x.original_filename,'status':x.status,'job_id':str(j.id) if j else None,'job_state':j.state if j else None,'attempt_count':j.attempt_count if j else 0,'error':j.error_safe_message if j else None,'result':j.result_json if j and j.state=='parsed' else None}
 @app.get('/api/v1/me/resumes/{rid}/download')
 def download_resume(rid:UUID,a=Depends(auth),s:Session=Depends(db)):
  x=s.get(Resume,rid)
@@ -204,31 +204,18 @@ def download_resume(rid:UUID,a=Depends(auth),s:Session=Depends(db)):
 def parse_resume(rid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  x=s.get(Resume,rid)
  if not x or x.owner_user_id!=a[0].id:raise HTTPException(404,'resource not found')
- j=s.scalar(select(ParseJob).where(ParseJob.resume_id==rid));j.state='processing';s.flush()
- try:
-  from docling.document_converter import DocumentConverter
-  timeout_seconds=int(os.getenv('HHBA_PARSE_TIMEOUT_SECONDS','120'))
-  worker=ThreadPoolExecutor(max_workers=1)
-  future=worker.submit(lambda:DocumentConverter().convert(os.path.join(UPLOAD_ROOT,x.storage_key)))
-  try: result=future.result(timeout=timeout_seconds)
-  finally: worker.shutdown(wait=False,cancel_futures=True)
-  text=result.document.export_to_markdown()[:200000]
-  # Rules only: no external model, no invented values. Every extracted value preserves source evidence.
-  lines=[line.strip() for line in text.splitlines() if line.strip()]
-  skills=[line[2:].strip() for line in lines if line.lower().startswith(('- python','- java','- react','- sql'))][:30]
-  j.state='parsed';j.result_json={'raw_text_excerpt':text[:12000],'display_name':{'value':None,'status':'needs_confirmation'},'skills':[{'value':v,'evidence':v,'status':'needs_confirmation'} for v in skills],'experiences':[],'education':[],'source':'docling_local'};x.status='parsed';audit(s,r,'resume.parse','success',f'resume:{rid}',a[0].id)
- except FuturesTimeout:
-  j.state='failed';j.error_code='PARSE_TIMEOUT';j.error_safe_message='本地解析超时，可稍后受控重试。';x.status='failed';audit(s,r,'resume.parse','failed',f'resume:{rid}',a[0].id,{'error_type':'timeout'})
- except Exception as exc:
-  j.state='failed';j.error_code='LOCAL_PARSE_FAILED';j.error_safe_message='本地解析未完成，可在资源检查后重试。';x.status='failed';audit(s,r,'resume.parse','failed',f'resume:{rid}',a[0].id,{'error_type':type(exc).__name__})
- j.updated_at=now();s.commit();return {'job_id':str(j.id),'state':j.state,'result':j.result_json if j.state=='parsed' else None,'error':j.error_safe_message}
+ j=s.scalar(select(ParseJob).where(ParseJob.resume_id==rid))
+ if not j or j.state not in {'uploaded','failed'}:raise HTTPException(409,'parsing task is not ready')
+ if j.attempt_count>=MAX_PARSE_ATTEMPTS:raise HTTPException(409,'maximum parsing attempts reached')
+ j.state='queued';j.error_code=None;j.error_safe_message=None;j.cancel_requested=False;j.updated_at=now();x.status='queued';audit(s,r,'resume.parse.queued','success',f'resume:{rid}',a[0].id);s.commit();return {'job_id':str(j.id),'state':j.state,'attempt_count':j.attempt_count}
 @app.post('/api/v1/me/resumes/{rid}/retry-parse')
 def retry_parse(rid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  x=s.get(Resume,rid)
  if not x or x.owner_user_id!=a[0].id:raise HTTPException(404,'resource not found')
  old=s.scalar(select(ParseJob).where(ParseJob.resume_id==rid))
  if old and old.state not in {'failed','uploaded'}:raise HTTPException(409,'parsing task is not retryable')
- if old:old.state='uploaded';old.error_code=None;old.error_safe_message=None;old.result_json=None;old.updated_at=now()
+ if old and old.attempt_count>=MAX_PARSE_ATTEMPTS:raise HTTPException(409,'maximum parsing attempts reached')
+ if old:old.state='queued';old.error_code=None;old.error_safe_message=None;old.result_json=None;old.cancel_requested=False;old.updated_at=now();x.status='queued'
  audit(s,r,'resume.parse.retry','success',f'resume:{rid}',a[0].id);s.commit();return {'resume_id':str(rid),'state':'uploaded'}
 @app.post('/api/v1/me/parsing-jobs/{jid}/apply-draft')
 def apply_parse_draft(jid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
@@ -242,6 +229,8 @@ def delete_resume(rid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  x=s.get(Resume,rid)
  if not x or x.owner_user_id!=a[0].id:raise HTTPException(404,'resource not found')
  p=os.path.join(UPLOAD_ROOT,x.storage_key)
+ job=s.scalar(select(ParseJob).where(ParseJob.resume_id==rid))
+ if job and job.state in {'queued','processing'}:job.cancel_requested=True;job.state='cancelled';job.finished_at=now()
  if os.path.isfile(p):os.remove(p)
  s.delete(x);audit(s,r,'resume.delete','success',f'resume:{rid}',a[0].id);s.commit();return {'deleted':True}
 class ProfileIn(BaseModel): content:dict; display_name:str|None=None
