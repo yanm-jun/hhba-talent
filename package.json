@@ -1,0 +1,1 @@
+{"dependencies":{"react":"18.3.1","react-dom":"18.3.1"},"devDependencies":{"@vitejs/plugin-react":"4.3.4","typescript":"5.7.3","vite":"6.0.11"},"name":"hhba-web","private":true,"scripts":{"build":"vite build","dev":"vite"},"type":"module","version":"0.0.0"}

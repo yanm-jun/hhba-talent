@@ -1,0 +1,43 @@
+# HHBA 本地开发基础设施（Phase 0）
+# 用法（需本机安装 Docker Engine + Compose，由用户授权后在其电脑执行）：
+#   docker compose up -d postgres      # 仅启动 PostgreSQL + pgvector
+#   docker compose --profile search up -d  # 另加 Meilisearch（V0.2 可选）
+# 约束：所有端口仅绑定 127.0.0.1；测试库与测试数据，不导入真实简历；
+#       不设置 restart: always，避免无意义自启。
+name: hhba-dev
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: hhba-postgres
+    environment:
+      POSTGRES_DB: hhba_dev
+      POSTGRES_USER: hhba
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-CHANGE_ME}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - hhba-pgdata:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hhba -d hhba_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 全文/纠错搜索（V0.2 可选，Phase 0 不默认启动）
+  meilisearch:
+    image: getmeili/meilisearch:v1.55.0   # 锁定 CE 社区版（MIT）；严禁 enterprise 镜像（BUSL-1.1）
+    container_name: hhba-meilisearch
+    profiles: ["search"]
+    environment:
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-CHANGE_ME}
+      MEILI_ENV: development
+    ports:
+      - "127.0.0.1:7700:7700"
+    volumes:
+      - hhba-meili:/meili_data
+
+volumes:
+  hhba-pgdata:
+  hhba-meili:

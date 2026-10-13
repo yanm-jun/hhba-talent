@@ -1,0 +1,38 @@
+# 密钥与本地配置（绝不提交）
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Node
+node_modules/
+dist/
+build/
+.vite/
+*.local
+
+# 数据与模型（本地测试数据不提交）
+data/
+*.db
+*.sqlite*
+models/
+*.bin
+*.onnx
+
+# 日志与临时文件
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
