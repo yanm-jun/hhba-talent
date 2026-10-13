@@ -1,0 +1,21 @@
+name: hhba-local
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.1-pg17
+    container_name: hhba-postgres-dev
+    restart: "no"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-hhba_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-hhba_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - hhba_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  hhba_postgres_data:
