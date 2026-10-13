@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr, Field
 from pwdlib import PasswordHash
-from sqlalchemy import Boolean, DateTime, ForeignKey, JSON, String, create_engine, select
+from sqlalchemy import Boolean, DateTime, ForeignKey, JSON, String, Text, create_engine, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 def now(): return datetime.now(timezone.utc)
 def comparable_time(value): return value.replace(tzinfo=timezone.utc) if value and value.tzinfo is None else value
@@ -44,7 +44,11 @@ class Project(ProfileDetail):
  __tablename__='profile_projects';name: Mapped[str|None]=mapped_column(String(200));summary: Mapped[str|None]=mapped_column()
 class ServiceIntent(ProfileDetail):
  __tablename__='profile_service_intents';service_name: Mapped[str]=mapped_column(String(200));region: Mapped[str|None]=mapped_column(String(100));work_mode: Mapped[str|None]=mapped_column(String(64))
-engine=create_engine(os.getenv('DATABASE_URL','postgresql+psycopg://hhba_app:CHANGE_ME_LOCAL_ONLY@127.0.0.1:5432/hhba_dev'),pool_pre_ping=True); SessionLocal=sessionmaker(bind=engine,expire_on_commit=False); pwd=PasswordHash.recommended(); app=FastAPI(title='HHBA API',version='0.1.0')
+class HiringRequirement(Base):
+ __tablename__='hiring_requirements'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); created_by: Mapped[UUID]=mapped_column(ForeignKey('users.id')); title: Mapped[str]=mapped_column(String(160)); description: Mapped[str]=mapped_column(Text); location: Mapped[str|None]=mapped_column(String(120)); work_mode: Mapped[str|None]=mapped_column(String(64)); status: Mapped[str]=mapped_column(String(32),default='draft'); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+DATABASE_URL=os.getenv('DATABASE_URL','postgresql+psycopg://hhba_app:CHANGE_ME_LOCAL_ONLY@127.0.0.1:5432/hhba_dev')
+if DATABASE_URL.startswith('postgresql://'):DATABASE_URL='postgresql+psycopg://'+DATABASE_URL.removeprefix('postgresql://')
+engine=create_engine(DATABASE_URL,pool_pre_ping=True); SessionLocal=sessionmaker(bind=engine,expire_on_commit=False); pwd=PasswordHash.recommended(); app=FastAPI(title='HHBA API',version='0.1.0')
 app.add_middleware(CORSMiddleware,allow_origins=['http://127.0.0.1:3000','http://127.0.0.1:5173'],allow_credentials=True,allow_methods=['GET','POST','PUT','PATCH','DELETE'],allow_headers=['Content-Type','X-CSRF-Token'])
 def db():
  s=SessionLocal()
@@ -68,6 +72,10 @@ class OrgIn(BaseModel): legal_name:str=Field(min_length=2)
 class ReviewIn(BaseModel): status:str=Field(pattern='^(approved|rejected|suspended)$')
 class ConsentIn(BaseModel): granted:bool
 class MemberIn(BaseModel): user_id:UUID; role:str=Field(pattern='^(owner|member)$')
+class RequirementIn(BaseModel):
+ title:str=Field(min_length=1,max_length=160); description:str=Field(min_length=1,max_length=8000); location:str|None=Field(default=None,max_length=120); work_mode:str|None=Field(default=None,max_length=64); status:str=Field(default='draft',pattern='^(draft|archived)$')
+class RequirementPatch(BaseModel):
+ title:str|None=Field(default=None,min_length=1,max_length=160); description:str|None=Field(default=None,min_length=1,max_length=8000); location:str|None=Field(default=None,max_length=120); work_mode:str|None=Field(default=None,max_length=64); status:str|None=Field(default=None,pattern='^(draft|archived)$')
 @app.get('/healthz')
 def healthz(): return {'status':'ok','phase':'1'}
 @app.post('/api/v1/auth/register',status_code=201)
@@ -81,12 +89,22 @@ def login(x:Login,res:Response,r:Request,s:Session=Depends(db)):
  u=s.scalar(select(User).where(User.email==str(x.email).casefold()))
  if not u or not pwd.verify(x.password,u.password_hash):audit(s,r,'auth.login','denied','session');s.commit();raise HTTPException(401,'invalid credentials')
  t=secrets.token_urlsafe(32);q=AuthSession(user_id=u.id,token_hash=hashlib.sha256(t.encode()).hexdigest(),csrf=secrets.token_urlsafe(32),expires_at=now()+timedelta(hours=8));s.add(q);audit(s,r,'auth.login','success','session',u.id);s.commit();res.set_cookie('hhba_session',t,httponly=True,samesite='lax');return {'csrf_token':q.csrf,'role':u.role}
+@app.get('/api/v1/auth/me')
+def me(a=Depends(auth)):
+ return {'id':str(a[0].id),'email':a[0].email,'display_name':a[0].name,'role':a[0].role}
 @app.delete('/api/v1/auth/session')
 def logout(res:Response,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  a[1].revoked_at=now();audit(s,r,'auth.logout','success','session',a[0].id);s.commit();res.delete_cookie('hhba_session');return {'ok':True}
 @app.post('/api/v1/organizations',status_code=201)
 def org(x:OrgIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  o=Organization(legal_name=x.legal_name,created_by=a[0].id);s.add(o);s.flush();s.add(Membership(organization_id=o.id,user_id=a[0].id,role='owner'));audit(s,r,'organization.create','success',f'organization:{o.id}',a[0].id);s.commit();return {'id':str(o.id),'status':o.status}
+@app.get('/api/v1/organizations')
+def organizations(a=Depends(auth),s:Session=Depends(db)):
+ rows=s.scalars(select(Membership).where(Membership.user_id==a[0].id,Membership.status=='active')).all();result=[]
+ for m in rows:
+  o=s.get(Organization,m.organization_id)
+  if o:result.append({'id':str(o.id),'legal_name':o.legal_name,'status':o.status,'membership_role':m.role})
+ return {'organizations':result}
 @app.get('/api/v1/organizations/{oid}/members')
 def members(oid:UUID,a=Depends(auth),s:Session=Depends(db)):
  if not s.scalar(select(Membership).where(Membership.organization_id==oid,Membership.user_id==a[0].id,Membership.status=='active')):raise HTTPException(404,'resource not found')
@@ -123,6 +141,33 @@ def restricted(oid:UUID,r:Request,a=Depends(auth),s:Session=Depends(db)):
  m=s.scalar(select(Membership).where(Membership.organization_id==oid,Membership.user_id==a[0].id,Membership.status=='active'));o=s.get(Organization,oid)
  if not m or not o or o.status!='approved':audit(s,r,'organization.restricted_access','denied',f'organization:{oid}',a[0].id);s.commit();raise HTTPException(403,'organization not approved')
  audit(s,r,'organization.restricted_access','success',f'organization:{oid}',a[0].id);s.commit();return {'restricted_access':True}
+def active_membership(oid:UUID,user_id:UUID,s:Session):
+ return s.scalar(select(Membership).where(Membership.organization_id==oid,Membership.user_id==user_id,Membership.status=='active'))
+def requirement_view(x:HiringRequirement):
+ return {'id':str(x.id),'organization_id':str(x.organization_id),'created_by':str(x.created_by),'title':x.title,'description':x.description,'location':x.location,'work_mode':x.work_mode,'status':x.status,'created_at':x.created_at,'updated_at':x.updated_at}
+@app.post('/api/v1/organizations/{oid}/hiring-requirements',status_code=201)
+def create_requirement(oid:UUID,x:RequirementIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if not active_membership(oid,a[0].id,s):raise HTTPException(404,'resource not found')
+ requirement=HiringRequirement(organization_id=oid,created_by=a[0].id,**x.model_dump());s.add(requirement);s.flush();audit(s,r,'hiring_requirement.create','success',f'hiring_requirement:{requirement.id}',a[0].id,{'organization_id':str(oid),'status':x.status});s.commit();return requirement_view(requirement)
+@app.get('/api/v1/organizations/{oid}/hiring-requirements')
+def list_requirements(oid:UUID,a=Depends(auth),s:Session=Depends(db)):
+ if not active_membership(oid,a[0].id,s):raise HTTPException(404,'resource not found')
+ return {'items':[requirement_view(x) for x in s.scalars(select(HiringRequirement).where(HiringRequirement.organization_id==oid).order_by(HiringRequirement.updated_at.desc()))]}
+@app.get('/api/v1/organizations/{oid}/hiring-requirements/{rid}')
+def get_requirement(oid:UUID,rid:UUID,a=Depends(auth),s:Session=Depends(db)):
+ if not active_membership(oid,a[0].id,s):raise HTTPException(404,'resource not found')
+ x=s.get(HiringRequirement,rid)
+ if not x or x.organization_id!=oid:raise HTTPException(404,'resource not found')
+ return requirement_view(x)
+@app.patch('/api/v1/organizations/{oid}/hiring-requirements/{rid}')
+def patch_requirement(oid:UUID,rid:UUID,x:RequirementPatch,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ member=active_membership(oid,a[0].id,s)
+ if not member:raise HTTPException(404,'resource not found')
+ requirement=s.get(HiringRequirement,rid)
+ if not requirement or requirement.organization_id!=oid:raise HTTPException(404,'resource not found')
+ if member.role!='owner' and requirement.created_by!=a[0].id:raise HTTPException(404,'resource not found')
+ for key,value in x.model_dump(exclude_unset=True).items():setattr(requirement,key,value)
+ requirement.updated_at=now();audit(s,r,'hiring_requirement.update','success',f'hiring_requirement:{rid}',a[0].id,{'organization_id':str(oid)});s.commit();return requirement_view(requirement)
 @app.put('/api/v1/me/consents/{typ}')
 def consent(typ:str,x:ConsentIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if typ not in {'enterprise_search','public_share','search_engine_index'}:raise HTTPException(404,'resource not found')

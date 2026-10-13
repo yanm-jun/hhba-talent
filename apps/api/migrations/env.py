@@ -3,7 +3,11 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 config=context.config
 if os.getenv('DATABASE_URL'):
- config.set_main_option('sqlalchemy.url',os.environ['DATABASE_URL'])
+ url=os.environ['DATABASE_URL']
+ # HHBA installs psycopg v3, so a generic PostgreSQL URL must not silently
+ # select SQLAlchemy's unavailable psycopg2 default driver.
+ if url.startswith('postgresql://'):url='postgresql+psycopg://'+url.removeprefix('postgresql://')
+ config.set_main_option('sqlalchemy.url',url)
 def run_migrations_offline():
  context.configure(url=config.get_main_option('sqlalchemy.url'),literal_binds=True)
  with context.begin_transaction(): context.run_migrations()
