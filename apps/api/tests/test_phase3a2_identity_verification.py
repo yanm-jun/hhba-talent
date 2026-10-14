@@ -39,6 +39,10 @@ def test_candidate_cannot_create_organization_and_registration_never_bootstraps_
     assert candidate.post('/api/v1/organizations',json={'legal_name':'不能创建'},headers={'X-CSRF-Token':csrf}).status_code==403
     assert candidate.get('/api/v1/auth/me').json()['role']=='user'
     assert candidate.get('/api/v1/auth/me').json()['account_types']==['candidate']
+    wrong_entry=TestClient(app)
+    denied=wrong_entry.post('/api/v1/auth/session',json={'email':email,'password':PASSWORD,'account_type':'recruiter'})
+    assert denied.status_code==403
+    assert wrong_entry.get('/api/v1/auth/me').status_code==401
 
 
 def test_recruiter_verification_then_platform_gate_controls_search_access():
@@ -68,3 +72,15 @@ def test_reviewer_cannot_approve_own_application_and_candidate_cannot_read_docum
     candidate=TestClient(app);_,candidate_csrf=account(candidate,'outsider','candidate')
     assert candidate.get(f'/api/v1/recruiter/organizations/{oid}/verification').status_code==404
     assert candidate.post(f'/api/v1/organizations/{oid}/hiring-requirements',json={'title':'越权','description':'synthetic'},headers={'X-CSRF-Token':candidate_csrf}).status_code==404
+
+
+def test_submitted_evidence_is_locked_and_approval_requires_snapshot():
+    recruiter=TestClient(app);_,csrf=account(recruiter,'locked-evidence','recruiter');oid=create_recruiter_org(recruiter,csrf)
+    payload={'legal_name':f'合成锁定企业{RUN}','credit_code':'91370000LOCK123456','registered_location':'山东省青岛市','recruitment_subject_type':'employer','real_name':'合成经办人','job_title':'招聘负责人'}
+    assert recruiter.put(f'/api/v1/recruiter/organizations/{oid}/verification',json=payload,headers={'X-CSRF-Token':csrf}).status_code==200
+    for kind in ('business_license','authorization_letter'):
+        result=recruiter.post(f'/api/v1/recruiter/organizations/{oid}/verification/documents?document_type={kind}',files={'file':(f'{kind}.pdf',b'%PDF-1.4\nsynthetic','application/pdf')},headers={'X-CSRF-Token':csrf})
+        assert result.status_code==201
+    assert recruiter.post(f'/api/v1/recruiter/organizations/{oid}/verification/submit',headers={'X-CSRF-Token':csrf}).status_code==200
+    locked=recruiter.post(f'/api/v1/recruiter/organizations/{oid}/verification/documents?document_type=business_license',files={'file':('changed.pdf',b'%PDF-1.4\nchanged','application/pdf')},headers={'X-CSRF-Token':csrf})
+    assert locked.status_code==409

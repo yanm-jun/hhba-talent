@@ -45,7 +45,7 @@ export type TalentSearchCandidate = { candidate_ref: CandidateReference; display
 export const api = {
   me: async () => { const user=await request<User>('/auth/me'); setCsrfToken(user.csrf_token || null); return user; },
   register: (email: string, password: string, displayName: string, accountType: AccountType = 'candidate') => request<{ id: string; account_type: AccountType }>('/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, display_name: displayName, account_type: accountType }) }),
-  login: async (email: string, password: string) => { const data = await request<{ csrf_token: string }>('/auth/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) }); setCsrfToken(data.csrf_token); return data; },
+  login: async (email: string, password: string, accountType?: AccountType) => { const data = await request<{ csrf_token: string }>('/auth/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, account_type: accountType }) }); setCsrfToken(data.csrf_token); return data; },
   logout: async () => { await request('/auth/session', { method: 'DELETE' }); setCsrfToken(null); },
   upload: (file: File) => { const form = new FormData(); form.append('file', file); return request<{ resume_id: string; job_id: string; state: string }>('/me/resumes', { method: 'POST', body: form }); },
   resumes: () => request<{ items: ResumeSummary[] }>('/me/resumes'),

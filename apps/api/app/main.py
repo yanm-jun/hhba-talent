@@ -59,7 +59,9 @@ class RecruiterVerification(Base):
 class RecruiterOrganizationAuthorization(Base):
  __tablename__='recruiter_organization_authorizations'; __table_args__=(UniqueConstraint('organization_id','user_id',name='uq_recruiter_org_authorization'),); id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True); role: Mapped[str]=mapped_column(String(32),default='recruiter'); status: Mapped[str]=mapped_column(String(32),default='draft'); granted_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); expires_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); revoked_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class VerificationDocument(Base):
- __tablename__='verification_documents'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); uploader_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); document_type: Mapped[str]=mapped_column(String(48)); storage_key: Mapped[str]=mapped_column(String(255),unique=True); original_filename: Mapped[str]=mapped_column(String(255)); mime_type: Mapped[str]=mapped_column(String(100)); size_bytes: Mapped[int]=mapped_column(); sha256: Mapped[str]=mapped_column(String(64)); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+ __tablename__='verification_documents'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); uploader_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); evidence_version: Mapped[int]=mapped_column(Integer,default=1); document_type: Mapped[str]=mapped_column(String(48)); storage_key: Mapped[str]=mapped_column(String(255),unique=True); original_filename: Mapped[str]=mapped_column(String(255)); mime_type: Mapped[str]=mapped_column(String(100)); size_bytes: Mapped[int]=mapped_column(); sha256: Mapped[str]=mapped_column(String(64)); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+class VerificationEvidenceSnapshot(Base):
+ __tablename__='verification_evidence_snapshots'; __table_args__=(UniqueConstraint('organization_id','evidence_version',name='uq_verification_evidence_version'),); id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); evidence_version: Mapped[int]=mapped_column(Integer); manifest: Mapped[dict]=mapped_column(JSON); manifest_sha256: Mapped[str]=mapped_column(String(64)); submitted_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class VerificationReview(Base):
  __tablename__='verification_reviews'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); reviewer_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); outcome: Mapped[str]=mapped_column(String(32)); reason_code: Mapped[str]=mapped_column(String(80)); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class PlatformServiceGate(Base):
@@ -85,7 +87,7 @@ def csrf(r:Request,a=Depends(auth)):
  if not secrets.compare_digest(r.headers.get('X-CSRF-Token',''),a[1].csrf): raise HTTPException(403,'csrf validation failed')
  return a
 class Register(BaseModel): email:EmailStr; password:str=Field(min_length=12); display_name:str; account_type:str=Field(default='candidate',pattern='^(candidate|recruiter)$')
-class Login(BaseModel): email:EmailStr; password:str
+class Login(BaseModel): email:EmailStr; password:str; account_type:str|None=Field(default=None,pattern='^(candidate|recruiter)$')
 class OrgIn(BaseModel): legal_name:str=Field(min_length=2)
 class ReviewIn(BaseModel): status:str=Field(pattern='^(approved|rejected|suspended)$')
 class VerificationIn(BaseModel): legal_name:str=Field(min_length=2,max_length=200); credit_code:str=Field(min_length=8,max_length=32); registered_location:str=Field(min_length=2,max_length=160); recruitment_subject_type:str=Field(default='employer',pattern='^(employer|agency)$'); real_name:str=Field(min_length=2,max_length=100); job_title:str=Field(min_length=2,max_length=120)
@@ -128,6 +130,7 @@ def reg(x:Register,r:Request,s:Session=Depends(db)):
 def login(x:Login,res:Response,r:Request,s:Session=Depends(db)):
  u=s.scalar(select(User).where(User.email==str(x.email).casefold()))
  if not u or not pwd.verify(x.password,u.password_hash):audit(s,r,'auth.login','denied','session');s.commit();raise HTTPException(401,'invalid credentials')
+ if x.account_type and not has_identity(s,u.id,x.account_type):audit(s,r,'auth.login.identity_denied','denied','session',u.id,{'account_type':x.account_type});s.commit();raise HTTPException(403,'account identity does not match this entry')
  t=secrets.token_urlsafe(32);q=AuthSession(user_id=u.id,token_hash=hashlib.sha256(t.encode()).hexdigest(),csrf=secrets.token_urlsafe(32),expires_at=now()+timedelta(hours=8));s.add(q);audit(s,r,'auth.login','success','session',u.id);s.commit();res.set_cookie('hhba_session',t,httponly=True,samesite='lax');return {'csrf_token':q.csrf,'role':u.role}
 @app.get('/api/v1/auth/me')
 def me(a=Depends(auth),s:Session=Depends(db)):
@@ -161,7 +164,7 @@ def require_recruitment_permission(s,oid,user_id,permission):
  member,org,org_ver,recruiter,authorization=recruiter_context(s,oid,user_id)
  base=bool(member and member.status=='active' and has_identity(s,user_id,'recruiter') and authorization and authorization.status in {'draft','active'} and authorization.role in RECRUITER_ROLES and (not authorization.expires_at or comparable_time(authorization.expires_at)>now()))
  if permission=='manage_drafts': return base
- if permission in {'manage_members','review_verification'}: return bool(base and authorization and authorization.role in {'organization_owner','recruitment_admin'})
+ if permission in {'manage_members','review_verification'}: return bool(base and authorization and authorization.status=='active' and verification_is_current(org_ver) and verification_is_current(recruiter) and authorization.role in {'organization_owner','recruitment_admin'})
  if permission in {'talent_search','restricted_access'}:
   gate=s.get(PlatformServiceGate,'network_recruitment')
   return bool(base and gate and gate.enabled and org and org.status=='approved' and verification_is_current(org_ver) and verification_is_current(recruiter) and authorization and authorization.status=='active')
@@ -200,16 +203,27 @@ def save_recruiter_verification(oid:UUID,x:VerificationIn,r:Request,a=Depends(cs
 async def upload_verification_document(oid:UUID,document_type:str,r:Request,file:UploadFile=File(...),a=Depends(csrf),s:Session=Depends(db)):
  if document_type not in {'business_license','authorization_letter'}:raise HTTPException(422,'unsupported verification document type')
  if not verification_owner(s,oid,a[0].id):raise HTTPException(404,'resource not found')
- name=os.path.basename(file.filename or '');ext=os.path.splitext(name)[1].lower();data=await file.read();is_pdf=data.startswith(b'%PDF-');is_jpg=data.startswith(b'\xff\xd8\xff');is_png=data.startswith(b'\x89PNG\r\n\x1a\n')
- if len(data)>10*1024*1024: raise HTTPException(413,'verification document exceeds the 10 MB limit')
+ row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid).with_for_update())
+ if not row or row.status not in {'draft','need_more_info','rejected'}:raise HTTPException(409,'verification evidence is locked; start a new review version first')
+ name=os.path.basename(file.filename or '');ext=os.path.splitext(name)[1].lower();chunks=[];size=0
+ while True:
+  chunk=await file.read(1024*1024)
+  if not chunk:break
+  size+=len(chunk)
+  if size>10*1024*1024:raise HTTPException(413,'verification document exceeds the 10 MB limit')
+  chunks.append(chunk)
+ data=b''.join(chunks);is_pdf=data.startswith(b'%PDF-');is_jpg=data.startswith(b'\xff\xd8\xff');is_png=data.startswith(b'\x89PNG\r\n\x1a\n')
  if ext not in {'.pdf','.jpg','.jpeg','.png'} or len(data)==0 or not ((ext=='.pdf' and is_pdf) or (ext in {'.jpg','.jpeg'} and is_jpg) or (ext=='.png' and is_png)):raise HTTPException(415,'unsupported or mismatched verification document')
- os.makedirs(VERIFICATION_ROOT,exist_ok=True);key=uuid4().hex+ext;open(os.path.join(VERIFICATION_ROOT,key),'wb').write(data);mime='application/pdf' if is_pdf else 'image/png' if is_png else 'image/jpeg';doc=VerificationDocument(organization_id=oid,uploader_user_id=a[0].id,document_type=document_type,storage_key=key,original_filename=name,mime_type=mime,size_bytes=len(data),sha256=hashlib.sha256(data).hexdigest());s.add(doc);audit(s,r,'verification.document.upload','success',f'verification_document:{doc.id}',a[0].id,{'document_type':document_type});s.commit();return {'id':str(doc.id),'document_type':document_type}
+ os.makedirs(VERIFICATION_ROOT,exist_ok=True);key=uuid4().hex+ext;open(os.path.join(VERIFICATION_ROOT,key),'wb').write(data);mime='application/pdf' if is_pdf else 'image/png' if is_png else 'image/jpeg';doc=VerificationDocument(organization_id=oid,uploader_user_id=a[0].id,evidence_version=row.version,document_type=document_type,storage_key=key,original_filename=name,mime_type=mime,size_bytes=len(data),sha256=hashlib.sha256(data).hexdigest());s.add(doc);audit(s,r,'verification.document.upload','success',f'verification_document:{doc.id}',a[0].id,{'document_type':document_type,'version':row.version});s.commit();return {'id':str(doc.id),'document_type':document_type}
 @app.post('/api/v1/recruiter/organizations/{oid}/verification/submit')
 def submit_verification(oid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if not verification_owner(s,oid,a[0].id):raise HTTPException(404,'resource not found')
- row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid));person=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==a[0].id));kinds={d.document_type for d in s.scalars(select(VerificationDocument).where(VerificationDocument.organization_id==oid))}
- if not row or not person or not row.credit_code or not person.real_name or not {'business_license','authorization_letter'}.issubset(kinds):raise HTTPException(422,'business license and recruiter authorization are required')
- row.status='submitted';row.submitted_at=now();row.updated_at=now();person.status='submitted';person.updated_at=now();audit(s,r,'verification.submit','success',f'organization:{oid}',a[0].id);s.commit();return {'status':'submitted'}
+ row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid).with_for_update());person=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==a[0].id).with_for_update())
+ if not row or not person or row.status not in {'draft','need_more_info','rejected'}:raise HTTPException(409,'verification cannot be submitted in its current state')
+ docs=s.scalars(select(VerificationDocument).where(VerificationDocument.organization_id==oid,VerificationDocument.evidence_version==row.version)).all();kinds={d.document_type for d in docs}
+ if not row.credit_code or not person.real_name or not {'business_license','authorization_letter'}.issubset(kinds):raise HTTPException(422,'business license and recruiter authorization are required')
+ manifest=[{'id':str(d.id),'type':d.document_type,'sha256':d.sha256,'size':d.size_bytes} for d in sorted(docs,key=lambda x:(x.document_type,str(x.id)))];serialized=json.dumps(manifest,sort_keys=True,separators=(',',':'));s.add(VerificationEvidenceSnapshot(organization_id=oid,evidence_version=row.version,manifest=manifest,manifest_sha256=hashlib.sha256(serialized.encode()).hexdigest()))
+ row.status='submitted';row.submitted_at=now();row.updated_at=now();person.status='submitted';person.updated_at=now();audit(s,r,'verification.submit','success',f'organization:{oid}',a[0].id,{'version':row.version});s.commit();return {'status':'submitted','evidence_version':row.version}
 @app.get('/api/v1/organizations')
 def organizations(a=Depends(auth),s:Session=Depends(db)):
  rows=s.scalars(select(Membership).where(Membership.user_id==a[0].id,Membership.status=='active')).all();result=[]
@@ -255,12 +269,12 @@ def review(oid:UUID,x:ReviewIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
 @app.post('/api/v1/admin/verification/organizations/{oid}/review')
 def review_verification(oid:UUID,x:VerificationReviewIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if a[0].role!='admin':raise HTTPException(403,'administrator role required')
- row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid));org_row=s.get(Organization,oid)
+ row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid).with_for_update());org_row=s.scalar(select(Organization).where(Organization.id==oid).with_for_update())
  if not row or not org_row:raise HTTPException(404,'resource not found')
  if row.applicant_user_id==a[0].id:raise HTTPException(403,'reviewer cannot approve own application')
  if row.status not in {'submitted','need_more_info'}:raise HTTPException(409,'verification is not awaiting review')
- recruiter=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==row.applicant_user_id));authorization=s.scalar(select(RecruiterOrganizationAuthorization).where(RecruiterOrganizationAuthorization.organization_id==oid,RecruiterOrganizationAuthorization.user_id==row.applicant_user_id))
- if not recruiter or not authorization:raise HTTPException(409,'verification linkage missing')
+ recruiter=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==row.applicant_user_id).with_for_update());authorization=s.scalar(select(RecruiterOrganizationAuthorization).where(RecruiterOrganizationAuthorization.organization_id==oid,RecruiterOrganizationAuthorization.user_id==row.applicant_user_id).with_for_update());snapshot=s.scalar(select(VerificationEvidenceSnapshot).where(VerificationEvidenceSnapshot.organization_id==oid,VerificationEvidenceSnapshot.evidence_version==row.version))
+ if not recruiter or not authorization or not snapshot:raise HTTPException(409,'fixed evidence snapshot and verification linkage are required')
  outcome=x.status;at=now();row.status=outcome;row.reviewed_at=at;row.reviewed_by=a[0].id;row.review_reason_code=x.reason_code;row.updated_at=at
  recruiter.status=outcome;recruiter.reviewed_at=at;recruiter.reviewed_by=a[0].id;recruiter.review_reason_code=x.reason_code;recruiter.updated_at=at
  if outcome=='approved':
