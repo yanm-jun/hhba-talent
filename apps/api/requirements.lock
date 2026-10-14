@@ -29,8 +29,6 @@ filetype==1.2.0
 fsspec==2026.9.0
 h11==0.16.0
 hf-xet==1.7.0
-# Editable Git install with no remote (hhba-api==0.0.0)
--e c:\users\lenovo\documents\codex\2026-10-13\hhba-hhba-phase-0-2026-10\hhba\apps\api
 httpcore==1.0.9
 httpcore2==2.13.1
 httptools==0.9.0

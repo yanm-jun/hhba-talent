@@ -28,6 +28,10 @@ __pycache__/
 data/
 uploads/
 apps/api/private_uploads/
+# Defensive rule for an API accidentally started from the repository root.
+# Uploaded resumes must never be tracked, even when their relative storage
+# root resolves here rather than under apps/api.
+private_uploads/
 work/
 *.sqlite3
 coverage/

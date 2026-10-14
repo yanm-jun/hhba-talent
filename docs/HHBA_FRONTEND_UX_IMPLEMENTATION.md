@@ -19,10 +19,10 @@
 
 ```powershell
 Set-Location C:\Users\Lenovo\Documents\Codex\2026-10-13\hhba-hhba-phase-0-2026-10\HHBA\apps\api
-..\..\.tooling\python312\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8003
+.\.venv\Scripts\uvicorn.exe app.main:app --env-file ..\..\.env --host 127.0.0.1 --port 8003
 
 Set-Location ..\web
 npm run dev -- --port 3003
 ```
 
-请在停止旧 HHBA API 后再启动上述命令，确保浏览器加载新的恢复接口。不要读取、打印或提交 `.env`。
+API 必须从 `apps/api` 工作目录启动：该目录使相对 `HHBA_UPLOAD_ROOT` 与 Docker Worker 的只读挂载一致。不要读取、打印或提交 `.env`。
