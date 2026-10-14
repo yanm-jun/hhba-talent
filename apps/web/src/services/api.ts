@@ -35,6 +35,10 @@ export type Organization = { id: string; legal_name: string; status: string; mem
 export type Requirement = { id: string; organization_id: string; title: string; description: string; location?: string | null; work_mode?: string | null; status: 'draft' | 'archived'; created_at?: string; updated_at?: string };
 export type ResumeSummary = { resume_id: string; filename: string; status: string; job_id?: string | null; job_state: string | null; created_at?: string };
 export type Consents = { enterprise_search: boolean; public_share: boolean; search_engine_index: boolean };
+export type EnterpriseProfileFields = { display_name: string | null; headline: string | null; capability_summary: string | null; skills: string[]; industries: string[]; location: string | null; service_regions: string[]; work_modes: string[]; work_years: number | null; project_summaries: string[] };
+export type CandidateReference = string;
+export type TalentMatchReason = { field: 'skill' | 'industry' | 'region' | 'work_mode' | 'work_years' | 'capability'; value: string | number; expanded: boolean };
+export type TalentSearchCandidate = { candidate_ref: CandidateReference; display_name: string | null; headline: string | null; skills: string[]; industries: string[]; location: string | null; service_regions: string[]; work_modes: string[]; work_years: number | null; project_summaries: string[]; match_reasons: TalentMatchReason[] };
 
 export const api = {
   me: async () => { const user=await request<User>('/auth/me'); setCsrfToken(user.csrf_token || null); return user; },
@@ -48,6 +52,7 @@ export const api = {
   retryParse: (id: string) => request<{ state: string }>(`/me/resumes/${id}/retry-parse`, { method: 'POST' }),
   applyDraft: (id: string) => request('/me/parsing-jobs/' + id + '/apply-draft', { method: 'POST' }),
   profile: () => request<{ profile: Profile | null }>('/me/profile'),
+  enterpriseProfilePreview: () => request<{ eligible: boolean; fields: EnterpriseProfileFields | null }>('/me/profile/enterprise-preview'),
   saveProfile: (display_name: string, content: Record<string, unknown>) => request('/me/profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ display_name, content }) }),
   confirmProfile: () => request<{ status: string }>('/me/profile/confirm', { method: 'POST' }),
   publishProfile: () => request<{ slug: string; status: string }>('/me/profile/publish', { method: 'POST' }),
