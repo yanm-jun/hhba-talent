@@ -64,3 +64,30 @@ def test_owner_only_preview_uses_projection_transform_and_not_raw_contact_data()
     assert preview.status_code == 200 and 'preview@example.invalid' not in str(preview.json())
     outsider = TestClient(app); login(outsider, 'preview-outsider')
     assert outsider.get('/api/v1/me/profile/enterprise-preview').json()['fields'] is None
+
+
+def test_305_authorized_candidates_are_paginated_without_101_row_truncation():
+    admin = TestClient(app); admin_email, admin_csrf = login(admin, 'page-admin')
+    session = SessionLocal(); session.query(User).filter_by(email=admin_email).one().role = 'admin'; session.commit(); session.close()
+    employer = TestClient(app); _, employer_csrf = login(employer, 'page-employer')
+    organization = employer.post('/api/v1/organizations', json={'legal_name': f'分页合成企业 {RUN}'}, headers={'X-CSRF-Token': employer_csrf})
+    assert organization.status_code == 201
+    oid = organization.json()['id']
+    assert admin.post(f'/api/v1/admin/organizations/{oid}/review', json={'status':'approved'}, headers={'X-CSRF-Token':admin_csrf}).status_code == 200
+    session = SessionLocal(); old_ref = None
+    for index in range(305):
+        user = User(email=f'page-{index}-{RUN}@hhba-synthetic.com', name='分页合成', password_hash='x'); session.add(user); session.flush()
+        profile = Profile(owner_user_id=user.id, status='confirmed', display_name=f'候选人{index}', content_json={}); session.add(profile); session.flush()
+        session.add(Consent(user_id=user.id, consent_type='enterprise_search', granted=True))
+        projection = CandidateSearchProjection(profile_id=profile.id, owner_user_id=user.id, display_name=f'候选人{index}', headline='合成分页能力', capability_summary='合成分页能力', skills=['分页技能'], industries=['合成行业'], location='山东', service_regions=['山东'], work_modes=['项目合作'], work_years=5, project_summaries=[], skills_text='|分页技能|', industries_text='|合成行业|', regions_text='|山东|', work_modes_text='|项目合作|', search_text='合成分页能力')
+        session.add(projection); session.flush()
+        if index == 0: old_ref = projection.candidate_ref
+    session.commit(); session.close()
+    seen = set()
+    for page in (1, 2, 10):
+        response = employer.post(f'/api/v1/organizations/{oid}/talent-search', json={'keywords':'合成分页能力','page':page,'page_size':10}, headers={'X-CSRF-Token':employer_csrf})
+        assert response.status_code == 200, response.text
+        payload = response.json(); refs = [item['candidate_ref'] for item in payload['items']]
+        assert len(refs) == 10 and len(set(refs)) == 10 and not seen.intersection(refs)
+        seen.update(refs); assert payload['has_more'] is True
+    assert old_ref in seen

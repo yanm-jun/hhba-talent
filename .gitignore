@@ -35,6 +35,9 @@ private_uploads/
 work/
 *.sqlite3
 coverage/
+# Local browser/automation evidence can contain synthetic profile content and
+# is recorded in reports by path only; it must not enter source control.
+tests/evidence/
 
 # Editors / operating systems
 .vscode/

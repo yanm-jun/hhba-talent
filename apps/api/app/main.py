@@ -429,11 +429,12 @@ def talent_search(oid:UUID,x:TalentSearchIn,r:Request,a=Depends(csrf),s:Session=
  if x.work_years_min is not None:stmt=stmt.where(CandidateSearchProjection.work_years>=x.work_years_min)
  if x.work_years_max is not None:stmt=stmt.where(CandidateSearchProjection.work_years<=x.work_years_max)
  if x.keywords:stmt=stmt.where(text_match(CandidateSearchProjection.search_text,x.keywords))
+ # Order before pagination. Do not re-sort this bounded SQL page in Python: doing
+ # so changes the global order and can duplicate candidates across pages.
  rows=s.scalars(stmt.order_by(CandidateSearchProjection.indexed_at.asc(),CandidateSearchProjection.profile_id.asc()).offset((x.page-1)*x.page_size).limit(x.page_size+1)).all();ranked=[]
  for row in rows:
   reasons=search_reasons(row,x)
   if reasons:ranked.append((len(reasons),row,reasons))
- ranked.sort(key=lambda item:(-item[0],str(item[1].profile_id)))
  window=ranked[:x.page_size];payload={'items':[candidate_card(row,reasons) for _,row,reasons in window],'page':x.page,'page_size':x.page_size,'has_more':len(ranked)>x.page_size}
  query_hash=hashlib.sha256(json.dumps(x.model_dump(),sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:16];audit(s,r,'talent_search','success',f'organization:{oid}',a[0].id,{'query_hash':query_hash,'result_bucket':'0' if not ranked else '1-10' if len(ranked)<=10 else '11+','page':x.page});s.commit();return payload
 @app.post('/api/v1/admin/talent-search/rebuild')
