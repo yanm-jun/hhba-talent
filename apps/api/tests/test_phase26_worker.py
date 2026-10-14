@@ -4,6 +4,7 @@ import subprocess
 import sys
 import time
 import uuid
+from datetime import timedelta
 
 RUN = uuid.uuid4().hex
 os.environ['DATABASE_URL'] = f'sqlite:///./phase26-{RUN}.sqlite3'
@@ -35,6 +36,19 @@ def test_process_tree_termination_stops_a_real_child():
     docling_worker.kill_process_tree(child)
     child.wait(timeout=10)
     assert child.returncode is not None
+
+
+def test_expired_lease_is_recovered_or_fails_at_the_retry_limit():
+    session = SessionLocal(); recoverable = make_job(session, 'recoverable'); exhausted = make_job(session, 'exhausted')
+    for job_id, attempts in [(recoverable, 1), (exhausted, docling_worker.MAX_ATTEMPTS)]:
+        row = session.get(ParseJob, job_id)
+        row.state = 'processing'; row.attempt_count = attempts; row.worker_id = 'crashed-worker'
+        row.lease_expires_at = docling_worker.now() - timedelta(seconds=1)
+    session.commit(); docling_worker.recover_stale(session); session.commit()
+    assert session.get(ParseJob, recoverable).state == 'queued'
+    exhausted_row = session.get(ParseJob, exhausted)
+    assert exhausted_row.state == 'failed' and exhausted_row.error_code == 'WORKER_LEASE_EXPIRED'
+    session.close()
 
 
 def test_session_recovery_returns_the_csrf_token_needed_for_future_writes():

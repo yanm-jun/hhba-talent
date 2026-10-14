@@ -49,6 +49,7 @@ export const api = {
   confirmProfile: () => request<{ status: string }>('/me/profile/confirm', { method: 'POST' }),
   publishProfile: () => request<{ slug: string; status: string }>('/me/profile/publish', { method: 'POST' }),
   withdrawProfile: () => request<{ status: string }>('/me/profile/withdraw', { method: 'POST' }),
+  publicProfile: (slug: string) => request<{ display_name: string | null; headline?: string | null; skills: string[]; services: string[]; updated_at: string }>(`/public/profiles/${slug}`),
   consent: (type: string, granted: boolean) => request(`/me/consents/${type}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ granted }) }),
   organizations: () => request<{ organizations: Organization[] }>('/organizations'),
   createOrganization: (legal_name: string) => request<{ id: string; status: string }>('/organizations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ legal_name }) }),

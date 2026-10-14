@@ -22,8 +22,21 @@ TIMEOUT_SECONDS = int(os.getenv('HHBA_PARSE_TIMEOUT_SECONDS', '120'))
 
 
 def _safe_result(path: str) -> dict:
-    from docling.document_converter import DocumentConverter
-    converted = DocumentConverter().convert(path)
+    from docling.datamodel.base_models import InputFormat
+    from docling.datamodel.pipeline_options import NativePdfPipelineOptions
+    from docling.document_converter import DocumentConverter, NativePdfFormatOption
+    # Text PDFs use Docling's native, model-free pipeline.  This keeps the
+    # isolated worker offline and rejects scans requiring OCR rather than
+    # silently fetching models or sending a document to an external service.
+    if path.lower().endswith('.pdf'):
+        converter = DocumentConverter(format_options={
+            InputFormat.PDF: NativePdfFormatOption(pipeline_options=NativePdfPipelineOptions(
+                generate_page_images=False, generate_picture_images=False, parser_threads=1,
+            )),
+        })
+    else:
+        converter = DocumentConverter()
+    converted = converter.convert(path)
     text = converted.document.export_to_markdown()[:200000]
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     skills = [line[2:].strip() for line in lines if line.lower().startswith(('- python', '- java', '- react', '- sql'))][:30]

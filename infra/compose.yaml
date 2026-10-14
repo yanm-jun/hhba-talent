@@ -30,6 +30,8 @@ services:
       HHBA_PARSE_TIMEOUT_SECONDS: ${HHBA_PARSE_TIMEOUT_SECONDS:-120}
       HHBA_PARSE_MAX_ATTEMPTS: ${HHBA_PARSE_MAX_ATTEMPTS:-3}
       HHBA_PARSE_MAX_CONCURRENT: "1"
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
     depends_on:
       postgres:
         condition: service_healthy
