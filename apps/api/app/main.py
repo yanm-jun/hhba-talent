@@ -1,5 +1,5 @@
 """Phase 1 identity, organization, consent and audit API."""
-import hashlib, json, os, secrets
+import hashlib, json, os, re, secrets
 from datetime import date, datetime, timedelta, timezone
 from uuid import UUID, uuid4
 from fastapi import FastAPI, Depends, HTTPException, Request, Response, UploadFile, File
@@ -9,6 +9,7 @@ from pydantic import BaseModel, EmailStr, Field
 from pwdlib import PasswordHash
 from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, JSON, String, Text, UniqueConstraint, and_, create_engine, func, or_, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 def now(): return datetime.now(timezone.utc)
 def comparable_time(value): return value.replace(tzinfo=timezone.utc) if value and value.tzinfo is None else value
 class Base(DeclarativeBase): pass
@@ -21,7 +22,7 @@ class Organization(Base):
 class Membership(Base):
  __tablename__='organization_memberships'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id')); user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); role: Mapped[str]=mapped_column(String(32),default='member'); status: Mapped[str]=mapped_column(String(32),default='active')
 class Consent(Base):
- __tablename__='consents'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); consent_type: Mapped[str]=mapped_column(String(64)); granted: Mapped[bool]=mapped_column(Boolean,default=False); changed_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+ __tablename__='consents'; __table_args__=(UniqueConstraint('user_id','consent_type',name='uq_consents_user_type'),); id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); consent_type: Mapped[str]=mapped_column(String(64)); granted: Mapped[bool]=mapped_column(Boolean,default=False); changed_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class Audit(Base):
  __tablename__='audit_events'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); occurred_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now); actor_id: Mapped[UUID|None]=mapped_column(ForeignKey('users.id')); action: Mapped[str]=mapped_column(String(120)); outcome: Mapped[str]=mapped_column(String(32)); resource: Mapped[str]=mapped_column(String(100)); request_id: Mapped[str]=mapped_column(String(64)); metadata_redacted: Mapped[dict]=mapped_column(JSON,default=dict)
 class Resume(Base):
@@ -46,7 +47,7 @@ class ServiceIntent(ProfileDetail):
 class HiringRequirement(Base):
  __tablename__='hiring_requirements'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); created_by: Mapped[UUID]=mapped_column(ForeignKey('users.id')); title: Mapped[str]=mapped_column(String(160)); description: Mapped[str]=mapped_column(Text); location: Mapped[str|None]=mapped_column(String(120)); work_mode: Mapped[str|None]=mapped_column(String(64)); status: Mapped[str]=mapped_column(String(32),default='draft'); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class CandidateSearchProjection(Base):
- __tablename__='candidate_search_projections'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); profile_id: Mapped[UUID]=mapped_column(ForeignKey('profiles.id',ondelete='CASCADE'),unique=True,index=True); owner_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True); display_name: Mapped[str|None]=mapped_column(String(100)); headline: Mapped[str|None]=mapped_column(String(300)); capability_summary: Mapped[str|None]=mapped_column(Text); skills: Mapped[list]=mapped_column(JSON,default=list); industries: Mapped[list]=mapped_column(JSON,default=list); location: Mapped[str|None]=mapped_column(String(120)); service_regions: Mapped[list]=mapped_column(JSON,default=list); work_modes: Mapped[list]=mapped_column(JSON,default=list); work_years: Mapped[int|None]=mapped_column(Integer); project_summaries: Mapped[list]=mapped_column(JSON,default=list); skills_text: Mapped[str]=mapped_column(Text,default=''); industries_text: Mapped[str]=mapped_column(Text,default=''); regions_text: Mapped[str]=mapped_column(Text,default=''); work_modes_text: Mapped[str]=mapped_column(Text,default=''); search_text: Mapped[str]=mapped_column(Text,default=''); profile_version: Mapped[int]=mapped_column(Integer,default=0); indexed_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+ __tablename__='candidate_search_projections'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); profile_id: Mapped[UUID]=mapped_column(ForeignKey('profiles.id',ondelete='CASCADE'),unique=True,index=True); owner_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True); candidate_ref: Mapped[str]=mapped_column(String(32),unique=True,index=True,default=lambda:uuid4().hex); display_name: Mapped[str|None]=mapped_column(String(100)); headline: Mapped[str|None]=mapped_column(String(300)); capability_summary: Mapped[str|None]=mapped_column(Text); skills: Mapped[list]=mapped_column(JSON,default=list); industries: Mapped[list]=mapped_column(JSON,default=list); location: Mapped[str|None]=mapped_column(String(120)); service_regions: Mapped[list]=mapped_column(JSON,default=list); work_modes: Mapped[list]=mapped_column(JSON,default=list); work_years: Mapped[int|None]=mapped_column(Integer); project_summaries: Mapped[list]=mapped_column(JSON,default=list); skills_text: Mapped[str]=mapped_column(Text,default=''); industries_text: Mapped[str]=mapped_column(Text,default=''); regions_text: Mapped[str]=mapped_column(Text,default=''); work_modes_text: Mapped[str]=mapped_column(Text,default=''); search_text: Mapped[str]=mapped_column(Text,default=''); profile_version: Mapped[int]=mapped_column(Integer,default=0); indexed_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class TalentSearchUsage(Base):
  __tablename__='talent_search_usages'; __table_args__=(UniqueConstraint('organization_id','user_id','usage_date',name='uq_talent_search_usage_day'),); id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True); usage_date: Mapped[date]=mapped_column(Date); request_count: Mapped[int]=mapped_column(Integer,default=0); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 DATABASE_URL=os.getenv('DATABASE_URL','postgresql+psycopg://hhba_app:CHANGE_ME_LOCAL_ONLY@127.0.0.1:5432/hhba_dev')
@@ -87,7 +88,10 @@ class TalentSearchIn(BaseModel):
  work_mode:str|None=Field(default=None,max_length=64)
  work_years_min:int|None=Field(default=None,ge=0,le=80)
  work_years_max:int|None=Field(default=None,ge=0,le=80)
- page:int=Field(default=1,ge=1,le=10)
+ # A page stays deliberately small (at most ten projected cards), while the
+ # page range matches the per-organization daily search allowance. This makes
+ # a 305+ result set reachable without returning a bulk enumeration response.
+ page:int=Field(default=1,ge=1,le=100)
  page_size:int=Field(default=10,ge=1,le=10)
 @app.get('/healthz')
 def healthz(): return {'status':'ok','phase':'1'}
@@ -159,11 +163,32 @@ def active_membership(oid:UUID,user_id:UUID,s:Session):
 SEARCHABLE_PROFILE_STATUSES=('confirmed','published')
 SYNONYM_GROUPS=(('经销商运营','汽车门店运营'),('销售培训','销售人员培训'),('新能源车销售','新能源汽车销售'))
 def normalized(value): return str(value or '').strip().casefold()
+SENSITIVE_TEXT=re.compile(r'(?ix)(?:\b[\w.+-]+\s*@\s*[\w-]+\s*(?:\.\s*[\w-]+)+\b|(?<!\d)1\s*[3-9](?:\s*\d){9}(?!\d)|\b\d{15,18}[0-9xX]\b|(?:微信|wechat|vx)\s*(?:号|id)?\s*[:：]?\s*[\w-]{5,}|(?:电话|手机号|邮箱|email)\s*[:：]?\s*[^\s，。；;]{3,})')
+# A city/province is useful for matching.  A street number, unit, or a city
+# followed by a street-level address is not part of HHBA's enterprise/public
+# disclosure allow-list.  This is a reject rule, not a promise of exhaustive
+# PII detection; owners must still review the server-generated preview.
+PRIVATE_ADDRESS_MARKERS=re.compile(r'(?:[\u4e00-\u9fffA-Za-z0-9]{1,24}(?:路|街|巷|弄)\s*(?:\d+|[一二三四五六七八九十]+号?)|(?:\d+|[一二三四五六七八九十]+)\s*(?:号|室|栋|单元|门牌)|(?:省|市|区|县).{0,32}(?:路|街|巷|弄|号|室|栋|单元|门牌))')
+def safe_projection_text(value,limit):
+ """Return an allow-listed disclosure value or reject the complete field.
+
+ Contact/address fragments are not redacted in-place: retaining surrounding
+ free text is too easy to get wrong.  This deliberately conservative guard is
+ shared by enterprise projections and public-card fields.
+ """
+ value=str(value or '').strip()
+ if not value or SENSITIVE_TEXT.search(value) or PRIVATE_ADDRESS_MARKERS.search(value):return ''
+ return value[:limit]
+def safe_region(value):
+ value=safe_projection_text(value,80)
+ # A city/province is useful for matching; a detailed address is not an allowed
+ # enterprise-search field. Reject it rather than trying to redact fragments.
+ return None if not value or PRIVATE_ADDRESS_MARKERS.search(value) else value
 def string_list(value):
  if isinstance(value,list): values=value
  elif value: values=[value]
  else: values=[]
- return [normalized(x) for x in values if normalized(x)]
+ return [item for item in (safe_projection_text(normalized(x),80) for x in values if normalized(x)) if item]
 def delimited(values): return ''.join(f'|{x}|' for x in dict.fromkeys(string_list(values)))
 def expand_synonym(value):
  value=normalized(value)
@@ -174,15 +199,18 @@ def granted_enterprise_search(s,user_id):
  return bool(s.scalar(select(Consent).where(Consent.user_id==user_id,Consent.consent_type=='enterprise_search',Consent.granted.is_(True))))
 def remove_projection(s,profile_id):
  s.query(CandidateSearchProjection).filter_by(profile_id=profile_id).delete()
-def sync_search_projection(s,p):
- """Copy only confirmed, enterprise-authorized fields; never resumes/evidence/contact data."""
- if p.status not in SEARCHABLE_PROFILE_STATUSES or not granted_enterprise_search(s,p.owner_user_id):
-  remove_projection(s,p.id); return None
+def projection_values(s,p):
+ """Build the enterprise-search allow-list from confirmed profile fields only.
+
+ This intentionally excludes parsed evidence, source files, contact attributes and
+ arbitrary top-level JSON keys.  The same function powers persistence and the
+ owner-only preview so the UI cannot drift from search disclosure rules.
+ """
  content=p.content_json or {}
  skills=string_list(content.get('skills'))
  industries=string_list(content.get('industries') or content.get('industry'))
- regions=string_list(content.get('service_regions') or content.get('regions'))
- location=normalized(content.get('location') or content.get('region')) or None
+ regions=[x for x in string_list(content.get('service_regions') or content.get('regions')) if safe_region(x)]
+ location=safe_region(content.get('location') or content.get('region'))
  if location: regions=list(dict.fromkeys(regions+[location]))
  work_modes=string_list(content.get('work_modes') or content.get('work_mode'))
  work_years=content.get('work_years')
@@ -191,17 +219,28 @@ def sync_search_projection(s,p):
  if work_years is not None and not 0<=work_years<=80: work_years=None
  projects=[]
  for project in s.scalars(select(Project).where(Project.profile_id==p.id,Project.visibility.in_(('enterprise','public')))):
-  summary=(project.summary or '').strip()
-  if summary: projects.append(summary[:500])
+  summary=safe_projection_text(project.summary,500)
+  if summary: projects.append(summary)
  for intent in s.scalars(select(ServiceIntent).where(ServiceIntent.profile_id==p.id,ServiceIntent.visibility.in_(('enterprise','public')))):
-  if intent.region: regions=list(dict.fromkeys(regions+[normalized(intent.region)]))
-  if intent.work_mode: work_modes=list(dict.fromkeys(work_modes+[normalized(intent.work_mode)]))
- summary=str(content.get('capability_summary') or content.get('headline') or '').strip()[:2000]
+  region=safe_region(intent.region)
+  mode=safe_projection_text(intent.work_mode,80)
+  if region: regions=list(dict.fromkeys(regions+[region]))
+  if mode: work_modes=list(dict.fromkeys(work_modes+[mode]))
+ summary=safe_projection_text(content.get('capability_summary') or content.get('headline'),2000)
+ return {'display_name':safe_projection_text(p.display_name,100) or None,'headline':safe_projection_text(content.get('headline') or content.get('title'),300) or None,'capability_summary':summary or None,'skills':skills,'industries':industries,'location':location,'service_regions':regions,'work_modes':work_modes,'work_years':work_years,'project_summaries':projects}
+def sync_search_projection(s,p):
+ """Copy only confirmed, enterprise-authorized fields; never resumes/evidence/contact data."""
+ if p.status not in SEARCHABLE_PROFILE_STATUSES or not granted_enterprise_search(s,p.owner_user_id):
+  remove_projection(s,p.id); return None
+ values=projection_values(s,p)
  version=s.scalar(select(func.count(ProfileVersion.id)).where(ProfileVersion.profile_id==p.id)) or 0
- search_text=' '.join([summary,*skills,*industries,*regions,*work_modes,*projects])[:12000]
+ search_text=' '.join([values['capability_summary'] or '',*values['skills'],*values['industries'],*values['service_regions'],*values['work_modes'],*values['project_summaries']])[:12000]
  row=s.scalar(select(CandidateSearchProjection).where(CandidateSearchProjection.profile_id==p.id)) or CandidateSearchProjection(profile_id=p.id,owner_user_id=p.owner_user_id)
- row.display_name=(p.display_name or '').strip()[:100] or None;row.headline=str(content.get('headline') or content.get('title') or '').strip()[:300] or None;row.capability_summary=summary or None;row.skills=skills;row.industries=industries;row.location=location;row.service_regions=regions;row.work_modes=work_modes;row.work_years=work_years;row.project_summaries=projects;row.skills_text=delimited(skills);row.industries_text=delimited(industries);row.regions_text=delimited(regions);row.work_modes_text=delimited(work_modes);row.search_text=search_text;row.profile_version=version;row.indexed_at=now();s.add(row);return row
+ row.display_name=values['display_name'];row.headline=values['headline'];row.capability_summary=values['capability_summary'];row.skills=values['skills'];row.industries=values['industries'];row.location=values['location'];row.service_regions=values['service_regions'];row.work_modes=values['work_modes'];row.work_years=values['work_years'];row.project_summaries=values['project_summaries'];row.skills_text=delimited(values['skills']);row.industries_text=delimited(values['industries']);row.regions_text=delimited(values['service_regions']);row.work_modes_text=delimited(values['work_modes']);row.search_text=search_text;row.profile_version=version;row.indexed_at=now();s.add(row);return row
 def consume_search_quota(s,oid,user_id):
+ # Lock the organization first: every member search takes the same lock,
+ # serializing member and organization daily counters without an in-memory race.
+ s.scalar(select(Organization).where(Organization.id==oid).with_for_update())
  today=now().date();usage=s.scalar(select(TalentSearchUsage).where(TalentSearchUsage.organization_id==oid,TalentSearchUsage.user_id==user_id,TalentSearchUsage.usage_date==today).with_for_update())
  org_count=s.scalar(select(func.coalesce(func.sum(TalentSearchUsage.request_count),0)).where(TalentSearchUsage.organization_id==oid,TalentSearchUsage.usage_date==today)) or 0
  if (usage and usage.request_count>=30) or org_count>=100:return False
@@ -235,7 +274,10 @@ def patch_requirement(oid:UUID,rid:UUID,x:RequirementPatch,r:Request,a=Depends(c
 @app.put('/api/v1/me/consents/{typ}')
 def consent(typ:str,x:ConsentIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if typ not in {'enterprise_search','public_share','search_engine_index'}:raise HTTPException(404,'resource not found')
- c=s.scalar(select(Consent).where(Consent.user_id==a[0].id,Consent.consent_type==typ)) or Consent(user_id=a[0].id,consent_type=typ);c.granted=x.granted;c.changed_at=now();s.add(c)
+ if s.bind.dialect.name=='postgresql':
+  c=s.execute(pg_insert(Consent).values(user_id=a[0].id,consent_type=typ,granted=x.granted,changed_at=now()).on_conflict_do_update(index_elements=['user_id','consent_type'],set_={'granted':x.granted,'changed_at':now()}).returning(Consent)).scalar_one()
+ else:
+  c=s.scalar(select(Consent).where(Consent.user_id==a[0].id,Consent.consent_type==typ)) or Consent(user_id=a[0].id,consent_type=typ);c.granted=x.granted;c.changed_at=now();s.add(c)
  if typ=='public_share' and not x.granted:
   p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
   if p:p.status='confirmed';p.public_slug=None;p.published_at=None
@@ -319,6 +361,14 @@ class DetailIn(BaseModel): items:list[dict]
 @app.get('/api/v1/me/profile')
 def my_profile(a=Depends(auth),s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id));return {'profile':None if not p else {'id':str(p.id),'status':p.status,'display_name':p.display_name,'content':p.content_json,'public_slug':p.public_slug}}
+@app.get('/api/v1/me/profile/enterprise-preview')
+def enterprise_profile_preview(a=Depends(auth),s:Session=Depends(db)):
+ p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
+ if not p:return {'eligible':False,'fields':None}
+ # This route is owner-only and deliberately does not create a projection before
+ # the owner grants consent.  It returns exactly the same allow-listed transform.
+ values=projection_values(s,p)
+ return {'eligible':p.status in SEARCHABLE_PROFILE_STATUSES,'fields':values}
 @app.put('/api/v1/me/profile')
 def save_profile(x:ProfileIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id)) or Profile(owner_user_id=a[0].id);p.content_json=x.content;p.display_name=x.display_name;p.status='draft';s.add(p);s.flush();remove_projection(s,p.id);audit(s,r,'profile.save','success','profile',a[0].id);s.commit();return {'status':'draft'}
@@ -356,7 +406,11 @@ def withdraw_profile(r:Request,a=Depends(csrf),s:Session=Depends(db)):
 def public_profile(slug:str,s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.public_slug==slug,Profile.status=='published'))
  if not p:raise HTTPException(404,'profile not found')
- c=p.content_json or {}; return {'display_name':p.display_name,'headline':c.get('headline'),'skills':c.get('skills',[]),'services':c.get('services',[]),'updated_at':p.updated_at}
+ # Public cards use the same conservative field-level disclosure guard as
+ # enterprise projections.  Public-share consent is not permission to expose
+ # contact details or a precise home/work address accidentally pasted into a
+ # free-text field.
+ c=p.content_json or {}; return {'display_name':safe_projection_text(p.display_name,100) or None,'headline':safe_projection_text(c.get('headline'),300) or None,'skills':string_list(c.get('skills')),'services':string_list(c.get('services')),'updated_at':p.updated_at}
 
 def safe_like(value): return '%' + normalized(value).replace('\\','\\\\').replace('%','\\%').replace('_','\\_') + '%'
 def delimited_match(column,value): return or_(*[column.contains(f'|{term}|',autoescape=True) for term in expand_synonym(value)])
@@ -369,10 +423,11 @@ def search_reasons(row,query):
  if query.industry and any(term in industries for term in expand_synonym(query.industry)):reasons.append({'field':'industry','value':normalized(query.industry),'expanded':False})
  if query.region and any(term in regions for term in expand_synonym(query.region)):reasons.append({'field':'region','value':normalized(query.region),'expanded':False})
  if query.work_mode and any(term in modes for term in expand_synonym(query.work_mode)):reasons.append({'field':'work_mode','value':normalized(query.work_mode),'expanded':False})
+ if row.work_years is not None and (query.work_years_min is None or row.work_years>=query.work_years_min) and (query.work_years_max is None or row.work_years<=query.work_years_max):reasons.append({'field':'work_years','value':row.work_years,'expanded':False})
  if query.keywords and any(term in normalized(row.search_text) for term in expand_synonym(query.keywords)):reasons.append({'field':'capability','value':normalized(query.keywords),'expanded':False})
  return reasons
 def candidate_card(row,reasons):
- return {'display_name':row.display_name,'headline':row.headline,'skills':row.skills or [],'industries':row.industries or [],'location':row.location,'service_regions':row.service_regions or [],'work_modes':row.work_modes or [],'work_years':row.work_years,'project_summaries':row.project_summaries or [],'match_reasons':reasons}
+ return {'candidate_ref':row.candidate_ref,'display_name':row.display_name,'headline':row.headline,'skills':row.skills or [],'industries':row.industries or [],'location':row.location,'service_regions':row.service_regions or [],'work_modes':row.work_modes or [],'work_years':row.work_years,'project_summaries':row.project_summaries or [],'match_reasons':reasons}
 @app.post('/api/v1/organizations/{oid}/talent-search')
 def talent_search(oid:UUID,x:TalentSearchIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  member=active_membership(oid,a[0].id,s);organization=s.get(Organization,oid)
@@ -392,13 +447,13 @@ def talent_search(oid:UUID,x:TalentSearchIn,r:Request,a=Depends(csrf),s:Session=
  if x.work_years_min is not None:stmt=stmt.where(CandidateSearchProjection.work_years>=x.work_years_min)
  if x.work_years_max is not None:stmt=stmt.where(CandidateSearchProjection.work_years<=x.work_years_max)
  if x.keywords:stmt=stmt.where(text_match(CandidateSearchProjection.search_text,x.keywords))
- rows=s.scalars(stmt.order_by(CandidateSearchProjection.indexed_at.desc()).limit(101)).all();ranked=[]
- for row in rows:
-  reasons=search_reasons(row,x)
-  if reasons:ranked.append((len(reasons),row,reasons))
- ranked.sort(key=lambda item:(-item[0],str(item[1].profile_id)))
- start=(x.page-1)*x.page_size;window=ranked[start:start+x.page_size];payload={'items':[candidate_card(row,reasons) for _,row,reasons in window],'page':x.page,'page_size':x.page_size,'has_more':len(ranked)>start+x.page_size}
- query_hash=hashlib.sha256(json.dumps(x.model_dump(),sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:16];audit(s,r,'talent_search','success',f'organization:{oid}',a[0].id,{'query_hash':query_hash,'result_bucket':'0' if not ranked else '1-10' if len(ranked)<=10 else '11+','page':x.page});s.commit();return payload
+ # SQL owns filtering, stable ordering, and pagination.  Do not discard or
+ # re-rank rows after applying OFFSET/LIMIT: that would make has_more and page
+ # boundaries inconsistent.  search_reasons is explanation-only and mirrors
+ # the predicates above.
+ rows=s.scalars(stmt.order_by(CandidateSearchProjection.indexed_at.asc(),CandidateSearchProjection.profile_id.asc()).offset((x.page-1)*x.page_size).limit(x.page_size+1)).all()
+ window=rows[:x.page_size];payload={'items':[candidate_card(row,search_reasons(row,x)) for row in window],'page':x.page,'page_size':x.page_size,'has_more':len(rows)>x.page_size}
+ query_hash=hashlib.sha256(json.dumps(x.model_dump(),sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:16];audit(s,r,'talent_search','success',f'organization:{oid}',a[0].id,{'query_hash':query_hash,'result_bucket':'0' if not window else '1-10' if len(window)<=10 else '11+','page':x.page});s.commit();return payload
 @app.post('/api/v1/admin/talent-search/rebuild')
 def rebuild_talent_search(r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if a[0].role!='admin':raise HTTPException(403,'administrator role required')
