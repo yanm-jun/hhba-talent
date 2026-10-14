@@ -32,7 +32,9 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 export type User = { id: string; email: string; display_name: string; role: string; csrf_token?: string };
 export type Organization = { id: string; legal_name: string; status: string; membership_role: string };
-export type Requirement = { id: string; organization_id: string; title: string; description: string; location?: string | null; work_mode?: string | null; status: 'draft' | 'archived' };
+export type Requirement = { id: string; organization_id: string; title: string; description: string; location?: string | null; work_mode?: string | null; status: 'draft' | 'archived'; created_at?: string; updated_at?: string };
+export type ResumeSummary = { resume_id: string; filename: string; status: string; job_id?: string | null; job_state: string | null; created_at?: string };
+export type Consents = { enterprise_search: boolean; public_share: boolean; search_engine_index: boolean };
 
 export const api = {
   me: async () => { const user=await request<User>('/auth/me'); setCsrfToken(user.csrf_token || null); return user; },
@@ -40,6 +42,7 @@ export const api = {
   login: async (email: string, password: string) => { const data = await request<{ csrf_token: string }>('/auth/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) }); setCsrfToken(data.csrf_token); return data; },
   logout: async () => { await request('/auth/session', { method: 'DELETE' }); setCsrfToken(null); },
   upload: (file: File) => { const form = new FormData(); form.append('file', file); return request<{ resume_id: string; job_id: string; state: string }>('/me/resumes', { method: 'POST', body: form }); },
+  resumes: () => request<{ items: ResumeSummary[] }>('/me/resumes'),
   resume: (id: string) => request<{ resume_id: string; filename: string; status: string; job_id?: string; job_state: string | null; error?: string | null; result?: ParseResult | null }>(`/me/resumes/${id}`),
   parse: (id: string) => request<{ job_id: string; state: string; result?: ParseResult; error?: string }>(`/me/resumes/${id}/parse`, { method: 'POST' }),
   retryParse: (id: string) => request<{ state: string }>(`/me/resumes/${id}/retry-parse`, { method: 'POST' }),
@@ -51,6 +54,7 @@ export const api = {
   withdrawProfile: () => request<{ status: string }>('/me/profile/withdraw', { method: 'POST' }),
   publicProfile: (slug: string) => request<{ display_name: string | null; headline?: string | null; skills: string[]; services: string[]; updated_at: string }>(`/public/profiles/${slug}`),
   consent: (type: string, granted: boolean) => request(`/me/consents/${type}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ granted }) }),
+  consents: () => request<Consents>('/me/consents'),
   organizations: () => request<{ organizations: Organization[] }>('/organizations'),
   createOrganization: (legal_name: string) => request<{ id: string; status: string }>('/organizations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ legal_name }) }),
   requirements: (organizationId: string) => request<{ items: Requirement[] }>(`/organizations/${organizationId}/hiring-requirements`),
@@ -59,4 +63,4 @@ export const api = {
 };
 
 export type ParseResult = { raw_text_excerpt?: string; display_name?: { value: string | null; status: string }; skills?: { value: string; evidence?: string; status: string }[]; experiences?: unknown[]; education?: unknown[]; source?: string };
-export type Profile = { id: string; status: 'draft' | 'confirmed' | 'published'; content: Record<string, unknown>; public_slug?: string | null };
+export type Profile = { id: string; status: 'draft' | 'confirmed' | 'published'; display_name?: string | null; content: Record<string, unknown>; public_slug?: string | null };

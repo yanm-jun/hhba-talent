@@ -175,6 +175,11 @@ def consent(typ:str,x:ConsentIn,r:Request,a=Depends(csrf),s:Session=Depends(db))
   p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
   if p:p.status='confirmed';p.public_slug=None;p.published_at=None
  audit(s,r,'consent.change','success',f'consent:{typ}',a[0].id,{'granted':x.granted});s.commit();return {'consent_type':typ,'granted':x.granted}
+@app.get('/api/v1/me/consents')
+def my_consents(a=Depends(auth),s:Session=Depends(db)):
+ rows=s.scalars(select(Consent).where(Consent.user_id==a[0].id)).all()
+ values={row.consent_type:row.granted for row in rows}
+ return {'enterprise_search':values.get('enterprise_search',False),'public_share':values.get('public_share',False),'search_engine_index':values.get('search_engine_index',False)}
 @app.get('/api/v1/admin/audit-events')
 def events(a=Depends(auth),s:Session=Depends(db)):
  if a[0].role!='admin':raise HTTPException(403,'administrator role required')
@@ -188,6 +193,14 @@ async def upload_resume(r:Request,file:UploadFile=File(...),a=Depends(csrf),s:Se
  if (ext=='.pdf' and not data.startswith(b'%PDF-')) or (ext=='.docx' and not data.startswith(b'PK')): raise HTTPException(422,'file signature does not match extension')
  os.makedirs(UPLOAD_ROOT,exist_ok=True); key=uuid4().hex+ext; path=os.path.join(UPLOAD_ROOT,key); open(path,'wb').write(data)
  resume=Resume(owner_user_id=a[0].id,storage_key=key,original_filename=name,mime_type='application/pdf' if ext=='.pdf' else 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',size_bytes=len(data),sha256=hashlib.sha256(data).hexdigest(),status='uploaded');s.add(resume);s.flush();job=ParseJob(resume_id=resume.id,state='uploaded');s.add(job);audit(s,r,'resume.upload','success',f'resume:{resume.id}',a[0].id);s.commit();return {'resume_id':str(resume.id),'job_id':str(job.id),'state':'uploaded'}
+@app.get('/api/v1/me/resumes')
+def list_resumes(a=Depends(auth),s:Session=Depends(db)):
+ rows=s.scalars(select(Resume).where(Resume.owner_user_id==a[0].id).order_by(Resume.created_at.desc())).all()
+ items=[]
+ for x in rows:
+  j=s.scalar(select(ParseJob).where(ParseJob.resume_id==x.id))
+  items.append({'resume_id':str(x.id),'filename':x.original_filename,'status':x.status,'job_id':str(j.id) if j else None,'job_state':j.state if j else None,'created_at':x.created_at})
+ return {'items':items}
 @app.get('/api/v1/me/resumes/{rid}')
 def resume_status(rid:UUID,a=Depends(auth),s:Session=Depends(db)):
  x=s.get(Resume,rid)
@@ -237,7 +250,7 @@ class ProfileIn(BaseModel): content:dict; display_name:str|None=None
 class DetailIn(BaseModel): items:list[dict]
 @app.get('/api/v1/me/profile')
 def my_profile(a=Depends(auth),s:Session=Depends(db)):
- p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id));return {'profile':None if not p else {'id':str(p.id),'status':p.status,'content':p.content_json,'public_slug':p.public_slug}}
+ p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id));return {'profile':None if not p else {'id':str(p.id),'status':p.status,'display_name':p.display_name,'content':p.content_json,'public_slug':p.public_slug}}
 @app.put('/api/v1/me/profile')
 def save_profile(x:ProfileIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id)) or Profile(owner_user_id=a[0].id);p.content_json=x.content;p.display_name=x.display_name;p.status='draft';s.add(p);audit(s,r,'profile.save','success','profile',a[0].id);s.commit();return {'status':'draft'}
