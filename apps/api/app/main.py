@@ -63,7 +63,7 @@ class VerificationDocument(Base):
 class VerificationEvidenceSnapshot(Base):
  __tablename__='verification_evidence_snapshots'; __table_args__=(UniqueConstraint('organization_id','evidence_version',name='uq_verification_evidence_version'),); id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); evidence_version: Mapped[int]=mapped_column(Integer); manifest: Mapped[dict]=mapped_column(JSON); manifest_sha256: Mapped[str]=mapped_column(String(64)); submitted_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class VerificationReview(Base):
- __tablename__='verification_reviews'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); reviewer_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); outcome: Mapped[str]=mapped_column(String(32)); reason_code: Mapped[str]=mapped_column(String(80)); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+ __tablename__='verification_reviews'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); reviewer_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); evidence_version: Mapped[int]=mapped_column(Integer); evidence_snapshot_id: Mapped[UUID]=mapped_column(ForeignKey('verification_evidence_snapshots.id')); evidence_manifest_sha256: Mapped[str]=mapped_column(String(64)); outcome: Mapped[str]=mapped_column(String(32)); reason_code: Mapped[str]=mapped_column(String(80)); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class PlatformServiceGate(Base):
  __tablename__='platform_service_gates'; gate_key: Mapped[str]=mapped_column(String(64),primary_key=True); enabled: Mapped[bool]=mapped_column(Boolean,default=False); reviewed_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); reviewed_by: Mapped[UUID|None]=mapped_column(ForeignKey('users.id')); reason_code: Mapped[str|None]=mapped_column(String(80))
 DATABASE_URL=os.getenv('DATABASE_URL','postgresql+psycopg://hhba_app:CHANGE_ME_LOCAL_ONLY@127.0.0.1:5432/hhba_dev')
@@ -164,7 +164,7 @@ def require_recruitment_permission(s,oid,user_id,permission):
  member,org,org_ver,recruiter,authorization=recruiter_context(s,oid,user_id)
  base=bool(member and member.status=='active' and has_identity(s,user_id,'recruiter') and authorization and authorization.status in {'draft','active'} and authorization.role in RECRUITER_ROLES and (not authorization.expires_at or comparable_time(authorization.expires_at)>now()))
  if permission=='manage_drafts': return base
- if permission in {'manage_members','review_verification'}: return bool(base and authorization and authorization.status=='active' and verification_is_current(org_ver) and verification_is_current(recruiter) and authorization.role in {'organization_owner','recruitment_admin'})
+ if permission in {'manage_members','review_verification'}: return bool(base and org and org.status=='approved' and authorization and authorization.status=='active' and verification_is_current(org_ver) and verification_is_current(recruiter) and authorization.role in {'organization_owner','recruitment_admin'})
  if permission in {'talent_search','restricted_access'}:
   gate=s.get(PlatformServiceGate,'network_recruitment')
   return bool(base and gate and gate.enabled and org and org.status=='approved' and verification_is_current(org_ver) and verification_is_current(recruiter) and authorization and authorization.status=='active')
@@ -190,15 +190,16 @@ def recruiter_verification(oid:UUID,a=Depends(auth),s:Session=Depends(db)):
 def save_recruiter_verification(oid:UUID,x:VerificationIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if not verification_owner(s,oid,a[0].id):raise HTTPException(404,'resource not found')
  if x.recruitment_subject_type=='agency':raise HTTPException(403,'agency verification is not open in this version')
- row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid));person=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==a[0].id))
- if not row or not person or row.status in {'approved','suspended'}:raise HTTPException(409,'verification cannot be edited in its current state')
+ row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid).with_for_update());person=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==a[0].id).with_for_update())
+ if not row or not person or row.status not in {'draft','need_more_info','rejected'}:raise HTTPException(409,'verification cannot be edited in its current state')
  credit_code=x.credit_code.upper()
  # A legal entity cannot have two concurrent verification applications.  Do
  # not infer ownership from the code; instead reject the duplicate and make
  # it visible to an internal reviewer through the audit trail.
  duplicate=s.scalar(select(OrganizationVerification).where(OrganizationVerification.credit_code==credit_code,OrganizationVerification.organization_id!=oid,OrganizationVerification.status.in_(['draft','submitted','need_more_info','approved'])))
  if duplicate: raise HTTPException(409,'an active verification already exists for this credit code')
- row.legal_name=x.legal_name;row.credit_code=credit_code;row.registered_location=x.registered_location;row.recruitment_subject_type=x.recruitment_subject_type;row.status='draft';row.version+=1;row.updated_at=now();person.real_name=x.real_name;person.job_title=x.job_title;person.status='draft';person.updated_at=now();audit(s,r,'verification.save','success',f'organization:{oid}',a[0].id);s.commit();return verification_view(row,[])
+ if row.status in {'need_more_info','rejected'}: row.version+=1
+ row.legal_name=x.legal_name;row.credit_code=credit_code;row.registered_location=x.registered_location;row.recruitment_subject_type=x.recruitment_subject_type;row.status='draft';row.updated_at=now();person.real_name=x.real_name;person.job_title=x.job_title;person.status='draft';person.updated_at=now();audit(s,r,'verification.save','success',f'organization:{oid}',a[0].id,{'version':row.version});s.commit();return verification_view(row,[])
 @app.post('/api/v1/recruiter/organizations/{oid}/verification/documents',status_code=201)
 async def upload_verification_document(oid:UUID,document_type:str,r:Request,file:UploadFile=File(...),a=Depends(csrf),s:Session=Depends(db)):
  if document_type not in {'business_license','authorization_letter'}:raise HTTPException(422,'unsupported verification document type')
@@ -275,13 +276,15 @@ def review_verification(oid:UUID,x:VerificationReviewIn,r:Request,a=Depends(csrf
  if row.status not in {'submitted','need_more_info'}:raise HTTPException(409,'verification is not awaiting review')
  recruiter=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==row.applicant_user_id).with_for_update());authorization=s.scalar(select(RecruiterOrganizationAuthorization).where(RecruiterOrganizationAuthorization.organization_id==oid,RecruiterOrganizationAuthorization.user_id==row.applicant_user_id).with_for_update());snapshot=s.scalar(select(VerificationEvidenceSnapshot).where(VerificationEvidenceSnapshot.organization_id==oid,VerificationEvidenceSnapshot.evidence_version==row.version))
  if not recruiter or not authorization or not snapshot:raise HTTPException(409,'fixed evidence snapshot and verification linkage are required')
+ manifest=json.dumps(snapshot.manifest,sort_keys=True,separators=(',',':'))
+ if hashlib.sha256(manifest.encode()).hexdigest()!=snapshot.manifest_sha256:raise HTTPException(409,'evidence snapshot integrity check failed')
  outcome=x.status;at=now();row.status=outcome;row.reviewed_at=at;row.reviewed_by=a[0].id;row.review_reason_code=x.reason_code;row.updated_at=at
  recruiter.status=outcome;recruiter.reviewed_at=at;recruiter.reviewed_by=a[0].id;recruiter.review_reason_code=x.reason_code;recruiter.updated_at=at
  if outcome=='approved':
   due=at+timedelta(days=x.valid_days);row.verified_at=at;row.next_review_due_at=due;recruiter.verified_at=at;recruiter.next_review_due_at=due;authorization.status='active';authorization.granted_at=at;org_row.status='approved';org_row.reviewed_at=at;org_row.reviewed_by=a[0].id
  elif outcome=='suspended': org_row.status='suspended';row.suspended_at=at;authorization.status='revoked';authorization.revoked_at=at
  else: authorization.status='draft';org_row.status='pending_review'
- s.add(VerificationReview(organization_id=oid,reviewer_user_id=a[0].id,outcome=outcome,reason_code=x.reason_code));audit(s,r,'verification.review','success',f'organization:{oid}',a[0].id,{'outcome':outcome,'reason_code':x.reason_code});s.commit();return {'status':outcome,'organization_status':org_row.status}
+ s.add(VerificationReview(organization_id=oid,reviewer_user_id=a[0].id,evidence_version=row.version,evidence_snapshot_id=snapshot.id,evidence_manifest_sha256=snapshot.manifest_sha256,outcome=outcome,reason_code=x.reason_code));audit(s,r,'verification.review','success',f'organization:{oid}',a[0].id,{'outcome':outcome,'reason_code':x.reason_code,'version':row.version});s.commit();return {'status':outcome,'organization_status':org_row.status}
 @app.put('/api/v1/admin/platform-service-gates/network-recruitment')
 def set_network_recruitment_gate(x:GateIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if a[0].role!='admin':raise HTTPException(403,'administrator role required')
