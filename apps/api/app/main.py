@@ -147,6 +147,12 @@ def register_recruiter(x:Register,r:Request,s:Session=Depends(db)):
  return reg(Register(email=x.email,password=x.password,display_name=x.display_name,account_type='recruiter'),r,s)
 def has_identity(s,user_id,identity_type):
  return bool(s.scalar(select(BusinessIdentity).where(BusinessIdentity.user_id==user_id,BusinessIdentity.identity_type==identity_type,BusinessIdentity.status=='active')))
+def candidate_auth(a=Depends(auth),s:Session=Depends(db)):
+ if not has_identity(s,a[0].id,'candidate'):raise HTTPException(403,'candidate identity required')
+ return a
+def candidate_csrf(a=Depends(csrf),s:Session=Depends(db)):
+ if not has_identity(s,a[0].id,'candidate'):raise HTTPException(403,'candidate identity required')
+ return a
 def verification_is_current(row):
  return bool(row and row.status=='approved' and (not row.next_review_due_at or comparable_time(row.next_review_due_at)>now()))
 RECRUITER_ROLES={'organization_owner','recruitment_admin','recruiter'}
@@ -416,7 +422,7 @@ def patch_requirement(oid:UUID,rid:UUID,x:RequirementPatch,r:Request,a=Depends(c
  for key,value in x.model_dump(exclude_unset=True).items():setattr(requirement,key,value)
  requirement.updated_at=now();audit(s,r,'hiring_requirement.update','success',f'hiring_requirement:{rid}',a[0].id,{'organization_id':str(oid)});s.commit();return requirement_view(requirement)
 @app.put('/api/v1/me/consents/{typ}')
-def consent(typ:str,x:ConsentIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def consent(typ:str,x:ConsentIn,r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  if typ not in {'enterprise_search','public_share','search_engine_index'}:raise HTTPException(404,'resource not found')
  if s.bind.dialect.name=='postgresql':
   c=s.execute(pg_insert(Consent).values(user_id=a[0].id,consent_type=typ,granted=x.granted,changed_at=now()).on_conflict_do_update(index_elements=['user_id','consent_type'],set_={'granted':x.granted,'changed_at':now()}).returning(Consent)).scalar_one()
@@ -430,7 +436,7 @@ def consent(typ:str,x:ConsentIn,r:Request,a=Depends(csrf),s:Session=Depends(db))
   if p: sync_search_projection(s,p)
  audit(s,r,'consent.change','success',f'consent:{typ}',a[0].id,{'granted':x.granted});s.commit();return {'consent_type':typ,'granted':x.granted}
 @app.get('/api/v1/me/consents')
-def my_consents(a=Depends(auth),s:Session=Depends(db)):
+def my_consents(a=Depends(candidate_auth),s:Session=Depends(db)):
  rows=s.scalars(select(Consent).where(Consent.user_id==a[0].id)).all()
  values={row.consent_type:row.granted for row in rows}
  return {'enterprise_search':values.get('enterprise_search',False),'public_share':values.get('public_share',False),'search_engine_index':values.get('search_engine_index',False)}
@@ -441,14 +447,14 @@ def events(a=Depends(auth),s:Session=Depends(db)):
 UPLOAD_ROOT=os.path.abspath(os.getenv('HHBA_UPLOAD_ROOT','./private_uploads'))
 MAX_PARSE_ATTEMPTS=int(os.getenv('HHBA_PARSE_MAX_ATTEMPTS','3'))
 @app.post('/api/v1/me/resumes',status_code=201)
-async def upload_resume(r:Request,file:UploadFile=File(...),a=Depends(csrf),s:Session=Depends(db)):
+async def upload_resume(r:Request,file:UploadFile=File(...),a=Depends(candidate_csrf),s:Session=Depends(db)):
  name=os.path.basename(file.filename or ''); ext=os.path.splitext(name)[1].lower(); data=await file.read()
  if ext not in {'.pdf','.docx'} or len(data)==0 or len(data)>10*1024*1024: raise HTTPException(422,'unsupported or oversized document')
  if (ext=='.pdf' and not data.startswith(b'%PDF-')) or (ext=='.docx' and not data.startswith(b'PK')): raise HTTPException(422,'file signature does not match extension')
  os.makedirs(UPLOAD_ROOT,exist_ok=True); key=uuid4().hex+ext; path=os.path.join(UPLOAD_ROOT,key); open(path,'wb').write(data)
  resume=Resume(owner_user_id=a[0].id,storage_key=key,original_filename=name,mime_type='application/pdf' if ext=='.pdf' else 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',size_bytes=len(data),sha256=hashlib.sha256(data).hexdigest(),status='uploaded');s.add(resume);s.flush();job=ParseJob(resume_id=resume.id,state='uploaded');s.add(job);audit(s,r,'resume.upload','success',f'resume:{resume.id}',a[0].id);s.commit();return {'resume_id':str(resume.id),'job_id':str(job.id),'state':'uploaded'}
 @app.get('/api/v1/me/resumes')
-def list_resumes(a=Depends(auth),s:Session=Depends(db)):
+def list_resumes(a=Depends(candidate_auth),s:Session=Depends(db)):
  rows=s.scalars(select(Resume).where(Resume.owner_user_id==a[0].id).order_by(Resume.created_at.desc())).all()
  items=[]
  for x in rows:
@@ -456,19 +462,19 @@ def list_resumes(a=Depends(auth),s:Session=Depends(db)):
   items.append({'resume_id':str(x.id),'filename':x.original_filename,'status':x.status,'job_id':str(j.id) if j else None,'job_state':j.state if j else None,'created_at':x.created_at})
  return {'items':items}
 @app.get('/api/v1/me/resumes/{rid}')
-def resume_status(rid:UUID,a=Depends(auth),s:Session=Depends(db)):
+def resume_status(rid:UUID,a=Depends(candidate_auth),s:Session=Depends(db)):
  x=s.get(Resume,rid)
  if not x or x.owner_user_id!=a[0].id:raise HTTPException(404,'resource not found')
  j=s.scalar(select(ParseJob).where(ParseJob.resume_id==rid));return {'resume_id':str(x.id),'filename':x.original_filename,'status':x.status,'job_id':str(j.id) if j else None,'job_state':j.state if j else None,'attempt_count':j.attempt_count if j else 0,'error':j.error_safe_message if j else None,'result':j.result_json if j and j.state=='parsed' else None}
 @app.get('/api/v1/me/resumes/{rid}/download')
-def download_resume(rid:UUID,a=Depends(auth),s:Session=Depends(db)):
+def download_resume(rid:UUID,a=Depends(candidate_auth),s:Session=Depends(db)):
  x=s.get(Resume,rid)
  if not x or x.owner_user_id!=a[0].id:raise HTTPException(404,'resource not found')
  path=os.path.join(UPLOAD_ROOT,x.storage_key)
  if not os.path.isfile(path):raise HTTPException(404,'resource not found')
  return FileResponse(path,media_type=x.mime_type,filename=x.original_filename,headers={'Cache-Control':'no-store'})
 @app.post('/api/v1/me/resumes/{rid}/parse')
-def parse_resume(rid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def parse_resume(rid:UUID,r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  x=s.get(Resume,rid)
  if not x or x.owner_user_id!=a[0].id:raise HTTPException(404,'resource not found')
  j=s.scalar(select(ParseJob).where(ParseJob.resume_id==rid))
@@ -476,7 +482,7 @@ def parse_resume(rid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if j.attempt_count>=MAX_PARSE_ATTEMPTS:raise HTTPException(409,'maximum parsing attempts reached')
  j.state='queued';j.error_code=None;j.error_safe_message=None;j.cancel_requested=False;j.updated_at=now();x.status='queued';audit(s,r,'resume.parse.queued','success',f'resume:{rid}',a[0].id);s.commit();return {'job_id':str(j.id),'state':j.state,'attempt_count':j.attempt_count}
 @app.post('/api/v1/me/resumes/{rid}/retry-parse')
-def retry_parse(rid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def retry_parse(rid:UUID,r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  x=s.get(Resume,rid)
  if not x or x.owner_user_id!=a[0].id:raise HTTPException(404,'resource not found')
  old=s.scalar(select(ParseJob).where(ParseJob.resume_id==rid))
@@ -485,14 +491,14 @@ def retry_parse(rid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if old:old.state='queued';old.error_code=None;old.error_safe_message=None;old.result_json=None;old.cancel_requested=False;old.updated_at=now();x.status='queued'
  audit(s,r,'resume.parse.retry','success',f'resume:{rid}',a[0].id);s.commit();return {'resume_id':str(rid),'state':'uploaded'}
 @app.post('/api/v1/me/parsing-jobs/{jid}/apply-draft')
-def apply_parse_draft(jid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def apply_parse_draft(jid:UUID,r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  j=s.get(ParseJob,jid)
  resume=s.get(Resume,j.resume_id) if j else None
  if not j or not resume or resume.owner_user_id!=a[0].id or j.state!='parsed':raise HTTPException(404,'resource not found')
  result=j.result_json or {};content={'headline':'待用户确认','skills':[x.get('value') for x in result.get('skills',[]) if x.get('value')],'experiences':result.get('experiences',[]),'education':result.get('education',[]),'projects':[],'services':[],'source_evidence':result.get('raw_text_excerpt','')[:4000]}
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id)) or Profile(owner_user_id=a[0].id);p.content_json=content;p.display_name=None;p.status='draft';p.updated_at=now();s.add(p);s.flush();remove_projection(s,p.id);audit(s,r,'profile.apply_parse_draft','success',f'parse_job:{jid}',a[0].id);s.commit();return {'status':'draft','profile':content}
 @app.delete('/api/v1/me/resumes/{rid}')
-def delete_resume(rid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def delete_resume(rid:UUID,r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  x=s.get(Resume,rid)
  if not x or x.owner_user_id!=a[0].id:raise HTTPException(404,'resource not found')
  p=os.path.join(UPLOAD_ROOT,x.storage_key)
@@ -503,10 +509,10 @@ def delete_resume(rid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
 class ProfileIn(BaseModel): content:dict; display_name:str|None=None
 class DetailIn(BaseModel): items:list[dict]
 @app.get('/api/v1/me/profile')
-def my_profile(a=Depends(auth),s:Session=Depends(db)):
+def my_profile(a=Depends(candidate_auth),s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id));return {'profile':None if not p else {'id':str(p.id),'status':p.status,'display_name':p.display_name,'content':p.content_json,'public_slug':p.public_slug}}
 @app.get('/api/v1/me/profile/enterprise-preview')
-def enterprise_profile_preview(a=Depends(auth),s:Session=Depends(db)):
+def enterprise_profile_preview(a=Depends(candidate_auth),s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
  if not p:return {'eligible':False,'fields':None}
  # This route is owner-only and deliberately does not create a projection before
@@ -514,16 +520,16 @@ def enterprise_profile_preview(a=Depends(auth),s:Session=Depends(db)):
  values=projection_values(s,p)
  return {'eligible':p.status in SEARCHABLE_PROFILE_STATUSES,'fields':values}
 @app.put('/api/v1/me/profile')
-def save_profile(x:ProfileIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def save_profile(x:ProfileIn,r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id)) or Profile(owner_user_id=a[0].id);p.content_json=x.content;p.display_name=x.display_name;p.status='draft';s.add(p);s.flush();remove_projection(s,p.id);audit(s,r,'profile.save','success','profile',a[0].id);s.commit();return {'status':'draft'}
 DETAILS={'experiences':Experience,'educations':Education,'projects':Project,'service-intents':ServiceIntent}
 @app.get('/api/v1/me/profile/{kind}')
-def list_details(kind:str,a=Depends(auth),s:Session=Depends(db)):
+def list_details(kind:str,a=Depends(candidate_auth),s:Session=Depends(db)):
  model=DETAILS.get(kind);p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
  if not model or not p: return {'items':[]}
  return {'items':[{k:v for k,v in row.__dict__.items() if not k.startswith('_')} for row in s.scalars(select(model).where(model.profile_id==p.id))]}
 @app.put('/api/v1/me/profile/{kind}')
-def replace_details(kind:str,x:DetailIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def replace_details(kind:str,x:DetailIn,r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  model=DETAILS.get(kind);p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
  if not model or not p:raise HTTPException(404,'profile not found')
  s.query(model).filter_by(profile_id=p.id).delete()
@@ -531,7 +537,7 @@ def replace_details(kind:str,x:DetailIn,r:Request,a=Depends(csrf),s:Session=Depe
  for item in x.items:s.add(model(profile_id=p.id,**{k:v for k,v in item.items() if k in allowed}))
  p.status='draft';remove_projection(s,p.id);audit(s,r,'profile.details.replace','success',f'profile:{p.id}',a[0].id,{'kind':kind});s.commit();return {'count':len(x.items),'status':'draft'}
 @app.post('/api/v1/me/profile/confirm')
-def confirm_profile(r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def confirm_profile(r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
  if not p:raise HTTPException(404,'profile not found')
  n=s.query(ProfileVersion).filter_by(profile_id=p.id).count()+1;s.add(ProfileVersion(profile_id=p.id,version=n,content_json=p.content_json));p.status='confirmed';p.updated_at=now();s.flush();sync_search_projection(s,p);audit(s,r,'profile.confirm','success',f'profile:{p.id}',a[0].id);s.commit();return {'status':p.status,'version':n}
