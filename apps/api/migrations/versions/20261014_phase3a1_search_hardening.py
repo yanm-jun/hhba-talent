@@ -5,6 +5,7 @@ Revises: 20261014_phase3a_talent_search
 """
 from alembic import op
 import sqlalchemy as sa
+from uuid import uuid4
 
 revision = '20261014_phase3a1_hardening'
 down_revision = '20261014_phase3a_talent_search'
@@ -66,12 +67,11 @@ def upgrade():
     op.create_unique_constraint('uq_consents_user_type', 'consents', ['user_id', 'consent_type'])
 
     op.add_column('candidate_search_projections', sa.Column('candidate_ref', sa.String(32), nullable=True))
-    if bind.dialect.name == 'postgresql':
-        op.execute("UPDATE candidate_search_projections SET candidate_ref = md5(profile_id::text) WHERE candidate_ref IS NULL")
-    else:
-        # Generic migration execution is not an acceptance target; development
-        # PostgreSQL always uses the opaque md5 UUID representation above.
-        bind.execute(sa.text("UPDATE candidate_search_projections SET candidate_ref = lower(hex(randomblob(16))) WHERE candidate_ref IS NULL"))
+    # `candidate_ref` is an external identifier and must not be a deterministic
+    # transform of an internal UUID.  Generate opaque values in the migration
+    # process so this remains portable across PostgreSQL and SQLite tooling.
+    for (projection_id,) in bind.execute(sa.text("SELECT id FROM candidate_search_projections WHERE candidate_ref IS NULL")).fetchall():
+        bind.execute(sa.text("UPDATE candidate_search_projections SET candidate_ref = :candidate_ref WHERE id = :id"), {'candidate_ref': uuid4().hex, 'id': projection_id})
     op.alter_column('candidate_search_projections', 'candidate_ref', nullable=False)
     op.create_unique_constraint('uq_candidate_search_projection_ref', 'candidate_search_projections', ['candidate_ref'])
     op.create_index('ix_candidate_search_projections_candidate_ref', 'candidate_search_projections', ['candidate_ref'])

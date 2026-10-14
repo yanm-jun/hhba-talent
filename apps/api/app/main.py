@@ -163,10 +163,21 @@ def active_membership(oid:UUID,user_id:UUID,s:Session):
 SEARCHABLE_PROFILE_STATUSES=('confirmed','published')
 SYNONYM_GROUPS=(('经销商运营','汽车门店运营'),('销售培训','销售人员培训'),('新能源车销售','新能源汽车销售'))
 def normalized(value): return str(value or '').strip().casefold()
-SENSITIVE_TEXT=re.compile(r'(?i)(?:\b[\w.+-]+@[\w-]+\.[\w.-]+\b|(?<!\d)1[3-9]\d{9}(?!\d)|\b\d{15,18}[0-9xX]\b|(?:微信|wechat|vx)\s*[:：]?\s*[\w-]{5,}|(?:电话|手机号|邮箱)\s*[:：]?\s*[^\s，。；;]{3,})')
-PRIVATE_ADDRESS_MARKERS=re.compile(r'(?:\d{3,}|(?:路|街|巷|弄|号|室|栋|单元|门牌))')
+SENSITIVE_TEXT=re.compile(r'(?ix)(?:\b[\w.+-]+\s*@\s*[\w-]+\s*(?:\.\s*[\w-]+)+\b|(?<!\d)1\s*[3-9](?:\s*\d){9}(?!\d)|\b\d{15,18}[0-9xX]\b|(?:微信|wechat|vx)\s*(?:号|id)?\s*[:：]?\s*[\w-]{5,}|(?:电话|手机号|邮箱|email)\s*[:：]?\s*[^\s，。；;]{3,})')
+# A city/province is useful for matching.  A street number, unit, or a city
+# followed by a street-level address is not part of HHBA's enterprise/public
+# disclosure allow-list.  This is a reject rule, not a promise of exhaustive
+# PII detection; owners must still review the server-generated preview.
+PRIVATE_ADDRESS_MARKERS=re.compile(r'(?:[\u4e00-\u9fffA-Za-z0-9]{1,24}(?:路|街|巷|弄)\s*(?:\d+|[一二三四五六七八九十]+号?)|(?:\d+|[一二三四五六七八九十]+)\s*(?:号|室|栋|单元|门牌)|(?:省|市|区|县).{0,32}(?:路|街|巷|弄|号|室|栋|单元|门牌))')
 def safe_projection_text(value,limit):
- value=SENSITIVE_TEXT.sub('[已隐藏私人联系方式]',str(value or '')).strip()
+ """Return an allow-listed disclosure value or reject the complete field.
+
+ Contact/address fragments are not redacted in-place: retaining surrounding
+ free text is too easy to get wrong.  This deliberately conservative guard is
+ shared by enterprise projections and public-card fields.
+ """
+ value=str(value or '').strip()
+ if not value or SENSITIVE_TEXT.search(value) or PRIVATE_ADDRESS_MARKERS.search(value):return ''
  return value[:limit]
 def safe_region(value):
  value=safe_projection_text(value,80)
@@ -177,7 +188,7 @@ def string_list(value):
  if isinstance(value,list): values=value
  elif value: values=[value]
  else: values=[]
- return [safe_projection_text(normalized(x),80) for x in values if normalized(x) and not SENSITIVE_TEXT.search(str(x))]
+ return [item for item in (safe_projection_text(normalized(x),80) for x in values if normalized(x)) if item]
 def delimited(values): return ''.join(f'|{x}|' for x in dict.fromkeys(string_list(values)))
 def expand_synonym(value):
  value=normalized(value)
@@ -395,7 +406,11 @@ def withdraw_profile(r:Request,a=Depends(csrf),s:Session=Depends(db)):
 def public_profile(slug:str,s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.public_slug==slug,Profile.status=='published'))
  if not p:raise HTTPException(404,'profile not found')
- c=p.content_json or {}; return {'display_name':p.display_name,'headline':c.get('headline'),'skills':c.get('skills',[]),'services':c.get('services',[]),'updated_at':p.updated_at}
+ # Public cards use the same conservative field-level disclosure guard as
+ # enterprise projections.  Public-share consent is not permission to expose
+ # contact details or a precise home/work address accidentally pasted into a
+ # free-text field.
+ c=p.content_json or {}; return {'display_name':safe_projection_text(p.display_name,100) or None,'headline':safe_projection_text(c.get('headline'),300) or None,'skills':string_list(c.get('skills')),'services':string_list(c.get('services')),'updated_at':p.updated_at}
 
 def safe_like(value): return '%' + normalized(value).replace('\\','\\\\').replace('%','\\%').replace('_','\\_') + '%'
 def delimited_match(column,value): return or_(*[column.contains(f'|{term}|',autoescape=True) for term in expand_synonym(value)])
@@ -408,7 +423,7 @@ def search_reasons(row,query):
  if query.industry and any(term in industries for term in expand_synonym(query.industry)):reasons.append({'field':'industry','value':normalized(query.industry),'expanded':False})
  if query.region and any(term in regions for term in expand_synonym(query.region)):reasons.append({'field':'region','value':normalized(query.region),'expanded':False})
  if query.work_mode and any(term in modes for term in expand_synonym(query.work_mode)):reasons.append({'field':'work_mode','value':normalized(query.work_mode),'expanded':False})
- if row.work_years is not None and ((query.work_years_min is not None and row.work_years>=query.work_years_min) or (query.work_years_max is not None and row.work_years<=query.work_years_max)):reasons.append({'field':'work_years','value':row.work_years,'expanded':False})
+ if row.work_years is not None and (query.work_years_min is None or row.work_years>=query.work_years_min) and (query.work_years_max is None or row.work_years<=query.work_years_max):reasons.append({'field':'work_years','value':row.work_years,'expanded':False})
  if query.keywords and any(term in normalized(row.search_text) for term in expand_synonym(query.keywords)):reasons.append({'field':'capability','value':normalized(query.keywords),'expanded':False})
  return reasons
 def candidate_card(row,reasons):
@@ -432,14 +447,13 @@ def talent_search(oid:UUID,x:TalentSearchIn,r:Request,a=Depends(csrf),s:Session=
  if x.work_years_min is not None:stmt=stmt.where(CandidateSearchProjection.work_years>=x.work_years_min)
  if x.work_years_max is not None:stmt=stmt.where(CandidateSearchProjection.work_years<=x.work_years_max)
  if x.keywords:stmt=stmt.where(text_match(CandidateSearchProjection.search_text,x.keywords))
- # Order before pagination. Do not re-sort this bounded SQL page in Python: doing
- # so changes the global order and can duplicate candidates across pages.
- rows=s.scalars(stmt.order_by(CandidateSearchProjection.indexed_at.asc(),CandidateSearchProjection.profile_id.asc()).offset((x.page-1)*x.page_size).limit(x.page_size+1)).all();ranked=[]
- for row in rows:
-  reasons=search_reasons(row,x)
-  if reasons:ranked.append((len(reasons),row,reasons))
- window=ranked[:x.page_size];payload={'items':[candidate_card(row,reasons) for _,row,reasons in window],'page':x.page,'page_size':x.page_size,'has_more':len(ranked)>x.page_size}
- query_hash=hashlib.sha256(json.dumps(x.model_dump(),sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:16];audit(s,r,'talent_search','success',f'organization:{oid}',a[0].id,{'query_hash':query_hash,'result_bucket':'0' if not ranked else '1-10' if len(ranked)<=10 else '11+','page':x.page});s.commit();return payload
+ # SQL owns filtering, stable ordering, and pagination.  Do not discard or
+ # re-rank rows after applying OFFSET/LIMIT: that would make has_more and page
+ # boundaries inconsistent.  search_reasons is explanation-only and mirrors
+ # the predicates above.
+ rows=s.scalars(stmt.order_by(CandidateSearchProjection.indexed_at.asc(),CandidateSearchProjection.profile_id.asc()).offset((x.page-1)*x.page_size).limit(x.page_size+1)).all()
+ window=rows[:x.page_size];payload={'items':[candidate_card(row,search_reasons(row,x)) for row in window],'page':x.page,'page_size':x.page_size,'has_more':len(rows)>x.page_size}
+ query_hash=hashlib.sha256(json.dumps(x.model_dump(),sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:16];audit(s,r,'talent_search','success',f'organization:{oid}',a[0].id,{'query_hash':query_hash,'result_bucket':'0' if not window else '1-10' if len(window)<=10 else '11+','page':x.page});s.commit();return payload
 @app.post('/api/v1/admin/talent-search/rebuild')
 def rebuild_talent_search(r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if a[0].role!='admin':raise HTTPException(403,'administrator role required')
