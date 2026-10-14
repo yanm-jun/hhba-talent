@@ -48,6 +48,11 @@ def test_expired_lease_is_recovered_or_fails_at_the_retry_limit():
     assert session.get(ParseJob, recoverable).state == 'queued'
     exhausted_row = session.get(ParseJob, exhausted)
     assert exhausted_row.state == 'failed' and exhausted_row.error_code == 'WORKER_LEASE_EXPIRED'
+    # Keep this shared synthetic SQLite process clean for later document tests.
+    # The assertion above verifies recovery; leaving a deliberately recovered
+    # queue item would make an unrelated test worker claim the wrong task.
+    session.get(ParseJob, recoverable).state = 'cancelled'
+    session.commit()
     session.close()
 
 

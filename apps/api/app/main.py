@@ -1,13 +1,13 @@
 """Phase 1 identity, organization, consent and audit API."""
-import hashlib, os, secrets
-from datetime import datetime, timedelta, timezone
+import hashlib, json, os, secrets
+from datetime import date, datetime, timedelta, timezone
 from uuid import UUID, uuid4
 from fastapi import FastAPI, Depends, HTTPException, Request, Response, UploadFile, File
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr, Field
 from pwdlib import PasswordHash
-from sqlalchemy import Boolean, DateTime, ForeignKey, JSON, String, Text, create_engine, select
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, JSON, String, Text, UniqueConstraint, and_, create_engine, func, or_, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 def now(): return datetime.now(timezone.utc)
 def comparable_time(value): return value.replace(tzinfo=timezone.utc) if value and value.tzinfo is None else value
@@ -45,6 +45,10 @@ class ServiceIntent(ProfileDetail):
  __tablename__='profile_service_intents';service_name: Mapped[str]=mapped_column(String(200));region: Mapped[str|None]=mapped_column(String(100));work_mode: Mapped[str|None]=mapped_column(String(64))
 class HiringRequirement(Base):
  __tablename__='hiring_requirements'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); created_by: Mapped[UUID]=mapped_column(ForeignKey('users.id')); title: Mapped[str]=mapped_column(String(160)); description: Mapped[str]=mapped_column(Text); location: Mapped[str|None]=mapped_column(String(120)); work_mode: Mapped[str|None]=mapped_column(String(64)); status: Mapped[str]=mapped_column(String(32),default='draft'); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+class CandidateSearchProjection(Base):
+ __tablename__='candidate_search_projections'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); profile_id: Mapped[UUID]=mapped_column(ForeignKey('profiles.id',ondelete='CASCADE'),unique=True,index=True); owner_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True); display_name: Mapped[str|None]=mapped_column(String(100)); headline: Mapped[str|None]=mapped_column(String(300)); capability_summary: Mapped[str|None]=mapped_column(Text); skills: Mapped[list]=mapped_column(JSON,default=list); industries: Mapped[list]=mapped_column(JSON,default=list); location: Mapped[str|None]=mapped_column(String(120)); service_regions: Mapped[list]=mapped_column(JSON,default=list); work_modes: Mapped[list]=mapped_column(JSON,default=list); work_years: Mapped[int|None]=mapped_column(Integer); project_summaries: Mapped[list]=mapped_column(JSON,default=list); skills_text: Mapped[str]=mapped_column(Text,default=''); industries_text: Mapped[str]=mapped_column(Text,default=''); regions_text: Mapped[str]=mapped_column(Text,default=''); work_modes_text: Mapped[str]=mapped_column(Text,default=''); search_text: Mapped[str]=mapped_column(Text,default=''); profile_version: Mapped[int]=mapped_column(Integer,default=0); indexed_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+class TalentSearchUsage(Base):
+ __tablename__='talent_search_usages'; __table_args__=(UniqueConstraint('organization_id','user_id','usage_date',name='uq_talent_search_usage_day'),); id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True); usage_date: Mapped[date]=mapped_column(Date); request_count: Mapped[int]=mapped_column(Integer,default=0); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 DATABASE_URL=os.getenv('DATABASE_URL','postgresql+psycopg://hhba_app:CHANGE_ME_LOCAL_ONLY@127.0.0.1:5432/hhba_dev')
 if DATABASE_URL.startswith('postgresql://'):DATABASE_URL='postgresql+psycopg://'+DATABASE_URL.removeprefix('postgresql://')
 engine=create_engine(DATABASE_URL,pool_pre_ping=True); SessionLocal=sessionmaker(bind=engine,expire_on_commit=False); pwd=PasswordHash.recommended(); app=FastAPI(title='HHBA API',version='0.1.0')
@@ -75,6 +79,16 @@ class RequirementIn(BaseModel):
  title:str=Field(min_length=1,max_length=160); description:str=Field(min_length=1,max_length=8000); location:str|None=Field(default=None,max_length=120); work_mode:str|None=Field(default=None,max_length=64); status:str=Field(default='draft',pattern='^(draft|archived)$')
 class RequirementPatch(BaseModel):
  title:str|None=Field(default=None,min_length=1,max_length=160); description:str|None=Field(default=None,min_length=1,max_length=8000); location:str|None=Field(default=None,max_length=120); work_mode:str|None=Field(default=None,max_length=64); status:str|None=Field(default=None,pattern='^(draft|archived)$')
+class TalentSearchIn(BaseModel):
+ keywords:str|None=Field(default=None,max_length=200)
+ skills:list[str]=Field(default_factory=list,max_length=8)
+ industry:str|None=Field(default=None,max_length=80)
+ region:str|None=Field(default=None,max_length=80)
+ work_mode:str|None=Field(default=None,max_length=64)
+ work_years_min:int|None=Field(default=None,ge=0,le=80)
+ work_years_max:int|None=Field(default=None,ge=0,le=80)
+ page:int=Field(default=1,ge=1,le=10)
+ page_size:int=Field(default=10,ge=1,le=10)
 @app.get('/healthz')
 def healthz(): return {'status':'ok','phase':'1'}
 @app.post('/api/v1/auth/register',status_code=201)
@@ -142,6 +156,57 @@ def restricted(oid:UUID,r:Request,a=Depends(auth),s:Session=Depends(db)):
  audit(s,r,'organization.restricted_access','success',f'organization:{oid}',a[0].id);s.commit();return {'restricted_access':True}
 def active_membership(oid:UUID,user_id:UUID,s:Session):
  return s.scalar(select(Membership).where(Membership.organization_id==oid,Membership.user_id==user_id,Membership.status=='active'))
+SEARCHABLE_PROFILE_STATUSES=('confirmed','published')
+SYNONYM_GROUPS=(('经销商运营','汽车门店运营'),('销售培训','销售人员培训'),('新能源车销售','新能源汽车销售'))
+def normalized(value): return str(value or '').strip().casefold()
+def string_list(value):
+ if isinstance(value,list): values=value
+ elif value: values=[value]
+ else: values=[]
+ return [normalized(x) for x in values if normalized(x)]
+def delimited(values): return ''.join(f'|{x}|' for x in dict.fromkeys(string_list(values)))
+def expand_synonym(value):
+ value=normalized(value)
+ for group in SYNONYM_GROUPS:
+  if value in group:return tuple(group)
+ return (value,)
+def granted_enterprise_search(s,user_id):
+ return bool(s.scalar(select(Consent).where(Consent.user_id==user_id,Consent.consent_type=='enterprise_search',Consent.granted.is_(True))))
+def remove_projection(s,profile_id):
+ s.query(CandidateSearchProjection).filter_by(profile_id=profile_id).delete()
+def sync_search_projection(s,p):
+ """Copy only confirmed, enterprise-authorized fields; never resumes/evidence/contact data."""
+ if p.status not in SEARCHABLE_PROFILE_STATUSES or not granted_enterprise_search(s,p.owner_user_id):
+  remove_projection(s,p.id); return None
+ content=p.content_json or {}
+ skills=string_list(content.get('skills'))
+ industries=string_list(content.get('industries') or content.get('industry'))
+ regions=string_list(content.get('service_regions') or content.get('regions'))
+ location=normalized(content.get('location') or content.get('region')) or None
+ if location: regions=list(dict.fromkeys(regions+[location]))
+ work_modes=string_list(content.get('work_modes') or content.get('work_mode'))
+ work_years=content.get('work_years')
+ try: work_years=int(work_years) if work_years is not None else None
+ except (TypeError,ValueError): work_years=None
+ if work_years is not None and not 0<=work_years<=80: work_years=None
+ projects=[]
+ for project in s.scalars(select(Project).where(Project.profile_id==p.id,Project.visibility.in_(('enterprise','public')))):
+  summary=(project.summary or '').strip()
+  if summary: projects.append(summary[:500])
+ for intent in s.scalars(select(ServiceIntent).where(ServiceIntent.profile_id==p.id,ServiceIntent.visibility.in_(('enterprise','public')))):
+  if intent.region: regions=list(dict.fromkeys(regions+[normalized(intent.region)]))
+  if intent.work_mode: work_modes=list(dict.fromkeys(work_modes+[normalized(intent.work_mode)]))
+ summary=str(content.get('capability_summary') or content.get('headline') or '').strip()[:2000]
+ version=s.scalar(select(func.count(ProfileVersion.id)).where(ProfileVersion.profile_id==p.id)) or 0
+ search_text=' '.join([summary,*skills,*industries,*regions,*work_modes,*projects])[:12000]
+ row=s.scalar(select(CandidateSearchProjection).where(CandidateSearchProjection.profile_id==p.id)) or CandidateSearchProjection(profile_id=p.id,owner_user_id=p.owner_user_id)
+ row.display_name=(p.display_name or '').strip()[:100] or None;row.headline=str(content.get('headline') or content.get('title') or '').strip()[:300] or None;row.capability_summary=summary or None;row.skills=skills;row.industries=industries;row.location=location;row.service_regions=regions;row.work_modes=work_modes;row.work_years=work_years;row.project_summaries=projects;row.skills_text=delimited(skills);row.industries_text=delimited(industries);row.regions_text=delimited(regions);row.work_modes_text=delimited(work_modes);row.search_text=search_text;row.profile_version=version;row.indexed_at=now();s.add(row);return row
+def consume_search_quota(s,oid,user_id):
+ today=now().date();usage=s.scalar(select(TalentSearchUsage).where(TalentSearchUsage.organization_id==oid,TalentSearchUsage.user_id==user_id,TalentSearchUsage.usage_date==today).with_for_update())
+ org_count=s.scalar(select(func.coalesce(func.sum(TalentSearchUsage.request_count),0)).where(TalentSearchUsage.organization_id==oid,TalentSearchUsage.usage_date==today)) or 0
+ if (usage and usage.request_count>=30) or org_count>=100:return False
+ if not usage:usage=TalentSearchUsage(organization_id=oid,user_id=user_id,usage_date=today,request_count=0);s.add(usage)
+ usage.request_count+=1;usage.updated_at=now();return True
 def requirement_view(x:HiringRequirement):
  return {'id':str(x.id),'organization_id':str(x.organization_id),'created_by':str(x.created_by),'title':x.title,'description':x.description,'location':x.location,'work_mode':x.work_mode,'status':x.status,'created_at':x.created_at,'updated_at':x.updated_at}
 @app.post('/api/v1/organizations/{oid}/hiring-requirements',status_code=201)
@@ -174,6 +239,9 @@ def consent(typ:str,x:ConsentIn,r:Request,a=Depends(csrf),s:Session=Depends(db))
  if typ=='public_share' and not x.granted:
   p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
   if p:p.status='confirmed';p.public_slug=None;p.published_at=None
+ if typ=='enterprise_search':
+  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
+  if p: sync_search_projection(s,p)
  audit(s,r,'consent.change','success',f'consent:{typ}',a[0].id,{'granted':x.granted});s.commit();return {'consent_type':typ,'granted':x.granted}
 @app.get('/api/v1/me/consents')
 def my_consents(a=Depends(auth),s:Session=Depends(db)):
@@ -236,7 +304,7 @@ def apply_parse_draft(jid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  resume=s.get(Resume,j.resume_id) if j else None
  if not j or not resume or resume.owner_user_id!=a[0].id or j.state!='parsed':raise HTTPException(404,'resource not found')
  result=j.result_json or {};content={'headline':'待用户确认','skills':[x.get('value') for x in result.get('skills',[]) if x.get('value')],'experiences':result.get('experiences',[]),'education':result.get('education',[]),'projects':[],'services':[],'source_evidence':result.get('raw_text_excerpt','')[:4000]}
- p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id)) or Profile(owner_user_id=a[0].id);p.content_json=content;p.display_name=None;p.status='draft';p.updated_at=now();s.add(p);audit(s,r,'profile.apply_parse_draft','success',f'parse_job:{jid}',a[0].id);s.commit();return {'status':'draft','profile':content}
+ p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id)) or Profile(owner_user_id=a[0].id);p.content_json=content;p.display_name=None;p.status='draft';p.updated_at=now();s.add(p);s.flush();remove_projection(s,p.id);audit(s,r,'profile.apply_parse_draft','success',f'parse_job:{jid}',a[0].id);s.commit();return {'status':'draft','profile':content}
 @app.delete('/api/v1/me/resumes/{rid}')
 def delete_resume(rid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  x=s.get(Resume,rid)
@@ -253,7 +321,7 @@ def my_profile(a=Depends(auth),s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id));return {'profile':None if not p else {'id':str(p.id),'status':p.status,'display_name':p.display_name,'content':p.content_json,'public_slug':p.public_slug}}
 @app.put('/api/v1/me/profile')
 def save_profile(x:ProfileIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
- p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id)) or Profile(owner_user_id=a[0].id);p.content_json=x.content;p.display_name=x.display_name;p.status='draft';s.add(p);audit(s,r,'profile.save','success','profile',a[0].id);s.commit();return {'status':'draft'}
+ p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id)) or Profile(owner_user_id=a[0].id);p.content_json=x.content;p.display_name=x.display_name;p.status='draft';s.add(p);s.flush();remove_projection(s,p.id);audit(s,r,'profile.save','success','profile',a[0].id);s.commit();return {'status':'draft'}
 DETAILS={'experiences':Experience,'educations':Education,'projects':Project,'service-intents':ServiceIntent}
 @app.get('/api/v1/me/profile/{kind}')
 def list_details(kind:str,a=Depends(auth),s:Session=Depends(db)):
@@ -267,12 +335,12 @@ def replace_details(kind:str,x:DetailIn,r:Request,a=Depends(csrf),s:Session=Depe
  s.query(model).filter_by(profile_id=p.id).delete()
  allowed=set(model.__table__.columns.keys())-{'id','profile_id'}
  for item in x.items:s.add(model(profile_id=p.id,**{k:v for k,v in item.items() if k in allowed}))
- p.status='draft';audit(s,r,'profile.details.replace','success',f'profile:{p.id}',a[0].id,{'kind':kind});s.commit();return {'count':len(x.items),'status':'draft'}
+ p.status='draft';remove_projection(s,p.id);audit(s,r,'profile.details.replace','success',f'profile:{p.id}',a[0].id,{'kind':kind});s.commit();return {'count':len(x.items),'status':'draft'}
 @app.post('/api/v1/me/profile/confirm')
 def confirm_profile(r:Request,a=Depends(csrf),s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
  if not p:raise HTTPException(404,'profile not found')
- n=s.query(ProfileVersion).filter_by(profile_id=p.id).count()+1;s.add(ProfileVersion(profile_id=p.id,version=n,content_json=p.content_json));p.status='confirmed';p.updated_at=now();audit(s,r,'profile.confirm','success',f'profile:{p.id}',a[0].id);s.commit();return {'status':p.status,'version':n}
+ n=s.query(ProfileVersion).filter_by(profile_id=p.id).count()+1;s.add(ProfileVersion(profile_id=p.id,version=n,content_json=p.content_json));p.status='confirmed';p.updated_at=now();s.flush();sync_search_projection(s,p);audit(s,r,'profile.confirm','success',f'profile:{p.id}',a[0].id);s.commit();return {'status':p.status,'version':n}
 @app.post('/api/v1/me/profile/publish')
 def publish_profile(r:Request,a=Depends(csrf),s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
@@ -289,3 +357,58 @@ def public_profile(slug:str,s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.public_slug==slug,Profile.status=='published'))
  if not p:raise HTTPException(404,'profile not found')
  c=p.content_json or {}; return {'display_name':p.display_name,'headline':c.get('headline'),'skills':c.get('skills',[]),'services':c.get('services',[]),'updated_at':p.updated_at}
+
+def safe_like(value): return '%' + normalized(value).replace('\\','\\\\').replace('%','\\%').replace('_','\\_') + '%'
+def delimited_match(column,value): return or_(*[column.contains(f'|{term}|',autoescape=True) for term in expand_synonym(value)])
+def text_match(column,value): return or_(*[column.ilike(safe_like(term),escape='\\') for term in expand_synonym(value)])
+def search_reasons(row,query):
+ reasons=[];skills=set(row.skills or []);industries=set(row.industries or []);regions=set(row.service_regions or []);modes=set(row.work_modes or [])
+ for skill in query.skills:
+  matched=[term for term in expand_synonym(skill) if term in skills]
+  if matched: reasons.append({'field':'skill','value':matched[0],'expanded':matched[0]!=normalized(skill)})
+ if query.industry and any(term in industries for term in expand_synonym(query.industry)):reasons.append({'field':'industry','value':normalized(query.industry),'expanded':False})
+ if query.region and any(term in regions for term in expand_synonym(query.region)):reasons.append({'field':'region','value':normalized(query.region),'expanded':False})
+ if query.work_mode and any(term in modes for term in expand_synonym(query.work_mode)):reasons.append({'field':'work_mode','value':normalized(query.work_mode),'expanded':False})
+ if query.keywords and any(term in normalized(row.search_text) for term in expand_synonym(query.keywords)):reasons.append({'field':'capability','value':normalized(query.keywords),'expanded':False})
+ return reasons
+def candidate_card(row,reasons):
+ return {'display_name':row.display_name,'headline':row.headline,'skills':row.skills or [],'industries':row.industries or [],'location':row.location,'service_regions':row.service_regions or [],'work_modes':row.work_modes or [],'work_years':row.work_years,'project_summaries':row.project_summaries or [],'match_reasons':reasons}
+@app.post('/api/v1/organizations/{oid}/talent-search')
+def talent_search(oid:UUID,x:TalentSearchIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ member=active_membership(oid,a[0].id,s);organization=s.get(Organization,oid)
+ if not member:
+  audit(s,r,'talent_search','denied','organization',a[0].id);s.commit();raise HTTPException(404,'resource not found')
+ if not organization or organization.status!='approved':
+  audit(s,r,'talent_search','denied',f'organization:{oid}',a[0].id);s.commit();raise HTTPException(403,'organization not approved')
+ if x.work_years_min is not None and x.work_years_max is not None and x.work_years_min>x.work_years_max:raise HTTPException(422,'invalid work years range')
+ if not any([normalized(x.keywords),x.skills,normalized(x.industry),normalized(x.region),normalized(x.work_mode),x.work_years_min is not None,x.work_years_max is not None]):raise HTTPException(422,'at least one search condition is required')
+ if not consume_search_quota(s,oid,a[0].id):
+  audit(s,r,'talent_search','rate_limited',f'organization:{oid}',a[0].id);s.commit();raise HTTPException(429,'talent search limit reached')
+ stmt=select(CandidateSearchProjection).join(Profile,CandidateSearchProjection.profile_id==Profile.id).join(Consent,and_(Consent.user_id==CandidateSearchProjection.owner_user_id,Consent.consent_type=='enterprise_search',Consent.granted.is_(True))).where(Profile.status.in_(SEARCHABLE_PROFILE_STATUSES))
+ for skill in x.skills:stmt=stmt.where(delimited_match(CandidateSearchProjection.skills_text,skill))
+ if x.industry:stmt=stmt.where(delimited_match(CandidateSearchProjection.industries_text,x.industry))
+ if x.region:stmt=stmt.where(delimited_match(CandidateSearchProjection.regions_text,x.region))
+ if x.work_mode:stmt=stmt.where(delimited_match(CandidateSearchProjection.work_modes_text,x.work_mode))
+ if x.work_years_min is not None:stmt=stmt.where(CandidateSearchProjection.work_years>=x.work_years_min)
+ if x.work_years_max is not None:stmt=stmt.where(CandidateSearchProjection.work_years<=x.work_years_max)
+ if x.keywords:stmt=stmt.where(text_match(CandidateSearchProjection.search_text,x.keywords))
+ rows=s.scalars(stmt.order_by(CandidateSearchProjection.indexed_at.desc()).limit(101)).all();ranked=[]
+ for row in rows:
+  reasons=search_reasons(row,x)
+  if reasons:ranked.append((len(reasons),row,reasons))
+ ranked.sort(key=lambda item:(-item[0],str(item[1].profile_id)))
+ start=(x.page-1)*x.page_size;window=ranked[start:start+x.page_size];payload={'items':[candidate_card(row,reasons) for _,row,reasons in window],'page':x.page,'page_size':x.page_size,'has_more':len(ranked)>start+x.page_size}
+ query_hash=hashlib.sha256(json.dumps(x.model_dump(),sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:16];audit(s,r,'talent_search','success',f'organization:{oid}',a[0].id,{'query_hash':query_hash,'result_bucket':'0' if not ranked else '1-10' if len(ranked)<=10 else '11+','page':x.page});s.commit();return payload
+@app.post('/api/v1/admin/talent-search/rebuild')
+def rebuild_talent_search(r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if a[0].role!='admin':raise HTTPException(403,'administrator role required')
+ s.query(CandidateSearchProjection).delete();s.flush();count=0
+ for p in s.scalars(select(Profile).where(Profile.status.in_(SEARCHABLE_PROFILE_STATUSES))):
+  if sync_search_projection(s,p):count+=1
+ audit(s,r,'talent_search.rebuild','success','candidate_search_projection',a[0].id,{'projection_count':count});s.commit();return {'rebuilt':count}
+@app.get('/api/v1/admin/talent-search/consistency')
+def talent_search_consistency(a=Depends(auth),s:Session=Depends(db)):
+ if a[0].role!='admin':raise HTTPException(403,'administrator role required')
+ eligible=s.scalar(select(func.count(Profile.id)).join(Consent,and_(Consent.user_id==Profile.owner_user_id,Consent.consent_type=='enterprise_search',Consent.granted.is_(True))).where(Profile.status.in_(SEARCHABLE_PROFILE_STATUSES))) or 0
+ projected=s.scalar(select(func.count(CandidateSearchProjection.id))) or 0
+ return {'eligible_profiles':eligible,'projected_profiles':projected,'in_sync':eligible==projected}
