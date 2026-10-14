@@ -57,11 +57,12 @@ def test_recruiter_verification_then_platform_gate_controls_search_access():
     assert recruiter.get(f'/api/v1/organizations/{oid}/restricted-access').status_code==403
     admin=TestClient(app);admin_email,admin_csrf=account(admin,'reviewer','candidate');make_admin(admin_email)
     review=admin.post(f'/api/v1/admin/verification/organizations/{oid}/review',json={'status':'approved','reason_code':'synthetic_approved','valid_days':30},headers={'X-CSRF-Token':admin_csrf})
-    assert review.status_code==200,review.text
-    assert recruiter.get(f'/api/v1/organizations/{oid}/restricted-access').status_code==403
+    assert review.status_code==422 and 'clean files' in review.text
+    # A platform gate cannot compensate for absent file-security and legal
+    # verification conclusions.
     gate=admin.put('/api/v1/admin/platform-service-gates/network-recruitment',json={'enabled':True,'reason_code':'synthetic_test'},headers={'X-CSRF-Token':admin_csrf})
     assert gate.status_code==200
-    assert recruiter.get(f'/api/v1/organizations/{oid}/restricted-access').status_code==200
+    assert recruiter.get(f'/api/v1/organizations/{oid}/restricted-access').status_code==403
 
 
 def test_reviewer_cannot_approve_own_application_and_candidate_cannot_read_documents():

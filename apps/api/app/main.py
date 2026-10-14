@@ -59,11 +59,11 @@ class RecruiterVerification(Base):
 class RecruiterOrganizationAuthorization(Base):
  __tablename__='recruiter_organization_authorizations'; __table_args__=(UniqueConstraint('organization_id','user_id',name='uq_recruiter_org_authorization'),); id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True); role: Mapped[str]=mapped_column(String(32),default='recruiter'); status: Mapped[str]=mapped_column(String(32),default='draft'); granted_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); expires_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); revoked_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class VerificationDocument(Base):
- __tablename__='verification_documents'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); uploader_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); evidence_version: Mapped[int]=mapped_column(Integer,default=1); document_type: Mapped[str]=mapped_column(String(48)); storage_key: Mapped[str]=mapped_column(String(255),unique=True); original_filename: Mapped[str]=mapped_column(String(255)); mime_type: Mapped[str]=mapped_column(String(100)); size_bytes: Mapped[int]=mapped_column(); sha256: Mapped[str]=mapped_column(String(64)); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+ __tablename__='verification_documents'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); uploader_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); evidence_version: Mapped[int]=mapped_column(Integer,default=1); document_type: Mapped[str]=mapped_column(String(48)); storage_key: Mapped[str]=mapped_column(String(255),unique=True); original_filename: Mapped[str]=mapped_column(String(255)); mime_type: Mapped[str]=mapped_column(String(100)); size_bytes: Mapped[int]=mapped_column(); sha256: Mapped[str]=mapped_column(String(64)); security_status: Mapped[str]=mapped_column(String(32),default='pending'); security_checked_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); security_checked_by: Mapped[UUID|None]=mapped_column(ForeignKey('users.id')); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class VerificationEvidenceSnapshot(Base):
  __tablename__='verification_evidence_snapshots'; __table_args__=(UniqueConstraint('organization_id','evidence_version',name='uq_verification_evidence_version'),); id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); evidence_version: Mapped[int]=mapped_column(Integer); manifest: Mapped[dict]=mapped_column(JSON); manifest_sha256: Mapped[str]=mapped_column(String(64)); submitted_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class VerificationReview(Base):
- __tablename__='verification_reviews'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); reviewer_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); evidence_version: Mapped[int]=mapped_column(Integer); evidence_snapshot_id: Mapped[UUID]=mapped_column(ForeignKey('verification_evidence_snapshots.id')); evidence_manifest_sha256: Mapped[str]=mapped_column(String(64)); outcome: Mapped[str]=mapped_column(String(32)); reason_code: Mapped[str]=mapped_column(String(80)); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+ __tablename__='verification_reviews'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); reviewer_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); evidence_version: Mapped[int]=mapped_column(Integer); evidence_snapshot_id: Mapped[UUID]=mapped_column(ForeignKey('verification_evidence_snapshots.id')); evidence_manifest_sha256: Mapped[str]=mapped_column(String(64)); entity_verification: Mapped[str]=mapped_column(String(32),default='not_verified'); representative_verification: Mapped[str]=mapped_column(String(32),default='not_verified'); authorization_verification: Mapped[str]=mapped_column(String(32),default='not_verified'); outcome: Mapped[str]=mapped_column(String(32)); reason_code: Mapped[str]=mapped_column(String(80)); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class PlatformServiceGate(Base):
  __tablename__='platform_service_gates'; gate_key: Mapped[str]=mapped_column(String(64),primary_key=True); enabled: Mapped[bool]=mapped_column(Boolean,default=False); reviewed_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); reviewed_by: Mapped[UUID|None]=mapped_column(ForeignKey('users.id')); reason_code: Mapped[str|None]=mapped_column(String(80))
 DATABASE_URL=os.getenv('DATABASE_URL','postgresql+psycopg://hhba_app:CHANGE_ME_LOCAL_ONLY@127.0.0.1:5432/hhba_dev')
@@ -91,7 +91,7 @@ class Login(BaseModel): email:EmailStr; password:str; account_type:str|None=Fiel
 class OrgIn(BaseModel): legal_name:str=Field(min_length=2)
 class ReviewIn(BaseModel): status:str=Field(pattern='^(approved|rejected|suspended)$')
 class VerificationIn(BaseModel): legal_name:str=Field(min_length=2,max_length=200); credit_code:str=Field(min_length=8,max_length=32); registered_location:str=Field(min_length=2,max_length=160); recruitment_subject_type:str=Field(default='employer',pattern='^(employer|agency)$'); real_name:str=Field(min_length=2,max_length=100); job_title:str=Field(min_length=2,max_length=120)
-class VerificationReviewIn(BaseModel): status:str=Field(pattern='^(need_more_info|approved|rejected|suspended)$'); reason_code:str=Field(min_length=3,max_length=80); valid_days:int=Field(default=180,ge=1,le=365)
+class VerificationReviewIn(BaseModel): status:str=Field(pattern='^(need_more_info|approved|rejected|suspended)$'); reason_code:str=Field(min_length=3,max_length=80); valid_days:int=Field(default=180,ge=1,le=365); entity_verification:str=Field(default='not_verified',pattern='^(not_verified|manual_verified|failed)$'); representative_verification:str=Field(default='not_verified',pattern='^(not_verified|manual_verified|failed)$'); authorization_verification:str=Field(default='not_verified',pattern='^(not_verified|manual_verified|failed)$')
 class GateIn(BaseModel): enabled:bool; reason_code:str=Field(min_length=3,max_length=80)
 class AuthorizationIn(BaseModel): user_id:UUID; role:str=Field(pattern='^(organization_owner|recruitment_admin|recruiter|review_only)$')
 class ConsentIn(BaseModel): granted:bool
@@ -185,7 +185,23 @@ VERIFICATION_ROOT=os.path.abspath(os.getenv('HHBA_VERIFICATION_ROOT','./private_
 def verification_owner(s,oid,user_id):
  member=active_membership(oid,user_id,s);return bool(member and member.role=='owner' and has_identity(s,user_id,'recruiter'))
 def verification_view(row,docs):
- return {'organization_id':str(row.organization_id),'status':row.status,'legal_name':row.legal_name,'credit_code_masked':None if not row.credit_code else row.credit_code[:4]+'***'+row.credit_code[-4:],'registered_location':row.registered_location,'recruitment_subject_type':row.recruitment_subject_type,'review_reason_code':row.review_reason_code,'next_review_due_at':row.next_review_due_at,'documents':[{'id':str(d.id),'document_type':d.document_type,'filename':d.original_filename,'created_at':d.created_at} for d in docs]}
+ return {'organization_id':str(row.organization_id),'status':row.status,'revision':row.version,'legal_name':row.legal_name,'credit_code_masked':None if not row.credit_code else row.credit_code[:4]+'***'+row.credit_code[-4:],'registered_location':row.registered_location,'recruitment_subject_type':row.recruitment_subject_type,'review_reason_code':row.review_reason_code,'next_review_due_at':row.next_review_due_at,'documents':[{'id':str(d.id),'document_type':d.document_type,'filename':d.original_filename,'size_bytes':d.size_bytes,'security_status':d.security_status,'evidence_version':d.evidence_version,'created_at':d.created_at} for d in docs]}
+def evidence_integrity(s,snapshot):
+ """Validate the submitted manifest against DB metadata and private bytes."""
+ manifest=json.dumps(snapshot.manifest,sort_keys=True,separators=(',',':'))
+ if hashlib.sha256(manifest.encode()).hexdigest()!=snapshot.manifest_sha256:return False,'manifest_hash_mismatch',[]
+ records=[]
+ for item in snapshot.manifest:
+  try:did=UUID(item['id'])
+  except (KeyError,ValueError,TypeError):return False,'manifest_identifier_invalid',[]
+  doc=s.get(VerificationDocument,did);path=os.path.join(VERIFICATION_ROOT,doc.storage_key) if doc else ''
+  if not doc or doc.organization_id!=snapshot.organization_id or doc.evidence_version!=snapshot.evidence_version:return False,'document_record_mismatch',[]
+  if doc.sha256!=item.get('sha256') or doc.size_bytes!=item.get('size') or doc.document_type!=item.get('type'):return False,'document_metadata_mismatch',[]
+  if not os.path.isfile(path):return False,'document_file_missing',[]
+  with open(path,'rb') as handle:actual=hashlib.sha256(handle.read()).hexdigest()
+  if actual!=doc.sha256:return False,'document_bytes_mismatch',[]
+  records.append(doc)
+ return True,'ok',records
 @app.get('/api/v1/recruiter/organizations/{oid}/verification')
 def recruiter_verification(oid:UUID,a=Depends(auth),s:Session=Depends(db)):
  if not verification_owner(s,oid,a[0].id):raise HTTPException(404,'resource not found')
@@ -279,18 +295,19 @@ def review_verification(oid:UUID,x:VerificationReviewIn,r:Request,a=Depends(csrf
  row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid).with_for_update());org_row=s.scalar(select(Organization).where(Organization.id==oid).with_for_update())
  if not row or not org_row:raise HTTPException(404,'resource not found')
  if row.applicant_user_id==a[0].id:raise HTTPException(403,'reviewer cannot approve own application')
- if row.status not in {'submitted','need_more_info'}:raise HTTPException(409,'verification is not awaiting review')
+ if row.status!='submitted':raise HTTPException(409,'only the current submitted evidence version can be reviewed')
  recruiter=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==row.applicant_user_id).with_for_update());authorization=s.scalar(select(RecruiterOrganizationAuthorization).where(RecruiterOrganizationAuthorization.organization_id==oid,RecruiterOrganizationAuthorization.user_id==row.applicant_user_id).with_for_update());snapshot=s.scalar(select(VerificationEvidenceSnapshot).where(VerificationEvidenceSnapshot.organization_id==oid,VerificationEvidenceSnapshot.evidence_version==row.version))
  if not recruiter or not authorization or not snapshot:raise HTTPException(409,'fixed evidence snapshot and verification linkage are required')
- manifest=json.dumps(snapshot.manifest,sort_keys=True,separators=(',',':'))
- if hashlib.sha256(manifest.encode()).hexdigest()!=snapshot.manifest_sha256:raise HTTPException(409,'evidence snapshot integrity check failed')
+ intact,integrity_reason,documents=evidence_integrity(s,snapshot)
+ if not intact:raise HTTPException(409,f'evidence integrity check failed: {integrity_reason}')
+ if x.status=='approved' and (any(doc.security_status!='clean' for doc in documents) or {x.entity_verification,x.representative_verification,x.authorization_verification}!={'manual_verified'}):raise HTTPException(422,'approval requires clean files and independent verification conclusions')
  outcome=x.status;at=now();row.status=outcome;row.reviewed_at=at;row.reviewed_by=a[0].id;row.review_reason_code=x.reason_code;row.updated_at=at
  recruiter.status=outcome;recruiter.reviewed_at=at;recruiter.reviewed_by=a[0].id;recruiter.review_reason_code=x.reason_code;recruiter.updated_at=at
  if outcome=='approved':
   due=at+timedelta(days=x.valid_days);row.verified_at=at;row.next_review_due_at=due;recruiter.verified_at=at;recruiter.next_review_due_at=due;authorization.status='active';authorization.granted_at=at;org_row.status='approved';org_row.reviewed_at=at;org_row.reviewed_by=a[0].id
  elif outcome=='suspended': org_row.status='suspended';row.suspended_at=at;authorization.status='revoked';authorization.revoked_at=at
  else: authorization.status='draft';org_row.status='pending_review'
- s.add(VerificationReview(organization_id=oid,reviewer_user_id=a[0].id,evidence_version=row.version,evidence_snapshot_id=snapshot.id,evidence_manifest_sha256=snapshot.manifest_sha256,outcome=outcome,reason_code=x.reason_code));audit(s,r,'verification.review','success',f'organization:{oid}',a[0].id,{'outcome':outcome,'reason_code':x.reason_code,'version':row.version});s.commit();return {'status':outcome,'organization_status':org_row.status}
+ s.add(VerificationReview(organization_id=oid,reviewer_user_id=a[0].id,evidence_version=row.version,evidence_snapshot_id=snapshot.id,evidence_manifest_sha256=snapshot.manifest_sha256,entity_verification=x.entity_verification,representative_verification=x.representative_verification,authorization_verification=x.authorization_verification,outcome=outcome,reason_code=x.reason_code));audit(s,r,'verification.review','success',f'organization:{oid}',a[0].id,{'outcome':outcome,'reason_code':x.reason_code,'version':row.version});s.commit();return {'status':outcome,'organization_status':org_row.status}
 @app.put('/api/v1/admin/platform-service-gates/network-recruitment')
 def set_network_recruitment_gate(x:GateIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if a[0].role!='admin':raise HTTPException(403,'administrator role required')
