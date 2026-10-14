@@ -87,7 +87,7 @@ class TalentSearchIn(BaseModel):
  work_mode:str|None=Field(default=None,max_length=64)
  work_years_min:int|None=Field(default=None,ge=0,le=80)
  work_years_max:int|None=Field(default=None,ge=0,le=80)
- page:int=Field(default=1,ge=1,le=10)
+ page:int=Field(default=1,ge=1,le=100)
  page_size:int=Field(default=10,ge=1,le=10)
 @app.get('/healthz')
 def healthz(): return {'status':'ok','phase':'1'}
@@ -158,6 +158,61 @@ def active_membership(oid:UUID,user_id:UUID,s:Session):
  return s.scalar(select(Membership).where(Membership.organization_id==oid,Membership.user_id==user_id,Membership.status=='active'))
 SEARCHABLE_PROFILE_STATUSES=('confirmed','published')
 SYNONYM_GROUPS=(('经销商运营','汽车门店运营'),('销售培训','销售人员培训'),('新能源车销售','新能源汽车销售'))
+# Phase 3A.3: 城市级位置白名单。企业搜索只允许展示城市级（或更粗）地理信息；
+# 无法可靠识别到城市的原始输入一律视为未设置，禁止用截断/正则假装脱敏。
+CITY_LEVEL_NAMES=frozenset([
+ # 直辖市
+ '北京市','上海市','天津市','重庆市',
+ # 省会/首府
+ '石家庄市','太原市','呼和浩特市','沈阳市','长春市','哈尔滨市','南京市','杭州市','合肥市','福州市','南昌市','济南市','郑州市','武汉市','长沙市','广州市','南宁市','海口市','成都市','贵阳市','昆明市','拉萨市','西安市','兰州市','西宁市','银川市','乌鲁木齐市',
+ # 计划单列市/主要地级市
+ '大连市','青岛市','宁波市','厦门市','深圳市','苏州市','无锡市','常州市','南通市','徐州市','盐城市','扬州市','镇江市','温州市','金华市','绍兴市','台州市','嘉兴市','湖州市','衢州市','丽水市','舟山市','芜湖市','蚌埠市','淮南市','马鞍山市','安庆市','阜阳市','宿州市','滁州市','泉州市','漳州市','莆田市','三明市','龙岩市','宁德市','南平市','赣州市','九江市','上饶市','宜春市','吉安市','抚州市','烟台市','潍坊市','临沂市','淄博市','济宁市','泰安市','威海市','日照市','德州市','聊城市','滨州市','菏泽市','枣庄市','东营市','洛阳市','南阳市','新乡市','安阳市','许昌市','平顶山','信阳市','周口市','商丘市','驻马店','焦作市','濮阳市','三门峡','鹤壁市','襄阳市','宜昌市','荆州市','十堰市','孝感市','黄冈市','鄂州市','株洲市','湘潭市','衡阳市','岳阳市','常德市','郴州市','邵阳市','益阳市','永州市','怀化市','娄底市','佛山市','东莞市','珠海市','惠州市','中山市','江门市','汕头市','湛江市','肇庆市','梅州市','茂名市','清远市','韶关市','揭阳市','阳江市','潮州市','汕尾市','河源市','柳州市','桂林市','梧州市','北海市','玉林市','钦州市','贵港市','百色市','河池市','三亚市','儋州市','绵阳市','德阳市','宜宾市','泸州市','南充市','乐山市','自贡市','攀枝花','广安市','达州市','遂宁市','内江市','眉山市','遵义市','六盘水','安顺市','毕节市','铜仁市','大理市','曲靖市','玉溪市','保山市','昭通市','丽江市','普洱市','临沧市','日喀则市','昌都市','林芝市','宝鸡市','咸阳市','渭南市','汉中市','榆林市','延安市','安康市','商洛市','铜川市','天水市','白银市','武威市','张掖市','酒泉市','平凉市','庆阳市','定西市','陇南市','海东市','海西州','玉树州','石嘴山市','吴忠市','固原市','中卫市','克拉玛依','吐鲁番','哈密市','昌吉市','巴音郭楞','阿克苏','喀什市','和田市','伊犁市',
+ # 省级（比城市更粗，允许展示）
+ '河北省','山西省','辽宁省','吉林省','黑龙江省','江苏省','浙江省','安徽省','福建省','江西省','山东省','河南省','湖北省','湖南省','广东省','海南省','四川省','贵州省','云南省','陕西省','甘肃省','青海省','内蒙古自治区','广西壮族自治区','西藏自治区','宁夏回族自治区','新疆维吾尔自治区',
+ # 港澳台（城市级）
+ '香港','澳门','台北市','高雄市','台中市','台南市','新北市','桃园市',
+])
+# Phase 3A.4：仅城市参与匹配；省份条目不再作为回退（见 city_level_location 说明）。
+_CITY_NAMES=[n for n in CITY_LEVEL_NAMES if not n.endswith(('省','自治区','特别行政区'))]
+def _location_variants(name):
+ yield name
+# Phase 3A.5-B：城市匹配必须锚定输入开头，禁止任意子串匹配。
+# "我不在北京市"/"曾经在上海市工作"等不得误识别；只有输入以城市名开头才算可靠。
+# 明确无歧义的短名走别名表，不再统一去后缀（"吉林"同时是吉林市/吉林省的前缀，有歧义）。
+_CITY_ALIASES={
+ '北京': '北京市', '上海': '上海市', '天津': '天津市', '重庆': '重庆市',
+ '广州': '广州市', '深圳': '深圳市',
+}
+_PROVINCE_FULL_NAMES=[
+ '河北省','山西省','辽宁省','吉林省','黑龙江省','江苏省','浙江省','安徽省','福建省','江西省',
+ '山东省','河南省','湖北省','湖南省','广东省','海南省','四川省','贵州省','云南省','陕西省',
+ '甘肃省','青海省','内蒙古自治区','广西壮族自治区','西藏自治区','宁夏回族自治区',
+ '新疆维吾尔自治区','香港特别行政区','澳门特别行政区','台湾省',
+]
+# 确定性顺序：长度降序、名称排序，不依赖 set 迭代顺序
+_CITY_LEVEL_ORDERED=tuple(sorted(_CITY_NAMES,key=lambda n:(-len(n),n)))
+def city_level_location(raw_value):
+ """从原始位置文本中提取城市级位置；无法可靠识别时返回 None（展示为"未设置"）。
+ 规则：输入必须以城市全名（或明确别名）开头；允许"省份全名+城市"前缀（如"山东省临沂市"）。
+ 绝不做子串包含匹配、截断或正则删数字等假装脱敏的处理。"""
+ text=normalized(raw_value)
+ if not text: return None
+ # 1) 直接以城市全名开头
+ for name in _CITY_LEVEL_ORDERED:
+  if text.startswith(name): return name
+ # 2) 明确别名（如"北京"→"北京市"）
+ for alias, name in _CITY_ALIASES.items():
+  if text.startswith(alias): return name
+ # 3) 省份全名 + 城市名开头（如"山东省临沂市"）
+ for prov in _PROVINCE_FULL_NAMES:
+  if text.startswith(prov):
+   rest=text[len(prov):]
+   for name in _CITY_LEVEL_ORDERED:
+    if rest.startswith(name): return name
+   for alias, name in _CITY_ALIASES.items():
+    if rest.startswith(alias): return name
+   break
+ return None
 def normalized(value): return str(value or '').strip().casefold()
 def string_list(value):
  if isinstance(value,list): values=value
@@ -182,7 +237,9 @@ def sync_search_projection(s,p):
  skills=string_list(content.get('skills'))
  industries=string_list(content.get('industries') or content.get('industry'))
  regions=string_list(content.get('service_regions') or content.get('regions'))
- location=normalized(content.get('location') or content.get('region')) or None
+ # Phase 3A.3: location 只允许城市级；原始自由文本不得进入搜索投影。
+ # 无法可靠识别到城市时记为 None（企业端展示"未设置"）。
+ location=city_level_location(content.get('location') or content.get('region'))
  if location: regions=list(dict.fromkeys(regions+[location]))
  work_modes=string_list(content.get('work_modes') or content.get('work_mode'))
  work_years=content.get('work_years')
@@ -384,7 +441,10 @@ def talent_search(oid:UUID,x:TalentSearchIn,r:Request,a=Depends(csrf),s:Session=
  if not any([normalized(x.keywords),x.skills,normalized(x.industry),normalized(x.region),normalized(x.work_mode),x.work_years_min is not None,x.work_years_max is not None]):raise HTTPException(422,'at least one search condition is required')
  if not consume_search_quota(s,oid,a[0].id):
   audit(s,r,'talent_search','rate_limited',f'organization:{oid}',a[0].id);s.commit();raise HTTPException(429,'talent search limit reached')
- stmt=select(CandidateSearchProjection).join(Profile,CandidateSearchProjection.profile_id==Profile.id).join(Consent,and_(Consent.user_id==CandidateSearchProjection.owner_user_id,Consent.consent_type=='enterprise_search',Consent.granted.is_(True))).where(Profile.status.in_(SEARCHABLE_PROFILE_STATUSES))
+ # Phase 3A.5-B：授权检查用 EXISTS 而非 JOIN——Consent 表无 (user_id, consent_type) 唯一约束，
+ # 若存在重复授权行，JOIN 会产生重复投影行导致 COUNT/分页错误；EXISTS 不受重复行影响。
+ _consent_ok=select(1).where(Consent.user_id==CandidateSearchProjection.owner_user_id,Consent.consent_type=='enterprise_search',Consent.granted.is_(True)).exists()
+ stmt=select(CandidateSearchProjection).join(Profile,CandidateSearchProjection.profile_id==Profile.id).where(_consent_ok).where(Profile.status.in_(SEARCHABLE_PROFILE_STATUSES))
  for skill in x.skills:stmt=stmt.where(delimited_match(CandidateSearchProjection.skills_text,skill))
  if x.industry:stmt=stmt.where(delimited_match(CandidateSearchProjection.industries_text,x.industry))
  if x.region:stmt=stmt.where(delimited_match(CandidateSearchProjection.regions_text,x.region))
@@ -392,13 +452,25 @@ def talent_search(oid:UUID,x:TalentSearchIn,r:Request,a=Depends(csrf),s:Session=
  if x.work_years_min is not None:stmt=stmt.where(CandidateSearchProjection.work_years>=x.work_years_min)
  if x.work_years_max is not None:stmt=stmt.where(CandidateSearchProjection.work_years<=x.work_years_max)
  if x.keywords:stmt=stmt.where(text_match(CandidateSearchProjection.search_text,x.keywords))
- rows=s.scalars(stmt.order_by(CandidateSearchProjection.indexed_at.desc()).limit(101)).all();ranked=[]
- for row in rows:
-  reasons=search_reasons(row,x)
-  if reasons:ranked.append((len(reasons),row,reasons))
- ranked.sort(key=lambda item:(-item[0],str(item[1].profile_id)))
- start=(x.page-1)*x.page_size;window=ranked[start:start+x.page_size];payload={'items':[candidate_card(row,reasons) for _,row,reasons in window],'page':x.page,'page_size':x.page_size,'has_more':len(ranked)>start+x.page_size}
- query_hash=hashlib.sha256(json.dumps(x.model_dump(),sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:16];audit(s,r,'talent_search','success',f'organization:{oid}',a[0].id,{'query_hash':query_hash,'result_bucket':'0' if not ranked else '1-10' if len(ranked)<=10 else '11+','page':x.page});s.commit();return payload
+ # Phase 3A.3: 在完整合格结果集上分页。
+ # SQL 已用 AND 语义执行全部过滤维度（含 Consent 授权 JOIN），因此每行必然具备
+ # 匹配理由；旧的 LIMIT 101 + Python 二次过滤会导致深分页截断。
+ # 排序键使用唯一的 profile_id，保证确定性；page(≤100)/page_size(≤10) 已在模型层钳制，
+ # 单次最多加载 10 条，不会无界加载。
+ has_reason_dimension=bool(x.skills or normalized(x.industry) or normalized(x.region) or normalized(x.work_mode) or normalized(x.keywords))
+ if not has_reason_dimension:
+  # 仅按 work_years 搜索：按产品规则"无法解释时不展示结果"，显式返回空。
+  total=0;page_items=[]
+ else:
+  total=s.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+  start=(x.page-1)*x.page_size
+  rows=s.scalars(stmt.order_by(CandidateSearchProjection.profile_id).offset(start).limit(x.page_size)).all()
+  # Phase 3A.5-B：search_reasons 仅为解释生成，不再做第二层过滤。
+  # SQL 已用 AND 语义执行全部过滤维度（含 Consent 授权），has_reason_dimension 为真时
+  # 每行必然具备理由；去掉 Python 过滤可从根上消除 total 与实际结果的分歧。
+  page_items=[(row,search_reasons(row,x)) for row in rows]
+ payload={'items':[candidate_card(row,reasons) for row,reasons in page_items],'page':x.page,'page_size':x.page_size,'total':total,'has_more':(x.page*x.page_size)<total}
+ query_hash=hashlib.sha256(json.dumps(x.model_dump(),sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:16];audit(s,r,'talent_search','success',f'organization:{oid}',a[0].id,{'query_hash':query_hash,'result_bucket':'0' if not total else '1-10' if total<=10 else '11+','page':x.page,'total':total});s.commit();return payload
 @app.post('/api/v1/admin/talent-search/rebuild')
 def rebuild_talent_search(r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if a[0].role!='admin':raise HTTPException(403,'administrator role required')
