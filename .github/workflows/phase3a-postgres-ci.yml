@@ -1,0 +1,88 @@
+name: HHBA Phase 3A PostgreSQL CI
+
+on:
+  push:
+    branches: ['feat/**', 'phase*/**', 'test/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# 最小权限；禁止访问生产数据库、禁止泄露敏感数据
+permissions:
+  contents: read
+
+jobs:
+  postgres-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.7-pg17
+        env:
+          POSTGRES_USER: hhba_test
+          POSTGRES_PASSWORD: hhba_test_only_ci
+          POSTGRES_DB: hhba_phase3a4_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hhba_test -d hhba_phase3a4_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql+psycopg://hhba_test:hhba_test_only_ci@127.0.0.1:5432/hhba_phase3a4_test
+      HHBA_BOOTSTRAP_ADMIN_EMAIL: ci-admin@hhba-synthetic.local
+      PYTHONHASHSEED: '0'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install API dependencies (no docling/mcp needed for tests)
+        run: |
+          python -m pip install --upgrade pip
+          pip install "fastapi>=0.115,<1" "sqlalchemy>=2.0,<2.1" "pydantic>=2" \
+            "pwdlib[argon2]>=0.2,<1" "email-validator==2.3.0" "httpx>=0.28" \
+            "pytest>=8" "alembic>=1.14,<2" "psycopg[binary]>=3.2,<4" python-multipart
+        working-directory: apps/api
+
+      - name: Run Alembic migrations on test database
+        run: |
+          alembic upgrade head
+          alembic current
+        working-directory: apps/api
+        # 迁移失败则整个 job 失败（禁止 continue-on-error）
+
+      - name: Run PostgreSQL integration tests (Phase 3A.4)
+        run: |
+          python -m pytest tests/test_phase3a4_postgres.py -v --tb=short
+        working-directory: apps/api
+
+      - name: Verify PG tests actually ran (not all skipped)
+        run: |
+          SKIPPED=$(python -m pytest tests/test_phase3a4_postgres.py -q --collect-only 2>/dev/null | grep -c "skipped" || true)
+          echo "skipped=$SKIPPED"
+          # 全部 5 个 PG 测试必须实际执行；若被 skip 说明 DATABASE_URL 未正确指向 PG
+          python -m pytest tests/test_phase3a4_postgres.py -q -p no:warnings 2>&1 | tee /tmp/pg_out.txt
+          if grep -q "5 skipped" /tmp/pg_out.txt; then
+            echo "FATAL: all PG tests were skipped — DATABASE_URL not pointing at PostgreSQL"
+            exit 1
+          fi
+          if grep -qE " failed| error" /tmp/pg_out.txt; then
+            echo "FATAL: PG tests failed"
+            exit 1
+          fi
+        working-directory: apps/api
+
+      - name: Run SQLite regression + security tests
+        run: |
+          python -m pytest tests/test_phase3a3_regression.py tests/test_phase3a_search.py tests/test_phase1_p0.py -q
+        working-directory: apps/api
+        env:
+          DATABASE_URL: sqlite:////tmp/hhba_ci_sqlite.db
