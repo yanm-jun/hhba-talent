@@ -7,7 +7,7 @@ os.environ['DATABASE_URL']=f'sqlite:///./phase3a2-{RUN}.sqlite3'
 os.environ['HHBA_VERIFICATION_ROOT']=f'./phase3a2-private-{RUN}'
 
 from fastapi.testclient import TestClient
-from app.main import Base, Organization, SessionLocal, User, VerificationEvidenceSnapshot, app, engine
+from app.main import Base, Organization, OrganizationVerification, RecruiterOrganizationAuthorization, RecruiterVerification, SessionLocal, User, VerificationEvidenceSnapshot, app, engine
 
 PASSWORD='SyntheticOnly123!'
 
@@ -103,3 +103,20 @@ def test_staged_onboarding_persists_only_for_recruiter_owner():
     candidate=TestClient(app);_,candidate_csrf=account(candidate,'staged-outsider','candidate')
     denied=candidate.put(f'/api/v1/recruiter/organizations/{oid}/verification/company',json={'legal_name':'越权','credit_code':'91370000DENY123456','registered_location':'山东','recruitment_subject_type':'employer'},headers={'X-CSRF-Token':candidate_csrf})
     assert denied.status_code==404
+
+
+def test_team_invitation_is_recipient_bound_and_acceptance_is_not_authorization():
+    owner=TestClient(app);owner_email,owner_csrf=account(owner,'team-owner','recruiter');oid=create_recruiter_org(owner,owner_csrf)
+    invitee=TestClient(app);invitee_email,_=account(invitee,'team-invitee','recruiter')
+    # This synthetic fixture models an already manually-approved owner; the
+    # invitation API must still create only a draft authorization for invitee.
+    session=SessionLocal();owner_user=session.query(User).filter_by(email=owner_email).one();org=session.get(Organization,uuid.UUID(oid));org.status='approved';org_ver=session.query(OrganizationVerification).filter_by(organization_id=uuid.UUID(oid)).one();org_ver.status='approved';org_ver.verified_at=org_ver.updated_at;org_ver.next_review_due_at=org_ver.updated_at.replace(year=org_ver.updated_at.year+1);person=session.query(RecruiterVerification).filter_by(user_id=owner_user.id).one();person.status='approved';person.verified_at=person.updated_at;person.next_review_due_at=person.updated_at.replace(year=person.updated_at.year+1);authorization=session.query(RecruiterOrganizationAuthorization).filter_by(organization_id=uuid.UUID(oid),user_id=owner_user.id).one();authorization.status='active';session.commit();invitee_user=session.query(User).filter_by(email=invitee_email).one();session.close()
+    created=owner.post(f'/api/v1/organizations/{oid}/recruiter-invitations',json={'invitee_user_id':str(invitee_user.id),'proposed_role':'member','expires_in_days':7},headers={'X-CSRF-Token':owner_csrf})
+    assert created.status_code==201,created.text
+    invitation_id=created.json()['id']
+    attacker=TestClient(app);_,attacker_csrf=account(attacker,'team-attacker','recruiter')
+    assert attacker.post(f'/api/v1/recruiter-invitations/{invitation_id}/accept',headers={'X-CSRF-Token':attacker_csrf}).status_code==404
+    invitee_login=invitee.post('/api/v1/auth/session',json={'email':invitee_email,'password':PASSWORD,'account_type':'recruiter'})
+    accepted=invitee.post(f'/api/v1/recruiter-invitations/{invitation_id}/accept',headers={'X-CSRF-Token':invitee_login.json()['csrf_token']})
+    assert accepted.status_code==200 and accepted.json()['authorization_status']=='draft'
+    assert invitee.get(f'/api/v1/organizations/{oid}/restricted-access').status_code==403

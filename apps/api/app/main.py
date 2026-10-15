@@ -58,6 +58,8 @@ class RecruiterVerification(Base):
  __tablename__='recruiter_verifications'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),unique=True,index=True); status: Mapped[str]=mapped_column(String(32),default='draft'); real_name: Mapped[str|None]=mapped_column(String(100)); job_title: Mapped[str|None]=mapped_column(String(120)); relationship_type: Mapped[str|None]=mapped_column(String(48)); reviewed_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); reviewed_by: Mapped[UUID|None]=mapped_column(ForeignKey('users.id')); review_reason_code: Mapped[str|None]=mapped_column(String(80)); verified_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); next_review_due_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class RecruiterOrganizationAuthorization(Base):
  __tablename__='recruiter_organization_authorizations'; __table_args__=(UniqueConstraint('organization_id','user_id',name='uq_recruiter_org_authorization'),); id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True); role: Mapped[str]=mapped_column(String(32),default='recruiter'); status: Mapped[str]=mapped_column(String(32),default='draft'); granted_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); expires_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); revoked_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+class RecruiterInvitation(Base):
+ __tablename__='recruiter_invitations'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); invitee_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True); created_by_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); proposed_role: Mapped[str]=mapped_column(String(32)); status: Mapped[str]=mapped_column(String(32),default='pending'); expires_at: Mapped[datetime]=mapped_column(DateTime(timezone=True)); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now); accepted_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); revoked_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True))
 class VerificationDocument(Base):
  __tablename__='verification_documents'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); uploader_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); evidence_version: Mapped[int]=mapped_column(Integer,default=1); document_type: Mapped[str]=mapped_column(String(48)); storage_key: Mapped[str]=mapped_column(String(255),unique=True); original_filename: Mapped[str]=mapped_column(String(255)); mime_type: Mapped[str]=mapped_column(String(100)); size_bytes: Mapped[int]=mapped_column(); sha256: Mapped[str]=mapped_column(String(64)); security_status: Mapped[str]=mapped_column(String(32),default='pending'); security_checked_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); security_checked_by: Mapped[UUID|None]=mapped_column(ForeignKey('users.id')); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class VerificationEvidenceSnapshot(Base):
@@ -95,6 +97,7 @@ class CompanyVerificationIn(BaseModel): legal_name:str=Field(min_length=2,max_le
 class RepresentativeVerificationIn(BaseModel): real_name:str=Field(min_length=2,max_length=100); job_title:str=Field(min_length=2,max_length=120); relationship_type:str=Field(pattern='^(legal_representative|business_owner|hr_lead|hr_recruiter|authorized_agent)$')
 class VerificationReviewIn(BaseModel): status:str=Field(pattern='^(need_more_info|approved|rejected|suspended)$'); reason_code:str=Field(min_length=3,max_length=80); expected_revision:int=Field(ge=1); evidence_snapshot_id:UUID; valid_days:int=Field(default=180,ge=1,le=365); entity_verification:str=Field(default='not_verified',pattern='^(not_verified|manual_verified|failed)$'); representative_verification:str=Field(default='not_verified',pattern='^(not_verified|manual_verified|failed)$'); authorization_verification:str=Field(default='not_verified',pattern='^(not_verified|manual_verified|failed)$')
 class DocumentSecurityIn(BaseModel): status:str=Field(pattern='^(clean|rejected)$'); reason_code:str=Field(min_length=3,max_length=80)
+class InvitationIn(BaseModel): invitee_user_id:UUID; proposed_role:str=Field(pattern='^(member|admin)$'); expires_in_days:int=Field(default=7,ge=1,le=30)
 class GateIn(BaseModel): enabled:bool; reason_code:str=Field(min_length=3,max_length=80)
 class AuthorizationIn(BaseModel): user_id:UUID; role:str=Field(pattern='^(organization_owner|recruitment_admin|recruiter|review_only)$')
 class ConsentIn(BaseModel): granted:bool
@@ -296,6 +299,43 @@ def organizations(a=Depends(auth),s:Session=Depends(db)):
 def members(oid:UUID,a=Depends(auth),s:Session=Depends(db)):
  if not require_recruitment_permission(s,oid,a[0].id,'manage_drafts'):raise HTTPException(404,'resource not found')
  return {'members':[{'user_id':str(m.user_id),'role':m.role,'status':m.status} for m in s.scalars(select(Membership).where(Membership.organization_id==oid))]}
+@app.get('/api/v1/organizations/{oid}/recruiter-invitations')
+def organization_invitations(oid:UUID,a=Depends(auth),s:Session=Depends(db)):
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_members'):raise HTTPException(404,'resource not found')
+ return {'items':[{'id':str(item.id),'invitee_user_id':str(item.invitee_user_id),'proposed_role':item.proposed_role,'status':'expired' if item.status=='pending' and comparable_time(item.expires_at)<=now() else item.status,'expires_at':item.expires_at,'created_at':item.created_at} for item in s.scalars(select(RecruiterInvitation).where(RecruiterInvitation.organization_id==oid).order_by(RecruiterInvitation.created_at.desc()))]}
+@app.post('/api/v1/organizations/{oid}/recruiter-invitations',status_code=201)
+def create_recruiter_invitation(oid:UUID,x:InvitationIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_members'):raise HTTPException(404,'resource not found')
+ if x.invitee_user_id==a[0].id:raise HTTPException(422,'cannot invite yourself')
+ if not s.get(User,x.invitee_user_id) or not has_identity(s,x.invitee_user_id,'recruiter'):raise HTTPException(422,'invitee must have an active recruiter identity')
+ if s.scalar(select(Membership).where(Membership.organization_id==oid,Membership.user_id==x.invitee_user_id,Membership.status=='active')):raise HTTPException(409,'invitee is already an active member')
+ existing=s.scalar(select(RecruiterInvitation).where(RecruiterInvitation.organization_id==oid,RecruiterInvitation.invitee_user_id==x.invitee_user_id,RecruiterInvitation.status=='pending',RecruiterInvitation.expires_at>now()))
+ if existing:raise HTTPException(409,'an active invitation already exists')
+ invitation=RecruiterInvitation(organization_id=oid,invitee_user_id=x.invitee_user_id,created_by_user_id=a[0].id,proposed_role=x.proposed_role,expires_at=now()+timedelta(days=x.expires_in_days));s.add(invitation);audit(s,r,'organization.invitation.create','success',f'invitation:{invitation.id}',a[0].id,{'organization_id':str(oid),'proposed_role':x.proposed_role});s.commit();return {'id':str(invitation.id),'status':invitation.status,'expires_at':invitation.expires_at}
+@app.get('/api/v1/recruiter-invitations')
+def my_recruiter_invitations(a=Depends(auth),s:Session=Depends(db)):
+ if not has_identity(s,a[0].id,'recruiter'):raise HTTPException(403,'recruiter identity required')
+ result=[]
+ for item in s.scalars(select(RecruiterInvitation).where(RecruiterInvitation.invitee_user_id==a[0].id).order_by(RecruiterInvitation.created_at.desc())):
+  org_row=s.get(Organization,item.organization_id)
+  result.append({'id':str(item.id),'organization_id':str(item.organization_id),'organization_name':org_row.legal_name if org_row else None,'proposed_role':item.proposed_role,'status':'expired' if item.status=='pending' and comparable_time(item.expires_at)<=now() else item.status,'expires_at':item.expires_at})
+ return {'items':result}
+@app.post('/api/v1/recruiter-invitations/{iid}/accept')
+def accept_recruiter_invitation(iid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if not has_identity(s,a[0].id,'recruiter'):raise HTTPException(403,'recruiter identity required')
+ invitation=s.scalar(select(RecruiterInvitation).where(RecruiterInvitation.id==iid).with_for_update())
+ if not invitation or invitation.invitee_user_id!=a[0].id:raise HTTPException(404,'resource not found')
+ if invitation.status!='pending':raise HTTPException(409,'invitation is no longer available')
+ if comparable_time(invitation.expires_at)<=now():invitation.status='expired';s.commit();raise HTTPException(409,'invitation has expired')
+ if s.scalar(select(Membership).where(Membership.organization_id==invitation.organization_id,Membership.user_id==a[0].id,Membership.status=='active')):raise HTTPException(409,'already an active member')
+ membership_role='member' if invitation.proposed_role=='member' else 'admin';s.add(Membership(organization_id=invitation.organization_id,user_id=a[0].id,role=membership_role));s.add(RecruiterOrganizationAuthorization(organization_id=invitation.organization_id,user_id=a[0].id,role='recruiter' if membership_role=='member' else 'recruitment_admin',status='draft'));invitation.status='accepted';invitation.accepted_at=now();audit(s,r,'organization.invitation.accept','success',f'invitation:{iid}',a[0].id,{'organization_id':str(invitation.organization_id)});s.commit();return {'status':'accepted','organization_id':str(invitation.organization_id),'authorization_status':'draft'}
+@app.delete('/api/v1/organizations/{oid}/recruiter-invitations/{iid}')
+def revoke_recruiter_invitation(oid:UUID,iid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_members'):raise HTTPException(404,'resource not found')
+ invitation=s.scalar(select(RecruiterInvitation).where(RecruiterInvitation.id==iid,RecruiterInvitation.organization_id==oid).with_for_update())
+ if not invitation:raise HTTPException(404,'resource not found')
+ if invitation.status!='pending':raise HTTPException(409,'only a pending invitation can be revoked')
+ invitation.status='revoked';invitation.revoked_at=now();audit(s,r,'organization.invitation.revoke','success',f'invitation:{iid}',a[0].id);s.commit();return {'status':'revoked'}
 @app.post('/api/v1/organizations/{oid}/members',status_code=201)
 def addmember(oid:UUID,x:MemberIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if not require_recruitment_permission(s,oid,a[0].id,'manage_members'):raise HTTPException(404,'resource not found')
