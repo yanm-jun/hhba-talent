@@ -50,6 +50,24 @@ class CandidateSearchProjection(Base):
  __tablename__='candidate_search_projections'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); profile_id: Mapped[UUID]=mapped_column(ForeignKey('profiles.id',ondelete='CASCADE'),unique=True,index=True); owner_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True); candidate_ref: Mapped[str]=mapped_column(String(32),unique=True,index=True,default=lambda:uuid4().hex); display_name: Mapped[str|None]=mapped_column(String(100)); headline: Mapped[str|None]=mapped_column(String(300)); capability_summary: Mapped[str|None]=mapped_column(Text); skills: Mapped[list]=mapped_column(JSON,default=list); industries: Mapped[list]=mapped_column(JSON,default=list); location: Mapped[str|None]=mapped_column(String(120)); service_regions: Mapped[list]=mapped_column(JSON,default=list); work_modes: Mapped[list]=mapped_column(JSON,default=list); work_years: Mapped[int|None]=mapped_column(Integer); project_summaries: Mapped[list]=mapped_column(JSON,default=list); skills_text: Mapped[str]=mapped_column(Text,default=''); industries_text: Mapped[str]=mapped_column(Text,default=''); regions_text: Mapped[str]=mapped_column(Text,default=''); work_modes_text: Mapped[str]=mapped_column(Text,default=''); search_text: Mapped[str]=mapped_column(Text,default=''); profile_version: Mapped[int]=mapped_column(Integer,default=0); indexed_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class TalentSearchUsage(Base):
  __tablename__='talent_search_usages'; __table_args__=(UniqueConstraint('organization_id','user_id','usage_date',name='uq_talent_search_usage_day'),); id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True); usage_date: Mapped[date]=mapped_column(Date); request_count: Mapped[int]=mapped_column(Integer,default=0); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+class BusinessIdentity(Base):
+ __tablename__='business_identities'; __table_args__=(UniqueConstraint('user_id','identity_type',name='uq_business_identity_user_type'),); id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True); identity_type: Mapped[str]=mapped_column(String(32)); status: Mapped[str]=mapped_column(String(32),default='active'); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+class OrganizationVerification(Base):
+ __tablename__='organization_verifications'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),unique=True,index=True); applicant_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); recruitment_subject_type: Mapped[str]=mapped_column(String(32),default='employer'); legal_name: Mapped[str|None]=mapped_column(String(200)); credit_code: Mapped[str|None]=mapped_column(String(32),index=True); registered_location: Mapped[str|None]=mapped_column(String(160)); status: Mapped[str]=mapped_column(String(32),default='draft'); version: Mapped[int]=mapped_column(Integer,default=1); submitted_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); reviewed_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); reviewed_by: Mapped[UUID|None]=mapped_column(ForeignKey('users.id')); review_reason_code: Mapped[str|None]=mapped_column(String(80)); verified_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); next_review_due_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); suspended_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); suspension_reason_code: Mapped[str|None]=mapped_column(String(80)); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+class RecruiterVerification(Base):
+ __tablename__='recruiter_verifications'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),unique=True,index=True); status: Mapped[str]=mapped_column(String(32),default='draft'); real_name: Mapped[str|None]=mapped_column(String(100)); job_title: Mapped[str|None]=mapped_column(String(120)); relationship_type: Mapped[str|None]=mapped_column(String(48)); reviewed_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); reviewed_by: Mapped[UUID|None]=mapped_column(ForeignKey('users.id')); review_reason_code: Mapped[str|None]=mapped_column(String(80)); verified_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); next_review_due_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+class RecruiterOrganizationAuthorization(Base):
+ __tablename__='recruiter_organization_authorizations'; __table_args__=(UniqueConstraint('organization_id','user_id',name='uq_recruiter_org_authorization'),); id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True); role: Mapped[str]=mapped_column(String(32),default='recruiter'); status: Mapped[str]=mapped_column(String(32),default='draft'); granted_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); expires_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); revoked_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+class RecruiterInvitation(Base):
+ __tablename__='recruiter_invitations'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); invitee_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True); created_by_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); proposed_role: Mapped[str]=mapped_column(String(32)); status: Mapped[str]=mapped_column(String(32),default='pending'); expires_at: Mapped[datetime]=mapped_column(DateTime(timezone=True)); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now); accepted_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); revoked_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True))
+class VerificationDocument(Base):
+ __tablename__='verification_documents'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); uploader_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); evidence_version: Mapped[int]=mapped_column(Integer,default=1); document_type: Mapped[str]=mapped_column(String(48)); storage_key: Mapped[str]=mapped_column(String(255),unique=True); original_filename: Mapped[str]=mapped_column(String(255)); mime_type: Mapped[str]=mapped_column(String(100)); size_bytes: Mapped[int]=mapped_column(); sha256: Mapped[str]=mapped_column(String(64)); security_status: Mapped[str]=mapped_column(String(32),default='pending'); security_checked_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); security_checked_by: Mapped[UUID|None]=mapped_column(ForeignKey('users.id')); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+class VerificationEvidenceSnapshot(Base):
+ __tablename__='verification_evidence_snapshots'; __table_args__=(UniqueConstraint('organization_id','evidence_version',name='uq_verification_evidence_version'),); id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); evidence_version: Mapped[int]=mapped_column(Integer); manifest: Mapped[dict]=mapped_column(JSON); manifest_sha256: Mapped[str]=mapped_column(String(64)); submitted_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+class VerificationReview(Base):
+ __tablename__='verification_reviews'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); reviewer_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); evidence_version: Mapped[int]=mapped_column(Integer); evidence_snapshot_id: Mapped[UUID]=mapped_column(ForeignKey('verification_evidence_snapshots.id')); evidence_manifest_sha256: Mapped[str]=mapped_column(String(64)); entity_verification: Mapped[str]=mapped_column(String(32),default='not_verified'); representative_verification: Mapped[str]=mapped_column(String(32),default='not_verified'); authorization_verification: Mapped[str]=mapped_column(String(32),default='not_verified'); outcome: Mapped[str]=mapped_column(String(32)); reason_code: Mapped[str]=mapped_column(String(80)); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+class PlatformServiceGate(Base):
+ __tablename__='platform_service_gates'; gate_key: Mapped[str]=mapped_column(String(64),primary_key=True); enabled: Mapped[bool]=mapped_column(Boolean,default=False); reviewed_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); reviewed_by: Mapped[UUID|None]=mapped_column(ForeignKey('users.id')); reason_code: Mapped[str|None]=mapped_column(String(80))
 DATABASE_URL=os.getenv('DATABASE_URL','postgresql+psycopg://hhba_app:CHANGE_ME_LOCAL_ONLY@127.0.0.1:5432/hhba_dev')
 if DATABASE_URL.startswith('postgresql://'):DATABASE_URL='postgresql+psycopg://'+DATABASE_URL.removeprefix('postgresql://')
 engine=create_engine(DATABASE_URL,pool_pre_ping=True); SessionLocal=sessionmaker(bind=engine,expire_on_commit=False); pwd=PasswordHash.recommended(); app=FastAPI(title='HHBA API',version='0.1.0')
@@ -70,10 +88,18 @@ def auth(r:Request,s:Session=Depends(db)):
 def csrf(r:Request,a=Depends(auth)):
  if not secrets.compare_digest(r.headers.get('X-CSRF-Token',''),a[1].csrf): raise HTTPException(403,'csrf validation failed')
  return a
-class Register(BaseModel): email:EmailStr; password:str=Field(min_length=12); display_name:str
-class Login(BaseModel): email:EmailStr; password:str
+class Register(BaseModel): email:EmailStr; password:str=Field(min_length=12); display_name:str; account_type:str=Field(default='candidate',pattern='^(candidate|recruiter)$')
+class Login(BaseModel): email:EmailStr; password:str; account_type:str|None=Field(default=None,pattern='^(candidate|recruiter)$')
 class OrgIn(BaseModel): legal_name:str=Field(min_length=2)
 class ReviewIn(BaseModel): status:str=Field(pattern='^(approved|rejected|suspended)$')
+class VerificationIn(BaseModel): legal_name:str=Field(min_length=2,max_length=200); credit_code:str=Field(min_length=8,max_length=32); registered_location:str=Field(min_length=2,max_length=160); recruitment_subject_type:str=Field(default='employer',pattern='^(employer|agency)$'); real_name:str=Field(min_length=2,max_length=100); job_title:str=Field(min_length=2,max_length=120)
+class CompanyVerificationIn(BaseModel): legal_name:str=Field(min_length=2,max_length=200); credit_code:str=Field(min_length=8,max_length=32); registered_location:str=Field(min_length=2,max_length=160); recruitment_subject_type:str=Field(default='employer',pattern='^(employer|agency)$')
+class RepresentativeVerificationIn(BaseModel): real_name:str=Field(min_length=2,max_length=100); job_title:str=Field(min_length=2,max_length=120); relationship_type:str=Field(pattern='^(legal_representative|business_owner|hr_lead|hr_recruiter|authorized_agent)$')
+class VerificationReviewIn(BaseModel): status:str=Field(pattern='^(need_more_info|approved|rejected|suspended)$'); reason_code:str=Field(min_length=3,max_length=80); expected_revision:int=Field(ge=1); evidence_snapshot_id:UUID; valid_days:int=Field(default=180,ge=1,le=365); entity_verification:str=Field(default='not_verified',pattern='^(not_verified|manual_verified|failed)$'); representative_verification:str=Field(default='not_verified',pattern='^(not_verified|manual_verified|failed)$'); authorization_verification:str=Field(default='not_verified',pattern='^(not_verified|manual_verified|failed)$')
+class DocumentSecurityIn(BaseModel): status:str=Field(pattern='^(clean|rejected)$'); reason_code:str=Field(min_length=3,max_length=80)
+class InvitationIn(BaseModel): invitee_user_id:UUID; proposed_role:str=Field(pattern='^(member|admin)$'); expires_in_days:int=Field(default=7,ge=1,le=30)
+class GateIn(BaseModel): enabled:bool; reason_code:str=Field(min_length=3,max_length=80)
+class AuthorizationIn(BaseModel): user_id:UUID; role:str=Field(pattern='^(organization_owner|recruitment_admin|recruiter|review_only)$')
 class ConsentIn(BaseModel): granted:bool
 class MemberIn(BaseModel): user_id:UUID; role:str=Field(pattern='^(owner|member)$')
 class RequirementIn(BaseModel):
@@ -97,24 +123,171 @@ class TalentSearchIn(BaseModel):
 def healthz(): return {'status':'ok','phase':'1'}
 @app.post('/api/v1/auth/register',status_code=201)
 def reg(x:Register,r:Request,s:Session=Depends(db)):
- e=str(x.email).casefold(); u=User(email=e,name=x.display_name,password_hash=pwd.hash(x.password),role='admin' if e==os.getenv('HHBA_BOOTSTRAP_ADMIN_EMAIL','').casefold() else 'user');s.add(u)
+ # Public registration must never mint an internal-reviewer account from an
+ # email address.  Internal administrators are provisioned through a separate
+ # controlled operational procedure, not a browser registration side effect.
+ e=str(x.email).casefold(); u=User(email=e,name=x.display_name,password_hash=pwd.hash(x.password),role='user');s.add(u)
  try:s.flush()
  except Exception:s.rollback();raise HTTPException(409,'account cannot be created')
- audit(s,r,'auth.register','success',f'user:{u.id}',u.id);s.commit();return {'id':str(u.id)}
+ s.add(BusinessIdentity(user_id=u.id,identity_type=x.account_type));
+ if x.account_type=='recruiter':s.add(RecruiterVerification(user_id=u.id,status='draft'))
+ audit(s,r,'auth.register','success',f'user:{u.id}',u.id,{'account_type':x.account_type});s.commit();return {'id':str(u.id),'account_type':x.account_type}
 @app.post('/api/v1/auth/session')
 def login(x:Login,res:Response,r:Request,s:Session=Depends(db)):
  u=s.scalar(select(User).where(User.email==str(x.email).casefold()))
  if not u or not pwd.verify(x.password,u.password_hash):audit(s,r,'auth.login','denied','session');s.commit();raise HTTPException(401,'invalid credentials')
+ if x.account_type and not has_identity(s,u.id,x.account_type):audit(s,r,'auth.login.identity_denied','denied','session',u.id,{'account_type':x.account_type});s.commit();raise HTTPException(403,'account identity does not match this entry')
  t=secrets.token_urlsafe(32);q=AuthSession(user_id=u.id,token_hash=hashlib.sha256(t.encode()).hexdigest(),csrf=secrets.token_urlsafe(32),expires_at=now()+timedelta(hours=8));s.add(q);audit(s,r,'auth.login','success','session',u.id);s.commit();res.set_cookie('hhba_session',t,httponly=True,samesite='lax');return {'csrf_token':q.csrf,'role':u.role}
 @app.get('/api/v1/auth/me')
-def me(a=Depends(auth)):
- return {'id':str(a[0].id),'email':a[0].email,'display_name':a[0].name,'role':a[0].role,'csrf_token':a[1].csrf}
+def me(a=Depends(auth),s:Session=Depends(db)):
+ identities=[row.identity_type for row in s.scalars(select(BusinessIdentity).where(BusinessIdentity.user_id==a[0].id,BusinessIdentity.status=='active'))]
+ return {'id':str(a[0].id),'email':a[0].email,'display_name':a[0].name,'role':a[0].role,'account_types':identities,'csrf_token':a[1].csrf}
 @app.delete('/api/v1/auth/session')
 def logout(res:Response,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  a[1].revoked_at=now();audit(s,r,'auth.logout','success','session',a[0].id);s.commit();res.delete_cookie('hhba_session');return {'ok':True}
+@app.post('/api/v1/auth/register/candidate',status_code=201)
+def register_candidate(x:Register,r:Request,s:Session=Depends(db)):
+ return reg(Register(email=x.email,password=x.password,display_name=x.display_name,account_type='candidate'),r,s)
+@app.post('/api/v1/auth/register/recruiter',status_code=201)
+def register_recruiter(x:Register,r:Request,s:Session=Depends(db)):
+ return reg(Register(email=x.email,password=x.password,display_name=x.display_name,account_type='recruiter'),r,s)
+def has_identity(s,user_id,identity_type):
+ return bool(s.scalar(select(BusinessIdentity).where(BusinessIdentity.user_id==user_id,BusinessIdentity.identity_type==identity_type,BusinessIdentity.status=='active')))
+def candidate_auth(a=Depends(auth),s:Session=Depends(db)):
+ if not has_identity(s,a[0].id,'candidate'):raise HTTPException(403,'candidate identity required')
+ return a
+def candidate_csrf(a=Depends(csrf),s:Session=Depends(db)):
+ if not has_identity(s,a[0].id,'candidate'):raise HTTPException(403,'candidate identity required')
+ return a
+def verification_is_current(row):
+ return bool(row and row.status=='approved' and (not row.next_review_due_at or comparable_time(row.next_review_due_at)>now()))
+RECRUITER_ROLES={'organization_owner','recruitment_admin','recruiter'}
+def recruiter_context(s,oid,user_id):
+ """Resolve recruiter context once; callers must not hand-roll this check."""
+ return (active_membership(oid,user_id,s),s.get(Organization,oid),s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid)),s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==user_id)),s.scalar(select(RecruiterOrganizationAuthorization).where(RecruiterOrganizationAuthorization.organization_id==oid,RecruiterOrganizationAuthorization.user_id==user_id)))
+def require_recruitment_permission(s,oid,user_id,permission):
+ """Central deny-by-default policy for organization-scoped recruiter actions.
+
+ `manage_drafts` is intentionally available while verification is being
+ prepared.  Search/restricted access remains unavailable until the platform
+ gate, organization verification, individual verification and authorization
+ are all current.
+ """
+ member,org,org_ver,recruiter,authorization=recruiter_context(s,oid,user_id)
+ base=bool(member and member.status=='active' and has_identity(s,user_id,'recruiter') and authorization and authorization.status in {'draft','active'} and authorization.role in RECRUITER_ROLES and (not authorization.expires_at or comparable_time(authorization.expires_at)>now()))
+ if permission=='manage_drafts': return base
+ if permission in {'manage_members','review_verification'}: return bool(base and org and org.status=='approved' and authorization and authorization.status=='active' and verification_is_current(org_ver) and verification_is_current(recruiter) and authorization.role in {'organization_owner','recruitment_admin'})
+ if permission in {'talent_search','restricted_access'}:
+  gate=s.get(PlatformServiceGate,'network_recruitment')
+  return bool(base and gate and gate.enabled and org and org.status=='approved' and verification_is_current(org_ver) and verification_is_current(recruiter) and authorization and authorization.status=='active')
+ return False
+def recruitment_allowed(s,oid,user_id):
+ return require_recruitment_permission(s,oid,user_id,'talent_search')
 @app.post('/api/v1/organizations',status_code=201)
 def org(x:OrgIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
- o=Organization(legal_name=x.legal_name,created_by=a[0].id);s.add(o);s.flush();s.add(Membership(organization_id=o.id,user_id=a[0].id,role='owner'));audit(s,r,'organization.create','success',f'organization:{o.id}',a[0].id);s.commit();return {'id':str(o.id),'status':o.status}
+ if not has_identity(s,a[0].id,'recruiter'):raise HTTPException(403,'recruiter identity required')
+ o=Organization(legal_name=x.legal_name,created_by=a[0].id);s.add(o);s.flush();s.add(Membership(organization_id=o.id,user_id=a[0].id,role='owner'));s.add(OrganizationVerification(organization_id=o.id,applicant_user_id=a[0].id,legal_name=x.legal_name,status='draft'));s.add(RecruiterOrganizationAuthorization(organization_id=o.id,user_id=a[0].id,role='organization_owner',status='draft'));audit(s,r,'organization.create','success',f'organization:{o.id}',a[0].id);s.commit();return {'id':str(o.id),'status':o.status}
+VERIFICATION_ROOT=os.path.abspath(os.getenv('HHBA_VERIFICATION_ROOT','./private_verification_documents'))
+def verification_owner(s,oid,user_id):
+ member=active_membership(oid,user_id,s);return bool(member and member.role=='owner' and has_identity(s,user_id,'recruiter'))
+def verification_view(row,docs,person=None):
+ return {'organization_id':str(row.organization_id),'status':row.status,'revision':row.version,'legal_name':row.legal_name,'credit_code_masked':None if not row.credit_code else row.credit_code[:4]+'***'+row.credit_code[-4:],'registered_location':row.registered_location,'recruitment_subject_type':row.recruitment_subject_type,'review_reason_code':row.review_reason_code,'next_review_due_at':row.next_review_due_at,'representative':None if not person else {'real_name':person.real_name,'job_title':person.job_title,'relationship_type':person.relationship_type},'documents':[{'id':str(d.id),'document_type':d.document_type,'filename':d.original_filename,'size_bytes':d.size_bytes,'security_status':d.security_status,'evidence_version':d.evidence_version,'created_at':d.created_at} for d in docs]}
+def verification_editable(row,person):
+ if not row or not person or row.status not in {'draft','need_more_info','rejected'}:raise HTTPException(409,'verification cannot be edited in its current state')
+ if row.status in {'need_more_info','rejected'}:
+  row.version+=1
+  row.status='draft'
+  person.status='draft'
+def duplicate_credit_code(s,oid,credit_code):
+ return s.scalar(select(OrganizationVerification).where(OrganizationVerification.credit_code==credit_code,OrganizationVerification.organization_id!=oid,OrganizationVerification.status.in_(['draft','submitted','need_more_info','approved'])))
+def evidence_integrity(s,snapshot):
+ """Validate the submitted manifest against DB metadata and private bytes."""
+ manifest=json.dumps(snapshot.manifest,sort_keys=True,separators=(',',':'))
+ if hashlib.sha256(manifest.encode()).hexdigest()!=snapshot.manifest_sha256:return False,'manifest_hash_mismatch',[]
+ records=[]
+ for item in snapshot.manifest:
+  try:did=UUID(item['id'])
+  except (KeyError,ValueError,TypeError):return False,'manifest_identifier_invalid',[]
+  doc=s.get(VerificationDocument,did);path=os.path.join(VERIFICATION_ROOT,doc.storage_key) if doc else ''
+  if not doc or doc.organization_id!=snapshot.organization_id or doc.evidence_version!=snapshot.evidence_version:return False,'document_record_mismatch',[]
+  if doc.sha256!=item.get('sha256') or doc.size_bytes!=item.get('size') or doc.document_type!=item.get('type'):return False,'document_metadata_mismatch',[]
+  if not os.path.isfile(path):return False,'document_file_missing',[]
+  with open(path,'rb') as handle:actual=hashlib.sha256(handle.read()).hexdigest()
+  if actual!=doc.sha256:return False,'document_bytes_mismatch',[]
+  records.append(doc)
+ return True,'ok',records
+@app.get('/api/v1/recruiter/organizations/{oid}/verification')
+def recruiter_verification(oid:UUID,a=Depends(auth),s:Session=Depends(db)):
+ if not verification_owner(s,oid,a[0].id):raise HTTPException(404,'resource not found')
+ row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid));
+ if not row:raise HTTPException(404,'resource not found')
+ # Older evidence remains available to the audit trail, but the applicant
+ # receives only the active revision.  This prevents stale rejected evidence
+ # from appearing as if it could be submitted again.
+ person=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==a[0].id))
+ return verification_view(row,s.scalars(select(VerificationDocument).where(VerificationDocument.organization_id==oid,VerificationDocument.evidence_version==row.version)).all(),person)
+@app.get('/api/v1/recruiter/onboarding')
+def recruiter_onboarding(a=Depends(auth),s:Session=Depends(db)):
+ if not has_identity(s,a[0].id,'recruiter'):raise HTTPException(403,'recruiter identity required')
+ result=[]
+ for membership in s.scalars(select(Membership).where(Membership.user_id==a[0].id,Membership.status=='active')).all():
+  org_row=s.get(Organization,membership.organization_id);verification=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==membership.organization_id))
+  if org_row and verification:result.append({'organization_id':str(org_row.id),'legal_name':org_row.legal_name,'membership_role':membership.role,'organization_status':org_row.status,'verification_status':verification.status,'revision':verification.version})
+ return {'applications':result}
+@app.put('/api/v1/recruiter/organizations/{oid}/verification/company')
+def save_company_verification(oid:UUID,x:CompanyVerificationIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if not verification_owner(s,oid,a[0].id):raise HTTPException(404,'resource not found')
+ if x.recruitment_subject_type=='agency':raise HTTPException(403,'agency verification is not open in this version')
+ row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid).with_for_update());person=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==a[0].id).with_for_update());verification_editable(row,person)
+ credit_code=x.credit_code.upper()
+ if duplicate_credit_code(s,oid,credit_code):raise HTTPException(409,'an active verification already exists for this credit code')
+ row.legal_name=x.legal_name;row.credit_code=credit_code;row.registered_location=x.registered_location;row.recruitment_subject_type=x.recruitment_subject_type;row.updated_at=now();audit(s,r,'verification.company.save','success',f'organization:{oid}',a[0].id,{'version':row.version});s.commit();return verification_view(row,[],person)
+@app.put('/api/v1/recruiter/organizations/{oid}/verification/representative')
+def save_representative_verification(oid:UUID,x:RepresentativeVerificationIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if not verification_owner(s,oid,a[0].id):raise HTTPException(404,'resource not found')
+ row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid).with_for_update());person=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==a[0].id).with_for_update());verification_editable(row,person)
+ person.real_name=x.real_name;person.job_title=x.job_title;person.relationship_type=x.relationship_type;person.updated_at=now();row.updated_at=now();audit(s,r,'verification.representative.save','success',f'organization:{oid}',a[0].id,{'version':row.version,'relationship_type':x.relationship_type});s.commit();return verification_view(row,[],person)
+@app.put('/api/v1/recruiter/organizations/{oid}/verification')
+def save_recruiter_verification(oid:UUID,x:VerificationIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if not verification_owner(s,oid,a[0].id):raise HTTPException(404,'resource not found')
+ if x.recruitment_subject_type=='agency':raise HTTPException(403,'agency verification is not open in this version')
+ row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid).with_for_update());person=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==a[0].id).with_for_update())
+ verification_editable(row,person)
+ credit_code=x.credit_code.upper()
+ # A legal entity cannot have two concurrent verification applications.  Do
+ # not infer ownership from the code; instead reject the duplicate and make
+ # it visible to an internal reviewer through the audit trail.
+ duplicate=duplicate_credit_code(s,oid,credit_code)
+ if duplicate: raise HTTPException(409,'an active verification already exists for this credit code')
+ row.legal_name=x.legal_name;row.credit_code=credit_code;row.registered_location=x.registered_location;row.recruitment_subject_type=x.recruitment_subject_type;row.status='draft';row.updated_at=now();person.real_name=x.real_name;person.job_title=x.job_title;person.status='draft';person.updated_at=now();audit(s,r,'verification.save','success',f'organization:{oid}',a[0].id,{'version':row.version});s.commit();return verification_view(row,[])
+@app.post('/api/v1/recruiter/organizations/{oid}/verification/documents',status_code=201)
+async def upload_verification_document(oid:UUID,document_type:str,r:Request,file:UploadFile=File(...),a=Depends(csrf),s:Session=Depends(db)):
+ if document_type not in {'business_license','authorization_letter'}:raise HTTPException(422,'unsupported verification document type')
+ if not verification_owner(s,oid,a[0].id):raise HTTPException(404,'resource not found')
+ row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid).with_for_update())
+ if not row or row.status not in {'draft','need_more_info','rejected'}:raise HTTPException(409,'verification evidence is locked; start a new review version first')
+ name=os.path.basename(file.filename or '');ext=os.path.splitext(name)[1].lower();chunks=[];size=0
+ while True:
+  chunk=await file.read(1024*1024)
+  if not chunk:break
+  size+=len(chunk)
+  if size>10*1024*1024:raise HTTPException(413,'verification document exceeds the 10 MB limit')
+  chunks.append(chunk)
+ data=b''.join(chunks);is_pdf=data.startswith(b'%PDF-');is_jpg=data.startswith(b'\xff\xd8\xff');is_png=data.startswith(b'\x89PNG\r\n\x1a\n')
+ if ext not in {'.pdf','.jpg','.jpeg','.png'} or len(data)==0 or not ((ext=='.pdf' and is_pdf) or (ext in {'.jpg','.jpeg'} and is_jpg) or (ext=='.png' and is_png)):raise HTTPException(415,'unsupported or mismatched verification document')
+ os.makedirs(VERIFICATION_ROOT,exist_ok=True);key=uuid4().hex+ext;open(os.path.join(VERIFICATION_ROOT,key),'wb').write(data);mime='application/pdf' if is_pdf else 'image/png' if is_png else 'image/jpeg';doc=VerificationDocument(organization_id=oid,uploader_user_id=a[0].id,evidence_version=row.version,document_type=document_type,storage_key=key,original_filename=name,mime_type=mime,size_bytes=len(data),sha256=hashlib.sha256(data).hexdigest());s.add(doc);audit(s,r,'verification.document.upload','success',f'verification_document:{doc.id}',a[0].id,{'document_type':document_type,'version':row.version});s.commit();return {'id':str(doc.id),'document_type':document_type}
+@app.post('/api/v1/recruiter/organizations/{oid}/verification/submit')
+def submit_verification(oid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if not verification_owner(s,oid,a[0].id):raise HTTPException(404,'resource not found')
+ row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid).with_for_update());person=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==a[0].id).with_for_update())
+ # A request for more information/rejection must go through save first.  Save
+ # creates a new revision, so an immutable evidence version gets one snapshot.
+ if not row or not person or row.status!='draft':raise HTTPException(409,'verification must be saved as a new draft before submission')
+ docs=s.scalars(select(VerificationDocument).where(VerificationDocument.organization_id==oid,VerificationDocument.evidence_version==row.version)).all();kinds={d.document_type for d in docs}
+ if not row.credit_code or not person.real_name or not {'business_license','authorization_letter'}.issubset(kinds):raise HTTPException(422,'business license and recruiter authorization are required')
+ if s.scalar(select(VerificationEvidenceSnapshot).where(VerificationEvidenceSnapshot.organization_id==oid,VerificationEvidenceSnapshot.evidence_version==row.version)):raise HTTPException(409,'evidence version has already been submitted')
+ manifest=[{'id':str(d.id),'type':d.document_type,'sha256':d.sha256,'size':d.size_bytes} for d in sorted(docs,key=lambda x:(x.document_type,str(x.id)))];serialized=json.dumps(manifest,sort_keys=True,separators=(',',':'));s.add(VerificationEvidenceSnapshot(organization_id=oid,evidence_version=row.version,manifest=manifest,manifest_sha256=hashlib.sha256(serialized.encode()).hexdigest()))
+ row.status='submitted';row.submitted_at=now();row.updated_at=now();person.status='submitted';person.updated_at=now();audit(s,r,'verification.submit','success',f'organization:{oid}',a[0].id,{'version':row.version});s.commit();return {'status':'submitted','evidence_version':row.version}
 @app.get('/api/v1/organizations')
 def organizations(a=Depends(auth),s:Session=Depends(db)):
  rows=s.scalars(select(Membership).where(Membership.user_id==a[0].id,Membership.status=='active')).all();result=[]
@@ -124,39 +297,136 @@ def organizations(a=Depends(auth),s:Session=Depends(db)):
  return {'organizations':result}
 @app.get('/api/v1/organizations/{oid}/members')
 def members(oid:UUID,a=Depends(auth),s:Session=Depends(db)):
- if not s.scalar(select(Membership).where(Membership.organization_id==oid,Membership.user_id==a[0].id,Membership.status=='active')):raise HTTPException(404,'resource not found')
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_drafts'):raise HTTPException(404,'resource not found')
  return {'members':[{'user_id':str(m.user_id),'role':m.role,'status':m.status} for m in s.scalars(select(Membership).where(Membership.organization_id==oid))]}
+@app.get('/api/v1/organizations/{oid}/recruiter-invitations')
+def organization_invitations(oid:UUID,a=Depends(auth),s:Session=Depends(db)):
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_members'):raise HTTPException(404,'resource not found')
+ return {'items':[{'id':str(item.id),'invitee_user_id':str(item.invitee_user_id),'proposed_role':item.proposed_role,'status':'expired' if item.status=='pending' and comparable_time(item.expires_at)<=now() else item.status,'expires_at':item.expires_at,'created_at':item.created_at} for item in s.scalars(select(RecruiterInvitation).where(RecruiterInvitation.organization_id==oid).order_by(RecruiterInvitation.created_at.desc()))]}
+@app.post('/api/v1/organizations/{oid}/recruiter-invitations',status_code=201)
+def create_recruiter_invitation(oid:UUID,x:InvitationIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_members'):raise HTTPException(404,'resource not found')
+ if x.invitee_user_id==a[0].id:raise HTTPException(422,'cannot invite yourself')
+ if not s.get(User,x.invitee_user_id) or not has_identity(s,x.invitee_user_id,'recruiter'):raise HTTPException(422,'invitee must have an active recruiter identity')
+ if s.scalar(select(Membership).where(Membership.organization_id==oid,Membership.user_id==x.invitee_user_id,Membership.status=='active')):raise HTTPException(409,'invitee is already an active member')
+ existing=s.scalar(select(RecruiterInvitation).where(RecruiterInvitation.organization_id==oid,RecruiterInvitation.invitee_user_id==x.invitee_user_id,RecruiterInvitation.status=='pending',RecruiterInvitation.expires_at>now()))
+ if existing:raise HTTPException(409,'an active invitation already exists')
+ invitation=RecruiterInvitation(organization_id=oid,invitee_user_id=x.invitee_user_id,created_by_user_id=a[0].id,proposed_role=x.proposed_role,expires_at=now()+timedelta(days=x.expires_in_days));s.add(invitation);audit(s,r,'organization.invitation.create','success',f'invitation:{invitation.id}',a[0].id,{'organization_id':str(oid),'proposed_role':x.proposed_role});s.commit();return {'id':str(invitation.id),'status':invitation.status,'expires_at':invitation.expires_at}
+@app.get('/api/v1/recruiter-invitations')
+def my_recruiter_invitations(a=Depends(auth),s:Session=Depends(db)):
+ if not has_identity(s,a[0].id,'recruiter'):raise HTTPException(403,'recruiter identity required')
+ result=[]
+ for item in s.scalars(select(RecruiterInvitation).where(RecruiterInvitation.invitee_user_id==a[0].id).order_by(RecruiterInvitation.created_at.desc())):
+  org_row=s.get(Organization,item.organization_id)
+  result.append({'id':str(item.id),'organization_id':str(item.organization_id),'organization_name':org_row.legal_name if org_row else None,'proposed_role':item.proposed_role,'status':'expired' if item.status=='pending' and comparable_time(item.expires_at)<=now() else item.status,'expires_at':item.expires_at})
+ return {'items':result}
+@app.post('/api/v1/recruiter-invitations/{iid}/accept')
+def accept_recruiter_invitation(iid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if not has_identity(s,a[0].id,'recruiter'):raise HTTPException(403,'recruiter identity required')
+ invitation=s.scalar(select(RecruiterInvitation).where(RecruiterInvitation.id==iid).with_for_update())
+ if not invitation or invitation.invitee_user_id!=a[0].id:raise HTTPException(404,'resource not found')
+ if invitation.status!='pending':raise HTTPException(409,'invitation is no longer available')
+ if comparable_time(invitation.expires_at)<=now():invitation.status='expired';s.commit();raise HTTPException(409,'invitation has expired')
+ if s.scalar(select(Membership).where(Membership.organization_id==invitation.organization_id,Membership.user_id==a[0].id,Membership.status=='active')):raise HTTPException(409,'already an active member')
+ membership_role='member' if invitation.proposed_role=='member' else 'admin';s.add(Membership(organization_id=invitation.organization_id,user_id=a[0].id,role=membership_role));s.add(RecruiterOrganizationAuthorization(organization_id=invitation.organization_id,user_id=a[0].id,role='recruiter' if membership_role=='member' else 'recruitment_admin',status='draft'));invitation.status='accepted';invitation.accepted_at=now();audit(s,r,'organization.invitation.accept','success',f'invitation:{iid}',a[0].id,{'organization_id':str(invitation.organization_id)});s.commit();return {'status':'accepted','organization_id':str(invitation.organization_id),'authorization_status':'draft'}
+@app.delete('/api/v1/organizations/{oid}/recruiter-invitations/{iid}')
+def revoke_recruiter_invitation(oid:UUID,iid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_members'):raise HTTPException(404,'resource not found')
+ invitation=s.scalar(select(RecruiterInvitation).where(RecruiterInvitation.id==iid,RecruiterInvitation.organization_id==oid).with_for_update())
+ if not invitation:raise HTTPException(404,'resource not found')
+ if invitation.status!='pending':raise HTTPException(409,'only a pending invitation can be revoked')
+ invitation.status='revoked';invitation.revoked_at=now();audit(s,r,'organization.invitation.revoke','success',f'invitation:{iid}',a[0].id);s.commit();return {'status':'revoked'}
 @app.post('/api/v1/organizations/{oid}/members',status_code=201)
 def addmember(oid:UUID,x:MemberIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
- m=s.scalar(select(Membership).where(Membership.organization_id==oid,Membership.user_id==a[0].id,Membership.status=='active'))
- if not m or m.role!='owner':raise HTTPException(404,'resource not found')
- if not s.get(User,x.user_id):raise HTTPException(404,'resource not found')
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_members'):raise HTTPException(404,'resource not found')
+ if not s.get(User,x.user_id) or not has_identity(s,x.user_id,'recruiter'):raise HTTPException(422,'active recruiter identity required')
  if s.scalar(select(Membership).where(Membership.organization_id==oid,Membership.user_id==x.user_id)):raise HTTPException(409,'membership already exists')
- s.add(Membership(organization_id=oid,user_id=x.user_id,role=x.role));audit(s,r,'organization.member.add','success',f'organization:{oid}',a[0].id);s.commit();return {'ok':True}
+ s.add(Membership(organization_id=oid,user_id=x.user_id,role=x.role));s.add(RecruiterOrganizationAuthorization(organization_id=oid,user_id=x.user_id,role='recruiter' if x.role=='member' else 'recruitment_admin',status='draft'));audit(s,r,'organization.member.add','success',f'organization:{oid}',a[0].id);s.commit();return {'ok':True}
 @app.delete('/api/v1/organizations/{oid}/members/{uid}')
 def removemember(oid:UUID,uid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
- m=s.scalar(select(Membership).where(Membership.organization_id==oid,Membership.user_id==a[0].id,Membership.status=='active'))
- if not m or m.role!='owner':raise HTTPException(404,'resource not found')
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_members'):raise HTTPException(404,'resource not found')
  target=s.scalar(select(Membership).where(Membership.organization_id==oid,Membership.user_id==uid))
  if not target:raise HTTPException(404,'resource not found')
- target.status='removed';audit(s,r,'organization.member.remove','success',f'organization:{oid}',a[0].id);s.commit();return {'ok':True}
+ target.status='removed';authorization=s.scalar(select(RecruiterOrganizationAuthorization).where(RecruiterOrganizationAuthorization.organization_id==oid,RecruiterOrganizationAuthorization.user_id==uid));
+ if authorization: authorization.status='revoked';authorization.revoked_at=now();authorization.updated_at=now()
+ audit(s,r,'organization.member.remove','success',f'organization:{oid}',a[0].id);s.commit();return {'ok':True}
 @app.patch('/api/v1/organizations/{oid}/members/{uid}')
 def changemember(oid:UUID,uid:UUID,x:MemberIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
- m=s.scalar(select(Membership).where(Membership.organization_id==oid,Membership.user_id==a[0].id,Membership.status=='active'))
- if not m or m.role!='owner':raise HTTPException(404,'resource not found')
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_members'):raise HTTPException(404,'resource not found')
  target=s.scalar(select(Membership).where(Membership.organization_id==oid,Membership.user_id==uid,Membership.status=='active'))
  if not target:raise HTTPException(404,'resource not found')
- target.role=x.role;audit(s,r,'organization.member.role_change','success',f'organization:{oid}',a[0].id);s.commit();return {'ok':True}
+ target.role=x.role;authorization=s.scalar(select(RecruiterOrganizationAuthorization).where(RecruiterOrganizationAuthorization.organization_id==oid,RecruiterOrganizationAuthorization.user_id==uid))
+ if authorization: authorization.role='recruiter' if x.role=='member' else 'recruitment_admin';authorization.updated_at=now()
+ audit(s,r,'organization.member.role_change','success',f'organization:{oid}',a[0].id);s.commit();return {'ok':True}
 @app.post('/api/v1/admin/organizations/{oid}/review')
 def review(oid:UUID,x:ReviewIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if a[0].role!='admin':raise HTTPException(403,'administrator role required')
  o=s.get(Organization,oid)
  if not o:raise HTTPException(404,'resource not found')
- o.status=x.status;o.reviewed_by=a[0].id;o.reviewed_at=now();audit(s,r,'organization.review','success',f'organization:{oid}',a[0].id,{'status':x.status});s.commit();return {'status':o.status}
+ # Legacy endpoint cannot bypass the verification workflow.  It remains only
+ # for an emergency suspension of an already-existing organization.
+ if x.status!='suspended': raise HTTPException(409,'use verification review workflow')
+ o.status='suspended';o.reviewed_by=a[0].id;o.reviewed_at=now();audit(s,r,'organization.review.suspend','success',f'organization:{oid}',a[0].id,{'status':x.status});s.commit();return {'status':o.status}
+@app.get('/api/v1/admin/verification/organizations')
+def verification_review_queue(status:str='submitted',a=Depends(auth),s:Session=Depends(db)):
+ if a[0].role!='admin':raise HTTPException(403,'administrator role required')
+ rows=s.scalars(select(OrganizationVerification).where(OrganizationVerification.status==status).order_by(OrganizationVerification.submitted_at.asc())).all()
+ items=[]
+ for row in rows:
+  org_row=s.get(Organization,row.organization_id);person=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==row.applicant_user_id));snapshot=s.scalar(select(VerificationEvidenceSnapshot).where(VerificationEvidenceSnapshot.organization_id==row.organization_id,VerificationEvidenceSnapshot.evidence_version==row.version))
+  items.append({'organization_id':str(row.organization_id),'legal_name':row.legal_name,'status':row.status,'revision':row.version,'submitted_at':row.submitted_at,'representative_name':person.real_name if person else None,'evidence_snapshot_id':str(snapshot.id) if snapshot else None})
+ return {'items':items}
+@app.get('/api/v1/admin/verification/organizations/{oid}')
+def verification_review_detail(oid:UUID,a=Depends(auth),s:Session=Depends(db)):
+ if a[0].role!='admin':raise HTTPException(403,'administrator role required')
+ row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid))
+ if not row:raise HTTPException(404,'resource not found')
+ person=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==row.applicant_user_id));docs=s.scalars(select(VerificationDocument).where(VerificationDocument.organization_id==oid,VerificationDocument.evidence_version==row.version)).all();snapshot=s.scalar(select(VerificationEvidenceSnapshot).where(VerificationEvidenceSnapshot.organization_id==oid,VerificationEvidenceSnapshot.evidence_version==row.version));reviews=s.scalars(select(VerificationReview).where(VerificationReview.organization_id==oid).order_by(VerificationReview.created_at.desc())).all()
+ return {'verification':verification_view(row,docs,person),'evidence_snapshot':None if not snapshot else {'id':str(snapshot.id),'evidence_version':snapshot.evidence_version,'manifest_sha256':snapshot.manifest_sha256,'submitted_at':snapshot.submitted_at},'reviews':[{'outcome':review.outcome,'reason_code':review.reason_code,'evidence_version':review.evidence_version,'created_at':review.created_at} for review in reviews]}
+@app.put('/api/v1/admin/verification/documents/{did}/security-assessment')
+def record_document_security(did:UUID,x:DocumentSecurityIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if a[0].role!='admin':raise HTTPException(403,'administrator role required')
+ doc=s.scalar(select(VerificationDocument).where(VerificationDocument.id==did).with_for_update())
+ if not doc:raise HTTPException(404,'resource not found')
+ row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==doc.organization_id))
+ if not row or row.status!='submitted' or doc.evidence_version!=row.version:raise HTTPException(409,'only current submitted evidence can be assessed')
+ doc.security_status=x.status;doc.security_checked_at=now();doc.security_checked_by=a[0].id;audit(s,r,'verification.document.security_assessment','success',f'verification_document:{did}',a[0].id,{'status':x.status,'reason_code':x.reason_code});s.commit();return {'id':str(did),'security_status':doc.security_status}
+@app.post('/api/v1/admin/verification/organizations/{oid}/review')
+def review_verification(oid:UUID,x:VerificationReviewIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if a[0].role!='admin':raise HTTPException(403,'administrator role required')
+ row=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==oid).with_for_update());org_row=s.scalar(select(Organization).where(Organization.id==oid).with_for_update())
+ if not row or not org_row:raise HTTPException(404,'resource not found')
+ if row.applicant_user_id==a[0].id:raise HTTPException(403,'reviewer cannot approve own application')
+ if row.status!='submitted':raise HTTPException(409,'only the current submitted evidence version can be reviewed')
+ recruiter=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==row.applicant_user_id).with_for_update());authorization=s.scalar(select(RecruiterOrganizationAuthorization).where(RecruiterOrganizationAuthorization.organization_id==oid,RecruiterOrganizationAuthorization.user_id==row.applicant_user_id).with_for_update());snapshot=s.scalar(select(VerificationEvidenceSnapshot).where(VerificationEvidenceSnapshot.organization_id==oid,VerificationEvidenceSnapshot.evidence_version==row.version))
+ if not recruiter or not authorization or not snapshot:raise HTTPException(409,'fixed evidence snapshot and verification linkage are required')
+ if row.version!=x.expected_revision or snapshot.id!=x.evidence_snapshot_id:raise HTTPException(409,'verification evidence changed; refresh before reviewing')
+ intact,integrity_reason,documents=evidence_integrity(s,snapshot)
+ if not intact:raise HTTPException(409,f'evidence integrity check failed: {integrity_reason}')
+ if x.status=='approved' and (any(doc.security_status!='clean' for doc in documents) or {x.entity_verification,x.representative_verification,x.authorization_verification}!={'manual_verified'}):raise HTTPException(422,'approval requires clean files and independent verification conclusions')
+ outcome=x.status;at=now();row.status=outcome;row.reviewed_at=at;row.reviewed_by=a[0].id;row.review_reason_code=x.reason_code;row.updated_at=at
+ recruiter.status=outcome;recruiter.reviewed_at=at;recruiter.reviewed_by=a[0].id;recruiter.review_reason_code=x.reason_code;recruiter.updated_at=at
+ if outcome=='approved':
+  due=at+timedelta(days=x.valid_days);row.verified_at=at;row.next_review_due_at=due;recruiter.verified_at=at;recruiter.next_review_due_at=due;authorization.status='active';authorization.granted_at=at;org_row.status='approved';org_row.reviewed_at=at;org_row.reviewed_by=a[0].id
+ elif outcome=='suspended': org_row.status='suspended';row.suspended_at=at;authorization.status='revoked';authorization.revoked_at=at
+ else: authorization.status='draft';org_row.status='pending_review'
+ s.add(VerificationReview(organization_id=oid,reviewer_user_id=a[0].id,evidence_version=row.version,evidence_snapshot_id=snapshot.id,evidence_manifest_sha256=snapshot.manifest_sha256,entity_verification=x.entity_verification,representative_verification=x.representative_verification,authorization_verification=x.authorization_verification,outcome=outcome,reason_code=x.reason_code));audit(s,r,'verification.review','success',f'organization:{oid}',a[0].id,{'outcome':outcome,'reason_code':x.reason_code,'version':row.version});s.commit();return {'status':outcome,'organization_status':org_row.status}
+@app.put('/api/v1/admin/platform-service-gates/network-recruitment')
+def set_network_recruitment_gate(x:GateIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if a[0].role!='admin':raise HTTPException(403,'administrator role required')
+ gate=s.get(PlatformServiceGate,'network_recruitment') or PlatformServiceGate(gate_key='network_recruitment')
+ gate.enabled=x.enabled;gate.reason_code=x.reason_code;gate.reviewed_at=now();gate.reviewed_by=a[0].id;s.add(gate);audit(s,r,'platform_service_gate.update','success','network_recruitment',a[0].id,{'enabled':x.enabled,'reason_code':x.reason_code});s.commit();return {'gate_key':gate.gate_key,'enabled':gate.enabled}
+@app.get('/api/v1/admin/verification/documents/{did}')
+def read_verification_document(did:UUID,a=Depends(auth),s:Session=Depends(db)):
+ if a[0].role!='admin':raise HTTPException(403,'administrator role required')
+ doc=s.get(VerificationDocument,did)
+ if not doc:raise HTTPException(404,'resource not found')
+ path=os.path.join(VERIFICATION_ROOT,doc.storage_key)
+ if not os.path.isfile(path):raise HTTPException(404,'verification document is unavailable')
+ return FileResponse(path,media_type=doc.mime_type,filename=doc.original_filename,headers={'Cache-Control':'no-store'})
 @app.get('/api/v1/organizations/{oid}/restricted-access')
 def restricted(oid:UUID,r:Request,a=Depends(auth),s:Session=Depends(db)):
- m=s.scalar(select(Membership).where(Membership.organization_id==oid,Membership.user_id==a[0].id,Membership.status=='active'));o=s.get(Organization,oid)
- if not m or not o or o.status!='approved':audit(s,r,'organization.restricted_access','denied',f'organization:{oid}',a[0].id);s.commit();raise HTTPException(403,'organization not approved')
+ if not recruitment_allowed(s,oid,a[0].id):audit(s,r,'organization.restricted_access','denied',f'organization:{oid}',a[0].id);s.commit();raise HTTPException(403,'recruitment verification or platform gate is not active')
  audit(s,r,'organization.restricted_access','success',f'organization:{oid}',a[0].id);s.commit();return {'restricted_access':True}
 def active_membership(oid:UUID,user_id:UUID,s:Session):
  return s.scalar(select(Membership).where(Membership.organization_id==oid,Membership.user_id==user_id,Membership.status=='active'))
@@ -250,29 +520,29 @@ def requirement_view(x:HiringRequirement):
  return {'id':str(x.id),'organization_id':str(x.organization_id),'created_by':str(x.created_by),'title':x.title,'description':x.description,'location':x.location,'work_mode':x.work_mode,'status':x.status,'created_at':x.created_at,'updated_at':x.updated_at}
 @app.post('/api/v1/organizations/{oid}/hiring-requirements',status_code=201)
 def create_requirement(oid:UUID,x:RequirementIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
- if not active_membership(oid,a[0].id,s):raise HTTPException(404,'resource not found')
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_drafts'):raise HTTPException(404,'resource not found')
  requirement=HiringRequirement(organization_id=oid,created_by=a[0].id,**x.model_dump());s.add(requirement);s.flush();audit(s,r,'hiring_requirement.create','success',f'hiring_requirement:{requirement.id}',a[0].id,{'organization_id':str(oid),'status':x.status});s.commit();return requirement_view(requirement)
 @app.get('/api/v1/organizations/{oid}/hiring-requirements')
 def list_requirements(oid:UUID,a=Depends(auth),s:Session=Depends(db)):
- if not active_membership(oid,a[0].id,s):raise HTTPException(404,'resource not found')
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_drafts'):raise HTTPException(404,'resource not found')
  return {'items':[requirement_view(x) for x in s.scalars(select(HiringRequirement).where(HiringRequirement.organization_id==oid).order_by(HiringRequirement.updated_at.desc()))]}
 @app.get('/api/v1/organizations/{oid}/hiring-requirements/{rid}')
 def get_requirement(oid:UUID,rid:UUID,a=Depends(auth),s:Session=Depends(db)):
- if not active_membership(oid,a[0].id,s):raise HTTPException(404,'resource not found')
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_drafts'):raise HTTPException(404,'resource not found')
  x=s.get(HiringRequirement,rid)
  if not x or x.organization_id!=oid:raise HTTPException(404,'resource not found')
  return requirement_view(x)
 @app.patch('/api/v1/organizations/{oid}/hiring-requirements/{rid}')
 def patch_requirement(oid:UUID,rid:UUID,x:RequirementPatch,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  member=active_membership(oid,a[0].id,s)
- if not member:raise HTTPException(404,'resource not found')
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_drafts'):raise HTTPException(404,'resource not found')
  requirement=s.get(HiringRequirement,rid)
  if not requirement or requirement.organization_id!=oid:raise HTTPException(404,'resource not found')
  if member.role!='owner' and requirement.created_by!=a[0].id:raise HTTPException(404,'resource not found')
  for key,value in x.model_dump(exclude_unset=True).items():setattr(requirement,key,value)
  requirement.updated_at=now();audit(s,r,'hiring_requirement.update','success',f'hiring_requirement:{rid}',a[0].id,{'organization_id':str(oid)});s.commit();return requirement_view(requirement)
 @app.put('/api/v1/me/consents/{typ}')
-def consent(typ:str,x:ConsentIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def consent(typ:str,x:ConsentIn,r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  if typ not in {'enterprise_search','public_share','search_engine_index'}:raise HTTPException(404,'resource not found')
  if s.bind.dialect.name=='postgresql':
   c=s.execute(pg_insert(Consent).values(user_id=a[0].id,consent_type=typ,granted=x.granted,changed_at=now()).on_conflict_do_update(index_elements=['user_id','consent_type'],set_={'granted':x.granted,'changed_at':now()}).returning(Consent)).scalar_one()
@@ -286,7 +556,7 @@ def consent(typ:str,x:ConsentIn,r:Request,a=Depends(csrf),s:Session=Depends(db))
   if p: sync_search_projection(s,p)
  audit(s,r,'consent.change','success',f'consent:{typ}',a[0].id,{'granted':x.granted});s.commit();return {'consent_type':typ,'granted':x.granted}
 @app.get('/api/v1/me/consents')
-def my_consents(a=Depends(auth),s:Session=Depends(db)):
+def my_consents(a=Depends(candidate_auth),s:Session=Depends(db)):
  rows=s.scalars(select(Consent).where(Consent.user_id==a[0].id)).all()
  values={row.consent_type:row.granted for row in rows}
  return {'enterprise_search':values.get('enterprise_search',False),'public_share':values.get('public_share',False),'search_engine_index':values.get('search_engine_index',False)}
@@ -297,14 +567,14 @@ def events(a=Depends(auth),s:Session=Depends(db)):
 UPLOAD_ROOT=os.path.abspath(os.getenv('HHBA_UPLOAD_ROOT','./private_uploads'))
 MAX_PARSE_ATTEMPTS=int(os.getenv('HHBA_PARSE_MAX_ATTEMPTS','3'))
 @app.post('/api/v1/me/resumes',status_code=201)
-async def upload_resume(r:Request,file:UploadFile=File(...),a=Depends(csrf),s:Session=Depends(db)):
+async def upload_resume(r:Request,file:UploadFile=File(...),a=Depends(candidate_csrf),s:Session=Depends(db)):
  name=os.path.basename(file.filename or ''); ext=os.path.splitext(name)[1].lower(); data=await file.read()
  if ext not in {'.pdf','.docx'} or len(data)==0 or len(data)>10*1024*1024: raise HTTPException(422,'unsupported or oversized document')
  if (ext=='.pdf' and not data.startswith(b'%PDF-')) or (ext=='.docx' and not data.startswith(b'PK')): raise HTTPException(422,'file signature does not match extension')
  os.makedirs(UPLOAD_ROOT,exist_ok=True); key=uuid4().hex+ext; path=os.path.join(UPLOAD_ROOT,key); open(path,'wb').write(data)
  resume=Resume(owner_user_id=a[0].id,storage_key=key,original_filename=name,mime_type='application/pdf' if ext=='.pdf' else 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',size_bytes=len(data),sha256=hashlib.sha256(data).hexdigest(),status='uploaded');s.add(resume);s.flush();job=ParseJob(resume_id=resume.id,state='uploaded');s.add(job);audit(s,r,'resume.upload','success',f'resume:{resume.id}',a[0].id);s.commit();return {'resume_id':str(resume.id),'job_id':str(job.id),'state':'uploaded'}
 @app.get('/api/v1/me/resumes')
-def list_resumes(a=Depends(auth),s:Session=Depends(db)):
+def list_resumes(a=Depends(candidate_auth),s:Session=Depends(db)):
  rows=s.scalars(select(Resume).where(Resume.owner_user_id==a[0].id).order_by(Resume.created_at.desc())).all()
  items=[]
  for x in rows:
@@ -312,19 +582,19 @@ def list_resumes(a=Depends(auth),s:Session=Depends(db)):
   items.append({'resume_id':str(x.id),'filename':x.original_filename,'status':x.status,'job_id':str(j.id) if j else None,'job_state':j.state if j else None,'created_at':x.created_at})
  return {'items':items}
 @app.get('/api/v1/me/resumes/{rid}')
-def resume_status(rid:UUID,a=Depends(auth),s:Session=Depends(db)):
+def resume_status(rid:UUID,a=Depends(candidate_auth),s:Session=Depends(db)):
  x=s.get(Resume,rid)
  if not x or x.owner_user_id!=a[0].id:raise HTTPException(404,'resource not found')
  j=s.scalar(select(ParseJob).where(ParseJob.resume_id==rid));return {'resume_id':str(x.id),'filename':x.original_filename,'status':x.status,'job_id':str(j.id) if j else None,'job_state':j.state if j else None,'attempt_count':j.attempt_count if j else 0,'error':j.error_safe_message if j else None,'result':j.result_json if j and j.state=='parsed' else None}
 @app.get('/api/v1/me/resumes/{rid}/download')
-def download_resume(rid:UUID,a=Depends(auth),s:Session=Depends(db)):
+def download_resume(rid:UUID,a=Depends(candidate_auth),s:Session=Depends(db)):
  x=s.get(Resume,rid)
  if not x or x.owner_user_id!=a[0].id:raise HTTPException(404,'resource not found')
  path=os.path.join(UPLOAD_ROOT,x.storage_key)
  if not os.path.isfile(path):raise HTTPException(404,'resource not found')
  return FileResponse(path,media_type=x.mime_type,filename=x.original_filename,headers={'Cache-Control':'no-store'})
 @app.post('/api/v1/me/resumes/{rid}/parse')
-def parse_resume(rid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def parse_resume(rid:UUID,r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  x=s.get(Resume,rid)
  if not x or x.owner_user_id!=a[0].id:raise HTTPException(404,'resource not found')
  j=s.scalar(select(ParseJob).where(ParseJob.resume_id==rid))
@@ -332,7 +602,7 @@ def parse_resume(rid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if j.attempt_count>=MAX_PARSE_ATTEMPTS:raise HTTPException(409,'maximum parsing attempts reached')
  j.state='queued';j.error_code=None;j.error_safe_message=None;j.cancel_requested=False;j.updated_at=now();x.status='queued';audit(s,r,'resume.parse.queued','success',f'resume:{rid}',a[0].id);s.commit();return {'job_id':str(j.id),'state':j.state,'attempt_count':j.attempt_count}
 @app.post('/api/v1/me/resumes/{rid}/retry-parse')
-def retry_parse(rid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def retry_parse(rid:UUID,r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  x=s.get(Resume,rid)
  if not x or x.owner_user_id!=a[0].id:raise HTTPException(404,'resource not found')
  old=s.scalar(select(ParseJob).where(ParseJob.resume_id==rid))
@@ -341,14 +611,14 @@ def retry_parse(rid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if old:old.state='queued';old.error_code=None;old.error_safe_message=None;old.result_json=None;old.cancel_requested=False;old.updated_at=now();x.status='queued'
  audit(s,r,'resume.parse.retry','success',f'resume:{rid}',a[0].id);s.commit();return {'resume_id':str(rid),'state':'uploaded'}
 @app.post('/api/v1/me/parsing-jobs/{jid}/apply-draft')
-def apply_parse_draft(jid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def apply_parse_draft(jid:UUID,r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  j=s.get(ParseJob,jid)
  resume=s.get(Resume,j.resume_id) if j else None
  if not j or not resume or resume.owner_user_id!=a[0].id or j.state!='parsed':raise HTTPException(404,'resource not found')
  result=j.result_json or {};content={'headline':'待用户确认','skills':[x.get('value') for x in result.get('skills',[]) if x.get('value')],'experiences':result.get('experiences',[]),'education':result.get('education',[]),'projects':[],'services':[],'source_evidence':result.get('raw_text_excerpt','')[:4000]}
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id)) or Profile(owner_user_id=a[0].id);p.content_json=content;p.display_name=None;p.status='draft';p.updated_at=now();s.add(p);s.flush();remove_projection(s,p.id);audit(s,r,'profile.apply_parse_draft','success',f'parse_job:{jid}',a[0].id);s.commit();return {'status':'draft','profile':content}
 @app.delete('/api/v1/me/resumes/{rid}')
-def delete_resume(rid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def delete_resume(rid:UUID,r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  x=s.get(Resume,rid)
  if not x or x.owner_user_id!=a[0].id:raise HTTPException(404,'resource not found')
  p=os.path.join(UPLOAD_ROOT,x.storage_key)
@@ -359,10 +629,10 @@ def delete_resume(rid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
 class ProfileIn(BaseModel): content:dict; display_name:str|None=None
 class DetailIn(BaseModel): items:list[dict]
 @app.get('/api/v1/me/profile')
-def my_profile(a=Depends(auth),s:Session=Depends(db)):
+def my_profile(a=Depends(candidate_auth),s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id));return {'profile':None if not p else {'id':str(p.id),'status':p.status,'display_name':p.display_name,'content':p.content_json,'public_slug':p.public_slug}}
 @app.get('/api/v1/me/profile/enterprise-preview')
-def enterprise_profile_preview(a=Depends(auth),s:Session=Depends(db)):
+def enterprise_profile_preview(a=Depends(candidate_auth),s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
  if not p:return {'eligible':False,'fields':None}
  # This route is owner-only and deliberately does not create a projection before
@@ -370,16 +640,16 @@ def enterprise_profile_preview(a=Depends(auth),s:Session=Depends(db)):
  values=projection_values(s,p)
  return {'eligible':p.status in SEARCHABLE_PROFILE_STATUSES,'fields':values}
 @app.put('/api/v1/me/profile')
-def save_profile(x:ProfileIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def save_profile(x:ProfileIn,r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id)) or Profile(owner_user_id=a[0].id);p.content_json=x.content;p.display_name=x.display_name;p.status='draft';s.add(p);s.flush();remove_projection(s,p.id);audit(s,r,'profile.save','success','profile',a[0].id);s.commit();return {'status':'draft'}
 DETAILS={'experiences':Experience,'educations':Education,'projects':Project,'service-intents':ServiceIntent}
 @app.get('/api/v1/me/profile/{kind}')
-def list_details(kind:str,a=Depends(auth),s:Session=Depends(db)):
+def list_details(kind:str,a=Depends(candidate_auth),s:Session=Depends(db)):
  model=DETAILS.get(kind);p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
  if not model or not p: return {'items':[]}
  return {'items':[{k:v for k,v in row.__dict__.items() if not k.startswith('_')} for row in s.scalars(select(model).where(model.profile_id==p.id))]}
 @app.put('/api/v1/me/profile/{kind}')
-def replace_details(kind:str,x:DetailIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def replace_details(kind:str,x:DetailIn,r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  model=DETAILS.get(kind);p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
  if not model or not p:raise HTTPException(404,'profile not found')
  s.query(model).filter_by(profile_id=p.id).delete()
@@ -387,18 +657,18 @@ def replace_details(kind:str,x:DetailIn,r:Request,a=Depends(csrf),s:Session=Depe
  for item in x.items:s.add(model(profile_id=p.id,**{k:v for k,v in item.items() if k in allowed}))
  p.status='draft';remove_projection(s,p.id);audit(s,r,'profile.details.replace','success',f'profile:{p.id}',a[0].id,{'kind':kind});s.commit();return {'count':len(x.items),'status':'draft'}
 @app.post('/api/v1/me/profile/confirm')
-def confirm_profile(r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def confirm_profile(r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
  if not p:raise HTTPException(404,'profile not found')
  n=s.query(ProfileVersion).filter_by(profile_id=p.id).count()+1;s.add(ProfileVersion(profile_id=p.id,version=n,content_json=p.content_json));p.status='confirmed';p.updated_at=now();s.flush();sync_search_projection(s,p);audit(s,r,'profile.confirm','success',f'profile:{p.id}',a[0].id);s.commit();return {'status':p.status,'version':n}
 @app.post('/api/v1/me/profile/publish')
-def publish_profile(r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def publish_profile(r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
  consent=s.scalar(select(Consent).where(Consent.user_id==a[0].id,Consent.consent_type=='public_share'))
  if not p or p.status!='confirmed' or not consent or not consent.granted:raise HTTPException(403,'confirmed profile and public-share consent required')
  p.status='published';p.public_slug=p.public_slug or uuid4().hex;p.published_at=now();audit(s,r,'profile.publish','success',f'profile:{p.id}',a[0].id);s.commit();return {'slug':p.public_slug,'status':p.status}
 @app.post('/api/v1/me/profile/withdraw')
-def withdraw_profile(r:Request,a=Depends(csrf),s:Session=Depends(db)):
+def withdraw_profile(r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
  p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
  if not p:raise HTTPException(404,'profile not found')
  p.status='confirmed';p.public_slug=None;p.published_at=None;audit(s,r,'profile.withdraw','success',f'profile:{p.id}',a[0].id);s.commit();return {'status':p.status}
@@ -433,7 +703,7 @@ def talent_search(oid:UUID,x:TalentSearchIn,r:Request,a=Depends(csrf),s:Session=
  member=active_membership(oid,a[0].id,s);organization=s.get(Organization,oid)
  if not member:
   audit(s,r,'talent_search','denied','organization',a[0].id);s.commit();raise HTTPException(404,'resource not found')
- if not organization or organization.status!='approved':
+ if not organization or not recruitment_allowed(s,oid,a[0].id):
   audit(s,r,'talent_search','denied',f'organization:{oid}',a[0].id);s.commit();raise HTTPException(403,'organization not approved')
  if x.work_years_min is not None and x.work_years_max is not None and x.work_years_min>x.work_years_max:raise HTTPException(422,'invalid work years range')
  if not any([normalized(x.keywords),x.skills,normalized(x.industry),normalized(x.region),normalized(x.work_mode),x.work_years_min is not None,x.work_years_max is not None]):raise HTTPException(422,'at least one search condition is required')

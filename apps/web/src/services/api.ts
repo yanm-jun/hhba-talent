@@ -30,8 +30,11 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   } finally { window.clearTimeout(timer); }
 }
 
-export type User = { id: string; email: string; display_name: string; role: string; csrf_token?: string };
+export type AccountType = 'candidate' | 'recruiter';
+export type User = { id: string; email: string; display_name: string; role: string; account_types?: AccountType[]; csrf_token?: string };
 export type Organization = { id: string; legal_name: string; status: string; membership_role: string };
+export type Verification = { organization_id: string; status: string; revision: number; legal_name: string | null; credit_code_masked: string | null; registered_location: string | null; recruitment_subject_type: 'employer'; review_reason_code: string | null; next_review_due_at: string | null; representative?: { real_name: string | null; job_title: string | null; relationship_type: string | null } | null; documents: { id: string; document_type: string; filename: string; size_bytes?: number; security_status?: string; created_at: string }[] };
+export type OnboardingApplication = { organization_id: string; legal_name: string; membership_role: string; organization_status: string; verification_status: string; revision: number };
 export type Requirement = { id: string; organization_id: string; title: string; description: string; location?: string | null; work_mode?: string | null; status: 'draft' | 'archived'; created_at?: string; updated_at?: string };
 export type ResumeSummary = { resume_id: string; filename: string; status: string; job_id?: string | null; job_state: string | null; created_at?: string };
 export type Consents = { enterprise_search: boolean; public_share: boolean; search_engine_index: boolean };
@@ -42,8 +45,8 @@ export type TalentSearchCandidate = { candidate_ref: CandidateReference; display
 
 export const api = {
   me: async () => { const user=await request<User>('/auth/me'); setCsrfToken(user.csrf_token || null); return user; },
-  register: (email: string, password: string, displayName: string) => request<{ id: string }>('/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, display_name: displayName }) }),
-  login: async (email: string, password: string) => { const data = await request<{ csrf_token: string }>('/auth/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) }); setCsrfToken(data.csrf_token); return data; },
+  register: (email: string, password: string, displayName: string, accountType: AccountType = 'candidate') => request<{ id: string; account_type: AccountType }>('/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, display_name: displayName, account_type: accountType }) }),
+  login: async (email: string, password: string, accountType?: AccountType) => { const data = await request<{ csrf_token: string }>('/auth/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, account_type: accountType }) }); setCsrfToken(data.csrf_token); return data; },
   logout: async () => { await request('/auth/session', { method: 'DELETE' }); setCsrfToken(null); },
   upload: (file: File) => { const form = new FormData(); form.append('file', file); return request<{ resume_id: string; job_id: string; state: string }>('/me/resumes', { method: 'POST', body: form }); },
   resumes: () => request<{ items: ResumeSummary[] }>('/me/resumes'),
@@ -62,6 +65,13 @@ export const api = {
   consents: () => request<Consents>('/me/consents'),
   organizations: () => request<{ organizations: Organization[] }>('/organizations'),
   createOrganization: (legal_name: string) => request<{ id: string; status: string }>('/organizations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ legal_name }) }),
+  verification: (organizationId: string) => request<Verification>(`/recruiter/organizations/${organizationId}/verification`),
+  onboarding: () => request<{ applications: OnboardingApplication[] }>('/recruiter/onboarding'),
+  saveVerificationCompany: (organizationId: string, payload: { legal_name: string; credit_code: string; registered_location: string; recruitment_subject_type: 'employer' | 'agency' }) => request<Verification>(`/recruiter/organizations/${organizationId}/verification/company`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }),
+  saveVerificationRepresentative: (organizationId: string, payload: { real_name: string; job_title: string; relationship_type: 'legal_representative' | 'business_owner' | 'hr_lead' | 'hr_recruiter' | 'authorized_agent' }) => request<Verification>(`/recruiter/organizations/${organizationId}/verification/representative`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }),
+  saveVerification: (organizationId: string, payload: { legal_name: string; credit_code: string; registered_location: string; recruitment_subject_type: 'employer'; real_name: string; job_title: string }) => request<Verification>(`/recruiter/organizations/${organizationId}/verification`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }),
+  uploadVerificationDocument: (organizationId: string, documentType: 'business_license' | 'authorization_letter', file: File) => { const form=new FormData(); form.append('file',file); return request<{ id:string }>(`/recruiter/organizations/${organizationId}/verification/documents?document_type=${documentType}`,{method:'POST',body:form}); },
+  submitVerification: (organizationId: string) => request<{ status:string }>(`/recruiter/organizations/${organizationId}/verification/submit`,{method:'POST'}),
   requirements: (organizationId: string) => request<{ items: Requirement[] }>(`/organizations/${organizationId}/hiring-requirements`),
   createRequirement: (organizationId: string, payload: { title: string; description: string; location?: string | null; work_mode?: string | null }) => request<Requirement>(`/organizations/${organizationId}/hiring-requirements`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...payload, status: 'draft' }) }),
   updateRequirement: (organizationId: string, requirementId: string, payload: Partial<Requirement>) => request<Requirement>(`/organizations/${organizationId}/hiring-requirements/${requirementId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }),

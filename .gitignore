@@ -15,6 +15,8 @@ dist/
 npm-debug.log*
 pnpm-debug.log*
 worker-image-build*.log
+apps/api/api-local.*.log
+apps/web/web-local.*.log
 
 # Python
 .venv/
@@ -32,6 +34,10 @@ apps/api/private_uploads/
 # Uploaded resumes must never be tracked, even when their relative storage
 # root resolves here rather than under apps/api.
 private_uploads/
+# Private enterprise-verification documents; test runs use a UUID-suffixed
+# root and neither synthetic nor real credentials belong in version control.
+private_verification_documents/
+phase3a2-private-*/
 work/
 *.sqlite3
 coverage/
