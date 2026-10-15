@@ -7,7 +7,7 @@ os.environ['DATABASE_URL']=f'sqlite:///./phase3a2-{RUN}.sqlite3'
 os.environ['HHBA_VERIFICATION_ROOT']=f'./phase3a2-private-{RUN}'
 
 from fastapi.testclient import TestClient
-from app.main import Base, Organization, SessionLocal, User, app, engine
+from app.main import Base, Organization, SessionLocal, User, VerificationEvidenceSnapshot, app, engine
 
 PASSWORD='SyntheticOnly123!'
 
@@ -56,7 +56,8 @@ def test_recruiter_verification_then_platform_gate_controls_search_access():
     assert recruiter.post(f'/api/v1/recruiter/organizations/{oid}/verification/submit',headers={'X-CSRF-Token':csrf}).status_code==200
     assert recruiter.get(f'/api/v1/organizations/{oid}/restricted-access').status_code==403
     admin=TestClient(app);admin_email,admin_csrf=account(admin,'reviewer','candidate');make_admin(admin_email)
-    review=admin.post(f'/api/v1/admin/verification/organizations/{oid}/review',json={'status':'approved','reason_code':'synthetic_approved','valid_days':30},headers={'X-CSRF-Token':admin_csrf})
+    session=SessionLocal();snapshot=session.query(VerificationEvidenceSnapshot).filter_by(organization_id=uuid.UUID(oid)).one();snapshot_id=str(snapshot.id);session.close()
+    review=admin.post(f'/api/v1/admin/verification/organizations/{oid}/review',json={'status':'approved','reason_code':'synthetic_approved','valid_days':30,'expected_revision':1,'evidence_snapshot_id':snapshot_id},headers={'X-CSRF-Token':admin_csrf})
     assert review.status_code==422 and 'clean files' in review.text
     # A platform gate cannot compensate for absent file-security and legal
     # verification conclusions.
@@ -68,7 +69,7 @@ def test_recruiter_verification_then_platform_gate_controls_search_access():
 def test_reviewer_cannot_approve_own_application_and_candidate_cannot_read_documents():
     recruiter=TestClient(app);recruiter_email,csrf=account(recruiter,'self-review','recruiter');oid=create_recruiter_org(recruiter,csrf)
     session=SessionLocal();session.query(User).filter_by(email=recruiter_email).one().role='admin';session.commit();session.close()
-    response=recruiter.post(f'/api/v1/admin/verification/organizations/{oid}/review',json={'status':'approved','reason_code':'must_fail'})
+    response=recruiter.post(f'/api/v1/admin/verification/organizations/{oid}/review',json={'status':'approved','reason_code':'must_fail','expected_revision':1,'evidence_snapshot_id':str(uuid.uuid4())})
     assert response.status_code==403
     candidate=TestClient(app);_,candidate_csrf=account(candidate,'outsider','candidate')
     assert candidate.get(f'/api/v1/recruiter/organizations/{oid}/verification').status_code==404
@@ -83,5 +84,22 @@ def test_submitted_evidence_is_locked_and_approval_requires_snapshot():
         result=recruiter.post(f'/api/v1/recruiter/organizations/{oid}/verification/documents?document_type={kind}',files={'file':(f'{kind}.pdf',b'%PDF-1.4\nsynthetic','application/pdf')},headers={'X-CSRF-Token':csrf})
         assert result.status_code==201
     assert recruiter.post(f'/api/v1/recruiter/organizations/{oid}/verification/submit',headers={'X-CSRF-Token':csrf}).status_code==200
+    # The same frozen evidence version cannot receive a second snapshot.
+    assert recruiter.post(f'/api/v1/recruiter/organizations/{oid}/verification/submit',headers={'X-CSRF-Token':csrf}).status_code==409
     locked=recruiter.post(f'/api/v1/recruiter/organizations/{oid}/verification/documents?document_type=business_license',files={'file':('changed.pdf',b'%PDF-1.4\nchanged','application/pdf')},headers={'X-CSRF-Token':csrf})
     assert locked.status_code==409
+
+
+def test_staged_onboarding_persists_only_for_recruiter_owner():
+    recruiter=TestClient(app);_,csrf=account(recruiter,'staged-owner','recruiter');oid=create_recruiter_org(recruiter,csrf)
+    company=recruiter.put(f'/api/v1/recruiter/organizations/{oid}/verification/company',json={'legal_name':f'合成分步企业{RUN}','credit_code':'91370000STEP123456','registered_location':'山东省青岛市','recruitment_subject_type':'employer'},headers={'X-CSRF-Token':csrf})
+    assert company.status_code==200,company.text
+    representative=recruiter.put(f'/api/v1/recruiter/organizations/{oid}/verification/representative',json={'real_name':'合成招聘人','job_title':'招聘负责人','relationship_type':'hr_lead'},headers={'X-CSRF-Token':csrf})
+    assert representative.status_code==200,representative.text
+    current=recruiter.get(f'/api/v1/recruiter/organizations/{oid}/verification')
+    assert current.status_code==200
+    assert current.json()['representative']=={'real_name':'合成招聘人','job_title':'招聘负责人','relationship_type':'hr_lead'}
+    assert any(item['organization_id']==oid for item in recruiter.get('/api/v1/recruiter/onboarding').json()['applications'])
+    candidate=TestClient(app);_,candidate_csrf=account(candidate,'staged-outsider','candidate')
+    denied=candidate.put(f'/api/v1/recruiter/organizations/{oid}/verification/company',json={'legal_name':'越权','credit_code':'91370000DENY123456','registered_location':'山东','recruitment_subject_type':'employer'},headers={'X-CSRF-Token':candidate_csrf})
+    assert denied.status_code==404
