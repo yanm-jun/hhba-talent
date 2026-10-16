@@ -48,8 +48,19 @@ class RecruitmentStub(BaseHTTPRequestHandler):
            "current_application_verified":False,"source_platform":"Synthetic ATS"
         }
         if self.path.startswith("/api/v1/marketplace"):
+            # Social filter returns a SYNTHETIC reviewed application-link fixture.
+            # Other filters keep the normal unverified historical record.
+            approved="recruitment_type=SOCIAL" in self.path
+            if approved:
+                sample={**sample,
+                    "primary_recruitment_type":"SOCIAL",
+                    "application_link_status":"VERIFIED_DIRECT",
+                    "application_url":"https://example.org/synthetic-only",
+                    "current_application_verified":True,
+                    "application_verified_at":"2026-10-16T07:00:00+00:00",
+                }
             data={"data_mode":"official_source_historical_not_live",
-                  "all_current_application_statuses_unverified":True,
+                  "all_current_application_statuses_unverified":not approved,
                   "total":1,"items":[sample]}
         elif self.path=="/api/v1/jobs/JOB-SYNTH-001":
             data=sample
@@ -145,6 +156,14 @@ class BrowserIntegrationTests(unittest.TestCase):
             page.get_by_role("button",name="社会招聘").click()
             page.locator(".market-card").first.wait_for()
             self.assertEqual(page.locator(".market-channels button[aria-pressed='true']").inner_text(),"社会招聘")
+            link=page.get_by_role("link",name="去官方投递 ↗")
+            link.wait_for(state="visible",timeout=12000)
+            self.assertEqual(link.get_attribute("href"),"https://example.org/synthetic-only")
+            self.assertEqual(link.get_attribute("rel"),"noopener noreferrer")
+            self.assertFalse(page.locator(".market-card").first.get_by_text("当前投递待核实").count())
+            page.get_by_role("button",name="校园招聘").click()
+            page.get_by_text("当前投递待核实").first.wait_for()
+            self.assertEqual(page.get_by_role("link",name="去官方投递 ↗").count(),0)
             self.assertTrue(any("recruitment_type=SOCIAL" in p for p,h in RecruitmentStub.visits))
             for path, headers in RecruitmentStub.visits:
                 lower={key.lower() for key in headers}

@@ -49,3 +49,5 @@
 .market-bottom span{font-size:11px;color:#91a196;line-height:1.7}
 @media(max-width:900px){.market-search{grid-template-columns:auto 1fr auto 130px}.market-search button{grid-column:1/-1}.market-head{align-items:start;flex-direction:column}.market-total{width:100%;margin:6px 0 0}}
 @media(max-width:680px){.home-marketplace{margin:47px auto 55px;padding:0 1px}.market-list{grid-template-columns:1fr}.market-card{padding:18px}.market-search{grid-template-columns:1fr;gap:6px;padding:15px}.market-search label{margin-top:3px}.market-search .market-input{padding:0}.market-search input,.market-search .market-city{height:39px;border:1px solid #dce7db;border-radius:8px;padding:0 12px}.market-search .market-city{border-left:1px solid #dce7db}.market-search button{grid-column:auto;margin-top:5px}.market-card-foot{align-items:start;flex-direction:column;gap:12px}.market-bottom{align-items:start;flex-direction:column}.market-channels button{padding:9px 12px}}
+
+.market-card-links a.market-verified-apply{background:#dff8aa;color:#204b32;border-radius:7px;padding:8px 11px;font-weight:900}.market-card-links a.market-verified-apply:hover{background:#c8ed85;text-decoration:none}

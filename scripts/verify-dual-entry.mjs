@@ -26,10 +26,14 @@ assert.ok(h.includes('<RecruitmentMarketplace/>'));
 assert.ok(h.indexOf('<RecruitmentMarketplace/>')>h.lastIndexOf('<EntryCard'));
 assert.ok(market.includes("const sourceUrl = '/recruitment/api/v1/marketplace'"));
 assert.ok(market.includes("credentials:'omit'"));
-assert.ok(market.includes("all_current_application_statuses_unverified !== true"));
+assert.ok(market.includes("typeof result.all_current_application_statuses_unverified !== 'boolean'"));
 assert.ok(market.includes("OFFICIAL_HISTORICAL_UNCONFIRMED"));
-assert.ok(market.includes("current_application_verified!==false"));
+assert.ok(market.includes("job.current_application_verified === true"));
 assert.ok(market.includes("没有符合筛选条件的已核对官方岗位记录"));
 assert.ok(market.includes("未公开"));
 assert.ok(market.includes("官方核对 ↗"));
 console.log('PASS: genuine official-sourced market mounted below two roles, no synthetic records or live-opening assertion.');
+
+assert.ok(market.includes("去官方投递 ↗"));
+assert.ok(market.includes("官网核对 · 投递未确认 ↗"));
+assert.ok(market.includes("application_link_status !== 'VERIFIED_DIRECT'"));

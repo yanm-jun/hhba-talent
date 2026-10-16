@@ -52,3 +52,15 @@ Production is **not yet deployed**. The local Python gateway does not provide TL
 3. Actual Chromium: opens homepage two roles and market, recruiter register, candidate area, search and detail on mobile and desktop.
 4. Both **real** services exercised locally (separately checked out private repos) against official-source historical data before staging sign-off.
 5. At least one real current official job-level title/detail/apply entrance observed, independently reviewed, before a job may be marketed **currently open**. No such production admission is claimed by this integration test.
+
+## V0.4-03｜准确的官方岗位投递直达
+
+首页的招聘市场和应聘端岗位卡已经根据招聘 API 的三个状态显示不同操作：
+
+- `VERIFIED_DIRECT` 且 `current_application_verified=true`、`application_url` 是合规 HTTPS 地址：**去官方投递 ↗**。职位卡标题也直达同一个企业官方**具体岗位**的申请入口，默认新窗口并带 `noopener noreferrer`。
+- 只有 `OFFICIAL_DETAIL_ONLY`：显示**官网核对 · 投递未确认 ↗**，没有“立即投递”误导。
+- `UNAVAILABLE`：不展示官网跳转按钮，也不拼造首页或详情 URL。
+
+新后端 `hhba-recruitment-engine/hhba_pipeline/apply_links.py` 默认不允许任何岗位被认定 `VERIFIED_DIRECT`；必须由仓库外的逐岗浏览器证据、截图 SHA、原始职位身份匹配、72 小时内观察和人工批准共同支持，且证据变化时自动撤销展示。必须通过独立外部 `--apply-registry` 参数启用。
+
+**当前真实主库仍没有已经取得本轮申请按钮证据的正式开放岗位**。CI 的直接投递链接测试仅使用明确标注为合成的 `example.org` fixture；不代表“小米济南销售”或任何实际企业岗位已核验。上线前必须由真人逐岗审核真实证据并保护审批文件访问权限，保持“打开官网投递”而非 HHBA 自动提交简历。

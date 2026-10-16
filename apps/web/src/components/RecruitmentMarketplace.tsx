@@ -16,6 +16,10 @@ type MarketJob = {
   source_platform?: string | null;
   source_id?: string | null;
   official_detail_url?: string | null;
+  application_url?: string | null;
+  application_link_status?: 'VERIFIED_DIRECT' | 'OFFICIAL_DETAIL_ONLY' | 'UNAVAILABLE';
+  application_verified_at?: string | null;
+  application_expires_at?: string | null;
   salary_display?: string | null;
   marketplace_status: string;
   current_application_verified: boolean;
@@ -45,18 +49,25 @@ const safeOfficial = (value?: string | null) => {
 function MarketCard({job}: {job: MarketJob}) {
   const href = validId(job.job_id) ? '/candidate/jobs/' + encodeURIComponent(job.job_id) : null;
   const official = safeOfficial(job.official_detail_url);
+  const application = job.current_application_verified === true
+    && job.application_link_status === 'VERIFIED_DIRECT'
+    ? safeOfficial(job.application_url) : null;
   return <article className="market-card">
     <div className="market-card-top"><span className="market-company"><Building2 size={15}/>{readable(job.company_display_name, '企业名称未披露')}</span><span className="market-source">官方来源 · {readable(job.source_platform, '平台未标注')}</span></div>
-    <h3>{href ? <Link to={href}>{readable(job.job_title, '职位未命名')}</Link> : readable(job.job_title, '职位未命名')}</h3>
+    <h3>{application ? <a href={application} target="_blank" rel="noopener noreferrer" aria-label={'直达'+readable(job.job_title)+'官方岗位投递入口'}>{readable(job.job_title, '职位未命名')} ↗</a>
+      : href ? <Link to={href}>{readable(job.job_title, '职位未命名')}</Link> : readable(job.job_title, '职位未命名')}</h3>
     <div className="market-meta">
       <span className="market-type">{tags[job.primary_recruitment_type || ''] || '类型未分类'}</span>
       <span><MapPin size={13}/>{readable(job.work_city, '地点未公开')}</span>
       <span>学历 {readable(job.education_min)}</span>
       <span>薪资 {readable(job.salary_display)}</span>
     </div>
-    <div className="market-card-proof"><ShieldCheck size={14}/><span>真实官方历史记录 · 当前投递待核实</span></div>
+    <div className="market-card-proof"><ShieldCheck size={14}/><span>{application ? '岗位申请入口已近期核验 · 请以官网为准' : '真实官方历史记录 · 当前投递待核实'}</span></div>
     <div className="market-card-foot"><div><span>最近来源核验 {published(job.last_verified_at)}</span><span>发布时间 {published(job.published_at)}</span></div>
-      <div className="market-card-links">{href && <Link to={href}>查看记录 <ArrowRight size={14}/></Link>}{official && <a href={official} target="_blank" rel="noopener noreferrer">官方核对 ↗</a>}</div></div>
+      <div className="market-card-links">{href && <Link to={href}>查看记录 <ArrowRight size={14}/></Link>}
+        {application
+          ? <a className="market-verified-apply" href={application} target="_blank" rel="noopener noreferrer">去官方投递 ↗</a>
+          : official && <a href={official} target="_blank" rel="noopener noreferrer">官网核对 · 投递未确认 ↗</a>}</div></div>
   </article>;
 }
 export function RecruitmentMarketplace() {
@@ -85,18 +96,24 @@ export function RecruitmentMarketplace() {
     }).then(result=>{
       if(controller.signal.aborted)return;
       if(result.data_mode !== 'official_source_historical_not_live'
-        || result.all_current_application_statuses_unverified !== true
+        || typeof result.all_current_application_statuses_unverified !== 'boolean'
         || !Number.isInteger(result.total) || result.total < 0
         || !Array.isArray(result.items)
         || result.items.some(job=>
           job.record_kind!=='HISTORICAL_MASTER'
           || job.marketplace_status!=='OFFICIAL_HISTORICAL_UNCONFIRMED'
-          || job.current_application_verified!==false
+          || typeof job.current_application_verified !== 'boolean'
+          || (job.current_application_verified === true &&
+              (job.application_link_status !== 'VERIFIED_DIRECT' || !safeOfficial(job.application_url)))
+          || (job.current_application_verified === false &&
+              (job.application_link_status === 'VERIFIED_DIRECT' || !!job.application_url))
           || !validId(job.job_id)
           || !safeOfficial(job.official_detail_url)
           || !job.source_id || !job.job_title || !job.company_display_name
         )
       ) throw new Error('untrusted marketplace response');
+      if(result.all_current_application_statuses_unverified &&
+         result.items.some(job=>job.current_application_verified)) throw new Error('contradictory application status');
       setData(result);
     }).catch(()=>{
       if(!controller.signal.aborted){setError(true);setData(null);}

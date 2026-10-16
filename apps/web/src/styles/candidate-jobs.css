@@ -43,3 +43,5 @@
 .hhba-official{width:max-content!important;padding:12px 18px!important;margin-top:22px!important;background:#dbf88e!important;color:#1e3c2a!important}
 @media(max-width:760px){.hhba-position-grid{grid-template-columns:1fr}.hhba-jobs-form{grid-template-columns:1fr 1fr}.hhba-jobs-form .primary-button{grid-column:1/-1}.hhba-job-detail-grid{grid-template-columns:1fr}.hhba-jobs-hero{padding:30px}.candidate-jobs-entry{flex-direction:column;align-items:stretch}.candidate-jobs-entry .secondary-button{width:100%}}
 @media(max-width:480px){.hhba-jobs-page{margin:18px auto 40px}.hhba-jobs-hero{padding:25px 20px}.hhba-jobs-form{grid-template-columns:1fr}.hhba-jobs-form .primary-button{grid-column:auto}.hhba-jobs-count h2{font-size:19px}.hhba-position-card{padding:17px}.hhba-position-footer{flex-wrap:wrap}.hhba-job-trail{gap:7px;flex-wrap:wrap}}
+
+.hhba-position-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px}.hhba-position-actions a{color:#267141;font-size:12px;font-weight:800;text-decoration:none}.hhba-position-actions a:hover{text-decoration:underline}

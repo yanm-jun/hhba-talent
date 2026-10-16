@@ -15,6 +15,10 @@ type Job = {
  status_checked_at?: string | null; last_verified_at?: string | null;
  application_access_status?: string | null;
  official_detail_url?: string | null; source_platform?: string | null; source_id?: string | null;
+ application_url?: string | null;
+ application_link_status?: 'VERIFIED_DIRECT'|'OFFICIAL_DETAIL_ONLY'|'UNAVAILABLE';
+ current_application_verified?: boolean;
+ application_verified_at?: string | null; application_expires_at?: string | null;
 };
 type SearchResult = { items: Job[]; total: number };
 const API = '/recruitment/api/v1';
@@ -37,11 +41,16 @@ function Trail({detail=false}:{detail?:boolean}) {
 }
 function Position({job}:{job:Job}) {
  const valid=/^[A-Za-z0-9_-]{1,64}$/.test(job.job_id||'');
+ const direct=job.current_application_verified===true && job.application_link_status==='VERIFIED_DIRECT'
+   ? officialLink(job.application_url) : null;
  return <article className="hhba-position-card">
    <span className="hhba-position-company">{label(job.company_display_name,'企业名称待确认')}</span>
-   <h3>{valid?<Link to={'/candidate/jobs/'+encodeURIComponent(job.job_id)}>{label(job.job_title,'未命名历史岗位')}</Link>:label(job.job_title,'未命名历史岗位')}</h3>
+   <h3>{direct?<a href={direct} target="_blank" rel="noopener noreferrer">{label(job.job_title,'未命名历史岗位')} ↗</a>:valid?<Link to={'/candidate/jobs/'+encodeURIComponent(job.job_id)}>{label(job.job_title,'未命名历史岗位')}</Link>:label(job.job_title,'未命名历史岗位')}</h3>
    <div className="hhba-position-tags"><span>{names[job.primary_recruitment_type||'']||'待分类'}</span><span>{label(job.work_city,'地点未披露')}</span><span>{states[job.job_status||'']||'历史状态未知'}</span></div>
-   <div className="hhba-position-footer"><small>历史核验：{day(job.status_checked_at||job.last_verified_at)}</small>{valid&&<Link to={'/candidate/jobs/'+encodeURIComponent(job.job_id)}>查看详情 <ArrowRight size={14}/></Link>}</div>
+   <div className="hhba-position-footer"><small>历史核验：{day(job.status_checked_at||job.last_verified_at)}</small><span className="hhba-position-actions">
+     {valid&&<Link to={'/candidate/jobs/'+encodeURIComponent(job.job_id)}>查看详情 <ArrowRight size={14}/></Link>}
+     {direct && <a href={direct} target="_blank" rel="noopener noreferrer">去官方投递 ↗</a>}
+   </span></div>
  </article>;
 }
 export function CandidateJobsPage({user}:{user:User|null}) {
@@ -98,14 +107,18 @@ export function CandidateJobDetailPage({user,jobId}:{user:User|null;jobId:string
    return ()=>ctrl.abort();
  },[jobId]);
  const link=officialLink(job?.official_detail_url);
+ const direct=job?.current_application_verified===true && job?.application_link_status==='VERIFIED_DIRECT'
+    ? officialLink(job.application_url) : null;
  return <Shell user={user}><section className="hhba-jobs-page"><Trail detail/>
    {loading?<div className="hhba-jobs-empty" role="status">正在读取历史职位详情…</div>:
    error||!job?<div className="hhba-jobs-empty" role="alert">无法获取这条历史职位。<p><Link to="/candidate/jobs">返回岗位搜索</Link></p></div>:
    <><header className="hhba-jobs-hero"><span className="page-kicker">HISTORICAL RECORD · 历史记录</span><h1>{label(job.job_title,'岗位未命名')}</h1><p>{label(job.company_display_name,'企业未披露')} · {label(job.work_city,'城市未披露')}</p><div className="hhba-position-tags"><span>{names[job.primary_recruitment_type||'']||'类型待确认'}</span><span>{states[job.job_status||'']||'历史状态待确认'}</span></div>
-     {link?<a className="primary-button hhba-official" href={link} target="_blank" rel="noopener noreferrer">前往企业官网核对 <ArrowRight size={16}/></a>:<p>官方详情链接尚未核实，暂不提供投递入口。</p>}
+     {direct ? <a className="primary-button hhba-official" href={direct} target="_blank" rel="noopener noreferrer">去官方投递 · 已核验入口 <ArrowRight size={16}/></a>
+       : link ? <a className="primary-button hhba-official" href={link} target="_blank" rel="noopener noreferrer">前往企业官网核对 · 投递未确认 <ArrowRight size={16}/></a>
+       : <p>官方详情链接尚未核实，暂不提供投递入口。</p>}
    </header><div className="hhba-job-detail-grid"><article className="hhba-position-card"><h2>职位基本信息</h2><dl className="hhba-detail-facts">
      <dt>工作地点</dt><dd>{label(job.work_city)}</dd><dt>最低学历</dt><dd>{label(job.education_min)}</dd><dt>最近检查</dt><dd>{day(job.status_checked_at||job.last_verified_at)}</dd>
-     <dt>申请状态</dt><dd>{job.application_access_status==='APPLICATION_CONFIRMED_OPEN'?'历史曾观察到入口 · 今天未确认':'申请入口未核验'}</dd></dl><div className="hhba-detail-note">尚无允许公开的职位描述正文。请以官方实际页面为准，不推测职责和要求。</div></article>
+     <dt>申请状态</dt><dd>{direct?'近期职位级投递入口已核验；以官方系统为准':job.application_access_status==='APPLICATION_CONFIRMED_OPEN'?'历史曾观察到入口 · 今天未确认':'申请入口未核验'}</dd></dl><div className="hhba-detail-note">尚无允许公开的职位描述正文。请以官方实际页面为准，不推测职责和要求。</div></article>
      <aside className="hhba-position-card"><h2>历史记录来源</h2><dl className="hhba-detail-facts"><dt>来源平台</dt><dd>{label(job.source_platform)}</dd><dt>企业来源 ID</dt><dd>{label(job.source_id)}</dd><dt>HHBA 记录 ID</dt><dd>{job.job_id}</dd></dl><p className="hhba-detail-note">此处仅有历史事实，不代表当前在招。</p></aside></div></>}
  </section></Shell>;
 }
