@@ -1,0 +1,54 @@
+name: HHBA V0.4 Staging Gateway Integration
+on:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'scripts/run_staging_gateway.py'
+      - 'scripts/test_staging_gateway.py'
+      - 'scripts/test_staging_browser.py'
+      - '.github/workflows/hhba-v04-integrated-staging.yml'
+      - 'apps/web/**'
+  pull_request:
+    paths:
+      - 'scripts/run_staging_gateway.py'
+      - 'scripts/test_staging_gateway.py'
+      - 'scripts/test_staging_browser.py'
+      - '.github/workflows/hhba-v04-integrated-staging.yml'
+      - 'apps/web/**'
+permissions:
+  contents: read
+jobs:
+  gateway-frontend-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile unchanged existing React HHBA frontend
+        run: |
+          cd apps/web
+          npm ci
+          npm run build
+      - name: Exercise gateway route separation, safe headers and auth cookies
+        run: python -m unittest discover -s scripts -p 'test_staging_gateway.py' -v
+      - name: Install real Chromium for same-origin user journey
+        run: |
+          python -m pip install 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Click two homepage entry roles and real-data API market UI
+        run: python -m unittest discover -s scripts -p 'test_staging_browser.py' -v
+      - name: Upload real compiled Chromium screenshots (synthetic backend fixtures)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-v04-unified-site-chromium-screenshots
+          path: ${{ runner.temp }}/hhba-v04-ui/*.png
+          if-no-files-found: warn
+          retention-days: 14

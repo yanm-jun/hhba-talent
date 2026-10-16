@@ -1,0 +1,156 @@
+"""Real Chromium smoke of HHBA's compiled dual-entry website through gateway.
+
+Upstream jobs are synthetic fixtures; this validates product wiring, NOT live ATS availability.
+"""
+from __future__ import annotations
+import json
+import os
+import tempfile
+import threading
+import unittest
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+
+from playwright.sync_api import sync_playwright
+from scripts.run_staging_gateway import make_handler
+
+_ROOT=Path(__file__).resolve().parents[1]
+_DIST=_ROOT/"apps"/"web"/"dist"
+
+
+class TalentStub(BaseHTTPRequestHandler):
+    protocol_version="HTTP/1.1"
+    def do_GET(self):
+        body=json.dumps({"detail":"synthetic not signed in"}).encode()
+        self.send_response(401)
+        self.send_header("Content-Type","application/json")
+        self.send_header("Content-Length",str(len(body)))
+        self.end_headers();self.wfile.write(body)
+    def log_message(self,*_): pass
+
+
+class RecruitmentStub(BaseHTTPRequestHandler):
+    protocol_version="HTTP/1.1"
+    visits=[]
+    def do_GET(self):
+        self.__class__.visits.append((self.path,dict(self.headers)))
+        sample={
+           "job_id":"JOB-SYNTH-001","record_kind":"HISTORICAL_MASTER",
+           "job_title":"合成测试岗位（仅自动化验收）",
+           "company_display_name":"合成测试企业",
+           "source_id":"SRC-SYNTHETIC","work_city":"广州",
+           "primary_recruitment_type":"CAMPUS",
+           "official_detail_url":"https://example.org/synthetic-only",
+           "last_verified_at":"2026-10-16",
+           "published_at":None,"education_min":"本科","salary_display":"未公开",
+           "job_status":"UNKNOWN","application_access_status":"NOT_OBSERVED",
+           "marketplace_status":"OFFICIAL_HISTORICAL_UNCONFIRMED",
+           "current_application_verified":False,"source_platform":"Synthetic ATS"
+        }
+        if self.path.startswith("/api/v1/marketplace"):
+            data={"data_mode":"official_source_historical_not_live",
+                  "all_current_application_statuses_unverified":True,
+                  "total":1,"items":[sample]}
+        elif self.path=="/api/v1/jobs/JOB-SYNTH-001":
+            data=sample
+        elif self.path.startswith("/api/v1/jobs"):
+            data={"total":1,"items":[sample],"limit":12,"offset":0}
+        else:
+            data={"error":"unknown synthetic route"}
+        payload=json.dumps(data,ensure_ascii=False).encode()
+        self.send_response(200)
+        self.send_header("Content-Type","application/json")
+        self.send_header("Content-Length",str(len(payload)))
+        self.end_headers();self.wfile.write(payload)
+    def log_message(self,*_): pass
+
+
+class BrowserIntegrationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if not (_DIST/"index.html").exists():
+            raise RuntimeError("Run npm build before Chromium tests")
+        cls.talent=ThreadingHTTPServer(("127.0.0.1",0),TalentStub)
+        cls.jobs=ThreadingHTTPServer(("127.0.0.1",0),RecruitmentStub)
+        cls.gateway=ThreadingHTTPServer(("127.0.0.1",0),make_handler(
+            _DIST,cls.talent.server_address,cls.jobs.server_address))
+        cls.workers=[]
+        for srv in (cls.talent,cls.jobs,cls.gateway):
+            thread=threading.Thread(target=srv.serve_forever,daemon=True)
+            thread.start();cls.workers.append(thread)
+        cls.base=f"http://127.0.0.1:{cls.gateway.server_port}"
+        cls.p=sync_playwright().start()
+        cls.browser=cls.p.chromium.launch(headless=True)
+        cls.out=Path(os.environ.get("RUNNER_TEMP",tempfile.gettempdir()))/"hhba-v04-ui"
+        cls.out.mkdir(parents=True,exist_ok=True)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.close();cls.p.stop()
+        for srv,worker in zip((cls.talent,cls.jobs,cls.gateway),cls.workers):
+            srv.shutdown();worker.join(timeout=5);srv.server_close()
+
+    def page(self, width=1440, height=900):
+        p=self.browser.new_page(viewport={"width":width,"height":height},
+                                device_scale_factor=1)
+        def gate(route):
+            if route.request.url.startswith(self.base+"/"):
+                route.continue_()
+            else:
+                route.abort("blockedbyclient")
+        p.route("**/*",gate)
+        return p
+
+    def test_home_two_roles_above_real_api_market_and_navigation(self):
+        page=self.page()
+        try:
+            page.goto(self.base+"/",wait_until="domcontentloaded")
+            roles=page.locator(".entry-card")
+            self.assertEqual(roles.count(),2)
+            self.assertIn("我要应聘",roles.nth(0).inner_text())
+            self.assertIn("我要招人",roles.nth(1).inner_text())
+            page.locator(".market-card").first.wait_for(timeout=12000)
+            self.assertIn("合成测试岗位",page.locator(".market-card").first.inner_text())
+            self.assertIn("当前投递待核实",page.locator(".market-card").first.inner_text())
+            self.assertFalse(page.locator("body").evaluate("(e)=>e.scrollWidth>innerWidth+3"))
+            a=page.locator(".market-card").first
+            self.assertGreaterEqual(a.locator("a[href^='/candidate/jobs/']").count(),1)
+            market_top=page.locator("#recruitment-marketplace").evaluate("(e)=>e.getBoundingClientRect().top+scrollY")
+            roles_end=roles.last.evaluate("(e)=>e.getBoundingClientRect().bottom+scrollY")
+            self.assertGreater(market_top,roles_end)
+            page.screenshot(path=str(self.out/"v04-desktop-home.png"),full_page=True)
+            page.get_by_role("button",name="我要招人").click()
+            self.assertTrue(page.url.endswith("/recruiter/register"))
+            page.get_by_role("link",name="HHBA.").click()
+            page.get_by_role("button",name="我要应聘").click()
+            self.assertTrue(page.url.endswith("/candidate"))
+            page.get_by_text("查看招聘职位").click()
+            self.assertTrue(page.url.endswith("/candidate/jobs"))
+            page.get_by_text("合成测试岗位（仅自动化验收）").first.click()
+            self.assertTrue(page.url.endswith("/candidate/jobs/JOB-SYNTH-001"))
+            self.assertIn("历史",page.locator("body").inner_text())
+        finally:page.close()
+
+    def test_mobile_home_market_search_filter_and_no_leaked_tokens(self):
+        page=self.page(width=390,height=844)
+        try:
+            page.goto(self.base+"/",wait_until="domcontentloaded")
+            page.locator(".market-card").first.wait_for(timeout=12000)
+            self.assertFalse(page.evaluate("document.documentElement.scrollWidth > innerWidth + 2"))
+            page.screenshot(path=str(self.out/"v04-mobile-home.png"),full_page=True)
+            page.locator("#market-q").fill("合成测试岗位")
+            page.locator(".market-search button").click()
+            page.locator(".market-card").first.wait_for()
+            page.get_by_role("button",name="社会招聘").click()
+            page.locator(".market-card").first.wait_for()
+            self.assertEqual(page.locator(".market-channels button[aria-pressed='true']").inner_text(),"社会招聘")
+            self.assertTrue(any("recruitment_type=SOCIAL" in p for p,h in RecruitmentStub.visits))
+            for path, headers in RecruitmentStub.visits:
+                lower={key.lower() for key in headers}
+                self.assertNotIn("cookie",lower)
+                self.assertNotIn("authorization",lower)
+        finally:page.close()
+
+
+if __name__=="__main__":
+    unittest.main()
