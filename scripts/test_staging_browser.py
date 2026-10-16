@@ -106,6 +106,7 @@ class BrowserIntegrationTests(unittest.TestCase):
         try:
             page.goto(self.base+"/",wait_until="domcontentloaded")
             roles=page.locator(".entry-card")
+            roles.first.wait_for(state="visible",timeout=12000)
             self.assertEqual(roles.count(),2)
             self.assertIn("我要应聘",roles.nth(0).inner_text())
             self.assertIn("我要招人",roles.nth(1).inner_text())
