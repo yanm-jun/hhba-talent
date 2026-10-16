@@ -31,7 +31,7 @@ assert.ok(market.includes("OFFICIAL_HISTORICAL_UNCONFIRMED"));
 assert.ok(market.includes("job.current_application_verified === true"));
 assert.ok(market.includes("没有符合筛选条件的已核对官方岗位记录"));
 assert.ok(market.includes("未公开"));
-assert.ok(market.includes("官方核对 ↗"));
+assert.ok(market.includes("官网核对 · 投递未确认 ↗"));
 console.log('PASS: genuine official-sourced market mounted below two roles, no synthetic records or live-opening assertion.');
 
 assert.ok(market.includes("去官方投递 ↗"));
