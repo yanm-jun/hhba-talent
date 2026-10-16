@@ -51,6 +51,18 @@ class RecruitmentStub(BaseHTTPRequestHandler):
             # Social filter returns a SYNTHETIC reviewed application-link fixture.
             # Other filters keep the normal unverified historical record.
             approved="recruitment_type=SOCIAL" in self.path
+            if "recruitment_type=INTERNSHIP" in self.path:
+                sample={**sample,
+                    "job_title":"合成小米实习测试岗位（不是实际招聘）",
+                    "primary_recruitment_type":"INTERNSHIP",
+                    "record_kind":"OFFICIAL_LIST_OBSERVED",
+                    "marketplace_status":"OFFICIAL_LIST_UNCONFIRMED",
+                    "official_detail_url":None,
+                    "official_list_url":"https://xiaomi.jobs.f.mioffice.cn/internship/",
+                    "current_application_verified":False,
+                    "application_url":None,
+                    "application_link_status":"UNAVAILABLE",
+                }
             if approved:
                 sample={**sample,
                     "primary_recruitment_type":"SOCIAL",
@@ -163,6 +175,12 @@ class BrowserIntegrationTests(unittest.TestCase):
             self.assertFalse(page.locator(".market-card").first.get_by_text("当前投递待核实").count())
             page.get_by_role("button",name="校园招聘").click()
             page.get_by_text("当前投递待核实").first.wait_for()
+            self.assertEqual(page.get_by_role("link",name="去官方投递 ↗").count(),0)
+            page.get_by_role("button",name="实习招聘").click()
+            page.get_by_text("官方真实岗位列表已采集").first.wait_for(timeout=12000)
+            listing=page.get_by_role("link",name="查看企业招聘频道 · 非岗位直达 ↗")
+            self.assertEqual(listing.get_attribute("href"),
+                             "https://xiaomi.jobs.f.mioffice.cn/internship/")
             self.assertEqual(page.get_by_role("link",name="去官方投递 ↗").count(),0)
             self.assertTrue(any("recruitment_type=SOCIAL" in p for p,h in RecruitmentStub.visits))
             for path, headers in RecruitmentStub.visits:

@@ -37,3 +37,8 @@ console.log('PASS: genuine official-sourced market mounted below two roles, no s
 assert.ok(market.includes("去官方投递 ↗"));
 assert.ok(market.includes("官网核对 · 投递未确认 ↗"));
 assert.ok(market.includes("application_link_status !== 'VERIFIED_DIRECT'"));
+
+assert.ok(market.includes("OFFICIAL_LIST_OBSERVED"));
+assert.ok(market.includes("OFFICIAL_LIST_UNCONFIRMED"));
+assert.ok(market.includes("查看企业招聘频道 · 非岗位直达 ↗"));
+assert.ok(j.includes("查看企业招聘频道 · 不是该岗位投递地址"));

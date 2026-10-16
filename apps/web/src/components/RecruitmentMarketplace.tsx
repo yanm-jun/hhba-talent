@@ -16,6 +16,7 @@ type MarketJob = {
   source_platform?: string | null;
   source_id?: string | null;
   official_detail_url?: string | null;
+  official_list_url?: string | null;
   application_url?: string | null;
   application_link_status?: 'VERIFIED_DIRECT' | 'OFFICIAL_DETAIL_ONLY' | 'UNAVAILABLE';
   application_verified_at?: string | null;
@@ -49,6 +50,8 @@ const safeOfficial = (value?: string | null) => {
 function MarketCard({job}: {job: MarketJob}) {
   const href = validId(job.job_id) ? '/candidate/jobs/' + encodeURIComponent(job.job_id) : null;
   const official = safeOfficial(job.official_detail_url);
+  const listOnly = job.record_kind === 'OFFICIAL_LIST_OBSERVED';
+  const listUrl = listOnly ? safeOfficial(job.official_list_url) : null;
   const application = job.current_application_verified === true
     && job.application_link_status === 'VERIFIED_DIRECT'
     ? safeOfficial(job.application_url) : null;
@@ -62,12 +65,14 @@ function MarketCard({job}: {job: MarketJob}) {
       <span>学历 {readable(job.education_min)}</span>
       <span>薪资 {readable(job.salary_display)}</span>
     </div>
-    <div className="market-card-proof"><ShieldCheck size={14}/><span>{application ? '岗位申请入口已近期核验 · 请以官网为准' : '真实官方历史记录 · 当前投递待核实'}</span></div>
+    <div className="market-card-proof"><ShieldCheck size={14}/><span>{application ? '岗位申请入口已近期核验 · 请以官网为准' : listOnly ? '官方真实岗位列表已采集 · 详情及投递待核实' : '真实官方历史记录 · 当前投递待核实'}</span></div>
     <div className="market-card-foot"><div><span>最近来源核验 {published(job.last_verified_at)}</span><span>发布时间 {published(job.published_at)}</span></div>
       <div className="market-card-links">{href && <Link to={href}>查看记录 <ArrowRight size={14}/></Link>}
         {application
           ? <a className="market-verified-apply" href={application} target="_blank" rel="noopener noreferrer">去官方投递 ↗</a>
-          : official && <a href={official} target="_blank" rel="noopener noreferrer">官网核对 · 投递未确认 ↗</a>}</div></div>
+          : listOnly && listUrl
+            ? <a href={listUrl} target="_blank" rel="noopener noreferrer">查看企业招聘频道 · 非岗位直达 ↗</a>
+            : official && <a href={official} target="_blank" rel="noopener noreferrer">官网核对 · 投递未确认 ↗</a>}</div></div>
   </article>;
 }
 export function RecruitmentMarketplace() {
@@ -100,15 +105,18 @@ export function RecruitmentMarketplace() {
         || !Number.isInteger(result.total) || result.total < 0
         || !Array.isArray(result.items)
         || result.items.some(job=>
-          job.record_kind!=='HISTORICAL_MASTER'
-          || job.marketplace_status!=='OFFICIAL_HISTORICAL_UNCONFIRMED'
+          !((job.record_kind==='HISTORICAL_MASTER' && job.marketplace_status==='OFFICIAL_HISTORICAL_UNCONFIRMED') ||
+            (job.record_kind==='OFFICIAL_LIST_OBSERVED' && job.marketplace_status==='OFFICIAL_LIST_UNCONFIRMED'))
           || typeof job.current_application_verified !== 'boolean'
           || (job.current_application_verified === true &&
               (job.application_link_status !== 'VERIFIED_DIRECT' || !safeOfficial(job.application_url)))
           || (job.current_application_verified === false &&
               (job.application_link_status === 'VERIFIED_DIRECT' || !!job.application_url))
           || !validId(job.job_id)
-          || !safeOfficial(job.official_detail_url)
+          || (job.record_kind==='HISTORICAL_MASTER' && !safeOfficial(job.official_detail_url))
+          || (job.record_kind==='OFFICIAL_LIST_OBSERVED' &&
+              (!safeOfficial(job.official_list_url) || !!job.official_detail_url ||
+                job.current_application_verified!==false || !!job.application_url))
           || !job.source_id || !job.job_title || !job.company_display_name
         )
       ) throw new Error('untrusted marketplace response');
@@ -141,9 +149,9 @@ export function RecruitmentMarketplace() {
     </form>
     <div className="market-channels" role="group" aria-label="招聘市场分类">
       {channels.map(([key,value])=><button key={key} type="button" aria-pressed={type===key} className={type===key?'active':''} onClick={()=>setType(key)}>{value}</button>)}
-      <span className="market-total">{!loading&&!error&&data ? data.total+' 条合规公开历史记录' : '来源实时读取'}</span>
+      <span className="market-total">{!loading&&!error&&data ? data.total+' 条真实官方列表与历史记录' : '来源实时读取'}</span>
     </div>
-    <div className="market-caution"><ShieldCheck size={18}/><span>这里展示的是真实官方来源的<strong>历史岗位记录</strong>，不是已确认当前在招岗位。岗位职责、专业、薪资与投递日期等未公开信息不会编造；申请前请核对官网。</span></div>
+    <div className="market-caution"><ShieldCheck size={18}/><span>这里包括真实企业官方列表采集记录与历史岗位，<strong>均不代表已确认当前在招</strong>。岗位职责、专业、薪资与投递日期等未公开信息不会编造；申请前请核对官网。</span></div>
     {loading ? <div className="market-state" role="status">正在向 HHBA 招聘数据引擎读取真实岗位…</div>
       : error ? <div className="market-state" role="alert"><p>真实招聘数据暂不可用。当前不展示任何示例或假岗位。</p><button type="button" onClick={()=>setAttempt(n=>n+1)}><RefreshCcw size={15}/> 重新读取</button></div>
       : !data?.items.length ? <div className="market-state"><strong>当前没有符合筛选条件的已核对官方岗位记录</strong><p>我们不会用虚构岗位填补列表，也不会把未核验的候选标为正在招聘。</p></div>
