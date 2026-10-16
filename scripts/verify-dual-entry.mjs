@@ -12,7 +12,7 @@ assert.ok(h.includes("'/candidate'"));assert.ok(h.includes("'/recruiter/register
 assert.ok(m.includes("route==='/candidate/jobs'"));
 assert.ok(m.includes('CandidateJobDetailPage'));
 assert.ok(c.includes('to="/candidate/jobs"'));
-assert.ok(j.includes("credentials: 'omit'"));
+assert.ok(/credentials:\s*'omit'/.test(j));
 assert.ok(j.includes('HISTORICAL_MASTER'));
 assert.ok(j.includes('历史标记开放'));
 assert.ok(v.includes('VITE_RECRUITMENT_PROXY_TARGET'));
