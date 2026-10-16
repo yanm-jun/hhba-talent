@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const h=read('apps/web/src/pages/HomePage.tsx');
+const market=read('apps/web/src/components/RecruitmentMarketplace.tsx');
 const m=read('apps/web/src/main.tsx');
 const c=read('apps/web/src/pages/CandidatePages.tsx');
 const v=read('apps/web/vite.config.ts');
@@ -19,3 +20,16 @@ assert.ok(v.includes('VITE_RECRUITMENT_PROXY_TARGET'));
 assert.ok(v.includes("request.removeHeader('cookie')"));
 assert.ok(v.includes("request.removeHeader('authorization')"));
 console.log('PASS: original two-entry HHBA homepage and candidate-only job search.');
+
+// The market is BELOW two authentic role actions, never a third fake role.
+assert.ok(h.includes('<RecruitmentMarketplace/>'));
+assert.ok(h.indexOf('<RecruitmentMarketplace/>')>h.lastIndexOf('<EntryCard'));
+assert.ok(market.includes("const sourceUrl = '/recruitment/api/v1/marketplace'"));
+assert.ok(market.includes("credentials:'omit'"));
+assert.ok(market.includes("all_current_application_statuses_unverified !== true"));
+assert.ok(market.includes("OFFICIAL_HISTORICAL_UNCONFIRMED"));
+assert.ok(market.includes("current_application_verified!==false"));
+assert.ok(market.includes("没有符合筛选条件的已核对官方岗位记录"));
+assert.ok(market.includes("未公开"));
+assert.ok(market.includes("官方核对 ↗"));
+console.log('PASS: genuine official-sourced market mounted below two roles, no synthetic records or live-opening assertion.');
