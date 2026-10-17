@@ -151,7 +151,7 @@ def load_staged_ats(stage_dir: Path):
 def _read_loopback_json(url: str):
     parsed = urlsplit(url)
     if (parsed.scheme != "http" or parsed.hostname not in {"127.0.0.1", "localhost", "::1"}
-            or parsed.username or parsed.password or parsed.query or parsed.fragment):
+            or parsed.username or parsed.password or parsed.fragment):
         raise ValueError("domestic API must be a loopback HTTP origin")
     with urlopen(Request(url, headers={"Accept": "application/json"}), timeout=5) as response:
         if response.status != 200 or "json" not in response.headers.get("Content-Type", "").lower():
