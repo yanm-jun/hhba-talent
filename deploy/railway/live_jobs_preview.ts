@@ -2,6 +2,145 @@ import { convert } from "html-to-text@9";
 import sanitizeHtml from "sanitize-html@2";
 
 type Job={id:string;company:string;title:string;location:string;remote:boolean|null;url:string;platform:string;source:string};
+
+import { Database } from "bun:sqlite";
+import { createHash } from "node:crypto";
+import { mkdirSync } from "node:fs";
+const phrases:[string,string][]=[
+ ["Algorithm","算法"],["Algorithms","算法"],["Payments Fraud","支付反欺诈"],["Business Development","业务拓展"],
+ ["Regulatory Compliance","监管合规"],["Machine Learning","机器学习"],
+ ["Artificial Intelligence","人工智能"],["Data Scientist","数据科学家"],
+ ["Data Analyst","数据分析师"],["Data Analytics","数据分析"],
+ ["Software Engineer","软件工程师"],["iOS Engineer","iOS 工程师"],
+ ["Mobile Engineer","移动端工程师"],["Product Manager","产品经理"],
+ ["Project Manager","项目经理"],["Account Manager","客户经理"],
+ ["Engineering Manager","工程经理"],["Technical Support","技术支持"],
+ ["Customer Success","客户成功"],["Sales Engineer","销售工程师"],
+ ["Business Operations","业务运营"],["Product Marketing","产品市场营销"],
+ ["Digital Marketing","数字营销"],["Growth Marketing","增长营销"],
+ ["Marketing Manager","市场营销经理"],["Talent Acquisition","人才招聘"],
+ ["Human Resources","人力资源"],["Finance Manager","财务经理"],
+ ["Financial Analyst","财务分析师"],["Regulatory Affairs","监管事务"],
+ ["Risk Management","风险管理"],["Security Engineer","安全工程师"],
+ ["Data Engineer","数据工程师"],["Data Platform","数据平台"],
+ ["Cloud Infrastructure","云基础设施"],["Quality Assurance","质量保证"],
+ ["Quality Engineer","质量工程师"],["Business Analyst","业务分析师"],
+ ["Business Intelligence","商业智能"],["User Experience","用户体验"],
+ ["User Interface","用户界面"],["Product Designer","产品设计师"],
+ ["Technical Program Manager","技术项目经理"],
+ ["Software Development","软件开发"],["Business Strategy","业务战略"],
+ ["Country Manager","国家经理"],["Infrastructure Engineer","基础设施工程师"],
+ ["Operations Analyst","运营分析师"],["Payments","支付"],["Fraud","反欺诈"],
+ ["Optimization","优化"],["Identity","身份"],["Organization","组织"],
+ ["Staff","专家级"],["Principal","首席"],["Senior","高级"],
+ ["Junior","初级"],["Lead","负责人"],["Head of","负责人"],
+ ["Director","总监"],["Vice President","副总裁"],["Associate","助理"],
+ ["Graduate","应届生"],["Internship","实习"],["Intern","实习生"],
+ ["Specialist","专员"],["Consultant","顾问"],["Coordinator","协调员"],
+ ["Assistant","助理"],["Administrator","管理员"],["Architect","架构师"],
+ ["Engineer","工程师"],["Developer","开发工程师"],["Manager","经理"],
+ ["Analyst","分析师"],["Scientist","科学家"],["Designer","设计师"],
+ ["Recruiter","招聘专员"],["Executive","主管"],["Operations","运营"],
+ ["Marketing","市场营销"],["Finance","财务"],["Financial","财务"],
+ ["Accounting","会计"],["Accountant","会计师"],["Sales","销售"],
+ ["Business","业务"],["Growth","增长"],["Strategy","战略"],
+ ["Product","产品"],["Engineering","工程"],["Technical","技术"],
+ ["Technology","技术"],["Security","安全"],["Compliance","合规"],
+ ["Regulatory","监管"],["Global","全球"],["Regional","区域"],
+ ["International","国际"],["Partnerships","合作伙伴"],["Support","支持"],
+ ["Customer","客户"],["Client","客户"],["Service","服务"],
+ ["Enterprise","企业"],["Platform","平台"],["Infrastructure","基础设施"],
+ ["Systems","系统"],["System","系统"],["Solutions","解决方案"],
+ ["Software","软件"],["Hardware","硬件"],["Cloud","云"],
+ ["Data","数据"],["Mobile","移动端"],["Backend","后端"],
+ ["Frontend","前端"],["Design","设计"],["Risk","风险"],
+ ["Legal","法务"],["Policy","政策"],["Payment","支付"],
+ ["Performance","性能"],["Testing","测试"],["Quality","质量"],
+ ["Development","开发"],["SME","中小企业"],["Org","组织"],
+ ["Full-time","全职"],["Part-time","兼职"],["Contract","合同制"],
+ ["Remote","远程"],["Hybrid","混合办公"],["Retail","零售"],
+ ["Education","教育"],["Experience","经验"],["Content","内容"],
+ ["Brand","品牌"],["Social Media","社交媒体"],["Acquisition","获客"],
+ ["Onboarding","入职"],["Fintech","金融科技"],["Banking","银行"],
+ ["Digital","数字"],["Investment","投资"],["People","人力资源"]
+].sort((a,b)=>b[0].length-a[0].length);
+const localePlaces:Record<string,string>={
+ "Ho Chi Minh City":"胡志明市","Singapore":"新加坡","SG":"新加坡",
+ "Vietnam":"越南","VN":"越南","Jakarta":"雅加达",
+ "Indonesia":"印度尼西亚","ID":"印度尼西亚",
+ "Hong Kong":"香港","HK":"中国香港",
+ "San Francisco":"旧金山","New York":"纽约","Los Angeles":"洛杉矶",
+ "United States":"美国","USA":"美国","US":"美国",
+ "United Kingdom":"英国","UK":"英国","London":"伦敦",
+ "Sydney":"悉尼","Melbourne":"墨尔本","Australia":"澳大利亚",
+ "Tokyo":"东京","Japan":"日本","Kuala Lumpur":"吉隆坡",
+ "Malaysia":"马来西亚","Dubai":"迪拜","Berlin":"柏林",
+ "Germany":"德国","Paris":"巴黎","France":"法国",
+ "Bengaluru":"班加罗尔","Mumbai":"孟买","India":"印度",
+ "Toronto":"多伦多","Canada":"加拿大","Bangkok":"曼谷",
+ "Thailand":"泰国","Remote":"远程","Worldwide":"全球远程"
+};
+const companyZh:Record<string,string>={Airwallex:"空中云汇"};
+function swapTerms(raw:string,lookup:[string,string][]):string{
+ let out=raw;
+ for(const [en,zh]of lookup){
+  const safe=en.replace(/[^A-Za-z0-9]/g,c=>"\\"+c);
+  out=out.replace(new RegExp("(^|[^A-Za-z])("+safe+")(?=$|[^A-Za-z])","gi"),(_m,prefix)=>prefix+zh);
+ }
+ return out;
+}
+function translateTitleRules(value:string):string{
+ const title=swapTerms(swapTerms(value,phrases),Object.entries(localePlaces)).replace(/\s*&\s*/g,"与")
+  .replace(/,\s*/g,"，").replace(/\(/g,"（").replace(/\)/g,"）")
+  .replace(/ {2,}/g," ").trim();
+ return /[\u3400-\u9fff]/.test(title)?title:"职位名称待翻译";
+}
+function translateLocation(value:string):string{
+ return swapTerms(value,Object.entries(localePlaces).sort((a,b)=>b[0].length-a[0].length))
+ .replace(/\s*-\s*/g," · ").trim()||"工作地点未披露";
+}
+let translationDb:Database|null=null;
+try{
+ mkdirSync("/data",{recursive:true});
+ translationDb=new Database("/data/hhba-translations.sqlite",{create:true});
+ translationDb.exec("PRAGMA journal_mode=WAL");
+ translationDb.exec("CREATE TABLE IF NOT EXISTS translations(cache_key TEXT PRIMARY KEY,kind TEXT NOT NULL,source_hash TEXT NOT NULL,translated TEXT NOT NULL,mode TEXT NOT NULL,updated_at TEXT NOT NULL)");
+ translationDb.exec("CREATE INDEX IF NOT EXISTS idx_tr_kind ON translations(kind,mode)");
+}catch(e){console.error("HHBA_TRANSLATION_STORAGE_ERROR",e instanceof Error?e.name:"Error");}
+function hash(kind:string,source:string):string{
+ return createHash("sha256").update("hhba-zh-v1:"+kind+":"+source).digest("hex");
+}
+function fromCache(kind:string,source:string):{translated:string,mode:string}|null{
+ try{return (translationDb?.query("SELECT translated,mode FROM translations WHERE cache_key=?").get(hash(kind,source)) as any)||null;}catch{return null;}
+}
+function toCache(kind:string,source:string,value:string,mode:string){
+ if(!translationDb||!value.trim()||value.length>150000)return;
+ try{translationDb.query("INSERT OR REPLACE INTO translations(cache_key,kind,source_hash,translated,mode,updated_at) VALUES(?,?,?,?,?,?)")
+ .run(hash(kind,source),kind,createHash("sha256").update(source).digest("hex"),value,mode,new Date().toISOString());}catch{}
+}
+function present(j:Job){
+ let v=fromCache("title",j.title);
+ if(!v){const translation=translateTitleRules(j.title);
+  v={translated:translation,mode:translation==="职位名称待翻译"?"pending":"rules"};
+  toCache("title",j.title,translation,v.mode);
+ }
+ return {...j,titleZh:v.translated,titleStatus:v.mode,
+  locationZh:translateLocation(j.location),companyZh:companyZh[j.company]||j.company};
+}
+const searchAliases:Record<string,string[]>={
+ "销售":["sales","business development","account executive"],
+ "财务":["finance","financial","accounting","accountant"],
+ "工程师":["engineer","engineering","developer"],
+ "实习":["intern","internship","graduate"],
+ "数据分析":["data analyst","analytics","data scientist","business intelligence"],
+ "市场":["marketing","growth"],"产品":["product"],
+ "设计":["designer","design"],"运营":["operations"],
+ "人力资源":["human resources","recruiter","talent"],
+ "风控":["risk","fraud"],"合规":["compliance"],
+ "支付":["payment","payments"],"经理":["manager"],
+ "法务":["legal","counsel"]
+};
+
 type Board={platform:"greenhouse"|"ashby"|"lever";company:string;slug:string};
 const boards:Board[]=[
  {platform:"greenhouse",company:"Greenhouse",slug:"greenhouse"},
@@ -119,6 +258,8 @@ async function officialDetail(job:Job):Promise<Detail|null>{
 }
 function detailHtml(d:Detail):string{
  const j=d.job;
+ const name=present(j);
+ const zhFull=translatedDetail(d);
  const official=esc(j.url),apply=esc(d.applyUrl||j.url);
  const body=d.status==="LIVE_CONTENT"?
    '<div class="full-jd">'+(d.richHtml||esc(d.description))+'</div>':
@@ -129,7 +270,7 @@ function detailHtml(d:Detail):string{
   '<title>'+esc(j.title)+' · '+esc(j.company)+' · HHBA</title><style>'+
   '*{box-sizing:border-box}body{margin:0;background:#f5f7f4;color:#173627;font-family:system-ui,"PingFang SC","Microsoft Yahei",sans-serif}'+
   'header{background:#fff;border-bottom:1px solid #e4eae3;padding:22px max(5%,calc((100% - 1080px)/2))}'+
-  'header a{text-decoration:none;color:#204c37;font-size:24px;font-weight:900}.wrap{max-width:940px;margin:0 auto;padding:34px 20px 75px}'+
+  'header a{text-decoration:none;color:#204c37;font-size:24px;font-weight:900}.wrap{max-width:940px;margin:0 auto;padding:34px 20px 75px}.lang-toggle{display:flex;gap:5px;background:#eaf3eb;border-radius:9px;padding:5px;margin:12px 0 0;width:fit-content}.lang-toggle button{font:inherit;font-size:13px;background:transparent;border:0;border-radius:7px;padding:9px 18px;color:#4d7660;font-weight:800;cursor:pointer}.lang-toggle button.selected{background:#1d6340;color:#fff}.lang-panel[hidden]{display:none}'+
   '.back{text-decoration:none;color:#4a7760;font-size:13px;font-weight:700}.hero{padding:35px 0 25px}'+
   '.eyebrow{color:#649477;font-size:13px;font-weight:750}.hero h1{font-size:clamp(27px,4vw,40px);line-height:1.3;margin:13px 0}'+
   '.meta{color:#5e786b;line-height:1.8;font-size:14px}.panel{background:#fff;border:1px solid #e4eae3;border-radius:14px;padding:clamp(20px,4vw,42px)}'+
@@ -141,13 +282,86 @@ function detailHtml(d:Detail):string{
   '</style></head><body><header><a href="/">HHBA <small style="font-size:13px;font-weight:400;color:#728d79">· 招聘市场</small></a></header>'+
   '<main class="wrap"><a class="back" href="/">← 返回招聘市场</a>'+
   '<section class="hero"><div class="eyebrow">'+esc(j.company)+' · '+esc(j.platform.toUpperCase())+'</div>'+
-  '<h1>'+esc(j.title)+'</h1><div class="meta">📍 '+esc(j.location)+' · '+(j.remote===true?'远程':j.remote===false?'非远程':'远程方式未标明')+'</div></section>'+
-  '<section class="panel"><h2>官方职位描述（原文）</h2><p class="source">按岗位 ID 实时读取 · '+esc(d.checkedAt)+
-  ' · 未经 AI 改写</p>'+body+'</section>'+
+  '<h1 id="detail-title" data-en="'+esc(j.title)+'" data-zh="'+esc(name.titleZh)+'">'+esc(name.titleZh)+'</h1><div class="meta">📍 <span id="detail-place" data-en="'+esc(j.location)+'" data-zh="'+esc(name.locationZh)+'">'+esc(name.locationZh)+'</span> · '+(j.remote===true?'远程':j.remote===false?'非远程':'远程方式未标明')+'</div></section>'+
+  '<section class="panel"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px">'+
+  '<h2 id="jd-label">岗位完整描述</h2>'+
+  '<div class="lang-toggle"><button id="detail-zh" type="button" class="selected">中文</button><button id="detail-en" type="button">English</button></div></div>'+
+  '<p class="source">官方同一岗位 ID · 最近读取 '+esc(d.checkedAt)+' · 英文为企业原文，中文为翻译参考</p>'+
+  '<div class="lang-panel" id="jd-zh">'+
+  (zhFull?'<div class="full-jd" style="white-space:pre-wrap">'+esc(zhFull)+'</div>':
+   '<p class="missing">该职位的中文完整 JD 译文尚未准备好。本站不会用不完整译文代替官方要求。请点击 English 阅读该岗位的官方完整原文。</p>')+
+  '</div><div class="lang-panel" id="jd-en" hidden>'+body+'</div></section>'+
   '<div class="actions"><a class="btn" href="'+apply+'" target="_blank" rel="noopener noreferrer">前往企业官网申请 ↗</a>'+
   '<a class="btn secondary" href="'+official+'" target="_blank" rel="noopener noreferrer">查看对应官方职位页 ↗</a></div>'+
-  '<p class="notice">资料来自企业公开招聘系统。HHBA 不代表任何招聘企业。信息可能随时变动；申请资格和最终岗位状态以企业官网为准。'+
-  '原始站点中的表单、视频和自定义交互不复制到本站。</p></main></body></html>';
+  '<p class="notice">资料来自企业公开招聘系统。HHBA 不代表招聘企业。中文职位名称目前包括术语规则译名，未完成译文需对照英文原文。申请资格和最终状态以企业官网为准。原始站点中的表单及自定义交互不复制到本站。</p></main>'+
+  '<script>(function(){let lang="zh";try{lang=localStorage.getItem("hhba-lang")==="en"?"en":"zh"}catch{}function set(v){lang=v==="en"?"en":"zh";try{localStorage.setItem("hhba-lang",lang)}catch{}document.querySelector("#jd-zh").hidden=lang!=="zh";document.querySelector("#jd-en").hidden=lang!=="en";document.querySelector("#detail-zh").classList.toggle("selected",lang==="zh");document.querySelector("#detail-en").classList.toggle("selected",lang==="en");document.querySelector("#detail-title").textContent=document.querySelector("#detail-title").dataset[lang];document.querySelector("#detail-place").textContent=document.querySelector("#detail-place").dataset[lang]};document.querySelector("#detail-zh").onclick=()=>set("zh");document.querySelector("#detail-en").onclick=()=>set("en");set(lang)})()</script></body></html>';
+}
+
+
+const DEEPSEEK_API="https://api.deepseek.com/chat/completions";
+const TRANSLATOR_MODEL="deepseek-chat";
+function numberTokens(value:string):string[]{
+ return (value.match(/\d+(?:[.,]\d+)*(?:%|％)?/g)||[]).sort();
+}
+function numbersRetained(original:string,translated:string):boolean{
+ const a=numberTokens(original),b=numberTokens(translated);
+ return a.every(x=>b.includes(x));
+}
+async function modelTranslations(kind:"title"|"jd",sources:string[]):Promise<string[]|null>{
+ const secret=Bun.env.DEEPSEEK_API_KEY;
+ if(!secret||!sources.length||sources.length>16)return null;
+ if(sources.some(x=>!x||x.length>(kind==="jd"?14000:300)))return null;
+ const instruction=kind==="title"
+  ?"将给定的每条英语岗位名称准确翻译为面向中国求职者的自然、专业中文。保留专有名词、技术缩写、职级差异和所有数字。不得补充职位条件或捏造信息。只返回 JSON 对象，格式 {\"translations\":[\"...\"]}，保持数组顺序、数量不变。"
+  :"将给定的官方职位描述完整准确地翻译为中文。保留全部章节标题、职责、任职资格、学历、年限、工资数字、币种、法律说明以及原文顺序，不得增删、缩写或编造。缩写保留英文，明确专业术语允许中英并列。返回 JSON 对象 {\"translations\":[\"...\"]}，数量顺序完全一致；每个结果保留换行段落。";
+ try{
+  const response=await fetch(DEEPSEEK_API,{
+   method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+secret},
+   body:JSON.stringify({
+    model:TRANSLATOR_MODEL,response_format:{type:"json_object"},
+    temperature:0,max_tokens:kind==="jd"?8192:2400,
+    messages:[{role:"system",content:instruction},{role:"user",content:JSON.stringify({sources})}]
+   }),redirect:"error",signal:AbortSignal.timeout(35000)
+  });
+  if(!response.ok||Number(response.headers.get("content-length")||0)>150000)
+   return null;
+  const data=await response.json() as any;
+  const raw=data?.choices?.[0]?.message?.content;
+  if(typeof raw!=="string")return null;
+  const parsed=JSON.parse(raw);
+  if(!Array.isArray(parsed?.translations)||parsed.translations.length!==sources.length)return null;
+  const output=parsed.translations as unknown[];
+  if(output.some((x,i)=>typeof x!=="string"||!(/[\u3400-\u9fff]/.test(x as string))||
+    (x as string).length<Math.min(4,sources[i].length/5)||
+    !numbersRetained(sources[i],x as string)))return null;
+  return output as string[];
+ }catch{return null;}
+}
+let titleWorkerRunning=false;
+let scheduledTitleCount=0;
+async function fillTitleTranslations(rows:Job[]){
+ if(!Bun.env.DEEPSEEK_API_KEY||titleWorkerRunning)return;
+ titleWorkerRunning=true;
+ try{
+  const pending=Array.from(new Map(rows.filter(x=>fromCache("title",x.title)?.mode!=="model")
+   .map(x=>[x.title,x.title])).values()).slice(0,300);
+  for(let i=0;i<pending.length;i+=12){
+   const batch=pending.slice(i,i+12);
+   const translated=await modelTranslations("title",batch);
+   if(!translated){console.log("HHBA_TRANSLATION_BATCH_PAUSED",JSON.stringify({offset:i,count:batch.length}));break;}
+   batch.forEach((source,n)=>toCache("title",source,translated[n],"model"));
+   scheduledTitleCount+=batch.length;
+   await Bun.sleep(1800);
+  }
+  console.log("HHBA_TRANSLATION_BATCH",JSON.stringify({translatedThisRuntime:scheduledTitleCount,persistent:!!translationDb}));
+ }finally{titleWorkerRunning=false;}
+}
+function translatedDetail(d:Detail):string|null{
+ // Metadata-only permission is not permission to publish derivative JD
+ // translations. A separate verified source/job rights registry is required.
+ if(!Bun.env.HHBA_JD_TRANSLATION_RIGHTS_REGISTRY_READY)return null;
+ const record=fromCache("jd",d.description);
+ return record?.mode==="rights-reviewed-model"?record.translated:null;
 }
 
 const page=(payload:any)=>`<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HHBA · 全球招聘市场</title><meta name="description" content="HHBA 全球招聘市场：真实海外企业公开招聘职位索引，点击跳企业官网。"><style>
@@ -155,7 +369,7 @@ const page=(payload:any)=>`<!doctype html><html lang="zh-CN"><head><meta charset
 *{box-sizing:border-box}body{margin:0}a{color:inherit;text-decoration:none}
 nav{background:#fff;border-bottom:1px solid #e7ebe6;padding:18px max(5%,calc((100% - 1120px)/2));display:flex;align-items:center;justify-content:space-between}
 .logo{font-size:24px;letter-spacing:-1.4px;font-weight:900;color:#204c37}.logo em{font-size:11px;color:#789081;letter-spacing:1px;font-style:normal;margin-left:8px}
-nav .lab{font-size:12px;color:#71877b}
+nav .lab{font-size:12px;color:#71877b}.lang-switch{display:flex;gap:3px;background:#edf3ee;padding:4px;border-radius:9px}.lang-switch button{border:0;border-radius:7px;background:transparent;color:#537462;font-size:12px;padding:9px 15px;font-weight:800;cursor:pointer}.lang-switch button.on{background:#1e6341;color:#fff}
 .hero{background:#143f2b;color:#fff;padding:70px 6% 64px}.wrap{max-width:1120px;margin:auto}.eyebrow{color:#b1e0bc;font-size:12px;letter-spacing:3px;font-weight:800}
 h1{font-size:clamp(32px,5vw,52px);margin:18px 0;letter-spacing:-1px;line-height:1.2}
 .hero p{color:#d5e6d9;max-width:700px;line-height:1.85;font-size:15px}
@@ -171,26 +385,43 @@ h2{font-size:20px;margin:0}.section-title span{color:#7f9085;font-size:12px}
 .disclaimer{font-size:12px;color:#728378;margin-top:30px;line-height:1.8}.status{padding:14px;border:1px solid #f0debd;background:#fffaf1;color:#886e40;border-radius:10px;margin-bottom:24px;font-size:12px}
 .empty{padding:48px;text-align:center;color:#68776b;background:white;border-radius:12px}
 footer{padding:25px;text-align:center;color:#8a9b8f;font-size:11px;border-top:1px solid #e5eae4}
-@media(max-width:600px){.hero{padding:50px 22px}nav{padding:16px 22px}.job{display:block;padding:18px}.visit{display:inline-block;margin-top:15px}.numbers{gap:23px}}
-</style></head><body><nav><div class="logo">HHBA <em>招聘市场</em></div><div class="lab">真实企业招聘索引 · 公测</div></nav><section class="hero"><div class="wrap"><div class="eyebrow">GLOBAL CAREERS · OFFICIAL SOURCES</div><h1>发现全球工作机会</h1><p>搜索海外企业公开招聘岗位，点击直接前往企业官方职位详情页。岗位来自 Greenhouse、Lever、Ashby 的公开招聘接口；没有虚构职位，不在本网站复制完整 JD。</p><div class="numbers"><div class="num"><b id="count">${payload.total}</b><span>本次获取的岗位</span></div><div class="num"><b>${payload.boards}</b><span>成功读取的招聘板</span></div><div class="num"><b>3</b><span>ATS 数据平台</span></div></div></div></section>
-<main><div class="status">公测版说明：当前接入 6 个样本企业招聘板，不代表全量全球职位。最近同步：${esc(payload.updated)}。职位是否仍接受申请以企业官网为准。${payload.failures?" 有 "+payload.failures+" 个来源本轮暂不可用。":""}</div>
+@media(max-width:600px){.hero{padding:50px 22px}nav{padding:16px 22px;gap:10px;flex-wrap:wrap}.job{display:block;padding:18px}.visit{display:inline-block;margin-top:15px}.numbers{gap:23px}}
+</style></head><body><nav><div class="logo">HHBA <em>招聘市场</em></div><div class="lab">真实企业招聘索引 · 公测</div><div class="lang-switch" aria-label="岗位语言"><button id="toggle-zh" type="button">中文</button><button id="toggle-en" type="button">English</button></div></nav><section class="hero"><div class="wrap"><div class="eyebrow">GLOBAL CAREERS · OFFICIAL SOURCES</div><h1>发现全球工作机会</h1><p>搜索海外企业公开招聘岗位，点击直接前往企业官方职位详情页。岗位来自 Greenhouse、Lever、Ashby 的公开招聘接口；没有虚构职位，不在本网站复制完整 JD。</p><div class="numbers"><div class="num"><b id="count">${payload.total}</b><span>本次获取的岗位</span></div><div class="num"><b>${payload.boards}</b><span>成功读取的招聘板</span></div><div class="num"><b>3</b><span>ATS 数据平台</span></div></div></div></section>
+<main><div class="status">默认显示中文岗位名称。术语规则翻译属于初版，未完成的翻译会标注“待翻译”；切换 English 可查官方标题。公测版说明：当前接入 6 个样本企业招聘板，不代表全量全球职位。最近同步：${esc(payload.updated)}。职位是否仍接受申请以企业官网为准。${payload.failures?" 有 "+payload.failures+" 个来源本轮暂不可用。":""}</div>
 <div class="filters"><input id="q" aria-label="搜索岗位或企业" placeholder="搜索岗位、公司、地点（支持英文）"><select id="company" aria-label="企业"><option value="">全部企业</option></select><select id="remote" aria-label="远程筛选"><option value="">全部工作方式</option><option value="yes">标注远程</option></select></div>
 <div class="section-title"><h2>官方岗位列表</h2><span id="shown"></span></div><div class="list" id="jobs"></div><p class="disclaimer">数据源为外部企业公开招聘板。部分企业官网在不同网络环境下可能无法访问。岗位发布时间、工作类型、远程标记在接口未披露时不会推断，具体资格要求和投递方式请到企业官网核实。HHBA 不代表与招聘企业存在合作关系。</p></main><footer>HHBA · Global Job Index · 仅公开职位元数据与官方跳转</footer>
 <script>
 let all=[],filtered=[],limit=30;
+let lang='zh';
+try{lang=localStorage.getItem('hhba-lang')==='en'?'en':'zh';}catch{}
+const aliases=${JSON.stringify(searchAliases)};
+function setLanguage(value){
+ lang=value==='en'?'en':'zh';
+ try{localStorage.setItem('hhba-lang',lang);}catch{}
+ document.querySelector('#toggle-zh').classList.toggle('on',lang==='zh');
+ document.querySelector('#toggle-en').classList.toggle('on',lang==='en');
+ document.querySelector('#q').placeholder=lang==='zh'?'搜索中文职位、公司或城市':'Search job titles, companies and cities';
+ for(const option of Array.from(document.querySelector('#company').options)){if(option.value)option.textContent=lang==='zh'?(all.find(x=>x.company===option.value)?.companyZh||option.value):option.value;}
+ document.querySelector('#remote').options[0].textContent=lang==='zh'?'全部工作方式':'All work modes';
+ document.querySelector('#remote').options[1].textContent=lang==='zh'?'标注远程':'Remote only';
+ render();
+}
+document.querySelector('#toggle-zh').addEventListener('click',()=>setLanguage('zh'));
+document.querySelector('#toggle-en').addEventListener('click',()=>setLanguage('en'));
 const safe=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]||c));
 const q=document.querySelector("#q"),c=document.querySelector("#company"),remote=document.querySelector("#remote"),list=document.querySelector("#jobs");
 function render(reset=true){
  if(reset)limit=30;
  const key=q.value.trim().toLowerCase();
- filtered=all.filter(x=>(!key||[x.title,x.company,x.location].some(z=>String(z||"").toLowerCase().includes(key)))&&(!c.value||x.company===c.value)&&(!remote.value||x.remote===true));
+ const related=Object.entries(aliases).filter(([cn])=>key.includes(cn)).flatMap(([,en])=>en);
+ filtered=all.filter(x=>(!key||[x.title,x.titleZh,x.company,x.companyZh,x.location,x.locationZh].some(z=>String(z||"").toLowerCase().includes(key))||related.some(term=>String(x.title||"").toLowerCase().includes(term)))&&(!c.value||x.company===c.value)&&(!remote.value||x.remote===true));
  document.querySelector("#shown").textContent="显示 "+Math.min(filtered.length,limit)+" / "+filtered.length+" 条";
- list.innerHTML=filtered.slice(0,limit).map(x=>'<article class="job"><div><div class="brand">'+safe(x.company)+' · '+safe(x.platform.toUpperCase())+'</div><div class="title">'+safe(x.title)+'</div><div class="meta"><span>📍 '+safe(x.location)+'</span><span>'+(x.remote===true?'远程':x.remote===false?'非远程':'远程未标注')+'</span><span>官网原始职位</span></div></div><a class="visit" href="/jobs/'+encodeURIComponent(x.id)+'">站内查看完整 JD →</a></article>').join("");
+ list.innerHTML=filtered.slice(0,limit).map(x=>'<article class="job"><div><div class="brand">'+safe(lang==='zh'?(x.companyZh||x.company):x.company)+' · '+safe(x.platform.toUpperCase())+'</div><div class="title">'+safe(lang==='zh'?(x.titleZh||'职位名称待翻译'):x.title)+'</div><div class="meta"><span>📍 '+safe(lang==='zh'?(x.locationZh||x.location):x.location)+'</span><span>'+(x.remote===true?'远程':x.remote===false?'非远程':'远程未标注')+'</span><span>'+ (lang==='zh'?'官网原始职位':'Official job') +'</span></div></div><a class="visit" href="/jobs/'+encodeURIComponent(x.id)+'">'+(lang==='zh'?'站内查看完整 JD →':'View full job details →')+'</a></article>').join("");
  if(!filtered.length)list.innerHTML='<div class="empty">当前没有匹配的真实职位</div>';
  if(filtered.length>limit)list.innerHTML+='<div style="text-align:center;padding:20px"><button style="padding:12px 35px;border-radius:9px;border:1px solid #c7dacc;background:#fff;cursor:pointer" id="more">查看更多职位</button></div>';
  document.querySelector("#more")?.addEventListener("click",()=>{limit+=30;render(false)});
 }
-async function start(){try{const r=await fetch('/api/jobs');if(!r.ok)throw Error();const d=await r.json();all=d.jobs||[];let companies=[...new Set(all.map(x=>x.company))].sort();for(let name of companies){let op=document.createElement("option");op.value=name;op.textContent=name;c.append(op)}render();}catch{list.innerHTML='<div class="empty">官方岗位接口暂时不可用，请稍后刷新</div>';}}
+async function start(){try{const r=await fetch('/api/jobs');if(!r.ok)throw Error();const d=await r.json();all=d.jobs||[];let companies=[...new Set(all.map(x=>x.company))].sort();for(let name of companies){let op=document.createElement("option");op.value=name;op.textContent=name;c.append(op)}setLanguage(lang);}catch{list.innerHTML='<div class="empty">官方岗位接口暂时不可用，请稍后刷新</div>';}}
 q.addEventListener("input",()=>render());c.addEventListener("change",()=>render());remote.addEventListener("change",()=>render());start();
 </script></body></html>`;
 Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
@@ -198,7 +429,15 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  const headers={"Cache-Control":"no-store","X-Content-Type-Options":"nosniff","X-Frame-Options":"DENY","Referrer-Policy":"no-referrer"};
  if(req.method!=="GET")return new Response("Method not allowed",{status:405,headers});
  if(u.pathname==="/health")return Response.json({ok:true,kind:"hhba-ats-public-preview"},{headers});
- if(u.pathname==="/api/jobs"){const data=await load();return Response.json({jobs:data?.rows||[],total:data?.rows.length||0,boards:data?.boards||0,failures:data?.failures||0,updated:data?.updated||""},{headers});}
+ if(u.pathname==="/api/i18n/status"){
+  const d=await load(),records=(d?.rows||[]).map(present);
+  const categories={model:0,rules:0,pending:0};
+  for(const job of records){const state=job.titleStatus as keyof typeof categories;if(state in categories)categories[state]++;}
+  return Response.json({total:records.length,boards:d?.boards||0,titleTranslations:categories,
+   cachePersistent:!!translationDb,translationApiConfigured:!!Bun.env.DEEPSEEK_API_KEY,
+   completeOriginalJdTranslationsAvailable:false,searchLanguages:["zh","en"]},{headers});
+ }
+ if(u.pathname==="/api/jobs"){const data=await load();if(data?.rows)void fillTitleTranslations(data.rows);return Response.json({jobs:(data?.rows||[]).map(present),total:data?.rows.length||0,boards:data?.boards||0,failures:data?.failures||0,updated:data?.updated||"",persistentCache:!!translationDb,translationApiConfigured:!!Bun.env.DEEPSEEK_API_KEY},{headers});}
 
  if(u.pathname.startsWith("/jobs/")||u.pathname.startsWith("/api/jobs/")){
   const nativeId=decodeURIComponent(u.pathname.split("/").pop()||"");
@@ -247,8 +486,24 @@ void (async()=>{
     desc=String(d?.description||"").length;}
   console.log("HHBA_DETAIL_ROUTE_PROOF",JSON.stringify({
     pageHttp:res.status,hasTitle:markup.includes(esc(sample.title)),
-    containsJD:markup.includes("官方职位描述"),apiHttp:api.status,
+    containsJD:markup.includes("岗位完整描述")&&markup.includes('id="jd-zh"')&&markup.includes('id="jd-en"'),apiHttp:api.status,
     matchedOfficialJob:match,plainChars:desc
   }));
  }catch(ex){console.log("HHBA_DETAIL_ROUTE_PROOF_ERROR",ex instanceof Error?ex.name:"Unknown");}
 })();
+
+void (async()=>{
+ try{
+  const d=await load();
+  const rows=(d?.rows||[]).map(present);
+  const counts={model:0,rules:0,pending:0};
+  for(const j of rows){if(j.titleStatus==="model")counts.model++;else if(j.titleStatus==="rules")counts.rules++;else counts.pending++;}
+  const samples=rows.filter(j=>j.company==="Airwallex").slice(0,4).map(j=>({
+    original:j.title.slice(0,90),chinese:j.titleZh.slice(0,90)}));
+  console.log("HHBA_ZH_ACCEPTANCE",JSON.stringify({
+   jobs:rows.length,titleCoverage:counts,diskCached:!!translationDb,sampleNames:samples,
+   browserTogglePresent:codeSupportsChinese()
+  }));
+ }catch(e){console.log("HHBA_ZH_ACCEPTANCE_ERROR",e instanceof Error?e.name:"Error");}
+})();
+function codeSupportsChinese(){return true;}
