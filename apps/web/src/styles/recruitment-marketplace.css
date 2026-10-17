@@ -90,3 +90,6 @@
 .market-state button{border-color:#c4ceda;background:#f8f9fa;color:#263d5c}
 .market-bottom span{color:#98a2b3}
 @media(max-width:680px){.home-marketplace{margin-top:45px}}
+
+.market-staging-notice{display:flex;align-items:flex-start;gap:10px;margin:14px 0;padding:12px 14px;border:1px solid #e8c878;border-radius:10px;background:#fff9e9;color:#6f4b0c;font-size:13px;line-height:1.65}
+.market-staging-notice svg{flex:0 0 auto;margin-top:2px}
