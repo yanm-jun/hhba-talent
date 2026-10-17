@@ -1,4 +1,5 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { JobFilterPanel, emptyJobFilters, filtersToQuery, type JobFilterSelection } from './JobFilterPanel';
 import { ArrowRight, Building2, MapPin, RefreshCcw, Search, ShieldCheck } from 'lucide-react';
 import { Link } from '../router';
 import '../styles/recruitment-marketplace.css';
@@ -79,10 +80,7 @@ function MarketCard({job}: {job: MarketJob}) {
   </article>;
 }
 export function RecruitmentMarketplace() {
-  const [type,setType] = useState<Channel>('');
-  const [query,setQuery] = useState('');
-  const [city,setCity] = useState('');
-  const [filters,setFilters] = useState({q:'',city:''});
+  const [filters,setFilters] = useState<JobFilterSelection>(emptyJobFilters);
   const [data,setData] = useState<MarketResponse|null>(null);
   const [loading,setLoading] = useState(true);
   const [error,setError] = useState(false);
@@ -91,9 +89,7 @@ export function RecruitmentMarketplace() {
   useEffect(()=>{
     const controller = new AbortController();
     const params = new URLSearchParams({limit:'8'});
-    if(type) params.set('recruitment_type', type);
-    if(filters.q) params.set('q',filters.q);
-    if(filters.city) params.set('city',filters.city);
+    filtersToQuery(filters).forEach((value,key)=>params.set(key,value));
     setLoading(true);setError(false);setData(null);
     fetch(sourceUrl+'?'+params.toString(), {
       method:'GET', credentials:'omit',cache:'no-store',
@@ -138,11 +134,7 @@ export function RecruitmentMarketplace() {
       if(!controller.signal.aborted){setError(true);setData(null);}
     }).finally(()=>{if(!controller.signal.aborted)setLoading(false);});
     return ()=>controller.abort();
-  },[type,filters,attempt]);
-  function submit(event: FormEvent) {
-    event.preventDefault();
-    setFilters({q:query.trim(),city:city.trim()});
-  }
+  },[filters,attempt]);
   return <section className="home-marketplace" aria-labelledby="marketplace-title" id="recruitment-marketplace">
     <div className="market-head">
       <div><div className="market-eyebrow"><span className="market-eyebrow-line"/> OFFICIAL RECRUITMENT RECORDS</div>
@@ -152,17 +144,8 @@ export function RecruitmentMarketplace() {
       <Link to="/candidate/jobs" className="market-more">进入完整岗位搜索 <ArrowRight size={16}/></Link>
     </div>
     {data?.data_mode === 'official_source_staging_only' && <div className="market-staging-notice" role="alert"><ShieldCheck size={18}/><span>{data.staging_notice || '内部验收预览：ATS 来源与发布权限尚未人工审核，禁止作为公网正式数据发布。'}</span></div>}
-    <form className="market-search" onSubmit={submit} aria-label="搜索真实招聘记录">
-      <label htmlFor="market-q">岗位或企业</label>
-      <div className="market-input"><Search size={17}/><input id="market-q" maxLength={120} value={query} onChange={event=>setQuery(event.target.value)} placeholder="搜索岗位或企业名称"/></div>
-      <label htmlFor="market-city">城市</label>
-      <input className="market-city" id="market-city" value={city} maxLength={120} onChange={event=>setCity(event.target.value)} placeholder="城市"/>
-      <button type="submit">搜索市场 <ArrowRight size={15}/></button>
-    </form>
-    <div className="market-channels" role="group" aria-label="招聘市场分类">
-      {channels.map(([key,value])=><button key={key} type="button" aria-pressed={type===key} className={type===key?'active':''} onClick={()=>setType(key)}>{value}</button>)}
-      <span className="market-total">{!loading&&!error&&data ? data.total+(data.data_mode === 'official_source_staging_only' ? ' 条统一市场记录（含内部 ATS 预览）' : ' 条真实官方列表与历史记录') : '来源实时读取'}</span>
-    </div>
+    <JobFilterPanel value={filters} onChange={setFilters}/>
+    <div className="market-channels" aria-label="当前查询的岗位数量"><span className="market-total">{!loading&&!error&&data ? data.total+(data.data_mode === 'official_source_staging_only' ? ' 条内部 ATS 预览记录' : ' 条官方岗位记录') : '读取真实数据'}</span></div>
     <div className="market-caution"><ShieldCheck size={18}/><span>这里包括真实企业官方列表采集记录与历史岗位，<strong>均不代表已确认当前在招</strong>。岗位职责、专业、薪资与投递日期等未公开信息不会编造；申请前请核对官网。</span></div>
     {loading ? <div className="market-state" role="status">正在向 HHBA 招聘数据引擎读取真实岗位…</div>
       : error ? <div className="market-state" role="alert"><p>真实招聘数据暂不可用。当前不展示任何示例或假岗位。</p><button type="button" onClick={()=>setAttempt(n=>n+1)}><RefreshCcw size={15}/> 重新读取</button></div>

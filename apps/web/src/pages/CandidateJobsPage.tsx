@@ -1,5 +1,6 @@
 
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { JobFilterPanel, emptyJobFilters, filtersToQuery, type JobFilterSelection } from '../components/JobFilterPanel';
 import { ArrowRight, Search, ShieldCheck } from 'lucide-react';
 import { Shell } from '../components/Shell';
 import { Link } from '../router';
@@ -58,14 +59,13 @@ function Position({job}:{job:Job}) {
  </article>;
 }
 export function CandidateJobsPage({user}:{user:User|null}) {
- const [q,setQ]=useState(''),[city,setCity]=useState('');
- const [filters,setFilters]=useState<{q:string;city:string;kind:Channel}>({q:'',city:'',kind:''});
+ const [filters,setFilters]=useState<JobFilterSelection>(emptyJobFilters);
  const [page,setPage]=useState(0),[response,setResponse]=useState<SearchResult|null>(null);
  const [loading,setLoading]=useState(true),[error,setError]=useState(false),[retry,setRetry]=useState(0);
  useEffect(()=>{
    const ctrl=new AbortController();
    const p=new URLSearchParams({limit:String(size),offset:String(page*size)});
-   if(filters.q)p.set('q',filters.q);if(filters.city)p.set('city',filters.city);if(filters.kind)p.set('recruitment_type',filters.kind);
+   filtersToQuery(filters).forEach((value,key)=>p.set(key,value));
    setLoading(true);setError(false);
    readJSON<SearchResult>(API+'/jobs?'+p.toString(),ctrl.signal).then(result=>{
      if(!Array.isArray(result.items)||!Number.isInteger(result.total)||result.total<0)throw Error('invalid data');
@@ -74,20 +74,13 @@ export function CandidateJobsPage({user}:{user:User|null}) {
      .finally(()=>{if(!ctrl.signal.aborted)setLoading(false);});
    return ()=>ctrl.abort();
  },[filters,page,retry]);
- const submit=(e:FormEvent)=>{e.preventDefault();setPage(0);setFilters(current=>({...current,q:q.trim(),city:city.trim()}));};
- const choose=(kind:Channel)=>{setPage(0);setFilters(current=>({...current,kind}));};
+ const updateFilters=(next:JobFilterSelection)=>{setPage(0);setFilters(next);};
  const total=response?.total||0;
  return <Shell user={user}><section className="hhba-jobs-page">
    <Trail/>
    <header className="hhba-jobs-hero"><span className="page-kicker">HHBA · 统一招聘市场</span><h1>搜索国内外企业官方岗位</h1><p>国内外岗位统一搜索，不拆分中国与全球岗位库。校园招聘、社会招聘和实习可选筛选；岗位状态是历史记录，并非实时可投递承诺。</p>
-   <form className="hhba-jobs-form" onSubmit={submit}>
-     <label>岗位或企业关键词<input maxLength={120} value={q} onChange={e=>setQ(e.target.value)} placeholder="如：销售、运营、产品"/></label>
-     <label>工作城市<input maxLength={120} value={city} onChange={e=>setCity(e.target.value)} placeholder="如：杭州"/></label>
-     <button className="primary-button" type="submit"><Search size={17}/> 搜索岗位</button>
-   </form></header>
-   <div className="hhba-jobs-channels" aria-label="招聘类型">
-     {([['','全部'],['CAMPUS','校园招聘'],['SOCIAL','社会招聘'],['INTERNSHIP','实习招聘']] as const).map(([kind,name])=><button key={kind} type="button" aria-pressed={filters.kind===kind} className={filters.kind===kind?'active':''} onClick={()=>choose(kind)}>{name}</button>)}
-   </div>
+   </header>
+   <JobFilterPanel value={filters} onChange={updateFilters}/>
    <div className="hhba-jobs-count"><h2>企业官方岗位记录</h2><span>{loading?'读取中…':error?'连接不可用':total+' 条官方列表与历史记录'}</span></div>
    <p className="hhba-jobs-warning"><ShieldCheck size={17}/> 历史 OPEN 不等于当前仍在招聘；所有岗位请以企业官网为准。已观察的官方列表岗位可以搜索，但不代表当前开放投递。</p>
    {error?<div className="hhba-jobs-empty" role="alert"><p>招聘引擎暂不可用，请检查本地服务配置。</p><button className="secondary-button" onClick={()=>setRetry(x=>x+1)}>重新连接</button></div>:
