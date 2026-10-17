@@ -113,9 +113,13 @@ export function JobFilterPanel({ value, onChange }: {value: JobFilterSelection; 
  const set = (patch: Partial<JobFilterSelection>) => {
    if(['country','province','city','district'].some(key=>key in patch)) {
      cancelInFlightLocation();
-     if(rememberCity)forgetCity();
    }
-   onChange({...value,...patch});
+   const updated={...value,...patch};
+   if(rememberCity){
+     if(updated.country)saveCity({country:updated.country,province:updated.province,city:updated.city,district:''});
+     else forgetCity();
+   }
+   onChange(updated);
  };
  function setRegion(country: string) {set({country,province:'',city:'',district:''});}
  function setProvince(name:string) {const special=subdivisions.find(p=>p.n===name && ['HK','MO','TW'].includes(String(p.c)));set({country:special?String(special.c):'CN',province:name,city:'',district:''});}

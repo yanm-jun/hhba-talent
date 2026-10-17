@@ -199,6 +199,61 @@ class BrowserIntegrationTests(unittest.TestCase):
                 self.assertNotIn("authorization",lower)
         finally:page.close()
 
+    def test_authorized_device_location_auto_applies_city_filters(self):
+        # Deterministic mocked GPS and geocoder: no real user geolocation,
+        # no production coordinates, and no fake live ATS evidence.
+        ctx=self.browser.new_context(viewport={"width":390,"height":844},
+            permissions=["geolocation"],
+            geolocation={"latitude":36.65,"longitude":117.12,"accuracy":150})
+        page=ctx.new_page()
+        seen=[]
+        def mock_geo(route):
+            seen.append(route.request.url)
+            route.fulfill(status=200, content_type="application/json",
+                body=json.dumps({"address":{"country_code":"cn","state":"山东省","city":"济南市"}}))
+        page.route("**/location/reverse*",mock_geo)
+        try:
+            page.goto(self.base+"/",wait_until="domcontentloaded")
+            page.locator(".market-card").first.wait_for(timeout=12000)
+            page.get_by_role("button",name="使用当前位置推荐岗位").click()
+            page.get_by_text("已定位到山东省 · 济南市",exact=False).wait_for(timeout=14000)
+            page.wait_for_function("""() => document.querySelector('.hhba-filter-pill')?.textContent?.includes('济南市')""")
+            self.assertTrue(seen)
+            # Rounded, never raw high precision GPS.
+            self.assertIn("lat=36.65",seen[0])
+            self.assertIn("lon=117.12",seen[0])
+            self.assertTrue(any("country=CN" in path and
+                                "city=%E6%B5%8E%E5%8D%97%E5%B8%82" in path
+                                for path,headers in RecruitmentStub.visits))
+            page.screenshot(path=str(self.out/"v04-mobile-geolocation-filter.png"),full_page=True)
+            # Explicit city-only remember option, not silent background tracking.
+            page.get_by_label("在本设备保存城市24小时，下次自动筛选").check()
+            self.assertTrue(page.evaluate("localStorage.getItem('hhba-recruitment-saved-city-v1') !== null"))
+            saved=page.evaluate("localStorage.getItem('hhba-recruitment-saved-city-v1')")
+            self.assertNotIn("latitude",saved);self.assertNotIn("longitude",saved)
+            page.reload(wait_until="domcontentloaded")
+            page.get_by_text("已按上次授权保存的城市筛选",exact=False).wait_for(timeout=10000)
+            self.assertIn("济南市",page.locator(".hhba-filter-pill").first.inner_text())
+            page.get_by_role("button",name="重置筛选",exact=False).click()
+            self.assertIsNone(page.evaluate("localStorage.getItem('hhba-recruitment-saved-city-v1')"))
+        finally:
+            ctx.close()
+
+    def test_geolocation_denied_does_not_clear_manual_job_search(self):
+        ctx=self.browser.new_context(viewport={"width":390,"height":844})
+        page=ctx.new_page()
+        try:
+            page.goto(self.base+"/",wait_until="domcontentloaded")
+            page.locator(".market-card").first.wait_for(timeout=12000)
+            page.locator(".hhba-filter-keyword input").fill("销售")
+            page.locator(".hhba-filter-keyword button").click()
+            page.get_by_role("button",name="使用当前位置推荐岗位").click()
+            page.get_by_text("你尚未允许定位",exact=False).wait_for(timeout=14000)
+            self.assertIn("销售",page.locator(".hhba-filter-keyword input").input_value())
+            self.assertFalse(page.evaluate("document.documentElement.scrollWidth > innerWidth + 2"))
+        finally:
+            ctx.close()
+
 
 if __name__=="__main__":
     unittest.main()

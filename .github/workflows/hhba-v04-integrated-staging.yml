@@ -32,6 +32,8 @@ jobs:
         with:
           python-version: '3.12'
       - name: Compile unchanged existing React HHBA frontend
+        env:
+          VITE_HHBA_REVERSE_GEOCODE_URL: /location/reverse
         run: |
           cd apps/web
           npm ci
