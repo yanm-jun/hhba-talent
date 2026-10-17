@@ -139,7 +139,7 @@ export function JobFilterPanel({ value, onChange }: {value: JobFilterSelection; 
   </div>
   <div className="hhba-nearby-preferences">
     <label><input type="checkbox" checked={rememberCity} onChange={e=>changeRememberCity(e.target.checked)}/>在本设备保存城市24小时，下次自动筛选</label>
-    <span>定位只用于选城市；不保存经纬度。{locationSource==='osm-pilot'?'当前使用 OpenStreetMap 试点服务。':'位置解析需使用地理编码服务。'}</span>
+    <span>位置授权后，约1公里精度坐标会发送到地理编码服务换算城市；HHBA不保存经纬度。{locationSource==='osm-pilot'?'当前使用 OpenStreetMap 试点服务。':''}</span>
   </div>
   {locationNotice && <p className="hhba-nearby-status" role="status">{locationNotice}</p>}
   {locationSource==='osm-pilot' && <div className="hhba-nearby-attribution"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a></div>}

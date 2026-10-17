@@ -10,6 +10,7 @@ import threading
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 
 from playwright.sync_api import sync_playwright
 from scripts.run_staging_gateway import make_handler
@@ -74,6 +75,13 @@ class RecruitmentStub(BaseHTTPRequestHandler):
             data={"data_mode":"official_source_historical_not_live",
                   "all_current_application_statuses_unverified":not approved,
                   "total":1,"items":[sample]}
+            # Source-bound synthetic fixture must not pretend a Guangzhou job
+            # matches a genuine user-selected Jinan city filter.
+            city_filter=parse_qs(urlsplit(self.path).query).get("city",[""])[0]
+            if city_filter and city_filter not in sample.get("work_city",""):
+                data={"data_mode":"official_source_historical_not_live",
+                      "all_current_application_statuses_unverified":not approved,
+                      "total":0,"items":[]}
         elif self.path=="/api/v1/jobs/JOB-SYNTH-001":
             data=sample
         elif self.path.startswith("/api/v1/jobs"):
@@ -218,6 +226,7 @@ class BrowserIntegrationTests(unittest.TestCase):
             page.get_by_role("button",name="使用当前位置推荐岗位").click()
             page.get_by_text("已定位到山东省 · 济南市",exact=False).wait_for(timeout=14000)
             page.wait_for_function("""() => document.querySelector('.hhba-filter-pill')?.textContent?.includes('济南市')""")
+            page.get_by_text("当前没有符合筛选条件的已核对官方岗位记录",exact=False).wait_for(timeout=12000)
             self.assertTrue(seen)
             # Rounded, never raw high precision GPS.
             self.assertIn("lat=36.65",seen[0])
