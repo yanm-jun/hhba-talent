@@ -113,8 +113,8 @@ class RealATSBrowserTests(unittest.TestCase):
             # Search a real board's company as returned by the engine source registry.
             source = next(item for item in self.stats["sources"] if item["platform"] == "ASHBY")
             company = source["company"]
-            page.locator("#market-q").fill(company)
-            page.locator(".market-search button").click()
+            page.locator(".hhba-filter-keyword input").fill(company)
+            page.locator(".hhba-filter-keyword button").click()
             page.locator(".market-card").first.wait_for(timeout=12000)
             cards = page.locator(".market-card").all_inner_texts()
             self.assertTrue(cards)
