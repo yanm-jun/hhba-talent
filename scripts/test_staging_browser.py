@@ -177,7 +177,7 @@ class BrowserIntegrationTests(unittest.TestCase):
             page.locator(".market-card").first.wait_for()
             page.locator(".hhba-filter-select select").nth(0).select_option("SOCIAL")
             page.locator(".market-card").first.wait_for()
-            self.assertEqual(page.locator(".market-channels button[aria-pressed='true']").inner_text(),"社会招聘")
+            self.assertEqual(page.locator(".hhba-filter-select select").nth(0).input_value(),"SOCIAL")
             link=page.get_by_role("link",name="去官方投递 ↗")
             link.wait_for(state="visible",timeout=12000)
             self.assertEqual(link.get_attribute("href"),"https://example.org/synthetic-only")
