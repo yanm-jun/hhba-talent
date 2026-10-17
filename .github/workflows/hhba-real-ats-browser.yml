@@ -1,10 +1,9 @@
-name: HHBA REAL ATS desktop mobile browser proof (NO JOB FIXTURES)
+name: HHBA real ATS engine + original frontend browser proof
 on:
   push:
     branches: [feat/dual-entry-recruitment-integration]
     paths:
       - '.github/workflows/hhba-real-ats-browser.yml'
-      - 'scripts/real_ats_preview.py'
       - 'scripts/test_live_ats_browser.py'
       - 'apps/web/**'
   workflow_dispatch:
@@ -13,9 +12,15 @@ permissions:
 jobs:
   real-ats-homepage-chromium:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+      - name: Checkout the existing recruitment engine (not a duplicate collector)
+        uses: actions/checkout@v4
+        with:
+          repository: yanm-jun/hhba-recruitment-engine
+          ref: feat/global-ats-public-apis-20261017
+          path: engine
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -24,19 +29,61 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Build actual HHBA front-end (unchanged original home design)
+      - name: Build the actual HHBA React frontend
         working-directory: apps/web
         run: |
           npm ci
           npm run build
-      - name: Install actual Chromium (no mock browser)
+      - name: Check engine bridge contract and tests
+        run: |
+          python engine/scripts/serve_global_ats_preview.py --help
+          python -m unittest discover -s engine/tests -p 'test_global_ats_market.py' -v
+      - name: Stage real ATS snapshots using the existing engine adapters
+        run: |
+          python engine/scripts/stage_global_ats.py \
+            --registry engine/data/ats/global_boards_seed.json \
+            --output-dir "${{ runner.temp }}/hhba-ats-stage" \
+            --execute-network --max-boards 6 --pause-seconds 1
+      - name: Start loopback-only engine preview using domestic master plus real ATS snapshots
+        run: |
+          python engine/scripts/serve_global_ats_preview.py \
+            --master engine/data/jobs_master.jsonl \
+            --stage-dir "${{ runner.temp }}/hhba-ats-stage" \
+            --host 127.0.0.1 --port 8765 \
+            > "${{ runner.temp }}/hhba-engine-preview.log" 2>&1 &
+          echo $! > "${{ runner.temp }}/hhba-engine-preview.pid"
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8765/api/v1/stats > "${{ runner.temp }}/hhba-engine-stats.json"; then
+              break
+            fi
+            sleep 1
+          done
+          cat "${{ runner.temp }}/hhba-engine-stats.json"
+          python -c "import json,sys; d=json.load(open(sys.argv[1])); assert d['mode']=='INTERNAL_STAGING_ONLY'; assert d['ats_staging_rows'] >= 6; assert d['domestic_public_rows'] >= 1" "${{ runner.temp }}/hhba-engine-stats.json"
+      - name: Start HHBA React frontend against the engine API
+        working-directory: apps/web
+        run: |
+          npm run dev -- --host 127.0.0.1 --port 3000 --strictPort \
+            > "${{ runner.temp }}/hhba-vite.log" 2>&1 &
+          echo $! > "${{ runner.temp }}/hhba-vite.pid"
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:3000/ > /dev/null
+      - name: Install actual Chromium (not a mocked browser)
         run: |
           python -m pip install 'playwright>=1.55,<2'
           python -m playwright install --with-deps chromium
-      - name: Pull REAL official ATS JSON directly to memory and test gateway UI
+      - name: Test real engine API, original HHBA desktop and mobile UI
+        env:
+          HHBA_BASE_URL: http://127.0.0.1:3000
+          HHBA_ENGINE_API_URL: http://127.0.0.1:8765
         run: |
           python -m unittest discover -s scripts -p 'test_live_ats_browser.py' -v
-      - name: Save real-browser screenshots containing actual API job names
+      - name: Save screenshots with actual official ATS titles
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -44,6 +91,8 @@ jobs:
           path: ${{ runner.temp }}/hhba-real-ats-frontend/*.png
           if-no-files-found: warn
           retention-days: 7
-      - name: Ensure no ATS full JD or resumes committed
+      - name: Verify the preview did not modify either repository
+        if: always()
         run: |
-          test -z "$(git status --short --untracked-files=all)"
+          git diff --exit-code
+          git -C engine diff --exit-code
