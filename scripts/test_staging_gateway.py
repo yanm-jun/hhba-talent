@@ -21,7 +21,10 @@ class Stub(BaseHTTPRequestHandler):
         self.server.log.append({"method":self.command,"path":self.path,
                                 "headers":dict(self.headers),
                                 "body":self.rfile.read(int(self.headers.get("Content-Length","0")))})
-        if self.path.startswith("/api/v1/marketplace"):
+        if self.path.startswith("/api/v1/internal/ats-jd/"):
+            value={"review_scope":"INTERNAL_SOURCE_INSPECTION_ONLY",
+                   "full_text":"SYNTHETIC INTERNAL-ONLY UNIT TEST"}
+        elif self.path.startswith("/api/v1/marketplace"):
             value={"data_mode":"official_source_historical_not_live",
                    "all_current_application_statuses_unverified":True,"total":0,"items":[]}
         elif self.path.startswith("/api/v1/auth/"):
@@ -138,6 +141,35 @@ class GatewayTests(unittest.TestCase):
             with self.subTest(x=x),self.assertRaises(ValueError):
                 validate_target(x)
         self.assertEqual(validate_target("http://localhost:8765"),("127.0.0.1",8765))
+
+    def test_internal_jd_route_is_off_by_default_and_opt_in_restricts_headers(self):
+        fake_id="ATS-"+("a"*24)
+        path="/recruitment/api/v1/internal/ats-jd/"+fake_id
+        with self.assertRaises(HTTPError) as no_auth:
+            self.request(path,headers={"X-HHBA-Internal-Preview":"1"})
+        self.assertEqual(no_auth.exception.code,404)
+        preview=ThreadingHTTPServer(("127.0.0.1",0),make_handler(
+            self.dist,self.talent.server_address,self.jobs.server_address,
+            allow_internal_jd=True))
+        thread=threading.Thread(target=preview.serve_forever,daemon=True)
+        thread.start()
+        url=f"http://127.0.0.1:{preview.server_port}"+path
+        try:
+            with self.assertRaises(HTTPError) as no_header:
+                urlopen(Request(url,method="GET"),timeout=5)
+            self.assertEqual(no_header.exception.code,404)
+            with self.assertRaises(HTTPError) as query:
+                urlopen(Request(url+"?bad=1",headers={"X-HHBA-Internal-Preview":"1"}),timeout=5)
+            self.assertEqual(query.exception.code,404)
+            with urlopen(Request(url,headers={"X-HHBA-Internal-Preview":"1",
+                  "Cookie":"SESSION_PRIVATE","Authorization":"Bearer SENSITIVE"}),timeout=5) as response:
+                body=json.loads(response.read())
+                self.assertEqual(body["review_scope"],"INTERNAL_SOURCE_INSPECTION_ONLY")
+            self.assertEqual(self.jobs.log[-1]["headers"].get("X-Hhba-Internal-Preview"),"1")
+            self.assertNotIn("Cookie",self.jobs.log[-1]["headers"])
+            self.assertNotIn("Authorization",self.jobs.log[-1]["headers"])
+        finally:
+            preview.shutdown();thread.join(timeout=3);preview.server_close()
 
 
 if __name__ == "__main__":

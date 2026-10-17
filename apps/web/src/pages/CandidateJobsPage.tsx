@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { JobFilterPanel, emptyJobFilters, filtersToQuery, type JobFilterSelection } from '../components/JobFilterPanel';
 import { ArrowRight, Search, ShieldCheck } from 'lucide-react';
 import { Shell } from '../components/Shell';
@@ -100,6 +100,63 @@ export function CandidateJobsPage({user}:{user:User|null}) {
    <p className="hhba-jobs-privacy">此搜索不会上传简历或自动向企业投递。<Link to="/">返回 HHBA 首页</Link></p>
  </section></Shell>;
 }
+
+type InternalATSJDPayload = {
+  job_id: string; job_title: string; platform: string; source_url: string;
+  full_text: string; responsibilities: string; requirements: string;
+  unclassified: string; section_evidence: string;
+  observed_at: string; jd_sha256: string;
+  review_scope: 'INTERNAL_SOURCE_INSPECTION_ONLY';
+  public_display_approved: false; current_application_verified: false;
+};
+function InternalATSJD({job}:{job:Job}) {
+ const [detail,setDetail]=useState<InternalATSJDPayload|null>(null);
+ const [loading,setLoading]=useState(false);
+ const [error,setError]=useState('');
+ const controller=useRef<AbortController|null>(null);
+ useEffect(()=>()=>controller.current?.abort(),[job.job_id]);
+ if(job.record_kind!=='ATS_STAGING_PREVIEW'||!localPreviewHost())return null;
+ const load=async()=>{
+   if(loading)return;
+   controller.current?.abort();
+   const ctrl=new AbortController();controller.current=ctrl;
+   setLoading(true);setError('');setDetail(null);
+   try {
+     const result=await fetch(API+'/internal/ats-jd/'+encodeURIComponent(job.job_id),{
+       method:'GET',credentials:'omit',cache:'no-store',signal:ctrl.signal,
+       headers:{Accept:'application/json','X-HHBA-Internal-Preview':'1'},
+     });
+     if(!result.ok)throw new Error(result.status===429?'当前审阅请求已达到限速，请稍后再试。':
+       result.status===404?'内部 JD 审阅服务未开启，需在本地显式配置。':
+       '官方 API 未返回匹配的职位正文，岗位可能已下架或变更。');
+     const data=await result.json() as InternalATSJDPayload;
+     if(data.review_scope!=='INTERNAL_SOURCE_INSPECTION_ONLY'||
+         data.public_display_approved!==false||data.current_application_verified!==false||
+         data.job_id!==job.job_id||data.job_title!==job.job_title||
+         !data.full_text || officialLink(data.source_url)!==officialLink(job.official_detail_url))
+        throw new Error('官方职位身份或内部审阅边界校验失败。');
+     setDetail(data);
+   } catch(e) {
+     if(!ctrl.signal.aborted)setError(e instanceof Error?e.message:'读取失败，请以官网为准。');
+   } finally {if(!ctrl.signal.aborted)setLoading(false);}
+ };
+ return <section className="hhba-internal-ats-jd" aria-label="内部 ATS 真实 JD 核对">
+    <div className="hhba-jd-section-heading"><div><span className="hhba-jd-eyebrow">INTERNAL ONLY · GREENHOUSE / LEVER / ASHBY</span><h2>官方 ATS 职位原文核对</h2></div><span className="hhba-jd-review-pill">仅本机审核 · 不对外发布</span></div>
+    <p>点击后从所选岗位对应的公开 ATS API 读取真实 JD，原始文本不存入 HHBA 公共岗位库；需另外通过展示权限审核。不能按标题推测学历、技能或当前招聘状态。</p>
+    <button className="hhba-internal-fetch" type="button" onClick={load} disabled={loading}>{loading?'正在核对岗位 ID 并读取官方 JD…':'读取该岗位真实 JD →'}</button>
+    {error&&<p className="hhba-internal-error" role="alert">{error}</p>}
+    {detail&&<div className="hhba-internal-jd-result" role="region" aria-label="官方原始 JD">
+       <div className="hhba-internal-jd-status">官方 API 原始内容 · {detail.platform} · 未获公开转载批准</div>
+       {detail.responsibilities&&<div><h3>岗位职责（显式章节）</h3><p className="hhba-jd-text">{detail.responsibilities}</p></div>}
+       {detail.requirements&&<div><h3>任职要求（显式章节）</h3><p className="hhba-jd-text">{detail.requirements}</p></div>}
+       {(!detail.responsibilities||!detail.requirements)&&<p className="hhba-internal-note">部分章节没有独立标题，下面保留完整原文供人工核对，不自动编造或分类。</p>}
+       <details><summary>查看官方 JD 全文（原始语言）</summary><p className="hhba-jd-text">{detail.full_text}</p></details>
+       <div className="hhba-jd-proof"><ShieldCheck size={16}/><span>源站现场读取 · SHA-256：{detail.jd_sha256.slice(0,12)}… · {day(detail.observed_at)}。此结果不证明岗位仍开放，也不代表获得转载授权。</span>
+       <a href={detail.source_url} rel="noopener noreferrer" target="_blank">打开官方岗位 <ArrowRight size={14}/></a></div>
+    </div>}
+ </section>;
+}
+
 function ReviewedJobDescription({job}:{job:Job}){
  const content=job.approved_jd;
  // The server must have opted this exact detail record into publication.
@@ -164,7 +221,7 @@ export function CandidateJobDetailPage({user,jobId}:{user:User|null;jobId:string
        : link ? <a className="primary-button hhba-official" href={link} target="_blank" rel="noopener noreferrer">{job.record_kind==='ATS_STAGING_PREVIEW'?'打开 ATS 原始岗位页面核对 · 非投递确认':'前往企业官网核对 · 投递未确认'} <ArrowRight size={16}/></a>
        : listLink ? <a className="primary-button hhba-official" href={listLink} target="_blank" rel="noopener noreferrer">查看企业招聘频道 · 不是该岗位投递地址 <ArrowRight size={16}/></a>
        : <p>官方详情链接尚未核实，暂不提供投递入口。</p>}
-   </header><ReviewedJobDescription job={job}/><div className="hhba-job-detail-grid"><article className="hhba-position-card"><h2>职位基本信息</h2><dl className="hhba-detail-facts">
+   </header><InternalATSJD job={job}/><ReviewedJobDescription job={job}/><div className="hhba-job-detail-grid"><article className="hhba-position-card"><h2>职位基本信息</h2><dl className="hhba-detail-facts">
      <dt>工作地点</dt><dd>{label(job.work_city)}</dd><dt>最低学历</dt><dd>{label(job.education_min)}</dd><dt>最近检查</dt><dd>{day(job.status_checked_at||job.last_verified_at)}</dd>
      <dt>申请状态</dt><dd>{direct?'近期职位级投递入口已核验；以官方系统为准':job.application_access_status==='APPLICATION_CONFIRMED_OPEN'?'历史曾观察到入口 · 今天未确认':'申请入口未核验'}</dd></dl></article>
      <aside className="hhba-position-card"><h2>历史记录来源</h2><dl className="hhba-detail-facts"><dt>来源平台</dt><dd>{label(job.source_platform)}</dd><dt>企业来源 ID</dt><dd>{label(job.source_id)}</dd><dt>HHBA 记录 ID</dt><dd>{job.job_id}</dd></dl><p className="hhba-detail-note">{job.record_kind==='OFFICIAL_LIST_OBSERVED'

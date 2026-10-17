@@ -24,6 +24,7 @@ _ROOT = Path(__file__).resolve().parents[1]
 _DIST = _ROOT / "apps" / "web" / "dist"
 _PUBLIC_ID = re.compile(r"[A-Za-z0-9_-]{1,64}\Z")
 _MARKET_ALLOWED = re.compile(r"/api/v1/(?:marketplace|jobs|jobs/[A-Za-z0-9_-]{1,64}|stats)\Z")
+_INTERNAL_JD_ALLOWED = re.compile(r"/api/v1/internal/ats-jd/[A-Za-z0-9_-]{1,64}\Z")
 _BLOCKED_HEADERS = {"connection", "transfer-encoding", "keep-alive", "proxy-authenticate",
                     "proxy-authorization", "te", "trailer", "upgrade", "content-length",
                     "host", "set-cookie", "access-control-allow-origin",
@@ -45,7 +46,8 @@ def validate_target(spec: str) -> tuple[str, int]:
     return "127.0.0.1", parsed.port
 
 
-def make_handler(dist: Path, talent: tuple[str, int], recruitment: tuple[str, int]):
+def make_handler(dist: Path, talent: tuple[str, int], recruitment: tuple[str, int], *,
+                 allow_internal_jd: bool = False):
     dist = dist.resolve()
     if not dist.is_dir() or not (dist / "index.html").is_file():
         raise ValueError("build apps/web first (npm ci && npm run build)")
@@ -90,12 +92,20 @@ def make_handler(dist: Path, talent: tuple[str, int], recruitment: tuple[str, in
             path = parsed.path
             if path.startswith("/recruitment/") or path == "/recruitment":
                 stripped = path.removeprefix("/recruitment")
-                if (self.command not in {"GET", "HEAD"} or not _MARKET_ALLOWED.fullmatch(stripped)):
+                is_internal_jd = bool(_INTERNAL_JD_ALLOWED.fullmatch(stripped))
+                if is_internal_jd:
+                    # Explicit localhost operator flag and non-simple header;
+                    # never let the browser use staging for a production JD feed.
+                    if (not allow_internal_jd or self.command != "GET"
+                            or parsed.query or self.headers.get("X-HHBA-Internal-Preview") != "1"):
+                        self._error(404, "internal_jd_disabled")
+                        return
+                elif self.command not in {"GET", "HEAD"} or not _MARKET_ALLOWED.fullmatch(stripped):
                     self._error(404 if self.command in {"GET", "HEAD"} else 405,
                                 "recruitment_route_forbidden")
                     return
-                self._proxy(recruitment, stripped + ("?" + parsed.query if parsed.query else ""),
-                            recruit=True)
+                self._proxy(recruitment, stripped + (("?" + parsed.query) if parsed.query else ""),
+                            recruit=True, internal_jd=is_internal_jd)
                 return
             if path.startswith("/api/v1/"):
                 if self.command not in {"GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"}:
@@ -109,7 +119,8 @@ def make_handler(dist: Path, talent: tuple[str, int], recruitment: tuple[str, in
                 return
             self._static(path)
 
-        def _proxy(self, target: tuple[str, int], resource: str, *, recruit: bool):
+        def _proxy(self, target: tuple[str, int], resource: str, *, recruit: bool,
+                   internal_jd: bool = False):
             size = self.headers.get("Content-Length", "0")
             if self.headers.get("Transfer-Encoding"):
                 self._error(400, "chunked_not_supported")
@@ -127,6 +138,8 @@ def make_handler(dist: Path, talent: tuple[str, int], recruitment: tuple[str, in
             allow = {"accept"} if recruit else {
                 "accept", "content-type", "cookie", "authorization",
                 "x-csrf-token", "origin", "referer", "accept-language"}
+            if internal_jd:
+                allow.add("x-hhba-internal-preview")
             headers = {"Host": f"{target[0]}:{target[1]}"}
             for key, value in self.headers.items():
                 if key.lower() in allow and "\r" not in value and "\n" not in value:
@@ -194,6 +207,8 @@ def main():
     parser.add_argument("--talent", default="http://127.0.0.1:8003")
     parser.add_argument("--recruitment", default="http://127.0.0.1:8765")
     parser.add_argument("--dist", type=Path, default=_DIST)
+    parser.add_argument("--allow-internal-ats-jd", action="store_true",
+                        help="local review only; never enable on a public-facing gateway")
     args = parser.parse_args()
     if args.host != "127.0.0.1":
         parser.error("staging gateway may bind to 127.0.0.1 ONLY")
@@ -202,7 +217,7 @@ def main():
     if talent == recruitment:
         parser.error("talent and recruitment must be separate local services")
     with ThreadingHTTPServer((args.host, args.port),
-                             make_handler(args.dist, talent, recruitment)) as server:
+                             make_handler(args.dist, talent, recruitment, allow_internal_jd=args.allow_internal_ats_jd)) as server:
         print(f"HHBA staging: http://127.0.0.1:{server.server_port}/", flush=True)
         server.serve_forever()
 
