@@ -160,6 +160,44 @@ function InternalATSJD({job}:{job:Job}) {
  </section>;
 }
 
+
+// Public ATS full text is served only after the backend verifies both the
+// original posting and explicit permission to display that source's JD.
+type OfficialJD = {
+ job_id: string; job_title: string; source_url: string;
+ full_text: string; observed_at: string;
+ display_scope: 'LICENSED_SOURCE_ORIGINAL_JD';
+};
+function PublicATSOriginalJD({job}:{job:Job}) {
+ const [jd,setJD]=useState<OfficialJD|null>(null);
+ const [status,setStatus]=useState<'loading'|'unavailable'|'ready'>('loading');
+ useEffect(()=>{
+  if(job.record_kind!=='ATS_OFFICIAL_METADATA')return;
+  const ctrl=new AbortController();setStatus('loading');setJD(null);
+  readJSON<OfficialJD>(API+'/jobs/'+encodeURIComponent(job.job_id)+'/original-jd',ctrl.signal)
+   .then(data=>{
+     if(data.display_scope!=='LICENSED_SOURCE_ORIGINAL_JD'||data.job_id!==job.job_id||
+        data.job_title!==job.job_title||!data.full_text.trim()||
+        officialLink(data.source_url)!==officialLink(job.official_detail_url))
+         throw Error('official posting identity mismatch');
+     setJD(data);setStatus('ready');
+   }).catch(()=>{if(!ctrl.signal.aborted)setStatus('unavailable');});
+  return ()=>ctrl.abort();
+ },[job.job_id,job.job_title,job.record_kind,job.official_detail_url]);
+ if(job.record_kind!=='ATS_OFFICIAL_METADATA')return null;
+ return <section className="hhba-official-original" aria-label="站内查看官方职位描述">
+  <div className="hhba-jd-section-heading"><div>
+    <span className="hhba-jd-eyebrow">OFFICIAL ATS · ORIGINAL JOB DESCRIPTION</span>
+    <h2>官方岗位完整原文</h2></div>
+    <span>{status==='ready'?'按官方原文展示':'请以企业官网为准'}</span>
+  </div>
+  {status==='loading'&&<p role="status">正在读取这条岗位的官方 JD…</p>}
+  {status==='unavailable'&&<p>这条岗位的官方完整 JD 尚无可公开展示的权利许可，或官方接口暂时不可用。请打开该岗位的企业官方页面阅读，本站不会编造任职要求。</p>}
+  {jd&&<><div className="hhba-original-full-text">{jd.full_text}</div>
+  <p className="hhba-detail-note">内容未经 AI 改写 · 最近读取：{day(jd.observed_at)} · 最终申请信息以企业官网为准。</p></>}
+ </section>;
+}
+
 function ReviewedJobDescription({job}:{job:Job}){
  const content=job.approved_jd;
  // The server must have opted this exact detail record into publication.
@@ -224,7 +262,7 @@ export function CandidateJobDetailPage({user,jobId}:{user:User|null;jobId:string
        : link ? <a className="primary-button hhba-official" href={link} target="_blank" rel="noopener noreferrer">{job.record_kind==='ATS_STAGING_PREVIEW'?'打开 ATS 原始岗位页面核对 · 非投递确认':'前往企业官网核对 · 投递未确认'} <ArrowRight size={16}/></a>
        : listLink ? <a className="primary-button hhba-official" href={listLink} target="_blank" rel="noopener noreferrer">查看企业招聘频道 · 不是该岗位投递地址 <ArrowRight size={16}/></a>
        : <p>官方详情链接尚未核实，暂不提供投递入口。</p>}
-   </header><InternalATSJD job={job}/><ReviewedJobDescription job={job}/><div className="hhba-job-detail-grid"><article className="hhba-position-card"><h2>职位基本信息</h2><dl className="hhba-detail-facts">
+   </header><InternalATSJD job={job}/><PublicATSOriginalJD job={job}/>{job.record_kind!=='ATS_OFFICIAL_METADATA'&&<ReviewedJobDescription job={job}/>}<div className="hhba-job-detail-grid"><article className="hhba-position-card"><h2>职位基本信息</h2><dl className="hhba-detail-facts">
      <dt>工作地点</dt><dd>{label(job.work_city)}</dd><dt>最低学历</dt><dd>{label(job.education_min)}</dd><dt>最近检查</dt><dd>{day(job.status_checked_at||job.last_verified_at)}</dd>
      <dt>申请状态</dt><dd>{direct?'近期职位级投递入口已核验；以官方系统为准':job.application_access_status==='APPLICATION_CONFIRMED_OPEN'?'历史曾观察到入口 · 今天未确认':'申请入口未核验'}</dd></dl></article>
      <aside className="hhba-position-card"><h2>历史记录来源</h2><dl className="hhba-detail-facts"><dt>来源平台</dt><dd>{label(job.source_platform)}</dd><dt>企业来源 ID</dt><dd>{label(job.source_id)}</dd><dt>HHBA 记录 ID</dt><dd>{job.job_id}</dd></dl><p className="hhba-detail-note">{job.record_kind==='OFFICIAL_LIST_OBSERVED'

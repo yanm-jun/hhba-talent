@@ -86,3 +86,8 @@
 /* Avoid overflow of long official-link labels on 390px phones. */
 .hhba-official{max-width:100%!important;width:auto!important;white-space:normal!important;text-align:center;overflow-wrap:anywhere}
 .hhba-jobs-hero .hhba-detail-note{background:#fff8e8;border-color:#f0deb2;color:#775c2d}
+
+.hhba-official-original{background:#fff;border:1px solid #e1e8df;border-radius:15px;padding:30px 32px;margin-top:22px}
+.hhba-original-full-text{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.95;color:#2d4638}
+.hhba-official-original>p{color:#698273;font-size:13px;line-height:1.8}
+@media(max-width:640px){.hhba-official-original{padding:20px 17px}}
