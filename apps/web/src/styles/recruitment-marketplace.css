@@ -51,3 +51,42 @@
 @media(max-width:680px){.home-marketplace{margin:47px auto 55px;padding:0 1px}.market-list{grid-template-columns:1fr}.market-card{padding:18px}.market-search{grid-template-columns:1fr;gap:6px;padding:15px}.market-search label{margin-top:3px}.market-search .market-input{padding:0}.market-search input,.market-search .market-city{height:39px;border:1px solid #dce7db;border-radius:8px;padding:0 12px}.market-search .market-city{border-left:1px solid #dce7db}.market-search button{grid-column:auto;margin-top:5px}.market-card-foot{align-items:start;flex-direction:column;gap:12px}.market-bottom{align-items:start;flex-direction:column}.market-channels button{padding:9px 12px}}
 
 .market-card-links a.market-verified-apply{background:#dff8aa;color:#204b32;border-radius:7px;padding:8px 11px;font-weight:900}.market-card-links a.market-verified-apply:hover{background:#c8ed85;text-decoration:none}
+
+
+/* Keep the unified market visually consistent with the original neutral HHBA homepage. */
+.home-marketplace{margin-top:54px;color:#171717}
+.market-eyebrow{color:#667085}
+.market-eyebrow-line{color:#c4cbd5}
+.market-head h2{color:#171717}
+.market-head p{color:#667085}
+.market-more,.market-bottom a{color:#263d5c}
+.market-search{border-color:#e4e7ec;box-shadow:0 5px 18px rgba(23,29,38,.025)}
+.market-search label{color:#475467}
+.market-search .market-input svg{color:#667085}
+.market-search input{color:#171717}
+.market-search input::placeholder{color:#98a2b3}
+.market-search .market-city{border-left-color:#e4e7ec}
+.market-search button{background:#263d5c}
+.market-search button:hover{background:#1d304a}
+.market-channels{border-bottom-color:#e4e7ec}
+.market-channels button{border-color:#e4e7ec;color:#475467}
+.market-channels button[aria-pressed="true"]{background:#263d5c;border-color:#263d5c;color:#fff}
+.market-total{color:#667085}
+.market-caution{background:#f9fafb;border-color:#e4e7ec;color:#667085}
+.market-caution strong{color:#344054}
+.market-list .market-card{border-color:#e4e7ec}
+.market-list .market-card:hover{border-color:#c4ceda;box-shadow:0 10px 25px rgba(23,29,38,.06)}
+.market-company{color:#344054}
+.market-source{color:#98a2b3}
+.market-card h3{color:#171717}
+.market-card h3 a:hover{color:#263d5c}
+.market-meta span{background:#f8f9fa;border-color:#e4e7ec;color:#667085}
+.market-meta .market-type{background:#eef2f7;border-color:#dbe3ed;color:#344054}
+.market-card-proof{color:#667085}
+.market-card-foot{border-top-color:#e4e7ec}
+.market-card-foot>div:first-child{color:#98a2b3}
+.market-card-links a{color:#263d5c}
+.market-state{border-color:#d0d5dd;color:#667085}
+.market-state button{border-color:#c4ceda;background:#f8f9fa;color:#263d5c}
+.market-bottom span{color:#98a2b3}
+@media(max-width:680px){.home-marketplace{margin-top:45px}}
