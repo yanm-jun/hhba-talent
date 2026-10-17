@@ -41,7 +41,7 @@ async function readJSON<T>(url: string, signal: AbortSignal): Promise<T> {
  return await r.json() as T;
 }
 function Trail({detail=false}:{detail?:boolean}) {
- return <nav className="hhba-job-trail" aria-label="应聘路径"><Link to="/">首页</Link><span>/</span><Link to="/candidate">我要找工作</Link><span>/</span>{detail?<Link to="/candidate/jobs">招聘岗位</Link>:<strong>招聘岗位</strong>}{detail&&<><span>/</span><strong>职位详情</strong></>}</nav>;
+ return <nav className="hhba-job-trail" aria-label="应聘路径"><Link to="/">首页</Link><span>/</span><Link to="/candidate">我要应聘</Link><span>/</span>{detail?<Link to="/candidate/jobs">招聘岗位</Link>:<strong>招聘岗位</strong>}{detail&&<><span>/</span><strong>职位详情</strong></>}</nav>;
 }
 function Position({job}:{job:Job}) {
  const valid=/^[A-Za-z0-9_-]{1,64}$/.test(job.job_id||'');
