@@ -34,7 +34,7 @@ export const emptyJobFilters: JobFilterSelection = { q: '', country: '', provinc
  district: '', occupation: '', recruitment_type: '', education: '', work_mode: '' };
 export function filtersToQuery(filters: JobFilterSelection): URLSearchParams {
  const result = new URLSearchParams();
- for (const [key, value] of Object.entries(filters)) if(value) result.set(key,value);
+ for (const [key, value] of Object.entries(filters)) if(value && !(key==='province' && ['HK','MO','TW'].includes(filters.country))) result.set(key,value);
  return result;
 }
 export function JobFilterPanel({ value, onChange }: {value: JobFilterSelection; onChange: (next: JobFilterSelection)=>void}) {
@@ -55,7 +55,7 @@ export function JobFilterPanel({ value, onChange }: {value: JobFilterSelection; 
  const districts = city?.ch || [];
  const set = (patch: Partial<JobFilterSelection>) => onChange({...value,...patch});
  function setRegion(country: string) {set({country,province:'',city:'',district:''});}
- function setProvince(name:string) {set({country:'CN',province:name,city:'',district:''});}
+ function setProvince(name:string) {const special=subdivisions.find(p=>p.n===name && ['HK','MO','TW'].includes(String(p.c)));set({country:special?String(special.c):'CN',province:name,city:'',district:''});}
  function setCity(name:string) {set({city:name,district:''});}
  function keywordSubmit(event:FormEvent){ event.preventDefault();set({q:queryDraft.trim()});setPanel(null); }
  const regionLabel=value.district||value.city||value.province||(value.country==='CN'?'中国大陆':value.country?(new Intl.DisplayNames(['zh-Hans'],{type:'region'})).of(value.country):'全国 / 全球');
