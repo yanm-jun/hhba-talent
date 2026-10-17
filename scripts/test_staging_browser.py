@@ -307,6 +307,64 @@ class BrowserIntegrationTests(unittest.TestCase):
         finally:
             page.close()
 
+    def test_local_internal_ats_full_jd_only_after_explicit_click(self):
+        # UI fixture only. A separate GitHub Action performs real-source
+        # Greenhouse, Lever and Ashby HTTP GET with exact job IDs.
+        job_id="ATS-"+("a"*24)
+        url="https://jobs.ashbyhq.com/fixture/engineer"
+        stub={
+          "job_id":job_id,"record_kind":"ATS_STAGING_PREVIEW",
+          "job_title":"Engineering (synthetic browser fixture)",
+          "company_display_name":"Synthetic ATS Fixture",
+          "work_city":"London","job_status":"UNKNOWN",
+          "primary_recruitment_type":"SOCIAL","source_id":"ATS-TEST",
+          "marketplace_status":"STAGING_SOURCE_REVIEW_REQUIRED",
+          "source_review_status":"NOT_APPROVED_FOR_PUBLICATION",
+          "current_application_verified":False,"application_url":None,
+          "official_detail_url":url
+        }
+        jd={
+          "job_id":job_id,"job_title":stub["job_title"],
+          "platform":"ASHBY","source_url":url,
+          "full_text":"Responsibilities\nSYNTHETIC JD BODY\nRequirements\nSYNTHETIC JD REQUIREMENTS",
+          "responsibilities":"SYNTHETIC JD BODY",
+          "requirements":"SYNTHETIC JD REQUIREMENTS",
+          "unclassified":"","section_evidence":"EXPLICIT_HEADINGS",
+          "observed_at":"2026-10-17T13:33:00+00:00",
+          "jd_sha256":"a"*64,
+          "review_scope":"INTERNAL_SOURCE_INSPECTION_ONLY",
+          "public_display_approved":False,"current_application_verified":False
+        }
+        seen=[]
+        ctx=self.browser.new_context(viewport={"width":390,"height":844})
+        page=ctx.new_page()
+        try:
+            def detail(route):
+                route.fulfill(status=200,content_type="application/json",
+                              body=json.dumps(stub,ensure_ascii=False))
+            def internal(route):
+                seen.append(route.request)
+                route.fulfill(status=200,content_type="application/json",
+                              body=json.dumps(jd,ensure_ascii=False))
+            page.route("**/recruitment/api/v1/jobs/"+job_id, detail)
+            page.route("**/recruitment/api/v1/internal/ats-jd/"+job_id, internal)
+            page.goto(self.base+"/candidate/jobs/"+job_id,wait_until="domcontentloaded")
+            button=page.get_by_role("button",name="读取该岗位真实 JD",exact=False)
+            button.wait_for(timeout=15000)
+            self.assertEqual(seen,[],"JD must not be fetched automatically")
+            self.assertNotIn("SYNTHETIC JD BODY",page.locator("body").inner_text())
+            button.click()
+            page.get_by_text("SYNTHETIC JD REQUIREMENTS",exact=False).first.wait_for(timeout=12000)
+            self.assertEqual(len(seen),1)
+            self.assertEqual(seen[0].headers.get("x-hhba-internal-preview"),"1")
+            self.assertIn("SYNTHETIC JD BODY",page.locator(".hhba-internal-ats-jd").inner_text())
+            self.assertIn("不对外发布",page.locator(".hhba-internal-ats-jd").inner_text())
+            page.screenshot(path=str(self.out/"v06-internal-ashby-jd-ui-synthetic.png"),full_page=True)
+            self.assertFalse(page.evaluate("document.documentElement.scrollWidth > innerWidth + 2"))
+        finally:
+            ctx.close()
+
+
 
 if __name__=="__main__":
     unittest.main()
