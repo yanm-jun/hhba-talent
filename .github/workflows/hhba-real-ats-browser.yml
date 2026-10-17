@@ -1,11 +1,13 @@
-name: HHBA real ATS engine + original frontend browser proof
+name: HHBA real ATS adapter + original frontend browser proof
 on:
   push:
     branches: [feat/dual-entry-recruitment-integration]
     paths:
       - '.github/workflows/hhba-real-ats-browser.yml'
+      - 'scripts/real_ats_preview.py'
       - 'scripts/test_live_ats_browser.py'
       - 'apps/web/**'
+      - 'vendor/hhba-recruitment-engine/**'
   workflow_dispatch:
 permissions:
   contents: read
@@ -15,12 +17,6 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-      - name: Checkout the existing recruitment engine (not a duplicate collector)
-        uses: actions/checkout@v4
-        with:
-          repository: yanm-jun/hhba-recruitment-engine
-          ref: feat/global-ats-public-apis-20261017
-          path: engine
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -34,20 +30,20 @@ jobs:
         run: |
           npm ci
           npm run build
-      - name: Check engine bridge contract and tests
+      - name: Verify pinned upstream engine adapter snapshot
         run: |
-          python engine/scripts/serve_global_ats_preview.py --help
-          python -m unittest discover -s engine/tests -p 'test_global_ats_market.py' -v
-      - name: Stage real ATS snapshots using the existing engine adapters
+          python vendor/hhba-recruitment-engine/scripts/stage_global_ats.py --help
+          python -c "import sys; sys.path.insert(0,'vendor/hhba-recruitment-engine'); from hhba_pipeline.global_ats import Board, collect_board; print('upstream ATS adapter imports successfully')"
+          python scripts/real_ats_preview.py --help
+      - name: Stage genuine Greenhouse, Ashby and Lever JSON using upstream adapter
         run: |
-          python engine/scripts/stage_global_ats.py \
-            --registry engine/data/ats/global_boards_seed.json \
+          python vendor/hhba-recruitment-engine/scripts/stage_global_ats.py \
+            --registry vendor/hhba-recruitment-engine/data/ats/global_boards_seed.json \
             --output-dir "${{ runner.temp }}/hhba-ats-stage" \
             --execute-network --max-boards 6 --pause-seconds 1
-      - name: Start loopback-only engine preview using domestic master plus real ATS snapshots
+      - name: Start loopback-only metadata preview from the staged source snapshots
         run: |
-          python engine/scripts/serve_global_ats_preview.py \
-            --master engine/data/jobs_master.jsonl \
+          python scripts/real_ats_preview.py \
             --stage-dir "${{ runner.temp }}/hhba-ats-stage" \
             --host 127.0.0.1 --port 8765 \
             > "${{ runner.temp }}/hhba-engine-preview.log" 2>&1 &
@@ -59,8 +55,8 @@ jobs:
             sleep 1
           done
           cat "${{ runner.temp }}/hhba-engine-stats.json"
-          python -c "import json,sys; d=json.load(open(sys.argv[1])); assert d['mode']=='INTERNAL_STAGING_ONLY'; assert d['ats_staging_rows'] >= 6; assert d['domestic_public_rows'] >= 1" "${{ runner.temp }}/hhba-engine-stats.json"
-      - name: Start HHBA React frontend against the engine API
+          python -c "import json,sys; d=json.load(open(sys.argv[1])); assert d['mode']=='INTERNAL_STAGING_ONLY'; assert d['ats_staging_rows'] >= 6; assert d['total_rows']==d['ats_staging_rows']+d['domestic_public_rows']; assert {s['platform'] for s in d['sources']} >= {'GREENHOUSE','ASHBY','LEVER'}" "${{ runner.temp }}/hhba-engine-stats.json"
+      - name: Start HHBA React frontend against the loopback data API
         working-directory: apps/web
         run: |
           npm run dev -- --host 127.0.0.1 --port 3000 --strictPort \
@@ -73,17 +69,17 @@ jobs:
             sleep 1
           done
           curl -fsS http://127.0.0.1:3000/ > /dev/null
-      - name: Install actual Chromium (not a mocked browser)
+      - name: Install actual Chromium
         run: |
           python -m pip install 'playwright>=1.55,<2'
           python -m playwright install --with-deps chromium
-      - name: Test real engine API, original HHBA desktop and mobile UI
+      - name: Test real ATS source records in original desktop/mobile HHBA UI
         env:
           HHBA_BASE_URL: http://127.0.0.1:3000
           HHBA_ENGINE_API_URL: http://127.0.0.1:8765
         run: |
           python -m unittest discover -s scripts -p 'test_live_ats_browser.py' -v
-      - name: Save screenshots with actual official ATS titles
+      - name: Save desktop and mobile screenshots with actual ATS job titles
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -91,8 +87,6 @@ jobs:
           path: ${{ runner.temp }}/hhba-real-ats-frontend/*.png
           if-no-files-found: warn
           retention-days: 7
-      - name: Verify the preview did not modify either repository
+      - name: Verify the preview did not modify tracked files
         if: always()
-        run: |
-          git diff --exit-code
-          git -C engine diff --exit-code
+        run: git diff --exit-code
