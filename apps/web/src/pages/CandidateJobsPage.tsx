@@ -164,11 +164,11 @@ export function CandidateJobDetailPage({user,jobId}:{user:User|null;jobId:string
        : link ? <a className="primary-button hhba-official" href={link} target="_blank" rel="noopener noreferrer">{job.record_kind==='ATS_STAGING_PREVIEW'?'打开 ATS 原始岗位页面核对 · 非投递确认':'前往企业官网核对 · 投递未确认'} <ArrowRight size={16}/></a>
        : listLink ? <a className="primary-button hhba-official" href={listLink} target="_blank" rel="noopener noreferrer">查看企业招聘频道 · 不是该岗位投递地址 <ArrowRight size={16}/></a>
        : <p>官方详情链接尚未核实，暂不提供投递入口。</p>}
-   </header><div className="hhba-job-detail-grid"><article className="hhba-position-card"><h2>职位基本信息</h2><dl className="hhba-detail-facts">
+   </header><ReviewedJobDescription job={job}/><div className="hhba-job-detail-grid"><article className="hhba-position-card"><h2>职位基本信息</h2><dl className="hhba-detail-facts">
      <dt>工作地点</dt><dd>{label(job.work_city)}</dd><dt>最低学历</dt><dd>{label(job.education_min)}</dd><dt>最近检查</dt><dd>{day(job.status_checked_at||job.last_verified_at)}</dd>
      <dt>申请状态</dt><dd>{direct?'近期职位级投递入口已核验；以官方系统为准':job.application_access_status==='APPLICATION_CONFIRMED_OPEN'?'历史曾观察到入口 · 今天未确认':'申请入口未核验'}</dd></dl></article>
      <aside className="hhba-position-card"><h2>历史记录来源</h2><dl className="hhba-detail-facts"><dt>来源平台</dt><dd>{label(job.source_platform)}</dd><dt>企业来源 ID</dt><dd>{label(job.source_id)}</dd><dt>HHBA 记录 ID</dt><dd>{job.job_id}</dd></dl><p className="hhba-detail-note">{job.record_kind==='OFFICIAL_LIST_OBSERVED'
        ?'此岗位来自真实官方公开列表快照；职位详情、是否仍开放、投递按钮尚未逐一核验。'
-       :job.record_kind==='ATS_STAGING_PREVIEW'?'该记录来自现有 ATS 采集器生成的真实来源快照，仅用于内部页面联调；企业归属与元数据发布权限未审核，不得作为正式公开数据。':'此处仅有历史事实，不代表当前在招。'}</p></aside></div><ReviewedJobDescription job={job}/></>}
+       :job.record_kind==='ATS_STAGING_PREVIEW'?'该记录来自现有 ATS 采集器生成的真实来源快照，仅用于内部页面联调；企业归属与元数据发布权限未审核，不得作为正式公开数据。':'此处仅有历史事实，不代表当前在招。'}</p></aside></div></>}
  </section></Shell>;
 }
