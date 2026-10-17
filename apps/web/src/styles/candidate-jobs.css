@@ -82,3 +82,7 @@
 .hhba-internal-jd-result details{border:1px solid #edf1ed;padding:13px;border-radius:9px;margin-top:20px}
 .hhba-internal-jd-result summary{cursor:pointer;color:#335b42;font-size:12px;font-weight:750;margin-bottom:10px}
 @media(max-width:520px){.hhba-internal-ats-jd{padding:16px}}
+
+/* Avoid overflow of long official-link labels on 390px phones. */
+.hhba-official{max-width:100%!important;width:auto!important;white-space:normal!important;text-align:center;overflow-wrap:anywhere}
+.hhba-jobs-hero .hhba-detail-note{background:#fff8e8;border-color:#f0deb2;color:#775c2d}
