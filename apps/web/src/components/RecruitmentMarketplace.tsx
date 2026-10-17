@@ -117,7 +117,7 @@ export function RecruitmentMarketplace() {
               job.marketplace_status==='STAGING_SOURCE_REVIEW_REQUIRED' &&
               job.source_review_status==='NOT_APPROVED_FOR_PUBLICATION' &&
               job.current_application_verified===false && !job.application_url &&
-              !!safeOfficial(job.official_detail_url))
+              !!safeOfficial(job.official_detail_url)))
           || typeof job.current_application_verified !== 'boolean'
           || (job.current_application_verified === true &&
               (job.application_link_status !== 'VERIFIED_DIRECT' || !safeOfficial(job.application_url)))
