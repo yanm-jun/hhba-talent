@@ -16,7 +16,7 @@ import unittest
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-from scripts.real_ats_preview import load_staged_ats, create_handler
+from scripts.real_ats_preview import load_staged_ats, load_domestic_api, create_handler
 
 BOARDS = [
     ("ATS-GH-TEST", "GH-TEST", "greenhouse", "Test Greenhouse", "https://job-boards.greenhouse.io/test-greenhouse", "https://job-boards.greenhouse.io/test-greenhouse/jobs/123/test"),
@@ -103,6 +103,59 @@ class StagingPreviewContractTests(unittest.TestCase):
         self._write_source(sid, company_id, platform, evidence, observed, [bad])
         with self.assertRaisesRegex(ValueError, "official ATS board"):
             load_staged_ats(self.root)
+
+
+    def test_loopback_domestic_api_and_ats_share_one_marketplace(self):
+        domestic = {
+            "job_id": "JOB-DOM-001", "company_display_name": "国内测试来源公司",
+            "job_title": "国内官方岗位（单测夹具）", "source_id": "SRC-DOM-001",
+            "source_platform": "Moka", "work_city": "上海",
+            "record_kind": "HISTORICAL_MASTER",
+            "marketplace_status": "OFFICIAL_HISTORICAL_UNCONFIRMED",
+            "official_detail_url": "https://jobs.example.org/domestic/1",
+            "official_list_url": None, "application_url": None,
+            "application_link_status": "OFFICIAL_DETAIL_ONLY",
+            "current_application_verified": False,
+        }
+        class DomesticHandler(__import__("http.server", fromlist=["BaseHTTPRequestHandler"]).BaseHTTPRequestHandler):
+            def do_GET(self):
+                raw = json.dumps({"total": 1, "items": [domestic]}).encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+            def log_message(self, *_): pass
+        server = ThreadingHTTPServer(("127.0.0.1", 0), DomesticHandler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            origin = f"http://127.0.0.1:{server.server_address[1]}"
+            domestic_rows = load_domestic_api(origin)
+            ats_rows, sources = load_staged_ats(self.root)
+            combined = domestic_rows + ats_rows
+            stats = {"domestic_public_rows": len(domestic_rows),
+                     "ats_staging_rows": len(ats_rows), "total_rows": len(combined),
+                     "sources": sources}
+            api = ThreadingHTTPServer(("127.0.0.1", 0), create_handler(combined, stats))
+            api_thread = threading.Thread(target=api.serve_forever, daemon=True)
+            api_thread.start()
+            try:
+                with urlopen(f"http://127.0.0.1:{api.server_address[1]}/api/v1/marketplace?limit=8") as response:
+                    result = json.load(response)
+                self.assertEqual(result["total"], 4)
+                self.assertEqual({row["record_kind"] for row in result["items"]},
+                                 {"HISTORICAL_MASTER", "ATS_STAGING_PREVIEW"})
+                self.assertTrue(result["all_current_application_statuses_unverified"])
+                self.assertEqual(result["data_mode"], "official_source_staging_only")
+            finally:
+                api.shutdown()
+                api_thread.join(timeout=3)
+                api.server_close()
+        finally:
+            server.shutdown()
+            thread.join(timeout=3)
+            server.server_close()
 
     def test_api_exposes_only_whitelisted_staging_metadata(self):
         rows, sources = load_staged_ats(self.root)
