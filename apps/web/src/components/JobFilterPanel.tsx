@@ -1,4 +1,6 @@
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { LocateFixed, MapPin, RefreshCw } from 'lucide-react';
+import { forgetCity, locateRegion, readSavedCity, saveCity } from '../services/jobGeolocation';
 import chinaDivisions from '../data/china_pca_2026.json';
 import '../styles/job-filters.css';
 
@@ -43,6 +45,61 @@ export function JobFilterPanel({ value, onChange }: {value: JobFilterSelection; 
  const [overseas,setOverseas]=useState(value.country!=='' && value.country!=='CN');
  const [activeGroup,setActiveGroup]=useState('销售');
  const [countryQuery,setCountryQuery]=useState('');
+ const [locating,setLocating]=useState(false);
+ const [rememberCity,setRememberCity]=useState(false);
+ const [locationNotice,setLocationNotice]=useState('');
+ const [locationSource,setLocationSource]=useState<'osm-pilot'|'configured'|null>(null);
+ const latestValue=useRef(value);
+ const latestOnChange=useRef(onChange);
+ const sequence=useRef(0);
+ const controller=useRef<AbortController|null>(null);
+ latestValue.current=value;
+ latestOnChange.current=onChange;
+ useEffect(()=>{
+   const saved=readSavedCity();
+   if (saved) {
+     setRememberCity(true);
+     if(!Object.values(latestValue.current).some(Boolean)) {
+       latestOnChange.current({...latestValue.current,...saved.region});
+       setLocationNotice('已按上次授权保存的城市筛选（24小时内）；想获取当前位置，请点击重新定位。');
+     }
+   }
+   return ()=>{sequence.current++;controller.current?.abort();};
+ },[]);
+ async function requestDeviceLocation(){
+   const request=++sequence.current;
+   controller.current?.abort();
+   const abort=new AbortController();controller.current=abort;
+   setPanel(null);setLocating(true);setLocationNotice('正在请求浏览器定位并识别城市…');
+   try{
+     const result=await locateRegion(abort.signal);
+     if(abort.signal.aborted || request!==sequence.current)return;
+     const region=result.region;
+     if (!region.province && !region.city){
+       setLocationNotice('已识别国家或地区，但未能确定城市；已按国家筛选，可手动细化。');
+     } else {
+       setLocationNotice('已定位到'+[region.province,region.city].filter(Boolean).join(' · ')+'，正在查询该地区的真实岗位。');
+     }
+     latestOnChange.current({...latestValue.current,...region});
+     if(rememberCity)saveCity(region);
+     setLocationSource(result.provider==='osm-pilot'?'osm-pilot':'configured');
+     setOverseas(region.country!=='CN');
+   }catch(e){
+     if(!abort.signal.aborted && request===sequence.current)
+       setLocationNotice(e instanceof Error ? e.message : '定位失败，请手动选择地区。');
+   }finally{
+     if(request===sequence.current){setLocating(false);controller.current=null;}
+   }
+ }
+ function changeRememberCity(checked:boolean){
+   setRememberCity(checked);
+   if (!checked) {forgetCity();return;}
+   if(value.country)saveCity({country:value.country,province:value.province,city:value.city,district:''});
+ }
+ function cancelInFlightLocation(){
+   sequence.current++;controller.current?.abort();controller.current=null;
+   if(locating){setLocating(false);setLocationNotice('已保留你手动选择的地区。');}
+ }
  const regionCountries=useMemo(()=>{
    const names = new Intl.DisplayNames(['zh-Hans'], {type:'region'});
    return ISO_CODES.filter(code=>!['CN','HK','MO','TW'].includes(code)).map(code=>({code,name:names.of(code)||code}))
@@ -53,7 +110,13 @@ export function JobFilterPanel({ value, onChange }: {value: JobFilterSelection; 
  const cities = province?.ch || [];
  const city = cities.find(p=>p.n===value.city);
  const districts = city?.ch || [];
- const set = (patch: Partial<JobFilterSelection>) => onChange({...value,...patch});
+ const set = (patch: Partial<JobFilterSelection>) => {
+   if(['country','province','city','district'].some(key=>key in patch)) {
+     cancelInFlightLocation();
+     if(rememberCity)forgetCity();
+   }
+   onChange({...value,...patch});
+ };
  function setRegion(country: string) {set({country,province:'',city:'',district:''});}
  function setProvince(name:string) {const special=subdivisions.find(p=>p.n===name && ['HK','MO','TW'].includes(String(p.c)));set({country:special?String(special.c):'CN',province:name,city:'',district:''});}
  function setCity(name:string) {set({city:name,district:''});}
@@ -65,7 +128,17 @@ export function JobFilterPanel({ value, onChange }: {value: JobFilterSelection; 
  const modes=[['','工作方式'],['REMOTE','远程办公'],['HYBRID','混合办公'],['ONSITE','现场办公']];
  return <div className="hhba-filter-wrap" aria-label="招聘条件筛选">
   <div className="hhba-filter-head"><div><strong>发现适合你的工作</strong><span>支持国内省市区和全球国家筛选 · 分类按职位名称匹配</span></div>
-   <button type="button" className="hhba-filter-clear" onClick={()=>{onChange(emptyJobFilters);setQueryDraft('');setPanel(null);}}>重置筛选 ↺</button></div>
+   <button type="button" className="hhba-filter-clear" onClick={()=>{cancelInFlightLocation();forgetCity();setRememberCity(false);onChange(emptyJobFilters);setQueryDraft('');setPanel(null);setLocationNotice('');}}>重置筛选 ↺</button></div>
+  <div className="hhba-nearby-panel">
+   <div className="hhba-nearby-head"><MapPin size={18}/><div><strong>优先查看我附近的岗位</strong><small>授权后自动选定所在国家、省份及城市；岗位距离不作猜测</small></div></div>
+   <button type="button" className="hhba-nearby-button" onClick={requestDeviceLocation} disabled={locating} aria-label="使用当前位置推荐岗位">{locating?<RefreshCw className="hhba-nearby-spin" size={15}/>:<LocateFixed size={15}/>} {locating?'正在定位…':'使用当前位置推荐'}</button>
+  </div>
+  <div className="hhba-nearby-preferences">
+    <label><input type="checkbox" checked={rememberCity} onChange={e=>changeRememberCity(e.target.checked)}/>在本设备保存城市24小时，下次自动筛选</label>
+    <span>定位只用于选城市；不保存经纬度。{locationSource==='osm-pilot'?'当前使用 OpenStreetMap 试点服务。':'位置解析需使用地理编码服务。'}</span>
+  </div>
+  {locationNotice && <p className="hhba-nearby-status" role="status">{locationNotice}</p>}
+  {locationSource==='osm-pilot' && <div className="hhba-nearby-attribution"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a></div>}
   <form className="hhba-filter-keyword" onSubmit={keywordSubmit}>
     <span className="hhba-filter-glass" aria-hidden="true">⌕</span>
     <input aria-label="搜索公司或岗位关键词" placeholder="搜索职位 / 企业名称，如：小米、销售、产品经理" value={queryDraft} onChange={e=>setQueryDraft(e.target.value)} maxLength={120}/>
