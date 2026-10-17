@@ -1,0 +1,49 @@
+name: HHBA REAL ATS desktop mobile browser proof (NO JOB FIXTURES)
+on:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - '.github/workflows/hhba-real-ats-browser.yml'
+      - 'scripts/real_ats_preview.py'
+      - 'scripts/test_live_ats_browser.py'
+      - 'apps/web/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-ats-homepage-chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build actual HHBA front-end (unchanged original home design)
+        working-directory: apps/web
+        run: |
+          npm ci
+          npm run build
+      - name: Install actual Chromium (no mock browser)
+        run: |
+          python -m pip install 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Pull REAL official ATS JSON directly to memory and test gateway UI
+        run: |
+          python -m unittest discover -s scripts -p 'test_live_ats_browser.py' -v
+      - name: Save real-browser screenshots containing actual API job names
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-real-ats-homepage-desktop-mobile
+          path: ${{ runner.temp }}/hhba-real-ats-frontend/*.png
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Ensure no ATS full JD or resumes committed
+        run: |
+          test -z "$(git status --short --untracked-files=all)"
