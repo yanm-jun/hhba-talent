@@ -2,6 +2,16 @@
 
 ## 目标与当前边界
 
+## 最新真实浏览器验收（2026-10-17）
+
+- 工作流：https://github.com/yanm-jun/hhba-talent/actions/runs/39026807028
+- 真实 ATS 快照共 **1,279 条**：Greenhouse 19、Canonical 309、Ashby 63、Airwallex 496、Spotify 82、Palantir Technologies 310。
+- 浏览器验收：3/3 测试通过，覆盖真实 API、桌面首页、手机搜索和岗位详情；没有合成职位作为 fallback。
+- 截图包 Artifact 名称：hhba-real-ats-homepage-desktop-mobile；包含 hhba-real-desktop-first.png、hhba-real-desktop-full.png、hhba-real-desktop-search.png、hhba-real-mobile-full.png、hhba-real-mobile-filtered.png。
+- 此次 CI 的 domestic_public_rows 为 0，因为 CI Runner 无权克隆私有引擎仓库且没有国内主库挂载；没有用虚构国内岗位补齐。若本机启动真实引擎 API，可通过 --domestic-api 将通过公开展示门禁的国内记录合入同一预览市场。
+- 六个 ATS board 均未获自动发布批准；当前可核验已开放投递的岗位数为 0。预览仅用于内部验收，不是公网发布。
+
+
 保留原 HHBA React 首页、两个入口“我要找工作 / 我要招人才”，首页下方只保留一个统一岗位市场。前端通过同一个 /recruitment/api/v1/marketplace、/recruitment/api/v1/jobs 和 /recruitment/api/v1/jobs/{id} API 读取数据。
 
 本仓库内的 vendor/hhba-recruitment-engine/ 是从上游 yanm-jun/hhba-recruitment-engine@d8e6f1d54c4e014b66f79dbd47965d43a9c64db2 同步的固定版本适配器快照，只用于 CI 和本地内部验收。它不是两个仓库自动同步的机制；升级上游时，必须显式同步并复核版本。
