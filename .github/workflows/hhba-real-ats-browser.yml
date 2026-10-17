@@ -6,6 +6,7 @@ on:
       - '.github/workflows/hhba-real-ats-browser.yml'
       - 'scripts/real_ats_preview.py'
       - 'scripts/test_live_ats_browser.py'
+      - 'scripts/test_real_ats_preview_contract.py'
       - 'apps/web/**'
       - 'vendor/hhba-recruitment-engine/**'
   workflow_dispatch:
@@ -35,6 +36,7 @@ jobs:
           python vendor/hhba-recruitment-engine/scripts/stage_global_ats.py --help
           python -c "import sys; sys.path.insert(0,'vendor/hhba-recruitment-engine'); from hhba_pipeline.global_ats import Board, collect_board; print('upstream ATS adapter imports successfully')"
           python scripts/real_ats_preview.py --help
+          python -m unittest discover -s scripts -p 'test_real_ats_preview_contract.py' -v
       - name: Stage genuine Greenhouse, Ashby and Lever JSON using upstream adapter
         run: |
           python vendor/hhba-recruitment-engine/scripts/stage_global_ats.py \
