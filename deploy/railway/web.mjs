@@ -9,7 +9,7 @@ const MIME = {
   '.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg',
   '.webp':'image/webp','.ico':'image/x-icon','.woff2':'font/woff2'
 };
-const API_PATH=/^\/recruitment\/api\/v1\/(?:marketplace|stats|health|jobs(?:\/[A-Za-z0-9_-]{1,64})?)\/?$/;
+const API_PATH=/^\/recruitment\/api\/v1\/(?:marketplace|stats|health|jobs(?:\/[A-Za-z0-9_-]{1,64}(?:\/original-jd)?)?)\/?$/;
 
 const json = (res,code,data)=>{
   res.writeHead(code,{'content-type':'application/json; charset=utf-8',

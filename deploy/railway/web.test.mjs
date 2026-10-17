@@ -28,6 +28,9 @@ test('recruitment-only site serves React and proxies only explicit GET jobs, no 
    assert.equal(hits.at(-1).url,'/api/v1/marketplace?limit=8');
    assert.equal(hits.at(-1).cookie,undefined);
    assert.equal(hits.at(-1).authorization,undefined);
+   r=await fetch(root+'/recruitment/api/v1/jobs/ATS-f12345678901234567890123/original-jd');
+   assert.equal(r.status,200);
+   assert.equal(hits.at(-1).url,'/api/v1/jobs/ATS-f12345678901234567890123/original-jd');
    r=await fetch(root+'/recruitment/api/v1/internal/ats-jd/ATS-abc');
    assert.equal(r.status,404);
    r=await fetch(root+'/api/v1/auth/me');assert.equal(r.status,401);
