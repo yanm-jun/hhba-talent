@@ -45,3 +45,25 @@
 @media(max-width:480px){.hhba-jobs-page{margin:18px auto 40px}.hhba-jobs-hero{padding:25px 20px}.hhba-jobs-form{grid-template-columns:1fr}.hhba-jobs-form .primary-button{grid-column:auto}.hhba-jobs-count h2{font-size:19px}.hhba-position-card{padding:17px}.hhba-position-footer{flex-wrap:wrap}.hhba-job-trail{gap:7px;flex-wrap:wrap}}
 
 .hhba-position-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px}.hhba-position-actions a{color:#267141;font-size:12px;font-weight:800;text-decoration:none}.hhba-position-actions a:hover{text-decoration:underline}
+
+/* Only operator-approved, source-bound JD text renders as plain React text. */
+.hhba-jd-display{margin:17px 0 0;border:1px solid #dce8df;background:#fff;border-radius:14px;padding:28px;box-shadow:0 8px 26px #17372509;min-width:0}
+.hhba-jd-section-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.hhba-jd-section-heading h2{font-size:20px;margin:3px 0}
+.hhba-jd-eyebrow{font-size:10px;color:#537765;letter-spacing:1.2px;font-weight:750}
+.hhba-jd-approved{font-size:11px;color:#277144;background:#eaf6ed;border:1px solid #cee7d2;padding:7px 10px;border-radius:20px}
+.hhba-jd-columns{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.hhba-jd-columns>div{padding:18px;background:#f9fbfa;border:1px solid #edf1ee;border-radius:11px;min-width:0}
+.hhba-jd-columns h3{font-size:16px;margin:0 0 14px;color:#274b39}
+.hhba-jd-text{font-size:14px;line-height:1.9;color:#344840;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.hhba-jd-attributes{border-top:1px solid #e6eee8;margin-top:22px;padding-top:16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.hhba-jd-attributes strong{display:block;color:#3c644b;font-size:13px;margin:0 0 9px}
+.hhba-jd-proof{display:flex;align-items:flex-start;flex-wrap:wrap;gap:9px;margin-top:21px;padding-top:16px;border-top:1px solid #e6eee8;color:#71877c;font-size:11px;line-height:1.7}
+.hhba-jd-proof svg{flex:none}.hhba-jd-proof span{flex:1;min-width:180px}
+.hhba-jd-proof a{display:inline-flex;align-items:center;gap:4px;color:#276449;text-decoration:none;font-weight:700}
+.hhba-jd-unavailable{background:#fcfdfc;border-style:dashed}
+.hhba-jd-unavailable .hhba-jd-section-heading{margin-bottom:8px}
+.hhba-jd-unavailable .hhba-jd-section-heading span{font-size:11px;color:#9a7951}
+.hhba-jd-unavailable p{color:#788b7c;font-size:13px;line-height:1.8;max-width:850px}
+@media(max-width:760px){.hhba-jd-columns{grid-template-columns:1fr}.hhba-jd-attributes{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.hhba-jd-display{padding:17px}.hhba-jd-attributes{grid-template-columns:1fr}.hhba-jd-section-heading h2{font-size:18px}}

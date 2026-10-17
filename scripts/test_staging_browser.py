@@ -263,6 +263,50 @@ class BrowserIntegrationTests(unittest.TestCase):
         finally:
             ctx.close()
 
+    def test_job_detail_renders_only_reviewer_approved_sections(self):
+        # Synthetic UI fixture: real production approvals come exclusively from
+        # external audited rights evidence. This route must not be a data fallback.
+        page=self.page(width=390,height=844)
+        base=self.base
+        fake={
+          "job_id":"JOB-SYNTH-001","record_kind":"HISTORICAL_MASTER",
+          "job_title":"离线合成职责职位","company_display_name":"测试企业（并非招聘）",
+          "work_city":"测试地区","job_status":"UNKNOWN",
+          "source_id":"SYNTH","current_application_verified":False,
+          "official_detail_url":"https://example.org/synthetic-only",
+          "jd_publication_status":"APPROVED_FOR_DISPLAY",
+          "approved_jd":{
+             "status":"APPROVED_FOR_DISPLAY",
+             "responsibilities":"负责离线验证职责栏及安全文本呈现",
+             "requirements":"需要独立验证任职要求及人才条件",
+             "education":"本科","skills":"数据分析","experience":"",
+             "language":"zh-CN",
+             "source_url":"https://example.org/synthetic-only",
+             "rights_holder":"SYNTHETIC_TEST_RIGHTS_ONLY",
+             "content_reviewed_at":"2026-10-17"
+          }
+        }
+        def detail_route(route):
+            route.fulfill(status=200,content_type="application/json",
+                          body=json.dumps(fake,ensure_ascii=False))
+        try:
+            page.route("**/recruitment/api/v1/jobs/JOB-SYNTH-001",detail_route)
+            page.goto(base+"/candidate/jobs/JOB-SYNTH-001",wait_until="domcontentloaded")
+            page.get_by_role("heading",name="岗位职责与任职要求").wait_for(timeout=12000)
+            self.assertIn("离线验证职责栏",page.locator(".hhba-jd-display").inner_text())
+            self.assertIn("独立验证任职要求",page.locator(".hhba-jd-display").inner_text())
+            self.assertIn("本科",page.locator(".hhba-jd-display").inner_text())
+            page.screenshot(path=str(self.out/"v05-mobile-approved-jd-synthetic.png"),full_page=True)
+            # Forge the same content without server approval: it cannot render.
+            fake["jd_publication_status"]="NOT_APPROVED"
+            page.reload(wait_until="domcontentloaded")
+            page.get_by_text("暂不可公开展示").wait_for(timeout=12000)
+            self.assertNotIn("离线验证职责栏",page.locator("body").inner_text())
+            self.assertFalse(page.evaluate("document.documentElement.scrollWidth>innerWidth+2"))
+            page.screenshot(path=str(self.out/"v05-mobile-jd-pending.png"),full_page=True)
+        finally:
+            page.close()
+
 
 if __name__=="__main__":
     unittest.main()

@@ -8,7 +8,16 @@ import type { User } from '../services/api';
 import '../styles/candidate-jobs.css';
 
 type Channel = '' | 'CAMPUS' | 'SOCIAL' | 'INTERNSHIP';
+type ApprovedJD = {
+ status: 'APPROVED_FOR_DISPLAY';
+ responsibilities: string; requirements: string;
+ skills?: string; education?: string; experience?: string;
+ language: 'en' | 'zh-CN'; source_url: string;
+ rights_holder: string; content_reviewed_at: string;
+};
 type Job = {
+ jd_publication_status?: 'APPROVED_FOR_DISPLAY' | 'NOT_APPROVED';
+ approved_jd?: ApprovedJD | null;
  job_id: string; record_kind?: string;
  job_title?: string | null; company_display_name?: string | null;
  work_city?: string | null; primary_recruitment_type?: string | null;
@@ -91,6 +100,36 @@ export function CandidateJobsPage({user}:{user:User|null}) {
    <p className="hhba-jobs-privacy">此搜索不会上传简历或自动向企业投递。<Link to="/">返回 HHBA 首页</Link></p>
  </section></Shell>;
 }
+function ReviewedJobDescription({job}:{job:Job}){
+ const content=job.approved_jd;
+ // The server must have opted this exact detail record into publication.
+ // Never trust a staging preview or an unapproved/malformed JSON payload.
+ const permitted=job.record_kind!=='ATS_STAGING_PREVIEW' &&
+   job.record_kind!=='OFFICIAL_LIST_OBSERVED' &&
+   job.jd_publication_status==='APPROVED_FOR_DISPLAY' &&
+   content?.status==='APPROVED_FOR_DISPLAY' &&
+   !!content?.responsibilities?.trim() && !!content?.requirements?.trim() &&
+   !!officialLink(content?.source_url) &&
+   officialLink(content?.source_url)===officialLink(job.official_detail_url) &&
+   !!content?.content_reviewed_at && !!content?.rights_holder;
+ if(!permitted||!content) return <section className="hhba-jd-display hhba-jd-unavailable" aria-label="岗位职责与任职要求">
+   <div className="hhba-jd-section-heading"><h2>岗位职责与任职要求</h2><span>暂不可公开展示</span></div>
+   <p>这条记录尚无获得展示许可并完成准确性审核的完整 JD。我们不会根据岗位标题编写职责、学历或技能要求，请前往企业官方岗位页面核对。</p>
+ </section>;
+ const attributes=[['学历要求',content.education],['经验要求',content.experience],['技能要求',content.skills]] as const;
+ return <section className="hhba-jd-display" aria-label="岗位职责与任职要求">
+   <div className="hhba-jd-section-heading"><div><span className="hhba-jd-eyebrow">SOURCE-VERIFIED · RIGHTS-REVIEWED</span><h2>岗位职责与任职要求</h2></div><span className="hhba-jd-approved">已审核展示内容</span></div>
+   <div className="hhba-jd-columns">
+     <div><h3>岗位职责</h3><p className="hhba-jd-text">{content.responsibilities}</p></div>
+     <div><h3>任职要求 / 人才要求</h3><p className="hhba-jd-text">{content.requirements}</p></div>
+   </div>
+   {attributes.some(([,v])=>Boolean(v?.trim()))&&<div className="hhba-jd-attributes">
+     {attributes.filter(([,v])=>Boolean(v?.trim())).map(([key,v])=><div key={key}><strong>{key}</strong><p className="hhba-jd-text">{v}</p></div>)}
+   </div>}
+   <div className="hhba-jd-proof"><ShieldCheck size={16}/><span>内容经人工对照原始来源并核对展示权限。审核日期：{content.content_reviewed_at} · 权利方：{content.rights_holder}。职位是否仍可申请，以企业官网为准。</span>
+    <a href={content.source_url} rel="noopener noreferrer" target="_blank">核对官方原文 <ArrowRight size={14}/></a></div>
+ </section>;
+}
 export function CandidateJobDetailPage({user,jobId}:{user:User|null;jobId:string}) {
  const [job,setJob]=useState<Job|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState(false);
  useEffect(()=>{
@@ -127,9 +166,9 @@ export function CandidateJobDetailPage({user,jobId}:{user:User|null;jobId:string
        : <p>官方详情链接尚未核实，暂不提供投递入口。</p>}
    </header><div className="hhba-job-detail-grid"><article className="hhba-position-card"><h2>职位基本信息</h2><dl className="hhba-detail-facts">
      <dt>工作地点</dt><dd>{label(job.work_city)}</dd><dt>最低学历</dt><dd>{label(job.education_min)}</dd><dt>最近检查</dt><dd>{day(job.status_checked_at||job.last_verified_at)}</dd>
-     <dt>申请状态</dt><dd>{direct?'近期职位级投递入口已核验；以官方系统为准':job.application_access_status==='APPLICATION_CONFIRMED_OPEN'?'历史曾观察到入口 · 今天未确认':'申请入口未核验'}</dd></dl><div className="hhba-detail-note">尚无允许公开的职位描述正文。请以官方实际页面为准，不推测职责和要求。</div></article>
+     <dt>申请状态</dt><dd>{direct?'近期职位级投递入口已核验；以官方系统为准':job.application_access_status==='APPLICATION_CONFIRMED_OPEN'?'历史曾观察到入口 · 今天未确认':'申请入口未核验'}</dd></dl></article>
      <aside className="hhba-position-card"><h2>历史记录来源</h2><dl className="hhba-detail-facts"><dt>来源平台</dt><dd>{label(job.source_platform)}</dd><dt>企业来源 ID</dt><dd>{label(job.source_id)}</dd><dt>HHBA 记录 ID</dt><dd>{job.job_id}</dd></dl><p className="hhba-detail-note">{job.record_kind==='OFFICIAL_LIST_OBSERVED'
        ?'此岗位来自真实官方公开列表快照；职位详情、是否仍开放、投递按钮尚未逐一核验。'
-       :job.record_kind==='ATS_STAGING_PREVIEW'?'该记录来自现有 ATS 采集器生成的真实来源快照，仅用于内部页面联调；企业归属与元数据发布权限未审核，不得作为正式公开数据。':'此处仅有历史事实，不代表当前在招。'}</p></aside></div></>}
+       :job.record_kind==='ATS_STAGING_PREVIEW'?'该记录来自现有 ATS 采集器生成的真实来源快照，仅用于内部页面联调；企业归属与元数据发布权限未审核，不得作为正式公开数据。':'此处仅有历史事实，不代表当前在招。'}</p></aside></div><ReviewedJobDescription job={job}/></>}
  </section></Shell>;
 }
