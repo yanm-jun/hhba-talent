@@ -1,282 +1,319 @@
-"""HHBA real ATS read-only STAGING preview, never synthetic recruitment fixtures.
+"""Local-only HHBA ATS preview over snapshots from the EXISTING engine collector.
 
-Fetch a narrow, explicit set of public Greenhouse, Ashby and Lever JSON boards.
-All role/company/link facts must come from the ATS API response. No full JD
-persistence or translation, no scraping, cookies, redirects, personal data,
-license assumptions, automatic publication, or 'current apply' claims.
-
-This is a local-only, ephemeral preview API for genuine-browser acceptance.
-Real production admissions still require separate source/rights approval.
+This module does not fetch ATS data. First run the vendored, pinned upstream
+scripts/stage_global_ats.py. The server then verifies its SHA-256 manifests,
+exposes only factual metadata, and marks all unreviewed ATS records as internal
+staging. It may optionally merge the public records from a running loopback
+HHBA recruitment-engine API. Never deploy this preview server to the internet.
 """
 from __future__ import annotations
 
+import argparse
 from datetime import datetime, timezone
 from hashlib import sha256
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-import argparse
+import ipaddress
 import json
+from pathlib import Path
 import re
-from urllib.error import HTTPError, URLError
-from urllib.parse import parse_qs, urlsplit
-from urllib.request import Request, HTTPRedirectHandler, build_opener
+from urllib.parse import parse_qs, urlsplit, unquote
+from urllib.request import Request, urlopen
 
-BOARDS = (
-    ("GREENHOUSE", "greenhouse", "Greenhouse", "https://boards-api.greenhouse.io/v1/boards/greenhouse/jobs"),
-    ("GREENHOUSE", "canonical", "Canonical", "https://boards-api.greenhouse.io/v1/boards/canonical/jobs"),
-    ("ASHBY", "ashby", "Ashby", "https://api.ashbyhq.com/posting-api/job-board/ashby"),
-    ("ASHBY", "airwallex", "Airwallex", "https://api.ashbyhq.com/posting-api/job-board/airwallex"),
-    ("LEVER", "spotify", "Spotify", "https://api.lever.co/v0/postings/spotify?mode=json&skip=0&limit=100"),
-    ("LEVER", "palantir", "Palantir Technologies", "https://api.lever.co/v0/postings/palantir?mode=json&skip=0&limit=100"),
-)
-OFFICIAL_DETAIL_HOSTS = {
-    "GREENHOUSE": {"job-boards.greenhouse.io", "boards.greenhouse.io"},
-    "ASHBY": {"jobs.ashbyhq.com"},
-    "LEVER": {"jobs.lever.co"},
+ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+EXCLUDED_FIELDS = frozenset({
+    "job_description_raw", "requirements_raw", "responsibilities_raw",
+    "descriptionPlain", "descriptionHtml", "content", "jd_text", "jd_translation",
+})
+DETAIL_HOSTS = {
+    "greenhouse": {"job-boards.greenhouse.io", "boards.greenhouse.io", "boards.eu.greenhouse.io"},
+    "ashby": {"jobs.ashbyhq.com"},
+    "lever": {"jobs.lever.co"},
 }
-MAX_RESPONSE_BYTES=12*1024*1024
-MAX_PER_BOARD=100
-MAX_QUERY=120
-ID_RE=re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+ALLOWED_TYPES = {"", "CAMPUS", "SOCIAL", "INTERNSHIP", "SPECIAL", "UNKNOWN"}
 
 
-class NoRedirect(HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        return None
+def _text(value):
+    return value.strip() if isinstance(value, str) and value.strip() else None
 
 
-def get_json(url: str):
-    req=Request(url,method="GET",headers={
-        "Accept":"application/json",
-        "User-Agent":"HHBA-ATS-genuine-local-preview/0.1",
-    })
-    with build_opener(NoRedirect).open(req, timeout=22) as response:
-        if response.status!=200 or "json" not in response.headers.get("Content-Type","").lower():
-            raise ValueError("ATS source did not return JSON HTTP 200")
-        body=response.read(MAX_RESPONSE_BYTES+1)
-    if len(body)>MAX_RESPONSE_BYTES:
-        raise ValueError("ATS source response exceeded bound")
-    return json.loads(body)
-
-
-def valid_detail(value, platform: str, slug: str) -> str | None:
-    if not isinstance(value,str) or len(value)>2048 or any(ord(ch)<32 for ch in value):
+def _safe_detail(value, platform, slug):
+    if not isinstance(value, str) or len(value) > 2048 or any(ord(c) < 32 for c in value):
         return None
     try:
-        parsed=urlsplit(value)
+        parsed = urlsplit(value)
     except ValueError:
         return None
-    if (parsed.scheme!="https" or parsed.username or parsed.password or parsed.fragment
-            or parsed.hostname not in OFFICIAL_DETAIL_HOSTS[platform]):
+    if (parsed.scheme != "https" or parsed.username or parsed.password
+            or parsed.fragment or parsed.hostname not in DETAIL_HOSTS[platform]):
         return None
-    if f"/{slug}/" not in parsed.path:
+    if slug not in [part for part in parsed.path.split("/") if part]:
         return None
     return value
 
 
-def as_text(v):
-    return v.strip() if isinstance(v,str) and v.strip() else None
+def load_staged_ats(stage_dir: Path):
+    """Read exact SHA-bound snapshots, reject raw JD and never auto-approve."""
+    if not stage_dir.is_dir():
+        raise ValueError("ATS staging directory is missing")
+    rows, sources, seen_jobs = [], [], set()
+    manifests = sorted(stage_dir.glob("*.manifest.json"))
+    if not manifests:
+        raise ValueError("no ATS manifests; real staging is required")
+    for manifest_path in manifests:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        sid = manifest.get("source_id")
+        if not isinstance(sid, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,99}", sid):
+            raise ValueError("invalid source ID in manifest")
+        payload_path = stage_dir / (sid + ".jsonl")
+        payload = payload_path.read_bytes()
+        if len(payload) > 40 * 1024 * 1024:
+            raise ValueError("staged ATS source exceeds size bound")
+        digest = sha256(payload).hexdigest()
+        if (manifest_path.name != sid + ".manifest.json"
+                or manifest.get("sha256") != digest
+                or manifest.get("snapshot_complete") is not True
+                or manifest.get("publication_approved") is not False
+                or manifest.get("JD_republication_approved") is not False
+                or not isinstance(manifest.get("observed_at"), str)):
+            raise ValueError("ATS snapshot hash/completeness/publication gate mismatch")
+        platform = manifest.get("platform")
+        if platform not in DETAIL_HOSTS:
+            raise ValueError("unsupported ATS platform")
+        evidence = manifest.get("source_evidence_url")
+        if not isinstance(evidence, str):
+            raise ValueError("missing board identity evidence URL")
+        ep = urlsplit(evidence)
+        if ep.scheme != "https" or ep.hostname not in DETAIL_HOSTS[platform] or ep.username or ep.password:
+            raise ValueError("board evidence is not on the expected ATS host")
+        segments = [part for part in ep.path.split("/") if part]
+        if not segments:
+            raise ValueError("board slug missing from evidence URL")
+        slug = segments[0]
+        lines = payload.decode("utf-8").splitlines()
+        if not lines or len(lines) != manifest.get("indexed_rows"):
+            raise ValueError("staged row count mismatch")
+        names = set()
+        for line in lines:
+            item = json.loads(line)
+            if not isinstance(item, dict) or EXCLUDED_FIELDS.intersection(item):
+                raise ValueError("unsafe/non-metadata field in ATS stage")
+            jid = item.get("job_id")
+            if (not isinstance(jid, str) or not re.fullmatch(r"ATS-[0-9a-f]{24}", jid)
+                    or jid in seen_jobs):
+                raise ValueError("duplicate or invalid ATS job ID")
+            if (item.get("source_id") != sid
+                    or item.get("source_platform", "").lower() != platform
+                    or item.get("company_id") != manifest.get("company_id")
+                    or not _text(item.get("company_display_name"))
+                    or not _text(item.get("job_title"))
+                    or item.get("job_status") != "UNKNOWN"
+                    or item.get("current_application_verified") is not False
+                    or item.get("rights_status") != "RIGHTS_REVIEW_REQUIRED"):
+                raise ValueError("staged ATS identity/status boundary mismatch")
+            detail = _safe_detail(item.get("job_source_url"), platform, slug)
+            if not detail:
+                raise ValueError("job URL does not match the official ATS board")
+            seen_jobs.add(jid)
+            names.add(item["company_display_name"])
+            rows.append({
+                "job_id": jid, "company_id": item["company_id"], "source_id": sid,
+                "company_display_name": item["company_display_name"], "job_title": item["job_title"],
+                "work_city": _text(item.get("work_city")), "work_country": _text(item.get("work_country")),
+                "work_mode": _text(item.get("work_mode")),
+                "is_remote": item.get("is_remote") if isinstance(item.get("is_remote"), bool) else None,
+                "employment_type": _text(item.get("employment_type")),
+                "primary_recruitment_type": item.get("primary_recruitment_type")
+                    if item.get("primary_recruitment_type") in ALLOWED_TYPES - {""} else "UNKNOWN",
+                "education_min": None, "salary_display": "未公开", "job_status": "UNKNOWN",
+                "public_visibility_status": "STAGING_ONLY", "application_access_status": "NOT_OBSERVED",
+                "first_seen_at": _text(item.get("first_seen_at")),
+                "last_verified_at": _text(item.get("last_verified_at")) or manifest["observed_at"],
+                "status_checked_at": _text(item.get("last_verified_at")) or manifest["observed_at"],
+                "published_at": _text(item.get("published_at")), "source_platform": platform.upper(),
+                "official_detail_url": detail, "official_list_url": None, "application_url": None,
+                "application_link_status": "OFFICIAL_DETAIL_ONLY", "current_application_verified": False,
+                "application_verified_at": None, "application_expires_at": None,
+                "record_kind": "ATS_STAGING_PREVIEW",
+                "marketplace_status": "STAGING_SOURCE_REVIEW_REQUIRED",
+                "source_review_status": "NOT_APPROVED_FOR_PUBLICATION",
+            })
+        sources.append({
+            "source_id": sid, "platform": platform.upper(),
+            "company": sorted(names)[0] if names else sid, "board_slug": slug,
+            "rows": len(lines), "observed_at": manifest["observed_at"],
+            "source_identity_and_rights_reviewed": False,
+        })
+    if not {"GREENHOUSE", "ASHBY", "LEVER"} <= {s["platform"] for s in sources}:
+        raise ValueError("need real rows from Greenhouse, Ashby and Lever; no mock fallback")
+    return rows, sources
 
 
-def to_job(platform: str, slug: str, company: str, source: dict,
-           observed: str) -> dict | None:
-    if not isinstance(source,dict):
-        raise ValueError("ATS job response contains non-object")
-    if platform=="ASHBY" and source.get("isListed") is False:
-        return None
-    if platform=="GREENHOUSE":
-        native=source.get("id")
-        title=as_text(source.get("title"))
-        location=as_text((source.get("location") or {}).get("name"))
-        detail=source.get("absolute_url")
-        published=as_text(source.get("first_published"))
-    elif platform=="ASHBY":
-        native=source.get("id") or source.get("jobUrl")
-        title=as_text(source.get("title"))
-        location=as_text(source.get("location"))
-        detail=source.get("jobUrl")
-        published=as_text(source.get("publishedAt"))
-    else:
-        native=source.get("id")
-        title=as_text(source.get("text"))
-        location=as_text((source.get("categories") or {}).get("location"))
-        detail=source.get("hostedUrl")
-        published=None
-    official=valid_detail(detail,platform,slug)
-    if not title or not official or not isinstance(native,(str,int)) or isinstance(native,bool):
-        raise ValueError("ATS posting lacks title, native ID or trusted original detail URL")
-    jid="ATS-"+sha256(f"{platform}\0{slug}\0{native}".encode()).hexdigest()[:24]
-    is_intern="intern" in title.casefold() or (
-        platform=="ASHBY" and "intern" in (as_text(source.get("employmentType")) or "").casefold()
+def _read_loopback_json(url: str):
+    parsed = urlsplit(url)
+    if (parsed.scheme != "http" or parsed.hostname not in {"127.0.0.1", "localhost", "::1"}
+            or parsed.username or parsed.password or parsed.query or parsed.fragment):
+        raise ValueError("domestic API must be a loopback HTTP origin")
+    with urlopen(Request(url, headers={"Accept": "application/json"}), timeout=5) as response:
+        if response.status != 200 or "json" not in response.headers.get("Content-Type", "").lower():
+            raise ValueError("domestic API did not return JSON")
+        data = json.load(response)
+    return data
+
+
+def load_domestic_api(api_origin: str | None):
+    """Optionally consume only public-eligible rows from the running real engine."""
+    if not api_origin:
+        return []
+    origin = api_origin.rstrip("/")
+    first = _read_loopback_json(origin + "/api/v1/marketplace?limit=24&offset=0")
+    total = first.get("total")
+    if not isinstance(total, int) or total < 0 or not isinstance(first.get("items"), list):
+        raise ValueError("invalid domestic marketplace response")
+    rows = list(first["items"])
+    for offset in range(24, total, 24):
+        page = _read_loopback_json(origin + f"/api/v1/marketplace?limit=24&offset={offset}")
+        if not isinstance(page.get("items"), list):
+            raise ValueError("invalid domestic marketplace page")
+        rows.extend(page["items"])
+    if len(rows) != total:
+        raise ValueError("domestic market pagination mismatch")
+    return rows
+
+
+def _matches(row, q, city, company, kind):
+    if kind and row.get("primary_recruitment_type") != kind:
+        return False
+    if city and city not in str(row.get("work_city") or "").casefold():
+        return False
+    if company and company not in str(row.get("company_display_name") or "").casefold():
+        return False
+    searchable = " ".join(str(row.get(k) or "") for k in (
+        "job_title", "company_display_name", "work_city", "work_country",
+    )).casefold()
+    return all(term in searchable for term in q.split())
+
+
+def _project(row):
+    keys = (
+        "job_id", "company_id", "source_id", "company_display_name", "job_title",
+        "work_city", "work_country", "work_mode", "is_remote", "employment_type",
+        "primary_recruitment_type", "education_min", "salary_display", "job_status",
+        "public_visibility_status", "application_access_status", "first_seen_at",
+        "last_verified_at", "status_checked_at", "published_at", "source_platform",
+        "official_detail_url", "official_list_url", "application_url",
+        "application_link_status", "current_application_verified",
+        "application_verified_at", "application_expires_at", "record_kind",
+        "marketplace_status", "source_review_status",
     )
-    return {
-        "job_id":jid, "record_kind":"HISTORICAL_MASTER",
-        "job_title":title,
-        "company_display_name":company,
-        "source_id":f"ATS-{platform}-{slug.upper()}",
-        "source_platform":platform,
-        "work_city":location,
-        "education_min":None,
-        "primary_recruitment_type":"INTERNSHIP" if is_intern else "UNKNOWN",
-        "last_verified_at":observed,
-        "published_at":published,
-        "salary_display":"未公开",
-        "marketplace_status":"OFFICIAL_HISTORICAL_UNCONFIRMED",
-        "job_status":"UNKNOWN",
-        "official_detail_url":official,
-        "official_list_url":None,
-        "application_url":None,
-        "application_link_status":"OFFICIAL_DETAIL_ONLY",
-        "current_application_verified":False,
-        "application_access_status":"NOT_OBSERVED",
-        "application_verified_at":None,
-        "application_expires_at":None,
-    }
+    return {key: row.get(key) for key in keys}
 
 
-def read_genuine_public_ats() -> tuple[list[dict],list[dict]]:
-    """Read minimal factual fields only, dropping JD/full native data in memory."""
-    observations=[]
-    source_jobs={}
-    observed=datetime.now(timezone.utc).isoformat()
-    for platform,slug,company,url in BOARDS:
-        try:
-            response=get_json(url)
-            if platform=="LEVER":
-                if not isinstance(response,list) or len(response)>100:
-                    raise ValueError("Lever schema/page bound mismatch")
-                native_jobs=response
-            elif isinstance(response,dict) and isinstance(response.get("jobs"),list):
-                native_jobs=response["jobs"]
-                if platform=="GREENHOUSE" and isinstance((response.get("meta") or {}).get("total"),int):
-                    if response["meta"]["total"]!=len(native_jobs):
-                        raise ValueError("Greenhouse total mismatch")
-            else:
-                raise ValueError("ATS board JSON schema mismatch")
-            # Do not claim the whole board was crawled; we intentionally cap to
-            # 100 per board and Lever first page.  This is an interface pilot.
-            minimal=[to_job(platform,slug,company,row,observed)
-                     for row in native_jobs[:MAX_PER_BOARD]]
-            minimal=[j for j in minimal if j is not None]
-            if len({j["job_id"] for j in minimal})!=len(minimal):
-                raise ValueError("duplicate native ATS job ID")
-            source_jobs[(platform,slug)]=minimal
-            observations.append({
-                "platform":platform,"board":slug,"company":company,
-                "response_rows":len(native_jobs),"staging_preview_rows":len(minimal),
-                "complete_board_synced":False,
-                "status":"READ_PUBLIC_JSON_AT_TEST_TIME",
-            })
-        except (ValueError,HTTPError,URLError,TimeoutError,UnicodeError,OSError) as exc:
-            observations.append({
-                "platform":platform,"board":slug,"company":company,
-                "status":"SOURCE_UNAVAILABLE_NOT_SIMULATED",
-                "error_type":type(exc).__name__,
-            })
-    for platform in ("GREENHOUSE","ASHBY","LEVER"):
-        if not any(platform==p and rows for (p,_),rows in source_jobs.items()):
-            raise RuntimeError(f"No genuine {platform} source available; refuse mock fallback")
-    # Round robin to expose source diversity in the first screen without
-    # creating any roles not actually observed from public official APIs.
-    output=[]
-    groups=list(source_jobs.values())
-    for i in range(MAX_PER_BOARD):
-        for rows in groups:
-            if i<len(rows):
-                output.append(rows[i])
-    return output,observations
-
-
-def filter_market(jobs: list[dict], params: dict[str,list[str]], *,
-                  limit_default: int) -> dict:
-    allowed={"recruitment_type","q","city","company","limit","offset"}
-    if set(params)-allowed or any(len(x)!=1 for x in params.values()):
-        raise ValueError("invalid or repeated filter")
-    get=lambda name,default="": params.get(name,[default])[0]
-    q,city,company=[get(k).strip().casefold() for k in ("q","city","company")]
-    if any(len(s)>MAX_QUERY for s in (q,city,company)):
-        raise ValueError("query too long")
-    kind=get("recruitment_type")
-    if kind not in {"","SOCIAL","CAMPUS","INTERNSHIP","UNKNOWN"}:
-        raise ValueError("invalid recruitment type")
-    limit,offset=int(get("limit",str(limit_default))),int(get("offset","0"))
-    if not (1<=limit<=24 and 0<=offset<=1000000):
-        raise ValueError("invalid result window")
-    terms=q.split()
-    matched=[j for j in jobs if
-             (not kind or j["primary_recruitment_type"]==kind)
-             and (not city or city in (j.get("work_city") or "").casefold())
-             and (not company or company in j["company_display_name"].casefold())
-             and (not terms or all(term in (
-                 j["job_title"]+" "+j["company_display_name"]+" "+(j["work_city"] or "")
-             ).casefold() for term in terms))]
-    return {
-        "data_mode":"official_source_historical_not_live",
-        "all_current_application_statuses_unverified":True,
-        "total":len(matched),
-        "limit":limit,"offset":offset,"items":matched[offset:offset+limit],
-        "disclaimer":"Actual public ATS JSON seen at test time, not live application verification. No JD publication permission asserted.",
-    }
-
-
-def serve(jobs: list[dict],host: str,port: int):
-    lookup={j["job_id"]:j for j in jobs}
+def create_handler(rows, stats):
+    by_id = {row["job_id"]: row for row in rows}
     class Handler(BaseHTTPRequestHandler):
-        protocol_version="HTTP/1.1"
-        def do_GET(self):
-            parsed=urlsplit(self.path)
-            if self.client_address[0] not in {"127.0.0.1","::1"}:
-                return self.reply(403,{"error":"loopback only"})
-            try:
-                if parsed.path in {"/api/v1/marketplace","/api/v1/jobs"}:
-                    result=filter_market(jobs,parse_qs(parsed.query,keep_blank_values=True),
-                                         limit_default=8 if parsed.path.endswith("marketplace") else 12)
-                elif parsed.path.startswith("/api/v1/jobs/"):
-                    jid=parsed.path.rsplit("/",1)[-1]
-                    if not ID_RE.fullmatch(jid) or jid not in lookup:
-                        return self.reply(404,{"error":"not found"})
-                    result=lookup[jid]
-                elif parsed.path=="/api/v1/stats":
-                    result={"total_jobs":len(jobs),"currently_verified_open":0,
-                            "mode":"Genuine public ATS staging preview, no current apply verification"}
-                else:
-                    return self.reply(404,{"error":"not found"})
-                return self.reply(200,result)
-            except (ValueError,OverflowError):
-                return self.reply(400,{"error":"invalid query"})
-        def reply(self,status,data):
-            raw=json.dumps(data,ensure_ascii=False).encode()
+        def _json(self, status, payload):
+            raw = json.dumps(payload, ensure_ascii=False).encode("utf-8")
             self.send_response(status)
-            self.send_header("Content-Type","application/json; charset=utf-8")
-            self.send_header("Cache-Control","no-store")
-            self.send_header("Content-Length",str(len(raw)))
-            self.send_header("X-Content-Type-Options","nosniff")
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("X-Frame-Options", "DENY")
+            self.send_header("Referrer-Policy", "no-referrer")
+            self.send_header("Content-Length", str(len(raw)))
             self.end_headers()
             self.wfile.write(raw)
-        def log_message(self,*_):
+        def do_GET(self):
+            try:
+                if not ipaddress.ip_address(self.client_address[0]).is_loopback:
+                    return self._json(403, {"error": "loopback only"})
+            except ValueError:
+                return self._json(403, {"error": "loopback only"})
+            parsed = urlsplit(self.path)
+            try:
+                if parsed.path == "/api/v1/stats":
+                    return self._json(200, {
+                        **stats, "mode": "INTERNAL_STAGING_ONLY",
+                        "currently_verified_open": 0,
+                        "disclaimer": "Local preview only; ATS source identity and metadata rights review incomplete.",
+                    })
+                if parsed.path.startswith("/api/v1/jobs/"):
+                    jid = unquote(parsed.path.rsplit("/", 1)[-1])
+                    if not ID_RE.fullmatch(jid) or jid not in by_id:
+                        return self._json(404, {"error": "not found"})
+                    return self._json(200, _project(by_id[jid]))
+                if parsed.path not in {"/api/v1/marketplace", "/api/v1/jobs"}:
+                    return self._json(404, {"error": "not found"})
+                params = parse_qs(parsed.query, keep_blank_values=True, max_num_fields=8)
+                allowed = {"q", "city", "company", "recruitment_type", "limit", "offset"}
+                if set(params) - allowed or any(len(v) != 1 for v in params.values()):
+                    raise ValueError("unknown or duplicate filter")
+                get = lambda key, default="": params.get(key, [default])[0]
+                q, city, company = (get(key).strip().casefold() for key in ("q", "city", "company"))
+                if any(len(x) > 120 for x in (q, city, company)):
+                    raise ValueError("filter too long")
+                kind = get("recruitment_type")
+                if kind not in ALLOWED_TYPES:
+                    raise ValueError("invalid recruitment type")
+                default_limit = 8 if parsed.path.endswith("marketplace") else 12
+                limit, offset = int(get("limit", str(default_limit))), int(get("offset", "0"))
+                max_limit = 24 if parsed.path.endswith("marketplace") else 100
+                if not 1 <= limit <= max_limit or not 0 <= offset <= 1_000_000:
+                    raise ValueError("invalid result window")
+                matched = [row for row in rows if _matches(row, q, city, company, kind)]
+                items = [_project(row) for row in matched[offset:offset + limit]]
+                result = {"total": len(matched), "limit": limit, "offset": offset,
+                          "items": items,
+                          "disclaimer": "Internal staging only. Unreviewed ATS metadata must not be publicly published."}
+                if parsed.path == "/api/v1/marketplace":
+                    result.update({
+                        "data_mode": "official_source_staging_only",
+                        "all_current_application_statuses_unverified": not any(
+                            row.get("current_application_verified") is True for row in matched),
+                        "staging_notice": "内部验收预览：ATS 来源归属与元数据发布权限尚未人工审核；所有投递状态均未核验。禁止作为公网正式数据发布。",
+                    })
+                return self._json(200, result)
+            except (ValueError, OverflowError):
+                return self._json(400, {"error": "invalid query"})
+        def do_POST(self):
+            return self._json(405, {"error": "read-only service"})
+        def log_message(self, *_):
             pass
-    with ThreadingHTTPServer((host,port),Handler) as server:
-        print("Genuine ATS preview listening on loopback; real records:",len(jobs),flush=True)
-        server.serve_forever()
+    return Handler
 
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--host",default="127.0.0.1")
-    p.add_argument("--port",type=int,default=8765)
-    p.add_argument("--check-only",action="store_true")
-    args=p.parse_args()
-    if args.host!="127.0.0.1" or not 1<=args.port<=65535:
-        p.error("loopback only")
-    jobs,report=read_genuine_public_ats()
-    print("REAL_ATS_OBSERVED_SUMMARY",json.dumps({
-        "real_metadata_rows":len(jobs),"sources":report,
-        "synthetic_job_count":0,"current_apply_verified":0,
-        "full_jd_republished":False,
-        "approved_for_public_production":False,
-    },ensure_ascii=False),flush=True)
-    if not args.check_only:
-        serve(jobs,args.host,args.port)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--stage-dir", type=Path, required=True)
+    parser.add_argument("--domestic-api", help="optional existing engine loopback origin, e.g. http://127.0.0.1:8766")
+    parser.add_argument("--host", default="127.0.0.1")
+    parser.add_argument("--port", type=int, default=8765)
+    args = parser.parse_args()
+    try:
+        bind_ip = ipaddress.ip_address(args.host)
+    except ValueError:
+        parser.error("host must be an explicit loopback IP")
+    if not bind_ip.is_loopback or not 1 <= args.port <= 65535:
+        parser.error("preview server can only bind to a loopback IP and valid port")
+    ats, sources = load_staged_ats(args.stage_dir)
+    domestic = load_domestic_api(args.domestic_api)
+    combined = []
+    seen = set()
+    for row in domestic + ats:
+        jid = row.get("job_id")
+        if not isinstance(jid, str) or jid in seen:
+            continue
+        seen.add(jid)
+        combined.append(row)
+    combined.sort(key=lambda row: (str(row.get("last_verified_at") or ""), str(row.get("job_id") or "")), reverse=True)
+    stats = {
+        "domestic_public_rows": len([row for row in combined if row.get("record_kind") != "ATS_STAGING_PREVIEW"]),
+        "ats_staging_rows": len([row for row in combined if row.get("record_kind") == "ATS_STAGING_PREVIEW"]),
+        "total_rows": len(combined), "sources": sources,
+    }
+    print("HHBA_INTERNAL_STAGING_PREVIEW", json.dumps(stats, ensure_ascii=False), flush=True)
+    with ThreadingHTTPServer((args.host, args.port), create_handler(combined, stats)) as server:
+        server.serve_forever()
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
