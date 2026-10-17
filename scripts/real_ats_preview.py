@@ -296,15 +296,34 @@ def main():
         parser.error("preview server can only bind to a loopback IP and valid port")
     ats, sources = load_staged_ats(args.stage_dir)
     domestic = load_domestic_api(args.domestic_api)
+    # Internal preview only: round-robin ATS boards so the first viewport
+    # demonstrates the actual source diversity instead of being dominated by
+    # whichever board happened to finish last. Production ordering remains the
+    # upstream JobSearchIndex ordering.
+    groups = {}
+    for row in ats:
+        groups.setdefault(row["source_id"], []).append(row)
+    ats_mixed = []
+    max_group = max((len(group) for group in groups.values()), default=0)
+    for i in range(max_group):
+        for group in groups.values():
+            if i < len(group):
+                ats_mixed.append(group[i])
     combined = []
     seen = set()
-    for row in domestic + ats:
-        jid = row.get("job_id")
-        if not isinstance(jid, str) or jid in seen:
-            continue
-        seen.add(jid)
-        combined.append(row)
-    combined.sort(key=lambda row: (str(row.get("last_verified_at") or ""), str(row.get("job_id") or "")), reverse=True)
+    di = ai = 0
+    while di < len(domestic) or ai < len(ats_mixed):
+        batch = []
+        if di < len(domestic):
+            batch.append(domestic[di]); di += 1
+        if ai < len(ats_mixed):
+            batch.append(ats_mixed[ai]); ai += 1
+        for row in batch:
+            jid = row.get("job_id")
+            if not isinstance(jid, str) or jid in seen:
+                continue
+            seen.add(jid)
+            combined.append(row)
     stats = {
         "domestic_public_rows": len([row for row in combined if row.get("record_kind") != "ATS_STAGING_PREVIEW"]),
         "ats_staging_rows": len([row for row in combined if row.get("record_kind") == "ATS_STAGING_PREVIEW"]),
