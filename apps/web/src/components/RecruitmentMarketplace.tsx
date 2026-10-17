@@ -55,6 +55,7 @@ function MarketCard({job}: {job: MarketJob}) {
   const official = safeOfficial(job.official_detail_url);
   const listOnly = job.record_kind === 'OFFICIAL_LIST_OBSERVED';
   const stagingOnly = job.record_kind === 'ATS_STAGING_PREVIEW';
+  const officialATS = job.record_kind === 'ATS_OFFICIAL_METADATA';
   const listUrl = listOnly ? safeOfficial(job.official_list_url) : null;
   const application = job.current_application_verified === true
     && job.application_link_status === 'VERIFIED_DIRECT'
@@ -62,6 +63,7 @@ function MarketCard({job}: {job: MarketJob}) {
   return <article className="market-card">
     <div className="market-card-top"><span className="market-company"><Building2 size={15}/>{readable(job.company_display_name, '企业名称未披露')}</span><span className="market-source">官方来源 · {readable(job.source_platform, '平台未标注')}</span></div>
     <h3>{application ? <a href={application} target="_blank" rel="noopener noreferrer" aria-label={'直达'+readable(job.job_title)+'官方岗位投递入口'}>{readable(job.job_title, '职位未命名')} ↗</a>
+      : officialATS && official ? <a href={official} target="_blank" rel="noopener noreferrer" aria-label={'查看'+readable(job.job_title)+'企业官方职位详情'}>{readable(job.job_title, '职位未命名')} ↗</a>
       : href ? <Link to={href}>{readable(job.job_title, '职位未命名')}</Link> : readable(job.job_title, '职位未命名')}</h3>
     <div className="market-meta">
       <span className="market-type">{tags[job.primary_recruitment_type || ''] || '类型未分类'}</span>
@@ -69,14 +71,14 @@ function MarketCard({job}: {job: MarketJob}) {
       <span>学历 {readable(job.education_min)}</span>
       <span>薪资 {readable(job.salary_display)}</span>
     </div>
-    <div className="market-card-proof"><ShieldCheck size={14}/><span>{stagingOnly ? '内部验收数据 · 来源归属与发布权限待审核' : application ? '岗位申请入口已近期核验 · 请以官网为准' : listOnly ? '官方真实岗位列表已采集 · 详情及投递待核实' : '真实官方历史记录 · 当前投递待核实'}</span></div>
+    <div className="market-card-proof"><ShieldCheck size={14}/><span>{stagingOnly ? '内部验收数据 · 来源归属与发布权限待审核' : officialATS ? '招聘板来源已审核 · 最近完整快照已同步 · 具体申请状态以官网为准' : application ? '岗位申请入口已近期核验 · 请以官网为准' : listOnly ? '官方真实岗位列表已采集 · 详情及投递待核实' : '真实官方历史记录 · 当前投递待核实'}</span></div>
     <div className="market-card-foot"><div><span>最近来源核验 {published(job.last_verified_at)}</span><span>发布时间 {published(job.published_at)}</span></div>
       <div className="market-card-links">{href && <Link to={href}>查看记录 <ArrowRight size={14}/></Link>}
         {application
           ? <a className="market-verified-apply" href={application} target="_blank" rel="noopener noreferrer">去官方投递 ↗</a>
           : listOnly && listUrl
             ? <a href={listUrl} target="_blank" rel="noopener noreferrer">查看企业招聘频道 · 非岗位直达 ↗</a>
-            : official && <a href={official} target="_blank" rel="noopener noreferrer">官网核对 · 投递未确认 ↗</a>}</div></div>
+            : official && <a href={official} target="_blank" rel="noopener noreferrer">{officialATS ? '企业官方岗位详情 · 查看要求 ↗' : '官网核对 · 投递未确认 ↗'}</a>}</div></div>
   </article>;
 }
 export function RecruitmentMarketplace() {
@@ -108,6 +110,10 @@ export function RecruitmentMarketplace() {
         || !Array.isArray(result.items)
         || result.items.some(job=>
           !((job.record_kind==='HISTORICAL_MASTER' && job.marketplace_status==='OFFICIAL_HISTORICAL_UNCONFIRMED') ||
+            (job.record_kind==='ATS_OFFICIAL_METADATA' &&
+              job.marketplace_status==='ATS_METADATA_SOURCE_REVIEWED' &&
+              job.current_application_verified===false && !job.application_url &&
+              !!safeOfficial(job.official_detail_url)) ||
             (job.record_kind==='OFFICIAL_LIST_OBSERVED' && job.marketplace_status==='OFFICIAL_LIST_UNCONFIRMED') ||
             (stagingMode && localPreviewHost && job.record_kind==='ATS_STAGING_PREVIEW' &&
               job.marketplace_status==='STAGING_SOURCE_REVIEW_REQUIRED' &&
