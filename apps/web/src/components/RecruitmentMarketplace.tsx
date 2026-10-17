@@ -135,8 +135,8 @@ export function RecruitmentMarketplace() {
   return <section className="home-marketplace" aria-labelledby="marketplace-title" id="recruitment-marketplace">
     <div className="market-head">
       <div><div className="market-eyebrow"><span className="market-eyebrow-line"/> OFFICIAL RECRUITMENT RECORDS</div>
-        <h2 id="marketplace-title">招聘市场</h2>
-        <p>真实企业官方招聘信息，校招、社招、实习独立分类。所有岗位都标注来源，当前投递状态未核实的不冒充在招。</p>
+        <h2 id="marketplace-title">统一招聘市场</h2>
+        <p>国内外企业官方岗位统一展示，不拆分中国与全球岗位库。你可以搜索岗位、企业和城市，也可以按校招、社招或实习筛选；投递状态未核实的岗位不会冒充正在招聘。</p>
       </div>
       <Link to="/candidate/jobs" className="market-more">进入完整岗位搜索 <ArrowRight size={16}/></Link>
     </div>
