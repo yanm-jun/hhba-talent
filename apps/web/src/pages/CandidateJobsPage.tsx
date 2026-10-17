@@ -61,11 +61,11 @@ function Position({job}:{job:Job}) {
    ? officialLink(job.official_detail_url):null;
  return <article className="hhba-position-card">
    <span className="hhba-position-company">{label(job.company_display_name,'企业名称待确认')}</span>
-   <h3>{direct?<a href={direct} target="_blank" rel="noopener noreferrer">{label(job.job_title,'未命名历史岗位')} ↗</a>:officialATS?<a href={officialATS} target="_blank" rel="noopener noreferrer">{label(job.job_title,'未命名历史岗位')} ↗</a>:valid?<Link to={'/candidate/jobs/'+encodeURIComponent(job.job_id)}>{label(job.job_title,'未命名历史岗位')}</Link>:label(job.job_title,'未命名历史岗位')}</h3>
+   <h3>{job.record_kind==='ATS_OFFICIAL_METADATA'&&valid?<Link to={'/candidate/jobs/'+encodeURIComponent(job.job_id)}>{label(job.job_title,'未命名历史岗位')}</Link>:direct?<a href={direct} target="_blank" rel="noopener noreferrer">{label(job.job_title,'未命名历史岗位')} ↗</a>:valid?<Link to={'/candidate/jobs/'+encodeURIComponent(job.job_id)}>{label(job.job_title,'未命名历史岗位')}</Link>:label(job.job_title,'未命名历史岗位')}</h3>
    <div className="hhba-position-tags"><span>{names[job.primary_recruitment_type||'']||'待分类'}</span><span>{label(job.work_city,'地点未披露')}</span><span>{job.record_kind==='ATS_STAGING_PREVIEW'?'内部验收预览 · 来源待审核':job.record_kind==='ATS_OFFICIAL_METADATA'?'官方招聘板已同步 · 申请状态请核实':job.record_kind==='OFFICIAL_LIST_OBSERVED'?'官网列表已采集 · 投递待核实':states[job.job_status||'']||'历史状态未知'}</span></div>
    <div className="hhba-position-footer"><small>历史核验：{day(job.status_checked_at||job.last_verified_at)}</small><span className="hhba-position-actions">
      {valid&&<Link to={'/candidate/jobs/'+encodeURIComponent(job.job_id)}>查看详情 <ArrowRight size={14}/></Link>}
-     {officialATS && <a href={officialATS} target="_blank" rel="noopener noreferrer">企业官网查看 JD / 申请 ↗</a>}
+     {officialATS && valid && <Link to={'/candidate/jobs/'+encodeURIComponent(job.job_id)}>站内查看完整职位描述 <ArrowRight size={14}/></Link>}
      {direct && <a href={direct} target="_blank" rel="noopener noreferrer">去官方投递 ↗</a>}
    </span></div>
  </article>;
@@ -198,7 +198,7 @@ export function CandidateJobDetailPage({user,jobId}:{user:User|null;jobId:string
    readJSON<Job>(API+'/jobs/'+encodeURIComponent(jobId),ctrl.signal).then(result=>{
      const stagingPreview=result.record_kind==='ATS_STAGING_PREVIEW';
      if(result.job_id!==jobId||
-        (!['HISTORICAL_MASTER','OFFICIAL_LIST_OBSERVED'].includes(result.record_kind||'') &&
+        (!['HISTORICAL_MASTER','OFFICIAL_LIST_OBSERVED','ATS_OFFICIAL_METADATA'].includes(result.record_kind||'') &&
           !(stagingPreview && localPreviewHost() &&
             result.marketplace_status==='STAGING_SOURCE_REVIEW_REQUIRED' &&
             result.source_review_status==='NOT_APPROVED_FOR_PUBLICATION' &&
@@ -219,7 +219,7 @@ export function CandidateJobDetailPage({user,jobId}:{user:User|null;jobId:string
  return <Shell user={user}><section className="hhba-jobs-page"><Trail detail/>
    {loading?<div className="hhba-jobs-empty" role="status">正在读取历史职位详情…</div>:
    error||!job?<div className="hhba-jobs-empty" role="alert">无法获取这条历史职位。<p><Link to="/candidate/jobs">返回岗位搜索</Link></p></div>:
-   <><header className="hhba-jobs-hero"><span className="page-kicker">{job.record_kind==='ATS_STAGING_PREVIEW'?'INTERNAL STAGING · 内部验收预览':job.record_kind==='OFFICIAL_LIST_OBSERVED'?'OFFICIAL LIST · 官方岗位列表采集':'HISTORICAL RECORD · 历史记录'}</span><h1>{label(job.job_title,'岗位未命名')}</h1><p>{label(job.company_display_name,'企业未披露')} · {label(job.work_city,'城市未披露')}</p>{job.record_kind==='ATS_STAGING_PREVIEW'&&<p className="hhba-detail-note" role="alert">仅供内部验收：该 ATS 来源的企业归属与元数据公开使用权限尚未人工审核。岗位并非已核验可投递，不得将此预览直接作为公网正式内容。</p>}<div className="hhba-position-tags"><span>{names[job.primary_recruitment_type||'']||'类型待确认'}</span><span>{states[job.job_status||'']||'历史状态待确认'}</span></div>
+   <><header className="hhba-jobs-hero"><span className="page-kicker">{job.record_kind==='ATS_STAGING_PREVIEW'?'INTERNAL STAGING · 内部验收预览':job.record_kind==='ATS_OFFICIAL_METADATA'?'OFFICIAL ATS · 官方招聘板已核对':job.record_kind==='OFFICIAL_LIST_OBSERVED'?'OFFICIAL LIST · 官方岗位列表采集':'HISTORICAL RECORD · 历史记录'}</span><h1>{label(job.job_title,'岗位未命名')}</h1><p>{label(job.company_display_name,'企业未披露')} · {label(job.work_city,'城市未披露')}</p>{job.record_kind==='ATS_STAGING_PREVIEW'&&<p className="hhba-detail-note" role="alert">仅供内部验收：该 ATS 来源的企业归属与元数据公开使用权限尚未人工审核。岗位并非已核验可投递，不得将此预览直接作为公网正式内容。</p>}<div className="hhba-position-tags"><span>{names[job.primary_recruitment_type||'']||'类型待确认'}</span><span>{states[job.job_status||'']||'历史状态待确认'}</span></div>
      {direct ? <a className="primary-button hhba-official" href={direct} target="_blank" rel="noopener noreferrer">去官方投递 · 已核验入口 <ArrowRight size={16}/></a>
        : link ? <a className="primary-button hhba-official" href={link} target="_blank" rel="noopener noreferrer">{job.record_kind==='ATS_STAGING_PREVIEW'?'打开 ATS 原始岗位页面核对 · 非投递确认':'前往企业官网核对 · 投递未确认'} <ArrowRight size={16}/></a>
        : listLink ? <a className="primary-button hhba-official" href={listLink} target="_blank" rel="noopener noreferrer">查看企业招聘频道 · 不是该岗位投递地址 <ArrowRight size={16}/></a>
