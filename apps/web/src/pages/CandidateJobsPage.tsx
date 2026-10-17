@@ -38,7 +38,7 @@ async function readJSON<T>(url: string, signal: AbortSignal): Promise<T> {
  return await r.json() as T;
 }
 function Trail({detail=false}:{detail?:boolean}) {
- return <nav className="hhba-job-trail" aria-label="应聘路径"><Link to="/">首页</Link><span>/</span><Link to="/candidate">我要应聘</Link><span>/</span>{detail?<Link to="/candidate/jobs">招聘岗位</Link>:<strong>招聘岗位</strong>}{detail&&<><span>/</span><strong>职位详情</strong></>}</nav>;
+ return <nav className="hhba-job-trail" aria-label="应聘路径"><Link to="/">首页</Link><span>/</span><Link to="/candidate">我要找工作</Link><span>/</span>{detail?<Link to="/candidate/jobs">招聘岗位</Link>:<strong>招聘岗位</strong>}{detail&&<><span>/</span><strong>职位详情</strong></>}</nav>;
 }
 function Position({job}:{job:Job}) {
  const valid=/^[A-Za-z0-9_-]{1,64}$/.test(job.job_id||'');
@@ -76,7 +76,7 @@ export function CandidateJobsPage({user}:{user:User|null}) {
  const total=response?.total||0;
  return <Shell user={user}><section className="hhba-jobs-page">
    <Trail/>
-   <header className="hhba-jobs-hero"><span className="page-kicker">HHBA · 我要应聘</span><h1>搜索企业官方招聘记录</h1><p>校园招聘、社会招聘、实习独立筛选。岗位状态是历史记录，并非实时可投递承诺。</p>
+   <header className="hhba-jobs-hero"><span className="page-kicker">HHBA · 统一招聘市场</span><h1>搜索国内外企业官方岗位</h1><p>国内外岗位统一搜索，不拆分中国与全球岗位库。校园招聘、社会招聘和实习可选筛选；岗位状态是历史记录，并非实时可投递承诺。</p>
    <form className="hhba-jobs-form" onSubmit={submit}>
      <label>岗位或企业关键词<input maxLength={120} value={q} onChange={e=>setQ(e.target.value)} placeholder="如：销售、运营、产品"/></label>
      <label>工作城市<input maxLength={120} value={city} onChange={e=>setCity(e.target.value)} placeholder="如：杭州"/></label>
@@ -92,7 +92,7 @@ export function CandidateJobsPage({user}:{user:User|null}) {
    !response?.items.length?<div className="hhba-jobs-empty">没有符合条件的岗位记录。</div>:
    <div className="hhba-position-grid">{response.items.map(job=><Position key={job.job_id} job={job}/>)}</div>}
    {!loading&&!error&&total>0&&<div className="hhba-jobs-pager"><button disabled={page===0} onClick={()=>setPage(Math.max(0,page-1))}>上一页</button><span>第 {page+1} / {Math.max(1,Math.ceil(total/size))} 页</span><button disabled={(page+1)*size>=total} onClick={()=>setPage(page+1)}>下一页</button></div>}
-   <p className="hhba-jobs-privacy">此搜索不会上传简历或自动向企业投递。<Link to="/candidate">返回应聘端</Link></p>
+   <p className="hhba-jobs-privacy">此搜索不会上传简历或自动向企业投递。<Link to="/">返回 HHBA 首页</Link></p>
  </section></Shell>;
 }
 export function CandidateJobDetailPage({user,jobId}:{user:User|null;jobId:string}) {
