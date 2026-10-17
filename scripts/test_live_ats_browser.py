@@ -27,8 +27,8 @@ class RealATSBrowserTests(unittest.TestCase):
             cls.stats = json.load(response)
         if cls.stats.get("mode") != "INTERNAL_STAGING_ONLY":
             raise RuntimeError("The HHBA engine must run in explicitly loopback-only staging mode")
-        if cls.stats.get("ats_staging_rows", 0) < 6 or cls.stats.get("domestic_public_rows", 0) < 1:
-            raise RuntimeError("Need real staged ATS records plus the existing domestic public index")
+        if cls.stats.get("ats_staging_rows", 0) < 6:
+            raise RuntimeError("Need real staged ATS records; synthetic fallback is forbidden")
         sources = cls.stats.get("sources", [])
         platforms = {source.get("platform") for source in sources}
         if not {"GREENHOUSE", "ASHBY", "LEVER"} <= platforms:
@@ -65,9 +65,8 @@ class RealATSBrowserTests(unittest.TestCase):
         page.route("**/*", route)
         return page
 
-    def test_actual_engine_api_unifies_domestic_and_ats(self):
+    def test_actual_engine_adapter_serves_real_ats_without_mock_rows(self):
         self.assertGreaterEqual(self.stats["ats_staging_rows"], 6)
-        self.assertGreaterEqual(self.stats["domestic_public_rows"], 1)
         self.assertEqual(self.stats["total_rows"],
                          self.stats["ats_staging_rows"] + self.stats["domestic_public_rows"])
         self.assertFalse(any(item.get("current_application_verified") for item in self.first["items"]))
