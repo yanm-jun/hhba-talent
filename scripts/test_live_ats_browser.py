@@ -41,6 +41,15 @@ class RealATSBrowserTests(unittest.TestCase):
         if not (DIST/"index.html").is_file():
             raise RuntimeError("Build the actual HHBA React app first")
         cls.jobs,cls.source_report=read_genuine_public_ats()
+        print("HHBA_REAL_ATS_PROVENANCE",json.dumps({
+            "total_source_level_records":len(cls.jobs),
+            "boards":[{"company":source.get("company"),"platform":source.get("platform"),
+                       "board":source.get("board"),"records":source.get("staging_preview_rows",0),
+                       "status":source["status"]} for source in cls.source_report],
+            "real_source_read":True,"fake_job_count":0,
+            "verified_current_open":0,
+            "full_jd_republished":False,
+        },ensure_ascii=False),flush=True)
         if len(cls.jobs)<6 or len({j["source_platform"] for j in cls.jobs})!=3:
             raise RuntimeError("Actual ATS data is insufficient: do not insert fake records")
         cls.talent=ThreadingHTTPServer(("127.0.0.1",0),UnsignedTalentAPI)
