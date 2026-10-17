@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from hashlib import sha256
-from http.server import ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
 import tempfile
@@ -117,7 +117,7 @@ class StagingPreviewContractTests(unittest.TestCase):
             "application_link_status": "OFFICIAL_DETAIL_ONLY",
             "current_application_verified": False,
         }
-        class DomesticHandler(__import__("http.server", fromlist=["BaseHTTPRequestHandler"]).BaseHTTPRequestHandler):
+        class DomesticHandler(BaseHTTPRequestHandler):
             def do_GET(self):
                 raw = json.dumps({"total": 1, "items": [domestic]}).encode()
                 self.send_response(200)
