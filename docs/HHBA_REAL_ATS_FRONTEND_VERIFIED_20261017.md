@@ -26,12 +26,12 @@
 
 在 hhba-talent 根目录运行：
 
-\`\`\`bash
-python vendor/hhba-recruitment-engine/scripts/stage_global_ats.py \\
-  --registry vendor/hhba-recruitment-engine/data/ats/global_boards_seed.json \\
-  --output-dir ../hhba-ats-stage-20261017 \\
+```bash
+python vendor/hhba-recruitment-engine/scripts/stage_global_ats.py \
+  --registry vendor/hhba-recruitment-engine/data/ats/global_boards_seed.json \
+  --output-dir ../hhba-ats-stage-20261017 \
   --execute-network --max-boards 6 --pause-seconds 1
-\`\`\`
+```
 
 必须使用全新、位于 Git 仓库外的输出目录。若任何来源失败，检查实际报告；不得手工补造职位，也不得将失败来源当作空职位列表。
 
@@ -39,9 +39,9 @@ python vendor/hhba-recruitment-engine/scripts/stage_global_ats.py \\
 
 若你本机已克隆并运行 hhba-recruitment-engine，先在引擎仓库运行其原有服务：
 
-\`\`\`bash
+```bash
 python scripts/serve_jobs_api.py --master data/jobs_master.jsonl --host 127.0.0.1 --port 8766
-\`\`\`
+```
 
 这会从现有国内主库提供其通过公开展示门禁的岗位记录。保持该终端运行。
 
@@ -49,12 +49,12 @@ python scripts/serve_jobs_api.py --master data/jobs_master.jsonl --host 127.0.0.
 
 回到 hhba-talent 根目录：
 
-\`\`\`bash
-python scripts/real_ats_preview.py \\
-  --stage-dir ../hhba-ats-stage-20261017 \\
-  --domestic-api http://127.0.0.1:8766 \\
+```bash
+python scripts/real_ats_preview.py \
+  --stage-dir ../hhba-ats-stage-20261017 \
+  --domestic-api http://127.0.0.1:8766 \
   --host 127.0.0.1 --port 8765
-\`\`\`
+```
 
 若尚未运行国内引擎，可省略 --domestic-api；预览只显示真实 ATS 来源岗位，不会拿虚构国内岗位填充。
 
@@ -62,11 +62,11 @@ python scripts/real_ats_preview.py \\
 
 另开终端：
 
-\`\`\`bash
+```bash
 cd apps/web
 npm ci
 npm run dev
-\`\`\`
+```
 
 打开 http://127.0.0.1:3000。Vite 将 /recruitment/api/ 代理至 127.0.0.1:8765，桌面端、手机端、岗位搜索与详情共用同一市场。
 
