@@ -25,10 +25,12 @@ type MarketJob = {
   marketplace_status: string;
   current_application_verified: boolean;
   record_kind: string;
+  source_review_status?: string | null;
 };
 type MarketResponse = {
   data_mode: string;
   all_current_application_statuses_unverified: boolean;
+  staging_notice?: string;
   total: number;
   items: MarketJob[];
 };
@@ -51,6 +53,7 @@ function MarketCard({job}: {job: MarketJob}) {
   const href = validId(job.job_id) ? '/candidate/jobs/' + encodeURIComponent(job.job_id) : null;
   const official = safeOfficial(job.official_detail_url);
   const listOnly = job.record_kind === 'OFFICIAL_LIST_OBSERVED';
+  const stagingOnly = job.record_kind === 'ATS_STAGING_PREVIEW';
   const listUrl = listOnly ? safeOfficial(job.official_list_url) : null;
   const application = job.current_application_verified === true
     && job.application_link_status === 'VERIFIED_DIRECT'
@@ -65,7 +68,7 @@ function MarketCard({job}: {job: MarketJob}) {
       <span>学历 {readable(job.education_min)}</span>
       <span>薪资 {readable(job.salary_display)}</span>
     </div>
-    <div className="market-card-proof"><ShieldCheck size={14}/><span>{application ? '岗位申请入口已近期核验 · 请以官网为准' : listOnly ? '官方真实岗位列表已采集 · 详情及投递待核实' : '真实官方历史记录 · 当前投递待核实'}</span></div>
+    <div className="market-card-proof"><ShieldCheck size={14}/><span>{stagingOnly ? '内部验收数据 · 来源归属与发布权限待审核' : application ? '岗位申请入口已近期核验 · 请以官网为准' : listOnly ? '官方真实岗位列表已采集 · 详情及投递待核实' : '真实官方历史记录 · 当前投递待核实'}</span></div>
     <div className="market-card-foot"><div><span>最近来源核验 {published(job.last_verified_at)}</span><span>发布时间 {published(job.published_at)}</span></div>
       <div className="market-card-links">{href && <Link to={href}>查看记录 <ArrowRight size={14}/></Link>}
         {application
@@ -100,13 +103,21 @@ export function RecruitmentMarketplace() {
       return await response.json() as MarketResponse;
     }).then(result=>{
       if(controller.signal.aborted)return;
-      if(result.data_mode !== 'official_source_historical_not_live'
+      const stagingMode = result.data_mode === 'official_source_staging_only';
+      const localPreviewHost = typeof window !== 'undefined' &&
+        ['localhost','127.0.0.1','::1','[::1]'].includes(window.location.hostname);
+      if((result.data_mode !== 'official_source_historical_not_live' && !(stagingMode && localPreviewHost))
         || typeof result.all_current_application_statuses_unverified !== 'boolean'
         || !Number.isInteger(result.total) || result.total < 0
         || !Array.isArray(result.items)
         || result.items.some(job=>
           !((job.record_kind==='HISTORICAL_MASTER' && job.marketplace_status==='OFFICIAL_HISTORICAL_UNCONFIRMED') ||
-            (job.record_kind==='OFFICIAL_LIST_OBSERVED' && job.marketplace_status==='OFFICIAL_LIST_UNCONFIRMED'))
+            (job.record_kind==='OFFICIAL_LIST_OBSERVED' && job.marketplace_status==='OFFICIAL_LIST_UNCONFIRMED') ||
+            (stagingMode && localPreviewHost && job.record_kind==='ATS_STAGING_PREVIEW' &&
+              job.marketplace_status==='STAGING_SOURCE_REVIEW_REQUIRED' &&
+              job.source_review_status==='NOT_APPROVED_FOR_PUBLICATION' &&
+              job.current_application_verified===false && !job.application_url &&
+              !!safeOfficial(job.official_detail_url))
           || typeof job.current_application_verified !== 'boolean'
           || (job.current_application_verified === true &&
               (job.application_link_status !== 'VERIFIED_DIRECT' || !safeOfficial(job.application_url)))
@@ -140,6 +151,7 @@ export function RecruitmentMarketplace() {
       </div>
       <Link to="/candidate/jobs" className="market-more">进入完整岗位搜索 <ArrowRight size={16}/></Link>
     </div>
+    {data?.data_mode === 'official_source_staging_only' && <div className="market-staging-notice" role="alert"><ShieldCheck size={18}/><span>{data.staging_notice || '内部验收预览：ATS 来源与发布权限尚未人工审核，禁止作为公网正式数据发布。'}</span></div>}
     <form className="market-search" onSubmit={submit} aria-label="搜索真实招聘记录">
       <label htmlFor="market-q">岗位或企业</label>
       <div className="market-input"><Search size={17}/><input id="market-q" maxLength={120} value={query} onChange={event=>setQuery(event.target.value)} placeholder="搜索岗位或企业名称"/></div>
@@ -149,7 +161,7 @@ export function RecruitmentMarketplace() {
     </form>
     <div className="market-channels" role="group" aria-label="招聘市场分类">
       {channels.map(([key,value])=><button key={key} type="button" aria-pressed={type===key} className={type===key?'active':''} onClick={()=>setType(key)}>{value}</button>)}
-      <span className="market-total">{!loading&&!error&&data ? data.total+' 条真实官方列表与历史记录' : '来源实时读取'}</span>
+      <span className="market-total">{!loading&&!error&&data ? data.total+(data.data_mode === 'official_source_staging_only' ? ' 条统一市场记录（含内部 ATS 预览）' : ' 条真实官方列表与历史记录') : '来源实时读取'}</span>
     </div>
     <div className="market-caution"><ShieldCheck size={18}/><span>这里包括真实企业官方列表采集记录与历史岗位，<strong>均不代表已确认当前在招</strong>。岗位职责、专业、薪资与投递日期等未公开信息不会编造；申请前请核对官网。</span></div>
     {loading ? <div className="market-state" role="status">正在向 HHBA 招聘数据引擎读取真实岗位…</div>
