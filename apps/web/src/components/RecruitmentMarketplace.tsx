@@ -62,8 +62,8 @@ function MarketCard({job}: {job: MarketJob}) {
     ? safeOfficial(job.application_url) : null;
   return <article className="market-card">
     <div className="market-card-top"><span className="market-company"><Building2 size={15}/>{readable(job.company_display_name, '企业名称未披露')}</span><span className="market-source">官方来源 · {readable(job.source_platform, '平台未标注')}</span></div>
-    <h3>{application ? <a href={application} target="_blank" rel="noopener noreferrer" aria-label={'直达'+readable(job.job_title)+'官方岗位投递入口'}>{readable(job.job_title, '职位未命名')} ↗</a>
-      : officialATS && official ? <a href={official} target="_blank" rel="noopener noreferrer" aria-label={'查看'+readable(job.job_title)+'企业官方职位详情'}>{readable(job.job_title, '职位未命名')} ↗</a>
+    <h3>{officialATS && href ? <Link to={href}>{readable(job.job_title, '职位未命名')}</Link>
+      : application ? <a href={application} target="_blank" rel="noopener noreferrer" aria-label={'直达'+readable(job.job_title)+'官方岗位投递入口'}>{readable(job.job_title, '职位未命名')} ↗</a>
       : href ? <Link to={href}>{readable(job.job_title, '职位未命名')}</Link> : readable(job.job_title, '职位未命名')}</h3>
     <div className="market-meta">
       <span className="market-type">{tags[job.primary_recruitment_type || ''] || '类型未分类'}</span>
@@ -73,7 +73,7 @@ function MarketCard({job}: {job: MarketJob}) {
     </div>
     <div className="market-card-proof"><ShieldCheck size={14}/><span>{stagingOnly ? '内部验收数据 · 来源归属与发布权限待审核' : officialATS ? '招聘板来源已审核 · 最近完整快照已同步 · 具体申请状态以官网为准' : application ? '岗位申请入口已近期核验 · 请以官网为准' : listOnly ? '官方真实岗位列表已采集 · 详情及投递待核实' : '真实官方历史记录 · 当前投递待核实'}</span></div>
     <div className="market-card-foot"><div><span>最近来源核验 {published(job.last_verified_at)}</span><span>发布时间 {published(job.published_at)}</span></div>
-      <div className="market-card-links">{href && <Link to={href}>查看记录 <ArrowRight size={14}/></Link>}
+      <div className="market-card-links">{href && <Link to={href}>{officialATS?"站内查看职位详情":"查看记录"} <ArrowRight size={14}/></Link>}
         {application
           ? <a className="market-verified-apply" href={application} target="_blank" rel="noopener noreferrer">去官方投递 ↗</a>
           : listOnly && listUrl
