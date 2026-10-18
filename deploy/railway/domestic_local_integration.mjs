@@ -10,13 +10,15 @@ async function get(path){
  }
  throw last;
 }
-const summary=await get('/api/jobs/page?country=cn&limit=3');
+const summary=await get('/api/jobs/page?country=cn&q=小米&limit=3');
 assert.equal(summary.total,1010);
 assert.equal(summary.domesticObserved,1010);
+assert.equal(summary.domesticVerifiedJobDetails,7);
+assert.equal(summary.domesticEmployers,2);
 assert.ok(summary.jobs.every(x=>x.company==='Xiaomi'&&x.domestic===true&&x.recordKind==='OFFICIAL_LIST_OBSERVED'));
 assert.ok(summary.jobs.every(x=>x.currentApplicationVerified===false));
 for(const [t,n] of [['SOCIAL',350],['CAMPUS',350],['INTERNSHIP',310]]){
- const rows=await get('/api/jobs/page?country=cn&recruitment_type='+t+'&limit=2');
+ const rows=await get('/api/jobs/page?country=cn&q=小米&recruitment_type='+t+'&limit=2');
  assert.equal(rows.total,n,'Wrong Xiaomi '+t+' count');
  assert.ok(rows.jobs.every(x=>x.recruitmentType===t));
 }
@@ -32,6 +34,15 @@ assert.equal(detail.applyUrl,null);
 assert.equal(detail.currentApplicationVerified,false);
 assert.equal(detail.recordKind,'OFFICIAL_LIST_OBSERVED');
 assert.ok(detail.officialListUrl.startsWith('https://xiaomi.jobs.f.mioffice.cn/'));
+const second=await get('/api/jobs/page?country=cn&q=美团&limit=7');
+assert.equal(second.total,7);
+assert.ok(second.jobs.every(x=>x.company==='Meituan'&&x.domestic===true&&x.recordKind==='OFFICIAL_JOB_PAGE_OBSERVED'));
+const meituanDetail=await get('/api/jobs/'+encodeURIComponent(second.jobs[0].id));
+assert.equal(meituanDetail.recordKind,'OFFICIAL_JOB_PAGE_OBSERVED');
+assert.equal(meituanDetail.detailVerified,true);
+assert.equal(meituanDetail.currentApplicationVerified,false);
+assert.equal(meituanDetail.applyUrl,null);
+assert.ok(meituanDetail.officialJobUrl.startsWith('https://zhaopin.meituan.com/web/position/detail?'));
 const html=await get('/jobs/'+encodeURIComponent(id));
 assert.ok(html.includes('该岗位直达投递')||html.includes('直达投递链接'));
 assert.ok(!html.includes('https://xiaomi.jobs.f.mioffice.cn/campus/position/'));
@@ -43,4 +54,4 @@ assert.ok(global.boards>=25,'International ATS discovery regressed');
 assert.ok(global.jobs.every(x=>!x.domestic));
 const openai=await get('/api/jobs/page?q=OpenAI&limit=1');
 assert.ok(openai.total>=1&&openai.jobs[0].company==='OpenAI');
-console.log('HHBA_DOMESTIC_INTEGRATION_PASS',JSON.stringify({domestic:summary.total,channels:{SOCIAL:350,CAMPUS:350,INTERNSHIP:310},internationalATS:global.boards,globalJobs:global.total,openaiJobs:openai.total,detail:'source-only',filters:'pass'}));
+console.log('HHBA_DOMESTIC_INTEGRATION_PASS',JSON.stringify({xiaomi:summary.total,meituan:second.total,domesticTotal:1017,channels:{SOCIAL:350,CAMPUS:350,INTERNSHIP:310},internationalATS:global.boards,globalJobs:global.total,openaiJobs:openai.total,detail:'source-only',filters:'pass'}));
