@@ -51,9 +51,12 @@ async function run(){
    if(!body.text.trim()){failed={index:part,reason:'blank_translated_segment'};break;}
    if(!/[\u3400-\u9fff]/.test(body.text)){failed={index:part,reason:'no_chinese_in_translation'};break;}
    const suspicious=(body.text.match(/(?:[A-Za-z]{3,}[ \t]+){7,}[A-Za-z]{3,}/g)||[]);
+   const englishOnlyLines=body.text.split('\n').filter(line=>!/[\u3400-\u9fff]/.test(line)&&
+     !/https?:\/\/|@/.test(line)&&((line.match(/[A-Za-z]{2,}/g)||[]).length>=4));
    results.push({len:body.text.length,numericReview:body.numbersVerified===false,
      englishWordRuns:suspicious.length,
-     englishHeadings:(body.text.match(/(?:^|\n)\s*(?:Responsibilities|Requirements|Qualifications|Benefits|About the role|What you will do)\s*:?(?=\n|$)/gmi)||[]).length});
+     englishHeadings:(body.text.match(/(?:^|\n)\s*(?:Responsibilities|Requirements|Qualifications|Benefits|About the role|What you will do)\s*:?(?=\n|$)/gmi)||[]).length,
+     englishOnlyLines:englishOnlyLines.length});
    part++;
   }
   const record={platform,jobId:job.id,segmentsExpected:total,
@@ -62,13 +65,14 @@ async function run(){
    numbersNeedComparison:results.filter(x=>x.numericReview).length,
    englishWordRuns:results.reduce((acc,x)=>acc+x.englishWordRuns,0),
    englishHeadings:results.reduce((acc,x)=>acc+x.englishHeadings,0),
+   englishOnlyLines:results.reduce((acc,x)=>acc+x.englishOnlyLines,0),
    error:failed};
   outputs.push(record);
   console.log('HHBA_COMPLETE_JD_BY_PLATFORM',JSON.stringify(record));
  }
  await mkdir('three-ats-translation',{recursive:true});
  await writeFile('three-ats-translation/results.json',JSON.stringify({jobs:jobs.length,outputs},null,2));
- const failed=outputs.filter(x=>!x.complete||x.englishWordRuns>0||x.englishHeadings>0);
+ const failed=outputs.filter(x=>!x.complete||x.englishWordRuns>0||x.englishHeadings>0||x.englishOnlyLines>0);
  console.log('HHBA_COMPLETE_JD_ALL',JSON.stringify({tested:outputs.length,passed:outputs.length-failed.length,failed:failed.length}));
  if(failed.length||outputs.length!==requiredBoards)process.exitCode=1;
 }
