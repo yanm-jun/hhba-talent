@@ -5,6 +5,11 @@ on:
     paths:
       - 'deploy/railway/probe_domestic_employer_portals.mjs'
       - '.github/workflows/hhba-domestic-portals.yml'
+  pull_request:
+    paths:
+      - 'deploy/railway/probe_domestic_employer_portals.mjs'
+      - 'deploy/railway/domestic_employer_directory_20261018.json'
+      - '.github/workflows/hhba-domestic-portals.yml'
   workflow_dispatch:
 permissions:
   contents: read
