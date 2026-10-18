@@ -651,9 +651,9 @@ h2{font-size:20px;margin:0}.section-title span{color:#7f9085;font-size:12px}
 .empty{padding:36px 22px;text-align:center;color:#68776b;background:white;border-radius:12px}.filter-tools{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin:-10px 0 20px;font-size:12px;color:#658070}.filter-clear{border:1px solid #c8d9ce;border-radius:8px;background:#fff;color:#1e6740;cursor:pointer;font:inherit;font-weight:700;padding:8px 14px}.filter-clear:hover{background:#e8f4ed}.filter-clear[hidden]{display:none}.empty .filter-clear{margin-top:15px}
 footer{padding:25px;text-align:center;color:#8a9b8f;font-size:11px;border-top:1px solid #e5eae4}
 @media(max-width:600px){.hero{padding:50px 22px}nav{padding:16px 22px;gap:10px;flex-wrap:wrap}.job{display:block;padding:17px}.job-main{gap:12px}.company-logo{width:48px;height:48px;flex-basis:48px}.job-title{font-size:16px}.visit{display:inline-flex;margin:15px 0 0 60px}.numbers{gap:23px}}
-</style></head><body><nav><div class="logo">HHBA <em id="market-brand">招聘市场</em></div><div id="market-lab" class="lab">真实企业招聘索引 · 公测</div><div class="lang-switch" aria-label="岗位语言"><button id="toggle-zh" type="button">中文</button><button id="toggle-en" type="button">English</button></div></nav><section class="hero"><div class="wrap"><div id="market-kicker" class="eyebrow">全球职业机会 · 企业官方来源</div><h1 id="market-h1">发现全球工作机会</h1><p id="market-subtitle">搜索海外企业公开招聘岗位，在 HHBA 阅读岗位详情，再前往企业官网申请。岗位来自 Greenhouse、Lever、Ashby 的公开招聘接口。</p><div class="numbers"><div class="num"><b id="count">${payload.total}</b><span id="market-count-label">本次获取的岗位</span></div><div class="num"><b>${payload.boards}</b><span id="market-board-label">成功读取的招聘板</span></div><div class="num"><b>3</b><span id="market-source-label">官方招聘系统</span></div><div class="num"><b id="translated-count">—</b><span id="translated-label">已机器翻译职位名称</span></div></div></div></section>
+</style></head><body><nav><div class="logo">HHBA <em id="market-brand">招聘市场</em></div><div id="market-lab" class="lab">真实企业招聘索引 · 公测</div><div class="lang-switch" aria-label="岗位语言"><button id="toggle-zh" type="button">中文</button><button id="toggle-en" type="button">English</button></div></nav><section class="hero"><div class="wrap"><div id="market-kicker" class="eyebrow">全球职业机会 · 企业官方来源</div><h1 id="market-h1">发现全球工作机会</h1><p id="market-subtitle">搜索海外企业公开招聘岗位，在 HHBA 阅读岗位详情，再前往企业官网申请。岗位来自 Greenhouse、Lever、Ashby 的公开招聘接口。</p><div class="numbers"><div class="num"><b id="count">${payload.total}</b><span id="market-count-label">本次获取的岗位</span></div><div class="num"><b>${payload.boards}</b><span id="market-board-label">成功读取的招聘板</span></div><div class="num"><b>1</b><span id="market-source-label">国内企业（列表观察）</span></div><div class="num"><b id="translated-count">—</b><span id="translated-label">已机器翻译职位名称</span></div></div></div></section>
 <main><div id="market-status" data-updated="${esc(payload.updated)}" data-failures="${payload.failures}" class="status">默认显示中文岗位名称。术语规则翻译属于初版，未完成的翻译会标注“待翻译”；切换英文可核对官方标题。公测版说明：本次已接入 ${payload.boards} 个企业招聘板，不代表全量全球职位。最近同步：${esc(payload.updated)}。职位是否仍接受申请以企业官网为准。${payload.failures?" 有 "+payload.failures+" 个来源本轮暂不可用。":""}</div>
-<div class="filters"><input id="q" aria-label="搜索岗位或企业" placeholder="搜索岗位、公司、地点（支持英文）"><select id="company" aria-label="企业"><option value="">全部企业</option></select><select id="remote" aria-label="远程筛选"><option value="">全部工作方式</option><option value="yes">标注远程</option></select></div>
+<div class="filters"><input id="q" aria-label="搜索岗位或企业" placeholder="搜索岗位、公司、地点（支持英文）"><select id="company" aria-label="企业"><option value="">全部企业</option></select><select id="country" aria-label="招聘来源"><option value="">全部来源</option><option value="cn">国内官方</option><option value="global">海外 ATS</option></select><select id="recruitment" aria-label="招聘类型"><option value="">全部招聘类型</option><option value="SOCIAL">社招</option><option value="CAMPUS">校招</option><option value="INTERNSHIP">实习</option></select><select id="remote" aria-label="远程筛选"><option value="">全部工作方式</option><option value="yes">标注远程</option></select></div>
 <div class="filter-tools"><span id="filter-summary" aria-live="polite"></span><button type="button" id="clear-filters" class="filter-clear" hidden>清除全部筛选</button></div><div class="section-title"><h2 id="market-list-h2">官方岗位列表</h2><span id="shown"></span></div><div class="list" id="jobs"></div><p id="market-disclaimer" class="disclaimer">数据源为外部企业公开招聘板。部分企业官网在不同网络环境下可能无法访问。岗位发布时间、工作类型、远程标记在接口未披露时不会推断，具体资格要求和投递方式请到企业官网核实。HHBA 不代表与招聘企业存在合作关系。</p></main><footer id="market-footer">HHBA · 全球职位索引 · 仅展示公开岗位资料与官网链接</footer>
 <script>
 let all=[],filtered=[],limit=30,totalFiltered=0,companyNames=[],latestRequest=0,searchTimer=null;
@@ -676,9 +676,13 @@ function setLanguage(value){
  for(const option of Array.from(document.querySelector('#company').options)){if(option.value)option.textContent=lang==='zh'?(companyNames.find(x=>x.name===option.value)?.zh||option.value):option.value;}
  document.querySelector('#remote').options[0].textContent=lang==='zh'?'全部工作方式':'All work modes';
  document.querySelector('#remote').options[1].textContent=lang==='zh'?'标注远程':'Remote only';
+ const sources=lang==='zh'?['全部来源','国内官方','海外 ATS']:['All sources','Mainland official','International ATS'];
+ Array.from(document.querySelector('#country').options).forEach((o,i)=>o.textContent=sources[i]);
+ const types=lang==='zh'?['全部招聘类型','社招','校招','实习']:['All recruitment types','Experienced','Graduate','Internship'];
+ Array.from(document.querySelector('#recruitment').options).forEach((o,i)=>o.textContent=types[i]);
  document.querySelector('#company').options[0].textContent=lang==='zh'?'全部企业':'All companies';
  document.querySelector('#market-h1').textContent=lang==='zh'?'发现全球工作机会':'Explore global career opportunities';
- document.querySelector('#market-subtitle').textContent=lang==='zh'?'搜索真实海外岗位，在 HHBA 阅读职位详情，再去企业官网申请。':'Search real overseas jobs, read details on HHBA, then apply on the employer website.';
+ document.querySelector('#market-subtitle').textContent=lang==='zh'?'同一个市场搜索海外 ATS 岗位和国内企业官方招聘列表记录。历史岗位请到企业官网核实。':'Search international ATS jobs and historical observations from mainland employer job boards in one marketplace.';
  document.querySelector('#market-list-h2').textContent=lang==='zh'?'官方岗位列表':'Official job listings';
  document.querySelector('#translated-label').textContent=lang==='zh'?'已机器翻译职位名称':'Machine-translated job titles';
  document.querySelector('#clear-filters').textContent=lang==='zh'?'清除全部筛选':'Clear all filters';
@@ -686,9 +690,9 @@ function setLanguage(value){
   ['#market-brand','招聘市场','Job Marketplace'],
   ['#market-lab','真实企业招聘索引 · 公测','Official employer jobs · Beta'],
   ['#market-kicker','全球职业机会 · 企业官方来源','GLOBAL CAREERS · OFFICIAL SOURCES'],
-  ['#market-count-label','本次获取的岗位','Live indexed jobs'],
-  ['#market-board-label','成功读取的招聘板','Connected job boards'],
-  ['#market-source-label','官方招聘系统','Recruitment platforms'],
+  ['#market-count-label','索引记录（含历史观察）','Indexed records (including historical observations)'],
+  ['#market-board-label','海外招聘板','International ATS boards'],
+  ['#market-source-label','国内企业（列表观察）','Domestic employer (observed listing)'],
   ['#market-footer','HHBA · 全球职位索引 · 仅展示公开岗位资料与官网链接','HHBA · Global job index · Official employer links'],
   ['#market-disclaimer','资料来源为企业公开招聘网站。实际工作条件与投递流程以对应企业官方页面为准。HHBA 与招聘企业不构成合作关系。','Data originates from public employer job boards. Job requirements and application steps are determined by the employers. HHBA is not affiliated with these companies.']
  ];
@@ -709,9 +713,11 @@ function setLanguage(value){
 document.querySelector('#toggle-zh').addEventListener('click',()=>setLanguage('zh'));
 document.querySelector('#toggle-en').addEventListener('click',()=>setLanguage('en'));
 const safe=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]||c));
-const q=document.querySelector("#q"),c=document.querySelector("#company"),remote=document.querySelector("#remote"),list=document.querySelector("#jobs");
+const q=document.querySelector("#q"),c=document.querySelector("#company"),country=document.querySelector("#country"),recruitment=document.querySelector("#recruitment"),remote=document.querySelector("#remote"),list=document.querySelector("#jobs");
 function currentFilters(){
  const flags=[];
+ if(country.value)flags.push(country.options[country.selectedIndex].text);
+ if(recruitment.value)flags.push(recruitment.options[recruitment.selectedIndex].text);
  if(q.value.trim())flags.push((lang==='zh'?'关键词：':'Keyword: ')+q.value.trim());
  if(c.value)flags.push((lang==='zh'?'企业：':'Company: ')+c.value);
  if(remote.value)flags.push(lang==='zh'?'仅远程':'Remote only');
@@ -723,7 +729,7 @@ function syncFilterStatus(){
  document.querySelector('#filter-summary').textContent=flags.length?flags.join('  ·  '):(lang==='zh'?'搜索企业名称或职位关键词，例如 OpenAI':'Try a company or job title, e.g. OpenAI');
 }
 function clearFilters(){
- q.value='';c.value='';remote.value='';limit=30;
+ q.value='';c.value='';country.value='';recruitment.value='';remote.value='';limit=30;
  const u=new URL(window.location.href);u.searchParams.delete('q');window.history.replaceState(null,'',u.pathname+u.search+u.hash);
  void fetchJobs(true);
 }
@@ -736,10 +742,10 @@ function render(reset=true){
  list.innerHTML=filtered.slice(0,limit).map(x=>{
   const href='/jobs/'+encodeURIComponent(x.id);
   const company=lang==='zh'?(x.companyZh||x.company):x.company;
-  const title=lang==='zh'?(x.titleZh||'职位名称待翻译'):x.title;
-  const location=lang==='zh'?(x.locationZh||x.location):x.location;
-  const remoteText=x.remote===true?(lang==='zh'?'远程':'Remote'):x.remote===false?(lang==='zh'?'非远程':'Not remote'):(lang==='zh'?'远程未标注':'Remote not specified');
-  return '<article class="job"><div class="job-main">'+logoMarkup(x.company)+'<div class="job-body"><a class="job-title" href="'+href+'">'+safe(title)+'</a><div class="company-name">'+safe(company)+'</div><div class="job-meta"><span>'+safe(location)+'</span><span>'+safe(remoteText)+'</span><span>'+(lang==='zh'?'官方招聘来源':'Official employer listing')+'</span></div><div class="job-source">'+safe(x.platform.toUpperCase())+'</div></div></div><a class="visit" href="'+href+'">'+(lang==='zh'?'查看岗位详情 ↗':'View job details ↗')+'</a></article>';
+  const title=x.domestic?(lang==='zh'?x.title:'Original title available in Chinese'):(lang==='zh'?(x.titleZh||'职位名称待翻译'):x.title);
+  const location=x.domestic&&lang==='en'?'Mainland China':(lang==='zh'?(x.locationZh||x.location):x.location);
+  const remoteText=x.domestic?(lang==='zh'?({SOCIAL:'社招',CAMPUS:'校招',INTERNSHIP:'实习'}[x.recruitmentType]||'类别待核实'):({SOCIAL:'Experienced',CAMPUS:'Graduate',INTERNSHIP:'Internship'}[x.recruitmentType]||'Type unverified')):x.remote===true?(lang==='zh'?'远程':'Remote'):x.remote===false?(lang==='zh'?'非远程':'Not remote'):(lang==='zh'?'远程未标注':'Remote not specified');
+  return '<article class="job"><div class="job-main">'+logoMarkup(x.company)+'<div class="job-body"><a class="job-title" href="'+href+'">'+safe(title)+'</a><div class="company-name">'+safe(company)+'</div><div class="job-meta"><span>'+safe(location)+'</span><span>'+safe(remoteText)+'</span><span>'+(x.domestic?(lang==='zh'?'历史列表 · 投递未核实':'Historical listing · Apply unverified'):(lang==='zh'?'官方招聘来源':'Official employer listing'))+'</span></div><div class="job-source">'+(x.domestic?(lang==='zh'?'小米官方招聘频道 · 2026-10-16':'Xiaomi official board · 2026-10-16'):safe(x.platform.toUpperCase()))+'</div></div></div><a class="visit" href="'+href+'">'+(x.domestic?(lang==='zh'?'查看岗位记录 ↗':'View observed record ↗'):(lang==='zh'?'查看岗位详情 ↗':'View job details ↗'))+'</a></article>';
  }).join("");
  if(!filtered.length)list.innerHTML='<div class="empty">'+(lang==='zh'?'没有找到符合当前筛选的岗位，请检查企业和远程筛选条件。':'No jobs match these filters. Check the company and remote filters.')+'<div><button type="button" id="reset-empty" class="filter-clear">'+(lang==='zh'?'清除筛选并重新搜索':'Clear filters and search again')+'</button></div></div>';
  document.querySelector('#reset-empty')?.addEventListener('click',clearFilters);
@@ -753,10 +759,14 @@ async function fetchJobs(reset=true){
  const query=q.value.trim();
  // An exact employer keyword begins a new company search instead of
  // intersecting with a previously selected, different employer.
- const requestedEmployer=Object.keys(employerBrandSites).find(name=>name.toLowerCase()===query.toLowerCase());
+ const requestedEmployer=Object.keys(employerBrandSites).find(name=>name.toLowerCase()===query.toLowerCase()||name==='Xiaomi'&&(query==='小米'||query==='小米集团'));
+ if(requestedEmployer==='Xiaomi'&&country.value==='global')country.value='';
+ if(requestedEmployer&&requestedEmployer!=='Xiaomi'&&country.value==='cn')country.value='';
  if(requestedEmployer&&c.value&&c.value!==requestedEmployer)c.value='';
  if(query)params.set("q",query);
  if(c.value)params.set("company",c.value);
+ if(country.value)params.set("country",country.value);
+ if(recruitment.value)params.set("recruitment_type",recruitment.value);
  if(remote.value)params.set("remote","true");
  try{
   const response=await fetch("/api/jobs/page?"+params.toString(),{headers:{Accept:"application/json"}});
@@ -783,8 +793,10 @@ async function fetchJobs(reset=true){
 }
 function start(){
  try{
-  const urlQuery=new URLSearchParams(window.location.search).get('q');
+  const parms=new URLSearchParams(window.location.search),urlQuery=parms.get('q');
   if(urlQuery)q.value=urlQuery.slice(0,100);
+  if(['cn','global'].includes(parms.get('country')))country.value=parms.get('country');
+  if(['SOCIAL','CAMPUS','INTERNSHIP'].includes(parms.get('recruitment_type')))recruitment.value=parms.get('recruitment_type');
  }catch{}
  setLanguage(lang);
  void fetchJobs(true);
@@ -803,6 +815,8 @@ c.addEventListener("change",()=>{
  void fetchJobs(true);
 });
 remote.addEventListener("change",()=>{void fetchJobs(true)});
+country.addEventListener("change",()=>{if(country.value==="cn"&&c.value&&c.value!=="Xiaomi")c.value="";if(country.value==="global"&&c.value==="Xiaomi")c.value="";void fetchJobs(true)});
+recruitment.addEventListener("change",()=>{void fetchJobs(true)});
 start();
 </script></body></html>`;
 
