@@ -274,7 +274,11 @@ const boards:Board[]=[
  {platform:"ashby",company:"PostHog",slug:"posthog"},
  {platform:"ashby",company:"ClickUp",slug:"clickup"},
  {platform:"ashby",company:"Cursor",slug:"cursor"},
- {platform:"ashby",company:"Mercor",slug:"mercor"}
+ {platform:"ashby",company:"Mercor",slug:"mercor"},
+ {platform:"ashby",company:"Form Energy",slug:"formenergy"},
+ {platform:"lever",company:"ShopBack",slug:"shopback-2"},
+ {platform:"greenhouse",company:"AlphaSights Campus Recruiting",slug:"alphasightsresumedrop"},
+ {platform:"ashby",company:"General Robotics",slug:"generalrobotics"}
 ];
 const esc=(v:unknown)=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]||c));
 const urlOK=(value:unknown,slug:string,platform:string)=>{
