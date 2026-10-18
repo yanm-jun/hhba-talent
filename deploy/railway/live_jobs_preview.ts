@@ -7,6 +7,26 @@ import { Database } from "bun:sqlite";
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync } from "node:fs";
 const phrases:[string,string][]=[
+ ["Integration Technician","集成技术员"],["Test Technician","测试技术员"],
+ ["Manufacturing Engineer","制造工程师"],["Supply Chain Manager","供应链经理"],
+ ["Warehouse Associate","仓储专员"],["Procurement Specialist","采购专员"],
+ ["Quality Control","质量控制"],["Production Supervisor","生产主管"],
+ ["Nurse Practitioner","执业护士"],["Mental Health Therapist","心理健康治疗师"],
+ ["Clinical Product","临床产品"],["Care Coordinator","护理协调员"],
+ ["Customer Experience","客户体验"],["Business Development Representative","业务拓展代表"],
+ ["Account Executive","客户经理"],["Revenue Operations","营收运营"],
+ ["Information Security","信息安全"],["Research Assistant","研究助理"],
+ ["Technical Sales","技术销售"],["Growth Operations","增长运营"],
+ ["Production","生产"],["Technician","技术员"],["Buyer","采购员"],
+ ["Manufacturing","制造"],["Warehouse","仓储"],["Logistics","物流"],
+ ["Procurement","采购"],["Assembler","装配工"],["Assembly","装配"],
+ ["Supply Chain","供应链"],["Operations Associate","运营专员"],
+ ["VP","副总裁"],["Pipeline","人才储备"],["Maintenance","维护"],
+ ["Therapist","治疗师"],["Nurse","护士"],["Clinical","临床"],
+ ["Healthcare","医疗健康"],["Health","健康"],["Provider","服务提供者"],
+ ["Patient","患者"],["Safety","安全"],["Training","培训"],
+ ["Education","教育"],["Teaching","教学"],["Instructor","讲师"],
+ ["Accounting","会计"],["Attorney","律师"],["Cousel","法律顾问"],
  ["Algorithm","算法"],["Algorithms","算法"],["Payments Fraud","支付反欺诈"],["Business Development","业务拓展"],
  ["Regulatory Compliance","监管合规"],["Machine Learning","机器学习"],
  ["Artificial Intelligence","人工智能"],["Data Scientist","数据科学家"],
@@ -430,25 +450,62 @@ let titleWorkerRunning=false;
 let scheduledTitleCount=0;
 let workerLastFailure=0;
 const translationNeedsReview=new Set<string>();
+const MAX_TITLE_MACHINE_TRANSLATIONS_PER_DAY=320;
+try{
+ translationDb?.exec("CREATE TABLE IF NOT EXISTS machine_title_budget(day TEXT PRIMARY KEY,requested INTEGER NOT NULL DEFAULT 0)");
+}catch(e){console.log("HHBA_TITLE_BUDGET_SETUP_ERROR",e instanceof Error?e.name:"unknown");}
+function titleTranslationBudget(){
+ if(!translationDb)return {date:"",remaining:0};
+ const date=new Date().toISOString().slice(0,10);
+ try{
+  const row=translationDb.query("SELECT requested FROM machine_title_budget WHERE day=?").get(date) as any;
+  return {date,remaining:Math.max(0,MAX_TITLE_MACHINE_TRANSLATIONS_PER_DAY-Number(row?.requested||0))};
+ }catch{return {date,remaining:0};}
+}
+function reserveTitleBudget(date:string,count:number){
+ if(!translationDb||count<1)return false;
+ try{
+  translationDb.query("INSERT INTO machine_title_budget(day,requested) VALUES(?,?) ON CONFLICT(day) DO UPDATE SET requested=requested+excluded.requested").run(date,count);
+  return true;
+ }catch{return false;}
+}
 async function fillTitleTranslations(rows:Job[]){
- if(!privateTranslatorUrl()||titleWorkerRunning||
-   (Date.now()-workerLastFailure<3*60*1000))return;
+ if(!privateTranslatorUrl()||titleWorkerRunning||!translationDb||
+    (Date.now()-workerLastFailure<3*60*1000))return;
+ const available=titleTranslationBudget();
+ if(available.remaining<=0)return;
  titleWorkerRunning=true;
  try{
-  // Limited low-frequency batches; no public caller can submit arbitrary text.
+  // First translate titles whose dictionary fallback has zero Chinese.
+  // Remaining terminology-only titles are translated gradually at a fixed
+  // daily compute budget; all translations are saved by original text hash.
   const unique=[...new Set(rows.map(x=>x.title))];
-  const pending=unique.filter(t=>fromCache("title",t)?.mode!=="machine"&&!translationNeedsReview.has(t)).slice(0,60);
-  for(let i=0;i<pending.length;i+=4){
-   const batch=pending.slice(i,i+4);
-   const translated=await machineTranslations("title",batch);
-   if(!translated){workerLastFailure=Date.now();
-     console.log("HHBA_MT_BATCH_PAUSED",JSON.stringify({offset:i,count:batch.length}));break;}
-   batch.forEach((source,n)=>{const txt=translated[n];if(txt){toCache("title",source,professionalTitle(source,txt),"machine");scheduledTitleCount++;}else translationNeedsReview.add(source);});
-   if(i+4<pending.length)await Bun.sleep(1200);
+  const pending=unique.filter(t=>fromCache("title",t)?.mode!=="machine"&&!translationNeedsReview.has(t));
+  pending.sort((a,b)=>{
+   const aData=fromCache("title",a),bData=fromCache("title",b);
+   return Number(bData?.mode==="pending")-Number(aData?.mode==="pending");
+  });
+  const queue=pending.slice(0,Math.min(available.remaining,96));
+  let translated=0,attempted=0;
+  for(let i=0;i<queue.length;i+=4){
+   const batch=queue.slice(i,i+4);
+   if(!reserveTitleBudget(available.date,batch.length))break;
+   attempted+=batch.length;
+   const results=await machineTranslations("title",batch);
+   if(!results){workerLastFailure=Date.now();
+    console.log("HHBA_MT_BATCH_PAUSED",JSON.stringify({offset:i,count:batch.length}));break;}
+   batch.forEach((source,n)=>{
+    const txt=results[n];
+    if(txt){toCache("title",source,professionalTitle(source,txt),"machine");translated++;scheduledTitleCount++;}
+    else translationNeedsReview.add(source);
+   });
+   if(i+4<queue.length)await Bun.sleep(1450);
   }
-  console.log("HHBA_MT_TITLES",JSON.stringify({newTranslations:scheduledTitleCount,persistent:!!translationDb}));
- }catch(ex){workerLastFailure=Date.now();console.log("HHBA_MT_WORKER_ERROR",ex instanceof Error?ex.name:"unknown");}
- finally{titleWorkerRunning=false;}
+  console.log("HHBA_MT_TITLES",JSON.stringify({attempted,translated,completedSinceStart:scheduledTitleCount,
+    remainingDailyBudget:titleTranslationBudget().remaining,persistent:!!translationDb}));
+ }catch(e){workerLastFailure=Date.now();
+  console.log("HHBA_MT_WORKER_ERROR",e instanceof Error?e.name:"unknown");
+ }finally{titleWorkerRunning=false;}
 }
 
 function licensedJd(d:Detail):boolean{
