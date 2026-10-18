@@ -10,7 +10,7 @@ const combined=await json('/api/jobs/page?limit=1');
 assert.ok(combined.allJobs>=8761,'Merged index unexpectedly shrank');
 assert.equal(combined.domesticObserved,1010);
 assert.equal(combined.boards,34);
-const mi=await json('/api/jobs/page?country=cn&limit=5');
+const mi=await json('/api/jobs/page?country=cn&q=小米&limit=5');
 assert.equal(mi.total,1010);
 assert.ok(mi.jobs.every(j=>j.domestic&&j.company==='Xiaomi'));
 for(const [type,expected] of [['SOCIAL',350],['CAMPUS',350],['INTERNSHIP',310]]){
@@ -23,6 +23,13 @@ for(const q of ['小米','小米集团','Xiaomi']){
 }
 const oa=await json('/api/jobs/page?q=OpenAI&limit=3');
 assert.ok(oa.total>=1&&oa.jobs.every(j=>j.company==='OpenAI'),'OpenAI source regression');
+const mt=await json('/api/jobs/page?country=cn&q=美团&limit=7');
+assert.equal(mt.total,7);
+assert.ok(mt.jobs.every(x=>x.company==='Meituan'));
+const mtDetail=await json('/api/jobs/'+encodeURIComponent(mt.jobs[0].id));
+assert.equal(mtDetail.recordKind,'OFFICIAL_JOB_PAGE_OBSERVED');
+assert.equal(mtDetail.applyUrl,null);
+assert.equal(mtDetail.detailVerified,true);
 const item=mi.jobs[0];const itemDetail=await json('/api/jobs/'+encodeURIComponent(item.id));
 assert.equal(itemDetail.description,null);
 assert.equal(itemDetail.applyUrl,null);
@@ -37,10 +44,11 @@ try{
  await desktop.goto(base+'/?q=小米',{waitUntil:'domcontentloaded',timeout:80000});
  await desktop.waitForFunction(()=>document.querySelector('.job .company-name')?.textContent==='小米集团',{timeout:75000});
  assert.match(await desktop.locator('#shown').innerText(),/1,?010/);
- await desktop.locator('#country').selectOption('cn');
+ assert.equal(await desktop.locator('#employer-directory .employer-link').count(),10);
+await desktop.locator('#country').selectOption('cn');
  await desktop.locator('#recruitment').selectOption('CAMPUS');
- await desktop.waitForFunction(()=>document.querySelector('#shown')?.textContent?.includes('350'),{timeout:75000});
- assert.equal((await desktop.locator('.job .company-name').first().innerText()),'小米集团');
+ await desktop.waitForFunction(()=>document.querySelector('#shown')?.textContent?.includes('353'),{timeout:75000});
+ assert.ok(['小米集团','美团'].includes(await desktop.locator('.job .company-name').first().innerText()));
  await desktop.screenshot({path:'domestic-live-evidence/xiaomi-desktop.png',fullPage:false});
  await desktop.locator('.job-title').first().click();
  await desktop.waitForURL(/\/jobs\/xiaomi-/,{timeout:35000});
@@ -52,5 +60,5 @@ try{
  await mobile.waitForFunction(()=>document.querySelector('.job .company-name')?.textContent==='小米集团',{timeout:75000});
  await mobile.screenshot({path:'domestic-live-evidence/xiaomi-mobile.png',fullPage:false});
  assert.equal(errors.length,0,errors.join('; '));
- console.log('HHBA_DOMESTIC_LIVE_BROWSER_PASS',JSON.stringify({merged:combined.allJobs,domestic:mi.total,openAI:oa.total,boards:combined.boards,desktop:true,mobile:true,sourceFilters:true,jobDetail:'safe',officialList:'correct'}));
+ console.log('HHBA_DOMESTIC_LIVE_BROWSER_PASS',JSON.stringify({merged:combined.allJobs,xiaomi:mi.total,meituan:mt.total,domestic:1017,openAI:oa.total,boards:combined.boards,desktop:true,mobile:true,sourceFilters:true,jobDetail:'safe',officialList:'correct'}));
 }finally{await browser.close();}
