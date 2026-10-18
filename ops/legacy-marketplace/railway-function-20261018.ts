@@ -1222,10 +1222,41 @@ void (async()=>{try{
  console.log("HHBA_HOME_LIST_RESTORED",JSON.stringify({http:response.status,serverRenderedJobCards:cards,directoryGridRemoved:true,scriptSyntaxValid:jsValid,clientSearchIndex,pass:ok&&jsValid&&clientSearchIndex}));
 }catch(e){console.error("HHBA_HOME_LIST_RESTORED_ERROR",e instanceof Error?e.message:"unknown");}})();
 
-/** Staging-only startup check. Verifies the exact reader-origin permission and
- * one real, unmodified official JD chunk through the private translator.
- * Logs status only; never logs copyrighted JD or translated body text.
+/** Staging-only smoke: confirm semantic English JD and actual Chinese
+ * translation endpoint, not merely that an upstream translator returned text.
+ * Log metrics/error codes only; never print copyrighted JD content.
  */
+void (async()=>{if(Bun.env.RAILWAY_SERVICE_NAME!=="hhba-web")return;
+ try{
+  const job=(await load())?.rows.find(j=>j.id==="greenhouse-airtable-8403107002");
+  const detail=job?await officialDetail(job):null;
+  const english=detail?.description||"",originalHtml=detail?.richHtml||"";
+  const headingCount=(originalHtml.match(/<h3>/g)||[]).length;
+  const bulletCount=(originalHtml.match(/<li>/g)||[]).length;
+  const paragraphCount=(originalHtml.match(/<p>/g)||[]).length;
+  const rawMarkup=hasLeakedJdTags(english)||hasEscapedJdTags(originalHtml);
+  const chunks=jdChunks(english);
+  const host="hhba-web-production-024c.up.railway.app";
+  const endpoint="https://"+host+"/api/jobs/greenhouse-airtable-8403107002/translate-part";
+  const req=new Request(endpoint,{method:"POST",headers:{
+   "host":host,"origin":"https://"+host,"content-type":"application/json"
+  },body:JSON.stringify({part:0,sourceHash:createHash("sha256").update(english).digest("hex")})});
+  const allowed=humanReaderAllowed(req,new URL(endpoint));
+  const response=allowed&&detail?await readJobForTranslation(req,new URL(endpoint),{}):null;
+  const payload=response?await response.json() as any:{};
+  const translated=response?.ok&&typeof payload.text==="string";
+  const clean=!!translated&&!hasLeakedJdTags(payload.text);
+  const pass=allowed&&detail?.status==="LIVE_CONTENT"&&headingCount>=3&&bulletCount>=8&&
+   paragraphCount>=3&&!rawMarkup&&chunks.length>1&&clean;
+  console.log("HHBA_STAGING_JD_E2E",JSON.stringify({
+   officialJD:detail?.status||"missing",headings:headingCount,bullets:bulletCount,
+   paragraphs:paragraphCount,jdCharacters:english.length,chunks:chunks.length,
+   escapedMarkup:rawMarkup,translationStatus:response?.status??null,
+   translationError:payload.error||null,cleanTranslation:clean,pass
+  }));
+ }catch(e){console.log("HHBA_STAGING_JD_E2E_ERROR",e instanceof Error?e.message:"unknown");}
+})();
+
 void (async()=>{if(Bun.env.RAILWAY_SERVICE_NAME!=="hhba-web")return;
  try{
   const host="hhba-web-production-024c.up.railway.app";
