@@ -1,0 +1,27 @@
+name: HHBA Discover Verified Official ATS Boards
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/probe_official_boards.mjs'
+      - '.github/workflows/hhba-board-discovery.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Probe exact public ATS JSON API and real JD identity (no website scraping)
+        run: node deploy/railway/probe_official_boards.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-ats-verified-new-boards
+          path: board-candidates/
+          retention-days: 21
