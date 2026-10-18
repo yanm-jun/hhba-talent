@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 const source=readFileSync(new URL('./live_jobs_preview.ts',import.meta.url),'utf8');
 const observed=JSON.parse(readFileSync(new URL('./domestic_xiaomi_20261016.compact.json',import.meta.url),'utf8'));
 assert.equal(observed.schema,1);
@@ -26,4 +27,5 @@ for(const token of ['const domesticObserved:Job[]','rows.push(...domesticObserve
 assert.ok(source.includes('company:"OpenAI"')&&source.includes('company:"Figma"'),'Existing international sources must remain present');
 assert.ok(source.includes('officialListUrl:job.url'),'Official list link required');
 assert.ok(!source.includes('originalJobUrlAssumedApproved'),'Unreviewed direct link contract');
+console.log('HHBA_XIAOMI_ENV_SNAPSHOT_SHA256',createHash('sha256').update(JSON.stringify(observed.jobs)).digest('hex'));
 console.log('HHBA_DOMESTIC_STATIC_PASS',JSON.stringify({observed:seen.size,channels:types,schema:observed.schema,reviewedApply:observed.verified_current_apply,reviewedJd:observed.verified_details,globalCompaniesRetained:true}));
