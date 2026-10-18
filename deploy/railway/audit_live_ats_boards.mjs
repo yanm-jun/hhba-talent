@@ -30,9 +30,12 @@ async function run(){
  const body=(await json(BASE+'/api/jobs',90000)).body;
  if(!Array.isArray(body?.jobs))throw Error('Production jobs API is not available');
  const grouped=new Map(boards.map(x=>[key(x),[]]));
+ const atsRows=body.jobs.filter(j=>['greenhouse','ashby','lever'].includes(j.platform));
+ const domesticRows=body.jobs.filter(j=>j.platform==='xiaomi-official');
+ if(domesticRows.some(j=>j.company!=='Xiaomi'||j.domestic!==true))throw Error('Unexpected domestic market entry');
  const issues=[],ids=new Set(),urls=new Set();
  const counts={machine:0,rules:0,pending:0};
- for(const j of body.jobs){
+ for(const j of atsRows){
   const k=key(j);
   if(!grouped.has(k)){issues.push({type:'unapproved_source',jobId:j.id,source:k});continue;}
   grouped.get(k).push(j);
@@ -62,7 +65,7 @@ async function run(){
  }
  await Promise.all(Array.from({length:3},()=>worker()));
  const summary={timestamp:new Date().toISOString(),registryBoards:boards.length,
-  liveBoards:body.boards,sourceFailures:body.failures,totalJobs:body.jobs.length,
+  liveBoards:body.boards,sourceFailures:body.failures,totalJobs:body.jobs.length,internationalJobs:atsRows.length,domesticObserved:domesticRows.length,
   titleModes:counts,verifiedDetails:detail.filter(x=>x.valid).length,
   issues:issues.length};
  await mkdir('board-audit-output',{recursive:true});
