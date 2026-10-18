@@ -17,10 +17,14 @@ async function run(){
  const jobs=listing.body.jobs;
  const chosen={
   greenhouse:jobs.find(j=>j.platform==='greenhouse'&&j.source==='canonical'),
+  greenhouse_board:jobs.find(j=>j.platform==='greenhouse'&&j.source==='greenhouse'),
   ashby:jobs.find(j=>j.platform==='ashby'&&j.source==='airwallex'&&j.title.includes('Staff Data Scientist')),
-  lever:jobs.find(j=>j.platform==='lever'&&j.source==='palantir')
+  ashby_board:jobs.find(j=>j.platform==='ashby'&&j.source==='ashby'),
+  lever:jobs.find(j=>j.platform==='lever'&&j.source==='palantir'),
+  lever_spotify:jobs.find(j=>j.platform==='lever'&&j.source==='spotify')
  };
  const outputs=[];
+ const requiredBoards=Object.keys(chosen).length;
  for(const [platform,job]of Object.entries(chosen)){
   assert(job,'no current verified real job for '+platform);
   const r=await fetch(BASE+'/jobs/'+encodeURIComponent(job.id),{signal:AbortSignal.timeout(24000)});
@@ -48,7 +52,8 @@ async function run(){
    if(!/[\u3400-\u9fff]/.test(body.text)){failed={index:part,reason:'no_chinese_in_translation'};break;}
    const suspicious=(body.text.match(/(?:[A-Za-z]{3,}[ \t]+){7,}[A-Za-z]{3,}/g)||[]);
    results.push({len:body.text.length,numericReview:body.numbersVerified===false,
-     englishWordRuns:suspicious.length});
+     englishWordRuns:suspicious.length,
+     englishHeadings:(body.text.match(/(?:^|\n)\s*(?:Responsibilities|Requirements|Qualifications|Benefits|About the role|What you will do)\s*:?(?=\n|$)/gmi)||[]).length});
    part++;
   }
   const record={platform,jobId:job.id,segmentsExpected:total,
@@ -56,14 +61,15 @@ async function run(){
    totalTranslatedChars:results.reduce((acc,x)=>acc+x.len,0),
    numbersNeedComparison:results.filter(x=>x.numericReview).length,
    englishWordRuns:results.reduce((acc,x)=>acc+x.englishWordRuns,0),
+   englishHeadings:results.reduce((acc,x)=>acc+x.englishHeadings,0),
    error:failed};
   outputs.push(record);
   console.log('HHBA_COMPLETE_JD_BY_PLATFORM',JSON.stringify(record));
  }
  await mkdir('three-ats-translation',{recursive:true});
  await writeFile('three-ats-translation/results.json',JSON.stringify({jobs:jobs.length,outputs},null,2));
- const failed=outputs.filter(x=>!x.complete||x.englishWordRuns>0);
+ const failed=outputs.filter(x=>!x.complete||x.englishWordRuns>0||x.englishHeadings>0);
  console.log('HHBA_COMPLETE_JD_ALL',JSON.stringify({tested:outputs.length,passed:outputs.length-failed.length,failed:failed.length}));
- if(failed.length||outputs.length!==3)process.exitCode=1;
+ if(failed.length||outputs.length!==requiredBoards)process.exitCode=1;
 }
 run().catch(e=>{console.error('HHBA_COMPLETE_JD_FATAL',e.message);process.exitCode=1});

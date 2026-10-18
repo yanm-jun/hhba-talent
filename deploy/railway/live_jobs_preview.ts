@@ -340,7 +340,7 @@ function detailHtml(d:Detail,zhFull:string|null):string{
   '<div class="actions"><a id="detail-apply" class="btn" href="'+apply+'" target="_blank" rel="noopener noreferrer">前往企业官网申请 ↗</a>'+
   '<a id="detail-official" class="btn secondary" href="'+official+'" target="_blank" rel="noopener noreferrer">查看对应官方职位页 ↗</a></div>'+
   '<p id="detail-disclaimer" class="notice">资料来自企业公开招聘系统，机器翻译仅供辅助阅读。申请资格及最终岗位状态以企业官网为准；HHBA 不代表招聘企业。</p></main>'+
-  '<script>'+ "(function(){\nlet lang=\"zh\";\ntry{lang=localStorage.getItem(\"hhba-lang\")===\"en\"?\"en\":\"zh\"}catch{}\nconst reader=document.querySelector(\"#personal-reader\");\nconst retry=document.querySelector(\"#retry-translation\");\nconst note=document.querySelector(\"#translation-note\");\nconst progress=document.querySelector(\"#translation-progress\");\nconst output=document.querySelector(\"#translated-paragraphs\");\nconst numericRisk=document.querySelector(\"#numeric-risk\");\nconst originalButton=document.querySelector(\"#show-original-english\");\nlet numericIssues=0;\nlet inflight=null;\nasync function translate(){\n if(!reader||reader.dataset.done===\"true\")return;\n if(inflight)return inflight;\n inflight=(async()=>{\n   if(retry)retry.hidden=true;\n   if(numericRisk)numericRisk.hidden=true;\n   numericIssues=0;\n   let parts=[],part=0,total=1;\n   let saved=null;\n   const storageKey=\"hhba-reader-v2-chinese-only:\"+reader.dataset.job+\":\"+reader.dataset.hash;\n   try{saved=sessionStorage.getItem(storageKey)}catch{}\n   if(saved&&output){output.textContent=saved;progress.textContent=\"中文译文已加载（本次浏览会话缓存）\";note.textContent=\"这是机器即时翻译，请核对对应的英文原文。\";reader.dataset.done=\"true\";return;}\n   if(output)output.textContent=\"\";\n   try{\n    while(part<total){\n     let response=null;\n     for(let trial=0;trial<2;trial++){\n      response=await fetch(\"/api/jobs/\"+encodeURIComponent(reader.dataset.job)+\"/translate-part\",{\n       method:\"POST\",credentials:\"same-origin\",\n       headers:{\"Content-Type\":\"application/json\"},\n       body:JSON.stringify({part,sourceHash:reader.dataset.hash})\n      });\n      if(response.status!==429)break;\n      await new Promise(r=>setTimeout(r,3000));\n     }\n     if(!response||!response.ok){\n      let payload={};try{payload=await response.json()}catch{}\n      if(payload.error===\"source_changed\")throw Error(\"官方岗位内容已更新，请刷新页面重试。\");\n      if(payload.error===\"source_too_long\")throw Error(\"这条官方 JD 过长，暂未完成全文翻译，请使用 English 原文。\");\n      throw Error(\"第 \"+(part+1)+\" 段翻译暂时失败，可以重试或查看完整英文原文。\");\n     }\n     const result=await response.json();\n     if(result.jobId!==reader.dataset.job||result.sourceHash!==reader.dataset.hash||\n        result.part!==part||!Number.isInteger(result.total)||result.total<1||result.total>80||\n        typeof result.text!==\"string\")throw Error(\"译文与当前岗位版本不一致，请刷新页面。\");\n     if(part===0)total=result.total;\n     if(result.total!==total)throw Error(\"官方岗位在翻译过程中发生变化，请刷新页面。\");\n     if(result.numbersVerified===false){numericIssues++;if(numericRisk)numericRisk.hidden=false;}\n     parts.push(result.text);\n     if(output)output.textContent=parts.join(\"\\n\");\n     part++;\n     if(progress)progress.textContent=\"已翻译 \"+part+\" / \"+total+\" 段\";\n    }\n    const complete=parts.join(\"\\n\");\n    if(reader&&complete.trim()){\n     try{sessionStorage.setItem(storageKey,complete)}catch{}\n     reader.dataset.done=\"true\";\n     if(note)note.textContent=\"中文即时翻译已完成（机器译文，仅供辅助理解）。请对照英文原文核对招聘条件。\";\n     if(progress)progress.textContent=\"已完成 \"+total+\" / \"+total+\" 段\";\n    }\n   }catch(err){\n     if(note)note.textContent=err.message||\"翻译暂时不可用。\";\n     if(progress)progress.textContent=parts.length?\"当前已完成 \"+parts.length+\" 段。其余内容请查看下方完整原文。\":\"下面可以直接展开完整官方英文原文。\";\n     if(retry)retry.hidden=false;\n   }\n })();\n try{return await inflight}finally{inflight=null}\n}\nfunction set(v){\n lang=v===\"en\"?\"en\":\"zh\";\n try{localStorage.setItem(\"hhba-lang\",lang)}catch{}\n document.querySelector(\"#jd-zh\").hidden=lang!==\"zh\";\n document.querySelector(\"#jd-en\").hidden=lang!==\"en\";\n document.querySelector(\"#detail-zh\").classList.toggle(\"selected\",lang===\"zh\");\n document.querySelector(\"#detail-en\").classList.toggle(\"selected\",lang===\"en\");\n document.querySelector(\"#detail-title\").textContent=document.querySelector(\"#detail-title\").dataset[lang];\n document.querySelector(\"#detail-place\").textContent=document.querySelector(\"#detail-place\").dataset[lang];\n const labels={\n \"#detail-brand\":[\"· 招聘市场\",\"· Job Marketplace\"],\n \"#detail-back\":[\"← 返回招聘市场\",\"← Back to jobs\"],\n \"#jd-label\":[\"岗位完整描述\",\"Full job description\"],\n \"#detail-apply\":[\"前往企业官网申请 ↗\",\"Apply on employer website ↗\"],\n \"#detail-official\":[\"查看对应官方职位页 ↗\",\"View original job posting ↗\"],\n \"#detail-disclaimer\":[\"资料来自企业公开招聘系统，机器翻译仅供辅助阅读。申请资格及最终岗位状态以企业官网为准；HHBA 不代表招聘企业。\",\"Information comes from public employer job boards. HHBA is not affiliated with employers. Requirements and availability are governed by the official posting.\"]\n};\nfor(const [selector,pair] of Object.entries(labels)){\n const element=document.querySelector(selector);\n if(element)element.textContent=pair[lang===\"en\"?1:0];\n}\nconst source=document.querySelector(\"#detail-source\");\nif(source)source.textContent=lang===\"zh\"?\"企业官方岗位 · 读取时间 \"+source.dataset.check+\" · 中文机器译文仅供参考\":\n \"Original employer posting · Retrieved \"+source.dataset.check+\" · English source text\";\nconst remote=document.querySelector(\"#detail-remote\");\nif(remote){const value=remote.dataset.value;\n remote.textContent=value===\"true\"?(lang===\"en\"?\"Remote\":\"远程\"):\n value===\"false\"?(lang===\"en\"?\"Not remote\":\"非远程\"):\n (lang===\"en\"?\"Remote unspecified\":\"远程方式未标明\");}\ndocument.documentElement.lang=lang===\"en\"?\"en\":\"zh-CN\";\nif(lang===\"zh\"&&reader)void translate();\n}\ndocument.querySelector(\"#detail-zh\").onclick=()=>set(\"zh\");\ndocument.querySelector(\"#detail-en\").onclick=()=>set(\"en\");\nif(retry)retry.onclick=()=>{reader.dataset.done=\"false\";void translate()};\nif(originalButton)originalButton.onclick=()=>set(\"en\");\nset(lang);\n})()" +'</script></body></html>';
+  '<script>'+ "(function(){\nlet lang=\"zh\";\ntry{lang=localStorage.getItem(\"hhba-lang\")===\"en\"?\"en\":\"zh\"}catch{}\nconst reader=document.querySelector(\"#personal-reader\");\nconst retry=document.querySelector(\"#retry-translation\");\nconst note=document.querySelector(\"#translation-note\");\nconst progress=document.querySelector(\"#translation-progress\");\nconst output=document.querySelector(\"#translated-paragraphs\");\nconst numericRisk=document.querySelector(\"#numeric-risk\");\nconst originalButton=document.querySelector(\"#show-original-english\");\nlet numericIssues=0;\nlet inflight=null;\nasync function translate(){\n if(!reader||reader.dataset.done===\"true\")return;\n if(inflight)return inflight;\n inflight=(async()=>{\n   if(retry)retry.hidden=true;\n   if(numericRisk)numericRisk.hidden=true;\n   numericIssues=0;\n   let parts=[],part=0,total=1;\n   let saved=null;\n   const storageKey=\"hhba-reader-v2-chinese-only:\"+reader.dataset.job+\":\"+reader.dataset.hash;\n   try{saved=sessionStorage.getItem(storageKey)}catch{}\n   if(saved&&output){output.textContent=saved;progress.textContent=\"中文译文已加载（本次浏览会话缓存）\";note.textContent=\"这是机器即时翻译，请核对对应的英文原文。\";reader.dataset.done=\"true\";return;}\n   if(output)output.textContent=\"\";\n   try{\n    while(part<total){\n     let response=null;\n     for(let trial=0;trial<2;trial++){\n      response=await fetch(\"/api/jobs/\"+encodeURIComponent(reader.dataset.job)+\"/translate-part\",{\n       method:\"POST\",credentials:\"same-origin\",\n       headers:{\"Content-Type\":\"application/json\"},\n       body:JSON.stringify({part,sourceHash:reader.dataset.hash})\n      });\n      if(response.status!==429)break;\n      await new Promise(r=>setTimeout(r,3000));\n     }\n     if(!response||!response.ok){\n      let payload={};try{payload=await response.json()}catch{}\n      if(payload.error===\"source_changed\")throw Error(\"官方岗位内容已更新，请刷新页面重试。\");\n      if(payload.error===\"source_too_long\")throw Error(\"这条官方职位描述过长，暂无法完整翻译。请切换英文查看企业官方原文。\");\n      if(payload.error===\"translation_incomplete\")throw Error(\"检测到本段仍包含未翻译的英文长句。系统没有把不完整译文当成中文显示，请重试或切换英文。\");\n      throw Error(\"第 \"+(part+1)+\" 段翻译暂时失败，可以重试或查看完整英文原文。\");\n     }\n     const result=await response.json();\n     if(result.jobId!==reader.dataset.job||result.sourceHash!==reader.dataset.hash||\n        result.part!==part||!Number.isInteger(result.total)||result.total<1||result.total>80||\n        typeof result.text!==\"string\")throw Error(\"译文与当前岗位版本不一致，请刷新页面。\");\n     if(part===0)total=result.total;\n     if(result.total!==total)throw Error(\"官方岗位在翻译过程中发生变化，请刷新页面。\");\n     if(result.numbersVerified===false){numericIssues++;if(numericRisk)numericRisk.hidden=false;}\n     parts.push(result.text);\n     if(output)output.textContent=parts.join(\"\\n\");\n     part++;\n     if(progress)progress.textContent=\"已翻译 \"+part+\" / \"+total+\" 段\";\n    }\n    const complete=parts.join(\"\\n\");\n    if(reader&&complete.trim()){\n     try{sessionStorage.setItem(storageKey,complete)}catch{}\n     reader.dataset.done=\"true\";\n     if(note)note.textContent=\"中文即时翻译已完成（机器译文，仅供辅助理解）。请对照英文原文核对招聘条件。\";\n     if(progress)progress.textContent=\"已完成 \"+total+\" / \"+total+\" 段\";\n    }\n   }catch(err){\n     if(note)note.textContent=err.message||\"翻译暂时不可用。\";\n     if(progress)progress.textContent=parts.length?\"当前已完成 \"+parts.length+\" 段。其余内容请查看下方完整原文。\":\"下面可以直接展开完整官方英文原文。\";\n     if(retry)retry.hidden=false;\n   }\n })();\n try{return await inflight}finally{inflight=null}\n}\nfunction set(v){\n lang=v===\"en\"?\"en\":\"zh\";\n try{localStorage.setItem(\"hhba-lang\",lang)}catch{}\n document.querySelector(\"#jd-zh\").hidden=lang!==\"zh\";\n document.querySelector(\"#jd-en\").hidden=lang!==\"en\";\n document.querySelector(\"#detail-zh\").classList.toggle(\"selected\",lang===\"zh\");\n document.querySelector(\"#detail-en\").classList.toggle(\"selected\",lang===\"en\");\n document.querySelector(\"#detail-title\").textContent=document.querySelector(\"#detail-title\").dataset[lang];\n document.querySelector(\"#detail-place\").textContent=document.querySelector(\"#detail-place\").dataset[lang];\n const labels={\n \"#detail-brand\":[\"· 招聘市场\",\"· Job Marketplace\"],\n \"#detail-back\":[\"← 返回招聘市场\",\"← Back to jobs\"],\n \"#jd-label\":[\"岗位完整描述\",\"Full job description\"],\n \"#detail-apply\":[\"前往企业官网申请 ↗\",\"Apply on employer website ↗\"],\n \"#detail-official\":[\"查看对应官方职位页 ↗\",\"View original job posting ↗\"],\n \"#detail-disclaimer\":[\"资料来自企业公开招聘系统，机器翻译仅供辅助阅读。申请资格及最终岗位状态以企业官网为准；HHBA 不代表招聘企业。\",\"Information comes from public employer job boards. HHBA is not affiliated with employers. Requirements and availability are governed by the official posting.\"]\n};\nfor(const [selector,pair] of Object.entries(labels)){\n const element=document.querySelector(selector);\n if(element)element.textContent=pair[lang===\"en\"?1:0];\n}\nconst source=document.querySelector(\"#detail-source\");\nif(source)source.textContent=lang===\"zh\"?\"企业官方岗位 · 读取时间 \"+source.dataset.check+\" · 中文机器译文仅供参考\":\n \"Original employer posting · Retrieved \"+source.dataset.check+\" · English source text\";\nconst remote=document.querySelector(\"#detail-remote\");\nif(remote){const value=remote.dataset.value;\n remote.textContent=value===\"true\"?(lang===\"en\"?\"Remote\":\"远程\"):\n value===\"false\"?(lang===\"en\"?\"Not remote\":\"非远程\"):\n (lang===\"en\"?\"Remote unspecified\":\"远程方式未标明\");}\ndocument.documentElement.lang=lang===\"en\"?\"en\":\"zh-CN\";\nif(lang===\"zh\"&&reader)void translate();\n}\ndocument.querySelector(\"#detail-zh\").onclick=()=>set(\"zh\");\ndocument.querySelector(\"#detail-en\").onclick=()=>set(\"en\");\nif(retry)retry.onclick=()=>{reader.dataset.done=\"false\";void translate()};\nif(originalButton)originalButton.onclick=()=>set(\"en\");\nset(lang);\n})()" +'</script></body></html>';
 }
 
 
@@ -518,6 +518,61 @@ async function start(){try{const r=await fetch('/api/jobs');if(!r.ok)throw Error
 q.addEventListener("input",()=>render());c.addEventListener("change",()=>render());remote.addEventListener("change",()=>render());start();
 </script></body></html>`;
 
+
+const zhSectionLabels:Record<string,string>={
+ "responsibilities":"岗位职责",
+ "key responsibilities":"主要职责",
+ "job responsibilities":"岗位职责",
+ "requirements":"任职要求",
+ "basic qualifications":"基本任职条件",
+ "minimum qualifications":"最低任职要求",
+ "preferred qualifications":"优先任职条件",
+ "qualifications":"任职条件",
+ "what you will do":"工作职责",
+ "what you'll do":"工作职责",
+ "what we are looking for":"我们期待的人选",
+ "who you are":"任职条件",
+ "about the role":"职位介绍",
+ "about us":"关于我们",
+ "about the team":"关于团队",
+ "benefits":"福利待遇",
+ "perks and benefits":"福利待遇",
+ "compensation":"薪酬待遇",
+ "salary":"薪资",
+ "equal opportunity":"平等就业机会",
+ "equal opportunity employer":"平等就业机会"
+};
+function fixEnglishJdHeadings(input:string):string{
+ return input.split("\n").map(line=>{
+  const normalized=line.trim().toLowerCase().replace(/[:：]\s*$/,"");
+  const replacement=zhSectionLabels[normalized];
+  return replacement??line;
+ }).join("\n");
+}
+function englishBodyRuns(input:string):string[]{
+ // Long runs of untouched English prose are not ordinary branded nouns,
+ // API abbreviations, or programming language names.
+ return input.match(/(?:[A-Za-z]{3,}[ \t]+){7,}[A-Za-z]{3,}/g)||[];
+}
+async function ensureChineseProse(value:string):Promise<string|null>{
+ let current=fixEnglishJdHeadings(value);
+ for(let cycle=0;cycle<2;cycle++){
+  const residual=englishBodyRuns(current);
+  if(!residual.length)return current;
+  if(residual.length>6)return null;
+  let changed=false;
+  for(const phrase of residual){
+   const ret=await machineTranslations("jd",[phrase]);
+   const translated=ret?.[0];
+   if(!translated||!/[一-龥]/.test(translated)||englishBodyRuns(translated).length)return null;
+   current=current.replace(phrase,translated);
+   changed=true;
+  }
+  if(!changed)break;
+ }
+ return englishBodyRuns(current).length?null:current;
+}
+
 // Per-view, not published / indexed: a user reads a live official posting
 // in Chinese without adding the translated third-party JD to the shared DB.
 const JD_READER_SIZE=900;
@@ -606,11 +661,12 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
   if(!one.trim())return Response.json({jobId:job.id,part,total:chunks.length,text:one,sourceHash:digest,sourceUrl:job.url,mode:"private_reading_translation"},{headers});
   const output=await machineTranslations("jd",[one]);
   if(!output||!output[0])return Response.json({error:"translation_unverified",part,total:chunks.length},{status:503,headers});
-  // Chinese reading only: never append the official English paragraphs to
-  // the Chinese payload. Numeric warnings are machine-readable metadata;
-  // the user can switch to the English tab to inspect official conditions.
-  const numbersVerified=numbersRetained(one,output[0]);
-  return Response.json({jobId:job.id,part,total:chunks.length,text:output[0],sourceHash:digest,
+  // An English paragraph inside a Chinese translation is a QA failure.
+  // Retry affected prose separately; never return whole English passages.
+  const chinese=await ensureChineseProse(output[0]);
+  if(!chinese)return Response.json({error:"translation_incomplete",part,total:chunks.length},{status:503,headers});
+  const numbersVerified=numbersRetained(one,chinese);
+  return Response.json({jobId:job.id,part,total:chunks.length,text:chinese,sourceHash:digest,
     numbersVerified,sourceUrl:job.url,mode:"private_reading_translation"},{headers});
  }catch(ex){
   console.log("HHBA_READER_ERROR",ex instanceof Error?ex.name:"unknown");

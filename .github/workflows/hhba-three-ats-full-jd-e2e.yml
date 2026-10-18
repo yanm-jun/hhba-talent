@@ -1,4 +1,4 @@
-name: HHBA complete Chinese JD across all three ATS
+name: HHBA complete Chinese JD across all six job boards
 on:
   workflow_dispatch:
   push:
@@ -13,17 +13,17 @@ permissions:
 jobs:
   three-ats-translation:
     runs-on: ubuntu-latest
-    timeout-minutes: 16
+    timeout-minutes: 28
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify every JD segment for three live official ATS roles
+      - name: Verify all JD segments across all six ATS boards, with no untranslated English prose
         run: node deploy/railway/full_three_ats_jd_e2e.mjs
       - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: hhba-three-ats-complete-chinese-jd
+          name: hhba-six-boards-complete-chinese-jd
           path: three-ats-translation/
           retention-days: 14
