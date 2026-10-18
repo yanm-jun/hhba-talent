@@ -42,7 +42,8 @@ try{
     {waitUntil:'domcontentloaded',timeout:30000});
    entry.http=response.status();
    if(!response.ok())throw Error('GET status '+response.status());
-   await page.locator('#jd-zh').waitFor({timeout:10000});
+   await page.locator('#jd-zh').waitFor({state:'attached',timeout:10000});
+   await page.locator('#detail-zh').click();
    await page.locator('#jd-en').count();
    assert.equal(await page.locator('#detail-zh').count(),1);
    assert.equal(await page.locator('#detail-en').count(),1);
