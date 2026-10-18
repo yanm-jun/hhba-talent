@@ -26,7 +26,7 @@ const phrases:[string,string][]=[
  ["Healthcare","医疗健康"],["Health","健康"],["Provider","服务提供者"],
  ["Patient","患者"],["Safety","安全"],["Training","培训"],
  ["Education","教育"],["Teaching","教学"],["Instructor","讲师"],
- ["Accounting","会计"],["Attorney","律师"],["Cousel","法律顾问"],
+ ["Accounting","会计"],["Attorney","律师"],["Counsel","法律顾问"],
  ["Algorithm","算法"],["Algorithms","算法"],["Payments Fraud","支付反欺诈"],["Business Development","业务拓展"],
  ["Regulatory Compliance","监管合规"],["Machine Learning","机器学习"],
  ["Artificial Intelligence","人工智能"],["Data Scientist","数据科学家"],
@@ -483,7 +483,9 @@ async function fillTitleTranslations(rows:Job[]){
   const pending=unique.filter(t=>fromCache("title",t)?.mode!=="machine"&&!translationNeedsReview.has(t));
   pending.sort((a,b)=>{
    const aData=fromCache("title",a),bData=fromCache("title",b);
-   return Number(bData?.mode==="pending")-Number(aData?.mode==="pending");
+   const am=aData?.mode||(translateTitleRules(a)==="职位名称待翻译"?"pending":"rules");
+   const bm=bData?.mode||(translateTitleRules(b)==="职位名称待翻译"?"pending":"rules");
+   return Number(bm==="pending")-Number(am==="pending");
   });
   const queue=pending.slice(0,Math.min(available.remaining,96));
   let translated=0,attempted=0;
