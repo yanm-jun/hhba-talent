@@ -23,3 +23,14 @@ The existing Xiaomi records are a historical official-list snapshot, not indepen
 
 ## Developer test
 `node --test ops/railway/jobs-marketplace/source.test.mjs` verifies invariants and change presence without requiring private Railway environment variables. It is **not** a replacement for deployed HTTP and user-interface acceptance tests.
+
+
+## Verified deployment — 2026-10-18
+
+- **Railway Function size limit is 96 KiB.** The first proposed source was 99,640 bytes, which prevented a new working build despite successful mutation responses. Removed standalone comments, retaining all code and ATS records. Final source is **96,052 UTF-8 bytes**.
+- **Production deployment ID:** `64c7dc64-77d1-4118-85c0-de497d9fd595`, `SUCCESS`. Live source read-back matched the compact version.
+- **Source loading:** 9,040 job records, 36 healthy ATS boards, zero board failures. The previous source loaded 8,795 records from 34 ATS boards.
+- **Live HTTP self-tests:** OpenAI 813, Tencent 19, Xiaomi 1,010, Cursor 133, Mercor 112; all five returned HTTP 200 with expected company and positive job count.
+- **Homepage self-test:** 30 server-rendered job cards, no employer-directory replacement, client script syntactically valid and employer-name mapping present.
+- **GitHub Actions runner caveat:** The private-repo workflow failed before executing any steps; the job steps array was empty and GitHub job logs returned `BlobNotFound`. Retrying the run also failed without test steps. Do not present GitHub Actions as passing. Inspect the repo's Actions runtime availability, policy and billing settings separately.
+- **Future expansion:** Do not continue growing a monolithic Railway Function near its source-size ceiling. Move the board registry and server to a normal repo-based deploy or externally managed data configuration before large-scale expansion.
