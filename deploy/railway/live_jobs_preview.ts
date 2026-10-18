@@ -643,6 +643,20 @@ async function translatedDetail(d:Detail):Promise<string|null>{
  return value;
 }
 
+// Server-rendered cards are a resilient, real-data fallback for mobile browsers.
+function firstPageJobCards(rows:Job[]):string{
+ const unique=new Map<string,Job>();
+ for(const j of rows)if(!unique.has(j.company))unique.set(j.company,j);
+ return [...unique.values()].slice(0,30).map(j=>{
+  const name=companyZh[j.company]||j.company;
+  const title=j.domestic?j.title:(present(j).titleZh||j.title);
+  const place=j.domestic?j.location:translateLocation(j.location);
+  const initials=esc(j.company.slice(0,2).toUpperCase()),domain=employerBrandSites[j.company];
+  const icon='<span class="company-logo" aria-hidden="true"><span class="company-initials">'+initials+'</span>'+(domain?'<img src="https://'+esc(domain)+'/favicon.ico" alt="" loading="lazy" decoding="async">':'')+'</span>';
+  const detail='/jobs/'+encodeURIComponent(j.id);
+  return '<article class="job"><div class="job-main">'+icon+'<div class="job-body"><a class="job-title" href="'+detail+'">'+esc(title)+'</a><div class="company-name">'+esc(name)+'</div><div class="job-meta"><span>'+esc(place)+'</span><span>'+(j.domestic?'国内官方 · 招聘状态待核实':'海外企业官方招聘')+'</span></div></div></div><a class="visit" href="'+detail+'">查看岗位详情 ↗</a></article>';
+ }).join("");
+}
 const page=(payload:any)=>`<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HHBA · 全球招聘市场</title><meta name="description" content="HHBA 全球招聘市场：真实海外企业公开招聘职位索引，点击跳企业官网。"><style>
 :root{font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;color:#172821;background:#f6f7f4}
 *{box-sizing:border-box}body{margin:0}a{color:inherit;text-decoration:none}
@@ -681,7 +695,7 @@ footer{padding:25px;text-align:center;color:#8a9b8f;font-size:11px;border-top:1p
 </style></head><body><nav><div class="logo">HHBA <em id="market-brand">招聘市场</em></div><div id="market-lab" class="lab">真实企业招聘索引 · 公测</div><div class="lang-switch" aria-label="岗位语言"><button id="toggle-zh" type="button">中文</button><button id="toggle-en" type="button">English</button></div></nav><section class="hero"><div class="wrap"><div id="market-kicker" class="eyebrow">全球职业机会 · 企业官方来源</div><h1 id="market-h1">发现全球工作机会</h1><p id="market-subtitle">搜索海外企业公开招聘岗位，在 HHBA 阅读岗位详情，再前往企业官网申请。岗位来自 Greenhouse、Lever、Ashby 的公开招聘接口。</p><div class="numbers"><div class="num"><b id="count">${payload.total}</b><span id="market-count-label">本次获取的岗位</span></div><div class="num"><b>${payload.boards}</b><span id="market-board-label">成功读取的招聘板</span></div><div class="num"><b>4</b><span id="market-source-label">有岗位记录的国内企业</span></div><div class="num"><b id="translated-count">—</b><span id="translated-label">已机器翻译职位名称</span></div></div></div></section>
 <main><div id="market-status" data-updated="${esc(payload.updated)}" data-failures="${payload.failures}" class="status">默认显示中文岗位名称。术语规则翻译属于初版，未完成的翻译会标注“待翻译”；切换英文可核对官方标题。公测版说明：本次已接入 ${payload.boards} 个企业招聘板，不代表全量全球职位。最近同步：${esc(payload.updated)}。职位是否仍接受申请以企业官网为准。${payload.failures?" 有 "+payload.failures+" 个来源本轮暂不可用。":""}</div>
 <div class="filters"><input id="q" aria-label="搜索岗位或企业" placeholder="搜索岗位、公司、地点（支持英文）"><select id="company" aria-label="企业"><option value="">全部企业</option></select><select id="country" aria-label="招聘来源"><option value="">全部来源</option><option value="cn">国内官方</option><option value="global">海外 ATS</option></select><select id="recruitment" aria-label="招聘类型"><option value="">全部招聘类型</option><option value="SOCIAL">社招</option><option value="CAMPUS">校招</option><option value="INTERNSHIP">实习</option></select><select id="remote" aria-label="远程筛选"><option value="">全部工作方式</option><option value="yes">标注远程</option></select></div>
-<div class="filter-tools"><span id="filter-summary" aria-live="polite"></span><button type="button" id="clear-filters" class="filter-clear" hidden>清除全部筛选</button></div><div class="section-title"><h2 id="market-list-h2">官方岗位列表</h2><span id="shown"></span></div><div class="list" id="jobs"></div><section class="directory" aria-label="已核验企业官网"><div class="directory-head"><h2 id="dir-title">国内企业官方招聘入口</h2><small id="dir-note">10 家官网已核验 · 入口不代表已收录岗位</small></div><div class="directory-grid" id="employer-directory"></div></section><p id="market-disclaimer" class="disclaimer">数据源为外部企业公开招聘板。部分企业官网在不同网络环境下可能无法访问。岗位发布时间、工作类型、远程标记在接口未披露时不会推断，具体资格要求和投递方式请到企业官网核实。HHBA 不代表与招聘企业存在合作关系。</p></main><footer id="market-footer">HHBA · 全球职位索引 · 仅展示公开岗位资料与官网链接</footer>
+<div class="filter-tools"><span id="filter-summary" aria-live="polite"></span><button type="button" id="clear-filters" class="filter-clear" hidden>清除全部筛选</button></div><div class="section-title"><h2 id="market-list-h2">官方岗位列表</h2><span id="shown">显示 ${Math.min(payload.total,30)} / ${payload.total} 条</span></div><div class="list" id="jobs">${firstPageJobCards(payload.rows||[])}</div><details class="directory" aria-label="已核验企业官网"><summary style="cursor:pointer;padding:12px 0;font-weight:750">查看10家国内企业官方招聘入口（辅助导航）</summary><div class="directory-head"><h2 id="dir-title">国内企业官方招聘入口</h2><small id="dir-note">10 家官网已核验 · 入口不代表已收录岗位</small></div><div class="directory-grid" id="employer-directory"></div></details><p id="market-disclaimer" class="disclaimer">数据源为外部企业公开招聘板。部分企业官网在不同网络环境下可能无法访问。岗位发布时间、工作类型、远程标记在接口未披露时不会推断，具体资格要求和投递方式请到企业官网核实。HHBA 不代表与招聘企业存在合作关系。</p></main><footer id="market-footer">HHBA · 全球职位索引 · 仅展示公开岗位资料与官网链接</footer>
 <script>
 let all=[],filtered=[],limit=30,totalFiltered=0,companyNames=[],latestRequest=0,searchTimer=null;
 window.hhbaBoardCount=${payload.boards};
@@ -743,7 +757,7 @@ function setLanguage(value){
  document.querySelector('#company').setAttribute('aria-label',lang==='zh'?'按企业筛选':'Filter companies');
  document.querySelector('#remote').setAttribute('aria-label',lang==='zh'?'按工作方式筛选':'Filter workplace type');
  renderPortalDirectory();
- render();
+ if(all.length)render();
 }
 document.querySelector('#toggle-zh').addEventListener('click',()=>setLanguage('zh'));
 document.querySelector('#toggle-en').addEventListener('click',()=>setLanguage('en'));
@@ -822,7 +836,7 @@ async function fetchJobs(reset=true){
    document.querySelector("#translated-count").textContent=data.machineCount;
   render(false);
  }catch{
-  if(token===latestRequest)
+  if(token===latestRequest&&!list.querySelector('.job'))
    list.innerHTML='<div class="empty">'+(lang==="zh"?"岗位暂时无法加载，请重试。":"Jobs temporarily unavailable. Please retry.")+'</div>';
  }
 }
@@ -833,7 +847,7 @@ function start(){
   if(['cn','global'].includes(parms.get('country')))country.value=parms.get('country');
   if(['SOCIAL','CAMPUS','INTERNSHIP'].includes(parms.get('recruitment_type')))recruitment.value=parms.get('recruitment_type');
  }catch{}
- setLanguage(lang);
+ try{setLanguage(lang)}catch(e){console.error("HHBA_MOBILE_INIT_ERROR",e)}
  void fetchJobs(true);
 }
 q.addEventListener("input",()=>{
@@ -1076,7 +1090,7 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  }
 
  if(u.pathname!=="/")return new Response("Not found",{status:404,headers});
- const data=await load();return new Response(page({total:data?.rows.length||0,boards:data?.boards||0,failures:data?.failures||0,updated:data?.updated||""}),{headers:{...headers,"Content-Type":"text/html; charset=utf-8"}});
+ const data=await load();return new Response(page({rows:data?.rows||[],total:data?.rows.length||0,boards:data?.boards||0,failures:data?.failures||0,updated:data?.updated||""}),{headers:{...headers,"Content-Type":"text/html; charset=utf-8"}});
 }});
 
 
@@ -1094,13 +1108,3 @@ void (async()=>{try{
 }catch(e){console.error("HHBA_DOMESTIC_SEARCH_SELFTEST_ERROR",e instanceof Error?e.message:"unknown");}})();
 void load().then(data=>console.log("HHBA_SOURCE_SYNC",JSON.stringify({jobs:data?.rows.length||0,boards:data?.boards||0,failures:data?.failures||0,domesticObserved:domesticObserved.length})))
 .catch(e=>console.error("HHBA_SOURCE_STARTUP_ERROR",e instanceof Error?e.name:"unknown"));
-
-// One-time browser bootstrap syntax probe. Never logs source or job content.
-void (async()=>{try{
- const response=await fetch("http://127.0.0.1:"+String(Bun.env.PORT||3000)+"/");
- const html=await response.text();
- const match=html.match(/<script>([\s\S]*?)<\/script>/i);
- if(!match)throw Error("Inline search bootstrap missing");
- try{new Function(match[1]);console.log("HHBA_BROWSER_BOOTSTRAP_PROOF",JSON.stringify({valid:true,jsChars:match[1].length,jobList:html.includes('id="jobs"'),directory:html.includes('id="employer-directory"')}));}
- catch(e){console.error("HHBA_BROWSER_BOOTSTRAP_PROOF",JSON.stringify({valid:false,error:e instanceof Error?e.message:"unknown"}));}
-}catch(e){console.error("HHBA_BROWSER_BOOTSTRAP_PROOF_ERROR",e instanceof Error?e.message:"unknown");}})();
