@@ -32,7 +32,7 @@ const server=http.createServer((req,res)=>{
    return send(res,job?200:404,job?{job}:{error:"not_found"});
   }
   if(u.pathname==="/app.js"){res.writeHead(200,headers("text/javascript; charset=utf-8"));return res.end(app)}
-  if(u.pathname==="/"){res.writeHead(200,headers("text/html; charset=utf-8"));return res.end(home())}
+  if(u.pathname==="/"||/^\\/jobs\\/[a-f0-9]{32}$/.test(u.pathname)){res.writeHead(200,headers("text/html; charset=utf-8"));return res.end(home())}
   return send(res,404,{error:"not_found"});
  }catch(e){console.error("HHBA_INDEXER_REQUEST_ERROR",e?.message);return send(res,500,{error:"server_error"})}
 });
