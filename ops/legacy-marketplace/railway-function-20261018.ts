@@ -534,8 +534,20 @@ function restoreGroupedNumbers(source:string,translated:string):string{
 }
 
 function numbersRetained(original:string,translated:string):boolean{
- const b=numberTokens(translated);
- return numberTokens(original).every(x=>b.includes(x));
+ const translatedDigits=numberTokens(translated);
+ // Legitimate Chinese unit conversions, e.g. "500,000" -> "50万"
+ // or "$182,800" -> "18.28万美元", must retain the same quantity.
+ const expressed:string[]=[];
+ for(const m of translated.matchAll(/(\d+(?:\.\d+)?)\s*(?:多|余)?\s*(百万|千|万|亿)/g)){
+  const factors:Record<string,number>={"千":1000,"万":10000,"百万":1000000,"亿":100000000};
+  expressed.push(String(Number(m[1])*factors[m[2]]));
+ }
+ return numberTokens(original).every(token=>{
+  if(translatedDigits.includes(token))return true;
+  if(/[％%]$/.test(token))return false;
+  const numeric=Number(token.replace(/,/g,""));
+  return Number.isFinite(numeric)&&expressed.includes(String(numeric));
+ });
 }
 async function machineTranslations(kind:"title"|"jd",sources:string[]):Promise<(string|null)[]|null>{
  const url=privateTranslatorUrl();
@@ -1164,13 +1176,17 @@ void (async()=>{if(Bun.env.RAILWAY_SERVICE_NAME!=="hhba-web")return;
  const normalized=normalizeOfficialMarkup(sample);
  const rendered=convert(normalized,{wordwrap:false});
  const numberSample=restoreGroupedNumbers("$182,800 to $238,100","182 800美元至238 100美元");
+ const unitNumbersPass=numbersRetained("More than 500,000 users","50多万用户")&&
+  numbersRetained("Salary $182,800","薪资18.28万美元")&&
+  !numbersRetained("500,000 users","40万用户")&&
+  !numbersRetained("80%","70%");
  const pass=normalized.includes("<p>")&&normalized.includes("<li>")&&
   !hasLeakedJdTags(rendered)&&rendered.includes("Salary")&&
-  numberSample==="182,800美元至238,100美元";
+  unitNumbersPass&&numberSample==="182,800美元至238,100美元";
  console.log("HHBA_JD_HTML_NORMALIZER_TEST",JSON.stringify({
   structuralTagsRecovered:normalized.includes("<li>"),
   plainTextClean:!hasLeakedJdTags(rendered),
-  numberGroupingRestored:numberSample==="182,800美元至238,100美元",
+  numberGroupingRestored:numberSample==="182,800美元至238,100美元",unitNumbersPass,
   pass
  }));
 })();
