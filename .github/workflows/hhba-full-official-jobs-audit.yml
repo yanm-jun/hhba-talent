@@ -1,0 +1,30 @@
+name: HHBA official all jobs full audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/audit_all_official_jobs.mjs'
+      - '.github/workflows/hhba-full-official-jobs-audit.yml'
+  schedule:
+    - cron: '35 2 * * 1'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check deploy/railway/audit_all_official_jobs.mjs
+      - name: Verify all live listing official-source JD and public detail pages
+        run: node deploy/railway/audit_all_official_jobs.mjs
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-full-jobs-source-audit
+          path: audit-output/
+          retention-days: 21
