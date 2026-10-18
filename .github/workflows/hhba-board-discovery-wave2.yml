@@ -1,0 +1,28 @@
+name: HHBA second wave industry-diverse official ATS discovery
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/probe_official_boards_wave2.mjs'
+      - '.github/workflows/hhba-board-discovery-wave2.yml'
+permissions:
+  contents: read
+jobs:
+  official-source-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check deploy/railway/probe_official_boards_wave2.mjs
+      - name: Check new public ATS JSON boards and one original JD each
+        run: node deploy/railway/probe_official_boards_wave2.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-wave2-real-employer-board-candidates
+          path: board-candidates-wave2/
+          retention-days: 21
