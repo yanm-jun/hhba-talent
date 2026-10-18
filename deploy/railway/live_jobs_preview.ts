@@ -5,7 +5,7 @@ type Job={id:string;company:string;title:string;location:string;remote:boolean|n
 
 import { Database } from "bun:sqlite";
 import { createHash } from "node:crypto";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 const phrases:[string,string][]=[
  ["Algorithm","算法"],["Algorithms","算法"],["Payments Fraud","支付反欺诈"],["Business Development","业务拓展"],
  ["Regulatory Compliance","监管合规"],["Machine Learning","机器学习"],
@@ -278,10 +278,9 @@ async function officialDetail(job:Job):Promise<Detail|null>{
    checkedAt:new Date().toISOString()};
  }catch{return null;}
 }
-function detailHtml(d:Detail):string{
+function detailHtml(d:Detail,zhFull:string|null):string{
  const j=d.job;
  const name=present(j);
- const zhFull=translatedDetail(d);
  const official=esc(j.url),apply=esc(d.applyUrl||j.url);
  const body=d.status==="LIVE_CONTENT"?
    '<div class="full-jd">'+(d.richHtml||esc(d.description))+'</div>':
@@ -311,7 +310,7 @@ function detailHtml(d:Detail):string{
   '<p class="source">官方同一岗位 ID · 最近读取 '+esc(d.checkedAt)+' · 英文为企业原文，中文为翻译参考</p>'+
   '<div class="lang-panel" id="jd-zh">'+
   (zhFull?'<div class="full-jd" style="white-space:pre-wrap">'+esc(zhFull)+'</div>':
-   '<p class="missing">该职位的中文完整 JD 译文尚未准备好。本站不会用不完整译文代替官方要求。请点击 English 阅读该岗位的官方完整原文。</p>')+
+   '<p class="missing">该职位的中文完整 JD 译文尚未取得可公开展示的授权，或翻译尚未完成。本站不会用不完整译文代替官方要求。请点击 English 阅读该岗位的官方完整原文。</p>')+
   '</div><div class="lang-panel" id="jd-en" hidden>'+body+'</div></section>'+
   '<div class="actions"><a class="btn" href="'+apply+'" target="_blank" rel="noopener noreferrer">前往企业官网申请 ↗</a>'+
   '<a class="btn secondary" href="'+official+'" target="_blank" rel="noopener noreferrer">查看对应官方职位页 ↗</a></div>'+
@@ -386,12 +385,46 @@ async function fillTitleTranslations(rows:Job[]){
  finally{titleWorkerRunning=false;}
 }
 
-function translatedDetail(d:Detail):string|null{
- // Metadata-only permission is not permission to publish derivative JD
- // translations. A separate verified source/job rights registry is required.
- if(!Bun.env.HHBA_JD_TRANSLATION_RIGHTS_REGISTRY_READY)return null;
+function licensedJd(d:Detail):boolean{
+ // This registry is operator-owned inside the mounted volume. It has no
+ // HTTP write route, and metadata-only rights are explicitly insufficient.
+ try{
+  const raw=readFileSync("/data/hhba-jd-rights.json");
+  if(raw.length>200000)return false;
+  const manifest=JSON.parse(raw.toString("utf8")) as any;
+  if(manifest.schema_version!==1||manifest.mode!=="HHBA_TRANSLATED_JD_RIGHTS"||
+     !Array.isArray(manifest.grants))return false;
+  const grant=manifest.grants.find((g:any)=>g?.job_id===d.job.id);
+  if(!grant||grant.rights_scope!=="FULL_JD_TRANSLATION_AND_REPUBLICATION"||
+     grant.permission_confirmed!==true||
+     grant.original_source_url!==d.job.url||
+     grant.source_sha256!==createHash("sha256").update(d.description).digest("hex")||
+     !grant.grant_reviewed_at||!grant.rights_expires_at||
+     !(Date.parse(grant.grant_reviewed_at)<=Date.now()&&Date.parse(grant.rights_expires_at)>Date.now())||
+     !grant.reviewer||!grant.publisher||grant.reviewer===grant.publisher||
+     !grant.rights_holder)return false;
+  // Permission documentation must be physically present and hash-matched,
+  // not merely asserted in a JSON boolean.
+  if(typeof grant.permission_evidence_sha256!=="string"||
+     !/^[a-f0-9]{64}$/.test(grant.permission_evidence_sha256)||
+     typeof grant.permission_evidence_filename!=="string"||
+     !/^[a-zA-Z0-9_-]{1,60}\.txt$/.test(grant.permission_evidence_filename))return false;
+  const evidence=readFileSync("/data/grants/"+grant.permission_evidence_filename);
+  return evidence.length>0&&evidence.length<100000&&
+    createHash("sha256").update(evidence).digest("hex")===grant.permission_evidence_sha256;
+ }catch{return false;}
+}
+async function translatedDetail(d:Detail):Promise<string|null>{
+ if(!licensedJd(d)||d.status!=="LIVE_CONTENT"||!d.description.trim())return null;
  const record=fromCache("jd",d.description);
- return record?.mode==="rights-reviewed-model"?record.translated:null;
+ if(record?.mode==="rights-reviewed-machine")return record.translated;
+ // JD translation is strictly on-demand after permission; no mass
+ // republishing a third-party text to the translation cache by default.
+ const result=await machineTranslations("jd",[d.description]);
+ const value=result?.[0];
+ if(!value||!numbersRetained(d.description,value)||!licensedJd(d))return null;
+ toCache("jd",d.description,value,"rights-reviewed-machine");
+ return value;
 }
 
 const page=(payload:any)=>`<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HHBA · 全球招聘市场</title><meta name="description" content="HHBA 全球招聘市场：真实海外企业公开招聘职位索引，点击跳企业官网。"><style>
@@ -416,10 +449,10 @@ h2{font-size:20px;margin:0}.section-title span{color:#7f9085;font-size:12px}
 .empty{padding:48px;text-align:center;color:#68776b;background:white;border-radius:12px}
 footer{padding:25px;text-align:center;color:#8a9b8f;font-size:11px;border-top:1px solid #e5eae4}
 @media(max-width:600px){.hero{padding:50px 22px}nav{padding:16px 22px;gap:10px;flex-wrap:wrap}.job{display:block;padding:18px}.visit{display:inline-block;margin-top:15px}.numbers{gap:23px}}
-</style></head><body><nav><div class="logo">HHBA <em>招聘市场</em></div><div class="lab">真实企业招聘索引 · 公测</div><div class="lang-switch" aria-label="岗位语言"><button id="toggle-zh" type="button">中文</button><button id="toggle-en" type="button">English</button></div></nav><section class="hero"><div class="wrap"><div class="eyebrow">GLOBAL CAREERS · OFFICIAL SOURCES</div><h1>发现全球工作机会</h1><p>搜索海外企业公开招聘岗位，点击直接前往企业官方职位详情页。岗位来自 Greenhouse、Lever、Ashby 的公开招聘接口；没有虚构职位，不在本网站复制完整 JD。</p><div class="numbers"><div class="num"><b id="count">${payload.total}</b><span>本次获取的岗位</span></div><div class="num"><b>${payload.boards}</b><span>成功读取的招聘板</span></div><div class="num"><b>3</b><span>ATS 数据平台</span></div></div></div></section>
+</style></head><body><nav><div class="logo">HHBA <em>招聘市场</em></div><div class="lab">真实企业招聘索引 · 公测</div><div class="lang-switch" aria-label="岗位语言"><button id="toggle-zh" type="button">中文</button><button id="toggle-en" type="button">English</button></div></nav><section class="hero"><div class="wrap"><div class="eyebrow">GLOBAL CAREERS · OFFICIAL SOURCES</div><h1 id="market-h1">发现全球工作机会</h1><p id="market-subtitle">搜索海外企业公开招聘岗位，在 HHBA 阅读岗位详情，再前往企业官网申请。岗位来自 Greenhouse、Lever、Ashby 的公开招聘接口。</p><div class="numbers"><div class="num"><b id="count">${payload.total}</b><span>本次获取的岗位</span></div><div class="num"><b>${payload.boards}</b><span>成功读取的招聘板</span></div><div class="num"><b>3</b><span>ATS 数据平台</span></div><div class="num"><b id="translated-count">—</b><span id="translated-label">已机器翻译职位名称</span></div></div></div></section>
 <main><div class="status">默认显示中文岗位名称。术语规则翻译属于初版，未完成的翻译会标注“待翻译”；切换 English 可查官方标题。公测版说明：当前接入 6 个样本企业招聘板，不代表全量全球职位。最近同步：${esc(payload.updated)}。职位是否仍接受申请以企业官网为准。${payload.failures?" 有 "+payload.failures+" 个来源本轮暂不可用。":""}</div>
 <div class="filters"><input id="q" aria-label="搜索岗位或企业" placeholder="搜索岗位、公司、地点（支持英文）"><select id="company" aria-label="企业"><option value="">全部企业</option></select><select id="remote" aria-label="远程筛选"><option value="">全部工作方式</option><option value="yes">标注远程</option></select></div>
-<div class="section-title"><h2>官方岗位列表</h2><span id="shown"></span></div><div class="list" id="jobs"></div><p class="disclaimer">数据源为外部企业公开招聘板。部分企业官网在不同网络环境下可能无法访问。岗位发布时间、工作类型、远程标记在接口未披露时不会推断，具体资格要求和投递方式请到企业官网核实。HHBA 不代表与招聘企业存在合作关系。</p></main><footer>HHBA · Global Job Index · 仅公开职位元数据与官方跳转</footer>
+<div class="section-title"><h2 id="market-list-h2">官方岗位列表</h2><span id="shown"></span></div><div class="list" id="jobs"></div><p class="disclaimer">数据源为外部企业公开招聘板。部分企业官网在不同网络环境下可能无法访问。岗位发布时间、工作类型、远程标记在接口未披露时不会推断，具体资格要求和投递方式请到企业官网核实。HHBA 不代表与招聘企业存在合作关系。</p></main><footer>HHBA · Global Job Index · 仅公开职位元数据与官方跳转</footer>
 <script>
 let all=[],filtered=[],limit=30;
 let lang='zh';
@@ -434,6 +467,11 @@ function setLanguage(value){
  for(const option of Array.from(document.querySelector('#company').options)){if(option.value)option.textContent=lang==='zh'?(all.find(x=>x.company===option.value)?.companyZh||option.value):option.value;}
  document.querySelector('#remote').options[0].textContent=lang==='zh'?'全部工作方式':'All work modes';
  document.querySelector('#remote').options[1].textContent=lang==='zh'?'标注远程':'Remote only';
+ document.querySelector('#company').options[0].textContent=lang==='zh'?'全部企业':'All companies';
+ document.querySelector('#market-h1').textContent=lang==='zh'?'发现全球工作机会':'Explore global career opportunities';
+ document.querySelector('#market-subtitle').textContent=lang==='zh'?'搜索真实海外岗位，在 HHBA 阅读职位详情，再去企业官网申请。':'Search real overseas jobs, read details on HHBA, then apply on the employer website.';
+ document.querySelector('#market-list-h2').textContent=lang==='zh'?'官方岗位列表':'Official job listings';
+ document.querySelector('#translated-label').textContent=lang==='zh'?'已机器翻译职位名称':'Machine-translated job titles';
  render();
 }
 document.querySelector('#toggle-zh').addEventListener('click',()=>setLanguage('zh'));
@@ -445,13 +483,13 @@ function render(reset=true){
  const key=q.value.trim().toLowerCase();
  const related=Object.entries(aliases).filter(([cn])=>key.includes(cn)).flatMap(([,en])=>en);
  filtered=all.filter(x=>(!key||[x.title,x.titleZh,x.company,x.companyZh,x.location,x.locationZh].some(z=>String(z||"").toLowerCase().includes(key))||related.some(term=>String(x.title||"").toLowerCase().includes(term)))&&(!c.value||x.company===c.value)&&(!remote.value||x.remote===true));
- document.querySelector("#shown").textContent="显示 "+Math.min(filtered.length,limit)+" / "+filtered.length+" 条";
+ document.querySelector("#shown").textContent=(lang==="zh"?"显示 ":"Showing ")+Math.min(filtered.length,limit)+" / "+filtered.length+(lang==="zh"?" 条":" jobs");
  list.innerHTML=filtered.slice(0,limit).map(x=>'<article class="job"><div><div class="brand">'+safe(lang==='zh'?(x.companyZh||x.company):x.company)+' · '+safe(x.platform.toUpperCase())+'</div><div class="title">'+safe(lang==='zh'?(x.titleZh||'职位名称待翻译'):x.title)+'</div><div class="meta"><span>📍 '+safe(lang==='zh'?(x.locationZh||x.location):x.location)+'</span><span>'+(x.remote===true?'远程':x.remote===false?'非远程':'远程未标注')+'</span><span>'+ (lang==='zh'?'官网原始职位':'Official job') +'</span></div></div><a class="visit" href="/jobs/'+encodeURIComponent(x.id)+'">'+(lang==='zh'?'站内查看完整 JD →':'View full job details →')+'</a></article>').join("");
  if(!filtered.length)list.innerHTML='<div class="empty">当前没有匹配的真实职位</div>';
  if(filtered.length>limit)list.innerHTML+='<div style="text-align:center;padding:20px"><button style="padding:12px 35px;border-radius:9px;border:1px solid #c7dacc;background:#fff;cursor:pointer" id="more">查看更多职位</button></div>';
  document.querySelector("#more")?.addEventListener("click",()=>{limit+=30;render(false)});
 }
-async function start(){try{const r=await fetch('/api/jobs');if(!r.ok)throw Error();const d=await r.json();all=d.jobs||[];let companies=[...new Set(all.map(x=>x.company))].sort();for(let name of companies){let op=document.createElement("option");op.value=name;op.textContent=name;c.append(op)}setLanguage(lang);}catch{list.innerHTML='<div class="empty">官方岗位接口暂时不可用，请稍后刷新</div>';}}
+async function start(){try{const r=await fetch('/api/jobs');if(!r.ok)throw Error();const d=await r.json();all=d.jobs||[];let companies=[...new Set(all.map(x=>x.company))].sort();for(let name of companies){let op=document.createElement("option");op.value=name;op.textContent=name;c.append(op)}document.querySelector('#translated-count').textContent=all.filter(j=>j.titleStatus==='machine').length;setLanguage(lang);}catch{list.innerHTML='<div class="empty">官方岗位接口暂时不可用，请稍后刷新</div>';}}
 q.addEventListener("input",()=>render());c.addEventListener("change",()=>render());remote.addEventListener("change",()=>render());start();
 </script></body></html>`;
 Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
@@ -478,7 +516,8 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
   const result=await officialDetail(job);
   if(!result)return new Response("官方职位详情暂不可用，请从招聘列表进入企业官网",{status:503,headers});
   if(u.pathname.startsWith("/api/"))return Response.json(result,{headers});
-  return new Response(detailHtml(result),{headers:{...headers,"Content-Type":"text/html; charset=utf-8"}});
+  const zhJd=await translatedDetail(result);
+  return new Response(detailHtml(result,zhJd),{headers:{...headers,"Content-Type":"text/html; charset=utf-8"}});
  }
 
  if(u.pathname!=="/")return new Response("Not found",{status:404,headers});
@@ -526,8 +565,8 @@ void (async()=>{
  try{
   const d=await load();
   const rows=(d?.rows||[]).map(present);
-  const counts={model:0,rules:0,pending:0};
-  for(const j of rows){if(j.titleStatus==="model")counts.model++;else if(j.titleStatus==="rules")counts.rules++;else counts.pending++;}
+  const counts={machine:0,rules:0,pending:0};
+  for(const j of rows){if(j.titleStatus==="machine")counts.machine++;else if(j.titleStatus==="rules")counts.rules++;else counts.pending++;}
   const samples=rows.filter(j=>j.company==="Airwallex").slice(0,4).map(j=>({
     original:j.title.slice(0,90),chinese:j.titleZh.slice(0,90)}));
   console.log("HHBA_ZH_ACCEPTANCE",JSON.stringify({
