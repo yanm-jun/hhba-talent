@@ -7,8 +7,10 @@ async function json(path){
  assert.equal(res.status,200,path+' HTTP status');return res.json();
 }
 const combined=await json('/api/jobs/page?limit=1');
-assert.ok(combined.allJobs>=8761,'Merged index unexpectedly shrank');
+assert.ok(combined.allJobs>=8795,'Merged index unexpectedly shrank');
 assert.equal(combined.domesticObserved,1010);
+assert.equal(combined.domesticVerifiedJobDetails,34);
+assert.equal(combined.domesticEmployers,4);
 assert.equal(combined.boards,34);
 const mi=await json('/api/jobs/page?country=cn&q=小米&limit=5');
 assert.equal(mi.total,1010);
@@ -30,6 +32,13 @@ const mtDetail=await json('/api/jobs/'+encodeURIComponent(mt.jobs[0].id));
 assert.equal(mtDetail.recordKind,'OFFICIAL_JOB_PAGE_OBSERVED');
 assert.equal(mtDetail.applyUrl,null);
 assert.equal(mtDetail.detailVerified,true);
+const tencent=await json('/api/jobs/page?q='+encodeURIComponent('腾讯')+'&country=cn&limit=2');
+const baidu=await json('/api/jobs/page?q='+encodeURIComponent('百度')+'&country=cn&limit=2');
+assert.equal(tencent.total,19);assert.equal(baidu.total,8);
+for(const j of [tencent.jobs[0],baidu.jobs[0]]){
+ const d=await json('/api/jobs/'+encodeURIComponent(j.id));
+ assert.equal(d.currentApplicationVerified,false);assert.equal(d.applyUrl,null);assert.equal(d.detailVerified,true);
+}
 const item=mi.jobs[0];const itemDetail=await json('/api/jobs/'+encodeURIComponent(item.id));
 assert.equal(itemDetail.description,null);
 assert.equal(itemDetail.applyUrl,null);
@@ -60,5 +69,5 @@ await desktop.locator('#country').selectOption('cn');
  await mobile.waitForFunction(()=>document.querySelector('.job .company-name')?.textContent==='小米集团',{timeout:75000});
  await mobile.screenshot({path:'domestic-live-evidence/xiaomi-mobile.png',fullPage:false});
  assert.equal(errors.length,0,errors.join('; '));
- console.log('HHBA_DOMESTIC_LIVE_BROWSER_PASS',JSON.stringify({merged:combined.allJobs,xiaomi:mi.total,meituan:mt.total,domestic:1017,openAI:oa.total,boards:combined.boards,desktop:true,mobile:true,sourceFilters:true,jobDetail:'safe',officialList:'correct'}));
+ console.log('HHBA_DOMESTIC_LIVE_BROWSER_PASS',JSON.stringify({merged:combined.allJobs,xiaomi:mi.total,meituan:mt.total,domestic:1044,tencent:19,baidu:8,openAI:oa.total,boards:combined.boards,desktop:true,mobile:true,sourceFilters:true,jobDetail:'safe',officialList:'correct'}));
 }finally{await browser.close();}
