@@ -973,6 +973,21 @@ void (async()=>{
  }catch(err){console.log("HHBA_FULL_AUDIT_REPAIR_ERROR",err instanceof Error?err.name:"Unknown");}
 })();
 
+// Verify official OpenAI data through real same-origin API requests at startup.
+void (async()=>{
+ try{
+  const origin="http://127.0.0.1:"+String(Bun.env.PORT||3000);
+  const targets=["?q=openai&limit=5","?q=OpenAI&limit=5","?company=OpenAI&limit=5"];
+  const checks=[];
+  for(const suffix of targets){
+   const response=await fetch(origin+"/api/jobs/page"+suffix,{signal:AbortSignal.timeout(15000)});
+   const data=response.ok?await response.json() as any:null;
+   checks.push({query:suffix,http:response.status,total:data?.total??null,openaiInFirstFive:(data?.jobs||[]).filter((x:any)=>x.company==="OpenAI").length});
+  }
+  const rows=(await load())?.rows||[];
+  console.log("HHBA_OPENAI_SEARCH_DIAGNOSTIC",JSON.stringify({rawOpenAIRows:rows.filter(x=>x.company==="OpenAI").length,checks}));
+ }catch(ex){console.log("HHBA_OPENAI_SEARCH_DIAGNOSTIC_ERROR",ex instanceof Error?ex.message:"unknown");}
+})();
 // One-time deployment diagnostic: no JD text or personal data is logged.
 void (async()=>{
  try{
