@@ -27,6 +27,12 @@ try{
  stats.language=await page.locator('#toggle-zh').getAttribute('class');
  // Flip language in place, then return to Chinese.
  await page.locator('#toggle-en').click();
+ const marketEnglish=(await page.locator('body').innerText()).replace(/中文/g,'');
+ if(/[\u3400-\u9fff]/.test(marketEnglish))
+  failures.push({type:'Chinese_labels_visible_in_English_job_market',
+    sample:marketEnglish.match(/.{0,18}[\u3400-\u9fff].{0,38}/)?.[0]||''});
+ if(await page.title()!=='HHBA · Global Jobs')
+  failures.push({type:'English_market_browser_title_not_translated'});
  const englishRemote=await page.locator('#jobs .job .meta span:nth-child(2)').first().innerText();
  if(/[\u3400-\u9fff]/.test(englishRemote))
   failures.push({type:'english_remote_badge_is_chinese',value:englishRemote});
@@ -54,6 +60,8 @@ try{
    if(platform==='ashby')await page.screenshot({path:'browser-evidence/job-zh-loading.png'});
    await page.locator('#detail-en').click();
    const official=await page.locator('#jd-en').innerText();
+   if(!await page.title().then(x=>x.includes(' · HHBA')&&!/[\u3400-\u9fff]/.test(x)))
+    failures.push({platform,id:job.id,type:'English_detail_browser_title_not_translated'});
    const visibleEnglish=await page.locator('body').innerText();
    const withoutLanguagePicker=visibleEnglish.replace(/中文/g,'');
    if(/[\u3400-\u9fff]/.test(withoutLanguagePicker))

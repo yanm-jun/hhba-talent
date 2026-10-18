@@ -21,6 +21,11 @@ test('user reader only reads fixed live posting and never indexes translated ful
  assert.match(source,/private_reading_translation/);
  assert.match(source,/function jdChunks/);
  assert.match(source,/numbersVerified/);
+ assert.match(source,/ensureChineseProse/);
+ assert.match(source,/englishBodyRuns/);
+ assert.match(source,/translation_incomplete/);
+ assert.match(source,/id="market-status"/);
+ assert.match(source,/HHBA · Global Jobs/);
  assert.doesNotMatch(source,/const shown=output\[0\]\+/);
  assert.doesNotMatch(source,/<details class="reader-original"/);
  assert.match(source,/id="show-original-english"/);
