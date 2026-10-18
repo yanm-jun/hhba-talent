@@ -1,0 +1,24 @@
+name: HHBA Tencent Public Careers API Probe
+on:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/probe_tencent_public_api.mjs'
+      - '.github/workflows/hhba-tencent-api-probe.yml'
+  pull_request:
+    paths:
+      - 'deploy/railway/probe_tencent_public_api.mjs'
+      - '.github/workflows/hhba-tencent-api-probe.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node deploy/railway/probe_tencent_public_api.mjs
