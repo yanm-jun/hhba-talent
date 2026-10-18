@@ -1,0 +1,21 @@
+name: HHBA OpenAI live search smoke
+on:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/openai_search_smoke.mjs'
+      - '.github/workflows/hhba-openai-search-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify live OpenAI keyword search, company filter, JD and brand card
+        run: node deploy/railway/openai_search_smoke.mjs
