@@ -1,6 +1,7 @@
 import { convert } from "html-to-text@9";
 import sanitizeHtml from "sanitize-html@2";
 import { decode as decodeHtmlEntities } from "html-entities";
+import { parseDocument } from "htmlparser2";
 
 type Job={id:string;company:string;title:string;location:string;remote:boolean|null;url:string;platform:string;source:string;domestic?:boolean;recruitmentType?:string;observedAt?:string};
 
@@ -381,6 +382,74 @@ function hasLeakedJdTags(value:string):boolean{
  return /<\/?\s*(?:p|div|ul|ol|li|h[1-6]|br|strong|em|span|a|section|blockquote|table|tr|td)(?:\s|>|\/)/i.test(value)||hasEscapedJdTags(value);
 }
 
+
+type OfficialJdBlock={kind:"heading"|"bullet"|"paragraph";text:string;links:{label:string;href:string}[]};
+function officialJdBlocks(html:string):OfficialJdBlock[]{
+ const doc=parseDocument(normalizeOfficialMarkup(html),{decodeEntities:true});
+ const result:OfficialJdBlock[]=[];
+ const inline=(node:any):string=>{
+  if(node?.type==="text")return String(node.data||"");
+  if(node?.name==="br")return "\n";
+  if(["script","style","iframe","svg"].includes(node?.name))return "";
+  return Array.isArray(node?.children)?node.children.map(inline).join(""):"";
+ };
+ const links=(node:any):{label:string;href:string}[]=>{
+  const out:{label:string;href:string}[]=[];
+  const walk=(n:any)=>{
+   if(n?.name==="a"&&typeof n.attribs?.href==="string"){
+    try{
+     const url=new URL(n.attribs.href);
+     if((url.protocol==="https:"||url.protocol==="mailto:")&&!url.username&&!url.password){
+      out.push({label:inline(n).trim().slice(0,120),href:url.href});
+     }
+    }catch{}
+   }
+   if(Array.isArray(n?.children))for(const child of n.children)walk(child);
+  };
+  walk(node);return out.slice(0,12);
+ };
+ const add=(kind:OfficialJdBlock["kind"],raw:string,node:any)=>{
+  const pieces=String(raw||"").replace(/\u00a0/g," ").replace(/[ \t]+/g," ")
+   .split(/\n{2,}/).map(x=>x.replace(/\s*\n\s*/g," ").trim()).filter(Boolean);
+  for(const [index,piece] of pieces.entries()){
+   if(piece.length>30000)continue;
+   result.push({kind,text:piece,links:index===0?links(node):[]});
+  }
+ };
+ const visit=(node:any)=>{
+  if(result.length>=250||!node)return;
+  const tag=String(node.name||"").toLowerCase();
+  if(["script","style","iframe","svg","noscript"].includes(tag))return;
+  if(/^h[1-6]$/.test(tag)){add("heading",inline(node),node);return}
+  if(tag==="li"){
+   const top=Array.isArray(node.children)?node.children.filter((x:any)=>!["ul","ol"].includes(x?.name)):[];
+   add("bullet",top.map(inline).join(""),node);
+   for(const nested of node.children||[])if(["ul","ol"].includes(nested?.name))visit(nested);
+   return;
+  }
+  if(tag==="p"){add("paragraph",inline(node),node);return}
+  if(tag==="div"||tag==="section"||tag==="article"||tag==="blockquote"){
+   const children=node.children||[];
+   const structural=children.some((n:any)=>/^(?:p|div|section|article|blockquote|h[1-6]|ul|ol|li)$/.test(n.name||""));
+   if(!structural){add("paragraph",inline(node),node);return}
+  }
+  if(node.type==="text"){if(String(node.data||"").trim())add("paragraph",node.data,node);return}
+  if(Array.isArray(node.children))for(const child of node.children)visit(child);
+ };
+ for(const child of doc.children)visit(child);
+ return result;
+}
+function officialBlocksText(blocks:OfficialJdBlock[]):string{
+ return blocks.map(b=>(b.kind==="heading"?"# ":b.kind==="bullet"?"- ":"")+b.text).join("\n\n");
+}
+function officialBlocksHtml(blocks:OfficialJdBlock[]):string{
+ return blocks.map(b=>{
+  const tag=b.kind==="heading"?"h3":b.kind==="bullet"?"li":"p";
+  const refs=b.links.map(l=>' <a href="'+esc(l.href)+'" rel="noopener noreferrer nofollow" target="_blank">'+esc(l.label||"查看相关链接")+' ↗</a>').join("");
+  return "<"+tag+">"+esc(b.text)+refs+"</"+tag+">";
+ }).join("");
+}
+
 async function officialDetail(job:Job):Promise<Detail|null>{
  const board=boards.find(b=>b.slug===job.source&&b.platform===job.platform);
  if(!board)return null;
@@ -422,19 +491,17 @@ async function officialDetail(job:Job):Promise<Detail|null>{
     html=pieces.join("\n");
   }
   const normalizedHtml=normalizeOfficialMarkup(html);
+  const blocks=officialJdBlocks(normalizedHtml);
+  const textFromBlocks=officialBlocksText(blocks);
   const ashbyPlain=board.platform==="ashby"&&typeof raw.descriptionPlain==="string"?
     raw.descriptionPlain:"";
-  const plain=ashbyPlain&&!hasLeakedJdTags(ashbyPlain)?
-    ashbyPlain:convert(normalizedHtml,{wordwrap:false,
-      selectors:[{selector:"img",format:"skip"},{selector:"a",options:{hideLinkHrefIfSameAsText:true}}]});
+  const plain=textFromBlocks||(ashbyPlain&&!hasLeakedJdTags(ashbyPlain)?ashbyPlain:
+    convert(normalizedHtml,{wordwrap:false,
+      selectors:[{selector:"img",format:"skip"},{selector:"a",options:{hideLinkHrefIfSameAsText:true}}]}));
   if(plain.length>200000||normalizedHtml.length>250000)return null;
   if(hasLeakedJdTags(plain))return null;
-  const richHtml = normalizedHtml.trim()?sanitizeHtml(normalizedHtml,{
-    allowedTags:["p","div","span","br","h1","h2","h3","h4","h5","h6","strong","b","em","i","u","ul","ol","li","blockquote","hr","table","thead","tbody","tr","td","th","pre","code","a"],
-    allowedAttributes:{"a":["href","title","target","rel"]},
-    allowedSchemes:["https","mailto"],
-    transformTags:{"a":(_tag,atts)=>({tagName:"a",attribs:{href:atts.href||"",target:"_blank",rel:"noopener noreferrer nofollow"}})}
-  }):"";
+  // Emit only markup created from parsed, escaped text, never ATS raw HTML.
+  const richHtml=blocks.length?officialBlocksHtml(blocks):'<p>'+esc(plain)+'</p>';
   return {job,description:plain,richHtml,status:plain.trim()?"LIVE_CONTENT":"DESCRIPTION_UNAVAILABLE",
    applyUrl:approvedApplyUrl(raw.applyUrl,board),
    checkedAt:new Date().toISOString()};
