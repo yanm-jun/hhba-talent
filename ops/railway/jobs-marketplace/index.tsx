@@ -118,8 +118,6 @@ function translateTitleRules(value:string):string{
 function translateLocation(value:string):string{
  const raw=swapTerms(value,Object.entries(localePlaces).sort((a,b)=>b[0].length-a[0].length))
   .replace(/\s*-\s*/g," · ").trim()||"工作地点未披露";
- // Singapore may appear both as a country code (SG) and city (Singapore).
- // Never display “新加坡 · 新加坡” to Chinese-language job seekers.
  const parts=raw.split(/\s*[·,，]\s*/).filter(Boolean);
  return parts.filter((piece,index)=>parts.indexOf(piece)===index).join(" · ")||raw;
 }
@@ -177,8 +175,6 @@ function professionalTitle(original:string,translation:string):string{
    .replace(/\s+/g," ").trim();
 }
 
-// Curated employer website hostnames; never accept image URLs from job data.
-// Official-site favicons are optional. Missing icons fall back to initials.
 const employerBrandSites:Record<string,string>={"Tencent":"tencent.com","ByteDance":"bytedance.com","Huawei":"huawei.com","BYD":"byd.com","Alibaba":"alibaba.com","Meituan":"meituan.com","Baidu":"baidu.com","NIO":"nio.com","Lenovo":"lenovo.com","Trip.com Group":"ctrip.com","Xiaomi":"mi.com","Greenhouse":"greenhouse.com","Ashby":"ashbyhq.com","Spotify":"spotify.com","Canonical":"canonical.com","Airwallex":"airwallex.com","Palantir":"palantir.com","Figma":"figma.com","Anduril":"anduril.com","Discord":"discord.com","Reddit":"reddit.com","Airtable":"airtable.com","Flexport":"flexport.com","Robinhood":"robinhood.com","GitLab":"gitlab.com","Twilio":"twilio.com","Cloudflare":"cloudflare.com","Vercel":"vercel.com","Gusto":"gusto.com","Wise":"wise.com","Coursera":"coursera.org","OpenAI":"openai.com","Notion":"notion.so","Ramp":"ramp.com","Linear":"linear.app","Perplexity":"perplexity.ai","ElevenLabs":"elevenlabs.io","Vanta":"vanta.com","Harvey":"harvey.ai","Headway":"headway.co","Binance":"binance.com","Cognition":"cognition.ai","Replit":"replit.com","PostHog":"posthog.com","ClickUp":"clickup.com","Cursor":"cursor.com","Mercor":"mercor.com"};
 function employerLogo(company:string):string{
  const domain=employerBrandSites[company];
@@ -214,10 +210,6 @@ const searchAliases:Record<string,string[]>={
  "法务":["legal","counsel"]
 };
 
-// 2026-10-16 official Xiaomi LIST snapshot, NOT proof of current openings or direct applications.
-// Original JSONL hash 43f1937c0b2263a9e2334963f8f2becc074089f93ba26572ec2e11e8ea977d34; browser capture #38891842142.
-// Private Railway environment stores the approved historical-list JSON in eleven
-// bounded chunks. A pinned SHA-256 rejects stale or altered job observations.
 const xiaomiPayload=Array.from({length:11},(_,i)=>Bun.env["HHBA_XIAOMI_CHUNK_"+i]||"").join("");
 if(createHash("sha256").update(xiaomiPayload,"utf8").digest("hex")!=="97ef1d92751c7726225f98fdd0797d22e45eb07553029452697b54dd208def8e")throw Error("HHBA_XIAOMI_SNAPSHOT_DIGEST_MISMATCH");
 const xiaomiCompact:[string,string,string,string][]=JSON.parse(xiaomiPayload);
@@ -228,8 +220,6 @@ const domesticObserved:Job[]=xiaomiCompact.map(([kind,native,title,city])=>{
  return {id:"xiaomi-"+kind+"-"+native,company:"Xiaomi",title,location:city,remote:null,url:xiaomiUrls[kind],platform:"xiaomi-official",source:xiaomiType[kind],domestic:true,recruitmentType:xiaomiType[kind],observedAt:"2026-10-16"};
 });
 if(domesticObserved.length!==1010||new Set(domesticObserved.map(j=>j.id)).size!==1010||domesticObserved.filter(j=>j.recruitmentType==="SOCIAL").length!==350||domesticObserved.filter(j=>j.recruitmentType==="CAMPUS").length!==350||domesticObserved.filter(j=>j.recruitmentType==="INTERNSHIP").length!==310)throw Error("Invalid Xiaomi total or channels");
-// Browser-verified official Meituan job pages; not guaranteed open after 2026-10-18.
-// Evidence: GitHub Actions #39107337875, zero independently verified application submissions.
 const meituanCompact:[string,string,string,string,string][]=[["4694862735","AI应用开发工程师","北京、上海","CAMPUS","https://zhaopin.meituan.com/web/position/detail?highlightType=campus&jobShareType=1&jobUnionId=4694862735"],["4691573955","B端AI应用FDE","北京","SOCIAL","https://zhaopin.meituan.com/web/position/detail?highlightType=social&jobUnionId=4691573955"],["4696454382","产品运营岗","多城市","CAMPUS","https://zhaopin.meituan.com/web/position/detail?highlightType=campus&jobShareType=1&jobUnionId=4696454382"],["4701989120","美团联盟行业运营（到店方向）","北京","SOCIAL","https://zhaopin.meituan.com/web/position/detail?highlightType=social&jobUnionId=4701989120"],["4747089400","用户体验改善-服务运营岗","北京","SOCIAL","https://zhaopin.meituan.com/web/position/detail?highlightType=social&jobUnionId=4747089400"],["4360870843","AI产品经理","北京","SOCIAL","https://zhaopin.meituan.com/web/position/detail?highlightType=social&jobUnionId=4360870843"],["4694862636","商品运营岗","北京、广州","CAMPUS","https://zhaopin.meituan.com/web/position/detail?highlightType=campus&jobShareType=1&jobUnionId=4694862636"]];
 const meituanObserved:Job[]=meituanCompact.map(([uid,title,location,recruitmentType,url])=>{
  if(!/^\d{8,20}$/.test(uid)||!title||!location||!["SOCIAL","CAMPUS","INTERNSHIP"].includes(recruitmentType))throw Error("Invalid Meituan record");
@@ -238,8 +228,6 @@ const meituanObserved:Job[]=meituanCompact.map(([uid,title,location,recruitmentT
  return {id:"meituan-"+uid,company:"Meituan",title,location,remote:null,url,platform:"meituan-official",source:"verified-detail",domestic:true,recruitmentType,observedAt:"2026-10-18"};
 });
 if(meituanObserved.length!==7||new Set(meituanObserved.map(j=>j.id)).size!==7)throw Error("Invalid Meituan count");
-// SHA-256 pinned, browser/search-observed official Tencent/Baidu job detail URLs.
-// Treat as observed job pages, not proof of current application availability.
 const reviewedPayload=(Bun.env.HHBA_REVIEWED_OFFICIAL_0||"")+(Bun.env.HHBA_REVIEWED_OFFICIAL_1||"");
 const reviewedRows:[string,string,string,string,string,string][]=reviewedPayload&&createHash("sha256").update(reviewedPayload).digest("hex")==="5bbae03c21888eff0765f8b8a34aa10b61b353caacea95702009e6272413ee49"?JSON.parse(reviewedPayload):[];
 if(reviewedRows.length!==27)console.warn("HHBA_DOMESTIC_REVIEWED_SNAPSHOT_UNAVAILABLE");
@@ -285,7 +273,6 @@ const boards:Board[]=[
  {platform:"ashby",company:"Replit",slug:"replit"},
  {platform:"ashby",company:"PostHog",slug:"posthog"},
  {platform:"ashby",company:"ClickUp",slug:"clickup"},
- // Verified public Ashby JSON job boards. Jobs must pass the existing official URL validator.
  {platform:"ashby",company:"Cursor",slug:"cursor"},
  {platform:"ashby",company:"Mercor",slug:"mercor"}
 ];
@@ -311,9 +298,6 @@ async function getBoard(b:Board):Promise<Job[]>{
  const endpoint=b.platform==="greenhouse"?"https://boards-api.greenhouse.io/v1/boards/"+encodeURIComponent(b.slug)+"/jobs":
  b.platform==="ashby"?"https://api.ashbyhq.com/posting-api/job-board/"+encodeURIComponent(b.slug):
  "https://api.lever.co/v0/postings/"+encodeURIComponent(b.slug)+"?mode=json";
- // Larger boards such as Anduril (>2,500 roles) sometimes exceed the
- // previous 12-second deadline. Allow two bounded attempts, with a short
- // backoff only on transient failures. Invalid responses never count as 0 jobs.
  const perAttemptTimeout=b.slug==="andurilindustries"?30000:19000;
  for(let attempt=0;attempt<2;attempt++){
   try{
@@ -349,8 +333,6 @@ async function load(){
  if(cache&&Date.now()-cache.at<(cache.failures?60*1000:10*60*1000))return cache;
  if(inflight)return await inflight;
  inflight=(async()=>{
-  // Limit simultaneous outbound ATS requests to avoid overwhelming boards.
-  // Failed boards are isolated; all jobs retain their exact source identity.
   const outcomes:PromiseSettledResult<Job[]>[]=new Array(boards.length);
   let next=0;
   const worker=async()=>{while(next<boards.length){const i=next++;
@@ -372,8 +354,6 @@ async function load(){
 }
 
 type Detail={job:Job;description:string;richHtml:string;applyUrl:string|null;status:"LIVE_CONTENT"|"DESCRIPTION_UNAVAILABLE";checkedAt:string};
-// Read the official published job on the user's click. No local JD corpus,
-// no untrusted URL parameters, no AI paraphrase and no fabricated sections.
 function approvedApplyUrl(value:unknown,b:Board):string|null{
  return urlOK(value,b.slug,b.platform);
 }
@@ -516,8 +496,6 @@ function numbersRetained(original:string,translated:string):boolean{
  const b=numberTokens(translated);
  return numberTokens(original).every(x=>b.includes(x));
 }
-// Local Argos-powered machine translation. Never sends content to a
-// generative model, never accepts a request-supplied server URL.
 async function machineTranslations(kind:"title"|"jd",sources:string[]):Promise<(string|null)[]|null>{
  const url=privateTranslatorUrl();
  if(!url||sources.length<1||sources.length>8)return null;
@@ -569,9 +547,6 @@ async function fillTitleTranslations(rows:Job[]){
  if(available.remaining<=0)return;
  titleWorkerRunning=true;
  try{
-  // First translate titles whose dictionary fallback has zero Chinese.
-  // Remaining terminology-only titles are translated gradually at a fixed
-  // daily compute budget; all translations are saved by original text hash.
   const unique=[...new Set(rows.filter(x=>!x.domestic).map(x=>x.title))];
   const pending=unique.filter(t=>fromCache("title",t)?.mode!=="machine"&&!translationNeedsReview.has(t));
   pending.sort((a,b)=>{
@@ -604,8 +579,6 @@ async function fillTitleTranslations(rows:Job[]){
 }
 
 function licensedJd(d:Detail):boolean{
- // This registry is operator-owned inside the mounted volume. It has no
- // HTTP write route, and metadata-only rights are explicitly insufficient.
  try{
   const raw=readFileSync("/data/hhba-jd-rights.json");
   if(raw.length>200000)return false;
@@ -621,8 +594,6 @@ function licensedJd(d:Detail):boolean{
      !(Date.parse(grant.grant_reviewed_at)<=Date.now()&&Date.parse(grant.rights_expires_at)>Date.now())||
      !grant.reviewer||!grant.publisher||grant.reviewer===grant.publisher||
      !grant.rights_holder)return false;
-  // Permission documentation must be physically present and hash-matched,
-  // not merely asserted in a JSON boolean.
   if(typeof grant.permission_evidence_sha256!=="string"||
      !/^[a-f0-9]{64}$/.test(grant.permission_evidence_sha256)||
      typeof grant.permission_evidence_filename!=="string"||
@@ -636,8 +607,6 @@ async function translatedDetail(d:Detail):Promise<string|null>{
  if(!licensedJd(d)||d.status!=="LIVE_CONTENT"||!d.description.trim())return null;
  const record=fromCache("jd",d.description);
  if(record?.mode==="rights-reviewed-machine")return record.translated;
- // JD translation is strictly on-demand after permission; no mass
- // republishing a third-party text to the translation cache by default.
  const result=await machineTranslations("jd",[d.description]);
  const value=result?.[0];
  if(!value||!numbersRetained(d.description,value)||!licensedJd(d))return null;
@@ -645,7 +614,6 @@ async function translatedDetail(d:Detail):Promise<string|null>{
  return value;
 }
 
-// Server-rendered cards are a resilient, real-data fallback for mobile browsers.
 function firstPageJobCards(rows:Job[]):string{
  const unique=new Map<string,Job>();
  for(const j of rows)if(!unique.has(j.company))unique.set(j.company,j);
@@ -802,8 +770,6 @@ async function fetchJobs(reset=true){
  const token=++latestRequest;
  const params=new URLSearchParams({limit:String(limit),offset:"0"});
  const query=q.value.trim();
- // An exact employer keyword begins a new company search instead of
- // intersecting with a previously selected, different employer.
  const requestedEmployer=Object.keys(employerBrandSites).find(name=>name.toLowerCase()===query.toLowerCase()||companyZh[name]===query);
  if(requestedEmployer&&domesticEmployers.has(requestedEmployer)&&country.value==='global')country.value='';
  if(requestedEmployer&&!domesticEmployers.has(requestedEmployer)&&country.value==='cn')country.value='';
@@ -901,8 +867,6 @@ function fixEnglishJdHeadings(input:string):string{
  }).join("\n");
 }
 function englishBodyRuns(input:string):string[]{
- // Long runs of untouched English prose are not ordinary branded nouns,
- // API abbreviations, or programming language names.
  return input.match(/(?:[A-Za-z]{3,}[ \t]+){7,}[A-Za-z]{3,}/g)||[];
 }
 async function ensureChineseProse(value:string):Promise<string|null>{
@@ -924,8 +888,6 @@ async function ensureChineseProse(value:string):Promise<string|null>{
  return englishBodyRuns(current).length?null:current;
 }
 
-// Per-view, not published / indexed: a user reads a live official posting
-// in Chinese without adding the translated third-party JD to the shared DB.
 const JD_READER_SIZE=900;
 const JD_READER_MAX_CHARS=30000;
 const translationRequests=new Map<string,{count:number,expires:number}>();
@@ -933,8 +895,6 @@ let activeJdReaders=0;
 function jdChunks(full:string):string[]{
  const parts:string[]=[];
  let current="";
- // Keep newlines so headings, bullet lists, and eligibility sections survive.
- // Long blocks are sliced on whitespace when practical.
  const lines=full.replace(/\r\n?/g,"\n").split("\n");
  for(const line of lines){
   const units:string[]=[];
@@ -972,7 +932,6 @@ function readerRateLimit(req:Request):boolean{
  const ip=(req.headers.get("x-forwarded-for")||"anonymous").split(",").at(-1)?.trim()||"anonymous";
  const key=createHash("sha256").update(ip).digest("hex").slice(0,32);
  const now=Date.now();
- // Sweep bounded in-process counters; rolling restart resets limits.
  if(translationRequests.size>2500)for(const[k,v]of translationRequests)
   if(v.expires<now)translationRequests.delete(k);
  const hit=translationRequests.get(key);
@@ -1012,8 +971,6 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
   if(!one.trim())return Response.json({jobId:job.id,part,total:chunks.length,text:one,sourceHash:digest,sourceUrl:job.url,mode:"private_reading_translation"},{headers});
   const output=await machineTranslations("jd",[one]);
   if(!output||!output[0])return Response.json({error:"translation_unverified",part,total:chunks.length},{status:503,headers});
-  // An English paragraph inside a Chinese translation is a QA failure.
-  // Retry affected prose separately; never return whole English passages.
   const chinese=await ensureChineseProse(output[0]);
   if(!chinese)return Response.json({error:"translation_incomplete",part,total:chunks.length},{status:503,headers});
   const numbersVerified=numbersRetained(one,chinese);
@@ -1094,9 +1051,6 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
 }});
 
 
-// Source health is verified in GitHub Actions; avoid repeating expensive
-// startup probes and multi-part translation jobs on each Railway restart.
-// Source-only diagnostic: run the actual local HTTP search handlers at startup.
 void (async()=>{try{
  const p=String(Bun.env.PORT||3000),out:any={};
  for(const [name,expected] of [["Tencent",19],["Baidu",8],["Meituan",7],["Xiaomi",1010]] as const){
@@ -1117,7 +1071,6 @@ void (async()=>{try{
 void load().then(data=>console.log("HHBA_SOURCE_SYNC",JSON.stringify({jobs:data?.rows.length||0,boards:data?.boards||0,failures:data?.failures||0,domesticObserved:domesticObserved.length})))
 .catch(e=>console.error("HHBA_SOURCE_STARTUP_ERROR",e instanceof Error?e.name:"unknown"));
 
-// Verify the real initial HTML contains visible job cards even without JavaScript.
 void (async()=>{try{
  const response=await fetch("http://127.0.0.1:"+String(Bun.env.PORT||3000)+"/",{signal:AbortSignal.timeout(20000)});
  const raw=await response.text(),html=raw.split("<script>")[0];
