@@ -519,6 +519,20 @@ function privateTranslatorUrl():string|null{
 function numberTokens(value:string):string[]{
  return (value.match(/\d+(?:[.,]\d+)*(?:%|％)?/g)||[]).sort();
 }
+
+/** Restore grouped numbers that machine translation separated with spaces.
+ * Examples: $182,800 -> 182 800美元 -> 182,800美元. Does not invent numbers.
+ */
+function restoreGroupedNumbers(source:string,translated:string):string{
+ let fixed=translated;
+ for(const token of new Set(source.match(/\b\d{1,3}(?:,\d{3})+(?:\.\d+)?\b/g)||[])){
+  if(fixed.includes(token))continue;
+  const pattern="(?<!\\d)"+token.split(",").map(x=>x.replace(/\./g,"\\.")).join("[\\s,，]+")+"(?!\\d)";
+  fixed=fixed.replace(new RegExp(pattern,"g"),token);
+ }
+ return fixed;
+}
+
 function numbersRetained(original:string,translated:string):boolean{
  const b=numberTokens(translated);
  return numberTokens(original).every(x=>b.includes(x));
@@ -1000,10 +1014,11 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
   if(!output||!output[0])return Response.json({error:"translation_unverified",part,total:chunks.length},{status:503,headers});
   const chinese=await ensureChineseProse(output[0]);
   if(!chinese)return Response.json({error:"translation_incomplete",part,total:chunks.length},{status:503,headers});
-  if(hasLeakedJdTags(chinese))return Response.json({error:"translation_markup_leak",part,total:chunks.length},{status:503,headers});
-  if(!numbersRetained(one,chinese))return Response.json({error:"translation_numbers_mismatch",part,total:chunks.length},{status:503,headers});
-  const numbersVerified=numbersRetained(one,chinese);
-  return Response.json({jobId:job.id,part,total:chunks.length,text:chinese,sourceHash:digest,
+  const corrected=restoreGroupedNumbers(one,chinese);
+  if(hasLeakedJdTags(corrected))return Response.json({error:"translation_markup_leak",part,total:chunks.length},{status:503,headers});
+  if(!numbersRetained(one,corrected))return Response.json({error:"translation_numbers_mismatch",part,total:chunks.length},{status:503,headers});
+  const numbersVerified=true;
+  return Response.json({jobId:job.id,part,total:chunks.length,text:corrected,sourceHash:digest,
     numbersVerified,sourceUrl:job.url,mode:"private_reading_translation"},{headers});
  }catch(ex){
   console.log("HHBA_READER_ERROR",ex instanceof Error?ex.name:"unknown");
@@ -1128,10 +1143,33 @@ void (async()=>{if(Bun.env.RAILWAY_SERVICE_NAME!=="hhba-web")return;
   const chunk=detail?.description?jdChunks(detail.description)[0]:null;
   const raw=chunk?await machineTranslations("jd",[chunk]):null;
   const translated=raw?.[0]?await ensureChineseProse(raw[0]):null;
+  const corrected=translated&&chunk?restoreGroupedNumbers(chunk,translated):null;
+  const sourceMarkup=!!chunk&&hasLeakedJdTags(chunk);
+  const translationMarkup=!!corrected&&hasLeakedJdTags(corrected);
+  const numeralsPreserved=!!corrected&&!!chunk&&numbersRetained(chunk,corrected);
+  const paragraphBreaks=detail?.description?.includes("\n")||false;
+  const pass=permitted&&detail?.status==="LIVE_CONTENT"&&!sourceMarkup&&!translationMarkup&&numeralsPreserved&&!!corrected;
   console.log("HHBA_STAGING_TRANSLATION_SMOKE",JSON.stringify({
    readerOriginAccepted:permitted,officialJD:detail?.status||"not_found",
    sourceChars:chunk?.length||0,backendTranslated:!!raw?.[0],
-   verifiedChinese:!!translated,pass:permitted&&!!translated
+   sourceMarkup,translationMarkup,paragraphBreaks,numeralsPreserved,
+   verifiedChinese:!!corrected,pass
   }));
  }catch(ex){console.log("HHBA_STAGING_TRANSLATION_SMOKE_ERROR",ex instanceof Error?ex.message:"unknown")}
+})();
+
+void (async()=>{if(Bun.env.RAILWAY_SERVICE_NAME!=="hhba-web")return;
+ const sample="&amp;lt;p&amp;gt;Welcome to the role.&amp;lt;/p&amp;gt;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;Salary $182,800 to $238,100.&amp;lt;/li&amp;gt;&amp;lt;/ul&amp;gt;";
+ const normalized=normalizeOfficialMarkup(sample);
+ const rendered=convert(normalized,{wordwrap:false});
+ const numberSample=restoreGroupedNumbers("$182,800 to $238,100","182 800美元至238 100美元");
+ const pass=normalized.includes("<p>")&&normalized.includes("<li>")&&
+  !hasLeakedJdTags(rendered)&&rendered.includes("Salary")&&
+  numberSample==="182,800美元至238,100美元";
+ console.log("HHBA_JD_HTML_NORMALIZER_TEST",JSON.stringify({
+  structuralTagsRecovered:normalized.includes("<li>"),
+  plainTextClean:!hasLeakedJdTags(rendered),
+  numberGroupingRestored:numberSample==="182,800美元至238,100美元",
+  pass
+ }));
 })();
