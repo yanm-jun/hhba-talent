@@ -11,6 +11,10 @@ test('Chinese reader client is valid JavaScript',()=>{
  assert.match(browser,/translate-part/);
  assert.match(browser,/sessionStorage/);
  assert.match(browser,/sourceHash/);
+ assert.match(browser,/renderChineseJD/);
+ assert.match(browser,/jd-bullet/);
+ assert.match(browser,/jd-heading/);
+ assert.match(browser,/host.replaceChildren\(fragment\)/);
  assert.match(browser,/document.documentElement.lang/);
  assert.match(browser,/numericRisk/);
  assert.match(browser,/hhba-reader-v2-chinese-only/);
@@ -25,6 +29,9 @@ test('user reader only reads fixed live posting and never indexes translated ful
  assert.match(source,/englishBodyRuns/);
  assert.match(source,/translation_incomplete/);
  assert.match(source,/id="market-status"/);
+ assert.match(source,/#jd-zh \.jd-bullet/);
+ assert.match(source,/#jd-zh \.jd-heading/);
+ assert.doesNotMatch(source,/id="translated-paragraphs"[^>]*white-space:pre-wrap/);
  assert.match(source,/HHBA · Global Jobs/);
  assert.doesNotMatch(source,/const shown=output\[0\]\+/);
  assert.doesNotMatch(source,/<details class="reader-original"/);

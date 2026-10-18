@@ -40,9 +40,13 @@ try{
   failures.push({type:'english_toggle_not_selected'});
  await page.locator('#toggle-zh').click();
  const seen=new Set();
- for(const platform of ['greenhouse','ashby','lever']){
-  const job=entries.find(j=>j.platform===platform&&j.company==='Airwallex')||
-    entries.find(j=>j.platform===platform);
+ for(const target of ['greenhouse','ashby','lever','spotify']){
+  const platform=target==='spotify'?'lever':target;
+  const job=target==='spotify'?
+    (entries.find(j=>j.source==='spotify'&&/Data Scientist/i.test(j.title))||
+     entries.find(j=>j.source==='spotify')):
+    (entries.find(j=>j.platform===platform&&j.company==='Airwallex')||
+     entries.find(j=>j.platform===platform));
   if(!job){failures.push({platform,type:'no_live_job'});continue;}
   if(seen.has(job.id))continue;seen.add(job.id);
   const entry={platform,id:job.id};
@@ -77,6 +81,28 @@ try{
     return !!el&&el.textContent.length>40&&/[\u3400-\u9fff]/.test(el.textContent);
    },{timeout:60000}).catch(()=>{});
    entry.chineseChars=(await chinese.innerText()).length;
+
+   const spacing=await chinese.evaluate(el=>{
+    const blocks=[...el.querySelectorAll('.jd-heading,.jd-bullet,.jd-paragraph')];
+    const style=getComputedStyle(el);
+    const gaps=blocks.slice(1).map((next,index)=>
+      Math.round(next.getBoundingClientRect().top-blocks[index].getBoundingClientRect().bottom));
+    const bulletMargins=blocks.filter(x=>x.classList.contains('jd-bullet'))
+      .map(x=>parseFloat(getComputedStyle(x).marginBottom));
+    return {blocks:blocks.length,headingCount:blocks.filter(x=>x.classList.contains('jd-heading')).length,
+      bulletCount:bulletMargins.length,whiteSpace:style.whiteSpace,
+      lineHeightRatio:parseFloat(style.lineHeight)/parseFloat(style.fontSize),
+      maxGap:gaps.length?Math.max(...gaps):0,
+      maxBulletMargin:bulletMargins.length?Math.max(...bulletMargins):0,
+      orphanPunctuation:blocks.filter(x=>/^[.。．]{1,2}$/.test(x.textContent.trim())).length,
+      looseRawTextNodes:[...el.childNodes].filter(x=>x.nodeType===3&&x.textContent.trim()).length};
+   });
+   entry.spacing=spacing;
+   if(spacing.blocks<1||spacing.whiteSpace!=='normal'||spacing.lineHeightRatio>1.72||
+      spacing.maxGap>36||spacing.maxBulletMargin>12||
+      spacing.orphanPunctuation||spacing.looseRawTextNodes)
+     failures.push({platform,id:job.id,type:'excessive_zh_jd_spacing_or_structure',spacing});
+
    const visibleChinese=await chinese.innerText();
    const leakedEnglish=visibleChinese.match(/(?:[A-Za-z]{3,}[ \t]+){7,}[A-Za-z]{3,}/g)||[];
    if(leakedEnglish.length)failures.push({platform,id:job.id,type:'untranslated_english_prose_visible_in_zh',count:leakedEnglish.length});
@@ -94,10 +120,11 @@ try{
     failures.push({platform,type:'real_browser_chinese_not_readable',id:job.id,
       state:entry.progress});
    if(platform==='ashby')await page.screenshot({path:'browser-evidence/job-zh.png'});
+   if(target==='spotify')await page.screenshot({path:'browser-evidence/spotify-jd-spacing-mobile.png',fullPage:true});
    await page.locator('#detail-en').click();
    if(platform==='ashby')await page.screenshot({path:'browser-evidence/job-en.png'});
   }catch(err){failures.push({platform,id:job.id,type:'browser_detail_error',error:err.message});}
-  stats[platform]=entry;
+  stats[target]=entry;
  }
  if(errors.length)failures.push({type:'browser_page_errors',errors:errors.slice(0,8)});
  await writeFile('browser-evidence/report.json',JSON.stringify({stats,failures},null,2));
