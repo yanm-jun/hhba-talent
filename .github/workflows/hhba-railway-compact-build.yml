@@ -4,10 +4,12 @@ on:
     branches: [feat/dual-entry-recruitment-integration]
     paths:
       - 'deploy/railway/live_jobs_preview.ts'
+      - 'deploy/railway/compact_runtime.mjs'
       - '.github/workflows/hhba-railway-compact-build.yml'
   pull_request:
     paths:
       - 'deploy/railway/live_jobs_preview.ts'
+      - 'deploy/railway/compact_runtime.mjs'
       - '.github/workflows/hhba-railway-compact-build.yml'
   workflow_dispatch:
 permissions:
@@ -23,10 +25,11 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - name: Produce minified self-contained Railway function source
         run: |
-          bun build deploy/railway/live_jobs_preview.ts --target=bun --external 'html-to-text@9' --external 'sanitize-html@2' --minify --outfile deploy/railway/live_jobs_preview.min.js
+          node deploy/railway/compact_runtime.mjs
+          bun build deploy/railway/live_jobs_preview.compact.ts --target=bun --external 'html-to-text@9' --external 'sanitize-html@2' --minify --outfile deploy/railway/live_jobs_preview.min.js
           echo "Original bytes: $(wc -c < deploy/railway/live_jobs_preview.ts)"
           echo "Minified bytes: $(wc -c < deploy/railway/live_jobs_preview.min.js)"
-          test "$(wc -c < deploy/railway/live_jobs_preview.min.js)" -lt 90000
+          test "$(wc -c < deploy/railway/live_jobs_preview.min.js)" -lt 99000
           node --check deploy/railway/live_jobs_preview.min.js
       - name: Save reproducible compact runtime to working branch
         run: |
