@@ -1,0 +1,35 @@
+name: HHBA Railway Function Compact Build
+on:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/live_jobs_preview.ts'
+      - '.github/workflows/hhba-railway-compact-build.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  compact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/dual-entry-recruitment-integration
+      - uses: oven-sh/setup-bun@v2
+      - name: Produce minified self-contained Railway function source
+        run: |
+          bun build deploy/railway/live_jobs_preview.ts --target=bun --external 'html-to-text@9' --external 'sanitize-html@2' --minify --outfile deploy/railway/live_jobs_preview.min.js
+          echo "Original bytes: $(wc -c < deploy/railway/live_jobs_preview.ts)"
+          echo "Minified bytes: $(wc -c < deploy/railway/live_jobs_preview.min.js)"
+          test "$(wc -c < deploy/railway/live_jobs_preview.min.js)" -lt 90000
+          node --check deploy/railway/live_jobs_preview.min.js
+      - name: Save reproducible compact runtime to working branch
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add deploy/railway/live_jobs_preview.min.js
+          if ! git diff --cached --quiet; then
+            git commit -m "build(railway): commit minified verified HHBA function"
+            git push origin HEAD:feat/dual-entry-recruitment-integration
+          fi
