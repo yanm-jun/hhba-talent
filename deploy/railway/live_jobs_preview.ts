@@ -118,13 +118,35 @@ function toCache(kind:string,source:string,value:string,mode:string){
  try{translationDb.query("INSERT OR REPLACE INTO translations(cache_key,kind,source_hash,translated,mode,updated_at) VALUES(?,?,?,?,?,?)")
  .run(hash(kind,source),kind,createHash("sha256").update(source).digest("hex"),value,mode,new Date().toISOString());}catch{}
 }
+
+const approvedTerminology:Record<string,string>={
+ "Staff Data Scientist, Algorithm (Payments Fraud & Optimization)":"专家级数据科学家（支付反欺诈与算法优化）",
+ "(Senior) iOS Engineer, Mobile - Identity & Org":"（高级）iOS 移动端工程师（身份与组织）",
+ "(Senior) Manager, Business Development, SME & Growth":"（高级）业务拓展经理（中小企业与增长）",
+ "(Senior) Manager, Regulatory Compliance, Indonesia":"（高级）监管合规经理（印度尼西亚）"
+};
+function professionalTitle(original:string,translation:string):string{
+ const named=approvedTerminology[original.trim()];
+ if(named)return named;
+ return translation.trim()
+   .replace(/工作人员(?=[\u3400-\u9fffA-Za-z])/g,"专家级")
+   .replace(/付款欺诈/g,"支付反欺诈")
+   .replace(/支付欺诈/g,"支付反欺诈")
+   .replace(/工商发展/g,"业务拓展")
+   .replace(/业务发展/g,"业务拓展")
+   .replace(/数据科学家\s*,/g,"数据科学家，")
+   .replace(/^\((高级)\)/g,"（$1）")
+   .replace(/\s+/g," ").trim();
+}
+
 function present(j:Job){
  let v=fromCache("title",j.title);
  if(!v){const translation=translateTitleRules(j.title);
   v={translated:translation,mode:translation==="职位名称待翻译"?"pending":"rules"};
   toCache("title",j.title,translation,v.mode);
  }
- return {...j,titleZh:v.translated,titleStatus:v.mode,
+ const normalized=professionalTitle(j.title,v.translated);if(v.mode==="machine"&&normalized!==v.translated)toCache("title",j.title,normalized,"machine");
+ return {...j,titleZh:normalized,titleStatus:v.mode,
   locationZh:translateLocation(j.location),companyZh:companyZh[j.company]||j.company};
 }
 const searchAliases:Record<string,string[]>={
@@ -298,64 +320,72 @@ function detailHtml(d:Detail):string{
 }
 
 
-const DEEPSEEK_API="https://api.deepseek.com/chat/completions";
-const TRANSLATOR_MODEL="deepseek-chat";
+
+const HHBA_TRANSLATOR_URL=Bun.env.HHBA_TRANSLATOR_URL||"";
+function privateTranslatorUrl():string|null{
+ if(!HHBA_TRANSLATOR_URL)return null;
+ try{
+  const u=new URL(HHBA_TRANSLATOR_URL);
+  if(u.protocol!=="http:"||u.hostname!=="hhba-translator.railway.internal"||u.port!=="5000"||
+     u.pathname!=="/"||u.search||u.hash||u.username||u.password)return null;
+  return u.origin;
+ }catch{return null;}
+}
 function numberTokens(value:string):string[]{
  return (value.match(/\d+(?:[.,]\d+)*(?:%|％)?/g)||[]).sort();
 }
 function numbersRetained(original:string,translated:string):boolean{
- const a=numberTokens(original),b=numberTokens(translated);
- return a.every(x=>b.includes(x));
+ const b=numberTokens(translated);
+ return numberTokens(original).every(x=>b.includes(x));
 }
-async function modelTranslations(kind:"title"|"jd",sources:string[]):Promise<string[]|null>{
- const secret=Bun.env.DEEPSEEK_API_KEY;
- if(!secret||!sources.length||sources.length>16)return null;
- if(sources.some(x=>!x||x.length>(kind==="jd"?14000:300)))return null;
- const instruction=kind==="title"
-  ?"将给定的每条英语岗位名称准确翻译为面向中国求职者的自然、专业中文。保留专有名词、技术缩写、职级差异和所有数字。不得补充职位条件或捏造信息。只返回 JSON 对象，格式 {\"translations\":[\"...\"]}，保持数组顺序、数量不变。"
-  :"将给定的官方职位描述完整准确地翻译为中文。保留全部章节标题、职责、任职资格、学历、年限、工资数字、币种、法律说明以及原文顺序，不得增删、缩写或编造。缩写保留英文，明确专业术语允许中英并列。返回 JSON 对象 {\"translations\":[\"...\"]}，数量顺序完全一致；每个结果保留换行段落。";
+// Local Argos-powered machine translation. Never sends content to a
+// generative model, never accepts a request-supplied server URL.
+async function machineTranslations(kind:"title"|"jd",sources:string[]):Promise<(string|null)[]|null>{
+ const url=privateTranslatorUrl();
+ if(!url||sources.length<1||sources.length>8)return null;
+ if(sources.some(x=>!x||x.length>(kind==="jd"?11000:320)))return null;
  try{
-  const response=await fetch(DEEPSEEK_API,{
-   method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+secret},
-   body:JSON.stringify({
-    model:TRANSLATOR_MODEL,response_format:{type:"json_object"},
-    temperature:0,max_tokens:kind==="jd"?8192:2400,
-    messages:[{role:"system",content:instruction},{role:"user",content:JSON.stringify({sources})}]
-   }),redirect:"error",signal:AbortSignal.timeout(35000)
+  const response=await fetch(url+"/translate",{
+   method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},
+   body:JSON.stringify({q:sources,source:"en",target:"zh",format:"text"}),
+   signal:AbortSignal.timeout(kind==="jd"?80000:45000),redirect:"error",
   });
-  if(!response.ok||Number(response.headers.get("content-length")||0)>150000)
-   return null;
-  const data=await response.json() as any;
-  const raw=data?.choices?.[0]?.message?.content;
-  if(typeof raw!=="string")return null;
-  const parsed=JSON.parse(raw);
-  if(!Array.isArray(parsed?.translations)||parsed.translations.length!==sources.length)return null;
-  const output=parsed.translations as unknown[];
-  if(output.some((x,i)=>typeof x!=="string"||!(/[\u3400-\u9fff]/.test(x as string))||
-    (x as string).length<Math.min(4,sources[i].length/5)||
-    !numbersRetained(sources[i],x as string)))return null;
-  return output as string[];
- }catch{return null;}
+  if(!response.ok||Number(response.headers.get("content-length")||0)>180000){console.log("HHBA_MT_HTTP",response.status);return null;}
+  const output=await response.json() as any;
+  const arr=Array.isArray(output?.translatedText)?output.translatedText:
+            sources.length===1&&typeof output?.translatedText==="string"?[output.translatedText]:null;
+  if(!arr||arr.length!==sources.length)return null;
+  return arr.map((x,i)=>typeof x==="string"&&x.length>1&&/[\u3400-\u9fff]/.test(x)&&numbersRetained(sources[i],x)?x:null);
+ }catch(ex){
+  console.log("HHBA_MT_UNAVAILABLE",ex instanceof Error?ex.name:"unknown");
+  return null;
+ }
 }
 let titleWorkerRunning=false;
 let scheduledTitleCount=0;
+let workerLastFailure=0;
+const translationNeedsReview=new Set<string>();
 async function fillTitleTranslations(rows:Job[]){
- if(!Bun.env.DEEPSEEK_API_KEY||titleWorkerRunning)return;
+ if(!privateTranslatorUrl()||titleWorkerRunning||
+   (Date.now()-workerLastFailure<3*60*1000))return;
  titleWorkerRunning=true;
  try{
-  const pending=Array.from(new Map(rows.filter(x=>fromCache("title",x.title)?.mode!=="model")
-   .map(x=>[x.title,x.title])).values()).slice(0,300);
-  for(let i=0;i<pending.length;i+=12){
-   const batch=pending.slice(i,i+12);
-   const translated=await modelTranslations("title",batch);
-   if(!translated){console.log("HHBA_TRANSLATION_BATCH_PAUSED",JSON.stringify({offset:i,count:batch.length}));break;}
-   batch.forEach((source,n)=>toCache("title",source,translated[n],"model"));
-   scheduledTitleCount+=batch.length;
-   await Bun.sleep(1800);
+  // Limited low-frequency batches; no public caller can submit arbitrary text.
+  const unique=[...new Set(rows.map(x=>x.title))];
+  const pending=unique.filter(t=>fromCache("title",t)?.mode!=="machine"&&!translationNeedsReview.has(t)).slice(0,60);
+  for(let i=0;i<pending.length;i+=4){
+   const batch=pending.slice(i,i+4);
+   const translated=await machineTranslations("title",batch);
+   if(!translated){workerLastFailure=Date.now();
+     console.log("HHBA_MT_BATCH_PAUSED",JSON.stringify({offset:i,count:batch.length}));break;}
+   batch.forEach((source,n)=>{const txt=translated[n];if(txt){toCache("title",source,professionalTitle(source,txt),"machine");scheduledTitleCount++;}else translationNeedsReview.add(source);});
+   if(i+4<pending.length)await Bun.sleep(1200);
   }
-  console.log("HHBA_TRANSLATION_BATCH",JSON.stringify({translatedThisRuntime:scheduledTitleCount,persistent:!!translationDb}));
- }finally{titleWorkerRunning=false;}
+  console.log("HHBA_MT_TITLES",JSON.stringify({newTranslations:scheduledTitleCount,persistent:!!translationDb}));
+ }catch(ex){workerLastFailure=Date.now();console.log("HHBA_MT_WORKER_ERROR",ex instanceof Error?ex.name:"unknown");}
+ finally{titleWorkerRunning=false;}
 }
+
 function translatedDetail(d:Detail):string|null{
  // Metadata-only permission is not permission to publish derivative JD
  // translations. A separate verified source/job rights registry is required.
@@ -431,13 +461,13 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  if(u.pathname==="/health")return Response.json({ok:true,kind:"hhba-ats-public-preview"},{headers});
  if(u.pathname==="/api/i18n/status"){
   const d=await load(),records=(d?.rows||[]).map(present);
-  const categories={model:0,rules:0,pending:0};
+  const categories={machine:0,rules:0,pending:0};
   for(const job of records){const state=job.titleStatus as keyof typeof categories;if(state in categories)categories[state]++;}
   return Response.json({total:records.length,boards:d?.boards||0,titleTranslations:categories,
-   cachePersistent:!!translationDb,translationApiConfigured:!!Bun.env.DEEPSEEK_API_KEY,
+   cachePersistent:!!translationDb,translationEngine:privateTranslatorUrl()?"libretranslate-private":"unconfigured",
    completeOriginalJdTranslationsAvailable:false,searchLanguages:["zh","en"]},{headers});
  }
- if(u.pathname==="/api/jobs"){const data=await load();if(data?.rows)void fillTitleTranslations(data.rows);return Response.json({jobs:(data?.rows||[]).map(present),total:data?.rows.length||0,boards:data?.boards||0,failures:data?.failures||0,updated:data?.updated||"",persistentCache:!!translationDb,translationApiConfigured:!!Bun.env.DEEPSEEK_API_KEY},{headers});}
+ if(u.pathname==="/api/jobs"){const data=await load();if(data?.rows)void fillTitleTranslations(data.rows);return Response.json({jobs:(data?.rows||[]).map(present),total:data?.rows.length||0,boards:data?.boards||0,failures:data?.failures||0,updated:data?.updated||"",persistentCache:!!translationDb,translationEngine:privateTranslatorUrl()?"libretranslate-private":"unconfigured"},{headers});}
 
  if(u.pathname.startsWith("/jobs/")||u.pathname.startsWith("/api/jobs/")){
   const nativeId=decodeURIComponent(u.pathname.split("/").pop()||"");
@@ -507,3 +537,28 @@ void (async()=>{
  }catch(e){console.log("HHBA_ZH_ACCEPTANCE_ERROR",e instanceof Error?e.name:"Error");}
 })();
 function codeSupportsChinese(){return true;}
+
+
+void (async()=>{
+ try{
+  const base=privateTranslatorUrl();
+  if(!base){console.log("HHBA_MT_PROBE","ENGINE_NOT_CONFIGURED");return;}
+  const languages=await fetch(base+"/languages",{headers:{Accept:"application/json"},
+    signal:AbortSignal.timeout(15000),redirect:"error"});
+  console.log("HHBA_MT_HEALTH",JSON.stringify({http:languages.status,serverReachable:languages.ok}));
+  if(!languages.ok)return;
+  const examples=[
+    "Staff Data Scientist, Algorithm (Payments Fraud & Optimization)",
+    "(Senior) iOS Engineer, Mobile - Identity & Org",
+    "(Senior) Manager, Business Development, SME & Growth",
+    "(Senior) Manager, Regulatory Compliance, Indonesia"
+  ];
+  const translated=await machineTranslations("title",examples);
+  if(translated&&translated.every(Boolean)){
+    examples.forEach((title,i)=>toCache("title",title,professionalTitle(title,translated[i] as string),"machine"));
+    console.log("HHBA_MT_QUALITY_PROBE",JSON.stringify(examples.map((title,i)=>({en:title,zh:translated[i]}))));
+  }else console.log("HHBA_MT_QUALITY_PROBE","NOT_READY_OR_TRANSLATION_FAILED");
+  const list=await load();
+  if(list?.rows&&translated)void fillTitleTranslations(list.rows);
+ }catch(ex){console.log("HHBA_MT_STARTUP_ERROR",ex instanceof Error?ex.name:"unknown");}
+})();
