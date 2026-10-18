@@ -1,5 +1,5 @@
 const $=id=>document.getElementById(id);
-let limit=30,token=0;
+let offset=0,token=0,total=0;
 function card(job){
  const item=document.createElement("article");item.className="job";
  const brand=document.createElement("div");brand.className="logo";
@@ -12,26 +12,27 @@ function card(job){
  meta.textContent=job.location+" · "+(job.remote===true?"远程":job.remote===false?"非远程":"远程未标注")+" · "+(job.status==="fresh"?"本轮官方同步":"历史缓存")+" · "+job.platform.toUpperCase();
  body.append(title,company,meta);item.append(brand,body);return item;
 }
-async function load(){
+async function load(append=false){
  const n=++token;
- const params=new URLSearchParams({q:$("q").value,company:$("company").value,remote:$("remote").value,limit:String(limit)});
+ const params=new URLSearchParams({q:$("q").value,company:$("company").value,remote:$("remote").value,limit:"30",offset:String(append?offset:0)});
  try{
   const r=await fetch("/api/jobs/page?"+params);
   if(!r.ok)throw Error("Unavailable");
   const d=await r.json();if(n!==token)return;
-  $("jobs").replaceChildren(...d.jobs.map(card));
+  if(append)$("jobs").append(...d.jobs.map(card));else $("jobs").replaceChildren(...d.jobs.map(card));
+  offset=(append?offset:0)+d.jobs.length;total=d.total;
   $("summary").textContent="匹配 "+d.total+" 条岗位 · 成功连接 "+d.successBoards+"/"+d.boards+" 个官方招聘板 · 最近同步 "+(d.updatedAt||"待同步");
-  $("more").hidden=d.total<=d.jobs.length;
+  $("more").hidden=offset>=d.total;
  }catch{
   if(n!==token)return;
-  $("jobs").replaceChildren();
+  offset=0;total=0;$("jobs").replaceChildren();
   $("more").hidden=true;
   $("summary").textContent="岗位数据暂时不可用，请重试；不会展示可能过时的搜索结果";
  }
 }
-$("filters").addEventListener("submit",e=>{e.preventDefault();limit=30;load()});
-$("more").addEventListener("click",()=>{limit=Math.min(5000,limit+30);load()});
-$("q").addEventListener("input",()=>{clearTimeout(window.searchDelay);window.searchDelay=setTimeout(()=>{limit=30;load()},280)});
-$("company").addEventListener("change",()=>{limit=30;load()});
-$("remote").addEventListener("change",()=>{limit=30;load()});
+$("filters").addEventListener("submit",e=>{e.preventDefault();offset=0;load()});
+$("more").addEventListener("click",()=>{load(true)});
+$("q").addEventListener("input",()=>{clearTimeout(window.searchDelay);window.searchDelay=setTimeout(()=>{offset=0;load()},280)});
+$("company").addEventListener("change",()=>{offset=0;load()});
+$("remote").addEventListener("change",()=>{offset=0;load()});
 load();
