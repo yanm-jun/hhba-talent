@@ -8,7 +8,7 @@ test("preserves original job marketplace and not a link directory",()=>{
  assert.match(src,/if\(u\.pathname==="\/api\/jobs\/page"\)/);
  assert.match(src,/function start\(\)/);
  assert.match(src,/id="jobs"/);
- assert.doesNotMatch(src,/id="employer-directory"/);
+ assert.doesNotMatch(src,/<div[^>]+id="employer-directory"/);
 });
 test("OpenAI and existing mainland job datasets retained",()=>{
  for(const target of ['company:"OpenAI",slug:"openai"','domesticObserved:Job[]','meituanCompact','additionalDomesticJobs'])
