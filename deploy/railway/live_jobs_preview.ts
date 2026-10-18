@@ -297,7 +297,7 @@ function detailHtml(d:Detail,zhFull:string|null):string{
   '.meta{color:#5e786b;line-height:1.8;font-size:14px}.panel{background:#fff;border:1px solid #e4eae3;border-radius:14px;padding:clamp(20px,4vw,42px)}'+
   '.panel h2{font-size:21px;margin:0 0 10px}.source{color:#819185;font-size:12px;margin:0 0 28px}'+
   '.full-jd{overflow-wrap:anywhere;line-height:1.85;font-size:15px;color:#304539}.full-jd p{margin:12px 0}.full-jd li{margin:7px 0}.full-jd h2,.full-jd h3{margin-top:28px}.full-jd a{color:#147343;text-decoration:underline}'+
-  '.missing{line-height:1.8;color:#7b7656}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:27px}'+
+  '.missing{line-height:1.8;color:#7b7656}.reader-original{border-top:1px solid #e4eae3;margin-top:24px;padding-top:15px}.reader-original summary{color:#1e6740;cursor:pointer;font-size:14px;font-weight:750;margin:8px 0 14px}.reader-retry{padding:9px 14px;border:1px solid #b3d7c1;background:#e7f4e9;border-radius:8px;color:#1e6740;font-weight:750;cursor:pointer}.reader-retry[hidden]{display:none}#translation-progress{font-size:13px;color:#537b64}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:27px}'+
   '.btn{display:inline-block;text-decoration:none;border-radius:9px;padding:13px 20px;font-weight:800;font-size:14px;background:#1e6740;color:white}'+
   '.btn.secondary{color:#1e6740;background:#e7f4e9}.notice{font-size:12px;color:#74857a;line-height:1.8;margin-top:25px}'+
   '</style></head><body><header><a href="/">HHBA <small style="font-size:13px;font-weight:400;color:#728d79">· 招聘市场</small></a></header>'+
@@ -310,12 +310,18 @@ function detailHtml(d:Detail,zhFull:string|null):string{
   '<p class="source">官方同一岗位 ID · 最近读取 '+esc(d.checkedAt)+' · 英文为企业原文，中文为翻译参考</p>'+
   '<div class="lang-panel" id="jd-zh">'+
   (zhFull?'<div class="full-jd" style="white-space:pre-wrap">'+esc(zhFull)+'</div>':
-   '<p class="missing">该职位的中文完整 JD 译文尚未取得可公开展示的授权，或翻译尚未完成。本站不会用不完整译文代替官方要求。请点击 English 阅读该岗位的官方完整原文。</p>')+
+   '<div id="personal-reader" data-job="'+esc(j.id)+'" data-hash="'+createHash("sha256").update(d.description).digest("hex")+'">'+
+  '<p id="translation-note" class="source">正在准备这条岗位的中文即时翻译，内容将逐段显示。翻译仅供个人辅助阅读，具体条件以企业官方原文为准。</p>'+
+  '<p id="translation-progress" role="status" aria-live="polite">正在连接翻译服务…</p>'+
+  '<div id="translated-paragraphs" class="full-jd" style="white-space:pre-wrap"></div>'+
+  '<button id="retry-translation" class="reader-retry" hidden type="button">重新尝试翻译</button>'+
+  '<details class="reader-original"><summary>立即查看完整官方英文原文</summary><div class="full-jd" style="white-space:pre-wrap">'+esc(d.description)+'</div></details>'+
+  '<p class="source">此译文按用户当前请求临时生成，不作为企业官方中文 JD 公开收录；涉及薪资、签证、工作经验等关键条件，请核对 English 原文。</p></div>')+
   '</div><div class="lang-panel" id="jd-en" hidden>'+body+'</div></section>'+
   '<div class="actions"><a class="btn" href="'+apply+'" target="_blank" rel="noopener noreferrer">前往企业官网申请 ↗</a>'+
   '<a class="btn secondary" href="'+official+'" target="_blank" rel="noopener noreferrer">查看对应官方职位页 ↗</a></div>'+
   '<p class="notice">资料来自企业公开招聘系统。HHBA 不代表招聘企业。中文职位名称目前包括术语规则译名，未完成译文需对照英文原文。申请资格和最终状态以企业官网为准。原始站点中的表单及自定义交互不复制到本站。</p></main>'+
-  '<script>(function(){let lang="zh";try{lang=localStorage.getItem("hhba-lang")==="en"?"en":"zh"}catch{}function set(v){lang=v==="en"?"en":"zh";try{localStorage.setItem("hhba-lang",lang)}catch{}document.querySelector("#jd-zh").hidden=lang!=="zh";document.querySelector("#jd-en").hidden=lang!=="en";document.querySelector("#detail-zh").classList.toggle("selected",lang==="zh");document.querySelector("#detail-en").classList.toggle("selected",lang==="en");document.querySelector("#detail-title").textContent=document.querySelector("#detail-title").dataset[lang];document.querySelector("#detail-place").textContent=document.querySelector("#detail-place").dataset[lang]};document.querySelector("#detail-zh").onclick=()=>set("zh");document.querySelector("#detail-en").onclick=()=>set("en");set(lang)})()</script></body></html>';
+  '<script>'+ "(function(){\nlet lang=\"zh\";\ntry{lang=localStorage.getItem(\"hhba-lang\")===\"en\"?\"en\":\"zh\"}catch{}\nconst reader=document.querySelector(\"#personal-reader\");\nconst retry=document.querySelector(\"#retry-translation\");\nconst note=document.querySelector(\"#translation-note\");\nconst progress=document.querySelector(\"#translation-progress\");\nconst output=document.querySelector(\"#translated-paragraphs\");\nlet inflight=null;\nasync function translate(){\n if(!reader||reader.dataset.done===\"true\")return;\n if(inflight)return inflight;\n inflight=(async()=>{\n   if(retry)retry.hidden=true;\n   let parts=[],part=0,total=1;\n   let saved=null;\n   const storageKey=\"hhba-reader:\"+reader.dataset.job+\":\"+reader.dataset.hash;\n   try{saved=sessionStorage.getItem(storageKey)}catch{}\n   if(saved&&output){output.textContent=saved;progress.textContent=\"中文译文已加载（本次浏览会话缓存）\";note.textContent=\"这是机器即时翻译，请核对对应的英文原文。\";reader.dataset.done=\"true\";return;}\n   if(output)output.textContent=\"\";\n   try{\n    while(part<total){\n     let response=null;\n     for(let trial=0;trial<2;trial++){\n      response=await fetch(\"/api/jobs/\"+encodeURIComponent(reader.dataset.job)+\"/translate-part\",{\n       method:\"POST\",credentials:\"same-origin\",\n       headers:{\"Content-Type\":\"application/json\"},\n       body:JSON.stringify({part,sourceHash:reader.dataset.hash})\n      });\n      if(response.status!==429)break;\n      await new Promise(r=>setTimeout(r,3000));\n     }\n     if(!response||!response.ok){\n      let payload={};try{payload=await response.json()}catch{}\n      if(payload.error===\"source_changed\")throw Error(\"官方岗位内容已更新，请刷新页面重试。\");\n      if(payload.error===\"source_too_long\")throw Error(\"这条官方 JD 过长，暂未完成全文翻译，请使用 English 原文。\");\n      throw Error(\"第 \"+(part+1)+\" 段翻译暂时失败，可以重试或查看完整英文原文。\");\n     }\n     const result=await response.json();\n     if(result.jobId!==reader.dataset.job||result.sourceHash!==reader.dataset.hash||\n        result.part!==part||!Number.isInteger(result.total)||result.total<1||result.total>80||\n        typeof result.text!==\"string\")throw Error(\"译文与当前岗位版本不一致，请刷新页面。\");\n     if(part===0)total=result.total;\n     if(result.total!==total)throw Error(\"官方岗位在翻译过程中发生变化，请刷新页面。\");\n     parts.push(result.text);\n     if(output)output.textContent=parts.join(\"\\n\");\n     part++;\n     if(progress)progress.textContent=\"已翻译 \"+part+\" / \"+total+\" 段\";\n    }\n    const complete=parts.join(\"\\n\");\n    if(reader&&complete.trim()){\n     try{sessionStorage.setItem(storageKey,complete)}catch{}\n     reader.dataset.done=\"true\";\n     if(note)note.textContent=\"中文即时翻译已完成（机器译文，仅供辅助理解）。请对照 English 原文核对招聘条件。\";\n     if(progress)progress.textContent=\"已完成 \"+total+\" / \"+total+\" 段\";\n    }\n   }catch(err){\n     if(note)note.textContent=err.message||\"翻译暂时不可用。\";\n     if(progress)progress.textContent=parts.length?\"当前已完成 \"+parts.length+\" 段。其余内容请查看下方完整原文。\":\"下面可以直接展开完整官方英文原文。\";\n     if(retry)retry.hidden=false;\n   }\n })();\n try{return await inflight}finally{inflight=null}\n}\nfunction set(v){\n lang=v===\"en\"?\"en\":\"zh\";\n try{localStorage.setItem(\"hhba-lang\",lang)}catch{}\n document.querySelector(\"#jd-zh\").hidden=lang!==\"zh\";\n document.querySelector(\"#jd-en\").hidden=lang!==\"en\";\n document.querySelector(\"#detail-zh\").classList.toggle(\"selected\",lang===\"zh\");\n document.querySelector(\"#detail-en\").classList.toggle(\"selected\",lang===\"en\");\n document.querySelector(\"#detail-title\").textContent=document.querySelector(\"#detail-title\").dataset[lang];\n document.querySelector(\"#detail-place\").textContent=document.querySelector(\"#detail-place\").dataset[lang];\n if(lang===\"zh\"&&reader)void translate();\n}\ndocument.querySelector(\"#detail-zh\").onclick=()=>set(\"zh\");\ndocument.querySelector(\"#detail-en\").onclick=()=>set(\"en\");\nif(retry)retry.onclick=()=>{reader.dataset.done=\"false\";void translate()};\nset(lang);\n})()" +'</script></body></html>';
 }
 
 
@@ -354,7 +360,7 @@ async function machineTranslations(kind:"title"|"jd",sources:string[]):Promise<(
   const arr=Array.isArray(output?.translatedText)?output.translatedText:
             sources.length===1&&typeof output?.translatedText==="string"?[output.translatedText]:null;
   if(!arr||arr.length!==sources.length)return null;
-  return arr.map((x,i)=>typeof x==="string"&&x.length>1&&/[\u3400-\u9fff]/.test(x)&&numbersRetained(sources[i],x)?x:null);
+  return arr.map((x,i)=>typeof x==="string"&&x.length>1&&/[\u3400-\u9fff]/.test(x)&&(kind==="jd"||numbersRetained(sources[i],x))?x:null);
  }catch(ex){
   console.log("HHBA_MT_UNAVAILABLE",ex instanceof Error?ex.name:"unknown");
   return null;
@@ -492,9 +498,111 @@ function render(reset=true){
 async function start(){try{const r=await fetch('/api/jobs');if(!r.ok)throw Error();const d=await r.json();all=d.jobs||[];let companies=[...new Set(all.map(x=>x.company))].sort();for(let name of companies){let op=document.createElement("option");op.value=name;op.textContent=name;c.append(op)}document.querySelector('#translated-count').textContent=all.filter(j=>j.titleStatus==='machine').length;setLanguage(lang);}catch{list.innerHTML='<div class="empty">官方岗位接口暂时不可用，请稍后刷新</div>';}}
 q.addEventListener("input",()=>render());c.addEventListener("change",()=>render());remote.addEventListener("change",()=>render());start();
 </script></body></html>`;
+
+// Per-view, not published / indexed: a user reads a live official posting
+// in Chinese without adding the translated third-party JD to the shared DB.
+const JD_READER_SIZE=900;
+const JD_READER_MAX_CHARS=30000;
+const translationRequests=new Map<string,{count:number,expires:number}>();
+let activeJdReaders=0;
+function jdChunks(full:string):string[]{
+ const parts:string[]=[];
+ let current="";
+ // Keep newlines so headings, bullet lists, and eligibility sections survive.
+ // Long blocks are sliced on whitespace when practical.
+ const lines=full.replace(/\r\n?/g,"\n").split("\n");
+ for(const line of lines){
+  const units:string[]=[];
+  if(line.length<=JD_READER_SIZE){units.push(line);}
+  else {
+   let remaining=line;
+   while(remaining.length>JD_READER_SIZE){
+    let end=remaining.lastIndexOf(" ",JD_READER_SIZE);
+    if(end<JD_READER_SIZE/2)end=JD_READER_SIZE;
+    units.push(remaining.slice(0,end));
+    remaining=remaining.slice(end).trimStart();
+   }
+   units.push(remaining);
+  }
+  for(let i=0;i<units.length;i++){
+   const fragment=units[i]+(i===units.length-1?"\n":" ");
+   if(current&&current.length+fragment.length>JD_READER_SIZE){
+    parts.push(current);current="";
+   }
+   current+=fragment;
+  }
+ }
+ if(current)parts.push(current);
+ return parts;
+}
+function humanReaderAllowed(req:Request,u:URL):boolean{
+ const origin=req.headers.get("origin");
+ const host=req.headers.get("host");
+ if(!host||!/^hhba-live-jobs-preview-production\.up\.railway\.app(?::443)?$/i.test(host))return false;
+ return origin==="https://hhba-live-jobs-preview-production.up.railway.app" &&
+   req.headers.get("content-type")?.startsWith("application/json")===true &&
+   Number(req.headers.get("content-length")||0)<=300;
+}
+function readerRateLimit(req:Request):boolean{
+ const ip=(req.headers.get("x-forwarded-for")||"anonymous").split(",").at(-1)?.trim()||"anonymous";
+ const key=createHash("sha256").update(ip).digest("hex").slice(0,32);
+ const now=Date.now();
+ // Sweep bounded in-process counters; rolling restart resets limits.
+ if(translationRequests.size>2500)for(const[k,v]of translationRequests)
+  if(v.expires<now)translationRequests.delete(k);
+ const hit=translationRequests.get(key);
+ if(!hit||hit.expires<now){translationRequests.set(key,{count:1,expires:now+3600000});return true;}
+ if(hit.count>=120)return false;
+ hit.count++;
+ return true;
+}
+async function readJobForTranslation(req:Request,u:URL,headers:Record<string,string>):Promise<Response>{
+ if(!humanReaderAllowed(req,u))return Response.json({error:"same_origin_reader_only"},{status:403,headers});
+ if(!privateTranslatorUrl())return Response.json({error:"translator_offline"},{status:503,headers});
+ if(activeJdReaders>=4||!readerRateLimit(req))
+  return Response.json({error:"reader_busy",retryAfter:5},{status:429,headers:{"Retry-After":"5",...headers}});
+ const match=u.pathname.match(/^\/api\/jobs\/([a-zA-Z0-9_-]{1,180})\/translate-part$/);
+ if(!match)return Response.json({error:"invalid_job"},{status:404,headers});
+ let data:any;
+ try{data=await req.json();}catch{return Response.json({error:"bad_json"},{status:400,headers});}
+ const part=data?.part,sourceHash=data?.sourceHash;
+ if(!Number.isInteger(part)||part<0||part>80||
+    typeof sourceHash!=="string"||!/^[a-f0-9]{64}$/.test(sourceHash))
+  return Response.json({error:"bad_reader_request"},{status:400,headers});
+ const catalog=await load();
+ const job=catalog?.rows.find(row=>row.id===match[1]);
+ if(!job)return Response.json({error:"posting_not_listed"},{status:404,headers});
+ activeJdReaders++;
+ try{
+  const detail=await officialDetail(job);
+  if(!detail||detail.status!=="LIVE_CONTENT")return Response.json({error:"source_unavailable"},{status:503,headers});
+  const english=detail.description;
+  if(!english||english.length>JD_READER_MAX_CHARS)
+   return Response.json({error:"source_too_long",maxCharacters:JD_READER_MAX_CHARS},{status:422,headers});
+  const digest=createHash("sha256").update(english).digest("hex");
+  if(digest!==sourceHash)return Response.json({error:"source_changed"},{status:409,headers});
+  const chunks=jdChunks(english);
+  if(part>=chunks.length)return Response.json({error:"part_out_of_range"},{status:404,headers});
+  const one=chunks[part];
+  if(!one.trim())return Response.json({jobId:job.id,part,total:chunks.length,text:one,sourceHash:digest,sourceUrl:job.url,mode:"private_reading_translation"},{headers});
+  const output=await machineTranslations("jd",[one]);
+  if(!output||!output[0])return Response.json({error:"translation_unverified",part,total:chunks.length},{status:503,headers});
+  // If automatic MT changes a number, retain the entire corresponding
+  // English original alongside the Chinese translation for verification.
+  const numbersVerified=numbersRetained(one,output[0]);
+  const shown=output[0]+(numbersVerified?"":"\n\n【关键信息核对：以下英文原文数字未全部保留】\n"+one);
+  return Response.json({jobId:job.id,part,total:chunks.length,text:shown,sourceHash:digest,
+    numbersVerified,sourceUrl:job.url,mode:"private_reading_translation"},{headers});
+ }catch(ex){
+  console.log("HHBA_READER_ERROR",ex instanceof Error?ex.name:"unknown");
+  return Response.json({error:"translation_temporarily_unavailable"},{status:503,headers});
+ }finally{activeJdReaders--;}
+}
+
 Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  const u=new URL(req.url);
  const headers={"Cache-Control":"no-store","X-Content-Type-Options":"nosniff","X-Frame-Options":"DENY","Referrer-Policy":"no-referrer"};
+ if(req.method==="POST"&&/^\/api\/jobs\/[a-zA-Z0-9_-]{1,180}\/translate-part$/.test(u.pathname))return readJobForTranslation(req,u,headers);
  if(req.method!=="GET")return new Response("Method not allowed",{status:405,headers});
  if(u.pathname==="/health")return Response.json({ok:true,kind:"hhba-ats-public-preview"},{headers});
  if(u.pathname==="/api/i18n/status"){
@@ -600,4 +708,73 @@ void (async()=>{
   const list=await load();
   if(list?.rows&&translated)void fillTitleTranslations(list.rows);
  }catch(ex){console.log("HHBA_MT_STARTUP_ERROR",ex instanceof Error?ex.name:"unknown");}
+})();
+
+
+// Internal bounded acceptance: verifies the actual same-origin reader route
+// against one currently listed real Ashby job, without logging JD content.
+void (async()=>{
+ try{
+  const catalog=await load();
+  const job=catalog?.rows.find(j=>j.platform==="ashby"&&j.source==="airwallex");
+  if(!job){console.log("HHBA_ZH_READER_PROOF","NO_LIVE_AIRWALLEX");return;}
+  const detail=await officialDetail(job);
+  if(!detail||!detail.description){console.log("HHBA_ZH_READER_PROOF","SOURCE_UNAVAILABLE");return;}
+  const domain="hhba-live-jobs-preview-production.up.railway.app";
+  const u=new URL("https://"+domain+"/api/jobs/"+encodeURIComponent(job.id)+"/translate-part");
+  const hash=createHash("sha256").update(detail.description).digest("hex");
+  const request=new Request(u.href,{method:"POST",headers:{
+    "Content-Type":"application/json","Origin":"https://"+domain,"Host":domain},
+    body:JSON.stringify({part:0,sourceHash:hash})
+  });
+  const started=Date.now();
+  const response=await readJobForTranslation(request,u,{"Cache-Control":"no-store"});
+  let info:any=null;
+  try{info=await response.json();}catch{}
+  console.log("HHBA_ZH_READER_PROOF",JSON.stringify({
+   http:response.status,
+   jobMatches:info?.jobId===job.id,
+   sourceMatches:info?.sourceHash===hash,
+   chinese:typeof info?.text==="string"&&/[\u3400-\u9fff]/.test(info.text),
+   originalChars:detail.description.length,
+   chineseChunkChars:typeof info?.text==="string"?info.text.length:0,
+   chunks:info?.total??null,error:info?.error??null,ms:Date.now()-started
+  }));
+ }catch(err){console.log("HHBA_ZH_READER_PROOF_ERROR",err instanceof Error?err.name:"unknown");}
+})();
+
+
+void (async()=>{
+ try{
+  const job=(await load())?.rows.find(j=>j.platform==="ashby"&&j.source==="airwallex");
+  if(!job)return;
+  const detail=await officialDetail(job);
+  if(!detail||!detail.description)return;
+  const digest=createHash("sha256").update(detail.description).digest("hex");
+  const hostname="hhba-live-jobs-preview-production.up.railway.app";
+  const u=new URL("https://"+hostname+"/api/jobs/"+encodeURIComponent(job.id)+"/translate-part");
+  const all=jdChunks(detail.description);
+  let succeeded=0,shortened=0,numericWarnings=0,failed="";
+  const started=Date.now();
+  for(let index=0;index<all.length;index++){
+   const req=new Request(u.href,{method:"POST",headers:{
+    "Content-Type":"application/json","Origin":"https://"+hostname,"Host":hostname},
+    body:JSON.stringify({part:index,sourceHash:digest})});
+   const response=await readJobForTranslation(req,u,{"Cache-Control":"no-store"});
+   const body=await response.json() as any;
+   if(!response.ok||body?.jobId!==job.id||body.sourceHash!==digest||
+      body.part!==index||body.total!==all.length||!body.text?.trim()){
+     failed=(body?.error||"mismatched_reply")+"@"+index+"_"+response.status;break;
+   }
+   if(body.numbersVerified===false)numericWarnings++;
+   if(body.text.length<all[index].length/4)shortened++;
+   succeeded++;
+  }
+  console.log("HHBA_JD_FULL_TRANSLATION_PROOF",JSON.stringify({
+    company:job.company,parts:all.length,translated:succeeded,
+    complete:succeeded===all.length,sourceCharacters:detail.description.length,
+    numericCrossChecks:numericWarnings,suspiciousShortParts:shortened,
+    failure:failed||null,ms:Date.now()-started
+  }));
+ }catch(e){console.log("HHBA_JD_FULL_TRANSLATION_ERROR",e instanceof Error?e.name:"unknown");}
 })();
