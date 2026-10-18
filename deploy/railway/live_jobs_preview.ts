@@ -259,16 +259,42 @@ async function getBoard(b:Board):Promise<Job[]>{
  const endpoint=b.platform==="greenhouse"?"https://boards-api.greenhouse.io/v1/boards/"+encodeURIComponent(b.slug)+"/jobs":
  b.platform==="ashby"?"https://api.ashbyhq.com/posting-api/job-board/"+encodeURIComponent(b.slug):
  "https://api.lever.co/v0/postings/"+encodeURIComponent(b.slug)+"?mode=json";
- let resp=await fetch(endpoint,{headers:{"Accept":"application/json","User-Agent":"HHBA-public-job-index/0.1"},signal:AbortSignal.timeout(12000),redirect:"error"});
- if(!resp.ok||Number(resp.headers.get("content-length")||0)>8000000)throw Error("source unavailable");
- const body=await resp.json() as any;
- const arr=Array.isArray(body)?body:Array.isArray(body?.jobs)?body.jobs:[];
- return arr.slice(0,3000).map((x:any)=>normalize(b,x)).filter((x:Job|null):x is Job=>!!x);
+ // Larger boards such as Anduril (>2,500 roles) sometimes exceed the
+ // previous 12-second deadline. Allow two bounded attempts, with a short
+ // backoff only on transient failures. Invalid responses never count as 0 jobs.
+ const perAttemptTimeout=b.slug==="andurilindustries"?30000:19000;
+ for(let attempt=0;attempt<2;attempt++){
+  try{
+   const resp=await fetch(endpoint,{
+    headers:{"Accept":"application/json","User-Agent":"HHBA-public-job-index/0.3"},
+    signal:AbortSignal.timeout(perAttemptTimeout),redirect:"error"
+   });
+   if(!resp.ok){
+    if((resp.status===429||resp.status>=500)&&attempt===0){await Bun.sleep(1100);continue;}
+    throw Error("ATS_HTTP_"+resp.status);
+   }
+   if(Number(resp.headers.get("content-length")||0)>16000000)throw Error("ATS_BOARD_TOO_LARGE");
+   const body=await resp.json() as any;
+   const arr=Array.isArray(body)?body:Array.isArray(body?.jobs)?body.jobs:null;
+   if(!arr)throw Error("ATS_INVALID_JOB_ARRAY");
+   const valid=arr.slice(0,3000).map((x:any)=>normalize(b,x)).filter((x:Job|null):x is Job=>!!x);
+   if(arr.length>0&&valid.length===0)throw Error("ATS_NO_VALID_OFFICIAL_JOBS");
+   if(attempt>0)console.log("HHBA_ATS_BOARD_RECOVERED",JSON.stringify({platform:b.platform,slug:b.slug,jobs:valid.length,attempts:attempt+1}));
+   return valid;
+  }catch(e){
+   if(attempt===1||String((e as Error)?.message||"").includes("ATS_HTTP_4")||
+      String((e as Error)?.message||"").includes("ATS_BOARD_TOO_LARGE")||
+      String((e as Error)?.message||"").includes("ATS_INVALID_JOB_ARRAY")||
+      String((e as Error)?.message||"").includes("ATS_NO_VALID_OFFICIAL_JOBS"))throw e;
+   await Bun.sleep(1100);
+  }
+ }
+ throw Error("ATS_RETRY_EXHAUSTED");
 }
 let cache:{at:number;rows:Job[];boards:number;failures:number;updated:string}|null=null;
 let inflight:Promise<typeof cache>|null=null;
 async function load(){
- if(cache&&Date.now()-cache.at<10*60*1000)return cache;
+ if(cache&&Date.now()-cache.at<(cache.failures?60*1000:10*60*1000))return cache;
  if(inflight)return await inflight;
  inflight=(async()=>{
   // Limit simultaneous outbound ATS requests to avoid overwhelming boards.
