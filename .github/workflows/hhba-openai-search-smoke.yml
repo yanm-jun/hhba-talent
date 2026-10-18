@@ -1,9 +1,16 @@
-name: HHBA OpenAI live search smoke
+name: HHBA OpenAI real search acceptance
 on:
   push:
     branches: [feat/dual-entry-recruitment-integration]
     paths:
       - 'deploy/railway/openai_search_smoke.mjs'
+      - 'deploy/railway/openai_browser_smoke.mjs'
+      - '.github/workflows/hhba-openai-search-smoke.yml'
+  pull_request:
+    paths:
+      - 'deploy/railway/live_jobs_preview.ts'
+      - 'deploy/railway/openai_search_smoke.mjs'
+      - 'deploy/railway/openai_browser_smoke.mjs'
       - '.github/workflows/hhba-openai-search-smoke.yml'
   workflow_dispatch:
 permissions:
@@ -11,11 +18,24 @@ permissions:
 jobs:
   search:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 16
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify live OpenAI keyword search, company filter, JD and brand card
+      - name: Verify live OpenAI search API and official JD
         run: node deploy/railway/openai_search_smoke.mjs
+      - name: Install browser test runner
+        run: npm install --prefix .browser-test --no-package-lock --no-audit --no-fund playwright@1.56.1
+      - name: Install Chromium
+        run: .browser-test/node_modules/.bin/playwright install --with-deps chromium
+      - name: Verify desktop/mobile search, reset and language switch
+        run: node deploy/railway/openai_browser_smoke.mjs
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-openai-browser-search-evidence
+          path: openai-search-evidence/
+          if-no-files-found: ignore
+          retention-days: 7
