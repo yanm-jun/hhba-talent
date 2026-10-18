@@ -100,7 +100,7 @@ const localePlaces:Record<string,string>={
  "Toronto":"多伦多","Canada":"加拿大","Bangkok":"曼谷",
  "Thailand":"泰国","Remote":"远程","Worldwide":"全球远程"
 };
-const companyZh:Record<string,string>={Cognition:"Cognition",Replit:"Replit",PostHog:"PostHog",ClickUp:"ClickUp",Airwallex:"空中云汇","OpenAI":"OpenAI","Notion":"Notion","Ramp":"Ramp","Linear":"Linear","Perplexity":"Perplexity","ElevenLabs":"ElevenLabs","Vanta":"Vanta","Harvey":"Harvey","Headway":"Headway","Coursera":"Coursera","Figma":"Figma","Anduril":"Anduril","Discord":"Discord","Reddit":"Reddit","Airtable":"Airtable","Flexport":"Flexport","Robinhood":"Robinhood","GitLab":"GitLab","Twilio":"Twilio","Cloudflare":"Cloudflare","Vercel":"Vercel","Gusto":"Gusto","Wise":"Wise","Binance":"Binance"};
+const companyZh:Record<string,string>={Xiaomi:"小米集团",Meituan:"美团",Tencent:"腾讯",Baidu:"百度",Cognition:"Cognition",Replit:"Replit",PostHog:"PostHog",ClickUp:"ClickUp",Airwallex:"空中云汇","OpenAI":"OpenAI","Notion":"Notion","Ramp":"Ramp","Linear":"Linear","Perplexity":"Perplexity","ElevenLabs":"ElevenLabs","Vanta":"Vanta","Harvey":"Harvey","Headway":"Headway","Coursera":"Coursera","Figma":"Figma","Anduril":"Anduril","Discord":"Discord","Reddit":"Reddit","Airtable":"Airtable","Flexport":"Flexport","Robinhood":"Robinhood","GitLab":"GitLab","Twilio":"Twilio","Cloudflare":"Cloudflare","Vercel":"Vercel","Gusto":"Gusto","Wise":"Wise","Binance":"Binance"};
 function swapTerms(raw:string,lookup:[string,string][]):string{
  let out=raw;
  for(const [en,zh]of lookup){
@@ -187,7 +187,7 @@ function employerLogo(company:string):string{
  (domain?'<img src="https://'+esc(domain)+'/favicon.ico" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">':'')+'</span>';
 }
 function present(j:Job){
- if(j.domestic)return {...j,companyZh:j.company==="Meituan"?"美团":"小米集团",titleZh:j.title,titleStatus:"original",locationZh:j.location,recordKind:j.company==="Meituan"?"OFFICIAL_JOB_PAGE_OBSERVED":"OFFICIAL_LIST_OBSERVED",currentApplicationVerified:false};
+ if(j.domestic)return {...j,companyZh:companyZh[j.company]||j.company,titleZh:j.title,titleStatus:"original",locationZh:j.location,recordKind:j.company==="Xiaomi"?"OFFICIAL_LIST_OBSERVED":"OFFICIAL_JOB_PAGE_OBSERVED",currentApplicationVerified:false};
  let v=fromCache("title",j.title);
  if(!v){const translation=translateTitleRules(j.title);
   v={translated:translation,mode:translation==="职位名称待翻译"?"pending":"rules"};
@@ -239,6 +239,17 @@ const meituanObserved:Job[]=meituanCompact.map(([uid,title,location,recruitmentT
  return {id:"meituan-"+uid,company:"Meituan",title,location,remote:null,url,platform:"meituan-official",source:"verified-detail",domestic:true,recruitmentType,observedAt:"2026-10-18"};
 });
 if(meituanObserved.length!==7||new Set(meituanObserved.map(j=>j.id)).size!==7)throw Error("Invalid Meituan count");
+// SHA-256 pinned, browser/search-observed official Tencent/Baidu job detail URLs.
+// Treat as observed job pages, not proof of current application availability.
+const reviewedPayload=(Bun.env.HHBA_REVIEWED_OFFICIAL_0||"")+(Bun.env.HHBA_REVIEWED_OFFICIAL_1||"");
+const reviewedRows:[string,string,string,string,string,string][]=reviewedPayload&&createHash("sha256").update(reviewedPayload).digest("hex")==="5bbae03c21888eff0765f8b8a34aa10b61b353caacea95702009e6272413ee49"?JSON.parse(reviewedPayload):[];
+if(reviewedRows.length!==27)console.warn("HHBA_DOMESTIC_REVIEWED_SNAPSHOT_UNAVAILABLE");
+const additionalDomesticJobs:Job[]=reviewedRows.map(([company,id,title,city,kind,url])=>{
+ const u=new URL(url),tencent=company==="Tencent";
+ if(!(tencent||company==="Baidu")||!title||!city||!["SOCIAL","CAMPUS"].includes(kind)||
+ (tencent?(!/^\d{18,21}$/.test(id)||u.hostname!=="careers.tencent.com"||u.pathname!=="/jobdesc.html"||u.searchParams.get("postId")!==id):(!/^[0-9a-f-]{36}$/.test(id)||u.hostname!=="talent.baidu.com"||u.pathname!=="/jobs/detail/GRADUATE/"+id))||u.protocol!=="https:")throw Error("Invalid official China job");
+ return {id:company.toLowerCase()+"-"+id,company,title,location:city,remote:null,url,platform:company.toLowerCase()+"-official",source:"official-detail-observed",domestic:true,recruitmentType:kind,observedAt:"2026-10-18"};
+});
 type Board={platform:"greenhouse"|"ashby"|"lever";company:string;slug:string};
 const boards:Board[]=[
  {platform:"greenhouse",company:"Greenhouse",slug:"greenhouse"},
@@ -349,7 +360,7 @@ async function load(){
   outcomes.forEach((o,i)=>{if(o.status==="fulfilled"){ok++;for(const j of o.value){if(!seen.has(j.url)){seen.add(j.url);rows.push(j);}}}else {
    failed++;console.warn("HHBA_ATS_BOARD_FAILED",JSON.stringify({platform:boards[i].platform,slug:boards[i].slug,reason:String(o.reason?.name||"unknown")}));
   }});
-  rows.push(...domesticObserved,...meituanObserved);
+  rows.push(...domesticObserved,...meituanObserved,...additionalDomesticJobs);
   rows.sort((a,b)=>a.company.localeCompare(b.company)||a.title.localeCompare(b.title));
   if(ok===0&&cache)return cache;
   cache={at:Date.now(),rows,boards:ok,failures:failed,updated:new Date().toISOString()};
@@ -420,12 +431,12 @@ async function officialDetail(job:Job):Promise<Detail|null>{
  }catch{return null;}
 }
 function domesticDetailHtml(j:Job):string{
- const meituan=j.company==="Meituan",name=meituan?"美团":"小米集团";
+ const meituan=j.company==="Meituan",direct=j.company!=="Xiaomi",name=companyZh[j.company]||j.company;
  const category=({SOCIAL:"社招",CAMPUS:"校招",INTERNSHIP:"实习"} as Record<string,string>)[j.recruitmentType||""]||"待核实";
- const note=meituan?"2026-10-18已核验美团官方职位详情：标题、城市及页面申请按钮可见。请到官网确认当前是否可申请；完整JD和申请提交终点未核实。":"2026-10-16小米官方列表观察记录。当前在招状态、完整任职要求及该岗位直达投递链接尚未核实。";
- const english=meituan?"Meituan job title, location and Apply entry observed on October 18, 2026. Recheck the official site; full JD and application submission remain unverified.":"Xiaomi official job list observed on October 16, 2026. Current opening, full JD and direct application unverified.";
+ const note=meituan?"2026-10-18核验美团官方职位详情，当时可见申请入口。请在官网确认当前是否在招；未核实申请提交。":direct?"腾讯/百度官方单岗页面于2026-10-18观察到职位名称和地点。当前是否在招、具体投递状态请在官网核对，HHBA不转载完整JD。":"2026-10-16小米官方列表观察记录。当前在招状态、完整任职要求及直达投递链接尚未核实。";
+ const english=meituan?"Official Meituan job and Apply entry observed October 18, 2026. Recheck availability.":direct?"Tencent/Baidu official job detail page observed October 18, 2026. Current opening and application status unverified.":"Xiaomi public job list observed October 16, 2026. Current opening and direct application unverified.";
  const attrs=(a:string,b:string)=>' data-zh="'+esc(a)+'" data-en="'+esc(b)+'"';
- return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(j.title)+' · HHBA</title><style>body{font-family:system-ui;margin:0;color:#183c28;background:#f5f7f5}header{background:white;padding:20px;font-weight:900;font-size:24px}main{max-width:850px;margin:25px auto;padding:18px}article{background:#fff;border-radius:12px;padding:26px}h1{font-size:30px}.notice{background:#fff8ea;padding:18px;line-height:1.8;margin:22px 0}.action{display:inline-block;background:#207247;border-radius:8px;padding:14px;color:white;text-decoration:none}button{padding:9px;margin:4px}</style></head><body><header>HHBA</header><main><a href="/"'+attrs("← 返回招聘市场","← Back to jobs")+'>← 返回招聘市场</a><article><div style="text-align:right"><button id="zh">中文</button><button id="en">English</button></div><p'+attrs(name+" · 官方招聘记录",j.company+" · Official job observation")+'>'+name+' · 官方招聘记录</p><h1'+attrs(j.title,"Original job title available in Chinese")+'>'+esc(j.title)+'</h1><p'+attrs(j.location+" · "+category,"Mainland China · "+(j.recruitmentType||"Unknown"))+'>'+esc(j.location)+' · '+category+'</p><p'+attrs("来源观察："+j.observedAt,"Source observed: "+j.observedAt)+'>来源观察：'+esc(j.observedAt)+'</p><div class="notice"'+attrs(note,english)+'>'+esc(note)+'</div><a class="action" href="'+esc(j.url)+'" target="_blank" rel="noopener noreferrer nofollow"'+attrs(meituan?"前往美团官方职位与申请入口 ↗":"前往小米官方招聘频道 ↗",meituan?"View official Meituan job and Apply ↗":"Open Xiaomi official careers ↗")+'>'+(meituan?"前往美团官方职位与申请入口 ↗":"前往小米官方招聘频道 ↗")+'</a></article></main><script>(function(){function set(l){document.documentElement.lang=l==="en"?"en":"zh-CN";for(const e of document.querySelectorAll("[data-zh][data-en]"))e.textContent=e.dataset[l];}for(const l of ["zh","en"])document.getElementById(l).onclick=()=>{try{localStorage.setItem("hhba-lang",l)}catch{}set(l)};let l="zh";try{l=localStorage.getItem("hhba-lang")==="en"?"en":"zh"}catch{}set(l);})();</script></body></html>';
+ return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(j.title)+' · HHBA</title><style>body{font-family:system-ui;margin:0;color:#183c28;background:#f5f7f5}header{background:white;padding:20px;font-weight:900;font-size:24px}main{max-width:850px;margin:25px auto;padding:18px}article{background:#fff;border-radius:12px;padding:26px}h1{font-size:30px}.notice{background:#fff8ea;padding:18px;line-height:1.8;margin:22px 0}.action{display:inline-block;background:#207247;border-radius:8px;padding:14px;color:white;text-decoration:none}button{padding:9px;margin:4px}</style></head><body><header>HHBA</header><main><a href="/"'+attrs("← 返回招聘市场","← Back to jobs")+'>← 返回招聘市场</a><article><div style="text-align:right"><button id="zh">中文</button><button id="en">English</button></div><p'+attrs(name+" · 官方招聘记录",j.company+" · Official job observation")+'>'+name+' · 官方招聘记录</p><h1'+attrs(j.title,"Original job title available in Chinese")+'>'+esc(j.title)+'</h1><p'+attrs(j.location+" · "+category,"Mainland China · "+(j.recruitmentType||"Unknown"))+'>'+esc(j.location)+' · '+category+'</p><p'+attrs("来源观察："+j.observedAt,"Source observed: "+j.observedAt)+'>来源观察：'+esc(j.observedAt)+'</p><div class="notice"'+attrs(note,english)+'>'+esc(note)+'</div><a class="action" href="'+esc(j.url)+'" target="_blank" rel="noopener noreferrer nofollow"'+attrs(direct?"查看官方职位详情 ↗":"前往小米官方招聘频道 ↗",direct?"Open official job details ↗":"Open Xiaomi careers ↗")+'>'+(meituan?"前往美团官方职位与申请入口 ↗":"前往小米官方招聘频道 ↗")+'</a></article></main><script>(function(){function set(l){document.documentElement.lang=l==="en"?"en":"zh-CN";for(const e of document.querySelectorAll("[data-zh][data-en]"))e.textContent=e.dataset[l];}for(const l of ["zh","en"])document.getElementById(l).onclick=()=>{try{localStorage.setItem("hhba-lang",l)}catch{}set(l)};let l="zh";try{l=localStorage.getItem("hhba-lang")==="en"?"en":"zh"}catch{}set(l);})();</script></body></html>';
 }
 function detailHtml(d:Detail,zhFull:string|null):string{
  const j=d.job;
@@ -667,7 +678,7 @@ h2{font-size:20px;margin:0}.section-title span{color:#7f9085;font-size:12px}
 .empty{padding:36px 22px;text-align:center;color:#68776b;background:white;border-radius:12px}.filter-tools{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin:-10px 0 20px;font-size:12px;color:#658070}.filter-clear{border:1px solid #c8d9ce;border-radius:8px;background:#fff;color:#1e6740;cursor:pointer;font:inherit;font-weight:700;padding:8px 14px}.filter-clear:hover{background:#e8f4ed}.filter-clear[hidden]{display:none}.empty .filter-clear{margin-top:15px}
 footer{padding:25px;text-align:center;color:#8a9b8f;font-size:11px;border-top:1px solid #e5eae4}
 @media(max-width:600px){.hero{padding:50px 22px}nav{padding:16px 22px;gap:10px;flex-wrap:wrap}.job{display:block;padding:17px}.job-main{gap:12px}.company-logo{width:48px;height:48px;flex-basis:48px}.job-title{font-size:16px}.visit{display:inline-flex;margin:15px 0 0 60px}.numbers{gap:23px}}
-</style></head><body><nav><div class="logo">HHBA <em id="market-brand">招聘市场</em></div><div id="market-lab" class="lab">真实企业招聘索引 · 公测</div><div class="lang-switch" aria-label="岗位语言"><button id="toggle-zh" type="button">中文</button><button id="toggle-en" type="button">English</button></div></nav><section class="hero"><div class="wrap"><div id="market-kicker" class="eyebrow">全球职业机会 · 企业官方来源</div><h1 id="market-h1">发现全球工作机会</h1><p id="market-subtitle">搜索海外企业公开招聘岗位，在 HHBA 阅读岗位详情，再前往企业官网申请。岗位来自 Greenhouse、Lever、Ashby 的公开招聘接口。</p><div class="numbers"><div class="num"><b id="count">${payload.total}</b><span id="market-count-label">本次获取的岗位</span></div><div class="num"><b>${payload.boards}</b><span id="market-board-label">成功读取的招聘板</span></div><div class="num"><b>2</b><span id="market-source-label">有岗位记录的国内企业</span></div><div class="num"><b id="translated-count">—</b><span id="translated-label">已机器翻译职位名称</span></div></div></div></section>
+</style></head><body><nav><div class="logo">HHBA <em id="market-brand">招聘市场</em></div><div id="market-lab" class="lab">真实企业招聘索引 · 公测</div><div class="lang-switch" aria-label="岗位语言"><button id="toggle-zh" type="button">中文</button><button id="toggle-en" type="button">English</button></div></nav><section class="hero"><div class="wrap"><div id="market-kicker" class="eyebrow">全球职业机会 · 企业官方来源</div><h1 id="market-h1">发现全球工作机会</h1><p id="market-subtitle">搜索海外企业公开招聘岗位，在 HHBA 阅读岗位详情，再前往企业官网申请。岗位来自 Greenhouse、Lever、Ashby 的公开招聘接口。</p><div class="numbers"><div class="num"><b id="count">${payload.total}</b><span id="market-count-label">本次获取的岗位</span></div><div class="num"><b>${payload.boards}</b><span id="market-board-label">成功读取的招聘板</span></div><div class="num"><b>4</b><span id="market-source-label">有岗位记录的国内企业</span></div><div class="num"><b id="translated-count">—</b><span id="translated-label">已机器翻译职位名称</span></div></div></div></section>
 <main><div id="market-status" data-updated="${esc(payload.updated)}" data-failures="${payload.failures}" class="status">默认显示中文岗位名称。术语规则翻译属于初版，未完成的翻译会标注“待翻译”；切换英文可核对官方标题。公测版说明：本次已接入 ${payload.boards} 个企业招聘板，不代表全量全球职位。最近同步：${esc(payload.updated)}。职位是否仍接受申请以企业官网为准。${payload.failures?" 有 "+payload.failures+" 个来源本轮暂不可用。":""}</div>
 <div class="filters"><input id="q" aria-label="搜索岗位或企业" placeholder="搜索岗位、公司、地点（支持英文）"><select id="company" aria-label="企业"><option value="">全部企业</option></select><select id="country" aria-label="招聘来源"><option value="">全部来源</option><option value="cn">国内官方</option><option value="global">海外 ATS</option></select><select id="recruitment" aria-label="招聘类型"><option value="">全部招聘类型</option><option value="SOCIAL">社招</option><option value="CAMPUS">校招</option><option value="INTERNSHIP">实习</option></select><select id="remote" aria-label="远程筛选"><option value="">全部工作方式</option><option value="yes">标注远程</option></select></div>
 <div class="filter-tools"><span id="filter-summary" aria-live="polite"></span><button type="button" id="clear-filters" class="filter-clear" hidden>清除全部筛选</button></div><div class="section-title"><h2 id="market-list-h2">官方岗位列表</h2><span id="shown"></span></div><div class="list" id="jobs"></div><section class="directory" aria-label="已核验企业官网"><div class="directory-head"><h2 id="dir-title">国内企业官方招聘入口</h2><small id="dir-note">10 家官网已核验 · 入口不代表已收录岗位</small></div><div class="directory-grid" id="employer-directory"></div></section><p id="market-disclaimer" class="disclaimer">数据源为外部企业公开招聘板。部分企业官网在不同网络环境下可能无法访问。岗位发布时间、工作类型、远程标记在接口未披露时不会推断，具体资格要求和投递方式请到企业官网核实。HHBA 不代表与招聘企业存在合作关系。</p></main><footer id="market-footer">HHBA · 全球职位索引 · 仅展示公开岗位资料与官网链接</footer>
@@ -769,7 +780,7 @@ function render(reset=true){
   const title=x.domestic?(lang==='zh'?x.title:'Original title available in Chinese'):(lang==='zh'?(x.titleZh||'职位名称待翻译'):x.title);
   const location=x.domestic&&lang==='en'?'Mainland China':(lang==='zh'?(x.locationZh||x.location):x.location);
   const remoteText=x.domestic?(lang==='zh'?({SOCIAL:'社招',CAMPUS:'校招',INTERNSHIP:'实习'}[x.recruitmentType]||'类别待核实'):({SOCIAL:'Experienced',CAMPUS:'Graduate',INTERNSHIP:'Internship'}[x.recruitmentType]||'Type unverified')):x.remote===true?(lang==='zh'?'远程':'Remote'):x.remote===false?(lang==='zh'?'非远程':'Not remote'):(lang==='zh'?'远程未标注':'Remote not specified');
-  return '<article class="job"><div class="job-main">'+logoMarkup(x.company)+'<div class="job-body"><a class="job-title" href="'+href+'">'+safe(title)+'</a><div class="company-name">'+safe(company)+'</div><div class="job-meta"><span>'+safe(location)+'</span><span>'+safe(remoteText)+'</span><span>'+(x.company==='Meituan'?(lang==='zh'?'官方职位 · 当前申请需核对':'Official job · Recheck availability'):x.domestic?(lang==='zh'?'历史列表 · 投递未核实':'Historical listing · Apply unverified'):(lang==='zh'?'官方招聘来源':'Official employer listing'))+'</span></div><div class="job-source">'+(x.company==='Meituan'?(lang==='zh'?'美团官方职位详情 · 2026-10-18':'Meituan official job · 2026-10-18'):x.domestic?(lang==='zh'?'小米官方招聘频道 · 2026-10-16':'Xiaomi official board · 2026-10-16'):safe(x.platform.toUpperCase()))+'</div></div></div><a class="visit" href="'+href+'">'+(x.domestic?(lang==='zh'?'查看岗位记录 ↗':'View observed record ↗'):(lang==='zh'?'查看岗位详情 ↗':'View job details ↗'))+'</a></article>';
+  return '<article class="job"><div class="job-main">'+logoMarkup(x.company)+'<div class="job-body"><a class="job-title" href="'+href+'">'+safe(title)+'</a><div class="company-name">'+safe(company)+'</div><div class="job-meta"><span>'+safe(location)+'</span><span>'+safe(remoteText)+'</span><span>'+(x.domestic&&x.company!=='Xiaomi'?(lang==='zh'?'官方职位 · 当前申请需核对':'Official job · Recheck availability'):x.domestic?(lang==='zh'?'历史列表 · 投递未核实':'Historical listing · Apply unverified'):(lang==='zh'?'官方招聘来源':'Official employer listing'))+'</span></div><div class="job-source">'+(x.domestic&&x.company!=='Xiaomi'?(lang==='zh'?(x.companyZh||x.company)+'官方职位 · '+x.observedAt:(x.company+' official job · '+x.observedAt)):x.domestic?(lang==='zh'?'小米官方招聘频道 · 2026-10-16':'Xiaomi official board · 2026-10-16'):safe(x.platform.toUpperCase()))+'</div></div></div><a class="visit" href="'+href+'">'+(x.domestic?(lang==='zh'?'查看岗位记录 ↗':'View observed record ↗'):(lang==='zh'?'查看岗位详情 ↗':'View job details ↗'))+'</a></article>';
  }).join("");
  if(!filtered.length)list.innerHTML='<div class="empty">'+(lang==='zh'?'没有找到符合当前筛选的岗位，请检查企业和远程筛选条件。':'No jobs match these filters. Check the company and remote filters.')+'<div><button type="button" id="reset-empty" class="filter-clear">'+(lang==='zh'?'清除筛选并重新搜索':'Clear filters and search again')+'</button></div></div>';
  document.querySelector('#reset-empty')?.addEventListener('click',clearFilters);
@@ -783,7 +794,7 @@ async function fetchJobs(reset=true){
  const query=q.value.trim();
  // An exact employer keyword begins a new company search instead of
  // intersecting with a previously selected, different employer.
- const requestedEmployer=Object.keys(employerBrandSites).find(name=>name.toLowerCase()===query.toLowerCase()||name==='Xiaomi'&&(query==='小米'||query==='小米集团'));
+ const requestedEmployer=Object.keys(employerBrandSites).find(name=>name.toLowerCase()===query.toLowerCase()||companyZh[name]===query);
  if(requestedEmployer==='Xiaomi'&&country.value==='global')country.value='';
  if(requestedEmployer&&requestedEmployer!=='Xiaomi'&&country.value==='cn')country.value='';
  if(requestedEmployer&&c.value&&c.value!==requestedEmployer)c.value='';
@@ -1032,7 +1043,7 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
    if(country==="cn"&&!j.domestic||country==="global"&&j.domestic)return false;
    if(recruitmentType&&j.recruitmentType!==recruitmentType)return false;
    if(!q)return true;
-   const fields=[j.title,j.company,j.domestic?(j.company==="Meituan"?"美团":"小米集团"):companyZh[j.company]||"",j.location,translateLocation(j.location),present(j).titleZh];
+   const fields=[j.title,j.company,j.domestic?(companyZh[j.company]||""):companyZh[j.company]||"",j.location,translateLocation(j.location),present(j).titleZh];
    return fields.some(v=>String(v||"").toLowerCase().includes(q))||
      related.some(t=>j.title.toLowerCase().includes(t));
   });
@@ -1042,7 +1053,7 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
   return Response.json({
     jobs:filtered.slice(offset,offset+limit).map(present),total:filtered.length,
     allJobs:rows.length,limit,offset,companies,machineCount,
-    boards:data?.boards||0,domesticObserved:domesticObserved.length,domesticVerifiedJobDetails:meituanObserved.length,domesticEmployers:2,failures:data?.failures||0,updated:data?.updated||""
+    boards:data?.boards||0,domesticObserved:domesticObserved.length,domesticVerifiedJobDetails:meituanObserved.length+additionalDomesticJobs.length,domesticEmployers:additionalDomesticJobs.length?4:2,failures:data?.failures||0,updated:data?.updated||""
   },{headers});
  }
  if(u.pathname==="/api/jobs"){const data=await load();if(data?.rows)void fillTitleTranslations(data.rows);return Response.json({jobs:(data?.rows||[]).map(present),total:data?.rows.length||0,boards:data?.boards||0,failures:data?.failures||0,updated:data?.updated||"",persistentCache:!!translationDb,translationEngine:privateTranslatorUrl()?"libretranslate-private":"unconfigured"},{headers});}
@@ -1054,7 +1065,7 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
   const market=await load(),job=market?.rows.find(x=>x.id===nativeId);
   if(!job)return new Response("该岗位不在当前官方公开列表中",{status:404,headers});
   if(job.domestic){
-   if(u.pathname.startsWith("/api/"))return Response.json({job:present(job),description:null,richHtml:null,applyUrl:null,recordKind:job.company==="Meituan"?"OFFICIAL_JOB_PAGE_OBSERVED":"OFFICIAL_LIST_OBSERVED",currentApplicationVerified:false,detailVerified:job.company==="Meituan",officialListUrl:job.company==="Meituan"?null:job.url,officialJobUrl:job.company==="Meituan"?job.url:null,observedAt:job.observedAt},{headers});
+   if(u.pathname.startsWith("/api/"))return Response.json({job:present(job),description:null,richHtml:null,applyUrl:null,recordKind:job.company==="Xiaomi"?"OFFICIAL_LIST_OBSERVED":"OFFICIAL_JOB_PAGE_OBSERVED",currentApplicationVerified:false,detailVerified:job.company!=="Xiaomi",officialListUrl:job.company==="Xiaomi"?job.url:null,officialJobUrl:job.company==="Xiaomi"?null:job.url,observedAt:job.observedAt},{headers});
    return new Response(domesticDetailHtml(job),{headers:{...headers,"Content-Type":"text/html; charset=utf-8"}});
   }
   const result=await officialDetail(job);
