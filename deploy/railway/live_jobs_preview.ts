@@ -629,13 +629,13 @@ h2{font-size:20px;margin:0}.section-title span{color:#7f9085;font-size:12px}
 .visit{flex-shrink:0;white-space:nowrap;color:#176d40;border:1px solid #dbe8df;background:#f3f8f4;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:750}
 .visit:hover{background:#e5f1e8}.visit:focus-visible,.job-title:focus-visible{outline:2px solid #247e51;outline-offset:4px}
 .disclaimer{font-size:12px;color:#728378;margin-top:30px;line-height:1.8}.status{padding:14px;border:1px solid #f0debd;background:#fffaf1;color:#886e40;border-radius:10px;margin-bottom:24px;font-size:12px}
-.empty{padding:48px;text-align:center;color:#68776b;background:white;border-radius:12px}
+.empty{padding:36px 22px;text-align:center;color:#68776b;background:white;border-radius:12px}.filter-tools{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin:-10px 0 20px;font-size:12px;color:#658070}.filter-clear{border:1px solid #c8d9ce;border-radius:8px;background:#fff;color:#1e6740;cursor:pointer;font:inherit;font-weight:700;padding:8px 14px}.filter-clear:hover{background:#e8f4ed}.filter-clear[hidden]{display:none}.empty .filter-clear{margin-top:15px}
 footer{padding:25px;text-align:center;color:#8a9b8f;font-size:11px;border-top:1px solid #e5eae4}
 @media(max-width:600px){.hero{padding:50px 22px}nav{padding:16px 22px;gap:10px;flex-wrap:wrap}.job{display:block;padding:17px}.job-main{gap:12px}.company-logo{width:48px;height:48px;flex-basis:48px}.job-title{font-size:16px}.visit{display:inline-flex;margin:15px 0 0 60px}.numbers{gap:23px}}
 </style></head><body><nav><div class="logo">HHBA <em id="market-brand">招聘市场</em></div><div id="market-lab" class="lab">真实企业招聘索引 · 公测</div><div class="lang-switch" aria-label="岗位语言"><button id="toggle-zh" type="button">中文</button><button id="toggle-en" type="button">English</button></div></nav><section class="hero"><div class="wrap"><div id="market-kicker" class="eyebrow">全球职业机会 · 企业官方来源</div><h1 id="market-h1">发现全球工作机会</h1><p id="market-subtitle">搜索海外企业公开招聘岗位，在 HHBA 阅读岗位详情，再前往企业官网申请。岗位来自 Greenhouse、Lever、Ashby 的公开招聘接口。</p><div class="numbers"><div class="num"><b id="count">${payload.total}</b><span id="market-count-label">本次获取的岗位</span></div><div class="num"><b>${payload.boards}</b><span id="market-board-label">成功读取的招聘板</span></div><div class="num"><b>3</b><span id="market-source-label">官方招聘系统</span></div><div class="num"><b id="translated-count">—</b><span id="translated-label">已机器翻译职位名称</span></div></div></div></section>
 <main><div id="market-status" data-updated="${esc(payload.updated)}" data-failures="${payload.failures}" class="status">默认显示中文岗位名称。术语规则翻译属于初版，未完成的翻译会标注“待翻译”；切换英文可核对官方标题。公测版说明：本次已接入 ${payload.boards} 个企业招聘板，不代表全量全球职位。最近同步：${esc(payload.updated)}。职位是否仍接受申请以企业官网为准。${payload.failures?" 有 "+payload.failures+" 个来源本轮暂不可用。":""}</div>
 <div class="filters"><input id="q" aria-label="搜索岗位或企业" placeholder="搜索岗位、公司、地点（支持英文）"><select id="company" aria-label="企业"><option value="">全部企业</option></select><select id="remote" aria-label="远程筛选"><option value="">全部工作方式</option><option value="yes">标注远程</option></select></div>
-<div class="section-title"><h2 id="market-list-h2">官方岗位列表</h2><span id="shown"></span></div><div class="list" id="jobs"></div><p id="market-disclaimer" class="disclaimer">数据源为外部企业公开招聘板。部分企业官网在不同网络环境下可能无法访问。岗位发布时间、工作类型、远程标记在接口未披露时不会推断，具体资格要求和投递方式请到企业官网核实。HHBA 不代表与招聘企业存在合作关系。</p></main><footer id="market-footer">HHBA · 全球职位索引 · 仅展示公开岗位资料与官网链接</footer>
+<div class="filter-tools"><span id="filter-summary" aria-live="polite"></span><button type="button" id="clear-filters" class="filter-clear" hidden>清除全部筛选</button></div><div class="section-title"><h2 id="market-list-h2">官方岗位列表</h2><span id="shown"></span></div><div class="list" id="jobs"></div><p id="market-disclaimer" class="disclaimer">数据源为外部企业公开招聘板。部分企业官网在不同网络环境下可能无法访问。岗位发布时间、工作类型、远程标记在接口未披露时不会推断，具体资格要求和投递方式请到企业官网核实。HHBA 不代表与招聘企业存在合作关系。</p></main><footer id="market-footer">HHBA · 全球职位索引 · 仅展示公开岗位资料与官网链接</footer>
 <script>
 let all=[],filtered=[],limit=30,totalFiltered=0,companyNames=[],latestRequest=0,searchTimer=null;
 window.hhbaBoardCount=${payload.boards};
@@ -662,6 +662,7 @@ function setLanguage(value){
  document.querySelector('#market-subtitle').textContent=lang==='zh'?'搜索真实海外岗位，在 HHBA 阅读职位详情，再去企业官网申请。':'Search real overseas jobs, read details on HHBA, then apply on the employer website.';
  document.querySelector('#market-list-h2').textContent=lang==='zh'?'官方岗位列表':'Official job listings';
  document.querySelector('#translated-label').textContent=lang==='zh'?'已机器翻译职位名称':'Machine-translated job titles';
+ document.querySelector('#clear-filters').textContent=lang==='zh'?'清除全部筛选':'Clear all filters';
  const labels=[
   ['#market-brand','招聘市场','Job Marketplace'],
   ['#market-lab','真实企业招聘索引 · 公测','Official employer jobs · Beta'],
@@ -690,9 +691,28 @@ document.querySelector('#toggle-zh').addEventListener('click',()=>setLanguage('z
 document.querySelector('#toggle-en').addEventListener('click',()=>setLanguage('en'));
 const safe=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]||c));
 const q=document.querySelector("#q"),c=document.querySelector("#company"),remote=document.querySelector("#remote"),list=document.querySelector("#jobs");
+function currentFilters(){
+ const flags=[];
+ if(q.value.trim())flags.push((lang==='zh'?'关键词：':'Keyword: ')+q.value.trim());
+ if(c.value)flags.push((lang==='zh'?'企业：':'Company: ')+c.value);
+ if(remote.value)flags.push(lang==='zh'?'仅远程':'Remote only');
+ return flags;
+}
+function syncFilterStatus(){
+ const flags=currentFilters();
+ document.querySelector('#clear-filters').hidden=!flags.length;
+ document.querySelector('#filter-summary').textContent=flags.length?flags.join('  ·  '):(lang==='zh'?'搜索企业名称或职位关键词，例如 OpenAI':'Try a company or job title, e.g. OpenAI');
+}
+function clearFilters(){
+ q.value='';c.value='';remote.value='';limit=30;
+ const u=new URL(window.location.href);u.searchParams.delete('q');window.history.replaceState(null,'',u.pathname+u.search+u.hash);
+ void fetchJobs(true);
+}
+document.querySelector('#clear-filters').addEventListener('click',clearFilters);
 function render(reset=true){
  if(reset)limit=30;
  filtered=all;
+ syncFilterStatus();
  document.querySelector("#shown").textContent=(lang==="zh"?"显示 ":"Showing ")+Math.min(totalFiltered,limit)+" / "+totalFiltered+(lang==="zh"?" 条":" jobs");
  list.innerHTML=filtered.slice(0,limit).map(x=>{
   const href='/jobs/'+encodeURIComponent(x.id);
@@ -702,7 +722,8 @@ function render(reset=true){
   const remoteText=x.remote===true?(lang==='zh'?'远程':'Remote'):x.remote===false?(lang==='zh'?'非远程':'Not remote'):(lang==='zh'?'远程未标注':'Remote not specified');
   return '<article class="job"><div class="job-main">'+logoMarkup(x.company)+'<div class="job-body"><a class="job-title" href="'+href+'">'+safe(title)+'</a><div class="company-name">'+safe(company)+'</div><div class="job-meta"><span>'+safe(location)+'</span><span>'+safe(remoteText)+'</span><span>'+(lang==='zh'?'官方招聘来源':'Official employer listing')+'</span></div><div class="job-source">'+safe(x.platform.toUpperCase())+'</div></div></div><a class="visit" href="'+href+'">'+(lang==='zh'?'查看岗位详情 ↗':'View job details ↗')+'</a></article>';
  }).join("");
- if(!filtered.length)list.innerHTML='<div class="empty">'+(lang==='zh'?'当前没有匹配的真实职位':'No matching jobs found')+'</div>';
+ if(!filtered.length)list.innerHTML='<div class="empty">'+(lang==='zh'?'没有找到符合当前筛选的岗位，请检查企业和远程筛选条件。':'No jobs match these filters. Check the company and remote filters.')+'<div><button type="button" id="reset-empty" class="filter-clear">'+(lang==='zh'?'清除筛选并重新搜索':'Clear filters and search again')+'</button></div></div>';
+ document.querySelector('#reset-empty')?.addEventListener('click',clearFilters);
  if(totalFiltered>limit)list.innerHTML+='<div style="text-align:center;padding:20px"><button style="padding:12px 35px;border-radius:9px;border:1px solid #c7dacc;background:#fff;cursor:pointer" id="more">'+(lang==='zh'?'查看更多职位':'Load more jobs')+'</button></div>';
  document.querySelector("#more")?.addEventListener("click",()=>{limit+=30;void fetchJobs(false)});
 }
@@ -711,6 +732,10 @@ async function fetchJobs(reset=true){
  const token=++latestRequest;
  const params=new URLSearchParams({limit:String(limit),offset:"0"});
  const query=q.value.trim();
+ // An exact employer keyword begins a new company search instead of
+ // intersecting with a previously selected, different employer.
+ const requestedEmployer=Object.keys(employerBrandSites).find(name=>name.toLowerCase()===query.toLowerCase());
+ if(requestedEmployer&&c.value&&c.value!==requestedEmployer)c.value='';
  if(query)params.set("q",query);
  if(c.value)params.set("company",c.value);
  if(remote.value)params.set("remote","true");
@@ -738,11 +763,26 @@ async function fetchJobs(reset=true){
  }
 }
 function start(){
+ try{
+  const urlQuery=new URLSearchParams(window.location.search).get('q');
+  if(urlQuery)q.value=urlQuery.slice(0,100);
+ }catch{}
  setLanguage(lang);
  void fetchJobs(true);
 }
-q.addEventListener("input",()=>{if(searchTimer)clearTimeout(searchTimer);searchTimer=setTimeout(()=>{void fetchJobs(true)},220)});
-c.addEventListener("change",()=>{void fetchJobs(true)});
+q.addEventListener("input",()=>{
+ if(searchTimer)clearTimeout(searchTimer);
+ const u=new URL(window.location.href);
+ if(q.value.trim())u.searchParams.set('q',q.value.trim());else u.searchParams.delete('q');
+ window.history.replaceState(null,'',u.pathname+u.search+u.hash);
+ searchTimer=setTimeout(()=>{void fetchJobs(true)},220);
+});
+c.addEventListener("change",()=>{
+ if(c.value&&Object.keys(employerBrandSites).some(name=>name.toLowerCase()===q.value.trim().toLowerCase()&&name!==c.value)){
+  q.value='';const u=new URL(window.location.href);u.searchParams.delete('q');window.history.replaceState(null,'',u.pathname+u.search+u.hash);
+ }
+ void fetchJobs(true);
+});
 remote.addEventListener("change",()=>{void fetchJobs(true)});
 start();
 </script></body></html>`;
