@@ -702,6 +702,7 @@ let lang='zh';
 try{lang=localStorage.getItem('hhba-lang')==='en'?'en':'zh';}catch{}
 const aliases=${JSON.stringify(searchAliases)};
 const employerBrandSites=${JSON.stringify(employerBrandSites)};
+const companyZh=${JSON.stringify(companyZh)};
 function logoMarkup(company){
  const domain=employerBrandSites[company],initials=(String(company||'?').trim().slice(0,2)||'?').toUpperCase();
  return '<span class="company-logo" aria-hidden="true"><span class="company-initials">'+safe(initials)+'</span>'+(domain?'<img src="https://'+safe(domain)+'/favicon.ico" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">':'')+'</span>';
