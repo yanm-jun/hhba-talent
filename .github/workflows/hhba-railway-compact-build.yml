@@ -1,42 +1,27 @@
-name: HHBA Railway Function Compact Build
+name: HHBA Railway Function Source Check
 on:
   push:
     branches: [feat/dual-entry-recruitment-integration]
     paths:
       - 'deploy/railway/live_jobs_preview.ts'
-      - 'deploy/railway/compact_runtime.mjs'
+      - 'deploy/railway/domestic_xiaomi_20261016.compact.json'
       - '.github/workflows/hhba-railway-compact-build.yml'
   pull_request:
     paths:
       - 'deploy/railway/live_jobs_preview.ts'
-      - 'deploy/railway/compact_runtime.mjs'
+      - 'deploy/railway/domestic_xiaomi_20261016.compact.json'
       - '.github/workflows/hhba-railway-compact-build.yml'
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 jobs:
-  compact:
+  source-check:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: feat/dual-entry-recruitment-integration
       - uses: oven-sh/setup-bun@v2
-      - name: Produce minified self-contained Railway function source
+      - name: Confirm function source syntax
         run: |
-          node deploy/railway/compact_runtime.mjs
-          bun build deploy/railway/live_jobs_preview.compact.ts --target=bun --external 'html-to-text@9' --external 'sanitize-html@2' --minify --outfile deploy/railway/live_jobs_preview.min.js
-          echo "Original bytes: $(wc -c < deploy/railway/live_jobs_preview.ts)"
-          echo "Minified bytes: $(wc -c < deploy/railway/live_jobs_preview.min.js)"
-          test "$(wc -c < deploy/railway/live_jobs_preview.min.js)" -lt 99000
-          node --check deploy/railway/live_jobs_preview.min.js
-      - name: Save reproducible compact runtime to working branch
-        run: |
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git config user.name "github-actions[bot]"
-          git add deploy/railway/live_jobs_preview.min.js
-          if ! git diff --cached --quiet; then
-            git commit -m "build(railway): commit minified verified HHBA function"
-            git push origin HEAD:feat/dual-entry-recruitment-integration
-          fi
+          bun build deploy/railway/live_jobs_preview.ts --target=bun --external 'html-to-text@9' --external 'sanitize-html@2' --outfile /tmp/hhba-preview-checked.js
+          node deploy/railway/domestic_static_acceptance.mjs
