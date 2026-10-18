@@ -1,4 +1,4 @@
-name: HHBA 30 Board Live Acceptance
+name: HHBA Current ATS Board Live Acceptance
 on:
   push:
     branches: [feat/dual-entry-recruitment-integration]
@@ -18,11 +18,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Check all 30 real company boards and corresponding official JD in HHBA
+      - name: Check every configured ATS board and one original JD per source
         run: node deploy/railway/30_board_live_acceptance.mjs
       - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: hhba-thirty-live-boards
-          path: thirty-board-audit/
+          name: hhba-current-ats-live-boards
+          path: current-board-audit/
           retention-days: 21
