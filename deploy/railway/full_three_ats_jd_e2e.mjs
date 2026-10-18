@@ -46,20 +46,23 @@ async function run(){
    if(body.total!==total){failed={index:part,reason:'source_version_changed'};break;}
    if(!body.text.trim()){failed={index:part,reason:'blank_translated_segment'};break;}
    if(!/[\u3400-\u9fff]/.test(body.text)){failed={index:part,reason:'no_chinese_in_translation'};break;}
-   results.push({len:body.text.length,numericReview:body.numbersVerified===false});
+   const suspicious=(body.text.match(/(?:[A-Za-z]{3,}[ \t]+){7,}[A-Za-z]{3,}/g)||[]);
+   results.push({len:body.text.length,numericReview:body.numbersVerified===false,
+     englishWordRuns:suspicious.length});
    part++;
   }
   const record={platform,jobId:job.id,segmentsExpected:total,
    segmentsCompleted:results.length,complete:!failed&&results.length===total,
    totalTranslatedChars:results.reduce((acc,x)=>acc+x.len,0),
    numbersNeedComparison:results.filter(x=>x.numericReview).length,
+   englishWordRuns:results.reduce((acc,x)=>acc+x.englishWordRuns,0),
    error:failed};
   outputs.push(record);
   console.log('HHBA_COMPLETE_JD_BY_PLATFORM',JSON.stringify(record));
  }
  await mkdir('three-ats-translation',{recursive:true});
  await writeFile('three-ats-translation/results.json',JSON.stringify({jobs:jobs.length,outputs},null,2));
- const failed=outputs.filter(x=>!x.complete);
+ const failed=outputs.filter(x=>!x.complete||x.englishWordRuns>0);
  console.log('HHBA_COMPLETE_JD_ALL',JSON.stringify({tested:outputs.length,passed:outputs.length-failed.length,failed:failed.length}));
  if(failed.length||outputs.length!==3)process.exitCode=1;
 }
