@@ -80,7 +80,7 @@ const localePlaces:Record<string,string>={
  "Toronto":"多伦多","Canada":"加拿大","Bangkok":"曼谷",
  "Thailand":"泰国","Remote":"远程","Worldwide":"全球远程"
 };
-const companyZh:Record<string,string>={Airwallex:"空中云汇"};
+const companyZh:Record<string,string>={Airwallex:"空中云汇","OpenAI":"OpenAI","Notion":"Notion","Ramp":"Ramp","Linear":"Linear","Perplexity":"Perplexity","ElevenLabs":"ElevenLabs","Vanta":"Vanta","Harvey":"Harvey","Headway":"Headway","Coursera":"Coursera","Figma":"Figma","Anduril":"Anduril","Discord":"Discord","Reddit":"Reddit","Airtable":"Airtable","Flexport":"Flexport","Robinhood":"Robinhood","GitLab":"GitLab","Twilio":"Twilio","Cloudflare":"Cloudflare","Vercel":"Vercel","Gusto":"Gusto","Wise":"Wise","Binance":"Binance"};
 function swapTerms(raw:string,lookup:[string,string][]):string{
  let out=raw;
  for(const [en,zh]of lookup){
@@ -187,7 +187,31 @@ const boards:Board[]=[
  {platform:"lever",company:"Spotify",slug:"spotify"},
  {platform:"greenhouse",company:"Canonical",slug:"canonical"},
  {platform:"ashby",company:"Airwallex",slug:"airwallex"},
- {platform:"lever",company:"Palantir",slug:"palantir"}
+ {platform:"lever",company:"Palantir",slug:"palantir"},
+ {platform:"greenhouse",company:"Figma",slug:"figma"},
+ {platform:"greenhouse",company:"Anduril",slug:"andurilindustries"},
+ {platform:"greenhouse",company:"Discord",slug:"discord"},
+ {platform:"greenhouse",company:"Reddit",slug:"reddit"},
+ {platform:"greenhouse",company:"Airtable",slug:"airtable"},
+ {platform:"greenhouse",company:"Flexport",slug:"flexport"},
+ {platform:"greenhouse",company:"Robinhood",slug:"robinhood"},
+ {platform:"greenhouse",company:"GitLab",slug:"gitlab"},
+ {platform:"greenhouse",company:"Twilio",slug:"twilio"},
+ {platform:"greenhouse",company:"Cloudflare",slug:"cloudflare"},
+ {platform:"greenhouse",company:"Vercel",slug:"vercel"},
+ {platform:"greenhouse",company:"Gusto",slug:"gusto"},
+ {platform:"greenhouse",company:"Wise",slug:"wise"},
+ {platform:"greenhouse",company:"Coursera",slug:"coursera"},
+ {platform:"ashby",company:"OpenAI",slug:"openai"},
+ {platform:"ashby",company:"Notion",slug:"notion"},
+ {platform:"ashby",company:"Ramp",slug:"ramp"},
+ {platform:"ashby",company:"Linear",slug:"linear"},
+ {platform:"ashby",company:"Perplexity",slug:"perplexity"},
+ {platform:"ashby",company:"ElevenLabs",slug:"elevenlabs"},
+ {platform:"ashby",company:"Vanta",slug:"vanta"},
+ {platform:"ashby",company:"Harvey",slug:"harvey"},
+ {platform:"ashby",company:"Headway",slug:"headway"},
+ {platform:"lever",company:"Binance",slug:"binance"}
 ];
 const esc=(v:unknown)=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]||c));
 const urlOK=(value:unknown,slug:string,platform:string)=>{
@@ -223,9 +247,19 @@ async function load(){
  if(cache&&Date.now()-cache.at<10*60*1000)return cache;
  if(inflight)return await inflight;
  inflight=(async()=>{
-  const outcomes=await Promise.allSettled(boards.map(getBoard));
+  // Limit simultaneous outbound ATS requests to avoid overwhelming boards.
+  // Failed boards are isolated; all jobs retain their exact source identity.
+  const outcomes:PromiseSettledResult<Job[]>[]=new Array(boards.length);
+  let next=0;
+  const worker=async()=>{while(next<boards.length){const i=next++;
+    try{outcomes[i]={status:"fulfilled",value:await getBoard(boards[i])};}
+    catch(e){outcomes[i]={status:"rejected",reason:e};}
+  }};
+  await Promise.all(Array.from({length:6},()=>worker()));
   const rows:Job[]=[];const seen=new Set<string>();let ok=0,failed=0;
-  outcomes.forEach(o=>{if(o.status==="fulfilled"){ok++;for(const j of o.value){if(!seen.has(j.url)){seen.add(j.url);rows.push(j);}}}else failed++;});
+  outcomes.forEach((o,i)=>{if(o.status==="fulfilled"){ok++;for(const j of o.value){if(!seen.has(j.url)){seen.add(j.url);rows.push(j);}}}else {
+   failed++;console.warn("HHBA_ATS_BOARD_FAILED",JSON.stringify({platform:boards[i].platform,slug:boards[i].slug,reason:String(o.reason?.name||"unknown")}));
+  }});
   rows.sort((a,b)=>a.company.localeCompare(b.company)||a.title.localeCompare(b.title));
   if(ok===0&&cache)return cache;
   cache={at:Date.now(),rows,boards:ok,failures:failed,updated:new Date().toISOString()};
@@ -482,11 +516,12 @@ h2{font-size:20px;margin:0}.section-title span{color:#7f9085;font-size:12px}
 footer{padding:25px;text-align:center;color:#8a9b8f;font-size:11px;border-top:1px solid #e5eae4}
 @media(max-width:600px){.hero{padding:50px 22px}nav{padding:16px 22px;gap:10px;flex-wrap:wrap}.job{display:block;padding:18px}.visit{display:inline-block;margin-top:15px}.numbers{gap:23px}}
 </style></head><body><nav><div class="logo">HHBA <em id="market-brand">招聘市场</em></div><div id="market-lab" class="lab">真实企业招聘索引 · 公测</div><div class="lang-switch" aria-label="岗位语言"><button id="toggle-zh" type="button">中文</button><button id="toggle-en" type="button">English</button></div></nav><section class="hero"><div class="wrap"><div id="market-kicker" class="eyebrow">全球职业机会 · 企业官方来源</div><h1 id="market-h1">发现全球工作机会</h1><p id="market-subtitle">搜索海外企业公开招聘岗位，在 HHBA 阅读岗位详情，再前往企业官网申请。岗位来自 Greenhouse、Lever、Ashby 的公开招聘接口。</p><div class="numbers"><div class="num"><b id="count">${payload.total}</b><span id="market-count-label">本次获取的岗位</span></div><div class="num"><b>${payload.boards}</b><span id="market-board-label">成功读取的招聘板</span></div><div class="num"><b>3</b><span id="market-source-label">官方招聘系统</span></div><div class="num"><b id="translated-count">—</b><span id="translated-label">已机器翻译职位名称</span></div></div></div></section>
-<main><div id="market-status" data-updated="${esc(payload.updated)}" data-failures="${payload.failures}" class="status">默认显示中文岗位名称。术语规则翻译属于初版，未完成的翻译会标注“待翻译”；切换英文可核对官方标题。公测版说明：当前接入 6 个样本企业招聘板，不代表全量全球职位。最近同步：${esc(payload.updated)}。职位是否仍接受申请以企业官网为准。${payload.failures?" 有 "+payload.failures+" 个来源本轮暂不可用。":""}</div>
+<main><div id="market-status" data-updated="${esc(payload.updated)}" data-failures="${payload.failures}" class="status">默认显示中文岗位名称。术语规则翻译属于初版，未完成的翻译会标注“待翻译”；切换英文可核对官方标题。公测版说明：本次已接入 ${payload.boards} 个企业招聘板，不代表全量全球职位。最近同步：${esc(payload.updated)}。职位是否仍接受申请以企业官网为准。${payload.failures?" 有 "+payload.failures+" 个来源本轮暂不可用。":""}</div>
 <div class="filters"><input id="q" aria-label="搜索岗位或企业" placeholder="搜索岗位、公司、地点（支持英文）"><select id="company" aria-label="企业"><option value="">全部企业</option></select><select id="remote" aria-label="远程筛选"><option value="">全部工作方式</option><option value="yes">标注远程</option></select></div>
 <div class="section-title"><h2 id="market-list-h2">官方岗位列表</h2><span id="shown"></span></div><div class="list" id="jobs"></div><p id="market-disclaimer" class="disclaimer">数据源为外部企业公开招聘板。部分企业官网在不同网络环境下可能无法访问。岗位发布时间、工作类型、远程标记在接口未披露时不会推断，具体资格要求和投递方式请到企业官网核实。HHBA 不代表与招聘企业存在合作关系。</p></main><footer id="market-footer">HHBA · 全球职位索引 · 仅展示公开岗位资料与官网链接</footer>
 <script>
 let all=[],filtered=[],limit=30;
+window.hhbaBoardCount=${payload.boards};
 let lang='zh';
 try{lang=localStorage.getItem('hhba-lang')==='en'?'en':'zh';}catch{}
 const aliases=${JSON.stringify(searchAliases)};
@@ -518,8 +553,8 @@ function setLanguage(value){
  const status=document.querySelector('#market-status');
  if(status){const stamp=status.dataset.updated||'unknown',errors=Number(status.dataset.failures||0);
   status.textContent=lang==='zh'?
-    '公测版仅接入六家样本企业，不代表全球全部职位；职位是否仍在招聘以企业官网为准。最近同步：'+stamp+'。'+(errors?'本轮有'+errors+'个来源暂不可用。':''):
-    'This beta indexes six sample employers, not the full global market. Confirm availability on each employer website. Last sync: '+stamp+'.'+(errors?' '+errors+' sources unavailable this refresh.':'');
+    '目前成功连接 '+(window.hhbaBoardCount||0)+' 家企业招聘板，不代表全球全部职位；职位是否仍在招聘以企业官网为准。最近同步：'+stamp+'。'+(errors?'本轮有'+errors+'个来源暂不可用。':''):
+    'This beta currently connects '+(window.hhbaBoardCount||0)+' employer job boards, not the full global market. Confirm availability on each employer website. Last sync: '+stamp+'.'+(errors?' '+errors+' sources unavailable this refresh.':'');
  }
  document.documentElement.lang=lang==='zh'?'zh-CN':'en';
  document.title=lang==='zh'?'HHBA · 全球招聘市场':'HHBA · Global Jobs';
