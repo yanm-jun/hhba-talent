@@ -5,6 +5,10 @@ on:
     paths:
       - 'deploy/railway/live_jobs_preview.ts'
       - '.github/workflows/hhba-railway-compact-build.yml'
+  pull_request:
+    paths:
+      - 'deploy/railway/live_jobs_preview.ts'
+      - '.github/workflows/hhba-railway-compact-build.yml'
   workflow_dispatch:
 permissions:
   contents: write
