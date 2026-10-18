@@ -54,6 +54,11 @@ try{
    if(platform==='ashby')await page.screenshot({path:'browser-evidence/job-zh-loading.png'});
    await page.locator('#detail-en').click();
    const official=await page.locator('#jd-en').innerText();
+   const visibleEnglish=await page.locator('body').innerText();
+   const withoutLanguagePicker=visibleEnglish.replace(/中文/g,'');
+   if(/[\u3400-\u9fff]/.test(withoutLanguagePicker))
+     failures.push({platform,type:'chinese_UI_leaks_in_English_mode',id:job.id,
+       snippet:withoutLanguagePicker.match(/.{0,15}[\u3400-\u9fff].{0,30}/)?.[0]||''});
    entry.englishChars=official.length;
    if(official.length<100)throw Error('English official JD too short');
    await page.locator('#detail-zh').click();
@@ -64,6 +69,15 @@ try{
     return !!el&&el.textContent.length>40&&/[\u3400-\u9fff]/.test(el.textContent);
    },{timeout:60000}).catch(()=>{});
    entry.chineseChars=(await chinese.innerText()).length;
+   const shownChinese=await chinese.innerText();
+   if(shownChinese.includes('【关键信息核对：以下英文原文数字未全部保留】'))
+     failures.push({platform,id:job.id,type:'English_source_appended_to_Chinese_reading'});
+   if(await page.locator('#jd-zh .reader-original').count())
+     failures.push({platform,id:job.id,type:'full_English_expanded_inside_Chinese_reading'});
+   if(!await page.locator('#show-original-english').count())
+     failures.push({platform,id:job.id,type:'English_original_switch_missing'});
+   const numericRiskVisible=await page.locator('#numeric-risk').isVisible();
+   entry.riskBadgeVisible=numericRiskVisible;
    entry.progress=await page.locator('#translation-progress').innerText();
    if(entry.chineseChars<40)
     failures.push({platform,type:'real_browser_chinese_not_readable',id:job.id,

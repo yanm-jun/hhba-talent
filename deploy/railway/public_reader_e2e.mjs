@@ -39,4 +39,8 @@ test('real public HHBA listing opens Chinese reader and translates a live JD sec
  assert.ok(result.total>1);
  assert.match(result.text,/[\u3400-\u9fff]/);
  assert.equal(result.mode,'private_reading_translation');
+ assert.doesNotMatch(result.text,/【关键信息核对：以下英文原文数字未全部保留】/);
+ assert.doesNotMatch(html,/class="reader-original"/,'English must not be embedded in Chinese reading panel');
+ assert.match(html,/id="show-original-english"/);
+ assert.match(html,/id="numeric-risk"/);
 });
