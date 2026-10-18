@@ -1,0 +1,169 @@
+{
+  "schema": 1,
+  "checkedAt": "2026-10-18",
+  "semantics": "OFFICIAL_PORTAL_DIRECTORY_ONLY",
+  "indexedJobsIncrement": 0,
+  "employers": [
+    {
+      "id": "Tencent",
+      "zh": "腾讯",
+      "url": "https://careers.tencent.com/",
+      "logoDomain": "tencent.com",
+      "industry": "互联网与科技",
+      "types": [
+        "SOCIAL",
+        "CAMPUS"
+      ],
+      "secondary": "https://careers.tencent.com/search.html",
+      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+    },
+    {
+      "id": "ByteDance",
+      "zh": "字节跳动",
+      "url": "https://jobs.bytedance.com/experienced/",
+      "logoDomain": "bytedance.com",
+      "industry": "互联网与科技",
+      "types": [
+        "SOCIAL",
+        "CAMPUS",
+        "INTERNSHIP"
+      ],
+      "secondary": "https://jobs.bytedance.com/campus/",
+      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+    },
+    {
+      "id": "Huawei",
+      "zh": "华为",
+      "url": "https://career.huawei.com/",
+      "logoDomain": "huawei.com",
+      "industry": "通信与科技",
+      "types": [
+        "SOCIAL",
+        "CAMPUS",
+        "INTERNSHIP"
+      ],
+      "secondary": "https://career.huawei.com/cn/campus-recruitment",
+      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+    },
+    {
+      "id": "BYD",
+      "zh": "比亚迪",
+      "url": "https://job.byd.com/",
+      "logoDomain": "byd.com",
+      "industry": "汽车与制造",
+      "types": [
+        "SOCIAL",
+        "CAMPUS",
+        "INTERNSHIP"
+      ],
+      "secondary": "https://job.byd.com/portal/mobile/school-home",
+      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+    },
+    {
+      "id": "Alibaba",
+      "zh": "阿里巴巴",
+      "url": "https://talent.alibaba.com/",
+      "logoDomain": "alibaba.com",
+      "industry": "互联网与零售",
+      "types": [],
+      "secondary": null,
+      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+    },
+    {
+      "id": "Meituan",
+      "zh": "美团",
+      "url": "https://zhaopin.meituan.com/web/social",
+      "logoDomain": "meituan.com",
+      "industry": "本地生活",
+      "types": [
+        "SOCIAL",
+        "CAMPUS"
+      ],
+      "secondary": "https://zhaopin.meituan.com/web/position",
+      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+    },
+    {
+      "id": "Baidu",
+      "zh": "百度",
+      "url": "https://talent.baidu.com/static/index.html",
+      "logoDomain": "baidu.com",
+      "industry": "互联网与人工智能",
+      "types": [
+        "SOCIAL",
+        "CAMPUS",
+        "INTERNSHIP"
+      ],
+      "secondary": "https://talent.baidu.com/jobs/",
+      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+    },
+    {
+      "id": "NIO",
+      "zh": "蔚来",
+      "url": "https://campus.nio.com/",
+      "logoDomain": "nio.com",
+      "industry": "汽车与制造",
+      "types": [
+        "CAMPUS",
+        "INTERNSHIP"
+      ],
+      "secondary": null,
+      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+    },
+    {
+      "id": "Lenovo",
+      "zh": "联想",
+      "url": "https://talent.lenovo.com.cn/position",
+      "logoDomain": "lenovo.com",
+      "industry": "计算机与制造",
+      "types": [
+        "CAMPUS",
+        "INTERNSHIP"
+      ],
+      "secondary": null,
+      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+    },
+    {
+      "id": "Trip.com Group",
+      "zh": "携程集团",
+      "url": "https://careers.ctrip.com/",
+      "logoDomain": "ctrip.com",
+      "industry": "旅游与服务",
+      "types": [
+        "SOCIAL",
+        "CAMPUS"
+      ],
+      "secondary": null,
+      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+    }
+  ]
+}
