@@ -25,7 +25,9 @@ async function get(url,max=20000){
 }
 const live=await get(base+'/api/jobs',90000);
 if(live.status!==200||!Array.isArray(live.body.jobs))throw Error('Public job catalog failed '+JSON.stringify(live));
-const data=live.body,all=data.jobs;
+const data=live.body,all=data.jobs.filter(x=>x.platform==='greenhouse'||x.platform==='ashby'||x.platform==='lever');
+const domestic=live.body.jobs.filter(x=>x.platform==='xiaomi-official');
+if(domestic.length&&domestic.some(x=>x.company!=='Xiaomi'||x.domestic!==true))throw Error('Unexpected domestic record');
 const index=new Map(registry.map(x=>[x.platform+'/'+x.slug,[]]));
 const issues=[],seen=new Set(),urls=new Set();
 let missingChinese=0,machine=0,rules=0,notCertified=0;
@@ -64,7 +66,7 @@ async function worker(){
 await Promise.all(Array.from({length:4},()=>worker()));
 for(const r of results)if(r.issue)issues.push({kind:r.issue,company:r.company,slug:r.slug,id:r.sampleId});
 const summary={time:new Date().toISOString(),registry:registry.length,boardsWithJobs:results.filter(x=>x.listed>0).length,
- listed:all.length,boardsReportedByWebsite:data.boards,sourceFailures:data.failures,
+ listed:all.length,domesticObserved:domestic.length,boardsReportedByWebsite:data.boards,sourceFailures:data.failures,
  machineTranslatedTitles:machine,ruleTitles:rules,pendingChineseTitles:missingChinese,
  officialJdSamplesPassed:results.filter(x=>x.originalJdChars>=100).length,
  problemCount:issues.length};
