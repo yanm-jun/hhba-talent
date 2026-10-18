@@ -4,7 +4,7 @@ const BASE='https://hhba-live-jobs-preview-production.up.railway.app';
 const source=readFileSync(new URL('./live_jobs_preview.ts',import.meta.url),'utf8');
 const boards=[...source.matchAll(/\{platform:"(greenhouse|ashby|lever)",company:"([^"]+)",slug:"([^"]+)"\}/g)]
  .map(x=>({platform:x[1],company:x[2],slug:x[3]}));
-const key=x=>x.platform+'/'+x.slug;
+const key=x=>x.platform+'/'+(x.slug||x.source);
 async function json(url,ms=30000){
  let reason='unknown';
  for(let i=0;i<2;i++){
