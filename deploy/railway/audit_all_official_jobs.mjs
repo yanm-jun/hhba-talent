@@ -123,6 +123,6 @@ async function main(){
   'This audit checks original ATS JD availability, not 1,279 complete Chinese translations.\n');
  console.log('HHBA_FULL_AUDIT_SUMMARY',JSON.stringify(summary));
  console.log('HHBA_FULL_AUDIT_BOARDS',JSON.stringify(boards));
- if(mismatch||pageBad||cache.size!==SOURCE.length)process.exitCode=1;
+ if(mismatch||pageBad||cache.size!==SOURCE.length||kinds.not_translated||kinds.duplicate_city)process.exitCode=1;
 }
 main().catch(err=>{console.error('HHBA_FULL_AUDIT_FATAL',err.message);process.exitCode=1});

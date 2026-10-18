@@ -27,6 +27,9 @@ try{
  stats.language=await page.locator('#toggle-zh').getAttribute('class');
  // Flip language in place, then return to Chinese.
  await page.locator('#toggle-en').click();
+ const englishRemote=await page.locator('#jobs .job .meta span:nth-child(2)').first().innerText();
+ if(/[\u3400-\u9fff]/.test(englishRemote))
+  failures.push({type:'english_remote_badge_is_chinese',value:englishRemote});
  if(!await page.locator('#toggle-en').getAttribute('class').then(x=>x?.includes('on')))
   failures.push({type:'english_toggle_not_selected'});
  await page.locator('#toggle-zh').click();

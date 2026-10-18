@@ -96,8 +96,12 @@ function translateTitleRules(value:string):string{
  return /[\u3400-\u9fff]/.test(title)?title:"职位名称待翻译";
 }
 function translateLocation(value:string):string{
- return swapTerms(value,Object.entries(localePlaces).sort((a,b)=>b[0].length-a[0].length))
- .replace(/\s*-\s*/g," · ").trim()||"工作地点未披露";
+ const raw=swapTerms(value,Object.entries(localePlaces).sort((a,b)=>b[0].length-a[0].length))
+  .replace(/\s*-\s*/g," · ").trim()||"工作地点未披露";
+ // Singapore may appear both as a country code (SG) and city (Singapore).
+ // Never display “新加坡 · 新加坡” to Chinese-language job seekers.
+ const parts=raw.split(/\s*[·,，]\s*/).filter(Boolean);
+ return parts.filter((piece,index)=>index===0||piece!==parts[index-1]).join(" · ")||raw;
 }
 let translationDb:Database|null=null;
 try{
@@ -120,6 +124,16 @@ function toCache(kind:string,source:string,value:string,mode:string){
 }
 
 const approvedTerminology:Record<string,string>={
+ "Commercial Counsel":"商业法律顾问",
+ "Deployment Strategist":"部署策略顾问",
+ "Deployment Strategist - Intel":"部署策略顾问（情报业务）",
+ "Deployment Strategist - Korea Forward Deployed":"部署策略顾问（韩国驻场交付）",
+ "Deployment Strategist - Spain":"部署策略顾问（西班牙）",
+ "Deployment Strategist - Warp Speed":"部署策略顾问（Warp Speed 项目）",
+ "Deployment Strategist, New Grad - Commercial":"应届生部署策略顾问（商业业务）",
+ "Meritocracy Fellowship":"人才选拔培养项目（Meritocracy Fellowship）",
+ "Neurodivergent Fellowship":"神经多样性人才培养项目",
+ "Talent Strategist":"人才战略顾问",
  "Staff Data Scientist, Algorithm (Payments Fraud & Optimization)":"专家级数据科学家（支付反欺诈与算法优化）",
  "(Senior) iOS Engineer, Mobile - Identity & Org":"（高级）iOS 移动端工程师（身份与组织）",
  "(Senior) Manager, Business Development, SME & Growth":"（高级）业务拓展经理（中小企业与增长）",
@@ -146,7 +160,10 @@ function present(j:Job){
   toCache("title",j.title,translation,v.mode);
  }
  const normalized=professionalTitle(j.title,v.translated);if(v.mode==="machine"&&normalized!==v.translated)toCache("title",j.title,normalized,"machine");
- return {...j,titleZh:normalized,titleStatus:v.mode,
+ const reviewed=Boolean(approvedTerminology[j.title.trim()]);
+ const translationMode=reviewed&&v.mode==="pending"?"rules":v.mode;
+ if(reviewed&&v.mode==="pending")toCache("title",j.title,normalized,"rules");
+ return {...j,titleZh:normalized,titleStatus:translationMode,
   locationZh:translateLocation(j.location),companyZh:companyZh[j.company]||j.company};
 }
 const searchAliases:Record<string,string[]>={
@@ -490,9 +507,9 @@ function render(reset=true){
  const related=Object.entries(aliases).filter(([cn])=>key.includes(cn)).flatMap(([,en])=>en);
  filtered=all.filter(x=>(!key||[x.title,x.titleZh,x.company,x.companyZh,x.location,x.locationZh].some(z=>String(z||"").toLowerCase().includes(key))||related.some(term=>String(x.title||"").toLowerCase().includes(term)))&&(!c.value||x.company===c.value)&&(!remote.value||x.remote===true));
  document.querySelector("#shown").textContent=(lang==="zh"?"显示 ":"Showing ")+Math.min(filtered.length,limit)+" / "+filtered.length+(lang==="zh"?" 条":" jobs");
- list.innerHTML=filtered.slice(0,limit).map(x=>'<article class="job"><div><div class="brand">'+safe(lang==='zh'?(x.companyZh||x.company):x.company)+' · '+safe(x.platform.toUpperCase())+'</div><div class="title">'+safe(lang==='zh'?(x.titleZh||'职位名称待翻译'):x.title)+'</div><div class="meta"><span>📍 '+safe(lang==='zh'?(x.locationZh||x.location):x.location)+'</span><span>'+(x.remote===true?'远程':x.remote===false?'非远程':'远程未标注')+'</span><span>'+ (lang==='zh'?'官网原始职位':'Official job') +'</span></div></div><a class="visit" href="/jobs/'+encodeURIComponent(x.id)+'">'+(lang==='zh'?'站内查看完整 JD →':'View full job details →')+'</a></article>').join("");
- if(!filtered.length)list.innerHTML='<div class="empty">当前没有匹配的真实职位</div>';
- if(filtered.length>limit)list.innerHTML+='<div style="text-align:center;padding:20px"><button style="padding:12px 35px;border-radius:9px;border:1px solid #c7dacc;background:#fff;cursor:pointer" id="more">查看更多职位</button></div>';
+ list.innerHTML=filtered.slice(0,limit).map(x=>'<article class="job"><div><div class="brand">'+safe(lang==='zh'?(x.companyZh||x.company):x.company)+' · '+safe(x.platform.toUpperCase())+'</div><div class="title">'+safe(lang==='zh'?(x.titleZh||'职位名称待翻译'):x.title)+'</div><div class="meta"><span>📍 '+safe(lang==='zh'?(x.locationZh||x.location):x.location)+'</span><span>'+(x.remote===true?(lang==='zh'?'远程':'Remote'):x.remote===false?(lang==='zh'?'非远程':'Not remote'):(lang==='zh'?'远程未标注':'Remote not specified'))+'</span><span>'+ (lang==='zh'?'官网原始职位':'Official job') +'</span></div></div><a class="visit" href="/jobs/'+encodeURIComponent(x.id)+'">'+(lang==='zh'?'站内查看完整 JD →':'View full job details →')+'</a></article>').join("");
+ if(!filtered.length)list.innerHTML='<div class="empty">'+(lang==='zh'?'当前没有匹配的真实职位':'No matching jobs found')+'</div>';
+ if(filtered.length>limit)list.innerHTML+='<div style="text-align:center;padding:20px"><button style="padding:12px 35px;border-radius:9px;border:1px solid #c7dacc;background:#fff;cursor:pointer" id="more">'+(lang==='zh'?'查看更多职位':'Load more jobs')+'</button></div>';
  document.querySelector("#more")?.addEventListener("click",()=>{limit+=30;render(false)});
 }
 async function start(){try{const r=await fetch('/api/jobs');if(!r.ok)throw Error();const d=await r.json();all=d.jobs||[];let companies=[...new Set(all.map(x=>x.company))].sort();for(let name of companies){let op=document.createElement("option");op.value=name;op.textContent=name;c.append(op)}document.querySelector('#translated-count').textContent=all.filter(j=>j.titleStatus==='machine').length;setLanguage(lang);}catch{list.innerHTML='<div class="empty">官方岗位接口暂时不可用，请稍后刷新</div>';}}
@@ -631,6 +648,17 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  if(u.pathname!=="/")return new Response("Not found",{status:404,headers});
  const data=await load();return new Response(page({total:data?.rows.length||0,boards:data?.boards||0,failures:data?.failures||0,updated:data?.updated||""}),{headers:{...headers,"Content-Type":"text/html; charset=utf-8"}});
 }});
+
+
+void (async()=>{
+ try{
+   const jobs=(await load())?.rows||[];
+   const pending=jobs.filter(j=>present(j).titleStatus==="pending")
+     .map(j=>({jobId:j.id,original:j.title,company:j.company})).slice(0,45);
+   const duplicates=jobs.filter(j=>present(j).locationZh.includes("新加坡 · 新加坡")).length;
+   console.log("HHBA_FULL_AUDIT_REPAIR",JSON.stringify({pendingCount:pending.length,pending,duplicateCitiesAfterFix:duplicates}));
+ }catch(err){console.log("HHBA_FULL_AUDIT_REPAIR_ERROR",err instanceof Error?err.name:"Unknown");}
+})();
 
 // One-time deployment diagnostic: no JD text or personal data is logged.
 void (async()=>{
