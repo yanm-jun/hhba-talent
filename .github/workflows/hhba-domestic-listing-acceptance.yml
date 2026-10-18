@@ -7,6 +7,10 @@ on:
       - 'deploy/railway/domestic_xiaomi_20261016.compact.json'
       - 'deploy/railway/domestic_static_acceptance.mjs'
       - '.github/workflows/hhba-domestic-listing-acceptance.yml'
+  pull_request:
+    paths:
+      - 'deploy/railway/**'
+      - '.github/workflows/hhba-domestic-listing-acceptance.yml'
   workflow_dispatch:
 permissions:
   contents: read
