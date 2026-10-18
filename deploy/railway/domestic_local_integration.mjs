@@ -13,8 +13,8 @@ async function get(path){
 const summary=await get('/api/jobs/page?country=cn&q=小米&limit=3');
 assert.equal(summary.total,1010);
 assert.equal(summary.domesticObserved,1010);
-assert.equal(summary.domesticVerifiedJobDetails,7);
-assert.equal(summary.domesticEmployers,2);
+assert.equal(summary.domesticVerifiedJobDetails,34);
+assert.equal(summary.domesticEmployers,4);
 assert.ok(summary.jobs.every(x=>x.company==='Xiaomi'&&x.domestic===true&&x.recordKind==='OFFICIAL_LIST_OBSERVED'));
 assert.ok(summary.jobs.every(x=>x.currentApplicationVerified===false));
 for(const [t,n] of [['SOCIAL',350],['CAMPUS',350],['INTERNSHIP',310]]){
@@ -43,6 +43,15 @@ assert.equal(meituanDetail.detailVerified,true);
 assert.equal(meituanDetail.currentApplicationVerified,false);
 assert.equal(meituanDetail.applyUrl,null);
 assert.ok(meituanDetail.officialJobUrl.startsWith('https://zhaopin.meituan.com/web/position/detail?'));
+const tencent=await get('/api/jobs/page?country=cn&q='+encodeURIComponent('腾讯')+'&limit=2');
+assert.equal(tencent.total,19);assert.ok(tencent.jobs.every(x=>x.company==='Tencent'&&x.recordKind==='OFFICIAL_JOB_PAGE_OBSERVED'));
+const baidu=await get('/api/jobs/page?country=cn&q='+encodeURIComponent('百度')+'&limit=2');
+assert.equal(baidu.total,8);assert.ok(baidu.jobs.every(x=>x.company==='Baidu'&&x.recruitmentType==='CAMPUS'));
+for(const x of [tencent.jobs[0],baidu.jobs[0]]){
+ const d=await get('/api/jobs/'+encodeURIComponent(x.id));
+ assert.equal(d.detailVerified,true);assert.equal(d.applyUrl,null);assert.equal(d.currentApplicationVerified,false);
+ assert.ok(d.officialJobUrl.startsWith(x.company==='Tencent'?'https://careers.tencent.com/':'https://talent.baidu.com/'));
+}
 const html=await get('/jobs/'+encodeURIComponent(id));
 assert.ok(html.includes('该岗位直达投递')||html.includes('直达投递链接'));
 assert.ok(!html.includes('https://xiaomi.jobs.f.mioffice.cn/campus/position/'));
@@ -54,4 +63,4 @@ assert.ok(global.boards>=25,'International ATS discovery regressed');
 assert.ok(global.jobs.every(x=>!x.domestic));
 const openai=await get('/api/jobs/page?q=OpenAI&limit=1');
 assert.ok(openai.total>=1&&openai.jobs[0].company==='OpenAI');
-console.log('HHBA_DOMESTIC_INTEGRATION_PASS',JSON.stringify({xiaomi:summary.total,meituan:second.total,domesticTotal:1017,channels:{SOCIAL:350,CAMPUS:350,INTERNSHIP:310},internationalATS:global.boards,globalJobs:global.total,openaiJobs:openai.total,detail:'source-only',filters:'pass'}));
+console.log('HHBA_DOMESTIC_INTEGRATION_PASS',JSON.stringify({xiaomi:summary.total,meituan:second.total,domesticTotal:1044,tencent:19,baidu:8,channels:{SOCIAL:350,CAMPUS:350,INTERNSHIP:310},internationalATS:global.boards,globalJobs:global.total,openaiJobs:openai.total,detail:'source-only',filters:'pass'}));
