@@ -1082,5 +1082,15 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
 
 // Source health is verified in GitHub Actions; avoid repeating expensive
 // startup probes and multi-part translation jobs on each Railway restart.
+// Source-only diagnostic: run the actual local HTTP search handlers at startup.
+void (async()=>{try{
+ const p=String(Bun.env.PORT||3000),out:any={};
+ for(const [name,expected] of [["Tencent",19],["Baidu",8],["Meituan",7],["Xiaomi",1010]] as const){
+  const r=await fetch("http://127.0.0.1:"+p+"/api/jobs/page?company="+name+"&country=cn&limit=1",{signal:AbortSignal.timeout(15000)});
+  const j=r.ok?await r.json():{};
+  out[name]={total:j.total??null,ok:r.ok&&j.total===expected&&j.jobs?.[0]?.company===name};
+ }
+ console.log("HHBA_DOMESTIC_SEARCH_SELFTEST",JSON.stringify(out));
+}catch(e){console.error("HHBA_DOMESTIC_SEARCH_SELFTEST_ERROR",e instanceof Error?e.message:"unknown");}})();
 void load().then(data=>console.log("HHBA_SOURCE_SYNC",JSON.stringify({jobs:data?.rows.length||0,boards:data?.boards||0,failures:data?.failures||0,domesticObserved:domesticObserved.length})))
 .catch(e=>console.error("HHBA_SOURCE_STARTUP_ERROR",e instanceof Error?e.name:"unknown"));
