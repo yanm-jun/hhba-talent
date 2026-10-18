@@ -927,8 +927,8 @@ function jdChunks(full:string):string[]{
 function humanReaderAllowed(req:Request,u:URL):boolean{
  const origin=req.headers.get("origin");
  const host=req.headers.get("host");
- if(!host||!/^hhba-live-jobs-preview-production\.up\.railway\.app(?::443)?$/i.test(host))return false;
- return origin==="https://hhba-live-jobs-preview-production.up.railway.app" &&
+ if(!host||!/^hhba-(?:live-jobs-preview-production|web-production-024c)\.up\.railway\.app(?::443)?$/i.test(host))return false;
+ return origin==="https://"+host.replace(/:443$/,"") &&
    req.headers.get("content-type")?.startsWith("application/json")===true &&
    Number(req.headers.get("content-length")||0)<=300;
 }
