@@ -179,7 +179,7 @@ function professionalTitle(original:string,translation:string):string{
 
 // Curated employer website hostnames; never accept image URLs from job data.
 // Official-site favicons are optional. Missing icons fall back to initials.
-const employerBrandSites:Record<string,string>={"Xiaomi":"mi.com","Greenhouse":"greenhouse.com","Ashby":"ashbyhq.com","Spotify":"spotify.com","Canonical":"canonical.com","Airwallex":"airwallex.com","Palantir":"palantir.com","Figma":"figma.com","Anduril":"anduril.com","Discord":"discord.com","Reddit":"reddit.com","Airtable":"airtable.com","Flexport":"flexport.com","Robinhood":"robinhood.com","GitLab":"gitlab.com","Twilio":"twilio.com","Cloudflare":"cloudflare.com","Vercel":"vercel.com","Gusto":"gusto.com","Wise":"wise.com","Coursera":"coursera.org","OpenAI":"openai.com","Notion":"notion.so","Ramp":"ramp.com","Linear":"linear.app","Perplexity":"perplexity.ai","ElevenLabs":"elevenlabs.io","Vanta":"vanta.com","Harvey":"harvey.ai","Headway":"headway.co","Binance":"binance.com","Cognition":"cognition.ai","Replit":"replit.com","PostHog":"posthog.com","ClickUp":"clickup.com"};
+const employerBrandSites:Record<string,string>={"Tencent":"tencent.com","ByteDance":"bytedance.com","Huawei":"huawei.com","BYD":"byd.com","Alibaba":"alibaba.com","Meituan":"meituan.com","Baidu":"baidu.com","NIO":"nio.com","Lenovo":"lenovo.com","Trip.com Group":"ctrip.com","Xiaomi":"mi.com","Greenhouse":"greenhouse.com","Ashby":"ashbyhq.com","Spotify":"spotify.com","Canonical":"canonical.com","Airwallex":"airwallex.com","Palantir":"palantir.com","Figma":"figma.com","Anduril":"anduril.com","Discord":"discord.com","Reddit":"reddit.com","Airtable":"airtable.com","Flexport":"flexport.com","Robinhood":"robinhood.com","GitLab":"gitlab.com","Twilio":"twilio.com","Cloudflare":"cloudflare.com","Vercel":"vercel.com","Gusto":"gusto.com","Wise":"wise.com","Coursera":"coursera.org","OpenAI":"openai.com","Notion":"notion.so","Ramp":"ramp.com","Linear":"linear.app","Perplexity":"perplexity.ai","ElevenLabs":"elevenlabs.io","Vanta":"vanta.com","Harvey":"harvey.ai","Headway":"headway.co","Binance":"binance.com","Cognition":"cognition.ai","Replit":"replit.com","PostHog":"posthog.com","ClickUp":"clickup.com"};
 function employerLogo(company:string):string{
  const domain=employerBrandSites[company];
  const initials=(company.trim().slice(0,2)||"?").toUpperCase();
@@ -200,6 +200,7 @@ function present(j:Job){
  return {...j,titleZh:normalized,titleStatus:translationMode,
   locationZh:translateLocation(j.location),companyZh:companyZh[j.company]||j.company};
 }
+const domesticEmployerPortals=[["Tencent","腾讯","https://careers.tencent.com/","tencent.com"],["ByteDance","字节跳动","https://jobs.bytedance.com/experienced/","bytedance.com"],["Huawei","华为","https://career.huawei.com/cn","huawei.com"],["BYD","比亚迪","https://job.byd.com/portal/pc/#/","byd.com"],["Alibaba","阿里巴巴","https://talent.alibaba.com/?lang=zh","alibaba.com"],["Meituan","美团","https://zhaopin.meituan.com/web/social","meituan.com"],["Baidu","百度","https://talent.baidu.com/static/index.html","baidu.com"],["NIO","蔚来","https://campus.nio.com/#/","nio.com"],["Lenovo","联想","https://talent.lenovo.com.cn/position","lenovo.com"],["Trip.com Group","携程集团","https://careers.ctrip.com/#/","ctrip.com"]];
 const searchAliases:Record<string,string[]>={
  "销售":["sales","business development","account executive"],
  "财务":["finance","financial","accounting","accountant"],
@@ -651,24 +652,31 @@ h2{font-size:20px;margin:0}.section-title span{color:#7f9085;font-size:12px}
 .job-source{font-size:11px;color:#97a39b;margin-top:10px;letter-spacing:.1px}
 .visit{flex-shrink:0;white-space:nowrap;color:#176d40;border:1px solid #dbe8df;background:#f3f8f4;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:750}
 .visit:hover{background:#e5f1e8}.visit:focus-visible,.job-title:focus-visible{outline:2px solid #247e51;outline-offset:4px}
-.disclaimer{font-size:12px;color:#728378;margin-top:30px;line-height:1.8}.status{padding:14px;border:1px solid #f0debd;background:#fffaf1;color:#886e40;border-radius:10px;margin-bottom:24px;font-size:12px}
+.disclaimer{font-size:12px;color:#728378;margin-top:30px;line-height:1.8}.directory{margin-top:35px;padding-top:22px;border-top:1px solid #e3ebe5}.directory-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;margin-bottom:15px}.directory-head small{color:#7a887d}.directory-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:9px}.employer-link{background:#fff;border:1px solid #e4eae5;border-radius:10px;display:flex;align-items:center;gap:10px;padding:12px}.employer-link:hover{background:#f0f8f2}.employer-info{min-width:0}.employer-info strong{display:block;font-size:14px}.employer-info small{color:#71877b;font-size:11px}.status{padding:14px;border:1px solid #f0debd;background:#fffaf1;color:#886e40;border-radius:10px;margin-bottom:24px;font-size:12px}
 .empty{padding:36px 22px;text-align:center;color:#68776b;background:white;border-radius:12px}.filter-tools{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin:-10px 0 20px;font-size:12px;color:#658070}.filter-clear{border:1px solid #c8d9ce;border-radius:8px;background:#fff;color:#1e6740;cursor:pointer;font:inherit;font-weight:700;padding:8px 14px}.filter-clear:hover{background:#e8f4ed}.filter-clear[hidden]{display:none}.empty .filter-clear{margin-top:15px}
 footer{padding:25px;text-align:center;color:#8a9b8f;font-size:11px;border-top:1px solid #e5eae4}
 @media(max-width:600px){.hero{padding:50px 22px}nav{padding:16px 22px;gap:10px;flex-wrap:wrap}.job{display:block;padding:17px}.job-main{gap:12px}.company-logo{width:48px;height:48px;flex-basis:48px}.job-title{font-size:16px}.visit{display:inline-flex;margin:15px 0 0 60px}.numbers{gap:23px}}
 </style></head><body><nav><div class="logo">HHBA <em id="market-brand">招聘市场</em></div><div id="market-lab" class="lab">真实企业招聘索引 · 公测</div><div class="lang-switch" aria-label="岗位语言"><button id="toggle-zh" type="button">中文</button><button id="toggle-en" type="button">English</button></div></nav><section class="hero"><div class="wrap"><div id="market-kicker" class="eyebrow">全球职业机会 · 企业官方来源</div><h1 id="market-h1">发现全球工作机会</h1><p id="market-subtitle">搜索海外企业公开招聘岗位，在 HHBA 阅读岗位详情，再前往企业官网申请。岗位来自 Greenhouse、Lever、Ashby 的公开招聘接口。</p><div class="numbers"><div class="num"><b id="count">${payload.total}</b><span id="market-count-label">本次获取的岗位</span></div><div class="num"><b>${payload.boards}</b><span id="market-board-label">成功读取的招聘板</span></div><div class="num"><b>1</b><span id="market-source-label">国内企业（列表观察）</span></div><div class="num"><b id="translated-count">—</b><span id="translated-label">已机器翻译职位名称</span></div></div></div></section>
 <main><div id="market-status" data-updated="${esc(payload.updated)}" data-failures="${payload.failures}" class="status">默认显示中文岗位名称。术语规则翻译属于初版，未完成的翻译会标注“待翻译”；切换英文可核对官方标题。公测版说明：本次已接入 ${payload.boards} 个企业招聘板，不代表全量全球职位。最近同步：${esc(payload.updated)}。职位是否仍接受申请以企业官网为准。${payload.failures?" 有 "+payload.failures+" 个来源本轮暂不可用。":""}</div>
 <div class="filters"><input id="q" aria-label="搜索岗位或企业" placeholder="搜索岗位、公司、地点（支持英文）"><select id="company" aria-label="企业"><option value="">全部企业</option></select><select id="country" aria-label="招聘来源"><option value="">全部来源</option><option value="cn">国内官方</option><option value="global">海外 ATS</option></select><select id="recruitment" aria-label="招聘类型"><option value="">全部招聘类型</option><option value="SOCIAL">社招</option><option value="CAMPUS">校招</option><option value="INTERNSHIP">实习</option></select><select id="remote" aria-label="远程筛选"><option value="">全部工作方式</option><option value="yes">标注远程</option></select></div>
-<div class="filter-tools"><span id="filter-summary" aria-live="polite"></span><button type="button" id="clear-filters" class="filter-clear" hidden>清除全部筛选</button></div><div class="section-title"><h2 id="market-list-h2">官方岗位列表</h2><span id="shown"></span></div><div class="list" id="jobs"></div><p id="market-disclaimer" class="disclaimer">数据源为外部企业公开招聘板。部分企业官网在不同网络环境下可能无法访问。岗位发布时间、工作类型、远程标记在接口未披露时不会推断，具体资格要求和投递方式请到企业官网核实。HHBA 不代表与招聘企业存在合作关系。</p></main><footer id="market-footer">HHBA · 全球职位索引 · 仅展示公开岗位资料与官网链接</footer>
+<div class="filter-tools"><span id="filter-summary" aria-live="polite"></span><button type="button" id="clear-filters" class="filter-clear" hidden>清除全部筛选</button></div><div class="section-title"><h2 id="market-list-h2">官方岗位列表</h2><span id="shown"></span></div><div class="list" id="jobs"></div><section class="directory" aria-label="已核验企业官网"><div class="directory-head"><h2 id="dir-title">国内企业官方招聘入口</h2><small id="dir-note">10 家官网已核验 · 入口不代表已收录岗位</small></div><div class="directory-grid" id="employer-directory"></div></section><p id="market-disclaimer" class="disclaimer">数据源为外部企业公开招聘板。部分企业官网在不同网络环境下可能无法访问。岗位发布时间、工作类型、远程标记在接口未披露时不会推断，具体资格要求和投递方式请到企业官网核实。HHBA 不代表与招聘企业存在合作关系。</p></main><footer id="market-footer">HHBA · 全球职位索引 · 仅展示公开岗位资料与官网链接</footer>
 <script>
 let all=[],filtered=[],limit=30,totalFiltered=0,companyNames=[],latestRequest=0,searchTimer=null;
 window.hhbaBoardCount=${payload.boards};
 let lang='zh';
 try{lang=localStorage.getItem('hhba-lang')==='en'?'en':'zh';}catch{}
 const aliases=${JSON.stringify(searchAliases)};
+const portalCatalog=${JSON.stringify(domesticEmployerPortals)};
 const employerBrandSites=${JSON.stringify(employerBrandSites)};
 function logoMarkup(company){
  const domain=employerBrandSites[company],initials=(String(company||'?').trim().slice(0,2)||'?').toUpperCase();
  return '<span class="company-logo" aria-hidden="true"><span class="company-initials">'+safe(initials)+'</span>'+(domain?'<img src="https://'+safe(domain)+'/favicon.ico" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">':'')+'</span>';
+}
+function renderPortalDirectory(){
+ const area=document.querySelector('#employer-directory');if(!area)return;
+ document.querySelector('#dir-title').textContent=lang==='zh'?'国内企业官方招聘入口':'Mainland employer career portals';
+ document.querySelector('#dir-note').textContent=lang==='zh'?'10 家官网已核验 · 入口不代表已收录岗位':'10 official sites checked · Portals are not indexed jobs';
+ area.innerHTML=portalCatalog.map(p=>'<a class="employer-link" href="'+safe(p[2])+'" target="_blank" rel="noopener noreferrer nofollow" aria-label="'+safe(p[1])+'">'+logoMarkup(p[0])+'<span class="employer-info"><strong>'+safe(lang==='zh'?p[1]:p[0])+'</strong><small>'+(lang==='zh'?'前往官方招聘官网 ↗':'Official careers site ↗')+'</small></span></a>').join('');
 }
 document.addEventListener('error',function(e){const t=e.target;if(t&&t.tagName==='IMG'&&t.closest('.company-logo'))t.closest('.company-logo').classList.add('logo-fallback');},true);
 function setLanguage(value){
@@ -712,6 +720,7 @@ function setLanguage(value){
  document.querySelector('#q').setAttribute('aria-label',lang==='zh'?'搜索岗位和企业':'Search jobs and employers');
  document.querySelector('#company').setAttribute('aria-label',lang==='zh'?'按企业筛选':'Filter companies');
  document.querySelector('#remote').setAttribute('aria-label',lang==='zh'?'按工作方式筛选':'Filter workplace type');
+ renderPortalDirectory();
  render();
 }
 document.querySelector('#toggle-zh').addEventListener('click',()=>setLanguage('zh'));
