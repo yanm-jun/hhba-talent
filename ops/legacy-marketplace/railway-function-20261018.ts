@@ -1084,3 +1084,29 @@ void (async()=>{try{
  const ok=response.status===200&&cards>=20&&html.includes('id="jobs"')&&!html.includes('id="employer-directory"');
  console.log("HHBA_HOME_LIST_RESTORED",JSON.stringify({http:response.status,serverRenderedJobCards:cards,directoryGridRemoved:true,scriptSyntaxValid:jsValid,clientSearchIndex,pass:ok&&jsValid&&clientSearchIndex}));
 }catch(e){console.error("HHBA_HOME_LIST_RESTORED_ERROR",e instanceof Error?e.message:"unknown");}})();
+
+/** Staging-only startup check. Verifies the exact reader-origin permission and
+ * one real, unmodified official JD chunk through the private translator.
+ * Logs status only; never logs copyrighted JD or translated body text.
+ */
+void (async()=>{if(Bun.env.RAILWAY_SERVICE_NAME!=="hhba-web")return;
+ try{
+  const host="hhba-web-production-024c.up.railway.app";
+  const origin="https://"+host;
+  const endpoint=origin+"/api/jobs/greenhouse-airtable-8403107002/translate-part";
+  const request=new Request(endpoint,{method:"POST",headers:{
+   "host":host,"origin":origin,"content-type":"application/json"
+  },body:JSON.stringify({part:0,sourceHash:"0".repeat(64)})});
+  const permitted=humanReaderAllowed(request,new URL(endpoint));
+  const job=(await load())?.rows.find(j=>j.id==="greenhouse-airtable-8403107002");
+  const detail=job?await officialDetail(job):null;
+  const chunk=detail?.description?jdChunks(detail.description)[0]:null;
+  const raw=chunk?await machineTranslations("jd",[chunk]):null;
+  const translated=raw?.[0]?await ensureChineseProse(raw[0]):null;
+  console.log("HHBA_STAGING_TRANSLATION_SMOKE",JSON.stringify({
+   readerOriginAccepted:permitted,officialJD:detail?.status||"not_found",
+   sourceChars:chunk?.length||0,backendTranslated:!!raw?.[0],
+   verifiedChinese:!!translated,pass:permitted&&!!translated
+  }));
+ }catch(ex){console.log("HHBA_STAGING_TRANSLATION_SMOKE_ERROR",ex instanceof Error?ex.message:"unknown")}
+})();
