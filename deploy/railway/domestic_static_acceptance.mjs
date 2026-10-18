@@ -21,12 +21,12 @@ for(const job of observed.jobs){
  assert.ok(!seen.has(channel+id));seen.add(channel+id);types[channel]++;
 }
 assert.deepEqual(types,{S:350,C:350,I:310});
-for(const token of ['const domesticObserved:Job[]','rows.push(...domesticObserved,...meituanObserved)','domesticDetailHtml(job)','currentApplicationVerified:false','applyUrl:null','id="country"','id="recruitment"','country==="cn"','country==="global"','recruitmentType&&j.recruitmentType!==recruitmentType','titleStatus:"original"']){
+for(const token of ['const domesticObserved:Job[]','rows.push(...domesticObserved,...meituanObserved,...additionalDomesticJobs)','domesticDetailHtml(job)','currentApplicationVerified:false','applyUrl:null','id="country"','id="recruitment"','country==="cn"','country==="global"','recruitmentType&&j.recruitmentType!==recruitmentType','titleStatus:"original"']){
  assert.ok(source.includes(token),'Missing guarded domestic feature: '+token);
 }
 assert.ok(source.includes('company:"OpenAI"')&&source.includes('company:"Figma"'),'Existing international sources must remain present');
-assert.ok(source.includes('officialListUrl:job.company==="Meituan"?null:job.url'),'Xiaomi official list link retained');
-assert.ok(source.includes('officialJobUrl:job.company==="Meituan"?job.url:null'),'Meituan exact official detail linked');
+assert.ok(source.includes('officialListUrl:job.company==="Xiaomi"?job.url:null'),'Xiaomi official list link retained');
+assert.ok(source.includes('officialJobUrl:job.company==="Xiaomi"?null:job.url'),'Meituan exact official detail linked');
 assert.ok(source.includes('applyUrl:null'),'Unverified application links remain unavailable');
 assert.ok(source.includes('renderPortalDirectory()'),'Employer portal directory displayed separately');
 assert.ok(!source.includes('originalJobUrlAssumedApproved'),'Unreviewed direct link contract');
