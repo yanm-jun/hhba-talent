@@ -38,6 +38,22 @@ const server=http.createServer((req,res)=>{
 });
 server.listen(port,"0.0.0.0",()=>{
  console.log("HHBA_INDEXER_READY",JSON.stringify({port,configuredBoards:boards.length}));
- refresh().catch(e=>console.error("HHBA_INDEXER_SYNC_FAILED",e?.message));
+ refresh().then(async()=>{
+  const base="http://127.0.0.1:"+port;
+  const checks=[];
+  for(const company of ["OpenAI","Cursor","Mercor","Form Energy","ShopBack","AlphaSights Campus Recruiting","General Robotics"]){
+   const r=await fetch(base+"/api/jobs/page?company="+encodeURIComponent(company)+"&limit=2",{signal:AbortSignal.timeout(8000)});
+   const body=r.ok?await r.json():{};
+   checks.push({company,http:r.status,total:body.total??null,firstMatched:body.jobs?.[0]?.company===company||false});
+  }
+  const health=await fetch(base+"/health",{signal:AbortSignal.timeout(8000)}),ready=await fetch(base+"/ready",{signal:AbortSignal.timeout(8000)});
+  const first=snapshot.jobs[0];
+  const detail=first?await fetch(base+"/api/jobs/"+first.id,{signal:AbortSignal.timeout(8000)}):null;
+  const p1=await(await fetch(base+"/api/jobs/page?company=OpenAI&limit=1&offset=0")).json();
+  const p2=await(await fetch(base+"/api/jobs/page?company=OpenAI&limit=1&offset=1")).json();
+  const pagesDistinct=!!p1.jobs?.length&&!!p2.jobs?.length&&p1.jobs[0].id!==p2.jobs[0].id;
+  console.log("HHBA_INDEXER_E2E",JSON.stringify({health:health.status,ready:ready.status,detail:detail?.status||null,pagesDistinct,checks,
+   pass:health.ok&&ready.ok&&detail?.ok&&pagesDistinct&&checks.every(c=>c.http===200)}));
+ }).catch(e=>console.error("HHBA_INDEXER_E2E_ERROR",e?.message));
  setInterval(()=>refresh().catch(e=>console.error("HHBA_INDEXER_SYNC_FAILED",e?.message)),15*60*1000).unref();
 });
