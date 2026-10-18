@@ -68,10 +68,10 @@ const summary={time:new Date().toISOString(),registry:registry.length,boardsWith
  machineTranslatedTitles:machine,ruleTitles:rules,pendingChineseTitles:missingChinese,
  officialJdSamplesPassed:results.filter(x=>x.originalJdChars>=100).length,
  problemCount:issues.length};
-await mkdir('thirty-board-audit',{recursive:true});
-await writeFile('thirty-board-audit/results.json',JSON.stringify({summary,results,issues},null,2));
-console.log('HHBA_30_BOARD_ACCEPTANCE',JSON.stringify(summary));
-for(const x of results)console.log('HHBA_30_BOARD',JSON.stringify({slug:x.slug,company:x.company,jobs:x.listed,jd:x.originalJdChars||0,error:x.issue||null}));
+await mkdir('current-board-audit',{recursive:true});
+await writeFile('current-board-audit/results.json',JSON.stringify({summary,results,issues},null,2));
+console.log('HHBA_CURRENT_BOARD_ACCEPTANCE',JSON.stringify(summary));
+for(const x of results)console.log('HHBA_CURRENT_BOARD',JSON.stringify({slug:x.slug,company:x.company,jobs:x.listed,jd:x.originalJdChars||0,error:x.issue||null}));
 if(results.length!==registry.length||summary.boardsWithJobs!==registry.length||
  summary.officialJdSamplesPassed!==registry.length||
  data.boards!==registry.length||data.failures||issues.length)process.exitCode=1;
