@@ -77,6 +77,9 @@ try{
     return !!el&&el.textContent.length>40&&/[\u3400-\u9fff]/.test(el.textContent);
    },{timeout:60000}).catch(()=>{});
    entry.chineseChars=(await chinese.innerText()).length;
+   const visibleChinese=await chinese.innerText();
+   const leakedEnglish=visibleChinese.match(/(?:[A-Za-z]{3,}[ \t]+){7,}[A-Za-z]{3,}/g)||[];
+   if(leakedEnglish.length)failures.push({platform,id:job.id,type:'untranslated_english_prose_visible_in_zh',count:leakedEnglish.length});
    const shownChinese=await chinese.innerText();
    if(shownChinese.includes('【关键信息核对：以下英文原文数字未全部保留】'))
      failures.push({platform,id:job.id,type:'English_source_appended_to_Chinese_reading'});
