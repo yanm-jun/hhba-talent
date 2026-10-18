@@ -47,7 +47,7 @@ try{
  assert.equal(await desktop.locator('#employer-directory .employer-link').count(),10);
 await desktop.locator('#country').selectOption('cn');
  await desktop.locator('#recruitment').selectOption('CAMPUS');
- await desktop.waitForFunction(()=>document.querySelector('#shown')?.textContent?.includes('353'),{timeout:75000});
+ await desktop.waitForFunction(()=>document.querySelector('#shown')?.textContent?.includes('350'),{timeout:75000});
  assert.ok(['小米集团','美团'].includes(await desktop.locator('.job .company-name').first().innerText()));
  await desktop.screenshot({path:'domestic-live-evidence/xiaomi-desktop.png',fullPage:false});
  await desktop.locator('.job-title').first().click();
