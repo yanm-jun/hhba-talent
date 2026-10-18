@@ -609,7 +609,7 @@ footer{padding:25px;text-align:center;color:#8a9b8f;font-size:11px;border-top:1p
 <div class="filters"><input id="q" aria-label="搜索岗位或企业" placeholder="搜索岗位、公司、地点（支持英文）"><select id="company" aria-label="企业"><option value="">全部企业</option></select><select id="remote" aria-label="远程筛选"><option value="">全部工作方式</option><option value="yes">标注远程</option></select></div>
 <div class="section-title"><h2 id="market-list-h2">官方岗位列表</h2><span id="shown"></span></div><div class="list" id="jobs"></div><p id="market-disclaimer" class="disclaimer">数据源为外部企业公开招聘板。部分企业官网在不同网络环境下可能无法访问。岗位发布时间、工作类型、远程标记在接口未披露时不会推断，具体资格要求和投递方式请到企业官网核实。HHBA 不代表与招聘企业存在合作关系。</p></main><footer id="market-footer">HHBA · 全球职位索引 · 仅展示公开岗位资料与官网链接</footer>
 <script>
-let all=[],filtered=[],limit=30;
+let all=[],filtered=[],limit=30,totalFiltered=0,companyNames=[],latestRequest=0,searchTimer=null;
 window.hhbaBoardCount=${payload.boards};
 let lang='zh';
 try{lang=localStorage.getItem('hhba-lang')==='en'?'en':'zh';}catch{}
@@ -620,7 +620,7 @@ function setLanguage(value){
  document.querySelector('#toggle-zh').classList.toggle('on',lang==='zh');
  document.querySelector('#toggle-en').classList.toggle('on',lang==='en');
  document.querySelector('#q').placeholder=lang==='zh'?'搜索中文职位、公司或城市':'Search job titles, companies and cities';
- for(const option of Array.from(document.querySelector('#company').options)){if(option.value)option.textContent=lang==='zh'?(all.find(x=>x.company===option.value)?.companyZh||option.value):option.value;}
+ for(const option of Array.from(document.querySelector('#company').options)){if(option.value)option.textContent=lang==='zh'?(companyNames.find(x=>x.name===option.value)?.zh||option.value):option.value;}
  document.querySelector('#remote').options[0].textContent=lang==='zh'?'全部工作方式':'All work modes';
  document.querySelector('#remote').options[1].textContent=lang==='zh'?'标注远程':'Remote only';
  document.querySelector('#company').options[0].textContent=lang==='zh'?'全部企业':'All companies';
@@ -658,17 +658,52 @@ const safe=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"
 const q=document.querySelector("#q"),c=document.querySelector("#company"),remote=document.querySelector("#remote"),list=document.querySelector("#jobs");
 function render(reset=true){
  if(reset)limit=30;
- const key=q.value.trim().toLowerCase();
- const related=Object.entries(aliases).filter(([cn])=>key.includes(cn)).flatMap(([,en])=>en);
- filtered=all.filter(x=>(!key||[x.title,x.titleZh,x.company,x.companyZh,x.location,x.locationZh].some(z=>String(z||"").toLowerCase().includes(key))||related.some(term=>String(x.title||"").toLowerCase().includes(term)))&&(!c.value||x.company===c.value)&&(!remote.value||x.remote===true));
- document.querySelector("#shown").textContent=(lang==="zh"?"显示 ":"Showing ")+Math.min(filtered.length,limit)+" / "+filtered.length+(lang==="zh"?" 条":" jobs");
+ filtered=all;
+ document.querySelector("#shown").textContent=(lang==="zh"?"显示 ":"Showing ")+Math.min(totalFiltered,limit)+" / "+totalFiltered+(lang==="zh"?" 条":" jobs");
  list.innerHTML=filtered.slice(0,limit).map(x=>'<article class="job"><div><div class="brand">'+safe(lang==='zh'?(x.companyZh||x.company):x.company)+' · '+safe(x.platform.toUpperCase())+'</div><div class="title">'+safe(lang==='zh'?(x.titleZh||'职位名称待翻译'):x.title)+'</div><div class="meta"><span>📍 '+safe(lang==='zh'?(x.locationZh||x.location):x.location)+'</span><span>'+(x.remote===true?(lang==='zh'?'远程':'Remote'):x.remote===false?(lang==='zh'?'非远程':'Not remote'):(lang==='zh'?'远程未标注':'Remote not specified'))+'</span><span>'+ (lang==='zh'?'官网原始职位':'Official job') +'</span></div></div><a class="visit" href="/jobs/'+encodeURIComponent(x.id)+'">'+(lang==='zh'?'站内查看完整 JD →':'View full job details →')+'</a></article>').join("");
  if(!filtered.length)list.innerHTML='<div class="empty">'+(lang==='zh'?'当前没有匹配的真实职位':'No matching jobs found')+'</div>';
- if(filtered.length>limit)list.innerHTML+='<div style="text-align:center;padding:20px"><button style="padding:12px 35px;border-radius:9px;border:1px solid #c7dacc;background:#fff;cursor:pointer" id="more">'+(lang==='zh'?'查看更多职位':'Load more jobs')+'</button></div>';
- document.querySelector("#more")?.addEventListener("click",()=>{limit+=30;render(false)});
+ if(totalFiltered>limit)list.innerHTML+='<div style="text-align:center;padding:20px"><button style="padding:12px 35px;border-radius:9px;border:1px solid #c7dacc;background:#fff;cursor:pointer" id="more">'+(lang==='zh'?'查看更多职位':'Load more jobs')+'</button></div>';
+ document.querySelector("#more")?.addEventListener("click",()=>{limit+=30;void fetchJobs(false)});
 }
-async function start(){try{const r=await fetch('/api/jobs');if(!r.ok)throw Error();const d=await r.json();all=d.jobs||[];let companies=[...new Set(all.map(x=>x.company))].sort();for(let name of companies){let op=document.createElement("option");op.value=name;op.textContent=name;c.append(op)}document.querySelector('#translated-count').textContent=all.filter(j=>j.titleStatus==='machine').length;setLanguage(lang);}catch{list.innerHTML='<div class="empty">官方岗位接口暂时不可用，请稍后刷新</div>';}}
-q.addEventListener("input",()=>render());c.addEventListener("change",()=>render());remote.addEventListener("change",()=>render());start();
+async function fetchJobs(reset=true){
+ if(reset)limit=30;
+ const token=++latestRequest;
+ const params=new URLSearchParams({limit:String(limit),offset:"0"});
+ const query=q.value.trim();
+ if(query)params.set("q",query);
+ if(c.value)params.set("company",c.value);
+ if(remote.value)params.set("remote","true");
+ try{
+  const response=await fetch("/api/jobs/page?"+params.toString(),{headers:{Accept:"application/json"}});
+  if(!response.ok)throw Error("jobs_api_unavailable");
+  const data=await response.json();
+  if(token!==latestRequest)return;
+  all=Array.isArray(data.jobs)?data.jobs:[];
+  totalFiltered=Number(data.total)||0;
+  if(Array.isArray(data.companies)&&data.companies.length){
+   const before=c.value;
+   companyNames=data.companies;
+   c.replaceChildren(new Option(lang==="zh"?"全部企业":"All companies",""));
+   for(const company of companyNames)
+    c.add(new Option(lang==="zh"?company.zh:company.name,company.name));
+   if(companyNames.some(x=>x.name===before))c.value=before;
+  }
+  if(data.machineCount!==null&&data.machineCount!==undefined)
+   document.querySelector("#translated-count").textContent=data.machineCount;
+  render(false);
+ }catch{
+  if(token===latestRequest)
+   list.innerHTML='<div class="empty">'+(lang==="zh"?"岗位暂时无法加载，请重试。":"Jobs temporarily unavailable. Please retry.")+'</div>';
+ }
+}
+function start(){
+ setLanguage(lang);
+ void fetchJobs(true);
+}
+q.addEventListener("input",()=>{if(searchTimer)clearTimeout(searchTimer);searchTimer=setTimeout(()=>{void fetchJobs(true)},220)});
+c.addEventListener("change",()=>{void fetchJobs(true)});
+remote.addEventListener("change",()=>{void fetchJobs(true)});
+start();
 </script></body></html>`;
 
 
@@ -840,6 +875,32 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
   return Response.json({total:records.length,boards:d?.boards||0,titleTranslations:categories,
    cachePersistent:!!translationDb,translationEngine:privateTranslatorUrl()?"libretranslate-private":"unconfigured",
    completeOriginalJdTranslationsAvailable:false,searchLanguages:["zh","en"]},{headers});
+ }
+ if(u.pathname==="/api/jobs/page"){
+  const data=await load();const rows=data?.rows||[];
+  if(rows.length)void fillTitleTranslations(rows);
+  const q=String(u.searchParams.get("q")||"").toLowerCase().trim().slice(0,100);
+  const company=String(u.searchParams.get("company")||"").slice(0,120);
+  const remoteOnly=u.searchParams.get("remote")==="true";
+  const limit=Math.max(1,Math.min(60,Number.parseInt(u.searchParams.get("limit")||"30",10)||30));
+  const offset=Math.max(0,Math.min(50000,Number.parseInt(u.searchParams.get("offset")||"0",10)||0));
+  const related=Object.entries(searchAliases).filter(([cn])=>q.includes(cn)).flatMap(([,words])=>words);
+  const filtered=rows.filter(j=>{
+   if(company&&j.company!==company)return false;
+   if(remoteOnly&&j.remote!==true)return false;
+   if(!q)return true;
+   const fields=[j.title,j.company,companyZh[j.company]||"",j.location,translateLocation(j.location),present(j).titleZh];
+   return fields.some(v=>String(v||"").toLowerCase().includes(q))||
+     related.some(t=>j.title.toLowerCase().includes(t));
+  });
+  const names=[...new Set(rows.map(j=>j.company))].sort((a,b)=>a.localeCompare(b));
+  const companies=offset===0?names.map(name=>({name,zh:companyZh[name]||name})):[];
+  const machineCount=offset===0?rows.reduce((n,j)=>n+(fromCache("title",j.title)?.mode==="machine"?1:0),0):null;
+  return Response.json({
+    jobs:filtered.slice(offset,offset+limit).map(present),total:filtered.length,
+    allJobs:rows.length,limit,offset,companies,machineCount,
+    boards:data?.boards||0,failures:data?.failures||0,updated:data?.updated||""
+  },{headers});
  }
  if(u.pathname==="/api/jobs"){const data=await load();if(data?.rows)void fillTitleTranslations(data.rows);return Response.json({jobs:(data?.rows||[]).map(present),total:data?.rows.length||0,boards:data?.boards||0,failures:data?.failures||0,updated:data?.updated||"",persistentCache:!!translationDb,translationEngine:privateTranslatorUrl()?"libretranslate-private":"unconfigured"},{headers});}
 
