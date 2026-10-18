@@ -1147,12 +1147,13 @@ void (async()=>{if(Bun.env.RAILWAY_SERVICE_NAME!=="hhba-web")return;
   const sourceMarkup=!!chunk&&hasLeakedJdTags(chunk);
   const translationMarkup=!!corrected&&hasLeakedJdTags(corrected);
   const numeralsPreserved=!!corrected&&!!chunk&&numbersRetained(chunk,corrected);
+  const missingNumbers=chunk&&corrected?numberTokens(chunk).filter(x=>!numberTokens(corrected).includes(x)).slice(0,12):[];
   const paragraphBreaks=detail?.description?.includes("\n")||false;
   const pass=permitted&&detail?.status==="LIVE_CONTENT"&&!sourceMarkup&&!translationMarkup&&numeralsPreserved&&!!corrected;
   console.log("HHBA_STAGING_TRANSLATION_SMOKE",JSON.stringify({
    readerOriginAccepted:permitted,officialJD:detail?.status||"not_found",
    sourceChars:chunk?.length||0,backendTranslated:!!raw?.[0],
-   sourceMarkup,translationMarkup,paragraphBreaks,numeralsPreserved,
+   sourceMarkup,translationMarkup,paragraphBreaks,numeralsPreserved,missingNumbers,
    verifiedChinese:!!corrected,pass
   }));
  }catch(ex){console.log("HHBA_STAGING_TRANSLATION_SMOKE_ERROR",ex instanceof Error?ex.message:"unknown")}
