@@ -1254,6 +1254,30 @@ void (async()=>{if(Bun.env.RAILWAY_SERVICE_NAME!=="hhba-web")return;
    escapedMarkup:rawMarkup,translationStatus:response?.status??null,
    translationError:payload.error||null,cleanTranslation:clean,pass
   }));
+  if(!pass)return;
+  const responses=[{part:0,http:response?.status??0,error:payload.error||null}];
+  let translatedParts=1;
+  let translatedText=String(payload.text||"");
+  for(let part=1;part<chunks.length&&part<80;part++){
+   const request=new Request(endpoint,{method:"POST",headers:{
+    "host":host,"origin":"https://"+host,"content-type":"application/json"
+   },body:JSON.stringify({part,sourceHash:createHash("sha256").update(english).digest("hex")})});
+   const result=await readJobForTranslation(request,new URL(endpoint),{});
+   const value=await result.json() as any;
+   responses.push({part,http:result.status,error:value.error||null});
+   if(!result.ok||typeof value.text!=="string"||hasLeakedJdTags(value.text))break;
+   translatedParts++;
+   translatedText+="\n\n"+value.text;
+  }
+  const headingsTranslated=(translatedText.match(/^# /gm)||[]).length;
+  const bulletsTranslated=(translatedText.match(/^- /gm)||[]).length;
+  const fullPass=translatedParts===chunks.length&&headingsTranslated===headingCount&&
+   bulletsTranslated===bulletCount&&!hasLeakedJdTags(translatedText);
+  console.log("HHBA_STAGING_JD_FULL_E2E",JSON.stringify({
+   chunks:chunks.length,translatedParts,headingsTranslated,bulletsTranslated,
+   originalHeadings:headingCount,originalBullets:bulletCount,
+   translationCharacters:translatedText.length,responses,pass:fullPass
+  }));
  }catch(e){console.log("HHBA_STAGING_JD_E2E_ERROR",e instanceof Error?e.message:"unknown");}
 })();
 
