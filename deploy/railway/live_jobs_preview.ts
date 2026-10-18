@@ -121,7 +121,7 @@ function translateLocation(value:string):string{
  // Singapore may appear both as a country code (SG) and city (Singapore).
  // Never display “新加坡 · 新加坡” to Chinese-language job seekers.
  const parts=raw.split(/\s*[·,，]\s*/).filter(Boolean);
- return parts.filter((piece,index)=>index===0||piece!==parts[index-1]).join(" · ")||raw;
+ return parts.filter((piece,index)=>parts.indexOf(piece)===index).join(" · ")||raw;
 }
 let translationDb:Database|null=null;
 try{
@@ -144,6 +144,10 @@ function toCache(kind:string,source:string,value:string,mode:string){
 }
 
 const approvedTerminology:Record<string,string>={
+ "Automation Technician 2nd Shift, Manufacturing Automation":"制造自动化技术员（第二班次）",
+ "Environmental Test Technician (1st Shift)":"环境测试技术员（第一班次）",
+ "Environmental Test Technician (2nd Shift)":"环境测试技术员（第二班次）",
+ "Metrology Technician (2nd Shift)":"计量检测技术员（第二班次）",
  "Commercial Counsel":"商业法律顾问",
  "Deployment Strategist":"部署策略顾问",
  "Deployment Strategist - Intel":"部署策略顾问（情报业务）",
