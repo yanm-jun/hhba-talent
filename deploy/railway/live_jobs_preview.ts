@@ -100,7 +100,7 @@ const localePlaces:Record<string,string>={
  "Toronto":"多伦多","Canada":"加拿大","Bangkok":"曼谷",
  "Thailand":"泰国","Remote":"远程","Worldwide":"全球远程"
 };
-const companyZh:Record<string,string>={Airwallex:"空中云汇","OpenAI":"OpenAI","Notion":"Notion","Ramp":"Ramp","Linear":"Linear","Perplexity":"Perplexity","ElevenLabs":"ElevenLabs","Vanta":"Vanta","Harvey":"Harvey","Headway":"Headway","Coursera":"Coursera","Figma":"Figma","Anduril":"Anduril","Discord":"Discord","Reddit":"Reddit","Airtable":"Airtable","Flexport":"Flexport","Robinhood":"Robinhood","GitLab":"GitLab","Twilio":"Twilio","Cloudflare":"Cloudflare","Vercel":"Vercel","Gusto":"Gusto","Wise":"Wise","Binance":"Binance"};
+const companyZh:Record<string,string>={Cognition:"Cognition",Replit:"Replit",PostHog:"PostHog",ClickUp:"ClickUp",Airwallex:"空中云汇","OpenAI":"OpenAI","Notion":"Notion","Ramp":"Ramp","Linear":"Linear","Perplexity":"Perplexity","ElevenLabs":"ElevenLabs","Vanta":"Vanta","Harvey":"Harvey","Headway":"Headway","Coursera":"Coursera","Figma":"Figma","Anduril":"Anduril","Discord":"Discord","Reddit":"Reddit","Airtable":"Airtable","Flexport":"Flexport","Robinhood":"Robinhood","GitLab":"GitLab","Twilio":"Twilio","Cloudflare":"Cloudflare","Vercel":"Vercel","Gusto":"Gusto","Wise":"Wise","Binance":"Binance"};
 function swapTerms(raw:string,lookup:[string,string][]):string{
  let out=raw;
  for(const [en,zh]of lookup){
@@ -231,7 +231,11 @@ const boards:Board[]=[
  {platform:"ashby",company:"Vanta",slug:"vanta"},
  {platform:"ashby",company:"Harvey",slug:"harvey"},
  {platform:"ashby",company:"Headway",slug:"headway"},
- {platform:"lever",company:"Binance",slug:"binance"}
+ {platform:"lever",company:"Binance",slug:"binance"},
+ {platform:"ashby",company:"Cognition",slug:"cognition"},
+ {platform:"ashby",company:"Replit",slug:"replit"},
+ {platform:"ashby",company:"PostHog",slug:"posthog"},
+ {platform:"ashby",company:"ClickUp",slug:"clickup"}
 ];
 const esc=(v:unknown)=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]||c));
 const urlOK=(value:unknown,slug:string,platform:string)=>{
