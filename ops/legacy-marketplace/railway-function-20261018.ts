@@ -596,6 +596,20 @@ function numberTokens(value:string):string[]{
 /** Restore grouped numbers that machine translation separated with spaces.
  * Examples: $182,800 -> 182 800美元 -> 182,800美元. Does not invent numbers.
  */
+
+/** Keep an employer's official product name intact in machine-translated JD.
+ * These fixes are limited to evidenced mistranslations for this board.
+ */
+function stabilizeEmployerTerminology(company:string,translated:string):string{
+ if(company!=="Airtable")return translated;
+ return translated
+  .replace(/\b(?:Airbet|Airable|AirTable)\b/gi,"Airtable")
+  .replace(/空气表|气表/g,"Airtable")
+  .replace(/机票(?=是机会均等|致力于|是一个|是一家)/g,"Airtable")
+  .replace(/公司账户执行人/g,"企业客户经理")
+  .replace(/企业账户执行官/g,"企业大客户经理");
+}
+
 function restoreGroupedNumbers(source:string,translated:string):string{
  let fixed=translated;
  for(const token of new Set(source.match(/\b\d{1,3}(?:,\d{3})+(?:\.\d+)?\b/g)||[])){
@@ -1114,7 +1128,7 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
    const source=segments[i].original;
    const chinese=await ensureChineseProse(output[i]||"");
    if(!chinese)return Response.json({error:"translation_incomplete",part,total:chunks.length},{status:503,headers});
-   const corrected=restoreGroupedNumbers(source,chinese);
+   const corrected=stabilizeEmployerTerminology(job.company,restoreGroupedNumbers(source,chinese));
    if(hasLeakedJdTags(corrected))return Response.json({error:"translation_markup_leak",part,total:chunks.length},{status:503,headers});
    if(!numbersRetained(source,corrected))return Response.json({error:"translation_numbers_mismatch",part,total:chunks.length},{status:503,headers});
    const mark=segments[i].kind==="heading"?"# ":segments[i].kind==="bullet"?"- ":"";
@@ -1242,6 +1256,16 @@ void (async()=>{if(Bun.env.RAILWAY_SERVICE_NAME!=="hhba-web")return;
   const paragraphCount=(originalHtml.match(/<p>/g)||[]).length;
   const rawMarkup=hasLeakedJdTags(english)||hasEscapedJdTags(originalHtml);
   const chunks=jdChunks(english);
+  const detailRoute=await fetch("http://127.0.0.1:"+String(Bun.env.PORT||3000)+
+    "/jobs/greenhouse-airtable-8403107002");
+  const renderedPage=detailRoute.ok?await detailRoute.text():"";
+  const englishPanel=renderedPage.split('<div class="lang-panel" id="jd-en" hidden>')[1]?.split("</div></section>")[0]||"";
+  const englishRenderedCorrectly=detailRoute.ok&&
+   (englishPanel.match(/<h3>/g)||[]).length===headingCount&&
+   (englishPanel.match(/<li>/g)||[]).length===bulletCount&&
+   !/&lt;\\?\/?(?:p|li|h[1-6]|ul)\b/i.test(englishPanel)&&
+   renderedPage.includes('id="detail-zh"')&&renderedPage.includes('id="detail-en"');
+  const hasOfficialReferences=englishPanel.includes("https://airtable.com/careers/life-at-airtable");
   const host="hhba-web-production-024c.up.railway.app";
   const endpoint="https://"+host+"/api/jobs/greenhouse-airtable-8403107002/translate-part";
   const req=new Request(endpoint,{method:"POST",headers:{
@@ -1253,11 +1277,12 @@ void (async()=>{if(Bun.env.RAILWAY_SERVICE_NAME!=="hhba-web")return;
   const translated=response?.ok&&typeof payload.text==="string";
   const clean=!!translated&&!hasLeakedJdTags(payload.text);
   const pass=allowed&&detail?.status==="LIVE_CONTENT"&&headingCount>=3&&bulletCount>=8&&
-   paragraphCount>=3&&!rawMarkup&&chunks.length>1&&clean;
+   paragraphCount>=3&&!rawMarkup&&chunks.length>1&&clean&&englishRenderedCorrectly&&hasOfficialReferences;
   console.log("HHBA_STAGING_JD_E2E",JSON.stringify({
    officialJD:detail?.status||"missing",headings:headingCount,bullets:bulletCount,
    paragraphs:paragraphCount,jdCharacters:english.length,chunks:chunks.length,
-   escapedMarkup:rawMarkup,translationStatus:response?.status??null,
+   escapedMarkup:rawMarkup,englishPageStatus:detailRoute.status,
+   englishRenderedCorrectly,hasOfficialReferences,translationStatus:response?.status??null,
    translationError:payload.error||null,cleanTranslation:clean,pass
   }));
   if(!pass)return;
