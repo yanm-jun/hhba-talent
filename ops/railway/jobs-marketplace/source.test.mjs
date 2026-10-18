@@ -3,6 +3,10 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 const src=readFileSync(new URL("./index.tsx",import.meta.url),"utf8");
 
+test("Railway Function source stays within 96 KiB",()=>{
+ const size=Buffer.byteLength(src,"utf8");
+ assert.ok(size<=96*1024,"Railway Function source exceeds 96 KiB: "+size+" bytes");
+});
 test("preserves original job marketplace and not a link directory",()=>{
  assert.match(src,/function firstPageJobCards\(rows:Job\[\]\)/);
  assert.match(src,/if\(u\.pathname==="\/api\/jobs\/page"\)/);
