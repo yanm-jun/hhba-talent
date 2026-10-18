@@ -143,6 +143,7 @@ function toCache(kind:string,source:string,value:string,mode:string){
 }
 
 const approvedTerminology:Record<string,string>={
+ "Account Executive, Corporate":"企业客户经理",
  "Automation Technician 2nd Shift, Manufacturing Automation":"制造自动化技术员（第二班次）",
  "Environmental Test Technician (1st Shift)":"环境测试技术员（第一班次）",
  "Environmental Test Technician (2nd Shift)":"环境测试技术员（第二班次）",
