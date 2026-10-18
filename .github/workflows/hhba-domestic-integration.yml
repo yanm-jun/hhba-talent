@@ -20,6 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
+      - name: Stage approved Xiaomi source chunks for CI
+        run: node deploy/railway/export_xiaomi_ci_env.mjs
       - name: Start actual Bun recruitment market API
         run: |
           PORT=3555 bun run deploy/railway/live_jobs_preview.ts > /tmp/hhba-domestic-server.log 2>&1 &
