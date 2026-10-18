@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "checkedAt": "2026-10-18",
-  "semantics": "OFFICIAL_PORTAL_DIRECTORY_ONLY",
+  "semantics": "OFFICIAL_CAREER_PORTAL_CANDIDATES_NOT_INDEXED",
   "indexedJobsIncrement": 0,
   "employers": [
     {
@@ -15,10 +15,10 @@
         "CAMPUS"
       ],
       "secondary": "https://careers.tencent.com/search.html",
-      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "sourceStatus": "REVIEW_PENDING",
       "jobRecords": 0,
       "checkedAt": "2026-10-18",
-      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+      "disclaimer": "Employer portal candidate; URL and affiliation require live verification. Not an indexed job."
     },
     {
       "id": "ByteDance",
@@ -32,10 +32,10 @@
         "INTERNSHIP"
       ],
       "secondary": "https://jobs.bytedance.com/campus/",
-      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "sourceStatus": "REVIEW_PENDING",
       "jobRecords": 0,
       "checkedAt": "2026-10-18",
-      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+      "disclaimer": "Employer portal candidate; URL and affiliation require live verification. Not an indexed job."
     },
     {
       "id": "Huawei",
@@ -49,10 +49,10 @@
         "INTERNSHIP"
       ],
       "secondary": "https://career.huawei.com/cn/campus-recruitment",
-      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "sourceStatus": "REVIEW_PENDING",
       "jobRecords": 0,
       "checkedAt": "2026-10-18",
-      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+      "disclaimer": "Employer portal candidate; URL and affiliation require live verification. Not an indexed job."
     },
     {
       "id": "BYD",
@@ -66,10 +66,10 @@
         "INTERNSHIP"
       ],
       "secondary": "https://job.byd.com/portal/mobile/school-home",
-      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "sourceStatus": "REVIEW_PENDING",
       "jobRecords": 0,
       "checkedAt": "2026-10-18",
-      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+      "disclaimer": "Employer portal candidate; URL and affiliation require live verification. Not an indexed job."
     },
     {
       "id": "Alibaba",
@@ -79,10 +79,10 @@
       "industry": "互联网与零售",
       "types": [],
       "secondary": null,
-      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "sourceStatus": "REVIEW_PENDING",
       "jobRecords": 0,
       "checkedAt": "2026-10-18",
-      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+      "disclaimer": "Employer portal candidate; URL and affiliation require live verification. Not an indexed job."
     },
     {
       "id": "Meituan",
@@ -95,10 +95,10 @@
         "CAMPUS"
       ],
       "secondary": "https://zhaopin.meituan.com/web/position",
-      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "sourceStatus": "REVIEW_PENDING",
       "jobRecords": 0,
       "checkedAt": "2026-10-18",
-      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+      "disclaimer": "Employer portal candidate; URL and affiliation require live verification. Not an indexed job."
     },
     {
       "id": "Baidu",
@@ -112,10 +112,10 @@
         "INTERNSHIP"
       ],
       "secondary": "https://talent.baidu.com/jobs/",
-      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "sourceStatus": "REVIEW_PENDING",
       "jobRecords": 0,
       "checkedAt": "2026-10-18",
-      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+      "disclaimer": "Employer portal candidate; URL and affiliation require live verification. Not an indexed job."
     },
     {
       "id": "NIO",
@@ -128,10 +128,10 @@
         "INTERNSHIP"
       ],
       "secondary": null,
-      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "sourceStatus": "REVIEW_PENDING",
       "jobRecords": 0,
       "checkedAt": "2026-10-18",
-      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+      "disclaimer": "Employer portal candidate; URL and affiliation require live verification. Not an indexed job."
     },
     {
       "id": "Lenovo",
@@ -144,10 +144,10 @@
         "INTERNSHIP"
       ],
       "secondary": null,
-      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "sourceStatus": "REVIEW_PENDING",
       "jobRecords": 0,
       "checkedAt": "2026-10-18",
-      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+      "disclaimer": "Employer portal candidate; URL and affiliation require live verification. Not an indexed job."
     },
     {
       "id": "Trip.com Group",
@@ -160,10 +160,10 @@
         "CAMPUS"
       ],
       "secondary": null,
-      "sourceStatus": "OFFICIAL_PORTAL_VERIFIED",
+      "sourceStatus": "REVIEW_PENDING",
       "jobRecords": 0,
       "checkedAt": "2026-10-18",
-      "disclaimer": "Portal verified, individual jobs have not yet been indexed"
+      "disclaimer": "Employer portal candidate; URL and affiliation require live verification. Not an indexed job."
     }
   ]
 }
