@@ -14,7 +14,7 @@ const mi=await json('/api/jobs/page?country=cn&q=小米&limit=5');
 assert.equal(mi.total,1010);
 assert.ok(mi.jobs.every(j=>j.domestic&&j.company==='Xiaomi'));
 for(const [type,expected] of [['SOCIAL',350],['CAMPUS',350],['INTERNSHIP',310]]){
- const page=await json('/api/jobs/page?country=cn&recruitment_type='+type+'&limit=2');
+ const page=await json('/api/jobs/page?country=cn&q=小米&recruitment_type='+type+'&limit=2');
  assert.equal(page.total,expected,type+' source count');
 }
 for(const q of ['小米','小米集团','Xiaomi']){
