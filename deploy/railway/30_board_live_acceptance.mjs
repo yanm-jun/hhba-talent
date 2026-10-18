@@ -2,10 +2,14 @@ import {readFileSync} from 'node:fs';
 import {mkdir,writeFile} from 'node:fs/promises';
 const base='https://hhba-live-jobs-preview-production.up.railway.app';
 const src=readFileSync(new URL('./live_jobs_preview.ts',import.meta.url),'utf8');
-const chunk=src.slice(src.indexOf('const boards:Board[]=['),src.indexOf('const boards:Board[]=[')+3400);
+const start=src.indexOf('const boards:Board[]=[');
+const end=src.indexOf('];',start);
+if(start<0||end<0)throw Error('Canonical ATS board registry was not found');
+const chunk=src.slice(start,end+2);
 const registry=[...chunk.matchAll(/\{platform:"([^"]+)",company:"([^"]+)",slug:"([^"]+)"\}/g)]
  .map(m=>({platform:m[1],company:m[2],slug:m[3]}));
-if(registry.length!==30)throw Error('Registry does not contain exactly 30 sources; got '+registry.length);
+if(registry.length<30)throw Error('Canonical registry unexpectedly shrank below 30 sources; got '+registry.length);
+if(new Set(registry.map(x=>x.platform+'/'+x.slug)).size!==registry.length)throw Error('Duplicate ATS board source');
 const results=[];
 let pending=0;
 async function get(url,max=20000){
@@ -68,5 +72,6 @@ await mkdir('thirty-board-audit',{recursive:true});
 await writeFile('thirty-board-audit/results.json',JSON.stringify({summary,results,issues},null,2));
 console.log('HHBA_30_BOARD_ACCEPTANCE',JSON.stringify(summary));
 for(const x of results)console.log('HHBA_30_BOARD',JSON.stringify({slug:x.slug,company:x.company,jobs:x.listed,jd:x.originalJdChars||0,error:x.issue||null}));
-if(results.length!==30||summary.boardsWithJobs!==30||summary.officialJdSamplesPassed!==30||
- data.boards!==30||data.failures||issues.length)process.exitCode=1;
+if(results.length!==registry.length||summary.boardsWithJobs!==registry.length||
+ summary.officialJdSamplesPassed!==registry.length||
+ data.boards!==registry.length||data.failures||issues.length)process.exitCode=1;
