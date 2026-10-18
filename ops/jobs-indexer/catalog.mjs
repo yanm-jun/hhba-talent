@@ -44,6 +44,9 @@ export function endpoint(b) {
  if(b.platform==="ashby")return "https://api.ashbyhq.com/posting-api/job-board/"+encodeURIComponent(b.slug);
  return "https://api.lever.co/v0/postings/"+encodeURIComponent(b.slug)+"?mode=json";
 }
+export function isTalentPool(title){
+ return /^(?:general application|open application|join our talent network|future opportunities|talent community|don.t see the job|don.t see a role|speculative application)(?:$|[\s?!:–—-])/i.test(String(title||"").trim());
+}
 export async function fetchBoard(board){
  const target=endpoint(board);
  for(let attempt=0;attempt<2;attempt++){
@@ -60,9 +63,9 @@ export async function fetchBoard(board){
    const payload=JSON.parse(text);
    const raw=Array.isArray(payload)?payload:Array.isArray(payload?.jobs)?payload.jobs:null;
    if(!raw)throw Error("Invalid job array");
-   const result=raw.slice(0,5000).map(x=>normalize(board,x)).filter(Boolean);
-   if(raw.length>0&&!result.length)throw Error("No validated job URLs");
-   return result;
+   const validated=raw.slice(0,5000).map(x=>normalize(board,x)).filter(Boolean);
+   if(raw.length>0&&!validated.length)throw Error("No validated job URLs");
+   return validated.filter(x=>!isTalentPool(x.title));
   }catch(e){if(attempt>0)throw e;}
  }
  throw Error("ATS_UNAVAILABLE");
