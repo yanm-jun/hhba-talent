@@ -1094,3 +1094,13 @@ void (async()=>{try{
 }catch(e){console.error("HHBA_DOMESTIC_SEARCH_SELFTEST_ERROR",e instanceof Error?e.message:"unknown");}})();
 void load().then(data=>console.log("HHBA_SOURCE_SYNC",JSON.stringify({jobs:data?.rows.length||0,boards:data?.boards||0,failures:data?.failures||0,domesticObserved:domesticObserved.length})))
 .catch(e=>console.error("HHBA_SOURCE_STARTUP_ERROR",e instanceof Error?e.name:"unknown"));
+
+// One-time browser bootstrap syntax probe. Never logs source or job content.
+void (async()=>{try{
+ const response=await fetch("http://127.0.0.1:"+String(Bun.env.PORT||3000)+"/");
+ const html=await response.text();
+ const match=html.match(/<script>([\s\S]*?)<\/script>/i);
+ if(!match)throw Error("Inline search bootstrap missing");
+ try{new Function(match[1]);console.log("HHBA_BROWSER_BOOTSTRAP_PROOF",JSON.stringify({valid:true,jsChars:match[1].length,jobList:html.includes('id="jobs"'),directory:html.includes('id="employer-directory"')}));}
+ catch(e){console.error("HHBA_BROWSER_BOOTSTRAP_PROOF",JSON.stringify({valid:false,error:e instanceof Error?e.message:"unknown"}));}
+}catch(e){console.error("HHBA_BROWSER_BOOTSTRAP_PROOF_ERROR",e instanceof Error?e.message:"unknown");}})();
