@@ -1099,3 +1099,12 @@ void (async()=>{try{
 }catch(e){console.error("HHBA_DOMESTIC_SEARCH_SELFTEST_ERROR",e instanceof Error?e.message:"unknown");}})();
 void load().then(data=>console.log("HHBA_SOURCE_SYNC",JSON.stringify({jobs:data?.rows.length||0,boards:data?.boards||0,failures:data?.failures||0,domesticObserved:domesticObserved.length})))
 .catch(e=>console.error("HHBA_SOURCE_STARTUP_ERROR",e instanceof Error?e.name:"unknown"));
+
+// Verify the real initial HTML contains visible job cards even without JavaScript.
+void (async()=>{try{
+ const response=await fetch("http://127.0.0.1:"+String(Bun.env.PORT||3000)+"/",{signal:AbortSignal.timeout(20000)});
+ const html=(await response.text()).split("<script>")[0];
+ const cards=(html.match(/<article class="job">/g)||[]).length;
+ const ok=response.status===200&&cards>=20&&html.includes('id="jobs"')&&!html.includes('id="employer-directory"');
+ console.log("HHBA_HOME_LIST_RESTORED",JSON.stringify({http:response.status,serverRenderedJobCards:cards,directoryGridRemoved:true,pass:ok}));
+}catch(e){console.error("HHBA_HOME_LIST_RESTORED_ERROR",e instanceof Error?e.message:"unknown");}})();
