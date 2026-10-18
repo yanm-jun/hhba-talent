@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
-import {officialLink,normalize,validateBoards,endpoint} from "../catalog.mjs";
+import {officialLink,normalize,validateBoards,endpoint,isTalentPool} from "../catalog.mjs";
 const registry=JSON.parse(readFileSync(new URL("../boards.json",import.meta.url),"utf8"));
 test("board registry retains baseline 36 and has new candidates",()=>{
  assert.equal(registry.boards.length,40);
@@ -26,4 +26,12 @@ test("normalize only accepts official per-position links",()=>{
 });
 test("source URLs are native read-only job APIs",()=>{
  for(const b of registry.boards)assert.ok(endpoint(b).startsWith("https://"));
+});
+
+test("talent pool placeholders are not counted as specific jobs",()=>{
+ assert.equal(isTalentPool("Don't see the job you're looking for?"),true);
+ assert.equal(isTalentPool("General Application"),true);
+ assert.equal(isTalentPool("Open Application"),true);
+ assert.equal(isTalentPool("Senior Software Engineer"),false);
+ assert.equal(isTalentPool("Marketing Intern"),false);
 });
