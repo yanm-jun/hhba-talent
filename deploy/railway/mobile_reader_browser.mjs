@@ -80,6 +80,12 @@ try{
     const el=document.querySelector('#translated-paragraphs');
     return !!el&&el.textContent.length>40&&/[\u3400-\u9fff]/.test(el.textContent);
    },{timeout:60000}).catch(()=>{});
+   if(target==='spotify'){
+    await page.waitForFunction(()=>{
+     const reader=document.querySelector('#personal-reader');
+     return reader?.dataset.done==='true';
+    },null,{timeout:150000});
+   }
    entry.chineseChars=(await chinese.innerText()).length;
 
    const spacing=await chinese.evaluate(el=>{
@@ -120,7 +126,11 @@ try{
     failures.push({platform,type:'real_browser_chinese_not_readable',id:job.id,
       state:entry.progress});
    if(platform==='ashby')await page.screenshot({path:'browser-evidence/job-zh.png'});
-   if(target==='spotify')await page.screenshot({path:'browser-evidence/spotify-jd-spacing-mobile.png',fullPage:true});
+   if(target==='spotify'){
+    const score=entry.spacing;
+    if(score.blocks<5)failures.push({type:'Spotify_complete_JD_structure_missing',id:job.id,score});
+    await page.screenshot({path:'browser-evidence/spotify-jd-spacing-mobile.png',fullPage:true});
+   }
    await page.locator('#detail-en').click();
    if(platform==='ashby')await page.screenshot({path:'browser-evidence/job-en.png'});
   }catch(err){failures.push({platform,id:job.id,type:'browser_detail_error',error:err.message});}
