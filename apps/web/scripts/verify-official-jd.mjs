@@ -16,10 +16,18 @@ if(String(body.id)!==native||typeof body.content!=='string'||body.content.length
 const readable=body.content.replace(/<[^>]*>/g,' ').replace(/&[a-z]+;/gi,' ').replace(/\s+/g,' ').trim();
 const hasRequirements=/qualification|requirement|experience|skills|ability|responsibilit/i.test(readable);
 if(!hasRequirements)throw Error('Real Airtable JD does not contain recognizable requirements');
+const callback='hhbaOfficialJdProbe';
+const jsonp=new URL(endpoint);
+jsonp.searchParams.set('callback',callback);
+const publicReader=await fetch(jsonp,{redirect:'error',signal:AbortSignal.timeout(12000)});
+if(!publicReader.ok)throw new Error('Official Greenhouse JSONP endpoint unavailable');
+const jsonpText=await publicReader.text();
+if(!jsonpText.trimStart().startsWith(callback+'('))
+  throw new Error('Official Greenhouse API did not honor the JSONP callback');
 const cors=reply.headers.get('access-control-allow-origin')||'NOT_DECLARED';
 console.log('OFFICIAL_JD_SMOKE',JSON.stringify({
   company:selection.company,job_id:selection.id,
   has_full_description:true,html_chars:body.content.length,
   requirement_indicators:true,cors_origin:cors,
-  source:'Greenhouse official board API'
+  jsonp_supported:true,source:'Greenhouse official board API'
 }));
