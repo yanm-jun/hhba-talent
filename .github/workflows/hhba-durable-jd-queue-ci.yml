@@ -21,7 +21,7 @@ jobs:
       - name: Test persistent queue, source version, no false full-translation claims
         working-directory: ops/legacy-marketplace
         run: bun test jd-sync-store.test.mjs jd-sync-runner.test.mjs
-      - name: Verify imported server can bundle with queue dependencies
+      - name: Verify deployed Bun Docker server bundles the persistent worker and queue
         working-directory: ops/legacy-marketplace
         run: |
           bun install
