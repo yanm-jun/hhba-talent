@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {auditSnapshot,compareFeeds} from './audit-all-official-jds.mjs';
+import {auditSnapshot,compareFeeds,compareAudits} from './audit-all-official-jds.mjs';
 const clock=Date.parse('2026-10-19T09:00:00Z');
 const greenhouse=(id,more={})=>({
  id:'greenhouse-airtable-'+id,platform:'greenhouse',source:'airtable',company:'Airtable',
@@ -81,4 +81,21 @@ test('tracks added, disappeared, changed IDs but does not equate missing with co
  assert.equal(x.absent_from_current_feed,1);
  assert.equal(x.changed,1);
  assert.deepEqual(x.absent_ids,['greenhouse-airtable-14']);
+});
+
+test('compares exact official JD hashes instead of relying on list title changes',()=>{
+ const previous={jobs:[
+ {job_id:'j1',jd_sha256:'old-hash',status:'OFFICIAL_JD_AND_REQUIREMENTS_FOUND'},
+ {job_id:'j2',jd_sha256:'same',status:'OFFICIAL_JD_AND_REQUIREMENTS_FOUND'},
+ ]};
+ const current={jobs:[
+ {job_id:'j1',jd_sha256:'new-hash',status:'OFFICIAL_JD_AND_REQUIREMENTS_FOUND'},
+ {job_id:'j2',jd_sha256:'same',status:'OFFICIAL_JD_REQUIREMENTS_UNCLASSIFIED'},
+ {job_id:'j3',jd_sha256:'third',status:'OFFICIAL_JD_AND_REQUIREMENTS_FOUND'},
+ ]};
+ const changes=compareAudits(previous,current);
+ assert.equal(changes.jd_content_changes,1);
+ assert.equal(changes.status_changes,1);
+ assert.equal(changes.newly_audited,1);
+ assert.deepEqual(changes.jd_content_changed_ids,['j1']);
 });
