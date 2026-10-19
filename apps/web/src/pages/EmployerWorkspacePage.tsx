@@ -2,7 +2,7 @@ import {useEffect,useState,type FormEvent} from 'react';
 import {ArrowRight,Building2,ClipboardCheck,FilePlus2,Search,ShieldCheck,Users,XCircle} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
-import {api,ApiError,type EmployerPosting,type EmployerPostingInput,type Organization,type TalentSearchCandidate,type User} from '../services/api';
+import {api,ApiError,employerApiReady,type EmployerPosting,type EmployerPostingInput,type Organization,type TalentSearchCandidate,type User} from '../services/api';
 import '../styles/employer-workspace.css';
 const blank:EmployerPostingInput={title:'',description:'',requirements:'',location:'',work_mode:'onsite',recruitment_type:'SOCIAL',apply_url:''};
 const messages:Record<string,string>={
@@ -26,10 +26,10 @@ export function EmployerWorkspacePage({user}:{user:User|null}){
  const [hasMore,setHasMore]=useState(false);
  const [searched,setSearched]=useState(false);
  const organization=organizations.find(o=>o.id===oid);
- useEffect(()=>{if(!user)return;let cancelled=false;api.organizations().then(r=>{if(cancelled)return;setOrganizations(r.organizations);setOid(r.organizations[0]?.id||'')}).catch(e=>{if(!cancelled)setNotice(readable(e))}).finally(()=>{if(!cancelled)setLoading(false)});return()=>{cancelled=true}},[user]);
- useEffect(()=>{if(!oid){setPostings([]);return}let cancelled=false;setNotice('');setResults([]);setSearched(false);api.postings(oid).then(r=>{if(!cancelled)setPostings(r.items)}).catch(e=>{if(!cancelled)setNotice(readable(e))});return()=>{cancelled=true}},[oid]);
+ useEffect(()=>{if(!user||!employerApiReady)return;let cancelled=false;api.organizations().then(r=>{if(cancelled)return;setOrganizations(r.organizations);setOid(r.organizations[0]?.id||'')}).catch(e=>{if(!cancelled)setNotice(readable(e))}).finally(()=>{if(!cancelled)setLoading(false)});return()=>{cancelled=true}},[user]);
+ useEffect(()=>{if(!oid||!employerApiReady){setPostings([]);return}let cancelled=false;setNotice('');setResults([]);setSearched(false);api.postings(oid).then(r=>{if(!cancelled)setPostings(r.items)}).catch(e=>{if(!cancelled)setNotice(readable(e))});return()=>{cancelled=true}},[oid]);
  async function refresh(){if(!oid)return;const r=await api.postings(oid);setPostings(r.items)}
- async function save(e:FormEvent){e.preventDefault();if(!oid)return;setBusy(true);setNotice('');
+ async function save(e:FormEvent){e.preventDefault();if(!employerApiReady){setNotice('当前为静态预览，企业业务服务器未连接，无法保存岗位。');return}if(!oid)return;setBusy(true);setNotice('');
   try{
    if(editing)await api.updatePosting(oid,editing,form);else await api.createPosting(oid,form);
    await refresh();setForm(blank);setEditing(null);setNotice('岗位草稿已私密保存。只有认证完成并经平台审核后才能公开。');
@@ -45,7 +45,7 @@ export function EmployerWorkspacePage({user}:{user:User|null}){
  function change<K extends keyof EmployerPostingInput>(key:K,value:EmployerPostingInput[K]){setForm(prev=>({...prev,[key]:value}))}
  function edit(post:EmployerPosting){setEditing(post.id);setForm({title:post.title,description:post.description,requirements:post.requirements,location:post.location,work_mode:post.work_mode,recruitment_type:post.recruitment_type,apply_url:post.apply_url});setTab('jobs');window.scrollTo({top:0,behavior:'smooth'})}
  async function findTalents(nextPage=1){
-  if(!oid)return;
+  if(!employerApiReady){setNotice('当前是界面预览，认证企业人才搜索尚未上线。');return}if(!oid)return;
   const parsedSkills=search.skills.split(/[，,、]/).map(s=>s.trim()).filter(Boolean).slice(0,8);
   if(!search.keywords.trim()&&!parsedSkills.length&&!search.industry.trim()&&!search.region.trim()&&!search.work_mode&&search.min===''&&search.max===''){
    setNotice('请至少填写关键词、技能或一项筛选条件。');return;
@@ -56,18 +56,19 @@ export function EmployerWorkspacePage({user}:{user:User|null}){
    setResults(r.items);setPage(r.page);setHasMore(r.has_more);setSearched(true);
   }catch(e){setResults([]);setHasMore(false);setSearched(false);setNotice(readable(e))}finally{setBusy(false)}
  }
- if(!user){navigate('/recruiter/login?next='+encodeURIComponent('/employer/workspace'));return null}
+ if(!user&&employerApiReady){navigate('/recruiter/login?next='+encodeURIComponent('/employer/workspace'));return null}
  return <Shell user={user}><main className="employer-workspace">
   <div className="employer-ws-top"><span className="page-kicker">HHBA 企业招聘工作台</span><h1>发布真实岗位，寻找已授权的人才。</h1>
    <p>先完成企业主体和招聘经办人认证。岗位需经平台审核才会对外发布，人才搜索只返回明确同意企业检索的候选人。</p></div>
+  {!employerApiReady&&<section className="employer-ws-offline" role="status"><ShieldCheck size={20}/><div><strong>企业功能预览版 · 暂未连接正式业务服务器</strong><p>现在可以查看企业认证、岗位发布、人才检索的页面结构；真实提交、人工审核和授权人才数据查询尚未开放。不会生成模拟数据。</p></div></section>}
   <div className="employer-ws-company"><Building2 size={20}/><label>当前企业
    <select value={oid} onChange={e=>setOid(e.target.value)} disabled={loading}>{organizations.length?organizations.map(o=><option key={o.id} value={o.id}>{o.legal_name}</option>):<option value="">暂未创建企业组织</option>}</select></label>
-   <span className="employer-ws-status">{organization?.status==='approved'?'企业组织已审核':'企业组织尚未审核通过'}</span>
+   <span className="employer-ws-status">{!employerApiReady?'企业资料未连接':organization?.status==='approved'?'企业组织已审核':'企业组织尚未审核通过'}</span>
    <Link to="/recruiter/onboarding">办理或查看企业认证 <ArrowRight size={14}/></Link>
    {user.role==='admin'&&<Link to="/admin/employer-review">进入管理员审核台 →</Link>}
   </div>
-  {!oid&&<section className="employer-ws-empty"><ShieldCheck size={24}/><h2>先完成企业主体信息</h2><p>企业招聘经办人先注册、提交营业执照和招聘授权材料，审核通过后才能提交公开职位及检索授权人才。</p><Link to="/recruiter/onboarding">开始认证企业 →</Link></section>}
-  {oid&&<>
+  {!oid&&employerApiReady&&<section className="employer-ws-empty"><ShieldCheck size={24}/><h2>先完成企业主体信息</h2><p>企业招聘经办人先注册、提交营业执照和招聘授权材料，审核通过后才能提交公开职位及检索授权人才。</p><Link to="/recruiter/onboarding">开始认证企业 →</Link></section>}
+  {(oid||!employerApiReady)&&<>
    <nav className="employer-ws-tabs" aria-label="企业工作台功能">
     <button className={tab==='jobs'?'active':''} onClick={()=>setTab('jobs')}><FilePlus2 size={17}/> 岗位发布与管理</button>
     <button className={tab==='talent'?'active':''} onClick={()=>setTab('talent')}><Users size={17}/> 授权人才搜索</button>
@@ -83,7 +84,7 @@ export function EmployerWorkspacePage({user}:{user:User|null}){
      <label>岗位职责<textarea required minLength={40} maxLength={8000} rows={5} value={form.description} onChange={e=>change('description',e.target.value)} placeholder="填写真实职责，不得伪造工作地点、薪资或招聘主体。"/></label>
      <label>任职要求<textarea required minLength={20} maxLength={8000} rows={5} value={form.requirements} onChange={e=>change('requirements',e.target.value)} placeholder="明确学历、经验、技能、证书等确实需要的条件。"/></label>
      <label>官方投递地址<input required type="url" minLength={12} maxLength={1000} pattern="https://.*" value={form.apply_url} onChange={e=>change('apply_url',e.target.value)} placeholder="https://careers.example.com/job/123"/></label>
-     <div className="employer-ws-actions"><button className="primary-button" disabled={busy}>{busy?'正在保存…':'保存私密岗位草稿'}</button>{editing&&<button type="button" className="text-button" onClick={()=>{setEditing(null);setForm(blank)}}>取消编辑</button>}</div>
+     <div className="employer-ws-actions"><button className="primary-button" disabled={!employerApiReady||!oid||busy}>{busy?'正在保存…':employerApiReady?'保存私密岗位草稿':'待连接企业 API 后开放保存'}</button>{editing&&<button type="button" className="text-button" onClick={()=>{setEditing(null);setForm(blank)}}>取消编辑</button>}</div>
     </form>
     <section className="employer-ws-card">
      <div className="employer-ws-card-heading"><ClipboardCheck size={19}/><div><h2>企业岗位列表</h2><p>草稿 → 平台审核 → 公开发布 → 到期或关闭</p></div></div>
@@ -103,7 +104,7 @@ export function EmployerWorkspacePage({user}:{user:User|null}){
      <label>地区<input value={search.region} onChange={e=>setSearch({...search,region:e.target.value})} placeholder="例如：山东"/></label>
      <label>工作方式<select value={search.work_mode} onChange={e=>setSearch({...search,work_mode:e.target.value})}><option value="">全部</option><option value="全职">全职</option><option value="远程">远程</option><option value="短期项目">短期项目</option></select></label>
      <div className="employer-ws-two"><label>最少工作年限<input type="number" min="0" max="80" value={search.min} onChange={e=>setSearch({...search,min:e.target.value})}/></label><label>最多工作年限<input type="number" min="0" max="80" value={search.max} onChange={e=>setSearch({...search,max:e.target.value})}/></label></div>
-     <button className="primary-button" disabled={busy}>{busy?'正在授权检索…':'检索符合条件的人才'}</button>
+     <button className="primary-button" disabled={!employerApiReady||!oid||busy}>{busy?'正在授权检索…':employerApiReady?'检索符合条件的人才':'待企业业务服务上线后开放检索'}</button>
     </form>
     {searched&&<div className="employer-ws-results"><h3>授权检索结果 · 当前第 {page} 页</h3>{results.length===0?<p className="employer-ws-muted">没有符合当前条件且授权企业检索的候选人。请调整筛选，不能扩大至未授权简历。</p>:results.map(candidate=><article className="employer-ws-person" key={candidate.candidate_ref}>
       <strong>{candidate.display_name||'已授权候选人'}</strong><span>{candidate.headline||'暂未提供职业简介'}</span>
