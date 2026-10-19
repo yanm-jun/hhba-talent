@@ -209,7 +209,7 @@ async function readGreenDetail(job:LiveJob,signal:AbortSignal):Promise<OfficialJ
   if(!response.ok)throw new Error('原市场详情服务暂不可用');
   const body=await response.json();
   if(body?.job?.id!==job.id || body?.status!=='LIVE_CONTENT' || typeof body.description!=='string' ||
-     body.description.length<1 || body.description.length>30_000)throw new Error('原市场官方 JD 核对失败');
+     body.description.length<1 || body.description.length>100_000)throw new Error('原市场官方 JD 核对失败');
   // Match source posting identity; do not show a description from another job.
   const source=new URL(body.job.url),expected=new URL(job.url);
   if(!sameOfficialPosting(source.href,expected.href))
@@ -221,7 +221,7 @@ async function readGreenDetail(job:LiveJob,signal:AbortSignal):Promise<OfficialJ
 }
 export async function translateGreenJd(job:LiveJob,originalText:string,signal:AbortSignal,
   onProgress?:(done:number,total:number)=>void):Promise<string> {
-  if(originalText.length>30_000)throw new Error('岗位原文超过翻译服务限制');
+  if(originalText.length>100_000)throw new Error('岗位原文超过翻译服务限制');
   const sha=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(originalText));
   const hash=[...new Uint8Array(sha)].map(v=>v.toString(16).padStart(2,'0')).join('');
   const cacheKey='hhba-jd-zh:'+job.id+':'+hash;
@@ -230,23 +230,40 @@ export async function translateGreenJd(job:LiveJob,originalText:string,signal:Ab
     if(cached&&/[\u3400-\u9fff]/u.test(cached))return cached;
   }catch{}
   const translated:string[]=[];let total=1;
+  const maxAttempts=3;
   for(let part=0;part<total;part++){
     if(signal.aborted)throw new DOMException('Aborted','AbortError');
-    const response=await fetch(GREEN_SITE+'/api/jobs/'+encodeURIComponent(job.id)+'/translate-part',{
-      method:'POST',mode:'cors',credentials:'omit',redirect:'error',signal,
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({part,sourceHash:hash})
-    });
-    if(!response.ok)throw new Error(response.status===409?
+    let response:Response|null=null;
+    for(let attempt=0;attempt<maxAttempts;attempt++){
+      response=await fetch(GREEN_SITE+'/api/jobs/'+encodeURIComponent(job.id)+'/translate-part',{
+        method:'POST',mode:'cors',credentials:'omit',redirect:'error',signal,
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({part,sourceHash:hash})
+      });
+      if(response.status!==429 && response.status!==502 && response.status!==503)break;
+      if(attempt===maxAttempts-1)break;
+      await new Promise<void>((resolve,reject)=>{
+        if(signal.aborted)return reject(new DOMException('Aborted','AbortError'));
+        const timer=setTimeout(()=>{signal.removeEventListener('abort',stop);resolve()},Math.min(2400,700*(attempt+1)));
+        const stop=()=>{clearTimeout(timer);reject(new DOMException('Aborted','AbortError'))};
+        signal.addEventListener('abort',stop,{once:true});
+      });
+    }
+    if(!response?.ok)throw new Error(response?.status===409?
       '官方 JD 在翻译过程中已更新，请刷新页面':
       '中文翻译暂时不可用，请稍后重试或阅读官方英文原文');
     const data=await response.json();
     if(data.jobId!==job.id || data.part!==part || data.sourceHash!==hash ||
-      !Number.isInteger(data.total) || data.total<1 || data.total>80 ||
+      !Number.isInteger(data.total) || data.total<1 || data.total>150 ||
       typeof data.text!=='string' || data.numbersVerified!==true ||
       !/[\u3400-\u9fff]/u.test(data.text))throw new Error('翻译校验未通过');
     if(part===0)total=data.total;
     else if(total!==data.total)throw new Error('翻译时岗位正文发生变化');
+    // One English source chunk must have one valid Chinese counterpart.
+    // Keep an incomplete job out of the "fully translated" count.
+    if(data.text.trim().length<3 || /\uFFFD/.test(data.text) || 
+       /(?:[A-Za-z]{3,}\s+){12,}[A-Za-z]{3,}/.test(data.text))
+       throw new Error('检测到不完整或乱码译文，此岗位不计为完成');
     translated.push(data.text);
     onProgress?.(part+1,total);
   }
