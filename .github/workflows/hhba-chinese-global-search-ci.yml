@@ -1,0 +1,46 @@
+name: HHBA Chinese Global Job Search CI
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-chinese-global-search-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/chinese-structured-jobs-search-20261019
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Test natural Chinese query, country, city, recruitment type, official degree and experience
+        working-directory: apps/web
+        run: node --test scripts/job-search-facets.test.mjs scripts/audit-all-official-jds.test.mjs
+      - name: Install exact white HHBA dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Build white React HHBA and verify TypeScript integration
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+        run: npm run build
+      - name: Check new structured facets connected to source audit and white search
+        run: |
+          node -e "
+          const fs=require('fs');
+          const a=fs.readFileSync('apps/web/scripts/audit-all-official-jds.mjs','utf8');
+          const s=fs.readFileSync('apps/web/src/services/liveRecruitment.ts','utf8');
+          const ui=fs.readFileSync('apps/web/src/components/UnifiedJobMarket.tsx','utf8');
+          if(!a.includes('job-search-facets.json')||!a.includes('searchFacts(job,rawContent)'))throw Error('Official JD metadata not generated');
+          if(!s.includes('searchJobs(current')&&!s.includes('searchPreview(current,filters,offset,index.facets)'))throw Error('Full structured search not connected to marketplace');
+          for(const key of ['filters.location_country','filters.city','filters.education','filters.experience','parseNaturalQuery'])
+            if(!ui.includes(key))throw Error('Missing UI search filter '+key);
+          console.log('HHBA_CHINESE_SEARCH_CONTRACT_PASS');
+          "
