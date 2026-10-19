@@ -7,7 +7,8 @@ type Job={id:string;company:string;title:string;location:string;remote:boolean|n
 
 import { Database } from "bun:sqlite";
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync } from "node:fs";
+import { mkdirSync, readFileSync, existsSync } from "node:fs";
+import { openJobSyncStore } from "./jd-sync-store.mjs";
 const phrases:[string,string][]=[
  ["Integration Technician","集成技术员"],["Test Technician","测试技术员"],
  ["Manufacturing Engineer","制造工程师"],["Supply Chain Manager","供应链经理"],
@@ -1120,6 +1121,19 @@ async function ensureChineseProse(value:string):Promise<string|null>{
 
 const JD_READER_SIZE=900;
 const JD_READER_MAX_CHARS=100000;
+const JD_SYNC_DAILY_CHUNKS=Math.max(1,Math.min(2000,Number.parseInt(Bun.env.HHBA_JD_SYNC_DAILY_CHUNKS||"180",10)||180));
+const JD_SYNC_INTERVAL_MS=90_000;
+let durableJobStore:ReturnType<typeof openJobSyncStore>|null=null;
+let lastCatalogRefresh=0;
+let backgroundJdBusy=false;
+try{
+ // Enforce volume mount existence: never count ephemeral container storage as durable.
+ if(Bun.env.HHBA_JD_SYNC_ENABLED==="1"&&existsSync("/sync-state"))
+   durableJobStore=openJobSyncStore("/sync-state/overseas-jd.sqlite");
+ else if(Bun.env.HHBA_JD_SYNC_ENABLED==="1")
+   console.warn("HHBA_JD_SYNC_DISABLED_NO_PERSISTENT_VOLUME");
+}catch(error){console.error("HHBA_JD_SYNC_DATABASE_UNAVAILABLE",error instanceof Error?error.message:"unknown");}
+
 // In-memory private, short-lived translation cache keyed by exact official JD hash.
 // No full third-party JD or unlicensed translations are exported to Pages or GitHub.
 const readerChunkCache=new Map<string,{text:string,at:number,total:number}>();
@@ -1219,6 +1233,16 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
   const chunks=jdChunks(english);
   if(chunks.length>150)return Response.json({error:"source_too_many_parts"},{status:422,headers});
   if(part>=chunks.length)return Response.json({error:"part_out_of_range"},{status:404,headers});
+  if(durableJobStore){
+    try{
+      durableJobStore.sourceVersion(job.id,digest,chunks.length);
+      const persistent=durableJobStore.cachedPart(job.id,digest,part,chunks.length);
+      if(persistent)return Response.json({
+        jobId:job.id,part,total:chunks.length,text:persistent,sourceHash:digest,
+        numbersVerified:true,sourceUrl:job.url,mode:"private_versioned_cached_translation",cached:true
+      },{headers});
+    }catch(e){console.warn("HHBA_DURABLE_TRANSLATION_READ",e instanceof Error?e.message:"unknown");}
+  }
   const cacheKey=createHash("sha256").update(job.id+"\0"+digest+"\0"+part).digest("hex");
   pruneReaderCache();
   const cached=readerChunkCache.get(cacheKey);
@@ -1251,6 +1275,10 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
    translated.push(mark+numberSafe.trim());
   }
   const text=translated.join("\n\n");
+  if(durableJobStore){
+    try{durableJobStore.saveVerifiedPart(job.id,digest,part,chunks.length,text);}
+    catch(e){console.warn("HHBA_DURABLE_TRANSLATION_WRITE",e instanceof Error?e.message:"unknown");}
+  }
   readerChunkCache.set(cacheKey,{text,at:Date.now(),total:chunks.length});
   markReaderPart(job.id+":"+digest,job.id,part,chunks.length);
   pruneReaderCache();
@@ -1289,6 +1317,12 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
     readerJobsPartiallyTranslatedInMemory:[...readerJobProgress.values()].filter(v=>v.parts.size<v.total).length,
     readerEphemeralCache:true,readerCacheHours:2,
     readerLimitCharacters:JD_READER_MAX_CHARS,
+    backgroundFullJdSync:durableJobStore?durableJobStore.coverage():{
+      kind:"HHBA_OVERSEAS_JD_SYNC_V1",enabled:false,
+      reason:"PRIVATE_PERSISTENT_VOLUME_NOT_CONNECTED",
+      complete:0,total_current:0
+    },
+    backgroundFullJdDailyChunkLimit:JD_SYNC_DAILY_CHUNKS,
     searchLanguages:["zh","en"]},{headers});
  }
  if(u.pathname==="/api/jobs/page"){
