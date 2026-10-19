@@ -27,13 +27,26 @@ const allowedHost: Record<string,string[]> = {
   greenhouse: ['boards.greenhouse.io','boards.eu.greenhouse.io','job-boards.greenhouse.io'],
   lever: ['jobs.lever.co','jobs.eu.lever.co'],
 };
+const BRANDED_GREENHOUSE={
+ stripe:{host:'stripe.com',path:'/jobs/search'},
+ coinbase:{host:'www.coinbase.com',path:'/careers/positions/'},
+ airbnb:{host:'careers.airbnb.com',path:'/positions/'},
+ databricks:{host:'databricks.com',path:'/company/careers/open-positions/job'}
+};
 export function safeOfficialJobUrl(job: LiveJob) {
   try {
     const u = new URL(job.url);
     if(u.protocol !== 'https:' || u.username || u.password || u.port) return null;
     if (!job.domestic) {
       const hosts = allowedHost[String(job.platform||'').toLowerCase()] || [];
-      if (!hosts.includes(u.hostname) || !u.pathname.split('/').includes(job.source||'')) return null;
+      const standard=hosts.includes(u.hostname) && u.pathname.split('/').includes(job.source||'');
+      const branded=job.platform==='greenhouse'?BRANDED_GREENHOUSE[job.source||'']:null;
+      const prefix='greenhouse-'+job.source+'-';
+      const native=job.id.startsWith(prefix)?job.id.slice(prefix.length):'';
+      const corporate=!!branded && /^[0-9]{5,20}$/.test(native) && u.hostname===branded.host &&
+        (branded.path.endsWith('/')?u.pathname.startsWith(branded.path):u.pathname===branded.path) &&
+        u.searchParams.get('gh_jid')===native;
+      if(!standard&&!corporate)return null;
     } else {
       const domesticHosts: Record<string,string> = {
         'xiaomi-official': 'xiaomi.jobs.f.mioffice.cn',
