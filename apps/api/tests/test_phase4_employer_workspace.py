@@ -20,7 +20,7 @@ def organ(client,csrf):
  r=client.post('/api/v1/organizations',json={'legal_name':'合成企业 '+uuid.uuid4().hex[:6]},headers={'X-CSRF-Token':csrf})
  assert r.status_code==201,r.text
  return r.json()['id']
-POST={'title':'区域渠道销售经理','description':'负责本区域终端门店运营，销售线索转化和培训协同，以及每周复盘与业务流程优化。',
+POST={'title':'区域渠道销售经理','description':'负责本区域终端门店运营，销售线索转化和培训协同，以及每周复盘与业务流程优化，并定期组织门店人员产品培训，分析客户反馈并推动业务持续改进。',
       'requirements':'要求有销售培训、区域运营的工作经历，能够进行日常数据分析和沟通。',
       'location':'山东济南','work_mode':'onsite','recruitment_type':'SOCIAL',
       'apply_url':'https://recruit.example.org/careers/job/100'}
