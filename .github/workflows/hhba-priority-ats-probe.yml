@@ -1,0 +1,30 @@
+name: HHBA Priority Brand Official ATS Verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-priority-ats-probe.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe-brands:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/ats-first-brand-expansion-20261019
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify official recruitment board and full original JD for every priority employer
+        working-directory: apps/web
+        run: node scripts/probe-priority-ats.mjs
+      - name: Retain validation evidence, do not publish guessed jobs
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-priority-ats-official-boards
+          path: apps/web/dist/data/priority-ats-probe.json
+          retention-days: 30
+          if-no-files-found: error
