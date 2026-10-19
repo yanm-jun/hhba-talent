@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
-      - name: Build bilingual HHBA with live persistent overseas JD translation progress
+      - name: Build HHBA bilingual JD and official source grounded Chinese natural job search
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
@@ -38,12 +38,30 @@ jobs:
       - name: Refresh complete white HHBA job index from 50 verified official ATS boards
         working-directory: apps/web
         run: node scripts/prepare-pages-jobs.mjs
-      - name: Verify full-audit regression cases
+      - name: Verify official JD and Chinese structured search regression cases
         working-directory: apps/web
-        run: node --test scripts/audit-all-official-jds.test.mjs
+        run: node --test scripts/audit-all-official-jds.test.mjs scripts/job-search-facets.test.mjs
       - name: Audit ALL jobs, compare official JD changes and verify requirements
         working-directory: apps/web
         run: node scripts/audit-all-official-jds.mjs
+      - name: Validate all-job source-grounded search metadata and its exact feed timestamp
+        working-directory: apps/web
+        run: |
+          node -e "
+          const fs=require('fs');
+          const feed=JSON.parse(fs.readFileSync('dist/data/jobs.json','utf8'));
+          const facets=JSON.parse(fs.readFileSync('dist/data/job-search-facets.json','utf8'));
+          if(facets.kind!=='HHBA_OFFICIAL_JD_SEARCH_FACETS_V1'||facets.indexed_as_of!==feed.updated)
+            throw Error('SEARCH_METADATA_SNAPSHOT_MISMATCH');
+          if(facets.total_indexed_jobs!==feed.total||facets.jobs.length!==facets.extracted_count)
+            throw Error('SEARCH_METADATA_INCOMPLETE');
+          if(facets.extracted_count<8000)throw Error('MISSING_GLOBAL_ATS_SEARCH_FACETS');
+          if(facets.jobs.some(j=>typeof j.original_source_hash!=='string'||j.original_source_hash.length!==64))
+            throw Error('INVALID_OFFICIAL_JD_EVIDENCE_HASH');
+          console.log('HHBA_REAL_GLOBAL_SEARCH_FACETS',JSON.stringify({
+            indexed:feed.total,officialJdFacets:facets.extracted_count,updated:feed.updated
+          }));
+          "
       - name: Preserve per-job evidence states without copying copyrighted JD
         uses: actions/upload-artifact@v4
         with:
@@ -51,6 +69,7 @@ jobs:
           path: |
             apps/web/dist/data/job-sync-status.json
             apps/web/dist/data/job-sync-summary.json
+            apps/web/dist/data/job-search-facets.json
           retention-days: 30
           if-no-files-found: error
       - name: Verify Airtable official JD and the green Chinese reader bridge
