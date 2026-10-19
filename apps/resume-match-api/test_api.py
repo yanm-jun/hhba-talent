@@ -67,7 +67,7 @@ class MatcherSecurityTests(unittest.TestCase):
  def test_unknown_degree_is_never_called_unrestricted(self):
   p=rank_official_jobs(PROFILE,[ROLE],{ROLE_ID:{**FACET,"education":None}},{ROLE_ID:AUDIT})
   self.assertEqual(len(p),1)
-  self.assertTrue(any("不代表不限学历" in text for text in p[0]["needs_verification"]))
+  self.assertTrue(any("不能当作不限学历" in text for text in p[0]["needs_verification"]))
 
  def test_official_hash_mismatch_or_fake_employer_link_cannot_recommend(self):
   self.assertEqual(rank_official_jobs(PROFILE,[ROLE],
