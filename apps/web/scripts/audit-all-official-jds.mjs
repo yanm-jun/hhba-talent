@@ -198,6 +198,21 @@ export function compareFeeds(previous,current){
  return {added:added.length,absent_from_current_feed:absent.length,changed:changed.length,
   absent_ids:absent.slice(0,20000),changed_ids:changed.slice(0,20000)};
 }
+export function compareAudits(previous,current){
+ const oldRows=new Map((previous?.jobs||[]).filter(x=>x?.job_id).map(x=>[x.job_id,x]));
+ const changed=[],statusChanged=[],newlyChecked=[];
+ for(const item of (current?.jobs||[])){
+  const prior=oldRows.get(item.job_id);
+  if(!prior){newlyChecked.push(item.job_id);continue;}
+  if(item.jd_sha256 && prior.jd_sha256 && item.jd_sha256!==prior.jd_sha256)
+   changed.push(item.job_id);
+  if(item.status!==prior.status)statusChanged.push(item.job_id);
+ }
+ return {jd_content_changes:changed.length,status_changes:statusChanged.length,
+  newly_audited:newlyChecked.length,
+  jd_content_changed_ids:changed,
+  status_changed_ids:statusChanged};
+}
 async function main(){
  const dir=resolve(process.env.HHBA_AUDIT_DIST||'dist');
  const json=JSON.parse(await readFile(resolve(dir,'data','jobs.json'),'utf8'));
@@ -207,11 +222,17 @@ async function main(){
   const previous=await getJson('https://yanm-jun.github.io/hhba-talent/data/jobs.json',{retries:0});
   feedDiff=compareFeeds(previous,json);
  }catch{feedDiff={warning:'PREVIOUS_FEED_UNAVAILABLE'};}
- const safe={...report,feed_change:feedDiff};
+ let contentDiff=null;
+ try{
+  const previousAudit=await getJson('https://yanm-jun.github.io/hhba-talent/data/job-sync-status.json',{retries:0});
+  if(previousAudit?.summary?.kind==='HHBA_OFFICIAL_FULL_JOB_JD_AUDIT_V1')
+    contentDiff=compareAudits(previousAudit,report);
+ }catch{contentDiff={warning:'PREVIOUS_JD_AUDIT_NOT_AVAILABLE'};}
+ const safe={...report,feed_change:feedDiff,jd_content_change:contentDiff};
  await mkdir(resolve(dir,'data'),{recursive:true});
  await writeFile(resolve(dir,'data','job-sync-status.json'),JSON.stringify(safe),'utf8');
  await writeFile(resolve(dir,'data','job-sync-summary.json'),JSON.stringify({...report.summary,
-   source_failures:report.source_failures,feed_change:feedDiff}),'utf8');
+   source_failures:report.source_failures,feed_change:feedDiff,jd_content_change:contentDiff}),'utf8');
  console.log('HHBA_ALL_JOBS_OFFICIAL_JD_AUDIT',JSON.stringify({
   total:report.summary.total_indexed_jobs,
   official_full_details:report.summary.verified_full_original_jd_and_requirements,
@@ -219,6 +240,7 @@ async function main(){
   source_failures:report.summary.official_ats_board_failures,
   statuses:report.summary.statuses,
   feed_change:feedDiff?{added:feedDiff.added,absent:feedDiff.absent_from_current_feed,changed:feedDiff.changed}:null,
+  jd_content_changed:typeof contentDiff?.jd_content_changes==='number'?contentDiff.jd_content_changes:null,
   output:'metadata-only status report'
  }));
 }
