@@ -22,7 +22,9 @@ jsonp.searchParams.set('callback',callback);
 const publicReader=await fetch(jsonp,{redirect:'error',signal:AbortSignal.timeout(12000)});
 if(!publicReader.ok)throw new Error('Official Greenhouse JSONP endpoint unavailable');
 const jsonpText=await publicReader.text();
-if(!jsonpText.trimStart().startsWith(callback+'('))
+const prefix=jsonpText.trim().replace(/^\/\*[\s\S]*?\*\/\s*/, '');
+console.log('OFFICIAL_JSONP_PROBE',JSON.stringify({contentType:publicReader.headers.get('content-type'),firstCharacters:prefix.slice(0,70),length:jsonpText.length}));
+if(!prefix.startsWith(callback+'('))
   throw new Error('Official Greenhouse API did not honor the JSONP callback');
 const cors=reply.headers.get('access-control-allow-origin')||'NOT_DECLARED';
 console.log('OFFICIAL_JD_SMOKE',JSON.stringify({
