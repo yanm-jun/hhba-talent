@@ -242,6 +242,13 @@ const additionalDomesticJobs:Job[]=reviewedRows.map(([company,id,title,city,kind
 });
 type Board={platform:"greenhouse"|"ashby"|"lever";company:string;slug:string};
 const boards:Board[]=[
+ // Audited 2026-10-19 against public original ATS board+job+description URLs.
+ {platform:"greenhouse",company:"SpaceX",slug:"spacex"},
+ {platform:"greenhouse",company:"SpaceX Global",slug:"spacexglobal"},
+ {platform:"greenhouse",company:"Anthropic",slug:"anthropic"},
+ {platform:"greenhouse",company:"DoorDash",slug:"doordashusa"},
+ {platform:"ashby",company:"Deepgram",slug:"deepgram"},
+ {platform:"ashby",company:"Cohere",slug:"cohere"},
  {platform:"greenhouse",company:"Greenhouse",slug:"greenhouse"},
  {platform:"ashby",company:"Ashby",slug:"ashby"},
  {platform:"lever",company:"Spotify",slug:"spotify"},
