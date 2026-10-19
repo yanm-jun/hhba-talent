@@ -95,7 +95,7 @@ export function openJobSyncStore(file,{now=()=>Date.now(),root="/sync-state"}={}
  }
  function release(id){
   verify(id);
-  db.query("UPDATE jobs SET state=CASE WHEN hash IS NULL THEN 'QUEUED' ELSE 'TRANSLATING' END,lease_ms=0 WHERE id=? AND state='WORKING'").run(id);
+  db.query("UPDATE jobs SET state=CASE WHEN hash IS NULL THEN 'QUEUED' ELSE 'TRANSLATING' END,lease_ms=0,attempts=0 WHERE id=? AND state='WORKING'").run(id);
  }
  function cleanup(){
   const ts=now();
