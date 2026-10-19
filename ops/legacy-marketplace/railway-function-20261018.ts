@@ -673,6 +673,45 @@ function numbersRetained(original:string,translated:string):boolean{
   return Number.isFinite(numeric)&&expressed.includes(String(numeric));
  });
 }
+/**
+ * Numeral-safe fallback for MT that spelled a source digit in Chinese.
+ * Never invent numerical values: only attach source-observed numbers and only
+ * if no extra, contradictory Arabic-number value appears in the translation.
+ * A visible "official original numbers" note avoids implying that a unit was
+ * reliably placed into the translated sentence.
+ */
+function preserveOfficialNumbers(source:string,translated:string):string|null{
+ if(numbersRetained(source,translated))return translated;
+ const originals=numberTokens(source);
+ if(!originals.length)return translated;
+ const asValue=(token:string)=>{
+  const percent=/%|％/.test(token);
+  const amount=Number(token.replace(/[,％%]/g,""));
+  return Number.isFinite(amount)?{amount,percent}:null;
+ };
+ const originalValues=originals.map(asValue);
+ const permitted=(token:string)=>{
+  const target=asValue(token);
+  if(!target)return false;
+  if(originalValues.some(x=>x && x.percent===target.percent && x.amount===target.amount))
+    return true;
+  // 50万 is an equivalent formatting of an official 500,000, not a new value.
+  const factors:Record<string,number>={"千":1000,"万":10000,"亿":100000000,"百万":1000000};
+  if(target.percent)return false;
+  for(const match of translated.matchAll(/(\d+(?:\.\d+)?)\s*(?:多|余)?\s*(百万|千|万|亿)/g)){
+   if(match[1]===token && originalValues.some(x=>x && !x.percent &&
+     x.amount===Number(match[1])*factors[match[2]]))return true;
+  }
+  return false;
+ };
+ if(numberTokens(translated).some(token=>!permitted(token)))return null;
+ const missing=originals.filter(token=>!numbersRetained(token,translated));
+ if(!missing.length)return translated;
+ if(missing.length>8)return null;
+ const unique=[...new Set(missing)];
+ const result=translated.trimEnd()+"\n（官网原文数字核对："+unique.join("、")+"）";
+ return numbersRetained(source,result)?result:null;
+}
 async function machineTranslations(kind:"title"|"jd",sources:string[]):Promise<(string|null)[]|null>{
  const url=privateTranslatorUrl();
  if(!url||sources.length<1||sources.length>8)return null;
@@ -1192,9 +1231,10 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
    if(!chinese)return Response.json({error:"translation_incomplete",part,total:chunks.length},{status:503,headers});
    const corrected=stabilizeEmployerTerminology(job.company,restoreGroupedNumbers(source,chinese));
    if(hasLeakedJdTags(corrected))return Response.json({error:"translation_markup_leak",part,total:chunks.length},{status:503,headers});
-   if(!numbersRetained(source,corrected))return Response.json({error:"translation_numbers_mismatch",part,total:chunks.length},{status:503,headers});
+   const numberSafe=preserveOfficialNumbers(source,corrected);
+   if(!numberSafe)return Response.json({error:"translation_numbers_mismatch",part,total:chunks.length},{status:503,headers});
    const mark=segments[i].kind==="heading"?"# ":segments[i].kind==="bullet"?"- ":"";
-   translated.push(mark+corrected.trim());
+   translated.push(mark+numberSafe.trim());
   }
   const text=translated.join("\n\n");
   readerChunkCache.set(cacheKey,{text,at:Date.now(),total:chunks.length});
