@@ -28,7 +28,7 @@ test('only exact overseas ATS IDs and valid HTTPS source enter queue',t=>{
 test('hash versioning, encrypted/private volume namespace and durable recovery',t=>{
  const {store,root}=setup(t);
  store.catalogSync(entries,{complete:true});
- assert.equal(store.sourceVersion(entries[0].id,hash('a'),2).changed,true);
+ assert.equal(store.sourceVersion(entries[0].id,hash('a'),2).source_changed,true);
  assert.deepEqual(store.saveVerifiedPart(entries[0].id,hash('a'),0,2,'岗位职责：完成系统开发'),{done:1,total:2,complete:false});
  assert.equal(store.cachedPart(entries[0].id,hash('a'),0,2),'岗位职责：完成系统开发');
  assert.equal(store.coverage().complete,0);
