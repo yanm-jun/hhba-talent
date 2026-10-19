@@ -7,12 +7,15 @@ from __future__ import annotations
 import asyncio
 import io
 import ipaddress
+import hashlib
+import secrets
+import sqlite3
 import json
 import logging
 import os
 import re
 import time
-from collections import defaultdict
+from pathlib import Path
 from datetime import datetime, timezone
 from typing import Annotated
 from urllib.parse import urlsplit
@@ -55,13 +58,34 @@ app.add_middleware(
     allow_headers=["Content-Type"], allow_credentials=False, max_age=600
 )
 
-# One-worker launch; process-local budget is a safety stop for pilot traffic.
-# Production requires persistent global counters and verified candidate accounts / anti-bot.
+# Public beta is OFF until the administrator explicitly enables it.
+# In addition to one platform-owned DeepSeek key, requests require a writable
+# persistent SQLite quota volume. The key is NEVER returned to the browser.
+MATCH_PUBLIC_ENABLED = os.getenv("HHBA_MATCH_PUBLIC_ENABLED", "0") == "1"
+QUOTA_DB_PATH = os.getenv("HHBA_QUOTA_DB_PATH", "/sync-state/hhba-match-usage.sqlite")
 quota_lock = asyncio.Lock()
-request_semaphore = asyncio.Semaphore(MAX_CONCURRENT)
-day_total: dict[str, int] = defaultdict(int)
-day_clients: dict[tuple[str, str], int] = defaultdict(int)
 active_count = 0
+ip_salt = secrets.token_bytes(32)
+quota_db: sqlite3.Connection | None = None
+
+def quota_connection() -> sqlite3.Connection | None:
+    global quota_db
+    if quota_db is not None:
+        return quota_db
+    try:
+        file = Path(QUOTA_DB_PATH)
+        if not str(file.resolve()).startswith("/sync-state/") or not file.parent.is_dir():
+            return None
+        connection = sqlite3.connect(file, timeout=5, check_same_thread=False, isolation_level=None)
+        connection.execute("PRAGMA journal_mode=WAL")
+        connection.execute("PRAGMA busy_timeout=5000")
+        connection.execute("CREATE TABLE IF NOT EXISTS usage (day TEXT NOT NULL, scope TEXT NOT NULL, used INTEGER NOT NULL, PRIMARY KEY (day,scope))")
+        quota_db = connection
+        return connection
+    except (sqlite3.Error, OSError, PermissionError):
+        log.warning("HHBA_MATCH_QUOTA_STORAGE_UNAVAILABLE")
+        return None
+
 
 snapshot_lock = asyncio.Lock()
 snapshot_cache: dict = {"at": 0.0, "data": None}
@@ -238,22 +262,35 @@ async def extract_profile_with_deepseek(text: str, key: str) -> dict:
 async def reserve_budget(ip: str):
     global active_count
     async with quota_lock:
+        conn = quota_connection()
+        if conn is None:
+            raise HTTPException(status_code=503, detail="PERSISTENT_USAGE_QUOTA_UNAVAILABLE")
         day = datetime.now(timezone.utc).date().isoformat()
+        client_hash = hashlib.sha256(ip_salt + ip.encode("utf-8") + day.encode("ascii")).hexdigest()
+        scope = "client:" + client_hash
         if active_count >= MAX_CONCURRENT:
             raise HTTPException(status_code=429, detail="AI_TOO_MANY_ACTIVE_REQUESTS")
-        if day_total[day] >= MAX_REQUEST_PER_DAY:
-            raise HTTPException(status_code=429, detail="AI_DAILY_BUDGET_EXHAUSTED")
-        if day_clients[(day, ip)] >= MAX_CLIENT_PER_DAY:
-            raise HTTPException(status_code=429, detail="AI_DAILY_PERSONAL_LIMIT_REACHED")
-        day_total[day] += 1
-        day_clients[(day, ip)] += 1
+        try:
+            conn.execute("BEGIN IMMEDIATE")
+            total = conn.execute("SELECT used FROM usage WHERE day=? AND scope='GLOBAL'", (day,)).fetchone()
+            personal = conn.execute("SELECT used FROM usage WHERE day=? AND scope=?", (day, scope)).fetchone()
+            if total and total[0] >= MAX_REQUEST_PER_DAY:
+                conn.execute("ROLLBACK")
+                raise HTTPException(status_code=429, detail="AI_DAILY_BUDGET_EXHAUSTED")
+            if personal and personal[0] >= MAX_CLIENT_PER_DAY:
+                conn.execute("ROLLBACK")
+                raise HTTPException(status_code=429, detail="AI_DAILY_PERSONAL_LIMIT_REACHED")
+            for label in ("GLOBAL", scope):
+                conn.execute("INSERT INTO usage(day,scope,used) VALUES(?,?,1) ON CONFLICT(day,scope) DO UPDATE SET used=used+1", (day, label))
+            conn.execute("DELETE FROM usage WHERE day < date(?, '-14 day')", (day,))
+            conn.execute("COMMIT")
+        except HTTPException:
+            raise
+        except sqlite3.Error:
+            if conn.in_transaction:
+                conn.execute("ROLLBACK")
+            raise HTTPException(status_code=503, detail="PERSISTENT_USAGE_QUOTA_UNAVAILABLE")
         active_count += 1
-        for key in list(day_total):
-            if key != day:
-                del day_total[key]
-        for key in list(day_clients):
-            if key[0] != day:
-                del day_clients[key]
 
 
 async def release_slot():
@@ -267,6 +304,8 @@ async def health():
     return {
         "ok": True, "service": "hhba-private-resume-match",
         "admin_deepseek_configured": bool(os.getenv("DEEPSEEK_API_KEY", "").strip()),
+        "public_enabled": MATCH_PUBLIC_ENABLED,
+        "quota_storage_ready": quota_connection() is not None,
         "privacy": "no_server_side_resume_storage", "job_source": "verified_public_official_ats"
     }
 
@@ -283,6 +322,8 @@ async def resume_match(
     origin: Annotated[str | None, Header()] = None,
 ):
     check_origin(origin)
+    if not MATCH_PUBLIC_ENABLED:
+        raise HTTPException(status_code=503, detail="ADMIN_HAS_NOT_ENABLED_AI_MATCHING")
     key = os.getenv("DEEPSEEK_API_KEY", "").strip()
     if not key:
         raise HTTPException(status_code=503, detail="ADMIN_AI_NOT_CONFIGURED")
