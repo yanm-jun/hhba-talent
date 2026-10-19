@@ -2,7 +2,7 @@
 
 The **platform administrator** configures one `DEEPSEEK_API_KEY` on this Railway backend; job seekers **never** enter or see it.
 
-- Only consented in-memory PDF/DOCX resume extraction; redacted text is sent to DeepSeek; no raw uploads or candidate data is saved by this service.
+- Only consented transient PDF/DOCX processing; redacted text is sent to DeepSeek. Multipart input might temporarily spool to ephemeral disk, but original documents are not persisted on the private Railway volume or in candidate databases.
 - The candidate must check the extracted claims and match explanations. The AI does not invent employers, job links, academic qualifications, or job availability.
 - Ground matches only in verified Greenhouse/Ashby/Lever position metadata and official JD audit fields from HHBA's existing public snapshot.
 - Per-client and global quotas plus concurrency guards apply. This is a limited **anonymous trial** until HHBA's real candidate authentication is deployed; IP quotas are not full user accounts. Stronger production protection (verified sessions and/or anti-bot challenge) is required before broad release.
@@ -10,7 +10,7 @@ The **platform administrator** configures one `DEEPSEEK_API_KEY` on this Railway
 
 ## Railway admin configuration
 
-Set `DEEPSEEK_API_KEY` on **this backend only** via Railway Variables. Do not enter it in the frontend, in source code or ChatGPT. Set `HHBA_ALLOWED_ORIGINS=https://yanm-jun.github.io` (default). `HHBA_DAILY_REQUEST_BUDGET=60`, `HHBA_PER_CLIENT_DAILY_LIMIT=2`, `HHBA_MAX_CONCURRENT=2`, `HHBA_DEEPSEEK_MAX_TOKENS=1600` can be adjusted by the owner. `DEEPSEEK_API_KEY` is not mandatory for a cold healthcheck, but without it `/api/v1/match/resume` returns `503 ADMIN_AI_NOT_CONFIGURED` before accepting or processing files.
+The **owner** sets `DEEPSEEK_API_KEY` exactly once on this backend using Railway Variables. Job seekers never provide a key. Place the service in its own Railway process with repository root directory `/apps/resume-match-api` and attach a private SQLite usage-quota volume at `/sync-state`. Configure `HHBA_MATCH_PUBLIC_ENABLED=1` only after the private volume exists; all other platform options can be set by the operator: `HHBA_ALLOWED_ORIGINS=https://yanm-jun.github.io`, `HHBA_DAILY_REQUEST_BUDGET=60`, `HHBA_PER_CLIENT_DAILY_LIMIT=2`, `HHBA_MAX_CONCURRENT=2`, `HHBA_DEEPSEEK_MAX_TOKENS=1600`. Before the key, explicit enablement or persistent quota is available, `/api/v1/match/resume` safely fails closed. The front-end must only contain the **public service URL** under `VITE_HHBA_RESUME_MATCH_API`, never a DeepSeek token. The intended workflow remains a single shared platform key, not user-specific keys.
 
 ## Privacy
 
@@ -18,7 +18,10 @@ Applicants must explicitly check consent before sending the **redacted extracted
 
 ## API
 
-- `GET /health`: readiness (no credentials or personal information).
+- `GET /health`: readiness and public-enabled status (no credentials or personal information).
+- `GET /api/v1/match/status`: whether the operator has enabled the private-quota-backed service.
 - `POST /api/v1/match/resume`: multipart `file` PDF/DOCX, `consent=true`, optional `country`, `remote_only`, `role_hint`, `limit`. Response includes verified profile and candidate match reasons. Admin owns the API key.
 
 No per-user API keys; no server-side resume persistence; no background tasks; no direct employer submissions.
+
+If Railway reports an account-level service provision limit, do not overwrite an existing market or translation service. Wait for the owner to authorize freeing an unused slot or expanding the Railway plan.
