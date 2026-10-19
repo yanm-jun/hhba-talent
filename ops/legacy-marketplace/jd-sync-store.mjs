@@ -20,6 +20,7 @@ export function openJobSyncStore(file,{now=()=>Date.now(),root="/sync-state"}={}
  db.exec("CREATE TABLE IF NOT EXISTS parts (id TEXT NOT NULL,hash TEXT NOT NULL,part INTEGER NOT NULL,total INTEGER NOT NULL,zh TEXT NOT NULL,expire_ms INTEGER NOT NULL,PRIMARY KEY(id,hash,part))");
  db.exec("CREATE INDEX IF NOT EXISTS idx_jd_sync_queue ON jobs(state,next_ms,priority)");
  db.exec("CREATE INDEX IF NOT EXISTS idx_jd_sync_expire ON parts(expire_ms)");
+ db.exec("CREATE TABLE IF NOT EXISTS sync_budget(day TEXT PRIMARY KEY,used INTEGER NOT NULL DEFAULT 0)");
  const read=db.query("SELECT * FROM jobs WHERE id=?");
  const count=db.query("SELECT COUNT(*) AS n FROM parts WHERE id=? AND hash=? AND expire_ms>?");
  const getPart=db.query("SELECT zh,total,expire_ms FROM parts WHERE id=? AND hash=? AND part=?");
@@ -103,6 +104,19 @@ export function openJobSyncStore(file,{now=()=>Date.now(),root="/sync-state"}={}
   db.query("UPDATE jobs SET state='TRANSLATING',next_ms=0 WHERE state='COMPLETE' AND done<total").run();
   return {expired};
  }
+ const budgetTxn=db.transaction(limit=>{
+  if(!Number.isInteger(limit)||limit<1||limit>100000)throw Error("INVALID_SYNC_BUDGET");
+  const day=new Date(now()).toISOString().slice(0,10);
+  const used=Number(db.query("SELECT used FROM sync_budget WHERE day=?").get(day)?.used||0);
+  if(used>=limit)return false;
+  db.query("INSERT INTO sync_budget(day,used) VALUES(?,1) ON CONFLICT(day) DO UPDATE SET used=used+1").run(day);
+  return true;
+ });
+ function remainingBudget(limit){
+  const day=new Date(now()).toISOString().slice(0,10);
+  const used=Number(db.query("SELECT used FROM sync_budget WHERE day=?").get(day)?.used||0);
+  return Math.max(0,Math.min(100000,limit)-used);
+ }
  function coverage(){
   const groups=db.query("SELECT state,COUNT(*) AS n FROM jobs GROUP BY state").all();
   const counts=Object.fromEntries(groups.map(g=>[g.state,g.n]));
@@ -118,5 +132,5 @@ export function openJobSyncStore(file,{now=()=>Date.now(),root="/sync-state"}={}
   return {id:j.id,state:j.state,done:j.done,total:j.total,last_error:j.error,
    checked_at:j.checked_ms?new Date(j.checked_ms).toISOString():null};
  }
- return {db,catalogSync,sourceVersion,cachedPart,saveVerifiedPart,claim:()=>claimTxn(),fail,release,cleanup,coverage,metadata,close:()=>db.close()};
+ return {db,catalogSync,sourceVersion,cachedPart,saveVerifiedPart,claim:()=>claimTxn(),fail,release,cleanup,coverage,metadata,reserveBudget:limit=>budgetTxn(limit),remainingBudget,close:()=>db.close()};
 }
