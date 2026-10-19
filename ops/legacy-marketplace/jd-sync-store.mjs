@@ -25,7 +25,7 @@ export function openJobSyncStore(file,{now=()=>Date.now(),root="/sync-state"}={}
  const count=db.query("SELECT COUNT(*) AS n FROM parts WHERE id=? AND hash=? AND expire_ms>?");
  const getPart=db.query("SELECT zh,total,expire_ms FROM parts WHERE id=? AND hash=? AND part=?");
  const removeParts=db.query("DELETE FROM parts WHERE id=?");
- const updateSource=db.query("UPDATE jobs SET hash=?,total=?,done=?,state=?,checked_ms=?,lease_ms=CASE WHEN state='WORKING' AND lease_ms>? THEN lease_ms ELSE 0 END,next_ms=0,error=NULL,attempts=CASE WHEN hash IS NOT ? THEN 0 ELSE attempts END WHERE id=?");
+ const updateSource=db.query("UPDATE jobs SET hash=?,total=?,done=?,state=?,checked_ms=?,lease_ms=CASE WHEN state='WORKING' AND lease_ms>? THEN lease_ms ELSE 0 END,next_ms=0,error=NULL,attempts=CASE WHEN ?=1 THEN 0 WHEN hash IS NOT ? THEN CASE WHEN state='WORKING' THEN 1 ELSE 0 END ELSE attempts END WHERE id=?");
  const insertPart=db.query("INSERT INTO parts(id,hash,part,total,zh,expire_ms) VALUES(?,?,?,?,?,?) ON CONFLICT(id,hash,part) DO UPDATE SET zh=excluded.zh,total=excluded.total,expire_ms=excluded.expire_ms");
  const updatePart=db.query("UPDATE jobs SET done=?,state=?,checked_ms=?,lease_ms=CASE WHEN state='WORKING' AND lease_ms>? THEN lease_ms ELSE 0 END,next_ms=0,error=NULL WHERE id=?");
  const upsert=db.query("INSERT INTO jobs(id,platform,company,url,seen_ms,priority) VALUES(?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET platform=excluded.platform,company=excluded.company,url=excluded.url,seen_ms=excluded.seen_ms,priority=excluded.priority,state=CASE WHEN jobs.url<>excluded.url OR jobs.state='REMOVED' THEN 'QUEUED' ELSE jobs.state END,hash=CASE WHEN jobs.url<>excluded.url THEN NULL ELSE jobs.hash END,total=CASE WHEN jobs.url<>excluded.url THEN NULL ELSE jobs.total END,done=CASE WHEN jobs.url<>excluded.url THEN 0 ELSE jobs.done END,next_ms=CASE WHEN jobs.url<>excluded.url THEN 0 ELSE jobs.next_ms END,lease_ms=CASE WHEN jobs.url<>excluded.url THEN 0 ELSE jobs.lease_ms END");
@@ -55,7 +55,7 @@ export function openJobSyncStore(file,{now=()=>Date.now(),root="/sync-state"}={}
    if(!j||j.state==="REMOVED")throw Error("JOB_NOT_IN_CURRENT_INDEX");
    if(j.hash!==hash)removeParts.run(id);
    const n=Number(count.get(id,hash,now()).n);
-   updateSource.run(hash,total,n,n===total?"COMPLETE":j.state==="WORKING"&&j.lease_ms>now()?"WORKING":"TRANSLATING",now(),now(),hash,id);
+   updateSource.run(hash,total,n,n===total?"COMPLETE":j.state==="WORKING"&&j.lease_ms>now()?"WORKING":"TRANSLATING",now(),now(),n===total?1:0,hash,id);
    return {total,done:n,complete:n===total,source_changed:j.hash!==hash};
   })();
  }
@@ -81,7 +81,7 @@ export function openJobSyncStore(file,{now=()=>Date.now(),root="/sync-state"}={}
  }
  const claimTxn=db.transaction(()=>{
   const ts=now();
-  const job=db.query("SELECT * FROM jobs WHERE ((state IN ('QUEUED','TRANSLATING','RETRY') AND next_ms<=?) OR (state='WORKING' AND lease_ms<?)) AND attempts<12 ORDER BY priority DESC,next_ms ASC,seen_ms ASC,id LIMIT 1").get(ts,ts);
+  const job=db.query("SELECT * FROM jobs WHERE ((state IN ('QUEUED','TRANSLATING','RETRY') AND next_ms<=?) OR (state='WORKING' AND lease_ms<?) OR (state='COMPLETE' AND checked_ms<?)) AND attempts<12 ORDER BY CASE WHEN state='COMPLETE' THEN 1 ELSE 0 END ASC,priority DESC,next_ms ASC,seen_ms ASC,id LIMIT 1").get(ts,ts,ts-7*86400000);
   if(!job)return null;
   db.query("UPDATE jobs SET state='WORKING',attempts=attempts+1,lease_ms=? WHERE id=?").run(ts+180000,job.id);
   return job;
@@ -91,7 +91,7 @@ export function openJobSyncStore(file,{now=()=>Date.now(),root="/sync-state"}={}
   const j=read.get(id);if(!j||j.state==="REMOVED")return;
   const delay=Math.min(12*3600000,60000*2**Math.min(9,j.attempts||1));
   db.query("UPDATE jobs SET state=?,error=?,next_ms=?,lease_ms=0 WHERE id=?")
-   .run(permanent?"NEEDS_REVIEW":"RETRY",String(reason).slice(0,120),now()+delay,id);
+   .run(permanent||j.attempts>=12?"NEEDS_REVIEW":"RETRY",String(reason).slice(0,120),now()+delay,id);
  }
  function release(id){
   verify(id);

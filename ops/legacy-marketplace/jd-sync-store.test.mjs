@@ -90,3 +90,40 @@ test('source version mismatch, missing JD parts or invalid text fail closed',t=>
  assert.equal(store.coverage().complete,0);
  store.close();
 });
+
+
+test('completed official JD is rechecked after seven days without retranslating when the source hash is unchanged',t=>{
+ const {store,move}=setup(t);
+ store.catalogSync(entries.slice(0,1),{complete:true});
+ const id=entries[0].id;
+ store.sourceVersion(id,hash('a'),1);
+ store.saveVerifiedPart(id,hash('a'),0,1,'任职要求：软件研发经验');
+ assert.equal(store.coverage().complete,1);
+ assert.equal(store.claim(),null,'recent fully checked JD should not consume queue');
+ move(8*86400000);
+ const recheck=store.claim();
+ assert.equal(recheck.id,id);
+ const refreshed=store.sourceVersion(id,hash('a'),1);
+ assert.equal(refreshed.complete,true);
+ assert.equal(refreshed.source_changed,false);
+ assert.equal(store.cachedPart(id,hash('a'),0,1),'任职要求：软件研发经验');
+ assert.equal(store.coverage().complete,1);
+ assert.equal(store.claim(),null,'recheck must reset the timer rather than looping');
+ store.close();
+});
+test('failed unchanged official JD is not silently retried forever after exhaustion',t=>{
+ const {store,move}=setup(t);
+ store.catalogSync(entries.slice(0,1),{complete:true});
+ const id=entries[0].id;
+ store.sourceVersion(id,hash('b'),1);
+ for(let attempt=0;attempt<12;attempt++){
+  const job=store.claim();
+  assert.equal(job?.id,id,'claim must work for attempt '+attempt);
+  store.sourceVersion(id,hash('b'),1);
+  store.fail(id,'translation_incomplete');
+  move(13*3600000);
+ }
+ assert.equal(store.metadata(id).state,'NEEDS_REVIEW');
+ assert.equal(store.claim(),null,'no infinite retries against failing translator');
+ store.close();
+});
