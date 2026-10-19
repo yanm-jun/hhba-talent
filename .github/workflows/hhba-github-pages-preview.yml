@@ -38,6 +38,9 @@ jobs:
       - name: Check static job metadata and create snapshot
         working-directory: apps/web
         run: node scripts/prepare-pages-jobs.mjs
+      - name: Verify live Airtable official JD and requirements source
+        working-directory: apps/web
+        run: node scripts/verify-official-jd.mjs
       - name: Check Chinese/English and original entry routes
         run: node scripts/verify-dual-entry.mjs
       - name: Enable deep-link reload fallback
