@@ -37,6 +37,8 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Browser verify truly anonymous employer preview and zero backend data mutations
         working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
         run: |
           npx vite preview --host 127.0.0.1 --port 4174 > /tmp/hhba-phase4-preview.log 2>&1 &
           sleep 3
