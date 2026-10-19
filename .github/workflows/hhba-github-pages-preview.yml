@@ -56,6 +56,9 @@ jobs:
       - name: Verify Airtable official JD and the green Chinese reader bridge
         working-directory: apps/web
         run: node scripts/verify-official-jd.mjs
+      - name: Verify stale or withdrawn official jobs cannot appear in active results
+        run: |
+          node -e "const fs=require('fs');const x=fs.readFileSync('apps/web/src/services/liveRecruitment.ts','utf8');if(!x.includes('MISSING_FROM_OFFICIAL_BOARD')||!x.includes('OFFICIAL_URL_CHANGED')||!x.includes('loadPublicJobAudit'))process.exit(1)"
       - name: Check Chinese/English and original entry routes
         run: node scripts/verify-dual-entry.mjs
       - name: Enable deep-link reload fallback
