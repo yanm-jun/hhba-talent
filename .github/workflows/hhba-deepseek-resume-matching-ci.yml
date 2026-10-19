@@ -1,0 +1,43 @@
+name: HHBA Private DeepSeek Resume Matching CI
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-deepseek-resume-matching-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  private-api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/deepseek-private-resume-matching-20261019
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact matching API dependencies
+        working-directory: apps/resume-match-api
+        run: pip install -r requirements.txt
+      - name: Test privacy controls and official-source evidence without real key
+        working-directory: apps/resume-match-api
+        run: python -m unittest discover -v -p 'test_*.py'
+      - name: Compile Python service without secrets
+        working-directory: apps/resume-match-api
+        run: python -m compileall -q server.py matcher.py
+      - name: Build isolated Railway Docker service
+        run: docker build --tag hhba-resume-match-test apps/resume-match-api
+      - name: Verify no API key appears in GitHub bundle
+        working-directory: apps/resume-match-api
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          code=Path('server.py').read_text()
+          assert 'os.getenv("DEEPSEEK_API_KEY"' in code
+          assert 'DEEPSEEK_API_KEY' not in Path('Dockerfile').read_text()
+          assert "ADMIN_AI_NOT_CONFIGURED" in code
+          assert "EXPLICIT_AI_SHARING_CONSENT_REQUIRED" in code
+          print("HHBA_PLATFORM_OWNED_DEEPSEEK_KEY_CONTRACT_PASS")
+          PY
