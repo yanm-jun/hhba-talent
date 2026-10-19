@@ -6,7 +6,7 @@ import {pathToFileURL} from 'node:url';
 const ACTIVE_ATS=new Set(['greenhouse','ashby','lever']);
 const ALLOWED_DOMESTIC=new Set(['xiaomi-official','meituan-official','tencent-official','baidu-official']);
 const LIMIT=25000;
-const REQUIREMENT_HINT=/qualifications?|requirements?|skills?|experience|expertise|proficien|must.have|you bring|what we.re looking|abilities|education|degree|任职|要求|学历|专业|技能|资质|资格|经验/i;
+const REQUIREMENT_HINT=/\b(?:qualifications?|requirements?|skills?|experience|expertise|proficien\w*|must.have|you bring|what we.re looking|abilities|education|degree)\b|任职|要求|学历|专业|技能|资质|资格|经验/i;
 const RESPONSIBILITY_HINT=/responsibilit|duties|what you.ll do|your role|the role|job description|you will|职位描述|岗位职责|工作职责/i;
 const collapse=s=>String(s||'').replace(/\s+/g,' ').trim();
 const stripped=s=>collapse(String(s||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;|&#160;/gi,' ').replace(/&amp;/gi,'&').replace(/&lt;/gi,'<').replace(/&gt;/gi,'>'));
