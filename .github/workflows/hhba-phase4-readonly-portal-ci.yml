@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feat/phase4-live-api-readiness-20261020
+          ref: feat/phase4-postreview-readonly-20261020
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
