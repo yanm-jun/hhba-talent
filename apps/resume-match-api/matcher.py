@@ -120,6 +120,8 @@ DEGREE_EVIDENCE = {
     "PHD": ("phd", "ph.d", "doctorate", "doctoral", "博士"),
 }
 CHINESE_YEAR_NUMBERS = {"零": 0, "一": 1, "二": 2, "两": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9, "十": 10}
+ENGLISH_YEAR_NUMBERS = {"zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10}
+
 
 
 def exact_skill_evidence(skill: str, evidence: str) -> bool:
@@ -135,6 +137,9 @@ def exact_experience_evidence(years: float, evidence: str) -> bool:
         return True
     chinese = re.findall(r"([一二两三四五六七八九十])\s*年(?:以上|工作经验|经验)?", t)
     if any(abs(CHINESE_YEAR_NUMBERS[value] - years) <= 0.1 for value in chinese):
+        return True
+    english = re.findall(r"\b(zero|one|two|three|four|five|six|seven|eight|nine|ten)\s*(?:years?|yrs?)\b", t)
+    if any(abs(ENGLISH_YEAR_NUMBERS[value] - years) <= 0.1 for value in english):
         return True
     periods = re.findall(r"\b(19\d{2}|20\d{2})\s*[-–—至到]\s*(19\d{2}|20\d{2})\b", t)
     return any(0 <= int(end) - int(start) <= 55 and
