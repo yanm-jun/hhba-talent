@@ -1,6 +1,6 @@
 import {Database} from "bun:sqlite";
 import {mkdirSync} from "node:fs";
-import {dirname} from "node:path";
+import {dirname,resolve,sep} from "node:path";
 
 const ID=/^(greenhouse|ashby|lever)-[A-Za-z0-9_-]{1,170}$/;
 const HASH=/^[a-f0-9]{64}$/;
@@ -10,8 +10,8 @@ function verify(id,hash,part,total){
  if(hash!==undefined&&(typeof hash!=="string"||!HASH.test(hash)))throw Error("INVALID_SOURCE_HASH");
  if(part!==undefined&&(!Number.isInteger(total)||total<1||total>150||!Number.isInteger(part)||part<0||part>=total))throw Error("INVALID_JD_PART");
 }
-export function openJobSyncStore(file,{now=()=>Date.now()}={}){
- if(typeof file!=="string"||!file.startsWith("/sync-state/")||file.includes("..")||!file.endsWith(".sqlite"))
+export function openJobSyncStore(file,{now=()=>Date.now(),root="/sync-state"}={}){
+ if(typeof file!=="string"||!file.endsWith(".sqlite")||!resolve(file).startsWith(resolve(root)+sep))
    throw Error("JOB_SYNC_MUST_USE_PRIVATE_VOLUME");
  mkdirSync(dirname(file),{recursive:true});
  const db=new Database(file,{create:true});
