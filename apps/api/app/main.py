@@ -1,5 +1,6 @@
 """Phase 1 identity, organization, consent and audit API."""
 import hashlib, json, os, re, secrets
+from urllib.parse import urlsplit
 from datetime import date, datetime, timedelta, timezone
 from uuid import UUID, uuid4
 from fastapi import FastAPI, Depends, HTTPException, Request, Response, UploadFile, File
@@ -46,6 +47,28 @@ class ServiceIntent(ProfileDetail):
  __tablename__='profile_service_intents';service_name: Mapped[str]=mapped_column(String(200));region: Mapped[str|None]=mapped_column(String(100));work_mode: Mapped[str|None]=mapped_column(String(64))
 class HiringRequirement(Base):
  __tablename__='hiring_requirements'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); created_by: Mapped[UUID]=mapped_column(ForeignKey('users.id')); title: Mapped[str]=mapped_column(String(160)); description: Mapped[str]=mapped_column(Text); location: Mapped[str|None]=mapped_column(String(120)); work_mode: Mapped[str|None]=mapped_column(String(64)); status: Mapped[str]=mapped_column(String(32),default='draft'); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now); updated_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+class EmployerPosting(Base):
+ __tablename__='employer_postings'
+ id:Mapped[UUID]=mapped_column(primary_key=True,default=uuid4)
+ organization_id:Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True)
+ created_by:Mapped[UUID]=mapped_column(ForeignKey('users.id'))
+ title:Mapped[str]=mapped_column(String(160))
+ description:Mapped[str]=mapped_column(Text)
+ requirements:Mapped[str]=mapped_column(Text)
+ location:Mapped[str]=mapped_column(String(120))
+ work_mode:Mapped[str]=mapped_column(String(32))
+ recruitment_type:Mapped[str]=mapped_column(String(24))
+ apply_url:Mapped[str]=mapped_column(String(1000))
+ status:Mapped[str]=mapped_column(String(32),default='draft')
+ submitted_at:Mapped[datetime|None]=mapped_column(DateTime(timezone=True))
+ reviewed_at:Mapped[datetime|None]=mapped_column(DateTime(timezone=True))
+ reviewed_by:Mapped[UUID|None]=mapped_column(ForeignKey('users.id'))
+ review_reason:Mapped[str|None]=mapped_column(String(120))
+ published_at:Mapped[datetime|None]=mapped_column(DateTime(timezone=True))
+ expires_at:Mapped[datetime|None]=mapped_column(DateTime(timezone=True))
+ created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+ updated_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+
 class CandidateSearchProjection(Base):
  __tablename__='candidate_search_projections'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); profile_id: Mapped[UUID]=mapped_column(ForeignKey('profiles.id',ondelete='CASCADE'),unique=True,index=True); owner_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True); candidate_ref: Mapped[str]=mapped_column(String(32),unique=True,index=True,default=lambda:uuid4().hex); display_name: Mapped[str|None]=mapped_column(String(100)); headline: Mapped[str|None]=mapped_column(String(300)); capability_summary: Mapped[str|None]=mapped_column(Text); skills: Mapped[list]=mapped_column(JSON,default=list); industries: Mapped[list]=mapped_column(JSON,default=list); location: Mapped[str|None]=mapped_column(String(120)); service_regions: Mapped[list]=mapped_column(JSON,default=list); work_modes: Mapped[list]=mapped_column(JSON,default=list); work_years: Mapped[int|None]=mapped_column(Integer); project_summaries: Mapped[list]=mapped_column(JSON,default=list); skills_text: Mapped[str]=mapped_column(Text,default=''); industries_text: Mapped[str]=mapped_column(Text,default=''); regions_text: Mapped[str]=mapped_column(Text,default=''); work_modes_text: Mapped[str]=mapped_column(Text,default=''); search_text: Mapped[str]=mapped_column(Text,default=''); profile_version: Mapped[int]=mapped_column(Integer,default=0); indexed_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class TalentSearchUsage(Base):
@@ -106,6 +129,17 @@ class RequirementIn(BaseModel):
  title:str=Field(min_length=1,max_length=160); description:str=Field(min_length=1,max_length=8000); location:str|None=Field(default=None,max_length=120); work_mode:str|None=Field(default=None,max_length=64); status:str=Field(default='draft',pattern='^(draft|archived)$')
 class RequirementPatch(BaseModel):
  title:str|None=Field(default=None,min_length=1,max_length=160); description:str|None=Field(default=None,min_length=1,max_length=8000); location:str|None=Field(default=None,max_length=120); work_mode:str|None=Field(default=None,max_length=64); status:str|None=Field(default=None,pattern='^(draft|archived)$')
+class EmployerPostingIn(BaseModel):
+ title:str=Field(min_length=3,max_length=160)
+ description:str=Field(min_length=40,max_length=8000)
+ requirements:str=Field(min_length=20,max_length=8000)
+ location:str=Field(min_length=2,max_length=120)
+ work_mode:str=Field(pattern='^(onsite|hybrid|remote)$')
+ recruitment_type:str=Field(pattern='^(SOCIAL|CAMPUS|INTERNSHIP)$')
+ apply_url:str=Field(min_length=12,max_length=1000)
+class EmployerPostingReviewIn(BaseModel):
+ decision:str=Field(pattern='^(approved|rejected)$')
+ reason_code:str=Field(min_length=3,max_length=120)
 class TalentSearchIn(BaseModel):
  keywords:str|None=Field(default=None,max_length=200)
  skills:list[str]=Field(default_factory=list,max_length=8)
@@ -737,3 +771,196 @@ def talent_search_consistency(a=Depends(auth),s:Session=Depends(db)):
  eligible=s.scalar(select(func.count(Profile.id)).join(Consent,and_(Consent.user_id==Profile.owner_user_id,Consent.consent_type=='enterprise_search',Consent.granted.is_(True))).where(Profile.status.in_(SEARCHABLE_PROFILE_STATUSES))) or 0
  projected=s.scalar(select(func.count(CandidateSearchProjection.id))) or 0
  return {'eligible_profiles':eligible,'projected_profiles':projected,'in_sync':eligible==projected}
+
+def employer_posting_recruiter_current(s,post):
+ person=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==post.created_by))
+ authz=s.scalar(select(RecruiterOrganizationAuthorization).where(
+  RecruiterOrganizationAuthorization.organization_id==post.organization_id,
+  RecruiterOrganizationAuthorization.user_id==post.created_by))
+ return bool(verification_is_current(person) and active_membership(post.organization_id,post.created_by,s)
+  and authz and authz.status=='active' and not authz.revoked_at
+  and (not authz.expires_at or comparable_time(authz.expires_at)>now()))
+
+# Phase 4 - enterprise-direct vacancies are always kept distinct from official ATS records.
+# Publication requires verified recruiter + company, network-recruitment gate and independent review.
+def checked_apply_link(value:str):
+ try:
+  u=urlsplit(value)
+  host=(u.hostname or '').lower().rstrip('.')
+  if (u.scheme!='https' or not host or u.username or u.password or u.port or
+      u.fragment or len(value)>1000 or not re.fullmatch(r'[a-z0-9.-]+',host) or
+      '.' not in host or host.endswith(('.local','.internal','.invalid','.test','.example')) or
+      any(host==blocked or host.endswith('.'+blocked) for blocked in ('localhost','127.0.0.1','0.0.0.0','10.0.0.1','169.254.169.254','bit.ly','tinyurl.com','t.co')) or
+      re.fullmatch(r'\d+(?:\.\d+){3}',host)):
+   raise ValueError()
+  return value
+ except (ValueError,TypeError):
+  raise HTTPException(422,'HTTPS employer application link required; shortened or internal links forbidden')
+
+def employer_posting_view(x:EmployerPosting, company:str, public=False):
+ fields={'id':'employer-'+str(x.id),'organization_id':str(x.organization_id),
+         'company':company,'title':x.title,'location':x.location,
+         'work_mode':x.work_mode,'recruitment_type':x.recruitment_type,
+         'status':x.status,'updated_at':x.updated_at,'published_at':x.published_at,
+         'expires_at':x.expires_at,'source_type':'HHBA_VERIFIED_EMPLOYER',
+         'notice':'企业认证并通过岗位审核的自发布岗位；并非官方 ATS 同步数据'}
+ if public:
+  return {k:v for k,v in fields.items() if k!='organization_id'}|{'description':x.description,
+    'requirements':x.requirements,'apply_url':x.apply_url}
+ return fields|{'description':x.description,'requirements':x.requirements,
+                'apply_url':x.apply_url,'review_reason':x.review_reason}
+
+def employer_posting_of(s,oid,pid):
+ x=s.get(EmployerPosting,pid)
+ if not x or x.organization_id!=oid:raise HTTPException(404,'resource not found')
+ return x
+
+@app.post('/api/v1/organizations/{oid}/postings',status_code=201)
+def employer_posting_create(oid:UUID,x:EmployerPostingIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_drafts'):
+  raise HTTPException(404,'resource not found')
+ checked_apply_link(x.apply_url)
+ post=EmployerPosting(organization_id=oid,created_by=a[0].id,**x.model_dump())
+ s.add(post);s.flush()
+ audit(s,r,'employer_posting.create','success',f'employer_posting:{post.id}',a[0].id,{'status':'draft'})
+ s.commit()
+ return employer_posting_view(post,s.get(Organization,oid).legal_name)
+
+@app.get('/api/v1/organizations/{oid}/postings')
+def employer_posting_list(oid:UUID,a=Depends(auth),s:Session=Depends(db)):
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_drafts'):
+  raise HTTPException(404,'resource not found')
+ org=s.get(Organization,oid)
+ rows=s.scalars(select(EmployerPosting).where(EmployerPosting.organization_id==oid).order_by(EmployerPosting.created_at.desc(),EmployerPosting.id.desc()).limit(100)).all()
+ return {'items':[employer_posting_view(x,org.legal_name) for x in rows]}
+
+@app.put('/api/v1/organizations/{oid}/postings/{pid}')
+def employer_posting_update(oid:UUID,pid:UUID,x:EmployerPostingIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_drafts'):
+  raise HTTPException(404,'resource not found')
+ post=employer_posting_of(s,oid,pid)
+ if post.status not in {'draft','rejected'}:raise HTTPException(409,'only private drafts and rejected vacancies may be edited')
+ member=active_membership(oid,a[0].id,s)
+ if member.role!='owner' and post.created_by!=a[0].id:raise HTTPException(404,'resource not found')
+ checked_apply_link(x.apply_url)
+ for key,value in x.model_dump().items():setattr(post,key,value)
+ post.status='draft';post.review_reason=None;post.updated_at=now()
+ audit(s,r,'employer_posting.update','success',f'employer_posting:{pid}',a[0].id)
+ s.commit();return employer_posting_view(post,s.get(Organization,oid).legal_name)
+
+@app.post('/api/v1/organizations/{oid}/postings/{pid}/submit')
+def employer_posting_submit(oid:UUID,pid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if not require_recruitment_permission(s,oid,a[0].id,'talent_search'):
+  raise HTTPException(403,'company and recruiter verification plus network recruitment gate required')
+ post=employer_posting_of(s,oid,pid)
+ if post.status!='draft':raise HTTPException(409,'only a private draft may be submitted')
+ checked_apply_link(post.apply_url)
+ post.status='pending_review';post.submitted_at=now();post.updated_at=now()
+ audit(s,r,'employer_posting.submit','success',f'employer_posting:{pid}',a[0].id)
+ s.commit();return {'id':'employer-'+str(pid),'status':post.status}
+
+@app.post('/api/v1/organizations/{oid}/postings/{pid}/close')
+def employer_posting_close(oid:UUID,pid:UUID,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if not require_recruitment_permission(s,oid,a[0].id,'manage_drafts'):
+  raise HTTPException(404,'resource not found')
+ post=employer_posting_of(s,oid,pid)
+ member=active_membership(oid,a[0].id,s)
+ if member.role!='owner' and post.created_by!=a[0].id:raise HTTPException(404,'resource not found')
+ if post.status=='closed':return {'id':'employer-'+str(pid),'status':'closed'}
+ post.status='closed';post.updated_at=now()
+ audit(s,r,'employer_posting.close','success',f'employer_posting:{pid}',a[0].id)
+ s.commit();return {'id':'employer-'+str(pid),'status':'closed'}
+
+@app.get('/api/v1/admin/employer-postings')
+def admin_postings(a=Depends(auth),s:Session=Depends(db)):
+ if a[0].role!='admin':raise HTTPException(403,'admin only')
+ rows=s.scalars(select(EmployerPosting).where(EmployerPosting.status=='pending_review').order_by(EmployerPosting.submitted_at.asc()).limit(100)).all()
+ return {'items':[employer_posting_view(row,s.get(Organization,row.organization_id).legal_name) for row in rows]}
+
+@app.post('/api/v1/admin/employer-postings/{pid}/review')
+def admin_posting_review(pid:UUID,x:EmployerPostingReviewIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ if a[0].role!='admin':raise HTTPException(403,'admin only')
+ post=s.scalar(select(EmployerPosting).where(EmployerPosting.id==pid).with_for_update())
+ if not post:raise HTTPException(404,'resource not found')
+ if post.status!='pending_review':raise HTTPException(409,'the submission state has changed')
+ if post.created_by==a[0].id:raise HTTPException(403,'reviewer cannot approve own vacancy')
+ if x.decision=='approved':
+  org=s.get(Organization,post.organization_id)
+  person=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==post.created_by))
+  org_ver=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==post.organization_id))
+  authorization=s.scalar(select(RecruiterOrganizationAuthorization).where(
+      RecruiterOrganizationAuthorization.organization_id==post.organization_id,
+      RecruiterOrganizationAuthorization.user_id==post.created_by))
+  gate=s.get(PlatformServiceGate,'network_recruitment')
+  if not (gate and gate.enabled and org and org.status=='approved' and
+          verification_is_current(org_ver) and verification_is_current(person) and
+          authorization and authorization.status=='active'
+          and not authorization.revoked_at and
+          active_membership(post.organization_id,post.created_by,s) and
+          (not authorization.expires_at or comparable_time(authorization.expires_at)>now())):
+   raise HTTPException(403,'employer verification or platform service gate is not active')
+  checked_apply_link(post.apply_url)
+  post.status='published';post.published_at=now();post.expires_at=now()+timedelta(days=45)
+ else:
+  post.status='rejected';post.review_reason=x.reason_code
+ post.reviewed_by=a[0].id;post.reviewed_at=now();post.updated_at=now()
+ audit(s,r,'employer_posting.review','success',f'employer_posting:{pid}',a[0].id,{'decision':x.decision,'reason_code':x.reason_code})
+ s.commit();return {'id':'employer-'+str(pid),'status':post.status}
+
+def public_employer_stmt(s):
+ gate=s.get(PlatformServiceGate,'network_recruitment')
+ if not gate or not gate.enabled:return None
+ point=now()
+ # Apply ALL publication eligibility in SQL before COUNT/OFFSET/LIMIT;
+ # expired, suspended or revoked recruiters must not produce false totals
+ # or empty pages. The public endpoint cannot enumerate private drafts.
+ recruiter_ok=(select(RecruiterVerification.id).where(
+  RecruiterVerification.user_id==EmployerPosting.created_by,
+  RecruiterVerification.status=='approved',
+  or_(RecruiterVerification.next_review_due_at.is_(None),
+      RecruiterVerification.next_review_due_at>point)).exists())
+ authorization_ok=(select(RecruiterOrganizationAuthorization.id).where(
+  RecruiterOrganizationAuthorization.organization_id==EmployerPosting.organization_id,
+  RecruiterOrganizationAuthorization.user_id==EmployerPosting.created_by,
+  RecruiterOrganizationAuthorization.status=='active',
+  RecruiterOrganizationAuthorization.revoked_at.is_(None),
+  or_(RecruiterOrganizationAuthorization.expires_at.is_(None),
+      RecruiterOrganizationAuthorization.expires_at>point)).exists())
+ membership_ok=(select(Membership.id).where(
+  Membership.organization_id==EmployerPosting.organization_id,
+  Membership.user_id==EmployerPosting.created_by,
+  Membership.status=='active').exists())
+ return (select(EmployerPosting,Organization)
+  .join(Organization,EmployerPosting.organization_id==Organization.id)
+  .join(OrganizationVerification,EmployerPosting.organization_id==OrganizationVerification.organization_id)
+  .where(EmployerPosting.status=='published',EmployerPosting.expires_at>point,
+    Organization.status=='approved',
+    OrganizationVerification.status=='approved',
+    or_(OrganizationVerification.next_review_due_at.is_(None),
+        OrganizationVerification.next_review_due_at>point),
+    recruiter_ok,authorization_ok,membership_ok))
+
+@app.get('/api/v1/public/employer-postings')
+def public_employer_postings(q:str='',limit:int=20,offset:int=0,s:Session=Depends(db)):
+ if limit<1 or limit>30 or offset<0 or offset>3000 or len(q)>100:raise HTTPException(422,'invalid pagination or search')
+ stmt=public_employer_stmt(s)
+ if stmt is None:return {'items':[],'total':0}
+ if q.strip():
+  escaped=q.strip().replace('\\','\\\\').replace('%','\\%').replace('_','\\_')
+  pattern='%'+escaped+'%'
+  stmt=stmt.where(or_(EmployerPosting.title.ilike(pattern,escape='\\'),
+    EmployerPosting.location.ilike(pattern,escape='\\'),
+    Organization.legal_name.ilike(pattern,escape='\\')))
+ count=s.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+ rows=s.execute(stmt.order_by(EmployerPosting.published_at.desc(),EmployerPosting.id.desc()).offset(offset).limit(limit)).all()
+ return {'items':[employer_posting_view(post,org.legal_name,public=True) for post,org in rows if employer_posting_recruiter_current(s,post)],
+         'total':count,'limit':limit,'offset':offset}
+
+@app.get('/api/v1/public/employer-postings/{pid}')
+def public_employer_posting(pid:UUID,s:Session=Depends(db)):
+ stmt=public_employer_stmt(s)
+ if stmt is None:raise HTTPException(404,'resource not found')
+ row=s.execute(stmt.where(EmployerPosting.id==pid)).first()
+ if not row or not employer_posting_recruiter_current(s,row[0]):raise HTTPException(404,'resource not found')
+ return employer_posting_view(row[0],row[1].legal_name,public=True)
+
