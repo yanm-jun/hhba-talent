@@ -189,7 +189,8 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
         </div>}
     </div>
     {!compact && <p className="unified-job-history">{lang==='zh'?'查阅保留的历史岗位资料：':'Archived historical records: '}
-      <Link to="/candidate/jobs/archive">{lang==='zh'?'历史岗位记录':'Historical jobs'}</Link></p>}
+      <Link to="/candidate/jobs/archive">{lang==='zh'?'历史岗位记录':'Historical jobs'}</Link>
+       {' · '}<Link to="/candidate/employer-jobs">{lang==='zh'?'经认证企业自行发布的岗位':'Employer-submitted jobs (separate from official ATS)'}</Link></p>}
   </section>;
   return compact? market:<Shell user={user}>{market}</Shell>;
 }
