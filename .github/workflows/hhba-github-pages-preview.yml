@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
-      - name: Publish canonical HHBA candidate resume AI matching page with administrator-only DeepSeek key
+      - name: Build white HHBA with independent employer verification, job posting and consent-only talent search workspace
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
