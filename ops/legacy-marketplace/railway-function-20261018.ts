@@ -1205,6 +1205,30 @@ function readerRateLimit(req:Request):boolean{
  hit.count++;
  return true;
 }
+type TranslatedChunk={text:string|null;error:string|null};
+async function verifiedJdChunk(job:Job,one:string):Promise<TranslatedChunk>{
+ const segments=one.split(/\n{2,}/).filter(Boolean).map(raw=>{
+  const kind=raw.startsWith("# ")?"heading":raw.startsWith("- ")?"bullet":"paragraph";
+  return {kind,original:kind==="paragraph"?raw:raw.slice(2)};
+ });
+ if(!segments.length||segments.length>8)return {text:null,error:"invalid_layout"};
+ const output=await machineTranslations("jd",segments.map(s=>s.original));
+ if(!output||output.length!==segments.length||output.some(x=>!x))
+  return {text:null,error:"translation_unverified"};
+ const translated:string[]=[];
+ for(let i=0;i<segments.length;i++){
+  const source=segments[i].original;
+  const chinese=await ensureChineseProse(output[i]||"");
+  if(!chinese)return {text:null,error:"translation_incomplete"};
+  const corrected=stabilizeEmployerTerminology(job.company,restoreGroupedNumbers(source,chinese));
+  if(hasLeakedJdTags(corrected))return {text:null,error:"translation_markup_leak"};
+  const safe=preserveOfficialNumbers(source,corrected);
+  if(!safe)return {text:null,error:"translation_numbers_mismatch"};
+  const mark=segments[i].kind==="heading"?"# ":segments[i].kind==="bullet"?"- ":"";
+  translated.push(mark+safe.trim());
+ }
+ return {text:translated.join("\n\n"),error:null};
+}
 async function readJobForTranslation(req:Request,u:URL,headers:Record<string,string>):Promise<Response>{
  if(!humanReaderAllowed(req,u))return Response.json({error:"same_origin_reader_only"},{status:403,headers});
  if(!privateTranslatorUrl())return Response.json({error:"translator_offline"},{status:503,headers});
@@ -1251,30 +1275,10 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
     return Response.json({jobId:job.id,part,total:chunks.length,text:cached.text,sourceHash:digest,
       numbersVerified:true,sourceUrl:job.url,mode:"ephemeral_verified_translation",cached:true},{headers});
   }
-  const one=chunks[part];
-  const segments=one.split(/\n{2,}/).filter(Boolean).map(raw=>{
-   const kind=raw.startsWith("# ")?"heading":raw.startsWith("- ")?"bullet":"paragraph";
-   return {kind,original:kind==="paragraph"?raw:raw.slice(2)};
-  });
-  if(!segments.length||segments.length>8)return Response.json({error:"invalid_layout",part},{status:422,headers});
-  // Translate each semantic element independently, never send ATS tags or
-  // heading/list markup to the translator.
-  const output=await machineTranslations("jd",segments.map(s=>s.original));
-  if(!output||output.length!==segments.length||output.some(x=>!x))
-   return Response.json({error:"translation_unverified",part,total:chunks.length},{status:503,headers});
-  const translated:string[]=[];
-  for(let i=0;i<segments.length;i++){
-   const source=segments[i].original;
-   const chinese=await ensureChineseProse(output[i]||"");
-   if(!chinese)return Response.json({error:"translation_incomplete",part,total:chunks.length},{status:503,headers});
-   const corrected=stabilizeEmployerTerminology(job.company,restoreGroupedNumbers(source,chinese));
-   if(hasLeakedJdTags(corrected))return Response.json({error:"translation_markup_leak",part,total:chunks.length},{status:503,headers});
-   const numberSafe=preserveOfficialNumbers(source,corrected);
-   if(!numberSafe)return Response.json({error:"translation_numbers_mismatch",part,total:chunks.length},{status:503,headers});
-   const mark=segments[i].kind==="heading"?"# ":segments[i].kind==="bullet"?"- ":"";
-   translated.push(mark+numberSafe.trim());
-  }
-  const text=translated.join("\n\n");
+  const translatedChunk=await verifiedJdChunk(job,chunks[part]);
+  if(!translatedChunk.text)return Response.json({error:translatedChunk.error||"translation_unverified",
+    part,total:chunks.length},{status:translatedChunk.error==="invalid_layout"?422:503,headers});
+  const text=translatedChunk.text;
   if(durableJobStore){
     try{durableJobStore.saveVerifiedPart(job.id,digest,part,chunks.length,text);}
     catch(e){console.warn("HHBA_DURABLE_TRANSLATION_WRITE",e instanceof Error?e.message:"unknown");}
