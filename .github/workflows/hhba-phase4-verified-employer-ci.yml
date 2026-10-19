@@ -42,7 +42,7 @@ jobs:
       - name: Install existing frontend dependencies
         working-directory: apps/web
         run: npm ci
-      - name: Typecheck and build existing HHBA with new employer workflow
+      - name: Compile full HHBA employer public + admin workflow without duplicate API actions
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
