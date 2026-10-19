@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feat/deepseek-private-resume-matching-20261019
+          ref: feat/match-cost-privacy-hardening-20261019
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -24,7 +24,7 @@ jobs:
       - name: Compile backend with no secrets
         working-directory: apps/resume-match-api
         run: python -m py_compile matcher.py server.py test_api.py
-      - name: Verify owner-key-only consent, verified work history, official job matching and persistent cost quotas
+      - name: Check malformed resume quota refund and evidence-proven model claims
         working-directory: apps/resume-match-api
         run: python -m unittest -v test_api
       - name: Build isolated Railway Docker image
@@ -35,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feat/deepseek-private-resume-matching-20261019
+          ref: feat/match-cost-privacy-hardening-20261019
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
