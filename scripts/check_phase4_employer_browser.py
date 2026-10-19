@@ -44,5 +44,39 @@ async def run():
     'published_site':BASE,'route':'employer/workspace',
     'synthetic_org_only':True,'job_form':True,'recruiter_search_form':True,
     'backend_requires_real_verification':True,'page_errors':errors},ensure_ascii=False))
+  # Public employer-posted jobs are a separate area: this test deliberately
+  # returns a missing backend, so the page may not invent listings.
+  await page.goto(BASE+'candidate/employer-jobs',wait_until='domcontentloaded',timeout=60000)
+  await page.get_by_role('heading',name='查看经认证企业自主发布的真实招聘岗位。').wait_for(timeout=25000)
+  await page.get_by_text('企业发布岗位的数据服务尚未连接',exact=False).wait_for(timeout=25000)
+  assert await page.locator('.employer-public-item').count()==0
+  assert not errors,errors
+
+  # No backend is exposed to the browser test. Synthetic admin responses are
+  # only intercepted in this Chromium process and never written to production.
+  admin=await browser.new_page(viewport={'width':390,'height':844},locale='zh-CN')
+  admin_errors=[]
+  admin.on('pageerror',lambda e:admin_errors.append(str(e)[:160]))
+  async def fake_admin(route):
+   u=route.request.url
+   if u.endswith('/auth/me'):
+    return await route.fulfill(status=200,content_type='application/json',body=json.dumps({
+      'id':USER,'display_name':'合成平台审核员','email':'admin@synthetic.example',
+      'role':'admin','account_types':['recruiter'],'csrf_token':'synthetic-test-token'}))
+   if u.endswith('/admin/employer-postings') or '/admin/verification/organizations?' in u:
+    return await route.fulfill(status=200,content_type='application/json',body='{"items":[]}')
+   return await route.fulfill(status=404,content_type='application/json',body='{"detail":"test-only"}')
+  await admin.route('**/api/v1/**',fake_admin)
+  await admin.goto(BASE+'admin/employer-review',wait_until='domcontentloaded',timeout=60000)
+  await admin.get_by_role('heading',name='企业认证及职位人工审核').wait_for(timeout=25000)
+  await admin.get_by_role('button',name='待审核企业（0）').click()
+  await admin.get_by_text('没有待审核的企业认证申请。').wait_for(timeout=15000)
+  assert not admin_errors,admin_errors
+  await admin.screenshot(path='/tmp/hhba-phase4-admin-mobile.png',full_page=True)
+  await admin.close()
+  print('HHBA_PHASE4_PUBLIC_AND_ADMIN_ROUTES_PASS',json.dumps({
+     'public_jobs_uses_real_api_only':True,'no_fake_postings':True,
+     'admin_requires_server_session':True,'admin_ui_synthetic_no_writes':True,
+     'browser_errors':errors+admin_errors},ensure_ascii=False))
   await browser.close()
 if __name__=='__main__':asyncio.run(run())
