@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
-      - name: Build existing merged white HHBA React site
+      - name: Build merged bilingual HHBA with verified long-form overseas JD reader
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
