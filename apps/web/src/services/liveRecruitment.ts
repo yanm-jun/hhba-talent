@@ -1,5 +1,7 @@
 // One source and one public-job identity for the home market and candidate market.
 import {loadPublicJobAudit} from './jobSyncStatus';
+import {searchJobs, type SearchFacet} from './jobSearchFacets.mjs';
+import {loadOfficialSearchFacets} from './officialSearchIndex';
 export type Language = 'zh' | 'en';
 export type LiveJob = {
   id: string; company: string; companyZh?: string; title: string; titleZh?: string;
@@ -11,6 +13,7 @@ export type LiveJob = {
 export type LiveFilters = {
   q: string; company: string; country: '' | 'cn' | 'global'; remote: boolean;
   recruitment_type: '' | 'SOCIAL' | 'CAMPUS' | 'INTERNSHIP';
+  location_country?: string; city?: string; education?: string; experience?: string;
 };
 export type LivePage = {
   jobs: LiveJob[]; total: number; limit: number; offset: number;
@@ -127,37 +130,18 @@ async function previewSnapshot(signal:AbortSignal):Promise<LivePage> {
   if(signal.aborted)throw new DOMException('Aborted','AbortError');
   return cachedSnapshot;
 }
-const searchAliases: Record<string,string[]> = {
-  '销售':['sales','account executive','business development'],
-  '工程师':['engineer','engineering','developer'],
-  '财务':['finance','accountant','accounting'],
-  '产品':['product','product manager'],
-  '实习':['intern','internship'],
-  '运营':['operations','operation'],
-  '设计':['design','designer'],
-};
-function searchPreview(data:LivePage,filters:LiveFilters,offset:number):LivePage{
-  const q=filters.q.trim().toLocaleLowerCase();
-  const aliases=Object.entries(searchAliases).filter(([term])=>q.includes(term)).flatMap(([,values])=>values);
-  const company=filters.company.trim().toLocaleLowerCase();
-  const rows=data.jobs.filter(j=>{
-    if(filters.country==='cn'&&!j.domestic||filters.country==='global'&&j.domestic)return false;
-    if(filters.recruitment_type&&j.recruitmentType!==filters.recruitment_type)return false;
-    if(filters.remote&&j.remote!==true)return false;
-    if(company && ![j.company,j.companyZh].some(v=>String(v||'').toLocaleLowerCase().includes(company)))return false;
-    if(!q)return true;
-    const fields=[j.title,j.titleZh,j.company,j.companyZh,j.location,j.locationZh];
-    return fields.some(v=>String(v||'').toLocaleLowerCase().includes(q)) ||
-      aliases.some(v=>String(j.title||'').toLocaleLowerCase().includes(v));
-  });
-  return {...data,jobs:rows.slice(offset,offset+30),total:rows.length,offset,limit:30};
+function searchPreview(data:LivePage,filters:LiveFilters,offset:number,facets:Map<string,SearchFacet>):LivePage{
+  const matches=searchJobs(data.jobs,filters,facets);
+  return {...data,jobs:matches.rows.slice(offset,offset+30),total:matches.counted,offset,limit:30};
 }
 export async function listJobs(filters: LiveFilters, offset: number, signal: AbortSignal) {
   if(PAGES_PREVIEW) {
     const snapshot=await previewSnapshot(signal);
-    const audit=await loadPublicJobAudit();
+    const [audit,index]=await Promise.all([loadPublicJobAudit(),loadOfficialSearchFacets()]);
     if(!audit || audit.summary.indexed_as_of!==snapshot.updated)
       throw new Error('官方岗位核验结果尚未与列表同步，暂不显示旧数据');
+    if(index.indexed_as_of!==snapshot.updated)
+      throw new Error('中英文岗位条件索引尚未与官网同步，暂不使用过期筛选信息');
     const excluded=new Set(audit.jobs.filter(entry=>[
       'MISSING_FROM_OFFICIAL_BOARD','OFFICIAL_URL_CHANGED',
       'OFFICIAL_SOURCE_READ_FAILED','OFFICIAL_TITLE_CHANGED',
@@ -165,7 +149,7 @@ export async function listJobs(filters: LiveFilters, offset: number, signal: Abo
     ].includes(entry.status)).map(entry=>entry.job_id));
     const current={...snapshot,jobs:snapshot.jobs.filter(job=>!excluded.has(job.id)),
       total:snapshot.jobs.length-excluded.size};
-    return searchPreview(current,filters,offset);
+    return searchPreview(current,filters,offset,index.facets);
   }
   const p = new URLSearchParams({ limit:'30',offset:String(offset) });
   if (filters.q.trim()) p.set('q', filters.q.trim().slice(0,100));

@@ -67,3 +67,16 @@
 @media(max-width:720px){.unified-job-audit small{margin-left:0}}
 
 .unified-jd-sync-progress{display:flex;align-items:flex-start;gap:9px;padding:11px 14px;margin:10px 0 13px;border:1px solid #cddfd2;border-radius:9px;background:#f6faf7;color:#446e53;font-size:12px;line-height:1.75}.unified-jd-sync-progress svg{margin-top:3px;flex-shrink:0}
+
+/* Source-grounded Chinese/English job search controls */
+.unified-job-controls{align-items:stretch;gap:9px}
+.unified-job-controls .unified-job-search{flex:1 1 100%;min-height:45px}
+.unified-job-controls select{flex:1 1 144px;max-width:220px}
+.unified-job-remote{padding:8px 2px;white-space:nowrap}
+.unified-search-interpreted{background:#f7faf8;border:1px solid #e1ece5;border-radius:8px;color:#315b45;padding:9px 12px;margin:12px 0 0;font-size:12px;line-height:1.7}
+.unified-search-provenance{color:#7a8581;margin:9px 0 14px;font-size:11px;line-height:1.6}
+@media(max-width:720px){
+ .unified-job-controls .unified-job-search{flex-basis:100%}
+ .unified-job-controls select{flex:1 1 calc(50% - 6px);max-width:none;min-width:0}
+ .unified-job-remote{flex:1 1 100%}
+}

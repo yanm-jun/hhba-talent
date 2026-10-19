@@ -48,6 +48,13 @@ test('checks every indexed record against grouped official board APIs, not sampl
  assert.equal(calls.length,3,'batch official ATS requests by board');
  assert.equal(jobs[0].status,'OFFICIAL_JD_AND_REQUIREMENTS_FOUND');
  assert.equal(jobs[0].full_original_jd_verified,true);
+ assert.equal(jobs[0].search.cityKey,null,'missing city must stay unknown');
+ assert.equal(jobs[0].search.education,null,'unmentioned degree must stay unknown');
+ assert.equal(jobs[0].search.experienceMinYears,5);
+ assert.ok(jobs[0].search.skills.includes('typescript'));
+ assert.ok(jobs[0].search.skills.includes('react'));
+ assert.equal(jobs[2].search,undefined,'missing official JD must not emit requirements metadata');
+
  assert.match(jobs[0].jd_sha256,/^[a-f0-9]{64}$/);
  assert.equal(jobs[1].status,'OFFICIAL_JD_REQUIREMENTS_UNCLASSIFIED');
  assert.equal(jobs[2].status,'MISSING_FROM_OFFICIAL_BOARD');

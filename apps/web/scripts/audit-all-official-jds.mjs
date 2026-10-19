@@ -2,6 +2,7 @@ import {createHash} from 'node:crypto';
 import {readFile,mkdir,writeFile} from 'node:fs/promises';
 import {resolve,dirname} from 'node:path';
 import {pathToFileURL} from 'node:url';
+import {searchFacts} from '../src/services/jobSearchFacets.mjs';
 
 const ACTIVE_ATS=new Set(['greenhouse','ashby','lever']);
 const ALLOWED_DOMESTIC=new Set(['xiaomi-official','meituan-official','tencent-official','baidu-official']);
@@ -152,6 +153,7 @@ export async function auditSnapshot(snapshot,{fetchFn=fetch,concurrency=5,now=Da
         chinese_full_jd_verified:false,
         official_title_verified:!titleChanged,
         jd_sha256:sha256(readable),jd_characters:readable.length,
+        search:searchFacts(job,rawContent),
         official_checked_at:new Date(now).toISOString()
       });
     }
@@ -231,6 +233,24 @@ async function main(){
  const safe={...report,feed_change:feedDiff,jd_content_change:contentDiff};
  await mkdir(resolve(dir,'data'),{recursive:true});
  await writeFile(resolve(dir,'data','job-sync-status.json'),JSON.stringify(safe),'utf8');
+ const sourceFacets=report.jobs.filter(item=>item.search &&
+   (item.status==='OFFICIAL_JD_AND_REQUIREMENTS_FOUND' ||
+    item.status==='OFFICIAL_JD_REQUIREMENTS_UNCLASSIFIED'));
+ const facets={
+  kind:'HHBA_OFFICIAL_JD_SEARCH_FACETS_V1',
+  indexed_as_of:json.updated,
+  verified_at:report.summary.checked_at,
+  total_indexed_jobs:json.jobs.length,
+  extracted_count:sourceFacets.length,
+  extraction_mode:'CONSERVATIVE_HEURISTICS_UNDISCLOSED_IS_UNKNOWN',
+  jobs:sourceFacets.map(item=>({
+   id:item.job_id,
+   ...item.search,
+   original_source_hash:item.jd_sha256
+  }))
+ };
+ await writeFile(resolve(dir,'data','job-search-facets.json'),JSON.stringify(facets),'utf8');
+
  await writeFile(resolve(dir,'data','job-sync-summary.json'),JSON.stringify({...report.summary,
    source_failures:report.source_failures,feed_change:feedDiff,jd_content_change:contentDiff}),'utf8');
  console.log('HHBA_ALL_JOBS_OFFICIAL_JD_AUDIT',JSON.stringify({
@@ -241,6 +261,7 @@ async function main(){
   statuses:report.summary.statuses,
   feed_change:feedDiff?{added:feedDiff.added,absent:feedDiff.absent_from_current_feed,changed:feedDiff.changed}:null,
   jd_content_changed:typeof contentDiff?.jd_content_changes==='number'?contentDiff.jd_content_changes:null,
+  facet_jobs:sourceFacets.length,
   output:'metadata-only status report'
  }));
 }

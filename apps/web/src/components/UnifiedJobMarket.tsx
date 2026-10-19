@@ -7,9 +7,10 @@ import { getJob, listJobs, localizedCompany, localizedLocation, localizedTitle, 
   type Language, type LiveFilters, type LiveJob, type LivePage } from '../services/liveRecruitment';
 import { fetchOfficialJd, greenDetailLink, translateGreenJd, type OfficialJd } from '../services/officialJd';
 import { loadPublicJobAudit, loadOverseasJdProgress, auditForJob, describeAudit, type OverseasJdProgress, type JobAuditEntry, type JobAuditSummary } from '../services/jobSyncStatus';
+import {countryOptions,cityOptions,parseNaturalQuery} from '../services/jobSearchFacets.mjs';
 import '../styles/unified-jobs.css';
 
-const emptyFilters: LiveFilters={q:'',company:'',country:'',remote:false,recruitment_type:''};
+const emptyFilters: LiveFilters={q:'',company:'',country:'',remote:false,recruitment_type:'',location_country:'',city:'',education:'',experience:''};
 const typeLabel: Record<string,{zh:string,en:string}>={SOCIAL:{zh:'社会招聘',en:'Professional'},CAMPUS:{zh:'校园招聘',en:'Graduate'},INTERNSHIP:{zh:'实习招聘',en:'Internship'},SPECIAL:{zh:'专项招聘',en:'Special program'}};
 const formatDate=(value?:string)=>value&&Number.isFinite(Date.parse(value)) ? value.slice(0,10) : '--';
 function useLanguage() {
@@ -66,25 +67,66 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   },[filters,page,retry]);
   const eligible=useMemo(()=>snapshot?.jobs.filter(j=>officialStatus(j,snapshot.updated)==='recent')||[],[snapshot]);
   const shown=compact?eligible.slice(0,8):eligible;
+  const interpreted=useMemo(()=>parseNaturalQuery(filters.q),[filters.q]);
+  const roleNames:Record<string,string>={software:'软件工程师',sales:'销售',engineer:'工程师',product:'产品经理',intern:'实习',design:'设计',finance:'财务',marketing:'市场营销',operations:'运营'};
+  const intentLabels=[
+    interpreted.countryCode&&(countryOptions.find(c=>c.value===interpreted.countryCode)?.[lang]||interpreted.countryCode),
+    interpreted.cityKey&&(cityOptions.find(c=>c.value===interpreted.cityKey)?.[lang]||interpreted.cityKey),
+    interpreted.roleKeys.length>0&&(lang==='zh'?'职位：':'Role: ')+interpreted.roleKeys.map(k=>lang==='zh'?(roleNames[k]||k):k).join(', '),
+    interpreted.remote&&(lang==='zh'?'远程':'Remote'),
+    interpreted.education==='UNRESTRICTED'&&(lang==='zh'?'明确无学历要求':'Explicitly no degree required'),
+    interpreted.experience&&(lang==='zh'?'经验：':'Experience: ')+interpreted.experience
+  ].filter(Boolean);
+
   const controls=<div className="unified-job-controls">
     <label className="unified-job-search"><Search size={17}/>
       <input value={draft} onChange={e=>setDraft(e.target.value)} maxLength={100}
-        placeholder={lang==='zh'?'搜索企业、岗位或技能':'Search companies or roles'}
-        aria-label={lang==='zh'?'搜索岗位':'Search jobs'}/></label>
-    <select value={filters.country} onChange={e=>{setPage(0);setFilters(f=>({...f,country:e.target.value as LiveFilters['country']}))}} aria-label="Country">
-      <option value="">{lang==='zh'?'全部地区':'All regions'}</option>
-      <option value="cn">{lang==='zh'?'中国':'China'}</option>
-      <option value="global">{lang==='zh'?'海外':'International'}</option>
+        placeholder={lang==='zh'?'例如：新加坡软件工程师、美国销售、不限学历的远程工作':'Try Singapore software engineer or remote sales'}
+        aria-label={lang==='zh'?'自然语言搜索岗位':'Search jobs in natural language'}/></label>
+    <select value={filters.country} onChange={e=>{setPage(0);setFilters(f=>({...f,country:e.target.value as LiveFilters['country']}))}} aria-label={lang==='zh'?'国内外范围':'Domestic or international'}>
+      <option value="">{lang==='zh'?'国内外全部':'All markets'}</option>
+      <option value="cn">{lang==='zh'?'中国岗位':'China jobs'}</option>
+      <option value="global">{lang==='zh'?'海外岗位':'International jobs'}</option>
     </select>
-    <select value={filters.recruitment_type} onChange={e=>{setPage(0);setFilters(f=>({...f,recruitment_type:e.target.value as LiveFilters['recruitment_type']}))}} aria-label="Recruitment type">
-      <option value="">{lang==='zh'?'全部招聘类型':'All types'}</option>
-      <option value="SOCIAL">{lang==='zh'?'社会招聘':'Professional'}</option>
-      <option value="CAMPUS">{lang==='zh'?'校园招聘':'Graduate'}</option>
-      <option value="INTERNSHIP">{lang==='zh'?'实习':'Internships'}</option>
+    <select value={filters.location_country||''} onChange={e=>{setPage(0);setFilters(f=>({...f,location_country:e.target.value,city:''}))}}
+      aria-label={lang==='zh'?'国家筛选':'Filter by country'}>
+      <option value="">{lang==='zh'?'全部国家':'All countries'}</option>
+      {countryOptions.map(c=><option key={c.value} value={c.value}>{c[lang]}</option>)}
+    </select>
+    <select value={filters.city||''} onChange={e=>{setPage(0);setFilters(f=>({...f,city:e.target.value}))}}
+      aria-label={lang==='zh'?'城市筛选':'Filter by city'}>
+      <option value="">{lang==='zh'?'全部城市':'All cities'}</option>
+      {cityOptions.filter(c=>!filters.location_country||c.country===filters.location_country)
+        .map(c=><option key={c.country+':'+c.value} value={c.value}>{c[lang]}</option>)}
+    </select>
+    <select value={filters.recruitment_type} onChange={e=>{setPage(0);setFilters(f=>({...f,recruitment_type:e.target.value as LiveFilters['recruitment_type']}))}} aria-label={lang==='zh'?'招聘类型':'Recruitment type'}>
+      <option value="">{lang==='zh'?'全部招聘类型':'All job types'}</option>
+      <option value="SOCIAL">{lang==='zh'?'常规 / 社招':'Professional'}</option>
+      <option value="CAMPUS">{lang==='zh'?'应届 / 校招':'Graduate'}</option>
+      <option value="INTERNSHIP">{lang==='zh'?'实习':'Internship'}</option>
+    </select>
+    <select value={filters.education||''} onChange={e=>{setPage(0);setFilters(f=>({...f,education:e.target.value}))}}
+      aria-label={lang==='zh'?'学历要求':'Education requirements'}>
+      <option value="">{lang==='zh'?'全部学历要求':'Any education requirement'}</option>
+      <option value="UNRESTRICTED">{lang==='zh'?'明确不限学历':'Explicitly no degree required'}</option>
+      <option value="HIGH_SCHOOL">{lang==='zh'?'要求高中学历':'High school requirement'}</option>
+      <option value="ASSOCIATE">{lang==='zh'?'要求专科学历':'Associate requirement'}</option>
+      <option value="BACHELOR">{lang==='zh'?'要求本科学历':'Bachelor requirement'}</option>
+      <option value="MASTER">{lang==='zh'?'要求硕士学历':'Master requirement'}</option>
+      <option value="PHD">{lang==='zh'?'要求博士学历':'Doctoral requirement'}</option>
+    </select>
+    <select value={filters.experience||''} onChange={e=>{setPage(0);setFilters(f=>({...f,experience:e.target.value}))}}
+      aria-label={lang==='zh'?'经验要求':'Experience requirement'}>
+      <option value="">{lang==='zh'?'全部经验要求':'All experience requirements'}</option>
+      <option value="0">{lang==='zh'?'明确不要求经验':'No experience required'}</option>
+      <option value="1-3">{lang==='zh'?'最低经验 1—3 年':'Minimum 1–3 years'}</option>
+      <option value="3-5">{lang==='zh'?'最低经验 3—5 年':'Minimum 3–5 years'}</option>
+      <option value="5+">{lang==='zh'?'最低经验 5 年以上':'Minimum 5+ years'}</option>
+      <option value="unreported">{lang==='zh'?'经验要求未识别':'Experience unspecified'}</option>
     </select>
     <label className="unified-job-remote"><input type="checkbox" checked={filters.remote}
       onChange={e=>{setPage(0);setFilters(f=>({...f,remote:e.target.checked}))}}/>
-      {lang==='zh'?'仅远程':'Remote only'}</label>
+      {lang==='zh'?'仅远程岗位':'Remote only'}</label>
   </div>;
   const market=<section className="unified-market" aria-labelledby="unified-market-title">
     <div className="unified-market-heading"><div><small>HHBA · RECRUITMENT</small>
@@ -92,6 +134,13 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       <p>{lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
       <LanguageSwitcher lang={lang} change={change}/></div>
     {controls}
+    {intentLabels.length>0&&<p className="unified-search-interpreted">
+      {lang==='zh'?'搜索条件已识别：':'Recognized filters: '}{intentLabels.join(' · ')}
+    </p>}
+    <p className="unified-search-provenance">
+      {lang==='zh'?'学历和年限筛选仅使用官方 JD 明确可识别的内容；未披露不代表不限。检索信息为机器提取，请在职位详情核对原文。':
+       'Education and experience filters use identifiable official JD evidence. Unreported does not mean unrestricted. Verify requirements against the source.'}
+    </p>
     {auditSummary && Number.isFinite(Date.parse(auditSummary.checked_at)) &&
       Date.now()-Date.parse(auditSummary.checked_at)<24*3600_000 &&
       snapshot?.updated===auditSummary.indexed_as_of &&
@@ -113,8 +162,8 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       shown.length?<div className="unified-job-grid">{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated}/>)}</div>:
         <div className="unified-job-state">{lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
     <div className="unified-job-footer">
-      <span>{lang==='zh'? `本页符合展示要求 ${eligible.length} 条 · 来源更新时间：${formatDate(snapshot?.updated)}`
-        : `${eligible.length} verified for display on this page · Updated ${formatDate(snapshot?.updated)}`}</span>
+      <span>{lang==='zh'? `共匹配 ${snapshot?.total.toLocaleString()||0} 条 · 本页 ${eligible.length} 条 · 来源更新时间：${formatDate(snapshot?.updated)}`
+        : `${snapshot?.total.toLocaleString()||0} matching jobs · ${eligible.length} on this page · Updated ${formatDate(snapshot?.updated)}`}</span>
       {compact?<Link to="/candidate/jobs">{lang==='zh'?'查看完整招聘市场':'Browse all jobs'} <ArrowRight size={15}/></Link>:
         <div className="unified-job-paging">
           <button type="button" disabled={page===0||loading} onClick={()=>setPage(x=>x-1)}>{lang==='zh'?'上一页':'Previous'}</button>
