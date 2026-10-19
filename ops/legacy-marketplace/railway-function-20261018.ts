@@ -1066,7 +1066,25 @@ async function ensureChineseProse(value:string):Promise<string|null>{
 }
 
 const JD_READER_SIZE=900;
-const JD_READER_MAX_CHARS=30000;
+const JD_READER_MAX_CHARS=100000;
+// In-memory private, short-lived translation cache keyed by exact official JD hash.
+// No full third-party JD or unlicensed translations are exported to Pages or GitHub.
+const readerChunkCache=new Map<string,{text:string,at:number,total:number}>();
+const readerJobProgress=new Map<string,{parts:Set<number>,total:number,at:number,jobId:string}>();
+const READER_CACHE_TTL=2*60*60*1000;
+function pruneReaderCache(){
+ const now=Date.now();
+ for(const [key,value] of readerChunkCache)if(now-value.at>READER_CACHE_TTL)readerChunkCache.delete(key);
+ for(const [key,value] of readerJobProgress)if(now-value.at>READER_CACHE_TTL)readerJobProgress.delete(key);
+ while(readerChunkCache.size>900)readerChunkCache.delete(readerChunkCache.keys().next().value!);
+ while(readerJobProgress.size>300)readerJobProgress.delete(readerJobProgress.keys().next().value!);
+}
+function markReaderPart(key:string,jobId:string,part:number,total:number){
+ let x=readerJobProgress.get(key);
+ if(!x||x.total!==total)x={parts:new Set<number>(),total,at:Date.now(),jobId};
+ x.parts.add(part);x.at=Date.now();readerJobProgress.set(key,x);
+}
+
 const translationRequests=new Map<string,{count:number,expires:number}>();
 let activeJdReaders=0;
 function jdChunks(full:string):string[]{
@@ -1147,6 +1165,14 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
   if(digest!==sourceHash)return Response.json({error:"source_changed"},{status:409,headers});
   const chunks=jdChunks(english);
   if(part>=chunks.length)return Response.json({error:"part_out_of_range"},{status:404,headers});
+  const cacheKey=createHash("sha256").update(job.id+"\\0"+digest+"\\0"+part).digest("hex");
+  pruneReaderCache();
+  const cached=readerChunkCache.get(cacheKey);
+  if(cached&&cached.total===chunks.length){
+    markReaderPart(job.id+":"+digest,job.id,part,chunks.length);
+    return Response.json({jobId:job.id,part,total:chunks.length,text:cached.text,sourceHash:digest,
+      numbersVerified:true,sourceUrl:job.url,mode:"ephemeral_verified_translation",cached:true},{headers});
+  }
   const one=chunks[part];
   const segments=one.split(/\n{2,}/).filter(Boolean).map(raw=>{
    const kind=raw.startsWith("# ")?"heading":raw.startsWith("- ")?"bullet":"paragraph";
@@ -1170,8 +1196,11 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
    translated.push(mark+corrected.trim());
   }
   const text=translated.join("\n\n");
+  readerChunkCache.set(cacheKey,{text,at:Date.now(),total:chunks.length});
+  markReaderPart(job.id+":"+digest,job.id,part,chunks.length);
+  pruneReaderCache();
   return Response.json({jobId:job.id,part,total:chunks.length,text,sourceHash:digest,
-    numbersVerified:true,sourceUrl:job.url,mode:"private_semantic_translation"},{headers});
+    numbersVerified:true,sourceUrl:job.url,mode:"private_semantic_translation",cached:false},{headers});
  }catch(ex){
   console.log("HHBA_READER_ERROR",ex instanceof Error?ex.name:"unknown");
   return Response.json({error:"translation_temporarily_unavailable"},{status:503,headers});
@@ -1200,7 +1229,12 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
   for(const job of records){const state=job.titleStatus as keyof typeof categories;if(state in categories)categories[state]++;}
   return Response.json({total:records.length,boards:d?.boards||0,titleTranslations:categories,
    cachePersistent:!!translationDb,translationEngine:privateTranslatorUrl()?"libretranslate-private":"unconfigured",
-   completeOriginalJdTranslationsAvailable:false,searchLanguages:["zh","en"]},{headers});
+   completeOriginalJdTranslationsAvailable:false,
+    readerJobCompletionsInMemory:[...readerJobProgress.values()].filter(v=>v.parts.size===v.total).length,
+    readerJobsPartiallyTranslatedInMemory:[...readerJobProgress.values()].filter(v=>v.parts.size<v.total).length,
+    readerEphemeralCache:true,readerCacheHours:2,
+    readerLimitCharacters:JD_READER_MAX_CHARS,
+    searchLanguages:["zh","en"]},{headers});
  }
  if(u.pathname==="/api/jobs/page"){
   const data=await load();const rows=data?.rows||[];
