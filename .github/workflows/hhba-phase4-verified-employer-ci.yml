@@ -24,7 +24,7 @@ jobs:
       - name: Compile backend and new phase 4 migration without executing unsafe data changes
         run: |
           python -m py_compile apps/api/app/main.py apps/api/migrations/versions/20261020_phase4_employer_postings.py apps/api/tests/test_phase4_employer_workspace.py
-      - name: Verify independent posting review and opt-in only talent search with immediate revoke
+      - name: Verify reviewed employer postings, SQL authorization, private talent search and immediate revoke
         working-directory: apps/api
         run: python -m pytest -q tests/test_phase4_employer_workspace.py
   frontend:
@@ -47,6 +47,12 @@ jobs:
         env:
           HHBA_GITHUB_PAGES: '1'
         run: npm run build
+      - name: Verify standalone public employer jobs and independent reviewer pages
+        run: |
+          test -f apps/web/src/pages/EmployerPublicJobsPage.tsx
+          test -f apps/web/src/pages/EmployerReviewPage.tsx
+          test -f apps/web/src/styles/employer-public-jobs.css
+          test -f apps/web/src/styles/employer-review.css
       - name: Verify employer dashboard and admin review are both integrated without changing official ATS search
         run: |
-          node -e "const fs=require('fs');const ui=fs.readFileSync('apps/web/src/pages/EmployerWorkspacePage.tsx','utf8');const router=fs.readFileSync('apps/web/src/main.tsx','utf8');for(const k of ['api.createPosting','api.submitPosting','api.talentSearch','api.closePosting','/recruiter/onboarding'])if(!ui.includes(k))throw Error('missing employer action '+k);if(!router.includes('/employer/workspace')||!router.includes('/admin/recruitment'))throw Error('workspace or reviewer route absent');console.log('HHBA_EMPLOYER_WORKSPACE_CONTRACT_PASS');"
+          node -e "const fs=require('fs');const ui=fs.readFileSync('apps/web/src/pages/EmployerWorkspacePage.tsx','utf8');const router=fs.readFileSync('apps/web/src/main.tsx','utf8');for(const k of ['api.createPosting','api.submitPosting','api.talentSearch','api.closePosting','/recruiter/onboarding'])if(!ui.includes(k))throw Error('missing employer action '+k);if(!router.includes('/employer/workspace')||!router.includes('/admin/employer-review'))throw Error('workspace or reviewer route absent');console.log('HHBA_EMPLOYER_WORKSPACE_CONTRACT_PASS');"
