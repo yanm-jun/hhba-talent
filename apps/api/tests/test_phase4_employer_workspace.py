@@ -10,7 +10,7 @@ Base.metadata.create_all(engine)
 PWD='SyntheticOnly123!'
 def actor(name,kind='recruiter'):
  client=TestClient(app)
- email=f'{name}-{uuid.uuid4().hex[:8]}@synthetic.invalid'
+ email=f'{name}-{uuid.uuid4().hex[:8]}@hhba-synthetic.com'
  response=client.post('/api/v1/auth/register',json={'email':email,'password':PWD,'display_name':name,'account_type':kind})
  assert response.status_code==201,response.text
  login=client.post('/api/v1/auth/session',json={'email':email,'password':PWD,'account_type':kind})
@@ -98,8 +98,8 @@ def test_revoked_recruiter_prevents_public_access_even_if_posting_published():
  ad,token,_=admin()
  assert ad.post(f'/api/v1/admin/employer-postings/{pid}/review',json={'decision':'approved','reason_code':'checked'},headers={'X-CSRF-Token':token}).status_code==200
  with SessionLocal() as s:
-  actor=s.query(User).filter_by(email=email).one()
-  grant=s.query(RecruiterOrganizationAuthorization).filter_by(organization_id=uuid.UUID(oid),user_id=actor.id).one()
+  recruiter_user=s.query(User).filter_by(email=email).one()
+  grant=s.query(RecruiterOrganizationAuthorization).filter_by(organization_id=uuid.UUID(oid),user_id=recruiter_user.id).one()
   grant.status='revoked';grant.revoked_at=now();s.commit()
  assert c.get(f'/api/v1/public/employer-postings/{pid}').status_code==404
  assert all(x['id']!='employer-'+pid for x in c.get('/api/v1/public/employer-postings').json()['items'])
