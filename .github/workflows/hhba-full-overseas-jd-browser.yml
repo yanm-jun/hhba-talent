@@ -1,0 +1,26 @@
+name: HHBA Full Overseas JD Three ATS Browser E2E
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-full-overseas-jd-browser.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/github-pages-white-preview-20261019
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Chromium and Playwright
+        run: |
+          python -m pip install 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Validate English source and complete Chinese reader on Greenhouse Ashby Lever
+        run: python scripts/check_full_overseas_jd_three_ats.py
