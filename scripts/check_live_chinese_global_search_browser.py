@@ -36,6 +36,22 @@ async def main():
     assert "远程" in label and "明确无学历要求" in label
    results.append({"query":query,"count":count,"recognized":recognized})
    print("HHBA_LIVE_CHINESE_JOB_SEARCH",json.dumps(results[-1],ensure_ascii=False))
+  # User may elect a clearly labelled broader search without pretending unknown means no degree.
+  await page.locator(".unified-search-fallback button").wait_for(timeout=12000)
+  await page.locator(".unified-search-fallback button").click()
+  await page.locator(".unified-search-fallback-active").wait_for(timeout=12000)
+  await page.wait_for_timeout(850)
+  try:await page.locator(".unified-job-state[role='status']").wait_for(state="hidden",timeout=45000)
+  except Exception:pass
+  text=await page.locator(".unified-job-footer").inner_text()
+  match=re.search(r"共匹配\s*([\d,]+)\s*条",text)
+  assert match and int(match.group(1).replace(",",""))>0, "Unknown-degree fallback must show real jobs"
+  fallback_count=int(match.group(1).replace(",",""))
+  warning=await page.locator(".unified-search-fallback-active").inner_text()
+  assert "可能仍有学历要求" in warning
+  print("HHBA_NO_DEGREE_UNKNOWN_FALLBACK_VERIFIED",json.dumps({
+    "relaxed_candidate_count":fallback_count,"unknown_degree_is_not_unrestricted":True
+  },ensure_ascii=False))
   await page.locator(".unified-job-search input").fill("")
   await page.locator("select[aria-label='国家筛选']").select_option("US")
   await page.locator("select[aria-label='城市筛选']").select_option("new york")
