@@ -1148,7 +1148,7 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
  let data:any;
  try{data=await req.json();}catch{return Response.json({error:"bad_json"},{status:400,headers});}
  const part=data?.part,sourceHash=data?.sourceHash;
- if(!Number.isInteger(part)||part<0||part>80||
+ if(!Number.isInteger(part)||part<0||part>150||
     typeof sourceHash!=="string"||!/^[a-f0-9]{64}$/.test(sourceHash))
   return Response.json({error:"bad_reader_request"},{status:400,headers});
  const catalog=await load();
@@ -1164,8 +1164,9 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
   const digest=createHash("sha256").update(english).digest("hex");
   if(digest!==sourceHash)return Response.json({error:"source_changed"},{status:409,headers});
   const chunks=jdChunks(english);
+  if(chunks.length>150)return Response.json({error:"source_too_many_parts"},{status:422,headers});
   if(part>=chunks.length)return Response.json({error:"part_out_of_range"},{status:404,headers});
-  const cacheKey=createHash("sha256").update(job.id+"\\0"+digest+"\\0"+part).digest("hex");
+  const cacheKey=createHash("sha256").update(job.id+"\0"+digest+"\0"+part).digest("hex");
   pruneReaderCache();
   const cached=readerChunkCache.get(cacheKey);
   if(cached&&cached.total===chunks.length){
