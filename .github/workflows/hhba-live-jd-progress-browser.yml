@@ -1,0 +1,33 @@
+name: HHBA Real Overseas JD Progress Browser Acceptance
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-live-jd-progress-browser.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/github-pages-white-preview-20261019
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Chromium test runner
+        run: |
+          python -m pip install 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Verify real total and completed JD progress in Chinese and English
+        run: python scripts/check_live_overseas_jd_progress.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-live-jd-progress-mobile
+          path: /tmp/hhba-live-jd-progress.png
+          retention-days: 14
+          if-no-files-found: ignore
