@@ -41,7 +41,7 @@ jobs:
       - name: Verify full-audit regression cases
         working-directory: apps/web
         run: node --test scripts/audit-all-official-jds.test.mjs
-      - name: Audit ALL existing jobs against official role content and requirements
+      - name: Audit ALL jobs, compare official JD changes and verify requirements
         working-directory: apps/web
         run: node scripts/audit-all-official-jds.mjs
       - name: Preserve per-job evidence states without copying copyrighted JD
