@@ -1,4 +1,5 @@
 // One source and one public-job identity for the home market and candidate market.
+import {loadPublicJobAudit} from './jobSyncStatus';
 export type Language = 'zh' | 'en';
 export type LiveJob = {
   id: string; company: string; companyZh?: string; title: string; titleZh?: string;
@@ -139,7 +140,20 @@ function searchPreview(data:LivePage,filters:LiveFilters,offset:number):LivePage
   return {...data,jobs:rows.slice(offset,offset+30),total:rows.length,offset,limit:30};
 }
 export async function listJobs(filters: LiveFilters, offset: number, signal: AbortSignal) {
-  if(PAGES_PREVIEW) return searchPreview(await previewSnapshot(signal),filters,offset);
+  if(PAGES_PREVIEW) {
+    const snapshot=await previewSnapshot(signal);
+    const audit=await loadPublicJobAudit();
+    if(!audit || audit.summary.indexed_as_of!==snapshot.updated)
+      throw new Error('官方岗位核验结果尚未与列表同步，暂不显示旧数据');
+    const excluded=new Set(audit.jobs.filter(entry=>[
+      'MISSING_FROM_OFFICIAL_BOARD','OFFICIAL_URL_CHANGED',
+      'OFFICIAL_SOURCE_READ_FAILED','OFFICIAL_TITLE_CHANGED',
+      'INVALID_ATS_ID_OR_URL','DUPLICATE_JOB_ID','INVALID_JOB_ID'
+    ].includes(entry.status)).map(entry=>entry.job_id));
+    const current={...snapshot,jobs:snapshot.jobs.filter(job=>!excluded.has(job.id)),
+      total:snapshot.jobs.length-excluded.size};
+    return searchPreview(current,filters,offset);
+  }
   const p = new URLSearchParams({ limit:'30',offset:String(offset) });
   if (filters.q.trim()) p.set('q', filters.q.trim().slice(0,100));
   if (filters.company.trim()) p.set('company',filters.company.trim().slice(0,100));
