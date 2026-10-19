@@ -9,6 +9,7 @@ import { Database } from "bun:sqlite";
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, existsSync } from "node:fs";
 import { openJobSyncStore } from "./jd-sync-store.mjs";
+import { startOverseasJdWorker } from "./jd-sync-worker.mjs";
 import { createFullJdWorker } from "./jd-sync-runner.mjs";
 const phrases:[string,string][]=[
  ["Integration Technician","集成技术员"],["Test Technician","测试技术员"],
@@ -1325,12 +1326,20 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
  }finally{activeJdReaders--;}
 }
 
+if(durableJobStore && privateTranslatorUrl()){
+ startOverseasJdWorker({store:durableJobStore,load,boardsCount:boards.length,
+  officialDetail,jdChunks,translateVerifiedChunk:verifiedJdChunk,
+  maxCharacters:JD_READER_MAX_CHARS,dailyChunks:JD_SYNC_DAILY_CHUNKS,
+  intervalMs:JD_SYNC_INTERVAL_MS});
+}
+
 Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  const u=new URL(req.url);
  const headers:Record<string,string>={"Cache-Control":"no-store","X-Content-Type-Options":"nosniff","X-Frame-Options":"DENY","Referrer-Policy":"no-referrer"};
  const pagesRequest=req.headers.get("origin")==="https://yanm-jun.github.io" &&
    /^\/api\/jobs\/[A-Za-z0-9_-]{1,180}(?:\/translate-part)?$/.test(u.pathname);
- if(pagesRequest){
+ const pagesSyncStatus=req.headers.get("origin")==="https://yanm-jun.github.io" && u.pathname==="/api/jd-sync/status";
+ if(pagesRequest||pagesSyncStatus){
    headers["Access-Control-Allow-Origin"]="https://yanm-jun.github.io";
    headers["Vary"]="Origin";
    headers["Access-Control-Allow-Methods"]="GET, POST, OPTIONS";
@@ -1341,6 +1350,14 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  if(req.method==="POST"&&/^\/api\/jobs\/[a-zA-Z0-9_-]{1,180}\/translate-part$/.test(u.pathname))return readJobForTranslation(req,u,headers);
  if(req.method!=="GET")return new Response("Method not allowed",{status:405,headers});
  if(u.pathname==="/health")return Response.json({ok:true,kind:"hhba-ats-public-preview"},{headers});
+ if(u.pathname==="/api/jd-sync/status"){
+  return Response.json(durableJobStore?{...durableJobStore.coverage(),
+   enabled:true,persistent:true,
+   translationBudgetRemaining:durableJobStore.remainingBudget(JD_SYNC_DAILY_CHUNKS)}:
+   {kind:"HHBA_OVERSEAS_JD_SYNC_V1",enabled:false,persistent:false,
+    complete:0,total_current:0,reason:"PRIVATE_VOLUME_NOT_ENABLED"},{headers});
+ }
+
  if(u.pathname==="/api/i18n/status"){
   const d=await load(),records=(d?.rows||[]).map(present);
   const categories={machine:0,rules:0,pending:0,original:0};
