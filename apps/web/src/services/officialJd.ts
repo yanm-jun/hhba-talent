@@ -231,8 +231,24 @@ export async function translateGreenJd(job:LiveJob,originalText:string,signal:Ab
   }catch{}
   const translated:string[]=[];let total=1;
   const maxAttempts=3;
+  // Chunk cache is private to the current browser session and bound to the
+  // exact source JD hash. Failed translations resume without hiding gaps.
+  const partPrefix=cacheKey+':part:';
   for(let part=0;part<total;part++){
     if(signal.aborted)throw new DOMException('Aborted','AbortError');
+    if(part>0){
+      let saved:string|null=null;
+      try{saved=sessionStorage.getItem(partPrefix+part)}catch{}
+      if(saved){
+        try{
+          const parsed=JSON.parse(saved) as {text:string,total:number};
+          if(parsed.total===total && typeof parsed.text==='string' &&
+             /[\u3400-\u9fff]/u.test(parsed.text) && !/\uFFFD/.test(parsed.text)){
+            translated.push(parsed.text);onProgress?.(part+1,total);continue;
+          }
+        }catch{}
+      }
+    }
     let response:Response|null=null;
     for(let attempt=0;attempt<maxAttempts;attempt++){
       response=await fetch(GREEN_SITE+'/api/jobs/'+encodeURIComponent(job.id)+'/translate-part',{
@@ -265,6 +281,7 @@ export async function translateGreenJd(job:LiveJob,originalText:string,signal:Ab
        /(?:[A-Za-z]{3,}\s+){12,}[A-Za-z]{3,}/.test(data.text))
        throw new Error('检测到不完整或乱码译文，此岗位不计为完成');
     translated.push(data.text);
+    try{sessionStorage.setItem(partPrefix+part,JSON.stringify({text:data.text,total}))}catch{}
     onProgress?.(part+1,total);
   }
   const result=translated.join('\n\n');
