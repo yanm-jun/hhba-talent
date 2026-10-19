@@ -135,7 +135,7 @@ def profile_from_llm(raw: dict, redacted_resume: str) -> dict:
 
     edu = raw.get("education") if isinstance(raw.get("education"), dict) else {}
     level = edu.get("level")
-    education = level if level in LEVEL and evidence_ok(edu.get("evidence")) else None
+    education = level if isinstance(level, str) and level in LEVEL and evidence_ok(edu.get("evidence")) else None
     years = raw.get("experience_years")
     years_ev = raw.get("experience_evidence")
     if not isinstance(years, (int, float)) or isinstance(years, bool) or not (0 <= years <= 55) or not evidence_ok(years_ev):
@@ -176,9 +176,16 @@ def rank_official_jobs(profile: dict, jobs: list[dict], facets: dict[str, dict],
     for j in jobs:
         if not isinstance(j, dict) or j.get("domestic") is True or not valid_official_url(j):
             continue
-        if j.get("id") not in audits or audits[j["id"]].get("status") in AUDIT_EXCLUDED:
+        evidence = audits.get(j.get("id"))
+        if (not isinstance(evidence, dict)
+                or evidence.get("status") not in {"OFFICIAL_JD_AND_REQUIREMENTS_FOUND", "OFFICIAL_JD_REQUIREMENTS_UNCLASSIFIED"}
+                or evidence.get("full_original_jd_verified") is not True):
             continue
         f = facets.get(j["id"], {})
+        if not isinstance(f, dict) or not re.fullmatch(r"[a-f0-9]{64}", str(f.get("original_source_hash") or "")):
+            continue
+        if f["original_source_hash"] != evidence.get("jd_sha256"):
+            continue
         if country and f.get("countryCode") != country:
             continue
         if remote_only and j.get("remote") is not True:
