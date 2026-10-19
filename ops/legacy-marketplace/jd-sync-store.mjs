@@ -24,9 +24,9 @@ export function openJobSyncStore(file,{now=()=>Date.now()}={}){
  const count=db.query("SELECT COUNT(*) AS n FROM parts WHERE id=? AND hash=? AND expire_ms>?");
  const getPart=db.query("SELECT zh,total,expire_ms FROM parts WHERE id=? AND hash=? AND part=?");
  const removeParts=db.query("DELETE FROM parts WHERE id=?");
- const updateSource=db.query("UPDATE jobs SET hash=?,total=?,done=?,state=?,checked_ms=?,lease_ms=0,next_ms=0,error=NULL WHERE id=?");
+ const updateSource=db.query("UPDATE jobs SET hash=?,total=?,done=?,state=?,checked_ms=?,lease_ms=CASE WHEN state='WORKING' AND lease_ms>? THEN lease_ms ELSE 0 END,next_ms=0,error=NULL,attempts=CASE WHEN hash IS NOT ? THEN 0 ELSE attempts END WHERE id=?");
  const insertPart=db.query("INSERT INTO parts(id,hash,part,total,zh,expire_ms) VALUES(?,?,?,?,?,?) ON CONFLICT(id,hash,part) DO UPDATE SET zh=excluded.zh,total=excluded.total,expire_ms=excluded.expire_ms");
- const updatePart=db.query("UPDATE jobs SET done=?,state=?,checked_ms=?,lease_ms=0,next_ms=0,error=NULL WHERE id=?");
+ const updatePart=db.query("UPDATE jobs SET done=?,state=?,checked_ms=?,lease_ms=CASE WHEN state='WORKING' AND lease_ms>? THEN lease_ms ELSE 0 END,next_ms=0,error=NULL WHERE id=?");
  const upsert=db.query("INSERT INTO jobs(id,platform,company,url,seen_ms,priority) VALUES(?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET platform=excluded.platform,company=excluded.company,url=excluded.url,seen_ms=excluded.seen_ms,priority=excluded.priority,state=CASE WHEN jobs.url<>excluded.url OR jobs.state='REMOVED' THEN 'QUEUED' ELSE jobs.state END,hash=CASE WHEN jobs.url<>excluded.url THEN NULL ELSE jobs.hash END,total=CASE WHEN jobs.url<>excluded.url THEN NULL ELSE jobs.total END,done=CASE WHEN jobs.url<>excluded.url THEN 0 ELSE jobs.done END,next_ms=CASE WHEN jobs.url<>excluded.url THEN 0 ELSE jobs.next_ms END,lease_ms=CASE WHEN jobs.url<>excluded.url THEN 0 ELSE jobs.lease_ms END");
  function catalogSync(rows,{complete=false}={}){
   if(!Array.isArray(rows)||rows.length>100000)throw Error("INVALID_INDEX");
@@ -53,7 +53,7 @@ export function openJobSyncStore(file,{now=()=>Date.now()}={}){
    if(!j||j.state==="REMOVED")throw Error("JOB_NOT_IN_CURRENT_INDEX");
    if(j.hash!==hash)removeParts.run(id);
    const n=Number(count.get(id,hash,now()).n);
-   updateSource.run(hash,total,n,n===total?"COMPLETE":"TRANSLATING",now(),id);
+   updateSource.run(hash,total,n,n===total?"COMPLETE":j.state==="WORKING"&&j.lease_ms>now()?"WORKING":"TRANSLATING",now(),now(),hash,id);
    return {total,done:n,complete:n===total,source_changed:j.hash!==hash};
   })();
  }
@@ -73,7 +73,7 @@ export function openJobSyncStore(file,{now=()=>Date.now()}={}){
    insertPart.run(id,hash,part,total,zh,ts+TTL);
    const n=Number(count.get(id,hash,ts).n);
    const complete=n===total;
-   updatePart.run(n,complete?"COMPLETE":"TRANSLATING",ts,id);
+   updatePart.run(n,complete?"COMPLETE":j.state==="WORKING"&&j.lease_ms>ts?"WORKING":"TRANSLATING",ts,ts,id);
    return {done:n,total,complete};
   })();
  }
