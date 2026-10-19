@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
-      - name: Build HHBA bilingual JD and official source grounded Chinese natural job search
+      - name: Build Chinese global search with real location filters and explicit unknown-degree fallback
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
