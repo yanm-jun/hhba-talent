@@ -219,10 +219,12 @@ Return only a JSON object with this shape:
 {"education":{"level":"BACHELOR","evidence":"exact text copied from resume"},
  "experience_years":3,"experience_evidence":"exact text copied from resume",
  "skills":[{"name":"Python","evidence":"exact phrase copied from resume"}],
- "target_roles":[{"role":"Software Engineer","evidence":"exact phrase copied from resume"}]}
+ "target_roles":[{"role":"Software Engineer","evidence":"exact phrase copied from resume"}],
+ "experiences":[{"role":"Sales Manager","organization":"Acme Corp","period":"2022-2025","evidence":"exact text copied from resume"}]}
 Education level must be one of HIGH_SCHOOL, ASSOCIATE, BACHELOR, MASTER, PHD, or null.
 Use null (and null evidence) if the resume does not prove the education level or years.
-Every skill and target role MUST have an exact evidence snippet from the resume.
+Every skill, target role, and work experience MUST have an exact evidence snippet from the resume.
+For work experience, preserve original role, organization and period strings only when they appear literally in that same evidence snippet.
 Copy evidence VERBATIM, never paraphrase it. Do not infer a certification,
 an employer, work years, a skill or a degree from unrelated context.
 Do not emit personal identifiers, names, phone numbers, addresses or e-mails.
