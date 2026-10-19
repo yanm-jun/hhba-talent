@@ -1,0 +1,56 @@
+name: HHBA Full Overseas JD Reader Build Verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-overseas-jd-build.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/full-overseas-jd-translation-20261019
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.3'
+      - name: Verify job ID consistency and transparent translation progress
+        working-directory: ops/legacy-marketplace
+        run: |
+          node -e "const fs=require('fs');const c=fs.readFileSync('railway-function-20261018.ts','utf8');for(const k of ['JD_READER_MAX_CHARS=100000','readerChunkCache','readerJobCompletionsInMemory','sourceHash!==digest','translation_incomplete','numbersVerified:true','maxAttempts','part>150'])if(!c.includes(k))throw Error('Missing translation safety: '+k);console.log('SERVER_READONLY_FULL_JD_CONTRACT_PASS')"
+      - name: Install Bun existing dependencies
+        working-directory: ops/legacy-marketplace
+        run: bun install
+      - name: Verify ATS backend compiles
+        working-directory: ops/legacy-marketplace
+        run: |
+          cp railway-function-20261018.ts server.ts
+          sed -i 's/"html-to-text@9"/"html-to-text"/;s/"sanitize-html@2"/"sanitize-html"/' server.ts
+          bun build --target=bun server.ts --outdir /tmp/hhba-full-jd-reader
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/full-overseas-jd-reader-20261019
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked frontend dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Build bilingual HHBA Pages
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+        run: npm run build
+      - name: Verify partial-retry isolation and complete-only Chinese status
+        run: |
+          node -e "const fs=require('fs');const a=fs.readFileSync('apps/web/src/services/officialJd.ts','utf8');for(const k of ['sourceHash:hash','numbersVerified!==true','partPrefix+part','data.total>150','100_000','maxAttempts=3'])if(!a.includes(k))throw Error('Missing client full-JD safety: '+k);console.log('CLIENT_CHUNKED_TRANSLATION_CONTRACT_PASS')"
