@@ -1,0 +1,26 @@
+name: HHBA Branded Greenhouse Browser Acceptance
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-branded-browser-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  branded-job-details:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/github-pages-white-preview-20261019
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install real Chromium
+        run: |
+          python -m pip install 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Verify four branded employer official URLs and full JD details
+        run: python scripts/check_branded_greenhouse_browser.py
