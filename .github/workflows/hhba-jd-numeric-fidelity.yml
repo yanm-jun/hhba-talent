@@ -21,16 +21,12 @@ jobs:
       - name: Install existing Bun dependencies
         working-directory: ops/legacy-marketplace
         run: bun install
-      - name: Verify safe fallback plus reject contradictory numeric translations
+      - name: Execute real official numeric protection and contradictory-number rejection
+        working-directory: ops/legacy-marketplace
+        run: bun run verify-numeric-fidelity.mjs
+      - name: Compile ATS server with the verified numeric guard
         working-directory: ops/legacy-marketplace
         run: |
           cp railway-function-20261018.ts server.ts
           sed -i 's/"html-to-text@9"/"html-to-text"/;s/"sanitize-html@2"/"sanitize-html"/' server.ts
           bun build --target=bun server.ts --outdir /tmp/hhba-number-fidelity
-          set +e
-          timeout 8s bun run server.ts > /tmp/hhba-number-smoke.log 2>&1
-          status=$?
-          set -e
-          cat /tmp/hhba-number-smoke.log
-          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then exit "$status"; fi
-          grep 'HHBA_OFFICIAL_JD_NUMBER_GUARD' /tmp/hhba-number-smoke.log
