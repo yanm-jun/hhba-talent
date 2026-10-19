@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
-      - name: Build HHBA Chinese job search plus platform-provided DeepSeek resume matching entrance
+      - name: Publish canonical HHBA candidate resume AI matching page with administrator-only DeepSeek key
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
