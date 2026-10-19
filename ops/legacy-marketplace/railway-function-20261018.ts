@@ -1069,7 +1069,11 @@ function humanReaderAllowed(req:Request,u:URL):boolean{
  const origin=req.headers.get("origin");
  const host=req.headers.get("host");
  if(!host||!/^hhba-(?:live-jobs-preview-production|web-production-024c)\.up\.railway\.app(?::443)?$/i.test(host))return false;
- return origin==="https://"+host.replace(/:443$/,"") &&
+ const sameOrigin=origin==="https://"+host.replace(/:443$/,"");
+ const pagesOrigin=host.replace(/:443$/,"")==="hhba-web-production-024c.up.railway.app" &&
+   origin==="https://yanm-jun.github.io" &&
+   /^\/api\/jobs\/[A-Za-z0-9_-]{1,180}\/translate-part$/.test(u.pathname);
+ return (sameOrigin||pagesOrigin) &&
    req.headers.get("content-type")?.startsWith("application/json")===true &&
    Number(req.headers.get("content-length")||0)<=300;
 }
@@ -1145,7 +1149,17 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
 
 Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  const u=new URL(req.url);
- const headers={"Cache-Control":"no-store","X-Content-Type-Options":"nosniff","X-Frame-Options":"DENY","Referrer-Policy":"no-referrer"};
+ const headers:Record<string,string>={"Cache-Control":"no-store","X-Content-Type-Options":"nosniff","X-Frame-Options":"DENY","Referrer-Policy":"no-referrer"};
+ const pagesRequest=req.headers.get("origin")==="https://yanm-jun.github.io" &&
+   /^\/api\/jobs\/[A-Za-z0-9_-]{1,180}(?:\/translate-part)?$/.test(u.pathname);
+ if(pagesRequest){
+   headers["Access-Control-Allow-Origin"]="https://yanm-jun.github.io";
+   headers["Vary"]="Origin";
+   headers["Access-Control-Allow-Methods"]="GET, POST, OPTIONS";
+   headers["Access-Control-Allow-Headers"]="Content-Type";
+ }
+ if(req.method==="OPTIONS"&&pagesRequest)
+   return new Response(null,{status:204,headers});
  if(req.method==="POST"&&/^\/api\/jobs\/[a-zA-Z0-9_-]{1,180}\/translate-part$/.test(u.pathname))return readJobForTranslation(req,u,headers);
  if(req.method!=="GET")return new Response("Method not allowed",{status:405,headers});
  if(u.pathname==="/health")return Response.json({ok:true,kind:"hhba-ats-public-preview"},{headers});
