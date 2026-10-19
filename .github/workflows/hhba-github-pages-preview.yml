@@ -1,0 +1,64 @@
+name: HHBA White Site GitHub Pages Preview
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-github-pages-preview.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '15 0,12 * * *'
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: hhba-github-pages-preview
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/github-pages-white-preview-20261019
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Build existing merged white HHBA React site
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+        run: npm run build
+      - name: Check static job metadata and create snapshot
+        working-directory: apps/web
+        run: node scripts/prepare-pages-jobs.mjs
+      - name: Check Chinese/English and original entry routes
+        run: node scripts/verify-dual-entry.mjs
+      - name: Enable deep-link reload fallback
+        working-directory: apps/web
+        run: cp dist/index.html dist/404.html
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - name: Upload exactly the public built site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/web/dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish the white HHBA site
+        id: deployment
+        uses: actions/deploy-pages@v4
