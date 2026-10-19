@@ -27,5 +27,10 @@ jobs:
           cp railway-function-20261018.ts server.ts
           sed -i 's/"html-to-text@9"/"html-to-text"/;s/"sanitize-html@2"/"sanitize-html"/' server.ts
           bun build --target=bun server.ts --outdir /tmp/hhba-number-fidelity
-          timeout 8s bun run server.ts > /tmp/hhba-number-smoke.log 2>&1 || test "$?" -eq 124
-          cat /tmp/hhba-number-smoke.log | grep 'HHBA_OFFICIAL_JD_NUMBER_GUARD'
+          set +e
+          timeout 8s bun run server.ts > /tmp/hhba-number-smoke.log 2>&1
+          status=$?
+          set -e
+          cat /tmp/hhba-number-smoke.log
+          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then exit "$status"; fi
+          grep 'HHBA_OFFICIAL_JD_NUMBER_GUARD' /tmp/hhba-number-smoke.log
