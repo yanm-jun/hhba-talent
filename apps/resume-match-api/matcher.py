@@ -112,6 +112,40 @@ def valid_official_url(job: dict) -> bool:
         return False
 
 
+DEGREE_EVIDENCE = {
+    "HIGH_SCHOOL": ("high school", "secondary school", "高中", "中专"),
+    "ASSOCIATE": ("associate", "专科", "大专"),
+    "BACHELOR": ("bachelor", "undergraduate", "b.sc", "b.s.", "学士", "本科"),
+    "MASTER": ("master", "m.sc", "m.s.", "硕士"),
+    "PHD": ("phd", "ph.d", "doctorate", "doctoral", "博士"),
+}
+CHINESE_YEAR_NUMBERS = {"零": 0, "一": 1, "二": 2, "两": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9, "十": 10}
+ENGLISH_YEAR_NUMBERS = {"zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10}
+
+
+
+def exact_skill_evidence(skill: str, evidence: str) -> bool:
+    aliases = SKILL_SYNONYMS.get(skill, (skill,))
+    t = normalized(evidence)
+    return any(has_phrase(t, alias) for alias in aliases)
+
+
+def exact_experience_evidence(years: float, evidence: str) -> bool:
+    t = normalized(evidence)
+    explicit = re.findall(r"(?<!\d)(\d{1,2}(?:\.\d)?)\s*(?:\+|以上)?\s*(?:years?|yrs?|年)(?!\w)", t)
+    if any(abs(float(value) - years) <= 0.1 for value in explicit):
+        return True
+    chinese = re.findall(r"([一二两三四五六七八九十])\s*年(?:以上|工作经验|经验)?", t)
+    if any(abs(CHINESE_YEAR_NUMBERS[value] - years) <= 0.1 for value in chinese):
+        return True
+    english = re.findall(r"\b(zero|one|two|three|four|five|six|seven|eight|nine|ten)\s*(?:years?|yrs?)\b", t)
+    if any(abs(ENGLISH_YEAR_NUMBERS[value] - years) <= 0.1 for value in english):
+        return True
+    periods = re.findall(r"\b(19\d{2}|20\d{2})\s*[-–—至到]\s*(19\d{2}|20\d{2})\b", t)
+    return any(0 <= int(end) - int(start) <= 55 and
+               abs(int(end) - int(start) - years) <= 1 for start, end in periods)
+
+
 def profile_from_llm(raw: dict, redacted_resume: str) -> dict:
     """Reject profile assertions without verbatim source evidence. No PII fields."""
     if not isinstance(raw, dict):
@@ -129,16 +163,19 @@ def profile_from_llm(raw: dict, redacted_resume: str) -> dict:
         if not isinstance(name, str) or len(name.strip()) > 45 or not evidence_ok(item.get("evidence")):
             continue
         skill = normalize_skill(name)
-        if skill and skill not in seen:
+        if skill and skill not in seen and exact_skill_evidence(skill, item['evidence']):
             seen.add(skill)
             skills.append({"name": skill, "evidence": item["evidence"][:180]})
 
     edu = raw.get("education") if isinstance(raw.get("education"), dict) else {}
     level = edu.get("level")
-    education = level if isinstance(level, str) and level in LEVEL and evidence_ok(edu.get("evidence")) else None
+    education = (level if isinstance(level, str) and level in LEVEL
+                 and evidence_ok(edu.get("evidence"))
+                 and any(has_phrase(normalized(edu["evidence"]), synonym)
+                         for synonym in DEGREE_EVIDENCE[level]) else None)
     years = raw.get("experience_years")
     years_ev = raw.get("experience_evidence")
-    if not isinstance(years, (int, float)) or isinstance(years, bool) or not (0 <= years <= 55) or not evidence_ok(years_ev):
+    if not isinstance(years, (int, float)) or isinstance(years, bool) or not (0 <= years <= 55) or not evidence_ok(years_ev) or not exact_experience_evidence(float(years), years_ev):
         years = None
     else:
         years = round(float(years), 1)
@@ -148,7 +185,7 @@ def profile_from_llm(raw: dict, redacted_resume: str) -> dict:
         if not isinstance(item, dict) or not isinstance(item.get("role"), str) or not evidence_ok(item.get("evidence")):
             continue
         text = item["role"].strip()[:70]
-        if text and text not in target_roles:
+        if text and text not in target_roles and (has_phrase(normalized(item['evidence']), text) or bool(set(role_categories(text)) & set(role_categories(item['evidence'])))):
             target_roles.append(text)
 
     experiences = []

@@ -65,6 +65,7 @@ app.add_middleware(
 MATCH_PUBLIC_ENABLED = os.getenv("HHBA_MATCH_PUBLIC_ENABLED", "0") == "1"
 QUOTA_DB_PATH = os.getenv("HHBA_QUOTA_DB_PATH", "/sync-state/hhba-match-usage.sqlite")
 quota_lock = asyncio.Lock()
+processing_semaphore = asyncio.Semaphore(MAX_CONCURRENT * 2)
 active_count = 0
 ip_salt = secrets.token_bytes(32)
 quota_db: sqlite3.Connection | None = None
@@ -167,19 +168,17 @@ def parse_resume(data: bytes, filename: str) -> str:
 
 
 def redact_resume(text: str) -> str:
-    # Redact obvious identifiers before calling third-party DeepSeek.
-    # Best effort only: applicants need clear consent and should remove
-    # names, addresses, photos and uncommon identifiers themselves.
+    """Best effort PII removal; keep experience dates like 2022-2025 intact."""
     rules = [
         (r"(?<![\w.])[\w.+-]{1,64}@[\w.-]{1,200}\.[A-Za-z]{2,20}\b", "[邮箱已隐藏]"),
-        (r"(?<!\d)(?:\+?\d[\d ()-]{7,}\d)(?!\d)", "[联系电话已隐藏]"),
         (r"\b\d{6}(?:19|20)\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{3}[\dXx]\b", "[身份证号已隐藏]"),
+        (r"(?<!\w)(?:\+\d{1,3}[\s().-]*)?(?:\d[\s().-]*){10,14}(?!\d)", "[联系电话已隐藏]"),
         (r"https?://(?:www\.)?(?:linkedin\.com/in|github\.com)/[\w./-]+", "[个人主页已隐藏]"),
+        (r"(?m)^(?:姓名|Name)\s*[:：]\s*[^\n]{1,70}$", "[姓名已隐藏]"),
     ]
-    for pat, rep in rules:
-        text = re.sub(pat, rep, text, flags=re.I)
+    for pattern, replacement in rules:
+        text = re.sub(pattern, replacement, text, flags=re.I)
     return text
-
 
 async def download_official_data() -> tuple[list, dict, dict]:
     now = time.monotonic()
@@ -387,10 +386,16 @@ async def resume_match(
     if file.size is not None and file.size > MAX_FILE:
         raise HTTPException(status_code=413, detail="FILE_TOO_LARGE")
 
-    await reserve_budget(client_ip(request))
+    # Reject malformed files and stale official snapshots before consuming
+    # a paid DeepSeek quota. Bound parsing separately from paid calls.
+    charged = False
+    parsing = False
     try:
-        # Retrieve published source data before disclosing any personal information
-        # to DeepSeek. A stale or missing official index fails the entire request.
+        try:
+            await asyncio.wait_for(processing_semaphore.acquire(), timeout=3.0)
+            parsing = True
+        except asyncio.TimeoutError:
+            raise HTTPException(status_code=429, detail="AI_TOO_MANY_ACTIVE_REQUESTS")
         jobs, facets, audit = await download_official_data()
         binary = await file.read(MAX_FILE + 1)
         await file.close()
@@ -398,6 +403,8 @@ async def resume_match(
         del binary
         redacted = redact_resume(text)
         del text
+        await reserve_budget(client_ip(request))
+        charged = True
         candidate = await extract_profile_with_deepseek(redacted, key)
         del redacted
 
@@ -415,7 +422,10 @@ async def resume_match(
         }, headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
     finally:
         await file.close()
-        await release_slot()
+        if charged:
+            await release_slot()
+        if parsing:
+            processing_semaphore.release()
 
 
 @app.exception_handler(HTTPException)

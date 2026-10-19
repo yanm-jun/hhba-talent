@@ -64,6 +64,26 @@ class MatcherSecurityTests(unittest.TestCase):
   self.assertEqual([x["name"] for x in p["skills"]],["python"])
   self.assertEqual(p["target_roles"],["Software Engineer"])
 
+ def test_model_may_not_claim_a_different_degree_skill_or_year_count_than_resume(self):
+  resume="Bachelor of Science. Three years experience building Python APIs and Excel reports. Software Engineer."
+  parsed={
+   "education":{"level":"PHD","evidence":"Bachelor of Science"},
+   "experience_years":12,"experience_evidence":"Three years experience",
+   "skills":[
+    {"name":"Java","evidence":"Python APIs"},
+    {"name":"Python","evidence":"Python APIs"}
+   ],
+   "target_roles":[
+    {"role":"Financial Controller","evidence":"Software Engineer"},
+    {"role":"Software Engineer","evidence":"Software Engineer"}
+   ],
+  }
+  p=profile_from_llm(parsed,resume)
+  self.assertIsNone(p["education"])
+  self.assertIsNone(p["experience_years"])
+  self.assertEqual([x["name"] for x in p["skills"]],["python"])
+  self.assertEqual(p["target_roles"],["Software Engineer"])
+
  def test_work_history_must_appear_verbatim_in_resume(self):
   resume="Acme Corp Sales Manager 2022-2025. Bachelor of Science. 3 years experience."
   candidate=profile_from_llm({
@@ -189,6 +209,28 @@ class ApiConsentTests(unittest.TestCase):
    self.database.close()
    self.database=server.quota_db
    self.assertEqual(self.submit().status_code,429)
+ def test_bad_resume_never_debits_daily_paid_ai_quota(self):
+  server.MATCH_PUBLIC_ENABLED=True
+  async def official():return [ROLE],{ROLE_ID:FACET},{ROLE_ID:AUDIT}
+  with patch.object(server,"download_official_data",official),patch.object(server,"extract_profile_with_deepseek") as ai:
+   response=self.client.post("/api/v1/match/resume",
+    data={"consent":"true","limit":"10"},
+    files={"file":("resume.pdf",b"this is not a pdf","application/pdf")},
+    headers={"Origin":"https://yanm-jun.github.io"})
+   self.assertIn(response.status_code,(415,422))
+   self.assertEqual(self.database.execute("SELECT COUNT(*) FROM usage").fetchone()[0],0)
+   ai.assert_not_called()
+
+ def test_resume_redaction_preserves_work_timeline_and_blocks_basic_identifiers(self):
+  raw="Sales Manager 2022-2025\n姓名：张三\nEmail: me@example.com\nPhone: +86 13800138000\nSoftware Engineer 2019-2022"
+  cleaned=server.redact_resume(raw)
+  self.assertIn("2022-2025",cleaned)
+  self.assertIn("2019-2022",cleaned)
+  self.assertNotIn("me@example.com",cleaned)
+  self.assertNotIn("13800138000",cleaned)
+  self.assertNotIn("张三",cleaned)
+  self.assertIn("姓名已隐藏",cleaned)
+
  def test_scan_pdf_and_bad_docx_are_rejected_without_provider_call(self):
   from fastapi import HTTPException
   with self.assertRaises(HTTPException):
