@@ -9,7 +9,7 @@ import '../styles/unified-jobs.css';
 
 const emptyFilters: LiveFilters={q:'',company:'',country:'',remote:false,recruitment_type:''};
 const typeLabel: Record<string,{zh:string,en:string}>={SOCIAL:{zh:'社会招聘',en:'Professional'},CAMPUS:{zh:'校园招聘',en:'Graduate'},INTERNSHIP:{zh:'实习招聘',en:'Internship'},SPECIAL:{zh:'专项招聘',en:'Special program'}};
-const formatDate=(value?:string)=>value&&Number.isFinite(Date.parse(value)) ? value.slice(0,10) : '未公开';
+const formatDate=(value?:string)=>value&&Number.isFinite(Date.parse(value)) ? value.slice(0,10) : '--';
 function useLanguage() {
   const [lang, setLang] = useState<Language>(()=>{
     try { return sessionStorage.getItem('hhba.jobs.language')==='en'?'en':'zh'; } catch {return 'zh';}
@@ -89,7 +89,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
     <p className="unified-market-caution"><ShieldCheck size={16}/>
       {lang==='zh'?'仅显示本页符合近期来源记录要求的岗位；历史信息另存，申请前核对官网。':'Showing recently observed listings on this page; check the original site before applying.'}</p>
     {loading?<p className="unified-job-state" role="status">{lang==='zh'?'正在读取真实岗位…':'Loading jobs…'}</p>:
-      error?<div className="unified-job-state" role="alert">{error}<button type="button" onClick={()=>setRetry(x=>x+1)}><RefreshCcw size={15}/> 重试</button></div>:
+      error?<div className="unified-job-state" role="alert">{lang==='zh'?error:'Jobs temporarily unavailable. Please retry.'}<button type="button" onClick={()=>setRetry(x=>x+1)}><RefreshCcw size={15}/> {lang==='zh'?'重试':'Retry'}</button></div>:
       shown.length?<div className="unified-job-grid">{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated}/>)}</div>:
         <div className="unified-job-state">{lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
     <div className="unified-job-footer">
@@ -122,7 +122,7 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  return <Shell user={user}><div className="unified-detail">
    <div className="unified-market-heading"><Link to="/candidate/jobs">← {lang==='zh'?'返回招聘市场':'Back to jobs'}</Link>
      <LanguageSwitcher lang={lang} change={change}/></div>
-   {error?<p className="unified-job-state" role="alert">{error}</p>:!job?<p className="unified-job-state">正在读取官方岗位信息…</p>:
+   {error?<p className="unified-job-state" role="alert">{lang==='zh'?error:'Job details unavailable.'}</p>:!job?<p className="unified-job-state">{lang==='zh'?'正在读取官方岗位信息…':'Loading official job details…'}</p>:
    <article className="unified-detail-card">
      <small>{localizedCompany(job,lang)}</small><h1>{localizedTitle(job,lang)}</h1>
      <p><MapPin size={15}/>{localizedLocation(job,lang)}</p>
