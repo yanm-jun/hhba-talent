@@ -1,0 +1,65 @@
+name: HHBA Platform-Funded DeepSeek Resume Matcher
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-deepseek-platform-matching-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/deepseek-private-resume-matching-20261019
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install private resume matcher
+        working-directory: apps/resume-match-api
+        run: python -m pip install -r requirements.txt
+      - name: Compile backend with no secrets
+        working-directory: apps/resume-match-api
+        run: python -m py_compile matcher.py server.py test_api.py
+      - name: Verify owner-key-only consent, verified source ranking, backend quotas and matching
+        working-directory: apps/resume-match-api
+        run: python -m unittest -v test_api
+      - name: Build isolated Railway Docker image
+        run: docker build -t hhba-resume-match-test apps/resume-match-api
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/deepseek-private-resume-matching-20261019
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install HHBA web dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Verify existing bilingual marketplace plus platform-funded resume matching compiles
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+        run: npm run build
+      - name: Prove users are not asked to enter API keys
+        run: |
+          node -e "
+          const fs=require('fs');
+          const ui=fs.readFileSync('apps/web/src/pages/ResumeMatchPage.tsx','utf8');
+          const client=fs.readFileSync('apps/web/src/services/resumeMatching.ts','utf8');
+          const api=fs.readFileSync('apps/resume-match-api/server.py','utf8');
+          if(!ui.includes('无需个人 API Key')||!client.includes('VITE_HHBA_MATCH_API_ORIGIN'))throw Error('Incorrect platform key UX');
+          if(/append\(\s*['\"](?:api_key|token|deepseek_key)/i.test(client)||ui.includes('DEEPSEEK_API_KEY'))
+            throw Error('Browser must not handle DeepSeek credentials');
+          if(!api.includes('os.getenv(\"DEEPSEEK_API_KEY\"')||!api.includes('HHBA_MATCH_PUBLIC_ENABLED'))
+            throw Error('Missing server-side-only platform credential control');
+          console.log('HHBA_SINGLE_PLATFORM_DEEPSEEK_KEY_CONTRACT_PASS');
+          "
