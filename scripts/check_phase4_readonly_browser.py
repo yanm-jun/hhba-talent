@@ -11,6 +11,11 @@ async def main():
   mutations=[]
   page.on('pageerror',lambda e:errors.append(str(e)))
   page.on('request',lambda r:mutations.append({'method':r.method,'url':r.url}) if r.method not in ('GET','HEAD') else None)
+  async def no_session(route):
+   await route.fulfill(status=401,content_type='application/json',body='{"detail":"authentication required"}')
+  # A public Pages preview has no working login. Respond 401 only to the
+  # bootstrap identity check; never stub employer/org/posting/talent APIs.
+  await page.route('**/api/v1/auth/me',no_session)
 
   await page.goto(BASE+'employer/workspace',wait_until='domcontentloaded',timeout=45000)
   await page.wait_for_timeout(1700)
