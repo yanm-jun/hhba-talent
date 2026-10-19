@@ -26,6 +26,23 @@ const prefix=jsonpText.trim().replace(/^\/\*[\s\S]*?\*\/\s*/, '');
 console.log('OFFICIAL_JSONP_PROBE',JSON.stringify({contentType:publicReader.headers.get('content-type'),firstCharacters:prefix.slice(0,70),length:jsonpText.length}));
 if(!prefix.startsWith(callback+'('))
   throw new Error('Official Greenhouse API did not honor the JSONP callback');
+const liveDetail='https://hhba-web-production-024c.up.railway.app/api/jobs/'+encodeURIComponent(selection.id);
+const corsOrigin='https://yanm-jun.github.io';
+const existing=await fetch(liveDetail,{headers:{Origin:corsOrigin,Accept:'application/json'},
+  redirect:'error',signal:AbortSignal.timeout(30000)});
+if(!existing.ok || existing.headers.get('access-control-allow-origin')!==corsOrigin)
+  throw new Error('Green detail service has not opened the exact Pages read origin');
+const json=await existing.json();
+if(json?.job?.id!==selection.id || typeof json?.description!=='string'||json.description.length<100)
+  throw new Error('Green detail reader did not return the same original full JD');
+const preflight=await fetch(liveDetail+'/translate-part',{
+  method:'OPTIONS',headers:{Origin:corsOrigin,
+    'Access-Control-Request-Method':'POST','Access-Control-Request-Headers':'content-type'},
+  redirect:'error',signal:AbortSignal.timeout(8000)});
+if(preflight.status!==204 || preflight.headers.get('access-control-allow-origin')!==corsOrigin)
+  throw new Error('Green Chinese reader CORS preflight is not correctly configured');
+console.log('HHBA_PAGES_GREEN_BRIDGE',JSON.stringify({detail:true,sourceMatches:true,
+  originalChars:json.description.length,translationPreflight:true,corsAllowedOrigin:corsOrigin}));
 const cors=reply.headers.get('access-control-allow-origin')||'NOT_DECLARED';
 console.log('OFFICIAL_JD_SMOKE',JSON.stringify({
   company:selection.company,job_id:selection.id,
