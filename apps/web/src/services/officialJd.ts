@@ -138,6 +138,44 @@ async function readBoard(url:string, signal:AbortSignal) {
   }
   return boardCache.get(url)!.promise;
 }
+// Greenhouse's documented Job Board JSONP GET supports browsers even if the
+// JSON endpoint does not expose Access-Control-Allow-Origin. Only its official,
+// checked host is used. The response still must pass ID and URL validation.
+let jsonpSerial=0;
+function readGreenhouseJsonp(endpoint:string,signal:AbortSignal):Promise<any> {
+  const parsed=new URL(endpoint);
+  if(parsed.origin!=='https://boards-api.greenhouse.io' ||
+     !/^\/v1\/boards\/[A-Za-z0-9_-]+\/jobs\/[A-Za-z0-9_-]+$/.test(parsed.pathname))
+    return Promise.reject(new Error('不允许使用未经验证的 JSONP 来源'));
+  return new Promise((resolve,reject)=>{
+    if(signal.aborted)return reject(new DOMException('Aborted','AbortError'));
+    const callback='__hhbaOfficialJd'+(++jsonpSerial);
+    const script=document.createElement('script');
+    let done=false;
+    let timeout:ReturnType<typeof setTimeout>;
+    const cleanup=()=>{
+      clearTimeout(timeout);
+      script.remove();
+      delete (window as unknown as Record<string,unknown>)[callback];
+      signal.removeEventListener('abort',onAbort);
+    };
+    const finish=(error?:Error,value?:unknown)=>{
+      if(done)return;
+      done=true;cleanup();
+      if(error)reject(error);else resolve(value);
+    };
+    const onAbort=()=>finish(new DOMException('Aborted','AbortError'));
+    (window as unknown as Record<string,unknown>)[callback]=(value:unknown)=>finish(undefined,value);
+    script.async=true;
+    script.referrerPolicy='no-referrer';
+    script.onerror=()=>finish(new Error('官方 JSONP 读取暂时失败'));
+    parsed.searchParams.set('callback',callback);
+    script.src=parsed.href;
+    timeout=setTimeout(()=>finish(new Error('官方职位读取超时')),12000);
+    signal.addEventListener('abort',onAbort,{once:true});
+    document.head.appendChild(script);
+  });
+}
 export async function fetchOfficialJd(job:LiveJob,signal:AbortSignal):Promise<OfficialJd> {
   const info=getJobId(job);
   if(!info)throw new Error('这个来源暂不支持直接读取完整 JD，请使用企业官方链接');
@@ -149,7 +187,13 @@ export async function fetchOfficialJd(job:LiveJob,signal:AbortSignal):Promise<Of
   if(info.platform==='ashby')
     endpoint='https://api.ashbyhq.com/posting-api/job-board/'+encodeURIComponent(info.slug);
   try {
-    const raw=await readBoard(endpoint,signal);
+    let raw:any;
+    try{raw=await readBoard(endpoint,signal);}
+    catch(e){
+      if(signal.aborted)throw e;
+      if(info.platform!=='greenhouse'||!(e instanceof TypeError))throw e;
+      raw=await readGreenhouseJsonp(endpoint,signal);
+    }
     const record=info.platform==='ashby' ?
       Array.isArray(raw?.jobs)?raw.jobs.find((v:any)=>String(v?.id)===info.native):null : raw;
     return validateOfficialDetail(record,info,job);
