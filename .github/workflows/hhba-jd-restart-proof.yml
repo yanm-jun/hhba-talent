@@ -1,0 +1,31 @@
+name: HHBA JD Durable Storage Restart Proof
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-jd-restart-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check-restart:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read live private JD queue status after Railway replacement deployment
+        run: |
+          curl --fail --silent --show-error --retry 3 --retry-all-errors \
+          https://hhba-web-production-024c.up.railway.app/api/jd-sync/status \
+          -o /tmp/hhba-verified-jd-status.json
+          node -e "
+            const fs=require('fs');
+            const s=JSON.parse(fs.readFileSync('/tmp/hhba-verified-jd-status.json','utf8'));
+            if(s.kind!=='HHBA_OVERSEAS_JD_SYNC_V1'||s.persistent!==true||s.enabled!==true)
+              throw Error('Private durable queue not enabled after restart');
+            if(s.total_current<14000||s.complete<2||s.translated_parts<21)
+              throw Error('Previously completed verified work did not survive the Railway restart');
+            console.log('HHBA_DURABLE_QUEUE_SURVIVED_DEPLOY',JSON.stringify({
+              total:s.total_current,complete:s.complete,
+              verifiedParts:s.translated_parts,enabled:s.enabled,persistent:s.persistent
+            }));
+          "
