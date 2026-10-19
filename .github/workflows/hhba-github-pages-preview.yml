@@ -38,6 +38,21 @@ jobs:
       - name: Check static job metadata and create snapshot
         working-directory: apps/web
         run: node scripts/prepare-pages-jobs.mjs
+      - name: Verify full-audit regression cases
+        working-directory: apps/web
+        run: node --test scripts/audit-all-official-jds.test.mjs
+      - name: Audit ALL existing jobs against official role content and requirements
+        working-directory: apps/web
+        run: node scripts/audit-all-official-jds.mjs
+      - name: Preserve per-job evidence states without copying copyrighted JD
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-full-jd-sync-report
+          path: |
+            apps/web/dist/data/job-sync-status.json
+            apps/web/dist/data/job-sync-summary.json
+          retention-days: 30
+          if-no-files-found: error
       - name: Verify Airtable official JD and the green Chinese reader bridge
         working-directory: apps/web
         run: node scripts/verify-official-jd.mjs
