@@ -3,7 +3,10 @@ export class ApiError extends Error {
 }
 
 let csrfToken: string | null = null;
-const API = import.meta.env.VITE_API_BASE || '/api/v1';
+const configuredApiBase = String(import.meta.env.VITE_API_BASE || '').trim();
+const pagesPreview = import.meta.env.BASE_URL.startsWith('/hhba-talent/');
+export const employerApiReady = !pagesPreview || /^https:\/\/[^\s/?#]+\/api\/v1\/?$/.test(configuredApiBase);
+const API = configuredApiBase || '/api/v1';
 function errorMessage(detail: unknown) {
   if (typeof detail === 'string') return detail;
   if (Array.isArray(detail)) return detail.map(x => typeof x?.msg === 'string' ? x.msg : '请求字段无效').join('；');
@@ -14,6 +17,7 @@ export function setCsrfToken(value: string | null) { csrfToken = value; }
 export function getCsrfToken() { return csrfToken; }
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  if (!employerApiReady) throw new ApiError(503, 'HHBA 企业与个人账户服务尚未部署到此预览站。当前可查看演示界面，不能完成账户操作或人才检索。');
   const controller = new AbortController();
   const timer = window.setTimeout(() => controller.abort(), 20_000);
   const headers = new Headers(init.headers);
