@@ -1,0 +1,48 @@
+name: HHBA All-Jobs Official JD Audit (isolated)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-all-jobs-sync-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit-all-jobs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/all-jobs-official-jd-sync-audit-20261019
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked HHBA build dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Typecheck and build existing white HHBA
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+        run: npm run build
+      - name: Run synthetic full audit contract tests
+        working-directory: apps/web
+        run: node --test scripts/audit-all-official-jds.test.mjs
+      - name: Collect the complete existing live jobs index
+        working-directory: apps/web
+        run: node scripts/prepare-pages-jobs.mjs
+      - name: Inspect ALL indexed jobs grouped by public official ATS board
+        working-directory: apps/web
+        run: node scripts/audit-all-official-jds.mjs
+      - name: Upload only per-job verification statuses, not original JD bodies
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-all-jobs-official-jd-audit
+          path: |
+            apps/web/dist/data/job-sync-status.json
+            apps/web/dist/data/job-sync-summary.json
+          retention-days: 30
+          if-no-files-found: error
