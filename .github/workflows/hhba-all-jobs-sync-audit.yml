@@ -28,6 +28,8 @@ jobs:
         env:
           HHBA_GITHUB_PAGES: '1'
         run: npm run build
+      - name: Check merged frontend routes and user-facing audit states
+        run: node scripts/verify-dual-entry.mjs
       - name: Run synthetic full audit contract tests
         working-directory: apps/web
         run: node --test scripts/audit-all-official-jds.test.mjs
