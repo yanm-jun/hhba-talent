@@ -8,6 +8,29 @@ on:
 permissions:
   contents: read
 jobs:
+  bilingual-frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/deepseek-private-resume-matching-20261019
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install HHBA white frontend dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Build Chinese resume AI matching site without any frontend API key
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+        run: npm run build
+      - name: Verify that end users never need tokens and consent is mandatory
+        run: |
+          node -e "const fs=require('fs'); const p=fs.readFileSync('apps/web/src/pages/CandidateMatchPage.tsx','utf8');const s=fs.readFileSync('apps/web/src/services/resumeMatch.ts','utf8');if(!p.includes('无须自备 API Key')||!p.includes('consent')||!s.includes('VITE_HHBA_RESUME_MATCH_API'))process.exit(1);if(s.includes('DEEPSEEK_API_KEY'))process.exit(2);console.log('HHBA_ONE_ADMIN_DEEPSEEK_KEY_UI_PASS')"
   private-api:
     runs-on: ubuntu-latest
     timeout-minutes: 15
