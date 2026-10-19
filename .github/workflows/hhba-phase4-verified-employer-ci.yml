@@ -24,7 +24,7 @@ jobs:
       - name: Compile backend and new phase 4 migration without executing unsafe data changes
         run: |
           python -m py_compile apps/api/app/main.py apps/api/migrations/versions/20261020_phase4_employer_postings.py apps/api/tests/test_phase4_employer_workspace.py
-      - name: Test independent verified employer publishing and privacy guards
+      - name: Regression test valid recruiter onboarding, moderated postings and immediate revocation
         working-directory: apps/api
         run: python -m pytest -q tests/test_phase4_employer_workspace.py
   frontend:
