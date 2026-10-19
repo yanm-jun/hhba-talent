@@ -1,0 +1,36 @@
+name: HHBA Live JD Translation Coverage UI
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-live-jd-coverage-build.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/live-overseas-jd-progress-20261019
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install exact white HHBA app dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Build bilingual pages and sync-progress UI
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+        run: npm run build
+      - name: Check live overseas JD sync page and read-only endpoint
+        run: |
+          node -e "const fs=require('fs');const f=fs.readFileSync('apps/web/src/components/UnifiedJobMarket.tsx','utf8');if(!f.includes('jdSync.complete')||!f.includes('jdSync.total_current'))throw Error('Need real complete counts');"
+          curl --retry 3 --retry-all-errors --fail --silent --show-error \
+            'https://hhba-web-production-024c.up.railway.app/api/jd-sync/status' -o /tmp/hhba-jd-status.json
+          node -e "const fs=require('fs');const s=JSON.parse(fs.readFileSync('/tmp/hhba-jd-status.json','utf8'));if(s.kind!=='HHBA_OVERSEAS_JD_SYNC_V1'||s.enabled!==true||s.persistent!==true)throw Error('Durable job sync has not started');if(s.complete>s.total_current)throw Error('Invalid coverage');console.log('HHBA_REAL_JD_SYNC_STATUS',JSON.stringify({total:s.total_current,complete:s.complete,parts:s.translated_parts,enabled:s.enabled,persistent:s.persistent}));"
