@@ -9,6 +9,7 @@ import { Database } from "bun:sqlite";
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, existsSync } from "node:fs";
 import { openJobSyncStore } from "./jd-sync-store.mjs";
+import { createFullJdWorker } from "./jd-sync-runner.mjs";
 const phrases:[string,string][]=[
  ["Integration Technician","集成技术员"],["Test Technician","测试技术员"],
  ["Manufacturing Engineer","制造工程师"],["Supply Chain Manager","供应链经理"],
@@ -1228,6 +1229,36 @@ async function verifiedJdChunk(job:Job,one:string):Promise<TranslatedChunk>{
   translated.push(mark+safe.trim());
  }
  return {text:translated.join("\n\n"),error:null};
+}
+let fullJdWorker:ReturnType<typeof createFullJdWorker>|null=null;
+if(durableJobStore){
+ try{
+  fullJdWorker=createFullJdWorker({
+   store:durableJobStore,
+   source:load,
+   readDetail:officialDetail,
+   chunkJd:jdChunks,
+   translateChunk:async(job:Job,chunk:string)=>{
+    const result=await verifiedJdChunk(job,chunk);
+    if(!result.text)throw Error(result.error||"TRANSLATION_UNAVAILABLE");
+    return result.text;
+   },
+   maxPartsDaily:JD_SYNC_DAILY_CHUNKS,
+   maxPartsPerTick:3,
+   logger:(...args:any[])=>console.log(...args)
+  });
+  // Graceful startup: only one background worker; no unaudited automatic
+  // ingestion or JD publishing to static GitHub Pages.
+  const timer=setInterval(()=>void fullJdWorker?.tick(),JD_SYNC_INTERVAL_MS);
+  timer.unref();
+  setTimeout(()=>void fullJdWorker?.tick(),15_000).unref();
+  console.log("HHBA_FULL_JD_SYNC_ENABLED",JSON.stringify({
+   privateVolume:true,dailyChunkLimit:JD_SYNC_DAILY_CHUNKS,
+   intervalSeconds:JD_SYNC_INTERVAL_MS/1000,platforms:["greenhouse","ashby","lever"]
+  }));
+ }catch(error){
+  console.error("HHBA_FULL_JD_SYNC_NOT_STARTED",error instanceof Error?error.message:"unknown");
+ }
 }
 async function readJobForTranslation(req:Request,u:URL,headers:Record<string,string>):Promise<Response>{
  if(!humanReaderAllowed(req,u))return Response.json({error:"same_origin_reader_only"},{status:403,headers});
