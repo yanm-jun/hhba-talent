@@ -248,7 +248,10 @@ async def extract_profile_with_deepseek(text: str, key: str) -> dict:
             raise HTTPException(status_code=502, detail="AI_PROVIDER_UNAVAILABLE")
         if len(res.content) > 50_000:
             raise HTTPException(status_code=502, detail="AI_PROVIDER_RESPONSE_TOO_LARGE")
-        content = res.json()["choices"][0]["message"]["content"]
+        choice = res.json()["choices"][0]
+        if choice.get("finish_reason") != "stop":
+            raise HTTPException(status_code=502, detail="AI_PROFILE_INCOMPLETE")
+        content = choice["message"]["content"]
         if not isinstance(content, str):
             raise ValueError("INVALID_PROVIDER_TEXT")
         parsed = json.loads(content)
@@ -297,6 +300,37 @@ async def release_slot():
     global active_count
     async with quota_lock:
         active_count = max(0, active_count - 1)
+
+
+@app.middleware("http")
+async def limit_upload_before_multipart(request: Request, call_next):
+    if request.url.path == "/api/v1/match/resume" and request.method == "POST":
+        if not MATCH_PUBLIC_ENABLED:
+            return JSONResponse({"error": "ADMIN_HAS_NOT_ENABLED_AI_MATCHING"}, status_code=503)
+        value = request.headers.get("content-length")
+        if value is None:
+            return JSONResponse({"error": "CONTENT_LENGTH_REQUIRED"}, status_code=411)
+        try:
+            size = int(value)
+        except (TypeError, ValueError):
+            return JSONResponse({"error": "INVALID_CONTENT_LENGTH"}, status_code=400)
+        if size <= 0 or size > MAX_FILE + 65536:
+            return JSONResponse({"error": "FILE_TOO_LARGE"}, status_code=413)
+    return await call_next(request)
+
+
+@app.get("/api/v1/match/status")
+async def public_status():
+    return {
+        "enabled": MATCH_PUBLIC_ENABLED and bool(os.getenv("DEEPSEEK_API_KEY", "").strip())
+                   and quota_connection() is not None,
+        "admin_configured": bool(os.getenv("DEEPSEEK_API_KEY", "").strip()),
+        "per_client_daily_limit": MAX_CLIENT_PER_DAY,
+        "global_daily_limit": MAX_REQUEST_PER_DAY,
+        "formats": ["pdf", "docx"], "file_limit_bytes": MAX_FILE,
+        "data_use": "Resume processed in memory; redacted text sent to DeepSeek with applicant consent",
+        "no_resume_storage": True,
+    }
 
 
 @app.get("/health")
