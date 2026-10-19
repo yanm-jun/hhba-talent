@@ -22,7 +22,7 @@ jobs:
         run: |
           python -m pip install 'playwright>=1.55,<2'
           python -m playwright install --with-deps chromium
-      - name: Test online HHBA real JD in English and Chinese
+      - name: Test online full-job audit status plus real English and Chinese JD
         run: python scripts/check_pages_jd_browser.py
       - name: Retain visual evidence
         if: always()
