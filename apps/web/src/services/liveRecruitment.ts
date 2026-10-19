@@ -57,15 +57,31 @@ export function officialStatus(job: LiveJob, updated: string) {
       observed > Date.now() + 5 * 60_000 || Date.now() - observed > 72 * 60 * 60_000) return 'historical' as const;
   return 'recent' as const;
 }
+const han = /[\u3400-\u9fff]/u;
+const corrupted = /\uFFFD|(?:Ã.|Â.|â[€Œœ„™])|(?:ä¸|å[\x80-\xBF]|æ[\x80-\xBF])|[\u0000-\u001F\u007F]/u;
+export function cleanLocaleText(value?:string|null) {
+  const text = typeof value === 'string' ? value.trim().replace(/<[^>]*>/g, '').replace(/\s+/g, ' ') : '';
+  if (!text || corrupted.test(text) || text.length > 240) return null;
+  return text;
+}
 export function localizedTitle(job: LiveJob, lang: Language) {
-  return lang === 'zh' && job.titleZh && /[\u3400-\u9fff]/u.test(job.titleZh) &&
-    job.titleStatus !== 'pending' ? job.titleZh : job.title;
+  const original=cleanLocaleText(job.title);
+  const translated=cleanLocaleText(job.titleZh);
+  if(lang==='zh') {
+    if(translated && han.test(translated) && job.titleStatus!=='pending') return translated;
+    return original && han.test(original) ? original : '职位名称待翻译';
+  }
+  return original && !han.test(original) ? original : 'Title translation pending';
 }
 export function localizedCompany(job: LiveJob, lang: Language) {
-  return lang === 'zh' ? (job.companyZh || job.company) : job.company;
+  const original=cleanLocaleText(job.company)||'Unknown company';
+  const zh=cleanLocaleText(job.companyZh);
+  return lang==='zh'?(zh||original):original;
 }
 export function localizedLocation(job: LiveJob, lang: Language) {
-  return lang === 'zh' ? (job.locationZh || job.location || '地点未披露') : (job.location || 'Not specified');
+  const original=cleanLocaleText(job.location), zh=cleanLocaleText(job.locationZh);
+  if(lang==='zh')return zh&&han.test(zh)?zh:original&&han.test(original)?original:'地点待翻译';
+  return original&&!han.test(original)?original:'Location translation pending';
 }
 async function readJSON<T>(path: string, signal: AbortSignal): Promise<T> {
   const response = await fetch(PREFIX + path, {
@@ -75,7 +91,55 @@ async function readJSON<T>(path: string, signal: AbortSignal): Promise<T> {
   if (!response.ok) throw new Error('职位数据暂时无法读取，请稍后重试');
   return response.json() as Promise<T>;
 }
+// GitHub Pages has no backend or CORS proxy; it uses the read-only, source-validated
+// public metadata snapshot generated at build time. Railway stays unchanged.
+const PAGES_PREVIEW=import.meta.env.BASE_URL==='/hhba-talent/';
+let cachedSnapshot: Promise<LivePage>|null=null;
+async function previewSnapshot(signal:AbortSignal):Promise<LivePage> {
+  if(!cachedSnapshot) {
+    const url=import.meta.env.BASE_URL+'data/jobs.json';
+    cachedSnapshot=fetch(url,{method:'GET',headers:{Accept:'application/json'},cache:'no-store',credentials:'omit'})
+      .then(async response=>{if(!response.ok)throw new Error('Pages 岗位快照尚未发布');return response.json() as Promise<LivePage>})
+      .then(data=>{
+        if(!Array.isArray(data.jobs) || !Number.isInteger(data.total) ||
+          !Number.isFinite(Date.parse(data.updated)) || data.failures!==0)
+          throw new Error('招聘数据快照无效');
+        if(Date.now()-Date.parse(data.updated)>24*60*60_000 ||
+           Date.now()<Date.parse(data.updated)-5*60_000)
+          throw new Error('岗位数据已过期，等待重新同步');
+        return data;
+      }).catch(e=>{cachedSnapshot=null;throw e});
+  }
+  if(signal.aborted)throw new DOMException('Aborted','AbortError');
+  return cachedSnapshot;
+}
+const searchAliases: Record<string,string[]> = {
+  '销售':['sales','account executive','business development'],
+  '工程师':['engineer','engineering','developer'],
+  '财务':['finance','accountant','accounting'],
+  '产品':['product','product manager'],
+  '实习':['intern','internship'],
+  '运营':['operations','operation'],
+  '设计':['design','designer'],
+};
+function searchPreview(data:LivePage,filters:LiveFilters,offset:number):LivePage{
+  const q=filters.q.trim().toLocaleLowerCase();
+  const aliases=Object.entries(searchAliases).filter(([term])=>q.includes(term)).flatMap(([,values])=>values);
+  const company=filters.company.trim().toLocaleLowerCase();
+  const rows=data.jobs.filter(j=>{
+    if(filters.country==='cn'&&!j.domestic||filters.country==='global'&&j.domestic)return false;
+    if(filters.recruitment_type&&j.recruitmentType!==filters.recruitment_type)return false;
+    if(filters.remote&&j.remote!==true)return false;
+    if(company && ![j.company,j.companyZh].some(v=>String(v||'').toLocaleLowerCase().includes(company)))return false;
+    if(!q)return true;
+    const fields=[j.title,j.titleZh,j.company,j.companyZh,j.location,j.locationZh];
+    return fields.some(v=>String(v||'').toLocaleLowerCase().includes(q)) ||
+      aliases.some(v=>String(j.title||'').toLocaleLowerCase().includes(v));
+  });
+  return {...data,jobs:rows.slice(offset,offset+30),total:rows.length,offset,limit:30};
+}
 export async function listJobs(filters: LiveFilters, offset: number, signal: AbortSignal) {
+  if(PAGES_PREVIEW) return searchPreview(await previewSnapshot(signal),filters,offset);
   const p = new URLSearchParams({ limit:'30',offset:String(offset) });
   if (filters.q.trim()) p.set('q', filters.q.trim().slice(0,100));
   if (filters.company.trim()) p.set('company',filters.company.trim().slice(0,100));
@@ -91,6 +155,11 @@ export async function listJobs(filters: LiveFilters, offset: number, signal: Abo
 }
 export async function getJob(id: string,signal: AbortSignal) {
   if(!safeId(id)) throw new Error('无效的岗位编号');
+  if(PAGES_PREVIEW){
+    const listing=(await previewSnapshot(signal)).jobs.find(j=>j.id===id);
+    if(!listing||!safeOfficialJobUrl(listing))throw new Error('岗位不存在或来源无效');
+    return {job:listing,description:null,richHtml:null,applyUrl:null} as LiveDetail;
+  }
   const detail = await readJSON<LiveDetail>('/api/jobs/' + encodeURIComponent(id), signal);
   if(!detail?.job || detail.job.id !== id || !safeOfficialJobUrl(detail.job)) throw new Error('岗位来源核验失败');
   return detail;
