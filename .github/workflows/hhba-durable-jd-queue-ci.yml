@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feat/durable-overseas-jd-sync-20261019
+          ref: feat/jd-hash-recheck-retry-20261019
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.3.3'
