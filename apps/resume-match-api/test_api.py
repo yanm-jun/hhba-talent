@@ -222,7 +222,7 @@ class ApiConsentTests(unittest.TestCase):
    ai.assert_not_called()
 
  def test_resume_redaction_preserves_work_timeline_and_blocks_basic_identifiers(self):
-  raw="Sales Manager 2022-2025\\n姓名：张三\\nEmail: me@example.com\\nPhone: +86 13800138000\\nSoftware Engineer 2019-2022"
+  raw="Sales Manager 2022-2025\n姓名：张三\nEmail: me@example.com\nPhone: +86 13800138000\nSoftware Engineer 2019-2022"
   cleaned=server.redact_resume(raw)
   self.assertIn("2022-2025",cleaned)
   self.assertIn("2019-2022",cleaned)
