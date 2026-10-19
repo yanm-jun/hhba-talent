@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify official recruitment board and full original JD for every priority employer
+      - name: Verify Greenhouse, Ashby and Lever high-priority employers and their official JDs
         working-directory: apps/web
         run: node scripts/probe-priority-ats.mjs
       - name: Retain validation evidence, do not publish guessed jobs
