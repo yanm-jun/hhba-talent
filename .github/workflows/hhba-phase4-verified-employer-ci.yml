@@ -47,6 +47,6 @@ jobs:
         env:
           HHBA_GITHUB_PAGES: '1'
         run: npm run build
-      - name: Verify employer dashboard is actually wired into existing React and API
+      - name: Verify employer dashboard and admin review are both integrated without changing official ATS search
         run: |
-          node -e "const fs=require('fs');const ui=fs.readFileSync('apps/web/src/pages/EmployerWorkspacePage.tsx','utf8');const router=fs.readFileSync('apps/web/src/main.tsx','utf8');for(const k of ['api.createPosting','api.submitPosting','api.talentSearch','api.closePosting','/recruiter/onboarding'])if(!ui.includes(k))throw Error('missing employer action '+k);if(!router.includes('/employer/workspace'))throw Error('workspace route absent');console.log('HHBA_EMPLOYER_WORKSPACE_CONTRACT_PASS');"
+          node -e "const fs=require('fs');const ui=fs.readFileSync('apps/web/src/pages/EmployerWorkspacePage.tsx','utf8');const router=fs.readFileSync('apps/web/src/main.tsx','utf8');for(const k of ['api.createPosting','api.submitPosting','api.talentSearch','api.closePosting','/recruiter/onboarding'])if(!ui.includes(k))throw Error('missing employer action '+k);if(!router.includes('/employer/workspace')||!router.includes('/admin/recruitment'))throw Error('workspace or reviewer route absent');console.log('HHBA_EMPLOYER_WORKSPACE_CONTRACT_PASS');"
