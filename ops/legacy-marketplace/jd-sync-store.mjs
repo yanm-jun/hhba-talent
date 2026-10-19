@@ -30,7 +30,8 @@ export function openJobSyncStore(file,{now=()=>Date.now(),root="/sync-state"}={}
  const upsert=db.query("INSERT INTO jobs(id,platform,company,url,seen_ms,priority) VALUES(?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET platform=excluded.platform,company=excluded.company,url=excluded.url,seen_ms=excluded.seen_ms,priority=excluded.priority,state=CASE WHEN jobs.url<>excluded.url OR jobs.state='REMOVED' THEN 'QUEUED' ELSE jobs.state END,hash=CASE WHEN jobs.url<>excluded.url THEN NULL ELSE jobs.hash END,total=CASE WHEN jobs.url<>excluded.url THEN NULL ELSE jobs.total END,done=CASE WHEN jobs.url<>excluded.url THEN 0 ELSE jobs.done END,next_ms=CASE WHEN jobs.url<>excluded.url THEN 0 ELSE jobs.next_ms END,lease_ms=CASE WHEN jobs.url<>excluded.url THEN 0 ELSE jobs.lease_ms END");
  function catalogSync(rows,{complete=false}={}){
   if(!Array.isArray(rows)||rows.length>100000)throw Error("INVALID_INDEX");
-  const ts=now(),seen=new Set(),clean=[];
+  const latest=Number(db.query("SELECT COALESCE(MAX(seen_ms),0) AS value FROM jobs").get().value)||0;
+  const ts=Math.max(now(),latest+1),seen=new Set(),clean=[];
   for(const j of rows){
    if(!j||j.domestic||!["greenhouse","ashby","lever"].includes(j.platform)||!ID.test(j.id)||seen.has(j.id))continue;
    try{const u=new URL(j.url);if(u.protocol!=="https:"||u.port||u.username||u.password)continue}catch{continue}
