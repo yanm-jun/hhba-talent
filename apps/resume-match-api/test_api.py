@@ -64,6 +64,26 @@ class MatcherSecurityTests(unittest.TestCase):
   self.assertEqual([x["name"] for x in p["skills"]],["python"])
   self.assertEqual(p["target_roles"],["Software Engineer"])
 
+ def test_model_may_not_claim_a_different_degree_skill_or_year_count_than_resume(self):
+  resume="Bachelor of Science. Three years experience building Python APIs and Excel reports. Software Engineer."
+  parsed={
+   "education":{"level":"PHD","evidence":"Bachelor of Science"},
+   "experience_years":12,"experience_evidence":"Three years experience",
+   "skills":[
+    {"name":"Java","evidence":"Python APIs"},
+    {"name":"Python","evidence":"Python APIs"}
+   ],
+   "target_roles":[
+    {"role":"Financial Controller","evidence":"Software Engineer"},
+    {"role":"Software Engineer","evidence":"Software Engineer"}
+   ],
+  }
+  p=profile_from_llm(parsed,resume)
+  self.assertIsNone(p["education"])
+  self.assertIsNone(p["experience_years"])
+  self.assertEqual([x["name"] for x in p["skills"]],["python"])
+  self.assertEqual(p["target_roles"],["Software Engineer"])
+
  def test_work_history_must_appear_verbatim_in_resume(self):
   resume="Acme Corp Sales Manager 2022-2025. Bachelor of Science. 3 years experience."
   candidate=profile_from_llm({
