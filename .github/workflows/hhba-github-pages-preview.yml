@@ -35,7 +35,7 @@ jobs:
         env:
           HHBA_GITHUB_PAGES: '1'
         run: npm run build
-      - name: Build white HHBA with verified branded corporate ATS URL validation
+      - name: Refresh complete white HHBA job index from 50 verified official ATS boards
         working-directory: apps/web
         run: node scripts/prepare-pages-jobs.mjs
       - name: Verify full-audit regression cases
