@@ -10,7 +10,7 @@
     },
     {
       "platform": "greenhouse",
-      "company": "SpaceX Global (Starlink international)",
+      "company": "SpaceX Global",
       "slug": "spacexglobal",
       "priority": 1
     },
@@ -49,6 +49,24 @@
       "company": "Databricks",
       "slug": "databricks",
       "priority": 2
+    },
+    {
+      "platform": "ashby",
+      "company": "Deepgram",
+      "slug": "deepgram",
+      "priority": 1
+    },
+    {
+      "platform": "ashby",
+      "company": "Cohere",
+      "slug": "cohere",
+      "priority": 1
+    },
+    {
+      "platform": "lever",
+      "company": "Plaid",
+      "slug": "plaid",
+      "priority": 1
     }
   ]
 }
