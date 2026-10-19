@@ -6,6 +6,7 @@ import type { User } from '../services/api';
 import { getJob, listJobs, localizedCompany, localizedLocation, localizedTitle, officialStatus, safeOfficialJobUrl,
   type Language, type LiveFilters, type LiveJob, type LivePage } from '../services/liveRecruitment';
 import { fetchOfficialJd, greenDetailLink, translateGreenJd, type OfficialJd } from '../services/officialJd';
+import { loadPublicJobAudit, auditForJob, describeAudit, type JobAuditEntry, type JobAuditSummary } from '../services/jobSyncStatus';
 import '../styles/unified-jobs.css';
 
 const emptyFilters: LiveFilters={q:'',company:'',country:'',remote:false,recruitment_type:''};
@@ -50,7 +51,9 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   const [error,setError]=useState('');
   const [loading,setLoading]=useState(true);
   const [retry,setRetry]=useState(0);
+  const [auditSummary,setAuditSummary]=useState<JobAuditSummary|null>(null);
   useEffect(()=>{const id=setTimeout(()=>{setPage(0);setFilters(f=>({...f,q:draft}));},280);return()=>clearTimeout(id)},[draft]);
+  useEffect(()=>{loadPublicJobAudit().then(report=>setAuditSummary(report?.summary||null)).catch(()=>setAuditSummary(null));},[]);
   useEffect(()=>{
     const controller=new AbortController();setLoading(true);setError('');
     listJobs(filters,page*30,controller.signal)
@@ -87,6 +90,14 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       <p>{lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
       <LanguageSwitcher lang={lang} change={change}/></div>
     {controls}
+    {auditSummary && Number.isFinite(Date.parse(auditSummary.checked_at)) &&
+      Date.now()-Date.parse(auditSummary.checked_at)<24*3600_000 &&
+      snapshot?.updated===auditSummary.indexed_as_of &&
+      <p className="unified-audit-summary">
+        {lang==='zh'
+          ? `全量官方 JD 核验：${auditSummary.verified_full_original_jd_and_requirements.toLocaleString()} / ${auditSummary.total_indexed_jobs.toLocaleString()} 条有职责与任职要求证据；中文全文需另行核验。`
+          : `Official JD audit: ${auditSummary.verified_full_original_jd_and_requirements.toLocaleString()} of ${auditSummary.total_indexed_jobs.toLocaleString()} have description and requirements evidence. Full Chinese coverage not yet verified.`}
+      </p>}
     <p className="unified-market-caution"><ShieldCheck size={16}/>
       {lang==='zh'?'仅显示本页符合近期来源记录要求的岗位；历史信息另存，申请前核对官网。':'Showing recently observed listings on this page; check the original site before applying.'}</p>
     {loading?<p className="unified-job-state" role="status">{lang==='zh'?'正在读取真实岗位…':'Loading jobs…'}</p>:
@@ -111,6 +122,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
 export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  const {lang,change}=useLanguage();
  const [detail,setDetail]=useState<Awaited<ReturnType<typeof getJob>>|null>(null);
+ const [audit,setAudit]=useState<JobAuditEntry|null>(null);
  const [error,setError]=useState('');
  const [jd,setJd]=useState<OfficialJd|null>(null);
  const [jdError,setJdError]=useState('');
@@ -129,6 +141,17 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
    return()=>controller.abort();
  },[jobId]);
  const job=detail?.job;
+ useEffect(()=>{
+   if(!job)return;
+   let active=true;
+   loadPublicJobAudit().then(report=>{
+     if(!active||!report||Date.now()-Date.parse(report.summary.checked_at)>24*3600_000)return;
+     const row=report.jobs.find(item=>item.job_id===job.id&&item.platform===job.platform);
+     if(row)setAudit(row);
+   }).catch(()=>undefined);
+   return()=>{active=false};
+ },[job]);
+
  useEffect(()=>{
    if(!job)return;
    const controller=new AbortController();
@@ -173,6 +196,10 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
      <div className="unified-detail-warning"><ShieldCheck size={17}/>
        {lang==='zh'?'正在核对企业官方职位内容。最新投递状态以官网为准。':
          'Checking the employer’s published job details. Confirm application availability on the official site.'}</div>
+     {audit && <p className="unified-job-audit"><ShieldCheck size={16}/>
+       {describeAudit(audit.status,lang)}
+       {audit.official_checked_at && <small>{lang==='zh'?'核验：':'Checked: '}{audit.official_checked_at.slice(0,10)}</small>}
+     </p>}
      <h2>{lang==='zh'?'职位说明与任职要求':'Description and job requirements'}</h2>
      {jdLoading?<p role="status">{lang==='zh'?'正在读取官方岗位职责及任职要求…':'Fetching current employer requirements…'}</p>:
        jdError?<div className="unified-jd-empty" role="status">
