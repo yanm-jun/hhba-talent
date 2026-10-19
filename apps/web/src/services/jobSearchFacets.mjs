@@ -94,7 +94,7 @@ export function classifyJobType(title,declared){
  const t=norm(title);
  if(/\bintern(?:ship)?\b|\bco[\s-]?op\b|\bworking student\b|实习/.test(t))
   return {jobType:'INTERNSHIP',jobTypeEvidence:'title_inferred'};
- if(/\bnew grad(?:uate)?\b|\brecent graduate\b|\bgraduate program\b|\bcampus\b|\bearly careers\b|校招|应届|管培生/.test(t))
+ if(/\bnew grad(?:uate)?\b|\brecent graduate\b|\bgraduate\b|\bgraduate program\b|\bcampus\b|\bearly careers\b|校招|应届|管培生/.test(t))
   return {jobType:'CAMPUS',jobTypeEvidence:'title_inferred'};
  return {jobType:'REGULAR',jobTypeEvidence:'title_exclusion_only'};
 }
