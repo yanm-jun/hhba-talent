@@ -7,7 +7,10 @@ type Job={id:string;company:string;title:string;location:string;remote:boolean|n
 
 import { Database } from "bun:sqlite";
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync } from "node:fs";
+import { mkdirSync, readFileSync, existsSync } from "node:fs";
+import { openJobSyncStore } from "./jd-sync-store.mjs";
+import { startOverseasJdWorker } from "./jd-sync-worker.mjs";
+import { createFullJdWorker } from "./jd-sync-runner.mjs";
 const phrases:[string,string][]=[
  ["Integration Technician","集成技术员"],["Test Technician","测试技术员"],
  ["Manufacturing Engineer","制造工程师"],["Supply Chain Manager","供应链经理"],
@@ -1120,6 +1123,19 @@ async function ensureChineseProse(value:string):Promise<string|null>{
 
 const JD_READER_SIZE=900;
 const JD_READER_MAX_CHARS=100000;
+const JD_SYNC_DAILY_CHUNKS=Math.max(1,Math.min(2000,Number.parseInt(Bun.env.HHBA_JD_SYNC_DAILY_CHUNKS||"180",10)||180));
+const JD_SYNC_INTERVAL_MS=90_000;
+let durableJobStore:ReturnType<typeof openJobSyncStore>|null=null;
+let lastCatalogRefresh=0;
+let backgroundJdBusy=false;
+try{
+ // Enforce volume mount existence: never count ephemeral container storage as durable.
+ if(Bun.env.HHBA_JD_SYNC_ENABLED==="1"&&existsSync("/sync-state"))
+   durableJobStore=openJobSyncStore("/sync-state/overseas-jd.sqlite");
+ else if(Bun.env.HHBA_JD_SYNC_ENABLED==="1")
+   console.warn("HHBA_JD_SYNC_DISABLED_NO_PERSISTENT_VOLUME");
+}catch(error){console.error("HHBA_JD_SYNC_DATABASE_UNAVAILABLE",error instanceof Error?error.message:"unknown");}
+
 // In-memory private, short-lived translation cache keyed by exact official JD hash.
 // No full third-party JD or unlicensed translations are exported to Pages or GitHub.
 const readerChunkCache=new Map<string,{text:string,at:number,total:number}>();
@@ -1191,6 +1207,60 @@ function readerRateLimit(req:Request):boolean{
  hit.count++;
  return true;
 }
+type TranslatedChunk={text:string|null;error:string|null};
+async function verifiedJdChunk(job:Job,one:string):Promise<TranslatedChunk>{
+ const segments=one.split(/\n{2,}/).filter(Boolean).map(raw=>{
+  const kind=raw.startsWith("# ")?"heading":raw.startsWith("- ")?"bullet":"paragraph";
+  return {kind,original:kind==="paragraph"?raw:raw.slice(2)};
+ });
+ if(!segments.length||segments.length>8)return {text:null,error:"invalid_layout"};
+ const output=await machineTranslations("jd",segments.map(s=>s.original));
+ if(!output||output.length!==segments.length||output.some(x=>!x))
+  return {text:null,error:"translation_unverified"};
+ const translated:string[]=[];
+ for(let i=0;i<segments.length;i++){
+  const source=segments[i].original;
+  const chinese=await ensureChineseProse(output[i]||"");
+  if(!chinese)return {text:null,error:"translation_incomplete"};
+  const corrected=stabilizeEmployerTerminology(job.company,restoreGroupedNumbers(source,chinese));
+  if(hasLeakedJdTags(corrected))return {text:null,error:"translation_markup_leak"};
+  const safe=preserveOfficialNumbers(source,corrected);
+  if(!safe)return {text:null,error:"translation_numbers_mismatch"};
+  const mark=segments[i].kind==="heading"?"# ":segments[i].kind==="bullet"?"- ":"";
+  translated.push(mark+safe.trim());
+ }
+ return {text:translated.join("\n\n"),error:null};
+}
+let fullJdWorker:ReturnType<typeof createFullJdWorker>|null=null;
+if(durableJobStore){
+ try{
+  fullJdWorker=createFullJdWorker({
+   store:durableJobStore,
+   source:load,
+   readDetail:officialDetail,
+   chunkJd:jdChunks,
+   translateChunk:async(job:Job,chunk:string)=>{
+    const result=await verifiedJdChunk(job,chunk);
+    if(!result.text)throw Error(result.error||"TRANSLATION_UNAVAILABLE");
+    return result.text;
+   },
+   maxPartsDaily:JD_SYNC_DAILY_CHUNKS,
+   maxPartsPerTick:3,
+   logger:(...args:any[])=>console.log(...args)
+  });
+  // Graceful startup: only one background worker; no unaudited automatic
+  // ingestion or JD publishing to static GitHub Pages.
+  const timer=setInterval(()=>void fullJdWorker?.tick(),JD_SYNC_INTERVAL_MS);
+  timer.unref();
+  setTimeout(()=>void fullJdWorker?.tick(),15_000).unref();
+  console.log("HHBA_FULL_JD_SYNC_ENABLED",JSON.stringify({
+   privateVolume:true,dailyChunkLimit:JD_SYNC_DAILY_CHUNKS,
+   intervalSeconds:JD_SYNC_INTERVAL_MS/1000,platforms:["greenhouse","ashby","lever"]
+  }));
+ }catch(error){
+  console.error("HHBA_FULL_JD_SYNC_NOT_STARTED",error instanceof Error?error.message:"unknown");
+ }
+}
 async function readJobForTranslation(req:Request,u:URL,headers:Record<string,string>):Promise<Response>{
  if(!humanReaderAllowed(req,u))return Response.json({error:"same_origin_reader_only"},{status:403,headers});
  if(!privateTranslatorUrl())return Response.json({error:"translator_offline"},{status:503,headers});
@@ -1219,6 +1289,16 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
   const chunks=jdChunks(english);
   if(chunks.length>150)return Response.json({error:"source_too_many_parts"},{status:422,headers});
   if(part>=chunks.length)return Response.json({error:"part_out_of_range"},{status:404,headers});
+  if(durableJobStore){
+    try{
+      durableJobStore.sourceVersion(job.id,digest,chunks.length);
+      const persistent=durableJobStore.cachedPart(job.id,digest,part,chunks.length);
+      if(persistent)return Response.json({
+        jobId:job.id,part,total:chunks.length,text:persistent,sourceHash:digest,
+        numbersVerified:true,sourceUrl:job.url,mode:"private_versioned_cached_translation",cached:true
+      },{headers});
+    }catch(e){console.warn("HHBA_DURABLE_TRANSLATION_READ",e instanceof Error?e.message:"unknown");}
+  }
   const cacheKey=createHash("sha256").update(job.id+"\0"+digest+"\0"+part).digest("hex");
   pruneReaderCache();
   const cached=readerChunkCache.get(cacheKey);
@@ -1227,30 +1307,14 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
     return Response.json({jobId:job.id,part,total:chunks.length,text:cached.text,sourceHash:digest,
       numbersVerified:true,sourceUrl:job.url,mode:"ephemeral_verified_translation",cached:true},{headers});
   }
-  const one=chunks[part];
-  const segments=one.split(/\n{2,}/).filter(Boolean).map(raw=>{
-   const kind=raw.startsWith("# ")?"heading":raw.startsWith("- ")?"bullet":"paragraph";
-   return {kind,original:kind==="paragraph"?raw:raw.slice(2)};
-  });
-  if(!segments.length||segments.length>8)return Response.json({error:"invalid_layout",part},{status:422,headers});
-  // Translate each semantic element independently, never send ATS tags or
-  // heading/list markup to the translator.
-  const output=await machineTranslations("jd",segments.map(s=>s.original));
-  if(!output||output.length!==segments.length||output.some(x=>!x))
-   return Response.json({error:"translation_unverified",part,total:chunks.length},{status:503,headers});
-  const translated:string[]=[];
-  for(let i=0;i<segments.length;i++){
-   const source=segments[i].original;
-   const chinese=await ensureChineseProse(output[i]||"");
-   if(!chinese)return Response.json({error:"translation_incomplete",part,total:chunks.length},{status:503,headers});
-   const corrected=stabilizeEmployerTerminology(job.company,restoreGroupedNumbers(source,chinese));
-   if(hasLeakedJdTags(corrected))return Response.json({error:"translation_markup_leak",part,total:chunks.length},{status:503,headers});
-   const numberSafe=preserveOfficialNumbers(source,corrected);
-   if(!numberSafe)return Response.json({error:"translation_numbers_mismatch",part,total:chunks.length},{status:503,headers});
-   const mark=segments[i].kind==="heading"?"# ":segments[i].kind==="bullet"?"- ":"";
-   translated.push(mark+numberSafe.trim());
+  const translatedChunk=await verifiedJdChunk(job,chunks[part]);
+  if(!translatedChunk.text)return Response.json({error:translatedChunk.error||"translation_unverified",
+    part,total:chunks.length},{status:translatedChunk.error==="invalid_layout"?422:503,headers});
+  const text=translatedChunk.text;
+  if(durableJobStore){
+    try{durableJobStore.saveVerifiedPart(job.id,digest,part,chunks.length,text);}
+    catch(e){console.warn("HHBA_DURABLE_TRANSLATION_WRITE",e instanceof Error?e.message:"unknown");}
   }
-  const text=translated.join("\n\n");
   readerChunkCache.set(cacheKey,{text,at:Date.now(),total:chunks.length});
   markReaderPart(job.id+":"+digest,job.id,part,chunks.length);
   pruneReaderCache();
@@ -1262,12 +1326,20 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
  }finally{activeJdReaders--;}
 }
 
+if(durableJobStore && privateTranslatorUrl()){
+ startOverseasJdWorker({store:durableJobStore,load,boardsCount:boards.length,
+  officialDetail,jdChunks,translateVerifiedChunk:verifiedJdChunk,
+  maxCharacters:JD_READER_MAX_CHARS,dailyChunks:JD_SYNC_DAILY_CHUNKS,
+  intervalMs:JD_SYNC_INTERVAL_MS});
+}
+
 Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  const u=new URL(req.url);
  const headers:Record<string,string>={"Cache-Control":"no-store","X-Content-Type-Options":"nosniff","X-Frame-Options":"DENY","Referrer-Policy":"no-referrer"};
  const pagesRequest=req.headers.get("origin")==="https://yanm-jun.github.io" &&
    /^\/api\/jobs\/[A-Za-z0-9_-]{1,180}(?:\/translate-part)?$/.test(u.pathname);
- if(pagesRequest){
+ const pagesSyncStatus=req.headers.get("origin")==="https://yanm-jun.github.io" && u.pathname==="/api/jd-sync/status";
+ if(pagesRequest||pagesSyncStatus){
    headers["Access-Control-Allow-Origin"]="https://yanm-jun.github.io";
    headers["Vary"]="Origin";
    headers["Access-Control-Allow-Methods"]="GET, POST, OPTIONS";
@@ -1278,6 +1350,14 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  if(req.method==="POST"&&/^\/api\/jobs\/[a-zA-Z0-9_-]{1,180}\/translate-part$/.test(u.pathname))return readJobForTranslation(req,u,headers);
  if(req.method!=="GET")return new Response("Method not allowed",{status:405,headers});
  if(u.pathname==="/health")return Response.json({ok:true,kind:"hhba-ats-public-preview"},{headers});
+ if(u.pathname==="/api/jd-sync/status"){
+  return Response.json(durableJobStore?{...durableJobStore.coverage(),
+   enabled:true,persistent:true,
+   translationBudgetRemaining:durableJobStore.remainingBudget(JD_SYNC_DAILY_CHUNKS)}:
+   {kind:"HHBA_OVERSEAS_JD_SYNC_V1",enabled:false,persistent:false,
+    complete:0,total_current:0,reason:"PRIVATE_VOLUME_NOT_ENABLED"},{headers});
+ }
+
  if(u.pathname==="/api/i18n/status"){
   const d=await load(),records=(d?.rows||[]).map(present);
   const categories={machine:0,rules:0,pending:0,original:0};
@@ -1289,6 +1369,12 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
     readerJobsPartiallyTranslatedInMemory:[...readerJobProgress.values()].filter(v=>v.parts.size<v.total).length,
     readerEphemeralCache:true,readerCacheHours:2,
     readerLimitCharacters:JD_READER_MAX_CHARS,
+    backgroundFullJdSync:durableJobStore?durableJobStore.coverage():{
+      kind:"HHBA_OVERSEAS_JD_SYNC_V1",enabled:false,
+      reason:"PRIVATE_PERSISTENT_VOLUME_NOT_CONNECTED",
+      complete:0,total_current:0
+    },
+    backgroundFullJdDailyChunkLimit:JD_SYNC_DAILY_CHUNKS,
     searchLanguages:["zh","en"]},{headers});
  }
  if(u.pathname==="/api/jobs/page"){
