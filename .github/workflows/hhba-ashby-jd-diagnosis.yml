@@ -18,6 +18,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Probe a real failing Ashby Deepgram JD translation and record status code only
+      - name: Recheck Deepgram after verified official-number-fidelity repair
         working-directory: apps/web
         run: node scripts/diagnose-ashby-translation.mjs
