@@ -8,7 +8,7 @@ import { getJob, listJobs, localizedCompany, localizedLocation, localizedTitle, 
 import '../styles/unified-jobs.css';
 
 const emptyFilters: LiveFilters={q:'',company:'',country:'',remote:false,recruitment_type:''};
-const typeLabel: Record<string,string>={SOCIAL:'社会招聘',CAMPUS:'校园招聘',INTERNSHIP:'实习招聘',SPECIAL:'专项招聘'};
+const typeLabel: Record<string,{zh:string,en:string}>={SOCIAL:{zh:'社会招聘',en:'Professional'},CAMPUS:{zh:'校园招聘',en:'Graduate'},INTERNSHIP:{zh:'实习招聘',en:'Internship'},SPECIAL:{zh:'专项招聘',en:'Special program'}};
 const formatDate=(value?:string)=>value&&Number.isFinite(Date.parse(value)) ? value.slice(0,10) : '未公开';
 function useLanguage() {
   const [lang, setLang] = useState<Language>(()=>{
@@ -22,10 +22,10 @@ function JobCard({job,lang,asOf}:{job:LiveJob,lang:Language,asOf:string}){
   if(!source || officialStatus(job,asOf)!=='recent')return null;
   return <article className="unified-job-card">
     <div className="unified-job-head"><span><Building2 size={15}/>{localizedCompany(job,lang)}</span>
-    <small>{job.domestic?'国内官方招聘信息':'官方 ATS 招聘板'}</small></div>
+    <small>{lang==='zh'?(job.domestic?'国内官方招聘信息':'官方 ATS 招聘板'):(job.domestic?'Official China career site':'Official ATS board')}</small></div>
     <h3><Link to={'/candidate/jobs/'+encodeURIComponent(job.id)}>{localizedTitle(job,lang)}</Link></h3>
     <div className="unified-job-meta"><span><MapPin size={14}/>{localizedLocation(job,lang)}</span>
-      <span>{job.recruitmentType?typeLabel[job.recruitmentType]||job.recruitmentType:(lang==='zh'?'招聘类型待确认':'Type unverified')}</span>
+      <span>{job.recruitmentType?typeLabel[job.recruitmentType]?.[lang]||job.recruitmentType:(lang==='zh'?'招聘类型待确认':'Type unverified')}</span>
       {job.remote===true&&<span>{lang==='zh'?'远程':'Remote'}</span>}</div>
     <p className="unified-job-proof"><ShieldCheck size={15}/> {lang==='zh'
       ? '近期来源记录，是否仍可申请请以企业官网为准'
