@@ -31,9 +31,9 @@ async def test():
       try:
         await page.locator(".unified-jd-chinese").wait_for(timeout=125000)
         zh=await page.locator(".unified-jd-chinese").inner_text()
-        hans=sum(1 for ch in zh if "\\u3400"<=ch<="\\u9fff")
+        hans=sum(1 for ch in zh if 0x3400<=ord(ch)<=0x9fff)
         assert hans>80,f"{platform} translation too short"
-        assert not re.search(r"\\ufffd|(?:[A-Za-z]{3,}\\s+){12,}[A-Za-z]{3,}",zh), f"{platform} leaked untranslated English"
+        assert chr(0xfffd) not in zh and not re.search(r"(?:[A-Za-z]{3,}\\s+){12,}[A-Za-z]{3,}",zh), f"{platform} leaked untranslated English"
         results.append({"platform":platform,"source":slug,"job":id,"english_chars":len(en),"zh_han":hans,"translated":True})
       except Exception as e:
         status=await page.locator(".unified-jd-translate").all_text_contents()
