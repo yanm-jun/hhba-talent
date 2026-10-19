@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Build HHBA Pages without pretending enterprise backend is deployed
+      - name: Verify optional anonymous user TypeScript safety and build HHBA Pages with no enterprise API
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
