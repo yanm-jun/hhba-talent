@@ -12,6 +12,12 @@ const BOARD_HOSTS={
  ashby:new Set(['jobs.ashbyhq.com']),
  lever:new Set(['jobs.lever.co','jobs.eu.lever.co'])
 };
+const BRANDED_GREENHOUSE={
+ stripe:{host:'stripe.com',path:'/jobs/search'},
+ coinbase:{host:'www.coinbase.com',path:'/careers/positions/'},
+ airbnb:{host:'careers.airbnb.com',path:'/positions/'},
+ databricks:{host:'databricks.com',path:'/company/careers/open-positions/job'}
+};
 const CHINA_HOSTS={
  'xiaomi-official':'xiaomi.jobs.f.mioffice.cn',
  'meituan-official':'zhaopin.meituan.com',
@@ -30,7 +36,14 @@ function safeUrl(job){
   const u=new URL(job.url),platform=job.platform,source=job.source;
   if(u.protocol!=='https:'||u.port||u.username||u.password)return false;
   if(job.domestic===true)return u.hostname===CHINA_HOSTS[platform];
-  return BOARD_HOSTS[platform]?.has(u.hostname)&&u.pathname.split('/').includes(source);
+  if(BOARD_HOSTS[platform]?.has(u.hostname)&&u.pathname.split('/').includes(source))return true;
+  const branded=platform==='greenhouse'?BRANDED_GREENHOUSE[source]:null;
+  if(!branded)return false;
+  const prefix='greenhouse-'+source+'-';
+  const native=String(job.id||'').startsWith(prefix)?String(job.id).slice(prefix.length):'';
+  return /^[0-9]{5,20}$/.test(native)&&u.hostname===branded.host &&
+    (branded.path.endsWith('/')?u.pathname.startsWith(branded.path):u.pathname===branded.path) &&
+    u.searchParams.get('gh_jid')===native;
  }catch{return false;}
 }
 function onlyPublic(job){
