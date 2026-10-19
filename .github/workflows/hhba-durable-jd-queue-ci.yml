@@ -20,7 +20,7 @@ jobs:
           bun-version: '1.3.3'
       - name: Test persistent queue, source version, no false full-translation claims
         working-directory: ops/legacy-marketplace
-        run: bun test jd-sync-store.test.mjs
+        run: bun test jd-sync-store.test.mjs jd-sync-runner.test.mjs
       - name: Verify imported server can bundle with queue dependencies
         working-directory: ops/legacy-marketplace
         run: |
