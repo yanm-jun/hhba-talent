@@ -21,7 +21,7 @@ const ATS_HOSTS: Record<string, readonly string[]> = {
   lever: ['jobs.lever.co','jobs.eu.lever.co']
 };
 const MAX_HTML = 240_000;
-const BRANDED_GREENHOUSE={
+const BRANDED_GREENHOUSE:Record<string,{host:string;path:string}>={
  stripe:{host:'stripe.com',path:'/jobs/search'},
  coinbase:{host:'www.coinbase.com',path:'/careers/positions/'},
  airbnb:{host:'careers.airbnb.com',path:'/positions/'},
