@@ -1,0 +1,52 @@
+name: HHBA Phase 4 Read-Only Preview and Candidate Employer Jobs
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-phase4-readonly-portal-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/phase4-live-api-readiness-20261020
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build HHBA Pages without pretending enterprise backend is deployed
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          VITE_API_BASE: ''
+        run: |
+          npm ci
+          npm run build
+      - name: Install Chromium for real browser contract
+        run: |
+          python -m pip install 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Browser verify public portal, disabled mutations and separate employer jobs
+        working-directory: apps/web
+        run: |
+          npx vite preview --host 127.0.0.1 --port 4174 > /tmp/hhba-phase4-preview.log 2>&1 &
+          sleep 3
+          python ../../scripts/check_phase4_readonly_browser.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase4-employer-readonly-preview
+          path: |
+            /tmp/hhba-phase4-offline-employer.png
+            /tmp/hhba-phase4-offline-candidate.png
+          retention-days: 14
+          if-no-files-found: ignore
