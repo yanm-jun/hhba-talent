@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
-      - name: Build Chinese global search with real location filters and explicit unknown-degree fallback
+      - name: Build HHBA Chinese job search plus platform-provided DeepSeek resume matching entrance
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
