@@ -62,10 +62,10 @@ class SourceTests(unittest.TestCase):
 
     def test_matching_grounded_by_live_audit_and_explicit_requirements(self):
         facts = {
-            self.job["id"]: {"countryCode": "SG", "education": "BACHELOR",
+            self.job["id"]: {"countryCode": "SG", "original_source_hash": "a" * 64, "education": "BACHELOR",
                              "experienceMinYears": 2, "skills": ["excel", "salesforce"]},
         }
-        audits = {self.job["id"]: {"status": "OFFICIAL_JD_AND_REQUIREMENTS_FOUND"}}
+        audits = {self.job["id"]: {"status": "OFFICIAL_JD_AND_REQUIREMENTS_FOUND", "full_original_jd_verified": True, "jd_sha256": "a" * 64}}
         result = matcher.rank_official_jobs(self.profile, [self.job], facts, audits, country="SG")
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["official_url"], self.job["url"])
@@ -80,10 +80,10 @@ class SourceTests(unittest.TestCase):
             self.profile, [self.job], {}, audits, remote_only=True), [])
 
     def test_unknown_is_never_assumed_degree_compliant(self):
-        f = {self.job["id"]: {"countryCode": "SG", "education": None,
+        f = {self.job["id"]: {"countryCode": "SG", "original_source_hash": "a" * 64, "education": None,
                               "experienceMinYears": None, "skills": []}}
         result = matcher.rank_official_jobs(self.profile, [self.job], f,
-                         {self.job["id"]: {"status": "OFFICIAL_JD_AND_REQUIREMENTS_FOUND"}})
+                         {self.job["id"]: {"status": "OFFICIAL_JD_AND_REQUIREMENTS_FOUND", "full_original_jd_verified": True, "jd_sha256": "a" * 64}})
         self.assertEqual(len(result), 1)
         self.assertTrue(any("不能当作不限学历" in s for s in result[0]["needs_verification"]))
 
@@ -105,13 +105,13 @@ class SourceTests(unittest.TestCase):
 
     def test_requires_admin_key_even_before_file_read_and_privacy_consents(self):
         client = TestClient(server.app)
-        with patch.dict(os.environ, {"DEEPSEEK_API_KEY": ""}):
+        with patch.object(server, "MATCH_PUBLIC_ENABLED", True), patch.dict(os.environ, {"DEEPSEEK_API_KEY": ""}):
             reply = client.post("/api/v1/match/resume", files={"file": (
                 "cv.docx", b"PK\x03\x04", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             )}, data={"consent": "true"}, headers={"Origin": "https://yanm-jun.github.io"})
             self.assertEqual(reply.status_code, 503)
             self.assertEqual(reply.json()["error"], "ADMIN_AI_NOT_CONFIGURED")
-        with patch.dict(os.environ, {"DEEPSEEK_API_KEY": "test-not-real"}):
+        with patch.object(server, "MATCH_PUBLIC_ENABLED", True), patch.dict(os.environ, {"DEEPSEEK_API_KEY": "test-not-real"}):
             reply = client.post("/api/v1/match/resume", files={"file": (
                 "cv.pdf", b"%PDF-notreal", "application/pdf"
             )}, data={"consent": "false"}, headers={"Origin": "https://yanm-jun.github.io"})
