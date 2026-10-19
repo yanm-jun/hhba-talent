@@ -117,7 +117,7 @@ export function parseNaturalQuery(query){
   if(word(text,phrase)){parsed.experience=val;text=remove(text,phrase);break}}
  const y=text.match(/(\d{1,2})年(?:工作)?经验/);
  if(y){const n=Number(y[1]);parsed.experience=n===0?'0':n<=3?'1-3':n<=5?'3-5':'5+';text=text.replace(y[0],' ')}
- for(const [a,value] of [['实习','INTERNSHIP'],['internship','INTERNSHIP'],['校招','CAMPUS'],['校园招聘','CAMPUS'],['应届','CAMPUS'],['社招','REGULAR'],['社会招聘','REGULAR']]){
+ for(const [a,value] of [['实习','INTERNSHIP'],['internship','INTERNSHIP'],['校招','CAMPUS'],['校园招聘','CAMPUS'],['应届','CAMPUS'],['社招','SOCIAL'],['社会招聘','SOCIAL']]){
   if(word(text,a)){parsed.jobType=value;text=remove(text,a);break}}
  const matches=roles.flatMap(r=>r.aliases.map(a=>({key:r.key,alias:a}))).sort((a,b)=>b.alias.length-a.alias.length);
  for(const a of matches)if(word(text,a.alias)){parsed.roleKeys=[a.key];text=remove(text,a.alias);break}
@@ -144,8 +144,13 @@ export function searchJobs(jobs,filters={},facets=new Map()){
   if(remote&&job.remote!==true)continue;
   if(company&&![job.company,job.companyZh].some(t=>norm(t).includes(company)))continue;
   const actualType=f.jobType||classifyJobType(job.title,job.recruitmentType).jobType;
-  if(type&&type!==actualType&&!(type==='SOCIAL'&&actualType==='REGULAR'))continue;
-  if(education&&f.education!==education)continue;
+  if(type&&type!==actualType&&!(type==='REGULAR'&&actualType==='SOCIAL'))continue;
+  if(education){
+   const known=f.education||null;
+   if(education==='UNRESTRICTED_OR_UNREPORTED'){
+    if(known!==null&&known!=='UNRESTRICTED')continue;
+   }else if(known!==education)continue;
+  }
   const years=Number.isFinite(f.experienceMinYears)?f.experienceMinYears:null;
   if(experience){
    if(experience==='unreported'){if(years!==null)continue}

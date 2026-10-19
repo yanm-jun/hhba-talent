@@ -89,3 +89,22 @@ test('real native ATS titles and original JD alone create source-constrained fac
  assert.equal(fact.experienceMinYears,2);
  assert.deepEqual(fact.skills,['excel','salesforce']);
 });
+
+
+test('no-degree remote fallback includes only explicit no-degree and unknown education with warning mode, never known mandatory degree',()=>{
+ const strict=searchJobs(jobs,{q:'不限学历的远程工作'},facets);
+ assert.deepEqual(strict.rows.map(j=>j.id),['f']);
+ const broad=searchJobs(jobs,{q:'不限学历的远程工作',education:'UNRESTRICTED_OR_UNREPORTED'},facets);
+ assert.deepEqual(broad.rows.map(j=>j.id),['d','e','f','g']);
+ assert.ok(broad.rows.every(j=>j.remote===true));
+ assert.ok(broad.rows.every(j=>(facets.get(j.id)?.education??null)===null||
+  facets.get(j.id).education==='UNRESTRICTED'));
+});
+test('explicit social recruitment never silently includes normal titles inferred from absence of internship',()=>{
+ const verified=role('h','Software Engineer','Singapore',{recruitmentType:'SOCIAL'});
+ const all=[...jobs,verified];
+ assert.deepEqual(searchJobs(all,{q:'社招'},facets).rows.map(j=>j.id),['h']);
+ assert.ok(searchJobs(all,{recruitment_type:'REGULAR'},facets).rows.some(j=>j.id==='a'));
+ assert.ok(searchJobs(all,{recruitment_type:'REGULAR'},facets).rows.some(j=>j.id==='h'));
+ assert.deepEqual(searchJobs(all,{recruitment_type:'SOCIAL'},facets).rows.map(j=>j.id),['h']);
+});

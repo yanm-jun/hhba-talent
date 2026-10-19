@@ -80,3 +80,9 @@
  .unified-job-controls select{flex:1 1 calc(50% - 6px);max-width:none;min-width:0}
  .unified-job-remote{flex:1 1 100%}
 }
+
+.unified-search-fallback{margin:14px 0;border:1px solid #e3e0d7;border-radius:9px;background:#fbfaf6;padding:13px 15px;color:#665f4e;font-size:12px;line-height:1.8}
+.unified-search-fallback p{margin:0 0 9px}
+.unified-search-fallback button{padding:9px 12px;border:1px solid #bccfbf;border-radius:8px;color:#315f45;background:#fff;font-size:12px;font-weight:600;cursor:pointer}
+.unified-search-fallback button:hover{background:#f3f8f3}
+.unified-search-fallback-active{border-left:3px solid #b6a77e;padding:8px 12px;margin:12px 0;color:#675f4c;background:#fbfaf6;font-size:12px;line-height:1.7}
