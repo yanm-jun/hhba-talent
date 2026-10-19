@@ -81,7 +81,7 @@ export function openJobSyncStore(file,{now=()=>Date.now(),root="/sync-state"}={}
  }
  const claimTxn=db.transaction(()=>{
   const ts=now();
-  const job=db.query("SELECT * FROM jobs WHERE ((state IN ('QUEUED','TRANSLATING','RETRY') AND next_ms<=?) OR (state='WORKING' AND lease_ms<?) OR (state='COMPLETE' AND checked_ms<?)) AND attempts<12 ORDER BY CASE WHEN state='COMPLETE' THEN 1 ELSE 0 END ASC,priority DESC,next_ms ASC,seen_ms ASC,id LIMIT 1").get(ts,ts,ts-30*86400000);
+  const job=db.query("SELECT * FROM jobs WHERE ((state IN ('QUEUED','TRANSLATING','RETRY') AND next_ms<=?) OR (state='WORKING' AND lease_ms<?) OR (state='COMPLETE' AND checked_ms<?)) AND attempts<12 ORDER BY CASE WHEN state='COMPLETE' THEN 1 ELSE 0 END ASC,priority DESC,next_ms ASC,seen_ms ASC,id LIMIT 1").get(ts,ts,ts-7*86400000);
   if(!job)return null;
   db.query("UPDATE jobs SET state='WORKING',attempts=attempts+1,lease_ms=? WHERE id=?").run(ts+180000,job.id);
   return job;
