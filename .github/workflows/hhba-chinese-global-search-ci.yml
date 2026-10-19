@@ -14,13 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feat/chinese-structured-jobs-search-20261019
+          ref: feat/search-unknown-degree-fallback-20261019
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
-      - name: Test natural Chinese query, country, city, recruitment type, official degree and experience
+      - name: Test official-degree-only and optional unknown-degree remote discovery with all structured filters
         working-directory: apps/web
         run: node --test scripts/job-search-facets.test.mjs scripts/audit-all-official-jds.test.mjs
       - name: Install exact white HHBA dependencies
