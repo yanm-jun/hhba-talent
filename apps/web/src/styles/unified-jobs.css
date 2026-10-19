@@ -65,3 +65,5 @@
 .unified-job-audit{display:flex;align-items:center;flex-wrap:wrap;gap:7px;background:#f7faf8;border:1px solid #e5eee8;border-radius:8px;padding:10px 12px;color:#496c59!important;font-size:12px!important;line-height:1.5!important}
 .unified-job-audit small{margin-left:auto;font-size:11px;color:#697f72}
 @media(max-width:720px){.unified-job-audit small{margin-left:0}}
+
+.unified-jd-sync-progress{display:flex;align-items:flex-start;gap:9px;padding:11px 14px;margin:10px 0 13px;border:1px solid #cddfd2;border-radius:9px;background:#f6faf7;color:#446e53;font-size:12px;line-height:1.75}.unified-jd-sync-progress svg{margin-top:3px;flex-shrink:0}
