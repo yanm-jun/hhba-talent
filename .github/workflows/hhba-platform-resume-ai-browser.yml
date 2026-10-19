@@ -22,7 +22,7 @@ jobs:
         run: |
           python -m pip install 'playwright>=1.55,<2'
           python -m playwright install --with-deps chromium
-      - name: Check one shared platform key, explicit consent, no unsafe public upload or token prompt
+      - name: Verify latest white HHBA Pages uses admin-owned DeepSeek only with safe disabled uploads
         run: python scripts/check_platform_resume_matching_preview.py
       - uses: actions/upload-artifact@v4
         if: always()
