@@ -37,13 +37,20 @@ function getJobId(job: LiveJob) {
 function headingSection(value: string):OfficialJdBlock['section'] | null {
   const v=value.toLocaleLowerCase().trim();
   if(/responsibilit|what you.ll do|what you will do|duties|about the role|the role|岗位职责|工作职责|主要职责/.test(v))return 'responsibilities';
-  if(/requirement|qualification|what we.re looking|who you are|experience|skills|must.have|you bring|knowledge|任职|条件|技能|专业能力|岗位要求/.test(v))return 'requirements';
+  if(/requirement|qualification|what we.re looking|who you are|experience|skills|technical|technology|must.have|you bring|knowledge|任职|条件|技能|专业能力|岗位要求/.test(v))return 'requirements';
   if(/benefit|compensation|salary|perks|薪资|福利|薪酬/.test(v))return 'benefits';
   return null;
 }
 // Parse into React text nodes. Never inject third-party HTML into the document.
 export function parseOfficialBlocks(html:string): OfficialJdBlock[] {
   if(typeof html!=='string'||html.length>MAX_HTML)throw new Error('官方职位描述超过安全读取上限');
+  // Some ATS boards double-encode markup: decode safely before structural parsing.
+  for(let i=0;i<3 && /&(?:amp;)?lt;\s*\/?(?:p|div|ul|li|h[1-6]|section)/i.test(html);i++){
+    const textarea=document.createElement('textarea');textarea.innerHTML=html;
+    const decoded=textarea.value;
+    if(decoded===html)break;
+    html=decoded;
+  }
   const doc=new DOMParser().parseFromString(html,'text/html');
   const root=doc.body;
   root.querySelectorAll('script,style,iframe,svg,noscript,form,button,img').forEach(n=>n.remove());
@@ -117,17 +124,19 @@ function validateOfficialDetail(raw:any,info:NonNullable<ReturnType<typeof getJo
   return {blocks,checkedAt:new Date().toISOString(),sourceUrl:job.url,
     roleTitle:publishedTitle,status:'LIVE_CONTENT' as const};
 }
-const boardCache=new Map<string,Promise<any>>();
+const boardCache=new Map<string,{created:number,promise:Promise<any>}>();
 async function readBoard(url:string, signal:AbortSignal) {
   // Per-page only, no persistent JD harvesting. Reuse same Ashby board response.
-  if(!boardCache.has(url)){
-    boardCache.set(url,fetch(url,{method:'GET',credentials:'omit',redirect:'error',signal,
+  const old=boardCache.get(url);
+  if(!old || Date.now()-old.created>10*60_000){
+    const promise=fetch(url,{method:'GET',credentials:'omit',redirect:'error',signal,
       headers:{Accept:'application/json'}}).then(r=>{
       if(!r.ok)throw new Error('官方详情接口 HTTP '+r.status);
       return r.json();
-    }).catch(e=>{boardCache.delete(url);throw e}));
+    }).catch(e=>{boardCache.delete(url);throw e});
+    boardCache.set(url,{created:Date.now(),promise});
   }
-  return boardCache.get(url)!;
+  return boardCache.get(url)!.promise;
 }
 export async function fetchOfficialJd(job:LiveJob,signal:AbortSignal):Promise<OfficialJd> {
   const info=getJobId(job);
