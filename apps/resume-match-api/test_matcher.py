@@ -1,0 +1,139 @@
+"""No real resume or DeepSeek token is needed for these safety tests."""
+import io
+import json
+import os
+import unittest
+from unittest.mock import AsyncMock, patch
+
+from fastapi.testclient import TestClient
+from docx import Document
+
+import matcher
+import server
+
+
+class SourceTests(unittest.TestCase):
+    def setUp(self):
+        self.resume = ("本科 信息管理专业。3年销售经验，企业销售，负责客户拜访及 Salesforce。"
+                       "了解 Excel 数据分析，目标职位是 Sales Account Executive。")
+        self.profile = {
+            "education": "BACHELOR", "experience_years": 3,
+            "skills": [{"name": "excel", "evidence": "Excel"}, {"name": "salesforce", "evidence": "Salesforce"}],
+            "target_roles": ["Sales Account Executive"],
+        }
+        self.job = {
+            "id": "greenhouse-stripe-123456",
+            "platform": "greenhouse", "source": "stripe", "company": "Stripe",
+            "title": "Enterprise Account Executive", "location": "Singapore",
+            "url": "https://stripe.com/jobs/search?gh_jid=123456", "remote": False,
+            "domestic": False,
+        }
+
+    def test_profile_rejects_llm_hallucinations(self):
+        proposed = {
+            "education": {"level": "PHD", "evidence": "PhD Stanford"},
+            "experience_years": 20, "experience_evidence": "20 years of experience",
+            "skills": [
+                {"name": "Excel", "evidence": "Excel"},
+                {"name": "Kubernetes", "evidence": "Kubernetes"},
+                {"name": "Salesforce", "evidence": "Salesforce"},
+            ],
+            "target_roles": [
+                {"role": "Account Executive", "evidence": "Sales Account Executive"},
+                {"role": "Chief Data Scientist", "evidence": "Chief Data Scientist"},
+            ],
+        }
+        profile = matcher.profile_from_llm(proposed, self.resume)
+        self.assertIsNone(profile["education"])
+        self.assertIsNone(profile["experience_years"])
+        self.assertEqual([x["name"] for x in profile["skills"]], ["excel", "salesforce"])
+        self.assertEqual(profile["target_roles"], ["Account Executive"])
+
+    def test_url_validation_no_external_redirect_or_guessed_id(self):
+        self.assertTrue(matcher.valid_official_url(self.job))
+        self.assertFalse(matcher.valid_official_url({**self.job, "url": "https://evil.com/jobs/search?gh_jid=123456"}))
+        self.assertFalse(matcher.valid_official_url({**self.job, "url": "https://stripe.com/jobs/search?gh_jid=987654"}))
+        self.assertFalse(matcher.valid_official_url({**self.job, "url": "http://stripe.com/jobs/search?gh_jid=123456"}))
+        self.assertFalse(matcher.valid_official_url({**self.job, "url": "https://stripe.com@evil.com/jobs/search?gh_jid=123456"}))
+        self.assertTrue(matcher.valid_official_url({
+            "id": "ashby-deepgram-abc123", "source": "deepgram", "platform": "ashby",
+            "url": "https://jobs.ashbyhq.com/deepgram/abc123",
+        }))
+
+    def test_matching_grounded_by_live_audit_and_explicit_requirements(self):
+        facts = {
+            self.job["id"]: {"countryCode": "SG", "education": "BACHELOR",
+                             "experienceMinYears": 2, "skills": ["excel", "salesforce"]},
+        }
+        audits = {self.job["id"]: {"status": "OFFICIAL_JD_AND_REQUIREMENTS_FOUND"}}
+        result = matcher.rank_official_jobs(self.profile, [self.job], facts, audits, country="SG")
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["official_url"], self.job["url"])
+        self.assertTrue(result[0]["matched"])
+        self.assertEqual(result[0]["not_evidenced"], [])
+        self.assertIn("needs_verification", result[0])
+        self.assertLessEqual(result[0]["reference_score"], 95)
+        self.assertEqual(matcher.rank_official_jobs(self.profile, [self.job], facts, audits, country="US"), [])
+        self.assertEqual(matcher.rank_official_jobs(
+            self.profile, [self.job], facts, {self.job["id"]: {"status": "MISSING_FROM_OFFICIAL_BOARD"}}), [])
+        self.assertEqual(matcher.rank_official_jobs(
+            self.profile, [self.job], {}, audits, remote_only=True), [])
+
+    def test_unknown_is_never_assumed_degree_compliant(self):
+        f = {self.job["id"]: {"countryCode": "SG", "education": None,
+                              "experienceMinYears": None, "skills": []}}
+        result = matcher.rank_official_jobs(self.profile, [self.job], f,
+                         {self.job["id"]: {"status": "OFFICIAL_JD_AND_REQUIREMENTS_FOUND"}})
+        self.assertEqual(len(result), 1)
+        self.assertTrue(any("不能当作不限学历" in s for s in result[0]["needs_verification"]))
+
+    def test_no_unsupported_platform(self):
+        j = dict(self.job, platform="notanats", id="notanats-stripe-123456")
+        self.assertFalse(matcher.valid_official_url(j))
+
+    def test_pdf_and_docx_types_and_pii(self):
+        d = Document()
+        d.add_paragraph("本科销售顾问。管理多个客户项目以及业务增长。Excel 和 Salesforce，三年工作经验。")
+        output = io.BytesIO()
+        d.save(output)
+        txt = server.parse_resume(output.getvalue(), "resume.docx")
+        self.assertIn("Salesforce", txt)
+        masked = server.redact_resume("李先生 13800138000 email@example.com https://github.com/some-user")
+        self.assertNotIn("13800138000", masked)
+        self.assertNotIn("email@example.com", masked)
+        self.assertNotIn("github.com", masked)
+
+    def test_requires_admin_key_even_before_file_read_and_privacy_consents(self):
+        client = TestClient(server.app)
+        with patch.dict(os.environ, {"DEEPSEEK_API_KEY": ""}):
+            reply = client.post("/api/v1/match/resume", files={"file": (
+                "cv.docx", b"PK\x03\x04", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            )}, data={"consent": "true"}, headers={"Origin": "https://yanm-jun.github.io"})
+            self.assertEqual(reply.status_code, 503)
+            self.assertEqual(reply.json()["error"], "ADMIN_AI_NOT_CONFIGURED")
+        with patch.dict(os.environ, {"DEEPSEEK_API_KEY": "test-not-real"}):
+            reply = client.post("/api/v1/match/resume", files={"file": (
+                "cv.pdf", b"%PDF-notreal", "application/pdf"
+            )}, data={"consent": "false"}, headers={"Origin": "https://yanm-jun.github.io"})
+            self.assertEqual(reply.status_code, 400)
+            self.assertEqual(reply.json()["error"], "EXPLICIT_AI_SHARING_CONSENT_REQUIRED")
+            spoofed = client.post("/api/v1/match/resume", files={"file": (
+                "cv.pdf", b"%PDF-notreal", "application/pdf"
+            )}, data={"consent": "true"}, headers={"Origin": "https://evil.com"})
+            self.assertEqual(spoofed.status_code, 403)
+
+    def test_reject_wrong_magic_or_scanned_pdfs(self):
+        with self.assertRaises(Exception):
+            server.parse_resume(b"evil not pdf" * 20, "cv.pdf")
+        with self.assertRaises(Exception):
+            server.parse_resume(b"PK\x03\x04broken" * 20, "cv.docx")
+
+    def test_health_does_not_return_admin_secret(self):
+        with patch.dict(os.environ, {"DEEPSEEK_API_KEY": "a-test-private-key"}):
+            resp = TestClient(server.app).get("/health")
+        self.assertTrue(resp.json()["admin_deepseek_configured"])
+        self.assertNotIn("a-test-private-key", resp.text)
+
+
+if __name__ == "__main__":
+    unittest.main()
