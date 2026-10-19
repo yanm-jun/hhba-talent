@@ -12,7 +12,7 @@ export type LiveJob = {
 };
 export type LiveFilters = {
   q: string; company: string; country: '' | 'cn' | 'global'; remote: boolean;
-  recruitment_type: '' | 'SOCIAL' | 'CAMPUS' | 'INTERNSHIP';
+  recruitment_type: '' | 'REGULAR' | 'SOCIAL' | 'CAMPUS' | 'INTERNSHIP';
   location_country?: string; city?: string; education?: string; experience?: string;
 };
 export type LivePage = {
