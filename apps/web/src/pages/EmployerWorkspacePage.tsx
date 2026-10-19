@@ -2,7 +2,7 @@ import {useEffect,useState,type FormEvent} from 'react';
 import {ArrowRight,Building2,ClipboardCheck,FilePlus2,Search,ShieldCheck,Users,XCircle} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
-import {api,ApiError,type EmployerPosting,type EmployerPostingInput,type Organization,type TalentSearchCandidate,type User} from '../services/api';
+import {api,ApiError,employerApiReady,type EmployerPosting,type EmployerPostingInput,type Organization,type TalentSearchCandidate,type User} from '../services/api';
 import '../styles/employer-workspace.css';
 const blank:EmployerPostingInput={title:'',description:'',requirements:'',location:'',work_mode:'onsite',recruitment_type:'SOCIAL',apply_url:''};
 const messages:Record<string,string>={
@@ -60,6 +60,7 @@ export function EmployerWorkspacePage({user}:{user:User|null}){
  return <Shell user={user}><main className="employer-workspace">
   <div className="employer-ws-top"><span className="page-kicker">HHBA 企业招聘工作台</span><h1>发布真实岗位，寻找已授权的人才。</h1>
    <p>先完成企业主体和招聘经办人认证。岗位需经平台审核才会对外发布，人才搜索只返回明确同意企业检索的候选人。</p></div>
+  {!employerApiReady&&<section className="employer-ws-offline" role="status"><ShieldCheck size={20}/><div><strong>企业功能预览版 · 暂未连接正式业务服务器</strong><p>可以查看岗位发布与授权搜索界面，但企业认证、真实岗位提交和人才搜索还不能实际执行。现有公开招聘市场不受影响。</p></div></section>}
   <div className="employer-ws-company"><Building2 size={20}/><label>当前企业
    <select value={oid} onChange={e=>setOid(e.target.value)} disabled={loading}>{organizations.length?organizations.map(o=><option key={o.id} value={o.id}>{o.legal_name}</option>):<option value="">暂未创建企业组织</option>}</select></label>
    <span className="employer-ws-status">{organization?.status==='approved'?'企业组织已审核':'企业组织尚未审核通过'}</span>
