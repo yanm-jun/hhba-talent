@@ -9,6 +9,7 @@ import io
 import ipaddress
 import hashlib
 import secrets
+import zipfile
 import sqlite3
 import json
 import logging
@@ -134,6 +135,14 @@ def parse_resume(data: bytes, filename: str) -> str:
         else:
             if not data.startswith(b"PK\x03\x04"):
                 raise HTTPException(status_code=415, detail="INVALID_DOCX_HEADER")
+            # DOCX is ZIP. Enforce aggregate uncompressed limits before XML
+            # parsing; a 3 MB upload can otherwise contain a decompression bomb.
+            with zipfile.ZipFile(io.BytesIO(data)) as archive:
+                infos = archive.infolist()
+                if len(infos) > 500 or sum(i.file_size for i in infos) > 20 * 1024 * 1024:
+                    raise HTTPException(status_code=413, detail="DOCUMENT_UNPACKED_TOO_LARGE")
+                if any(i.flag_bits & 0x1 for i in infos):
+                    raise HTTPException(status_code=422, detail="ENCRYPTED_DOCUMENT_NOT_SUPPORTED")
             document = Document(io.BytesIO(data))
             contents = []
             for p in document.paragraphs:
@@ -219,10 +228,12 @@ Return only a JSON object with this shape:
 {"education":{"level":"BACHELOR","evidence":"exact text copied from resume"},
  "experience_years":3,"experience_evidence":"exact text copied from resume",
  "skills":[{"name":"Python","evidence":"exact phrase copied from resume"}],
- "target_roles":[{"role":"Software Engineer","evidence":"exact phrase copied from resume"}]}
+ "target_roles":[{"role":"Software Engineer","evidence":"exact phrase copied from resume"}],
+ "experiences":[{"role":"Sales Manager","organization":"Acme Corp","period":"2022-2025","evidence":"exact text copied from resume"}]}
 Education level must be one of HIGH_SCHOOL, ASSOCIATE, BACHELOR, MASTER, PHD, or null.
 Use null (and null evidence) if the resume does not prove the education level or years.
-Every skill and target role MUST have an exact evidence snippet from the resume.
+Every skill, target role, and work experience MUST have an exact evidence snippet from the resume.
+For work experience, preserve original role, organization and period strings only when they appear literally in that same evidence snippet.
 Copy evidence VERBATIM, never paraphrase it. Do not infer a certification,
 an employer, work years, a skill or a degree from unrelated context.
 Do not emit personal identifiers, names, phone numbers, addresses or e-mails.

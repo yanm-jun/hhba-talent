@@ -3,6 +3,7 @@ export type CandidateProfile = {
  experience_years:number|null;experience_evidence:string|null;
  skills:{name:string;evidence:string}[];
  target_roles:string[];
+ experiences:{role:string;organization:string|null;period:string|null;evidence:string}[];
  warnings:string[];
 };
 export type JobMatch={

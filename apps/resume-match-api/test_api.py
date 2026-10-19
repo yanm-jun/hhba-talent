@@ -64,10 +64,24 @@ class MatcherSecurityTests(unittest.TestCase):
   self.assertEqual([x["name"] for x in p["skills"]],["python"])
   self.assertEqual(p["target_roles"],["Software Engineer"])
 
+ def test_work_history_must_appear_verbatim_in_resume(self):
+  resume="Acme Corp Sales Manager 2022-2025. Bachelor of Science. 3 years experience."
+  candidate=profile_from_llm({
+   "experiences":[
+    {"role":"Sales Manager","organization":"Acme Corp","period":"2022-2025",
+     "evidence":"Acme Corp Sales Manager 2022-2025"},
+    {"role":"CTO","organization":"Another","period":"2021-2022",
+     "evidence":"unrelated invented work"},
+   ]
+  },resume)
+  self.assertEqual(len(candidate["experiences"]),1)
+  self.assertEqual(candidate["experiences"][0]["role"],"Sales Manager")
+  self.assertEqual(candidate["experiences"][0]["organization"],"Acme Corp")
+
  def test_unknown_degree_is_never_called_unrestricted(self):
   p=rank_official_jobs(PROFILE,[ROLE],{ROLE_ID:{**FACET,"education":None}},{ROLE_ID:AUDIT})
   self.assertEqual(len(p),1)
-  self.assertTrue(any("不代表不限学历" in text for text in p[0]["needs_verification"]))
+  self.assertTrue(any("不能当作不限学历" in text for text in p[0]["needs_verification"]))
 
  def test_official_hash_mismatch_or_fake_employer_link_cannot_recommend(self):
   self.assertEqual(rank_official_jobs(PROFILE,[ROLE],

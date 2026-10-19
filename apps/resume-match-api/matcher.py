@@ -151,6 +151,27 @@ def profile_from_llm(raw: dict, redacted_resume: str) -> dict:
         if text and text not in target_roles:
             target_roles.append(text)
 
+    experiences = []
+    for item in (raw.get("experiences") if isinstance(raw.get("experiences"), list) else [])[:8]:
+        if not isinstance(item, dict) or not evidence_ok(item.get("evidence")):
+            continue
+        evidence = item["evidence"][:220]
+        role = item.get("role")
+        employer = item.get("organization")
+        period = item.get("period")
+        if not isinstance(role, str) or not role.strip() or len(role) > 90:
+            continue
+        if normalized(role) not in normalized(evidence):
+            continue
+        if not isinstance(employer, str) or normalized(employer) not in normalized(evidence):
+            employer = None
+        if not isinstance(period, str) or normalized(period) not in normalized(evidence):
+            period = None
+        experiences.append({
+            "role": role.strip(), "organization": employer,
+            "period": period, "evidence": evidence,
+        })
+
     # Evidence is shown only to the owner and remains in this response; never persisted.
     return {
         "education": education,
@@ -159,6 +180,7 @@ def profile_from_llm(raw: dict, redacted_resume: str) -> dict:
         "experience_evidence": years_ev[:180] if years is not None else None,
         "skills": skills,
         "target_roles": target_roles,
+        "experiences": experiences,
         "warnings": ["AI 提取仅供核对；缺失信息不代表你没有这项能力。"],
     }
 
