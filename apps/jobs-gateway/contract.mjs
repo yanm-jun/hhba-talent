@@ -37,7 +37,7 @@ export function normalizeAts(row, { observedAt, now = Date.now(), maxAgeMs = MAX
   const titleZh = safeString(row.titleZh, 220);
   const locationZh = safeString(row.locationZh, 170);
   const translationMode = safeString(row.titleStatus, 30);
-  const translationValid = Boolean(titleZh && titleZh !== title && translationMode !== 'pending');
+  const translationValid = Boolean(titleZh && /[\u3400-\u9fff]/u.test(titleZh) && titleZh !== title && translationMode !== 'pending');
   const oldId = safeString(row.id, 180);
   return {
     job_id: jobId,
