@@ -22,12 +22,14 @@ jobs:
         run: |
           python -m pip install 'playwright>=1.55,<2'
           python -m playwright install --with-deps chromium
-      - name: Browser check using synthetic recruiter only (no real company or resume writes)
+      - name: Mobile browser proof of isolated employer recruitment, non-fabricated public listings and private admin review
         run: python scripts/check_phase4_employer_browser.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: hhba-phase4-employer-mobile-preview
-          path: /tmp/hhba-phase4-employer-mobile.png
+          path: |
+            /tmp/hhba-phase4-employer-mobile.png
+            /tmp/hhba-phase4-admin-mobile.png
           retention-days: 14
           if-no-files-found: ignore
