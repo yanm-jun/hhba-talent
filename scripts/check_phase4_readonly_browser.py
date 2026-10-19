@@ -12,8 +12,11 @@ async def main():
   page.on('pageerror',lambda e:errors.append(str(e)))
   page.on('request',lambda r:mutations.append({'method':r.method,'url':r.url}) if r.method not in ('GET','HEAD') else None)
 
-  await page.goto(BASE+'employer/workspace',wait_until='networkidle',timeout=45000)
-  await page.get_by_role('heading',name='发布真实岗位，寻找已授权的人才。').wait_for()
+  await page.goto(BASE+'employer/workspace',wait_until='domcontentloaded',timeout=45000)
+  await page.wait_for_timeout(1700)
+  print('PHASE4_PREVIEW_DIAGNOSTICS',json.dumps({'url':page.url,'title':await page.title(),'text':(await page.locator('body').inner_text())[:850],'browserErrors':errors},ensure_ascii=False))
+  await page.screenshot(path='/tmp/hhba-phase4-offline-employer.png',full_page=True)
+  await page.get_by_role('heading',name='发布真实岗位，寻找已授权的人才。').wait_for(timeout=12000)
   assert await page.get_by_text('企业功能预览版',exact=False).count()>0
   assert await page.get_by_role('button',name='待连接企业 API 后开放保存').is_disabled()
   await page.get_by_role('textbox',name='岗位名称').fill('合成预览岗位：绝不提交')
