@@ -103,3 +103,33 @@ def test_revoked_recruiter_prevents_public_access_even_if_posting_published():
   grant.status='revoked';grant.revoked_at=now();s.commit()
  assert c.get(f'/api/v1/public/employer-postings/{pid}').status_code==404
  assert all(x['id']!='employer-'+pid for x in c.get('/api/v1/public/employer-postings').json()['items'])
+
+
+def test_authorized_candidate_is_searchable_and_revoke_is_immediate():
+ owner,csrf,email=actor('privacy-recruiter');oid=organ(owner,csrf)
+ approve_synthetic_org(oid,email)
+ candidate,cc,mail=actor('optin-candidate','candidate')
+ data={'display_name':'测试已授权人才','content':{
+  'headline':'新能源汽车区域销售培训','skills':['销售培训','经销商运营'],
+  'industries':['新能源汽车'],'location':'山东','service_regions':['山东'],
+  'work_modes':['短期项目'],'work_years':5,'phone':'13800000000',
+  'source_evidence':'这是不得被企业看到的原始证据'}}
+ saved=candidate.put('/api/v1/me/profile',json=data,headers={'X-CSRF-Token':cc})
+ assert saved.status_code==200,saved.text
+ assert candidate.post('/api/v1/me/profile/confirm',headers={'X-CSRF-Token':cc}).status_code==200
+ endpoint=f'/api/v1/organizations/{oid}/talent-search'
+ query={'skills':['销售培训'],'region':'山东'}
+ hidden=owner.post(endpoint,json=query,headers={'X-CSRF-Token':csrf})
+ assert hidden.status_code==200,hidden.text
+ assert hidden.json()['items']==[]
+ allow=candidate.put('/api/v1/me/consents/enterprise_search',json={'granted':True},headers={'X-CSRF-Token':cc})
+ assert allow.status_code==200,allow.text
+ visible=owner.post(endpoint,json=query,headers={'X-CSRF-Token':csrf})
+ assert visible.status_code==200,visible.text
+ assert any(c['display_name']=='测试已授权人才' for c in visible.json()['items'])
+ serialized=str(visible.json())
+ assert '13800000000' not in serialized and '原始证据' not in serialized and 'source_evidence' not in serialized
+ revoke=candidate.put('/api/v1/me/consents/enterprise_search',json={'granted':False},headers={'X-CSRF-Token':cc})
+ assert revoke.status_code==200,revoke.text
+ again=owner.post(endpoint,json=query,headers={'X-CSRF-Token':csrf})
+ assert again.status_code==200 and again.json()['items']==[],again.text
