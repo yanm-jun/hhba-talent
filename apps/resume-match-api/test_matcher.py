@@ -128,6 +128,62 @@ class SourceTests(unittest.TestCase):
         with self.assertRaises(Exception):
             server.parse_resume(b"PK\x03\x04broken" * 20, "cv.docx")
 
+    def test_complete_upload_to_official_match_with_stubbed_platform_deepseek(self):
+        """Integration test: users send no key; only server knows the configured key."""
+        document = Document()
+        document.add_paragraph(
+            "Account Executive, enterprise sales and customer relationship management. "
+            "I have 3 years of sales experience with Salesforce, Excel, team training and "
+            "quarterly revenue targets. My role is Sales Account Executive. "
+            "Contact: private@example.com."
+        )
+        out = io.BytesIO()
+        document.save(out)
+        official_hash = "a" * 64
+        source = {**self.job}
+        source_fact = {
+            "countryCode": "SG", "cityKey": "singapore", "education": None,
+            "experienceMinYears": 2, "skills": ["excel", "salesforce"],
+            "original_source_hash": official_hash,
+        }
+        source_audit = {
+            "status": "OFFICIAL_JD_AND_REQUIREMENTS_FOUND",
+            "full_original_jd_verified": True, "jd_sha256": official_hash,
+        }
+        ai_result = {
+            "education": None, "education_evidence": None,
+            "experience_years": 3, "experience_evidence": "3 years of sales experience",
+            "skills": [{"name": "excel", "evidence": "Excel"},
+                       {"name": "salesforce", "evidence": "Salesforce"}],
+            "target_roles": ["Sales Account Executive"], "warnings": [],
+        }
+        with (patch.dict(os.environ, {"DEEPSEEK_API_KEY": "test-server-only-key"}),
+              patch.object(server, "MATCH_PUBLIC_ENABLED", True),
+              patch.object(server, "reserve_budget", new_callable=AsyncMock),
+              patch.object(server, "release_slot", new_callable=AsyncMock),
+              patch.object(server, "download_official_data",
+                           new_callable=AsyncMock, return_value=(
+                               [source], {source["id"]: source_fact}, {source["id"]: source_audit})),
+              patch.object(server, "extract_profile_with_deepseek",
+                           new_callable=AsyncMock, return_value=ai_result) as provider):
+            response = TestClient(server.app).post(
+                "/api/v1/match/resume",
+                headers={"Origin": "https://yanm-jun.github.io"},
+                files={"file": ("resume.docx", out.getvalue(),
+                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document")},
+                data={"consent": "true", "country": "SG", "role_hint": "sales", "limit": "10"}
+            )
+        self.assertEqual(response.status_code, 200, response.text)
+        body = response.json()
+        self.assertEqual(body["status"], "COMPLETE")
+        self.assertEqual(len(body["matches"]), 1)
+        self.assertEqual(body["matches"][0]["official_url"], source["url"])
+        self.assertTrue(body["matches"][0]["matched"])
+        self.assertEqual(body["matches"][0]["source"], "stripe")
+        self.assertNotIn("test-server-only-key", response.text)
+        self.assertNotIn("private@example.com", provider.call_args.args[0])
+        self.assertIn("[邮箱已隐藏]", provider.call_args.args[0])
+
     def test_health_does_not_return_admin_secret(self):
         with patch.dict(os.environ, {"DEEPSEEK_API_KEY": "a-test-private-key"}):
             resp = TestClient(server.app).get("/health")
