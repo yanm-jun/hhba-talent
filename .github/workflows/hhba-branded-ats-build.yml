@@ -1,0 +1,32 @@
+name: HHBA Branded ATS Production Build
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-branded-ats-build.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  branded-ats-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/famous-branded-greenhouse-20261019
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.3'
+      - name: Verify every official posting is on its company's own domain and ID matches
+        working-directory: ops/legacy-marketplace
+        run: node verify-branded-hosts.mjs
+      - name: Install existing dependencies
+        working-directory: ops/legacy-marketplace
+        run: bun install
+      - name: Compile existing Bun recruitment service with four new brand sources
+        working-directory: ops/legacy-marketplace
+        run: |
+          cp railway-function-20261018.ts server.ts
+          sed -i 's/"html-to-text@9"/"html-to-text"/;s/"sanitize-html@2"/"sanitize-html"/' server.ts
+          bun build --target=bun server.ts --outdir /tmp/hhba-branded-ats-build
