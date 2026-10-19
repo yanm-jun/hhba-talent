@@ -910,13 +910,35 @@ def admin_posting_review(pid:UUID,x:EmployerPostingReviewIn,r:Request,a=Depends(
 def public_employer_stmt(s):
  gate=s.get(PlatformServiceGate,'network_recruitment')
  if not gate or not gate.enabled:return None
+ point=now()
+ # Apply ALL publication eligibility in SQL before COUNT/OFFSET/LIMIT;
+ # expired, suspended or revoked recruiters must not produce false totals
+ # or empty pages. The public endpoint cannot enumerate private drafts.
+ recruiter_ok=(select(RecruiterVerification.id).where(
+  RecruiterVerification.user_id==EmployerPosting.created_by,
+  RecruiterVerification.status=='approved',
+  or_(RecruiterVerification.next_review_due_at.is_(None),
+      RecruiterVerification.next_review_due_at>point)).exists())
+ authorization_ok=(select(RecruiterOrganizationAuthorization.id).where(
+  RecruiterOrganizationAuthorization.organization_id==EmployerPosting.organization_id,
+  RecruiterOrganizationAuthorization.user_id==EmployerPosting.created_by,
+  RecruiterOrganizationAuthorization.status=='active',
+  RecruiterOrganizationAuthorization.revoked_at.is_(None),
+  or_(RecruiterOrganizationAuthorization.expires_at.is_(None),
+      RecruiterOrganizationAuthorization.expires_at>point)).exists())
+ membership_ok=(select(Membership.id).where(
+  Membership.organization_id==EmployerPosting.organization_id,
+  Membership.user_id==EmployerPosting.created_by,
+  Membership.status=='active').exists())
  return (select(EmployerPosting,Organization)
   .join(Organization,EmployerPosting.organization_id==Organization.id)
   .join(OrganizationVerification,EmployerPosting.organization_id==OrganizationVerification.organization_id)
-  .where(EmployerPosting.status=='published',EmployerPosting.expires_at>now(),
-     Organization.status=='approved',
-     OrganizationVerification.status=='approved',
-     or_(OrganizationVerification.next_review_due_at.is_(None),OrganizationVerification.next_review_due_at>now())))
+  .where(EmployerPosting.status=='published',EmployerPosting.expires_at>point,
+    Organization.status=='approved',
+    OrganizationVerification.status=='approved',
+    or_(OrganizationVerification.next_review_due_at.is_(None),
+        OrganizationVerification.next_review_due_at>point),
+    recruiter_ok,authorization_ok,membership_ok))
 
 @app.get('/api/v1/public/employer-postings')
 def public_employer_postings(q:str='',limit:int=20,offset:int=0,s:Session=Depends(db)):
