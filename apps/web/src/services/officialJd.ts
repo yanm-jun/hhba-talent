@@ -11,6 +11,9 @@ export type OfficialJd = {
   sourceUrl: string;
   roleTitle: string;
   status: 'LIVE_CONTENT';
+  // Exact official sanitized plain text emitted by the existing green reader.
+  // Only present when cross-origin access has been explicitly allowed.
+  originalText?: string;
 };
 const ATS_HOSTS: Record<string, readonly string[]> = {
   greenhouse: ['job-boards.greenhouse.io','boards.greenhouse.io','boards.eu.greenhouse.io'],
@@ -176,6 +179,70 @@ function readGreenhouseJsonp(endpoint:string,signal:AbortSignal):Promise<any> {
     document.head.appendChild(script);
   });
 }
+const GREEN_SITE='https://hhba-web-production-024c.up.railway.app';
+const htmlToBlocks=(raw:string):OfficialJdBlock[]=>{
+  let section:OfficialJdBlock['section']='other';
+  return raw.split(/\n{2,}/).map(entry=>{
+    const text=entry.trim();
+    const kind:OfficialJdBlock['kind']=text.startsWith('# ')?'heading':text.startsWith('- ')?'bullet':'paragraph';
+    const body=kind==='paragraph'?text:text.slice(2);
+    if(kind==='heading')section=headingSection(body)||'other';
+    return {kind,text:body,section};
+  }).filter(x=>x.text.length>0 && x.text.length<=12_000).slice(0,250);
+};
+async function readGreenDetail(job:LiveJob,signal:AbortSignal):Promise<OfficialJd>{
+  const response=await fetch(GREEN_SITE+'/api/jobs/'+encodeURIComponent(job.id),{
+    method:'GET',mode:'cors',credentials:'omit',redirect:'error',
+    headers:{Accept:'application/json'},signal});
+  if(!response.ok)throw new Error('原市场详情服务暂不可用');
+  const body=await response.json();
+  if(body?.job?.id!==job.id || body?.status!=='LIVE_CONTENT' || typeof body.description!=='string' ||
+     body.description.length<1 || body.description.length>30_000)throw new Error('原市场官方 JD 核对失败');
+  // Match source posting identity; do not show a description from another job.
+  const source=new URL(body.job.url),expected=new URL(job.url);
+  if(source.origin+source.pathname!==expected.origin+expected.pathname)
+    throw new Error('原市场岗位来源发生变化');
+  const blocks=htmlToBlocks(body.description);
+  if(!blocks.length)throw new Error('官方 JD 正文为空');
+  return {blocks,originalText:body.description,roleTitle:body.job.title,
+    checkedAt:body.checkedAt||new Date().toISOString(),sourceUrl:job.url,status:'LIVE_CONTENT'};
+}
+export async function translateGreenJd(job:LiveJob,originalText:string,signal:AbortSignal,
+  onProgress?:(done:number,total:number)=>void):Promise<string> {
+  if(originalText.length>30_000)throw new Error('岗位原文超过翻译服务限制');
+  const sha=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(originalText));
+  const hash=[...new Uint8Array(sha)].map(v=>v.toString(16).padStart(2,'0')).join('');
+  const cacheKey='hhba-jd-zh:'+job.id+':'+hash;
+  try{
+    const cached=sessionStorage.getItem(cacheKey);
+    if(cached&&/[\u3400-\u9fff]/u.test(cached))return cached;
+  }catch{}
+  const translated:string[]=[];let total=1;
+  for(let part=0;part<total;part++){
+    if(signal.aborted)throw new DOMException('Aborted','AbortError');
+    const response=await fetch(GREEN_SITE+'/api/jobs/'+encodeURIComponent(job.id)+'/translate-part',{
+      method:'POST',mode:'cors',credentials:'omit',redirect:'error',signal,
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({part,sourceHash:hash})
+    });
+    if(!response.ok)throw new Error(response.status===409?
+      '官方 JD 在翻译过程中已更新，请刷新页面':
+      '中文翻译暂时不可用，请稍后重试或阅读官方英文原文');
+    const data=await response.json();
+    if(data.jobId!==job.id || data.part!==part || data.sourceHash!==hash ||
+      !Number.isInteger(data.total) || data.total<1 || data.total>80 ||
+      typeof data.text!=='string' || data.numbersVerified!==true ||
+      !/[\u3400-\u9fff]/u.test(data.text))throw new Error('翻译校验未通过');
+    if(part===0)total=data.total;
+    else if(total!==data.total)throw new Error('翻译时岗位正文发生变化');
+    translated.push(data.text);
+    onProgress?.(part+1,total);
+  }
+  const result=translated.join('\n\n');
+  if(!result.trim())throw new Error('中文译文为空');
+  try{sessionStorage.setItem(cacheKey,result)}catch{}
+  return result;
+}
 export async function fetchOfficialJd(job:LiveJob,signal:AbortSignal):Promise<OfficialJd> {
   const info=getJobId(job);
   if(!info)throw new Error('这个来源暂不支持直接读取完整 JD，请使用企业官方链接');
@@ -187,6 +254,10 @@ export async function fetchOfficialJd(job:LiveJob,signal:AbortSignal):Promise<Of
   if(info.platform==='ashby')
     endpoint='https://api.ashbyhq.com/posting-api/job-board/'+encodeURIComponent(info.slug);
   try {
+    // Prefer the existing translated-detail reader when the precise Pages
+    // origin has been enabled. It shares the exact JD hash with translator.
+    try{return await readGreenDetail(job,signal);}
+    catch(e){if(signal.aborted)throw e;}
     let raw:any;
     try{raw=await readBoard(endpoint,signal);}
     catch(e){
