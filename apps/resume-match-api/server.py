@@ -9,6 +9,7 @@ import io
 import ipaddress
 import hashlib
 import secrets
+import zipfile
 import sqlite3
 import json
 import logging
@@ -134,6 +135,14 @@ def parse_resume(data: bytes, filename: str) -> str:
         else:
             if not data.startswith(b"PK\x03\x04"):
                 raise HTTPException(status_code=415, detail="INVALID_DOCX_HEADER")
+            # DOCX is ZIP. Enforce aggregate uncompressed limits before XML
+            # parsing; a 3 MB upload can otherwise contain a decompression bomb.
+            with zipfile.ZipFile(io.BytesIO(data)) as archive:
+                infos = archive.infolist()
+                if len(infos) > 500 or sum(i.file_size for i in infos) > 20 * 1024 * 1024:
+                    raise HTTPException(status_code=413, detail="DOCUMENT_UNPACKED_TOO_LARGE")
+                if any(i.flag_bits & 0x1 for i in infos):
+                    raise HTTPException(status_code=422, detail="ENCRYPTED_DOCUMENT_NOT_SUPPORTED")
             document = Document(io.BytesIO(data))
             contents = []
             for p in document.paragraphs:
