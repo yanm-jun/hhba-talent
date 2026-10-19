@@ -29,12 +29,18 @@ const allowedHost: Record<string,string[]> = {
 export function safeOfficialJobUrl(job: LiveJob) {
   try {
     const u = new URL(job.url);
-    if(u.protocol !== 'https:' || u.username || u.password) return null;
+    if(u.protocol !== 'https:' || u.username || u.password || u.port) return null;
     if (!job.domestic) {
       const hosts = allowedHost[String(job.platform||'').toLowerCase()] || [];
       if (!hosts.includes(u.hostname) || !u.pathname.split('/').includes(job.source||'')) return null;
-    } else if (!['xiaomi-official','meituan-official','tencent-official','baidu-official'].includes(job.platform || '')) {
-      return null;
+    } else {
+      const domesticHosts: Record<string,string> = {
+        'xiaomi-official': 'xiaomi.jobs.f.mioffice.cn',
+        'meituan-official': 'zhaopin.meituan.com',
+        'tencent-official': 'careers.tencent.com',
+        'baidu-official': 'talent.baidu.com'
+      };
+      if (u.hostname !== domesticHosts[job.platform || '']) return null;
     }
     return u.href;
   } catch { return null; }
@@ -80,6 +86,7 @@ export async function listJobs(filters: LiveFilters, offset: number, signal: Abo
   if(!Array.isArray(data.jobs) || !Number.isInteger(data.total) ||
      !Number.isInteger(data.failures) || !Number.isFinite(Date.parse(data.updated))) throw new Error('岗位来源数据异常');
   if (data.failures > 0) throw new Error('部分招聘来源暂时无法核验，请稍后重试');
+  if (Math.abs(Date.now()-Date.parse(data.updated)) > 24 * 60 * 60_000) throw new Error('岗位同步时间过久，暂不展示');
   return data;
 }
 export async function getJob(id: string,signal: AbortSignal) {
