@@ -44,6 +44,10 @@ export type EmployerPostingInput = Pick<EmployerPosting,'title'|'description'|'r
 export type TalentSearchInput = {keywords?:string;skills?:string[];industry?:string;region?:string;work_mode?:string;work_years_min?:number;work_years_max?:number;page?:number;page_size?:number};
 export type TalentSearchResponse = {items:TalentSearchCandidate[];page:number;page_size:number;has_more:boolean};
 
+export type PublicEmployerJob = EmployerPosting & {published_at:string;expires_at:string;notice:string};
+export type EmployerPublicJobs = {items:PublicEmployerJob[];total:number;limit:number;offset:number};
+export type EmployerVerificationQueue = {items:{organization_id:string;legal_name:string;status:string;revision:number;submitted_at:string|null;representative_name:string|null;evidence_snapshot_id:string|null}[]};
+export type EmployerVerificationAdminDetail = {verification:Verification;evidence_snapshot:{id:string;evidence_version:number;manifest_sha256:string}|null;reviews:{outcome:string;reason_code:string;evidence_version:number;created_at:string}[]};
 export type CandidateReference = string;
 export type TalentMatchReason = { field: 'skill' | 'industry' | 'region' | 'work_mode' | 'work_years' | 'capability'; value: string | number; expanded: boolean };
 export type TalentSearchCandidate = { candidate_ref: CandidateReference; display_name: string | null; headline: string | null; skills: string[]; industries: string[]; location: string | null; service_regions: string[]; work_modes: string[]; work_years: number | null; project_summaries: string[]; match_reasons: TalentMatchReason[] };
@@ -86,6 +90,15 @@ export const api = {
   submitPosting: (oid:string,id:string) => request<{status:string}>(`/organizations/${oid}/postings/${id.replace(/^employer-/,'')}/submit`,{method:'POST'}),
   closePosting: (oid:string,id:string) => request<{status:string}>(`/organizations/${oid}/postings/${id.replace(/^employer-/,'')}/close`,{method:'POST'}),
   talentSearch: (oid:string,payload:TalentSearchInput) => request<TalentSearchResponse>(`/organizations/${oid}/talent-search`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),
+  publicEmployerJobs: (search:string='',offset=0) => request<EmployerPublicJobs>(`/public/employer-postings?q=${encodeURIComponent(search)}&offset=${offset}&limit=20`),
+  publicEmployerJob: (id:string) => request<PublicEmployerJob>(`/public/employer-postings/${encodeURIComponent(id.replace(/^employer-/,''))}`),
+  adminPendingPostings: () => request<{items:EmployerPosting[]}>('/admin/employer-postings'),
+  adminPostingReview: (id:string,decision:'approved'|'rejected',reason_code:string) => request<{status:string}>(`/admin/employer-postings/${id.replace(/^employer-/,'')}/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision,reason_code})}),
+  adminOrgVerificationQueue: () => request<EmployerVerificationQueue>('/admin/verification/organizations?status=submitted'),
+  adminOrgVerificationDetail: (id:string) => request<EmployerVerificationAdminDetail>(`/admin/verification/organizations/${id}`),
+  adminMarkDocumentSecurity: (id:string,status:'clean'|'rejected',reason_code:string) => request<{id:string;security_status:string}>(`/admin/verification/documents/${id}/security-assessment`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status,reason_code})}),
+  adminReviewOrgVerification: (oid:string,body:{status:'need_more_info'|'approved'|'rejected';reason_code:string;expected_revision:number;evidence_snapshot_id:string;entity_verification:'manual_verified'|'not_verified';representative_verification:'manual_verified'|'not_verified';authorization_verification:'manual_verified'|'not_verified';valid_days:number}) => request<{status:string;organization_status:string}>(`/admin/verification/organizations/${oid}/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}),
+
   adminVerificationQueue: () => request<{items:{organization_id:string;legal_name:string;status:string;revision:number;submitted_at?:string;representative_name?:string;evidence_snapshot_id?:string}[]}>('/admin/verification/organizations'),
   adminVerificationDetail: (oid:string) => request<{verification:Verification;evidence_snapshot:{id:string;evidence_version:number;manifest_sha256:string}|null;reviews:{outcome:string;reason_code:string}[]}>(`/admin/verification/organizations/${oid}`),
   adminPendingPostings: () => request<{items:EmployerPosting[]}>('/admin/employer-postings'),
