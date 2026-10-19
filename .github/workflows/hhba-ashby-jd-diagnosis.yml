@@ -1,0 +1,23 @@
+name: HHBA Diagnose Ashby JD Translation Failure
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-ashby-jd-diagnosis.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/github-pages-white-preview-20261019
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Probe a real failing Ashby Deepgram JD translation and record status code only
+        working-directory: apps/web
+        run: node scripts/diagnose-ashby-translation.mjs
