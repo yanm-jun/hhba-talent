@@ -93,6 +93,8 @@ export const api = {
   talentSearch: (oid:string,payload:TalentSearchInput) => request<TalentSearchResponse>(`/organizations/${oid}/talent-search`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),
   adminVerificationQueue: () => request<{items:{organization_id:string;legal_name:string;status:string;revision:number;submitted_at?:string;representative_name?:string;evidence_snapshot_id?:string}[]}>('/admin/verification/organizations'),
   adminVerificationDetail: (oid:string) => request<{verification:Verification;evidence_snapshot:{id:string;evidence_version:number;manifest_sha256:string}|null;reviews:{outcome:string;reason_code:string}[]}>(`/admin/verification/organizations/${oid}`),
+  publicEmployerPostings: (q='',limit=20,offset=0) => request<{items:EmployerPosting[];total:number;limit:number;offset:number}>(`/public/employer-postings?q=${encodeURIComponent(q.slice(0,100))}&limit=${Math.max(1,Math.min(30,limit))}&offset=${Math.max(0,Math.min(3000,offset))}`),
+  publicEmployerPosting: (id:string) => request<EmployerPosting>(`/public/employer-postings/${encodeURIComponent(id.replace(/^employer-/,''))}`),
   adminPendingPostings: () => request<{items:EmployerPosting[]}>('/admin/employer-postings'),
   adminReviewPosting: (id:string,decision:'approved'|'rejected',reason_code:string) => request<{status:string}>(`/admin/employer-postings/${id.replace(/^employer-/,'')}/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision,reason_code})}),
 
