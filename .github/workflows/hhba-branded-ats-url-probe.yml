@@ -1,0 +1,23 @@
+name: HHBA Branded Greenhouse Domain Verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-branded-ats-url-probe.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect-official-custom-domains:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/ats-first-brand-expansion-20261019
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Identify exact official custom-hosted Greenhouse job URLs
+        working-directory: apps/web
+        run: node scripts/probe-branded-ats-links.mjs
