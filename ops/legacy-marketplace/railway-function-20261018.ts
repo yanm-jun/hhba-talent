@@ -712,6 +712,20 @@ function preserveOfficialNumbers(source:string,translated:string):string|null{
  const result=translated.trimEnd()+"\n（官网原文数字核对："+unique.join("、")+"）";
  return numbersRetained(source,result)?result:null;
 }
+function selfTestOfficialNumericFidelity(){
+ const restored=preserveOfficialNumbers("5 years of experience","具有五年工作经验");
+ const wrong=preserveOfficialNumbers("5 years of experience","具有3年工作经验");
+ const unit=preserveOfficialNumbers("$500,000 annual salary","年薪为50万美元");
+ const percent=preserveOfficialNumbers("20% annual bonus","20％年度奖金");
+ const many=preserveOfficialNumbers("3 to 5 years","三到五年");
+ const noDigits=preserveOfficialNumbers("Develop a product","开发一款产品");
+ if(!restored?.includes("官网原文数字核对：5")||wrong!==null||
+    unit!== "年薪为50万美元" || percent!=="20％年度奖金" ||
+    !many?.includes("3、5")||noDigits!=="开发一款产品")
+   throw Error("OFFICIAL_JD_NUMERAL_FIDELITY_REGRESSION");
+ console.log("HHBA_OFFICIAL_JD_NUMBER_GUARD",{pass:true,missingOriginalRestored:true,contradictionRejected:true});
+}
+selfTestOfficialNumericFidelity();
 async function machineTranslations(kind:"title"|"jd",sources:string[]):Promise<(string|null)[]|null>{
  const url=privateTranslatorUrl();
  if(!url||sources.length<1||sources.length>8)return null;
