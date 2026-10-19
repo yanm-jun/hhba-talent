@@ -54,7 +54,7 @@ export function normalizeAts(row, { observedAt, now = Date.now(), maxAgeMs = MAX
     education_min: null,
     experience_years_min: null,
     source: { type: 'OFFICIAL_ATS', platform, source_key: `${platform}:${slug}`,
-      native_id: oldId || null, official_detail_url: url,
+      native_id: null, official_detail_url: url,
       last_observed_at: new Date(observed).toISOString() },
     availability: { state: 'RECENTLY_OBSERVED', checked_at: new Date(observed).toISOString(),
       application_link_status: 'OFFICIAL_DETAIL_ONLY', direct_apply_url: null,
