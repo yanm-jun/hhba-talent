@@ -1,0 +1,26 @@
+name: HHBA Newly Synced Brands Browser Acceptance
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-new-ats-brands-browser.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-new-ats-brands:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/github-pages-white-preview-20261019
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare real Chromium browser
+        run: |
+          python -m pip install 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Verify SpaceX, Anthropic, DoorDash, Deepgram, Cohere and existing Spotify
+        run: python scripts/check_priority_ats_live_browser.py
