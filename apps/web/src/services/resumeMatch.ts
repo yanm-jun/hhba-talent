@@ -37,6 +37,9 @@ export const MATCH_API_ORIGIN=apiOrigin();
 
 const messages:Record<string,string>={
  ADMIN_AI_NOT_CONFIGURED:'平台管理员尚未启用 DeepSeek 智能分析，当前不能调用 AI。',
+ ADMIN_HAS_NOT_ENABLED_AI_MATCHING:'平台管理员尚未开放 AI 简历匹配，请稍后再试。',
+ PERSISTENT_USAGE_QUOTA_UNAVAILABLE:'平台 AI 用量保护未就绪，已暂停调用以防超额收费。',
+ AI_PROFILE_INCOMPLETE:'DeepSeek 返回不完整的能力信息，请稍后再试。',
  EXPLICIT_AI_SHARING_CONSENT_REQUIRED:'需要先同意将脱敏文本交给 DeepSeek 处理。',
  ONLY_PDF_OR_DOCX:'只支持 PDF 或 DOCX 格式简历。',
  INVALID_PDF_HEADER:'所选文件不是有效的 PDF。',
@@ -68,7 +71,7 @@ export async function matchServiceReady(signal?:AbortSignal):Promise<boolean>{
   if(!r.ok)return false;
   const body=await r.json();
   return body.ok===true && body.service==='hhba-private-resume-match' &&
-   body.admin_deepseek_configured===true;
+   body.admin_deepseek_configured===true && body.public_enabled===true && body.quota_storage_ready===true;
  }catch{return false}
 }
 export async function submitResumeForMatching(file:File, opts:MatchOptions, consent:boolean, signal?:AbortSignal):Promise<MatchResponse>{
