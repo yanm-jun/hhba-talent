@@ -21,6 +21,14 @@ const ATS_HOSTS: Record<string, readonly string[]> = {
   lever: ['jobs.lever.co','jobs.eu.lever.co']
 };
 const MAX_HTML = 240_000;
+const BRANDED_GREENHOUSE={
+ stripe:{host:'stripe.com',path:'/jobs/search'},
+ coinbase:{host:'www.coinbase.com',path:'/careers/positions/'},
+ airbnb:{host:'careers.airbnb.com',path:'/positions/'},
+ databricks:{host:'databricks.com',path:'/company/careers/open-positions/job'}
+};
+function sameOfficialPosting(a:string,b:string){const left=new URL(a),right=new URL(b);return left.origin===right.origin&&left.pathname===right.pathname&&left.searchParams.get('gh_jid')===right.searchParams.get('gh_jid');}
+
 function getJobId(job: LiveJob) {
   const platform = job.platform || '';
   const slug = job.source || '';
@@ -31,9 +39,13 @@ function getJobId(job: LiveJob) {
   if(!/^[A-Za-z0-9_-]{1,100}$/.test(native))return null;
   try {
     const u = new URL(job.url);
-    if(u.protocol!=='https:' || u.port || u.username || u.password ||
-      !ATS_HOSTS[platform].includes(u.hostname) || !u.pathname.split('/').includes(slug))
-      return null;
+    if(u.protocol!=='https:' || u.port || u.username || u.password)return null;
+    const standard=ATS_HOSTS[platform].includes(u.hostname) && u.pathname.split('/').includes(slug);
+    const branded=platform==='greenhouse'?BRANDED_GREENHOUSE[slug]:null;
+    const corporate=!!branded && /^[0-9]{5,20}$/.test(native)&&u.hostname===branded.host &&
+      (branded.path.endsWith('/')?u.pathname.startsWith(branded.path):u.pathname===branded.path) &&
+      u.searchParams.get('gh_jid')===native;
+    if(!standard&&!corporate)return null;
     return {platform,slug,native,url:u.href};
   } catch {return null}
 }
@@ -108,7 +120,7 @@ function validateOfficialDetail(raw:any,info:NonNullable<ReturnType<typeof getJo
   if(typeof publishedTitle!=='string' || typeof publishedUrl!=='string')
     throw new Error('官方岗位信息缺少必要字段');
   const url=new URL(publishedUrl);
-  if(url.origin+url.pathname!==new URL(job.url).origin+new URL(job.url).pathname)
+  if(!sameOfficialPosting(publishedUrl,job.url))
     throw new Error('官方岗位链接与索引不一致');
   let html='';
   if(info.platform==='ashby') html=String(raw.descriptionHtml||'');
@@ -200,7 +212,7 @@ async function readGreenDetail(job:LiveJob,signal:AbortSignal):Promise<OfficialJ
      body.description.length<1 || body.description.length>30_000)throw new Error('原市场官方 JD 核对失败');
   // Match source posting identity; do not show a description from another job.
   const source=new URL(body.job.url),expected=new URL(job.url);
-  if(source.origin+source.pathname!==expected.origin+expected.pathname)
+  if(!sameOfficialPosting(source.href,expected.href))
     throw new Error('原市场岗位来源发生变化');
   const blocks=htmlToBlocks(body.description);
   if(!blocks.length)throw new Error('官方 JD 正文为空');
