@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "note": "Candidate boards are NOT active until direct ATS API validation of board/identity/posting URL, title and detail evidence. Do not add guessed names to public markets.",
+  "candidates": [
+    {
+      "platform": "greenhouse",
+      "company": "SpaceX",
+      "slug": "spacex",
+      "priority": 1
+    },
+    {
+      "platform": "greenhouse",
+      "company": "SpaceX Global (Starlink international)",
+      "slug": "spacexglobal",
+      "priority": 1
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Stripe",
+      "slug": "stripe",
+      "priority": 1
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Coinbase",
+      "slug": "coinbase",
+      "priority": 1
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Airbnb",
+      "slug": "airbnb",
+      "priority": 1
+    },
+    {
+      "platform": "greenhouse",
+      "company": "DoorDash",
+      "slug": "doordashusa",
+      "priority": 1
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Anthropic",
+      "slug": "anthropic",
+      "priority": 1
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Databricks",
+      "slug": "databricks",
+      "priority": 2
+    }
+  ]
+}
