@@ -38,7 +38,7 @@ jobs:
       - name: Check static job metadata and create snapshot
         working-directory: apps/web
         run: node scripts/prepare-pages-jobs.mjs
-      - name: Verify live Airtable official JD and requirements source
+      - name: Verify Airtable full JD plus Greenhouse browser JSONP reader
         working-directory: apps/web
         run: node scripts/verify-official-jd.mjs
       - name: Check Chinese/English and original entry routes
