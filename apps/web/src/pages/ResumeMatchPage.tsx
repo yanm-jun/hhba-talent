@@ -122,6 +122,14 @@ export function ResumeMatchPage({user}:{user:User|null}){
      <div><small>检索到的技能</small><strong>{result.profile.skills.length} 项</strong></div>
     </div>
     <div className="resume-match-tags">{result.profile.skills.length?result.profile.skills.map(s=><span key={s.name}>{s.name}</span>):<p>简历中暂未找到能可靠验证的技能，请完善文件。</p>}</div>
+    {result.profile.experiences?.length>0&&<div className="resume-match-experiences">
+      <h3>从简历识别出的工作经历（请核对）</h3>
+      {result.profile.experiences.map((item,i)=><div key={i}>
+        <strong>{item.role}</strong>
+        <span>{[item.organization,item.period].filter(Boolean).join(' · ')}</span>
+        <small>原文依据：{item.evidence}</small>
+      </div>)}
+    </div>}
     <button className="resume-match-evidence-btn" onClick={()=>setShowEvidence(v=>!v)}>
      {showEvidence?'收起':'核对'}简历原文证据 <ChevronDown size={16}/></button>
     {showEvidence&&<div className="resume-match-evidence">
