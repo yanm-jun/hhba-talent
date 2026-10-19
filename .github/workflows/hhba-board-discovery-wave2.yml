@@ -1,0 +1,28 @@
+name: HHBA Expand Verified ATS Boards Wave 2
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/probe_official_boards_wave2.mjs'
+      - '.github/workflows/hhba-board-discovery-wave2.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check deploy/railway/probe_official_boards_wave2.mjs
+      - name: Verify official source API, job URLs and complete JD presence
+        run: node deploy/railway/probe_official_boards_wave2.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-wave2-verified-sources
+          path: board-candidates-wave2/
+          retention-days: 21

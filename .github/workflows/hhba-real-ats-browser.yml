@@ -1,0 +1,94 @@
+name: HHBA real ATS adapter + original frontend browser proof
+on:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - '.github/workflows/hhba-real-ats-browser.yml'
+      - 'scripts/real_ats_preview.py'
+      - 'scripts/test_live_ats_browser.py'
+      - 'scripts/test_real_ats_preview_contract.py'
+      - 'apps/web/**'
+      - 'vendor/hhba-recruitment-engine/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-ats-homepage-chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build the actual HHBA React frontend
+        working-directory: apps/web
+        run: |
+          npm ci
+          npm run build
+      - name: Verify pinned upstream engine adapter snapshot
+        run: |
+          python vendor/hhba-recruitment-engine/scripts/stage_global_ats.py --help
+          python -c "import sys; sys.path.insert(0,'vendor/hhba-recruitment-engine'); from hhba_pipeline.global_ats import Board, collect_board; print('upstream ATS adapter imports successfully')"
+          python scripts/real_ats_preview.py --help
+          python -m unittest discover -s scripts -p 'test_real_ats_preview_contract.py' -v
+      - name: Stage genuine Greenhouse, Ashby and Lever JSON using upstream adapter
+        run: |
+          python vendor/hhba-recruitment-engine/scripts/stage_global_ats.py \
+            --registry vendor/hhba-recruitment-engine/data/ats/global_boards_seed.json \
+            --output-dir "${{ runner.temp }}/hhba-ats-stage" \
+            --execute-network --max-boards 6 --pause-seconds 1
+      - name: Start loopback-only metadata preview from the staged source snapshots
+        run: |
+          python scripts/real_ats_preview.py \
+            --stage-dir "${{ runner.temp }}/hhba-ats-stage" \
+            --host 127.0.0.1 --port 8765 \
+            > "${{ runner.temp }}/hhba-engine-preview.log" 2>&1 &
+          echo $! > "${{ runner.temp }}/hhba-engine-preview.pid"
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8765/api/v1/stats > "${{ runner.temp }}/hhba-engine-stats.json"; then
+              break
+            fi
+            sleep 1
+          done
+          cat "${{ runner.temp }}/hhba-engine-stats.json"
+          python -c "import json,sys; d=json.load(open(sys.argv[1])); assert d['mode']=='INTERNAL_STAGING_ONLY'; assert d['ats_staging_rows'] >= 6; assert d['total_rows']==d['ats_staging_rows']+d['domestic_public_rows']; assert {s['platform'] for s in d['sources']} >= {'GREENHOUSE','ASHBY','LEVER'}" "${{ runner.temp }}/hhba-engine-stats.json"
+      - name: Start HHBA React frontend against the loopback data API
+        working-directory: apps/web
+        run: |
+          npm run dev -- --host 127.0.0.1 --port 3000 --strictPort \
+            > "${{ runner.temp }}/hhba-vite.log" 2>&1 &
+          echo $! > "${{ runner.temp }}/hhba-vite.pid"
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:3000/ > /dev/null
+      - name: Install actual Chromium
+        run: |
+          python -m pip install 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Test real ATS source records in original desktop/mobile HHBA UI
+        env:
+          HHBA_BASE_URL: http://127.0.0.1:3000
+          HHBA_ENGINE_API_URL: http://127.0.0.1:8765
+        run: |
+          python -m unittest discover -s scripts -p 'test_live_ats_browser.py' -v
+      - name: Save desktop and mobile screenshots with actual ATS job titles
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-real-ats-homepage-desktop-mobile
+          path: ${{ runner.temp }}/hhba-real-ats-frontend/*.png
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Verify the preview did not modify tracked files
+        if: always()
+        run: git diff --exit-code

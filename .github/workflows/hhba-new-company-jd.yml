@@ -1,0 +1,26 @@
+name: HHBA New Company Chinese JD Smoke
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/new_company_chinese_jd.mjs'
+      - '.github/workflows/hhba-new-company-jd.yml'
+permissions:
+  contents: read
+jobs:
+  sample-new-company:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify newly added companies have readable original and Chinese JD
+        run: node deploy/railway/new_company_chinese_jd.mjs
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-new-company-jd-proofs
+          path: new-company-jd/
+          retention-days: 14

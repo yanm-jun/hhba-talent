@@ -1,0 +1,27 @@
+name: HHBA Railway Function Source Check
+on:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/live_jobs_preview.ts'
+      - 'deploy/railway/domestic_xiaomi_20261016.compact.json'
+      - '.github/workflows/hhba-railway-compact-build.yml'
+  pull_request:
+    paths:
+      - 'deploy/railway/live_jobs_preview.ts'
+      - 'deploy/railway/domestic_xiaomi_20261016.compact.json'
+      - '.github/workflows/hhba-railway-compact-build.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Confirm function source syntax
+        run: |
+          bun build deploy/railway/live_jobs_preview.ts --target=bun --external 'html-to-text@9' --external 'sanitize-html@2' --outfile /tmp/hhba-preview-checked.js
+          node deploy/railway/domestic_static_acceptance.mjs

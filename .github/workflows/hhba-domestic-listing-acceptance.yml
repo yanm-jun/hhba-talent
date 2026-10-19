@@ -1,0 +1,27 @@
+name: HHBA Domestic Official Listing Acceptance
+on:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/live_jobs_preview.ts'
+      - 'deploy/railway/domestic_xiaomi_20261016.compact.json'
+      - 'deploy/railway/domestic_static_acceptance.mjs'
+      - '.github/workflows/hhba-domestic-listing-acceptance.yml'
+  pull_request:
+    paths:
+      - 'deploy/railway/**'
+      - '.github/workflows/hhba-domestic-listing-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  domestic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Validate pinned public source and application disclaimer
+        run: node deploy/railway/domestic_static_acceptance.mjs
+      - name: TypeScript function syntax check
+        run: bun build ./deploy/railway/live_jobs_preview.ts --target=bun --external 'html-to-text@9' --external 'sanitize-html@2' --outfile /tmp/hhba-domestic-preview.js

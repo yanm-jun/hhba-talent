@@ -1,0 +1,30 @@
+name: HHBA all verified ATS boards production audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/audit_live_ats_boards.mjs'
+      - '.github/workflows/hhba-full-official-jobs-audit.yml'
+  schedule:
+    - cron: '35 2 * * 1'
+permissions:
+  contents: read
+jobs:
+  all-board-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check deploy/railway/audit_live_ats_boards.mjs
+      - name: Verify all listed jobs and one real official JD per ATS board
+        run: node deploy/railway/audit_live_ats_boards.mjs
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-all-live-ats-sources
+          path: board-audit-output/
+          retention-days: 21

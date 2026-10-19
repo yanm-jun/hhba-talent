@@ -1,0 +1,36 @@
+name: HHBA Domestic and Global Local Integration
+on:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/live_jobs_preview.ts'
+      - 'deploy/railway/domestic_local_integration.mjs'
+      - '.github/workflows/hhba-domestic-integration.yml'
+  pull_request:
+    paths:
+      - 'deploy/railway/**'
+      - '.github/workflows/hhba-domestic-integration.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  local-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Stage approved Xiaomi source chunks for CI
+        run: node deploy/railway/export_xiaomi_ci_env.mjs
+      - name: Stage reviewed Tencent and Baidu details
+        run: node deploy/railway/export_reviewed_ci_env.mjs
+      - name: Start actual Bun recruitment market API
+        run: |
+          PORT=3555 bun run deploy/railway/live_jobs_preview.ts > /tmp/hhba-domestic-server.log 2>&1 &
+          echo $! > /tmp/hhba-server.pid
+      - name: Test Xiaomi social/campus/internship, links and OpenAI preservation
+        run: node deploy/railway/domestic_local_integration.mjs
+      - if: always()
+        name: Report bounded server diagnostics
+        run: |
+          grep -E 'HHBA_SOURCE_SYNC|HHBA_OPENAI_SEARCH_DIAGNOSTIC|HHBA_ZH_ACCEPTANCE|ERROR|Error' /tmp/hhba-domestic-server.log | tail -20 || true

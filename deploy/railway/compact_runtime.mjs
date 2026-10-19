@@ -1,0 +1,17 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+import {brotliCompressSync,constants} from 'node:zlib';
+const root=new URL('./',import.meta.url);
+const source=readFileSync(new URL('./live_jobs_preview.ts',root),'utf8');
+const pinned=JSON.parse(readFileSync(new URL('./domestic_xiaomi_20261016.compact.json',root),'utf8'));
+if(pinned.jobs.length!==1010||pinned.verified_current_apply!==0||pinned.verified_details!==0||pinned.original_jsonl_sha256!=='43f1937c0b2263a9e2334963f8f2becc074089f93ba26572ec2e11e8ea977d34')throw Error('unverified original Xiaomi snapshot');
+const raw=JSON.stringify(pinned.jobs);
+const packed=brotliCompressSync(Buffer.from(raw,'utf8'),{params:{[constants.BROTLI_PARAM_QUALITY]:11,[constants.BROTLI_PARAM_MODE]:constants.BROTLI_MODE_TEXT}}).toString('base64');
+const start=source.indexOf('function unpackXiaomi('),end=source.indexOf('\nconst xiaomiType:',start);
+if(start<0||end<=start)throw Error('missing compression boundary');
+const decoder='const xiaomiCompact:[string,string,string,string][]=JSON.parse(brotliDecompressSync(Buffer.from('+JSON.stringify(packed)+',"base64")).toString("utf8"));';
+let compact=source.slice(0,start)+decoder+source.slice(end);
+compact=compact.replace('import { convert } from "html-to-text@9";','import { convert } from "html-to-text@9";\nimport { brotliDecompressSync } from "node:zlib";');
+if(!compact.includes('domesticObserved:Job[]')||!compact.includes('const xiaomiCompact:'))throw Error('invalid compact source');
+const dest=new URL('./live_jobs_preview.compact.ts',root);
+writeFileSync(dest,compact);
+console.log('HHBA_COMPRESSION_READY',JSON.stringify({originalBytes:Buffer.byteLength(source),transformedBytes:Buffer.byteLength(compact),broB64:packed.length,rows:pinned.jobs.length}));

@@ -1,0 +1,30 @@
+name: HHBA Dual Entry Frontend Build
+on:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+  pull_request:
+    paths:
+      - 'apps/web/**'
+      - 'scripts/verify-dual-entry.mjs'
+      - '.github/workflows/hhba-dual-entry-frontend.yml'
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Typecheck and bundle existing HHBA React app
+        working-directory: apps/web
+        run: npm run build
+      - name: Verify exactly two role entries and secure recruitment route
+        run: node scripts/verify-dual-entry.mjs

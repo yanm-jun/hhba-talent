@@ -1,0 +1,36 @@
+name: HHBA Domestic Production Live Acceptance
+on:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/domestic_live_browser_acceptance.mjs'
+      - '.github/workflows/hhba-domestic-live-browser.yml'
+  pull_request:
+    paths:
+      - 'deploy/railway/domestic_live_browser_acceptance.mjs'
+      - '.github/workflows/hhba-domestic-live-browser.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test runner
+        run: npm install --prefix .browser-test --no-package-lock --no-audit --no-fund playwright@1.56.1
+      - name: Install Chromium
+        run: .browser-test/node_modules/.bin/playwright install --with-deps chromium
+      - name: Verify real Mainland Xiaomi searches alongside OpenAI in desktop and mobile
+        run: node deploy/railway/domestic_live_browser_acceptance.mjs
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-domestic-live-browser-evidence
+          path: domestic-live-evidence/
+          if-no-files-found: ignore
+          retention-days: 7

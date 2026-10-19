@@ -1,0 +1,33 @@
+name: HHBA Tencent Meituan Real Job Verification
+on:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/probe_domestic_job_detail_pilot.mjs'
+      - '.github/workflows/hhba-domestic-job-probe.yml'
+  pull_request:
+    paths:
+      - 'deploy/railway/probe_domestic_job_detail_pilot.mjs'
+      - '.github/workflows/hhba-domestic-job-probe.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  detail:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --prefix .browser-test --no-package-lock --no-audit --no-fund playwright@1.56.1
+      - run: .browser-test/node_modules/.bin/playwright install --with-deps chromium
+      - run: node deploy/railway/probe_domestic_job_detail_pilot.mjs
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-domestic-job-probe-evidence
+          path: domestic-official-job-evidence/
+          if-no-files-found: ignore
+          retention-days: 30

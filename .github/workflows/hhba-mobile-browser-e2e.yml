@@ -1,0 +1,29 @@
+name: HHBA Mobile Web Real JD Translation E2E
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/mobile_reader_browser.mjs'
+      - '.github/workflows/hhba-mobile-browser-e2e.yml'
+permissions:
+  contents: read
+jobs:
+  mobile-chinese-reader:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright
+      - run: npx playwright install --with-deps chromium
+      - name: Mobile Chinese and English real-browser original JD flow (three ATS)
+        run: node deploy/railway/mobile_reader_browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-real-iphone-like-browser-evidence
+          path: browser-evidence/
+          retention-days: 14

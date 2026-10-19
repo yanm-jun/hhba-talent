@@ -1,0 +1,22 @@
+name: HHBA live JD reader source check
+on:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/live_jobs_preview.ts'
+      - 'deploy/railway/reader_compile_test.mjs'
+      - '.github/workflows/hhba-live-reader-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Parse production TSX without making network requests
+        run: bun build deploy/railway/live_jobs_preview.ts --target=bun --external 'html-to-text@9' --external 'sanitize-html@2' --outfile=/tmp/hhba-preview.js
+      - name: Parse embedded mobile translation reader JavaScript
+        run: node --test deploy/railway/reader_compile_test.mjs

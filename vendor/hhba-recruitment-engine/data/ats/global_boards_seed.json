@@ -1,0 +1,52 @@
+{
+  "boards": [
+    {
+      "company_id": "GH-GREENHOUSE",
+      "company_name": "Greenhouse",
+      "platform": "greenhouse",
+      "slug": "greenhouse",
+      "source_id": "ATS-GH-GREENHOUSE",
+      "evidence_url": "https://job-boards.greenhouse.io/greenhouse"
+    },
+    {
+      "company_id": "ASH-ASHBY",
+      "company_name": "Ashby",
+      "platform": "ashby",
+      "slug": "ashby",
+      "source_id": "ATS-ASH-ASHBY",
+      "evidence_url": "https://jobs.ashbyhq.com/ashby"
+    },
+    {
+      "company_id": "LEV-SPOTIFY",
+      "company_name": "Spotify",
+      "platform": "lever",
+      "slug": "spotify",
+      "source_id": "ATS-LEV-SPOTIFY",
+      "evidence_url": "https://jobs.lever.co/spotify"
+    },
+    {
+      "company_id": "GH-CANONICAL",
+      "company_name": "Canonical",
+      "platform": "greenhouse",
+      "slug": "canonical",
+      "source_id": "ATS-GH-CANONICAL",
+      "evidence_url": "https://job-boards.greenhouse.io/canonical"
+    },
+    {
+      "company_id": "ASH-AIRWALLEX",
+      "company_name": "Airwallex",
+      "platform": "ashby",
+      "slug": "airwallex",
+      "source_id": "ATS-ASH-AIRWALLEX",
+      "evidence_url": "https://jobs.ashbyhq.com/airwallex"
+    },
+    {
+      "company_id": "LEV-PALANTIR",
+      "company_name": "Palantir Technologies",
+      "platform": "lever",
+      "slug": "palantir",
+      "source_id": "ATS-LEV-PALANTIR",
+      "evidence_url": "https://jobs.lever.co/palantir"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+import assert from 'node:assert/strict';
+import {mkdir} from 'node:fs/promises';
+import {chromium} from '../../.browser-test/node_modules/playwright/index.mjs';
+const base=process.env.HHBA_PREVIEW_URL||'https://hhba-live-jobs-preview-production.up.railway.app';
+const browser=await chromium.launch({headless:true});
+await mkdir('openai-search-evidence',{recursive:true});
+try{
+ const page=await browser.newPage({viewport:{width:1280,height:900},locale:'zh-CN'});
+ const errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(base+'/?q=OpenAI',{waitUntil:'domcontentloaded',timeout:100000});
+ await page.waitForFunction(()=>document.querySelectorAll('.job .company-name').length>0,{timeout:90000});
+ assert.equal(await page.locator('#q').inputValue(),'OpenAI');
+ assert.ok(await page.locator('.job .company-name').allTextContents().then(a=>a.every(x=>x==='OpenAI')));
+ assert.ok((await page.locator('#shown').innerText()).includes('813'));
+ await page.screenshot({path:'openai-search-evidence/openai-desktop.png',fullPage:false});
+ await page.locator('#company').selectOption('Figma');
+ await page.waitForFunction(()=>document.querySelectorAll('.job .company-name').length>0&&[...document.querySelectorAll('.job .company-name')].every(x=>x.textContent==='Figma'),{timeout:90000});
+ assert.equal(await page.locator('#q').inputValue(),'');
+ await page.locator('#q').fill('openai');
+ await page.waitForFunction(()=>document.querySelectorAll('.job .company-name').length>0&&document.querySelector('.job .company-name')?.textContent==='OpenAI',{timeout:90000});
+ assert.equal(await page.locator('#company').inputValue(),'');
+ assert.ok(!(await page.locator('#clear-filters').isHidden()));
+ await page.locator('#clear-filters').click();
+ await page.waitForFunction(()=>document.querySelectorAll('.job .company-name').length>0&&document.querySelector('#q')?.value==='',{timeout:90000});
+ const mobile=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true,locale:'zh-CN'});
+ mobile.on('pageerror',e=>errors.push('mobile: '+e.message));
+ await mobile.goto(base+'/?q=openai',{waitUntil:'domcontentloaded',timeout:100000});
+ await mobile.waitForFunction(()=>document.querySelectorAll('.job .company-name').length>0,{timeout:90000});
+ assert.equal(await mobile.locator('#q').inputValue(),'openai');
+ assert.equal((await mobile.locator('.job .company-name').first().innerText()),'OpenAI');
+ await mobile.screenshot({path:'openai-search-evidence/openai-mobile.png',fullPage:false});
+ await mobile.locator('#toggle-en').click();
+ assert.equal((await mobile.locator('.job .company-name').first().innerText()),'OpenAI');
+ assert.ok(!errors.length,'Browser page errors: '+JSON.stringify(errors));
+ console.log('HHBA_OPENAI_BROWSER_PASS',JSON.stringify({company:'OpenAI',listing:'813',desktop:true,mobile:true,deepLink:true,clearConflictingFilters:true,languageSwitch:true}));
+}finally{await browser.close();}

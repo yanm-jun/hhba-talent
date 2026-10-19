@@ -1,0 +1,21 @@
+name: HHBA paginated global jobs marketplace E2E
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'deploy/railway/paged_market_e2e.mjs'
+      - '.github/workflows/hhba-paged-market-e2e.yml'
+permissions:
+  contents: read
+jobs:
+  paginated-search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify paging, bilingual search and live source filters
+        run: node --test deploy/railway/paged_market_e2e.mjs

@@ -1,0 +1,24 @@
+name: HHBA Public Deployment Package
+on:
+  push:
+    branches: [feat/dual-entry-recruitment-integration]
+    paths:
+      - 'Dockerfile'
+      - 'deploy/railway/**'
+      - '.github/workflows/hhba-public-deploy-package.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Public recruitment proxy security smoke
+        run: node --test deploy/railway/web.test.mjs
+      - name: Verify deploy build compiles production web
+        run: docker build -f Dockerfile -t hhba-public-web:ci .

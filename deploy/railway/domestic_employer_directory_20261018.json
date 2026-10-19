@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "checkedAt": "2026-10-18",
+  "semantics": "OFFICIAL_PORTAL_DIRECTORY_SEPARATE_FROM_INDEXED_JOBS",
+  "indexedJobsIncrement": 0,
+  "employers": [
+    {
+      "id": "Tencent",
+      "zh": "腾讯",
+      "url": "https://careers.tencent.com/",
+      "logoDomain": "tencent.com",
+      "industry": "互联网与科技",
+      "types": [
+        "SOCIAL",
+        "CAMPUS"
+      ],
+      "sourceStatus": "OFFICIAL_PORTAL_BROWSER_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Official employer career portal confirmed in Chromium; this card is not a job listing and does not imply affiliation.",
+      "verificationRun": "39107012561"
+    },
+    {
+      "id": "ByteDance",
+      "zh": "字节跳动",
+      "url": "https://jobs.bytedance.com/experienced/",
+      "logoDomain": "bytedance.com",
+      "industry": "互联网与科技",
+      "types": [
+        "SOCIAL",
+        "CAMPUS",
+        "INTERNSHIP"
+      ],
+      "sourceStatus": "OFFICIAL_PORTAL_BROWSER_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Official employer career portal confirmed in Chromium; this card is not a job listing and does not imply affiliation.",
+      "verificationRun": "39107012561"
+    },
+    {
+      "id": "Huawei",
+      "zh": "华为",
+      "url": "https://career.huawei.com/cn",
+      "logoDomain": "huawei.com",
+      "industry": "通信与科技",
+      "types": [
+        "SOCIAL",
+        "CAMPUS",
+        "INTERNSHIP"
+      ],
+      "sourceStatus": "OFFICIAL_PORTAL_BROWSER_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Official employer career portal confirmed in Chromium; this card is not a job listing and does not imply affiliation.",
+      "verificationRun": "39107012561"
+    },
+    {
+      "id": "BYD",
+      "zh": "比亚迪",
+      "url": "https://job.byd.com/portal/pc/#/",
+      "logoDomain": "byd.com",
+      "industry": "汽车与制造",
+      "types": [
+        "SOCIAL",
+        "CAMPUS",
+        "INTERNSHIP"
+      ],
+      "sourceStatus": "OFFICIAL_PORTAL_BROWSER_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Official employer career portal confirmed in Chromium; this card is not a job listing and does not imply affiliation.",
+      "verificationRun": "39107012561"
+    },
+    {
+      "id": "Alibaba",
+      "zh": "阿里巴巴",
+      "url": "https://talent.alibaba.com/?lang=zh",
+      "logoDomain": "alibaba.com",
+      "industry": "互联网与零售",
+      "types": [],
+      "sourceStatus": "OFFICIAL_PORTAL_BROWSER_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Official employer career portal confirmed in Chromium; this card is not a job listing and does not imply affiliation.",
+      "verificationRun": "39107012561"
+    },
+    {
+      "id": "Meituan",
+      "zh": "美团",
+      "url": "https://zhaopin.meituan.com/web/social",
+      "logoDomain": "meituan.com",
+      "industry": "本地生活",
+      "types": [
+        "SOCIAL",
+        "CAMPUS"
+      ],
+      "sourceStatus": "OFFICIAL_PORTAL_BROWSER_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Official employer career portal confirmed in Chromium; this card is not a job listing and does not imply affiliation.",
+      "verificationRun": "39107012561"
+    },
+    {
+      "id": "Baidu",
+      "zh": "百度",
+      "url": "https://talent.baidu.com/static/index.html",
+      "logoDomain": "baidu.com",
+      "industry": "互联网与人工智能",
+      "types": [
+        "SOCIAL",
+        "CAMPUS",
+        "INTERNSHIP"
+      ],
+      "sourceStatus": "OFFICIAL_PORTAL_BROWSER_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Official employer career portal confirmed in Chromium; this card is not a job listing and does not imply affiliation.",
+      "verificationRun": "39107012561"
+    },
+    {
+      "id": "NIO",
+      "zh": "蔚来",
+      "url": "https://campus.nio.com/#/",
+      "logoDomain": "nio.com",
+      "industry": "汽车与制造",
+      "types": [
+        "CAMPUS",
+        "INTERNSHIP"
+      ],
+      "sourceStatus": "OFFICIAL_PORTAL_BROWSER_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Official employer career portal confirmed in Chromium; this card is not a job listing and does not imply affiliation.",
+      "verificationRun": "39107012561"
+    },
+    {
+      "id": "Lenovo",
+      "zh": "联想",
+      "url": "https://talent.lenovo.com.cn/position",
+      "logoDomain": "lenovo.com",
+      "industry": "计算机与制造",
+      "types": [
+        "CAMPUS",
+        "INTERNSHIP"
+      ],
+      "sourceStatus": "OFFICIAL_PORTAL_BROWSER_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Official employer career portal confirmed in Chromium; this card is not a job listing and does not imply affiliation.",
+      "verificationRun": "39107012561"
+    },
+    {
+      "id": "Trip.com Group",
+      "zh": "携程集团",
+      "url": "https://careers.ctrip.com/#/",
+      "logoDomain": "ctrip.com",
+      "industry": "旅游与服务",
+      "types": [
+        "SOCIAL",
+        "CAMPUS"
+      ],
+      "sourceStatus": "OFFICIAL_PORTAL_BROWSER_VERIFIED",
+      "jobRecords": 0,
+      "checkedAt": "2026-10-18",
+      "disclaimer": "Official employer career portal confirmed in Chromium; this card is not a job listing and does not imply affiliation.",
+      "verificationRun": "39107012561"
+    }
+  ],
+  "verificationRun": "https://github.com/yanm-jun/hhba-talent/actions/runs/39107012561"
+}
