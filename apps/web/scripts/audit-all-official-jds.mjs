@@ -15,7 +15,7 @@ function officialPath(value){
  try{
   const u=new URL(value);
   if(u.protocol!=='https:'||u.username||u.password||u.port)return null;
-  return u.origin+u.pathname;
+  return u.origin+u.pathname+(u.searchParams.has('gh_jid')?'?gh_jid='+u.searchParams.get('gh_jid'):'');
  }catch{return null;}
 }
 function nativeId(job){
