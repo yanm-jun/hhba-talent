@@ -6,7 +6,7 @@ import type { User } from '../services/api';
 import { getJob, listJobs, localizedCompany, localizedLocation, localizedTitle, officialStatus, safeOfficialJobUrl,
   type Language, type LiveFilters, type LiveJob, type LivePage } from '../services/liveRecruitment';
 import { fetchOfficialJd, greenDetailLink, translateGreenJd, type OfficialJd } from '../services/officialJd';
-import { loadPublicJobAudit, auditForJob, describeAudit, type JobAuditEntry, type JobAuditSummary } from '../services/jobSyncStatus';
+import { loadPublicJobAudit, loadOverseasJdProgress, auditForJob, describeAudit, type OverseasJdProgress, type JobAuditEntry, type JobAuditSummary } from '../services/jobSyncStatus';
 import '../styles/unified-jobs.css';
 
 const emptyFilters: LiveFilters={q:'',company:'',country:'',remote:false,recruitment_type:''};
@@ -52,8 +52,10 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   const [loading,setLoading]=useState(true);
   const [retry,setRetry]=useState(0);
   const [auditSummary,setAuditSummary]=useState<JobAuditSummary|null>(null);
+  const [jdSync,setJdSync]=useState<OverseasJdProgress|null>(null);
   useEffect(()=>{const id=setTimeout(()=>{setPage(0);setFilters(f=>({...f,q:draft}));},280);return()=>clearTimeout(id)},[draft]);
   useEffect(()=>{loadPublicJobAudit().then(report=>setAuditSummary(report?.summary||null)).catch(()=>setAuditSummary(null));},[]);
+  useEffect(()=>{let active=true;loadOverseasJdProgress().then(status=>{if(active)setJdSync(status)});return()=>{active=false};},[retry]);
   useEffect(()=>{
     const controller=new AbortController();setLoading(true);setError('');
     listJobs(filters,page*30,controller.signal)
@@ -98,6 +100,12 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
           ? `全量官方 JD 核验：${auditSummary.verified_full_original_jd_and_requirements.toLocaleString()} / ${auditSummary.total_indexed_jobs.toLocaleString()} 条有职责与任职要求证据；中文全文需另行核验。`
           : `Official JD audit: ${auditSummary.verified_full_original_jd_and_requirements.toLocaleString()} of ${auditSummary.total_indexed_jobs.toLocaleString()} have description and requirements evidence. Full Chinese coverage not yet verified.`}
       </p>}
+    {jdSync && <p className="unified-jd-sync-progress" role="status">
+      <ShieldCheck size={15}/>
+      {lang==='zh'
+       ? `海外 JD 中文全文机械校验完成：${jdSync.complete.toLocaleString()} / ${jdSync.total_current.toLocaleString()} 条；另有 ${jdSync.translated_parts.toLocaleString()} 段已验证。机器翻译仅供辅助阅读，尚未经人工逐条审校。`
+       : `Overseas full-JD machine-validated Chinese: ${jdSync.complete.toLocaleString()} / ${jdSync.total_current.toLocaleString()} jobs; ${jdSync.translated_parts.toLocaleString()} verified chunks. Machine translation is not human-reviewed.`}
+    </p>}
     <p className="unified-market-caution"><ShieldCheck size={16}/>
       {lang==='zh'?'仅显示本页符合近期来源记录要求的岗位；历史信息另存，申请前核对官网。':'Showing recently observed listings on this page; check the original site before applying.'}</p>
     {loading?<p className="unified-job-state" role="status">{lang==='zh'?'正在读取真实岗位…':'Loading jobs…'}</p>:

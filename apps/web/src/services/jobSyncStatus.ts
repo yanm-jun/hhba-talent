@@ -64,3 +64,35 @@ export function describeAudit(status:string,lang:'zh'|'en'){
  };
  return (labels[status] || ['职位详细信息待核验','Job detail verification pending'])[lang==='zh'?0:1];
 }
+
+
+export type OverseasJdProgress = {
+ kind:'HHBA_OVERSEAS_JD_SYNC_V1';
+ enabled:true;
+ persistent:true;
+ total_current:number;
+ complete:number;
+ translated_parts:number;
+ expected_parts:number;
+ states:Record<string,number>;
+ checked_at:string;
+ translationBudgetRemaining:number;
+ translation_quality?:string;
+};
+export async function loadOverseasJdProgress():Promise<OverseasJdProgress|null>{
+ try{
+  const response=await fetch('https://hhba-web-production-024c.up.railway.app/api/jd-sync/status',{
+   method:'GET',mode:'cors',credentials:'omit',cache:'no-store',
+   headers:{Accept:'application/json'},signal:AbortSignal.timeout(12000)
+  });
+  if(!response.ok)return null;
+  const status=await response.json() as Partial<OverseasJdProgress>;
+  if(status.kind!=='HHBA_OVERSEAS_JD_SYNC_V1'||status.enabled!==true||status.persistent!==true||
+   !Number.isInteger(status.total_current)||status.total_current!<1||
+   !Number.isInteger(status.complete)||status.complete!<0||status.complete!>status.total_current!||
+   !Number.isInteger(status.translated_parts)||status.translated_parts!<0||
+   typeof status.checked_at!=='string'||!Number.isFinite(Date.parse(status.checked_at)))return null;
+  if(Date.now()-Date.parse(status.checked_at)>10*60_000||Date.parse(status.checked_at)>Date.now()+5*60_000)return null;
+  return status as OverseasJdProgress;
+ }catch{return null;}
+}
