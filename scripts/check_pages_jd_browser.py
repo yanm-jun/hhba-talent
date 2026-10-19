@@ -21,6 +21,14 @@ async def main():
         if response is None or response.status >= 500:
             raise AssertionError("White HHBA GitHub Pages homepage did not load")
         await page.get_by_text("我要应聘").first.wait_for(timeout=20000)
+        audit_response = await page.request.get(ROOT + "data/job-sync-summary.json", timeout=30000)
+        assert audit_response.status == 200, "Published full-job audit report is missing"
+        audit = await audit_response.json()
+        assert audit.get("total_indexed_jobs", 0) > 9000, "Audit does not cover all imported positions"
+        assert audit.get("verified_full_original_jd_and_requirements", 0) > 8000, "Full JD evidence count too low"
+        assert sum(audit.get("statuses", {}).values()) == audit["total_indexed_jobs"], "Missing audited jobs"
+        await page.get_by_text("全量官方 JD 核验", exact=False).first.wait_for(timeout=25000)
+        await page.screenshot(path=str(OUT / "home-sync-audit.png"), full_page=True)
         await page.goto(DETAIL, wait_until="domcontentloaded", timeout=60000)
         await page.locator(".unified-detail-card h1").wait_for(timeout=20000)
         await page.get_by_role("button", name="English").click()
@@ -38,7 +46,7 @@ async def main():
         assert zh_count > 350, f"Full Chinese translation missing, Han chars={zh_count}"
         await page.screenshot(path=str(OUT / "airtable-translated-zh.png"), full_page=True)
         print("HHBA_BROWSER_JD_SUCCESS", json.dumps({
-            "home_ok": True, "detail": DETAIL,
+            "home_ok": True, "audited_all_positions": audit["total_indexed_jobs"], "detail": DETAIL,
             "english_characters": char_count,
             "chinese_characters": zh_count,
             "screenshots": sorted(x.name for x in OUT.glob("*.png")),
