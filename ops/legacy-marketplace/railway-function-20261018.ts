@@ -243,6 +243,11 @@ const additionalDomesticJobs:Job[]=reviewedRows.map(([company,id,title,city,kind
 type Board={platform:"greenhouse"|"ashby"|"lever";company:string;slug:string};
 const boards:Board[]=[
  // Audited 2026-10-19 against public original ATS board+job+description URLs.
+ // Custom first-party corporate URLs, admitted only when gh_jid equals official native ATS ID.
+ {platform:"greenhouse",company:"Stripe",slug:"stripe"},
+ {platform:"greenhouse",company:"Coinbase",slug:"coinbase"},
+ {platform:"greenhouse",company:"Airbnb",slug:"airbnb"},
+ {platform:"greenhouse",company:"Databricks",slug:"databricks"},
  {platform:"greenhouse",company:"SpaceX",slug:"spacex"},
  {platform:"greenhouse",company:"SpaceX Global",slug:"spacexglobal"},
  {platform:"greenhouse",company:"Anthropic",slug:"anthropic"},
@@ -291,16 +296,35 @@ const boards:Board[]=[
  {platform:"ashby",company:"General Robotics",slug:"generalrobotics"}
 ];
 const esc=(v:unknown)=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]||c));
-const urlOK=(value:unknown,slug:string,platform:string)=>{
- try {let u=new URL(String(value||""));let hosts=platform==="greenhouse"?["job-boards.greenhouse.io","boards.greenhouse.io","boards.eu.greenhouse.io"]:platform==="ashby"?["jobs.ashbyhq.com"]:["jobs.lever.co","jobs.eu.lever.co"];
- return u.protocol==="https:"&&!u.username&&!u.password&&hosts.includes(u.hostname)&&u.pathname.split("/").includes(slug)?u.href:null;}catch{return null;}
+const brandedGreenhouse:Record<string,{host:string;path:string}>={
+ stripe:{host:"stripe.com",path:"/jobs/search"},
+ coinbase:{host:"www.coinbase.com",path:"/careers/positions/"},
+ airbnb:{host:"careers.airbnb.com",path:"/positions/"},
+ databricks:{host:"databricks.com",path:"/company/careers/open-positions/job"}
+};
+const urlOK=(value:unknown,slug:string,platform:string,nativeId?:unknown)=>{
+ try {
+  const u=new URL(String(value||""));
+  if(u.protocol!=="https:"||u.username||u.password||u.port)return null;
+  const hosts=platform==="greenhouse"?
+   ["job-boards.greenhouse.io","boards.greenhouse.io","boards.eu.greenhouse.io"]:
+   platform==="ashby"?["jobs.ashbyhq.com"]:["jobs.lever.co","jobs.eu.lever.co"];
+  if(hosts.includes(u.hostname)&&u.pathname.split("/").includes(slug))return u.href;
+  const branded=platform==="greenhouse"?brandedGreenhouse[slug]:null;
+  const native=String(nativeId??"");
+  if(branded && u.hostname===branded.host &&
+    (branded.path.endsWith("/")?u.pathname.startsWith(branded.path):u.pathname===branded.path) &&
+    /^[0-9]{5,20}$/.test(native) &&
+    u.searchParams.get("gh_jid")===native)return u.href;
+  return null;
+ }catch{return null;}
 };
 function id(platform:string,slug:string,uid:unknown){return platform+"-"+slug+"-"+String(uid||"").slice(0,85);}
 function normalize(board:Board,x:any):Job|null{
  const title=board.platform==="lever"?x?.text:x?.title;
  const native=x?.id;
  const url=board.platform==="greenhouse"?x?.absolute_url:board.platform==="ashby"?x?.jobUrl:x?.hostedUrl;
- const safe=urlOK(url,board.slug,board.platform);
+ const safe=urlOK(url,board.slug,board.platform,native);
  if(!safe||!title||!native||x?.isListed===false)return null;
  const location=board.platform==="lever"?x?.categories?.location:board.platform==="greenhouse"?x?.location?.name:x?.location;
  const remote=typeof x?.isRemote==="boolean"?x.isRemote:typeof x?.workplaceType==="string"?x.workplaceType.toLowerCase()==="remote":null;
@@ -483,7 +507,7 @@ async function officialDetail(job:Job):Promise<Detail|null>{
   const title=board.platform==="lever"?raw.text:raw.title;
   const original=board.platform==="greenhouse"?raw.absolute_url:
     board.platform==="lever"?raw.hostedUrl:raw.jobUrl;
-  if(!title||!urlOK(original,board.slug,board.platform)||original!==job.url)return null;
+  if(!title||!urlOK(original,board.slug,board.platform,native)||original!==job.url)return null;
   let html="";
   if(board.platform==="greenhouse")html=typeof raw.content==="string"?raw.content:"";
   if(board.platform==="ashby")html=typeof raw.descriptionHtml==="string"?raw.descriptionHtml:"";
