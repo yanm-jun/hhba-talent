@@ -93,7 +93,7 @@ class SourceTests(unittest.TestCase):
 
     def test_pdf_and_docx_types_and_pii(self):
         d = Document()
-        d.add_paragraph("本科销售顾问。管理多个客户项目以及业务增长。Excel 和 Salesforce，三年工作经验。")
+        d.add_paragraph("本科销售顾问。管理多个客户项目以及业务增长。Excel 和 Salesforce，三年工作经验。工作内容包括市场销售、客户关系管理、门店培训、数据处理、项目交付、业务沟通和团队合作。")
         output = io.BytesIO()
         d.save(output)
         txt = server.parse_resume(output.getvalue(), "resume.docx")
