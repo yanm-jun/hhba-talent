@@ -60,3 +60,8 @@
 .unified-detail-actions{justify-content:flex-start;gap:12px;flex-wrap:wrap;margin:18px 0}
 .unified-detail-actions a{display:inline-flex;border:1px solid #cbded1;border-radius:9px;padding:11px 13px;background:#f4f8f5}
 .unified-detail-actions a:hover{background:#edf5ef}
+
+.unified-audit-summary{background:#f2f6f3;border:1px solid #dce8df;border-radius:9px;padding:11px 13px;margin:16px 0 9px;color:#476d55;font-size:12px;line-height:1.8}
+.unified-job-audit{display:flex;align-items:center;flex-wrap:wrap;gap:7px;background:#f7faf8;border:1px solid #e5eee8;border-radius:8px;padding:10px 12px;color:#496c59!important;font-size:12px!important;line-height:1.5!important}
+.unified-job-audit small{margin-left:auto;font-size:11px;color:#697f72}
+@media(max-width:720px){.unified-job-audit small{margin-left:0}}
