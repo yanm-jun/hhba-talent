@@ -35,7 +35,7 @@ jobs:
         env:
           HHBA_GITHUB_PAGES: '1'
         run: npm run build
-      - name: Import up-to-date 46 official ATS source boards into white HHBA
+      - name: Build white HHBA with verified branded corporate ATS URL validation
         working-directory: apps/web
         run: node scripts/prepare-pages-jobs.mjs
       - name: Verify full-audit regression cases
