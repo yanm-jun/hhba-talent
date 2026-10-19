@@ -886,7 +886,7 @@ def admin_posting_review(pid:UUID,x:EmployerPostingReviewIn,r:Request,a=Depends(
  if post.created_by==a[0].id:raise HTTPException(403,'reviewer cannot approve own vacancy')
  if x.decision=='approved':
   org=s.get(Organization,post.organization_id)
-  person=s.get(RecruiterVerification,post.created_by)
+  person=s.scalar(select(RecruiterVerification).where(RecruiterVerification.user_id==post.created_by))
   org_ver=s.scalar(select(OrganizationVerification).where(OrganizationVerification.organization_id==post.organization_id))
   authorization=s.scalar(select(RecruiterOrganizationAuthorization).where(
       RecruiterOrganizationAuthorization.organization_id==post.organization_id,
@@ -894,7 +894,10 @@ def admin_posting_review(pid:UUID,x:EmployerPostingReviewIn,r:Request,a=Depends(
   gate=s.get(PlatformServiceGate,'network_recruitment')
   if not (gate and gate.enabled and org and org.status=='approved' and
           verification_is_current(org_ver) and verification_is_current(person) and
-          authorization and authorization.status=='active'):
+          authorization and authorization.status=='active'
+          and not authorization.revoked_at and
+          active_membership(post.organization_id,post.created_by,s) and
+          (not authorization.expires_at or comparable_time(authorization.expires_at)>now())):
    raise HTTPException(403,'employer verification or platform service gate is not active')
   checked_apply_link(post.apply_url)
   post.status='published';post.published_at=now();post.expires_at=now()+timedelta(days=45)
