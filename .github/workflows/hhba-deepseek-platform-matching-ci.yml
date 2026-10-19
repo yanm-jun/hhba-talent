@@ -24,7 +24,7 @@ jobs:
       - name: Compile backend with no secrets
         working-directory: apps/resume-match-api
         run: python -m py_compile matcher.py server.py test_api.py
-      - name: Verify owner-key-only consent, verified source ranking, backend quotas and matching
+      - name: Verify owner-key-only consent, verified work history, official job matching and persistent cost quotas
         working-directory: apps/resume-match-api
         run: python -m unittest -v test_api
       - name: Build isolated Railway Docker image
