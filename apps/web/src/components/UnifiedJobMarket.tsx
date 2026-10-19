@@ -54,7 +54,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   const [retry,setRetry]=useState(0);
   const [auditSummary,setAuditSummary]=useState<JobAuditSummary|null>(null);
   const [jdSync,setJdSync]=useState<OverseasJdProgress|null>(null);
-  useEffect(()=>{const id=setTimeout(()=>{setPage(0);setFilters(f=>({...f,q:draft}));},280);return()=>clearTimeout(id)},[draft]);
+  useEffect(()=>{const id=setTimeout(()=>{setPage(0);setFilters(f=>({...f,q:draft,education:f.education==='UNRESTRICTED_OR_UNREPORTED'?'':f.education}));},280);return()=>clearTimeout(id)},[draft]);
   useEffect(()=>{loadPublicJobAudit().then(report=>setAuditSummary(report?.summary||null)).catch(()=>setAuditSummary(null));},[]);
   useEffect(()=>{let active=true;loadOverseasJdProgress().then(status=>{if(active)setJdSync(status)});return()=>{active=false};},[retry]);
   useEffect(()=>{
@@ -74,6 +74,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
     interpreted.cityKey&&(cityOptions.find(c=>c.value===interpreted.cityKey)?.[lang]||interpreted.cityKey),
     interpreted.roleKeys.length>0&&(lang==='zh'?'职位：':'Role: ')+interpreted.roleKeys.map(k=>lang==='zh'?(roleNames[k]||k):k).join(', '),
     interpreted.remote&&(lang==='zh'?'远程':'Remote'),
+    filters.education==='UNRESTRICTED_OR_UNREPORTED'?(lang==='zh'?'包含学历未识别岗位（需核实）':'Includes unverified education requirements'):
     interpreted.education==='UNRESTRICTED'&&(lang==='zh'?'明确无学历要求':'Explicitly no degree required'),
     interpreted.experience&&(lang==='zh'?'经验：':'Experience: ')+interpreted.experience
   ].filter(Boolean);
@@ -101,7 +102,8 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
     </select>
     <select value={filters.recruitment_type} onChange={e=>{setPage(0);setFilters(f=>({...f,recruitment_type:e.target.value as LiveFilters['recruitment_type']}))}} aria-label={lang==='zh'?'招聘类型':'Recruitment type'}>
       <option value="">{lang==='zh'?'全部招聘类型':'All job types'}</option>
-      <option value="SOCIAL">{lang==='zh'?'常规 / 社招':'Professional'}</option>
+      <option value="REGULAR">{lang==='zh'?'常规岗位（标题推断）':'Regular roles (inferred)'}</option>
+      <option value="SOCIAL">{lang==='zh'?'明确社会招聘':'Confirmed professional recruitment'}</option>
       <option value="CAMPUS">{lang==='zh'?'应届 / 校招':'Graduate'}</option>
       <option value="INTERNSHIP">{lang==='zh'?'实习':'Internship'}</option>
     </select>
@@ -109,6 +111,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       aria-label={lang==='zh'?'学历要求':'Education requirements'}>
       <option value="">{lang==='zh'?'全部学历要求':'Any education requirement'}</option>
       <option value="UNRESTRICTED">{lang==='zh'?'明确不限学历':'Explicitly no degree required'}</option>
+      <option value="UNRESTRICTED_OR_UNREPORTED">{lang==='zh'?'不限学历或要求未识别（需核实）':'No degree requirement or unknown (verify)'}</option>
       <option value="HIGH_SCHOOL">{lang==='zh'?'要求高中学历':'High school requirement'}</option>
       <option value="ASSOCIATE">{lang==='zh'?'要求专科学历':'Associate requirement'}</option>
       <option value="BACHELOR">{lang==='zh'?'要求本科学历':'Bachelor requirement'}</option>
@@ -155,6 +158,20 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
        ? `海外 JD 中文全文机械校验完成：${jdSync.complete.toLocaleString()} / ${jdSync.total_current.toLocaleString()} 条；另有 ${jdSync.translated_parts.toLocaleString()} 段已验证。机器翻译仅供辅助阅读，尚未经人工逐条审校。`
        : `Overseas full-JD machine-validated Chinese: ${jdSync.complete.toLocaleString()} / ${jdSync.total_current.toLocaleString()} jobs; ${jdSync.translated_parts.toLocaleString()} verified chunks. Machine translation is not human-reviewed.`}
     </p>}
+    {!loading&&!error&&snapshot?.total===0&&interpreted.education==='UNRESTRICTED'&&
+      filters.education!=='UNRESTRICTED_OR_UNREPORTED'&&
+      <div className="unified-search-fallback">
+        <p>{lang==='zh'?'当前没有官方明确声明“不要求学历”且符合其余条件的岗位。可以放宽为包含学历条件未识别的职位，但这不代表企业没有学历要求。':
+          'No roles explicitly say that no degree is required under these conditions. You can also inspect jobs with unknown education requirements, but they may still require a degree.'}</p>
+        <button type="button" onClick={()=>{setPage(0);setFilters(f=>({...f,education:'UNRESTRICTED_OR_UNREPORTED'}))}}>
+          {lang==='zh'?'查看学历要求未识别的职位（需核实）':'Include unknown education requirements'}
+        </button>
+      </div>}
+    {filters.education==='UNRESTRICTED_OR_UNREPORTED'&&
+      <p className="unified-search-fallback-active">
+        {lang==='zh'?'当前包含官网没有明确识别到学历条件的岗位。这些职位可能仍有学历要求，请务必查阅官方任职资格。':
+          'Some listed jobs have unknown education requirements. This does not mean that a degree is unnecessary; check the employer’s official qualifications.'}
+      </p>}
     <p className="unified-market-caution"><ShieldCheck size={16}/>
       {lang==='zh'?'仅显示本页符合近期来源记录要求的岗位；历史信息另存，申请前核对官网。':'Showing recently observed listings on this page; check the original site before applying.'}</p>
     {loading?<p className="unified-job-state" role="status">{lang==='zh'?'正在读取真实岗位…':'Loading jobs…'}</p>:
