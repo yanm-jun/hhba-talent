@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
-      - name: Build white HHBA with separate verified employer jobs, full JD details and human certification review
+      - name: Build white HHBA with reviewed employer job details, ATS separation and safe anonymous employer previews
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
