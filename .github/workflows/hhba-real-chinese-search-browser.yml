@@ -27,7 +27,7 @@ jobs:
         run: |
           python -m pip install 'playwright>=1.55,<2'
           python -m playwright install --with-deps chromium
-      - name: Test Chinese query parsing and city, country, type, education, experience in real mobile UI
+      - name: Test real Chinese queries, optional unknown-degree fallback and all structured filters
         run: python scripts/check_live_chinese_global_search_browser.py
       - name: Upload screenshot evidence
         uses: actions/upload-artifact@v4
