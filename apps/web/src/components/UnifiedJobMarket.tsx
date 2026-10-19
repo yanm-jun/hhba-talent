@@ -5,7 +5,7 @@ import { Shell } from './Shell';
 import type { User } from '../services/api';
 import { getJob, listJobs, localizedCompany, localizedLocation, localizedTitle, officialStatus, safeOfficialJobUrl,
   type Language, type LiveFilters, type LiveJob, type LivePage } from '../services/liveRecruitment';
-import { fetchOfficialJd, greenDetailLink, type OfficialJd } from '../services/officialJd';
+import { fetchOfficialJd, greenDetailLink, translateGreenJd, type OfficialJd } from '../services/officialJd';
 import '../styles/unified-jobs.css';
 
 const emptyFilters: LiveFilters={q:'',company:'',country:'',remote:false,recruitment_type:''};
@@ -115,6 +115,11 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  const [jd,setJd]=useState<OfficialJd|null>(null);
  const [jdError,setJdError]=useState('');
  const [jdLoading,setJdLoading]=useState(false);
+ const [chineseJd,setChineseJd]=useState('');
+ const [translateBusy,setTranslateBusy]=useState(false);
+ const [translateError,setTranslateError]=useState('');
+ const [translationProgress,setTranslationProgress]=useState('');
+
  useEffect(()=>{
    const controller=new AbortController();
    setDetail(null);setError('');setJd(null);setJdError('');
@@ -135,6 +140,17 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
    }).finally(()=>{if(!controller.signal.aborted)setJdLoading(false)});
    return()=>controller.abort();
  },[job]);
+ useEffect(()=>{
+   if(lang!=='zh'||!job||!jd?.originalText)return;
+   const controller=new AbortController();
+   setChineseJd('');setTranslateError('');setTranslateBusy(true);setTranslationProgress('');
+   translateGreenJd(job,jd.originalText,controller.signal,(done,total)=>{
+     if(!controller.signal.aborted)setTranslationProgress('翻译进度 '+done+' / '+total);
+   }).then(translated=>{if(!controller.signal.aborted)setChineseJd(translated)})
+    .catch(e=>{if(!controller.signal.aborted)setTranslateError(e instanceof Error?e.message:'中文 JD 翻译失败')})
+    .finally(()=>{if(!controller.signal.aborted)setTranslateBusy(false)});
+   return()=>controller.abort();
+ },[lang,job,jd]);
  const official=job?safeOfficialJobUrl(job):null;
  const translatedReader=job?greenDetailLink(job):null;
  const segmentName:Record<string,{zh:string,en:string}>={
@@ -174,10 +190,30 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
              <p key={i} className="unified-jd-bullet">{block.text}</p>:
              <p key={i}>{block.text}</p>)}
          </section>):
-         <div className="unified-jd-translate">
-           <strong>已读取完整官方英文职位说明</strong>
-           <p>中文岗位职责与技术任职要求需要经过完整翻译和核验。你可以切换 English 阅读当前官方原文，
-             或使用原招聘市场的中文辅助阅读，不会以夹杂英文的内容冒充中文译文。</p>
+         chineseJd?<section className="unified-jd-section unified-jd-chinese">
+           <h3>官方职位说明 · 中文辅助译文</h3>
+           <p className="unified-jd-machine-notice">以下为机器译文，仅供理解。职责、学历、技能、薪资数字请与英文原文及企业官网核对。</p>
+           {chineseJd.split(/\n{2,}/).filter(Boolean).map((paragraph,i)=>{
+             const trimmed=paragraph.trim();
+             return trimmed.startsWith('# ')?<h4 key={i}>{trimmed.slice(2)}</h4>:
+               <p key={i} className={trimmed.startsWith('- ')?'unified-jd-bullet':''}>
+                 {trimmed.startsWith('- ')?trimmed.slice(2):trimmed}
+               </p>;
+           })}
+         </section>:<div className="unified-jd-translate">
+           <strong>{translateBusy?'正在生成完整中文岗位说明':'已获取完整的企业官方岗位说明'}</strong>
+           <p>{translateBusy?(translationProgress||'正在逐段翻译岗位职责、任职要求及技能条件。'):
+             translateError ? '中文译文暂时无法生成，请稍后重试，或使用原招聘市场的中文辅助阅读功能。':
+             '完整中文翻译需要原招聘市场的翻译服务支持。可以切换 English 阅读最新官方原文。'}</p>
+           {!translateBusy&&translateError&&
+             <button type="button" className="unified-jd-retry" onClick={()=>{
+               setTranslateError('');setTranslateBusy(true);
+               const controller=new AbortController();
+               if(job&&jd?.originalText)translateGreenJd(job,jd.originalText,controller.signal,(done,total)=>{
+                 setTranslationProgress('翻译进度 '+done+' / '+total);
+               }).then(setChineseJd).catch(e=>setTranslateError(e instanceof Error?e.message:'中文翻译失败'))
+                 .finally(()=>setTranslateBusy(false));
+             }}>重试中文翻译</button>}
          </div>}
        </div>:null}
      <div className="unified-job-actions unified-detail-actions">
