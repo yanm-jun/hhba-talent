@@ -64,6 +64,7 @@ export function EmployerWorkspacePage({user}:{user:User|null}){
    <select value={oid} onChange={e=>setOid(e.target.value)} disabled={loading}>{organizations.length?organizations.map(o=><option key={o.id} value={o.id}>{o.legal_name}</option>):<option value="">暂未创建企业组织</option>}</select></label>
    <span className="employer-ws-status">{organization?.status==='approved'?'企业组织已审核':'企业组织尚未审核通过'}</span>
    <Link to="/recruiter/onboarding">办理或查看企业认证 <ArrowRight size={14}/></Link>
+   {user.role==='admin'&&<Link to="/admin/employer-review">进入管理员审核台 →</Link>}
   </div>
   {!oid&&<section className="employer-ws-empty"><ShieldCheck size={24}/><h2>先完成企业主体信息</h2><p>企业招聘经办人先注册、提交营业执照和招聘授权材料，审核通过后才能提交公开职位及检索授权人才。</p><Link to="/recruiter/onboarding">开始认证企业 →</Link></section>}
   {oid&&<>
