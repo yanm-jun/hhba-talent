@@ -9,6 +9,19 @@ const MIME = {
   '.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg',
   '.webp':'image/webp','.ico':'image/x-icon','.woff2':'font/woff2'
 };
+const LIVE_API_PATH=/^\/live-recruitment\/api\/jobs(?:\/page|\/[A-Za-z0-9_-]{1,180})?\/?$/;
+const LIVE_MARKET_HOSTS=new Set([
+  'hhba-web-production-024c.up.railway.app',
+  'hhba-live-jobs-preview-production.up.railway.app'
+]);
+function liveOrigin(value){
+  if(!value)return null;
+  const url=new URL(value);
+  if(url.protocol!=='https:'||url.username||url.password||url.port||
+     url.pathname!=='/'||url.search||url.hash||!LIVE_MARKET_HOSTS.has(url.hostname))
+    throw Error('HHBA_LIVE_RECRUITMENT_URL is not an allowed read-only source');
+  return url.origin;
+}
 const API_PATH=/^\/recruitment\/api\/v1\/(?:marketplace|stats|health|jobs(?:\/[A-Za-z0-9_-]{1,64}(?:\/original-jd)?)?)\/?$/;
 
 const json = (res,code,data)=>{
@@ -40,9 +53,11 @@ function secure(res){
   res.setHeader('x-frame-options','DENY');
   res.setHeader('permissions-policy','camera=(),microphone=(),geolocation=(self)');
 }
-export function makeServer({dist=resolve('dist'),apiUrl=process.env.HHBA_RECRUITMENT_API_URL}={}){
+export function makeServer({dist=resolve('dist'),apiUrl=process.env.HHBA_RECRUITMENT_API_URL,
+  liveUrl=process.env.HHBA_LIVE_RECRUITMENT_URL}={}){
   const root=resolve(dist);
   const backend=upstream(apiUrl);
+  const liveBackend=liveOrigin(liveUrl);
   return httpServer(async(req,res)=>{
     secure(res);
     let url;
@@ -51,6 +66,25 @@ export function makeServer({dist=resolve('dist'),apiUrl=process.env.HHBA_RECRUIT
     if(url.pathname==='/health'){
       return json(res,await upstreamHealth(backend)?200:503,
         {ok:await upstreamHealth(backend),role:'hhba-public-readonly'});
+    }
+    if(url.pathname.startsWith('/live-recruitment/')){
+      if(!['GET','HEAD'].includes(req.method||'')||!LIVE_API_PATH.test(url.pathname))
+        return json(res,404,{error:'route_not_found'});
+      if(!liveBackend)return json(res,503,{error:'recruitment_preview_not_configured'});
+      try{
+        const path=url.pathname.replace(/^\/live-recruitment/,'')+url.search;
+        const response=await fetch(liveBackend+path,{
+          method:'GET',headers:{Accept:'application/json'},
+          redirect:'manual',signal:AbortSignal.timeout(15000)
+        });
+        const data=await response.arrayBuffer();
+        if(data.byteLength>2*1024*1024)return json(res,502,{error:'preview_response_too_large'});
+        if(!response.headers.get('content-type')?.includes('application/json'))
+          return json(res,502,{error:'unexpected_response_type'});
+        res.writeHead(response.status,{'content-type':'application/json; charset=utf-8',
+          'cache-control':'no-store','x-content-type-options':'nosniff'});
+        return res.end(req.method==='HEAD'?undefined:Buffer.from(data));
+      }catch{return json(res,502,{error:'recruitment_preview_unavailable'});}
     }
     if(url.pathname.startsWith('/api/')){
       // Candidate/recruiter auth and user data are NOT enabled in the
