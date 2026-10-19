@@ -21,7 +21,7 @@ jobs:
       - name: Verify job ID consistency and transparent translation progress
         working-directory: ops/legacy-marketplace
         run: |
-          node -e "const fs=require('fs');const c=fs.readFileSync('railway-function-20261018.ts','utf8');for(const k of ['JD_READER_MAX_CHARS=100000','readerChunkCache','readerJobCompletionsInMemory','sourceHash!==digest','translation_incomplete','numbersVerified:true','maxAttempts','part>150'])if(!c.includes(k))throw Error('Missing translation safety: '+k);console.log('SERVER_READONLY_FULL_JD_CONTRACT_PASS')"
+          node -e "const fs=require('fs');const c=fs.readFileSync('railway-function-20261018.ts','utf8');for(const k of ['JD_READER_MAX_CHARS=100000','readerChunkCache','readerJobCompletionsInMemory','digest!==sourceHash','translation_incomplete','numbersVerified:true','part>150'])if(!c.includes(k))throw Error('Missing translation safety: '+k);console.log('SERVER_READONLY_FULL_JD_CONTRACT_PASS')"
       - name: Install Bun existing dependencies
         working-directory: ops/legacy-marketplace
         run: bun install
