@@ -1,0 +1,56 @@
+name: HHBA Railway native index real-source dry run
+on:
+  push:
+    branches: [feat/railway-native-job-index-20261020]
+    paths:
+      - 'ops/legacy-marketplace/publish-official-index.mjs'
+      - 'ops/legacy-marketplace/read-official-index.mjs'
+      - '.github/workflows/hhba-native-index-live-dryrun.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  official-live-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Pull verified public official metadata (no private JD or resumes)
+        working-directory: apps/web
+        run: node scripts/prepare-pages-jobs.mjs
+      - name: Audit real official Greenhouse, Ashby and Lever boards and generate facets
+        working-directory: apps/web
+        run: node scripts/audit-all-official-jds.mjs
+      - name: Atomically publish to isolated local Railway-volume fixture (never production)
+        run: |
+          node ops/legacy-marketplace/publish-official-index.mjs apps/web/dist/data /tmp/hhba-native-index-dryrun
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {readNativeIndex} from './ops/legacy-marketplace/read-official-index.mjs';
+          const dest='/tmp/hhba-native-index-dryrun';
+          const names=['jobs.json','job-sync-status.json','job-sync-summary.json','job-search-facets.json'];
+          const docs={};
+          for(const name of names){
+           const entry=await readNativeIndex(dest,name);
+           assert.ok(entry,name+' not safely loaded');
+           docs[name]=JSON.parse(entry.bytes.toString('utf8'));
+          }
+          assert.equal(docs['jobs.json'].failures,0);
+          assert.ok(docs['jobs.json'].total>=10000);
+          assert.ok(docs['job-search-facets.json'].extracted_count>=8000);
+          assert.equal(docs['job-sync-status.json'].summary.indexed_as_of,docs['jobs.json'].updated);
+          const audit=docs['job-sync-status.json'].summary;
+          console.log('HHBA_NATIVE_RAILWAY_LIVE_DRY_RUN',JSON.stringify({
+            total:docs['jobs.json'].total,
+            eligibleFacets:docs['job-search-facets.json'].extracted_count,
+            audited:audit.total_indexed_jobs,
+            sourceFailures:audit.official_ats_board_failures,
+            updated:docs['jobs.json'].updated,
+            ready:true
+          }));
+          NODE
+      - name: Do not persist employer JD or user data as artifacts
+        run: echo 'Dry-run public index is ephemeral; no upload or deployment occurs.'

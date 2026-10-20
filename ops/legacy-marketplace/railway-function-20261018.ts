@@ -12,6 +12,7 @@ import { openJobSyncStore } from "./jd-sync-store.mjs";
 import { startOverseasJdWorker } from "./jd-sync-worker.mjs";
 import { createFullJdWorker } from "./jd-sync-runner.mjs";
 import { translateWithSourceNumbers } from "./number-locked-translation.mjs";
+import {readNativeIndex} from "./read-official-index.mjs";
 const phrases:[string,string][]=[
  ["Integration Technician","集成技术员"],["Test Technician","测试技术员"],
  ["Manufacturing Engineer","制造工程师"],["Supply Chain Manager","供应链经理"],
@@ -1408,6 +1409,26 @@ async function whiteSnapshot(name:string):Promise<Response>{
  const headers={"Content-Type":"application/json; charset=utf-8",
   "Cache-Control":"no-store","X-Content-Type-Options":"nosniff"};
  if(!WHITE_PUBLIC_DATA.has(name))return Response.json({error:"INVALID_SNAPSHOT_PATH"},{status:404,headers});
+ if(Bun.env.HHBA_NATIVE_INDEX_READ==="1"){
+  try{
+   const nativeCached=whiteSnapshotCache.get("native:"+name);
+   if(nativeCached&&nativeCached.expires>Date.now())
+    return new Response(nativeCached.bytes,{headers:{...headers,
+     "X-HHBA-Index-Source":"railway-verified-volume"}});
+   // No pointer on a fresh volume: existing Pages publisher stays available.
+   // A corrupt/expired native index is rejected instead of silently serving bad data.
+   const native=await readNativeIndex("/sync-state/public-index",name);
+   if(native){
+    if(whiteSnapshotCache.size>12)whiteSnapshotCache.clear();
+    whiteSnapshotCache.set("native:"+name,{expires:Date.now()+30000,bytes:native.bytes});
+    return new Response(native.bytes,{headers:{...headers,
+     "X-HHBA-Index-Source":"railway-verified-volume"}});
+   }
+  }catch(e){
+   console.error("HHBA_NATIVE_INDEX_REJECTED",e instanceof Error?e.message:"unknown");
+   return Response.json({error:"RAILWAY_EVIDENCE_REJECTED"},{status:503,headers});
+  }
+ }
  const cached=whiteSnapshotCache.get(name);
  if(cached&&cached.expires>Date.now())return new Response(cached.bytes,{headers});
  try{
@@ -1445,10 +1466,56 @@ async function whiteSnapshot(name:string):Promise<Response>{
   return Response.json({error:"PUBLIC_EVIDENCE_TEMPORARILY_UNAVAILABLE"},{status:503,headers});
  }
 }
+// Same-service background indexer: only active with explicitly enabled Railway
+// production settings, existing mounted durable volume and fixed bundled scripts.
+let nativeIndexJobRunning=false;
+function startNativeIndexSchedule(){
+ if(Bun.env.HHBA_NATIVE_INDEX_PUBLISH!=="1"||
+    !Bun.env.RAILWAY_ENVIRONMENT_ID||!existsSync("/sync-state"))return;
+ const run=async()=>{
+  if(nativeIndexJobRunning)return;
+  nativeIndexJobRunning=true;
+  const tasks=[
+   ["bun","run","scripts/prepare-pages-jobs.mjs"],
+   ["bun","run","scripts/audit-all-official-jds.mjs"],
+   ["bun","run","/app/publish-official-index.mjs","dist/data","/sync-state/public-index"]
+  ];
+  try{
+   for(const [step,argv] of tasks.entries()){
+    const child=Bun.spawn(argv,{cwd:"/app/index-builder",
+      stdout:"inherit",stderr:"inherit",env:{...Bun.env}});
+    const exitCode=await child.exited;
+    if(exitCode!==0)throw Error("NATIVE_INDEX_PHASE_"+(step+1)+"_FAILED_"+exitCode);
+   }
+   console.log("HHBA_NATIVE_RAILWAY_INDEX_PUBLISHED",{status:"verified_complete"});
+  }catch(e){
+   console.error("HHBA_NATIVE_INDEX_REFRESH_REJECTED",e instanceof Error?e.message:"unknown");
+  }finally{nativeIndexJobRunning=false}
+ };
+ setTimeout(()=>void run(),45_000).unref();
+ setInterval(()=>void run(),12*60*60*1000).unref();
+ console.log("HHBA_NATIVE_RAILWAY_INDEX_SCHEDULED",{hours:12,source:"official_ats"});
+}
+startNativeIndexSchedule();
+
 const WHITE_SPA_ROUTES=/^\/(?:candidate(?:\/.*)?|employer(?:\/.*)?|recruiter(?:\/.*)?|auth|workspace|public\/[^/?#]+|admin(?:\/.*)?)$/;
 async function whiteSiteResponse(req:Request,u:URL):Promise<Response|null>{
  if(req.method!=="GET"&&req.method!=="HEAD")return null;
  const p=u.pathname;
+ if(p==="/api/official-index/status"){
+  try{
+   const active=Bun.env.HHBA_NATIVE_INDEX_READ==="1";
+   const native=await readNativeIndex("/sync-state/public-index","jobs.json");
+   return Response.json({kind:"HHBA_OFFICIAL_INDEX_STATUS_V1",
+    nativeReadEnabled:active,
+    nativePublishEnabled:Bun.env.HHBA_NATIVE_INDEX_PUBLISH==="1",
+    available:!!native,source:active&&native?"railway-verified-volume":"pages-verified-fallback",
+    updated:native?.manifest.updated||null,
+    jobs:native?.manifest.jobs||null,facets:native?.manifest.facets||null
+   },{headers:{"Cache-Control":"no-store"}});
+  }catch{return Response.json({kind:"HHBA_OFFICIAL_INDEX_STATUS_V1",
+    available:false,error:"NATIVE_INDEX_REJECTED"},{status:503});}
+ }
  if(p.startsWith("/data/")){
   const match=p.match(/^\/data\/([a-z-]+\.json)$/);
   return match?whiteSnapshot(match[1]):
