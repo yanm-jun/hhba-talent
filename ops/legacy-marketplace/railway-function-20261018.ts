@@ -216,16 +216,21 @@ const searchAliases:Record<string,string[]>={
  "法务":["legal","counsel"]
 };
 
+// Public CI verifies the website and public ATS endpoints without copying
+// the private Xiaomi production dataset. This bypass is forbidden in Railway.
+const publicCiOnly=Bun.env.HHBA_PUBLIC_CI_ONLY==="1" &&
+ !Bun.env.RAILWAY_ENVIRONMENT && !Bun.env.RAILWAY_PROJECT_ID &&
+ !Bun.env.RAILWAY_SERVICE_ID && !Bun.env.RAILWAY_SERVICE_NAME;
 const xiaomiPayload=Array.from({length:11},(_,i)=>Bun.env["HHBA_XIAOMI_CHUNK_"+i]||"").join("");
-if(createHash("sha256").update(xiaomiPayload,"utf8").digest("hex")!=="97ef1d92751c7726225f98fdd0797d22e45eb07553029452697b54dd208def8e")throw Error("HHBA_XIAOMI_SNAPSHOT_DIGEST_MISMATCH");
-const xiaomiCompact:[string,string,string,string][]=JSON.parse(xiaomiPayload);
+if(!publicCiOnly&&createHash("sha256").update(xiaomiPayload,"utf8").digest("hex")!=="97ef1d92751c7726225f98fdd0797d22e45eb07553029452697b54dd208def8e")throw Error("HHBA_XIAOMI_SNAPSHOT_DIGEST_MISMATCH");
+const xiaomiCompact:[string,string,string,string][]=publicCiOnly?[]:JSON.parse(xiaomiPayload);
 const xiaomiType:Record<string,string>={S:"SOCIAL",C:"CAMPUS",I:"INTERNSHIP"};
 const xiaomiUrls:Record<string,string>={S:"https://xiaomi.jobs.f.mioffice.cn/index/",C:"https://xiaomi.jobs.f.mioffice.cn/campus/",I:"https://xiaomi.jobs.f.mioffice.cn/internship/"};
 const domesticObserved:Job[]=xiaomiCompact.map(([kind,native,title,city])=>{
  if(!xiaomiType[kind]||!/^\d{12,22}$/.test(native)||!title||title.length>220||!city||city.length>100)throw Error("Invalid Xiaomi list record");
  return {id:"xiaomi-"+kind+"-"+native,company:"Xiaomi",title,location:city,remote:null,url:xiaomiUrls[kind],platform:"xiaomi-official",source:xiaomiType[kind],domestic:true,recruitmentType:xiaomiType[kind],observedAt:"2026-10-16"};
 });
-if(domesticObserved.length!==1010||new Set(domesticObserved.map(j=>j.id)).size!==1010||domesticObserved.filter(j=>j.recruitmentType==="SOCIAL").length!==350||domesticObserved.filter(j=>j.recruitmentType==="CAMPUS").length!==350||domesticObserved.filter(j=>j.recruitmentType==="INTERNSHIP").length!==310)throw Error("Invalid Xiaomi total or channels");
+if(!publicCiOnly&&(domesticObserved.length!==1010||new Set(domesticObserved.map(j=>j.id)).size!==1010||domesticObserved.filter(j=>j.recruitmentType==="SOCIAL").length!==350||domesticObserved.filter(j=>j.recruitmentType==="CAMPUS").length!==350||domesticObserved.filter(j=>j.recruitmentType==="INTERNSHIP").length!==310))throw Error("Invalid Xiaomi total or channels");
 const meituanCompact:[string,string,string,string,string][]=[["4694862735","AI应用开发工程师","北京、上海","CAMPUS","https://zhaopin.meituan.com/web/position/detail?highlightType=campus&jobShareType=1&jobUnionId=4694862735"],["4691573955","B端AI应用FDE","北京","SOCIAL","https://zhaopin.meituan.com/web/position/detail?highlightType=social&jobUnionId=4691573955"],["4696454382","产品运营岗","多城市","CAMPUS","https://zhaopin.meituan.com/web/position/detail?highlightType=campus&jobShareType=1&jobUnionId=4696454382"],["4701989120","美团联盟行业运营（到店方向）","北京","SOCIAL","https://zhaopin.meituan.com/web/position/detail?highlightType=social&jobUnionId=4701989120"],["4747089400","用户体验改善-服务运营岗","北京","SOCIAL","https://zhaopin.meituan.com/web/position/detail?highlightType=social&jobUnionId=4747089400"],["4360870843","AI产品经理","北京","SOCIAL","https://zhaopin.meituan.com/web/position/detail?highlightType=social&jobUnionId=4360870843"],["4694862636","商品运营岗","北京、广州","CAMPUS","https://zhaopin.meituan.com/web/position/detail?highlightType=campus&jobShareType=1&jobUnionId=4694862636"]];
 const meituanObserved:Job[]=meituanCompact.map(([uid,title,location,recruitmentType,url])=>{
  if(!/^\d{8,20}$/.test(uid)||!title||!location||!["SOCIAL","CAMPUS","INTERNSHIP"].includes(recruitmentType))throw Error("Invalid Meituan record");
