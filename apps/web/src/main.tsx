@@ -1,13 +1,21 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-
-function App() {
-  return (
-    <main style={{ fontFamily: "system-ui", padding: 40 }}>
-      <h1>HHBA · Phase 0</h1>
-      <p>开发环境准备阶段，前端骨架验证通过。</p>
-    </main>
-  );
-}
-
-createRoot(document.getElementById("root")!).render(<App />);
+import { createRoot } from 'react-dom/client';
+import { useEffect, useState } from 'react';
+import './styles.css';
+import { api, ApiError, type User } from './services/api';
+import { useRoute, navigate } from './router';
+import { HomePage } from './pages/HomePage';
+import { CandidateMatchPage } from './pages/CandidateMatchPage';
+import { AuthPage } from './pages/AuthPage';
+import { CandidatePage, ProfilePage, PublicProfilePage, ResumePage, ReviewPage } from './pages/CandidatePages';
+import { EmployerPage } from './pages/EmployerPage';
+import { EmployerWorkspacePage } from './pages/EmployerWorkspacePage';
+import { EmployerPublicJobsPage, EmployerPublicJobDetail } from './pages/EmployerPublicJobsPage';
+import { MyEmployerApplicationsPage } from './pages/MyEmployerApplicationsPage';
+import { EmployerReviewPage } from './pages/EmployerReviewPage';
+import { AdminRecruitmentPage } from './pages/AdminRecruitmentPage';
+import { CandidateJobsPage, CandidateJobDetailPage } from './pages/CandidateJobsPage';
+import { UnifiedJobMarket, UnifiedJobDetail } from './components/UnifiedJobMarket';
+import { CompanyStepPage, DocumentsStepPage, RecruiterWelcomePage, RepresentativeStepPage, SubmitReviewPage } from './pages/recruiter/RecruiterOnboarding';
+import { WorkspacePage } from './pages/WorkspacePage';
+function App(){const route=useRoute();const [user,setUser]=useState<User|null>(null);const [ready,setReady]=useState(false);useEffect(()=>{api.me().then(setUser).catch((e)=>{if(!(e instanceof ApiError&&e.status===401))console.warn('Unable to restore session',e);}).finally(()=>setReady(true));},[]);const logout=async()=>{try{await api.logout();}finally{setUser(null);navigate('/');}};if(!ready)return <main className="app-shell" aria-busy="true"/>;if(route==='/')return <HomePage user={user}/>;if(route==='/auth'||route==='/candidate/login'||route==='/candidate/register')return <AuthPage user={user} onUser={setUser} accountType="candidate" initialMode={route.endsWith('/register')?'register':'login'}/>;if(route==='/recruiter/login'||route==='/recruiter/register'||route==='/recruiter')return <AuthPage user={user} onUser={setUser} accountType="recruiter" initialMode={route.endsWith('/register')?'register':'login'}/>;if(route==='/recruiter/onboarding')return <RecruiterWelcomePage user={user}/>;if(route==='/recruiter/onboarding/company')return <CompanyStepPage user={user}/>;if(route==='/recruiter/onboarding/documents')return <DocumentsStepPage user={user}/>;if(route==='/recruiter/onboarding/representative')return <RepresentativeStepPage user={user}/>;if(route==='/recruiter/onboarding/submit')return <SubmitReviewPage user={user}/>;if(route==='/candidate')return <CandidatePage user={user}/>;if(route==='/candidate/match')return <CandidateMatchPage user={user}/>;if(route==='/candidate/jobs')return <UnifiedJobMarket user={user}/>;if(route==='/candidate/jobs/archive')return <CandidateJobsPage user={user}/>;if(/^\/candidate\/jobs\/[A-Za-z0-9_-]{1,180}$/.test(route)){const id=route.split('/').pop()!;return /^(JOB-|ATS-)/.test(id)?<CandidateJobDetailPage user={user} jobId={id}/>:<UnifiedJobDetail user={user} jobId={id}/>;}if(route.startsWith('/candidate/resume/'))return <ResumePage user={user} resumeId={route.split('/').pop()!}/>;if(route==='/candidate/review')return <ReviewPage user={user}/>;if(route==='/candidate/profile')return <ProfilePage user={user}/>;if(route.startsWith('/public/'))return <PublicProfilePage slug={route.split('/').pop()!}/>;if(route==='/admin/recruitment')return <AdminRecruitmentPage user={user}/>;if(route==='/candidate/employer-jobs')return <EmployerPublicJobsPage user={user}/>;if(route==='/candidate/my-applications')return <MyEmployerApplicationsPage user={user}/>;if(/^\/candidate\/employer-jobs\/[a-fA-F0-9-]{36}$/.test(route))return <EmployerPublicJobDetail user={user} id={route.split('/').pop()!}/>;if(route==='/admin/employer-review')return <EmployerReviewPage user={user}/>;if(route==='/employer/workspace')return <EmployerWorkspacePage user={user}/>;if(route==='/employer')return <EmployerPage user={user}/>;if(route==='/workspace'&&user)return <WorkspacePage user={user} onLogout={logout}/>;navigate('/');return null;}
+createRoot(document.getElementById('root')!).render(<App/>);
