@@ -1303,7 +1303,21 @@ if(durableJobStore){
  try{
   fullJdWorker=createFullJdWorker({
    store:durableJobStore,
-   source:load,
+   // Include the six highlighted jobs from the verified Railway-native index.
+   // They are absent from some of the older catalog's ATS boards.
+   source:async()=>{
+    const catalog=await load();
+    if(!catalog)return null;
+    const rows=new Map<string,Job>(catalog.rows.map((j:Job)=>[j.id,j]));
+    let missing=0;
+    for(const id of BILINGUAL_FEATURED_IDS){
+     const verified=await fromWhiteIndex(id);
+     if(verified)rows.set(id,verified);
+     else missing++;
+    }
+    return {...catalog,rows:[...rows.values()],
+      failures:catalog.failures+(missing?1:0)};
+   },
    readDetail:officialDetail,
    chunkJd:jdChunks,
    translateChunk:async(job:Job,chunk:string)=>{
@@ -1312,14 +1326,15 @@ if(durableJobStore){
     return result.text;
    },
    maxPartsDaily:JD_SYNC_DAILY_CHUNKS,
-   maxPartsPerTick:3,
+   // Complete a short document per background run; existing per-day cap stays.
+   maxPartsPerTick:20,
    logger:(...args:any[])=>console.log(...args)
   });
   // Graceful startup: only one background worker; no unaudited automatic
   // ingestion or JD publishing to static GitHub Pages.
   const timer=setInterval(()=>void fullJdWorker?.tick(),JD_SYNC_INTERVAL_MS);
   timer.unref();
-  setTimeout(()=>void fullJdWorker?.tick(),8_000).unref();
+  setTimeout(()=>void fullJdWorker?.tick(),35_000).unref();
   console.log("HHBA_FULL_JD_SYNC_ENABLED",JSON.stringify({
    privateVolume:true,dailyChunkLimit:JD_SYNC_DAILY_CHUNKS,
    intervalSeconds:JD_SYNC_INTERVAL_MS/1000,platforms:["greenhouse","ashby","lever"]
@@ -1432,7 +1447,7 @@ async function prewarmFeaturedEnglish(){
  }finally{warmupActive=false}
 }
 if(durableJobStore){
- setTimeout(()=>void prewarmFeaturedEnglish(),25_000).unref();
+ setTimeout(()=>void prewarmFeaturedEnglish(),4_000).unref();
  setInterval(()=>void prewarmFeaturedEnglish(),12*3600_000).unref();
 }
 
