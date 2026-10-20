@@ -535,7 +535,26 @@
       "company": "Discord",
       "platform": "greenhouse",
       "source": "discord",
-      "people": [],
+      "people": [
+        {
+          "name": "Jason Citron",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://discord.com/company",
+          "photo": null
+        },
+        {
+          "name": "Stanislav Vishnevskiy",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://discord.com/company",
+          "photo": null
+        }
+      ],
       "workplaces": [
         {
           "file": "444 De Haro Street.jpg",
@@ -567,7 +586,26 @@
       "company": "Airtable",
       "platform": "greenhouse",
       "source": "airtable",
-      "people": [],
+      "people": [
+        {
+          "name": "Howie Liu",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.airtable.com/newsroom/building-your-dream-company-takes-time-howie-liu-as-a-guest-on-the-secret-leaders-podcast",
+          "photo": null
+        },
+        {
+          "name": "Andrew Ofstad",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.airtable.com/newsroom/building-your-dream-company-takes-time-howie-liu-as-a-guest-on-the-secret-leaders-podcast",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
@@ -575,7 +613,26 @@
       "company": "Robinhood",
       "platform": "greenhouse",
       "source": "robinhood",
-      "people": [],
+      "people": [
+        {
+          "name": "Vlad Tenev",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://robinhood.com/us/en/newsroom/a-note-from-our-ceo/",
+          "photo": null
+        },
+        {
+          "name": "Baiju Bhatt",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://robinhood.com/us/en/newsroom/a-note-from-our-ceo/",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
@@ -659,7 +716,17 @@
       "company": "Vercel",
       "platform": "greenhouse",
       "source": "vercel",
-      "people": [],
+      "people": [
+        {
+          "name": "Guillermo Rauch",
+          "role": {
+            "zh": "创始人",
+            "en": "Founder"
+          },
+          "source": "https://vercel.com/blog/series-f",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
@@ -721,7 +788,26 @@
       "company": "Notion",
       "platform": "ashby",
       "source": "notion",
-      "people": [],
+      "people": [
+        {
+          "name": "Ivan Zhao",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.notion.com/blog/first-block-with-ivan-zhao-simon-last",
+          "photo": null
+        },
+        {
+          "name": "Simon Last",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.notion.com/blog/first-block-with-ivan-zhao-simon-last",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
@@ -953,7 +1039,17 @@
       "company": "Anduril",
       "platform": "greenhouse",
       "source": "andurilindustries",
-      "people": [],
+      "people": [
+        {
+          "name": "Palmer Luckey",
+          "role": {
+            "zh": "创始人",
+            "en": "Founder"
+          },
+          "source": "https://www.anduril.com/news/anduril-expands-to-republic-of-korea",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
@@ -961,7 +1057,53 @@
       "company": "Airwallex",
       "platform": "ashby",
       "source": "airwallex",
-      "people": [],
+      "people": [
+        {
+          "name": "Jack Zhang",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.airwallex.com/en-hk/manifesto-and-values",
+          "photo": null
+        },
+        {
+          "name": "Max Li",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.airwallex.com/en-hk/manifesto-and-values",
+          "photo": null
+        },
+        {
+          "name": "Xijing Dai",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.airwallex.com/en-hk/manifesto-and-values",
+          "photo": null
+        },
+        {
+          "name": "Lucy Liu",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.airwallex.com/en-hk/manifesto-and-values",
+          "photo": null
+        },
+        {
+          "name": "Ki-Lok Wong",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.airwallex.com/en-hk/manifesto-and-values",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
@@ -1004,7 +1146,53 @@
       "company": "Form Energy",
       "platform": "ashby",
       "source": "formenergy",
-      "people": [],
+      "people": [
+        {
+          "name": "Mateo Jaramillo",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://formenergy.com/about/",
+          "photo": null
+        },
+        {
+          "name": "Ted Wiley",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://formenergy.com/about/",
+          "photo": null
+        },
+        {
+          "name": "Billy Woodford",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://formenergy.com/about/",
+          "photo": null
+        },
+        {
+          "name": "Yet-Ming Chiang",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://formenergy.com/about/",
+          "photo": null
+        },
+        {
+          "name": "Marco Ferrara",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://formenergy.com/about/",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
@@ -1135,7 +1323,17 @@
       "company": "Vanta",
       "platform": "ashby",
       "source": "vanta",
-      "people": [],
+      "people": [
+        {
+          "name": "Christina Cacioppo",
+          "role": {
+            "zh": "创始人",
+            "en": "Founder"
+          },
+          "source": "https://www.vanta.com/company/about",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
