@@ -67,7 +67,7 @@ test('cached original and complete Chinese are source-bound, no partial translat
  assert.ok(detail.includes('setChineseJd(prepared.chinese'));
  assert.ok(detail.includes('setTranslationPrepared(prepared.ready)'));
  assert.ok(detail.includes('fetchOfficialJd(job,controller.signal)'));
- assert.ok(detail.includes('中文完整译文正在后台准备'));
+ assert.ok(detail.includes('完整中文译文'));
  assert.ok(!detail.includes('翻译进度'));
  assert.ok(reader.includes('/ready-jd'));
  assert.ok(reader.includes('if(sourceHash!==data.sourceHash)'));
