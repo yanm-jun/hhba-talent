@@ -1,0 +1,49 @@
+name: HHBA White JD live API acceptance
+on:
+  push:
+    paths:
+      - ".github/workflows/hhba-white-jd-live-smoke.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-jd:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check Pages-to-Railway official JD on real Airbnb roles
+        run: |
+          node --input-type=module <<'NODE'
+          const origin='https://yanm-jun.github.io';
+          const site=origin+'/hhba-talent/';
+          const service='https://hhba-web-production-024c.up.railway.app';
+          const current=await fetch(site+'data/jobs.json',{signal:AbortSignal.timeout(20000)}).then(r=>{if(!r.ok)throw Error('snapshot '+r.status);return r.json()});
+          const candidates=current.jobs.filter(x=>x.company==='Airbnb'&&x.platform==='greenhouse'&&x.id.startsWith('greenhouse-airbnb-')).slice(0,8);
+          if(!candidates.length)throw Error('NO_AIRBNB_CANDIDATE_IN_WHITE_SNAPSHOT');
+          const checks=[];
+          for(const job of candidates) {
+           let row={id:job.id,status:0,good:false};
+           try{
+            const response=await fetch(service+'/api/jobs/'+encodeURIComponent(job.id),{
+              headers:{Origin:origin,Accept:'application/json'},redirect:'error',signal:AbortSignal.timeout(20000)
+            });
+            row.status=response.status;
+            row.cors=response.headers.get('access-control-allow-origin');
+            if(response.ok){
+             const data=await response.json();
+             row.good=data.job?.id===job.id&&data.status==='LIVE_CONTENT'&&
+               data.job?.url===job.url&&typeof data.description==='string'&&data.description.length>80;
+             row.length=data.description?.length||0;
+            }
+           }catch(e){row.error=e?.message||String(e)}
+           checks.push(row);
+           if(row.good)break;
+          }
+          console.log('HHBA_WHITE_AIRBNB_JD_SMOKE',JSON.stringify(checks));
+          if(!checks.some(x=>x.good&&x.cors===origin))throw Error('WHITE_JOB_DETAILS_NOT_READABLE_FROM_API');
+          const unknown=await fetch(service+'/api/jobs/greenhouse-fakecompany-9999999999',{headers:{Origin:origin},signal:AbortSignal.timeout(20000)});
+          if(unknown.status!==404)throw Error('UNVERIFIED_JOB_WAS_ACCEPTED_'+unknown.status);
+          console.log('HHBA_WHITE_JD_API_ACCEPTED');
+          NODE
