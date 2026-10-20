@@ -37,6 +37,9 @@ jobs:
           assert.equal(summary.noForegroundTranslation,true);
           assert.equal(summary.featured.length,6);
           const ids=new Set(summary.featured.map(x=>x.id));assert.equal(ids.size,6);
+          console.log('HHBA_READY_STATUS',JSON.stringify(summary.featured.map(x=>({
+            id:x.id,english:x.englishReady,ready:x.chineseReady,done:x.done,total:x.total,state:x.state
+          }))));
           const list=[];
           for(const {id} of summary.featured){
             const before=Date.now(),r=await get('/api/jobs/'+id+'/ready-jd');
