@@ -5,6 +5,7 @@ import { Link } from '../router';
 import { approvedEmployerJobIds, companyDirectoryFromSnapshot,
  type EmployerDirectoryRecord } from '../services/companyDirectory';
 import { loadOfficialPublicSnapshot } from '../services/liveRecruitment';
+import { reviewedEditorialForEmployer } from '../services/reviewedCompanyEditorial';
 import { loadPublicJobAudit } from '../services/jobSyncStatus';
 import type { User } from '../services/api';
 import '../styles/company-profiles.css';
@@ -71,7 +72,7 @@ export function CompanyDirectoryPage({user}:{user:User|null}){
        <span className="company-directory-card-text">
         <strong>{item.identity.company}</strong>
         <small>{item.identity.platform} · {item.jobCount} 条已核验招聘记录</small>
-        <em>{reviewedLegacySlug(item)?'已审核的企业介绍与岗位':'企业介绍待完善 · 查看岗位'}</em>
+        <em>{reviewedLegacySlug(item)||reviewedEditorialForEmployer(item.identity)?'已审核的企业介绍与岗位':'企业介绍待完善 · 查看岗位'}</em>
        </span><ArrowRight size={17}/>
      </Link>)}
     </div>
