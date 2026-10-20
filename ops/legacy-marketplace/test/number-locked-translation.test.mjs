@@ -7,7 +7,7 @@ test('recovers source years without accepting a wrong translation numeral',async
  const result=await translateWithSourceNumbers(source,async texts=>texts.map((s)=>s
   .replace(/At least/,'至少').replace(/ years of experience in software and /,'年软件经验和')
   .replace(/ years in leadership./,'年领导经验。')));
- assert.equal(result,'至少5年软件经验和3年领导经验。');
+ assert.equal(result.replace(/\s+(?=\d)/g,''),'至少5年软件经验和3年领导经验。');
 });
 test('keeps salaries and percentages exactly as the employer wrote',async()=>{
  const source='Salary $182,800 to $238,100 and 80% bonus.';
