@@ -294,6 +294,7 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  const sections=jd ? ['responsibilities','requirements','benefits','other'].map(kind=>({
    kind,blocks:jd.blocks.filter(item=>item.section===kind)
  })).filter(group=>group.blocks.length>0):[];
+ const returnTarget=getJobReturnTarget();
  return <Shell user={user}><div className="unified-detail">
    <div className="unified-market-heading"><Link to={returnTarget.to} restoreScrollY={returnTarget.scrollY} restoreMarketState={returnTarget.marketState}>
         ← {lang==='zh'?'返回上一页':'Back to previous page'}</Link>
