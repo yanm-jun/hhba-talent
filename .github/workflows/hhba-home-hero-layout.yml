@@ -1,0 +1,38 @@
+name: HHBA home hero layout acceptance
+on:
+  push:
+    branches: [fix/home-hero-spacing-type-20261020]
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/hhba-home-hero-layout.yml'
+  pull_request:
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/hhba-home-hero-layout.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  home-layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Check exact screenshot-inspired layout and preserved candidate / employer entry
+        working-directory: apps/web
+        run: node --test scripts/home-hero-layout.contract.test.mjs
+      - name: Build unchanged Railway white UI with updated CSS
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '0'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+          test -s dist/index.html
