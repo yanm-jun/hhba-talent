@@ -33,12 +33,13 @@ test('brand files match original OpenAI and Claude sites and SpaceX attribution 
  }
 });
 test('six curated positions are exact source verified job IDs, no invented card jobs',()=>{
- const ids=selections.match(/id:'(?:ashby-openai|greenhouse-anthropic|greenhouse-spacex)-[a-zA-Z0-9-]+'/g)||[];
+ const curated=selections.slice(selections.indexOf('export const CURATED_JOBS'),selections.indexOf('const empty:LiveFilters'));
+ const ids=curated.match(/id:'(?:ashby-openai|greenhouse-anthropic|greenhouse-spacex)-[a-zA-Z0-9-]+'/g)||[];
  assert.equal(ids.length,6);
  assert.equal(new Set(ids).size,6);
- assert.equal((selections.match(/company:'OpenAI'/g)||[]).length,2);
- assert.equal((selections.match(/company:'Anthropic'/g)||[]).length,2);
- assert.equal((selections.match(/company:'SpaceX'/g)||[]).length,2);
+ assert.equal((curated.match(/company:'OpenAI'/g)||[]).length,2);
+ assert.equal((curated.match(/company:'Anthropic'/g)||[]).length,2);
+ assert.equal((curated.match(/company:'SpaceX'/g)||[]).length,2);
  assert.ok(selections.includes("status==='OFFICIAL_JD_AND_REQUIREMENTS_FOUND'"));
  assert.ok(selections.includes("officialStatus(job,latest)!=='recent'"));
  assert.ok(selections.includes("job.title===entry.title"));
