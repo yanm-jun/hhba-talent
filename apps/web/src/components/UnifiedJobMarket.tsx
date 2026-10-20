@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, ExternalLink, MapPin, RefreshCcw, Search, ShieldCheck } from 'lucide-react';
-import { Link } from '../router';
+import { Link, getJobReturnTarget, navigate } from '../router';
 import { Shell } from './Shell';
 import { EmployerBrandLogo } from './EmployerBrandLogo';
 import { featuredTitle, featuredLocation, isDefaultMarketFilters, loadVerifiedFeaturedJobs } from '../services/featuredOfficialJobs';
@@ -12,6 +12,13 @@ import { loadPublicJobAudit, auditForJob, describeAudit, type JobAuditEntry } fr
 import {countryOptions,cityOptions,parseNaturalQuery} from '../services/jobSearchFacets.mjs';
 import '../styles/unified-jobs.css';
 
+type PersistedMarketState={scope:'home'|'jobs';filters:Record<string,unknown>;draft:string;page:number};
+function readMarketState(compact:boolean):PersistedMarketState|null{
+ const state=history.state?.hhbaMarketState as PersistedMarketState|undefined;
+ if(!state||state.scope!==(compact?'home':'jobs')||!state.filters||typeof state.filters!=='object')return null;
+ if(typeof state.draft!=='string'||state.draft.length>100||!Number.isSafeInteger(state.page)||state.page<0)return null;
+ return state;
+}
 const emptyFilters: LiveFilters={q:'',company:'',country:'',remote:false,recruitment_type:'',location_country:'',city:'',education:'',experience:''};
 function initialJobQuery(){
   try{return new URLSearchParams(location.search).get('q')?.trim().slice(0,100)||'';}
@@ -49,9 +56,9 @@ function LanguageSwitcher({lang,change}:{lang:Language,change:(value:Language)=>
 }
 export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,user?:User|null}){
   const {lang,change}=useLanguage();
-  const [filters,setFilters]=useState<LiveFilters>(()=>({...emptyFilters,q:initialJobQuery()}));
-  const [draft,setDraft]=useState(initialJobQuery);
-  const [page,setPage]=useState(0);
+  const [filters,setFilters]=useState<LiveFilters>(()=>({...emptyFilters,...readMarketState(compact)?.filters,q:readMarketState(compact)?.draft??initialJobQuery()}));
+  const [draft,setDraft]=useState(()=>readMarketState(compact)?.draft??initialJobQuery());
+  const [page,setPage]=useState(()=>readMarketState(compact)?.page??0);
   const [snapshot,setSnapshot]=useState<LivePage|null>(null);
   const [error,setError]=useState('');
   const [loading,setLoading]=useState(true);
@@ -67,6 +74,11 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       .finally(()=>{if(!controller.signal.aborted)setLoading(false)});
     return()=>controller.abort();
   },[filters,page,retry]);
+  useEffect(()=>{
+    const state={scope:compact?'home' as const:'jobs' as const,filters,draft,page};
+    const previous=history.state&&typeof history.state==='object'?history.state:{};
+    history.replaceState({...previous,hhbaMarketState:state},'');
+  },[compact,filters,draft,page]);
   const defaultView=isDefaultMarketFilters(filters,page);
   useEffect(()=>{
     if(!defaultView){setFeatured(null);setFeaturedError('');return;}
@@ -282,8 +294,10 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  const sections=jd ? ['responsibilities','requirements','benefits','other'].map(kind=>({
    kind,blocks:jd.blocks.filter(item=>item.section===kind)
  })).filter(group=>group.blocks.length>0):[];
+ const returnTarget=getJobReturnTarget();
  return <Shell user={user}><div className="unified-detail">
-   <div className="unified-market-heading"><Link to="/candidate/jobs">← {lang==='zh'?'返回招聘市场':'Back to jobs'}</Link>
+   <div className="unified-market-heading"><Link to={returnTarget.to} restoreScrollY={returnTarget.scrollY} restoreMarketState={returnTarget.marketState}>
+        ← {lang==='zh'?'返回上一页':'Back to previous page'}</Link>
      <LanguageSwitcher lang={lang} change={change}/></div>
    {error?<p className="unified-job-state" role="alert">{lang==='zh'?error:'Job details unavailable.'}</p>:!job?<p className="unified-job-state">
      {lang==='zh'?'正在读取官方岗位信息…':'Loading official job details…'}</p>:
