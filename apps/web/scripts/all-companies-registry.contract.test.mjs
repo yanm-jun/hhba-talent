@@ -87,3 +87,23 @@ test('offline review queue produces evidence-only records and never overwrites o
    'export must never overwrite existing review results');
  }finally{rmSync(folder,{recursive:true,force:true})}
 });
+
+test('new reviewed employer entries have exact source ID and multiple attributable references',()=>{
+ const ids=new Set();
+ for(const entry of profiles.profiles){
+  assert.equal(entry.status,'VERIFIED');
+  assert.equal(entry.id,Buffer.from(JSON.stringify([
+   entry.identity.platform,entry.identity.source,entry.identity.company
+  ]),'utf8').toString('base64url'));
+  assert.equal(entry.name,entry.identity.company);
+  assert.ok(!ids.has(entry.id));ids.add(entry.id);
+  assert.match(entry.lastReviewed,/^\\d{4}-\\d{2}-\\d{2}$/);
+  assert.ok(entry.overview.length>=2&&entry.focus.length>=1);
+  assert.ok(entry.sources.length>=2);
+  assert.ok(entry.sources.every(s=>{
+   try{return new URL(s.url).protocol==='https:'}catch{return false}
+  }));
+ }
+ assert.ok(profiles.profiles.some(x=>x.name==='Anduril'),
+  'Anduril pilot biography should prove that publishing reviewed JSON works');
+});
