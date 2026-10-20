@@ -41,7 +41,7 @@ test('six curated positions are exact source verified job IDs, no invented card 
  assert.equal((curated.match(/company:'Anthropic'/g)||[]).length,2);
  assert.equal((curated.match(/company:'SpaceX'/g)||[]).length,2);
  assert.ok(selections.includes("status==='OFFICIAL_JD_AND_REQUIREMENTS_FOUND'"));
- assert.ok(selections.includes("officialStatus(job,latest)!=='recent'"));
+ assert.ok(selections.includes("officialStatus(job,snapshot.updated)!=='recent'"));
  assert.ok(selections.includes("job.title===entry.title"));
  assert.ok(selections.includes('!!safeOfficialJobUrl(job)'));
 });
