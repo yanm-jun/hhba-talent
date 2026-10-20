@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, ArrowRight, Building2, ExternalLink, MapPin, RefreshCcw, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ExternalLink, MapPin, RefreshCcw, ShieldCheck } from 'lucide-react';
+import { EmployerBrandLogo } from '../components/EmployerBrandLogo';
 import { Link, getCompanyReturnTarget } from '../router';
 import { Shell } from '../components/Shell';
 import { decodeEmployerIdentity, discoverEmployerJobs,
@@ -80,9 +81,7 @@ export function IndexedCompanyPage({encodedId,user}:{encodedId:string;user:User|
    </div>
   </nav>
   <header className="company-profile-header">
-   <div className="company-profile-brand" title={lang==='zh'?'未获取已核实的品牌 Logo':'No verified brand logo'}>
-    <Building2 size={32} aria-label={lang==='zh'?'通用企业图标':'Generic company icon'}/>
-   </div>
+   <EmployerBrandLogo identity={identity} variant="profile"/>
    <div className="company-profile-identity">
     <div className="company-profile-eyebrow">HHBA · COMPANY PROFILE</div>
     <h1>{status==='ready'?identity.company:(lang==='zh'?'正在核验企业身份…':'Verifying employer identity…')}</h1>
