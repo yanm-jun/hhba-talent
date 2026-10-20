@@ -1,0 +1,37 @@
+name: HHBA Fast Featured Market Performance Gate
+on:
+  push:
+    branches: [fix/featured-jobs-fast-loading-20261020]
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/hhba-fast-featured-market.yml'
+  pull_request:
+    paths:
+      - 'apps/web/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  optimized-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22',cache: 'npm',cache-dependency-path: 'apps/web/package-lock.json'}
+      - name: Install locked website dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify no wasted unfiltered facets + official JD constraints
+        working-directory: apps/web
+        run: |
+          node --test scripts/featured-fastload.contract.test.mjs
+          node --test scripts/featured-brand-jobs.contract.test.mjs
+          node --test scripts/white-market-detail.contract.test.mjs
+      - name: Exact Railway white-site build
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '0'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+        run: npm run build
