@@ -130,6 +130,12 @@ async function previewSnapshot(signal:AbortSignal):Promise<LivePage> {
   if(signal.aborted)throw new DOMException('Aborted','AbortError');
   return cachedSnapshot;
 }
+// Reuse the ONE already source-validated public snapshot shared by the market.
+// Never refetch and rescan the 15k+ jobs once per featured company.
+export function loadOfficialPublicSnapshot(signal:AbortSignal):Promise<LivePage>{
+ if(!PAGES_PREVIEW)return Promise.reject(new Error('经验证的岗位快照暂不可用'));
+ return previewSnapshot(signal);
+}
 function searchPreview(data:LivePage,filters:LiveFilters,offset:number,facets:Map<string,SearchFacet>):LivePage{
   const matches=searchJobs(data.jobs,filters,facets);
   return {...data,jobs:matches.rows.slice(offset,offset+30),total:matches.counted,offset,limit:30};
@@ -137,10 +143,21 @@ function searchPreview(data:LivePage,filters:LiveFilters,offset:number,facets:Ma
 export async function listJobs(filters: LiveFilters, offset: number, signal: AbortSignal) {
   if(PAGES_PREVIEW) {
     const snapshot=await previewSnapshot(signal);
-    const [audit,index]=await Promise.all([loadPublicJobAudit(),loadOfficialSearchFacets()]);
+    // The unfiltered first paint does not use JD-derived education, skills or
+    // experience filters. Loading the 14k-row facets file on every initial
+    // visit needlessly blocks the home page and the six curated employers.
+    // Keep the official audit gate; load the expensive facets only when search
+    // and/or user-selected filters actually need them.
+    const unfiltered=!filters.q.trim()&&!filters.company.trim()&&!filters.country&&
+      !filters.remote&&!filters.recruitment_type&&!filters.location_country&&
+      !filters.city&&!filters.education&&!filters.experience;
+    const [audit,index]=await Promise.all([
+      loadPublicJobAudit(),
+      unfiltered?Promise.resolve(null):loadOfficialSearchFacets()
+    ]);
     if(!audit || audit.summary.indexed_as_of!==snapshot.updated)
       throw new Error('官方岗位核验结果尚未与列表同步，暂不显示旧数据');
-    if(index.indexed_as_of!==snapshot.updated)
+    if(index&&index.indexed_as_of!==snapshot.updated)
       throw new Error('中英文岗位条件索引尚未与官网同步，暂不使用过期筛选信息');
     const excluded=new Set(audit.jobs.filter(entry=>[
       'MISSING_FROM_OFFICIAL_BOARD','OFFICIAL_URL_CHANGED',
@@ -149,7 +166,10 @@ export async function listJobs(filters: LiveFilters, offset: number, signal: Abo
     ].includes(entry.status)).map(entry=>entry.job_id));
     const current={...snapshot,jobs:snapshot.jobs.filter(job=>!excluded.has(job.id)),
       total:snapshot.jobs.length-excluded.size};
-    return searchPreview(current,filters,offset,index.facets);
+    // No facet projection is needed to browse the audited, complete index.
+    if(unfiltered)return {...current,jobs:current.jobs.slice(offset,offset+30),
+      offset,limit:30};
+    return searchPreview(current,filters,offset,index!.facets);
   }
   const p = new URLSearchParams({ limit:'30',offset:String(offset) });
   if (filters.q.trim()) p.set('q', filters.q.trim().slice(0,100));

@@ -72,18 +72,28 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
     if(!defaultView){setFeatured(null);setFeaturedError('');return;}
     const controller=new AbortController();
     setFeatured(null);setFeaturedError('');
+    // Verification must never leave the job market stuck on a spinner.
+    // The normal audited market remains available if the curated set is slow.
+    const guard=setTimeout(()=>{
+      if(!controller.signal.aborted){
+        controller.abort();
+        setFeaturedError('精选岗位核验超时，已切换至其他近期核验职位');
+      }
+    },6500);
     loadVerifiedFeaturedJobs(controller.signal)
       .then(verified=>{if(!controller.signal.aborted)setFeatured(verified)})
       .catch(e=>{if(!controller.signal.aborted)setFeaturedError(
-        e instanceof Error?e.message:'精选企业岗位暂时不可用')});
-    return ()=>controller.abort();
+        e instanceof Error?e.message:'精选企业岗位暂时不可用')})
+      .finally(()=>clearTimeout(guard));
+    return ()=>{clearTimeout(guard);controller.abort()};
   },[defaultView,retry]);
   const eligible=useMemo(()=>snapshot?.jobs.filter(j=>officialStatus(j,snapshot.updated)==='recent')||[],[snapshot]);
   // Only the UNFILTERED first page gets six highlighted jobs. Search,
   // company/city filtering and all other pages retain their normal results.
   const curatedIds=new Set(featured?.map(j=>j.id)||[]);
   const shown=defaultView
-    ?(featured ? (compact?featured:[...featured,...eligible.filter(j=>!curatedIds.has(j.id)).slice(0,24)]):[])
+    ?(featured ? (compact?featured:[...featured,...eligible.filter(j=>!curatedIds.has(j.id)).slice(0,24)])
+      : featuredError ? (compact?eligible.slice(0,8):eligible) : [])
     :(compact?eligible.slice(0,8):eligible);
   const featuredPending=defaultView && !featured && !featuredError;
   const interpreted=useMemo(()=>parseNaturalQuery(filters.q),[filters.q]);
@@ -176,13 +186,17 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
     {(loading||featuredPending)?<p className="unified-job-state" role="status">{lang==='zh'
       ?(featuredPending?'正在核验六个精选企业岗位…':'正在读取真实岗位…')
       :(featuredPending?'Verifying six highlighted official jobs…':'Loading jobs…')}</p>:
-      defaultView&&featuredError?<div className="unified-job-state" role="alert">
-        {lang==='zh'?'精选岗位暂时未全部通过官方核验，请稍后重试或使用搜索筛选其他真实岗位。':'Featured jobs could not all be verified. Search other official jobs instead.'}
-        <button type="button" onClick={()=>setRetry(x=>x+1)}><RefreshCcw size={15}/>{lang==='zh'?'重新核验':'Retry verification'}</button>
-      </div>:
       error?<div className="unified-job-state" role="alert">{lang==='zh'?error:'Jobs temporarily unavailable. Please retry.'}<button type="button" onClick={()=>setRetry(x=>x+1)}><RefreshCcw size={15}/> {lang==='zh'?'重试':'Retry'}</button></div>:
       shown.length?<div className="unified-job-grid">{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated}/>)}</div>:
         <div className="unified-job-state">{lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
+    {!loading&&defaultView&&featuredError&&
+      <div className="unified-featured-fallback" role="status">
+        <span>{lang==='zh'?'六个精选岗位未能及时完成最新核验，当前显示其他近期核验的真实职位。':
+          'Featured verification is delayed; showing other recently audited jobs.'}</span>
+        <button type="button" onClick={()=>setRetry(x=>x+1)}>
+          <RefreshCcw size={14}/>{lang==='zh'?'重试精选':'Retry featured'}
+        </button>
+      </div>}
     <div className="unified-job-footer">
       <span>{lang==='zh'? `共匹配 ${snapshot?.total.toLocaleString()||0} 条 · 本页 ${eligible.length} 条 · 来源更新时间：${formatDate(snapshot?.updated)}`
         : `${snapshot?.total.toLocaleString()||0} matching jobs · ${eligible.length} on this page · Updated ${formatDate(snapshot?.updated)}`}</span>
