@@ -5,7 +5,7 @@ import { Shell } from './Shell';
 import type { User } from '../services/api';
 import { getJob, listJobs, localizedCompany, localizedLocation, localizedTitle, officialStatus, safeOfficialJobUrl,
   type Language, type LiveFilters, type LiveJob, type LivePage } from '../services/liveRecruitment';
-import { fetchOfficialJd, greenDetailLink, translateGreenJd, type OfficialJd } from '../services/officialJd';
+import { fetchOfficialJd, translateGreenJd, type OfficialJd } from '../services/officialJd';
 import { loadPublicJobAudit, loadOverseasJdProgress, auditForJob, describeAudit, type OverseasJdProgress, type JobAuditEntry, type JobAuditSummary } from '../services/jobSyncStatus';
 import {countryOptions,cityOptions,parseNaturalQuery} from '../services/jobSearchFacets.mjs';
 import '../styles/unified-jobs.css';
@@ -34,8 +34,7 @@ function JobCard({job,lang,asOf}:{job:LiveJob,lang:Language,asOf:string}){
       ? '近期来源记录，是否仍可申请请以企业官网为准'
       : 'Recently observed; confirm current availability on the official site'}</p>
     <div className="unified-job-actions"><Link to={'/candidate/jobs/'+encodeURIComponent(job.id)}>
-      {lang==='zh'?'查看岗位':'View role'} <ArrowRight size={14}/></Link>
-      <a href={source} target="_blank" rel="noopener noreferrer">{lang==='zh'?'企业官方页':'Official posting'} <ExternalLink size={13}/></a></div>
+      {lang==='zh'?'查看岗位':'View role'} <ArrowRight size={14}/></Link></div>
   </article>;
 }
 function LanguageSwitcher({lang,change}:{lang:Language,change:(value:Language)=>void}){
@@ -202,6 +201,7 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  const [jd,setJd]=useState<OfficialJd|null>(null);
  const [jdError,setJdError]=useState('');
  const [jdLoading,setJdLoading]=useState(false);
+ const [jdRetry,setJdRetry]=useState(0);
  const [chineseJd,setChineseJd]=useState('');
  const [translateBusy,setTranslateBusy]=useState(false);
  const [translateError,setTranslateError]=useState('');
@@ -230,14 +230,14 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  useEffect(()=>{
    if(!job)return;
    const controller=new AbortController();
-   setJd(null);setJdError('');setJdLoading(true);
+   setJd(null);setChineseJd('');setTranslateError('');setJdError('');setJdLoading(true);
    fetchOfficialJd(job,controller.signal).then(result=>{
      if(!controller.signal.aborted)setJd(result);
    }).catch(e=>{
      if(!controller.signal.aborted)setJdError(e instanceof Error?e.message:'职位原文暂不可用');
    }).finally(()=>{if(!controller.signal.aborted)setJdLoading(false)});
    return()=>controller.abort();
- },[job]);
+ },[job,jdRetry]);
  useEffect(()=>{
    if(lang!=='zh'||!job||!jd?.originalText)return;
    const controller=new AbortController();
@@ -250,7 +250,6 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
    return()=>controller.abort();
  },[lang,job,jd]);
  const official=job?safeOfficialJobUrl(job):null;
- const translatedReader=job?greenDetailLink(job):null;
  const segmentName:Record<string,{zh:string,en:string}>={
    responsibilities:{zh:'岗位职责',en:'Responsibilities'},
    requirements:{zh:'任职资格与技术要求',en:'Requirements and skills'},
@@ -278,9 +277,11 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
      <h2>{lang==='zh'?'职位说明与任职要求':'Description and job requirements'}</h2>
      {jdLoading?<p role="status">{lang==='zh'?'正在读取官方岗位职责及任职要求…':'Fetching current employer requirements…'}</p>:
        jdError?<div className="unified-jd-empty" role="status">
-         <p>{lang==='zh'?'当前无法在本页面获取完整官方 JD，原有绿色市场的详情阅读仍可使用。':
-           'The full JD could not be retrieved in this browser. The original recruitment detail reader remains available.'}</p>
-         <small>{lang==='zh'?'数据读取受限制时，不会编造职责或任职要求。':'Requirements are not fabricated when source data is unavailable.'}</small>
+         <p>{lang==='zh'?'该岗位的完整官方职位说明暂未获取成功。':'The full official description for this role is temporarily unavailable.'}</p>
+         <small>{lang==='zh'?jdError:'The employer source could not be verified; requirements will not be invented.'}</small>
+         <button type="button" className="unified-jd-retry" onClick={()=>setJdRetry(n=>n+1)}>
+           <RefreshCcw size={14}/>{lang==='zh'?'重新获取岗位职责与任职要求':'Retry official job description'}
+         </button>
        </div>:
        jd?<div className="unified-jd-content">
          <p className="unified-jd-source">{lang==='zh'?'官方内容核验时间：':'Official content checked: '}
@@ -305,8 +306,8 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
          </section>:<div className="unified-jd-translate">
            <strong>{translateBusy?'正在生成完整中文岗位说明':'已获取完整的企业官方岗位说明'}</strong>
            <p>{translateBusy?(translationProgress||'正在逐段翻译岗位职责、任职要求及技能条件。'):
-             translateError ? '中文译文暂时无法生成，请稍后重试，或使用原招聘市场的中文辅助阅读功能。':
-             '完整中文翻译需要原招聘市场的翻译服务支持。可以切换 English 阅读最新官方原文。'}</p>
+             translateError ? '中文译文暂时不可用，请在本页面重试；完整英文原文可使用 English 查看。':
+             '尚未取得通过校验的中文译文；请切换 English 阅读本页的官方原文。'}</p>
            {!translateBusy&&translateError&&
              <button type="button" className="unified-jd-retry" onClick={()=>{
                setTranslateError('');setTranslateBusy(true);
@@ -319,13 +320,11 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
          </div>}
        </div>:null}
      <div className="unified-job-actions unified-detail-actions">
-       {translatedReader&&!job.domestic&&<a href={translatedReader} target="_blank" rel="noopener noreferrer">
-         {lang==='zh'?'查看原市场完整 JD / 中文辅助阅读':'Original full JD / Chinese reading'} <ExternalLink size={15}/></a>}
-       {official&&<a href={official} target="_blank" rel="noopener noreferrer">
-         {lang==='zh'?'打开企业官方岗位':'View official job posting'} <ExternalLink size={15}/></a>}
+       {official&&<a href={official} target="_blank" rel="noopener noreferrer" aria-label={lang==='zh'?'前往企业官网立即申请':'Apply on official employer website'}>
+         {lang==='zh'?'立即申请':'Apply now'} <ExternalLink size={15}/></a>}
      </div>
      <p className="unified-detail-footnote">{lang==='zh'?
-       '职位正文仅在浏览时尝试读取企业官方公开接口，不编造岗位要求；原始投递链接保留。':
+       '岗位职责与任职要求直接在 HHBA 白色详情页展示；尚未读取成功的内容不会被编造。申请请以企业官网为准。':
        'Original job requirements are retrieved on demand from public employer endpoints. Job availability may change.'}</p>
    </article>}
  </div></Shell>;
