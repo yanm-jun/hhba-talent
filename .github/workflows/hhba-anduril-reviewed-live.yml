@@ -1,0 +1,52 @@
+name: HHBA Source Reviewed Anduril Editorial Live
+on:
+  push:
+    branches: [test/anduril-editorial-live-20261020]
+    paths: ['.github/workflows/hhba-anduril-reviewed-live.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Isolated browser dependencies
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.0
+          npx playwright install --with-deps chromium
+      - name: Verify Anduril reviewed description and actual Greenhouse jobs
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {chromium} from 'playwright';
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          const url='https://hhba-web-production-024c.up.railway.app/companies/id/WyJncmVlbmhvdXNlIiwiYW5kdXJpbGluZHVzdHJpZXMiLCJBbmR1cmlsIl0';
+          const page=await browser.newPage({viewport:{width:1440,height:900}});
+          try{
+            let response;
+            for(let k=0;k<4;k++){
+              response=await page.goto(url,{waitUntil:'domcontentloaded',timeout:40000});
+              if(response?.status()===200)break;
+              await new Promise(r=>setTimeout(r,3000));
+            }
+            assert.equal(response?.status(),200);
+            await page.locator('.company-profile-identity h1').waitFor({timeout:30000});
+            assert.equal(await page.locator('.company-profile-identity h1').textContent(),'Anduril');
+            await page.locator('.company-profile-job-card').first().waitFor({timeout:35000});
+            assert.ok((await page.locator('.company-profile-section').first().textContent()).includes('2017'));
+            assert.ok(await page.locator('.company-profile-focus').count()>=3,'verified products not published');
+            assert.ok(await page.locator('.company-profile-sources>a').count()>=4,'official sources missing');
+            assert.equal(await page.locator('.company-profile-pending').count(),0,'stale unreviewed placeholder still shown');
+            assert.equal(await page.locator('.company-profile-brand img').count(),0,'invented Anduril logo appeared');
+            const status=await page.locator('.company-profile-meta').textContent();
+            assert.ok(status.includes('已审核'),'reviewed status not displayed');
+            console.log('HHBA_ANDURIL_REVIEWED_LIVE_ACCEPTED',JSON.stringify({url,company:'Anduril',
+              sources:await page.locator('.company-profile-sources>a').count(),
+              products:await page.locator('.company-profile-focus').count(),
+              jobCards:await page.locator('.company-profile-job-card').count(),
+              reviewed:true}));
+          }finally{await browser.close()}
+          NODE
