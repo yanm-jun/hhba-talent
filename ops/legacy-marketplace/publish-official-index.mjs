@@ -1,7 +1,7 @@
 // Atomic, public-only official recruitment index publication for Railway.
 // Used after the existing ATS importer and evidence auditor have successfully
 // generated one MATCHING four-file evidence set. No resumes, raw JD or PII.
-import {createHash} from "node:crypto";
+import {createHash,randomBytes} from "node:crypto";
 import {readFile,writeFile,mkdir,rename,rm,stat} from "node:fs/promises";
 import {join,resolve} from "node:path";
 const names=["jobs.json","job-sync-status.json","job-sync-summary.json","job-search-facets.json"];
@@ -39,30 +39,54 @@ export async function publishIndex(sourceDir,destination,{minJobs=10000}={}){
     Object.keys(job).some(key=>!allowedJobFields.has(key)))throw Error("JOB_METADATA_ONLY_POLICY");
   jobIds.add(job.id);
  }
- const docs={jobs:jobs.total,facets:facets.jobs.length,updated:jobs.updated};
- const version=hash(contents.get("jobs.json")).slice(0,24);
+ if(!Array.isArray(facets.jobs)||facets.jobs.some(row=>
+   !jobIds.has(row?.id) || typeof row?.original_source_hash!=="string" ||
+   !/^[0-9a-f]{64}$/.test(row.original_source_hash)))
+   throw Error("FACETS_EVIDENCE_MISSING");
+ const facetIds=new Set(facets.jobs.map(x=>x.id));
+ if(facetIds.size!==facets.jobs.length)throw Error("DUPLICATE_FACETS");
+ const audited=new Set(audit.jobs.map(row=>row?.job_id));
+ if(audited.size!==jobs.total||audit.jobs.some(row=>!jobIds.has(row?.job_id)))
+   throw Error("AUDIT_DUPLICATE_OR_MISSING_JOBS");
+ const docHashes={};
+ for(const name of names)docHashes[name]=hash(contents.get(name));
+ // A new verification changes release ID even if source jobs stay identical.
+ const version=hash(names.map(name=>name+":"+docHashes[name]).join("\n")).slice(0,32);
+ const docs={jobs:jobs.total,facets:facets.jobs.length,updated:jobs.updated,
+  checkedAt:audit.summary.checked_at};
  await mkdir(join(destination,"snapshots"),{recursive:true});
- const staging=join(destination,"snapshots","."+version+".staging");
+ const staging=join(destination,"snapshots","."+version+"."+process.pid+"."+randomBytes(6).toString("hex")+".staging");
  const published=join(destination,"snapshots",version);
  // No partially updated index is ever made discoverable.
- await rm(staging,{force:true,recursive:true});
- await mkdir(staging,{recursive:true});
+ await mkdir(staging,{recursive:true,mode:0o700});
  try{
   const hashes={};
   for(const name of names){
-   const value=contents.get(name);hashes[name]=hash(value);
+   const value=contents.get(name);hashes[name]=docHashes[name];
    await writeFile(join(staging,name),value,{flag:"wx",mode:0o600});
   }
   const manifest={kind:"HHBA_RAILWAY_PUBLIC_INDEX_V1",version,...docs,files:hashes};
   await writeFile(join(staging,"manifest.json"),JSON.stringify(manifest),{flag:"wx",mode:0o600});
   try{await rename(staging,published)}catch(e){
    if(e.code!=="EEXIST"&&e.code!=="ENOTEMPTY")throw e;
+   const existing=JSON.parse(await readFile(join(published,"manifest.json"),"utf8"));
+   if(existing.version!==version||names.some(n=>existing.files?.[n]!==hashes[n]))
+     throw Error("PUBLISHED_VERSION_COLLISION");
    await rm(staging,{recursive:true,force:true});
   }
   const pointer=join(destination,"current.json");
-  const temp=join(destination,"current."+process.pid+".tmp");
-  await writeFile(temp,JSON.stringify({version,updated:jobs.updated}),{flag:"w",mode:0o600});
-  await rename(temp,pointer);
+  // Preserve the previously accepted feed if a slower writer arrives late.
+  let previous=null;try{previous=JSON.parse(await readFile(pointer,"utf8"))}catch(e){if(e.code!=="ENOENT")throw e}
+  if(previous?.updated && Date.parse(previous.updated)>Date.parse(jobs.updated))
+   throw Error("REFUSE_OLDER_SOURCE_SNAPSHOT");
+  if(previous?.checkedAt && jobs.updated===previous.updated &&
+     Date.parse(previous.checkedAt)>Date.parse(docs.checkedAt))
+   throw Error("REFUSE_OLDER_AUDIT");
+  const temp=join(destination,"current."+process.pid+"."+randomBytes(5).toString("hex")+".tmp");
+  try{
+   await writeFile(temp,JSON.stringify({version,updated:jobs.updated,checkedAt:docs.checkedAt}),{flag:"wx",mode:0o600});
+   await rename(temp,pointer);
+  }finally{await rm(temp,{force:true})}
   return manifest;
  }catch(e){await rm(staging,{recursive:true,force:true});throw e}
 }
