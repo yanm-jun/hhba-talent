@@ -1,0 +1,61 @@
+name: HHBA Phase 5 Live Public Applicant Mobile Proof
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-phase5-live-mobile.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-pages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Chromium
+        run: |
+          python -m pip install 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Verify genuine deployed Pages renders applicant progress and employer inbox safely
+        run: |
+          python - <<'PY'
+          import asyncio,json
+          from playwright.async_api import async_playwright
+          BASE='https://yanm-jun.github.io/hhba-talent/'
+          async def main():
+           async with async_playwright() as p:
+            browser=await p.chromium.launch(headless=True,args=['--no-sandbox'])
+            page=await browser.new_page(viewport={'width':390,'height':844},locale='zh-CN')
+            errors=[];writes=[]
+            page.on('pageerror',lambda e:errors.append(str(e)[:180]))
+            page.on('request',lambda r:writes.append((r.method,r.url)) if r.method not in ('GET','HEAD') else None)
+            await page.goto(BASE+'candidate/my-applications',wait_until='domcontentloaded',timeout=60000)
+            await page.get_by_role('heading',name='我的企业岗位申请与进度').wait_for(timeout=30000)
+            assert await page.get_by_text('申请业务服务器尚未上线',exact=False).count()==1
+            assert await page.locator('.hhba-applications-item').count()==0
+            await page.screenshot(path='/tmp/hhba-phase5-public-candidate.png',full_page=True)
+            await page.goto(BASE+'employer/workspace',wait_until='domcontentloaded',timeout=60000)
+            await page.get_by_role('heading',name='发布真实岗位，寻找已授权的人才。').wait_for(timeout=30000)
+            await page.get_by_role('button',name='收到的求职申请').click()
+            assert await page.get_by_text('当前只提供界面预览',exact=False).count()==1
+            assert await page.locator('.hhba-applicant-card').count()==0
+            await page.screenshot(path='/tmp/hhba-phase5-public-employer.png',full_page=True)
+            assert not errors and not writes,(errors,writes)
+            print('HHBA_PHASE5_LIVE_PAGES_VERIFIED',json.dumps({'public_candidate_progress':True,
+             'employer_inbox':True,'false_applications':0,'data_mutations':0,'browser_errors':0},ensure_ascii=False))
+            await browser.close()
+          asyncio.run(main())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-phase5-real-public-mobile-screenshots
+          path: |
+            /tmp/hhba-phase5-public-candidate.png
+            /tmp/hhba-phase5-public-employer.png
+          retention-days: 14
+          if-no-files-found: ignore
