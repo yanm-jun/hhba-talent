@@ -99,7 +99,7 @@ test('Railway serves only vetted SVG and PNG files and preserves CSP protection'
  assert.ok(server.includes('"Content-Security-Policy":"default-src'));
 });
 
-test('Headway's only published brand is its own ATS-board uploaded employer image, not Ashby favicon or same-name business',()=>{
+test("Headway's only published brand is its own ATS-board uploaded employer image, not Ashby favicon or same-name business",()=>{
  const item=registry.records.find(x=>x.company==='Headway'&&x.platform==='ashby'&&x.source==='headway');
  assert.ok(item);
  assert.equal(item.file,'brand-headway.png');
