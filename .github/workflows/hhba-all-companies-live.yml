@@ -1,0 +1,88 @@
+name: HHBA All Companies Railway Live Browser Acceptance
+on:
+  push:
+    branches: [test/all-companies-live-20261020]
+    paths: ['.github/workflows/hhba-all-companies-live.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  company-directory-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Prepare isolated Chromium runner
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.0
+          npx playwright install --with-deps chromium
+      - name: Verify directory, unreviewed employers, genuine jobs and company links
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {chromium} from 'playwright';
+          const root='https://hhba-web-production-024c.up.railway.app';
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          const page=await browser.newPage({viewport:{width:1365,height:900}});
+          page.on('pageerror',e=>console.warn('BROWSER_JS_ERROR',e.message.slice(0,220)));
+          async function open(url){
+            let response;
+            for(let attempt=0;attempt<4;attempt++){
+              try{
+                response=await page.goto(root+url,{waitUntil:'domcontentloaded',timeout:50000});
+                if(response?.status()===200)return response;
+              }catch(e){console.warn('TEMPORARY_BROWSER_NETWORK',String(e).slice(0,150))}
+              console.log('RAILWAY_RETRY',url,response?.status(),attempt+1);
+              await new Promise(r=>setTimeout(r,2200));
+            }
+            assert.equal(response?.status(),200,'Railway deep link not accessible: '+url);
+          }
+          try{
+            await open('/companies');
+            await page.locator('.company-directory-card').first().waitFor({timeout:60000});
+            const rows=await page.locator('.company-directory-card').count();
+            const summary=await page.locator('.company-profile-job-count').first().textContent();
+            assert.ok(rows>=5,'directory appears to contain only three hardcoded brands');
+            const links=await page.locator('.company-directory-card').evaluateAll(items=>
+              items.map(a=>a.getAttribute('href')));
+            const unknown=links.find(h=>h?.startsWith('/companies/id/'));
+            assert.ok(unknown,'dynamic company links not generated');
+            console.log('HHBA_ALL_COMPANIES_DIRECTORY',JSON.stringify({rowsOnFirstPage:rows,summary,unreviewedExample:unknown}));
+            await page.locator('.company-directory-card[href="'+unknown+'"]').first().click();
+            await page.waitForURL('**'+unknown,{timeout:15000});
+            await page.locator('.company-profile-identity h1').waitFor({timeout:15000});
+            await page.locator('.company-profile-job-card').first().waitFor({timeout:45000});
+            const company=await page.locator('.company-profile-identity h1').textContent();
+            const jobs=await page.locator('.company-profile-job-card').count();
+            const evidenceNotice=await page.locator('.company-profile-pending').textContent();
+            assert.ok(evidenceNotice.includes('资料待补充'));
+            assert.ok(jobs>=1,'unreviewed company has no genuine jobs');
+            assert.equal(await page.locator('.company-profile-brand img').count(),0,
+              'unreviewed employer must not be assigned a guessed logo');
+            const href=await page.locator('.company-profile-job-card').first().getAttribute('href');
+            assert.ok(href.startsWith('/candidate/jobs/'));
+            console.log('HHBA_DYNAMIC_COMPANY_LIVE',JSON.stringify({company,verifiedJobCards:jobs,exampleJobUrl:href,unreviewed:true}));
+            await open(unknown);
+            await page.locator('.company-profile-job-card').first().waitFor({timeout:45000});
+            await page.locator('.company-profile-job-card').first().click();
+            await page.waitForURL(/\/candidate\/jobs\//,{timeout:15000});
+            await page.locator('.unified-detail-company-link').waitFor({timeout:30000});
+            const actualCompanyHref=await page.locator('.unified-detail-company-link').getAttribute('href');
+            assert.equal(actualCompanyHref,unknown,'detail must return to exact same source-scoped employer');
+            await page.locator('.unified-detail-company-link').click();
+            await page.waitForURL('**'+unknown,{timeout:15000});
+            await page.locator('.company-profile-top a').first().click();
+            await page.waitForURL(/\/candidate\/jobs\//,{timeout:15000});
+            // Existing high-quality editorial brands must remain intact.
+            await open('/companies/openai');
+            await page.locator('.company-profile-identity h1').waitFor({timeout:15000});
+            assert.equal(await page.locator('.company-profile-identity h1').textContent(),'OpenAI');
+            assert.ok(await page.locator('.company-profile-focus').count()>=3);
+            await open('/');
+            assert.ok(await page.getByRole('button',{name:/我要应聘/}).isVisible());
+            assert.ok(await page.getByRole('button',{name:/我要招人/}).isVisible());
+            console.log('HHBA_ALL_COMPANIES_BROWSER_ACCEPTED',JSON.stringify({site:root,directory:true,dynamicCompany:true,
+              realJobs:true,jobReturn:true,existingBrandPreserved:true}));
+          }finally{await browser.close()}
+          NODE
