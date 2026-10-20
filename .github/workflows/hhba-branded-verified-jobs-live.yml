@@ -1,0 +1,82 @@
+name: HHBA Official Brand Six Jobs Railway Live Proof
+on:
+  push:
+    branches: [test/official-brand-logos-live-20261020]
+    paths: ['.github/workflows/hhba-branded-verified-jobs-live.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify live original brand assets and six non-fabricated ATS opportunities
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {createHash} from 'node:crypto';
+          import {readFileSync} from 'node:fs';
+          const root='https://hhba-web-production-024c.up.railway.app';
+          async function get(path){
+            let last;
+            for(let i=0;i<3;i++){
+              try{return await fetch(root+path,{redirect:'manual',signal:AbortSignal.timeout(40000)})}
+              catch(e){last=e;await new Promise(r=>setTimeout(r,900))}
+            }
+            throw last;
+          }
+          const page=await get('/candidate/jobs');
+          assert.equal(page.status,200);
+          const html=await page.text();
+          const compiled=html.match(/src="(\/assets\/[^"]+\.js)"/);
+          assert.ok(compiled,'vite entry point missing');
+          const js=await get(compiled[1]);
+          assert.equal(js.status,200);
+          const bundle=await js.text();
+          for(const fragment of ['loadVerifiedFeaturedJobs','亚太区广告供应商负责人','身份平台工程经理',
+            '亚太区市场拓展赋能负责人','汽车行业企业客户经理','财务应用软件工程经理','射频工程师'])
+            assert.ok(bundle.includes(fragment),'featured source not published: '+fragment);
+          const manifest=readFileSync('apps/web/public/brands/SOURCES.md','utf8');
+          for(const file of ['openai.svg','claude.svg','spacex.svg']){
+            const response=await get('/brands/'+file);
+            assert.equal(response.status,200,'missing real logo '+file);
+            const data=Buffer.from(await response.arrayBuffer());
+            assert.ok(data.length>100&&data.toString().includes('<svg'));
+            const sha=createHash('sha256').update(data).digest('hex');
+            assert.ok(manifest.includes('SHA-256 '+sha),'logo is not original source SHA '+file);
+          }
+          const index=await get('/data/jobs.json');
+          assert.equal(index.status,200);
+          assert.equal(index.headers.get('x-hhba-index-source'),'railway-verified-volume');
+          const data=await index.json();
+          const auditResponse=await get('/data/job-sync-status.json');
+          assert.equal(auditResponse.status,200);
+          const audit=await auditResponse.json();
+          assert.equal(audit.summary.indexed_as_of,data.updated);
+          const selected=[
+           'ashby-openai-18e64608-5881-4b8f-b5cf-abd09a8ff086',
+           'ashby-openai-7ba0b390-b198-4101-80bb-b49a6dd62607',
+           'greenhouse-anthropic-5426627008','greenhouse-anthropic-5391293008',
+           'greenhouse-spacex-8885762002','greenhouse-spacex-8621995002'];
+          for(const id of selected){
+           const job=data.jobs.find(x=>x.id===id);
+           assert.ok(job,'official job withdrawn or not indexed: '+id);
+           const proof=audit.jobs.find(x=>x.job_id===id);
+           assert.equal(proof?.status,'OFFICIAL_JD_AND_REQUIREMENTS_FOUND',id);
+           assert.ok(job.url.startsWith('https://'),id);
+           const original=await get('/api/jobs/'+encodeURIComponent(id));
+           assert.equal(original.status,200,'source JD not available '+id);
+           const content=await original.json();
+           assert.equal(content.status,'LIVE_CONTENT',id);
+           assert.equal(content.job.url,job.url,id);
+          }
+          const deep=await get('/candidate/jobs/'+selected[0]);
+          assert.equal(deep.status,200);
+          console.log('HHBA_AUTHENTIC_LOGOS_AND_6_LIVE_JOBS_ACCEPTED',JSON.stringify({
+             site:root+'/candidate/jobs',brands:3,
+             verified:6,officialJd:6,source:'Railway audited ATS index',total:data.total}));
+          NODE
