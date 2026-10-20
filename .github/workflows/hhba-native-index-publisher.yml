@@ -1,0 +1,25 @@
+name: HHBA Railway native index publisher acceptance
+on:
+  push:
+    branches: [feat/railway-native-job-index-20261020]
+    paths:
+      - 'ops/legacy-marketplace/publish-official-index.mjs'
+      - 'ops/legacy-marketplace/test/publish-official-index.test.mjs'
+      - '.github/workflows/hhba-native-index-publisher.yml'
+  pull_request:
+    paths:
+      - 'ops/legacy-marketplace/publish-official-index.mjs'
+      - 'ops/legacy-marketplace/test/publish-official-index.test.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  atomic-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run no-PII publisher and rollback integrity tests
+        run: node --test ops/legacy-marketplace/test/publish-official-index.test.mjs
