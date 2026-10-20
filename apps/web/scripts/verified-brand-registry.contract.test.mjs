@@ -28,9 +28,9 @@ const expected=[
 ];
 const identity=row=>[row.company,row.platform,row.source].join('\0');
 
-test('25 new employer brands and three original icons each have exact ATS identities',()=>{
+test('current employer brands and three original icons each have exact ATS identities',()=>{
  assert.equal(registry.schemaVersion,1);
- assert.equal(registry.records.length,28);
+ assert.equal(registry.records.length,49);
  const keys=registry.records.map(identity);
  assert.equal(new Set(keys).size,28);
  for(const [company,platform,source] of expected){
@@ -45,9 +45,9 @@ test('25 new employer brands and three original icons each have exact ATS identi
   assert.equal(item?.kind,'original-source');
  }
 });
-test('all 28 source icons match pinned, immutable SHA-256 with exact provenance',()=>{
+test('all current source icons match pinned, immutable SHA-256 with exact provenance',()=>{
  assert.equal(proof.schemaVersion,1);
- assert.equal(proof.records.length,28);
+ assert.equal(proof.records.length,49);
  assert.ok(proof.sourcePolicy.includes('does not grant trademark rights'));
  const seen=new Set();
  for(const logo of registry.records){
@@ -62,8 +62,8 @@ test('all 28 source icons match pinned, immutable SHA-256 with exact provenance'
   assert.equal(createHash('sha256').update(bytes).digest('hex'),entry.sha256,
     'actual SVG bytes do not match traceable source '+logo.file);
   const svg=bytes.toString('utf8');
-  assert.match(svg,/<svg\s/);
-  assert.doesNotMatch(svg,/<script|<foreignObject|onload\s*=|onerror\s*=|javascript:/i);
+  assert.ok(logo.file.endsWith('.png')?bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])):/<svg\s/.test(svg));
+  if(logo.file.endsWith('.svg'))assert.doesNotMatch(svg,/<script|<foreignObject|onload\s*=|onerror\s*=|javascript:/i);
   if(logo.kind==='source-traced-vector'){
    assert.equal(entry.upstreamCommit,'c71c69e3a27e4436936b831c72643e6513b9f49b');
    assert.ok(entry.upstreamSvg.endsWith('/icons/'+logo.file.slice(3)));
@@ -91,6 +91,8 @@ test('same logo renderer serves job cards, job detail, directory and dynamic com
 });
 test('Railway only serves bundled SVG paths and retains CSP protection',()=>{
  assert.ok(server.includes('si-[a-z0-9]{2,40}'));
+ assert.ok(server.includes('brand-[a-z0-9]{2,60}'));
+ assert.ok(server.includes('p.endsWith(".png")?"image/png"'));
  assert.ok(server.includes('Brand asset not published'));
  assert.ok(server.includes('"Content-Type":"image/svg+xml; charset=utf-8"'));
  assert.ok(server.includes('"X-Content-Type-Options":"nosniff"'));
