@@ -1,0 +1,116 @@
+name: HHBA scrolling brands Chromium visual and motion acceptance
+on:
+  push:
+    branches: [feat/home-verified-logo-marquee-20261021]
+    paths: ['.github/workflows/hhba-home-marquee-browser.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated Chromium
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.0
+          npx playwright install --with-deps chromium
+      - name: Build the real HHBA Railway frontend and start local preview
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '0'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+          npx vite preview --host 127.0.0.1 --port 4183 > /tmp/hhba-preview.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4183/ >/dev/null && break; sleep 1; done
+          curl -fsS http://127.0.0.1:4183/ >/dev/null
+      - name: Real Chrome animation, clickable navigation, responsive alignment, reduced motion
+        run: |
+          node --input-type=module <<'NODE'
+          import {chromium} from 'playwright';
+          import assert from 'node:assert/strict';
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          try {
+            for(const viewport of [{width:1440,height:900},{width:390,height:844}]){
+              const page=await browser.newPage({viewport});
+              await page.goto('http://127.0.0.1:4183/',{waitUntil:'domcontentloaded'});
+              await page.locator('.home-company-marquee-link').first().waitFor({timeout:20000});
+              const metrics=await page.evaluate(()=>{
+                const main=document.querySelector('.unified-market'),box=document.querySelector('.home-company-marquee'),
+                  track=document.querySelector('.home-company-marquee-track'),win=document.querySelector('.home-company-marquee-window');
+                if(!main||!box||!track||!win)throw Error('home company band DOM missing');
+                const mr=main.getBoundingClientRect(),br=box.getBoundingClientRect();
+                const inset=parseFloat(getComputedStyle(main).paddingLeft);
+                return {
+                  realBrands:document.querySelectorAll('.home-company-marquee-run:not(.is-copy) .home-company-marquee-link').length,
+                  clones:document.querySelectorAll('.home-company-marquee-run.is-copy .home-company-marquee-link').length,
+                  duplicateHidden:document.querySelector('.home-company-marquee-run.is-copy')?.getAttribute('aria-hidden'),
+                  firstName:document.querySelector('.home-company-marquee-name')?.textContent?.trim(),
+                  firstLink:document.querySelector('.home-company-marquee-link')?.getAttribute('href'),
+                  companyLeft:br.left,marketInnerLeft:mr.left+inset,
+                  companyRight:br.right,marketInnerRight:mr.right-inset,
+                  whitespaceAbove:br.top-mr.bottom,
+                  motion:getComputedStyle(track).animationName,
+                  duration:getComputedStyle(track).animationDuration,
+                  windowOverflow:getComputedStyle(win).overflowX,
+                  horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1
+                };
+              });
+              console.log('HHBA_HOME_50_BRAND_DESKTOP_MOBILE',JSON.stringify({viewport,metrics}));
+              assert.equal(metrics.realBrands,50);
+              assert.equal(metrics.clones,50);
+              assert.equal(metrics.duplicateHidden,'true');
+              assert.equal(metrics.firstName,'OpenAI');
+              assert.equal(metrics.firstLink,'/companies/openai');
+              assert.ok(Math.abs(metrics.companyLeft-metrics.marketInnerLeft)<1.5,'left boundary mismatch');
+              assert.ok(Math.abs(metrics.companyRight-metrics.marketInnerRight)<1.5,'right boundary mismatch');
+              assert.ok(metrics.whitespaceAbove>=0&&metrics.whitespaceAbove<=40);
+              assert.equal(metrics.motion,'hhba-company-marquee-left');
+              assert.equal(metrics.duration,'115s');
+              assert.ok(!metrics.horizontalOverflow);
+              const logos=page.locator('.home-company-marquee-run:not(.is-copy) img');
+              for(const idx of [0,1,2,3,4]){
+                await logos.nth(idx).evaluate(image=>image.decode());
+                assert.ok(await logos.nth(idx).evaluate(el=>el.naturalWidth>0),'original real brand logo failed');
+              }
+              const track=page.locator('.home-company-marquee-track');
+              const a=await track.evaluate(el=>getComputedStyle(el).transform);
+              await page.waitForTimeout(460);
+              const b=await track.evaluate(el=>getComputedStyle(el).transform);
+              assert.notEqual(a,b,'track does not animate');
+              await page.locator('.home-company-marquee-window').hover();
+              assert.equal(await track.evaluate(el=>getComputedStyle(el).animationPlayState),'paused');
+              await page.locator('.home-company-marquee-link').first().click();
+              await page.waitForURL('**/companies/openai',{timeout:8000});
+              assert.equal(await page.locator('.company-profile-identity h1').textContent(),'OpenAI');
+              await page.close();
+            }
+            const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
+            await page.goto('http://127.0.0.1:4183/',{waitUntil:'domcontentloaded'});
+            await page.locator('.home-company-marquee-track').waitFor({timeout:20000});
+            const reduced=await page.evaluate(()=>{
+              const track=document.querySelector('.home-company-marquee-track'),
+                box=document.querySelector('.home-company-marquee-window'),
+                copy=document.querySelector('.home-company-marquee-run.is-copy');
+              return {animation:getComputedStyle(track).animationName,
+                overflowX:getComputedStyle(box).overflowX,
+                copyDisplay:getComputedStyle(copy).display,
+                scrollWidth:document.documentElement.scrollWidth,screenWidth:innerWidth};
+            });
+            console.log('HHBA_HOME_50_BRAND_REDUCED_MOTION',JSON.stringify(reduced));
+            assert.equal(reduced.animation,'none');
+            assert.equal(reduced.overflowX,'auto');
+            assert.equal(reduced.copyDisplay,'none');
+            assert.ok(reduced.scrollWidth<=reduced.screenWidth+1);
+            await page.close();
+            console.log('HHBA_HOME_50_BRAND_CHROMIUM_ACCEPTED',JSON.stringify({realBrands:50,
+              animations:true,loopCopies:2,desktop:true,mobile:true,hoverPause:true,reducedMotion:true,correctRoutes:true}));
+          }finally{await browser.close()}
+          NODE

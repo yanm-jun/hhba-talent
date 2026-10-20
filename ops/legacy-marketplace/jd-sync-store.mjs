@@ -1,10 +1,20 @@
 import {Database} from "bun:sqlite";
 import {mkdirSync} from "node:fs";
+import {createHash} from "node:crypto";
 import {dirname,resolve,sep} from "node:path";
 
 const ID=/^(greenhouse|ashby|lever)-[A-Za-z0-9_-]{1,170}$/;
 const HASH=/^[a-f0-9]{64}$/;
 const TTL=30*86400000;
+const MAX_READY_AGE=7*86400000;
+const FEATURED_PREWARM_IDS=new Set([
+ "ashby-openai-18e64608-5881-4b8f-b5cf-abd09a8ff086",
+ "ashby-openai-7ba0b390-b198-4101-80bb-b49a6dd62607",
+ "greenhouse-anthropic-5426627008",
+ "greenhouse-anthropic-5391293008",
+ "greenhouse-spacex-8885762002",
+ "greenhouse-spacex-8621995002"
+]);
 function verify(id,hash,part,total){
  if(typeof id!=="string"||!ID.test(id))throw Error("INVALID_JOB_ID");
  if(hash!==undefined&&(typeof hash!=="string"||!HASH.test(hash)))throw Error("INVALID_SOURCE_HASH");
@@ -21,6 +31,12 @@ export function openJobSyncStore(file,{now=()=>Date.now(),root="/sync-state"}={}
  db.exec("CREATE INDEX IF NOT EXISTS idx_jd_sync_queue ON jobs(state,next_ms,priority)");
  db.exec("CREATE INDEX IF NOT EXISTS idx_jd_sync_expire ON parts(expire_ms)");
  db.exec("CREATE TABLE IF NOT EXISTS sync_budget(day TEXT PRIMARY KEY,used INTEGER NOT NULL DEFAULT 0)");
+ // Private bounded cache; not included in public search snapshots or GitHub.
+ db.exec("CREATE TABLE IF NOT EXISTS source_documents (id TEXT PRIMARY KEY,hash TEXT NOT NULL,english TEXT NOT NULL,checked_ms INTEGER NOT NULL,expire_ms INTEGER NOT NULL)");
+ db.exec("CREATE INDEX IF NOT EXISTS idx_jd_english_expiry ON source_documents(expire_ms)");
+ const upsertEnglish=db.query("INSERT INTO source_documents(id,hash,english,checked_ms,expire_ms) VALUES(?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET hash=excluded.hash,english=excluded.english,checked_ms=excluded.checked_ms,expire_ms=excluded.expire_ms");
+ const readEnglish=db.query("SELECT hash,english,checked_ms,expire_ms FROM source_documents WHERE id=?");
+ const readParts=db.query("SELECT part,total,zh,expire_ms FROM parts WHERE id=? AND hash=? ORDER BY part ASC");
  const read=db.query("SELECT * FROM jobs WHERE id=?");
  const count=db.query("SELECT COUNT(*) AS n FROM parts WHERE id=? AND hash=? AND expire_ms>?");
  const getPart=db.query("SELECT zh,total,expire_ms FROM parts WHERE id=? AND hash=? AND part=?");
@@ -41,23 +57,48 @@ export function openJobSyncStore(file,{now=()=>Date.now(),root="/sync-state"}={}
   if(complete&&!clean.length)throw Error("EMPTY_COMPLETE_ATS_FEED");
   db.transaction(()=>{
    for(const j of clean){
-    const priority=["SpaceX","Anthropic","OpenAI","Stripe","Airbnb"].includes(j.company)?1:0;
+    const priority=FEATURED_PREWARM_IDS.has(j.id)?100:["SpaceX","Anthropic","OpenAI","Stripe","Airbnb"].includes(j.company)?1:0;
     upsert.run(j.id,j.platform,String(j.company||"UNKNOWN").slice(0,180),j.url,ts,priority);
    }
    if(complete)db.query("UPDATE jobs SET state='REMOVED',lease_ms=0,error='MISSING_FROM_COMPLETE_ATS_FEED' WHERE seen_ms<?").run(ts);
   })();
   return {discovered:clean.length,complete_snapshot:complete};
  }
- function sourceVersion(id,hash,total){
+ function sourceVersion(id,hash,total,english){
   verify(id,hash,0,total);
   return db.transaction(()=>{
    const j=read.get(id);
    if(!j||j.state==="REMOVED")throw Error("JOB_NOT_IN_CURRENT_INDEX");
    if(j.hash!==hash)removeParts.run(id);
+   if(english!==undefined){
+    if(typeof english!=="string"||!english.trim()||english.length>100000||
+       createHash("sha256").update(english).digest("hex")!==hash)
+      throw Error("ENGLISH_SOURCE_HASH_INVALID");
+    upsertEnglish.run(id,hash,english,now(),now()+TTL);
+   }
    const n=Number(count.get(id,hash,now()).n);
    updateSource.run(hash,total,n,n===total?"COMPLETE":j.state==="WORKING"&&j.lease_ms>now()?"WORKING":"TRANSLATING",now(),now(),n===total?1:0,hash,id);
    return {total,done:n,complete:n===total,source_changed:j.hash!==hash};
   })();
+ }
+ function readyDocument(id,expectedUrl){
+  verify(id);
+  const job=read.get(id);
+  if(!job||job.state==="REMOVED"||
+     (expectedUrl&&job.url!==expectedUrl)||!HASH.test(job.hash||"")||
+     !Number.isInteger(job.total)||job.total<1||job.total>150)return null;
+  const original=readEnglish.get(id);
+  if(!original||original.hash!==job.hash||
+     original.expire_ms<=now()||original.checked_ms<now()-MAX_READY_AGE||
+     createHash("sha256").update(original.english).digest("hex")!==job.hash)return null;
+  const parts=readParts.all(id,job.hash);
+  const complete=parts.length===job.total&&parts.every((p,index)=>
+    p.part===index&&p.total===job.total&&p.expire_ms>now()&&
+    typeof p.zh==="string"&&/[一-龥]/.test(p.zh));
+  return {jobId:id,sourceHash:job.hash,sourceUrl:job.url,
+    checkedAt:new Date(original.checked_ms).toISOString(),originalText:original.english,
+    chineseText:complete?parts.map(p=>p.zh).join("\n\n"):null,
+    ready:complete,done:complete?job.total:parts.filter(p=>p.expire_ms>now()).length,total:job.total};
  }
  function cachedPart(id,hash,part,total){
   verify(id,hash,part,total);
@@ -100,6 +141,7 @@ export function openJobSyncStore(file,{now=()=>Date.now(),root="/sync-state"}={}
  function cleanup(){
   const ts=now();
   const expired=db.query("DELETE FROM parts WHERE expire_ms<=?").run(ts).changes;
+  db.query("DELETE FROM source_documents WHERE expire_ms<=?").run(ts);
   db.query("UPDATE jobs SET done=(SELECT COUNT(*) FROM parts WHERE parts.id=jobs.id AND parts.hash=jobs.hash AND parts.expire_ms>?) WHERE state='COMPLETE'").run(ts);
   db.query("UPDATE jobs SET state='TRANSLATING',next_ms=0 WHERE state='COMPLETE' AND done<total").run();
   return {expired};
@@ -132,5 +174,5 @@ export function openJobSyncStore(file,{now=()=>Date.now(),root="/sync-state"}={}
   return {id:j.id,state:j.state,done:j.done,total:j.total,last_error:j.error,
    checked_at:j.checked_ms?new Date(j.checked_ms).toISOString():null};
  }
- return {db,catalogSync,sourceVersion,cachedPart,saveVerifiedPart,claim:()=>claimTxn(),fail,release,cleanup,coverage,metadata,reserveBudget:limit=>budgetTxn(limit),remainingBudget,close:()=>db.close()};
+ return {db,catalogSync,sourceVersion,readyDocument,cachedPart,saveVerifiedPart,claim:()=>claimTxn(),fail,release,cleanup,coverage,metadata,reserveBudget:limit=>budgetTxn(limit),remainingBudget,close:()=>db.close()};
 }

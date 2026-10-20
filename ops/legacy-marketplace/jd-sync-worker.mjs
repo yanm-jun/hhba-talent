@@ -56,7 +56,7 @@ export function startOverseasJdWorker({store,load,boardsCount,officialDetail,
     store.fail(currentId,"JD_PARTS_UNSUPPORTED",{permanent:true});
     return {status:"SOURCE_UNSUPPORTED"};
    }
-   const source=store.sourceVersion(job.id,hash,chunks.length);
+   const source=store.sourceVersion(job.id,hash,chunks.length,original);
    if(source.complete)return {status:"COMPLETE_ALREADY",id:job.id};
    for(let part=0;part<chunks.length;part++){
     if(store.cachedPart(job.id,hash,part,chunks.length))continue;

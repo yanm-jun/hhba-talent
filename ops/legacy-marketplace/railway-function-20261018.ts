@@ -11,6 +11,8 @@ import { mkdirSync, readFileSync, existsSync } from "node:fs";
 import { openJobSyncStore } from "./jd-sync-store.mjs";
 import { startOverseasJdWorker } from "./jd-sync-worker.mjs";
 import { createFullJdWorker } from "./jd-sync-runner.mjs";
+import { translateWithSourceNumbers } from "./number-locked-translation.mjs";
+import {readNativeIndex} from "./read-official-index.mjs";
 const phrases:[string,string][]=[
  ["Integration Technician","集成技术员"],["Test Technician","测试技术员"],
  ["Manufacturing Engineer","制造工程师"],["Supply Chain Manager","供应链经理"],
@@ -216,16 +218,21 @@ const searchAliases:Record<string,string[]>={
  "法务":["legal","counsel"]
 };
 
+// Public CI verifies the website and public ATS endpoints without copying
+// the private Xiaomi production dataset. This bypass is forbidden in Railway.
+const publicCiOnly=Bun.env.HHBA_PUBLIC_CI_ONLY==="1" &&
+ !Bun.env.RAILWAY_ENVIRONMENT && !Bun.env.RAILWAY_PROJECT_ID &&
+ !Bun.env.RAILWAY_SERVICE_ID && !Bun.env.RAILWAY_SERVICE_NAME;
 const xiaomiPayload=Array.from({length:11},(_,i)=>Bun.env["HHBA_XIAOMI_CHUNK_"+i]||"").join("");
-if(createHash("sha256").update(xiaomiPayload,"utf8").digest("hex")!=="97ef1d92751c7726225f98fdd0797d22e45eb07553029452697b54dd208def8e")throw Error("HHBA_XIAOMI_SNAPSHOT_DIGEST_MISMATCH");
-const xiaomiCompact:[string,string,string,string][]=JSON.parse(xiaomiPayload);
+if(!publicCiOnly&&createHash("sha256").update(xiaomiPayload,"utf8").digest("hex")!=="97ef1d92751c7726225f98fdd0797d22e45eb07553029452697b54dd208def8e")throw Error("HHBA_XIAOMI_SNAPSHOT_DIGEST_MISMATCH");
+const xiaomiCompact:[string,string,string,string][]=publicCiOnly?[]:JSON.parse(xiaomiPayload);
 const xiaomiType:Record<string,string>={S:"SOCIAL",C:"CAMPUS",I:"INTERNSHIP"};
 const xiaomiUrls:Record<string,string>={S:"https://xiaomi.jobs.f.mioffice.cn/index/",C:"https://xiaomi.jobs.f.mioffice.cn/campus/",I:"https://xiaomi.jobs.f.mioffice.cn/internship/"};
 const domesticObserved:Job[]=xiaomiCompact.map(([kind,native,title,city])=>{
  if(!xiaomiType[kind]||!/^\d{12,22}$/.test(native)||!title||title.length>220||!city||city.length>100)throw Error("Invalid Xiaomi list record");
  return {id:"xiaomi-"+kind+"-"+native,company:"Xiaomi",title,location:city,remote:null,url:xiaomiUrls[kind],platform:"xiaomi-official",source:xiaomiType[kind],domestic:true,recruitmentType:xiaomiType[kind],observedAt:"2026-10-16"};
 });
-if(domesticObserved.length!==1010||new Set(domesticObserved.map(j=>j.id)).size!==1010||domesticObserved.filter(j=>j.recruitmentType==="SOCIAL").length!==350||domesticObserved.filter(j=>j.recruitmentType==="CAMPUS").length!==350||domesticObserved.filter(j=>j.recruitmentType==="INTERNSHIP").length!==310)throw Error("Invalid Xiaomi total or channels");
+if(!publicCiOnly&&(domesticObserved.length!==1010||new Set(domesticObserved.map(j=>j.id)).size!==1010||domesticObserved.filter(j=>j.recruitmentType==="SOCIAL").length!==350||domesticObserved.filter(j=>j.recruitmentType==="CAMPUS").length!==350||domesticObserved.filter(j=>j.recruitmentType==="INTERNSHIP").length!==310))throw Error("Invalid Xiaomi total or channels");
 const meituanCompact:[string,string,string,string,string][]=[["4694862735","AI应用开发工程师","北京、上海","CAMPUS","https://zhaopin.meituan.com/web/position/detail?highlightType=campus&jobShareType=1&jobUnionId=4694862735"],["4691573955","B端AI应用FDE","北京","SOCIAL","https://zhaopin.meituan.com/web/position/detail?highlightType=social&jobUnionId=4691573955"],["4696454382","产品运营岗","多城市","CAMPUS","https://zhaopin.meituan.com/web/position/detail?highlightType=campus&jobShareType=1&jobUnionId=4696454382"],["4701989120","美团联盟行业运营（到店方向）","北京","SOCIAL","https://zhaopin.meituan.com/web/position/detail?highlightType=social&jobUnionId=4701989120"],["4747089400","用户体验改善-服务运营岗","北京","SOCIAL","https://zhaopin.meituan.com/web/position/detail?highlightType=social&jobUnionId=4747089400"],["4360870843","AI产品经理","北京","SOCIAL","https://zhaopin.meituan.com/web/position/detail?highlightType=social&jobUnionId=4360870843"],["4694862636","商品运营岗","北京、广州","CAMPUS","https://zhaopin.meituan.com/web/position/detail?highlightType=campus&jobShareType=1&jobUnionId=4694862636"]];
 const meituanObserved:Job[]=meituanCompact.map(([uid,title,location,recruitmentType,url])=>{
  if(!/^\d{8,20}$/.test(uid)||!title||!location||!["SOCIAL","CAMPUS","INTERNSHIP"].includes(recruitmentType))throw Error("Invalid Meituan record");
@@ -497,12 +504,21 @@ async function fromWhiteIndex(id:string):Promise<Job|null>{
  if(!/^(?:greenhouse|ashby|lever)-[a-zA-Z0-9_-]{1,100}-[A-Za-z0-9_-]{1,100}$/.test(id))return null;
  try{
   if(!whiteJobCache||Date.now()-whiteJobCache.at>300000){
-   const response=await fetch("https://yanm-jun.github.io/hhba-talent/data/jobs.json",{
-    headers:{"Accept":"application/json"},redirect:"error",signal:AbortSignal.timeout(14000)});
-   if(!response.ok||Number(response.headers.get("content-length")||0)>16000000)return null;
-   const raw=await response.text();
-   if(raw.length>16000000)return null;
-   const data=JSON.parse(raw);
+   // Native Railway evidence is now authoritative for on-demand JD identity.
+   // Pages is retained only as an explicit, pre-cutover bootstrap fallback.
+   let data:any=null;
+   if(Bun.env.HHBA_NATIVE_INDEX_READ==="1"){
+    const local=await readNativeIndex("/sync-state/public-index","jobs.json");
+    if(local)data=JSON.parse(new TextDecoder().decode(local.bytes));
+   }
+   if(!data){
+    const response=await fetch("https://yanm-jun.github.io/hhba-talent/data/jobs.json",{
+     headers:{"Accept":"application/json"},redirect:"error",signal:AbortSignal.timeout(14000)});
+    if(!response.ok||Number(response.headers.get("content-length")||0)>16000000)return null;
+    const raw=await response.text();
+    if(raw.length>16000000)return null;
+    data=JSON.parse(raw);
+   }
    if(!Array.isArray(data.jobs)||data.jobs.length>25000||
      !Number.isFinite(Date.parse(data.updated||""))||
      Math.abs(Date.now()-Date.parse(data.updated))>24*3600000||
@@ -784,7 +800,7 @@ async function machineTranslations(kind:"title"|"jd",sources:string[]):Promise<(
   const arr=Array.isArray(output?.translatedText)?output.translatedText:
             sources.length===1&&typeof output?.translatedText==="string"?[output.translatedText]:null;
   if(!arr||arr.length!==sources.length)return null;
-  return arr.map((x,i)=>typeof x==="string"&&x.length>1&&/[\u3400-\u9fff]/.test(x)&&(kind==="jd"||numbersRetained(sources[i],x))?x:null);
+  return arr.map((x,i)=>typeof x==="string"&&x.length>=(kind==="jd"?1:2)&&/[\u3400-\u9fff]/.test(x)&&(kind==="jd"||numbersRetained(sources[i],x))?x:null);
  }catch(ex){
   console.log("HHBA_MT_UNAVAILABLE",ex instanceof Error?ex.name:"unknown");
   return null;
@@ -1164,7 +1180,7 @@ async function ensureChineseProse(value:string):Promise<string|null>{
 const JD_READER_SIZE=900;
 const JD_READER_MAX_CHARS=100000;
 const JD_SYNC_DAILY_CHUNKS=Math.max(1,Math.min(2000,Number.parseInt(Bun.env.HHBA_JD_SYNC_DAILY_CHUNKS||"180",10)||180));
-const JD_SYNC_INTERVAL_MS=90_000;
+const JD_SYNC_INTERVAL_MS=30_000;
 let durableJobStore:ReturnType<typeof openJobSyncStore>|null=null;
 let lastCatalogRefresh=0;
 let backgroundJdBusy=false;
@@ -1264,7 +1280,18 @@ async function verifiedJdChunk(job:Job,one:string):Promise<TranslatedChunk>{
   if(!chinese)return {text:null,error:"translation_incomplete"};
   const corrected=stabilizeEmployerTerminology(job.company,restoreGroupedNumbers(source,chinese));
   if(hasLeakedJdTags(corrected))return {text:null,error:"translation_markup_leak"};
-  const safe=preserveOfficialNumbers(source,corrected);
+  let safe=preserveOfficialNumbers(source,corrected);
+  if(!safe){
+   // Re-translate only the failed section and force original numeric tokens,
+   // never silently accept invented salaries, dates, percentages or years.
+   const locked=await translateWithSourceNumbers(source,
+     async fragments=>await machineTranslations("jd",fragments));
+   if(locked){
+    const repaired=await ensureChineseProse(locked);
+    const fixed=repaired?stabilizeEmployerTerminology(job.company,repaired):null;
+    if(fixed&&!hasLeakedJdTags(fixed))safe=preserveOfficialNumbers(source,fixed);
+   }
+  }
   if(!safe)return {text:null,error:"translation_numbers_mismatch"};
   const mark=segments[i].kind==="heading"?"# ":segments[i].kind==="bullet"?"- ":"";
   translated.push(mark+safe.trim());
@@ -1292,7 +1319,7 @@ if(durableJobStore){
   // ingestion or JD publishing to static GitHub Pages.
   const timer=setInterval(()=>void fullJdWorker?.tick(),JD_SYNC_INTERVAL_MS);
   timer.unref();
-  setTimeout(()=>void fullJdWorker?.tick(),15_000).unref();
+  setTimeout(()=>void fullJdWorker?.tick(),8_000).unref();
   console.log("HHBA_FULL_JD_SYNC_ENABLED",JSON.stringify({
    privateVolume:true,dailyChunkLimit:JD_SYNC_DAILY_CHUNKS,
    intervalSeconds:JD_SYNC_INTERVAL_MS/1000,platforms:["greenhouse","ashby","lever"]
@@ -1367,22 +1394,223 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
  }finally{activeJdReaders--;}
 }
 
-if(durableJobStore && privateTranslatorUrl()){
- startOverseasJdWorker({store:durableJobStore,load,boardsCount:boards.length,
-  officialDetail,jdChunks,translateVerifiedChunk:verifiedJdChunk,
-  maxCharacters:JD_READER_MAX_CHARS,dailyChunks:JD_SYNC_DAILY_CHUNKS,
-  intervalMs:JD_SYNC_INTERVAL_MS});
+// Only one validated background worker claims the shared SQLite job queue.
+// The older duplicate worker caused contention and made progress unpredictable.
+
+// Background-only English warmup of six audited front-page roles.
+// Chinese completion uses the normal prioritized, daily-budgeted worker.
+// No document leaves the private /sync-state volume or enters public indexes.
+const BILINGUAL_FEATURED_IDS=[
+ "ashby-openai-18e64608-5881-4b8f-b5cf-abd09a8ff086",
+ "ashby-openai-7ba0b390-b198-4101-80bb-b49a6dd62607",
+ "greenhouse-anthropic-5426627008",
+ "greenhouse-anthropic-5391293008",
+ "greenhouse-spacex-8885762002",
+ "greenhouse-spacex-8621995002"
+];
+let warmupActive=false;
+async function prewarmFeaturedEnglish(){
+ if(!durableJobStore||warmupActive)return;
+ warmupActive=true;let saved=0;
+ try{
+  for(const id of BILINGUAL_FEATURED_IDS){
+   try{
+    const job=await fromWhiteIndex(id);
+    if(!job)continue;
+    // Upsert only verified current jobs; never close unrelated source rows.
+    durableJobStore.catalogSync([job],{complete:false});
+    const detail=await officialDetail(job);
+    if(!detail||detail.status!=="LIVE_CONTENT"||!detail.description)continue;
+    const chunks=jdChunks(detail.description);
+    if(!chunks.length||chunks.length>150)continue;
+    const hash=createHash("sha256").update(detail.description).digest("hex");
+    durableJobStore.sourceVersion(id,hash,chunks.length,detail.description);
+    saved++;
+   }catch(e){console.warn("HHBA_FEATURED_JD_WARMUP_SKIP",id,e instanceof Error?e.message:"unknown")}
+  }
+  console.log("HHBA_FEATURED_ENGLISH_PREWARM",JSON.stringify({saved,total:BILINGUAL_FEATURED_IDS.length}));
+ }finally{warmupActive=false}
+}
+if(durableJobStore){
+ setTimeout(()=>void prewarmFeaturedEnglish(),25_000).unref();
+ setInterval(()=>void prewarmFeaturedEnglish(),12*3600_000).unref();
+}
+
+// The white HHBA React app is compiled into /app/white-site at Docker build.
+// Until the independent ATS evidence job is migrated, the same public and
+// time-limited evidence snapshots are read from Pages via a strict allowlist.
+// Source failure fails closed. No user data, resumes or cookies are proxied.
+const WHITE_PUBLIC_ROOT="/app/white-site";
+const WHITE_SNAPSHOT_ORIGIN="https://yanm-jun.github.io";
+const WHITE_SNAPSHOT_BASE="/hhba-talent/data/";
+const WHITE_PUBLIC_DATA=new Set([
+ "jobs.json","job-sync-status.json","job-sync-summary.json",
+ "job-search-facets.json"
+]);
+const whiteSnapshotCache=new Map<string,{expires:number,bytes:Uint8Array}>();
+const WHITE_MAX_SNAPSHOT_BYTES=32*1024*1024;
+async function whiteSnapshot(name:string):Promise<Response>{
+ const headers={"Content-Type":"application/json; charset=utf-8",
+  "Cache-Control":"no-store","X-Content-Type-Options":"nosniff"};
+ if(!WHITE_PUBLIC_DATA.has(name))return Response.json({error:"INVALID_SNAPSHOT_PATH"},{status:404,headers});
+ if(Bun.env.HHBA_NATIVE_INDEX_READ==="1"){
+  try{
+   const nativeCached=whiteSnapshotCache.get("native:"+name);
+   if(nativeCached&&nativeCached.expires>Date.now())
+    return new Response(nativeCached.bytes,{headers:{...headers,
+     "X-HHBA-Index-Source":"railway-verified-volume"}});
+   // No pointer on a fresh volume: existing Pages publisher stays available.
+   // A corrupt/expired native index is rejected instead of silently serving bad data.
+   const native=await readNativeIndex("/sync-state/public-index",name);
+   if(native){
+    if(whiteSnapshotCache.size>12)whiteSnapshotCache.clear();
+    whiteSnapshotCache.set("native:"+name,{expires:Date.now()+30000,bytes:native.bytes});
+    return new Response(native.bytes,{headers:{...headers,
+     "X-HHBA-Index-Source":"railway-verified-volume"}});
+   }
+  }catch(e){
+   console.error("HHBA_NATIVE_INDEX_REJECTED",e instanceof Error?e.message:"unknown");
+   return Response.json({error:"RAILWAY_EVIDENCE_REJECTED"},{status:503,headers});
+  }
+ }
+ const cached=whiteSnapshotCache.get(name);
+ if(cached&&cached.expires>Date.now())return new Response(cached.bytes,{headers});
+ try{
+  const src=await fetch(WHITE_SNAPSHOT_ORIGIN+WHITE_SNAPSHOT_BASE+name,{
+   method:"GET",redirect:"error",signal:AbortSignal.timeout(20000),
+   headers:{"Accept":"application/json"}});
+  if(!src.ok||Number(src.headers.get("content-length")||0)>WHITE_MAX_SNAPSHOT_BYTES)
+   throw Error("REMOTE_SNAPSHOT_NOT_READY");
+  const bytes=new Uint8Array(await src.arrayBuffer());
+  if(!bytes.length||bytes.byteLength>WHITE_MAX_SNAPSHOT_BYTES)
+   throw Error("SNAPSHOT_OUT_OF_BOUNDS");
+  // Only public JSON objects are cached. Never proxy raw HTML or untrusted URLs.
+  const data=JSON.parse(new TextDecoder().decode(bytes));
+  if(!data||typeof data!=="object"||Array.isArray(data))
+   throw Error("SNAPSHOT_INVALID_JSON");
+  if(name==="jobs.json"){
+   if(!Array.isArray(data.jobs)||!Number.isFinite(Date.parse(data.updated))||
+      data.failures!==0||Math.abs(Date.now()-Date.parse(data.updated))>24*3600000)
+     throw Error("UNVERIFIED_JOB_SNAPSHOT");
+  }else if(name==="job-search-facets.json"){
+   if(data.kind!=="HHBA_OFFICIAL_JD_SEARCH_FACETS_V1"||
+     !Number.isFinite(Date.parse(data.indexed_as_of))||
+     Math.abs(Date.now()-Date.parse(data.indexed_as_of))>24*3600000)
+     throw Error("STALE_JOB_FACETS");
+  }else if(name==="job-sync-status.json"){
+   if(data.summary?.kind!=="HHBA_OFFICIAL_FULL_JOB_JD_AUDIT_V1"||
+      !Number.isFinite(Date.parse(data.summary.indexed_as_of))||
+      Math.abs(Date.now()-Date.parse(data.summary.indexed_as_of))>24*3600000)
+     throw Error("STALE_JOB_AUDIT");
+  }
+  if(whiteSnapshotCache.size>8)whiteSnapshotCache.clear();
+  whiteSnapshotCache.set(name,{expires:Date.now()+90000,bytes});
+  return new Response(bytes,{headers});
+ }catch{
+  return Response.json({error:"PUBLIC_EVIDENCE_TEMPORARILY_UNAVAILABLE"},{status:503,headers});
+ }
+}
+// Same-service background indexer: only active with explicitly enabled Railway
+// production settings, existing mounted durable volume and fixed bundled scripts.
+let nativeIndexJobRunning=false;
+function startNativeIndexSchedule(){
+ if(Bun.env.HHBA_NATIVE_INDEX_PUBLISH!=="1"||
+    !Bun.env.RAILWAY_ENVIRONMENT_ID||!existsSync("/sync-state"))return;
+ const run=async()=>{
+  if(nativeIndexJobRunning)return;
+  nativeIndexJobRunning=true;
+  const tasks=[
+   ["bun","run","scripts/prepare-pages-jobs.mjs"],
+   ["bun","run","scripts/audit-all-official-jds.mjs"],
+   ["bun","run","/app/publish-official-index.mjs","dist/data","/sync-state/public-index"]
+  ];
+  try{
+   for(const [step,argv] of tasks.entries()){
+    const child=Bun.spawn(argv,{cwd:"/app/index-builder",
+      stdout:"inherit",stderr:"inherit",env:{...Bun.env}});
+    const exitCode=await child.exited;
+    if(exitCode!==0)throw Error("NATIVE_INDEX_PHASE_"+(step+1)+"_FAILED_"+exitCode);
+   }
+   console.log("HHBA_NATIVE_RAILWAY_INDEX_PUBLISHED",{status:"verified_complete"});
+  }catch(e){
+   console.error("HHBA_NATIVE_INDEX_REFRESH_REJECTED",e instanceof Error?e.message:"unknown");
+  }finally{nativeIndexJobRunning=false}
+ };
+ setTimeout(()=>void run(),45_000).unref();
+ setInterval(()=>void run(),12*60*60*1000).unref();
+ console.log("HHBA_NATIVE_RAILWAY_INDEX_SCHEDULED",{hours:12,source:"official_ats"});
+}
+startNativeIndexSchedule();
+
+const WHITE_SPA_ROUTES=/^\/(?:companies(?:\/(?:openai|anthropic|spacex|id\/[A-Za-z0-9_-]{12,600}))?|candidate(?:\/.*)?|employer(?:\/.*)?|recruiter(?:\/.*)?|auth|workspace|public\/[^/?#]+|admin(?:\/.*)?)$/;
+async function whiteSiteResponse(req:Request,u:URL):Promise<Response|null>{
+ if(req.method!=="GET"&&req.method!=="HEAD")return null;
+ const p=u.pathname;
+ if(p==="/api/official-index/status"){
+  try{
+   const active=Bun.env.HHBA_NATIVE_INDEX_READ==="1";
+   const native=await readNativeIndex("/sync-state/public-index","jobs.json");
+   return Response.json({kind:"HHBA_OFFICIAL_INDEX_STATUS_V1",
+    nativeReadEnabled:active,
+    nativePublishEnabled:Bun.env.HHBA_NATIVE_INDEX_PUBLISH==="1",
+    available:!!native,source:active&&native?"railway-verified-volume":"pages-verified-fallback",
+    updated:native?.manifest.updated||null,
+    jobs:native?.manifest.jobs||null,facets:native?.manifest.facets||null
+   },{headers:{"Cache-Control":"no-store"}});
+  }catch{return Response.json({kind:"HHBA_OFFICIAL_INDEX_STATUS_V1",
+    available:false,error:"NATIVE_INDEX_REJECTED"},{status:503});}
+ }
+ if(p.startsWith("/data/")){
+  const match=p.match(/^\/data\/([a-z-]+\.json)$/);
+  return match?whiteSnapshot(match[1]):
+   Response.json({error:"NOT_FOUND"},{status:404});
+ }
+ // Serve only locally reviewed original vectors or official-site PNG/SVG icons.
+ // Never turn this into an arbitrary filesystem path or URL proxy.
+ if(p.startsWith("/brands/")){
+  if(!/^\/brands\/(?:(?:openai|claude|spacex|si-[a-z0-9]{2,40})\.svg|brand-[a-z0-9]{2,60}\.(?:png|svg))$/.test(p))
+   return new Response("Not found",{status:404});
+  const verified=Bun.file(WHITE_PUBLIC_ROOT+p);
+  if(!await verified.exists())return new Response("Brand asset not published",{status:404});
+  return new Response(req.method==="HEAD"?null:verified,{headers:{
+   "Content-Type":p.endsWith(".png")?"image/png":"image/svg+xml; charset=utf-8",
+   "Cache-Control":"public, max-age=86400",
+   "X-Content-Type-Options":"nosniff",
+   "Content-Security-Policy":"default-src 'none'; style-src 'unsafe-inline'; sandbox"
+  }});
+ }
+ if(p.startsWith("/assets/")){
+  if(!/^\/assets\/[A-Za-z0-9._-]{1,180}$/.test(p))
+   return new Response("Not found",{status:404});
+  const asset=Bun.file(WHITE_PUBLIC_ROOT+p);
+  if(!await asset.exists())return new Response("Not found",{status:404});
+  return new Response(req.method==="HEAD"?null:asset,{headers:{
+   "Content-Type":asset.type||"application/octet-stream",
+   "Cache-Control":"public, max-age=31536000, immutable",
+   "X-Content-Type-Options":"nosniff"
+  }});
+ }
+ if(p==="/"||p==="/jobs"||WHITE_SPA_ROUTES.test(p)){
+  const index=Bun.file(WHITE_PUBLIC_ROOT+"/index.html");
+  if(!await index.exists())return new Response("White frontend not built",{status:503});
+  return new Response(req.method==="HEAD"?null:index,{headers:{
+   "Content-Type":"text/html; charset=utf-8",
+   "Cache-Control":"no-store",
+   "X-Content-Type-Options":"nosniff",
+   "Referrer-Policy":"no-referrer"
+  }});
+ }
+ return null;
 }
 
 Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  const u=new URL(req.url);
- // The WHITE HHBA is the sole user-facing job marketplace. Keep these
- // existing Railway JSON/JD/translation APIs reachable for the white reader.
- if(req.method==="GET"&&(u.pathname==="/"||u.pathname==="/jobs"))
-  return Response.redirect("https://yanm-jun.github.io/hhba-talent/",302);
+ // Preserve old /jobs/:id deep links on the NEW white hostname.
  const oldJobRoute=u.pathname.match(new RegExp("^/jobs/([A-Za-z0-9_-]{1,180})$"));
  if(req.method==="GET"&&oldJobRoute)
-  return Response.redirect("https://yanm-jun.github.io/hhba-talent/candidate/jobs/"+encodeURIComponent(oldJobRoute[1]),302);
+  return Response.redirect(u.origin+"/candidate/jobs/"+encodeURIComponent(oldJobRoute[1]),302);
+ const whiteResponse=await whiteSiteResponse(req,u);
+ if(whiteResponse)return whiteResponse;
  const headers:Record<string,string>={"Cache-Control":"no-store","X-Content-Type-Options":"nosniff","X-Frame-Options":"DENY","Referrer-Policy":"no-referrer"};
  const pagesRequest=req.headers.get("origin")==="https://yanm-jun.github.io" &&
    /^\/api\/jobs\/[A-Za-z0-9_-]{1,180}(?:\/translate-part)?$/.test(u.pathname);
@@ -1397,7 +1625,36 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
    return new Response(null,{status:204,headers});
  if(req.method==="POST"&&/^\/api\/jobs\/[a-zA-Z0-9_-]{1,180}\/translate-part$/.test(u.pathname))return readJobForTranslation(req,u,headers);
  if(req.method!=="GET")return new Response("Method not allowed",{status:405,headers});
- if(u.pathname==="/health")return Response.json({ok:true,kind:"hhba-ats-public-preview"},{headers});
+ if(u.pathname==="/health"){const frontendReady=await Bun.file(WHITE_PUBLIC_ROOT+"/index.html").exists();return Response.json({ok:frontendReady,kind:"hhba-white-ats-railway",frontendReady},{status:frontendReady?200:503,headers});}
+ // A single fast read for private precomputed, hash-bound bilingual text.
+ // This route MUST NOT invoke official ATS fetch or an MT service.
+ const readyMatch=u.pathname.match(/^\/api\/jobs\/([A-Za-z0-9_-]{1,180})\/ready-jd$/);
+ if(readyMatch){
+  if(!durableJobStore)return Response.json({ready:false,status:"PREPARING",reason:"STORAGE_UNAVAILABLE"},{status:503,headers});
+  const id=readyMatch[1];
+  const job=await fromWhiteIndex(id);
+  if(!job)return Response.json({ready:false,error:"OFFICIAL_JOB_NOT_LISTED"},{status:404,headers});
+  const doc=durableJobStore.readyDocument(id,job.url);
+  if(!doc)return Response.json({ready:false,status:"PREPARING"},{status:202,headers});
+  return Response.json({...doc,job:{id:job.id,url:job.url,title:job.title,company:job.company},
+    status:doc.ready?"READY":"TRANSLATING",machineTranslated:!!doc.chineseText,
+    note:"Unofficial machine translation; refer to the employer's original posting."
+   },{headers});
+ }
+ if(u.pathname==="/api/jd-ready/status"){
+  const items=BILINGUAL_FEATURED_IDS.map(id=>{
+   const meta=durableJobStore?.metadata(id);
+   const completed=durableJobStore?.readyDocument(id);
+   return {id,englishReady:!!completed?.originalText,
+     chineseReady:completed?.ready===true,
+     done:completed?.done??meta?.done??0,total:completed?.total??meta?.total??0,
+     state:meta?.state||"PREPARING"};
+  });
+  return Response.json({kind:"HHBA_PREPARED_BILINGUAL_V1",
+   persistent:!!durableJobStore,featured:items,
+   complete:items.filter(j=>j.chineseReady).length,total:items.length,
+   noForegroundTranslation:true},{headers});
+ }
  if(u.pathname==="/api/jd-sync/status"){
   return Response.json(durableJobStore?{...durableJobStore.coverage(),
    enabled:true,persistent:true,
@@ -1471,8 +1728,24 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
    if(u.pathname.startsWith("/api/"))return Response.json({job:present(job),description:null,richHtml:null,applyUrl:null,recordKind:job.company==="Xiaomi"?"OFFICIAL_LIST_OBSERVED":"OFFICIAL_JOB_PAGE_OBSERVED",currentApplicationVerified:false,detailVerified:job.company!=="Xiaomi",officialListUrl:job.company==="Xiaomi"?job.url:null,officialJobUrl:job.company==="Xiaomi"?null:job.url,observedAt:job.observedAt},{headers});
    return new Response(domesticDetailHtml(job),{headers:{...headers,"Content-Type":"text/html; charset=utf-8"}});
   }
+  const prepared=durableJobStore?.readyDocument(job.id,job.url);
+  if(prepared && u.pathname.startsWith("/api/")){
+   const offline:Detail={job,description:prepared.originalText,richHtml:"",applyUrl:job.url,
+      status:"LIVE_CONTENT",checkedAt:prepared.checkedAt};
+   return Response.json(offline,{headers});
+  }
   const result=await officialDetail(job);
   if(!result)return new Response("官方职位详情暂不可用，请从招聘列表进入企业官网",{status:503,headers});
+  if(durableJobStore&&result.status==="LIVE_CONTENT"&&result.description){
+    // Opportunistically save the checked English original (never trigger MT).
+    // A later GET can use it instantly, while the background worker fills zh.
+    try{
+     const sourceHash=createHash("sha256").update(result.description).digest("hex");
+     const segments=jdChunks(result.description);
+     if(segments.length>0&&segments.length<=150)
+      durableJobStore.sourceVersion(job.id,sourceHash,segments.length,result.description);
+    }catch(e){console.warn("HHBA_JD_SOURCE_CACHE_SKIPPED",e instanceof Error?e.message:"unknown");}
+  }
   if(u.pathname.startsWith("/api/"))return Response.json(result,{headers});
   const zhJd=await translatedDetail(result);
   return new Response(detailHtml(result,zhJd),{headers:{...headers,"Content-Type":"text/html; charset=utf-8"}});

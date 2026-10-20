@@ -1,0 +1,82 @@
+
+.resume-match-page{max-width:1110px;margin:0 auto;padding:26px 28px 86px;color:#20352c}
+.resume-match-breadcrumb{display:flex;align-items:center;gap:10px;font-size:13px;color:#7a877e;margin-bottom:36px}
+.resume-match-breadcrumb a{color:#526d59;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+.resume-match-breadcrumb strong{font-weight:500;color:#3f5547}
+.resume-match-kicker{color:#33764f;font-size:13px;font-weight:650;letter-spacing:.02em;display:flex;align-items:center;gap:9px;margin-bottom:15px}
+.resume-match-page h1{font-size:clamp(27px,4vw,43px);max-width:840px;letter-spacing:-.04em;line-height:1.2;margin:0 0 16px}
+.resume-match-intro{max-width:760px;color:#65786d;font-size:15px;line-height:1.85;margin:0 0 19px}
+.resume-match-benefits{display:flex;gap:14px 21px;flex-wrap:wrap;margin-bottom:22px;color:#577461;font-size:12px}
+.resume-match-benefits span{display:inline-flex;align-items:center;gap:6px}
+.resume-match-status{display:inline-flex;align-items:center;gap:9px;color:#78684f;border:1px solid #e9e0d2;background:#fbf9f5;padding:8px 13px;font-size:12px;border-radius:999px;margin:0 0 24px}
+.resume-match-status.ready{background:#f0f9f2;border-color:#d4e7d8;color:#397450}
+.resume-match-dot{height:7px;width:7px;border-radius:50%;background:#b79c72}
+.resume-match-status.ready .resume-match-dot{background:#4c9c6b}
+.resume-match-layout{display:grid;grid-template-columns:minmax(0,1fr) 285px;gap:25px;align-items:start}
+.resume-match-form{border:1px solid #dce8df;border-radius:16px;padding:25px 25px 22px;background:#fff;box-shadow:0 8px 38px rgba(45,69,50,.035)}
+.resume-match-step{font-size:13px;font-weight:750;color:#3b6148;margin:0 0 14px}
+.resume-match-step:not(:first-child){margin-top:25px}
+.resume-match-hidden{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0,0,0,0)}
+.resume-match-dropzone{border:1.5px dashed #acc9b3;border-radius:12px;min-height:153px;background:#f8fbf9;display:flex;justify-content:center;align-items:center;flex-direction:column;gap:7px;cursor:pointer;padding:15px;text-align:center;color:#52795e}
+.resume-match-dropzone strong{font-size:14px;color:#355341;overflow-wrap:anywhere}
+.resume-match-dropzone small{font-size:12px;color:#809087}
+.resume-match-filters{display:grid;grid-template-columns:1.3fr 1fr;gap:13px}
+.resume-match-filters label{font-size:12px;color:#667a6c;font-weight:600;display:flex;flex-direction:column;gap:8px}
+.resume-match-filters input,.resume-match-filters select{background:#fff;border:1px solid #dde7df;border-radius:8px;padding:11px 12px;font-size:13px;color:#233f30;min-width:0;width:100%;outline-offset:3px}
+.resume-match-check{display:flex;align-items:center;gap:9px;margin-top:15px;font-size:13px;color:#596e61;cursor:pointer}
+.resume-match-check input,.resume-match-consent input{accent-color:#277e50;flex-shrink:0}
+.resume-match-consent{display:flex;align-items:flex-start;gap:11px;padding:14px;background:#f8faf8;border:1px solid #e4ebe5;border-radius:8px;cursor:pointer}
+.resume-match-consent input{margin-top:3px}
+.resume-match-consent span{color:#6a776e;font-size:12px;line-height:1.9}
+.resume-match-run{margin-top:19px;width:100%;display:flex;align-items:center;justify-content:center;gap:9px;border:0;background:#276d46;color:#fff;border-radius:9px;min-height:45px;font-size:14px;font-weight:700;cursor:pointer}
+.resume-match-run:disabled{opacity:.49;cursor:not-allowed}
+.resume-match-run:not(:disabled):hover{background:#205a39}
+.resume-match-cancel,.resume-match-evidence-btn{border:0;color:#4f7558;background:transparent;cursor:pointer;padding:9px 4px;font-size:13px}
+.resume-match-cancel{display:block;margin:9px auto 0}
+.resume-match-fineprint{display:flex;align-items:flex-start;gap:8px;font-size:11px;line-height:1.75;color:#829088;margin:13px 0 0}
+.resume-match-fineprint svg{flex-shrink:0;margin-top:2px}
+.resume-match-error{border-radius:7px;background:#fff3f1;color:#9a4f3c;font-size:12px;padding:11px 13px;line-height:1.65}
+.resume-match-guide{border:1px solid #e4eae5;border-radius:13px;background:#fbfcfb;padding:20px}
+.resume-match-guide h2{font-size:16px;letter-spacing:-.02em;margin:0 0 23px}
+.resume-match-guide div{padding-left:12px;border-left:2px solid #c7d9cd;margin:0 0 22px}
+.resume-match-guide b{font-size:13px;color:#385542}
+.resume-match-guide p{color:#7e8b81;line-height:1.75;font-size:12px;margin:5px 0}
+.resume-match-guide>a,.resume-match-guide p a{color:#37784f}
+.resume-match-results{margin-top:42px;padding-top:8px}
+.resume-match-result-heading>span{color:#3d8960;font-size:12px;font-weight:650}
+.resume-match-result-heading h2{font-size:27px;line-height:1.4;margin:7px 0}
+.resume-match-result-heading p{font-size:13px;color:#79877f;margin:0 0 18px}
+.resume-match-profile{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:21px 0 14px}
+.resume-match-profile>div{display:flex;flex-direction:column;gap:8px;padding:16px;border:1px solid #e1e9e2;border-radius:10px}
+.resume-match-profile small{color:#819086;font-size:12px}
+.resume-match-profile strong{font-size:15px;color:#375a41;overflow-wrap:anywhere}
+.resume-match-tags{display:flex;flex-wrap:wrap;gap:7px}
+.resume-match-tags span{border-radius:999px;background:#edf7f0;color:#447655;padding:6px 10px;font-size:12px}
+.resume-match-evidence{background:#f6faf7;border:1px solid #e6eee8;border-radius:9px;padding:13px;margin:6px 0 15px}
+.resume-match-evidence p{color:#62776a;font-size:12px;line-height:1.65;overflow-wrap:anywhere;margin:7px 0}
+.resume-match-count{display:flex;align-items:end;gap:15px;flex-wrap:wrap;margin:29px 0 16px}
+.resume-match-count h3{font-size:20px;line-height:1.4;margin:0}
+.resume-match-count p{color:#7a8980;font-size:11px;margin:0 0 3px}
+.resume-match-job-list{display:grid;gap:15px}
+.resume-match-job{border:1px solid #e0eae3;border-radius:13px;padding:18px 20px}
+.resume-match-job-top{display:flex;justify-content:space-between;gap:18px}
+.resume-match-job-top>div:first-child>span{color:#56735e;font-size:12px}
+.resume-match-job-top h4{font-size:18px;margin:6px 0;line-height:1.5}
+.resume-match-job-top small{color:#839087;font-size:11px}
+.resume-match-score{display:flex;flex-direction:column;align-items:center;background:#f0f8f2;border-radius:9px;padding:9px 13px;min-width:82px;height:max-content}
+.resume-match-score strong{font-size:25px;color:#32734a}
+.resume-match-score span{font-size:10px;color:#679074;white-space:nowrap}
+.resume-match-reason{margin-top:15px;border-top:1px solid #eef2ef;padding-top:11px}
+.resume-match-reason h5{font-size:12px;color:#887050;margin:0 0 7px}
+.resume-match-reason h5.positive{color:#3c7950}
+.resume-match-reason p{color:#647669;font-size:12px;line-height:1.7;margin:4px 0;overflow-wrap:anywhere}
+.resume-match-job-actions{display:flex;flex-wrap:wrap;gap:12px 17px;align-items:center;margin-top:19px}
+.resume-match-job-actions a{font-size:12px;color:#276f45;text-decoration:none;display:inline-flex;gap:5px;align-items:center;font-weight:700}
+.resume-match-none{padding:18px;color:#64776a;font-size:13px;line-height:1.7;border-radius:10px;background:#f7faf8}
+.resume-match-none a{color:#28724a}
+.resume-match-spinning{animation:resume-match-rotate 1.3s linear infinite}
+@keyframes resume-match-rotate{to{transform:rotate(360deg)}}
+@media(max-width:850px){.resume-match-layout{grid-template-columns:1fr}.resume-match-guide{display:none}}
+@media(max-width:560px){.resume-match-page{padding:20px 16px 65px}.resume-match-page h1{font-size:29px}.resume-match-form{padding:18px 16px}.resume-match-filters{grid-template-columns:1fr}.resume-match-profile{grid-template-columns:1fr 1fr}.resume-match-profile>div:last-child{grid-column:1/-1}.resume-match-job{padding:17px 15px}.resume-match-score{min-width:68px;padding:8px}}
+
+.resume-match-experiences{margin:19px 0 6px;border-top:1px solid #e8eee9;padding-top:14px}.resume-match-experiences h3{font-size:14px;margin:0 0 12px}.resume-match-experiences>div{display:flex;flex-direction:column;gap:5px;border-left:2px solid #b9d0bf;padding:6px 12px;margin:11px 0}.resume-match-experiences strong{font-size:13px;color:#3f604a}.resume-match-experiences span{font-size:12px;color:#607669}.resume-match-experiences small{font-size:11px;color:#819087;line-height:1.5;overflow-wrap:anywhere}

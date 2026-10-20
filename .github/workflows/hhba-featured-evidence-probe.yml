@@ -1,0 +1,31 @@
+name: HHBA Featured Enterprises Evidence Probe
+on:
+  push:
+    branches: [feat/official-brand-logos-featured-20261020]
+    paths: ['.github/workflows/hhba-featured-evidence-probe.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Inspect exact verified live job metadata, no job details copied to logs
+        run: |
+          node --input-type=module <<'NODE'
+          const origin='https://hhba-web-production-024c.up.railway.app';
+          const response=await fetch(origin+'/data/jobs.json',{signal:AbortSignal.timeout(50000)});
+          if(!response.ok)throw Error('Verified native job feed HTTP '+response.status);
+          const data=await response.json();
+          const targets=['OpenAI','Anthropic','SpaceX'];
+          for(const name of targets){
+           const selected=data.jobs.filter(row=>row.company.toLowerCase().includes(name.toLowerCase()));
+           console.log('VERIFIED_COMPANY_EVIDENCE',JSON.stringify({company:name,count:selected.length,
+             first:selected.slice(0,5).map(x=>({id:x.id,company:x.company,source:x.source,platform:x.platform,
+             title:x.title,location:x.location,url:x.url,observedAt:x.observedAt}))}));
+          }
+          console.log('VERIFIED_NATIVE_TOTAL',JSON.stringify({total:data.total,updated:data.updated}));
+          NODE

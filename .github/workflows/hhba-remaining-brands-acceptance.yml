@@ -1,0 +1,62 @@
+name: HHBA Remaining Genuine Brands and Railway Safety Gate
+on:
+  push:
+    branches: [feat/remaining-verified-brand-logos-20261020]
+    paths:
+      - 'apps/web/**'
+      - 'ops/legacy-marketplace/**'
+      - '.github/workflows/hhba-remaining-brands-acceptance.yml'
+  pull_request:
+    paths:
+      - 'apps/web/**'
+      - 'ops/legacy-marketplace/**'
+      - '.github/workflows/hhba-remaining-brands-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-and-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Check all logo SHA-256, correct employer identity, and existing routes
+        working-directory: apps/web
+        run: |
+          node --test scripts/verified-brand-registry.contract.test.mjs
+          node --test scripts/featured-brand-jobs.contract.test.mjs
+          node --test scripts/all-companies-registry.contract.test.mjs
+          node --test scripts/company-profiles.contract.test.mjs
+          node --test scripts/job-origin-navigation.contract.test.mjs
+          node --test scripts/white-market-detail.contract.test.mjs
+      - name: Exact Railway build, require every original vetted file
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '0'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+        run: |
+          npm run build
+          node --input-type=module <<'NODE'
+          import {readFileSync,statSync} from 'node:fs';
+          const registry=JSON.parse(readFileSync('src/data/verifiedBrandAssets.json','utf8'));
+          const keys=new Set();
+          if(registry.records.length!==50)throw Error('Must have 50 vetted company identities');
+          for(const r of registry.records){
+            const key=JSON.stringify([r.company,r.platform,r.source]);
+            if(keys.has(key))throw Error('Duplicate employer identity '+key);
+            keys.add(key);
+            if(statSync('dist/brands/'+r.file).size===0)throw Error('Missing genuine mark '+r.file);
+          }
+          if(!keys.has(JSON.stringify(['Headway','ashby','headway'])))
+            throw Error('The original Headway ATS-declared company logo is required');
+          console.log('HHBA_50_REAL_BRAND_ASSETS_READY',JSON.stringify({total:registry.records.length,distinct:keys.size,pending:0}));
+          NODE

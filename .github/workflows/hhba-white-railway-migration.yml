@@ -1,0 +1,81 @@
+name: HHBA white Railway migration acceptance
+on:
+  push:
+    branches: [feat/white-railway-migration-20261020]
+    paths:
+      - 'Dockerfile.hhba'
+      - 'ops/legacy-marketplace/**'
+      - 'apps/web/**'
+      - '.github/workflows/hhba-white-railway-migration.yml'
+  pull_request:
+    paths:
+      - 'Dockerfile.hhba'
+      - 'ops/legacy-marketplace/**'
+      - 'apps/web/**'
+      - '.github/workflows/hhba-white-railway-migration.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  docker-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build white HHBA + current official ATS reader
+        run: docker build -f Dockerfile.hhba -t hhba-white-migration:test .
+      - name: Start local Railway-compatible image
+        run: docker run -d --name hhba-acceptance --publish 127.0.0.1:8765:8080 --env PORT=8080 --env HHBA_PUBLIC_CI_ONLY=1 hhba-white-migration:test
+      - name: Validate white SPA, API isolation and verified public evidence
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {setTimeout} from 'node:timers/promises';
+          const root='http://127.0.0.1:8765';
+          let health=null;
+          for(let i=0;i<35;i++){
+           try{const r=await fetch(root+'/health');
+             if(r.ok){health=await r.json();break;}}catch{}
+           await setTimeout(1000);
+          }
+          assert.equal(health?.frontendReady,true,'white image health must be ready');
+          const home=await fetch(root+'/');
+          assert.equal(home.status,200,'root must serve HHBA, not redirect to GitHub Pages');
+          const html=await home.text();
+          assert.match(html,/<div id="root"><\/div>/);
+          const compiled=html.match(/src="(\/assets\/[^"]+\.js)"/);
+          assert.ok(compiled,'compiled white bundle missing');
+          const js=await fetch(root+compiled[1]);
+          assert.equal(js.status,200);
+          assert.match(js.headers.get('content-type')||'',/javascript/);
+          const routes=['/candidate','/candidate/jobs','/candidate/jobs/example-id','/employer','/recruiter/register'];
+          for(const p of routes){
+           const r=await fetch(root+p);
+           assert.equal(r.status,200,'SPA deep-route failed: '+p);
+           assert.match(await r.text(),/<div id="root"><\/div>/);
+          }
+          const missing=await fetch(root+'/assets/fake-unsafe.js');
+          assert.equal(missing.status,404);
+          const badapi=await fetch(root+'/api/v1/auth/me');
+          assert.notEqual(badapi.headers.get('content-type'),'text/html; charset=utf-8','authenticated API cannot silently resolve to white HTML');
+          const jdSync=await fetch(root+'/api/jd-sync/status');
+          assert.equal(jdSync.status,200);
+          const feed=await fetch(root+'/data/jobs.json',{signal:AbortSignal.timeout(40000)});
+          assert.equal(feed.status,200,'verified metadata snapshot unavailable');
+          const data=await feed.json();
+          assert.ok(Array.isArray(data.jobs)&&data.jobs.length>1000,'real jobs missing');
+          const audit=await fetch(root+'/data/job-sync-status.json',{signal:AbortSignal.timeout(40000)});
+          assert.equal(audit.status,200,'official JD audit unavailable');
+          const facets=await fetch(root+'/data/job-search-facets.json',{signal:AbortSignal.timeout(40000)});
+          assert.equal(facets.status,200,'Chinese search facets unavailable');
+          const f=await facets.json();
+          assert.equal(f.indexed_as_of,data.updated,'facets must correspond to same source snapshot');
+          console.log('HHBA_WHITE_RAILWAY_ACCEPTED',JSON.stringify({jobs:data.jobs.length,updated:data.updated,matchedFacets:f.jobs.length,routes:routes.length,apiIsolated:true}));
+          NODE
+      - name: Print logs on failure
+        if: failure()
+        run: docker logs --tail 160 hhba-acceptance
+      - name: Stop container
+        if: always()
+        run: docker rm --force hhba-acceptance || true

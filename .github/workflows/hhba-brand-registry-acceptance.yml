@@ -1,0 +1,50 @@
+name: HHBA 28 Traceable Employer Logos and UI
+on:
+  push:
+    branches: [feat/verified-brand-registry-20261020]
+    paths:
+      - 'apps/web/**'
+      - 'ops/legacy-marketplace/**'
+      - '.github/workflows/hhba-brand-registry-acceptance.yml'
+  pull_request:
+    paths:
+      - 'apps/web/**'
+      - 'ops/legacy-marketplace/**'
+      - '.github/workflows/hhba-brand-registry-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  brands:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install exact web deps
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Validate 28 original SVG hashes, source pairing, routes and real job cards
+        working-directory: apps/web
+        run: |
+          node --test scripts/verified-brand-registry.contract.test.mjs
+          node --test scripts/featured-brand-jobs.contract.test.mjs
+          node --test scripts/all-companies-registry.contract.test.mjs
+          node --test scripts/company-profiles.contract.test.mjs
+          node --test scripts/white-market-detail.contract.test.mjs
+      - name: Railway web build (not GitHub Pages)
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '0'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+        run: |
+          npm run build
+          test -s dist/brands/si-stripe.svg
+          test -s dist/brands/si-notion.svg
+          test -s dist/brands/si-cloudflare.svg
+          test -s dist/brands/spacex.svg

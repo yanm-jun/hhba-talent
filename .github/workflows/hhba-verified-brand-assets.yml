@@ -1,0 +1,71 @@
+name: HHBA Capture Authentic Brand Logo Assets
+on:
+  push:
+    branches: [feat/official-brand-logos-featured-20261020]
+    paths: ['.github/workflows/hhba-verified-brand-assets.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  authoritative-logo-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/official-brand-logos-featured-20261020
+          persist-credentials: true
+      - name: Download actual brand-owned marks, no generated or substitute symbols
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import io,urllib.request,zipfile,xml.etree.ElementTree as ET,hashlib
+          folder=Path('apps/web/public/brands')
+          folder.mkdir(parents=True,exist_ok=True)
+          def read(url):
+           r=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 HHBA verified brand asset setup'})
+           with urllib.request.urlopen(r,timeout=35) as response:
+            data=response.read(5_000_000+1)
+            if len(data)>5_000_000:raise RuntimeError('asset too big')
+            return data
+          kit=read('https://cdn.openai.com/brand/OpenAI-Logos-2025.zip')
+          z=zipfile.ZipFile(io.BytesIO(kit))
+          logo=z.read('OpenAI-logos(new)/SVGs/OpenAI-black-monoblossom.svg')
+          sources=[
+            ('openai.svg',logo,'https://cdn.openai.com/brand/OpenAI-Logos-2025.zip'),
+            ('claude.svg',read('https://claude.com/favicon.svg'),'https://claude.com/favicon.svg')
+          ]
+          errors=[]
+          for url in [
+            'https://commons.wikimedia.org/wiki/Special:FilePath/SpaceX_logo_black.svg',
+            'https://upload.wikimedia.org/wikipedia/commons/3/34/SpaceX_logo_black.svg',
+            'https://raw.githubusercontent.com/simple-icons/simple-icons/master/icons/spacex.svg'
+          ]:
+           try:
+            vector=read(url)
+            if b'<svg' not in vector[:600]:raise ValueError('not SVG')
+            sources.append(('spacex.svg',vector,url))
+            break
+           except Exception as ex:errors.append(url+' '+type(ex).__name__)
+          if len(sources)!=3:raise RuntimeError('NO_VERIFIED_SPACEX_VECTOR '+str(errors))
+          manifest=['# HHBA logo provenance','','These are original brand marks, not AI-generated artwork or affiliated employer badges.',
+            'They are used only to identify the employers of independently indexed official jobs.',
+            'Brand names and trademarks belong to their owners. Refer to source terms before redistribution.','']
+          for name,data,url in sources:
+           if len(data)>150000 or len(data)<100 or b'<svg' not in data[:500]:raise ValueError(name+' missing SVG')
+           root=ET.fromstring(data)
+           if not root.tag.endswith('svg'):raise ValueError(name+' invalid root')
+           if any(x.tag.endswith('script') or x.tag.endswith('foreignObject') for x in root.iter()):
+            raise ValueError('unsafe SVG elements in '+name)
+           (folder/name).write_bytes(data)
+           digest=hashlib.sha256(data).hexdigest()
+           print('HHBA_AUTHENTIC_BRAND_SVG',name,'bytes',len(data),'sha256',digest,'source',url)
+           manifest.append('- '+name+' — '+url+' — SHA-256 '+digest)
+          (folder/'SOURCES.md').write_text('\n'.join(manifest)+'\n','utf8')
+          PY
+      - name: Commit unchanged source SVGs with provenance
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/public/brands/openai.svg apps/web/public/brands/claude.svg apps/web/public/brands/spacex.svg apps/web/public/brands/SOURCES.md
+          git commit -m "assets(brand): add provenance-verified original OpenAI Claude SpaceX vectors"
+          git push origin HEAD:feat/official-brand-logos-featured-20261020

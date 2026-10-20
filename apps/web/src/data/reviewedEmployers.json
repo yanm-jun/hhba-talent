@@ -1,0 +1,453 @@
+{
+  "schemaVersion": 1,
+  "profiles": [
+    {
+      "id": "WyJncmVlbmhvdXNlIiwiYW5kdXJpbGluZHVzdHJpZXMiLCJBbmR1cmlsIl0",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "andurilindustries",
+        "company": "Anduril"
+      },
+      "name": "Anduril",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "国防科技、自主系统与人工智能软件",
+        "en": "Defense technology, autonomous systems and AI software"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2017",
+      "tagline": {
+        "zh": "将人工智能、自主系统与先进制造应用于现代国防技术。",
+        "en": "Developing AI-driven autonomous systems and advanced defense technologies."
+      },
+      "overview": [
+        {
+          "zh": "Anduril Industries 是一家美国国防科技企业，成立于 2017 年。公司重点开发自主系统、传感器、人工智能软件以及可用于多种任务环境的网络化系统。与传统仅提供单一硬件产品的模式不同，Anduril 将软件能力与不同平台、传感器和设备的协同作为重要研发方向。",
+          "en": "Founded in 2017, Anduril Industries is a US defense technology company developing autonomous systems, sensors, artificial intelligence software and networked systems for a variety of operating environments. Its approach emphasizes integrating software capabilities across platforms and equipment."
+        },
+        {
+          "zh": "公司的核心软件平台 Lattice 用于连接和管理传感器、系统及相关设备，支持信息整合、决策辅助和任务管理。Anduril 还公开展示了陆地、空中、海上领域的多种自主系统。对于求职者而言，具体岗位的技术范围与资质条件仍需以企业官方 JD 为准。",
+          "en": "Anduril’s Lattice software connects and manages sensors, systems and other devices, supporting information integration, decision support and mission management. The company also publicly describes autonomous systems across land, air and maritime domains. Actual responsibilities and qualifications should always be checked against the original job description."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Lattice 软件平台",
+            "en": "Lattice software platform"
+          },
+          "description": {
+            "zh": "连接多类传感器、网络和系统，用于信息融合、任务管理和协同操作。",
+            "en": "Connects sensors, networks and systems for data integration, mission management and coordinated operations."
+          }
+        },
+        {
+          "name": {
+            "zh": "自主航空系统",
+            "en": "Autonomous air systems"
+          },
+          "description": {
+            "zh": "开发与软件平台连接的自主航空设备及相关技术。",
+            "en": "Develops autonomous air vehicles and associated software-connected capabilities."
+          }
+        },
+        {
+          "name": {
+            "zh": "传感器与反无人机系统",
+            "en": "Sensors and counter-UAS systems"
+          },
+          "description": {
+            "zh": "产品涉及传感、监测以及对空中威胁的综合识别与防护。",
+            "en": "Develops sensing, awareness and integrated counter-UAS capabilities."
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2017",
+          "description": {
+            "zh": "Anduril 成立，提出通过快速研发和软件驱动技术推动国防创新。",
+            "en": "Anduril was founded with an emphasis on rapid development and software-driven defense technology."
+          }
+        },
+        {
+          "date": "2023",
+          "description": {
+            "zh": "公司发布年度回顾，介绍其自主系统及国防技术业务的发展。",
+            "en": "Anduril published its 2023 year in review, covering its growth in autonomous and defense technologies."
+          }
+        },
+        {
+          "date": "2025",
+          "description": {
+            "zh": "Anduril 公布获得美国海军陆战队反无人机系统项目合同。",
+            "en": "Anduril announced a U.S. Marine Corps program contract relating to counter-UAS systems."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Anduril 官方使命与技术介绍",
+            "en": "Anduril official mission and technology"
+          },
+          "url": "https://www.anduril.com/mission"
+        },
+        {
+          "label": {
+            "zh": "Anduril 官方公司主页",
+            "en": "Anduril official company homepage"
+          },
+          "url": "https://www.anduril.com/"
+        },
+        {
+          "label": {
+            "zh": "Anduril 2023 年官方回顾",
+            "en": "Anduril 2023 official year in review"
+          },
+          "url": "https://www.anduril.com/news/anduril-in-2023-a-year-in-review"
+        },
+        {
+          "label": {
+            "zh": "Anduril 反无人机业务与新闻",
+            "en": "Anduril counter-UAS products and news"
+          },
+          "url": "https://www.anduril.com/counter-uas/"
+        }
+      ],
+      "lastReviewed": "2026-10-20"
+    },
+    {
+      "identity": {
+        "platform": "greenhouse",
+        "source": "figma",
+        "company": "Figma"
+      },
+      "name": "Figma",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "协作式产品设计与开发工具",
+        "en": "Collaborative product design and development software"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2012",
+      "tagline": {
+        "zh": "帮助团队从构思、设计到交付，共同打造数字产品。",
+        "en": "Helping teams move from ideas and design to shipped digital products."
+      },
+      "overview": [
+        {
+          "zh": "Figma 是一家创立于 2012 年的美国软件企业，以浏览器原生的协作式界面设计工具起步。设计师、产品经理和开发人员可以围绕同一份设计文件进行编辑、评论、原型演示和协同决策。",
+          "en": "Founded in 2012, Figma is a US software company that began with browser-native, collaborative interface design. Designers, product managers and developers use shared files to edit, comment, prototype and coordinate product decisions."
+        },
+        {
+          "zh": "Figma 已将产品范围从界面设计扩展至白板协作、开发交接以及其他数字产品制作环节。HHBA 的企业介绍用于理解业务背景；岗位职责、薪酬和任职要求须以对应企业官方招聘信息为准。",
+          "en": "Figma has expanded beyond interface design into whiteboarding, developer handoff and other stages of digital product creation. This independent profile provides business context; actual duties, compensation and qualifications must be checked in the official posting."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Figma Design",
+            "en": "Figma Design"
+          },
+          "description": {
+            "zh": "协作式界面设计、组件系统和交互原型工具。",
+            "en": "Collaborative interface design, design systems and interactive prototyping."
+          }
+        },
+        {
+          "name": {
+            "zh": "FigJam",
+            "en": "FigJam"
+          },
+          "description": {
+            "zh": "用于头脑风暴、工作坊与团队共创的在线白板。",
+            "en": "An online whiteboard for brainstorming, workshops and team ideation."
+          }
+        },
+        {
+          "name": {
+            "zh": "Dev Mode",
+            "en": "Dev Mode"
+          },
+          "description": {
+            "zh": "连接设计与开发交付，帮助工程师读取设计实现信息。",
+            "en": "Bridges design and engineering handoff with implementation-oriented design context."
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2012",
+          "description": {
+            "zh": "Figma 由 Dylan Field 和 Evan Wallace 共同创立。",
+            "en": "Figma was founded by Dylan Field and Evan Wallace."
+          }
+        },
+        {
+          "date": "2015",
+          "description": {
+            "zh": "Figma 公开发布协作式浏览器界面设计工具的早期版本。",
+            "en": "Figma announced an early release of its collaborative browser-based interface design tool."
+          }
+        },
+        {
+          "date": "2025",
+          "description": {
+            "zh": "Figma 在纽约证券交易所上市，创始人再次阐述其协作设计愿景。",
+            "en": "Figma became publicly listed, and its founder reiterated its vision for collaborative design."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Figma 官方公司介绍与产品",
+            "en": "Figma official company and products"
+          },
+          "url": "https://www.figma.com/about/"
+        },
+        {
+          "label": {
+            "zh": "Figma 创始人上市公开信（2025）",
+            "en": "Figma founder's IPO letter (2025)"
+          },
+          "url": "https://www.figma.com/blog/figma-ipo-founder-letter/"
+        },
+        {
+          "label": {
+            "zh": "Figma 官方产品发布记录（2015）",
+            "en": "Figma official launch history (2015)"
+          },
+          "url": "https://www.figma.com/blog/design-meet-the-internet/"
+        }
+      ],
+      "id": "WyJncmVlbmhvdXNlIiwiZmlnbWEiLCJGaWdtYSJd",
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "identity": {
+        "platform": "greenhouse",
+        "source": "databricks",
+        "company": "Databricks"
+      },
+      "name": "Databricks",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "企业数据平台、数据工程与人工智能",
+        "en": "Enterprise data platforms, data engineering and AI"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2013",
+      "tagline": {
+        "zh": "在统一数据平台上连接分析、治理与人工智能应用。",
+        "en": "Connecting analytics, governance and AI on a unified data platform."
+      },
+      "overview": [
+        {
+          "zh": "Databricks 是一家 2013 年创立于美国的数据与人工智能软件企业，起源于加州大学伯克利分校的研究与开源生态。其创始团队参与了 Apache Spark 等数据技术的早期发展，核心业务是帮助组织统一管理数据分析、数据工程和机器学习工作负载。",
+          "en": "Databricks is a US data and AI software company founded in 2013 with roots in UC Berkeley research and open source. Its founding team helped create technologies including Apache Spark. Its platform brings together data analytics, data engineering and machine learning workloads."
+        },
+        {
+          "zh": "Databricks 的 Data + AI Platform 以开放式湖仓架构为基础，提供数据摄取、处理、分析、权限治理及 AI 应用能力。不同职位可能对应分布式系统、数据基础设施、平台产品、销售或客户成功等方向，具体资格以官方 JD 为准。",
+          "en": "Databricks' Data + AI Platform builds on open lakehouse architecture and supports ingestion, transformation, analytics, governance and AI applications. Roles can span distributed systems, data infrastructure, product, sales and customer success; official JDs remain authoritative."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Lakehouse / 数据与 AI 平台",
+            "en": "Lakehouse / Data + AI Platform"
+          },
+          "description": {
+            "zh": "将数据湖与数据仓库能力整合，支撑分析与 AI 工作负载。",
+            "en": "Combines data lake and data warehouse capabilities for analytics and AI workloads."
+          }
+        },
+        {
+          "name": {
+            "zh": "Unity Catalog",
+            "en": "Unity Catalog"
+          },
+          "description": {
+            "zh": "对数据、模型和相关 AI 资产实施统一发现、权限与血缘治理。",
+            "en": "Unified discovery, access control and lineage for data, models and AI assets."
+          }
+        },
+        {
+          "name": {
+            "zh": "Lakeflow",
+            "en": "Lakeflow"
+          },
+          "description": {
+            "zh": "为数据摄取、转换与作业编排提供数据工程工具。",
+            "en": "Data engineering tools for ingestion, transformation and workflow orchestration."
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2013",
+          "description": {
+            "zh": "Databricks 由伯克利研究人员创立，与 Apache Spark 开源生态密切相关。",
+            "en": "Databricks was founded by Berkeley researchers closely connected to the Apache Spark open-source ecosystem."
+          }
+        },
+        {
+          "date": "2026",
+          "description": {
+            "zh": "官方产品资料展示统一的数据工程、治理及 AI 应用平台布局。",
+            "en": "The official product portfolio includes unified data engineering, governance and AI application capabilities."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Databricks 官方公司简介",
+            "en": "Databricks official company overview"
+          },
+          "url": "https://www.databricks.com/company/about-us"
+        },
+        {
+          "label": {
+            "zh": "Databricks 官方品牌与创始团队资料",
+            "en": "Databricks official press kit and founders"
+          },
+          "url": "https://www.databricks.com/company/newsroom/press-kit"
+        },
+        {
+          "label": {
+            "zh": "Databricks 数据与 AI 平台产品",
+            "en": "Databricks Data + AI Platform"
+          },
+          "url": "https://www.databricks.com/product/platform"
+        }
+      ],
+      "id": "WyJncmVlbmhvdXNlIiwiZGF0YWJyaWNrcyIsIkRhdGFicmlja3MiXQ",
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "identity": {
+        "platform": "greenhouse",
+        "source": "airbnb",
+        "company": "Airbnb"
+      },
+      "name": "Airbnb",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "旅行住宿、体验与服务平台",
+        "en": "Travel accommodation, experiences and services marketplace"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2007",
+      "tagline": {
+        "zh": "连接旅行者与世界各地的房东、体验达人和服务提供者。",
+        "en": "Connecting travelers with hosts and local experiences and services."
+      },
+      "overview": [
+        {
+          "zh": "Airbnb（爱彼迎）起源于 2007 年美国旧金山的一次短期住宿分享尝试。平台逐步从个人房间出租发展到整套房源与度假住宿，让旅行者能够直接查找和预订由房东提供的住宿。",
+          "en": "Airbnb began in 2007 with a home-sharing experiment in San Francisco. It expanded from room rentals to whole-home and vacation stays, allowing travelers to discover and book accommodation offered by hosts."
+        },
+        {
+          "zh": "Airbnb 的业务现已包含住宿、由当地人提供的体验与旅行相关服务。公司负责市场平台、预订支付、信任与安全及房东和旅行者体验等产品能力；具体工作职责和申请限制以企业官方职位为准。",
+          "en": "Airbnb now spans stays, locally hosted experiences and travel-related services. The company operates marketplace, booking, payments, trust and safety, and host-and-guest experiences. The official posting determines each role's responsibilities and eligibility."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "住宿预订",
+            "en": "Stays"
+          },
+          "description": {
+            "zh": "让旅行者搜索、比较和预订个人房源、整套住宅及其他住宿。",
+            "en": "Search, discovery and booking of rooms, entire homes and other stays."
+          }
+        },
+        {
+          "name": {
+            "zh": "Airbnb Experiences",
+            "en": "Airbnb Experiences"
+          },
+          "description": {
+            "zh": "由当地达人提供的活动与体验，帮助旅客探索目的地。",
+            "en": "Locally hosted activities that help guests discover destinations."
+          }
+        },
+        {
+          "name": {
+            "zh": "Airbnb Services",
+            "en": "Airbnb Services"
+          },
+          "description": {
+            "zh": "与出行和住宿相关的服务，扩展旅途中的预订选择。",
+            "en": "Travel-related services that extend booking options beyond accommodation."
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2007",
+          "description": {
+            "zh": "Airbed & Breakfast 在旧金山迎来最初的三位客人。",
+            "en": "The Airbed & Breakfast idea welcomed its first three guests in San Francisco."
+          }
+        },
+        {
+          "date": "2008",
+          "description": {
+            "zh": "Airbed & Breakfast 正式推出服务与网站。",
+            "en": "Airbed & Breakfast officially launched its service and website."
+          }
+        },
+        {
+          "date": "2025",
+          "description": {
+            "zh": "Airbnb 宣布扩展 Experiences 和 Services 及新版应用。",
+            "en": "Airbnb announced expanded Experiences and Services alongside a redesigned app."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "爱彼迎中文官方公司故事",
+            "en": "Airbnb official company story in Chinese"
+          },
+          "url": "https://news.airbnb.com/zh/about-us"
+        },
+        {
+          "label": {
+            "zh": "Airbnb 英文官方公司故事",
+            "en": "Airbnb official company story"
+          },
+          "url": "https://news.airbnb.com/about-us"
+        },
+        {
+          "label": {
+            "zh": "Airbnb 2025 年产品更新",
+            "en": "Airbnb 2025 product expansion"
+          },
+          "url": "https://www.airbnb.com/resources/hosting-homes/a/now-you-can-airbnb-more-than-an-airbnb-730"
+        }
+      ],
+      "id": "WyJncmVlbmhvdXNlIiwiYWlyYm5iIiwiQWlyYm5iIl0",
+      "lastReviewed": "2026-10-21"
+    }
+  ]
+}

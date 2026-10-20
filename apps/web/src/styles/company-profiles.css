@@ -1,0 +1,101 @@
+/* HHBA independently authored company information pages */
+.company-profile{max-width:1100px;margin:30px auto 76px;padding:0 12px;color:var(--ink)}
+.company-profile-top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:23px}
+.company-profile-top>a{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;text-decoration:none}
+.company-profile-top>a:hover{color:#2f674d}
+.company-profile-header{display:flex;align-items:center;gap:23px;padding:32px 34px;border:1px solid #e2e8e5;border-radius:16px;background:#fff}
+.company-profile-brand{width:88px;height:88px;flex:0 0 88px;display:flex;align-items:center;justify-content:center;border:1px solid #e6ebe8;border-radius:16px;background:#fff}
+.company-profile-brand img{width:66px;height:66px;object-fit:contain}
+.company-profile-brand-wide{width:136px;flex-basis:136px}
+.company-profile-brand-wide img{width:122px;height:48px}
+.company-profile-identity{flex:1;min-width:0}
+.company-profile-eyebrow{font-size:10px;letter-spacing:.09em;color:#587364;font-weight:750}
+.company-profile-identity h1{font-size:clamp(28px,4vw,42px);letter-spacing:-1px;margin:8px 0 7px;line-height:1.15}
+.company-profile-identity p{font-size:15px;line-height:1.6;color:#556477;margin:0}
+.company-profile-website{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;font-size:12px;border:1px solid #c9ded0;border-radius:9px;padding:10px 12px;color:#286344;text-decoration:none;white-space:nowrap}
+.company-profile-website:hover,.company-profile-load-more:hover{background:#eff6f0}
+.company-profile-meta{display:flex;flex-wrap:wrap;gap:9px;margin:16px 0 13px}
+.company-profile-meta span{display:inline-flex;align-items:center;padding:7px 11px;border:1px solid #dfe7e1;background:#f9fbf9;border-radius:999px;color:#51695d;font-size:12px}
+.company-profile-editorial{display:flex;align-items:flex-start;gap:8px;margin:0 0 30px;color:#78877e;font-size:12px;line-height:1.65}
+.company-profile-editorial svg{flex-shrink:0;margin-top:2px}
+.company-profile-section{border-top:1px solid #e3e9e5;padding:27px 0}
+.company-profile-section h2{font-size:21px;letter-spacing:-.4px;margin:0 0 17px}
+.company-profile-section>p{max-width:900px;color:#536075;font-size:14px;line-height:1.95;margin:11px 0}
+.company-profile-focus-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.company-profile-focus{border:1px solid #e4e9e6;border-radius:11px;background:#fff;padding:21px;min-width:0}
+.company-profile-focus h3{font-size:15px;margin:0 0 11px;color:#1d2a22}
+.company-profile-focus p{font-size:13px;color:#64717b;line-height:1.75;margin:0}
+.company-profile-milestones{display:grid;gap:0}
+.company-profile-milestone{display:grid;grid-template-columns:75px minmax(0,1fr);gap:18px;padding:16px 0;border-bottom:1px solid #e8ece9}
+.company-profile-milestone:last-child{border-bottom:0}
+.company-profile-milestone strong{color:#396e51;font-size:15px}
+.company-profile-milestone p{margin:0;color:#566577;font-size:13px;line-height:1.8}
+.company-profile-section-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.company-profile-section-heading h2{margin-bottom:8px}
+.company-profile-section-heading p{font-size:12px;color:#7b8890;line-height:1.7;margin:0 0 12px}
+.company-profile-section-heading>a,.company-profile-sources>a,.company-profile-footer>a{display:inline-flex;align-items:center;gap:7px;color:#286546;text-decoration:none;font-size:13px;white-space:nowrap}
+.company-profile-section-heading>a:hover,.company-profile-sources>a:hover,.company-profile-footer>a:hover{text-decoration:underline}
+.company-profile-job-count{font-size:12px!important;margin:10px 0 16px!important;color:#587460!important}
+.company-profile-job-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.company-profile-job-card{display:flex;flex-direction:column;align-items:flex-start;gap:12px;text-decoration:none;border:1px solid #e2e8e5;border-radius:11px;background:#fff;padding:19px 20px;min-width:0;color:var(--ink)}
+.company-profile-job-card:hover{border-color:#bfd6c7;box-shadow:0 6px 16px #1f372308}
+.company-profile-job-card strong{font-size:15px;line-height:1.5}
+.company-profile-job-card>span{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px;line-height:1.6}
+.company-profile-job-card em{display:flex;align-items:center;gap:5px;color:#306748;font-size:12px;font-style:normal;font-weight:650;margin-top:auto}
+.company-profile-jobs-state{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;min-height:80px;background:#fff;border:1px solid #e2e8e5;border-radius:10px;color:#718078;font-size:13px;padding:18px}
+.company-profile-jobs-state button,.company-profile-load-more{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #cadccc;border-radius:8px;padding:9px 12px;font-size:12px;color:#306748}
+.company-profile-load-more{margin:20px auto 0;display:flex}
+.company-profile-sources{display:flex;flex-direction:column;align-items:flex-start;gap:11px}
+.company-profile-sources h2{margin-bottom:0}
+.company-profile-sources p{margin:0 0 6px}
+.company-profile-sources small{font-size:11px;color:#89918d;margin-top:7px}
+.company-profile-footer{padding:25px 0 5px;display:flex;justify-content:space-between;gap:15px;align-items:center;border-top:1px solid #e3e9e5}
+.company-profile-footer span{color:#849088;font-size:12px;line-height:1.7}
+.unknown-company{display:grid;gap:14px}
+.unknown-company h1{font-size:26px}
+.unknown-company>a{display:inline-flex;gap:6px;align-items:center;color:#326b4d}
+@media(max-width:720px){
+ .company-profile{margin:20px auto 48px}
+ .company-profile-header{align-items:flex-start;flex-wrap:wrap;gap:14px;padding:22px 18px}
+ .company-profile-brand{width:66px;height:66px;flex-basis:66px;border-radius:12px}
+ .company-profile-brand img{width:48px;height:48px}
+ .company-profile-brand-wide{width:94px;flex-basis:94px}
+ .company-profile-brand-wide img{width:85px;height:34px}
+ .company-profile-identity{flex:1 1 58%}
+ .company-profile-identity h1{font-size:27px}
+ .company-profile-identity p{font-size:13px}
+ .company-profile-website{align-self:auto}
+ .company-profile-section{padding:24px 0}
+ .company-profile-section h2{font-size:19px}
+ .company-profile-focus-grid{grid-template-columns:1fr}
+ .company-profile-focus{padding:17px}
+ .company-profile-job-grid{grid-template-columns:1fr}
+ .company-profile-section-heading{flex-wrap:wrap}
+ .company-profile-footer{align-items:flex-start;flex-direction:column}
+}
+
+/* Reusable, evidence-labeled company pages and generated directory. */
+.company-profile-pending{border:1px solid #e5e8e3;border-radius:11px;background:#f9faf8;padding:19px 21px;max-width:910px}
+.company-profile-pending strong{font-size:13px;color:#526a57}
+.company-profile-pending p{font-size:13px;color:#66717c;line-height:1.85;margin:10px 0 0}
+.company-profile-pending-text{border:1px dashed #dde4df;border-radius:9px;padding:13px 16px;background:#fafbf9}
+.company-directory-header h1{font-size:clamp(27px,3.7vw,38px);margin:0 0 10px}
+.company-directory-header p{font-size:14px;color:#667684;line-height:1.8;max-width:800px;margin:0 0 22px}
+.company-directory-counter{font-size:11px;letter-spacing:.08em;color:#6b8374;font-weight:700}
+.company-directory-search{display:flex;align-items:center;gap:12px;border:1px solid #e1e7e3;border-radius:10px;background:#fff;padding:14px 16px}
+.company-directory-search svg{color:#7e8991;flex-shrink:0}
+.company-directory-search input{border:0;outline:0;flex:1;min-width:0;font:inherit;background:transparent}
+.company-directory-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.company-directory-card{display:flex;align-items:center;gap:12px;padding:17px;border:1px solid #e2e8e5;background:#fff;border-radius:11px;text-decoration:none;color:#24312b;min-width:0}
+.company-directory-card:hover{border-color:#b9d4c2;background:#fbfdfb}
+.company-directory-icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 42px;width:42px;height:42px;border:1px solid #e6ece7;border-radius:9px;background:#f7f9f8;color:#688376}
+.company-directory-card-text{display:flex;flex-direction:column;min-width:0;flex:1;gap:5px}
+.company-directory-card-text strong{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.company-directory-card-text small{font-size:12px;color:#72827a}
+.company-directory-card-text em{font-size:11px;font-style:normal;color:#367552}
+.company-directory-card>svg{color:#7d9586;flex-shrink:0}
+@media(max-width:720px){
+ .company-directory-grid{grid-template-columns:1fr}
+ .company-directory-card{padding:14px}
+ .company-profile-pending{padding:15px}
+}

@@ -1,0 +1,30 @@
+name: HHBA Genuine Headway Ashby Employer Logo
+on:
+  push:
+    branches: [feat/headway-verified-ashby-brand-20261020]
+    paths:
+      - '.github/workflows/hhba-headway-logo-assets.yml'
+      - 'apps/web/scripts/add-headway-verified-logo.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install PNG image validator
+        run: pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Fetch only actual employer image from the exact first-party recruiting board
+        run: python apps/web/scripts/add-headway-verified-logo.py
+      - name: Commit source-pinned image and cryptographic provenance
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/public/brands/brand-headway.png apps/web/public/brands/PROVENANCE.json
+          git add -f apps/web/src/data/verifiedBrandAssets.json
+          git commit -m "assets(brand): add ATS-declared original Headway logo, completing 50 official source identities"
+          git push origin HEAD:feat/headway-verified-ashby-brand-20261020

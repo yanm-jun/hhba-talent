@@ -1,0 +1,972 @@
+{
+  "profiles": [
+    {
+      "id": "WyJncmVlbmhvdXNlIiwiZ3VzdG8iLCJHdXN0byJd",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "gusto",
+        "company": "Gusto"
+      },
+      "name": "Gusto",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "薪资、人事与员工福利软件",
+        "en": "Payroll, HR and employee benefits"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2011",
+      "tagline": {
+        "zh": "面向中小企业的薪酬与人员管理平台。",
+        "en": "Payroll and people management for small businesses."
+      },
+      "overview": [
+        {
+          "zh": "Gusto 前身为 ZenPayroll，创立于 2011 年，为美国中小企业提供薪酬计算、税务申报支持和人事管理工具。",
+          "en": "Gusto began as ZenPayroll in 2011 and builds payroll, tax-filing support and HR tools for US small businesses."
+        },
+        {
+          "zh": "公司后来将福利、员工入职、考勤等功能整合到平台之中。具体服务因美国地区与企业条件不同而有所差异。",
+          "en": "It subsequently integrated benefits, employee onboarding, time tracking and other people-operations capabilities; availability varies by jurisdiction and employer."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Payroll 薪酬管理",
+            "en": "Payroll"
+          },
+          "description": {
+            "zh": "工资核算与相关税务流程",
+            "en": "Payroll calculation and related tax workflows"
+          }
+        },
+        {
+          "name": {
+            "zh": "Benefits 福利管理",
+            "en": "Benefits"
+          },
+          "description": {
+            "zh": "员工保险和福利管理工具",
+            "en": "Employee benefits administration"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2011",
+          "description": {
+            "zh": "Gusto 创立或启动相关业务。",
+            "en": "Gusto was founded or launched its initial operations."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Gusto 官方企业与业务资料",
+            "en": "Gusto official company source"
+          },
+          "url": "https://gusto.com/about"
+        },
+        {
+          "label": {
+            "zh": "Gusto 官方产品及发展资料",
+            "en": "Gusto official product or history"
+          },
+          "url": "https://gusto.com/company-news/introducing-gusto"
+        },
+        {
+          "label": {
+            "zh": "Gusto 官方招聘来源",
+            "en": "Gusto official job board"
+          },
+          "url": "https://job-boards.greenhouse.io/gusto"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJhc2hieSIsImRlZXBncmFtIiwiRGVlcGdyYW0iXQ",
+      "identity": {
+        "platform": "ashby",
+        "source": "deepgram",
+        "company": "Deepgram"
+      },
+      "name": "Deepgram",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "语音识别与语音人工智能",
+        "en": "Speech recognition and voice AI"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2015",
+      "tagline": {
+        "zh": "通过 API 让应用理解、生成和处理语音。",
+        "en": "Voice understanding and generation through APIs."
+      },
+      "overview": [
+        {
+          "zh": "Deepgram 创立于 2015 年，专注语音人工智能，最初研发深度学习语音识别，后来拓展到文本转语音及语音交互技术。",
+          "en": "Founded in 2015, Deepgram develops voice AI, beginning with deep learning speech recognition and expanding into speech synthesis and voice interactions."
+        },
+        {
+          "zh": "其平台服务呼叫中心、实时字幕、语音助手及开发者应用，提供转录、音频理解与对话式语音接口。",
+          "en": "The platform serves contact centers, live transcription, voice agents and developer applications with transcription, audio intelligence and conversational voice APIs."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Speech to Text",
+            "en": "Speech to Text"
+          },
+          "description": {
+            "zh": "语音转文字与实时转录",
+            "en": "Speech recognition and real-time transcription"
+          }
+        },
+        {
+          "name": {
+            "zh": "Voice Agent API",
+            "en": "Voice Agent API"
+          },
+          "description": {
+            "zh": "构建双向实时语音智能体",
+            "en": "Build real-time conversational voice agents"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2015",
+          "description": {
+            "zh": "Deepgram 创立或启动相关业务。",
+            "en": "Deepgram was founded or launched its initial operations."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Deepgram 官方企业与业务资料",
+            "en": "Deepgram official company source"
+          },
+          "url": "https://deepgram.com/about"
+        },
+        {
+          "label": {
+            "zh": "Deepgram 官方产品及发展资料",
+            "en": "Deepgram official product or history"
+          },
+          "url": "https://deepgram.com/company/history"
+        },
+        {
+          "label": {
+            "zh": "Deepgram 官方招聘来源",
+            "en": "Deepgram official job board"
+          },
+          "url": "https://jobs.ashbyhq.com/deepgram"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJhc2hieSIsImNsaWNrdXAiLCJDbGlja1VwIl0",
+      "identity": {
+        "platform": "ashby",
+        "source": "clickup",
+        "company": "ClickUp"
+      },
+      "name": "ClickUp",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "团队协作与项目生产力软件",
+        "en": "Team collaboration and productivity software"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2017",
+      "tagline": {
+        "zh": "整合任务、文档和团队工作流。",
+        "en": "Bringing tasks, documents and team workflows together."
+      },
+      "overview": [
+        {
+          "zh": "ClickUp 创立于 2017 年，开发面向个人与团队的综合工作管理平台，帮助不同职能在同一工作空间规划任务、项目和进度。",
+          "en": "Founded in 2017, ClickUp develops an integrated work-management platform for teams and individuals to organize tasks, projects and progress."
+        },
+        {
+          "zh": "除任务管理外，ClickUp 还提供文档、目标、仪表盘和 AI 辅助工具，以支持跨部门协作。",
+          "en": "Besides tasks, ClickUp offers documents, goals, dashboards and AI assistance to coordinate cross-functional work."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "任务与项目",
+            "en": "Tasks and projects"
+          },
+          "description": {
+            "zh": "分配任务、设置进度与项目视图",
+            "en": "Assign work and organize project views"
+          }
+        },
+        {
+          "name": {
+            "zh": "ClickUp Brain",
+            "en": "ClickUp Brain"
+          },
+          "description": {
+            "zh": "基于工作空间内容的 AI 辅助",
+            "en": "AI assistance with workspace context"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2017",
+          "description": {
+            "zh": "ClickUp 创立或启动相关业务。",
+            "en": "ClickUp was founded or launched its initial operations."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "ClickUp 官方企业与业务资料",
+            "en": "ClickUp official company source"
+          },
+          "url": "https://clickup.com/about/zeb-evans"
+        },
+        {
+          "label": {
+            "zh": "ClickUp 官方产品及发展资料",
+            "en": "ClickUp official product or history"
+          },
+          "url": "https://clickup.com/features"
+        },
+        {
+          "label": {
+            "zh": "ClickUp 官方招聘来源",
+            "en": "ClickUp official job board"
+          },
+          "url": "https://jobs.ashbyhq.com/clickup"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJncmVlbmhvdXNlIiwiZ3JlZW5ob3VzZSIsIkdyZWVuaG91c2UiXQ",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "greenhouse",
+        "company": "Greenhouse"
+      },
+      "name": "Greenhouse",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "招聘管理与 ATS 人才获取软件",
+        "en": "Applicant tracking and talent acquisition software"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2012",
+      "tagline": {
+        "zh": "支持企业从招聘计划到面试录用的全过程。",
+        "en": "Tools for planning, interviewing and hiring talent."
+      },
+      "overview": [
+        {
+          "zh": "Greenhouse 是一家美国招聘技术企业，提供申请人追踪系统（ATS）和结构化招聘工具，帮助招聘团队管理岗位、面试与候选人流程。",
+          "en": "Greenhouse is a US hiring technology company providing an applicant tracking system and structured hiring workflows to manage jobs, interviews and applicants."
+        },
+        {
+          "zh": "其公开 Job Board 产品还被多家企业用作官方岗位展示来源；HHBA 引用的是各企业公开岗位，不代表 Greenhouse 或雇主授权合作。",
+          "en": "Its public Job Board software is used by employers to publish roles; HHBA uses public postings without implying that Greenhouse or an employer has authorized a partnership."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Greenhouse Recruiting",
+            "en": "Greenhouse Recruiting"
+          },
+          "description": {
+            "zh": "从招聘需求到面试与录用管理",
+            "en": "Applicant tracking from requisition to offer"
+          }
+        },
+        {
+          "name": {
+            "zh": "Structured Hiring",
+            "en": "Structured Hiring"
+          },
+          "description": {
+            "zh": "通过面试评分和流程设计提高一致性",
+            "en": "Interview scorecards and consistent hiring processes"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2012",
+          "description": {
+            "zh": "Greenhouse 创立或启动相关业务。",
+            "en": "Greenhouse was founded or launched its initial operations."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Greenhouse 官方企业与业务资料",
+            "en": "Greenhouse official company source"
+          },
+          "url": "https://www.greenhouse.com/"
+        },
+        {
+          "label": {
+            "zh": "Greenhouse 官方产品及发展资料",
+            "en": "Greenhouse official product or history"
+          },
+          "url": "https://www.greenhouse.com/products"
+        },
+        {
+          "label": {
+            "zh": "Greenhouse 官方招聘来源",
+            "en": "Greenhouse official job board"
+          },
+          "url": "https://job-boards.greenhouse.io/greenhouse"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJsZXZlciIsImJpbmFuY2UiLCJCaW5hbmNlIl0",
+      "identity": {
+        "platform": "lever",
+        "source": "binance",
+        "company": "Binance"
+      },
+      "name": "Binance",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "数字资产交易与区块链生态",
+        "en": "Digital asset exchange and blockchain ecosystem"
+      },
+      "country": {
+        "zh": "全球（监管辖区不同）",
+        "en": "Global (jurisdiction dependent)"
+      },
+      "founded": "2017",
+      "tagline": {
+        "zh": "提供数字资产服务及区块链知识与研究资源。",
+        "en": "Digital asset services, education and blockchain research."
+      },
+      "overview": [
+        {
+          "zh": "Binance 是 2017 年推出的数字资产交易平台与区块链生态系统。其官方介绍涵盖数字资产交易、研究、教育以及与区块链相关的产品和服务。",
+          "en": "Launched in 2017, Binance is a digital-asset exchange and blockchain ecosystem. Its official materials describe trading services, research, education and other blockchain-related offerings."
+        },
+        {
+          "zh": "Binance 的业务覆盖多个法律实体和司法辖区，并非所有服务在所有国家可用。HHBA 仅独立整理公司背景及招聘来源，不提供加密资产投资建议，亦不将 Binance 与 HHBA 描述为合作招聘关系。",
+          "en": "Binance services operate across legal entities and jurisdictions, and product access varies by location. HHBA independently describes the business and its recruiting source, without investment advice or any implied hiring partnership."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Binance Exchange",
+            "en": "Binance Exchange"
+          },
+          "description": {
+            "zh": "提供适用地区的数字资产交易服务",
+            "en": "Digital asset trading where legally available"
+          }
+        },
+        {
+          "name": {
+            "zh": "Binance Academy",
+            "en": "Binance Academy"
+          },
+          "description": {
+            "zh": "公开的加密资产与区块链教育资源",
+            "en": "Open-access blockchain and crypto learning"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2017",
+          "description": {
+            "zh": "Binance 创立或启动相关业务。",
+            "en": "Binance was founded or launched its initial operations."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Binance 官方企业与业务资料",
+            "en": "Binance official company source"
+          },
+          "url": "https://www.binance.com/en/about"
+        },
+        {
+          "label": {
+            "zh": "Binance 官方产品及发展资料",
+            "en": "Binance official product or history"
+          },
+          "url": "https://academy.binance.com/en"
+        },
+        {
+          "label": {
+            "zh": "Binance 官方招聘来源",
+            "en": "Binance official job board"
+          },
+          "url": "https://jobs.lever.co/binance"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJhc2hieSIsImFpcndhbGxleCIsIkFpcndhbGxleCJd",
+      "identity": {
+        "platform": "ashby",
+        "source": "airwallex",
+        "company": "Airwallex"
+      },
+      "name": "Airwallex",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "跨境支付与企业金融基础设施",
+        "en": "Cross-border payments and business financial infrastructure"
+      },
+      "country": {
+        "zh": "澳大利亚",
+        "en": "Australia"
+      },
+      "founded": "2015",
+      "tagline": {
+        "zh": "帮助企业跨市场收付、管理和转换资金。",
+        "en": "Business payments and money management across borders."
+      },
+      "overview": [
+        {
+          "zh": "Airwallex 成立于 2015 年，是一家起源于澳大利亚的金融科技公司，向企业提供国际资金收付、外汇兑换以及相关支付基础设施。",
+          "en": "Founded in 2015, Airwallex is a financial technology company originating in Australia that provides international payments, foreign exchange and related infrastructure to businesses."
+        },
+        {
+          "zh": "Airwallex 的产品覆盖企业账户、全球付款、嵌入式支付和费用管理，服务范围依赖不同地区的监管与牌照。",
+          "en": "Its products include business accounts, global transfers, embedded payments and spend management. Coverage and permissions depend on local licensing and regulation."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "全球企业账户",
+            "en": "Global business accounts"
+          },
+          "description": {
+            "zh": "跨币种持有和收付资金",
+            "en": "Hold and move funds across currencies"
+          }
+        },
+        {
+          "name": {
+            "zh": "全球付款",
+            "en": "Global payouts"
+          },
+          "description": {
+            "zh": "企业国际转账和跨境结算",
+            "en": "International transfers and cross-border settlement"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2015",
+          "description": {
+            "zh": "Airwallex 创立或启动相关业务。",
+            "en": "Airwallex was founded or launched its initial operations."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Airwallex 官方企业与业务资料",
+            "en": "Airwallex official company source"
+          },
+          "url": "https://www.airwallex.com/"
+        },
+        {
+          "label": {
+            "zh": "Airwallex 官方产品及发展资料",
+            "en": "Airwallex official product or history"
+          },
+          "url": "https://www.airwallex.com/company"
+        },
+        {
+          "label": {
+            "zh": "Airwallex 官方招聘来源",
+            "en": "Airwallex official job board"
+          },
+          "url": "https://jobs.ashbyhq.com/airwallex"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJhc2hieSIsImhhcnZleSIsIkhhcnZleSJd",
+      "identity": {
+        "platform": "ashby",
+        "source": "harvey",
+        "company": "Harvey"
+      },
+      "name": "Harvey",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "法律与专业服务人工智能",
+        "en": "AI for legal and professional services"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2022",
+      "tagline": {
+        "zh": "面向法律与专业团队的 AI 工作流。",
+        "en": "AI workflows for legal and professional teams."
+      },
+      "overview": [
+        {
+          "zh": "Harvey 是一家美国人工智能软件企业，向律师事务所、企业法务和专业服务机构提供用于知识工作和文档处理的 AI 工具。",
+          "en": "Harvey is a US AI software company serving law firms, in-house legal teams and professional services with tools for knowledge work and document processing."
+        },
+        {
+          "zh": "其官方产品介绍涉及合同分析、尽职调查、合规及诉讼相关工作流。AI 生成结果需要专业人员复核，招聘岗位职责应以官方 JD 为准。",
+          "en": "Its published use cases include contract review, due diligence, compliance and litigation workflows. AI outputs require professional review; role qualifications come from official job descriptions."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "法律智能助理",
+            "en": "Legal AI assistant"
+          },
+          "description": {
+            "zh": "支持查询、撰写及分析法律资料",
+            "en": "Research, drafting and analysis for legal teams"
+          }
+        },
+        {
+          "name": {
+            "zh": "专业工作流",
+            "en": "Professional workflows"
+          },
+          "description": {
+            "zh": "辅助合同审阅与尽调流程",
+            "en": "Contract review and due-diligence workflows"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2022",
+          "description": {
+            "zh": "Harvey 创立或启动相关业务。",
+            "en": "Harvey was founded or launched its initial operations."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Harvey 官方企业与业务资料",
+            "en": "Harvey official company source"
+          },
+          "url": "https://www.harvey.ai/company"
+        },
+        {
+          "label": {
+            "zh": "Harvey 官方产品及发展资料",
+            "en": "Harvey official product or history"
+          },
+          "url": "https://www.harvey.ai/"
+        },
+        {
+          "label": {
+            "zh": "Harvey 官方招聘来源",
+            "en": "Harvey official job board"
+          },
+          "url": "https://jobs.ashbyhq.com/harvey"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJncmVlbmhvdXNlIiwiZmxleHBvcnQiLCJGbGV4cG9ydCJd",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "flexport",
+        "company": "Flexport"
+      },
+      "name": "Flexport",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "国际物流与供应链技术",
+        "en": "Global logistics and supply-chain technology"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2013",
+      "tagline": {
+        "zh": "以技术平台连接国际货运与供应链运营。",
+        "en": "Technology-supported global freight and supply-chain operations."
+      },
+      "overview": [
+        {
+          "zh": "Flexport 是一家美国物流与供应链技术企业，面向跨境贸易客户提供货运代理、运输协调、清关及供应链可视化服务。",
+          "en": "Flexport is a US logistics and supply-chain technology company offering freight forwarding, shipment coordination, customs services and visibility for cross-border trade."
+        },
+        {
+          "zh": "其平台连接海运、空运、仓储和物流数据，帮助客户了解运输状态与成本。招聘涵盖运营、报关合规、软件及全球客户服务。",
+          "en": "Its platform coordinates ocean and air freight, warehousing and logistics data so customers can track movement and costs. Roles span operations, customs compliance, software and customer support."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "货运代理服务",
+            "en": "Freight forwarding"
+          },
+          "description": {
+            "zh": "海运、空运及跨境货物协调",
+            "en": "Ocean, air and cross-border shipment coordination"
+          }
+        },
+        {
+          "name": {
+            "zh": "供应链平台",
+            "en": "Supply chain platform"
+          },
+          "description": {
+            "zh": "货物追踪与物流数据分析",
+            "en": "Shipment visibility and logistics analytics"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2013",
+          "description": {
+            "zh": "Flexport 创立或启动相关业务。",
+            "en": "Flexport was founded or launched its initial operations."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Flexport 官方企业与业务资料",
+            "en": "Flexport official company source"
+          },
+          "url": "https://www.flexport.com/"
+        },
+        {
+          "label": {
+            "zh": "Flexport 官方产品及发展资料",
+            "en": "Flexport official product or history"
+          },
+          "url": "https://www.flexport.com/company/"
+        },
+        {
+          "label": {
+            "zh": "Flexport 官方招聘来源",
+            "en": "Flexport official job board"
+          },
+          "url": "https://job-boards.greenhouse.io/flexport"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJhc2hieSIsImZvcm1lbmVyZ3kiLCJGb3JtIEVuZXJneSJd",
+      "identity": {
+        "platform": "ashby",
+        "source": "formenergy",
+        "company": "Form Energy"
+      },
+      "name": "Form Energy",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "长时储能与铁空气电池",
+        "en": "Long-duration energy storage and iron-air batteries"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2017",
+      "tagline": {
+        "zh": "研发可为电网提供多日储能的铁空气电池。",
+        "en": "Developing iron-air storage for multi-day grid reliability."
+      },
+      "overview": [
+        {
+          "zh": "Form Energy 是 2017 年创立的美国能源技术企业，致力于通过低成本长时储能支持电网稳定运行，其核心技术方向是可充放电的铁空气电池系统。",
+          "en": "Founded in 2017, Form Energy is a US energy technology company developing cost-oriented long-duration grid storage using rechargeable iron-air battery systems."
+        },
+        {
+          "zh": "公司的研发包括电池化学、电化学系统、量产制造和电网项目交付。官方资料记录了从实验室原型到工厂和示范项目的发展。",
+          "en": "Its work spans battery chemistry, electrochemical systems, manufacturing scale-up and grid projects. Official histories cover progress from prototypes to factories and demonstrations."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "铁空气电池",
+            "en": "Iron-air battery"
+          },
+          "description": {
+            "zh": "面向多日持续放电的电化学储能",
+            "en": "Electrochemical storage for multi-day discharge"
+          }
+        },
+        {
+          "name": {
+            "zh": "电网储能项目",
+            "en": "Grid storage projects"
+          },
+          "description": {
+            "zh": "为公共事业和电力系统部署储能设施",
+            "en": "Storage deployments for utilities and power grids"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2017",
+          "description": {
+            "zh": "Form Energy 创立或启动相关业务。",
+            "en": "Form Energy was founded or launched its initial operations."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Form Energy 官方企业与业务资料",
+            "en": "Form Energy official company source"
+          },
+          "url": "https://formenergy.com/about/"
+        },
+        {
+          "label": {
+            "zh": "Form Energy 官方产品及发展资料",
+            "en": "Form Energy official product or history"
+          },
+          "url": "https://formenergy.com/technology/"
+        },
+        {
+          "label": {
+            "zh": "Form Energy 官方招聘来源",
+            "en": "Form Energy official job board"
+          },
+          "url": "https://jobs.ashbyhq.com/formenergy"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJhc2hieSIsInJhbXAiLCJSYW1wIl0",
+      "identity": {
+        "platform": "ashby",
+        "source": "ramp",
+        "company": "Ramp"
+      },
+      "name": "Ramp",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "企业费用管理与财务软件",
+        "en": "Corporate spend management and finance software"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2019",
+      "tagline": {
+        "zh": "连接公司卡、报销和费用管控流程。",
+        "en": "Connecting corporate cards, expenses and spending controls."
+      },
+      "overview": [
+        {
+          "zh": "Ramp 是一家美国企业财务技术公司，为组织提供公司卡、员工报销、采购审批及费用控制软件，帮助财务团队管理企业支出。",
+          "en": "Ramp is a US financial technology company offering corporate cards, expense reimbursement, purchasing approvals and spend controls to organizations."
+        },
+        {
+          "zh": "Ramp 的平台也涉及供应商付款、账单处理和财务自动化。相关服务的适用范围取决于客户资格与地区，不能将产品介绍理解为就业承诺。",
+          "en": "Its platform also supports bill payments, vendor workflows and finance automation. Service access depends on eligibility and location; this background does not imply an employment commitment."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Corporate Cards",
+            "en": "Corporate Cards"
+          },
+          "description": {
+            "zh": "公司支出卡与消费管控",
+            "en": "Company spending cards and controls"
+          }
+        },
+        {
+          "name": {
+            "zh": "Expense Management",
+            "en": "Expense Management"
+          },
+          "description": {
+            "zh": "员工报销、审批与费用跟踪",
+            "en": "Expense reporting, approvals and tracking"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2019",
+          "description": {
+            "zh": "Ramp 创立或启动相关业务。",
+            "en": "Ramp was founded or launched its initial operations."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Ramp 官方企业与业务资料",
+            "en": "Ramp official company source"
+          },
+          "url": "https://ramp.com/"
+        },
+        {
+          "label": {
+            "zh": "Ramp 官方产品及发展资料",
+            "en": "Ramp official product or history"
+          },
+          "url": "https://ramp.com/spend-management"
+        },
+        {
+          "label": {
+            "zh": "Ramp 官方招聘来源",
+            "en": "Ramp official job board"
+          },
+          "url": "https://jobs.ashbyhq.com/ramp"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJncmVlbmhvdXNlIiwidHdpbGlvIiwiVHdpbGlvIl0",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "twilio",
+        "company": "Twilio"
+      },
+      "name": "Twilio",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "云通信 API 与客户数据平台",
+        "en": "Cloud communications APIs and customer data platforms"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2008",
+      "tagline": {
+        "zh": "通过 API 连接短信、语音与数字客户体验。",
+        "en": "APIs for messaging, voice and customer interactions."
+      },
+      "overview": [
+        {
+          "zh": "Twilio 是一家美国云通信软件公司，创立于 2008 年，以开发者可调用的通信 API 将电信能力接入网站和应用。",
+          "en": "Founded in 2008, Twilio is a US cloud communications company that exposes telecommunications functionality through developer APIs."
+        },
+        {
+          "zh": "Twilio 产品覆盖短信、电话、身份验证及客户数据和互动工具。公司提供的软件基础设施面向开发者和企业运营团队。",
+          "en": "Twilio products span messaging, calling, identity verification and customer data and engagement tools. Its services support developers and enterprise operations."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Messaging API",
+            "en": "Messaging APIs"
+          },
+          "description": {
+            "zh": "发送、接收及管理应用消息",
+            "en": "Send, receive and manage application messages"
+          }
+        },
+        {
+          "name": {
+            "zh": "Voice 与验证",
+            "en": "Voice and verification"
+          },
+          "description": {
+            "zh": "电话通信及身份验证工具",
+            "en": "Programmable calls and verification services"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2008",
+          "description": {
+            "zh": "Twilio 创立或启动相关业务。",
+            "en": "Twilio was founded or launched its initial operations."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Twilio 官方企业与业务资料",
+            "en": "Twilio official company source"
+          },
+          "url": "https://www.twilio.com/en-us/company"
+        },
+        {
+          "label": {
+            "zh": "Twilio 官方产品及发展资料",
+            "en": "Twilio official product or history"
+          },
+          "url": "https://www.twilio.com/en-us/products"
+        },
+        {
+          "label": {
+            "zh": "Twilio 官方招聘来源",
+            "en": "Twilio official job board"
+          },
+          "url": "https://job-boards.greenhouse.io/twilio"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    }
+  ]
+}

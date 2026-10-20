@@ -1,0 +1,30 @@
+name: HHBA Remaining Official Brand Assets
+on:
+  push:
+    branches: [feat/remaining-verified-brand-logos-20261020]
+    paths:
+      - '.github/workflows/hhba-build-remaining-official-brands.yml'
+      - 'apps/web/scripts/extend-verified-brand-icons.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Pillow for exact ICO to PNG pixel-preserving conversion
+        run: pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Only fetch source-traced or official-site icons for exact employer identities
+        run: python apps/web/scripts/extend-verified-brand-icons.py
+      - name: Commit original assets and their cryptographic provenance
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/public/brands/brand-* apps/web/public/brands/si-*.svg apps/web/public/brands/PROVENANCE.json
+          git add -f apps/web/src/data/verifiedBrandAssets.json
+          git commit -m "assets(brands): add 21 authentic official-source icons and exact employer associations"
+          git push origin HEAD:feat/remaining-verified-brand-logos-20261020

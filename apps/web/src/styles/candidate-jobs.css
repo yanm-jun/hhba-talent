@@ -1,0 +1,93 @@
+
+.candidate-jobs-entry{max-width:720px;margin:0 auto 32px;padding:18px 22px;border:1px solid #cfded2;background:linear-gradient(110deg,#f1f8f2,#fff);border-radius:15px;display:flex;justify-content:space-between;align-items:center;gap:20px;text-align:left}
+.candidate-jobs-entry span{display:flex;flex-direction:column;gap:7px}.candidate-jobs-entry strong{color:#244d3b;font-size:15px}.candidate-jobs-entry small{font-size:12px;line-height:1.6;color:#647b6d}
+.candidate-jobs-entry .secondary-button{white-space:nowrap;flex-shrink:0}
+.hhba-jobs-page{max-width:1110px;margin:35px auto 75px;color:var(--ink)}
+.hhba-job-trail{display:flex;align-items:center;gap:10px;color:#81908a;margin:0 0 23px;font-size:12px}
+.hhba-job-trail a{color:#325a47;text-decoration:none;font-weight:650}
+.hhba-job-trail a:hover{text-decoration:underline}
+.hhba-jobs-hero{background:linear-gradient(116deg,#163c30,#285140);color:#fff;padding:40px 45px;border-radius:17px}
+.hhba-jobs-hero .page-kicker{color:#cbe3a4}
+.hhba-jobs-hero h1{font-size:clamp(26px,4vw,40px);letter-spacing:-1px;line-height:1.25;margin:11px 0}
+.hhba-jobs-hero p{font-size:13px;color:#d8e6db;line-height:1.75;max-width:740px}
+.hhba-jobs-form{display:grid;grid-template-columns:1fr 0.75fr auto;gap:12px;align-items:end;margin-top:26px}
+.hhba-jobs-form label{display:grid;gap:8px;font-size:12px;font-weight:680}
+.hhba-jobs-form input{background:#fff;border:1px solid #cee0d2;border-radius:9px;height:43px;color:#253e30;font-size:13px;min-width:0;padding:0 12px}
+.hhba-jobs-form .primary-button{margin:0;min-height:43px}
+.hhba-jobs-channels{display:flex;gap:9px;flex-wrap:wrap;padding:24px 0 13px;border-bottom:1px solid var(--line)}
+.hhba-jobs-channels button{background:#fff;border:1px solid #d5dede;color:#61736a;border-radius:9px;font-size:12px;font-weight:720;padding:11px 15px}
+.hhba-jobs-channels button.active{background:#244934;color:#fff;border-color:#244934}
+.hhba-jobs-count{display:flex;justify-content:space-between;align-items:center;margin:27px 0 12px;gap:13px}
+.hhba-jobs-count h2{font-size:21px;margin:0}.hhba-jobs-count span{font-size:12px;color:#83968b}
+.hhba-jobs-warning{display:flex;align-items:flex-start;gap:9px;background:#fff9e8;border:1px solid #f0e6cd;border-radius:10px;padding:13px;font-size:11px;color:#836f47;line-height:1.75;margin-bottom:18px}
+.hhba-jobs-warning svg{flex-shrink:0}
+.hhba-position-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.hhba-position-card{background:#fff;border:1px solid #e1e7e2;border-radius:13px;padding:23px;min-width:0;box-shadow:0 7px 24px #17372508}
+.hhba-position-company{font-size:12px;color:#6b806f;font-weight:700}.hhba-position-card h3{font-size:18px;letter-spacing:-.35px;margin:13px 0 18px;line-height:1.45}
+.hhba-position-card h3 a{text-decoration:none;color:#183d2b}.hhba-position-card h3 a:hover{text-decoration:underline}
+.hhba-position-card h2{font-size:18px;margin:0 0 20px}
+.hhba-position-tags{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0}
+.hhba-position-tags span{font-size:11px;background:#ecf3eb;color:#4c7456;border-radius:6px;padding:5px 8px}
+.hhba-position-footer{border-top:1px solid #e8eee8;padding-top:15px;margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.hhba-position-footer small{font-size:11px;color:#829587}.hhba-position-footer a{font-size:12px;color:#2e6e42;font-weight:800;text-decoration:none;display:flex;gap:7px;align-items:center}
+.hhba-jobs-empty{border:1px dashed #c9d7c9;background:#fff;border-radius:13px;padding:38px;text-align:center;color:#697d70;font-size:13px;line-height:1.8}
+.hhba-jobs-pager{display:flex;justify-content:center;align-items:center;gap:18px;margin:25px 0}
+.hhba-jobs-pager button{padding:10px 17px;border-radius:8px;border:1px solid #cfdcce;background:#fff;color:#326043;cursor:pointer}
+.hhba-jobs-pager button:disabled{opacity:.4;cursor:not-allowed}
+.hhba-jobs-pager span{font-size:12px;color:#819188}
+.hhba-jobs-privacy{font-size:11px;line-height:1.8;color:#84958a;margin:22px 0}.hhba-jobs-privacy a{margin-left:7px;color:#286b42}
+.hhba-job-detail-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:15px;margin-top:16px}
+.hhba-detail-facts{display:grid;grid-template-columns:130px 1fr;gap:14px 10px;font-size:12px;margin:0}
+.hhba-detail-facts dt{color:#8b9a8d}.hhba-detail-facts dd{margin:0;overflow-wrap:anywhere;font-weight:680;color:#244734}
+.hhba-detail-note{font-size:12px;color:#849288;background:#f7f9f5;border:1px solid #edf1e9;padding:17px;margin:23px 0 0;line-height:1.8;border-radius:9px}
+.hhba-official{width:max-content!important;padding:12px 18px!important;margin-top:22px!important;background:#dbf88e!important;color:#1e3c2a!important}
+@media(max-width:760px){.hhba-position-grid{grid-template-columns:1fr}.hhba-jobs-form{grid-template-columns:1fr 1fr}.hhba-jobs-form .primary-button{grid-column:1/-1}.hhba-job-detail-grid{grid-template-columns:1fr}.hhba-jobs-hero{padding:30px}.candidate-jobs-entry{flex-direction:column;align-items:stretch}.candidate-jobs-entry .secondary-button{width:100%}}
+@media(max-width:480px){.hhba-jobs-page{margin:18px auto 40px}.hhba-jobs-hero{padding:25px 20px}.hhba-jobs-form{grid-template-columns:1fr}.hhba-jobs-form .primary-button{grid-column:auto}.hhba-jobs-count h2{font-size:19px}.hhba-position-card{padding:17px}.hhba-position-footer{flex-wrap:wrap}.hhba-job-trail{gap:7px;flex-wrap:wrap}}
+
+.hhba-position-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px}.hhba-position-actions a{color:#267141;font-size:12px;font-weight:800;text-decoration:none}.hhba-position-actions a:hover{text-decoration:underline}
+
+/* Only operator-approved, source-bound JD text renders as plain React text. */
+.hhba-jd-display{margin:17px 0 0;border:1px solid #dce8df;background:#fff;border-radius:14px;padding:28px;box-shadow:0 8px 26px #17372509;min-width:0}
+.hhba-jd-section-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.hhba-jd-section-heading h2{font-size:20px;margin:3px 0}
+.hhba-jd-eyebrow{font-size:10px;color:#537765;letter-spacing:1.2px;font-weight:750}
+.hhba-jd-approved{font-size:11px;color:#277144;background:#eaf6ed;border:1px solid #cee7d2;padding:7px 10px;border-radius:20px}
+.hhba-jd-columns{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.hhba-jd-columns>div{padding:18px;background:#f9fbfa;border:1px solid #edf1ee;border-radius:11px;min-width:0}
+.hhba-jd-columns h3{font-size:16px;margin:0 0 14px;color:#274b39}
+.hhba-jd-text{font-size:14px;line-height:1.9;color:#344840;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.hhba-jd-attributes{border-top:1px solid #e6eee8;margin-top:22px;padding-top:16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.hhba-jd-attributes strong{display:block;color:#3c644b;font-size:13px;margin:0 0 9px}
+.hhba-jd-proof{display:flex;align-items:flex-start;flex-wrap:wrap;gap:9px;margin-top:21px;padding-top:16px;border-top:1px solid #e6eee8;color:#71877c;font-size:11px;line-height:1.7}
+.hhba-jd-proof svg{flex:none}.hhba-jd-proof span{flex:1;min-width:180px}
+.hhba-jd-proof a{display:inline-flex;align-items:center;gap:4px;color:#276449;text-decoration:none;font-weight:700}
+.hhba-jd-unavailable{background:#fcfdfc;border-style:dashed}
+.hhba-jd-unavailable .hhba-jd-section-heading{margin-bottom:8px}
+.hhba-jd-unavailable .hhba-jd-section-heading span{font-size:11px;color:#9a7951}
+.hhba-jd-unavailable p{color:#788b7c;font-size:13px;line-height:1.8;max-width:850px}
+@media(max-width:760px){.hhba-jd-columns{grid-template-columns:1fr}.hhba-jd-attributes{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.hhba-jd-display{padding:17px}.hhba-jd-attributes{grid-template-columns:1fr}.hhba-jd-section-heading h2{font-size:18px}}
+
+/* Only shown on explicit localhost internal ATS review; never public-page fallback. */
+.hhba-internal-ats-jd{background:#fffdf9;border:1px solid #f0e1c1;border-radius:14px;padding:24px;margin:16px 0 0;min-width:0}
+.hhba-internal-ats-jd>p{font-size:12px;line-height:1.8;color:#7c785f}
+.hhba-jd-review-pill{background:#fff3d2;border:1px solid #ecd998;border-radius:16px;color:#88651c;font-size:11px;padding:6px 11px}
+.hhba-internal-fetch{border:0;background:#314e3e;color:#fff;border-radius:9px;font-weight:700;font-size:13px;padding:12px 18px;margin:10px 0;cursor:pointer}
+.hhba-internal-fetch:disabled{opacity:.6;cursor:wait}
+.hhba-internal-error{color:#a43e32!important}
+.hhba-internal-jd-result{padding:17px;background:#fff;border-radius:10px;border:1px solid #eee4cc}
+.hhba-internal-jd-status{background:#fff5dc;color:#8b631c;display:inline-block;font-size:11px;padding:5px 9px;border-radius:6px}
+.hhba-internal-jd-result h3{font-size:15px;color:#315340;margin:22px 0 10px}
+.hhba-internal-note{font-size:12px;color:#937e50}
+.hhba-internal-jd-result details{border:1px solid #edf1ed;padding:13px;border-radius:9px;margin-top:20px}
+.hhba-internal-jd-result summary{cursor:pointer;color:#335b42;font-size:12px;font-weight:750;margin-bottom:10px}
+@media(max-width:520px){.hhba-internal-ats-jd{padding:16px}}
+
+/* Avoid overflow of long official-link labels on 390px phones. */
+.hhba-official{max-width:100%!important;width:auto!important;white-space:normal!important;text-align:center;overflow-wrap:anywhere}
+.hhba-jobs-hero .hhba-detail-note{background:#fff8e8;border-color:#f0deb2;color:#775c2d}
+
+.hhba-official-original{background:#fff;border:1px solid #e1e8df;border-radius:15px;padding:30px 32px;margin-top:22px}
+.hhba-original-full-text{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.95;color:#2d4638}
+.hhba-official-original>p{color:#698273;font-size:13px;line-height:1.8}
+@media(max-width:640px){.hhba-official-original{padding:20px 17px}}
