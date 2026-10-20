@@ -27,7 +27,7 @@ export function EmployerBrandLogo({job,identity,variant='card'}:LogoProps){
     :'unified-brand-logo'+(asset?.wide?' unified-brand-logo-wide':'');
   return <span className={cls} title={alt||'企业身份以官方招聘来源为准'}>
     {url&&!broken?
-      <img src={url} alt={alt} loading={variant==='profile'?'eager':'lazy'}
+      <img src={url} alt={alt} loading="eager"
         decoding="async" onError={()=>setBroken(true)}/>:
       <Building2 size={variant==='profile'?28:18} aria-label="未获取已核实企业品牌标识"/>}
   </span>;
