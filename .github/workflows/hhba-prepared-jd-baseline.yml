@@ -1,0 +1,39 @@
+name: HHBA prepared bilingual JD live baseline
+on:
+  push:
+    branches: [feat/complete-bilingual-jd-precompute-20261020]
+    paths: ['.github/workflows/hhba-prepared-jd-baseline.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify current source-persistent bilingual JD readiness
+        run: |
+          node --input-type=module <<'NODE'
+          const root='https://hhba-web-production-024c.up.railway.app';
+          for(const path of ['/api/jd-ready/status','/api/jd-sync/status']){
+           let res;
+           for(let tryNum=0;tryNum<3;tryNum++){
+            try{res=await fetch(root+path,{signal:AbortSignal.timeout(20000)});break}
+            catch{await new Promise(resolve=>setTimeout(resolve,1000))}
+           }
+           if(!res)throw Error('No connection for '+path);
+           const body=await res.json();
+           if(path.includes('jd-ready')){
+            console.log('HHBA_PREPARED_SIX_BASELINE',JSON.stringify({http:res.status,
+              persistent:body.persistent,complete:body.complete,
+              jobs:body.featured?.map(x=>({id:x.id,englishReady:x.englishReady,
+               chineseReady:x.chineseReady,done:x.done,total:x.total,state:x.state}))}));
+           }else{
+            console.log('HHBA_BACKGROUND_WORKER_BASELINE',JSON.stringify({http:res.status,
+              enabled:body.enabled,persistent:body.persistent,
+              completed:body.complete,remaining:body.translationBudgetRemaining,
+              parts:body.translated_parts,states:body.states}));
+           }
+          }
+          NODE
