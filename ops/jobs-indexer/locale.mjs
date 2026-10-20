@@ -56,15 +56,16 @@ const cities=[
  ["san francisco","旧金山"],["new york city","纽约"],["new york","纽约"],
  ["los angeles","洛杉矶"],["san jose","圣何塞"],["mountain view","山景城"],
  ["palo alto","帕洛阿尔托"],["san diego","圣迭戈"],
- ["singapore","新加坡"],["united states","美国"],["usa","美国"],
- ["united kingdom","英国"],["london","伦敦"],
- ["hong kong","中国香港"],["tokyo","东京"],["japan","日本"],
+ ["singapore","新加坡"],["united states","美国"],["usa","美国"],["us","美国"],["sg","新加坡"],
+ ["united kingdom","英国"],["uk","英国"],["london","伦敦"],
+ ["hong kong","中国香港"],["hk","中国香港"],["tokyo","东京"],["japan","日本"],
  ["toronto","多伦多"],["vancouver","温哥华"],["canada","加拿大"],
  ["sydney","悉尼"],["melbourne","墨尔本"],["australia","澳大利亚"],
  ["berlin","柏林"],["munich","慕尼黑"],["germany","德国"],
  ["paris","巴黎"],["france","法国"],["boston","波士顿"],
  ["seattle","西雅图"],["chicago","芝加哥"],["austin","奥斯汀"],
  ["beijing","北京"],["shanghai","上海"],["shenzhen","深圳"],
+ ["nyc","纽约"],["ny","纽约州"],["ca","加利福尼亚州"],["tx","得克萨斯州"],["wa","华盛顿州"],["ma","马萨诸塞州"],
  ["remote","远程"],["hybrid","混合办公"],["multiple locations","多个地点"],
  ["not specified","未注明"],["worldwide","全球"]
 ].sort((a,b)=>b[0].length-a[0].length);
@@ -77,12 +78,12 @@ function replaceWhole(input,items){
  return s;
 }
 function cleanup(s){return s.replace(/[,;|]+/g," · ").replace(/[-–—]+/g," · ")
- .replace(/\s*\/\s*/g,"／").replace(/[ \t]{2,}/g," ").replace(/\s*·\s*/g," · ").trim();}
+ .replace(/\s*\/\s*/g,"／").replace(/[ \t]{2,}/g," ").replace(/\s*·\s*/g," · ").replace(/([\u3400-\u9fff])\s+([\u3400-\u9fff])/g,"$1$2").replace(/\(/g,"（").replace(/\)/g,"）").trim();}
 function safeChinese(raw,table){
  if(/[\u3400-\u9fff]/.test(raw)&&!/[a-z]{3,}/i.test(raw))return {text:raw,status:"original"};
  const out=cleanup(replaceWhole(String(raw||""),table));
  // Never present partly-translated English prose as a complete Chinese translation.
- if(/[a-z]{3,}/i.test(out))return {text:"",status:"needs-review"};
+ if(/[a-z]/i.test(out))return {text:"",status:"needs-review"};
  return {text:out||"",status:out?"rules":"needs-review"};
 }
 export function localizeJob(job){
