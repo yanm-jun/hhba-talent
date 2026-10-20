@@ -29,8 +29,16 @@ jobs:
             page.on('pageerror',e=>console.warn('BROWSER_JS_WARNING',e.message.slice(0,190)));
             for(const [slug,name,logo] of [['openai','OpenAI','openai.svg'],
               ['anthropic','Anthropic','claude.svg'],['spacex','SpaceX','spacex.svg']]){
-              const response=await page.goto(origin+'/companies/'+slug,{waitUntil:'domcontentloaded',timeout:85000});
-              assert.equal(response.status(),200,'deep-link reload should serve the white SPA '+slug);
+              let response;
+              for(let attempt=0;attempt<4;attempt++){
+                try{
+                  response=await page.goto(origin+'/companies/'+slug,{waitUntil:'domcontentloaded',timeout:45000});
+                  if(response?.status()===200)break;
+                  console.warn('RETRY_TRANSIENT_RAILWAY_RESPONSE',slug,response?.status(),attempt+1);
+                }catch(error){console.warn('RETRY_TRANSIENT_RAILWAY_NETWORK',slug,attempt+1,String(error).slice(0,150));}
+                await new Promise(r=>setTimeout(r,2500));
+              }
+              assert.equal(response?.status(),200,'deep-link reload should serve the white SPA '+slug);
               await page.locator('.company-profile-identity h1').waitFor({timeout:20000});
               assert.equal(await page.locator('.company-profile-identity h1').textContent(),name);
               const headings=await page.locator('.company-profile-section h2').allTextContents();
