@@ -1,0 +1,54 @@
+name: HHBA Phase 5 Candidate Applications and Employer Pipeline Browser
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-phase5-applications-browser.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/phase5-candidate-applications-20261020
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build current HHBA including opt-in pipeline (no backend secret)
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          VITE_API_BASE: ''
+        run: |
+          npm ci
+          npm run build
+      - name: Install real Chromium
+        run: |
+          python -m pip install 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Verify mobile progress and employer application pipeline without public data mutation
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+        run: |
+          npx vite preview --host 127.0.0.1 --port 4174 > /tmp/hhba-phase5-preview.log 2>&1 &
+          sleep 3
+          python ../../scripts/check_phase5_application_browser.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-phase5-consented-applications-mobile
+          path: |
+            /tmp/hhba-phase5-candidate-progress.png
+            /tmp/hhba-phase5-employer-pipeline.png
+          retention-days: 14
+          if-no-files-found: ignore
