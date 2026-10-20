@@ -21,6 +21,9 @@ export function verifiedBrandForEmployer(identity:BrandIdentity):VerifiedBrand|n
  return registry.get(key(identity))||null;
 }
 export function verifiedBrandCount(){return registry.size}
+// Reuse the same vetted employer identities and bundled source assets in the homepage strip.
+export function verifiedBrandRecords():readonly VerifiedBrand[]{return [...registry.values()]}
+
 export function verifiedBrandAssetUrl(identity:BrandIdentity):string|null{
  const brand=verifiedBrandForEmployer(identity);
  return brand?import.meta.env.BASE_URL+'brands/'+brand.file:null;
