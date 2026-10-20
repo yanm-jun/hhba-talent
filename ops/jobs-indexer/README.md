@@ -16,10 +16,10 @@ The production Railway Bun Function hit its **96 KiB single-file limit**. This s
 ## API
 - `GET /health` checks HTTP runtime, source counts and freshness; `GET /ready` returns 503 until a nonempty snapshot exists
 - `GET /api/boards` reports **configured** sources and each source's actual result
-- `GET /api/jobs/page?q=...&company=...&remote=true&limit=30&offset=0`
+- `GET /api/jobs/page?q=...&company=...&remote=true&status=fresh|stale&limit=30&offset=0`
 - `GET /api/jobs/:id` gives an individual normalized record (no copyrighted full JD)
-- `GET /` is the staging preview
-- Jobs use `status=fresh|stale`, `observedAt` and validated official application links. A configured board is not counted as successful until live JSON returns a valid result.
+- `GET /` is the bilingual (Chinese-first) staging preview
+- Jobs use `status=fresh|stale`, `observedAt` and validated official application links. **Default search returns only `fresh`; archived records require explicit `status=stale` and are never mixed into default results.** The API provides `titleZh`, `locationZh`, their translation status, and unchanged original fields. Rule-based Chinese translations fail closed to a clear pending label if an English fragment remains. Original English labels remain available through the language switch. A configured board is not counted as successful until live JSON returns a valid result.
 
 ## Cross-industry candidates (not counted as deployed yet)
 Form Energy (battery manufacturing), ShopBack (retail/commerce), AlphaSights Campus Recruiting (professional services), General Robotics (robotics). These were selected from discoverable official public recruiting pages, but actual ATS API fetching and non-zero job counts need Railway execution before acceptance.
@@ -41,5 +41,5 @@ Railway returned `Free plan resource provision limit exceeded. Please upgrade to
 ## Caveats
 - The refreshed snapshot is in process memory, not a durable database. A process restart requires a fresh sync.
 - A source that returns zero jobs is valid; a failed/invalid source is not a verified success.
-- The staging preview shows official original-language job titles. The bilingual feature and original domestic listings belong to the current production app and need an explicit migration.
+- The staging preview now supports bilingual titles and labels with conservative rule-based coverage. Full bilingual job descriptions and existing domestic listings are **not** yet migrated; unsupported translations display a pending marker rather than fabricated text.
 - Site/app security is by an official host+board slug allowlist, not by trust in arbitrary third-party URLs. No website scraping, application submission or resume collection.
