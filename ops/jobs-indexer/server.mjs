@@ -1,6 +1,6 @@
 import http from "node:http";
 import {readFileSync} from "node:fs";
-import {boards,snapshot,sourceStatus,refresh,filterJobs} from "./store.mjs";
+import {boards,snapshot,sourceStatus,refresh,filterJobs,parseJobQuery} from "./store.mjs";
 import {home} from "./page.mjs";
 const port=Number(process.env.PORT||8080);
 const app=readFileSync(new URL("./app.js",import.meta.url),"utf8");
@@ -23,7 +23,7 @@ const server=http.createServer((req,res)=>{
    return send(res,snapshot.updatedAt?200:503,{jobs:rows.slice(offset,offset+limit),total:rows.length,
      allJobs:snapshot.jobs.length,limit,offset,boards:boards.length,
      successBoards:snapshot.successBoards,failedBoards:snapshot.failedBoards,staleBoards:snapshot.staleBoards,
-     updatedAt:snapshot.updatedAt});
+     updatedAt:snapshot.updatedAt,query:parseJobQuery(u.searchParams.get("q")||"")});
   }
   if(u.pathname.startsWith("/api/jobs/")){
    const id=u.pathname.slice("/api/jobs/".length);
