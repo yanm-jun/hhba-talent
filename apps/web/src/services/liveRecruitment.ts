@@ -130,6 +130,12 @@ async function previewSnapshot(signal:AbortSignal):Promise<LivePage> {
   if(signal.aborted)throw new DOMException('Aborted','AbortError');
   return cachedSnapshot;
 }
+// Reuse the ONE already source-validated public snapshot shared by the market.
+// Never refetch and rescan the 15k+ jobs once per featured company.
+export function loadOfficialPublicSnapshot(signal:AbortSignal):Promise<LivePage>{
+ if(!PAGES_PREVIEW)return Promise.reject(new Error('经验证的岗位快照暂不可用'));
+ return previewSnapshot(signal);
+}
 function searchPreview(data:LivePage,filters:LiveFilters,offset:number,facets:Map<string,SearchFacet>):LivePage{
   const matches=searchJobs(data.jobs,filters,facets);
   return {...data,jobs:matches.rows.slice(offset,offset+30),total:matches.counted,offset,limit:30};
