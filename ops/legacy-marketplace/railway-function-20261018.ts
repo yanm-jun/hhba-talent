@@ -1180,7 +1180,7 @@ async function ensureChineseProse(value:string):Promise<string|null>{
 const JD_READER_SIZE=900;
 const JD_READER_MAX_CHARS=100000;
 const JD_SYNC_DAILY_CHUNKS=Math.max(1,Math.min(2000,Number.parseInt(Bun.env.HHBA_JD_SYNC_DAILY_CHUNKS||"180",10)||180));
-const JD_SYNC_INTERVAL_MS=90_000;
+const JD_SYNC_INTERVAL_MS=30_000;
 let durableJobStore:ReturnType<typeof openJobSyncStore>|null=null;
 let lastCatalogRefresh=0;
 let backgroundJdBusy=false;
@@ -1319,7 +1319,7 @@ if(durableJobStore){
   // ingestion or JD publishing to static GitHub Pages.
   const timer=setInterval(()=>void fullJdWorker?.tick(),JD_SYNC_INTERVAL_MS);
   timer.unref();
-  setTimeout(()=>void fullJdWorker?.tick(),15_000).unref();
+  setTimeout(()=>void fullJdWorker?.tick(),8_000).unref();
   console.log("HHBA_FULL_JD_SYNC_ENABLED",JSON.stringify({
    privateVolume:true,dailyChunkLimit:JD_SYNC_DAILY_CHUNKS,
    intervalSeconds:JD_SYNC_INTERVAL_MS/1000,platforms:["greenhouse","ashby","lever"]
@@ -1394,12 +1394,8 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
  }finally{activeJdReaders--;}
 }
 
-if(durableJobStore && privateTranslatorUrl()){
- startOverseasJdWorker({store:durableJobStore,load,boardsCount:boards.length,
-  officialDetail,jdChunks,translateVerifiedChunk:verifiedJdChunk,
-  maxCharacters:JD_READER_MAX_CHARS,dailyChunks:JD_SYNC_DAILY_CHUNKS,
-  intervalMs:JD_SYNC_INTERVAL_MS});
-}
+// Only one validated background worker claims the shared SQLite job queue.
+// The older duplicate worker caused contention and made progress unpredictable.
 
 // The white HHBA React app is compiled into /app/white-site at Docker build.
 // Until the independent ATS evidence job is migrated, the same public and
@@ -1591,6 +1587,21 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  if(req.method==="POST"&&/^\/api\/jobs\/[a-zA-Z0-9_-]{1,180}\/translate-part$/.test(u.pathname))return readJobForTranslation(req,u,headers);
  if(req.method!=="GET")return new Response("Method not allowed",{status:405,headers});
  if(u.pathname==="/health"){const frontendReady=await Bun.file(WHITE_PUBLIC_ROOT+"/index.html").exists();return Response.json({ok:frontendReady,kind:"hhba-white-ats-railway",frontendReady},{status:frontendReady?200:503,headers});}
+ // A single fast read for private precomputed, hash-bound bilingual text.
+ // This route MUST NOT invoke official ATS fetch or an MT service.
+ const readyMatch=u.pathname.match(/^\/api\/jobs\/([A-Za-z0-9_-]{1,180})\/ready-jd$/);
+ if(readyMatch){
+  if(!durableJobStore)return Response.json({ready:false,status:"PREPARING",reason:"STORAGE_UNAVAILABLE"},{status:503,headers});
+  const id=readyMatch[1];
+  const job=await fromWhiteIndex(id);
+  if(!job)return Response.json({ready:false,error:"OFFICIAL_JOB_NOT_LISTED"},{status:404,headers});
+  const doc=durableJobStore.readyDocument(id,job.url);
+  if(!doc)return Response.json({ready:false,status:"PREPARING"},{status:202,headers});
+  return Response.json({...doc,job:{id:job.id,url:job.url,title:job.title,company:job.company},
+    status:doc.ready?"READY":"TRANSLATING",machineTranslated:!!doc.chineseText,
+    note:"Unofficial machine translation; refer to the employer's original posting."
+   },{headers});
+ }
  if(u.pathname==="/api/jd-sync/status"){
   return Response.json(durableJobStore?{...durableJobStore.coverage(),
    enabled:true,persistent:true,
@@ -1663,6 +1674,12 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
   if(job.domestic){
    if(u.pathname.startsWith("/api/"))return Response.json({job:present(job),description:null,richHtml:null,applyUrl:null,recordKind:job.company==="Xiaomi"?"OFFICIAL_LIST_OBSERVED":"OFFICIAL_JOB_PAGE_OBSERVED",currentApplicationVerified:false,detailVerified:job.company!=="Xiaomi",officialListUrl:job.company==="Xiaomi"?job.url:null,officialJobUrl:job.company==="Xiaomi"?null:job.url,observedAt:job.observedAt},{headers});
    return new Response(domesticDetailHtml(job),{headers:{...headers,"Content-Type":"text/html; charset=utf-8"}});
+  }
+  const prepared=durableJobStore?.readyDocument(job.id,job.url);
+  if(prepared && u.pathname.startsWith("/api/")){
+   const offline:Detail={job,description:prepared.originalText,richHtml:"",applyUrl:job.url,
+      status:"LIVE_CONTENT",checkedAt:prepared.checkedAt};
+   return Response.json(offline,{headers});
   }
   const result=await officialDetail(job);
   if(!result)return new Response("官方职位详情暂不可用，请从招聘列表进入企业官网",{status:503,headers});
