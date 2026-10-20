@@ -5,6 +5,7 @@ import {readFileSync} from 'node:fs';
 const cards=readFileSync(new URL('../src/components/UnifiedJobMarket.tsx',import.meta.url),'utf8');
 const reader=readFileSync(new URL('../src/services/officialJd.ts',import.meta.url),'utf8');
 const home=readFileSync(new URL('../src/pages/HomePage.tsx',import.meta.url),'utf8');
+const archive=readFileSync(new URL('../src/pages/CandidateJobsPage.tsx',import.meta.url),'utf8');
 
 test('white HHBA keeps both candidate and employer entrances',()=>{
  assert.ok(home.includes('title="我要应聘"'));
@@ -35,4 +36,11 @@ test('JD fallback keeps strict official identity checks',()=>{
  assert.ok(reader.includes("body.description.length>100_000"));
  assert.ok(reader.includes("sourceHash:hash"));
  assert.ok(!reader.includes('原招聘市场查看'));
+});
+
+test('archive listing also keeps official links inside the detail, not cards',()=>{
+ const listing=archive.slice(archive.indexOf('function Position('),archive.indexOf('export function CandidateJobsPage'));
+ assert.ok(!listing.includes('<a href={direct}'));
+ assert.ok(!listing.includes('去官方投递 ↗'));
+ assert.ok(listing.includes('查看岗位'));
 });
