@@ -6,7 +6,7 @@ import type { User } from '../services/api';
 import { getJob, listJobs, localizedCompany, localizedLocation, localizedTitle, officialStatus, safeOfficialJobUrl,
   type Language, type LiveFilters, type LiveJob, type LivePage } from '../services/liveRecruitment';
 import { fetchOfficialJd, translateGreenJd, type OfficialJd } from '../services/officialJd';
-import { loadPublicJobAudit, loadOverseasJdProgress, auditForJob, describeAudit, type OverseasJdProgress, type JobAuditEntry, type JobAuditSummary } from '../services/jobSyncStatus';
+import { loadPublicJobAudit, auditForJob, describeAudit, type JobAuditEntry } from '../services/jobSyncStatus';
 import {countryOptions,cityOptions,parseNaturalQuery} from '../services/jobSearchFacets.mjs';
 import '../styles/unified-jobs.css';
 
@@ -55,11 +55,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   const [error,setError]=useState('');
   const [loading,setLoading]=useState(true);
   const [retry,setRetry]=useState(0);
-  const [auditSummary,setAuditSummary]=useState<JobAuditSummary|null>(null);
-  const [jdSync,setJdSync]=useState<OverseasJdProgress|null>(null);
   useEffect(()=>{const id=setTimeout(()=>{setPage(0);setFilters(f=>({...f,q:draft,education:f.education==='UNRESTRICTED_OR_UNREPORTED'?'':f.education}));},280);return()=>clearTimeout(id)},[draft]);
-  useEffect(()=>{loadPublicJobAudit().then(report=>setAuditSummary(report?.summary||null)).catch(()=>setAuditSummary(null));},[]);
-  useEffect(()=>{let active=true;loadOverseasJdProgress().then(status=>{if(active)setJdSync(status)});return()=>{active=false};},[retry]);
   useEffect(()=>{
     const controller=new AbortController();setLoading(true);setError('');
     listJobs(filters,page*30,controller.signal)
@@ -143,24 +139,6 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
     {intentLabels.length>0&&<p className="unified-search-interpreted">
       {lang==='zh'?'搜索条件已识别：':'Recognized filters: '}{intentLabels.join(' · ')}
     </p>}
-    <p className="unified-search-provenance">
-      {lang==='zh'?'学历和年限筛选仅使用官方 JD 明确可识别的内容；未披露不代表不限。检索信息为机器提取，请在职位详情核对原文。':
-       'Education and experience filters use identifiable official JD evidence. Unreported does not mean unrestricted. Verify requirements against the source.'}
-    </p>
-    {auditSummary && Number.isFinite(Date.parse(auditSummary.checked_at)) &&
-      Date.now()-Date.parse(auditSummary.checked_at)<24*3600_000 &&
-      snapshot?.updated===auditSummary.indexed_as_of &&
-      <p className="unified-audit-summary">
-        {lang==='zh'
-          ? `全量官方 JD 核验：${auditSummary.verified_full_original_jd_and_requirements.toLocaleString()} / ${auditSummary.total_indexed_jobs.toLocaleString()} 条有职责与任职要求证据；中文全文需另行核验。`
-          : `Official JD audit: ${auditSummary.verified_full_original_jd_and_requirements.toLocaleString()} of ${auditSummary.total_indexed_jobs.toLocaleString()} have description and requirements evidence. Full Chinese coverage not yet verified.`}
-      </p>}
-    {jdSync && <p className="unified-jd-sync-progress" role="status">
-      <ShieldCheck size={15}/>
-      {lang==='zh'
-       ? `海外 JD 中文全文机械校验完成：${jdSync.complete.toLocaleString()} / ${jdSync.total_current.toLocaleString()} 条；另有 ${jdSync.translated_parts.toLocaleString()} 段已验证。机器翻译仅供辅助阅读，尚未经人工逐条审校。`
-       : `Overseas full-JD machine-validated Chinese: ${jdSync.complete.toLocaleString()} / ${jdSync.total_current.toLocaleString()} jobs; ${jdSync.translated_parts.toLocaleString()} verified chunks. Machine translation is not human-reviewed.`}
-    </p>}
     {!loading&&!error&&snapshot?.total===0&&interpreted.education==='UNRESTRICTED'&&
       filters.education!=='UNRESTRICTED_OR_UNREPORTED'&&
       <div className="unified-search-fallback">
@@ -175,8 +153,6 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
         {lang==='zh'?'当前包含官网没有明确识别到学历条件的岗位。这些职位可能仍有学历要求，请务必查阅官方任职资格。':
           'Some listed jobs have unknown education requirements. This does not mean that a degree is unnecessary; check the employer’s official qualifications.'}
       </p>}
-    <p className="unified-market-caution"><ShieldCheck size={16}/>
-      {lang==='zh'?'仅显示本页符合近期来源记录要求的岗位；历史信息另存，申请前核对官网。':'Showing recently observed listings on this page; check the original site before applying.'}</p>
     {loading?<p className="unified-job-state" role="status">{lang==='zh'?'正在读取真实岗位…':'Loading jobs…'}</p>:
       error?<div className="unified-job-state" role="alert">{lang==='zh'?error:'Jobs temporarily unavailable. Please retry.'}<button type="button" onClick={()=>setRetry(x=>x+1)}><RefreshCcw size={15}/> {lang==='zh'?'重试':'Retry'}</button></div>:
       shown.length?<div className="unified-job-grid">{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated}/>)}</div>:

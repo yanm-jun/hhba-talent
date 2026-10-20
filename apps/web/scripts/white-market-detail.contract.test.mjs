@@ -44,3 +44,19 @@ test('archive listing also keeps official links inside the detail, not cards',()
  assert.ok(!listing.includes('去官方投递 ↗'));
  assert.ok(listing.includes('查看岗位'));
 });
+
+test('recruitment market hides all three highlighted notices while retaining filters and verified results',()=>{
+ const market=cards.slice(cards.indexOf('export function UnifiedJobMarket'),cards.indexOf('export function UnifiedJobDetail'));
+ for(const removed of [
+   'unified-search-provenance','unified-audit-summary','unified-jd-sync-progress','unified-market-caution',
+   '全量官方 JD 核验：','仅显示本页符合近期来源记录要求的岗位',
+   '学历和年限筛选仅使用官方 JD 明确可识别的内容'
+ ])assert.ok(!market.includes(removed),'notice still visible: '+removed);
+ for(const retained of [
+   'unified-job-controls','unified-job-grid','unified-job-search',
+   'listJobs(filters,page*30,controller.signal)','officialStatus(j,snapshot.updated)',
+   'type="checkbox"','unified-job-state'
+ ])assert.ok(market.includes(retained),'required function unexpectedly removed: '+retained);
+ assert.ok(cards.slice(cards.indexOf('export function UnifiedJobDetail')).includes('loadPublicJobAudit()'),
+   'job detail official source audit must continue to work');
+});
