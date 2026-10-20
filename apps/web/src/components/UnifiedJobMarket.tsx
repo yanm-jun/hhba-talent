@@ -11,6 +11,10 @@ import {countryOptions,cityOptions,parseNaturalQuery} from '../services/jobSearc
 import '../styles/unified-jobs.css';
 
 const emptyFilters: LiveFilters={q:'',company:'',country:'',remote:false,recruitment_type:'',location_country:'',city:'',education:'',experience:''};
+function initialJobQuery(){
+  try{return new URLSearchParams(location.search).get('q')?.trim().slice(0,100)||'';}
+  catch{return '';}
+}
 const typeLabel: Record<string,{zh:string,en:string}>={SOCIAL:{zh:'社会招聘',en:'Professional'},CAMPUS:{zh:'校园招聘',en:'Graduate'},INTERNSHIP:{zh:'实习招聘',en:'Internship'},SPECIAL:{zh:'专项招聘',en:'Special program'}};
 const formatDate=(value?:string)=>value&&Number.isFinite(Date.parse(value)) ? value.slice(0,10) : '--';
 function useLanguage() {
@@ -44,8 +48,8 @@ function LanguageSwitcher({lang,change}:{lang:Language,change:(value:Language)=>
 }
 export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,user?:User|null}){
   const {lang,change}=useLanguage();
-  const [filters,setFilters]=useState<LiveFilters>(emptyFilters);
-  const [draft,setDraft]=useState('');
+  const [filters,setFilters]=useState<LiveFilters>(()=>({...emptyFilters,q:initialJobQuery()}));
+  const [draft,setDraft]=useState(initialJobQuery);
   const [page,setPage]=useState(0);
   const [snapshot,setSnapshot]=useState<LivePage|null>(null);
   const [error,setError]=useState('');

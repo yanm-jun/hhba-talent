@@ -1,0 +1,69 @@
+/* White candidate workspace. Only the "我要应聘" landing page uses these rules. */
+.candidate-dashboard{max-width:920px;margin:24px auto 72px;color:var(--ink)}
+.candidate-dashboard-trail{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin:22px 0 30px}
+.candidate-dashboard-trail a{color:var(--muted);text-decoration:none}
+.candidate-dashboard-trail a:hover{text-decoration:underline}
+.candidate-dashboard-trail strong{font-weight:650;color:#334155}
+.candidate-dashboard-intro{margin-bottom:19px}
+.candidate-dashboard-intro h1{font-size:clamp(24px,3vw,32px);font-weight:760;letter-spacing:-.65px;line-height:1.25;margin:0}
+.candidate-dashboard-intro p{font-size:13px;color:var(--muted);line-height:1.7;margin:9px 0 0}
+.candidate-dashboard-search{display:flex;align-items:center;gap:11px;border:1px solid #dce3e6;background:#fff;border-radius:12px;min-height:56px;padding:7px 8px 7px 17px;box-shadow:0 1px 3px #11182704}
+.candidate-dashboard-search>svg{color:#64748b;flex-shrink:0}
+.candidate-dashboard-search input{flex:1;min-width:0;border:0;outline:0;padding:8px 2px;background:transparent;color:var(--ink);font-size:14px}
+.candidate-dashboard-search input::placeholder{color:#9aa2af}
+.candidate-dashboard-search input::-webkit-search-cancel-button{cursor:pointer}
+.candidate-dashboard-search:focus-within{border-color:#9cbaa7;box-shadow:0 0 0 3px #1e5c3710}
+.candidate-dashboard-search button{flex-shrink:0;border:0;border-radius:8px;background:#315b46;color:#fff;min-height:40px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;gap:10px;font-size:13px;font-weight:680}
+.candidate-dashboard-search button:hover{background:#234b37}
+.candidate-dashboard-profile{background:#fff;border:1px solid #e3e7e8;border-radius:13px;padding:22px 24px;margin:22px 0 14px}
+.candidate-dashboard-profile-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.candidate-dashboard-heading{display:flex;align-items:center;gap:9px}
+.candidate-dashboard-heading>svg{color:#42725c}
+.candidate-dashboard-heading h2{font-size:16px;margin:0;font-weight:730}
+.candidate-dashboard-status{color:#687782;font-size:12px;white-space:nowrap}
+.candidate-dashboard-profile p{font-size:13px;color:var(--muted);margin:10px 0 15px;line-height:1.7}
+.candidate-dashboard-profile-action{display:inline-flex;align-items:center;gap:7px;min-height:36px;border:1px solid #d9e0e5;border-radius:8px;padding:7px 12px;color:#234c38;text-decoration:none;font-size:13px;font-weight:680}
+.candidate-dashboard-profile-action:hover{background:#f3f7f4;border-color:#bdcec2}
+.candidate-dashboard-notice{color:#78838b;font-size:12px;line-height:1.6}
+.candidate-dashboard-quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:0 0 30px}
+.candidate-dashboard-quick{min-height:112px;display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:20px;border:1px solid #e2e7e9;background:#fff;border-radius:12px;text-decoration:none;color:var(--ink)}
+a.candidate-dashboard-quick:hover{border-color:#afc6b8;background:#fcfefd;box-shadow:0 4px 16px #162d1d08}
+.candidate-dashboard-quick>svg{color:#50705d}
+.candidate-dashboard-quick strong{font-size:15px;font-weight:730}
+.candidate-dashboard-quick small{font-size:12px;color:var(--muted);line-height:1.55}
+.candidate-dashboard-quick-muted{background:#f9fafb}
+.candidate-dashboard-section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:13px}
+.candidate-dashboard-section-head h2{font-size:18px;letter-spacing:-.25px;font-weight:750;margin:0}
+.candidate-dashboard-section-head>a{color:#385d47;display:inline-flex;align-items:center;gap:4px;font-size:13px;text-decoration:none;white-space:nowrap}
+.candidate-dashboard-section-head>a:hover{text-decoration:underline}
+.candidate-dashboard-job-list{background:#fff;border:1px solid #e2e7e9;border-radius:12px;overflow:hidden}
+.candidate-dashboard-job{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 20px;text-decoration:none;color:var(--ink);border-top:1px solid #eef0f2}
+.candidate-dashboard-job:first-child{border-top:0}
+.candidate-dashboard-job:hover{background:#fafcfb}
+.candidate-dashboard-job-main{display:grid;gap:8px;min-width:0}
+.candidate-dashboard-job-main strong{font-size:14px;font-weight:730;line-height:1.4}
+.candidate-dashboard-job-main small{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:12px;color:var(--muted);line-height:1.5}
+.candidate-dashboard-job-action{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;font-size:12px;font-weight:700;color:#345e49}
+.candidate-dashboard-job-state{background:#fff;border:1px solid #e3e7e9;border-radius:12px;padding:25px 20px;color:var(--muted);font-size:13px;line-height:1.7}
+.candidate-dashboard-job-state p{margin:0 0 12px}
+.candidate-dashboard-job-state button{background:#fff;border:1px solid #bccfc2;border-radius:7px;padding:7px 10px;color:#315b46}
+.candidate-dashboard-job-state a{color:#315b46}
+.candidate-dashboard-source-note{display:flex;align-items:flex-start;gap:7px;margin:16px 0 0;font-size:12px;line-height:1.7;color:#74808a}
+.candidate-dashboard-source-note svg{flex-shrink:0;margin-top:2px}
+.candidate-dashboard-updated{font-size:11px;color:#89949a;margin:5px 0 0 21px}
+@media(max-width:600px){
+ .candidate-dashboard{margin:12px auto 38px}
+ .candidate-dashboard-trail{margin:15px 0 24px}
+ .candidate-dashboard-intro h1{font-size:25px}
+ .candidate-dashboard-search{padding-left:12px;min-height:52px}
+ .candidate-dashboard-search button{padding:0 10px;gap:4px}
+ .candidate-dashboard-search button span{display:none}
+ .candidate-dashboard-profile{padding:18px 16px;margin-top:17px}
+ .candidate-dashboard-quick-grid{gap:10px;margin-bottom:26px}
+ .candidate-dashboard-quick{min-height:114px;padding:15px 13px}
+ .candidate-dashboard-job{padding:15px 14px}
+ .candidate-dashboard-job-main strong{font-size:13px}
+ .candidate-dashboard-job-action{font-size:0}
+ .candidate-dashboard-job-action svg{width:17px;height:17px}
+ .candidate-dashboard-section-head h2{font-size:17px}
+}

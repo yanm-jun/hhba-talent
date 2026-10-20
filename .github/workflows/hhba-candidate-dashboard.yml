@@ -1,0 +1,41 @@
+name: HHBA candidate dashboard clean landing acceptance
+on:
+  push:
+    branches: [feat/candidate-dashboard-clean-20261020]
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/hhba-candidate-dashboard.yml'
+  pull_request:
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/hhba-candidate-dashboard.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ui-acceptance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Check candidate flow contracts and verified job detail protection
+        working-directory: apps/web
+        run: |
+          node --test scripts/candidate-dashboard.contract.test.mjs
+          node --test scripts/white-market-detail.contract.test.mjs
+      - name: Build exact Railway white UI with account writes closed
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '0'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+        run: |
+          npm run build
+          test -s dist/index.html
