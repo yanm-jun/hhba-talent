@@ -3,11 +3,13 @@ import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 import {officialLink,normalize,validateBoards,endpoint,isTalentPool} from "../catalog.mjs";
 const registry=JSON.parse(readFileSync(new URL("../boards.json",import.meta.url),"utf8"));
-test("board registry retains baseline 36 and has new candidates",()=>{
- assert.equal(registry.boards.length,40);
- assert.equal(validateBoards(registry.boards).length,40);
+test("board registry retains baseline 36 and seven source candidates",()=>{
+ assert.equal(registry.boards.length,43);
+ assert.equal(validateBoards(registry.boards).length,43);
  assert.ok(registry.boards.some(b=>b.company==="OpenAI"&&b.platform==="ashby"));
  assert.ok(registry.boards.some(b=>b.company==="Form Energy"));
+ for(const company of ["Sierra","Monzo","Duolingo University Recruitment"])
+  assert.ok(registry.boards.some(b=>b.company===company));
 });
 test("host allowlist rejects dangerous, non-official, and misattributed URLs",()=>{
  const b={platform:"ashby",company:"Cursor",slug:"cursor"};
