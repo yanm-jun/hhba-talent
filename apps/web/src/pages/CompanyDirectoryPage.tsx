@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, ArrowRight, Building2, Search, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Search, ShieldCheck } from 'lucide-react';
+import { EmployerBrandLogo } from '../components/EmployerBrandLogo';
 import { Shell } from '../components/Shell';
 import { Link } from '../router';
 import { approvedEmployerJobIds, companyDirectoryFromSnapshot,
@@ -68,7 +69,7 @@ export function CompanyDirectoryPage({user}:{user:User|null}){
     <div className="company-directory-grid">
      {matching.slice(0,limit).map(item=><Link className="company-directory-card" key={item.id}
         to={reviewedLegacySlug(item)?'/companies/'+reviewedLegacySlug(item):'/companies/id/'+item.id}>
-       <span className="company-directory-icon"><Building2 size={21}/></span>
+       <EmployerBrandLogo identity={item.identity}/>
        <span className="company-directory-card-text">
         <strong>{item.identity.company}</strong>
         <small>{item.identity.platform} · {item.jobCount} 条已核验招聘记录</small>

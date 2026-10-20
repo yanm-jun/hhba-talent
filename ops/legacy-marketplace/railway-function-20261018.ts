@@ -1568,7 +1568,7 @@ async function whiteSiteResponse(req:Request,u:URL):Promise<Response|null>{
  // Only allow the three provenance-verified, original brand SVGs.
  // Never turn this into an arbitrary filesystem path or URL proxy.
  if(p.startsWith("/brands/")){
-  if(!["/brands/openai.svg","/brands/claude.svg","/brands/spacex.svg"].includes(p))
+  if(!/^\/brands\/(?:openai|claude|spacex|si-[a-z0-9]{2,40})\.svg$/.test(p))
    return new Response("Not found",{status:404});
   const verified=Bun.file(WHITE_PUBLIC_ROOT+p);
   if(!await verified.exists())return new Response("Brand asset not published",{status:404});

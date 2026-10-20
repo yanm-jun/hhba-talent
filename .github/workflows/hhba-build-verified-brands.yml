@@ -1,0 +1,29 @@
+name: HHBA Build Source-Verified Brand Assets
+on:
+  push:
+    branches: [feat/verified-brand-registry-20261020]
+    paths: ['.github/workflows/hhba-build-verified-brands.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  get-authentic-brand-marks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/verified-brand-registry-20261020
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Retrieve pinned original vectors only when provenance matches official company sources
+        run: python apps/web/scripts/collect-verified-brand-icons.py
+      - name: Commit unchanged upstream SVG assets and cryptographic provenance
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/public/brands/si-*.svg apps/web/public/brands/PROVENANCE.json
+          git add -f apps/web/src/data/verifiedBrandAssets.json
+          git commit -m "assets(brand): add 25 source-traceable original-vector marks with immutable provenance"
+          git push origin HEAD:feat/verified-brand-registry-20261020

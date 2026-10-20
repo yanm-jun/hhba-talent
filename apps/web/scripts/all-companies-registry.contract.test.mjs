@@ -36,7 +36,8 @@ test('company pages never invent business descriptions or logos for pending edit
  assert.ok(indexed.includes('NO_PROFILE_ZH'));
  assert.ok(indexed.includes('企业资料待补充'));
  assert.ok(indexed.includes('成立时间、重大事件尚未完成公开来源核实'));
- assert.ok(indexed.includes('通用企业图标'));
+ assert.ok(indexed.includes('<EmployerBrandLogo identity={identity} variant="profile"/>'));
+ assert.ok(listing.includes('<EmployerBrandLogo identity={item.identity}/>'));
  assert.ok(!indexed.includes('img src='));
  assert.ok(indexed.includes("verifiedBrandKey")===false);
  assert.ok(indexed.includes("approvedEmployerJobIds(audit,snapshot.updated)"));
