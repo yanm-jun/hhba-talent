@@ -870,7 +870,17 @@
       "company": "Perplexity",
       "platform": "ashby",
       "source": "perplexity",
-      "people": [],
+      "people": [
+        {
+          "name": "Aravind Srinivas",
+          "role": {
+            "zh": "创始人",
+            "en": "Founder"
+          },
+          "source": "https://www.wired.com/story/founder-perplexity-ai-sundar-pichai-competing-to-reinvent-search",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
@@ -977,7 +987,35 @@
       "company": "Gusto",
       "platform": "greenhouse",
       "source": "gusto",
-      "people": [],
+      "people": [
+        {
+          "name": "Josh Reeves",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://embedded.gusto.com/blog/gusto-founders-perspective-on-saas-3-and-embedded-fintech/",
+          "photo": null
+        },
+        {
+          "name": "Tomer London",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://embedded.gusto.com/blog/gusto-founders-perspective-on-saas-3-and-embedded-fintech/",
+          "photo": null
+        },
+        {
+          "name": "Eddie Kim",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://embedded.gusto.com/blog/gusto-founders-perspective-on-saas-3-and-embedded-fintech/",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
@@ -985,7 +1023,35 @@
       "company": "Deepgram",
       "platform": "ashby",
       "source": "deepgram",
-      "people": [],
+      "people": [
+        {
+          "name": "Scott Stephenson",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.ycombinator.com/companies/deepgram",
+          "photo": null
+        },
+        {
+          "name": "Adam Sypniewski",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.ycombinator.com/companies/deepgram",
+          "photo": null
+        },
+        {
+          "name": "Noah Shutty",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.ycombinator.com/companies/deepgram",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
@@ -993,7 +1059,26 @@
       "company": "ClickUp",
       "platform": "ashby",
       "source": "clickup",
-      "people": [],
+      "people": [
+        {
+          "name": "Zeb Evans",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://clickup.com/blog/zeb-evans-entrepreneur-of-the-year-2021-san-diego/",
+          "photo": null
+        },
+        {
+          "name": "Alex Yurkowski",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://clickup.com/blog/zeb-evans-entrepreneur-of-the-year-2021-san-diego/",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
@@ -1167,7 +1252,17 @@
       "company": "Flexport",
       "platform": "greenhouse",
       "source": "flexport",
-      "people": [],
+      "people": [
+        {
+          "name": "Ryan Petersen",
+          "role": {
+            "zh": "创始人",
+            "en": "Founder"
+          },
+          "source": "https://www.flexport.com/author/ryan-petersen/",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
