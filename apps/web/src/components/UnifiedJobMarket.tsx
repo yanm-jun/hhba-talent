@@ -4,6 +4,7 @@ import { Link, getJobReturnTarget, navigate } from '../router';
 import { Shell } from './Shell';
 import { EmployerBrandLogo } from './EmployerBrandLogo';
 import { companyProfileForJob } from '../services/companyProfiles';
+import { companyPageRouteForJob } from '../services/companyDirectory';
 import { featuredTitle, featuredLocation, isDefaultMarketFilters, loadVerifiedFeaturedJobs } from '../services/featuredOfficialJobs';
 import type { User } from '../services/api';
 import { getJob, listJobs, localizedCompany, localizedLocation, localizedTitle, officialStatus, safeOfficialJobUrl,
@@ -42,11 +43,15 @@ function useLanguage() {
 function JobCard({job,lang,asOf}:{job:LiveJob,lang:Language,asOf:string}){
   const source=safeOfficialJobUrl(job);
   const profile=companyProfileForJob(job);
+  const companyRoute=companyPageRouteForJob(job);
   if(!source || officialStatus(job,asOf)!=='recent')return null;
   return <article className="unified-job-card">
     <div className="unified-job-head">
       {profile?<Link className="unified-company-brand" to={'/companies/'+profile.slug}
         title={lang==='zh'?'查看 '+profile.name+' 企业介绍':'About '+profile.name}>
+        <EmployerBrandLogo job={job}/><strong>{localizedCompany(job,lang)}</strong>
+      </Link>:companyRoute?<Link className="unified-company-brand" to={companyRoute}
+        title={lang==='zh'?'查看企业资料和真实岗位':'View company profile and jobs'}>
         <EmployerBrandLogo job={job}/><strong>{localizedCompany(job,lang)}</strong>
       </Link>:<span className="unified-company-brand"><EmployerBrandLogo job={job}/>
         <strong>{localizedCompany(job,lang)}</strong></span>}
@@ -234,14 +239,18 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
     <div className="unified-job-footer">
       <span>{lang==='zh'? `共匹配 ${snapshot?.total.toLocaleString()||0} 条 · 本页 ${eligible.length} 条 · 来源更新时间：${formatDate(snapshot?.updated)}`
         : `${snapshot?.total.toLocaleString()||0} matching jobs · ${eligible.length} on this page · Updated ${formatDate(snapshot?.updated)}`}</span>
-      {compact?<Link to="/candidate/jobs">{lang==='zh'?'查看完整招聘市场':'Browse all jobs'} <ArrowRight size={15}/></Link>:
+      {compact?<div className="unified-job-browse-links">
+         <Link to="/companies">{lang==='zh'?'浏览企业资料库':'Browse companies'} <ArrowRight size={15}/></Link>
+         <Link to="/candidate/jobs">{lang==='zh'?'查看完整招聘市场':'Browse all jobs'} <ArrowRight size={15}/></Link>
+       </div>:
         <div className="unified-job-paging">
           <button type="button" disabled={page===0||loading} onClick={()=>setPage(x=>x-1)}>{lang==='zh'?'上一页':'Previous'}</button>
           <span>{page+1}</span>
           <button type="button" disabled={loading||!snapshot||((page+1)*30>=snapshot.total)} onClick={()=>setPage(x=>x+1)}>{lang==='zh'?'下一页':'Next'}</button>
         </div>}
     </div>
-    {!compact && <p className="unified-job-history">{lang==='zh'?'查阅保留的历史岗位资料：':'Archived historical records: '}
+    {!compact && <p className="unified-job-history">{lang==='zh'?'了解企业或查阅历史岗位资料：':'Explore companies and historical records: '}
+      <Link to="/companies">{lang==='zh'?'企业资料库':'Company directory'}</Link>{' · '}
       <Link to="/candidate/jobs/archive">{lang==='zh'?'历史岗位记录':'Historical jobs'}</Link>
        {' · '}<Link to="/candidate/employer-jobs">{lang==='zh'?'经认证企业自行发布的岗位':'Employer-submitted jobs (separate from official ATS)'}</Link></p>}
   </section>;
@@ -308,6 +317,7 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  },[job,jdRetry]);
  const official=job?safeOfficialJobUrl(job):null;
  const companyProfile=job?companyProfileForJob(job):null;
+ const generalCompanyRoute=job?companyPageRouteForJob(job):null;
  const segmentName:Record<string,{zh:string,en:string}>={
    responsibilities:{zh:'岗位职责',en:'Responsibilities'},
    requirements:{zh:'任职资格与技术要求',en:'Requirements and skills'},
@@ -329,6 +339,11 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
        {companyProfile?<Link to={'/companies/'+companyProfile.slug}
          className="unified-detail-company-link"
          title={lang==='zh'?'查看企业介绍':'View company profile'}>
+         <EmployerBrandLogo job={job}/><small>{localizedCompany(job,lang)}</small>
+         <ArrowRight size={14}/>
+       </Link>:generalCompanyRoute?<Link to={generalCompanyRoute}
+         className="unified-detail-company-link"
+         title={lang==='zh'?'查看企业资料':'View company information'}>
          <EmployerBrandLogo job={job}/><small>{localizedCompany(job,lang)}</small>
          <ArrowRight size={14}/>
        </Link>:<><EmployerBrandLogo job={job}/><small>{localizedCompany(job,lang)}</small></>}
