@@ -1,0 +1,99 @@
+name: HHBA 49 Verified Brands Railway Live Acceptance
+on:
+  push:
+    branches: [test/remaining-brands-railway-live-20261020]
+    paths: ['.github/workflows/hhba-49-brand-railway-live.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  all-49-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Install browser runner
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.0
+          npx playwright install --with-deps chromium
+      - name: Verify exact SHA for all 49 online genuine icons and browse real company cards
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {createHash} from 'node:crypto';
+          import {readFileSync} from 'node:fs';
+          import {chromium} from 'playwright';
+          const root='https://hhba-web-production-024c.up.railway.app';
+          const registry=JSON.parse(readFileSync('apps/web/src/data/verifiedBrandAssets.json','utf8'));
+          const provenance=JSON.parse(readFileSync('apps/web/public/brands/PROVENANCE.json','utf8'));
+          assert.equal(registry.records.length,49);
+          assert.equal(provenance.records.length,49);
+          const pause=ms=>new Promise(r=>setTimeout(r,ms));
+          let ready=false;
+          for(let attempt=1;attempt<=20;attempt++){
+           try{
+            const res=await fetch(root+'/brands/brand-anduril.png',{signal:AbortSignal.timeout(12000)});
+            ready=res.ok;
+            if(ready)break;
+            console.log('WAITING_RAILWAY_NEW_BRANDS',attempt,res.status);
+           }catch(e){console.log('WAITING_RAILWAY_BRAND_NETWORK',attempt,String(e).slice(0,100))}
+           await pause(10000);
+          }
+          assert.ok(ready,'Railway failed to publish new company PNG assets within 200s');
+          const jobsRes=await fetch(root+'/data/jobs.json',{signal:AbortSignal.timeout(50000)});
+          assert.equal(jobsRes.status,200);
+          const sourceJobs=await jobsRes.json();
+          const active=[];
+          async function checkIcon(row){
+           const asset=provenance.records.find(p=>p.file===row.file&&p.company===row.company);
+           assert.ok(asset,'no independently traceable provenance for '+row.company);
+           const r=await fetch(root+'/brands/'+row.file,{signal:AbortSignal.timeout(25000)});
+           assert.equal(r.status,200,'missing Railway asset '+row.file);
+           assert.ok(r.headers.get('content-type')?.startsWith(row.file.endsWith('.png')?'image/png':'image/svg+xml'),
+             'mismatched image MIME '+row.file);
+           const b=Buffer.from(await r.arrayBuffer());
+           assert.equal(createHash('sha256').update(b).digest('hex'),asset.sha256,'tampered brand '+row.company);
+           assert.ok(sourceJobs.jobs.some(j=>j.company===row.company&&j.platform===row.platform&&j.source===row.source),
+             'logo not associated with any real source board '+row.company);
+           return row.company;
+          }
+          const results=await Promise.all(registry.records.map(checkIcon));
+          assert.equal(results.length,49);
+          console.log('HHBA_49_LOGO_HTTP_SHA_MIME_ACCEPTED',JSON.stringify({shaVerified:49,available:49,realAtsMatches:49}));
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          const page=await browser.newPage({viewport:{width:1440,height:950}});
+          try{
+           await page.goto(root+'/companies',{waitUntil:'domcontentloaded',timeout:70000});
+           await page.locator('.company-directory-card').first().waitFor({timeout:40000});
+           const search=page.getByRole('textbox',{name:'搜索企业资料库'});
+           for(const name of ['Anduril','Airwallex','Harvey','Ramp','Twilio','Cohere','Ashby','General Robotics']){
+            await search.fill(name);
+            const card=page.locator('.company-directory-card').filter({has:page.locator('strong',{hasText:name})}).first();
+            await card.waitFor({timeout:15000});
+            const img=card.locator('.unified-brand-logo img');
+            await img.waitFor({timeout:12000});
+            await page.waitForFunction((logo)=>[...document.querySelectorAll('.company-directory-card')].some(c=>
+              c.querySelector('strong')?.textContent?.trim()===logo &&
+              c.querySelector('.unified-brand-logo img')?.naturalWidth>0),name,{timeout:15000});
+            console.log('HHBA_BRAND_DIRECTORY_VISIBLE',JSON.stringify({company:name,src:await img.getAttribute('src')}));
+           }
+           await search.fill('Headway');
+           const headway=page.locator('.company-directory-card').filter({has:page.locator('strong',{hasText:'Headway'})}).first();
+           await headway.waitFor({timeout:18000});
+           assert.equal(await headway.locator('.unified-brand-logo img').count(),0,
+             'No fake Headway brand when evidence unavailable');
+           assert.ok(await headway.locator('.unified-brand-logo svg').count()>0);
+           await search.fill('Anduril');
+           await page.locator('.company-directory-card').filter({has:page.locator('strong',{hasText:'Anduril'})}).first().click();
+           await page.waitForURL('**/companies/id/**',{timeout:15000});
+           await page.locator('.company-profile-brand img').waitFor({timeout:12000});
+           await page.waitForFunction(()=>document.querySelector('.company-profile-brand img')?.naturalWidth>0,
+             null,{timeout:15000});
+           await page.locator('.company-profile-job-card').first().waitFor({timeout:40000});
+           assert.ok((await page.locator('.company-profile-job-card').first().getAttribute('href')).startsWith('/candidate/jobs/'));
+           console.log('HHBA_49_BRANDS_LIVE_ACCEPTED',JSON.stringify({brandSourceCoverage:49,
+             remainingUnverified:['Headway'],directorySample:8,allHashes:true,brandCompanyPage:true,realJobLink:true}));
+          }finally{await browser.close()}
+          NODE
