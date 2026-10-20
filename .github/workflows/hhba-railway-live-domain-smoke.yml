@@ -61,6 +61,15 @@ jobs:
           assert.equal(unknown.status,404,'fake job accepted');
           const account=await get('/api/v1/auth/me');
           assert.notEqual((account.headers.get('content-type')||'').split(';')[0],'text/html','unconfigured authenticated API must not spoof page');
+          const old='https://hhba-live-jobs-preview-production.up.railway.app';
+          for(const path of ['/','/jobs/greenhouse-airbnb-12345']){
+           const oldPage=await fetch(old+path,{redirect:'manual',signal:AbortSignal.timeout(15000)});
+           assert.equal(oldPage.status,302,'old green UI should redirect: '+path);
+           const destination=oldPage.headers.get('location')||'';
+           assert.ok(destination.startsWith(host+'/'),'legacy route must point to new Railway white site');
+          }
+          const oldHealth=await fetch(old+'/health',{signal:AbortSignal.timeout(15000)});
+          assert.equal(oldHealth.status,200,'legacy ATS backend must remain available');
           console.log('HHBA_RAILWAY_WHITE_LIVE_ACCEPTED',JSON.stringify({
            origin:host,jobs:listing.jobs.length,facets:indexed.jobs.length,
            updated:listing.updated,searchJobs:result.total,routeTests:3,white:true
