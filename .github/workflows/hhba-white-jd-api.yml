@@ -1,0 +1,31 @@
+name: HHBA white JD API build
+on:
+  push:
+    branches: [feat/white-jd-api-readonly-20261020]
+    paths:
+      - 'ops/legacy-marketplace/**'
+      - '.github/workflows/hhba-white-jd-api.yml'
+  pull_request:
+    paths:
+      - 'ops/legacy-marketplace/**'
+      - '.github/workflows/hhba-white-jd-api.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  api-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Ensure white index fallback remains a source-verified read-only API
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const s=fs.readFileSync('ops/legacy-marketplace/railway-function-20261018.ts','utf8');
+          for(const token of ['async function fromWhiteIndex(id:string)','!urlOK(row.url,row.source,row.platform,native)','Math.abs(Date.now()-Date.parse(data.updated))>24*3600000','const job=market?.rows.find(x=>x.id===nativeId)||await fromWhiteIndex(nativeId)','headers["Access-Control-Allow-Origin"]="https://yanm-jun.github.io"']){
+            if(!s.includes(token))throw Error('Missing verified white JD fallback: '+token)
+          }
+          NODE
+      - name: Docker build production-compatible Bun service
+        run: docker build --file ops/legacy-marketplace/Dockerfile --tag hhba-white-jd-api:ci ops/legacy-marketplace
