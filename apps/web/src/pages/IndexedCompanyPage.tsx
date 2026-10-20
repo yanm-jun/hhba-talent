@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ArrowRight, ExternalLink, MapPin, RefreshCcw, ShieldCheck } from 'lucide-react';
 import { EmployerBrandLogo } from '../components/EmployerBrandLogo';
+import { CompanyVisualStory } from '../components/CompanyVisualStory';
 import { Link, getCompanyReturnTarget } from '../router';
 import { Shell } from '../components/Shell';
 import { decodeEmployerIdentity, discoverEmployerJobs,
@@ -115,6 +116,7 @@ export function IndexedCompanyPage({encodedId,user}:{encodedId:string;user:User|
        'HHBA has observed source-matched official job postings. Industry, size and legal-entity relationships have not yet been independently verified.'}</p>
     </div>}
   </section>
+  <CompanyVisualStory identity={identity} lang={lang}/>
   <section className="company-profile-section">
    <h2>{lang==='zh'?'主要业务与代表产品':'Business and products'}</h2>
    {editorial?<div className="company-profile-focus-grid">{editorial.focus.map((item,i)=>
