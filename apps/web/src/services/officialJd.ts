@@ -204,6 +204,36 @@ const htmlToBlocks=(raw:string):OfficialJdBlock[]=>{
     return {kind,text:body,section};
   }).filter(x=>x.text.length>0 && x.text.length<=12_000).slice(0,250);
 };
+export type PreparedBilingualJd={jd:OfficialJd;chinese:string|null;ready:boolean;sourceHash:string};
+// The user receives a complete saved document in ONE request.
+// HTTP 202 means no ready private cache yet. It never starts translation.
+export async function fetchPreparedBilingualJd(job:LiveJob,signal:AbortSignal):Promise<PreparedBilingualJd|null>{
+ const response=await fetch(JD_API_ORIGIN+'/api/jobs/'+encodeURIComponent(job.id)+'/ready-jd',{
+  method:'GET',mode:'cors',credentials:'omit',redirect:'error',
+  headers:{Accept:'application/json'},signal
+ });
+ if(response.status===202||response.status===503||response.status===404)return null;
+ if(!response.ok)throw new Error('预处理岗位详情服务不可用');
+ const data=await response.json();
+ if(data.jobId!==job.id||data.sourceUrl!==job.url||
+    data.job?.id!==job.id||data.job?.url!==job.url||
+    !/^[a-f0-9]{64}$/.test(data.sourceHash||'')||
+    typeof data.originalText!=='string'||data.originalText.length>100000||
+    data.originalText.length<1||
+    (data.chineseText!==null&&typeof data.chineseText!=='string')||
+    (data.ready===true&&(!data.chineseText||!/[\u3400-\u9fff]/u.test(data.chineseText)))||
+    !Number.isFinite(Date.parse(data.checkedAt))||
+    Date.now()-Date.parse(data.checkedAt)>7*86400000)
+  throw new Error('已保存的双语职位版本或来源校验失败');
+ const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(data.originalText));
+ const sourceHash=[...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,'0')).join('');
+ if(sourceHash!==data.sourceHash)throw new Error('岗位原文哈希已更新，请等待后台重新核验');
+ const blocks=htmlToBlocks(data.originalText);
+ if(!blocks.length)throw new Error('预处理的英文职位说明内容为空');
+ return {jd:{blocks,originalText:data.originalText,roleTitle:job.title,
+   checkedAt:data.checkedAt,sourceUrl:job.url,status:'LIVE_CONTENT'},
+   chinese:data.ready?data.chineseText:null,ready:data.ready===true,sourceHash};
+}
 async function readGreenDetail(job:LiveJob,signal:AbortSignal):Promise<OfficialJd>{
   const response=await fetch(JD_API_ORIGIN+'/api/jobs/'+encodeURIComponent(job.id),{
     method:'GET',mode:'cors',credentials:'omit',redirect:'error',
