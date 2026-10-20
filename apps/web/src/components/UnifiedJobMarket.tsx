@@ -202,6 +202,7 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  const [jdError,setJdError]=useState('');
  const [jdLoading,setJdLoading]=useState(false);
  const [jdRetry,setJdRetry]=useState(0);
+ const [translateRetry,setTranslateRetry]=useState(0);
  const [chineseJd,setChineseJd]=useState('');
  const [translateBusy,setTranslateBusy]=useState(false);
  const [translateError,setTranslateError]=useState('');
@@ -248,7 +249,7 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
     .catch(e=>{if(!controller.signal.aborted)setTranslateError(e instanceof Error?e.message:'中文 JD 翻译失败')})
     .finally(()=>{if(!controller.signal.aborted)setTranslateBusy(false)});
    return()=>controller.abort();
- },[lang,job,jd]);
+ },[lang,job,jd,translateRetry]);
  const official=job?safeOfficialJobUrl(job):null;
  const segmentName:Record<string,{zh:string,en:string}>={
    responsibilities:{zh:'岗位职责',en:'Responsibilities'},
@@ -306,17 +307,12 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
          </section>:<div className="unified-jd-translate">
            <strong>{translateBusy?'正在生成完整中文岗位说明':'已获取完整的企业官方岗位说明'}</strong>
            <p>{translateBusy?(translationProgress||'正在逐段翻译岗位职责、任职要求及技能条件。'):
-             translateError ? '中文译文暂时不可用，请在本页面重试；完整英文原文可使用 English 查看。':
+             translateError ? '中文翻译尚未完成：'+translateError+'。请在本页面重试，也可以切换 English 阅读官方原文。':
              '尚未取得通过校验的中文译文；请切换 English 阅读本页的官方原文。'}</p>
            {!translateBusy&&translateError&&
-             <button type="button" className="unified-jd-retry" onClick={()=>{
-               setTranslateError('');setTranslateBusy(true);
-               const controller=new AbortController();
-               if(job&&jd?.originalText)translateGreenJd(job,jd.originalText,controller.signal,(done,total)=>{
-                 setTranslationProgress('翻译进度 '+done+' / '+total);
-               }).then(setChineseJd).catch(e=>setTranslateError(e instanceof Error?e.message:'中文翻译失败'))
-                 .finally(()=>setTranslateBusy(false));
-             }}>重试中文翻译</button>}
+             <button type="button" className="unified-jd-retry" onClick={()=>setTranslateRetry(n=>n+1)}>
+               重新翻译中文
+             </button>}
          </div>}
        </div>:null}
      <div className="unified-job-actions unified-detail-actions">
