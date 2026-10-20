@@ -38,4 +38,18 @@ jobs:
           assert.equal(response.status,200,'previously failing translation must succeed');
           assert.equal(body.numbersVerified,true);
           assert.equal(body.sourceHash,hash);
+          const checks=[{part:0,status:response.status,cached:body.cached||false}];
+          for(let part=1;part<body.total;part++){
+           const chunk=await fetch(base+'/api/jobs/'+id+'/translate-part',{
+             method:'POST',headers:{Origin:base,'Content-Type':'application/json'},
+             body:JSON.stringify({part,sourceHash:hash}),signal:AbortSignal.timeout(160000)
+           });
+           let result={};try{result=await chunk.json()}catch{}
+           checks.push({part,status:chunk.status,error:result.error||null,cached:result.cached||false});
+           if(chunk.status!==200||result.numbersVerified!==true||result.sourceHash!==hash||result.part!==part||
+             typeof result.text!=='string'||!/[\u3400-\u9fff]/u.test(result.text))break;
+          }
+          console.log('HHBA_FULL_JOB_CHINESE_TRANSLATION',JSON.stringify({id,total:body.total,checks}));
+          assert.equal(checks.length,body.total,'not all parts reached');
+          assert.ok(checks.every(item=>item.status===200),'some parts failed to translate');
           NODE
