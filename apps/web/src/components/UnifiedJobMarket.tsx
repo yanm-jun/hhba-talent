@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, Building2, ExternalLink, MapPin, RefreshCcw, Search, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ExternalLink, MapPin, RefreshCcw, Search, ShieldCheck } from 'lucide-react';
 import { Link } from '../router';
 import { Shell } from './Shell';
+import { EmployerBrandLogo } from './EmployerBrandLogo';
+import { featuredTitle, featuredLocation, isDefaultMarketFilters, loadVerifiedFeaturedJobs } from '../services/featuredOfficialJobs';
 import type { User } from '../services/api';
 import { getJob, listJobs, localizedCompany, localizedLocation, localizedTitle, officialStatus, safeOfficialJobUrl,
   type Language, type LiveFilters, type LiveJob, type LivePage } from '../services/liveRecruitment';
@@ -28,15 +30,14 @@ function JobCard({job,lang,asOf}:{job:LiveJob,lang:Language,asOf:string}){
   const source=safeOfficialJobUrl(job);
   if(!source || officialStatus(job,asOf)!=='recent')return null;
   return <article className="unified-job-card">
-    <div className="unified-job-head"><span><Building2 size={15}/>{localizedCompany(job,lang)}</span>
-    <small>{lang==='zh'?(job.domestic?'国内官方招聘信息':'官方 ATS 招聘板'):(job.domestic?'Official China career site':'Official ATS board')}</small></div>
-    <h3><Link to={'/candidate/jobs/'+encodeURIComponent(job.id)}>{localizedTitle(job,lang)}</Link></h3>
-    <div className="unified-job-meta"><span><MapPin size={14}/>{localizedLocation(job,lang)}</span>
+    <div className="unified-job-head">
+      <span className="unified-company-brand"><EmployerBrandLogo job={job}/><strong>{localizedCompany(job,lang)}</strong></span>
+      <small>{lang==='zh'?'官方招聘':'Official opening'}</small>
+    </div>
+    <h3><Link to={'/candidate/jobs/'+encodeURIComponent(job.id)}>{featuredTitle(job,lang)}</Link></h3>
+    <div className="unified-job-meta"><span><MapPin size={14}/>{featuredLocation(job,lang)||localizedLocation(job,lang)}</span>
       <span>{job.recruitmentType?typeLabel[job.recruitmentType]?.[lang]||job.recruitmentType:(lang==='zh'?'招聘类型待确认':'Type unverified')}</span>
       {job.remote===true&&<span>{lang==='zh'?'远程':'Remote'}</span>}</div>
-    <p className="unified-job-proof"><ShieldCheck size={15}/> {lang==='zh'
-      ? '近期来源记录，是否仍可申请请以企业官网为准'
-      : 'Recently observed; confirm current availability on the official site'}</p>
     <div className="unified-job-actions"><Link to={'/candidate/jobs/'+encodeURIComponent(job.id)}>
       {lang==='zh'?'查看岗位':'View role'} <ArrowRight size={14}/></Link></div>
   </article>;
@@ -55,6 +56,8 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   const [error,setError]=useState('');
   const [loading,setLoading]=useState(true);
   const [retry,setRetry]=useState(0);
+  const [featured,setFeatured]=useState<LiveJob[]|null>(null);
+  const [featuredError,setFeaturedError]=useState('');
   useEffect(()=>{const id=setTimeout(()=>{setPage(0);setFilters(f=>({...f,q:draft,education:f.education==='UNRESTRICTED_OR_UNREPORTED'?'':f.education}));},280);return()=>clearTimeout(id)},[draft]);
   useEffect(()=>{
     const controller=new AbortController();setLoading(true);setError('');
@@ -64,8 +67,25 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       .finally(()=>{if(!controller.signal.aborted)setLoading(false)});
     return()=>controller.abort();
   },[filters,page,retry]);
+  const defaultView=isDefaultMarketFilters(filters,page);
+  useEffect(()=>{
+    if(!defaultView){setFeatured(null);setFeaturedError('');return;}
+    const controller=new AbortController();
+    setFeatured(null);setFeaturedError('');
+    loadVerifiedFeaturedJobs(controller.signal)
+      .then(verified=>{if(!controller.signal.aborted)setFeatured(verified)})
+      .catch(e=>{if(!controller.signal.aborted)setFeaturedError(
+        e instanceof Error?e.message:'精选企业岗位暂时不可用')});
+    return ()=>controller.abort();
+  },[defaultView,retry]);
   const eligible=useMemo(()=>snapshot?.jobs.filter(j=>officialStatus(j,snapshot.updated)==='recent')||[],[snapshot]);
-  const shown=compact?eligible.slice(0,8):eligible;
+  // Only the UNFILTERED first page gets six highlighted jobs. Search,
+  // company/city filtering and all other pages retain their normal results.
+  const curatedIds=new Set(featured?.map(j=>j.id)||[]);
+  const shown=defaultView
+    ?(featured ? (compact?featured:[...featured,...eligible.filter(j=>!curatedIds.has(j.id)).slice(0,24)]):[])
+    :(compact?eligible.slice(0,8):eligible);
+  const featuredPending=defaultView && !featured && !featuredError;
   const interpreted=useMemo(()=>parseNaturalQuery(filters.q),[filters.q]);
   const roleNames:Record<string,string>={software:'软件工程师',sales:'销售',engineer:'工程师',product:'产品经理',intern:'实习',design:'设计',finance:'财务',marketing:'市场营销',operations:'运营'};
   const intentLabels=[
@@ -153,7 +173,13 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
         {lang==='zh'?'当前包含官网没有明确识别到学历条件的岗位。这些职位可能仍有学历要求，请务必查阅官方任职资格。':
           'Some listed jobs have unknown education requirements. This does not mean that a degree is unnecessary; check the employer’s official qualifications.'}
       </p>}
-    {loading?<p className="unified-job-state" role="status">{lang==='zh'?'正在读取真实岗位…':'Loading jobs…'}</p>:
+    {(loading||featuredPending)?<p className="unified-job-state" role="status">{lang==='zh'
+      ?(featuredPending?'正在核验六个精选企业岗位…':'正在读取真实岗位…')
+      :(featuredPending?'Verifying six highlighted official jobs…':'Loading jobs…')}</p>:
+      defaultView&&featuredError?<div className="unified-job-state" role="alert">
+        {lang==='zh'?'精选岗位暂时未全部通过官方核验，请稍后重试或使用搜索筛选其他真实岗位。':'Featured jobs could not all be verified. Search other official jobs instead.'}
+        <button type="button" onClick={()=>setRetry(x=>x+1)}><RefreshCcw size={15}/>{lang==='zh'?'重新核验':'Retry verification'}</button>
+      </div>:
       error?<div className="unified-job-state" role="alert">{lang==='zh'?error:'Jobs temporarily unavailable. Please retry.'}<button type="button" onClick={()=>setRetry(x=>x+1)}><RefreshCcw size={15}/> {lang==='zh'?'重试':'Retry'}</button></div>:
       shown.length?<div className="unified-job-grid">{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated}/>)}</div>:
         <div className="unified-job-state">{lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
@@ -246,7 +272,8 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
    {error?<p className="unified-job-state" role="alert">{lang==='zh'?error:'Job details unavailable.'}</p>:!job?<p className="unified-job-state">
      {lang==='zh'?'正在读取官方岗位信息…':'Loading official job details…'}</p>:
    <article className="unified-detail-card">
-     <small>{localizedCompany(job,lang)}</small><h1>{localizedTitle(job,lang)}</h1>
+     <div className="unified-detail-employer"><EmployerBrandLogo job={job}/><small>{localizedCompany(job,lang)}</small></div>
+     <h1>{featuredTitle(job,lang)}</h1>
      <p><MapPin size={15}/>{localizedLocation(job,lang)}</p>
      <div className="unified-detail-warning"><ShieldCheck size={17}/>
        {lang==='zh'?'正在核对企业官方职位内容。最新投递状态以官网为准。':
