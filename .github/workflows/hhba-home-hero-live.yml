@@ -1,0 +1,72 @@
+name: HHBA white homepage responsive live visual acceptance
+on:
+  push:
+    branches: [test/home-hero-live-20261020]
+    paths: ['.github/workflows/hhba-home-hero-live.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  visible-layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install temporary headless browser without adding project dependencies
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.0
+          npx playwright install --with-deps chromium
+      - name: Inspect actual Railway layout at desktop and mobile widths
+        run: |
+          node --input-type=module <<'NODE'
+          import {chromium} from 'playwright';
+          import assert from 'node:assert/strict';
+          const root='https://hhba-web-production-024c.up.railway.app/';
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          try{
+            for(const viewport of [{width:1440,height:900},{width:390,height:844}]){
+              const page=await browser.newPage({viewport});
+              for(let attempt=0;attempt<3;attempt++){
+                try{
+                  await page.goto(root,{waitUntil:'domcontentloaded',timeout:45000});
+                  await page.getByRole('heading',{name:'让机会与人才，找到彼此。'}).waitFor({timeout:20000});
+                  break;
+                }catch(err){if(attempt===2)throw err}
+              }
+              const metrics=await page.evaluate(()=>{
+                const nav=document.querySelector('.topbar');
+                const heading=document.querySelector('.home-hero h1');
+                const subtitle=document.querySelector('.home-hero p');
+                const cards=document.querySelector('.entry-grid');
+                if(!nav||!heading||!subtitle||!cards)throw Error('required HHBA home elements missing');
+                return {
+                  heading:heading.textContent?.trim(),subtitle:subtitle.textContent?.trim(),
+                  titlePx:parseFloat(getComputedStyle(heading).fontSize),
+                  subtitlePx:parseFloat(getComputedStyle(subtitle).fontSize),
+                  navigationGap:heading.getBoundingClientRect().top-nav.getBoundingClientRect().bottom,
+                  cardsGap:cards.getBoundingClientRect().top-subtitle.getBoundingClientRect().bottom,
+                  visibleEntryButtons:cards.querySelectorAll('button.entry-card').length,
+                  horizontalOverflow:document.documentElement.scrollWidth>window.innerWidth+1
+                };
+              });
+              console.log('HHBA_HOME_HERO_RENDERED',JSON.stringify({viewport,metrics}));
+              assert.equal(metrics.heading,'让机会与人才，找到彼此。');
+              assert.equal(metrics.subtitle,'你来到这里，是为了什么？');
+              assert.equal(metrics.visibleEntryButtons,2);
+              assert.ok(!metrics.horizontalOverflow,'horizontal overflow on homepage');
+              if(viewport.width>=900){
+                assert.ok(metrics.titlePx>=28&&metrics.titlePx<=32);
+                assert.ok(metrics.subtitlePx>=16);
+                assert.ok(metrics.navigationGap<90,'desktop whitespace still too large');
+              }else{
+                assert.ok(metrics.titlePx>=25);
+                assert.ok(metrics.subtitlePx>=15);
+                assert.ok(metrics.navigationGap<70,'mobile whitespace still too large');
+              }
+              await page.close();
+            }
+            console.log('HHBA_HOME_HERO_LIVE_ACCEPTED',JSON.stringify({site:root,desktop:true,mobile:true}));
+          }finally{await browser.close()}
+          NODE
