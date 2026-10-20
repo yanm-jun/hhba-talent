@@ -1,5 +1,6 @@
 import {readFileSync} from "node:fs";
 import {fetchBoard,validateBoards} from "./catalog.mjs";
+import {parseJobQuery,matchesJobQuery} from "./query.mjs";
 
 const data=JSON.parse(readFileSync(new URL("./boards.json",import.meta.url),"utf8"));
 export const boards=validateBoards(data.boards);
@@ -51,9 +52,11 @@ export async function refresh(){
  try{return await updating}finally{updating=null}
 }
 export function filterJobs(params){
- const q=String(params.get("q")||"").trim().toLowerCase().slice(0,100);
+ const query=parseJobQuery(params.get("q")||"");
  const company=String(params.get("company")||"").trim().toLowerCase().slice(0,100);
- const remote=params.get("remote")==="true";
+ const remote=params.get("remote")==="true"?true:null;
  return snapshot.jobs.filter(j=>(!company||j.company.toLowerCase()===company)&&
-  (!remote||j.remote===true)&&(!q||[j.company,j.title,j.location].some(s=>s.toLowerCase().includes(q))));
+  matchesJobQuery(j,query,remote));
 }
+
+export {parseJobQuery} from "./query.mjs";
