@@ -55,18 +55,13 @@ function Trail({detail=false}:{detail?:boolean}) {
 }
 function Position({job}:{job:Job}) {
  const valid=/^[A-Za-z0-9_-]{1,64}$/.test(job.job_id||'');
- const direct=job.current_application_verified===true && job.application_link_status==='VERIFIED_DIRECT'
-   ? officialLink(job.application_url) : null;
- const officialATS=job.record_kind==='ATS_OFFICIAL_METADATA'
-   ? officialLink(job.official_detail_url):null;
+
  return <article className="hhba-position-card">
    <span className="hhba-position-company">{label(job.company_display_name,'企业名称待确认')}</span>
-   <h3>{job.record_kind==='ATS_OFFICIAL_METADATA'&&valid?<Link to={'/candidate/jobs/'+encodeURIComponent(job.job_id)}>{label(job.job_title,'未命名历史岗位')}</Link>:direct?<a href={direct} target="_blank" rel="noopener noreferrer">{label(job.job_title,'未命名历史岗位')} ↗</a>:valid?<Link to={'/candidate/jobs/'+encodeURIComponent(job.job_id)}>{label(job.job_title,'未命名历史岗位')}</Link>:label(job.job_title,'未命名历史岗位')}</h3>
+   <h3>{valid?<Link to={'/candidate/jobs/'+encodeURIComponent(job.job_id)}>{label(job.job_title,'未命名历史岗位')}</Link>:label(job.job_title,'未命名历史岗位')}</h3>
    <div className="hhba-position-tags"><span>{names[job.primary_recruitment_type||'']||'待分类'}</span><span>{label(job.work_city,'地点未披露')}</span><span>{job.record_kind==='ATS_STAGING_PREVIEW'?'内部验收预览 · 来源待审核':job.record_kind==='ATS_OFFICIAL_METADATA'?'官方招聘板已同步 · 申请状态请核实':job.record_kind==='OFFICIAL_LIST_OBSERVED'?'官网列表已采集 · 投递待核实':states[job.job_status||'']||'历史状态未知'}</span></div>
    <div className="hhba-position-footer"><small>历史核验：{day(job.status_checked_at||job.last_verified_at)}</small><span className="hhba-position-actions">
-     {valid&&<Link to={'/candidate/jobs/'+encodeURIComponent(job.job_id)}>查看详情 <ArrowRight size={14}/></Link>}
-     {officialATS && valid && <Link to={'/candidate/jobs/'+encodeURIComponent(job.job_id)}>站内查看完整职位描述 <ArrowRight size={14}/></Link>}
-     {direct && <a href={direct} target="_blank" rel="noopener noreferrer">去官方投递 ↗</a>}
+     {valid&&<Link to={'/candidate/jobs/'+encodeURIComponent(job.job_id)}>查看岗位 <ArrowRight size={14}/></Link>}
    </span></div>
  </article>;
 }
