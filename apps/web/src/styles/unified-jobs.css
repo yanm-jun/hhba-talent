@@ -95,3 +95,10 @@
 .unified-search-fallback button{padding:9px 12px;border:1px solid #bccfbf;border-radius:8px;color:#315f45;background:#fff;font-size:12px;font-weight:600;cursor:pointer}
 .unified-search-fallback button:hover{background:#f3f8f3}
 .unified-search-fallback-active{border-left:3px solid #b6a77e;padding:8px 12px;margin:12px 0;color:#675f4c;background:#fbfaf6;font-size:12px;line-height:1.7}
+
+/* Non-blocking fallback: other source-audited posts remain browsable. */
+.unified-featured-fallback{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  border:1px solid #dce8df;background:#f8fbf9;color:#53685d;border-radius:9px;
+  padding:10px 13px;margin-top:13px;font-size:12px;line-height:1.6}
+.unified-featured-fallback button{border:1px solid #c5d8ca;background:white;border-radius:7px;
+  padding:6px 10px;font:inherit;font-weight:650;color:#315e48;display:inline-flex;align-items:center;gap:6px}
