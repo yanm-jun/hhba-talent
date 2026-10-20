@@ -1,0 +1,48 @@
+name: HHBA native Railway index live cutover acceptance
+on:
+  push:
+    branches: [test/native-index-read-cutover-20261020]
+    paths: ['.github/workflows/hhba-native-index-live-cutover.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify Railway native publisher created complete on-volume evidence
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const base='https://hhba-web-production-024c.up.railway.app';
+          const status=await fetch(base+'/api/official-index/status',{
+            headers:{Accept:'application/json'},signal:AbortSignal.timeout(15000)});
+          assert.equal(status.status,200);
+          const body=await status.json();
+          assert.equal(body.kind,'HHBA_OFFICIAL_INDEX_STATUS_V1');
+          assert.equal(body.available,true,'Railway does not yet have a valid native index');
+          assert.ok(body.jobs>=10000,'source listings unexpectedly small');
+          assert.ok(body.facets>=8000,'verified search metadata unexpectedly sparse');
+          const feed=await fetch(base+'/data/jobs.json',{
+            headers:{Accept:'application/json'},signal:AbortSignal.timeout(15000)});
+          assert.equal(feed.status,200);
+          const jobs=await feed.json();
+          assert.ok(jobs.jobs.length>10000);
+          const contentSource=feed.headers.get('x-hhba-index-source')||'pages-bootstrap';
+          if(body.nativeReadEnabled)assert.equal(contentSource,'railway-verified-volume');
+          const facets=await fetch(base+'/data/job-search-facets.json',{
+            headers:{Accept:'application/json'},signal:AbortSignal.timeout(15000)});
+          assert.equal(facets.status,200);
+          const f=await facets.json();
+          assert.equal(f.indexed_as_of,jobs.updated);
+          assert.ok(f.extracted_count>8000);
+          console.log('HHBA_NATIVE_INDEX_LIVE_ACCEPTED',JSON.stringify({
+            source:contentSource,enabled:body.nativeReadEnabled,
+            ready:body.available,jobs:body.jobs,facets:body.facets,
+            returnedJobs:jobs.total,returnedFacets:f.extracted_count
+          }));
+          NODE
