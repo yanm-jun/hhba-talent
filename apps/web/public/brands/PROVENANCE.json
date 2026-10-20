@@ -635,6 +635,22 @@
       "fetchedUrl": "https://job-boards.greenhouse.io/spacexglobal",
       "sha256": "b3591eba63012760c8fef72d6387dbff3feafde97c2e6c2c6724e6e3f905d985",
       "reviewNote": "The official recruitment board displays the SpaceX name; visually reuses the already verified original SpaceX vector."
+    },
+    {
+      "company": "Headway",
+      "platform": "ashby",
+      "boardSource": "headway",
+      "file": "brand-headway.png",
+      "attribution": "original company-specific logo declared in Headway's public Ashby employer recruitment page, not Ashby's generic favicon",
+      "sourceUrl": "https://app.ashbyhq.com/api/images/org-theme-logo/b1120523-8572-45e9-92ac-06cfd8a94d1c/d06e763f-0053-4f8e-8f7c-fbb08fe45d76/86e0c1b9-11a3-4776-a61d-65b48e3b9696.png",
+      "sourcePage": "https://jobs.ashbyhq.com/headway",
+      "fetchedUrl": "https://app.ashbyhq.com/api/images/org-theme-logo/b1120523-8572-45e9-92ac-06cfd8a94d1c/d06e763f-0053-4f8e-8f7c-fbb08fe45d76/86e0c1b9-11a3-4776-a61d-65b48e3b9696.png",
+      "sha256": "11d2003cf45ad6f6257f2f93bc14a1bfdbb7d3a2b94eca76883b387f930ad64a",
+      "reviewNote": "HTML og:image metadata on exact company ATS board, verified source identity; not a company-site download or partnership license",
+      "dimensions": [
+        500,
+        500
+      ]
     }
   ]
 }

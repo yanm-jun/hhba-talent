@@ -441,6 +441,15 @@
       "color": "#000000",
       "wide": false,
       "kind": "original-source"
+    },
+    {
+      "company": "Headway",
+      "platform": "ashby",
+      "source": "headway",
+      "file": "brand-headway.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-board-icon"
     }
   ]
 }

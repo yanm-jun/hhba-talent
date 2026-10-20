@@ -30,9 +30,9 @@ const identity=row=>[row.company,row.platform,row.source].join('\0');
 
 test('current employer brands and three original icons each have exact ATS identities',()=>{
  assert.equal(registry.schemaVersion,1);
- assert.equal(registry.records.length,49);
+ assert.equal(registry.records.length,50);
  const keys=registry.records.map(identity);
- assert.equal(new Set(keys).size,49);
+ assert.equal(new Set(keys).size,50);
  for(const [company,platform,source] of expected){
   const item=registry.records.find(row=>row.company===company&&row.platform===platform&&row.source===source);
   assert.ok(item,'missing exact employer source '+company);
@@ -47,7 +47,7 @@ test('current employer brands and three original icons each have exact ATS ident
 });
 test('all current source icons match pinned, immutable SHA-256 with exact provenance',()=>{
  assert.equal(proof.schemaVersion,1);
- assert.equal(proof.records.length,49);
+ assert.equal(proof.records.length,50);
  assert.ok(proof.sourcePolicy.includes('does not grant trademark rights'));
  const seen=new Set();
  for(const logo of registry.records){
@@ -97,4 +97,17 @@ test('Railway serves only vetted SVG and PNG files and preserves CSP protection'
  assert.ok(server.includes('"Content-Type":p.endsWith(".png")?"image/png":"image/svg+xml; charset=utf-8"'));
  assert.ok(server.includes('"X-Content-Type-Options":"nosniff"'));
  assert.ok(server.includes('"Content-Security-Policy":"default-src'));
+});
+
+test("Headway's only published brand is its own ATS-board uploaded employer image, not Ashby favicon or same-name business",()=>{
+ const item=registry.records.find(x=>x.company==='Headway'&&x.platform==='ashby'&&x.source==='headway');
+ assert.ok(item);
+ assert.equal(item.file,'brand-headway.png');
+ assert.equal(item.kind,'brand-board-icon');
+ const meta=proof.records.find(x=>x.file===item.file);
+ assert.equal(meta?.sourcePage,'https://jobs.ashbyhq.com/headway');
+ assert.match(meta?.sourceUrl||'',/^https:\/\/app\.ashbyhq\.com\/api\/images\/org-theme-logo\//);
+ assert.ok(meta?.attribution?.includes('not Ashby\'s generic favicon'));
+ assert.equal(meta?.sha256,'11d2003cf45ad6f6257f2f93bc14a1bfdbb7d3a2b94eca76883b387f930ad64a');
+ assert.ok(!registry.records.some(x=>x.company==='Headway Inc'||x.company==='Headway Digital Studio'));
 });
