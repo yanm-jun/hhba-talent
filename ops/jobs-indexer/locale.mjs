@@ -78,9 +78,9 @@ function replaceWhole(input,items){
  return s;
 }
 function cleanup(s){return s.replace(/[,;|]+/g," · ").replace(/[-–—]+/g," · ")
- .replace(/\s*\/\s*/g,"／").replace(/[ \t]{2,}/g," ").replace(/\s*·\s*/g," · ").replace(/([\u3400-\u9fff])\s+([\u3400-\u9fff])/g,"$1$2").replace(/\(/g,"（").replace(/\)/g,"）").trim();}
+ .replace(/\s*\/\s*/g,"／").replace(/[ \t]{2,}/g," ").replace(/\s*·\s*/g," · ").replace(/(?<=[\u3400-\u9fff])\s+(?=[\u3400-\u9fff])/g,"").replace(/\(/g,"（").replace(/\)/g,"）").trim();}
 function safeChinese(raw,table){
- if(/[\u3400-\u9fff]/.test(raw)&&!/[a-z]{3,}/i.test(raw))return {text:raw,status:"original"};
+ if(/[\u3400-\u9fff]/.test(raw)&&!/[a-z]/i.test(raw))return {text:raw,status:"original"};
  const out=cleanup(replaceWhole(String(raw||""),table));
  // Never present partly-translated English prose as a complete Chinese translation.
  if(/[a-z]/i.test(out))return {text:"",status:"needs-review"};
