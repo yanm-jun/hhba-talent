@@ -1,0 +1,41 @@
+name: HHBA fixed Chinese JD live confirmation
+on:
+  push:
+    branches: [test/jd-live-fidelity-after-fix-20261020]
+    paths:
+      - .github/workflows/hhba-translation-live-after-fix.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test source-bound translation on previously failing job
+        run: |
+          node --input-type=module <<'NODE'
+          import {createHash} from 'node:crypto';
+          import assert from 'node:assert/strict';
+          const base='https://hhba-web-production-024c.up.railway.app';
+          const id='greenhouse-airbnb-7755758';
+          const detail=await fetch(base+'/api/jobs/'+id,{signal:AbortSignal.timeout(25000)});
+          assert.equal(detail.status,200,'official English JD is required');
+          const data=await detail.json();
+          assert.equal(data.status,'LIVE_CONTENT');
+          const hash=createHash('sha256').update(data.description).digest('hex');
+          const response=await fetch(base+'/api/jobs/'+id+'/translate-part',{
+            method:'POST',headers:{Origin:base,'Content-Type':'application/json'},
+            body:JSON.stringify({part:0,sourceHash:hash}),signal:AbortSignal.timeout(160000)
+          });
+          let body={};try{body=await response.json()}catch{}
+          console.log('HHBA_FIXED_JD_LIVE',JSON.stringify({id,status:response.status,error:body.error||null,
+            part:body.part,total:body.total,cached:body.cached||false,numbersVerified:body.numbersVerified||false,
+            translated:typeof body.text==='string'&&/[\u3400-\u9fff]/u.test(body.text)}));
+          assert.equal(response.status,200,'previously failing translation must succeed');
+          assert.equal(body.numbersVerified,true);
+          assert.equal(body.sourceHash,hash);
+          NODE
