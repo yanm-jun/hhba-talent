@@ -16,7 +16,7 @@ test('AI resume promo shares recruitment market inner width and horizontal cente
 test('shortened height and mobile stacking retain readable action button',()=>{
  assert.ok(promo.includes('max-width:1096px;padding:13px 18px'));
  assert.ok(promo.includes('@media(max-width:650px)'));
- assert.ok(promo.includes('.home-match-promo{gap:13px;padding:14px}'));
+ assert.ok(promo.includes('.home-match-promo{gap:11px;padding:11px 14px}'));
  assert.ok(promo.includes('.home-match-promo + .unified-market{margin-top:26px}'));
  assert.ok(promo.includes('.home-match-promo button,.candidate-match-quick a{justify-content:center}'));
 });
