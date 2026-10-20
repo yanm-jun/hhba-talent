@@ -1380,7 +1380,7 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  // existing Railway JSON/JD/translation APIs reachable for the white reader.
  if(req.method==="GET"&&(u.pathname==="/"||u.pathname==="/jobs"))
   return Response.redirect("https://yanm-jun.github.io/hhba-talent/",302);
- const oldJobRoute=u.pathname.match(/^\\/jobs\\/([A-Za-z0-9_-]{1,180})$/);
+ const oldJobRoute=u.pathname.match(new RegExp("^/jobs/([A-Za-z0-9_-]{1,180})$"));
  if(req.method==="GET"&&oldJobRoute)
   return Response.redirect("https://yanm-jun.github.io/hhba-talent/candidate/jobs/"+encodeURIComponent(oldJobRoute[1]),302);
  const headers:Record<string,string>={"Cache-Control":"no-store","X-Content-Type-Options":"nosniff","X-Frame-Options":"DENY","Referrer-Policy":"no-referrer"};
