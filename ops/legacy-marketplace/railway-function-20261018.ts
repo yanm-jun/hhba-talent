@@ -504,12 +504,21 @@ async function fromWhiteIndex(id:string):Promise<Job|null>{
  if(!/^(?:greenhouse|ashby|lever)-[a-zA-Z0-9_-]{1,100}-[A-Za-z0-9_-]{1,100}$/.test(id))return null;
  try{
   if(!whiteJobCache||Date.now()-whiteJobCache.at>300000){
-   const response=await fetch("https://yanm-jun.github.io/hhba-talent/data/jobs.json",{
-    headers:{"Accept":"application/json"},redirect:"error",signal:AbortSignal.timeout(14000)});
-   if(!response.ok||Number(response.headers.get("content-length")||0)>16000000)return null;
-   const raw=await response.text();
-   if(raw.length>16000000)return null;
-   const data=JSON.parse(raw);
+   // Native Railway evidence is now authoritative for on-demand JD identity.
+   // Pages is retained only as an explicit, pre-cutover bootstrap fallback.
+   let data:any=null;
+   if(Bun.env.HHBA_NATIVE_INDEX_READ==="1"){
+    const local=await readNativeIndex("/sync-state/public-index","jobs.json");
+    if(local)data=JSON.parse(new TextDecoder().decode(local.bytes));
+   }
+   if(!data){
+    const response=await fetch("https://yanm-jun.github.io/hhba-talent/data/jobs.json",{
+     headers:{"Accept":"application/json"},redirect:"error",signal:AbortSignal.timeout(14000)});
+    if(!response.ok||Number(response.headers.get("content-length")||0)>16000000)return null;
+    const raw=await response.text();
+    if(raw.length>16000000)return null;
+    data=JSON.parse(raw);
+   }
    if(!Array.isArray(data.jobs)||data.jobs.length>25000||
      !Number.isFinite(Date.parse(data.updated||""))||
      Math.abs(Date.now()-Date.parse(data.updated))>24*3600000||
