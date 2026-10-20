@@ -19,7 +19,7 @@ export function EmployerBrandLogo({job}:{job:LiveJob}){
   return <span className={cls} title={alt||'企业身份以官方招聘来源为准'}>
     {brand&&!broken?
       <img src={import.meta.env.BASE_URL+'brands/'+(brand==='anthropic'?'claude':brand)+'.svg'}
-        alt={alt} loading="lazy" decoding="async" onError={()=>setBroken(true)}/>:
+        alt={alt} loading="eager" decoding="async" onError={()=>setBroken(true)}/>:
       <Building2 size={18} aria-label="未获取企业品牌标识"/>}
   </span>;
 }
