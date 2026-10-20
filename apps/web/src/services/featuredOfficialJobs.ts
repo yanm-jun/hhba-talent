@@ -1,4 +1,4 @@
-import { listJobs, officialStatus, safeOfficialJobUrl, localizedTitle,
+import { loadOfficialPublicSnapshot, officialStatus, safeOfficialJobUrl, localizedTitle,
   type LiveFilters, type LiveJob, type Language } from './liveRecruitment';
 import { loadPublicJobAudit } from './jobSyncStatus';
 
@@ -52,22 +52,24 @@ export function featuredLocation(job:LiveJob,lang:Language){
   return lang==='zh'&&entry?entry.zhLocation:null;
 }
 export async function loadVerifiedFeaturedJobs(signal:AbortSignal):Promise<LiveJob[]>{
- const companies=['OpenAI','Anthropic','SpaceX'] as const;
- const [pages,audit]=await Promise.all([
-   Promise.all(companies.map(company=>listJobs({...empty,company},0,signal))),
+ // Both callers (home and /candidate/jobs) reuse ONE cached full snapshot.
+ // This avoids three full 15k-job searches and repeated index parsing.
+ const [snapshot,audit]=await Promise.all([
+   loadOfficialPublicSnapshot(signal),
    loadPublicJobAudit()
  ]);
  if(signal.aborted)throw new Error('已取消精选岗位校验');
- const latest=pages[0]?.updated;
- if(!latest||pages.some(p=>p.updated!==latest)||!audit||
-    audit.summary.indexed_as_of!==latest)throw new Error('企业岗位审核版本尚未同步');
- const approved=new Set(audit.jobs.filter(a=>a.status==='OFFICIAL_JD_AND_REQUIREMENTS_FOUND')
+ if(!audit||audit.summary.indexed_as_of!==snapshot.updated||
+    snapshot.failures!==0)throw new Error('企业岗位审核版本尚未同步');
+ const approved=new Set(audit.jobs.filter(a=>a.status==='OFFICIAL_JD_AND_REQUIREMENTS_FOUND' &&
+   a.full_original_jd_verified===true && a.requirements_evidence===true)
    .map(a=>a.job_id));
+ const byId=new Map(snapshot.jobs.map(j=>[j.id,j]));
  const found:LiveJob[]=[];
  for(const entry of CURATED_JOBS){
-  const pg=pages[companies.indexOf(entry.company)];
-  const job=pg.jobs.find(j=>exactJobMatch(j,entry));
-  if(!job||!approved.has(job.id)||officialStatus(job,latest)!=='recent'){
+  const job=byId.get(entry.id);
+  if(!job||!exactJobMatch(job,entry)||!approved.has(job.id)||
+    officialStatus(job,snapshot.updated)!=='recent'){
    throw new Error('精选岗位 '+entry.company+' 尚未通过最新完整 JD 核验');
   }
   found.push(job);
