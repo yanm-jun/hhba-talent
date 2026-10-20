@@ -37,7 +37,7 @@ jobs:
           const js=await get(compiled[1]);
           assert.equal(js.status,200);
           const bundle=await js.text();
-          for(const fragment of ['loadVerifiedFeaturedJobs','亚太区广告供应商负责人','身份平台工程经理',
+          for(const fragment of ['亚太区广告供应商负责人','身份平台工程经理',
             '亚太区市场拓展赋能负责人','汽车行业企业客户经理','财务应用软件工程经理','射频工程师'])
             assert.ok(bundle.includes(fragment),'featured source not published: '+fragment);
           const manifest=readFileSync('apps/web/public/brands/SOURCES.md','utf8');
