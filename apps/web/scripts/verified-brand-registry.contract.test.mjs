@@ -30,9 +30,9 @@ const identity=row=>[row.company,row.platform,row.source].join('\0');
 
 test('current employer brands and three original icons each have exact ATS identities',()=>{
  assert.equal(registry.schemaVersion,1);
- assert.equal(registry.records.length,49);
+ assert.equal(registry.records.length,50);
  const keys=registry.records.map(identity);
- assert.equal(new Set(keys).size,49);
+ assert.equal(new Set(keys).size,50);
  for(const [company,platform,source] of expected){
   const item=registry.records.find(row=>row.company===company&&row.platform===platform&&row.source===source);
   assert.ok(item,'missing exact employer source '+company);
@@ -47,7 +47,7 @@ test('current employer brands and three original icons each have exact ATS ident
 });
 test('all current source icons match pinned, immutable SHA-256 with exact provenance',()=>{
  assert.equal(proof.schemaVersion,1);
- assert.equal(proof.records.length,49);
+ assert.equal(proof.records.length,50);
  assert.ok(proof.sourcePolicy.includes('does not grant trademark rights'));
  const seen=new Set();
  for(const logo of registry.records){
