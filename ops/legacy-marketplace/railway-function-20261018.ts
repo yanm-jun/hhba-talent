@@ -11,6 +11,7 @@ import { mkdirSync, readFileSync, existsSync } from "node:fs";
 import { openJobSyncStore } from "./jd-sync-store.mjs";
 import { startOverseasJdWorker } from "./jd-sync-worker.mjs";
 import { createFullJdWorker } from "./jd-sync-runner.mjs";
+import {mergeFeaturedATS} from "./featured-jd-catalog.mjs";
 import { translateWithSourceNumbers } from "./number-locked-translation.mjs";
 import {readNativeIndex} from "./read-official-index.mjs";
 const phrases:[string,string][]=[
@@ -1308,15 +1309,8 @@ if(durableJobStore){
    source:async()=>{
     const catalog=await load();
     if(!catalog)return null;
-    const rows=new Map<string,Job>(catalog.rows.map((j:Job)=>[j.id,j]));
-    let missing=0;
-    for(const id of BILINGUAL_FEATURED_IDS){
-     const verified=await fromWhiteIndex(id);
-     if(verified)rows.set(id,verified);
-     else missing++;
-    }
-    return {...catalog,rows:[...rows.values()],
-      failures:catalog.failures+(missing?1:0)};
+    const featured=await Promise.all(BILINGUAL_FEATURED_IDS.map(id=>fromWhiteIndex(id)));
+    return mergeFeaturedATS(catalog,featured,BILINGUAL_FEATURED_IDS);
    },
    readDetail:officialDetail,
    chunkJd:jdChunks,
