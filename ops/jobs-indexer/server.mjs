@@ -2,6 +2,7 @@ import http from "node:http";
 import {readFileSync} from "node:fs";
 import {boards,snapshot,sourceStatus,refresh,filterJobs,parseJobQuery} from "./store.mjs";
 import {home} from "./page.mjs";
+import {localizeJob} from "./locale.mjs";
 const port=Number(process.env.PORT||8080);
 const app=readFileSync(new URL("./app.js",import.meta.url),"utf8");
 function headers(type){return {"content-type":type,"cache-control":"no-store","x-content-type-options":"nosniff",
@@ -20,7 +21,7 @@ const server=http.createServer((req,res)=>{
    const limit=Math.max(1,Math.min(60,Number.parseInt(u.searchParams.get("limit")||"30",10)||30));
    const offset=Math.max(0,Math.min(50000,Number.parseInt(u.searchParams.get("offset")||"0",10)||0));
    const rows=filterJobs(u.searchParams);
-   return send(res,snapshot.updatedAt?200:503,{jobs:rows.slice(offset,offset+limit),total:rows.length,
+   return send(res,snapshot.updatedAt?200:503,{jobs:rows.slice(offset,offset+limit).map(localizeJob),total:rows.length,
      allJobs:snapshot.jobs.length,limit,offset,boards:boards.length,
      successBoards:snapshot.successBoards,failedBoards:snapshot.failedBoards,staleBoards:snapshot.staleBoards,
      updatedAt:snapshot.updatedAt,query:parseJobQuery(u.searchParams.get("q")||"")});
@@ -29,7 +30,7 @@ const server=http.createServer((req,res)=>{
    const id=u.pathname.slice("/api/jobs/".length);
    if(!/^[a-f0-9]{32}$/.test(id))return send(res,404,{error:"not_found"});
    const job=snapshot.jobs.find(j=>j.id===id);
-   return send(res,job?200:404,job?{job}:{error:"not_found"});
+   return send(res,job?200:404,job?{job:localizeJob(job)}:{error:"not_found"});
   }
   if(u.pathname==="/app.js"){res.writeHead(200,headers("text/javascript; charset=utf-8"));return res.end(app)}
   if(u.pathname==="/"||u.pathname.startsWith("/jobs/")){res.writeHead(200,headers("text/html; charset=utf-8"));return res.end(home())}
