@@ -267,9 +267,22 @@ export async function translateGreenJd(job:LiveJob,originalText:string,signal:Ab
         signal.addEventListener('abort',stop,{once:true});
       });
     }
-    if(!response?.ok)throw new Error(response?.status===409?
-      '官方 JD 在翻译过程中已更新，请刷新页面':
-      '中文翻译暂时不可用，请稍后重试或阅读官方英文原文');
+    if(!response?.ok){
+      let errorCode='';
+      try{const payload=await response?.json();errorCode=typeof payload?.error==='string'?payload.error:''}catch{}
+      const reasons:Record<string,string>={
+        translation_numbers_mismatch:'机器译文的薪资、年限或百分比与企业官方数字不一致，已停止展示错误译文',
+        translation_unverified:'翻译引擎暂时没有返回可以核验的中文内容',
+        translation_incomplete:'机器译文仍有未翻译的英文段落',
+        translation_markup_leak:'机器译文格式异常，正在保护页面内容',
+        source_unavailable:'企业官网职位内容暂时无法再次核验',
+        translator_offline:'开源翻译服务暂时不可用',
+        reader_busy:'当前翻译请求较多，请稍后重试'
+      };
+      throw new Error(response?.status===409?
+        '企业官方职位内容已经更新，请刷新页面':
+        reasons[errorCode]||'中文翻译暂时不可用，请稍后重试');
+    }
     const data=await response.json();
     if(data.jobId!==job.id || data.part!==part || data.sourceHash!==hash ||
       !Number.isInteger(data.total) || data.total<1 || data.total>150 ||
