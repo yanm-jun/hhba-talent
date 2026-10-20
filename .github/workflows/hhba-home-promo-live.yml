@@ -1,0 +1,64 @@
+name: HHBA homepage resume promo and market live alignment
+on:
+  push:
+    branches: [test/home-promo-alignment-live-20261020]
+    paths: ['.github/workflows/hhba-home-promo-live.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check-live-layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install temporary Chromium runner
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.0
+          npx playwright install --with-deps chromium
+      - name: Compare actual left and right edges on Railway desktop and mobile
+        run: |
+          node --input-type=module <<'NODE'
+          import {chromium} from 'playwright';
+          import assert from 'node:assert/strict';
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          const url='https://hhba-web-production-024c.up.railway.app/';
+          try{
+            for(const viewport of [{width:1536,height:900},{width:390,height:844}]){
+              const page=await browser.newPage({viewport});
+              await page.goto(url,{waitUntil:'domcontentloaded',timeout:90000});
+              await page.locator('.home-match-promo').waitFor({timeout:20000});
+              const metrics=await page.evaluate(()=>{
+                const promo=document.querySelector('.home-match-promo');
+                const market=document.querySelector('.unified-market');
+                const heading=document.querySelector('.unified-market-heading');
+                const card=document.querySelector('.entry-grid');
+                if(!promo||!market||!heading||!card)throw Error('HHBA homepage components missing');
+                const p=promo.getBoundingClientRect(),m=market.getBoundingClientRect();
+                const padding=parseFloat(getComputedStyle(market).paddingLeft)||0;
+                const b=promo.querySelector('button');
+                return {
+                  promoLeft:p.left,promoRight:p.right,
+                  marketContentLeft:m.left+padding,marketContentRight:m.right-padding,
+                  promoHeight:p.height,marginTop:parseFloat(getComputedStyle(market).marginTop),
+                  buttonText:b?.textContent?.trim()||'',
+                  buttonVisible:!!b && b.getBoundingClientRect().width>0,
+                  horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1,
+                  twoEntryButtons:card.querySelectorAll('button.entry-card').length
+                };
+              });
+              console.log('HHBA_PROMO_ALIGNMENT_RENDERED',JSON.stringify({viewport,metrics}));
+              assert.ok(Math.abs(metrics.promoLeft-metrics.marketContentLeft)<1.5,'left edges not aligned');
+              assert.ok(Math.abs(metrics.promoRight-metrics.marketContentRight)<1.5,'right edges not aligned');
+              assert.ok(metrics.promoHeight<145,'banner unexpectedly tall');
+              assert.ok(metrics.marginTop<40,'blank space below banner still too large');
+              assert.equal(metrics.twoEntryButtons,2,'dual entrance lost');
+              assert.ok(metrics.buttonVisible&&metrics.buttonText.includes('使用简历智能匹配'));
+              assert.ok(!metrics.horizontalOverflow);
+              await page.close();
+            }
+            console.log('HHBA_PROMO_ALIGNMENT_LIVE_ACCEPTED',JSON.stringify({site:url,desktop:true,mobile:true}));
+          }finally{await browser.close()}
+          NODE
