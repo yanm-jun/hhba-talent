@@ -11,8 +11,7 @@
 .unified-job-search input{border:0;outline:0;min-width:0;flex:1;background:transparent;font-size:13px;color:var(--ink)}
 .unified-job-controls select{border:1px solid var(--line);background:#fff;border-radius:9px;min-height:43px;padding:8px 10px;font-size:12px;color:var(--ink)}
 .unified-job-remote{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
-.unified-market-caution{display:flex;gap:8px;align-items:center;color:#5e7668;background:#f0f6f2;border:1px solid #e1ece5;border-radius:9px;padding:11px 12px;font-size:12px;line-height:1.6;margin:14px 0 18px}
-.unified-job-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.unified-job-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
 .unified-job-card{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:20px;min-width:0}
 .unified-job-head,.unified-job-meta,.unified-job-actions,.unified-job-footer{display:flex;align-items:center;flex-wrap:wrap;gap:12px;justify-content:space-between}
 .unified-job-head span,.unified-job-meta span,.unified-job-actions a,.unified-job-actions button{display:inline-flex;align-items:center;gap:6px}
@@ -61,12 +60,10 @@
 .unified-detail-actions a{display:inline-flex;border:1px solid #cbded1;border-radius:9px;padding:11px 13px;background:#f4f8f5}
 .unified-detail-actions a:hover{background:#edf5ef}
 
-.unified-audit-summary{background:#f2f6f3;border:1px solid #dce8df;border-radius:9px;padding:11px 13px;margin:16px 0 9px;color:#476d55;font-size:12px;line-height:1.8}
 .unified-job-audit{display:flex;align-items:center;flex-wrap:wrap;gap:7px;background:#f7faf8;border:1px solid #e5eee8;border-radius:8px;padding:10px 12px;color:#496c59!important;font-size:12px!important;line-height:1.5!important}
 .unified-job-audit small{margin-left:auto;font-size:11px;color:#697f72}
 @media(max-width:720px){.unified-job-audit small{margin-left:0}}
 
-.unified-jd-sync-progress{display:flex;align-items:flex-start;gap:9px;padding:11px 14px;margin:10px 0 13px;border:1px solid #cddfd2;border-radius:9px;background:#f6faf7;color:#446e53;font-size:12px;line-height:1.75}.unified-jd-sync-progress svg{margin-top:3px;flex-shrink:0}
 
 /* Source-grounded Chinese/English job search controls */
 .unified-job-controls{align-items:stretch;gap:9px}
@@ -74,7 +71,6 @@
 .unified-job-controls select{flex:1 1 144px;max-width:220px}
 .unified-job-remote{padding:8px 2px;white-space:nowrap}
 .unified-search-interpreted{background:#f7faf8;border:1px solid #e1ece5;border-radius:8px;color:#315b45;padding:9px 12px;margin:12px 0 0;font-size:12px;line-height:1.7}
-.unified-search-provenance{color:#7a8581;margin:9px 0 14px;font-size:11px;line-height:1.6}
 @media(max-width:720px){
  .unified-job-controls .unified-job-search{flex-basis:100%}
  .unified-job-controls select{flex:1 1 calc(50% - 6px);max-width:none;min-width:0}
