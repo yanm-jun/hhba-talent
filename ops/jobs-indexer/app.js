@@ -7,7 +7,7 @@ const words={
   note:"这是独立测试服务，不替换现有 HHBA。国内原有职位仍保留在旧服务；历史缓存不代表岗位仍在招聘，申请状态请以官网为准。",
   footer:"HHBA 不是招聘企业官方平台，也不代表与任何招聘企业存在合作关系。岗位条件、所在地和开放状态以企业官网为准。",
   query:"搜索职位、公司、城市",all:"全部企业",work:"全部工作方式",remote:"仅远程",
-  search:"搜索岗位",more:"查看更多岗位",back:"← 返回岗位列表",
+  search:"搜索岗位",freshFilter:"近期官网同步",staleFilter:"历史缓存（单独查看）",more:"查看更多岗位",back:"← 返回岗位列表",
   apply:"前往企业官网投递 ↗",missing:"岗位详情仅包含经过验证的基础索引信息。尚未同步完整岗位职责与任职要求，请通过官方招聘链接核查，不应将缺失内容视为没有要求。",
   failed:"岗位数据暂时不可用，请重试；不会展示可能过时的搜索结果",
   missingJob:"该岗位不存在或已下架，请返回岗位列表",fresh:"本轮官方同步",stale:"历史缓存",
@@ -16,7 +16,7 @@ const words={
   note:"This is an independent preview, not the existing HHBA website. Existing China job listings remain on the legacy service. Cached jobs may no longer be open; verify on the official employer page.",
   footer:"HHBA is not an official employer recruitment platform and has no implied employer affiliation. Verify eligibility and availability with the employer.",
   query:"Search titles, companies, cities",all:"All companies",work:"All work modes",remote:"Remote only",
-  search:"Search jobs",more:"Load more",back:"← Back to job listings",
+  search:"Search jobs",freshFilter:"Recently synced",staleFilter:"Cached archive only",more:"Load more",back:"← Back to job listings",
   apply:"Apply on official employer website ↗",missing:"The index currently includes verified basic metadata only, not full duties or qualifications. See the original employer posting for complete requirements.",
   failed:"Jobs are temporarily unavailable. Retry; potentially outdated results will not be shown.",
   missingJob:"This role is missing or closed. Return to listings.",fresh:"Synced this cycle",stale:"Cached listing",
@@ -31,6 +31,7 @@ function updateLanguage(){
  $("site-note").textContent=t.note;$("site-footer").textContent=t.footer;
  $("q").placeholder=t.query;$("company").options[0].textContent=t.all;
  $("remote").options[0].textContent=t.work;$("remote").options[1].textContent=t.remote;
+ $("status").options[0].textContent=t.freshFilter;$("status").options[1].textContent=t.staleFilter;
  $("filters").querySelector("button[type=submit]").textContent=t.search;
  $("more").textContent=t.more;
 }
@@ -59,7 +60,7 @@ function card(job){
 }
 async function load(append=false){
  const n=++token;
- const params=new URLSearchParams({q:$("q").value,company:$("company").value,remote:$("remote").value,limit:"30",offset:String(append?offset:0)});
+ const params=new URLSearchParams({q:$("q").value,company:$("company").value,remote:$("remote").value,status:$("status").value,limit:"30",offset:String(append?offset:0)});
  try{
   const r=await fetch("/api/jobs/page?"+params);
   if(!r.ok)throw Error("Unavailable");
@@ -103,6 +104,7 @@ $("more").addEventListener("click",()=>load(true));
 $("q").addEventListener("input",()=>{clearTimeout(searchDelay);searchDelay=setTimeout(()=>{offset=0;load()},280)});
 $("company").addEventListener("change",()=>{offset=0;load()});
 $("remote").addEventListener("change",()=>{offset=0;load()});
+$("status").addEventListener("change",()=>{offset=0;load()});
 $("lang").addEventListener("change",()=>{
  language=$("lang").value==="en"?"en":"zh";
  try{localStorage.setItem("hhba-language",language)}catch{}
