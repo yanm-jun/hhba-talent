@@ -489,8 +489,48 @@ function officialBlocksHtml(blocks:OfficialJdBlock[]):string{
  return out;
 }
 
+// The white GitHub Pages website publishes a signed-by-source metadata snapshot,
+// not third-party JD bodies. Older Railway has fewer ATS boards than the white site.
+// Allow on-demand reads ONLY for a job ID proved to belong to that public snapshot.
+let whiteJobCache:{at:number,jobs:Job[]}|null=null;
+async function fromWhiteIndex(id:string):Promise<Job|null>{
+ if(!/^(?:greenhouse|ashby|lever)-[a-zA-Z0-9_-]{1,100}-[A-Za-z0-9_-]{1,100}$/.test(id))return null;
+ try{
+  if(!whiteJobCache||Date.now()-whiteJobCache.at>300000){
+   const response=await fetch("https://yanm-jun.github.io/hhba-talent/data/jobs.json",{
+    headers:{"Accept":"application/json"},redirect:"error",signal:AbortSignal.timeout(14000)});
+   if(!response.ok||Number(response.headers.get("content-length")||0)>16000000)return null;
+   const raw=await response.text();
+   if(raw.length>16000000)return null;
+   const data=JSON.parse(raw);
+   if(!Array.isArray(data.jobs)||data.jobs.length>25000||
+     !Number.isFinite(Date.parse(data.updated||""))||
+     Math.abs(Date.now()-Date.parse(data.updated))>24*3600000||
+     Number(data.failures)!==0)return null;
+   // Retain metadata in memory for only five minutes; no JD content persisted.
+   whiteJobCache={at:Date.now(),jobs:data.jobs};
+  }
+  const row=whiteJobCache.jobs.find(j=>j.id===id);
+  if(!row||!["ashby","greenhouse","lever"].includes(row.platform)||
+    !/^[A-Za-z0-9_-]{2,100}$/.test(row.source||"")||
+    typeof row.url!=="string"||typeof row.title!=="string"||!row.title.trim())return null;
+  const native=id.slice(row.platform.length+row.source.length+2);
+  if(id!==row.platform+"-"+row.source+"-"+native||
+    !/^[A-Za-z0-9_-]{1,100}$/.test(native)||
+    !urlOK(row.url,row.source,row.platform,native))return null;
+  return {id:row.id,company:String(row.company||"").slice(0,120),
+    title:row.title.slice(0,220),location:String(row.location||"").slice(0,170),
+    remote:typeof row.remote==="boolean"?row.remote:null,url:row.url,
+    platform:row.platform,source:row.source,domestic:false};
+ }catch{return null;}
+}
 async function officialDetail(job:Job):Promise<Detail|null>{
- const board=boards.find(b=>b.slug===job.source&&b.platform===job.platform);
+ const known=boards.find(b=>b.slug===job.source&&b.platform===job.platform);
+ // The only allowed dynamic sources are validated against the white public feed.
+ const fallbackBoard=(!known && ["greenhouse","ashby","lever"].includes(job.platform) &&
+   /^[A-Za-z0-9_-]{2,100}$/.test(job.source)) ?
+   {platform:job.platform as Board["platform"],slug:job.source,company:job.company}:null;
+ const board=known||fallbackBoard;
  if(!board)return null;
  const native=job.id.slice(board.platform.length+board.slug.length+2);
  if(!native || native.length>100 || !/^[A-Za-z0-9_-]+$/.test(native))return null;
@@ -1275,7 +1315,8 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
     typeof sourceHash!=="string"||!/^[a-f0-9]{64}$/.test(sourceHash))
   return Response.json({error:"bad_reader_request"},{status:400,headers});
  const catalog=await load();
- const job=catalog?.rows.find(row=>row.id===match[1]);
+ // White-only verified ATS jobs use the same hash-bound translation path.
+ const job=catalog?.rows.find(row=>row.id===match[1])||await fromWhiteIndex(match[1]);
  if(!job)return Response.json({error:"posting_not_listed"},{status:404,headers});
  activeJdReaders++;
  try{
@@ -1414,8 +1455,11 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
   const nativeId=decodeURIComponent(u.pathname.split("/").pop()||"");
   if(nativeId.length>180||!/^[A-Za-z0-9_-]+$/.test(nativeId))
    return new Response("Not found",{status:404,headers});
-  const market=await load(),job=market?.rows.find(x=>x.id===nativeId);
-  if(!job)return new Response("该岗位不在当前官方公开列表中",{status:404,headers});
+  const market=await load();
+  // Existing live catalog is preferred; white-only ATS boards use validated
+  // public snapshot identity before any outbound ATS request is made.
+  const job=market?.rows.find(x=>x.id===nativeId)||await fromWhiteIndex(nativeId);
+  if(!job)return new Response("该岗位不在已核验的官方公开职位列表中",{status:404,headers});
   if(job.domestic){
    if(u.pathname.startsWith("/api/"))return Response.json({job:present(job),description:null,richHtml:null,applyUrl:null,recordKind:job.company==="Xiaomi"?"OFFICIAL_LIST_OBSERVED":"OFFICIAL_JOB_PAGE_OBSERVED",currentApplicationVerified:false,detailVerified:job.company!=="Xiaomi",officialListUrl:job.company==="Xiaomi"?job.url:null,officialJobUrl:job.company==="Xiaomi"?null:job.url,observedAt:job.observedAt},{headers});
    return new Response(domesticDetailHtml(job),{headers:{...headers,"Content-Type":"text/html; charset=utf-8"}});
