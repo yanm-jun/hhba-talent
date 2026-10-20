@@ -4,13 +4,13 @@ import type { LiveJob } from './liveRecruitment';
 export type BrandIdentity=Pick<LiveJob,'company'|'platform'|'source'>;
 export type VerifiedBrand={
  company:string;platform:string;source:string;file:string;color:string;
- wide:boolean;kind:'original-source'|'source-traced-vector'|'brand-site-icon';
+ wide:boolean;kind:'original-source'|'source-traced-vector'|'brand-site-icon'|'brand-board-icon';
 };
 const filePattern=/^(?:(?:openai|claude|spacex|si-[a-z0-9]{2,40})\.svg|brand-[a-z0-9]{2,60}\.(?:png|svg))$/;
 const records=(raw.records as VerifiedBrand[]).filter(x=>
  x.company&&x.company.length<=120&&x.platform&&x.source&&filePattern.test(x.file)&&
  /^#[a-fA-F0-9]{6}$/.test(x.color)&&
- (x.kind==='original-source'||x.kind==='source-traced-vector'||x.kind==='brand-site-icon')
+ (x.kind==='original-source'||x.kind==='source-traced-vector'||x.kind==='brand-site-icon'||x.kind==='brand-board-icon')
 );
 const key=(p:BrandIdentity)=>JSON.stringify([p.company,p.platform,p.source]);
 const registry=new Map<string,VerifiedBrand>(records.map(x=>[key(x),x]));
