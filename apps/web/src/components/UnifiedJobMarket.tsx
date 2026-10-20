@@ -67,9 +67,13 @@ function LanguageSwitcher({lang,change}:{lang:Language,change:(value:Language)=>
 }
 export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,user?:User|null}){
   const {lang,change}=useLanguage();
-  const [filters,setFilters]=useState<LiveFilters>(()=>({...emptyFilters,...readMarketState(compact)?.filters,
-    q:readMarketState(compact)?.draft??initialJobQuery(),
-    company:readMarketState(compact)?.filters.company??initialCompanyQuery()}));
+  const [filters,setFilters]=useState<LiveFilters>(()=>{
+    const previous=readMarketState(compact);
+    const saved=previous?.filters.company;
+    return {...emptyFilters,...previous?.filters,
+      q:previous?.draft??initialJobQuery(),
+      company:typeof saved==='string'&&saved.length<=100?saved:initialCompanyQuery()};
+  });
   const [draft,setDraft]=useState(()=>readMarketState(compact)?.draft??initialJobQuery());
   const [page,setPage]=useState(()=>readMarketState(compact)?.page??0);
   const [snapshot,setSnapshot]=useState<LivePage|null>(null);
