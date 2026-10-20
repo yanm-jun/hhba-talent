@@ -1,4 +1,124 @@
 {
   "schemaVersion": 1,
-  "profiles": []
+  "profiles": [
+    {
+      "id": "WyJncmVlbmhvdXNlIiwiYW5kdXJpbGluZHVzdHJpZXMiLCJBbmR1cmlsIl0",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "andurilindustries",
+        "company": "Anduril"
+      },
+      "name": "Anduril",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "国防科技、自主系统与人工智能软件",
+        "en": "Defense technology, autonomous systems and AI software"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2017",
+      "tagline": {
+        "zh": "将人工智能、自主系统与先进制造应用于现代国防技术。",
+        "en": "Developing AI-driven autonomous systems and advanced defense technologies."
+      },
+      "overview": [
+        {
+          "zh": "Anduril Industries 是一家美国国防科技企业，成立于 2017 年。公司重点开发自主系统、传感器、人工智能软件以及可用于多种任务环境的网络化系统。与传统仅提供单一硬件产品的模式不同，Anduril 将软件能力与不同平台、传感器和设备的协同作为重要研发方向。",
+          "en": "Founded in 2017, Anduril Industries is a US defense technology company developing autonomous systems, sensors, artificial intelligence software and networked systems for a variety of operating environments. Its approach emphasizes integrating software capabilities across platforms and equipment."
+        },
+        {
+          "zh": "公司的核心软件平台 Lattice 用于连接和管理传感器、系统及相关设备，支持信息整合、决策辅助和任务管理。Anduril 还公开展示了陆地、空中、海上领域的多种自主系统。对于求职者而言，具体岗位的技术范围与资质条件仍需以企业官方 JD 为准。",
+          "en": "Anduril’s Lattice software connects and manages sensors, systems and other devices, supporting information integration, decision support and mission management. The company also publicly describes autonomous systems across land, air and maritime domains. Actual responsibilities and qualifications should always be checked against the original job description."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Lattice 软件平台",
+            "en": "Lattice software platform"
+          },
+          "description": {
+            "zh": "连接多类传感器、网络和系统，用于信息融合、任务管理和协同操作。",
+            "en": "Connects sensors, networks and systems for data integration, mission management and coordinated operations."
+          }
+        },
+        {
+          "name": {
+            "zh": "自主航空系统",
+            "en": "Autonomous air systems"
+          },
+          "description": {
+            "zh": "开发与软件平台连接的自主航空设备及相关技术。",
+            "en": "Develops autonomous air vehicles and associated software-connected capabilities."
+          }
+        },
+        {
+          "name": {
+            "zh": "传感器与反无人机系统",
+            "en": "Sensors and counter-UAS systems"
+          },
+          "description": {
+            "zh": "产品涉及传感、监测以及对空中威胁的综合识别与防护。",
+            "en": "Develops sensing, awareness and integrated counter-UAS capabilities."
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2017",
+          "description": {
+            "zh": "Anduril 成立，提出通过快速研发和软件驱动技术推动国防创新。",
+            "en": "Anduril was founded with an emphasis on rapid development and software-driven defense technology."
+          }
+        },
+        {
+          "date": "2023",
+          "description": {
+            "zh": "公司发布年度回顾，介绍其自主系统及国防技术业务的发展。",
+            "en": "Anduril published its 2023 year in review, covering its growth in autonomous and defense technologies."
+          }
+        },
+        {
+          "date": "2025",
+          "description": {
+            "zh": "Anduril 公布获得美国海军陆战队反无人机系统项目合同。",
+            "en": "Anduril announced a U.S. Marine Corps program contract relating to counter-UAS systems."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Anduril 官方使命与技术介绍",
+            "en": "Anduril official mission and technology"
+          },
+          "url": "https://www.anduril.com/mission"
+        },
+        {
+          "label": {
+            "zh": "Anduril 官方公司主页",
+            "en": "Anduril official company homepage"
+          },
+          "url": "https://www.anduril.com/"
+        },
+        {
+          "label": {
+            "zh": "Anduril 2023 年官方回顾",
+            "en": "Anduril 2023 official year in review"
+          },
+          "url": "https://www.anduril.com/news/anduril-in-2023-a-year-in-review"
+        },
+        {
+          "label": {
+            "zh": "Anduril 反无人机业务与新闻",
+            "en": "Anduril counter-UAS products and news"
+          },
+          "url": "https://www.anduril.com/counter-uas/"
+        }
+      ],
+      "lastReviewed": "2026-10-20"
+    }
+  ]
 }
