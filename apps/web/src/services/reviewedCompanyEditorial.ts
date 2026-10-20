@@ -1,4 +1,8 @@
 import reviewed from '../data/reviewedEmployers.json';
+import batchA from '../data/companyEditorialAdditionalA.json';
+import batchB from '../data/companyEditorialAdditionalB.json';
+import batchC from '../data/companyEditorialAdditionalC.json';
+import batchD from '../data/companyEditorialAdditionalD.json';
 import type { EmployerIdentity } from './companyDirectory';
 import { encodeEmployerIdentity, identityKey } from './companyDirectory';
 
@@ -47,14 +51,16 @@ export function validatedReviewedEditorial(candidate:unknown,identity:EmployerId
   !Array.isArray(p.sources)||p.sources.length<2||
   !p.sources.every(s=>isLocalized(s?.label)&&isOfficialReference(s?.url))||
   !/^\d{4}-\d{2}-\d{2}$/.test(p.lastReviewed)||
-  !/^\d{4}$/.test(p.founded))return null;
+  !(/^(?:\d{4}|—)$/.test(p.founded)))return null;
  return p;
 }
+// Exact ATS employer identities; never merge by company names alone.
+const allReviewed=[...reviewed.profiles,...batchA.profiles,...batchB.profiles,...batchC.profiles,...batchD.profiles];
 export function reviewedEditorialForEmployer(identity:EmployerIdentity){
  const key=encodeEmployerIdentity(identity);
  if(!key)return null;
  // Only human-reviewed editorials enter this published static dataset.
- const item=(reviewed.profiles as unknown[]).find(record=>
+ const item=(allReviewed as unknown[]).find(record=>
    !!record&&typeof record==='object'&&(record as {id?:string}).id===key);
  return validatedReviewedEditorial(item,identity);
 }
