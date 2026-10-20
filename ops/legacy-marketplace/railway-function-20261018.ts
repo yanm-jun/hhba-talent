@@ -1530,6 +1530,20 @@ async function whiteSiteResponse(req:Request,u:URL):Promise<Response|null>{
   return match?whiteSnapshot(match[1]):
    Response.json({error:"NOT_FOUND"},{status:404});
  }
+ // Only allow the three provenance-verified, original brand SVGs.
+ // Never turn this into an arbitrary filesystem path or URL proxy.
+ if(p.startsWith("/brands/")){
+  if(!["/brands/openai.svg","/brands/claude.svg","/brands/spacex.svg"].includes(p))
+   return new Response("Not found",{status:404});
+  const verified=Bun.file(WHITE_PUBLIC_ROOT+p);
+  if(!await verified.exists())return new Response("Brand asset not published",{status:404});
+  return new Response(req.method==="HEAD"?null:verified,{headers:{
+   "Content-Type":"image/svg+xml; charset=utf-8",
+   "Cache-Control":"public, max-age=86400",
+   "X-Content-Type-Options":"nosniff",
+   "Content-Security-Policy":"default-src 'none'; style-src 'unsafe-inline'; sandbox"
+  }});
+ }
  if(p.startsWith("/assets/")){
   if(!/^\/assets\/[A-Za-z0-9._-]{1,180}$/.test(p))
    return new Response("Not found",{status:404});
