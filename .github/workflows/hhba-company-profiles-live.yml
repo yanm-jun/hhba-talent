@@ -53,8 +53,13 @@ jobs:
                 items.map(a=>({url:a.getAttribute('href'),rel:a.getAttribute('rel'),target:a.getAttribute('target')})));
               assert.ok(sources.length>=2,'insufficient reference evidence');
               assert.ok(sources.every(x=>x.url.startsWith('https://')&&x.rel.includes('noopener')&&x.target==='_blank'));
-              await page.locator('.company-profile-jobs-state,.company-profile-job-card').first().waitFor({timeout:30000});
+              await page.waitForFunction(()=>!!document.querySelector('.company-profile-job-card')||
+                !!document.querySelector('.company-profile-jobs-state[role="alert"]')||
+                document.querySelector('.company-profile-jobs-state')?.textContent?.includes('目前没有'),
+                null,{timeout:45000});
               const jobs=await page.locator('.company-profile-job-card').count();
+              if(!jobs)console.warn('HHBA_COMPANY_JOB_DIAGNOSTIC',slug,
+                await page.locator('.company-profile-jobs-state').allTextContents());
               assert.ok(jobs>=1,'no actual verified company openings '+slug);
               const jobHref=await page.locator('.company-profile-job-card').first().getAttribute('href');
               assert.ok(jobHref.startsWith('/candidate/jobs/'),'fake JD path '+slug);
