@@ -62,7 +62,7 @@ export function CandidateDashboardPage({user}:{user:User|null}){
   const canManageProfile=employerApiReady && !!user;
 
   return <Shell user={user}>
-    <main className="candidate-dashboard" aria-label="HHBA 求职中心">
+    <section className="candidate-dashboard" aria-label="HHBA 求职中心">
       <div className="candidate-dashboard-trail">
         <Link to="/">首页</Link><span aria-hidden="true">/</span><strong>求职中心</strong>
       </div>
@@ -142,6 +142,6 @@ export function CandidateDashboardPage({user}:{user:User|null}){
         </p>
         {asOf && <p className="candidate-dashboard-updated">岗位来源更新：{asOf.slice(0,10)}</p>}
       </section>
-    </main>
+    </section>
   </Shell>;
 }
