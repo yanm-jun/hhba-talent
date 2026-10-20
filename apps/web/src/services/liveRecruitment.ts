@@ -108,15 +108,15 @@ async function readJSON<T>(path: string, signal: AbortSignal): Promise<T> {
   if (!response.ok) throw new Error('职位数据暂时无法读取，请稍后重试');
   return response.json() as Promise<T>;
 }
-// GitHub Pages has no backend or CORS proxy; it uses the read-only, source-validated
-// public metadata snapshot generated at build time. Railway stays unchanged.
-const PAGES_PREVIEW=import.meta.env.BASE_URL==='/hhba-talent/';
+// White HHBA on Railway uses the same source-validated snapshot and search facets
+// as GitHub Pages, proxied by our own read-only /data/ route during migration.
+const PAGES_PREVIEW=import.meta.env.BASE_URL==='/hhba-talent/' || import.meta.env.VITE_HHBA_VERIFIED_SNAPSHOT==='1';
 let cachedSnapshot: Promise<LivePage>|null=null;
 async function previewSnapshot(signal:AbortSignal):Promise<LivePage> {
   if(!cachedSnapshot) {
     const url=import.meta.env.BASE_URL+'data/jobs.json';
     cachedSnapshot=fetch(url,{method:'GET',headers:{Accept:'application/json'},cache:'no-store',credentials:'omit'})
-      .then(async response=>{if(!response.ok)throw new Error('Pages 岗位快照尚未发布');return response.json() as Promise<LivePage>})
+      .then(async response=>{if(!response.ok)throw new Error('岗位数据快照尚未更新');return response.json() as Promise<LivePage>})
       .then(data=>{
         if(!Array.isArray(data.jobs) || !Number.isInteger(data.total) ||
           !Number.isFinite(Date.parse(data.updated)) || data.failures!==0)
