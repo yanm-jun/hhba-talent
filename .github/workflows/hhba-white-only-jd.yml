@@ -1,0 +1,36 @@
+name: HHBA white-only marketplace validation
+on:
+  push:
+    branches: [feat/white-market-only-jd-20261020]
+    paths:
+      - "apps/web/**"
+      - ".github/workflows/hhba-white-only-jd.yml"
+  pull_request:
+    paths:
+      - "apps/web/**"
+      - ".github/workflows/hhba-white-only-jd.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  white-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Verify only the white marketplace exposes job actions
+        run: node --test scripts/white-market-detail.contract.test.mjs
+      - name: Build white dual-entry HHBA
+        env:
+          HHBA_GITHUB_PAGES: '1'
+        run: npm run build
+      - name: Confirm compiled site exists
+        run: test -s dist/index.html
