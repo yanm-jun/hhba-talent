@@ -39,10 +39,13 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
-      - name: Compile existing HHBA with protected application workflow
+      - name: Verify working candidate application pages and employer review panel compile on the same HHBA
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
         run: |
           npm ci
           npm run build
+      - name: Assert voluntary consent, user withdrawal and employer processing are really linked
+        run: |
+          node -e "const fs=require('fs');const p='apps/web/src/';const check=[['main.tsx','/candidate/my-applications'],['pages/EmployerPublicJobsPage.tsx','EmployerJobApplicationForm'],['pages/EmployerWorkspacePage.tsx','EmployerApplicantPanel'],['components/EmployerJobApplicationForm.tsx','confirmed_share'],['pages/MyEmployerApplicationsPage.tsx','withdrawEmployerApplication'],['components/EmployerApplicantPanel.tsx','updateEmployerApplicationStatus']];for(const [file,part] of check)if(!fs.readFileSync(p+file,'utf8').includes(part))throw Error(file+' missing '+part);console.log('HHBA_CANDIDATE_EMPLOYER_APPLICATION_UX_LINKED_PASS')"
