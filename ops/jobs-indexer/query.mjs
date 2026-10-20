@@ -57,3 +57,6 @@ export function matchesJobQuery(job,query,remoteOverride=null) {
   if(query.residual && !fields.includes(query.residual))return false;
   return true;
 }
+
+// Unverified old observations never mix into the default fresh search.
+export function matchesJobStatus(job,status){return job.status===(status==="stale"?"stale":"fresh");}
