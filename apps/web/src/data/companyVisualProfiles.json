@@ -578,7 +578,26 @@
       "company": "Reddit",
       "platform": "greenhouse",
       "source": "reddit",
-      "people": [],
+      "people": [
+        {
+          "name": "Steve Huffman",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.ycombinator.com/companies/reddit",
+          "photo": null
+        },
+        {
+          "name": "Alexis Ohanian",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.ycombinator.com/companies/reddit",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
@@ -1359,7 +1378,26 @@
       "company": "AlphaSights Campus Recruiting",
       "platform": "greenhouse",
       "source": "alphasightsresumedrop",
-      "people": [],
+      "people": [
+        {
+          "name": "Andrew Heath",
+          "role": {
+            "zh": "AlphaSights 联合创始人（关联招聘主体）",
+            "en": "AlphaSights co-founder (recruiting entity)"
+          },
+          "source": "https://www.alphasights.com/ja/from-our-founders/",
+          "photo": null
+        },
+        {
+          "name": "Max Cartellieri",
+          "role": {
+            "zh": "AlphaSights 联合创始人（关联招聘主体）",
+            "en": "AlphaSights co-founder (recruiting entity)"
+          },
+          "source": "https://www.alphasights.com/ja/from-our-founders/",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": {
         "zh": "AlphaSights 校园招聘来源，不是独立企业",
@@ -1378,7 +1416,30 @@
       "company": "SpaceX Global",
       "platform": "greenhouse",
       "source": "spacexglobal",
-      "people": [],
+      "people": [
+        {
+          "name": "Elon Musk",
+          "role": {
+            "zh": "SpaceX 创始人（关联招聘主体）",
+            "en": "SpaceX founder (recruiting entity)"
+          },
+          "source": "https://www.spacex.com/company/",
+          "photo": {
+            "file": "Elon Musk (3018710552).jpg",
+            "author": "JD Lasica",
+            "license": "CC BY 2.0",
+            "date": "",
+            "caption": {
+              "zh": "埃隆·马斯克",
+              "en": "Elon Musk"
+            },
+            "location": {
+              "zh": "公开活动或肖像拍摄",
+              "en": "Documented public portrait"
+            }
+          }
+        }
+      ],
       "workplaces": [],
       "relationship": {
         "zh": "SpaceX 国际招聘来源，不是另一家经过核实的独立企业",
