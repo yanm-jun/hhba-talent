@@ -1,0 +1,101 @@
+name: HHBA Home Brand Marquee Live Railway Verification
+on:
+  push:
+    branches: [test/home-brand-marquee-railway-20261021]
+    paths: ['.github/workflows/hhba-home-brand-marquee-live.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Isolated Chromium
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.0
+          npx playwright install --with-deps chromium
+      - name: Inspect actual Railway public homepage and original local brand assets
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {createHash} from 'node:crypto';
+          import {readFileSync} from 'node:fs';
+          import {chromium} from 'playwright';
+          const root='https://hhba-web-production-024c.up.railway.app';
+          const brands=JSON.parse(readFileSync('apps/web/src/data/verifiedBrandAssets.json')).records;
+          const proof=JSON.parse(readFileSync('apps/web/public/brands/PROVENANCE.json')).records;
+          assert.equal(brands.length,50);
+          const pause=ms=>new Promise(r=>setTimeout(r,ms));
+          let seen=false;
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          try{
+           for(const viewport of [{width:1536,height:860},{width:390,height:844}]){
+            const page=await browser.newPage({viewport});
+            for(let attempt=0;attempt<6;attempt++){
+              try{
+                const response=await page.goto(root+'/',{waitUntil:'domcontentloaded',timeout:42000});
+                if(response?.status()===200){
+                  await page.locator('.home-company-marquee-track').waitFor({timeout:12000});
+                  seen=true;
+                  break;
+                }
+                console.log('WAIT_RAILWAY_HOME',attempt,response?.status());
+              }catch(e){console.log('WAIT_RAILWAY_HOME_NETWORK',String(e).slice(0,120))}
+              await pause(2500);
+            }
+            assert.ok(seen,'marquee not present in latest Railway build');
+            const data=await page.evaluate(()=>{
+              const m=document.querySelector('.unified-market');
+              const section=document.querySelector('.home-company-marquee');
+              const track=document.querySelector('.home-company-marquee-track');
+              const mr=m.getBoundingClientRect(),sr=section.getBoundingClientRect();
+              const pad=parseFloat(getComputedStyle(m).paddingLeft);
+              return {
+                real:document.querySelectorAll('.home-company-marquee-run:not(.is-copy) a').length,
+                clones:document.querySelectorAll('.home-company-marquee-run.is-copy a').length,
+                paths:[...document.querySelectorAll('.home-company-marquee-run:not(.is-copy) a')].map(a=>a.getAttribute('href')),
+                images:[...document.querySelectorAll('.home-company-marquee-run:not(.is-copy) img')].map(i=>i.getAttribute('src')),
+                left:sr.left,marketLeft:mr.left+pad,right:sr.right,marketRight:mr.right-pad,
+                gap:sr.top-mr.bottom,css:getComputedStyle(track).animationName,
+                overflow:document.documentElement.scrollWidth>innerWidth+1,
+                aria:document.querySelector('.home-company-marquee-run.is-copy').getAttribute('aria-hidden')
+              };
+            });
+            console.log('HHBA_BRAND_MARQUEE_LIVE_GEOMETRY',JSON.stringify({viewport,real:data.real,clones:data.clones,
+              left:data.left,marketLeft:data.marketLeft,right:data.right,marketRight:data.marketRight,
+              gap:data.gap,animation:data.css,overflow:data.overflow}));
+            assert.equal(data.real,50);assert.equal(data.clones,50);assert.equal(data.aria,'true');
+            assert.ok(Math.abs(data.left-data.marketLeft)<1.5);
+            assert.ok(Math.abs(data.right-data.marketRight)<1.5);
+            assert.ok(data.gap>=0&&data.gap<40);assert.ok(!data.overflow);
+            assert.equal(data.css,'hhba-company-marquee-left');
+            const expected=brands.map(b=>'/brands/'+b.file);
+            assert.deepEqual([...data.images].sort(),[...expected].sort(),'missing or unknown brand art');
+            assert.ok(data.paths.every(p=>p?.startsWith('/companies/')));
+            const img=page.locator('.home-company-marquee-run:not(.is-copy) img').first();
+            await img.evaluate(i=>i.decode());
+            assert.ok(await img.evaluate(i=>i.naturalWidth>0));
+            await page.locator('.home-company-marquee-window').hover();
+            assert.equal(await page.locator('.home-company-marquee-track').evaluate(n=>getComputedStyle(n).animationPlayState),'paused');
+            await page.locator('.home-company-marquee-run:not(.is-copy) a').first().click();
+            await page.waitForURL('**/companies/openai',{timeout:15000});
+            assert.equal(await page.locator('.company-profile-identity h1').textContent(),'OpenAI');
+            await page.close();
+           }
+           const real=await Promise.all(brands.map(async b=>{
+             const res=await fetch(root+'/brands/'+b.file,{signal:AbortSignal.timeout(18000)});
+             assert.equal(res.status,200,b.file);
+             const bytes=Buffer.from(await res.arrayBuffer());
+             assert.equal(createHash('sha256').update(bytes).digest('hex'),
+               proof.find(p=>p.file===b.file)?.sha256,'invalid original logo '+b.file);
+             return b.file;
+           }));
+           assert.equal(real.length,50);
+           console.log('HHBA_HOME_MARQUEE_LIVE_ACCEPTED',JSON.stringify({realCompanyBrands:50,shaOnPublicServer:50,
+             desktop:true,mobile:true,hoverPause:true,clickToCompany:true}));
+          }finally{await browser.close()}
+          NODE
