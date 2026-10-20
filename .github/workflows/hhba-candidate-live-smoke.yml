@@ -1,0 +1,55 @@
+name: HHBA candidate landing live Railway acceptance
+on:
+  push:
+    branches: [test/candidate-dashboard-live-20261020]
+    paths: ['.github/workflows/hhba-candidate-live-smoke.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  candidate-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Railway serves updated candidate workspace, true job feed and deep links
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const host='https://hhba-web-production-024c.up.railway.app';
+          const get=path=>fetch(host+path,{redirect:'manual',signal:AbortSignal.timeout(20000)});
+          const health=await get('/health');
+          assert.equal(health.status,200);
+          const current=await health.json();
+          assert.equal(current.frontendReady,true);
+          const route=await get('/candidate');
+          assert.equal(route.status,200);
+          const html=await route.text();
+          assert.match(html,/<div id="root"><\/div>/);
+          const script=html.match(/src="(\/assets\/[^"]+\.js)"/);
+          assert.ok(script,'compiled candidate JavaScript missing');
+          const asset=await get(script[1]);
+          assert.equal(asset.status,200);
+          const js=await asset.text();
+          for(const required of ['找到适合你的工作','我的求职档案','适合探索的职位','搜索岗位、公司或工作地点']){
+            assert.ok(js.includes(required),'new candidate workspace missing '+required);
+          }
+          const upload=await get('/candidate/resume/new');
+          assert.equal(upload.status,200,'dedicated private resume route should refresh safely');
+          const feed=await get('/data/jobs.json');
+          assert.equal(feed.status,200);
+          assert.equal(feed.headers.get('x-hhba-index-source'),'railway-verified-volume');
+          const index=await feed.json();
+          assert.ok(index.total>10000 && Array.isArray(index.jobs));
+          const detail=await get('/candidate/jobs/greenhouse-airbnb-7755758');
+          assert.equal(detail.status,200,'original job detail route broken');
+          const auth=await get('/api/v1/auth/me');
+          assert.notEqual(auth.headers.get('content-type')?.split(';')[0],'text/html',
+            'private account endpoint must not masquerade as page');
+          console.log('HHBA_CANDIDATE_LIVE_ACCEPTED',JSON.stringify({
+            site:host+'/candidate',realJobs:index.total,source:'Railway native',
+            uploadedAccountsNotEnabled:true,jobDetailAccessible:true
+          }));
+          NODE
