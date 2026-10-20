@@ -19,6 +19,7 @@ COPY ops/legacy-marketplace/railway-function-20261018.ts ./server.ts
 COPY ops/legacy-marketplace/jd-sync-store.mjs ./jd-sync-store.mjs
 COPY ops/legacy-marketplace/jd-sync-worker.mjs ./jd-sync-worker.mjs
 COPY ops/legacy-marketplace/jd-sync-runner.mjs ./jd-sync-runner.mjs
+COPY ops/legacy-marketplace/number-locked-translation.mjs ./number-locked-translation.mjs
 COPY --from=white-builder /build/apps/web/dist /app/white-site
 # Bun's native execution uses package names, not Railway Function versioned names.
 RUN sed -i 's/"html-to-text@9"/"html-to-text"/;s/"sanitize-html@2"/"sanitize-html"/' server.ts
