@@ -1,0 +1,38 @@
+/* Homepage only. One calm, continuous strip of source-traceable company identities. */
+.home-match-promo ~ .unified-market{margin-bottom:29px}
+.home-company-marquee{width:calc(100% - 24px);max-width:1096px;margin:0 auto 24px;padding:26px 0 0;border-top:1px solid #e5e9e7;color:var(--ink);min-width:0}
+.home-company-marquee-heading{display:flex;justify-content:space-between;align-items:end;gap:18px;margin-bottom:18px}
+.home-company-marquee-kicker{font-size:10px;letter-spacing:.11em;font-weight:750;color:#5e8571;margin:0 0 8px}
+.home-company-marquee h2{font-size:21px;font-weight:780;letter-spacing:-.4px;margin:0 0 7px;line-height:1.4}
+.home-company-marquee-description{font-size:12px;color:#7b8792;margin:0;line-height:1.65}
+.home-company-marquee-all{display:inline-flex;align-items:center;white-space:nowrap;gap:5px;color:#2c6b4a;font-size:12px;font-weight:680;text-decoration:none;padding-bottom:3px}
+.home-company-marquee-all:hover{text-decoration:underline}
+.home-company-marquee-window{overflow:hidden;width:100%;min-width:0;padding:5px 0;mask-image:linear-gradient(to right,transparent,black 6%,black 94%,transparent);-webkit-mask-image:linear-gradient(to right,transparent,black 6%,black 94%,transparent)}
+.home-company-marquee-track{display:flex;align-items:center;width:max-content;min-width:max-content;animation:hhba-company-marquee-left 115s linear infinite;will-change:transform}
+.home-company-marquee-window:hover .home-company-marquee-track,.home-company-marquee-window:focus-within .home-company-marquee-track{animation-play-state:paused}
+.home-company-marquee-run{display:flex;align-items:center;flex:none;gap:13px;width:max-content;list-style:none;margin:0;padding:0 13px 0 0}
+.home-company-marquee-item{flex:none;margin:0;padding:0}
+.home-company-marquee-link{display:flex;align-items:center;justify-content:flex-start;gap:11px;width:168px;min-height:62px;border:1px solid #e6eae9;border-radius:11px;background:#fff;padding:8px 11px;text-decoration:none;color:#222a2b;transition:border-color .18s,background-color .18s}
+.home-company-marquee-link:hover{background:#fcfefd;border-color:#a9cbb7}
+.home-company-marquee-link:focus-visible{outline:2px solid #387d55;outline-offset:3px}
+.home-company-marquee-icon{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;overflow:hidden;border:1px solid #eef0f0;border-radius:8px;background:#fff;color:#6d8376}
+.home-company-marquee-icon img{display:block;max-width:29px;max-height:29px;width:auto;height:auto;object-fit:contain}
+.home-company-marquee-icon.is-wide img{max-width:35px;max-height:19px}
+.home-company-marquee-name{display:block;flex:1;min-width:0;font-size:12px;font-weight:690;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.home-company-marquee-disclaimer{font-size:11px;color:#929a9b;line-height:1.65;text-align:center;margin:15px 0 0}
+@keyframes hhba-company-marquee-left{to{transform:translateX(-50%)}}
+@media(max-width:720px){
+ .home-match-promo ~ .unified-market{margin-bottom:25px}
+ .home-company-marquee{margin-bottom:18px;padding-top:22px}
+ .home-company-marquee-heading{align-items:flex-start;gap:8px;flex-wrap:wrap}
+ .home-company-marquee h2{font-size:19px}
+ .home-company-marquee-all{margin-top:1px}
+ .home-company-marquee-link{width:154px;min-height:58px}
+ .home-company-marquee-run{gap:10px;padding-right:10px}
+ .home-company-marquee-disclaimer{text-align:left}
+}
+@media(prefers-reduced-motion:reduce){
+ .home-company-marquee-window{overflow-x:auto;mask-image:none;-webkit-mask-image:none;scrollbar-width:thin}
+ .home-company-marquee-track{animation:none;will-change:auto}
+ .home-company-marquee-run.is-copy{display:none}
+}
