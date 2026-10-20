@@ -21,7 +21,7 @@ async function load(append=false){
   const d=await r.json();if(n!==token)return;
   if(append)$("jobs").append(...d.jobs.map(card));else $("jobs").replaceChildren(...d.jobs.map(card));
   offset=(append?offset:0)+d.jobs.length;total=d.total;
-  $("summary").textContent="匹配 "+d.total+" 条岗位 · 成功连接 "+d.successBoards+"/"+d.boards+" 个官方招聘板 · 最近同步 "+(d.updatedAt||"待同步");
+  $("summary").textContent="匹配 "+d.total+" 条岗位 · 成功连接 "+d.successBoards+"/"+d.boards+" 个官方招聘板 · 最近同步 "+(d.updatedAt||"待同步")+(d.query?.warnings?.length?" · 注意："+d.query.warnings.join("；"):"");
   $("more").hidden=offset>=d.total;
  }catch{
   if(n!==token)return;
