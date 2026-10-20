@@ -67,6 +67,10 @@ test('a new audit of unchanged job listings produces a new immutable version',as
   const {folder,docs}=await fixtures(root),dest=join(root,'volume');
   const first=await publishIndex(folder,dest,{minJobs:2});
   docs['job-sync-status.json'].summary.checked_at=new Date(Date.now()+1000).toISOString();
+  docs['job-sync-summary.json'].checked_at=docs['job-sync-status.json'].summary.checked_at;
+  docs['job-search-facets.json'].verified_at=docs['job-sync-status.json'].summary.checked_at;
+  await writeFile(join(folder,'job-sync-summary.json'),JSON.stringify(docs['job-sync-summary.json']));
+  await writeFile(join(folder,'job-search-facets.json'),JSON.stringify(docs['job-search-facets.json']));
   await writeFile(join(folder,'job-sync-status.json'),JSON.stringify(docs['job-sync-status.json']));
   const second=await publishIndex(folder,dest,{minJobs:2});
   assert.notEqual(second.version,first.version);
