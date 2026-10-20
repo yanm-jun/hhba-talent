@@ -1,0 +1,51 @@
+name: HHBA Railway recruitment-market clean UI live acceptance
+on:
+  push:
+    branches: [test/hhba-notice-removed-live-20261020]
+    paths: ['.github/workflows/hhba-market-notices-live.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify new JS hides notices and official positions still work
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const root='https://hhba-web-production-024c.up.railway.app';
+          async function get(path){
+           let last;
+           for(let n=0;n<3;n++){
+            try{return await fetch(root+path,{redirect:'manual',signal:AbortSignal.timeout(35000)})}
+            catch(e){last=e;await new Promise(r=>setTimeout(r,1000))}
+           }
+           throw last;
+          }
+          const page=await get('/candidate/jobs');
+          assert.equal(page.status,200);
+          const html=await page.text();
+          const script=html.match(/src="(\/assets\/[^"]+\.js)"/);
+          assert.ok(script,'JS not published');
+          const jsResponse=await get(script[1]);
+          assert.equal(jsResponse.status,200);
+          const code=await jsResponse.text();
+          for(const forbidden of ['全量官方 JD 核验：','学历和年限筛选仅使用官方 JD 明确可识别的内容',
+            '仅显示本页符合近期来源记录要求的岗位','Overseas full-JD machine-validated Chinese:'])
+           assert.ok(!code.includes(forbidden),'old banner still shipped: '+forbidden);
+          for(const needed of ['招聘市场','全部学历要求','全部招聘类型','查看岗位'])
+           assert.ok(code.includes(needed),'required recruitment feature missing: '+needed);
+          const feed=await get('/data/jobs.json');
+          assert.equal(feed.status,200);
+          assert.equal(feed.headers.get('x-hhba-index-source'),'railway-verified-volume');
+          const data=await feed.json();
+          assert.ok(data.total>10000);
+          const job=await get('/candidate/jobs/greenhouse-airbnb-7755758');
+          assert.equal(job.status,200);
+          console.log('HHBA_MARKET_NOTICES_REMOVED',JSON.stringify({jobCount:data.total,live:true,
+            hostedAt:root+'/candidate/jobs',officialDetailStillWorks:true}));
+          NODE
