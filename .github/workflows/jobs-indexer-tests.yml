@@ -22,4 +22,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - run: npm test
+      - name: Validate JavaScript modules
+        run: |
+          node --check app.js
+          node --check page.mjs
+          node --check locale.mjs
+          node --check query.mjs
+          node --check store.mjs
+          node --check server.mjs
+      - name: Run unit tests
+        run: npm test
