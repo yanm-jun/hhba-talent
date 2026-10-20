@@ -1,0 +1,41 @@
+name: HHBA Pages Translation Bridge Safety Build
+on:
+  pull_request:
+    branches: [feat/jobs-indexer-service-20261018]
+    paths:
+      - 'ops/legacy-marketplace/**'
+      - '.github/workflows/hhba-pages-i18n-cors-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.1'
+      - name: Install pinned dependencies
+        working-directory: ops/legacy-marketplace
+        run: bun install
+      - name: Compile entire existing green recruitment service
+        working-directory: ops/legacy-marketplace
+        run: |
+          sed 's/"html-to-text@9"/"html-to-text"/;s/"sanitize-html@2"/"sanitize-html"/' railway-function-20261018.ts > __check_backend.ts
+          bun build __check_backend.ts --target=bun --outfile=/tmp/hhba-green-verified.mjs
+          rm __check_backend.ts
+      - name: Require exact whitelist and no unrestricted CORS
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const src=fs.readFileSync('ops/legacy-marketplace/railway-function-20261018.ts','utf8');
+          assert(src.includes('origin==="https://yanm-jun.github.io"'));
+          assert(src.includes('headers["Access-Control-Allow-Origin"]="https://yanm-jun.github.io"'));
+          assert(src.includes('req.method==="OPTIONS"&&pagesRequest'));
+          assert(src.includes('sameOrigin||pagesOrigin'));
+          assert(src.includes('readerRateLimit(req)'));
+          assert(!src.includes('"Access-Control-Allow-Origin":"*"'));
+          console.log('PASS: Pages origin restricted, original same-origin preserved, translation rate limit preserved');
+          NODE
