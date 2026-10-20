@@ -3,6 +3,7 @@ import { ArrowRight, ExternalLink, MapPin, RefreshCcw, Search, ShieldCheck } fro
 import { Link, getJobReturnTarget, navigate } from '../router';
 import { Shell } from './Shell';
 import { EmployerBrandLogo } from './EmployerBrandLogo';
+import { companyProfileForJob } from '../services/companyProfiles';
 import { featuredTitle, featuredLocation, isDefaultMarketFilters, loadVerifiedFeaturedJobs } from '../services/featuredOfficialJobs';
 import type { User } from '../services/api';
 import { getJob, listJobs, localizedCompany, localizedLocation, localizedTitle, officialStatus, safeOfficialJobUrl,
@@ -20,6 +21,11 @@ function readMarketState(compact:boolean):PersistedMarketState|null{
  return state;
 }
 const emptyFilters: LiveFilters={q:'',company:'',country:'',remote:false,recruitment_type:'',location_country:'',city:'',education:'',experience:''};
+function initialCompanyQuery(){
+ try{const company=new URLSearchParams(location.search).get('company');
+   return ['OpenAI','Anthropic','SpaceX'].includes(company||'')?company!:'';
+ }catch{return ''}
+}
 function initialJobQuery(){
   try{return new URLSearchParams(location.search).get('q')?.trim().slice(0,100)||'';}
   catch{return '';}
@@ -35,10 +41,15 @@ function useLanguage() {
 }
 function JobCard({job,lang,asOf}:{job:LiveJob,lang:Language,asOf:string}){
   const source=safeOfficialJobUrl(job);
+  const profile=companyProfileForJob(job);
   if(!source || officialStatus(job,asOf)!=='recent')return null;
   return <article className="unified-job-card">
     <div className="unified-job-head">
-      <span className="unified-company-brand"><EmployerBrandLogo job={job}/><strong>{localizedCompany(job,lang)}</strong></span>
+      {profile?<Link className="unified-company-brand" to={'/companies/'+profile.slug}
+        title={lang==='zh'?'查看 '+profile.name+' 企业介绍':'About '+profile.name}>
+        <EmployerBrandLogo job={job}/><strong>{localizedCompany(job,lang)}</strong>
+      </Link>:<span className="unified-company-brand"><EmployerBrandLogo job={job}/>
+        <strong>{localizedCompany(job,lang)}</strong></span>}
       <small>{lang==='zh'?'官方招聘':'Official opening'}</small>
     </div>
     <h3><Link to={'/candidate/jobs/'+encodeURIComponent(job.id)}>{featuredTitle(job,lang)}</Link></h3>
@@ -56,7 +67,13 @@ function LanguageSwitcher({lang,change}:{lang:Language,change:(value:Language)=>
 }
 export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,user?:User|null}){
   const {lang,change}=useLanguage();
-  const [filters,setFilters]=useState<LiveFilters>(()=>({...emptyFilters,...readMarketState(compact)?.filters,q:readMarketState(compact)?.draft??initialJobQuery()}));
+  const [filters,setFilters]=useState<LiveFilters>(()=>{
+    const previous=readMarketState(compact);
+    const saved=previous?.filters.company;
+    return {...emptyFilters,...previous?.filters,
+      q:previous?.draft??initialJobQuery(),
+      company:typeof saved==='string'&&saved.length<=100?saved:initialCompanyQuery()};
+  });
   const [draft,setDraft]=useState(()=>readMarketState(compact)?.draft??initialJobQuery());
   const [page,setPage]=useState(()=>readMarketState(compact)?.page??0);
   const [snapshot,setSnapshot]=useState<LivePage|null>(null);
@@ -111,6 +128,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   const interpreted=useMemo(()=>parseNaturalQuery(filters.q),[filters.q]);
   const roleNames:Record<string,string>={software:'软件工程师',sales:'销售',engineer:'工程师',product:'产品经理',intern:'实习',design:'设计',finance:'财务',marketing:'市场营销',operations:'运营'};
   const intentLabels=[
+    filters.company&&(lang==='zh'?'企业：':'Company: ')+filters.company,
     interpreted.countryCode&&(countryOptions.find(c=>c.value===interpreted.countryCode)?.[lang]||interpreted.countryCode),
     interpreted.cityKey&&(cityOptions.find(c=>c.value===interpreted.cityKey)?.[lang]||interpreted.cityKey),
     interpreted.roleKeys.length>0&&(lang==='zh'?'职位：':'Role: ')+interpreted.roleKeys.map(k=>lang==='zh'?(roleNames[k]||k):k).join(', '),
@@ -178,9 +196,13 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       <p>{lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
       <LanguageSwitcher lang={lang} change={change}/></div>
     {controls}
-    {intentLabels.length>0&&<p className="unified-search-interpreted">
+    {intentLabels.length>0&&<div className="unified-search-interpreted">
       {lang==='zh'?'搜索条件已识别：':'Recognized filters: '}{intentLabels.join(' · ')}
-    </p>}
+      {filters.company&&<button className="unified-company-filter-clear" type="button"
+        onClick={()=>{setPage(0);setFilters(f=>({...f,company:''}))}}>
+        {lang==='zh'?'清除企业筛选':'Clear company filter'} ×
+      </button>}
+    </div>}
     {!loading&&!error&&snapshot?.total===0&&interpreted.education==='UNRESTRICTED'&&
       filters.education!=='UNRESTRICTED_OR_UNREPORTED'&&
       <div className="unified-search-fallback">
@@ -285,6 +307,7 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
    return()=>controller.abort();
  },[job,jdRetry]);
  const official=job?safeOfficialJobUrl(job):null;
+ const companyProfile=job?companyProfileForJob(job):null;
  const segmentName:Record<string,{zh:string,en:string}>={
    responsibilities:{zh:'岗位职责',en:'Responsibilities'},
    requirements:{zh:'任职资格与技术要求',en:'Requirements and skills'},
@@ -302,7 +325,14 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
    {error?<p className="unified-job-state" role="alert">{lang==='zh'?error:'Job details unavailable.'}</p>:!job?<p className="unified-job-state">
      {lang==='zh'?'正在读取官方岗位信息…':'Loading official job details…'}</p>:
    <article className="unified-detail-card">
-     <div className="unified-detail-employer"><EmployerBrandLogo job={job}/><small>{localizedCompany(job,lang)}</small></div>
+     <div className="unified-detail-employer">
+       {companyProfile?<Link to={'/companies/'+companyProfile.slug}
+         className="unified-detail-company-link"
+         title={lang==='zh'?'查看企业介绍':'View company profile'}>
+         <EmployerBrandLogo job={job}/><small>{localizedCompany(job,lang)}</small>
+         <ArrowRight size={14}/>
+       </Link>:<><EmployerBrandLogo job={job}/><small>{localizedCompany(job,lang)}</small></>}
+     </div>
      <h1>{featuredTitle(job,lang)}</h1>
      <p><MapPin size={15}/>{localizedLocation(job,lang)}</p>
      <div className="unified-detail-warning"><ShieldCheck size={17}/>

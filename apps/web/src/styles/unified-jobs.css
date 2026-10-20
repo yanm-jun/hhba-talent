@@ -102,3 +102,12 @@
   padding:10px 13px;margin-top:13px;font-size:12px;line-height:1.6}
 .unified-featured-fallback button{border:1px solid #c5d8ca;background:white;border-radius:7px;
   padding:6px 10px;font:inherit;font-weight:650;color:#315e48;display:inline-flex;align-items:center;gap:6px}
+
+/* Company identity opens HHBA's independent, sourced company overview. */
+a.unified-company-brand{color:inherit;text-decoration:none;border-radius:8px}
+a.unified-company-brand:hover strong{color:#256746;text-decoration:underline}
+a.unified-company-brand:focus-visible,.unified-detail-company-link:focus-visible{outline:2px solid #3b8563;outline-offset:3px}
+.unified-detail-company-link{display:inline-flex;align-items:center;gap:12px;color:#2d7556;text-decoration:none;border-radius:8px}
+.unified-detail-company-link:hover small{text-decoration:underline}
+.unified-company-filter-clear{margin-left:9px;border:1px solid #c4d9cb;color:#2b6044;padding:3px 8px;background:#fff;border-radius:6px;font-size:11px;cursor:pointer}
+.unified-company-filter-clear:hover{background:#edf6ef}

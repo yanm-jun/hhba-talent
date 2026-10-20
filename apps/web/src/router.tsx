@@ -12,11 +12,12 @@ type MarketState={scope:'home'|'jobs';filters:Record<string,unknown>;draft:strin
 type InternalNavigation={scrollY?:number;restoreMarketState?:MarketState};
 type JobOrigin={to:string;scrollY:number;marketState?:MarketState};
 const detailRoute=/^\/candidate\/jobs\/[A-Za-z0-9_-]{1,180}$/;
+const companyRoute=/^\/companies\/(?:openai|anthropic|spacex)$/;
 function currentPathWithSearch(){return currentRoute()+location.search;}
 function safeOrigin(to:unknown):to is string{
  if(typeof to!=='string'||to.length>700||!to.startsWith('/')||to.startsWith('//')||to.includes('\\'))return false;
  const path=to.split(/[?#]/,1)[0];
- return path==='/'||path==='/candidate'||path==='/candidate/jobs'||path==='/candidate/match'||
+ return detailRoute.test(path)||companyRoute.test(path)||path==='/'||path==='/candidate'||path==='/candidate/jobs'||path==='/candidate/match'||
    path==='/candidate/jobs/archive'||path==='/candidate/employer-jobs';
 }
 const safeScroll=(value:unknown)=>typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<10000000?value:0;
@@ -36,14 +37,23 @@ export function navigate(to:string,options:InternalNavigation={}){
  const inheritedOrigin:JobOrigin|undefined=
    detailRoute.test(currentRoute())&&source?.hhbaJobOrigin&&safeOrigin(source.hhbaJobOrigin.to)
      ?source.hhbaJobOrigin:undefined;
+ const restoredOrigin:JobOrigin|undefined=companyRoute.test(currentRoute())&&
+   source?.hhbaCompanyOrigin?.to===to&&source?.hhbaReturnJobOrigin&&
+   safeOrigin(source.hhbaReturnJobOrigin.to)?source.hhbaReturnJobOrigin:undefined;
  const jobOrigin=detailRoute.test(to.split('?',1)[0])
-   ?inheritedOrigin||(safeOrigin(from)
+   ?restoredOrigin||inheritedOrigin||(safeOrigin(from)
      ?{to:from,scrollY:safeScroll(source?.hhbaScrollY),
        marketState:source?.hhbaMarketState}
      :undefined)
    :undefined;
  const state:Record<string,unknown>={hhbaScrollY:safeScroll(options.scrollY)};
  if(jobOrigin)state.hhbaJobOrigin=jobOrigin;
+ if(companyRoute.test(to.split('?',1)[0])&&safeOrigin(from)){
+   state.hhbaCompanyOrigin={to:from,scrollY:safeScroll(source?.hhbaScrollY),
+     marketState:source?.hhbaMarketState};
+   if(detailRoute.test(currentRoute())&&source?.hhbaJobOrigin&&
+     safeOrigin(source.hhbaJobOrigin.to))state.hhbaReturnJobOrigin=source.hhbaJobOrigin;
+ }
  if(options.restoreMarketState)state.hhbaMarketState=options.restoreMarketState;
  history.pushState(state,'',href(to));
  dispatchEvent(new PopStateEvent('popstate',{state}));
@@ -54,6 +64,12 @@ export function getJobReturnTarget():JobOrigin{
    return {to:origin.to,scrollY:safeScroll(origin.scrollY),
      marketState:origin.marketState};
  }
+ return {to:'/candidate/jobs',scrollY:0};
+}
+export function getCompanyReturnTarget():JobOrigin{
+ const origin=history.state?.hhbaCompanyOrigin;
+ if(origin&&safeOrigin(origin.to))return {to:origin.to,
+   scrollY:safeScroll(origin.scrollY),marketState:origin.marketState};
  return {to:'/candidate/jobs',scrollY:0};
 }
 export function useRoute(){
