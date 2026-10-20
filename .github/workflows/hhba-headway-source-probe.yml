@@ -1,0 +1,51 @@
+name: HHBA Headway Original Brand Source Probe
+on:
+  push:
+    branches: [audit/headway-official-brand-20261020]
+    paths: ['.github/workflows/hhba-headway-source-probe.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Probe Headway first-party icons and verified Ashby employer metadata without mutation
+        run: |
+          python - <<'PY'
+          import urllib.request,urllib.error,urllib.parse,json,re,html.parser
+          urls=[
+           "https://headway.co/favicon.ico",
+           "https://headway.co/favicon.svg",
+           "https://headway.co/favicon.png",
+           "https://headway.co/apple-touch-icon.png",
+           "https://www.headway.co/favicon.ico",
+           "https://www.headway.co/apple-touch-icon.png",
+           "https://www.findheadway.com/favicon.ico",
+           "https://findheadway.com/apple-touch-icon.png",
+           "https://jobs.ashbyhq.com/headway",
+           "https://api.ashbyhq.com/posting-api/job-board/headway",
+           "https://api.ashbyhq.com/posting-api/job-board/headway?includeCompensation=true",
+          ]
+          for u in urls:
+           try:
+            req=urllib.request.Request(u,headers={"User-Agent":"Mozilla/5.0","Accept":"*/*"})
+            with urllib.request.urlopen(req,timeout=12) as response:
+             d=response.read(350000)
+             final=response.geturl()
+             mime=response.headers.get("content-type","")
+             x={"url":u,"status":response.status,"final":final,"mime":mime,"bytes":len(d)}
+             if "json" in mime:
+              try:
+               j=json.loads(d);x["jsonKeys"]=list(j.keys());x["logoCandidates"]={k:v for k,v in j.items() if "logo" in k.lower() or "image" in k.lower() or "company" in k.lower()}
+              except:pass
+             if "text/html" in mime:
+              h=d.decode("utf-8","ignore")
+              x["metadata"]=re.findall(r'<meta[^>]+(?:og:image|twitter:image)[^>]+>',h,re.I)[:6]
+              x["links"]=re.findall(r'<link[^>]+(?:icon|logo)[^>]+>',h,re.I)[:8]
+             if d.startswith(b"\x89PNG"):x["imageDimensions"]=[int.from_bytes(d[16:20],"big"),int.from_bytes(d[20:24],"big")]
+             if d.startswith(b"\x00\x00\x01\x00"):x["icon"]="Valid ICO"
+             print("HHBA_HEADWAY_FIRST_PARTY_PROBE",json.dumps(x)[:1200],flush=True)
+           except Exception as e:
+            print("HHBA_HEADWAY_FIRST_PARTY_PROBE",json.dumps({"url":u,"error":str(e)[:150]}),flush=True)
+          PY
