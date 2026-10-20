@@ -43,6 +43,11 @@ export type Requirement = { id: string; organization_id: string; title: string; 
 export type ResumeSummary = { resume_id: string; filename: string; status: string; job_id?: string | null; job_state: string | null; created_at?: string };
 export type Consents = { enterprise_search: boolean; public_share: boolean; search_engine_index: boolean };
 export type EnterpriseProfileFields = { display_name: string | null; headline: string | null; capability_summary: string | null; skills: string[]; industries: string[]; location: string | null; service_regions: string[]; work_modes: string[]; work_years: number | null; project_summaries: string[] };
+export type ApplicationSharedFields = {display_name:string|null;headline:string|null;skills:string[];location:string|null;work_years:number|null};
+export type CandidateJobPreview = {eligible:boolean;reason:'CONFIRMED_PROFILE_REQUIRED'|'ALREADY_APPLIED'|null;posting:{id:string;company:string;title:string};shared_fields:ApplicationSharedFields|null;already_applied:boolean};
+export type CandidateJobApplication = {id:string;posting_id:string;company:string;title:string;location:string;status:string;created_at:string;updated_at:string};
+export type EmployerJobApplication = {id:string;posting_id:string;shared_fields:ApplicationSharedFields;cover_note:string;status:string;created_at:string;updated_at:string};
+export type ApplicationStage = 'submitted'|'reviewing'|'shortlisted'|'interview'|'rejected'|'hired'|'withdrawn';
 export type EmployerPosting = { id:string;company:string;title:string;description:string;requirements:string;location:string;work_mode:'onsite'|'hybrid'|'remote';recruitment_type:'SOCIAL'|'CAMPUS'|'INTERNSHIP';apply_url:string;status:'draft'|'pending_review'|'published'|'rejected'|'closed';published_at?:string|null;expires_at?:string|null;review_reason?:string|null;source_type:'HHBA_VERIFIED_EMPLOYER' };
 export type EmployerPostingInput = Pick<EmployerPosting,'title'|'description'|'requirements'|'location'|'work_mode'|'recruitment_type'|'apply_url'>;
 export type TalentSearchInput = {keywords?:string;skills?:string[];industry?:string;region?:string;work_mode?:string;work_years_min?:number;work_years_max?:number;page?:number;page_size?:number};
@@ -95,6 +100,13 @@ export const api = {
   closePosting: (oid:string,id:string) => request<{status:string}>(`/organizations/${oid}/postings/${id.replace(/^employer-/,'')}/close`,{method:'POST'}),
   talentSearch: (oid:string,payload:TalentSearchInput) => request<TalentSearchResponse>(`/organizations/${oid}/talent-search`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),
   publicEmployerJobs: (search:string='',offset=0) => request<EmployerPublicJobs>(`/public/employer-postings?q=${encodeURIComponent(search)}&offset=${offset}&limit=20`),
+  applicationPreview: (postingId:string) => request<CandidateJobPreview>(`/me/employer-applications/preview/${encodeURIComponent(postingId.replace(/^employer-/,''))}`),
+  applyEmployerJob: (postingId:string,confirmed_share:boolean,cover_note:string) => request<{id:string;status:string;notice:string}>(`/me/employer-applications/${encodeURIComponent(postingId.replace(/^employer-/,''))}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirmed_share,cover_note})}),
+  myEmployerApplications: () => request<{items:CandidateJobApplication[]}>('/me/employer-applications'),
+  withdrawEmployerApplication: (id:string) => request<{id:string;status:string}>(`/me/employer-applications/${encodeURIComponent(id)}/withdraw`,{method:'POST'}),
+  employerJobApplications: (oid:string,postingId:string) => request<{items:EmployerJobApplication[]}>(`/organizations/${encodeURIComponent(oid)}/postings/${encodeURIComponent(postingId.replace(/^employer-/,''))}/applications`),
+  updateEmployerApplicationStatus: (oid:string,postingId:string,id:string,status:ApplicationStage,expected_status:ApplicationStage) => request<{id:string;status:string}>(`/organizations/${encodeURIComponent(oid)}/postings/${encodeURIComponent(postingId.replace(/^employer-/,''))}/applications/${encodeURIComponent(id)}/status`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({status,expected_status})}),
+
   publicEmployerJob: (id:string) => request<PublicEmployerJob>(`/public/employer-postings/${encodeURIComponent(id.replace(/^employer-/,''))}`),
   adminPendingPostings: () => request<{items:EmployerPosting[]}>('/admin/employer-postings'),
   adminPostingReview: (id:string,decision:'approved'|'rejected',reason_code:string) => request<{status:string}>(`/admin/employer-postings/${id.replace(/^employer-/,'')}/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision,reason_code})}),

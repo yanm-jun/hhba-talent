@@ -69,6 +69,22 @@ class EmployerPosting(Base):
  created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
  updated_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 
+class EmployerJobApplication(Base):
+ __tablename__='employer_job_applications'
+ __table_args__=(UniqueConstraint('posting_id','candidate_user_id',name='uq_employer_application_posting_candidate'),)
+ id:Mapped[UUID]=mapped_column(primary_key=True,default=uuid4)
+ posting_id:Mapped[UUID]=mapped_column(ForeignKey('employer_postings.id',ondelete='CASCADE'),index=True)
+ organization_id:Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True)
+ candidate_user_id:Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True)
+ snapshot_json:Mapped[dict]=mapped_column(JSON,default=dict)
+ cover_note:Mapped[str]=mapped_column(Text,default='')
+ status:Mapped[str]=mapped_column(String(32),default='submitted')
+ consented_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+ created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+ updated_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
+ withdrawn_at:Mapped[datetime|None]=mapped_column(DateTime(timezone=True))
+ updated_by:Mapped[UUID|None]=mapped_column(ForeignKey('users.id'))
+
 class CandidateSearchProjection(Base):
  __tablename__='candidate_search_projections'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); profile_id: Mapped[UUID]=mapped_column(ForeignKey('profiles.id',ondelete='CASCADE'),unique=True,index=True); owner_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),index=True); candidate_ref: Mapped[str]=mapped_column(String(32),unique=True,index=True,default=lambda:uuid4().hex); display_name: Mapped[str|None]=mapped_column(String(100)); headline: Mapped[str|None]=mapped_column(String(300)); capability_summary: Mapped[str|None]=mapped_column(Text); skills: Mapped[list]=mapped_column(JSON,default=list); industries: Mapped[list]=mapped_column(JSON,default=list); location: Mapped[str|None]=mapped_column(String(120)); service_regions: Mapped[list]=mapped_column(JSON,default=list); work_modes: Mapped[list]=mapped_column(JSON,default=list); work_years: Mapped[int|None]=mapped_column(Integer); project_summaries: Mapped[list]=mapped_column(JSON,default=list); skills_text: Mapped[str]=mapped_column(Text,default=''); industries_text: Mapped[str]=mapped_column(Text,default=''); regions_text: Mapped[str]=mapped_column(Text,default=''); work_modes_text: Mapped[str]=mapped_column(Text,default=''); search_text: Mapped[str]=mapped_column(Text,default=''); profile_version: Mapped[int]=mapped_column(Integer,default=0); indexed_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class TalentSearchUsage(Base):
@@ -140,6 +156,13 @@ class EmployerPostingIn(BaseModel):
 class EmployerPostingReviewIn(BaseModel):
  decision:str=Field(pattern='^(approved|rejected)$')
  reason_code:str=Field(min_length=3,max_length=120)
+class EmployerApplicationSubmitIn(BaseModel):
+ confirmed_share:bool
+ cover_note:str=Field(default='',max_length=500)
+class EmployerApplicationStatusIn(BaseModel):
+ status:str=Field(pattern='^(reviewing|shortlisted|interview|rejected|hired)$')
+ expected_status:str=Field(pattern='^(submitted|reviewing|shortlisted|interview|rejected|hired)$')
+
 class TalentSearchIn(BaseModel):
  keywords:str|None=Field(default=None,max_length=200)
  skills:list[str]=Field(default_factory=list,max_length=8)
@@ -964,3 +987,131 @@ def public_employer_posting(pid:UUID,s:Session=Depends(db)):
  if not row or not employer_posting_recruiter_current(s,row[0]):raise HTTPException(404,'resource not found')
  return employer_posting_view(row[0],row[1].legal_name,public=True)
 
+# Applications are distinct from consent to appear in enterprise talent search.
+APP_TRANSITIONS={
+ 'submitted':{'reviewing','shortlisted','rejected'},
+ 'reviewing':{'shortlisted','interview','rejected'},
+ 'shortlisted':{'interview','rejected'},
+ 'interview':{'hired','rejected'},
+ 'rejected':set(),'hired':set()
+}
+def active_application_vacancy(s,pid):
+ stmt=public_employer_stmt(s)
+ if stmt is None:raise HTTPException(404,'vacancy unavailable')
+ row=s.execute(stmt.where(EmployerPosting.id==pid)).first()
+ if not row or not employer_posting_recruiter_current(s,row[0]):
+  raise HTTPException(404,'vacancy unavailable')
+ return row[0],row[1]
+
+def application_share_fields(s,p):
+ values=projection_values(s,p)
+ return {'display_name':values['display_name'],'headline':values['headline'],
+  'skills':values['skills'][:8],'location':values['location'],
+  'work_years':values['work_years']}
+
+@app.get('/api/v1/me/employer-applications/preview/{pid}')
+def application_preview(pid:UUID,a=Depends(candidate_auth),s:Session=Depends(db)):
+ posting,org=active_application_vacancy(s,pid)
+ p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
+ existing=s.scalar(select(EmployerJobApplication).where(
+  EmployerJobApplication.posting_id==pid,
+  EmployerJobApplication.candidate_user_id==a[0].id))
+ allowed=bool(p and p.status in SEARCHABLE_PROFILE_STATUSES)
+ return {'eligible':allowed and not existing,
+  'reason':'CONFIRMED_PROFILE_REQUIRED' if not allowed else 'ALREADY_APPLIED' if existing else None,
+  'posting':{'id':'employer-'+str(pid),'title':posting.title,'company':org.legal_name},
+  'shared_fields':application_share_fields(s,p) if allowed else None,
+  'already_applied':bool(existing)}
+
+@app.post('/api/v1/me/employer-applications/{pid}',status_code=201)
+def application_submit(pid:UUID,x:EmployerApplicationSubmitIn,r:Request,
+                       a=Depends(candidate_csrf),s:Session=Depends(db)):
+ if x.confirmed_share is not True:
+  raise HTTPException(422,'explicit per-job sharing consent required')
+ s.scalar(select(EmployerPosting).where(EmployerPosting.id==pid).with_for_update())
+ posting,org=active_application_vacancy(s,pid)
+ p=s.scalar(select(Profile).where(Profile.owner_user_id==a[0].id))
+ if not p or p.status not in SEARCHABLE_PROFILE_STATUSES:
+  raise HTTPException(409,'confirmed capability profile required')
+ existing=s.scalar(select(EmployerJobApplication).where(
+  EmployerJobApplication.posting_id==pid,
+  EmployerJobApplication.candidate_user_id==a[0].id))
+ if existing:raise HTTPException(409,'already applied; duplicate submissions forbidden')
+ note=x.cover_note.strip()
+ if note and (len(note)<12 or safe_projection_text(note,500)!=note):
+  raise HTTPException(422,'application note contains sensitive contact or address')
+ snapshot=application_share_fields(s,p)
+ if not any((snapshot['headline'],snapshot['skills'],snapshot['location'],snapshot['work_years'] is not None)):
+  raise HTTPException(422,'confirmed profile lacks shareable capability information')
+ item=EmployerJobApplication(posting_id=pid,organization_id=posting.organization_id,
+  candidate_user_id=a[0].id,snapshot_json=snapshot,cover_note=note,status='submitted',
+  consented_at=now())
+ s.add(item);s.flush()
+ audit(s,r,'employer_application.submit','success',f'employer_application:{item.id}',
+  a[0].id,{'posting_id':str(pid),'fields':[k for k,v in snapshot.items() if v]})
+ s.commit()
+ return {'id':str(item.id),'status':'submitted','company':org.legal_name,
+  'notice':'This per-vacancy consent does not authorize broad talent search or raw resume disclosure'}
+
+@app.get('/api/v1/me/employer-applications')
+def application_owner_list(a=Depends(candidate_auth),s:Session=Depends(db)):
+ rows=s.execute(select(EmployerJobApplication,EmployerPosting,Organization)
+  .join(EmployerPosting,EmployerJobApplication.posting_id==EmployerPosting.id)
+  .join(Organization,EmployerJobApplication.organization_id==Organization.id)
+  .where(EmployerJobApplication.candidate_user_id==a[0].id)
+  .order_by(EmployerJobApplication.created_at.desc()).limit(100)).all()
+ return {'items':[{'id':str(j.id),'posting_id':'employer-'+str(j.posting_id),
+  'company':org.legal_name,'title':p.title,'location':p.location,
+  'status':j.status,'created_at':j.created_at,'updated_at':j.updated_at}
+  for j,p,org in rows]}
+
+@app.post('/api/v1/me/employer-applications/{aid}/withdraw')
+def application_withdraw(aid:UUID,r:Request,a=Depends(candidate_csrf),s:Session=Depends(db)):
+ j=s.scalar(select(EmployerJobApplication).where(
+  EmployerJobApplication.id==aid,
+  EmployerJobApplication.candidate_user_id==a[0].id).with_for_update())
+ if not j:raise HTTPException(404,'application unavailable')
+ if j.status!='withdrawn':
+  j.status='withdrawn';j.withdrawn_at=now();j.updated_at=now()
+  j.snapshot_json={};j.cover_note=''
+  audit(s,r,'employer_application.withdraw','success',f'employer_application:{aid}',a[0].id)
+  s.commit()
+ return {'id':str(aid),'status':'withdrawn','notice':'shared profile snapshot erased'}
+
+def employer_application_access(s,oid,pid,user_id):
+ if not recruitment_allowed(s,oid,user_id):raise HTTPException(403,'verified employer required')
+ post=s.get(EmployerPosting,pid)
+ if not post or post.organization_id!=oid:raise HTTPException(404,'vacancy unavailable')
+ active_application_vacancy(s,pid)
+ return post
+
+def employer_application_card(x):
+ return {'id':str(x.id),'posting_id':'employer-'+str(x.posting_id),
+  'shared_fields':x.snapshot_json,'cover_note':x.cover_note,
+  'status':x.status,'created_at':x.created_at,'updated_at':x.updated_at}
+
+@app.get('/api/v1/organizations/{oid}/postings/{pid}/applications')
+def employer_application_list(oid:UUID,pid:UUID,a=Depends(auth),s:Session=Depends(db)):
+ employer_application_access(s,oid,pid,a[0].id)
+ rows=s.scalars(select(EmployerJobApplication).where(
+  EmployerJobApplication.posting_id==pid,EmployerJobApplication.organization_id==oid,
+  EmployerJobApplication.status!='withdrawn')
+  .order_by(EmployerJobApplication.created_at.desc()).limit(100)).all()
+ return {'items':[employer_application_card(x) for x in rows]}
+
+@app.post('/api/v1/organizations/{oid}/postings/{pid}/applications/{aid}/status')
+def employer_application_status(oid:UUID,pid:UUID,aid:UUID,x:EmployerApplicationStatusIn,
+  r:Request,a=Depends(csrf),s:Session=Depends(db)):
+ employer_application_access(s,oid,pid,a[0].id)
+ row=s.scalar(select(EmployerJobApplication).where(EmployerJobApplication.id==aid,
+  EmployerJobApplication.posting_id==pid,
+  EmployerJobApplication.organization_id==oid).with_for_update())
+ if not row or row.status=='withdrawn':raise HTTPException(404,'application unavailable')
+ if row.status!=x.expected_status:raise HTTPException(409,'status changed; refresh')
+ if x.status not in APP_TRANSITIONS.get(row.status,set()):
+  raise HTTPException(409,'unsupported status transition')
+ row.status=x.status;row.updated_at=now();row.updated_by=a[0].id
+ audit(s,r,'employer_application.status','success',f'employer_application:{aid}',
+  a[0].id,{'status':x.status})
+ s.commit()
+ return {'id':str(aid),'status':row.status,'updated_at':row.updated_at}
