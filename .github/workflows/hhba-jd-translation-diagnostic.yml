@@ -1,0 +1,43 @@
+name: HHBA translated JD failure diagnostics
+on:
+  push:
+    branches: [feat/jd-translation-stability-20261020]
+    paths:
+      - '.github/workflows/hhba-jd-translation-diagnostic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-bound-diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify real official JD versus one Chinese translation part
+        run: |
+          node --input-type=module <<'NODE'
+          import {createHash} from 'node:crypto';
+          const origin='https://hhba-web-production-024c.up.railway.app';
+          const candidates=['greenhouse-airbnb-7755758','greenhouse-airbnb-7755759'];
+          for(const id of candidates){
+           try{
+            const response=await fetch(origin+'/api/jobs/'+id,{signal:AbortSignal.timeout(25000)});
+            if(!response.ok){console.log('JD_DIAG',id,'source_status',response.status);continue}
+            const body=await response.json();
+            if(body.status!=='LIVE_CONTENT'||typeof body.description!=='string')continue;
+            const hash=createHash('sha256').update(body.description).digest('hex');
+            const result=await fetch(origin+'/api/jobs/'+id+'/translate-part',{
+              method:'POST',signal:AbortSignal.timeout(120000),
+              headers:{'Content-Type':'application/json','Origin':origin},
+              body:JSON.stringify({part:0,sourceHash:hash})
+            });
+            let data={};try{data=await result.json()}catch{}
+            console.log('JD_DIAG',JSON.stringify({id,status:result.status,officialSource:true,
+              err:data.error||null,part:data.part,mode:data.mode||null,
+              hasChinese:typeof data.text==='string'&&/[\u3400-\u9fff]/u.test(data.text),
+              numberProof:data.numbersVerified===true,sourceMatched:data.sourceHash===hash}));
+           }catch(e){console.log('JD_DIAG',JSON.stringify({id,error:e.name||'request_failed'}))}
+          }
+          NODE

@@ -1,0 +1,27 @@
+name: HHBA number-preserving JD translation acceptance
+on:
+  push:
+    branches: [feat/jd-translation-stability-20261020]
+    paths:
+      - 'ops/legacy-marketplace/**'
+      - 'Dockerfile.hhba'
+      - '.github/workflows/hhba-jd-number-guard.yml'
+  pull_request:
+    paths:
+      - 'ops/legacy-marketplace/**'
+      - 'Dockerfile.hhba'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  numeric-fidelity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test exact number preservation and error rejection
+        run: node --test ops/legacy-marketplace/test/number-locked-translation.test.mjs
+      - name: Build integrated white UI and existing official ATS API
+        run: docker build -f Dockerfile.hhba --tag hhba-numeric-guard:test .

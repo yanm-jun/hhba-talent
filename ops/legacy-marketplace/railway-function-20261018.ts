@@ -11,6 +11,7 @@ import { mkdirSync, readFileSync, existsSync } from "node:fs";
 import { openJobSyncStore } from "./jd-sync-store.mjs";
 import { startOverseasJdWorker } from "./jd-sync-worker.mjs";
 import { createFullJdWorker } from "./jd-sync-runner.mjs";
+import { translateWithSourceNumbers } from "./number-locked-translation.mjs";
 const phrases:[string,string][]=[
  ["Integration Technician","集成技术员"],["Test Technician","测试技术员"],
  ["Manufacturing Engineer","制造工程师"],["Supply Chain Manager","供应链经理"],
@@ -789,7 +790,7 @@ async function machineTranslations(kind:"title"|"jd",sources:string[]):Promise<(
   const arr=Array.isArray(output?.translatedText)?output.translatedText:
             sources.length===1&&typeof output?.translatedText==="string"?[output.translatedText]:null;
   if(!arr||arr.length!==sources.length)return null;
-  return arr.map((x,i)=>typeof x==="string"&&x.length>1&&/[\u3400-\u9fff]/.test(x)&&(kind==="jd"||numbersRetained(sources[i],x))?x:null);
+  return arr.map((x,i)=>typeof x==="string"&&x.length>=(kind==="jd"?1:2)&&/[\u3400-\u9fff]/.test(x)&&(kind==="jd"||numbersRetained(sources[i],x))?x:null);
  }catch(ex){
   console.log("HHBA_MT_UNAVAILABLE",ex instanceof Error?ex.name:"unknown");
   return null;
@@ -1269,7 +1270,18 @@ async function verifiedJdChunk(job:Job,one:string):Promise<TranslatedChunk>{
   if(!chinese)return {text:null,error:"translation_incomplete"};
   const corrected=stabilizeEmployerTerminology(job.company,restoreGroupedNumbers(source,chinese));
   if(hasLeakedJdTags(corrected))return {text:null,error:"translation_markup_leak"};
-  const safe=preserveOfficialNumbers(source,corrected);
+  let safe=preserveOfficialNumbers(source,corrected);
+  if(!safe){
+   // Re-translate only the failed section and force original numeric tokens,
+   // never silently accept invented salaries, dates, percentages or years.
+   const locked=await translateWithSourceNumbers(source,
+     async fragments=>await machineTranslations("jd",fragments));
+   if(locked){
+    const repaired=await ensureChineseProse(locked);
+    const fixed=repaired?stabilizeEmployerTerminology(job.company,repaired):null;
+    if(fixed&&!hasLeakedJdTags(fixed))safe=preserveOfficialNumbers(source,fixed);
+   }
+  }
   if(!safe)return {text:null,error:"translation_numbers_mismatch"};
   const mark=segments[i].kind==="heading"?"# ":segments[i].kind==="bullet"?"- ":"";
   translated.push(mark+safe.trim());
