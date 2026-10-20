@@ -1,0 +1,58 @@
+name: HHBA employer real PostgreSQL migration and privacy acceptance
+on:
+  push:
+    branches: [feat/white-employer-api-recovery-20261020]
+    paths:
+      - 'apps/api/**'
+      - '.github/workflows/hhba-phase5-postgres-acceptance.yml'
+  pull_request:
+    paths: ['apps/api/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  synthetic-postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: phase3a_test
+          POSTGRES_USER: hhba_ci
+          POSTGRES_PASSWORD: hhba_ci_synthetic_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hhba_ci -d phase3a_test"
+          --health-interval 5s --health-timeout 3s --health-retries 15
+    env:
+      DATABASE_URL: postgresql+psycopg://hhba_ci:hhba_ci_synthetic_only@127.0.0.1:5432/phase3a_test
+      HHBA_VERIFICATION_ROOT: /tmp/hhba-postgres-verification-synthetic
+      HHBA_UPLOAD_ROOT: /tmp/hhba-postgres-resumes-synthetic
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install minimal API migrations and test dependencies
+        run: |
+          python -m pip install --disable-pip-version-check             'fastapi>=0.115,<1' 'sqlalchemy>=2.0,<2.1' 'alembic>=1.14,<2'             'psycopg[binary]>=3.2,<4' 'pwdlib[argon2]>=0.2,<1'             'email-validator==2.3.0' 'python-multipart>=0.0.20,<1'             'httpx>=0.28,<1' 'pytest>=8,<10'
+      - name: Apply all HHBA Alembic revisions to isolated synthetic PostgreSQL
+        working-directory: apps/api
+        run: python -m alembic upgrade head
+      - name: Confirm approved employer postings, applications and consent tables
+        working-directory: apps/api
+        run: |
+          python - <<'PY'
+          from sqlalchemy import inspect
+          from app.main import engine
+          tables=set(inspect(engine).get_table_names())
+          required={'users','organizations','consents','employer_postings',
+                    'employer_job_applications','organization_memberships'}
+          assert required.issubset(tables),sorted(required-tables)
+          print('HHBA_REAL_POSTGRES_MIGRATIONS_OK',sorted(required))
+          PY
+      - name: Test real PostgreSQL bounded talent search and immediate revocation
+        working-directory: apps/api
+        run: python -m pytest -q tests/test_phase3a_postgres.py
