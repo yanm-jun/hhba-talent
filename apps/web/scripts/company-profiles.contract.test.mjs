@@ -46,7 +46,7 @@ test('no fake jobs: company posts derive from current verified ATS and official 
 });
 test('company profile supports real deep links and company-only job filter',()=>{
  assert.ok(app.includes("if(/^\\/companies\\/[a-z-]{2,60}$/.test(route))"));
- assert.ok(server.includes('companies\\/(?:openai|anthropic|spacex)'));
+ assert.ok(server.includes('companies(?:\\/(?:openai|anthropic|spacex|id\\/'));
  assert.ok(router.includes('const companyRoute='));
  assert.ok(router.includes("getCompanyReturnTarget()"));
  assert.ok(router.includes('hhbaCompanyOrigin'));
