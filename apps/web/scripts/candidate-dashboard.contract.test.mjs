@@ -22,7 +22,8 @@ test('"我要应聘" opens a single candidate workspace, not another five-card d
 test('candidate search submits directly to existing verified market and pre-populates its search',()=>{
  assert.ok(dashboard.includes("navigate('/candidate/jobs'+(term?'?q='+encodeURIComponent(term):''))"));
  assert.ok(market.includes("new URLSearchParams(location.search).get('q')"));
- assert.ok(market.includes("q:initialJobQuery()"));
+ assert.ok(market.includes("readMarketState(compact)?.draft??initialJobQuery()"),
+   'job market should keep origin-specific query history or read the URL on fresh entry');
 });
 test('real job previews are read from verified ATS index rather than placeholders',()=>{
  assert.ok(dashboard.includes('listJobs(initialFilters,0,controller.signal)'));
