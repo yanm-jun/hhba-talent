@@ -27,7 +27,7 @@ export type JobAuditSummary = {
 };
 type AuditReport = {summary:JobAuditSummary; jobs:JobAuditEntry[]};
 let auditPromise:Promise<AuditReport>|null=null;
-const pagesSite=import.meta.env.BASE_URL==='/hhba-talent/';
+const pagesSite=import.meta.env.BASE_URL==='/hhba-talent/' || import.meta.env.VITE_HHBA_VERIFIED_SNAPSHOT==='1';
 export async function loadPublicJobAudit():Promise<AuditReport|null>{
  if(!pagesSite)return null;
  if(!auditPromise){
@@ -81,7 +81,7 @@ export type OverseasJdProgress = {
 };
 export async function loadOverseasJdProgress():Promise<OverseasJdProgress|null>{
  try{
-  const response=await fetch('https://hhba-web-production-024c.up.railway.app/api/jd-sync/status',{
+  const response=await fetch(import.meta.env.VITE_HHBA_VERIFIED_SNAPSHOT==='1'?'/api/jd-sync/status':'https://hhba-web-production-024c.up.railway.app/api/jd-sync/status',{
    method:'GET',mode:'cors',credentials:'omit',cache:'no-store',
    headers:{Accept:'application/json'},signal:AbortSignal.timeout(12000)
   });
