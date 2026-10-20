@@ -1,0 +1,49 @@
+name: HHBA home 50 genuine company marquee acceptance
+on:
+  push:
+    branches: [feat/home-verified-logo-marquee-20261021]
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/hhba-home-brand-marquee.yml'
+  pull_request:
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/hhba-home-brand-marquee.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  brand-marquee:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked web dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Validate real original brand hashes, company routes and accessible animation
+        working-directory: apps/web
+        run: |
+          node --test scripts/home-company-marquee.contract.test.mjs
+          node --test scripts/verified-brand-registry.contract.test.mjs
+          node --test scripts/featured-brand-jobs.contract.test.mjs
+          node --test scripts/all-companies-registry.contract.test.mjs
+          node --test scripts/job-origin-navigation.contract.test.mjs
+      - name: Check exact Railway Vite production build
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '0'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+        run: |
+          npm run build
+          test -s dist/index.html
+          test -s dist/brands/openai.svg
+          test -s dist/brands/claude.svg
+          test -s dist/brands/spacex.svg
+          test -s dist/brands/brand-headway.png
