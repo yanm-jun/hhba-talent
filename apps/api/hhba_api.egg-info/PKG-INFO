@@ -1,0 +1,8 @@
+Metadata-Version: 2.4
+Name: hhba-api
+Version: 0.0.0
+Requires-Python: <3.13,>=3.12
+Requires-Dist: fastapi<1,>=0.115
+Requires-Dist: uvicorn[standard]<1,>=0.30
+Requires-Dist: docling==2.138.0
+Requires-Dist: mcp==2.3.0

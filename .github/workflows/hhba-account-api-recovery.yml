@@ -1,0 +1,39 @@
+name: HHBA private account API recovery contract
+on:
+  push:
+    branches: [feat/white-employer-api-recovery-20261020]
+    paths:
+      - 'apps/api/**'
+      - '.github/workflows/hhba-account-api-recovery.yml'
+  pull_request:
+    paths:
+      - 'apps/api/**'
+      - '.github/workflows/hhba-account-api-recovery.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-acceptance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check Python syntax and Alembic sources without user data
+        run: python -m compileall -q apps/api/app apps/api/migrations
+      - name: Inspect feature completeness without a production database
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          source=Path('apps/api/app/main.py').read_text('utf-8')
+          required=['/api/v1/auth/session','/api/v1/auth/register',
+          '/api/v1/organizations','/api/v1/recruiter/onboarding',
+          '/api/v1/me/consents','/api/v1/me/employer-applications',
+          '/api/v1/organizations/{oid}/postings']
+          for name in required:
+              if name not in source: raise SystemExit('MISSING_ROUTE: '+name)
+          migrations=list(Path('apps/api/migrations/versions').glob('*.py'))
+          assert len(migrations)>=15,len(migrations)
+          print('HHBA_RECOVERED_API_SOURCE',{'routes':len(required),'migrations':len(migrations)})
+          PY
