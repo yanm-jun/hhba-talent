@@ -1,0 +1,74 @@
+name: HHBA Company Profiles Live Browser Acceptance
+on:
+  push:
+    branches: [test/company-profiles-browser-20261020]
+    paths: ['.github/workflows/hhba-company-profiles-live.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-company-profile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Install isolated browser runner
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.0
+          npx playwright install --with-deps chromium
+      - name: Verify actual online official company sources, logos, job links and navigation
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {chromium} from 'playwright';
+          const origin='https://hhba-web-production-024c.up.railway.app';
+          const b=await chromium.launch({headless:true,args:['--no-sandbox']});
+          try{
+            const page=await b.newPage({viewport:{width:1440,height:900}});
+            page.on('pageerror',e=>console.warn('BROWSER_JS_WARNING',e.message.slice(0,190)));
+            for(const [slug,name,logo] of [['openai','OpenAI','openai.svg'],
+              ['anthropic','Anthropic','claude.svg'],['spacex','SpaceX','spacex.svg']]){
+              const response=await page.goto(origin+'/companies/'+slug,{waitUntil:'domcontentloaded',timeout:85000});
+              assert.equal(response.status(),200,'deep-link reload should serve the white SPA '+slug);
+              await page.locator('.company-profile-identity h1').waitFor({timeout:20000});
+              assert.equal(await page.locator('.company-profile-identity h1').textContent(),name);
+              const headings=await page.locator('.company-profile-section h2').allTextContents();
+              assert.ok(headings.some(v=>v.includes('关于企业')),'intro missing '+slug);
+              assert.ok(headings.some(v=>v.includes('主要业务')),'products missing '+slug);
+              assert.ok(headings.some(v=>v.includes('信息来源')),'sources missing '+slug);
+              const image=page.locator('.company-profile-brand img');
+              await image.waitFor({timeout:20000});
+              await page.waitForFunction(()=>document.querySelector('.company-profile-brand img')?.naturalWidth>0,null,{timeout:20000});
+              assert.ok((await image.getAttribute('src')).endsWith('/brands/'+logo));
+              const sources=await page.locator('.company-profile-sources a').evaluateAll(items=>
+                items.map(a=>({url:a.getAttribute('href'),rel:a.getAttribute('rel'),target:a.getAttribute('target')})));
+              assert.ok(sources.length>=2,'insufficient reference evidence');
+              assert.ok(sources.every(x=>x.url.startsWith('https://')&&x.rel.includes('noopener')&&x.target==='_blank'));
+              await page.locator('.company-profile-jobs-state,.company-profile-job-card').first().waitFor({timeout:30000});
+              const jobs=await page.locator('.company-profile-job-card').count();
+              assert.ok(jobs>=1,'no actual verified company openings '+slug);
+              const jobHref=await page.locator('.company-profile-job-card').first().getAttribute('href');
+              assert.ok(jobHref.startsWith('/candidate/jobs/'),'fake JD path '+slug);
+              console.log('HHBA_COMPANY_LIVE',JSON.stringify({slug,company:name,logo,sourceCount:sources.length,visibleJobs:jobs,jobHref}));
+              await page.getByRole('button',{name:'English'}).click();
+              assert.ok((await page.locator('.company-profile-section h2').allTextContents()).some(x=>x.includes('About the company')));
+              await page.getByRole('button',{name:'中文'}).click();
+            }
+            await page.goto(origin+'/',{waitUntil:'domcontentloaded',timeout:85000});
+            await page.locator('.unified-company-brand[href="/companies/openai"]').first().waitFor({timeout:30000});
+            await page.locator('.unified-company-brand[href="/companies/openai"]').first().click();
+            await page.waitForURL('**/companies/openai',{timeout:15000});
+            await page.locator('.company-profile-top a').first().click();
+            await page.waitForURL(origin+'/',{timeout:15000});
+            assert.ok(await page.getByRole('button',{name:/我要应聘/}).isVisible());
+            assert.ok(await page.getByRole('button',{name:/我要招人/}).isVisible());
+            await page.locator('.unified-job-card h3 a').first().click();
+            await page.waitForURL(/\/candidate\/jobs\//,{timeout:15000});
+            await page.locator('.unified-detail-company-link').first().click();
+            await page.waitForURL('**/companies/openai',{timeout:15000});
+            await page.locator('.company-profile-top a').first().click();
+            await page.waitForURL(/\/candidate\/jobs\//,{timeout:15000});
+            console.log('HHBA_COMPANIES_BROWSER_ACCEPTED',JSON.stringify({url:origin,companyPages:3,realJobs:true,returnHome:true,returnJobDetail:true}));
+          }finally{await b.close()}
+          NODE
