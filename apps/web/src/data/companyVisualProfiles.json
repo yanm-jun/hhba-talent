@@ -1,0 +1,1025 @@
+{
+  "schemaVersion": 1,
+  "lastReviewed": "2026-10-21",
+  "records": [
+    {
+      "company": "OpenAI",
+      "platform": "ashby",
+      "source": "openai",
+      "people": [
+        {
+          "name": "Sam Altman",
+          "role": {
+            "zh": "Sam Altman",
+            "en": "Co-founder"
+          },
+          "source": "https://openai.com/index/introducing-openai/",
+          "photo": {
+            "file": "“Sam Altman” by Village Global.jpg",
+            "author": "Village Global",
+            "license": "CC BY 2.0",
+            "date": "",
+            "caption": {
+              "zh": "Sam Altman",
+              "en": "Sam Altman"
+            },
+            "location": {
+              "zh": "公开活动或肖像拍摄",
+              "en": "Documented public portrait"
+            }
+          }
+        },
+        {
+          "name": "Greg Brockman",
+          "role": {
+            "zh": "Greg Brockman",
+            "en": "Co-founder"
+          },
+          "source": "https://openai.com/index/introducing-openai/",
+          "photo": null
+        }
+      ],
+      "workplaces": [
+        {
+          "file": "1515 Third Street.jpg",
+          "caption": {
+            "zh": "旧金山 1515 Third Street 办公楼，拍摄时为 OpenAI 办公总部",
+            "en": "1515 Third Street, San Francisco, documented as OpenAI headquarters at photo date"
+          },
+          "takenAt": "2025-06-15",
+          "location": {
+            "zh": "旧金山，美国",
+            "en": "San Francisco, USA"
+          },
+          "author": "Coolcaesar",
+          "license": "CC BY-SA 4.0",
+          "kind": "office-building"
+        }
+      ],
+      "relationship": null
+    },
+    {
+      "company": "Anthropic",
+      "platform": "greenhouse",
+      "source": "anthropic",
+      "people": [
+        {
+          "name": "Dario Amodei",
+          "role": {
+            "zh": "Dario Amodei",
+            "en": "Co-founder"
+          },
+          "source": "https://www.anthropic.com/company/leadership",
+          "photo": null
+        },
+        {
+          "name": "Daniela Amodei",
+          "role": {
+            "zh": "Daniela Amodei",
+            "en": "Co-founder"
+          },
+          "source": "https://www.anthropic.com/company/leadership",
+          "photo": null
+        }
+      ],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "SpaceX",
+      "platform": "greenhouse",
+      "source": "spacex",
+      "people": [
+        {
+          "name": "Elon Musk",
+          "role": {
+            "zh": "埃隆·马斯克",
+            "en": "Co-founder"
+          },
+          "source": "https://www.spacex.com/company/",
+          "photo": {
+            "file": "Elon Musk (3018710552).jpg",
+            "author": "JD Lasica",
+            "license": "CC BY 2.0",
+            "date": "",
+            "caption": {
+              "zh": "埃隆·马斯克",
+              "en": "Elon Musk"
+            },
+            "location": {
+              "zh": "公开活动或肖像拍摄",
+              "en": "Documented public portrait"
+            }
+          }
+        }
+      ],
+      "workplaces": [
+        {
+          "file": "SpaceX Headquarters, Hawthorne, CA.jpg",
+          "caption": {
+            "zh": "SpaceX 加利福尼亚州霍桑历史总部/厂区（2012 年）",
+            "en": "SpaceX's historical Hawthorne headquarters and facilities (2012)"
+          },
+          "takenAt": "2012-09-28",
+          "location": {
+            "zh": "霍桑，美国",
+            "en": "Hawthorne, USA"
+          },
+          "author": "SpaceX",
+          "license": "CC0 1.0",
+          "kind": "office-building"
+        },
+        {
+          "file": "Entrance to SpaceX headquarters.jpg",
+          "caption": {
+            "zh": "SpaceX 霍桑总部历史入口（2010 年）",
+            "en": "Historical entrance to SpaceX headquarters in Hawthorne (2010)"
+          },
+          "takenAt": "2010-11-10",
+          "location": {
+            "zh": "霍桑，美国",
+            "en": "Hawthorne, USA"
+          },
+          "author": "brunosan",
+          "license": "CC BY 2.0",
+          "kind": "workplace"
+        }
+      ],
+      "relationship": null
+    },
+    {
+      "company": "Stripe",
+      "platform": "greenhouse",
+      "source": "stripe",
+      "people": [
+        {
+          "name": "Patrick Collison",
+          "role": {
+            "zh": "帕特里克·科里森",
+            "en": "Co-founder"
+          },
+          "source": "https://stripe.com/about",
+          "photo": {
+            "file": "Patrick Collison.jpg",
+            "author": "JD Lasica",
+            "license": "CC BY 2.0",
+            "date": "",
+            "caption": {
+              "zh": "帕特里克·科里森",
+              "en": "Patrick Collison"
+            },
+            "location": {
+              "zh": "公开活动或肖像拍摄",
+              "en": "Documented public portrait"
+            }
+          }
+        },
+        {
+          "name": "John Collison",
+          "role": {
+            "zh": "约翰·科里森",
+            "en": "Co-founder"
+          },
+          "source": "https://stripe.com/about",
+          "photo": null
+        }
+      ],
+      "workplaces": [
+        {
+          "file": "Stripe Headquarters.jpg",
+          "caption": {
+            "zh": "Stripe 南旧金山办公总部建筑（2023 年）",
+            "en": "Stripe headquarters office building in South San Francisco (2023)"
+          },
+          "takenAt": "2023-07-29",
+          "location": {
+            "zh": "南旧金山，美国",
+            "en": "South San Francisco, USA"
+          },
+          "author": "Coolcaesar",
+          "license": "CC BY-SA 4.0",
+          "kind": "office-building"
+        }
+      ],
+      "relationship": null
+    },
+    {
+      "company": "Coinbase",
+      "platform": "greenhouse",
+      "source": "coinbase",
+      "people": [
+        {
+          "name": "Brian Armstrong",
+          "role": {
+            "zh": "布莱恩·阿姆斯特朗",
+            "en": "Co-founder"
+          },
+          "source": "https://www.coinbase.com/about",
+          "photo": {
+            "file": "Brian Armstrong - TechCrunch Disrupt 2018 03.jpg",
+            "author": "TechCrunch",
+            "license": "CC BY 2.0",
+            "date": "",
+            "caption": {
+              "zh": "布莱恩·阿姆斯特朗",
+              "en": "Brian Armstrong"
+            },
+            "location": {
+              "zh": "公开活动或肖像拍摄",
+              "en": "Documented public portrait"
+            }
+          }
+        },
+        {
+          "name": "Fred Ehrsam",
+          "role": {
+            "zh": "弗雷德·埃尔萨姆",
+            "en": "Co-founder"
+          },
+          "source": "https://www.coinbase.com/about",
+          "photo": null
+        }
+      ],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Airbnb",
+      "platform": "greenhouse",
+      "source": "airbnb",
+      "people": [
+        {
+          "name": "Brian Chesky",
+          "role": {
+            "zh": "布莱恩·切斯基",
+            "en": "Co-founder"
+          },
+          "source": "https://news.airbnb.com/about-us",
+          "photo": {
+            "file": "Brian Chesky 2025.jpg",
+            "author": "Celeste Sloman / Airbnb",
+            "license": "CC BY-SA 4.0",
+            "date": "",
+            "caption": {
+              "zh": "布莱恩·切斯基",
+              "en": "Brian Chesky"
+            },
+            "location": {
+              "zh": "公开活动或肖像拍摄",
+              "en": "Documented public portrait"
+            }
+          }
+        },
+        {
+          "name": "Joe Gebbia",
+          "role": {
+            "zh": "乔·杰比亚",
+            "en": "Co-founder"
+          },
+          "source": "https://news.airbnb.com/about-us",
+          "photo": {
+            "file": "Joe-gebbia-airbnb-miller-mobley (cropped).jpg",
+            "author": "Miller Mobley",
+            "license": "CC BY 4.0",
+            "date": "",
+            "caption": {
+              "zh": "乔·杰比亚",
+              "en": "Joe Gebbia"
+            },
+            "location": {
+              "zh": "公开活动或肖像拍摄",
+              "en": "Documented public portrait"
+            }
+          }
+        },
+        {
+          "name": "Nathan Blecharczyk",
+          "role": {
+            "zh": "内森·布莱卡奇克",
+            "en": "Co-founder"
+          },
+          "source": "https://news.airbnb.com/about-us",
+          "photo": null
+        }
+      ],
+      "workplaces": [
+        {
+          "file": "Atrium of AirBnB Headquarters at 888 Brannan St, San Francisco.jpg",
+          "caption": {
+            "zh": "Airbnb 旧金山总部中庭与真实办公环境（2017 年）",
+            "en": "Airbnb headquarters atrium and workplace environment in 2017"
+          },
+          "takenAt": "2017-04-05",
+          "location": {
+            "zh": "旧金山，美国",
+            "en": "San Francisco, USA"
+          },
+          "author": "Dllu",
+          "license": "CC BY-SA 4.0",
+          "kind": "workplace"
+        },
+        {
+          "file": "888 Brannan, San Francisco, 2016.jpg",
+          "caption": {
+            "zh": "Airbnb 888 Brannan 大楼外观（2016 年，历史办公地址）",
+            "en": "Airbnb's 888 Brannan office exterior in 2016 (historical site)"
+          },
+          "takenAt": "2016-10-30",
+          "location": {
+            "zh": "旧金山，美国",
+            "en": "San Francisco, USA"
+          },
+          "author": "Dllu",
+          "license": "CC BY-SA 4.0",
+          "kind": "office-building"
+        }
+      ],
+      "relationship": null
+    },
+    {
+      "company": "Databricks",
+      "platform": "greenhouse",
+      "source": "databricks",
+      "people": [
+        {
+          "name": "Ali Ghodsi",
+          "role": {
+            "zh": "阿里·戈德西",
+            "en": "Co-founder"
+          },
+          "source": "https://www.databricks.com/company/about-us",
+          "photo": null
+        },
+        {
+          "name": "Matei Zaharia",
+          "role": {
+            "zh": "马泰·扎哈里亚",
+            "en": "Co-founder"
+          },
+          "source": "https://www.databricks.com/company/about-us",
+          "photo": null
+        }
+      ],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "DoorDash",
+      "platform": "greenhouse",
+      "source": "doordashusa",
+      "people": [
+        {
+          "name": "Tony Xu",
+          "role": {
+            "zh": "徐迅",
+            "en": "Co-founder"
+          },
+          "source": "https://about.doordash.com/en-us/company",
+          "photo": null
+        },
+        {
+          "name": "Stanley Tang",
+          "role": {
+            "zh": "Stanley Tang",
+            "en": "Co-founder"
+          },
+          "source": "https://about.doordash.com/en-us/company",
+          "photo": null
+        },
+        {
+          "name": "Andy Fang",
+          "role": {
+            "zh": "Andy Fang",
+            "en": "Co-founder"
+          },
+          "source": "https://about.doordash.com/en-us/company",
+          "photo": null
+        }
+      ],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Spotify",
+      "platform": "lever",
+      "source": "spotify",
+      "people": [
+        {
+          "name": "Daniel Ek",
+          "role": {
+            "zh": "丹尼尔·埃克",
+            "en": "Co-founder"
+          },
+          "source": "https://newsroom.spotify.com/company-info/",
+          "photo": {
+            "file": "Cropped image of Daniel Ek.jpg",
+            "author": "Patrik Ragnarsson",
+            "license": "CC BY 2.0",
+            "date": "",
+            "caption": {
+              "zh": "丹尼尔·埃克",
+              "en": "Daniel Ek"
+            },
+            "location": {
+              "zh": "公开活动或肖像拍摄",
+              "en": "Documented public portrait"
+            }
+          }
+        },
+        {
+          "name": "Martin Lorentzon",
+          "role": {
+            "zh": "马丁·洛伦松",
+            "en": "Co-founder"
+          },
+          "source": "https://newsroom.spotify.com/company-info/",
+          "photo": null
+        }
+      ],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Canonical",
+      "platform": "greenhouse",
+      "source": "canonical",
+      "people": [
+        {
+          "name": "Mark Shuttleworth",
+          "role": {
+            "zh": "马克·沙特尔沃思",
+            "en": "Co-founder"
+          },
+          "source": "https://canonical.com/company",
+          "photo": null
+        }
+      ],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Palantir",
+      "platform": "lever",
+      "source": "palantir",
+      "people": [
+        {
+          "name": "Alex Karp",
+          "role": {
+            "zh": "亚历克斯·卡普",
+            "en": "Co-founder"
+          },
+          "source": "https://www.palantir.com/about/",
+          "photo": null
+        }
+      ],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Figma",
+      "platform": "greenhouse",
+      "source": "figma",
+      "people": [
+        {
+          "name": "Dylan Field",
+          "role": {
+            "zh": "迪伦·菲尔德",
+            "en": "Co-founder"
+          },
+          "source": "https://www.figma.com/blog/meet-us-in-the-browser/",
+          "photo": {
+            "file": "Dylan Field 2008 (cropped).jpg",
+            "author": "Joi Ito",
+            "license": "CC BY 2.0",
+            "date": "",
+            "caption": {
+              "zh": "迪伦·菲尔德",
+              "en": "Dylan Field"
+            },
+            "location": {
+              "zh": "公开活动或肖像拍摄",
+              "en": "Documented public portrait"
+            }
+          }
+        },
+        {
+          "name": "Evan Wallace",
+          "role": {
+            "zh": "埃文·华莱士",
+            "en": "Co-founder"
+          },
+          "source": "https://www.figma.com/blog/meet-us-in-the-browser/",
+          "photo": null
+        }
+      ],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Discord",
+      "platform": "greenhouse",
+      "source": "discord",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Reddit",
+      "platform": "greenhouse",
+      "source": "reddit",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Airtable",
+      "platform": "greenhouse",
+      "source": "airtable",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Robinhood",
+      "platform": "greenhouse",
+      "source": "robinhood",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "GitLab",
+      "platform": "greenhouse",
+      "source": "gitlab",
+      "people": [
+        {
+          "name": "Dmitriy Zaporozhets",
+          "role": {
+            "zh": "德米特里·扎波罗热茨",
+            "en": "Co-founder"
+          },
+          "source": "https://about.gitlab.com/blog/letter-from-shareholders/",
+          "photo": null
+        },
+        {
+          "name": "Sytse Sijbrandij",
+          "role": {
+            "zh": "西泽·西布兰迪",
+            "en": "Co-founder"
+          },
+          "source": "https://about.gitlab.com/blog/letter-from-shareholders/",
+          "photo": null
+        }
+      ],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Cloudflare",
+      "platform": "greenhouse",
+      "source": "cloudflare",
+      "people": [
+        {
+          "name": "Matthew Prince",
+          "role": {
+            "zh": "马修·普林斯",
+            "en": "Co-founder"
+          },
+          "source": "https://www.cloudflare.com/our-story/",
+          "photo": {
+            "file": "Co-founder and CEO of Cloudflare Matthew Prince.jpg",
+            "author": "Noam Galai / TechCrunch",
+            "license": "CC BY 2.0",
+            "date": "",
+            "caption": {
+              "zh": "马修·普林斯",
+              "en": "Matthew Prince"
+            },
+            "location": {
+              "zh": "公开活动或肖像拍摄",
+              "en": "Documented public portrait"
+            }
+          }
+        },
+        {
+          "name": "Michelle Zatlyn",
+          "role": {
+            "zh": "米歇尔·扎特林",
+            "en": "Co-founder"
+          },
+          "source": "https://www.cloudflare.com/our-story/",
+          "photo": null
+        },
+        {
+          "name": "Lee Holloway",
+          "role": {
+            "zh": "李·霍洛韦",
+            "en": "Co-founder"
+          },
+          "source": "https://www.cloudflare.com/our-story/",
+          "photo": null
+        }
+      ],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Vercel",
+      "platform": "greenhouse",
+      "source": "vercel",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Wise",
+      "platform": "greenhouse",
+      "source": "wise",
+      "people": [
+        {
+          "name": "Kristo Käärmann",
+          "role": {
+            "zh": "克里斯托·卡尔曼",
+            "en": "Co-founder"
+          },
+          "source": "https://wise.com/imaginary-v2/images/66edcbaae5e13b596fd612fede0a9482-Wise_Prospectus.pdf",
+          "photo": null
+        },
+        {
+          "name": "Taavet Hinrikus",
+          "role": {
+            "zh": "塔韦特·欣里库斯",
+            "en": "Co-founder"
+          },
+          "source": "https://wise.com/imaginary-v2/images/66edcbaae5e13b596fd612fede0a9482-Wise_Prospectus.pdf",
+          "photo": null
+        }
+      ],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Coursera",
+      "platform": "greenhouse",
+      "source": "coursera",
+      "people": [
+        {
+          "name": "Daphne Koller",
+          "role": {
+            "zh": "达芙妮·科勒",
+            "en": "Co-founder"
+          },
+          "source": "https://about.coursera.org/About/",
+          "photo": null
+        },
+        {
+          "name": "Andrew Ng",
+          "role": {
+            "zh": "吴恩达",
+            "en": "Co-founder"
+          },
+          "source": "https://about.coursera.org/About/",
+          "photo": null
+        }
+      ],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Notion",
+      "platform": "ashby",
+      "source": "notion",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Linear",
+      "platform": "ashby",
+      "source": "linear",
+      "people": [
+        {
+          "name": "Karri Saarinen",
+          "role": {
+            "zh": "卡里·萨里宁",
+            "en": "Co-founder"
+          },
+          "source": "https://linear.app/about",
+          "photo": null
+        },
+        {
+          "name": "Jori Lallo",
+          "role": {
+            "zh": "约里·拉洛",
+            "en": "Co-founder"
+          },
+          "source": "https://linear.app/about",
+          "photo": null
+        },
+        {
+          "name": "Tuomas Artman",
+          "role": {
+            "zh": "图奥马斯·阿特曼",
+            "en": "Co-founder"
+          },
+          "source": "https://linear.app/about",
+          "photo": null
+        }
+      ],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Perplexity",
+      "platform": "ashby",
+      "source": "perplexity",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "ElevenLabs",
+      "platform": "ashby",
+      "source": "elevenlabs",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Cursor",
+      "platform": "ashby",
+      "source": "cursor",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Replit",
+      "platform": "ashby",
+      "source": "replit",
+      "people": [
+        {
+          "name": "Amjad Masad",
+          "role": {
+            "zh": "阿姆贾德·马萨德",
+            "en": "Co-founder"
+          },
+          "source": "https://replit.com/about/",
+          "photo": null
+        },
+        {
+          "name": "Haya Odeh",
+          "role": {
+            "zh": "哈雅·奥德",
+            "en": "Co-founder"
+          },
+          "source": "https://replit.com/about/",
+          "photo": null
+        }
+      ],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "PostHog",
+      "platform": "ashby",
+      "source": "posthog",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Gusto",
+      "platform": "greenhouse",
+      "source": "gusto",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Deepgram",
+      "platform": "ashby",
+      "source": "deepgram",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "ClickUp",
+      "platform": "ashby",
+      "source": "clickup",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Greenhouse",
+      "platform": "greenhouse",
+      "source": "greenhouse",
+      "people": [
+        {
+          "name": "Daniel Chait",
+          "role": {
+            "zh": "丹尼尔·蔡特",
+            "en": "Co-founder"
+          },
+          "source": "https://www.greenhouse.com/blog/a-thank-you-to-greenhouse-president-and-co-founder-jon-stross",
+          "photo": null
+        },
+        {
+          "name": "Jon Stross",
+          "role": {
+            "zh": "乔恩·斯特罗斯",
+            "en": "Co-founder"
+          },
+          "source": "https://www.greenhouse.com/blog/a-thank-you-to-greenhouse-president-and-co-founder-jon-stross",
+          "photo": null
+        }
+      ],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Binance",
+      "platform": "lever",
+      "source": "binance",
+      "people": [
+        {
+          "name": "Changpeng Zhao",
+          "role": {
+            "zh": "赵长鹏",
+            "en": "Co-founder"
+          },
+          "source": "https://www.binance.com/en/about",
+          "photo": {
+            "file": "Changpeng Zhao (2018).jpg",
+            "author": "Smorshedi",
+            "license": "CC BY-SA 4.0",
+            "date": "",
+            "caption": {
+              "zh": "赵长鹏",
+              "en": "Changpeng Zhao"
+            },
+            "location": {
+              "zh": "公开活动或肖像拍摄",
+              "en": "Documented public portrait"
+            }
+          }
+        },
+        {
+          "name": "Yi He",
+          "role": {
+            "zh": "何一",
+            "en": "Co-founder"
+          },
+          "source": "https://www.binance.com/en/about",
+          "photo": null
+        }
+      ],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Anduril",
+      "platform": "greenhouse",
+      "source": "andurilindustries",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Airwallex",
+      "platform": "ashby",
+      "source": "airwallex",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Harvey",
+      "platform": "ashby",
+      "source": "harvey",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Flexport",
+      "platform": "greenhouse",
+      "source": "flexport",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Form Energy",
+      "platform": "ashby",
+      "source": "formenergy",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Ramp",
+      "platform": "ashby",
+      "source": "ramp",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Twilio",
+      "platform": "greenhouse",
+      "source": "twilio",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Cohere",
+      "platform": "ashby",
+      "source": "cohere",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Mercor",
+      "platform": "ashby",
+      "source": "mercor",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Cognition",
+      "platform": "ashby",
+      "source": "cognition",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "ShopBack",
+      "platform": "lever",
+      "source": "shopback-2",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Vanta",
+      "platform": "ashby",
+      "source": "vanta",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "Ashby",
+      "platform": "ashby",
+      "source": "ashby",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "AlphaSights Campus Recruiting",
+      "platform": "greenhouse",
+      "source": "alphasightsresumedrop",
+      "people": [],
+      "workplaces": [],
+      "relationship": {
+        "zh": "AlphaSights 校园招聘来源，不是独立企业",
+        "en": "AlphaSights campus recruitment board, not a separate company"
+      }
+    },
+    {
+      "company": "General Robotics",
+      "platform": "ashby",
+      "source": "generalrobotics",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    },
+    {
+      "company": "SpaceX Global",
+      "platform": "greenhouse",
+      "source": "spacexglobal",
+      "people": [],
+      "workplaces": [],
+      "relationship": {
+        "zh": "SpaceX 国际招聘来源，不是另一家经过核实的独立企业",
+        "en": "International SpaceX job board, not a separately verified company"
+      }
+    },
+    {
+      "company": "Headway",
+      "platform": "ashby",
+      "source": "headway",
+      "people": [],
+      "workplaces": [],
+      "relationship": null
+    }
+  ]
+}
