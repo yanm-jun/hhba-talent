@@ -33,6 +33,7 @@ jobs:
         run: |
           node --test scripts/all-companies-registry.contract.test.mjs
           node --test scripts/complete-50-company-profiles.test.mjs
+          node --test scripts/company-visual-media.contract.test.mjs
           node --test scripts/company-profiles.contract.test.mjs
           node --test scripts/job-origin-navigation.contract.test.mjs
           node --test scripts/white-market-detail.contract.test.mjs
