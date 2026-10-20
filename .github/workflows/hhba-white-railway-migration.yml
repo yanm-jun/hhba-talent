@@ -26,7 +26,7 @@ jobs:
       - name: Build white HHBA + current official ATS reader
         run: docker build -f Dockerfile.hhba -t hhba-white-migration:test .
       - name: Start local Railway-compatible image
-        run: docker run -d --name hhba-acceptance --publish 127.0.0.1:8765:8080 --env PORT=8080 hhba-white-migration:test
+        run: docker run -d --name hhba-acceptance --publish 127.0.0.1:8765:8080 --env PORT=8080 --env HHBA_PUBLIC_CI_ONLY=1 hhba-white-migration:test
       - name: Validate white SPA, API isolation and verified public evidence
         run: |
           node --input-type=module <<'NODE'
