@@ -15,7 +15,8 @@ test('only genuine employer source identities may receive one of three logos',()
    "job.company==='Anthropic' && job.source==='anthropic' && job.platform==='greenhouse'",
    "job.company==='SpaceX' && job.source==='spacex' && job.platform==='greenhouse'"
  ])assert.ok(brands.includes(expected),expected);
- assert.ok(brands.includes("brand==='anthropic'?'claude':brand"));
+ assert.ok(brands.includes("verifiedBrandAssetUrl(target)"));
+ assert.ok(brands.includes("asset?.company==='Anthropic'?'Claude 品牌标识（Anthropic）'"));
  assert.ok(brands.includes('onError={()=>setBroken(true)}'));
  assert.ok(brands.includes('<Building2'));
 });
