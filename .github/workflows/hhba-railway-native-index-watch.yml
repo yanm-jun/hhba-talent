@@ -1,0 +1,54 @@
+name: HHBA Railway Native Index Health Watch
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/hhba-railway-native-index-watch.yml']
+  workflow_dispatch:
+  schedule:
+    - cron: '25 */6 * * *'
+permissions:
+  contents: read
+jobs:
+  official-index-health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify the Railway white site's native official index is fresh and consistent
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const site='https://hhba-web-production-024c.up.railway.app';
+          const get=async path=>fetch(site+path,{headers:{Accept:'application/json'},
+            signal:AbortSignal.timeout(25000)});
+          const health=await get('/health');
+          assert.equal(health.status,200);
+          const status=await get('/api/official-index/status');
+          assert.equal(status.status,200);
+          const state=await status.json();
+          assert.equal(state.nativeReadEnabled,true);
+          assert.equal(state.nativePublishEnabled,true);
+          assert.equal(state.available,true);
+          assert.ok(state.jobs>=10000);
+          assert.ok(state.facets>=8000);
+          const age=Date.now()-Date.parse(state.updated);
+          assert.ok(Number.isFinite(age)&&age>=-5*60000&&age<23*3600000,
+            'native official index exceeded freshness threshold');
+          const feed=await get('/data/jobs.json');
+          assert.equal(feed.status,200);
+          assert.equal(feed.headers.get('x-hhba-index-source'),'railway-verified-volume');
+          const jobs=await feed.json();
+          assert.equal(jobs.total,state.jobs);
+          assert.equal(jobs.failures,0);
+          const facets=await get('/data/job-search-facets.json');
+          assert.equal(facets.status,200);
+          const index=await facets.json();
+          assert.equal(index.indexed_as_of,jobs.updated);
+          assert.equal(index.extracted_count,state.facets);
+          console.log('HHBA_NATIVE_INDEX_HEALTHY',JSON.stringify({
+            jobs:state.jobs,facets:state.facets,source:'Railway durable volume',
+            ageHours:Number((age/3600000).toFixed(2))
+          }));
+          NODE
