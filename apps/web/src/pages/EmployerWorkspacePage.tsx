@@ -4,6 +4,7 @@ import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
 import {api,ApiError,employerApiReady,type EmployerPosting,type EmployerPostingInput,type Organization,type TalentSearchCandidate,type User} from '../services/api';
 import '../styles/employer-workspace.css';
+import {EmployerApplicantPanel} from '../components/EmployerApplicantPanel';
 const blank:EmployerPostingInput={title:'',description:'',requirements:'',location:'',work_mode:'onsite',recruitment_type:'SOCIAL',apply_url:''};
 const messages:Record<string,string>={
  draft:'仅自己与所属企业可见',pending_review:'待平台岗位审核',published:'已公开',rejected:'审核未通过',closed:'已关闭'
@@ -16,7 +17,7 @@ export function EmployerWorkspacePage({user}:{user:User|null}){
  const [postings,setPostings]=useState<EmployerPosting[]>([]);
  const [form,setForm]=useState<EmployerPostingInput>(blank);
  const [editing,setEditing]=useState<string|null>(null);
- const [tab,setTab]=useState<'jobs'|'talent'>('jobs');
+ const [tab,setTab]=useState<'jobs'|'talent'|'applications'>('jobs');
  const [loading,setLoading]=useState(true);
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
@@ -72,6 +73,7 @@ export function EmployerWorkspacePage({user}:{user:User|null}){
    <nav className="employer-ws-tabs" aria-label="企业工作台功能">
     <button className={tab==='jobs'?'active':''} onClick={()=>setTab('jobs')}><FilePlus2 size={17}/> 岗位发布与管理</button>
     <button className={tab==='talent'?'active':''} onClick={()=>setTab('talent')}><Users size={17}/> 授权人才搜索</button>
+    <button className={tab==='applications'?'active':''} onClick={()=>setTab('applications')}><ClipboardCheck size={17}/> 收到的求职申请</button>
    </nav>
    {notice&&<p role="status" className="employer-ws-notice">{notice}</p>}
    {tab==='jobs'?<div className="employer-ws-layout">
@@ -95,7 +97,7 @@ export function EmployerWorkspacePage({user}:{user:User|null}){
        {p.status!=='closed'&&<button disabled={busy} onClick={()=>void action(p,'close')}><XCircle size={13}/> 关闭</button>}
       </div></article>)}
     </section>
-   </div>:<section className="employer-ws-card employer-ws-search">
+   </div>:tab==='applications'?<EmployerApplicantPanel oid={oid} postings={postings}/>:<section className="employer-ws-card employer-ws-search">
     <div className="employer-ws-card-heading"><Search size={19}/><div><h2>只搜索已授权的求职者</h2><p>需要企业、招聘经办人和组织权限全部有效。求职者撤回授权后不能继续被搜索；原始简历和联系方式不会展示。</p></div></div>
     <form onSubmit={e=>{e.preventDefault();void findTalents(1)}} className="employer-ws-filters">
      <label>关键词<input maxLength={200} value={search.keywords} onChange={e=>setSearch({...search,keywords:e.target.value})} placeholder="例如：新能源汽车门店运营"/></label>
