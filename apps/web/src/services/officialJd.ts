@@ -192,7 +192,8 @@ function readGreenhouseJsonp(endpoint:string,signal:AbortSignal):Promise<any> {
   });
 }
 // Retain the existing Railway service only as a verified JD API for the white site.
-const JD_API_ORIGIN='https://hhba-web-production-024c.up.railway.app';
+// Avoid cross-origin calls when the white frontend and verified ATS reader share Railway.
+const JD_API_ORIGIN=import.meta.env.VITE_HHBA_VERIFIED_SNAPSHOT==='1' ? '' : 'https://hhba-web-production-024c.up.railway.app';
 const htmlToBlocks=(raw:string):OfficialJdBlock[]=>{
   let section:OfficialJdBlock['section']='other';
   return raw.split(/\n{2,}/).map(entry=>{
