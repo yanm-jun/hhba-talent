@@ -12,6 +12,7 @@ import { openJobSyncStore } from "./jd-sync-store.mjs";
 import { startOverseasJdWorker } from "./jd-sync-worker.mjs";
 import { createFullJdWorker } from "./jd-sync-runner.mjs";
 import { translateWithSourceNumbers } from "./number-locked-translation.mjs";
+import {readNativeIndex} from "./read-official-index.mjs";
 const phrases:[string,string][]=[
  ["Integration Technician","集成技术员"],["Test Technician","测试技术员"],
  ["Manufacturing Engineer","制造工程师"],["Supply Chain Manager","供应链经理"],
@@ -1408,6 +1409,18 @@ async function whiteSnapshot(name:string):Promise<Response>{
  const headers={"Content-Type":"application/json; charset=utf-8",
   "Cache-Control":"no-store","X-Content-Type-Options":"nosniff"};
  if(!WHITE_PUBLIC_DATA.has(name))return Response.json({error:"INVALID_SNAPSHOT_PATH"},{status:404,headers});
+ if(Bun.env.HHBA_NATIVE_INDEX_READ==="1"){
+  try{
+   // No pointer on a fresh volume: existing Pages publisher stays available.
+   // A corrupt/expired native index is rejected instead of silently serving bad data.
+   const native=await readNativeIndex("/sync-state/public-index",name);
+   if(native)return new Response(native.bytes,{headers:{...headers,
+     "X-HHBA-Index-Source":"railway-verified-volume"}});
+  }catch(e){
+   console.error("HHBA_NATIVE_INDEX_REJECTED",e instanceof Error?e.message:"unknown");
+   return Response.json({error:"RAILWAY_EVIDENCE_REJECTED"},{status:503,headers});
+  }
+ }
  const cached=whiteSnapshotCache.get(name);
  if(cached&&cached.expires>Date.now())return new Response(cached.bytes,{headers});
  try{
