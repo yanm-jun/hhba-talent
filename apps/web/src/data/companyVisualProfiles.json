@@ -886,7 +886,17 @@
       "company": "Cursor",
       "platform": "ashby",
       "source": "cursor",
-      "people": [],
+      "people": [
+        {
+          "name": "Michael Truell",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.notion.com/blog/first-block-with-michael-truell",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
