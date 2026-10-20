@@ -9,7 +9,13 @@ import { loadPublicJobAudit } from '../services/jobSyncStatus';
 import type { User } from '../services/api';
 import '../styles/company-profiles.css';
 
-const knownIds=new Map([['OpenAI','openai'],['Anthropic','anthropic'],['SpaceX','spacex']]);
+function reviewedLegacySlug(item:EmployerDirectoryRecord):string|null{
+ const {company,platform,source}=item.identity;
+ if(company==='OpenAI'&&platform==='ashby'&&source==='openai')return 'openai';
+ if(company==='Anthropic'&&platform==='greenhouse'&&source==='anthropic')return 'anthropic';
+ if(company==='SpaceX'&&platform==='greenhouse'&&source==='spacex')return 'spacex';
+ return null;
+}
 export function CompanyDirectoryPage({user}:{user:User|null}){
  const [records,setRecords]=useState<EmployerDirectoryRecord[]>([]);
  const [loading,setLoading]=useState(true);
@@ -60,16 +66,12 @@ export function CompanyDirectoryPage({user}:{user:User|null}){
     </p>
     <div className="company-directory-grid">
      {matching.slice(0,limit).map(item=><Link className="company-directory-card" key={item.id}
-        to={knownIds.get(item.identity.company)&&
-            ((item.identity.company==='OpenAI'&&item.identity.platform==='ashby'&&item.identity.source==='openai')||
-            (item.identity.company==='Anthropic'&&item.identity.platform==='greenhouse'&&item.identity.source==='anthropic')||
-            (item.identity.company==='SpaceX'&&item.identity.platform==='greenhouse'&&item.identity.source==='spacex'))
-         ?'/companies/'+knownIds.get(item.identity.company):'/companies/id/'+item.id}>
+        to={reviewedLegacySlug(item)?'/companies/'+reviewedLegacySlug(item):'/companies/id/'+item.id}>
        <span className="company-directory-icon"><Building2 size={21}/></span>
        <span className="company-directory-card-text">
         <strong>{item.identity.company}</strong>
         <small>{item.identity.platform} · {item.jobCount} 条已核验招聘记录</small>
-        <em>{knownIds.has(item.identity.company)?'企业信息与岗位':'企业介绍待完善 · 查看岗位'}</em>
+        <em>{reviewedLegacySlug(item)?'已审核的企业介绍与岗位':'企业介绍待完善 · 查看岗位'}</em>
        </span><ArrowRight size={17}/>
      </Link>)}
     </div>
