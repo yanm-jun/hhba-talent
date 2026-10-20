@@ -1683,6 +1683,16 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
   }
   const result=await officialDetail(job);
   if(!result)return new Response("官方职位详情暂不可用，请从招聘列表进入企业官网",{status:503,headers});
+  if(durableJobStore&&result.status==="LIVE_CONTENT"&&result.description){
+    // Opportunistically save the checked English original (never trigger MT).
+    // A later GET can use it instantly, while the background worker fills zh.
+    try{
+     const sourceHash=createHash("sha256").update(result.description).digest("hex");
+     const segments=jdChunks(result.description);
+     if(segments.length>0&&segments.length<=150)
+      durableJobStore.sourceVersion(job.id,sourceHash,segments.length,result.description);
+    }catch(e){console.warn("HHBA_JD_SOURCE_CACHE_SKIPPED",e instanceof Error?e.message:"unknown");}
+  }
   if(u.pathname.startsWith("/api/"))return Response.json(result,{headers});
   const zhJd=await translatedDetail(result);
   return new Response(detailHtml(result,zhJd),{headers:{...headers,"Content-Type":"text/html; charset=utf-8"}});
