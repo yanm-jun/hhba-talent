@@ -21,7 +21,7 @@ test('unfiltered market never blocks on the 14k facet index',()=>{
  assert.ok(index.includes('if(!audit || audit.summary.indexed_as_of!==snapshot.updated)'));
  assert.ok(index.includes('if(unfiltered)return {...current,jobs:current.jobs.slice(offset,offset+30)'));
  assert.ok(index.includes('return searchPreview(current,filters,offset,index!.facets)'));
- assert.ok(index.includes('loadOfficialPublicSnapshot(signal):Promise<LivePage>'));
+ assert.ok(index.includes('loadOfficialPublicSnapshot(signal:AbortSignal):Promise<LivePage>'));
 });
 test('default stays limited to audited true jobs and search pagination still work',()=>{
  assert.ok(market.includes('loadVerifiedFeaturedJobs(controller.signal)'));
