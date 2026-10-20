@@ -56,3 +56,24 @@ jobs:
       - name: Test real PostgreSQL bounded talent search and immediate revocation
         working-directory: apps/api
         run: python -m pytest -q tests/test_phase3a_postgres.py
+
+      - name: Confirm production rejects insecure CORS or unmounted private records
+        working-directory: apps/api
+        run: |
+          python - <<'PY'
+          import os,sys,subprocess
+          base={**os.environ,'RAILWAY_ENVIRONMENT_ID':'ci-synthetic-only'}
+          def blocked(overrides,expected):
+              env={**base,**overrides}
+              proc=subprocess.run([sys.executable,'-c','import app.main'],
+                  env=env,text=True,capture_output=True,timeout=12)
+              assert proc.returncode!=0
+              assert expected in proc.stderr, (expected,proc.stderr[-1200:])
+          blocked({'HHBA_ACCOUNT_ALLOWED_ORIGIN':'http://example.org'},
+                  'HHBA_ACCOUNT_EXACT_HTTPS_ORIGIN_REQUIRED')
+          blocked({'HHBA_ACCOUNT_ALLOWED_ORIGIN':'https://hhba-web-production-024c.up.railway.app'},
+                  'HHBA_ACCOUNT_PRIVATE_VERIFICATION_VOLUME_REQUIRED')
+          print('HHBA_ACCOUNT_PRODUCTION_SECURITY_GATES_PASS')
+          PY
+      - name: Build minimal isolated HTTP API container
+        run: docker build -f apps/api/Dockerfile.http -t hhba-account-api:synthetic apps/api
