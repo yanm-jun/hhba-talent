@@ -94,6 +94,7 @@ jobs:
             }
             const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
             await page.goto('http://127.0.0.1:4183/',{waitUntil:'domcontentloaded'});
+            await page.locator('.home-company-marquee-track').waitFor({timeout:20000});
             const reduced=await page.evaluate(()=>{
               const track=document.querySelector('.home-company-marquee-track'),
                 box=document.querySelector('.home-company-marquee-window'),
