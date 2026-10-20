@@ -107,10 +107,25 @@ class VerificationReview(Base):
  __tablename__='verification_reviews'; id: Mapped[UUID]=mapped_column(primary_key=True,default=uuid4); organization_id: Mapped[UUID]=mapped_column(ForeignKey('organizations.id',ondelete='CASCADE'),index=True); reviewer_user_id: Mapped[UUID]=mapped_column(ForeignKey('users.id')); evidence_version: Mapped[int]=mapped_column(Integer); evidence_snapshot_id: Mapped[UUID]=mapped_column(ForeignKey('verification_evidence_snapshots.id')); evidence_manifest_sha256: Mapped[str]=mapped_column(String(64)); entity_verification: Mapped[str]=mapped_column(String(32),default='not_verified'); representative_verification: Mapped[str]=mapped_column(String(32),default='not_verified'); authorization_verification: Mapped[str]=mapped_column(String(32),default='not_verified'); outcome: Mapped[str]=mapped_column(String(32)); reason_code: Mapped[str]=mapped_column(String(80)); created_at: Mapped[datetime]=mapped_column(DateTime(timezone=True),default=now)
 class PlatformServiceGate(Base):
  __tablename__='platform_service_gates'; gate_key: Mapped[str]=mapped_column(String(64),primary_key=True); enabled: Mapped[bool]=mapped_column(Boolean,default=False); reviewed_at: Mapped[datetime|None]=mapped_column(DateTime(timezone=True)); reviewed_by: Mapped[UUID|None]=mapped_column(ForeignKey('users.id')); reason_code: Mapped[str|None]=mapped_column(String(80))
+IS_RAILWAY_PRODUCTION=bool(os.getenv('RAILWAY_ENVIRONMENT_ID'))
+if IS_RAILWAY_PRODUCTION:
+ if not os.getenv('DATABASE_URL') or not os.environ['DATABASE_URL'].startswith(('postgresql://','postgresql+psycopg://')):
+  raise RuntimeError('HHBA_ACCOUNT_PRODUCTION_POSTGRES_REQUIRED')
+ raw_origin=os.getenv('HHBA_ACCOUNT_ALLOWED_ORIGIN','')
+ origin_parts=urlsplit(raw_origin)
+ if not (origin_parts.scheme=='https' and origin_parts.hostname and
+  origin_parts.hostname not in {'localhost','127.0.0.1'} and
+  not origin_parts.username and not origin_parts.password and not origin_parts.port and
+  not origin_parts.query and not origin_parts.fragment and origin_parts.path in {'','/'}):
+  raise RuntimeError('HHBA_ACCOUNT_EXACT_HTTPS_ORIGIN_REQUIRED')
+ CORS_ORIGINS=[raw_origin.rstrip('/')]
+else:
+ CORS_ORIGINS=['http://127.0.0.1:3000','http://127.0.0.1:3001',
+  'http://127.0.0.1:3002','http://127.0.0.1:3003','http://127.0.0.1:5173']
 DATABASE_URL=os.getenv('DATABASE_URL','postgresql+psycopg://hhba_app:CHANGE_ME_LOCAL_ONLY@127.0.0.1:5432/hhba_dev')
 if DATABASE_URL.startswith('postgresql://'):DATABASE_URL='postgresql+psycopg://'+DATABASE_URL.removeprefix('postgresql://')
 engine=create_engine(DATABASE_URL,pool_pre_ping=True); SessionLocal=sessionmaker(bind=engine,expire_on_commit=False); pwd=PasswordHash.recommended(); app=FastAPI(title='HHBA API',version='0.1.0')
-app.add_middleware(CORSMiddleware,allow_origins=['http://127.0.0.1:3000','http://127.0.0.1:3001','http://127.0.0.1:3002','http://127.0.0.1:3003','http://127.0.0.1:5173'],allow_credentials=True,allow_methods=['GET','POST','PUT','PATCH','DELETE'],allow_headers=['Content-Type','X-CSRF-Token'])
+app.add_middleware(CORSMiddleware,allow_origins=CORS_ORIGINS,allow_credentials=True,allow_methods=['GET','POST','PUT','PATCH','DELETE'],allow_headers=['Content-Type','X-CSRF-Token'])
 def db():
  s=SessionLocal()
  try: yield s
@@ -194,14 +209,14 @@ def login(x:Login,res:Response,r:Request,s:Session=Depends(db)):
  u=s.scalar(select(User).where(User.email==str(x.email).casefold()))
  if not u or not pwd.verify(x.password,u.password_hash):audit(s,r,'auth.login','denied','session');s.commit();raise HTTPException(401,'invalid credentials')
  if x.account_type and not has_identity(s,u.id,x.account_type):audit(s,r,'auth.login.identity_denied','denied','session',u.id,{'account_type':x.account_type});s.commit();raise HTTPException(403,'account identity does not match this entry')
- t=secrets.token_urlsafe(32);q=AuthSession(user_id=u.id,token_hash=hashlib.sha256(t.encode()).hexdigest(),csrf=secrets.token_urlsafe(32),expires_at=now()+timedelta(hours=8));s.add(q);audit(s,r,'auth.login','success','session',u.id);s.commit();res.set_cookie('hhba_session',t,httponly=True,samesite='lax');return {'csrf_token':q.csrf,'role':u.role}
+ t=secrets.token_urlsafe(32);q=AuthSession(user_id=u.id,token_hash=hashlib.sha256(t.encode()).hexdigest(),csrf=secrets.token_urlsafe(32),expires_at=now()+timedelta(hours=8));s.add(q);audit(s,r,'auth.login','success','session',u.id);s.commit();res.set_cookie('hhba_session',t,httponly=True,samesite='lax',secure=IS_RAILWAY_PRODUCTION);return {'csrf_token':q.csrf,'role':u.role}
 @app.get('/api/v1/auth/me')
 def me(a=Depends(auth),s:Session=Depends(db)):
  identities=[row.identity_type for row in s.scalars(select(BusinessIdentity).where(BusinessIdentity.user_id==a[0].id,BusinessIdentity.status=='active'))]
  return {'id':str(a[0].id),'email':a[0].email,'display_name':a[0].name,'role':a[0].role,'account_types':identities,'csrf_token':a[1].csrf}
 @app.delete('/api/v1/auth/session')
 def logout(res:Response,r:Request,a=Depends(csrf),s:Session=Depends(db)):
- a[1].revoked_at=now();audit(s,r,'auth.logout','success','session',a[0].id);s.commit();res.delete_cookie('hhba_session');return {'ok':True}
+ a[1].revoked_at=now();audit(s,r,'auth.logout','success','session',a[0].id);s.commit();res.delete_cookie('hhba_session',samesite='lax',secure=IS_RAILWAY_PRODUCTION);return {'ok':True}
 @app.post('/api/v1/auth/register/candidate',status_code=201)
 def register_candidate(x:Register,r:Request,s:Session=Depends(db)):
  return reg(Register(email=x.email,password=x.password,display_name=x.display_name,account_type='candidate'),r,s)
@@ -245,6 +260,8 @@ def org(x:OrgIn,r:Request,a=Depends(csrf),s:Session=Depends(db)):
  if not has_identity(s,a[0].id,'recruiter'):raise HTTPException(403,'recruiter identity required')
  o=Organization(legal_name=x.legal_name,created_by=a[0].id);s.add(o);s.flush();s.add(Membership(organization_id=o.id,user_id=a[0].id,role='owner'));s.add(OrganizationVerification(organization_id=o.id,applicant_user_id=a[0].id,legal_name=x.legal_name,status='draft'));s.add(RecruiterOrganizationAuthorization(organization_id=o.id,user_id=a[0].id,role='organization_owner',status='draft'));audit(s,r,'organization.create','success',f'organization:{o.id}',a[0].id);s.commit();return {'id':str(o.id),'status':o.status}
 VERIFICATION_ROOT=os.path.abspath(os.getenv('HHBA_VERIFICATION_ROOT','./private_verification_documents'))
+if IS_RAILWAY_PRODUCTION and not os.path.realpath(VERIFICATION_ROOT).startswith('/account-private/verification'):
+ raise RuntimeError('HHBA_ACCOUNT_PRIVATE_VERIFICATION_VOLUME_REQUIRED')
 def verification_owner(s,oid,user_id):
  member=active_membership(oid,user_id,s);return bool(member and member.role=='owner' and has_identity(s,user_id,'recruiter'))
 def verification_view(row,docs,person=None):
@@ -622,6 +639,8 @@ def events(a=Depends(auth),s:Session=Depends(db)):
  if a[0].role!='admin':raise HTTPException(403,'administrator role required')
  return {'events':[{'action':e.action,'outcome':e.outcome,'resource':e.resource} for e in s.scalars(select(Audit))]}
 UPLOAD_ROOT=os.path.abspath(os.getenv('HHBA_UPLOAD_ROOT','./private_uploads'))
+if IS_RAILWAY_PRODUCTION and not os.path.realpath(UPLOAD_ROOT).startswith('/account-private/resumes'):
+ raise RuntimeError('HHBA_ACCOUNT_PRIVATE_RESUME_VOLUME_REQUIRED')
 MAX_PARSE_ATTEMPTS=int(os.getenv('HHBA_PARSE_MAX_ATTEMPTS','3'))
 @app.post('/api/v1/me/resumes',status_code=201)
 async def upload_resume(r:Request,file:UploadFile=File(...),a=Depends(candidate_csrf),s:Session=Depends(db)):
