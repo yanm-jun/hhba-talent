@@ -1,0 +1,46 @@
+name: HHBA Instant Prepared Bilingual JD CI
+on:
+  push:
+    branches: [feat/complete-bilingual-jd-precompute-20261020]
+    paths: ['ops/legacy-marketplace/**','apps/web/**','Dockerfile.hhba','.github/workflows/hhba-instant-bilingual-jd.yml']
+  pull_request:
+    paths: ['ops/legacy-marketplace/**','apps/web/**','Dockerfile.hhba','.github/workflows/hhba-instant-bilingual-jd.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full-bilingual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22',cache: 'npm',cache-dependency-path: 'apps/web/package-lock.json'}
+      - name: Test priority catalog, source metadata and no foreground MT
+        run: |
+          node --test ops/legacy-marketplace/test/jd-precompute.contract.test.mjs
+          node --test apps/web/scripts/white-market-detail.contract.test.mjs
+      - name: Build production Railway image with Bun worker and React
+        run: docker build -f Dockerfile.hhba -t hhba-instant-bilingual:ci .
+      - name: Start and check fast prepared-only endpoint on isolated synthetic container
+        run: |
+          docker run -d --name hhba-bilingual-smoke -p 127.0.0.1:8902:8080 -e PORT=8080 -e HHBA_PUBLIC_CI_ONLY=1 hhba-instant-bilingual:ci
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const url='http://127.0.0.1:8902';
+          let good=false;
+          for(let n=0;n<25;n++){
+           try{let r=await fetch(url+'/health');if(r.ok){good=true;break}}catch{}
+           await new Promise(resolve=>setTimeout(resolve,600));
+          }
+          assert.ok(good,'white frontend failed to boot');
+          const r=await fetch(url+'/api/jobs/greenhouse-notreal-000/ready-jd');
+          assert.ok([202,404,503].includes(r.status));
+          const status=await fetch(url+'/api/jd-ready/status');
+          assert.equal(status.status,200);
+          const parsed=await status.json();
+          assert.equal(parsed.noForegroundTranslation,true);
+          console.log('HHBA_PREPARED_JD_BACKEND_BOOT_OK',{cachePersistent:parsed.persistent});
+          NODE
+      - if: always()
+        run: docker rm -f hhba-bilingual-smoke || true
