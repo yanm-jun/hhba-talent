@@ -24,7 +24,7 @@ export async function readNativeIndex(root,name){
  catch{throw Error("NATIVE_INDEX_MANIFEST_MISSING")}
  if(manifest.kind!=="HHBA_RAILWAY_PUBLIC_INDEX_V1"||
   manifest.version!==pointer.version||manifest.updated!==pointer.updated||
-  !Number.isInteger(manifest.jobs)||manifest.jobs<1000||
+  !Number.isInteger(manifest.jobs)||manifest.jobs<1||
   !Number.isInteger(manifest.facets)||manifest.facets<0||
   !PUBLIC_INDEX_FILES.has(name)||!Array.from(PUBLIC_INDEX_FILES).every(x=>/^[a-f0-9]{64}$/.test(manifest.files?.[x]||"")))
   throw Error("NATIVE_INDEX_MANIFEST_INVALID");
