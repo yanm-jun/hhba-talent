@@ -111,3 +111,7 @@ a.unified-company-brand:focus-visible,.unified-detail-company-link:focus-visible
 .unified-detail-company-link:hover small{text-decoration:underline}
 .unified-company-filter-clear{margin-left:9px;border:1px solid #c4d9cb;color:#2b6044;padding:3px 8px;background:#fff;border-radius:6px;font-size:11px;cursor:pointer}
 .unified-company-filter-clear:hover{background:#edf6ef}
+
+.unified-job-browse-links{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.unified-job-browse-links>a{display:inline-flex;gap:6px;align-items:center;color:#2a6749;text-decoration:none;font-size:12px;font-weight:650}
+.unified-job-browse-links>a:hover{text-decoration:underline}
