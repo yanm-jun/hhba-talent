@@ -3,11 +3,13 @@ import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 import {officialLink,normalize,validateBoards,endpoint,isTalentPool} from "../catalog.mjs";
 const registry=JSON.parse(readFileSync(new URL("../boards.json",import.meta.url),"utf8"));
-test("board registry retains baseline 36 and has new candidates",()=>{
- assert.equal(registry.boards.length,40);
- assert.equal(validateBoards(registry.boards).length,40);
+test("board registry retains baseline 36 and seven source candidates",()=>{
+ assert.equal(registry.boards.length,43);
+ assert.equal(validateBoards(registry.boards).length,43);
  assert.ok(registry.boards.some(b=>b.company==="OpenAI"&&b.platform==="ashby"));
  assert.ok(registry.boards.some(b=>b.company==="Form Energy"));
+ for(const company of ["Sierra","Monzo","Duolingo University Recruitment"])
+  assert.ok(registry.boards.some(b=>b.company===company));
 });
 test("host allowlist rejects dangerous, non-official, and misattributed URLs",()=>{
  const b={platform:"ashby",company:"Cursor",slug:"cursor"};
@@ -34,4 +36,29 @@ test("talent pool placeholders are not counted as specific jobs",()=>{
  assert.equal(isTalentPool("Open Application"),true);
  assert.equal(isTalentPool("Senior Software Engineer"),false);
  assert.equal(isTalentPool("Marketing Intern"),false);
+});
+
+import {parseJobQuery,matchesJobQuery} from "../query.mjs";
+test("Chinese country + role filters English metadata without false location matches",()=>{
+ const query=parseJobQuery("新加坡软件工程师");
+ assert.equal(matchesJobQuery({title:"Software Engineer",location:"Singapore",remote:false},query),true);
+ assert.equal(matchesJobQuery({title:"Software Engineer",location:"Austin, United States",remote:false},query),false);
+ assert.equal(matchesJobQuery({title:"Sales Manager",location:"Singapore",remote:false},query),false);
+});
+test("Remote only does not treat unspecified remote as true",()=>{
+ const query=parseJobQuery("美国销售远程");
+ assert.equal(matchesJobQuery({title:"Sales Executive",location:"New York, USA",remote:true},query),true);
+ assert.equal(matchesJobQuery({title:"Sales Executive",location:"New York, USA",remote:null},query),false);
+ assert.equal(matchesJobQuery({title:"Sales Executive",location:"Singapore",remote:true},query),false);
+});
+test("Degree unspecified is not misrepresented as no degree required",()=>{
+ const query=parseJobQuery("不限学历的远程工作");
+ assert.equal(query.degreeUnknown,true);
+ assert.ok(query.warnings[0].includes("尚未核实学历要求"));
+ assert.equal(matchesJobQuery({title:"Sales Executive",location:"Remote",remote:null},query),false);
+ assert.equal(matchesJobQuery({title:"Sales Executive",location:"Remote",remote:true},query),true);
+});
+test("United States abbreviation does not match Business by substring",()=>{
+ const query=parseJobQuery("美国销售");
+ assert.equal(matchesJobQuery({title:"Sales Executive",location:"Business Park",remote:false},query),false);
 });
