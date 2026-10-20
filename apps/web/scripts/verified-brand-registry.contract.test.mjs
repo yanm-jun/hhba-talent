@@ -98,3 +98,16 @@ test('Railway serves only vetted SVG and PNG files and preserves CSP protection'
  assert.ok(server.includes('"X-Content-Type-Options":"nosniff"'));
  assert.ok(server.includes('"Content-Security-Policy":"default-src'));
 });
+
+test('Headway's only published brand is its own ATS-board uploaded employer image, not Ashby favicon or same-name business',()=>{
+ const item=registry.records.find(x=>x.company==='Headway'&&x.platform==='ashby'&&x.source==='headway');
+ assert.ok(item);
+ assert.equal(item.file,'brand-headway.png');
+ assert.equal(item.kind,'brand-board-icon');
+ const meta=proof.records.find(x=>x.file===item.file);
+ assert.equal(meta?.sourcePage,'https://jobs.ashbyhq.com/headway');
+ assert.match(meta?.sourceUrl||'',/^https:\/\/app\.ashbyhq\.com\/api\/images\/org-theme-logo\//);
+ assert.ok(meta?.attribution?.includes('not Ashby\'s generic favicon'));
+ assert.equal(meta?.sha256,'11d2003cf45ad6f6257f2f93bc14a1bfdbb7d3a2b94eca76883b387f930ad64a');
+ assert.ok(!registry.records.some(x=>x.company==='Headway Inc'||x.company==='Headway Digital Studio'));
+});
