@@ -58,7 +58,7 @@ export function IndexedCompanyPage({encodedId,user}:{encodedId:string;user:User|
   setLang(value);
   try{sessionStorage.setItem('hhba.jobs.language',value)}catch{}
  };
- if(status==='missing'||!identity)return <Shell user={user}>
+ if(!identity||(status==='missing'&&!editorial))return <Shell user={user}>
   <section className="company-profile unknown-company">
    <h1>{lang==='zh'?'企业资料尚未建立或来源已变更':'Company source not found'}</h1>
    <p>{lang==='zh'?'没有可与此企业身份对应的近期已核验职位，不能创建没有来源支撑的企业档案。':
@@ -84,7 +84,7 @@ export function IndexedCompanyPage({encodedId,user}:{encodedId:string;user:User|
    <EmployerBrandLogo identity={identity} variant="profile"/>
    <div className="company-profile-identity">
     <div className="company-profile-eyebrow">HHBA · COMPANY PROFILE</div>
-    <h1>{status==='ready'?identity.company:(lang==='zh'?'正在核验企业身份…':'Verifying employer identity…')}</h1>
+    <h1>{status==='ready'||editorial?identity.company:(lang==='zh'?'正在核验企业身份…':'Verifying employer identity…')}</h1>
     <p>{editorial?.tagline[lang]||(lang==='zh'?'企业介绍 · 资料待完善':'Company profile · Editorial pending')}</p>
    </div>
    {sourceUrl&&<a className="company-profile-website" href={sourceUrl}
@@ -98,7 +98,7 @@ export function IndexedCompanyPage({encodedId,user}:{encodedId:string;user:User|
     {editorial?(lang==='zh'?'已审核':'Reviewed'):(lang==='zh'?'待审核':'Pending review')}</span>
    {editorial&&<><span>{editorial.industry[lang]}</span>
     <span>{editorial.country[lang]}</span>
-    <span>{lang==='zh'?'成立于':'Founded'} {editorial.founded}</span></>}
+    {editorial.founded!=='—'&&<span>{lang==='zh'?'成立于':'Founded'} {editorial.founded}</span>}</>}
   </div>
   <p className="company-profile-editorial"><ShieldCheck size={16}/>
    {lang==='zh'
@@ -144,7 +144,7 @@ export function IndexedCompanyPage({encodedId,user}:{encodedId:string;user:User|
     </div>
     <Link to="/candidate/jobs">{lang==='zh'?'返回招聘市场':'Job market'} <ArrowRight size={15}/></Link>
    </div>
-   {status==='loading'?<p role="status" className="company-profile-jobs-state">
+   {status==='missing'?<p role="status" className="company-profile-jobs-state">{lang==='zh'?'目前没有可展示的近期已核验职位；企业资料仍可独立阅读。':'No recently verified openings can be displayed; the company profile remains available.'}</p>:status==='loading'?<p role="status" className="company-profile-jobs-state">
     {lang==='zh'?'正在核验该企业招聘岗位…':'Verifying employer job listings…'}</p>:
     status==='error'?<div className="company-profile-jobs-state" role="alert">
      <span>{lang==='zh'?error:'The job index is temporarily unavailable.'}</span>
