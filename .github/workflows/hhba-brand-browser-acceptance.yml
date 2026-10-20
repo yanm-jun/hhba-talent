@@ -27,8 +27,21 @@ jobs:
           try{
            const page=await browser.newPage({viewport:{width:1440,height:1000}});
            page.on('pageerror',err=>console.warn('WEB_JS_ERROR',err.message.slice(0,160)));
+           const metrics={jobs:0,audit:0,facets:0};
+           page.on('request',r=>{
+             if(r.url().endsWith('/data/jobs.json'))metrics.jobs++;
+             if(r.url().endsWith('/data/job-sync-status.json'))metrics.audit++;
+             if(r.url().endsWith('/data/job-search-facets.json'))metrics.facets++;
+           });
+           const started=Date.now();
            await page.goto('https://hhba-web-production-024c.up.railway.app/candidate/jobs',{waitUntil:'domcontentloaded',timeout:90000});
-           await page.waitForFunction(()=>document.querySelectorAll('.unified-job-card').length>=6,{timeout:90000});
+           await page.waitForFunction(()=>document.querySelectorAll('.unified-job-card').length>=6,null,{timeout:15000});
+           const marketMs=Date.now()-started;
+           console.log('HHBA_FAST_MARKET_METRICS',JSON.stringify({marketMs,requests:metrics}));
+           assert.ok(marketMs<15000,'featured card loading is unreasonably slow');
+           assert.equal(metrics.facets,0,'default market unexpectedly downloads 14k JD facets');
+           assert.ok(metrics.jobs<=1,'duplicated full job feed download');
+           assert.ok(metrics.audit<=1,'duplicated audit feed download');
            await page.waitForFunction(()=>
              Array.from(document.querySelectorAll('.unified-job-card')).slice(0,6).every(node=>{
                const img=node.querySelector('.unified-brand-logo img');
