@@ -1,0 +1,87 @@
+name: HHBA 28 Brand Logos Railway Browser Acceptance
+on:
+  push:
+    branches: [test/verified-brand-icons-live-20261020]
+    paths: ['.github/workflows/hhba-verified-brand-browser.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Isolated Chromium
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.0
+          npx playwright install --with-deps chromium
+      - name: Check all original SVG SHA hashes and actual first-class employer logos
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {createHash} from 'node:crypto';
+          import {readFileSync} from 'node:fs';
+          import {chromium} from 'playwright';
+          const base='https://hhba-web-production-024c.up.railway.app';
+          const reg=JSON.parse(readFileSync('apps/web/src/data/verifiedBrandAssets.json','utf8'));
+          const provenance=JSON.parse(readFileSync('apps/web/public/brands/PROVENANCE.json','utf8'));
+          const jobs=await fetch(base+'/data/jobs.json',{signal:AbortSignal.timeout(45000)}).then(r=>{
+            assert.equal(r.status,200);return r.json();
+          });
+          let active=[];
+          for(const brand of reg.records){
+            const matches=jobs.jobs.filter(j=>j.company===brand.company&&j.platform===brand.platform&&j.source===brand.source);
+            if(matches.length)active.push({brand:brand.company,board:brand.source,jobs:matches.length});
+            const res=await fetch(base+'/brands/'+brand.file,{signal:AbortSignal.timeout(20000)});
+            assert.equal(res.status,200,'brand SVG not available on Railway '+brand.file);
+            assert.ok(res.headers.get('content-type')?.startsWith('image/svg+xml'));
+            const data=Buffer.from(await res.arrayBuffer());
+            assert.ok(data.toString().includes('<svg'));
+            const sha=createHash('sha256').update(data).digest('hex');
+            assert.equal(sha,provenance.records.find(p=>p.file===brand.file)?.sha256,
+               'online brand bytes do not match pinned original '+brand.file);
+          }
+          const missing=await fetch(base+'/brands/si-not-a-reviewed-brand.svg');
+          assert.equal(missing.status,404,'unknown brands cannot be served');
+          assert.ok(active.length>=15,'too few registered employers actually appear in live ATS feed');
+          console.log('HHBA_REAL_BRAND_SOURCE_COVERAGE',JSON.stringify({registered:reg.records.length,activeEmployers:active.length,active,shaVerified:reg.records.length}));
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          try{
+           const page=await browser.newPage({viewport:{width:1440,height:950}});
+           page.on('pageerror',e=>console.warn('WEB_JS_WARNING',e.message.slice(0,160)));
+           await page.goto(base+'/companies',{waitUntil:'domcontentloaded',timeout:75000});
+           await page.locator('.company-directory-card').first().waitFor({timeout:45000});
+           const checkNames=active.filter(x=>!['OpenAI','Anthropic','SpaceX'].includes(x.brand))
+               .sort((a,b)=>b.jobs-a.jobs).slice(0,6).map(x=>x.brand);
+           assert.equal(checkNames.length,6);
+           for(const name of checkNames){
+             const search=page.getByRole('textbox',{name:'搜索企业资料库'});
+             await search.fill(name);
+             const entry=page.locator('.company-directory-card').filter({has:page.locator('strong', {hasText:name})}).first();
+             await entry.waitFor({timeout:30000});
+             const img=entry.locator('.unified-brand-logo img');
+             await img.waitFor({timeout:12000});
+             await img.evaluate(async node=>{if(!node.complete)await new Promise(resolve=>node.addEventListener('load',resolve,{once:true}))});
+             const width=await img.evaluate(node=>node.naturalWidth);
+             assert.ok(width>0,'brand icon not visibly loaded for '+name);
+             console.log('HHBA_DIRECTORY_BRAND_LOADED',JSON.stringify({company:name,source:await img.getAttribute('src'),width}));
+             await search.fill('');
+           }
+           const chosen=checkNames[0];
+           await page.getByRole('textbox',{name:'搜索企业资料库'}).fill(chosen);
+           const companyLink=page.locator('.company-directory-card').filter({has:page.locator('strong',{hasText:chosen})}).first();
+           await companyLink.click();
+           await page.waitForURL(/\/companies\//,{timeout:15000});
+           const profileImg=page.locator('.company-profile-brand img');
+           await profileImg.waitFor({timeout:20000});
+           await page.waitForFunction(()=>document.querySelector('.company-profile-brand img')?.naturalWidth>0,null,{timeout:22000});
+           await page.locator('.company-profile-job-card').first().waitFor({timeout:45000});
+           const href=await page.locator('.company-profile-job-card').first().getAttribute('href');
+           assert.ok(href?.startsWith('/candidate/jobs/'));
+           console.log('HHBA_BRANDS_RAILWAY_BROWSER_ACCEPTED',JSON.stringify({registered:reg.records.length,
+              new:reg.records.length-3,directoryLogoSamples:6,companyProfileLogo:chosen,realJobLinked:true}));
+          }finally{await browser.close()}
+          NODE
