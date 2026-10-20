@@ -222,6 +222,7 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  const [jdError,setJdError]=useState('');
  const [jdLoading,setJdLoading]=useState(false);
  const [jdRetry,setJdRetry]=useState(0);
+ const [allowLiveEnglish,setAllowLiveEnglish]=useState(false);
  const [chineseJd,setChineseJd]=useState('');
  const [translationPrepared,setTranslationPrepared]=useState(false);
  const [translateError,setTranslateError]=useState('');
@@ -252,26 +253,33 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
    setJd(null);setChineseJd('');setTranslateError('');
    setTranslationPrepared(false);setJdError('');setJdLoading(true);
    (async()=>{
+     // The only AUTOMATIC request reads the already saved bilingual document.
+     // A slow employer ATS or LibreTranslate is never on the page-load path.
      const prepared=await fetchPreparedBilingualJd(job,controller.signal);
      if(prepared){
        if(!controller.signal.aborted){
          setJd(prepared.jd);
          setChineseJd(prepared.chinese||'');
          setTranslationPrepared(prepared.ready);
+         if(!prepared.ready)setTranslateError('后台正在补齐完整中文译文；当前已保存英文官方原文。');
        }
        return;
      }
-     // Unprepared postings remain readable in official English. No user-side MT.
+     if(!allowLiveEnglish){
+       if(!controller.signal.aborted)setJdError('此岗位的完整 JD 尚未完成后台同步。可直接前往企业官网阅读，或主动尝试读取英文原文。');
+       return;
+     }
+     // Explicitly requested English-only fallback; NEVER start Chinese MT.
      const english=await fetchOfficialJd(job,controller.signal);
      if(!controller.signal.aborted){
        setJd(english);
-       setTranslateError('中文完整译文正在后台准备，请使用 English 先阅读官方原文。');
+       setTranslateError('完整中文译文仍在后台准备，当前仅提供未经翻译的官方英文原文。');
      }
    })().catch(e=>{
      if(!controller.signal.aborted)setJdError(e instanceof Error?e.message:'职位原文暂不可用');
    }).finally(()=>{if(!controller.signal.aborted)setJdLoading(false)});
    return()=>controller.abort();
- },[job,jdRetry]);
+ },[job,jdRetry,allowLiveEnglish]);
  const official=job?safeOfficialJobUrl(job):null;
  const segmentName:Record<string,{zh:string,en:string}>={
    responsibilities:{zh:'岗位职责',en:'Responsibilities'},
@@ -304,8 +312,12 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
          <p>{lang==='zh'?'该岗位的完整官方职位说明暂未获取成功。':'The full official description for this role is temporarily unavailable.'}</p>
          <small>{lang==='zh'?jdError:'The employer source could not be verified; requirements will not be invented.'}</small>
          <button type="button" className="unified-jd-retry" onClick={()=>setJdRetry(n=>n+1)}>
-           <RefreshCcw size={14}/>{lang==='zh'?'重新获取岗位职责与任职要求':'Retry official job description'}
+           <RefreshCcw size={14}/>{lang==='zh'?'检查已同步的职位':'Check prepared document'}
          </button>
+         {!allowLiveEnglish&&<button type="button" className="unified-jd-retry"
+           onClick={()=>setAllowLiveEnglish(true)}>
+           {lang==='zh'?'手动读取官方英文原文':'Read original English on demand'}
+         </button>}
        </div>:
        jd?<div className="unified-jd-content">
          <p className="unified-jd-source">{lang==='zh'?'官方内容核验时间：':'Official content checked: '}
