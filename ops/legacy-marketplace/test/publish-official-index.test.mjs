@@ -11,13 +11,14 @@ const job=i=>({id:'ashby-example-'+i,company:'Example',title:'Engineer',
 async function fixtures(root,modified={}){
  const folder=join(root,'incoming');await mkdir(folder,{recursive:true});
  const updated=new Date().toISOString();
+ const checked_at=new Date().toISOString();
  const docs={
   'jobs.json':{jobs:[job(1),job(2)],total:2,updated,failures:0},
-  'job-sync-status.json':{summary:{kind:'HHBA_OFFICIAL_FULL_JOB_JD_AUDIT_V1',indexed_as_of:updated,total_indexed_jobs:2},
+  'job-sync-status.json':{summary:{kind:'HHBA_OFFICIAL_FULL_JOB_JD_AUDIT_V1',indexed_as_of:updated,total_indexed_jobs:2,checked_at},
     jobs:[{job_id:job(1).id},{job_id:job(2).id}]},
   'job-sync-summary.json':{indexed_as_of:updated,total_indexed_jobs:2},
   'job-search-facets.json':{kind:'HHBA_OFFICIAL_JD_SEARCH_FACETS_V1',indexed_as_of:updated,total_indexed_jobs:2,
-   extracted_count:2,jobs:[{id:job(1).id},{id:job(2).id}]}
+   extracted_count:2,jobs:[{id:job(1).id,original_source_hash:'a'.repeat(64)},{id:job(2).id,original_source_hash:'b'.repeat(64)}]}
  };
  for(const [name,value] of Object.entries({...docs,...modified})){
   await writeFile(join(folder,name),JSON.stringify(value));
@@ -56,5 +57,43 @@ test('rejects raw employer descriptions, resumes and unauthorized fields',async(
   docs['jobs.json'].jobs[0].description='Private details not for public snapshot';
   await writeFile(join(folder,'jobs.json'),JSON.stringify(docs['jobs.json']));
   await assert.rejects(publishIndex(folder,dest,{minJobs:2}),/JOB_METADATA_ONLY_POLICY/);
+ }finally{await rm(root,{recursive:true,force:true})}
+});
+
+test('a new audit of unchanged job listings produces a new immutable version',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'hhba-publisher-'));
+ try{
+  const {folder,docs}=await fixtures(root),dest=join(root,'volume');
+  const first=await publishIndex(folder,dest,{minJobs:2});
+  docs['job-sync-status.json'].summary.checked_at=new Date(Date.now()+1000).toISOString();
+  await writeFile(join(folder,'job-sync-status.json'),JSON.stringify(docs['job-sync-status.json']));
+  const second=await publishIndex(folder,dest,{minJobs:2});
+  assert.notEqual(second.version,first.version);
+  assert.equal(JSON.parse(await readFile(join(dest,'current.json'),'utf8')).version,second.version);
+ }finally{await rm(root,{recursive:true,force:true})}
+});
+test('duplicate facet IDs or cross-source evidence must fail before pointer publication',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'hhba-publisher-'));
+ try{
+  const {folder,docs}=await fixtures(root),dest=join(root,'volume');
+  docs['job-search-facets.json'].jobs[1].id=job(1).id;
+  await writeFile(join(folder,'job-search-facets.json'),JSON.stringify(docs['job-search-facets.json']));
+  await assert.rejects(publishIndex(folder,dest,{minJobs:2}),/DUPLICATE_FACETS/);
+  await assert.rejects(readFile(join(dest,'current.json'),'utf8'),/ENOENT/);
+ }finally{await rm(root,{recursive:true,force:true})}
+});
+test('publication refuses an older complete snapshot and retains newer pointer',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'hhba-publisher-'));
+ try{
+  const {folder,docs}=await fixtures(root),dest=join(root,'volume');
+  await publishIndex(folder,dest,{minJobs:2});
+  const before=await readFile(join(dest,'current.json'),'utf8');
+  docs['jobs.json'].updated=new Date(Date.now()-120000).toISOString();
+  docs['job-sync-status.json'].summary.indexed_as_of=docs['jobs.json'].updated;
+  docs['job-sync-summary.json'].indexed_as_of=docs['jobs.json'].updated;
+  docs['job-search-facets.json'].indexed_as_of=docs['jobs.json'].updated;
+  for(const name of Object.keys(docs))await writeFile(join(folder,name),JSON.stringify(docs[name]));
+  await assert.rejects(publishIndex(folder,dest,{minJobs:2}),/REFUSE_OLDER_SOURCE_SNAPSHOT/);
+  assert.equal(await readFile(join(dest,'current.json'),'utf8'),before);
  }finally{await rm(root,{recursive:true,force:true})}
 });
