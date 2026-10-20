@@ -1,0 +1,68 @@
+name: HHBA Railway white live domain smoke
+on:
+  push:
+    branches: [test/white-railway-live-smoke-20261020]
+    paths: ['.github/workflows/hhba-railway-live-domain-smoke.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify real Railway domain is the white HHBA with intact ATS API
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const host='https://hhba-web-production-024c.up.railway.app';
+          async function get(path,timeout=25000) {
+           const r=await fetch(host+path,{redirect:'manual',signal:AbortSignal.timeout(timeout),headers:{Accept:path.endsWith('.json')||path.startsWith('/api')?'application/json':'text/html'}});
+           return r;
+          }
+          const health=await get('/health');
+          assert.equal(health.status,200,'Railway health');
+          const h=await health.json();
+          assert.equal(h.frontendReady,true,'white build absent');
+          assert.equal(h.kind,'hhba-white-ats-railway');
+          const home=await get('/');
+          assert.equal(home.status,200,'white site should not redirect to Pages');
+          const html=await home.text();
+          assert.match(html,/<div id="root"><\/div>/);
+          assert.match(html,/<title>HHBA/);
+          const js=html.match(/src="(\/assets\/[^"]+\.js)"/);
+          assert.ok(js,'missing white Vite JS bundle');
+          const script=await get(js[1]);
+          assert.equal(script.status,200,'frontend bundle unavailable');
+          assert.match(await script.text(),/我要应聘|我要招人/,'white dual-entry UI absent');
+          for(const path of ['/candidate/jobs','/employer','/recruiter/register']) {
+           const r=await get(path);
+           assert.equal(r.status,200,'white deep-route missing: '+path);
+           assert.match(await r.text(),/<div id="root"><\/div>/);
+          }
+          const feed=await get('/data/jobs.json',45000);
+          assert.equal(feed.status,200,'job snapshot unavailable');
+          const listing=await feed.json();
+          assert.ok(listing.jobs.length>10000,'global job index shrank drastically');
+          const facets=await get('/data/job-search-facets.json',45000);
+          assert.equal(facets.status,200,'Chinese filters unavailable');
+          const indexed=await facets.json();
+          assert.equal(indexed.indexed_as_of,listing.updated);
+          const sync=await get('/api/jd-sync/status');
+          assert.equal(sync.status,200,'JD sync endpoint lost');
+          const search=await get('/api/jobs/page?q=OpenAI&limit=1',45000);
+          assert.equal(search.status,200,'official live query lost');
+          const result=await search.json();
+          assert.ok(result.total>0,'official search returned no jobs');
+          const unknown=await get('/api/jobs/greenhouse-fakecompany-9999999999');
+          assert.equal(unknown.status,404,'fake job accepted');
+          const account=await get('/api/v1/auth/me');
+          assert.notEqual((account.headers.get('content-type')||'').split(';')[0],'text/html','unconfigured authenticated API must not spoof page');
+          console.log('HHBA_RAILWAY_WHITE_LIVE_ACCEPTED',JSON.stringify({
+           origin:host,jobs:listing.jobs.length,facets:indexed.jobs.length,
+           updated:listing.updated,searchJobs:result.total,routeTests:3,white:true
+          }));
+          NODE
