@@ -1374,15 +1374,101 @@ if(durableJobStore && privateTranslatorUrl()){
   intervalMs:JD_SYNC_INTERVAL_MS});
 }
 
+// The white HHBA React app is compiled into /app/white-site at Docker build.
+// Until the independent ATS evidence job is migrated, the same public and
+// time-limited evidence snapshots are read from Pages via a strict allowlist.
+// Source failure fails closed. No user data, resumes or cookies are proxied.
+const WHITE_PUBLIC_ROOT="/app/white-site";
+const WHITE_SNAPSHOT_ORIGIN="https://yanm-jun.github.io";
+const WHITE_SNAPSHOT_BASE="/hhba-talent/data/";
+const WHITE_PUBLIC_DATA=new Set([
+ "jobs.json","job-sync-status.json","job-sync-summary.json",
+ "job-search-facets.json"
+]);
+const whiteSnapshotCache=new Map<string,{expires:number,bytes:Uint8Array}>();
+const WHITE_MAX_SNAPSHOT_BYTES=32*1024*1024;
+async function whiteSnapshot(name:string):Promise<Response>{
+ const headers={"Content-Type":"application/json; charset=utf-8",
+  "Cache-Control":"no-store","X-Content-Type-Options":"nosniff"};
+ if(!WHITE_PUBLIC_DATA.has(name))return Response.json({error:"INVALID_SNAPSHOT_PATH"},{status:404,headers});
+ const cached=whiteSnapshotCache.get(name);
+ if(cached&&cached.expires>Date.now())return new Response(cached.bytes,{headers});
+ try{
+  const src=await fetch(WHITE_SNAPSHOT_ORIGIN+WHITE_SNAPSHOT_BASE+name,{
+   method:"GET",redirect:"error",signal:AbortSignal.timeout(20000),
+   headers:{"Accept":"application/json"}});
+  if(!src.ok||Number(src.headers.get("content-length")||0)>WHITE_MAX_SNAPSHOT_BYTES)
+   throw Error("REMOTE_SNAPSHOT_NOT_READY");
+  const bytes=new Uint8Array(await src.arrayBuffer());
+  if(!bytes.length||bytes.byteLength>WHITE_MAX_SNAPSHOT_BYTES)
+   throw Error("SNAPSHOT_OUT_OF_BOUNDS");
+  // Only public JSON objects are cached. Never proxy raw HTML or untrusted URLs.
+  const data=JSON.parse(new TextDecoder().decode(bytes));
+  if(!data||typeof data!=="object"||Array.isArray(data))
+   throw Error("SNAPSHOT_INVALID_JSON");
+  if(name==="jobs.json"){
+   if(!Array.isArray(data.jobs)||!Number.isFinite(Date.parse(data.updated))||
+      data.failures!==0||Math.abs(Date.now()-Date.parse(data.updated))>24*3600000)
+     throw Error("UNVERIFIED_JOB_SNAPSHOT");
+  }else if(name==="job-search-facets.json"){
+   if(data.kind!=="HHBA_OFFICIAL_JD_SEARCH_FACETS_V1"||
+     !Number.isFinite(Date.parse(data.indexed_as_of))||
+     Math.abs(Date.now()-Date.parse(data.indexed_as_of))>24*3600000)
+     throw Error("STALE_JOB_FACETS");
+  }else if(name==="job-sync-status.json"){
+   if(data.summary?.kind!=="HHBA_OFFICIAL_FULL_JOB_JD_AUDIT_V1"||
+      !Number.isFinite(Date.parse(data.summary.indexed_as_of))||
+      Math.abs(Date.now()-Date.parse(data.summary.indexed_as_of))>24*3600000)
+     throw Error("STALE_JOB_AUDIT");
+  }
+  if(whiteSnapshotCache.size>8)whiteSnapshotCache.clear();
+  whiteSnapshotCache.set(name,{expires:Date.now()+90000,bytes});
+  return new Response(bytes,{headers});
+ }catch{
+  return Response.json({error:"PUBLIC_EVIDENCE_TEMPORARILY_UNAVAILABLE"},{status:503,headers});
+ }
+}
+const WHITE_SPA_ROUTES=/^\/(?:candidate(?:\/.*)?|employer(?:\/.*)?|recruiter(?:\/.*)?|auth|workspace|public\/[^/?#]+|admin(?:\/.*)?)$/;
+async function whiteSiteResponse(req:Request,u:URL):Promise<Response|null>{
+ if(req.method!=="GET"&&req.method!=="HEAD")return null;
+ const p=u.pathname;
+ if(p.startsWith("/data/")){
+  const match=p.match(/^\/data\/([a-z-]+\.json)$/);
+  return match?whiteSnapshot(match[1]):
+   Response.json({error:"NOT_FOUND"},{status:404});
+ }
+ if(p.startsWith("/assets/")){
+  if(!/^\/assets\/[A-Za-z0-9._-]{1,180}$/.test(p))
+   return new Response("Not found",{status:404});
+  const asset=Bun.file(WHITE_PUBLIC_ROOT+p);
+  if(!await asset.exists())return new Response("Not found",{status:404});
+  return new Response(req.method==="HEAD"?null:asset,{headers:{
+   "Content-Type":asset.type||"application/octet-stream",
+   "Cache-Control":"public, max-age=31536000, immutable",
+   "X-Content-Type-Options":"nosniff"
+  }});
+ }
+ if(p==="/"||p==="/jobs"||WHITE_SPA_ROUTES.test(p)){
+  const index=Bun.file(WHITE_PUBLIC_ROOT+"/index.html");
+  if(!await index.exists())return new Response("White frontend not built",{status:503});
+  return new Response(req.method==="HEAD"?null:index,{headers:{
+   "Content-Type":"text/html; charset=utf-8",
+   "Cache-Control":"no-store",
+   "X-Content-Type-Options":"nosniff",
+   "Referrer-Policy":"no-referrer"
+  }});
+ }
+ return null;
+}
+
 Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  const u=new URL(req.url);
- // The WHITE HHBA is the sole user-facing job marketplace. Keep these
- // existing Railway JSON/JD/translation APIs reachable for the white reader.
- if(req.method==="GET"&&(u.pathname==="/"||u.pathname==="/jobs"))
-  return Response.redirect("https://yanm-jun.github.io/hhba-talent/",302);
+ // Preserve old /jobs/:id deep links on the NEW white hostname.
  const oldJobRoute=u.pathname.match(new RegExp("^/jobs/([A-Za-z0-9_-]{1,180})$"));
  if(req.method==="GET"&&oldJobRoute)
-  return Response.redirect("https://yanm-jun.github.io/hhba-talent/candidate/jobs/"+encodeURIComponent(oldJobRoute[1]),302);
+  return Response.redirect(u.origin+"/candidate/jobs/"+encodeURIComponent(oldJobRoute[1]),302);
+ const whiteResponse=await whiteSiteResponse(req,u);
+ if(whiteResponse)return whiteResponse;
  const headers:Record<string,string>={"Cache-Control":"no-store","X-Content-Type-Options":"nosniff","X-Frame-Options":"DENY","Referrer-Policy":"no-referrer"};
  const pagesRequest=req.headers.get("origin")==="https://yanm-jun.github.io" &&
    /^\/api\/jobs\/[A-Za-z0-9_-]{1,180}(?:\/translate-part)?$/.test(u.pathname);
@@ -1397,7 +1483,7 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
    return new Response(null,{status:204,headers});
  if(req.method==="POST"&&/^\/api\/jobs\/[a-zA-Z0-9_-]{1,180}\/translate-part$/.test(u.pathname))return readJobForTranslation(req,u,headers);
  if(req.method!=="GET")return new Response("Method not allowed",{status:405,headers});
- if(u.pathname==="/health")return Response.json({ok:true,kind:"hhba-ats-public-preview"},{headers});
+ if(u.pathname==="/health"){const frontendReady=await Bun.file(WHITE_PUBLIC_ROOT+"/index.html").exists();return Response.json({ok:frontendReady,kind:"hhba-white-ats-railway",frontendReady},{status:frontendReady?200:503,headers});}
  if(u.pathname==="/api/jd-sync/status"){
   return Response.json(durableJobStore?{...durableJobStore.coverage(),
    enabled:true,persistent:true,
