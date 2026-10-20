@@ -1,0 +1,94 @@
+name: HHBA All 50 Genuine Company Marks Live
+on:
+  push:
+    branches: [test/all-50-company-logos-live-20261020]
+    paths: ['.github/workflows/hhba-50-logos-live.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  official-icons-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Install Playwright Chromium without touching HHBA dependencies
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.0
+          npx playwright install --with-deps chromium
+      - name: Validate 50 authentic local files, source matching and actual Headway company pages
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {createHash} from 'node:crypto';
+          import {readFileSync} from 'node:fs';
+          import {chromium} from 'playwright';
+          const base='https://hhba-web-production-024c.up.railway.app';
+          const records=JSON.parse(readFileSync('apps/web/src/data/verifiedBrandAssets.json')).records;
+          const proofs=JSON.parse(readFileSync('apps/web/public/brands/PROVENANCE.json')).records;
+          assert.equal(records.length,50);
+          assert.equal(proofs.length,50);
+          const headway=records.find(x=>x.company==='Headway'&&x.platform==='ashby'&&x.source==='headway');
+          assert.equal(headway?.file,'brand-headway.png');
+          assert.equal(headway?.kind,'brand-board-icon');
+          const evidence=proofs.find(x=>x.file===headway.file);
+          assert.equal(evidence?.sourcePage,'https://jobs.ashbyhq.com/headway');
+          assert.ok(evidence?.sourceUrl?.startsWith('https://app.ashbyhq.com/api/images/org-theme-logo/'));
+          const pause=ms=>new Promise(r=>setTimeout(r,ms));
+          let ready=false;
+          for(let t=0;t<22;t++){
+           try{
+            const res=await fetch(base+'/brands/brand-headway.png',{signal:AbortSignal.timeout(9000)});
+            ready=res.status===200;
+            if(ready)break;
+            console.log('WAIT_FOR_DEPLOY',t,res.status);
+           }catch(e){console.log('WAIT_FOR_DEPLOY_NETWORK',String(e).slice(0,100))}
+           await pause(9500);
+          }
+          assert.ok(ready,'50th employer image has not deployed to Railway');
+          const index=await fetch(base+'/data/jobs.json',{signal:AbortSignal.timeout(55000)});
+          assert.equal(index.status,200);
+          const jobs=(await index.json()).jobs;
+          await Promise.all(records.map(async r=>{
+           const real=jobs.some(j=>j.company===r.company&&j.platform===r.platform&&j.source===r.source);
+           assert.ok(real,'no real official ATS board for '+r.company);
+           const p=proofs.find(p=>p.file===r.file&&p.company===r.company);
+           assert.ok(p,'missing brand origin evidence '+r.company);
+           const data=await fetch(base+'/brands/'+r.file,{signal:AbortSignal.timeout(25000)});
+           assert.equal(data.status,200,'missing original asset '+r.file);
+           assert.ok(data.headers.get('content-type')?.startsWith(r.file.endsWith('.png')?'image/png':'image/svg+xml'));
+           const bytes=Buffer.from(await data.arrayBuffer());
+           assert.equal(createHash('sha256').update(bytes).digest('hex'),p.sha256,
+            'image bytes differ from original provenance '+r.company);
+          }));
+          console.log('HHBA_50_LOGOS_ORIGINAL_SHA_ACCEPTED',JSON.stringify({registered:50,originalSHA:50,officialAtsMatches:50,PNGAndSVG:true}));
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          const page=await browser.newPage({viewport:{width:1440,height:900}});
+          try{
+           await page.goto(base+'/companies',{waitUntil:'domcontentloaded',timeout:80000});
+           await page.locator('.company-directory-card').first().waitFor({timeout:60000});
+           const input=page.getByRole('textbox',{name:'搜索企业资料库'});
+           for(const name of ['Headway','Anduril','Twilio','Vanta','General Robotics']){
+            await input.fill(name);
+            const card=page.locator('.company-directory-card').filter({has:page.locator('strong',{hasText:name})}).first();
+            await card.waitFor({timeout:20000});
+            const img=card.locator('.unified-brand-logo img');
+            await img.waitFor({timeout:15000});
+            await page.waitForFunction(name=>[...document.querySelectorAll('.company-directory-card')].some(card=>
+             card.querySelector('strong')?.textContent?.trim()===name &&
+             card.querySelector('.unified-brand-logo img')?.naturalWidth>0),name,{timeout:20000});
+            console.log('HHBA_50_BRAND_RENDERED',JSON.stringify({company:name,file:await img.getAttribute('src')}));
+           }
+           await input.fill('Headway');
+           const item=page.locator('.company-directory-card').filter({has:page.locator('strong',{hasText:'Headway'})}).first();
+           await item.click();
+           await page.waitForURL(/\/companies\/id\//,{timeout:15000});
+           await page.waitForFunction(()=>document.querySelector('.company-profile-brand img')?.naturalWidth>0,null,{timeout:20000});
+           await page.locator('.company-profile-job-card').first().waitFor({timeout:45000});
+           assert.ok((await page.locator('.company-profile-job-card').first().getAttribute('href')).startsWith('/candidate/jobs/'));
+           console.log('HHBA_ALL_50_COMPANY_LOGOS_LIVE_ACCEPTED',JSON.stringify({coverage:'50/50',headwaySource:'original-Ashby-employer-og-image',
+             correctHeadwayLogo:true,directoryExamples:5,companyJobLinks:true}));
+          }finally{await browser.close()}
+          NODE
