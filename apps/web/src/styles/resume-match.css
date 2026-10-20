@@ -78,10 +78,13 @@
 @media(max-width:800px){.hhba-ai-layout{grid-template-columns:1fr}.hhba-ai-aside{display:none}.hhba-ai-reasons{grid-template-columns:1fr}}
 @media(max-width:600px){.hhba-ai-page{padding:18px 16px 65px}.hhba-ai-upload{padding:18px}.hhba-ai-fields{grid-template-columns:1fr}.hhba-ai-profile-grid{grid-template-columns:1fr}.hhba-ai-job-header{flex-wrap:wrap}.hhba-ai-hero h1{font-size:28px}.hhba-ai-results-head{flex-wrap:wrap}}
 
-.home-match-promo{display:flex;gap:20px;align-items:center;justify-content:space-between;padding:17px 21px;background:#f7faf8;border:1px solid #e2ebe4;border-radius:12px;margin:15px 0 18px;color:#25402e}
+/* Align the promo box with the inner content of .unified-market:
+   market max-width 1120px minus 12px padding on both sides. */
+.home-match-promo{display:flex;gap:20px;align-items:center;justify-content:space-between;width:calc(100% - 24px);max-width:1096px;padding:13px 18px;background:#f7faf8;border:1px solid #e2ebe4;border-radius:12px;margin:14px auto 0;color:#25402e}
+.home-match-promo + .unified-market{margin-top:34px}
 .home-match-promo strong{font-size:14px}.home-match-promo p{color:#698171;font-size:12px;line-height:1.7;margin:7px 0 0}
 .home-match-promo button{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:10px 13px;color:#fff;background:#306b49;border:0;border-radius:8px;font-weight:650;font-size:12px;cursor:pointer}
 .candidate-match-quick{display:flex;align-items:center;justify-content:space-between;gap:18px;border:1px solid #d8e8dd;background:#f6faf7;padding:17px 19px;border-radius:12px;margin:18px 0}
 .candidate-match-quick span{display:flex;flex-direction:column;gap:7px}.candidate-match-quick strong{color:#2e6040}.candidate-match-quick small{color:#6d7e73;line-height:1.7}
 .candidate-match-quick a{white-space:nowrap}
-@media(max-width:650px){.home-match-promo,.candidate-match-quick{flex-direction:column;align-items:stretch}.home-match-promo button,.candidate-match-quick a{justify-content:center}}
+@media(max-width:650px){.home-match-promo,.candidate-match-quick{flex-direction:column;align-items:stretch}.home-match-promo button,.candidate-match-quick a{justify-content:center}.home-match-promo{gap:13px;padding:14px}.home-match-promo + .unified-market{margin-top:26px}}
