@@ -1,0 +1,25 @@
+name: HHBA jobs indexer tests
+on:
+  push:
+    branches:
+      - feat/chinese-job-search-20261020
+    paths:
+      - "ops/jobs-indexer/**"
+      - ".github/workflows/jobs-indexer-tests.yml"
+  pull_request:
+    paths:
+      - "ops/jobs-indexer/**"
+      - ".github/workflows/jobs-indexer-tests.yml"
+  workflow_dispatch:
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ops/jobs-indexer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm test
