@@ -1542,7 +1542,7 @@ function startNativeIndexSchedule(){
 }
 startNativeIndexSchedule();
 
-const WHITE_SPA_ROUTES=/^\/(?:companies\/(?:openai|anthropic|spacex)|candidate(?:\/.*)?|employer(?:\/.*)?|recruiter(?:\/.*)?|auth|workspace|public\/[^/?#]+|admin(?:\/.*)?)$/;
+const WHITE_SPA_ROUTES=/^\/(?:companies(?:\/(?:openai|anthropic|spacex|id\/[A-Za-z0-9_-]{12,600}))?|candidate(?:\/.*)?|employer(?:\/.*)?|recruiter(?:\/.*)?|auth|workspace|public\/[^/?#]+|admin(?:\/.*)?)$/;
 async function whiteSiteResponse(req:Request,u:URL):Promise<Response|null>{
  if(req.method!=="GET"&&req.method!=="HEAD")return null;
  const p=u.pathname;
