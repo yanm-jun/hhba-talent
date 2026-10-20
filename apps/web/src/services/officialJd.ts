@@ -11,8 +11,8 @@ export type OfficialJd = {
   sourceUrl: string;
   roleTitle: string;
   status: 'LIVE_CONTENT';
-  // Exact official sanitized plain text emitted by the existing green reader.
-  // Only present when cross-origin access has been explicitly allowed.
+  // Exact official sanitized plain text from the internal verified JD service.
+  // Only present when browser access and source identity have been validated.
   originalText?: string;
 };
 const ATS_HOSTS: Record<string, readonly string[]> = {
@@ -141,7 +141,7 @@ function validateOfficialDetail(raw:any,info:NonNullable<ReturnType<typeof getJo
 }
 const boardCache=new Map<string,{created:number,promise:Promise<any>}>();
 async function readBoard(url:string, signal:AbortSignal) {
-  // Per-page only, no persistent JD harvesting. Reuse same Ashby board response.
+  // On-demand official ATS reads only. Reuse the same Ashby board response.
   const old=boardCache.get(url);
   if(!old || Date.now()-old.created>10*60_000){
     const promise=fetch(url,{method:'GET',credentials:'omit',redirect:'error',signal,
@@ -153,7 +153,7 @@ async function readBoard(url:string, signal:AbortSignal) {
   }
   return boardCache.get(url)!.promise;
 }
-// Greenhouse's documented Job Board JSONP GET supports browsers even if the
+// Greenhouse's documented Job Board JSONP GET can support browsers even if the
 // JSON endpoint does not expose Access-Control-Allow-Origin. Only its official,
 // checked host is used. The response still must pass ID and URL validation.
 let jsonpSerial=0;
@@ -191,7 +191,8 @@ function readGreenhouseJsonp(endpoint:string,signal:AbortSignal):Promise<any> {
     document.head.appendChild(script);
   });
 }
-const GREEN_SITE='https://hhba-web-production-024c.up.railway.app';
+// Retain the existing Railway service only as a verified JD API for the white site.
+const JD_API_ORIGIN='https://hhba-web-production-024c.up.railway.app';
 const htmlToBlocks=(raw:string):OfficialJdBlock[]=>{
   let section:OfficialJdBlock['section']='other';
   return raw.split(/\n{2,}/).map(entry=>{
@@ -203,17 +204,17 @@ const htmlToBlocks=(raw:string):OfficialJdBlock[]=>{
   }).filter(x=>x.text.length>0 && x.text.length<=12_000).slice(0,250);
 };
 async function readGreenDetail(job:LiveJob,signal:AbortSignal):Promise<OfficialJd>{
-  const response=await fetch(GREEN_SITE+'/api/jobs/'+encodeURIComponent(job.id),{
+  const response=await fetch(JD_API_ORIGIN+'/api/jobs/'+encodeURIComponent(job.id),{
     method:'GET',mode:'cors',credentials:'omit',redirect:'error',
     headers:{Accept:'application/json'},signal});
-  if(!response.ok)throw new Error('原市场详情服务暂不可用');
+  if(!response.ok)throw new Error('官方 JD 服务暂时不可用（HTTP '+response.status+'）');
   const body=await response.json();
   if(body?.job?.id!==job.id || body?.status!=='LIVE_CONTENT' || typeof body.description!=='string' ||
-     body.description.length<1 || body.description.length>100_000)throw new Error('原市场官方 JD 核对失败');
+     body.description.length<1 || body.description.length>100_000)throw new Error('官方 JD 来源身份或内容校验失败');
   // Match source posting identity; do not show a description from another job.
   const source=new URL(body.job.url),expected=new URL(job.url);
   if(!sameOfficialPosting(source.href,expected.href))
-    throw new Error('原市场岗位来源发生变化');
+    throw new Error('官方 JD 来源地址发生变化');
   const blocks=htmlToBlocks(body.description);
   if(!blocks.length)throw new Error('官方 JD 正文为空');
   return {blocks,originalText:body.description,roleTitle:body.job.title,
@@ -251,7 +252,7 @@ export async function translateGreenJd(job:LiveJob,originalText:string,signal:Ab
     }
     let response:Response|null=null;
     for(let attempt=0;attempt<maxAttempts;attempt++){
-      response=await fetch(GREEN_SITE+'/api/jobs/'+encodeURIComponent(job.id)+'/translate-part',{
+      response=await fetch(JD_API_ORIGIN+'/api/jobs/'+encodeURIComponent(job.id)+'/translate-part',{
         method:'POST',mode:'cors',credentials:'omit',redirect:'error',signal,
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({part,sourceHash:hash})
@@ -291,7 +292,7 @@ export async function translateGreenJd(job:LiveJob,originalText:string,signal:Ab
 }
 export async function fetchOfficialJd(job:LiveJob,signal:AbortSignal):Promise<OfficialJd> {
   const info=getJobId(job);
-  if(!info)throw new Error('这个来源暂不支持直接读取完整 JD，请使用企业官方链接');
+  if(!info)throw new Error('此岗位来源暂未提供 HHBA 可验证的完整职位说明');
   let endpoint='';
   if(info.platform==='greenhouse')
     endpoint='https://boards-api.greenhouse.io/v1/boards/'+encodeURIComponent(info.slug)+'/jobs/'+encodeURIComponent(info.native)+'?content=true';
@@ -300,8 +301,8 @@ export async function fetchOfficialJd(job:LiveJob,signal:AbortSignal):Promise<Of
   if(info.platform==='ashby')
     endpoint='https://api.ashbyhq.com/posting-api/job-board/'+encodeURIComponent(info.slug);
   try {
-    // Prefer the existing translated-detail reader when the precise Pages
-    // origin has been enabled. It shares the exact JD hash with translator.
+    // Prefer verified JD source via the existing read API. Hash parity is
+    // required before its translations can be shown on the white site.
     try{return await readGreenDetail(job,signal);}
     catch(e){if(signal.aborted)throw e;}
     let raw:any;
@@ -316,11 +317,7 @@ export async function fetchOfficialJd(job:LiveJob,signal:AbortSignal):Promise<Of
     return validateOfficialDetail(record,info,job);
   }catch(e){
     if(signal.aborted)throw e;
-    if(e instanceof TypeError)throw new Error('浏览器暂时无法直连企业官方接口，请使用原招聘市场查看完整职位说明');
+    if(e instanceof TypeError)throw new Error('浏览器暂时无法连接官方 JD 数据源，请在本页重试');
     throw e;
   }
-}
-export function greenDetailLink(job:LiveJob){
-  return /^[-\w]{1,180}$/.test(job.id) ?
-    'https://hhba-web-production-024c.up.railway.app/jobs/'+encodeURIComponent(job.id) : null;
 }
