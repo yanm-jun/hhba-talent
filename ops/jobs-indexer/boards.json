@@ -241,6 +241,24 @@
       "company": "General Robotics",
       "slug": "generalrobotics",
       "website": "generalrobotics.company"
+    },
+    {
+      "platform": "ashby",
+      "company": "Sierra",
+      "slug": "sierra",
+      "website": "sierra.ai"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Monzo",
+      "slug": "monzo",
+      "website": "monzo.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Duolingo University Recruitment",
+      "slug": "duolingounirecruitment",
+      "website": "duolingo.com"
     }
   ]
 }
