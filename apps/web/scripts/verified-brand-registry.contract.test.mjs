@@ -32,7 +32,7 @@ test('current employer brands and three original icons each have exact ATS ident
  assert.equal(registry.schemaVersion,1);
  assert.equal(registry.records.length,49);
  const keys=registry.records.map(identity);
- assert.equal(new Set(keys).size,28);
+ assert.equal(new Set(keys).size,49);
  for(const [company,platform,source] of expected){
   const item=registry.records.find(row=>row.company===company&&row.platform===platform&&row.source===source);
   assert.ok(item,'missing exact employer source '+company);
@@ -89,12 +89,12 @@ test('same logo renderer serves job cards, job detail, directory and dynamic com
  assert.ok(market.includes("to={'/candidate/jobs/'+encodeURIComponent(job.id)}"),
    'job detail navigation must remain unaffected by company logo');
 });
-test('Railway only serves bundled SVG paths and retains CSP protection',()=>{
+test('Railway serves only vetted SVG and PNG files and preserves CSP protection',()=>{
  assert.ok(server.includes('si-[a-z0-9]{2,40}'));
  assert.ok(server.includes('brand-[a-z0-9]{2,60}'));
  assert.ok(server.includes('p.endsWith(".png")?"image/png"'));
  assert.ok(server.includes('Brand asset not published'));
- assert.ok(server.includes('"Content-Type":"image/svg+xml; charset=utf-8"'));
+ assert.ok(server.includes('"Content-Type":p.endsWith(".png")?"image/png":"image/svg+xml; charset=utf-8"'));
  assert.ok(server.includes('"X-Content-Type-Options":"nosniff"'));
  assert.ok(server.includes('"Content-Security-Policy":"default-src'));
 });
