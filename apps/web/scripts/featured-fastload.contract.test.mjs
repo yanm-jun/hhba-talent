@@ -30,3 +30,12 @@ test('default stays limited to audited true jobs and search pagination still wor
  assert.ok(market.includes('shown.map(job=><JobCard'));
  assert.ok(market.includes('officialStatus(j,snapshot.updated)'));
 });
+
+test('slow curated verification times out and falls back to source-audited market',()=>{
+ assert.ok(market.includes('},6500)'),'featured watchdog missing');
+ assert.ok(market.includes("controller.abort();"),'stale verification not cancelled');
+ assert.ok(market.includes('featuredError ? (compact?eligible.slice(0,8):eligible)'),
+   'error still blocks all verified jobs');
+ assert.ok(market.includes('unified-featured-fallback'));
+ assert.ok(market.includes('setRetry(x=>x+1)'));
+});
