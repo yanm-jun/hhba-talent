@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowRight, Building2, ExternalLink, MapPin, RefreshCcw, ShieldCheck } from 'lucide-react';
 import { Link, getCompanyReturnTarget } from '../router';
 import { Shell } from '../components/Shell';
+import { CompanyVisualStory } from '../components/CompanyVisualStory';
 import { verifiedBrandKey } from '../components/EmployerBrandLogo';
 import { companyProfiles, profileFromSlug, type CompanySlug } from '../services/companyProfiles';
 import { CURATED_JOBS, featuredTitle, featuredLocation } from '../services/featuredOfficialJobs';
@@ -110,6 +111,7 @@ export function CompanyProfilePage({slug,user}:{slug:string;user:User|null}){
        <h2>{lang==='zh'?'关于企业':'About the company'}</h2>
        {profile.overview.map((paragraph,i)=><p key={i}>{paragraph[lang]}</p>)}
      </section>
+     <CompanyVisualStory identity={{company:profile.name,platform:slug==='openai'?'ashby':'greenhouse',source:slug}} lang={lang}/>
      <section className="company-profile-section">
        <h2>{lang==='zh'?'主要业务与代表产品':'Business and products'}</h2>
        <div className="company-profile-focus-grid">
