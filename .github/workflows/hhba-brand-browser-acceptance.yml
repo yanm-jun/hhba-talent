@@ -29,6 +29,11 @@ jobs:
            page.on('pageerror',err=>console.warn('WEB_JS_ERROR',err.message.slice(0,160)));
            await page.goto('https://hhba-web-production-024c.up.railway.app/candidate/jobs',{waitUntil:'domcontentloaded',timeout:90000});
            await page.waitForFunction(()=>document.querySelectorAll('.unified-job-card').length>=6,{timeout:90000});
+           await page.waitForFunction(()=>
+             Array.from(document.querySelectorAll('.unified-job-card')).slice(0,6).every(node=>{
+               const img=node.querySelector('.unified-brand-logo img');
+               return !!img && img.complete && img.naturalWidth>0;
+             }),null,{timeout:40000});
            const cards=await page.locator('.unified-job-card').evaluateAll(elements=>elements.slice(0,6).map(node=>{
              const image=node.querySelector('.unified-brand-logo img');
              return {
