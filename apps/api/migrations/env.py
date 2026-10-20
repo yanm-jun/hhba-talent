@@ -20,8 +20,13 @@ def run_migrations_online():
   # Alembic tries to write the next revision, preserving all application data.
   if c.dialect.name=='postgresql':
    width=c.execute(text("SELECT character_maximum_length FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='alembic_version' AND column_name='version_num'")).scalar_one_or_none()
-   if width is not None and width<64:
-    c.execute(text('ALTER TABLE alembic_version ALTER COLUMN version_num TYPE VARCHAR(64)'))
+   if width is None:
+    # Fresh databases would otherwise inherit Alembic's default VARCHAR(32)
+    # before the first descriptive revision is inserted.
+    c.execute(text('CREATE TABLE IF NOT EXISTS alembic_version (version_num VARCHAR(128) NOT NULL PRIMARY KEY)'))
+    c.commit()
+  elif width<128:
+    c.execute(text('ALTER TABLE alembic_version ALTER COLUMN version_num TYPE VARCHAR(128)'))
     c.commit()
   context.configure(connection=c)
   with context.begin_transaction(): context.run_migrations()
