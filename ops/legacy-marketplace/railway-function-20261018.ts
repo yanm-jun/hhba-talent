@@ -1397,6 +1397,45 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
 // Only one validated background worker claims the shared SQLite job queue.
 // The older duplicate worker caused contention and made progress unpredictable.
 
+// Background-only English warmup of six audited front-page roles.
+// Chinese completion uses the normal prioritized, daily-budgeted worker.
+// No document leaves the private /sync-state volume or enters public indexes.
+const BILINGUAL_FEATURED_IDS=[
+ "ashby-openai-18e64608-5881-4b8f-b5cf-abd09a8ff086",
+ "ashby-openai-7ba0b390-b198-4101-80bb-b49a6dd62607",
+ "greenhouse-anthropic-5426627008",
+ "greenhouse-anthropic-5391293008",
+ "greenhouse-spacex-8885762002",
+ "greenhouse-spacex-8621995002"
+];
+let warmupActive=false;
+async function prewarmFeaturedEnglish(){
+ if(!durableJobStore||warmupActive)return;
+ warmupActive=true;let saved=0;
+ try{
+  for(const id of BILINGUAL_FEATURED_IDS){
+   try{
+    const job=await fromWhiteIndex(id);
+    if(!job)continue;
+    // Upsert only verified current jobs; never close unrelated source rows.
+    durableJobStore.catalogSync([job],{complete:false});
+    const detail=await officialDetail(job);
+    if(!detail||detail.status!=="LIVE_CONTENT"||!detail.description)continue;
+    const chunks=jdChunks(detail.description);
+    if(!chunks.length||chunks.length>150)continue;
+    const hash=createHash("sha256").update(detail.description).digest("hex");
+    durableJobStore.sourceVersion(id,hash,chunks.length,detail.description);
+    saved++;
+   }catch(e){console.warn("HHBA_FEATURED_JD_WARMUP_SKIP",id,e instanceof Error?e.message:"unknown")}
+  }
+  console.log("HHBA_FEATURED_ENGLISH_PREWARM",JSON.stringify({saved,total:BILINGUAL_FEATURED_IDS.length}));
+ }finally{warmupActive=false}
+}
+if(durableJobStore){
+ setTimeout(()=>void prewarmFeaturedEnglish(),25_000).unref();
+ setInterval(()=>void prewarmFeaturedEnglish(),12*3600_000).unref();
+}
+
 // The white HHBA React app is compiled into /app/white-site at Docker build.
 // Until the independent ATS evidence job is migrated, the same public and
 // time-limited evidence snapshots are read from Pages via a strict allowlist.
@@ -1601,6 +1640,20 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
     status:doc.ready?"READY":"TRANSLATING",machineTranslated:!!doc.chineseText,
     note:"Unofficial machine translation; refer to the employer's original posting."
    },{headers});
+ }
+ if(u.pathname==="/api/jd-ready/status"){
+  const items=BILINGUAL_FEATURED_IDS.map(id=>{
+   const meta=durableJobStore?.metadata(id);
+   const completed=durableJobStore?.readyDocument(id);
+   return {id,englishReady:!!completed?.originalText,
+     chineseReady:completed?.ready===true,
+     done:completed?.done??meta?.done??0,total:completed?.total??meta?.total??0,
+     state:meta?.state||"PREPARING"};
+  });
+  return Response.json({kind:"HHBA_PREPARED_BILINGUAL_V1",
+   persistent:!!durableJobStore,featured:items,
+   complete:items.filter(j=>j.chineseReady).length,total:items.length,
+   noForegroundTranslation:true},{headers});
  }
  if(u.pathname==="/api/jd-sync/status"){
   return Response.json(durableJobStore?{...durableJobStore.coverage(),
