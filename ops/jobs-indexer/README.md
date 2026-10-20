@@ -6,7 +6,7 @@ Independent, repo-built recruitment indexer. This is **not** the production HHBA
 The production Railway Bun Function hit its **96 KiB single-file limit**. This service splits official ATS sources, normalization, refresh state, API and UI into separate files and deploys as a conventional Node container.
 
 ## Contents
-- `boards.json`: 36 existing configured ATS boards plus 4 new cross-industry candidates
+- `boards.json`: 36 baseline ATS boards plus 7 cross-industry source candidates
 - `catalog.mjs`: native public Greenhouse, Lever and Ashby JSON GET, strict official job URL validation
 - `store.mjs`: bounded parallel refresh (5), 15-minute refresh interval, per-source health, 24-hour maximum retained in-process stale cache, URL deduplication
 - `server.mjs`: HTTP endpoints and safe pagination
@@ -22,7 +22,7 @@ The production Railway Bun Function hit its **96 KiB single-file limit**. This s
 - Jobs use `status=fresh|stale`, `observedAt` and validated official application links. **Default search returns only `fresh`; archived records require explicit `status=stale` and are never mixed into default results.** The API provides `titleZh`, `locationZh`, their translation status, and unchanged original fields. Rule-based Chinese translations fail closed to a clear pending label if an English fragment remains. Original English labels remain available through the language switch. A configured board is not counted as successful until live JSON returns a valid result.
 
 ## Cross-industry candidates (not counted as deployed yet)
-Form Energy (battery manufacturing), ShopBack (retail/commerce), AlphaSights Campus Recruiting (professional services), General Robotics (robotics). These were selected from discoverable official public recruiting pages, but actual ATS API fetching and non-zero job counts need Railway execution before acceptance.
+Form Energy (battery manufacturing), ShopBack (retail/commerce), AlphaSights Campus Recruiting (professional services), General Robotics (robotics), Sierra (AI), Monzo (banking), Duolingo University Recruitment (education). These were selected from discoverable official public recruiting pages, but actual ATS API fetching and non-zero job counts need runtime verification before acceptance. **43 configured boards does not mean 43 verified or synced boards.**
 
 ## Start and test
 From `ops/jobs-indexer`: `npm test`, then `npm start`. Node 22+; no third-party runtime packages. Docker build: `docker build -f Dockerfile.prod .`.
