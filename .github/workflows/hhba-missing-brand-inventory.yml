@@ -1,0 +1,49 @@
+name: HHBA Missing Brand Inventory
+on:
+  push:
+    branches: [feat/remaining-verified-brand-logos-20261020]
+    paths: ['.github/workflows/hhba-missing-brand-inventory.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Identify genuinely missing official ATS employer marks
+        run: |
+          python - <<'PY'
+          import json,urllib.request,collections,re,unicodedata
+          base="https://hhba-web-production-024c.up.railway.app"
+          def get(path):
+            with urllib.request.urlopen(urllib.request.Request(base+path,headers={"User-Agent":"HHBA-Source-Brands-Audit/1.0"}),timeout=45) as r:
+              return json.load(r)
+          jobs=get("/data/jobs.json")
+          audit=get("/data/job-sync-status.json")
+          assert audit["summary"]["indexed_as_of"]==jobs["updated"]
+          approved={j["job_id"] for j in audit["jobs"] if j["status"]=="OFFICIAL_JD_AND_REQUIREMENTS_FOUND"}
+          existing=json.load(open("apps/web/src/data/verifiedBrandAssets.json"))
+          keys={(x["company"],x["platform"],x["source"]) for x in existing["records"]}
+          tally=collections.Counter()
+          examples={}
+          for j in jobs["jobs"]:
+            if j["id"] not in approved:continue
+            k=(j["company"],j["platform"],j["source"])
+            tally[k]+=1
+            examples.setdefault(k,j.get("url",""))
+          def slug(x):return re.sub("[^a-z0-9]","",unicodedata.normalize("NFKD",x).lower())
+          simple=json.load(urllib.request.urlopen("https://raw.githubusercontent.com/simple-icons/simple-icons/c71c69e3a27e4436936b831c72643e6513b9f49b/data/simple-icons.json",timeout=40))
+          matches={slug(x["title"]):x for x in simple}
+          missing=[(k,n) for k,n in tally.items() if k not in keys]
+          for (company,platform,source),count in sorted(missing,key=lambda i:-i[1]):
+            meta=matches.get(slug(company))
+            print("HHBA_MISSING_BRAND",json.dumps({"company":company,"platform":platform,"source":source,"jobCount":count,
+             "suggestedIcon":meta and slug(meta["title"]),"upstreamBrandSource":meta and meta.get("source"),
+             "iconLicense":meta and meta.get("license"),"exampleJob":examples[(company,platform,source)]},ensure_ascii=False))
+          print("HHBA_MISSING_BRAND_TOTAL",json.dumps({"uniqueEmployerSources":len(tally),"existing":len(tally)-len(missing),
+             "missing":len(missing),"indexRecords":len(jobs["jobs"]),"approvedJobCount":len(approved)}))
+          PY
