@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {localizeJob} from "../locale.mjs";
-import {parseJobQuery,matchesJobQuery} from "../query.mjs";
+import {parseJobQuery,matchesJobQuery,matchesJobStatus} from "../query.mjs";
 
 test("Chinese labels are readable without altering the official original",()=>{
  const job={id:"a",title:"Senior Software Engineer",location:"Singapore",url:"https://jobs.ashbyhq.com/example/id",company:"Example"};
@@ -46,4 +46,11 @@ test("Remote eligibility and missing education remain conservative",()=>{
  assert.ok(q.warnings.length>0);
  assert.ok(matchesJobQuery({title:"Software Engineer",location:"Remote",remote:true},q));
  assert.ok(!matchesJobQuery({title:"Software Engineer",location:"Remote",remote:null},q));
+});
+
+test("Default live search excludes cached archive; archive is explicit",()=>{
+ assert.equal(matchesJobStatus({status:"fresh"},"fresh"),true);
+ assert.equal(matchesJobStatus({status:"stale"},"fresh"),false);
+ assert.equal(matchesJobStatus({status:"stale"},"stale"),true);
+ assert.equal(matchesJobStatus({status:"fresh"},"stale"),false);
 });
