@@ -252,6 +252,195 @@
       "color": "#000000",
       "wide": false,
       "kind": "source-traced-vector"
+    },
+    {
+      "company": "Gusto",
+      "platform": "greenhouse",
+      "source": "gusto",
+      "file": "si-gusto.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Deepgram",
+      "platform": "ashby",
+      "source": "deepgram",
+      "file": "si-deepgram.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "ClickUp",
+      "platform": "ashby",
+      "source": "clickup",
+      "file": "si-clickup.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Greenhouse",
+      "platform": "greenhouse",
+      "source": "greenhouse",
+      "file": "si-greenhouse.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Binance",
+      "platform": "lever",
+      "source": "binance",
+      "file": "si-binance.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Anduril",
+      "platform": "greenhouse",
+      "source": "andurilindustries",
+      "file": "brand-anduril.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Airwallex",
+      "platform": "ashby",
+      "source": "airwallex",
+      "file": "brand-airwallex.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Harvey",
+      "platform": "ashby",
+      "source": "harvey",
+      "file": "brand-harvey.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Flexport",
+      "platform": "greenhouse",
+      "source": "flexport",
+      "file": "brand-flexport.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Form Energy",
+      "platform": "ashby",
+      "source": "formenergy",
+      "file": "brand-formenergy.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Ramp",
+      "platform": "ashby",
+      "source": "ramp",
+      "file": "brand-ramp.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Twilio",
+      "platform": "greenhouse",
+      "source": "twilio",
+      "file": "brand-twilio.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Cohere",
+      "platform": "ashby",
+      "source": "cohere",
+      "file": "brand-cohere.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Mercor",
+      "platform": "ashby",
+      "source": "mercor",
+      "file": "brand-mercor.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Cognition",
+      "platform": "ashby",
+      "source": "cognition",
+      "file": "brand-cognition.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "ShopBack",
+      "platform": "lever",
+      "source": "shopback-2",
+      "file": "brand-shopback.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Vanta",
+      "platform": "ashby",
+      "source": "vanta",
+      "file": "brand-vanta.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Ashby",
+      "platform": "ashby",
+      "source": "ashby",
+      "file": "brand-ashby.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "AlphaSights Campus Recruiting",
+      "platform": "greenhouse",
+      "source": "alphasightsresumedrop",
+      "file": "brand-alphasightscampusrecruiting.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "General Robotics",
+      "platform": "ashby",
+      "source": "generalrobotics",
+      "file": "brand-generalrobotics.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "SpaceX Global",
+      "platform": "greenhouse",
+      "source": "spacexglobal",
+      "file": "brand-spacexglobal.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "original-source"
     }
   ]
 }
