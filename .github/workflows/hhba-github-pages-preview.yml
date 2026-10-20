@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
-      - name: Enforce white-only job cards, internal complete JD reader, and verified Apply button
+      - name: Enforce white-only current/archive cards, internal JD reader, and verified Apply button
         working-directory: apps/web
         run: node --test scripts/white-market-detail.contract.test.mjs
       - name: Build HHBA with consent-first candidate applications, employer review progress and separate official ATS listings
