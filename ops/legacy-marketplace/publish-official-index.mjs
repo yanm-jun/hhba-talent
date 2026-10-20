@@ -45,6 +45,10 @@ export async function publishIndex(sourceDir,destination,{minJobs=10000}={}){
    throw Error("FACETS_EVIDENCE_MISSING");
  const facetIds=new Set(facets.jobs.map(x=>x.id));
  if(facetIds.size!==facets.jobs.length)throw Error("DUPLICATE_FACETS");
+ if(!validTime(audit.summary.checked_at)||
+   facets.verified_at!==audit.summary.checked_at||
+   report.checked_at!==audit.summary.checked_at)
+   throw Error("AUDIT_VERIFICATION_TIME_INVALID");
  const audited=new Set(audit.jobs.map(row=>row?.job_id));
  if(audited.size!==jobs.total||audit.jobs.some(row=>!jobIds.has(row?.job_id)))
    throw Error("AUDIT_DUPLICATE_OR_MISSING_JOBS");
