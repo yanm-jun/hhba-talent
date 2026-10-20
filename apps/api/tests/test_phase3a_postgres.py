@@ -15,19 +15,35 @@ if 'phase3a_test' not in os.getenv('DATABASE_URL', ''):
 
 from fastapi.testclient import TestClient
 from app.main import (CandidateSearchProjection, Consent, Organization, Profile,
-                      SessionLocal, User, app)
+                      SessionLocal, User, OrganizationVerification, RecruiterVerification,
+                      RecruiterOrganizationAuthorization, PlatformServiceGate, app)
 
 RUN = uuid.uuid4().hex
 PASSWORD = 'SyntheticOnly123!'
 
 
-def register_login(client, prefix):
+def register_login(client, prefix, account_type='candidate'):
     email = f'{prefix}-{RUN}@hhba-synthetic.com'
-    created = client.post('/api/v1/auth/register', json={'email': email, 'password': PASSWORD, 'display_name': prefix})
+    created = client.post('/api/v1/auth/register', json={'email': email, 'password': PASSWORD, 'display_name': prefix, 'account_type': account_type})
     assert created.status_code == 201, created.text
-    response = client.post('/api/v1/auth/session', json={'email': email, 'password': PASSWORD})
+    response = client.post('/api/v1/auth/session', json={'email': email, 'password': PASSWORD, 'account_type': account_type})
     assert response.status_code == 200
     return email, response.json()['csrf_token']
+
+
+def approve_synthetic_recruiter(oid, email):
+    # Set approvals in an isolated synthetic DB only. Do not weaken public
+    # registration, identity separation or verification production gates.
+    with SessionLocal() as s:
+        owner=s.query(User).filter_by(email=email).one()
+        s.get(Organization,uuid.UUID(oid)).status='approved'
+        s.query(OrganizationVerification).filter_by(organization_id=uuid.UUID(oid)).one().status='approved'
+        s.query(RecruiterVerification).filter_by(user_id=owner.id).one().status='approved'
+        s.query(RecruiterOrganizationAuthorization).filter_by(organization_id=uuid.UUID(oid),user_id=owner.id).one().status='active'
+        gate=s.get(PlatformServiceGate,'network_recruitment')
+        if gate: gate.enabled=True
+        else: s.add(PlatformServiceGate(gate_key='network_recruitment',enabled=True))
+        s.commit()
 
 
 def test_postgres_search_policy_and_bounded_1000_synthetic_candidates():
@@ -37,10 +53,10 @@ def test_postgres_search_policy_and_bounded_1000_synthetic_candidates():
     assert candidate.put('/api/v1/me/profile', json={'display_name': 'PG 合成候选人', 'content': content}, headers={'X-CSRF-Token': candidate_csrf}).status_code == 200
     assert candidate.put('/api/v1/me/consents/enterprise_search', json={'granted': True}, headers={'X-CSRF-Token': candidate_csrf}).status_code == 200
     assert candidate.post('/api/v1/me/profile/confirm', headers={'X-CSRF-Token': candidate_csrf}).status_code == 200
-    employer = TestClient(app); employer_email, employer_csrf = register_login(employer, 'pg-employer')
+    employer = TestClient(app); employer_email, employer_csrf = register_login(employer, 'pg-employer', 'recruiter')
     org = employer.post('/api/v1/organizations', json={'legal_name': 'PG 合成验收企业'}, headers={'X-CSRF-Token': employer_csrf}); assert org.status_code == 201
     oid = org.json()['id']
-    session = SessionLocal(); session.get(Organization, uuid.UUID(oid)).status = 'approved'; session.commit(); session.close()
+    approve_synthetic_recruiter(oid,employer_email)
     query = {'keywords': unique_marker, 'skills': ['销售人员培训'], 'region': '山东', 'industry': '新能源汽车', 'work_mode': '短期项目', 'page_size': 10}
     found = employer.post(f'/api/v1/organizations/{oid}/talent-search', json=query, headers={'X-CSRF-Token': employer_csrf})
     assert found.status_code == 200 and [x['display_name'] for x in found.json()['items']] == ['PG 合成候选人'], found.text
@@ -68,7 +84,7 @@ def test_postgres_search_policy_and_bounded_1000_synthetic_candidates():
         page_org = employer.post('/api/v1/organizations', json={'legal_name': f'PG 分页验收企业 {RUN}-{chunk}'}, headers={'X-CSRF-Token': employer_csrf})
         assert page_org.status_code == 201, page_org.text
         page_oid = page_org.json()['id']
-        session = SessionLocal(); session.get(Organization, uuid.UUID(page_oid)).status = 'approved'; session.commit(); session.close()
+        approve_synthetic_recruiter(page_oid,employer_email)
         page_oids.append(page_oid)
     pages = []
     for page in range(1, 101):
