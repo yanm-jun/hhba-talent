@@ -2,7 +2,7 @@
 // Used after the existing ATS importer and evidence auditor have successfully
 // generated one MATCHING four-file evidence set. No resumes, raw JD or PII.
 import {createHash,randomBytes} from "node:crypto";
-import {readFile,writeFile,mkdir,rename,rm,stat} from "node:fs/promises";
+import {readFile,writeFile,mkdir,rename,rm,stat,readdir} from "node:fs/promises";
 import {join,resolve} from "node:path";
 const names=["jobs.json","job-sync-status.json","job-sync-summary.json","job-search-facets.json"];
 const hash=buf=>createHash("sha256").update(buf).digest("hex");
@@ -91,6 +91,20 @@ export async function publishIndex(sourceDir,destination,{minJobs=10000}={}){
    await writeFile(temp,JSON.stringify({version,updated:jobs.updated,checkedAt:docs.checkedAt}),{flag:"wx",mode:0o600});
    await rename(temp,pointer);
   }finally{await rm(temp,{force:true})}
+  // Keep the active release and two predecessors on the 500 MB Railway volume.
+  // Ignore cleanup failures: they must never undo a successful atomic release.
+  try{
+   const dir=join(destination,"snapshots");
+   const versions=(await readdir(dir,{withFileTypes:true}))
+     .filter(e=>e.isDirectory()&&/^[a-f0-9]{32}$/.test(e.name)).map(e=>e.name);
+   const ordered=await Promise.all(versions.map(async name=>({
+     name,mtime:(await stat(join(dir,name))).mtimeMs
+   })));
+   ordered.sort((a,b)=>b.mtime-a.mtime);
+   const keep=new Set([version,...ordered.slice(0,2).map(e=>e.name)]);
+   for(const entry of ordered)if(!keep.has(entry.name))
+    await rm(join(dir,entry.name),{recursive:true,force:true});
+  }catch(e){console.warn("HHBA_INDEX_PRUNE_SKIPPED",e instanceof Error?e.message:"unknown")}
   return manifest;
  }catch(e){await rm(staging,{recursive:true,force:true});throw e}
 }
