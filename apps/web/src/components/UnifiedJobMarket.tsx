@@ -7,7 +7,7 @@ import { featuredTitle, featuredLocation, isDefaultMarketFilters, loadVerifiedFe
 import type { User } from '../services/api';
 import { getJob, listJobs, localizedCompany, localizedLocation, localizedTitle, officialStatus, safeOfficialJobUrl,
   type Language, type LiveFilters, type LiveJob, type LivePage } from '../services/liveRecruitment';
-import { fetchOfficialJd, translateGreenJd, type OfficialJd } from '../services/officialJd';
+import { fetchOfficialJd, fetchPreparedBilingualJd, type OfficialJd } from '../services/officialJd';
 import { loadPublicJobAudit, auditForJob, describeAudit, type JobAuditEntry } from '../services/jobSyncStatus';
 import {countryOptions,cityOptions,parseNaturalQuery} from '../services/jobSearchFacets.mjs';
 import '../styles/unified-jobs.css';
@@ -222,11 +222,9 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  const [jdError,setJdError]=useState('');
  const [jdLoading,setJdLoading]=useState(false);
  const [jdRetry,setJdRetry]=useState(0);
- const [translateRetry,setTranslateRetry]=useState(0);
  const [chineseJd,setChineseJd]=useState('');
- const [translateBusy,setTranslateBusy]=useState(false);
+ const [translationPrepared,setTranslationPrepared]=useState(false);
  const [translateError,setTranslateError]=useState('');
- const [translationProgress,setTranslationProgress]=useState('');
 
  useEffect(()=>{
    const controller=new AbortController();
@@ -251,25 +249,29 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  useEffect(()=>{
    if(!job)return;
    const controller=new AbortController();
-   setJd(null);setChineseJd('');setTranslateError('');setJdError('');setJdLoading(true);
-   fetchOfficialJd(job,controller.signal).then(result=>{
-     if(!controller.signal.aborted)setJd(result);
-   }).catch(e=>{
+   setJd(null);setChineseJd('');setTranslateError('');
+   setTranslationPrepared(false);setJdError('');setJdLoading(true);
+   (async()=>{
+     const prepared=await fetchPreparedBilingualJd(job,controller.signal);
+     if(prepared){
+       if(!controller.signal.aborted){
+         setJd(prepared.jd);
+         setChineseJd(prepared.chinese||'');
+         setTranslationPrepared(prepared.ready);
+       }
+       return;
+     }
+     // Unprepared postings remain readable in official English. No user-side MT.
+     const english=await fetchOfficialJd(job,controller.signal);
+     if(!controller.signal.aborted){
+       setJd(english);
+       setTranslateError('中文完整译文正在后台准备，请使用 English 先阅读官方原文。');
+     }
+   })().catch(e=>{
      if(!controller.signal.aborted)setJdError(e instanceof Error?e.message:'职位原文暂不可用');
    }).finally(()=>{if(!controller.signal.aborted)setJdLoading(false)});
    return()=>controller.abort();
  },[job,jdRetry]);
- useEffect(()=>{
-   if(lang!=='zh'||!job||!jd?.originalText)return;
-   const controller=new AbortController();
-   setChineseJd('');setTranslateError('');setTranslateBusy(true);setTranslationProgress('');
-   translateGreenJd(job,jd.originalText,controller.signal,(done,total)=>{
-     if(!controller.signal.aborted)setTranslationProgress('翻译进度 '+done+' / '+total);
-   }).then(translated=>{if(!controller.signal.aborted)setChineseJd(translated)})
-    .catch(e=>{if(!controller.signal.aborted)setTranslateError(e instanceof Error?e.message:'中文 JD 翻译失败')})
-    .finally(()=>{if(!controller.signal.aborted)setTranslateBusy(false)});
-   return()=>controller.abort();
- },[lang,job,jd,translateRetry]);
  const official=job?safeOfficialJobUrl(job):null;
  const segmentName:Record<string,{zh:string,en:string}>={
    responsibilities:{zh:'岗位职责',en:'Responsibilities'},
@@ -326,14 +328,8 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
                </p>;
            })}
          </section>:<div className="unified-jd-translate">
-           <strong>{translateBusy?'正在生成完整中文岗位说明':'已获取完整的企业官方岗位说明'}</strong>
-           <p>{translateBusy?(translationProgress||'正在逐段翻译岗位职责、任职要求及技能条件。'):
-             translateError ? '中文翻译尚未完成：'+translateError+'。请在本页面重试，也可以切换 English 阅读官方原文。':
-             '尚未取得通过校验的中文译文；请切换 English 阅读本页的官方原文。'}</p>
-           {!translateBusy&&translateError&&
-             <button type="button" className="unified-jd-retry" onClick={()=>setTranslateRetry(n=>n+1)}>
-               重新翻译中文
-             </button>}
+           <strong>中文职位说明正在后台准备</strong>
+           <p>{translateError||'尚未取得经过完整性校验的中文译文。可直接切换 English 阅读官方原文，稍后刷新页面查看中文。'}</p>
          </div>}
        </div>:null}
      <div className="unified-job-actions unified-detail-actions">

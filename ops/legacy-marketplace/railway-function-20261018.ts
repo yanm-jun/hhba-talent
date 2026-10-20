@@ -1180,7 +1180,7 @@ async function ensureChineseProse(value:string):Promise<string|null>{
 const JD_READER_SIZE=900;
 const JD_READER_MAX_CHARS=100000;
 const JD_SYNC_DAILY_CHUNKS=Math.max(1,Math.min(2000,Number.parseInt(Bun.env.HHBA_JD_SYNC_DAILY_CHUNKS||"180",10)||180));
-const JD_SYNC_INTERVAL_MS=90_000;
+const JD_SYNC_INTERVAL_MS=30_000;
 let durableJobStore:ReturnType<typeof openJobSyncStore>|null=null;
 let lastCatalogRefresh=0;
 let backgroundJdBusy=false;
@@ -1319,7 +1319,7 @@ if(durableJobStore){
   // ingestion or JD publishing to static GitHub Pages.
   const timer=setInterval(()=>void fullJdWorker?.tick(),JD_SYNC_INTERVAL_MS);
   timer.unref();
-  setTimeout(()=>void fullJdWorker?.tick(),15_000).unref();
+  setTimeout(()=>void fullJdWorker?.tick(),8_000).unref();
   console.log("HHBA_FULL_JD_SYNC_ENABLED",JSON.stringify({
    privateVolume:true,dailyChunkLimit:JD_SYNC_DAILY_CHUNKS,
    intervalSeconds:JD_SYNC_INTERVAL_MS/1000,platforms:["greenhouse","ashby","lever"]
@@ -1394,11 +1394,46 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
  }finally{activeJdReaders--;}
 }
 
-if(durableJobStore && privateTranslatorUrl()){
- startOverseasJdWorker({store:durableJobStore,load,boardsCount:boards.length,
-  officialDetail,jdChunks,translateVerifiedChunk:verifiedJdChunk,
-  maxCharacters:JD_READER_MAX_CHARS,dailyChunks:JD_SYNC_DAILY_CHUNKS,
-  intervalMs:JD_SYNC_INTERVAL_MS});
+// Only one validated background worker claims the shared SQLite job queue.
+// The older duplicate worker caused contention and made progress unpredictable.
+
+// Background-only English warmup of six audited front-page roles.
+// Chinese completion uses the normal prioritized, daily-budgeted worker.
+// No document leaves the private /sync-state volume or enters public indexes.
+const BILINGUAL_FEATURED_IDS=[
+ "ashby-openai-18e64608-5881-4b8f-b5cf-abd09a8ff086",
+ "ashby-openai-7ba0b390-b198-4101-80bb-b49a6dd62607",
+ "greenhouse-anthropic-5426627008",
+ "greenhouse-anthropic-5391293008",
+ "greenhouse-spacex-8885762002",
+ "greenhouse-spacex-8621995002"
+];
+let warmupActive=false;
+async function prewarmFeaturedEnglish(){
+ if(!durableJobStore||warmupActive)return;
+ warmupActive=true;let saved=0;
+ try{
+  for(const id of BILINGUAL_FEATURED_IDS){
+   try{
+    const job=await fromWhiteIndex(id);
+    if(!job)continue;
+    // Upsert only verified current jobs; never close unrelated source rows.
+    durableJobStore.catalogSync([job],{complete:false});
+    const detail=await officialDetail(job);
+    if(!detail||detail.status!=="LIVE_CONTENT"||!detail.description)continue;
+    const chunks=jdChunks(detail.description);
+    if(!chunks.length||chunks.length>150)continue;
+    const hash=createHash("sha256").update(detail.description).digest("hex");
+    durableJobStore.sourceVersion(id,hash,chunks.length,detail.description);
+    saved++;
+   }catch(e){console.warn("HHBA_FEATURED_JD_WARMUP_SKIP",id,e instanceof Error?e.message:"unknown")}
+  }
+  console.log("HHBA_FEATURED_ENGLISH_PREWARM",JSON.stringify({saved,total:BILINGUAL_FEATURED_IDS.length}));
+ }finally{warmupActive=false}
+}
+if(durableJobStore){
+ setTimeout(()=>void prewarmFeaturedEnglish(),25_000).unref();
+ setInterval(()=>void prewarmFeaturedEnglish(),12*3600_000).unref();
 }
 
 // The white HHBA React app is compiled into /app/white-site at Docker build.
@@ -1591,6 +1626,35 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  if(req.method==="POST"&&/^\/api\/jobs\/[a-zA-Z0-9_-]{1,180}\/translate-part$/.test(u.pathname))return readJobForTranslation(req,u,headers);
  if(req.method!=="GET")return new Response("Method not allowed",{status:405,headers});
  if(u.pathname==="/health"){const frontendReady=await Bun.file(WHITE_PUBLIC_ROOT+"/index.html").exists();return Response.json({ok:frontendReady,kind:"hhba-white-ats-railway",frontendReady},{status:frontendReady?200:503,headers});}
+ // A single fast read for private precomputed, hash-bound bilingual text.
+ // This route MUST NOT invoke official ATS fetch or an MT service.
+ const readyMatch=u.pathname.match(/^\/api\/jobs\/([A-Za-z0-9_-]{1,180})\/ready-jd$/);
+ if(readyMatch){
+  if(!durableJobStore)return Response.json({ready:false,status:"PREPARING",reason:"STORAGE_UNAVAILABLE"},{status:503,headers});
+  const id=readyMatch[1];
+  const job=await fromWhiteIndex(id);
+  if(!job)return Response.json({ready:false,error:"OFFICIAL_JOB_NOT_LISTED"},{status:404,headers});
+  const doc=durableJobStore.readyDocument(id,job.url);
+  if(!doc)return Response.json({ready:false,status:"PREPARING"},{status:202,headers});
+  return Response.json({...doc,job:{id:job.id,url:job.url,title:job.title,company:job.company},
+    status:doc.ready?"READY":"TRANSLATING",machineTranslated:!!doc.chineseText,
+    note:"Unofficial machine translation; refer to the employer's original posting."
+   },{headers});
+ }
+ if(u.pathname==="/api/jd-ready/status"){
+  const items=BILINGUAL_FEATURED_IDS.map(id=>{
+   const meta=durableJobStore?.metadata(id);
+   const completed=durableJobStore?.readyDocument(id);
+   return {id,englishReady:!!completed?.originalText,
+     chineseReady:completed?.ready===true,
+     done:completed?.done??meta?.done??0,total:completed?.total??meta?.total??0,
+     state:meta?.state||"PREPARING"};
+  });
+  return Response.json({kind:"HHBA_PREPARED_BILINGUAL_V1",
+   persistent:!!durableJobStore,featured:items,
+   complete:items.filter(j=>j.chineseReady).length,total:items.length,
+   noForegroundTranslation:true},{headers});
+ }
  if(u.pathname==="/api/jd-sync/status"){
   return Response.json(durableJobStore?{...durableJobStore.coverage(),
    enabled:true,persistent:true,
@@ -1664,8 +1728,24 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
    if(u.pathname.startsWith("/api/"))return Response.json({job:present(job),description:null,richHtml:null,applyUrl:null,recordKind:job.company==="Xiaomi"?"OFFICIAL_LIST_OBSERVED":"OFFICIAL_JOB_PAGE_OBSERVED",currentApplicationVerified:false,detailVerified:job.company!=="Xiaomi",officialListUrl:job.company==="Xiaomi"?job.url:null,officialJobUrl:job.company==="Xiaomi"?null:job.url,observedAt:job.observedAt},{headers});
    return new Response(domesticDetailHtml(job),{headers:{...headers,"Content-Type":"text/html; charset=utf-8"}});
   }
+  const prepared=durableJobStore?.readyDocument(job.id,job.url);
+  if(prepared && u.pathname.startsWith("/api/")){
+   const offline:Detail={job,description:prepared.originalText,richHtml:"",applyUrl:job.url,
+      status:"LIVE_CONTENT",checkedAt:prepared.checkedAt};
+   return Response.json(offline,{headers});
+  }
   const result=await officialDetail(job);
   if(!result)return new Response("官方职位详情暂不可用，请从招聘列表进入企业官网",{status:503,headers});
+  if(durableJobStore&&result.status==="LIVE_CONTENT"&&result.description){
+    // Opportunistically save the checked English original (never trigger MT).
+    // A later GET can use it instantly, while the background worker fills zh.
+    try{
+     const sourceHash=createHash("sha256").update(result.description).digest("hex");
+     const segments=jdChunks(result.description);
+     if(segments.length>0&&segments.length<=150)
+      durableJobStore.sourceVersion(job.id,sourceHash,segments.length,result.description);
+    }catch(e){console.warn("HHBA_JD_SOURCE_CACHE_SKIPPED",e instanceof Error?e.message:"unknown");}
+  }
   if(u.pathname.startsWith("/api/"))return Response.json(result,{headers});
   const zhJd=await translatedDetail(result);
   return new Response(detailHtml(result,zhJd),{headers:{...headers,"Content-Type":"text/html; charset=utf-8"}});

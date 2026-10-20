@@ -42,7 +42,7 @@ export function createFullJdWorker({store,source,readDetail,chunkJd,translateChu
         store.fail(id,"SOURCE_JD_BLOCK_COUNT_UNSUPPORTED",{permanent:true});id=null;return {invalid_chunks:true};
       }
       const hash=createHash("sha256").update(detail.description).digest("hex");
-      const version=store.sourceVersion(id,hash,blocks.length);
+      const version=store.sourceVersion(id,hash,blocks.length,detail.description);
       if(version.complete){id=null;return {already_complete:true};}
       let translated=0;
       for(let part=0;part<blocks.length&&translated<maxPartsPerTick;part++){
