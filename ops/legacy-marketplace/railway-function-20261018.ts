@@ -1565,15 +1565,15 @@ async function whiteSiteResponse(req:Request,u:URL):Promise<Response|null>{
   return match?whiteSnapshot(match[1]):
    Response.json({error:"NOT_FOUND"},{status:404});
  }
- // Only allow the three provenance-verified, original brand SVGs.
+ // Serve only locally reviewed original vectors or official-site PNG/SVG icons.
  // Never turn this into an arbitrary filesystem path or URL proxy.
  if(p.startsWith("/brands/")){
-  if(!/^\/brands\/(?:openai|claude|spacex|si-[a-z0-9]{2,40})\.svg$/.test(p))
+  if(!/^\/brands\/(?:(?:openai|claude|spacex|si-[a-z0-9]{2,40})\.svg|brand-[a-z0-9]{2,60}\.(?:png|svg))$/.test(p))
    return new Response("Not found",{status:404});
   const verified=Bun.file(WHITE_PUBLIC_ROOT+p);
   if(!await verified.exists())return new Response("Brand asset not published",{status:404});
   return new Response(req.method==="HEAD"?null:verified,{headers:{
-   "Content-Type":"image/svg+xml; charset=utf-8",
+   "Content-Type":p.endsWith(".png")?"image/png":"image/svg+xml; charset=utf-8",
    "Cache-Control":"public, max-age=86400",
    "X-Content-Type-Options":"nosniff",
    "Content-Security-Policy":"default-src 'none'; style-src 'unsafe-inline'; sandbox"
