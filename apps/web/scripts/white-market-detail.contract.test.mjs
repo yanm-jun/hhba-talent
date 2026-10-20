@@ -22,7 +22,8 @@ test('job cards only link internally to the white detail page',()=>{
 test('white detail includes full JD parsing, retry and verified apply link',()=>{
  const detail=cards.slice(cards.indexOf('export function UnifiedJobDetail'));
  assert.ok(detail.includes('fetchOfficialJd(job,controller.signal)'));
- assert.ok(detail.includes("translateGreenJd(job,jd.originalText"));
+ assert.ok(detail.includes('fetchPreparedBilingualJd(job,controller.signal)'));
+ assert.ok(!detail.includes('translateGreenJd('),'the browser must never translate JD chunks on click');
  assert.ok(detail.includes('职位说明与任职要求'));
  assert.ok(detail.includes("setJdRetry(n=>n+1)"));
  assert.ok(detail.includes("safeOfficialJobUrl(job)"));
@@ -59,4 +60,16 @@ test('recruitment market hides all three highlighted notices while retaining fil
  ])assert.ok(market.includes(retained),'required function unexpectedly removed: '+retained);
  assert.ok(cards.slice(cards.indexOf('export function UnifiedJobDetail')).includes('loadPublicJobAudit()'),
    'job detail official source audit must continue to work');
+});
+
+test('cached original and complete Chinese are source-bound, no partial translation UI',()=>{
+ const detail=cards.slice(cards.indexOf('export function UnifiedJobDetail'));
+ assert.ok(detail.includes('setChineseJd(prepared.chinese'));
+ assert.ok(detail.includes('setTranslationPrepared(prepared.ready)'));
+ assert.ok(detail.includes('fetchOfficialJd(job,controller.signal)'));
+ assert.ok(detail.includes('中文完整译文正在后台准备'));
+ assert.ok(!detail.includes('翻译进度'));
+ assert.ok(reader.includes('/ready-jd'));
+ assert.ok(reader.includes('if(sourceHash!==data.sourceHash)'));
+ assert.ok(reader.includes('data.sourceUrl!==job.url'));
 });
