@@ -1,0 +1,62 @@
+name: HHBA Bilingual JD instant browser verification
+on:
+  push:
+    branches: [test/precomputed-jd-browser-20261020]
+    paths: ['.github/workflows/hhba-precomputed-browser.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Install temporary real browser
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.0
+          npx playwright install --with-deps chromium
+      - name: Confirm the real white detail does not launch translation calls
+        run: |
+          node --input-type=module <<'NODE'
+          import {chromium} from 'playwright';
+          import assert from 'node:assert/strict';
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          try{
+           const page=await browser.newPage({viewport:{width:1350,height:950}});
+           const base='https://hhba-web-production-024c.up.railway.app';
+           let chunkCalls=0,preparedCalls=0;
+           page.on('request',request=>{
+             if(request.url().includes('/translate-part'))chunkCalls++;
+             if(request.url().includes('/ready-jd'))preparedCalls++;
+           });
+           const first='ashby-openai-18e64608-5881-4b8f-b5cf-abd09a8ff086';
+           await page.goto(base+'/candidate/jobs/'+first,{waitUntil:'domcontentloaded',timeout:80000});
+           await page.locator('.unified-jd-chinese').waitFor({timeout:45000});
+           const original=await page.locator('.unified-jd-chinese').innerText();
+           assert.ok(original.length>100,'prepared Chinese lacks complete content');
+           await page.getByRole('button',{name:'English'}).click();
+           const english=await page.locator('.unified-jd-section').allInnerTexts();
+           assert.ok(english.join('').length>100,'original English not displayed');
+           await page.getByRole('button',{name:'中文'}).click();
+           await page.locator('.unified-jd-chinese').waitFor({timeout:8000});
+           assert.equal(chunkCalls,0,'browser must not call incremental machine translation');
+           assert.ok(preparedCalls>=1,'precomputed cache not used');
+           console.log('HHBA_PREPARED_BROWSER_READY',JSON.stringify({cachedChineseCharacters:original.length,
+             originalEnglishCharacters:english.join('').length,preparedCalls,chunkCalls}));
+           const second='greenhouse-anthropic-5391293008';
+           await page.goto(base+'/candidate/jobs/'+second,{waitUntil:'domcontentloaded',timeout:80000});
+           await page.locator('.unified-jd-content').waitFor({timeout:45000});
+           const status=await page.locator('.unified-jd-chinese').count();
+           if(!status){
+             assert.ok((await page.locator('.unified-jd-translate').innerText()).includes('后台准备'));
+             await page.getByRole('button',{name:'English'}).click();
+             assert.ok((await page.locator('.unified-jd-section').allInnerTexts()).join('').length>100);
+           }
+           assert.equal(chunkCalls,0,'unprepared Chinese job must not trigger foreground translation');
+           console.log('HHBA_PREPARED_BROWSER_NO_CHUNKS',JSON.stringify({secondCachedChinese:!!status,
+             samePageLanguageSwitch:true,foregroundTranslationCalls:chunkCalls}));
+          }finally{await browser.close()}
+          NODE
