@@ -1351,7 +1351,17 @@
       "company": "Twilio",
       "platform": "greenhouse",
       "source": "twilio",
-      "people": [],
+      "people": [
+        {
+          "name": "Jeff Lawson",
+          "role": {
+            "zh": "创始人",
+            "en": "Founder"
+          },
+          "source": "https://www.twilio.com/en-us/blog/company/leadership-updates/twilio-leadership-update",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
@@ -1431,7 +1441,35 @@
       "company": "Cognition",
       "platform": "ashby",
       "source": "cognition",
-      "people": [],
+      "people": [
+        {
+          "name": "Scott Wu",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.businessinsider.com/cognition-ceo-scott-wu-tokenmaxxing-leaderboards-opinion-ai-vibe-coding-2026-6",
+          "photo": null
+        },
+        {
+          "name": "Steven Hao",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.businessinsider.com/cognition-ceo-scott-wu-tokenmaxxing-leaderboards-opinion-ai-vibe-coding-2026-6",
+          "photo": null
+        },
+        {
+          "name": "Walden Yan",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.businessinsider.com/cognition-ceo-scott-wu-tokenmaxxing-leaderboards-opinion-ai-vibe-coding-2026-6",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
@@ -1439,7 +1477,26 @@
       "company": "ShopBack",
       "platform": "lever",
       "source": "shopback-2",
-      "people": [],
+      "people": [
+        {
+          "name": "Henry Chan",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.shopback.co.jp/press/shopback-raises-us-80-million-in-series-f-investment-led-by-asia-partners",
+          "photo": null
+        },
+        {
+          "name": "Joel Leong",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.shopback.co.jp/press/shopback-raises-us-80-million-in-series-f-investment-led-by-asia-partners",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
@@ -1465,7 +1522,17 @@
       "company": "Ashby",
       "platform": "ashby",
       "source": "ashby",
-      "people": [],
+      "people": [
+        {
+          "name": "Benjamin Encz",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.ashbydev.com/blog/culture/series-c",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
@@ -1503,7 +1570,26 @@
       "company": "General Robotics",
       "platform": "ashby",
       "source": "generalrobotics",
-      "people": [],
+      "people": [
+        {
+          "name": "Ashish Kapoor",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.crunchbase.com/organization/gen-robotics",
+          "photo": null
+        },
+        {
+          "name": "Dinesh Narayanan",
+          "role": {
+            "zh": "联合创始人",
+            "en": "Co-founder"
+          },
+          "source": "https://www.crunchbase.com/organization/gen-robotics",
+          "photo": null
+        }
+      ],
       "workplaces": [],
       "relationship": null
     },
