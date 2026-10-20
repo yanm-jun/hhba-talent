@@ -1,0 +1,54 @@
+name: HHBA Original Brand and Featured Job Proof
+on:
+  push:
+    branches: [feat/official-brand-logos-featured-20261020]
+    paths: ['.github/workflows/hhba-brand-source-diagnostics.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify original brand download candidates and official job audit
+        run: |
+          python - <<'PY'
+          import urllib.request,io,zipfile
+          url='https://cdn.openai.com/brand/OpenAI-Logos-2025.zip'
+          try:
+           data=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'}),timeout=25).read()
+           z=zipfile.ZipFile(io.BytesIO(data))
+           print('OFFICIAL_OPENAI_BRAND_ZIP',len(data),'items',len(z.namelist()))
+           for name in z.namelist()[:65]:print('OFFICIAL_OPENAI_FILE',name)
+          except Exception as exc:print('OFFICIAL_OPENAI_SOURCE_BLOCKED',type(exc).__name__,str(exc)[:130])
+          for site in ['https://claude.com/favicon.svg','https://claude.com/favicon.ico',
+             'https://www.spacex.com/favicon.ico','https://www.spacex.com/favicon.png']:
+           try:
+            r=urllib.request.urlopen(urllib.request.Request(site,headers={'User-Agent':'Mozilla/5.0'}),timeout=12)
+            print('OFFICIAL_ICON_PROBE',site,r.status,r.headers.get('Content-Type'),len(r.read()))
+           except Exception as exc:print('OFFICIAL_ICON_BLOCKED',site,type(exc).__name__)
+          PY
+          node --input-type=module <<'NODE'
+          const root='https://hhba-web-production-024c.up.railway.app';
+          const live=await fetch(root+'/data/jobs.json',{signal:AbortSignal.timeout(45000)}).then(r=>r.json());
+          const audit=await fetch(root+'/data/job-sync-status.json',{signal:AbortSignal.timeout(45000)}).then(r=>r.json());
+          const ids=['ashby-openai-18e64608-5881-4b8f-b5cf-abd09a8ff086',
+            'ashby-openai-7ba0b390-b198-4101-80bb-b49a6dd62607',
+            'greenhouse-anthropic-5426627008','greenhouse-anthropic-5391293008',
+            'greenhouse-spacex-8885762002','greenhouse-spacex-8621995002'];
+          for(const id of ids){
+           const job=live.jobs.find(j=>j.id===id);
+           const proof=audit.jobs.find(j=>j.job_id===id);
+           let apiStatus=0,contentStatus='unknown';
+           try{const r=await fetch(root+'/api/jobs/'+id,{signal:AbortSignal.timeout(22000)});
+            apiStatus=r.status;if(r.ok){const d=await r.json();contentStatus=d.status||'unknown'}}catch{}
+           console.log('FEATURED_JOB_ID_EVIDENCE',JSON.stringify({
+            id,found:!!job,title:job?.title,company:job?.company,originalUrl:job?.url,
+            zhTitle:job?.titleZh,titleStatus:job?.titleStatus,auditStatus:proof?.status,
+            platform:job?.platform,apiStatus,contentStatus
+           }));
+          }
+          NODE
