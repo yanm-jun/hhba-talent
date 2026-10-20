@@ -97,7 +97,7 @@ test('new reviewed employer entries have exact source ID and multiple attributab
   ]),'utf8').toString('base64url'));
   assert.equal(entry.name,entry.identity.company);
   assert.ok(!ids.has(entry.id));ids.add(entry.id);
-  assert.match(entry.lastReviewed,/^\\d{4}-\\d{2}-\\d{2}$/);
+  assert.match(entry.lastReviewed,/^\d{4}-\d{2}-\d{2}$/);
   assert.ok(entry.overview.length>=2&&entry.focus.length>=1);
   assert.ok(entry.sources.length>=2);
   assert.ok(entry.sources.every(s=>{
