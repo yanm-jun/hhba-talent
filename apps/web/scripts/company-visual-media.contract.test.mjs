@@ -24,7 +24,7 @@ test('founder facts have identity sources, never backfill unknown names or face 
   assert.ok(Array.isArray(company.people)&&Array.isArray(company.workplaces));
   for(const person of company.people){
    count++;
-   assert.ok(person.name.length>=3 && person.role.en==='Co-founder');
+   assert.ok(person.name.length>=3 && ['Founder','Co-founder'].includes(person.role.en));
    const u=new URL(person.source);
    assert.equal(u.protocol,'https:');
    if(person.photo){photos++;validMedia(person.photo);}
