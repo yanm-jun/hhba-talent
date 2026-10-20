@@ -1,0 +1,28 @@
+name: HHBA Brand Sources Audit
+on:
+  push:
+    branches: [feat/verified-brand-registry-20261020]
+    paths: ['.github/workflows/hhba-brand-sources-audit.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read immutable Simple Icons source ledger
+        run: |
+          python - <<'PY'
+          import urllib.request,json
+          sha="c71c69e3a27e4436936b831c72643e6513b9f49b"
+          u="https://raw.githubusercontent.com/simple-icons/simple-icons/"+sha+"/data/simple-icons.json"
+          records=json.loads(urllib.request.urlopen(u,timeout=30).read())
+          chosen=["stripe","coinbase","airbnb","databricks","doordash","spotify","canonical","palantir","figma","discord","reddit","airtable","robinhood","gitlab","cloudflare","vercel","wise","coursera","notion","linear","perplexity","elevenlabs","cursor","replit","posthog"]
+          def slug(t):
+           import re,unicodedata
+           return re.sub("[^a-z0-9]","",unicodedata.normalize("NFKD",t).lower())
+          for name in chosen:
+           v=next((x for x in records if slug(x.get("title",""))==name),None)
+           print('BRAND_SOURCE_PROOF',json.dumps({"slug":name,"title":v.get("title") if v else None,
+             "source":v.get("source") if v else None,"guidelines":v.get("guidelines") if v else None,
+             "hex":v.get("hex") if v else None,"license":v.get("license") if v else None}))
+          PY
