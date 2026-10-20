@@ -1315,7 +1315,8 @@ async function readJobForTranslation(req:Request,u:URL,headers:Record<string,str
     typeof sourceHash!=="string"||!/^[a-f0-9]{64}$/.test(sourceHash))
   return Response.json({error:"bad_reader_request"},{status:400,headers});
  const catalog=await load();
- const job=catalog?.rows.find(row=>row.id===match[1]);
+ // White-only verified ATS jobs use the same hash-bound translation path.
+ const job=catalog?.rows.find(row=>row.id===match[1])||await fromWhiteIndex(match[1]);
  if(!job)return Response.json({error:"posting_not_listed"},{status:404,headers});
  activeJdReaders++;
  try{
