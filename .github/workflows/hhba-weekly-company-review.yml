@@ -1,0 +1,42 @@
+name: HHBA Weekly Company Biography Review Queue
+on:
+  schedule:
+    - cron: '30 2 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  create-review-queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/white-railway-migration-20261020
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Read only HHBA source-verified public job index and same-version audit
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/hhba-company-audit
+          curl --fail --location --retry 3 --retry-all-errors --max-time 90 \
+            --output /tmp/hhba-company-audit/jobs.json \
+            https://hhba-web-production-024c.up.railway.app/data/jobs.json
+          curl --fail --location --retry 3 --retry-all-errors --max-time 90 \
+            --output /tmp/hhba-company-audit/job-sync-status.json \
+            https://hhba-web-production-024c.up.railway.app/data/job-sync-status.json
+          test -s /tmp/hhba-company-audit/jobs.json
+          test -s /tmp/hhba-company-audit/job-sync-status.json
+      - name: Build evidence-only CSV-ready JSON for human investigation
+        run: |
+          node apps/web/scripts/export-company-review-queue.mjs \
+            /tmp/hhba-company-audit/jobs.json \
+            /tmp/hhba-company-audit/job-sync-status.json \
+            /tmp/hhba-company-audit/company-review-queue.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hhba-company-editorial-review-queue
+          path: /tmp/hhba-company-audit/company-review-queue.json
+          retention-days: 7
+          if-no-files-found: error
