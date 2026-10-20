@@ -23,6 +23,18 @@ const allowedHosts={
  greenhouse:['boards.greenhouse.io','boards.eu.greenhouse.io','job-boards.greenhouse.io'],
  lever:['jobs.lever.co','jobs.eu.lever.co']
 };
+const brandedGreenhouse={
+ stripe:{host:'stripe.com',path:'/jobs/search'},
+ coinbase:{host:'www.coinbase.com',path:'/careers/positions/'},
+ airbnb:{host:'careers.airbnb.com',path:'/positions/'},
+ databricks:{host:'databricks.com',path:'/company/careers/open-positions/job'}
+};
+const domesticHosts={
+ 'xiaomi-official':'xiaomi.jobs.f.mioffice.cn',
+ 'meituan-official':'zhaopin.meituan.com',
+ 'tencent-official':'careers.tencent.com',
+ 'baidu-official':'talent.baidu.com'
+};
 function identityForJob(job){
  if(!job.company||!job.platform||!job.source||typeof job.company!=='string')return null;
  const company=job.company.trim();
@@ -34,9 +46,16 @@ function verifiedUrl(job){
  try{
   const u=new URL(job.url);
   if(u.protocol!=='https:'||u.username||u.password||u.port)return false;
-  if(job.domestic)return /-official$/.test(job.platform)&&u.hostname.includes('.');
-  if(!(allowedHosts[job.platform]||[]).includes(u.hostname))return false;
-  return u.pathname.split('/').includes(job.source);
+  if(job.domestic)return u.hostname===domesticHosts[job.platform];
+  if((allowedHosts[job.platform]||[]).includes(u.hostname)&&
+    u.pathname.split('/').includes(job.source))return true;
+  const branded=job.platform==='greenhouse'?brandedGreenhouse[job.source]:null;
+  const prefix='greenhouse-'+job.source+'-';
+  const native=job.id?.startsWith(prefix)?job.id.slice(prefix.length):'';
+  return !!branded&&/^[0-9]{5,20}$/.test(native)&&
+    u.hostname===branded.host&&
+    (branded.path.endsWith('/')?u.pathname.startsWith(branded.path):u.pathname===branded.path)&&
+    u.searchParams.get('gh_jid')===native;
  }catch{return false}
 }
 for(const job of snapshot.jobs){
