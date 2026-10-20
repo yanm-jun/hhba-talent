@@ -19,7 +19,7 @@ function safeOrigin(to:unknown):to is string{
  return path==='/'||path==='/candidate'||path==='/candidate/jobs'||path==='/candidate/match'||
    path==='/candidate/jobs/archive'||path==='/candidate/employer-jobs';
 }
-const safeScroll=(value:unknown)=>Number.isFinite(value)&&typeof value==='number'&&value>=0&&value<10000000?value:0;
+const safeScroll=(value:unknown)=>typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<10000000?value:0;
 function saveScrollForCurrentEntry(){
  const previous=history.state&&typeof history.state==='object'?history.state:{};
  history.replaceState({...previous,hhbaScrollY:Math.max(0,window.scrollY||0)},'');
