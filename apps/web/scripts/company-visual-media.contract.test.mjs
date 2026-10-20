@@ -15,6 +15,7 @@ const validMedia=m=>{
 };
 test('50 marquee brand identities are individually mapped to exact-source visual records',()=>{
  assert.equal(data.records.length,50);
+ assert.ok(data.records.every(x=>x.people.length>=1),'every brand source needs named founding-person attribution');
  assert.equal(new Set(data.records.map(id)).size,50);
  assert.deepEqual(new Set(data.records.map(id)),new Set(brands.map(id)));
 });
@@ -30,7 +31,7 @@ test('founder facts have identity sources, never backfill unknown names or face 
    if(person.photo){photos++;validMedia(person.photo);}
   }
  }
- assert.ok(count>=40);
+ assert.ok(count>=100);
  assert.ok(photos>=10);
  const binance=data.records.find(x=>x.company==='Binance');
  assert.equal(binance.platform,'lever');
@@ -44,7 +45,7 @@ test('office / headquarters photos are genuinely dated, located and licensed',()
   assert.match(place.takenAt,/^20[0-9]{2}-[0-9]{2}-[0-9]{2}$/);
   assert.ok(['office-building','workplace'].includes(place.kind));
  }
- assert.ok(photos>=6);
+ assert.ok(photos>=8);
  const first=data.records.find(x=>x.company==='Airbnb');
  assert.ok(first.workplaces.some(x=>x.file.includes('Atrium')&&x.takenAt.startsWith('2017')));
 });
