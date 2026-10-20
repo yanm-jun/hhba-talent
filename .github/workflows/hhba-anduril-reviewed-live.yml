@@ -33,9 +33,8 @@ jobs:
               await new Promise(r=>setTimeout(r,3000));
             }
             assert.equal(response?.status(),200);
-            await page.locator('.company-profile-identity h1').waitFor({timeout:30000});
+            await page.locator('.company-profile-job-card').first().waitFor({timeout:45000});
             assert.equal(await page.locator('.company-profile-identity h1').textContent(),'Anduril');
-            await page.locator('.company-profile-job-card').first().waitFor({timeout:35000});
             assert.ok((await page.locator('.company-profile-section').first().textContent()).includes('2017'));
             assert.ok(await page.locator('.company-profile-focus').count()>=3,'verified products not published');
             assert.ok(await page.locator('.company-profile-sources>a').count()>=4,'official sources missing');
