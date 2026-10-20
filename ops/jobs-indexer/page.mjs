@@ -14,6 +14,7 @@ export function home(){
  '<form id="filters"><input id="q" placeholder="搜索职位、公司、城市" aria-label="关键词">'+
  '<select id="company" aria-label="企业"><option value="">全部企业</option>'+options+'</select>'+
  '<select id="remote" aria-label="远程筛选"><option value="">全部工作方式</option><option value="true">仅远程</option></select>'+
+ '<select id="status" aria-label="岗位时效"><option value="fresh">近期官网同步</option><option value="stale">历史缓存（单独查看）</option></select>'+ 
  '<button type="submit">搜索岗位</button></form>'+
  '<p id="summary">正在核验公开招聘来源…</p><div id="jobs"></div><button id="more" type="button" hidden>查看更多岗位</button>'+
  '<footer><small id="site-footer">HHBA 非招聘企业官方平台，亦不代表与这些企业存在合作关系。部分企业的招聘网站在某些网络环境下可能无法访问。</small></footer></main></body></html>';
