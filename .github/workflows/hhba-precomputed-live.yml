@@ -1,0 +1,80 @@
+name: HHBA Prepared Bilingual JD Railway Live Acceptance
+on:
+  push:
+    branches: [test/live-precomputed-jd-20261020]
+    paths: ['.github/workflows/hhba-precomputed-live.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check instant cache API, completeness and no on-click translation
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {createHash} from 'node:crypto';
+          const host='https://hhba-web-production-024c.up.railway.app';
+          async function get(path){
+            let last;
+            for(let attempt=0;attempt<3;attempt++){
+              try{return await fetch(host+path,{redirect:'manual',signal:AbortSignal.timeout(45000)})}
+              catch(e){last=e;await new Promise(r=>setTimeout(r,1200))}
+            }
+            throw last;
+          }
+          const health=await get('/health');assert.equal(health.status,200);
+          const status=await get('/api/jd-ready/status');
+          assert.equal(status.status,200,'new precomputed JD status missing');
+          const summary=await status.json();
+          assert.equal(summary.kind,'HHBA_PREPARED_BILINGUAL_V1');
+          assert.equal(summary.persistent,true,'private /sync-state not connected');
+          assert.equal(summary.noForegroundTranslation,true);
+          assert.equal(summary.featured.length,6);
+          const ids=new Set(summary.featured.map(x=>x.id));assert.equal(ids.size,6);
+          const list=[];
+          for(const {id} of summary.featured){
+            const before=Date.now(),r=await get('/api/jobs/'+id+'/ready-jd');
+            assert.ok([200,202].includes(r.status),'cache route unexpected '+r.status+' '+id);
+            const data=await r.json();
+            if(r.status===200){
+              assert.equal(data.jobId,id);
+              assert.equal(data.job?.id,id);
+              assert.equal(data.sourceUrl,data.job.url);
+              assert.ok(data.originalText?.length>100);
+              assert.equal(createHash('sha256').update(data.originalText).digest('hex'),data.sourceHash);
+              if(data.ready===true){
+                assert.equal(data.status,'READY');
+                assert.ok(data.chineseText&&/[\u3400-\u9fff]/.test(data.chineseText));
+                assert.equal(data.done,data.total);
+              }else{
+                assert.equal(data.chineseText,null,'a partial translation was exposed');
+                assert.equal(data.status,'TRANSLATING');
+              }
+            }else{
+              assert.equal(data.ready,false);
+              assert.equal(data.status,'PREPARING');
+            }
+            list.push({id,status:r.status,ready:data.ready===true,ms:Date.now()-before});
+          }
+          const page=await get('/candidate/jobs/greenhouse-anthropic-5391293008');
+          assert.equal(page.status,200);
+          const html=await page.text();
+          const asset=html.match(/src="(\/assets\/[^"]+\.js)"/);
+          assert.ok(asset);
+          const js=await get(asset[1]);assert.equal(js.status,200);
+          const source=await js.text();
+          assert.ok(source.includes('中文完整译文正在后台准备'),
+            'not-ready state missing');
+          assert.ok(!source.includes('翻译进度 '),'foreground paragraph progress still shipped');
+          console.log('HHBA_PRECOMPUTED_JD_LIVE',JSON.stringify({
+            englishReady:summary.featured.filter(x=>x.englishReady).length,
+            completeChinese:summary.complete,featured:6,individual:list,
+            status:'real cache coverage, not fabricated completeness'
+          }));
+          NODE
