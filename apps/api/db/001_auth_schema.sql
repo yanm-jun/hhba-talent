@@ -8,6 +8,8 @@
 --     手机登录成功 != 企业已认证（employer_verifications.status 独立流转）；
 --   * 管理员不能自助获得：is_admin 只能由受控流程置位，且必须记录 granted_by / granted_at，
 --     CHECK 约束保证「有管理员标记必有授予记录」；
+--   * 注册/登录双入口严格分开（2026-10-21 用户拍板）：sms_codes.purpose 绑定入口、验证码不可跨用途；
+--     users.registered_from 记录建号来源，登录流程在应用层没有任何 INSERT users 路径；
 --   * 验证码与会话只存哈希（HMAC-SHA256，密钥在环境变量 SMS_CODE_PEPPER / 会话密钥），库里没有明文；
 --   * 设备级匿名收藏（现有 hhba-saved.sqlite）与账户收藏是两张语义不同的表，禁止自动合并：
 --     saved_jobs_account 只写登录后用户主动收藏；匿名收藏迁移须用户在前端显式确认后逐条调用接口。
@@ -25,6 +27,10 @@ CREATE TABLE users (
   status          text NOT NULL DEFAULT 'active'
                     CONSTRAINT users_status_chk CHECK (status IN ('active', 'suspended', 'deleted')),
   is_admin        boolean NOT NULL DEFAULT false,
+  registered_from text NOT NULL DEFAULT 'register'
+                    CONSTRAINT users_registered_from_chk CHECK (registered_from IN ('register', 'admin')),
+                    -- 账户来源：'register'=经注册入口自助注册（本系统唯一自助建号路径，2026-10-21 双入口拍板）；
+                    -- 'admin'=受控离线流程预置。登录路径永不 INSERT users，此列即对账证据。
   admin_granted_by uuid,            -- 授予人（另一名管理员或离线受控流程的记录 id）
   admin_granted_at timestamptz,
   CONSTRAINT users_admin_grant_required
@@ -66,8 +72,10 @@ CREATE INDEX auth_sessions_user_idx ON auth_sessions (user_id, expires_at) WHERE
 CREATE TABLE sms_codes (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   phone        text NOT NULL,
-  purpose      text NOT NULL DEFAULT 'login' CONSTRAINT sms_purpose_chk CHECK (purpose IN ('login')),
-  code_hash    text NOT NULL,                  -- HMAC-SHA256(pepper, phone|code)，绝不存明文验证码
+  purpose      text NOT NULL CONSTRAINT sms_purpose_chk CHECK (purpose IN ('register', 'login')),
+                    -- 用途与入口绑定（2026-10-21 双入口拍板）：无默认值，应用层发码必填；
+                    -- register 码只能完成注册、login 码只能完成登录，跨用途在应用层查无此码即失败。
+  code_hash    text NOT NULL,                  -- HMAC-SHA256(pepper, phone|purpose|code)，绝不存明文验证码
   attempts     integer NOT NULL DEFAULT 0 CONSTRAINT sms_attempts_chk CHECK (attempts >= 0),
   max_attempts integer NOT NULL DEFAULT 5,
   sent_via     text NOT NULL DEFAULT 'mock',   -- aliyun | mock（mock 仅非 production，应用层强制）

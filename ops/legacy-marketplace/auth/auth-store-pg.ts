@@ -5,11 +5,13 @@
  * 为避免在本代码包里锁死驱动版本，这里只依赖一个最小 Queryable 接口：
  * 生产装配时传 pg.Pool（npm 包 pg 的 Pool.query 签名兼容）或 Bun.sql 的等价封装。
  * 全部 SQL 参数化，表/列与 apps/api/db/001_auth_schema.sql 一一对应。
- * 并发纪律：loginWithCode 的「读最新未消费码 → 校验 → 写回」须在同一事务中对 sms_codes 行
- * 加 FOR UPDATE（见 loginTx 注释），否则并发请求可绕过 5 次错误上限——合并时按注释落地。
+ * 并发纪律：registerWithCode / loginWithCode 的「读最新未消费码 → 校验 → 写回」须在同一事务中
+ * 对 sms_codes 行加 FOR UPDATE（见 latestOpenSmsCode 注释），否则并发请求可绕过 5 次错误上限。
+ * 双入口纪律：insertNewUserForRegister 是全库唯一的 users INSERT，只允许注册路径调用；
+ * 登录路径在本文件里只有 SELECT + UPDATE last_login_at，合并评审时按此条 grep 核对。
  */
 import type { AuthStore, UserRow, SessionRow } from "./auth-service.ts";
-import type { SmsCodeRecord } from "./sms-code.ts";
+import type { SmsCodeRecord, SmsPurpose } from "./sms-code.ts";
 
 export interface Queryable {
   query(sql: string, params?: unknown[]): Promise<{ rows: Record<string, unknown>[] }>;
@@ -20,6 +22,7 @@ const toUser = (r: Record<string, unknown>): UserRow => ({
   accountRole: r.account_role as UserRow["accountRole"], status: r.status as UserRow["status"],
   isAdmin: Boolean(r.is_admin), createdAtMs: new Date(String(r.created_at)).getTime(),
   lastLoginAtMs: r.last_login_at ? new Date(String(r.last_login_at)).getTime() : null,
+  registeredFrom: (r.registered_from as UserRow["registeredFrom"]) ?? "register",
 });
 
 export class PgAuthStore implements AuthStore {
@@ -29,10 +32,11 @@ export class PgAuthStore implements AuthStore {
     const { rows } = await this.db.query("SELECT * FROM users WHERE phone=$1", [phone]);
     return rows[0] ? toUser(rows[0]) : null;
   }
-  async createUser(phone: string): Promise<UserRow> {
+  /** 唯一建号 SQL：registered_from 写死 'register'。仅注册路径可调用（见文件头纪律）。 */
+  async insertNewUserForRegister(phone: string): Promise<UserRow> {
     // ON CONFLICT 兜底并发同号注册：唯一约束保证最终只有一个账户
     const { rows } = await this.db.query(
-      `INSERT INTO users(phone) VALUES($1)
+      `INSERT INTO users(phone, registered_from) VALUES($1, 'register')
        ON CONFLICT (phone) DO UPDATE SET phone=EXCLUDED.phone RETURNING *`, [phone]);
     return toUser(rows[0]);
   }
@@ -53,7 +57,7 @@ export class PgAuthStore implements AuthStore {
        ORDER BY created_at DESC LIMIT 1`, [phone, purpose]);
     const r = rows[0]; if (!r) return null;
     return {
-      id: String(r.id), phone: String(r.phone), purpose: String(r.purpose), codeHash: String(r.code_hash),
+      id: String(r.id), phone: String(r.phone), purpose: String(r.purpose) as SmsPurpose, codeHash: String(r.code_hash),
       attempts: Number(r.attempts), maxAttempts: Number(r.max_attempts),
       createdAtMs: new Date(String(r.created_at)).getTime(), expiresAtMs: new Date(String(r.expires_at)).getTime(),
       consumedAtMs: r.consumed_at ? new Date(String(r.consumed_at)).getTime() : null,
@@ -63,10 +67,13 @@ export class PgAuthStore implements AuthStore {
     await this.db.query("UPDATE sms_codes SET attempts=$2, consumed_at=$3 WHERE id=$1",
       [rec.id, rec.attempts, rec.consumedAtMs ? new Date(rec.consumedAtMs).toISOString() : null]);
   }
-  async logSmsSend(e: { phone: string; provider: string; requestId: string | null; status: string; errorCode: string | null; ip: string | null }): Promise<void> {
+  async logSmsSend(e: { phone: string; purpose: string | null; provider: string; requestId: string | null; status: string; errorCode: string | null; ip: string | null }): Promise<void> {
+    // sms_send_log 无 purpose 列：用途进 detail jsonb，排障时可按 register/login 拆分
     await this.db.query(
-      `INSERT INTO sms_send_log(phone,provider,provider_request_id,status,error_code,request_ip)
-       VALUES($1,$2,$3,$4,$5,$6)`, [e.phone, e.provider, e.requestId, e.status, e.errorCode, e.ip]);
+      `INSERT INTO sms_send_log(phone,provider,provider_request_id,status,error_code,detail,request_ip)
+       VALUES($1,$2,$3,$4,$5,$6,$7)`,
+      [e.phone, e.provider, e.requestId, e.status, e.errorCode,
+       JSON.stringify({ purpose: e.purpose }), e.ip]);
   }
   async createSession(s: SessionRow): Promise<void> {
     await this.db.query(

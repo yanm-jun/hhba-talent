@@ -10,6 +10,11 @@
  *   - 数据库只存 HMAC-SHA256(pepper, phone|purpose|code)，不存明文；
  *     pepper 来自环境变量 SMS_CODE_PEPPER（见 sms-provider / auth-service 装配处）
  *   - 比较使用 timingSafeEqual 防时序侧信道
+ *
+ * 注册/登录双入口（2026-10-21 用户拍板，取代旧「验码即注册登录」统一入口）:
+ *   - 每条验证码记录强制绑定用途 purpose ∈ {'register','login'}，发码时必填、无默认值；
+ *   - purpose 进入 HMAC 输入：同一串数字在另一用途下哈希不同，天然不可跨用途使用；
+ *   - 存储层查询按 (phone, purpose) 取码，验码时再断言 record.purpose === 期望用途（双保险）。
  */
 import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 
@@ -23,20 +28,28 @@ export function isValidCnPhone(phone: unknown): phone is string {
   return typeof phone === "string" && CN_PHONE_RE.test(phone);
 }
 
+/** 验证码用途：与注册/登录两个独立入口一一对应。任何发码/验码调用都必须显式给出，缺失即非法。 */
+export type SmsPurpose = "register" | "login";
+export const SMS_PURPOSES: readonly SmsPurpose[] = ["register", "login"];
+export function isSmsPurpose(value: unknown): value is SmsPurpose {
+  return value === "register" || value === "login";
+}
+
 /** 生成 6 位数字验证码字符串（000000–999999 均匀分布，保留前导零）。 */
 export function generateCode(): string {
   return String(randomInt(0, 1_000_000)).padStart(CODE_LENGTH, "0");
 }
 
 /** 验证码的存储形态：只输出哈希。pepper 缺失直接抛错——宁可发不出码，不可降级存明文。 */
-export function hashCode(pepper: string, phone: string, purpose: string, code: string): string {
+export function hashCode(pepper: string, phone: string, purpose: SmsPurpose, code: string): string {
   if (!pepper || pepper.length < 16) throw new Error("SMS_CODE_PEPPER_MISSING_OR_WEAK");
+  if (!isSmsPurpose(purpose)) throw new Error("SMS_PURPOSE_INVALID");
   return createHmac("sha256", pepper).update(`${phone}|${purpose}|${code}`).digest("hex");
 }
 
 export interface SmsCodeRecord {
   phone: string;
-  purpose: string;
+  purpose: SmsPurpose;
   codeHash: string;
   attempts: number;
   maxAttempts: number;
@@ -45,11 +58,13 @@ export interface SmsCodeRecord {
   consumedAtMs: number | null;
 }
 
-/** 由明文码构造待入库记录；明文只应交给短信网关发送，调用方不得落库/打日志。 */
+/** 由明文码构造待入库记录；明文只应交给短信网关发送，调用方不得落库/打日志。
+ *  purpose 必填：不给默认值是刻意的——任何一处漏传用途在类型层就过不了。 */
 export function createCodeRecord(args: {
-  pepper: string; phone: string; purpose?: string; code: string; nowMs: number;
+  pepper: string; phone: string; purpose: SmsPurpose; code: string; nowMs: number;
 }): SmsCodeRecord {
-  const purpose = args.purpose ?? "login";
+  const purpose = args.purpose;
+  if (!isSmsPurpose(purpose)) throw new Error("SMS_PURPOSE_INVALID");
   return {
     phone: args.phone,
     purpose,
@@ -64,7 +79,7 @@ export function createCodeRecord(args: {
 
 export type VerifyResult =
   | { ok: true }
-  | { ok: false; reason: "consumed" | "expired" | "too_many_attempts" | "mismatch" };
+  | { ok: false; reason: "consumed" | "expired" | "too_many_attempts" | "mismatch" | "purpose_mismatch" };
 
 /**
  * 校验一次尝试。就地更新 record（attempts / consumedAtMs），
@@ -73,8 +88,13 @@ export type VerifyResult =
  */
 export function verifyCode(
   record: SmsCodeRecord,
-  args: { pepper: string; candidate: string; nowMs: number },
+  args: { pepper: string; candidate: string; nowMs: number; expectedPurpose?: SmsPurpose },
 ): VerifyResult {
+  // 用途断言（双保险的第二道）：正常路径已按 (phone, purpose) 取码、且哈希本身含 purpose，
+  // 这里再显式比对一次，任何装配错误都会以失败收场而不是串用途放行。不消耗尝试次数、不作废。
+  if (args.expectedPurpose !== undefined && record.purpose !== args.expectedPurpose) {
+    return { ok: false, reason: "purpose_mismatch" };
+  }
   if (record.consumedAtMs !== null) return { ok: false, reason: "consumed" };
   if (args.nowMs >= record.expiresAtMs) {
     record.consumedAtMs = args.nowMs;
