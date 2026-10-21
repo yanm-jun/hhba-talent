@@ -5,6 +5,9 @@ import {dirname,join} from 'node:path';
 import {getPublicOverview} from './metrics.mjs';
 
 const ROOT=dirname(fileURLToPath(import.meta.url));
+const PUBLIC_PREVIEW=process.env.HHBA_ADMIN_PUBLIC_PREVIEW==='1';
+const LOCAL_HOST=/^(?:127\\.0\\.0\\.1|localhost)(?::\\d{2,5})?$/;
+const RAILWAY_PREVIEW_HOST=/^[a-z0-9-]+\\.up\\.railway\\.app(?::\\d{2,5})?$/;
 const FILES=new Map([
  ['/','index.html'],['/index.html','index.html'],
  ['/styles.css','styles.css'],['/dashboard.js','dashboard.js'],
@@ -28,15 +31,19 @@ export function createPreviewServer({overview=getPublicOverview}={}){
  return httpServer(async(req,res)=>{
   const method=req.method||'GET';
   const host=req.headers.host||'';
-  // Prevent browser DNS rebinding and accidental public admin hosting.
-  if(!/^(?:127\.0\.0\.1|localhost)(?::\d{2,5})?$/.test(host)){
-   send(res,403,'Local preview only','text/plain; charset=utf-8',method);return;
+  // Preview serves only static UI and publicly available aggregate data.
+  // Railway public host is allowed only in explicit preview mode.
+  if(!LOCAL_HOST.test(host)&&!(PUBLIC_PREVIEW&&RAILWAY_PREVIEW_HOST.test(host))){
+   send(res,403,'Preview domain not allowed','text/plain; charset=utf-8',method);return;
   }
   if(!['GET','HEAD'].includes(method)){
    res.setHeader('Allow','GET, HEAD');
    send(res,405,'Read only preview','text/plain; charset=utf-8',method);return;
   }
   const url=new URL(req.url||'/', 'http://127.0.0.1');
+  if(url.pathname==='/health'){
+   send(res,200,JSON.stringify({ok:true,kind:'HHBA_ADMIN_PUBLIC_READONLY_PREVIEW_V1'}),'application/json; charset=utf-8',method);return;
+  }
   if(url.pathname==='/api/overview'){
    try{
     const data=await overview();
@@ -61,8 +68,8 @@ export function createPreviewServer({overview=getPublicOverview}={}){
 if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href){
  const requested=Number(process.env.PORT||4318);
  const port=Number.isInteger(requested)&&requested>=1024&&requested<=65535?requested:4318;
- createPreviewServer().listen(port,'127.0.0.1',()=>{
-  console.log('HHBA_ADMIN_PREVIEW http://127.0.0.1:'+port);
-  console.log('Localhost only. No admin authentication or privileged API is enabled.');
+ createPreviewServer().listen(port,PUBLIC_PREVIEW?'0.0.0.0':'127.0.0.1',()=>{
+  console.log('HHBA_ADMIN_PREVIEW_LISTEN '+port+' public='+PUBLIC_PREVIEW);
+  console.log('No admin authentication, candidate data, privileged API or write routes are enabled.');
  });
 }
