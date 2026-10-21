@@ -3,6 +3,7 @@
 import {Database} from 'bun:sqlite';
 import {createHmac,randomBytes,timingSafeEqual,createHash} from 'node:crypto';
 import {existsSync} from 'node:fs';
+import {validOrigin} from './engagement-core.mjs';
 
 const COOKIE='hhba_admin_v1',TTL=8*3600_000;
 const CACHE='no-store, no-cache, must-revalidate';
@@ -25,12 +26,14 @@ function cookie(p:string){
  const expiry=String(Date.now()+TTL),nonce=randomBytes(16).toString('hex');
  return `${COOKIE}=${expiry}.${nonce}.${mac(expiry+'.'+nonce,p)}; Max-Age=28800; Path=/; HttpOnly; Secure; SameSite=Strict`;
 }
-function clearCookie(){return `${COOKIE}=; Max-Age=0; Path=/management; HttpOnly; Secure; SameSite=Strict`;}
+function clearCookie(){return `${COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict`;}
 function sameOrigin(req:Request){
- try{
-  const origin=req.headers.get('origin');
-  return !!origin&&origin===new URL(req.url).origin&&req.headers.get('sec-fetch-site')!=='cross-site';
- }catch{return false}
+ const fetchSite=req.headers.get('sec-fetch-site');
+ if(fetchSite==='cross-site')return false;
+ const configured=Bun.env.RAILWAY_PUBLIC_DOMAIN||'';
+ const origin=req.headers.get('origin');
+ // A real browser POST supplies Origin; never trust arbitrary forwarded-host headers.
+ return validOrigin(origin,req.url,configured);
 }
 const attempts=new Map<string,{count:number,expires:number}>();
 function loginAllowed(key:string){
