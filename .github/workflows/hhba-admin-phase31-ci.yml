@@ -22,6 +22,7 @@ jobs:
       - name: Validate secured admin source and behavior
         run: |
           node --check ops/legacy-marketplace/admin-ui/dashboard.js
+          node --test ops/legacy-marketplace/tests/engagement-core.test.mjs
           bun test ops/legacy-marketplace/tests/admin-console.test.ts
       - name: Validate pre-existing official-job contracts
         working-directory: apps/web
