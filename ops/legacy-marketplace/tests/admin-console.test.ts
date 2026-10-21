@@ -74,3 +74,37 @@ test('custom period validated and never future dates',()=>{
  const fallback=normalizePeriod('7',new Date('2026-10-21T02:00:00Z'),'2026-10-10','2026-11-10');
  expect(fallback.days).toBe(7);
 });
+
+test('admin login succeeds with browser HTTPS origin when Railway forwards an HTTP internal URL',async()=>{
+ const prior=Bun.env.RAILWAY_PUBLIC_DOMAIN;
+ const trusted='hhba-web-production-024c.up.railway.app';
+ Bun.env.RAILWAY_PUBLIC_DOMAIN=trusted;
+ try{
+  const u=new URL('http://127.0.0.1:3000/management/login');
+  const mk=(origin:string,credential:string)=>new Request(u,{method:'POST',headers:{
+   origin,'sec-fetch-site':'same-origin','content-type':'application/x-www-form-urlencoded'
+  },body:new URLSearchParams({password:credential})});
+  const wrong=await handlePrivateAdmin(mk('https://'+trusted,'incorrect'),u);
+  expect(wrong?.status).toBe(200); // Not a proxy-origin 403.
+  const good=await handlePrivateAdmin(mk('https://'+trusted,secret),u);
+  expect(good?.status).toBe(303);
+  expect(good?.headers.get('location')).toBe('/management/');
+  const token=good?.headers.get('set-cookie')?.split(';')[0]||'';
+  expect(token.startsWith('hhba_admin_v1=')).toBe(true);
+  const statsUrl=new URL('http://127.0.0.1:3000/api/admin/growth?days=7');
+  const stats=await handlePrivateAdmin(new Request(statsUrl,{headers:{cookie:token}}),statsUrl);
+  expect(stats?.status).toBe(200);
+  const attack=await handlePrivateAdmin(mk('https://attacker.invalid',secret),u);
+  expect(attack?.status).toBe(403);
+  const badScheme=await handlePrivateAdmin(mk('http://'+trusted,secret),u);
+  expect(badScheme?.status).toBe(403);
+  const logoutUrl=new URL('http://127.0.0.1:3000/management/logout');
+  const logout=await handlePrivateAdmin(new Request(logoutUrl,{method:'POST',headers:{
+   cookie:token,origin:'https://'+trusted,'sec-fetch-site':'same-origin'}}),logoutUrl);
+  expect(logout?.status).toBe(303);
+  expect(logout?.headers.get('set-cookie')).toContain('Path=/;');
+ }finally{
+  if(prior===undefined)delete Bun.env.RAILWAY_PUBLIC_DOMAIN;
+  else Bun.env.RAILWAY_PUBLIC_DOMAIN=prior;
+ }
+});
