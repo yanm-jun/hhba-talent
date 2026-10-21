@@ -23,7 +23,7 @@ function authenticated(req:Request,p:string):boolean{
 }
 function cookie(p:string){
  const expiry=String(Date.now()+TTL),nonce=randomBytes(16).toString('hex');
- return `${COOKIE}=${expiry}.${nonce}.${mac(expiry+'.'+nonce,p)}; Max-Age=28800; Path=/management; HttpOnly; Secure; SameSite=Strict`;
+ return `${COOKIE}=${expiry}.${nonce}.${mac(expiry+'.'+nonce,p)}; Max-Age=28800; Path=/; HttpOnly; Secure; SameSite=Strict`;
 }
 function clearCookie(){return `${COOKIE}=; Max-Age=0; Path=/management; HttpOnly; Secure; SameSite=Strict`;}
 function sameOrigin(req:Request){
@@ -39,7 +39,7 @@ function loginAllowed(key:string){
  if(!r||r.expires<now){attempts.set(key,{count:1,expires:now+15*60_000});return true}
  r.count++;return r.count<=8;
 }
-const html=(content:string,status=200)=>new Response(content,{status,headers:{...HEADERS,'Content-Type':'text/html; charset=utf-8'}});
+const html=(content:string,status=200)=>new Response(content,{status,headers:{...HEADERS,'Content-Security-Policy':HEADERS['Content-Security-Policy'].replace("style-src 'self'","style-src 'self' 'unsafe-inline'"),'Content-Type':'text/html; charset=utf-8'}});
 function loginPage(error=false,disabled=false){
  return html(`<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>管理员登录 · HHBA</title>
  <style>:root{font-family:system-ui,"Microsoft YaHei",sans-serif;color:#24362a;background:#f6f9f6}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:16px}main{width:min(410px,100%);border:1px solid #dfe9e0;background:white;border-radius:18px;padding:36px;box-shadow:0 14px 42px #1b39200e}.logo{font-size:22px;font-weight:850;color:#326247}h1{font-size:23px;margin:27px 0 12px}p{font-size:13px;line-height:1.75;color:#718175}label{display:block;font-size:13px;font-weight:600;margin:23px 0 9px}input{display:block;width:100%;padding:13px;border:1px solid #d8e1d9;border-radius:9px;font-size:15px}button{background:#30674a;color:white;border:0;border-radius:9px;padding:13px;width:100%;margin-top:16px;font-weight:700;cursor:pointer}button:disabled{opacity:.5}.warn{color:#ad4a34}a{color:#386e4d;font-size:12px}</style></head><body><main>
@@ -124,7 +124,7 @@ export async function handlePrivateAdmin(req:Request,url:URL):Promise<Response|n
  if(path==='/management/login'&&req.method==='POST'){
   if(!sameOrigin(req))return bad('ORIGIN_DENIED',403);
   if(!(req.headers.get('content-type')||'').startsWith('application/x-www-form-urlencoded'))return bad('BAD_CONTENT_TYPE',415);
-  const key=req.headers.get('x-forwarded-for')?.split(',')[0]?.trim().slice(0,70)||'unknown';
+  const key='admin-login-global'; // Fixed bucket; forwarded IP headers must not bypass brute-force throttling.
   if(!loginAllowed(key))return loginPage(true);
   if(Number(req.headers.get('content-length')||0)>512)return bad('PAYLOAD_TOO_LARGE',413);
   const body=await req.text();if(body.length>512)return bad('PAYLOAD_TOO_LARGE',413);
