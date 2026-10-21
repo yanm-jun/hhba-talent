@@ -19,6 +19,8 @@ COPY ops/legacy-marketplace/railway-function-20261018.ts ./server.ts
 COPY ops/legacy-marketplace/jd-sync-store.mjs ./jd-sync-store.mjs
 COPY ops/legacy-marketplace/engagement.ts ./engagement.ts
 COPY ops/legacy-marketplace/saved.ts ./saved.ts
+COPY ops/legacy-marketplace/admin-console.ts ./admin-console.ts
+COPY ops/legacy-marketplace/admin-ui/ /app/admin-console/
 COPY ops/legacy-marketplace/engagement-core.mjs ./engagement-core.mjs
 COPY ops/legacy-marketplace/jd-sync-worker.mjs ./jd-sync-worker.mjs
 COPY ops/legacy-marketplace/jd-sync-runner.mjs ./jd-sync-runner.mjs
