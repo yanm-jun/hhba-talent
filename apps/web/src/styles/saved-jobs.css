@@ -1,0 +1,6 @@
+.hhba-save-wrap{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
+.hhba-save-button{display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:6px 10px;border:1px solid #dbe4df;border-radius:8px;background:#fff;color:#35624a;font-size:12px;cursor:pointer}
+.hhba-save-button:hover{border-color:#91b7a1;background:#f4f8f5}
+.hhba-save-button[aria-pressed="true"]{background:#edf5ee;border-color:#b6d3bf}
+.hhba-save-error{color:#ad3737;font-size:11px}
+@media(max-width:650px){.hhba-save-button{padding:7px}}
