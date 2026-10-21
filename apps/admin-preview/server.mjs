@@ -6,8 +6,8 @@ import {getPublicOverview} from './metrics.mjs';
 
 const ROOT=dirname(fileURLToPath(import.meta.url));
 const PUBLIC_PREVIEW=process.env.HHBA_ADMIN_PUBLIC_PREVIEW==='1';
-const LOCAL_HOST=/^(?:127\\.0\\.0\\.1|localhost)(?::\\d{2,5})?$/;
-const RAILWAY_PREVIEW_HOST=/^[a-z0-9-]+\\.up\\.railway\\.app(?::\\d{2,5})?$/;
+const LOCAL_HOST=/^(?:127\.0\.0\.1|localhost)(?::\d{2,5})?$/;
+const RAILWAY_PREVIEW_HOST=/^[a-z0-9-]+\.up\.railway\.app(?::\d{2,5})?$/;
 const FILES=new Map([
  ['/','index.html'],['/index.html','index.html'],
  ['/styles.css','styles.css'],['/dashboard.js','dashboard.js'],
