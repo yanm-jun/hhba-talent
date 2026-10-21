@@ -29,3 +29,15 @@ test('prototype has editable preferences and genuine device favorites but no fab
  assert.ok(page.includes('不会获得企业权限'));
  assert.ok(page.includes('deleteDemoAccount()'));
 });
+
+test('personal center feature cards keep horizontal readable text and compact mobile layout',()=>{
+ const page=source('pages/PersonalCenterPage.tsx');
+ const styles=source('styles/demo-account.css');
+ assert.ok(page.includes('className="hhba-account-tool-card"'));
+ assert.ok(page.includes('className="hhba-account-tool-copy"'));
+ assert.match(styles,/\.hhba-account-tool-copy\{[^}]*display:flex;flex-direction:column;[^}]*min-width:0;/);
+ assert.match(styles,/\.hhba-account-tool-grid>a\.hhba-account-tool-card\{[^}]*grid-template-columns:20px minmax\(0,1fr\) 15px;/);
+ assert.ok(styles.includes('min-height:88px'));
+ assert.ok(styles.includes('.hhba-account-tool-grid{grid-template-columns:1fr}'));
+ assert.ok(!styles.includes('grid-template-rows:auto auto'));
+});
