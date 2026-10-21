@@ -1,0 +1,34 @@
+name: HHBA 2027 Campus Search CI
+on:
+  push:
+    branches: ['feat/campus-2027-search-railway-20261021']
+  pull_request:
+    paths:
+      - 'apps/web/public/campus-2027.json'
+      - 'apps/web/src/services/liveRecruitment.ts'
+      - 'apps/web/src/services/jobSearchFacets.mjs'
+      - 'apps/web/src/services/jobSearchFacets.d.mts'
+      - 'apps/web/src/components/UnifiedJobMarket.tsx'
+      - 'ops/legacy-marketplace/railway-function-20261018.ts'
+      - 'apps/web/scripts/campus-2027.contract.test.mjs'
+  workflow_dispatch:
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: apps/web
+      - run: node --test scripts/campus-2027.contract.test.mjs scripts/white-market-detail.contract.test.mjs
+        working-directory: apps/web
+      - run: npm run build
+        working-directory: apps/web
+      - run: test -s dist/campus-2027.json
+        working-directory: apps/web
