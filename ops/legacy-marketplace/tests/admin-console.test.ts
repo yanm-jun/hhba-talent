@@ -1,0 +1,76 @@
+import {test,expect,beforeAll,afterAll} from 'bun:test';
+import {Database} from 'bun:sqlite';
+import {mkdtempSync,mkdirSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {handlePrivateAdmin,normalizePeriod,privateGrowth} from '../admin-console.ts';
+const root=mkdtempSync(join(tmpdir(),'hhba-private-growth-'));
+const secret='CI_ONLY_DO_NOT_USE_LIVE_credential_24_chars';
+const today=new Date().toISOString().slice(0,10);
+const yesterday=new Date(Date.now()-86400_000).toISOString().slice(0,10);
+beforeAll(()=>{Bun.env.HHBA_ADMIN_PASSWORD=secret;Bun.env.HHBA_ENGAGEMENT_DIR=root;});
+afterAll(()=>rmSync(root,{recursive:true,force:true}));
+test('all private analytics and former public summary endpoints require admin auth',async()=>{
+ for(const path of ['/api/admin/growth','/api/admin/jobs','/api/engagement/summary','/api/saved/summary']){
+  const response=await handlePrivateAdmin(new Request('https://local.test'+path),new URL('https://local.test'+path));
+  expect(response?.status).toBe(401);
+ }
+ const response=await handlePrivateAdmin(new Request('https://local.test/management/'),new URL('https://local.test/management/'));
+ expect(response?.status).toBe(200);expect((await response?.text())?.includes('管理员访问密码')).toBe(true);
+});
+test('cross-origin login and invalid password cannot mint a session',async()=>{
+ const url=new URL('https://local.test/management/login');
+ const stolen=await handlePrivateAdmin(new Request(url,{method:'POST',headers:{origin:'https://evil.test','content-type':'application/x-www-form-urlencoded'},body:'password=x'}),url);
+ expect(stolen?.status).toBe(403);
+ const wrong=await handlePrivateAdmin(new Request(url,{method:'POST',headers:{origin:url.origin,'content-type':'application/x-www-form-urlencoded'},body:'password=wrong'}),url);
+ expect(wrong?.status).toBe(200);
+ expect(wrong?.headers.get('set-cookie')).toBeNull();
+});
+test('valid session cookie works for protected API and expires on logout',async()=>{
+ const url=new URL('https://local.test/management/login');
+ const response=await handlePrivateAdmin(new Request(url,{method:'POST',headers:{origin:url.origin,'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({password:secret})}),url);
+ expect(response?.status).toBe(303);
+ const token=response?.headers.get('set-cookie')?.split(';')[0]||'';
+ expect(token).toContain('hhba_admin_v1=');
+ expect(response?.headers.get('set-cookie')).toContain('HttpOnly');
+ expect(response?.headers.get('set-cookie')).toContain('SameSite=Strict');
+ const auth=new Request('https://local.test/api/admin/growth?days=7',{headers:{cookie:token}});
+ const growth=await handlePrivateAdmin(auth,new URL(auth.url));
+ expect(growth?.status).toBe(200);
+ const body=await growth?.json();
+ expect(body.kind).toBe('HHBA_PRIVATE_GROWTH_V1');
+ const exitUrl=new URL('https://local.test/management/logout');
+ const denied=await handlePrivateAdmin(new Request(exitUrl,{method:'POST',headers:{cookie:token,origin:'https://bad.test'}}),exitUrl);
+ expect(denied?.status).toBe(403);
+ const logout=await handlePrivateAdmin(new Request(exitUrl,{method:'POST',headers:{cookie:token,origin:exitUrl.origin}}),exitUrl);
+ expect(logout?.status).toBe(303);expect(logout?.headers.get('set-cookie')).toContain('Max-Age=0');
+});
+test('growth query preserves zero vs unavailable and distinguishes daily UV sum',()=>{
+ expect(privateGrowth(normalizePeriod('1')).traffic.quality).toBe('unavailable');
+ const traffic=new Database(join(root,'hhba-engagement.sqlite'),{create:true});
+ traffic.exec('CREATE TABLE engagement_events(day TEXT,event_type TEXT,visitor_hash TEXT)');
+ traffic.query('INSERT INTO engagement_events VALUES(?,?,?)').run(today,'page_view','a');
+ traffic.query('INSERT INTO engagement_events VALUES(?,?,?)').run(today,'page_view','a');
+ traffic.query('INSERT INTO engagement_events VALUES(?,?,?)').run(today,'page_view','b');
+ traffic.query('INSERT INTO engagement_events VALUES(?,?,?)').run(yesterday,'page_view','a');
+ traffic.query('INSERT INTO engagement_events VALUES(?,?,?)').run(today,'job_search','a');
+ traffic.close();
+ const saved=new Database(join(root,'hhba-saved.sqlite'),{create:true});
+ saved.exec('CREATE TABLE saved_jobs(device_hash TEXT,job_id TEXT);CREATE TABLE saved_events(day TEXT,event TEXT,quantity INTEGER)');
+ saved.query('INSERT INTO saved_jobs VALUES(?,?)').run('deviceA','jobA');
+ saved.query('INSERT INTO saved_events VALUES(?,?,?)').run(today,'added',1);
+ saved.close();
+ const result=privateGrowth(normalizePeriod('7'));
+ expect(result.traffic.pv).toBe(4);
+ expect(result.traffic.dailyUvSum).toBe(3); // a counted once yesterday, once today; b today.
+ expect(result.traffic.searches).toBe(1);
+ expect(result.bookmarks.totalActive).toBe(1);
+ expect(result.bookmarks.added).toBe(1);
+ expect(result.unavailable.registeredUsers).toBeNull();
+});
+test('custom period validated and never future dates',()=>{
+ const custom=normalizePeriod('30',new Date('2026-10-21T02:00:00Z'),'2026-10-10','2026-10-20');
+ expect(custom).toEqual({days:11,from:'2026-10-10',today:'2026-10-20'});
+ const fallback=normalizePeriod('7',new Date('2026-10-21T02:00:00Z'),'2026-10-10','2026-11-10');
+ expect(fallback.days).toBe(7);
+});
