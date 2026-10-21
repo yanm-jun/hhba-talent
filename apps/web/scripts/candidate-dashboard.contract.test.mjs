@@ -36,7 +36,7 @@ test('private resume form is on its own route and remains disabled until real ac
  assert.ok(app.includes("if(route==='/candidate/resume/new')return <ResumeUploadPage user={user}/>"));
  assert.ok(upload.includes('export function ResumeUploadPage'));
  assert.ok(upload.includes('if(!employerApiReady)return'));
- assert.ok(dashboard.includes('账户服务待开放'));
+ assert.ok(dashboard.includes("demo?'演示账户':'可体验模拟账户'"), 'the visible mock account must remain labeled as a demo');
  assert.ok(dashboard.includes('账户服务接入后开放'));
 });
 test('mobile shows two side-by-side compact controls and no duplicated green menu',()=>{
