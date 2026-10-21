@@ -1,0 +1,35 @@
+name: HHBA Phase3 Traffic and Favorites CI
+on:
+  push:
+    branches:
+      - 'feat/phase3-traffic-favorites-personal-center-20261021'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Validate engagement module and privacy tests
+        run: |
+          node --check ops/legacy-marketplace/engagement-core.mjs
+          node --test ops/legacy-marketplace/tests/engagement-core.test.mjs
+      - name: Install frontend dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Build app and guard recruitment contracts
+        working-directory: apps/web
+        run: |
+          node --test scripts/white-market-detail.contract.test.mjs
+          npm run build
+      - uses: oven-sh/setup-bun@v2
+      - name: Verify backend TypeScript build
+        run: |
+          bun build ops/legacy-marketplace/railway-function-20261018.ts --target=bun --external 'html-to-text@9' --external 'sanitize-html@2' --outdir=/tmp/hhba-phase3-syntax
