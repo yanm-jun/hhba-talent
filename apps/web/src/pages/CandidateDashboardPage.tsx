@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ArrowRight, BriefcaseBusiness, FileUser, MapPin, Search, Sparkles, UserRound } from 'lucide-react';
 import { Shell } from '../components/Shell';
 import { Link, navigate } from '../router';
+import { trackEvent } from '../services/engagement';
 import { api, employerApiReady, type User } from '../services/api';
 import {
   listJobs, officialStatus, localizedCompany, localizedLocation, localizedTitle,
@@ -55,6 +56,7 @@ export function CandidateDashboardPage({user}:{user:User|null}){
   function submitSearch(event:React.FormEvent<HTMLFormElement>){
     event.preventDefault();
     const term=query.trim().slice(0,100);
+    if(term)trackEvent('job_search','/candidate/jobs');
     navigate('/candidate/jobs'+(term?'?q='+encodeURIComponent(term):''));
   }
 
@@ -99,6 +101,8 @@ export function CandidateDashboardPage({user}:{user:User|null}){
       </section>
 
       <div className="candidate-dashboard-quick-grid" aria-label="求职工具">
+        <Link className="candidate-dashboard-quick" to="/candidate/saved"><BriefcaseBusiness size={20} aria-hidden="true"/><strong>我的收藏</strong><small>查看本设备已收藏的真实职位</small></Link>
+        <Link className="candidate-dashboard-quick" to="/candidate/account"><UserRound size={20} aria-hidden="true"/><strong>个人中心</strong><small>管理收藏与访问统计隐私选项</small></Link>
         {employerApiReady?
           <Link className="candidate-dashboard-quick" to="/candidate/my-applications">
             <BriefcaseBusiness size={20} aria-hidden="true"/><strong>我的申请</strong>
