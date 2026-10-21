@@ -7,6 +7,7 @@ type Job={id:string;company:string;title:string;location:string;remote:boolean|n
 
 import { handleEngagement } from "./engagement.ts";
 import { handleSavedJobs } from "./saved.ts";
+import { handlePrivateAdmin } from "./admin-console.ts";
 import { Database } from "bun:sqlite";
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, existsSync } from "node:fs";
@@ -1607,6 +1608,8 @@ async function whiteSiteResponse(req:Request,u:URL):Promise<Response|null>{
 
 Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  const u=new URL(req.url);
+ const adminResponse=await handlePrivateAdmin(req,u);
+ if(adminResponse)return adminResponse;
  const engagementResponse=await handleEngagement(req,u);
  if(engagementResponse)return engagementResponse;
  const savedResponse=await handleSavedJobs(req,u,async id=>{
