@@ -104,7 +104,11 @@ export function searchFacts(job,officialJD){
 }
 export function parseNaturalQuery(query){
  let text=norm(query).slice(0,100);
- const parsed={countryCode:null,cityKey:null,remote:false,education:null,experience:null,jobType:null,roleKeys:[],skills:[],terms:[]};
+ const parsed={countryCode:null,cityKey:null,remote:false,education:null,experience:null,jobType:null,graduationYear:null,roleKeys:[],skills:[],terms:[]};
+ // In 2026 autumn the term 2027届 is explicit cohort evidence, not a job-title keyword.
+ const cohort=text.match(/(?:^|[^0-9])(202[6-9])\s*届?(?=$|[^0-9])/);
+ if(cohort){parsed.graduationYear=Number(cohort[1]);text=text.replace(cohort[0],' ')}
+ if(word(text,'秋招')){parsed.jobType='CAMPUS';text=remove(text,'秋招')}
  for(const c of sortedCities){const alias=c.aliases.find(a=>word(text,a));if(alias){
    parsed.cityKey=c.value;parsed.countryCode=c.country;text=remove(text,alias);break}}
  for(const c of countries){const alias=[...c.aliases].sort((a,b)=>b.length-a.length).find(a=>word(text,a));if(alias){
@@ -140,7 +144,10 @@ export function searchJobs(jobs,filters={},facets=new Map()){
   const job=jobs[i],f=facets.get(job.id)||{},place=f.countryCode?f:locationFacts(job.location,job.domestic);
   if(filters.country==='cn'&&!job.domestic||filters.country==='global'&&job.domestic)continue;
   if(countryCode&&place.countryCode!==countryCode)continue;
-  if(city&&place.cityKey!==city&&!word(norm(job.location),city))continue;
+  if(parsed.graduationYear&&job.graduationYear!==parsed.graduationYear)continue;
+  const cityMeta=city?cities.find(x=>x.value===city):null;
+  if(city&&place.cityKey!==city&&!word(norm(job.location),city)&&
+     !(cityMeta&&cityMeta.aliases.some(a=>word(norm(job.location),a))))continue;
   if(remote&&job.remote!==true)continue;
   if(company&&![job.company,job.companyZh].some(t=>norm(t).includes(company)))continue;
   const actualType=f.jobType||classifyJobType(job.title,job.recruitmentType).jobType;
@@ -184,7 +191,8 @@ export function searchJobs(jobs,filters={},facets=new Map()){
  }
  found.sort((a,b)=>b.score-a.score||a.index-b.index);
  return {rows:found.map(x=>x.job),interpreted:{...parsed,countryCode,cityKey:city||null,remote,
-  education:education||null,experience:experience||null,jobType:type||null},counted:found.length};
+  education:education||null,experience:experience||null,jobType:type||null,
+  graduationYear:parsed.graduationYear||null},counted:found.length};
 }
 export const countryOptions=countries.map(c=>({value:c.value,zh:c.zh,en:c.en[0]}));
 export const cityOptions=cities.map(c=>({value:c.value,zh:c.zh,en:c.value,country:c.country}));
