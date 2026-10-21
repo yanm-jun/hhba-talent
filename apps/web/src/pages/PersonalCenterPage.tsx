@@ -22,7 +22,7 @@ const pages:{id:Section;label:string;icon:typeof UserRound;description:string}[]
  {id:'privacy',label:'账户与隐私',icon:ShieldCheck,description:'管理匿名统计和演示数据'},
 ];
 function routeFor(id:Section){return id==='overview'?'/candidate/account':id==='saved'?'/candidate/saved':'/candidate/account/'+id;}
-export function PersonalCenterPage({user,onlySaved=false,section='overview'}:{user:User|null;onlySaved?:boolean;section?:Exclude<Section,'overview'|'saved'>}){
+export function PersonalCenterPage({user,onlySaved=false,section='overview'}:{user:User|null;onlySaved?:boolean;section?:Section}){
  const current:Section=onlySaved?'saved':section;
  const demo=useDemoAccount();
  const displayName=user?.display_name||demo?.nickname||'访客';
