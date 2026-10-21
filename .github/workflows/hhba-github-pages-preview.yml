@@ -91,13 +91,14 @@ jobs:
       - name: Checkout admin UI from the dedicated, non-production preview branch
         uses: actions/checkout@v4
         with:
-          ref: feat/admin-investor-console-phase1-20261021
+          ref: feat/admin-investor-console-phase2-20261021
           path: _hhba_admin_source
           persist-credentials: false
       - name: Check admin static preview security and functional contracts
         run: |
           node --check _hhba_admin_source/apps/admin-preview/dashboard.js
           node --check _hhba_admin_source/apps/admin-preview/metrics.mjs
+          node --check _hhba_admin_source/apps/admin-preview/phase2-metrics.mjs
           node --test _hhba_admin_source/apps/admin-preview/tests/*.test.mjs
       - name: Embed public-only admin static preview at /hhba-talent/admin-preview/
         run: |
@@ -131,28 +132,32 @@ jobs:
           writeFileSync(root+'dashboard.js',js);
           if(!js.includes("fetch('./data/overview.json'"))throw Error('ADMIN_STATIC_TRANSFORM_FAILED');
           NODE
-      - name: Capture public index snapshot without fake investor metrics
+      - name: Capture phase 2 metrics from SAME built public listing and official JD audit
         run: |
           node --input-type=module <<'NODE'
-          import {writeFileSync} from 'node:fs';
-          import {getPublicOverview} from './_hhba_admin_source/apps/admin-preview/metrics.mjs';
+          import {readFileSync,writeFileSync} from 'node:fs';
+          import {buildPhase2Overview} from './_hhba_admin_source/apps/admin-preview/phase2-metrics.mjs';
+          const root='apps/web/dist/data/';
           let result;
-          try{
-            result=await getPublicOverview();
-          }catch(error){
-            console.warn('PUBLIC_INDEX_UNAVAILABLE: publishing honest empty display');
-            result={
-              kind:'HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V1',
-              sourceType:'PUBLIC_INDEX_METADATA',
-              quality:'unavailable',
-              asOf:null,
-              counts:{indexedJobs:null,successfulJobBoards:null,failedJobBoards:null},
-              future:{totalRegisteredUsers:null,activeUsers30d:null,applyOutboundClicks:null,
-                revenueCny:null,retention30d:null,trafficSeries:null}
-            };
+          try {
+            const feed=JSON.parse(readFileSync(root+'jobs.json','utf8'));
+            const audit=JSON.parse(readFileSync(root+'job-sync-status.json','utf8'));
+            result=buildPhase2Overview(feed,audit);
+          } catch(error) {
+            console.warn('ADMIN_PHASE2_SOURCE_UNAVAILABLE',error.message);
+            result={kind:'HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2',
+              sourceType:'PUBLIC_PAGES_FEED_AND_OFFICIAL_JD_AUDIT',
+              quality:'unavailable',asOf:null,observedAt:new Date().toISOString(),
+              auditCheckedAt:null,counts:{indexedJobs:null,displayableJobs:null,
+                auditedJobRequirements:null,distinctIndexedCompanies:null,
+                checkedAtsSources:null,failedAtsSources:null,
+                unclassifiedOrUnverifiedJobs:null},
+              definitions:{},future:{totalRegisteredUsers:null,activeUsers30d:null,
+                applyOutboundClicks:null,revenueCny:null,retention30d:null,trafficSeries:null}};
           }
-          // Never export login, finances, user records, or a credential.
-          const allowed=new Set(['kind','source','sourceType','asOf','observedAt','quality','counts','definitions','future']);
+          // Public snapshot: allow only safe, aggregated metrics (never user data).
+          const allowed=new Set(['kind','source','sourceType','asOf','observedAt','auditCheckedAt',
+            'quality','counts','definitions','future']);
           for(const key of Object.keys(result))if(!allowed.has(key))throw Error('UNEXPECTED_ADMIN_FIELD');
           writeFileSync('apps/web/dist/admin-preview/data/overview.json',JSON.stringify(result));
           NODE
