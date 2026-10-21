@@ -1640,6 +1640,40 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  if(req.method==="POST"&&/^\/api\/jobs\/[a-zA-Z0-9_-]{1,180}\/translate-part$/.test(u.pathname))return readJobForTranslation(req,u,headers);
  if(req.method!=="GET")return new Response("Method not allowed",{status:405,headers});
  if(u.pathname==="/health"){const frontendReady=await Bun.file(WHITE_PUBLIC_ROOT+"/index.html").exists();return Response.json({ok:frontendReady,kind:"hhba-white-ats-railway",frontendReady},{status:frontendReady?200:503,headers});}
+ // Public, reviewed 2027 campus positions: independent of overseas ATS snapshots.
+ // No unverified application claim, no copying of full employer JD.
+ if(u.pathname==="/api/campus-2027/jobs"){
+  try{
+   const file=Bun.file(WHITE_PUBLIC_ROOT+"/campus-2027.json");
+   if(!await file.exists())return Response.json({error:"CAMPUS_INDEX_NOT_PUBLISHED"},{status:503,headers});
+   const data=await file.json() as any;
+   if(data?.kind!=="HHBA_CAMPUS_2027_WAVE1_VERIFIED_DETAILS_V1"||!Array.isArray(data.jobs)||
+       data.jobs.length>100||!Number.isFinite(Date.parse(data.capturedAt||"")))
+     throw Error("CAMPUS_SOURCE_INVALID");
+   const seen=new Set<string>();
+   for(const row of data.jobs){
+    if(!row||typeof row.id!=="string"||!/^campus27-(?:baidu|meituan)-[a-z0-9-]{4,80}$/.test(row.id)||
+       seen.has(row.id)||row.recruitmentType!=="CAMPUS"||row.graduationYear!==2027||
+       row.currentApplicationVerified!==false||row.domestic!==true||
+       row.recordKind!=="OFFICIAL_JOB_PAGE_OBSERVED"||
+       !Number.isFinite(Date.parse(row.observedAt||""))||
+       typeof row.title!=="string"||!row.title.trim()||
+       typeof row.responsibilitiesSummary!=="string"||!row.responsibilitiesSummary.trim()||
+       typeof row.requirementsSummary!=="string"||!row.requirementsSummary.trim())
+      throw Error("CAMPUS_JOB_INVALID");
+    seen.add(row.id);
+    const url=new URL(row.url);
+    const baidu=row.platform==="baidu-official"&&row.company==="Baidu"&&url.hostname==="talent.baidu.com"&&
+       /^\/jobs\/detail\/GRADUATE\/[a-f0-9-]{36}$/.test(url.pathname);
+    const meituan=row.platform==="meituan-official"&&row.company==="Meituan"&&url.hostname==="zhaopin.meituan.com"&&
+       url.pathname==="/web/position/detail"&&/^\d{8,20}$/.test(url.searchParams.get("jobUnionId")||"");
+    if(url.protocol!=="https:"||url.username||url.password||url.port||(!baidu&&!meituan))throw Error("CAMPUS_OFFICIAL_URL_INVALID");
+   }
+   return Response.json({kind:data.kind,capturedAt:data.capturedAt,jobs:data.jobs,total:data.jobs.length,
+     claim:"OFFICIAL_JOB_DETAIL_ONLY_APPLICATION_STATUS_UNVERIFIED"},{headers});
+  }catch(e){console.error("HHBA_CAMPUS_2027_REJECTED",e instanceof Error?e.message:"invalid");return Response.json({error:"CAMPUS_INDEX_VALIDATION_FAILED"},{status:503,headers})}
+ }
+
  // A single fast read for private precomputed, hash-bound bilingual text.
  // This route MUST NOT invoke official ATS fetch or an MT service.
  const readyMatch=u.pathname.match(/^\/api\/jobs\/([A-Za-z0-9_-]{1,180})\/ready-jd$/);
