@@ -55,7 +55,16 @@ function openDb(file:string):Database|null{
   const d=new Database(path,{readonly:true,strict:true});d.exec('PRAGMA busy_timeout=1000');return d;
  }catch{return null}
 }
-export function normalizePeriod(raw:string|null,now=new Date()){
+export function normalizePeriod(raw:string|null,now=new Date(),start:string|null=null,end:string|null=null){
+ if(start!==null&&end!==null&&/^\\d{4}-\\d{2}-\\d{2}$/.test(start)&&/^\\d{4}-\\d{2}-\\d{2}$/.test(end)){
+  const a=Date.parse(start+'T00:00:00Z'),b=Date.parse(end+'T00:00:00Z');
+  const today=new Date(now).toISOString().slice(0,10);
+  if(Number.isFinite(a)&&Number.isFinite(b)&&a<=b&&b<=Date.parse(today+'T00:00:00Z')){
+   const days=Math.round((b-a)/86400_000)+1;
+   if(days>=1&&days<=90)return {days,from:start,today:end};
+  }
+ }
+
  const days=raw==='1'?1:raw==='7'?7:raw==='90'?90:30;
  const today=new Date(now).toISOString().slice(0,10);
  const from=new Date(now.getTime()-(days-1)*86400_000).toISOString().slice(0,10);
@@ -141,7 +150,18 @@ export async function handlePrivateAdmin(req:Request,url:URL):Promise<Response|n
   if(!sameOrigin(req))return bad('ORIGIN_DENIED',403);
   return new Response(null,{status:303,headers:{...HEADERS,Location:'/management/login','Set-Cookie':clearCookie()}});
  }
- if(path==='/api/admin/growth'&&req.method==='GET')return json(privateGrowth(normalizePeriod(url.searchParams.get('days'))));
+ if(path==='/api/admin/growth'&&req.method==='GET')return json(privateGrowth(normalizePeriod(url.searchParams.get('days'),new Date(),url.searchParams.get('from'),url.searchParams.get('to'))));
+ if(path==='/api/admin/jobs'&&req.method==='GET'){
+  try{
+   const upstream=await fetch('https://yanm-jun.github.io/hhba-talent/admin-preview/data/overview.json',{
+    method:'GET',headers:{Accept:'application/json'},redirect:'error',signal:AbortSignal.timeout(8000),cache:'no-store'});
+   if(!upstream.ok||Number(upstream.headers.get('content-length')||0)>30000)return bad('JOB_SNAPSHOT_UNAVAILABLE',503);
+   const data=await upstream.json() as any;
+   if(data?.kind!=='HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2'||!['current','partial','stale','unavailable'].includes(data.quality)||!data.counts)return bad('JOB_SNAPSHOT_INVALID',503);
+   return json(data);
+  }catch{return bad('JOB_SNAPSHOT_UNAVAILABLE',503)}
+ }
+
  if(path.startsWith('/api/admin/'))return bad('NOT_FOUND',404);
  if(!['GET','HEAD'].includes(req.method))return bad('METHOD_NOT_ALLOWED',405);
  let file:string;
