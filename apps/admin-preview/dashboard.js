@@ -63,27 +63,32 @@ function qualityText(data){
  if(!data)return '暂不可用';
  if(data.quality==='stale')return '快照已过期';
  if(data.quality==='partial')return '同步不完整';
- return '最近来源核验正常';
+ if(data.quality==='unavailable')return '真实数据暂不可用';
+ return '来源与审计快照已核对';
 }
 function updateOverview(){
- const data=snapshot,valid=data?.quality==='current',counts=data?.counts;
- byId('jobs-count').textContent=valid?fmt.format(counts.indexedJobs):'—';
- byId('boards-count').textContent=valid?fmt.format(counts.successfulJobBoards):'—';
- byId('jobs-sub').textContent=valid?'当前快照 · 非投递次数':data?'快照不完整，暂不展示总数':'真实索引暂不可用';
- byId('boards-sub').textContent=valid?'官方 ATS 来源，非合作企业数':'来源尚待核验';
+ const data=snapshot,valid=data?.quality!=='stale'&&['current','partial'].includes(data?.quality)&&data?.kind==='HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2',counts=data?.counts;
+ byId('jobs-count').textContent=valid?fmt.format(counts.displayableJobs):'—';
+ byId('indexed-count').textContent=valid?fmt.format(counts.indexedJobs):'—';
+ byId('requirements-count').textContent=valid?fmt.format(counts.auditedJobRequirements):'—';
+ byId('companies-count').textContent=valid?fmt.format(counts.distinctIndexedCompanies):'—';
+ byId('boards-count').textContent=valid&&counts.checkedAtsSources!==null?fmt.format(counts.checkedAtsSources):'—';
+ byId('jobs-sub').textContent=valid?'排除明确异常 · 不保证当前可申请':data?'快照不完整，暂不展示总数':'真实索引暂不可用';
+ byId('boards-sub').textContent=valid?'本次审计的 ATS 来源，非合作企业数':'来源尚待核验';
  byId('top-source-date').textContent=data?'公开索引 · '+formatTime(data.asOf):'数据源：暂不可用';
  byId('feed-health').textContent=qualityText(data);
  byId('feed-detail').textContent=data?
    '来源时间：'+formatTime(data.asOf):'无法获取公开岗位快照，请稍后刷新。';
  byId('feed-dot').className='source-status-dot'+(valid?' good':data?' bad':'');
- byId('failed-boards').textContent=data?fmt.format(data.counts.failedJobBoards):'—';
- byId('snapshot-time').textContent=data?formatTime(data.asOf):'—';
+ byId('failed-boards').textContent=Number.isInteger(counts?.failedAtsSources)?fmt.format(counts.failedAtsSources):'—';
+ byId('snapshot-time').textContent=data?.asOf?formatTime(data.asOf):'—';
+ byId('audit-time').textContent=data?.auditCheckedAt?formatTime(data.auditCheckedAt):'—';
  const status=byId('jobs-status');
  status.textContent=valid?'已核验':data?'不完整 / 过期':'暂不可用';
  status.className='table-status '+(valid?'good':data?'bad':'waiting');
- byId('investor-jobs').textContent=valid?fmt.format(counts.indexedJobs):'—';
- byId('investor-boards').textContent=valid?fmt.format(counts.successfulJobBoards):'—';
- byId('investor-jobs-label').textContent=valid?'公开来源索引记录，非客户量':'尚无完整有效快照';
+ byId('investor-jobs').textContent=valid?fmt.format(counts.displayableJobs):'—';
+ byId('investor-boards').textContent=valid?fmt.format(counts.distinctIndexedCompanies):'—';
+ byId('investor-jobs-label').textContent=valid?'经排除异常的展示记录，非实时在招认证':'尚无完整有效快照';
  byId('investor-asof').textContent=data?formatTime(data.asOf):'—';
  byId('investor-quality').textContent=qualityText(data);
  byId('export-csv').disabled=!valid;
@@ -98,9 +103,9 @@ async function refresh(){
    headers:{Accept:'application/json'}});
   if(!response.ok)throw Error('index_not_available');
   const body=await response.json();
-  if(body.kind!=='HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V1'||
-     !['current','partial','stale'].includes(body.quality)||
-     !body.counts||!Number.isInteger(body.counts.failedJobBoards))
+  if(body.kind!=='HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2'||
+     !['current','partial','stale','unavailable'].includes(body.quality)||
+     !body.counts||!(body.counts.displayableJobs===null||Number.isSafeInteger(body.counts.displayableJobs)))
    throw Error('invalid_public_index_response');
   snapshot=body;
  }catch{
@@ -114,12 +119,15 @@ async function refresh(){
 }
 function exportCSV(){
  const data=snapshot;
- if(!data||data.quality!=='current')return;
+ if(!data||!['current','partial'].includes(data.quality)||data.kind!=='HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2')return;
  const rows=[
   ['HHBA 融资只读数据快照','指标值','统计口径','来源时间（ISO 8601）'],
-  ['岗位索引记录',String(data.counts.indexedJobs),'公开 ATS 岗位索引记录，非招聘合作或投递数量',data.asOf],
-  ['成功同步招聘来源',String(data.counts.successfulJobBoards),'成功同步的 ATS 来源数，非付费企业数',data.asOf],
-  ['失败同步来源',String(data.counts.failedJobBoards),'本次未能完成同步的 ATS 来源数',data.asOf],
+  ['公开索引记录',String(data.counts.indexedJobs),data.definitions.indexedJobs,data.asOf],
+  ['可展示记录',String(data.counts.displayableJobs),data.definitions.displayableJobs,data.asOf],
+  ['已核验官网任职要求',String(data.counts.auditedJobRequirements),data.definitions.auditedJobRequirements,data.auditCheckedAt],
+  ['去重收录企业',String(data.counts.distinctIndexedCompanies),data.definitions.distinctIndexedCompanies,data.asOf],
+  ['已审计 ATS 来源',String(data.counts.checkedAtsSources),data.definitions.checkedAtsSources,data.auditCheckedAt],
+  ['失败 ATS 来源',String(data.counts.failedAtsSources),data.definitions.failedAtsSources,data.auditCheckedAt],
   ['累计注册用户','未接入','没有可核验用户计数',''],
   ['近 30 日活跃用户','未接入','没有完整用户事件数据',''],
   ['真实收入','未接入','未接入财务台账','']
