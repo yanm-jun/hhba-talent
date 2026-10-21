@@ -208,3 +208,32 @@ body.investor-mode .top-env{display:none}
  .metric-number{font-size:24px}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+
+/* Phase 3.1: compact, responsive private traffic and favorites panels. */
+.admin-growth-summary{margin:16px 0 20px}
+.admin-growth-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px}
+.admin-growth-heading h2{font-size:16px;margin:0 0 6px;letter-spacing:-.2px}
+.admin-growth-heading p{font-size:11px;color:var(--muted);line-height:1.6;margin:0}
+.admin-growth-link{border:0;background:transparent;color:var(--green);white-space:nowrap;font-size:12px;cursor:pointer}
+.admin-growth-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.admin-growth-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px 17px;min-width:0;min-height:125px;display:flex;flex-direction:column;gap:8px}
+.admin-growth-card>span{color:#68756c;font-size:12px}
+.admin-growth-card strong{font-size:27px;line-height:1.15;letter-spacing:-.6px;font-weight:760;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.admin-growth-card small{color:#929e95;font-size:10px;line-height:1.55;margin-top:auto}
+.admin-growth-availability{font-size:11px;color:#738b7b;margin:11px 1px 0;line-height:1.7}
+.admin-growth-cards-details{margin:16px 0 20px}
+.admin-traffic-chart{display:flex;flex-direction:column;justify-content:flex-end;min-height:230px;padding:20px 12px 12px;border-radius:12px;background:#fafcfb;border:1px solid #eaf0eb}
+.admin-chart-bars{height:160px;display:flex;align-items:end;gap:2px;border-bottom:1px solid #dce8df}
+.admin-chart-column{flex:1 1 0;min-width:2px;height:100%;display:flex;align-items:end}
+.admin-chart-bar{display:block;width:100%;min-height:2px;max-height:100%;background:#67967a;border-radius:3px 3px 0 0;transition:background-color .15s}
+.admin-chart-bar:hover{background:#275f43}
+.admin-chart-dates{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:#899a8e;padding-top:12px}
+.admin-empty-chart{display:grid;place-items:center;color:#8b9a8f;font-size:12px;text-align:center;line-height:1.8}
+.admin-traffic-chart-large{min-height:300px}
+.admin-traffic-chart-large .admin-chart-bars{height:230px}
+.admin-detail-panel{padding:23px;margin:0 0 18px}
+.admin-detail-panel p{font-size:12px;color:var(--muted);line-height:1.85}
+.top-actions form{margin:0}
+@media(max-width:1050px){.admin-growth-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:580px){.admin-growth-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.admin-growth-card{padding:13px;min-height:110px}.admin-growth-card strong{font-size:22px}.admin-growth-heading{align-items:flex-start;flex-direction:column}.admin-traffic-chart{min-height:160px}.admin-chart-bars{height:95px}.admin-traffic-chart-large .admin-chart-bars{height:140px}}
