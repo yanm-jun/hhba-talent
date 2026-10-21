@@ -145,7 +145,9 @@ export function searchJobs(jobs,filters={},facets=new Map()){
   if(filters.country==='cn'&&!job.domestic||filters.country==='global'&&job.domestic)continue;
   if(countryCode&&place.countryCode!==countryCode)continue;
   if(parsed.graduationYear&&job.graduationYear!==parsed.graduationYear)continue;
-  if(city&&place.cityKey!==city&&!word(norm(job.location),city))continue;
+  const cityMeta=city?cities.find(x=>x.value===city):null;
+  if(city&&place.cityKey!==city&&!word(norm(job.location),city)&&
+     !(cityMeta&&cityMeta.aliases.some(a=>word(norm(job.location),a))))continue;
   if(remote&&job.remote!==true)continue;
   if(company&&![job.company,job.companyZh].some(t=>norm(t).includes(company)))continue;
   const actualType=f.jobType||classifyJobType(job.title,job.recruitmentType).jobType;
