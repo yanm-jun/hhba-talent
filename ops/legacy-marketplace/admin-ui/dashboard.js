@@ -1,5 +1,4 @@
-// HHBA Admin Console — Phase 1, read-only local preview.
-// All remote content is restricted to the server's validated aggregate metrics.
+// HHBA Admin Console — private Railway Phase 3.1; all queries require an admin session.
 const byId=id=>document.getElementById(id);
 const fmt=new Intl.NumberFormat('zh-CN');
 const formatTime=value=>{
@@ -8,11 +7,10 @@ const formatTime=value=>{
    hour:'2-digit',minute:'2-digit',hour12:false
  })+'（北京时间）'}catch{return '—'}
 };
-let snapshot=null,selectedPeriod='30d',customRange=null,activeView='overview';
-const titles={overview:'数据总览',users:'用户分析',market:'岗位与企业',operations:'运营监控',
+let snapshot=null,growth=null,selectedPeriod='30d',customRange=null,activeView='overview';
+const titles={overview:'数据总览',users:'访问与收藏',market:'岗位与企业',operations:'运营监控',
  finance:'财务成本',investor:'融资展示',settings:'系统设置'};
 const details={
- users:['注册与活跃用户','未来接入真实身份系统、用户事件与留存数据；不从访问量反推注册用户。'],
  market:['企业和岗位质量分析','未来接入岗位状态、ATS 来源及招聘质量报表；当前公开索引汇总在数据总览。'],
  operations:['系统运行与数据同步','未来接入有权限的同步队列和异常日志；当前预览不读取服务器私有日志。'],
  finance:['成本、收入与经营效率','未来接入经核对的收支台账和 API 成本；无记录时不生成模拟营收。'],
@@ -22,7 +20,7 @@ function setView(view){
  if(!Object.hasOwn(titles,view))view='overview';
  activeView=view;
  for(const node of document.querySelectorAll('.page-view'))node.hidden=true;
- byId('view-'+(view==='investor'?'investor':view==='overview'?'overview':'placeholder')).hidden=false;
+ byId('view-'+(['investor','overview','users'].includes(view)?view:'placeholder')).hidden=false;
  byId('breadcrumb').textContent=titles[view];
  document.title=titles[view]+' · HHBA 管理中心';
  document.body.classList.toggle('investor-mode',view==='investor');
@@ -45,7 +43,7 @@ function closeMenu(){
  byId('mobile-menu').setAttribute('aria-expanded','false');
 }
 function choosePeriod(value){
- if(!['today','7d','30d','custom'].includes(value))return;
+ if(!['today','7d','30d','90d','custom'].includes(value))return;
  selectedPeriod=value;
  for(const node of document.querySelectorAll('[data-period]')){
   const chosen=node.dataset.period===value;
@@ -53,11 +51,11 @@ function choosePeriod(value){
   node.setAttribute('aria-pressed',String(chosen));
  }
  byId('custom-range').hidden=value!=='custom';
- const text={today:'今日', '7d':'近 7 天','30d':'近 30 天',custom:customRange?'自定义时间':'自定义时间'};
+ const text={today:'今日', '7d':'近 7 天','30d':'近 30 天','90d':'近 90 天',custom:customRange?'自定义时间':'自定义时间'};
  byId('trend-range-label').textContent=value==='custom'&&customRange
   ?customRange.from+' 至 '+customRange.to:text[value];
- byId('period-notice').querySelector('span').textContent='当前岗位指标为最新索引快照，与所选'+text[value]+
-  '范围无关；按日注册、活跃与趋势尚未接入。';
+ byId('period-notice').querySelector('span').textContent='访问和收藏操作按'+text[value]+'范围统计；岗位索引及当前有效收藏总量属于快照指标，不随日期筛选变化。';
+ if(value!=='custom'||customRange)void refreshGrowth();
 }
 function qualityText(data){
  if(!data)return '暂不可用';
@@ -99,8 +97,9 @@ async function refresh(){
  btn.setAttribute('aria-busy','true');
  btn.lastChild.textContent=' 正在核对…';
  try{
-  const response=await fetch('/api/overview',{method:'GET',cache:'no-store',credentials:'omit',
+  const response=await fetch('/api/admin/jobs',{method:'GET',cache:'no-store',credentials:'same-origin',
    headers:{Accept:'application/json'}});
+  if(response.status===401){location.assign('/management/login');return;}
   if(!response.ok)throw Error('index_not_available');
   const body=await response.json();
   if(body.kind!=='HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2'||
@@ -132,11 +131,79 @@ function exportCSV(){
   ['近 30 日活跃用户','未接入','没有完整用户事件数据',''],
   ['真实收入','未接入','未接入财务台账','']
  ];
+ if(growth?.traffic?.quality==='collected'){
+  rows.push(['匿名同意采集 PV',String(growth.traffic.pv),growth.definitions.pv,growth.asOf],
+   ['按日日 UV 合计',String(growth.traffic.dailyUvSum),growth.definitions.dailyUvSum,growth.asOf],
+   ['官方申请链接点击',String(growth.traffic.applyClicks),'点击行为，不代表申请成功',growth.asOf]);
+ }
+ if(growth?.bookmarks?.quality==='collected')rows.push(
+  ['有效本设备收藏',String(growth.bookmarks.totalActive),growth.definitions.bookmarks,growth.asOf],
+  ['新增收藏',String(growth.bookmarks.added),'本期新增收藏操作次数',growth.asOf],
+  ['取消收藏',String(growth.bookmarks.removed),'本期取消收藏操作次数',growth.asOf]);
  const csv='\uFEFF'+rows.map(row=>row.map(cell=>'"'+String(cell).replaceAll('"','""')+'"').join(',')).join('\r\n');
  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
  const a=document.createElement('a');a.href=url;a.download='HHBA-verified-overview.csv';
  document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
+
+function displayMetric(id,value,available){const el=byId(id);if(el)el.textContent=available&&Number.isSafeInteger(value)?fmt.format(value):'—';}
+function renderDailyPV(id,data,available){
+ const root=byId(id);root.replaceChildren();
+ if(!available){root.textContent='暂未取得有效的匿名访问数据。';root.classList.add('admin-empty-chart');return;}
+ root.classList.remove('admin-empty-chart');
+ const entries=data||[],max=Math.max(1,...entries.map(item=>Number(item.pv)||0));
+ const chart=document.createElement('div');chart.className='admin-chart-bars';
+ for(const item of entries){
+  const col=document.createElement('div');col.className='admin-chart-column';
+  const bar=document.createElement('span');bar.className='admin-chart-bar';
+  const n=Number(item.pv)||0;
+  bar.style.height=n===0?'2px':Math.max(4,Math.round(n/max*100))+'%';
+  bar.title=item.date+'：'+n+' 次页面浏览';
+  bar.setAttribute('aria-label',bar.title);
+  col.append(bar);chart.append(col);
+ }
+ const dates=document.createElement('div');dates.className='admin-chart-dates';
+ const first=document.createElement('span');first.textContent=entries[0]?.date||'—';
+ const last=document.createElement('span');last.textContent=entries[entries.length-1]?.date||'—';
+ dates.append(first,last);
+ root.append(chart,dates);
+}
+function updateGrowth(){
+ const t=growth?.traffic,b=growth?.bookmarks;
+ const readyT=t?.quality==='collected',readyB=b?.quality==='collected';
+ for(const [id,value] of [['ov-pv',t?.pv],['growth-pv',t?.pv],['ov-uv',t?.dailyUvSum],['growth-uv',t?.dailyUvSum],
+  ['ov-click',t?.applyClicks],['growth-click',t?.applyClicks],['growth-views',t?.jobViews],['growth-search',t?.searches]])
+  displayMetric(id,value,readyT);
+ for(const [id,value] of [['ov-saves',b?.totalActive],['growth-saved',b?.totalActive],['growth-saved-devices',b?.devicesWithBookmarks],['investor-saved',b?.totalActive]])
+  displayMetric(id,value,readyB);
+ displayMetric('investor-pv',t?.pv,readyT);
+ byId('growth-changes').textContent=readyB&&Number.isSafeInteger(b.added)&&Number.isSafeInteger(b.removed)
+  ?fmt.format(b.added)+' / '+fmt.format(b.removed):'—';
+ const quality=readyT&&readyB?'访问与收藏数据已连接':readyT?'访问数据正常，收藏数据暂不可用':
+  readyB?'收藏数据正常，访问数据暂不可用':'聚合数据暂不可用';
+ byId('growth-quality').textContent=quality+' · '+(growth?.asOf?formatTime(growth.asOf):'数据未获取');
+ byId('users-data-quality').textContent='数据质量：'+quality;
+ byId('users-interval').textContent=growth?.period?growth.period.from+' 至 '+growth.period.today+' · UTC':'暂未取得统计区间';
+ renderDailyPV('trend-chart',t?.series,readyT);
+ renderDailyPV('users-chart',t?.series,readyT);
+}
+async function refreshGrowth(){
+ const params=new URLSearchParams();
+ if(selectedPeriod==='custom'){
+  if(!customRange)return;
+  params.set('from',customRange.from);params.set('to',customRange.to);
+ }else params.set('days',selectedPeriod==='today'?'1':selectedPeriod.replace('d',''));
+ try{
+  const res=await fetch('/api/admin/growth?'+params,{credentials:'same-origin',cache:'no-store'});
+  if(res.status===401){location.assign('/management/login');return;}
+  if(!res.ok)throw Error('PRIVATE_GROWTH_UNAVAILABLE');
+  const data=await res.json();
+  if(data.kind!=='HHBA_PRIVATE_GROWTH_V1'||!data.traffic||!data.bookmarks)throw Error('INVALID_GROWTH_PAYLOAD');
+  growth=data;
+ }catch{growth=null;}
+ updateGrowth();
+}
+
 for(const node of document.querySelectorAll('.nav-link'))node.addEventListener('click',()=>{
  setView(node.dataset.view);
 });
@@ -148,10 +215,13 @@ byId('apply-custom').addEventListener('click',()=>{
  const alert=byId('date-error');
  if(!from||!to||from>to){alert.textContent='请选择有效的起止日期';return}
  if(to>new Date().toISOString().slice(0,10)){alert.textContent='结束日期不能晚于今天';return}
+ const fromDate=Date.parse(from+'T00:00:00Z'),toDate=Date.parse(to+'T00:00:00Z');
+ if(!Number.isFinite(fromDate)||!Number.isFinite(toDate)||(toDate-fromDate)/86400000>89){alert.textContent='自定义日期最多支持 90 天';return}
  alert.textContent='';
  customRange={from,to};choosePeriod('custom');
 });
-byId('refresh').addEventListener('click',refresh);
+byId('refresh').addEventListener('click',()=>{void refresh();void refreshGrowth()});
+byId('growth-open').addEventListener('click',()=>setView('users'));
 byId('top-investor').addEventListener('click',()=>setView('investor'));
 byId('show-investor').addEventListener('click',()=>setView('investor'));
 byId('leave-investor').addEventListener('click',()=>setView('overview'));
