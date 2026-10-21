@@ -56,7 +56,7 @@ function openDb(file:string):Database|null{
  }catch{return null}
 }
 export function normalizePeriod(raw:string|null,now=new Date(),start:string|null=null,end:string|null=null){
- if(start!==null&&end!==null&&/^\\d{4}-\\d{2}-\\d{2}$/.test(start)&&/^\\d{4}-\\d{2}-\\d{2}$/.test(end)){
+ if(start!==null&&end!==null&&/^\d{4}-\d{2}-\d{2}$/.test(start)&&/^\d{4}-\d{2}-\d{2}$/.test(end)){
   const a=Date.parse(start+'T00:00:00Z'),b=Date.parse(end+'T00:00:00Z');
   const today=new Date(now).toISOString().slice(0,10);
   if(Number.isFinite(a)&&Number.isFinite(b)&&a<=b&&b<=Date.parse(today+'T00:00:00Z')){
