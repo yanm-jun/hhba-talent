@@ -80,11 +80,12 @@
           <span>当前岗位指标为最新索引快照，不受时间筛选影响；用户增长与历史趋势尚未接入。</span>
         </div>
         <div class="kpi-grid">
-          <article class="kpi-card"><div class="kpi-head"><span>岗位索引记录</span><span class="metric-icon"><svg viewBox="0 0 24 24"><rect x="3.5" y="7" width="17" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg></span></div><div class="metric-number" id="jobs-count">—</div><p id="jobs-sub" class="kpi-foot">正在核对公开索引</p></article>
-          <article class="kpi-card"><div class="kpi-head"><span>本次成功同步来源</span><span class="metric-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span></div><div class="metric-number" id="boards-count">—</div><p id="boards-sub" class="kpi-foot">ATS 招聘来源，非合作企业数</p></article>
+          <article class="kpi-card"><div class="kpi-head"><span>可展示岗位记录</span><span class="metric-icon"><svg viewBox="0 0 24 24"><rect x="3.5" y="7" width="17" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg></span></div><div class="metric-number" id="jobs-count">—</div><p id="jobs-sub" class="kpi-foot">正在核对公开索引</p></article>
+          <article class="kpi-card"><div class="kpi-head"><span>已审计 ATS 来源</span><span class="metric-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span></div><div class="metric-number" id="boards-count">—</div><p id="boards-sub" class="kpi-foot">ATS 招聘来源，非合作企业数</p></article>
           <article class="kpi-card"><div class="kpi-head"><span>累计注册用户</span><span class="metric-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 19v-2c0-3 2.3-4 6-4s6 1 6 4v2"/></svg></span></div><div class="metric-number pending">—</div><p class="kpi-foot muted">等待接入用户统计接口</p></article>
           <article class="kpi-card"><div class="kpi-head"><span>近 30 日活跃用户</span><span class="metric-icon"><svg viewBox="0 0 24 24"><path d="M3 13h4l3-7 4 12 3-5h4"/></svg></span></div><div class="metric-number pending">—</div><p class="kpi-foot muted">尚未建立行为事件口径</p></article>
         </div>
+        <div class="kpi-grid phase2-metrics"><article class="kpi-card"><div class="kpi-head"><span>全部索引记录</span></div><div class="metric-number" id="indexed-count">—</div><p class="kpi-foot">原始索引规模，非全部有效在招</p></article><article class="kpi-card"><div class="kpi-head"><span>官网任职要求已核验</span></div><div class="metric-number" id="requirements-count">—</div><p class="kpi-foot">原文证据已核验，非完整翻译数量</p></article><article class="kpi-card"><div class="kpi-head"><span>去重收录企业</span></div><div class="metric-number" id="companies-count">—</div><p class="kpi-foot">按公司名称去重，非签约企业数</p></article></div>
         <div class="insights-grid">
           <article class="panel panel-trend">
             <div class="panel-heading"><div><h2>平台增长趋势</h2><p>注册、活跃与岗位增长的历史变化</p></div><span class="small-label" id="trend-range-label">近 30 天</span></div>
@@ -100,7 +101,7 @@
             <div class="source-health"><span class="source-status-dot" id="feed-dot"></span><div><strong id="feed-health">正在核对公开数据源</strong><p id="feed-detail">尚未收到有效快照</p></div></div>
             <div class="quality-lines">
               <div><span>岗位同步失败来源</span><strong id="failed-boards">—</strong></div>
-              <div><span>岗位索引时间</span><strong id="snapshot-time">—</strong></div>
+              <div><span>岗位索引时间</span><strong id="snapshot-time">—</strong></div><div><span>官网 JD 审计时间</span><strong id="audit-time">—</strong></div>
               <div><span>用户留存 / 转化</span><strong class="neutral-value">尚未采集</strong></div>
             </div>
             <p class="quality-warning"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 16H3l9-16Z"/><path d="M12 9v4M12 16h.01"/></svg> 来源数量不等于签约企业，岗位数量不等于真实投递或收入。</p>
@@ -114,13 +115,13 @@
             <tr><td><strong>申请外链点击 / 商业收入</strong><small>不能使用浏览量估算转化</small></td><td>行为埋点 / 财务账目（未接入）</td><td><span class="table-status waiting">待接入</span></td></tr>
           </tbody></table></div>
         </article>
-        <footer class="page-footer">HHBA Management Console · Phase 1 只读界面预览 · 所有统计数据均须标明来源、口径与时间</footer>
+        <footer class="page-footer">HHBA Management Console · Phase 2 公开数据看板 · 所有统计数据均须标明来源、口径与时间</footer>
       </section>
       <section class="page-view" id="view-investor" hidden aria-labelledby="investor-heading">
         <div class="page-heading investor-heading"><div><p class="eyebrow">INVESTOR DATA ROOM · PREVIEW</p><h1 id="investor-heading">HHBA · 融资数据展示</h1><p class="page-subtitle">可核验的平台基础建设进度，尚未接入的经营指标明确留空。</p></div><div class="heading-actions"><button type="button" class="button-outline" id="export-csv">导出已核验 CSV</button><button type="button" class="button-primary" id="leave-investor">返回管理后台</button></div></div>
         <div class="investor-statement"><div class="statement-symbol">H</div><div><strong>Human Capability Network</strong><p>全球职位与人才能力连接平台 · HHBA 独立整理公开职位来源，不代表与雇主建立招聘合作。</p></div></div>
-        <div class="investor-kpis"><article><span>公开职位索引记录</span><strong id="investor-jobs">—</strong><small id="investor-jobs-label">待核验数据</small></article><article><span>成功同步 ATS 来源</span><strong id="investor-boards">—</strong><small>非客户数、非合作伙伴数</small></article><article><span>用户增长</span><strong>—</strong><small>待接入正式用户统计</small></article></div>
-        <article class="panel investor-disclosure"><h2>给投资人的数据披露说明</h2><p>此页面只展示从公开招聘索引即时读取的聚合信息。尚无可核验数据的用户注册量、活跃率、留存、投递转化、收入与成本均不展示数字；不得将岗位索引规模解释为真实用户规模或公司营收。</p><dl><div><dt>当前索引快照</dt><dd id="investor-asof">—</dd></div><div><dt>索引状态</dt><dd id="investor-quality">等待数据</dd></div><div><dt>增长历史</dt><dd>尚未接入按日数据</dd></div><div><dt>数据采集方式</dt><dd>同源本地只读聚合网关</dd></div></dl></article>
+        <div class="investor-kpis"><article><span>可展示职位记录</span><strong id="investor-jobs">—</strong><small id="investor-jobs-label">待核验数据</small></article><article><span>去重收录企业</span><strong id="investor-boards">—</strong><small>索引公司名称去重，非合作伙伴数</small></article><article><span>用户增长</span><strong>—</strong><small>待接入正式用户统计</small></article></div>
+        <article class="panel investor-disclosure"><h2>给投资人的数据披露说明</h2><p>此页面展示由主站同批次公开职位列表和官网 JD 审计计算的聚合信息，GitHub Pages 更新时生成快照而非实时查询。尚无可核验数据的用户注册量、活跃率、留存、投递转化、收入与成本均不展示数字；不得将岗位索引规模解释为真实用户规模或公司营收。</p><dl><div><dt>当前索引快照</dt><dd id="investor-asof">—</dd></div><div><dt>索引状态</dt><dd id="investor-quality">等待数据</dd></div><div><dt>增长历史</dt><dd>尚未接入按日数据</dd></div><div><dt>数据采集方式</dt><dd>Pages 构建时读取同源公开岗位快照与官网 JD 审计</dd></div></dl></article>
         <footer class="page-footer">仅供内部融资材料编排与指标核对；正式对外分享须完成身份认证、数据审查与访问控制。</footer>
       </section>
       <section class="page-view" id="view-placeholder" hidden aria-labelledby="placeholder-heading">
