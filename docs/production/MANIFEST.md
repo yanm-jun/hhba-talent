@@ -3,6 +3,12 @@
 - 基准：`feat/admin-phase31-private-growth-20261021` HEAD `323be6d1e507b9639cc8e8a6a93a69ab2e773d14`（Phase 0 审计，见 `~/workspace/hhba-prod-audit/AUDIT_PHASE0.md`）
 - 目标分支：`feat/production-aliyun-auth-admin-20261021`（已建，未动）
 - 状态声明：**本包全部文件只在本地编写与测试，未 push GitHub、未部署到任何服务器、未接触 Railway/阿里云生产、未使用任何真实密钥。**
+- ⚠️ SUPERSEDE（2026-10-21 23:34 用户拍板后修订）：本包 auth 模块第一版曾以「验码即注册登录」统一入口
+  推送到目标分支提交 `f878e1b`。用户随后改令【注册/登录双入口严格分开】，本地已按新语义重写
+  `auth/sms-code.ts`、`auth/auth-service.ts`、`auth/auth-routes.ts`、`auth/auth-store-pg.ts`、`auth/auth.test.ts`
+  与 `apps/api/db/001_auth_schema.sql`——**本地版本 supersede f878e1b 的对应文件**，合并时以本地为准整文件覆盖，
+  不要 cherry-pick 旧版的 loginWithCode 自动建号逻辑。变更档案见 `CHANGES_REGISTER_LOGIN_SPLIT.md`，
+  前端接线与后台替换补丁在 `patches/`。本地新版尚未推送，等主会话验收后另行提交。
 - 目录组织：路径即仓库相对路径，合并时按「落点」整文件拷入或按「改哪个现有文件」做定点替换。
 
 ## 文件清单
@@ -27,13 +33,13 @@
 | 本包文件 | 落点 | 改哪个现有文件 | 为什么 |
 |---|---|---|---|
 | `apps/api/db/001_auth_schema.sql` | 同路径新增 | 无（`apps/api/` 现仅 main.py 骨架） | 10 张表：users（手机号唯一+格式 CHECK、角色、管理员受控授予 CHECK）、user_profiles、auth_sessions（只存 token 哈希）、sms_codes（只存 HMAC 哈希）、sms_send_log、saved_jobs_account（账户收藏，与设备收藏隔离）、employers、employer_verifications、job_reviews、admin_audit_log |
-| `ops/legacy-marketplace/auth/sms-code.ts` | 同路径新增 | 无 | 验证码核心规则纯逻辑：6 位/5 分钟/成功即失效/最多 5 次错误/HMAC 哈希不存明文/时序安全比对 |
+| `ops/legacy-marketplace/auth/sms-code.ts` | 同路径新增（本地新版 supersede f878e1b） | 无 | 验证码核心规则纯逻辑：6 位/5 分钟/成功即失效/最多 5 次错误/HMAC 哈希（phone\|purpose\|code）不存明文/时序安全比对；**purpose 强类型必填、无默认值，跨用途三层失败** |
 | `ops/legacy-marketplace/auth/rate-limit.ts` | 同路径新增 | 无 | 发送限流：60 秒重发间隔、同号 24h≤10、同 IP 1h≤20 |
 | `ops/legacy-marketplace/auth/sms-provider.ts` | 同路径新增 | 无 | 短信适配器接口 + 阿里云 Dysmsapi 形状实现（错误码映射、配置 fail-fast）+ mock 网关；生产防线：production 或未显式 `HHBA_ALLOW_MOCK_SMS=1` 时 mock 构造即抛错，无万能码 |
-| `ops/legacy-marketplace/auth/auth-service.ts` | 同路径新增 | 无 | 编排：发码（限流→哈希落库→网关→发送日志）、验证码登录/注册（同号唯一账户）、会话签发/校验/撤销、账户级收藏隔离 |
-| `ops/legacy-marketplace/auth/auth-store-pg.ts` | 同路径新增 | 无 | AuthStore 的 PG 实现骨架（参数化 SQL 与 schema 对应，含验证码行锁防并发绕过的落地注释） |
-| `ops/legacy-marketplace/auth/auth-routes.ts` | 同路径新增 | 合并时改 `railway-function-20261018.ts`：启动装配一行 + fetch 分发链加一行（`HHBA_AUTH_ENABLED=1` 才启用） | `/api/v1/auth/sms/send`、`/sms/verify`、`/logout`、`/me`、`/api/v1/saved*`；Origin+CSRF 双校验；关闭开关时路由不存在，现网行为不受影响 |
-| `ops/legacy-marketplace/auth/auth.test.ts` | 同路径新增 | 无 | 23 个用例：哈希/过期/错误次数/限流/mock 生产防线/阿里云参数形状/注册登录会话收藏隔离闭环 |
+| `ops/legacy-marketplace/auth/auth-service.ts` | 同路径新增（本地新版 supersede f878e1b） | 无 | 编排（双入口版）：sendCode(phone,purpose,ip) 双道注册状态门；registerWithCode 为唯一建号路径（#createAccountViaRegister→store.insertNewUserForRegister）；loginWithCode 无任何建号调用；会话签发/校验/撤销、账户级收藏隔离；AUTH_ERROR_MESSAGES 错误码→中文文案表 |
+| `ops/legacy-marketplace/auth/auth-store-pg.ts` | 同路径新增（本地新版 supersede f878e1b） | 无 | AuthStore 的 PG 实现骨架（参数化 SQL 与 schema 对应，含验证码行锁防并发绕过的落地注释）；建号方法改名 insertNewUserForRegister 并写 registered_from='register' |
+| `ops/legacy-marketplace/auth/auth-routes.ts` | 同路径新增（本地新版 supersede f878e1b） | 合并时改 `railway-function-20261018.ts`：启动装配一行 + fetch 分发链加一行（`HHBA_AUTH_ENABLED=1` 才启用） | `/api/v1/auth/sms/send`（purpose 必填）、`/api/v1/auth/register`、`/api/v1/auth/login`、`/sms/verify`（兼容端点，必须带 purpose 分发）、`/logout`、`/me`、`/api/v1/saved*`；Origin+CSRF 双校验；关闭开关时路由不存在，现网行为不受影响 |
+| `ops/legacy-marketplace/auth/auth.test.ts` | 同路径新增（本地新版 supersede f878e1b） | 无 | 38 个用例：哈希/过期/错误次数/限流/mock 生产防线/阿里云参数形状 + 双入口语义（未注册拒登录且用户数不变、已注册拒注册、register→login 全链路、跨 purpose 三场景、HTTP 路由层） |
 
 前端待改（本包只给契约、未改前端代码，合并阶段处理）：
 - `apps/web/src/pages/AuthPage.tsx` / `services/api.ts`：正式登录入口改调 `/api/v1/auth/sms/*`（手机号+验证码），
