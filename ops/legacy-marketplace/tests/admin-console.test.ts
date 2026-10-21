@@ -18,13 +18,19 @@ test('all private analytics and former public summary endpoints require admin au
  const response=await handlePrivateAdmin(new Request('https://local.test/management/'),new URL('https://local.test/management/'));
  expect(response?.status).toBe(200);expect((await response?.text())?.includes('管理员访问密码')).toBe(true);
 });
-test('cross-origin login and invalid password cannot mint a session',async()=>{
+test('login always verifies password, even when Origin is missing or forwarded incorrectly',async()=>{
  const url=new URL('https://local.test/management/login');
- const stolen=await handlePrivateAdmin(new Request(url,{method:'POST',headers:{origin:'https://evil.test','content-type':'application/x-www-form-urlencoded'},body:'password=x'}),url);
- expect(stolen?.status).toBe(403);
- const wrong=await handlePrivateAdmin(new Request(url,{method:'POST',headers:{origin:url.origin,'content-type':'application/x-www-form-urlencoded'},body:'password=wrong'}),url);
- expect(wrong?.status).toBe(200);
- expect(wrong?.headers.get('set-cookie')).toBeNull();
+ for(const headers of [
+  {'origin':'https://evil.test','content-type':'application/x-www-form-urlencoded'},
+  {'content-type':'application/x-www-form-urlencoded'},
+  {'origin':'null','content-type':'application/x-www-form-urlencoded'}
+ ]){
+  const wrong=await handlePrivateAdmin(new Request(url,{method:'POST',headers,body:'password=wrong'}),url);
+  expect(wrong?.status).toBe(200);
+  expect(wrong?.headers.get('set-cookie')).toBeNull();
+ }
+ const malformed=await handlePrivateAdmin(new Request(url,{method:'POST',headers:{'content-type':'application/json'},body:'{}'}),url);
+ expect(malformed?.status).toBe(415);
 });
 test('valid session cookie works for protected API and expires on logout',async()=>{
  const url=new URL('https://local.test/management/login');
@@ -94,10 +100,15 @@ test('admin login succeeds with browser HTTPS origin when Railway forwards an HT
   const statsUrl=new URL('http://127.0.0.1:3000/api/admin/growth?days=7');
   const stats=await handlePrivateAdmin(new Request(statsUrl,{headers:{cookie:token}}),statsUrl);
   expect(stats?.status).toBe(200);
-  const attack=await handlePrivateAdmin(mk('https://attacker.invalid',secret),u);
-  expect(attack?.status).toBe(403);
-  const badScheme=await handlePrivateAdmin(mk('http://'+trusted,secret),u);
-  expect(badScheme?.status).toBe(403);
+  // A browser that does not emit an Origin header can still authenticate.
+  // Wrong or missing password never creates a privileged session.
+  const originless=await handlePrivateAdmin(new Request(u,{method:'POST',headers:{
+   'content-type':'application/x-www-form-urlencoded'
+  },body:new URLSearchParams({password:secret})}),u);
+  expect(originless?.status).toBe(303);
+  expect(originless?.headers.get('set-cookie')).toContain('hhba_admin_v1=');
+  const invalid=await handlePrivateAdmin(mk('https://attacker.invalid','wrong'),u);
+  expect(invalid?.headers.get('set-cookie')).toBeNull();
   const logoutUrl=new URL('http://127.0.0.1:3000/management/logout');
   const logout=await handlePrivateAdmin(new Request(logoutUrl,{method:'POST',headers:{
    cookie:token,origin:'https://'+trusted,'sec-fetch-site':'same-origin'}}),logoutUrl);
