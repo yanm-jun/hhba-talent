@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, ExternalLink, MapPin, RefreshCcw, Search, ShieldCheck } from 'lucide-react';
 import { Link, getJobReturnTarget, navigate } from '../router';
 import { Shell } from './Shell';
+import { SaveJobButton } from './SaveJobButton';
+import { trackEvent } from '../services/engagement';
+import '../styles/saved-jobs.css';
 import { EmployerBrandLogo } from './EmployerBrandLogo';
 import { companyProfileForJob } from '../services/companyProfiles';
 import { companyPageRouteForJob } from '../services/companyDirectory';
@@ -62,7 +65,7 @@ function JobCard({job,lang,asOf}:{job:LiveJob,lang:Language,asOf:string}){
       <span>{job.recruitmentType?typeLabel[job.recruitmentType]?.[lang]||job.recruitmentType:(lang==='zh'?'招聘类型待确认':'Type unverified')}</span>
       {job.remote===true&&<span>{lang==='zh'?'远程':'Remote'}</span>}</div>
     <div className="unified-job-actions"><Link to={'/candidate/jobs/'+encodeURIComponent(job.id)}>
-      {lang==='zh'?'查看岗位':'View role'} <ArrowRight size={14}/></Link></div>
+      {lang==='zh'?'查看岗位':'View role'} <ArrowRight size={14}/></Link><SaveJobButton jobId={job.id}/></div>
   </article>;
 }
 function LanguageSwitcher({lang,change}:{lang:Language,change:(value:Language)=>void}){
@@ -392,7 +395,8 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
          </div>}
        </div>:null}
      <div className="unified-job-actions unified-detail-actions">
-       {official&&<a href={official} target="_blank" rel="noopener noreferrer" aria-label={lang==='zh'?'前往企业官网立即申请':'Apply on official employer website'}>
+       <SaveJobButton jobId={job.id}/>
+       {official&&<a href={official} onClick={()=>trackEvent('official_apply_click','/candidate/jobs/:job')} target="_blank" rel="noopener noreferrer" aria-label={lang==='zh'?'前往企业官网立即申请':'Apply on official employer website'}>
          {lang==='zh'?'立即申请':'Apply now'} <ExternalLink size={15}/></a>}
      </div>
      <p className="unified-detail-footnote">{lang==='zh'?
