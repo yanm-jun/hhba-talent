@@ -1,0 +1,32 @@
+name: HHBA admin preview phase 1
+on:
+  pull_request:
+    paths:
+      - 'apps/admin-preview/**'
+      - '.github/workflows/hhba-admin-preview.yml'
+  push:
+    branches:
+      - feat/admin-investor-console-phase1-20261021
+    paths:
+      - 'apps/admin-preview/**'
+      - '.github/workflows/hhba-admin-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Static syntax checks
+        run: |
+          node --check apps/admin-preview/dashboard.js
+          node --check apps/admin-preview/server.mjs
+          node --check apps/admin-preview/metrics.mjs
+      - name: Secure preview and honest metrics
+        working-directory: apps/admin-preview
+        run: npm test
