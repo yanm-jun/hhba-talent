@@ -67,7 +67,7 @@ function qualityText(data){
  return '来源与审计快照已核对';
 }
 function updateOverview(){
- const data=snapshot,valid=data?.quality!=='stale'&&['current','partial'].includes(data?.quality)&&data?.kind==='HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2',counts=data?.counts;
+ const data=snapshot,valid=['current','partial'].includes(data?.quality)&&data?.kind==='HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2'&&Number.isSafeInteger(data?.counts?.displayableJobs),counts=data?.counts;
  byId('jobs-count').textContent=valid?fmt.format(counts.displayableJobs):'—';
  byId('indexed-count').textContent=valid?fmt.format(counts.indexedJobs):'—';
  byId('requirements-count').textContent=valid?fmt.format(counts.auditedJobRequirements):'—';
@@ -79,13 +79,13 @@ function updateOverview(){
  byId('feed-health').textContent=qualityText(data);
  byId('feed-detail').textContent=data?
    '来源时间：'+formatTime(data.asOf):'无法获取公开岗位快照，请稍后刷新。';
- byId('feed-dot').className='source-status-dot'+(valid?' good':data?' bad':'');
+ byId('feed-dot').className='source-status-dot'+(valid&&data.quality==='current'?' good':data?' bad':'');
  byId('failed-boards').textContent=Number.isInteger(counts?.failedAtsSources)?fmt.format(counts.failedAtsSources):'—';
  byId('snapshot-time').textContent=data?.asOf?formatTime(data.asOf):'—';
  byId('audit-time').textContent=data?.auditCheckedAt?formatTime(data.auditCheckedAt):'—';
  const status=byId('jobs-status');
- status.textContent=valid?'已核验':data?'不完整 / 过期':'暂不可用';
- status.className='table-status '+(valid?'good':data?'bad':'waiting');
+ status.textContent=valid?(data.quality==='partial'?'部分核验':'已核验'):data?'不完整 / 过期':'暂不可用';
+ status.className='table-status '+(valid&&data.quality==='current'?'good':data?'bad':'waiting');
  byId('investor-jobs').textContent=valid?fmt.format(counts.displayableJobs):'—';
  byId('investor-boards').textContent=valid?fmt.format(counts.distinctIndexedCompanies):'—';
  byId('investor-jobs-label').textContent=valid?'经排除异常的展示记录，非实时在招认证':'尚无完整有效快照';
