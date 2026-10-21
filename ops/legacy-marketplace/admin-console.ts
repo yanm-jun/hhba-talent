@@ -135,7 +135,11 @@ export async function handlePrivateAdmin(req:Request,url:URL):Promise<Response|n
  if(path==='/management')return new Response(null,{status:308,headers:{...HEADERS,Location:'/management/'}});
  if(!p)return path.startsWith('/api/')?bad('ADMIN_NOT_CONFIGURED',503):loginPage(false,true);
  if(path==='/management/login'&&req.method==='POST'){
-  if(!sameOrigin(req))return bad('ORIGIN_DENIED',403);
+  // Password verification, request size cap and server rate limit protect this
+  // unauthenticated login endpoint. A strict Origin gate is brittle behind
+  // Railway TLS termination and browser form POSTs (which may omit Origin).
+  // No existing privileged session state is mutated without the admin secret.
+  // Keep same-origin checks for authenticated state-changing actions, e.g. logout.
   if(!(req.headers.get('content-type')||'').startsWith('application/x-www-form-urlencoded'))return bad('BAD_CONTENT_TYPE',415);
   const key='admin-login-global'; // Fixed bucket; forwarded IP headers must not bypass brute-force throttling.
   if(!loginAllowed(key))return loginPage(true);
