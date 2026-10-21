@@ -1614,6 +1614,12 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  if(engagementResponse)return engagementResponse;
  const savedResponse=await handleSavedJobs(req,u,async id=>{
    if(await fromWhiteIndex(id))return true;
+   if(/^campus27-(?:baidu|meituan)-[a-z0-9-]{4,80}$/.test(id)){
+    try {const campus=await Bun.file(WHITE_PUBLIC_ROOT+"/campus-2027.json").json() as any;
+      return campus?.kind==="HHBA_CAMPUS_2027_WAVE1_VERIFIED_DETAILS_V1"&&
+        campus.jobs?.some((j:any)=>j.id===id)===true;
+    }catch{return false}
+   }
    // Domestic public listings share the existing source index and must also be saveable.
    const listings=await load();
    return Boolean(listings?.rows?.some((row:Job)=>row.id===id));
