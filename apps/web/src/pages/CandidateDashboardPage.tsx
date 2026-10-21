@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight, BriefcaseBusiness, FileUser, MapPin, Search, Sparkles, UserRound } from 'lucide-react';
 import { Shell } from '../components/Shell';
+import {useDemoAccount} from '../services/demoAccount';
 import { Link, navigate } from '../router';
 import { trackEvent } from '../services/engagement';
 import { api, employerApiReady, type User } from '../services/api';
@@ -20,6 +21,7 @@ const initialFilters:LiveFilters={
  * rather than showing another directory of feature-entry cards.
  */
 export function CandidateDashboardPage({user}:{user:User|null}){
+  const demo=useDemoAccount();
   const [query,setQuery]=useState('');
   const [jobs,setJobs]=useState<LiveJob[]>([]);
   const [asOf,setAsOf]=useState('');
@@ -60,7 +62,7 @@ export function CandidateDashboardPage({user}:{user:User|null}){
     navigate('/candidate/jobs'+(term?'?q='+encodeURIComponent(term):''));
   }
 
-  const profileStatus=!employerApiReady?'账户服务待开放':!user?'未登录':hasProfile?'已建立':'待完善';
+  const profileStatus=!employerApiReady?(demo?'演示账户':'可体验模拟账户'):!user?'未登录':hasProfile?'已建立':'待完善';
   const canManageProfile=employerApiReady && !!user;
 
   return <Shell user={user}>
@@ -89,7 +91,7 @@ export function CandidateDashboardPage({user}:{user:User|null}){
           </div>
           <span className="candidate-dashboard-status">{profileStatus}</span>
         </div>
-        <p>{!employerApiReady?'简历档案与账户功能正在接入，暂不接收或保存个人文件。':
+        <p>{!employerApiReady?'模拟账户可以先编辑个人资料与求职偏好；真实简历上传尚未开放。':
           hasProfile?'你的求职资料已建立，可继续查看与完善。':
           '上传或完善简历，之后可获得更符合个人能力的职位推荐。'}</p>
         {employerApiReady?
@@ -97,7 +99,7 @@ export function CandidateDashboardPage({user}:{user:User|null}){
             to={canManageProfile&&hasProfile?'/candidate/profile':'/candidate/resume/new'}>
             {hasProfile?'查看我的求职档案':'完善我的简历'} <ArrowRight size={15}/>
           </Link>:
-          <span className="candidate-dashboard-notice">账户开通后可在这里管理简历；现在可以直接搜索岗位。</span>}
+          <Link className="candidate-dashboard-profile-action" to={demo?'/candidate/account/profile':'/candidate/register'}>{demo?'编辑演示资料':'创建模拟账户'} <ArrowRight size={15}/></Link>}
       </section>
 
       <div className="candidate-dashboard-quick-grid" aria-label="求职工具">

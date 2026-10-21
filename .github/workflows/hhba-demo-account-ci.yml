@@ -1,0 +1,33 @@
+name: HHBA Demo Account Preview Checks
+on:
+  push:
+    branches: [feat/phase3-demo-account-ui-20261021]
+  pull_request:
+    branches: [feat/phase3-traffic-favorites-personal-center-20261021]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Verify demo contract and official-job safety
+        working-directory: apps/web
+        run: |
+          node --test scripts/demo-account.contract.test.mjs scripts/white-market-detail.contract.test.mjs
+      - name: Install frontend dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Build real frontend with demo account isolated from API
+        working-directory: apps/web
+        env:
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          HHBA_GITHUB_PAGES: '0'
+        run: npm run build

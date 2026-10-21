@@ -1,12 +1,13 @@
 import {useEffect,useState} from 'react';
 import {useRoute} from '../router';
 import {analyticsChoice,chooseAnalytics,trackEvent} from '../services/engagement';
+import {demoModeEnabled} from '../services/demoAccount';
 import '../styles/analytics-consent.css';
 export function AnalyticsConsent(){
  const route=useRoute();
  const [choice,setChoice]=useState<boolean|null>(()=>analyticsChoice());
  useEffect(()=>{
-  if(choice===true){
+  if(choice===true && !(demoModeEnabled && (/^\/candidate\/(?:account(?:\/.*)?|saved|login|register)$/.test(route)||route==='/auth'))){
    trackEvent('page_view',route);
    if(/^\/candidate\/jobs\/[A-Za-z0-9_-]{1,180}$/.test(route))trackEvent('job_view',route);
   }
