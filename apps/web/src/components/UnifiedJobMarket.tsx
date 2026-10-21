@@ -297,6 +297,9 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
    const controller=new AbortController();
    setJd(null);setChineseJd('');setTranslateError('');
    setTranslationPrepared(false);setJdError('');setJdLoading(true);
+   // Campus summaries have a reviewed source URL; do not trigger the overseas ATS JD reader.
+   if(job.graduationYear===2027&&job.recordKind==='OFFICIAL_JOB_PAGE_OBSERVED'&&
+      job.responsibilitiesSummary&&job.requirementsSummary){setJdLoading(false);return;}
    (async()=>{
      const prepared=await fetchPreparedBilingualJd(job,controller.signal);
      if(prepared){
@@ -361,7 +364,15 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
        {audit.official_checked_at && <small>{lang==='zh'?'核验：':'Checked: '}{audit.official_checked_at.slice(0,10)}</small>}
      </p>}
      <h2>{lang==='zh'?'职位说明与任职要求':'Description and job requirements'}</h2>
-     {jdLoading?<p role="status">{lang==='zh'?'正在读取官方岗位职责及任职要求…':'Fetching current employer requirements…'}</p>:
+     {job.graduationYear===2027&&job.responsibilitiesSummary&&job.requirementsSummary?
+       <div className="unified-jd-content">
+         <p className="unified-jd-source">2027 届校招 · 官网职位详情已观察 · 最近核验：{formatDate(job.observedAt)}</p>
+         <p className="unified-jd-machine-notice">以下为 HHBA 整理的中文要点，并非完整官方招聘原文。尚未核验该岗位目前能否提交申请，请以官网为准。</p>
+         <section className="unified-jd-section"><h3>岗位职责</h3><p>{job.responsibilitiesSummary}</p></section>
+         <section className="unified-jd-section"><h3>任职要求</h3><p>{job.requirementsSummary}</p></section>
+         {official&&<a href={official} target="_blank" rel="noopener noreferrer">打开企业官方职位详情，核对完整 JD 与投递状态 <ExternalLink size={14}/></a>}
+       </div>:
+     jdLoading?<p role="status">{lang==='zh'?'正在读取官方岗位职责及任职要求…':'Fetching current employer requirements…'}</p>:
        jdError?<div className="unified-jd-empty" role="status">
          <p>{lang==='zh'?'该岗位的完整官方职位说明暂未获取成功。':'The full official description for this role is temporarily unavailable.'}</p>
          <small>{lang==='zh'?jdError:'The employer source could not be verified; requirements will not be invented.'}</small>
