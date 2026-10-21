@@ -5,6 +5,7 @@ import { parseDocument } from "htmlparser2";
 
 type Job={id:string;company:string;title:string;location:string;remote:boolean|null;url:string;platform:string;source:string;domestic?:boolean;recruitmentType?:string;observedAt?:string};
 
+import { handleEngagement } from "./engagement.ts";
 import { Database } from "bun:sqlite";
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, existsSync } from "node:fs";
@@ -1605,6 +1606,8 @@ async function whiteSiteResponse(req:Request,u:URL):Promise<Response|null>{
 
 Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  const u=new URL(req.url);
+ const engagementResponse=await handleEngagement(req,u);
+ if(engagementResponse)return engagementResponse;
  // Preserve old /jobs/:id deep links on the NEW white hostname.
  const oldJobRoute=u.pathname.match(new RegExp("^/jobs/([A-Za-z0-9_-]{1,180})$"));
  if(req.method==="GET"&&oldJobRoute)
