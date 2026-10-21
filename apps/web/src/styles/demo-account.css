@@ -39,11 +39,14 @@
 .hhba-account-panel{background:#fff;border:1px solid #e2e9e4;border-radius:13px;padding:24px 26px;margin-bottom:20px;min-width:0}
 .hhba-account-panel>p{font-size:13px;line-height:1.75;color:#7c8b7f}
 .hhba-account-tool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.hhba-account-tool-grid>a{padding:16px;display:grid;grid-template-columns:25px 1fr 14px;grid-template-rows:auto auto;column-gap:10px;row-gap:6px;align-items:center;background:#fbfcfb;border:1px solid #e7ede8;border-radius:11px;text-decoration:none;color:#2d4836}
-.hhba-account-tool-grid>a>svg:first-child{grid-row:span 2;color:#4e7e5e}
-.hhba-account-tool-grid>a>svg:last-child{grid-column:3;grid-row:span 2;color:#839988}
-.hhba-account-tool-grid strong{font-size:13px}
-.hhba-account-tool-grid small{font-size:11px;color:#89968a;line-height:1.5}
+.hhba-account-tool-grid>a.hhba-account-tool-card{display:grid;grid-template-columns:20px minmax(0,1fr) 15px;align-items:center;column-gap:12px;min-height:88px;padding:14px 16px;background:#fbfcfb;border:1px solid #e7ede8;border-radius:11px;text-decoration:none;color:#2d4836;transition:background-color .15s,border-color .15s}
+.hhba-account-tool-grid>a.hhba-account-tool-card:hover{background:#f3f8f4;border-color:#bcd7c4}
+.hhba-account-tool-grid>a.hhba-account-tool-card:focus-visible{outline:2px solid #4b8760;outline-offset:2px}
+.hhba-account-tool-icon{color:#4e7e5e;flex-shrink:0}
+.hhba-account-tool-copy{display:flex;flex-direction:column;gap:5px;min-width:0;overflow-wrap:normal;word-break:normal;white-space:normal;writing-mode:horizontal-tb}
+.hhba-account-tool-copy strong{display:block;font-size:13px;line-height:1.4;font-weight:730;white-space:normal}
+.hhba-account-tool-copy small{display:block;font-size:11px;line-height:1.55;color:#89968a;white-space:normal;word-break:normal;overflow-wrap:break-word}
+.hhba-account-tool-arrow{color:#839988;justify-self:end;flex-shrink:0}
 .hhba-account-form{display:flex;flex-direction:column;gap:17px}
 .hhba-account-form-row{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 .hhba-account-form label{display:flex;flex-direction:column;gap:7px;font-size:12px;font-weight:700;color:#3a4b3e}
@@ -74,4 +77,4 @@
 .hhba-account-danger:disabled{opacity:.5;cursor:not-allowed}
 .hhba-account-footer{display:flex;align-items:center;gap:8px;color:#88978d;font-size:11px;margin:20px 0 0}
 @media(max-width:900px){.hhba-account-grid{grid-template-columns:1fr;gap:12px}.hhba-account-sidebar{display:flex;flex-direction:row;flex-wrap:wrap;padding:10px;gap:4px}.hhba-account-sidebar>p{display:none}.hhba-account-sidebar a{padding:9px 11px;min-height:38px}.hhba-account-chevron{display:none}}
-@media(max-width:620px){.hhba-account-header{padding:19px;gap:12px;flex-wrap:wrap}.hhba-account-avatar{width:48px;height:48px;border-radius:12px}.hhba-account-exit{margin-left:auto}.hhba-account-sidebar a{font-size:12px}.hhba-account-stat-grid{gap:7px}.hhba-account-stat-grid>a{padding:13px 10px}.hhba-account-stat-grid strong{font-size:22px}.hhba-account-panel{padding:18px 15px}.hhba-account-form-row{grid-template-columns:1fr}.hhba-account-tool-grid{grid-template-columns:1fr}.hhba-account-entry{flex-direction:column;align-items:flex-start}.hhba-account-privacy-row{flex-direction:column;align-items:flex-start}.hhba-account-section-heading h2{font-size:19px}}
+@media(max-width:620px){.hhba-account-header{padding:19px;gap:12px;flex-wrap:wrap}.hhba-account-avatar{width:48px;height:48px;border-radius:12px}.hhba-account-exit{margin-left:auto}.hhba-account-sidebar a{font-size:12px}.hhba-account-stat-grid{gap:7px}.hhba-account-stat-grid>a{padding:13px 10px}.hhba-account-stat-grid strong{font-size:22px}.hhba-account-panel{padding:18px 15px}.hhba-account-form-row{grid-template-columns:1fr}.hhba-account-tool-grid{grid-template-columns:1fr}.hhba-account-tool-grid>a.hhba-account-tool-card{min-height:76px;padding:12px 14px;column-gap:11px}.hhba-account-entry{flex-direction:column;align-items:flex-start}.hhba-account-privacy-row{flex-direction:column;align-items:flex-start}.hhba-account-section-heading h2{font-size:19px}}
