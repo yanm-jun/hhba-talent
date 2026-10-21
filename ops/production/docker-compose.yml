@@ -1,0 +1,123 @@
+# HHBA 生产部署（阿里云 ECS）—— Phase 1 部署包
+# 基准：仓库 Dockerfile.hhba（两阶段：node:22-alpine 构建白站 → oven/bun:1.3 运行
+# ops/legacy-marketplace/railway-function-20261018.ts，容器内为 server.ts）。
+# 本文件不改业务代码，只把 Railway 的运行环境换成自托管等价物：
+#   Railway 持久卷 /sync-state  -> 命名卷 hhba_sync_state（挂到同一路径 /sync-state）
+#   Railway 域名/TLS 终止       -> Caddy 反向代理（见 Caddyfile 与下方选型说明）
+#   新增 PostgreSQL 17          -> Phase 2 真实账户库（users / sessions / 短信等）
+#
+# 反向代理选型：Caddy（不用 Nginx），理由：
+#   1. 内置 ACME 自动签发/续期 Let's Encrypt 证书，ECS 上免维护 certbot 定时任务；
+#   2. 单文件配置（Caddyfile），reverse_proxy 自动设置 X-Forwarded-For/Proto/Host，
+#      正是现有代码 validOrigin / 管理后台 Origin 判断依赖的头，踩坑面比手写 Nginx 小；
+#   3. 代价：团队若更熟 Nginx 可等价替换，应用层无感知（只依赖标准转发头）。
+#
+# 使用：cp .env.production.example .env.production 并填真实值（该文件禁止进 Git）；
+#       docker compose --env-file .env.production -f docker-compose.yml up -d --build
+name: hhba-prod
+
+services:
+  hhba-web:
+    build:
+      context: ../..            # 仓库根目录（Dockerfile.hhba 位于根目录）
+      dockerfile: Dockerfile.hhba
+      args:
+        # 审计发现原 Dockerfile 把开关写死；迁移时改为构建参数注入，默认值与线上一致。
+        VITE_HHBA_VERIFIED_SNAPSHOT: ${VITE_HHBA_VERIFIED_SNAPSHOT:-1}
+        VITE_HHBA_ACCOUNT_API_ENABLED: ${VITE_HHBA_ACCOUNT_API_ENABLED:-0}
+    image: hhba-web:prod
+    restart: unless-stopped     # 自动重启（进程崩溃/宿主机重启后自恢复）
+    environment:
+      PORT: "3000"
+      # —— 持久化目录：与 Railway 保持同一绝对路径，业务代码零改动 ——
+      HHBA_ENGAGEMENT_DIR: /sync-state
+      HHBA_NATIVE_INDEX_READ: ${HHBA_NATIVE_INDEX_READ:-1}
+      HHBA_NATIVE_INDEX_PUBLISH: ${HHBA_NATIVE_INDEX_PUBLISH:-0}
+      HHBA_JD_SYNC_ENABLED: ${HHBA_JD_SYNC_ENABLED:-0}
+      # —— 管理后台（沿用现有单密码 + HMAC Cookie 鉴权，见 admin-console.ts）——
+      HHBA_ADMIN_PASSWORD: ${HHBA_ADMIN_PASSWORD:?must be set (>=20 chars)}
+      # —— Phase 2 账户系统（代码合并前保持关闭；开启走灰度，见 auth 模块）——
+      HHBA_AUTH_ENABLED: ${HHBA_AUTH_ENABLED:-0}
+      DATABASE_URL: ${DATABASE_URL:?must be set}
+      APP_ORIGIN: ${APP_ORIGIN:?must be set, e.g. https://www.hhba.com.cn}
+      TRUSTED_PROXY: ${TRUSTED_PROXY:-caddy}
+      SMS_CODE_PEPPER: ${SMS_CODE_PEPPER:-}
+      HHBA_SMS_PROVIDER: ${HHBA_SMS_PROVIDER:-mock}
+      HHBA_ALLOW_MOCK_SMS: ${HHBA_ALLOW_MOCK_SMS:-0}
+      ALIBABA_CLOUD_ACCESS_KEY_ID: ${ALIBABA_CLOUD_ACCESS_KEY_ID:-}
+      ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${ALIBABA_CLOUD_ACCESS_KEY_SECRET:-}
+      ALIYUN_SMS_SIGN_NAME: ${ALIYUN_SMS_SIGN_NAME:-}
+      ALIYUN_SMS_TEMPLATE_CODE: ${ALIYUN_SMS_TEMPLATE_CODE:-}
+      ALIYUN_SMS_REGION: ${ALIYUN_SMS_REGION:-cn-hangzhou}
+      HHBA_TRANSLATOR_URL: ${HHBA_TRANSLATOR_URL:-}
+    volumes:
+      - hhba_sync_state:/sync-state   # engagement / saved / overseas-jd / public-index
+      - hhba_data:/data               # 翻译缓存 hhba-translations.sqlite（审计：原 /data 不在 /sync-state 卷内，一并持久化）
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      # 主服务已有 GET /health（线上实测 200 {"ok":true,...}）
+      test: ["CMD", "bun", "-e", "const r=await fetch('http://127.0.0.1:3000/health');process.exit(r.ok?0:1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+    # 不直接对外暴露 3000 端口：仅经 Caddy 访问（ports 不写，只 expose 给同网络）
+    expose: ["3000"]
+
+  postgres:
+    image: postgres:17           # 与 Phase 0 技术选型 PostgreSQL 17 对齐
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-hhba}
+      POSTGRES_USER: ${POSTGRES_USER:-hhba}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?must be set}
+    volumes:
+      - hhba_pgdata:/var/lib/postgresql/data
+      # 首次初始化自动执行 Phase 2 账户 schema（仅空库时运行；后续迁移走版本化脚本）
+      - ../../apps/api/db:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hhba} -d ${POSTGRES_DB:-hhba}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+    expose: ["5432"]              # 不映射宿主机端口，仅容器网络内访问
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      hhba-web:
+        condition: service_healthy
+    environment:
+      HHBA_DOMAIN: ${HHBA_DOMAIN:?must be set, e.g. www.hhba.com.cn}
+      ACME_EMAIL: ${ACME_EMAIL:?must be set}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - hhba_caddy_data:/data       # 证书与 ACME 账户，必须持久化否则反复签发触发限额
+      - hhba_caddy_config:/config
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:2019/metrics"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+volumes:
+  hhba_sync_state:
+  hhba_data:
+  hhba_pgdata:
+  hhba_caddy_data:
+  hhba_caddy_config:

@@ -1,0 +1,36 @@
+# HHBA 反向代理（Caddy 2）—— 配合 docker-compose.yml 使用
+# 职责：HTTPS 自动证书、HTTP→HTTPS 跳转、转发头、安全响应头、访问日志。
+# Caddy 的 reverse_proxy 默认即设置 X-Forwarded-For / X-Forwarded-Proto / X-Forwarded-Host，
+# 现有服务端的 validOrigin() 与管理后台 Origin 校验依赖这些头，不要改成透传原始 Host 的写法。
+
+{
+	email {$ACME_EMAIL}
+	# 管理端点仅监听容器内 2019（不对外映射），供 healthcheck 使用
+	admin localhost:2019
+}
+
+{$HHBA_DOMAIN} {
+	encode gzip zstd
+
+	header {
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	# 管理后台与账户 API 不做任何缓存（应用层亦返回 no-store，这里双保险）
+	@nocache path /management/* /api/admin/* /api/v1/* /api/engagement/* /api/saved*
+	header @nocache Cache-Control "no-store"
+
+	reverse_proxy hhba-web:3000
+
+	log {
+		output stdout
+		format json
+	}
+}
+
+# 裸域跳转到主域名（域名正式切换后启用；测试阶段可整段注释）
+# example.com {
+#	redir https://www.example.com{uri} permanent
+# }
