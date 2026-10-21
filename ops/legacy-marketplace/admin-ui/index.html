@@ -65,6 +65,7 @@
             <button type="button" data-period="today">今日</button>
             <button type="button" data-period="7d">近 7 天</button>
             <button type="button" data-period="30d" class="selected" aria-pressed="true">近 30 天</button>
+            <button type="button" data-period="90d">近 90 天</button>
             <button type="button" data-period="custom">自定义</button>
           </div>
           <span class="updated-note" id="top-source-date">数据源：等待连接</span>
@@ -86,7 +87,7 @@
           <article class="kpi-card"><div class="kpi-head"><span>近 30 日活跃用户</span><span class="metric-icon"><svg viewBox="0 0 24 24"><path d="M3 13h4l3-7 4 12 3-5h4"/></svg></span></div><div class="metric-number pending">—</div><p class="kpi-foot muted">尚未建立行为事件口径</p></article>
         </div>
         <section class="admin-growth-summary" aria-labelledby="growth-heading">
- <div class="admin-growth-heading"><div><h2 id="growth-heading">访问与收藏 · 真实采集</h2><p>按 UTC 日期展示用户主动同意采集的事件；不代表全站所有访客。</p></div><a href="javascript:void(0)" id="growth-open" class="admin-growth-link">查看详情 →</a></div>
+ <div class="admin-growth-heading"><div><h2 id="growth-heading">访问与收藏 · 真实采集</h2><p>按 UTC 日期展示用户主动同意采集的事件；不代表全站所有访客。</p></div><button type="button" id="growth-open" class="admin-growth-link">查看详情 →</button></div>
  <div class="admin-growth-cards">
   <article class="admin-growth-card"><span>页面浏览 PV</span><strong id="ov-pv">—</strong><small>仅同意采集的访问</small></article>
   <article class="admin-growth-card"><span>日 UV 合计</span><strong id="ov-uv">—</strong><small>跨天可能重复，不是跨期去重 UV</small></article>
@@ -126,6 +127,10 @@
       <section class="page-view" id="view-users" hidden aria-labelledby="users-heading">
  <div class="page-heading"><div><p class="eyebrow">REAL USER BEHAVIOR · PHASE 3.1</p><h1 id="users-heading">访问与收藏分析</h1>
  <p class="page-subtitle">真实访问及收藏关系的聚合趋势，不展示用户身份、简历或具体个人行为。</p></div></div>
+ <div class="overview-toolbar"><div class="range-group" role="group" aria-label="访问统计时间范围">
+ <button type="button" data-period="today">今日</button><button type="button" data-period="7d">近 7 天</button>
+ <button type="button" data-period="30d" class="selected" aria-pressed="true">近 30 天</button>
+ <button type="button" data-period="90d">近 90 天</button></div><span class="updated-note">本模块日期采用 UTC</span></div>
  <div class="admin-growth-cards admin-growth-cards-details">
   <article class="admin-growth-card"><span>页面浏览 PV</span><strong id="growth-pv">—</strong><small>主动同意的匿名访问</small></article>
   <article class="admin-growth-card"><span>日 UV 合计</span><strong id="growth-uv">—</strong><small>日去重后求和，非跨期独立人数</small></article>
