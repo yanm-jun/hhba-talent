@@ -129,6 +129,7 @@ export async function handlePrivateAdmin(req:Request,url:URL):Promise<Response|n
   return bad('ADMIN_AUTH_REQUIRED',401); // Deprecate unauthenticated Phase 3 summary endpoints.
  if(!(path==='/management'||path.startsWith('/management/')||path.startsWith('/api/admin/')))return null;
  const p=password();
+ if(path==='/management')return new Response(null,{status:308,headers:{...HEADERS,Location:'/management/'}});
  if(!p)return path.startsWith('/api/')?bad('ADMIN_NOT_CONFIGURED',503):loginPage(false,true);
  if(path==='/management/login'&&req.method==='POST'){
   if(!sameOrigin(req))return bad('ORIGIN_DENIED',403);
@@ -145,6 +146,7 @@ export async function handlePrivateAdmin(req:Request,url:URL):Promise<Response|n
  if(!authenticated(req,p)){
   return path.startsWith('/api/')?bad('ADMIN_AUTH_REQUIRED',401):loginPage();
  }
+ if(path==='/management/login')return new Response(null,{status:303,headers:{...HEADERS,Location:'/management/'}});
  if(path==='/management/logout'){
   if(req.method!=='POST')return bad('METHOD_NOT_ALLOWED',405);
   if(!sameOrigin(req))return bad('ORIGIN_DENIED',403);
