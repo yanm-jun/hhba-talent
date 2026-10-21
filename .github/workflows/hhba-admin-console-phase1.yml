@@ -1,0 +1,32 @@
+name: HHBA Admin Console Phase 1 Readonly Preview
+on:
+  push:
+    branches: [feat/admin-investor-console-phase1-20261021]
+    paths:
+      - 'apps/admin-preview/**'
+      - '.github/workflows/hhba-admin-console-phase1.yml'
+  pull_request:
+    paths:
+      - 'apps/admin-preview/**'
+      - '.github/workflows/hhba-admin-console-phase1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preview-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate JavaScript syntax and HTML/CSS existence
+        run: |
+          node --check apps/admin-preview/dashboard.js
+          node --check apps/admin-preview/metrics.mjs
+          node --check apps/admin-preview/server.mjs
+          test -s apps/admin-preview/index.html
+          test -s apps/admin-preview/styles.css
+      - name: Test source integrity, read-only isolation and investor disclosures
+        run: node --test apps/admin-preview/tests/*.test.mjs
