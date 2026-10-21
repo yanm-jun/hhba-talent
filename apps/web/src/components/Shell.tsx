@@ -2,6 +2,7 @@ import { Link, useNavigate } from '../router';
 import type { User } from '../services/api';
 import { Bookmark, UserRound } from 'lucide-react';
 import {demoModeEnabled,useDemoAccount,exitDemoAccount} from '../services/demoAccount';
+import '../styles/demo-nav.css';
 
 export function Shell({ user, children }: { user: User | null; children: React.ReactNode }) {
   const navigate = useNavigate();
