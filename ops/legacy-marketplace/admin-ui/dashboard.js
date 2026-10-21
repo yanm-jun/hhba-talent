@@ -2,6 +2,7 @@
 const byId=id=>document.getElementById(id);
 const fmt=new Intl.NumberFormat('zh-CN');
 const formatTime=value=>{
+ if(!value)return '—';
  try{return new Date(value).toLocaleString('zh-CN',{
    timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit',
    hour:'2-digit',minute:'2-digit',hour12:false
@@ -89,7 +90,7 @@ function updateOverview(){
  byId('investor-jobs-label').textContent=valid?'经排除异常的展示记录，非实时在招认证':'尚无完整有效快照';
  byId('investor-asof').textContent=data?formatTime(data.asOf):'—';
  byId('investor-quality').textContent=qualityText(data);
- byId('export-csv').disabled=!valid;
+ byId('export-csv').disabled=!valid&&growth?.traffic?.quality!=='collected'&&growth?.bookmarks?.quality!=='collected';
 }
 async function refresh(){
  const btn=byId('refresh');
@@ -118,34 +119,36 @@ async function refresh(){
 }
 function exportCSV(){
  const data=snapshot;
- if(!data||!['current','partial'].includes(data.quality)||data.kind!=='HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2')return;
- const rows=[
-  ['HHBA 融资只读数据快照','指标值','统计口径','来源时间（ISO 8601）'],
-  ['公开索引记录',String(data.counts.indexedJobs),data.definitions.indexedJobs,data.asOf],
-  ['可展示记录',String(data.counts.displayableJobs),data.definitions.displayableJobs,data.asOf],
-  ['已核验官网任职要求',String(data.counts.auditedJobRequirements),data.definitions.auditedJobRequirements,data.auditCheckedAt],
-  ['去重收录企业',String(data.counts.distinctIndexedCompanies),data.definitions.distinctIndexedCompanies,data.asOf],
-  ['已审计 ATS 来源',String(data.counts.checkedAtsSources),data.definitions.checkedAtsSources,data.auditCheckedAt],
-  ['失败 ATS 来源',String(data.counts.failedAtsSources),data.definitions.failedAtsSources,data.auditCheckedAt],
-  ['累计注册用户','未接入','没有可核验用户计数',''],
-  ['近 30 日活跃用户','未接入','没有完整用户事件数据',''],
-  ['真实收入','未接入','未接入财务台账','']
- ];
- if(growth?.traffic?.quality==='collected'){
-  rows.push(['匿名同意采集 PV',String(growth.traffic.pv),growth.definitions.pv,growth.asOf],
-   ['按日日 UV 合计',String(growth.traffic.dailyUvSum),growth.definitions.dailyUvSum,growth.asOf],
-   ['官方申请链接点击',String(growth.traffic.applyClicks),'点击行为，不代表申请成功',growth.asOf]);
- }
- if(growth?.bookmarks?.quality==='collected')rows.push(
-  ['有效本设备收藏',String(growth.bookmarks.totalActive),growth.definitions.bookmarks,growth.asOf],
-  ['新增收藏',String(growth.bookmarks.added),'本期新增收藏操作次数',growth.asOf],
-  ['取消收藏',String(growth.bookmarks.removed),'本期取消收藏操作次数',growth.asOf]);
+ const jobsReady=data?.kind==='HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2'&&['current','partial'].includes(data.quality);
+ const trafficReady=growth?.traffic?.quality==='collected';
+ const savedReady=growth?.bookmarks?.quality==='collected';
+ if(!jobsReady&&!trafficReady&&!savedReady)return;
+ const rows=[['HHBA 私有管理端真实指标','指标值','统计口径','来源时间（ISO 8601）']];
+ if(jobsReady)rows.push(
+  ['公开索引岗位',String(data.counts.indexedJobs),data.definitions.indexedJobs,data.asOf],
+  ['可展示岗位',String(data.counts.displayableJobs),data.definitions.displayableJobs,data.asOf],
+  ['官网要求已核验',String(data.counts.auditedJobRequirements),data.definitions.auditedJobRequirements,data.auditCheckedAt],
+  ['去重收录企业',String(data.counts.distinctIndexedCompanies),data.definitions.distinctIndexedCompanies,data.asOf]);
+ if(trafficReady)rows.push(
+  ['PV（同意采集）',String(growth.traffic.pv),growth.definitions.pv,growth.asOf],
+  ['日 UV 合计',String(growth.traffic.dailyUvSum),growth.definitions.dailyUvSum,growth.asOf],
+  ['岗位详情浏览',String(growth.traffic.jobViews),'非跨期去重访客',growth.asOf],
+  ['搜索次数',String(growth.traffic.searches),'仅记录事件，不存关键词',growth.asOf],
+  ['申请外链点击',String(growth.traffic.applyClicks),'点击不等于投递成功',growth.asOf]);
+ if(savedReady)rows.push(
+  ['有效设备收藏总量',String(growth.bookmarks.totalActive),growth.definitions.bookmarks,growth.asOf],
+  ['有收藏的设备数',String(growth.bookmarks.devicesWithBookmarks),'不是注册账户数',growth.asOf],
+  ['本期新增收藏',String(growth.bookmarks.added),'期间内收藏操作次数',growth.asOf],
+  ['本期取消收藏',String(growth.bookmarks.removed),'期间内取消操作次数',growth.asOf]);
+ rows.push(['真实注册账户','未接入','模拟账户不计入真实注册数',''],
+  ['真正 DAU/MAU','未接入','没有正式账号活跃度口径',''],
+  ['营收','未接入','没有经核实财务台账','']);
  const csv='\uFEFF'+rows.map(row=>row.map(cell=>'"'+String(cell).replaceAll('"','""')+'"').join(',')).join('\r\n');
  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
- const a=document.createElement('a');a.href=url;a.download='HHBA-verified-overview.csv';
- document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ const link=document.createElement('a');link.href=url;link.download='HHBA-phase31-private-verified-metrics.csv';
+ document.body.append(link);link.click();link.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-
 function displayMetric(id,value,available){const el=byId(id);if(el)el.textContent=available&&Number.isSafeInteger(value)?fmt.format(value):'—';}
 function renderDailyPV(id,data,available){
  const root=byId(id);root.replaceChildren();
@@ -179,6 +182,7 @@ function updateGrowth(){
  displayMetric('investor-pv',t?.pv,readyT);
  byId('growth-changes').textContent=readyB&&Number.isSafeInteger(b.added)&&Number.isSafeInteger(b.removed)
   ?fmt.format(b.added)+' / '+fmt.format(b.removed):'—';
+ byId('export-csv').disabled=!(readyT||readyB||(['current','partial'].includes(snapshot?.quality)&&snapshot?.kind==='HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2'));
  const quality=readyT&&readyB?'访问与收藏数据已连接':readyT?'访问数据正常，收藏数据暂不可用':
   readyB?'收藏数据正常，访问数据暂不可用':'聚合数据暂不可用';
  byId('growth-quality').textContent=quality+' · '+(growth?.asOf?formatTime(growth.asOf):'数据未获取');
