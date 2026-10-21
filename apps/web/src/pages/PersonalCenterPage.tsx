@@ -111,7 +111,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview'}:{us
       </div>
       <section className="hhba-account-panel"><div className="hhba-account-section-heading"><div><h3>完善我的职业档案</h3><p>体验个人资料、求职偏好与账户隐私设置。</p></div></div>
        <div className="hhba-account-tool-grid">
-        {pages.filter(x=>['profile','preferences','resume','privacy'].includes(x.id)).map(x=><Link to={routeFor(x.id)} key={x.id}><x.icon size={20}/><strong>{x.label}</strong><small>{x.description}</small><ArrowRight size={15}/></Link>)}
+        {pages.filter(x=>['profile','preferences','resume','privacy'].includes(x.id)).map(x=><Link to={routeFor(x.id)} key={x.id} className="hhba-account-tool-card"><x.icon size={20} className="hhba-account-tool-icon"/><span className="hhba-account-tool-copy"><strong>{x.label}</strong><small>{x.description}</small></span><ArrowRight size={15} className="hhba-account-tool-arrow"/></Link>)}
        </div>
       </section>
       <section className="hhba-account-panel"><div className="hhba-account-section-heading"><div><h3>真实招聘市场</h3><p>收藏后返回这里查看，企业岗位是否仍在招以官网为准。</p></div><Link to="/candidate/jobs">查看全部岗位 <ArrowRight size={15}/></Link></div>
