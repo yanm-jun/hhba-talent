@@ -1,77 +1,32 @@
-name: HHBA Admin Static Preview (GitHub Pages)
+name: HHBA Admin Static Preview Safety Check
 on:
   push:
     branches: [feat/admin-investor-console-phase1-20261021]
     paths:
       - 'apps/admin-preview/**'
       - '.github/workflows/hhba-admin-pages.yml'
+  pull_request:
+    paths:
+      - 'apps/admin-preview/**'
+      - '.github/workflows/hhba-admin-pages.yml'
   workflow_dispatch:
 permissions:
   contents: read
-  pages: write
-  id-token: write
-concurrency:
-  group: hhba-admin-pages-preview
-  cancel-in-progress: true
 jobs:
-  pages:
+  verify:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify no admin secrets or simulated metrics
-        working-directory: apps/admin-preview
+      - name: Check static console without publishing over the original HHBA website
         run: |
-          node --check dashboard.js
-          node --check metrics.mjs
-          npm test
-      - name: Build public read-only preview
-        run: |
-          mkdir -p /tmp/hhba-pages/admin-preview/data
-          cp apps/admin-preview/index.html apps/admin-preview/styles.css apps/admin-preview/dashboard.js apps/admin-preview/favicon.svg /tmp/hhba-pages/admin-preview/
-          node --input-type=module <<'NODE'
-          import {readFileSync,writeFileSync} from 'node:fs';
-          let html=readFileSync('/tmp/hhba-pages/admin-preview/index.html','utf8');
-          html=html.replaceAll('href="/styles.css"','href="./styles.css"')
-            .replaceAll('src="/dashboard.js"','src="./dashboard.js"')
-            .replaceAll('href="/favicon.svg"','href="./favicon.svg"');
-          writeFileSync('/tmp/hhba-pages/admin-preview/index.html',html);
-          let js=readFileSync('/tmp/hhba-pages/admin-preview/dashboard.js','utf8');
-          if(!js.includes("fetch('/api/overview'"))throw Error('API reference unexpectedly changed');
-          js=js.replace("fetch('/api/overview'","fetch('./data/overview.json'");
-          writeFileSync('/tmp/hhba-pages/admin-preview/dashboard.js',js);
-          NODE
-      - name: Snapshot only openly published aggregate ATS counters
-        working-directory: apps/admin-preview
-        run: |
-          node --input-type=module <<'NODE'
-          import {writeFileSync} from 'node:fs';
-          import {getPublicOverview} from './metrics.mjs';
-          let result;
-          try{result=await getPublicOverview()}catch(e){
-            result={kind:'HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V1',quality:'unavailable',
-             counts:{indexedJobs:null,successfulJobBoards:null,failedJobBoards:0},
-             asOf:null,sourceType:'PUBLIC_INDEX_METADATA',future:{
-              totalRegisteredUsers:null,activeUsers30d:null,applyOutboundClicks:null,
-              revenueCny:null,retention30d:null,trafficSeries:null
-             }};
-          }
-          writeFileSync('/tmp/hhba-pages/admin-preview/data/overview.json',JSON.stringify(result));
-          NODE
-      - name: Verify paths and remove directory indexing
-        run: |
-          test -s /tmp/hhba-pages/admin-preview/index.html
-          test -s /tmp/hhba-pages/admin-preview/data/overview.json
-          touch /tmp/hhba-pages/.nojekyll
-          node --check /tmp/hhba-pages/admin-preview/dashboard.js
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: /tmp/hhba-pages
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          node --check apps/admin-preview/dashboard.js
+          node --check apps/admin-preview/metrics.mjs
+          node --test apps/admin-preview/tests/*.test.mjs
+          test -s apps/admin-preview/index.html
+          test -s apps/admin-preview/styles.css
+      # The main HHBA Pages workflow stages these files at /admin-preview/.
+      # Never deploy a second Pages artifact containing only this directory.
