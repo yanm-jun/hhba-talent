@@ -407,8 +407,8 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
        </div>:null}
      <div className="unified-job-actions unified-detail-actions">
        <SaveJobButton jobId={job.id}/>
-       {official&&<a href={official} onClick={()=>trackEvent('official_apply_click','/candidate/jobs/:job')} target="_blank" rel="noopener noreferrer" aria-label={lang==='zh'?'前往企业官网立即申请':'Apply on official employer website'}>
-         {lang==='zh'?'立即申请':'Apply now'} <ExternalLink size={15}/></a>}
+       {official&&<a href={official} onClick={()=>trackEvent('official_apply_click','/candidate/jobs/:job')} target="_blank" rel="noopener noreferrer" aria-label={job.graduationYear===2027&&job.currentApplicationVerified===false?(lang==='zh'?'打开企业官网核实投递状态':'Check employer application status'):(lang==='zh'?'前往企业官网立即申请':'Apply on official employer website')}>
+         {job.graduationYear===2027&&job.currentApplicationVerified===false?(lang==='zh'?'前往官网核实投递':'Check official application'):(lang==='zh'?'立即申请':'Apply now')} <ExternalLink size={15}/></a>}
      </div>
      <p className="unified-detail-footnote">{lang==='zh'?
        '岗位职责与任职要求直接在 HHBA 白色详情页展示；尚未读取成功的内容不会被编造。申请请以企业官网为准。':
