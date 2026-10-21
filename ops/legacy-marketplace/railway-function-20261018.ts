@@ -1609,7 +1609,12 @@ Bun.serve({port:Number(Bun.env.PORT||3000),hostname:"0.0.0.0",async fetch(req){
  const u=new URL(req.url);
  const engagementResponse=await handleEngagement(req,u);
  if(engagementResponse)return engagementResponse;
- const savedResponse=await handleSavedJobs(req,u,async id=>Boolean(await fromWhiteIndex(id)));
+ const savedResponse=await handleSavedJobs(req,u,async id=>{
+   if(await fromWhiteIndex(id))return true;
+   // Domestic public listings share the existing source index and must also be saveable.
+   const listings=await load();
+   return Boolean(listings?.rows?.some((row:Job)=>row.id===id));
+ });
  if(savedResponse)return savedResponse;
  // Preserve old /jobs/:id deep links on the NEW white hostname.
  const oldJobRoute=u.pathname.match(new RegExp("^/jobs/([A-Za-z0-9_-]{1,180})$"));
