@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {once} from 'node:events';
+import {request as rawRequest} from 'node:http';
 import {readFileSync} from 'node:fs';
 import {getPublicOverview,parsePublicIndex,PUBLIC_INDEX_ENDPOINT} from '../metrics.mjs';
 import {createPreviewServer} from '../server.mjs';
@@ -66,8 +67,13 @@ test('server is localhost only, refuses writes and exposes only vetted paths',as
  assert.equal(post.status,405);
  const unknown=await fetch(origin+'/secret/users');
  assert.equal(unknown.status,404);
- const hostile=await fetch(origin+'/',{headers:{host:'example.com'}});
- assert.equal(hostile.status,403);
+ const hostile=await new Promise((resolve,reject)=>{
+  const req=rawRequest({hostname:'127.0.0.1',port,path:'/',method:'GET',headers:{Host:'example.com'}},res=>{
+    res.resume();res.on('end',()=>resolve(res.statusCode));
+  });
+  req.on('error',reject);req.end();
+ });
+ assert.equal(hostile,403);
 });
 test('failed upstream remains unavailable without synthetic investor data',async(t)=>{
  const local=createPreviewServer({overview:async()=>{throw Error('PRIVATE_STACK_TRACE_TEST')}});
@@ -89,7 +95,7 @@ test('UI keeps future metrics null and distinguishes current snapshots from hist
  assert.match(html,/融资数据展示/);
  assert.match(html,/近 30 天/);
  assert.match(js,/当前岗位指标为最新索引快照/);
- assert.match(js,/body\.quality==='current'/);
+ assert.match(js,/data\.quality==='current'/);
  assert.match(js,/function exportCSV/);
  assert.match(css,/prefers-reduced-motion/);
  assert.match(css,/max-width:780px/);
