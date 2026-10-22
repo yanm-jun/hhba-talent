@@ -74,6 +74,7 @@ function LanguageSwitcher({lang,change}:{lang:Language,change:(value:Language)=>
    <button type="button" aria-pressed={lang==='en'} onClick={()=>change('en')}>English</button></div>;
 }
 export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,user?:User|null}){
+  const domesticOnly=import.meta.env.VITE_HHBA_DOMESTIC_STATIC_ONLY==='1';
   const {lang,change}=useLanguage();
   const [filters,setFilters]=useState<LiveFilters>(()=>{
     const previous=readMarketState(compact);
@@ -106,6 +107,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   },[compact,filters,draft,page]);
   const defaultView=isDefaultMarketFilters(filters,page);
   useEffect(()=>{
+    if(domesticOnly){setFeatured([]);setFeaturedError('');return;}
     if(!defaultView){setFeatured(null);setFeaturedError('');return;}
     const controller=new AbortController();
     setFeatured(null);setFeaturedError('');
@@ -128,11 +130,11 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   // Only the UNFILTERED first page gets six highlighted jobs. Search,
   // company/city filtering and all other pages retain their normal results.
   const curatedIds=new Set(featured?.map(j=>j.id)||[]);
-  const shown=defaultView
+  const shown=domesticOnly?(compact?eligible.slice(0,8):eligible):defaultView
     ?(featured ? (compact?featured:[...featured,...eligible.filter(j=>!curatedIds.has(j.id)).slice(0,24)])
       : featuredError ? (compact?eligible.slice(0,8):eligible) : [])
     :(compact?eligible.slice(0,8):eligible);
-  const featuredPending=defaultView && !featured && !featuredError;
+  const featuredPending=defaultView && !domesticOnly && !featured && !featuredError;
   const interpreted=useMemo(()=>parseNaturalQuery(filters.q),[filters.q]);
   const roleNames:Record<string,string>={software:'软件工程师',sales:'销售',engineer:'工程师',product:'产品经理',intern:'实习',design:'设计',finance:'财务',marketing:'市场营销',operations:'运营'};
   const intentLabels=[
@@ -201,7 +203,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   const market=<section className="unified-market" aria-labelledby="unified-market-title">
     <div className="unified-market-heading"><div><small>HHBA · RECRUITMENT</small>
       <h2 id="unified-market-title">{lang==='zh'?'招聘市场':'Job market'}</h2>
-      <p>{lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
+      <p>{domesticOnly?(lang==='zh'?'国内历史招聘岗位静态测试 · 岗位状态以企业官网为准':'Historical China listings preview · Check employer for availability'):lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
       <LanguageSwitcher lang={lang} change={change}/></div>
     {controls}
     {intentLabels.length>0&&<div className="unified-search-interpreted">
@@ -230,8 +232,8 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       :(featuredPending?'Verifying six highlighted official jobs…':'Loading jobs…')}</p>:
       error?<div className="unified-job-state" role="alert">{lang==='zh'?error:'Jobs temporarily unavailable. Please retry.'}<button type="button" onClick={()=>setRetry(x=>x+1)}><RefreshCcw size={15}/> {lang==='zh'?'重试':'Retry'}</button></div>:
       shown.length?<div className="unified-job-grid">{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated}/>)}</div>:
-        <div className="unified-job-state">{lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
-    {!loading&&defaultView&&featuredError&&
+        <div className="unified-job-state">{domesticOnly?(lang==='zh'?'当前没有符合条件的历史岗位。':'No matching archived jobs.'):lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
+    {!domesticOnly&&!loading&&defaultView&&featuredError&&
       <div className="unified-featured-fallback" role="status">
         <span>{lang==='zh'?'六个精选岗位未能及时完成最新核验，当前显示其他近期核验的真实职位。':
           'Featured verification is delayed; showing other recently audited jobs.'}</span>
