@@ -220,7 +220,7 @@ export async function listJobs(filters: LiveFilters, offset: number, signal: Abo
       try{
         const audit=await loadPublicJobAudit();
         if(audit?.summary.indexed_as_of===snapshot.updated){
-          const index=unfiltered?null:await loadOfficialSearchFacets();
+          const index=await (unfiltered?Promise.resolve(null):loadOfficialSearchFacets());
           if(!index||index.indexed_as_of===snapshot.updated){
             if(index)facets=index.facets;
             const excluded=new Set(audit.jobs.filter(entry=>[
