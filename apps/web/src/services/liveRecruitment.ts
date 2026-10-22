@@ -113,7 +113,7 @@ async function readJSON<T>(path: string, signal: AbortSignal): Promise<T> {
 }
 // White HHBA on Railway uses the same source-validated snapshot and search facets
 // as GitHub Pages, proxied by our own read-only /data/ route during migration.
-const PAGES_PREVIEW=import.meta.env.BASE_URL==='/hhba-talent/' || import.meta.env.VITE_HHBA_VERIFIED_SNAPSHOT==='1';
+const PAGES_PREVIEW=import.meta.env.VITE_HHBA_DOMESTIC_STATIC_ONLY==='1' || import.meta.env.BASE_URL==='/hhba-talent/' || import.meta.env.VITE_HHBA_VERIFIED_SNAPSHOT==='1';
 let cachedSnapshot: Promise<LivePage>|null=null;
 let domesticCache:Promise<{jobs:LiveJob[];updated:string}>|null=null;
 // Independent historical domestic snapshot; never relax overseas audit/freshness gates.
