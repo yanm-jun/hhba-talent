@@ -28,4 +28,4 @@ jobs:
           HHBA_GITHUB_PAGES: '1'
         run: npm run build --prefix apps/web
       - name: Check build contains static domestic snapshot
-        run: node -e "const a=require('./apps/web/dist/data/domestic-jobs.json');if(a.total!==297)process.exit(1)"
+        run: node -e "const a=require('./apps/web/dist/data/domestic-jobs.json');if(a.total!==301)process.exit(1)"
