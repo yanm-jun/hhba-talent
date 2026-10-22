@@ -149,7 +149,7 @@ async function loadDomesticSnapshot():Promise<{jobs:LiveJob[];updated:string}>{
 // Fail closed independently: a campus network error never invalidates overseas jobs.
 let campus2027Cache:Promise<LiveJob[]>|null=null;
 async function loadCampus2027():Promise<LiveJob[]>{
- if(!PAGES_PREVIEW || import.meta.env.BASE_URL==='/hhba-talent/')return [];
+ if(!PAGES_PREVIEW || import.meta.env.BASE_URL!=='/')return [];
  if(!campus2027Cache){
   campus2027Cache=fetch('/api/campus-2027/jobs',{credentials:'omit',cache:'no-store',
     headers:{Accept:'application/json'}}).then(async response=>{
