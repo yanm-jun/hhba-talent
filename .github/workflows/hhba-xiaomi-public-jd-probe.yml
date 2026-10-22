@@ -1,0 +1,48 @@
+name: HHBA Xiaomi Public Full JD Read Only Probe
+on:
+  push:
+    branches: [feat/domestic-weekly-cache-pages-20261022]
+    paths: ['.github/workflows/hhba-xiaomi-public-jd-probe.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-one-detail:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test exactly one public Xiaomi official job detail without collecting text
+        run: |
+          node --input-type=module <<'NODE'
+          const domain='https://xiaomi.jobs.f.mioffice.cn';
+          const id='7536168291875094637';
+          let robotsRule='UNKNOWN';
+          try{
+            const robots=await fetch(domain+'/robots.txt',{signal:AbortSignal.timeout(12000),headers:{'User-Agent':'HHBA-ReadOnly-Official-JD-Verification/1.0'}});
+            robotsRule='HTTP_'+robots.status;
+            if(robots.ok){
+              const content=await robots.text();
+              if(/Disallow:\s*\/api(?:\/|\s|$)/i.test(content))robotsRule='API_BLOCKED';
+            }
+          }catch(e){robotsRule='UNREACHABLE'}
+          if(robotsRule==='API_BLOCKED'){console.log('PROBE_STOP robots restriction');process.exit(0)}
+          const url=domain+'/api/v1/job/posts/'+id+'?portal_type=6&with_recommend=false';
+          try{
+            const response=await fetch(url,{
+              headers:{'Accept':'application/json','User-Agent':'HHBA-ReadOnly-Official-JD-Verification/1.0','portal-platform':'pc'},
+              signal:AbortSignal.timeout(20000),redirect:'error'
+            });
+            console.log('OFFICIAL_DETAIL_HTTP',response.status,'ROBOTS',robotsRule,'CONTENT_TYPE',response.headers.get('content-type'));
+            if([401,403,429].includes(response.status)){console.log('PROBE_STOP access restricted');process.exit(0)}
+            if(!response.ok)return;
+            const payload=await response.json();
+            const d=payload?.data?.job_post_detail;
+            const valid=d&&String(d.id)===id;
+            const desc=valid?String(d.description||''):'';
+            const req=valid?String(d.requirement||''):'';
+            console.log('JD_VERIFICATION',JSON.stringify({idMatch:!!valid,descriptionLength:desc.length,requirementLength:req.length,complete:desc.length>50&&req.length>30}));
+          }catch(e){console.log('PROBE_ERROR',String(e).slice(0,180))}
+          NODE
