@@ -13,6 +13,7 @@ import type { User } from '../services/api';
 import { getJob, listJobs, localizedCompany, localizedLocation, localizedTitle, officialStatus, safeOfficialJobUrl,
   type Language, type LiveFilters, type LiveJob, type LivePage } from '../services/liveRecruitment';
 import { fetchOfficialJd, fetchPreparedBilingualJd, type OfficialJd } from '../services/officialJd';
+import { loadDomesticSummary, type DomesticSummary } from '../services/domesticJd';
 import { loadPublicJobAudit, auditForJob, describeAudit, type JobAuditEntry } from '../services/jobSyncStatus';
 import {countryOptions,cityOptions,parseNaturalQuery} from '../services/jobSearchFacets.mjs';
 import '../styles/unified-jobs.css';
@@ -270,6 +271,8 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  const [jdError,setJdError]=useState('');
  const [jdLoading,setJdLoading]=useState(false);
  const [jdRetry,setJdRetry]=useState(0);
+ const [domesticSummary,setDomesticSummary]=useState<DomesticSummary|null>(null);
+ const [domesticSummaryError,setDomesticSummaryError]=useState('');
  const [chineseJd,setChineseJd]=useState('');
  const [translationPrepared,setTranslationPrepared]=useState(false);
  const [translateError,setTranslateError]=useState('');
@@ -283,6 +286,17 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
    return()=>controller.abort();
  },[jobId]);
  const job=detail?.job;
+ useEffect(()=>{
+   setDomesticSummary(null);setDomesticSummaryError('');
+   if(!job||job.recordKind!=='DOMESTIC_ARCHIVE_SNAPSHOT')return;
+   const controller=new AbortController();
+   loadDomesticSummary(job,controller.signal).then(value=>{
+     if(!controller.signal.aborted)setDomesticSummary(value);
+   }).catch(err=>{
+     if(!controller.signal.aborted)setDomesticSummaryError(err instanceof Error?err.message:'历史职责读取失败');
+   });
+   return ()=>controller.abort();
+ },[job]);
  useEffect(()=>{
    if(!job)return;
    let active=true;
@@ -367,7 +381,22 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
        {audit.official_checked_at && <small>{lang==='zh'?'核验：':'Checked: '}{audit.official_checked_at.slice(0,10)}</small>}
      </p>}
      <h2>{lang==='zh'?'职位说明与任职要求':'Description and job requirements'}</h2>
-     {job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'?<div className="unified-jd-content"><p className="unified-jd-machine-notice">{lang==='zh'?'本岗位为企业官方页面的历史收录记录；详情摘录尚未取得公开展示授权，完整职责和要求请前往企业官网核对。':'Archived official listing. Full description is not published here; check the employer page.'}</p>{job.educationLabel&&<section className="unified-jd-section"><h3>{lang==='zh'?'学历要求':'Education'}</h3><p>{job.educationLabel}</p></section>}{job.experienceLabel&&<section className="unified-jd-section"><h3>{lang==='zh'?'经验要求':'Experience'}</h3><p>{job.experienceLabel}</p></section>}{official&&<a href={official} target="_blank" rel="noopener noreferrer">{lang==='zh'?'前往官网核实完整职位与投递状态':'Check official job and application status'} <ExternalLink size={14}/></a>}</div>:
+     {job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'?<div className="unified-jd-content">
+       <p className="unified-jd-source">{lang==='zh'?'历史采集日期：':'Archived on: '}{formatDate(job.observedAt)}</p>
+       <p className="unified-jd-machine-notice">{lang==='zh'?
+         '以下是 HHBA 历史采集整理的岗位摘要，不是完整官方 JD 原文，也未重新确认招聘状态；内容来源及公开使用仍待复核，请以企业官网为准。':
+         'HHBA archival paraphrase, not the full official JD. Content rights and application status remain unverified.'}</p>
+       {lang==='zh'?(domesticSummary?<>
+         <section className="unified-jd-section"><h3>岗位职责（历史整理）</h3><p>{domesticSummary.responsibilities}</p></section>
+         <section className="unified-jd-section"><h3>任职要求（历史整理）</h3><p>{domesticSummary.requirements}</p></section>
+       </>:domesticSummaryError?
+         <p className="unified-jd-machine-notice" role="status">岗位职责读取失败：{domesticSummaryError}</p>:
+         <p role="status">正在读取岗位职责与任职要求摘要…</p>):
+         <p className="unified-jd-machine-notice">English translation is not available for this historical Chinese summary. Switch to 中文 to read the archived source summary.</p>}
+       {job.educationLabel&&<section className="unified-jd-section"><h3>{lang==='zh'?'学历要求':'Education'}</h3><p>{job.educationLabel}</p></section>}
+       {job.experienceLabel&&<section className="unified-jd-section"><h3>{lang==='zh'?'经验要求':'Experience'}</h3><p>{job.experienceLabel}</p></section>}
+       {official&&<a href={official} target="_blank" rel="noopener noreferrer">{lang==='zh'?'前往官网核实完整职位与投递状态':'Check full official job description and availability'} <ExternalLink size={14}/></a>}
+     </div>:
      job.graduationYear===2027&&job.responsibilitiesSummary&&job.requirementsSummary?
        <div className="unified-jd-content">
          <p className="unified-jd-source">2027 届校招 · 官网职位详情已观察 · 最近核验：{formatDate(job.observedAt)}</p>
