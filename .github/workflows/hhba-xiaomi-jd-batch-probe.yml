@@ -1,0 +1,48 @@
+name: HHBA Xiaomi Public JD 12-Role Batch Probe
+on:
+  push:
+    branches: [feat/domestic-weekly-cache-pages-20261022]
+    paths: ['.github/workflows/hhba-xiaomi-jd-batch-probe.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test 12 source-linked official details (no full text logged or published)
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          import {setTimeout as sleep} from 'node:timers/promises';
+          const root='https://xiaomi.jobs.f.mioffice.cn';
+          const jobs=JSON.parse(readFileSync('apps/web/public/data/domestic-jobs.json','utf8')).jobs;
+          const target=jobs.find(j=>j.id==='domestic-xiaomi-7536168291875094637');
+          const examples=[target,...jobs.filter(j=>j!==target).slice(0,11)];
+          const stats={requested:0,verified:0,full:0,missing:0,blocked:0,bad:0,fail:0,details:[]};
+          for(const job of examples){
+            if(!job?.url?.startsWith(root+'/'))continue;
+            const id=job.id.replace('domestic-xiaomi-','');
+            const url=root+'/api/v1/job/posts/'+id+'?portal_type=6&with_recommend=false';
+            stats.requested++;
+            try{
+              const r=await fetch(url,{redirect:'error',signal:AbortSignal.timeout(18000),
+                headers:{Accept:'application/json','portal-platform':'pc','User-Agent':'HHBA-ReadOnly-Official-JD-Verification/1.0'}});
+              if([401,403,429].includes(r.status)){stats.blocked++;stats.details.push({id,status:r.status});break}
+              if(!r.ok){stats.missing++;stats.details.push({id,status:r.status});continue}
+              const data=await r.json(),d=data?.data?.job_post_detail;
+              if(String(d?.id)!==id){stats.bad++;stats.details.push({id,status:'ID_MISMATCH'});continue}
+              stats.verified++;
+              const len1=String(d.description||'').length,len2=String(d.requirement||'').length;
+              if(len1>50&&len2>30)stats.full++;
+              stats.details.push({id,status:'ID_MATCH',responsibilityLength:len1,requirementLength:len2});
+            }catch(e){stats.fail++;stats.details.push({id,status:'REQUEST_ERROR'})}
+            await sleep(850);
+          }
+          console.log('HHBA_XIAOMI_12_DETAIL_PROBE',JSON.stringify(stats));
+          NODE

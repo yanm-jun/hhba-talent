@@ -27,7 +27,7 @@ export type JobAuditSummary = {
 };
 type AuditReport = {summary:JobAuditSummary; jobs:JobAuditEntry[]};
 let auditPromise:Promise<AuditReport>|null=null;
-const pagesSite=import.meta.env.BASE_URL==='/hhba-talent/' || import.meta.env.VITE_HHBA_VERIFIED_SNAPSHOT==='1';
+const pagesSite=import.meta.env.VITE_HHBA_DOMESTIC_STATIC_ONLY==='1' || import.meta.env.BASE_URL==='/hhba-talent/' || import.meta.env.VITE_HHBA_VERIFIED_SNAPSHOT==='1';
 export async function loadPublicJobAudit():Promise<AuditReport|null>{
  if(!pagesSite)return null;
  if(!auditPromise){

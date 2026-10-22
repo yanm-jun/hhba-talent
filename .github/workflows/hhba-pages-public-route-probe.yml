@@ -1,0 +1,27 @@
+name: HHBA Pages Public HTTP Route Probe
+on:
+  push:
+    branches: [feat/domestic-weekly-cache-pages-20261022]
+    paths: ['.github/workflows/hhba-pages-public-route-probe.yml']
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Probe actual GitHub Pages URLs (no credentials)
+        run: |
+          for path in \
+            'https://yanm-jun.github.io/' \
+            'https://yanm-jun.github.io/yanmingjun.github.io/' \
+            'https://yanm-jun.github.io/yanmingjun.github.io/hhba-domestic-preview/' \
+            'https://yanm-jun.github.io/yanmingjun.github.io/hhba-domestic-preview/data/jobs.json' \
+            'https://yanm-jun.github.io/yanmingjun.github.io/hhba-unified-preview/' \
+            'https://yanm-jun.github.io/yanmingjun.github.io/hhba-unified-preview/data/domestic-jobs.json' \
+            'https://yanm-jun.github.io/hhba-domestic-preview/' \
+            'https://yanm-jun.github.io/hhba-unified-preview/'; do
+            echo "URL=$path"
+            curl -L -sS --max-time 15 -o /tmp/hhba-response -w 'STATUS=%{http_code} FINAL=%{url_effective} SIZE=%{size_download}\n' "$path" || true
+            head -c 80 /tmp/hhba-response | tr '\n' ' '; echo
+          done

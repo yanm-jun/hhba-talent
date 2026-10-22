@@ -1,0 +1,31 @@
+name: HHBA Domestic Static Preview Acceptance
+on:
+  push:
+    branches: [feat/domestic-weekly-cache-pages-20261022]
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/hhba-domestic-static-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Validate historical source data
+        run: node --test apps/web/scripts/domestic-preview.test.mjs
+      - name: Install frontend dependencies
+        run: npm ci --prefix apps/web
+      - name: Build Pages frontend without touching Railway
+        env:
+          HHBA_GITHUB_PAGES: '1'
+        run: npm run build --prefix apps/web
+      - name: Check build contains static domestic snapshot
+        run: node -e "const a=require('./apps/web/dist/data/domestic-jobs.json');if(a.total!==301)process.exit(1)"
