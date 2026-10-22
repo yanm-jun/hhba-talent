@@ -18,9 +18,10 @@ test('featured roles use one cached validated Railway job snapshot, not three re
 });
 test('unfiltered market never blocks on the 14k facet index',()=>{
  assert.ok(index.includes('unfiltered?Promise.resolve(null):loadOfficialSearchFacets()'));
- assert.ok(index.includes('if(!audit || audit.summary.indexed_as_of!==snapshot.updated)'));
- assert.ok(index.includes('if(unfiltered)return {...current,jobs:current.jobs.slice(offset,offset+30)'));
- assert.ok(index.includes('return searchPreview(current,filters,offset,index!.facets)'));
+ assert.ok(index.includes("if(audit?.summary.indexed_as_of===snapshot.updated)"));
+ assert.ok(index.includes("const domestic=domesticResult.status==='fulfilled'"));
+ assert.ok(index.includes('if(unfiltered)return {...combined,jobs:jobs.slice(offset,offset+30)'));
+ assert.ok(index.includes('return searchPreview(combined,filters,offset,facets)'));
  assert.ok(index.includes('loadOfficialPublicSnapshot(signal:AbortSignal):Promise<LivePage>'));
 });
 test('default stays limited to audited true jobs and search pagination still work',()=>{
