@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 // GitHub Pages uses /hhba-talent/, while Railway keeps routes at /.
-const prefix = import.meta.env.BASE_URL === '/hhba-talent/' ? '/hhba-talent' : '';
+const prefix = import.meta.env.BASE_URL.replace(/\/$/,'');
 const href = (to: string) => prefix + (to.startsWith('/') ? to : '/'+to);
 function currentRoute() {
   const path = location.pathname;
