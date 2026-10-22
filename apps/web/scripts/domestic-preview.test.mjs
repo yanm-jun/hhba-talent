@@ -28,8 +28,10 @@ test('every public link points to exact Xiaomi official listing',()=>{
 });
 test('no private JD or fake real-time status is distributed',()=>{
  for(const j of jobs){
-  assert.equal(j.responsibilitiesSummary,undefined);
-  assert.equal(j.requirementsSummary,undefined);
+  assert.ok(typeof j.responsibilitiesSummary==='string'&&j.responsibilitiesSummary.length>=20);
+  assert.ok(typeof j.requirementsSummary==='string'&&j.requirementsSummary.length>=20);
+  assert.equal(j.summaryKind,'HISTORICAL_EDITORIAL_SUMMARY');
+  assert.equal(j.originalJdAvailable,false);
   assert.equal(j.currentApplicationVerified,false);
   assert.equal(j.platform,'xiaomi-official');
  }
