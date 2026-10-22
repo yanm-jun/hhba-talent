@@ -26,17 +26,15 @@ test('every public link points to exact Xiaomi official listing',()=>{
   assert.ok(Date.parse(job.observedAt));
  }
 });
-test('no private JD or fake real-time status is distributed',()=>{
+test('list snapshot contains no bulky JD; content is in source-verified details index',()=>{
  for(const j of jobs){
-  assert.ok(typeof j.responsibilitiesSummary==='string'&&j.responsibilitiesSummary.length>=20);
-  assert.ok(typeof j.requirementsSummary==='string'&&j.requirementsSummary.length>=20);
-  assert.equal(j.summaryKind,'HISTORICAL_EDITORIAL_SUMMARY');
-  assert.equal(j.originalJdAvailable,false);
+  assert.equal(j.responsibilitiesSummary,undefined);
+  assert.equal(j.requirementsSummary,undefined);
   assert.equal(j.currentApplicationVerified,false);
   assert.equal(j.platform,'xiaomi-official');
  }
  const json=JSON.stringify(data);
- assert.doesNotMatch(json,/"(?:cookie|authorization|apiKey|accessToken|password)"\s*:/i);
+ assert.doesNotMatch(json,/"(?:cookie|authorization|apiKey|accessToken|password)"\\s*:/i);
 });
 test('cached records have enough fields for unified search',()=>{
  const search=(q,kind)=>jobs.filter(j=>(!kind||j.recruitmentType===kind)&&
