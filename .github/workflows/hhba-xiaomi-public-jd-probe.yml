@@ -37,7 +37,7 @@ jobs:
             });
             console.log('OFFICIAL_DETAIL_HTTP',response.status,'ROBOTS',robotsRule,'CONTENT_TYPE',response.headers.get('content-type'));
             if([401,403,429].includes(response.status)){console.log('PROBE_STOP access restricted');process.exit(0)}
-            if(!response.ok)return;
+            if(!response.ok){console.log('PROBE_STOP official HTTP error');process.exit(0)}
             const payload=await response.json();
             const d=payload?.data?.job_post_detail;
             const valid=d&&String(d.id)===id;
