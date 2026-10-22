@@ -44,3 +44,34 @@ test('cached records have enough fields for unified search',()=>{
  assert.ok(search('北京','INTERNSHIP').length>=0);
  assert.equal(search('北京','CAMPUS').length,0);
 });
+
+test('all 301 real historical roles have separately sourced duties and requirements',()=>{
+ const bundle=JSON.parse(readFileSync(join('apps','web','public','data','domestic-jd-summaries.json'),'utf8'));
+ assert.equal(bundle.kind,'HHBA_DOMESTIC_HISTORICAL_SUMMARIES_V1');
+ assert.equal(bundle.total,301);
+ assert.equal(bundle.jobs.length,jobs.length);
+ const byId=new Map(jobs.map(j=>[j.id,j]));
+ const seen=new Set();
+ for(const summary of bundle.jobs){
+   assert.equal(summary.mode,'HHBA_PARAPHRASED_HISTORICAL_SUMMARY');
+   assert.equal(summary.rightsReviewStatus,'RIGHTS_REVIEW_REQUIRED');
+   assert.equal(summary.sourceUrl,byId.get(summary.id)?.url);
+   assert.equal(summary.observedAt,byId.get(summary.id)?.observedAt);
+   assert.ok(summary.responsibilities.length>=20,'missing duties for '+summary.id);
+   assert.ok(summary.requirements.length>=20,'missing requirements for '+summary.id);
+   assert.ok(!seen.has(summary.id));seen.add(summary.id);
+ }
+ assert.equal(seen.size,jobs.length);
+ const caseJob=bundle.jobs.find(j=>j.id==='domestic-xiaomi-7536168291875094637');
+ assert.ok(caseJob?.responsibilities.includes('整车物流'));
+ assert.ok(caseJob?.requirements.includes('物流'));
+});
+test('unified job detail renders duties and requirements without live ATS calls',()=>{
+ const page=readFileSync(join('apps','web','src','components','UnifiedJobMarket.tsx'),'utf8');
+ assert.ok(page.includes('loadDomesticSummary(job,controller.signal)'));
+ assert.ok(page.includes('岗位职责（历史整理）'));
+ assert.ok(page.includes('任职要求（历史整理）'));
+ assert.ok(page.includes('domesticSummary.responsibilities'));
+ assert.ok(page.includes('domesticSummary.requirements'));
+ assert.ok(page.includes('not the full official JD'));
+});
