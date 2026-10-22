@@ -7,7 +7,7 @@ const data=JSON.parse(readFileSync(join('apps','web','public','data','domestic-j
 const jobs=data.jobs;
 test('snapshot has real recorded historical jobs with a stable schema',()=>{
  assert.equal(data.kind,'HHBA_DOMESTIC_SNAPSHOT_V1');
- assert.equal(data.total,297);
+ assert.equal(data.total,301);
  assert.equal(jobs.length,data.total);
  assert.ok(Date.parse(data.updated));
  assert.ok(jobs.every(j=>j.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'));
@@ -17,7 +17,7 @@ test('every public link points to exact Xiaomi official listing',()=>{
  const idSet=new Set(),urls=new Set();
  for(const job of jobs){
   assert.match(job.id,/^domestic-xiaomi-\d{12,22}$/);
-  assert.match(job.url,/^https:\/\/xiaomi\.jobs\.f\.mioffice\.cn\/(?:index|campus|internship)\/position\/\d{12,22}\/detail$/);
+  assert.match(job.url,/^https:\/\/xiaomi\.jobs\.f\.mioffice\.cn\/(?:index|campus|internship|topintern)\/position\/\d{12,22}\/detail$/);
   assert.equal(idSet.has(job.id),false,'duplicate public job ID');
   assert.equal(urls.has(job.url),false,'duplicate URL');
   idSet.add(job.id);urls.add(job.url);
