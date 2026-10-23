@@ -1,12 +1,14 @@
 import {useMemo,useState} from 'react';
 import {Building2,ArrowRight,GraduationCap} from 'lucide-react';
 import profiles from '../data/domesticCareerProfiles.json';
+import bundled from '../data/domesticMediaBundle.json';
 import {Link} from '../router';
 import {getDomesticCompanies,searchDomesticCompanies,type DomesticCompany} from '../services/domesticCompanySearch';
 import {companyMatchesSelectedMajor,majorById} from '../services/domesticMajors';
 import '../styles/domestic-company-search.css';
 type Preview={displayName?:string;summary?:string;brandImage?:string;officeLocations?:unknown[];photos?:unknown[];brandAssetStatus?:string};
 const rich=profiles as Record<string,Preview>;
+const available=bundled as {companies:Record<string,{brand?:{state:string;path?:string}}>};
 type Props={query:string;majorSlug?:string;scope?:string;country?:string;city?:string};
 function BrandMark({src,name}:{src?:string;name:string}){
  const [failed,setFailed]=useState(false);
@@ -43,7 +45,7 @@ export function DomesticCompanyResults({query,majorSlug='',scope='',country='',c
    const editorial=rich[company.name];
    return <Link className="domestic-company-card" key={company.id} to={company.route}>
     <div className="domestic-company-card-head"><span className="domestic-result-brand" aria-hidden="true">
-      <BrandMark src={editorial?.brandImage} name={company.name}/>
+      <BrandMark src={available.companies[company.name]?.brand?.state==='ready'?import.meta.env.BASE_URL+available.companies[company.name].brand.path:undefined} name={company.name}/>
      </span><strong>{editorial?.displayName||company.name}</strong></div>
     <small>{company.industry}{company.city?' · '+company.city:''}{company.parentName?' · 关联：'+company.parentName:''}</small>
     {editorial?.displayName&&editorial.displayName!==company.name&&<small className="domestic-card-legal">企业主体：{company.name}</small>}

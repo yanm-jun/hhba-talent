@@ -5,6 +5,7 @@ import {Link,getCompanyReturnTarget} from '../router';
 import {getDomesticCompanies,companyById,findParentCompany,findRelatedCompanies} from '../services/domesticCompanySearch';
 import {matchingMajors} from '../services/domesticMajors';
 import profiles from '../data/domesticCareerProfiles.json';
+import bundled from '../data/domesticMediaBundle.json';
 import type {User} from '../services/api';
 import '../styles/domestic-company-search.css';
 
@@ -19,6 +20,7 @@ type Reviewed={
  evidenceLevel?:string;
 };
 const curated=profiles as Record<string,Reviewed>;
+const available=bundled as {companies:Record<string,{brand?:{state:string;path?:string};photos?:{state:string;path?:string}[]}>};
 function httpsLink(value?:string){
  if(!value)return '';
  try{const u=new URL(/^https?:\/\//i.test(value)?value:'https://'+value);
@@ -34,6 +36,8 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
  const parent=company?findParentCompany(all,company):null;
  const related=company?findRelatedCompanies(all,company):[];
  const article=company?curated[company.name]:undefined;
+ const media=company?available.companies[company.name]:undefined;
+ const brandSrc=media?.brand?.state==='ready'?import.meta.env.BASE_URL+media.brand.path:undefined;
  const majors=company?matchingMajors(company):[];
  const careers=company?httpsLink(article?.careersUrl||company.careers):'';
  const shownRelated=related.filter(c=>(c.name+c.industry+(c.city||'')+c.tags.join(' ')).toLocaleLowerCase().includes(filter.trim().toLocaleLowerCase())).slice(0,24);
@@ -43,7 +47,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
    <div className="domestic-editorial-panel">
     <header className="domestic-editorial-hero">
      <div className="domestic-company-profile-mark" aria-label="企业视觉资料">
-      {article?.brandImage&&!imageFailed?<img src={article.brandImage} alt={company.name+'的企业官网图标'} onError={()=>setImageFailed(true)}/>:
+      {brandSrc&&!imageFailed?<img src={brandSrc} alt={company.name+'的企业官网图标'} onError={()=>setImageFailed(true)}/>:
        <Building2 size={26} aria-hidden="true"/>}
      </div>
      <div className="domestic-profile-identity">
@@ -52,8 +56,8 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       <p>{article?.subtitle||company.industry}{company.city?' · '+company.city:''}</p>
       {article?.displayName&&article.displayName!==company.name&&<small>经营主体：{company.name}</small>}
       {article?.officeLocations?.length? <small className="domestic-profile-office-hint"><MapPin size={13}/>{article.officeLocations[0].address}</small>:null}
-      {article&&!article.brandImage?<small className="domestic-media-confidence">正式品牌 Logo 尚未核验；已屏蔽失效图片地址</small>:null}
-      {article?.brandImage&&<small className="domestic-media-confidence">
+      {article&&!brandSrc?<small className="domestic-media-confidence">正式品牌 Logo 尚未核验；已屏蔽失效图片地址</small>:null}
+      {brandSrc&&<small className="domestic-media-confidence">
        {article.brandAssetStatus==='official_domain_favicon_unverified_visual'?'当前显示企业网站图标，尚未确认为正式品牌 Logo':'品牌图来源已登记，显示状态以实际加载结果为准'}
       </small>}
      </div>
@@ -69,12 +73,12 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
        {article.business.map(item=><div key={item.title}><strong>{item.title}</strong><p>{item.description}</p></div>)}
       </div>}
     </section>
-    {article?.photos?.length?<section className="domestic-editorial-section domestic-editorial-photos" aria-label="企业真实图片">
+    {article?.photos?.some((_,i)=>media?.photos?.[i]?.state==='ready')?<section className="domestic-editorial-section domestic-editorial-photos" aria-label="企业真实图片">
       <h2>企业与产品实景</h2>
       <div className="domestic-editorial-photo-grid">
-       {article.photos.map(photo=><figure key={photo.url} className="domestic-official-photo">
+       {article.photos.filter((_,i)=>media?.photos?.[i]?.state==='ready').map(photo=><figure key={photo.url} className="domestic-official-photo">
         <a href={photo.source} target="_blank" rel="noopener noreferrer" aria-label={'查看'+photo.label+'的来源'}>
-         <img src={photo.url} loading="lazy" alt={photo.label} onError={e=>{e.currentTarget.style.display='none';e.currentTarget.parentElement?.classList.add('domestic-photo-unavailable')}}/>
+         <img src={import.meta.env.BASE_URL+media!.photos![article.photos!.indexOf(photo)].path} loading="lazy" alt={photo.label} onError={e=>{e.currentTarget.style.display='none';e.currentTarget.parentElement?.classList.add('domestic-photo-unavailable')}}/>
          <span className="domestic-photo-fallback"><Images size={18}/>点击查看官网图片</span>
         </a>
         <figcaption>{photo.label} · 官方来源</figcaption>
