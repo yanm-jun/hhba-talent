@@ -4,6 +4,8 @@ import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import path from 'node:path';
 const profiles=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
 const sources=[
+ {name:'华域视觉科技（上海）有限公司',page:'https://www.hascovision.com/products-innovation/intelligent-manufacturing',host:['www.hascovision.com','hascovision.com'],
+ rules:[{match:/^工厂(?:\.jpg)?$/i,kind:'factory',label:'华域视觉官网：嘉定数字化工厂'}]},
  {name:'京东方Ａ',page:'https://www.boe.com/Enterprise/SmartEnergyManagement',host:['www.boe.com','boe.com','boe-official01.oss-cn-beijing.aliyuncs.com'],
   rules:[
    {match:/^(?:园区场景)[-—·\s]*京东方集团/i,kind:'headquarters',label:'京东方官网：北京集团园区场景'},
@@ -38,7 +40,9 @@ for(const source of sources){
   const candidates=[];
   for(const tag of html.match(/<img\b[^>]*>/gi)||[]){
    const alt=attr(tag,'alt')||attr(tag,'title');
-   const rule=source.rules.find(r=>r.match.test(alt));
+   const rawLabel=attr(tag,'data-original')||attr(tag,'data-src')||attr(tag,'src');
+   let basename='';try{basename=decodeURIComponent(new URL(rawLabel,source.page).pathname.split('/').at(-1)||'')}catch{}
+   const rule=source.rules.find(r=>r.match.test(alt)||r.match.test(basename));
    if(!rule)continue;
    const original=attr(tag,'data-original')||attr(tag,'data-src')||attr(tag,'src');
    if(!original||original.startsWith('data:'))continue;
