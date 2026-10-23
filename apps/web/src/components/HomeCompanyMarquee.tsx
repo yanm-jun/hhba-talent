@@ -10,7 +10,7 @@ import '../styles/home-company-marquee.css';
 // No third-party logo proxy, AI artwork, simulated company marks or cooperation claim.
 const featuredOrder=['OpenAI','Anthropic','SpaceX'];
 const employers=verifiedBrandRecords()
-  .filter(item=>!!encodeEmployerIdentity(item))
+  .filter(item=>featuredOrder.includes(item.company) && !!encodeEmployerIdentity(item))
   .sort((a,b)=>{
     const ia=featuredOrder.indexOf(a.company),ib=featuredOrder.indexOf(b.company);
     if(ia!==-1||ib!==-1)return (ia===-1?999:ia)-(ib===-1?999:ib);
