@@ -79,7 +79,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       <div className="domestic-editorial-photo-grid">
        {article!.photos!.filter((_,i)=>media?.photos?.[i]?.state==='ready').map(photo=><figure key={photo.url} className="domestic-official-photo">
         <a href={photo.source} target="_blank" rel="noopener noreferrer" aria-label={'查看'+photo.label+'的来源'}>
-         <img src={import.meta.env.BASE_URL+media!.photos![article.photos!.indexOf(photo)].path} loading="lazy" alt={photo.label} onError={e=>{e.currentTarget.style.display='none';e.currentTarget.parentElement?.classList.add('domestic-photo-unavailable')}}/>
+         <img src={import.meta.env.BASE_URL+(media?.photos?.[article!.photos!.indexOf(photo)]?.path||'')} loading="lazy" alt={photo.label} onError={e=>{e.currentTarget.style.display='none';e.currentTarget.parentElement?.classList.add('domestic-photo-unavailable')}}/>
          <span className="domestic-photo-fallback"><Images size={18}/>点击查看官网图片</span>
         </a>
         <figcaption>{photo.label} · {photo.kind==='product'?'产品照片':photo.kind==='factory'?'生产基地':photo.kind==='headquarters'?'总部实景':'官网图片'}</figcaption>
