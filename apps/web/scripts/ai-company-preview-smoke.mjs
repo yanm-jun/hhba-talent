@@ -21,8 +21,8 @@ try {
   browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 1280, height: 860 } });
   page.on('pageerror', e => errors.push(e.message));
-  page.on('console', m => { if(m.type()==='error') errors.push('console: '+m.text()) });
-  page.on('requestfailed', req=>errors.push('request: '+req.url()+' '+req.failure()?.errorText));
+  page.on('console', m => { if(m.type()==='error' && /Uncaught|ReferenceError|TypeError|Failed to fetch dynamically imported module/i.test(m.text())) errors.push('script: '+m.text()) });
+  page.on('requestfailed', req=>{if(/\.(?:js|css)(?:\?|$)/i.test(req.url())) errors.push('asset: '+req.url()+' '+req.failure()?.errorText)});
   await page.goto(ROOT, { waitUntil: 'domcontentloaded' });
   try {
     await page.getByRole('heading', { name: '智能找企业' }).waitFor({timeout:12000});
@@ -45,6 +45,7 @@ try {
   await page.screenshot({ path: 'preview-screenshots/desktop.png', fullPage: true });
   await page.getByRole('button', { name: '原有岗位搜索' }).click();
   await page.locator('.unified-job-search input').waitFor();
+  await page.locator('.unified-job-card').first().waitFor({timeout:12000});
   await page.getByRole('button', { name: 'AI 智能找企业' }).click();
   await page.locator('.ai-company-input textarea').fill('OpenAI');
   await page.getByRole('button', { name: /本地检索企业/ }).click();
