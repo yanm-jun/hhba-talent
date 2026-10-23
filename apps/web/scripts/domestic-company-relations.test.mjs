@@ -92,7 +92,7 @@ test('searchable major filter covers broad subjects and connects with company li
  assert(picker.includes('onKeyDown={onKey}'));
  assert(market.includes('<MajorFilter value={selectedMajor} onChange={selectMajor} lang={lang}/>'));
  assert(market.includes('majorSlug={selectedMajor}'));
- assert(companies.includes('matchingMajors(company)'));
+ assert(companies.includes('companyMatchesSelectedMajor(company,chosen.slug)'));
  assert(companies.includes('if(!word&&!chosen)return null'));
 });
 test('expanded career profiles have authentic image provenance and no asserted live roles',()=>{
