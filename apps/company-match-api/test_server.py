@@ -48,7 +48,7 @@ class TestCompanyMatch(unittest.TestCase):
         ]}, ensure_ascii=False), self.companies)
         self.assertEqual([r["id"] for r in rows], [self.domestic["id"], self.overseas["id"]])
         self.assertEqual(rows[0]["directions"], [])
-        self.assertIn("历史", self.domestic["overview"])
+        self.assertIn("已登记", self.domestic["overview"])
         self.assertIn("核实", rows[0]["reason"])
 
     def test_invalid_json_is_rejected(self):
