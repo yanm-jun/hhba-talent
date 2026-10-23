@@ -69,6 +69,20 @@ try{
  await desktop.locator('.unified-job-browse-links').getByRole('link',{name:/查看完整招聘市场/}).click();
  assert.match(desktop.url(),/\/candidate\/jobs$/);
  await desktop.locator('.unified-job-search input').waitFor();
+ // Verify real company graph routes through HHBA pages, not directly to an ATS.
+ await desktop.locator('.unified-job-search input').fill('华域视觉');
+ await desktop.locator('.domestic-company-card').filter({hasText:'华域视觉'}).first().waitFor({timeout:12000});
+ await desktop.locator('.domestic-company-card').filter({hasText:'华域视觉'}).first().click();
+ await desktop.getByRole('heading',{name:'华域视觉科技（上海）有限公司'}).waitFor();
+ assert.match(desktop.url(),/\/companies\/domestic\//);
+ await desktop.locator('.domestic-parent-link').filter({hasText:'华域汽车'}).click();
+ await desktop.getByRole('heading',{name:'华域汽车',exact:true}).waitFor();
+ await desktop.locator('.domestic-related-card').filter({hasText:'华域视觉'}).first().waitFor();
+ await desktop.locator('.domestic-parent-link').filter({hasText:'上汽集团'}).click();
+ await desktop.getByRole('heading',{name:'上汽集团',exact:true}).waitFor();
+ await desktop.locator('.domestic-relations-search input').fill('华域视觉');
+ await desktop.locator('.domestic-related-card').filter({hasText:'华域视觉'}).first().waitFor();
+ assert.equal(await desktop.locator('.domestic-related-card').count(),1);
  assert.deepEqual(errors,[]);
  console.log('HHBA_REAL_ATS_MARKET_AND_ORIGINAL_LAYOUT_BROWSER_PASS',expected);
 }finally{await browser?.close();server.kill('SIGTERM');}
