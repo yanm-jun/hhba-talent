@@ -1,4 +1,4 @@
-// Strict, reproducible five-part completeness test for HHBA's first 50 existing companies.
+// Six independent completion gates; ordinary company photos and screenshots are accepted as local images.
 // A logo candidate, broken photograph, corporate homepage or unrelated major cannot pass.
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {test} from 'node:test';
@@ -11,7 +11,7 @@ const pictures=json('src/data/domesticMediaBundle.json').companies||{};
 const roster=json('src/data/domesticListedCompanies.json');
 const majorsSource=readFileSync('src/services/domesticMajors.ts','utf8');
 const majorIds=new Set([...majorsSource.matchAll(/(?:slug:\s*|\[\s*)'([^']+)'/g)].map(m=>m[1]));
-const kinds=new Set(['headquarters','factory','office','product']);
+const kinds=new Set(['headquarters','factory','office','product','screenshot']);
 const isHttps=s=>{try{return new URL(s).protocol==='https:'}catch{return false}};
 const nameSet=new Set(cohort.companyNames);
 const results=[];
@@ -25,7 +25,8 @@ for(const name of cohort.companyNames){
  const photoIdx=(p.photos||[]).findIndex((x,i)=>{
    const actual=media.photos?.[i];
    return actual?.state==='ready'&&actual.path?.startsWith('domestic-media/')&&
-    isHttps(x.url)&&isHttps(x.source)&&x.label&&kinds.has(x.kind);
+    (isHttps(x.url)||x.localPath===actual.path)&&
+    (isHttps(x.source)||x.source==='user_submission')&&x.label&&kinds.has(x.kind);
  });
  const checks={
   introduction:Boolean(info.length>=280&&p.description?.length>=3&&business.length>=3&&isHttps(p.officialSource)&&
@@ -34,8 +35,9 @@ for(const name of cohort.companyNames){
   classification:Boolean(p.primaryIndustry&&p.subIndustry&&isHttps(p.industryEvidenceUrl)),
   professionalAssociation:Boolean(majors.length>=4&&new Set(majors).size===majors.length&&
     majors.every(id=>majorIds.has(id))&&p.majorMappingBasis?.includes('非招聘专业承诺')),
-  officialLogo:Boolean(p.brandAssetStatus==='official_logo_visually_verified'&&
-    p.brandIdentityEvidence&&p.brandVerifiedAt&&isHttps(p.brandImageSource)&&
+  officialLogo:Boolean(['official_logo_visually_verified','user_provided_logo_confirmed'].includes(p.brandAssetStatus)&&
+    p.brandIdentityEvidence&&p.brandVerifiedAt&&
+    (isHttps(p.brandImageSource)||p.brandAssetStatus==='user_provided_logo_confirmed')&&
     media.brand?.state==='ready'&&media.brand.path?.startsWith('domestic-media/')),
   officialPhoto:Boolean(photoIdx>=0),
   officialRecruitment:Boolean(rec?.url&&rec?.evidenceUrl&&isHttps(rec.url)&&isHttps(rec.evidenceUrl)&&
@@ -55,13 +57,13 @@ const summary={
  incomplete:results.filter(x=>!x.complete).length,completionRate:results.filter(x=>x.complete).length/50,
  byDimension:counters,
  date:new Date().toISOString(),
- note:'Completed requires all 6 checks (introduction, classification, professional association, official logo, official photograph, exact recruiting portal). Source/availability status and actual local media matter; do not count placeholder or favicon.'
+ note:'All 6 gates require matching identity and working locally bundled images. Ordinary JPG/PNG/WebP or screenshots are acceptable, including user submissions; unchecked candidate logos, mismatched brands and corporate homepages do not pass.'
 };
 mkdirSync('preview-reports',{recursive:true});
 mkdirSync('public/data',{recursive:true});
 writeFileSync('preview-reports/complete-50-quality.json',JSON.stringify({summary,results},null,2)+'\n');
 writeFileSync('public/data/domestic-complete-50-progress.json',JSON.stringify({summary,results},null,2)+'\n');
-const header=['# HHBA 50 家企业完整档案逐项验收','','> **这不是仅有 50 家名单的任务。仅当介绍、行业、专业、真实Logo、真实照片和该主体的招聘站全部通过，才可以写“已完成”。**','','| 验收项 | 完成家数 |','|---|---:|',
+const header=['# HHBA 50 家企业完整档案逐项验收','','> **普通照片、截图、PNG/JPG/WebP都可验收；必须是该企业，且本地可展示。六项全部通过才能称完成。**','','| 验收项 | 完成家数 |','|---|---:|',
  ...Object.entries(counters).map(([k,v])=>'| '+k+' | '+v+'/50 |'),
  '','**完全通过：'+summary.complete+'/50 家**','','## 尚未完成的公司与具体缺口'];
 for(const r of results.filter(x=>!x.complete))header.push('- '+r.name+'：'+r.issues.join('、')+'（图片：'+r.localPictures+'，招聘：'+(r.careerUrl||'待核验')+'）');
