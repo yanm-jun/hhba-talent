@@ -143,3 +143,14 @@ a.unified-company-brand:focus-visible,.unified-detail-company-link:focus-visible
 .unified-major-options button:hover,.unified-major-options button.is-focused{background:#edf6f0}
 .unified-major-no-match{font-size:12px;color:#76857a;padding:12px 8px}
 @media(max-width:740px){.unified-major-filter{flex:1 1 calc(50% - 6px);min-width:0}.unified-major-options{width:calc(200% + 8px)}}
+
+/* Academic-major catalogue 2026: compact tier tabs, code labels, and fallback entry. */
+.unified-major-options{width:max(100%,340px);max-width:min(420px,calc(100vw - 32px));max-height:350px}
+.unified-major-levels{display:flex;gap:4px;border-radius:8px;padding:4px;background:#f3f7f4;margin:6px 3px}
+.unified-major-levels button{flex:1 1 0;font-size:11px!important;text-align:center!important;justify-content:center!important;min-width:0;padding:8px 3px!important}
+.unified-major-levels button.is-active{background:#fff!important;color:#225a40!important;font-weight:700;box-shadow:0 1px 4px #234a3017}
+.unified-major-options [role="option"]>span{display:flex;flex-direction:column;gap:3px}
+.unified-major-options [role="option"] small,.unified-major-custom small{display:block;font-size:10px;color:#829087;font-weight:400}
+.unified-major-options .unified-major-custom{border-top:1px solid #e5ece6;border-radius:0;color:#276146}
+.unified-major-options [role="option"]{min-height:45px}
+@media(max-width:740px){.unified-major-options{width:min(420px,calc(100vw - 32px));max-width:calc(100vw - 32px)}}

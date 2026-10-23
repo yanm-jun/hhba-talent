@@ -28,6 +28,8 @@ on:
       - 'apps/web/src/services/domesticMajors.ts'
       - 'apps/web/src/data/domesticCareerProfiles.json'
       - 'apps/web/src/components/MajorFilter.tsx'
+      - 'apps/web/src/data/officialAcademicMajors.json'
+      - 'apps/web/src/data/officialVocationalMajors.json'
   workflow_dispatch:
 permissions:
   contents: read

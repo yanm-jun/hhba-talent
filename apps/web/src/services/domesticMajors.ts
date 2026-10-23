@@ -1,6 +1,10 @@
 import { getDomesticCompanies, type DomesticCompany } from './domesticCompanySearch';
+import higherCatalog from '../data/officialAcademicMajors.json';
+import vocationalCatalog from '../data/officialVocationalMajors.json';
 
-export type MajorDefinition={slug:string;name:string;keywords:string[];description:string};
+export type MajorLevel='undergraduate'|'vocational'|'postgraduate'|'legacy'|'custom';
+export type MajorDefinition={slug:string;name:string;keywords:string[];description:string;code?:string;level?:MajorLevel;discipline?:string;sourceYear?:number};
+type AcademicRecord={id:string;name:string;code:string;level:MajorLevel;discipline?:string;sourceYear?:number};
 export const MAJORS:MajorDefinition[]=[
  {slug:'electrical-engineering',name:'电气工程及其自动化',keywords:['电气自动化','电气工程','电力系统','智能电网','汽车电器','电气','电驱动','电控','工业控制','配电'],description:'电气控制、电能转换、电驱动和电气系统相关业务'},
  {slug:'automation',name:'自动化',keywords:['自动化','PLC','工业控制','工业机器人','智能制造','运动控制','伺服','机器人'],description:'自动控制、工业设备、机器人与自动化产线'},
@@ -73,8 +77,57 @@ const EXTRA_MAJORS:MajorDefinition[]=[
 ].map(([slug,name,keywords,description])=>({slug:slug as string,name:name as string,keywords:keywords as string[],description:description as string}));
 MAJORS.push(...EXTRA_MAJORS);
 
-const majorBySlug=new Map(MAJORS.map(m=>[m.slug,m]));
-export const majorById=(slug:string)=>majorBySlug.get(slug)||null;
+
+const linkedByVocational:Record<string,string>={
+ 'voc-460306':'electrical-engineering','voc-460301':'automation','voc-460305':'robotics',
+ 'voc-460303':'automation','voc-460104':'mechanical-engineering','voc-460103':'mechanical-engineering',
+ 'voc-510203':'software-engineering','voc-510201':'computer-science',
+ 'voc-520201':'nursing','voc-570102K':'preschool-education','voc-530605':'marketing',
+ 'voc-530701':'marketing','voc-460310':'automation'
+};
+const linkedByAcademicName:Record<string,string>={
+ '电气工程':'electrical-engineering','控制科学与工程':'automation','计算机技术':'computer-science',
+ '机械':'mechanical-engineering','机械工程':'mechanical-design',
+ '电子信息':'electronic-information','软件工程':'software-engineering',
+ '人工智能':'ai','工商管理':'business-administration',
+ '新闻与传播':'journalism','临床医学':'clinical-medicine'
+};
+const legacyBySlug=new Map(MAJORS.map(m=>[m.slug,m]));
+const legacyByName=new Map(MAJORS.map(m=>[m.name,m]));
+const officialRecords=[
+ ...(higherCatalog.records as AcademicRecord[]),
+ ...(vocationalCatalog.records as AcademicRecord[])
+];
+export const MAJOR_OPTIONS:MajorDefinition[]=officialRecords.map(record=>{
+ const legacy=legacyByName.get(record.name);
+ return {slug:record.id,name:record.name,code:record.code,level:record.level,
+  discipline:record.discipline,sourceYear:record.sourceYear,
+  description:legacy?.description||'',keywords:legacy?.keywords||[]};
+});
+for(const legacy of MAJORS)if(!MAJOR_OPTIONS.some(m=>m.name===legacy.name)){
+ MAJOR_OPTIONS.push({...legacy,level:'legacy'});
+}
+const officialBySlug=new Map(MAJOR_OPTIONS.map(m=>[m.slug,m]));
+export function majorById(slug:string):MajorDefinition|null{
+ if(slug.startsWith('custom:')){
+  let name='';try{name=decodeURIComponent(slug.slice(7)).trim().slice(0,70)}catch{return null}
+  return name?{slug,name,level:'custom',keywords:[],description:'自填专业，尚未核对国家专业目录'}:null;
+ }
+ return officialBySlug.get(slug)||legacyBySlug.get(slug)||null;
+}
+function canonicalMajorSlug(major:MajorDefinition):string{
+ return legacyBySlug.has(major.slug)?major.slug:
+   linkedByVocational[major.slug]||
+   linkedByAcademicName[major.name]||
+   legacyByName.get(major.name)?.slug||'';
+}
+export function companyMatchesSelectedMajor(company:DomesticCompany,slug:string):boolean{
+ if(company.entityKind==='business')return false;
+ const major=majorById(slug);if(!major)return false;
+ const canonical=canonicalMajorSlug(major);
+ if(!canonical)return false; // Avoid inventing matches from a major name alone.
+ return matchingMajors(company).some(m=>m.slug===canonical);
+}
 const normalized=(x:string)=>x.toLocaleLowerCase().replace(/\s+/g,'');
 const aliases:Record<string,string[]>={
  '华域视觉科技（上海）有限公司':['electrical-engineering','automation','mechanical-engineering','vehicle-engineering','electronic-information','optoelectronics','computer-science','materials-engineering']
@@ -92,7 +145,7 @@ export function companiesForMajor(slug:string,limit=80):MajorCompanyResult[]{
  const major=majorById(slug);
  if(!major)return [];
  const all=getDomesticCompanies();
- const result=all.filter(company=>matchingMajors(company).some(x=>x.slug===slug)&&company.entityKind!=='business')
+ const result=all.filter(company=>companyMatchesSelectedMajor(company,slug))
  .map(company=>({
   company,
   matchedTags:company.tags.filter(t=>major.keywords.some(key=>normalized(t).includes(normalized(key))||normalized(key).includes(normalized(t))&&t.length>=3)).slice(0,3)
@@ -104,5 +157,5 @@ export function companiesForMajor(slug:string,limit=80):MajorCompanyResult[]{
  return result.slice(0,limit);
 }
 export function relatedCompanyCount(slug:string):number{
- return getDomesticCompanies().filter(c=>c.entityKind!=='business'&&matchingMajors(c).some(m=>m.slug===slug)).length;
+ return getDomesticCompanies().filter(c=>companyMatchesSelectedMajor(c,slug)).length;
 }

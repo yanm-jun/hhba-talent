@@ -109,3 +109,31 @@ test('expanded career profiles have authentic image provenance and no asserted l
  assert.equal(p['思源电气'].careersUrl,'https://www.sieyuan.com/join');
  assert.equal(p['正泰电器'].careersUrl,'');
 });
+
+test('catalog contains sourced 2026 new majors with separate study levels',()=>{
+ const u=JSON.parse(readFileSync('src/data/officialAcademicMajors.json','utf8'));
+ const v=JSON.parse(readFileSync('src/data/officialVocationalMajors.json','utf8'));
+ assert.equal(u.records.filter(x=>x.level==='undergraduate').length,882);
+ assert.equal(u.records.filter(x=>x.level==='postgraduate').length,181);
+ assert(v.records.length>=80);
+ const records=[...u.records,...v.records];
+ assert.equal(records.length,new Set(records.map(x=>x.id)).size,'no duplicate id');
+ for(const x of records){assert(x.code&&x.name&&x.level&&x.sourceYear);}
+ const has=(code,level,name)=>records.some(x=>x.code===code&&x.level===level&&x.name===name);
+ assert(has('140012TK','undergraduate','具身智能'));
+ assert(has('130205','undergraduate','舞蹈学'));
+ assert(has('460306','vocational','电气自动化技术'));
+ assert(has('460301','vocational','机电一体化技术'));
+ assert(has('0808','postgraduate','电气工程'));
+});
+test('all selectable majors preserve metadata without pretending employer vacancies exist',()=>{
+ const service=readFileSync('src/services/domesticMajors.ts','utf8');
+ const picker=readFileSync('src/components/MajorFilter.tsx','utf8');
+ assert(service.includes('MAJOR_OPTIONS'));
+ assert(service.includes('companyMatchesSelectedMajor'));
+ assert(service.includes('if(!canonical)return false'));
+ assert(picker.includes('自填专业'));
+ assert(picker.includes('role="combobox"'));
+ assert(picker.includes('高职专科'));
+ assert(picker.includes('专业代码'));
+});

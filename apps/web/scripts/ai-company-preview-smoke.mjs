@@ -72,6 +72,12 @@ try{
  // Searchable, keyboard-accessible academic-major filter is part of the original filter row.
  const majorCombo=desktop.getByRole('combobox',{name:'搜索或选择所学专业'});
  await majorCombo.waitFor();
+ await majorCombo.fill('具身');
+ await desktop.getByRole('option',{name:/具身智能/}).first().waitFor({timeout:3500});
+ await majorCombo.fill('机电一体化');
+ await desktop.getByRole('option',{name:/机电一体化技术/}).first().waitFor({timeout:3500});
+ await majorCombo.fill('舞蹈学');
+ await desktop.getByRole('option',{name:/舞蹈学/}).first().waitFor({timeout:3500});
  await majorCombo.fill('电气');
  await desktop.getByRole('option',{name:'电气工程及其自动化'}).click();
  await desktop.locator('.domestic-major-filter-active').getByText('电气工程及其自动化').waitFor();

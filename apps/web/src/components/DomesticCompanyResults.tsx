@@ -3,7 +3,7 @@ import {Building2,ArrowRight,GraduationCap} from 'lucide-react';
 import profiles from '../data/domesticCareerProfiles.json';
 import {Link} from '../router';
 import {getDomesticCompanies,searchDomesticCompanies,type DomesticCompany} from '../services/domesticCompanySearch';
-import {matchingMajors,majorById} from '../services/domesticMajors';
+import {companyMatchesSelectedMajor,majorById} from '../services/domesticMajors';
 import '../styles/domestic-company-search.css';
 type Preview={displayName?:string;summary?:string;brandImage?:string};
 const rich=profiles as Record<string,Preview>;
@@ -16,7 +16,7 @@ export function DomesticCompanyResults({query,majorSlug='',scope='',country='',c
   if(scope==='global')return [];
   // This control discovers Chinese business-related employers; it does not filter foreign ATS job openings.
   if(country&&!/^(cn|chn|china|中国|中国大陆)$/i.test(country))return [];
-  let eligible=chosen?all.filter(company=>company.entityKind!=='business'&&matchingMajors(company).some(major=>major.slug===chosen.slug)):all;
+  let eligible=chosen?all.filter(company=>company.entityKind!=='business'&&companyMatchesSelectedMajor(company,chosen.slug)):all;
   if(city)eligible=eligible.filter(company=>(company.city||'').includes(city)||(company.province||'').includes(city));
   if(word)return searchDomesticCompanies(eligible,word,36);
   return eligible.filter(company=>company.status==='industry_reviewed').sort((a,b)=>{
@@ -31,9 +31,9 @@ export function DomesticCompanyResults({query,majorSlug='',scope='',country='',c
  return <section className="domestic-company-result" aria-label="国内企业搜索结果">
   <div className="domestic-company-title"><h3>{chosen?'与所学专业相关的国内企业':'相关国内企业'}</h3>
    <small>{'显示 '+list.length+' 家 · 企业名录 '+all.length.toLocaleString()+' 条'}</small></div>
-  {chosen&&<div className="domestic-major-filter-active"><GraduationCap size={15}/>已选择：<strong>{chosen.name}</strong><span>根据公开业务方向匹配，非在招承诺</span></div>}
+  {chosen&&<div className="domestic-major-filter-active"><GraduationCap size={15}/>已选择：<strong>{chosen.name}</strong><span>按业务证据关联，非在招承诺</span></div>}
   <p className="domestic-company-caution">输入一个汉字即可搜索企业。选择专业后可进一步输入企业名称；进入公司详情可查看已核验的官方招聘渠道。</p>
-  {!list.length&&<p className="domestic-company-empty">未找到同时符合当前专业、关键词或地区条件的企业，请调整筛选。</p>}
+  {!list.length&&<p className="domestic-company-empty">当前专业尚无经过业务证据核验的关联企业，或者不符合关键词与地区条件。可以更换专业，或清除专业筛选后直接搜索企业；这不代表没有企业招聘该专业。</p>}
   <div className="domestic-company-grid">{list.map(company=>{
    const editorial=rich[company.name];
    return <Link className="domestic-company-card" key={company.id} to={company.route}>
