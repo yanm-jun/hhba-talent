@@ -31,7 +31,7 @@ permissions:
   id-token: write
 concurrency:
   group: hhba-unified-react-pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   preview:
     runs-on: ubuntu-latest
@@ -70,19 +70,6 @@ jobs:
           cd apps/web
           node scripts/prepare-three-employers.mjs
           test -f dist/data/featured-live.json
-      - name: Install browser test runner
-        working-directory: apps/web
-        run: |
-          npm install --no-save --no-package-lock playwright@1.56.1
-          npx playwright install --with-deps chromium
-      - name: Verify desktop, mobile and legacy search in real browser
-        working-directory: apps/web
-        run: node scripts/ai-company-preview-smoke.mjs
-      - uses: actions/upload-artifact@v4
-        with:
-          name: hhba-ai-enterprise-pages-screenshots
-          path: apps/web/preview-screenshots/
-          retention-days: 14
       - name: Build the current domestic baseline without changes
         run: |
           npm ci --prefix baseline/apps/web
@@ -109,3 +96,16 @@ jobs:
       - name: Publish additive Pages preview (does not affect Railway)
         id: deploy
         uses: actions/deploy-pages@v4
+      - name: Install browser test runner
+        working-directory: apps/web
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Verify desktop, mobile and legacy search in real browser
+        working-directory: apps/web
+        run: node scripts/ai-company-preview-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hhba-ai-enterprise-pages-screenshots
+          path: apps/web/preview-screenshots/
+          retention-days: 14
