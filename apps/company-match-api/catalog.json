@@ -665,10 +665,11 @@
       "industry": "A股",
       "overview": "已登记的企业类型：A股。经核验的官方招聘入口包括：未分类。该记录不能证明当前岗位、专业、学历或工作经验要求。",
       "route": null,
-      "careers": "https://www.yto.net.cn",
+      "careers": null,
       "evidenceUrl": "https://www.yto.net.cn",
       "lastReviewed": "2026-10-15",
-      "provenance": "official_recruitment_entry_only"
+      "provenance": "official_recruitment_entry_only",
+      "recruitmentAuditNote": "Legacy link was corporate homepage, not a recruitment portal. Blocked pending actual issuer recruitment page verification."
     },
     {
       "id": "cn-B1-014",
@@ -742,8 +743,8 @@
       "industry": "A股",
       "overview": "已登记的企业类型：A股。经核验的官方招聘入口包括：未分类。该记录不能证明当前岗位、专业、学历或工作经验要求。",
       "route": null,
-      "careers": "https://www.icbc.com.cn/icbcltd/职业发展/人才招聘",
-      "evidenceUrl": "https://www.icbc.com.cn",
+      "careers": "https://job.icbc.com.cn/",
+      "evidenceUrl": "https://job.icbc.com.cn/",
       "lastReviewed": "2026-10-15",
       "provenance": "official_recruitment_entry_only"
     },
