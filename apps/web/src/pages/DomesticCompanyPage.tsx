@@ -123,10 +123,12 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
     </section>}
     {(article||recruitment)&&<section className="domestic-editorial-section domestic-careers" aria-label="官方招聘渠道">
       <h2>官方招聘渠道</h2>
-      <p>仅展示核实对应主体的官方招聘站或官方招聘公告；企业介绍官网和招聘渠道严格分离，招聘入口不代表当前一定有开放岗位。</p>
+      <p>招聘渠道与企业介绍来源分别核验。集团统一招聘站并不代表每个子公司都有开放岗位；具体法人、地区与招聘批次以官方页面为准。</p>
       {careers?<div className="domestic-careers-row"><div><strong>{recruitment?.label||'招聘渠道待复核'}</strong>
-       <small>{recruitment?.kind==='group_recruitment_portal'?'集团统一招聘平台；投递前请确认所选用人公司':recruitment?.availability==='announcement_only'?'仅显示招聘公告，非岗位直投入口':recruitment?.availability==='temporarily_unavailable'?'官网目前显示维护中，暂可能无法投递':'企业官方招聘专用渠道'}</small></div>
-       <a href={careers} target="_blank" rel="noopener noreferrer" className="domestic-careers-link">{recruitment?.availability==='announcement_only'?'查看招聘公告':recruitment?.availability==='temporarily_unavailable'?'访问招聘系统（维护中）':'查看招聘官网'} <ExternalLink size={15}/></a></div>:
+       <small>{recruitment?.availability==='unconfirmed_runtime'?'招聘线索的当前访问状态尚未完成核验，不代表已能直投岗位':recruitment?.kind==='group_recruitment_portal'?'集团统一招聘平台；投递前请核对实际用人公司':recruitment?.availability==='announcement_only'?'仅显示招聘公告，非岗位直投入口':recruitment?.availability==='temporarily_unavailable'?'官网目前显示维护中，暂可能无法投递':'已登记的企业招聘专用渠道'}</small>
+       {recruitment?.recruitmentEntity&&recruitment.recruitmentEntity!==company.name?<small>招聘系统归属：{recruitment.recruitmentEntity}（并非 {company.name} 独立招聘系统）</small>:null}
+       {recruitment?.notes?<small>{recruitment.notes}</small>:null}</div>
+       <a href={careers} target="_blank" rel="noopener noreferrer" className="domestic-careers-link">{recruitment?.availability==='announcement_only'?'查看招聘公告':recruitment?.availability==='temporarily_unavailable'?'访问招聘系统（维护中）':recruitment?.availability==='unconfirmed_runtime'?'查看待核实招聘线索':'查看招聘官网'} <ExternalLink size={15}/></a></div>:
        <div className="domestic-editorial-limited">尚未核验该主体的官方招聘入口，暂不展示“查看招聘官网”按钮。
        </div>}
     </section>}
