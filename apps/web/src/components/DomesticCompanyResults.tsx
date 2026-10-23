@@ -11,7 +11,10 @@ const rich=profiles as Record<string,Preview>;
 const hasDeepProfile=(name:string)=>Boolean(rich[name]?.summary);
 const isSubstantive=(name:string)=>{
  const record=profiles[name as keyof typeof profiles] as {description?:string[];business?:unknown[];majorSlugs?:string[];officialSource?:string}|undefined;
- return Boolean(record?.officialSource&&record.description?.length>=3&&record.description.join('').length>=280&&record.business?.length>=3&&record.majorSlugs?.length>=4);
+ const paragraphs=record?.description||[];
+ const business=record?.business||[];
+ const majors=record?.majorSlugs||[];
+ return Boolean(record?.officialSource&&paragraphs.length>=3&&paragraphs.join('').length>=280&&business.length>=3&&majors.length>=4);
 };
 const available=bundled as {companies:Record<string,{brand?:{state:string;path?:string}}>};
 type Props={query:string;majorSlug?:string;scope?:string;country?:string;city?:string};
