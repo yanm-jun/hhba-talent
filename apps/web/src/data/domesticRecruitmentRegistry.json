@@ -493,6 +493,18 @@
       "aliases": [],
       "verifiedBy": "official_employer_recruitment_page",
       "notes": "该入口可从企业官方招聘页面或其公开招聘系统独立核实。"
+    },
+    "歌尔股份": {
+      "url": "https://www.goertek.com/join/recruitcategory144.html",
+      "evidenceUrl": "https://www.goertek.com/join/recruitcategory144.html",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "歌尔股份官方招聘栏目",
+      "recruitmentEntity": "歌尔股份",
+      "verifiedOn": "2026-10-23",
+      "aliases": [],
+      "verifiedBy": "official_company_recruitment_page",
+      "notes": "官网直接列示2027届研发、制造、供应链及职能岗位类别，并提示以官方渠道投递。"
     }
   }
 }

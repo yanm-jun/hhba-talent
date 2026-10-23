@@ -1135,7 +1135,8 @@
     "description": [
       "歌尔股份有限公司成立于2001年，在2008年登陆深交所，是精密零组件与智能硬件制造领域的重要企业。歌尔的业务强调从零部件、模组到整机的工艺整合，具有显著的声学、光学与电子技术特点。",
       "公司公开的主要业务包含声光电精密零组件、精密结构件、智能整机和高端装备。其垂直整合能力覆盖模具、注塑、表面处理、精密加工、自动化产线和声光电模组研发。",
-      "声学、光电、电子信息、机械制造、自动化、材料和计算机背景均可根据业务细分方向选择研发或制造团队。研发中心分布多地，实际任职地点和专业要求应在企业招聘公告中核对。"
+      "声学、光电、电子信息、机械制造、自动化、材料和计算机背景均可根据业务细分方向选择研发或制造团队。研发中心分布多地，实际任职地点和专业要求应在企业招聘公告中核对。",
+      "歌尔股份官网公布的2027届招聘内容将研发技术、制造技术、供应链及市场、职能等专业方向分别列出，研发侧覆盖软件、机械、光学、声学和控制等技术领域。这体现了声光电组件、智能硬件研发和精密制造的跨学科协作，不能将所有岗位简单归类为电子装配。"
     ],
     "business": [
       {
@@ -1166,8 +1167,8 @@
       "automation",
       "computer-science"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://www.goertek.com/join/recruitcategory144.html",
+    "careersLabel": "歌尔股份官方招聘栏目",
     "officialSource": "https://www.goertek.com/about/intro.html",
     "productSource": "https://goertek.com",
     "brandImage": "",
@@ -1185,7 +1186,12 @@
     "primaryIndustry": "半导体与数字科技",
     "subIndustry": "声光电组件",
     "industryEvidenceUrl": "https://www.goertek.com/about/intro.html",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "recruitmentEvidenceUrl": "https://www.goertek.com/join/recruitcategory144.html",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "歌尔股份",
+    "extraBusinessEvidenceUrl": "https://www.goertek.com/join/recruitcategory144.html"
   },
   "中兴通讯": {
     "displayName": "中兴通讯",

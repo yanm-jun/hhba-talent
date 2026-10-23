@@ -382,20 +382,18 @@
       "name": "埃斯顿",
       "stockCode": "002747",
       "exchange": "SZSE",
-      "stage": "EXISTING_PARTIAL_REQUIRES_SOURCE_EXPANSION",
+      "stage": "LONGFORM_CONTENT_READY",
       "isNewProfileThisBatch": false,
       "sourceStatus": "HAS_PROFILE_SOURCE",
       "officialEvidenceUrl": "https://www.estun.com/about-us/",
-      "contentChars": 249,
+      "contentChars": 345,
       "hasBusinessSpecifics": true,
       "hasMajorLinks": true,
       "mediaStatus": "BRAND_CANDIDATE",
       "realPhotoCount": 0,
-      "verifiedExactCareers": false,
+      "verifiedExactCareers": true,
       "problems": [
-        "LONGFORM_NOT_APPROVED",
-        "OFFICIAL_PHOTOS_MISSING",
-        "RECRUITMENT_ENTRY_NOT_VERIFIED"
+        "OFFICIAL_PHOTOS_MISSING"
       ]
     },
     {
@@ -403,18 +401,17 @@
       "name": "德赛西威",
       "stockCode": "002920",
       "exchange": "SZSE",
-      "stage": "EXISTING_PARTIAL_REQUIRES_SOURCE_EXPANSION",
+      "stage": "LONGFORM_CONTENT_READY",
       "isNewProfileThisBatch": false,
       "sourceStatus": "HAS_PROFILE_SOURCE",
       "officialEvidenceUrl": "https://www.desaysv.com/about.html",
-      "contentChars": 262,
+      "contentChars": 366,
       "hasBusinessSpecifics": true,
       "hasMajorLinks": true,
       "mediaStatus": "BRAND_CANDIDATE",
       "realPhotoCount": 0,
       "verifiedExactCareers": true,
       "problems": [
-        "LONGFORM_NOT_APPROVED",
         "OFFICIAL_PHOTOS_MISSING"
       ]
     },
@@ -423,40 +420,36 @@
       "name": "京东方Ａ",
       "stockCode": "000725",
       "exchange": "SZSE",
-      "stage": "EXISTING_PARTIAL_REQUIRES_SOURCE_EXPANSION",
+      "stage": "LONGFORM_CONTENT_READY",
       "isNewProfileThisBatch": false,
       "sourceStatus": "HAS_PROFILE_SOURCE",
       "officialEvidenceUrl": "https://www.boe.com/about/index",
-      "contentChars": 277,
+      "contentChars": 382,
       "hasBusinessSpecifics": true,
       "hasMajorLinks": true,
       "mediaStatus": "BRAND_CANDIDATE",
       "realPhotoCount": 2,
       "verifiedExactCareers": true,
-      "problems": [
-        "LONGFORM_NOT_APPROVED"
-      ]
+      "problems": []
     },
     {
       "rank": 22,
       "name": "歌尔股份",
       "stockCode": "002241",
       "exchange": "SZSE",
-      "stage": "EXISTING_PARTIAL_REQUIRES_SOURCE_EXPANSION",
+      "stage": "LONGFORM_CONTENT_READY",
       "isNewProfileThisBatch": false,
       "sourceStatus": "HAS_PROFILE_SOURCE",
       "officialEvidenceUrl": "https://www.goertek.com/about/intro.html",
-      "contentChars": 246,
+      "contentChars": 364,
       "hasBusinessSpecifics": true,
       "hasMajorLinks": true,
       "mediaStatus": "NO_VERIFIED_LOGO",
       "realPhotoCount": 0,
-      "verifiedExactCareers": false,
+      "verifiedExactCareers": true,
       "problems": [
-        "LONGFORM_NOT_APPROVED",
         "LOGO_MISSING",
-        "OFFICIAL_PHOTOS_MISSING",
-        "RECRUITMENT_ENTRY_NOT_VERIFIED"
+        "OFFICIAL_PHOTOS_MISSING"
       ]
     },
     {
@@ -526,21 +519,19 @@
       "name": "兆易创新",
       "stockCode": "603986",
       "exchange": "SSE",
-      "stage": "EXISTING_PARTIAL_REQUIRES_SOURCE_EXPANSION",
+      "stage": "LONGFORM_CONTENT_READY",
       "isNewProfileThisBatch": false,
       "sourceStatus": "HAS_PROFILE_SOURCE",
       "officialEvidenceUrl": "https://www.gigadevice.com.cn/about/contact",
-      "contentChars": 248,
+      "contentChars": 343,
       "hasBusinessSpecifics": true,
       "hasMajorLinks": true,
       "mediaStatus": "NO_VERIFIED_LOGO",
       "realPhotoCount": 0,
-      "verifiedExactCareers": false,
+      "verifiedExactCareers": true,
       "problems": [
-        "LONGFORM_NOT_APPROVED",
         "LOGO_MISSING",
-        "OFFICIAL_PHOTOS_MISSING",
-        "RECRUITMENT_ENTRY_NOT_VERIFIED"
+        "OFFICIAL_PHOTOS_MISSING"
       ]
     },
     {
@@ -569,18 +560,17 @@
       "name": "隆基绿能",
       "stockCode": "601012",
       "exchange": "SSE",
-      "stage": "EXISTING_PARTIAL_REQUIRES_SOURCE_EXPANSION",
+      "stage": "LONGFORM_CONTENT_READY",
       "isNewProfileThisBatch": false,
       "sourceStatus": "HAS_PROFILE_SOURCE",
       "officialEvidenceUrl": "https://www.longi.com/cn/about-longi/",
-      "contentChars": 251,
+      "contentChars": 352,
       "hasBusinessSpecifics": true,
       "hasMajorLinks": true,
       "mediaStatus": "BRAND_CANDIDATE",
       "realPhotoCount": 0,
       "verifiedExactCareers": true,
       "problems": [
-        "LONGFORM_NOT_APPROVED",
         "OFFICIAL_PHOTOS_MISSING"
       ]
     },
@@ -652,18 +642,17 @@
       "name": "海尔智家",
       "stockCode": "600690",
       "exchange": "SSE",
-      "stage": "EXISTING_PARTIAL_REQUIRES_SOURCE_EXPANSION",
+      "stage": "LONGFORM_CONTENT_READY",
       "isNewProfileThisBatch": false,
       "sourceStatus": "HAS_PROFILE_SOURCE",
       "officialEvidenceUrl": "https://www.haier.com/about_haier/haiererpinpai/ppdw/",
-      "contentChars": 264,
+      "contentChars": 363,
       "hasBusinessSpecifics": true,
       "hasMajorLinks": true,
       "mediaStatus": "BRAND_CANDIDATE",
       "realPhotoCount": 0,
       "verifiedExactCareers": true,
       "problems": [
-        "LONGFORM_NOT_APPROVED",
         "OFFICIAL_PHOTOS_MISSING"
       ]
     },
@@ -672,38 +661,34 @@
       "name": "阳光电源",
       "stockCode": "300274",
       "exchange": "SZSE",
-      "stage": "EXISTING_PARTIAL_REQUIRES_SOURCE_EXPANSION",
+      "stage": "LONGFORM_CONTENT_READY",
       "isNewProfileThisBatch": false,
       "sourceStatus": "HAS_PROFILE_SOURCE",
       "officialEvidenceUrl": "https://www.sungrowpower.com/",
-      "contentChars": 272,
+      "contentChars": 368,
       "hasBusinessSpecifics": true,
       "hasMajorLinks": true,
       "mediaStatus": "BRAND_CANDIDATE",
       "realPhotoCount": 1,
       "verifiedExactCareers": true,
-      "problems": [
-        "LONGFORM_NOT_APPROVED"
-      ]
+      "problems": []
     },
     {
       "rank": 34,
       "name": "宁德时代",
       "stockCode": "300750",
       "exchange": "SZSE",
-      "stage": "EXISTING_PARTIAL_REQUIRES_SOURCE_EXPANSION",
+      "stage": "LONGFORM_CONTENT_READY",
       "isNewProfileThisBatch": false,
       "sourceStatus": "HAS_PROFILE_SOURCE",
       "officialEvidenceUrl": "https://www.catl.com/",
-      "contentChars": 255,
+      "contentChars": 360,
       "hasBusinessSpecifics": true,
       "hasMajorLinks": true,
       "mediaStatus": "BRAND_CANDIDATE",
       "realPhotoCount": 1,
       "verifiedExactCareers": true,
-      "problems": [
-        "LONGFORM_NOT_APPROVED"
-      ]
+      "problems": []
     },
     {
       "rank": 35,
