@@ -20,3 +20,7 @@
 .ai-company-browse-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}
 .ai-company-browse-grid a{display:flex;gap:10px;align-items:center;border:1px solid var(--line);padding:10px;border-radius:8px;text-decoration:none;color:var(--ink);font-size:13px}
 .ai-company-browse-grid span{flex:1}.ai-company-all{margin-top:10px}@media(max-width:700px){.ai-company-search{padding:16px;margin:20px 0}.ai-company-search header{flex-wrap:wrap}.ai-company-browse-grid{grid-template-columns:1fr}}
+
+.hhba-search-mode{max-width:1120px;margin:30px auto 0;padding:0 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hhba-search-mode button{border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--muted);padding:10px 15px;font-size:13px;font-weight:650;cursor:pointer}
+.hhba-search-mode button[aria-pressed=true]{background:#215d46;color:#fff;border-color:#215d46}
