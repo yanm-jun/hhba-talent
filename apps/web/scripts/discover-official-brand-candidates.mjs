@@ -56,7 +56,7 @@ await Promise.all(Array.from({length:5},async()=>{
     // Official site only (including subdomains). Third-party logos must be manually reviewed.
     if(absolute.protocol!=='https:'||!(hostname===host||hostname.endsWith('.'+host.replace(/^www\./,''))))continue;
     const filename=decodeURIComponent(absolute.pathname).toLowerCase();
-    if(!/\.(png|jpg|jpeg|webp|gif)(?:$|\?)/.test(filename))continue;
+    if(!/\.(png|jpg|jpeg|webp|gif|svg)(?:$|\?)/.test(filename))continue;
     const logo=/logo|品牌标识|企业标识|公司标志/i;
     const isLogo=logo.test(cls+' '+id+' '+alt+' '+filename);
     if(!isLogo||/customer|client|partner|invest|supplier|footer|service|国家|政府/i.test(cls+' '+alt+' '+filename))continue;
