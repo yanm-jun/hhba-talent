@@ -35,6 +35,8 @@ on:
       - 'apps/web/src/pages/MajorCompaniesPage.tsx'
       - 'apps/web/src/services/domesticMajors.ts'
       - 'apps/web/src/data/domesticCareerProfiles.json'
+      - 'apps/web/src/data/domesticCompanyBatch001.json'
+      - 'apps/web/scripts/validate-domestic-company-batch.mjs'
       - 'apps/web/src/components/MajorFilter.tsx'
       - 'apps/web/src/data/officialAcademicMajors.json'
       - 'apps/web/src/data/officialVocationalMajors.json'
@@ -105,6 +107,9 @@ jobs:
       - name: Validate public company relationship sources and hierarchy
         working-directory: apps/web
         run: node --test scripts/domestic-company-relations.test.mjs
+      - name: Validate 100 existing-company first-batch pipeline and evidence gate
+        working-directory: apps/web
+        run: node --test scripts/validate-domestic-company-batch.mjs
       - name: Audit every searchable company for substantive content and unverifiable placeholders
         working-directory: apps/web
         run: node --test scripts/audit-all-company-content.mjs

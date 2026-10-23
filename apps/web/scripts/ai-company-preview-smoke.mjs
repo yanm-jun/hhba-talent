@@ -108,6 +108,21 @@ try{
  }
  assert.equal(results.length,Object.keys(deepProfiles).length);
  console.log('HHBA_DEEP_EMPLOYER_SEARCH_LINKAGE_PASS',results.length);
+ // First verified batch must be directly findable and readable, without faking job openings.
+ for(const name of ['比亚迪','中国平安','浦发银行','招商银行','贵州茅台','海天味业','中国建筑','伊利股份']){
+  await searchBox.fill(name);
+  const card=desktop.locator('.domestic-company-card').filter({hasText:name}).first();
+  await card.waitFor({timeout:7000});
+  await card.click();
+  await desktop.getByRole('heading',{name,exact:true}).waitFor();
+  const body=await desktop.locator('.domestic-editorial-body').innerText();
+  assert(body.length>=280,'Real long-form description missing for '+name);
+  assert((await desktop.locator('.domestic-editorial-business').locator('strong').count())>=3,
+    'Real business lines missing for '+name);
+  assert((await desktop.locator('.domestic-major-tag').count())>=4,'Business-major mapping missing for '+name);
+  await desktop.goto(ROOT);
+  await desktop.locator('.unified-job-browse-links').getByRole('link',{name:/查看完整招聘市场/}).click();
+ }
  await searchBox.fill('华安证券');
  await desktop.locator('.domestic-company-card').filter({hasText:'华安证券'}).first().click();
  await desktop.getByRole('heading',{name:'华安证券'}).waitFor();

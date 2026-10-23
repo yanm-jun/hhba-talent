@@ -241,3 +241,21 @@ test('company cards distinguish substantive articles, partial writeups and raw s
  assert(script.includes("'PARTIAL_PROFILE'"));
  assert(script.includes('partialProfiles:'));
 });
+
+test('100-company pilot has no new company identity and source-backed evidence for completed dossiers',()=>{
+ const batch=JSON.parse(readFileSync('src/data/domesticCompanyBatch001.json','utf8'));
+ const roster=JSON.parse(readFileSync('src/data/domesticListedCompanies.json','utf8'));
+ const profiles=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
+ assert.equal(batch.rows.length,100);
+ const list=new Map(roster.companies.map(c=>[c.name,c.code]));
+ for(const row of batch.rows)assert.equal(list.get(row.name),row.stockCode,'Batch must only upgrade existing names');
+ const approved=batch.rows.filter(x=>x.isNewProfileThisBatch);
+ assert.equal(approved.length,15);
+ for(const row of approved){
+  const p=profiles[row.name];
+  assert(p.officialSource.startsWith('https://'));
+  assert(p.description.join('').length>=280);
+  assert(p.description.length>=3&&p.business.length>=3&&p.majorSlugs.length>=4);
+  assert(!p.careersUrl,'Do not invent corporate jobs');
+ }
+});

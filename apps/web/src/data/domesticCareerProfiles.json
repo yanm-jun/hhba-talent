@@ -2561,5 +2561,897 @@
     "evidenceLevel": "official_source_read",
     "website": "https://www.ebscn.com",
     "industry": "综合证券与金融服务"
+  },
+  "比亚迪": {
+    "displayName": "比亚迪",
+    "subtitle": "新能源汽车、电子、新能源与轨道交通四大产业",
+    "summary": "比亚迪股份有限公司1994年在深圳创立，最初从充电电池领域起步，随后进入电子和汽车制造；2002年登陆香港资本市场，2011年登陆深圳证券交易所。公司的业务发展从单一电池制造扩展为多产业协同，并在不同汽车品牌、电子制造和城市交通产品间建立技术关联。其",
+    "description": [
+      "比亚迪股份有限公司1994年在深圳创立，最初从充电电池领域起步，随后进入电子和汽车制造；2002年登陆香港资本市场，2011年登陆深圳证券交易所。公司的业务发展从单一电池制造扩展为多产业协同，并在不同汽车品牌、电子制造和城市交通产品间建立技术关联。其汽车经营主体、比亚迪电子以及其他关联公司必须按实际用人法人区分。",
+      "比亚迪官网明确列出汽车、电子、新能源、轨道交通四大业务板块。汽车业务涵盖乘用车和商用车以及电池、电机、电控等核心技术，并形成王朝、海洋、腾势、方程豹、仰望等品牌矩阵；电子业务面向智能终端与精密零部件制造；新能源领域包含储能、电力系统等方向；轨道交通布局包括云轨和云巴。",
+      "研发工作的核心交叉点是电池材料与安全、功率电子、电驱动、智能网联、车身结构、工厂工艺和整车系统集成。与传统单一整车厂相比，多产业链并行使各技术团队侧重点差异较大：汽车电子研发、轨交控制、工业自动化、精密模具和动力电池制造不宜合并成一个统一岗位类型。",
+      "机械、车辆、新能源、电气、电子信息、软件与材料背景可以从其对应的工程产品线寻找学习方向；市场营销、供应链和国际商务则与销售网络和跨境运营相关。具体学历、技能、城市与招聘主体须以比亚迪各自招聘平台正式职位为准，HHBA不根据专业相关性推断正在招聘。"
+    ],
+    "business": [
+      {
+        "title": "新能源汽车",
+        "description": "乘用车、商用车及电池、电机、电控核心技术"
+      },
+      {
+        "title": "电子制造",
+        "description": "电子组件、精密制造、终端产品和客户工程"
+      },
+      {
+        "title": "新能源",
+        "description": "电池储能、电力电子与能源系统"
+      },
+      {
+        "title": "轨道交通",
+        "description": "云轨、云巴城市交通装备"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "vehicle-engineering",
+      "electrical-engineering",
+      "automation",
+      "materials-engineering",
+      "mechanical-engineering",
+      "software-engineering",
+      "supply-chain"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.bydglobal.com/cn/about.html",
+    "productSource": "https://www.bydglobal.com/cn/about.html",
+    "website": "https://www.bydglobal.com/cn",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "photoSourcePage": "https://www.bydglobal.com/cn/about.html",
+    "photoSourceLabel": "查看官方网站（图片尚待核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "first_party_or_corporate_disclosure_summary",
+    "industry": "新能源汽车、电子、新能源与轨道交通四大产业",
+    "sourceEvidence": [
+      {
+        "url": "https://www.bydglobal.com/cn/about.html",
+        "type": "company_official_profile",
+        "verifiedAt": "2026-10-23"
+      }
+    ]
+  },
+  "中国平安": {
+    "displayName": "中国平安",
+    "subtitle": "保险、银行、资产管理与医疗养老综合服务",
+    "summary": "中国平安保险（集团）股份有限公司于1988年在深圳蛇口创立，起点是股份制保险业务，后来逐步形成保险、银行、投资及医疗养老协同体系。集团同时在上海和香港资本市场上市，A股代码601318；不能将平安银行、平安产险、平安寿险等不同法人机构的业务牌照和招聘",
+    "description": [
+      "中国平安保险（集团）股份有限公司于1988年在深圳蛇口创立，起点是股份制保险业务，后来逐步形成保险、银行、投资及医疗养老协同体系。集团同时在上海和香港资本市场上市，A股代码601318；不能将平安银行、平安产险、平安寿险等不同法人机构的业务牌照和招聘岗位视为上市母公司统一招聘。",
+      "公司官方网站列示的综合金融体系包括人寿保险、财产保险、养老保险、健康保险、银行和资产管理等业务，不同板块面向个人、家庭和机构客户提供风险保障、支付结算、投资管理与融资服务。集团在此基础上发展医疗健康及养老服务场景，强调金融顾问、家庭医生和养老管家的服务结合。",
+      "保险产品需要精算、风险定价、理赔运营、合规及客户服务的专业系统；银行业务涉及授信、存贷款、结算、科技平台和反洗钱；医疗养老服务则对医疗运营、产品管理、信息系统及客户体验提出不同要求。因此集团跨行业布局不能简单理解为证券或保险产品销售。",
+      "金融、经济、保险、精算、会计和法学专业可研究产品定价、投资分析、财务风控与监管合规；计算机、软件、数据科学及医学背景可能与技术平台和健康服务业务有关。岗位具体的雇主名称、资质与是否招聘，应由相应子公司官方公告核对。"
+    ],
+    "business": [
+      {
+        "title": "保险保障",
+        "description": "寿险、产险、健康险和养老保险"
+      },
+      {
+        "title": "银行及金融服务",
+        "description": "授信、支付结算、资产管理和个人金融"
+      },
+      {
+        "title": "投资与风控",
+        "description": "资产配置、投资研究和风险控制"
+      },
+      {
+        "title": "医疗养老",
+        "description": "健康管理、医疗服务及养老服务"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "finance",
+      "economics",
+      "accounting",
+      "financial-management",
+      "law",
+      "computer-science",
+      "data-science"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.pingan.cn/about/overview.shtml",
+    "productSource": "https://www.pingan.cn/about/overview.shtml",
+    "website": "https://www.pingan.cn",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "photoSourcePage": "https://www.pingan.cn/about/overview.shtml",
+    "photoSourceLabel": "查看官方网站（图片尚待核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "first_party_or_corporate_disclosure_summary",
+    "industry": "保险、银行、资产管理与医疗养老综合服务",
+    "sourceEvidence": [
+      {
+        "url": "https://www.pingan.cn/about/overview.shtml",
+        "type": "company_official_profile",
+        "verifiedAt": "2026-10-23"
+      }
+    ]
+  },
+  "贵州茅台": {
+    "displayName": "贵州茅台",
+    "subtitle": "酱香型白酒生产、品牌与渠道运营",
+    "summary": "贵州茅台酒股份有限公司成立于1999年11月20日，由茅台集团作为主发起人联合其他单位设立，2001年在上海证券交易所上市，证券代码600519。公司位于贵州省仁怀市茅台镇，围绕茅台酒及茅台酱香系列酒的生产销售开展经营。上市公司与茅台集团及集团所涉旅",
+    "description": [
+      "贵州茅台酒股份有限公司成立于1999年11月20日，由茅台集团作为主发起人联合其他单位设立，2001年在上海证券交易所上市，证券代码600519。公司位于贵州省仁怀市茅台镇，围绕茅台酒及茅台酱香系列酒的生产销售开展经营。上市公司与茅台集团及集团所涉旅游、金融等其他产业是不同主体。",
+      "公司官网说明其产品以大曲酱香型白酒为核心，品牌与贵州茅台镇的地域酿造条件紧密相关。理解产品需要结合原料、制曲、发酵、贮存、勾调与产品质量控制，也需要考虑不同消费场景和渠道的品牌经营、数字化运营、产品溯源与客户服务。",
+      "作为食品饮料制造企业，公司的生产核心包括粮食原料管理、微生物发酵与感官品质、包装材料、设备维护和工厂安全。市场与服务侧则涉及渠道运营、商业管理、消费者沟通及知识产权保护。制造端与市场端具有不同职业路径，不应将“酒业”简单理解成营销销售岗位。",
+      "食品科学与工程、发酵工程、化学、生物技术、机械自动化等方向能与酿造和质量管理关联；市场营销、财务管理、法学及供应链管理方向可能关联渠道、经营与合规。HHBA仅据公开经营事实建立职业探索标签，不列举未经确认的岗位需求。"
+    ],
+    "business": [
+      {
+        "title": "茅台酒及系列酒",
+        "description": "酱香型白酒生产与产品经营"
+      },
+      {
+        "title": "酿造工艺与质量",
+        "description": "原料、发酵、贮存、包装与品质检测"
+      },
+      {
+        "title": "渠道及品牌经营",
+        "description": "市场体系、客户服务和品牌管理"
+      },
+      {
+        "title": "生产保障",
+        "description": "设备、供应链、工厂安全与质量体系"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "food-engineering",
+      "chemical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "marketing",
+      "accounting",
+      "supply-chain"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.moutai.com.cn/mtgf/qygk/gsjj/index.html",
+    "productSource": "https://www.moutai.com.cn/mtgf/qygk/gsjj/index.html",
+    "website": "https://www.moutai.com.cn",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "photoSourcePage": "https://www.moutai.com.cn/mtgf/qygk/gsjj/index.html",
+    "photoSourceLabel": "查看官方网站（图片尚待核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "first_party_or_corporate_disclosure_summary",
+    "industry": "酱香型白酒生产、品牌与渠道运营",
+    "sourceEvidence": [
+      {
+        "url": "https://www.moutai.com.cn/mtgf/qygk/gsjj/index.html",
+        "type": "company_official_profile",
+        "verifiedAt": "2026-10-23"
+      }
+    ]
+  },
+  "格力电器": {
+    "displayName": "格力电器",
+    "subtitle": "家用电器、暖通楼宇与工业装备",
+    "summary": "珠海格力电器股份有限公司是以家电、暖通及相关制造技术为核心的上市企业，证券代码000651。公司官网明确将消费领域和工业领域列为不同业务生态，既为家庭提供空调和多品类电器，也面向楼宇与生产制造客户提供装备、部件及工程方案。旗下具体品牌和零部件企业不能",
+    "description": [
+      "珠海格力电器股份有限公司是以家电、暖通及相关制造技术为核心的上市企业，证券代码000651。公司官网明确将消费领域和工业领域列为不同业务生态，既为家庭提供空调和多品类电器，也面向楼宇与生产制造客户提供装备、部件及工程方案。旗下具体品牌和零部件企业不能与上市公司招聘主体混同。",
+      "消费业务不仅涉及家用空调，也包括暖通、冰箱、洗衣机、热水器、厨房电器和环境电器。官网展示了在机场、轨道交通、大型建筑等工程场景应用的中央空调项目。此类大型暖通工程与零售家电的开发流程不同，涉及热管理、能效、系统配置、安装和维护保障。",
+      "公司公开的工业业务包括数控机床、工业机器人、精密模具、电机、压缩机、电容、半导体、铸造、基础材料及工业储能。其制造技术链条把研发、精密结构加工、功率驱动、工艺工程与质量控制联结起来，既有消费产品设计，也有为企业服务的工业制造岗位。",
+      "能源动力、机械、电气、自动化、材料与工业设计等专业可对应制冷技术、设备、电机驱动与外观结构研发；计算机和软件技术与智能家居、物联网及控制系统相关；市场与供应链背景可探索渠道与采购领域。不同工厂、子公司和岗位条件仍须逐项核验。"
+    ],
+    "business": [
+      {
+        "title": "家电与空调",
+        "description": "家电产品、制冷及智能楼宇系统"
+      },
+      {
+        "title": "暖通工程",
+        "description": "中央空调、楼宇能源管理和工程服务"
+      },
+      {
+        "title": "工业装备",
+        "description": "数控机床、机器人、模具与精密制造"
+      },
+      {
+        "title": "核心零部件",
+        "description": "电机、压缩机、电容及材料技术"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "energy-power",
+      "mechanical-engineering",
+      "electrical-engineering",
+      "automation",
+      "materials-engineering",
+      "industrial-design",
+      "software-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.gree.com/",
+    "productSource": "https://www.gree.com/",
+    "website": "https://www.gree.com",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "photoSourcePage": "https://www.gree.com/",
+    "photoSourceLabel": "查看官方网站（图片尚待核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "first_party_or_corporate_disclosure_summary",
+    "industry": "家用电器、暖通楼宇与工业装备",
+    "sourceEvidence": [
+      {
+        "url": "https://www.gree.com/",
+        "type": "company_official_profile",
+        "verifiedAt": "2026-10-23"
+      }
+    ]
+  },
+  "浦发银行": {
+    "displayName": "浦发银行",
+    "subtitle": "公司金融、零售银行与数智金融",
+    "summary": "上海浦东发展银行股份有限公司于1992年获批筹建、1993年1月9日正式开业，1999年在上海证券交易所上市，股票代码600000，总行设于上海。它是全国性股份制商业银行，不属于一家只服务上海地区的地方性银行；官网公开了个人金融、公司金融以及金融科技",
+    "description": [
+      "上海浦东发展银行股份有限公司于1992年获批筹建、1993年1月9日正式开业，1999年在上海证券交易所上市，股票代码600000，总行设于上海。它是全国性股份制商业银行，不属于一家只服务上海地区的地方性银行；官网公开了个人金融、公司金融以及金融科技转型相关的产品和业务体系。",
+      "公司金融覆盖企业客户融资、供应链金融、普惠金融、科技金融、跨境结算、投资银行以及现金管理等服务。部分面向企业客户的产品需要综合评估行业与企业财务状况，兼顾流动性、授信风险、商业链条和资金运营，因此工作类型除了客户经营，也包括审查、风控与产品设计。",
+      "零售金融包含个人账户、消费信贷与财富管理服务，业务涉及线上产品、客户服务和监管合规。银行亦通过信托、基金、理财、租赁等相关牌照公司开展综合化经营，但这些公司拥有不同的经营范围与独立雇佣关系。官网目前强调数智金融及线上化流程建设。",
+      "金融、经济、会计、法学和统计背景可从银行授信、投融资、财务分析及风险管理等方向展开；计算机、软件与数据科学则与数字渠道、金融系统和数据合规有关。专业关联不是招聘公告，实际岗位仍以银行及具体用人主体公开页面为准。"
+    ],
+    "business": [
+      {
+        "title": "公司银行",
+        "description": "企业信贷、现金管理、供应链及跨境金融"
+      },
+      {
+        "title": "零售金融",
+        "description": "个人金融、消费信贷和财富服务"
+      },
+      {
+        "title": "投资银行及机构",
+        "description": "资本市场及机构金融服务"
+      },
+      {
+        "title": "数智金融",
+        "description": "线上渠道、数据能力及银行系统"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "finance",
+      "accounting",
+      "economics",
+      "law",
+      "computer-science",
+      "data-science"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://cor.spdb.com.cn/jj/202503/t20250329_1130989.shtml",
+    "productSource": "https://cor.spdb.com.cn/jj/202503/t20250329_1130989.shtml",
+    "website": "https://www.spdb.com.cn",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "photoSourcePage": "https://cor.spdb.com.cn/jj/202503/t20250329_1130989.shtml",
+    "photoSourceLabel": "查看官方网站（图片尚待核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "first_party_or_corporate_disclosure_summary",
+    "industry": "公司金融、零售银行与数智金融",
+    "sourceEvidence": [
+      {
+        "url": "https://cor.spdb.com.cn/jj/202503/t20250329_1130989.shtml",
+        "type": "company_official_profile",
+        "verifiedAt": "2026-10-23"
+      }
+    ]
+  },
+  "招商银行": {
+    "displayName": "招商银行",
+    "subtitle": "零售金融、公司银行与跨境综合金融",
+    "summary": "招商银行股份有限公司1987年在深圳蛇口设立，官方介绍称其为由企业创办的商业银行，后来发展为在上海和香港两地上市的银行集团，A股代码600036。银行经营由早期单一网点扩展为覆盖多个城市的公司金融和零售金融网络，并通过持牌子公司扩展理财、租赁和基金等",
+    "description": [
+      "招商银行股份有限公司1987年在深圳蛇口设立，官方介绍称其为由企业创办的商业银行，后来发展为在上海和香港两地上市的银行集团，A股代码600036。银行经营由早期单一网点扩展为覆盖多个城市的公司金融和零售金融网络，并通过持牌子公司扩展理财、租赁和基金等业务。",
+      "招商银行官网将零售客户服务放在重要位置，业务涉及支付结算、银行卡、储蓄、消费信贷、私人银行和财富管理；公司客户方向包括企业融资、票据、跨境结算及企业财富管理。个人金融与对公服务的风险、系统和运营方式各不相同，不能只从其零售品牌判断公司职位类型。",
+      "银行在国内外拥有不同层级网点，并通过金融租赁、基金管理、人寿保险、消费金融、理财等专业主体提供产品与服务。官网特别介绍数字化渠道、手机银行以及公司金融细分解决方案；这使数字产品、数据治理、安全与客户体验成为其经营支撑能力。",
+      "金融学、会计、经济学适合研究财富管理、企业授信、财务审查等方向；法学关注合规与金融监管；计算机、软件、数据科学可对应核心系统、线上应用和模型风控；市场营销及管理专业可以探索客户服务和产品运营。是否招聘由实际岗位公告决定。"
+    ],
+    "business": [
+      {
+        "title": "零售与财富管理",
+        "description": "个人储蓄、信贷、支付及财富产品"
+      },
+      {
+        "title": "公司银行",
+        "description": "企业融资、供应链及跨境金融"
+      },
+      {
+        "title": "金融市场与机构",
+        "description": "投资交易、金融市场及机构客户服务"
+      },
+      {
+        "title": "数字银行",
+        "description": "移动银行、数据管理及金融科技平台"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "finance",
+      "accounting",
+      "economics",
+      "law",
+      "computer-science",
+      "data-science",
+      "marketing"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.cmbchina.com/cmbinfo/aboutcmb/",
+    "productSource": "https://www.cmbchina.com/cmbinfo/aboutcmb/",
+    "website": "https://www.cmbchina.com",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "photoSourcePage": "https://www.cmbchina.com/cmbinfo/aboutcmb/",
+    "photoSourceLabel": "查看官方网站（图片尚待核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "first_party_or_corporate_disclosure_summary",
+    "industry": "零售金融、公司银行与跨境综合金融",
+    "sourceEvidence": [
+      {
+        "url": "https://www.cmbchina.com/cmbinfo/aboutcmb/",
+        "type": "company_official_profile",
+        "verifiedAt": "2026-10-23"
+      }
+    ]
+  },
+  "海天味业": {
+    "displayName": "海天味业",
+    "subtitle": "调味品研发、食品制造与品牌经营",
+    "summary": "佛山市海天调味食品股份有限公司的业务传承与岭南地区的传统酱园文化相关，其现代化制造体系以食品调味品为核心。公司2014年在上海证券交易所上市，股票代码603288，主要经营场所和产业基础与广东佛山紧密相关。其上市公司业务应与其他海天品牌或上下游合作商",
+    "description": [
+      "佛山市海天调味食品股份有限公司的业务传承与岭南地区的传统酱园文化相关，其现代化制造体系以食品调味品为核心。公司2014年在上海证券交易所上市，股票代码603288，主要经营场所和产业基础与广东佛山紧密相关。其上市公司业务应与其他海天品牌或上下游合作商区别对待。",
+      "企业官网公开的产品体系包括酱油、蚝油、调味酱、食醋、料酒及复合调味料等，覆盖家庭烹饪与餐饮等需求。产品开发既需要理解食物口味、微生物发酵、配方与工艺，也需要结合原料采购、包装、食品安全法规与跨区域物流体系。",
+      "海天在官网重点介绍自动化酿造设备、发酵菌种、产品检测以及智能化制造能力。食品制造中，稳定性与质量安全不仅由终检决定，还依赖原料、产线条件、发酵工艺和供应链的全过程管理；其产品进入国内外销售渠道，还涉及各地区食品标准和品牌保护。",
+      "食品科学、食品质量与安全、化学、生物技术及机械自动化等专业可能关联研发、品控与生产工艺；物流、市场营销、供应链、财务及法学方向分别可能关联分销、采购、经营或合规工作。实际岗位类型与专业要求应通过企业自己的公开招聘信息核查。"
+    ],
+    "business": [
+      {
+        "title": "调味品产品",
+        "description": "酱油、蚝油、食醋、料酒及复合调味品"
+      },
+      {
+        "title": "食品研发与质量",
+        "description": "配方、菌种、发酵工艺和食品安全检测"
+      },
+      {
+        "title": "智能制造",
+        "description": "酿造装备、生产过程和质量追踪"
+      },
+      {
+        "title": "品牌与供应链",
+        "description": "渠道销售、原料供应及国际业务"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "food-engineering",
+      "chemical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "marketing",
+      "supply-chain"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.haday.com/about.html",
+    "productSource": "https://www.haday.com/about.html",
+    "website": "https://www.haday.com",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "photoSourcePage": "https://www.haday.com/about.html",
+    "photoSourceLabel": "查看官方网站（图片尚待核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "first_party_or_corporate_disclosure_summary",
+    "industry": "调味品研发、食品制造与品牌经营",
+    "sourceEvidence": [
+      {
+        "url": "https://www.haday.com/about.html",
+        "type": "company_official_profile",
+        "verifiedAt": "2026-10-23"
+      }
+    ]
+  },
+  "中国建筑": {
+    "displayName": "中国建筑",
+    "subtitle": "房屋建筑、基础设施、地产开发与勘察设计",
+    "summary": "中国建筑股份有限公司是中建集团开展投资建设业务的重要上市平台，证券代码601668。官网介绍中建集团正式组建于1982年，企业经营涉及国内多个省区市与海外市场。上市公司、集团母公司及各工程局、区域经营公司属于不同法人和雇主层级，不能把某一工程局招聘岗",
+    "description": [
+      "中国建筑股份有限公司是中建集团开展投资建设业务的重要上市平台，证券代码601668。官网介绍中建集团正式组建于1982年，企业经营涉及国内多个省区市与海外市场。上市公司、集团母公司及各工程局、区域经营公司属于不同法人和雇主层级，不能把某一工程局招聘岗位当作中国建筑总部统一招聘。",
+      "公司的公开业务主要由房屋建筑、基础设施、房地产开发、勘察设计和新兴业务构成。房屋建筑涉及住宅、公共建筑等项目全过程的施工组织；基础设施涵盖市政、交通和其他公共建设；地产与投资强调融资、建设和运营协同；勘察设计侧重前期工程与技术咨询。",
+      "大型工程项目往往具有异地施工、复杂分包体系、供应链组织和长期进度管理等特点。项目质量与安全管理、工程测量、BIM数字化、材料检测、工程造价和财务合规共同构成项目控制体系。数字建造和绿色低碳也是公开介绍中出现的新业务方向。",
+      "土木工程、建筑学、工程管理、机械及电气专业可从建设施工和专业工程方向了解企业；财务管理、法律及供应链背景可能用于项目经营、投融资和合同管理；计算机与数据技术也关联BIM及数字工地。工作城市和薪资条件须以具体中建下属招聘主体公告为准。"
+    ],
+    "business": [
+      {
+        "title": "房屋建筑",
+        "description": "住宅、公共建筑及工程总承包"
+      },
+      {
+        "title": "基础设施",
+        "description": "公共交通、市政及基础设施工程"
+      },
+      {
+        "title": "地产投资和运营",
+        "description": "投资开发与项目资产运营"
+      },
+      {
+        "title": "勘察设计",
+        "description": "工程设计、咨询与技术管理"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "civil-engineering",
+      "architecture",
+      "construction-management",
+      "electrical-engineering",
+      "mechanical-engineering",
+      "accounting",
+      "law"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.cscec.com/gyzj/gsjj_new/",
+    "productSource": "https://www.cscec.com/gyzj/gsjj_new/",
+    "website": "https://www.cscec.com",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "photoSourcePage": "https://www.cscec.com/gyzj/gsjj_new/",
+    "photoSourceLabel": "查看官方网站（图片尚待核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "first_party_or_corporate_disclosure_summary",
+    "industry": "房屋建筑、基础设施、地产开发与勘察设计",
+    "sourceEvidence": [
+      {
+        "url": "https://www.cscec.com/gyzj/gsjj_new/",
+        "type": "company_official_profile",
+        "verifiedAt": "2026-10-23"
+      }
+    ]
+  },
+  "上海机场": {
+    "displayName": "上海机场",
+    "subtitle": "上海航空枢纽运营和非航空性配套服务",
+    "summary": "上海国际机场股份有限公司于1997年设立、1998年在上海证券交易所上市，证券代码600009。2022年完成重大资产重组后，公司的管理范围包括上海航空枢纽客货运资源的经营与配置。官方网站将其航空性经营业务和非航空性经营业务分开介绍，母集团上海机场集",
+    "description": [
+      "上海国际机场股份有限公司于1997年设立、1998年在上海证券交易所上市，证券代码600009。2022年完成重大资产重组后，公司的管理范围包括上海航空枢纽客货运资源的经营与配置。官方网站将其航空性经营业务和非航空性经营业务分开介绍，母集团上海机场集团及其他关联公司的法律身份和招聘入口需要区分。",
+      "机场的航空性业务围绕航空器、旅客和货物运输的基础设施运营，涉及机场场地、航空地面服务、航班保障与运输资源协调。机场日常运转属于连续性强的公共服务体系，强调安全、流程稳定、应急保障以及航空公司等多方协同。",
+      "非航空性业务则涵盖商业零售、广告、酒店、贵宾服务和其他机场配套。公司官网还列出货运、地面代理和航油服务等不同经营方向，这意味着机场企业的职位结构可能包含航务、机电设备、运行管理、商业运营和数字化系统等多类团队，并非只招聘航空服务专业。",
+      "交通运输、物流、工商管理、机械电气、计算机、市场营销和财务等专业可从运营和技术系统寻找业务关联。不同岗位在安全培训、轮班、行业资质等方面可能有特殊要求，不能由专业匹配算法代替正式职位说明。"
+    ],
+    "business": [
+      {
+        "title": "航空性业务",
+        "description": "机场运行、旅客和航班保障"
+      },
+      {
+        "title": "货运与地面服务",
+        "description": "机场货运和地面代理业务"
+      },
+      {
+        "title": "商业配套",
+        "description": "机场商铺、广告、酒店与贵宾服务"
+      },
+      {
+        "title": "基础设施",
+        "description": "机电系统、场站运营和航空资源管理"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "transportation",
+      "logistics",
+      "business-administration",
+      "electrical-engineering",
+      "computer-science",
+      "marketing"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.shanghaiairport.com/gfgs1/index.html",
+    "productSource": "https://www.shanghaiairport.com/gfgs1/index.html",
+    "website": "https://www.shanghaiairport.com",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "photoSourcePage": "https://www.shanghaiairport.com/gfgs1/index.html",
+    "photoSourceLabel": "查看官方网站（图片尚待核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "first_party_or_corporate_disclosure_summary",
+    "industry": "上海航空枢纽运营和非航空性配套服务",
+    "sourceEvidence": [
+      {
+        "url": "https://www.shanghaiairport.com/gfgs1/index.html",
+        "type": "company_official_profile",
+        "verifiedAt": "2026-10-23"
+      }
+    ]
+  },
+  "伊利股份": {
+    "displayName": "伊利股份",
+    "subtitle": "液态奶、奶粉、酸奶、奶酪与冷饮食品",
+    "summary": "内蒙古伊利实业集团股份有限公司以乳制品与营养食品为主要业务，A股证券代码600887。公司官网将液态奶、奶粉、酸奶、奶酪和冷饮等列为重要产品类别，并展示覆盖多个市场的产品与业务体系。乳业企业的特点是将农业原料供应、现代食品加工、冷链与终端销售连接在一",
+    "description": [
+      "内蒙古伊利实业集团股份有限公司以乳制品与营养食品为主要业务，A股证券代码600887。公司官网将液态奶、奶粉、酸奶、奶酪和冷饮等列为重要产品类别，并展示覆盖多个市场的产品与业务体系。乳业企业的特点是将农业原料供应、现代食品加工、冷链与终端销售连接在一起。",
+      "伊利的液态奶业务涵盖常温奶等饮品，乳粉业务服务不同年龄和营养需求，酸奶采用发酵乳技术，冷饮和奶酪则有各自的配方、加工及仓储条件。品牌体系中，金典、安慕希、舒化等被放在不同产品组合里；产品研发不只是口味设计，也包含蛋白质、营养配方和食品安全检测。",
+      "企业招聘官网将业务进一步按液态奶、奶粉、冷饮、酸奶、成人营养品、奶酪等事业部区分。制造方面需要生物发酵、热处理、包装技术及自动化质量控制；经营方面需要原料与牧场协同、冷链运输、销售渠道管理及品牌营销。集团旗下事业部和生产园区的用人岗位不应自动合并为总部职位。",
+      "食品科学、营养、生物技术、化工、机械自动化等背景与研发工艺和品控有关；物流、市场营销、财务管理与供应链管理可关联产销协调和市场经营。岗位与学历要求仍以伊利自己的公开招聘信息为准。"
+    ],
+    "business": [
+      {
+        "title": "液态奶及酸奶",
+        "description": "常温奶、发酵乳等乳制品"
+      },
+      {
+        "title": "营养产品",
+        "description": "婴幼儿及成人乳粉等营养业务"
+      },
+      {
+        "title": "冷饮与奶酪",
+        "description": "冷链食品、冰淇淋和奶酪产品"
+      },
+      {
+        "title": "食品供应链",
+        "description": "原奶采购、生产加工与销售网络"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "food-engineering",
+      "chemical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "marketing",
+      "supply-chain"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.yili.com/pages/",
+    "productSource": "https://www.yili.com/pages/",
+    "website": "https://www.yili.com",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "photoSourcePage": "https://www.yili.com/pages/",
+    "photoSourceLabel": "查看官方网站（图片尚待核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "first_party_or_corporate_disclosure_summary",
+    "industry": "液态奶、奶粉、酸奶、奶酪与冷饮食品",
+    "sourceEvidence": [
+      {
+        "url": "https://www.yili.com/pages/",
+        "type": "company_official_profile",
+        "verifiedAt": "2026-10-23"
+      }
+    ]
+  },
+  "农业银行": {
+    "displayName": "农业银行",
+    "subtitle": "三农普惠、公司零售银行与金融市场业务",
+    "summary": "中国农业银行股份有限公司的历史可追溯至1951年的农业合作银行，在1979年恢复设立后经历了专业银行和国有商业银行等发展阶段，2009年整体改制为股份有限公司，2010年在上海和香港上市，A股代码601288。官方介绍突出服务乡村振兴和服务实体经济的",
+    "description": [
+      "中国农业银行股份有限公司的历史可追溯至1951年的农业合作银行，在1979年恢复设立后经历了专业银行和国有商业银行等发展阶段，2009年整体改制为股份有限公司，2010年在上海和香港上市，A股代码601288。官方介绍突出服务乡村振兴和服务实体经济的定位，并拥有覆盖城乡的分支机构网络。",
+      "农业银行官网明确列出公司金融与零售金融服务，包括企业融资、账户结算、个人储蓄、银行卡和财富管理。其业务范围还包含金融市场、资产管理、投资银行以及基金、金融租赁和保险等持牌业务。银行各项业务所需的风险、法务、运营和客户服务能力有不同分工。",
+      "农行的鲜明特色在于面向县域和农业产业链的金融服务，围绕农业经营主体、农村居民、小微企业、绿色金融与数字经营提供不同产品。与城市商业银行相比，县域网点、农业供应链及区域风险识别构成其不同的经营实践场景；同时需要大型支付结算、账户及安全系统支撑。",
+      "金融、经济、会计专业可了解信贷审查、经营分析与财富管理；法学与风险合规关联；数据、计算机和软件专业则可研究数字渠道、模型与银行基础设施；农业经济及相关专业可以理解县域行业客户需求。这是专业与业务方向的对应，不等于该银行正在招聘。"
+    ],
+    "business": [
+      {
+        "title": "三农及县域金融",
+        "description": "农村经营主体、普惠金融和农业产业链服务"
+      },
+      {
+        "title": "公司金融",
+        "description": "企业存贷、结算与供应链融资"
+      },
+      {
+        "title": "零售金融",
+        "description": "储蓄、个人信贷和财富服务"
+      },
+      {
+        "title": "金融市场与科技",
+        "description": "资金业务、资产管理和数字系统"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "finance",
+      "economics",
+      "accounting",
+      "law",
+      "computer-science",
+      "software-engineering",
+      "data-science"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.abchina.com.cn/cn/AboutABC/nhfm/nhjj/",
+    "productSource": "https://www.abchina.com.cn/cn/AboutABC/nhfm/nhjj/",
+    "website": "https://www.abchina.com.cn",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "photoSourcePage": "https://www.abchina.com.cn/cn/AboutABC/nhfm/nhjj/",
+    "photoSourceLabel": "查看官方网站（图片尚待核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "first_party_or_corporate_disclosure_summary",
+    "industry": "三农普惠、公司零售银行与金融市场业务",
+    "sourceEvidence": [
+      {
+        "url": "https://www.abchina.com.cn/cn/AboutABC/nhfm/nhjj/",
+        "type": "company_official_profile",
+        "verifiedAt": "2026-10-23"
+      }
+    ]
+  },
+  "建设银行": {
+    "displayName": "建设银行",
+    "subtitle": "住房金融、公司银行、零售与资金资管",
+    "summary": "中国建设银行股份有限公司的前身中国人民建设银行成立于1954年，总部位于北京，2005年在香港上市、2007年在上海证券交易所上市，A股代码601939。建设银行官网将其定位为综合性金融服务提供商，业务范围从早期建设金融逐渐扩展至公司、个人与资金资管",
+    "description": [
+      "中国建设银行股份有限公司的前身中国人民建设银行成立于1954年，总部位于北京，2005年在香港上市、2007年在上海证券交易所上市，A股代码601939。建设银行官网将其定位为综合性金融服务提供商，业务范围从早期建设金融逐渐扩展至公司、个人与资金资管等领域。",
+      "建设银行经营公司金融、个人金融和资金资管等业务，产品包括企业贷款、账户结算、支付、个人住房及消费金融、银行卡与财富服务。官网还明确披露其在基金、金融租赁、信托、保险、期货和投资银行等领域设有业务公司。这些机构具有独立合规和招聘主体，应与母银行区分。",
+      "住房租赁、普惠金融、金融科技等方向在建行的公开策略中占有位置。这类金融服务不仅依赖前台网点，还需要信贷模型、风险识别、支付基础设施、客户数据安全和运营流程设计。大型银行同时拥有多地区分行与总行专业团队，岗位对工作城市和经验的要求差异很大。",
+      "金融、会计、经济及法律专业可研究银行资产负债、授信审批、财务报表与合规监管；计算机、软件工程和数据科学可了解核心银行系统、信息安全及线上金融产品。专业匹配仅用于帮助用户理解业务，实际岗位按雇主公告为准。"
+    ],
+    "business": [
+      {
+        "title": "公司金融",
+        "description": "企业信贷、结算与综合客户服务"
+      },
+      {
+        "title": "个人与住房金融",
+        "description": "储蓄、信贷、住房租赁与财富管理"
+      },
+      {
+        "title": "资金资管",
+        "description": "资金市场及专业资产管理服务"
+      },
+      {
+        "title": "金融科技",
+        "description": "数字化银行、数据安全与支付系统"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "finance",
+      "accounting",
+      "economics",
+      "law",
+      "computer-science",
+      "software-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.ccb.cn/cn/investor/survey.html",
+    "productSource": "https://www.ccb.cn/cn/investor/survey.html",
+    "website": "https://www.ccb.cn",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "photoSourcePage": "https://www.ccb.cn/cn/investor/survey.html",
+    "photoSourceLabel": "查看官方网站（图片尚待核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "first_party_or_corporate_disclosure_summary",
+    "industry": "住房金融、公司银行、零售与资金资管",
+    "sourceEvidence": [
+      {
+        "url": "https://www.ccb.cn/cn/investor/survey.html",
+        "type": "company_official_profile",
+        "verifiedAt": "2026-10-23"
+      }
+    ]
+  },
+  "中国银行": {
+    "displayName": "中国银行",
+    "subtitle": "商业银行、国际结算及跨境综合金融",
+    "summary": "中国银行股份有限公司是具有悠久历史的商业银行，A股证券代码601988，业务网络覆盖中国境内及多个境外市场。银行官网介绍公司金融、个人金融、金融市场和跨境服务等经营体系，并披露与国际金融市场及人民币结算有关的全球机构布局。",
+    "description": [
+      "中国银行股份有限公司是具有悠久历史的商业银行，A股证券代码601988，业务网络覆盖中国境内及多个境外市场。银行官网介绍公司金融、个人金融、金融市场和跨境服务等经营体系，并披露与国际金融市场及人民币结算有关的全球机构布局。",
+      "中国银行的对公服务涵盖企业存贷款、跨境收付、结算与贸易金融，个人业务包含账户、储蓄、消费金融与财富服务；金融市场业务则涉及投资交易与机构客户服务。其综合金融集团还在投资银行、证券、保险、基金、资产管理、航空租赁及金融科技等领域拥有持牌经营实体。",
+      "中国银行与境外市场联系紧密，不同区域的金融监管、币种结算、外汇风险管理和反洗钱要求使其产品与国内单一币种银行业务有明显差异。国际银行岗位需要协调支付网络、法规、系统稳定性和跨境客户服务；技术部门则承担线上支付、风险监测及全球业务系统支撑。",
+      "金融、经济、会计、国际贸易与法学可分别探索跨境结算、企业授信、财务与合规；计算机、软件和数据科学相关方向可研究交易系统、跨境支付网络及安全风控。海外分行和国内分行的用人主体、签证条件及具体职位须分别核验。"
+    ],
+    "business": [
+      {
+        "title": "公司银行",
+        "description": "贸易金融、企业融资和跨境结算"
+      },
+      {
+        "title": "个人金融",
+        "description": "银行卡、个人信贷与财富产品"
+      },
+      {
+        "title": "金融市场",
+        "description": "外汇、资金业务与机构服务"
+      },
+      {
+        "title": "国际综合金融",
+        "description": "全球结算、跨境金融及专业附属机构"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "finance",
+      "economics",
+      "accounting",
+      "law",
+      "international-trade",
+      "computer-science"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.boc.cn/aboutboc/ab1/200809/t20080901_985.html",
+    "productSource": "https://www.boc.cn/aboutboc/ab1/200809/t20080901_985.html",
+    "website": "https://www.boc.cn",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "photoSourcePage": "https://www.boc.cn/aboutboc/ab1/200809/t20080901_985.html",
+    "photoSourceLabel": "查看官方网站（图片尚待核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "first_party_or_corporate_disclosure_summary",
+    "industry": "商业银行、国际结算及跨境综合金融",
+    "sourceEvidence": [
+      {
+        "url": "https://www.boc.cn/aboutboc/ab1/200809/t20080901_985.html",
+        "type": "company_official_profile",
+        "verifiedAt": "2026-10-23"
+      }
+    ]
+  },
+  "中国移动": {
+    "displayName": "中国移动",
+    "subtitle": "移动通信、宽带网络、云与算力",
+    "summary": "中国移动有限公司的A股简称为中国移动，证券代码600941。中国移动通信集团有限公司于2000年根据电信体制改革组建，2022年其主营业务上市主体回归A股。集团介绍与上市公司的经营范围、境内外控股子公司需要分别核对，HHBA不能将集团不同地区分支的招",
+    "description": [
+      "中国移动有限公司的A股简称为中国移动，证券代码600941。中国移动通信集团有限公司于2000年根据电信体制改革组建，2022年其主营业务上市主体回归A股。集团介绍与上市公司的经营范围、境内外控股子公司需要分别核对，HHBA不能将集团不同地区分支的招聘合并为上市主体统一岗位。",
+      "中国移动面向个人和政企客户提供移动通信、宽带连接、数据中心和算力相关服务。官网披露其通信网络、算力网络和智能网络协同发展，既提供基本通信连接，也持续推进5G、千兆宽带、云平台、人工智能与算网调度等新技术基础设施。",
+      "运营商产品建设离不开无线网络规划、基站工程、核心网与光传输、网络运行维护以及大型客户服务系统。算力和云业务又涉及服务器、网络、安全、数据、软件平台与云产品工程。集团内部的区域公司、专业公司承担不同市场任务，通信工程与软件工程的实际岗位职责差别明显。",
+      "通信工程、电子信息、计算机与软件专业可了解无线网络、云计算和平台研发；网络安全与数据科学方向可研究安全与智能运维；工商管理和营销方向则可研究政企产品、渠道与客户运营。具体招聘信息应根据省公司和专业公司的独立公告确认。"
+    ],
+    "business": [
+      {
+        "title": "通信网络",
+        "description": "移动网络、宽带及基础连接服务"
+      },
+      {
+        "title": "云与算力",
+        "description": "云平台、数据中心和算网技术"
+      },
+      {
+        "title": "网络运营",
+        "description": "工程建设、网管与安全运维"
+      },
+      {
+        "title": "政企数字化",
+        "description": "产业客户通信及信息化解决方案"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "communications",
+      "electronic-information",
+      "computer-science",
+      "software-engineering",
+      "information-security",
+      "data-science"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.10086.cn/aboutus/jtgk/",
+    "productSource": "https://www.10086.cn/aboutus/jtgk/",
+    "website": "https://www.10086.cn",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "photoSourcePage": "https://www.10086.cn/aboutus/jtgk/",
+    "photoSourceLabel": "查看官方网站（图片尚待核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "first_party_or_corporate_disclosure_summary",
+    "industry": "移动通信、宽带网络、云与算力",
+    "sourceEvidence": [
+      {
+        "url": "https://www.10086.cn/aboutus/jtgk/",
+        "type": "company_official_profile",
+        "verifiedAt": "2026-10-23"
+      }
+    ]
+  },
+  "中国电信": {
+    "displayName": "中国电信",
+    "subtitle": "宽带通信、天翼云与产业数字化",
+    "summary": "中国电信股份有限公司是中国电信集团的重要上市电信经营主体，A股证券代码601728。与母集团及旗下不同专业公司一样，上市主体的法律关系和招聘入口必须按实际披露核对。其业务服务对象包括个人用户、家庭客户与政企机构，覆盖通信和数字化基础设施。",
+    "description": [
+      "中国电信股份有限公司是中国电信集团的重要上市电信经营主体，A股证券代码601728。与母集团及旗下不同专业公司一样，上市主体的法律关系和招聘入口必须按实际披露核对。其业务服务对象包括个人用户、家庭客户与政企机构，覆盖通信和数字化基础设施。",
+      "中国电信集团公开的2026年中期业务信息显示，企业经营围绕通信连接、云计算、算力、人工智能与行业数字化展开。宽带与移动网络不仅包括用户接入，还涵盖网络容量、传输、核心网、故障恢复和安全运营；云服务及平台业务又要求计算资源调度与大型系统稳定性。",
+      "数字化转型相关业务会涉及面向企业的数据中心、云基础设施、网络安全与智能化服务。不同团队需要通信协议、网络工程、软件平台、硬件设备、客户解决方案和产品运营等专业能力。集团或省级公司发布的公开材料不能自动被认作上市公司本部某个具体岗位公告。",
+      "通信工程、电子信息、计算机和软件工程可关注网络、云平台及研发体系；信息安全与数据科学背景可研究网安、运维自动化和智能应用；市场营销与管理专业则关联政企业务、产品方案与客户服务。是否正在招聘应以独立招聘页面为准。"
+    ],
+    "business": [
+      {
+        "title": "通信接入",
+        "description": "移动网络、宽带及基础电信服务"
+      },
+      {
+        "title": "云计算",
+        "description": "天翼云、计算平台和算力服务"
+      },
+      {
+        "title": "产业数字化",
+        "description": "企业网络、系统方案与数据服务"
+      },
+      {
+        "title": "网络安全",
+        "description": "安全运营、智能运维和网络保障"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "communications",
+      "electronic-information",
+      "computer-science",
+      "software-engineering",
+      "information-security",
+      "data-science"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://wap.sasac.gov.cn/n2588025/n2588124/c35808638/content.html",
+    "productSource": "https://wap.sasac.gov.cn/n2588025/n2588124/c35808638/content.html",
+    "website": "https://www.chinatelecom.com.cn",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "photoSourcePage": "https://wap.sasac.gov.cn/n2588025/n2588124/c35808638/content.html",
+    "photoSourceLabel": "查看官方网站（图片尚待核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "first_party_or_corporate_disclosure_summary",
+    "industry": "宽带通信、天翼云与产业数字化",
+    "sourceEvidence": [
+      {
+        "url": "https://wap.sasac.gov.cn/n2588025/n2588124/c35808638/content.html",
+        "type": "issuer_group_public_disclosure",
+        "verifiedAt": "2026-10-23"
+      }
+    ]
   }
 }
