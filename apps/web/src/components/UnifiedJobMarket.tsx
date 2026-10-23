@@ -207,7 +207,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       <h2 id="unified-market-title">{lang==='zh'?'招聘市场':'Job market'}</h2>
       <p>{officialThree?(lang==='zh'?'OpenAI、Anthropic、SpaceX 官方公开招聘 · 只展示本次从招聘系统核验到的职位，随时可能变化':'OpenAI, Anthropic and SpaceX public ATS listings · Verified at latest sync'):domesticOnly?(lang==='zh'?'国内历史招聘岗位静态测试 · 岗位状态以企业官网为准':'Historical China listings preview · Check employer for availability'):lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
       <LanguageSwitcher lang={lang} change={change}/></div>
-    {!compact&&controls}
+    {controls}
     {intentLabels.length>0&&<div className="unified-search-interpreted">
       {lang==='zh'?'搜索条件已识别：':'Recognized filters: '}{intentLabels.join(' · ')}
       {filters.company&&<button className="unified-company-filter-clear" type="button"
