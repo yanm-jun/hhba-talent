@@ -1137,7 +1137,7 @@
     "productSource": "https://boe.com",
     "brandImage": "https://boe.com/nuxt/resouces/img/logo.8bcbfe7.png",
     "brandImageSource": "https://boe.com/",
-    "brandAssetStatus": "official_website_logo_candidate",
+    "brandAssetStatus": "official_logo_visually_verified",
     "photos": [
       {
         "url": "https://boe-official01.oss-cn-beijing.aliyuncs.com/jpg/list011606287766299boe.jpg",
@@ -1167,7 +1167,8 @@
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
     "extraBusinessEvidenceUrl": "https://www.boe.com/about/index",
     "brandLocalPath": "domestic-media/ef46316c30c0d3d-website-brand-candidate.png",
-    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
+    "brandIdentityEvidence": "实际查看GitHub本地保存的PNG文件并与所属企业官网来源对应：BOE（京东方）白色透明背景页眉品牌字标，深灰背景视觉核对后确认为BOE企业字标。不是favicon、外部赞助商标或装饰图片。",
+    "brandVerifiedAt": "2026-10-23"
   },
   "歌尔股份": {
     "displayName": "歌尔股份",
@@ -1214,7 +1215,7 @@
     "productSource": "https://goertek.com",
     "brandImage": "https://goertek.com/images/logo.png",
     "brandImageSource": "https://goertek.com/",
-    "brandAssetStatus": "official_website_logo_candidate",
+    "brandAssetStatus": "official_logo_visually_verified",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
@@ -1234,7 +1235,8 @@
     "recruitmentEntity": "歌尔股份",
     "extraBusinessEvidenceUrl": "https://www.goertek.com/join/recruitcategory144.html",
     "brandLocalPath": "domestic-media/f369cdb6bcf3967-website-brand-candidate.png",
-    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
+    "brandIdentityEvidence": "实际查看GitHub本地保存的PNG文件并与所属企业官网来源对应：Goertek（歌尔）白色透明背景官方页眉品牌字标，深灰背景核对后确认为Goertek。不是favicon、外部赞助商标或装饰图片。",
+    "brandVerifiedAt": "2026-10-23"
   },
   "中兴通讯": {
     "displayName": "中兴通讯",
