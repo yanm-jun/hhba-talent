@@ -148,7 +148,7 @@ try{
  assert.equal(await desktop.locator('.domestic-major-tag').count(),8);
  assert((await desktop.locator('.domestic-editorial-body').innerText()).length>200);
  await desktop.getByText('上海市嘉定区叶城路767号').first().waitFor();
- assert.equal(await desktop.locator('.domestic-official-photo').count(),2);
+ assert((await desktop.locator('.domestic-official-photo').count())>=2,'Official employer photo gallery must preserve verified images and allow new factory images');
  assert.equal(await desktop.locator('.domestic-careers-link[href="https://www.hascovision.com/join-us"]').count(),1);
  assert.equal(await desktop.locator('.domestic-profile-relations details[open]').count(),0,
   'Company relations must be collapsed by default');
