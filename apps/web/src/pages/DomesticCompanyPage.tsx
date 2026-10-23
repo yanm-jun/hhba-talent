@@ -76,7 +76,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
     {article?.photos?.some((_,i)=>media?.photos?.[i]?.state==='ready')?<section className="domestic-editorial-section domestic-editorial-photos" aria-label="企业真实图片">
       <h2>企业与产品实景</h2>
       <div className="domestic-editorial-photo-grid">
-       {article.photos.filter((_,i)=>media?.photos?.[i]?.state==='ready').map(photo=><figure key={photo.url} className="domestic-official-photo">
+       {article!.photos!.filter((_,i)=>media?.photos?.[i]?.state==='ready').map(photo=><figure key={photo.url} className="domestic-official-photo">
         <a href={photo.source} target="_blank" rel="noopener noreferrer" aria-label={'查看'+photo.label+'的来源'}>
          <img src={import.meta.env.BASE_URL+media!.photos![article.photos!.indexOf(photo)].path} loading="lazy" alt={photo.label} onError={e=>{e.currentTarget.style.display='none';e.currentTarget.parentElement?.classList.add('domestic-photo-unavailable')}}/>
          <span className="domestic-photo-fallback"><Images size={18}/>点击查看官网图片</span>
