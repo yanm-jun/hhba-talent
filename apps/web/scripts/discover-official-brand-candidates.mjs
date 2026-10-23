@@ -39,7 +39,7 @@ await Promise.all(Array.from({length:5},async()=>{
    const html=(await r.text()).slice(0,180000);
    let options=[];
    for(const match of html.matchAll(/<img\b[^>]*>/gi)){
-    const tag=match[0],raw=htmlAttr(tag,'src')||htmlAttr(tag,'data-src')||htmlAttr(tag,'data-original');
+    const tag=match[0],raw=htmlAttr(tag,'data-original')||htmlAttr(tag,'data-src')||htmlAttr(tag,'data-lazy-src')||htmlAttr(tag,'src')||htmlAttr(tag,'srcset').split(',')[0]?.trim().split(/\s+/)[0];
     const alt=htmlAttr(tag,'alt'),cls=htmlAttr(tag,'class'),id=htmlAttr(tag,'id');
     if(!raw||raw.startsWith('data:')||raw.startsWith('blob:'))continue;
     let absolute;try{absolute=new URL(raw,url)}catch{continue}
