@@ -104,8 +104,8 @@ test('expanded career profiles have authentic image provenance and no asserted l
   assert(p[name].brandImage&&p[name].brandImage.startsWith('https://'),name+' missing verifiable brand image URL');
   assert(p[name].brandImageSource||p[name].imageSource,name+' missing image provenance');
  }
- assert.equal(p['雷赛智能'].careersUrl,'https://www.leisai.com/recruitment/index.html');
- assert.equal(p['英威腾'].careersUrl,'https://www.invt.com.cn/careers');
+ assert.equal(p['雷赛智能'].careersUrl,'','Unverifiable recruiting endpoint must not be shown');
+ assert.equal(p['英威腾'].careersUrl,'','Unverifiable recruiting endpoint must not be shown');
  assert.equal(p['思源电气'].careersUrl,'https://www.sieyuan.com/join');
  assert.equal(p['正泰电器'].careersUrl,'');
 });
