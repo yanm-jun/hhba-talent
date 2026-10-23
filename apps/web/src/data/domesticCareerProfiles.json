@@ -150,7 +150,10 @@
     "subIndustry": "汽车零部件系统 · 智能制造 · 新能源",
     "industryEvidenceUrl": "https://www.hasco-group.com/about/company.html/1000",
     "industry": "汽车与零部件",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "brandVerifiedAt": "2026-10-23",
+    "brandIdentityEvidence": "已检查下载的实际图像：主体标记清晰可辨（华域汽车），并核对该候选图对应的企业官网/官方页面来源；非favicon、非第三方合作品牌或装饰图片。正式视觉核验日期 2026-10-23。"
   },
   "上汽集团": {
     "displayName": "上汽集团",
@@ -197,7 +200,6 @@
     "careersLabel": "上汽集团统一招聘系统",
     "officialSource": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
     "productSource": "https://www.saicmotor.com/chinese/gsgk/qyml/index.shtml",
-    "brandImage": "https://www.saicmotor.com/chinese/images/logos/2025/1.png",
     "photos": [
       {
         "url": "https://www.saicmotor.com/chinese/images/xwzx/mtbd/2025/2025/4/9/9A7452D93ABC496D97C8725C5A980401.jpg",
@@ -209,7 +211,6 @@
     ],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
-    "brandImageSource": "https://www.saicmotor.com/",
     "photoSourcePage": "https://www.saicmotor.com/chinese/xwzx/mtbd/2025/61304.shtml",
     "photoSourceLabel": "查看上汽集团官网的企业建筑图片原文",
     "recruitmentEvidenceUrl": "https://saic-recruit.saicmotor.com/",
@@ -221,9 +222,8 @@
     "industryEvidenceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
     "industry": "汽车与零部件",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
-    "brandLocalPath": "domestic-media/a07a4a962c51878-website-brand-candidate.png",
-    "brandAssetStatus": "official_website_logo_candidate",
-    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
+    "brandAssetStatus": "pending_official_logo",
+    "brandReviewNote": "2026-10-23 图像逐项视觉审查：原 saicmotor.com/chinese/images/logos/2025/1.png 实际展示荣威 ROEWE 品牌，不是上汽集团企业 Logo。已停止用该图片冒充集团标识。"
   },
   "汇川技术": {
     "displayName": "汇川技术",
@@ -353,8 +353,9 @@
     "industry": "工业自动化与工业装备",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
     "brandLocalPath": "domestic-media/159d05469a676ad-website-brand-candidate.png",
-    "brandAssetStatus": "official_website_logo_candidate",
-    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
+    "brandAssetStatus": "official_logo_visually_verified",
+    "brandIdentityEvidence": "已检查下载的实际图像：主体标记清晰可辨（中国中车），并核对该候选图对应的企业官网/官方页面来源；非favicon、非第三方合作品牌或装饰图片。正式视觉核验日期 2026-10-23。",
+    "brandVerifiedAt": "2026-10-23"
   },
   "美的集团": {
     "displayName": "美的集团",
@@ -408,7 +409,10 @@
     "subIndustry": "智能家居 · 工业技术 · 机器人自动化",
     "industryEvidenceUrl": "https://www.midea.com.cn/zh/about-midea?wcmmode=disabled",
     "industry": "家电与智慧家居",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "brandVerifiedAt": "2026-10-23",
+    "brandIdentityEvidence": "已检查下载的实际图像：主体标记清晰可辨（美的集团），并核对该候选图对应的企业官网/官方页面来源；非favicon、非第三方合作品牌或装饰图片。正式视觉核验日期 2026-10-23。"
   },
   "雷赛智能": {
     "displayName": "雷赛智能",
@@ -479,8 +483,9 @@
     "recruitmentVerifiedAt": "2026-10-23",
     "recruitmentEntity": "雷赛智能",
     "brandLocalPath": "domestic-media/99b6396dc634834-website-brand-candidate.png",
-    "brandAssetStatus": "official_website_logo_candidate",
-    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
+    "brandAssetStatus": "official_logo_visually_verified",
+    "brandIdentityEvidence": "已检查下载的实际图像：主体标记清晰可辨（雷赛智能），并核对该候选图对应的企业官网/官方页面来源；非favicon、非第三方合作品牌或装饰图片。正式视觉核验日期 2026-10-23。",
+    "brandVerifiedAt": "2026-10-23"
   },
   "正泰电器": {
     "displayName": "正泰电器",
@@ -607,8 +612,9 @@
     "recruitmentVerifiedAt": "2026-10-23",
     "recruitmentEntity": "英威腾",
     "brandLocalPath": "domestic-media/14107a82c4f0575-website-brand-candidate.png",
-    "brandAssetStatus": "official_website_logo_candidate",
-    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
+    "brandAssetStatus": "official_logo_visually_verified",
+    "brandIdentityEvidence": "已检查下载的实际图像：主体标记清晰可辨（英威腾），并核对该候选图对应的企业官网/官方页面来源；非favicon、非第三方合作品牌或装饰图片。正式视觉核验日期 2026-10-23。",
+    "brandVerifiedAt": "2026-10-23"
   },
   "思源电气": {
     "displayName": "思源电气",
@@ -1275,7 +1281,7 @@
     "productSource": "https://zte.com.cn",
     "brandImage": "https://zte.com.cn/content/dam/zte-site/res-www-zte-com-cn/navigator/global/main/img/logo-en.png",
     "brandImageSource": "https://zte.com.cn/",
-    "brandAssetStatus": "official_website_logo_candidate",
+    "brandAssetStatus": "official_logo_visually_verified",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
@@ -1292,7 +1298,8 @@
     "industryEvidenceUrl": "https://www.zte.com.cn/china/about/investorrelations.html",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
     "brandLocalPath": "domestic-media/797301040f88850-website-brand-candidate.png",
-    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
+    "brandIdentityEvidence": "已检查下载的实际图像：主体标记清晰可辨（中兴通讯），并核对该候选图对应的企业官网/官方页面来源；非favicon、非第三方合作品牌或装饰图片。正式视觉核验日期 2026-10-23。",
+    "brandVerifiedAt": "2026-10-23"
   },
   "科大讯飞": {
     "displayName": "科大讯飞",
@@ -2984,7 +2991,7 @@
     "productSource": "https://www.bydglobal.com/cn/about.html",
     "website": "https://www.bydglobal.com/cn",
     "brandImage": "https://www.bydglobal.com/material/group-official-website/common/logo.png",
-    "brandAssetStatus": "official_website_logo_candidate",
+    "brandAssetStatus": "official_logo_visually_verified",
     "brandImageSource": "https://www.bydglobal.com/",
     "photos": [
       {
@@ -3017,7 +3024,8 @@
     "industryEvidenceUrl": "https://www.bydglobal.com/cn/about.html",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
     "brandLocalPath": "domestic-media/c580a626b8f7287-website-brand-candidate.png",
-    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
+    "brandIdentityEvidence": "已检查下载的实际图像：主体标记清晰可辨（比亚迪），并核对该候选图对应的企业官网/官方页面来源；非favicon、非第三方合作品牌或装饰图片。正式视觉核验日期 2026-10-23。",
+    "brandVerifiedAt": "2026-10-23"
   },
   "中国平安": {
     "displayName": "中国平安",
@@ -3397,7 +3405,7 @@
     "productSource": "https://www.haday.com/about.html",
     "website": "https://www.haday.com",
     "brandImage": "https://static.haday.com/zh-cn/img/logo.png",
-    "brandAssetStatus": "official_website_logo_candidate",
+    "brandAssetStatus": "official_logo_visually_verified",
     "brandImageSource": "https://www.haday.com/",
     "photos": [],
     "photoSourcePage": "https://www.haday.com/about.html",
@@ -3421,7 +3429,8 @@
     "industryEvidenceUrl": "https://www.haday.com/about.html",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
     "brandLocalPath": "domestic-media/47c958dedacd8cd-website-brand-candidate.png",
-    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
+    "brandIdentityEvidence": "已检查下载的实际图像：主体标记清晰可辨（海天味业），并核对该候选图对应的企业官网/官方页面来源；非favicon、非第三方合作品牌或装饰图片。正式视觉核验日期 2026-10-23。",
+    "brandVerifiedAt": "2026-10-23"
   },
   "中国建筑": {
     "displayName": "中国建筑",
