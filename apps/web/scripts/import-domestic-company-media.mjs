@@ -20,7 +20,7 @@ const allowedExt=/\.(png|jpe?g|webp|gif)$/i;
 function kindOf(filename){
  const stem=filename.replace(allowedExt,'');
  if(/^(logo|brand|公司logo|企业logo|品牌logo|品牌图|企业标志|公司标志|商标)/i.test(stem))return 'logo';
- if(/总部|大楼|总部大厦|园区|楼宇|总部建筑|总部外景/.test(stem))return 'headquarters';
+ if(/^(?:headquarters?|hq)(?:[-_\d]|$)|总部|大楼|总部大厦|园区|楼宇|总部建筑|总部外景/i.test(stem))return 'headquarters';
  if(/office|办公|会议室|研发中心|工作环境/i.test(stem))return 'office';
  if(/factory|工厂|车间|生产线|制造基地/i.test(stem))return 'factory';
  if(/product|产品|设备图片/i.test(stem))return 'product';
