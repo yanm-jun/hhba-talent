@@ -190,12 +190,20 @@
     "officialSource": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
     "productSource": "https://www.saicmotor.com/chinese/gsgk/qyml/index.shtml",
     "brandImage": "https://commons.wikimedia.org/wiki/Special:Redirect/file/SAICMotor_logo.png",
-    "photos": [],
+    "photos": [
+      {
+        "url": "https://www.saicmotor.com/chinese/images/xwzx/mtbd/2025/2025/4/9/9A7452D93ABC496D97C8725C5A980401.jpg",
+        "label": "上汽集团官网发布的企业大楼外立面与上汽集团标识",
+        "kind": "office",
+        "source": "https://www.saicmotor.com/chinese/xwzx/mtbd/2025/61304.shtml",
+        "verification": "image_shown_on_official_company_article_pending_reuse_clearance"
+      }
+    ],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
     "brandImageSource": "https://commons.wikimedia.org/wiki/File:SAICMotor_logo.png",
-    "photoSourcePage": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "photoSourcePage": "https://www.saicmotor.com/chinese/xwzx/mtbd/2025/61304.shtml",
+    "photoSourceLabel": "查看上汽集团官网的企业建筑图片原文",
     "recruitmentEvidenceUrl": "https://saic-recruit.saicmotor.com/",
     "recruitmentVerifiedAt": "2026-10-23",
     "recruitmentStatus": "normal",
