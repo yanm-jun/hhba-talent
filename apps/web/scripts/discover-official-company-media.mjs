@@ -42,6 +42,7 @@ for(const [name,p] of Object.entries(profiles)){
   const host=link.hostname.replace(/^www\\./,'');
   sources.push({name,page:link.href,host:[host,'www.'+host,link.hostname],
    rules:sceneDescriptors.map(x=>({match:x.regex,kind:x.kind,label:x.label}))});
+  break; // One source per employer; avoid overwriting its published evidence.
  }
 }
 
@@ -62,7 +63,10 @@ async function get(url,ms=11000){
  if(!res.ok)throw Error('HTTP '+res.status);
  return res;
 }
-for(const source of sources){
+let nextSource=0;
+await Promise.all(Array.from({length:Math.min(5,sources.length)},async()=>{
+ while(nextSource<sources.length){
+ const source=sources[nextSource++];
  const entry={sourcePage:source.page,candidates:[],published:[],status:'pending'};
  result.entries[source.name]=entry;
  if(!profiles[source.name]){entry.status='no_profile';continue}
@@ -106,7 +110,8 @@ for(const source of sources){
   }
   entry.status=entry.published.length?'official_page_caption_assets_found':'no_approved_download';
  }catch(e){entry.status='source_inaccessible';result.warnings.push(source.name+':'+String(e).slice(0,140))}
-}
+ }
+}));
 for(const [name,group] of Object.entries(result.entries)){
  const profile=profiles[name];if(!profile)continue;
  const existing=new Set((profile.photos||[]).map(p=>p.url));
