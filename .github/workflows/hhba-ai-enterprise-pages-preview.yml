@@ -4,6 +4,9 @@ on:
     branches: [feat/ai-company-search-phase1-20261023]
     paths:
       - '.github/workflows/hhba-ai-enterprise-pages-preview.yml'
+      - 'apps/web/scripts/ai-company-preview-smoke.mjs'
+      - 'apps/web/src/components/AICompanySearch.tsx'
+      - 'apps/web/src/styles/ai-company-search.css'
   workflow_dispatch:
 permissions:
   contents: read
