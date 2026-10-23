@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-23T13:21:05.237Z",
+  "generatedAt": "2026-10-23T13:34:51.356Z",
   "companies": {
     "华域视觉科技（上海）有限公司": {
       "brand": {
@@ -354,7 +354,7 @@
           "path": "domestic-media/e6af94e4ba9ae8bfaa-official-caption-0.jpg",
           "source": "https://www.bydglobal.com/material/group-official-website/cn/about/pinpai.jpg",
           "sourcePage": "https://www.bydglobal.com/cn/about.html",
-          "classification": "official_publisher_caption_not_independently_visual_verified"
+          "classification": "publisher_image_not_independently_visual_verified"
         }
       ]
     },
