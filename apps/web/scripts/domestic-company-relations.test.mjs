@@ -46,7 +46,7 @@ test('child cards remain within HHBA before external careers links',()=>{
  assert(majorPage.includes('companiesForMajor'));
  assert(majorPage.includes('company.route'));
  const market=readFileSync('src/components/UnifiedJobMarket.tsx','utf8');
- assert(market.includes('<DomesticCompanyResults query={draft}/>'));
+ assert(market.includes('<DomesticCompanyResults query={draft} majorSlug={selectedMajor}'));
 });
 
 test('one Chinese character gives enterprise name suggestions, not broad tags',()=>{
