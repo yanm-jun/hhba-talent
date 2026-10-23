@@ -7,7 +7,7 @@ import { chromium } from 'playwright';
 
 const ROOT = 'http://127.0.0.1:4179/hhba-talent/ai-company-preview/';
 const browserServer = spawn(process.execPath, ['./node_modules/vite/bin/vite.js', 'preview',
-  '--host', '127.0.0.1', '--port', '4179', '--strictPort'], { stdio: 'pipe' });
+  '--host', '127.0.0.1', '--port', '4179', '--strictPort'], { stdio: 'pipe', env: { ...process.env, HHBA_GITHUB_PAGES: '1', HHBA_PAGES_BASE: '/hhba-talent/ai-company-preview/' } });
 let browser;
 let errors = [];
 try {
