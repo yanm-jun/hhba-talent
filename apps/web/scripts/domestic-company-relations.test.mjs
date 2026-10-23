@@ -175,7 +175,7 @@ test('new employer profiles seed missing entities and override weak stock-roster
  assert(matching.includes('prof?.majorSlugs?.length'));
  assert(main.includes('profile-[a-z0-9-]{8,150}'));
  assert(result.includes('BrandMark'));
- assert(result.includes('企业介绍已整理'));
+ assert(result.includes('已核验企业介绍'));
  assert(!result.includes("'完整企业介绍'"),'Do not call incomplete photo profiles complete');
 });
 
