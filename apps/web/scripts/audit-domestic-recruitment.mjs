@@ -76,7 +76,7 @@ test('verified recruitment registry belongs to known exact business identities',
   assert(rec.verifiedOn&&!rec.url.includes('sse.com.cn/assortment'));
   if(rec.url==='https://www.abchina.com.cn'||rec.url==='https://www.abchina.com')assert.fail('Agricultural Bank homepage used as recruiting');
   const u=new URL(rec.url);
-  const officialDedicated=/recruit|career|jobs|job\.|talent|hotjob|zhiye|wejob|campus|maker\./i.test(u.hostname);
+  const officialDedicated=/recruit|career|jobs|job\.|talent|hotjob|zhiye|wejob|campus|maker\.|^zp\./i.test(u.hostname);
   const restrictedPath=/^\/(?:joinus|join\/?|rlzy_new\/rczp\/|aboutboc\/bi4\/|jobList\.html|recruitOut\/ihr\/social|smart_home\/customizedjobs\.html)/i.test(u.pathname);
   assert(officialDedicated||restrictedPath,'Corporate homepage is not a recruiting URL: '+name+' '+rec.url);
  }
