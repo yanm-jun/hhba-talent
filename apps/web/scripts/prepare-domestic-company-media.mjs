@@ -46,10 +46,23 @@ async function download(url,key,maxBytes=2_800_000){
   }
   const bytes=Buffer.concat(parts);const ext=extFor(bytes);
   if(!ext)return {state:'not_supported_image'};
-  const file=key+'.'+ext;
-  writeFileSync(join(directory,file),bytes);
-  stats.files++;stats.bytes+=bytes.length;
-  return {state:'ready',path:'domestic-media/'+file,bytes:bytes.length,source:url};
+  let packed=bytes, finalExt=ext;
+  // Preserve exact-brand logo pixels; reduce large first-party scene photographs
+  // to web-sized WebP so the verified static preview can be versioned in Git.
+  if(key.includes('-photo-')&&['png','jpg','webp'].includes(ext)){
+   try{
+    const {default:sharp}=await import('sharp');
+    packed=await sharp(bytes,{limitInputPixels:35_000_000}).rotate()
+      .resize({width:1200,withoutEnlargement:true})
+      .webp({quality:78,effort:4}).toBuffer();
+    finalExt='webp';
+   }catch{ /* Original magic-header-checked image stays available. */ }
+  }
+  if(packed.length>maxBytes)return {state:'too_large_after_pack'};
+  const file=key+'.'+finalExt;
+  writeFileSync(join(directory,file),packed);
+  stats.files++;stats.bytes+=packed.length;
+  return {state:'ready',path:'domestic-media/'+file,bytes:packed.length,source:url};
  }catch(e){return {state:e?.name==='TimeoutError'?'timeout':'blocked_or_network'};}
 }
 const jobs=[];
