@@ -88,7 +88,8 @@ test('verified recruitment registry belongs to known exact business identities',
     (u.hostname==='unigroup.zhaopin.com'&&u.pathname==='/')||
     (u.hostname==='zhaopin.greeyun.com')||
     (u.hostname==='app.mokahr.com'&&/^\/(?:apply\/dfzq\/?|campus-recruitment\/chint\/)/.test(u.pathname))||
-    (u.hostname==='www.shanghaiairport.com'&&u.pathname.startsWith('/shzp/'));
+    (u.hostname==='www.shanghaiairport.com'&&u.pathname.startsWith('/shzp/'))||
+    (u.hostname==='xjec.com'&&u.pathname==='/contact/campus/');
 
   assert(officialDedicated||restrictedPath||sourceBackedException,'Corporate homepage is not a recruiting URL: '+name+' '+rec.url);
  }
