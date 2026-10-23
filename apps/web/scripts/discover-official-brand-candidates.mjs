@@ -13,9 +13,9 @@ const htmlAttr=(tag,key)=>{
 };
 const svgToPng=async(source)=>{
  const markup=source.toString('utf8');
- if(!/<svg[\\s>]/i.test(markup.slice(0,1000)))throw Error('invalid_svg');
+ if(!/<svg[\s>]/i.test(markup.slice(0,1000)))throw Error('invalid_svg');
  // Fail closed on XML entity expansion, script and remotely referenced content.
- if(/<!DOCTYPE|<!ENTITY|<script\\b|<foreignObject\\b|\\son[a-z]+\\s*=|(?:xlink:)?href\\s*=\\s*["'](?:https?:|data:|javascript:|\\/\\/)/i.test(markup))throw Error('unsafe_svg');
+ if(/<!DOCTYPE|<!ENTITY|<script\b|<foreignObject\b|\son[a-z]+\s*=|(?:xlink:)?href\s*=\s*["'](?:https?:|data:|javascript:|\/\/)/i.test(markup))throw Error('unsafe_svg');
  const {Resvg}=await import('@resvg/resvg-js');
  return Buffer.from(new Resvg(markup,{fitTo:{mode:'width',value:480}}).render().asPng());
 };
@@ -24,7 +24,7 @@ const fileFormat=b=>{
  if(b[0]===0xff&&b[1]===0xd8&&b[2]===0xff)return 'jpg';
  if(b.subarray(0,4).toString()==='RIFF'&&b.subarray(8,12).toString()==='WEBP')return 'webp';
  if(b.subarray(0,3).toString()==='GIF')return 'gif';
- if(/<svg[\\s>]/i.test(b.subarray(0,1200).toString('utf8')))return 'svg';
+ if(/<svg[\s>]/i.test(b.subarray(0,1200).toString('utf8')))return 'svg';
  return '';
 };
 const projects=Object.entries(profiles).filter(([name,p])=>p.brandAssetStatus!=='official_logo_visually_verified')
