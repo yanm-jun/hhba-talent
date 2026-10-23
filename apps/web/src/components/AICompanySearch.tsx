@@ -8,6 +8,22 @@ type Company={id:string;name:string;industry:string;overview:string;route:string
 type Result={id:string;reason:string;directions:string[]};
 type MatchResponse={status:string;recommendations:Result[];notice:string};
 const ENDPOINT=(import.meta.env.VITE_HHBA_COMPANY_MATCH_API_ORIGIN||'').trim().replace(/\/$/,'');
+const STATIC_PREVIEW=import.meta.env.VITE_HHBA_COMPANY_PREVIEW==='1';
+const DEMO_TERMS=['比亚迪','上汽','宁德时代','OpenAI','Anthropic','SpaceX','汽车','人工智能','航空','航天','金融','支付','云计算','网络安全','能源','制造','电商','软件','教育'];
+function localCatalogMatches(input:string):Company[]{
+  const q=normalize(input);
+  if(q.length<2)return [];
+  // Only an evidence-backed keyword demonstration, never employment eligibility scoring.
+  const words=DEMO_TERMS.filter(t=>q.includes(normalize(t)));
+  if(words.length===0)words.push(q);
+  return candidates.map(company=>{
+    const text=normalize([company.name,company.industry,company.overview].join(' '));
+    const title=normalize(company.name);
+    const score=words.reduce((n,word)=>n+(title.includes(normalize(word))?3:text.includes(normalize(word))?1:0),0);
+    return {company,score};
+  }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score||a.company.name.localeCompare(b.company.name,'zh-CN'))
+  .slice(0,12).map(x=>x.company);
+}
 function endpoint(){
   if(!ENDPOINT)return '';
   try {const url=new URL(ENDPOINT);return url.protocol==='https:'&&!url.username&&!url.password&&!url.search&&!url.hash&&!url.pathname.replace(/\//g,'')?url.origin:'';}
@@ -27,7 +43,8 @@ export function AICompanySearch(){
  const [error,setError]=useState('');
  const [results,setResults]=useState<Result[]|null>(null);
  const [browse,setBrowse]=useState('');
- const api=endpoint();
+ const [localResults,setLocalResults]=useState<Company[]|null>(null);
+ const api=STATIC_PREVIEW?'':endpoint();
  useEffect(()=>{
   if(!api){setStatus('disabled');return;}
   const ctrl=new AbortController();
@@ -60,14 +77,28 @@ export function AICompanySearch(){
  return <section className="ai-company-search" aria-labelledby="ai-company-title">
   <header><div><small>HHBA · AI COMPANY DISCOVERY</small><h2 id="ai-company-title">智能找企业</h2>
    <p>描述你的专业、学历、工作经历和求职方向，优先匹配企业，而不是只搜索岗位名称。</p></div>
-   <span className="ai-company-status"><BrainCircuit size={15}/>{status==='ready'?'AI 试用可用':status==='checking'?'正在检查服务':'AI 尚未启用'}</span></header>
+   <span className="ai-company-status"><BrainCircuit size={15}/>{STATIC_PREVIEW?'页面预览 · AI 未接入':status==='ready'?'AI 试用可用':status==='checking'?'正在检查服务':'AI 尚未启用'}</span></header>
+  {STATIC_PREVIEW&&<p className="ai-company-demo-banner" role="status"><ShieldCheck size={16}/>这是免费的交互预览，只根据已整理的企业资料做关键词检索；不会向 DeepSeek 发送数据，也不会声称企业与你的学历或经历相匹配。</p>}
   <label className="ai-company-input"><Search size={18}/><textarea value={query} onChange={e=>setQuery(e.target.value)} maxLength={500} rows={2} placeholder="例如：舞蹈学本科，做过一年汽车销售和门店督导，想去上海找大型企业的培训或运营工作"/></label>
-  <div className="ai-company-submit"><label><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>
+  {!STATIC_PREVIEW&&<div className="ai-company-submit"><label><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>
    我同意将输入的求职描述发送给 DeepSeek 分析；请勿输入身份证、住址等敏感信息。</label>
    <button type="button" disabled={busy||status!=='ready'} onClick={run}>
-    {busy?'正在匹配企业…':'智能匹配企业'} <ArrowRight size={16}/></button></div>
+    {busy?'正在匹配企业…':'智能匹配企业'} <ArrowRight size={16}/></button></div>}
+  {STATIC_PREVIEW&&<div className="ai-company-submit ai-company-demo-actions"><small>试试输入“汽车”“人工智能”或“比亚迪”；职业适配分析需接入真实 AI 后才可用。</small><button type="button" onClick={()=>{setLocalResults(localCatalogMatches(query));setError('')}}>本地检索企业（非 AI） <Search size={16}/></button></div>}
   {error&&<p className="ai-company-notice" role="alert">{error}</p>}
   <p className="ai-company-note"><ShieldCheck size={15}/> 推荐仅基于企业介绍与个人自述，不代表当前在招、符合硬性资格或保证录用。首版只覆盖经整理的企业样本；未核验具体职位条件。</p>
+  {STATIC_PREVIEW&&localResults!==null&&<div className="ai-company-results" aria-live="polite" data-testid="demo-results">
+   <h3>关键词命中的真实企业资料 · {localResults.length} 家（非 AI 推荐）</h3>
+   {localResults.length===0?<p>当前目录没有找到文字匹配的企业，可以尝试企业名称、汽车、人工智能等行业关键词。此结果不是个人求职能力评价。</p>:
+   localResults.map(company=><article className="ai-company-card" key={company.id}>
+      <div className="ai-company-card-header"><Building2 size={20}/><div><strong>{company.name}</strong><small>{company.industry}</small></div></div>
+      <p>{company.provenance==='official_recruitment_entry_only'?'这家企业的官方招聘入口曾经过资料核验；尚未审核具体岗位及学历条件。':company.overview}</p>
+      <small>资料日期：{company.lastReviewed} · 非当前招聘核验</small>
+      <div className="ai-company-links">{company.route&&<Link to={company.route}>企业资料 <ArrowRight size={14}/></Link>}
+        {safeCareer(company.careers)&&<a href={safeCareer(company.careers)} target="_blank" rel="noopener noreferrer">官方招聘入口 <ExternalLink size={14}/></a>}
+      </div>
+     </article>)}
+  </div>}
   {results!==null&&<div className="ai-company-results" aria-live="polite">
    <h3>企业匹配结果 · {matches.length} 家</h3>
    {matches.length===0?<p>没有足够依据推荐候选企业，可以尝试补充工作经历或目标方向。</p>:
