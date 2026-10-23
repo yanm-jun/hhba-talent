@@ -505,6 +505,102 @@
       "aliases": [],
       "verifiedBy": "official_company_recruitment_page",
       "notes": "官网直接列示2027届研发、制造、供应链及职能岗位类别，并提示以官方渠道投递。"
+    },
+    "立讯精密": {
+      "url": "https://wecruit.hotjob.cn/SU601778b25d83dc072073230a/pb/social.html",
+      "evidenceUrl": "https://www.luxshare-ict.com/careers.html",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "立讯精密社会招聘（集团官网直达）",
+      "recruitmentEntity": "立讯精密",
+      "notes": "公司官网「加入我们」直接指向该社会招聘 ATS；另有校园招聘独立入口。",
+      "verifiedOn": "2026-10-23",
+      "verifiedBy": "official_company_link_or_official_employer_advertisement",
+      "aliases": []
+    },
+    "北方华创": {
+      "url": "https://career.naura.com/social",
+      "evidenceUrl": "https://www.naura.com/join/index.html",
+      "kind": "group_recruitment_portal",
+      "availability": "normal",
+      "label": "北方华创半导体装备社会招聘",
+      "recruitmentEntity": "北方华创",
+      "notes": "官网另列真空新能源装备和精密元器件的独立招聘系统；本入口仅为半导体装备板块，不应充当全部子公司职位。",
+      "verifiedOn": "2026-10-23",
+      "verifiedBy": "official_company_link_or_official_employer_advertisement",
+      "aliases": []
+    },
+    "格力电器": {
+      "url": "https://zhaopin.greeyun.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118040.html",
+      "kind": "official_recruitment_portal",
+      "availability": "campus_only",
+      "label": "珠海格力电器招聘系统（已确认校园招聘）",
+      "recruitmentEntity": "格力电器",
+      "notes": "招聘系统可见2026年秋季2027届校招岗位；其他招聘类型需在系统中核验。",
+      "verifiedOn": "2026-10-23",
+      "verifiedBy": "official_company_link_or_official_employer_advertisement",
+      "aliases": []
+    },
+    "福耀玻璃": {
+      "url": "https://job.fuyaogroup.com/fuyao",
+      "evidenceUrl": "https://smcareer.xmu.edu.cn/info/1008/31515.htm",
+      "kind": "official_recruitment_portal",
+      "availability": "campus_only",
+      "label": "福耀集团官方网申（校园招聘入口）",
+      "recruitmentEntity": "福耀玻璃",
+      "notes": "2027届校招宣讲披露 job.fuyaogroup.com，HTTP/HTTPS均重定向到 /fuyao；该系统由集团提供，具体岗位须核对用人法人。",
+      "verifiedOn": "2026-10-23",
+      "verifiedBy": "official_company_link_or_official_employer_advertisement",
+      "aliases": []
+    },
+    "许继电气": {
+      "url": "https://campus.51job.com/xjzp2027",
+      "evidenceUrl": "https://job.tiangong.edu.cn/correcruit/content/id/56215.html",
+      "kind": "group_recruitment_portal",
+      "availability": "campus_only",
+      "label": "许继集团及许继电气2027届校园招聘",
+      "recruitmentEntity": "许继电气",
+      "notes": "官方联合招聘公告所列第三方校招站，同时覆盖许继集团；并非许继电气独家社招入口。",
+      "verifiedOn": "2026-10-23",
+      "verifiedBy": "official_company_link_or_official_employer_advertisement",
+      "aliases": []
+    },
+    "东方证券": {
+      "url": "https://app.mokahr.com/apply/dfzq/4927",
+      "evidenceUrl": "https://www.dfzq.com.cn/osoa/views/main/companyinfodisclosure/companyrecruitment/index.shtml",
+      "kind": "official_recruitment_portal",
+      "availability": "unconfirmed_runtime",
+      "label": "东方证券社会招聘（官网指向 Moka）",
+      "recruitmentEntity": "东方证券",
+      "notes": "链接来自东方证券官网招聘页，检查时 Moka 存在跳转循环，未通过可访问性验收。",
+      "verifiedOn": "2026-10-23",
+      "verifiedBy": "official_company_link_or_official_employer_advertisement",
+      "aliases": []
+    },
+    "正泰电器": {
+      "url": "https://app.mokahr.com/campus-recruitment/chint/40745",
+      "evidenceUrl": "https://jobcareer.sdu.edu.cn/eweb/jygl/zpfw.so?entityId=SCFW_JYGL_DWXX&id=8FhMybSDFVRHRjbxegeCnU&modcode=jygl_scfwyrdw&subsyscode=zpfw&type=viewDwxx",
+      "kind": "group_recruitment_portal",
+      "availability": "unconfirmed_runtime",
+      "label": "正泰集团校园招聘（电器主体需核对）",
+      "recruitmentEntity": "正泰集团",
+      "notes": "高校页面由浙江正泰电器股份有限公司提交，指向正泰集团 Moka 校招；Moka 访问受限，未独立验收具体法人岗位，不能计入正泰电器精确入口完成数。",
+      "verifiedOn": "2026-10-23",
+      "verifiedBy": "official_company_link_or_official_employer_advertisement",
+      "aliases": []
+    },
+    "上海机场": {
+      "url": "https://www.shanghaiairport.com/shzp/index.html",
+      "evidenceUrl": "https://www.shanghaiairport.com/shzp/index.html",
+      "kind": "official_recruitment_announcements",
+      "availability": "announcement_only",
+      "label": "上海机场集团社会招聘信息（非上市主体独立投递站）",
+      "recruitmentEntity": "上海机场(集团)有限公司",
+      "notes": "集团招聘页当前显示「敬请期待」；上海国际机场股份有限公司与集团需区分，不可计为上市主体独立招聘入口。",
+      "verifiedOn": "2026-10-23",
+      "verifiedBy": "official_company_link_or_official_employer_advertisement",
+      "aliases": []
     }
   }
 }
