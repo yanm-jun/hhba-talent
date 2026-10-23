@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AICompanySearch } from './AICompanySearch';
 import { ArrowRight, ExternalLink, MapPin, RefreshCcw, Search, ShieldCheck } from 'lucide-react';
 import { Link, getJobReturnTarget, navigate } from '../router';
 import { Shell } from './Shell';
@@ -77,6 +76,7 @@ function LanguageSwitcher({lang,change}:{lang:Language,change:(value:Language)=>
 }
 export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,user?:User|null}){
   const domesticOnly=import.meta.env.VITE_HHBA_DOMESTIC_STATIC_ONLY==='1';
+  const officialThree=import.meta.env.VITE_HHBA_OFFICIAL_THREE_ONLY==='1';
   const {lang,change}=useLanguage();
   const [filters,setFilters]=useState<LiveFilters>(()=>{
     const previous=readMarketState(compact);
@@ -109,7 +109,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   },[compact,filters,draft,page]);
   const defaultView=isDefaultMarketFilters(filters,page);
   useEffect(()=>{
-    if(domesticOnly){setFeatured([]);setFeaturedError('');return;}
+    if(officialThree||domesticOnly){setFeatured([]);setFeaturedError('');return;}
     if(!defaultView){setFeatured(null);setFeaturedError('');return;}
     const controller=new AbortController();
     setFeatured(null);setFeaturedError('');
@@ -132,11 +132,11 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   // Only the UNFILTERED first page gets six highlighted jobs. Search,
   // company/city filtering and all other pages retain their normal results.
   const curatedIds=new Set(featured?.map(j=>j.id)||[]);
-  const shown=domesticOnly?(compact?eligible.slice(0,8):eligible):defaultView
+  const shown=officialThree?(compact?eligible.slice(0,6):eligible):domesticOnly?(compact?eligible.slice(0,8):eligible):defaultView
     ?(featured ? (compact?featured:[...featured,...eligible.filter(j=>!curatedIds.has(j.id)).slice(0,24)])
       : featuredError ? (compact?eligible.slice(0,8):eligible) : [])
     :(compact?eligible.slice(0,8):eligible);
-  const featuredPending=defaultView && !domesticOnly && !featured && !featuredError;
+  const featuredPending=defaultView && !officialThree && !domesticOnly && !featured && !featuredError;
   const interpreted=useMemo(()=>parseNaturalQuery(filters.q),[filters.q]);
   const roleNames:Record<string,string>={software:'软件工程师',sales:'销售',engineer:'工程师',product:'产品经理',intern:'实习',design:'设计',finance:'财务',marketing:'市场营销',operations:'运营'};
   const intentLabels=[
@@ -205,7 +205,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   const market=<section className="unified-market" aria-labelledby="unified-market-title">
     <div className="unified-market-heading"><div><small>HHBA · RECRUITMENT</small>
       <h2 id="unified-market-title">{lang==='zh'?'招聘市场':'Job market'}</h2>
-      <p>{domesticOnly?(lang==='zh'?'国内历史招聘岗位静态测试 · 岗位状态以企业官网为准':'Historical China listings preview · Check employer for availability'):lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
+      <p>{officialThree?(lang==='zh'?'OpenAI、Anthropic、SpaceX 官方公开招聘 · 只展示本次从招聘系统核验到的职位，随时可能变化':'OpenAI, Anthropic and SpaceX public ATS listings · Verified at latest sync'):domesticOnly?(lang==='zh'?'国内历史招聘岗位静态测试 · 岗位状态以企业官网为准':'Historical China listings preview · Check employer for availability'):lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
       <LanguageSwitcher lang={lang} change={change}/></div>
     {!compact&&controls}
     {intentLabels.length>0&&<div className="unified-search-interpreted">
@@ -261,9 +261,8 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       <Link to="/candidate/jobs/archive">{lang==='zh'?'历史岗位记录':'Historical jobs'}</Link>
        {' · '}<Link to="/candidate/employer-jobs">{lang==='zh'?'经认证企业自行发布的岗位':'Employer-submitted jobs (separate from official ATS)'}</Link></p>}
   </section>;
-  // One compact enterprise search on the homepage; the audited job market
-  // remains visible underneath. The full job-search controls live at /candidate/jobs.
-  return compact?<><AICompanySearch/>{market}</>:<Shell user={user}>{market}</Shell>;
+  // The existing market is the ONE search surface; never overlay a second AI UI.
+  return compact?market:<Shell user={user}>{market}</Shell>;
 }
 export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  const {lang,change}=useLanguage();
