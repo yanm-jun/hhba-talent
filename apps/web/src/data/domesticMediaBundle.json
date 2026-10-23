@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-23T13:01:18.680Z",
+  "generatedAt": "2026-10-23T13:06:28.795Z",
   "companies": {
     "华域视觉科技（上海）有限公司": {
       "brand": {
@@ -93,11 +93,7 @@
     },
     "正泰电器": {
       "brand": {
-        "state": "ready",
-        "path": "domestic-media/e6ada3e6b3b0e794b5e599a8-brand.jpg",
-        "bytes": 34972,
-        "source": "https://en.miracletech.com/media_library/image_20251013170129OFKX.JPEG",
-        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+        "state": "missing"
       },
       "photos": []
     },
@@ -112,11 +108,7 @@
     },
     "思源电气": {
       "brand": {
-        "state": "ready",
-        "path": "domestic-media/e6809de6ba90e794b5e6b094-brand.png",
-        "bytes": 42149,
-        "source": "https://pbs.twimg.com/profile_images/1121308964975591429/G3LvwCKG_400x400.png",
-        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+        "state": "missing"
       },
       "photos": []
     },
@@ -440,10 +432,7 @@
     },
     "中国银行": {
       "brand": {
-        "state": "ready",
-        "path": "domestic-media/caf76992859b35e-website-brand-candidate.gif",
-        "source": "https://www.boc.cn/images/LOGO-AGACCS.gif",
-        "classification": "official_site_brand_candidate_not_visually_verified"
+        "state": "missing"
       },
       "photos": []
     },
