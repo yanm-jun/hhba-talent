@@ -62,6 +62,9 @@ await Promise.all(Array.from({length:5},async()=>{
     // Ignore certification/accessibility badges and third-party trademarks even if
     // the filename contains "logo". Those were incorrectly picked for 中国银行.
     if(/适老化|无障碍|认证|certification|accessibility|第三方|微信|支付宝|监管|服务标章|社交分享/i.test(alt+' '+cls+' '+id+' '+filename))continue;
+    // The SAIC homepage also carries separate MG/Roewe subsidiary logos.
+    // These must never be promoted as the group-company mark.
+    if(name==='上汽集团'&&/\/chinese\/images\/logos\/20\d\d\//i.test(absolute.pathname))continue;
     const isLogo=logo.test(cls+' '+id+' '+alt+' '+filename);
     if(!isLogo||/customer|client|partner|invest|supplier|footer|service|国家|政府/i.test(cls+' '+alt+' '+filename))continue;
     const score=(/logo/i.test(cls)?40:0)+(/logo/i.test(id)?35:0)+
