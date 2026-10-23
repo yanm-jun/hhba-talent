@@ -48,6 +48,18 @@ for(const [name,p] of Object.entries(profiles)){
 
 function entities(s=''){return s.replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;|&#x27;/gi,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>')}
 function attr(tag,key){const m=tag.match(new RegExp('(?:^|\\s)'+key+'\\s*=\\s*(?:"([^"]*)"|([^\\s>]+))','i'));return entities((m?.[1]||m?.[2]||'').trim())}
+function figureCaption(html,position){
+ const start=html.lastIndexOf('<figure',position);
+ const priorEnd=html.lastIndexOf('</figure>',position);
+ if(start<0||start<priorEnd||position-start>12000)return '';
+ const end=html.indexOf('</figure>',position);
+ if(end<0||end-position>12000)return '';
+ const figure=html.slice(start,end);
+ if((figure.match(/<img\\b/gi)||[]).length!==1)return '';
+ const matched=figure.match(/<figcaption\\b[^>]*>([\\s\\S]*?)<\\/figcaption>/i);
+ if(!matched)return '';
+ return entities(matched[1].replace(/<[^>]*>/g,' ').replace(/\\s+/g,' ')).trim().slice(0,150);
+}
 function extFor(buffer){
  if(buffer[0]===0x89&&buffer[1]===0x50&&buffer[2]===0x4e&&buffer[3]===0x47)return 'png';
  if(buffer[0]===0xff&&buffer[1]===0xd8&&buffer[2]===0xff)return 'jpg';
@@ -73,8 +85,9 @@ await Promise.all(Array.from({length:Math.min(5,sources.length)},async()=>{
  try{
   const html=await (await get(source.page)).text();
   const candidates=[];
-  for(const tag of html.match(/<img\b[^>]*>/gi)||[]){
-   const alt=attr(tag,'alt')||attr(tag,'title');
+  for(const m of html.matchAll(/<img\b[^>]*>/gi)){
+   const tag=m[0];
+   const alt=attr(tag,'alt')||attr(tag,'title')||attr(tag,'data-caption')||figureCaption(html,m.index);
    const rawLabel=attr(tag,'data-original')||attr(tag,'data-src')||attr(tag,'src');
    let basename='';try{basename=decodeURIComponent(new URL(rawLabel,source.page).pathname.split('/').at(-1)||'')}catch{}
    // Exact descriptive captions are required for generic discovery; opaque filenames alone
