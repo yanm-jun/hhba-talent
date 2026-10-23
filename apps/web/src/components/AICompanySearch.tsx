@@ -1,15 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, BrainCircuit, Building2, ExternalLink, Search, ShieldCheck } from 'lucide-react';
-import reviewed from '../data/reviewedEmployers.json';
-import batchA from '../data/companyEditorialAdditionalA.json';
-import batchB from '../data/companyEditorialAdditionalB.json';
-import batchC from '../data/companyEditorialAdditionalC.json';
-import batchD from '../data/companyEditorialAdditionalD.json';
-import { companyProfiles } from '../services/companyProfiles';
+import catalog from '../data/aiCompanyCatalog.json';
 import { Link } from '../router';
 import '../styles/ai-company-search.css';
 
-type Company={id:string;name:string;industry:string;overview:string;route:string;careers?:string};
+type Company={id:string;name:string;industry:string;overview:string;route:string|null;careers:string|null;lastReviewed:string;provenance:string};
 type Result={id:string;reason:string;directions:string[]};
 type MatchResponse={status:string;recommendations:Result[];notice:string};
 const ENDPOINT=(import.meta.env.VITE_HHBA_COMPANY_MATCH_API_ORIGIN||'').trim().replace(/\/$/,'');
@@ -19,22 +14,7 @@ function endpoint(){
   catch {return '';}
 }
 const normalize=(text:string)=>text.trim().toLocaleLowerCase();
-const editorialRows=[...reviewed.profiles,...batchA.profiles,...batchB.profiles,...batchC.profiles,...batchD.profiles];
-const candidates:Company[]=(()=>{
- const list:Company[]=Object.values(companyProfiles).map(p=>({
-  id:p.slug,name:p.name,industry:p.industry.zh,overview:p.overview.map(t=>t.zh).join(' ').slice(0,600),
-  route:'/companies/'+p.slug,careers:p.careers
- }));
- const seen=new Set(list.map(x=>normalize(x.name)));
- for(const raw of editorialRows){
-  if(raw.status!=='VERIFIED'||!raw.id||!raw.name||!Array.isArray(raw.overview)||!raw.overview.length||
-     !raw.industry?.zh||seen.has(normalize(raw.name)))continue;
-  seen.add(normalize(raw.name));
-  list.push({id:raw.id,name:raw.name,industry:raw.industry.zh,
-   overview:raw.overview.map(p=>p.zh).join(' ').slice(0,600),route:'/companies/id/'+raw.id});
- }
- return list;
-})();
+const candidates:Company[]=catalog.companies;
 function safeCareer(url?:string){
  if(!url)return '';
  try{const u=new URL(url);return u.protocol==='https:'&&!u.username&&!u.password?u.href:'';}catch{return ''}
@@ -57,7 +37,8 @@ export function AICompanySearch(){
   return()=>ctrl.abort();
  },[api]);
  const byId=useMemo(()=>new Map(candidates.map(c=>[c.id,c])),[]);
- const matches=useMemo(()=>results?.map(r=>({company:byId.get(r.id),result:r})).filter(x=>!!x.company)||[],[results,byId]);
+ const matches=useMemo(()=>results?.filter(r=>typeof r.id==='string'&&typeof r.reason==='string'&&Array.isArray(r.directions))
+   .map(r=>({company:byId.get(r.id),result:r})).filter(x=>!!x.company)||[],[results,byId]);
  const browsed=useMemo(()=>{const q=normalize(browse);return q?candidates.filter(c=>normalize(c.name+' '+c.industry+' '+c.overview).includes(q)).slice(0,20):[];},[browse]);
  async function run(){
   if(query.trim().length<5){setError('请补充专业、学历、经历或期望方向。');return;}
@@ -67,9 +48,7 @@ export function AICompanySearch(){
   try{
    const response=await fetch(api+'/api/v1/company-match',{
     method:'POST',headers:{'Content-Type':'application/json'},credentials:'omit',
-    body:JSON.stringify({query:query.trim(),consent:true,companies:candidates.slice(0,40).map(c=>({
-      id:c.id,name:c.name,industry:c.industry,overview:c.overview
-    }))})
+    body:JSON.stringify({query:query.trim(),consent:true})
    });
    if(!response.ok)throw Error(response.status===429?'今日 AI 试用额度已用完或服务繁忙。':'AI 匹配暂时不可用。');
    const data=await response.json() as MatchResponse;
@@ -88,21 +67,21 @@ export function AICompanySearch(){
    <button type="button" disabled={busy||status!=='ready'} onClick={run}>
     {busy?'正在匹配企业…':'智能匹配企业'} <ArrowRight size={16}/></button></div>
   {error&&<p className="ai-company-notice" role="alert">{error}</p>}
-  <p className="ai-company-note"><ShieldCheck size={15}/> 推荐仅基于企业介绍与个人自述，不代表当前在招、符合硬性资格或保证录用。首版仅覆盖已整理的企业样本。</p>
+  <p className="ai-company-note"><ShieldCheck size={15}/> 推荐仅基于企业介绍与个人自述，不代表当前在招、符合硬性资格或保证录用。首版只覆盖经整理的企业样本；未核验具体职位条件。</p>
   {results!==null&&<div className="ai-company-results" aria-live="polite">
    <h3>企业匹配结果 · {matches.length} 家</h3>
    {matches.length===0?<p>没有足够依据推荐候选企业，可以尝试补充工作经历或目标方向。</p>:
     matches.map(({company,result})=>company&&<article key={company.id} className="ai-company-card">
      <div className="ai-company-card-header"><Building2 size={20}/><div><strong>{company.name}</strong><small>{company.industry}</small></div></div>
-     <p>{result.reason}</p>{result.directions.length>0&&<p className="ai-company-tags">{result.directions.map(d=><span key={d}>{d}</span>)}</p>}
-     <div className="ai-company-links"><Link to={company.route}>查看 HHBA 企业详情 <ArrowRight size={14}/></Link>
+     <p>{result.reason}</p><small>{company.provenance==='official_recruitment_entry_only'?'招聘入口历史核验：':'企业资料审核：'}{company.lastReviewed} · 当前招聘状态需官网核对</small>{result.directions.length>0&&<p className="ai-company-tags">{result.directions.map(d=><span key={d}>{d}</span>)}</p>}
+     <div className="ai-company-links">{company.route&&<Link to={company.route}>查看 HHBA 企业详情 <ArrowRight size={14}/></Link>}
       {safeCareer(company.careers)&&<a href={safeCareer(company.careers)} target="_blank" rel="noopener noreferrer">官方招聘网站 <ExternalLink size={14}/></a>}
      </div>
     </article>)}
   </div>}
   <div className="ai-company-browse"><label>不使用 AI 也能免费查找现有企业资料
    <input value={browse} onChange={e=>setBrowse(e.target.value)} maxLength={100} placeholder="输入企业名称或行业"/></label>
-   {browsed.length>0&&<div className="ai-company-browse-grid">{browsed.map(c=><Link to={c.route} key={c.id}><Building2 size={16}/><span>{c.name}</span><ArrowRight size={14}/></Link>)}</div>}
+   {browsed.length>0&&<div className="ai-company-browse-grid">{browsed.map(c=>c.route?<Link to={c.route} key={c.id}><Building2 size={16}/><span>{c.name}</span><ArrowRight size={14}/></Link>:safeCareer(c.careers)?<a href={safeCareer(c.careers)} target="_blank" rel="noopener noreferrer" key={c.id}><Building2 size={16}/><span>{c.name} · 官方招聘入口（历史核验）</span><ExternalLink size={14}/></a>:null)}</div>}
    <Link to="/companies" className="ai-company-all">浏览全部企业资料 <ArrowRight size={14}/></Link>
   </div>
  </section>;
