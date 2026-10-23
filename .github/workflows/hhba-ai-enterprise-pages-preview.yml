@@ -1,0 +1,189 @@
+name: HHBA AI Enterprise GitHub Pages Preview
+on:
+  push:
+    branches: [feat/ai-company-search-phase1-20261023]
+    paths:
+      - '.github/workflows/hhba-ai-enterprise-pages-preview.yml'
+      - 'apps/web/scripts/ai-company-preview-smoke.mjs'
+      - 'apps/web/src/components/AICompanySearch.tsx'
+      - 'apps/web/src/components/UnifiedJobMarket.tsx'
+      - 'apps/web/src/pages/HomePage.tsx'
+      - 'apps/web/src/services/liveRecruitment.ts'
+      - 'apps/web/src/styles/unified-jobs.css'
+      - 'apps/web/scripts/prepare-three-employers.mjs'
+      - 'apps/web/src/styles/ai-company-search.css'
+      - 'apps/web/src/services/domesticCompanySearch.ts'
+      - 'apps/web/src/components/DomesticCompanyResults.tsx'
+      - 'apps/web/src/pages/DomesticCompanyPage.tsx'
+      - 'apps/web/src/styles/domestic-company-search.css'
+      - 'apps/web/src/data/domesticCompanyEditorial.json'
+      - 'apps/web/public/data/domestic-listed-companies.json'
+      - 'apps/web/public/data/domestic-company-relations.json'
+      - 'apps/web/src/data/domesticListedCompanies.json'
+      - 'apps/web/src/data/domesticCompanyRelations.json'
+      - 'apps/web/scripts/domestic-company-relations.test.mjs'
+      - 'apps/web/scripts/audit-domestic-company-media.mjs'
+      - 'apps/web/scripts/audit-all-company-content.mjs'
+      - 'apps/web/scripts/check-domestic-company-image-urls.mjs'
+      - 'apps/web/scripts/prepare-domestic-company-media.mjs'
+      - 'apps/web/scripts/discover-official-company-media.mjs'
+      - 'apps/web/scripts/discover-official-brand-candidates.mjs'
+      - 'apps/web/src/data/domesticOfficialSceneBundle.json'
+      - 'apps/web/src/data/domesticMediaBundle.json'
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/src/router.tsx'
+      - 'apps/web/src/pages/MajorCompaniesPage.tsx'
+      - 'apps/web/src/services/domesticMajors.ts'
+      - 'apps/web/src/data/domesticCareerProfiles.json'
+      - 'apps/web/src/data/domesticComplete50Target.json'
+      - 'apps/web/scripts/audit-company-complete-50.mjs'
+      - 'apps/web/src/data/domesticRecruitmentRegistry.json'
+      - 'apps/web/scripts/audit-domestic-recruitment.mjs'
+      - 'apps/web/src/data/domesticCompanyBatch001.json'
+      - 'apps/web/scripts/validate-domestic-company-batch.mjs'
+      - 'apps/web/src/components/MajorFilter.tsx'
+      - 'apps/web/src/data/officialAcademicMajors.json'
+      - 'apps/web/src/data/officialVocationalMajors.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: hhba-unified-react-pages
+  cancel-in-progress: true
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment:
+      name: ai-company-preview
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Checkout AI enterprise preview branch
+        uses: actions/checkout@v4
+      - name: Checkout existing domestic Pages baseline (preserve root)
+        uses: actions/checkout@v4
+        with:
+          ref: feat/domestic-weekly-cache-pages-20261022
+          path: baseline
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install AI preview app
+        run: npm ci --prefix apps/web
+      - name: Install isolated official SVG-to-PNG renderer for source logo candidates
+        run: npm install --prefix apps/web --no-save --no-package-lock @resvg/resvg-js@2.6.2
+      - name: Restore retained company media between deployments
+        id: employer_media_cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            apps/web/public/domestic-media/
+            apps/web/src/data/domesticMediaBundle.json
+          key: hhba-company-media-v2-${{ github.run_id }}
+          restore-keys: |
+            hhba-company-media-v2-
+      - name: Check syntax of the three source-verifying image acquisition scripts
+        working-directory: apps/web
+        run: |
+          node --check scripts/discover-official-company-media.mjs
+          node --check scripts/discover-official-brand-candidates.mjs
+          node --check scripts/prepare-domestic-company-media.mjs
+      - name: Discover explicitly captioned office and factory photos on official pages
+        working-directory: apps/web
+        run: node scripts/discover-official-company-media.mjs
+      - name: Discover logo candidates from exact-company official websites
+        working-directory: apps/web
+        run: node scripts/discover-official-brand-candidates.mjs
+      - name: Bundle reachable, source-tracked employer images
+        working-directory: apps/web
+        run: node scripts/prepare-domestic-company-media.mjs
+      - name: Audit each of the 50 target companies against all six evidence gates
+        working-directory: apps/web
+        run: node --test scripts/audit-company-complete-50.mjs
+      - name: Preserve successfully downloaded company media
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            apps/web/public/domestic-media/
+            apps/web/src/data/domesticMediaBundle.json
+          key: hhba-company-media-v2-${{ github.run_id }}
+      - name: Build enterprise preview with AI API disabled
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/ai-company-preview/'
+          VITE_HHBA_COMPANY_PREVIEW: '1'
+          VITE_HHBA_DOMESTIC_STATIC_ONLY: '0'
+          VITE_HHBA_OFFICIAL_THREE_ONLY: '1'
+        run: npm run build --prefix apps/web
+      - name: Validate public company relationship sources and hierarchy
+        working-directory: apps/web
+        run: node --test scripts/domestic-company-relations.test.mjs
+      - name: Validate 100 existing-company first-batch pipeline and evidence gate
+        working-directory: apps/web
+        run: node --test scripts/validate-domestic-company-batch.mjs
+      - name: Audit all existing recruiting URLs, exact entities and bad homepage destinations
+        working-directory: apps/web
+        run: node --test scripts/audit-domestic-recruitment.mjs
+      - name: Audit every searchable company for substantive content and unverifiable placeholders
+        working-directory: apps/web
+        run: node --test scripts/audit-all-company-content.mjs
+      - name: Audit company media and profile source coverage
+        working-directory: apps/web
+        run: node --test scripts/audit-domestic-company-media.mjs
+      - name: Probe employer brand and photo image URLs for reachability
+        working-directory: apps/web
+        run: node scripts/check-domestic-company-image-urls.mjs
+      - name: Retrieve public ATS listings for OpenAI, Anthropic, SpaceX (no API Key)
+        run: |
+          cd apps/web
+          node scripts/prepare-three-employers.mjs
+          test -f dist/data/featured-live.json
+      - name: Build the current domestic baseline without changes
+        run: |
+          npm ci --prefix baseline/apps/web
+          HHBA_GITHUB_PAGES=1 npm run build --prefix baseline/apps/web
+          test -f baseline/apps/web/dist/data/domestic-jobs.json
+      - name: Package both static sites; preserve existing root
+        run: |
+          mkdir -p combined/ai-company-preview
+          cp -a baseline/apps/web/dist/. combined/
+          cp -a apps/web/dist/. combined/ai-company-preview/
+          cp combined/index.html combined/404.html
+          test -f combined/index.html
+          test -f combined/ai-company-preview/index.html
+          test -f combined/ai-company-preview/data/featured-live.json
+          # No runtime fetch needed: these are compiled into the static JS assets.
+          test -f combined/data/domestic-jobs.json
+          if grep -R -E 'DEEPSEEK_API_KEY|sk-[a-zA-Z0-9]{18,}' combined/ai-company-preview/assets/; then
+            echo 'Possible credential leak in client assets'; exit 1
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: combined
+      - name: Publish additive Pages preview (does not affect Railway)
+        id: deploy
+        uses: actions/deploy-pages@v4
+      - name: Install browser test runner
+        working-directory: apps/web
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Verify desktop, mobile and legacy search in real browser
+        working-directory: apps/web
+        run: node scripts/ai-company-preview-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-company-media-audit
+          path: apps/web/preview-reports/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hhba-ai-enterprise-pages-screenshots
+          path: apps/web/preview-screenshots/
+          retention-days: 14

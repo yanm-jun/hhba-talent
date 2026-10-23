@@ -1,0 +1,1492 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-23",
+  "description": "官方企业站披露的集团业务成员、子公司、分公司、投资企业、合资企业与业务板块。关系标签不代表一律直接控股；时间点与直接/间接持股需另行核验。",
+  "relations": [
+    {
+      "id": "rel-saic-001",
+      "parent": "上汽集团",
+      "child": "上汽集团乘用车分公司",
+      "relation": "分公司",
+      "kind": "branch",
+      "industry": "整车研发与制造",
+      "tags": [
+        "汽车制造",
+        "汽车工程",
+        "新能源汽车",
+        "车辆工程",
+        "电气自动化"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "上汽乘用车",
+        "上汽大乘用车"
+      ],
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
+    },
+    {
+      "id": "rel-saic-002",
+      "parent": "上汽集团",
+      "child": "上汽大通汽车有限公司",
+      "relation": "全资子公司",
+      "kind": "company",
+      "industry": "商用车和整车制造",
+      "tags": [
+        "汽车制造",
+        "新能源汽车",
+        "车辆工程"
+      ],
+      "sourceUrl": "https://www.saicmaxus.com/disclosure/detail/827",
+      "reviewedAt": "2026-10-23",
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
+    },
+    {
+      "id": "rel-saic-003",
+      "parent": "上汽集团",
+      "child": "智己汽车科技有限公司",
+      "relation": "集团整车业务成员",
+      "kind": "company",
+      "industry": "智能电动汽车",
+      "tags": [
+        "新能源汽车",
+        "智能驾驶",
+        "汽车电子"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23",
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
+    },
+    {
+      "id": "rel-saic-004",
+      "parent": "上汽集团",
+      "child": "飞凡汽车科技有限公司",
+      "relation": "集团整车业务成员",
+      "kind": "company",
+      "industry": "新能源汽车",
+      "tags": [
+        "新能源汽车",
+        "车辆工程"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-saic-005",
+      "parent": "上汽集团",
+      "child": "上汽大众汽车有限公司",
+      "relation": "合资企业",
+      "kind": "company",
+      "industry": "汽车整车制造",
+      "tags": [
+        "汽车制造",
+        "新能源汽车",
+        "车辆工程"
+      ],
+      "sourceUrl": "https://www.csvw.com/csvw-website/module/about.html",
+      "reviewedAt": "2026-10-23",
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
+    },
+    {
+      "id": "rel-saic-006",
+      "parent": "上汽集团",
+      "child": "上汽通用汽车有限公司",
+      "relation": "合资企业",
+      "kind": "company",
+      "industry": "汽车整车制造",
+      "tags": [
+        "汽车制造",
+        "新能源汽车",
+        "车辆工程"
+      ],
+      "sourceUrl": "https://www.gm.com.cn/zh/home/company/operations.html",
+      "reviewedAt": "2026-10-23",
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
+    },
+    {
+      "id": "rel-saic-007",
+      "parent": "上汽集团",
+      "child": "上汽通用五菱汽车股份有限公司",
+      "relation": "合资企业",
+      "kind": "company",
+      "industry": "汽车整车制造",
+      "tags": [
+        "汽车制造",
+        "新能源汽车",
+        "车辆工程"
+      ],
+      "sourceUrl": "https://www.gm.com.cn/zh/home/company/operations.html",
+      "reviewedAt": "2026-10-23",
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
+    },
+    {
+      "id": "rel-saic-008",
+      "parent": "上汽集团",
+      "child": "南京汽车集团有限公司",
+      "relation": "集团整车业务成员",
+      "kind": "company",
+      "industry": "汽车制造",
+      "tags": [
+        "汽车制造",
+        "车辆工程"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-saic-009",
+      "parent": "上汽集团",
+      "child": "南京依维柯汽车有限公司",
+      "relation": "集团整车业务成员",
+      "kind": "company",
+      "industry": "商用车制造",
+      "tags": [
+        "汽车制造",
+        "商用车"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-saic-010",
+      "parent": "上汽集团",
+      "child": "上汽红岩汽车有限公司",
+      "relation": "集团整车业务成员",
+      "kind": "company",
+      "industry": "商用车制造",
+      "tags": [
+        "汽车制造",
+        "商用车"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-saic-011",
+      "parent": "上汽集团",
+      "child": "上海申沃客车有限公司",
+      "relation": "集团整车业务成员",
+      "kind": "company",
+      "industry": "客车制造",
+      "tags": [
+        "汽车制造",
+        "客车"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-saic-012",
+      "parent": "上汽集团",
+      "child": "上海汽车变速器有限公司",
+      "relation": "集团零部件业务成员",
+      "kind": "company",
+      "industry": "汽车变速器",
+      "tags": [
+        "汽车零部件",
+        "汽车工程",
+        "机械制造"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-saic-013",
+      "parent": "上汽集团",
+      "child": "联合汽车电子有限公司",
+      "relation": "集团零部件业务成员",
+      "kind": "company",
+      "industry": "汽车电子",
+      "tags": [
+        "汽车电子",
+        "电气自动化",
+        "工业控制",
+        "汽车零部件"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23",
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
+    },
+    {
+      "id": "rel-saic-014",
+      "parent": "上汽集团",
+      "child": "华域汽车",
+      "relation": "集团零部件业务成员",
+      "kind": "company",
+      "industry": "汽车零部件",
+      "tags": [
+        "汽车零部件",
+        "电气自动化",
+        "机械制造",
+        "汽车电子"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "华域汽车系统股份有限公司"
+      ],
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
+    },
+    {
+      "id": "rel-huayu-001",
+      "parent": "华域汽车",
+      "child": "华域汽车车身零件（上海）有限公司",
+      "relation": "投资企业",
+      "kind": "company",
+      "industry": "汽车车身结构件",
+      "tags": [
+        "汽车零部件",
+        "车身制造"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-huayu-002",
+      "parent": "华域汽车",
+      "child": "上海赛科利汽车模具技术应用有限公司",
+      "relation": "投资企业",
+      "kind": "company",
+      "industry": "汽车模具与结构件",
+      "tags": [
+        "汽车模具",
+        "机械制造"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-huayu-003",
+      "parent": "华域汽车",
+      "child": "延锋汽车饰件系统有限公司",
+      "relation": "投资企业",
+      "kind": "company",
+      "industry": "汽车内饰与饰件",
+      "tags": [
+        "汽车零部件",
+        "汽车内饰"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-huayu-004",
+      "parent": "华域汽车",
+      "child": "华域视觉科技（上海）有限公司",
+      "relation": "投资企业",
+      "kind": "company",
+      "industry": "汽车照明、电子与智能制造",
+      "tags": [
+        "汽车照明",
+        "汽车电子",
+        "电气自动化",
+        "智能制造",
+        "机械制造"
+      ],
+      "sourceUrl": "https://www.hascovision.com/about/about-us",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "华域视觉"
+      ],
+      "website": "https://www.hascovision.com/",
+      "city": "上海",
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
+    },
+    {
+      "id": "rel-huayu-005",
+      "parent": "华域汽车",
+      "child": "上海汇众汽车制造有限公司",
+      "relation": "投资企业",
+      "kind": "company",
+      "industry": "汽车底盘及汽车零部件",
+      "tags": [
+        "汽车底盘",
+        "汽车零部件",
+        "机械制造"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-huayu-006",
+      "parent": "华域汽车",
+      "child": "上海实业交通电器有限公司",
+      "relation": "投资企业",
+      "kind": "company",
+      "industry": "汽车电器与零部件",
+      "tags": [
+        "汽车电器",
+        "汽车零部件",
+        "电气自动化"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-huayu-007",
+      "parent": "华域汽车",
+      "child": "上海法雷奥汽车电器系统有限公司",
+      "relation": "投资企业",
+      "kind": "company",
+      "industry": "汽车电气系统与零部件",
+      "tags": [
+        "汽车电器",
+        "汽车零部件"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-huayu-008",
+      "parent": "华域汽车",
+      "child": "华域三电汽车空调有限公司",
+      "relation": "投资企业",
+      "kind": "company",
+      "industry": "汽车空调系统",
+      "tags": [
+        "汽车零部件",
+        "汽车热管理"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-huayu-009",
+      "parent": "华域汽车",
+      "child": "上海纳铁福传动轴有限公司",
+      "relation": "投资企业",
+      "kind": "company",
+      "industry": "汽车传动轴",
+      "tags": [
+        "汽车传动系统",
+        "机械制造"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-huayu-010",
+      "parent": "华域汽车",
+      "child": "上海皮尔博格有色零部件有限公司",
+      "relation": "投资企业",
+      "kind": "company",
+      "industry": "汽车有色金属零部件",
+      "tags": [
+        "汽车零部件",
+        "金属加工"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-huayu-011",
+      "parent": "华域汽车",
+      "child": "上海乾通汽车附件有限公司",
+      "relation": "投资企业",
+      "kind": "company",
+      "industry": "汽车零部件",
+      "tags": [
+        "汽车零部件"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-huayu-012",
+      "parent": "华域汽车",
+      "child": "华域汽车电动系统有限公司",
+      "relation": "投资企业",
+      "kind": "company",
+      "industry": "汽车电驱动与零部件",
+      "tags": [
+        "汽车电子",
+        "电气自动化",
+        "新能源汽车"
+      ],
+      "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-byd-001",
+      "parent": "比亚迪",
+      "child": "弗迪电池有限公司",
+      "relation": "集团旗下企业（官方报道）",
+      "kind": "company",
+      "industry": "动力电池及储能电池",
+      "tags": [
+        "新能源",
+        "动力电池",
+        "储能",
+        "电气自动化"
+      ],
+      "sourceUrl": "https://www.bydglobal.com/sites/Satellite?c=BydArticle&cid=1514436167763&d=Touch&pagename=BYD_CN%2FBydArticle%2FCommon%2FArticleDetails",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-byd-002",
+      "parent": "比亚迪",
+      "child": "弗迪视觉有限公司",
+      "relation": "集团旗下企业（官方报道）",
+      "kind": "company",
+      "industry": "汽车照明与车载信号系统",
+      "tags": [
+        "汽车照明",
+        "汽车电子",
+        "电气自动化"
+      ],
+      "sourceUrl": "https://www.bydglobal.com/sites/Satellite?c=BydArticle&cid=1514436167763&d=Touch&pagename=BYD_CN%2FBydArticle%2FCommon%2FArticleDetails",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-byd-003",
+      "parent": "比亚迪",
+      "child": "弗迪科技有限公司",
+      "relation": "集团旗下企业（官方报道）",
+      "kind": "company",
+      "industry": "汽车电子与底盘系统",
+      "tags": [
+        "汽车电子",
+        "底盘系统",
+        "电气自动化"
+      ],
+      "sourceUrl": "https://www.bydglobal.com/sites/Satellite?c=BydArticle&cid=1514436167763&d=Touch&pagename=BYD_CN%2FBydArticle%2FCommon%2FArticleDetails",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-byd-004",
+      "parent": "比亚迪",
+      "child": "弗迪动力有限公司",
+      "relation": "集团旗下企业（官方报道）",
+      "kind": "company",
+      "industry": "动力总成与新能源汽车系统",
+      "tags": [
+        "新能源汽车",
+        "动力总成",
+        "电气自动化"
+      ],
+      "sourceUrl": "https://www.bydglobal.com/sites/Satellite?c=BydArticle&cid=1514436167763&d=Touch&pagename=BYD_CN%2FBydArticle%2FCommon%2FArticleDetails",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-byd-005",
+      "parent": "比亚迪",
+      "child": "弗迪模具有限公司",
+      "relation": "集团旗下企业（官方报道）",
+      "kind": "company",
+      "industry": "汽车模具与自动化制造",
+      "tags": [
+        "模具",
+        "机械制造",
+        "智能制造"
+      ],
+      "sourceUrl": "https://www.bydglobal.com/sites/Satellite?c=BydArticle&cid=1514436167763&d=Touch&pagename=BYD_CN%2FBydArticle%2FCommon%2FArticleDetails",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-midea-001",
+      "parent": "美的集团",
+      "child": "智能家居",
+      "relation": "业务板块",
+      "kind": "business",
+      "industry": "智能家电",
+      "tags": [
+        "家电",
+        "自动化",
+        "工业设计"
+      ],
+      "sourceUrl": "https://www.midea.com.cn/zh/our-businesses",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-midea-002",
+      "parent": "美的集团",
+      "child": "美的工业技术",
+      "relation": "业务板块",
+      "kind": "business",
+      "industry": "工业驱动、核心部件及技术",
+      "tags": [
+        "工业自动化",
+        "机电",
+        "机器人",
+        "电气自动化"
+      ],
+      "sourceUrl": "https://www.midea.com.cn/zh/our-businesses",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-midea-003",
+      "parent": "美的集团",
+      "child": "美的楼宇科技",
+      "relation": "业务板块",
+      "kind": "business",
+      "industry": "暖通、能源和楼宇自动化",
+      "tags": [
+        "楼宇自动化",
+        "能源管理",
+        "电气自动化"
+      ],
+      "sourceUrl": "https://www.midea.com.cn/zh/our-businesses",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-midea-004",
+      "parent": "美的集团",
+      "child": "机器人与自动化",
+      "relation": "业务板块",
+      "kind": "business",
+      "industry": "机器人与工业自动化",
+      "tags": [
+        "工业机器人",
+        "自动化",
+        "智能制造"
+      ],
+      "sourceUrl": "https://www.midea.com.cn/zh/our-businesses",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-midea-005",
+      "parent": "美的集团",
+      "child": "美的能源",
+      "relation": "业务板块",
+      "kind": "business",
+      "industry": "新能源与能源系统",
+      "tags": [
+        "新能源",
+        "电气自动化",
+        "储能"
+      ],
+      "sourceUrl": "https://www.midea.com.cn/zh/our-businesses",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-midea-006",
+      "parent": "美的集团",
+      "child": "美的医疗",
+      "relation": "业务板块",
+      "kind": "business",
+      "industry": "医疗科技与设备",
+      "tags": [
+        "医疗设备",
+        "医疗工程"
+      ],
+      "sourceUrl": "https://www.midea.com.cn/zh/our-businesses",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-midea-007",
+      "parent": "美的集团",
+      "child": "安得智联",
+      "relation": "业务板块",
+      "kind": "business",
+      "industry": "智慧物流与供应链",
+      "tags": [
+        "物流",
+        "供应链"
+      ],
+      "sourceUrl": "https://www.midea.com.cn/zh/our-businesses",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-midea-008",
+      "parent": "美的集团",
+      "child": "合康新能",
+      "relation": "旗下上市企业",
+      "kind": "company",
+      "industry": "新能源与工业自动化",
+      "tags": [
+        "电气自动化",
+        "高压变频",
+        "新能源",
+        "储能"
+      ],
+      "sourceUrl": "https://www.midea.com.cn/zh/our-businesses/midea-energy",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "北京合康新能科技股份有限公司"
+      ]
+    },
+    {
+      "id": "rel-midea-009",
+      "parent": "美的集团",
+      "child": "科陆电子",
+      "relation": "旗下上市企业",
+      "kind": "company",
+      "industry": "智能电网与储能",
+      "tags": [
+        "电气自动化",
+        "智能电网",
+        "新能源",
+        "储能"
+      ],
+      "sourceUrl": "https://www.midea.com.cn/zh/our-businesses/midea-energy",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "深圳市科陆电子科技股份有限公司"
+      ]
+    },
+    {
+      "id": "rel-crrc-001",
+      "parent": "中国中车",
+      "child": "中车齐车集团有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车齐车集团"
+      ]
+    },
+    {
+      "id": "rel-crrc-002",
+      "parent": "中国中车",
+      "child": "中车齐齐哈尔车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车齐齐哈尔"
+      ]
+    },
+    {
+      "id": "rel-crrc-003",
+      "parent": "中国中车",
+      "child": "中车沈阳机车车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车沈阳"
+      ]
+    },
+    {
+      "id": "rel-crrc-004",
+      "parent": "中国中车",
+      "child": "中车石家庄车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车石家庄"
+      ]
+    },
+    {
+      "id": "rel-crrc-005",
+      "parent": "中国中车",
+      "child": "中车山东风电有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车山东风电"
+      ]
+    },
+    {
+      "id": "rel-crrc-006",
+      "parent": "中国中车",
+      "child": "中车山东机车车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车山东"
+      ]
+    },
+    {
+      "id": "rel-crrc-007",
+      "parent": "中国中车",
+      "child": "中车哈尔滨车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车哈尔滨"
+      ]
+    },
+    {
+      "id": "rel-crrc-008",
+      "parent": "中国中车",
+      "child": "中车长春轨道客车股份有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车长客"
+      ]
+    },
+    {
+      "id": "rel-crrc-009",
+      "parent": "中国中车",
+      "child": "中车大连机车车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车大连"
+      ]
+    },
+    {
+      "id": "rel-crrc-010",
+      "parent": "中国中车",
+      "child": "中车兰州机车有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车兰州"
+      ]
+    },
+    {
+      "id": "rel-crrc-011",
+      "parent": "中国中车",
+      "child": "中车唐山机车车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车唐山"
+      ]
+    },
+    {
+      "id": "rel-crrc-012",
+      "parent": "中国中车",
+      "child": "中车北京南口机械有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车南口"
+      ]
+    },
+    {
+      "id": "rel-crrc-013",
+      "parent": "中国中车",
+      "child": "中车大同电力机车有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通电气与技术相关企业",
+      "tags": [
+        "轨道交通",
+        "电气自动化",
+        "电力机车"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车大同"
+      ]
+    },
+    {
+      "id": "rel-crrc-014",
+      "parent": "中国中车",
+      "child": "中车永济电机有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通电气与技术相关企业",
+      "tags": [
+        "轨道交通",
+        "电气自动化",
+        "电力机车"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车永济电机"
+      ]
+    },
+    {
+      "id": "rel-crrc-015",
+      "parent": "中国中车",
+      "child": "中车大连电力牵引研发中心有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通电气与技术相关企业",
+      "tags": [
+        "轨道交通",
+        "电气自动化",
+        "电力机车"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车大连电牵"
+      ]
+    },
+    {
+      "id": "rel-crrc-016",
+      "parent": "中国中车",
+      "child": "中车青岛四方机车车辆股份有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车四方"
+      ]
+    },
+    {
+      "id": "rel-crrc-017",
+      "parent": "中国中车",
+      "child": "中车成都机车车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车成都"
+      ]
+    },
+    {
+      "id": "rel-crrc-018",
+      "parent": "中国中车",
+      "child": "中车广东轨道交通车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车广东"
+      ]
+    },
+    {
+      "id": "rel-crrc-019",
+      "parent": "中国中车",
+      "child": "青岛中车四方轨道车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "青岛中车四方"
+      ]
+    },
+    {
+      "id": "rel-crrc-020",
+      "parent": "中国中车",
+      "child": "青岛四方阿尔斯通铁路运输设备有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "四方阿尔斯通"
+      ]
+    },
+    {
+      "id": "rel-crrc-021",
+      "parent": "中国中车",
+      "child": "中车南京浦镇车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车浦镇"
+      ]
+    },
+    {
+      "id": "rel-crrc-022",
+      "parent": "中国中车",
+      "child": "中车戚墅堰机车有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车戚墅堰"
+      ]
+    },
+    {
+      "id": "rel-crrc-023",
+      "parent": "中国中车",
+      "child": "中车长江运输设备集团有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车长江集团"
+      ]
+    },
+    {
+      "id": "rel-crrc-024",
+      "parent": "中国中车",
+      "child": "中车长江车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车长江"
+      ]
+    },
+    {
+      "id": "rel-crrc-025",
+      "parent": "中国中车",
+      "child": "中车常州车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车常州"
+      ]
+    },
+    {
+      "id": "rel-crrc-026",
+      "parent": "中国中车",
+      "child": "中车株洲车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车株洲车辆"
+      ]
+    },
+    {
+      "id": "rel-crrc-027",
+      "parent": "中国中车",
+      "child": "中车长江铜陵车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车铜陵"
+      ]
+    },
+    {
+      "id": "rel-crrc-028",
+      "parent": "中国中车",
+      "child": "中车眉山车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车眉山"
+      ]
+    },
+    {
+      "id": "rel-crrc-029",
+      "parent": "中国中车",
+      "child": "中车贵阳车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车贵阳"
+      ]
+    },
+    {
+      "id": "rel-crrc-030",
+      "parent": "中国中车",
+      "child": "中车西安车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车西安"
+      ]
+    },
+    {
+      "id": "rel-crrc-031",
+      "parent": "中国中车",
+      "child": "中车太原机车车辆有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车太原"
+      ]
+    },
+    {
+      "id": "rel-crrc-032",
+      "parent": "中国中车",
+      "child": "中车株洲电力机车有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通电气与技术相关企业",
+      "tags": [
+        "轨道交通",
+        "电气自动化",
+        "电力机车"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车株机"
+      ]
+    },
+    {
+      "id": "rel-crrc-033",
+      "parent": "中国中车",
+      "child": "中车洛阳机车有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车洛阳"
+      ]
+    },
+    {
+      "id": "rel-crrc-034",
+      "parent": "中国中车",
+      "child": "中车资阳机车有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车资阳"
+      ]
+    },
+    {
+      "id": "rel-crrc-035",
+      "parent": "中国中车",
+      "child": "中车株洲电机有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通电气与技术相关企业",
+      "tags": [
+        "轨道交通",
+        "电气自动化",
+        "电力机车"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车株洲电机"
+      ]
+    },
+    {
+      "id": "rel-crrc-036",
+      "parent": "中国中车",
+      "child": "中车大连机车研究所有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通电气与技术相关企业",
+      "tags": [
+        "轨道交通",
+        "电气自动化",
+        "电力机车"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车大连所"
+      ]
+    },
+    {
+      "id": "rel-crrc-037",
+      "parent": "中国中车",
+      "child": "中车青岛四方车辆研究所有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通电气与技术相关企业",
+      "tags": [
+        "轨道交通",
+        "电气自动化",
+        "电力机车"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车四方所"
+      ]
+    },
+    {
+      "id": "rel-crrc-038",
+      "parent": "中国中车",
+      "child": "中车制动系统有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通电气与技术相关企业",
+      "tags": [
+        "轨道交通",
+        "电气自动化",
+        "电力机车"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车制动"
+      ]
+    },
+    {
+      "id": "rel-crrc-039",
+      "parent": "中国中车",
+      "child": "中车戚墅堰机车车辆工艺研究所股份有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通电气与技术相关企业",
+      "tags": [
+        "轨道交通",
+        "电气自动化",
+        "电力机车"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车戚墅堰所"
+      ]
+    },
+    {
+      "id": "rel-crrc-040",
+      "parent": "中国中车",
+      "child": "中车株洲电力机车研究所有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通电气与技术相关企业",
+      "tags": [
+        "轨道交通",
+        "电气自动化",
+        "电力机车"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车株洲所"
+      ]
+    },
+    {
+      "id": "rel-crrc-041",
+      "parent": "中国中车",
+      "child": "株洲中车时代电气股份有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通电气与技术相关企业",
+      "tags": [
+        "轨道交通",
+        "电气自动化",
+        "电力机车"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车时代电气"
+      ]
+    },
+    {
+      "id": "rel-crrc-042",
+      "parent": "中国中车",
+      "child": "宝鸡中车时代工程机械有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车宝鸡时代"
+      ]
+    },
+    {
+      "id": "rel-crrc-043",
+      "parent": "中国中车",
+      "child": "株洲时代新材料科技股份有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车时代新材"
+      ]
+    },
+    {
+      "id": "rel-crrc-044",
+      "parent": "中国中车",
+      "child": "中车物流有限公司",
+      "relation": "集团成员（含一级与重点二级）",
+      "kind": "company",
+      "industry": "轨道交通装备相关企业",
+      "tags": [
+        "轨道交通",
+        "轨道装备"
+      ],
+      "sourceUrl": "https://www.crrcgc.cc/crrcgc/71_4829/71_5083/index.html",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "中车物流"
+      ]
+    },
+    {
+      "id": "rel-geely-001",
+      "parent": "浙江吉利控股集团",
+      "child": "吉利汽车控股有限公司",
+      "relation": "控股企业",
+      "kind": "company",
+      "industry": "乘用车研发制造",
+      "tags": [
+        "汽车制造",
+        "新能源汽车",
+        "智能汽车"
+      ],
+      "sourceUrl": "https://www.geelyauto.com.hk/zh-cn/%E5%85%AC%E5%8F%B8%E7%AE%80%E4%BB%8B-2/",
+      "reviewedAt": "2026-10-23",
+      "aliases": [
+        "吉利汽车",
+        "吉利汽车集团"
+      ]
+    },
+    {
+      "id": "rel-geely-002",
+      "parent": "浙江吉利控股集团",
+      "child": "极氪科技集团",
+      "relation": "集团业务板块",
+      "kind": "business",
+      "industry": "智能电动汽车与相关业务",
+      "tags": [
+        "新能源汽车",
+        "智能驾驶"
+      ],
+      "sourceUrl": "https://zgh.com/our-business/",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-geely-003",
+      "parent": "浙江吉利控股集团",
+      "child": "沃尔沃汽车集团",
+      "relation": "集团业务板块",
+      "kind": "business",
+      "industry": "乘用车",
+      "tags": [
+        "汽车制造",
+        "新能源汽车"
+      ],
+      "sourceUrl": "https://zgh.com/our-business/",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-geely-004",
+      "parent": "浙江吉利控股集团",
+      "child": "极星集团",
+      "relation": "集团业务板块",
+      "kind": "business",
+      "industry": "电动汽车",
+      "tags": [
+        "新能源汽车"
+      ],
+      "sourceUrl": "https://zgh.com/our-business/",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-geely-005",
+      "parent": "浙江吉利控股集团",
+      "child": "莲花集团",
+      "relation": "集团业务板块",
+      "kind": "business",
+      "industry": "跑车",
+      "tags": [
+        "汽车制造"
+      ],
+      "sourceUrl": "https://zgh.com/our-business/",
+      "reviewedAt": "2026-10-23"
+    },
+    {
+      "id": "rel-geely-006",
+      "parent": "浙江吉利控股集团",
+      "child": "远程新能源商用车集团",
+      "relation": "集团业务板块",
+      "kind": "business",
+      "industry": "新能源商用车",
+      "tags": [
+        "商用车",
+        "新能源"
+      ],
+      "sourceUrl": "https://zgh.com/our-business/",
+      "reviewedAt": "2026-10-23"
+    }
+  ]
+}

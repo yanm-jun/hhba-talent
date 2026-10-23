@@ -1,0 +1,142 @@
+{
+  "汇川技术": {
+    "industry": "工业自动化与智能制造",
+    "overview": "提供变频器、伺服系统、PLC 与工业机器人等工业自动化产品和解决方案。",
+    "tags": [
+      "电气自动化",
+      "电气工程",
+      "自动控制",
+      "PLC",
+      "伺服",
+      "工业机器人",
+      "智能制造",
+      "机械工程"
+    ],
+    "website": "https://www.inovance.com/",
+    "sourceUrl": "https://www.inovance.com/portal/investor"
+  },
+  "正泰电器": {
+    "industry": "低压电器与智慧能源",
+    "overview": "面向输配电、用电、电气设备与工业自动化等领域提供产品和解决方案。",
+    "tags": [
+      "电气自动化",
+      "电气工程",
+      "配电",
+      "电力系统",
+      "智能制造"
+    ],
+    "website": "https://www.chint.net/",
+    "sourceUrl": "https://www.chint.net/"
+  },
+  "英威腾": {
+    "industry": "工业自动化与能源技术",
+    "overview": "围绕变频器、伺服、PLC、人机界面及能源相关系统开发产品与解决方案。",
+    "tags": [
+      "电气自动化",
+      "电气工程",
+      "工业控制",
+      "PLC",
+      "伺服",
+      "变频器"
+    ],
+    "website": "https://www.invt.com.cn/",
+    "sourceUrl": "https://www.invt.com.cn/"
+  },
+  "许继电气": {
+    "industry": "电力装备、智能电网与自动化",
+    "overview": "聚焦智能变配电、直流输电、智能电表、新能源及充换电装备等领域。",
+    "tags": [
+      "电气自动化",
+      "电气工程",
+      "智能电网",
+      "电力系统",
+      "新能源"
+    ],
+    "website": "https://xjec.com/",
+    "sourceUrl": "https://xjec.com/"
+  },
+  "思源电气": {
+    "industry": "输配电装备与变电站自动化",
+    "overview": "提供高压开关、配电设备、电能质量、保护与自动化系统等产品。",
+    "tags": [
+      "电气自动化",
+      "电气工程",
+      "智能电网",
+      "配电",
+      "变电站自动化"
+    ],
+    "website": "https://www.shrcn.com/",
+    "sourceUrl": "https://www.shrcn.com/"
+  },
+  "雷赛智能": {
+    "industry": "运动控制与工业自动化",
+    "overview": "专注步进、伺服、运动控制 PLC、运动控制器和机器人核心部件。",
+    "tags": [
+      "电气自动化",
+      "自动控制",
+      "PLC",
+      "伺服",
+      "智能制造",
+      "机器人"
+    ],
+    "website": "https://www.leisai.com/",
+    "sourceUrl": "https://www.leisai.com/groupIntroduction.html"
+  },
+  "伟创电气": {
+    "industry": "变频器、伺服及运动控制",
+    "overview": "生产变频器、伺服系统、PLC、运动控制器和工业控制解决方案。",
+    "tags": [
+      "电气自动化",
+      "电气工程",
+      "PLC",
+      "伺服",
+      "变频器",
+      "智能制造"
+    ],
+    "website": "https://www.veichi.cn/",
+    "sourceUrl": "https://www.veichi.cn/"
+  },
+  "信捷电气": {
+    "industry": "自动化控制与智能装备",
+    "overview": "研发 PLC、人机界面、伺服系统、变频驱动、机器视觉及机器人相关产品。",
+    "tags": [
+      "电气自动化",
+      "自动控制",
+      "PLC",
+      "工业机器人",
+      "伺服",
+      "智能制造"
+    ],
+    "website": "https://www.xinje.com/",
+    "sourceUrl": "https://xinje.com/web/investo/index"
+  },
+  "西门子": {
+    "industry": "工业自动化与数字化",
+    "overview": "在中国提供工厂自动化、工业数字化、电气设备和相关技术服务。",
+    "tags": [
+      "电气自动化",
+      "电气工程",
+      "PLC",
+      "工业自动化",
+      "智能制造",
+      "工业软件"
+    ],
+    "website": "https://www.siemens.com/cn/zh.html",
+    "sourceUrl": "https://www.ad.siemens.com.cn/service/recruiting/dfrecruiting.aspx",
+    "careers": "https://www.ad.siemens.com.cn/service/recruiting/dfrecruiting.aspx"
+  },
+  "施耐德电气": {
+    "industry": "能源管理与工业自动化",
+    "overview": "通过电气化、自动化、能源管理及数字化技术服务楼宇、工厂和基础设施。",
+    "tags": [
+      "电气自动化",
+      "电气工程",
+      "能源管理",
+      "工业自动化",
+      "智能制造"
+    ],
+    "website": "https://www.schneider-electric.cn/",
+    "sourceUrl": "https://careers.se.com/china",
+    "careers": "https://careers.se.com/china"
+  }
+}

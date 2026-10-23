@@ -34,7 +34,7 @@ test('clickable company identities preserve all three curated profiles and sourc
  assert.ok(code.includes('<Link className="home-company-marquee-link" to={brand.route}'));
  assert.ok(home.includes('<UnifiedJobMarket compact/><HomeCompanyMarquee/></Shell>'));
  assert.ok(home.includes('title="我要应聘"')&&home.includes('title="我要招人"'));
- assert.ok(home.includes('navigate("/candidate/match")'));
+ assert.ok(home.includes("navigate(kind === 'candidate' ? '/candidate' : '/recruiter/register')"));
 });
 
 test('animated track is genuinely seamless, duplicates hidden from screen readers and links focusable',()=>{
