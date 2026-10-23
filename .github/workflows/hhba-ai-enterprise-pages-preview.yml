@@ -74,6 +74,8 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - name: Install AI preview app
         run: npm ci --prefix apps/web
+      - name: Install isolated official SVG-to-PNG renderer for source logo candidates
+        run: npm install --prefix apps/web --no-save --no-package-lock @resvg/resvg-js@2.6.2
       - name: Restore retained company media between deployments
         id: employer_media_cache
         uses: actions/cache/restore@v4
