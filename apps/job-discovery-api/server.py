@@ -61,7 +61,7 @@ def safe_official(url, company):
         parsed=urlsplit(url)
         return (parsed.scheme=="https" and parsed.hostname==company["host"] and
                 parsed.port in (None,443) and not parsed.username and not parsed.password and
-                parsed.fragment=="" and parsed.path.startswith("/"))
+                parsed.path.startswith("/"))
     except ValueError:return False
 
 def quota(client):
