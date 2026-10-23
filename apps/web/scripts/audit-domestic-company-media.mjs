@@ -17,8 +17,9 @@ const outcomes=selected.map(([name,p])=>{
  const faviconOnly=p.brandAssetStatus==='official_domain_favicon_unverified_visual';
  const officialLogoVerified=p.brandAssetStatus==='official_logo_visually_verified';
  const photoCount=(p.photos||[]).filter(x=>x.url&&x.label&&x.source).length;
+ const verifiedPhotoSources=(p.photos||[]).filter(x=>x.source?.startsWith('https://')&&x.kind).length;
  return {name,listedOrGroup:rawNames.has(normalize(name)),brandUrl:hasLogoCandidate,brandAssetStatus:p.brandAssetStatus||'unspecified',
-  officialLogoVerified,siteIconUnverified:faviconOnly,photoCount,photoSourcePage:Boolean(p.photoSourcePage),
+  officialLogoVerified,siteIconUnverified:faviconOnly,photoCount,verifiedPhotoSources,photoSourcePage:Boolean(p.photoSourcePage),
   detailRouteRequired:true,majorCount:p.majorSlugs?.length||0,officialCareers:Boolean(p.careersUrl),officeCount:p.officeLocations?.length||0,
   warnings:[
    !officialLogoVerified?'formal_logo_not_verified':null,
@@ -61,6 +62,7 @@ test('Every deep profile is a unique search identity with honest media evidence'
   if(p.careersUrl)assert(new URL(p.careersUrl).protocol==='https:',name+' recruitment site protocol');
   for(const photo of p.photos||[]){
    assert(photo.url.startsWith('https://')&&photo.source.startsWith('https://'),name+' photo source');
+   assert(['headquarters','factory','office','product'].includes(photo.kind||'office'),name+' photo category');
   }
   if(p.brandAssetStatus==='official_domain_favicon_unverified_visual')
    assert(p.brandImageSource?.startsWith('https://'),name+' favicon source missing');

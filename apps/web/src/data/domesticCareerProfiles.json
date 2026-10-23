@@ -59,7 +59,9 @@
       }
     ],
     "lastReviewed": "2026-10-23",
-    "evidenceLevel": "official"
+    "evidenceLevel": "official",
+    "photoSourcePage": "https://www.hascovision.com/about/about-us",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "华域汽车": {
     "displayName": "华域汽车",
@@ -116,7 +118,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
     "imageSource": "https://www.hasco-group.com/news/",
-    "brandImageSource": "https://www.hasco-group.com/news/"
+    "brandImageSource": "https://www.hasco-group.com/news/",
+    "photoSourcePage": "https://www.hasco-group.com/about/company.html/1000",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "上汽集团": {
     "displayName": "上汽集团",
@@ -167,7 +171,9 @@
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
-    "brandImageSource": "https://commons.wikimedia.org/wiki/File:SAICMotor_logo.png"
+    "brandImageSource": "https://commons.wikimedia.org/wiki/File:SAICMotor_logo.png",
+    "photoSourcePage": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "汇川技术": {
     "displayName": "汇川技术",
@@ -221,7 +227,9 @@
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
-    "brandImageSource": "https://inovance.zhiye.com/Campus"
+    "brandImageSource": "https://inovance.zhiye.com/Campus",
+    "photoSourcePage": "https://www.inovance.com/portal/investor",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "中国中车": {
     "displayName": "中国中车",
@@ -270,7 +278,9 @@
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
-    "brandImageSource": "https://bjhrckj.com/?list_38%2F112.html"
+    "brandImageSource": "https://bjhrckj.com/?list_38%2F112.html",
+    "photoSourcePage": "https://www.crrcgc.cc/eportal/ui?pageId=714829",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "美的集团": {
     "displayName": "美的集团",
@@ -313,7 +323,9 @@
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
-    "brandImageSource": "https://www.midea.com/global/company-intro"
+    "brandImageSource": "https://www.midea.com/global/company-intro",
+    "photoSourcePage": "https://www.midea.com.cn/zh/about-midea?wcmmode=disabled",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "雷赛智能": {
     "displayName": "雷赛智能",
@@ -369,7 +381,9 @@
     "brandImageSource": "https://www.luvbotics.com/homepage/",
     "photos": [],
     "lastReviewed": "2026-10-23",
-    "evidenceLevel": "official"
+    "evidenceLevel": "official",
+    "photoSourcePage": "https://www.leisai.com/groupIntroduction.html",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "正泰电器": {
     "displayName": "正泰电器",
@@ -418,7 +432,9 @@
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
-    "brandImageSource": "https://en.miracletech.com/aboutus.html?c_id=2&id=0"
+    "brandImageSource": "https://en.miracletech.com/aboutus.html?c_id=2&id=0",
+    "photoSourcePage": "https://www.chint.net/about/overview/about_us",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "英威腾": {
     "displayName": "英威腾",
@@ -473,7 +489,9 @@
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
-    "brandImageSource": "https://www.phb123.com/bk/qiye/2163.html"
+    "brandImageSource": "https://www.phb123.com/bk/qiye/2163.html",
+    "photoSourcePage": "https://www.invt.com.cn/",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "思源电气": {
     "displayName": "思源电气",
@@ -528,7 +546,9 @@
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
-    "brandImageSource": "https://x.com/sieyuan_group"
+    "brandImageSource": "https://x.com/sieyuan_group",
+    "photoSourcePage": "https://www.sieyuan.com/about",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "许继电气": {
     "displayName": "许继电气",
@@ -579,7 +599,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://xjec.com",
-    "industry": "智能变配电"
+    "industry": "智能变配电",
+    "photoSourcePage": "https://xjec.com/intro/shortintro/",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "平高电气": {
     "displayName": "平高电气",
@@ -625,7 +647,9 @@
     "website": "https://pinggao.com",
     "industry": "高压开关设备",
     "brandAssetCandidateRejected": "https://pinggao.com/favicon.ico",
-    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)"
+    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)",
+    "photoSourcePage": "https://www.pinggao.com/about/company.html",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "国电南瑞": {
     "displayName": "国电南瑞",
@@ -676,7 +700,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://nrec.com",
-    "industry": "电网自动化"
+    "industry": "电网自动化",
+    "photoSourcePage": "https://www.sse.com.cn/assortment/stock/list/info/company/index.shtml?COMPANY_CODE=600406",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "中控技术": {
     "displayName": "中控技术",
@@ -727,7 +753,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://supcon.com",
-    "industry": "流程控制"
+    "industry": "流程控制",
+    "photoSourcePage": "https://srm.supcon.com/",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "拓斯达": {
     "displayName": "拓斯达",
@@ -778,7 +806,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://topstarltd.com",
-    "industry": "工业机器人"
+    "industry": "工业机器人",
+    "photoSourcePage": "https://www.topstarltd.com/lang-cn/about.html",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "埃斯顿": {
     "displayName": "埃斯顿",
@@ -829,7 +859,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://estun.com",
-    "industry": "伺服与运动控制"
+    "industry": "伺服与运动控制",
+    "photoSourcePage": "https://www.estun.com/about-us/",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "德赛西威": {
     "displayName": "德赛西威",
@@ -945,7 +977,9 @@
     "evidenceLevel": "official_source_read",
     "website": "https://boe.com",
     "industry": "显示技术",
-    "imageSource": "https://www.boe.com/innovativeTechnologies/creativeSpace"
+    "imageSource": "https://www.boe.com/innovativeTechnologies/creativeSpace",
+    "photoSourcePage": "https://www.boe.com/about/index",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "歌尔股份": {
     "displayName": "歌尔股份",
@@ -998,7 +1032,9 @@
     "website": "https://goertek.com",
     "industry": "声光电组件",
     "brandAssetCandidateRejected": "https://goertek.com/favicon.ico",
-    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)"
+    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)",
+    "photoSourcePage": "https://www.goertek.com/about/intro.html",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "中兴通讯": {
     "displayName": "中兴通讯",
@@ -1049,7 +1085,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://zte.com.cn",
-    "industry": "无线通信"
+    "industry": "无线通信",
+    "photoSourcePage": "https://www.zte.com.cn/china/about/investorrelations.html",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "科大讯飞": {
     "displayName": "科大讯飞",
@@ -1100,7 +1138,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://iflytek.com",
-    "industry": "语音与语言AI"
+    "industry": "语音与语言AI",
+    "photoSourcePage": "https://www.xfyun.cn/introduction",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "潍柴动力": {
     "displayName": "潍柴动力",
@@ -1151,7 +1191,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://weichaipower.com",
-    "industry": "动力系统"
+    "industry": "动力系统",
+    "photoSourcePage": "https://www.weichaipower.com/assist/contact/",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "兆易创新": {
     "displayName": "兆易创新",
@@ -1203,7 +1245,9 @@
     "website": "https://gigadevice.com.cn",
     "industry": "存储器",
     "brandAssetCandidateRejected": "https://gigadevice.com.cn/favicon.ico",
-    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)"
+    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)",
+    "photoSourcePage": "https://www.gigadevice.com.cn/about/contact",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "浪潮信息": {
     "displayName": "浪潮信息",
@@ -1254,7 +1298,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://ieisystem.com",
-    "industry": "服务器与AI算力"
+    "industry": "服务器与AI算力",
+    "photoSourcePage": "https://www.ieisystem.com/about/",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "隆基绿能": {
     "displayName": "隆基绿能",
@@ -1305,7 +1351,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://longi.com",
-    "industry": "光伏电池及组件"
+    "industry": "光伏电池及组件",
+    "photoSourcePage": "https://www.longi.com/cn/about-longi/",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "晶科能源": {
     "displayName": "晶科能源",
@@ -1349,7 +1397,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://jinkosolar.com",
-    "industry": "电池片与组件"
+    "industry": "电池片与组件",
+    "photoSourcePage": "https://www.jinkosolar.com/site/aboutus",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "亿纬锂能": {
     "displayName": "亿纬锂能",
@@ -1396,11 +1446,44 @@
     "brandImage": "https://evebattery.com/favicon.ico",
     "brandImageSource": "https://evebattery.com",
     "brandAssetStatus": "official_domain_favicon_unverified_visual",
-    "photos": [],
+    "photos": [
+      {
+        "url": "https://www.evebattery.com/Public/Uploads/uploadfile/images/20230616/1-2.jpg",
+        "label": "亿纬锂能官网标注的惠州总部A区",
+        "kind": "headquarters",
+        "source": "https://www.evebattery.com/about"
+      },
+      {
+        "url": "https://www.evebattery.com/Public/Uploads/uploadfile/images/20230616/1-5.jpg",
+        "label": "亿纬锂能总部研发中心",
+        "kind": "office",
+        "source": "https://www.evebattery.com/about"
+      },
+      {
+        "url": "https://www.evebattery.com/Public/Uploads/uploadfile/images/20230616/1-6.jpg",
+        "label": "亿纬锂能惠州西坑生产基地",
+        "kind": "factory",
+        "source": "https://www.evebattery.com/about"
+      },
+      {
+        "url": "https://www.evebattery.com/Public/Uploads/uploadfile/images/20230616/2-1.jpg",
+        "label": "亿纬锂能潼湖生产基地全景",
+        "kind": "factory",
+        "source": "https://www.evebattery.com/about"
+      },
+      {
+        "url": "https://www.evebattery.com/Public/Uploads/uploadfile/images/20210831/d3_pic1.jpg",
+        "label": "亿纬锂能官网的先进制造展示",
+        "kind": "factory",
+        "source": "https://www.evebattery.com/advanced-manufacturing"
+      }
+    ],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://evebattery.com",
-    "industry": "消费电池"
+    "industry": "消费电池",
+    "photoSourcePage": "https://www.evebattery.com/about",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "欣旺达": {
     "displayName": "欣旺达",
@@ -1451,7 +1534,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://sunwoda.com",
-    "industry": "消费电池"
+    "industry": "消费电池",
+    "photoSourcePage": "https://sunwoda.com/",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "福耀玻璃": {
     "displayName": "福耀玻璃",
@@ -1501,7 +1586,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://fuyaogroup.com",
-    "industry": "汽车玻璃"
+    "industry": "汽车玻璃",
+    "photoSourcePage": "https://www.fuyaogroup.com/about.html",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "紫光股份": {
     "displayName": "紫光股份",
@@ -1548,7 +1635,9 @@
     "website": "https://unis.cn",
     "industry": "网络与安全",
     "brandAssetCandidateRejected": "https://unis.cn/favicon.ico",
-    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)"
+    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)",
+    "photoSourcePage": "https://www.unis.cn/about.htm",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "海尔智家": {
     "displayName": "海尔智家",
@@ -1599,7 +1688,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://haier.com",
-    "industry": "智慧家电"
+    "industry": "智慧家电",
+    "photoSourcePage": "https://www.haier.com/about_haier/haiererpinpai/ppdw/",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "阳光电源": {
     "displayName": "阳光电源",
@@ -1626,9 +1717,9 @@
     ],
     "officeLocations": [
       {
-        "type": "官方公布的办公或联系地点",
+        "type": "中国总部",
         "address": "安徽省合肥市高新区习友路1699号",
-        "source": "https://www.cpss.org.cn/Home/Company?key=2934"
+        "source": "https://www.sungrowpower.com/demo/zh/about-us/contact-us"
       }
     ],
     "majorSlugs": [
@@ -1646,11 +1737,20 @@
     "brandImage": "https://sungrowpower.com/favicon.ico",
     "brandImageSource": "https://sungrowpower.com",
     "brandAssetStatus": "official_domain_favicon_unverified_visual",
-    "photos": [],
+    "photos": [
+      {
+        "url": "https://official-oversears-file.sungrowpower.com/news-images/c0981ae7-a998-433b-b9b4-78127ea55996.png",
+        "label": "阳光电源官网展示的 SG3.0/3.6/4.0RS 逆变器",
+        "kind": "product",
+        "source": "https://www.sungrowpower.com/demo/zh/products/string-inverter"
+      }
+    ],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://sungrowpower.com",
-    "industry": "光伏逆变器"
+    "industry": "光伏逆变器",
+    "photoSourcePage": "https://www.sungrowpower.com/",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "海康机器人": {
     "displayName": "海康机器人",
@@ -1702,7 +1802,9 @@
     "evidenceLevel": "official_source_read",
     "website": "https://hikrobotics.com",
     "industry": "机器视觉",
-    "parentName": "海康威视"
+    "parentName": "海康威视",
+    "photoSourcePage": "https://www.hikrobotics.com/cn/contactus/",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "阳光电动力": {
     "displayName": "阳光电动力",
@@ -1756,7 +1858,9 @@
     "industry": "汽车电控",
     "parentName": "阳光电源",
     "brandAssetCandidateRejected": "https://sungrowev.com/favicon.ico",
-    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)"
+    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)",
+    "photoSourcePage": "https://www.sungrowev.com/cn/about-us",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "亿纬氢能": {
     "displayName": "亿纬氢能",
@@ -1808,7 +1912,9 @@
     "evidenceLevel": "official_source_read",
     "website": "https://evehydrogen.com",
     "industry": "AEM技术",
-    "parentName": "亿纬锂能"
+    "parentName": "亿纬锂能",
+    "photoSourcePage": "https://www.evehydrogen.com/about/index.html",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "立讯精密": {
     "displayName": "立讯精密",
@@ -1861,7 +1967,9 @@
     "website": "https://luxshare-ict.com",
     "industry": "精密连接",
     "brandAssetCandidateRejected": "https://luxshare-ict.com/favicon.ico",
-    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)"
+    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)",
+    "photoSourcePage": "https://www.luxshare-ict.com/about/company-profile.html",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "宁德时代": {
     "displayName": "宁德时代",
@@ -1888,9 +1996,9 @@
     ],
     "officeLocations": [
       {
-        "type": "总部所在城市（门牌待核验）",
-        "address": "福建省宁德市",
-        "source": "https://www.catl.com/"
+        "type": "总部地址",
+        "address": "福建省宁德市蕉城区漳湾镇新港路2号",
+        "source": "https://www.catl.com/contactus/"
       }
     ],
     "majorSlugs": [
@@ -1908,11 +2016,20 @@
     "brandImage": "https://catl.com/favicon.ico",
     "brandImageSource": "https://catl.com",
     "brandAssetStatus": "official_domain_favicon_unverified_visual",
-    "photos": [],
+    "photos": [
+      {
+        "url": "https://www.catl.com/uploads/1/image/public/202008/20200818161807_q641cuoh2y.png",
+        "label": "宁德时代官网的企业总部建筑展示",
+        "kind": "headquarters",
+        "source": "https://www.catl.com/about/profile/"
+      }
+    ],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://catl.com",
-    "industry": "动力电池"
+    "industry": "动力电池",
+    "photoSourcePage": "https://www.catl.com/",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "三一重工": {
     "displayName": "三一重工",
@@ -1957,7 +2074,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://sanygroup.com",
-    "industry": "工程机械"
+    "industry": "工程机械",
+    "photoSourcePage": "https://www.sanygroup.com/introduction/",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "海康威视": {
     "displayName": "海康威视",
@@ -2008,7 +2127,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://hikvision.com",
-    "industry": "视频感知"
+    "industry": "视频感知",
+    "photoSourcePage": "https://ifpd.hikvision.com/aboutUs.html",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   },
   "北方华创": {
     "displayName": "北方华创",
@@ -2059,6 +2180,8 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://naura.com",
-    "industry": "集成电路装备"
+    "industry": "集成电路装备",
+    "photoSourcePage": "https://www.naura.com/other/contact.html",
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
   }
 }

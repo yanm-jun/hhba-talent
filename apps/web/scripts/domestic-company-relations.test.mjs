@@ -178,3 +178,22 @@ test('new employer profiles seed missing entities and override weak stock-roster
  assert(result.includes('企业介绍已整理'));
  assert(!result.includes("'完整企业介绍'"),'Do not call incomplete photo profiles complete');
 });
+
+test('official plant and product assets are tied to correct employer records',()=>{
+ const p=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
+ const checks={
+  '亿纬锂能':{source:'evebattery.com',kinds:['headquarters','office','factory'],min:5},
+  '宁德时代':{source:'catl.com',kinds:['headquarters'],min:1},
+  '阳光电源':{source:'sungrowpower.com',kinds:['product'],min:1}
+ };
+ for(const [name,expected] of Object.entries(checks)){
+  const x=p[name];assert(x.photos.length>=expected.min,name);
+  for(const photo of x.photos){assert(new URL(photo.source).hostname.includes(expected.source));
+   assert(expected.kinds.includes(photo.kind));}
+ }
+ assert.equal(p['宁德时代'].officeLocations[0].source,'https://www.catl.com/contactus/');
+ assert.equal(p['阳光电源'].officeLocations[0].source,'https://www.sungrowpower.com/demo/zh/about-us/contact-us');
+ for(const x of Object.values(p))assert(x.photoSourcePage?.startsWith('https://'),'Missing source link for company with no ready photo');
+ const page=readFileSync('src/pages/DomesticCompanyPage.tsx','utf8');
+ assert(page.includes('article?.photoSourcePage&&!hasReadyPhoto?'),'No downloadable image must show verified source link');
+});

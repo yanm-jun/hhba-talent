@@ -14,7 +14,7 @@ type Reviewed={
  business:{title:string;description:string}[];majorSlugs:string[];
  careersUrl?:string;careersLabel?:string;officialSource:string;productSource?:string;
  brandImage?:string;imageSource?:string;brandImageSource?:string;brandAssetStatus?:string;lastReviewed:string;
- photos?:{url:string;label:string;source:string}[];
+ photos?:{url:string;label:string;source:string;kind?:'headquarters'|'factory'|'office'|'product'}[];
  officeLocations?:{type:string;address:string;source:string}[];
  photoSourcePage?:string;photoSourceLabel?:string;
  evidenceLevel?:string;
@@ -40,6 +40,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
  const brandSrc=media?.brand?.state==='ready'?import.meta.env.BASE_URL+media.brand.path:undefined;
  const majors=company?matchingMajors(company):[];
  const careers=company?httpsLink(article?.careersUrl||company.careers):'';
+ const hasReadyPhoto=Boolean(article?.photos?.some((_,i)=>media?.photos?.[i]?.state==='ready'));
  const shownRelated=related.filter(c=>(c.name+c.industry+(c.city||'')+c.tags.join(' ')).toLocaleLowerCase().includes(filter.trim().toLocaleLowerCase())).slice(0,24);
  return <Shell user={user}><article className="domestic-company-profile domestic-editorial-profile">
   <Link to={back.to} restoreScrollY={back.scrollY} restoreMarketState={back.marketState} className="domestic-company-back"><ArrowLeft size={16}/> 返回上一页</Link>
@@ -73,7 +74,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
        {article.business.map(item=><div key={item.title}><strong>{item.title}</strong><p>{item.description}</p></div>)}
       </div>}
     </section>
-    {article?.photos?.some((_,i)=>media?.photos?.[i]?.state==='ready')?<section className="domestic-editorial-section domestic-editorial-photos" aria-label="企业真实图片">
+    {hasReadyPhoto?<section className="domestic-editorial-section domestic-editorial-photos" aria-label="企业真实图片">
       <h2>企业与产品实景</h2>
       <div className="domestic-editorial-photo-grid">
        {article!.photos!.filter((_,i)=>media?.photos?.[i]?.state==='ready').map(photo=><figure key={photo.url} className="domestic-official-photo">
@@ -81,11 +82,11 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
          <img src={import.meta.env.BASE_URL+media!.photos![article.photos!.indexOf(photo)].path} loading="lazy" alt={photo.label} onError={e=>{e.currentTarget.style.display='none';e.currentTarget.parentElement?.classList.add('domestic-photo-unavailable')}}/>
          <span className="domestic-photo-fallback"><Images size={18}/>点击查看官网图片</span>
         </a>
-        <figcaption>{photo.label} · 官方来源</figcaption>
+        <figcaption>{photo.label} · {photo.kind==='product'?'产品照片':photo.kind==='factory'?'生产基地':photo.kind==='headquarters'?'总部实景':'官网图片'}</figcaption>
        </figure>)}
       </div>
      </section>:null}
-    {article?.photoSourcePage&&!article.photos?.length?
+    {article?.photoSourcePage&&!hasReadyPhoto?
      <section className="domestic-editorial-section" aria-label="官方企业实景来源"><h2>企业实景与办公环境</h2>
       <p className="domestic-company-note">图片暂未核验为可在本站稳定展示，避免错用其他企业照片。</p>
       <a href={article.photoSourcePage} target="_blank" rel="noopener noreferrer" className="domestic-careers-link">

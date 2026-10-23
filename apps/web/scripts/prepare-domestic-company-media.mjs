@@ -71,5 +71,22 @@ await Promise.all(Array.from({length:Math.min(7,jobs.length)},async()=>{
 writeFileSync('src/data/domesticMediaBundle.json',JSON.stringify(manifest,null,2)+'\n');
 mkdirSync('preview-reports',{recursive:true});
 writeFileSync('preview-reports/media-bundle-status.json',JSON.stringify({stats,manifest},null,2));
+const rows=Object.entries(manifest.companies).map(([name,m])=>({
+ name,localBrandCandidate:m.brand?.state==='ready',
+ brandClass:m.brand?.classification||'missing',
+ readyPhotos:(m.photos||[]).filter(photo=>photo?.state==='ready').length,
+ declaredPhotos:profiles[name].photos?.length||0,
+ brandedLogoVerified:profiles[name].brandAssetStatus==='official_logo_visually_verified'&&m.brand?.state==='ready'
+}));
+writeFileSync('preview-reports/media-coverage-by-company.json',JSON.stringify({generatedAt:manifest.generatedAt,rows},null,2));
+writeFileSync('preview-reports/media-coverage-by-company.md',[
+ '# HHBA 40家企业媒体真实验收',
+ '',
+ '打包成功≠品牌身份确认；未经视觉核对的 favicon 不是正式 Logo。未验证为可展示的照片不应计入。',
+ '',
+ '| 企业 | 本地品牌候选图 | 正式Logo已人工核对 | 本地有效照片 / 已登记 |',
+ '|---|---|---|---|',
+ ...rows.map(x=>`| ${x.name} | ${x.localBrandCandidate?'有':'无'} | ${x.brandedLogoVerified?'是':'否'} | ${x.readyPhotos}/${x.declaredPhotos} |`)
+].join('\n')+'\n');
 console.log('HHBA_MEDIA_BUNDLE',JSON.stringify(stats));
 console.log('HHBA_MEDIA_BUNDLE_FAILED',JSON.stringify(Object.entries(manifest.companies).filter(([_,v])=>v.brand.state!=='ready').map(([name,v])=>({name,state:v.brand.state}))));
