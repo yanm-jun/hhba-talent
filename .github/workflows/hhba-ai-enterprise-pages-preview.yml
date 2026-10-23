@@ -23,6 +23,7 @@ on:
       - 'apps/web/src/data/domesticCompanyRelations.json'
       - 'apps/web/scripts/domestic-company-relations.test.mjs'
       - 'apps/web/scripts/audit-domestic-company-media.mjs'
+      - 'apps/web/scripts/check-domestic-company-image-urls.mjs'
       - 'apps/web/src/main.tsx'
       - 'apps/web/src/router.tsx'
       - 'apps/web/src/pages/MajorCompaniesPage.tsx'
@@ -75,6 +76,9 @@ jobs:
       - name: Audit company media and profile source coverage
         working-directory: apps/web
         run: node --test scripts/audit-domestic-company-media.mjs
+      - name: Probe employer brand and photo image URLs for reachability
+        working-directory: apps/web
+        run: node scripts/check-domestic-company-image-urls.mjs
       - name: Retrieve public ATS listings for OpenAI, Anthropic, SpaceX (no API Key)
         run: |
           cd apps/web
