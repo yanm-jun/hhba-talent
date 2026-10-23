@@ -48,6 +48,13 @@
     "imageSource": "https://www.hascovision.com/about/about-us",
     "photos": [
       {
+        "url": "https://www.hascovision.com/Public/Uploads/uploadfile/images/20260313/changshuxingongchang.jpg",
+        "label": "华域视觉官网展示的常熟工厂真实外景（楼宇与企业标识）",
+        "kind": "factory",
+        "source": "https://www.hascovision.com/about/about-us",
+        "verification": "official_site_caption_and_visual_inspection"
+      },
+      {
         "url": "https://www.hascovision.com/Public/Uploads/uploadfile/images/20231219/e1img07.jpg",
         "label": "华域视觉官网 · 上海总部及业务布局展示",
         "source": "https://www.hascovision.com/about/about-us"
@@ -56,20 +63,12 @@
         "url": "https://www.hascovision.com/Public/Uploads/uploadfile/images/20240318/tu215.png",
         "label": "华域视觉官网 · 企业参展实景",
         "source": "https://www.hascovision.com/news/company-news"
-      },
-      {
-        "url": "https://www.hascovision.com/Public/Uploads/uploadfile/images/20240628/gongchang-525.jpg",
-        "label": "华域视觉官网：嘉定数字化工厂",
-        "kind": "factory",
-        "source": "https://www.hascovision.com/products-innovation/intelligent-manufacturing",
-        "localPath": "domestic-media/e58d8ee59f9fe8a786e8a789e7a791e68a80efbc88e4b88ae6b5b7e-official-caption-0.jpg",
-        "verification": "official_page_caption_not_human_reviewed"
       }
     ],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
     "photoSourcePage": "https://www.hascovision.com/about/about-us",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "photoSourceLabel": "查看官网常熟工厂实景",
     "brandAssetStatus": "official_logo_visually_verified",
     "brandImageSource": "https://gpms.hascovision.com/GPMS/supplier.jsp",
     "brandIdentityEvidence": "华域视觉自有采购门户以 logo_h.png 为页首品牌标识，已对照官方页面可见的 HASCO VISION 图形",
