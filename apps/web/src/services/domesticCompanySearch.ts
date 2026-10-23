@@ -1,5 +1,7 @@
 import curated from '../data/aiCompanyCatalog.json';
 import editorial from '../data/domesticCompanyEditorial.json';
+import rosterSnapshot from '../data/domesticListedCompanies.json';
+import relationsSnapshot from '../data/domesticCompanyRelations.json';
 
 export type DomesticCompany={
  id:string;name:string;legalName?:string;industry:string;overview:string;
@@ -20,7 +22,7 @@ export type CompanyRelation={
 type RelationFeed={schemaVersion:number;relations:CompanyRelation[]};
 const details=editorial as Record<string,Editorial>;
 const normalize=(value:string)=>value.toLocaleLowerCase().replace(/[\s·・（）()\-—_]/g,'');
-let cache:Promise<DomesticCompany[]>|undefined;
+let cache:DomesticCompany[]|undefined;
 function clean(value?:string){return value?.trim()||undefined}
 function oneCompanyFromRoster(r:Listed,roster:Roster,prior?:{
  id:string;name:string;industry:string;overview:string;careers:string|null;evidenceUrl?:string;lastReviewed:string;
@@ -61,17 +63,10 @@ function mergeRelation(c:DomesticCompany,r:CompanyRelation){
  if(r.city&&!c.city)c.city=r.city;
  if(r.careersUrl&&!c.careers){c.careers=r.careersUrl;c.careersShared=true;}
 }
-export function loadDomesticCompanies():Promise<DomesticCompany[]>{
+export function getDomesticCompanies():DomesticCompany[]{
  if(cache)return cache;
- cache=(async()=>{
-  const base=import.meta.env.BASE_URL+'data/';
-  const [rosterResponse,relationResponse]=await Promise.all([
-   fetch(base+'domestic-listed-companies.json',{credentials:'omit'}),
-   fetch(base+'domestic-company-relations.json',{credentials:'omit'})
-  ]);
-  if(!rosterResponse.ok||!relationResponse.ok)throw Error('国内企业资料暂不可用');
-  const roster=await rosterResponse.json() as Roster;
-  const relationships=await relationResponse.json() as RelationFeed;
+ const roster=rosterSnapshot as Roster;
+ const relationships=relationsSnapshot as RelationFeed;
   if(!Array.isArray(roster.companies)||roster.companies.length<5500||
    !Array.isArray(relationships.relations)||relationships.relations.length<40)throw Error('企业名录不完整');
   const existing=(curated.companies as Array<{
@@ -94,9 +89,10 @@ export function loadDomesticCompanies():Promise<DomesticCompany[]>{
   const index=createCompanyIndex(map);
   for(const [name,e] of Object.entries(details)){
    if(index.has(normalize(name)))continue;
-   const c:DomesticCompany={id:'spot-'+normalize(name),name,industry:e.industry,overview:e.overview,
+   const id='spot-'+Array.from(name).map(char=>char.codePointAt(0)!.toString(36)).join('-');
+   const c:DomesticCompany={id,name,industry:e.industry,overview:e.overview,
     website:clean(e.website),careers:clean(e.careers),sourceUrl:e.sourceUrl||e.website||'',
-    lastReviewed:'2026-10-23',tags:e.tags,route:'/companies/domestic/spot-'+normalize(name),
+    lastReviewed:'2026-10-23',tags:e.tags,route:'/companies/domestic/'+id,
     status:'industry_reviewed',entityKind:'company'};
    map.push(c);index.set(normalize(name),c);
   }
@@ -125,10 +121,10 @@ export function loadDomesticCompanies():Promise<DomesticCompany[]>{
    mergeRelation(company,r);
    for(const a of aliasesFor(company))if(!index.has(normalize(a)))index.set(normalize(a),company);
   }
+  cache=map;
   return map;
- })().catch(error=>{cache=undefined;throw error});
- return cache;
 }
+export function loadDomesticCompanies():Promise<DomesticCompany[]>{return Promise.resolve(getDomesticCompanies());}
 const synonyms:Record<string,string[]>={
  '电气自动化':['电气','自动化','电力','工业控制','控制系统','PLC','伺服','变频','机电','智能制造','电网','输配电','机器人'],
  '机械制造':['机械','机床','工业装备','智能制造','工程机械','机器人','制造'],

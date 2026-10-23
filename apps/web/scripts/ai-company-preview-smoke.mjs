@@ -71,6 +71,10 @@ try{
  await desktop.locator('.unified-job-search input').waitFor();
  // Verify real company graph routes through HHBA pages, not directly to an ATS.
  await desktop.locator('.unified-job-search input').fill('华域视觉');
+ // Built-in catalogue must show results on the first search render, with zero runtime JSON downloads.
+ await desktop.locator('.domestic-company-card').filter({hasText:'华域视觉'}).first().waitFor({timeout:2500});
+ assert(!((await desktop.locator('.domestic-company-result').innerText()).includes('载入企业名录中')));
+
  await desktop.locator('.domestic-company-card').filter({hasText:'华域视觉'}).first().waitFor({timeout:12000});
  await desktop.locator('.domestic-company-card').filter({hasText:'华域视觉'}).first().click();
  await desktop.getByRole('heading',{name:'华域视觉科技（上海）有限公司'}).waitFor();

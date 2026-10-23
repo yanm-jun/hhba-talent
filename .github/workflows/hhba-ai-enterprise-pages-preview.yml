@@ -19,6 +19,8 @@ on:
       - 'apps/web/src/data/domesticCompanyEditorial.json'
       - 'apps/web/public/data/domestic-listed-companies.json'
       - 'apps/web/public/data/domestic-company-relations.json'
+      - 'apps/web/src/data/domesticListedCompanies.json'
+      - 'apps/web/src/data/domesticCompanyRelations.json'
       - 'apps/web/scripts/domestic-company-relations.test.mjs'
       - 'apps/web/src/main.tsx'
       - 'apps/web/src/router.tsx'
@@ -95,6 +97,7 @@ jobs:
           test -f combined/index.html
           test -f combined/ai-company-preview/index.html
           test -f combined/ai-company-preview/data/featured-live.json
+          # No runtime fetch needed: these are compiled into the static JS assets.
           test -f combined/data/domestic-jobs.json
           if grep -R -E 'DEEPSEEK_API_KEY|sk-[a-zA-Z0-9]{18,}' combined/ai-company-preview/assets/; then
             echo 'Possible credential leak in client assets'; exit 1
