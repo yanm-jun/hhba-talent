@@ -18,7 +18,7 @@ export function DomesticCompanyResults({query}:{query:string}){
  {!busy&&!error&&!matched.length&&<p className="domestic-company-empty">暂未找到有足够资料的相关企业，可尝试更具体的专业或行业关键词。</p>}
  <div className="domestic-company-grid">{matched.map(c=><Link className="domestic-company-card" key={c.id} to={c.route}>
   <div className="domestic-company-card-head"><Building2 size={20}/><strong>{c.name}</strong></div>
-  <small>{c.industry}{c.city?' · '+c.city:''}</small>
+  <small>{c.industry}{c.city?' · '+c.city:''}{c.parentName?' · 关联：'+c.parentName:''}</small>
   <p>{c.overview}</p><footer><span>{c.status==='industry_reviewed'?'已整理业务资料':c.status==='official_entry_only'?'已有历史招聘入口':'上市主体已收录 · 业务待核验'}</span><span>了解企业 <ArrowRight size={14}/></span></footer>
  </Link>)}</div>
  </section>;

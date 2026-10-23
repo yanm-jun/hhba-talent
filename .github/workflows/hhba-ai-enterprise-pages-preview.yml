@@ -18,6 +18,8 @@ on:
       - 'apps/web/src/styles/domestic-company-search.css'
       - 'apps/web/src/data/domesticCompanyEditorial.json'
       - 'apps/web/public/data/domestic-listed-companies.json'
+      - 'apps/web/public/data/domestic-company-relations.json'
+      - 'apps/web/scripts/domestic-company-relations.test.mjs'
       - 'apps/web/src/main.tsx'
   workflow_dispatch:
 permissions:
@@ -57,6 +59,9 @@ jobs:
           VITE_HHBA_DOMESTIC_STATIC_ONLY: '0'
           VITE_HHBA_OFFICIAL_THREE_ONLY: '1'
         run: npm run build --prefix apps/web
+      - name: Validate public company relationship sources and hierarchy
+        working-directory: apps/web
+        run: node --test scripts/domestic-company-relations.test.mjs
       - name: Retrieve public ATS listings for OpenAI, Anthropic, SpaceX (no API Key)
         run: |
           cd apps/web
