@@ -3,6 +3,7 @@
 import {readFileSync,writeFileSync,mkdirSync,existsSync} from 'node:fs';
 import {join} from 'node:path';
 const profiles=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
+const targetNames=new Set(JSON.parse(readFileSync('src/data/domesticComplete50Target.json','utf8')).companyNames);
 let older={companies:{}};
 try{older=JSON.parse(readFileSync('src/data/domesticMediaBundle.json','utf8'))}catch{}
 function previousMedia(name,kind,idx,url){
@@ -15,7 +16,7 @@ function previousMedia(name,kind,idx,url){
 const directory='public/domestic-media';
 mkdirSync(directory,{recursive:true});
 const manifest={version:1,generatedAt:new Date().toISOString(),companies:{}};
-const stats={employers:Object.keys(profiles).length,brandSucceeded:0,brandFailed:0,photoSucceeded:0,photoFailed:0,cacheReused:0,files:0,bytes:0};
+const stats={employers:targetNames.size,brandSucceeded:0,brandFailed:0,photoSucceeded:0,photoFailed:0,cacheReused:0,files:0,bytes:0};
 const extFor=(buffer)=>{
  if(buffer.length>=4&&buffer[0]===0x89&&buffer[1]===0x50&&buffer[2]===0x4e&&buffer[3]===0x47)return 'png';
  if(buffer.length>=3&&buffer[0]===0xff&&buffer[1]===0xd8&&buffer[2]===0xff)return 'jpg';
@@ -53,11 +54,12 @@ async function download(url,key,maxBytes=2_800_000){
 }
 const jobs=[];
 for(const [name,p] of Object.entries(profiles)){
+ if(!targetNames.has(name))continue; // This job is scoped to the first fifty fully audited entities.
  const key=Buffer.from(name).toString('hex').slice(0,175);
  manifest.companies[name]={brand:{state:'missing'},photos:[]};
  if(p.brandLocalPath&&/^domestic-media\/[a-zA-Z0-9._-]+\.(?:png|jpg|webp|gif)$/.test(p.brandLocalPath)&&existsSync('public/'+p.brandLocalPath)){
   manifest.companies[name].brand={state:'ready',path:p.brandLocalPath,source:p.brandImage,
-   classification:'official_site_brand_candidate_not_visually_verified'};
+   classification:p.brandAssetStatus==='official_logo_visually_verified'?'logo_identity_checked':'official_site_brand_candidate_not_visually_verified'};
   stats.brandSucceeded++;
  }else if(p.brandImage){
   const cached=previousMedia(name,'brand',0,p.brandImage);
@@ -65,6 +67,10 @@ for(const [name,p] of Object.entries(profiles)){
   else jobs.push({name,kind:'brand',idx:0,url:p.brandImage,key:key+'-brand'});
  }
  (p.photos||[]).forEach((photo,idx)=>{
+  if(!photo.source?.startsWith('https://')||!photo.label||!['headquarters','office','factory','product'].includes(photo.kind)){
+   manifest.companies[name].photos[idx]={state:'pending_photo_identity_or_source'};
+   return;
+  }
   if(photo.localPath&&/^domestic-media\/[a-zA-Z0-9._-]+\.(?:png|jpg|webp|gif)$/.test(photo.localPath)&&existsSync('public/'+photo.localPath)){
    manifest.companies[name].photos[idx]={state:'ready',path:photo.localPath,source:photo.url,
     sourcePage:photo.source,classification:'official_publisher_caption_not_independently_visual_verified'};
@@ -107,7 +113,7 @@ const rows=Object.entries(manifest.companies).map(([name,m])=>({
 }));
 writeFileSync('preview-reports/media-coverage-by-company.json',JSON.stringify({generatedAt:manifest.generatedAt,rows},null,2));
 writeFileSync('preview-reports/media-coverage-by-company.md',[
- '# HHBA 40家企业媒体真实验收',
+ '# HHBA 首批50家企业媒体真实验收',
  '',
  '打包成功≠品牌身份确认；未经视觉核对的 favicon 不是正式 Logo。未验证为可展示的照片不应计入。',
  '',
