@@ -45,7 +45,7 @@ export function DomesticCompanyResults({query,majorSlug='',scope='',country='',c
    const editorial=rich[company.name];
    return <Link className="domestic-company-card" key={company.id} to={company.route}>
     <div className="domestic-company-card-head"><span className="domestic-result-brand" aria-hidden="true">
-      <BrandMark src={available.companies[company.name]?.brand?.state==='ready'&&available.companies[company.name]?.brand?.path?import.meta.env.BASE_URL+available.companies[company.name].brand.path:undefined} name={company.name}/>
+      <BrandMark src={available.companies[company.name]?.brand?.state==='ready'&&available.companies[company.name]?.brand?.path?import.meta.env.BASE_URL+(available.companies[company.name]?.brand?.path||''):undefined} name={company.name}/>
      </span><strong>{editorial?.displayName||company.name}</strong></div>
     <small>{company.industry}{company.city?' · '+company.city:''}{company.parentName?' · 关联：'+company.parentName:''}</small>
     {editorial?.displayName&&editorial.displayName!==company.name&&<small className="domestic-card-legal">企业主体：{company.name}</small>}
