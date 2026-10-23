@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - feat/ai-company-search-phase1-20261023
+  pull_request:
+    branches:
+      - feat/domestic-weekly-cache-pages-20261022
   workflow_dispatch:
 permissions:
   contents: read
