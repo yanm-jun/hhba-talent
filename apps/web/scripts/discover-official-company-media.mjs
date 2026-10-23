@@ -55,8 +55,8 @@ function figureCaption(html,position){
  const end=html.indexOf('</figure>',position);
  if(end<0||end-position>12000)return '';
  const figure=html.slice(start,end);
- if((figure.match(/<img\\b/gi)||[]).length!==1)return '';
- const matched=figure.match(/<figcaption\\b[^>]*>([\\s\\S]*?)<\\/figcaption>/i);
+ if((figure.match(/<img\b/gi)||[]).length!==1)return '';
+ const matched=figure.match(/<figcaption\b[^>]*>([\s\S]*?)<\/figcaption>/i);
  if(!matched)return '';
  return entities(matched[1].replace(/<[^>]*>/g,' ').replace(/\\s+/g,' ')).trim().slice(0,150);
 }
