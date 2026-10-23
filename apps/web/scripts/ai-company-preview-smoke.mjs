@@ -27,7 +27,14 @@ try{
  desktop.on('pageerror',e=>errors.push('desktop '+e.message));
  await desktop.goto(ROOT,{waitUntil:'domcontentloaded'});
  await desktop.getByRole('heading',{name:'招聘市场'}).waitFor({timeout:15000});
- await desktop.locator('.unified-job-search input').waitFor();
+ try {await desktop.locator('.unified-job-search input').waitFor({timeout:11000});}
+ catch(error){
+  console.error('URL',desktop.url());
+  console.error('SCRIPT_ERRORS',JSON.stringify(errors));
+  console.error('BODY', (await desktop.locator('body').innerText()).slice(0,4500));
+  console.error('HTML', (await desktop.content()).slice(0,1100));
+  throw error;
+ }
  assert.equal(await desktop.locator('.unified-job-search input').count(),1);
  assert.equal(await desktop.locator('.ai-company-single-search,.hhba-featured-card,.ai-company-demo-banner').count(),0);
  await desktop.locator('.unified-job-controls select').first().waitFor();
