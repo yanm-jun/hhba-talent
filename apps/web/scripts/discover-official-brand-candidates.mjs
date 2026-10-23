@@ -3,6 +3,7 @@
 import {readFileSync,writeFileSync,mkdirSync,existsSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 const profiles=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
+const targetNames=new Set(JSON.parse(readFileSync('src/data/domesticComplete50Target.json','utf8')).companyNames);
 const candidates=[];
 const report={generatedAt:new Date().toISOString(),checked:0,replaced:[],preserved:[],failed:[]};
 mkdirSync('public/domestic-media',{recursive:true});
@@ -27,7 +28,7 @@ const fileFormat=b=>{
  if(/<svg[\s>]/i.test(b.subarray(0,1200).toString('utf8')))return 'svg';
  return '';
 };
-const projects=Object.entries(profiles).filter(([name,p])=>p.brandAssetStatus!=='official_logo_visually_verified')
+const projects=Object.entries(profiles).filter(([name,p])=>targetNames.has(name)&&p.brandAssetStatus!=='official_logo_visually_verified')
  .map(([name,p])=>{
   const url=p.website||p.productSource||p.officialSource;
   try{
@@ -58,11 +59,15 @@ await Promise.all(Array.from({length:5},async()=>{
     const filename=decodeURIComponent(absolute.pathname).toLowerCase();
     if(!/\.(png|jpg|jpeg|webp|gif|svg)(?:$|\?)/.test(filename))continue;
     const logo=/logo|品牌标识|企业标识|公司标志/i;
+    // Ignore certification/accessibility badges and third-party trademarks even if
+    // the filename contains "logo". Those were incorrectly picked for 中国银行.
+    if(/适老化|无障碍|认证|certification|accessibility|第三方|微信|支付宝|监管|服务标章|社交分享/i.test(alt+' '+cls+' '+id+' '+filename))continue;
     const isLogo=logo.test(cls+' '+id+' '+alt+' '+filename);
     if(!isLogo||/customer|client|partner|invest|supplier|footer|service|国家|政府/i.test(cls+' '+alt+' '+filename))continue;
     const score=(/logo/i.test(cls)?40:0)+(/logo/i.test(id)?35:0)+
       (/(?:\/|_|-)logo/i.test(filename)?35:0)+(/logo/i.test(alt)?30:0)+
       (match.index<16000?25:0)-(match.index>60000?20:0);
+    if(score<40)continue; // A non-header filename-only logo hint is insufficient.
     options.push({url:absolute.href,alt,score});
    }
    options.sort((a,b)=>b.score-a.score);
