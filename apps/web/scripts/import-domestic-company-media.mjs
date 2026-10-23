@@ -14,7 +14,18 @@ const known=new Set(roster);
 const profiles=JSON.parse(readFileSync(profilesPath,'utf8'));
 const bundle=JSON.parse(readFileSync(bundlePath,'utf8'));
 const counts={companiesChecked:0,imagesImported:0,logos:0,photos:0,skipped:[],errors:[]};
-const kindPattern=/^(logo|headquarters|office|factory|product|screenshot)(?:[-_][\p{L}\p{N}-]+)?\.(png|jpe?g|webp|gif)$/iu;
+const allowedExt=/\.(png|jpe?g|webp|gif)$/i;
+// Screenshot names from phones and browsers are accepted without renaming.
+// Unclassified images become generic screenshots, never invented headquarters.
+function kindOf(filename){
+ const stem=filename.replace(allowedExt,'');
+ if(/^(logo|brand|公司logo|企业logo|品牌logo|品牌图|企业标志|公司标志|商标)/i.test(stem))return 'logo';
+ if(/总部|大楼|总部大厦|园区|楼宇|总部建筑|总部外景/.test(stem))return 'headquarters';
+ if(/office|办公|会议室|研发中心|工作环境/i.test(stem))return 'office';
+ if(/factory|工厂|车间|生产线|制造基地/i.test(stem))return 'factory';
+ if(/product|产品|设备图片/i.test(stem))return 'product';
+ return 'screenshot';
+}
 const labels={
  headquarters:'企业总部或大楼照片（用户提供）',
  office:'企业办公环境照片（用户提供）',
@@ -64,11 +75,10 @@ if(!existsSync(inbox)){
   const metaPath=path.join(folder,'sources.json');
   if(existsSync(metaPath)){try{metadata=JSON.parse(readFileSync(metaPath,'utf8'))}catch{counts.errors.push({company:name,reason:'Invalid sources.json'})}}
   const confirmed=metadata.confirmedCompany===name;
-  const candidates=readdirSync(folder,{withFileTypes:true}).filter(x=>x.isFile()&&kindPattern.test(x.name)).slice(0,13);
+  const candidates=readdirSync(folder,{withFileTypes:true}).filter(x=>x.isFile()&&allowedExt.test(x.name))
+    .sort((a,b)=>Number(kindOf(b.name)==='logo')-Number(kindOf(a.name)==='logo')||a.name.localeCompare(b.name,'zh-CN')).slice(0,13);
   for(const file of candidates){
-   const match=file.name.match(kindPattern);
-   const kind=match?.[1]?.toLowerCase();
-   if(!kind)continue;
+   const kind=kindOf(file.name);
    if(!profile){counts.errors.push({company:name,file:file.name,reason:'Profile missing'});continue}
    const filename=path.join(folder,file.name);
    if(lstatSync(filename).isSymbolicLink()){counts.skipped.push({company:name,file:file.name,reason:'Symbolic links disallowed'});continue}
