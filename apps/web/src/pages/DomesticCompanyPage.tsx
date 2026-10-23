@@ -1,7 +1,7 @@
 import {useEffect,useMemo,useState} from 'react';
 import {ArrowLeft,ArrowRight,ExternalLink,Building2,ShieldCheck,Search,ChevronDown} from 'lucide-react';
 import {Shell} from '../components/Shell';
-import {Link} from '../router';
+import {Link,getCompanyReturnTarget} from '../router';
 import {loadDomesticCompanies,companyById,findParentCompany,findRelatedCompanies,type DomesticCompany} from '../services/domesticCompanySearch';
 import type {User} from '../services/api';
 import '../styles/domestic-company-search.css';
@@ -24,6 +24,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
    .finally(()=>{if(active)setLoading(false)});
   return()=>{active=false};
  },[id]);
+ const back=getCompanyReturnTarget();
  const related=useMemo(()=>company?findRelatedCompanies(all,company):[],[all,company]);
  const parent=useMemo(()=>company?findParentCompany(all,company):null,[all,company]);
  const filtered=useMemo(()=>{const q=search.trim().toLocaleLowerCase().replace(/\s+/g,'');
@@ -31,7 +32,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
    .join(' ').toLocaleLowerCase().replace(/\s+/g,'').includes(q)):related;
  },[related,search]);
  return <Shell user={user}><article className="domestic-company-profile">
- <Link to="/candidate/jobs" className="domestic-company-back"><ArrowLeft size={16}/> 返回搜索</Link>
+ <Link to={back.to} restoreScrollY={back.scrollY} restoreMarketState={back.marketState} className="domestic-company-back"><ArrowLeft size={16}/> 返回上一页</Link>
  {loading?<p role="status">正在读取企业档案…</p>:error?<p role="alert">{error}</p>:!company?<p>该企业资料暂未找到。</p>:<>
  <header><div className="domestic-company-profile-mark"><Building2 size={28}/></div>
   <div className="domestic-profile-identity"><span>HHBA · 国内企业与经营主体</span>

@@ -21,6 +21,7 @@ on:
       - 'apps/web/public/data/domestic-company-relations.json'
       - 'apps/web/scripts/domestic-company-relations.test.mjs'
       - 'apps/web/src/main.tsx'
+      - 'apps/web/src/router.tsx'
   workflow_dispatch:
 permissions:
   contents: read
