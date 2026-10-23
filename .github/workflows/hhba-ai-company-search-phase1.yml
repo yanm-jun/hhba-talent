@@ -95,6 +95,7 @@ jobs:
             apps/web/preview-reports/
             apps/web/src/data/domesticMediaBundle.json
             apps/web/src/data/domesticOfficialSceneBundle.json
+            apps/web/public/domestic-media/
           retention-days: 30
       - name: Persist source-tagged image assets back to development branch
         shell: bash
