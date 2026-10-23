@@ -2,7 +2,7 @@ import {useEffect,useMemo,useState} from 'react';
 import {ArrowLeft,ArrowRight,ExternalLink,Building2,ShieldCheck,ChevronDown,MapPin,Images} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,getCompanyReturnTarget} from '../router';
-import {getDomesticCompanies,companyById,findParentCompany,findRelatedCompanies} from '../services/domesticCompanySearch';
+import {getDomesticCompanies,getDomesticRecruitment,companyById,findParentCompany,findRelatedCompanies} from '../services/domesticCompanySearch';
 import {matchingMajors} from '../services/domesticMajors';
 import profiles from '../data/domesticCareerProfiles.json';
 import bundled from '../data/domesticMediaBundle.json';
@@ -41,7 +41,8 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
  const media=company?available.companies[company.name]:undefined;
  const brandSrc=media?.brand?.state==='ready'?import.meta.env.BASE_URL+media.brand.path:undefined;
  const majors=company?matchingMajors(company):[];
- const careers=company?httpsLink(article?.careersUrl||company.careers):'';
+ const recruitment=company?getDomesticRecruitment(company.name):undefined;
+ const careers=company?httpsLink(company.careers):'';
  const hasReadyPhoto=Boolean(article?.photos?.some((_,i)=>media?.photos?.[i]?.state==='ready'));
  const shownRelated=related.filter(c=>(c.name+c.industry+(c.city||'')+c.tags.join(' ')).toLocaleLowerCase().includes(filter.trim().toLocaleLowerCase())).slice(0,24);
  return <Shell user={user}><article className="domestic-company-profile domestic-editorial-profile">
@@ -117,12 +118,12 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
        <p className="domestic-editorial-limited">暂无足够资料判断该企业与哪些专业方向相关，正在逐步完善。</p>}
       <p className="domestic-company-note">根据企业公开业务与技术方向整理的专业关联，不等于该企业正在招聘这些专业的学生。点击专业可发现更多业务相关企业。</p>
     </section>}
-    {article&&<section className="domestic-editorial-section domestic-careers" aria-label="官方招聘渠道">
+    {(article||recruitment)&&<section className="domestic-editorial-section domestic-careers" aria-label="官方招聘渠道">
       <h2>官方招聘渠道</h2>
-      <p>点击企业招聘页面查看当前招聘信息、岗位职责和实际申请条件；HHBA 不同步或虚构国内企业职位。</p>
-      {careers?<div className="domestic-careers-row"><div><strong>{article?.careersLabel||'企业招聘入口'}</strong>
-       <small>{article?'与该经营主体对应的官方招聘页面':'经独立核验的企业官方招聘页面'}</small></div>
-       <a href={careers} target="_blank" rel="noopener noreferrer" className="domestic-careers-link">查看招聘官网 <ExternalLink size={15}/></a></div>:
+      <p>仅展示核实对应主体的官方招聘站或官方招聘公告；企业介绍官网和招聘渠道严格分离，招聘入口不代表当前一定有开放岗位。</p>
+      {careers?<div className="domestic-careers-row"><div><strong>{recruitment?.label||'招聘渠道待复核'}</strong>
+       <small>{recruitment?.kind==='group_recruitment_portal'?'集团统一招聘平台；投递前请确认所选用人公司':recruitment?.availability==='announcement_only'?'仅显示招聘公告，非岗位直投入口':recruitment?.availability==='temporarily_unavailable'?'官网目前显示维护中，暂可能无法投递':'企业官方招聘专用渠道'}</small></div>
+       <a href={careers} target="_blank" rel="noopener noreferrer" className="domestic-careers-link">{recruitment?.availability==='announcement_only'?'查看招聘公告':recruitment?.availability==='temporarily_unavailable'?'访问招聘系统（维护中）':'查看招聘官网'} <ExternalLink size={15}/></a></div>:
        <div className="domestic-editorial-limited">尚未核验该主体的官方招聘入口，暂不展示“查看招聘官网”按钮。
        {httpsLink(company.website)&&<p><a href={httpsLink(company.website)} target="_blank" rel="noopener noreferrer">访问企业官网了解更多 <ExternalLink size={13}/></a></p>}</div>}
     </section>}
@@ -130,6 +131,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       <details className="domestic-company-sources" key={"sources-"+company.id}>
        <summary>资料来源与核验说明 <ChevronDown size={15}/></summary>
        <div>{httpsLink(article?.officialSource||company.sourceUrl)&&<a href={httpsLink(article?.officialSource||company.sourceUrl)} target="_blank" rel="noopener noreferrer">企业公开资料 <ExternalLink size={13}/></a>}
+       {recruitment&&<a href={recruitment.evidenceUrl} target="_blank" rel="noopener noreferrer">招聘入口核验依据（{recruitment.verifiedOn}） <ExternalLink size={13}/></a>}
        {article?.productSource&&<a href={article.productSource} target="_blank" rel="noopener noreferrer">公开产品资料 <ExternalLink size={13}/></a>}
        {article?.imageSource&&<a href={article.imageSource} target="_blank" rel="noopener noreferrer">企业图片来源 <ExternalLink size={13}/></a>}
        {article?.brandImageSource&&<a href={article.brandImageSource} target="_blank" rel="noopener noreferrer">

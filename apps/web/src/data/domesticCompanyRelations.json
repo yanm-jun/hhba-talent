@@ -23,8 +23,9 @@
         "上汽乘用车",
         "上汽大乘用车"
       ],
-      "careersUrl": "https://saic-recruit.saicmotor.com/",
-      "careersEvidenceUrl": "https://saic-recruit.saicmotor.com/"
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
     },
     {
       "id": "rel-saic-002",
@@ -40,8 +41,9 @@
       ],
       "sourceUrl": "https://www.saicmaxus.com/disclosure/detail/827",
       "reviewedAt": "2026-10-23",
-      "careersUrl": "https://saic-recruit.saicmotor.com/",
-      "careersEvidenceUrl": "https://saic-recruit.saicmotor.com/"
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
     },
     {
       "id": "rel-saic-003",
@@ -57,8 +59,9 @@
       ],
       "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
       "reviewedAt": "2026-10-23",
-      "careersUrl": "https://saic-recruit.saicmotor.com/",
-      "careersEvidenceUrl": "https://saic-recruit.saicmotor.com/"
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
     },
     {
       "id": "rel-saic-004",
@@ -88,8 +91,9 @@
       ],
       "sourceUrl": "https://www.csvw.com/csvw-website/module/about.html",
       "reviewedAt": "2026-10-23",
-      "careersUrl": "https://saic-recruit.saicmotor.com/",
-      "careersEvidenceUrl": "https://saic-recruit.saicmotor.com/"
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
     },
     {
       "id": "rel-saic-006",
@@ -105,8 +109,9 @@
       ],
       "sourceUrl": "https://www.gm.com.cn/zh/home/company/operations.html",
       "reviewedAt": "2026-10-23",
-      "careersUrl": "https://saic-recruit.saicmotor.com/",
-      "careersEvidenceUrl": "https://saic-recruit.saicmotor.com/"
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
     },
     {
       "id": "rel-saic-007",
@@ -122,8 +127,9 @@
       ],
       "sourceUrl": "https://www.gm.com.cn/zh/home/company/operations.html",
       "reviewedAt": "2026-10-23",
-      "careersUrl": "https://saic-recruit.saicmotor.com/",
-      "careersEvidenceUrl": "https://saic-recruit.saicmotor.com/"
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
     },
     {
       "id": "rel-saic-008",
@@ -211,8 +217,9 @@
       ],
       "sourceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
       "reviewedAt": "2026-10-23",
-      "careersUrl": "https://saic-recruit.saicmotor.com/",
-      "careersEvidenceUrl": "https://saic-recruit.saicmotor.com/"
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
     },
     {
       "id": "rel-saic-014",
@@ -232,8 +239,9 @@
       "aliases": [
         "华域汽车系统股份有限公司"
       ],
-      "careersUrl": "https://saic-recruit.saicmotor.com/",
-      "careersEvidenceUrl": "https://saic-recruit.saicmotor.com/"
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
     },
     {
       "id": "rel-huayu-001",
@@ -297,9 +305,10 @@
         "华域视觉"
       ],
       "website": "https://www.hascovision.com/",
-      "careersUrl": "https://saic-recruit.saicmotor.com/",
-      "careersEvidenceUrl": "https://saic-recruit.saicmotor.com/",
-      "city": "上海"
+      "city": "上海",
+      "groupRecruitmentPortalUrl": "https://saic-recruit.saicmotor.com/",
+      "groupRecruitmentPortalEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+      "recruitmentAuditStatus": "GROUP_PORTAL_ONLY_NOT_ENTITY_SPECIFIC"
     },
     {
       "id": "rel-huayu-005",

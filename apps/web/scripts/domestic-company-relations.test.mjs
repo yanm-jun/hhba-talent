@@ -39,7 +39,7 @@ test('child cards remain within HHBA before external careers links',()=>{
  assert(src.includes('article?.careersUrl||company.careers'),'Verified independent portal should override historical inherited portal');
  const reviewed=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
  const hv=reviewed['华域视觉科技（上海）有限公司'];
- assert.equal(hv.careersUrl,'https://www.hascovision.com/join-us');
+ assert.equal(hv.careersUrl,'https://hascovision.zhiye.com/social');
  assert(hv.description.length>=3);
  assert(hv.majorSlugs.includes('electrical-engineering'));
  const majorPage=readFileSync('src/pages/MajorCompaniesPage.tsx','utf8');
@@ -256,6 +256,7 @@ test('100-company pilot has no new company identity and source-backed evidence f
   assert(p.officialSource.startsWith('https://'));
   assert(p.description.join('').length>=280);
   assert(p.description.length>=3&&p.business.length>=3&&p.majorSlugs.length>=4);
-  assert(!p.careersUrl,'Do not invent corporate jobs');
+  const verified=JSON.parse(readFileSync('src/data/domesticRecruitmentRegistry.json','utf8')).entries;
+  assert.equal(Boolean(p.careersUrl),Boolean(verified[row.name]),'No unverified recruiting URLs: '+row.name);
  }
 });

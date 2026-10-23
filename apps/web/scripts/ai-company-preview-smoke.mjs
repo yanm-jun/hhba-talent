@@ -186,7 +186,7 @@ try{
  assert((await desktop.locator('.domestic-editorial-body').innerText()).length>200);
  await desktop.getByText('上海市嘉定区叶城路767号').first().waitFor();
  assert((await desktop.locator('.domestic-official-photo').count())>=2,'Official employer photo gallery must preserve verified images and allow new factory images');
- assert.equal(await desktop.locator('.domestic-careers-link[href="https://www.hascovision.com/join-us"]').count(),1);
+ assert.equal(await desktop.locator('.domestic-careers-link[href="https://hascovision.zhiye.com/social"]').count(),1);
  assert.equal(await desktop.locator('.domestic-profile-relations details[open]').count(),0,
   'Company relations must be collapsed by default');
  await desktop.getByRole('link',{name:/查看与电气工程及其自动化相关的企业/}).click();
@@ -194,7 +194,7 @@ try{
  assert.match(desktop.url(),/\/majors\/electrical-engineering$/);
  await desktop.locator('.domestic-major-company').filter({hasText:'华域视觉'}).first().waitFor();
  const majorCard=desktop.locator('.domestic-major-company').filter({hasText:'华域视觉'}).first();
- assert.equal(await majorCard.locator('a[href="https://www.hascovision.com/join-us"]').count(),1);
+ assert.equal(await majorCard.locator('a[href="https://hascovision.zhiye.com/social"]').count(),1);
  await majorCard.getByRole('link',{name:/了解企业/}).click();
  await desktop.getByRole('heading',{name:'华域视觉科技'}).waitFor();
  await desktop.locator('.domestic-profile-relations summary').click();

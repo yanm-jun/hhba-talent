@@ -40,8 +40,8 @@
       "computer-science",
       "materials-engineering"
     ],
-    "careersUrl": "https://www.hascovision.com/join-us",
-    "careersLabel": "华域视觉 · 加入我们",
+    "careersUrl": "https://hascovision.zhiye.com/social",
+    "careersLabel": "华域视觉社会招聘",
     "officialSource": "https://www.hascovision.com/about/about-us",
     "productSource": "https://www.hascovision.com/products-innovation/products",
     "brandImage": "https://gpms.hascovision.com/GPMS/resource/images/logo_h.png",
@@ -65,7 +65,11 @@
     "brandAssetStatus": "official_logo_visually_verified",
     "brandImageSource": "https://gpms.hascovision.com/GPMS/supplier.jsp",
     "brandIdentityEvidence": "华域视觉自有采购门户以 logo_h.png 为页首品牌标识，已对照官方页面可见的 HASCO VISION 图形",
-    "brandVerifiedAt": "2026-10-23"
+    "brandVerifiedAt": "2026-10-23",
+    "recruitmentEvidenceUrl": "https://www.hascovision.com/join-us",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "华域视觉科技（上海）有限公司"
   },
   "华域汽车": {
     "displayName": "华域汽车",
@@ -114,7 +118,7 @@
       "robotics"
     ],
     "careersUrl": "https://www.hasco-group.com/join/",
-    "careersLabel": "华域汽车 · 工作与职业",
+    "careersLabel": "华域汽车工作与职业",
     "officialSource": "https://www.hasco-group.com/about/company.html/1000",
     "productSource": "https://www.hasco-group.com/",
     "brandImage": "https://www.hasco-group.com/uploads/20190408161935.png",
@@ -124,7 +128,11 @@
     "imageSource": "https://www.hasco-group.com/news/",
     "brandImageSource": "https://www.hasco-group.com/news/",
     "photoSourcePage": "https://www.hasco-group.com/about/company.html/1000",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "recruitmentEvidenceUrl": "https://www.hasco-group.com/join/",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "华域汽车"
   },
   "上汽集团": {
     "displayName": "上汽集团",
@@ -168,7 +176,7 @@
       "energy-engineering"
     ],
     "careersUrl": "https://saic-recruit.saicmotor.com/",
-    "careersLabel": "上汽集团 · 招聘官网",
+    "careersLabel": "上汽集团统一招聘系统",
     "officialSource": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
     "productSource": "https://www.saicmotor.com/chinese/gsgk/qyml/index.shtml",
     "brandImage": "https://commons.wikimedia.org/wiki/Special:Redirect/file/SAICMotor_logo.png",
@@ -177,7 +185,11 @@
     "evidenceLevel": "official",
     "brandImageSource": "https://commons.wikimedia.org/wiki/File:SAICMotor_logo.png",
     "photoSourcePage": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "recruitmentEvidenceUrl": "https://saic-recruit.saicmotor.com/",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "上汽集团"
   },
   "汇川技术": {
     "displayName": "汇川技术",
@@ -224,7 +236,7 @@
       "software-engineering"
     ],
     "careersUrl": "https://recruit.inovance.com/",
-    "careersLabel": "汇川技术 · 招聘官网",
+    "careersLabel": "汇川技术招聘",
     "officialSource": "https://www.inovance.com/portal/investor",
     "productSource": "https://www.inovance.com/",
     "brandImage": "https://portal-oss.zhiye.com/231679/image/95a3212e-6fb7-47d4-9b6e-edadbfe1e294.png",
@@ -236,7 +248,11 @@
     "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
     "brandAssetStatus": "official_logo_visually_verified",
     "brandIdentityEvidence": "官方汇川技术招聘网站使用的INOVANCE/汇川技术组合品牌标识；图像内容已与官网招聘页核对",
-    "brandVerifiedAt": "2026-10-23"
+    "brandVerifiedAt": "2026-10-23",
+    "recruitmentEvidenceUrl": "https://recruit.inovance.com/social/jobs",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "汇川技术"
   },
   "中国中车": {
     "displayName": "中国中车",
@@ -277,8 +293,8 @@
       "materials-engineering",
       "robotics"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://crrc.hotjob.cn/",
+    "careersLabel": "中国中车招聘云平台",
     "officialSource": "https://www.crrcgc.cc/eportal/ui?pageId=714829",
     "productSource": "https://www.crrcgc.cc/sj/",
     "brandImage": "https://bjhrckj.com/static/upload/image/20250220/1740056632200426.jpg",
@@ -287,7 +303,11 @@
     "evidenceLevel": "official",
     "brandImageSource": "https://bjhrckj.com/?list_38%2F112.html",
     "photoSourcePage": "https://www.crrcgc.cc/eportal/ui?pageId=714829",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "recruitmentEvidenceUrl": "https://crrc.hotjob.cn/SU64d47c466202cc36e27a52d4/pb/news.html?pageType=0",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "中国中车"
   },
   "美的集团": {
     "displayName": "美的集团",
@@ -322,8 +342,8 @@
       "robotics",
       "energy-engineering"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://recruit.midea.com/recruitOut/ihr/social",
+    "careersLabel": "美的集团社会招聘",
     "officialSource": "https://www.midea.com.cn/zh/about-midea?wcmmode=disabled",
     "productSource": "https://www.midea.com.cn/zh/our-businesses",
     "brandImage": "https://cdn-apac.onetrust.com/logos/6fd01f34-9727-4df4-951a-f14b383f7ab6/b9622b14-80ea-41e5-ab50-e00618507aa8/54f906dc-b00f-4d35-a03e-b3e0782e45ac/Midea_Logo_%E7%95%99%E7%99%BD.png",
@@ -332,7 +352,11 @@
     "evidenceLevel": "official",
     "brandImageSource": "https://www.midea.com/global/company-intro",
     "photoSourcePage": "https://www.midea.com.cn/zh/about-midea?wcmmode=disabled",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "recruitmentEvidenceUrl": "https://recruit.midea.com/recruitOut/ihr/social",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "美的集团"
   },
   "雷赛智能": {
     "displayName": "雷赛智能",
@@ -380,8 +404,8 @@
       "robotics",
       "intelligent-manufacturing"
     ],
-    "careersUrl": "https://www.leisai.com/recruitment/index.html",
-    "careersLabel": "雷赛智能 · 官方招聘",
+    "careersUrl": "",
+    "careersLabel": "",
     "officialSource": "https://www.leisai.com/groupIntroduction.html",
     "productSource": "https://www.leisai.com/",
     "brandImage": "https://cdn.luvbotics.com/homepage/assets/images/friend4_leadshine.png",
@@ -390,7 +414,8 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
     "photoSourcePage": "https://www.leisai.com/groupIntroduction.html",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "recruitmentStatus": "UNVERIFIED_DISABLED"
   },
   "正泰电器": {
     "displayName": "正泰电器",
@@ -488,8 +513,8 @@
       "robotics",
       "computer-science"
     ],
-    "careersUrl": "https://www.invt.com.cn/careers",
-    "careersLabel": "英威腾 · 员工招聘",
+    "careersUrl": "",
+    "careersLabel": "",
     "officialSource": "https://www.invt.com.cn/",
     "productSource": "https://www.invt.com.cn/",
     "brandImage": "https://img.phb123.com/uploads/allimg/220827/810-220RGH5580-L.png",
@@ -498,7 +523,8 @@
     "evidenceLevel": "official",
     "brandImageSource": "https://www.phb123.com/bk/qiye/2163.html",
     "photoSourcePage": "https://www.invt.com.cn/",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "recruitmentStatus": "UNVERIFIED_DISABLED"
   },
   "思源电气": {
     "displayName": "思源电气",
@@ -546,7 +572,7 @@
       "materials-engineering"
     ],
     "careersUrl": "https://www.sieyuan.com/join",
-    "careersLabel": "思源电气 · 加入思源",
+    "careersLabel": "思源电气加入我们",
     "officialSource": "https://www.sieyuan.com/about",
     "productSource": "https://www.sieyuan.com/",
     "brandImage": "https://pbs.twimg.com/profile_images/1121308964975591429/G3LvwCKG_400x400.png",
@@ -555,7 +581,11 @@
     "evidenceLevel": "official",
     "brandImageSource": "https://x.com/sieyuan_group",
     "photoSourcePage": "https://www.sieyuan.com/about",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "recruitmentEvidenceUrl": "https://www.sieyuan.com/join",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "announcement_only",
+    "recruitmentEntity": "思源电气"
   },
   "许继电气": {
     "displayName": "许继电气",
@@ -909,7 +939,7 @@
       "communications"
     ],
     "careersUrl": "https://www.desaysv.com/jobList.html",
-    "careersLabel": "德赛西威 · 官方招聘入口",
+    "careersLabel": "德赛西威岗位招聘",
     "officialSource": "https://www.desaysv.com/about.html",
     "productSource": "https://desaysv.com",
     "brandImage": "https://desaysv.com/favicon.ico",
@@ -921,7 +951,11 @@
     "website": "https://desaysv.com",
     "industry": "智能座舱",
     "photoSourcePage": "https://www.desaysv.com/employerBrand.html",
-    "photoSourceLabel": "德赛西威官方雇主品牌页展示了实际工作环境照片"
+    "photoSourceLabel": "德赛西威官方雇主品牌页展示了实际工作环境照片",
+    "recruitmentEvidenceUrl": "https://www.desaysv.com/jobList.html",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "德赛西威"
   },
   "京东方Ａ": {
     "displayName": "京东方",
@@ -961,8 +995,8 @@
       "automation",
       "software-engineering"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://campus.boe.com/custom/professionals?hideMenu=1",
+    "careersLabel": "京东方社会招聘",
     "officialSource": "https://www.boe.com/about/index",
     "productSource": "https://boe.com",
     "brandImage": "https://boe.com/favicon.ico",
@@ -986,7 +1020,11 @@
     "industry": "显示技术",
     "imageSource": "https://www.boe.com/innovativeTechnologies/creativeSpace",
     "photoSourcePage": "https://www.boe.com/about/index",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "recruitmentEvidenceUrl": "https://campus.boe.com/custom/professionals?hideMenu=1",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "京东方Ａ"
   },
   "歌尔股份": {
     "displayName": "歌尔股份",
@@ -1081,8 +1119,8 @@
       "microelectronics",
       "automation"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://job.zte.com.cn/cn/",
+    "careersLabel": "中兴通讯招聘",
     "officialSource": "https://www.zte.com.cn/china/about/investorrelations.html",
     "productSource": "https://zte.com.cn",
     "brandImage": "https://zte.com.cn/favicon.ico",
@@ -1094,7 +1132,11 @@
     "website": "https://zte.com.cn",
     "industry": "无线通信",
     "photoSourcePage": "https://www.zte.com.cn/china/about/investorrelations.html",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "recruitmentEvidenceUrl": "https://job.zte.com.cn/cn/",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "中兴通讯"
   },
   "科大讯飞": {
     "displayName": "科大讯飞",
@@ -1347,8 +1389,8 @@
       "mechanical-engineering",
       "electronic-information"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://longi.hotjob.cn/",
+    "careersLabel": "隆基绿能招聘（访问状态待复核）",
     "officialSource": "https://www.longi.com/cn/about-longi/",
     "productSource": "https://longi.com",
     "brandImage": "https://longi.com/favicon.ico",
@@ -1360,7 +1402,11 @@
     "website": "https://longi.com",
     "industry": "光伏电池及组件",
     "photoSourcePage": "https://www.longi.com/cn/about-longi/",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "recruitmentEvidenceUrl": "https://www.longi.com/cn/career/",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "unconfirmed_runtime",
+    "recruitmentEntity": "隆基绿能"
   },
   "晶科能源": {
     "displayName": "晶科能源",
@@ -1446,8 +1492,8 @@
       "mechanical-engineering",
       "chemical-engineering"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://wecruit.hotjob.cn/SU630487ca0dcad45aa7768a79/pb/social.html",
+    "careersLabel": "亿纬锂能招聘",
     "officialSource": "https://www.evebattery.com/about",
     "productSource": "https://evebattery.com",
     "brandImage": "https://evebattery.com/favicon.ico",
@@ -1490,7 +1536,11 @@
     "website": "https://evebattery.com",
     "industry": "消费电池",
     "photoSourcePage": "https://www.evebattery.com/about",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "recruitmentEvidenceUrl": "https://wecruit.hotjob.cn/SU630487ca0dcad45aa7768a79/pb/posDetail.html?postId=6ad1938815a82a89c3278e02&postType=campus",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "亿纬锂能"
   },
   "欣旺达": {
     "displayName": "欣旺达",
@@ -1684,8 +1734,8 @@
       "iot",
       "industrial-design"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://maker.haier.net/smart_home/customizedjobs.html",
+    "careersLabel": "海尔智家招聘",
     "officialSource": "https://www.haier.com/about_haier/haiererpinpai/ppdw/",
     "productSource": "https://haier.com",
     "brandImage": "https://haier.com/favicon.ico",
@@ -1697,7 +1747,11 @@
     "website": "https://haier.com",
     "industry": "智慧家电",
     "photoSourcePage": "https://www.haier.com/about_haier/haiererpinpai/ppdw/",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "recruitmentEvidenceUrl": "https://maker.haier.net/smart_home/customizedjobs.html",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "海尔智家"
   },
   "阳光电源": {
     "displayName": "阳光电源",
@@ -1737,8 +1791,8 @@
       "mechanical-engineering",
       "software-engineering"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://jobs.sungrowpower.com/",
+    "careersLabel": "阳光电源招聘",
     "officialSource": "https://www.sungrowpower.com/",
     "productSource": "https://sungrowpower.com",
     "brandImage": "https://sungrowpower.com/favicon.ico",
@@ -1757,7 +1811,11 @@
     "website": "https://sungrowpower.com",
     "industry": "光伏逆变器",
     "photoSourcePage": "https://www.sungrowpower.com/",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "recruitmentEvidenceUrl": "https://jobs.sungrowpower.com/",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "阳光电源"
   },
   "海康机器人": {
     "displayName": "海康机器人",
@@ -2017,7 +2075,7 @@
       "mechanical-engineering"
     ],
     "careersUrl": "https://talent.catl.com/social-recruitment/catlhr/96144/",
-    "careersLabel": "宁德时代 · 独立官方招聘",
+    "careersLabel": "宁德时代招聘",
     "officialSource": "https://www.catl.com/",
     "productSource": "https://catl.com",
     "brandImage": "https://catl.com/favicon.ico",
@@ -2036,7 +2094,11 @@
     "website": "https://catl.com",
     "industry": "动力电池",
     "photoSourcePage": "https://www.catl.com/",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "recruitmentEvidenceUrl": "https://talent.catl.com/social-recruitment/catlhr/96144/",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "宁德时代"
   },
   "三一重工": {
     "displayName": "三一重工",
@@ -2124,7 +2186,7 @@
       "automation"
     ],
     "careersUrl": "https://talent.hikvision.com/",
-    "careersLabel": "海康威视 · 独立官方招聘",
+    "careersLabel": "海康威视招聘",
     "officialSource": "https://ifpd.hikvision.com/aboutUs.html",
     "productSource": "https://hikvision.com",
     "brandImage": "https://hikvision.com/favicon.ico",
@@ -2136,7 +2198,11 @@
     "website": "https://hikvision.com",
     "industry": "视频感知",
     "photoSourcePage": "https://ifpd.hikvision.com/aboutUs.html",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "recruitmentEvidenceUrl": "https://talent.hikvision.com/",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "海康威视"
   },
   "北方华创": {
     "displayName": "北方华创",
@@ -2294,7 +2360,7 @@
       "data-science"
     ],
     "careersUrl": "https://job.gf.com.cn/",
-    "careersLabel": "广发证券 · 官方招聘",
+    "careersLabel": "广发证券人才招聘网",
     "officialSource": "https://www.gf.com.cn/web/about",
     "productSource": "https://www.gf.com.cn",
     "brandImage": "",
@@ -2313,7 +2379,11 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://www.gf.com.cn",
-    "industry": "综合证券与金融服务"
+    "industry": "综合证券与金融服务",
+    "recruitmentEvidenceUrl": "https://job.gf.com.cn/",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "广发证券"
   },
   "中信证券": {
     "displayName": "中信证券",
@@ -2356,7 +2426,7 @@
       "data-science"
     ],
     "careersUrl": "https://careers.citics.com/",
-    "careersLabel": "中信证券 · 官方招聘",
+    "careersLabel": "中信证券招聘",
     "officialSource": "https://www.citics.com/newsite/AboutUs/",
     "productSource": "https://www.citics.com",
     "brandImage": "",
@@ -2380,7 +2450,11 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://www.citics.com",
-    "industry": "综合证券与金融服务"
+    "industry": "综合证券与金融服务",
+    "recruitmentEvidenceUrl": "https://careers.citics.com/",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "中信证券"
   },
   "东方证券": {
     "displayName": "东方证券",
@@ -2484,8 +2558,8 @@
       "marketing",
       "data-science"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://wecruit.hotjob.cn/SU6419745cbef57c635fe10142/pb/index.html?channelId=61d886b0bef57c659fd91ea8",
+    "careersLabel": "华泰证券校招及集团招聘",
     "officialSource": "https://www.htsc.com.cn/htzq/investor/new/company.jsp",
     "productSource": "https://www.htsc.com.cn",
     "brandImage": "",
@@ -2498,7 +2572,11 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://www.htsc.com.cn",
-    "industry": "综合证券与金融服务"
+    "industry": "综合证券与金融服务",
+    "recruitmentEvidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119470.html",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "华泰证券"
   },
   "光大证券": {
     "displayName": "光大证券",
@@ -2540,8 +2618,8 @@
       "marketing",
       "data-science"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://ebscn.zhiye.com/",
+    "careersLabel": "光大证券招聘",
     "officialSource": "https://www.ebscn.com/upload/20170717/20170717142455882.pdf",
     "productSource": "https://www.ebscn.com",
     "brandImage": "",
@@ -2560,7 +2638,11 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://www.ebscn.com",
-    "industry": "综合证券与金融服务"
+    "industry": "综合证券与金融服务",
+    "recruitmentEvidenceUrl": "https://ebscn.zhiye.com/",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "光大证券"
   },
   "比亚迪": {
     "displayName": "比亚迪",
@@ -2600,8 +2682,8 @@
       "software-engineering",
       "supply-chain"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://job.byd.com/portal/pc/#/home",
+    "careersLabel": "比亚迪招聘",
     "officialSource": "https://www.bydglobal.com/cn/about.html",
     "productSource": "https://www.bydglobal.com/cn/about.html",
     "website": "https://www.bydglobal.com/cn",
@@ -2620,7 +2702,11 @@
         "type": "company_official_profile",
         "verifiedAt": "2026-10-23"
       }
-    ]
+    ],
+    "recruitmentEvidenceUrl": "https://job.byd.com/portal/mobile/school-home",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "比亚迪"
   },
   "中国平安": {
     "displayName": "中国平安",
@@ -2660,8 +2746,8 @@
       "computer-science",
       "data-science"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://campus.pingan.com/",
+    "careersLabel": "中国平安校园招聘",
     "officialSource": "https://www.pingan.cn/about/overview.shtml",
     "productSource": "https://www.pingan.cn/about/overview.shtml",
     "website": "https://www.pingan.cn",
@@ -2680,7 +2766,11 @@
         "type": "company_official_profile",
         "verifiedAt": "2026-10-23"
       }
-    ]
+    ],
+    "recruitmentEvidenceUrl": "https://campus.pingan.com/job",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "campus_only",
+    "recruitmentEntity": "中国平安"
   },
   "贵州茅台": {
     "displayName": "贵州茅台",
@@ -2720,8 +2810,8 @@
       "accounting",
       "supply-chain"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://zp.moutai.com.cn/outhome",
+    "careersLabel": "贵州茅台人事招聘系统",
     "officialSource": "https://www.moutai.com.cn/mtgf/qygk/gsjj/index.html",
     "productSource": "https://www.moutai.com.cn/mtgf/qygk/gsjj/index.html",
     "website": "https://www.moutai.com.cn",
@@ -2740,7 +2830,11 @@
         "type": "company_official_profile",
         "verifiedAt": "2026-10-23"
       }
-    ]
+    ],
+    "recruitmentEvidenceUrl": "https://zp.moutai.com.cn/outhome",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "贵州茅台"
   },
   "格力电器": {
     "displayName": "格力电器",
@@ -2839,8 +2933,8 @@
       "computer-science",
       "data-science"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://job.spdb.com.cn/",
+    "careersLabel": "浦发银行招聘（官网目前维护中）",
     "officialSource": "https://cor.spdb.com.cn/jj/202503/t20250329_1130989.shtml",
     "productSource": "https://cor.spdb.com.cn/jj/202503/t20250329_1130989.shtml",
     "website": "https://www.spdb.com.cn",
@@ -2859,7 +2953,11 @@
         "type": "company_official_profile",
         "verifiedAt": "2026-10-23"
       }
-    ]
+    ],
+    "recruitmentEvidenceUrl": "https://www.spdb-wm.com/joinus/",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "temporarily_unavailable",
+    "recruitmentEntity": "浦发银行"
   },
   "招商银行": {
     "displayName": "招商银行",
@@ -2899,8 +2997,8 @@
       "data-science",
       "marketing"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://career.cmbchina.com/home",
+    "careersLabel": "招商银行招聘",
     "officialSource": "https://www.cmbchina.com/cmbinfo/aboutcmb/",
     "productSource": "https://www.cmbchina.com/cmbinfo/aboutcmb/",
     "website": "https://www.cmbchina.com",
@@ -2919,7 +3017,11 @@
         "type": "company_official_profile",
         "verifiedAt": "2026-10-23"
       }
-    ]
+    ],
+    "recruitmentEvidenceUrl": "https://cmb-recruitment-pc.paas.cmbchina.com/home",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "招商银行"
   },
   "海天味业": {
     "displayName": "海天味业",
@@ -2958,8 +3060,8 @@
       "marketing",
       "supply-chain"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://haday.hotjob.cn/",
+    "careersLabel": "海天味业招聘",
     "officialSource": "https://www.haday.com/about.html",
     "productSource": "https://www.haday.com/about.html",
     "website": "https://www.haday.com",
@@ -2978,7 +3080,11 @@
         "type": "company_official_profile",
         "verifiedAt": "2026-10-23"
       }
-    ]
+    ],
+    "recruitmentEvidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118731.html",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "海天味业"
   },
   "中国建筑": {
     "displayName": "中国建筑",
@@ -3018,8 +3124,8 @@
       "accounting",
       "law"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://www.cscec.com/rlzy_new/rczp/",
+    "careersLabel": "中国建筑招聘栏目（含股份公司）",
     "officialSource": "https://www.cscec.com/gyzj/gsjj_new/",
     "productSource": "https://www.cscec.com/gyzj/gsjj_new/",
     "website": "https://www.cscec.com",
@@ -3038,7 +3144,11 @@
         "type": "company_official_profile",
         "verifiedAt": "2026-10-23"
       }
-    ]
+    ],
+    "recruitmentEvidenceUrl": "https://www.cscec.com/rlzy_new/rczp/",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "中国建筑"
   },
   "上海机场": {
     "displayName": "上海机场",
@@ -3136,8 +3246,8 @@
       "marketing",
       "supply-chain"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://www.yili.com/joinus",
+    "careersLabel": "伊利招聘与岗位筛选",
     "officialSource": "https://www.yili.com/pages/",
     "productSource": "https://www.yili.com/pages/",
     "website": "https://www.yili.com",
@@ -3156,7 +3266,11 @@
         "type": "company_official_profile",
         "verifiedAt": "2026-10-23"
       }
-    ]
+    ],
+    "recruitmentEvidenceUrl": "https://www.yili.com/joinus",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "伊利股份"
   },
   "农业银行": {
     "displayName": "农业银行",
@@ -3196,8 +3310,8 @@
       "software-engineering",
       "data-science"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://career.abchina.com/build/index.html#/",
+    "careersLabel": "中国农业银行招聘网站",
     "officialSource": "https://www.abchina.com.cn/cn/AboutABC/nhfm/nhjj/",
     "productSource": "https://www.abchina.com.cn/cn/AboutABC/nhfm/nhjj/",
     "website": "https://www.abchina.com.cn",
@@ -3216,7 +3330,11 @@
         "type": "company_official_profile",
         "verifiedAt": "2026-10-23"
       }
-    ]
+    ],
+    "recruitmentEvidenceUrl": "https://www.xiongan.gov.cn/20260928/46eba16a444c40baaced6f5b115b0b91/c.html",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "农业银行"
   },
   "建设银行": {
     "displayName": "建设银行",
@@ -3255,8 +3373,8 @@
       "computer-science",
       "software-engineering"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://job.ccb.com/",
+    "careersLabel": "中国建设银行人才招聘",
     "officialSource": "https://www.ccb.cn/cn/investor/survey.html",
     "productSource": "https://www.ccb.cn/cn/investor/survey.html",
     "website": "https://www.ccb.cn",
@@ -3275,7 +3393,11 @@
         "type": "company_official_profile",
         "verifiedAt": "2026-10-23"
       }
-    ]
+    ],
+    "recruitmentEvidenceUrl": "https://job.ccb.com/",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "建设银行"
   },
   "中国银行": {
     "displayName": "中国银行",
@@ -3314,8 +3436,8 @@
       "international-trade",
       "computer-science"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://www.boc.cn/aboutboc/bi4/",
+    "careersLabel": "中国银行官方招聘公告栏目",
     "officialSource": "https://www.boc.cn/aboutboc/ab1/200809/t20080901_985.html",
     "productSource": "https://www.boc.cn/aboutboc/ab1/200809/t20080901_985.html",
     "website": "https://www.boc.cn",
@@ -3334,7 +3456,11 @@
         "type": "company_official_profile",
         "verifiedAt": "2026-10-23"
       }
-    ]
+    ],
+    "recruitmentEvidenceUrl": "https://www.boc.cn/aboutboc/bi4/",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "announcement_only",
+    "recruitmentEntity": "中国银行"
   },
   "中国移动": {
     "displayName": "中国移动",
@@ -3373,8 +3499,8 @@
       "information-security",
       "data-science"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://job.10086.cn/",
+    "careersLabel": "中国移动招聘网站",
     "officialSource": "https://www.10086.cn/aboutus/jtgk/",
     "productSource": "https://www.10086.cn/aboutus/jtgk/",
     "website": "https://www.10086.cn",
@@ -3393,7 +3519,11 @@
         "type": "company_official_profile",
         "verifiedAt": "2026-10-23"
       }
-    ]
+    ],
+    "recruitmentEvidenceUrl": "https://job.10086.cn/",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "normal",
+    "recruitmentEntity": "中国移动"
   },
   "中国电信": {
     "displayName": "中国电信",
@@ -3432,8 +3562,8 @@
       "information-security",
       "data-science"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://wejob.chinatelecom.com.cn/wt/TELE/web/index",
+    "careersLabel": "中国电信校招（集团各单位）",
     "officialSource": "https://wap.sasac.gov.cn/n2588025/n2588124/c35808638/content.html",
     "productSource": "https://wap.sasac.gov.cn/n2588025/n2588124/c35808638/content.html",
     "website": "https://www.chinatelecom.com.cn",
@@ -3452,6 +3582,10 @@
         "type": "issuer_group_public_disclosure",
         "verifiedAt": "2026-10-23"
       }
-    ]
+    ],
+    "recruitmentEvidenceUrl": "https://wejob.chinatelecom.com.cn/wt/TELE/web/index",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentStatus": "campus_only",
+    "recruitmentEntity": "中国电信"
   }
 }

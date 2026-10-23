@@ -1,6 +1,7 @@
 import curated from '../data/aiCompanyCatalog.json';
 import editorial from '../data/domesticCompanyEditorial.json';
 import careerProfiles from '../data/domesticCareerProfiles.json';
+import recruitmentRegistry from '../data/domesticRecruitmentRegistry.json';
 import rosterSnapshot from '../data/domesticListedCompanies.json';
 import relationsSnapshot from '../data/domesticCompanyRelations.json';
 
@@ -22,6 +23,15 @@ export type CompanyRelation={
 };
 type RelationFeed={schemaVersion:number;relations:CompanyRelation[]};
 const details=editorial as Record<string,Editorial>;
+export type DomesticRecruitmentRecord={
+ url:string;evidenceUrl:string;kind:'official_recruitment_portal'|'group_recruitment_portal'|'official_recruitment_announcements';
+ availability:'normal'|'campus_only'|'announcement_only'|'temporarily_unavailable'|'unconfirmed_runtime';
+ label:string;recruitmentEntity:string;verifiedOn:string;aliases?:string[];notes?:string;
+};
+const recruitmentEntries=(recruitmentRegistry as {entries:Record<string,DomesticRecruitmentRecord>}).entries;
+export function getDomesticRecruitment(name:string):DomesticRecruitmentRecord|undefined{
+ return recruitmentEntries[name];
+}
 const verifiedCareerProfiles=careerProfiles as Record<string,{careersUrl?:string;officialSource?:string;summary?:string;officeLocations?:{type:string;address:string;source:string}[];parentName?:string;industry?:string;website?:string;majorSlugs?:string[];brandImage?:string;}>;
 const normalize=(value:string)=>value.normalize('NFKC').toLocaleLowerCase().replace(/[\s·・（）()\-—_]/g,'');
 let cache:DomesticCompany[]|undefined;
@@ -145,7 +155,7 @@ export function getDomesticCompanies():DomesticCompany[]{
   for(const item of map){
    const exact=verifiedCareerProfiles[item.name];
    if(exact){
-    item.careers=clean(exact.careersUrl);
+    item.careers=undefined; // Only the independently audited registry can publish a recruitment link.
     item.careersShared=false;
     if(exact.summary){item.overview=exact.summary;item.status='industry_reviewed';}
     if(exact.industry)item.industry=exact.industry;
@@ -158,6 +168,15 @@ export function getDomesticCompanies():DomesticCompany[]{
       if(address.includes(c)){item.city=c;break;}
      }
     }
+   }
+  }
+  // Final and only source of clickable recruiting destinations.
+  // A verified group portal is explicitly labelled and may never be silently inherited by children.
+  for(const item of map){
+   const record=getDomesticRecruitment(item.name);
+   item.careers=record?.url;
+   if(record?.aliases?.length){
+    item.aliases=[...new Set([...(item.aliases||[]),...record.aliases])];
    }
   }
   cache=map;

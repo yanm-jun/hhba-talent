@@ -35,6 +35,8 @@ on:
       - 'apps/web/src/pages/MajorCompaniesPage.tsx'
       - 'apps/web/src/services/domesticMajors.ts'
       - 'apps/web/src/data/domesticCareerProfiles.json'
+      - 'apps/web/src/data/domesticRecruitmentRegistry.json'
+      - 'apps/web/scripts/audit-domestic-recruitment.mjs'
       - 'apps/web/src/data/domesticCompanyBatch001.json'
       - 'apps/web/scripts/validate-domestic-company-batch.mjs'
       - 'apps/web/src/components/MajorFilter.tsx'
@@ -110,6 +112,9 @@ jobs:
       - name: Validate 100 existing-company first-batch pipeline and evidence gate
         working-directory: apps/web
         run: node --test scripts/validate-domestic-company-batch.mjs
+      - name: Audit all existing recruiting URLs, exact entities and bad homepage destinations
+        working-directory: apps/web
+        run: node --test scripts/audit-domestic-recruitment.mjs
       - name: Audit every searchable company for substantive content and unverifiable placeholders
         working-directory: apps/web
         run: node --test scripts/audit-all-company-content.mjs
