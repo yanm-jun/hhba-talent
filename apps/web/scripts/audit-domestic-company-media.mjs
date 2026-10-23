@@ -67,7 +67,8 @@ test('Every deep profile is a unique search identity with honest media evidence'
  }
 });
 test('Media shortfall is explicitly visible instead of misreported as complete',()=>{
- assert(summary.imageUrls===summary.deepProfiles);
+ assert(summary.imageUrls<=summary.deepProfiles);
+ assert(summary.deepProfiles===40);
  assert(summary.photoCompanies<summary.deepProfiles,
    'When this reaches full coverage, replace this safeguard with a verification requirement');
  assert(summary.candidateSiteIcons>0,'Missing verification status on site icons');

@@ -616,14 +616,16 @@
     "careersLabel": "",
     "officialSource": "https://www.pinggao.com/about/company.html",
     "productSource": "https://pinggao.com",
-    "brandImage": "https://pinggao.com/favicon.ico",
+    "brandImage": "",
     "brandImageSource": "https://pinggao.com",
-    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "brandAssetStatus": "bad_http_response_needs_replacement",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://pinggao.com",
-    "industry": "高压开关设备"
+    "industry": "高压开关设备",
+    "brandAssetCandidateRejected": "https://pinggao.com/favicon.ico",
+    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)"
   },
   "国电南瑞": {
     "displayName": "国电南瑞",
@@ -987,14 +989,16 @@
     "careersLabel": "",
     "officialSource": "https://www.goertek.com/about/intro.html",
     "productSource": "https://goertek.com",
-    "brandImage": "https://goertek.com/favicon.ico",
+    "brandImage": "",
     "brandImageSource": "https://goertek.com",
-    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "brandAssetStatus": "bad_http_response_needs_replacement",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://goertek.com",
-    "industry": "声光电组件"
+    "industry": "声光电组件",
+    "brandAssetCandidateRejected": "https://goertek.com/favicon.ico",
+    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)"
   },
   "中兴通讯": {
     "displayName": "中兴通讯",
@@ -1190,14 +1194,16 @@
     "careersLabel": "",
     "officialSource": "https://www.gigadevice.com.cn/about/contact",
     "productSource": "https://gigadevice.com.cn",
-    "brandImage": "https://gigadevice.com.cn/favicon.ico",
+    "brandImage": "",
     "brandImageSource": "https://gigadevice.com.cn",
-    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "brandAssetStatus": "bad_http_response_needs_replacement",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://gigadevice.com.cn",
-    "industry": "存储器"
+    "industry": "存储器",
+    "brandAssetCandidateRejected": "https://gigadevice.com.cn/favicon.ico",
+    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)"
   },
   "浪潮信息": {
     "displayName": "浪潮信息",
@@ -1533,14 +1539,16 @@
     "careersLabel": "",
     "officialSource": "https://www.unis.cn/about.htm",
     "productSource": "https://unis.cn",
-    "brandImage": "https://unis.cn/favicon.ico",
+    "brandImage": "",
     "brandImageSource": "https://unis.cn",
-    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "brandAssetStatus": "bad_http_response_needs_replacement",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://unis.cn",
-    "industry": "网络与安全"
+    "industry": "网络与安全",
+    "brandAssetCandidateRejected": "https://unis.cn/favicon.ico",
+    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)"
   },
   "海尔智家": {
     "displayName": "海尔智家",
@@ -1738,15 +1746,17 @@
     "careersLabel": "",
     "officialSource": "https://www.sungrowev.com/cn/about-us",
     "productSource": "https://sungrowev.com",
-    "brandImage": "https://sungrowev.com/favicon.ico",
+    "brandImage": "",
     "brandImageSource": "https://sungrowev.com",
-    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "brandAssetStatus": "bad_http_response_needs_replacement",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://sungrowev.com",
     "industry": "汽车电控",
-    "parentName": "阳光电源"
+    "parentName": "阳光电源",
+    "brandAssetCandidateRejected": "https://sungrowev.com/favicon.ico",
+    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)"
   },
   "亿纬氢能": {
     "displayName": "亿纬氢能",
@@ -1842,14 +1852,16 @@
     "careersLabel": "",
     "officialSource": "https://www.luxshare-ict.com/about/company-profile.html",
     "productSource": "https://luxshare-ict.com",
-    "brandImage": "https://luxshare-ict.com/favicon.ico",
+    "brandImage": "",
     "brandImageSource": "https://luxshare-ict.com",
-    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "brandAssetStatus": "bad_http_response_needs_replacement",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://luxshare-ict.com",
-    "industry": "精密连接"
+    "industry": "精密连接",
+    "brandAssetCandidateRejected": "https://luxshare-ict.com/favicon.ico",
+    "brandAssetAudit": "2026-10-23 GitHub runner GET failed (404/403/non-image)"
   },
   "宁德时代": {
     "displayName": "宁德时代",
