@@ -8,6 +8,8 @@ on:
       - 'apps/web/src/components/AICompanySearch.tsx'
       - 'apps/web/src/components/UnifiedJobMarket.tsx'
       - 'apps/web/src/pages/HomePage.tsx'
+      - 'apps/web/src/services/liveRecruitment.ts'
+      - 'apps/web/scripts/prepare-three-employers.mjs'
       - 'apps/web/src/styles/ai-company-search.css'
   workflow_dispatch:
 permissions:
@@ -44,8 +46,14 @@ jobs:
           HHBA_GITHUB_PAGES: '1'
           HHBA_PAGES_BASE: '/hhba-talent/ai-company-preview/'
           VITE_HHBA_COMPANY_PREVIEW: '1'
-          VITE_HHBA_DOMESTIC_STATIC_ONLY: '1'
+          VITE_HHBA_DOMESTIC_STATIC_ONLY: '0'
+          VITE_HHBA_OFFICIAL_THREE_ONLY: '1'
         run: npm run build --prefix apps/web
+      - name: Retrieve public ATS listings for OpenAI, Anthropic, SpaceX (no API Key)
+        run: |
+          cd apps/web
+          node scripts/prepare-three-employers.mjs
+          test -f dist/data/featured-live.json
       - name: Install browser test runner
         working-directory: apps/web
         run: |
@@ -72,6 +80,7 @@ jobs:
           cp combined/index.html combined/404.html
           test -f combined/index.html
           test -f combined/ai-company-preview/index.html
+          test -f combined/ai-company-preview/data/featured-live.json
           test -f combined/data/domestic-jobs.json
           if grep -R -E 'DEEPSEEK_API_KEY|sk-[a-zA-Z0-9]{18,}' combined/ai-company-preview/assets/; then
             echo 'Possible credential leak in client assets'; exit 1
