@@ -6,6 +6,8 @@ on:
       - '.github/workflows/hhba-ai-enterprise-pages-preview.yml'
       - 'apps/web/scripts/ai-company-preview-smoke.mjs'
       - 'apps/web/src/components/AICompanySearch.tsx'
+      - 'apps/web/src/components/UnifiedJobMarket.tsx'
+      - 'apps/web/src/pages/HomePage.tsx'
       - 'apps/web/src/styles/ai-company-search.css'
   workflow_dispatch:
 permissions:
