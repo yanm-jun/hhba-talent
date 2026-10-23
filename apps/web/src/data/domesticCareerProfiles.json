@@ -1,24 +1,307 @@
 {
- "华域视觉科技（上海）有限公司": {
-  "displayName":"华域视觉科技",
-  "subtitle":"汽车照明 · 智能灯光 · 汽车电子",
-  "description":[
-   "华域视觉科技（上海）有限公司专注于汽车照明和视觉技术。公司由华域汽车系统股份有限公司收购原上海小糸车灯有限公司的日方股东股份后，于2018年3月正式转制成立。其业务覆盖汽车照明产品的设计、研发、制造、技术服务及相关汽车电子系统。",
-   "在汽车照明加速走向智能化与数字化的过程中，华域视觉从传统前照灯、尾灯延伸至数字灯光系统、交互式信号灯和车灯控制器等领域。它不仅需要研究光学与造型，也需要电子控制、机械结构、软件及制造工艺的协同。",
-   "公司总部位于上海，官网披露了常熟、吉林、武汉、长沙、重庆等地及海外相关生产与业务布局。对于求职者，理解不同基地和业务方向，有助于判断自己的技术背景可以在哪类团队发挥作用；具体岗位以官方招聘页为准。"
-  ],
-  "business":[
-   {"title":"汽车前照灯与尾灯","description":"涵盖照明、指示和信号功能，以及车灯造型、光学设计和电子系统的整合。"},
-   {"title":"数字灯光与交互系统","description":"围绕数字投影照明、交互式信号灯、灯光域控制器等方向开展产品研发。"},
-   {"title":"智能制造与测试验证","description":"面向汽车零部件规模化生产，涉及生产工艺、自动化、质量控制和测试验证。"}
-  ],
-  "majorSlugs":["electrical-engineering","automation","mechanical-engineering","vehicle-engineering","electronic-information","optoelectronics","computer-science","materials-engineering"],
-  "careersUrl":"https://www.hascovision.com/join-us",
-  "careersLabel":"华域视觉 · 加入我们",
-  "officialSource":"https://www.hascovision.com/about/about-us",
-  "productSource":"https://www.hascovision.com/products-innovation/products",
-  "brandImage":"https://www.hascovision.com/Public/Uploads/uploadfile/images/20240131/e1banpc.jpg",
-  "imageSource":"https://www.hascovision.com/about/about-us",
-  "lastReviewed":"2026-10-23"
- }
+  "华域视觉科技（上海）有限公司": {
+    "displayName": "华域视觉科技",
+    "subtitle": "智能汽车照明 · 电子控制 · 光学系统",
+    "summary": "源自上海小糸车灯业务体系，2018年改制成立的汽车照明及汽车电子技术企业，围绕智能车灯开展研发、生产和工程技术服务。",
+    "description": [
+      "华域视觉科技（上海）有限公司的汽车灯具技术可以追溯到原上海小糸车灯有限公司。2018年3月，华域汽车完成对原合资方有关股份的收购后，企业更名并转制为华域视觉。对于求职者而言，这不是上汽集团整车研发部门，而是一家具备独立汽车照明研发、生产和管理体系的零部件企业。",
+      "华域视觉的业务从汽车前照灯、尾灯等传统车灯，延伸到智能照明、电子控制和数字化设计。车灯产品的开发涉及光学配光、电子电路、结构设计、热管理、软件控制、模具和制造工艺等多个专业环节。它的技术特点是把汽车视觉识别、照明安全和智能交互需求转化为量产产品。",
+      "官网公布上海总部，以及常熟、吉林、武汉、长沙、重庆、烟台等国内制造与业务布局，并介绍德国沃尔夫斯堡和美国底特律的海外布局。不同基地的工作侧重点可能不同，专业关联并不代表这些地方目前都有空缺职位。求职者可通过其独立招聘网站分别查看校招与社招渠道。",
+      "从人才发展角度看，企业官网强调新员工培养、专业技能培训、工段长训练营和管理者培养等体系。适合关注汽车电子、光电、机械、自动化、工业工程和汽车制造的人进一步了解，但录用标准仍以具体官方公告为准。"
+    ],
+    "business": [
+      {
+        "title": "智能汽车照明",
+        "description": "涵盖前照灯、尾灯、信号灯和汽车照明系统的产品开发与制造。"
+      },
+      {
+        "title": "光学与电子控制",
+        "description": "产品设计需要光学、嵌入式控制、电路、材料、机械结构及功能验证协同。"
+      },
+      {
+        "title": "生产制造与质量验证",
+        "description": "多地生产和研发体系支撑工艺开发、自动化生产、实验与可靠性检测。"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "公司总部",
+        "address": "上海市嘉定区叶城路767号",
+        "source": "https://www.hascovision.com/about/contact-us"
+      }
+    ],
+    "majorSlugs": [
+      "electrical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "vehicle-engineering",
+      "electronic-information",
+      "optoelectronics",
+      "computer-science",
+      "materials-engineering"
+    ],
+    "careersUrl": "https://www.hascovision.com/join-us",
+    "careersLabel": "华域视觉 · 加入我们",
+    "officialSource": "https://www.hascovision.com/about/about-us",
+    "productSource": "https://www.hascovision.com/products-innovation/products",
+    "brandImage": "https://gpms.hascovision.com/GPMS/resource/images/logo_h.png",
+    "imageSource": "https://www.hascovision.com/about/about-us",
+    "photos": [
+      {
+        "url": "https://www.hascovision.com/Public/Uploads/uploadfile/images/20231219/e1img07.jpg",
+        "label": "华域视觉官网 · 上海总部及业务布局展示",
+        "source": "https://www.hascovision.com/about/about-us"
+      },
+      {
+        "url": "https://www.hascovision.com/Public/Uploads/uploadfile/images/20240318/tu215.png",
+        "label": "华域视觉官网 · 企业参展实景",
+        "source": "https://www.hascovision.com/news/company-news"
+      }
+    ],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official"
+  },
+  "华域汽车": {
+    "displayName": "华域汽车",
+    "subtitle": "汽车零部件系统 · 智能制造 · 新能源",
+    "summary": "上交所上市汽车零部件供应商，覆盖智能行驶、座舱与车身、智能动力等领域，拥有与整车制造商配套的研发制造体系。",
+    "description": [
+      "华域汽车系统股份有限公司（股票代码600741）是一家以汽车零部件研发、制造与配套供货为核心的上市公司。它不等同于华域视觉：华域汽车布局多个零部件业务板块，而华域视觉主要聚焦汽车照明。了解企业时，首先应区分母公司投资与业务管理职能，以及各下属经营主体的专业技术方向。",
+      "华域汽车官网将技术发展概括为智能行驶、智能座舱与车身、智能动力等平台。业务包括机器视觉、传感器、底盘与制动、汽车内外饰、汽车电子、座椅安全、电驱动及热管理。车辆工程、电气自动化、机械制造和材料类人才，可以从不同零部件方向寻找与自身知识结构相近的业务场景。",
+      "华域汽车强调数字化转型与智能化升级，在研发设计、生产设备、质量管理以及供应链中应用自动化与信息化技术。它在多地设有研发制造基地，但具体经营主体、工作地点和招聘渠道并不相同，不应以集团一个网址代替所有成员企业。",
+      "对希望进入汽车产业链工作的学生而言，华域汽车提供的是多种零部件领域的探索入口：从产品开发与试验，到制造工艺、供应链和质量体系。当前招聘信息应以华域汽车独立官网及有关经营主体自己的公告为准。"
+    ],
+    "business": [
+      {
+        "title": "智能行驶",
+        "description": "机器视觉、传感器、底盘、转向和制动等汽车部件系统。"
+      },
+      {
+        "title": "座舱与车身",
+        "description": "内外饰、车身零部件、座椅和安全系统等方向。"
+      },
+      {
+        "title": "智能动力",
+        "description": "新能源汽车电驱动、热管理及相关部件。"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "公司联系办公地址",
+        "address": "上海市静安区威海路489号",
+        "source": "https://www.hasco-group.com/"
+      }
+    ],
+    "majorSlugs": [
+      "electrical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "vehicle-engineering",
+      "electronic-information",
+      "materials-engineering",
+      "energy-engineering",
+      "robotics"
+    ],
+    "careersUrl": "https://www.hasco-group.com/join/",
+    "careersLabel": "华域汽车 · 工作与职业",
+    "officialSource": "https://www.hasco-group.com/about/company.html/1000",
+    "productSource": "https://www.hasco-group.com/",
+    "brandImage": "",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official"
+  },
+  "上汽集团": {
+    "displayName": "上汽集团",
+    "subtitle": "整车制造 · 汽车零部件 · 新能源与智能出行",
+    "summary": "上交所上市汽车集团，业务涉及整车、零部件、出行服务、汽车金融、海外经营及技术创新。",
+    "description": [
+      "上海汽车集团股份有限公司（股票代码600104）是中国大型汽车企业集团之一，业务并不限于传统整车制造。上汽集团官网把其业务分为整车、零部件、移动出行与服务、金融、国际经营和创新科技等协同板块。集团旗下有各具独立经营与招聘渠道的企业，因此在 HHBA 中应将集团背景介绍和具体子公司的招聘信息分开呈现。",
+      "上汽集团的整车业务涵盖乘用车和商用车研发、生产与销售，涉及自主品牌业务及合资制造体系。集团同时围绕新能源汽车、智能网联、汽车电子与相关技术进行研发和产业化。对学生来说，车辆工程、机械、电子、电气、自动化与计算机方向都可能对应不同的研发和制造业务，而非全部由集团总部直接招聘。",
+      "零部件板块包括发动机、变速器、底盘、电子电器及车身内外饰等领域，华域汽车是其中的重要上市企业。需要特别注意：华域视觉是华域汽车投资企业体系中的汽车照明经营主体，不能把华域视觉的岗位归为集团统一岗位，也不能把华域汽车的招聘页面误称为华域视觉官网。",
+      "上汽集团主要办公联系地址位于上海市静安区威海路489号，集团旗下不同整车及零部件企业在上海和其他地区设有基地。浏览集团页面适合先认识产业全貌；准备实际申请时应进一步确认具体用人单位。"
+    ],
+    "business": [
+      {
+        "title": "整车与新能源汽车",
+        "description": "自主与合资整车产品，涵盖乘用车、商用车、新能源汽车。"
+      },
+      {
+        "title": "汽车零部件",
+        "description": "电子电器、动力驱动、车身、底盘与内外饰配套产业。"
+      },
+      {
+        "title": "出行服务与全球运营",
+        "description": "移动出行、物流服务、汽车金融和海外业务。"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "公司办公地址",
+        "address": "上海市静安区威海路489号",
+        "source": "https://www.sse.com.cn/assortment/stock/list/info/company/index.shtml?COMPANY_CODE=600104&tabActive=1"
+      }
+    ],
+    "majorSlugs": [
+      "electrical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "vehicle-engineering",
+      "electronic-information",
+      "computer-science",
+      "materials-engineering",
+      "energy-engineering"
+    ],
+    "careersUrl": "https://saic-recruit.saicmotor.com/",
+    "careersLabel": "上汽集团 · 招聘官网",
+    "officialSource": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
+    "productSource": "https://www.saicmotor.com/chinese/gsgk/qyml/index.shtml",
+    "brandImage": "",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official"
+  },
+  "汇川技术": {
+    "displayName": "汇川技术",
+    "subtitle": "工业自动化 · 运动控制 · 工业数字化",
+    "summary": "围绕电力电子、电机驱动、工业控制与数字化开发系统方案，是电气自动化相关专业的重点企业。",
+    "description": [
+      "深圳市汇川技术股份有限公司（股票代码300124）以工业技术和自动化产品为主要发展方向，长期积累电力电子、电机驱动与控制、工业控制及通信、精密机械、工业软件和数字化等技术。公司不仅销售标准化工业控制产品，也提供面向不同行业设备和生产线的系统方案。",
+      "在工业场景中，变频器、伺服系统、PLC和运动控制技术能够服务制造设备的精确驱动和自动控制。对电气工程、自动化、机械和软件方向的学生，这些业务对应着硬件研发、驱动控制算法、产品测试、系统集成及技术支持等不同职业方向。",
+      "官方投资者资料公布了深圳和苏州等办公通讯地点。汇川技术拥有独立的招聘官网，区分校招、社招、实习招聘；求职者可以按具体岗位核对地点和专业要求，而不应仅以 HHBA 的业务相关性作为招聘承诺。"
+    ],
+    "business": [
+      {
+        "title": "驱动与控制",
+        "description": "变频、伺服与电机控制技术。"
+      },
+      {
+        "title": "工业控制",
+        "description": "工业控制器、通信与智能装备系统。"
+      },
+      {
+        "title": "工业软件与数字化",
+        "description": "连接自动化设备与制造业务的软件和数据能力。"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "深圳办公通讯地址",
+        "address": "深圳市龙华区观澜高新技术产业园汇川技术总部大厦",
+        "source": "https://www.inovance.com/portal/investor"
+      },
+      {
+        "type": "苏州办公通讯地址",
+        "address": "苏州市吴中区天鹅荡路52号",
+        "source": "https://www.inovance.com/portal/investor"
+      }
+    ],
+    "majorSlugs": [
+      "electrical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "electronic-information",
+      "computer-science",
+      "robotics",
+      "software-engineering"
+    ],
+    "careersUrl": "https://recruit.inovance.com/",
+    "careersLabel": "汇川技术 · 招聘官网",
+    "officialSource": "https://www.inovance.com/portal/investor",
+    "productSource": "https://www.inovance.com/",
+    "brandImage": "",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official"
+  },
+  "中国中车": {
+    "displayName": "中国中车",
+    "subtitle": "轨道交通装备 · 电力机车 · 机电与智能制造",
+    "summary": "由南车和北车重组设立的轨道交通装备上市公司，涵盖动车组、机车、轨道车辆和相关技术服务。",
+    "description": [
+      "中国中车股份有限公司由原中国南车与中国北车按照对等原则重组形成，2015年在上海证券交易所与香港交易所上市。公司经营围绕轨道交通装备展开，主要涉及高速动车组、电力机车、城市轨道车辆、铁路货车以及车辆相关零部件。",
+      "轨道交通装备的研发制造需要多专业协作，包括车辆机械结构、电气牵引、电机驱动、制动控制、车载电子和轨道系统工程。相较于单纯的车辆生产，中国中车还覆盖维修服务、工程装备及机电设备领域，对电气自动化、机械、车辆、电子信息等专业具有明确的业务关联。",
+      "公司总部位于北京，生产制造和研发由分布全国的成员企业承担。不同中车下属企业具有自己的招聘公告与用人主体，因此查看具体岗位应进入相应经营单位核验，不能将中国中车集团页面等同为全部分子公司的统一招聘入口。"
+    ],
+    "business": [
+      {
+        "title": "机车与动车组",
+        "description": "高速动车组、电力机车与轨道运输装备。"
+      },
+      {
+        "title": "城市轨道交通",
+        "description": "城轨车辆、车载设备与配套系统。"
+      },
+      {
+        "title": "研发制造与服务",
+        "description": "机电、控制、维修与轨道工程技术。"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "上市公司注册地址（非办公地点）",
+        "address": "北京市海淀区西四环中路16号",
+        "source": "https://www.crrcgc.cc/Portals/71/Uploads/Files/2023/11-15/638356504385903452.pdf"
+      }
+    ],
+    "majorSlugs": [
+      "electrical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "vehicle-engineering",
+      "electronic-information",
+      "materials-engineering",
+      "robotics"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.crrcgc.cc/eportal/ui?pageId=714829",
+    "productSource": "https://www.crrcgc.cc/sj/",
+    "brandImage": "",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official"
+  },
+  "美的集团": {
+    "displayName": "美的集团",
+    "subtitle": "智能家居 · 工业技术 · 机器人自动化",
+    "summary": "横跨智能家居、工业技术、楼宇、机器人与自动化、能源和医疗的科技集团。",
+    "description": [
+      "美的集团创立于1968年，业务从家电制造逐步扩展到智能家居、工业技术、楼宇科技、机器人与自动化、能源、医疗和智慧物流等多个领域。认识美的时不能只把它当作空调或家电公司，集团层面同时涉及电机、压缩机、智能制造、工业机器人和数智化技术。",
+      "美的工业技术板块覆盖电机、压缩机、芯片、泵阀及部分新能源与机器人核心部件；楼宇科技则面向暖通、楼宇智慧管理与能源系统。机器人与自动化业务涉及工业机器人、物流自动化与系统解决方案。这些业务在专业需求上存在明显差异，适合在 HHBA 中按具体领域进一步选择子公司和事业部。",
+      "企业官网将各事业板块分开介绍；用户可以先从集团理解业务全貌，再前往与目标职业方向对应的官方招聘渠道核实岗位。对于专业关联，我们只记录经业务信息支持的方向，不用一个集团标签推断每一个子公司都面向同样的专业招聘。"
+    ],
+    "business": [
+      {
+        "title": "智能家居",
+        "description": "家电及家庭智能场景。"
+      },
+      {
+        "title": "工业技术与楼宇",
+        "description": "电机、压缩机、工业部件、能源与楼宇系统。"
+      },
+      {
+        "title": "机器人与自动化",
+        "description": "工业机器人、物流自动化与智能制造。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "electrical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "electronic-information",
+      "computer-science",
+      "robotics",
+      "energy-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.midea.com.cn/zh/about-midea?wcmmode=disabled",
+    "productSource": "https://www.midea.com.cn/zh/our-businesses",
+    "brandImage": "",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official"
+  }
 }

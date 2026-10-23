@@ -70,12 +70,19 @@ try{
  assert.match(desktop.url(),/\/candidate\/jobs$/);
  await desktop.locator('.unified-job-search input').waitFor();
  // Verified company page and major → companies reverse lookup.
+ await desktop.locator('.unified-job-search input').fill('华');
+ await desktop.locator('.domestic-company-card').filter({hasText:'华域视觉'}).first().waitFor({timeout:2500});
+ await desktop.locator('.domestic-company-card').filter({hasText:'华域汽车'}).first().waitFor({timeout:2500});
+ assert((await desktop.locator('.domestic-company-card').count())<=16,'Single-character result list should remain compact');
  await desktop.locator('.unified-job-search input').fill('华域视觉');
  await desktop.locator('.domestic-company-card').filter({hasText:'华域视觉'}).first().waitFor({timeout:4500});
  assert(!((await desktop.locator('.domestic-company-result').innerText()).includes('载入企业名录中')));
  await desktop.locator('.domestic-company-card').filter({hasText:'华域视觉'}).first().click();
  await desktop.getByRole('heading',{name:'华域视觉科技'}).waitFor();
  assert.equal(await desktop.locator('.domestic-major-tag').count(),8);
+ assert((await desktop.locator('.domestic-editorial-body').innerText()).length>200);
+ await desktop.getByText('上海市嘉定区叶城路767号').first().waitFor();
+ assert.equal(await desktop.locator('.domestic-official-photo').count(),2);
  assert.equal(await desktop.locator('.domestic-careers-link[href="https://www.hascovision.com/join-us"]').count(),1);
  assert.equal(await desktop.locator('.domestic-profile-relations details[open]').count(),0,
   'Company relations must be collapsed by default');
@@ -90,6 +97,8 @@ try{
  await desktop.locator('.domestic-profile-relations summary').click();
  await desktop.locator('.domestic-relations-inside').getByRole('link',{name:/华域汽车/}).click();
  await desktop.getByRole('heading',{name:'华域汽车'}).waitFor();
+ assert.equal(await desktop.locator('.domestic-careers-link[href="https://www.hasco-group.com/join/"]').count(),1);
+ assert.equal(await desktop.locator('.domestic-careers-link[href="https://saic-recruit.saicmotor.com/"]').count(),0);
  // Each new employer page must begin with a collapsed relation list, never carry prior disclosure state.
  assert.equal(await desktop.locator('.domestic-profile-relations details[open]').count(),0);
  await desktop.locator('.domestic-profile-relations summary').click();

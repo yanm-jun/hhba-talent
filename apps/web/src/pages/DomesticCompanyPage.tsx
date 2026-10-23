@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useState} from 'react';
-import {ArrowLeft,ArrowRight,ExternalLink,Building2,ShieldCheck,ChevronDown,ImageOff} from 'lucide-react';
+import {ArrowLeft,ArrowRight,ExternalLink,Building2,ShieldCheck,ChevronDown,MapPin,Images} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,getCompanyReturnTarget} from '../router';
 import {getDomesticCompanies,companyById,findParentCompany,findRelatedCompanies} from '../services/domesticCompanySearch';
@@ -9,10 +9,13 @@ import type {User} from '../services/api';
 import '../styles/domestic-company-search.css';
 
 type Reviewed={
- displayName:string;subtitle:string;description:string[];
+ displayName:string;subtitle:string;summary?:string;description:string[];
  business:{title:string;description:string}[];majorSlugs:string[];
- careersUrl:string;careersLabel:string;officialSource:string;productSource:string;
- brandImage:string;imageSource:string;lastReviewed:string;
+ careersUrl?:string;careersLabel?:string;officialSource:string;productSource?:string;
+ brandImage?:string;imageSource?:string;lastReviewed:string;
+ photos?:{url:string;label:string;source:string}[];
+ officeLocations?:{type:string;address:string;source:string}[];
+ evidenceLevel?:string;
 };
 const curated=profiles as Record<string,Reviewed>;
 function httpsLink(value?:string){
@@ -39,7 +42,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
    <div className="domestic-editorial-panel">
     <header className="domestic-editorial-hero">
      <div className="domestic-company-profile-mark" aria-label="企业视觉资料">
-      {article?.brandImage&&!imageFailed?<img src={article.brandImage} alt="华域视觉官网公开的企业形象图片" onError={()=>setImageFailed(true)}/>:
+      {article?.brandImage&&!imageFailed?<img src={article.brandImage} alt={company.name+"的官方品牌标识"} onError={()=>setImageFailed(true)}/>:
        <Building2 size={26} aria-hidden="true"/>}
      </div>
      <div className="domestic-profile-identity">
@@ -47,17 +50,38 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       <h1>{article?.displayName||company.name}</h1>
       <p>{article?.subtitle||company.industry}{company.city?' · '+company.city:''}</p>
       {article?.displayName&&article.displayName!==company.name&&<small>经营主体：{company.name}</small>}
+      {article?.officeLocations?.length? <small className="domestic-profile-office-hint"><MapPin size={13}/>{article.officeLocations[0].address}</small>:null}
      </div>
     </header>
     <section className="domestic-editorial-section" aria-label="企业介绍">
       <h2>企业介绍</h2>
       {article?<div className="domestic-editorial-body">{article.description.map((paragraph,i)=><p key={i}>{paragraph}</p>)}</div>:
-       <div className="domestic-editorial-body"><p>{company.overview}</p>
-       <p className="domestic-editorial-limited">当前为基础企业档案；企业历史、技术实力、产品与图片尚待官方资料核验后补全，不使用虚构内容占位。</p></div>}
+       <div className="domestic-editorial-body"><p>{company.name}已收录至 HHBA 企业资料库。{company.industry!=='行业待细分'?'现有行业分类为：'+company.industry+'。':''}目前尚缺完整的官网核验资料，因此不编造企业历史、技术优势或招聘要求。</p>
+       {company.legalName&&<p>工商主体名称：{company.legalName}</p>}
+       {company.stockCode&&<p>上市证券代码：{company.stockCode}</p>}
+       <p className="domestic-editorial-limited">资料状态：基础档案。点击“资料来源”可查看已有出处；详细介绍将按官方资料逐步补齐。</p></div>}
       {article&&<div className="domestic-editorial-business">
        {article.business.map(item=><div key={item.title}><strong>{item.title}</strong><p>{item.description}</p></div>)}
       </div>}
     </section>
+    {article?.photos?.length?<section className="domestic-editorial-section domestic-editorial-photos" aria-label="企业真实图片">
+      <h2>企业与产品实景</h2>
+      <div className="domestic-editorial-photo-grid">
+       {article.photos.map(photo=><figure key={photo.url} className="domestic-official-photo">
+        <a href={photo.source} target="_blank" rel="noopener noreferrer" aria-label={'查看'+photo.label+'的来源'}>
+         <img src={photo.url} loading="lazy" alt={photo.label} onError={e=>{e.currentTarget.style.display='none';e.currentTarget.parentElement?.classList.add('domestic-photo-unavailable')}}/>
+         <span className="domestic-photo-fallback"><Images size={18}/>点击查看官网图片</span>
+        </a>
+        <figcaption>{photo.label} · 官方来源</figcaption>
+       </figure>)}
+      </div>
+     </section>:null}
+    {article?.officeLocations?.length?<section className="domestic-editorial-section" aria-label="办公地点">
+      <h2>总部与办公地点</h2>
+      <div className="domestic-office-list">{article.officeLocations.map(entry=><div key={entry.address}><MapPin size={17}/><div><strong>{entry.type}</strong><p>{entry.address}</p>
+       <a target="_blank" rel="noopener noreferrer" href={entry.source}>查看官方地址来源 <ExternalLink size={12}/></a></div></div>)}</div>
+      <p className="domestic-company-note">办公地址不代表该地点当前正在招聘；若需要前往现场，请先通过企业官网确认。</p>
+     </section>:null}
     <section className="domestic-editorial-section" aria-label="适合哪些专业背景">
       <h2>适合哪些专业背景？</h2>
       {majors.length?<div className="domestic-profile-tags domestic-major-tags">
@@ -70,9 +94,10 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       <h2>官方招聘渠道</h2>
       <p>点击企业招聘页面查看当前招聘信息、岗位职责和实际申请条件；HHBA 不同步或虚构国内企业职位。</p>
       {careers?<div className="domestic-careers-row"><div><strong>{article?.careersLabel||'企业招聘入口'}</strong>
-       <small>{article?'已核对企业官网的独立招聘页面':'来源于已有招聘入口记录，当前可用性请以打开结果为准'}</small></div>
+       <small>{article?'与该经营主体对应的官方招聘页面':'经独立核验的企业官方招聘页面'}</small></div>
        <a href={careers} target="_blank" rel="noopener noreferrer" className="domestic-careers-link">查看招聘官网 <ExternalLink size={15}/></a></div>:
-       <p className="domestic-editorial-limited">尚未核验该主体可直接访问的官方招聘渠道，不提供猜测的网址。</p>}
+       <div className="domestic-editorial-limited">尚未核验该主体的官方招聘入口，暂不展示“查看招聘官网”按钮。
+       {httpsLink(company.website)&&<p><a href={httpsLink(company.website)} target="_blank" rel="noopener noreferrer">访问企业官网了解更多 <ExternalLink size={13}/></a></p>}</div>}
     </section>
     <section className="domestic-editorial-section domestic-editorial-sources" aria-label="资料来源">
       <details className="domestic-company-sources" key={"sources-"+company.id}>

@@ -22,7 +22,7 @@ export type CompanyRelation={
 };
 type RelationFeed={schemaVersion:number;relations:CompanyRelation[]};
 const details=editorial as Record<string,Editorial>;
-const verifiedCareerProfiles=careerProfiles as Record<string,{careersUrl:string}>;
+const verifiedCareerProfiles=careerProfiles as Record<string,{careersUrl?:string;officialSource?:string;summary?:string;officeLocations?:{type:string;address:string;source:string}[];}>;
 const normalize=(value:string)=>value.toLocaleLowerCase().replace(/[\s·・（）()\-—_]/g,'');
 let cache:DomesticCompany[]|undefined;
 function clean(value?:string){return value?.trim()||undefined}
@@ -35,7 +35,7 @@ function oneCompanyFromRoster(r:Listed,roster:Roster,prior?:{
  industry:e?.industry||r.industry||'行业待细分',
  overview:e?.overview||(r.industry?'交易所历史名录行业分类：'+r.industry+'。具体主营业务有待核验。':'交易所上市企业名录记录，主营业务尚待核验。'),
  province:clean(r.province),city:clean(r.city),website:clean(e?.website||r.website),
- careers:clean(e?.careers||prior?.careers||undefined),
+ careers:undefined,
  sourceUrl:e?.sourceUrl||roster.sourceUrls[r.exchange]||'',lastReviewed:e?'2026-10-23':prior?.lastReviewed||roster.sourceDate,
  tags:e?.tags||[],stockCode:r.code,route:'/companies/domestic/'+r.id,
  status:e?'industry_reviewed':prior?'official_entry_only':'listed_identity_only',entityKind:'company'
@@ -63,7 +63,7 @@ function mergeRelation(c:DomesticCompany,r:CompanyRelation){
  c.lastReviewed=r.reviewedAt;
  if(r.website&&!c.website)c.website=r.website;
  if(r.city&&!c.city)c.city=r.city;
- if(r.careersUrl&&!c.careers){c.careers=r.careersUrl;c.careersShared=true;}
+ // Relationship evidence is not recruitment evidence. NEVER assign a parent's group ATS to its children.
 }
 export function getDomesticCompanies():DomesticCompany[]{
  if(cache)return cache;
@@ -84,7 +84,7 @@ export function getDomesticCompanies():DomesticCompany[]{
   for(const c of existing)if(!included.has(c.id)){
    const e=details[c.name];
    map.push({id:c.id,name:c.name,industry:e?.industry||c.industry,overview:e?.overview||c.overview,
-    website:clean(e?.website),careers:clean(e?.careers||c.careers||undefined),sourceUrl:e?.sourceUrl||c.evidenceUrl||'',
+    website:clean(e?.website),careers:undefined,sourceUrl:e?.sourceUrl||c.evidenceUrl||'',
     lastReviewed:e?'2026-10-23':c.lastReviewed,tags:e?.tags||[],route:'/companies/domestic/'+c.id,
     status:e?'industry_reviewed':'official_entry_only',entityKind:'company'});
   }
@@ -93,7 +93,7 @@ export function getDomesticCompanies():DomesticCompany[]{
    if(index.has(normalize(name)))continue;
    const id='spot-'+Array.from(name).map(char=>char.codePointAt(0)!.toString(36)).join('-');
    const c:DomesticCompany={id,name,industry:e.industry,overview:e.overview,
-    website:clean(e.website),careers:clean(e.careers),sourceUrl:e.sourceUrl||e.website||'',
+    website:clean(e.website),careers:undefined,sourceUrl:e.sourceUrl||e.website||'',
     lastReviewed:'2026-10-23',tags:e.tags,route:'/companies/domestic/'+id,
     status:'industry_reviewed',entityKind:'company'};
    map.push(c);index.set(normalize(name),c);
@@ -123,10 +123,20 @@ export function getDomesticCompanies():DomesticCompany[]{
    mergeRelation(company,r);
    for(const a of aliasesFor(company))if(!index.has(normalize(a)))index.set(normalize(a),company);
   }
-  // An employer's confirmed independent careers page overrides any inherited group portal.
+  // Recruitment links must be verified for the *exact* employer; no inherited group portal.
   for(const item of map){
    const exact=verifiedCareerProfiles[item.name];
-   if(exact){item.careers=exact.careersUrl;item.careersShared=false;}
+   if(exact){
+    item.careers=clean(exact.careersUrl);
+    item.careersShared=false;
+    if(exact.summary){item.overview=exact.summary;item.status='industry_reviewed';}
+    if(exact.officeLocations?.length){
+     const address=exact.officeLocations[0].address;
+     if(address.includes('上海'))item.city='上海';
+     else if(address.includes('深圳'))item.city='深圳';
+     else if(address.includes('北京'))item.city='北京';
+    }
+   }
   }
   cache=map;
   return map;
@@ -141,33 +151,48 @@ const synonyms:Record<string,string[]>={
  '舞蹈学':['舞蹈','艺术','教育','演艺','文旅','传媒']
 };
 export function searchDomesticCompanies(all:DomesticCompany[],raw:string,limit=36){
- const query=normalize(raw);if(query.length<2)return [];
- const parts=raw.split(/[\s,，、；;]+/).map(normalize).filter(x=>x.length>1);
+ const query=normalize(raw.trim());
+ if(!query)return [];
+ const oneCharacter=Array.from(query).length===1;
+ const take=oneCharacter?Math.min(limit,16):limit;
+ const parts=raw.trim().split(/[\s,，、；;]+/).map(normalize).filter(Boolean);
  const words=parts.length>1?parts:[query];
- const expansions=[...new Set(Object.entries(synonyms).filter(([k])=>query.includes(normalize(k))||normalize(k).includes(query)).flatMap(([,v])=>v))];
- return all.map(c=>{
-  const name=normalize(aliasesFor(c).join(' ')+(c.stockCode||''));
-  const industry=normalize(c.industry),tag=normalize(c.tags.join(' ')),description=normalize(c.overview);
-  const address=normalize((c.province||'')+(c.city||''));
-  const parent=normalize(c.parentName||'');
+ const expansions=oneCharacter?[]:[...new Set(Object.entries(synonyms).filter(([k])=>query.includes(normalize(k))||normalize(k).includes(query))
+ .flatMap(([,values])=>values.map(normalize)))];
+ return all.map(company=>{
+  const labels=aliasesFor(company).map(normalize).filter(Boolean);
+  const code=normalize(company.stockCode||'');
+  const tags=company.tags.map(normalize);
+  const overview=normalize(company.overview);
+  const industry=normalize(company.industry);
+  const city=normalize((company.province||'')+(company.city||''));
   let score=0;
-  for(const word of words){
-   if(name.includes(word))score+=100;
-   else if(tag.includes(word))score+=55;
-   else if(industry.includes(word))score+=28;
-   else if(description.includes(word))score+=12;
-   else if(address.includes(word))score+=3;
-   else if(parent.includes(word))score+=8;
+  const named=labels.some(n=>n.includes(query));
+  for(const term of words){
+   const nameScore=labels.reduce((best,n)=>Math.max(best,
+    n===term?2800:n.startsWith(term)?1900:n.includes(term)?1000:0),0);
+   if(nameScore){score+=nameScore;continue;}
+   if(code===term&&code)score+=2100;
+   else if(!oneCharacter){
+    if(tags.some(t=>t.includes(term)))score+=340;
+    else if(industry.includes(term))score+=110;
+    else if(overview.includes(term))score+=20;
+    else if(city.includes(term))score+=12;
+    else if(normalize(company.parentName||'').includes(term))score+=8;
+   }
   }
-  for(const word of expansions.map(normalize)){
-   if(tag.includes(word))score+=9;
-   else if(industry.includes(word))score+=4;
-   else if(name.includes(word))score+=3;
+  if(!oneCharacter)for(const word of expansions){
+   if(tags.some(t=>t.includes(word)))score+=30;
+   else if(industry.includes(word))score+=10;
   }
-  if(score&&c.status==='industry_reviewed')score+=18;
-  return {company:c,score};
- }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score||a.company.name.localeCompare(b.company.name,'zh-CN'))
-  .slice(0,limit).map(x=>x.company);
+  // One-character Chinese queries ONLY search names; avoid 5,000 unrelated industry matches.
+  if(oneCharacter&&!named)score=0;
+  if(score>0&&company.status==='industry_reviewed')score+=95;
+  if(score>0&&verifiedCareerProfiles[company.name]?.summary)score+=170;
+  return {company,score};
+ }).filter(v=>v.score>0)
+ .sort((a,b)=>b.score-a.score||a.company.name.localeCompare(b.company.name,'zh-CN'))
+ .slice(0,take).map(v=>v.company);
 }
 export function companyById(all:DomesticCompany[],id:string){return all.find(c=>c.id===id)||null}
 export function findRelatedCompanies(all:DomesticCompany[],company:DomesticCompany){

@@ -48,3 +48,35 @@ test('child cards remain within HHBA before external careers links',()=>{
  const market=readFileSync('src/components/UnifiedJobMarket.tsx','utf8');
  assert(market.includes('<DomesticCompanyResults query={draft}/>'));
 });
+
+test('one Chinese character gives enterprise name suggestions, not broad tags',()=>{
+ const src=readFileSync('src/services/domesticCompanySearch.ts','utf8');
+ const component=readFileSync('src/components/DomesticCompanyResults.tsx','utf8');
+ assert(src.includes('const oneCharacter=Array.from(query).length===1'));
+ assert(src.includes('if(oneCharacter&&!named)score=0'));
+ assert(!component.includes('word.length<2'),'Chinese one-character input must display results');
+});
+test('no inherited group recruiting portals and verified offices',()=>{
+ const src=readFileSync('src/services/domesticCompanySearch.ts','utf8');
+ assert(!src.includes('c.careers=r.careersUrl'),'Never assign a parent recruitment URL to a child');
+ assert(src.includes('item.careers=clean(exact.careersUrl)'));
+ const data=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
+ const hv=data['华域视觉科技（上海）有限公司'];
+ const auto=data['华域汽车'];
+ const saic=data['上汽集团'];
+ assert.equal(hv.careersUrl,'https://www.hascovision.com/join-us');
+ assert.equal(auto.careersUrl,'https://www.hasco-group.com/join/');
+ assert.notEqual(hv.careersUrl,auto.careersUrl);
+ assert.notEqual(hv.careersUrl,saic.careersUrl);
+ assert.equal(hv.officeLocations[0].address,'上海市嘉定区叶城路767号');
+ for(const company of [hv,auto,saic]){
+  assert(company.description.length>=3);
+  assert(company.description.join('').length>=180);
+  assert(company.officeLocations.length>=1);
+  assert(new URL(company.officialSource).protocol==='https:');
+  assert(new URL(company.careersUrl).protocol==='https:');
+ }
+ const page=readFileSync('src/pages/DomesticCompanyPage.tsx','utf8');
+ assert(page.includes('domestic-editorial-photo-grid'));
+ assert(page.includes('domestic-office-list'));
+});
