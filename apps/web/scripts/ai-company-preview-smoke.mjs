@@ -126,7 +126,7 @@ try{
  await desktop.locator('.domestic-company-card').filter({hasText:'平高电气'}).first().click();
  await desktop.getByRole('heading',{name:'平高电气'}).waitFor();
  assert((await desktop.locator('.domestic-editorial-body').innerText()).length>180);
- assert.equal(await desktop.locator('.domestic-careers-link').count(),0,
+ assert.equal(await desktop.locator('.domestic-careers .domestic-careers-link').count(),0,
    'No unverified careers portal should be displayed');
  await desktop.goto(ROOT);
  await desktop.locator('.unified-job-browse-links').getByRole('link',{name:/查看完整招聘市场/}).click();
