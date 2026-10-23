@@ -125,7 +125,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
        <small>{recruitment?.kind==='group_recruitment_portal'?'集团统一招聘平台；投递前请确认所选用人公司':recruitment?.availability==='announcement_only'?'仅显示招聘公告，非岗位直投入口':recruitment?.availability==='temporarily_unavailable'?'官网目前显示维护中，暂可能无法投递':'企业官方招聘专用渠道'}</small></div>
        <a href={careers} target="_blank" rel="noopener noreferrer" className="domestic-careers-link">{recruitment?.availability==='announcement_only'?'查看招聘公告':recruitment?.availability==='temporarily_unavailable'?'访问招聘系统（维护中）':'查看招聘官网'} <ExternalLink size={15}/></a></div>:
        <div className="domestic-editorial-limited">尚未核验该主体的官方招聘入口，暂不展示“查看招聘官网”按钮。
-       {httpsLink(company.website)&&<p><a href={httpsLink(company.website)} target="_blank" rel="noopener noreferrer">访问企业官网了解更多 <ExternalLink size={13}/></a></p>}</div>}
+       </div>}
     </section>}
     <section className="domestic-editorial-section domestic-editorial-sources" aria-label="资料来源">
       <details className="domestic-company-sources" key={"sources-"+company.id}>
