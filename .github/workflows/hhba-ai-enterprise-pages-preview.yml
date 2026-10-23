@@ -12,6 +12,13 @@ on:
       - 'apps/web/src/styles/unified-jobs.css'
       - 'apps/web/scripts/prepare-three-employers.mjs'
       - 'apps/web/src/styles/ai-company-search.css'
+      - 'apps/web/src/services/domesticCompanySearch.ts'
+      - 'apps/web/src/components/DomesticCompanyResults.tsx'
+      - 'apps/web/src/pages/DomesticCompanyPage.tsx'
+      - 'apps/web/src/styles/domestic-company-search.css'
+      - 'apps/web/src/data/domesticCompanyEditorial.json'
+      - 'apps/web/public/data/domestic-listed-companies.json'
+      - 'apps/web/src/main.tsx'
   workflow_dispatch:
 permissions:
   contents: read

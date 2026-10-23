@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, ExternalLink, MapPin, RefreshCcw, Search, ShieldCheck } from 'lucide-react';
 import { Link, getJobReturnTarget, navigate } from '../router';
 import { Shell } from './Shell';
+import { DomesticCompanyResults } from './DomesticCompanyResults';
 import { SaveJobButton } from './SaveJobButton';
 import { trackEvent } from '../services/engagement';
 import '../styles/saved-jobs.css';
@@ -276,6 +277,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       </div>
       {aiEvidence.jobs.length===0&&<p className="unified-job-state">暂未检索到具备可核对原文证据的岗位；不会提供虚构的职位。</p>}
     </section>}
+    <DomesticCompanyResults query={draft}/>
     {intentLabels.length>0&&<div className="unified-search-interpreted">
       {lang==='zh'?'搜索条件已识别：':'Recognized filters: '}{intentLabels.join(' · ')}
       {filters.company&&<button className="unified-company-filter-clear" type="button"
