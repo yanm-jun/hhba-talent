@@ -31,7 +31,8 @@ function oneCompanyFromRoster(r:Listed,roster:Roster,prior?:{
 }):DomesticCompany{
  const e=details[r.name]||details[prior?.name||''];
  return {
- id:r.id,name:prior?.name||r.name,legalName:clean(r.legalName),
+ id:r.id,name:r.name,legalName:clean(r.legalName),
+ aliases:prior?.name&&normalize(prior.name)!==normalize(r.name)?[prior.name]:undefined,
  industry:e?.industry||r.industry||'行业待细分',
  overview:e?.overview||(r.industry?'交易所历史名录行业分类：'+r.industry+'。具体主营业务有待核验。':'交易所上市企业名录记录，主营业务尚待核验。'),
  province:clean(r.province),city:clean(r.city),website:clean(e?.website||r.website),
