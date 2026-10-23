@@ -86,7 +86,7 @@ test('goal list is exactly fifty unique existing entities, not invented addition
   assert(profiles[name]&&isHttps(profiles[name].officialSource),'Unknown or unsourced employer dossier: '+name);
  }
 });
-test('media-delivery status requires one local logo and one matching company's photo',()=>{
+test('media delivery requires one local logo and at least one same-company photo',()=>{
  for(const r of results)if(r.mediaDisplayComplete){
    assert(r.localBrand&&r.localPictures>=1,'Incorrect media-complete claim: '+r.name);
  }
