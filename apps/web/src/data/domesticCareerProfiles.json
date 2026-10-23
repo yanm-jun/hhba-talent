@@ -529,5 +529,1510 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
     "brandImageSource": "https://x.com/sieyuan_group"
+  },
+  "许继电气": {
+    "displayName": "许继电气",
+    "subtitle": "智能变配电 · 直流输电 · 新能源充换电",
+    "summary": "源自许昌继电器厂的许继电气于1997年在深交所上市，长期深耕能源电力装备，业务覆盖从发电、输变电到配电与用电的多个环节。公司是中国电气装备集团体系中的重要上市主体，主要客户和工",
+    "description": [
+      "源自许昌继电器厂的许继电气于1997年在深交所上市，长期深耕能源电力装备，业务覆盖从发电、输变电到配电与用电的多个环节。公司是中国电气装备集团体系中的重要上市主体，主要客户和工程场景集中在电力系统。",
+      "其公开产品线包括智能变配电、直流输电系统、智能电表、中压配电设备以及新能源和充换电装备。与一般家用电器企业相比，许继更强调电力系统可靠性、保护控制、工程调试和复杂装备的协同。",
+      "电气工程与自动化专业可重点了解电力电子、继电保护、直流输电、智能电网和现场工程；机械、计算机与通信背景则可能关联装备结构、工业软件或智能运维。HHBA 只展示专业与业务的关联，具体招聘要求以公司公告为准。"
+    ],
+    "business": [
+      {
+        "title": "智能变配电",
+        "description": "高低压电力系统和智能配电设备"
+      },
+      {
+        "title": "直流输电",
+        "description": "电力电子及直流输电装备"
+      },
+      {
+        "title": "新能源充换电",
+        "description": "充换电、储能与新能源系统"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "公司办公与通讯地址",
+        "address": "河南省许昌市许继大道1298号",
+        "source": "https://xjec.com/intro/shortintro/"
+      }
+    ],
+    "majorSlugs": [
+      "electrical-engineering",
+      "automation",
+      "electronic-information",
+      "measurement-control",
+      "energy-power",
+      "software-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://xjec.com/intro/shortintro/",
+    "productSource": "https://xjec.com",
+    "brandImage": "https://xjec.com/favicon.ico",
+    "brandImageSource": "https://xjec.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://xjec.com",
+    "industry": "智能变配电"
+  },
+  "平高电气": {
+    "displayName": "平高电气",
+    "subtitle": "高压开关设备 · 输变电工程 · 配套技术",
+    "summary": "河南平高电气股份有限公司在2001年登陆上交所，属于中国电气装备集团体系的重要上市公司。它的特色在于高压、超高压和特高压电气装备，并非面向终端消费者的通用电器品牌。",
+    "description": [
+      "河南平高电气股份有限公司在2001年登陆上交所，属于中国电气装备集团体系的重要上市公司。它的特色在于高压、超高压和特高压电气装备，并非面向终端消费者的通用电器品牌。",
+      "公司的主营业务覆盖气体绝缘组合电器（GIS）、高压断路器、隔离开关、变电站设备及输变电设备在线监测等。研发生产需要绝缘技术、材料、机械结构、电气设计和高可靠制造体系协同。",
+      "学习高电压技术、电气工程、自动化或机械的学生可关注输变电装备的产品研发、制造测试、质量检测与工程服务。具体岗位可能位于不同工厂或成员公司，不应直接将集团招聘信息视作平高电气实时招聘。"
+    ],
+    "business": [
+      {
+        "title": "高压开关设备",
+        "description": "GIS、断路器及隔离开关"
+      },
+      {
+        "title": "输变电工程",
+        "description": "变电站成套设备与工程应用"
+      },
+      {
+        "title": "配套技术",
+        "description": "绝缘、在线监测和制造检测"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "electrical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "materials-engineering",
+      "measurement-control"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.pinggao.com/about/company.html",
+    "productSource": "https://pinggao.com",
+    "brandImage": "https://pinggao.com/favicon.ico",
+    "brandImageSource": "https://pinggao.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://pinggao.com",
+    "industry": "高压开关设备"
+  },
+  "国电南瑞": {
+    "displayName": "国电南瑞",
+    "subtitle": "电网自动化 · 电力软件 · 电力装备",
+    "summary": "国电南瑞科技股份有限公司于2003年在上交所上市，总部位于南京。其业务高度依托电力系统自动化及能源互联网的技术需求，既有硬件装备，也包含控制、监测与软件系统。",
+    "description": [
+      "国电南瑞科技股份有限公司于2003年在上交所上市，总部位于南京。其业务高度依托电力系统自动化及能源互联网的技术需求，既有硬件装备，也包含控制、监测与软件系统。",
+      "电网调度、继电保护、输变电自动化、配电自动化和能源管理是理解国电南瑞的重要关键词。相比单一电气设备制造，南瑞的研发还需要实时软件、通信网络、数据分析、网络安全和大型系统集成能力。",
+      "对于电气工程、自动化、计算机、通信和软件专业，国电南瑞的业务更偏向电网控制系统、工业软件及工程技术。不同子公司和业务团队采用的招聘渠道可能不同，尚未完成具体主体核验时不直接展示招聘按钮。"
+    ],
+    "business": [
+      {
+        "title": "电网自动化",
+        "description": "调度与输配电自动控制系统"
+      },
+      {
+        "title": "电力软件",
+        "description": "监测、调度与能源管理软件"
+      },
+      {
+        "title": "电力装备",
+        "description": "保护控制与智能感知设备"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "交易所披露的公司通讯地址",
+        "address": "江苏省南京市江宁区诚信大道19号",
+        "source": "https://www.sse.com.cn/assortment/stock/list/info/company/index.shtml?COMPANY_CODE=600406"
+      }
+    ],
+    "majorSlugs": [
+      "electrical-engineering",
+      "automation",
+      "software-engineering",
+      "computer-science",
+      "communications",
+      "electronic-information"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.sse.com.cn/assortment/stock/list/info/company/index.shtml?COMPANY_CODE=600406",
+    "productSource": "https://nrec.com",
+    "brandImage": "https://nrec.com/favicon.ico",
+    "brandImageSource": "https://nrec.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://nrec.com",
+    "industry": "电网自动化"
+  },
+  "中控技术": {
+    "displayName": "中控技术",
+    "subtitle": "流程控制 · 工业软件 · 工业AI",
+    "summary": "中控技术股份有限公司于1999年成立，在2020年登陆科创板。公司的重点客户来自石化、化工、能源、冶金等流程工业，不同于面向离散制造的通用机器人或消费电子企业。",
+    "description": [
+      "中控技术股份有限公司于1999年成立，在2020年登陆科创板。公司的重点客户来自石化、化工、能源、冶金等流程工业，不同于面向离散制造的通用机器人或消费电子企业。",
+      "中控的早期技术基础是分布式控制系统和工业自动化仪表，并逐渐扩展至工业软件、生产运行管理、工业数据和工业AI方案。流程工业的核心挑战在于长周期、连续生产、安全约束和复杂工艺的稳定控制。",
+      "自动化、测控、计算机、软件与化工等专业可从DCS、过程控制、工业仪表、工艺优化和AI工程应用切入。官网公布杭州滨江区的联系地点；是否有相应方向的岗位应查看企业自己发布的招聘公告。"
+    ],
+    "business": [
+      {
+        "title": "流程控制",
+        "description": "DCS、过程控制与工业自动化"
+      },
+      {
+        "title": "工业软件",
+        "description": "生产运营、数字化与工业数据"
+      },
+      {
+        "title": "工业AI",
+        "description": "面向流程工业的分析与智能应用"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "公司公开办公地址",
+        "address": "浙江省杭州市滨江区六和路309号中控科技园",
+        "source": "https://srm.supcon.com/"
+      }
+    ],
+    "majorSlugs": [
+      "automation",
+      "electrical-engineering",
+      "measurement-control",
+      "chemical-engineering",
+      "software-engineering",
+      "computer-science"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://srm.supcon.com/",
+    "productSource": "https://supcon.com",
+    "brandImage": "https://supcon.com/favicon.ico",
+    "brandImageSource": "https://supcon.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://supcon.com",
+    "industry": "流程控制"
+  },
+  "拓斯达": {
+    "displayName": "拓斯达",
+    "subtitle": "工业机器人 · 数控及注塑装备 · 具身智能",
+    "summary": "广东拓斯达科技股份有限公司成立于2007年，2017年在创业板上市，总部位于东莞。公司主要服务制造业客户，围绕自动化设备和智能制造升级提供产品及解决方案。",
+    "description": [
+      "广东拓斯达科技股份有限公司成立于2007年，2017年在创业板上市，总部位于东莞。公司主要服务制造业客户，围绕自动化设备和智能制造升级提供产品及解决方案。",
+      "拓斯达公开介绍的核心装备包括工业机器人、数控机床、注塑机和具身智能相关产品；技术积累涉及运动控制、伺服、机器视觉、AI与工艺软件。它在汽车、3C电子、新能源及其他制造场景开展设备交付。",
+      "机械设计制造及其自动化、机器人工程、电气工程、自动化、计算机等专业可关注机器人本体与系统、装备研发、现场调试、运动控制与机器视觉。具体产品线决定实际需要的技能，不能将专业关联等同于当前招聘。"
+    ],
+    "business": [
+      {
+        "title": "工业机器人",
+        "description": "机器人与智能制造解决方案"
+      },
+      {
+        "title": "数控及注塑装备",
+        "description": "五轴机床与注塑设备"
+      },
+      {
+        "title": "具身智能",
+        "description": "AI、视觉和运动控制集成"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "总部城市（官网未在该页公布门牌地址）",
+        "address": "广东省东莞市",
+        "source": "https://www.topstarltd.com/lang-cn/about.html"
+      }
+    ],
+    "majorSlugs": [
+      "mechanical-engineering",
+      "automation",
+      "electrical-engineering",
+      "robotics",
+      "mechatronics",
+      "ai"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.topstarltd.com/lang-cn/about.html",
+    "productSource": "https://topstarltd.com",
+    "brandImage": "https://topstarltd.com/favicon.ico",
+    "brandImageSource": "https://topstarltd.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://topstarltd.com",
+    "industry": "工业机器人"
+  },
+  "埃斯顿": {
+    "displayName": "埃斯顿",
+    "subtitle": "伺服与运动控制 · 工业机器人 · 自动化集成",
+    "summary": "南京埃斯顿自动化股份有限公司是国内工业自动化和机器人领域的上市企业之一，业务从运动控制核心部件延伸至机器人本体和行业自动化系统。公司官网将“人人享受自动化”作为品牌愿景。",
+    "description": [
+      "南京埃斯顿自动化股份有限公司是国内工业自动化和机器人领域的上市企业之一，业务从运动控制核心部件延伸至机器人本体和行业自动化系统。公司官网将“人人享受自动化”作为品牌愿景。",
+      "其业务链覆盖伺服、运动控制、工业机器人和智能制造系统，能够面向焊接、搬运、装配等多种制造工艺。机器人控制软件、驱动算法、机械结构和现场工业通信需要密切协同。",
+      "自动化、机器人工程、机械电子工程、电气工程、计算机等专业可根据产品线寻找适合自己的学习方向。与只做消费电子软件的企业不同，埃斯顿许多技术岗位需要理解设备运动精度和工厂环境。"
+    ],
+    "business": [
+      {
+        "title": "伺服与运动控制",
+        "description": "驱动器、控制系统"
+      },
+      {
+        "title": "工业机器人",
+        "description": "工业机器人产品"
+      },
+      {
+        "title": "自动化集成",
+        "description": "面向制造现场的智能装备方案"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "总部所在城市（非具体门牌地址）",
+        "address": "江苏省南京市",
+        "source": "https://www.estun.com/about-us/"
+      }
+    ],
+    "majorSlugs": [
+      "robotics",
+      "automation",
+      "mechanical-engineering",
+      "electrical-engineering",
+      "mechatronics",
+      "software-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.estun.com/about-us/",
+    "productSource": "https://estun.com",
+    "brandImage": "https://estun.com/favicon.ico",
+    "brandImageSource": "https://estun.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://estun.com",
+    "industry": "伺服与运动控制"
+  },
+  "德赛西威": {
+    "displayName": "德赛西威",
+    "subtitle": "智能座舱 · 智能驾驶 · 网联服务",
+    "summary": "德赛西威的汽车电子业务源自1986年成立的中欧电子工业有限公司，2017年在深圳证券交易所上市。公司持续围绕整车制造商的电子电气架构升级发展产品，而非一般消费电子零售业务。",
+    "description": [
+      "德赛西威的汽车电子业务源自1986年成立的中欧电子工业有限公司，2017年在深圳证券交易所上市。公司持续围绕整车制造商的电子电气架构升级发展产品，而非一般消费电子零售业务。",
+      "官网将智能座舱、智能驾驶和网联服务列为核心领域，产品研发需要显示交互、车载计算平台、感知算法、嵌入式软件和车规级硬件。公司在惠州及多个国内外地点设有研发或制造体系。",
+      "电子信息、计算机、软件、通信、自动化及车辆工程背景，可以关注智能座舱、辅助驾驶控制器和软件算法，也可以了解制造工艺与可靠性验证。该企业有自己公布的招聘页面，无需跳到其他汽车集团的招聘网站。"
+    ],
+    "business": [
+      {
+        "title": "智能座舱",
+        "description": "车载交互与座舱控制平台"
+      },
+      {
+        "title": "智能驾驶",
+        "description": "辅助驾驶域控制与智能计算"
+      },
+      {
+        "title": "网联服务",
+        "description": "车载通信与软件服务"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "惠州生产研发园区",
+        "address": "广东省惠州市惠南高新科技产业园惠泰北路6号",
+        "source": "https://www.desaysv.com/about.html"
+      }
+    ],
+    "majorSlugs": [
+      "electronic-information",
+      "computer-science",
+      "software-engineering",
+      "vehicle-engineering",
+      "automation",
+      "communications"
+    ],
+    "careersUrl": "https://www.desaysv.com/jobList.html",
+    "careersLabel": "德赛西威 · 官方招聘入口",
+    "officialSource": "https://www.desaysv.com/about.html",
+    "productSource": "https://desaysv.com",
+    "brandImage": "https://desaysv.com/favicon.ico",
+    "brandImageSource": "https://desaysv.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://desaysv.com",
+    "industry": "智能座舱"
+  },
+  "京东方Ａ": {
+    "displayName": "京东方",
+    "subtitle": "显示技术 · 传感与MLED · 物联网与智慧医工",
+    "summary": "京东方科技集团股份有限公司创立于1993年，是以显示技术为核心、向物联网与智慧医疗等领域发展的企业集团。京东方A与京东方B是其上市证券简称，HHBA 将企业主体档案与股票简称区",
+    "description": [
+      "京东方科技集团股份有限公司创立于1993年，是以显示技术为核心、向物联网与智慧医疗等领域发展的企业集团。京东方A与京东方B是其上市证券简称，HHBA 将企业主体档案与股票简称区分，避免把两种股票当作两家公司。",
+      "京东方官网将业务架构概括为显示、物联网创新、传感器及解决方案、MLED和智慧医工。显示产品从面板、模组扩展至高端显示解决方案，制造过程涉及光学、微电子、材料、精密装备和工厂自动化。",
+      "对电子信息、光电、材料、自动化、软件、工业工程等专业，京东方提供了不同业务切入点。集团在北京、合肥、成都、重庆等地有制造基地，工作地点应以具体用人主体和岗位说明为准。"
+    ],
+    "business": [
+      {
+        "title": "显示技术",
+        "description": "液晶和新型显示面板"
+      },
+      {
+        "title": "传感与MLED",
+        "description": "传感器、MLED及相关技术"
+      },
+      {
+        "title": "物联网与智慧医工",
+        "description": "面向不同应用场景的解决方案"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "集团总部办公地址",
+        "address": "北京市北京经济技术开发区西环中路12号",
+        "source": "https://www.boe.com/about/index"
+      }
+    ],
+    "majorSlugs": [
+      "optoelectronics",
+      "electronic-information",
+      "microelectronics",
+      "materials-engineering",
+      "automation",
+      "software-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.boe.com/about/index",
+    "productSource": "https://boe.com",
+    "brandImage": "https://boe.com/favicon.ico",
+    "brandImageSource": "https://boe.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://boe.com",
+    "industry": "显示技术"
+  },
+  "歌尔股份": {
+    "displayName": "歌尔股份",
+    "subtitle": "声光电组件 · 智能硬件 · 智能制造",
+    "summary": "歌尔股份有限公司成立于2001年，在2008年登陆深交所，是精密零组件与智能硬件制造领域的重要企业。歌尔的业务强调从零部件、模组到整机的工艺整合，具有显著的声学、光学与电子技术",
+    "description": [
+      "歌尔股份有限公司成立于2001年，在2008年登陆深交所，是精密零组件与智能硬件制造领域的重要企业。歌尔的业务强调从零部件、模组到整机的工艺整合，具有显著的声学、光学与电子技术特点。",
+      "公司公开的主要业务包含声光电精密零组件、精密结构件、智能整机和高端装备。其垂直整合能力覆盖模具、注塑、表面处理、精密加工、自动化产线和声光电模组研发。",
+      "声学、光电、电子信息、机械制造、自动化、材料和计算机背景均可根据业务细分方向选择研发或制造团队。研发中心分布多地，实际任职地点和专业要求应在企业招聘公告中核对。"
+    ],
+    "business": [
+      {
+        "title": "声光电组件",
+        "description": "声学、光学与电子精密零组件"
+      },
+      {
+        "title": "智能硬件",
+        "description": "智能终端与整机制造"
+      },
+      {
+        "title": "智能制造",
+        "description": "模具、精密加工及自动化产线"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "公司总部所在城市",
+        "address": "山东省潍坊市",
+        "source": "https://www.goertek.com/about/intro.html"
+      }
+    ],
+    "majorSlugs": [
+      "electronic-information",
+      "optoelectronics",
+      "mechanical-engineering",
+      "materials-engineering",
+      "automation",
+      "computer-science"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.goertek.com/about/intro.html",
+    "productSource": "https://goertek.com",
+    "brandImage": "https://goertek.com/favicon.ico",
+    "brandImageSource": "https://goertek.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://goertek.com",
+    "industry": "声光电组件"
+  },
+  "中兴通讯": {
+    "displayName": "中兴通讯",
+    "subtitle": "无线通信 · 算力与云网 · 终端产品",
+    "summary": "中兴通讯股份有限公司于1997年在深交所上市，2004年在香港上市，是面向全球电信运营商、政企客户和消费者提供通信与信息技术产品的企业。深圳是其重要研发与公司管理所在地。",
+    "description": [
+      "中兴通讯股份有限公司于1997年在深交所上市，2004年在香港上市，是面向全球电信运营商、政企客户和消费者提供通信与信息技术产品的企业。深圳是其重要研发与公司管理所在地。",
+      "业务覆盖移动通信设备、光网络、核心网、算力基础设施和通信终端。通信设备开发往往涉及射频硬件、数字信号处理、网络协议、嵌入式软件、云平台和芯片相关技术。",
+      "通信工程、电子信息、计算机、软件、微电子和自动化专业可按研发方向了解公司的产品及技术。不同地区和业务部门承担不同工作，具体招聘以中兴通讯自己的网站为准。"
+    ],
+    "business": [
+      {
+        "title": "无线通信",
+        "description": "无线接入与通信网络设备"
+      },
+      {
+        "title": "算力与云网",
+        "description": "数据中心、云与网络基础设施"
+      },
+      {
+        "title": "终端产品",
+        "description": "手机及移动互联终端"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "官方投资者关系联系地址",
+        "address": "广东省深圳市南山区科技南路55号",
+        "source": "https://www.zte.com.cn/china/about/investorrelations.html"
+      }
+    ],
+    "majorSlugs": [
+      "communications",
+      "electronic-information",
+      "computer-science",
+      "software-engineering",
+      "microelectronics",
+      "automation"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.zte.com.cn/china/about/investorrelations.html",
+    "productSource": "https://zte.com.cn",
+    "brandImage": "https://zte.com.cn/favicon.ico",
+    "brandImageSource": "https://zte.com.cn",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://zte.com.cn",
+    "industry": "无线通信"
+  },
+  "科大讯飞": {
+    "displayName": "科大讯飞",
+    "subtitle": "语音与语言AI · AI开放平台 · 行业应用",
+    "summary": "科大讯飞股份有限公司成立于1999年，2008年在深交所上市，长期专注智能语音、自然语言处理和人工智能产业化。企业既经营开发者平台，也通过面向教育、医疗、汽车与企业服务的解决方",
+    "description": [
+      "科大讯飞股份有限公司成立于1999年，2008年在深交所上市，长期专注智能语音、自然语言处理和人工智能产业化。企业既经营开发者平台，也通过面向教育、医疗、汽车与企业服务的解决方案拓展应用。",
+      "技术积累涉及语音识别、语音合成、自然语言理解、机器翻译、计算机视觉及认知智能相关能力。不同场景需要算法工程、数据处理、平台研发、嵌入式交互与产品设计协同。",
+      "计算机、软件工程、人工智能、数据科学、电子信息和教育技术专业可了解相关产品线。大模型或语音产品的岗位需求会随项目变化，HHBA 不据此声称正在招聘相应专业。"
+    ],
+    "business": [
+      {
+        "title": "语音与语言AI",
+        "description": "识别、合成、语义理解"
+      },
+      {
+        "title": "AI开放平台",
+        "description": "开发工具与模型能力"
+      },
+      {
+        "title": "行业应用",
+        "description": "教育、医疗、汽车与企业智能化"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "公司官方联系地址",
+        "address": "安徽省合肥市高新开发区望江西路666号",
+        "source": "https://www.xfyun.cn/introduction"
+      }
+    ],
+    "majorSlugs": [
+      "ai",
+      "software-engineering",
+      "computer-science",
+      "data-science",
+      "electronic-information",
+      "education"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.xfyun.cn/introduction",
+    "productSource": "https://iflytek.com",
+    "brandImage": "https://iflytek.com/favicon.ico",
+    "brandImageSource": "https://iflytek.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://iflytek.com",
+    "industry": "语音与语言AI"
+  },
+  "潍柴动力": {
+    "displayName": "潍柴动力",
+    "subtitle": "动力系统 · 汽车传动 · 智能制造",
+    "summary": "潍柴动力股份有限公司成立于2002年，拥有A股和H股资本市场平台，业务基础来自发动机及动力总成技术。与整车品牌不同，它关注动力系统及关键零部件的设计制造和产业协同。",
+    "description": [
+      "潍柴动力股份有限公司成立于2002年，拥有A股和H股资本市场平台，业务基础来自发动机及动力总成技术。与整车品牌不同，它关注动力系统及关键零部件的设计制造和产业协同。",
+      "发动机、传动系统、动力总成及新能源动力技术构成其相关业务图景。产品的研发需要机械、材料、热力、自动控制、电子电气和工艺制造之间的协作。",
+      "车辆工程、能源与动力工程、机械制造、自动化和材料专业学生可关注动力系统研发、测试、生产工艺和质量控制。集团关联主体较多，必须在实际招聘页面确认用人公司，不能把所有岗位默认为潍柴动力总部。"
+    ],
+    "business": [
+      {
+        "title": "动力系统",
+        "description": "发动机与动力总成"
+      },
+      {
+        "title": "汽车传动",
+        "description": "动力和传动相关装备"
+      },
+      {
+        "title": "智能制造",
+        "description": "零部件生产及检测工艺"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "官方联系地址",
+        "address": "山东省潍坊市高新技术产业开发区福寿东街197号甲",
+        "source": "https://www.weichaipower.com/assist/contact/"
+      }
+    ],
+    "majorSlugs": [
+      "energy-power",
+      "vehicle-engineering",
+      "mechanical-engineering",
+      "materials-engineering",
+      "automation",
+      "electronic-information"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.weichaipower.com/assist/contact/",
+    "productSource": "https://weichaipower.com",
+    "brandImage": "https://weichaipower.com/favicon.ico",
+    "brandImageSource": "https://weichaipower.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://weichaipower.com",
+    "industry": "动力系统"
+  },
+  "兆易创新": {
+    "displayName": "兆易创新",
+    "subtitle": "存储器 · 微控制器 · 技术支持",
+    "summary": "兆易创新科技集团股份有限公司是以芯片及相关电子器件为核心的半导体企业，在北京、上海、苏州、合肥、深圳等多个城市设有研发或业务机构。公司官网提供包括北京总部在内的全球联系方式。",
+    "description": [
+      "兆易创新科技集团股份有限公司是以芯片及相关电子器件为核心的半导体企业，在北京、上海、苏州、合肥、深圳等多个城市设有研发或业务机构。公司官网提供包括北京总部在内的全球联系方式。",
+      "公司产品涉及存储器、微控制器及相关半导体解决方案，设计流程包含数字与模拟电路、嵌入式软件、验证测试和客户应用支持。半导体企业的岗位对器件、硬件、软件和制程知识有不同侧重。",
+      "微电子、集成电路、电子信息、计算机和自动化等专业可依据自身课程背景选择芯片设计、系统验证或应用开发方向。具体城市、薪资及专业条件以公司官方招聘信息为准。"
+    ],
+    "business": [
+      {
+        "title": "存储器",
+        "description": "芯片与存储产品"
+      },
+      {
+        "title": "微控制器",
+        "description": "MCU与嵌入式应用"
+      },
+      {
+        "title": "技术支持",
+        "description": "硬件验证与客户应用"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "集团北京总部",
+        "address": "北京市海淀区丰豪东路9号中关村集成电路设计园8号楼",
+        "source": "https://www.gigadevice.com.cn/about/contact"
+      }
+    ],
+    "majorSlugs": [
+      "microelectronics",
+      "integrated-circuits",
+      "electronic-information",
+      "computer-science",
+      "automation"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.gigadevice.com.cn/about/contact",
+    "productSource": "https://gigadevice.com.cn",
+    "brandImage": "https://gigadevice.com.cn/favicon.ico",
+    "brandImageSource": "https://gigadevice.com.cn",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://gigadevice.com.cn",
+    "industry": "存储器"
+  },
+  "浪潮信息": {
+    "displayName": "浪潮信息",
+    "subtitle": "服务器与AI算力 · 存储系统 · 网络互联",
+    "summary": "浪潮信息（股票代码000977）是一家聚焦服务器、计算系统与IT基础设施的上市公司，技术发展与云计算、大数据、AI算力需求密切相关。其业务对象主要是数据中心与企业级系统客户。",
+    "description": [
+      "浪潮信息（股票代码000977）是一家聚焦服务器、计算系统与IT基础设施的上市公司，技术发展与云计算、大数据、AI算力需求密切相关。其业务对象主要是数据中心与企业级系统客户。",
+      "官方介绍强调以系统为核心的AI计算架构、开放的智算产品与方案、存储系统及数据中心网络互联。开发涉及计算机体系结构、服务器硬件、嵌入式软件、系统软件、散热和高速网络。",
+      "计算机、软件、电子信息、通信、数据科学及机械散热相关专业可以从硬件研发、平台软件、存储、测试和运维体系了解企业。岗位招聘通常具有鲜明的项目与区域要求，不能仅凭企业行业判断其正在招某一专业。"
+    ],
+    "business": [
+      {
+        "title": "服务器与AI算力",
+        "description": "服务器、智算与多元计算系统"
+      },
+      {
+        "title": "存储系统",
+        "description": "企业与AI数据基础设施"
+      },
+      {
+        "title": "网络互联",
+        "description": "高性能网络与系统解决方案"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "主要研发与管理城市（精确门牌待核验）",
+        "address": "山东省济南市",
+        "source": "https://www.ieisystem.com/about/"
+      }
+    ],
+    "majorSlugs": [
+      "computer-science",
+      "software-engineering",
+      "electronic-information",
+      "communications",
+      "data-science",
+      "mechanical-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.ieisystem.com/about/",
+    "productSource": "https://ieisystem.com",
+    "brandImage": "https://ieisystem.com/favicon.ico",
+    "brandImageSource": "https://ieisystem.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://ieisystem.com",
+    "industry": "服务器与AI算力"
+  },
+  "隆基绿能": {
+    "displayName": "隆基绿能",
+    "subtitle": "光伏电池及组件 · 研发与材料 · 新能源应用",
+    "summary": "隆基绿能科技股份有限公司创立于2000年，是以太阳能技术为重点的上市企业。企业从光伏材料与电池组件环节出发，持续围绕绿色电力的制造、转化与应用开展研发和产业布局。",
+    "description": [
+      "隆基绿能科技股份有限公司创立于2000年，是以太阳能技术为重点的上市企业。企业从光伏材料与电池组件环节出发，持续围绕绿色电力的制造、转化与应用开展研发和产业布局。",
+      "隆基官网主要介绍高效光伏组件、太阳能电池及相关光伏技术，产品的竞争重点包括能量转换效率、可靠性、制造成本和规模化工艺。光伏制造涉及材料物理、化学、电力电子、自动化设备与质量检测。",
+      "新能源科学与工程、材料科学、机械、电气、自动化及电子信息专业可了解光伏研发、产线工艺与电力应用方向。总部在西安，其他基地岗位应以招聘网页公布的具体主体与地点为准。"
+    ],
+    "business": [
+      {
+        "title": "光伏电池及组件",
+        "description": "太阳能电池与组件制造"
+      },
+      {
+        "title": "研发与材料",
+        "description": "电池转换效率和材料技术"
+      },
+      {
+        "title": "新能源应用",
+        "description": "光伏系统与能源解决方案"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "企业官网联系地址",
+        "address": "陕西省西安市经济技术开发区尚苑路8369号",
+        "source": "https://www.longi.com/cn/about-longi/"
+      }
+    ],
+    "majorSlugs": [
+      "energy-engineering",
+      "electrical-engineering",
+      "materials-engineering",
+      "automation",
+      "mechanical-engineering",
+      "electronic-information"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.longi.com/cn/about-longi/",
+    "productSource": "https://longi.com",
+    "brandImage": "https://longi.com/favicon.ico",
+    "brandImageSource": "https://longi.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://longi.com",
+    "industry": "光伏电池及组件"
+  },
+  "晶科能源": {
+    "displayName": "晶科能源",
+    "subtitle": "电池片与组件 · 光伏制造 · 清洁能源方案",
+    "summary": "晶科能源股份有限公司（688223）是一家专注太阳能光伏的上市企业，业务链包含硅片、电池片到组件制造及相关清洁能源解决方案。公司在国内外建设了多处生产与服务基地，面向全球市场提",
+    "description": [
+      "晶科能源股份有限公司（688223）是一家专注太阳能光伏的上市企业，业务链包含硅片、电池片到组件制造及相关清洁能源解决方案。公司在国内外建设了多处生产与服务基地，面向全球市场提供光伏产品。",
+      "晶科的技术重点包括高效电池、组件结构、材料可靠性与智能化工艺控制。太阳能组件既是电子器件也是制造产品，因此要协调材料、机械、电气、工艺、检测和供应链管理。",
+      "材料物理、新能源科学、电气工程、机械制造和自动化专业都可能与光伏产业链中的不同环节相关。公司总部、生产基地及当前招聘岗位需由独立官方渠道确认，不以某条企业目录信息替代岗位条件。"
+    ],
+    "business": [
+      {
+        "title": "电池片与组件",
+        "description": "高效太阳能组件"
+      },
+      {
+        "title": "光伏制造",
+        "description": "硅片、电池片及组件一体化制造"
+      },
+      {
+        "title": "清洁能源方案",
+        "description": "面向应用场景的光伏解决方案"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "energy-engineering",
+      "materials-engineering",
+      "electrical-engineering",
+      "automation",
+      "mechanical-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.jinkosolar.com/site/aboutus",
+    "productSource": "https://jinkosolar.com",
+    "brandImage": "https://jinkosolar.com/favicon.ico",
+    "brandImageSource": "https://jinkosolar.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://jinkosolar.com",
+    "industry": "电池片与组件"
+  },
+  "亿纬锂能": {
+    "displayName": "亿纬锂能",
+    "subtitle": "消费电池 · 动力电池 · 储能电池",
+    "summary": "惠州亿纬锂能股份有限公司成立于2001年，2009年在创业板首批上市。企业的产品涉及消费类电池、动力电池与储能电池，既面向日常电子设备，也面向汽车与能源系统。官网还明确列出惠州和其他城市的子公司与制造基地。",
+    "description": [
+      "惠州亿纬锂能股份有限公司成立于2001年，2009年在创业板首批上市。企业的产品涉及消费类电池、动力电池与储能电池，既面向日常电子设备，也面向汽车与能源系统。官网还明确列出惠州和其他城市的子公司与制造基地。",
+      "公司公开业务包括锂原电池、圆柱电池、动力电池及储能系统。电池从材料体系、电芯设计到模组与系统集成，涉及化学、材料、电气、电池管理、热管理和生产自动化等多种技术路径。",
+      "材料科学、化学工程、新能源、电气工程、自动化与机械专业可以根据不同产品线了解研发、工艺、设备与测试方向。对具体子公司和生产基地，应使用其独立地址和招聘主体，不自动把集团页面当作所有分支机构的招聘官网。"
+    ],
+    "business": [
+      {
+        "title": "消费电池",
+        "description": "锂原电池与小型锂电池"
+      },
+      {
+        "title": "动力电池",
+        "description": "车用电池、电池模组与系统"
+      },
+      {
+        "title": "储能电池",
+        "description": "大规模储能电芯及系统"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "官方公布的办公或联系地点",
+        "address": "广东省惠州市仲恺高新区惠风七路38号",
+        "source": "https://www.evebattery.com/contact"
+      }
+    ],
+    "majorSlugs": [
+      "energy-engineering",
+      "materials-engineering",
+      "electrical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "chemical-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.evebattery.com/about",
+    "productSource": "https://evebattery.com",
+    "brandImage": "https://evebattery.com/favicon.ico",
+    "brandImageSource": "https://evebattery.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://evebattery.com",
+    "industry": "消费电池"
+  },
+  "欣旺达": {
+    "displayName": "欣旺达",
+    "subtitle": "消费电池 · 动力与储能 · 智能制造",
+    "summary": "欣旺达电子股份有限公司是深圳的锂电池及新能源领域上市公司，主营业务经历了从消费电子电池模组向动力电池、储能电池及智能硬件的拓展。官方网站将消费电池、动力电池、储能电池、能源服务等方向明确列为不同业务单元。",
+    "description": [
+      "欣旺达电子股份有限公司是深圳的锂电池及新能源领域上市公司，主营业务经历了从消费电子电池模组向动力电池、储能电池及智能硬件的拓展。官方网站将消费电池、动力电池、储能电池、能源服务等方向明确列为不同业务单元。",
+      "电池技术的应用除了电芯与电池管理，也涉及电力电子、嵌入式控制、机械结构、生产装备及实验检测。尤其在汽车和储能系统中，对安全性能、循环寿命、热管理与制造一致性有较高要求。",
+      "材料、化学、电气、自动化、机械与电子信息等专业可分别关注材料研发、电池系统、电源管理和智能制造。欣旺达官网列出多个关联主体；如拟应聘动力电池子公司，应再确认实际用人主体的官方招聘渠道。"
+    ],
+    "business": [
+      {
+        "title": "消费电池",
+        "description": "便携式电子设备的电池及模组"
+      },
+      {
+        "title": "动力与储能",
+        "description": "汽车动力电池和储能系统"
+      },
+      {
+        "title": "智能制造",
+        "description": "电池产线、质量及测试"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "官方公布的办公或联系地点",
+        "address": "深圳市宝安区石岩街道石龙社区颐和路2号",
+        "source": "https://www.sunwoda.com/contact"
+      }
+    ],
+    "majorSlugs": [
+      "materials-engineering",
+      "chemical-engineering",
+      "energy-engineering",
+      "electrical-engineering",
+      "automation",
+      "electronic-information"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://sunwoda.com/",
+    "productSource": "https://sunwoda.com",
+    "brandImage": "https://sunwoda.com/favicon.ico",
+    "brandImageSource": "https://sunwoda.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://sunwoda.com",
+    "industry": "消费电池"
+  },
+  "福耀玻璃": {
+    "displayName": "福耀玻璃",
+    "subtitle": "汽车玻璃 · 材料工艺 · 汽车配套",
+    "summary": "福耀玻璃工业集团股份有限公司创立于1987年，是以汽车玻璃研发、生产与全球供应为核心的工业企业。公司在A股与H股上市，其经营体系面向汽车制造商提供配套产品，而不是一般建筑装饰玻璃零售。",
+    "description": [
+      "福耀玻璃工业集团股份有限公司创立于1987年，是以汽车玻璃研发、生产与全球供应为核心的工业企业。公司在A股与H股上市，其经营体系面向汽车制造商提供配套产品，而不是一般建筑装饰玻璃零售。",
+      "汽车玻璃需要满足光学清晰度、抗冲击、耐候、隔音、隔热及车辆结构匹配等要求。福耀业务从玻璃材料延伸至车窗系统、加工成型和汽车饰件，涉及材料、光学、机械、工艺自动化和高可靠质量检测。",
+      "对材料科学、机械制造、车辆工程、工业工程、电气自动化等专业，企业的研发实验、量产工艺与制造管理具有不同的学习切入点。福耀在多个国家和地区设有生产基地，具体工作地址和招聘条件应逐岗确认。"
+    ],
+    "business": [
+      {
+        "title": "汽车玻璃",
+        "description": "汽车安全玻璃和车窗系统"
+      },
+      {
+        "title": "材料工艺",
+        "description": "玻璃成型、加工和测试"
+      },
+      {
+        "title": "汽车配套",
+        "description": "面向整车制造商的系统化供货"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "官方公布的办公或联系地点",
+        "address": "福建省福清市福耀工业村2区",
+        "source": "https://www.sse.com.cn/assortment/stock/list/info/company/index.shtml?COMPANY_CODE=600660"
+      }
+    ],
+    "majorSlugs": [
+      "materials-engineering",
+      "mechanical-engineering",
+      "vehicle-engineering",
+      "automation",
+      "optoelectronics"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.fuyaogroup.com/about.html",
+    "productSource": "https://fuyaogroup.com",
+    "brandImage": "https://fuyaogroup.com/favicon.ico",
+    "brandImageSource": "https://fuyaogroup.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://fuyaogroup.com",
+    "industry": "汽车玻璃"
+  },
+  "紫光股份": {
+    "displayName": "紫光股份",
+    "subtitle": "网络与安全 · 算力与存储 · 数字化方案",
+    "summary": "紫光股份有限公司是面向信息通信基础设施与数字化解决方案的上市企业，业务覆盖云、网络、安全、算力、存储及终端等技术领域。理解紫光股份时，需要注意它是上市经营主体，其旗下关联业务品牌不一定都是相同法人公司。",
+    "description": [
+      "紫光股份有限公司是面向信息通信基础设施与数字化解决方案的上市企业，业务覆盖云、网络、安全、算力、存储及终端等技术领域。理解紫光股份时，需要注意它是上市经营主体，其旗下关联业务品牌不一定都是相同法人公司。",
+      "公司面向政府、运营商、教育、制造、金融等行业客户提供网络设备、服务器、存储、安全与云计算相关产品。其技术实现跨越网络协议、服务器硬件、数据中心软件、安全防护与系统集成等多个层面。",
+      "计算机、软件工程、通信工程、信息安全、电子信息与人工智能等专业可以依据网络、云平台、算力系统和行业解决方案找到相近的职业方向。当前岗位的用人主体和招聘网址需要分别核验，不把所有业务子公司的机会都归到同一招聘站。"
+    ],
+    "business": [
+      {
+        "title": "网络与安全",
+        "description": "企业网络设备及网络安全"
+      },
+      {
+        "title": "算力与存储",
+        "description": "服务器、存储和智算基础设施"
+      },
+      {
+        "title": "数字化方案",
+        "description": "面向行业客户的云网融合系统"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "computer-science",
+      "software-engineering",
+      "communications",
+      "information-security",
+      "ai",
+      "electronic-information"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.unis.cn/about.htm",
+    "productSource": "https://unis.cn",
+    "brandImage": "https://unis.cn/favicon.ico",
+    "brandImageSource": "https://unis.cn",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://unis.cn",
+    "industry": "网络与安全"
+  },
+  "海尔智家": {
+    "displayName": "海尔智家",
+    "subtitle": "智慧家电 · 智能家居 · 制造与服务",
+    "summary": "海尔智家股份有限公司是海尔集团智慧家庭业务的重要上市主体，经营内容包括家电、家居场景和智慧家庭生态。它与海尔集团整体并非相同的法律经营范围，因此在求职时不能把所有集团子公司和品牌合并成一个用人单位。",
+    "description": [
+      "海尔智家股份有限公司是海尔集团智慧家庭业务的重要上市主体，经营内容包括家电、家居场景和智慧家庭生态。它与海尔集团整体并非相同的法律经营范围，因此在求职时不能把所有集团子公司和品牌合并成一个用人单位。",
+      "家电产品的研发制造涉及制冷、热工、机械、电子、嵌入式控制与工业设计。智慧家庭服务则增加物联网、平台软件、数据连接和用户体验等方向，技术与经营岗位呈现多专业协同。",
+      "机械、能源动力、电气自动化、电子信息、物联网、工业设计和软件方向均可根据产品业务了解对应职业。企业不同工业园区和品牌公司的岗位地点可能差异明显，应以独立官方招聘公告为准。"
+    ],
+    "business": [
+      {
+        "title": "智慧家电",
+        "description": "冰箱、洗衣机、空调等家电产品"
+      },
+      {
+        "title": "智能家居",
+        "description": "家居连接与智慧场景"
+      },
+      {
+        "title": "制造与服务",
+        "description": "工业设计、生产和服务体系"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "总部所在城市（门牌待核验）",
+        "address": "山东省青岛市",
+        "source": "https://www.haier.com/about_haier/haiererpinpai/ppdw/"
+      }
+    ],
+    "majorSlugs": [
+      "mechanical-engineering",
+      "automation",
+      "energy-power",
+      "electronic-information",
+      "iot",
+      "industrial-design"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.haier.com/about_haier/haiererpinpai/ppdw/",
+    "productSource": "https://haier.com",
+    "brandImage": "https://haier.com/favicon.ico",
+    "brandImageSource": "https://haier.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://haier.com",
+    "industry": "智慧家电"
+  },
+  "阳光电源": {
+    "displayName": "阳光电源",
+    "subtitle": "光伏逆变器 · 储能系统 · 新能源电力技术",
+    "summary": "阳光电源股份有限公司成立于1997年，业务围绕清洁电力的转换、储存与应用展开。它区别于单纯光伏组件厂商，核心技术聚焦逆变器、储能系统、变流器以及与新能源电网接口有关的设备。",
+    "description": [
+      "阳光电源股份有限公司成立于1997年，业务围绕清洁电力的转换、储存与应用展开。它区别于单纯光伏组件厂商，核心技术聚焦逆变器、储能系统、变流器以及与新能源电网接口有关的设备。",
+      "光伏逆变器和储能变流器需要将不同形式的电能稳定接入电网，涉及功率半导体、电力电子、自动控制、嵌入式软件、结构散热和系统级安全。其业务还涉及电动汽车电驱动和氢能等能源场景。",
+      "电气工程及其自动化、新能源科学与工程、自动化、电子信息、能源动力和机械专业可以关注电力电子硬件、控制算法、产品测试及工程应用。阳光电源旗下还有独立经营的业务公司，不能将子公司的招聘链接默认指向上市公司。"
+    ],
+    "business": [
+      {
+        "title": "光伏逆变器",
+        "description": "光伏发电电能转换设备"
+      },
+      {
+        "title": "储能系统",
+        "description": "电池储能与电能变换系统"
+      },
+      {
+        "title": "新能源电力技术",
+        "description": "风电、充电、氢能相关电力设备"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "官方公布的办公或联系地点",
+        "address": "安徽省合肥市高新区习友路1699号",
+        "source": "https://www.cpss.org.cn/Home/Company?key=2934"
+      }
+    ],
+    "majorSlugs": [
+      "electrical-engineering",
+      "energy-engineering",
+      "automation",
+      "electronic-information",
+      "mechanical-engineering",
+      "software-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.sungrowpower.com/",
+    "productSource": "https://sungrowpower.com",
+    "brandImage": "https://sungrowpower.com/favicon.ico",
+    "brandImageSource": "https://sungrowpower.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://sungrowpower.com",
+    "industry": "光伏逆变器"
+  },
+  "海康机器人": {
+    "displayName": "海康机器人",
+    "subtitle": "机器视觉 · 移动机器人 · 机器人系统",
+    "summary": "海康机器人是面向工厂与物流自动化的机器视觉和机器人产品供应商，与海康威视的视频物联网主业存在品牌和产业联系，但在HHBA中应作为独立的业务主体展示，不能复制海康威视的企业介绍或招聘入口。",
+    "description": [
+      "海康机器人是面向工厂与物流自动化的机器视觉和机器人产品供应商，与海康威视的视频物联网主业存在品牌和产业联系，但在HHBA中应作为独立的业务主体展示，不能复制海康威视的企业介绍或招聘入口。",
+      "企业面向制造业提供机器视觉、移动机器人和关节机器人相关产品，典型应用涉及工业检测、物料搬运、智能物流与生产自动化。视觉算法、工业相机、伺服控制、导航与调度软件形成核心技术组合。",
+      "机器人工程、自动化、计算机、电子信息、机械和工业工程相关专业可研究视觉系统、运动控制与智能产线。官方联系页列出了杭州和多地办事机构，工作地点不一定等于总部办公地址。"
+    ],
+    "business": [
+      {
+        "title": "机器视觉",
+        "description": "工业相机、视觉检测和视觉算法"
+      },
+      {
+        "title": "移动机器人",
+        "description": "仓储物流与自主搬运"
+      },
+      {
+        "title": "机器人系统",
+        "description": "关节机器人及工厂自动化方案"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "官方公布的办公或联系地点",
+        "address": "浙江省杭州市丹枫路399号",
+        "source": "https://www.hikrobotics.com/cn/contactus/"
+      }
+    ],
+    "majorSlugs": [
+      "robotics",
+      "automation",
+      "computer-science",
+      "electronic-information",
+      "mechanical-engineering",
+      "ai"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.hikrobotics.com/cn/contactus/",
+    "productSource": "https://hikrobotics.com",
+    "brandImage": "https://hikrobotics.com/favicon.ico",
+    "brandImageSource": "https://hikrobotics.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://hikrobotics.com",
+    "industry": "机器视觉",
+    "parentName": "海康威视"
+  },
+  "阳光电动力": {
+    "displayName": "阳光电动力",
+    "subtitle": "汽车电控 · 车载电源 · 动力系统工程",
+    "summary": "合肥阳光电动力科技有限公司成立于2016年，依托阳光电源的电力电子与制造经验，专注新能源汽车电控、电源及相关产品。作为专门经营汽车电驱电子业务的公司，它不能和上市公司阳光电源的光伏逆变器招聘主体混为一谈。",
+    "description": [
+      "合肥阳光电动力科技有限公司成立于2016年，依托阳光电源的电力电子与制造经验，专注新能源汽车电控、电源及相关产品。作为专门经营汽车电驱电子业务的公司，它不能和上市公司阳光电源的光伏逆变器招聘主体混为一谈。",
+      "公司产品主要服务乘用车、商用车和工程机械的电控与电源场景，涵盖电力转换、驱动控制和车用系统工程。设计中需关注功能安全、可靠性、热管理、嵌入式软件和大批量制造要求。",
+      "车辆工程、电气工程、自动化、电子信息、机械和新能源相关专业可了解车用电力电子与控制研发。公司官网列出自身产品和发展历程，是否存在岗位仍需由该经营主体的官方招聘页面确认。"
+    ],
+    "business": [
+      {
+        "title": "汽车电控",
+        "description": "新能源汽车控制系统"
+      },
+      {
+        "title": "车载电源",
+        "description": "新能源车辆电源转换"
+      },
+      {
+        "title": "动力系统工程",
+        "description": "面向车辆与工程机械的集成应用"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "总部所在城市（门牌待核验）",
+        "address": "合肥市",
+        "source": "https://www.sungrowev.com/cn/about-us"
+      }
+    ],
+    "majorSlugs": [
+      "vehicle-engineering",
+      "electrical-engineering",
+      "automation",
+      "electronic-information",
+      "energy-power",
+      "software-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.sungrowev.com/cn/about-us",
+    "productSource": "https://sungrowev.com",
+    "brandImage": "https://sungrowev.com/favicon.ico",
+    "brandImageSource": "https://sungrowev.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://sungrowev.com",
+    "industry": "汽车电控",
+    "parentName": "阳光电源"
+  },
+  "亿纬氢能": {
+    "displayName": "亿纬氢能",
+    "subtitle": "AEM技术 · 电解水制氢 · 氢能应用",
+    "summary": "惠州亿纬氢能有限公司成立于2021年，是聚焦电解水制氢系统的新能源企业。它与亿纬锂能的电池主营业务有产业关联，但经营产品、技术团队和岗位要求均存在区别，应保留独立企业档案。",
+    "description": [
+      "惠州亿纬氢能有限公司成立于2021年，是聚焦电解水制氢系统的新能源企业。它与亿纬锂能的电池主营业务有产业关联，但经营产品、技术团队和岗位要求均存在区别，应保留独立企业档案。",
+      "官网介绍的技术包括阴离子交换膜（AEM）、AEM电解槽及制氢系统，服务场景涉及可再生能源制氢以及石化、冶金等工业用氢。设备研发结合电化学、膜材料、流体、控制与系统工程。",
+      "化学工程、材料科学、新能源、电气和机械工程专业可以研究电解槽、系统集成、试验与生产工艺。具体职位和地点以亿纬氢能自行发布的正式渠道为准。"
+    ],
+    "business": [
+      {
+        "title": "AEM技术",
+        "description": "阴离子交换膜及相关材料"
+      },
+      {
+        "title": "电解水制氢",
+        "description": "AEM电解槽与制氢系统"
+      },
+      {
+        "title": "氢能应用",
+        "description": "面向工业用氢的设备和系统"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "总部所在城市（门牌待核验）",
+        "address": "广东省惠州市",
+        "source": "https://www.evehydrogen.com/about/index.html"
+      }
+    ],
+    "majorSlugs": [
+      "chemical-engineering",
+      "materials-engineering",
+      "energy-engineering",
+      "electrical-engineering",
+      "automation",
+      "mechanical-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.evehydrogen.com/about/index.html",
+    "productSource": "https://evehydrogen.com",
+    "brandImage": "https://evehydrogen.com/favicon.ico",
+    "brandImageSource": "https://evehydrogen.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://evehydrogen.com",
+    "industry": "AEM技术",
+    "parentName": "亿纬锂能"
+  },
+  "立讯精密": {
+    "displayName": "立讯精密",
+    "subtitle": "精密连接 · 汽车电子 · 企业通信",
+    "summary": "立讯精密工业股份有限公司成立于2004年，2010年在深交所上市。公司从精密连接与制造能力出发，形成覆盖消费电子、汽车电子和企业通信的多业务体系。其客户和生产基地分布在多个地区，应按具体子公司明确招聘主体。",
+    "description": [
+      "立讯精密工业股份有限公司成立于2004年，2010年在深交所上市。公司从精密连接与制造能力出发，形成覆盖消费电子、汽车电子和企业通信的多业务体系。其客户和生产基地分布在多个地区，应按具体子公司明确招聘主体。",
+      "公开产品包括连接器、线束、模组、无线充电相关组件、汽车智能座舱与智能驾驶相关零部件、光模块和通信互连方案。产品工程对高可靠连接、精密模具、射频及高速信号、电磁兼容与自动化装配均有要求。",
+      "机械电子、电子信息、通信、材料、自动化与计算机相关专业可以从不同领域的精密电子研发或制造工艺寻找方向。公司官网列出东莞、昆山、遂宁等业务地点，但销售联络地址不一定是所有岗位的办公地址。"
+    ],
+    "business": [
+      {
+        "title": "精密连接",
+        "description": "电子连接器、线束和组件"
+      },
+      {
+        "title": "汽车电子",
+        "description": "汽车线束与智能座舱配套"
+      },
+      {
+        "title": "企业通信",
+        "description": "高速互连、光模块及相关部件"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "官方公布的办公或联系地点",
+        "address": "广东省东莞市清溪镇铁松北环路313号",
+        "source": "https://www.luxshare-ict.com/about/contact.html"
+      }
+    ],
+    "majorSlugs": [
+      "electronic-information",
+      "mechanical-engineering",
+      "communications",
+      "materials-engineering",
+      "automation",
+      "microelectronics"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.luxshare-ict.com/about/company-profile.html",
+    "productSource": "https://luxshare-ict.com",
+    "brandImage": "https://luxshare-ict.com/favicon.ico",
+    "brandImageSource": "https://luxshare-ict.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://luxshare-ict.com",
+    "industry": "精密连接"
+  },
+  "宁德时代": {
+    "displayName": "宁德时代",
+    "subtitle": "动力电池 · 储能系统 · 电池制造",
+    "summary": "宁德时代新能源科技股份有限公司以动力电池和储能电池技术为主要业务，产品应用于电动汽车、能源存储和相关绿色能源场景。公司具有不同城市的研发、生产及国际业务机构，具体工作地点应对应实际用人主体。",
+    "description": [
+      "宁德时代新能源科技股份有限公司以动力电池和储能电池技术为主要业务，产品应用于电动汽车、能源存储和相关绿色能源场景。公司具有不同城市的研发、生产及国际业务机构，具体工作地点应对应实际用人主体。",
+      "动力电池产业链涵盖电芯材料、结构设计、电池管理、热管理、电气集成、系统安全及产线自动化。研发和制造需要电化学、材料、机械、电气控制和软件算法等不同学科配合。",
+      "材料科学、化学工程、电气工程、新能源、机械和自动化相关专业可依据产品线寻找学习与职业发展方向。宁德时代设有专门的招聘官网，用户可直接查看其校园、社会和博士招聘入口。"
+    ],
+    "business": [
+      {
+        "title": "动力电池",
+        "description": "新能源汽车动力电池和系统"
+      },
+      {
+        "title": "储能系统",
+        "description": "电芯及储能应用技术"
+      },
+      {
+        "title": "电池制造",
+        "description": "电池工艺、测试和智能产线"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "总部所在城市（门牌待核验）",
+        "address": "福建省宁德市",
+        "source": "https://www.catl.com/"
+      }
+    ],
+    "majorSlugs": [
+      "materials-engineering",
+      "chemical-engineering",
+      "energy-engineering",
+      "electrical-engineering",
+      "automation",
+      "mechanical-engineering"
+    ],
+    "careersUrl": "https://talent.catl.com/social-recruitment/catlhr/96144/",
+    "careersLabel": "宁德时代 · 独立官方招聘",
+    "officialSource": "https://www.catl.com/",
+    "productSource": "https://catl.com",
+    "brandImage": "https://catl.com/favicon.ico",
+    "brandImageSource": "https://catl.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://catl.com",
+    "industry": "动力电池"
+  },
+  "三一重工": {
+    "displayName": "三一重工",
+    "subtitle": "工程机械 · 控制与液压 · 制造服务",
+    "summary": "三一重工股份有限公司是三一集团工业装备体系中的核心上市企业，主营大型工程机械及相关装备。官网将长沙与北京等地列为重要产业集群，业务和工作场景具有显著的制造、工程施工与产品售后属性。",
+    "description": [
+      "三一重工股份有限公司是三一集团工业装备体系中的核心上市企业，主营大型工程机械及相关装备。官网将长沙与北京等地列为重要产业集群，业务和工作场景具有显著的制造、工程施工与产品售后属性。",
+      "混凝土机械、挖掘机械、起重机械和桩工机械涉及复杂机械结构、液压传动、电气控制、车载软件与可靠性试验。大型工业设备产品还要求对工程现场环境、设备维护和售后服务有深入理解。",
+      "机械制造、车辆工程、能源动力、电气、自动化和工业工程背景可依据工程机械的研发、装配、调试和技术支持方向了解企业。集团其他经营主体和品牌不自动继承三一重工招聘入口。"
+    ],
+    "business": [
+      {
+        "title": "工程机械",
+        "description": "挖掘、起重与混凝土装备"
+      },
+      {
+        "title": "控制与液压",
+        "description": "机械传动、液压及电控"
+      },
+      {
+        "title": "制造服务",
+        "description": "大型装备生产、试验和维护"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "mechanical-engineering",
+      "vehicle-engineering",
+      "energy-power",
+      "electrical-engineering",
+      "automation",
+      "industrial-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.sanygroup.com/introduction/",
+    "productSource": "https://sanygroup.com",
+    "brandImage": "https://sanygroup.com/favicon.ico",
+    "brandImageSource": "https://sanygroup.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://sanygroup.com",
+    "industry": "工程机械"
+  },
+  "海康威视": {
+    "displayName": "海康威视",
+    "subtitle": "视频感知 · 智能分析 · 物联网方案",
+    "summary": "杭州海康威视数字技术股份有限公司是以视频技术为核心的智能物联网解决方案提供商，业务覆盖视频感知、传输存储、智能分析与可视化管理。海康威视是上市主体，旗下其他创新业务公司需要独立核验其经营范围。",
+    "description": [
+      "杭州海康威视数字技术股份有限公司是以视频技术为核心的智能物联网解决方案提供商，业务覆盖视频感知、传输存储、智能分析与可视化管理。海康威视是上市主体，旗下其他创新业务公司需要独立核验其经营范围。",
+      "公司技术涉及图像传感器、计算机视觉、嵌入式系统、视频编解码、网络通信和数据存储。不同产品从工业摄像设备到行业智能物联网解决方案，研发团队对软件、硬件、算法和质量测试各有侧重。",
+      "电子信息、计算机、软件工程、通信与人工智能专业可以从视觉算法、硬件研发、产品测试和行业解决方案了解企业。招聘官网明确列出社会招聘和学生招聘，并公布杭州通讯地址，适合用户进一步核对真实岗位。"
+    ],
+    "business": [
+      {
+        "title": "视频感知",
+        "description": "摄像与图像感知产品"
+      },
+      {
+        "title": "智能分析",
+        "description": "计算机视觉、AI与数据应用"
+      },
+      {
+        "title": "物联网方案",
+        "description": "视频物联网与行业应用"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "官方公布的办公或联系地点",
+        "address": "浙江省杭州市滨江区阡陌路555号",
+        "source": "https://talent.hikvision.com/"
+      }
+    ],
+    "majorSlugs": [
+      "electronic-information",
+      "computer-science",
+      "software-engineering",
+      "communications",
+      "ai",
+      "automation"
+    ],
+    "careersUrl": "https://talent.hikvision.com/",
+    "careersLabel": "海康威视 · 独立官方招聘",
+    "officialSource": "https://ifpd.hikvision.com/aboutUs.html",
+    "productSource": "https://hikvision.com",
+    "brandImage": "https://hikvision.com/favicon.ico",
+    "brandImageSource": "https://hikvision.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://hikvision.com",
+    "industry": "视频感知"
+  },
+  "北方华创": {
+    "displayName": "北方华创",
+    "subtitle": "集成电路装备 · 真空工艺 · 先进制造",
+    "summary": "北方华创科技集团股份有限公司是半导体设备与相关制造技术领域的上市企业。其集团内不同经营公司面向集成电路工艺设备、真空工艺装备及电子材料等领域开展业务，法律主体和招聘入口需要区分。",
+    "description": [
+      "北方华创科技集团股份有限公司是半导体设备与相关制造技术领域的上市企业。其集团内不同经营公司面向集成电路工艺设备、真空工艺装备及电子材料等领域开展业务，法律主体和招聘入口需要区分。",
+      "半导体工艺装备覆盖真空、薄膜沉积、刻蚀、热处理等关键制造环节，技术开发需要材料、微电子、机械、控制、真空与软件多学科协同。北方华创官网列出多个北京办公与业务机构。",
+      "微电子、材料科学、机械、自动化、电子信息与软件相关专业可以通过设备研发、工艺实验、装配测试和现场技术服务寻找业务关联。实际用人公司不应被统一替换为北方华创集团总部。"
+    ],
+    "business": [
+      {
+        "title": "集成电路装备",
+        "description": "半导体工艺与生产设备"
+      },
+      {
+        "title": "真空工艺",
+        "description": "真空系统与工艺装备"
+      },
+      {
+        "title": "先进制造",
+        "description": "工业控制及精密制造"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "官方公布的办公或联系地点",
+        "address": "北京市朝阳区酒仙桥东路1号",
+        "source": "https://www.naura.com/other/contact.html"
+      }
+    ],
+    "majorSlugs": [
+      "microelectronics",
+      "integrated-circuits",
+      "materials-engineering",
+      "mechanical-engineering",
+      "automation",
+      "electronic-information"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.naura.com/other/contact.html",
+    "productSource": "https://naura.com",
+    "brandImage": "https://naura.com/favicon.ico",
+    "brandImageSource": "https://naura.com",
+    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://naura.com",
+    "industry": "集成电路装备"
   }
 }

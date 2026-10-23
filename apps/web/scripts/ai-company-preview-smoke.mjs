@@ -88,6 +88,22 @@ try{
  await desktop.getByRole('button',{name:'清除所学专业'}).click();
  // Original company and jobs search still works after major selection/clear.
  // Verified company page and major → companies reverse lookup.
+ // Confirm newly indexed company and its professional detail page are navigable.
+ await desktop.locator('.unified-job-search input').fill('平高');
+ await desktop.locator('.domestic-company-card').filter({hasText:'平高电气'}).first().waitFor();
+ await desktop.locator('.domestic-company-card').filter({hasText:'平高电气'}).first().click();
+ await desktop.getByRole('heading',{name:'平高电气'}).waitFor();
+ assert((await desktop.locator('.domestic-editorial-body').innerText()).length>180);
+ assert.equal(await desktop.locator('.domestic-careers-link').count(),0,
+   'No unverified careers portal should be displayed');
+ await desktop.goto(ROOT);
+ await desktop.locator('.unified-job-browse-links').getByRole('link',{name:/查看完整招聘市场/}).click();
+ await desktop.locator('.unified-job-search input').fill('宁德时代');
+ await desktop.locator('.domestic-company-card').filter({hasText:'宁德时代'}).first().click();
+ await desktop.getByRole('heading',{name:'宁德时代'}).waitFor();
+ assert.equal(await desktop.locator('.domestic-careers-link[href="https://talent.catl.com/social-recruitment/catlhr/96144/"]').count(),1);
+ await desktop.goto(ROOT);
+ await desktop.locator('.unified-job-browse-links').getByRole('link',{name:/查看完整招聘市场/}).click();
  await desktop.locator('.unified-job-search input').fill('华');
  await desktop.locator('.domestic-company-card').filter({hasText:'华域视觉'}).first().waitFor({timeout:2500});
  await desktop.locator('.domestic-company-card').filter({hasText:'华域汽车'}).first().waitFor({timeout:2500});

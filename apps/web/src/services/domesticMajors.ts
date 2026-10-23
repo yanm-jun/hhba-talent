@@ -1,6 +1,7 @@
 import { getDomesticCompanies, type DomesticCompany } from './domesticCompanySearch';
 import higherCatalog from '../data/officialAcademicMajors.json';
 import vocationalCatalog from '../data/officialVocationalMajors.json';
+import verifiedProfiles from '../data/domesticCareerProfiles.json';
 
 export type MajorLevel='undergraduate'|'vocational'|'postgraduate'|'legacy'|'custom';
 export type MajorDefinition={slug:string;name:string;keywords:string[];description:string;code?:string;level?:MajorLevel;discipline?:string;sourceYear?:number};
@@ -134,6 +135,8 @@ const aliases:Record<string,string[]>={
 };
 // These are business-related suggestions, never assertions that an opening exists.
 export function matchingMajors(company:DomesticCompany):MajorDefinition[]{
+ const prof=(verifiedProfiles as Record<string,{majorSlugs?:string[]}>)[company.name];
+ if(prof?.majorSlugs?.length)return prof.majorSlugs.map(slug=>majorById(slug)).filter((x):x is MajorDefinition=>Boolean(x));
  const curated=aliases[company.name];
  if(curated)return curated.map(slug=>majorById(slug)).filter((x):x is MajorDefinition=>Boolean(x));
  if(company.status!=='industry_reviewed'||!company.tags.length)return [];

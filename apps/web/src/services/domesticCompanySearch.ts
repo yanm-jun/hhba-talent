@@ -22,8 +22,8 @@ export type CompanyRelation={
 };
 type RelationFeed={schemaVersion:number;relations:CompanyRelation[]};
 const details=editorial as Record<string,Editorial>;
-const verifiedCareerProfiles=careerProfiles as Record<string,{careersUrl?:string;officialSource?:string;summary?:string;officeLocations?:{type:string;address:string;source:string}[];}>;
-const normalize=(value:string)=>value.toLocaleLowerCase().replace(/[\s·・（）()\-—_]/g,'');
+const verifiedCareerProfiles=careerProfiles as Record<string,{careersUrl?:string;officialSource?:string;summary?:string;officeLocations?:{type:string;address:string;source:string}[];parentName?:string;industry?:string;website?:string;majorSlugs?:string[];brandImage?:string;}>;
+const normalize=(value:string)=>value.normalize('NFKC').toLocaleLowerCase().replace(/[\s·・（）()\-—_]/g,'');
 let cache:DomesticCompany[]|undefined;
 function clean(value?:string){return value?.trim()||undefined}
 function oneCompanyFromRoster(r:Listed,roster:Roster,prior?:{
@@ -123,6 +123,23 @@ export function getDomesticCompanies():DomesticCompany[]{
    mergeRelation(company,r);
    for(const a of aliasesFor(company))if(!index.has(normalize(a)))index.set(normalize(a),company);
   }
+  // Seed verified standalone companies absent from the historical A-share and ATS roster.
+  // Use the source-backed employer profile itself; do not synthesize a stock identifier.
+  const indexed=createCompanyIndex(map);
+  for(const [companyName,profile] of Object.entries(verifiedCareerProfiles)){
+   if(indexed.has(normalize(companyName)))continue;
+   if(!profile.officialSource||!profile.summary)continue;
+   const id='profile-'+Array.from(companyName).map(ch=>ch.codePointAt(0)!.toString(36)).join('-');
+   const entry:DomesticCompany={
+    id,name:companyName,industry:profile.industry||'行业待细分',overview:profile.summary,
+    sourceUrl:profile.officialSource,website:clean(profile.website),
+    lastReviewed:'2026-10-23',status:'industry_reviewed',
+    tags:[],route:'/companies/domestic/'+id,entityKind:'company',
+    ...(profile.parentName?{parentName:profile.parentName,relationLabel:'业务关联（请查阅来源核实主体关系）'}:{})
+   };
+   map.push(entry);
+   indexed.set(normalize(companyName),entry);
+  }
   // Recruitment links must be verified for the *exact* employer; no inherited group portal.
   for(const item of map){
    const exact=verifiedCareerProfiles[item.name];
@@ -130,11 +147,15 @@ export function getDomesticCompanies():DomesticCompany[]{
     item.careers=clean(exact.careersUrl);
     item.careersShared=false;
     if(exact.summary){item.overview=exact.summary;item.status='industry_reviewed';}
+    if(exact.industry)item.industry=exact.industry;
+    if(exact.website&&!item.website)item.website=clean(exact.website);
+    if(exact.parentName&&!item.parentName){item.parentName=exact.parentName;item.relationLabel='业务关联（不等于直接控股）';}
+    if(exact.officialSource)item.sourceUrl=exact.officialSource;
     if(exact.officeLocations?.length){
      const address=exact.officeLocations[0].address;
-     if(address.includes('上海'))item.city='上海';
-     else if(address.includes('深圳'))item.city='深圳';
-     else if(address.includes('北京'))item.city='北京';
+     for(const c of ['北京','上海','深圳','广州','杭州','南京','苏州','合肥','济南','潍坊','青岛','惠州','许昌','东莞','西安','宁德','福州','福清','厦门','长沙','宁波','武汉','温州']){
+      if(address.includes(c)){item.city=c;break;}
+     }
     }
    }
   }

@@ -12,7 +12,7 @@ type Reviewed={
  displayName:string;subtitle:string;summary?:string;description:string[];
  business:{title:string;description:string}[];majorSlugs:string[];
  careersUrl?:string;careersLabel?:string;officialSource:string;productSource?:string;
- brandImage?:string;imageSource?:string;lastReviewed:string;
+ brandImage?:string;imageSource?:string;brandImageSource?:string;brandAssetStatus?:string;lastReviewed:string;
  photos?:{url:string;label:string;source:string}[];
  officeLocations?:{type:string;address:string;source:string}[];
  evidenceLevel?:string;
@@ -105,6 +105,8 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
        <div>{httpsLink(article?.officialSource||company.sourceUrl)&&<a href={httpsLink(article?.officialSource||company.sourceUrl)} target="_blank" rel="noopener noreferrer">企业公开资料 <ExternalLink size={13}/></a>}
        {article?.productSource&&<a href={article.productSource} target="_blank" rel="noopener noreferrer">公开产品资料 <ExternalLink size={13}/></a>}
        {article?.imageSource&&<a href={article.imageSource} target="_blank" rel="noopener noreferrer">企业图片来源 <ExternalLink size={13}/></a>}
+       {article?.brandImageSource&&<a href={article.brandImageSource} target="_blank" rel="noopener noreferrer">
+        {article.brandAssetStatus==='official_domain_favicon_unverified_visual'?'企业官网图标来源（品牌Logo待核实）':'品牌图来源'} <ExternalLink size={13}/></a>}
        {httpsLink(company.website)&&<a href={httpsLink(company.website)} target="_blank" rel="noopener noreferrer">企业网站 <ExternalLink size={13}/></a>}
        <p>资料日期：{article?.lastReviewed||company.lastReviewed}。企业介绍和专业方向由 HHBA 独立整理，不代表企业招聘合作。</p></div>
       </details>

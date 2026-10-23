@@ -1,13 +1,18 @@
-import {useMemo} from 'react';
+import {useMemo,useState} from 'react';
 import {Building2,ArrowRight,GraduationCap} from 'lucide-react';
 import profiles from '../data/domesticCareerProfiles.json';
 import {Link} from '../router';
 import {getDomesticCompanies,searchDomesticCompanies,type DomesticCompany} from '../services/domesticCompanySearch';
 import {companyMatchesSelectedMajor,majorById} from '../services/domesticMajors';
 import '../styles/domestic-company-search.css';
-type Preview={displayName?:string;summary?:string;brandImage?:string};
+type Preview={displayName?:string;summary?:string;brandImage?:string;officeLocations?:unknown[];photos?:unknown[];brandAssetStatus?:string};
 const rich=profiles as Record<string,Preview>;
 type Props={query:string;majorSlug?:string;scope?:string;country?:string;city?:string};
+function BrandMark({src,name}:{src?:string;name:string}){
+ const [failed,setFailed]=useState(false);
+ if(!src||failed)return <Building2 size={19} aria-label="企业图标待补充"/>;
+ return <img loading="lazy" src={src} alt={name+'的官网品牌图标'} onError={()=>setFailed(true)}/>;
+}
 export function DomesticCompanyResults({query,majorSlug='',scope='',country='',city=''}:Props){
  const all=getDomesticCompanies();
  const word=query.trim();
@@ -38,11 +43,11 @@ export function DomesticCompanyResults({query,majorSlug='',scope='',country='',c
    const editorial=rich[company.name];
    return <Link className="domestic-company-card" key={company.id} to={company.route}>
     <div className="domestic-company-card-head"><span className="domestic-result-brand" aria-hidden="true">
-      {editorial?.brandImage?<img loading="lazy" src={editorial.brandImage} alt="" onError={e=>{e.currentTarget.style.display='none'}}/>:<Building2 size={19}/>}
+      <BrandMark src={editorial?.brandImage} name={company.name}/>
      </span><strong>{editorial?.displayName||company.name}</strong></div>
     <small>{company.industry}{company.city?' · '+company.city:''}{company.parentName?' · 关联：'+company.parentName:''}</small>
     <p>{editorial?.summary||company.overview}</p>
-    <footer><span>{editorial?.summary?'完整企业介绍':company.status==='industry_reviewed'?'业务资料已整理':'基础资料 · 待完善'}</span>
+    <footer><span>{editorial?.summary?'企业介绍已整理':company.status==='industry_reviewed'?'业务资料已整理':'基础资料 · 待完善'}</span>
      <span>查看企业 <ArrowRight size={14}/></span></footer>
    </Link>})}</div>
   </section>;

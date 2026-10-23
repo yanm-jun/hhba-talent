@@ -137,3 +137,44 @@ test('all selectable majors preserve metadata without pretending employer vacanc
  assert(picker.includes('高职专科'));
  assert(picker.includes('专业代码'));
 });
+
+test('2026-10 employer batch contains 30 distinctive, source-backed company profiles',()=>{
+ const p=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
+ const latest=['许继电气','平高电气','国电南瑞','中控技术','拓斯达','埃斯顿','德赛西威','京东方Ａ','歌尔股份','中兴通讯','科大讯飞','潍柴动力','兆易创新','浪潮信息','隆基绿能','晶科能源','亿纬锂能','欣旺达','福耀玻璃','紫光股份','海尔智家','阳光电源','海康机器人','阳光电动力','亿纬氢能','立讯精密','宁德时代','三一重工','海康威视','北方华创'];
+ assert.equal(new Set(latest).size,30);
+ for(const name of latest){
+  const record=p[name];
+  assert(record,'No company profile for '+name);
+  assert(record.description.length>=3,'Three tailored paragraphs required for '+name);
+  assert(record.description.join('').length>=180,'Not enough business background for '+name);
+  assert(record.business.length>=3,'Specific products and business lines required for '+name);
+  assert(record.majorSlugs.length>=4,'Must have major-to-business tags for '+name);
+  assert(record.officialSource.startsWith('https://'),'Public official evidence missing for '+name);
+  assert(record.brandImageSource.startsWith('https://'),'Official logo or favicon provenance missing for '+name);
+  if(record.careersUrl){
+   assert(new URL(record.careersUrl).protocol==='https:');
+   assert(!record.careersUrl.includes('saic-recruit'),'Never auto-inherit a group portal');
+  }
+  for(const office of record.officeLocations){assert(office.address&&office.source.startsWith('https://'))}
+ }
+ assert.equal(p['海康机器人'].parentName,'海康威视');
+ assert.equal(p['阳光电动力'].parentName,'阳光电源');
+ assert.equal(p['亿纬氢能'].parentName,'亿纬锂能');
+ assert.equal(p['德赛西威'].careersUrl,'https://www.desaysv.com/jobList.html');
+ assert.equal(p['宁德时代'].careersUrl,'https://talent.catl.com/social-recruitment/catlhr/96144/');
+ assert.equal(p['海康威视'].careersUrl,'https://talent.hikvision.com/');
+});
+test('new employer profiles seed missing entities and override weak stock-roster summaries',()=>{
+ const service=readFileSync('src/services/domesticCompanySearch.ts','utf8');
+ const matching=readFileSync('src/services/domesticMajors.ts','utf8');
+ const main=readFileSync('src/main.tsx','utf8');
+ const result=readFileSync('src/components/DomesticCompanyResults.tsx','utf8');
+ assert(service.includes("const id='profile-'"));
+ assert(service.includes('if(exact.summary){item.overview=exact.summary;'));
+ assert(service.includes("value.normalize('NFKC')"));
+ assert(matching.includes('prof?.majorSlugs?.length'));
+ assert(main.includes('profile-[a-z0-9-]{8,150}'));
+ assert(result.includes('BrandMark'));
+ assert(result.includes('企业介绍已整理'));
+ assert(!result.includes("'完整企业介绍'"),'Do not call incomplete photo profiles complete');
+});
