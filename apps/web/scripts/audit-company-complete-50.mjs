@@ -28,6 +28,11 @@ for(const name of cohort.companyNames){
     (isHttps(x.url)||x.localPath===actual.path)&&
     (isHttps(x.source)||x.source==='user_submission')&&x.label&&kinds.has(x.kind);
  });
+ // Media delivery is separately finished once this exact company has a working
+ // local brand image and at least one working local office/factory/photo screenshot.
+ // This does not imply legal trademark certification or verified direct hiring.
+ const mediaDisplayComplete=media.brand?.state==='ready'&&
+   String(media.brand.path||'').startsWith('domestic-media/')&&photoIdx>=0;
  const checks={
   introduction:Boolean(info.length>=280&&p.description?.length>=3&&business.length>=3&&isHttps(p.officialSource)&&
     business.every(x=>x.title?.trim()&&x.description?.trim())&&
@@ -45,7 +50,7 @@ for(const name of cohort.companyNames){
     ['normal','campus_only'].includes(rec.availability)&&rec.recruitmentEntity===name)
  };
  const issues=Object.entries(checks).filter(([,passed])=>!passed).map(([k])=>k);
- results.push({name,checks,complete:!issues.length,issues,
+ results.push({name,checks,mediaDisplayComplete,complete:!issues.length,issues,
   articleChars:info.length,relatedMajors:majors.length,brandEvidenceStatus:p.brandAssetStatus||'missing',
   localBrand:media.brand?.state==='ready',
   recordedPhotos:p.photos?.length||0,localPictures:media.photos?.filter(x=>x?.state==='ready').length||0,
@@ -53,7 +58,7 @@ for(const name of cohort.companyNames){
 }
 const counters=Object.fromEntries(Object.keys(results[0]?.checks||{}).map(k=>[k,results.filter(x=>x.checks[k]).length]));
 const summary={
- goal:50,companiesReviewed:results.length,complete:results.filter(x=>x.complete).length,
+ goal:50,companiesReviewed:results.length,mediaDisplayComplete:results.filter(x=>x.mediaDisplayComplete).length,complete:results.filter(x=>x.complete).length,
  incomplete:results.filter(x=>!x.complete).length,completionRate:results.filter(x=>x.complete).length/50,
  byDimension:counters,
  date:new Date().toISOString(),
@@ -65,7 +70,7 @@ writeFileSync('preview-reports/complete-50-quality.json',JSON.stringify({summary
 writeFileSync('public/data/domestic-complete-50-progress.json',JSON.stringify({summary,results},null,2)+'\n');
 const header=['# HHBA 50 家企业完整档案逐项验收','','> **普通照片、截图、PNG/JPG/WebP都可验收；必须是该企业，且本地可展示。六项全部通过才能称完成。**','','| 验收项 | 完成家数 |','|---|---:|',
  ...Object.entries(counters).map(([k,v])=>'| '+k+' | '+v+'/50 |'),
- '','**完全通过：'+summary.complete+'/50 家**','','## 尚未完成的公司与具体缺口'];
+ '','**企业图片展示交付：'+summary.mediaDisplayComplete+'/50 家**（普通截图与照片均可，未声称全部官方认证）','','**六项全部严格通过：'+summary.complete+'/50 家**','','## 尚未完成的公司与具体缺口'];
 for(const r of results.filter(x=>!x.complete))header.push('- '+r.name+'：'+r.issues.join('、')+'（图片：'+r.localPictures+'，招聘：'+(r.careerUrl||'待核验')+'）');
 header.push('','## 全项通过的企业',...results.filter(x=>x.complete).map(x=>'- '+x.name),'');
 writeFileSync('preview-reports/complete-50-quality.md',header.join('\n'));
@@ -79,6 +84,11 @@ test('goal list is exactly fifty unique existing entities, not invented addition
  // Verify known profile identity and first-party source rather than assuming roster coverage.
  for(const name of cohort.companyNames){
   assert(profiles[name]&&isHttps(profiles[name].officialSource),'Unknown or unsourced employer dossier: '+name);
+ }
+});
+test('media-delivery status requires one local logo and one matching company's photo',()=>{
+ for(const r of results)if(r.mediaDisplayComplete){
+   assert(r.localBrand&&r.localPictures>=1,'Incorrect media-complete claim: '+r.name);
  }
 });
 test('full-completion label requires visible media and exact first-party recruitment evidence',()=>{
