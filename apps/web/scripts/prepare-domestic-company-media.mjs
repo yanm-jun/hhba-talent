@@ -80,13 +80,13 @@ for(const [name,p] of Object.entries(profiles)){
   else jobs.push({name,kind:'brand',idx:0,url:p.brandImage,key:key+'-brand'});
  }
  (p.photos||[]).forEach((photo,idx)=>{
-  if(!photo.source?.startsWith('https://')||!photo.label||!['headquarters','office','factory','product'].includes(photo.kind)){
+  if(!photo.label||!['headquarters','office','factory','product','screenshot'].includes(photo.kind)||!(photo.source?.startsWith('https://')||photo.source==='user_submission')){
    manifest.companies[name].photos[idx]={state:'pending_photo_identity_or_source'};
    return;
   }
   if(photo.localPath&&/^domestic-media\/[a-zA-Z0-9._-]+\.(?:png|jpg|webp|gif)$/.test(photo.localPath)&&existsSync('public/'+photo.localPath)){
    manifest.companies[name].photos[idx]={state:'ready',path:photo.localPath,source:photo.url,
-    sourcePage:photo.source,classification:'official_publisher_caption_not_independently_visual_verified'};
+    sourcePage:photo.source,classification:photo.source==='user_submission'?'user_submitted_company_photo':'publisher_image_not_independently_visual_verified'};
    stats.photoSucceeded++;
   }else{
    const cached=previousMedia(name,'photo',idx,photo.url);
@@ -104,7 +104,7 @@ await Promise.all(Array.from({length:Math.min(7,jobs.length)},async()=>{
   if(j.kind==='brand'){
    rec.brand={...out,
     classification:profiles[j.name].brandAssetStatus==='official_logo_visually_verified'?
-      'logo_identity_checked':profiles[j.name].brandAssetStatus==='official_website_logo_candidate'?'official_site_brand_candidate_not_visually_verified':'site_icon_or_brand_candidate_not_visually_verified'};
+      'logo_identity_checked':profiles[j.name].brandAssetStatus==='user_provided_logo_confirmed'?'user_confirmed_company_logo':profiles[j.name].brandAssetStatus==='official_website_logo_candidate'?'official_site_brand_candidate_not_visually_verified':'site_icon_or_brand_candidate_not_visually_verified'};
    stats.brandSucceeded+=Number(out.state==='ready');
    stats.brandFailed+=Number(out.state!=='ready');
   }else{
