@@ -36,7 +36,7 @@ test('child cards remain within HHBA before external careers links',()=>{
  assert(src.includes('matchingMajors'));
  assert(src.includes('key={"relations-"+company.id}'),'Group relations must start collapsed for each company route');
  assert(src.includes('/majors/'),'Related majors should be navigable');
- assert(src.includes('article?.careersUrl||company.careers'),'Verified independent portal should override historical inherited portal');
+ assert(src.includes('getDomesticRecruitment(company.name)'),'Recruitment must be backed by explicit entity registry');
  const reviewed=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
  const hv=reviewed['华域视觉科技（上海）有限公司'];
  assert.equal(hv.careersUrl,'https://hascovision.zhiye.com/social');
@@ -59,12 +59,12 @@ test('one Chinese character gives enterprise name suggestions, not broad tags',(
 test('no inherited group recruiting portals and verified offices',()=>{
  const src=readFileSync('src/services/domesticCompanySearch.ts','utf8');
  assert(!src.includes('c.careers=r.careersUrl'),'Never assign a parent recruitment URL to a child');
- assert(src.includes('item.careers=clean(exact.careersUrl)'));
+ assert(src.includes('item.careers=record?.url'));
  const data=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
  const hv=data['华域视觉科技（上海）有限公司'];
  const auto=data['华域汽车'];
  const saic=data['上汽集团'];
- assert.equal(hv.careersUrl,'https://www.hascovision.com/join-us');
+ assert.equal(hv.careersUrl,'https://hascovision.zhiye.com/social');
  assert.equal(auto.careersUrl,'https://www.hasco-group.com/join/');
  assert.notEqual(hv.careersUrl,auto.careersUrl);
  assert.notEqual(hv.careersUrl,saic.careersUrl);
