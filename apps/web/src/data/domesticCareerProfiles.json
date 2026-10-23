@@ -1986,14 +1986,21 @@
         "label": "阳光电源官网展示的 SG3.0/3.6/4.0RS 逆变器",
         "kind": "product",
         "source": "https://www.sungrowpower.com/demo/zh/products/string-inverter"
+      },
+      {
+        "url": "https://fra.sungrowpower.com/upload/6385632548369337056336172.jpg",
+        "label": "阳光电源官方品牌故事展示的合肥总部办公塔楼",
+        "kind": "headquarters",
+        "source": "https://fra.sungrowpower.com/AboutSungrow",
+        "verification": "visually_attributed_to_exact_company_official_site_pending_reuse_clearance"
       }
     ],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://sungrowpower.com",
     "industry": "光伏逆变器",
-    "photoSourcePage": "https://www.sungrowpower.com/",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "photoSourcePage": "https://fra.sungrowpower.com/AboutSungrow",
+    "photoSourceLabel": "查看阳光电源官网总部实景来源",
     "recruitmentEvidenceUrl": "https://jobs.sungrowpower.com/",
     "recruitmentVerifiedAt": "2026-10-23",
     "recruitmentStatus": "normal",
