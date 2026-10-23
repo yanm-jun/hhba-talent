@@ -24,7 +24,7 @@
 .domestic-editorial-panel{background:#fff;border:1px solid #e3e8e5;border-radius:18px;padding:26px 27px 22px;margin-top:13px;color:var(--ink)}
 .domestic-editorial-hero{display:flex;align-items:center;gap:20px;margin:0!important;padding:0 0 22px;border-bottom:1px solid #edf0ed}
 .domestic-editorial-hero .domestic-company-profile-mark{width:58px;height:58px;flex:0 0 58px;border-radius:12px;overflow:hidden}
-.domestic-editorial-hero .domestic-company-profile-mark img{display:block;width:100%;height:100%;object-fit:cover}
+.domestic-editorial-hero .domestic-company-profile-mark img{display:block;width:100%;height:100%;object-fit:contain;background:#fff;padding:4px;box-sizing:border-box}
 .domestic-editorial-eyebrow{letter-spacing:.08em;font-size:10px!important;font-weight:700}
 .domestic-editorial-hero h1{font-size:25px!important;margin:4px 0 7px!important}
 .domestic-editorial-hero p{font-size:12px!important;margin:0!important;color:var(--muted)}
@@ -120,3 +120,6 @@
 .domestic-directory-website{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:#236745}
 .domestic-directory-card-description{color:#748078;font-size:12px!important}
 @media(max-width:540px){.domestic-directory-facts{grid-template-columns:1fr}}
+
+/* Uploaded rectangular logos and screenshots retain their full frame. */
+.domestic-official-photo.is-screenshot img{object-fit:contain!important;background:#f6f8f7}
