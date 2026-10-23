@@ -21,8 +21,18 @@ try {
   browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 1280, height: 860 } });
   page.on('pageerror', e => errors.push(e.message));
+  page.on('console', m => { if(m.type()==='error') errors.push('console: '+m.text()) });
+  page.on('requestfailed', req=>errors.push('request: '+req.url()+' '+req.failure()?.errorText));
   await page.goto(ROOT, { waitUntil: 'domcontentloaded' });
-  await page.getByRole('heading', { name: '智能找企业' }).waitFor();
+  try {
+    await page.getByRole('heading', { name: '智能找企业' }).waitFor({timeout:12000});
+  } catch (err) {
+    console.error('PREVIEW_DIAGNOSTIC_URL', page.url());
+    console.error('PREVIEW_DIAGNOSTIC_ERRORS', JSON.stringify(errors));
+    console.error('PREVIEW_DIAGNOSTIC_HTML', (await page.content()).slice(0,2500));
+    console.error('PREVIEW_DIAGNOSTIC_BODY', (await page.locator('body').innerText()).slice(0,1700));
+    throw err;
+  }
   assert.match(await page.locator('.ai-company-demo-banner').innerText(), /非.*AI|不会向 DeepSeek/);
   assert.match(await page.locator('.ai-company-status').innerText(), /AI 未接入/);
   await page.locator('.ai-company-input textarea').fill('有汽车行业工作经验，希望了解汽车企业');
