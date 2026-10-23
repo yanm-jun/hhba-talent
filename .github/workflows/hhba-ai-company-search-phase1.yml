@@ -35,7 +35,7 @@ jobs:
   media-preview:
     name: Persist genuine company media and refresh isolated Pages preview
     needs: verify
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 25
     permissions:
@@ -44,7 +44,7 @@ jobs:
       id-token: write
     concurrency:
       group: hhba-ai-company-preview-build
-      cancel-in-progress: true
+      cancel-in-progress: false
     environment:
       name: ai-company-preview
       url: https://yanm-jun.github.io/hhba-talent/ai-company-preview/
