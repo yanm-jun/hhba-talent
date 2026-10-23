@@ -14,7 +14,7 @@ type Reviewed={
  business:{title:string;description:string}[];majorSlugs:string[];
  careersUrl?:string;careersLabel?:string;officialSource:string;productSource?:string;
  brandImage?:string;imageSource?:string;brandImageSource?:string;brandAssetStatus?:string;lastReviewed:string;
- photos?:{url:string;label:string;source:string;kind?:'headquarters'|'factory'|'office'|'product'}[];
+ photos?:{url:string;label:string;source:string;localPath?:string;kind?:'headquarters'|'factory'|'office'|'product'|'screenshot'}[];
  officeLocations?:{type:string;address:string;source:string}[];
  photoSourcePage?:string;photoSourceLabel?:string;
  evidenceLevel?:string;
@@ -52,7 +52,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
    <div className="domestic-editorial-panel">
     <header className="domestic-editorial-hero">
      <div className="domestic-company-profile-mark" aria-label="企业视觉资料">
-      {brandSrc&&!imageFailed?<img src={brandSrc} alt={company.name+(article?.brandAssetStatus==='official_logo_visually_verified'?'的正式品牌标识':'的官网图片候选')} onError={()=>setImageFailed(true)}/>:
+      {brandSrc&&!imageFailed?<img src={brandSrc} alt={company.name+(article?.brandAssetStatus==='official_logo_visually_verified'?'的正式品牌标识':article?.brandAssetStatus==='user_provided_logo_confirmed'?'的已确认品牌图':'的企业品牌图')} onError={()=>setImageFailed(true)}/>:
        <Building2 size={26} aria-hidden="true"/>}
      </div>
      <div className="domestic-profile-identity">
@@ -64,7 +64,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       {article?.officeLocations?.length? <small className="domestic-profile-office-hint"><MapPin size={13}/>{article.officeLocations[0].address}</small>:null}
       {article&&!brandSrc?<small className="domestic-media-confidence">正式品牌 Logo 尚未核验；已屏蔽失效图片地址</small>:null}
       {brandSrc&&<small className="domestic-media-confidence">
-       {article?.brandAssetStatus==='official_logo_visually_verified'?'已对照企业官方招聘页面核验品牌标识':article?.brandAssetStatus==='official_domain_favicon_unverified_visual'?'当前显示企业网站图标，尚未确认为正式品牌 Logo':article?.brandAssetStatus==='official_website_logo_candidate'?'来自企业官网的品牌图候选，尚待人工核对正式 Logo':'品牌图来源已登记，尚未完成正式 Logo 身份核验'}
+       {article?.brandAssetStatus==='official_logo_visually_verified'?'已对照企业官方招聘页面核验品牌标识':article?.brandAssetStatus==='official_domain_favicon_unverified_visual'?'当前显示企业网站图标，尚未确认为正式品牌 Logo':article?.brandAssetStatus==='official_website_logo_candidate'?'来自企业官网的品牌图候选，尚待核对':article?.brandAssetStatus==='user_provided_logo_confirmed'?'用户提供并确认的企业品牌图片（普通照片或截图亦可）':article?.brandAssetStatus==='user_provided_logo_pending_identity'?'已添加企业品牌图片，尚待确认品牌归属':'品牌图已登记，尚待核对品牌归属'}
       </small>}
      </div>
     </header>
@@ -90,14 +90,14 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       </div>}
     </section>}
     {hasReadyPhoto?<section className="domestic-editorial-section domestic-editorial-photos" aria-label="企业真实图片">
-      <h2>企业与产品实景</h2>
+      <h2>企业照片与办公环境</h2>
       <div className="domestic-editorial-photo-grid">
-       {article!.photos!.filter((_,i)=>media?.photos?.[i]?.state==='ready').map(photo=><figure key={photo.url} className="domestic-official-photo">
-        <a href={photo.source} target="_blank" rel="noopener noreferrer" aria-label={'查看'+photo.label+'的来源'}>
-         <img src={import.meta.env.BASE_URL+(media?.photos?.[article!.photos!.indexOf(photo)]?.path||'')} loading="lazy" alt={photo.label} onError={e=>{e.currentTarget.style.display='none';e.currentTarget.parentElement?.classList.add('domestic-photo-unavailable')}}/>
-         <span className="domestic-photo-fallback"><Images size={18}/>点击查看官网图片</span>
+       {article!.photos!.map((photo,index)=>({photo,index})).filter(({index})=>media?.photos?.[index]?.state==='ready').map(({photo,index})=><figure key={photo.localPath||photo.url} className="domestic-official-photo">
+        <a href={httpsLink(photo.source)||import.meta.env.BASE_URL+(media?.photos?.[index]?.path||'')} target="_blank" rel="noopener noreferrer" aria-label={'查看'+photo.label}>
+         <img src={import.meta.env.BASE_URL+(media?.photos?.[index]?.path||'')} loading="lazy" alt={photo.label} onError={e=>{e.currentTarget.style.display='none';e.currentTarget.parentElement?.classList.add('domestic-photo-unavailable')}}/>
+         <span className="domestic-photo-fallback"><Images size={18}/>打开图片</span>
         </a>
-        <figcaption>{photo.label} · {photo.kind==='product'?'产品照片':photo.kind==='factory'?'生产基地':photo.kind==='headquarters'?'总部实景':'官网图片'}</figcaption>
+        <figcaption>{photo.label} · {photo.kind==='product'?'产品照片':photo.kind==='factory'?'工厂照片':photo.kind==='headquarters'?'总部/大楼':photo.kind==='office'?'办公环境':'网页或场景截图'}</figcaption>
        </figure>)}
       </div>
      </section>:null}
