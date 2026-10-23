@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-23T13:12:10.713Z",
+  "generatedAt": "2026-10-23T13:21:05.237Z",
   "companies": {
     "华域视觉科技（上海）有限公司": {
       "brand": {
@@ -12,13 +12,17 @@
       },
       "photos": [
         {
-          "state": "pending_source_reverification"
+          "state": "ready",
+          "path": "domestic-media/e58d8ee59f9fe8a786e8a789e7a791e68a80efbc88e4b88ae6b5b7efbc89e69c89e99990e585ace58fb8-photo-0.webp",
+          "bytes": 65872,
+          "source": "https://www.hascovision.com/Public/Uploads/uploadfile/images/20260313/changshuxingongchang.jpg",
+          "sourcePage": "https://www.hascovision.com/about/about-us"
         },
         {
-          "state": "pending_source_reverification"
+          "state": "pending_photo_identity_or_source"
         },
         {
-          "state": "pending_source_reverification"
+          "state": "pending_photo_identity_or_source"
         }
       ]
     },
@@ -138,7 +142,7 @@
         "state": "ready",
         "path": "domestic-media/ef46316c30c0d3d-website-brand-candidate.png",
         "source": "https://boe.com/nuxt/resouces/img/logo.8bcbfe7.png",
-        "classification": "official_site_brand_candidate_not_visually_verified"
+        "classification": "logo_identity_checked"
       },
       "photos": [
         {
@@ -154,7 +158,7 @@
         "state": "ready",
         "path": "domestic-media/f369cdb6bcf3967-website-brand-candidate.png",
         "source": "https://goertek.com/images/logo.png",
-        "classification": "official_site_brand_candidate_not_visually_verified"
+        "classification": "logo_identity_checked"
       },
       "photos": []
     },
