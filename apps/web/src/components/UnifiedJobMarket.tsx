@@ -77,7 +77,6 @@ function LanguageSwitcher({lang,change}:{lang:Language,change:(value:Language)=>
 }
 export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,user?:User|null}){
   const domesticOnly=import.meta.env.VITE_HHBA_DOMESTIC_STATIC_ONLY==='1';
-  const [searchMode,setSearchMode]=useState<'companies'|'jobs'>('companies');
   const {lang,change}=useLanguage();
   const [filters,setFilters]=useState<LiveFilters>(()=>{
     const previous=readMarketState(compact);
@@ -208,7 +207,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       <h2 id="unified-market-title">{lang==='zh'?'招聘市场':'Job market'}</h2>
       <p>{domesticOnly?(lang==='zh'?'国内历史招聘岗位静态测试 · 岗位状态以企业官网为准':'Historical China listings preview · Check employer for availability'):lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
       <LanguageSwitcher lang={lang} change={change}/></div>
-    {controls}
+    {!compact&&controls}
     {intentLabels.length>0&&<div className="unified-search-interpreted">
       {lang==='zh'?'搜索条件已识别：':'Recognized filters: '}{intentLabels.join(' · ')}
       {filters.company&&<button className="unified-company-filter-clear" type="button"
@@ -262,11 +261,9 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       <Link to="/candidate/jobs/archive">{lang==='zh'?'历史岗位记录':'Historical jobs'}</Link>
        {' · '}<Link to="/candidate/employer-jobs">{lang==='zh'?'经认证企业自行发布的岗位':'Employer-submitted jobs (separate from official ATS)'}</Link></p>}
   </section>;
-  const main=<><div className="hhba-search-mode" role="group" aria-label="搜索模式">
-    <button type="button" aria-pressed={searchMode==='companies'} onClick={()=>setSearchMode('companies')}>AI 智能找企业</button>
-    <button type="button" aria-pressed={searchMode==='jobs'} onClick={()=>setSearchMode('jobs')}>原有岗位搜索</button>
-  </div>{searchMode==='companies'?<AICompanySearch/>:market}</>;
-  return compact?main:<Shell user={user}>{main}</Shell>;
+  // One compact enterprise search on the homepage; the audited job market
+  // remains visible underneath. The full job-search controls live at /candidate/jobs.
+  return compact?<><AICompanySearch/>{market}</>:<Shell user={user}>{market}</Shell>;
 }
 export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  const {lang,change}=useLanguage();
