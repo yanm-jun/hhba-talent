@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-23T13:06:28.795Z",
+  "generatedAt": "2026-10-23T13:10:22.141Z",
   "companies": {
     "华域视觉科技（上海）有限公司": {
       "brand": {
@@ -38,10 +38,7 @@
     },
     "上汽集团": {
       "brand": {
-        "state": "ready",
-        "path": "domestic-media/a07a4a962c51878-website-brand-candidate.png",
-        "source": "https://www.saicmotor.com/chinese/images/logos/2025/1.png",
-        "classification": "official_site_brand_candidate_not_visually_verified"
+        "state": "missing"
       },
       "photos": [
         {
@@ -68,7 +65,7 @@
         "state": "ready",
         "path": "domestic-media/159d05469a676ad-website-brand-candidate.png",
         "source": "https://www.crrcgc.cc/Portals/71/Skins/crrcgc-index/images/logo.png",
-        "classification": "official_site_brand_candidate_not_visually_verified"
+        "classification": "logo_identity_checked"
       },
       "photos": []
     },
@@ -87,7 +84,7 @@
         "state": "ready",
         "path": "domestic-media/99b6396dc634834-website-brand-candidate.png",
         "source": "https://www.leisai.com/static/cn/img/header_logo.png",
-        "classification": "official_site_brand_candidate_not_visually_verified"
+        "classification": "logo_identity_checked"
       },
       "photos": []
     },
@@ -102,7 +99,7 @@
         "state": "ready",
         "path": "domestic-media/14107a82c4f0575-website-brand-candidate.png",
         "source": "https://www.invt.com.cn/application/home/view/default/images/a_logo2.png",
-        "classification": "official_site_brand_candidate_not_visually_verified"
+        "classification": "logo_identity_checked"
       },
       "photos": []
     },
@@ -170,7 +167,7 @@
         "state": "ready",
         "path": "domestic-media/797301040f88850-website-brand-candidate.png",
         "source": "https://zte.com.cn/content/dam/zte-site/res-www-zte-com-cn/navigator/global/main/img/logo-en.png",
-        "classification": "official_site_brand_candidate_not_visually_verified"
+        "classification": "logo_identity_checked"
       },
       "photos": []
     },
@@ -349,7 +346,7 @@
         "state": "ready",
         "path": "domestic-media/c580a626b8f7287-website-brand-candidate.png",
         "source": "https://www.bydglobal.com/material/group-official-website/common/logo.png",
-        "classification": "official_site_brand_candidate_not_visually_verified"
+        "classification": "logo_identity_checked"
       },
       "photos": [
         {
@@ -396,7 +393,7 @@
         "state": "ready",
         "path": "domestic-media/47c958dedacd8cd-website-brand-candidate.png",
         "source": "https://static.haday.com/zh-cn/img/logo.png",
-        "classification": "official_site_brand_candidate_not_visually_verified"
+        "classification": "logo_identity_checked"
       },
       "photos": []
     },
