@@ -27,7 +27,7 @@ const sources=[
 // Never label an uncaptioned or third-party image as its headquarters. A generic
 // decorative banner, logo, partner thumbnail or profile portrait is not a scene.
 const knownSources=new Set(sources.map(x=>x.name));
-const forbiddenHost=/sse\\.com\\.cn|cninfo\\.com\\.cn|zhiye\\.com|hotjob\\.cn|51job\\.com|zhaopin\\.com|gov\\.cn|edu\\.cn/;
+const forbiddenHost=/sse\.com\.cn|cninfo\.com\.cn|zhiye\.com|hotjob\.cn|51job\.com|zhaopin\.com|gov\.cn|edu\.cn/;
 const sceneDescriptors=[
  {regex:/(?:总部大楼|总部园区|企业园区|办公环境|办公楼|研发中心|研发大楼|办公园区|公司总部|研发总部|办公总部)/,kind:'office',label:'企业官网公开的总部、研发或办公环境'},
  {regex:/(?:制造基地|生产基地|生产车间|制造车间|智能工厂|数字化工厂|工业厂房|生产厂房|智能制造基地|制造园区)/,kind:'factory',label:'企业官网公开的生产或制造场景'},
@@ -39,7 +39,7 @@ for(const [name,p] of Object.entries(profiles)){
  for(const uri of [...new Set(urls)]){
   let link;try{link=new URL(uri)}catch{continue}
   if(link.protocol!=='https:'||forbiddenHost.test(link.hostname))continue;
-  const host=link.hostname.replace(/^www\\./,'');
+  const host=link.hostname.replace(/^www\./,'');
   sources.push({name,page:link.href,host:[host,'www.'+host,link.hostname],
    rules:sceneDescriptors.map(x=>({match:x.regex,kind:x.kind,label:x.label}))});
   break; // One source per employer; avoid overwriting its published evidence.
