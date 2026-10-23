@@ -435,8 +435,8 @@
       "robotics",
       "intelligent-manufacturing"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://www.leisai.com/recruitment/index.html",
+    "careersLabel": "雷赛智能官方招聘",
     "officialSource": "https://www.leisai.com/groupIntroduction.html",
     "productSource": "https://www.leisai.com/",
     "brandImage": "https://cdn.luvbotics.com/homepage/assets/images/friend4_leadshine.png",
@@ -446,13 +446,16 @@
     "evidenceLevel": "official",
     "photoSourcePage": "https://www.leisai.com/groupIntroduction.html",
     "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
-    "recruitmentStatus": "UNVERIFIED_DISABLED",
+    "recruitmentStatus": "normal",
     "primaryIndustry": "工业自动化与工业装备",
     "subIndustry": "工业运动控制 · 伺服驱动 · 机器人核心部件",
     "industryEvidenceUrl": "https://www.leisai.com/groupIntroduction.html",
     "industry": "工业自动化与工业装备",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
-    "extraBusinessEvidenceUrl": "https://www.leisai.com/groupIntroduction.html"
+    "extraBusinessEvidenceUrl": "https://www.leisai.com/groupIntroduction.html",
+    "recruitmentEvidenceUrl": "https://www.leisai.com/groupIntroduction.html",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentEntity": "雷赛智能"
   },
   "正泰电器": {
     "displayName": "正泰电器",
@@ -556,8 +559,8 @@
       "robotics",
       "computer-science"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://www.invt.com.cn/careers",
+    "careersLabel": "英威腾校园／社会招聘入口",
     "officialSource": "https://www.invt.com.cn/",
     "productSource": "https://www.invt.com.cn/",
     "brandImage": "https://img.phb123.com/uploads/allimg/220827/810-220RGH5580-L.png",
@@ -567,13 +570,16 @@
     "brandImageSource": "https://www.phb123.com/bk/qiye/2163.html",
     "photoSourcePage": "https://www.invt.com.cn/",
     "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
-    "recruitmentStatus": "UNVERIFIED_DISABLED",
+    "recruitmentStatus": "normal",
     "primaryIndustry": "工业自动化与工业装备",
     "subIndustry": "电气传动 · 工业自动化 · 光伏储能",
     "industryEvidenceUrl": "https://www.invt.com.cn/",
     "industry": "工业自动化与工业装备",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
-    "extraBusinessEvidenceUrl": "https://www.invt.com.cn/careers"
+    "extraBusinessEvidenceUrl": "https://www.invt.com.cn/careers",
+    "recruitmentEvidenceUrl": "https://www.invt.com.cn/careers",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentEntity": "英威腾"
   },
   "思源电气": {
     "displayName": "思源电气",
@@ -960,8 +966,8 @@
       "mechatronics",
       "software-engineering"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://estun1.zhiye.com/",
+    "careersLabel": "埃斯顿岗位招聘系统",
     "officialSource": "https://www.estun.com/about-us/",
     "productSource": "https://estun.com",
     "brandImage": "https://estun.com/favicon.ico",
@@ -978,7 +984,11 @@
     "subIndustry": "伺服与运动控制",
     "industryEvidenceUrl": "https://www.estun.com/about-us/",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
-    "extraBusinessEvidenceUrl": "https://estun1.zhiye.com/"
+    "extraBusinessEvidenceUrl": "https://estun1.zhiye.com/",
+    "recruitmentEvidenceUrl": "https://estun1.zhiye.com/",
+    "recruitmentStatus": "normal",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentEntity": "埃斯顿"
   },
   "德赛西威": {
     "displayName": "德赛西威",
@@ -1390,8 +1400,8 @@
       "computer-science",
       "automation"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://www.gigadevice.com.cn/about/career",
+    "careersLabel": "兆易创新官方招聘栏目",
     "officialSource": "https://www.gigadevice.com.cn/about/contact",
     "productSource": "https://gigadevice.com.cn",
     "brandImage": "",
@@ -1410,7 +1420,11 @@
     "subIndustry": "存储器",
     "industryEvidenceUrl": "https://www.gigadevice.com.cn/about/contact",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
-    "extraBusinessEvidenceUrl": "https://www.gigadevice.com.cn/about/career"
+    "extraBusinessEvidenceUrl": "https://www.gigadevice.com.cn/about/career",
+    "recruitmentEvidenceUrl": "https://www.gigadevice.com.cn/about/career",
+    "recruitmentStatus": "normal",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentEntity": "兆易创新"
   },
   "浪潮信息": {
     "displayName": "浪潮信息",
@@ -2012,8 +2026,8 @@
       "mechanical-engineering",
       "ai"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://job.hikrobotics.com/",
+    "careersLabel": "海康机器人社会招聘",
     "officialSource": "https://www.hikrobotics.com/cn/contactus/",
     "productSource": "https://hikrobotics.com",
     "brandImage": "https://hikrobotics.com/favicon.ico",
@@ -2031,7 +2045,11 @@
     "subIndustry": "机器视觉",
     "industryEvidenceUrl": "https://www.hikrobotics.com/cn/contactus/",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
-    "extraBusinessEvidenceUrl": "https://job.hikrobotics.com/"
+    "extraBusinessEvidenceUrl": "https://job.hikrobotics.com/",
+    "recruitmentEvidenceUrl": "https://job.hikrobotics.com/",
+    "recruitmentStatus": "normal",
+    "recruitmentVerifiedAt": "2026-10-23",
+    "recruitmentEntity": "海康机器人"
   },
   "阳光电动力": {
     "displayName": "阳光电动力",
