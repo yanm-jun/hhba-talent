@@ -601,6 +601,46 @@
       "verifiedOn": "2026-10-23",
       "verifiedBy": "official_company_link_or_official_employer_advertisement",
       "aliases": []
+    },
+    "华安证券": {
+      "url": "https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment",
+      "evidenceUrl": "https://jyzx.zuel.edu.cn/home/career/internship?id=41398",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "华安证券官方招聘报名系统",
+      "recruitmentEntity": "华安证券",
+      "verifiedOn": "2026-10-23",
+      "verifiedBy": "employer_submitted_university_recruitment_announcement",
+      "aliases": [
+        "华安证券股份有限公司"
+      ],
+      "notes": "2025招聘公告及2026招聘公告均指向该华安证券本体招聘站；该端口网页运行状态可能随地域或网络环境变化，以现场开放页面为准。"
+    },
+    "紫光股份": {
+      "url": "https://unigroup.zhaopin.com/",
+      "evidenceUrl": "https://jy.ncut.edu.cn/front/zpxx.jspa?tid=10871",
+      "kind": "group_recruitment_portal",
+      "availability": "unconfirmed_runtime",
+      "label": "新紫光集团2027校园招聘（须筛选紫光股份实际用人主体）",
+      "recruitmentEntity": "新紫光集团",
+      "verifiedOn": "2026-10-23",
+      "verifiedBy": "university_published_group_recruitment_announcement",
+      "aliases": [],
+      "notes": "紫光股份有限公司（000938.SZ）与新紫光集团、新华三集团、紫光展锐均不是完全相同招聘法人。现只能确认集团校招入口；未确认可直接投递紫光股份本体岗位，不能算精准入口验收完成。"
+    },
+    "国电南瑞": {
+      "url": "https://job.sgepri.sgcc.com.cn/",
+      "evidenceUrl": "https://see.cumt.edu.cn/info/1070/1957.htm",
+      "kind": "group_recruitment_portal",
+      "availability": "normal",
+      "label": "南瑞集团官方招聘系统（筛选国电南瑞用人主体）",
+      "recruitmentEntity": "国电南瑞",
+      "verifiedOn": "2026-10-23",
+      "verifiedBy": "nari_group_employer_university_publication",
+      "aliases": [
+        "国电南瑞科技股份有限公司"
+      ],
+      "notes": "高校发布的国电南瑞招聘文件明确要求登录南瑞集团招聘系统；集团官网覆盖多家关联法人，用人主体和具体岗位要逐项核对，不能等同集团任意岗位都属于国电南瑞上市主体。"
     }
   }
 }
