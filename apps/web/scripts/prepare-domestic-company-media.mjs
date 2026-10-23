@@ -72,7 +72,7 @@ for(const [name,p] of Object.entries(profiles)){
  manifest.companies[name]={brand:{state:'missing'},photos:[]};
  if(p.brandLocalPath&&/^domestic-media\/[a-zA-Z0-9._-]+\.(?:png|jpg|webp|gif)$/.test(p.brandLocalPath)&&existsSync('public/'+p.brandLocalPath)){
   manifest.companies[name].brand={state:'ready',path:p.brandLocalPath,source:p.brandImage,
-   classification:p.brandAssetStatus==='official_logo_visually_verified'?'logo_identity_checked':'official_site_brand_candidate_not_visually_verified'};
+   classification:p.brandAssetStatus==='official_logo_visually_verified'?'logo_identity_checked':p.brandAssetStatus==='user_provided_logo_confirmed'?'user_confirmed_company_logo':p.brandAssetStatus==='user_provided_logo_pending_identity'?'user_submitted_logo_pending_identity':'official_site_brand_candidate_not_visually_verified'};
   stats.brandSucceeded++;
  }else if(p.brandImage){
   const cached=previousMedia(name,'brand',0,p.brandImage);
