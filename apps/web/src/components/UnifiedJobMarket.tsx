@@ -3,6 +3,8 @@ import { ArrowRight, ExternalLink, MapPin, RefreshCcw, Search, ShieldCheck } fro
 import { Link, getJobReturnTarget, navigate } from '../router';
 import { Shell } from './Shell';
 import { DomesticCompanyResults } from './DomesticCompanyResults';
+import { MajorFilter } from './MajorFilter';
+import { majorById } from '../services/domesticMajors';
 import { SaveJobButton } from './SaveJobButton';
 import { trackEvent } from '../services/engagement';
 import '../styles/saved-jobs.css';
@@ -102,6 +104,13 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       q:previous?.draft??initialJobQuery(),
       company:typeof saved==='string'&&saved.length<=100?saved:initialCompanyQuery()};
   });
+  const [selectedMajor,setSelectedMajor]=useState(()=>{
+    try{const saved=sessionStorage.getItem('hhba.company.major')||'';return saved&&majorById(saved)?saved:''}catch{return ''}
+  });
+  const selectMajor=(slug:string)=>{
+    setSelectedMajor(slug);
+    try{if(slug)sessionStorage.setItem('hhba.company.major',slug);else sessionStorage.removeItem('hhba.company.major')}catch{}
+  };
   const [draft,setDraft]=useState(()=>readMarketState(compact)?.draft??initialJobQuery());
   const [page,setPage]=useState(()=>readMarketState(compact)?.page??0);
   const [snapshot,setSnapshot]=useState<LivePage|null>(null);
@@ -246,6 +255,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       <option value="5+">{lang==='zh'?'最低经验 5 年以上':'Minimum 5+ years'}</option>
       <option value="unreported">{lang==='zh'?'经验要求未识别':'Experience unspecified'}</option>
     </select>
+    <MajorFilter value={selectedMajor} onChange={selectMajor} lang={lang}/>
     <label className="unified-job-remote"><input type="checkbox" checked={filters.remote}
       onChange={e=>{setPage(0);setFilters(f=>({...f,remote:e.target.checked}))}}/>
       {lang==='zh'?'仅远程岗位':'Remote only'}</label>
@@ -277,7 +287,9 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       </div>
       {aiEvidence.jobs.length===0&&<p className="unified-job-state">暂未检索到具备可核对原文证据的岗位；不会提供虚构的职位。</p>}
     </section>}
-    <DomesticCompanyResults query={draft}/>
+    <DomesticCompanyResults query={draft} majorSlug={selectedMajor}
+      scope={filters.country} country={filters.location_country||''}
+      city={cityOptions.find(c=>c.value===filters.city)?.zh||''}/>
     {intentLabels.length>0&&<div className="unified-search-interpreted">
       {lang==='zh'?'搜索条件已识别：':'Recognized filters: '}{intentLabels.join(' · ')}
       {filters.company&&<button className="unified-company-filter-clear" type="button"

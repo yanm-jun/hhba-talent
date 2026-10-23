@@ -87,9 +87,14 @@
     ],
     "officeLocations": [
       {
-        "type": "公司联系办公地址",
+        "type": "办公地址（2026年半年报）",
+        "address": "上海市浦东新区科苑路501号",
+        "source": "https://static.cninfo.com.cn/finalpage/2026-08-28/1225516573.PDF"
+      },
+      {
+        "type": "注册地址（非实际办公地址）",
         "address": "上海市静安区威海路489号",
-        "source": "https://www.hasco-group.com/"
+        "source": "https://static.cninfo.com.cn/finalpage/2026-08-28/1225516573.PDF"
       }
     ],
     "majorSlugs": [
@@ -106,10 +111,12 @@
     "careersLabel": "华域汽车 · 工作与职业",
     "officialSource": "https://www.hasco-group.com/about/company.html/1000",
     "productSource": "https://www.hasco-group.com/",
-    "brandImage": "",
+    "brandImage": "https://www.hasco-group.com/uploads/20190408161935.png",
     "photos": [],
     "lastReviewed": "2026-10-23",
-    "evidenceLevel": "official"
+    "evidenceLevel": "official",
+    "imageSource": "https://www.hasco-group.com/news/",
+    "brandImageSource": "https://www.hasco-group.com/news/"
   },
   "上汽集团": {
     "displayName": "上汽集团",
@@ -156,10 +163,11 @@
     "careersLabel": "上汽集团 · 招聘官网",
     "officialSource": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
     "productSource": "https://www.saicmotor.com/chinese/gsgk/qyml/index.shtml",
-    "brandImage": "",
+    "brandImage": "https://commons.wikimedia.org/wiki/Special:Redirect/file/SAICMotor_logo.png",
     "photos": [],
     "lastReviewed": "2026-10-23",
-    "evidenceLevel": "official"
+    "evidenceLevel": "official",
+    "brandImageSource": "https://commons.wikimedia.org/wiki/File:SAICMotor_logo.png"
   },
   "汇川技术": {
     "displayName": "汇川技术",
@@ -209,10 +217,11 @@
     "careersLabel": "汇川技术 · 招聘官网",
     "officialSource": "https://www.inovance.com/portal/investor",
     "productSource": "https://www.inovance.com/",
-    "brandImage": "",
+    "brandImage": "https://portal-oss.zhiye.com/231679/image/95a3212e-6fb7-47d4-9b6e-edadbfe1e294.png",
     "photos": [],
     "lastReviewed": "2026-10-23",
-    "evidenceLevel": "official"
+    "evidenceLevel": "official",
+    "brandImageSource": "https://inovance.zhiye.com/Campus"
   },
   "中国中车": {
     "displayName": "中国中车",
@@ -257,10 +266,11 @@
     "careersLabel": "",
     "officialSource": "https://www.crrcgc.cc/eportal/ui?pageId=714829",
     "productSource": "https://www.crrcgc.cc/sj/",
-    "brandImage": "",
+    "brandImage": "https://bjhrckj.com/static/upload/image/20250220/1740056632200426.jpg",
     "photos": [],
     "lastReviewed": "2026-10-23",
-    "evidenceLevel": "official"
+    "evidenceLevel": "official",
+    "brandImageSource": "https://bjhrckj.com/?list_38%2F112.html"
   },
   "美的集团": {
     "displayName": "美的集团",
@@ -299,9 +309,225 @@
     "careersLabel": "",
     "officialSource": "https://www.midea.com.cn/zh/about-midea?wcmmode=disabled",
     "productSource": "https://www.midea.com.cn/zh/our-businesses",
-    "brandImage": "",
+    "brandImage": "https://cdn-apac.onetrust.com/logos/6fd01f34-9727-4df4-951a-f14b383f7ab6/b9622b14-80ea-41e5-ab50-e00618507aa8/54f906dc-b00f-4d35-a03e-b3e0782e45ac/Midea_Logo_%E7%95%99%E7%99%BD.png",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official",
+    "brandImageSource": "https://www.midea.com/global/company-intro"
+  },
+  "雷赛智能": {
+    "displayName": "雷赛智能",
+    "subtitle": "工业运动控制 · 伺服驱动 · 机器人核心部件",
+    "summary": "成立于1997年的运动控制技术企业，面向工业装备、机器人和智能制造提供伺服、步进、PLC与运动控制解决方案。",
+    "description": [
+      "深圳市雷赛智能控制股份有限公司（002979）成立于1997年，长期围绕运动控制系统进行技术研发和产业化。相比泛泛的机械制造企业，雷赛的业务重点是让工业设备中的电机与执行机构能够稳定、精确地完成运动任务，常见产品包括步进驱动、交流伺服、运动控制PLC和运动控制卡。",
+      "雷赛的产品应用横跨电子制造、半导体设备、机器人、锂电、光伏、机床加工、包装印刷和智能物流等场景。无论是机械结构设计还是电气控制，都需要和控制器、驱动器、工业通信及运动控制算法协同工作。因此，电气工程、自动化、机械电子、计算机、电子信息等背景的求职者，可从其产品业务寻找适合自己的职业方向。",
+      "官方发展历程记录了该公司从早期PC运动控制卡和步进驱动业务，到PLC、伺服以及人形机器人灵巧手和关节模组的业务拓展。不同产品部门需要的知识体系并不相同，选择时应先了解岗位所属团队，而非仅凭公司的行业标签判断自己能否应聘。",
+      "公司官网公布深圳南山智谷办公总部以及南山区百旺信高科技工业园生产基地，并设置社会招聘、校园招聘和员工成长相关入口。HHBA 不复制实时岗位列表，用户可直接前往雷赛官网查看企业发布的信息。"
+    ],
+    "business": [
+      {
+        "title": "步进与伺服驱动",
+        "description": "步进、交流伺服系统和各类电机驱动及控制产品。"
+      },
+      {
+        "title": "PLC与运动控制",
+        "description": "运动控制PLC、PC控制卡、I/O及现场控制系统。"
+      },
+      {
+        "title": "机器人核心部件",
+        "description": "面向人形机器人、关节模组、灵巧手等方向开展技术探索。"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "深圳总部办公",
+        "address": "深圳市南山区沙河西路3157号南山智谷产业园B栋15—20楼",
+        "source": "https://www.leisai.com/category/contact.html"
+      },
+      {
+        "type": "深圳生产基地",
+        "address": "深圳市南山区松白路百旺信高科技工业园5区22栋",
+        "source": "https://www.leisai.com/category/contact.html"
+      }
+    ],
+    "majorSlugs": [
+      "electrical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "mechatronics",
+      "electronic-information",
+      "computer-science",
+      "robotics",
+      "intelligent-manufacturing"
+    ],
+    "careersUrl": "https://www.leisai.com/recruitment/index.html",
+    "careersLabel": "雷赛智能 · 官方招聘",
+    "officialSource": "https://www.leisai.com/groupIntroduction.html",
+    "productSource": "https://www.leisai.com/",
+    "brandImage": "https://cdn.luvbotics.com/homepage/assets/images/friend4_leadshine.png",
+    "brandImageSource": "https://www.luvbotics.com/homepage/",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official"
+  },
+  "正泰电器": {
+    "displayName": "正泰电器",
+    "subtitle": "低压电器 · 智慧能源 · 电力系统",
+    "summary": "成立于1997年、2010年上市的低压电器及电力系统技术企业，提供电力设备、智能配电和相关系统解决方案。",
+    "description": [
+      "浙江正泰电器股份有限公司（601877.SH）是正泰集团旗下以低压电器为核心的上市主体，公司成立于1997年，并于2010年在上海证券交易所上市。它与正泰集团并非完全相同的法律主体：正泰电器重点发展低压电器和智慧电力解决方案，集团整体业务还涉及其他能源与产业板块。",
+      "正泰电器的产品围绕电能的分配、控制、保护和监测展开，覆盖断路器、接触器、继电器及配电系统等多个领域。对于电气工程、自动化、机电、能源与智能制造方向的人，相关业务不仅包括产品研发，也涉及检测认证、工业生产、系统集成与技术服务。",
+      "电力设备的应用跨越工厂、建筑、基础设施和能源等场景，设计过程需要兼顾安全性、可靠性、标准、生产工艺和长期运维。理解正泰电器时，宜把它看成具有研发、制造、销售与工程服务体系的电力电气企业，而不是只看单一产品。",
+      "正泰官网公开总部及联络地点在浙江温州乐清一带，也公开国内区域销售机构。具体招聘主体、工作地点及专业要求可能随业务而变化；本页先提供准确企业资料与官网，不对岗位开放情况作出承诺。"
+    ],
+    "business": [
+      {
+        "title": "低压电器",
+        "description": "断路器、接触器、控制保护及电力设备。"
+      },
+      {
+        "title": "配电与电力系统",
+        "description": "面向工厂、能源与建筑场景的用电、保护和配电系统。"
+      },
+      {
+        "title": "制造与工程服务",
+        "description": "设备制造、质量测试、技术服务及工程应用。"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "企业官网公布的总部地址",
+        "address": "浙江省温州市乐清市北白象镇正泰工业园区正泰路1号",
+        "source": "https://www.chint.net/about/contact"
+      }
+    ],
+    "majorSlugs": [
+      "electrical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "electronic-information",
+      "energy-engineering",
+      "intelligent-manufacturing"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.chint.net/about/overview/about_us",
+    "productSource": "https://www.chint.net/",
+    "brandImage": "https://en.miracletech.com/media_library/image_20251013170129OFKX.JPEG",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official",
+    "brandImageSource": "https://en.miracletech.com/aboutus.html?c_id=2&id=0"
+  },
+  "英威腾": {
+    "displayName": "英威腾",
+    "subtitle": "电气传动 · 工业自动化 · 光伏储能",
+    "summary": "2002年在深圳成立、2010年上市的工业自动化和能源技术企业，业务涵盖工业驱动、控制、网络能源和新能源动力。",
+    "description": [
+      "深圳市英威腾电气股份有限公司（股票代码002334）成立于2002年，主要围绕电力电子、工业自动化和能源管理建立产品与服务体系。公司官网把工业自动化、网络能源、光伏储能和新能源动力列为四大业务板块，覆盖传统制造升级与新型能源系统。",
+      "工业自动化业务涉及变频器、驱动系统、工业控制和系统解决方案，目的是让电机及工业设备实现高效、稳定、可调的运转。对于电气工程及其自动化、自动化和机械类专业，重要的应用方向包括功率电子、控制算法、驱动与电机、工业通信及工程调试。",
+      "在新能源业务方面，英威腾布局光伏和储能产品，以及面向交通运输和工程机械的新能源动力系统。电子信息、能源动力、软件和材料等不同背景的人，可以结合具体产品线判断自己想从事研发、测试、制造还是技术支持。",
+      "公司年度报告披露的办公地址在深圳光明区英威腾光明科技大厦，注册地址则位于深圳南山区。HHBA 会分别标记这两种地址，不把注册地点误写成用户应前往的实际办公室。招聘申请以公司官网当前信息为准。"
+    ],
+    "business": [
+      {
+        "title": "工业自动化",
+        "description": "变频器、驱动器和工业控制产品。"
+      },
+      {
+        "title": "网络能源与储能",
+        "description": "数据中心电力、光伏与储能系统。"
+      },
+      {
+        "title": "新能源动力",
+        "description": "面向交通和工程机械的新能源驱动与系统。"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "办公地址（2025年年度报告）",
+        "address": "深圳市光明区马田街道松白路英威腾光明科技大厦",
+        "source": "https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12511133&stockid=002334"
+      },
+      {
+        "type": "注册地址（非实际办公地址）",
+        "address": "深圳市南山区桃源街道长源社区学苑大道1001号南山智园A7栋501",
+        "source": "https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12511133&stockid=002334"
+      }
+    ],
+    "majorSlugs": [
+      "electrical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "electronic-information",
+      "energy-engineering",
+      "robotics",
+      "computer-science"
+    ],
+    "careersUrl": "https://www.invt.com.cn/careers",
+    "careersLabel": "英威腾 · 员工招聘",
+    "officialSource": "https://www.invt.com.cn/",
+    "productSource": "https://www.invt.com.cn/",
+    "brandImage": "https://img.phb123.com/uploads/allimg/220827/810-220RGH5580-L.png",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official",
+    "brandImageSource": "https://www.phb123.com/bk/qiye/2163.html"
+  },
+  "思源电气": {
+    "displayName": "思源电气",
+    "subtitle": "输变电设备 · 新型电力系统 · 智慧能源",
+    "summary": "研发制造输配电与电力保护控制设备的上市企业，产品用于变电站、电网及能源基础设施。",
+    "description": [
+      "思源电气股份有限公司（股票代码002028）是一家聚焦电力技术研发、输配电设备制造与工程服务的上市公司。企业所面对的典型应用场景包括变电站、电网建设以及高压、特高压电力系统。对企业的理解，应从输配电装备、保护控制和工程服务体系出发，而非仅以“电气”这一行业词概括。",
+      "思源的公开年报介绍了GIS、GIL、断路器、隔离开关、变压器、电抗器、继电保护系统、在线监测和无功补偿等设备类型。这些产品涉及电气绝缘、机械结构、电力电子、测控、自动控制和电力系统分析，能够对应电气工程、自动化、机械、材料和测控等多个专业方向。",
+      "对于希望进入电力装备行业的学生，这类企业的工作场景不仅有产品设计、试验验证和制造，也有项目工程、现场调试及售后技术服务。不同部门对出差、现场工作与专业能力的要求可能不同，具体仍需要按照真实岗位公告判断。",
+      "公司披露的实际经营地点在上海市闵行区华宁路3399号，注册地址为闵行区金都路4399号。思源官网设有“加入思源”栏目，可用作进一步了解招聘渠道与人才培养体系的入口。"
+    ],
+    "business": [
+      {
+        "title": "输配电与高压设备",
+        "description": "GIS、开关、变压器、互感器与电力配套设备。"
+      },
+      {
+        "title": "保护、控制和监测",
+        "description": "继电保护、监控、在线监测及电网自动化。"
+      },
+      {
+        "title": "电力工程技术",
+        "description": "变电站、电网与电力系统工程应用。"
+      }
+    ],
+    "officeLocations": [
+      {
+        "type": "实际经营地点",
+        "address": "上海市闵行区华宁路3399号",
+        "source": "https://www.sieyuan.com/privacy-policy"
+      },
+      {
+        "type": "注册地址",
+        "address": "上海市闵行区金都路4399号",
+        "source": "https://www.sieyuan.com/privacy-policy"
+      }
+    ],
+    "majorSlugs": [
+      "electrical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "measurement-control",
+      "electronic-information",
+      "energy-engineering",
+      "materials-engineering"
+    ],
+    "careersUrl": "https://www.sieyuan.com/join",
+    "careersLabel": "思源电气 · 加入思源",
+    "officialSource": "https://www.sieyuan.com/about",
+    "productSource": "https://www.sieyuan.com/",
+    "brandImage": "https://pbs.twimg.com/profile_images/1121308964975591429/G3LvwCKG_400x400.png",
+    "photos": [],
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official",
+    "brandImageSource": "https://x.com/sieyuan_group"
   }
 }

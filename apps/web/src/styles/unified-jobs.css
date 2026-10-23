@@ -128,3 +128,18 @@ a.unified-company-brand:focus-visible,.unified-detail-company-link:focus-visible
 .unified-ai-results .unified-job-card h3{font-size:17px}
 .unified-ai-results .unified-job-actions a{display:inline-flex;align-items:center;gap:6px;color:#286447;font-size:12px;text-decoration:none}
 .unified-ai-quote{font-size:12px;color:#65736c;line-height:1.65}
+
+/* Inline searchable academic-major picker: visually consistent with existing compact selects. */
+.unified-major-filter{flex:1 1 185px;min-width:165px;position:relative;z-index:6}
+.unified-major-field{display:flex;align-items:center;min-height:43px;padding:0 9px 0 11px;background:#fff;border:1px solid var(--line);border-radius:9px;color:var(--ink)}
+.unified-major-field:focus-within{outline:2px solid #b7d4c0;outline-offset:1px}
+.unified-major-field input{border:0;outline:0;background:transparent;width:100%;min-width:0;font-size:12px;line-height:1.4;color:var(--ink);padding:11px 0}
+.unified-major-field input::placeholder{color:#717d73}
+.unified-major-arrow{flex-shrink:0;color:#68776e;margin-left:4px}
+.unified-major-clear{display:grid;place-items:center;border:0;border-radius:6px;background:#f2f6f3;color:#386d50;padding:5px;cursor:pointer}
+.unified-major-options{position:absolute;z-index:40;top:calc(100% + 6px);left:0;right:0;width:max(100%,260px);max-width:min(360px,calc(100vw - 32px));max-height:310px;overflow-y:auto;background:#fff;border:1px solid #dbe8df;border-radius:10px;box-shadow:0 8px 25px #173b2621;padding:8px}
+.unified-major-options>small{display:block;color:#728078;padding:8px 7px;font-size:11px}
+.unified-major-options button{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;background:transparent;border:0;border-radius:6px;padding:9px 8px;text-align:left;font-size:12px;color:#344b3b;cursor:pointer}
+.unified-major-options button:hover,.unified-major-options button.is-focused{background:#edf6f0}
+.unified-major-no-match{font-size:12px;color:#76857a;padding:12px 8px}
+@media(max-width:740px){.unified-major-filter{flex:1 1 calc(50% - 6px);min-width:0}.unified-major-options{width:calc(200% + 8px)}}

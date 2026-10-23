@@ -69,6 +69,18 @@ try{
  await desktop.locator('.unified-job-browse-links').getByRole('link',{name:/查看完整招聘市场/}).click();
  assert.match(desktop.url(),/\/candidate\/jobs$/);
  await desktop.locator('.unified-job-search input').waitFor();
+ // Searchable, keyboard-accessible academic-major filter is part of the original filter row.
+ const majorCombo=desktop.getByRole('combobox',{name:'搜索或选择所学专业'});
+ await majorCombo.waitFor();
+ await majorCombo.fill('电气');
+ await desktop.getByRole('option',{name:'电气工程及其自动化'}).click();
+ await desktop.locator('.domestic-major-filter-active').getByText('电气工程及其自动化').waitFor();
+ await desktop.locator('.domestic-company-card').filter({hasText:'汇川技术'}).first().waitFor();
+ await majorCombo.fill('机械');
+ await desktop.getByRole('option',{name:'机械设计制造及其自动化'}).click();
+ await desktop.locator('.domestic-major-filter-active').getByText('机械设计制造及其自动化').waitFor();
+ await desktop.getByRole('button',{name:'清除所学专业'}).click();
+ // Original company and jobs search still works after major selection/clear.
  // Verified company page and major → companies reverse lookup.
  await desktop.locator('.unified-job-search input').fill('华');
  await desktop.locator('.domestic-company-card').filter({hasText:'华域视觉'}).first().waitFor({timeout:2500});

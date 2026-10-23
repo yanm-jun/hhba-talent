@@ -80,3 +80,32 @@ test('no inherited group recruiting portals and verified offices',()=>{
  assert(page.includes('domestic-editorial-photo-grid'));
  assert(page.includes('domestic-office-list'));
 });
+
+test('searchable major filter covers broad subjects and connects with company listing',()=>{
+ const majors=readFileSync('src/services/domesticMajors.ts','utf8');
+ const picker=readFileSync('src/components/MajorFilter.tsx','utf8');
+ const market=readFileSync('src/components/UnifiedJobMarket.tsx','utf8');
+ const companies=readFileSync('src/components/DomesticCompanyResults.tsx','utf8');
+ assert(majors.includes('MAJORS.push(...EXTRA_MAJORS)'));
+ assert(majors.includes("'dance'")&&majors.includes("'electrical-engineering'"));
+ assert(picker.includes('role="combobox"')&&picker.includes('role="listbox"'));
+ assert(picker.includes('onKeyDown={onKey}'));
+ assert(market.includes('<MajorFilter value={selectedMajor} onChange={selectMajor} lang={lang}/>'));
+ assert(market.includes('majorSlug={selectedMajor}'));
+ assert(companies.includes('matchingMajors(company)'));
+ assert(companies.includes('if(!word&&!chosen)return null'));
+});
+test('expanded career profiles have authentic image provenance and no asserted live roles',()=>{
+ const p=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
+ for(const name of ['华域视觉科技（上海）有限公司','华域汽车','上汽集团','汇川技术','中国中车','美的集团','雷赛智能','正泰电器','英威腾','思源电气']){
+  assert(p[name],name+' missing');
+  assert(p[name].description.length>=3,name+' needs a sourced narrative');
+  assert(p[name].description.join('').length>=170,name+' narrative too short');
+  assert(p[name].brandImage&&p[name].brandImage.startsWith('https://'),name+' missing verifiable brand image URL');
+  assert(p[name].brandImageSource||p[name].imageSource,name+' missing image provenance');
+ }
+ assert.equal(p['雷赛智能'].careersUrl,'https://www.leisai.com/recruitment/index.html');
+ assert.equal(p['英威腾'].careersUrl,'https://www.invt.com.cn/careers');
+ assert.equal(p['思源电气'].careersUrl,'https://www.sieyuan.com/join');
+ assert.equal(p['正泰电器'].careersUrl,'');
+});

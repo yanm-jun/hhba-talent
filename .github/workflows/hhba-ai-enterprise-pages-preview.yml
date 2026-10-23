@@ -27,6 +27,7 @@ on:
       - 'apps/web/src/pages/MajorCompaniesPage.tsx'
       - 'apps/web/src/services/domesticMajors.ts'
       - 'apps/web/src/data/domesticCareerProfiles.json'
+      - 'apps/web/src/components/MajorFilter.tsx'
   workflow_dispatch:
 permissions:
   contents: read
