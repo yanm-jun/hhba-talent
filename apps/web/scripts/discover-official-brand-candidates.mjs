@@ -11,11 +11,20 @@ const htmlAttr=(tag,key)=>{
  const m=tag.match(new RegExp('(?:^|\\s)'+key+'\\s*=\\s*(?:"([^"]*)"|([^\\s>]+))','i'));
  return (m?.[1]||m?.[2]||'').replace(/&amp;/g,'&');
 };
+const svgToPng=async(source)=>{
+ const markup=source.toString('utf8');
+ if(!/<svg[\\s>]/i.test(markup.slice(0,1000)))throw Error('invalid_svg');
+ // Fail closed on XML entity expansion, script and remotely referenced content.
+ if(/<!DOCTYPE|<!ENTITY|<script\\b|<foreignObject\\b|\\son[a-z]+\\s*=|(?:xlink:)?href\\s*=\\s*["'](?:https?:|data:|javascript:|\\/\\/)/i.test(markup))throw Error('unsafe_svg');
+ const {Resvg}=await import('@resvg/resvg-js');
+ return Buffer.from(new Resvg(markup,{fitTo:{mode:'width',value:480}}).render().asPng());
+};
 const fileFormat=b=>{
  if(b[0]===0x89&&b[1]===0x50&&b[2]===0x4e&&b[3]===0x47)return 'png';
  if(b[0]===0xff&&b[1]===0xd8&&b[2]===0xff)return 'jpg';
  if(b.subarray(0,4).toString()==='RIFF'&&b.subarray(8,12).toString()==='WEBP')return 'webp';
  if(b.subarray(0,3).toString()==='GIF')return 'gif';
+ if(/<svg[\\s>]/i.test(b.subarray(0,1200).toString('utf8')))return 'svg';
  return '';
 };
 const projects=Object.entries(profiles).filter(([name,p])=>p.brandAssetStatus!=='official_logo_visually_verified')
@@ -63,9 +72,12 @@ await Promise.all(Array.from({length:5},async()=>{
      const ir=await fetch(entry.url,{signal:AbortSignal.timeout(6500),headers:{'User-Agent':'Mozilla/5.0','Accept':'image/*'}});
      if(!ir.ok)continue;
      const len=Number(ir.headers.get('content-length')||0);if(len>900000)continue;
-     const buf=Buffer.from(await ir.arrayBuffer());
-     const fmt=fileFormat(buf);
-     if(!fmt||buf.length<200||buf.length>900000)continue;
+     const original=Buffer.from(await ir.arrayBuffer());
+     const detected=fileFormat(original);
+     if(!detected||original.length<200||original.length>900000)continue;
+     const buf=detected==='svg'?await svgToPng(original):original;
+     const fmt=detected==='svg'?'png':detected;
+     if(buf.length>900000)continue;
      const id=createHash('sha256').update(name).digest('hex').slice(0,15);
      const file='domestic-media/'+id+'-website-brand-candidate.'+fmt;
      writeFileSync('public/'+file,buf);
