@@ -12,17 +12,13 @@
       },
       "photos": [
         {
-          "state": "pending_photo_identity_or_source"
+          "state": "pending_source_reverification"
         },
         {
-          "state": "pending_photo_identity_or_source"
+          "state": "pending_source_reverification"
         },
         {
-          "state": "ready",
-          "path": "domestic-media/e58d8ee59f9fe8a786e8a789e7a791e68a80efbc88e4b88ae6b5b7e-official-caption-0.jpg",
-          "source": "https://www.hascovision.com/Public/Uploads/uploadfile/images/20240628/gongchang-525.jpg",
-          "sourcePage": "https://www.hascovision.com/products-innovation/intelligent-manufacturing",
-          "classification": "official_publisher_caption_not_independently_visual_verified"
+          "state": "pending_source_reverification"
         }
       ]
     },
