@@ -28,3 +28,6 @@ jobs:
           python-version: '3.12'
       - run: python -m unittest discover -s apps/company-match-api -p 'test_*.py' -v
       - run: python -m py_compile apps/company-match-api/server.py
+
+      - run: python -m unittest discover -s apps/job-discovery-api -p 'test_*.py' -v
+      - run: python -m py_compile apps/job-discovery-api/server.py
