@@ -67,6 +67,16 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - name: Install AI preview app
         run: npm ci --prefix apps/web
+      - name: Restore retained company media between deployments
+        id: employer_media_cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            apps/web/public/domestic-media/
+            apps/web/src/data/domesticMediaBundle.json
+          key: hhba-company-media-v2-${{ github.run_id }}
+          restore-keys: |
+            hhba-company-media-v2-
       - name: Discover explicitly captioned office and factory photos on official pages
         working-directory: apps/web
         run: node scripts/discover-official-company-media.mjs
@@ -76,6 +86,13 @@ jobs:
       - name: Bundle reachable, source-tracked employer images
         working-directory: apps/web
         run: node scripts/prepare-domestic-company-media.mjs
+      - name: Preserve successfully downloaded company media
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            apps/web/public/domestic-media/
+            apps/web/src/data/domesticMediaBundle.json
+          key: hhba-company-media-v2-${{ github.run_id }}
       - name: Build enterprise preview with AI API disabled
         env:
           HHBA_GITHUB_PAGES: '1'

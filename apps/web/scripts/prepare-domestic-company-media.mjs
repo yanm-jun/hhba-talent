@@ -3,10 +3,19 @@
 import {readFileSync,writeFileSync,mkdirSync,existsSync} from 'node:fs';
 import {join} from 'node:path';
 const profiles=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
+let older={companies:{}};
+try{older=JSON.parse(readFileSync('src/data/domesticMediaBundle.json','utf8'))}catch{}
+function previousMedia(name,kind,idx,url){
+ const item=kind==='brand'?older.companies?.[name]?.brand:older.companies?.[name]?.photos?.[idx];
+ if(item?.state!=='ready'||item.source!==url)return null;
+ if(!/^domestic-media\/[a-zA-Z0-9._-]+\.(?:png|jpg|webp|gif|ico)$/.test(item.path||''))return null;
+ return existsSync('public/'+item.path)?item:null;
+}
+
 const directory='public/domestic-media';
 mkdirSync(directory,{recursive:true});
 const manifest={version:1,generatedAt:new Date().toISOString(),companies:{}};
-const stats={employers:Object.keys(profiles).length,brandSucceeded:0,brandFailed:0,photoSucceeded:0,photoFailed:0,files:0,bytes:0};
+const stats={employers:Object.keys(profiles).length,brandSucceeded:0,brandFailed:0,photoSucceeded:0,photoFailed:0,cacheReused:0,files:0,bytes:0};
 const extFor=(buffer)=>{
  if(buffer.length>=4&&buffer[0]===0x89&&buffer[1]===0x50&&buffer[2]===0x4e&&buffer[3]===0x47)return 'png';
  if(buffer.length>=3&&buffer[0]===0xff&&buffer[1]===0xd8&&buffer[2]===0xff)return 'jpg';
@@ -50,13 +59,21 @@ for(const [name,p] of Object.entries(profiles)){
   manifest.companies[name].brand={state:'ready',path:p.brandLocalPath,source:p.brandImage,
    classification:'official_site_brand_candidate_not_visually_verified'};
   stats.brandSucceeded++;
- }else if(p.brandImage)jobs.push({name,kind:'brand',idx:0,url:p.brandImage,key:key+'-brand'});
+ }else if(p.brandImage){
+  const cached=previousMedia(name,'brand',0,p.brandImage);
+  if(cached){manifest.companies[name].brand=cached;stats.brandSucceeded++;stats.cacheReused++;}
+  else jobs.push({name,kind:'brand',idx:0,url:p.brandImage,key:key+'-brand'});
+ }
  (p.photos||[]).forEach((photo,idx)=>{
   if(photo.localPath&&/^domestic-media\/[a-zA-Z0-9._-]+\.(?:png|jpg|webp|gif)$/.test(photo.localPath)&&existsSync('public/'+photo.localPath)){
    manifest.companies[name].photos[idx]={state:'ready',path:photo.localPath,source:photo.url,
     sourcePage:photo.source,classification:'official_publisher_caption_not_independently_visual_verified'};
    stats.photoSucceeded++;
-  }else jobs.push({name,kind:'photo',idx,url:photo.url,key:key+'-photo-'+idx});
+  }else{
+   const cached=previousMedia(name,'photo',idx,photo.url);
+   if(cached){manifest.companies[name].photos[idx]=cached;stats.photoSucceeded++;stats.cacheReused++;}
+   else jobs.push({name,kind:'photo',idx,url:photo.url,key:key+'-photo-'+idx});
+  }
  });
 }
 let cursor=0;

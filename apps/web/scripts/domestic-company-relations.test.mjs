@@ -218,3 +218,14 @@ test('official-site brand candidate discovery never marks a logo human-verified'
  const prep=readFileSync('scripts/prepare-domestic-company-media.mjs','utf8');
  assert(prep.includes('official_site_brand_candidate_not_visually_verified'));
 });
+
+test('previously verified local media survives transient official-site outages',()=>{
+ const source=readFileSync('scripts/prepare-domestic-company-media.mjs','utf8');
+ const workflow=readFileSync('../../.github/workflows/hhba-ai-enterprise-pages-preview.yml','utf8');
+ assert(source.includes("function previousMedia(name,kind,idx,url)"));
+ assert(source.includes("item.source!==url"),'Cached files must be bound to their original company source URL');
+ assert(source.includes("existsSync('public/'+item.path)"));
+ assert(source.includes("stats.cacheReused++"));
+ assert(workflow.includes("actions/cache/restore@v4"));
+ assert(workflow.includes("actions/cache/save@v4"));
+});
