@@ -90,9 +90,8 @@ try{
  await desktop.locator('.domestic-profile-relations summary').click();
  await desktop.locator('.domestic-relations-inside').getByRole('link',{name:/华域汽车/}).click();
  await desktop.getByRole('heading',{name:'华域汽车'}).waitFor();
- await desktop.locator('.domestic-profile-relations summary').click();
- await desktop.locator('.domestic-relations-inside').getByRole('link',{name:/上汽集团/}).click();
- await desktop.getByRole('heading',{name:'上汽集团'}).waitFor();
+ // The group section remains compact and collapsed on each independently navigable company profile.
+ assert.equal(await desktop.locator('.domestic-profile-relations details[open]').count(),0);
  assert.deepEqual(errors,[]);
  console.log('HHBA_REAL_ATS_MARKET_AND_ORIGINAL_LAYOUT_BROWSER_PASS',expected);
 }finally{await browser?.close();server.kill('SIGTERM');}
