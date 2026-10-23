@@ -24,3 +24,10 @@
 .hhba-search-mode{max-width:1120px;margin:30px auto 0;padding:0 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .hhba-search-mode button{border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--muted);padding:10px 15px;font-size:13px;font-weight:650;cursor:pointer}
 .hhba-search-mode button[aria-pressed=true]{background:#215d46;color:#fff;border-color:#215d46}
+
+/* Clearly separated offline demo; never style it as a live AI answer. */
+.ai-company-demo-banner{display:flex;align-items:flex-start;gap:8px;border:1px solid #d5e4da;border-radius:9px;background:#f1f7f2;padding:12px 14px;color:#355c44;font-size:13px;line-height:1.7;margin:16px 0}
+.ai-company-demo-banner svg{flex:none;margin-top:3px}
+.ai-company-demo-actions small{font-size:12px;color:var(--muted);line-height:1.7}
+.ai-company-card small{display:block;color:var(--muted);margin:8px 0;font-size:11px}
+.ai-company-browse-grid a{color:var(--ink);text-decoration:none}
