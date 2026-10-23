@@ -1,4 +1,4 @@
-import {useMemo,useState} from 'react';
+import {useEffect,useMemo,useState} from 'react';
 import {ArrowLeft,ArrowRight,ExternalLink,Building2,ShieldCheck,ChevronDown,ImageOff} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,getCompanyReturnTarget} from '../router';
@@ -25,6 +25,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
  const company=useMemo(()=>companyById(all,id),[all,id]);
  const [imageFailed,setImageFailed]=useState(false);
  const [filter,setFilter]=useState('');
+ useEffect(()=>{setFilter('');setImageFailed(false)},[id]);
  const back=getCompanyReturnTarget();
  const parent=company?findParentCompany(all,company):null;
  const related=company?findRelatedCompanies(all,company):[];
@@ -74,7 +75,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
        <p className="domestic-editorial-limited">尚未核验该主体可直接访问的官方招聘渠道，不提供猜测的网址。</p>}
     </section>
     <section className="domestic-editorial-section domestic-editorial-sources" aria-label="资料来源">
-      <details className="domestic-company-sources">
+      <details className="domestic-company-sources" key={"sources-"+company.id}>
        <summary>资料来源与核验说明 <ChevronDown size={15}/></summary>
        <div>{httpsLink(article?.officialSource||company.sourceUrl)&&<a href={httpsLink(article?.officialSource||company.sourceUrl)} target="_blank" rel="noopener noreferrer">企业公开资料 <ExternalLink size={13}/></a>}
        {article?.productSource&&<a href={article.productSource} target="_blank" rel="noopener noreferrer">公开产品资料 <ExternalLink size={13}/></a>}
@@ -84,7 +85,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       </details>
     </section>
     {(parent||related.length>0)&&<section className="domestic-editorial-section domestic-profile-relations" aria-label="企业关系">
-      <details>
+      <details key={"relations-"+company.id}>
        <summary>企业关系 <span>按需查看</span><ChevronDown size={16}/></summary>
        <div className="domestic-relations-inside">
         {parent&&<p>所属或关联主体：<Link to={parent.route}>{parent.name} <ArrowRight size={13}/></Link> <small>· {company.relationLabel||'关联关系'}</small></p>}
