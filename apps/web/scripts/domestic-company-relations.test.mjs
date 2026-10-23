@@ -34,7 +34,7 @@ test('child cards remain within HHBA before external careers links',()=>{
  assert(src.includes('findRelatedCompanies'));
  assert(src.includes('to={item.route}'));
  assert(src.includes('matchingMajors'));
- assert(src.includes('<details>'),'Group relations should be collapsed until requested');
+ assert(src.includes('key={"relations-"+company.id}'),'Group relations must start collapsed for each company route');
  assert(src.includes('/majors/'),'Related majors should be navigable');
  assert(src.includes('article?.careersUrl||company.careers'),'Verified independent portal should override historical inherited portal');
  const reviewed=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
