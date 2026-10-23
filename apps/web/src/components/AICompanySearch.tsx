@@ -15,7 +15,7 @@ function endpoint(){
 }
 const normalize=(text:string)=>text.trim().toLocaleLowerCase();
 const candidates:Company[]=catalog.companies;
-function safeCareer(url?:string){
+function safeCareer(url?:string|null){
  if(!url)return '';
  try{const u=new URL(url);return u.protocol==='https:'&&!u.username&&!u.password?u.href:'';}catch{return ''}
 }
