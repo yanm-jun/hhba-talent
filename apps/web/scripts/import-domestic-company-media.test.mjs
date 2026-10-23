@@ -25,22 +25,24 @@ test('JPEG logo, PNG office photo and JPG screenshot import with no original pho
   writeFileSync(path.join(folder,'logo.jpg'),await sharp(input).jpeg().toBuffer());
   writeFileSync(path.join(folder,'office-1.png'),await sharp(input).png().toBuffer());
   writeFileSync(path.join(folder,'screenshot-1.jpeg'),await sharp(input).jpeg().toBuffer());
+  writeFileSync(path.join(folder,'微信图片_20261023.jpg'),await sharp(input).jpeg().toBuffer());
+  writeFileSync(path.join(folder,'公司总部大楼.png'),await sharp(input).png().toBuffer());
   const first=await run(process.execPath,[currentScript],{cwd:work,timeout:25000});
   assert.match(first.stdout,/HHBA_USER_MEDIA_IMPORT/);
   let p=json(path.join(work,'src/data/domesticCareerProfiles.json'))[company];
   let b=json(path.join(work,'src/data/domesticMediaBundle.json')).companies[company];
   assert.equal(p.brandAssetStatus,'user_provided_logo_pending_identity');
   assert.equal(b.brand.state,'ready');
-  assert.equal(p.photos.length,2);
-  assert.deepEqual(new Set(p.photos.map(x=>x.kind)),new Set(['office','screenshot']));
+  assert.equal(p.photos.length,4);
+  assert.deepEqual(new Set(p.photos.map(x=>x.kind)),new Set(['office','screenshot','headquarters']));
   assert.ok(p.photos.every(x=>x.source==='user_submission'&&x.localPath.startsWith('domestic-media/')));
   assert.ok(p.photos.every(x=>existsSync(path.join(work,'public',x.localPath))));
-  assert.equal(b.photos.filter(x=>x.state==='ready').length,2);
+  assert.equal(b.photos.filter(x=>x.state==='ready').length,4);
   assert.ok(existsSync(path.join(work,'public',b.brand.path)));
   // Repeated pipeline builds must be idempotent rather than duplicate photos.
   await run(process.execPath,[currentScript],{cwd:work,timeout:25000});
   p=json(path.join(work,'src/data/domesticCareerProfiles.json'))[company];
-  assert.equal(p.photos.length,2);
+  assert.equal(p.photos.length,4);
   // User confirmation upgrades identity evidence without requiring SVG/HTTPS.
   writeFileSync(path.join(folder,'sources.json'),JSON.stringify({confirmedCompany:company}));
   await run(process.execPath,[currentScript],{cwd:work,timeout:25000});
