@@ -9,6 +9,7 @@ on:
       - 'apps/web/src/components/UnifiedJobMarket.tsx'
       - 'apps/web/src/pages/HomePage.tsx'
       - 'apps/web/src/services/liveRecruitment.ts'
+      - 'apps/web/src/styles/unified-jobs.css'
       - 'apps/web/scripts/prepare-three-employers.mjs'
       - 'apps/web/src/styles/ai-company-search.css'
   workflow_dispatch:
