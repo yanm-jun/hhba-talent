@@ -1,1 +1,463 @@
-{"version":1,"generatedAt":"not_generated","companies":{}}
+{
+  "version": 1,
+  "generatedAt": "2026-10-23T13:01:18.680Z",
+  "companies": {
+    "华域视觉科技（上海）有限公司": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/e58d8ee59f9fe8a786e8a789e7a791e68a80efbc88e4b88ae6b5b7efbc89e69c89e99990e585ace58fb8-brand.png",
+        "bytes": 115284,
+        "source": "https://gpms.hascovision.com/GPMS/resource/images/logo_h.png",
+        "classification": "logo_identity_checked"
+      },
+      "photos": [
+        {
+          "state": "pending_photo_identity_or_source"
+        },
+        {
+          "state": "pending_photo_identity_or_source"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/e58d8ee59f9fe8a786e8a789e7a791e68a80efbc88e4b88ae6b5b7e-official-caption-0.jpg",
+          "source": "https://www.hascovision.com/Public/Uploads/uploadfile/images/20240628/gongchang-525.jpg",
+          "sourcePage": "https://www.hascovision.com/products-innovation/intelligent-manufacturing",
+          "classification": "official_publisher_caption_not_independently_visual_verified"
+        }
+      ]
+    },
+    "华域汽车": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/e58d8ee59f9fe6b1bde8bda6-brand.png",
+        "bytes": 40266,
+        "source": "https://www.hasco-group.com/uploads/20190408161935.png",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "上汽集团": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/a07a4a962c51878-website-brand-candidate.png",
+        "source": "https://www.saicmotor.com/chinese/images/logos/2025/1.png",
+        "classification": "official_site_brand_candidate_not_visually_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/e4b88ae6b1bde99b86e59ba2-photo-0.webp",
+          "bytes": 33670,
+          "source": "https://www.saicmotor.com/chinese/images/xwzx/mtbd/2025/2025/4/9/9A7452D93ABC496D97C8725C5A980401.jpg",
+          "sourcePage": "https://www.saicmotor.com/chinese/xwzx/mtbd/2025/61304.shtml"
+        }
+      ]
+    },
+    "汇川技术": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/e6b187e5b79de68a80e69caf-brand.png",
+        "bytes": 85563,
+        "source": "https://portal-oss.zhiye.com/231679/image/95a3212e-6fb7-47d4-9b6e-edadbfe1e294.png",
+        "classification": "logo_identity_checked"
+      },
+      "photos": []
+    },
+    "中国中车": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/159d05469a676ad-website-brand-candidate.png",
+        "source": "https://www.crrcgc.cc/Portals/71/Skins/crrcgc-index/images/logo.png",
+        "classification": "official_site_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "美的集团": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/e7be8ee79a84e99b86e59ba2-brand.png",
+        "bytes": 14755,
+        "source": "https://cdn-apac.onetrust.com/logos/6fd01f34-9727-4df4-951a-f14b383f7ab6/b9622b14-80ea-41e5-ab50-e00618507aa8/54f906dc-b00f-4d35-a03e-b3e0782e45ac/Midea_Logo_%E7%95%99%E7%99%BD.png",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "雷赛智能": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/99b6396dc634834-website-brand-candidate.png",
+        "source": "https://www.leisai.com/static/cn/img/header_logo.png",
+        "classification": "official_site_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "正泰电器": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/e6ada3e6b3b0e794b5e599a8-brand.jpg",
+        "bytes": 34972,
+        "source": "https://en.miracletech.com/media_library/image_20251013170129OFKX.JPEG",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "英威腾": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/14107a82c4f0575-website-brand-candidate.png",
+        "source": "https://www.invt.com.cn/application/home/view/default/images/a_logo2.png",
+        "classification": "official_site_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "思源电气": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/e6809de6ba90e794b5e6b094-brand.png",
+        "bytes": 42149,
+        "source": "https://pbs.twimg.com/profile_images/1121308964975591429/G3LvwCKG_400x400.png",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "许继电气": {
+      "brand": {
+        "state": "timeout",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "国电南瑞": {
+      "brand": {
+        "state": "blocked_or_network",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "埃斯顿": {
+      "brand": {
+        "state": "blocked_or_network",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "德赛西威": {
+      "brand": {
+        "state": "timeout",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "京东方Ａ": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/ef46316c30c0d3d-website-brand-candidate.png",
+        "source": "https://boe.com/nuxt/resouces/img/logo.8bcbfe7.png",
+        "classification": "official_site_brand_candidate_not_visually_verified"
+      },
+      "photos": [
+        {
+          "state": "pending_photo_identity_or_source"
+        },
+        {
+          "state": "pending_photo_identity_or_source"
+        }
+      ]
+    },
+    "歌尔股份": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/f369cdb6bcf3967-website-brand-candidate.png",
+        "source": "https://goertek.com/images/logo.png",
+        "classification": "official_site_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "中兴通讯": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/797301040f88850-website-brand-candidate.png",
+        "source": "https://zte.com.cn/content/dam/zte-site/res-www-zte-com-cn/navigator/global/main/img/logo-en.png",
+        "classification": "official_site_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "兆易创新": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "隆基绿能": {
+      "brand": {
+        "state": "blocked_or_network",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "亿纬锂能": {
+      "brand": {
+        "state": "timeout",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": [
+        {
+          "state": "http_404",
+          "sourcePage": "https://www.evebattery.com/about"
+        },
+        {
+          "state": "http_404",
+          "sourcePage": "https://www.evebattery.com/about"
+        },
+        {
+          "state": "http_404",
+          "sourcePage": "https://www.evebattery.com/about"
+        },
+        {
+          "state": "http_404",
+          "sourcePage": "https://www.evebattery.com/about"
+        },
+        {
+          "state": "http_404",
+          "sourcePage": "https://www.evebattery.com/advanced-manufacturing"
+        }
+      ]
+    },
+    "福耀玻璃": {
+      "brand": {
+        "state": "blocked_or_network",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "紫光股份": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/24f60a574cd0258-website-brand-candidate.png",
+        "source": "https://unis.cn/images/header/logo.png",
+        "classification": "official_site_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "海尔智家": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/e6b5b7e5b094e699bae5aeb6-brand.ico",
+        "bytes": 1150,
+        "source": "https://haier.com/favicon.ico",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "阳光电源": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/e998b3e58589e794b5e6ba90-brand.ico",
+        "bytes": 9662,
+        "source": "https://sungrowpower.com/favicon.ico",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/e998b3e58589e794b5e6ba90-photo-0.webp",
+          "bytes": 22338,
+          "source": "https://official-oversears-file.sungrowpower.com/news-images/c0981ae7-a998-433b-b9b4-78127ea55996.png",
+          "sourcePage": "https://www.sungrowpower.com/demo/zh/products/string-inverter"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/e998b3e58589e794b5e6ba90-photo-1.webp",
+          "bytes": 73282,
+          "source": "https://fra.sungrowpower.com/upload/6385632548369337056336172.jpg",
+          "sourcePage": "https://fra.sungrowpower.com/AboutSungrow"
+        }
+      ]
+    },
+    "海康机器人": {
+      "brand": {
+        "state": "blocked_or_network",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "立讯精密": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "宁德时代": {
+      "brand": {
+        "state": "timeout",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/e5ae81e5beb7e697b6e4bba3-photo-0.webp",
+          "bytes": 93600,
+          "source": "https://www.catl.com/uploads/1/image/public/202008/20200818161807_q641cuoh2y.png",
+          "sourcePage": "https://www.catl.com/about/profile/"
+        }
+      ]
+    },
+    "海康威视": {
+      "brand": {
+        "state": "timeout",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "北方华创": {
+      "brand": {
+        "state": "blocked_or_network",
+        "classification": "site_icon_or_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "华安证券": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "广发证券": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "中信证券": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "东方证券": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "华泰证券": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "光大证券": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "比亚迪": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/c580a626b8f7287-website-brand-candidate.png",
+        "source": "https://www.bydglobal.com/material/group-official-website/common/logo.png",
+        "classification": "official_site_brand_candidate_not_visually_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/e6af94e4ba9ae8bfaa-official-caption-0.jpg",
+          "source": "https://www.bydglobal.com/material/group-official-website/cn/about/pinpai.jpg",
+          "sourcePage": "https://www.bydglobal.com/cn/about.html",
+          "classification": "official_publisher_caption_not_independently_visual_verified"
+        }
+      ]
+    },
+    "中国平安": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "贵州茅台": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "格力电器": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "浦发银行": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "招商银行": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "海天味业": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/47c958dedacd8cd-website-brand-candidate.png",
+        "source": "https://static.haday.com/zh-cn/img/logo.png",
+        "classification": "official_site_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "中国建筑": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "上海机场": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "伊利股份": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "农业银行": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "建设银行": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "中国银行": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/caf76992859b35e-website-brand-candidate.gif",
+        "source": "https://www.boc.cn/images/LOGO-AGACCS.gif",
+        "classification": "official_site_brand_candidate_not_visually_verified"
+      },
+      "photos": []
+    },
+    "中国移动": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    },
+    "中国电信": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": []
+    }
+  }
+}

@@ -56,6 +56,14 @@
         "url": "https://www.hascovision.com/Public/Uploads/uploadfile/images/20240318/tu215.png",
         "label": "华域视觉官网 · 企业参展实景",
         "source": "https://www.hascovision.com/news/company-news"
+      },
+      {
+        "url": "https://www.hascovision.com/Public/Uploads/uploadfile/images/20240628/gongchang-525.jpg",
+        "label": "华域视觉官网：嘉定数字化工厂",
+        "kind": "factory",
+        "source": "https://www.hascovision.com/products-innovation/intelligent-manufacturing",
+        "localPath": "domestic-media/e58d8ee59f9fe8a786e8a789e7a791e68a80efbc88e4b88ae6b5b7e-official-caption-0.jpg",
+        "verification": "official_page_caption_not_human_reviewed"
       }
     ],
     "lastReviewed": "2026-10-23",
@@ -189,7 +197,7 @@
     "careersLabel": "上汽集团统一招聘系统",
     "officialSource": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
     "productSource": "https://www.saicmotor.com/chinese/gsgk/qyml/index.shtml",
-    "brandImage": "https://commons.wikimedia.org/wiki/Special:Redirect/file/SAICMotor_logo.png",
+    "brandImage": "https://www.saicmotor.com/chinese/images/logos/2025/1.png",
     "photos": [
       {
         "url": "https://www.saicmotor.com/chinese/images/xwzx/mtbd/2025/2025/4/9/9A7452D93ABC496D97C8725C5A980401.jpg",
@@ -201,7 +209,7 @@
     ],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
-    "brandImageSource": "https://commons.wikimedia.org/wiki/File:SAICMotor_logo.png",
+    "brandImageSource": "https://www.saicmotor.com/",
     "photoSourcePage": "https://www.saicmotor.com/chinese/xwzx/mtbd/2025/61304.shtml",
     "photoSourceLabel": "查看上汽集团官网的企业建筑图片原文",
     "recruitmentEvidenceUrl": "https://saic-recruit.saicmotor.com/",
@@ -212,7 +220,10 @@
     "subIndustry": "整车制造 · 汽车零部件 · 新能源与智能出行",
     "industryEvidenceUrl": "https://www.saicmotor.com/chinese/gsgk/gsjs/index.shtml",
     "industry": "汽车与零部件",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "brandLocalPath": "domestic-media/a07a4a962c51878-website-brand-candidate.png",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
   },
   "汇川技术": {
     "displayName": "汇川技术",
@@ -325,11 +336,11 @@
     "careersLabel": "中国中车招聘云平台",
     "officialSource": "https://www.crrcgc.cc/eportal/ui?pageId=714829",
     "productSource": "https://www.crrcgc.cc/sj/",
-    "brandImage": "https://bjhrckj.com/static/upload/image/20250220/1740056632200426.jpg",
+    "brandImage": "https://www.crrcgc.cc/Portals/71/Skins/crrcgc-index/images/logo.png",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
-    "brandImageSource": "https://bjhrckj.com/?list_38%2F112.html",
+    "brandImageSource": "https://www.crrcgc.cc/",
     "photoSourcePage": "https://www.crrcgc.cc/eportal/ui?pageId=714829",
     "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
     "recruitmentEvidenceUrl": "https://crrc.hotjob.cn/SU64d47c466202cc36e27a52d4/pb/news.html?pageType=0",
@@ -340,7 +351,10 @@
     "subIndustry": "轨道交通装备 · 电力机车 · 机电与智能制造",
     "industryEvidenceUrl": "https://www.crrcgc.cc/eportal/ui?pageId=714829",
     "industry": "工业自动化与工业装备",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "brandLocalPath": "domestic-media/159d05469a676ad-website-brand-candidate.png",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
   },
   "美的集团": {
     "displayName": "美的集团",
@@ -447,8 +461,8 @@
     "careersLabel": "雷赛智能官方招聘",
     "officialSource": "https://www.leisai.com/groupIntroduction.html",
     "productSource": "https://www.leisai.com/",
-    "brandImage": "https://cdn.luvbotics.com/homepage/assets/images/friend4_leadshine.png",
-    "brandImageSource": "https://www.luvbotics.com/homepage/",
+    "brandImage": "https://www.leisai.com/static/cn/img/header_logo.png",
+    "brandImageSource": "https://www.leisai.com/",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
@@ -463,7 +477,10 @@
     "extraBusinessEvidenceUrl": "https://www.leisai.com/groupIntroduction.html",
     "recruitmentEvidenceUrl": "https://www.leisai.com/groupIntroduction.html",
     "recruitmentVerifiedAt": "2026-10-23",
-    "recruitmentEntity": "雷赛智能"
+    "recruitmentEntity": "雷赛智能",
+    "brandLocalPath": "domestic-media/99b6396dc634834-website-brand-candidate.png",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
   },
   "正泰电器": {
     "displayName": "正泰电器",
@@ -571,11 +588,11 @@
     "careersLabel": "英威腾校园／社会招聘入口",
     "officialSource": "https://www.invt.com.cn/",
     "productSource": "https://www.invt.com.cn/",
-    "brandImage": "https://img.phb123.com/uploads/allimg/220827/810-220RGH5580-L.png",
+    "brandImage": "https://www.invt.com.cn/application/home/view/default/images/a_logo2.png",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
-    "brandImageSource": "https://www.phb123.com/bk/qiye/2163.html",
+    "brandImageSource": "https://www.invt.com.cn/",
     "photoSourcePage": "https://www.invt.com.cn/",
     "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
     "recruitmentStatus": "normal",
@@ -587,7 +604,10 @@
     "extraBusinessEvidenceUrl": "https://www.invt.com.cn/careers",
     "recruitmentEvidenceUrl": "https://www.invt.com.cn/careers",
     "recruitmentVerifiedAt": "2026-10-23",
-    "recruitmentEntity": "英威腾"
+    "recruitmentEntity": "英威腾",
+    "brandLocalPath": "domestic-media/14107a82c4f0575-website-brand-candidate.png",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
   },
   "思源电气": {
     "displayName": "思源电气",
@@ -747,9 +767,9 @@
     "careersLabel": "",
     "officialSource": "https://www.pinggao.com/about/company.html",
     "productSource": "https://pinggao.com",
-    "brandImage": "",
-    "brandImageSource": "https://pinggao.com",
-    "brandAssetStatus": "bad_http_response_needs_replacement",
+    "brandImage": "https://pinggao.com/static/cn/images/logo.png",
+    "brandImageSource": "https://pinggao.com/",
+    "brandAssetStatus": "official_website_logo_candidate",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
@@ -762,7 +782,9 @@
     "primaryIndustry": "电力设备与智能电网",
     "subIndustry": "高压开关设备",
     "industryEvidenceUrl": "https://www.pinggao.com/about/company.html",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "brandLocalPath": "domestic-media/f762632cf1ca43d-website-brand-candidate.png",
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
   },
   "国电南瑞": {
     "displayName": "国电南瑞",
@@ -1105,9 +1127,9 @@
     "careersLabel": "京东方社会招聘",
     "officialSource": "https://www.boe.com/about/index",
     "productSource": "https://boe.com",
-    "brandImage": "https://boe.com/favicon.ico",
-    "brandImageSource": "https://www.boe.com/about/brandIdentity",
-    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "brandImage": "https://boe.com/nuxt/resouces/img/logo.8bcbfe7.png",
+    "brandImageSource": "https://boe.com/",
+    "brandAssetStatus": "official_website_logo_candidate",
     "photos": [
       {
         "url": "https://boe-official01.oss-cn-beijing.aliyuncs.com/jpg/list011606287766299boe.jpg",
@@ -1135,7 +1157,9 @@
     "subIndustry": "显示技术",
     "industryEvidenceUrl": "https://www.boe.com/about/index",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
-    "extraBusinessEvidenceUrl": "https://www.boe.com/about/index"
+    "extraBusinessEvidenceUrl": "https://www.boe.com/about/index",
+    "brandLocalPath": "domestic-media/ef46316c30c0d3d-website-brand-candidate.png",
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
   },
   "歌尔股份": {
     "displayName": "歌尔股份",
@@ -1180,9 +1204,9 @@
     "careersLabel": "歌尔股份官方招聘栏目",
     "officialSource": "https://www.goertek.com/about/intro.html",
     "productSource": "https://goertek.com",
-    "brandImage": "",
-    "brandImageSource": "https://goertek.com",
-    "brandAssetStatus": "bad_http_response_needs_replacement",
+    "brandImage": "https://goertek.com/images/logo.png",
+    "brandImageSource": "https://goertek.com/",
+    "brandAssetStatus": "official_website_logo_candidate",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
@@ -1200,7 +1224,9 @@
     "recruitmentVerifiedAt": "2026-10-23",
     "recruitmentStatus": "normal",
     "recruitmentEntity": "歌尔股份",
-    "extraBusinessEvidenceUrl": "https://www.goertek.com/join/recruitcategory144.html"
+    "extraBusinessEvidenceUrl": "https://www.goertek.com/join/recruitcategory144.html",
+    "brandLocalPath": "domestic-media/f369cdb6bcf3967-website-brand-candidate.png",
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
   },
   "中兴通讯": {
     "displayName": "中兴通讯",
@@ -1245,9 +1271,9 @@
     "careersLabel": "中兴通讯招聘",
     "officialSource": "https://www.zte.com.cn/china/about/investorrelations.html",
     "productSource": "https://zte.com.cn",
-    "brandImage": "https://zte.com.cn/favicon.ico",
-    "brandImageSource": "https://zte.com.cn",
-    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "brandImage": "https://zte.com.cn/content/dam/zte-site/res-www-zte-com-cn/navigator/global/main/img/logo-en.png",
+    "brandImageSource": "https://zte.com.cn/",
+    "brandAssetStatus": "official_website_logo_candidate",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
@@ -1262,7 +1288,9 @@
     "primaryIndustry": "半导体与数字科技",
     "subIndustry": "无线通信",
     "industryEvidenceUrl": "https://www.zte.com.cn/china/about/investorrelations.html",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "brandLocalPath": "domestic-media/797301040f88850-website-brand-candidate.png",
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
   },
   "科大讯飞": {
     "displayName": "科大讯飞",
@@ -1484,9 +1512,9 @@
     "careersLabel": "",
     "officialSource": "https://www.ieisystem.com/about/",
     "productSource": "https://ieisystem.com",
-    "brandImage": "https://ieisystem.com/favicon.ico",
-    "brandImageSource": "https://ieisystem.com",
-    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "brandImage": "https://www.ieisystem.com/global/template/images/logo.png",
+    "brandImageSource": "https://ieisystem.com/",
+    "brandAssetStatus": "official_website_logo_candidate",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
@@ -1497,7 +1525,9 @@
     "primaryIndustry": "半导体与数字科技",
     "subIndustry": "服务器与AI算力",
     "industryEvidenceUrl": "https://www.ieisystem.com/about/",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "brandLocalPath": "domestic-media/fe44c3909bf328e-website-brand-candidate.png",
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
   },
   "隆基绿能": {
     "displayName": "隆基绿能",
@@ -1854,9 +1884,9 @@
     "careersLabel": "",
     "officialSource": "https://www.unis.cn/about.htm",
     "productSource": "https://unis.cn",
-    "brandImage": "",
-    "brandImageSource": "https://unis.cn",
-    "brandAssetStatus": "bad_http_response_needs_replacement",
+    "brandImage": "https://unis.cn/images/header/logo.png",
+    "brandImageSource": "https://unis.cn/",
+    "brandAssetStatus": "official_website_logo_candidate",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
@@ -1869,7 +1899,9 @@
     "primaryIndustry": "半导体与数字科技",
     "subIndustry": "网络与安全",
     "industryEvidenceUrl": "https://www.unis.cn/about.htm",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "brandLocalPath": "domestic-media/24f60a574cd0258-website-brand-candidate.png",
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
   },
   "海尔智家": {
     "displayName": "海尔智家",
@@ -2358,9 +2390,9 @@
     "careersLabel": "",
     "officialSource": "https://www.sanygroup.com/introduction/",
     "productSource": "https://sanygroup.com",
-    "brandImage": "https://sanygroup.com/favicon.ico",
-    "brandImageSource": "https://sanygroup.com",
-    "brandAssetStatus": "official_domain_favicon_unverified_visual",
+    "brandImage": "https://sanygroup.com/img/sany-logo.png",
+    "brandImageSource": "https://sanygroup.com/",
+    "brandAssetStatus": "official_website_logo_candidate",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
@@ -2371,7 +2403,9 @@
     "primaryIndustry": "工业自动化与工业装备",
     "subIndustry": "工程机械",
     "industryEvidenceUrl": "https://www.sanygroup.com/introduction/",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "brandLocalPath": "domestic-media/d5adb014d4d826f-website-brand-candidate.png",
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
   },
   "海康威视": {
     "displayName": "海康威视",
@@ -2947,10 +2981,19 @@
     "officialSource": "https://www.bydglobal.com/cn/about.html",
     "productSource": "https://www.bydglobal.com/cn/about.html",
     "website": "https://www.bydglobal.com/cn",
-    "brandImage": "",
-    "brandAssetStatus": "pending_official_logo",
-    "brandImageSource": "",
-    "photos": [],
+    "brandImage": "https://www.bydglobal.com/material/group-official-website/common/logo.png",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "brandImageSource": "https://www.bydglobal.com/",
+    "photos": [
+      {
+        "url": "https://www.bydglobal.com/material/group-official-website/cn/about/pinpai.jpg",
+        "label": "比亚迪官网汽车品牌及产品展示",
+        "kind": "product",
+        "source": "https://www.bydglobal.com/cn/about.html",
+        "localPath": "domestic-media/e6af94e4ba9ae8bfaa-official-caption-0.jpg",
+        "verification": "official_page_caption_not_human_reviewed"
+      }
+    ],
     "photoSourcePage": "https://www.bydglobal.com/cn/about.html",
     "photoSourceLabel": "查看官方网站（图片尚待核实）",
     "lastReviewed": "2026-10-23",
@@ -2970,7 +3013,9 @@
     "primaryIndustry": "汽车与零部件",
     "subIndustry": "新能源汽车、电子、新能源与轨道交通四大产业",
     "industryEvidenceUrl": "https://www.bydglobal.com/cn/about.html",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "brandLocalPath": "domestic-media/c580a626b8f7287-website-brand-candidate.png",
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
   },
   "中国平安": {
     "displayName": "中国平安",
@@ -3349,9 +3394,9 @@
     "officialSource": "https://www.haday.com/about.html",
     "productSource": "https://www.haday.com/about.html",
     "website": "https://www.haday.com",
-    "brandImage": "",
-    "brandAssetStatus": "pending_official_logo",
-    "brandImageSource": "",
+    "brandImage": "https://static.haday.com/zh-cn/img/logo.png",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "brandImageSource": "https://www.haday.com/",
     "photos": [],
     "photoSourcePage": "https://www.haday.com/about.html",
     "photoSourceLabel": "查看官方网站（图片尚待核实）",
@@ -3372,7 +3417,9 @@
     "primaryIndustry": "食品饮料",
     "subIndustry": "调味品研发、食品制造与品牌经营",
     "industryEvidenceUrl": "https://www.haday.com/about.html",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "brandLocalPath": "domestic-media/47c958dedacd8cd-website-brand-candidate.png",
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
   },
   "中国建筑": {
     "displayName": "中国建筑",
@@ -3749,9 +3796,9 @@
     "officialSource": "https://www.boc.cn/aboutboc/ab1/200809/t20080901_985.html",
     "productSource": "https://www.boc.cn/aboutboc/ab1/200809/t20080901_985.html",
     "website": "https://www.boc.cn",
-    "brandImage": "",
-    "brandAssetStatus": "pending_official_logo",
-    "brandImageSource": "",
+    "brandImage": "https://www.boc.cn/images/LOGO-AGACCS.gif",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "brandImageSource": "https://www.boc.cn/",
     "photos": [],
     "photoSourcePage": "https://www.boc.cn/aboutboc/ab1/200809/t20080901_985.html",
     "photoSourceLabel": "查看官方网站（图片尚待核实）",
@@ -3772,7 +3819,9 @@
     "primaryIndustry": "金融服务",
     "subIndustry": "商业银行、国际结算及跨境综合金融",
     "industryEvidenceUrl": "https://www.boc.cn/aboutboc/ab1/200809/t20080901_985.html",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "brandLocalPath": "domestic-media/caf76992859b35e-website-brand-candidate.gif",
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
   },
   "中国移动": {
     "displayName": "中国移动",
