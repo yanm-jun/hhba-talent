@@ -15,7 +15,7 @@ const svgToPng=async(source)=>{
  const markup=source.toString('utf8');
  if(!/<svg[\s>]/i.test(markup.slice(0,1000)))throw Error('invalid_svg');
  // Fail closed on XML entity expansion, script and remotely referenced content.
- if(/<!DOCTYPE|<!ENTITY|<script\b|<foreignObject\b|\son[a-z]+\s*=|(?:xlink:)?href\s*=\s*["'](?:https?:|data:|javascript:|\/\/)/i.test(markup))throw Error('unsafe_svg');
+ if(/<!DOCTYPE|<!ENTITY|<script\b|<foreignObject\b|<image\b|<use\b|<style\b|@import|url\s*\(|\son[a-z]+\s*=|(?:xlink:)?href\s*=/i.test(markup))throw Error('unsafe_svg');
  const {Resvg}=await import('@resvg/resvg-js');
  return Buffer.from(new Resvg(markup,{fitTo:{mode:'width',value:480}}).render().asPng());
 };
