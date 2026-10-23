@@ -93,7 +93,14 @@ try{
  for(const name of Object.keys(deepProfiles)){
    await searchBox.fill(name);
    const card=desktop.locator('.domestic-company-card').filter({hasText:name}).first();
-   await card.waitFor({timeout:6000});
+   try{await card.waitFor({timeout:5000})}
+   catch(e){
+    console.error('HHBA_EMPLOYER_CARD_NOT_FOUND',name);
+    console.error('SEARCH_VALUE',await searchBox.inputValue());
+    console.error('VISIBLE_CARD_TEXT',JSON.stringify((await desktop.locator('.domestic-company-card').allInnerTexts()).slice(0,8)));
+    console.error('RESULT_NOTE',(await desktop.locator('.domestic-company-result').allInnerTexts()).join(' ').slice(0,350));
+    throw e;
+   }
    const href=await card.getAttribute('href');
    assert(href?.includes('/companies/domestic/'),'Company should route through HHBA: '+name);
    assert(!href.startsWith('https://'),'Company card must not bypass HHBA details: '+name);
