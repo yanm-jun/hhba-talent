@@ -74,12 +74,17 @@ jobs:
           node --check scripts/discover-official-company-media.mjs
           node --check scripts/discover-official-brand-candidates.mjs
           node --check scripts/prepare-domestic-company-media.mjs
+          node --check scripts/import-domestic-company-media.mjs
+          node --test scripts/import-domestic-company-media.test.mjs
       - name: Discover first-party photos and official-site brand candidates
         working-directory: apps/web
         run: |
           node scripts/discover-official-company-media.mjs
           node scripts/discover-official-brand-candidates.mjs
           node scripts/prepare-domestic-company-media.mjs
+      - name: Import user-provided JPG/PNG office photos and screenshot assets
+        working-directory: apps/web
+        run: node scripts/import-domestic-company-media.mjs
       - name: Verify exact hiring sites and six dimensions without fake completion
         working-directory: apps/web
         run: |
