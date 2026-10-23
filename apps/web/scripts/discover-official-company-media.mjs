@@ -22,6 +22,29 @@ const sources=[
    {match:/^(?:工厂场景)[-—·\s]*京东方B(?:1|4|10)/i,kind:'factory',label:'京东方官网：生产工厂实景'}
   ]}
 ];
+
+// Extend coverage using only the reviewed employer's first-party product/about pages.
+// Never label an uncaptioned or third-party image as its headquarters. A generic
+// decorative banner, logo, partner thumbnail or profile portrait is not a scene.
+const knownSources=new Set(sources.map(x=>x.name));
+const forbiddenHost=/sse\\.com\\.cn|cninfo\\.com\\.cn|zhiye\\.com|hotjob\\.cn|51job\\.com|zhaopin\\.com|gov\\.cn|edu\\.cn/;
+const sceneDescriptors=[
+ {regex:/(?:总部大楼|总部园区|企业园区|办公环境|办公楼|研发中心|研发大楼|办公园区|公司总部|研发总部|办公总部)/,kind:'office',label:'企业官网公开的总部、研发或办公环境'},
+ {regex:/(?:制造基地|生产基地|生产车间|制造车间|智能工厂|数字化工厂|工业厂房|生产厂房|智能制造基地|制造园区)/,kind:'factory',label:'企业官网公开的生产或制造场景'},
+ {regex:/(?:主营产品|产品展示|主要产品|产品中心|业务产品|产品实景|技术产品|产品应用|系统解决方案)/,kind:'product',label:'企业官网公开的业务及产品展示'}
+];
+for(const [name,p] of Object.entries(profiles)){
+ if(knownSources.has(name))continue;
+ const urls=[p.productSource,p.officialSource].filter(Boolean);
+ for(const uri of [...new Set(urls)]){
+  let link;try{link=new URL(uri)}catch{continue}
+  if(link.protocol!=='https:'||forbiddenHost.test(link.hostname))continue;
+  const host=link.hostname.replace(/^www\\./,'');
+  sources.push({name,page:link.href,host:[host,'www.'+host,link.hostname],
+   rules:sceneDescriptors.map(x=>({match:x.regex,kind:x.kind,label:x.label}))});
+ }
+}
+
 function entities(s=''){return s.replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;|&#x27;/gi,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>')}
 function attr(tag,key){const m=tag.match(new RegExp('(?:^|\\s)'+key+'\\s*=\\s*(?:"([^"]*)"|([^\\s>]+))','i'));return entities((m?.[1]||m?.[2]||'').trim())}
 function extFor(buffer){
@@ -50,7 +73,11 @@ for(const source of sources){
    const alt=attr(tag,'alt')||attr(tag,'title');
    const rawLabel=attr(tag,'data-original')||attr(tag,'data-src')||attr(tag,'src');
    let basename='';try{basename=decodeURIComponent(new URL(rawLabel,source.page).pathname.split('/').at(-1)||'')}catch{}
-   const rule=source.rules.find(r=>r.match.test(alt)||r.match.test(basename));
+   // Exact descriptive captions are required for generic discovery; opaque filenames alone
+   // are insufficient proof of an employer photograph or product scene.
+   const genericDiscovery=!knownSources.has(source.name);
+   if(genericDiscovery&&(!alt||alt.trim().length<4||/logo|icon|banner|二维码|广告|奖章|伙伴|客户|肖像|团队合影/i.test(alt)))continue;
+   const rule=source.rules.find(r=>r.match.test(alt)||(!genericDiscovery&&r.match.test(basename)));
    if(!rule)continue;
    const original=attr(tag,'data-original')||attr(tag,'data-src')||attr(tag,'src');
    if(!original||original.startsWith('data:'))continue;
