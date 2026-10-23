@@ -28,7 +28,7 @@ const fileFormat=b=>{
  if(/<svg[\s>]/i.test(b.subarray(0,1200).toString('utf8')))return 'svg';
  return '';
 };
-const projects=Object.entries(profiles).filter(([name,p])=>targetNames.has(name)&&p.brandAssetStatus!=='official_logo_visually_verified')
+const projects=Object.entries(profiles).filter(([name,p])=>targetNames.has(name)&&!['official_logo_visually_verified','user_provided_logo_confirmed','user_provided_logo_pending_identity'].includes(p.brandAssetStatus))
  .map(([name,p])=>{
   const url=p.website||p.productSource||p.officialSource;
   try{
