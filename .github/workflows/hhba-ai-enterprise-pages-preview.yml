@@ -18,7 +18,7 @@ jobs:
     timeout-minutes: 25
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}ai-company-preview/
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - name: Checkout AI enterprise preview branch
         uses: actions/checkout@v4
