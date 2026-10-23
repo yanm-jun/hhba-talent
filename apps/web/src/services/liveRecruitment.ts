@@ -200,7 +200,39 @@ function searchPreview(data:LivePage,filters:LiveFilters,offset:number,facets:Ma
   const matches=searchJobs(data.jobs,filters,facets);
   return {...data,jobs:matches.rows.slice(offset,offset+30),total:matches.counted,offset,limit:30};
 }
+const THREE_OFFICIAL=import.meta.env.VITE_HHBA_OFFICIAL_THREE_ONLY==='1';
+let threePromise:Promise<LivePage>|null=null;
+async function readThreeVerified(signal:AbortSignal):Promise<LivePage>{
+ if(!threePromise){
+  threePromise=fetch(import.meta.env.BASE_URL+'data/featured-live.json',{
+   headers:{Accept:'application/json'},credentials:'omit',cache:'no-store'
+  }).then(async response=>{
+   if(!response.ok)throw Error('三家企业官方职位数据未发布');
+   const data=await response.json();
+   if(data.kind!=='HHBA_3_EMPLOYER_OFFICIAL_BOARD_V1'||!Array.isArray(data.jobs)||
+      !Number.isFinite(Date.parse(data.updated))||data.total!==data.jobs.length||
+      data.jobs.length>6||data.jobs.length<0||Date.now()-Date.parse(data.updated)>24*3600_000||
+      Date.parse(data.updated)>Date.now()+5*60000)throw Error('三家企业招聘数据过期或无效');
+   const valid:LiveJob[]=[];const ids=new Set<string>();
+   for(const j of data.jobs as LiveJob[]){
+    if(j.domestic!==false||!['OpenAI','Anthropic','SpaceX'].includes(j.company)||
+       !['ashby','greenhouse'].includes(j.platform||'')||
+       j.recordKind!=='ATS_PUBLIC_ACTIVE_LIST'||
+       !safeOfficialJobUrl(j)||!j.title||!safeId(j.id)||ids.has(j.id))continue;
+    ids.add(j.id);valid.push(j);
+   }
+   if(valid.length!==data.jobs.length)throw Error('官方来源数据校验失败');
+   return {jobs:valid,total:valid.length,offset:0,limit:30,updated:data.updated,boards:3,failures:0};
+  }).catch(error=>{threePromise=null;throw error});
+ }
+ if(signal.aborted)throw new DOMException('Aborted','AbortError');
+ return threePromise;
+}
 export async function listJobs(filters: LiveFilters, offset: number, signal: AbortSignal) {
+ if(THREE_OFFICIAL){
+  const verified=await readThreeVerified(signal);
+  return searchPreview(verified,filters,offset,new Map<string,SearchFacet>());
+ }
   if(PAGES_PREVIEW) {
     const [overseasResult,domesticResult]=await Promise.allSettled([
       previewSnapshot(signal),loadDomesticSnapshot()
