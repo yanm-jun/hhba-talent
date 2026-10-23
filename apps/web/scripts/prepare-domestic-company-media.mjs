@@ -1,6 +1,6 @@
 // Downloads only readable, recognizable images for the static preview.
 // Never synthesizes a logo or treats a website favicon as a verified brand mark.
-import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdirSync,existsSync} from 'node:fs';
 import {join} from 'node:path';
 const profiles=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
 const directory='public/domestic-media';
@@ -47,7 +47,13 @@ for(const [name,p] of Object.entries(profiles)){
  const key=Buffer.from(name).toString('hex').slice(0,175);
  manifest.companies[name]={brand:{state:'missing'},photos:[]};
  if(p.brandImage)jobs.push({name,kind:'brand',idx:0,url:p.brandImage,key:key+'-brand'});
- (p.photos||[]).forEach((photo,idx)=>jobs.push({name,kind:'photo',idx,url:photo.url,key:key+'-photo-'+idx}));
+ (p.photos||[]).forEach((photo,idx)=>{
+  if(photo.localPath&&/^domestic-media\/[a-zA-Z0-9._-]+\.(?:png|jpg|webp|gif)$/.test(photo.localPath)&&existsSync('public/'+photo.localPath)){
+   manifest.companies[name].photos[idx]={state:'ready',path:photo.localPath,source:photo.url,
+    sourcePage:photo.source,classification:'official_publisher_caption_not_independently_visual_verified'};
+   stats.photoSucceeded++;
+  }else jobs.push({name,kind:'photo',idx,url:photo.url,key:key+'-photo-'+idx});
+ });
 }
 let cursor=0;
 await Promise.all(Array.from({length:Math.min(7,jobs.length)},async()=>{

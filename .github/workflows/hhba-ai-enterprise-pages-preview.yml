@@ -25,6 +25,8 @@ on:
       - 'apps/web/scripts/audit-domestic-company-media.mjs'
       - 'apps/web/scripts/check-domestic-company-image-urls.mjs'
       - 'apps/web/scripts/prepare-domestic-company-media.mjs'
+      - 'apps/web/scripts/discover-official-company-media.mjs'
+      - 'apps/web/src/data/domesticOfficialSceneBundle.json'
       - 'apps/web/src/data/domesticMediaBundle.json'
       - 'apps/web/src/main.tsx'
       - 'apps/web/src/router.tsx'
@@ -64,6 +66,9 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - name: Install AI preview app
         run: npm ci --prefix apps/web
+      - name: Discover explicitly captioned office and factory photos on official pages
+        working-directory: apps/web
+        run: node scripts/discover-official-company-media.mjs
       - name: Bundle reachable, source-tracked employer images
         working-directory: apps/web
         run: node scripts/prepare-domestic-company-media.mjs

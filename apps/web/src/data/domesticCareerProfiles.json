@@ -229,7 +229,10 @@
     "evidenceLevel": "official",
     "brandImageSource": "https://inovance.zhiye.com/Campus",
     "photoSourcePage": "https://www.inovance.com/portal/investor",
-    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+    "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "brandIdentityEvidence": "官方汇川技术招聘网站使用的INOVANCE/汇川技术组合品牌标识；图像内容已与官网招聘页核对",
+    "brandVerifiedAt": "2026-10-23"
   },
   "中国中车": {
     "displayName": "中国中车",

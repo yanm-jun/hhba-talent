@@ -197,3 +197,16 @@ test('official plant and product assets are tied to correct employer records',()
  const page=readFileSync('src/pages/DomesticCompanyPage.tsx','utf8');
  assert(page.includes('article?.photoSourcePage&&!hasReadyPhoto?'),'No downloadable image must show verified source link');
 });
+
+test('official-logo verified status is limited to evidence-backed brand identity',()=>{
+ const p=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
+ const verified=Object.entries(p).filter(([,v])=>v.brandAssetStatus==='official_logo_visually_verified');
+ for(const [name,v] of verified){
+  assert(v.brandIdentityEvidence&&v.brandImageSource&&v.brandVerifiedAt,'Missing logo evidence: '+name);
+ }
+ assert.equal(p['汇川技术'].brandImageSource,'https://inovance.zhiye.com/Campus');
+ const workflow=readFileSync('../../.github/workflows/hhba-ai-enterprise-pages-preview.yml','utf8');
+ assert(workflow.includes('node scripts/discover-official-company-media.mjs'));
+ const prepare=readFileSync('scripts/prepare-domestic-company-media.mjs','utf8');
+ assert(prepare.includes('official_publisher_caption_not_independently_visual_verified'));
+});
