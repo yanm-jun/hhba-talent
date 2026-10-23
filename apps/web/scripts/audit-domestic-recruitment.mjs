@@ -36,7 +36,11 @@ const summary={
  deepCompanyProfiles:Object.keys(profiles).length,
  legacyRecruitmentReferencesInspected:legacyAll.length,
  legacyBySource:{profile:profileLinks.length,catalog:catalogLinks.length,relations:relationLinks.length,editorial:editorialLinks.length},
- verifiedRecruitmentEntries:registryNames.length,
+ registeredRecruitmentLeads:registryNames.length,
+ exactOrGroupRecruitmentReferences:registryNames.filter(n=>registry[n].availability==='normal'||registry[n].availability==='campus_only').length,
+ unconfirmedRuntimeReferences:registryNames.filter(n=>registry[n].availability==='unconfirmed_runtime').length,
+ announcementOnlyReferences:registryNames.filter(n=>registry[n].availability==='announcement_only').length,
+ mismatchedGroupEntityReferences:registryNames.filter(n=>registry[n].recruitmentEntity!==n).length,
  applicableListedIssuers:registryNames.filter(n=>uniqueRosters.has(n)).length,
  retiredCorporateHomepageLinks:1,
  retiredInheritedRelationRecruitmentLinks:9,
@@ -57,7 +61,7 @@ writeFileSync('preview-reports/domestic-recruitment-audit.md',[
  '| 项目 | 数值 |','|---|---:|',
  ...Object.entries(summary).filter(([k,v])=>typeof v==='number').map(([k,v])=>'|'+k+'|'+v+'|'),
  '',
- '## 已核验的独立招聘入口',
+ '## 招聘入口线索（按主体及运行状态区分；未必全部为可投递站点）',
  ...registryNames.map(n=>'- '+n+' · '+registry[n].url+' · '+registry[n].availability+' · 来源 '+registry[n].evidenceUrl),
  '',
  '## 未作为前端招聘入口发布的旧引用',
@@ -78,7 +82,15 @@ test('verified recruitment registry belongs to known exact business identities',
   const u=new URL(rec.url);
   const officialDedicated=/recruit|career|jobs|job\.|talent|hotjob|zhiye|wejob|campus|maker\.|^zp\./i.test(u.hostname);
   const restrictedPath=/^\/(?:joinus|join\/?|rlzy_new\/rczp\/|aboutboc\/bi4\/|careers\/?|recruitment\/?|about\/career\/?|jobList\.html|recruitOut\/ihr\/social|smart_home\/customizedjobs\.html)/i.test(u.pathname);
-  assert(officialDedicated||restrictedPath,'Corporate homepage is not a recruiting URL: '+name+' '+rec.url);
+  // Exceptional official gateways require the complete host AND recruitment-specific path;
+  // accepting a generic third-party domain alone would incorrectly validate corporate homepages.
+  const sourceBackedException=(u.hostname==='hahr.hazq.com'&&u.port==='8083'&&u.pathname==='/eip4ha-hyapp/recruitment')||
+    (u.hostname==='unigroup.zhaopin.com'&&u.pathname==='/')||
+    (u.hostname==='zhaopin.greeyun.com')||
+    (u.hostname==='app.mokahr.com'&&/^\/(?:apply\/dfzq\/?|campus-recruitment\/chint\/)/.test(u.pathname))||
+    (u.hostname==='www.shanghaiairport.com'&&u.pathname.startsWith('/shzp/'));
+
+  assert(officialDedicated||restrictedPath||sourceBackedException,'Corporate homepage is not a recruiting URL: '+name+' '+rec.url);
  }
 });
 test('specific agricultural bank recruiting path and common banking sites are properly matched',()=>{
