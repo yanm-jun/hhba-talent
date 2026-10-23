@@ -29,7 +29,7 @@ const outcomes=selected.map(([name,p])=>{
   ].filter(Boolean)};
 });
 const summary={
-  generated:'2026-10-23',scope:'40 deep employer profiles; 5576+ company directory identities are separate',
+  generated:'2026-10-23',scope:'All deep employer profiles; 5576+ company directory identities are separate',
   deepProfiles:outcomes.length,listedOrKnown:outcomes.filter(x=>x.listedOrGroup).length,
   imageUrls:outcomes.filter(x=>x.brandUrl).length,officialLogosVerified:outcomes.filter(x=>x.officialLogoVerified).length,
   candidateSiteIcons:outcomes.filter(x=>x.siteIconUnverified).length,
@@ -70,7 +70,7 @@ test('Every deep profile is a unique search identity with honest media evidence'
 });
 test('Media shortfall is explicitly visible instead of misreported as complete',()=>{
  assert(summary.imageUrls<=summary.deepProfiles);
- assert(summary.deepProfiles===40);
+ assert(summary.deepProfiles>=40);
  assert(summary.photoCompanies<summary.deepProfiles,
    'When this reaches full coverage, replace this safeguard with a verification requirement');
  assert(summary.candidateSiteIcons>0,'Missing verification status on site icons');

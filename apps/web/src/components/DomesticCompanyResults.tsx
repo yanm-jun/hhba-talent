@@ -8,6 +8,7 @@ import {companyMatchesSelectedMajor,majorById} from '../services/domesticMajors'
 import '../styles/domestic-company-search.css';
 type Preview={displayName?:string;summary?:string;brandImage?:string;officeLocations?:unknown[];photos?:unknown[];brandAssetStatus?:string};
 const rich=profiles as Record<string,Preview>;
+const hasDeepProfile=(name:string)=>Boolean(rich[name]?.summary);
 const available=bundled as {companies:Record<string,{brand?:{state:string;path?:string}}>};
 type Props={query:string;majorSlug?:string;scope?:string;country?:string;city?:string};
 function BrandMark({src,name}:{src?:string;name:string}){
@@ -49,9 +50,10 @@ export function DomesticCompanyResults({query,majorSlug='',scope='',country='',c
      </span><strong>{editorial?.displayName||company.name}</strong></div>
     <small>{company.industry}{company.city?' · '+company.city:''}{company.parentName?' · 关联：'+company.parentName:''}</small>
     {editorial?.displayName&&editorial.displayName!==company.name&&<small className="domestic-card-legal">企业主体：{company.name}</small>}
-    <p>{editorial?.summary||company.overview}</p>
-    <footer><span>{editorial?.summary?'企业介绍已整理':company.status==='industry_reviewed'?'业务资料已整理':'基础资料 · 待完善'}</span>
-     <span>查看企业 <ArrowRight size={14}/></span></footer>
+    {hasDeepProfile(company.name)?<p>{editorial?.summary}</p>:
+     <p className="domestic-directory-card-description">上市主体名录记录；当前尚无足够的企业官网证据支持详细业务介绍。{company.stockCode?'证券代码：'+company.stockCode+'。':''}</p>}
+    <footer><span>{hasDeepProfile(company.name)?'已核验企业介绍':'仅名录信息 · 不冒充深度介绍'}</span>
+     <span>{hasDeepProfile(company.name)?'查看企业详情':'查看名录事实'} <ArrowRight size={14}/></span></footer>
    </Link>})}</div>
   </section>;
 }

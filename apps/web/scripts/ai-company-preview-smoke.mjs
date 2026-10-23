@@ -108,6 +108,28 @@ try{
  }
  assert.equal(results.length,Object.keys(deepProfiles).length);
  console.log('HHBA_DEEP_EMPLOYER_SEARCH_LINKAGE_PASS',results.length);
+ await searchBox.fill('华安证券');
+ await desktop.locator('.domestic-company-card').filter({hasText:'华安证券'}).first().click();
+ await desktop.getByRole('heading',{name:'华安证券'}).waitFor();
+ await desktop.getByText('安徽省合肥市滨湖新区紫云路1018号').first().waitFor();
+ assert((await desktop.locator('.domestic-editorial-body').innerText()).length>300);
+ assert.equal(await desktop.locator('.domestic-major-tag').count()>0,true);
+ assert.equal(await desktop.locator('.domestic-careers .domestic-careers-link').count(),0,
+   'Do not invent recruitment portal for the repaired 华安证券 profile');
+ // Nonreviewed entities remain searchable but show truthful directory facts instead of template prose.
+ await desktop.goto(ROOT);
+ await desktop.locator('.unified-job-browse-links').getByRole('link',{name:/查看完整招聘市场/}).click();
+ await desktop.locator('.unified-job-search input').fill('白云机场');
+ await desktop.locator('.domestic-company-card').filter({hasText:'白云机场'}).first().click();
+ await desktop.getByRole('heading',{name:'白云机场'}).waitFor();
+ await desktop.getByRole('heading',{name:'上市主体基本信息'}).waitFor();
+ assert.equal(await desktop.getByRole('heading',{name:'企业介绍'}).count(),0);
+ assert.equal(await desktop.getByRole('heading',{name:'适合哪些专业背景？'}).count(),0);
+ assert.equal(await desktop.getByRole('heading',{name:'官方招聘渠道'}).count(),0);
+ assert.equal(await desktop.locator('body').innerText().then(s=>s.includes('已收录至 HHBA 企业资料库')),false);
+ assert.equal(await desktop.locator('body').innerText().then(s=>/\bsvg\b/i.test(s)),false);
+ await desktop.goto(ROOT);
+ await desktop.locator('.unified-job-browse-links').getByRole('link',{name:/查看完整招聘市场/}).click();
  await searchBox.fill('京东方');
  await desktop.locator('.domestic-company-card').filter({hasText:'京东方'}).first().click();
  await desktop.getByRole('heading',{name:'京东方'}).waitFor();

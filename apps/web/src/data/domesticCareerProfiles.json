@@ -2190,5 +2190,376 @@
     "industry": "集成电路装备",
     "photoSourcePage": "https://www.naura.com/other/contact.html",
     "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）"
+  },
+  "华安证券": {
+    "displayName": "华安证券",
+    "subtitle": "财富管理与证券经纪 · 投资银行与企业融资 · 机构服务与研究 · 资产管理与投资业务",
+    "summary": "安徽省属综合证券公司，前身可追溯至1991年的安徽省证券公司，2016年于上海证券交易所上市。",
+    "description": [
+      "华安证券股份有限公司的前身是1991年成立的安徽省证券公司，是安徽省较早成立的证券经营机构。2001年在整合相关证券资产后设立华安证券有限责任公司，2012年整体变更为股份有限公司，并于2016年12月6日登陆上海证券交易所，证券代码600909。企业总部现位于安徽省合肥市滨湖新区紫云路1018号，迁址在2024年由公司正式公告。",
+      "华安证券的经营业务并不局限于股票开户和交易。公司面向个人投资者提供证券经纪、财富管理、融资融券和投资顾问服务；面向企业客户提供证券承销、保荐、并购重组财务顾问及资产证券化等资本市场服务；同时向机构客户提供研究咨询、交易执行、托管及金融产品服务。公司也通过自营投资、基金和资管等业务形成综合金融布局。",
+      "公司公开披露的业务网络包括证券、期货、资产管理、另类投资、私募股权投资及香港业务等主体，其中不同子公司在法律身份、业务资质与招聘机制上均有区别。理解华安证券，应从其安徽区域背景、长三角业务布局及综合投融资服务模式入手，而不是把它简单视为一家销售金融产品的网点公司。",
+      "对于金融学和经济学背景的学生，可以关注证券研究、投行、交易及财富管理等知识方向；会计和财务管理背景可以研究财务分析、审计及资本市场信息披露；法学背景可了解合规、风控、投行业务相关法律工作；计算机、软件和数据科学背景则可能与金融科技平台和交易基础设施相关。这是基于主营业务的职业探索提示，并不代表公司当前招聘对应专业。"
+    ],
+    "business": [
+      {
+        "title": "财富管理与证券经纪",
+        "description": "面向个人及高净值客户的交易、投资咨询、资产配置与金融产品服务。"
+      },
+      {
+        "title": "投资银行与企业融资",
+        "description": "面向企业的发行承销、保荐、并购重组、资产证券化与财务顾问。"
+      },
+      {
+        "title": "机构服务与研究",
+        "description": "面向金融机构的证券交易、投资研究、托管、衍生品及综合机构服务。"
+      },
+      {
+        "title": "资产管理与投资业务",
+        "description": "包括证券资产管理、自营投资、另类投资和基金业务等。"
+      }
+    ],
+    "majorSlugs": [
+      "finance",
+      "economics",
+      "accounting",
+      "financial-management",
+      "law",
+      "computer-science",
+      "software-engineering",
+      "business-administration",
+      "marketing",
+      "data-science"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.hazq.com/main/aboutus/companyprofile/companyprofile/index.shtml",
+    "productSource": "https://www.hazq.com",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "officeLocations": [
+      {
+        "type": "公司总部办公地址（2024年迁址公告及2026年半年报）",
+        "address": "安徽省合肥市滨湖新区紫云路1018号",
+        "source": "https://paper.cnstock.com/html/2024-01/18/content_1867833.htm"
+      }
+    ],
+    "photoSourcePage": "https://www.hazq.com/main/aboutus/companyprofile/companyprofile/index.shtml",
+    "photoSourceLabel": "查看公司官网资料（实景素材尚待逐张核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://www.hazq.com",
+    "industry": "综合证券与金融服务"
+  },
+  "广发证券": {
+    "displayName": "广发证券",
+    "subtitle": "财富管理 · 投资银行 · 交易及机构业务 · 投资管理",
+    "summary": "1991年成立的综合证券集团，A股与H股分别于2010年、2015年上市，总部位于广州。",
+    "description": [
+      "广发证券股份有限公司成立于1991年，是中国较早成立的综合类券商之一。它于2010年在深圳证券交易所上市（000776），2015年在香港联合交易所上市（01776）。企业总部位于广州，业务服务对象覆盖个人投资者、企业客户、金融机构和其他专业投资者。",
+      "广发证券官网将主要经营方向区分为投资银行、财富管理、交易及机构和投资管理四大板块。财富管理业务涵盖交易、产品配置和投资顾问服务；投行业务侧重股权债券融资及财务顾问；交易及机构业务包括研究、机构交易、托管及金融衍生品；投资管理业务涉及资产管理、公募基金和私募投资等不同牌照主体。",
+      "广发证券的组织体系还包括广发期货、广发资管、广发信德、广发乾和以及境外业务机构。各机构可能有独立的人才招聘管理和运营场景，不宜把集团旗下所有公司的工作机会合并为同一招聘主体。企业官网公开了专门的招聘站，适合求职者核对投资银行、机构业务、科技、合规与运营方向的实际在招条件。",
+      "从专业关联看，金融与经济学能帮助理解资本市场和投资业务，会计与财务背景对应财务分析和资本运作，法学可面向合规、交易及投行监管要求，软件工程、计算机与数据科学则可研究金融交易技术和业务数字化。不同职位对教育、证书和经验的要求仍须以官方岗位公告为准。"
+    ],
+    "business": [
+      {
+        "title": "财富管理",
+        "description": "证券经纪、投资顾问、金融产品配置和客户财富服务。"
+      },
+      {
+        "title": "投资银行",
+        "description": "股权融资、债券融资、并购及资产证券化等企业金融服务。"
+      },
+      {
+        "title": "交易及机构业务",
+        "description": "投资研究、机构交易、资产托管和衍生产品业务。"
+      },
+      {
+        "title": "投资管理",
+        "description": "通过专业管理主体开展证券资管、公募基金及私募股权投资。"
+      }
+    ],
+    "majorSlugs": [
+      "finance",
+      "economics",
+      "accounting",
+      "financial-management",
+      "law",
+      "computer-science",
+      "software-engineering",
+      "business-administration",
+      "marketing",
+      "data-science"
+    ],
+    "careersUrl": "https://job.gf.com.cn/",
+    "careersLabel": "广发证券 · 官方招聘",
+    "officialSource": "https://www.gf.com.cn/web/about",
+    "productSource": "https://www.gf.com.cn",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "officeLocations": [
+      {
+        "type": "公司总部（官网投资者关系）",
+        "address": "广州市天河区马场路26号广发证券大厦",
+        "source": "https://ir.gf.com.cn/"
+      }
+    ],
+    "photoSourcePage": "https://www.gf.com.cn/web/about",
+    "photoSourceLabel": "查看公司官网资料（实景素材尚待逐张核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://www.gf.com.cn",
+    "industry": "综合证券与金融服务"
+  },
+  "中信证券": {
+    "displayName": "中信证券",
+    "subtitle": "投资银行与企业金融 · 机构交易与投资研究 · 财富管理与证券经纪 · 国际金融与专业子公司",
+    "summary": "1995年成立的综合证券公司，2003年A股上市、2011年H股上市，具有全球多地业务网络。",
+    "description": [
+      "中信证券股份有限公司成立于1995年10月，2003年在上海证券交易所上市，2011年在香港联合交易所上市，是中国较早实现A+H股上市的证券公司之一。其业务网络同时覆盖深圳、北京及多个境内外金融市场，主要股东背景和集团成员关系在公司官网持续披露。",
+      "公司综合金融服务覆盖证券、基金、期货、外汇和商品领域，面向企业提供股权债券融资、并购重组及财务顾问服务，面向机构客户提供投资研究、交易及风险管理解决方案，也为个人客户提供经纪与财富管理服务。官网明确列出旗下期货、证券资管、基金和投资等专业经营机构。",
+      "与单纯零售证券经纪公司相比，中信证券的业务结构更强调大中型企业融资、机构投资者服务及国际资本市场业务，研发、模型、交易技术、合规与风控工作需要跨部门协同。公司在深圳市福田区中心三路及北京市朝阳区亮马桥路均设有正式办公及联系地点，具体团队需按业务部门核对。",
+      "金融学、经济学、会计及财务管理等专业背景可研究投行、投资分析、财富管理与企业金融；法学专业与合规、内核及监管相关；数学、统计、计算机和软件背景可研究量化分析、交易系统、信息安全及金融科技。公司有明确的独立官方招聘站，并强调不存在付费内推或保录用渠道。"
+    ],
+    "business": [
+      {
+        "title": "投资银行与企业金融",
+        "description": "股权债权融资、并购顾问及资本市场服务。"
+      },
+      {
+        "title": "机构交易与投资研究",
+        "description": "投资研究、资产交易、衍生工具与机构综合服务。"
+      },
+      {
+        "title": "财富管理与证券经纪",
+        "description": "证券交易、资产配置及个人财富管理服务。"
+      },
+      {
+        "title": "国际金融与专业子公司",
+        "description": "通过独立主体开展期货、基金、资产管理和国际市场业务。"
+      }
+    ],
+    "majorSlugs": [
+      "finance",
+      "economics",
+      "accounting",
+      "financial-management",
+      "law",
+      "computer-science",
+      "software-engineering",
+      "business-administration",
+      "marketing",
+      "data-science"
+    ],
+    "careersUrl": "https://careers.citics.com/",
+    "careersLabel": "中信证券 · 官方招聘",
+    "officialSource": "https://www.citics.com/newsite/AboutUs/",
+    "productSource": "https://www.citics.com",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "officeLocations": [
+      {
+        "type": "深圳办公及联系地址",
+        "address": "深圳市福田区中心三路8号中信证券大厦",
+        "source": "https://www.citics.com/newsite/contact/"
+      },
+      {
+        "type": "北京办公及联系地址",
+        "address": "北京市朝阳区亮马桥路48号中信证券大厦",
+        "source": "https://www.citics.com/newsite/contact/"
+      }
+    ],
+    "photoSourcePage": "https://www.citics.com/newsite/AboutUs/",
+    "photoSourceLabel": "查看公司官网资料（实景素材尚待逐张核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://www.citics.com",
+    "industry": "综合证券与金融服务"
+  },
+  "东方证券": {
+    "displayName": "东方证券",
+    "subtitle": "证券经纪与财富管理 · 投资银行 · 机构服务与证券研究 · 资产管理与期货业务",
+    "summary": "1998年于上海起步的综合证券公司，2015年A股上市、2016年H股上市。",
+    "description": [
+      "东方证券股份有限公司的前身东方证券有限责任公司于1998年3月9日开业，总部位于上海。公司2015年在上交所上市（600958），2016年在香港联合交易所上市（03958），形成境内外资本市场平台。官网将其定位为提供证券、期货、资产管理、投资银行、证券研究等综合金融服务的证券公司。",
+      "东方证券的经营特色不只是证券交易，也包括机构研究和交易、资产管理、投融资顾问以及国际业务。公司在资产管理、期货、资本投资等领域设有业务主体，并与公募基金管理机构保持股权或业务联系。其不同金融产品与经营牌照意味着投资研究、资产配置及风控工作的专业要求并不相同。",
+      "对求职者而言，东方证券的核心业务岗位可涉及企业财务分析、机构客户服务、投行业务执行、证券研究、产品设计、合规稽核、IT平台及数据风控。金融、经济、会计、法学和计算机专业均可按具体部门需求探索方向，但不能因为专业背景相关就推定存在正在招聘的岗位。",
+      "官网公开的业务布局和历史资料可帮助判断其与上海金融市场、长三角客户及跨境业务的联系。具体工作地点通常涉及总部与分支机构，正式申请应以独立核验的公司招聘页面为准；尚未确认招聘首页前不会填入推测的网址。"
+    ],
+    "business": [
+      {
+        "title": "证券经纪与财富管理",
+        "description": "面向个人客户的交易、产品销售及财富服务。"
+      },
+      {
+        "title": "投资银行",
+        "description": "企业融资、并购重组及财务顾问。"
+      },
+      {
+        "title": "机构服务与证券研究",
+        "description": "投资研究、机构交易与相关市场服务。"
+      },
+      {
+        "title": "资产管理与期货业务",
+        "description": "通过持牌主体开展资产管理及相关衍生业务。"
+      }
+    ],
+    "majorSlugs": [
+      "finance",
+      "economics",
+      "accounting",
+      "financial-management",
+      "law",
+      "computer-science",
+      "software-engineering",
+      "business-administration",
+      "marketing",
+      "data-science"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.dfzq.com.cn/m/site/views/about.html?is_new_back=1",
+    "productSource": "https://www.dfzq.com.cn",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "officeLocations": [
+      {
+        "type": "公司总部城市（详细门牌待核对）",
+        "address": "上海市",
+        "source": "https://www.dfzq.com.cn/m/site/views/about.html?is_new_back=1"
+      }
+    ],
+    "photoSourcePage": "https://www.dfzq.com.cn/m/site/views/about.html?is_new_back=1",
+    "photoSourceLabel": "查看公司官网资料（实景素材尚待逐张核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://www.dfzq.com.cn",
+    "industry": "综合证券与金融服务"
+  },
+  "华泰证券": {
+    "displayName": "华泰证券",
+    "subtitle": "财富管理与数字金融 · 投资银行与机构服务 · 资产管理与投资业务 · 金融科技",
+    "summary": "1991年成立的科技驱动型综合证券集团，已在上海、香港及伦敦资本市场上市或发行存托凭证。",
+    "description": [
+      "华泰证券股份有限公司成立于1991年，2010年在上交所上市（601688），2015年在香港联交所上市，2019年全球存托凭证在伦敦发行交易。官方介绍将其定位为科技驱动的综合证券集团，主张通过数字平台连接财富管理、机构服务、投资管理和国际业务。",
+      "公司经营涵盖以移动财富管理平台为代表的个人金融服务、面向机构和企业的投行及研究服务，以及资管、投资业务和国际业务。它旗下有华泰联合证券、华泰证券资管、华泰国际及华泰期货等专业公司，不同主体承担不同经营牌照和人才需求。",
+      "对金融、经济与会计专业，可进一步研究财富管理、企业融资、机构研究及业务分析等方向；对法学专业，可研究证券监管、合规内控及投行业务中的法律要求；计算机、软件与数据背景可研究交易平台、移动金融应用、数据风控与金融科技。相关程度必须结合官方招聘团队实际职责理解。",
+      "总部及团队具体办公地址、实习安排和学历条件可能随业务分工和城市变化，尤其集团旗下主体不能被自动归并为同一用人单位。HHBA优先展示公司已披露的真实业务介绍，未核实的地址和招聘页面仍不作肯定性标注。"
+    ],
+    "business": [
+      {
+        "title": "财富管理与数字金融",
+        "description": "证券经纪、财富管理平台与客户综合服务。"
+      },
+      {
+        "title": "投资银行与机构服务",
+        "description": "资本市场融资、机构交易、投研咨询。"
+      },
+      {
+        "title": "资产管理与投资业务",
+        "description": "证券资管、投资管理及专业业务子公司。"
+      },
+      {
+        "title": "金融科技",
+        "description": "证券交易平台、数字化服务及数据应用。"
+      }
+    ],
+    "majorSlugs": [
+      "finance",
+      "economics",
+      "accounting",
+      "financial-management",
+      "law",
+      "computer-science",
+      "software-engineering",
+      "business-administration",
+      "marketing",
+      "data-science"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.htsc.com.cn/htzq/investor/new/company.jsp",
+    "productSource": "https://www.htsc.com.cn",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "officeLocations": [],
+    "photoSourcePage": "https://www.htsc.com.cn/htzq/investor/new/company.jsp",
+    "photoSourceLabel": "查看公司官网资料（实景素材尚待逐张核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://www.htsc.com.cn",
+    "industry": "综合证券与金融服务"
+  },
+  "光大证券": {
+    "displayName": "光大证券",
+    "subtitle": "经纪与财富管理 · 机构证券业务 · 投资银行与资产管理 · 信用业务与国际业务",
+    "summary": "1996年成立的综合证券公司，属于中国光大集团相关金融服务体系，2009年A股上市。",
+    "description": [
+      "光大证券股份有限公司成立于1996年，由中国光大集团相关主体参与设立和投资，是中国具有综合牌照和全国业务网络的证券公司。公司2009年在上海证券交易所上市（601788），2016年在香港联合交易所上市，是连接境内外资本市场业务的平台之一。",
+      "公司主要经营方向涉及证券经纪与财富管理、融资融券等信用业务、机构交易及证券研究、投资银行、资产管理和国际业务。不同业务线的客户和监管要求差异显著：面向个人客户需注重金融产品适当性，机构与投行方向更强调财务、法律和市场分析，资产管理和自营交易则涉及组合管理及风险控制。",
+      "作为光大集团相关业务体系中的证券平台，光大证券拥有分支机构及多种专业经营实体，但其子公司、海外机构和集团其他金融公司的招聘不是同一法律主体。企业总部位于上海，具体营业网点、办公门牌与招聘信息应依据现行正式公告核对。",
+      "金融、经济、会计、财务和法律专业能够分别对应财富管理、投行承销、企业财务分析与合规方向；计算机、软件及数据相关专业则可研究证券交易技术、线上服务及风险监控。HHBA只将这些列为业务相关专业，绝不视为在招岗位公告。"
+    ],
+    "business": [
+      {
+        "title": "经纪与财富管理",
+        "description": "面向个人投资者的证券交易、投资建议及财富服务。"
+      },
+      {
+        "title": "机构证券业务",
+        "description": "机构交易、投研咨询与机构客户综合服务。"
+      },
+      {
+        "title": "投资银行与资产管理",
+        "description": "融资承销、财务顾问、资产管理及投资业务。"
+      },
+      {
+        "title": "信用业务与国际业务",
+        "description": "融资融券等资本中介业务及境外金融服务。"
+      }
+    ],
+    "majorSlugs": [
+      "finance",
+      "economics",
+      "accounting",
+      "financial-management",
+      "law",
+      "computer-science",
+      "software-engineering",
+      "business-administration",
+      "marketing",
+      "data-science"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.ebscn.com/upload/20170717/20170717142455882.pdf",
+    "productSource": "https://www.ebscn.com",
+    "brandImage": "",
+    "brandAssetStatus": "pending_official_logo",
+    "brandImageSource": "",
+    "photos": [],
+    "officeLocations": [
+      {
+        "type": "总部所在城市（详细地址待核验）",
+        "address": "上海市",
+        "source": "https://www.ebscn.com/upload/20170717/20170717142455882.pdf"
+      }
+    ],
+    "photoSourcePage": "https://www.ebscn.com/upload/20170717/20170717142455882.pdf",
+    "photoSourceLabel": "查看公司官网资料（实景素材尚待逐张核实）",
+    "lastReviewed": "2026-10-23",
+    "evidenceLevel": "official_source_read",
+    "website": "https://www.ebscn.com",
+    "industry": "综合证券与金融服务"
   }
 }

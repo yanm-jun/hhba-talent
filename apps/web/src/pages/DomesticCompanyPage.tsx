@@ -52,9 +52,9 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
        <Building2 size={26} aria-hidden="true"/>}
      </div>
      <div className="domestic-profile-identity">
-      <span className="domestic-editorial-eyebrow">HHBA · COMPANY PROFILE</span>
+      <span className="domestic-editorial-eyebrow">{article?'HHBA · 企业深度资料':'HHBA · 上市主体名录（未完成深度核验）'}</span>
       <h1>{article?.displayName||company.name}</h1>
-      <p>{article?.subtitle||company.industry}{company.city?' · '+company.city:''}</p>
+      <p>{article?.subtitle||(company.industry!=='行业待细分'?company.industry:'证券主体名录记录')}{company.city?' · '+company.city:''}</p>
       {article?.displayName&&article.displayName!==company.name&&<small>经营主体：{company.name}</small>}
       {article?.officeLocations?.length? <small className="domestic-profile-office-hint"><MapPin size={13}/>{article.officeLocations[0].address}</small>:null}
       {article&&!brandSrc?<small className="domestic-media-confidence">正式品牌 Logo 尚未核验；已屏蔽失效图片地址</small>:null}
@@ -63,17 +63,26 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       </small>}
      </div>
     </header>
-    <section className="domestic-editorial-section" aria-label="企业介绍">
+    {!article?<section className="domestic-editorial-section domestic-directory-only" aria-label="上市主体名录核验">
+      <h2>上市主体基本信息</h2>
+      <p className="domestic-company-note">当前仅保留能够从上市公司名录核对的基础身份信息。由于还没有完成该企业自己的官方网站和主营业务资料核验，HHBA 暂不提供拼凑的企业介绍，也不会猜测适合专业或招聘岗位。</p>
+      <dl className="domestic-directory-facts">
+       <div><dt>企业名称</dt><dd>{company.name}</dd></div>
+       {company.legalName&&<div><dt>经营主体</dt><dd>{company.legalName}</dd></div>}
+       {company.stockCode&&<div><dt>证券代码</dt><dd>{company.stockCode}</dd></div>}
+       {company.industry!=='行业待细分'&&company.industry!=='业务方向待核验'&&<div><dt>名录行业分类</dt><dd>{company.industry}</dd></div>}
+       {company.city&&<div><dt>名录登记城市</dt><dd>{company.city}</dd></div>}
+      </dl>
+      <p className="domestic-company-note">此页不代表已完成企业档案。核验后再提供真实的历史、业务、图片、专业关联和独立招聘入口。</p>
+      {httpsLink(company.website)&&<a href={httpsLink(company.website)} target="_blank" rel="noopener noreferrer" className="domestic-directory-website">访问已有企业官网 <ExternalLink size={13}/></a>}
+     </section>:
+     <section className="domestic-editorial-section" aria-label="企业介绍">
       <h2>企业介绍</h2>
-      {article?<div className="domestic-editorial-body">{article.description.map((paragraph,i)=><p key={i}>{paragraph}</p>)}</div>:
-       <div className="domestic-editorial-body"><p>{company.name}已收录至 HHBA 企业资料库。{company.industry!=='行业待细分'?'现有行业分类为：'+company.industry+'。':''}目前尚缺完整的官网核验资料，因此不编造企业历史、技术优势或招聘要求。</p>
-       {company.legalName&&<p>工商主体名称：{company.legalName}</p>}
-       {company.stockCode&&<p>上市证券代码：{company.stockCode}</p>}
-       <p className="domestic-editorial-limited">资料状态：基础档案。点击“资料来源”可查看已有出处；详细介绍将按官方资料逐步补齐。</p></div>}
+      <div className="domestic-editorial-body">{article.description.map((paragraph,i)=><p key={i}>{paragraph}</p>)}</div>
       {article&&<div className="domestic-editorial-business">
        {article.business.map(item=><div key={item.title}><strong>{item.title}</strong><p>{item.description}</p></div>)}
       </div>}
-    </section>
+    </section>}
     {hasReadyPhoto?<section className="domestic-editorial-section domestic-editorial-photos" aria-label="企业真实图片">
       <h2>企业与产品实景</h2>
       <div className="domestic-editorial-photo-grid">
@@ -97,15 +106,15 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
        <a target="_blank" rel="noopener noreferrer" href={entry.source}>查看官方地址来源 <ExternalLink size={12}/></a></div></div>)}</div>
       <p className="domestic-company-note">办公地址不代表该地点当前正在招聘；若需要前往现场，请先通过企业官网确认。</p>
      </section>:null}
-    <section className="domestic-editorial-section" aria-label="适合哪些专业背景">
+    {article&&<section className="domestic-editorial-section" aria-label="适合哪些专业背景">
       <h2>适合哪些专业背景？</h2>
       {majors.length?<div className="domestic-profile-tags domestic-major-tags">
        {majors.map(major=><Link className="domestic-major-tag" key={major.slug} to={'/majors/'+major.slug}
         aria-label={'查看与'+major.name+'相关的企业'}>{major.name}<ArrowRight size={13}/></Link>)}</div>:
        <p className="domestic-editorial-limited">暂无足够资料判断该企业与哪些专业方向相关，正在逐步完善。</p>}
       <p className="domestic-company-note">根据企业公开业务与技术方向整理的专业关联，不等于该企业正在招聘这些专业的学生。点击专业可发现更多业务相关企业。</p>
-    </section>
-    <section className="domestic-editorial-section domestic-careers" aria-label="官方招聘渠道">
+    </section>}
+    {article&&<section className="domestic-editorial-section domestic-careers" aria-label="官方招聘渠道">
       <h2>官方招聘渠道</h2>
       <p>点击企业招聘页面查看当前招聘信息、岗位职责和实际申请条件；HHBA 不同步或虚构国内企业职位。</p>
       {careers?<div className="domestic-careers-row"><div><strong>{article?.careersLabel||'企业招聘入口'}</strong>
@@ -113,7 +122,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
        <a href={careers} target="_blank" rel="noopener noreferrer" className="domestic-careers-link">查看招聘官网 <ExternalLink size={15}/></a></div>:
        <div className="domestic-editorial-limited">尚未核验该主体的官方招聘入口，暂不展示“查看招聘官网”按钮。
        {httpsLink(company.website)&&<p><a href={httpsLink(company.website)} target="_blank" rel="noopener noreferrer">访问企业官网了解更多 <ExternalLink size={13}/></a></p>}</div>}
-    </section>
+    </section>}
     <section className="domestic-editorial-section domestic-editorial-sources" aria-label="资料来源">
       <details className="domestic-company-sources" key={"sources-"+company.id}>
        <summary>资料来源与核验说明 <ChevronDown size={15}/></summary>

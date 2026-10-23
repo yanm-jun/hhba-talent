@@ -23,6 +23,7 @@ on:
       - 'apps/web/src/data/domesticCompanyRelations.json'
       - 'apps/web/scripts/domestic-company-relations.test.mjs'
       - 'apps/web/scripts/audit-domestic-company-media.mjs'
+      - 'apps/web/scripts/audit-all-company-content.mjs'
       - 'apps/web/scripts/check-domestic-company-image-urls.mjs'
       - 'apps/web/scripts/prepare-domestic-company-media.mjs'
       - 'apps/web/scripts/discover-official-company-media.mjs'
@@ -104,6 +105,9 @@ jobs:
       - name: Validate public company relationship sources and hierarchy
         working-directory: apps/web
         run: node --test scripts/domestic-company-relations.test.mjs
+      - name: Audit every searchable company for substantive content and unverifiable placeholders
+        working-directory: apps/web
+        run: node --test scripts/audit-all-company-content.mjs
       - name: Audit company media and profile source coverage
         working-directory: apps/web
         run: node --test scripts/audit-domestic-company-media.mjs
