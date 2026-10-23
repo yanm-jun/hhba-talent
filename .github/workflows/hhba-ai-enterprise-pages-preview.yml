@@ -1,0 +1,80 @@
+name: HHBA AI Enterprise GitHub Pages Preview
+on:
+  push:
+    branches: [feat/ai-company-search-phase1-20261023]
+    paths:
+      - '.github/workflows/hhba-ai-enterprise-pages-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: hhba-unified-react-pages
+  cancel-in-progress: false
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}ai-company-preview/
+    steps:
+      - name: Checkout AI enterprise preview branch
+        uses: actions/checkout@v4
+      - name: Checkout existing domestic Pages baseline (preserve root)
+        uses: actions/checkout@v4
+        with:
+          ref: feat/domestic-weekly-cache-pages-20261022
+          path: baseline
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install AI preview app
+        run: npm ci --prefix apps/web
+      - name: Build enterprise preview with AI API disabled
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/ai-company-preview/'
+          VITE_HHBA_COMPANY_PREVIEW: '1'
+          VITE_HHBA_DOMESTIC_STATIC_ONLY: '1'
+        run: npm run build --prefix apps/web
+      - name: Install browser test runner
+        working-directory: apps/web
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Verify desktop, mobile and legacy search in real browser
+        working-directory: apps/web
+        run: node scripts/ai-company-preview-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hhba-ai-enterprise-pages-screenshots
+          path: apps/web/preview-screenshots/
+          retention-days: 14
+      - name: Build the current domestic baseline without changes
+        run: |
+          npm ci --prefix baseline/apps/web
+          HHBA_GITHUB_PAGES=1 npm run build --prefix baseline/apps/web
+          test -f baseline/apps/web/dist/data/domestic-jobs.json
+      - name: Package both static sites; preserve existing root
+        run: |
+          mkdir -p combined/ai-company-preview
+          cp -a baseline/apps/web/dist/. combined/
+          cp -a apps/web/dist/. combined/ai-company-preview/
+          cp combined/index.html combined/404.html
+          test -f combined/index.html
+          test -f combined/ai-company-preview/index.html
+          test -f combined/data/domestic-jobs.json
+          if grep -R -E 'DEEPSEEK_API_KEY|sk-[a-zA-Z0-9]{18,}' combined/ai-company-preview/assets/; then
+            echo 'Possible credential leak in client assets'; exit 1
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: combined
+      - name: Publish additive Pages preview (does not affect Railway)
+        id: deploy
+        uses: actions/deploy-pages@v4
