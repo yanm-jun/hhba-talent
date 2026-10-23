@@ -35,6 +35,8 @@ on:
       - 'apps/web/src/pages/MajorCompaniesPage.tsx'
       - 'apps/web/src/services/domesticMajors.ts'
       - 'apps/web/src/data/domesticCareerProfiles.json'
+      - 'apps/web/src/data/domesticComplete50Target.json'
+      - 'apps/web/scripts/audit-company-complete-50.mjs'
       - 'apps/web/src/data/domesticRecruitmentRegistry.json'
       - 'apps/web/scripts/audit-domestic-recruitment.mjs'
       - 'apps/web/src/data/domesticCompanyBatch001.json'
@@ -91,6 +93,9 @@ jobs:
       - name: Bundle reachable, source-tracked employer images
         working-directory: apps/web
         run: node scripts/prepare-domestic-company-media.mjs
+      - name: Audit each of the 50 target companies against all six evidence gates
+        working-directory: apps/web
+        run: node --test scripts/audit-company-complete-50.mjs
       - name: Preserve successfully downloaded company media
         uses: actions/cache/save@v4
         with:

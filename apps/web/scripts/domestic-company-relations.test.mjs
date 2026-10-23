@@ -104,8 +104,8 @@ test('expanded career profiles have authentic image provenance and no asserted l
   assert(p[name].brandImage&&p[name].brandImage.startsWith('https://'),name+' missing verifiable brand image URL');
   assert(p[name].brandImageSource||p[name].imageSource,name+' missing image provenance');
  }
- assert.equal(p['雷赛智能'].careersUrl,'','Unverifiable recruiting endpoint must not be shown');
- assert.equal(p['英威腾'].careersUrl,'','Unverifiable recruiting endpoint must not be shown');
+ assert.equal(p['雷赛智能'].careersUrl,'https://www.leisai.com/recruitment/index.html','Employer official social/campus recruiting page independently checked');
+ assert.equal(p['英威腾'].careersUrl,'https://www.invt.com.cn/careers','Employer official recruiting page independently checked');
  assert.equal(p['思源电气'].careersUrl,'https://www.sieyuan.com/join');
  assert.equal(p['正泰电器'].careersUrl,'');
 });
@@ -259,4 +259,22 @@ test('100-company pilot has no new company identity and source-backed evidence f
   const verified=JSON.parse(readFileSync('src/data/domesticRecruitmentRegistry.json','utf8')).entries;
   assert.equal(Boolean(p.careersUrl),Boolean(verified[row.name]),'No unverified recruiting URLs: '+row.name);
  }
+});
+
+test('fifty-company dossier target does not conflate industry, majors, recruitment, and real photos',()=>{
+ const target=JSON.parse(readFileSync('src/data/domesticComplete50Target.json','utf8'));
+ const profile=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
+ const careers=JSON.parse(readFileSync('src/data/domesticRecruitmentRegistry.json','utf8')).entries;
+ assert.equal(target.companyNames.length,50);
+ assert.equal(new Set(target.companyNames).size,50);
+ for(const n of target.companyNames){
+  assert(profile[n].primaryIndustry&&profile[n].subIndustry, 'Unclassified sector: '+n);
+  assert(profile[n].majorMappingBasis.includes('非招聘专业承诺'), 'Major labels must be business-linked not fictitious recruitment');
+ }
+ for(const name of ['雷赛智能','英威腾','兆易创新','埃斯顿','海康机器人']){
+  assert.equal(profile[name].careersUrl,careers[name].url);
+  assert(careers[name].evidenceUrl.startsWith('https://'));
+ }
+ const page=readFileSync('src/pages/DomesticCompanyPage.tsx','utf8');
+ assert(page.includes('行业分类：{article.primaryIndustry}'),'Company detail should show validated sector');
 });

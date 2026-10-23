@@ -18,6 +18,7 @@ type Reviewed={
  officeLocations?:{type:string;address:string;source:string}[];
  photoSourcePage?:string;photoSourceLabel?:string;
  evidenceLevel?:string;
+ primaryIndustry?:string;subIndustry?:string;industryEvidenceUrl?:string;majorMappingBasis?:string;
 };
 const curated=profiles as Record<string,Reviewed>;
 const available=bundled as {companies:Record<string,{brand?:{state:string;path?:string};photos?:{state:string;path?:string}[]}>};
@@ -51,7 +52,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
    <div className="domestic-editorial-panel">
     <header className="domestic-editorial-hero">
      <div className="domestic-company-profile-mark" aria-label="企业视觉资料">
-      {brandSrc&&!imageFailed?<img src={brandSrc} alt={company.name+'的企业官网图标'} onError={()=>setImageFailed(true)}/>:
+      {brandSrc&&!imageFailed?<img src={brandSrc} alt={company.name+(article?.brandAssetStatus==='official_logo_visually_verified'?'的正式品牌标识':'的官网图片候选')} onError={()=>setImageFailed(true)}/>:
        <Building2 size={26} aria-hidden="true"/>}
      </div>
      <div className="domestic-profile-identity">
@@ -59,6 +60,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       <h1>{article?.displayName||company.name}</h1>
       <p>{article?.subtitle||(company.industry!=='行业待细分'?company.industry:'证券主体名录记录')}{company.city?' · '+company.city:''}</p>
       {article?.displayName&&article.displayName!==company.name&&<small>经营主体：{company.name}</small>}
+      {article?.primaryIndustry&&<small className="domestic-category-breadcrumb">行业分类：{article.primaryIndustry} · {article.subIndustry||company.industry}</small>}
       {article?.officeLocations?.length? <small className="domestic-profile-office-hint"><MapPin size={13}/>{article.officeLocations[0].address}</small>:null}
       {article&&!brandSrc?<small className="domestic-media-confidence">正式品牌 Logo 尚未核验；已屏蔽失效图片地址</small>:null}
       {brandSrc&&<small className="domestic-media-confidence">
@@ -117,6 +119,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
         aria-label={'查看与'+major.name+'相关的企业'}>{major.name}<ArrowRight size={13}/></Link>)}</div>:
        <p className="domestic-editorial-limited">暂无足够资料判断该企业与哪些专业方向相关，正在逐步完善。</p>}
       <p className="domestic-company-note">根据企业公开业务与技术方向整理的专业关联，不等于该企业正在招聘这些专业的学生。点击专业可发现更多业务相关企业。</p>
+      {article.majorMappingBasis&&<small className="domestic-media-confidence">{article.majorMappingBasis}</small>}
     </section>}
     {(article||recruitment)&&<section className="domestic-editorial-section domestic-careers" aria-label="官方招聘渠道">
       <h2>官方招聘渠道</h2>
@@ -132,6 +135,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
        <summary>资料来源与核验说明 <ChevronDown size={15}/></summary>
        <div>{httpsLink(article?.officialSource||company.sourceUrl)&&<a href={httpsLink(article?.officialSource||company.sourceUrl)} target="_blank" rel="noopener noreferrer">企业公开资料 <ExternalLink size={13}/></a>}
        {recruitment&&<a href={recruitment.evidenceUrl} target="_blank" rel="noopener noreferrer">招聘入口核验依据（{recruitment.verifiedOn}） <ExternalLink size={13}/></a>}
+       {article?.industryEvidenceUrl&&<a href={article.industryEvidenceUrl} target="_blank" rel="noopener noreferrer">行业分类核验依据 <ExternalLink size={13}/></a>}
        {article?.productSource&&<a href={article.productSource} target="_blank" rel="noopener noreferrer">公开产品资料 <ExternalLink size={13}/></a>}
        {article?.imageSource&&<a href={article.imageSource} target="_blank" rel="noopener noreferrer">企业图片来源 <ExternalLink size={13}/></a>}
        {article?.brandImageSource&&<a href={article.brandImageSource} target="_blank" rel="noopener noreferrer">

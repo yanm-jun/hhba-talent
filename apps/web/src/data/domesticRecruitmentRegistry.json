@@ -196,12 +196,12 @@
       "evidenceUrl": "https://maker.haier.net/smart_home/customizedjobs.html",
       "kind": "official_recruitment_portal",
       "availability": "normal",
-      "label": "海尔智家招聘",
+      "label": "海尔智家招聘（独立业务分区）",
       "recruitmentEntity": "海尔智家",
       "verifiedOn": "2026-10-23",
       "aliases": [],
       "verifiedBy": "recruitment_page_or_employer_public_announcement",
-      "notes": ""
+      "notes": "招聘平台支持选取智家业务，避免把海尔集团其他行业岗位当作海尔智家。"
     },
     "京东方Ａ": {
       "url": "https://campus.boe.com/custom/professionals?hideMenu=1",
@@ -433,6 +433,66 @@
       "aliases": [],
       "verifiedBy": "recruitment_page_or_employer_public_announcement",
       "notes": "仅能确认招聘公告栏目，非岗位直投入口。"
+    },
+    "雷赛智能": {
+      "url": "https://www.leisai.com/recruitment/index.html",
+      "evidenceUrl": "https://www.leisai.com/groupIntroduction.html",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "雷赛智能官方招聘",
+      "recruitmentEntity": "雷赛智能",
+      "verifiedOn": "2026-10-23",
+      "aliases": [],
+      "verifiedBy": "official_employer_recruitment_page",
+      "notes": "该入口可从企业官方招聘页面或其公开招聘系统独立核实。"
+    },
+    "英威腾": {
+      "url": "https://www.invt.com.cn/careers",
+      "evidenceUrl": "https://www.invt.com.cn/careers",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "英威腾校园／社会招聘入口",
+      "recruitmentEntity": "英威腾",
+      "verifiedOn": "2026-10-23",
+      "aliases": [],
+      "verifiedBy": "official_employer_recruitment_page",
+      "notes": "该入口可从企业官方招聘页面或其公开招聘系统独立核实。"
+    },
+    "兆易创新": {
+      "url": "https://www.gigadevice.com.cn/about/career",
+      "evidenceUrl": "https://www.gigadevice.com.cn/about/career",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "兆易创新官方招聘栏目",
+      "recruitmentEntity": "兆易创新",
+      "verifiedOn": "2026-10-23",
+      "aliases": [],
+      "verifiedBy": "official_employer_recruitment_page",
+      "notes": "该入口可从企业官方招聘页面或其公开招聘系统独立核实。"
+    },
+    "埃斯顿": {
+      "url": "https://estun1.zhiye.com/",
+      "evidenceUrl": "https://estun1.zhiye.com/",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "埃斯顿岗位招聘系统",
+      "recruitmentEntity": "埃斯顿",
+      "verifiedOn": "2026-10-23",
+      "aliases": [],
+      "verifiedBy": "official_employer_recruitment_page",
+      "notes": "该入口可从企业官方招聘页面或其公开招聘系统独立核实。"
+    },
+    "海康机器人": {
+      "url": "https://job.hikrobotics.com/",
+      "evidenceUrl": "https://job.hikrobotics.com/",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "海康机器人社会招聘",
+      "recruitmentEntity": "海康机器人",
+      "verifiedOn": "2026-10-23",
+      "aliases": [],
+      "verifiedBy": "official_employer_recruitment_page",
+      "notes": "该入口可从企业官方招聘页面或其公开招聘系统独立核实。"
     }
   }
 }

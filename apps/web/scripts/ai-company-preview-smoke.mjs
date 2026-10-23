@@ -123,7 +123,25 @@ try{
   await desktop.goto(ROOT);
   await desktop.locator('.unified-job-browse-links').getByRole('link',{name:/查看完整招聘市场/}).click();
  }
- await searchBox.fill('华安证券');
+ // Newly verified employer-specific recruiting pages, industry and major labels.
+ for(const [name,expected] of [
+  ['雷赛智能','https://www.leisai.com/recruitment/index.html'],
+  ['英威腾','https://www.invt.com.cn/careers'],
+  ['兆易创新','https://www.gigadevice.com.cn/about/career'],
+  ['埃斯顿','https://estun1.zhiye.com/'],
+  ['海康机器人','https://job.hikrobotics.com/']
+ ]){
+  await searchBox.fill(name);
+  await desktop.locator('.domestic-company-card').filter({hasText:name}).first().click();
+  await desktop.getByRole('heading',{name,exact:true}).waitFor();
+  const actual=await desktop.locator('.domestic-careers .domestic-careers-link').first().getAttribute('href');
+  assert.equal(actual,expected,'Wrong exact recruiting employer link: '+name);
+  await desktop.locator('.domestic-category-breadcrumb').first().waitFor();
+  assert((await desktop.locator('.domestic-major-tag').count())>=4,'Professional association missing: '+name);
+  await desktop.goto(ROOT);
+  await desktop.locator('.unified-job-browse-links').getByRole('link',{name:/查看完整招聘市场/}).click();
+ }
+  await searchBox.fill('华安证券');
  await desktop.locator('.domestic-company-card').filter({hasText:'华安证券'}).first().click();
  await desktop.getByRole('heading',{name:'华安证券'}).waitFor();
  await desktop.getByText('安徽省合肥市滨湖新区紫云路1018号').first().waitFor();

@@ -4,6 +4,14 @@ import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import path from 'node:path';
 const profiles=JSON.parse(readFileSync('src/data/domesticCareerProfiles.json','utf8'));
 const sources=[
+ {name:"比亚迪",page:"https://www.bydglobal.com/cn/about.html",host:["www.bydglobal.com","bydglobal.com"],rules:[{match:/乘用车品牌|新能源汽车产品|多元产业/i,kind:"product",label:"比亚迪官网汽车品牌及产品展示"}]},
+ {name:"雷赛智能",page:"https://www.leisai.com/groupIntroduction.html",host:["www.leisai.com","leisai.com"],rules:[{match:/公司总部|总部大楼|生产基地|园区实景|工业厂房|办公环境/i,kind:"office",label:"雷赛智能官网展示的总部及办公环境"},{match:/伺服系统|PLC产品|运动控制器|工业机器人/i,kind:"product",label:"雷赛智能官网运动控制产品展示"}]},
+ {name:"德赛西威",page:"https://www.desaysv.com/about.html",host:["www.desaysv.com","desaysv.com"],rules:[{match:/惠南工业园|智能工厂|生产基地|园区实景/i,kind:"factory",label:"德赛西威官网产业园及工厂展示"},{match:/智能座舱|驾驶域控制器|产品实景/i,kind:"product",label:"德赛西威官网汽车电子产品"}]},
+ {name:"隆基绿能",page:"https://www.longi.com/cn/about-longi/",host:["www.longi.com","longi.com"],rules:[{match:/光伏组件|硅片制造|光伏工厂|隆基基地/i,kind:"product",label:"隆基绿能官网光伏产品与制造场景"}]},
+ {name:"兆易创新",page:"https://www.gigadevice.com.cn/about/career",host:["www.gigadevice.com.cn","gigadevice.com.cn"],rules:[{match:/办公环境|办公室|研发中心/i,kind:"office",label:"兆易创新官网办公环境"}]},
+ {name:"宁德时代",page:"https://www.catl.com/about/profile/",host:["www.catl.com","catl.com"],rules:[{match:/宁德总部|总部大楼|宁德基地|电池工厂/i,kind:"headquarters",label:"宁德时代官网总部及生产基地"},{match:/动力电池产品|储能系统|骁遥电池|神行电池/i,kind:"product",label:"宁德时代官网电池产品展示"}]},
+ {name:"海尔智家",page:"https://hd.maker.haier.net/client/home/abouthaier.html",host:["hd.maker.haier.net","maker.haier.net"],rules:[{match:/海尔智家总部|办公环境|海尔研发中心/i,kind:"office",label:"海尔智家官网办公和研发环境"},{match:/海尔智慧家庭|智能家电|三翼鸟智慧家庭/i,kind:"product",label:"海尔智家官网智慧家庭产品展示"}]},
+ {name:"英威腾",page:"https://www.invt.com.cn/careers",host:["www.invt.com.cn","invt.com.cn"],rules:[{match:/办公环境|生产基地|工厂展示|研发中心/i,kind:"office",label:"英威腾官方办公与研发场景"}]},
  {name:'华域视觉科技（上海）有限公司',page:'https://www.hascovision.com/products-innovation/intelligent-manufacturing',host:['www.hascovision.com','hascovision.com'],
  rules:[{match:/^工厂(?:\.jpg)?$/i,kind:'factory',label:'华域视觉官网：嘉定数字化工厂'}]},
  {name:'京东方Ａ',page:'https://www.boe.com/Enterprise/SmartEnergyManagement',host:['www.boe.com','boe.com','boe-official01.oss-cn-beijing.aliyuncs.com'],
