@@ -36,6 +36,8 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
  const parent=company?findParentCompany(all,company):null;
  const related=company?findRelatedCompanies(all,company):[];
  const article=company?curated[company.name]:undefined;
+ const substantive=Boolean(article?.officialSource&&article.description.length>=3&&
+  article.description.join('').length>=280&&article.business.length>=3&&article.majorSlugs.length>=4);
  const media=company?available.companies[company.name]:undefined;
  const brandSrc=media?.brand?.state==='ready'?import.meta.env.BASE_URL+media.brand.path:undefined;
  const majors=company?matchingMajors(company):[];
@@ -52,7 +54,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
        <Building2 size={26} aria-hidden="true"/>}
      </div>
      <div className="domestic-profile-identity">
-      <span className="domestic-editorial-eyebrow">{article?'HHBA · 企业深度资料':'HHBA · 上市主体名录（未完成深度核验）'}</span>
+      <span className="domestic-editorial-eyebrow">{substantive?'HHBA · 已整理深度资料':article?'HHBA · 企业资料（继续完善中）':'HHBA · 上市主体名录（未完成深度核验）'}</span>
       <h1>{article?.displayName||company.name}</h1>
       <p>{article?.subtitle||(company.industry!=='行业待细分'?company.industry:'证券主体名录记录')}{company.city?' · '+company.city:''}</p>
       {article?.displayName&&article.displayName!==company.name&&<small>经营主体：{company.name}</small>}
@@ -78,6 +80,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
      </section>:
      <section className="domestic-editorial-section" aria-label="企业介绍">
       <h2>企业介绍</h2>
+      {!substantive&&<p className="domestic-company-note">当前已有具体业务资料，但仍未达到完整深度档案标准；内容将依据官方来源继续补充。</p>}
       <div className="domestic-editorial-body">{article.description.map((paragraph,i)=><p key={i}>{paragraph}</p>)}</div>
       {article&&<div className="domestic-editorial-business">
        {article.business.map(item=><div key={item.title}><strong>{item.title}</strong><p>{item.description}</p></div>)}

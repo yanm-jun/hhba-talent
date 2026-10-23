@@ -229,3 +229,15 @@ test('previously verified local media survives transient official-site outages',
  assert(workflow.includes("actions/cache/restore@v4"));
  assert(workflow.includes("actions/cache/save@v4"));
 });
+
+test('company cards distinguish substantive articles, partial writeups and raw stock identities',()=>{
+ const cards=readFileSync('src/components/DomesticCompanyResults.tsx','utf8');
+ const page=readFileSync('src/pages/DomesticCompanyPage.tsx','utf8');
+ const script=readFileSync('scripts/audit-all-company-content.mjs','utf8');
+ assert(cards.includes('有来源的深度介绍'));
+ assert(cards.includes('已整理业务内容 · 仍需完善'));
+ assert(cards.includes('仅名录信息 · 不冒充深度介绍'));
+ assert(page.includes('企业资料（继续完善中）'));
+ assert(script.includes("'PARTIAL_PROFILE'"));
+ assert(script.includes('partialProfiles:'));
+});

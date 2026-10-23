@@ -31,6 +31,7 @@ for(const [key,r] of dataset){
  const e=editorialMap.get(key)?.p;
  const description=(p?.description||[]).join('');
  const hasEditorial=Boolean(e?.overview);
+ const hasPartialProfile=Boolean(p?.description?.length>=2&&p.business?.length>=2&&p.officialSource);
  const hasLongform=Boolean(p?.officialSource&&p.description?.length>=3&&
      description.length>=280&&p.business?.length>=3&&p.majorSlugs?.length>=4);
  const issues=[
@@ -41,7 +42,7 @@ for(const [key,r] of dataset){
    !p?.officeLocations?.length?'no_verified_office':null,
    !p?.careersUrl?'independent_recruitment_url_unverified':null,
  ].filter(Boolean);
- const tier=hasLongform?'SOURCE_BACKED_INTRO':hasEditorial?'SHORT_EDITORIAL':'DIRECTORY_ONLY';
+ const tier=hasLongform?'SOURCE_BACKED_INTRO':hasPartialProfile?'PARTIAL_PROFILE':hasEditorial?'SHORT_EDITORIAL':'DIRECTORY_ONLY';
  rows.push({name:r.name,code:r.code,source:r.source,tier,issues,mediaComplete:!issues.includes('formal_logo_unverified')&&!issues.includes('no_official_photo_evidence'),
   hasEditorial,hasProfile:Boolean(p),categories:r.categories});
 }
@@ -49,6 +50,7 @@ const summary={
  generatedAt:'2026-10-23',method:'union of 2026-10-23 A-share roster, affiliated businesses, editorial profiles and official-entry registry; not a claim of exhaustive verification',
  listedTotal:roster.companies.length,distinctSearchIdentities:rows.length,
  sourceBackedIntroductions:rows.filter(r=>r.tier==='SOURCE_BACKED_INTRO').length,
+ partialProfiles:rows.filter(r=>r.tier==='PARTIAL_PROFILE').length,
  shortEditorial:rows.filter(r=>r.tier==='SHORT_EDITORIAL').length,
  directoryOnly:rows.filter(r=>r.tier==='DIRECTORY_ONLY').length,
  officialLogoAndPhotoComplete:rows.filter(r=>r.mediaComplete).length,
@@ -80,7 +82,7 @@ test('Every listed issuer is assessed and not silently removed by quality gating
  assert.equal(roster.companies.length,5576);
  const keys=new Set(rows.map(r=>norm(r.name)));
  for(const c of roster.companies)assert(keys.has(norm(c.name)),c.name+' not audited');
- assert.equal(rows.length,summary.sourceBackedIntroductions+summary.shortEditorial+summary.directoryOnly);
+ assert.equal(rows.length,summary.sourceBackedIntroductions+summary.partialProfiles+summary.shortEditorial+summary.directoryOnly);
 });
 test('Known weak profile example has been replaced by a substantial source-backed article',()=>{
  const row=rows.find(x=>x.name==='华安证券');
