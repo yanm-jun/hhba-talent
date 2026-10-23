@@ -525,18 +525,19 @@
     "careersLabel": "",
     "officialSource": "https://www.chint.net/about/overview/about_us",
     "productSource": "https://www.chint.net/",
-    "brandImage": "https://en.miracletech.com/media_library/image_20251013170129OFKX.JPEG",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
-    "brandImageSource": "https://en.miracletech.com/aboutus.html?c_id=2&id=0",
     "photoSourcePage": "https://www.chint.net/about/overview/about_us",
     "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
     "primaryIndustry": "电力设备与智能电网",
     "subIndustry": "低压电器 · 智慧能源 · 电力系统",
     "industryEvidenceUrl": "https://www.chint.net/about/overview/about_us",
     "industry": "电力设备与智能电网",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "website": "https://www.chint.net/",
+    "brandAssetStatus": "pending_official_logo",
+    "brandReviewNote": "之前误引的 en.miracletech.com 不是正泰电器官方品牌域名"
   },
   "英威腾": {
     "displayName": "英威腾",
@@ -658,11 +659,9 @@
     "careersLabel": "思源电气加入我们",
     "officialSource": "https://www.sieyuan.com/about",
     "productSource": "https://www.sieyuan.com/",
-    "brandImage": "https://pbs.twimg.com/profile_images/1121308964975591429/G3LvwCKG_400x400.png",
     "photos": [],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official",
-    "brandImageSource": "https://x.com/sieyuan_group",
     "photoSourcePage": "https://www.sieyuan.com/about",
     "photoSourceLabel": "查看官网企业资料（实景素材仍待核实）",
     "recruitmentEvidenceUrl": "https://www.sieyuan.com/join",
@@ -673,7 +672,10 @@
     "subIndustry": "输变电设备 · 新型电力系统 · 智慧能源",
     "industryEvidenceUrl": "https://www.sieyuan.com/about",
     "industry": "电力设备与智能电网",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "website": "https://www.sieyuan.com/",
+    "brandAssetStatus": "pending_official_logo",
+    "brandReviewNote": "此前使用 Twitter 头像来源，未能由思源电气官网证实为正式 Logo"
   },
   "许继电气": {
     "displayName": "许继电气",
@@ -3795,10 +3797,8 @@
     "careersLabel": "中国银行官方招聘公告栏目",
     "officialSource": "https://www.boc.cn/aboutboc/ab1/200809/t20080901_985.html",
     "productSource": "https://www.boc.cn/aboutboc/ab1/200809/t20080901_985.html",
-    "website": "https://www.boc.cn",
-    "brandImage": "https://www.boc.cn/images/LOGO-AGACCS.gif",
-    "brandAssetStatus": "official_website_logo_candidate",
-    "brandImageSource": "https://www.boc.cn/",
+    "website": "https://www.boc.cn/",
+    "brandAssetStatus": "pending_official_logo",
     "photos": [],
     "photoSourcePage": "https://www.boc.cn/aboutboc/ab1/200809/t20080901_985.html",
     "photoSourceLabel": "查看官方网站（图片尚待核实）",
@@ -3820,8 +3820,7 @@
     "subIndustry": "商业银行、国际结算及跨境综合金融",
     "industryEvidenceUrl": "https://www.boc.cn/aboutboc/ab1/200809/t20080901_985.html",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
-    "brandLocalPath": "domestic-media/caf76992859b35e-website-brand-candidate.gif",
-    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
+    "brandReviewNote": "之前误选的 LOGO-AGACCS.gif 是无障碍认证标识，并非中国银行品牌 Logo"
   },
   "中国移动": {
     "displayName": "中国移动",
