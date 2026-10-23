@@ -1,5 +1,6 @@
 import curated from '../data/aiCompanyCatalog.json';
 import editorial from '../data/domesticCompanyEditorial.json';
+import careerProfiles from '../data/domesticCareerProfiles.json';
 import rosterSnapshot from '../data/domesticListedCompanies.json';
 import relationsSnapshot from '../data/domesticCompanyRelations.json';
 
@@ -21,6 +22,7 @@ export type CompanyRelation={
 };
 type RelationFeed={schemaVersion:number;relations:CompanyRelation[]};
 const details=editorial as Record<string,Editorial>;
+const verifiedCareerProfiles=careerProfiles as Record<string,{careersUrl:string}>;
 const normalize=(value:string)=>value.toLocaleLowerCase().replace(/[\s·・（）()\-—_]/g,'');
 let cache:DomesticCompany[]|undefined;
 function clean(value?:string){return value?.trim()||undefined}
@@ -120,6 +122,11 @@ export function getDomesticCompanies():DomesticCompany[]{
    }
    mergeRelation(company,r);
    for(const a of aliasesFor(company))if(!index.has(normalize(a)))index.set(normalize(a),company);
+  }
+  // An employer's confirmed independent careers page overrides any inherited group portal.
+  for(const item of map){
+   const exact=verifiedCareerProfiles[item.name];
+   if(exact){item.careers=exact.careersUrl;item.careersShared=false;}
   }
   cache=map;
   return map;

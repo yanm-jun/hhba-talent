@@ -24,6 +24,9 @@ on:
       - 'apps/web/scripts/domestic-company-relations.test.mjs'
       - 'apps/web/src/main.tsx'
       - 'apps/web/src/router.tsx'
+      - 'apps/web/src/pages/MajorCompaniesPage.tsx'
+      - 'apps/web/src/services/domesticMajors.ts'
+      - 'apps/web/src/data/domesticCareerProfiles.json'
   workflow_dispatch:
 permissions:
   contents: read

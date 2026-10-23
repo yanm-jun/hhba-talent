@@ -1,95 +1,102 @@
-import {useEffect,useMemo,useState} from 'react';
-import {ArrowLeft,ArrowRight,ExternalLink,Building2,ShieldCheck,Search,ChevronDown} from 'lucide-react';
+import {useMemo,useState} from 'react';
+import {ArrowLeft,ArrowRight,ExternalLink,Building2,ShieldCheck,ChevronDown,ImageOff} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,getCompanyReturnTarget} from '../router';
-import {loadDomesticCompanies,companyById,findParentCompany,findRelatedCompanies,type DomesticCompany} from '../services/domesticCompanySearch';
+import {getDomesticCompanies,companyById,findParentCompany,findRelatedCompanies} from '../services/domesticCompanySearch';
+import {matchingMajors} from '../services/domesticMajors';
+import profiles from '../data/domesticCareerProfiles.json';
 import type {User} from '../services/api';
 import '../styles/domestic-company-search.css';
-function httpsLink(raw?:string){
- if(!raw)return '';
- try{const value=new URL(/^https?:\/\//i.test(raw)?raw:'https://'+raw);
-  return value.protocol==='https:'&&!value.username&&!value.password?value.href:''}
- catch{return ''}
+
+type Reviewed={
+ displayName:string;subtitle:string;description:string[];
+ business:{title:string;description:string}[];majorSlugs:string[];
+ careersUrl:string;careersLabel:string;officialSource:string;productSource:string;
+ brandImage:string;imageSource:string;lastReviewed:string;
+};
+const curated=profiles as Record<string,Reviewed>;
+function httpsLink(value?:string){
+ if(!value)return '';
+ try{const u=new URL(/^https?:\/\//i.test(value)?value:'https://'+value);
+ return u.protocol==='https:'&&!u.username&&!u.password?u.href:'';}catch{return ''}
 }
-const typeLabel=(kind?:DomesticCompany['entityKind'])=>kind==='branch'?'分公司':kind==='business'?'业务板块':'企业主体';
 export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
- const [all,setAll]=useState<DomesticCompany[]>([]);
- const [company,setCompany]=useState<DomesticCompany|null>(null);
- const [error,setError]=useState('');const [loading,setLoading]=useState(true);
- const [search,setSearch]=useState('');const [shown,setShown]=useState(12);
- useEffect(()=>{
-  let active=true;setLoading(true);setCompany(null);setSearch('');setShown(12);
-  loadDomesticCompanies().then(items=>{if(active){setAll(items);setCompany(companyById(items,id));setError('')}})
-   .catch(e=>{if(active)setError(e instanceof Error?e.message:'无法读取企业档案')})
-   .finally(()=>{if(active)setLoading(false)});
-  return()=>{active=false};
- },[id]);
+ const all=useMemo(()=>getDomesticCompanies(),[]);
+ const company=useMemo(()=>companyById(all,id),[all,id]);
+ const [imageFailed,setImageFailed]=useState(false);
+ const [filter,setFilter]=useState('');
  const back=getCompanyReturnTarget();
- const related=useMemo(()=>company?findRelatedCompanies(all,company):[],[all,company]);
- const parent=useMemo(()=>company?findParentCompany(all,company):null,[all,company]);
- const filtered=useMemo(()=>{const q=search.trim().toLocaleLowerCase().replace(/\s+/g,'');
-  return q?related.filter(c=>[c.name,c.industry,c.city||'',c.parentName||'',...c.tags,...c.aliases||[]]
-   .join(' ').toLocaleLowerCase().replace(/\s+/g,'').includes(q)):related;
- },[related,search]);
- return <Shell user={user}><article className="domestic-company-profile">
- <Link to={back.to} restoreScrollY={back.scrollY} restoreMarketState={back.marketState} className="domestic-company-back"><ArrowLeft size={16}/> 返回上一页</Link>
- {loading?<p role="status">正在读取企业档案…</p>:error?<p role="alert">{error}</p>:!company?<p>该企业资料暂未找到。</p>:<>
- <header><div className="domestic-company-profile-mark"><Building2 size={28}/></div>
-  <div className="domestic-profile-identity"><span>HHBA · 国内企业与经营主体</span>
-   <h1>{company.name}</h1><p>{company.industry}{company.city?' · '+company.city:''}</p>
-   <small>{typeLabel(company.entityKind)}{company.relationLabel?' · '+company.relationLabel:''}</small>
-  </div></header>
- <p className="domestic-company-disclaimer"><ShieldCheck size={17}/> HHBA 根据企业官方资料及交易所历史名录整理。企业关系不等于全部为直接控股；专业标签不代表正在招聘或任职资格。</p>
- {parent&&<section className="domestic-profile-parent">
-  <h2>所属集团与经营主体</h2>
-  <Link to={parent.route} className="domestic-parent-link">
-   <Building2 size={18}/><strong>{parent.name}</strong><span>{company.relationLabel||'关联企业'}</span><ArrowRight size={16}/>
-  </Link>
-  {httpsLink(company.relationSourceUrl)&&<p className="domestic-company-note"><a target="_blank" rel="noopener noreferrer" href={httpsLink(company.relationSourceUrl)}>核对该企业关系的公开来源 <ExternalLink size={13}/></a></p>}
- </section>}
- <section><h2>{company.entityKind==='business'?'业务板块介绍':'企业介绍'}</h2>
-  <p>{company.overview}</p>
-  {company.legalName&&<p>登记名称：{company.legalName}</p>}
-  {company.stockCode&&<p>证券代码：{company.stockCode}</p>}
-  {company.entityKind==='business'&&<p className="domestic-company-note">该条目是业务板块，不自动视为独立法人公司。</p>}
- </section>
- <section><h2>业务方向与专业关联</h2>{company.tags.length?
-  <div className="domestic-profile-tags">{company.tags.map(tag=><span key={tag}>{tag}</span>)}</div>:
-  <p>该主体细分业务和对应专业尚未完成核验，暂不根据名称猜测岗位要求。</p>}
-  <p className="domestic-company-note">专业关联只是业务方向参考，不代表招聘条件，也不代表具备相应岗位。</p>
- </section>
- {related.length>0&&<section className="domestic-relations-section" aria-label="旗下及关联企业">
-  <div className="domestic-relations-head"><div><h2>旗下及关联企业</h2>
-   <p>按公开的集团业务关系整理，共关联 {related.length} 条经营主体或业务板块记录。可直接搜索，无需逐层展开。</p></div></div>
-  <label className="domestic-relations-search"><Search size={17}/>
-   <input type="search" value={search} maxLength={90} onChange={e=>{setSearch(e.target.value);setShown(12)}}
-    placeholder="搜索关联企业名称、专业或城市" aria-label="搜索旗下及关联企业"/></label>
-  {filtered.length===0?<p className="domestic-company-note">当前没有匹配的关联企业。</p>:
-   <div className="domestic-relations-grid">{filtered.slice(0,shown).map(item=><Link key={item.id}
-    to={item.route} className="domestic-related-card">
-    <div><strong>{item.name}</strong><span>{item.relationLabel||'关联企业'}</span></div>
-    {item.parentName!==company.name&&<small>关联路径：{item.parentName}</small>}
-    <p>{item.industry}{item.city?' · '+item.city:''}</p>
-    <footer><span>{item.tags.slice(0,3).join(' · ')||'专业标签待完善'}</span><ArrowRight size={15}/></footer>
-   </Link>)}</div>}
-  {filtered.length>shown&&<button className="domestic-related-more" type="button" onClick={()=>setShown(s=>s+12)}>
-   查看更多关联企业（剩余 {filtered.length-shown}） <ChevronDown size={16}/></button>}
- </section>}
- <section><h2>官网与核验来源</h2>
-  {httpsLink(company.website)&&<p><a href={httpsLink(company.website)} target="_blank" rel="noopener noreferrer">企业官网或名录登记网址 <ExternalLink size={15}/></a></p>}
-  {httpsLink(company.sourceUrl)&&<p><a href={httpsLink(company.sourceUrl)} target="_blank" rel="noopener noreferrer">企业资料来源 <ExternalLink size={15}/></a></p>}
-  {company.relationSourceUrl&&company.relationSourceUrl!==company.sourceUrl&&httpsLink(company.relationSourceUrl)&&
-   <p><a href={httpsLink(company.relationSourceUrl)} target="_blank" rel="noopener noreferrer">企业隶属与业务关系依据 <ExternalLink size={15}/></a></p>}
-  <small>资料整理时间：{company.lastReviewed} · {company.status==='listed_identity_only'?'上市公司身份已收录，经营业务仍待核实':company.status==='official_entry_only'?'历史招聘入口信息': '公开业务信息已整理，股权及当前招聘状态需核对'}</small>
- </section>
- <section className="domestic-careers"><h2>招聘岗位与官方渠道</h2>
-  <p>本站尚未对该主体提供可确认当前开放的独立岗位列表。招聘信息、岗位职责及任职要求以企业官方渠道为准。</p>
-  {httpsLink(company.careers)?<>
-   {company.careersShared&&<p className="domestic-company-note">以下是集团统一招聘入口，该主体名称在官方招聘公司筛选项中出现；不等于它有独立招聘网站或当前在招岗位。</p>}
-   <a className="domestic-careers-link" href={httpsLink(company.careers)} target="_blank" rel="noopener noreferrer">
-    {company.careersShared?'查看集团统一招聘入口':'查看官方招聘入口'} <ExternalLink size={17}/></a>
-  </>:<p>暂未核验该主体独立的官方招聘入口，不提供猜测的岗位或网址。</p>}
- </section>
- </>}
+ const parent=company?findParentCompany(all,company):null;
+ const related=company?findRelatedCompanies(all,company):[];
+ const article=company?curated[company.name]:undefined;
+ const majors=company?matchingMajors(company):[];
+ const careers=company?httpsLink(article?.careersUrl||company.careers):'';
+ const shownRelated=related.filter(c=>(c.name+c.industry+(c.city||'')+c.tags.join(' ')).toLocaleLowerCase().includes(filter.trim().toLocaleLowerCase())).slice(0,24);
+ return <Shell user={user}><article className="domestic-company-profile domestic-editorial-profile">
+  <Link to={back.to} restoreScrollY={back.scrollY} restoreMarketState={back.marketState} className="domestic-company-back"><ArrowLeft size={16}/> 返回上一页</Link>
+  {!company?<section className="domestic-editorial-panel"><h1>企业资料尚未找到</h1><Link to="/candidate/jobs">返回企业搜索</Link></section>:
+   <div className="domestic-editorial-panel">
+    <header className="domestic-editorial-hero">
+     <div className="domestic-company-profile-mark" aria-label="企业视觉资料">
+      {article?.brandImage&&!imageFailed?<img src={article.brandImage} alt="华域视觉官网公开的企业形象图片" onError={()=>setImageFailed(true)}/>:
+       <Building2 size={26} aria-hidden="true"/>}
+     </div>
+     <div className="domestic-profile-identity">
+      <span className="domestic-editorial-eyebrow">HHBA · COMPANY PROFILE</span>
+      <h1>{article?.displayName||company.name}</h1>
+      <p>{article?.subtitle||company.industry}{company.city?' · '+company.city:''}</p>
+      {article?.displayName&&article.displayName!==company.name&&<small>经营主体：{company.name}</small>}
+     </div>
+    </header>
+    <section className="domestic-editorial-section" aria-label="企业介绍">
+      <h2>企业介绍</h2>
+      {article?<div className="domestic-editorial-body">{article.description.map((paragraph,i)=><p key={i}>{paragraph}</p>)}</div>:
+       <div className="domestic-editorial-body"><p>{company.overview}</p>
+       <p className="domestic-editorial-limited">当前为基础企业档案；企业历史、技术实力、产品与图片尚待官方资料核验后补全，不使用虚构内容占位。</p></div>}
+      {article&&<div className="domestic-editorial-business">
+       {article.business.map(item=><div key={item.title}><strong>{item.title}</strong><p>{item.description}</p></div>)}
+      </div>}
+    </section>
+    <section className="domestic-editorial-section" aria-label="适合哪些专业背景">
+      <h2>适合哪些专业背景？</h2>
+      {majors.length?<div className="domestic-profile-tags domestic-major-tags">
+       {majors.map(major=><Link className="domestic-major-tag" key={major.slug} to={'/majors/'+major.slug}
+        aria-label={'查看与'+major.name+'相关的企业'}>{major.name}<ArrowRight size={13}/></Link>)}</div>:
+       <p className="domestic-editorial-limited">暂无足够资料判断该企业与哪些专业方向相关，正在逐步完善。</p>}
+      <p className="domestic-company-note">根据企业公开业务与技术方向整理的专业关联，不等于该企业正在招聘这些专业的学生。点击专业可发现更多业务相关企业。</p>
+    </section>
+    <section className="domestic-editorial-section domestic-careers" aria-label="官方招聘渠道">
+      <h2>官方招聘渠道</h2>
+      <p>点击企业招聘页面查看当前招聘信息、岗位职责和实际申请条件；HHBA 不同步或虚构国内企业职位。</p>
+      {careers?<div className="domestic-careers-row"><div><strong>{article?.careersLabel||'企业招聘入口'}</strong>
+       <small>{article?'已核对企业官网的独立招聘页面':'来源于已有招聘入口记录，当前可用性请以打开结果为准'}</small></div>
+       <a href={careers} target="_blank" rel="noopener noreferrer" className="domestic-careers-link">查看招聘官网 <ExternalLink size={15}/></a></div>:
+       <p className="domestic-editorial-limited">尚未核验该主体可直接访问的官方招聘渠道，不提供猜测的网址。</p>}
+    </section>
+    <section className="domestic-editorial-section domestic-editorial-sources" aria-label="资料来源">
+      <details className="domestic-company-sources">
+       <summary>资料来源与核验说明 <ChevronDown size={15}/></summary>
+       <div>{httpsLink(article?.officialSource||company.sourceUrl)&&<a href={httpsLink(article?.officialSource||company.sourceUrl)} target="_blank" rel="noopener noreferrer">企业公开资料 <ExternalLink size={13}/></a>}
+       {article?.productSource&&<a href={article.productSource} target="_blank" rel="noopener noreferrer">公开产品资料 <ExternalLink size={13}/></a>}
+       {article?.imageSource&&<a href={article.imageSource} target="_blank" rel="noopener noreferrer">企业图片来源 <ExternalLink size={13}/></a>}
+       {httpsLink(company.website)&&<a href={httpsLink(company.website)} target="_blank" rel="noopener noreferrer">企业网站 <ExternalLink size={13}/></a>}
+       <p>资料日期：{article?.lastReviewed||company.lastReviewed}。企业介绍和专业方向由 HHBA 独立整理，不代表企业招聘合作。</p></div>
+      </details>
+    </section>
+    {(parent||related.length>0)&&<section className="domestic-editorial-section domestic-profile-relations" aria-label="企业关系">
+      <details>
+       <summary>企业关系 <span>按需查看</span><ChevronDown size={16}/></summary>
+       <div className="domestic-relations-inside">
+        {parent&&<p>所属或关联主体：<Link to={parent.route}>{parent.name} <ArrowRight size={13}/></Link> <small>· {company.relationLabel||'关联关系'}</small></p>}
+        {related.length>0&&<><p>已整理 {related.length} 条子公司、分支机构及业务板块关系记录，不代表均为直接全资控股。</p>
+         <label className="domestic-relations-search"><input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="搜索关联企业" aria-label="搜索关联企业"/></label>
+         <div className="domestic-relations-compact">{shownRelated.map(item=><Link key={item.id} to={item.route}>{item.name}<ArrowRight size={13}/></Link>)}</div>
+         {related.length>24&&<small>为保持页面简洁，仅展示前 24 条匹配关系。</small>}
+        </>}
+       </div>
+      </details>
+    </section>}
+    <p className="domestic-company-disclaimer"><ShieldCheck size={15}/> 企业信息与专业关联供职业探索参考，真实招聘要求以企业官网为准。</p>
+   </div>}
  </article></Shell>;
 }

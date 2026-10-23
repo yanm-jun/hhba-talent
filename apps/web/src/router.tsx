@@ -14,11 +14,12 @@ type JobOrigin={to:string;scrollY:number;marketState?:MarketState};
 const detailRoute=/^\/candidate\/jobs\/[A-Za-z0-9_-]{1,180}$/;
 const companyRoute=/^\/companies\/(?:openai|anthropic|spacex|id\/[A-Za-z0-9_-]{12,600}|domestic\/(?:a-[0-9]{6}|cn-B1-[0-9]{3}|spot-[^/]{2,100}|rel-[a-z]+-[0-9]{3}|group-geely))$/;
 const directoryRoute=/^\/companies$/;
+const majorRoute=/^\/majors\/[a-z-]{3,80}$/;
 function currentPathWithSearch(){return currentRoute()+location.search;}
 function safeOrigin(to:unknown):to is string{
  if(typeof to!=='string'||to.length>700||!to.startsWith('/')||to.startsWith('//')||to.includes('\\'))return false;
  const path=to.split(/[?#]/,1)[0];
- return detailRoute.test(path)||companyRoute.test(path)||directoryRoute.test(path)||path==='/'||path==='/candidate'||path==='/candidate/jobs'||path==='/candidate/match'||
+ return detailRoute.test(path)||companyRoute.test(path)||directoryRoute.test(path)||majorRoute.test(path)||path==='/'||path==='/candidate'||path==='/candidate/jobs'||path==='/candidate/match'||
    path==='/candidate/jobs/archive'||path==='/candidate/employer-jobs';
 }
 const safeScroll=(value:unknown)=>typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<10000000?value:0;
@@ -49,7 +50,7 @@ export function navigate(to:string,options:InternalNavigation={}){
    :undefined;
  const state:Record<string,unknown>={hhbaScrollY:safeScroll(options.scrollY)};
  if(jobOrigin)state.hhbaJobOrigin=jobOrigin;
- if(companyRoute.test(to.split('?',1)[0])&&safeOrigin(from)){
+ if((companyRoute.test(to.split('?',1)[0])||majorRoute.test(to.split('?',1)[0]))&&safeOrigin(from)){
    state.hhbaCompanyOrigin={to:from,scrollY:safeScroll(source?.hhbaScrollY),
      marketState:source?.hhbaMarketState};
    if(detailRoute.test(currentRoute())&&source?.hhbaJobOrigin&&

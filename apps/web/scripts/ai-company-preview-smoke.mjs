@@ -69,24 +69,30 @@ try{
  await desktop.locator('.unified-job-browse-links').getByRole('link',{name:/查看完整招聘市场/}).click();
  assert.match(desktop.url(),/\/candidate\/jobs$/);
  await desktop.locator('.unified-job-search input').waitFor();
- // Verify real company graph routes through HHBA pages, not directly to an ATS.
+ // Verified company page and major → companies reverse lookup.
  await desktop.locator('.unified-job-search input').fill('华域视觉');
- // Built-in catalogue must show results on the first search render, with zero runtime JSON downloads.
- await desktop.locator('.domestic-company-card').filter({hasText:'华域视觉'}).first().waitFor({timeout:2500});
+ await desktop.locator('.domestic-company-card').filter({hasText:'华域视觉'}).first().waitFor({timeout:4500});
  assert(!((await desktop.locator('.domestic-company-result').innerText()).includes('载入企业名录中')));
-
- await desktop.locator('.domestic-company-card').filter({hasText:'华域视觉'}).first().waitFor({timeout:12000});
  await desktop.locator('.domestic-company-card').filter({hasText:'华域视觉'}).first().click();
- await desktop.getByRole('heading',{name:'华域视觉科技（上海）有限公司'}).waitFor();
- assert.match(desktop.url(),/\/companies\/domestic\//);
- await desktop.locator('.domestic-parent-link').filter({hasText:'华域汽车'}).click();
- await desktop.getByRole('heading',{name:'华域汽车',exact:true}).waitFor();
- await desktop.locator('.domestic-related-card').filter({hasText:'华域视觉'}).first().waitFor();
- await desktop.locator('.domestic-parent-link').filter({hasText:'上汽集团'}).click();
- await desktop.getByRole('heading',{name:'上汽集团',exact:true}).waitFor();
- await desktop.locator('.domestic-relations-search input').fill('华域视觉');
- await desktop.locator('.domestic-related-card').filter({hasText:'华域视觉'}).first().waitFor();
- assert.equal(await desktop.locator('.domestic-related-card').count(),1);
+ await desktop.getByRole('heading',{name:'华域视觉科技'}).waitFor();
+ assert.equal(await desktop.locator('.domestic-major-tag').count(),8);
+ assert.equal(await desktop.locator('.domestic-careers-link[href="https://www.hascovision.com/join-us"]').count(),1);
+ assert.equal(await desktop.locator('.domestic-profile-relations details[open]').count(),0,
+  'Company relations must be collapsed by default');
+ await desktop.getByRole('link',{name:/查看与电气工程及其自动化相关的企业/}).click();
+ await desktop.getByRole('heading',{name:'电气工程及其自动化'}).waitFor();
+ assert.match(desktop.url(),/\/majors\/electrical-engineering$/);
+ await desktop.locator('.domestic-major-company').filter({hasText:'华域视觉'}).first().waitFor();
+ const majorCard=desktop.locator('.domestic-major-company').filter({hasText:'华域视觉'}).first();
+ assert.equal(await majorCard.locator('a[href="https://www.hascovision.com/join-us"]').count(),1);
+ await majorCard.getByRole('link',{name:/了解企业/}).click();
+ await desktop.getByRole('heading',{name:'华域视觉科技'}).waitFor();
+ await desktop.locator('.domestic-profile-relations summary').click();
+ await desktop.locator('.domestic-relations-inside').getByRole('link',{name:/华域汽车/}).click();
+ await desktop.getByRole('heading',{name:'华域汽车'}).waitFor();
+ await desktop.locator('.domestic-profile-relations summary').click();
+ await desktop.locator('.domestic-relations-inside').getByRole('link',{name:/上汽集团/}).click();
+ await desktop.getByRole('heading',{name:'上汽集团'}).waitFor();
  assert.deepEqual(errors,[]);
  console.log('HHBA_REAL_ATS_MARKET_AND_ORIGINAL_LAYOUT_BROWSER_PASS',expected);
 }finally{await browser?.close();server.kill('SIGTERM');}

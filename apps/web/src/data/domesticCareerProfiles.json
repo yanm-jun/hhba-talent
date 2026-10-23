@@ -1,0 +1,24 @@
+{
+ "华域视觉科技（上海）有限公司": {
+  "displayName":"华域视觉科技",
+  "subtitle":"汽车照明 · 智能灯光 · 汽车电子",
+  "description":[
+   "华域视觉科技（上海）有限公司专注于汽车照明和视觉技术。公司由华域汽车系统股份有限公司收购原上海小糸车灯有限公司的日方股东股份后，于2018年3月正式转制成立。其业务覆盖汽车照明产品的设计、研发、制造、技术服务及相关汽车电子系统。",
+   "在汽车照明加速走向智能化与数字化的过程中，华域视觉从传统前照灯、尾灯延伸至数字灯光系统、交互式信号灯和车灯控制器等领域。它不仅需要研究光学与造型，也需要电子控制、机械结构、软件及制造工艺的协同。",
+   "公司总部位于上海，官网披露了常熟、吉林、武汉、长沙、重庆等地及海外相关生产与业务布局。对于求职者，理解不同基地和业务方向，有助于判断自己的技术背景可以在哪类团队发挥作用；具体岗位以官方招聘页为准。"
+  ],
+  "business":[
+   {"title":"汽车前照灯与尾灯","description":"涵盖照明、指示和信号功能，以及车灯造型、光学设计和电子系统的整合。"},
+   {"title":"数字灯光与交互系统","description":"围绕数字投影照明、交互式信号灯、灯光域控制器等方向开展产品研发。"},
+   {"title":"智能制造与测试验证","description":"面向汽车零部件规模化生产，涉及生产工艺、自动化、质量控制和测试验证。"}
+  ],
+  "majorSlugs":["electrical-engineering","automation","mechanical-engineering","vehicle-engineering","electronic-information","optoelectronics","computer-science","materials-engineering"],
+  "careersUrl":"https://www.hascovision.com/join-us",
+  "careersLabel":"华域视觉 · 加入我们",
+  "officialSource":"https://www.hascovision.com/about/about-us",
+  "productSource":"https://www.hascovision.com/products-innovation/products",
+  "brandImage":"https://www.hascovision.com/Public/Uploads/uploadfile/images/20240131/e1banpc.jpg",
+  "imageSource":"https://www.hascovision.com/about/about-us",
+  "lastReviewed":"2026-10-23"
+ }
+}
