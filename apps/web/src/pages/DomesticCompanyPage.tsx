@@ -15,6 +15,7 @@ type Reviewed={
  brandImage?:string;imageSource?:string;brandImageSource?:string;brandAssetStatus?:string;lastReviewed:string;
  photos?:{url:string;label:string;source:string}[];
  officeLocations?:{type:string;address:string;source:string}[];
+ photoSourcePage?:string;photoSourceLabel?:string;
  evidenceLevel?:string;
 };
 const curated=profiles as Record<string,Reviewed>;
@@ -42,7 +43,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
    <div className="domestic-editorial-panel">
     <header className="domestic-editorial-hero">
      <div className="domestic-company-profile-mark" aria-label="企业视觉资料">
-      {article?.brandImage&&!imageFailed?<img src={article.brandImage} alt={company.name+"的官方品牌标识"} onError={()=>setImageFailed(true)}/>:
+      {article?.brandImage&&!imageFailed?<img src={article.brandImage} alt={company.name+'的企业官网图标'} onError={()=>setImageFailed(true)}/>:
        <Building2 size={26} aria-hidden="true"/>}
      </div>
      <div className="domestic-profile-identity">
@@ -51,6 +52,9 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       <p>{article?.subtitle||company.industry}{company.city?' · '+company.city:''}</p>
       {article?.displayName&&article.displayName!==company.name&&<small>经营主体：{company.name}</small>}
       {article?.officeLocations?.length? <small className="domestic-profile-office-hint"><MapPin size={13}/>{article.officeLocations[0].address}</small>:null}
+      {article?.brandImage&&<small className="domestic-media-confidence">
+       {article.brandAssetStatus==='official_domain_favicon_unverified_visual'?'当前显示企业网站图标，尚未确认为正式品牌 Logo':'品牌图来源已登记，显示状态以实际加载结果为准'}
+      </small>}
      </div>
     </header>
     <section className="domestic-editorial-section" aria-label="企业介绍">
@@ -76,6 +80,11 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
        </figure>)}
       </div>
      </section>:null}
+    {article?.photoSourcePage&&!article.photos?.length?
+     <section className="domestic-editorial-section" aria-label="官方企业实景来源"><h2>企业实景与办公环境</h2>
+      <p className="domestic-company-note">图片暂未核验为可在本站稳定展示，避免错用其他企业照片。</p>
+      <a href={article.photoSourcePage} target="_blank" rel="noopener noreferrer" className="domestic-careers-link">
+       {article.photoSourceLabel||'查看官网企业实景资料'} <ExternalLink size={14}/></a></section>:null}
     {article?.officeLocations?.length?<section className="domestic-editorial-section" aria-label="办公地点">
       <h2>总部与办公地点</h2>
       <div className="domestic-office-list">{article.officeLocations.map(entry=><div key={entry.address}><MapPin size={17}/><div><strong>{entry.type}</strong><p>{entry.address}</p>

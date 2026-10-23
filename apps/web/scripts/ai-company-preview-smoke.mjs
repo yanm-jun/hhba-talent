@@ -86,6 +86,31 @@ try{
  await desktop.getByRole('option',{name:'机械设计制造及其自动化'}).click();
  await desktop.locator('.domestic-major-filter-active').getByText('机械设计制造及其自动化').waitFor();
  await desktop.getByRole('button',{name:'清除所学专业'}).click();
+ // Search-to-detail integrity: check every deep-profile employer, not only hand-picked examples.
+ const deepProfiles=JSON.parse(await readFile('src/data/domesticCareerProfiles.json','utf8'));
+ const searchBox=desktop.locator('.unified-job-search input');
+ const results=[];
+ for(const name of Object.keys(deepProfiles)){
+   await searchBox.fill(name);
+   const card=desktop.locator('.domestic-company-card').filter({hasText:name}).first();
+   await card.waitFor({timeout:6000});
+   const href=await card.getAttribute('href');
+   assert(href?.includes('/companies/domestic/'),'Company should route through HHBA: '+name);
+   assert(!href.startsWith('https://'),'Company card must not bypass HHBA details: '+name);
+   results.push({name,href});
+ }
+ assert.equal(results.length,Object.keys(deepProfiles).length);
+ console.log('HHBA_DEEP_EMPLOYER_SEARCH_LINKAGE_PASS',results.length);
+ await searchBox.fill('京东方');
+ await desktop.locator('.domestic-company-card').filter({hasText:'京东方'}).first().click();
+ await desktop.getByRole('heading',{name:'京东方'}).waitFor();
+ assert.equal(await desktop.locator('.domestic-official-photo').count(),2,'Official BOE event photos should be present');
+ const sourced=await desktop.locator('.domestic-official-photo a').evaluateAll(els=>els.every(el=>
+  el.href.startsWith('https://www.boe.com/innovativeTechnologies/creativeSpace')));
+ assert(sourced,'All enterprise photos need explicit official source links');
+ await desktop.goto(ROOT);
+ await desktop.locator('.unified-job-browse-links').getByRole('link',{name:/查看完整招聘市场/}).click();
+ await desktop.locator('.unified-job-search input').waitFor();
  // Original company and jobs search still works after major selection/clear.
  // Verified company page and major → companies reverse lookup.
  // Confirm newly indexed company and its professional detail page are navigable.

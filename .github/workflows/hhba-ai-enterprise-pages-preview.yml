@@ -22,6 +22,7 @@ on:
       - 'apps/web/src/data/domesticListedCompanies.json'
       - 'apps/web/src/data/domesticCompanyRelations.json'
       - 'apps/web/scripts/domestic-company-relations.test.mjs'
+      - 'apps/web/scripts/audit-domestic-company-media.mjs'
       - 'apps/web/src/main.tsx'
       - 'apps/web/src/router.tsx'
       - 'apps/web/src/pages/MajorCompaniesPage.tsx'
@@ -71,6 +72,9 @@ jobs:
       - name: Validate public company relationship sources and hierarchy
         working-directory: apps/web
         run: node --test scripts/domestic-company-relations.test.mjs
+      - name: Audit company media and profile source coverage
+        working-directory: apps/web
+        run: node --test scripts/audit-domestic-company-media.mjs
       - name: Retrieve public ATS listings for OpenAI, Anthropic, SpaceX (no API Key)
         run: |
           cd apps/web
@@ -110,6 +114,12 @@ jobs:
       - name: Verify desktop, mobile and legacy search in real browser
         working-directory: apps/web
         run: node scripts/ai-company-preview-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-company-media-audit
+          path: apps/web/preview-reports/
+          retention-days: 30
       - uses: actions/upload-artifact@v4
         with:
           name: hhba-ai-enterprise-pages-screenshots

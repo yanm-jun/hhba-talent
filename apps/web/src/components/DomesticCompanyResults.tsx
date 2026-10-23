@@ -11,7 +11,7 @@ type Props={query:string;majorSlug?:string;scope?:string;country?:string;city?:s
 function BrandMark({src,name}:{src?:string;name:string}){
  const [failed,setFailed]=useState(false);
  if(!src||failed)return <Building2 size={19} aria-label="企业图标待补充"/>;
- return <img loading="lazy" src={src} alt={name+'的官网品牌图标'} onError={()=>setFailed(true)}/>;
+ return <img loading="lazy" src={src} alt={name+'的企业网站图标'} onError={()=>setFailed(true)}/>;
 }
 export function DomesticCompanyResults({query,majorSlug='',scope='',country='',city=''}:Props){
  const all=getDomesticCompanies();
@@ -46,6 +46,7 @@ export function DomesticCompanyResults({query,majorSlug='',scope='',country='',c
       <BrandMark src={editorial?.brandImage} name={company.name}/>
      </span><strong>{editorial?.displayName||company.name}</strong></div>
     <small>{company.industry}{company.city?' · '+company.city:''}{company.parentName?' · 关联：'+company.parentName:''}</small>
+    {editorial?.displayName&&editorial.displayName!==company.name&&<small className="domestic-card-legal">企业主体：{company.name}</small>}
     <p>{editorial?.summary||company.overview}</p>
     <footer><span>{editorial?.summary?'企业介绍已整理':company.status==='industry_reviewed'?'业务资料已整理':'基础资料 · 待完善'}</span>
      <span>查看企业 <ArrowRight size={14}/></span></footer>

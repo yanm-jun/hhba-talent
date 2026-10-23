@@ -107,3 +107,6 @@
 .domestic-major-filter-active span{color:#718477;font-size:11px}
 .domestic-company-result .domestic-company-caution{margin:9px 0 12px}
 @media(max-width:640px){.domestic-major-filter-active{align-items:flex-start}}
+
+.domestic-card-legal{color:#7a827d!important;font-size:10px!important}
+.domestic-media-confidence{display:block;margin-top:6px;font-size:10px;color:#8b968e!important}

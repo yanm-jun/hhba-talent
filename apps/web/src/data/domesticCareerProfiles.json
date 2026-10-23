@@ -856,7 +856,7 @@
       {
         "type": "惠州生产研发园区",
         "address": "广东省惠州市惠南高新科技产业园惠泰北路6号",
-        "source": "https://www.desaysv.com/about.html"
+        "source": "https://www.desaysv.com/contactUs.html"
       }
     ],
     "majorSlugs": [
@@ -878,7 +878,9 @@
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://desaysv.com",
-    "industry": "智能座舱"
+    "industry": "智能座舱",
+    "photoSourcePage": "https://www.desaysv.com/employerBrand.html",
+    "photoSourceLabel": "德赛西威官方雇主品牌页展示了实际工作环境照片"
   },
   "京东方Ａ": {
     "displayName": "京东方",
@@ -907,7 +909,7 @@
       {
         "type": "集团总部办公地址",
         "address": "北京市北京经济技术开发区西环中路12号",
-        "source": "https://www.boe.com/about/index"
+        "source": "https://www.boe.com/about/globalLayout"
       }
     ],
     "majorSlugs": [
@@ -923,13 +925,25 @@
     "officialSource": "https://www.boe.com/about/index",
     "productSource": "https://boe.com",
     "brandImage": "https://boe.com/favicon.ico",
-    "brandImageSource": "https://boe.com",
+    "brandImageSource": "https://www.boe.com/about/brandIdentity",
     "brandAssetStatus": "official_domain_favicon_unverified_visual",
-    "photos": [],
+    "photos": [
+      {
+        "url": "https://boe-official01.oss-cn-beijing.aliyuncs.com/jpg/list011606287766299boe.jpg",
+        "label": "京东方官网公开的创新成果展实景",
+        "source": "https://www.boe.com/innovativeTechnologies/creativeSpace"
+      },
+      {
+        "url": "https://boe-official01.oss-cn-beijing.aliyuncs.com/jpeg/list021606287766301boe.jpeg",
+        "label": "京东方官网公开的创客挑战杯路演活动",
+        "source": "https://www.boe.com/innovativeTechnologies/creativeSpace"
+      }
+    ],
     "lastReviewed": "2026-10-23",
     "evidenceLevel": "official_source_read",
     "website": "https://boe.com",
-    "industry": "显示技术"
+    "industry": "显示技术",
+    "imageSource": "https://www.boe.com/innovativeTechnologies/creativeSpace"
   },
   "歌尔股份": {
     "displayName": "歌尔股份",
