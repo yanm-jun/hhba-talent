@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-23T13:09:21.548Z",
+  "generatedAt": "2026-10-23T13:11:14.739Z",
   "sourceCount": 60,
   "entries": {
     "比亚迪": {
@@ -110,7 +110,7 @@
       "sourcePage": "https://www.saicmotor.com/chinese/gsgk/qyml/index.shtml",
       "candidates": [],
       "published": [],
-      "status": "no_approved_download"
+      "status": "source_inaccessible"
     },
     "汇川技术": {
       "sourcePage": "https://www.inovance.com/",
@@ -224,7 +224,7 @@
       "sourcePage": "https://sunwoda.com/",
       "candidates": [],
       "published": [],
-      "status": "source_inaccessible"
+      "status": "no_approved_download"
     },
     "福耀玻璃": {
       "sourcePage": "https://fuyaogroup.com/",
@@ -242,7 +242,7 @@
       "sourcePage": "https://sungrowpower.com/",
       "candidates": [],
       "published": [],
-      "status": "no_approved_download"
+      "status": "source_inaccessible"
     },
     "海康机器人": {
       "sourcePage": "https://hikrobotics.com/",
@@ -296,7 +296,7 @@
       "sourcePage": "https://www.gf.com.cn/",
       "candidates": [],
       "published": [],
-      "status": "no_approved_download"
+      "status": "source_inaccessible"
     },
     "中信证券": {
       "sourcePage": "https://www.citics.com/",
@@ -392,7 +392,7 @@
       "sourcePage": "https://www.boc.cn/aboutboc/ab1/200809/t20080901_985.html",
       "candidates": [],
       "published": [],
-      "status": "no_approved_download"
+      "status": "source_inaccessible"
     },
     "中国移动": {
       "sourcePage": "https://www.10086.cn/aboutus/jtgk/",
@@ -403,26 +403,29 @@
   },
   "warnings": [
     "海尔智家:TypeError: fetch failed",
-    "国电南瑞:TypeError: fetch failed",
+    "上汽集团:TypeError: fetch failed",
     "正泰电器:Error: HTTP 403",
+    "国电南瑞:TypeError: fetch failed",
     "埃斯顿:TypeError: fetch failed",
     "雷赛智能:TypeError: fetch failed",
     "潍柴动力:TypeError: fetch failed",
     "许继电气:TypeError: fetch failed",
-    "中控技术:TypeError: fetch failed",
     "拓斯达:TypeError: fetch failed",
-    "欣旺达:TypeError: fetch failed",
+    "中控技术:TypeError: fetch failed",
     "福耀玻璃:TypeError: fetch failed",
+    "阳光电源:TypeError: fetch failed",
     "海康机器人:TypeError: fetch failed",
     "亿纬氢能:TypeError: fetch failed",
     "科大讯飞:TypeError: fetch failed",
     "北方华创:TypeError: fetch failed",
     "华安证券:TypeError: fetch failed",
-    "亿纬锂能:TypeError: fetch failed",
     "光大证券:TypeError: fetch failed",
+    "亿纬锂能:TypeError: fetch failed",
+    "广发证券:TypeError: fetch failed",
     "浦发银行:TypeError: fetch failed",
-    "海康威视:TypeError: fetch failed",
+    "上海机场:TypeError: fetch failed",
     "建设银行:TypeError: fetch failed",
-    "上海机场:TimeoutError: The operation was aborted due to timeout"
+    "海康威视:TypeError: fetch failed",
+    "中国银行:TypeError: fetch failed"
   ]
 }
