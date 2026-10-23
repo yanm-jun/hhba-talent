@@ -46,7 +46,11 @@ const jobs=[];
 for(const [name,p] of Object.entries(profiles)){
  const key=Buffer.from(name).toString('hex').slice(0,175);
  manifest.companies[name]={brand:{state:'missing'},photos:[]};
- if(p.brandImage)jobs.push({name,kind:'brand',idx:0,url:p.brandImage,key:key+'-brand'});
+ if(p.brandLocalPath&&/^domestic-media\/[a-zA-Z0-9._-]+\.(?:png|jpg|webp|gif)$/.test(p.brandLocalPath)&&existsSync('public/'+p.brandLocalPath)){
+  manifest.companies[name].brand={state:'ready',path:p.brandLocalPath,source:p.brandImage,
+   classification:'official_site_brand_candidate_not_visually_verified'};
+  stats.brandSucceeded++;
+ }else if(p.brandImage)jobs.push({name,kind:'brand',idx:0,url:p.brandImage,key:key+'-brand'});
  (p.photos||[]).forEach((photo,idx)=>{
   if(photo.localPath&&/^domestic-media\/[a-zA-Z0-9._-]+\.(?:png|jpg|webp|gif)$/.test(photo.localPath)&&existsSync('public/'+photo.localPath)){
    manifest.companies[name].photos[idx]={state:'ready',path:photo.localPath,source:photo.url,
@@ -64,7 +68,7 @@ await Promise.all(Array.from({length:Math.min(7,jobs.length)},async()=>{
   if(j.kind==='brand'){
    rec.brand={...out,
     classification:profiles[j.name].brandAssetStatus==='official_logo_visually_verified'?
-      'logo_identity_checked':'site_icon_or_brand_candidate_not_visually_verified'};
+      'logo_identity_checked':profiles[j.name].brandAssetStatus==='official_website_logo_candidate'?'official_site_brand_candidate_not_visually_verified':'site_icon_or_brand_candidate_not_visually_verified'};
    stats.brandSucceeded+=Number(out.state==='ready');
    stats.brandFailed+=Number(out.state!=='ready');
   }else{

@@ -210,3 +210,11 @@ test('official-logo verified status is limited to evidence-backed brand identity
  const prepare=readFileSync('scripts/prepare-domestic-company-media.mjs','utf8');
  assert(prepare.includes('official_publisher_caption_not_independently_visual_verified'));
 });
+
+test('official-site brand candidate discovery never marks a logo human-verified',()=>{
+ const file=readFileSync('scripts/discover-official-brand-candidates.mjs','utf8');
+ assert(file.includes("p.brandAssetStatus='official_website_logo_candidate'"));
+ assert(file.includes("human visual identity review pending"));
+ const prep=readFileSync('scripts/prepare-domestic-company-media.mjs','utf8');
+ assert(prep.includes('official_site_brand_candidate_not_visually_verified'));
+});

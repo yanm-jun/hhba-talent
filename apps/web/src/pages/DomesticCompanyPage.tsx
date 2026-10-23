@@ -59,7 +59,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       {article?.officeLocations?.length? <small className="domestic-profile-office-hint"><MapPin size={13}/>{article.officeLocations[0].address}</small>:null}
       {article&&!brandSrc?<small className="domestic-media-confidence">正式品牌 Logo 尚未核验；已屏蔽失效图片地址</small>:null}
       {brandSrc&&<small className="domestic-media-confidence">
-       {article?.brandAssetStatus==='official_logo_visually_verified'?'已对照企业官方招聘页面核验品牌标识':article?.brandAssetStatus==='official_domain_favicon_unverified_visual'?'当前显示企业网站图标，尚未确认为正式品牌 Logo':'品牌图来源已登记，尚未完成正式 Logo 身份核验'}
+       {article?.brandAssetStatus==='official_logo_visually_verified'?'已对照企业官方招聘页面核验品牌标识':article?.brandAssetStatus==='official_domain_favicon_unverified_visual'?'当前显示企业网站图标，尚未确认为正式品牌 Logo':article?.brandAssetStatus==='official_website_logo_candidate'?'来自企业官网的品牌图候选，尚待人工核对正式 Logo':'品牌图来源已登记，尚未完成正式 Logo 身份核验'}
       </small>}
      </div>
     </header>

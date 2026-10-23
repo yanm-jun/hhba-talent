@@ -26,6 +26,7 @@ on:
       - 'apps/web/scripts/check-domestic-company-image-urls.mjs'
       - 'apps/web/scripts/prepare-domestic-company-media.mjs'
       - 'apps/web/scripts/discover-official-company-media.mjs'
+      - 'apps/web/scripts/discover-official-brand-candidates.mjs'
       - 'apps/web/src/data/domesticOfficialSceneBundle.json'
       - 'apps/web/src/data/domesticMediaBundle.json'
       - 'apps/web/src/main.tsx'
@@ -69,6 +70,9 @@ jobs:
       - name: Discover explicitly captioned office and factory photos on official pages
         working-directory: apps/web
         run: node scripts/discover-official-company-media.mjs
+      - name: Discover logo candidates from exact-company official websites
+        working-directory: apps/web
+        run: node scripts/discover-official-brand-candidates.mjs
       - name: Bundle reachable, source-tracked employer images
         working-directory: apps/web
         run: node scripts/prepare-domestic-company-media.mjs
