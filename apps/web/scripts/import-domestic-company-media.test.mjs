@@ -8,6 +8,7 @@ import {promisify} from 'node:util';
 import {execFile} from 'node:child_process';
 const run=promisify(execFile);
 const currentScript=fileURLToPath(new URL('./import-domestic-company-media.mjs',import.meta.url));
+const bundler=fileURLToPath(new URL('./prepare-domestic-company-media.mjs',import.meta.url));
 const company='测试企业有限公司';
 const json=(file)=>JSON.parse(readFileSync(file,'utf8'));
 
@@ -39,6 +40,12 @@ test('JPEG logo, PNG office photo and JPG screenshot import with no original pho
   assert.ok(p.photos.every(x=>existsSync(path.join(work,'public',x.localPath))));
   assert.equal(b.photos.filter(x=>x.state==='ready').length,4);
   assert.ok(existsSync(path.join(work,'public',b.brand.path)));
+  // The following automated preview build must preserve user images and provenance.
+  await run(process.execPath,[bundler],{cwd:work,timeout:25000});
+  b=json(path.join(work,'src/data/domesticMediaBundle.json')).companies[company];
+  assert.equal(b.brand.state,'ready');
+  assert.equal(b.brand.classification,'user_submitted_logo_pending_identity');
+  assert.equal(b.photos.filter(x=>x.state==='ready').length,4);
   // Repeated pipeline builds must be idempotent rather than duplicate photos.
   await run(process.execPath,[currentScript],{cwd:work,timeout:25000});
   p=json(path.join(work,'src/data/domesticCareerProfiles.json'))[company];
