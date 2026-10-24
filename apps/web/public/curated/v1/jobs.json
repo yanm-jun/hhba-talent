@@ -738,7 +738,7 @@
       "titleZh": "增材制造工程师（猛禽发动机）",
       "titleTranslation": "editorial_checked",
       "locationEn": "Hawthorne, CA",
-      "locationZh": "地点待核验",
+      "locationZh": "美国 · 加利福尼亚州霍桑",
       "countryCode": "US",
       "cityKey": null,
       "education": null,
@@ -761,6 +761,30 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责猛禽发动机相关增材制造工艺的开发、测试与持续改进，工作涉及工业级 3D 打印设备、软件、零件设计、材料参数和质量控制。",
+        "responsibilities": [
+          "改进金属增材制造设备与打印流程，分析失败构建及过程监测数据，提升一致性和稳定性。",
+          "与设计、材料工程团队合作优化零件可制造性、打印参数、热处理和表面质量。",
+          "开发与维护制造数据采集分析工具，形成新设备与新工艺的技术规范。",
+          "持续推进制造效率、重复性和生产安全方面的改进。"
+        ],
+        "requirements": [
+          "工程相关专业本科，至少一年实际制造、装配、测试或项目管理经验。",
+          "熟悉粉床或送粉式增材制造、工艺参数开发和金属材料加工更有优势。",
+          "熟悉光学、激光、航空航天零件测试或热力学等基础技术者优先。",
+          "该岗位官网列有美国出口管制（ITAR）资格要求，申请人需满足适用身份或获批许可条件。"
+        ],
+        "benefits": [
+          "官网公布第一级年基本薪资约 100,000—130,000 美元，第二级约 115,000—160,000 美元。",
+          "可能提供股权相关激励及医疗、退休计划和带薪休假，具体按官方福利规则执行。"
+        ],
+        "originalSummary": "Raptor additive manufacturing engineer develops printing process, build parameters, manufacturing quality and equipment reliability. Requires an engineering bachelor's degree and at least one year of hands-on technical experience.",
+        "source": "https://job-boards.greenhouse.io/spacex/jobs/8816517002?gh_jid=8816517002"
       }
     },
     {
@@ -1108,6 +1132,29 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "该岗位属于 Stripe 的滥用行为研究团队，重点研究金融平台上的欺诈攻击与滥用手法，并通过安全数据分析提前发现威胁。",
+        "responsibilities": [
+          "围绕欺诈攻击链设计主动威胁搜寻方案，分析内部遥测、日志及外部情报。",
+          "研究账号接管、银行卡测试、凭证填充等复杂欺诈行为，并把发现转化为可操作的风险控制建议。",
+          "使用 Python、SQL 和自动化工具开发调查、验证及安全分析流程。",
+          "与欺诈运营、风控、产品和安全团队共同推动弱点修复及检测能力改进。"
+        ],
+        "requirements": [
+          "至少五年网络安全威胁情报、威胁搜寻、技术事件响应或平台滥用领域的相关经验。",
+          "至少五年复杂数据分析经验，熟悉 Python、SQL、日志分析和数字取证方法。",
+          "计算机科学、网络安全或相关技术专业本科／硕士，或具备同等实务能力。",
+          "熟悉金融欺诈攻击手法、自动化安全调查和大规模数据处理平台者优先。"
+        ],
+        "benefits": [
+          "原始岗位资料将远程工作界定为距离 Stripe 办公室较远、通常在家办公的岗位安排；薪资须以职位官网实际列示为准。"
+        ],
+        "originalSummary": "Threat-hunting engineer on Stripe's abuse research team, using data analysis, Python, SQL and adversary intelligence to proactively investigate fraud and protect payment infrastructure.",
+        "source": "https://stripe.com/careers/listing/abuse-research-engineer/8240322"
       }
     },
     {
@@ -1795,7 +1842,7 @@
       "titleZh": "商业成果架构师",
       "titleTranslation": "editorial_checked",
       "locationEn": "Tokyo, Japan",
-      "locationZh": "东京 · 日本",
+      "locationZh": "日本 · 东京",
       "countryCode": "JP",
       "cityKey": "tokyo",
       "education": null,
@@ -1818,6 +1865,29 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "面向 Notion 的企业客户，协助他们把人工智能和工作流程改造目标落实为可运行的系统，并推动客户采用、续约与长期价值实现。",
+        "responsibilities": [
+          "为负责的客户制定工作流程采用及价值交付计划，帮助客户在 Notion 内实现明确业务目标。",
+          "与解决方案顾问共同规划客户续约与增购机会，重点关注使用停滞或存在流失风险的客户。",
+          "组织使用场景咨询、业务复盘及投资回报评估，推动 AI 转型相关项目落地。",
+          "协调专业服务及相关交付团队，帮助复杂客户解决部署与实施问题。"
+        ],
+        "requirements": [
+          "至少三年 B2B 软件客户采用、客户成功、续约或业务扩张相关工作经验。",
+          "能够分析企业流程、与客户共同设计 Notion 工作区并解决配置和使用问题。",
+          "具备客户沟通、商业判断、项目管理及跨团队协作能力。",
+          "官网明确要求日语达到母语水平、英语达到商务工作水平。"
+        ],
+        "benefits": [
+          "工作地点为日本东京，属于全职岗位；具体薪酬按公司招聘页面确认。"
+        ],
+        "originalSummary": "Tokyo-based commercial outcomes architect helps named Notion customers adopt AI-native workflows, deliver measurable value and improve retention and expansion. Requires B2B SaaS experience, native Japanese and business English.",
+        "source": "https://jobs.ashbyhq.com/notion/b06005d2-e24b-467b-b7ea-783bac7366da"
       }
     },
     {
@@ -2158,6 +2228,30 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "Figma 合规工程师负责将 FedRAMP、SOC 2、ISO 27001 和 NIST 等安全合规框架落实为可测试、可监控的技术控制措施，并用自动化提高证据收集和验证效率。",
+        "responsibilities": [
+          "制定、实施与验证跨多个合规框架使用的技术安全控制措施。",
+          "联合安全、基础设施及产品工程团队，开展控制设计与运行有效性测试。",
+          "为发现的问题制定复核流程，建设可重复执行的评估和持续监控机制。",
+          "使用 JSON、REST API 及自动化流程管理合规规则和证据材料。"
+        ],
+        "requirements": [
+          "至少五年安全合规、IT 审计、控制保障或合规工程相关实际经验。",
+          "熟悉 FedRAMP、SOC 2、ISO 27001 或 NIST 800-53，以及 SaaS／云环境中的控制实践。",
+          "理解身份访问管理、漏洞管理、安全日志及云配置等技术。",
+          "具备 JSON、REST API 和自动化实践；了解 Python、OSCAL 或 AWS 安全技术者更佳。"
+        ],
+        "benefits": [
+          "官网说明可在美国指定办公地点或美国境内远程工作。",
+          "提供股权及医疗、退休计划、育儿与休假相关福利，实际待遇以招聘官网为准。"
+        ],
+        "originalSummary": "Figma compliance engineer designs, tests and automates technical security controls across FedRAMP, SOC 2, ISO 27001 and NIST frameworks. Requires 5+ years of relevant hands-on experience.",
+        "source": "https://job-boards.greenhouse.io/figma/jobs/6223155004"
       }
     },
     {
@@ -2489,7 +2583,7 @@
       "titleZh": "平台音视频工程师",
       "titleTranslation": "editorial_checked",
       "locationEn": "Stockholm",
-      "locationZh": "地点待核验",
+      "locationZh": "瑞典 · 斯德哥尔摩",
       "countryCode": "SE",
       "cityKey": "stockholm",
       "education": null,
@@ -2512,6 +2606,29 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "该岗位服务于 Spotify 企业内部 IT Studio 团队，维护欧洲、中东及非洲地区的会议室、音视频会议和办公协作设备，使日常及高层会议技术保持可靠。",
+        "responsibilities": [
+          "负责会议室、董事会议室、公共空间及数字标牌的音视频系统体验。",
+          "交付、维护并改进音视频设备方案，对复杂故障、重大会议支持和供应商项目进行协调。",
+          "监控设备运行，编制技术文档，开展故障处理、资产管理与预算预测。",
+          "在会议室与视频协作场景中探索人工智能功能和运维自动化。"
+        ],
+        "requirements": [
+          "至少三年音视频技术经验，能够参与方案设计、系统集成、调试和长期维护。",
+          "熟悉 DSP、控制处理器、放大器及 Crestron、Q-SYS、Dante 等系统。",
+          "具有 Google Meet 或 Zoom Rooms 等会议系统部署与问题排查经验。",
+          "了解企业 IT 和网络基础，能够为高管会议提供及时、专业的支持。"
+        ],
+        "benefits": [
+          "岗位位于瑞典斯德哥尔摩，官网说明一般每周到办公室约四至五天。"
+        ],
+        "originalSummary": "Stockholm AV Engineer II supports workplace meeting systems, executive collaboration technology, audiovisual infrastructure and vendors. Requires 3+ years in AV systems and integration.",
+        "source": "https://jobs.lever.co/spotify/785989a6-b219-43b1-92d9-750a67054f24"
       }
     },
     {
@@ -2826,7 +2943,7 @@
       "titleZh": "分析工程师",
       "titleTranslation": "editorial_checked",
       "locationEn": "Remote - United States",
-      "locationZh": "远程 · 美国",
+      "locationZh": "美国 · 远程",
       "countryCode": "US",
       "cityKey": null,
       "education": null,
@@ -2853,6 +2970,30 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "在 Reddit 数据科学组织中建设分析工程基础设施，连接数据生产方、数据工程师与业务分析团队，为产品、广告和营销决策提供可靠数据。",
+        "responsibilities": [
+          "开发及维护数据采集、加工和转换流水线，关注数据质量、性能及可靠性。",
+          "管理数据产品，建设质量检查、监控、内部分析工具和报告自动化能力。",
+          "与数据科学、工程及业务团队共同设计长期数据基础和技术路线。",
+          "推进跨内部或外部系统的数据集成，帮助团队使用一致、可信的数据。"
+        ],
+        "requirements": [
+          "计算机科学或定量分析相关专业本科。",
+          "至少三年大规模 ETL 系统和生产级数据软件开发经验。",
+          "熟练使用 Python、SQL 等技术；理解 Spark、Scala、Airflow、数据建模与数据库架构更匹配。",
+          "具备跨团队沟通、数据分析、仪表盘设计和独立推进任务的能力。"
+        ],
+        "benefits": [
+          "官网披露年基本薪资范围为 164,200—229,990 美元，并列有股权及美国雇员福利。",
+          "岗位公开标注可在美国远程工作。"
+        ],
+        "originalSummary": "Remote US analytics engineer builds trusted data products, ETL pipelines and quality tooling for Reddit's data science organization. Requires a quantitative bachelor's degree and 3+ years in large-scale ETL.",
+        "source": "https://job-boards.greenhouse.io/reddit/jobs/8282760"
       }
     },
     {
@@ -3169,7 +3310,7 @@
       "titleZh": "人工智能自动化工程师",
       "titleTranslation": "editorial_checked",
       "locationEn": "Costa Rica",
-      "locationZh": "地点待核验",
+      "locationZh": "哥斯达黎加",
       "countryCode": null,
       "cityKey": null,
       "education": null,
@@ -3195,6 +3336,29 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责为 Databricks 员工打造生产级人工智能代理和内部 IT 自动化服务，让员工通过自然语言请求完成常见 IT 操作，并确保流程可控、可审计。",
+        "responsibilities": [
+          "设计、部署和维护能够理解请求、读取企业上下文并执行工具操作的 AI Agent。",
+          "维护 MCP 服务，设计可拆分任务、处理失败与人工批准的智能工作流。",
+          "把常见 IT 支持事项转化为稳定的自助自动化流程，建立日志、指标和反馈机制。",
+          "结合访问权限控制、审计轨迹、凭证管理和异常处理建设可复用的自动化基础设施。"
+        ],
+        "requirements": [
+          "具备企业系统自动化、集成平台或智能代理应用开发经验。",
+          "熟悉 MCP 服务开发、工具调用与自动化流程治理。",
+          "了解身份访问管理、企业 SaaS 系统接入及日志监控。",
+          "熟悉 Databricks Agent Bricks、LangGraph、MLflow 或相关 AI Agent 框架者更有优势。"
+        ],
+        "benefits": [
+          "官网显示岗位地区为哥斯达黎加；公开职位详情未给出可直接确认的薪资金额。"
+        ],
+        "originalSummary": "Databricks AI automation engineer builds production IT agents, MCP servers, trusted context retrieval, approval workflows and observability for internal employee support in Costa Rica.",
+        "source": "https://www.databricks.com/company/careers/infrastructure/ai-automation-engineer-8829033002"
       }
     },
     {
