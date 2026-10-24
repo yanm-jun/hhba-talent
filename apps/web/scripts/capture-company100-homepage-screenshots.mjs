@@ -48,6 +48,7 @@ try {
    const url=safeSite(existingSource);
    if(!url){stats.failed.push({name,error:'missing_safe_company_website'});continue}
    const page=await browser.newPage({viewport:{width:1280,height:790},deviceScaleFactor:1,locale:'zh-CN',ignoreHTTPSErrors:false});
+   page.setDefaultTimeout(1800); // Dynamic headers must not block a company for 30 seconds per element.
    try{
     await page.route('**/*',route=>{
       const u=route.request().url();
@@ -55,18 +56,30 @@ try {
       if(!/^https?:\/\//i.test(u)||/^(?:http:\/\/)?(?:127\.|10\.|192\.168\.|localhost|169\.254\.)/i.test(u.replace(/^https?:\/\//,'')))return route.abort();
       return route.continue();
     });
-    const reply=await page.goto(url.href,{waitUntil:'domcontentloaded',timeout:13000});
-    if(!reply||reply.status()>=400)throw new Error('http_'+(reply?.status()||0));
-    const final=safeSite(page.url());
-    if(!final||!staysWithinEmployerSite(url,final))throw new Error('unexpected_redirect');
-    const title=(await page.title()).trim();
-    if(!title||/403|404|not found|access denied|security check|captcha|robot verification/i.test(title))throw new Error('unusable_page_title');
-    const body=await page.locator('body').innerText({timeout:2800}).catch(()=>'');
-    if(body.replace(/\s+/g,'').length<35)throw new Error('page_content_not_proven');
-    await page.waitForTimeout(700);
-    const screenshot=await page.screenshot({type:'jpeg',quality:74,fullPage:false,animations:'disabled',timeout:7000});
+    const candidates=[url,safeSite(profile.officialSource),
+      safeSite(url.hostname.startsWith('www.')?'https://'+url.hostname.slice(4)+url.pathname:'https://www.'+url.hostname+url.pathname)]
+      .filter(Boolean).filter((item,i,arr)=>arr.findIndex(v=>v.href===item.href)===i);
+    let final=null,title='',lastError='unreachable';
+    for(const candidate of candidates){
+     try{
+      const reply=await page.goto(candidate.href,{waitUntil:'domcontentloaded',timeout:10000});
+      if(!reply||reply.status()>=400)throw new Error('http_'+(reply?.status()||0));
+      const actual=safeSite(page.url());
+      if(!actual||!staysWithinEmployerSite(candidate,actual))throw new Error('unexpected_redirect');
+      const t=(await page.title()).trim();
+      if(!t||/403|404|not found|access denied|security check|captcha|robot verification/i.test(t))throw new Error('unusable_page_title');
+      const body=await page.locator('body').innerText({timeout:1800}).catch(()=>'');
+      if(body.replace(/\s+/g,'').length<35)throw new Error('page_content_not_proven');
+      title=t;final=actual;break;
+     }catch(e){lastError=String(e.message||e).slice(0,100)}
+    }
+    if(!final)throw new Error('no_firstparty_page:'+lastError);
+    await page.waitForTimeout(500);
+    let screenshot;
+    try{screenshot=await page.screenshot({type:'jpeg',quality:74,fullPage:false,animations:'allow',timeout:5500})}
+    catch{throw new Error('screenshot_timeout')}
     const output=await sharp(screenshot).resize({width:1024,withoutEnlargement:true}).webp({quality:78,effort:4}).toBuffer();
-    if(output.length<5000)throw new Error('image_too_small');
+    if(output.length<2300)throw new Error('image_too_small');
     const rel='domestic-media/company100-site-'+shortHash(name)+'.webp';
     writeFileSync(path.join('public',rel),output);
     const photo={url:rel,localPath:rel,source:final.href,kind:'screenshot',
