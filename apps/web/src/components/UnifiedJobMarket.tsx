@@ -287,6 +287,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       </div>
       {aiEvidence.jobs.length===0&&<p className="unified-job-state">暂未检索到具备可核对原文证据的岗位；不会提供虚构的职位。</p>}
     </section>}
+    <div className="unified-company-discovery-navigation" style={{margin:'18px auto 8px',maxWidth:1120,display:'flex',justifyContent:'flex-end'}}><Link to="/companies/discover" style={{fontSize:13,color:'#265e45',fontWeight:700,textDecoration:'none'}}>浏览全部 200 家企业档案 →</Link></div>
     <DomesticCompanyResults query={draft} majorSlug={selectedMajor}
       scope={filters.country} country={filters.location_country||''}
       city={cityOptions.find(c=>c.value===filters.city)?.zh||''}/>
