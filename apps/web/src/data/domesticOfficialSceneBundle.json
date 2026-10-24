@@ -1,0 +1,430 @@
+{
+  "generatedAt": "2026-10-23T14:55:23.750Z",
+  "sourceCount": 60,
+  "entries": {
+    "比亚迪": {
+      "sourcePage": "https://www.bydglobal.com/cn/about.html",
+      "candidates": [
+        {
+          "alt": "乘用车品牌",
+          "url": "https://www.bydglobal.com/material/group-official-website/cn/about/pinpai.jpg",
+          "kind": "product",
+          "label": "比亚迪官网汽车品牌及产品展示",
+          "state": "ready",
+          "sourcePage": "https://www.bydglobal.com/cn/about.html"
+        }
+      ],
+      "published": [
+        {
+          "kind": "product",
+          "label": "比亚迪官网汽车品牌及产品展示",
+          "sourcePage": "https://www.bydglobal.com/cn/about.html",
+          "originalUrl": "https://www.bydglobal.com/material/group-official-website/cn/about/pinpai.jpg",
+          "path": "domestic-media/e6af94e4ba9ae8bfaa-official-caption-0.jpg",
+          "evidence": "publisher_alt_on_official_page",
+          "identityVerifiedByHuman": false
+        }
+      ],
+      "status": "official_page_caption_assets_found"
+    },
+    "雷赛智能": {
+      "sourcePage": "https://www.leisai.com/groupIntroduction.html",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "德赛西威": {
+      "sourcePage": "https://www.desaysv.com/about.html",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "隆基绿能": {
+      "sourcePage": "https://www.longi.com/cn/about-longi/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "兆易创新": {
+      "sourcePage": "https://www.gigadevice.com.cn/about/career",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "宁德时代": {
+      "sourcePage": "https://www.catl.com/about/profile/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "海尔智家": {
+      "sourcePage": "https://hd.maker.haier.net/client/home/abouthaier.html",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "英威腾": {
+      "sourcePage": "https://www.invt.com.cn/careers",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "华域视觉科技（上海）有限公司": {
+      "sourcePage": "https://www.hascovision.com/about/about-us",
+      "candidates": [
+        {
+          "alt": "常熟新工厂.jpg",
+          "url": "https://www.hascovision.com/Public/Uploads/uploadfile/images/20260313/changshuxingongchang.jpg",
+          "kind": "factory",
+          "label": "华域视觉官网：常熟工厂建筑外景",
+          "state": "ready",
+          "sourcePage": "https://www.hascovision.com/about/about-us"
+        }
+      ],
+      "published": [
+        {
+          "kind": "factory",
+          "label": "华域视觉官网：常熟工厂建筑外景",
+          "sourcePage": "https://www.hascovision.com/about/about-us",
+          "originalUrl": "https://www.hascovision.com/Public/Uploads/uploadfile/images/20260313/changshuxingongchang.jpg",
+          "path": "domestic-media/e58d8ee59f9fe8a786e8a789e7a791e68a80efbc88e4b88ae6b5b7e-official-caption-0.jpg",
+          "evidence": "publisher_alt_on_official_page",
+          "identityVerifiedByHuman": false
+        }
+      ],
+      "status": "official_page_caption_assets_found"
+    },
+    "京东方Ａ": {
+      "sourcePage": "https://www.boe.com/Enterprise/SmartEnergyManagement",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "华域汽车": {
+      "sourcePage": "https://www.hasco-group.com/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "上汽集团": {
+      "sourcePage": "https://www.saicmotor.com/chinese/gsgk/qyml/index.shtml",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "汇川技术": {
+      "sourcePage": "https://www.inovance.com/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "中国中车": {
+      "sourcePage": "https://www.crrcgc.cc/sj/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "美的集团": {
+      "sourcePage": "https://www.midea.com.cn/zh/our-businesses",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "正泰电器": {
+      "sourcePage": "https://www.chint.net/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "思源电气": {
+      "sourcePage": "https://www.sieyuan.com/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "许继电气": {
+      "sourcePage": "https://xjec.com/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "平高电气": {
+      "sourcePage": "https://pinggao.com/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "国电南瑞": {
+      "sourcePage": "https://nrec.com/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "中控技术": {
+      "sourcePage": "https://supcon.com/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "拓斯达": {
+      "sourcePage": "https://topstarltd.com/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "埃斯顿": {
+      "sourcePage": "https://estun.com/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "歌尔股份": {
+      "sourcePage": "https://goertek.com/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "中兴通讯": {
+      "sourcePage": "https://zte.com.cn/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "科大讯飞": {
+      "sourcePage": "https://iflytek.com/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "潍柴动力": {
+      "sourcePage": "https://weichaipower.com/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "浪潮信息": {
+      "sourcePage": "https://ieisystem.com/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "晶科能源": {
+      "sourcePage": "https://jinkosolar.com/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "亿纬锂能": {
+      "sourcePage": "https://evebattery.com/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "欣旺达": {
+      "sourcePage": "https://sunwoda.com/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "福耀玻璃": {
+      "sourcePage": "https://fuyaogroup.com/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "紫光股份": {
+      "sourcePage": "https://unis.cn/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "阳光电源": {
+      "sourcePage": "https://sungrowpower.com/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "海康机器人": {
+      "sourcePage": "https://hikrobotics.com/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "阳光电动力": {
+      "sourcePage": "https://sungrowev.com/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "亿纬氢能": {
+      "sourcePage": "https://evehydrogen.com/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "立讯精密": {
+      "sourcePage": "https://luxshare-ict.com/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "三一重工": {
+      "sourcePage": "https://sanygroup.com/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "海康威视": {
+      "sourcePage": "https://hikvision.com/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "北方华创": {
+      "sourcePage": "https://naura.com/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "华安证券": {
+      "sourcePage": "https://www.hazq.com/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "广发证券": {
+      "sourcePage": "https://www.gf.com.cn/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "中信证券": {
+      "sourcePage": "https://www.citics.com/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "东方证券": {
+      "sourcePage": "https://www.dfzq.com.cn/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "华泰证券": {
+      "sourcePage": "https://www.htsc.com.cn/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "光大证券": {
+      "sourcePage": "https://www.ebscn.com/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "中国平安": {
+      "sourcePage": "https://www.pingan.cn/about/overview.shtml",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "贵州茅台": {
+      "sourcePage": "https://www.moutai.com.cn/mtgf/qygk/gsjj/index.html",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "格力电器": {
+      "sourcePage": "https://www.gree.com/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "浦发银行": {
+      "sourcePage": "https://cor.spdb.com.cn/jj/202503/t20250329_1130989.shtml",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "招商银行": {
+      "sourcePage": "https://www.cmbchina.com/cmbinfo/aboutcmb/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "海天味业": {
+      "sourcePage": "https://www.haday.com/about.html",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "中国建筑": {
+      "sourcePage": "https://www.cscec.com/gyzj/gsjj_new/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "上海机场": {
+      "sourcePage": "https://www.shanghaiairport.com/gfgs1/index.html",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "伊利股份": {
+      "sourcePage": "https://www.yili.com/pages/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "农业银行": {
+      "sourcePage": "https://www.abchina.com.cn/cn/AboutABC/nhfm/nhjj/",
+      "candidates": [],
+      "published": [],
+      "status": "no_approved_download"
+    },
+    "建设银行": {
+      "sourcePage": "https://www.ccb.cn/cn/investor/survey.html",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "中国银行": {
+      "sourcePage": "https://www.boc.cn/aboutboc/ab1/200809/t20080901_985.html",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    },
+    "中国移动": {
+      "sourcePage": "https://www.10086.cn/aboutus/jtgk/",
+      "candidates": [],
+      "published": [],
+      "status": "source_inaccessible"
+    }
+  },
+  "warnings": [
+    "海尔智家:TypeError: fetch failed",
+    "上汽集团:TypeError: fetch failed",
+    "国电南瑞:TypeError: fetch failed",
+    "正泰电器:Error: HTTP 403",
+    "埃斯顿:TypeError: fetch failed",
+    "潍柴动力:TypeError: fetch failed",
+    "许继电气:TypeError: fetch failed",
+    "拓斯达:TypeError: fetch failed",
+    "中控技术:TypeError: fetch failed",
+    "福耀玻璃:TypeError: fetch failed",
+    "海康机器人:TypeError: fetch failed",
+    "科大讯飞:TypeError: fetch failed",
+    "亿纬氢能:TypeError: fetch failed",
+    "华安证券:TypeError: fetch failed",
+    "晶科能源:TimeoutError: The operation was aborted due to timeout",
+    "广发证券:TypeError: fetch failed",
+    "亿纬锂能:TypeError: fetch failed",
+    "光大证券:TypeError: fetch failed",
+    "浦发银行:TypeError: fetch failed",
+    "北方华创:TypeError: fetch failed",
+    "海康威视:TypeError: fetch failed",
+    "建设银行:TypeError: fetch failed",
+    "中国银行:TypeError: fetch failed",
+    "中国移动:TypeError: fetch failed"
+  ]
+}
