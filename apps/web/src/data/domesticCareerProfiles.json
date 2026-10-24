@@ -1852,7 +1852,21 @@
     "brandImage": "https://weichaipower.com/favicon.ico",
     "brandImageSource": "https://weichaipower.com",
     "brandAssetStatus": "official_domain_favicon_unverified_visual",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company100-review-99bc5eb7f0f4e360c070.webp",
+        "localPath": "domestic-media/company100-review-99bc5eb7f0f4e360c070.webp",
+        "source": "https://www.xinhuanet.com/2021-08/05/c_1127733854.htm",
+        "kind": "factory",
+        "label": "新华网报道中的潍柴工业园区实景航拍图（非官网原始图）",
+        "verification": "reviewed_named_corporate_building_image_with_source",
+        "sourceFile": "reviewed-external-scene",
+        "attribution": "新华网报道配图（摄影作者待核实）",
+        "license": "news-photo-rights_not_independently_cleared",
+        "licenseUrl": null,
+        "changes": "resized and transcoded to WebP"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://weichaipower.com",

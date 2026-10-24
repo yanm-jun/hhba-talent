@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-24T04:18:01.825Z",
+  "generatedAt": "2026-10-24T04:19:36.237Z",
   "companies": {
     "华域视觉科技（上海）有限公司": {
       "brand": {
@@ -1874,6 +1874,20 @@
           "state": "ready",
           "path": "domestic-media/company100-review-cb0b0e4b48739fd2cd78.webp",
           "source": "https://www.zhaopin.com/companydetail/CC000577607.htm",
+          "classification": "source_backed_named_enterprise_scene",
+          "reviewDate": "2026-10-24"
+        }
+      ]
+    },
+    "潍柴动力": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-review-99bc5eb7f0f4e360c070.webp",
+          "source": "https://www.xinhuanet.com/2021-08/05/c_1127733854.htm",
           "classification": "source_backed_named_enterprise_scene",
           "reviewDate": "2026-10-24"
         }
