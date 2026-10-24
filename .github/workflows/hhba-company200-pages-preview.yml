@@ -12,6 +12,8 @@ on:
       - 'apps/web/src/components/Shell.tsx'
       - 'apps/web/src/components/CandidateAccountDropdown.tsx'
       - 'apps/web/src/pages/LegalAidLandingPage.tsx'
+      - 'apps/web/src/pages/LegalAidInterventionPage.tsx'
+      - 'apps/web/src/styles/legal-aid-intervention.css'
       - 'apps/web/src/pages/LegalAidTopicPage.tsx'
       - 'apps/web/src/data/laborRightsTopics.json'
       - 'apps/web/scripts/audit-labor-rights-topics.mjs'
@@ -295,6 +297,36 @@ jobs:
             }
             console.log('HHBA_EIGHT_LEGAL_GUIDES_BROWSER_OK',JSON.stringify({guides:8,allHaveLaws:true,evidence:true,paths:true,realCases:true,noUploads:true}));
             console.log('HHBA_LEGAL_AID_DESKTOP_OK',JSON.stringify({topics:8,desktopPanelWidth:panel.width,tabletTwoColumns:true,previewOnly:true}));
+            // Standalone funded-intervention view is real navigation, not a false case intake.
+            await page.goto(origin+'/candidate/account/legal-aid',{waitUntil:'domcontentloaded'});
+            await page.getByRole('link',{name:/请求平台介入/}).click();
+            await page.getByRole('heading',{name:'请求 HHBA 平台介入'}).waitFor({timeout:12000});
+            if(new URL(page.url()).pathname!==('/hhba-talent/candidate/account/legal-aid/intervention'))
+              throw Error('INTERVENTION_ROUTE_NOT_OPENED');
+            const inter=page.locator('.hhba-intervention');
+            await inter.getByText('服务筹备中 · 暂不接受申请',{exact:true}).waitFor({timeout:7000});
+            if(await inter.locator('.hhba-intervention-step').count()!==4)
+              throw Error('INTERVENTION_FOUR_STEPS_MISSING');
+            if(await inter.locator('.hhba-intervention-topic').count()!==8)
+              throw Error('INTERVENTION_EIGHT_CATEGORIES_MISSING');
+            await inter.getByRole('button',{name:'拖欠工资'}).click();
+            if(await inter.locator('.hhba-intervention-evidence-item').count()!==3)
+              throw Error('INTERVENTION_EVIDENCE_GUIDANCE_MISSING');
+            const lawLink=await inter.locator('.hhba-intervention-evidence-link').getAttribute('href');
+            if(lawLink!=='/hhba-talent/candidate/account/legal-aid/unpaid-wages')
+              throw Error('INTERVENTION_WRONG_TOPIC_GUIDE '+lawLink);
+            await inter.getByRole('heading',{name:/符合资助条件的案件，律师服务费用由 HHBA 承担/}).waitFor({timeout:5000});
+            if(await inter.locator('button.hhba-intervention-disabled:disabled').count()!==1)
+              throw Error('INTERVENTION_SUBMIT_MUST_BE_DISABLED');
+            if(await inter.locator('textarea,input,form,input[type="file"]').count()!==0)
+              throw Error('INTERVENTION_MUST_NOT_COLLECT_PERSONAL_DATA');
+            const feeNotice=await inter.locator('.hhba-intervention-funded').innerText();
+            if(!feeNotice.includes('第三方费用')||!feeNotice.includes('正式公布的资助规则'))
+              throw Error('INTERVENTION_FUNDING_SCOPE_MISSING');
+            await page.screenshot({path:'preview-reports/candidate-menu/legal-intervention-desktop.png',fullPage:true});
+            await inter.getByRole('link',{name:/返回法律援助/}).click();
+            await page.getByRole('heading',{name:'遇到劳动问题？'}).waitFor({timeout:8000});
+            console.log('HHBA_INTERVENTION_DESKTOP_OK',JSON.stringify({categories:8,evidencePurposes:3,fundingScope:true,applicationEnabled:false}));
             // Preserve the original job market when entering and leaving the account menu.
             await page.goto(origin+'/',{waitUntil:'domcontentloaded'});
             await page.locator('.unified-job-card').first().waitFor({timeout:50000});
@@ -333,6 +365,22 @@ jobs:
             if(detailWidth.page>detailWidth.viewport+2)
               throw Error('LEGAL_DETAIL_MOBILE_OVERFLOW '+JSON.stringify(detailWidth));
             await mobile.screenshot({path:'preview-reports/candidate-menu/legal-guide-mobile.png',fullPage:true});
+            await mobile.goto(origin+'/candidate/account/legal-aid/intervention',{waitUntil:'domcontentloaded',timeout:40000});
+            await mobile.getByRole('heading',{name:'请求 HHBA 平台介入'}).waitFor({timeout:12000});
+            const mInter=mobile.locator('.hhba-intervention');
+            await mInter.getByRole('button',{name:'工伤与赔偿'}).click();
+            if(await mInter.locator('.hhba-intervention-evidence-item').count()!==3)
+              throw Error('INTERVENTION_MOBILE_EVIDENCE_MISSING');
+            const interventionMeasures=await mobile.evaluate(()=>({
+              viewport:document.documentElement.clientWidth,
+              page:document.documentElement.scrollWidth
+            }));
+            if(interventionMeasures.page>interventionMeasures.viewport+2)
+              throw Error('INTERVENTION_MOBILE_HORIZONTAL_OVERFLOW '+JSON.stringify(interventionMeasures));
+            if(await mInter.locator('button.hhba-intervention-disabled:disabled').count()!==1)
+              throw Error('INTERVENTION_MOBILE_SUBMISSION_OPEN');
+            await mobile.screenshot({path:'preview-reports/candidate-menu/legal-intervention-mobile.png',fullPage:true});
+            console.log('HHBA_INTERVENTION_MOBILE_OK',JSON.stringify({...interventionMeasures,category:'工伤与赔偿',sensitiveDataCollected:false}));
             console.log('HHBA_LEGAL_AID_MOBILE_OK',JSON.stringify({...mobileMeasures,previewOnly:true}));
             console.log('HHBA_CANDIDATE_ACCOUNT_MENU_OK',JSON.stringify({
               sevenPathsVerified:true,hover:true,escape:true,keyboardFocus:true,
