@@ -641,6 +641,102 @@
         "国电南瑞科技股份有限公司"
       ],
       "notes": "高校发布的国电南瑞招聘文件明确要求登录南瑞集团招聘系统；集团官网覆盖多家关联法人，用人主体和具体岗位要逐项核对，不能等同集团任意岗位都属于国电南瑞上市主体。"
+    },
+    "平高电气": {
+      "url": "https://www.pinggao.com/contact/jobSociety.html",
+      "evidenceUrl": "https://www.pinggao.com/contact/jobSociety.html",
+      "kind": "official_recruitment_announcements",
+      "availability": "announcement_only",
+      "label": "平高电气官网社会招聘公告",
+      "recruitmentEntity": "平高电气",
+      "notes": "官网发布平高集团与平高电气的联合招聘公告，实际用人单位及投递方式以公告为准。",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_company_hiring_page_or_employer_university_announcement",
+      "aliases": []
+    },
+    "科大讯飞": {
+      "url": "https://iflytek.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://ejob.dhu.edu.cn/single/2026/10/12/2610121556504011147817122210141088310040.html",
+      "kind": "official_recruitment_portal",
+      "availability": "campus_only",
+      "label": "科大讯飞2027校园招聘",
+      "recruitmentEntity": "科大讯飞",
+      "notes": "2027届高校招聘公告确认该招聘系统，点击后以实际招聘子公司和岗位说明为准。",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_company_hiring_page_or_employer_university_announcement",
+      "aliases": []
+    },
+    "潍柴动力": {
+      "url": "https://weichai.zhiye.com/",
+      "evidenceUrl": "https://www.weichaipower.com/hr/",
+      "kind": "group_recruitment_portal",
+      "availability": "normal",
+      "label": "潍柴集团招聘平台（需确认潍柴动力岗位）",
+      "recruitmentEntity": "潍柴集团",
+      "notes": "集团官网指向潍柴统一招聘平台，含社招与校招，须确认所投岗位的实际用人单位，不等同所有集团岗位属于潍柴动力上市主体。",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_company_hiring_page_or_employer_university_announcement",
+      "aliases": []
+    },
+    "晶科能源": {
+      "url": "https://app.mokahr.com/campus-recruitment/jinkosolar/41896",
+      "evidenceUrl": "https://myjob.dlmu.edu.cn/campus/view/id/867161",
+      "kind": "official_recruitment_portal",
+      "availability": "campus_only",
+      "label": "晶科能源校园招聘官方投递入口",
+      "recruitmentEntity": "晶科能源",
+      "notes": "高校发布晶科能源2026届公告所列投递页面，当前 2027 届岗位与链接运行情况需要再次复核。",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_company_hiring_page_or_employer_university_announcement",
+      "aliases": []
+    },
+    "欣旺达": {
+      "url": "https://sunwoda.zhiye.com/jobs",
+      "evidenceUrl": "https://sunwoda.zhiye.com/jobs",
+      "kind": "group_recruitment_portal",
+      "availability": "normal",
+      "label": "欣旺达招聘系统（总部及业务板块）",
+      "recruitmentEntity": "欣旺达",
+      "notes": "门户显示集团总部、3C电池、动力电池和储能等机构，请核对目标职位的具体招聘主体。",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_company_hiring_page_or_employer_university_announcement",
+      "aliases": []
+    },
+    "阳光电动力": {
+      "url": "https://www.sungrowev.com/cn/contact-us/join-us",
+      "evidenceUrl": "https://www.sungrowev.com/cn/contact-us/join-us",
+      "kind": "official_recruitment_announcements",
+      "availability": "announcement_only",
+      "label": "阳光电动力官网工作机会与投递方式",
+      "recruitmentEntity": "阳光电动力",
+      "notes": "该页列示岗位要求及邮箱投递方式；发布时间和岗位当前状态请以企业实际确认的公告为准。",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_company_hiring_page_or_employer_university_announcement",
+      "aliases": []
+    },
+    "亿纬氢能": {
+      "url": "https://www.evehydrogen.com/contact/contact1.html",
+      "evidenceUrl": "https://www.evehydrogen.com/contact/contact1.html",
+      "kind": "official_recruitment_announcements",
+      "availability": "unconfirmed_runtime",
+      "label": "亿纬氢能官网校园招聘页面（数据待复核）",
+      "recruitmentEntity": "亿纬氢能",
+      "notes": "官网有招聘筛选入口，但另一社招页面出现疑似无关模板数据；目前不能确认有效职位，明确标记待人工复核。",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_company_hiring_page_or_employer_university_announcement",
+      "aliases": []
+    },
+    "三一重工": {
+      "url": "https://sany.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119589.html",
+      "kind": "group_recruitment_portal",
+      "availability": "campus_only",
+      "label": "三一集团2027校园招聘（核对三一重工用人主体）",
+      "recruitmentEntity": "三一集团",
+      "notes": "集团系统包含三一重工及其他关联企业，不能将全部集团职位视作三一重工股份有限公司岗位。",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_company_hiring_page_or_employer_university_announcement",
+      "aliases": []
     }
   }
 }
