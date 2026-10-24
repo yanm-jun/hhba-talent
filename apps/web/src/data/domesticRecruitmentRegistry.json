@@ -1085,6 +1085,78 @@
       "verifiedBy": "employer_career_site_or_employer_published_university_post",
       "aliases": [],
       "notes": "集团招聘系统可能覆盖其他法人，请先核对实际用人主体。招聘入口不代表职位或报名期限当前有效。"
+    },
+    "赛力斯": {
+      "url": "https://sokon.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/portal/recruit/details?id=c06a57200db444419a21ecea8919d925",
+      "kind": "group_recruitment_portal",
+      "availability": "campus_only",
+      "label": "赛力斯官方招聘渠道",
+      "recruitmentEntity": "赛力斯集团",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_official_hiring_notice_or_employer_university_post",
+      "aliases": [],
+      "notes": "集团平台包含多个招聘主体，请逐岗确认真实签约法人，职位开放情况以实际网站为准。"
+    },
+    "牧原股份": {
+      "url": "https://app.mokahr.com/m/campus-recruitment/muyuan/70116",
+      "evidenceUrl": "https://ejob.dhu.edu.cn/single/2026/07/02/2607021413502531003319111514160682210002.html",
+      "kind": "group_recruitment_portal",
+      "availability": "campus_only",
+      "label": "牧原股份官方招聘渠道",
+      "recruitmentEntity": "牧原集团",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_official_hiring_notice_or_employer_university_post",
+      "aliases": [],
+      "notes": "集团平台包含多个招聘主体，请逐岗确认真实签约法人，职位开放情况以实际网站为准。"
+    },
+    "温氏股份": {
+      "url": "https://www.wens.com.cn/groupnews/info.aspx?itemid=2479&parent=",
+      "evidenceUrl": "https://www.wens.com.cn/groupnews/info.aspx?itemid=2479&parent=",
+      "kind": "official_recruitment_announcements",
+      "availability": "announcement_only",
+      "label": "温氏股份官方招聘渠道",
+      "recruitmentEntity": "温氏股份",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_official_hiring_notice_or_employer_university_post",
+      "aliases": [],
+      "notes": "网站入口或招聘公告不保证当前岗位开放，校招批次与日期请在官方页面核实。"
+    },
+    "宝钢股份": {
+      "url": "https://baosteel.zhaopin.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/221790490532876.do",
+      "kind": "official_recruitment_portal",
+      "availability": "campus_only",
+      "label": "宝钢股份官方招聘渠道",
+      "recruitmentEntity": "宝钢股份",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_official_hiring_notice_or_employer_university_post",
+      "aliases": [],
+      "notes": "网站入口或招聘公告不保证当前岗位开放，校招批次与日期请在官方页面核实。"
+    },
+    "石头科技": {
+      "url": "https://roborock.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://www.career.zju.edu.cn/jyxt/sczp/zpztgl/ckZpgwXq.zf?zpxxbh=3F0EA85F32FEDF96E0653A68DD0E9B18",
+      "kind": "official_recruitment_portal",
+      "availability": "campus_only",
+      "label": "石头科技官方招聘渠道",
+      "recruitmentEntity": "石头科技",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_official_hiring_notice_or_employer_university_post",
+      "aliases": [],
+      "notes": "网站入口或招聘公告不保证当前岗位开放，校招批次与日期请在官方页面核实。"
+    },
+    "海大集团": {
+      "url": "https://haid1.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/116944.html",
+      "kind": "official_recruitment_portal",
+      "availability": "campus_only",
+      "label": "海大集团官方招聘渠道",
+      "recruitmentEntity": "海大集团",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_official_hiring_notice_or_employer_university_post",
+      "aliases": [],
+      "notes": "网站入口或招聘公告不保证当前岗位开放，校招批次与日期请在官方页面核实。"
     }
   }
 }
