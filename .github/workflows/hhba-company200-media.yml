@@ -5,6 +5,7 @@ on:
       - feat/domestic-company200-20261024
     paths:
       - '.github/workflows/hhba-company200-media.yml'
+      - 'apps/web/scripts/capture-company200-homepage-screenshots.mjs'
   workflow_dispatch:
 permissions:
   contents: write
