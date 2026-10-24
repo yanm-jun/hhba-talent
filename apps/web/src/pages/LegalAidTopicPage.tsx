@@ -49,7 +49,7 @@ export function LegalAidTopicPage({user,slug}:{user:User|null;slug:string}){
       <section className="hhba-law-article-section" aria-labelledby="legal-evidence">
        <div className="hhba-law-article-section-head"><span>03</span><h2 id="legal-evidence">需要证明什么，以及如何准备证据</h2></div>
        <p className="hhba-law-section-sub">先看需要证明的事实，再找可以合法保存的材料；没有某一项资料不代表一定不能维权。</p>
-       <div className="hhba-law-proof-list">{topic.proof.map((p,i)=><div key={p.fact} className="hhba-law-proof">
+       <div className="hhba-law-proof-list">{topic.proof.map(p=><div key={p.fact} className="hhba-law-proof">
         <div className="hhba-law-proof-title"><FileCheck2 size={17} aria-hidden="true"/><strong>{p.fact}</strong></div>
         <span className="hhba-law-proof-label">可参考的材料</span>
         <ul>{p.materials.map(item=><li key={item}>{item}</li>)}</ul>
