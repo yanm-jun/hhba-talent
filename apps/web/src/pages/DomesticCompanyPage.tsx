@@ -5,7 +5,9 @@ import {Link,getCompanyReturnTarget} from '../router';
 import {getDomesticCompanies,getDomesticRecruitment,companyById,findParentCompany,findRelatedCompanies} from '../services/domesticCompanySearch';
 import {matchingMajors} from '../services/domesticMajors';
 import profiles from '../data/domesticCareerProfiles.json';
+import additionalProfiles from '../data/domesticCompanyExpansion200Profiles.json';
 import bundled from '../data/domesticMediaBundle.json';
+import additionalMedia from '../data/domesticMedia200Bundle.json';
 import type {User} from '../services/api';
 import '../styles/domestic-company-search.css';
 
@@ -13,15 +15,15 @@ type Reviewed={
  displayName:string;subtitle:string;summary?:string;description:string[];
  business:{title:string;description:string}[];majorSlugs:string[];
  careersUrl?:string;careersLabel?:string;officialSource:string;productSource?:string;
- brandImage?:string;imageSource?:string;brandImageSource?:string;brandAssetStatus?:string;lastReviewed:string;
+ brandImage?:string;imageSource?:string;brandImageSource?:string;brandAssetStatus?:string;lastReviewed:string;contentReview?:string;
  photos?:{url:string;label:string;source:string;localPath?:string;kind?:'headquarters'|'factory'|'office'|'product'|'screenshot'}[];
  officeLocations?:{type:string;address:string;source:string}[];
  photoSourcePage?:string;photoSourceLabel?:string;
  evidenceLevel?:string;
  primaryIndustry?:string;subIndustry?:string;industryEvidenceUrl?:string;majorMappingBasis?:string;
 };
-const curated=profiles as Record<string,Reviewed>;
-const available=bundled as {companies:Record<string,{brand?:{state:string;path?:string};photos?:{state:string;path?:string}[]}>};
+const curated={...profiles,...additionalProfiles} as Record<string,Reviewed>;
+const available={companies:{...bundled.companies,...additionalMedia.companies}} as {companies:Record<string,{brand?:{state:string;path?:string};photos?:{state:string;path?:string}[]}>};
 function httpsLink(value?:string){
  if(!value)return '';
  try{const u=new URL(/^https?:\/\//i.test(value)?value:'https://'+value);
@@ -37,7 +39,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
  const parent=company?findParentCompany(all,company):null;
  const related=company?findRelatedCompanies(all,company):[];
  const article=company?curated[company.name]:undefined;
- const substantive=Boolean(article?.officialSource&&article.description.length>=3&&
+ const substantive=Boolean(article?.contentReview!=='first_pass_industry_explanation_not_official_company_detail_audited'&&article?.officialSource&&article.description.length>=3&&
   article.description.join('').length>=280&&article.business.length>=3&&article.majorSlugs.length>=4);
  const media=company?available.companies[company.name]:undefined;
  const brandSrc=media?.brand?.state==='ready'?import.meta.env.BASE_URL+media.brand.path:undefined;
@@ -83,7 +85,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
      </section>:
      <section className="domestic-editorial-section" aria-label="企业介绍">
       <h2>企业介绍</h2>
-      {!substantive&&<p className="domestic-company-note">当前已有具体业务资料，但仍未达到完整深度档案标准；内容将依据官方来源继续补充。</p>}
+      {!substantive&&<p className="domestic-company-note">当前已有业务方向初稿，企业专项事实与资料来源尚待逐项复核，不作为已通过官方资料审核的深度档案。</p>}
       <div className="domestic-editorial-body">{article.description.map((paragraph,i)=><p key={i}>{paragraph}</p>)}</div>
       {article&&<div className="domestic-editorial-business">
        {article.business.map(item=><div key={item.title}><strong>{item.title}</strong><p>{item.description}</p></div>)}
