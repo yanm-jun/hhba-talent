@@ -3,11 +3,13 @@ import {mkdirSync} from 'node:fs';
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 const base='http://127.0.0.1:4173/hhba-talent/';
 const blocked=[];mkdirSync('curated-review',{recursive:true});
-const preventOverseas=page=>page.route('**/*',route=>{
- const host=new URL(route.request().url()).hostname;
- if(host!=='127.0.0.1'){blocked.push(route.request().url());return route.abort();}
- return route.continue();
-});
+const preventOverseas=page=>{
+ page.on('request',request=>{
+  const host=new URL(request.url()).hostname;
+  if(host!=='127.0.0.1')blocked.push(request.url());
+ });
+ page.route(/https:\/\/(?:[^/]*\.)?(?:ashbyhq\.com|greenhouse\.io|lever\.co|up\.railway\.app)\//,route=>route.abort());
+};
 try{
  const page=await browser.newPage({viewport:{width:1440,height:920}});
  await preventOverseas(page);
