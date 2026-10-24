@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-24T04:12:35.927Z",
+  "generatedAt": "2026-10-24T04:15:15.239Z",
   "companies": {
     "华域视觉科技（上海）有限公司": {
       "brand": {
@@ -1804,6 +1804,48 @@
           "state": "ready",
           "path": "domestic-media/company100-review-9e193b14cd5739886f93.webp",
           "source": "https://www.gwm.com.cn/news/3403600.html",
+          "classification": "source_backed_named_enterprise_scene",
+          "reviewDate": "2026-10-24"
+        }
+      ]
+    },
+    "三一重工": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-review-d5adb014d4d826fb6b36.webp",
+          "source": "https://www.sanygroup.com/news/11374.html",
+          "classification": "source_backed_named_enterprise_scene",
+          "reviewDate": "2026-10-24"
+        }
+      ]
+    },
+    "中国联通": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-review-7b88db32109256770f78.webp",
+          "source": "https://commons.wikimedia.org/wiki/File:%E4%B8%AD%E5%9B%BD%E8%81%94%E9%80%9A%E6%B7%B1%E5%9C%B3%E5%88%86%E5%85%AC%E5%8F%B8.jpg",
+          "classification": "source_backed_named_enterprise_scene",
+          "reviewDate": "2026-10-24"
+        }
+      ]
+    },
+    "广汽集团": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-review-5865d0d40a2939f75a07.webp",
+          "source": "https://huacheng.gz-cmc.com/pages/2026/02/01/29d5156007bc4881a29146865010f259.html",
           "classification": "source_backed_named_enterprise_scene",
           "reviewDate": "2026-10-24"
         }

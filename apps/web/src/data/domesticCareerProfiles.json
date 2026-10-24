@@ -3157,7 +3157,21 @@
     "brandImage": "https://sanygroup.com/img/sany-logo.png",
     "brandImageSource": "https://sanygroup.com/",
     "brandAssetStatus": "official_website_logo_candidate",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company100-review-d5adb014d4d826fb6b36.webp",
+        "localPath": "domestic-media/company100-review-d5adb014d4d826fb6b36.webp",
+        "source": "https://www.sanygroup.com/news/11374.html",
+        "kind": "factory",
+        "label": "三一集团官网发布的“三一重工”18号灯塔工厂外景",
+        "verification": "reviewed_named_corporate_building_image_with_source",
+        "sourceFile": "reviewed-external-scene",
+        "attribution": "三一集团官网",
+        "license": "first-party-editorial-image_rights_unverified",
+        "licenseUrl": null,
+        "changes": "resized and transcoded to WebP"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://sanygroup.com",
@@ -5358,7 +5372,21 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company100-review-5865d0d40a2939f75a07.webp",
+        "localPath": "domestic-media/company100-review-5865d0d40a2939f75a07.webp",
+        "source": "https://huacheng.gz-cmc.com/pages/2026/02/01/29d5156007bc4881a29146865010f259.html",
+        "kind": "office",
+        "label": "广州媒体2026年报道中的广汽集团T2园区楼宇照片",
+        "verification": "reviewed_named_corporate_building_image_with_source",
+        "sourceFile": "reviewed-external-scene",
+        "attribution": "广州媒体华城",
+        "license": "news-photo-rights_not_independently_cleared",
+        "licenseUrl": null,
+        "changes": "resized and transcoded to WebP"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
     "contentReview": "first_pass_business_background_needs_company_page_confirmation",
@@ -5885,7 +5913,21 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company100-review-7b88db32109256770f78.webp",
+        "localPath": "domestic-media/company100-review-7b88db32109256770f78.webp",
+        "source": "https://commons.wikimedia.org/wiki/File:%E4%B8%AD%E5%9B%BD%E8%81%94%E9%80%9A%E6%B7%B1%E5%9C%B3%E5%88%86%E5%85%AC%E5%8F%B8.jpg",
+        "kind": "office",
+        "label": "中国联通深圳分公司楼宇（摄影 Lhzss8，CC BY-SA 4.0；非集团总部）",
+        "verification": "reviewed_named_corporate_building_image_with_source",
+        "sourceFile": "reviewed-external-scene",
+        "attribution": "Lhzss8",
+        "license": "CC BY-SA 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "changes": "resized and transcoded to WebP"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
     "contentReview": "first_pass_business_background_needs_company_page_confirmation",
