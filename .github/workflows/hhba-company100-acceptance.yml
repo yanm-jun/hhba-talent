@@ -10,6 +10,7 @@ on:
       - 'apps/web/src/data/domesticMediaBundle.json'
       - 'apps/web/scripts/audit-domestic-company100.mjs'
       - 'apps/web/scripts/capture-company100-homepage-screenshots.mjs'
+      - 'apps/web/scripts/import-company100-reviewed-scenes.mjs'
       - '.github/workflows/hhba-company100-acceptance.yml'
   workflow_dispatch:
 permissions:
@@ -36,6 +37,7 @@ jobs:
         working-directory: apps/web
         run: |
           node --check scripts/capture-company100-homepage-screenshots.mjs
+          node --check scripts/import-company100-reviewed-scenes.mjs
           node scripts/audit-domestic-company100.mjs
           npm run build
       - name: Detect if this exact source commit requests browser capture
@@ -56,6 +58,11 @@ jobs:
         if: steps.capture_gate.outputs.capture == 'true'
         working-directory: apps/web
         run: node scripts/capture-company100-homepage-screenshots.mjs
+      - name: Prepare codec for audited office/headquarters photos
+        run: npm install --prefix apps/web --no-save --no-package-lock sharp@0.34.4 --no-audit --no-fund
+      - name: Import only specifically attributed real company building photos
+        working-directory: apps/web
+        run: node scripts/import-company100-reviewed-scenes.mjs
       - name: Validate screenshot metadata after acquisition
         working-directory: apps/web
         run: |
@@ -70,8 +77,8 @@ jobs:
           path: |
             apps/web/preview-reports/company100-quality.json
             apps/web/preview-reports/company100-screenshot-capture.json
-      - name: Persist only company media files from this source branch
-        if: steps.capture_gate.outputs.capture == 'true'
+            apps/web/preview-reports/company100-reviewed-scenes.json
+      - name: Persist only allowlisted company media files from this source branch
         shell: bash
         run: |
           set -euo pipefail
