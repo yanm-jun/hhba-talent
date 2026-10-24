@@ -1,7 +1,7 @@
 import curated from '../data/aiCompanyCatalog.json';
 import editorial from '../data/domesticCompanyEditorial.json';
 import careerProfiles from '../data/domesticCareerProfiles.json';
-import careerProfiles200 from '../data/domesticCompanyExpansion200Profiles.json';
+import {domestic200Profiles as careerProfiles200} from './domesticCompany200Data';
 import recruitmentRegistry from '../data/domesticRecruitmentRegistry.json';
 import recruitmentRegistry200 from '../data/domesticRecruitment200Registry.json';
 import rosterSnapshot from '../data/domesticListedCompanies.json';
