@@ -38,7 +38,51 @@ jobs:
           node --check scripts/capture-company100-homepage-screenshots.mjs
           node scripts/audit-domestic-company100.mjs
           npm run build
+      - name: Detect whether this commit changes media acquisition logic
+        id: media_gate
+        shell: bash
+        run: |
+          if git show --format= --name-only HEAD | grep -q '^apps/web/scripts/capture-company100-homepage-screenshots.mjs
+        run: |
+          npm install --prefix apps/web --no-save --no-package-lock playwright@1.56.0 sharp@0.34.4 --no-audit --no-fund
+          cd apps/web && npx playwright install chromium --with-deps
+      - name: Capture company-site screenshots with explicit labels, no fake buildings
+        if: steps.media_gate.outputs.capture == 'true'
+        working-directory: apps/web
+        run: node scripts/capture-company100-homepage-screenshots.mjs
+      - name: Run complete enterprise quality check again
+        working-directory: apps/web
+        run: |
+          node scripts/audit-domestic-company100.mjs
+          npm run build
+      - name: Save complete 100-enterprise evidence and image capture report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-company100-qa
+          retention-days: 30
+          path: |
+            apps/web/preview-reports/company100-quality.json
+            apps/web/preview-reports/company100-screenshot-capture.json
+      - name: Commit only isolated company image files and evidence metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f apps/web/src/data/domesticCareerProfiles.json apps/web/src/data/domesticMediaBundle.json
+          git add -f apps/web/public/domestic-media/company100-* || true
+          if ! git diff --cached --quiet; then
+            git commit -m "assets(company100): preserve sourced official website screenshots as unreviewed visual references"
+            git push origin HEAD:refs/heads/feat/domestic-company100-20261024
+          fi
+; then
+            echo "capture=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "capture=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Install isolated Playwright and WebP converter (no manifest changes)
+        if: steps.media_gate.outputs.capture == 'true'
         run: |
           npm install --prefix apps/web --no-save --no-package-lock playwright@1.56.0 sharp@0.34.4 --no-audit --no-fund
           cd apps/web && npx playwright install chromium --with-deps
