@@ -50,11 +50,11 @@ const approved=[
   },
   {
    name:'潍柴动力',
-   url:'https://www.weichaipower.com/media_center/dlnews/202301/W020230113485004993384.jpg',
-   host:'www.weichaipower.com',
-   source:'https://www.weichaipower.com/media_center/dlnews/202301/t20230113_90769.html',
-   label:'潍柴动力官网刊载的潍柴高新工业园区照片（企业供图）',
-   kind:'factory',attribution:'潍柴动力股份有限公司官网',license:'first-party-editorial-image_rights_unverified',
+   url:'https://www.xinhuanet.com/2021-08/05/1127733854_16281541859501n.jpg',
+   host:'www.xinhuanet.com',
+   source:'https://www.xinhuanet.com/2021-08/05/c_1127733854.htm',
+   label:'新华网报道中的潍柴工业园区实景航拍图（非官网原始图）',
+   kind:'factory',attribution:'新华网报道配图（摄影作者待核实）',license:'news-photo-rights_not_independently_cleared',
    changes:'resized and transcoded to WebP'
   },
   {
