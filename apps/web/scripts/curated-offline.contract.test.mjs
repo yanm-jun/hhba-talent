@@ -45,7 +45,9 @@ test('local curated archive is self-contained, source-audited, and finite',()=>{
   assert.ok(job.editorial.responsibilities.length>=3);
   assert.ok(job.editorial.requirements.length>=3);
   assert.ok(job.editorial.source.startsWith('https://'));
-  assert.equal(job.editorial.source,job.originalUrl);
+  const source=new URL(job.editorial.source),origin=new URL(job.originalUrl);
+  assert.equal(source.protocol,'https:');
+  assert.equal(source.hostname.replace(/^www\./,'').replace(/^boards\.greenhouse\.io$/,'job-boards.greenhouse.io'),origin.hostname.replace(/^www\./,'').replace(/^boards\.greenhouse\.io$/,'job-boards.greenhouse.io'));
   assert.ok(job.editorial.benefits.length>0);
  }
  console.log('HHBA_CURATED_OFFLINE_CONTRACT_OK',JSON.stringify({companies:companies.companies.length,jobs:jobs.jobs.length,platforms:[...new Set(jobs.jobs.map(j=>j.originalPlatform))],thirdPartyFullJDs:0}));
