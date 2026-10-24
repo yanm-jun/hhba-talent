@@ -1,0 +1,57 @@
+
+.curated-market{max-width:1120px;margin:52px auto 84px;padding:0 12px;color:var(--ink)}
+.curated-compact{margin:50px auto 68px}
+.curated-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:23px}
+.curated-heading small,.curated-overline{display:block;font-size:11px;font-weight:800;letter-spacing:.09em;color:#34745b}
+.curated-heading h2{font-size:clamp(23px,2.8vw,33px);letter-spacing:-.75px;margin:8px 0 9px}
+.curated-heading p{font-size:13px;line-height:1.85;color:#66736f;max-width:670px}
+.curated-total{display:inline-flex;align-items:center;white-space:nowrap;border-radius:40px;background:#edf6ef;color:#32694d;padding:10px 15px;font-size:12px;font-weight:750;margin-top:8px}
+.curated-search-panel{display:flex;gap:10px;align-items:stretch;padding:14px;background:white;border:1px solid #e0e6e2;border-radius:14px}
+.curated-search{flex:1 1 360px;display:flex;align-items:center;gap:10px;border:1px solid #e1e7e2;border-radius:9px;padding:0 12px;color:#738078;min-height:43px}
+.curated-search input{flex:1;border:0;outline:0;width:100%;font-size:13px;min-width:0;background:transparent;color:#25352e}
+.curated-search-panel select{width:150px;max-width:100%;border:1px solid #e1e7e2;border-radius:9px;padding:0 12px;background:#fff;font-size:13px;color:#34463c}
+.curated-result-label{margin:15px 2px;color:#718078;font-size:12px}
+.curated-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.curated-job-card{padding:22px;background:#fff;border:1px solid #e1e8e3;border-radius:14px;display:flex;flex-direction:column;gap:10px;min-width:0;transition:border-color .15s}
+.curated-job-card:hover{border-color:#94b9a0}
+.curated-card-top,.curated-card-foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.curated-card-top strong{font-size:13px}
+.curated-age-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;border-radius:7px;background:#f2f3f1;color:#58645d;padding:6px 8px;font-weight:650}
+.curated-job-card h3{font-size:18px;line-height:1.45;letter-spacing:-.25px;margin:2px 0 0}
+.curated-job-card h3 a{color:#233b2c;text-decoration:none}
+.curated-original-title{color:#697772;font-size:12px;line-height:1.5;margin:0}
+.curated-job-place{display:flex;align-items:center;gap:6px;color:#617167;font-size:12px}
+.curated-skills{display:flex;gap:7px;flex-wrap:wrap;margin:5px 0}
+.curated-skills span{display:inline-flex;align-items:center;border:1px solid #e2eae3;background:#f8faf8;color:#3b6251;font-size:11px;border-radius:6px;padding:6px 8px}
+.curated-card-foot{border-top:1px solid #f0f1ef;padding-top:12px;margin-top:auto}
+.curated-card-foot small{color:#87928c;font-size:11px}
+.curated-card-foot a,.curated-explore a{display:inline-flex;align-items:center;gap:6px;color:#26704c;text-decoration:none;font-weight:750;font-size:12px}
+.curated-explore{display:flex;justify-content:center;margin:25px 0}
+.curated-explore a{border:1px solid #bfd6c5;padding:11px 18px;border-radius:9px}
+.curated-notice{display:flex;gap:8px;align-items:flex-start;color:#87928b;font-size:12px;line-height:1.7;margin-top:22px}
+.curated-empty,.curated-error{padding:28px;border:1px solid #ecefeb;border-radius:12px;color:#66746a;background:#fff}
+.curated-more-hint{color:#61746a;font-size:12px;text-align:center;margin-top:20px}
+.curated-detail{max-width:1070px;margin:32px auto 96px;padding:0 18px;color:#28392c}
+.curated-back{border:0;background:transparent;color:#3e7856;display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;padding:7px 0;margin-bottom:24px}
+.curated-detail-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:26px;border-bottom:1px solid #e1e6e1;padding:20px 0 27px}
+.curated-detail-heading h1{font-size:clamp(27px,3.7vw,39px);line-height:1.35;letter-spacing:-.8px;margin:10px 0 8px}
+.curated-detail-heading p{color:#6b7971;font-size:14px;line-height:1.7}
+.curated-detail-heading .curated-overline{color:#27704d;font-size:12px}
+.curated-detail-heading .curated-age-tag{margin-top:9px}
+.curated-detail-location{display:flex;align-items:center;gap:7px}
+.curated-detail-snapshot{min-width:210px;border:1px solid #dce9df;background:#f5faf6;padding:20px;border-radius:12px;display:flex;flex-direction:column;gap:8px;color:#326e50;font-size:13px}
+.curated-detail-snapshot small{font-weight:400;color:#6d8977;font-size:12px}
+.curated-detail-layout{display:grid;grid-template-columns:minmax(0,1fr) 275px;gap:28px;margin-top:28px}
+.curated-detail-section,.curated-detail-aside{background:white;border:1px solid #e2e8e2;border-radius:12px;padding:25px;margin-bottom:16px}
+.curated-detail-section h2{display:flex;gap:8px;align-items:center;margin:0 0 20px;font-size:18px}
+.curated-detail-section p,.curated-detail-aside p{font-size:13px;line-height:1.9;color:#66776b}
+.curated-facts{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:0}
+.curated-facts div{min-width:0}
+.curated-facts dt,.curated-detail-aside dt{font-size:12px;color:#849188;margin-bottom:7px}
+.curated-facts dd,.curated-detail-aside dd{font-size:14px;font-weight:650;margin:0;line-height:1.6;overflow-wrap:anywhere}
+.curated-facts dd small{display:block;color:#8a958e;font-size:11px;font-weight:400;margin-top:2px}
+.curated-caveat{font-size:12px!important;color:#89958a!important;margin:15px 0 0}
+.curated-detail-aside h3{font-size:16px;margin:0 0 16px}
+.curated-detail-aside dl{display:grid;gap:14px;margin:22px 0}
+.curated-detail-aside a{display:inline-flex;align-items:center;gap:7px;color:#26704c;font-size:13px;text-decoration:none}
+@media(max-width:760px){.curated-heading{display:block}.curated-heading .curated-total{margin-top:12px}.curated-search-panel{flex-wrap:wrap}.curated-search{flex-basis:100%;min-height:45px}.curated-search-panel select{flex:1 1 120px}.curated-cards{grid-template-columns:1fr}.curated-card-top{align-items:flex-start;flex-wrap:wrap}.curated-detail-layout{grid-template-columns:1fr}.curated-detail-snapshot{display:none}.curated-detail-heading{padding-top:5px}.curated-facts{grid-template-columns:1fr}.curated-market{margin-top:28px}}
