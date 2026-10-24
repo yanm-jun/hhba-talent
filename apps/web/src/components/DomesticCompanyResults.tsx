@@ -51,7 +51,7 @@ export function DomesticCompanyResults({query,majorSlug='',scope='',country='',c
  },[all,word,chosen,city,country,scope,browse200]);
  if(!word&&!chosen&&!browse200){
   if(scope==='global'||country&&!/^(cn|chn|china|中国|中国大陆)$/i.test(country))return null;
-  return <div className="domestic-browse200-entry">
+  return <div className="domestic-browse100-entry">
    <button type="button" onClick={()=>setBrowse200(true)}>浏览企业发现 200 家档案 <ArrowRight size={14}/></button>
    <small>按企业主体查看真实介绍、相关专业与已登记的官方招聘渠道</small>
   </div>;
