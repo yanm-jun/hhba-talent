@@ -9,14 +9,14 @@
   "hash": null,
   "sourceOfficialJdVerified": 100,
   "fullReprintedJobDescriptions": 0,
-  "completeHumanReviewedChineseDescriptions": 3,
+  "completeHumanReviewedChineseDescriptions": 10,
   "automaticSync": false,
   "externalApiAtRuntime": false,
   "historicalData": true,
   "defaultCurrentVacancyClaim": false,
-  "contentPolicy": "Fixed source-checked job metadata. Chinese factual editorial summaries appear only on individually verified postings; full third-party JD not reprinted. Other postings have unverified complete requirements.",
+  "contentPolicy": "100 archived public job titles from 10 firms, 10 individually source-reviewed Chinese summaries (one per firm), 90 titles still awaiting individual full role-description review; not a full verbatim copy or verified current vacancies.",
   "refreshedAt": "2026-10-24",
-  "editorialJobDescriptions": 3,
+  "editorialJobDescriptions": 10,
   "sourceSelection": "First ten source-verified samples per listed employer; fixed archived snapshot",
   "sourceFingerprintNote": "Original 150-record hash is not the 100-record digest"
 }
