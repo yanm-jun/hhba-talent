@@ -1209,6 +1209,18 @@
         "广东拓斯达科技股份有限公司"
       ],
       "notes": "拓斯达官网「联系我们—人才招聘—校园招聘」的直接职位列表；官网亦提供社会招聘栏目。岗位是否仍可投以网页实时显示为准，不等于集团其他企业招聘。"
+    },
+    "浪潮信息": {
+      "url": "https://inspur.hcmcloud.cn/recruit#/campus_category?type=campus",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/117451.html",
+      "kind": "group_recruitment_portal",
+      "availability": "unconfirmed_runtime",
+      "label": "浪潮集团2027校招线索（浪潮信息具体岗位未核实）",
+      "recruitmentEntity": "浪潮集团",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "university_confirms_group_recruitment; third_party_lists_https_group_portal; exact_employer_unconfirmed",
+      "aliases": [],
+      "notes": "南开大学公开的2027校园招聘公告证实浪潮集团统一校招，但未单独证明浪潮信息上市主体正在招聘，也未确认此 HCM Cloud HTTPS 地址当前可访问。该链接仅为集团线索，不得当成浪潮信息已核验的独立招聘官网。"
     }
   }
 }
