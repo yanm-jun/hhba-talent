@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-24T04:19:36.237Z",
+  "generatedAt": "2026-10-24T04:30:00.000Z",
   "companies": {
     "华域视觉科技（上海）有限公司": {
       "brand": {
@@ -1755,8 +1755,11 @@
     },
     "浪潮信息": {
       "brand": {
-        "state": "missing",
-        "classification": "identity_not_yet_verified"
+        "state": "ready",
+        "path": "domestic-media/fe44c3909bf328e-website-brand-candidate.png",
+        "source": "https://ieisystem.com/",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
       },
       "photos": [
         {
@@ -1811,7 +1814,11 @@
     },
     "三一重工": {
       "brand": {
-        "state": "missing"
+        "state": "ready",
+        "path": "domestic-media/d5adb014d4d826f-website-brand-candidate.png",
+        "source": "https://sanygroup.com/",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
       },
       "photos": [
         {
@@ -1892,6 +1899,13 @@
           "reviewDate": "2026-10-24"
         }
       ]
+    },
+    "平高电气": {
+      "brand": {
+        "state": "missing",
+        "classification": "candidate_rejected_wrong_identity",
+        "reviewDate": "2026-10-24"
+      }
     }
   }
 }
