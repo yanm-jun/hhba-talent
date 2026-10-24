@@ -30,9 +30,14 @@ export function LegalAidLandingPage({user}:{user:User|null}){
             <span className="hhba-law-brand-divider" aria-hidden="true"/>
             <span className="hhba-law-brand-name">法律援助</span>
           </div>
-          <Link to="/candidate/account" className="hhba-law-back">
-            返回个人中心 <ArrowUpRight size={12} aria-hidden="true"/>
-          </Link>
+          <div className="hhba-law-header-actions">
+            <Link to="/candidate/account/legal-aid/intervention" className="hhba-law-intervention-link">
+              <ShieldCheck size={13} aria-hidden="true"/>请求平台介入
+            </Link>
+            <Link to="/candidate/account" className="hhba-law-back">
+              返回个人中心 <ArrowUpRight size={12} aria-hidden="true"/>
+            </Link>
+          </div>
         </header>
 
         <div className="hhba-law-body">
