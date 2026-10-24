@@ -34,6 +34,22 @@ for(const [label,source,words] of [
  ['result list',result,['domesticComplete200Target','browse200','domesticCompany200Data','domesticMedia200Bundle']],
  ['detail page',page,['domesticCompany200Data','domesticMedia200Bundle','contentReview']]
 ])for(const w of words)assert(source.includes(w),label+' missing source connection: '+w);
+const app=load('src/main.tsx');
+const home=load('src/pages/HomePage.tsx');
+const nav=load('src/components/Shell.tsx');
+const market=load('src/components/UnifiedJobMarket.tsx');
+const source=load('src/services/featuredOfficialJobs.ts');
+const router=load('src/router.tsx');
+const discovery=load('src/pages/Company200PreviewPage.tsx');
+assert(app.includes("if(route==='/')return <HomePage user={user}/>"),'Original HHBA homepage must remain at root');
+assert(app.includes("if(route==='/companies/discover')return <Company200PreviewPage"),'200-company page must be additive and separately routed');
+assert(!app.includes("if(route==='/'&&import.meta.env.VITE_COMPANY200_STATIC_PREVIEW"),'Do not replace market homepage with company-only preview');
+assert(home.includes('<UnifiedJobMarket compact/>')&&home.includes('<HomeCompanyMarquee/>'),'Restore official market and original verified brand carousel');
+assert(nav.includes('to="/candidate/jobs"')&&nav.includes('to="/companies/discover"'),'Job and company discovery must both be navigable');
+assert(market.includes('loadVerifiedFeaturedJobs')&&market.includes('DomesticCompanyResults'),'Official recruitment cards and matched company discovery must coexist');
+assert(source.includes("company:'OpenAI'")&&source.includes("company:'Anthropic'")&&source.includes("company:'SpaceX'"),'Keep original three priority employers');
+assert(router.includes('domesticDiscoveryRoute'),'New company page must preserve SPA safe return navigation');
+assert(discovery.includes('browseDefault'),'200-company page must show all 200 on direct visit');
 console.log('HHBA_COMPANY200_INTEGRATION_OK',JSON.stringify({
   all:joined.length,added:100,majorsIncluded:joined.slice(100).filter(n=>additions[n].majorSlugs?.length>=4).length,
   recruitmentWithEvidence:Object.keys(registry).length,sourceBackedEditorial:Object.keys(sourceBacked).length,pathsVerified:4
