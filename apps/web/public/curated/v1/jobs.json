@@ -4406,7 +4406,7 @@
       "titleZh": "高级诉讼律师助理",
       "titleTranslation": "editorial_checked",
       "locationEn": "San Francisco, CA",
-      "locationZh": "旧金山 · 加利福尼亚州",
+      "locationZh": "旧金山 · 每周到办公室约一天",
       "countryCode": "US",
       "cityKey": "san francisco",
       "education": null,
@@ -4429,6 +4429,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "在 Reddit 法务团队管理雇佣、知识产权和普通诉讼的律师助理事务。",
+        "responsibilities": [
+          "管理诉讼案件登记、日程、文件与期限跟踪。",
+          "协调外部律师、电子证据保全和资料审阅。",
+          "改进法律科技和 AI 辅助电子取证工作流程。"
+        ],
+        "requirements": [
+          "有诉讼律师助理和案件运营经验。",
+          "熟悉电子证据开示、法律文件管理和诉讼保全义务。",
+          "具备良好的项目管理、准确性与跨团队沟通能力。"
+        ],
+        "benefits": [
+          "采用混合办公，每周约一次旧金山办公室。"
+        ],
+        "originalSummary": "Archived Reddit role Senior Litigation Paralegal, with a Chinese editorial summary of the official requirements.",
+        "source": "https://job-boards.greenhouse.io/reddit/jobs/8130697"
       }
     },
     {
@@ -4494,7 +4515,7 @@
       "titleZh": "荷兰语社区经理（合同制）",
       "titleTranslation": "editorial_checked",
       "locationEn": "Remote - The Netherlands",
-      "locationZh": "远程 · The Netherlands",
+      "locationZh": "荷兰 · 远程（合同制）",
       "countryCode": "NL",
       "cityKey": null,
       "education": null,
@@ -4517,6 +4538,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "帮助 Reddit 荷兰语社区成长，提升本地用户参与和社区运营质量。",
+        "responsibilities": [
+          "扶持新的本地社区并与版主团队合作。",
+          "规划荷兰语用户增长和社区活动。",
+          "监测社区健康、反馈和运营改进机会。"
+        ],
+        "requirements": [
+          "擅长社区管理或国际市场运营。",
+          "熟悉 Reddit 社区文化及荷兰语市场。",
+          "能够远程与全球社区运营团队协作。"
+        ],
+        "benefits": [
+          "合同制，申请者需位于荷兰。"
+        ],
+        "originalSummary": "Archived Reddit role Community Manager, Dutch Speaking (Contract), with a Chinese editorial summary of the official requirements.",
+        "source": "https://job-boards.greenhouse.io/reddit/jobs/8275952"
       }
     },
     {
@@ -4527,7 +4569,7 @@
       "titleZh": "工程经理（知识图谱平台）",
       "titleTranslation": "editorial_checked",
       "locationEn": "Remote - United States",
-      "locationZh": "远程 · 美国",
+      "locationZh": "美国 · 远程",
       "countryCode": "US",
       "cityKey": null,
       "education": null,
@@ -4552,6 +4594,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "领导 Reddit 知识图谱平台团队，利用图数据和 AI 为广告及消费者产品提供通用知识服务。",
+        "responsibilities": [
+          "管理工程师并建立可靠的知识图谱数据服务和 API。",
+          "制定图数据质量、可靠性和开发者体验标准。",
+          "使用大语言模型与智能体技术改进图谱构建和知识对齐。"
+        ],
+        "requirements": [
+          "具备平台工程或数据工程管理经验。",
+          "理解知识图谱、数据建模、可观测性和生产级系统可靠性。",
+          "能与语言学、产品及工程部门协调数据治理。"
+        ],
+        "benefits": [
+          "美国远程岗位，详细报酬以公司发布信息为准。"
+        ],
+        "originalSummary": "Archived Reddit role Engineering Manager, Knowledge Graph Platform, with a Chinese editorial summary of the official requirements.",
+        "source": "https://job-boards.greenhouse.io/reddit/jobs/8256326"
       }
     },
     {
@@ -4562,7 +4625,7 @@
       "titleZh": "德语区中型企业客户经理",
       "titleTranslation": "editorial_checked",
       "locationEn": "Amsterdam, Netherlands",
-      "locationZh": "地点待核验",
+      "locationZh": "荷兰 · 阿姆斯特丹现场办公",
       "countryCode": "NL",
       "cityKey": "amsterdam",
       "education": null,
@@ -4587,6 +4650,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "面向德国、奥地利和瑞士中型广告客户销售 Reddit 广告并管理既有广告业务。",
+        "responsibilities": [
+          "为负责客户制定销售和收入增长计划。",
+          "优化广告活动并分析效果，为广告主提供建议。",
+          "维护客户和代理机构关系，反馈广告产品需求。"
+        ],
+        "requirements": [
+          "至少五年在线媒体广告销售或客户管理经验。",
+          "英语、德语流利，熟悉德语区数字广告市场。",
+          "熟悉广告投放、效果衡量和数据分析。"
+        ],
+        "benefits": [
+          "必须在阿姆斯特丹办公室工作，官网提及可提供搬迁支持。"
+        ],
+        "originalSummary": "Archived Reddit role Account Executive, Mid-Market (DACH), with a Chinese editorial summary of the official requirements.",
+        "source": "https://job-boards.greenhouse.io/reddit/jobs/8153017"
       }
     },
     {
@@ -4597,7 +4681,7 @@
       "titleZh": "中小企业产品采用策略负责人",
       "titleTranslation": "editorial_checked",
       "locationEn": "Chicago, IL; New York City, NY",
-      "locationZh": "芝加哥 · 伊利诺伊州; 纽约 · 纽约州",
+      "locationZh": "美国 · 芝加哥／纽约",
       "countryCode": "US",
       "cityKey": "new york",
       "education": null,
@@ -4620,6 +4704,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "推动 Reddit 中小企业广告产品采用，建设规模化客户激活和销售赋能计划。",
+        "responsibilities": [
+          "面向中小企业制定产品采用、复购和激活方案。",
+          "协调 Shopify、WooCommerce 等电商合作伙伴。",
+          "建立产品采用指标、行业策略与销售培训流程。"
+        ],
+        "requirements": [
+          "八年以上数字广告、产品采用、广告销售战略或营收运营经验。",
+          "能管理跨产品、销售与市场推广的规模化方案。",
+          "熟悉广告转化衡量和中小企业客户群。"
+        ],
+        "benefits": [
+          "工作地点芝加哥或纽约，官网年薪 182,000—254,800 美元。"
+        ],
+        "originalSummary": "Archived Reddit role Lead Product Adoption Strategist, SMB, with a Chinese editorial summary of the official requirements.",
+        "source": "https://job-boards.greenhouse.io/reddit/jobs/8263435"
       }
     },
     {
@@ -4630,7 +4735,7 @@
       "titleZh": "战略财务高级经理",
       "titleTranslation": "editorial_checked",
       "locationEn": "Remote - United States",
-      "locationZh": "远程 · 美国",
+      "locationZh": "美国 · 远程",
       "countryCode": "US",
       "cityKey": null,
       "education": null,
@@ -4656,6 +4761,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "为 Reddit 用户和广告收入增长制定财务模型及战略方案，支持投资和资源配置。",
+        "responsibilities": [
+          "建立业务预测、增长模型和投资商业案例。",
+          "协调营销、产品和销售团队评估增长机会。",
+          "向管理层和投资者关系团队解释财务洞察。"
+        ],
+        "requirements": [
+          "五至七年咨询／投资银行及公司财务或战略经验。",
+          "熟悉 Excel 或表格财务建模，SQL 为加分项。",
+          "能够使用 AI 进行分析并验证结果准确性。"
+        ],
+        "benefits": [
+          "美国远程，官网年薪 180,200—252,300 美元。"
+        ],
+        "originalSummary": "Archived Reddit role Strategic Finance Senior Manager, with a Chinese editorial summary of the official requirements.",
+        "source": "https://job-boards.greenhouse.io/reddit/jobs/8244067"
       }
     },
     {
