@@ -200,6 +200,39 @@
       "verifiedOn": "2026-10-24",
       "verifiedBy": "direct_employer_recruitment_page_or_current_school_job_notice",
       "notes": "集团频道覆盖可能与当前企业单一法人不同的用人单位；进入后须核对真实招聘主体和职位状态。"
+    },
+    "泡泡玛特": {
+      "url": "https://popmart.zhiye.com/",
+      "evidenceUrl": "https://www.popmart.com.cn/home/joinUs",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "泡泡玛特官方招聘（社招／校招／实习）",
+      "recruitmentEntity": "泡泡玛特",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "company_owned_careers_page_or_recruitment_portal",
+      "notes": "职位列表随企业变动；以该页公布岗位为准。"
+    },
+    "泰格医药": {
+      "url": "https://tigermed.zhiye.com/",
+      "evidenceUrl": "https://tigermed.zhiye.com/",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "泰格医药官方招聘",
+      "recruitmentEntity": "泰格医药",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "company_owned_careers_page_or_recruitment_portal",
+      "notes": "发布页面含社招和校招，应核对岗位归属及报名条件。"
+    },
+    "联影医疗": {
+      "url": "https://global.united-imaging.com/zh-cn/careers",
+      "evidenceUrl": "https://www.united-imaging.com/zh-cn/",
+      "kind": "group_recruitment_portal",
+      "availability": "normal",
+      "label": "联影集团招聘导航",
+      "recruitmentEntity": "联影医疗",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "company_owned_careers_page_or_recruitment_portal",
+      "notes": "联影集团官网招聘入口可能覆盖多个关联法人；需确认发布岗位的真实聘用单位。"
     }
   }
 }
