@@ -94,6 +94,8 @@ export function CuratedHomePage({user}:{user:User|null}){
 export function CuratedJobMarket({user,compact=false}:{user?:User|null;compact?:boolean}){
  const [pack,setPack]=useState<Pack|null>(null),[error,setError]=useState('');
  const [query,setQuery]=useState(''),[company,setCompany]=useState(''),[country,setCountry]=useState('');
+ const [visibleCount,setVisibleCount]=useState(60);
+ useEffect(()=>{setVisibleCount(60)},[query,company,country]);
  useEffect(()=>{let alive=true;loadCuratedOffline().then(p=>{if(alive)setPack(p)}).catch(e=>{if(alive)setError(e.message)});return ()=>{alive=false}},[]);
  const results=useMemo(()=>selectCurated(pack?.jobs||[],query,company,country),[pack,query,company,country]);
  const countries=useMemo(()=>[...new Set((pack?.jobs||[]).map(j=>j.countryCode).filter((x):x is string=>!!x))].sort(),[pack]);
@@ -109,9 +111,9 @@ export function CuratedJobMarket({user,compact=false}:{user?:User|null;compact?:
     <select aria-label="筛选国家" value={country} onChange={e=>setCountry(e.target.value)}><option value="">全部国家地区</option>{countries.map(c=><option value={c} key={c}>{c}</option>)}</select>
    </div>
    <div className="curated-result-label">符合条件 {results.length} 条 · 收录快照 {pack.manifest.originalSnapshotAt.slice(0,10)}</div>
-   {results.length?<div className="curated-cards">{(compact?results.slice(0,6):results.slice(0,60)).map(job=><JobCard job={job} key={job.id}/>)}</div>:
+   {results.length?<div className="curated-cards">{(compact?results.slice(0,6):results.slice(0,visibleCount)).map(job=><JobCard job={job} key={job.id}/>)}</div>:
     <div className="curated-empty">没有找到匹配的岗位资料，试试其他关键词或企业。</div>}
-   {!compact&&results.length>60&&<p className="curated-more-hint">目前只展示前 60 条结果，请使用搜索条件进一步筛选。</p>}
+   {!compact&&results.length>visibleCount&&<div className="curated-explore"><button type="button" className="curated-load-more" onClick={()=>setVisibleCount(n=>Math.min(n+60,results.length))}>继续显示更多岗位（已显示 {Math.min(visibleCount,results.length)} / {results.length} 条） <ArrowRight size={16}/></button></div>}
    {compact&&<div className="curated-explore"><Link to="/candidate/jobs">查看全部 {pack.jobs.length} 条精选资料 <ArrowRight size={16}/></Link></div>}
    <p className="curated-notice"><ShieldCheck size={15}/> 本站提供职业资料研究，不代表与企业合作或确认岗位仍在开放投递；学历、经验和技能线索可能不完整。</p>
   </>}
