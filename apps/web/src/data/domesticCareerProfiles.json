@@ -5292,7 +5292,21 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company100-review-9e193b14cd5739886f93.webp",
+        "localPath": "domestic-media/company100-review-9e193b14cd5739886f93.webp",
+        "source": "https://www.gwm.com.cn/news/3403600.html",
+        "kind": "office",
+        "label": "长城汽车官网2025年报道中的企业园区建筑照片",
+        "verification": "reviewed_named_corporate_building_image_with_source",
+        "sourceFile": "reviewed-external-scene",
+        "attribution": "长城汽车官方网站",
+        "license": "first-party-editorial-image_rights_unverified",
+        "licenseUrl": null,
+        "changes": "resized and transcoded to WebP"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
     "contentReview": "first_pass_business_background_needs_company_page_confirmation",
@@ -7489,7 +7503,21 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company100-review-ed0ecc1cefa680fe8266.webp",
+        "localPath": "domestic-media/company100-review-ed0ecc1cefa680fe8266.webp",
+        "source": "https://commons.wikimedia.org/wiki/File:Xiaomi_Science_and_Technology_Park_(20220414090237).jpg",
+        "kind": "headquarters",
+        "label": "小米科技园北京总部大楼实景（摄影 N509FZ，修图 Jacek Halicki，CC BY-SA 4.0）",
+        "verification": "reviewed_named_corporate_building_image_with_source",
+        "sourceFile": "reviewed-external-scene",
+        "attribution": "N509FZ; Jacek Halicki (retouch)",
+        "license": "CC BY-SA 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "changes": "resized and transcoded to WebP"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
     "contentReview": "first_pass_business_background_needs_company_page_confirmation",

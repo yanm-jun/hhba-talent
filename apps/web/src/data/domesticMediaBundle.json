@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-24T03:57:10.764Z",
+  "generatedAt": "2026-10-24T04:12:35.927Z",
   "companies": {
     "华域视觉科技（上海）有限公司": {
       "brand": {
@@ -1778,6 +1778,34 @@
           "path": "domestic-media/company100-site-7ca2b7da6e0f8654c088.webp",
           "source": "https://www.xfyun.cn/introduction",
           "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "小米集团": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-review-ed0ecc1cefa680fe8266.webp",
+          "source": "https://commons.wikimedia.org/wiki/File:Xiaomi_Science_and_Technology_Park_(20220414090237).jpg",
+          "classification": "source_backed_named_enterprise_scene",
+          "reviewDate": "2026-10-24"
+        }
+      ]
+    },
+    "长城汽车": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-review-9e193b14cd5739886f93.webp",
+          "source": "https://www.gwm.com.cn/news/3403600.html",
+          "classification": "source_backed_named_enterprise_scene",
+          "reviewDate": "2026-10-24"
         }
       ]
     }
