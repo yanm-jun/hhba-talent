@@ -52,7 +52,8 @@
         "label": "华域视觉官网展示的常熟工厂真实外景（楼宇与企业标识）",
         "kind": "factory",
         "source": "https://www.hascovision.com/about/about-us",
-        "verification": "official_site_caption_and_visual_inspection"
+        "verification": "official_site_caption_and_visual_inspection",
+        "localPath": "domestic-media/e58d8ee59f9fe8a786e8a789e7a791e68a80efbc88e4b88ae6b5b7efbc89e69c89e99990e585ace58fb8-photo-0.webp"
       },
       {
         "url": "https://www.hascovision.com/Public/Uploads/uploadfile/images/20231219/e1img07.jpg",
@@ -251,7 +252,8 @@
         "label": "上汽集团官网发布的企业大楼外立面与上汽集团标识",
         "kind": "office",
         "source": "https://www.saicmotor.com/chinese/xwzx/mtbd/2025/61304.shtml",
-        "verification": "image_shown_on_official_company_article_pending_reuse_clearance"
+        "verification": "image_shown_on_official_company_article_pending_reuse_clearance",
+        "localPath": "domestic-media/e4b88ae6b1bde99b86e59ba2-photo-0.webp"
       },
       {
         "url": "domestic-media/user-b069062b35cacc0d8be80ec8.webp",
@@ -1062,9 +1064,9 @@
     "careersLabel": "平高电气官网社会招聘公告",
     "officialSource": "https://www.pinggao.com/about/company.html",
     "productSource": "https://pinggao.com",
-    "brandImage": "https://pinggao.com/static/cn/images/logo.png",
-    "brandImageSource": "https://pinggao.com/",
-    "brandAssetStatus": "official_website_logo_candidate",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "official_logo_rejected_mismatch",
     "photos": [],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
@@ -1078,8 +1080,10 @@
     "subIndustry": "高压开关设备",
     "industryEvidenceUrl": "https://www.pinggao.com/about/company.html",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
-    "brandLocalPath": "domestic-media/f762632cf1ca43d-website-brand-candidate.png",
-    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending",
+    "rejectedLogoSource": "https://pinggao.com/static/cn/images/logo.png",
+    "rejectedLogoLocalPath": "domestic-media/f762632cf1ca43d-website-brand-candidate.png",
+    "brandReviewNote": "2026-10-24：候选图为蓝绿 S 形标识，与平高电气公开的 PG 红色闪电商标不一致；不显示此候选，也不误认作正式 Logo。"
   },
   "国电南瑞": {
     "displayName": "国电南瑞",
@@ -2008,7 +2012,7 @@
     "productSource": "https://ieisystem.com",
     "brandImage": "https://www.ieisystem.com/global/template/images/logo.png",
     "brandImageSource": "https://ieisystem.com/",
-    "brandAssetStatus": "official_website_logo_candidate",
+    "brandAssetStatus": "official_logo_visually_verified",
     "photos": [
       {
         "url": "domestic-media/company100-site-fe44c3909bf328ecdc0f.webp",
@@ -2032,7 +2036,8 @@
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
     "brandLocalPath": "domestic-media/fe44c3909bf328e-website-brand-candidate.png",
     "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending",
-    "careerReviewStatus": "official_recruitment_entry_not_yet_verified"
+    "careerReviewStatus": "official_recruitment_entry_not_yet_verified",
+    "brandReviewNote": "2026-10-24：逐图核对既有本地候选与企业官方网站的实际品牌标识；该标识用于本企业页面，不代表招聘合作。"
   },
   "隆基绿能": {
     "displayName": "隆基绿能",
@@ -2670,14 +2675,16 @@
         "url": "https://official-oversears-file.sungrowpower.com/news-images/c0981ae7-a998-433b-b9b4-78127ea55996.png",
         "label": "阳光电源官网展示的 SG3.0/3.6/4.0RS 逆变器",
         "kind": "product",
-        "source": "https://www.sungrowpower.com/demo/zh/products/string-inverter"
+        "source": "https://www.sungrowpower.com/demo/zh/products/string-inverter",
+        "localPath": "domestic-media/e998b3e58589e794b5e6ba90-photo-0.webp"
       },
       {
         "url": "https://fra.sungrowpower.com/upload/6385632548369337056336172.jpg",
         "label": "阳光电源官方品牌故事展示的合肥总部办公塔楼",
         "kind": "headquarters",
         "source": "https://fra.sungrowpower.com/AboutSungrow",
-        "verification": "visually_attributed_to_exact_company_official_site_pending_reuse_clearance"
+        "verification": "visually_attributed_to_exact_company_official_site_pending_reuse_clearance",
+        "localPath": "domestic-media/e998b3e58589e794b5e6ba90-photo-1.webp"
       },
       {
         "url": "domestic-media/user-2e86bda6921e86580c185b46.webp",
@@ -3092,7 +3099,8 @@
         "url": "https://www.catl.com/uploads/1/image/public/202008/20200818161807_q641cuoh2y.png",
         "label": "宁德时代官网的企业总部建筑展示",
         "kind": "headquarters",
-        "source": "https://www.catl.com/about/profile/"
+        "source": "https://www.catl.com/about/profile/",
+        "localPath": "domestic-media/e5ae81e5beb7e697b6e4bba3-photo-0.webp"
       },
       {
         "url": "domestic-media/user-337888a30b38c8cfcd77ef77.webp",
@@ -3170,7 +3178,7 @@
     "productSource": "https://sanygroup.com",
     "brandImage": "https://sanygroup.com/img/sany-logo.png",
     "brandImageSource": "https://sanygroup.com/",
-    "brandAssetStatus": "official_website_logo_candidate",
+    "brandAssetStatus": "official_logo_visually_verified",
     "photos": [
       {
         "url": "domestic-media/company100-review-d5adb014d4d826fb6b36.webp",
@@ -3197,7 +3205,8 @@
     "industryEvidenceUrl": "https://www.sanygroup.com/introduction/",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
     "brandLocalPath": "domestic-media/d5adb014d4d826f-website-brand-candidate.png",
-    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending",
+    "brandReviewNote": "2026-10-24：逐图核对既有本地候选与企业官方网站的实际品牌标识；该标识用于本企业页面，不代表招聘合作。"
   },
   "海康威视": {
     "displayName": "海康威视",
