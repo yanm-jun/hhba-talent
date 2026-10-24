@@ -1183,6 +1183,18 @@
       "verifiedBy": "official_company_career_site",
       "verifiedOn": "2026-10-24",
       "aliases": []
+    },
+    "智飞生物": {
+      "url": "https://www.zhifeishengwu.com/zh_CN/recruitment/42.html",
+      "evidenceUrl": "https://www.zhifeishengwu.com/zh_CN",
+      "kind": "official_recruitment_announcements",
+      "availability": "unconfirmed_runtime",
+      "label": "智飞生物官网招聘岗位栏目",
+      "recruitmentEntity": "智飞生物",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_website_navigation_link_only",
+      "aliases": [],
+      "notes": "官网导航可找到招聘岗位栏目；细节页打开失败，尚未证实岗位当前开放和网页可用性，不能当作已验收的网申入口。"
     }
   }
 }
