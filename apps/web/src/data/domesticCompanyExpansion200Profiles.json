@@ -188,8 +188,8 @@
       "marketing",
       "industrial-design"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://xiaopeng.jobs.feishu.cn/",
+    "careersLabel": "小鹏集团招聘网站（需核对实际招聘法人）",
     "officialSource": "https://www.xpeng.com",
     "productSource": "https://www.xpeng.com",
     "website": "https://www.xpeng.com",
@@ -292,8 +292,8 @@
       "marketing",
       "industrial-design"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://www.zeekrgroup.com/join-us",
+    "careersLabel": "极氪科技集团招聘（非单一法人）",
     "officialSource": "https://www.zeekr.com",
     "productSource": "https://www.zeekr.com",
     "website": "https://www.zeekr.com",
@@ -344,8 +344,8 @@
       "marketing",
       "industrial-design"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://chery1.zhiye.com/",
+    "careersLabel": "奇瑞汽车股份有限公司招聘",
     "officialSource": "https://www.chery.cn",
     "productSource": "https://www.chery.cn",
     "website": "https://www.chery.cn",
@@ -361,58 +361,6 @@
     "industryEvidenceUrl": "https://www.chery.cn",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.chery.cn",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
-  },
-  "东风汽车": {
-    "displayName": "东风汽车",
-    "subtitle": "整车制造与智能出行",
-    "summary": "东风汽车涉及汽车集团整车业务、新能源汽车与零部件及商用车及产业服务等业务方向。企业档案用于行业探索；业务细节与用人主体请通过企业官方资料确认。",
-    "description": [
-      "东风汽车的公开业务方向可以从「汽车集团整车业务」「新能源汽车与零部件」「商用车及产业服务」三个维度理解。对于第一次研究这家企业的求职者，宜先区分企业品牌、实际经营主体与集团内其他公司，而不能把品牌名直接等同于单一招聘主体。这里整理的是业务和能力图谱，并非未经核实的在招岗位清单。",
-      "在汽车集团整车业务相关领域，通常需要产品规划、专业技术、质量控制和项目协同；新能源汽车与零部件则可能涉及技术研发、信息系统、供应链或合作伙伴配合。这些环节能够帮助求职者识别工作内容的差异，不应把行业共通的职责误写成东风汽车的具体职位说明。",
-      "从商用车及产业服务观察，企业运营除了直接面向市场的职能，也离不开财务、采购、法务、行政、人力资源与数据系统等支持。东风汽车旗下各业务板块、地区机构的用工安排可能不同，涉及校招、实习、社招时，应以实际公布的招聘单位、时间和申请条件为准。",
-      "专业探索方面，本档案根据整车制造与智能出行常见业务需求，关联了vehicle-engineering、mechanical-engineering、automation、electronic-information、computer-science等相关学科方向。用户可以借此发现潜在的行业入口，但专业关联并不意味着符合某个职位的所有要求，更不能代替岗位任职资格审查。企业图片、品牌归属与招聘专用入口需要分别核验，未完成前应清楚提示。"
-    ],
-    "business": [
-      {
-        "title": "汽车集团整车业务",
-        "description": "东风汽车在整车制造与智能出行相关业务中涉及汽车集团整车业务，该领域通常包含产品与技术方案、研发或经营计划等环节；具体由哪个法人或部门负责须以企业披露为准。"
-      },
-      {
-        "title": "新能源汽车与零部件",
-        "description": "东风汽车在整车制造与智能出行相关业务中涉及新能源汽车与零部件，该领域通常包含技术实现、组织协作、交付及质量控制等环节；具体由哪个法人或部门负责须以企业披露为准。"
-      },
-      {
-        "title": "商用车及产业服务",
-        "description": "东风汽车在整车制造与智能出行相关业务中涉及商用车及产业服务，该领域通常包含运营支持、市场协同、客户服务及商业管理等环节；具体由哪个法人或部门负责须以企业披露为准。"
-      }
-    ],
-    "majorSlugs": [
-      "vehicle-engineering",
-      "mechanical-engineering",
-      "automation",
-      "electronic-information",
-      "computer-science",
-      "marketing",
-      "industrial-design"
-    ],
-    "careersUrl": "",
-    "careersLabel": "",
-    "officialSource": "https://www.dfmc.com.cn",
-    "productSource": "https://www.dfmc.com.cn",
-    "website": "https://www.dfmc.com.cn",
-    "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
-    "lastReviewed": "2026-10-24",
-    "evidenceLevel": "company_website_candidate_detail_review_pending",
-    "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
-    "primaryIndustry": "整车制造与智能出行",
-    "subIndustry": "汽车集团整车业务 · 新能源汽车与零部件 · 商用车及产业服务",
-    "industryEvidenceUrl": "https://www.dfmc.com.cn",
-    "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
-    "photoSourcePage": "https://www.dfmc.com.cn",
     "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
   },
   "北京汽车": {
@@ -604,8 +552,8 @@
       "industrial-design",
       "marketing"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://hr.vivo.com/",
+    "careersLabel": "vivo官方招聘网站",
     "officialSource": "https://www.vivo.com.cn",
     "productSource": "https://www.vivo.com.cn",
     "website": "https://www.vivo.com.cn",
@@ -968,8 +916,8 @@
       "industrial-design",
       "marketing"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://careers.dji.com/zh-CN/",
+    "careersLabel": "大疆创新招聘网站",
     "officialSource": "https://www.dji.com/cn",
     "productSource": "https://www.dji.com/cn",
     "website": "https://www.dji.com/cn",
@@ -1384,8 +1332,8 @@
       "computer-science",
       "marketing"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://www.hotjob.cn/wt/SEC/mobweb/v8/index",
+    "careersLabel": "上海电气微招聘",
     "officialSource": "https://www.shanghai-electric.com",
     "productSource": "https://www.shanghai-electric.com",
     "website": "https://www.shanghai-electric.com",
@@ -3236,8 +3184,8 @@
       "digital-media",
       "finance"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://careers.meituan.com/web/home",
+    "careersLabel": "美团招聘网站",
     "officialSource": "https://www.meituan.com",
     "productSource": "https://www.meituan.com",
     "website": "https://www.meituan.com",
@@ -3554,8 +3502,8 @@
       "digital-media",
       "finance"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://career.yonyou.com/",
+    "careersLabel": "用友集团校园招聘线索（需核对运行状态）",
     "officialSource": "https://www.yonyou.com",
     "productSource": "https://www.yonyou.com",
     "website": "https://www.yonyou.com",
@@ -3607,8 +3555,8 @@
       "digital-media",
       "finance"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://www.kingdee.com/job",
+    "careersLabel": "金蝶招聘频道",
     "officialSource": "https://www.kingdee.com",
     "productSource": "https://www.kingdee.com",
     "website": "https://www.kingdee.com",
@@ -5038,8 +4986,8 @@
       "finance",
       "journalism"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://job.ctrip.com/",
+    "careersLabel": "携程集团招聘网站",
     "officialSource": "https://group.trip.com",
     "productSource": "https://group.trip.com",
     "website": "https://group.trip.com",
@@ -5267,6 +5215,58 @@
     "industryEvidenceUrl": "https://www.vanke.com",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.vanke.com",
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+  },
+  "东风汽车集团": {
+    "displayName": "东风汽车集团",
+    "subtitle": "整车制造与智能出行",
+    "summary": "东风汽车集团涉及整车产业、汽车相关技术以及集团旗下不同业务主体。集团总部与各子公司招聘应明确区分，不能把汽车股份公司等同于集团总部。",
+    "description": [
+      "东风汽车集团的公开业务方向可以从「汽车集团整车业务」「新能源汽车与零部件」「商用车及产业服务」三个维度理解。对于第一次研究这家企业的求职者，宜先区分企业品牌、实际经营主体与集团内其他公司，而不能把品牌名直接等同于单一招聘主体。这里整理的是业务和能力图谱，并非未经核实的在招岗位清单。",
+      "在汽车集团整车业务相关领域，通常需要产品规划、专业技术、质量控制和项目协同；新能源汽车与零部件则可能涉及技术研发、信息系统、供应链或合作伙伴配合。这些环节能够帮助求职者识别工作内容的差异，不应把行业共通的职责误写成东风汽车集团的具体职位说明。",
+      "从商用车及产业服务观察，企业运营除了直接面向市场的职能，也离不开财务、采购、法务、行政、人力资源与数据系统等支持。东风汽车集团旗下各业务板块、地区机构的用工安排可能不同，涉及校招、实习、社招时，应以实际公布的招聘单位、时间和申请条件为准。",
+      "专业探索方面，本档案根据整车制造与智能出行常见业务需求，关联了vehicle-engineering、mechanical-engineering、automation、electronic-information、computer-science等相关学科方向。用户可以借此发现潜在的行业入口，但专业关联并不意味着符合某个职位的所有要求，更不能代替岗位任职资格审查。企业图片、品牌归属与招聘专用入口需要分别核验，未完成前应清楚提示。"
+    ],
+    "business": [
+      {
+        "title": "汽车集团整车业务",
+        "description": "东风汽车在整车制造与智能出行相关业务中涉及汽车集团整车业务，该领域通常包含产品与技术方案、研发或经营计划等环节；具体由哪个法人或部门负责须以企业披露为准。"
+      },
+      {
+        "title": "新能源汽车与零部件",
+        "description": "东风汽车在整车制造与智能出行相关业务中涉及新能源汽车与零部件，该领域通常包含技术实现、组织协作、交付及质量控制等环节；具体由哪个法人或部门负责须以企业披露为准。"
+      },
+      {
+        "title": "商用车及产业服务",
+        "description": "东风汽车在整车制造与智能出行相关业务中涉及商用车及产业服务，该领域通常包含运营支持、市场协同、客户服务及商业管理等环节；具体由哪个法人或部门负责须以企业披露为准。"
+      }
+    ],
+    "majorSlugs": [
+      "vehicle-engineering",
+      "mechanical-engineering",
+      "automation",
+      "electronic-information",
+      "computer-science",
+      "marketing",
+      "industrial-design"
+    ],
+    "careersUrl": "https://www.dfmc.com.cn/zhaopin/zhaopin.html",
+    "careersLabel": "东风集团总部与所属单位招聘导览",
+    "officialSource": "https://www.dfmc.com.cn",
+    "productSource": "https://www.dfmc.com.cn",
+    "website": "https://www.dfmc.com.cn",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "company_website_candidate_detail_review_pending",
+    "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
+    "primaryIndustry": "整车制造与智能出行",
+    "subIndustry": "汽车集团整车业务 · 新能源汽车与零部件 · 商用车及产业服务",
+    "industryEvidenceUrl": "https://www.dfmc.com.cn",
+    "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
+    "photoSourcePage": "https://www.dfmc.com.cn",
     "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
   }
 }
