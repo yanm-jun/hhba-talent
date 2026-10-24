@@ -1514,6 +1514,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "作为 Bridge 客户经理维护中型与高成长客户组合，通过产品采用、续约与扩张提升现有客户收入。",
+        "responsibilities": [
+          "管理现有客户组合并发掘收入扩张机会。",
+          "识别产品使用障碍、流失风险并推动采用。",
+          "联动内部团队改进客户续约与账户运营流程。"
+        ],
+        "requirements": [
+          "具备企业客户管理、商业拓展或销售经验。",
+          "理解中大型客户的续约和产品扩张流程。",
+          "能够使用数据制定账户策略并跨团队解决问题。"
+        ],
+        "benefits": [
+          "具体薪资与办公地点以该职位官网当前披露为准。"
+        ],
+        "originalSummary": "Employer careers description for Account Executive - Bridge. Full English original is at the official source link.",
+        "source": "https://stripe.com/careers/listing/account-executive-bridge/8215824"
       }
     },
     {
@@ -1547,6 +1568,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "为日本企业介绍 Stripe Billing 及收入管理方案，负责产品销售、客户扩张和长期关系管理。",
+        "responsibilities": [
+          "推动新客户及现有客户的 Stripe Billing 销售。",
+          "主导技术与业务层面的产品方案讨论和战略成交。",
+          "汇总客户需求并向产品和营销团队反馈。"
+        ],
+        "requirements": [
+          "至少八年技术公司销售或商机开拓经验。",
+          "曾独立承担销售配额和新客户签约。",
+          "书面及口语日语流利；金融软件销售经验加分。"
+        ],
+        "benefits": [
+          "工作地点东京，官网目标薪酬范围约 20,988,000—31,482,000 日元／年（销售岗 OTE 口径）。"
+        ],
+        "originalSummary": "Employer careers description for Account Executive Product - Billing (Japanese Fluency). Full English original is at the official source link.",
+        "source": "https://stripe.com/careers/listing/account-executive-product-billing-japanese-fluency/8188088"
       }
     },
     {
@@ -1582,6 +1624,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "作为 Stripe 传播运营团队成员，为全球品牌创意和传播工作建设计划、工作流和衡量机制。",
+        "responsibilities": [
+          "设计传播项目协作流程、项目节奏和交付工具。",
+          "运用 AI 自动化减少重复运营任务。",
+          "搭建传播效果及运营效率报表，支持管理决策。"
+        ],
+        "requirements": [
+          "三至五年运营、战略或项目管理相关经验。",
+          "能在快节奏组织中系统化解决复杂流程问题。",
+          "积极使用 AI 工具和数据分析，愿意学习 SQL 或仪表盘工具。"
+        ],
+        "benefits": [
+          "官网未在已核对摘要中提供可靠薪酬数额，按官方职位页面为准。"
+        ],
+        "originalSummary": "Employer careers description for Comms Strategy & Operations Associate. Full English original is at the official source link.",
+        "source": "https://stripe.com/careers/listing/comms-strategy-operations-associate/8241857"
       }
     },
     {
@@ -1617,6 +1680,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责 Stripe 消费者品牌 Link 的创意项目制作管理，统筹营销、设计系统和品牌传播交付。",
+        "responsibilities": [
+          "制定 Link 品牌项目计划、预算和人员资源。",
+          "协调品牌网页、社交内容、广告和邮件等不同类型的创意制作。",
+          "与创意总监及外部代理机构合作改善制作流程和质量。"
+        ],
+        "requirements": [
+          "六年以上创意制作或相关运营工作经验。",
+          "熟悉品牌系统、数字营销、动效及跨类型制作流程。",
+          "能统筹预算与项目，并使用 AI 赋能创意制作。"
+        ],
+        "benefits": [
+          "官网披露美国基本年薪约 150,900—226,300 美元。"
+        ],
+        "originalSummary": "Employer careers description for Brand Producer, Link. Full English original is at the official source link.",
+        "source": "https://stripe.com/careers/listing/brand-producer-link/7991528"
       }
     },
     {
@@ -1653,6 +1737,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "调查 Stripe 账户滥用、银行卡测试及账号接管等金融欺诈事件，开展风险响应及技术分析。",
+        "responsibilities": [
+          "调查复杂欺诈事件并实施缓解和修复。",
+          "分析账户、交易和安全日志，识别攻击模式及根因。",
+          "与安全和数据科学团队开发可规模化的事件响应工具。"
+        ],
+        "requirements": [
+          "至少五年安全、信任风控或产品滥用事件响应经历。",
+          "至少五年大型数据分析或欺诈建模经历。",
+          "精通 Python、SQL，并熟悉日志分析和数字取证。"
+        ],
+        "benefits": [
+          "官网对应都柏林岗位给出的年薪区间为 89,100—133,700 欧元。"
+        ],
+        "originalSummary": "Employer careers description for Abuse Investigator. Full English original is at the official source link.",
+        "source": "https://stripe.com/careers/listing/abuse-investigator/8172487"
       }
     },
     {
@@ -1690,6 +1795,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责 Stripe Terminal 支付终端的 Android 底层软件与平台集成，支持现场支付设备能力。",
+        "responsibilities": [
+          "参与 Android 支付终端底层系统、设备支持和平台集成。",
+          "与终端工程团队合作提高支付设备可靠性。",
+          "分析 Android 平台问题并参与工程测试与兼容性改进。"
+        ],
+        "requirements": [
+          "需具备 Android 平台开发与设备软件基础。",
+          "熟悉系统级调试、软硬件集成及技术问题分析。",
+          "能够与终端支付产品及软件工程团队协作。"
+        ],
+        "benefits": [
+          "官网该职位的详细薪资与最低年限需进一步核对；不作额外推断。"
+        ],
+        "originalSummary": "Employer careers description for Android BSP Engineer. Full English original is at the official source link.",
+        "source": "https://stripe.com/careers/listing/android-bsp-engineer/8239006"
       }
     },
     {
@@ -1723,6 +1849,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责 Stripe 法国大型企业客户关系的续约扩张及复杂商业谈判，制定长期账户增长计划。",
+        "responsibilities": [
+          "为大型企业客户制定多年商业与扩张策略。",
+          "与高管及跨产品技术伙伴推进复杂合同谈判。",
+          "建立扩张商机管道并管理关键客户收益。"
+        ],
+        "requirements": [
+          "至少七年技术或 API 产品企业销售经验。",
+          "有复杂大客户销售、价值沟通及战略谈判能力。",
+          "法语和英语书面及口语均需流利。"
+        ],
+        "benefits": [
+          "工作地点巴黎，官网列出年薪约 153,800—230,600 欧元。"
+        ],
+        "originalSummary": "Employer careers description for Account Executive - Enterprise (Grower) - French Speaking. Full English original is at the official source link.",
+        "source": "https://stripe.com/careers/listing/account-executive-enterprise-grower-french-speaking/8284962"
       }
     },
     {
@@ -1756,6 +1903,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责 Stripe Radar 等欺诈及风险产品的企业销售，为客户提供降低支付风险的商业解决方案。",
+        "responsibilities": [
+          "向新旧客户销售 Radar、争议处理和风险管理产品。",
+          "管理复杂企业级合同和定制化产品方案成交。",
+          "收集客户反馈，与产品和工程团队完善欺诈防护能力。"
+        ],
+        "requirements": [
+          "十年以上大型科技或支付公司企业客户工作经历。",
+          "理解欺诈防控产品，能够与业务与技术决策者对话。",
+          "擅长复杂谈判及跨团队商业项目推进。"
+        ],
+        "benefits": [
+          "官网公布美国年薪约 239,000—358,400 美元，可在指定地点混合或美国境内符合条件远程工作。"
+        ],
+        "originalSummary": "Employer careers description for Account Executive Product - Fraud & Risk. Full English original is at the official source link.",
+        "source": "https://stripe.com/careers/listing/account-executive-product-fraud-risk/8181024"
       }
     },
     {
@@ -1789,6 +1957,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "面向大中华与东南亚市场传播 Stripe 的企业客户和支付基础设施故事，管理区域品牌声誉。",
+        "responsibilities": [
+          "为亚洲科技和商业媒体规划公司叙事与传播活动。",
+          "挖掘区域客户故事，协调产品发布和对外信息。",
+          "建立记者、行业影响者和合作伙伴的长期关系。"
+        ],
+        "requirements": [
+          "七年以上传播、公关或新闻行业经验。",
+          "了解大中华及东南亚科技、企业与媒体环境。",
+          "具备复杂技术主题写作及多市场传播项目管理能力；中文为加分项。"
+        ],
+        "benefits": [
+          "新加坡办公，官网列出年薪区间 153,600—230,400 新加坡元。"
+        ],
+        "originalSummary": "Employer careers description for Communications Manager, Asia. Full English original is at the official source link.",
+        "source": "https://stripe.com/careers/listing/communications-manager-asia/7684149"
       }
     },
     {
