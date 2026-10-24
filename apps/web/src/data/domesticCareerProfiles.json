@@ -6347,7 +6347,21 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company100-review-cb0b0e4b48739fd2cd78.webp",
+        "localPath": "domestic-media/company100-review-cb0b0e4b48739fd2cd78.webp",
+        "source": "https://www.zhaopin.com/companydetail/CC000577607.htm",
+        "kind": "office",
+        "label": "智联招聘雇主资料中展示的迈瑞医疗办公大楼照片",
+        "verification": "reviewed_named_corporate_building_image_with_source",
+        "sourceFile": "reviewed-external-scene",
+        "attribution": "智联招聘雇主资料（原摄影作者需另核实）",
+        "license": "employer-posted-photo-rights_not_independently_cleared",
+        "licenseUrl": null,
+        "changes": "resized and transcoded to WebP"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
     "contentReview": "first_pass_business_background_needs_company_page_confirmation",
@@ -6770,7 +6784,21 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company100-review-13184d8f52bb112d1d5c.webp",
+        "localPath": "domestic-media/company100-review-13184d8f52bb112d1d5c.webp",
+        "source": "https://www.sfccn.com/2021/11-24/zNMDEzODdfMTY4MTkzNA.html",
+        "kind": "office",
+        "label": "南方财经新闻配图中的 BAOSTEEL 企业楼宇外景",
+        "verification": "reviewed_named_corporate_building_image_with_source",
+        "sourceFile": "reviewed-external-scene",
+        "attribution": "南方财经网（原摄影作者需另核实）",
+        "license": "news-photo-rights_not_independently_cleared",
+        "licenseUrl": null,
+        "changes": "resized and transcoded to WebP"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
     "contentReview": "first_pass_business_background_needs_company_page_confirmation",

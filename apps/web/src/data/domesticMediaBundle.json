@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-24T04:16:53.417Z",
+  "generatedAt": "2026-10-24T04:18:01.825Z",
   "companies": {
     "华域视觉科技（上海）有限公司": {
       "brand": {
@@ -1846,6 +1846,34 @@
           "state": "ready",
           "path": "domestic-media/company100-review-5865d0d40a2939f75a07.webp",
           "source": "https://huacheng.gz-cmc.com/pages/2026/02/01/29d5156007bc4881a29146865010f259.html",
+          "classification": "source_backed_named_enterprise_scene",
+          "reviewDate": "2026-10-24"
+        }
+      ]
+    },
+    "宝钢股份": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-review-13184d8f52bb112d1d5c.webp",
+          "source": "https://www.sfccn.com/2021/11-24/zNMDEzODdfMTY4MTkzNA.html",
+          "classification": "source_backed_named_enterprise_scene",
+          "reviewDate": "2026-10-24"
+        }
+      ]
+    },
+    "迈瑞医疗": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-review-cb0b0e4b48739fd2cd78.webp",
+          "source": "https://www.zhaopin.com/companydetail/CC000577607.htm",
           "classification": "source_backed_named_enterprise_scene",
           "reviewDate": "2026-10-24"
         }
