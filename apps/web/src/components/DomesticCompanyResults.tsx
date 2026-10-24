@@ -21,15 +21,15 @@ const isSubstantive=(name:string)=>{
  return Boolean(record?.contentReview!=='first_pass_industry_explanation_not_official_company_detail_audited'&&record?.officialSource&&paragraphs.length>=3&&paragraphs.join('').length>=280&&business.length>=3&&majors.length>=4);
 };
 const available={companies:{...bundled.companies,...additionalMedia.companies}} as {companies:Record<string,{brand?:{state:string;path?:string}}>};
-type Props={query:string;majorSlug?:string;scope?:string;country?:string;city?:string};
+type Props={query:string;majorSlug?:string;scope?:string;country?:string;city?:string;browseDefault?:boolean};
 function BrandMark({src,name}:{src?:string;name:string}){
  const [failed,setFailed]=useState(false);
  if(!src||failed)return <Building2 size={19} aria-label="企业图标待补充"/>;
  return <img loading="lazy" src={src} alt={name+'的企业网站图标'} onError={()=>setFailed(true)}/>;
 }
-export function DomesticCompanyResults({query,majorSlug='',scope='',country='',city=''}:Props){
+export function DomesticCompanyResults({query,majorSlug='',scope='',country='',city='',browseDefault=false}:Props){
  const all=getDomesticCompanies();
- const [browse200,setBrowse100]=useState(false);
+ const [browse200,setBrowse200]=useState(browseDefault);
  const word=query.trim();
  const chosen=majorById(majorSlug);
  const list=useMemo(()=>{
@@ -52,7 +52,7 @@ export function DomesticCompanyResults({query,majorSlug='',scope='',country='',c
  if(!word&&!chosen&&!browse200){
   if(scope==='global'||country&&!/^(cn|chn|china|中国|中国大陆)$/i.test(country))return null;
   return <div className="domestic-browse200-entry">
-   <button type="button" onClick={()=>setBrowse100(true)}>浏览企业发现 200 家档案 <ArrowRight size={14}/></button>
+   <button type="button" onClick={()=>setBrowse200(true)}>浏览企业发现 200 家档案 <ArrowRight size={14}/></button>
    <small>按企业主体查看真实介绍、相关专业与已登记的官方招聘渠道</small>
   </div>;
  }
