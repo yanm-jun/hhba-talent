@@ -7,6 +7,7 @@ const base=get('domesticComplete100Target.json');
 const expansion=get('domesticComplete200Target.json');
 const oldProfiles=get('domesticCareerProfiles.json');
 const extra=get('domesticCompanyExpansion200Profiles.json');
+const reviewed=get('domesticCompany200VerifiedEditorial.json').entries;
 const oldRecruit=get('domesticRecruitmentRegistry.json').entries;
 const newRecruit=get('domesticRecruitment200Registry.json').entries;
 const oldMedia=get('domesticMediaBundle.json').companies;
@@ -34,6 +35,15 @@ for(const [offset,name] of names.entries()){
  assert(Array.isArray(profile.business)&&profile.business.length>=3,'Business categories absent '+name);
  assert(Array.isArray(profile.majorSlugs)&&profile.majorSlugs.length>=4,'Professional majors absent '+name);
  assert(profile.summary.includes(name),'Wrong subject in summary '+name);
+ const verifiedEditorial=reviewed[name];
+ if(verifiedEditorial){
+  assert.equal(verifiedEditorial.contentReview,'company_specific_official_page_verified','Editorial verified status invalid '+name);
+  assert(Array.isArray(verifiedEditorial.reviewEvidenceUrls)&&verifiedEditorial.reviewEvidenceUrls.length>0,'Reviewed editorial evidence missing '+name);
+  assert(verifiedEditorial.reviewEvidenceUrls.every(validHttps)&&validHttps(verifiedEditorial.officialSource),'Reviewed editorial URL invalid '+name);
+  assert(verifiedEditorial.description.length>=3&&verifiedEditorial.description.join('').length>=280,'Source-backed narrative incomplete '+name);
+  assert(verifiedEditorial.business.length>=3,'Source-backed business description incomplete '+name);
+  assert(verifiedEditorial.summary.includes(name),'Source-backed summary subject mismatch '+name);
+ }
  if(profile.brandLocalPath)assert(['candidate','ready'].includes(newMedia[name]?.brand?.state),'Candidate logo must have a manifest classification '+name);
  const media=newMedia[name]||{};
  if(media.brand?.state==='candidate'){
@@ -60,17 +70,19 @@ for(const [offset,name] of names.entries()){
  }
  rows.push({number:offset+1,name,industry:profile.primaryIndustry,
   editorialCharacters:profile.description.join('').length,majorCount:profile.majorSlugs.length,
-  evidenceLevel:profile.evidenceLevel,siteCandidate:profile.officialSource,
+  evidenceLevel:verifiedEditorial?.evidenceLevel||profile.evidenceLevel,siteCandidate:verifiedEditorial?.officialSource||profile.officialSource,
+  editorialCompanySpecificReviewed:Boolean(verifiedEditorial),
   recruitmentKind:recruit?.kind||null,recruitmentEvidence:recruit?.evidenceUrl||null,
   logoReady:media.brand?.state==='ready',photoOrScreenshotReady:(media.photos||[]).some(x=>x?.state==='ready'),
   verifiedComplete:false});
 }
+for(const name of Object.keys(reviewed))assert(Object.hasOwn(extra,name),'Orphan reviewed editorial entry '+name);
 for(const name of Object.keys(newRecruit))assert(Object.hasOwn(extra,name),'Orphan recruitment entry '+name);
 for(const name of Object.keys(newMedia))assert(Object.hasOwn(extra,name),'Orphan image entry '+name);
 const result={reviewedAt:new Date().toISOString(),target:200,existing:100,newRecords:rows.length,
  verifiedRecruitmentEntries:Object.keys(newRecruit).length,
  newLogoReady:rows.filter(x=>x.logoReady).length,newPhotoOrScreenshotReady:rows.filter(x=>x.photoOrScreenshotReady).length,
- officialLongformVerified:0,reason:'New entries are marked first-pass until company-specific source review',
+ officialLongformVerified:Object.keys(reviewed).length,reason:'Only individually source-reviewed editorial overlays count as verified longform; other new companies remain explicitly first-pass',
  rows};
 mkdirSync('preview-reports',{recursive:true});
 writeFileSync('preview-reports/company200-quality.json',JSON.stringify(result,null,2)+'\n');
