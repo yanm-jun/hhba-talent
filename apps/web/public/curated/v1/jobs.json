@@ -393,6 +393,28 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "从事大模型对齐科学实验的研究工程师／科学家意向征集，探索如何在复杂或对抗性场景中控制先进 AI 系统并评估失配风险。",
+        "responsibilities": [
+          "设计和运行机器学习安全实验，研究模型在未知或对抗条件下的行为。",
+          "使用多智能体强化学习、越狱评测与对齐压力测试方法，分析安全措施的有效性。",
+          "制作可重复的评估脚本、数据与工具，参与论文及技术报告撰写。"
+        ],
+        "requirements": [
+          "拥有扎实的软件工程、机器学习或实验研究经验，熟悉 Python。",
+          "具备实际参与 AI 研究项目的经历，并对 AI 安全方向有一定认识。",
+          "有语言模型、强化学习、研究论文或复杂实验基础设施经验者更匹配。"
+        ],
+        "benefits": [
+          "地点为英国伦敦，官网提出至少 25% 的当地到岗安排及偶尔赴旧金山出差。",
+          "官网展示年薪 260,000—370,000 英镑；该页面属于意向征集，不保证存在实时可申请职位。"
+        ],
+        "originalSummary": "Official posting editorial note: [Expression of Interest] Research Engineer / Scientist, Alignment - London; responsibilities and qualifications summarized in Chinese from employer career page.",
+        "source": "https://job-boards.greenhouse.io/anthropic/jobs/4610158008"
       }
     },
     {
@@ -487,6 +509,28 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责 Anthropic 内部大会、直播及高管演示的音视频技术制作，从活动需求、彩排到现场执行和设备维护全程承担技术责任。",
+        "responsibilities": [
+          "主持线上线下活动的多机位制作、音频调音、视频切换与直播编码。",
+          "制定 cue 表、彩排安排、备用方案，现场协调承包商与技术人员。",
+          "管理活动技术需求和排期，维护会议室、麦克风及演播设备并编写操作规范。"
+        ],
+        "requirements": [
+          "至少五年音视频运营、活动制作或现场技术支持经验。",
+          "能够独立承担完整活动制作并解决音频、视频、摄像和流媒体故障。",
+          "熟悉 Q-SYS、PTZ 摄像系统、Google Meet／Zoom Rooms、RTMP/SRT/HLS 或视听网络技术者更有优势。"
+        ],
+        "benefits": [
+          "岗位位于旧金山总部，预期每周五天在办公室；大型活动需偶尔早晚支持及每年约四至六周出差。",
+          "官网列出的年薪区间为 230,000—325,000 美元。"
+        ],
+        "originalSummary": "Official posting editorial note: AV Production Specialist; responsibilities and qualifications summarized in Chinese from employer career page.",
+        "source": "https://job-boards.greenhouse.io/anthropic/jobs/5379593008"
       }
     },
     {
@@ -522,6 +566,29 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "Anthropic 研究员计划的经济学与政策研究方向，支持具备技术背景的人才开展为期四个月的全职人工智能社会影响研究。",
+        "responsibilities": [
+          "在导师指导下选择经济学、政策、安全或社会影响方面的实验研究课题。",
+          "使用公开模型和计算资源开展研究，形成论文、技术报告等公开成果。",
+          "参加技术评估、研究讨论并与 Anthropic 研究人员交流研究进展。"
+        ],
+        "requirements": [
+          "能够使用 Python 编程，并可参加四个月全职研究。",
+          "具备计算机、数学、物理等领域的技术基础；经济学或社会科学相关背景亦有价值。",
+          "能快速实现研究想法、有效交流并愿意投入 AI 安全和社会影响研究。"
+        ],
+        "benefits": [
+          "官网描述为四个月全职项目，可提供研究导师和约每月 15,000 美元计算资源。",
+          "每周津贴标示为 3,850 美元／2,310 英镑／4,300 加元，按项目所在国家适用。",
+          "页面所列本期截止时间为 7 月 26 日，属于历史批次资料，不能声称仍开放申请。"
+        ],
+        "originalSummary": "Official posting editorial note: Anthropic Fellows Program, The Anthropic Institute (Economics & Policy); responsibilities and qualifications summarized in Chinese from employer career page.",
+        "source": "https://job-boards.greenhouse.io/anthropic/jobs/5183053008"
       }
     },
     {
@@ -560,6 +627,28 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责 Anthropic 品牌健康、广告投放效果及消费者与企业客户转化分析，让市场负责人能依数据调整预算和创意策略。",
+        "responsibilities": [
+          "负责面向管理层的周期性品牌指标报告和 Prosumer、B2B 品牌追踪研究。",
+          "结合传播、市场及数据科学团队建设一致的品牌指标面板，并管理调研供应商。",
+          "开展投放组合建模、归因、增量测试、营销活动前后评估与用户漏斗分析。"
+        ],
+        "requirements": [
+          "熟练使用 SQL 与 Python 或 R，能进行统计建模和实验分析。",
+          "能设计和解读 A/B 测试、回归、分群及因果推断，理解营销效果测量。",
+          "有建立长期被业务领导使用的指标报告、跨团队呈现和调研数据整合能力。"
+        ],
+        "benefits": [
+          "官网公布年薪范围为 255,000—320,000 美元。",
+          "可在旧金山或纽约相关办公室工作，具体办公安排按岗位要求执行。"
+        ],
+        "originalSummary": "Official posting editorial note: Brand Insights, Measurement Lead; responsibilities and qualifications summarized in Chinese from employer career page.",
+        "source": "https://job-boards.greenhouse.io/anthropic/jobs/5424408008"
       }
     },
     {
@@ -593,6 +682,28 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责让非营利等使命驱动型客户从签约走向 Claude 的企业级实际部署，在安全、身份、治理及使用推广方面提供交付支持。",
+        "responsibilities": [
+          "协调 Claude 企业版、Claude Code 等产品的组织激活、技术配置和客户交接。",
+          "实施 SSO/SAML、SCIM/JIT、权限策略及连接器，并帮助 IT 与安全团队解决配置故障。",
+          "创建可复制的部署清单、入门培训、管理员赋能和采用率跟踪流程。"
+        ],
+        "requirements": [
+          "至少五年技术实施、解决方案咨询或企业客户技术服务经验。",
+          "实际操作过企业身份系统与 SAML、OIDC、SCIM、RBAC、OAuth 等技术。",
+          "能够与 CISO、CTO 和 IT 负责人讨论安全治理，理解 SOC 2、ISO 27001 等框架。"
+        ],
+        "benefits": [
+          "官网公布年薪范围为 200,000—265,000 美元。",
+          "本科相关学历或同等经验；岗位涉及跨职能客户部署与培训。"
+        ],
+        "originalSummary": "Official posting editorial note: Activation Manager, Beneficial Deployments; responsibilities and qualifications summarized in Chinese from employer career page.",
+        "source": "https://job-boards.greenhouse.io/anthropic/jobs/5398438008"
       }
     },
     {
@@ -626,6 +737,28 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "Anthropic 可解释性研究团队的管理岗位意向征集，聚焦机械可解释性、神经网络内部机制研究和跨研究团队协作。官网明确表示当时没有实际开放的该经理岗位。",
+        "responsibilities": [
+          "与研究负责人共同制定研究方向、优先事项和项目执行计划。",
+          "管理研究人员的职业发展、绩效辅导、招聘和团队协作。",
+          "协调跨团队科研与工程工作，并向管理层沟通技术研究结果。"
+        ],
+        "requirements": [
+          "具有至少约二至五年的高度技术化研究或工程团队管理经验。",
+          "具备机器学习、人工智能或相关技术背景，能够理解复杂科研课题。",
+          "擅长人员培养、招聘、研究项目管理和跨团队沟通。"
+        ],
+        "benefits": [
+          "官网列出旧金山每周三天到岗安排，年薪区间 350,000—500,000 美元。",
+          "页面是岗位意向征集而非已确认开放的招聘职位，不应提供“立即投递”承诺。"
+        ],
+        "originalSummary": "Official posting editorial note: [Expression of Interest] Research Manager, Interpretability; responsibilities and qualifications summarized in Chinese from employer career page.",
+        "source": "https://job-boards.greenhouse.io/anthropic/jobs/4980436008"
       }
     },
     {
@@ -728,6 +861,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "新加坡招聘协调岗位，服务亚太地区招聘团队，帮助不同国家候选人和面试官顺利完成多时区面试安排。",
+        "responsibilities": [
+          "安排跨日本、韩国、印度、澳大利亚等市场的面试、复盘及背调电话。",
+          "为候选人提供面试时间、地点和流程沟通，兼顾当地节假日与语言差异。",
+          "维护招聘系统与排班工具，改进区域流程并参与招聘运营项目。"
+        ],
+        "requirements": [
+          "四年以上招聘协调或大规模面试排程经验，最好覆盖多个亚太市场。",
+          "熟悉 Greenhouse 等 ATS 和 ModernLoop、GoodTime 一类面试协调工具。",
+          "英语书面沟通优秀；日语、韩语或中文等额外语言能力属于加分项。"
+        ],
+        "benefits": [
+          "岗位位于新加坡，官网描述支持区域招聘团队的跨时区协作。"
+        ],
+        "originalSummary": "Official posting editorial note: APAC Recruiting Coordinator; responsibilities and qualifications summarized in Chinese from employer career page.",
+        "source": "https://job-boards.greenhouse.io/anthropic/jobs/5427309008"
       }
     },
     {
@@ -2469,6 +2623,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "Figma 的 2027 年数据工程实习项目，支持建设用于产品及业务决策的数据仓库、数据流水线及质量检查系统。",
+        "responsibilities": [
+          "开发和测试将产品或业务数据导入公司数据仓库的数据管道。",
+          "与数据工程师和分析师合作建立可复用、可靠的数据表与数据模型。",
+          "帮助改进数据质量、文档和内部数据可用性。"
+        ],
+        "requirements": [
+          "适合数据工程、计算机或相关领域的在校实习申请者。",
+          "具备 SQL、编程和数据处理基础，并愿意学习生产环境的数据仓库工作流。",
+          "需要能够与工程及分析同事合作，认真完成代码测试和技术文档。"
+        ],
+        "benefits": [
+          "官网写明实习办公地点为旧金山或纽约；具体毕业时间与实习资格以企业原始招聘页为准。"
+        ],
+        "originalSummary": "Official posting editorial note: Data Engineer Intern (2027); responsibilities and qualifications summarized in Chinese from employer career page.",
+        "source": "https://boards.greenhouse.io/figma/jobs/6178851004?gh_jid=6178851004"
       }
     },
     {
@@ -2696,6 +2871,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "领导 Spotify 面向音乐创作者、艺人及唱片公司的产品管理工作，统筹 Spotify for Artists、音乐上传、身份展示和艺人推广等产品。",
+        "responsibilities": [
+          "整合艺人与唱片公司产品的整体战略，制定跨多个领域的产品路线图。",
+          "带领产品经理负责人和资深产品经理，推动产品体验与商业结果落地。",
+          "围绕创作者增长、受众洞察、内容发行和粉丝体验开展跨部门协作。"
+        ],
+        "requirements": [
+          "具备领导复杂多团队产品组合的管理背景。",
+          "理解数字音乐、创作者生态及平台产品的战略规划和指标管理。",
+          "能协调多个产品领域，与工程、设计及业务利益相关者共同推进长期方向。"
+        ],
+        "benefits": [
+          "官方页面标注纽约地区、正式职位，并显示远程工作类别；薪酬条件需以官方完整页面为准。"
+        ],
+        "originalSummary": "Official posting editorial note: Head of Product Management - Artist Products; responsibilities and qualifications summarized in Chinese from employer career page.",
+        "source": "https://jobs.lever.co/spotify/e2c7bbb8-f873-42c7-811f-0bd45bf452ae"
       }
     },
     {
@@ -3028,6 +3224,28 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "在 Reddit 广告生态系统中管理转化数据与信号合作伙伴，推进 CDP、标签管理等平台集成，改善广告衡量效果。",
+        "responsibilities": [
+          "建立并维护与 CDP、标签管理器及信号服务平台的商业和技术合作。",
+          "提升转化信号覆盖、匹配质量和集成速度，制定可复用的联合营销和推广计划。",
+          "与产品、工程、销售和测量团队共同改进 Pixel、服务端转化集成及验证流程。"
+        ],
+        "requirements": [
+          "十年以上广告技术、营销技术、平台生态或相关合作伙伴管理经验。",
+          "理解 Pixel/CAPI、服务端事件、数据去重、匹配率与广告归因。",
+          "能在商业谈判、指标管理及跨职能技术项目中独立负责关键合作关系。"
+        ],
+        "benefits": [
+          "官网公布基本年薪范围 189,000—264,600 美元。",
+          "纽约为优先地点，部分合规地区支持远程；另有医疗、退休计划及休假福利。"
+        ],
+        "originalSummary": "Official posting editorial note: 3rd Party Partnerships Manager - Signals; responsibilities and qualifications summarized in Chinese from employer career page.",
+        "source": "https://job-boards.greenhouse.io/reddit/jobs/8089959"
       }
     },
     {
@@ -3063,6 +3281,28 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责 Reddit 财务 SaaS 产品组合的产品负责人，覆盖采购付款、财务关账、资金管理、薪酬股权等系统，并引入 AI 自动化。",
+        "responsibilities": [
+          "负责多个财务领域应用的产品愿景、季度路线图及供应商选型。",
+          "管理财务 SaaS 产品经理团队，同时亲自负责部分应用的需求、发布和采纳。",
+          "推动财务关账、对账、异常检测、审批与 SOX 控制流程自动化。"
+        ],
+        "requirements": [
+          "八年以上产品管理、财务系统或财务转型经验，其中两年以上人员管理经历。",
+          "熟悉 ERP、EPM、采购到付款、收款、资金或薪酬等多个财务业务领域。",
+          "擅长供应商管理、产品路线图、合规控制及面向高级管理者的沟通。"
+        ],
+        "benefits": [
+          "工作地点美国远程，官网公布年薪基本范围 210,800—295,200 美元。",
+          "另有股权、医疗、401(k) 和休假等福利，适用条件以雇佣所在地为准。"
+        ],
+        "originalSummary": "Official posting editorial note: Group Product Manager, Finance Technology; responsibilities and qualifications summarized in Chinese from employer career page.",
+        "source": "https://job-boards.greenhouse.io/reddit/jobs/8075185"
       }
     },
     {
@@ -3129,6 +3369,28 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "加入 Reddit KarmaLab 内部创意策略团队，为媒体娱乐与零售广告主设计符合 Reddit 社区文化的营销创意和活动。",
+        "responsibilities": [
+          "根据广告主商业目标及社群洞察设计创意策略、品牌故事和活动概念。",
+          "与销售、效果测量、产品和客户代理机构开展提案、工作坊与策略沟通。",
+          "沉淀经过验证的创意方法，并利用数据和市场反馈不断优化方案。"
+        ],
+        "requirements": [
+          "至少四年广告、媒体、社交、公关或创意策略经验。",
+          "有面向客户的策略提案作品，理解品牌、代理商和媒体平台生态。",
+          "能处理多个客户项目并熟练制作 Google Slides 等演示材料。"
+        ],
+        "benefits": [
+          "地点洛杉矶，采用混合办公；官网列出年薪区间 115,500—161,700 美元。",
+          "美国雇员福利包含医疗保险、401(k) 与家庭支持等。"
+        ],
+        "originalSummary": "Official posting editorial note: Creative Strategist (M&E/Retail); responsibilities and qualifications summarized in Chinese from employer career page.",
+        "source": "https://job-boards.greenhouse.io/reddit/jobs/8191664"
       }
     },
     {
