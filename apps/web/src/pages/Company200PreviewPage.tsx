@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import {Search, ShieldCheck} from 'lucide-react';
 import {Shell} from '../components/Shell';
+import {Link} from '../router';
 import {DomesticCompanyResults} from '../components/DomesticCompanyResults';
 import {MAJORS} from '../services/domesticMajors';
 import type {User} from '../services/api';
@@ -17,7 +18,8 @@ export function Company200PreviewPage({user}:{user:User|null}){
  return <Shell user={user}>
   <main className="domestic-editorial-panel" style={{maxWidth:1200,margin:'1.5rem auto',padding:'1.5rem'}}>
    <header style={{marginBottom:24}}>
-    <small style={{letterSpacing:'.1em',fontWeight:700}}>HHBA · 企业发现静态测试版</small>
+    <small style={{letterSpacing:'.1em',fontWeight:700}}>HHBA · 企业发现</small>
+    <p style={{margin:'8px 0'}}><Link to="/candidate/jobs" style={{fontSize:13,color:'#265e45',textDecoration:'none'}}>← 返回原招聘市场（OpenAI / Anthropic / SpaceX 等）</Link></p>
     <h1 style={{fontSize:'clamp(1.75rem,3vw,2.7rem)',margin:'10px 0'}}>发现 200 家企业，探索更多职业可能</h1>
     <p style={{color:'var(--muted,#64748b)',maxWidth:850,lineHeight:1.8}}>
      已接入原 HHBA 企业搜索、专业匹配和详情页。原有 100 家 + 新增 100 家，按企业主体浏览。
