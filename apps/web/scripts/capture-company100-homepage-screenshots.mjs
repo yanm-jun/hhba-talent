@@ -1,0 +1,90 @@
+// Fetch screenshot-sized visual references ONLY from a named company's published site.
+// A screenshot is NOT proof of an office/headquarters photo or a verified company logo.
+// No Railway and no production services are accessed.
+import {readFileSync,writeFileSync,mkdirSync,existsSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import path from 'node:path';
+
+const root='src/data/';
+const target=JSON.parse(readFileSync(root+'domesticComplete100Target.json','utf8'));
+const profiles=JSON.parse(readFileSync(root+'domesticCareerProfiles.json','utf8'));
+const manifest=JSON.parse(readFileSync(root+'domesticMediaBundle.json','utf8'));
+const {chromium}=await import('playwright');
+const {default:sharp}=await import('sharp');
+const existing=new Set(target.firstCohortNames);
+const group=target.secondCohortNames;
+const stats={checked:group.length,screenshots:0,skippedExisting:0,failed:[],saved:[]};
+mkdirSync('public/domestic-media',{recursive:true});
+mkdirSync('preview-reports',{recursive:true});
+const shortHash=v=>createHash('sha256').update(v).digest('hex').slice(0,20);
+function safeSite(str){
+ try{
+  const u=new URL(str);
+  if(u.protocol!=='https:'||u.username||u.password||u.port||u.search||u.hash)return null;
+  if(u.hostname==='localhost'||u.hostname.endsWith('.local')||!u.hostname.includes('.'))return null;
+  return u;
+ }catch{return null}
+}
+function staysWithinEmployerSite(before,after){
+ const a=before.hostname.replace(/^www\./,'').toLowerCase();
+ const b=after.hostname.replace(/^www\./,'').toLowerCase();
+ return before.protocol==='https:'&&after.protocol==='https:'&&(a===b||b.endsWith('.'+a));
+}
+const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
+let index=0;
+try {
+ await Promise.all(Array.from({length:3},async()=>{
+  while(index<group.length){
+   const name=group[index++];
+   const profile=profiles[name];
+   const existingSource=profile?.website||profile?.officialSource;
+   if(!profile||existing.has(name)){stats.failed.push({name,error:'unexpected_profile_or_cohort'});continue}
+   const record=manifest.companies[name]||{brand:{state:'missing',classification:'identity_not_yet_verified'},photos:[]};
+   record.photos ||= [];
+   const hasOriginalScreenshot=(profile.photos||[]).some(x=>x.verification==='company_website_screenshot_unreviewed'&&
+       x.localPath&&existsSync(path.join('public',x.localPath)));
+   if(hasOriginalScreenshot){stats.skippedExisting++;continue}
+   const url=safeSite(existingSource);
+   if(!url){stats.failed.push({name,error:'missing_safe_company_website'});continue}
+   const page=await browser.newPage({viewport:{width:1280,height:790},deviceScaleFactor:1,locale:'zh-CN',ignoreHTTPSErrors:false});
+   try{
+    await page.route('**/*',route=>{
+      const u=route.request().url();
+      if(/^(?:file:|data:|blob:|about:)/i.test(u))return route.continue();
+      if(!/^https?:\/\//i.test(u)||/^(?:http:\/\/)?(?:127\.|10\.|192\.168\.|localhost|169\.254\.)/i.test(u.replace(/^https?:\/\//,'')))return route.abort();
+      return route.continue();
+    });
+    const reply=await page.goto(url.href,{waitUntil:'domcontentloaded',timeout:13000});
+    if(!reply||reply.status()>=400)throw new Error('http_'+(reply?.status()||0));
+    const final=safeSite(page.url());
+    if(!final||!staysWithinEmployerSite(url,final))throw new Error('unexpected_redirect');
+    const title=(await page.title()).trim();
+    if(!title||/403|404|not found|access denied|security check|captcha|robot verification/i.test(title))throw new Error('unusable_page_title');
+    const body=await page.locator('body').innerText({timeout:2800}).catch(()=>'');
+    if(body.replace(/\s+/g,'').length<35)throw new Error('page_content_not_proven');
+    await page.waitForTimeout(700);
+    const screenshot=await page.screenshot({type:'jpeg',quality:74,fullPage:false,animations:'disabled',timeout:7000});
+    const output=await sharp(screenshot).resize({width:1024,withoutEnlargement:true}).webp({quality:78,effort:4}).toBuffer();
+    if(output.length<5000)throw new Error('image_too_small');
+    const rel='domestic-media/company100-site-'+shortHash(name)+'.webp';
+    writeFileSync(path.join('public',rel),output);
+    const photo={url:rel,localPath:rel,source:final.href,kind:'screenshot',
+      label:name+'官方网站页面截图（非总部或办公环境实景）',
+      verification:'company_website_screenshot_unreviewed',sourceFile:'company100-screenshot'};
+    const entry=(profile.photos||[]).findIndex(x=>x.sourceFile==='company100-screenshot');
+    profile.photos ||= [];
+    if(entry>=0){profile.photos[entry]=photo;record.photos[entry]={state:'ready',path:rel,source:final.href,classification:'official_website_screenshot_unreviewed'};}
+    else{profile.photos.push(photo);record.photos[profile.photos.length-1]={state:'ready',path:rel,source:final.href,classification:'official_website_screenshot_unreviewed'};}
+    manifest.companies[name]=record;
+    stats.screenshots++;
+    stats.saved.push({name,path:rel,source:final.href,title:title.slice(0,100)});
+   }catch(e){stats.failed.push({name,error:String(e.message||e).slice(0,130)})}
+   finally{await page.close().catch(()=>{})}
+  }
+ }));
+}finally{await browser.close()}
+manifest.generatedAt=new Date().toISOString();
+writeFileSync(root+'domesticMediaBundle.json',JSON.stringify(manifest,null,2)+'\n');
+writeFileSync(root+'domesticCareerProfiles.json',JSON.stringify(profiles,null,2)+'\n');
+writeFileSync('preview-reports/company100-screenshot-capture.json',JSON.stringify({...stats,date:new Date().toISOString()},null,2)+'\n');
+console.log('HHBA_COMPANY100_SCREENSHOT_IMPORT',JSON.stringify({checked:stats.checked,success:stats.screenshots,skipped:stats.skippedExisting,failed:stats.failed.length,sampleErrors:stats.failed.slice(0,12)}));
