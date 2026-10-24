@@ -8,6 +8,8 @@ export type LiveJob = {
   titleStatus?: string; location?: string; locationZh?: string; platform?: string;
   source?: string; url: string; domestic?: boolean; remote?: boolean | null;
   recruitmentType?: string; observedAt?: string; recordKind?: string;
+  // Optional display labels for domestic-company search cards; no change to live job source, filtering or freshness.
+  educationLabel?: string; experienceLabel?: string;
   currentApplicationVerified?: boolean;
   graduationYear?: number; responsibilitiesSummary?: string; requirementsSummary?: string;
 };
