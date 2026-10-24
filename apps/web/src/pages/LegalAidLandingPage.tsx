@@ -10,14 +10,14 @@ import '../styles/legal-aid-landing.css';
 // Static UI only: the legal assistance service has not launched.
 // No uploads, case intake, submissions, legal advice, or employer data transfer.
 const legalTopics=[
-  {title:'拖欠工资',icon:Wallet},
-  {title:'违法辞退与补偿',icon:BookmarkX},
-  {title:'加班费与休假',icon:Clock3},
-  {title:'劳动合同纠纷',icon:FileText},
-  {title:'社会保险争议',icon:ShieldCheck},
-  {title:'工伤与赔偿',icon:HeartPulse},
-  {title:'调岗降薪',icon:Waypoints},
-  {title:'灵活用工争议',icon:BadgeAlert}
+  {title:'拖欠工资',icon:Wallet,slug:'unpaid-wages'},
+  {title:'违法辞退与补偿',icon:BookmarkX,slug:'unlawful-dismissal'},
+  {title:'加班费与休假',icon:Clock3,slug:'overtime-leave'},
+  {title:'劳动合同纠纷',icon:FileText,slug:'labor-contracts'},
+  {title:'社会保险争议',icon:ShieldCheck,slug:'social-insurance'},
+  {title:'工伤与赔偿',icon:HeartPulse,slug:'work-injury'},
+  {title:'调岗降薪',icon:Waypoints,slug:'transfer-paycuts'},
+  {title:'灵活用工争议',icon:BadgeAlert,slug:'flexible-work'}
 ] as const;
 
 export function LegalAidLandingPage({user}:{user:User|null}){
@@ -48,19 +48,19 @@ export function LegalAidLandingPage({user}:{user:User|null}){
           </div>
 
           <section className="hhba-law-topics" aria-label="未来支持的劳动权益问题类型">
-            <h2>未来支持的劳动权益问题</h2>
+            <h2>劳动权益问题专题 · 8 类</h2>
             <div className="hhba-law-topic-grid">
-              {legalTopics.map(({title,icon:Icon})=><div className="hhba-law-topic" key={title}>
+              {legalTopics.map(({title,icon:Icon,slug})=><Link to={'/candidate/account/legal-aid/'+slug} className="hhba-law-topic" key={slug}>
                 <Icon className="hhba-law-topic-icon" size={15} strokeWidth={1.65} aria-hidden="true"/>
                 <span>{title}</span>
                 <ArrowUpRight className="hhba-law-topic-arrow" size={12} strokeWidth={1.7} aria-hidden="true"/>
-              </div>)}
+              </Link>)}
             </div>
           </section>
         </div>
 
         <footer className="hhba-law-footer">
-          服务尚未开放 · 暂不接受案件及证据材料
+          8 类法律知识与公开案例已开放查询 · 个案受理和证据提交仍未开放
         </footer>
       </section>
     </main>
