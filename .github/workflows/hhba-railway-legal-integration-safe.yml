@@ -1,0 +1,106 @@
+name: HHBA Railway legal aid integration isolated acceptance
+
+on:
+  push:
+    branches:
+      - feat/railway-legal-aid-integration-20261024
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frontend-safe-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout Railway-compatible integration branch only
+        uses: actions/checkout@v4
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked frontend packages
+        run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Validate official legal knowledge and existing white job market
+        working-directory: apps/web
+        run: |
+          node scripts/audit-labor-rights-topics.mjs
+          node --test scripts/white-market-detail.contract.test.mjs
+      - name: Compile with the original Railway Dockerfile frontend flags
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '0'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+        run: npm run build
+      - name: Check Railway backend source and Dockerfile remain original
+        run: |
+          git diff --exit-code ecb0a94531f37baadbdee18134d3f08e2252dd2a -- Dockerfile.hhba ops/legacy-marketplace/ apps/web/src/services/api.ts apps/web/src/services/savedJobs.ts
+          test -s apps/web/dist/index.html
+          ! grep -R 'BEGIN RSA PRIVATE KEY' apps/web/dist
+      - name: Set up Playwright for local Railway-style build smoke test
+        run: |
+          npm install --no-save --no-package-lock --prefix apps/web playwright@1.56.1 --no-audit --no-fund
+          cd apps/web
+          npx playwright install --with-deps chromium
+      - name: Smoke test navigation, legal reference and disabled intake
+        working-directory: apps/web
+        run: |
+          mkdir -p preview-reports/railway-legal
+          (npx vite preview --host 127.0.0.1 --port 4173 > /tmp/hhba-legal-vite.log 2>&1 & echo $! > /tmp/hhba-legal-vite.pid)
+          node --input-type=module <<'NODE'
+          import {chromium} from 'playwright';
+          const base='http://127.0.0.1:4173';
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          try{
+            const page=await browser.newPage({viewport:{width:1440,height:930}});
+            const errors=[];page.on('pageerror',e=>errors.push(e.message));
+            await page.goto(base,{waitUntil:'domcontentloaded',timeout:60000});
+            await page.getByRole('button',{name:/个人中心/}).first().hover();
+            const menu=page.getByRole('navigation',{name:'个人中心快速导航'});
+            await menu.waitFor({timeout:15000});
+            if(await menu.locator('.hhba-account-dropdown-item').count()!==7)throw Error('ACCOUNT_MENU_NOT_SEVEN_ITEMS');
+            await menu.getByRole('link',{name:/法律援助/}).click();
+            await page.getByRole('heading',{name:'遇到劳动问题？'}).waitFor({timeout:12000});
+            if(await page.locator('.hhba-law-topic').count()!==8)throw Error('EIGHT_LEGAL_TOPICS_MISSING');
+            await page.getByRole('link',{name:/请求平台介入/}).click();
+            await page.getByRole('heading',{name:'请求 HHBA 平台介入'}).waitFor({timeout:12000});
+            if(!page.url().endsWith('/candidate/account/legal-aid/intervention'))throw Error('INTERVENTION_ROUTE_BAD');
+            await page.locator('.hhba-intervention-topic').first().click();
+            if(await page.locator('.hhba-intervention-evidence-item').count()!==3)throw Error('EVIDENCE_MATRIX_MISSING');
+            if(await page.locator('button.hhba-intervention-disabled:disabled').count()!==1)throw Error('CASE_SUBMISSION_MUST_REMAIN_DISABLED');
+            if(await page.locator('input,textarea,form,input[type="file"]').count()!==0)throw Error('LEGAL_PAGE_COLLECTING_PERSONAL_DATA');
+            await page.screenshot({path:'preview-reports/railway-legal/intervention-desktop.png',fullPage:true});
+            const slugs=['unpaid-wages','unlawful-dismissal','overtime-leave','labor-contracts','social-insurance','work-injury','transfer-paycuts','flexible-work'];
+            for(const slug of slugs){
+              await page.goto(base+'/candidate/account/legal-aid/'+slug,{waitUntil:'domcontentloaded'});
+              await page.locator('.hhba-law-article-heading h1').waitFor({timeout:14000});
+              if(await page.locator('.hhba-law-law').count()<2||
+                 await page.locator('.hhba-law-proof').count()<3||
+                 await page.locator('.hhba-law-path').count()<3||
+                 await page.locator('.hhba-law-case-link').count()!==1)throw Error('INCOMPLETE_GUIDE '+slug);
+            }
+            await page.goto(base,{waitUntil:'domcontentloaded'});
+            await page.getByRole('button',{name:/我要应聘/}).first().waitFor({timeout:14000});
+            await page.getByRole('button',{name:/我要招人/}).first().waitFor({timeout:14000});
+            if(errors.length)throw Error('JS_ERROR '+errors.join('|'));
+            const mobile=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+            await mobile.goto(base+'/candidate/account/legal-aid/intervention',{waitUntil:'domcontentloaded'});
+            await mobile.getByRole('heading',{name:'请求 HHBA 平台介入'}).waitFor({timeout:12000});
+            await mobile.getByRole('button',{name:'工伤与赔偿'}).click();
+            const measures=await mobile.evaluate(()=>({page:document.documentElement.scrollWidth,viewport:document.documentElement.clientWidth}));
+            if(measures.page>measures.viewport+2)throw Error('MOBILE_OVERFLOW '+JSON.stringify(measures));
+            await mobile.screenshot({path:'preview-reports/railway-legal/intervention-mobile.png',fullPage:true});
+            console.log('HHBA_RAILWAY_SELECTIVE_MIGRATION_OK',JSON.stringify({menu:7,topics:8,legalRoutes:8,evidenceMatrix:3,caseIntake:false,originalEntrances:true,mobile:measures}));
+          }finally{await browser.close();}
+          NODE
+      - name: Save review screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-railway-selective-legal-review
+          path: apps/web/preview-reports/railway-legal/
+          retention-days: 14
