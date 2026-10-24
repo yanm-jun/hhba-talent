@@ -89,7 +89,7 @@ jobs:
       pages: write
       id-token: write
     environment:
-      name: github-pages
+      name: hhba-company200-preview
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Configure existing GitHub Pages publishing source
