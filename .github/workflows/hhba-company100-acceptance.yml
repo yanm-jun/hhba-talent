@@ -1,0 +1,73 @@
+name: HHBA 100 enterprise discovery isolated acceptance
+on:
+  pull_request:
+    branches:
+      - feat/admin-phase31-private-growth-20261021
+    paths:
+      - 'apps/web/src/data/domesticComplete100Target.json'
+      - 'apps/web/src/data/domesticCareerProfiles.json'
+      - 'apps/web/src/data/domesticRecruitmentRegistry.json'
+      - 'apps/web/src/data/domesticMediaBundle.json'
+      - 'apps/web/scripts/audit-domestic-company100.mjs'
+      - 'apps/web/scripts/capture-company100-homepage-screenshots.mjs'
+      - '.github/workflows/hhba-company100-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  company100:
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'feat/domestic-company100-20261024')
+    name: Verify 100 profiles and collect source-labelled company screenshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/domestic-company100-20261024
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install existing HHBA web dependencies
+        run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Validate existing app and 100 enterprise source records
+        working-directory: apps/web
+        run: |
+          node --check scripts/capture-company100-homepage-screenshots.mjs
+          node scripts/audit-domestic-company100.mjs
+          npm run build
+      - name: Install isolated Playwright and WebP converter (no manifest changes)
+        run: |
+          npm install --prefix apps/web --no-save --no-package-lock playwright@1.56.0 sharp@0.34.4 --no-audit --no-fund
+          cd apps/web && npx playwright install chromium --with-deps
+      - name: Capture company-site screenshots with explicit labels, no fake buildings
+        working-directory: apps/web
+        run: node scripts/capture-company100-homepage-screenshots.mjs
+      - name: Run complete enterprise quality check again
+        working-directory: apps/web
+        run: |
+          node scripts/audit-domestic-company100.mjs
+          npm run build
+      - name: Save complete 100-enterprise evidence and image capture report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-company100-qa
+          retention-days: 30
+          path: |
+            apps/web/preview-reports/company100-quality.json
+            apps/web/preview-reports/company100-screenshot-capture.json
+      - name: Commit only isolated company image files and evidence metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/src/data/domesticCareerProfiles.json apps/web/src/data/domesticMediaBundle.json
+          git add -f apps/web/public/domestic-media/company100-site-*.webp || true
+          if ! git diff --cached --quiet; then
+            git commit -m "assets(company100): preserve sourced official website screenshots as unreviewed visual references"
+            git push origin HEAD:refs/heads/feat/domestic-company100-20261024
+          fi
