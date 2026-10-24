@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-24T03:51:30.882Z",
+  "generatedAt": "2026-10-24T03:57:10.764Z",
   "companies": {
     "华域视觉科技（上海）有限公司": {
       "brand": {
@@ -1387,7 +1387,7 @@
         {
           "state": "ready",
           "path": "domestic-media/company100-site-e7e901fd1d79de188b9b.webp",
-          "source": "https://www.icbc.com.cn/",
+          "source": "https://icbc.com.cn/",
           "classification": "official_website_screenshot_unreviewed"
         }
       ]
@@ -1734,6 +1734,34 @@
           "state": "ready",
           "path": "domestic-media/company100-site-7117fa8d72fb99b9c07c.webp",
           "source": "https://www.changan.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "浪潮信息": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-fe44c3909bf328ecdc0f.webp",
+          "source": "https://en.ieisystem.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "科大讯飞": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-7ca2b7da6e0f8654c088.webp",
+          "source": "https://www.xfyun.cn/introduction",
           "classification": "official_website_screenshot_unreviewed"
         }
       ]

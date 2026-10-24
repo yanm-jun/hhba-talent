@@ -1784,7 +1784,17 @@
     "brandImage": "https://iflytek.com/favicon.ico",
     "brandImageSource": "https://iflytek.com",
     "brandAssetStatus": "official_domain_favicon_unverified_visual",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-7ca2b7da6e0f8654c088.webp",
+        "localPath": "domestic-media/company100-site-7ca2b7da6e0f8654c088.webp",
+        "source": "https://www.xfyun.cn/introduction",
+        "kind": "screenshot",
+        "label": "科大讯飞官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://iflytek.com",
@@ -1985,7 +1995,17 @@
     "brandImage": "https://www.ieisystem.com/global/template/images/logo.png",
     "brandImageSource": "https://ieisystem.com/",
     "brandAssetStatus": "official_website_logo_candidate",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-fe44c3909bf328ecdc0f.webp",
+        "localPath": "domestic-media/company100-site-fe44c3909bf328ecdc0f.webp",
+        "source": "https://en.ieisystem.com/",
+        "kind": "screenshot",
+        "label": "浪潮信息官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://ieisystem.com",
@@ -5963,7 +5983,7 @@
       {
         "url": "domestic-media/company100-site-e7e901fd1d79de188b9b.webp",
         "localPath": "domestic-media/company100-site-e7e901fd1d79de188b9b.webp",
-        "source": "https://www.icbc.com.cn/",
+        "source": "https://icbc.com.cn/",
         "kind": "screenshot",
         "label": "工商银行官方网站页面截图（非总部或办公环境实景）",
         "verification": "company_website_screenshot_unreviewed",
