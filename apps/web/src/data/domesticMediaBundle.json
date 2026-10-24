@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-23T14:56:23.065Z",
+  "generatedAt": "2026-10-24T03:44:24.282Z",
   "companies": {
     "华域视觉科技（上海）有限公司": {
       "brand": {
@@ -1299,6 +1299,352 @@
           "path": "domestic-media/user-b4b11293e602bf3d24a9b340.webp",
           "source": "domestic-media/user-b4b11293e602bf3d24a9b340.webp",
           "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "阳光电动力": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-56ba771c42b7c293e6c9.png",
+        "source": "https://www.sungrowev.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-56ba771c42b7c293e6c9.webp",
+          "source": "https://www.sungrowev.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "赛力斯": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-7f6333102da9e8bda2a5.png",
+        "source": "https://www.seres.cn/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-7f6333102da9e8bda2a5.webp",
+          "source": "https://www.seres.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "宇通客车": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-4c0e5edf81ba50538238.webp",
+          "source": "https://en.yutong.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "江淮汽车": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-21618745f28ae4599590.png",
+        "source": "https://www.jac.com.cn/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-21618745f28ae4599590.webp",
+          "source": "https://www.jac.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "中国海油": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-42d0faa9154c340b11b5.webp",
+          "source": "https://www.cnooc.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "工商银行": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-e7e901fd1d79de188b9b.webp",
+          "source": "https://www.icbc.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "中信银行": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-592de55f9c15c660827a.png",
+        "source": "https://www.citicbank.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-592de55f9c15c660827a.webp",
+          "source": "https://www.citicbank.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "兴业银行": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-65886f285b393964eee5.webp",
+          "source": "https://www.cib.com.cn/cn/index.html",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "中国人寿": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-dfb80b004c96aa54de35.png",
+        "source": "https://www.e-chinalife.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-dfb80b004c96aa54de35.webp",
+          "source": "https://www.e-chinalife.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "药明康德": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-60856a95b4e41852935b.png",
+        "source": "https://www.wuxiapptec.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-60856a95b4e41852935b.webp",
+          "source": "https://www.wuxiapptec.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "恒瑞医药": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-82674fdbcc698714924f.webp",
+          "source": "https://www.hengrui.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "TCL科技": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-6a5dd350a3708ccdd6ea.png",
+        "source": "https://www.tcltech.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-6a5dd350a3708ccdd6ea.webp",
+          "source": "https://www.tcltech.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "爱尔眼科": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-9f7c3e56728763537301.png",
+        "source": "https://www.aierchina.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-9f7c3e56728763537301.webp",
+          "source": "https://www.aierchina.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "顺丰控股": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-bc4d73df39630718bd13.webp",
+          "source": "https://www.sf-express.com/chn/sc",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "安克创新": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-5ba1b699a1052ef78801.webp",
+          "source": "https://www.anker-in.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "石头科技": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-3442ec70890655e86891.webp",
+          "source": "https://us.roborock.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "汇顶科技": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-65fec4c1938ad5a252a7.png",
+        "source": "https://www.goodix.com/en",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-65fec4c1938ad5a252a7.webp",
+          "source": "https://www.goodix.com/en",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "温氏股份": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-079ce03536cd607f31c3.webp",
+          "source": "https://www.wens.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "腾讯": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-53874092e000069bfeda.png",
+        "source": "https://www.tencent.com/zh-cn/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-53874092e000069bfeda.webp",
+          "source": "https://www.tencent.com/zh-cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "华为": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-82eaaba81d9dcc54deab.png",
+        "source": "https://www.huawei.com/cn/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-82eaaba81d9dcc54deab.webp",
+          "source": "https://www.huawei.com/cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "阿里巴巴": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-47c1e53c427aafb4556b.webp",
+          "source": "https://www.alibabagroup.com/zh-CN",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "字节跳动": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-702c213feab1671de4c5.webp",
+          "source": "https://www.bytedance.com/zh/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "京东集团": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-a236d6f921ddf3002e8e.png",
+        "source": "https://corporate.jd.com/home",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-a236d6f921ddf3002e8e.webp",
+          "source": "https://corporate.jd.com/home",
+          "classification": "official_website_screenshot_unreviewed"
         }
       ]
     }
