@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-24T03:44:24.282Z",
+  "generatedAt": "2026-10-24T03:47:54.029Z",
   "companies": {
     "华域视觉科技（上海）有限公司": {
       "brand": {
@@ -1644,6 +1644,50 @@
           "state": "ready",
           "path": "domestic-media/company100-site-a236d6f921ddf3002e8e.webp",
           "source": "https://corporate.jd.com/home",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "晶科能源": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-465bc4bfae1be70e4ae7.png",
+        "source": "https://www.jinkosolar.com/en/site/tigerneo_5",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-465bc4bfae1be70e4ae7.webp",
+          "source": "https://www.jinkosolar.com/en/site/tigerneo_5",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "中国邮政": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-432fc8c66640bfe1f847.webp",
+          "source": "https://www.chinapost.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "智飞生物": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-133f7a2b7e61a9ec5f02.webp",
+          "source": "https://www.zhifeishengwu.com/zh_CN",
           "classification": "official_website_screenshot_unreviewed"
         }
       ]
