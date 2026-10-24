@@ -67,7 +67,9 @@ jobs:
       - name: Smoke test China-friendly offline search and detail
         working-directory: apps/web
         run: |
-          (npx vite preview --host 127.0.0.1 --port 4173 >/tmp/hhba-curated-vite.log 2>&1 &)
+          mkdir -p /tmp/hhba-curated-host/hhba-talent
+          cp -a dist/. /tmp/hhba-curated-host/hhba-talent/
+          (python3 -m http.server 4173 --bind 127.0.0.1 --directory /tmp/hhba-curated-host >/tmp/hhba-curated-static.log 2>&1 &)
           node scripts/curated-offline.browser.mjs
       - name: Preserve review screenshots and offline build
         if: always()
