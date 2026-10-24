@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdirSync,existsSync} from 'node:fs';
 import path from 'node:path';
 const data='src/data/';
 const target=JSON.parse(readFileSync(data+'domesticComplete100Target.json','utf8'));
@@ -12,11 +12,12 @@ assert.equal(new Set(names).size,100,'No duplicate enterprise names');
 assert.equal(target.firstCohortNames.length,50);
 assert.equal(target.secondCohortNames.length,50);
 assert.deepEqual(names,[...target.firstCohortNames,...target.secondCohortNames]);
+const mediaExists=rel=>typeof rel==='string'&&/^domestic-media\/[a-zA-Z0-9_.-]+$/.test(rel)&&existsSync(path.join('public',rel));
 const rows=names.map((name,i)=>{
  const p=profiles[name]||{},r=registry[name],m=media[name];
  const descChars=Array.isArray(p.description)?p.description.join('').length:0;
- const logoReady=m?.brand?.state==='ready'&&!!m.brand.path;
- const imageReady=(m?.photos||[]).some(z=>z?.state==='ready'&&!!z.path);
+ const logoReady=m?.brand?.state==='ready'&&mediaExists(m.brand.path);
+ const imageReady=(m?.photos||[]).some(z=>z?.state==='ready'&&mediaExists(z.path));
  const majors=Array.isArray(p.majorSlugs)?p.majorSlugs:[];
  return {
   number:i+1,cohort:i<50?1:2,name,profile:!!profiles[name],descriptionChars:descChars,
@@ -37,6 +38,9 @@ for(const row of rows){
  assert(row.majors>=4,'Insufficient linked majors '+row.name);
  assert(row.industry,'Industry absent '+row.name);
  const p=profiles[row.name];
+ const manifest=media[row.name]||{};
+ for(const asset of [manifest.brand,...(manifest.photos||[])])
+  if(asset?.state==='ready')assert(mediaExists(asset.path),'Missing image binary '+row.name+':'+(asset.path||'unknown'));
  assert(/^https:\/\//.test(p.officialSource),'Non-HTTPS enterprise source '+row.name);
  const r=registry[row.name];
  if(r){
