@@ -1,0 +1,165 @@
+name: HHBA 100 overseas jobs - isolated GitHub Pages preview
+
+on:
+  push:
+    branches: [feat/curated-100-original-home-20261024]
+    paths:
+      - '.github/workflows/hhba-curated-100-pages-preview.yml'
+      - 'apps/web/src/**'
+      - 'apps/web/public/curated/v1/**'
+      - 'apps/web/scripts/curated-offline.*'
+      - 'apps/web/vite.config.ts'
+      - 'apps/web/package*.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: hhba-curated-100-pages-preview
+  cancel-in-progress: true
+
+jobs:
+  build-combined-pages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout only the original-home 100-job branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/curated-100-original-home-20261024
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Download last verified existing Pages site to preserve its root homepage
+        uses: actions/download-artifact@v4
+        with:
+          name: hhba-company200-static-preview
+          run-id: 40075821720
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: published-root
+
+      - name: Verify the existing root homepage snapshot before publication
+        run: |
+          set -euo pipefail
+          test -s published-root/index.html
+          test -s published-root/404.html
+          test -s published-root/data/jobs.json
+          grep -q '/hhba-talent/assets/' published-root/index.html
+          echo 'EXISTING_GITHUB_PAGES_ROOT_SNAPSHOT_PRESERVED'
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix apps/web --no-audit --no-fund
+
+      - name: Verify 10 x 10 static job data and individual Chinese summaries
+        working-directory: apps/web
+        run: node --test scripts/curated-offline.contract.test.mjs
+
+      - name: Build separate /preview-100/ app without affecting root homepage
+        working-directory: apps/web
+        env:
+          HHBA_PAGES_BASE: '/hhba-talent/preview-100/'
+          HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_CURATED_STATIC: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_DEMO_ACCOUNT_ENABLED: '0'
+        run: npm run build
+
+      - name: Preserve prior site verbatim and add only the new 100-job preview
+        run: |
+          set -euo pipefail
+          mkdir -p published/preview-100
+          cp -a published-root/. published/
+          cp -a apps/web/dist/. published/preview-100/
+          cp published/preview-100/index.html published/preview-100/404.html
+          touch published/.nojekyll
+          cmp published-root/index.html published/index.html
+          cmp published-root/404.html published/404.html
+          test -s published/preview-100/index.html
+          test -s published/preview-100/curated/v1/jobs.json
+          test -s published/preview-100/curated/v1/manifest.json
+          grep -q '/hhba-talent/preview-100/assets/' published/preview-100/index.html
+          ! grep -R -E 'BEGIN (RSA|OPENSSH) PRIVATE KEY' published/preview-100
+          echo 'HHBA_COMBINED_PAGES_HOME_UNCHANGED_PREVIEW_ADDED'
+
+      - name: Install Chromium
+        run: |
+          npm install --no-save --no-package-lock --prefix apps/web playwright@1.56.1 --no-audit --no-fund
+          (cd apps/web && npx playwright install --with-deps chromium)
+
+      - name: Browser test nested preview before publishing
+        working-directory: apps/web
+        env:
+          HHBA_TEST_BASE: 'http://127.0.0.1:4173/hhba-talent/preview-100/'
+        run: |
+          mkdir -p /tmp/hhba-preserved-pages/hhba-talent/preview-100
+          cp -a dist/. /tmp/hhba-preserved-pages/hhba-talent/preview-100/
+          (python3 -m http.server 4173 --bind 127.0.0.1 --directory /tmp/hhba-preserved-pages >/tmp/hhba-preserved-pages.log 2>&1 &)
+          node scripts/curated-offline.browser.mjs
+
+      - name: Retain verifiable combined site and browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-original-home-plus-curated-100-site
+          path: |
+            published/
+            apps/web/curated-review/
+          retention-days: 14
+
+      - name: Upload combined site for GitHub Pages
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: published
+
+  deploy-combined-pages:
+    needs: build-combined-pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: hhba-company200-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure existing GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Deploy existing unchanged homepage plus separate /preview-100/ preview
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  verify-public-pages:
+    needs: deploy-combined-pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Check the existing homepage and the new 100-job preview online
+        run: |
+          set -euo pipefail
+          root=https://yanm-jun.github.io/hhba-talent
+          for n in 1 2 3 4 5 6; do
+            if curl -fsSL --connect-timeout 10 --max-time 30 "$root/" -o /tmp/hhba-root.html &&
+              curl -fsSL --connect-timeout 10 --max-time 30 "$root/preview-100/" -o /tmp/hhba-curated.html &&
+              curl -fsSL --connect-timeout 10 --max-time 30 "$root/preview-100/curated/v1/jobs.json" -o /tmp/hhba-curated-100.json; then break; fi
+            if [ "$n" = 6 ]; then echo 'PAGES_ONLINE_NOT_AVAILABLE'; exit 1; fi
+            sleep 10
+          done
+          grep -q '/hhba-talent/assets/' /tmp/hhba-root.html
+          grep -q '/hhba-talent/preview-100/assets/' /tmp/hhba-curated.html
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const j=JSON.parse(fs.readFileSync('/tmp/hhba-curated-100.json'));
+          const by=new Map();
+          for(const row of j.jobs) by.set(row.company,(by.get(row.company)||0)+1);
+          if(j.jobs.length!==100||by.size!==10||[...by.values()].some(x=>x!==10)||j.jobs.some(x=>!x.editorial?.overview||x.editorial.responsibilities.length<3||x.editorial.requirements.length<3))
+            throw Error('PUBLIC_PREVIEW_100_JOB_CONTRACT_FAILED');
+          console.log('HHBA_PAGES_100_PUBLIC_OK',JSON.stringify({companies:by.size,jobs:j.jobs.length,base:'/hhba-talent/preview-100/',rootPreserved:true}));
+          NODE

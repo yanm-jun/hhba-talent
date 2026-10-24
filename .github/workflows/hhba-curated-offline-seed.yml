@@ -2,7 +2,7 @@ name: HHBA curated offline overseas jobs (one-time seed and acceptance)
 
 on:
   push:
-    branches: [feat/curated-offline-jobs-20261024]
+    branches: [feat/curated-offline-jobs-20261024, feat/curated-100-original-home-20261024]
   workflow_dispatch:
 
 permissions:
@@ -30,7 +30,7 @@ jobs:
           run-id: 40075821720
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: apps/web/source-artifact
-      - name: Select 10 companies and 150 source-backed historical job facts
+      - name: Select 10 companies and 100 source-backed historical job facts
         if: ${{ hashFiles('apps/web/public/curated/v1/manifest.json') == '' }}
         working-directory: apps/web
         run: node scripts/seed-curated-offline.mjs source-artifact public/curated/v1
@@ -39,7 +39,7 @@ jobs:
           git add apps/web/public/curated/v1/
           if ! git diff --cached --quiet; then
             git -c user.name="HHBA Archive Bot" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "data(curated): pin source-reviewed overseas job metadata locally"
-            git push origin HEAD:feat/curated-offline-jobs-20261024
+            git push origin HEAD:${{ github.ref_name }}
           fi
       - name: Install frontend packages
         run: npm ci --prefix apps/web --no-audit --no-fund

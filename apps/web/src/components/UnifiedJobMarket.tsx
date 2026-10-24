@@ -67,7 +67,7 @@ function JobCard({job,lang,asOf}:{job:LiveJob,lang:Language,asOf:string}){
   const source=safeOfficialJobUrl(job);
   const profile=companyProfileForJob(job);
   const companyRoute=companyPageRouteForJob(job);
-  if(!source || officialStatus(job,asOf)!=='recent')return null;
+  if(!source || (job.recordKind!=='CURATED_HISTORICAL' && officialStatus(job,asOf)!=='recent'))return null;
   return <article className="unified-job-card">
     <div className="unified-job-head">
       {profile?<Link className="unified-company-brand" to={'/companies/'+profile.slug}
@@ -78,7 +78,7 @@ function JobCard({job,lang,asOf}:{job:LiveJob,lang:Language,asOf:string}){
         <EmployerBrandLogo job={job}/><strong>{localizedCompany(job,lang)}</strong>
       </Link>:<span className="unified-company-brand"><EmployerBrandLogo job={job}/>
         <strong>{localizedCompany(job,lang)}</strong></span>}
-      <small>{job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'?(lang==='zh'?'历史收录 · 状态待核实':'Archived · Availability unverified'):(lang==='zh'?'官方招聘':'Official opening')}</small>
+      <small>{job.recordKind==='CURATED_HISTORICAL'?(lang==='zh'?'历史公开岗位 · 当前状态未核实':'Archived · Status unverified'):job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'?(lang==='zh'?'历史收录 · 状态待核实':'Archived · Availability unverified'):(lang==='zh'?'官方招聘':'Official opening')}</small>
     </div>
     <h3><Link to={'/candidate/jobs/'+encodeURIComponent(job.id)}>{featuredTitle(job,lang)}</Link></h3>
     <div className="unified-job-meta"><span><MapPin size={14}/>{featuredLocation(job,lang)||localizedLocation(job,lang)}</span>
@@ -94,6 +94,7 @@ function LanguageSwitcher({lang,change}:{lang:Language,change:(value:Language)=>
    <button type="button" aria-pressed={lang==='en'} onClick={()=>change('en')}>English</button></div>;
 }
 export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,user?:User|null}){
+  const curatedHundred=import.meta.env.VITE_HHBA_CURATED_STATIC==='1';
   const domesticOnly=import.meta.env.VITE_HHBA_DOMESTIC_STATIC_ONLY==='1';
   const officialThree=import.meta.env.VITE_HHBA_OFFICIAL_THREE_ONLY==='1';
   const {lang,change}=useLanguage();
@@ -166,7 +167,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   },[compact,filters,draft,page]);
   const defaultView=isDefaultMarketFilters(filters,page);
   useEffect(()=>{
-    if(officialThree||domesticOnly){setFeatured([]);setFeaturedError('');return;}
+    if(officialThree||domesticOnly||curatedHundred){setFeatured([]);setFeaturedError('');return;}
     if(!defaultView){setFeatured(null);setFeaturedError('');return;}
     const controller=new AbortController();
     setFeatured(null);setFeaturedError('');
@@ -185,15 +186,15 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       .finally(()=>clearTimeout(guard));
     return ()=>{clearTimeout(guard);controller.abort()};
   },[defaultView,retry]);
-  const eligible=useMemo(()=>snapshot?.jobs.filter(j=>officialStatus(j,snapshot.updated)==='recent')||[],[snapshot]);
+  const eligible=useMemo(()=>snapshot?.jobs.filter(j=>j.recordKind==='CURATED_HISTORICAL'||officialStatus(j,snapshot.updated)==='recent')||[],[snapshot]);
   // Only the UNFILTERED first page gets six highlighted jobs. Search,
   // company/city filtering and all other pages retain their normal results.
   const curatedIds=new Set(featured?.map(j=>j.id)||[]);
-  const shown=officialThree?(compact?eligible.slice(0,6):eligible):domesticOnly?(compact?eligible.slice(0,8):eligible):defaultView
+  const shown=curatedHundred?(compact?eligible.slice(0,6):eligible):officialThree?(compact?eligible.slice(0,6):eligible):domesticOnly?(compact?eligible.slice(0,8):eligible):defaultView
     ?(featured ? (compact?featured:[...featured,...eligible.filter(j=>!curatedIds.has(j.id)).slice(0,24)])
       : featuredError ? (compact?eligible.slice(0,8):eligible) : [])
     :(compact?eligible.slice(0,8):eligible);
-  const featuredPending=defaultView && !officialThree && !domesticOnly && !featured && !featuredError;
+  const featuredPending=defaultView && !curatedHundred && !officialThree && !domesticOnly && !featured && !featuredError;
   const interpreted=useMemo(()=>parseNaturalQuery(filters.q),[filters.q]);
   const roleNames:Record<string,string>={software:'软件工程师',sales:'销售',engineer:'工程师',product:'产品经理',intern:'实习',design:'设计',finance:'财务',marketing:'市场营销',operations:'运营'};
   const intentLabels=[
@@ -263,10 +264,10 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   const market=<section className="unified-market" aria-labelledby="unified-market-title">
     <div className="unified-market-heading"><div><small>HHBA · RECRUITMENT</small>
       <h2 id="unified-market-title">{lang==='zh'?'招聘市场':'Job market'}</h2>
-      <p>{officialThree?(lang==='zh'?'OpenAI、Anthropic、SpaceX 官方公开招聘 · 只展示本次从招聘系统核验到的职位，随时可能变化':'OpenAI, Anthropic and SpaceX public ATS listings · Verified at latest sync'):domesticOnly?(lang==='zh'?'国内历史招聘岗位静态测试 · 岗位状态以企业官网为准':'Historical China listings preview · Check employer for availability'):lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
+      <p>{curatedHundred?(lang==='zh'?'精选 10 家知名海外企业 · 100 条已存档岗位（状态待核实）':'100 archived roles from 10 companies; current availability unverified.'):officialThree?(lang==='zh'?'OpenAI、Anthropic、SpaceX 官方公开招聘 · 只展示本次从招聘系统核验到的职位，随时可能变化':'OpenAI, Anthropic and SpaceX public ATS listings · Verified at latest sync'):domesticOnly?(lang==='zh'?'国内历史招聘岗位静态测试 · 岗位状态以企业官网为准':'Historical China listings preview · Check employer for availability'):lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
       <LanguageSwitcher lang={lang} change={change}/></div>
     {controls}
-    {aiAvailable&&<div className="unified-ai-discovery">
+    {!curatedHundred&&aiAvailable&&<div className="unified-ai-discovery">
       <label><input type="checkbox" checked={aiConsent} onChange={e=>setAiConsent(e.target.checked)}/>
         同意将本次搜索描述发送给 DeepSeek 联网查找国内招聘官网；请勿输入身份证等敏感资料。</label>
       <button type="button" disabled={aiBusy} onClick={aiFindOfficialJobs}>
@@ -288,9 +289,9 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       {aiEvidence.jobs.length===0&&<p className="unified-job-state">暂未检索到具备可核对原文证据的岗位；不会提供虚构的职位。</p>}
     </section>}
     <div className="unified-company-discovery-navigation" style={{margin:'18px auto 8px',maxWidth:1120,display:'flex',justifyContent:'flex-end'}}><Link to="/companies/discover" style={{fontSize:13,color:'#265e45',fontWeight:700,textDecoration:'none'}}>浏览全部 200 家企业档案 →</Link></div>
-    <DomesticCompanyResults query={draft} majorSlug={selectedMajor}
+    {!curatedHundred&&<DomesticCompanyResults query={draft} majorSlug={selectedMajor}
       scope={filters.country} country={filters.location_country||''}
-      city={cityOptions.find(c=>c.value===filters.city)?.zh||''}/>
+      city={cityOptions.find(c=>c.value===filters.city)?.zh||''}/>}
     {intentLabels.length>0&&<div className="unified-search-interpreted">
       {lang==='zh'?'搜索条件已识别：':'Recognized filters: '}{intentLabels.join(' · ')}
       {filters.company&&<button className="unified-company-filter-clear" type="button"
@@ -318,7 +319,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       error?<div className="unified-job-state" role="alert">{lang==='zh'?error:'Jobs temporarily unavailable. Please retry.'}<button type="button" onClick={()=>setRetry(x=>x+1)}><RefreshCcw size={15}/> {lang==='zh'?'重试':'Retry'}</button></div>:
       shown.length?<div className="unified-job-grid">{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated}/>)}</div>:
         <div className="unified-job-state">{domesticOnly?(lang==='zh'?'当前没有符合条件的历史岗位。':'No matching archived jobs.'):lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
-    {!domesticOnly&&!loading&&defaultView&&featuredError&&
+    {!curatedHundred&&!domesticOnly&&!loading&&defaultView&&featuredError&&
       <div className="unified-featured-fallback" role="status">
         <span>{lang==='zh'?'六个精选岗位未能及时完成最新核验，当前显示其他近期核验的真实职位。':
           'Featured verification is delayed; showing other recently audited jobs.'}</span>
@@ -383,7 +384,7 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
    return ()=>controller.abort();
  },[job]);
  useEffect(()=>{
-   if(!job)return;
+   if(!job||job.recordKind==='CURATED_HISTORICAL')return;
    let active=true;
    loadPublicJobAudit().then(report=>{
      if(!active||!report||Date.now()-Date.parse(report.summary.checked_at)>24*3600_000)return;
@@ -399,7 +400,7 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
    setJd(null);setChineseJd('');setTranslateError('');
    setTranslationPrepared(false);setJdError('');setJdLoading(true);
    // Campus summaries have a reviewed source URL; do not trigger the overseas ATS JD reader.
-   if(job.domestic&&job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'){setJdLoading(false);return;}
+   if(job.recordKind==='CURATED_HISTORICAL'||job.domestic&&job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'){setJdLoading(false);return;}
    if(job.graduationYear===2027&&job.recordKind==='OFFICIAL_JOB_PAGE_OBSERVED'&&
       job.responsibilitiesSummary&&job.requirementsSummary){setJdLoading(false);return;}
    (async()=>{
@@ -459,14 +460,40 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
      <h1>{featuredTitle(job,lang)}</h1>
      <p><MapPin size={15}/>{localizedLocation(job,lang)}</p>
      <div className="unified-detail-warning"><ShieldCheck size={17}/>
-       {job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'?(lang==='zh'?`历史收录：${formatDate(job.observedAt)}。招聘状态尚未重新核实，以企业官网为准。`:`Archived on ${formatDate(job.observedAt)}. Application status unverified.`):lang==='zh'?'正在核对企业官方职位内容。最新投递状态以官网为准。':
+       {job.recordKind==='CURATED_HISTORICAL'?(lang==='zh'?'精选海外历史岗位资料 · 招聘状态尚未重新核实':'Archived overseas role · Current status unverified'):job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'?(lang==='zh'?`历史收录：${formatDate(job.observedAt)}。招聘状态尚未重新核实，以企业官网为准。`:`Archived on ${formatDate(job.observedAt)}. Application status unverified.`):lang==='zh'?'正在核对企业官方职位内容。最新投递状态以官网为准。':
          'Checking the employer’s published job details. Confirm application availability on the official site.'}</div>
      {audit && <p className="unified-job-audit"><ShieldCheck size={16}/>
        {describeAudit(audit.status,lang)}
        {audit.official_checked_at && <small>{lang==='zh'?'核验：':'Checked: '}{audit.official_checked_at.slice(0,10)}</small>}
      </p>}
      <h2>{lang==='zh'?'职位说明与任职要求':'Description and job requirements'}</h2>
-     {job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'?<div className="unified-jd-content">
+     {job.recordKind==='CURATED_HISTORICAL'?<div className="unified-jd-content">
+        <p className="unified-jd-source">{lang==='zh'?'岗位资料快照：':'Archived job snapshot: '}{formatDate(job.observedAt)}</p>
+        {job.editorial?<>
+          <p className="unified-jd-machine-notice">{lang==='zh'?
+            '以下为根据公开招聘资料整理的中文说明，不是官网逐字或逐段完整译文；部分历史链接可能已更新，请以企业官网为准。':
+            'Editorial summary based on the employer listing, not a verbatim reproduction.'}</p>
+          {lang==='zh'?<>
+            <section className="unified-jd-section"><h3>职位介绍</h3><p>{job.editorial.overview}</p></section>
+            <section className="unified-jd-section"><h3>工作职责</h3>{job.editorial.responsibilities.map((item,i)=><p className="unified-jd-bullet" key={i}>{item}</p>)}</section>
+            <section className="unified-jd-section"><h3>任职要求</h3>{job.editorial.requirements.map((item,i)=><p className="unified-jd-bullet" key={i}>{item}</p>)}</section>
+            {!!job.editorial.benefits.length&&<section className="unified-jd-section"><h3>薪资福利及工作方式</h3>{job.editorial.benefits.map((item,i)=><p className="unified-jd-bullet" key={i}>{item}</p>)}</section>}
+          </>:<section className="unified-jd-section"><h3>Verified English overview</h3><p>{job.editorial.originalSummary}</p>
+            <p>The complete original English requirements are available on the employer page; HHBA does not reprint them here.</p></section>}
+          <p className="unified-jd-source">{lang==='zh'?'来源核对日期：':'Source checked: '}{job.editorial.sourceVerifiedAt}</p>
+        </>:<div className="unified-jd-empty" role="status">
+          <p>{lang==='zh'?'已保存真实岗位的中文标题、地点和官网链接。完整职责与任职要求尚未取得可核实的整理内容。':'The role title, location and official link are saved. Detailed requirements are not yet verified.'}</p>
+          <small>{lang==='zh'?'不会根据职位名称编造工作内容。':'No requirements are invented from the job title.'}</small>
+        </div>}
+        {(job.educationLabel||job.experienceLabel||!!job.skillSignals?.length)&&<section className="unified-jd-section">
+          <h3>{lang==='zh'?'历史提取线索（可能不完整）':'Extracted archival clues (possibly incomplete)'}</h3>
+          {job.educationLabel&&<p>{lang==='zh'?'学历：':'Education: '}{job.educationLabel}</p>}
+          {job.experienceLabel&&<p>{lang==='zh'?'经验：':'Experience: '}{job.experienceLabel}</p>}
+          {!!job.skillSignals?.length&&<p>{lang==='zh'?'技能：':'Skills: '}{job.skillSignals.join('、')}</p>}
+        </section>}
+        {official&&<a href={official} target="_blank" rel="noopener noreferrer">{lang==='zh'?'查看官方原始岗位':'Original employer listing'} <ExternalLink size={14}/></a>}
+      </div>:
+      job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'?<div className="unified-jd-content">
        <p className="unified-jd-source">{lang==='zh'?'历史采集日期：':'Archived on: '}{formatDate(job.observedAt)}</p>
        <p className="unified-jd-machine-notice">{lang==='zh'?
          '以下是 HHBA 历史采集整理的岗位摘要，不是完整官方 JD 原文，也未重新确认招聘状态；内容来源及公开使用仍待复核，请以企业官网为准。':
@@ -525,8 +552,8 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
        </div>:null}
      <div className="unified-job-actions unified-detail-actions">
        <SaveJobButton jobId={job.id}/>
-       {official&&<a href={official} onClick={()=>trackEvent('official_apply_click','/candidate/jobs/:job')} target="_blank" rel="noopener noreferrer" aria-label={job.domestic&&job.currentApplicationVerified===false?(lang==='zh'?'打开企业官网核实投递状态':'Check employer application status'):(lang==='zh'?'前往企业官网立即申请':'Apply on official employer website')}>
-         {job.domestic&&job.currentApplicationVerified===false?(lang==='zh'?'前往官网核实投递':'Check official application'):(lang==='zh'?'立即申请':'Apply now')} <ExternalLink size={15}/></a>}
+       {official&&<a href={official} onClick={()=>trackEvent('official_apply_click','/candidate/jobs/:job')} target="_blank" rel="noopener noreferrer" aria-label={job.currentApplicationVerified===false?(lang==='zh'?'打开企业官网核实投递状态':'Check employer application status'):(lang==='zh'?'前往企业官网立即申请':'Apply on official employer website')}>
+         {job.currentApplicationVerified===false?(lang==='zh'?'查看原始岗位（状态待核实）':'Check original posting'):(lang==='zh'?'立即申请':'Apply now')} <ExternalLink size={15}/></a>}
      </div>
      <p className="unified-detail-footnote">{lang==='zh'?
        '岗位职责与任职要求直接在 HHBA 白色详情页展示；尚未读取成功的内容不会被编造。申请请以企业官网为准。':
