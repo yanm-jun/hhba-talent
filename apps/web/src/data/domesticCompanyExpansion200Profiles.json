@@ -92,7 +92,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-d3c20bd565303d39b602.webp",
+        "localPath": "domestic-media/company200-site-d3c20bd565303d39b602.webp",
+        "source": "https://www.lixiang.com/",
+        "kind": "screenshot",
+        "label": "理想汽车官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "recruitment_portal_verified_company_profile_first_pass",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -352,7 +362,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-ad06d05d50f75f7ff41e.webp",
+        "localPath": "domestic-media/company200-site-ad06d05d50f75f7ff41e.webp",
+        "source": "https://www.chery.cn/",
+        "kind": "screenshot",
+        "label": "奇瑞汽车官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -456,7 +476,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-b5050d379eda5ae8677b.webp",
+        "localPath": "domestic-media/company200-site-b5050d379eda5ae8677b.webp",
+        "source": "https://www.foton.com.cn/",
+        "kind": "screenshot",
+        "label": "福田汽车官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -508,7 +538,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-e2f4e2c4b8d7cf9c17f5.webp",
+        "localPath": "domestic-media/company200-site-e2f4e2c4b8d7cf9c17f5.webp",
+        "source": "https://www.oppo.com/cn/",
+        "kind": "screenshot",
+        "label": "OPPO官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "recruitment_portal_verified_company_profile_first_pass",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -560,7 +600,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-69337578b2468a881543.webp",
+        "localPath": "domestic-media/company200-site-69337578b2468a881543.webp",
+        "source": "https://www.vivo.com.cn/",
+        "kind": "screenshot",
+        "label": "vivo官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -610,9 +660,19 @@
     "productSource": "https://www.honor.com/cn/",
     "website": "https://www.honor.com/cn/",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.honor.com/cn/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-be548deba4a093d78e82.webp",
+        "localPath": "domestic-media/company200-site-be548deba4a093d78e82.webp",
+        "source": "https://www.honor.com/cn/",
+        "kind": "screenshot",
+        "label": "荣耀官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "recruitment_portal_verified_company_profile_first_pass",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -621,7 +681,9 @@
     "industryEvidenceUrl": "https://www.honor.com/cn/",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.honor.com/cn/",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-be548deba4a093d78e82.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "传音控股": {
     "displayName": "传音控股",
@@ -662,9 +724,19 @@
     "productSource": "https://www.transsion.com",
     "website": "https://www.transsion.com",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.transsion.com/zh-CN",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-c7b70618141f2f20796d.webp",
+        "localPath": "domestic-media/company200-site-c7b70618141f2f20796d.webp",
+        "source": "https://www.transsion.com/zh-CN",
+        "kind": "screenshot",
+        "label": "传音控股官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -673,7 +745,9 @@
     "industryEvidenceUrl": "https://www.transsion.com",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.transsion.com",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-c7b70618141f2f20796d.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "蓝思科技": {
     "displayName": "蓝思科技",
@@ -714,9 +788,19 @@
     "productSource": "https://www.hnlens.com",
     "website": "https://www.hnlens.com",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.hnlens.com/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-981090b3551841067422.webp",
+        "localPath": "domestic-media/company200-site-981090b3551841067422.webp",
+        "source": "https://www.hnlens.com/",
+        "kind": "screenshot",
+        "label": "蓝思科技官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -725,7 +809,9 @@
     "industryEvidenceUrl": "https://www.hnlens.com",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.hnlens.com",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-981090b3551841067422.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "闻泰科技": {
     "displayName": "闻泰科技",
@@ -974,9 +1060,19 @@
     "productSource": "https://www.smartsenstech.com",
     "website": "https://www.smartsenstech.com",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.smartsenstech.com/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-bfe948121d4de90c5155.webp",
+        "localPath": "domestic-media/company200-site-bfe948121d4de90c5155.webp",
+        "source": "https://www.smartsenstech.com/",
+        "kind": "screenshot",
+        "label": "思特威官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -985,7 +1081,9 @@
     "industryEvidenceUrl": "https://www.smartsenstech.com",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.smartsenstech.com",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-bfe948121d4de90c5155.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "中联重科": {
     "displayName": "中联重科",
@@ -1080,7 +1178,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-2faae1496409fc5faa91.webp",
+        "localPath": "domestic-media/company200-site-2faae1496409fc5faa91.webp",
+        "source": "https://www.xcmg.com/",
+        "kind": "screenshot",
+        "label": "徐工机械官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -1132,7 +1240,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-8ddcc6b189f768838c4a.webp",
+        "localPath": "domestic-media/company200-site-8ddcc6b189f768838c4a.webp",
+        "source": "https://www.liugong.com/",
+        "kind": "screenshot",
+        "label": "柳工官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -1392,7 +1510,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-a770f81d251bd2f865ce.webp",
+        "localPath": "domestic-media/company200-site-a770f81d251bd2f865ce.webp",
+        "source": "https://www.goldwind.com/cn/",
+        "kind": "screenshot",
+        "label": "金风科技官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -1444,7 +1572,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-91643037d9f596ac571f.webp",
+        "localPath": "domestic-media/company200-site-91643037d9f596ac571f.webp",
+        "source": "https://myse.com.cn/",
+        "kind": "screenshot",
+        "label": "明阳智能官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -1549,7 +1687,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-51f682d10d6b6f09fb7b.webp",
+        "localPath": "domestic-media/company200-site-51f682d10d6b6f09fb7b.webp",
+        "source": "https://www.nbcb.com.cn/",
+        "kind": "screenshot",
+        "label": "宁波银行官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -1708,7 +1856,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-4e83f9575781b726dd5c.webp",
+        "localPath": "domestic-media/company200-site-4e83f9575781b726dd5c.webp",
+        "source": "https://www.hzbank.com.cn/",
+        "kind": "screenshot",
+        "label": "杭州银行官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -1865,9 +2023,19 @@
     "productSource": "https://www.bocd.com.cn",
     "website": "https://www.bocd.com.cn",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.bocd.com.cn/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-b09d1dcc600aaeaf9e22.webp",
+        "localPath": "domestic-media/company200-site-b09d1dcc600aaeaf9e22.webp",
+        "source": "https://www.bocd.com.cn/",
+        "kind": "screenshot",
+        "label": "成都银行官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -1876,7 +2044,9 @@
     "industryEvidenceUrl": "https://www.bocd.com.cn",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.bocd.com.cn",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-b09d1dcc600aaeaf9e22.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "渝农商行": {
     "displayName": "渝农商行",
@@ -1973,7 +2143,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-f112198ca6d5bcfef660.webp",
+        "localPath": "domestic-media/company200-site-f112198ca6d5bcfef660.webp",
+        "source": "https://www.psbc.com/cn/",
+        "kind": "screenshot",
+        "label": "邮储银行官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -2024,9 +2204,19 @@
     "productSource": "https://www.cmbc.com.cn",
     "website": "https://www.cmbc.com.cn",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.cmbc.com.cn/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-d177ef7f1d911e4d2fdd.webp",
+        "localPath": "domestic-media/company200-site-d177ef7f1d911e4d2fdd.webp",
+        "source": "https://www.cmbc.com.cn/",
+        "kind": "screenshot",
+        "label": "民生银行官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -2035,7 +2225,9 @@
     "industryEvidenceUrl": "https://www.cmbc.com.cn",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.cmbc.com.cn",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-d177ef7f1d911e4d2fdd.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "复星医药": {
     "displayName": "复星医药",
@@ -2077,9 +2269,19 @@
     "productSource": "https://www.fosunpharma.com",
     "website": "https://www.fosunpharma.com",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.fosunpharma.com/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-5875aaa9a5940794ada5.webp",
+        "localPath": "domestic-media/company200-site-5875aaa9a5940794ada5.webp",
+        "source": "https://www.fosunpharma.com/",
+        "kind": "screenshot",
+        "label": "复星医药官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -2088,7 +2290,9 @@
     "industryEvidenceUrl": "https://www.fosunpharma.com",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.fosunpharma.com",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-5875aaa9a5940794ada5.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "上海医药": {
     "displayName": "上海医药",
@@ -2130,9 +2334,19 @@
     "productSource": "https://www.sphchina.com",
     "website": "https://www.sphchina.com",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.sphchina.com/index/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-039aed9521bd4be978c8.webp",
+        "localPath": "domestic-media/company200-site-039aed9521bd4be978c8.webp",
+        "source": "https://www.sphchina.com/index/",
+        "kind": "screenshot",
+        "label": "上海医药官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -2141,7 +2355,9 @@
     "industryEvidenceUrl": "https://www.sphchina.com",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.sphchina.com",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-039aed9521bd4be978c8.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "云南白药": {
     "displayName": "云南白药",
@@ -2185,7 +2401,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-f1d9c48fc45d3141bf20.webp",
+        "localPath": "domestic-media/company200-site-f1d9c48fc45d3141bf20.webp",
+        "source": "https://www.yunnanbaiyao.com.cn/",
+        "kind": "screenshot",
+        "label": "云南白药官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -2236,9 +2462,19 @@
     "productSource": "https://www.999.com.cn",
     "website": "https://www.999.com.cn",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.999.com.cn/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-e8ea716c06f3b2c615f8.webp",
+        "localPath": "domestic-media/company200-site-e8ea716c06f3b2c615f8.webp",
+        "source": "https://www.999.com.cn/",
+        "kind": "screenshot",
+        "label": "华润三九官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -2247,7 +2483,9 @@
     "industryEvidenceUrl": "https://www.999.com.cn",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.999.com.cn",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-e8ea716c06f3b2c615f8.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "片仔癀": {
     "displayName": "片仔癀",
@@ -2342,9 +2580,19 @@
     "productSource": "https://www.gybys.com.cn",
     "website": "https://www.gybys.com.cn",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.gybys.com.cn/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-799d2678d99c7fbd66c3.webp",
+        "localPath": "domestic-media/company200-site-799d2678d99c7fbd66c3.webp",
+        "source": "https://www.gybys.com.cn/",
+        "kind": "screenshot",
+        "label": "白云山官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -2353,7 +2601,9 @@
     "industryEvidenceUrl": "https://www.gybys.com.cn",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.gybys.com.cn",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-799d2678d99c7fbd66c3.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "泰格医药": {
     "displayName": "泰格医药",
@@ -2395,9 +2645,19 @@
     "productSource": "https://www.tigermedgrp.com",
     "website": "https://www.tigermedgrp.com",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.tigermedgrp.com/zh/homepage",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-2236dea6b6d7bd29c89f.webp",
+        "localPath": "domestic-media/company200-site-2236dea6b6d7bd29c89f.webp",
+        "source": "https://www.tigermedgrp.com/zh/homepage",
+        "kind": "screenshot",
+        "label": "泰格医药官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -2406,7 +2666,9 @@
     "industryEvidenceUrl": "https://www.tigermedgrp.com",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.tigermedgrp.com",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-2236dea6b6d7bd29c89f.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "金域医学": {
     "displayName": "金域医学",
@@ -2448,9 +2710,19 @@
     "productSource": "https://www.kingmed.com.cn",
     "website": "https://www.kingmed.com.cn",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.kingmed.com.cn/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-ef529d46ea63df00d13f.webp",
+        "localPath": "domestic-media/company200-site-ef529d46ea63df00d13f.webp",
+        "source": "https://www.kingmed.com.cn/",
+        "kind": "screenshot",
+        "label": "金域医学官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -2459,7 +2731,9 @@
     "industryEvidenceUrl": "https://www.kingmed.com.cn",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.kingmed.com.cn",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-ef529d46ea63df00d13f.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "联影医疗": {
     "displayName": "联影医疗",
@@ -2766,9 +3040,19 @@
     "productSource": "https://www.ch.com",
     "website": "https://www.ch.com",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.ch.com/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-af2bb9df1a07191f3fde.webp",
+        "localPath": "domestic-media/company200-site-af2bb9df1a07191f3fde.webp",
+        "source": "https://www.ch.com/",
+        "kind": "screenshot",
+        "label": "春秋航空官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -2777,7 +3061,9 @@
     "industryEvidenceUrl": "https://www.ch.com",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.ch.com",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-af2bb9df1a07191f3fde.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "吉祥航空": {
     "displayName": "吉祥航空",
@@ -2821,7 +3107,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-155954e09249899e0658.webp",
+        "localPath": "domestic-media/company200-site-155954e09249899e0658.webp",
+        "source": "https://www.juneyaoair.com/home",
+        "kind": "screenshot",
+        "label": "吉祥航空官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -2978,9 +3274,19 @@
     "productSource": "https://www.cimc.com",
     "website": "https://www.cimc.com",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.cimc.com/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-1d8917e8a2143221caab.webp",
+        "localPath": "domestic-media/company200-site-1d8917e8a2143221caab.webp",
+        "source": "https://www.cimc.com/",
+        "kind": "screenshot",
+        "label": "中集集团官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -2989,7 +3295,9 @@
     "industryEvidenceUrl": "https://www.cimc.com",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.cimc.com",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-1d8917e8a2143221caab.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "中国外运": {
     "displayName": "中国外运",
@@ -3033,7 +3341,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-5db9bf1e7a7cdf1c9e9d.webp",
+        "localPath": "domestic-media/company200-site-5db9bf1e7a7cdf1c9e9d.webp",
+        "source": "https://www.sinotrans.com/",
+        "kind": "screenshot",
+        "label": "中国外运官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -3084,9 +3402,19 @@
     "productSource": "https://www.jdl.com",
     "website": "https://www.jdl.com",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.jdl.com/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-7e1577e9849210d95af3.webp",
+        "localPath": "domestic-media/company200-site-7e1577e9849210d95af3.webp",
+        "source": "https://www.jdl.com/",
+        "kind": "screenshot",
+        "label": "京东物流官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -3095,7 +3423,9 @@
     "industryEvidenceUrl": "https://www.jdl.com",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.jdl.com",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-7e1577e9849210d95af3.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "百度": {
     "displayName": "百度",
@@ -3139,7 +3469,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-455ece81de5605d85e54.webp",
+        "localPath": "domestic-media/company200-site-455ece81de5605d85e54.webp",
+        "source": "https://www.baidu.com/",
+        "kind": "screenshot",
+        "label": "百度官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "recruitment_portal_verified_company_profile_first_pass",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -3192,7 +3532,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-cd6362472aea60ef45d5.webp",
+        "localPath": "domestic-media/company200-site-cd6362472aea60ef45d5.webp",
+        "source": "https://www.meituan.com/",
+        "kind": "screenshot",
+        "label": "美团官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -3351,7 +3701,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-effea4c9ff35497ce446.webp",
+        "localPath": "domestic-media/company200-site-effea4c9ff35497ce446.webp",
+        "source": "https://www.pinduoduo.com/",
+        "kind": "screenshot",
+        "label": "拼多多官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -3722,7 +4082,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-4bfdb7b242c41e293eeb.webp",
+        "localPath": "domestic-media/company200-site-4bfdb7b242c41e293eeb.webp",
+        "source": "https://www.szeastroc.com/",
+        "kind": "screenshot",
+        "label": "东鹏饮料官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -3828,7 +4198,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-c8649ad92c915b3cadda.webp",
+        "localPath": "domestic-media/company200-site-c8649ad92c915b3cadda.webp",
+        "source": "https://www.shuanghui.net/",
+        "kind": "screenshot",
+        "label": "双汇发展官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -3881,7 +4261,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-2bfe4cf761467b875bd0.webp",
+        "localPath": "domestic-media/company200-site-2bfe4cf761467b875bd0.webp",
+        "source": "https://www.juewei.cn/",
+        "kind": "screenshot",
+        "label": "绝味食品官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -4040,7 +4430,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-ec0f034cd5bf98bc717b.webp",
+        "localPath": "domestic-media/company200-site-ec0f034cd5bf98bc717b.webp",
+        "source": "https://www.yanjinpuzi.com/",
+        "kind": "screenshot",
+        "label": "盐津铺子官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -4146,7 +4546,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-987153f789c691b6eb77.webp",
+        "localPath": "domestic-media/company200-site-987153f789c691b6eb77.webp",
+        "source": "https://www.mengniu.com.cn/",
+        "kind": "screenshot",
+        "label": "蒙牛乳业官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -4197,9 +4607,19 @@
     "productSource": "https://www.whchem.com",
     "website": "https://www.whchem.com",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.whchem.com/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-0212fbff216a6cb6e15d.webp",
+        "localPath": "domestic-media/company200-site-0212fbff216a6cb6e15d.webp",
+        "source": "https://www.whchem.com/",
+        "kind": "screenshot",
+        "label": "万华化学官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -4208,7 +4628,9 @@
     "industryEvidenceUrl": "https://www.whchem.com",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.whchem.com",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-0212fbff216a6cb6e15d.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "荣盛石化": {
     "displayName": "荣盛石化",
@@ -4358,7 +4780,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-cf837b2d72c7a2c51694.webp",
+        "localPath": "domestic-media/company200-site-cf837b2d72c7a2c51694.webp",
+        "source": "https://www.tongkungroup.com/",
+        "kind": "screenshot",
+        "label": "桐昆股份官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -4568,9 +5000,19 @@
     "productSource": "https://www.putailai.com",
     "website": "https://www.putailai.com",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.putailai.com/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-9f5a5e62a31bc9060686.webp",
+        "localPath": "domestic-media/company200-site-9f5a5e62a31bc9060686.webp",
+        "source": "https://www.putailai.com/",
+        "kind": "screenshot",
+        "label": "璞泰来官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -4579,7 +5021,9 @@
     "industryEvidenceUrl": "https://www.putailai.com",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.putailai.com",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-9f5a5e62a31bc9060686.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "华友钴业": {
     "displayName": "华友钴业",
@@ -4676,7 +5120,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-99699ea142d3ad7b67f0.webp",
+        "localPath": "domestic-media/company200-site-99699ea142d3ad7b67f0.webp",
+        "source": "https://www.ganfenglithium.com/",
+        "kind": "screenshot",
+        "label": "赣锋锂业官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -4782,7 +5236,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-268d99ac6debb8a08a59.webp",
+        "localPath": "domestic-media/company200-site-268d99ac6debb8a08a59.webp",
+        "source": "https://www.lkcoffee.com/",
+        "kind": "screenshot",
+        "label": "瑞幸咖啡官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -5045,9 +5509,19 @@
     "productSource": "https://www.ly.com",
     "website": "https://www.ly.com",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.ly.com/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-fa8c9a97f2c921bf8484.webp",
+        "localPath": "domestic-media/company200-site-fa8c9a97f2c921bf8484.webp",
+        "source": "https://www.ly.com/",
+        "kind": "screenshot",
+        "label": "同程旅行官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -5056,7 +5530,9 @@
     "industryEvidenceUrl": "https://www.ly.com",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.ly.com",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-fa8c9a97f2c921bf8484.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "华住集团": {
     "displayName": "华住集团",
@@ -5098,9 +5574,19 @@
     "productSource": "https://www.hworld.com",
     "website": "https://www.hworld.com",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.hworld.com/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-0ade33b755a77945f61b.webp",
+        "localPath": "domestic-media/company200-site-0ade33b755a77945f61b.webp",
+        "source": "https://www.hworld.com/",
+        "kind": "screenshot",
+        "label": "华住集团官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -5109,7 +5595,9 @@
     "industryEvidenceUrl": "https://www.hworld.com",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.hworld.com",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-0ade33b755a77945f61b.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "锦江酒店": {
     "displayName": "锦江酒店",
@@ -5153,7 +5641,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-18566e762eb59ba07add.webp",
+        "localPath": "domestic-media/company200-site-18566e762eb59ba07add.webp",
+        "source": "https://www.jinjianghotels.com.cn/",
+        "kind": "screenshot",
+        "label": "锦江酒店官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -5204,9 +5702,19 @@
     "productSource": "https://www.vanke.com",
     "website": "https://www.vanke.com",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.vanke.com/home",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-c6fa24222c334b16eae8.webp",
+        "localPath": "domestic-media/company200-site-c6fa24222c334b16eae8.webp",
+        "source": "https://www.vanke.com/home",
+        "kind": "screenshot",
+        "label": "万科企业官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
@@ -5215,7 +5723,9 @@
     "industryEvidenceUrl": "https://www.vanke.com",
     "majorMappingBasis": "按已知业务方向与学科能力初步匹配；非任职专业承诺。",
     "photoSourcePage": "https://www.vanke.com",
-    "photoSourceLabel": "企业官方网站（实景图片尚未审定）"
+    "photoSourceLabel": "企业官方网站（实景图片尚未审定）",
+    "brandLocalPath": "domestic-media/company200-brand-c6fa24222c334b16eae8.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "东风汽车集团": {
     "displayName": "东风汽车集团",
@@ -5258,7 +5768,17 @@
     "brandImage": "",
     "brandImageSource": "",
     "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company200-site-16f0b98a3fb5ae71c976.webp",
+        "localPath": "domestic-media/company200-site-16f0b98a3fb5ae71c976.webp",
+        "source": "https://www.dfmc.com.cn/",
+        "kind": "screenshot",
+        "label": "东风汽车集团官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company200-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "company_website_candidate_detail_review_pending",
     "contentReview": "first_pass_industry_explanation_not_official_company_detail_audited",
