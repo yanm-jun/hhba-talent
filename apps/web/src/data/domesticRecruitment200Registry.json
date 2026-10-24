@@ -288,6 +288,50 @@
       "verifiedOn": "2026-10-24",
       "verifiedBy": "employer_recruitment_site_or_employer_school_notice",
       "notes": "该入口覆盖集团或关联航空公司；应核对用人单位与岗位批次，不能认为所有公告归属于上市公司本体。"
+    },
+    "北京银行": {
+      "url": "https://bankofbeijing.zhiye.com/",
+      "evidenceUrl": "https://bankofbeijing.zhiye.com/",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "北京银行官方招聘（社招／校招）",
+      "recruitmentEntity": "北京银行",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_employer_page_or_named_2027_university_notice",
+      "notes": "招聘专站存在，实际岗位开放、招聘地区及截止日期以页面为准。"
+    },
+    "上海银行": {
+      "url": "https://bosc.zhiye.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119528.html",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "上海银行官方招聘",
+      "recruitmentEntity": "上海银行",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_employer_page_or_named_2027_university_notice",
+      "notes": "招聘专站存在，实际岗位开放、招聘地区及截止日期以页面为准。"
+    },
+    "成都银行": {
+      "url": "https://www.bocd.com.cn/zyxxfb/rczp/zhaopingonggao/list1.html",
+      "evidenceUrl": "https://www.bocd.com.cn/zyxxfb/rczp/zhaopingonggao/1297971392687509504.html",
+      "kind": "official_recruitment_announcements",
+      "availability": "announcement_only",
+      "label": "成都银行官方招聘公告",
+      "recruitmentEntity": "成都银行",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_employer_page_or_named_2027_university_notice",
+      "notes": "仅提供企业招聘公告入口，不能视为直接网申或在招岗位清单。"
+    },
+    "邮储银行": {
+      "url": "https://www.psbc.com/cn/gyyc/rczp/shzp/",
+      "evidenceUrl": "https://www.psbc.com/cn/gyyc/rczp/shzp/",
+      "kind": "official_recruitment_announcements",
+      "availability": "announcement_only",
+      "label": "邮储银行官方网站人才招聘公告",
+      "recruitmentEntity": "邮储银行",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_employer_page_or_named_2027_university_notice",
+      "notes": "仅提供企业招聘公告入口，不能视为直接网申或在招岗位清单。"
     }
   }
 }
