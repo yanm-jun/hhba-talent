@@ -1157,6 +1157,32 @@
       "verifiedBy": "employer_official_hiring_notice_or_employer_university_post",
       "aliases": [],
       "notes": "网站入口或招聘公告不保证当前岗位开放，校招批次与日期请在官方页面核实。"
+    },
+    "长城汽车": {
+      "name": "长城汽车",
+      "url": "https://zhaopin.gwm.cn/SU692d3058ea11b01b6c54d0ea/pb/index.html",
+      "evidenceUrl": "https://zhaopin.gwm.cn/SU692d3058ea11b01b6c54d0ea/pb/index.html",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "长城汽车官网招聘系统（按股份公司与零部件主体区分）",
+      "recruitmentEntity": "长城汽车",
+      "notes": "集团招聘首页展示股份公司及多个零部件招聘单位，投递前核对对应组织。",
+      "verifiedBy": "official_company_career_site",
+      "verifiedOn": "2026-10-24",
+      "aliases": []
+    },
+    "恒瑞医药": {
+      "name": "恒瑞医药",
+      "url": "https://app.mokahr.com/campus-recruitment/hengrui/145997",
+      "evidenceUrl": "https://www.hengrui.com/media/",
+      "kind": "official_recruitment_portal",
+      "availability": "campus_only",
+      "label": "恒瑞医药招聘 Moka 校招入口",
+      "recruitmentEntity": "恒瑞医药",
+      "notes": "恒瑞医药官网于2026年9月发布2027全球校招公告，具体职位与用人单位以校招页面为准。",
+      "verifiedBy": "official_company_career_site",
+      "verifiedOn": "2026-10-24",
+      "aliases": []
     }
   }
 }
