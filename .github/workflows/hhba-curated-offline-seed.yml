@@ -1,0 +1,80 @@
+name: HHBA curated offline overseas jobs (one-time seed and acceptance)
+
+on:
+  push:
+    branches: [feat/curated-offline-jobs-20261024]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  seed-and-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Import one saved HHBA snapshot artifact (no overseas ATS request)
+        if: ${{ hashFiles('apps/web/public/curated/v1/manifest.json') == '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: hhba-company200-static-preview
+          run-id: 40075821720
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: apps/web/source-artifact
+      - name: Select 10 companies and 150 source-backed historical job facts
+        if: ${{ hashFiles('apps/web/public/curated/v1/manifest.json') == '' }}
+        working-directory: apps/web
+        run: node scripts/seed-curated-offline.mjs source-artifact public/curated/v1
+      - name: Persist initial JSON archive once
+        run: |
+          git add apps/web/public/curated/v1/
+          if ! git diff --cached --quiet; then
+            git -c user.name="HHBA Archive Bot" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "data(curated): pin source-reviewed overseas job metadata locally"
+            git push origin HEAD:feat/curated-offline-jobs-20261024
+          fi
+      - name: Install frontend packages
+        run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Verify archive schema, verified sources, and absence of runtime ATS dependencies
+        working-directory: apps/web
+        run: node --test scripts/curated-offline.contract.test.mjs
+      - name: Build opt-in offline variant
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_CURATED_STATIC: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+        run: npm run build
+      - name: Verify source market tests remain intact
+        run: |
+          test -s apps/web/dist/index.html
+          test -s apps/web/dist/curated/v1/jobs.json
+          test -s apps/web/dist/curated/v1/companies.json
+          node --test apps/web/scripts/white-market-detail.contract.test.mjs
+      - name: Install Playwright browser
+        run: |
+          npm install --no-save --no-package-lock --prefix apps/web playwright@1.56.1 --no-audit --no-fund
+          cd apps/web
+          npx playwright install --with-deps chromium
+      - name: Smoke test China-friendly offline search and detail
+        working-directory: apps/web
+        run: |
+          (npx vite preview --host 127.0.0.1 --port 4173 >/tmp/hhba-curated-vite.log 2>&1 &)
+          node scripts/curated-offline.browser.mjs
+      - name: Preserve review screenshots and offline build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-curated-offline-review
+          path: |
+            apps/web/curated-review/
+            apps/web/dist/
+          retention-days: 14
