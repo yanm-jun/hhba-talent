@@ -2442,6 +2442,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "面向大型企业客户的软件销售岗位，推动 Figma 企业级产品销售和持续扩展。",
+        "responsibilities": [
+          "管理企业客户商机，完成季度和年度收入目标。",
+          "与大型企业高管沟通业务需求，争取跨组织部署的支持。",
+          "制定账户战略并协同客户成功、产品等团队推进交易。"
+        ],
+        "requirements": [
+          "有多年企业 SaaS 销售及直接向高管成交的经验。",
+          "能够管理持续六个月以上的复杂销售周期。",
+          "擅长价值销售、线索开发和客户关系管理。"
+        ],
+        "benefits": [
+          "可在美国指定办公室或境内符合条件的远程地区工作。"
+        ],
+        "originalSummary": "Public employer listing: Account Executive, Enterprise; the Chinese role overview above is an editorial summary, not a verbatim English text.",
+        "source": "https://boards.greenhouse.io/figma/jobs/5426468004?gh_jid=5426468004"
       }
     },
     {
@@ -2477,6 +2498,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "在 Story Studio 用优质内容讲述产品设计与开发的过程，面向设计从业者呈现 Figma 产品故事。",
+        "responsibilities": [
+          "采访设计师、研究员及产品经理，创作产品案例与设计故事。",
+          "围绕新功能解释设计决策和用户难题，产出多种形式内容。",
+          "与营销和产品团队合作推广设计方法论及行业洞察。"
+        ],
+        "requirements": [
+          "至少五年产品设计或技术内容写作经历。",
+          "有产品设计文章、案例、访谈等作品集。",
+          "深入理解 Figma 等设计工具与设计行业文化。"
+        ],
+        "benefits": [
+          "官网披露基本年薪区间 127,000—269,000 美元。"
+        ],
+        "originalSummary": "Public employer listing: Content Strategist, Product; the Chinese role overview above is an editorial summary, not a verbatim English text.",
+        "source": "https://boards.greenhouse.io/figma/jobs/6207950004?gh_jid=6207950004"
       }
     },
     {
@@ -2547,6 +2589,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "为 Figma 品牌工作室设计营销网站、活动页面和新型网页体验，兼顾品牌表达、可用性与访问性能。",
+        "responsibilities": [
+          "从视觉概念到交互原型及上线负责网页设计。",
+          "与前端工程师合作开发网页交互、动效和设计系统组件。",
+          "优化信息架构、导航和产品故事表达。"
+        ],
+        "requirements": [
+          "五年以上网页设计经验，具备视觉、交互和排版作品集。",
+          "熟练使用 Figma 原型与设计工具。",
+          "理解网页无障碍标准，能与工程团队实现设计。"
+        ],
+        "benefits": [
+          "美国指定办公中心或境内符合条件的远程岗位。"
+        ],
+        "originalSummary": "Public employer listing: Brand Designer, Web; the Chinese role overview above is an editorial summary, not a verbatim English text.",
+        "source": "https://boards.greenhouse.io/figma/jobs/6216211004?gh_jid=6216211004"
       }
     },
     {
@@ -2586,6 +2649,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "利用生成式 AI、微调和强化学习技术提升 Figma 的设计产品能力。",
+        "responsibilities": [
+          "研究适用于设计软件的生成式 AI 模型。",
+          "运用监督微调、强化学习和合成数据提升模型表现。",
+          "与产品工程师共同上线功能并建设模型评测。"
+        ],
+        "requirements": [
+          "四年以上生成式 AI 和六年以上机器学习／自然语言处理等相关经历。",
+          "熟悉 PyTorch、JAX、Hugging Face 和强化学习方法。",
+          "具有五年以上 Python、C++、Java 或 R 软件开发能力。"
+        ],
+        "benefits": [
+          "官网公布基本年薪 153,000—376,000 美元。"
+        ],
+        "originalSummary": "Public employer listing: AI Applied Scientist; the Chinese role overview above is an editorial summary, not a verbatim English text.",
+        "source": "https://boards.greenhouse.io/figma/jobs/5707966004?gh_jid=5707966004"
       }
     },
     {
@@ -2679,6 +2763,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "印度班加罗尔企业客户销售岗位，为大型客户制定 Figma 采购与扩张方案。",
+        "responsibilities": [
+          "搭建并维护企业客户销售商机。",
+          "与大企业管理层分析业务需要并规划产品部署。",
+          "联动销售与客户成功等团队推动成交和扩张。"
+        ],
+        "requirements": [
+          "具有软件或 SaaS 大型企业销售经验。",
+          "善于长周期交易、价值销售与客户需求发现。",
+          "能管理客户关系、业务预测和销售目标。"
+        ],
+        "benefits": [
+          "工作地点为印度班加罗尔的企业办公中心。"
+        ],
+        "originalSummary": "Public employer listing: Account Executive, Enterprise (Bengaluru, India); the Chinese role overview above is an editorial summary, not a verbatim English text.",
+        "source": "https://boards.greenhouse.io/figma/jobs/5579204004?gh_jid=5579204004"
       }
     },
     {
@@ -2714,6 +2819,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责 Figma 员工签证、移民合规和跨国搬迁，协助公司国际化用工。",
+        "responsibilities": [
+          "管理全球签证和永久居留案件，跟踪工作许可有效期。",
+          "对接外部移民律师，处理申请、审查、法规遵从和补件。",
+          "制作员工答疑手册并支持国际搬迁项目。"
+        ],
+        "requirements": [
+          "至少五年全球技术企业或专业律所员工移民管理经验。",
+          "熟悉 H-1B、L-1、O-1、PERM 等移民和工作签证类别。",
+          "具备外部供应商管理及人事合规经验。"
+        ],
+        "benefits": [
+          "可在美国办公中心或符合条件的美国境内远程工作。"
+        ],
+        "originalSummary": "Public employer listing: Immigration Program Manager; the Chinese role overview above is an editorial summary, not a verbatim English text.",
+        "source": "https://boards.greenhouse.io/figma/jobs/6173031004?gh_jid=6173031004"
       }
     },
     {
@@ -2749,6 +2875,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责上市公司 Figma 的企业传播策略与执行，向不同受众讲述公司业务和品牌故事。",
+        "responsibilities": [
+          "与财务、投资者关系、法律、产品、品牌团队挖掘新闻素材。",
+          "针对新闻趋势制定传播计划，推动商业及产品议题。",
+          "建立企业传播方案并改善跨渠道故事表达。"
+        ],
+        "requirements": [
+          "七年以上企业内部传播经验。",
+          "有搭建和扩展传播项目的成功经历。",
+          "善于把复杂技术与商业信息转化成清晰叙事。"
+        ],
+        "benefits": [
+          "官网标注旧金山或纽约工作地点。"
+        ],
+        "originalSummary": "Public employer listing: Corporate Communications Manager; the Chinese role overview above is an editorial summary, not a verbatim English text.",
+        "source": "https://boards.greenhouse.io/figma/jobs/6208862004?gh_jid=6208862004"
       }
     },
     {
@@ -2838,6 +2985,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "面向中小型企业销售 Spotify 的开发者软件 Backstage Portal、Confidence 等，帮助客户改善开发工作流。",
+        "responsibilities": [
+          "开拓少于一千名员工的企业客户，负责演示、报价和成交。",
+          "管理高频销售商机及收入目标，协调销售工程与客户成功。",
+          "向 CTO 和工程负责人解释开发平台的业务价值。"
+        ],
+        "requirements": [
+          "至少四年承担销售目标的经历，其中两年以上直接成交经验。",
+          "具备 SaaS、云服务或开发者工具销售背景。",
+          "理解技术客户需求和 CRM 销售预测。"
+        ],
+        "benefits": [
+          "纽约混合办公，官网给出的美国基本年薪约 87,069—124,385 美元。"
+        ],
+        "originalSummary": "Public employer listing: Account Executive - Commercial, Spotify Technology; the Chinese role overview above is an editorial summary, not a verbatim English text.",
+        "source": "https://jobs.lever.co/spotify/2a55d6c9-c564-443a-be3e-a3851db5a93b"
       }
     },
     {
@@ -2925,6 +3093,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "主导 Spotify 中东、北非、土耳其和巴基斯坦市场的企业传播与品牌声誉。",
+        "responsibilities": [
+          "制定区域品牌和创作者传播策略。",
+          "对声誉、媒体、政策及监管议题向高管提供建议。",
+          "协调全球及本地团队，并管理公关机构和预算。"
+        ],
+        "requirements": [
+          "十年以上综合传播工作经验。",
+          "熟悉区域媒体、文化和创作者生态。",
+          "具备英语以及阿拉伯语或土耳其语的流利表达能力。"
+        ],
+        "benefits": [
+          "位于迪拜，官网标注现场办公岗位。"
+        ],
+        "originalSummary": "Public employer listing: Communications Lead - MENAT+; the Chinese role overview above is an editorial summary, not a verbatim English text.",
+        "source": "https://jobs.lever.co/spotify/c152d042-642d-4a48-862b-8be8d6cdc819"
       }
     },
     {
@@ -2960,6 +3149,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责 Spotify Reverb 内部创意工作室的视觉方向与设计团队管理。",
+        "responsibilities": [
+          "管理约五至六名平面设计师、动效设计师和制作人员。",
+          "把控全球品牌创意与内容作品质量。",
+          "与品牌及内容制作团队共同执行创意项目。"
+        ],
+        "requirements": [
+          "具备跨媒体品牌设计及创意团队管理经验。",
+          "能指导视觉、动效和内容制作人员。",
+          "擅长品牌叙事、团队辅导和跨职能创意协作。"
+        ],
+        "benefits": [
+          "工作地点为纽约，官网标注常驻办公类型。"
+        ],
+        "originalSummary": "Public employer listing: Global Creative Lead, Reverb; the Chinese role overview above is an editorial summary, not a verbatim English text.",
+        "source": "https://jobs.lever.co/spotify/25fac63d-d4ba-48b9-80b1-b8e87b55e448"
       }
     },
     {
@@ -2993,6 +3203,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "管理法国大型广告代理机构的战略合作，为 Spotify 广告销售创造增长机会。",
+        "responsibilities": [
+          "协调代理机构高层关系并谈判商业合作框架。",
+          "推动程序化、自助广告及自动化方案落地。",
+          "开展合作收入分析、业务复盘和行业培训。"
+        ],
+        "requirements": [
+          "十年以上代理商合作、商务拓展或战略销售经验。",
+          "熟悉法国广告代理机构及大型控股集团。",
+          "英语和法语口语及书面沟通流利。"
+        ],
+        "benefits": [
+          "工作地点巴黎，官网要求每周到办公室约二至三天。"
+        ],
+        "originalSummary": "Public employer listing: Agency Development Lead - France; the Chinese role overview above is an editorial summary, not a verbatim English text.",
+        "source": "https://jobs.lever.co/spotify/f7eb82ce-b57e-4dc0-b84a-7f7ec05bf66e"
       }
     },
     {
@@ -3031,6 +3262,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "为 Spotify 开发基于 Apache Iceberg 的数据湖仓及 BigQuery 平台基础设施。",
+        "responsibilities": [
+          "建设能直接读写 Iceberg 表的 Lakehouse 架构。",
+          "帮助数据流水线迁移并改善 BigQuery 容量、成本和监控。",
+          "参与数据平台值班，排查 Kubernetes、GCP 等故障。"
+        ],
+        "requirements": [
+          "具有 Java 或 Scala 生产级后端开发经验。",
+          "熟悉云数据仓库、数据平台和服务运维。",
+          "能处理复杂基础设施问题并与数据团队协作。"
+        ],
+        "benefits": [
+          "位于斯德哥尔摩或伦敦，采用混合办公。"
+        ],
+        "originalSummary": "Public employer listing: Backend Engineer - Data Platform; the Chinese role overview above is an editorial summary, not a verbatim English text.",
+        "source": "https://jobs.lever.co/spotify/926149ab-6999-4058-b35d-41e302b70e05"
       }
     },
     {
@@ -3097,6 +3349,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责 Spotify 核心音频和媒体播放产品，为多设备用户优化播放体验。",
+        "responsibilities": [
+          "制定音频播放领域产品战略和长短期路线图。",
+          "与工程、设计和用户研究共同管理功能开发。",
+          "根据数据、用户洞察改进播放质量和交互体验。"
+        ],
+        "requirements": [
+          "有复杂产品的资深产品管理及跨团队领导经验。",
+          "理解音频处理、混音衔接和节拍匹配技术。",
+          "熟悉数据驱动的产品决策；视频播放知识加分。"
+        ],
+        "benefits": [
+          "地点斯德哥尔摩或伦敦，可部分居家办公。"
+        ],
+        "originalSummary": "Public employer listing: Principal Product Manager - Audio and Media Playback; the Chinese role overview above is an editorial summary, not a verbatim English text.",
+        "source": "https://jobs.lever.co/spotify/080868dd-fc8c-4648-b6ab-6780d8ca3d63"
       }
     },
     {
@@ -3130,6 +3403,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "为 Spotify 全球内容与技术业务提供版权、专利和其他诉讼争议的法律支持。",
+        "responsibilities": [
+          "协助处理版权、专利和监管争议，制定诉讼策略。",
+          "管理外部律师、费用、证据披露和多司法辖区法律事项。",
+          "为内部业务团队提供风险评估、争议预防和法律培训。"
+        ],
+        "requirements": [
+          "有法学学位并符合纽约州内部法律顾问资格要求。",
+          "至少五年诉讼经验，包括版权相关诉讼。",
+          "具备电子证据开示与复杂争议管理经验。"
+        ],
+        "benefits": [
+          "纽约办公室岗位，官网披露基本年薪约 170,366—243,380 美元。"
+        ],
+        "originalSummary": "Public employer listing: Legal Counsel, Litigation and Copyright; the Chinese role overview above is an editorial summary, not a verbatim English text.",
+        "source": "https://jobs.lever.co/spotify/8d54dd6d-d7e0-4298-b051-423bcec4089e"
       }
     },
     {
