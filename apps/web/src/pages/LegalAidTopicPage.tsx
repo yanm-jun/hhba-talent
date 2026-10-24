@@ -1,4 +1,4 @@
-import {ArrowLeft,ArrowUpRight,BookOpen,CheckCircle2,ChevronRight,ClipboardList,ExternalLink,FileCheck2,Info,Landmark,Scale,ShieldAlert} from 'lucide-react';
+import {ArrowLeft,ArrowUpRight,BookOpen,ChevronRight,ClipboardList,ExternalLink,FileCheck2,Info,Landmark,Scale,ShieldAlert} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link} from '../router';
 import type {User} from '../services/api';
