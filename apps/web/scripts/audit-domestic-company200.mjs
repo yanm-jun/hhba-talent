@@ -11,7 +11,7 @@ const oldRecruit=get('domesticRecruitmentRegistry.json').entries;
 const newRecruit=get('domesticRecruitment200Registry.json').entries;
 const oldMedia=get('domesticMediaBundle.json').companies;
 const newMedia=get('domesticMedia200Bundle.json').companies;
-const norm=s=>s.normalize('NFKC').toLowerCase().replace(/[\\s（）()・·-_—]/g,'');
+const norm=s=>s.normalize('NFKC').toLowerCase().replace(/[\s（）()・·_—-]/g,'');
 assert.equal(base.companyNames.length,100,'Do not alter original 100 target count');
 assert.equal(expansion.companyNames.length,200,'Exactly 200 target companies');
 assert.deepEqual(expansion.companyNames.slice(0,100),base.companyNames,'Original 100 order must survive unchanged');
