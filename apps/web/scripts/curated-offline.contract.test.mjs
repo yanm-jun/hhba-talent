@@ -41,7 +41,9 @@ test('offline mode uses same-origin JSON, not overseas ATS, Railway, or live JD 
  const router=readFileSync('src/main.tsx','utf8');
  assert.match(client,/import\.meta\.env\.BASE_URL\+'curated\/v1\/'/);
  assert.doesNotMatch(client,/ashbyhq\.com|greenhouse\.io|api\.lever\.co|railway\.app|\/api\/jobs/);
- assert.match(root,/VITE_HHBA_CURATED_STATIC==='1'/);
+ assert.match(router,/VITE_HHBA_CURATED_STATIC==='1'/);
+ assert.match(root,/UnifiedJobMarket compact/);
+ assert.match(router,/if\(route==='\/candidate'\)return <CandidateDashboardPage/);
  assert.match(router,/CuratedJobDetail/);
  assert.match(client,/历史公开岗位/);
  assert.match(client,/机器翻译，待人工审校/);
