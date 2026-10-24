@@ -8,6 +8,12 @@ on:
       - 'apps/web/src/pages/Company200PreviewPage.tsx'
       - 'apps/web/src/components/DomesticCompanyResults.tsx'
       - 'apps/web/src/main.tsx'
+      - 'apps/web/src/pages/HomePage.tsx'
+      - 'apps/web/src/components/Shell.tsx'
+      - 'apps/web/src/components/UnifiedJobMarket.tsx'
+      - 'apps/web/src/router.tsx'
+      - 'apps/web/scripts/prepare-pages-jobs.mjs'
+      - 'apps/web/scripts/audit-all-official-jds.mjs'
       - 'apps/web/src/pages/DomesticCompanyPage.tsx'
       - 'apps/web/src/services/domesticCompanySearch.ts'
       - 'apps/web/src/services/domesticCompany200Data.ts'
@@ -29,7 +35,7 @@ concurrency:
 jobs:
   static-build:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - name: Checkout isolated 200-company source (never touch main or Railway)
         uses: actions/checkout@v4
@@ -48,15 +54,47 @@ jobs:
         run: |
           node scripts/audit-domestic-company200.mjs
           node scripts/company200-integration.contract.test.mjs
-      - name: Build public preview with Pages base path and without account API
+      - name: Build original HHBA job market plus additive 200-company discovery
+
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
-          VITE_COMPANY200_STATIC_PREVIEW: '1'
           VITE_HHBA_ACCOUNT_API_ENABLED: '0'
           VITE_DEMO_ACCOUNT_ENABLED: '0'
         run: |
           npm run build
+      - name: Refresh real public job index from existing official ATS source
+        working-directory: apps/web
+        run: node scripts/prepare-pages-jobs.mjs
+      - name: Validate source-backed JD audit and generate accurate searchable job facets
+        working-directory: apps/web
+        run: |
+          node --test scripts/audit-all-official-jds.test.mjs scripts/job-search-facets.test.mjs
+          node scripts/audit-all-official-jds.mjs
+      - name: Check published market data is current and tied to its audit
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const json=n=>JSON.parse(readFileSync('dist/data/'+n,'utf8'));
+          const jobs=json('jobs.json'),audit=json('job-sync-status.json'),facets=json('job-search-facets.json');
+          if(jobs.total!==jobs.jobs.length||jobs.total<1||jobs.failures!==0||
+              Date.now()-Date.parse(jobs.updated)>24*3600000||
+              audit.summary.indexed_as_of!==jobs.updated||
+              audit.jobs.length!==jobs.total||
+              facets.indexed_as_of!==jobs.updated||
+              facets.total_indexed_jobs!==jobs.total||
+              facets.jobs.length!==facets.extracted_count)
+            throw Error('PUBLIC_JOB_MARKET_NOT_READY');
+          const names=new Set(jobs.jobs.map(j=>j.company));
+          const existing=['OpenAI','Anthropic','SpaceX'];
+          const found=existing.filter(n=>names.has(n));
+          if(found.length!==3)throw Error('CORE_OFFICIAL_EMPLOYERS_MISSING '+found.join(','));
+          console.log('HHBA_INTEGRATED_PAGES_MARKET',{jobs:jobs.total,employers:found,companyDirectory:200,updated:jobs.updated});
+          NODE
+      - name: Finalize SPA deep-link reload and static routes
+        working-directory: apps/web
+        run: |
           cp dist/index.html dist/404.html
           touch dist/.nojekyll
       - name: Verify artifact is a subpath-safe SPA and contains compiled company data
@@ -64,6 +102,9 @@ jobs:
         run: |
           test -s dist/index.html
           test -s dist/404.html
+          test -s dist/data/jobs.json
+          test -s dist/data/job-sync-status.json
+          test -s dist/data/job-search-facets.json
           test -f dist/.nojekyll
           grep -q '/hhba-talent/assets/' dist/index.html
           ! grep -R -E 'BEGIN (RSA|OPENSSH) PRIVATE KEY' dist
