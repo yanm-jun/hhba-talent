@@ -65,7 +65,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps/web/src/data/domesticCareerProfiles.json apps/web/src/data/domesticMediaBundle.json
+          git add -f apps/web/src/data/domesticCareerProfiles.json apps/web/src/data/domesticMediaBundle.json
           git add -f apps/web/public/domestic-media/company100-site-*.webp || true
           if ! git diff --cached --quiet; then
             git commit -m "assets(company100): preserve sourced official website screenshots as unreviewed visual references"
