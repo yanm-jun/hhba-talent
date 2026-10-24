@@ -32,7 +32,20 @@ test('local curated archive is self-contained, source-audited, and finite',()=>{
   assert.ok(['greenhouse','ashby','lever'].includes(j.originalPlatform));
   assert.ok(Number.isFinite(Date.parse(j.snapshotObservedAt)));
  }
- for(const c of companies.companies)assert.equal(jobs.jobs.filter(j=>j.company===c.name).length,10);
+ for(const c of companies.companies){
+  const list=jobs.jobs.filter(j=>j.company===c.name);
+  assert.equal(list.length,10);
+  assert.equal(list.filter(j=>j.editorial).length,1);
+ }
+ assert.equal(manifest.completeHumanReviewedChineseDescriptions,10);
+ assert.equal(jobs.jobs.filter(j=>j.editorial).length,10);
+ for(const job of jobs.jobs.filter(j=>j.editorial)){
+  assert.equal(job.editorial.verification,'official_page_read');
+  assert.ok(job.editorial.overview.length>30);
+  assert.ok(job.editorial.responsibilities.length>=3);
+  assert.ok(job.editorial.requirements.length>=3);
+  assert.ok(job.editorial.source.startsWith('https://'));
+ }
  console.log('HHBA_CURATED_OFFLINE_CONTRACT_OK',JSON.stringify({companies:companies.companies.length,jobs:jobs.jobs.length,platforms:[...new Set(jobs.jobs.map(j=>j.originalPlatform))],thirdPartyFullJDs:0}));
 });
 test('offline mode uses same-origin JSON, not overseas ATS, Railway, or live JD fetches',()=>{
