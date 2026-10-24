@@ -6,6 +6,8 @@ on:
     paths:
       - 'apps/web/src/data/domesticComplete200Target.json'
       - 'apps/web/src/data/domesticCompanyExpansion200Profiles.json'
+      - 'apps/web/src/data/domesticCompany200VerifiedEditorial.json'
+      - 'apps/web/src/services/domesticCompany200Data.ts'
       - 'apps/web/src/data/domesticRecruitment200Registry.json'
       - 'apps/web/src/data/domesticMedia200Bundle.json'
       - 'apps/web/src/components/DomesticCompanyResults.tsx'
