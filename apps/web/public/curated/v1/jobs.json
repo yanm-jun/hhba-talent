@@ -394,7 +394,7 @@
       "titleZh": "客户助理（旧金山）",
       "titleTranslation": "editorial_checked",
       "locationEn": "San Francisco",
-      "locationZh": "旧金山",
+      "locationZh": "美国 · 旧金山",
       "countryCode": "US",
       "cityKey": "san francisco",
       "education": null,
@@ -417,6 +417,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "与 OpenAI 大型企业客户团队合作，把早期使用信号和试点机会转化为成熟的企业销售项目。",
+        "responsibilities": [
+          "与客户总监制定客户战略与多利益相关方接触计划。",
+          "执行新客户外联和需求访谈，识别企业 AI 采用障碍。",
+          "构建 AI 辅助销售流程，跟踪客户商机和关键洞察。"
+        ],
+        "requirements": [
+          "四年以上企业销售或战略客户工作经验。",
+          "能与大型企业高管及技术买家有效沟通。",
+          "熟悉金融、生命科学等复杂行业或企业 AI 产品者更匹配。"
+        ],
+        "benefits": [
+          "旧金山混合办公，每周通常三天到岗，官网基本薪资 144,000—160,000 美元。"
+        ],
+        "originalSummary": "Archived employer role: Account Associate - SF. The complete original English posting is not reproduced and remains linked at the source.",
+        "source": "https://jobs.ashbyhq.com/openai/55f36629-8351-41d9-b2f5-3d63c5e26bf7"
       }
     },
     {
@@ -960,6 +981,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "面向东南亚数字原生企业开展 Claude 商业销售，帮助科技初创公司和成熟互联网平台集成 AI。",
+        "responsibilities": [
+          "管理从客户寻找、洽谈到正式部署的端到端销售周期。",
+          "建立适合东南亚不同市场的销售策略及合作模板。",
+          "与产品、方案和云渠道伙伴合作反馈本地客户需求。"
+        ],
+        "requirements": [
+          "十二年以上企业销售经验，熟悉东南亚数字原生业务生态。",
+          "能推进复杂商业谈判与多方决策销售。",
+          "相关本科学历或同等经历；具备 AI、API 或云产品销售背景者优先。"
+        ],
+        "benefits": [
+          "新加坡岗位，官网表示存在签证协助政策但不能保证每名候选人获批。"
+        ],
+        "originalSummary": "Archived employer role: Account Executive - DNB. The complete original English posting is not reproduced and remains linked at the source.",
+        "source": "https://job-boards.greenhouse.io/anthropic/jobs/5391376008"
       }
     },
     {
@@ -970,7 +1012,7 @@
       "titleZh": "新产品导入业务系统分析师",
       "titleTranslation": "editorial_checked",
       "locationEn": "San Francisco, CA | New York City, NY | Seattle, WA",
-      "locationZh": "旧金山 · 加利福尼亚州 | 纽约 · 纽约州 | 西雅图 · 华盛顿州",
+      "locationZh": "美国 · 旧金山／纽约／西雅图",
       "countryCode": "US",
       "cityKey": "san francisco",
       "education": null,
@@ -996,6 +1038,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责 Anthropic 新产品与定价的销售报价、合同、计费和财务系统上线准备。",
+        "responsibilities": [
+          "把定价设计转换成 SKU、价格表、折扣、合同及计费配置。",
+          "管理跨 Salesforce、税务和计费平台的上市计划及上线验收。",
+          "设计可复用的新产品导入清单和事后账单核对机制。"
+        ],
+        "requirements": [
+          "具有 Salesforce、报价到收款业务系统或相关产品导入经验。",
+          "理解使用量、席位、分层和承诺式定价的系统要求。",
+          "具备跨产品、法务、财务及销售团队协作的能力。"
+        ],
+        "benefits": [
+          "主要在旧金山、纽约或西雅图办公，其他待遇按官方岗位实际页面为准。"
+        ],
+        "originalSummary": "Archived employer role: Business Systems Analyst, New Product Introduction. The complete original English posting is not reproduced and remains linked at the source.",
+        "source": "https://job-boards.greenhouse.io/anthropic/jobs/5416829008"
       }
     },
     {
@@ -2789,7 +2852,7 @@
       "titleZh": "业务拓展代表",
       "titleTranslation": "editorial_checked",
       "locationEn": "Seoul, South Korea",
-      "locationZh": "地点待核验",
+      "locationZh": "韩国 · 工作地点待核验",
       "countryCode": null,
       "cityKey": null,
       "education": null,
@@ -2814,6 +2877,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责 Notion 韩国市场的业务拓展和潜在企业客户挖掘，推动客户认识 AI 协作工作空间。",
+        "responsibilities": [
+          "识别高意向企业账户并组织多渠道外联。",
+          "与销售和解决方案伙伴协作完成客户资格判断。",
+          "把客户需求和使用障碍反馈给市场拓展团队。"
+        ],
+        "requirements": [
+          "具有 B2B 客户拓展、销售线索管理或客户沟通能力。",
+          "理解软件工具及企业工作流需求。",
+          "具备当地市场沟通及多渠道外联能力者更匹配。"
+        ],
+        "benefits": [
+          "官网路径显示岗位面向韩国市场；详细地点及薪酬需在原始页面再次确认。"
+        ],
+        "originalSummary": "Archived employer role: Business Development Representative. The complete original English posting is not reproduced and remains linked at the source.",
+        "source": "https://jobs.ashbyhq.com/notion/759a9c5a-cdd6-4d05-8eaf-e78eabc34293"
       }
     },
     {
@@ -2824,7 +2908,7 @@
       "titleZh": "人工智能产品经理（增长营销）",
       "titleTranslation": "editorial_checked",
       "locationEn": "New York, New York",
-      "locationZh": "纽约",
+      "locationZh": "美国 · 纽约",
       "countryCode": "US",
       "cityKey": "new york",
       "education": null,
@@ -2847,6 +2931,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责 Notion 通过 AI Agent 优化付费增长投放和营销实验，以改善客户获取效率。",
+        "responsibilities": [
+          "建立付费营销渠道、用户群、创意测试和测量的协作体系。",
+          "使用 AI 自动化代理管理实验与优化增长策略。",
+          "分析地区、用户群和投放结果，制定预算与衡量标准。"
+        ],
+        "requirements": [
+          "具备增长营销、产品管理或营销技术相关经验。",
+          "理解付费获客、因果实验和用户质量指标。",
+          "有 AI Agent、数据分析和跨营销团队项目经验者更匹配。"
+        ],
+        "benefits": [
+          "纽约混合办公岗位，公开资料标示基本年薪约 191,000—225,000 美元。"
+        ],
+        "originalSummary": "Archived employer role: AI Product Manager, Growth Marketing. The complete original English posting is not reproduced and remains linked at the source.",
+        "source": "https://jobs.ashbyhq.com/notion/11e56782-ee28-4025-ba0e-76222b0bfcea"
       }
     },
     {
@@ -2967,7 +3072,7 @@
       "titleZh": "日语语言培训专员（合同制）",
       "titleTranslation": "editorial_checked",
       "locationEn": "Tokyo, Japan",
-      "locationZh": "东京 · 日本",
+      "locationZh": "日本 · 东京／可选远程",
       "countryCode": "JP",
       "cityKey": "tokyo",
       "education": null,
@@ -2990,6 +3095,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责 Notion 日语培训内容的本地化质量，确保课程及测验准确、自然并符合日本学习者的文化背景。",
+        "responsibilities": [
+          "审查日语培训翻译、术语、风格及文化适配。",
+          "维护语言风格指南、词汇表与 QA 流程。",
+          "协调学习管理系统和供应商处理内容、测验质量问题。"
+        ],
+        "requirements": [
+          "有日语本地化 QA 或 SaaS 技术课程翻译管理经验。",
+          "熟悉词汇表、风格指南、LMS 或在线培训制作工具。",
+          "擅长项目协调和细致校对。"
+        ],
+        "benefits": [
+          "官网说明为六个月兼职合同，可延长；每周约 20 小时。"
+        ],
+        "originalSummary": "Archived employer role: [Contract] Language Training Specialist - Japanese. The complete original English posting is not reproduced and remains linked at the source.",
+        "source": "https://jobs.ashbyhq.com/notion/f1f9e19d-cbf3-49eb-9824-d04adf2e3d75"
       }
     },
     {
@@ -3000,7 +3126,7 @@
       "titleZh": "商业成果架构师（客户成功）",
       "titleTranslation": "editorial_checked",
       "locationEn": "San Francisco, California",
-      "locationZh": "旧金山 · 加利福尼亚州",
+      "locationZh": "美国 · 旧金山",
       "countryCode": "US",
       "cityKey": "san francisco",
       "education": null,
@@ -3023,6 +3149,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "为 Notion 企业客户规划 AI 工作流落地、使用推广及客户价值提升。",
+        "responsibilities": [
+          "与企业客户制定成功计划并推动工作空间采用。",
+          "协同技术顾问处理客户实施、续约和扩张机会。",
+          "帮助客户设计能带来可衡量价值的工作流。"
+        ],
+        "requirements": [
+          "至少三年 B2B 软件采用、续约或客户成功相关经验。",
+          "能理解客户运营流程并调试 Notion 工作区。",
+          "具备跨客户团队协作及商业判断能力。"
+        ],
+        "benefits": [
+          "工作地点旧金山；具体薪酬以官方页面为准。"
+        ],
+        "originalSummary": "Archived employer role: Commercial Outcomes Architect (Customer Success). The complete original English posting is not reproduced and remains linked at the source.",
+        "source": "https://jobs.ashbyhq.com/notion/ff294bf0-7dc1-48d6-876d-25acc8de264e"
       }
     },
     {
@@ -3033,7 +3180,7 @@
       "titleZh": "业务拓展代表",
       "titleTranslation": "editorial_checked",
       "locationEn": "Sydney, Australia",
-      "locationZh": "悉尼 · 澳大利亚",
+      "locationZh": "澳大利亚 · 悉尼",
       "countryCode": "AU",
       "cityKey": "sydney",
       "education": null,
@@ -3058,6 +3205,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "面向澳大利亚企业客户开展 Notion 商业拓展，帮助潜在客户发现新的协作和 AI 工作流。",
+        "responsibilities": [
+          "通过电话、邮件、线上活动等方式开发潜在企业客户。",
+          "与销售团队定义客户需求并安排深入演示。",
+          "管理商机质量和市场反馈。"
+        ],
+        "requirements": [
+          "具备企业客户沟通及 B2B 销售拓展经验。",
+          "善于账户研究、商机判断和多渠道沟通。",
+          "理解企业协作工具及 AI 应用者更适配。"
+        ],
+        "benefits": [
+          "岗位位于澳大利亚悉尼，同名韩国岗位是不同招聘记录。"
+        ],
+        "originalSummary": "Archived employer role: Business Development Representative. The complete original English posting is not reproduced and remains linked at the source.",
+        "source": "https://jobs.ashbyhq.com/notion/a59ae31e-059e-4f6b-84a7-0fa9db88c72b"
       }
     },
     {
@@ -3122,7 +3290,7 @@
       "titleZh": "产品、工程与设计团队高管运营助理",
       "titleTranslation": "editorial_checked",
       "locationEn": "New York, New York",
-      "locationZh": "纽约",
+      "locationZh": "美国 · 纽约",
       "countryCode": "US",
       "cityKey": "new york",
       "education": null,
@@ -3145,6 +3313,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "为 Notion 的两位产品和工程领导提供行政及运营支持，确保高频工作安排顺畅。",
+        "responsibilities": [
+          "管理高管日程、会议、差旅和报销。",
+          "组织团队活动、会议记录与行动事项追踪。",
+          "协调产品与工程团队跨部门事项并改善运营流程。"
+        ],
+        "requirements": [
+          "五年以上快速成长企业高管运营经验。",
+          "具备高度组织性、保密意识及协调能力。",
+          "熟悉大型团队活动策划与行政项目管理。"
+        ],
+        "benefits": [
+          "纽约混合办公，通常周一、周二、周四到岗；官网基本年薪 165,000—190,000 美元。"
+        ],
+        "originalSummary": "Archived employer role: Executive Operations Partner - EPD (Executive Assistant). The complete original English posting is not reproduced and remains linked at the source.",
+        "source": "https://jobs.ashbyhq.com/notion/8ee34d10-ba59-44bb-b12c-0130e908810d"
       }
     },
     {
@@ -3328,7 +3517,7 @@
       "titleZh": "业务招聘专员（巴西圣保罗）",
       "titleTranslation": "editorial_checked",
       "locationEn": "São Paulo, Brazil",
-      "locationZh": "地点待核验",
+      "locationZh": "巴西 · 圣保罗",
       "countryCode": null,
       "cityKey": null,
       "education": null,
@@ -3353,6 +3542,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "在 Figma 巴西业务招聘团队负责跨领域招聘项目，支持高成长团队的人才引进。",
+        "responsibilities": [
+          "与招聘经理定义岗位需求和候选人评估标准。",
+          "组织候选人寻找、面试、评估和录用沟通。",
+          "利用招聘流程数据改善候选人体验和招聘周期。"
+        ],
+        "requirements": [
+          "具备企业内部招聘和人才寻访经验。",
+          "擅长人才评估、跨团队沟通和招聘流程管理。",
+          "有高速成长软件公司招聘或巴西本地人才市场知识更匹配。"
+        ],
+        "benefits": [
+          "岗位明确指向巴西圣保罗；具体年限与薪资仍需参考官方职位页面。"
+        ],
+        "originalSummary": "Archived employer role: Business Recruiter (São Paulo, Brazil). The complete original English posting is not reproduced and remains linked at the source.",
+        "source": "https://boards.greenhouse.io/figma/jobs/5832782004?gh_jid=5832782004"
       }
     },
     {
@@ -4092,7 +4302,7 @@
       "titleZh": "Spotify 技术商业客户经理",
       "titleTranslation": "editorial_checked",
       "locationEn": "London",
-      "locationZh": "伦敦",
+      "locationZh": "英国 · 伦敦",
       "countryCode": "GB",
       "cityKey": "london",
       "education": null,
@@ -4115,6 +4325,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "销售 Spotify Technology 的开发者软件产品，服务员工少于千人的成长型企业。",
+        "responsibilities": [
+          "开发新的商业 SaaS 客户，组织产品演示和商业谈判。",
+          "与销售工程伙伴推动 Backstage Portal、Confidence 等方案采用。",
+          "管理销售商机、签约进度和客户需求反馈。"
+        ],
+        "requirements": [
+          "具有 B2B 软件或开发者工具销售经验。",
+          "善于面向技术负责人解释产品收益和开发效率价值。",
+          "能独立管理销售目标及数周到数月的销售周期。"
+        ],
+        "benefits": [
+          "工作地点英国伦敦，与纽约同名岗位分别存档，不混用两地薪资。"
+        ],
+        "originalSummary": "Archived employer role: Account Executive - Commercial, Spotify Technology. The complete original English posting is not reproduced and remains linked at the source.",
+        "source": "https://jobs.lever.co/spotify/2d67c471-9015-41c0-a041-b982ec4a14fd"
       }
     },
     {
