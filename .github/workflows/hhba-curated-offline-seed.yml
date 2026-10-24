@@ -58,7 +58,7 @@ jobs:
           test -s apps/web/dist/index.html
           test -s apps/web/dist/curated/v1/jobs.json
           test -s apps/web/dist/curated/v1/companies.json
-          node --test apps/web/scripts/white-market-detail.contract.test.mjs
+          (cd apps/web && node --test scripts/white-market-detail.contract.test.mjs)
       - name: Install Playwright browser
         run: |
           npm install --no-save --no-package-lock --prefix apps/web playwright@1.56.1 --no-audit --no-fund
