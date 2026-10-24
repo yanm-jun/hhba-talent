@@ -125,7 +125,7 @@ export function CuratedJobDetail({user,jobId}:{user:User|null;jobId:string}){
       <p className="curated-caveat">以上是从曾公开的官方岗位资料保守提取的关键词，不构成完整任职要求。我们未保存或转载原始完整 JD。</p>
      </section>
      <section className="curated-detail-section"><h2>岗位职责与详细要求</h2>
-      <p>这份档案目前仅收录已经核验的结构化事实。官方完整职责和要求尚未取得可公开转载的使用依据，不能以猜测或 AI 编造填充。</p>
+      <p>岗位职责原文未收录。这份档案目前仅收录已经核验的结构化事实。官方完整职责和要求尚未取得可公开转载的使用依据，不能以猜测或 AI 编造填充。</p>
       <p>后续经合法授权或人工核实的岗位说明，才会作为正式编辑内容补充。</p>
      </section>
    </div><aside className="curated-detail-aside">
