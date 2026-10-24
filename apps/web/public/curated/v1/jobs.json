@@ -1452,6 +1452,30 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "该岗位属于爱彼迎房客与房东服务工程团队，重点建设与改善房东协作、房源管理等用户体验。工程经理需要带领软件团队交付新功能，同时兼顾长期架构的稳定性和扩展能力。",
+        "responsibilities": [
+          "与产品、设计和工程伙伴共同制定房东服务产品的方向，推动从构想到规模化上线。",
+          "安排研发优先级与功能发布节奏，管理短期交付和长期技术质量之间的平衡。",
+          "协调其他工程团队集成跨产品功能，推动基础技术能力建设。",
+          "招聘和培养软件工程师，通过定期沟通及职业发展规划提升团队能力。",
+          "建设包容、协作、重视工程质量和创新的团队文化。"
+        ],
+        "requirements": [
+          "官网要求至少 5 年工程管理经验，并具有 9 年以上相关软件开发行业经验。",
+          "深入了解面向大量消费者的后端系统和复杂数据建模。",
+          "能够面向技术与非技术受众清晰沟通，具备跨团队协作及合理取舍能力。"
+        ],
+        "benefits": [
+          "官网公布英国岗位年基本薪酬范围为 120,000—150,000 英镑。",
+          "岗位所在地为英国伦敦，可能另有奖金、股权、福利和员工旅行积分，具体以官方为准。"
+        ],
+        "originalSummary": "Lead the Guest & Host engineering team building hosting experiences; manage roadmap, technical tradeoffs, partnerships and engineering talent. Requires 5+ years in engineering management and 9+ years in software development.",
+        "source": "https://careers.airbnb.com/positions/7532824/?gh_jid=7532824"
       }
     },
     {
