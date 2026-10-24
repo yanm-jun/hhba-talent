@@ -35,16 +35,18 @@ test('local curated archive is self-contained, source-audited, and finite',()=>{
  for(const c of companies.companies){
   const list=jobs.jobs.filter(j=>j.company===c.name);
   assert.equal(list.length,10);
-  assert.ok(list.filter(j=>j.editorial).length>=1);
+  assert.equal(list.filter(j=>j.editorial).length,10);
  }
- assert.equal(manifest.completeHumanReviewedChineseDescriptions,22);
- assert.equal(jobs.jobs.filter(j=>j.editorial).length,22);
+ assert.equal(manifest.completeHumanReviewedChineseDescriptions,100);
+ assert.equal(jobs.jobs.filter(j=>j.editorial).length,100);
  for(const job of jobs.jobs.filter(j=>j.editorial)){
   assert.equal(job.editorial.verification,'official_page_read');
   assert.ok(job.editorial.overview.length>30);
   assert.ok(job.editorial.responsibilities.length>=3);
   assert.ok(job.editorial.requirements.length>=3);
   assert.ok(job.editorial.source.startsWith('https://'));
+  assert.equal(job.editorial.source,job.originalUrl);
+  assert.ok(job.editorial.benefits.length>0);
  }
  console.log('HHBA_CURATED_OFFLINE_CONTRACT_OK',JSON.stringify({companies:companies.companies.length,jobs:jobs.jobs.length,platforms:[...new Set(jobs.jobs.map(j=>j.originalPlatform))],thirdPartyFullJDs:0}));
 });
