@@ -2259,6 +2259,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "在德语区开发和维护专业房东合作关系，增加 Airbnb 住宿供给，覆盖德国、奥地利与瑞士。",
+        "responsibilities": [
+          "寻找新合作房东及专业房源，与伙伴沟通并推动上线。",
+          "制定区域房东引入计划，维护合作伙伴销售管道。",
+          "分析市场表现并与产品及政策等团队解决本地问题。"
+        ],
+        "requirements": [
+          "六年以上销售经验，具备 B2B 新客户拓展能力。",
+          "懂德语和英语，能够赴负责的德语区市场出差。",
+          "熟悉旅行、住宿行业及 CRM 软件者优先。"
+        ],
+        "benefits": [
+          "历史官网资料显示德国基本年薪约 71,000—84,000 欧元；同一职位网址后来出现过更名，现有开放状态未确认。"
+        ],
+        "originalSummary": "Airbnb archived role: Business Development Manager. Chinese editorial paraphrase from employer posting and historical source records.",
+        "source": "https://careers.airbnb.com/positions/7995153?gh_jid=7995153"
       }
     },
     {
@@ -2269,7 +2290,7 @@
       "titleZh": "产品高级分析负责人",
       "titleTranslation": "editorial_checked",
       "locationEn": "United States",
-      "locationZh": "美国",
+      "locationZh": "美国 · 远程（指定州）",
       "countryCode": "US",
       "cityKey": null,
       "education": "PHD",
@@ -2295,6 +2316,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "帮助爱彼迎房客端产品决策，使用实验、统计建模与数据分析评估功能效果。",
+        "responsibilities": [
+          "分析大型产品数据集、设计 A/B 实验和非随机因果推断。",
+          "与产品、工程和财务团队建立衡量产品成效的指标。",
+          "开发分析报告和工具，向管理层提供可执行建议。"
+        ],
+        "requirements": [
+          "定量专业学历和六年以上行业分析经验，硕士或博士加分。",
+          "有产品数据科学、统计试验设计和 Python／R、SQL 经验。",
+          "能跨部门交流分析成果并推动产品决策。"
+        ],
+        "benefits": [
+          "美国指定州远程，官网基本年薪 164,000—191,000 美元。"
+        ],
+        "originalSummary": "Airbnb archived role: Lead Advanced Analytics, Product. Chinese editorial paraphrase from employer posting and historical source records.",
+        "source": "https://careers.airbnb.com/positions/8080954?gh_jid=8080954"
       }
     },
     {
@@ -2328,6 +2370,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "向爱彼迎日本业务团队提供法规、消费者保护、营销及隐私等领域的法律支持。",
+        "responsibilities": [
+          "为业务拓展、公共政策和营销团队提供法律建议。",
+          "评估监管、竞争、雇佣、数据保护等风险及可行处理方案。",
+          "联动地区及全球法务成员，处理争议和执法机构问询。"
+        ],
+        "requirements": [
+          "必须持有日本律师（弁護士）资格，取得资格后至少两年工作经历。",
+          "日语达到母语水平、英语能专业工作。",
+          "具备跨国公司或初创公司法务经历者优先。"
+        ],
+        "benefits": [
+          "工作地点可在日本境内；关东以外人员通常每月赴东京办公室一至两次。"
+        ],
+        "originalSummary": "Airbnb archived role: Associate Legal Counsel, Japan. Chinese editorial paraphrase from employer posting and historical source records.",
+        "source": "https://careers.airbnb.com/positions/7789554?gh_jid=7789554"
       }
     },
     {
@@ -2361,6 +2424,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "帮助 Airbnb 在欧洲、中东、非洲、拉美和亚太市场提供符合当地需求的高质量产品设计体验。",
+        "responsibilities": [
+          "与产品经理、工程师和研究人员合作定义用户流程与视觉交互。",
+          "形成覆盖多个市场的产品设计方向并指导其他设计师。",
+          "将地区市场洞察转化为产品路线图和全球平台改善。"
+        ],
+        "requirements": [
+          "本科或同等经验，十二年以上设计或设计领导经历。",
+          "具备优秀视觉交互能力、系统思维与完整产品案例。",
+          "能够指导团队并影响高级利益相关方。"
+        ],
+        "benefits": [
+          "工作地点英国伦敦。"
+        ],
+        "originalSummary": "Airbnb archived role: Sr. Staff Experience Designer. Chinese editorial paraphrase from employer posting and historical source records.",
+        "source": "https://careers.airbnb.com/positions/7978040?gh_jid=7978040"
       }
     },
     {
@@ -2371,7 +2455,7 @@
       "titleZh": "采购创新与供应商项目副总监",
       "titleTranslation": "editorial_checked",
       "locationEn": "United States",
-      "locationZh": "美国",
+      "locationZh": "美国 · 远程（指定州）",
       "countryCode": "US",
       "cityKey": null,
       "education": null,
@@ -2394,6 +2478,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "管理 Airbnb 采购技术和供应商接入项目，改善从寻源到付款的运营及风险控制。",
+        "responsibilities": [
+          "协调第三方供应商准入、系统开户及供应商风险审查。",
+          "改进采购工具、采购自动化及供应商体验。",
+          "维护采购项目指标并协同财务科技、合规、采购运营部门。"
+        ],
+        "requirements": [
+          "商业、财务、供应链等相关专业背景。",
+          "八年以上采购项目或首选供应商管理经历。",
+          "具备供应商入驻、风险管理、采购系统及数据自动化经验。"
+        ],
+        "benefits": [
+          "美国远程职位，历史岗位基本年薪约 102,000—120,000 美元。"
+        ],
+        "originalSummary": "Airbnb archived role: Associate Principal, Procurement Innovation Supplier Programs. Chinese editorial paraphrase from employer posting and historical source records.",
+        "source": "https://careers.airbnb.com/positions/8231416?gh_jid=8231416"
       }
     },
     {
@@ -2404,7 +2509,7 @@
       "titleZh": "工程经理（房东房源与质量）",
       "titleTranslation": "editorial_checked",
       "locationEn": "United States",
-      "locationZh": "美国",
+      "locationZh": "美国 · 远程（指定州）",
       "countryCode": "US",
       "cityKey": null,
       "education": null,
@@ -2427,6 +2532,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "领导房东洞察平台工程团队，为房东提供关于收益、房源质量和经营改善的智能个性化建议。",
+        "responsibilities": [
+          "将房东洞察从批处理升级为实时、模型驱动系统。",
+          "与产品、设计和数据科学团队规划个性化建议排序及衡量方式。",
+          "指导资深工程师并审查关键代码及架构。"
+        ],
+        "requirements": [
+          "十年以上技术行业经验，五年以上工程管理经验。",
+          "深入理解后端、数据工程、机器学习平台和实时流处理。",
+          "有生产环境机器学习模型及大规模系统重构经历。"
+        ],
+        "benefits": [
+          "美国指定州远程，官网基本年薪 212,000—265,000 美元。"
+        ],
+        "originalSummary": "Airbnb archived role: Engineering Manager, Guest & Host (Host Listings & Quality). Chinese editorial paraphrase from employer posting and historical source records.",
+        "source": "https://careers.airbnb.com/positions/8238604?gh_jid=8238604"
       }
     },
     {
@@ -2462,6 +2588,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责 Airbnb 亚洲市场运营汇报、增长举措落地和跨部门项目跟踪，覆盖日韩、印度及东南亚。",
+        "responsibilities": [
+          "制定亚洲业务汇报、月度复盘和统一衡量口径。",
+          "推进区域促销及其他增长计划的跨部门执行。",
+          "分析区域竞争、经营数据并协调市场进入事项。"
+        ],
+        "requirements": [
+          "十年以上运营、战略、咨询或项目管理经验。",
+          "有跨多个国家开展项目、建设业务复盘制度的经历。",
+          "熟练使用 Excel 和 SQL，英语流利。"
+        ],
+        "benefits": [
+          "新加坡为工作基地，预计每周约三天办公室办公，并需定期亚洲出差。"
+        ],
+        "originalSummary": "Airbnb archived role: Business Operations and Growth Lead, Asia. Chinese editorial paraphrase from employer posting and historical source records.",
+        "source": "https://careers.airbnb.com/positions/8242459?gh_jid=8242459"
       }
     },
     {
@@ -2472,7 +2619,7 @@
       "titleZh": "产品经理（API 平台）",
       "titleTranslation": "editorial_checked",
       "locationEn": "United States",
-      "locationZh": "美国",
+      "locationZh": "美国 · 远程（指定州）",
       "countryCode": "US",
       "cityKey": null,
       "education": null,
@@ -2495,6 +2642,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "管理面向房东和开发者的 Airbnb API 平台，推动平台能力和伙伴集成。",
+        "responsibilities": [
+          "制定 API 平台产品战略、路线图和新功能优先级。",
+          "协调工程团队及客户经理提升开发者工具和伙伴采用。",
+          "为开发者和合作伙伴解释产品价值并组织发布。"
+        ],
+        "requirements": [
+          "八年以上产品管理或产品营销经验，其中三年以上开发者平台产品管理经历。",
+          "熟悉 API、开发者体验和技术合作伙伴产品。",
+          "具备跨部门推动产品上线及商业沟通能力。"
+        ],
+        "benefits": [
+          "官网归档薪资范围约 200,000—240,000 美元；能配合太平洋时间工作。"
+        ],
+        "originalSummary": "Airbnb archived role: Product Manager, API Platform. Chinese editorial paraphrase from employer posting and historical source records.",
+        "source": "https://careers.airbnb.com/positions/8262207?gh_jid=8262207"
       }
     },
     {
@@ -2505,7 +2673,7 @@
       "titleZh": "客户服务合作伙伴运营经理（普通话，马尼拉）",
       "titleTranslation": "editorial_checked",
       "locationEn": "Manila, Philippines",
-      "locationZh": "地点待核验",
+      "locationZh": "菲律宾 · 马尼拉",
       "countryCode": null,
       "cityKey": null,
       "education": null,
@@ -2533,6 +2701,28 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "通过管理外包服务合作伙伴，保障 Airbnb 普通话客户的服务质量和运营绩效。",
+        "responsibilities": [
+          "监督客服外包伙伴的服务质量、效率与绩效指标。",
+          "协调伙伴管理、外包运营及客户体验改善。",
+          "分析服务问题并推动流程整改和交付计划。"
+        ],
+        "requirements": [
+          "要求普通话和英语流利。",
+          "具备客户服务外包、伙伴运营或服务管理能力。",
+          "能够同时处理日常服务和多伙伴持续改进事务。"
+        ],
+        "benefits": [
+          "岗位可以设于新加坡、东京、首尔或马尼拉，马尼拉版本对应菲律宾地点。",
+          "官网明确不提供签证担保。"
+        ],
+        "originalSummary": "Airbnb archived role: Customer Service Partner Operations Manager, Mandarin Speaking (Manila Based). Chinese editorial paraphrase from employer posting and historical source records.",
+        "source": "https://careers.airbnb.com/positions/8172735?gh_jid=8172735"
       }
     },
     {
