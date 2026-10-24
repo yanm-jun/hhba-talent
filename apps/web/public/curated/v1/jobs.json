@@ -1117,7 +1117,7 @@
       "titleZh": "星链战略连接业务客户负责人",
       "titleTranslation": "editorial_checked",
       "locationEn": "Hawthorne, CA",
-      "locationZh": "地点待核验",
+      "locationZh": "美国 · 加利福尼亚州霍桑",
       "countryCode": "US",
       "cityKey": null,
       "education": null,
@@ -1140,6 +1140,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "对接星链企业战略连接客户，重点协调数字普惠和社会影响项目的长期交付。",
+        "responsibilities": [
+          "从签订合同到服务开通，协调客户激活与客户需求。",
+          "制定可持续的数字连接社会影响项目计划，协调内部和外部伙伴。",
+          "追踪客户满意度、合同义务及服务交付进展。"
+        ],
+        "requirements": [
+          "有客户管理、咨询、项目管理或合作伙伴运营经历。",
+          "具备复杂跨团队项目组织与外部客户沟通能力。",
+          "可接受关键项目期间延长工时以及国内外出差。"
+        ],
+        "benefits": [
+          "官网披露基本年薪 90,000—125,000 美元。"
+        ],
+        "originalSummary": "SpaceX role Account Lead, Starlink Strategic Connectivity. Consult the original employer link for the full English posting.",
+        "source": "https://boards.greenhouse.io/spacex/jobs/8585061002?gh_jid=8585061002"
       }
     },
     {
@@ -1150,7 +1171,7 @@
       "titleZh": "入门级印制电路板组装生产技术员",
       "titleTranslation": "editorial_checked",
       "locationEn": "Redmond, WA",
-      "locationZh": "地点待核验",
+      "locationZh": "美国 · 华盛顿州雷德蒙德",
       "countryCode": "US",
       "cityKey": "redmond",
       "education": null,
@@ -1173,6 +1194,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "星链印刷电路板组装生产技术员，负责电子板卡的自动化装配及测试。",
+        "responsibilities": [
+          "操作贴片、回流焊、涂覆和光学／X 光检查设备。",
+          "开展电子硬件热测试与功能测试，定位生产缺陷。",
+          "维护校准机器并记录不良类型，以数据持续改进质量。"
+        ],
+        "requirements": [
+          "高中或同等学历，至少一年动手工作经验或相关职业培训。",
+          "有高产量电子制造、焊接、测试和装配图纸阅读能力更佳。",
+          "熟悉 Windows、Office、ERP 等工具者更匹配。"
+        ],
+        "benefits": [
+          "官网标示小时工资等级区间依次为 22—26.50、25.50—31 和 29.50—37 美元。"
+        ],
+        "originalSummary": "SpaceX role (Entry Level) Production Technician - PCBA. Consult the original employer link for the full English posting.",
+        "source": "https://boards.greenhouse.io/spacex/jobs/8657538002?gh_jid=8657538002"
       }
     },
     {
@@ -1183,7 +1225,7 @@
       "titleZh": "业务运营分析师",
       "titleTranslation": "editorial_checked",
       "locationEn": "Bastrop, TX",
-      "locationZh": "地点待核验",
+      "locationZh": "美国 · 得克萨斯州巴斯特罗普",
       "countryCode": "US",
       "cityKey": null,
       "education": null,
@@ -1212,6 +1254,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "为星链供应链硬件项目开展单位成本分析，支持采购、工程和制造决策。",
+        "responsibilities": [
+          "构建应有成本模型并追踪产品单位成本、毛利、费用与资本开支。",
+          "与采购、工程、制造团队优化成本与性能取舍。",
+          "评价自动化、产能扩张、自制外包等重大投资方案。"
+        ],
+        "requirements": [
+          "工程、数学、计算机或其他定量专业本科学历。",
+          "至少一年制造、工程、运营、财务分析或咨询等经验。",
+          "至少一年 Excel 或编程经验；Python、SQL、建模为加分项。"
+        ],
+        "benefits": [
+          "需满足适用美国出口管制资格。"
+        ],
+        "originalSummary": "SpaceX role Business Operations Analyst. Consult the original employer link for the full English posting.",
+        "source": "https://boards.greenhouse.io/spacex/jobs/8761189002?gh_jid=8761189002"
       }
     },
     {
@@ -1222,7 +1285,7 @@
       "titleZh": "色彩、材料与表面处理设计师（星链）",
       "titleTranslation": "editorial_checked",
       "locationEn": "Bastrop, TX",
-      "locationZh": "地点待核验",
+      "locationZh": "美国 · 得克萨斯州巴斯特罗普",
       "countryCode": "US",
       "cityKey": null,
       "education": null,
@@ -1245,6 +1308,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "为星链硬件制定颜色、材料与表面处理设计，兼顾批量制造、耐久性和视觉体验。",
+        "responsibilities": [
+          "制定材料、色彩及表面处理设计方案与效果验证。",
+          "与设计、工程、制造和供应商团队实现可量产的 CMF 方案。",
+          "维护材料样本库，并推动原型到规模制造的品质一致性。"
+        ],
+        "requirements": [
+          "工业设计、产品设计、建筑等设计专业本科学历及一年以上 CMF 经验。",
+          "熟悉量产材料和 Photoshop、Illustrator、Blender 或 KeyShot 等工具。",
+          "需提供优秀视觉作品集；岗位不接受远程或混合办公。"
+        ],
+        "benefits": [
+          "要求在得克萨斯州奥斯汀地区现场工作，可能需搬迁。"
+        ],
+        "originalSummary": "SpaceX role CMF Designer - Color, Material, and Finish (Starlink). Consult the original employer link for the full English posting.",
+        "source": "https://boards.greenhouse.io/spacex/jobs/8570197002?gh_jid=8570197002"
       }
     },
     {
@@ -1255,7 +1339,7 @@
       "titleZh": "增材制造专员（星链研发）",
       "titleTranslation": "editorial_checked",
       "locationEn": "Bastrop, TX",
-      "locationZh": "地点待核验",
+      "locationZh": "美国 · 得克萨斯州巴斯特罗普",
       "countryCode": "US",
       "cityKey": null,
       "education": null,
@@ -1278,6 +1362,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "独立管理星链研发 3D 打印实验室，负责工业级增材制造设备、后处理和工艺优化。",
+        "responsibilities": [
+          "设置并操作 FDM、SLA、SLS 等工业打印机，管理打印参数。",
+          "负责去粉、去支撑、打磨、尺寸检查和设备保养维修。",
+          "编制 SOP、培训团队并向研发提出适合增材制造的设计建议。"
+        ],
+        "requirements": [
+          "高中或同等学历及一年以上硬件组装、设备维护或复杂机器操作经历。",
+          "有三年以上工业 3D 打印机操作、维护或故障排查经历者优先。",
+          "能够按需要加班、出差并完成体力作业，适用出口管制资格。"
+        ],
+        "benefits": [
+          "岗位位于得克萨斯州巴斯特罗普。"
+        ],
+        "originalSummary": "SpaceX role Additive Manufacturing Specialist (Starlink Development). Consult the original employer link for the full English posting.",
+        "source": "https://boards.greenhouse.io/spacex/jobs/8694545002?gh_jid=8694545002"
       }
     },
     {
@@ -1288,7 +1393,7 @@
       "titleZh": "空气动力学工程师（星舰）",
       "titleTranslation": "editorial_checked",
       "locationEn": "Starbase, TX",
-      "locationZh": "地点待核验",
+      "locationZh": "美国 · 得克萨斯州星城",
       "countryCode": "US",
       "cityKey": null,
       "education": null,
@@ -1314,6 +1419,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "模拟星舰从亚音速到高超音速的气动及热环境，支持飞行控制和箭体结构设计。",
+        "responsibilities": [
+          "准备、网格划分、运行并分析 CFD 流体仿真。",
+          "对比飞行后数据和飞行前预估，改进模拟准确性。",
+          "编写自动化分析脚本，向设计、控制团队解释气动力学结果。"
+        ],
+        "requirements": [
+          "工程相关本科学历。",
+          "航空航天或机械工程硕士、CFD 网格、Linux 和 Python／MATLAB 经验优先。",
+          "具有可压缩流体力学和风洞实验经验者更匹配。"
+        ],
+        "benefits": [
+          "需遵守美国 ITAR 出口管制规定。"
+        ],
+        "originalSummary": "SpaceX role Aerodynamics Engineer (Starship). Consult the original employer link for the full English posting.",
+        "source": "https://boards.greenhouse.io/spacex/jobs/8558715002?gh_jid=8558715002"
       }
     },
     {
@@ -1324,7 +1450,7 @@
       "titleZh": "星链战略连接业务客户负责人",
       "titleTranslation": "editorial_checked",
       "locationEn": "Bastrop, TX",
-      "locationZh": "地点待核验",
+      "locationZh": "美国 · 得克萨斯州巴斯特罗普",
       "countryCode": "US",
       "cityKey": null,
       "education": null,
@@ -1347,6 +1473,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "服务星链战略连接客户，重点实施可持续的社会影响连接项目。",
+        "responsibilities": [
+          "管理从签约到激活的客户交付流程。",
+          "组织社会影响项目、伙伴协作和面向客户的实施计划。",
+          "定期协调客户沟通、内部资源与合同目标。"
+        ],
+        "requirements": [
+          "有业务项目、合作伙伴管理或客户成功经验。",
+          "能够管理外部客户、复杂实施日程及不同利益相关方。",
+          "可根据任务需要出差、延长工时。"
+        ],
+        "benefits": [
+          "工作地点巴斯特罗普，年薪及其他条件按该职位官网为准。"
+        ],
+        "originalSummary": "SpaceX role Account Lead, Starlink Strategic Connectivity. Consult the original employer link for the full English posting.",
+        "source": "https://boards.greenhouse.io/spacex/jobs/8594962002?gh_jid=8594962002"
       }
     },
     {
@@ -1357,7 +1504,7 @@
       "titleZh": "制造专员（星舰筒段生产）",
       "titleTranslation": "editorial_checked",
       "locationEn": "Starbase, TX",
-      "locationZh": "地点待核验",
+      "locationZh": "美国 · 得克萨斯州星城",
       "countryCode": "US",
       "cityKey": null,
       "education": "HIGH_SCHOOL",
@@ -1383,6 +1530,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "改善星舰筒段和贮箱主结构生产线的质量、可靠性和效率，负责根因调查与防错措施。",
+        "responsibilities": [
+          "针对生产故障、质量缺陷及停机开展 5 Why、鱼骨图等根因分析。",
+          "与工程师合作减少返工并优化产线利用率。",
+          "验证现场安全、流程符合性和持续改进措施的有效性。"
+        ],
+        "requirements": [
+          "高中学历加两年动手制造经验，或工程、数学、科学类本科学历。",
+          "有制造改善、激光焊接、精益工具、Excel 或 SQL 分析经验者优先。",
+          "可能需要倒班、加班、登高和短期出差。"
+        ],
+        "benefits": [
+          "工作地点得克萨斯州星城；需满足适用出口管制条件。"
+        ],
+        "originalSummary": "SpaceX role Build Specialist, Barrel Production (Starship). Consult the original employer link for the full English posting.",
+        "source": "https://boards.greenhouse.io/spacex/jobs/8686807002?gh_jid=8686807002"
       }
     },
     {
@@ -1393,7 +1561,7 @@
       "titleZh": "业务运营分析师（星链航空）",
       "titleTranslation": "editorial_checked",
       "locationEn": "Woodinville, WA",
-      "locationZh": "地点待核验",
+      "locationZh": "美国 · 华盛顿州伍丁维尔",
       "countryCode": "US",
       "cityKey": null,
       "education": null,
@@ -1418,6 +1586,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "支持星链航空商业与政府业务，通过运营分析和指标体系改善管理决策。",
+        "responsibilities": [
+          "建设跨工程、生产、测试、库存和供应链的指标看板。",
+          "发现运营瓶颈，针对成本和资源配置提出建议。",
+          "使用 Excel、可视化和演示工具向管理层解释复杂数据。"
+        ],
+        "requirements": [
+          "商业、工程、数学、经济或 STEM 本科学历。",
+          "至少三年战略咨询、投资银行或运营领域相关工作经历。",
+          "高级 Excel、数据看板和 PowerPoint 技能优先。"
+        ],
+        "benefits": [
+          "官网公布一级基本年薪 85,000—100,000 美元，二级 95,000—120,000 美元。"
+        ],
+        "originalSummary": "SpaceX role Business Operations Analyst (Starlink Aviation). Consult the original employer link for the full English posting.",
+        "source": "https://boards.greenhouse.io/spacex/jobs/8547926002?gh_jid=8547926002"
       }
     },
     {
