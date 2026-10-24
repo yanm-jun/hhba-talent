@@ -54,7 +54,7 @@ export function CandidateAccountDropdown(){
    onClick={event=>setOpen(event.detail>0?!pointerWasOpen.current:true)}>
    <UserRound size={15} aria-hidden="true"/><span>个人中心</span><ChevronDown size={13} aria-hidden="true"/>
   </button>
-  {open&&<nav id={id} className="hhba-account-dropdown-panel" aria-label="个人中心快速导航">
+  {open&&<div id={id} role="navigation" className="hhba-account-dropdown-panel" aria-label="个人中心快速导航">
     <header className="hhba-account-dropdown-heading">
      <strong>个人中心</strong><UserRound size={16} aria-hidden="true"/>
     </header>
@@ -65,12 +65,12 @@ export function CandidateAccountDropdown(){
        <Icon size={16} strokeWidth={1.8} aria-hidden="true"/>
        <span className="hhba-account-dropdown-copy">
         <strong>{label}</strong>
-        <small>{'description' in rest?rest.description:path}</small>
+        {'description' in rest&&<small>{rest.description}</small>}
        </span>
        <ChevronRight size={15} aria-hidden="true" className="hhba-account-dropdown-chevron"/>
       </Link>)}
     </div>
     <p className="hhba-account-dropdown-footnote">法律援助尚未开放材料提交，切勿上传个人敏感证据。</p>
-   </nav>}
+   </div>}
  </div>;
 }
