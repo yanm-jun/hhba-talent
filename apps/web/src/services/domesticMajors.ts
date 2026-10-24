@@ -2,7 +2,7 @@ import { getDomesticCompanies, type DomesticCompany } from './domesticCompanySea
 import higherCatalog from '../data/officialAcademicMajors.json';
 import vocationalCatalog from '../data/officialVocationalMajors.json';
 import verifiedProfiles from '../data/domesticCareerProfiles.json';
-import additionalProfiles from '../data/domesticCompanyExpansion200Profiles.json';
+import {domestic200Profiles as additionalProfiles} from './domesticCompany200Data';
 const allReviewedProfiles={...verifiedProfiles,...additionalProfiles};
 
 export type MajorLevel='undergraduate'|'vocational'|'postgraduate'|'legacy'|'custom';
