@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "reviewedOn": "2026-10-24",
+  "policy": "Add only confirmed employer recruitment destinations. Generic company homepages are never recruitment sites.",
+  "entries": {
+    "吉利汽车": {
+      "url": "https://www.geelyautogroup.com/recruitment",
+      "evidenceUrl": "https://www.geelyautogroup.com/recruitment",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "吉利汽车集团官网招聘（社招／校招）",
+      "recruitmentEntity": "吉利汽车",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_recruitment_page_or_employer_announcement",
+      "notes": "此处链接为已定位的企业招聘频道，具体岗位开放、校招/社招时间及招聘法人应以页面为准。"
+    },
+    "理想汽车": {
+      "url": "https://www.lixiang.com/employ/campus/list.html?fromJob=1&employchannelcode=H56UNDK&job_mode=1",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/116875.html",
+      "kind": "official_recruitment_portal",
+      "availability": "campus_only",
+      "label": "理想汽车2027校园招聘",
+      "recruitmentEntity": "理想汽车",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_recruitment_page_or_employer_announcement",
+      "notes": "此处链接为已定位的企业招聘频道，具体岗位开放、校招/社招时间及招聘法人应以页面为准。"
+    },
+    "蔚来汽车": {
+      "url": "https://campus.nio.com/",
+      "evidenceUrl": "https://campus.nio.com/",
+      "kind": "official_recruitment_portal",
+      "availability": "campus_only",
+      "label": "蔚来校园招聘",
+      "recruitmentEntity": "蔚来汽车",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_recruitment_page_or_employer_announcement",
+      "notes": "此处链接为已定位的企业招聘频道，具体岗位开放、校招/社招时间及招聘法人应以页面为准。"
+    },
+    "零跑汽车": {
+      "url": "https://leapmotor.zhiye.com/",
+      "evidenceUrl": "https://leapmotor.zhiye.com/",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "零跑汽车校招／社招／实习",
+      "recruitmentEntity": "零跑汽车",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_recruitment_page_or_employer_announcement",
+      "notes": "此处链接为已定位的企业招聘频道，具体岗位开放、校招/社招时间及招聘法人应以页面为准。"
+    },
+    "OPPO": {
+      "url": "https://careers.oppo.com/",
+      "evidenceUrl": "https://careers.oppo.com/",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "OPPO社会招聘／校园招聘",
+      "recruitmentEntity": "OPPO",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_recruitment_page_or_employer_announcement",
+      "notes": "此处链接为已定位的企业招聘频道，具体岗位开放、校招/社招时间及招聘法人应以页面为准。"
+    },
+    "荣耀": {
+      "url": "https://www.honor.com/cn/career/",
+      "evidenceUrl": "https://www.honor.com/cn/career/",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "荣耀招聘官网",
+      "recruitmentEntity": "荣耀",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_recruitment_page_or_employer_announcement",
+      "notes": "此处链接为已定位的企业招聘频道，具体岗位开放、校招/社招时间及招聘法人应以页面为准。"
+    },
+    "百度": {
+      "url": "https://talent.baidu.com/jobs/",
+      "evidenceUrl": "https://talent.baidu.com/jobs/",
+      "kind": "official_recruitment_portal",
+      "availability": "campus_only",
+      "label": "百度校园与实习招聘",
+      "recruitmentEntity": "百度",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_recruitment_page_or_employer_announcement",
+      "notes": "此处链接为已定位的企业招聘频道，具体岗位开放、校招/社招时间及招聘法人应以页面为准。"
+    }
+  }
+}
