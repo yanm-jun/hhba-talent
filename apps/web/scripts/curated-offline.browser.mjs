@@ -11,7 +11,11 @@ const preventOverseas=page=>page.route('**/*',route=>{
 try{
  const page=await browser.newPage({viewport:{width:1440,height:920}});
  await preventOverseas(page);
- await page.goto(base,{waitUntil:'domcontentloaded'});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>console.log('OFFLINE_REQUEST_FAILED',r.url(),r.failure()?.errorText));
+ const response=await page.goto(base,{waitUntil:'domcontentloaded'});
+ await page.waitForTimeout(2800);
+ console.log('OFFLINE_PAGE_DEBUG',JSON.stringify({http:response?.status(),url:page.url(),body:(await page.locator('body').innerText()).slice(0,1200),errors,curated:await page.locator('.curated-market').count()}));
+ await page.screenshot({path:'curated-review/home-debug.png',fullPage:true});
  await page.locator('.curated-job-card').first().waitFor({timeout:15000});
  if(await page.locator('.curated-job-card').count()!==6)throw Error('HOME_OFFLINE_CARDS_MISSING');
  await page.screenshot({path:'curated-review/home-desktop.png',fullPage:true});
