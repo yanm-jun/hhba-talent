@@ -55,9 +55,6 @@ export function CandidateAccountDropdown(){
    <UserRound size={15} aria-hidden="true"/><span>个人中心</span><ChevronDown size={13} aria-hidden="true"/>
   </button>
   {open&&<div id={id} role="navigation" className="hhba-account-dropdown-panel" aria-label="个人中心快速导航">
-    <header className="hhba-account-dropdown-heading">
-     <strong>个人中心</strong><UserRound size={16} aria-hidden="true"/>
-    </header>
     <div className="hhba-account-dropdown-links">
      {CANDIDATE_ACCOUNT_LINKS.map(({label,path,Icon,...rest})=><Link
        to={path} key={path} className="hhba-account-dropdown-item"
