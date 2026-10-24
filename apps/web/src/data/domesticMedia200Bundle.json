@@ -52,13 +52,6 @@
       },
       "photos": []
     },
-    "东风汽车": {
-      "brand": {
-        "state": "missing",
-        "classification": "identity_not_yet_verified"
-      },
-      "photos": []
-    },
     "北京汽车": {
       "brand": {
         "state": "missing",
@@ -697,6 +690,13 @@
       "photos": []
     },
     "万科企业": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "东风汽车集团": {
       "brand": {
         "state": "missing",
         "classification": "identity_not_yet_verified"
