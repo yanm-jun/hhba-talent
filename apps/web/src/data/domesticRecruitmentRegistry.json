@@ -1195,6 +1195,20 @@
       "verifiedBy": "official_website_navigation_link_only",
       "aliases": [],
       "notes": "官网导航可找到招聘岗位栏目；细节页打开失败，尚未证实岗位当前开放和网页可用性，不能当作已验收的网申入口。"
+    },
+    "拓斯达": {
+      "url": "https://www.topstarltd.com/lang-cn/recruitinglist/006002003.html",
+      "evidenceUrl": "https://www.topstarltd.com/lang-cn/recruitinglist/006002003.html",
+      "kind": "official_recruitment_portal",
+      "availability": "campus_only",
+      "label": "拓斯达官网校园招聘岗位列表",
+      "recruitmentEntity": "拓斯达",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "official_first_party_company_jobs_list_visible",
+      "aliases": [
+        "广东拓斯达科技股份有限公司"
+      ],
+      "notes": "拓斯达官网「联系我们—人才招聘—校园招聘」的直接职位列表；官网亦提供社会招聘栏目。岗位是否仍可投以网页实时显示为准，不等于集团其他企业招聘。"
     }
   }
 }
