@@ -471,7 +471,7 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
         <p className="unified-jd-source">{lang==='zh'?'岗位资料快照：':'Archived job snapshot: '}{formatDate(job.observedAt)}</p>
         {job.editorial?<>
           <p className="unified-jd-machine-notice">{lang==='zh'?
-            '以下是根据官方职位页面逐项核对后撰写的中文说明，非官网逐字转载；请以企业原始页面为准。':
+            '以下为根据公开招聘资料整理的中文说明，不是官网逐字或逐段完整译文；部分历史链接可能已更新，请以企业官网为准。':
             'Editorial summary based on the employer listing, not a verbatim reproduction.'}</p>
           {lang==='zh'?<>
             <section className="unified-jd-section"><h3>职位介绍</h3><p>{job.editorial.overview}</p></section>
