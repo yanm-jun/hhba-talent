@@ -12,6 +12,9 @@ on:
       - 'apps/web/src/components/Shell.tsx'
       - 'apps/web/src/components/CandidateAccountDropdown.tsx'
       - 'apps/web/src/pages/LegalAidLandingPage.tsx'
+      - 'apps/web/src/pages/LegalAidTopicPage.tsx'
+      - 'apps/web/src/data/laborRightsTopics.json'
+      - 'apps/web/scripts/audit-labor-rights-topics.mjs'
       - 'apps/web/src/pages/PersonalCenterPage.tsx'
       - 'apps/web/src/styles/candidate-account-dropdown.css'
       - 'apps/web/src/styles/legal-aid-landing.css'
@@ -59,6 +62,7 @@ jobs:
         run: |
           node scripts/audit-domestic-company200.mjs
           node scripts/company200-integration.contract.test.mjs
+          node scripts/audit-labor-rights-topics.mjs
       - name: Build original HHBA job market plus additive 200-company discovery
 
         working-directory: apps/web
@@ -246,7 +250,7 @@ jobs:
             const visible=await topics.locator('span').allTextContents();
             if(visible.join('|')!==labels.join('|'))throw Error('LEGAL_AID_TOPIC_ORDER '+visible.join('|'));
             await legal.getByText('功能筹备中',{exact:true}).waitFor({timeout:6000});
-            await legal.getByText('服务尚未开放 · 暂不接受案件及证据材料').waitFor({timeout:6000});
+            await legal.getByText('8 类法律知识与公开案例已开放查询 · 个案受理和证据提交仍未开放').waitFor({timeout:6000});
             if(await page.locator('input, textarea, form, button[type="submit"]').count()!==0)
               throw Error('LEGAL_AID_PREVIEW_MUST_NOT_COLLECT_DATA');
             if(await legal.locator('.hhba-law-hero, .hhba-law-method, .hhba-law-issue-card').count()!==0)
@@ -265,6 +269,31 @@ jobs:
             if(!tabletTopic0||!tabletTopic1||Math.abs(tabletTopic0.y-tabletTopic1.y)>2||tabletOverflow)
               throw Error('LEGAL_AID_752PX_REFERENCE_LAYOUT_FAILED');
             await page.screenshot({path:'preview-reports/candidate-menu/legal-aid-minimal-752px-reference.png',fullPage:true});
+            // Click every topic and verify it has independent law, evidence,
+            // procedural information and a court-published case outcome.
+            const slugs=['unpaid-wages','unlawful-dismissal','overtime-leave','labor-contracts',
+              'social-insurance','work-injury','transfer-paycuts','flexible-work'];
+            for(let i=0;i<slugs.length;i++){
+              await page.goto(origin+'/candidate/account/legal-aid',{waitUntil:'domcontentloaded',timeout:35000});
+              const link=page.locator('.hhba-law-topic').nth(i);
+              await link.click();
+              await page.locator('.hhba-law-article-heading h1').waitFor({timeout:12000});
+              if(new URL(page.url()).pathname!==('/hhba-talent/candidate/account/legal-aid/'+slugs[i]))
+                throw Error('LEGAL_TOPIC_ROUTING_FAILED '+slugs[i]);
+              const proofCount=await page.locator('.hhba-law-proof').count();
+              const lawCount=await page.locator('.hhba-law-law').count();
+              const paths=await page.locator('.hhba-law-path').count();
+              const citedCase=page.locator('.hhba-law-case-link');
+              const linkHref=await citedCase.getAttribute('href');
+              if(proofCount<3||lawCount<2||paths<3||!linkHref?.startsWith('https://www.court.gov.cn/'))
+                throw Error('LEGAL_GUIDE_NOT_COMPLETE '+slugs[i]);
+              if(await page.locator('form,input,textarea,input[type="file"],button[type="submit"]').count())
+                throw Error('UNLAUNCHED_LEGAL_INTAKE_FOUND '+slugs[i]);
+              await page.locator('.hhba-law-case dd').nth(1).waitFor({timeout:5000});
+              if(i===0||i===3)
+                await page.screenshot({path:'preview-reports/candidate-menu/legal-guide-'+slugs[i]+'.png',fullPage:true});
+            }
+            console.log('HHBA_EIGHT_LEGAL_GUIDES_BROWSER_OK',JSON.stringify({guides:8,allHaveLaws:true,evidence:true,paths:true,realCases:true,noUploads:true}));
             console.log('HHBA_LEGAL_AID_DESKTOP_OK',JSON.stringify({topics:8,desktopPanelWidth:panel.width,tabletTwoColumns:true,previewOnly:true}));
             // Preserve the original job market when entering and leaving the account menu.
             await page.goto(origin+'/',{waitUntil:'domcontentloaded'});
@@ -295,6 +324,15 @@ jobs:
             if(mobileMeasures.page>mobileMeasures.viewport+2)
               throw Error('LEGAL_MOBILE_HORIZONTAL_OVERFLOW '+JSON.stringify(mobileMeasures));
             await mobile.screenshot({path:'preview-reports/candidate-menu/legal-aid-minimal-mobile.png',fullPage:true});
+            await mobile.locator('.hhba-law-topic').first().click();
+            await mobile.getByRole('heading',{name:'拖欠工资',exact:true}).first().waitFor({timeout:14000});
+            const detailWidth=await mobile.evaluate(()=>({
+              viewport:document.documentElement.clientWidth,
+              page:document.documentElement.scrollWidth
+            }));
+            if(detailWidth.page>detailWidth.viewport+2)
+              throw Error('LEGAL_DETAIL_MOBILE_OVERFLOW '+JSON.stringify(detailWidth));
+            await mobile.screenshot({path:'preview-reports/candidate-menu/legal-guide-mobile.png',fullPage:true});
             console.log('HHBA_LEGAL_AID_MOBILE_OK',JSON.stringify({...mobileMeasures,previewOnly:true}));
             console.log('HHBA_CANDIDATE_ACCOUNT_MENU_OK',JSON.stringify({
               sevenPathsVerified:true,hover:true,escape:true,keyboardFocus:true,
