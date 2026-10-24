@@ -196,6 +196,9 @@ jobs:
               const url=await link.getAttribute('href');
               if(url!==('/hhba-talent'+path))throw Error('BAD_MENU_LINK '+label+': '+url);
             }
+            await menu.getByRole('link',{name:/工作台/}).hover();
+            await menu.waitFor({timeout:4000});
+            if(await links.count()!==7)throw Error('HOVER_MOVEMENT_CLOSED_MENU');
             await page.screenshot({path:'preview-reports/candidate-menu/desktop-hover-dropdown.png',fullPage:false});
             await page.keyboard.press('Escape');
             if(await menu.count()!==0||await trigger.getAttribute('aria-expanded')!=='false')
