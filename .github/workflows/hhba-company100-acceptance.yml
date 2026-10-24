@@ -17,7 +17,7 @@ permissions:
 jobs:
   company100:
     if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'feat/domestic-company100-20261024')
-    name: Verify 100 profiles and collect source-labelled company screenshots
+    name: Verify 100 profiles and source-labelled company screenshots
     runs-on: ubuntu-latest
     timeout-minutes: 28
     steps:
@@ -32,69 +32,36 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - name: Install existing HHBA web dependencies
         run: npm ci --prefix apps/web --no-audit --no-fund
-      - name: Validate existing app and 100 enterprise source records
+      - name: Verify full hundred profiles, binary availability, and web build
         working-directory: apps/web
         run: |
           node --check scripts/capture-company100-homepage-screenshots.mjs
           node scripts/audit-domestic-company100.mjs
           npm run build
-      - name: Detect whether this commit changes media acquisition logic
-        id: media_gate
+      - name: Detect if this exact source commit requests browser capture
+        id: capture_gate
         shell: bash
         run: |
-          if git show --format= --name-only HEAD | grep -q '^apps/web/scripts/capture-company100-homepage-screenshots.mjs
-        run: |
-          npm install --prefix apps/web --no-save --no-package-lock playwright@1.56.0 sharp@0.34.4 --no-audit --no-fund
-          cd apps/web && npx playwright install chromium --with-deps
-      - name: Capture company-site screenshots with explicit labels, no fake buildings
-        if: steps.media_gate.outputs.capture == 'true'
-        working-directory: apps/web
-        run: node scripts/capture-company100-homepage-screenshots.mjs
-      - name: Run complete enterprise quality check again
-        working-directory: apps/web
-        run: |
-          node scripts/audit-domestic-company100.mjs
-          npm run build
-      - name: Save complete 100-enterprise evidence and image capture report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: hhba-company100-qa
-          retention-days: 30
-          path: |
-            apps/web/preview-reports/company100-quality.json
-            apps/web/preview-reports/company100-screenshot-capture.json
-      - name: Commit only isolated company image files and evidence metadata
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f apps/web/src/data/domesticCareerProfiles.json apps/web/src/data/domesticMediaBundle.json
-          git add -f apps/web/public/domestic-media/company100-* || true
-          if ! git diff --cached --quiet; then
-            git commit -m "assets(company100): preserve sourced official website screenshots as unreviewed visual references"
-            git push origin HEAD:refs/heads/feat/domestic-company100-20261024
-          fi
-; then
+          if git show --format= --name-only HEAD | grep -q '^apps/web/scripts/capture-company100-homepage-screenshots.mjs$'; then
             echo "capture=true" >> "$GITHUB_OUTPUT"
           else
             echo "capture=false" >> "$GITHUB_OUTPUT"
           fi
-      - name: Install isolated Playwright and WebP converter (no manifest changes)
-        if: steps.media_gate.outputs.capture == 'true'
+      - name: Install isolated browser and screenshot codecs
+        if: steps.capture_gate.outputs.capture == 'true'
         run: |
           npm install --prefix apps/web --no-save --no-package-lock playwright@1.56.0 sharp@0.34.4 --no-audit --no-fund
           cd apps/web && npx playwright install chromium --with-deps
-      - name: Capture company-site screenshots with explicit labels, no fake buildings
+      - name: Capture only first-party, source-labeled company screenshots
+        if: steps.capture_gate.outputs.capture == 'true'
         working-directory: apps/web
         run: node scripts/capture-company100-homepage-screenshots.mjs
-      - name: Run complete enterprise quality check again
+      - name: Validate screenshot metadata after acquisition
         working-directory: apps/web
         run: |
           node scripts/audit-domestic-company100.mjs
           npm run build
-      - name: Save complete 100-enterprise evidence and image capture report
+      - name: Upload company evidence and summary
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -103,7 +70,8 @@ jobs:
           path: |
             apps/web/preview-reports/company100-quality.json
             apps/web/preview-reports/company100-screenshot-capture.json
-      - name: Commit only isolated company image files and evidence metadata
+      - name: Persist only company media files from this source branch
+        if: steps.capture_gate.outputs.capture == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -112,6 +80,6 @@ jobs:
           git add -f apps/web/src/data/domesticCareerProfiles.json apps/web/src/data/domesticMediaBundle.json
           git add -f apps/web/public/domestic-media/company100-* || true
           if ! git diff --cached --quiet; then
-            git commit -m "assets(company100): preserve sourced official website screenshots as unreviewed visual references"
+            git commit -m "assets(company100): save first-party screenshots and pending logo candidates"
             git push origin HEAD:refs/heads/feat/domestic-company100-20261024
           fi
