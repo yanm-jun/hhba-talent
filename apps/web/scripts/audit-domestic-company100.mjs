@@ -17,12 +17,15 @@ const rows=names.map((name,i)=>{
  const p=profiles[name]||{},r=registry[name],m=media[name];
  const descChars=Array.isArray(p.description)?p.description.join('').length:0;
  const logoReady=m?.brand?.state==='ready'&&mediaExists(m.brand.path);
+ const logoIdentityChecked=logoReady&&['official_logo_visually_verified','user_provided_logo_confirmed'].includes(p.brandAssetStatus);
+ const photoAlignment=(m?.photos||[]).every((asset,i)=>asset?.state!=='ready'||(p.photos?.[i]?.localPath===asset.path&&mediaExists(asset.path)));
+ const physicalPhotoReady=(m?.photos||[]).some((asset,i)=>asset?.state==='ready'&&mediaExists(asset.path)&&['headquarters','office','factory'].includes(p.photos?.[i]?.kind)&&p.photos?.[i]?.kind!=='screenshot'&&['official_site_caption_and_visual_inspection','reviewed_named_corporate_building_image_with_source','visually_attributed_to_exact_company_official_site_pending_reuse_clearance'].includes(p.photos?.[i]?.verification));
  const imageReady=(m?.photos||[]).some(z=>z?.state==='ready'&&mediaExists(z.path));
  const majors=Array.isArray(p.majorSlugs)?p.majorSlugs:[];
  return {
   number:i+1,cohort:i<50?1:2,name,profile:!!profiles[name],descriptionChars:descChars,
   industry:!!(p.primaryIndustry||p.industry||p.subtitle),majors:majors.length,
-  logoReady:!!logoReady,imageReady:!!imageReady,
+  logoReady:!!logoReady,logoIdentityChecked:!!logoIdentityChecked,imageReady:!!imageReady,physicalPhotoReady:!!physicalPhotoReady,photoAlignment,
   logoConfirmed:['official_logo_visually_verified','user_provided_logo_confirmed'].includes(p.brandAssetStatus),
   exactRecruitment:!!r&&r.recruitmentEntity===name&&r.kind==='official_recruitment_portal'&&r.availability!=='unconfirmed_runtime',
   recruitmentRegistered:!!r,recruitmentStatus:r?.availability||'missing',
@@ -37,6 +40,9 @@ for(const row of rows){
  assert(row.descriptionChars>=280,'Insufficient source narrative '+row.name);
  assert(row.majors>=4,'Insufficient linked majors '+row.name);
  assert(row.industry,'Industry absent '+row.name);
+ assert(row.photoAlignment,'Media/photo path mismatch '+row.name);
+ if(row.logoReady)assert(media[row.name].brand.path===p.brandLocalPath,'Brand path mismatch '+row.name);
+ if(p.brandAssetStatus==='official_logo_rejected_mismatch')assert(!row.logoReady,'Rejected logo must not display '+row.name);
  const p=profiles[row.name];
  const manifest=media[row.name]||{};
  for(const asset of [manifest.brand,...(manifest.photos||[])])
@@ -56,6 +62,10 @@ const metrics={
  recruitmentRegistered:rows.filter(x=>x.recruitmentRegistered).length,
  recruitmentMissing:rows.filter(x=>!x.recruitmentRegistered).map(x=>x.name),
  logoReady:rows.filter(x=>x.logoReady).length,
+ logoIdentityChecked:rows.filter(x=>x.logoIdentityChecked).length,
+ missingLogo:rows.filter(x=>!x.logoReady).map(x=>x.name),
+ missingSceneOrScreenshot:rows.filter(x=>!x.imageReady).map(x=>x.name),
+ physicalOfficeFactoryPhotos:rows.filter(x=>x.physicalPhotoReady).length,
  photosOrScreenshotsReady:rows.filter(x=>x.imageReady).length,
  completeWithAllSixChecks:rows.filter(x=>x.complete&&x.logoConfirmed).length,
  firstCohort:{size:50,logoReady:rows.slice(0,50).filter(x=>x.logoReady).length,photoReady:rows.slice(0,50).filter(x=>x.imageReady).length},
