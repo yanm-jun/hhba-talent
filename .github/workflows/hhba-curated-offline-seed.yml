@@ -30,7 +30,7 @@ jobs:
           run-id: 40075821720
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: apps/web/source-artifact
-      - name: Select 10 companies and 150 source-backed historical job facts
+      - name: Select 10 companies and 100 source-backed historical job facts
         if: ${{ hashFiles('apps/web/public/curated/v1/manifest.json') == '' }}
         working-directory: apps/web
         run: node scripts/seed-curated-offline.mjs source-artifact public/curated/v1
