@@ -5,7 +5,7 @@ import {Link,getCompanyReturnTarget} from '../router';
 import {getDomesticCompanies,getDomesticRecruitment,companyById,findParentCompany,findRelatedCompanies} from '../services/domesticCompanySearch';
 import {matchingMajors} from '../services/domesticMajors';
 import profiles from '../data/domesticCareerProfiles.json';
-import additionalProfiles from '../data/domesticCompanyExpansion200Profiles.json';
+import {domestic200Profiles as additionalProfiles} from '../services/domesticCompany200Data';
 import bundled from '../data/domesticMediaBundle.json';
 import additionalMedia from '../data/domesticMedia200Bundle.json';
 import type {User} from '../services/api';
