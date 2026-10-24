@@ -1,6 +1,7 @@
 import {useEffect,useMemo,useState} from 'react';
-import {ArrowLeft,ArrowRight,BookOpen,BriefcaseBusiness,ExternalLink,Globe2,MapPin,Search,ShieldCheck} from 'lucide-react';
+import {ArrowLeft,ArrowRight,BookOpen,BriefcaseBusiness,UsersRound,ExternalLink,Globe2,MapPin,Search,ShieldCheck} from 'lucide-react';
 import {Shell} from './Shell';
+import {HomeCompanyMarquee} from './HomeCompanyMarquee';
 import {Link,navigate} from '../router';
 import type {User} from '../services/api';
 import '../styles/curated-offline.css';
@@ -70,6 +71,26 @@ function JobCard({job}:{job:CuratedJob}){
   <div className="curated-card-foot"><small>标题为机器译文 · 可站内阅读</small><Link to={'/candidate/jobs/'+job.id}>查看岗位资料 <ArrowRight size={15}/></Link></div>
  </article>
 }
+export function CuratedHomePage({user}:{user:User|null}){
+ return <Shell user={user}>
+  <section className="home-hero"><h1>让机会与人才，找到彼此。</h1><p>你来到这里，是为了什么？</p></section>
+  <section className="entry-grid" aria-label="选择使用入口">
+   <button className="entry-card" onClick={()=>navigate('/candidate/jobs')}>
+    <span className="entry-icon"><BriefcaseBusiness size={23}/></span>
+    <strong>我要应聘</strong><small>直接检索精选全球企业职业资料，中文阅读，无需连接国外招聘系统。</small>
+    <span className="entry-footer">进入精选岗位市场 <ArrowRight size={15}/></span>
+   </button>
+   <button className="entry-card" onClick={()=>navigate('/recruiter/register')}>
+    <span className="entry-icon"><UsersRound size={23}/></span>
+    <strong>我要招人</strong><small>保留现有招聘方入口，待后续接入独立的国内服务。</small>
+    <span className="entry-footer">进入招聘方入口 <ArrowRight size={15}/></span>
+   </button>
+  </section>
+  <CuratedJobMarket compact/>
+  <HomeCompanyMarquee/>
+ </Shell>;
+}
+
 export function CuratedJobMarket({user,compact=false}:{user?:User|null;compact?:boolean}){
  const [pack,setPack]=useState<Pack|null>(null),[error,setError]=useState('');
  const [query,setQuery]=useState(''),[company,setCompany]=useState(''),[country,setCountry]=useState('');
