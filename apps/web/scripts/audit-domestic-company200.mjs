@@ -34,8 +34,12 @@ for(const [offset,name] of names.entries()){
  assert(Array.isArray(profile.business)&&profile.business.length>=3,'Business categories absent '+name);
  assert(Array.isArray(profile.majorSlugs)&&profile.majorSlugs.length>=4,'Professional majors absent '+name);
  assert(profile.summary.includes(name),'Wrong subject in summary '+name);
- assert(!profile.brandLocalPath,'Unreviewed logos cannot be published '+name);
+ if(profile.brandLocalPath)assert(['candidate','ready'].includes(newMedia[name]?.brand?.state),'Candidate logo must have a manifest classification '+name);
  const media=newMedia[name]||{};
+ if(media.brand?.state==='candidate'){
+  assert(profile.brandAssetStatus==='official_website_logo_candidate','Header logo candidate must remain unverified '+name);
+  assert(existsSync(path.join('public',media.brand.path)),'Header logo candidate binary missing '+name);
+ }
  if(media.brand?.state==='ready'){
   assert(profile.brandLocalPath===media.brand.path,'Logo identity/path mismatch '+name);
   assert(existsSync(path.join('public',media.brand.path)),'Logo missing file '+name);
