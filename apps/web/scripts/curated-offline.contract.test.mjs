@@ -32,7 +32,7 @@ test('local curated archive is self-contained, source-audited, and finite',()=>{
   assert.ok(['greenhouse','ashby','lever'].includes(j.originalPlatform));
   assert.ok(Number.isFinite(Date.parse(j.snapshotObservedAt)));
  }
- for(const c of companies.companies)assert.equal(jobs.jobs.filter(j=>j.company===c.name).length,15);
+ for(const c of companies.companies)assert.equal(jobs.jobs.filter(j=>j.company===c.name).length,10);
  console.log('HHBA_CURATED_OFFLINE_CONTRACT_OK',JSON.stringify({companies:companies.companies.length,jobs:jobs.jobs.length,platforms:[...new Set(jobs.jobs.map(j=>j.originalPlatform))],thirdPartyFullJDs:0}));
 });
 test('offline mode uses same-origin JSON, not overseas ATS, Railway, or live JD fetches',()=>{
@@ -46,7 +46,7 @@ test('offline mode uses same-origin JSON, not overseas ATS, Railway, or live JD 
  assert.doesNotMatch(router,/CuratedHomePage/);
  assert.match(client,/recordKind:'CURATED_HISTORICAL'/);
  assert.match(root,/UnifiedJobMarket compact/);
- assert.match(router,/if\(route==='\/candidate'\)return <CandidateDashboardPage/);
+ assert.match(router,/if\(route==='\/candidate'\)return import\.meta\.env\.VITE_HHBA_CURATED_STATIC/);
  assert.match(router,/UnifiedJobDetail/);
  assert.match(readFileSync('src/components/UnifiedJobMarket.tsx','utf8'),/历史公开岗位/);
  assert.match(readFileSync('src/components/UnifiedJobMarket.tsx','utf8'),/job\.editorial\.responsibilities/);
