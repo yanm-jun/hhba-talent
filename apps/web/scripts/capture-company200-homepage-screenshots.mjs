@@ -6,9 +6,9 @@ import {createHash} from 'node:crypto';
 import path from 'node:path';
 
 const root='src/data/';
-const target=JSON.parse(readFileSync(root+'domesticComplete100Target.json','utf8'));
-const profiles=JSON.parse(readFileSync(root+'domesticCareerProfiles.json','utf8'));
-const manifest=JSON.parse(readFileSync(root+'domesticMediaBundle.json','utf8'));
+const target=JSON.parse(readFileSync(root+'domesticComplete200Target.json','utf8'));
+const profiles=JSON.parse(readFileSync(root+'domesticCompanyExpansion200Profiles.json','utf8'));
+const manifest=JSON.parse(readFileSync(root+'domesticMedia200Bundle.json','utf8'));
 const {chromium}=await import('playwright');
 const {default:sharp}=await import('sharp');
 const existing=new Set(target.companyNames.slice(0,100));
@@ -151,7 +151,7 @@ for(const name of group){
  }
 }
 manifest.generatedAt=new Date().toISOString();
-writeFileSync(root+'domesticMediaBundle.json',JSON.stringify(manifest,null,2)+'\n');
-writeFileSync(root+'domesticCareerProfiles.json',JSON.stringify(profiles,null,2)+'\n');
+writeFileSync(root+'domesticMedia200Bundle.json',JSON.stringify(manifest,null,2)+'\n');
+writeFileSync(root+'domesticCompanyExpansion200Profiles.json',JSON.stringify(profiles,null,2)+'\n');
 writeFileSync('preview-reports/company200-screenshot-capture.json',JSON.stringify({...stats,date:new Date().toISOString()},null,2)+'\n');
 console.log('HHBA_COMPANY100_SCREENSHOT_IMPORT',JSON.stringify({checked:stats.checked,success:stats.screenshots,logoCandidates:stats.logoCandidates,skipped:stats.skippedExisting,failed:stats.failed.length,sampleErrors:stats.failed.slice(0,12)}));
