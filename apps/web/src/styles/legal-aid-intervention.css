@@ -1,0 +1,98 @@
+/* HHBA / Request platform intervention — simple white application-preparation experience.
+   No intake forms, upload controls or account/application data. */
+.hhba-intervention{box-sizing:border-box;width:min(890px,100%);margin:21px auto 72px;padding:0 18px;color:#202923}
+.hhba-intervention *{box-sizing:border-box}
+.hhba-intervention-panel{background:#fff;border:1px solid #e2e7e3;border-radius:18px;padding:0 16px 13px;overflow:hidden}
+.hhba-intervention-header{height:60px;border-bottom:1px solid #edf0ed;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:0 2px}
+.hhba-intervention-brand{display:flex;align-items:center;gap:10px;color:#77817a;font-size:11px;min-width:0}
+.hhba-intervention-logo{font-size:17px;letter-spacing:-.6px;font-weight:800;text-decoration:none;color:#1e2822}
+.hhba-intervention-divider{width:1px;height:17px;flex:none;background:#e3e9e3}
+.hhba-intervention-back{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;color:#708378;text-decoration:none;font-size:11px}
+.hhba-intervention-back:hover,.hhba-intervention-back:focus-visible{color:#2e6345;text-decoration:underline}
+.hhba-intervention-content{max-width:760px;margin:auto}
+.hhba-intervention-intro{text-align:center;display:flex;align-items:center;flex-direction:column;padding:37px 0 26px}
+.hhba-intervention-symbol{display:grid;place-items:center;color:#386e4d;background:#f0f5f0;width:54px;height:54px;border:1px solid #e7eee6;border-radius:18px}
+.hhba-intervention-status{display:flex;align-items:center;gap:8px;margin-top:18px;border:1px solid #e1e9e1;background:#f8faf7;padding:5px 11px;border-radius:18px;color:#718476;font-size:11px}
+.hhba-intervention-status-dot{width:6px;height:6px;background:#89aa8d;border-radius:50%}
+.hhba-intervention-intro h1{font-size:clamp(25px,3.2vw,33px);font-weight:760;letter-spacing:-.85px;line-height:1.35;margin:16px 0 10px}
+.hhba-intervention-intro>p{max-width:570px;color:#79847e;font-size:13px;line-height:1.9;margin:0}
+.hhba-intervention-funded{display:flex;gap:17px;border:1px solid #dfe9df;background:#f6f9f5;border-radius:15px;padding:23px 24px}
+.hhba-intervention-funded-icon{display:grid;place-items:center;flex:none;width:45px;height:45px;background:#e5f0e5;border-radius:13px;color:#366f4b}
+.hhba-intervention-funded-copy{flex:1;min-width:0}
+.hhba-intervention-kicker{font-size:10px;color:#718f79;font-weight:720;letter-spacing:.09em}
+.hhba-intervention-funded h2{font-size:18px;letter-spacing:-.45px;line-height:1.5;font-weight:750;margin:6px 0 9px}
+.hhba-intervention-funded-copy>p{font-size:12px;color:#596c60;line-height:1.95;margin:0}
+.hhba-intervention-funded-note{display:flex;gap:7px;align-items:flex-start;color:#879389;font-size:11px;line-height:1.85;margin-top:15px;border-top:1px solid #e0e9df;padding-top:13px}
+.hhba-intervention-funded-note svg{flex:none;margin-top:3px}
+.hhba-intervention-section{padding-top:38px}
+.hhba-intervention-section-no{display:block;font-size:10px;letter-spacing:.065em;font-weight:750;color:#6c9478}
+.hhba-intervention-section-head h2{font-size:19px;font-weight:750;line-height:1.4;margin:9px 0 6px;letter-spacing:-.4px}
+.hhba-intervention-section-head>p{color:#849087;line-height:1.85;font-size:12px;margin:0}
+.hhba-intervention-flow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:20px}
+.hhba-intervention-step{display:flex;align-items:flex-start;gap:13px;min-width:0;border:1px solid #e8ece8;border-radius:12px;padding:17px 17px 18px}
+.hhba-intervention-step-index{flex:none;width:32px;height:32px;border:1px solid #dce8df;background:#f5f9f5;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:750;color:#457255}
+.hhba-intervention-step h3{font-size:13px;margin:2px 0 8px;line-height:1.5}
+.hhba-intervention-step p{font-size:11px;color:#79857c;line-height:1.9;margin:0}
+.hhba-intervention-topics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 10px;margin-top:18px}
+.hhba-intervention-topic{font:inherit;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e5eae6;border-radius:10px;background:#fff;color:#414b44;padding:11px 13px;min-height:44px;text-align:left;cursor:pointer;font-size:12px;transition:background .15s,border-color .15s}
+.hhba-intervention-topic svg{color:#929f95;flex:none}
+.hhba-intervention-topic:hover,.hhba-intervention-topic:focus-visible{border-color:#b2cdb9;background:#f8fbf8;outline-offset:2px}
+.hhba-intervention-topic-selected,.hhba-intervention-topic-selected:hover{border-color:#9cbea4;background:#f0f7f1;color:#2d6745;font-weight:700}
+.hhba-intervention-topic-selected svg{color:#387150}
+.hhba-intervention-pick-hint{display:flex;align-items:center;gap:9px;font-size:11px;color:#87958b;margin-top:14px;min-height:27px}
+.hhba-intervention-evidence{margin-top:16px;border:1px solid #dfe8e0;border-radius:13px;overflow:hidden;background:#fcfdfc}
+.hhba-intervention-evidence-head{display:flex;align-items:flex-start;gap:10px;padding:17px;background:#f3f8f3;border-bottom:1px solid #e4ebe4}
+.hhba-intervention-evidence-head svg{flex:none;color:#5b8264}
+.hhba-intervention-evidence-head h3{margin:0 0 4px;font-size:13px;line-height:1.5}
+.hhba-intervention-evidence-head p{margin:0;font-size:11px;color:#7d8c81;line-height:1.8}
+.hhba-intervention-evidence-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+.hhba-intervention-evidence-item{padding:17px;border-right:1px solid #edf0ed}
+.hhba-intervention-evidence-item:last-child{border-right:0}
+.hhba-intervention-evidence-item strong{font-size:12px;line-height:1.55}
+.hhba-intervention-evidence-item ul{padding-left:16px;margin:10px 0 11px}
+.hhba-intervention-evidence-item li{font-size:11px;line-height:1.8;color:#5e7062;margin:3px 0}
+.hhba-intervention-evidence-item p{font-size:10px;color:#849388;line-height:1.75;margin:0}
+.hhba-intervention-evidence-link{display:inline-flex;align-items:center;gap:8px;color:#32694a;font-size:12px;font-weight:700;text-decoration:none;margin:0 17px 18px}
+.hhba-intervention-evidence-link:hover{text-decoration:underline}
+.hhba-intervention-submit{margin-top:39px;padding:22px;border:1px solid #e5e9e5;border-radius:14px;background:#fff}
+.hhba-intervention-submit-head{display:flex;align-items:flex-start;gap:12px}
+.hhba-intervention-submit-head svg{flex:none;color:#73887b}
+.hhba-intervention-submit h2{font-size:15px;margin:0 0 7px}
+.hhba-intervention-submit-head p{font-size:12px;line-height:1.85;color:#859087;margin:0}
+.hhba-intervention-disabled{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border:0;border-radius:10px;background:#e9eeea;color:#9aa79d;font-size:12px;font-weight:700;margin-top:18px;cursor:not-allowed}
+.hhba-intervention-submit-caption{font-size:11px;line-height:1.85;color:#909b92;margin:12px 0 0}
+.hhba-intervention-tracker{padding-top:30px}
+.hhba-intervention-tracker-title{display:flex;align-items:center;gap:9px;border-bottom:1px solid #edf0ed;padding-bottom:12px}
+.hhba-intervention-tracker-title svg{color:#607c69}
+.hhba-intervention-tracker-title h2{font-size:15px;margin:0;flex:1}
+.hhba-intervention-tracker-title>span{font-size:10px;color:#819286}
+.hhba-intervention-empty{display:flex;gap:13px;align-items:flex-start;padding:20px 0}
+.hhba-intervention-empty>svg{flex:none;color:#91a294}
+.hhba-intervention-empty strong{font-size:12px}
+.hhba-intervention-empty p{font-size:11px;color:#849187;line-height:1.9;margin:6px 0 0}
+.hhba-intervention-final-notice{display:flex;align-items:flex-start;gap:9px;padding:16px;background:#faf9f5;border:1px solid #f0ecdf;border-radius:10px;margin:10px 0 26px}
+.hhba-intervention-final-notice svg{color:#86794d;flex:none}
+.hhba-intervention-final-notice p{font-size:11px;color:#786f57;line-height:1.9;margin:0}
+.hhba-intervention-footer{font-size:10px;color:#99a49b;text-align:center;border-top:1px solid #edf0ed;padding:18px 4px 7px}
+@media(max-width:680px){
+ .hhba-intervention{margin:12px auto 45px;padding:0 10px}
+ .hhba-intervention-panel{padding:0 12px 9px}
+ .hhba-intervention-header{height:55px}
+ .hhba-intervention-intro{padding:30px 4px 20px}
+ .hhba-intervention-intro h1{font-size:25px}
+ .hhba-intervention-intro>p{font-size:12px}
+ .hhba-intervention-funded{padding:18px 15px;gap:12px}
+ .hhba-intervention-funded-icon{height:38px;width:38px}
+ .hhba-intervention-funded h2{font-size:15px}
+ .hhba-intervention-section{padding-top:30px}
+ .hhba-intervention-flow{grid-template-columns:1fr}
+ .hhba-intervention-step{padding:14px}
+ .hhba-intervention-topics{gap:7px}
+ .hhba-intervention-topic{padding:10px;min-height:44px;font-size:11px}
+ .hhba-intervention-evidence-list{grid-template-columns:1fr}
+ .hhba-intervention-evidence-item{border-right:0;border-bottom:1px solid #edf0ed;padding:15px}
+ .hhba-intervention-evidence-item:last-child{border-bottom:0}
+ .hhba-intervention-submit{padding:17px}
+}
+@media(max-width:365px){.hhba-intervention-topics{grid-template-columns:1fr}.hhba-intervention-back{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.hhba-intervention-topic{transition:none}}
