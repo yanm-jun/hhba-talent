@@ -1,7 +1,7 @@
 import {chromium} from 'playwright';
 import {mkdirSync} from 'node:fs';
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
-const base='http://127.0.0.1:4173/hhba-talent/';
+const base=process.env.HHBA_TEST_BASE||'http://127.0.0.1:4173/hhba-talent/';
 const blocked=[];mkdirSync('curated-review',{recursive:true});
 function observe(page){
  page.on('request',request=>{
