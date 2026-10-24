@@ -79,6 +79,127 @@
       "verifiedOn": "2026-10-24",
       "verifiedBy": "official_recruitment_page_or_employer_announcement",
       "notes": "此处链接为已定位的企业招聘频道，具体岗位开放、校招/社招时间及招聘法人应以页面为准。"
+    },
+    "小鹏汽车": {
+      "url": "https://xiaopeng.jobs.feishu.cn/",
+      "evidenceUrl": "https://xiaopeng.jobs.feishu.cn/",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "小鹏集团招聘网站（需核对实际招聘法人）",
+      "recruitmentEntity": "小鹏汽车",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "direct_employer_recruitment_page_or_current_school_job_notice",
+      "notes": "本链接为专门招聘频道，实际招聘岗位及校招/社招时间以企业官方页面为准。"
+    },
+    "极氪": {
+      "url": "https://www.zeekrgroup.com/join-us",
+      "evidenceUrl": "https://www.zeekrgroup.com/join-us",
+      "kind": "group_recruitment_portal",
+      "availability": "normal",
+      "label": "极氪科技集团招聘（非单一法人）",
+      "recruitmentEntity": "极氪",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "direct_employer_recruitment_page_or_current_school_job_notice",
+      "notes": "集团频道覆盖可能与当前企业单一法人不同的用人单位；进入后须核对真实招聘主体和职位状态。"
+    },
+    "奇瑞汽车": {
+      "url": "https://chery1.zhiye.com/",
+      "evidenceUrl": "https://chery1.zhiye.com/",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "奇瑞汽车股份有限公司招聘",
+      "recruitmentEntity": "奇瑞汽车",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "direct_employer_recruitment_page_or_current_school_job_notice",
+      "notes": "本链接为专门招聘频道，实际招聘岗位及校招/社招时间以企业官方页面为准。"
+    },
+    "东风汽车集团": {
+      "url": "https://www.dfmc.com.cn/zhaopin/zhaopin.html",
+      "evidenceUrl": "https://www.dfmc.com.cn/zhaopin/zhaopin.html",
+      "kind": "group_recruitment_portal",
+      "availability": "normal",
+      "label": "东风集团总部与所属单位招聘导览",
+      "recruitmentEntity": "东风汽车集团",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "direct_employer_recruitment_page_or_current_school_job_notice",
+      "notes": "集团频道覆盖可能与当前企业单一法人不同的用人单位；进入后须核对真实招聘主体和职位状态。"
+    },
+    "vivo": {
+      "url": "https://hr.vivo.com/",
+      "evidenceUrl": "https://hr.vivo.com/",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "vivo官方招聘网站",
+      "recruitmentEntity": "vivo",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "direct_employer_recruitment_page_or_current_school_job_notice",
+      "notes": "本链接为专门招聘频道，实际招聘岗位及校招/社招时间以企业官方页面为准。"
+    },
+    "大疆创新": {
+      "url": "https://careers.dji.com/zh-CN/",
+      "evidenceUrl": "https://careers.dji.com/zh-CN/",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "大疆创新招聘网站",
+      "recruitmentEntity": "大疆创新",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "direct_employer_recruitment_page_or_current_school_job_notice",
+      "notes": "本链接为专门招聘频道，实际招聘岗位及校招/社招时间以企业官方页面为准。"
+    },
+    "美团": {
+      "url": "https://careers.meituan.com/web/home",
+      "evidenceUrl": "https://careers.meituan.com/web/home",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "美团招聘网站",
+      "recruitmentEntity": "美团",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "direct_employer_recruitment_page_or_current_school_job_notice",
+      "notes": "本链接为专门招聘频道，实际招聘岗位及校招/社招时间以企业官方页面为准。"
+    },
+    "金蝶国际": {
+      "url": "https://www.kingdee.com/job",
+      "evidenceUrl": "https://www.kingdee.com/job",
+      "kind": "group_recruitment_portal",
+      "availability": "normal",
+      "label": "金蝶招聘频道",
+      "recruitmentEntity": "金蝶国际",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "direct_employer_recruitment_page_or_current_school_job_notice",
+      "notes": "集团频道覆盖可能与当前企业单一法人不同的用人单位；进入后须核对真实招聘主体和职位状态。"
+    },
+    "用友网络": {
+      "url": "https://career.yonyou.com/",
+      "evidenceUrl": "https://jobs.ynu.edu.cn/detail/online?id=3593989",
+      "kind": "group_recruitment_portal",
+      "availability": "unconfirmed_runtime",
+      "label": "用友集团校园招聘线索（需核对运行状态）",
+      "recruitmentEntity": "用友网络",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "direct_employer_recruitment_page_or_current_school_job_notice",
+      "notes": "集团频道覆盖可能与当前企业单一法人不同的用人单位；进入后须核对真实招聘主体和职位状态。"
+    },
+    "携程集团": {
+      "url": "https://job.ctrip.com/",
+      "evidenceUrl": "https://job.ctrip.com/undefined",
+      "kind": "group_recruitment_portal",
+      "availability": "normal",
+      "label": "携程集团招聘网站",
+      "recruitmentEntity": "携程集团",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "direct_employer_recruitment_page_or_current_school_job_notice",
+      "notes": "集团频道覆盖可能与当前企业单一法人不同的用人单位；进入后须核对真实招聘主体和职位状态。"
+    },
+    "上海电气": {
+      "url": "https://www.hotjob.cn/wt/SEC/mobweb/v8/index",
+      "evidenceUrl": "https://www.hotjob.cn/wt/SEC/mobweb/v8/index",
+      "kind": "group_recruitment_portal",
+      "availability": "normal",
+      "label": "上海电气微招聘",
+      "recruitmentEntity": "上海电气",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "direct_employer_recruitment_page_or_current_school_job_notice",
+      "notes": "集团频道覆盖可能与当前企业单一法人不同的用人单位；进入后须核对真实招聘主体和职位状态。"
     }
   }
 }
