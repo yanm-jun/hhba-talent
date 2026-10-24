@@ -43,7 +43,8 @@ try {
    record.photos ||= [];
    const hasOriginalScreenshot=(profile.photos||[]).some(x=>x.verification==='company_website_screenshot_unreviewed'&&
        x.localPath&&existsSync(path.join('public',x.localPath)));
-   if(hasOriginalScreenshot){stats.skippedExisting++;continue}
+   const hasLocalBrand=Boolean(profile.brandLocalPath&&existsSync(path.join('public',profile.brandLocalPath)));
+   if(hasOriginalScreenshot&&hasLocalBrand){stats.skippedExisting++;continue}
    const url=safeSite(existingSource);
    if(!url){stats.failed.push({name,error:'missing_safe_company_website'});continue}
    const page=await browser.newPage({viewport:{width:1280,height:790},deviceScaleFactor:1,locale:'zh-CN',ignoreHTTPSErrors:false});
@@ -77,7 +78,7 @@ try {
     else{profile.photos.push(photo);record.photos[profile.photos.length-1]={state:'ready',path:rel,source:final.href,classification:'official_website_screenshot_unreviewed'};}
     // Capture only a first-party page-header logo candidate, NEVER an arbitrary
     // sponsor, social icon or logo inside the page body. Review before verification.
-    if(!profile.brandLocalPath || profile.brandAssetStatus==='pending_official_logo'){
+    if(!profile.brandLocalPath || !existsSync(path.join('public',profile.brandLocalPath)) || profile.brandAssetStatus==='pending_official_logo'){
      const matches=page.locator('header img,nav img,[class*="header"] img,[id*="header"] img');
      const count=Math.min(await matches.count(),18);
      for(let i=0;i<count;i++){
