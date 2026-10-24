@@ -1,7 +1,7 @@
 import {useMemo,useState} from 'react';
 import {Building2,ArrowRight,GraduationCap} from 'lucide-react';
 import profiles from '../data/domesticCareerProfiles.json';
-import additionalProfiles from '../data/domesticCompanyExpansion200Profiles.json';
+import {domestic200Profiles as additionalProfiles} from '../services/domesticCompany200Data';
 import curated200 from '../data/domesticComplete200Target.json';
 import bundled from '../data/domesticMediaBundle.json';
 import additionalMedia from '../data/domesticMedia200Bundle.json';
