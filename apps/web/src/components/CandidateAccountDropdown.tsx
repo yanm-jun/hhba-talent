@@ -19,6 +19,8 @@ export function CandidateAccountDropdown(){
  const [open,setOpen]=useState(false);
  const root=useRef<HTMLDivElement>(null);
  const trigger=useRef<HTMLButtonElement>(null);
+ // Snapshot state before a touch/pointer focuses the trigger; focusing can open the menu.
+ const pointerWasOpen=useRef(false);
  const id=useId();
  useEffect(()=>{
   if(!open)return;
@@ -41,6 +43,7 @@ export function CandidateAccountDropdown(){
  return <div ref={root} className="hhba-account-dropdown"
   onPointerEnter={event=>{if(event.pointerType==='mouse')setOpen(true);}}
   onPointerLeave={event=>{if(event.pointerType==='mouse')setOpen(false);}}
+  onPointerDownCapture={event=>{if(event.target===trigger.current)pointerWasOpen.current=open;}}
   onFocusCapture={()=>setOpen(true)}
   onBlurCapture={event=>{
    const next=event.relatedTarget;
@@ -48,7 +51,7 @@ export function CandidateAccountDropdown(){
   }}>
   <button ref={trigger} type="button" className="auth hhba-account-dropdown-trigger"
    aria-expanded={open} aria-controls={id} aria-haspopup="true"
-   onClick={()=>setOpen(value=>!value)}>
+   onClick={event=>setOpen(event.detail>0?!pointerWasOpen.current:true)}>
    <UserRound size={15} aria-hidden="true"/><span>个人中心</span><ChevronDown size={13} aria-hidden="true"/>
   </button>
   {open&&<nav id={id} className="hhba-account-dropdown-panel" aria-label="个人中心快速导航">
