@@ -233,6 +233,61 @@
       "verifiedOn": "2026-10-24",
       "verifiedBy": "company_owned_careers_page_or_recruitment_portal",
       "notes": "联影集团官网招聘入口可能覆盖多个关联法人；需确认发布岗位的真实聘用单位。"
+    },
+    "杭州银行": {
+      "url": "https://myjob.hzbank.com.cn/hzzp-apply-web/static/index.html",
+      "evidenceUrl": "https://myjob.hzbank.com.cn/hzzp-apply-web/static/index.html",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "杭州银行招聘（社招／校招）",
+      "recruitmentEntity": "杭州银行",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_recruitment_site_or_employer_school_notice",
+      "notes": "招聘官网存在不等于今日仍有开放职位；校园招聘批次与结束时间以官方页面为准。"
+    },
+    "南京银行": {
+      "url": "https://job.njcb.com.cn/",
+      "evidenceUrl": "https://hera-webapp.fenbi.com/api/website/article/detail?apcid=0&app=web&av=100&client_context_id=620778cc7f91b69cb048895a8dcf646c&deviceType=3&hav=100&id=468934146675712",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "南京银行招聘官网",
+      "recruitmentEntity": "南京银行",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_recruitment_site_or_employer_school_notice",
+      "notes": "招聘官网存在不等于今日仍有开放职位；校园招聘批次与结束时间以官方页面为准。"
+    },
+    "中国国航": {
+      "url": "https://zhaopin.airchina.com.cn/",
+      "evidenceUrl": "https://zhaopin.airchina.com.cn/campus/jobs/2026/10/185705.shtml",
+      "kind": "group_recruitment_portal",
+      "availability": "normal",
+      "label": "中国航空集团招聘（含国航股份）",
+      "recruitmentEntity": "中国国航",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_recruitment_site_or_employer_school_notice",
+      "notes": "该入口覆盖集团或关联航空公司；应核对用人单位与岗位批次，不能认为所有公告归属于上市公司本体。"
+    },
+    "东方航空": {
+      "url": "https://job.ceair.com/",
+      "evidenceUrl": "https://job.ceair.com/",
+      "kind": "group_recruitment_portal",
+      "availability": "normal",
+      "label": "东方航空招聘官网",
+      "recruitmentEntity": "东方航空",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_recruitment_site_or_employer_school_notice",
+      "notes": "该入口覆盖集团或关联航空公司；应核对用人单位与岗位批次，不能认为所有公告归属于上市公司本体。"
+    },
+    "南方航空": {
+      "url": "https://job.csair.cn/global",
+      "evidenceUrl": "https://job.csair.cn/global",
+      "kind": "group_recruitment_portal",
+      "availability": "normal",
+      "label": "南方航空招聘网",
+      "recruitmentEntity": "南方航空",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_recruitment_site_or_employer_school_notice",
+      "notes": "该入口覆盖集团或关联航空公司；应核对用人单位与岗位批次，不能认为所有公告归属于上市公司本体。"
     }
   }
 }
