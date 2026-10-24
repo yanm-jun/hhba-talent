@@ -34,7 +34,7 @@ const recruitmentEntries={...(recruitmentRegistry as {entries:Record<string,Dome
 export function getDomesticRecruitment(name:string):DomesticRecruitmentRecord|undefined{
  return recruitmentEntries[name];
 }
-const verifiedCareerProfiles={...careerProfiles,...careerProfiles200} as Record<string,{careersUrl?:string;officialSource?:string;summary?:string;officeLocations?:{type:string;address:string;source:string}[];parentName?:string;industry?:string;website?:string;majorSlugs?:string[];brandImage?:string;contentReview?:string;}>;
+const verifiedCareerProfiles={...careerProfiles,...careerProfiles200} as Record<string,{careersUrl?:string;officialSource?:string;summary?:string;officeLocations?:{type:string;address:string;source:string}[];parentName?:string;industry?:string;primaryIndustry?:string;website?:string;majorSlugs?:string[];brandImage?:string;contentReview?:string;}>;
 const normalize=(value:string)=>value.normalize('NFKC').toLocaleLowerCase().replace(/[\s·・（）()\-—_]/g,'');
 let cache:DomesticCompany[]|undefined;
 function clean(value?:string){return value?.trim()||undefined}
@@ -144,7 +144,7 @@ export function getDomesticCompanies():DomesticCompany[]{
    if(!profile.officialSource||!profile.summary)continue;
    const id='profile-'+Array.from(companyName).map(ch=>ch.codePointAt(0)!.toString(36)).join('-');
    const entry:DomesticCompany={
-    id,name:companyName,industry:profile.industry||'行业待细分',overview:profile.summary,
+    id,name:companyName,industry:profile.industry||profile.primaryIndustry||'行业待细分',overview:profile.summary,
     sourceUrl:profile.officialSource,website:clean(profile.website),
     lastReviewed:'2026-10-23',status:profile.contentReview==='first_pass_industry_explanation_not_official_company_detail_audited'?'official_entry_only':'industry_reviewed',
     tags:[],route:'/companies/domestic/'+id,entityKind:'company',
@@ -160,7 +160,7 @@ export function getDomesticCompanies():DomesticCompany[]{
     item.careers=undefined; // Only the independently audited registry can publish a recruitment link.
     item.careersShared=false;
     if(exact.summary){item.overview=exact.summary;item.status=exact.contentReview==='first_pass_industry_explanation_not_official_company_detail_audited'?'official_entry_only':'industry_reviewed';}
-    if(exact.industry)item.industry=exact.industry;
+    if(exact.industry||exact.primaryIndustry)item.industry=exact.industry||exact.primaryIndustry||item.industry;
     if(exact.website&&!item.website)item.website=clean(exact.website);
     if(exact.parentName&&!item.parentName){item.parentName=exact.parentName;item.relationLabel='业务关联（不等于直接控股）';}
     if(exact.officialSource)item.sourceUrl=exact.officialSource;
