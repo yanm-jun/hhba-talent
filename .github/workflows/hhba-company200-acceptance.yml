@@ -13,6 +13,7 @@ on:
       - 'apps/web/src/services/domesticCompanySearch.ts'
       - 'apps/web/src/services/domesticMajors.ts'
       - 'apps/web/scripts/audit-domestic-company200.mjs'
+      - 'apps/web/scripts/company200-integration.contract.test.mjs'
       - '.github/workflows/hhba-company200-acceptance.yml'
   pull_request:
     branches:
@@ -38,6 +39,7 @@ jobs:
         run: |
           node --check scripts/audit-domestic-company200.mjs
           node scripts/audit-domestic-company200.mjs
+          node scripts/company200-integration.contract.test.mjs
       - name: Typecheck and build current HHBA frontend
         working-directory: apps/web
         run: npm run build
