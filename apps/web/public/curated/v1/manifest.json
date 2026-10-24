@@ -1,0 +1,19 @@
+{
+  "kind": "HHBA_CURATED_OFFLINE_V1",
+  "version": 1,
+  "source": "HHBA_EXISTING_SNAPSHOT_GITHUB_ACTIONS",
+  "originalSnapshotAt": "2026-10-24T07:50:49.655Z",
+  "sourceBoardsSnapshot": 50,
+  "numberOfCompanies": 10,
+  "numberOfJobs": 150,
+  "hash": "eb9f948bd35ecf1bb0c8881e062b07007b9dbff115484de048870963588aebfe",
+  "sourceOfficialJdVerified": 150,
+  "fullReprintedJobDescriptions": 0,
+  "completeHumanReviewedChineseDescriptions": 0,
+  "automaticSync": false,
+  "externalApiAtRuntime": false,
+  "historicalData": true,
+  "defaultCurrentVacancyClaim": false,
+  "contentPolicy": "Metadata and source-derived factual signals only. No reprinted full third-party JD. Machine-translated labels require editorial review.",
+  "refreshedAt": null
+}
