@@ -1,21 +1,80 @@
-.hhba-legal-page{max-width:980px;margin:35px auto 90px;padding:0 18px;color:#22352a}
-.hhba-legal-back{display:inline-flex;align-items:center;gap:8px;color:#577464;text-decoration:none;font-size:13px;margin-bottom:27px}
-.hhba-legal-hero{border:1px solid #e2eae4;border-radius:16px;background:#fff;padding:clamp(25px,4vw,40px)}
-.hhba-legal-kicker{display:inline-flex;align-items:center;gap:8px;color:#32734d;font-size:12px;font-weight:700}
-.hhba-legal-hero h1{font-size:clamp(28px,4vw,38px);letter-spacing:-.8px;margin:12px 0}
-.hhba-legal-hero p{max-width:750px;font-size:14px;line-height:1.9;color:#63746b}
-.hhba-legal-stage{display:inline-flex;align-items:center;gap:7px;border-radius:20px;background:#edf5ef;padding:7px 11px;color:#2a6943;font-size:12px;margin-top:13px}
-.hhba-legal-notice{display:flex;align-items:flex-start;gap:14px;border-radius:14px;border:1px solid #eadfbf;background:#fffbf1;padding:20px;margin:19px 0}
-.hhba-legal-notice>svg{flex:none;color:#8b6c26}
-.hhba-legal-notice h2{font-size:16px;margin:0 0 7px}
-.hhba-legal-notice p{font-size:13px;line-height:1.85;color:#675c41;margin:0}
-.hhba-legal-next{background:#fff;border:1px solid #e2eae4;border-radius:14px;padding:23px}
-.hhba-legal-next h2{font-size:19px;margin:0 0 18px}
-.hhba-legal-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
-.hhba-legal-steps article{background:#f6f9f7;padding:18px;border-radius:11px}
-.hhba-legal-steps article span{display:block;color:#50705d;font-size:11px;font-weight:700;margin-bottom:11px}
-.hhba-legal-steps article strong{font-size:14px}
-.hhba-legal-steps article p{color:#69796e;font-size:12px;line-height:1.75}
-.hhba-legal-note{display:flex;align-items:flex-start;gap:9px;margin:18px 0;color:#6b776d;font-size:12px;line-height:1.75}
-.hhba-legal-note svg{flex:none}
-@media(max-width:710px){.hhba-legal-page{padding:0 10px}.hhba-legal-steps{grid-template-columns:1fr}.hhba-legal-next{padding:17px}}
+/* HHBA / Labour rights — independent, editorial service presentation.
+   Preview-only: no evidence intake or legal-service actions. */
+.hhba-law{width:min(1120px,100%);margin:22px auto 88px;padding:0 18px;color:#172c25}
+.hhba-law *{box-sizing:border-box}
+.hhba-law-topline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 18px}
+.hhba-law-back{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#64776c;text-decoration:none;transition:color .18s}
+.hhba-law-back:hover,.hhba-law-back:focus-visible{color:#235f43}
+.hhba-law-topline-meta{display:inline-flex;align-items:center;gap:9px;font-size:11px;color:#91a098;letter-spacing:.025em}
+.hhba-law-topline-meta>span{color:#bdc8c0}
+.hhba-law-hero{position:relative;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(280px,.76fr);gap:32px;padding:clamp(27px,4.3vw,56px);background:linear-gradient(123deg,#143b30 0%,#1c493b 54%,#245241 100%);border:1px solid #285243;border-radius:23px;color:#fff;overflow:hidden;isolation:isolate}
+.hhba-law-hero:before{content:"";pointer-events:none;position:absolute;z-index:-1;width:520px;height:520px;right:-265px;top:-280px;border:1px solid rgba(233,241,215,.17);border-radius:50%;box-shadow:0 0 0 64px rgba(233,241,215,.035),0 0 0 140px rgba(233,241,215,.025)}
+.hhba-law-hero-main{display:flex;flex-direction:column;align-items:flex-start;min-width:0;justify-content:center}
+.hhba-law-hero-kicker{display:inline-flex;align-items:center;gap:9px;color:#d1e5d5;font-weight:750;letter-spacing:.12em;font-size:10px}
+.hhba-law-hero-kicker>svg{color:#c6ddc5;flex:none}
+.hhba-law-hero h1{font-size:clamp(32px,4vw,48px);line-height:1.27;font-weight:760;letter-spacing:-1.7px;margin:26px 0 19px;text-wrap:balance}
+.hhba-law-hero h1>span{display:block;color:#dbe9d9}
+.hhba-law-hero-description{max-width:565px;font-size:14px;line-height:2.05;color:#d9e9df;margin:0}
+.hhba-law-hero-signature{display:flex;align-items:center;gap:12px;margin-top:38px;font-size:11px;color:#b8d3c4;letter-spacing:.05em}
+.hhba-law-signature-line{width:28px;height:1px;background:#b8d3c4}
+.hhba-law-status{align-self:center;position:relative;display:flex;flex-direction:column;min-height:308px;background:#f8f9f4;border:1px solid rgba(255,255,255,.38);border-radius:17px;color:#17372b;padding:28px 26px;box-shadow:0 16px 32px rgba(4,33,19,.12)}
+.hhba-law-status-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:auto}
+.hhba-law-status-symbol{display:grid;place-items:center;width:47px;height:47px;border:1px solid #dce7dd;background:#ecf3eb;border-radius:13px;color:#275a43}
+.hhba-law-status-eyebrow{color:#96a69b;letter-spacing:.13em;font-size:10px;font-weight:700}
+.hhba-law-status-caption{font-size:12px;color:#74867a;margin-top:25px}
+.hhba-law-status>strong{font-size:28px;letter-spacing:-.7px;margin:7px 0 12px;font-weight:760}
+.hhba-law-status>p{font-size:12px;line-height:1.85;color:#62786a;margin:0}
+.hhba-law-status-rule{height:1px;background:#dfe8df;margin:22px 0 15px}
+.hhba-law-status-current{font-size:11px;color:#52735e;font-weight:650;display:flex;align-items:center;gap:9px}
+.hhba-law-pulse{width:7px;height:7px;flex:none;background:#8aaf91;border-radius:50%;box-shadow:0 0 0 4px #e6f0e5}
+.hhba-law-privacy-strip{display:flex;align-items:center;gap:17px;margin-top:17px;padding:18px 22px;background:#fff;border:1px solid #e4eae5;border-radius:14px;box-shadow:0 5px 20px rgba(22,45,29,.018)}
+.hhba-law-lock{display:grid;flex:none;place-items:center;width:44px;height:44px;background:#f0f5ef;border-radius:12px;color:#4c765a}
+.hhba-law-privacy-strip strong{display:block;font-size:14px;font-weight:730;line-height:1.45}
+.hhba-law-privacy-strip p{font-size:12px;line-height:1.75;color:#78857c;margin:4px 0 0}
+.hhba-law-eyebrow{display:block;font-size:10px;font-weight:780;letter-spacing:.13em;color:#577966}
+.hhba-law-issues{margin-top:66px}
+.hhba-law-section-heading{display:flex;align-items:end;justify-content:space-between;gap:26px;margin-bottom:23px}
+.hhba-law-section-heading>div{max-width:650px}
+.hhba-law-section-heading h2{font-size:clamp(24px,2.8vw,32px);letter-spacing:-.9px;line-height:1.4;margin:12px 0 0;font-weight:750}
+.hhba-law-section-heading>p{max-width:305px;min-width:210px;font-size:12px;color:#7e8b80;line-height:1.9;margin:0 0 3px}
+.hhba-law-issue-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.hhba-law-issue-card{display:flex;flex-direction:column;background:#fff;border:1px solid #e3e9e4;border-radius:17px;padding:24px 26px;min-height:250px;transition:box-shadow .2s,border-color .2s}
+.hhba-law-issue-top{display:flex;justify-content:space-between;align-items:flex-start}
+.hhba-law-issue-number{font-size:11px;color:#9cab9d;font-weight:700;letter-spacing:.1em}
+.hhba-law-issue-icon{display:grid;place-items:center;background:#eef4ef;color:#436b51;border-radius:12px;width:48px;height:48px}
+.hhba-law-issue-card h3{font-size:20px;letter-spacing:-.3px;font-weight:750;margin:8px 0 6px}
+.hhba-law-issue-summary{font-size:13px;color:#687a70;line-height:1.7;margin:0 0 24px}
+.hhba-law-issue-focus{margin-top:auto;border-top:1px solid #edf0ec;padding-top:15px}
+.hhba-law-issue-focus>span{display:block;font-size:10px;letter-spacing:.04em;font-weight:750;color:#577765}
+.hhba-law-issue-focus p{font-size:12px;line-height:1.65;margin:6px 0 0;color:#7b887d}
+.hhba-law-method{background:#f0f4ef;border:1px solid #e7eee7;border-radius:20px;margin-top:55px;padding:clamp(24px,3.6vw,43px)}
+.hhba-law-method-heading{display:flex;align-items:start;justify-content:space-between;gap:20px}
+.hhba-law-method-heading h2{font-size:clamp(23px,2.8vw,30px);line-height:1.45;margin:12px 0 0;font-weight:750;letter-spacing:-.7px}
+.hhba-law-method-heading h2>span{display:block}
+.hhba-law-method-mark{display:grid;place-items:center;width:54px;height:54px;flex:none;background:#e0eae1;color:#52705a;border-radius:14px}
+.hhba-law-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:38px;gap:20px}
+.hhba-law-step{min-width:0}
+.hhba-law-step-index{display:flex;align-items:center;gap:12px;margin-bottom:17px}
+.hhba-law-step-index>span:first-child{display:grid;place-items:center;width:33px;height:33px;border:1px solid #c7d8c9;border-radius:50%;background:#fff;color:#305d42;font-size:11px;font-weight:750;flex:none}
+.hhba-law-step-rule{height:1px;min-width:0;flex:1;background:#cadaed;background:#cbdbcf}
+.hhba-law-step-content h3{font-size:15px;margin:0 0 10px;line-height:1.45;font-weight:750}
+.hhba-law-step-content p{font-size:12px;line-height:1.85;color:#728275;margin:0}
+.hhba-law-method-foot{display:flex;align-items:flex-start;gap:10px;border-top:1px solid #dce6dc;margin-top:29px;padding-top:19px;color:#4d735b}
+.hhba-law-method-foot svg{flex:none;margin-top:2px}
+.hhba-law-method-foot p{margin:0;font-size:12px;line-height:1.75}
+.hhba-law-bottom{display:grid;grid-template-columns:.9fr 1.1fr;align-items:center;gap:26px;margin-top:58px;padding:30px 0 36px;border-bottom:1px solid #e0e7e0}
+.hhba-law-bottom-title h2{font-size:clamp(23px,2.6vw,31px);letter-spacing:-.7px;line-height:1.4;margin:12px 0}
+.hhba-law-bottom-title p{font-size:12px;line-height:1.9;color:#7b887e;max-width:340px;margin:0}
+.hhba-law-bottom-items{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.hhba-law-bottom-items>div{display:flex;flex-direction:column;align-items:flex-start;min-width:0;gap:9px}
+.hhba-law-bottom-items svg{color:#43765a}
+.hhba-law-bottom-items strong{font-size:13px}
+.hhba-law-bottom-items span{color:#7b897e;font-size:11px;line-height:1.6}
+.hhba-law-disclaimer{display:flex;align-items:start;gap:10px;padding-top:22px}
+.hhba-law-disclaimer>svg{flex:none;color:#93a298;margin-top:2px}
+.hhba-law-disclaimer p{flex:1;margin:0;color:#929c92;font-size:11px;line-height:1.75}
+.hhba-law-disclaimer a{display:inline-flex;align-items:center;white-space:nowrap;gap:5px;margin-top:1px;color:#4d7056;text-decoration:none;font-size:11px;font-weight:650}
+.hhba-law-disclaimer a:hover{text-decoration:underline}
+@media(max-width:900px){.hhba-law-hero{grid-template-columns:1fr;gap:27px}.hhba-law-status{min-height:230px}.hhba-law-status-top{margin-bottom:8px}.hhba-law-status-caption{margin-top:16px}.hhba-law-section-heading{align-items:start;flex-direction:column;gap:12px}.hhba-law-section-heading>p{max-width:700px}.hhba-law-steps{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:27px}.hhba-law-bottom{grid-template-columns:1fr}.hhba-law-bottom-items{max-width:660px}}
+@media(max-width:620px){.hhba-law{margin:15px auto 60px;padding:0 10px}.hhba-law-topline{padding:0 5px;margin-bottom:13px}.hhba-law-hero{padding:27px 21px;border-radius:17px;gap:23px}.hhba-law-hero-kicker{font-size:9px}.hhba-law-hero h1{font-size:32px;letter-spacing:-1px;margin:22px 0 13px}.hhba-law-hero-description{font-size:12px;line-height:1.95}.hhba-law-hero-signature{margin-top:23px}.hhba-law-status{padding:22px;min-height:215px}.hhba-law-status>strong{font-size:24px}.hhba-law-privacy-strip{padding:15px;gap:12px;align-items:flex-start}.hhba-law-lock{height:39px;width:39px}.hhba-law-privacy-strip strong{font-size:12px}.hhba-law-privacy-strip p{font-size:11px}.hhba-law-issues{margin-top:42px}.hhba-law-section-heading h2{font-size:24px}.hhba-law-issue-grid{grid-template-columns:1fr;gap:10px}.hhba-law-issue-card{padding:21px;min-height:222px}.hhba-law-issue-card h3{font-size:18px}.hhba-law-method{margin-top:35px;border-radius:15px;padding:25px 21px}.hhba-law-method-heading h2{font-size:22px}.hhba-law-method-mark{width:42px;height:42px}.hhba-law-steps{grid-template-columns:1fr;gap:19px;margin-top:26px}.hhba-law-step{display:grid;grid-template-columns:35px 1fr;gap:12px}.hhba-law-step-index{margin:0;flex-direction:column}.hhba-law-step-rule{height:auto;width:1px;min-height:25px;flex:1}.hhba-law-step-content h3{margin:6px 0 6px}.hhba-law-method-foot{margin-top:25px}.hhba-law-bottom{margin-top:40px;padding-bottom:25px}.hhba-law-bottom-title h2{font-size:24px}.hhba-law-bottom-items{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.hhba-law-bottom-items strong{font-size:12px}.hhba-law-bottom-items span{font-size:10px}.hhba-law-disclaimer{flex-wrap:wrap}.hhba-law-disclaimer p{flex:1 1 calc(100% - 35px)}.hhba-law-disclaimer a{margin-left:27px}}
+@media(prefers-reduced-motion:reduce){.hhba-law-back,.hhba-law-issue-card{transition:none}}
