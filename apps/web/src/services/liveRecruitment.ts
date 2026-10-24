@@ -12,6 +12,7 @@ export type LiveJob = {
   educationLabel?: string; experienceLabel?: string;
   currentApplicationVerified?: boolean;
   graduationYear?: number; responsibilitiesSummary?: string; requirementsSummary?: string;
+  editorial?: CuratedEditorial; experienceMinYears?: number|null; skillSignals?: string[];
 };
 export type LiveFilters = {
   q: string; company: string; country: '' | 'cn' | 'global'; remote: boolean;
@@ -171,7 +172,92 @@ function searchPreview(data:LivePage,filters:LiveFilters,offset:number,facets:Ma
   const matches=searchJobs(data.jobs,filters,facets);
   return {...data,jobs:matches.rows.slice(offset,offset+30),total:matches.counted,offset,limit:30};
 }
+
+type CuratedEditorial={
+  sourceVerifiedAt:string;verification:string;overview:string;
+  responsibilities:string[];requirements:string[];benefits:string[];
+  originalSummary:string;source:string;
+};
+type CuratedArchiveRow={
+  id:string;company:string;companyZh:string;titleEn:string;titleZh:string;
+  locationEn:string;locationZh:string;countryCode:string|null;cityKey:string|null;
+  education:string|null;experienceMinYears:number|null;skillSignals:string[];
+  jobCategory:string;jobType:string|null;originalPlatform:string;originalSource:string;
+  originalUrl:string;snapshotObservedAt:string;status:string;currentApplicationVerified:boolean;
+  editorial?:CuratedEditorial;
+};
+const CURATED_100=import.meta.env.VITE_HHBA_CURATED_STATIC==='1';
+let archivedCache:Promise<CuratedArchiveRow[]>|null=null;
+async function loadArchivedHundred(signal:AbortSignal):Promise<CuratedArchiveRow[]>{
+  if(!archivedCache){
+    archivedCache=fetch(import.meta.env.BASE_URL+'curated/v1/jobs.json',{
+      method:'GET',cache:'force-cache',credentials:'omit',headers:{Accept:'application/json'}
+    }).then(async response=>{
+      if(!response.ok)throw Error('本地岗位文件未找到');
+      const data=await response.json() as {kind:string;jobs:CuratedArchiveRow[]};
+      if(data.kind!=='HHBA_CURATED_JOBS_V1'||!Array.isArray(data.jobs)||data.jobs.length!==100||
+          new Set(data.jobs.map(j=>j.id)).size!==100)throw Error('岗位资料库数量校验失败');
+      const counts=new Map<string,number>();
+      for(const row of data.jobs){
+        if(!/^curated-(ashby|greenhouse|lever)-[A-Za-z0-9_-]{2,170}$/.test(row.id)||
+           !row.originalUrl.startsWith('https://')||row.currentApplicationVerified!==false||
+           row.status!=='historical_public_posting'||!row.titleZh||!row.titleEn)
+          throw Error('岗位资料库来源校验失败');
+        counts.set(row.company,(counts.get(row.company)||0)+1);
+      }
+      if(counts.size!==10||[...counts.values()].some(n=>n!==10))
+        throw Error('企业岗位配比校验失败');
+      return data.jobs;
+    }).catch(e=>{archivedCache=null;throw e});
+  }
+  if(signal.aborted)throw new DOMException('Aborted','AbortError');
+  return archivedCache;
+}
+function archivedJob(j:CuratedArchiveRow):LiveJob{
+  const degree:Record<string,string>={BACHELOR:'本科',MASTER:'硕士',PHD:'博士',
+    ASSOCIATE:'专科',HIGH_SCHOOL:'高中'};
+  return {
+    id:j.id.replace(/^curated-/,''),company:j.company,companyZh:j.companyZh,
+    title:j.titleEn,titleZh:j.titleZh,titleStatus:'editorial_checked',
+    location:j.locationEn,locationZh:j.locationZh,platform:j.originalPlatform,
+    source:j.originalSource,url:j.originalUrl,domestic:false,
+    remote:/\bremote\b/i.test(j.locationEn)?true:null,
+    recruitmentType:j.jobType==='REGULAR'?'REGULAR':undefined,
+    observedAt:j.snapshotObservedAt,recordKind:'CURATED_HISTORICAL',
+    currentApplicationVerified:false,
+    educationLabel:j.education?degree[j.education]||j.education:undefined,
+    experienceLabel:j.experienceMinYears!==null?j.experienceMinYears+' 年及以上':undefined,
+    experienceMinYears:j.experienceMinYears,skillSignals:j.skillSignals,
+    editorial:j.editorial
+  };
+}
+async function listArchivedJobs(filters:LiveFilters,offset:number,signal:AbortSignal):Promise<LivePage>{
+  const rows=await loadArchivedHundred(signal);
+  const parts=filters.q.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  const allowed=rows.filter(j=>{
+    if(filters.country==='cn'||(filters.company&&j.company!==filters.company))return false;
+    if(filters.location_country&&j.countryCode?.toLowerCase()!==filters.location_country.toLowerCase())return false;
+    if(filters.city&&j.cityKey!==filters.city)return false;
+    if(filters.remote&&!/\bremote\b/i.test(j.locationEn))return false;
+    if(filters.recruitment_type&&filters.recruitment_type!==j.jobType)return false;
+    if(filters.education&&filters.education!=='UNRESTRICTED_OR_UNREPORTED'&&filters.education!==j.education)return false;
+    if(filters.education==='UNRESTRICTED_OR_UNREPORTED'&&j.education!==null&&j.education!=='UNRESTRICTED')return false;
+    if(filters.experience==='unreported'&&j.experienceMinYears!==null)return false;
+    if(filters.experience==='0'&&j.experienceMinYears!==0)return false;
+    if(filters.experience==='1-3'&&(j.experienceMinYears===null||j.experienceMinYears<1||j.experienceMinYears>3))return false;
+    if(filters.experience==='3-5'&&(j.experienceMinYears===null||j.experienceMinYears<3||j.experienceMinYears>5))return false;
+    if(filters.experience==='5+'&&(j.experienceMinYears===null||j.experienceMinYears<5))return false;
+    const searchable=[j.company,j.companyZh,j.titleEn,j.titleZh,j.locationEn,j.locationZh,
+      j.countryCode,j.cityKey,...j.skillSignals].filter(Boolean).join(' ').toLowerCase();
+    return parts.every(term=>searchable.includes(term));
+  });
+  const updated=rows[0]?.snapshotObservedAt||'2026-10-24';
+  return {jobs:allowed.slice(offset,offset+30).map(archivedJob),
+    total:allowed.length,limit:30,offset,updated,boards:10,failures:0};
+}
+
 export async function listJobs(filters: LiveFilters, offset: number, signal: AbortSignal) {
+  if(CURATED_100)return listArchivedJobs(filters,offset,signal);
   if(PAGES_PREVIEW) {
     const snapshot=await previewSnapshot(signal);
     // The unfiltered first paint does not use JD-derived education, skills or
@@ -220,6 +306,13 @@ export async function listJobs(filters: LiveFilters, offset: number, signal: Abo
 }
 export async function getJob(id: string,signal: AbortSignal) {
   if(!safeId(id)) throw new Error('无效的岗位编号');
+  if(CURATED_100){
+    const original=(await loadArchivedHundred(signal)).find(row=>row.id==='curated-'+id);
+    if(!original)throw Error('该岗位未在精选资料库中');
+    const job=archivedJob(original);
+    if(!safeOfficialJobUrl(job))throw Error('原始岗位来源异常');
+    return {job,description:null,richHtml:null,applyUrl:null} as LiveDetail;
+  }
   if(PAGES_PREVIEW){
     const campus=(await loadCampus2027()).find(j=>j.id===id);
     const listing=campus||(await previewSnapshot(signal)).jobs.find(j=>j.id===id);
