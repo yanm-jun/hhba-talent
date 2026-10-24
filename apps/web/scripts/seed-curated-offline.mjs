@@ -35,7 +35,7 @@ const bucket=title=>/engineer|developer|architect|infrastructure|data scientist|
  /product|program manager|project manager/i.test(title)?'product':
  /account|sales|business development|partnership|marketing|growth|customer success/i.test(title)?'commercial':
  /finance|legal|recruit|people|operations|talent|policy|communications/i.test(title)?'operations':'other';
-const cap=15;
+const cap=10;
 const selection=[],evidence=[];
 for(const [name,nameZh,platform] of companies){
  const candidates=snapshot.jobs.filter(j=>j.company===name&&!j.domestic&&j.platform===platform&&
@@ -89,7 +89,7 @@ for(const [name,nameZh,platform] of companies){
   selection.push(row);evidence.push({id,hash:a.jd_sha256||null,sourceUrl:job.url});
  }
 }
-if(selection.length!==150||new Set(selection.map(j=>j.id)).size!==150)throw Error('CURATED_COUNT_OR_DUPLICATES');
+if(selection.length!==100||new Set(selection.map(j=>j.id)).size!==100)throw Error('CURATED_COUNT_OR_DUPLICATES');
 const sourceDigest=createHash('sha256').update(JSON.stringify({jobs:selection.map(j=>j.id),snapshot:snapshot.updated})).digest('hex');
 const manifest={
  kind:'HHBA_CURATED_OFFLINE_V1',version:1,source:'HHBA_EXISTING_SNAPSHOT_GITHUB_ACTIONS',
