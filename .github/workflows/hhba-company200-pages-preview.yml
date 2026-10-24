@@ -1,0 +1,399 @@
+name: HHBA 200-company GitHub Pages isolated preview
+
+on:
+  push:
+    branches: [feat/domestic-company200-20261024]
+    paths:
+      - '.github/workflows/hhba-company200-pages-preview.yml'
+      - 'apps/web/src/pages/Company200PreviewPage.tsx'
+      - 'apps/web/src/components/DomesticCompanyResults.tsx'
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/src/pages/HomePage.tsx'
+      - 'apps/web/src/components/Shell.tsx'
+      - 'apps/web/src/components/CandidateAccountDropdown.tsx'
+      - 'apps/web/src/pages/LegalAidLandingPage.tsx'
+      - 'apps/web/src/pages/LegalAidInterventionPage.tsx'
+      - 'apps/web/src/styles/legal-aid-intervention.css'
+      - 'apps/web/src/pages/LegalAidTopicPage.tsx'
+      - 'apps/web/src/data/laborRightsTopics.json'
+      - 'apps/web/scripts/audit-labor-rights-topics.mjs'
+      - 'apps/web/src/pages/PersonalCenterPage.tsx'
+      - 'apps/web/src/styles/candidate-account-dropdown.css'
+      - 'apps/web/src/styles/legal-aid-landing.css'
+      - 'apps/web/src/components/UnifiedJobMarket.tsx'
+      - 'apps/web/src/router.tsx'
+      - 'apps/web/scripts/prepare-pages-jobs.mjs'
+      - 'apps/web/scripts/audit-all-official-jds.mjs'
+      - 'apps/web/src/pages/DomesticCompanyPage.tsx'
+      - 'apps/web/src/services/domesticCompanySearch.ts'
+      - 'apps/web/src/services/domesticCompany200Data.ts'
+      - 'apps/web/src/services/domesticMajors.ts'
+      - 'apps/web/src/data/domesticComplete200Target.json'
+      - 'apps/web/src/data/domesticCompanyExpansion200Profiles.json'
+      - 'apps/web/src/data/domesticCompany200VerifiedEditorial.json'
+      - 'apps/web/src/data/domesticRecruitment200Registry.json'
+      - 'apps/web/src/data/domesticMedia200Bundle.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hhba-company200-pages-preview
+  cancel-in-progress: true
+
+jobs:
+  static-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout isolated 200-company source (never touch main or Railway)
+        uses: actions/checkout@v4
+        with:
+          ref: feat/domestic-company200-20261024
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked frontend dependencies
+        run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Verify 200 curated identities and UI integration
+        working-directory: apps/web
+        run: |
+          node scripts/audit-domestic-company200.mjs
+          node scripts/company200-integration.contract.test.mjs
+          node scripts/audit-labor-rights-topics.mjs
+      - name: Build original HHBA job market plus additive 200-company discovery
+
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_DEMO_ACCOUNT_ENABLED: '0'
+        run: |
+          npm run build
+      - name: Refresh real public job index from existing official ATS source
+        working-directory: apps/web
+        run: node scripts/prepare-pages-jobs.mjs
+      - name: Validate source-backed JD audit and generate accurate searchable job facets
+        working-directory: apps/web
+        run: |
+          node --test scripts/audit-all-official-jds.test.mjs scripts/job-search-facets.test.mjs
+          node scripts/audit-all-official-jds.mjs
+      - name: Check published market data is current and tied to its audit
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const json=n=>JSON.parse(readFileSync('dist/data/'+n,'utf8'));
+          const jobs=json('jobs.json'),audit=json('job-sync-status.json'),facets=json('job-search-facets.json');
+          if(jobs.total!==jobs.jobs.length||jobs.total<1||jobs.failures!==0||
+              Date.now()-Date.parse(jobs.updated)>24*3600000||
+              audit.summary.indexed_as_of!==jobs.updated||
+              audit.jobs.length!==jobs.total||
+              facets.indexed_as_of!==jobs.updated||
+              facets.total_indexed_jobs!==jobs.total||
+              facets.jobs.length!==facets.extracted_count)
+            throw Error('PUBLIC_JOB_MARKET_NOT_READY');
+          const names=new Set(jobs.jobs.map(j=>j.company));
+          const existing=['OpenAI','Anthropic','SpaceX'];
+          const found=existing.filter(n=>names.has(n));
+          if(found.length!==3)throw Error('CORE_OFFICIAL_EMPLOYERS_MISSING '+found.join(','));
+          console.log('HHBA_INTEGRATED_PAGES_MARKET',{jobs:jobs.total,employers:found,companyDirectory:200,updated:jobs.updated});
+          NODE
+      - name: Finalize SPA deep-link reload and static routes
+        working-directory: apps/web
+        run: |
+          cp dist/index.html dist/404.html
+          touch dist/.nojekyll
+      - name: Verify artifact is a subpath-safe SPA and contains compiled company data
+        working-directory: apps/web
+        run: |
+          test -s dist/index.html
+          test -s dist/404.html
+          test -s dist/data/jobs.json
+          test -s dist/data/job-sync-status.json
+          test -s dist/data/job-search-facets.json
+          test -f dist/.nojekyll
+          grep -q '/hhba-talent/assets/' dist/index.html
+          ! grep -R -E 'BEGIN (RSA|OPENSSH) PRIVATE KEY' dist
+          find dist/assets -name '*.js' -print -quit | grep -q .
+      - name: Upload reusable build artifact for independent review
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-company200-static-preview
+          path: apps/web/dist/
+          include-hidden-files: true
+          retention-days: 14
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: apps/web/dist
+
+  deploy-preview:
+    needs: static-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: hhba-company200-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure existing GitHub Pages publishing source
+        uses: actions/configure-pages@v5
+      - name: Publish isolated static preview to GitHub Pages
+        uses: actions/deploy-pages@v4
+        id: deployment
+
+  candidate-menu-browser:
+    needs: deploy-preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - name: Checkout current candidate UI test
+        uses: actions/checkout@v4
+        with:
+          ref: feat/domestic-company200-20261024
+      - name: Install browser tooling
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium for headless navigation test
+        run: |
+          npm install --no-save --no-package-lock --prefix apps/web playwright@1.56.1 --no-audit --no-fund
+          cd apps/web
+          npx playwright install --with-deps chromium
+      - name: Verify hover, keyboard, touch and all seven routes online
+        working-directory: apps/web
+        run: |
+          mkdir -p preview-reports/candidate-menu
+          node --input-type=module <<'NODE'
+          import {chromium} from 'playwright';
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          const origin='https://yanm-jun.github.io/hhba-talent';
+          const expected=[
+            ['工作台','/candidate/account'],
+            ['我的收藏','/candidate/saved'],
+            ['个人资料','/candidate/account/profile'],
+            ['求职偏好','/candidate/account/preferences'],
+            ['我的简历','/candidate/account/resume'],
+            ['求职记录','/candidate/account/applications'],
+            ['法律援助','/candidate/account/legal-aid']
+          ];
+          try{
+            const page=await browser.newPage({viewport:{width:1440,height:950},locale:'zh-CN'});
+            const errors=[];page.on('pageerror',e=>errors.push(e.message));
+            await page.goto(origin+'/',{waitUntil:'domcontentloaded',timeout:50000});
+            const trigger=page.getByRole('button',{name:/个人中心/}).first();
+            await trigger.waitFor({timeout:20000});
+            await trigger.hover();
+            const menu=page.getByRole('navigation',{name:'个人中心快速导航'});
+            await menu.waitFor({timeout:8000});
+            if(await trigger.getAttribute('aria-expanded')!=='true')throw Error('HOVER_NOT_OPEN');
+            const links=menu.locator('.hhba-account-dropdown-item');
+            if(await links.count()!==7)throw Error('EXPECTED_SEVEN_LINKS');
+            // Regression: the global ".topbar nav" flex rule must never affect the nested disclosure.
+            const panelBox=await menu.boundingBox();
+            const triggerBox=await trigger.boundingBox();
+            if(!panelBox||!triggerBox)throw Error('DROPDOWN_BOUNDING_BOX_MISSING');
+            console.log('HHBA_MENU_POSITION_DEBUG',JSON.stringify({triggerX:triggerBox.x,triggerWidth:triggerBox.width,menuX:panelBox.x,menuWidth:panelBox.width,viewportWidth:page.viewportSize().width}));
+            if(panelBox.width<220||panelBox.width>280)throw Error('DROPDOWN_WIDTH_BAD '+panelBox.width);
+            if(Math.abs(panelBox.x-(triggerBox.x-12))>5)throw Error('MENU_NOT_ANCHORED_TO_TRIGGER '+JSON.stringify({panelBox,triggerBox}));
+            if(panelBox.x+panelBox.width>page.viewportSize().width+1)throw Error('MENU_CLIPPED_AT_VIEWPORT_RIGHT');
+            if(await menu.locator('.hhba-account-dropdown-heading').count()!==0)throw Error('DUPLICATE_PERSONAL_CENTER_HEADING');
+            if((await menu.innerText()).match(/个人中心/))throw Error('DUPLICATE_PERSONAL_CENTER_TEXT');
+            const bounds=[];
+            const icons=[];
+            for(let n=0;n<7;n++){
+              const row=links.nth(n);
+              const b=await row.boundingBox();
+              const icon=await row.locator('svg').first().boundingBox();
+              const label=await row.locator('.hhba-account-dropdown-copy').boundingBox();
+              const arrow=await row.locator('.hhba-account-dropdown-chevron').boundingBox();
+              if(!b||!icon||!label||!arrow)throw Error('DROPDOWN_ROW_MISSING_'+n);
+              if(Math.abs(icon.x-triggerBox.x)>22)throw Error('ICON_NOT_ALIGNED_WITH_TOP_PERSONAL_CENTER '+n+': '+JSON.stringify({icon,triggerBox}));
+              if(label.x<=icon.x+icon.width||label.x>=arrow.x-18)throw Error('LABEL_POSITION_BAD '+n);
+              if(arrow.x+arrow.width>panelBox.x+panelBox.width-8)throw Error('ARROW_OUT_OF_PANEL '+n);
+              icons.push(Math.round(icon.x));bounds.push(b);
+            }
+            if(bounds[0].y-panelBox.y>32)throw Error('FIRST_ROW_NOT_AT_TOP');
+            for(let n=0;n<bounds.length;n++){
+              if(bounds[n].width<panelBox.width-35)throw Error('ROW_SQUEEZED '+n);
+              if(bounds[n].x<panelBox.x-2||bounds[n].x>panelBox.x+25)throw Error('ROW_NOT_LEFT_ALIGNED '+n);
+              if(n&&bounds[n].y<=bounds[n-1].y+bounds[n-1].height-2)throw Error('ROWS_NOT_VERTICAL '+n);
+            }
+            if((await menu.innerText()).includes('/candidate/'))throw Error('TECHNICAL_ROUTES_VISIBLE');
+            console.log('HHBA_MENU_LAYOUT_OK',JSON.stringify({panelX:panelBox.x,triggerX:triggerBox.x,iconXs:icons,panelWidth:panelBox.width,alignedToTrigger:true,duplicateHeading:false,sevenVerticalRows:true,technicalPathsHidden:true}));
+            for(const [label,path]of expected){
+              const link=menu.getByRole('link',{name:new RegExp(label)}).first();
+              const url=await link.getAttribute('href');
+              if(url!==('/hhba-talent'+path))throw Error('BAD_MENU_LINK '+label+': '+url);
+            }
+            await menu.getByRole('link',{name:/工作台/}).hover();
+            await menu.waitFor({timeout:4000});
+            if(await links.count()!==7)throw Error('HOVER_MOVEMENT_CLOSED_MENU');
+            await page.screenshot({path:'preview-reports/candidate-menu/desktop-hover-dropdown.png',fullPage:false});
+            await page.keyboard.press('Escape');
+            if(await menu.count()!==0||await trigger.getAttribute('aria-expanded')!=='false')
+              throw Error('ESCAPE_NOT_CLOSED');
+            await trigger.focus();
+            await menu.waitFor({timeout:7000});
+            await menu.getByRole('link',{name:/法律援助/}).click();
+            await page.getByRole('heading',{name:'遇到劳动问题？'}).waitFor({timeout:10000});
+            const legal=page.locator('.hhba-law');
+            const topics=legal.locator('.hhba-law-topic');
+            if(await topics.count()!==8)throw Error('LEGAL_AID_EXPECTED_EIGHT_TOPICS');
+            const labels=['拖欠工资','违法辞退与补偿','加班费与休假','劳动合同纠纷','社会保险争议','工伤与赔偿','调岗降薪','灵活用工争议'];
+            const visible=await topics.locator('span').allTextContents();
+            if(visible.join('|')!==labels.join('|'))throw Error('LEGAL_AID_TOPIC_ORDER '+visible.join('|'));
+            await legal.getByText('功能筹备中',{exact:true}).waitFor({timeout:6000});
+            await legal.getByText('8 类法律知识与公开案例已开放查询 · 个案受理和证据提交仍未开放').waitFor({timeout:6000});
+            if(await page.locator('input, textarea, form, button[type="submit"]').count()!==0)
+              throw Error('LEGAL_AID_PREVIEW_MUST_NOT_COLLECT_DATA');
+            if(await legal.locator('.hhba-law-hero, .hhba-law-method, .hhba-law-issue-card').count()!==0)
+              throw Error('LEGAL_AID_OLD_EDITORIAL_LAYOUT_STILL_PRESENT');
+            const panel=await legal.locator('.hhba-law-panel').boundingBox();
+            const header=await legal.locator('.hhba-law-header').boundingBox();
+            const first=await topics.first().boundingBox();
+            const second=await topics.nth(1).boundingBox();
+            if(!panel||!header||!first||!second||panel.width>790||panel.width<710||Math.abs(first.y-second.y)>2)
+              throw Error('LEGAL_AID_REFERENCE_DESKTOP_LAYOUT_MISMATCH');
+            await page.screenshot({path:'preview-reports/candidate-menu/legal-aid-minimal-desktop.png',fullPage:true});
+            // Exact screenshot reference width: two columns must still fit a 752px viewport.
+            await page.setViewportSize({width:752,height:620});
+            const tabletTopic0=await topics.first().boundingBox(),tabletTopic1=await topics.nth(1).boundingBox();
+            const tabletOverflow=await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth+2);
+            if(!tabletTopic0||!tabletTopic1||Math.abs(tabletTopic0.y-tabletTopic1.y)>2||tabletOverflow)
+              throw Error('LEGAL_AID_752PX_REFERENCE_LAYOUT_FAILED');
+            await page.screenshot({path:'preview-reports/candidate-menu/legal-aid-minimal-752px-reference.png',fullPage:true});
+            // Click every topic and verify it has independent law, evidence,
+            // procedural information and a court-published case outcome.
+            const slugs=['unpaid-wages','unlawful-dismissal','overtime-leave','labor-contracts',
+              'social-insurance','work-injury','transfer-paycuts','flexible-work'];
+            for(let i=0;i<slugs.length;i++){
+              await page.goto(origin+'/candidate/account/legal-aid',{waitUntil:'domcontentloaded',timeout:35000});
+              const link=page.locator('.hhba-law-topic').nth(i);
+              await link.click();
+              await page.locator('.hhba-law-article-heading h1').waitFor({timeout:12000});
+              if(new URL(page.url()).pathname!==('/hhba-talent/candidate/account/legal-aid/'+slugs[i]))
+                throw Error('LEGAL_TOPIC_ROUTING_FAILED '+slugs[i]);
+              const proofCount=await page.locator('.hhba-law-proof').count();
+              const lawCount=await page.locator('.hhba-law-law').count();
+              const paths=await page.locator('.hhba-law-path').count();
+              const citedCase=page.locator('.hhba-law-case-link');
+              const linkHref=await citedCase.getAttribute('href');
+              if(proofCount<3||lawCount<2||paths<3||!linkHref?.startsWith('https://www.court.gov.cn/'))
+                throw Error('LEGAL_GUIDE_NOT_COMPLETE '+slugs[i]);
+              if(await page.locator('form,input,textarea,input[type="file"],button[type="submit"]').count())
+                throw Error('UNLAUNCHED_LEGAL_INTAKE_FOUND '+slugs[i]);
+              await page.locator('.hhba-law-case dd').nth(1).waitFor({timeout:5000});
+              if(i===0||i===3)
+                await page.screenshot({path:'preview-reports/candidate-menu/legal-guide-'+slugs[i]+'.png',fullPage:true});
+            }
+            console.log('HHBA_EIGHT_LEGAL_GUIDES_BROWSER_OK',JSON.stringify({guides:8,allHaveLaws:true,evidence:true,paths:true,realCases:true,noUploads:true}));
+            console.log('HHBA_LEGAL_AID_DESKTOP_OK',JSON.stringify({topics:8,desktopPanelWidth:panel.width,tabletTwoColumns:true,previewOnly:true}));
+            // Standalone funded-intervention view is real navigation, not a false case intake.
+            await page.goto(origin+'/candidate/account/legal-aid',{waitUntil:'domcontentloaded'});
+            await page.getByRole('link',{name:/请求平台介入/}).click();
+            await page.getByRole('heading',{name:'请求 HHBA 平台介入'}).waitFor({timeout:12000});
+            if(new URL(page.url()).pathname!==('/hhba-talent/candidate/account/legal-aid/intervention'))
+              throw Error('INTERVENTION_ROUTE_NOT_OPENED');
+            const inter=page.locator('.hhba-intervention');
+            await inter.getByText('服务筹备中 · 暂不接受申请',{exact:true}).waitFor({timeout:7000});
+            if(await inter.locator('.hhba-intervention-step').count()!==4)
+              throw Error('INTERVENTION_FOUR_STEPS_MISSING');
+            if(await inter.locator('.hhba-intervention-topic').count()!==8)
+              throw Error('INTERVENTION_EIGHT_CATEGORIES_MISSING');
+            await inter.getByRole('button',{name:'拖欠工资'}).click();
+            if(await inter.locator('.hhba-intervention-evidence-item').count()!==3)
+              throw Error('INTERVENTION_EVIDENCE_GUIDANCE_MISSING');
+            const lawLink=await inter.locator('.hhba-intervention-evidence-link').getAttribute('href');
+            if(lawLink!=='/hhba-talent/candidate/account/legal-aid/unpaid-wages')
+              throw Error('INTERVENTION_WRONG_TOPIC_GUIDE '+lawLink);
+            await inter.getByRole('heading',{name:/符合资助条件的案件，律师服务费用由 HHBA 承担/}).waitFor({timeout:5000});
+            if(await inter.locator('button.hhba-intervention-disabled:disabled').count()!==1)
+              throw Error('INTERVENTION_SUBMIT_MUST_BE_DISABLED');
+            if(await inter.locator('textarea,input,form,input[type="file"]').count()!==0)
+              throw Error('INTERVENTION_MUST_NOT_COLLECT_PERSONAL_DATA');
+            const feeNotice=await inter.locator('.hhba-intervention-funded').innerText();
+            if(!feeNotice.includes('第三方费用')||!feeNotice.includes('正式公布的资助规则'))
+              throw Error('INTERVENTION_FUNDING_SCOPE_MISSING');
+            await page.screenshot({path:'preview-reports/candidate-menu/legal-intervention-desktop.png',fullPage:true});
+            await inter.getByRole('link',{name:/返回法律援助/}).click();
+            await page.getByRole('heading',{name:'遇到劳动问题？'}).waitFor({timeout:8000});
+            console.log('HHBA_INTERVENTION_DESKTOP_OK',JSON.stringify({categories:8,evidencePurposes:3,fundingScope:true,applicationEnabled:false}));
+            // Preserve the original job market when entering and leaving the account menu.
+            await page.goto(origin+'/',{waitUntil:'domcontentloaded'});
+            await page.locator('.unified-job-card').first().waitFor({timeout:50000});
+            const brands=await page.locator('.unified-job-card .unified-company-brand strong').allTextContents();
+            for(const n of ['OpenAI','Anthropic','SpaceX'])
+              if(!brands.some(v=>v.includes(n)))throw Error('ORIGINAL_MARKET_LOST '+n);
+            if(errors.length)throw Error('JS_PAGE_ERRORS '+errors.join(' | '));
+            const mobile=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true,locale:'zh-CN'});
+            await mobile.goto(origin+'/',{waitUntil:'domcontentloaded',timeout:50000});
+            const mTrigger=mobile.getByRole('button',{name:/个人中心/}).first();
+            await mTrigger.click();
+            await mobile.getByRole('navigation',{name:'个人中心快速导航'}).waitFor({timeout:8000});
+            await mobile.screenshot({path:'preview-reports/candidate-menu/mobile-tap-dropdown.png',fullPage:false});
+            await mobile.getByRole('navigation',{name:'个人中心快速导航'}).getByRole('link',{name:/求职偏好/}).click();
+            await mobile.getByText('求职偏好',{exact:true}).first().waitFor({timeout:10000});
+            await mobile.goto(origin+'/candidate/account/legal-aid',{waitUntil:'domcontentloaded',timeout:45000});
+            await mobile.getByRole('heading',{name:'遇到劳动问题？'}).waitFor({timeout:16000});
+            if(await mobile.locator('.hhba-law-topic').count()!==8)throw Error('LEGAL_MOBILE_EIGHT_TOPICS_REQUIRED');
+            const m0=await mobile.locator('.hhba-law-topic').nth(0).boundingBox();
+            const m1=await mobile.locator('.hhba-law-topic').nth(1).boundingBox();
+            if(!m0||!m1||m1.y<=m0.y+2)throw Error('LEGAL_MOBILE_TOPICS_NOT_STACKED');
+            const mobileMeasures=await mobile.evaluate(()=>({
+              viewport:document.documentElement.clientWidth,
+              page:document.documentElement.scrollWidth,
+              panel:document.querySelector('.hhba-law-panel')?.getBoundingClientRect().width
+            }));
+            if(mobileMeasures.page>mobileMeasures.viewport+2)
+              throw Error('LEGAL_MOBILE_HORIZONTAL_OVERFLOW '+JSON.stringify(mobileMeasures));
+            await mobile.screenshot({path:'preview-reports/candidate-menu/legal-aid-minimal-mobile.png',fullPage:true});
+            await mobile.locator('.hhba-law-topic').first().click();
+            await mobile.getByRole('heading',{name:'拖欠工资',exact:true}).first().waitFor({timeout:14000});
+            const detailWidth=await mobile.evaluate(()=>({
+              viewport:document.documentElement.clientWidth,
+              page:document.documentElement.scrollWidth
+            }));
+            if(detailWidth.page>detailWidth.viewport+2)
+              throw Error('LEGAL_DETAIL_MOBILE_OVERFLOW '+JSON.stringify(detailWidth));
+            await mobile.screenshot({path:'preview-reports/candidate-menu/legal-guide-mobile.png',fullPage:true});
+            await mobile.goto(origin+'/candidate/account/legal-aid/intervention',{waitUntil:'domcontentloaded',timeout:40000});
+            await mobile.getByRole('heading',{name:'请求 HHBA 平台介入'}).waitFor({timeout:12000});
+            const mInter=mobile.locator('.hhba-intervention');
+            await mInter.getByRole('button',{name:'工伤与赔偿'}).click();
+            if(await mInter.locator('.hhba-intervention-evidence-item').count()!==3)
+              throw Error('INTERVENTION_MOBILE_EVIDENCE_MISSING');
+            const interventionMeasures=await mobile.evaluate(()=>({
+              viewport:document.documentElement.clientWidth,
+              page:document.documentElement.scrollWidth
+            }));
+            if(interventionMeasures.page>interventionMeasures.viewport+2)
+              throw Error('INTERVENTION_MOBILE_HORIZONTAL_OVERFLOW '+JSON.stringify(interventionMeasures));
+            if(await mInter.locator('button.hhba-intervention-disabled:disabled').count()!==1)
+              throw Error('INTERVENTION_MOBILE_SUBMISSION_OPEN');
+            await mobile.screenshot({path:'preview-reports/candidate-menu/legal-intervention-mobile.png',fullPage:true});
+            console.log('HHBA_INTERVENTION_MOBILE_OK',JSON.stringify({...interventionMeasures,category:'工伤与赔偿',sensitiveDataCollected:false}));
+            console.log('HHBA_LEGAL_AID_MOBILE_OK',JSON.stringify({...mobileMeasures,previewOnly:true}));
+            console.log('HHBA_CANDIDATE_ACCOUNT_MENU_OK',JSON.stringify({
+              sevenPathsVerified:true,hover:true,escape:true,keyboardFocus:true,
+              mobileTap:true,legalPlaceholder:true,noEvidenceUpload:true,
+              jobsRetained:['OpenAI','Anthropic','SpaceX']
+            }));
+          }finally{await browser.close();}
+          NODE
+      - name: Retain navigation screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-candidate-personal-center-dropdown
+          path: apps/web/preview-reports/candidate-menu/
+          retention-days: 14
+          if-no-files-found: warn

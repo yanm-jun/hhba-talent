@@ -1,0 +1,55 @@
+name: HHBA 200-company Pages public HTTP smoke
+on:
+  push:
+    branches: [feat/domestic-company200-20261024]
+    paths:
+      - '.github/workflows/hhba-company200-online-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-http-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Verify public site and official market snapshot over HTTPS
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/hhba-pages-smoke
+          root='https://yanm-jun.github.io/hhba-talent'
+          for n in 1 2 3 4 5 6; do
+            if curl -fLsS --connect-timeout 10 --max-time 40 "$root/" -o /tmp/hhba-pages-smoke/index.html &&
+               curl -fLsS --connect-timeout 10 --max-time 40 "$root/data/jobs.json" -o /tmp/hhba-pages-smoke/jobs.json &&
+               curl -fLsS --connect-timeout 10 --max-time 40 "$root/data/job-sync-status.json" -o /tmp/hhba-pages-smoke/audit.json &&
+               curl -fLsS --connect-timeout 10 --max-time 40 "$root/data/job-search-facets.json" -o /tmp/hhba-pages-smoke/facets.json; then
+                 break
+            fi
+            if [ "$n" = 6 ]; then echo 'PAGES_HTTP_NOT_AVAILABLE';exit 1;fi
+            sleep 10
+          done
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const root='/tmp/hhba-pages-smoke/';
+          const h=readFileSync(root+'index.html','utf8');
+          const json=n=>JSON.parse(readFileSync(root+n,'utf8'));
+          const jobs=json('jobs.json'), audit=json('audit.json'), facets=json('facets.json');
+          if(!h.includes('/hhba-talent/assets/')||
+             jobs.total!==jobs.jobs.length||jobs.total<1||jobs.failures!==0||
+             audit.summary.indexed_as_of!==jobs.updated||
+             facets.indexed_as_of!==jobs.updated||
+             Date.now()-Date.parse(jobs.updated)>24*3600000)
+            throw Error('PAGES_PUBLISHED_MARKET_ASSETS_INVALID_OR_STALE');
+          for(const company of ['OpenAI','Anthropic','SpaceX'])
+            if(!jobs.jobs.some(j=>j.company===company))throw Error('MISSING_OFFICIAL_COMPANY_'+company);
+          console.log('LIVE_PUBLIC_PAGES_MARKET_VERIFIED',JSON.stringify({
+            total:jobs.total,updated:jobs.updated,officialCompanies:['OpenAI','Anthropic','SpaceX'],
+            runtimeIndexReady:true,paths:['/','/data/jobs.json','/data/job-sync-status.json','/data/job-search-facets.json']
+          }));
+          NODE
+      - name: Validate static deep-link fallback for separate enterprise discovery
+        run: |
+          set -euo pipefail
+          url='https://yanm-jun.github.io/hhba-talent/companies/discover'
+          curl -LsS --connect-timeout 10 --max-time 30 "$url" -o /tmp/hhba-pages-smoke/discover.html
+          grep -q '<div id="root">' /tmp/hhba-pages-smoke/discover.html
+          echo 'COMPANY_DISCOVERY_SPA_FALLBACK_PRESENT'

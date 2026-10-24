@@ -1,32 +1,35 @@
 import {useMemo,useState} from 'react';
 import {Building2,ArrowRight,GraduationCap} from 'lucide-react';
 import profiles from '../data/domesticCareerProfiles.json';
-import curated100 from '../data/domesticComplete100Target.json';
+import {domestic200Profiles as additionalProfiles} from '../services/domesticCompany200Data';
+import curated200 from '../data/domesticComplete200Target.json';
 import bundled from '../data/domesticMediaBundle.json';
+import additionalMedia from '../data/domesticMedia200Bundle.json';
 import {Link} from '../router';
 import {getDomesticCompanies,searchDomesticCompanies,type DomesticCompany} from '../services/domesticCompanySearch';
 import {companyMatchesSelectedMajor,majorById} from '../services/domesticMajors';
 import '../styles/domestic-company-search.css';
 type Preview={displayName?:string;summary?:string;brandImage?:string;officeLocations?:unknown[];photos?:unknown[];brandAssetStatus?:string};
-const rich=profiles as Record<string,Preview>;
+const allProfiles={...profiles,...additionalProfiles};
+const rich=allProfiles as Record<string,Preview>;
 const hasDeepProfile=(name:string)=>Boolean(rich[name]?.summary);
 const isSubstantive=(name:string)=>{
- const record=profiles[name as keyof typeof profiles] as {description?:string[];business?:unknown[];majorSlugs?:string[];officialSource?:string}|undefined;
+ const record=allProfiles[name as keyof typeof allProfiles] as {description?:string[];business?:unknown[];majorSlugs?:string[];officialSource?:string;contentReview?:string}|undefined;
  const paragraphs=record?.description||[];
  const business=record?.business||[];
  const majors=record?.majorSlugs||[];
- return Boolean(record?.officialSource&&paragraphs.length>=3&&paragraphs.join('').length>=280&&business.length>=3&&majors.length>=4);
+ return Boolean(record?.contentReview!=='first_pass_industry_explanation_not_official_company_detail_audited'&&record?.officialSource&&paragraphs.length>=3&&paragraphs.join('').length>=280&&business.length>=3&&majors.length>=4);
 };
-const available=bundled as {companies:Record<string,{brand?:{state:string;path?:string}}>};
-type Props={query:string;majorSlug?:string;scope?:string;country?:string;city?:string};
+const available={companies:{...bundled.companies,...additionalMedia.companies}} as {companies:Record<string,{brand?:{state:string;path?:string}}>};
+type Props={query:string;majorSlug?:string;scope?:string;country?:string;city?:string;browseDefault?:boolean};
 function BrandMark({src,name}:{src?:string;name:string}){
  const [failed,setFailed]=useState(false);
  if(!src||failed)return <Building2 size={19} aria-label="企业图标待补充"/>;
  return <img loading="lazy" src={src} alt={name+'的企业网站图标'} onError={()=>setFailed(true)}/>;
 }
-export function DomesticCompanyResults({query,majorSlug='',scope='',country='',city=''}:Props){
+export function DomesticCompanyResults({query,majorSlug='',scope='',country='',city='',browseDefault=false}:Props){
  const all=getDomesticCompanies();
- const [browse100,setBrowse100]=useState(false);
+ const [browse200,setBrowse200]=useState(browseDefault);
  const word=query.trim();
  const chosen=majorById(majorSlug);
  const list=useMemo(()=>{
@@ -36,27 +39,27 @@ export function DomesticCompanyResults({query,majorSlug='',scope='',country='',c
   let eligible=chosen?all.filter(company=>company.entityKind!=='business'&&companyMatchesSelectedMajor(company,chosen.slug)):all;
   if(city)eligible=eligible.filter(company=>(company.city||'').includes(city)||(company.province||'').includes(city));
   if(word)return searchDomesticCompanies(eligible,word,36);
-  if(!chosen&&browse100){
-   const ids=new Map((curated100.companyNames as string[]).map((name,i)=>[name,i]));
-   return eligible.filter(company=>ids.has(company.name)).sort((a,b)=>(ids.get(a.name)||0)-(ids.get(b.name)||0)).slice(0,100);
+  if(!chosen&&browse200){
+   const ids=new Map((curated200.companyNames as string[]).map((name,i)=>[name,i]));
+   return eligible.filter(company=>ids.has(company.name)).sort((a,b)=>(ids.get(a.name)||0)-(ids.get(b.name)||0)).slice(0,200);
   }
   return eligible.filter(company=>company.status==='industry_reviewed').sort((a,b)=>{
    const score=(company:DomesticCompany)=>Number(Boolean(rich[company.name]?.summary))*150+
      Number(Boolean(company.careers))*30+Number(Boolean(company.city))*5;
    return score(b)-score(a)||a.name.localeCompare(b.name,'zh-CN');
   }).slice(0,36);
- },[all,word,chosen,city,country,scope,browse100]);
- if(!word&&!chosen&&!browse100){
+ },[all,word,chosen,city,country,scope,browse200]);
+ if(!word&&!chosen&&!browse200){
   if(scope==='global'||country&&!/^(cn|chn|china|中国|中国大陆)$/i.test(country))return null;
   return <div className="domestic-browse100-entry">
-   <button type="button" onClick={()=>setBrowse100(true)}>浏览已整理的 100 家企业 <ArrowRight size={14}/></button>
+   <button type="button" onClick={()=>setBrowse200(true)}>浏览企业发现 200 家档案 <ArrowRight size={14}/></button>
    <small>按企业主体查看真实介绍、相关专业与已登记的官方招聘渠道</small>
   </div>;
  }
  if(scope==='global'||country&&!/^(cn|chn|china|中国|中国大陆)$/i.test(country))
   return <section className="domestic-company-result" aria-label="国内企业专业匹配"><p className="domestic-company-caution">「所学专业」用于关联国内企业业务方向。如需查看相关国内企业，请将地区改为“国内外全部”或“中国岗位”。海外岗位仍按照官方岗位条件筛选。</p></section>;
  return <section className="domestic-company-result" aria-label="国内企业搜索结果">
-  <div className="domestic-company-title"><h3>{chosen?'与所学专业相关的国内企业':browse100&&!word?'已整理的 100 家企业':'相关国内企业'}</h3>
+  <div className="domestic-company-title"><h3>{chosen?'与所学专业相关的国内企业':browse200&&!word?'企业发现 · 200 家档案':'相关国内企业'}</h3>
    <small>{'显示 '+list.length+' 家 · 企业名录 '+all.length.toLocaleString()+' 条'}</small></div>
   {chosen&&<div className="domestic-major-filter-active"><GraduationCap size={15}/>已选择：<strong>{chosen.name}</strong><span>按业务证据关联，非在招承诺</span></div>}
   <p className="domestic-company-caution">可按企业名称或专业筛选；部分新增公司图片或招聘入口仍待核验，企业详情将明确展示状态。</p>

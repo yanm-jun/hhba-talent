@@ -1,5 +1,5 @@
 import {type FormEvent,useEffect,useState} from 'react';
-import {ArrowRight,Bookmark,BriefcaseBusiness,CheckCircle2,Compass,FileUser,LockKeyhole,LogOut,ShieldCheck,SlidersHorizontal,Trash2,UserRound,ChartNoAxesCombined} from 'lucide-react';
+import {ArrowRight,Bookmark,BriefcaseBusiness,CheckCircle2,Compass,FileUser,LockKeyhole,LogOut,Scale,ShieldCheck,SlidersHorizontal,Trash2,UserRound,ChartNoAxesCombined} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
 import {getJob,localizedCompany,localizedLocation,localizedTitle,type LiveJob} from '../services/liveRecruitment';
@@ -100,6 +100,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview'}:{us
     {pages.map(page=><Link key={page.id} to={routeFor(page.id)} className={page.id===current?'active':''} aria-current={page.id===current?'page':undefined}>
       <page.icon size={17}/><span>{page.label}</span><ArrowRight size={14} className="hhba-account-chevron"/>
     </Link>)}
+    <Link to="/candidate/account/legal-aid"><Scale size={17}/><span>法律援助</span><ArrowRight size={14} className="hhba-account-chevron"/></Link>
    </aside>
    <div className="hhba-account-content">
     {current==='overview'&&<>

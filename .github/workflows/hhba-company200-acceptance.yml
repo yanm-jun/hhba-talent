@@ -1,0 +1,54 @@
+name: HHBA company 200 isolated quality checks
+on:
+  push:
+    branches:
+      - feat/domestic-company200-20261024
+    paths:
+      - 'apps/web/src/data/domesticComplete200Target.json'
+      - 'apps/web/src/data/domesticCompanyExpansion200Profiles.json'
+      - 'apps/web/src/data/domesticCompany200VerifiedEditorial.json'
+      - 'apps/web/src/services/domesticCompany200Data.ts'
+      - 'apps/web/src/data/domesticRecruitment200Registry.json'
+      - 'apps/web/src/data/domesticMedia200Bundle.json'
+      - 'apps/web/src/components/DomesticCompanyResults.tsx'
+      - 'apps/web/src/pages/DomesticCompanyPage.tsx'
+      - 'apps/web/src/services/domesticCompanySearch.ts'
+      - 'apps/web/src/services/domesticMajors.ts'
+      - 'apps/web/scripts/audit-domestic-company200.mjs'
+      - 'apps/web/scripts/company200-integration.contract.test.mjs'
+      - '.github/workflows/hhba-company200-acceptance.yml'
+  pull_request:
+    branches:
+      - feat/domestic-company100-20261024
+permissions:
+  contents: read
+jobs:
+  isolated-company200:
+    name: Static data and web build (no deploy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install existing frontend dependencies
+        run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Verify 100 plus 100 target integrity and media provenance
+        working-directory: apps/web
+        run: |
+          node --check scripts/audit-domestic-company200.mjs
+          node scripts/audit-domestic-company200.mjs
+          node scripts/company200-integration.contract.test.mjs
+      - name: Typecheck and build current HHBA frontend
+        working-directory: apps/web
+        run: npm run build
+      - name: Upload company200 audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-company200-quality
+          path: apps/web/preview-reports/company200-quality.json
+          retention-days: 14

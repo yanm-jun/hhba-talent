@@ -1,0 +1,1083 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-24T04:53:41.493Z",
+  "policy": "No inferred logos, no substitute office photos. Missing means not yet sourced or checked.",
+  "companies": {
+    "吉利汽车": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "理想汽车": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-d3c20bd565303d39b602.webp",
+          "source": "https://www.lixiang.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "蔚来汽车": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "小鹏汽车": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "零跑汽车": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "极氪": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "奇瑞汽车": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-ad06d05d50f75f7ff41e.webp",
+          "source": "https://www.chery.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "北京汽车": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "福田汽车": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-b5050d379eda5ae8677b.webp",
+          "source": "https://www.foton.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "OPPO": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-e2f4e2c4b8d7cf9c17f5.webp",
+          "source": "https://www.oppo.com/cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "vivo": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-69337578b2468a881543.webp",
+          "source": "https://www.vivo.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "荣耀": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-be548deba4a093d78e82.png",
+        "source": "https://www.honor.com/cn/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-be548deba4a093d78e82.webp",
+          "source": "https://www.honor.com/cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "传音控股": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-c7b70618141f2f20796d.png",
+        "source": "https://www.transsion.com/zh-CN",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-c7b70618141f2f20796d.webp",
+          "source": "https://www.transsion.com/zh-CN",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "蓝思科技": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-981090b3551841067422.png",
+        "source": "https://www.hnlens.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-981090b3551841067422.webp",
+          "source": "https://www.hnlens.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "闻泰科技": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "领益智造": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "舜宇光学科技": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "大疆创新": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "思特威": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-bfe948121d4de90c5155.png",
+        "source": "https://www.smartsenstech.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-bfe948121d4de90c5155.webp",
+          "source": "https://www.smartsenstech.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "中联重科": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "徐工机械": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-2faae1496409fc5faa91.webp",
+          "source": "https://www.xcmg.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "柳工": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-8ddcc6b189f768838c4a.webp",
+          "source": "https://www.liugong.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "杭叉集团": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "安徽合力": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "东方电气": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "上海电气": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "金风科技": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-a770f81d251bd2f865ce.webp",
+          "source": "https://www.goldwind.com/cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "明阳智能": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-91643037d9f596ac571f.webp",
+          "source": "https://myse.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "天合光能": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "宁波银行": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-51f682d10d6b6f09fb7b.webp",
+          "source": "https://www.nbcb.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "江苏银行": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "南京银行": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "杭州银行": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-4e83f9575781b726dd5c.webp",
+          "source": "https://www.hzbank.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "上海银行": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "北京银行": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "成都银行": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-b09d1dcc600aaeaf9e22.png",
+        "source": "https://www.bocd.com.cn/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-b09d1dcc600aaeaf9e22.webp",
+          "source": "https://www.bocd.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "渝农商行": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "邮储银行": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-f112198ca6d5bcfef660.webp",
+          "source": "https://www.psbc.com/cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "民生银行": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-d177ef7f1d911e4d2fdd.png",
+        "source": "https://www.cmbc.com.cn/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-d177ef7f1d911e4d2fdd.webp",
+          "source": "https://www.cmbc.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "复星医药": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-5875aaa9a5940794ada5.png",
+        "source": "https://www.fosunpharma.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-5875aaa9a5940794ada5.webp",
+          "source": "https://www.fosunpharma.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "上海医药": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-039aed9521bd4be978c8.png",
+        "source": "https://www.sphchina.com/index/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-039aed9521bd4be978c8.webp",
+          "source": "https://www.sphchina.com/index/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "云南白药": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-f1d9c48fc45d3141bf20.webp",
+          "source": "https://www.yunnanbaiyao.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "华润三九": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-e8ea716c06f3b2c615f8.png",
+        "source": "https://www.999.com.cn/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-e8ea716c06f3b2c615f8.webp",
+          "source": "https://www.999.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "片仔癀": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "白云山": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-799d2678d99c7fbd66c3.png",
+        "source": "https://www.gybys.com.cn/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-799d2678d99c7fbd66c3.webp",
+          "source": "https://www.gybys.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "泰格医药": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-2236dea6b6d7bd29c89f.png",
+        "source": "https://www.tigermedgrp.com/zh/homepage",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-2236dea6b6d7bd29c89f.webp",
+          "source": "https://www.tigermedgrp.com/zh/homepage",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "金域医学": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-ef529d46ea63df00d13f.png",
+        "source": "https://www.kingmed.com.cn/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-ef529d46ea63df00d13f.webp",
+          "source": "https://www.kingmed.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "联影医疗": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "九州通": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "中国国航": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "东方航空": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "南方航空": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "春秋航空": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-af2bb9df1a07191f3fde.png",
+        "source": "https://www.ch.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-af2bb9df1a07191f3fde.webp",
+          "source": "https://www.ch.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "吉祥航空": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-155954e09249899e0658.webp",
+          "source": "https://www.juneyaoair.com/home",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "中远海控": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "招商轮船": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "中集集团": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-1d8917e8a2143221caab.png",
+        "source": "https://www.cimc.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-1d8917e8a2143221caab.webp",
+          "source": "https://www.cimc.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "中国外运": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-5db9bf1e7a7cdf1c9e9d.webp",
+          "source": "https://www.sinotrans.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "京东物流": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-7e1577e9849210d95af3.png",
+        "source": "https://www.jdl.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-7e1577e9849210d95af3.webp",
+          "source": "https://www.jdl.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "百度": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-455ece81de5605d85e54.webp",
+          "source": "https://www.baidu.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "美团": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-cd6362472aea60ef45d5.webp",
+          "source": "https://www.meituan.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "网易": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "快手": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "拼多多": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-effea4c9ff35497ce446.webp",
+          "source": "https://www.pinduoduo.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "哔哩哔哩": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "金山办公": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "用友网络": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "金蝶国际": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "商汤科技": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "农夫山泉": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "东鹏饮料": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-4bfdb7b242c41e293eeb.webp",
+          "source": "https://www.szeastroc.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "安井食品": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "双汇发展": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-c8649ad92c915b3cadda.webp",
+          "source": "https://www.shuanghui.net/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "绝味食品": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-2bfe4cf761467b875bd0.webp",
+          "source": "https://www.juewei.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "洽洽食品": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "三只松鼠": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "盐津铺子": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-ec0f034cd5bf98bc717b.webp",
+          "source": "https://www.yanjinpuzi.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "桃李面包": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "蒙牛乳业": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-987153f789c691b6eb77.webp",
+          "source": "https://www.mengniu.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "万华化学": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-0212fbff216a6cb6e15d.png",
+        "source": "https://www.whchem.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-0212fbff216a6cb6e15d.webp",
+          "source": "https://www.whchem.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "荣盛石化": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "恒力石化": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "桐昆股份": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-cf837b2d72c7a2c51694.webp",
+          "source": "https://www.tongkungroup.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "新凤鸣": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "天赐材料": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "恩捷股份": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "璞泰来": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-9f5a5e62a31bc9060686.png",
+        "source": "https://www.putailai.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-9f5a5e62a31bc9060686.webp",
+          "source": "https://www.putailai.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "华友钴业": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "赣锋锂业": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-99699ea142d3ad7b67f0.webp",
+          "source": "https://www.ganfenglithium.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "海底捞": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "瑞幸咖啡": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-268d99ac6debb8a08a59.webp",
+          "source": "https://www.lkcoffee.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "蜜雪冰城": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "名创优品": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "泡泡玛特": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "携程集团": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": []
+    },
+    "同程旅行": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-fa8c9a97f2c921bf8484.png",
+        "source": "https://www.ly.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-fa8c9a97f2c921bf8484.webp",
+          "source": "https://www.ly.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "华住集团": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-0ade33b755a77945f61b.png",
+        "source": "https://www.hworld.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-0ade33b755a77945f61b.webp",
+          "source": "https://www.hworld.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "锦江酒店": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-18566e762eb59ba07add.webp",
+          "source": "https://www.jinjianghotels.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "万科企业": {
+      "brand": {
+        "state": "candidate",
+        "path": "domestic-media/company200-brand-c6fa24222c334b16eae8.png",
+        "source": "https://www.vanke.com/home",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-c6fa24222c334b16eae8.webp",
+          "source": "https://www.vanke.com/home",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "东风汽车集团": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company200-site-16f0b98a3fb5ae71c976.webp",
+          "source": "https://www.dfmc.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    }
+  }
+}

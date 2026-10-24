@@ -1,0 +1,65 @@
+name: HHBA company 200 screenshot candidate acquisition
+on:
+  push:
+    branches:
+      - feat/domestic-company200-20261024
+    paths:
+      - '.github/workflows/hhba-company200-media.yml'
+      - 'apps/web/scripts/capture-company200-homepage-screenshots.mjs'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  company200-screenshots:
+    if: github.ref == 'refs/heads/feat/domestic-company200-20261024'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout isolated company200 branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/domestic-company200-20261024
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install existing UI dependencies and browser tooling without editing lockfile
+        run: |
+          npm ci --prefix apps/web --no-audit --no-fund
+          npm install --prefix apps/web --no-save --no-package-lock playwright@1.56.1 sharp@0.34.4 --no-audit --no-fund
+          cd apps/web && npx playwright install --with-deps chromium
+      - name: Collect real first-party website screenshots (candidate media, not office evidence)
+        working-directory: apps/web
+        run: |
+          node scripts/capture-company200-homepage-screenshots.mjs
+          node scripts/audit-domestic-company200.mjs
+      - name: Save reports even if individual company pages reject automation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-company200-website-candidates
+          retention-days: 14
+          path: |
+            apps/web/preview-reports/company200-screenshot-capture.json
+            apps/web/preview-reports/company200-quality.json
+            apps/web/public/domestic-media/company200-site-*.webp
+            apps/web/public/domestic-media/company200-brand-*.png
+      - name: Persist only new candidate media and their manifests on isolated branch
+        if: success()
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f apps/web/src/data/domesticCompanyExpansion200Profiles.json apps/web/src/data/domesticMedia200Bundle.json
+          git add -f apps/web/public/domestic-media/company200-site-*.webp || true
+          git add -f apps/web/public/domestic-media/company200-brand-*.png || true
+          if ! git diff --cached --quiet; then
+            git commit -m "assets(company200): add attributed website screenshots and hidden logo candidates"
+            git fetch origin feat/domestic-company200-20261024
+            git rebase origin/feat/domestic-company200-20261024
+            git push origin HEAD:refs/heads/feat/domestic-company200-20261024
+          else
+            echo "No new valid website screenshots; keep existing branch unchanged."
+          fi

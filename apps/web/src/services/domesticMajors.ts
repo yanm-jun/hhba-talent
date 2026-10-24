@@ -2,6 +2,8 @@ import { getDomesticCompanies, type DomesticCompany } from './domesticCompanySea
 import higherCatalog from '../data/officialAcademicMajors.json';
 import vocationalCatalog from '../data/officialVocationalMajors.json';
 import verifiedProfiles from '../data/domesticCareerProfiles.json';
+import {domestic200Profiles as additionalProfiles} from './domesticCompany200Data';
+const allReviewedProfiles={...verifiedProfiles,...additionalProfiles};
 
 export type MajorLevel='undergraduate'|'vocational'|'postgraduate'|'legacy'|'custom';
 export type MajorDefinition={slug:string;name:string;keywords:string[];description:string;code?:string;level?:MajorLevel;discipline?:string;sourceYear?:number};
@@ -50,6 +52,7 @@ const EXTRA_MAJORS:MajorDefinition[]=[
  ['construction-management','工程管理',['工程','工程建设','项目管理'],'工程组织及项目管理'],
  ['medical-engineering','生物医学工程',['医疗设备','医疗工程','医药'],'医疗装备与工程技术'],
  ['pharmacy','药学',['制药','医药','药品'],'制药研发与药品技术'],
+ ['biology','生物科学',['生物','微生物','生物技术','细胞'],'生命科学、生物分析及应用相关方向'],
  ['nursing','护理学',['医疗','护理','医院'],'护理与医疗服务'],
  ['clinical-medicine','临床医学',['医院','医疗','临床'],'临床医疗'],
  ['accounting','会计学',['财务','会计','审计'],'会计、财务与审计'],
@@ -135,7 +138,7 @@ const aliases:Record<string,string[]>={
 };
 // These are business-related suggestions, never assertions that an opening exists.
 export function matchingMajors(company:DomesticCompany):MajorDefinition[]{
- const prof=(verifiedProfiles as Record<string,{majorSlugs?:string[]}>)[company.name];
+ const prof=(allReviewedProfiles as Record<string,{majorSlugs?:string[]}>)[company.name];
  if(prof?.majorSlugs?.length)return prof.majorSlugs.map(slug=>majorById(slug)).filter((x):x is MajorDefinition=>Boolean(x));
  const curated=aliases[company.name];
  if(curated)return curated.map(slug=>majorById(slug)).filter((x):x is MajorDefinition=>Boolean(x));

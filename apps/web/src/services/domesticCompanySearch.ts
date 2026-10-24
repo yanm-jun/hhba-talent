@@ -1,7 +1,9 @@
 import curated from '../data/aiCompanyCatalog.json';
 import editorial from '../data/domesticCompanyEditorial.json';
 import careerProfiles from '../data/domesticCareerProfiles.json';
+import {domestic200Profiles as careerProfiles200} from './domesticCompany200Data';
 import recruitmentRegistry from '../data/domesticRecruitmentRegistry.json';
+import recruitmentRegistry200 from '../data/domesticRecruitment200Registry.json';
 import rosterSnapshot from '../data/domesticListedCompanies.json';
 import relationsSnapshot from '../data/domesticCompanyRelations.json';
 
@@ -28,11 +30,11 @@ export type DomesticRecruitmentRecord={
  availability:'normal'|'campus_only'|'announcement_only'|'temporarily_unavailable'|'unconfirmed_runtime';
  label:string;recruitmentEntity:string;verifiedOn:string;aliases?:string[];notes?:string;
 };
-const recruitmentEntries=(recruitmentRegistry as {entries:Record<string,DomesticRecruitmentRecord>}).entries;
+const recruitmentEntries={...(recruitmentRegistry as {entries:Record<string,DomesticRecruitmentRecord>}).entries,...(recruitmentRegistry200 as {entries:Record<string,DomesticRecruitmentRecord>}).entries};
 export function getDomesticRecruitment(name:string):DomesticRecruitmentRecord|undefined{
  return recruitmentEntries[name];
 }
-const verifiedCareerProfiles=careerProfiles as Record<string,{careersUrl?:string;officialSource?:string;summary?:string;officeLocations?:{type:string;address:string;source:string}[];parentName?:string;industry?:string;website?:string;majorSlugs?:string[];brandImage?:string;}>;
+const verifiedCareerProfiles={...careerProfiles,...careerProfiles200} as Record<string,{careersUrl?:string;officialSource?:string;summary?:string;officeLocations?:{type:string;address:string;source:string}[];parentName?:string;industry?:string;primaryIndustry?:string;website?:string;majorSlugs?:string[];brandImage?:string;contentReview?:string;}>;
 const normalize=(value:string)=>value.normalize('NFKC').toLocaleLowerCase().replace(/[\s·・（）()\-—_]/g,'');
 let cache:DomesticCompany[]|undefined;
 function clean(value?:string){return value?.trim()||undefined}
@@ -142,9 +144,9 @@ export function getDomesticCompanies():DomesticCompany[]{
    if(!profile.officialSource||!profile.summary)continue;
    const id='profile-'+Array.from(companyName).map(ch=>ch.codePointAt(0)!.toString(36)).join('-');
    const entry:DomesticCompany={
-    id,name:companyName,industry:profile.industry||'行业待细分',overview:profile.summary,
+    id,name:companyName,industry:profile.industry||profile.primaryIndustry||'行业待细分',overview:profile.summary,
     sourceUrl:profile.officialSource,website:clean(profile.website),
-    lastReviewed:'2026-10-23',status:'industry_reviewed',
+    lastReviewed:'2026-10-23',status:profile.contentReview==='first_pass_industry_explanation_not_official_company_detail_audited'?'official_entry_only':'industry_reviewed',
     tags:[],route:'/companies/domestic/'+id,entityKind:'company',
     ...(profile.parentName?{parentName:profile.parentName,relationLabel:'业务关联（请查阅来源核实主体关系）'}:{})
    };
@@ -157,8 +159,8 @@ export function getDomesticCompanies():DomesticCompany[]{
    if(exact){
     item.careers=undefined; // Only the independently audited registry can publish a recruitment link.
     item.careersShared=false;
-    if(exact.summary){item.overview=exact.summary;item.status='industry_reviewed';}
-    if(exact.industry)item.industry=exact.industry;
+    if(exact.summary){item.overview=exact.summary;item.status=exact.contentReview==='first_pass_industry_explanation_not_official_company_detail_audited'?'official_entry_only':'industry_reviewed';}
+    if(exact.industry||exact.primaryIndustry)item.industry=exact.industry||exact.primaryIndustry||item.industry;
     if(exact.website&&!item.website)item.website=clean(exact.website);
     if(exact.parentName&&!item.parentName){item.parentName=exact.parentName;item.relationLabel='业务关联（不等于直接控股）';}
     if(exact.officialSource)item.sourceUrl=exact.officialSource;
