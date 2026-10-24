@@ -34,7 +34,8 @@ try{
  await page.screenshot({path:'curated-review/job-detail-desktop.png',fullPage:true});
  const mobile=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
  await preventOverseas(mobile);
- await mobile.goto(base+'candidate/jobs',{waitUntil:'domcontentloaded'});
+ await mobile.goto(base,{waitUntil:'domcontentloaded'});
+ await mobile.getByRole('button',{name:/我要应聘/}).click();
  await mobile.locator('.curated-job-card').first().waitFor();
  const sizes=await mobile.evaluate(()=>({page:document.documentElement.scrollWidth,viewport:document.documentElement.clientWidth}));
  if(sizes.page>sizes.viewport+2)throw Error('CURATED_MOBILE_OVERFLOW '+JSON.stringify(sizes));
