@@ -44,13 +44,15 @@ jobs:
           path: |
             apps/web/preview-reports/company200-screenshot-capture.json
             apps/web/preview-reports/company200-quality.json
+            apps/web/public/domestic-media/company200-site-*.webp
+            apps/web/public/domestic-media/company200-brand-*.png
       - name: Persist only new candidate media and their manifests on isolated branch
         if: success()
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps/web/src/data/domesticCompanyExpansion200Profiles.json apps/web/src/data/domesticMedia200Bundle.json
+          git add -f apps/web/src/data/domesticCompanyExpansion200Profiles.json apps/web/src/data/domesticMedia200Bundle.json
           git add -f apps/web/public/domestic-media/company200-site-*.webp || true
           git add -f apps/web/public/domestic-media/company200-brand-*.png || true
           if ! git diff --cached --quiet; then
