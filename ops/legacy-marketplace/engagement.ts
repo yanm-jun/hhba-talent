@@ -62,7 +62,7 @@ export async function handleEngagement(req:Request,url:URL):Promise<Response|nul
  if(!url.pathname.startsWith('/api/engagement/'))return null;
  if(url.pathname==='/api/engagement/event'){
   if(req.method!=='POST')return json({error:'method_not_allowed'},405);
-  if(!validOrigin(req.headers.get('origin'),req.url)||req.headers.get('sec-fetch-site')==='cross-site')
+  if(!validOrigin(req.headers.get('origin'),req.url,Bun.env.RAILWAY_PUBLIC_DOMAIN||'')||req.headers.get('sec-fetch-site')==='cross-site')
    return json({error:'origin_denied'},403);
   if(req.headers.get('dnt')==='1'||req.headers.get('sec-gpc')==='1')
    return json({accepted:false,reason:'privacy_preference'},200);

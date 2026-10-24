@@ -38,7 +38,7 @@ function owner(req:Request,create=false){
  return {hash:h('device-hash:'+newId),setCookie:`${COOKIE}=${newId}.${h('device:'+newId)}; Path=/; Max-Age=7776000; HttpOnly; SameSite=Lax; Secure`};
 }
 const jobId=/^[A-Za-z0-9_-]{1,180}$/;
-const methodAllowed=(req:Request)=>validOrigin(req.headers.get('origin'),req.url)&&req.headers.get('sec-fetch-site')!=='cross-site';
+const methodAllowed=(req:Request)=>validOrigin(req.headers.get('origin'),req.url,Bun.env.RAILWAY_PUBLIC_DOMAIN||'')&&req.headers.get('sec-fetch-site')!=='cross-site';
 export async function handleSavedJobs(req:Request,url:URL,jobExists:(id:string)=>Promise<boolean>):Promise<Response|null>{
  if(!url.pathname.startsWith('/api/saved'))return null;
  if(url.pathname==='/api/saved/summary'){

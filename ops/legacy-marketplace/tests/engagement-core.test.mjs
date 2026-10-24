@@ -17,3 +17,14 @@ test('events require exact same origin',()=>{
  assert.equal(validOrigin('https://evil.example','https://test.example/api/engagement/event'),false);
  assert.equal(validOrigin(null,'https://test.example/api/engagement/event'),false);
 });
+
+test('Railway canonical HTTPS hostname permits same-site form and tracker behind an internal HTTP proxy',()=>{
+ const trusted='hhba-web-production-024c.up.railway.app';
+ const internal='http://127.0.0.1:3000/api/engagement/event';
+ assert.equal(validOrigin('https://'+trusted,internal,trusted),true);
+ assert.equal(validOrigin('http://'+trusted,internal,trusted),false);
+ assert.equal(validOrigin('https://malicious.example',internal,trusted),false);
+ assert.equal(validOrigin('null',internal,trusted),false);
+ assert.equal(validOrigin(null,internal,trusted),false);
+ assert.equal(validOrigin('https://'+trusted,internal,'evil.com:443'),false);
+});

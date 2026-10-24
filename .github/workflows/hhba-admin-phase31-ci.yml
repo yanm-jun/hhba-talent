@@ -1,0 +1,49 @@
+name: HHBA Admin Phase 3.1 Private Metrics
+on:
+  push:
+    branches: [feat/admin-phase31-private-growth-20261021]
+  pull_request:
+    branches: [feat/phase3-demo-account-ui-20261021]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - uses: oven-sh/setup-bun@v2
+      - name: Validate secured admin source and behavior
+        run: |
+          node --check ops/legacy-marketplace/admin-ui/dashboard.js
+          node --test ops/legacy-marketplace/tests/engagement-core.test.mjs
+          bun test ops/legacy-marketplace/tests/admin-console.test.ts
+      - name: Validate pre-existing official-job contracts
+        working-directory: apps/web
+        run: node --test scripts/white-market-detail.contract.test.mjs scripts/demo-account.contract.test.mjs
+      - name: Compile existing recruitment site without altering client behavior
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+      - name: Static-admin integration contract
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const html=readFileSync('ops/legacy-marketplace/admin-ui/index.html','utf8');
+          const js=readFileSync('ops/legacy-marketplace/admin-ui/dashboard.js','utf8');
+          const server=readFileSync('ops/legacy-marketplace/railway-function-20261018.ts','utf8');
+          const docker=readFileSync('Dockerfile.hhba','utf8');
+          const ids=['ov-pv','ov-uv','ov-saves','ov-click','growth-pv','growth-uv','growth-views','growth-search','growth-click','growth-saved','growth-saved-devices','growth-changes','growth-quality','trend-chart','users-chart','users-data-quality','growth-open','investor-pv','investor-saved'];
+          for(const id of ids)if(!html.includes('id="'+id+'"')||!js.includes("'"+id+"'"))throw Error('MISSING_ADMIN_GROWTH_CONTROL:'+id);
+          if(!server.includes('await handlePrivateAdmin(req,u)')||server.indexOf('await handlePrivateAdmin(req,u)')>server.indexOf('await handleEngagement(req,u)'))throw Error('PRIVATE_ROUTE_NOT_FIRST');
+          if(!docker.includes('COPY ops/legacy-marketplace/admin-ui/ /app/admin-console/'))throw Error('MISSING_ADMIN_UI_IN_IMAGE');
+          if(html.includes('javascript:void')||html.includes('https://railway.app/api/admin/'))throw Error('INSECURE_ADMIN_UI');
+          console.log('PRIVATE_ADMIN_31_CONTRACT_OK',ids.length);
+          NODE

@@ -8,7 +8,10 @@ export type LiveJob = {
   titleStatus?: string; location?: string; locationZh?: string; platform?: string;
   source?: string; url: string; domestic?: boolean; remote?: boolean | null;
   recruitmentType?: string; observedAt?: string; recordKind?: string;
+  // Optional display labels for domestic-company search cards; no change to live job source, filtering or freshness.
+  educationLabel?: string; experienceLabel?: string;
   currentApplicationVerified?: boolean;
+  graduationYear?: number; responsibilitiesSummary?: string; requirementsSummary?: string;
 };
 export type LiveFilters = {
   q: string; company: string; country: '' | 'cn' | 'global'; remote: boolean;
@@ -112,6 +115,34 @@ async function readJSON<T>(path: string, signal: AbortSignal): Promise<T> {
 // as GitHub Pages, proxied by our own read-only /data/ route during migration.
 const PAGES_PREVIEW=import.meta.env.BASE_URL==='/hhba-talent/' || import.meta.env.VITE_HHBA_VERIFIED_SNAPSHOT==='1';
 let cachedSnapshot: Promise<LivePage>|null=null;
+
+// Railway-only public campus sidecar. The main ATS snapshot/audit stays unchanged.
+// Fail closed independently: a campus network error never invalidates overseas jobs.
+let campus2027Cache:Promise<LiveJob[]>|null=null;
+async function loadCampus2027():Promise<LiveJob[]>{
+ if(!PAGES_PREVIEW || import.meta.env.BASE_URL==='/hhba-talent/')return [];
+ if(!campus2027Cache){
+  campus2027Cache=fetch('/api/campus-2027/jobs',{credentials:'omit',cache:'no-store',
+    headers:{Accept:'application/json'}}).then(async response=>{
+   if(!response.ok)return [];
+   const data=await response.json() as {kind?:string;jobs?:LiveJob[];total?:number};
+   if(data.kind!=='HHBA_CAMPUS_2027_WAVE1_VERIFIED_DETAILS_V1'||
+      !Array.isArray(data.jobs)||data.jobs.length>100||data.jobs.length!==data.total)return [];
+   const now=Date.now(),ids=new Set<string>(),urls=new Set<string>(),accepted:LiveJob[]=[];
+   for(const j of data.jobs){
+    const observed=Date.parse(j.observedAt||'');
+    if(!safeId(j.id)||ids.has(j.id)||urls.has(j.url)||!j.domestic||
+       j.recordKind!=='OFFICIAL_JOB_PAGE_OBSERVED'||j.currentApplicationVerified!==false||
+       j.graduationYear!==2027||j.recruitmentType!=='CAMPUS'||!safeOfficialJobUrl(j)||
+       !Number.isFinite(observed)||observed>now+300000||now-observed>72*3600000)continue;
+    ids.add(j.id);urls.add(j.url);accepted.push(j);
+   }
+   return accepted;
+  }).catch(()=>{campus2027Cache=null;return []});
+ }
+ return campus2027Cache;
+}
+
 async function previewSnapshot(signal:AbortSignal):Promise<LivePage> {
   if(!cachedSnapshot) {
     const url=import.meta.env.BASE_URL+'data/jobs.json';
@@ -151,9 +182,10 @@ export async function listJobs(filters: LiveFilters, offset: number, signal: Abo
     const unfiltered=!filters.q.trim()&&!filters.company.trim()&&!filters.country&&
       !filters.remote&&!filters.recruitment_type&&!filters.location_country&&
       !filters.city&&!filters.education&&!filters.experience;
-    const [audit,index]=await Promise.all([
+    const [audit,index,campus]=await Promise.all([
       loadPublicJobAudit(),
-      unfiltered?Promise.resolve(null):loadOfficialSearchFacets()
+      unfiltered?Promise.resolve(null):loadOfficialSearchFacets(),
+      loadCampus2027()
     ]);
     if(!audit || audit.summary.indexed_as_of!==snapshot.updated)
       throw new Error('官方岗位核验结果尚未与列表同步，暂不显示旧数据');
@@ -164,8 +196,10 @@ export async function listJobs(filters: LiveFilters, offset: number, signal: Abo
       'OFFICIAL_SOURCE_READ_FAILED','OFFICIAL_TITLE_CHANGED',
       'INVALID_ATS_ID_OR_URL','DUPLICATE_JOB_ID','INVALID_JOB_ID'
     ].includes(entry.status)).map(entry=>entry.job_id));
-    const current={...snapshot,jobs:snapshot.jobs.filter(job=>!excluded.has(job.id)),
-      total:snapshot.jobs.length-excluded.size};
+    // Fresh official campus entries take precedence over matching historical URLs.
+    const campusUrls=new Set(campus.map(job=>job.url));
+    const existing=snapshot.jobs.filter(job=>!excluded.has(job.id)&&!campusUrls.has(job.url));
+    const current={...snapshot,jobs:[...campus,...existing],total:campus.length+existing.length};
     // No facet projection is needed to browse the audited, complete index.
     if(unfiltered)return {...current,jobs:current.jobs.slice(offset,offset+30),
       offset,limit:30};
@@ -187,7 +221,8 @@ export async function listJobs(filters: LiveFilters, offset: number, signal: Abo
 export async function getJob(id: string,signal: AbortSignal) {
   if(!safeId(id)) throw new Error('无效的岗位编号');
   if(PAGES_PREVIEW){
-    const listing=(await previewSnapshot(signal)).jobs.find(j=>j.id===id);
+    const campus=(await loadCampus2027()).find(j=>j.id===id);
+    const listing=campus||(await previewSnapshot(signal)).jobs.find(j=>j.id===id);
     if(!listing||!safeOfficialJobUrl(listing))throw new Error('岗位不存在或来源无效');
     return {job:listing,description:null,richHtml:null,applyUrl:null} as LiveDetail;
   }
