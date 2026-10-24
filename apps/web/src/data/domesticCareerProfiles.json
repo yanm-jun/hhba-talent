@@ -52,7 +52,8 @@
         "label": "华域视觉官网展示的常熟工厂真实外景（楼宇与企业标识）",
         "kind": "factory",
         "source": "https://www.hascovision.com/about/about-us",
-        "verification": "official_site_caption_and_visual_inspection"
+        "verification": "official_site_caption_and_visual_inspection",
+        "localPath": "domestic-media/e58d8ee59f9fe8a786e8a789e7a791e68a80efbc88e4b88ae6b5b7efbc89e69c89e99990e585ace58fb8-photo-0.webp"
       },
       {
         "url": "https://www.hascovision.com/Public/Uploads/uploadfile/images/20231219/e1img07.jpg",
@@ -251,7 +252,8 @@
         "label": "上汽集团官网发布的企业大楼外立面与上汽集团标识",
         "kind": "office",
         "source": "https://www.saicmotor.com/chinese/xwzx/mtbd/2025/61304.shtml",
-        "verification": "image_shown_on_official_company_article_pending_reuse_clearance"
+        "verification": "image_shown_on_official_company_article_pending_reuse_clearance",
+        "localPath": "domestic-media/e4b88ae6b1bde99b86e59ba2-photo-0.webp"
       },
       {
         "url": "domestic-media/user-b069062b35cacc0d8be80ec8.webp",
@@ -1033,7 +1035,8 @@
     "description": [
       "河南平高电气股份有限公司在2001年登陆上交所，属于中国电气装备集团体系的重要上市公司。它的特色在于高压、超高压和特高压电气装备，并非面向终端消费者的通用电器品牌。",
       "公司的主营业务覆盖气体绝缘组合电器（GIS）、高压断路器、隔离开关、变电站设备及输变电设备在线监测等。研发生产需要绝缘技术、材料、机械结构、电气设计和高可靠制造体系协同。",
-      "学习高电压技术、电气工程、自动化或机械的学生可关注输变电装备的产品研发、制造测试、质量检测与工程服务。具体岗位可能位于不同工厂或成员公司，不应直接将集团招聘信息视作平高电气实时招聘。"
+      "学习高电压技术、电气工程、自动化或机械的学生可关注输变电装备的产品研发、制造测试、质量检测与工程服务。具体岗位可能位于不同工厂或成员公司，不应直接将集团招聘信息视作平高电气实时招聘。",
+      "具体了解平高电气时，建议将公司主营产品、实施项目、技术或业务岗位与招聘组织逐项对应。研发、制造、销售支持和职能岗位的任职要求可能不同，相关专业关联仅表示有业务上的学习方向，并非企业对学历或专业的招聘承诺；请以官方招聘公告披露的真实岗位及招聘主体为准。"
     ],
     "business": [
       {
@@ -1057,15 +1060,15 @@
       "materials-engineering",
       "measurement-control"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://www.pinggao.com/contact/jobSociety.html",
+    "careersLabel": "平高电气官网社会招聘公告",
     "officialSource": "https://www.pinggao.com/about/company.html",
     "productSource": "https://pinggao.com",
-    "brandImage": "https://pinggao.com/static/cn/images/logo.png",
-    "brandImageSource": "https://pinggao.com/",
-    "brandAssetStatus": "official_website_logo_candidate",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "official_logo_rejected_mismatch",
     "photos": [],
-    "lastReviewed": "2026-10-23",
+    "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://pinggao.com",
     "industry": "高压开关设备",
@@ -1077,8 +1080,10 @@
     "subIndustry": "高压开关设备",
     "industryEvidenceUrl": "https://www.pinggao.com/about/company.html",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
-    "brandLocalPath": "domestic-media/f762632cf1ca43d-website-brand-candidate.png",
-    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending",
+    "rejectedLogoSource": "https://pinggao.com/static/cn/images/logo.png",
+    "rejectedLogoLocalPath": "domestic-media/f762632cf1ca43d-website-brand-candidate.png",
+    "brandReviewNote": "2026-10-24：候选图为蓝绿 S 形标识，与平高电气公开的 PG 红色闪电商标不一致；不显示此候选，也不误认作正式 Logo。"
   },
   "国电南瑞": {
     "displayName": "国电南瑞",
@@ -1175,7 +1180,8 @@
     "description": [
       "中控技术股份有限公司于1999年成立，在2020年登陆科创板。公司的重点客户来自石化、化工、能源、冶金等流程工业，不同于面向离散制造的通用机器人或消费电子企业。",
       "中控的早期技术基础是分布式控制系统和工业自动化仪表，并逐渐扩展至工业软件、生产运行管理、工业数据和工业AI方案。流程工业的核心挑战在于长周期、连续生产、安全约束和复杂工艺的稳定控制。",
-      "自动化、测控、计算机、软件与化工等专业可从DCS、过程控制、工业仪表、工艺优化和AI工程应用切入。官网公布杭州滨江区的联系地点；是否有相应方向的岗位应查看企业自己发布的招聘公告。"
+      "自动化、测控、计算机、软件与化工等专业可从DCS、过程控制、工业仪表、工艺优化和AI工程应用切入。官网公布杭州滨江区的联系地点；是否有相应方向的岗位应查看企业自己发布的招聘公告。",
+      "具体了解中控技术时，建议将公司主营产品、实施项目、技术或业务岗位与招聘组织逐项对应。研发、制造、销售支持和职能岗位的任职要求可能不同，相关专业关联仅表示有业务上的学习方向，并非企业对学历或专业的招聘承诺；请以官方招聘公告披露的真实岗位及招聘主体为准。"
     ],
     "business": [
       {
@@ -1214,7 +1220,7 @@
     "brandImageSource": "https://supcon.com",
     "brandAssetStatus": "official_domain_favicon_unverified_visual",
     "photos": [],
-    "lastReviewed": "2026-10-23",
+    "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://supcon.com",
     "industry": "流程控制",
@@ -1223,7 +1229,8 @@
     "primaryIndustry": "工业自动化与工业装备",
     "subIndustry": "流程控制",
     "industryEvidenceUrl": "https://srm.supcon.com/",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "careerReviewStatus": "official_recruitment_entry_not_yet_verified"
   },
   "拓斯达": {
     "displayName": "拓斯达",
@@ -1232,7 +1239,8 @@
     "description": [
       "广东拓斯达科技股份有限公司成立于2007年，2017年在创业板上市，总部位于东莞。公司主要服务制造业客户，围绕自动化设备和智能制造升级提供产品及解决方案。",
       "拓斯达公开介绍的核心装备包括工业机器人、数控机床、注塑机和具身智能相关产品；技术积累涉及运动控制、伺服、机器视觉、AI与工艺软件。它在汽车、3C电子、新能源及其他制造场景开展设备交付。",
-      "机械设计制造及其自动化、机器人工程、电气工程、自动化、计算机等专业可关注机器人本体与系统、装备研发、现场调试、运动控制与机器视觉。具体产品线决定实际需要的技能，不能将专业关联等同于当前招聘。"
+      "机械设计制造及其自动化、机器人工程、电气工程、自动化、计算机等专业可关注机器人本体与系统、装备研发、现场调试、运动控制与机器视觉。具体产品线决定实际需要的技能，不能将专业关联等同于当前招聘。",
+      "具体了解拓斯达时，建议将公司主营产品、实施项目、技术或业务岗位与招聘组织逐项对应。研发、制造、销售支持和职能岗位的任职要求可能不同，相关专业关联仅表示有业务上的学习方向，并非企业对学历或专业的招聘承诺；请以官方招聘公告披露的真实岗位及招聘主体为准。"
     ],
     "business": [
       {
@@ -1270,8 +1278,18 @@
     "brandImage": "https://topstarltd.com/favicon.ico",
     "brandImageSource": "https://topstarltd.com",
     "brandAssetStatus": "official_domain_favicon_unverified_visual",
-    "photos": [],
-    "lastReviewed": "2026-10-23",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-87dcba73458dbad3e189.webp",
+        "localPath": "domestic-media/company100-site-87dcba73458dbad3e189.webp",
+        "source": "https://www.topstarltd.com/lang-cn/about.html",
+        "kind": "screenshot",
+        "label": "拓斯达官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://topstarltd.com",
     "industry": "工业机器人",
@@ -1280,7 +1298,8 @@
     "primaryIndustry": "工业自动化与工业装备",
     "subIndustry": "工业机器人",
     "industryEvidenceUrl": "https://www.topstarltd.com/lang-cn/about.html",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "careerReviewStatus": "official_recruitment_entry_not_yet_verified"
   },
   "埃斯顿": {
     "displayName": "埃斯顿",
@@ -1730,7 +1749,8 @@
     "description": [
       "科大讯飞股份有限公司成立于1999年，2008年在深交所上市，长期专注智能语音、自然语言处理和人工智能产业化。企业既经营开发者平台，也通过面向教育、医疗、汽车与企业服务的解决方案拓展应用。",
       "技术积累涉及语音识别、语音合成、自然语言理解、机器翻译、计算机视觉及认知智能相关能力。不同场景需要算法工程、数据处理、平台研发、嵌入式交互与产品设计协同。",
-      "计算机、软件工程、人工智能、数据科学、电子信息和教育技术专业可了解相关产品线。大模型或语音产品的岗位需求会随项目变化，HHBA 不据此声称正在招聘相应专业。"
+      "计算机、软件工程、人工智能、数据科学、电子信息和教育技术专业可了解相关产品线。大模型或语音产品的岗位需求会随项目变化，HHBA 不据此声称正在招聘相应专业。",
+      "具体了解科大讯飞时，建议将公司主营产品、实施项目、技术或业务岗位与招聘组织逐项对应。研发、制造、销售支持和职能岗位的任职要求可能不同，相关专业关联仅表示有业务上的学习方向，并非企业对学历或专业的招聘承诺；请以官方招聘公告披露的真实岗位及招聘主体为准。"
     ],
     "business": [
       {
@@ -1761,15 +1781,25 @@
       "electronic-information",
       "education"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://iflytek.zhiye.com/campus/jobs",
+    "careersLabel": "科大讯飞2027校园招聘",
     "officialSource": "https://www.xfyun.cn/introduction",
     "productSource": "https://iflytek.com",
     "brandImage": "https://iflytek.com/favicon.ico",
     "brandImageSource": "https://iflytek.com",
     "brandAssetStatus": "official_domain_favicon_unverified_visual",
-    "photos": [],
-    "lastReviewed": "2026-10-23",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-7ca2b7da6e0f8654c088.webp",
+        "localPath": "domestic-media/company100-site-7ca2b7da6e0f8654c088.webp",
+        "source": "https://www.xfyun.cn/introduction",
+        "kind": "screenshot",
+        "label": "科大讯飞官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://iflytek.com",
     "industry": "语音与语言AI",
@@ -1787,7 +1817,8 @@
     "description": [
       "潍柴动力股份有限公司成立于2002年，拥有A股和H股资本市场平台，业务基础来自发动机及动力总成技术。与整车品牌不同，它关注动力系统及关键零部件的设计制造和产业协同。",
       "发动机、传动系统、动力总成及新能源动力技术构成其相关业务图景。产品的研发需要机械、材料、热力、自动控制、电子电气和工艺制造之间的协作。",
-      "车辆工程、能源与动力工程、机械制造、自动化和材料专业学生可关注动力系统研发、测试、生产工艺和质量控制。集团关联主体较多，必须在实际招聘页面确认用人公司，不能把所有岗位默认为潍柴动力总部。"
+      "车辆工程、能源与动力工程、机械制造、自动化和材料专业学生可关注动力系统研发、测试、生产工艺和质量控制。集团关联主体较多，必须在实际招聘页面确认用人公司，不能把所有岗位默认为潍柴动力总部。",
+      "具体了解潍柴动力时，建议将公司主营产品、实施项目、技术或业务岗位与招聘组织逐项对应。研发、制造、销售支持和职能岗位的任职要求可能不同，相关专业关联仅表示有业务上的学习方向，并非企业对学历或专业的招聘承诺；请以官方招聘公告披露的真实岗位及招聘主体为准。"
     ],
     "business": [
       {
@@ -1818,15 +1849,29 @@
       "automation",
       "electronic-information"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://weichai.zhiye.com/",
+    "careersLabel": "潍柴集团招聘平台（需确认潍柴动力岗位）",
     "officialSource": "https://www.weichaipower.com/assist/contact/",
     "productSource": "https://weichaipower.com",
     "brandImage": "https://weichaipower.com/favicon.ico",
     "brandImageSource": "https://weichaipower.com",
     "brandAssetStatus": "official_domain_favicon_unverified_visual",
-    "photos": [],
-    "lastReviewed": "2026-10-23",
+    "photos": [
+      {
+        "url": "domestic-media/company100-review-99bc5eb7f0f4e360c070.webp",
+        "localPath": "domestic-media/company100-review-99bc5eb7f0f4e360c070.webp",
+        "source": "https://www.xinhuanet.com/2021-08/05/c_1127733854.htm",
+        "kind": "factory",
+        "label": "新华网报道中的潍柴工业园区实景航拍图（非官网原始图）",
+        "verification": "reviewed_named_corporate_building_image_with_source",
+        "sourceFile": "reviewed-external-scene",
+        "attribution": "新华网报道配图（摄影作者待核实）",
+        "license": "news-photo-rights_not_independently_cleared",
+        "licenseUrl": null,
+        "changes": "resized and transcoded to WebP"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://weichaipower.com",
     "industry": "动力系统",
@@ -1929,7 +1974,8 @@
     "description": [
       "浪潮信息（股票代码000977）是一家聚焦服务器、计算系统与IT基础设施的上市公司，技术发展与云计算、大数据、AI算力需求密切相关。其业务对象主要是数据中心与企业级系统客户。",
       "官方介绍强调以系统为核心的AI计算架构、开放的智算产品与方案、存储系统及数据中心网络互联。开发涉及计算机体系结构、服务器硬件、嵌入式软件、系统软件、散热和高速网络。",
-      "计算机、软件、电子信息、通信、数据科学及机械散热相关专业可以从硬件研发、平台软件、存储、测试和运维体系了解企业。岗位招聘通常具有鲜明的项目与区域要求，不能仅凭企业行业判断其正在招某一专业。"
+      "计算机、软件、电子信息、通信、数据科学及机械散热相关专业可以从硬件研发、平台软件、存储、测试和运维体系了解企业。岗位招聘通常具有鲜明的项目与区域要求，不能仅凭企业行业判断其正在招某一专业。",
+      "具体了解浪潮信息时，建议将公司主营产品、实施项目、技术或业务岗位与招聘组织逐项对应。研发、制造、销售支持和职能岗位的任职要求可能不同，相关专业关联仅表示有业务上的学习方向，并非企业对学历或专业的招聘承诺；请以官方招聘公告披露的真实岗位及招聘主体为准。"
     ],
     "business": [
       {
@@ -1966,9 +2012,19 @@
     "productSource": "https://ieisystem.com",
     "brandImage": "https://www.ieisystem.com/global/template/images/logo.png",
     "brandImageSource": "https://ieisystem.com/",
-    "brandAssetStatus": "official_website_logo_candidate",
-    "photos": [],
-    "lastReviewed": "2026-10-23",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-fe44c3909bf328ecdc0f.webp",
+        "localPath": "domestic-media/company100-site-fe44c3909bf328ecdc0f.webp",
+        "source": "https://en.ieisystem.com/",
+        "kind": "screenshot",
+        "label": "浪潮信息官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://ieisystem.com",
     "industry": "服务器与AI算力",
@@ -1979,7 +2035,9 @@
     "industryEvidenceUrl": "https://www.ieisystem.com/about/",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
     "brandLocalPath": "domestic-media/fe44c3909bf328e-website-brand-candidate.png",
-    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending",
+    "careerReviewStatus": "official_recruitment_entry_not_yet_verified",
+    "brandReviewNote": "2026-10-24：逐图核对既有本地候选与企业官方网站的实际品牌标识；该标识用于本企业页面，不代表招聘合作。"
   },
   "隆基绿能": {
     "displayName": "隆基绿能",
@@ -2081,7 +2139,8 @@
     "description": [
       "晶科能源股份有限公司（688223）是一家专注太阳能光伏的上市企业，业务链包含硅片、电池片到组件制造及相关清洁能源解决方案。公司在国内外建设了多处生产与服务基地，面向全球市场提供光伏产品。",
       "晶科的技术重点包括高效电池、组件结构、材料可靠性与智能化工艺控制。太阳能组件既是电子器件也是制造产品，因此要协调材料、机械、电气、工艺、检测和供应链管理。",
-      "材料物理、新能源科学、电气工程、机械制造和自动化专业都可能与光伏产业链中的不同环节相关。公司总部、生产基地及当前招聘岗位需由独立官方渠道确认，不以某条企业目录信息替代岗位条件。"
+      "材料物理、新能源科学、电气工程、机械制造和自动化专业都可能与光伏产业链中的不同环节相关。公司总部、生产基地及当前招聘岗位需由独立官方渠道确认，不以某条企业目录信息替代岗位条件。",
+      "具体了解晶科能源时，建议将公司主营产品、实施项目、技术或业务岗位与招聘组织逐项对应。研发、制造、销售支持和职能岗位的任职要求可能不同，相关专业关联仅表示有业务上的学习方向，并非企业对学历或专业的招聘承诺；请以官方招聘公告披露的真实岗位及招聘主体为准。"
     ],
     "business": [
       {
@@ -2105,15 +2164,25 @@
       "automation",
       "mechanical-engineering"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://app.mokahr.com/campus-recruitment/jinkosolar/41896",
+    "careersLabel": "晶科能源校园招聘官方投递入口",
     "officialSource": "https://www.jinkosolar.com/site/aboutus",
     "productSource": "https://jinkosolar.com",
-    "brandImage": "https://jinkosolar.com/favicon.ico",
-    "brandImageSource": "https://jinkosolar.com",
-    "brandAssetStatus": "official_domain_favicon_unverified_visual",
-    "photos": [],
-    "lastReviewed": "2026-10-23",
+    "brandImage": "",
+    "brandImageSource": "https://www.jinkosolar.com/en/site/tigerneo_5",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-465bc4bfae1be70e4ae7.webp",
+        "localPath": "domestic-media/company100-site-465bc4bfae1be70e4ae7.webp",
+        "source": "https://www.jinkosolar.com/en/site/tigerneo_5",
+        "kind": "screenshot",
+        "label": "晶科能源官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://jinkosolar.com",
     "industry": "电池片与组件",
@@ -2122,7 +2191,10 @@
     "primaryIndustry": "新能源与储能",
     "subIndustry": "电池片与组件",
     "industryEvidenceUrl": "https://www.jinkosolar.com/site/aboutus",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "brandLocalPath": "domestic-media/company100-brand-465bc4bfae1be70e4ae7.png",
+    "brandIdentityEvidence": "官网页眉 Logo 截图，经图片内容逐张视觉核对：标识包含「晶科能源」对应的品牌文字或视觉标志。图片来自档案记录的企业官网页面；不表示 HHBA 获企业授权或合作。",
+    "brandVerifiedAt": "2026-10-24"
   },
   "亿纬锂能": {
     "displayName": "亿纬锂能",
@@ -2243,7 +2315,8 @@
     "description": [
       "欣旺达电子股份有限公司是深圳的锂电池及新能源领域上市公司，主营业务经历了从消费电子电池模组向动力电池、储能电池及智能硬件的拓展。官方网站将消费电池、动力电池、储能电池、能源服务等方向明确列为不同业务单元。",
       "电池技术的应用除了电芯与电池管理，也涉及电力电子、嵌入式控制、机械结构、生产装备及实验检测。尤其在汽车和储能系统中，对安全性能、循环寿命、热管理与制造一致性有较高要求。",
-      "材料、化学、电气、自动化、机械与电子信息等专业可分别关注材料研发、电池系统、电源管理和智能制造。欣旺达官网列出多个关联主体；如拟应聘动力电池子公司，应再确认实际用人主体的官方招聘渠道。"
+      "材料、化学、电气、自动化、机械与电子信息等专业可分别关注材料研发、电池系统、电源管理和智能制造。欣旺达官网列出多个关联主体；如拟应聘动力电池子公司，应再确认实际用人主体的官方招聘渠道。",
+      "具体了解欣旺达时，建议将公司主营产品、实施项目、技术或业务岗位与招聘组织逐项对应。研发、制造、销售支持和职能岗位的任职要求可能不同，相关专业关联仅表示有业务上的学习方向，并非企业对学历或专业的招聘承诺；请以官方招聘公告披露的真实岗位及招聘主体为准。"
     ],
     "business": [
       {
@@ -2274,15 +2347,25 @@
       "automation",
       "electronic-information"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://sunwoda.zhiye.com/jobs",
+    "careersLabel": "欣旺达招聘系统（总部及业务板块）",
     "officialSource": "https://sunwoda.com/",
     "productSource": "https://sunwoda.com",
-    "brandImage": "https://sunwoda.com/favicon.ico",
-    "brandImageSource": "https://sunwoda.com",
-    "brandAssetStatus": "official_domain_favicon_unverified_visual",
-    "photos": [],
-    "lastReviewed": "2026-10-23",
+    "brandImage": "",
+    "brandImageSource": "https://www.sunwoda.com/",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-6b6d421f9a1433cbf15c.webp",
+        "localPath": "domestic-media/company100-site-6b6d421f9a1433cbf15c.webp",
+        "source": "https://www.sunwoda.com/",
+        "kind": "screenshot",
+        "label": "欣旺达官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://sunwoda.com",
     "industry": "消费电池",
@@ -2291,7 +2374,10 @@
     "primaryIndustry": "新能源与储能",
     "subIndustry": "消费电池",
     "industryEvidenceUrl": "https://sunwoda.com/",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "brandLocalPath": "domestic-media/company100-brand-6b6d421f9a1433cbf15c.png",
+    "brandIdentityEvidence": "官网页眉 Logo 截图，经图片内容逐张视觉核对：标识包含「欣旺达」对应的品牌文字或视觉标志。图片来自档案记录的企业官网页面；不表示 HHBA 获企业授权或合作。",
+    "brandVerifiedAt": "2026-10-24"
   },
   "福耀玻璃": {
     "displayName": "福耀玻璃",
@@ -2589,14 +2675,16 @@
         "url": "https://official-oversears-file.sungrowpower.com/news-images/c0981ae7-a998-433b-b9b4-78127ea55996.png",
         "label": "阳光电源官网展示的 SG3.0/3.6/4.0RS 逆变器",
         "kind": "product",
-        "source": "https://www.sungrowpower.com/demo/zh/products/string-inverter"
+        "source": "https://www.sungrowpower.com/demo/zh/products/string-inverter",
+        "localPath": "domestic-media/e998b3e58589e794b5e6ba90-photo-0.webp"
       },
       {
         "url": "https://fra.sungrowpower.com/upload/6385632548369337056336172.jpg",
         "label": "阳光电源官方品牌故事展示的合肥总部办公塔楼",
         "kind": "headquarters",
         "source": "https://fra.sungrowpower.com/AboutSungrow",
-        "verification": "visually_attributed_to_exact_company_official_site_pending_reuse_clearance"
+        "verification": "visually_attributed_to_exact_company_official_site_pending_reuse_clearance",
+        "localPath": "domestic-media/e998b3e58589e794b5e6ba90-photo-1.webp"
       },
       {
         "url": "domestic-media/user-2e86bda6921e86580c185b46.webp",
@@ -2745,7 +2833,8 @@
     "description": [
       "合肥阳光电动力科技有限公司成立于2016年，依托阳光电源的电力电子与制造经验，专注新能源汽车电控、电源及相关产品。作为专门经营汽车电驱电子业务的公司，它不能和上市公司阳光电源的光伏逆变器招聘主体混为一谈。",
       "公司产品主要服务乘用车、商用车和工程机械的电控与电源场景，涵盖电力转换、驱动控制和车用系统工程。设计中需关注功能安全、可靠性、热管理、嵌入式软件和大批量制造要求。",
-      "车辆工程、电气工程、自动化、电子信息、机械和新能源相关专业可了解车用电力电子与控制研发。公司官网列出自身产品和发展历程，是否存在岗位仍需由该经营主体的官方招聘页面确认。"
+      "车辆工程、电气工程、自动化、电子信息、机械和新能源相关专业可了解车用电力电子与控制研发。公司官网列出自身产品和发展历程，是否存在岗位仍需由该经营主体的官方招聘页面确认。",
+      "具体了解阳光电动力时，建议将公司主营产品、实施项目、技术或业务岗位与招聘组织逐项对应。研发、制造、销售支持和职能岗位的任职要求可能不同，相关专业关联仅表示有业务上的学习方向，并非企业对学历或专业的招聘承诺；请以官方招聘公告披露的真实岗位及招聘主体为准。"
     ],
     "business": [
       {
@@ -2776,15 +2865,25 @@
       "energy-power",
       "software-engineering"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://www.sungrowev.com/cn/contact-us/join-us",
+    "careersLabel": "阳光电动力官网工作机会与投递方式",
     "officialSource": "https://www.sungrowev.com/cn/about-us",
     "productSource": "https://sungrowev.com",
     "brandImage": "",
-    "brandImageSource": "https://sungrowev.com",
-    "brandAssetStatus": "bad_http_response_needs_replacement",
-    "photos": [],
-    "lastReviewed": "2026-10-23",
+    "brandImageSource": "https://www.sungrowev.com/",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-56ba771c42b7c293e6c9.webp",
+        "localPath": "domestic-media/company100-site-56ba771c42b7c293e6c9.webp",
+        "source": "https://www.sungrowev.com/",
+        "kind": "screenshot",
+        "label": "阳光电动力官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://sungrowev.com",
     "industry": "汽车电控",
@@ -2796,7 +2895,10 @@
     "primaryIndustry": "新能源与储能",
     "subIndustry": "汽车电控",
     "industryEvidenceUrl": "https://www.sungrowev.com/cn/about-us",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "brandLocalPath": "domestic-media/company100-brand-56ba771c42b7c293e6c9.png",
+    "brandIdentityEvidence": "官网页眉 Logo 截图，经图片内容逐张视觉核对：标识包含「阳光电动力」对应的品牌文字或视觉标志。图片来自档案记录的企业官网页面；不表示 HHBA 获企业授权或合作。",
+    "brandVerifiedAt": "2026-10-24"
   },
   "亿纬氢能": {
     "displayName": "亿纬氢能",
@@ -2805,7 +2907,8 @@
     "description": [
       "惠州亿纬氢能有限公司成立于2021年，是聚焦电解水制氢系统的新能源企业。它与亿纬锂能的电池主营业务有产业关联，但经营产品、技术团队和岗位要求均存在区别，应保留独立企业档案。",
       "官网介绍的技术包括阴离子交换膜（AEM）、AEM电解槽及制氢系统，服务场景涉及可再生能源制氢以及石化、冶金等工业用氢。设备研发结合电化学、膜材料、流体、控制与系统工程。",
-      "化学工程、材料科学、新能源、电气和机械工程专业可以研究电解槽、系统集成、试验与生产工艺。具体职位和地点以亿纬氢能自行发布的正式渠道为准。"
+      "化学工程、材料科学、新能源、电气和机械工程专业可以研究电解槽、系统集成、试验与生产工艺。具体职位和地点以亿纬氢能自行发布的正式渠道为准。",
+      "具体了解亿纬氢能时，建议将公司主营产品、实施项目、技术或业务岗位与招聘组织逐项对应。研发、制造、销售支持和职能岗位的任职要求可能不同，相关专业关联仅表示有业务上的学习方向，并非企业对学历或专业的招聘承诺；请以官方招聘公告披露的真实岗位及招聘主体为准。"
     ],
     "business": [
       {
@@ -2836,15 +2939,15 @@
       "automation",
       "mechanical-engineering"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://www.evehydrogen.com/contact/contact1.html",
+    "careersLabel": "亿纬氢能官网校园招聘页面（数据待复核）",
     "officialSource": "https://www.evehydrogen.com/about/index.html",
     "productSource": "https://evehydrogen.com",
     "brandImage": "https://evehydrogen.com/favicon.ico",
     "brandImageSource": "https://evehydrogen.com",
     "brandAssetStatus": "official_domain_favicon_unverified_visual",
     "photos": [],
-    "lastReviewed": "2026-10-23",
+    "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://evehydrogen.com",
     "industry": "AEM技术",
@@ -2996,7 +3099,8 @@
         "url": "https://www.catl.com/uploads/1/image/public/202008/20200818161807_q641cuoh2y.png",
         "label": "宁德时代官网的企业总部建筑展示",
         "kind": "headquarters",
-        "source": "https://www.catl.com/about/profile/"
+        "source": "https://www.catl.com/about/profile/",
+        "localPath": "domestic-media/e5ae81e5beb7e697b6e4bba3-photo-0.webp"
       },
       {
         "url": "domestic-media/user-337888a30b38c8cfcd77ef77.webp",
@@ -3042,7 +3146,8 @@
     "description": [
       "三一重工股份有限公司是三一集团工业装备体系中的核心上市企业，主营大型工程机械及相关装备。官网将长沙与北京等地列为重要产业集群，业务和工作场景具有显著的制造、工程施工与产品售后属性。",
       "混凝土机械、挖掘机械、起重机械和桩工机械涉及复杂机械结构、液压传动、电气控制、车载软件与可靠性试验。大型工业设备产品还要求对工程现场环境、设备维护和售后服务有深入理解。",
-      "机械制造、车辆工程、能源动力、电气、自动化和工业工程背景可依据工程机械的研发、装配、调试和技术支持方向了解企业。集团其他经营主体和品牌不自动继承三一重工招聘入口。"
+      "机械制造、车辆工程、能源动力、电气、自动化和工业工程背景可依据工程机械的研发、装配、调试和技术支持方向了解企业。集团其他经营主体和品牌不自动继承三一重工招聘入口。",
+      "具体了解三一重工时，建议将公司主营产品、实施项目、技术或业务岗位与招聘组织逐项对应。研发、制造、销售支持和职能岗位的任职要求可能不同，相关专业关联仅表示有业务上的学习方向，并非企业对学历或专业的招聘承诺；请以官方招聘公告披露的真实岗位及招聘主体为准。"
     ],
     "business": [
       {
@@ -3067,15 +3172,29 @@
       "automation",
       "industrial-engineering"
     ],
-    "careersUrl": "",
-    "careersLabel": "",
+    "careersUrl": "https://sany.zhiye.com/campus/jobs",
+    "careersLabel": "三一集团2027校园招聘（核对三一重工用人主体）",
     "officialSource": "https://www.sanygroup.com/introduction/",
     "productSource": "https://sanygroup.com",
     "brandImage": "https://sanygroup.com/img/sany-logo.png",
     "brandImageSource": "https://sanygroup.com/",
-    "brandAssetStatus": "official_website_logo_candidate",
-    "photos": [],
-    "lastReviewed": "2026-10-23",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-review-d5adb014d4d826fb6b36.webp",
+        "localPath": "domestic-media/company100-review-d5adb014d4d826fb6b36.webp",
+        "source": "https://www.sanygroup.com/news/11374.html",
+        "kind": "factory",
+        "label": "三一集团官网发布的“三一重工”18号灯塔工厂外景",
+        "verification": "reviewed_named_corporate_building_image_with_source",
+        "sourceFile": "reviewed-external-scene",
+        "attribution": "三一集团官网",
+        "license": "first-party-editorial-image_rights_unverified",
+        "licenseUrl": null,
+        "changes": "resized and transcoded to WebP"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://sanygroup.com",
     "industry": "工程机械",
@@ -3086,7 +3205,8 @@
     "industryEvidenceUrl": "https://www.sanygroup.com/introduction/",
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
     "brandLocalPath": "domestic-media/d5adb014d4d826f-website-brand-candidate.png",
-    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending"
+    "brandIdentityEvidence": "Candidate found in official website HTML logo-marked image; human visual identity review pending",
+    "brandReviewNote": "2026-10-24：逐图核对既有本地候选与企业官方网站的实际品牌标识；该标识用于本企业页面，不代表招聘合作。"
   },
   "海康威视": {
     "displayName": "海康威视",
@@ -5167,5 +5287,2403 @@
     "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
     "brandLocalPath": "domestic-media/user-4637dc7db40564dd92de011c.png",
     "brandReviewNote": "已导入用户提供的Logo或截图，品牌归属尚需确认"
+  },
+  "长城汽车": {
+    "displayName": "长城汽车",
+    "subtitle": "汽车整车与零部件",
+    "summary": "长城汽车股份有限公司以 SUV、皮卡和新能源车型为核心经营方向，旗下不同汽车品牌面向差异化用户群与市场。",
+    "description": [
+      "长城汽车股份有限公司以 SUV、皮卡和新能源车型为核心经营方向，旗下不同汽车品牌面向差异化用户群与市场。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "整车项目包括动力系统、车身底盘、智能座舱、电子电气架构和生产制造，研发与销售并非一个统一团队。 车辆平台开发、智能驾驶辅助、三电系统和制造品质需要跨专业工程团队，也涉及海外市场、供应链及零部件体系。",
+      "车辆工程、电气工程、机械制造、自动化和计算机专业可根据具体车型平台与研发基地了解方向。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "汽车整车与零部件",
+        "description": "整车项目包括动力系统、车身底盘、智能座舱、电子电气架构和生产制造，研发与销售并非一个统一团队。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "车辆平台开发、智能驾驶辅助、三电系统和制造品质需要跨专业工程团队，也涉及海外市场、供应链及零部件体系。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "车辆工程、电气工程、机械制造、自动化和计算机专业可根据具体车型平台与研发基地了解方向。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "vehicle-engineering",
+      "electrical-engineering",
+      "mechanical-engineering",
+      "automation",
+      "computer-science",
+      "marketing"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.gwm.com.cn/",
+    "productSource": "https://www.gwm.com.cn/",
+    "website": "https://www.gwm.com.cn/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-review-9e193b14cd5739886f93.webp",
+        "localPath": "domestic-media/company100-review-9e193b14cd5739886f93.webp",
+        "source": "https://www.gwm.com.cn/news/3403600.html",
+        "kind": "office",
+        "label": "长城汽车官网2025年报道中的企业园区建筑照片",
+        "verification": "reviewed_named_corporate_building_image_with_source",
+        "sourceFile": "reviewed-external-scene",
+        "attribution": "长城汽车官方网站",
+        "license": "first-party-editorial-image_rights_unverified",
+        "licenseUrl": null,
+        "changes": "resized and transcoded to WebP"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "汽车整车与零部件",
+    "subIndustry": "汽车整车与零部件",
+    "industryEvidenceUrl": "https://www.gwm.com.cn/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.gwm.com.cn/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "广汽集团": {
+    "displayName": "广汽集团",
+    "subtitle": "汽车研发与整车制造",
+    "summary": "广州汽车集团股份有限公司经营整车研发、生产和销售，并涉及汽车零部件、出行服务及能源生态。",
+    "description": [
+      "广州汽车集团股份有限公司经营整车研发、生产和销售，并涉及汽车零部件、出行服务及能源生态。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "广汽的自主品牌与合资整车企业具有不同的经营与招聘主体，不能把集团旗下全部整车岗位理解为上市公司总部直接招聘。 新能源汽车研发、汽车造型、智能网联、汽车制造和国内外营销之间分工差异显著。",
+      "车辆工程、机械、自动化、软件、电气以及营销方向可从不同成员企业、车型项目分析对应能力。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "汽车研发与整车制造",
+        "description": "广汽的自主品牌与合资整车企业具有不同的经营与招聘主体，不能把集团旗下全部整车岗位理解为上市公司总部直接招聘。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "新能源汽车研发、汽车造型、智能网联、汽车制造和国内外营销之间分工差异显著。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "车辆工程、机械、自动化、软件、电气以及营销方向可从不同成员企业、车型项目分析对应能力。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "vehicle-engineering",
+      "mechanical-engineering",
+      "automation",
+      "software-engineering",
+      "electrical-engineering",
+      "marketing"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.gac.com.cn/",
+    "productSource": "https://www.gac.com.cn/",
+    "website": "https://www.gac.com.cn/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-review-5865d0d40a2939f75a07.webp",
+        "localPath": "domestic-media/company100-review-5865d0d40a2939f75a07.webp",
+        "source": "https://huacheng.gz-cmc.com/pages/2026/02/01/29d5156007bc4881a29146865010f259.html",
+        "kind": "office",
+        "label": "广州媒体2026年报道中的广汽集团T2园区楼宇照片",
+        "verification": "reviewed_named_corporate_building_image_with_source",
+        "sourceFile": "reviewed-external-scene",
+        "attribution": "广州媒体华城",
+        "license": "news-photo-rights_not_independently_cleared",
+        "licenseUrl": null,
+        "changes": "resized and transcoded to WebP"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "汽车研发与整车制造",
+    "subIndustry": "汽车研发与整车制造",
+    "industryEvidenceUrl": "https://www.gac.com.cn/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.gac.com.cn/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "长安汽车": {
+    "displayName": "长安汽车",
+    "subtitle": "汽车整车与新能源技术",
+    "summary": "重庆长安汽车股份有限公司经营乘用车、商用车及汽车相关技术，并围绕新能源、智能网联与全球研发开展业务。",
+    "description": [
+      "重庆长安汽车股份有限公司经营乘用车、商用车及汽车相关技术，并围绕新能源、智能网联与全球研发开展业务。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "整车开发从动力总成、底盘车身、汽车电子到软件与测试验证形成较长的产品开发链条。 企业的多产品线和研发组织意味着同一招聘站可能同时展示软件、电驱、电池和供应链等不同岗位类别。",
+      "车辆、机械、电气、计算机和工业设计专业应结合具体车型与工作地点了解岗位。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "汽车整车与新能源技术",
+        "description": "整车开发从动力总成、底盘车身、汽车电子到软件与测试验证形成较长的产品开发链条。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "企业的多产品线和研发组织意味着同一招聘站可能同时展示软件、电驱、电池和供应链等不同岗位类别。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "车辆、机械、电气、计算机和工业设计专业应结合具体车型与工作地点了解岗位。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "vehicle-engineering",
+      "mechanical-engineering",
+      "electrical-engineering",
+      "computer-science",
+      "industrial-design",
+      "automation"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.changan.com.cn/",
+    "productSource": "https://www.changan.com.cn/",
+    "website": "https://www.changan.com.cn/",
+    "brandImage": "",
+    "brandImageSource": "https://www.changan.com.cn/",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-7117fa8d72fb99b9c07c.webp",
+        "localPath": "domestic-media/company100-site-7117fa8d72fb99b9c07c.webp",
+        "source": "https://www.changan.com.cn/",
+        "kind": "screenshot",
+        "label": "长安汽车官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "汽车整车与新能源技术",
+    "subIndustry": "汽车整车与新能源技术",
+    "industryEvidenceUrl": "https://www.changan.com.cn/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.changan.com.cn/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐",
+    "brandLocalPath": "domestic-media/company100-brand-7117fa8d72fb99b9c07c.png",
+    "brandIdentityEvidence": "官网页眉 Logo 截图，经图片内容逐张视觉核对：标识包含「长安汽车」对应的品牌文字或视觉标志。图片来自档案记录的企业官网页面；不表示 HHBA 获企业授权或合作。",
+    "brandVerifiedAt": "2026-10-24"
+  },
+  "赛力斯": {
+    "displayName": "赛力斯",
+    "subtitle": "智能电动汽车",
+    "summary": "赛力斯集团股份有限公司围绕新能源汽车及相关零部件开展整车研发、制造与销售，智能电动化是其核心业务方向。",
+    "description": [
+      "赛力斯集团股份有限公司围绕新能源汽车及相关零部件开展整车研发、制造与销售，智能电动化是其核心业务方向。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "企业的研发体系包括汽车电子、动力电池和电驱动、整车性能以及智能化软硬件等领域。 整车制造链条需要结构、机械、自动化、制造工艺和供应商质量管理协同，业务品牌不应与上市主体混为一谈。",
+      "求职者应区分整车品牌项目、实际劳动合同主体与招聘网站列出的职能团队。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "智能电动汽车",
+        "description": "企业的研发体系包括汽车电子、动力电池和电驱动、整车性能以及智能化软硬件等领域。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "整车制造链条需要结构、机械、自动化、制造工艺和供应商质量管理协同，业务品牌不应与上市主体混为一谈。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "求职者应区分整车品牌项目、实际劳动合同主体与招聘网站列出的职能团队。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "vehicle-engineering",
+      "mechanical-engineering",
+      "electrical-engineering",
+      "automation",
+      "software-engineering",
+      "industrial-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.seres.cn/",
+    "productSource": "https://www.seres.cn/",
+    "website": "https://www.seres.cn/",
+    "brandImage": "",
+    "brandImageSource": "https://www.seres.cn/",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-7f6333102da9e8bda2a5.webp",
+        "localPath": "domestic-media/company100-site-7f6333102da9e8bda2a5.webp",
+        "source": "https://www.seres.cn/",
+        "kind": "screenshot",
+        "label": "赛力斯官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "智能电动汽车",
+    "subIndustry": "智能电动汽车",
+    "industryEvidenceUrl": "https://www.seres.cn/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.seres.cn/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐",
+    "brandLocalPath": "domestic-media/company100-brand-7f6333102da9e8bda2a5.png",
+    "brandIdentityEvidence": "官网页眉 Logo 截图，经图片内容逐张视觉核对：标识包含「赛力斯」对应的品牌文字或视觉标志。图片来自档案记录的企业官网页面；不表示 HHBA 获企业授权或合作。",
+    "brandVerifiedAt": "2026-10-24"
+  },
+  "江淮汽车": {
+    "displayName": "江淮汽车",
+    "subtitle": "商用车与新能源汽车",
+    "summary": "安徽江淮汽车集团股份有限公司长期经营商用车与乘用车产品，具有轻型商用车、客车和新能源整车业务。",
+    "description": [
+      "安徽江淮汽车集团股份有限公司长期经营商用车与乘用车产品，具有轻型商用车、客车和新能源整车业务。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "产品开发涉及汽车动力、底盘、整车控制、智能网联与汽车制造体系，商用车使用场景也不同于普通轿车。 企业与合作研发项目的技术职责、品牌归属及生产基地可能不同，应在岗位说明中明确识别。",
+      "车辆工程、自动化、电气、机械与物流相关专业可分别了解技术研发、生产和服务体系。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "商用车与新能源汽车",
+        "description": "产品开发涉及汽车动力、底盘、整车控制、智能网联与汽车制造体系，商用车使用场景也不同于普通轿车。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "企业与合作研发项目的技术职责、品牌归属及生产基地可能不同，应在岗位说明中明确识别。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "车辆工程、自动化、电气、机械与物流相关专业可分别了解技术研发、生产和服务体系。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "vehicle-engineering",
+      "mechanical-engineering",
+      "electrical-engineering",
+      "automation",
+      "logistics",
+      "marketing"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.jac.com.cn/",
+    "productSource": "https://www.jac.com.cn/",
+    "website": "https://www.jac.com.cn/",
+    "brandImage": "",
+    "brandImageSource": "https://www.jac.com.cn/",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-21618745f28ae4599590.webp",
+        "localPath": "domestic-media/company100-site-21618745f28ae4599590.webp",
+        "source": "https://www.jac.com.cn/",
+        "kind": "screenshot",
+        "label": "江淮汽车官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "商用车与新能源汽车",
+    "subIndustry": "商用车与新能源汽车",
+    "industryEvidenceUrl": "https://www.jac.com.cn/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.jac.com.cn/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐",
+    "brandLocalPath": "domestic-media/company100-brand-21618745f28ae4599590.png",
+    "brandIdentityEvidence": "官网页眉 Logo 截图，经图片内容逐张视觉核对：标识包含「江淮汽车」对应的品牌文字或视觉标志。图片来自档案记录的企业官网页面；不表示 HHBA 获企业授权或合作。",
+    "brandVerifiedAt": "2026-10-24"
+  },
+  "宇通客车": {
+    "displayName": "宇通客车",
+    "subtitle": "客车与新能源商用车",
+    "summary": "宇通客车股份有限公司以大中型客车与新能源商用车为主要产品，服务公交、客运、旅游和公共出行场景。",
+    "description": [
+      "宇通客车股份有限公司以大中型客车与新能源商用车为主要产品，服务公交、客运、旅游和公共出行场景。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "客车工程要考虑整车安全、车载电气、车身结构、动力系统、热管理及长周期使用可靠性。 集团还经营其他产业板块，宇通客车上市公司岗位与集团统一校招渠道必须逐项核对。",
+      "车辆工程、机械制造、自动化、能源动力、电气和售后服务方向可结合实际产品应用场景了解。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "客车与新能源商用车",
+        "description": "客车工程要考虑整车安全、车载电气、车身结构、动力系统、热管理及长周期使用可靠性。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "集团还经营其他产业板块，宇通客车上市公司岗位与集团统一校招渠道必须逐项核对。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "车辆工程、机械制造、自动化、能源动力、电气和售后服务方向可结合实际产品应用场景了解。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "vehicle-engineering",
+      "mechanical-engineering",
+      "automation",
+      "electrical-engineering",
+      "energy-power",
+      "marketing"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.yutong.com/",
+    "productSource": "https://www.yutong.com/",
+    "website": "https://www.yutong.com/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-4c0e5edf81ba50538238.webp",
+        "localPath": "domestic-media/company100-site-4c0e5edf81ba50538238.webp",
+        "source": "https://en.yutong.com/",
+        "kind": "screenshot",
+        "label": "宇通客车官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "客车与新能源商用车",
+    "subIndustry": "客车与新能源商用车",
+    "industryEvidenceUrl": "https://www.yutong.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.yutong.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "中国石油": {
+    "displayName": "中国石油",
+    "subtitle": "油气勘探与综合能源",
+    "summary": "中国石油天然气股份有限公司的业务覆盖油气勘探开发、炼油化工、销售及相关产业链。",
+    "description": [
+      "中国石油天然气股份有限公司的业务覆盖油气勘探开发、炼油化工、销售及相关产业链。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "上游油气田开发需要地质、石油工程、设备、安全与环境技术；下游炼化与销售则具有不同的工艺管理和商业职能。 国内外业务单位和集团母公司之间存在组织区别，高校毕业生招聘平台是集团统一渠道，具体公司需核对。",
+      "化学工程、能源动力、电气、自动化、计算机和财务等专业对应的业务场景差别很大。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "油气勘探与综合能源",
+        "description": "上游油气田开发需要地质、石油工程、设备、安全与环境技术；下游炼化与销售则具有不同的工艺管理和商业职能。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "国内外业务单位和集团母公司之间存在组织区别，高校毕业生招聘平台是集团统一渠道，具体公司需核对。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "化学工程、能源动力、电气、自动化、计算机和财务等专业对应的业务场景差别很大。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "chemical-engineering",
+      "energy-power",
+      "automation",
+      "electrical-engineering",
+      "computer-science",
+      "accounting"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.petrochina.com.cn/",
+    "productSource": "https://www.petrochina.com.cn/",
+    "website": "https://www.petrochina.com.cn/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "油气勘探与综合能源",
+    "subIndustry": "油气勘探与综合能源",
+    "industryEvidenceUrl": "https://www.petrochina.com.cn/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.petrochina.com.cn/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "中国石化": {
+    "displayName": "中国石化",
+    "subtitle": "石油化工与新材料",
+    "summary": "中国石油化工股份有限公司经营油气勘探、炼化生产、成品油销售及化工材料等产业链业务。",
+    "description": [
+      "中国石油化工股份有限公司经营油气勘探、炼化生产、成品油销售及化工材料等产业链业务。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "炼化装置持续运行对工艺控制、化学工程、催化、设备安全和质量检测提出不同能力要求。 企业下属油田、炼化分公司与销售系统各有管理体系，岗位可能在不同地区和实体发布。",
+      "化学工程、材料、自动化、电气、机械、物流和财务相关专业应从具体业务单位识别机会。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "石油化工与新材料",
+        "description": "炼化装置持续运行对工艺控制、化学工程、催化、设备安全和质量检测提出不同能力要求。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "企业下属油田、炼化分公司与销售系统各有管理体系，岗位可能在不同地区和实体发布。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "化学工程、材料、自动化、电气、机械、物流和财务相关专业应从具体业务单位识别机会。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "chemical-engineering",
+      "materials-engineering",
+      "automation",
+      "electrical-engineering",
+      "mechanical-engineering",
+      "accounting"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.sinopec.com/",
+    "productSource": "https://www.sinopec.com/",
+    "website": "https://www.sinopec.com/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "石油化工与新材料",
+    "subIndustry": "石油化工与新材料",
+    "industryEvidenceUrl": "https://www.sinopec.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.sinopec.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "中国海油": {
+    "displayName": "中国海油",
+    "subtitle": "海上油气与综合能源",
+    "summary": "中国海洋石油有限公司以海上油气勘探、开发及生产为主要经营业务，其相关集团在海洋工程和能源产业链中有多个法人单位。",
+    "description": [
+      "中国海洋石油有限公司以海上油气勘探、开发及生产为主要经营业务，其相关集团在海洋工程和能源产业链中有多个法人单位。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "海上能源项目涉及油藏、钻采、海洋平台、工程设备、海底管线、安全和环境管理，工作场景与陆上业务不同。 集团统一校园招聘平台可覆盖研究院、海上作业和工程服务企业，不能把全部岗位混作上市公司总部招聘。",
+      "能源工程、机械、电气、自动化、计算机及项目工程管理等方向需以具体用人主体为准。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "海上油气与综合能源",
+        "description": "海上能源项目涉及油藏、钻采、海洋平台、工程设备、海底管线、安全和环境管理，工作场景与陆上业务不同。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "集团统一校园招聘平台可覆盖研究院、海上作业和工程服务企业，不能把全部岗位混作上市公司总部招聘。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "能源工程、机械、电气、自动化、计算机及项目工程管理等方向需以具体用人主体为准。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "energy-engineering",
+      "mechanical-engineering",
+      "electrical-engineering",
+      "automation",
+      "computer-science",
+      "construction-management"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.cnooc.com.cn/",
+    "productSource": "https://www.cnooc.com.cn/",
+    "website": "https://www.cnooc.com.cn/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-42d0faa9154c340b11b5.webp",
+        "localPath": "domestic-media/company100-site-42d0faa9154c340b11b5.webp",
+        "source": "https://www.cnooc.com.cn/",
+        "kind": "screenshot",
+        "label": "中国海油官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "海上油气与综合能源",
+    "subIndustry": "海上油气与综合能源",
+    "industryEvidenceUrl": "https://www.cnooc.com.cn/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.cnooc.com.cn/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "中国神华": {
+    "displayName": "中国神华",
+    "subtitle": "煤炭能源与电力运输",
+    "summary": "中国神华能源股份有限公司经营煤炭生产、电力、铁路及港口运输等能源产业链业务。",
+    "description": [
+      "中国神华能源股份有限公司经营煤炭生产、电力、铁路及港口运输等能源产业链业务。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "煤矿生产与安全体系涉及矿山机电、智能采掘、监测自动化、环境治理，铁路及电力业务则需要不同专业基础。 母公司国家能源集团统一招聘系统中可能同时出现其他能源企业，必须按上市公司、矿区或分子公司辨认用人单位。",
+      "电气、自动化、机械、能源动力、交通运输与财务专业可结合具体岗位类型查阅官方要求。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "煤炭能源与电力运输",
+        "description": "煤矿生产与安全体系涉及矿山机电、智能采掘、监测自动化、环境治理，铁路及电力业务则需要不同专业基础。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "母公司国家能源集团统一招聘系统中可能同时出现其他能源企业，必须按上市公司、矿区或分子公司辨认用人单位。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "电气、自动化、机械、能源动力、交通运输与财务专业可结合具体岗位类型查阅官方要求。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "electrical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "energy-power",
+      "transportation",
+      "accounting"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.csec.com/",
+    "productSource": "https://www.csec.com/",
+    "website": "https://www.csec.com/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "煤炭能源与电力运输",
+    "subIndustry": "煤炭能源与电力运输",
+    "industryEvidenceUrl": "https://www.csec.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.csec.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "中国联通": {
+    "displayName": "中国联通",
+    "subtitle": "通信运营与数字科技",
+    "summary": "中国联合网络通信股份有限公司围绕移动通信、固网宽带、政企网络和数字化服务开展业务。",
+    "description": [
+      "中国联合网络通信股份有限公司围绕移动通信、固网宽带、政企网络和数字化服务开展业务。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "除通信网络规划建设和运维，业务还涉及云计算、网络安全、企业解决方案、数据与软件平台。 通信运营商的研发部门、属地分公司和产业互联网子公司组织不同，对经验与所在地要求可能差异明显。",
+      "通信工程、计算机、软件、电气、信息安全、市场营销和数据科学专业有不同的研究与实践入口。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "通信运营与数字科技",
+        "description": "除通信网络规划建设和运维，业务还涉及云计算、网络安全、企业解决方案、数据与软件平台。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "通信运营商的研发部门、属地分公司和产业互联网子公司组织不同，对经验与所在地要求可能差异明显。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "通信工程、计算机、软件、电气、信息安全、市场营销和数据科学专业有不同的研究与实践入口。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "communications",
+      "computer-science",
+      "software-engineering",
+      "information-security",
+      "data-science",
+      "marketing"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.chinaunicom.com.cn/",
+    "productSource": "https://www.chinaunicom.com.cn/",
+    "website": "https://www.chinaunicom.com.cn/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-review-7b88db32109256770f78.webp",
+        "localPath": "domestic-media/company100-review-7b88db32109256770f78.webp",
+        "source": "https://commons.wikimedia.org/wiki/File:%E4%B8%AD%E5%9B%BD%E8%81%94%E9%80%9A%E6%B7%B1%E5%9C%B3%E5%88%86%E5%85%AC%E5%8F%B8.jpg",
+        "kind": "office",
+        "label": "中国联通深圳分公司楼宇（摄影 Lhzss8，CC BY-SA 4.0；非集团总部）",
+        "verification": "reviewed_named_corporate_building_image_with_source",
+        "sourceFile": "reviewed-external-scene",
+        "attribution": "Lhzss8",
+        "license": "CC BY-SA 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "changes": "resized and transcoded to WebP"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "通信运营与数字科技",
+    "subIndustry": "通信运营与数字科技",
+    "industryEvidenceUrl": "https://www.chinaunicom.com.cn/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.chinaunicom.com.cn/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "中国邮政": {
+    "displayName": "中国邮政",
+    "subtitle": "邮政快递与金融服务",
+    "summary": "中国邮政集团有限公司经营邮政普遍服务、寄递物流和金融等板块，服务网络覆盖全国城乡。",
+    "description": [
+      "中国邮政集团有限公司经营邮政普遍服务、寄递物流和金融等板块，服务网络覆盖全国城乡。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "普遍服务和商业寄递的运营目标不同，信息系统、分拣网络、运输调度、客户服务及经营管理构成多种岗位场景。 旗下邮储银行等独立经营机构不能与集团邮政业务的招聘主体混用。",
+      "物流、计算机、财会、金融、工商管理和市场营销专业可根据寄递、网点或技术运营等团队区分。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "邮政快递与金融服务",
+        "description": "普遍服务和商业寄递的运营目标不同，信息系统、分拣网络、运输调度、客户服务及经营管理构成多种岗位场景。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "旗下邮储银行等独立经营机构不能与集团邮政业务的招聘主体混用。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "物流、计算机、财会、金融、工商管理和市场营销专业可根据寄递、网点或技术运营等团队区分。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "logistics",
+      "computer-science",
+      "accounting",
+      "finance",
+      "business-administration",
+      "marketing"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.chinapost.com.cn/",
+    "productSource": "https://www.chinapost.com.cn/",
+    "website": "https://www.chinapost.com.cn/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-432fc8c66640bfe1f847.webp",
+        "localPath": "domestic-media/company100-site-432fc8c66640bfe1f847.webp",
+        "source": "https://www.chinapost.com.cn/",
+        "kind": "screenshot",
+        "label": "中国邮政官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "邮政快递与金融服务",
+    "subIndustry": "邮政快递与金融服务",
+    "industryEvidenceUrl": "https://www.chinapost.com.cn/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.chinapost.com.cn/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "工商银行": {
+    "displayName": "工商银行",
+    "subtitle": "商业银行与金融科技",
+    "summary": "中国工商银行股份有限公司经营零售银行、公司金融、交易结算、金融市场及数字金融服务。",
+    "description": [
+      "中国工商银行股份有限公司经营零售银行、公司金融、交易结算、金融市场及数字金融服务。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "银行内的网点运营、法人客户、风险管理、金融科技开发和数据分析均属于不同业务方向。 总行科技中心、分行与境内外附属机构会有不同的招聘批次和要求，使用官网时应识别岗位所属主体。",
+      "金融、会计、经济、计算机、信息安全、法律和市场营销专业可结合银行岗位分类查看实际资格条件。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "商业银行与金融科技",
+        "description": "银行内的网点运营、法人客户、风险管理、金融科技开发和数据分析均属于不同业务方向。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "总行科技中心、分行与境内外附属机构会有不同的招聘批次和要求，使用官网时应识别岗位所属主体。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "金融、会计、经济、计算机、信息安全、法律和市场营销专业可结合银行岗位分类查看实际资格条件。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "finance",
+      "accounting",
+      "economics",
+      "computer-science",
+      "information-security",
+      "law"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.icbc.com.cn/",
+    "productSource": "https://www.icbc.com.cn/",
+    "website": "https://www.icbc.com.cn/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-e7e901fd1d79de188b9b.webp",
+        "localPath": "domestic-media/company100-site-e7e901fd1d79de188b9b.webp",
+        "source": "https://icbc.com.cn/",
+        "kind": "screenshot",
+        "label": "工商银行官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "商业银行与金融科技",
+    "subIndustry": "商业银行与金融科技",
+    "industryEvidenceUrl": "https://www.icbc.com.cn/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.icbc.com.cn/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "交通银行": {
+    "displayName": "交通银行",
+    "subtitle": "商业银行与金融服务",
+    "summary": "交通银行股份有限公司是全国性商业银行，业务涵盖企业金融、个人金融、信用卡、资金及财富管理等。",
+    "description": [
+      "交通银行股份有限公司是全国性商业银行，业务涵盖企业金融、个人金融、信用卡、资金及财富管理等。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "客户经营、信贷审批、风险合规、金融科技和运营服务在业务流程中承担不同职责。 总部、总行直属中心、分行和境外机构岗位不宜用一条集团招聘入口推定具体需求。",
+      "金融、会计、经济、法学、数据科学、软件和信息安全等专业可逐一核对岗位资格。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "商业银行与金融服务",
+        "description": "客户经营、信贷审批、风险合规、金融科技和运营服务在业务流程中承担不同职责。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "总部、总行直属中心、分行和境外机构岗位不宜用一条集团招聘入口推定具体需求。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "金融、会计、经济、法学、数据科学、软件和信息安全等专业可逐一核对岗位资格。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "finance",
+      "accounting",
+      "economics",
+      "law",
+      "data-science",
+      "software-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.bankcomm.com/",
+    "productSource": "https://www.bankcomm.com/",
+    "website": "https://www.bankcomm.com/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "商业银行与金融服务",
+    "subIndustry": "商业银行与金融服务",
+    "industryEvidenceUrl": "https://www.bankcomm.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.bankcomm.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "兴业银行": {
+    "displayName": "兴业银行",
+    "subtitle": "商业银行与综合金融",
+    "summary": "兴业银行股份有限公司提供企业金融、零售金融、同业及资产管理等金融服务。",
+    "description": [
+      "兴业银行股份有限公司提供企业金融、零售金融、同业及资产管理等金融服务。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "企业客户授信与绿色金融涉及行业研究、风控、运营结算等职能，银行科技系统支撑日常交易及线上业务。 不同分行与总行科技部门的岗位专业要求可能不同，不能把业务相关性理解为统一的校招门槛。",
+      "金融学、经济学、财会、计算机、信息安全和法律方向可按招聘机构分别了解。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "商业银行与综合金融",
+        "description": "企业客户授信与绿色金融涉及行业研究、风控、运营结算等职能，银行科技系统支撑日常交易及线上业务。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "不同分行与总行科技部门的岗位专业要求可能不同，不能把业务相关性理解为统一的校招门槛。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "金融学、经济学、财会、计算机、信息安全和法律方向可按招聘机构分别了解。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "finance",
+      "economics",
+      "accounting",
+      "computer-science",
+      "information-security",
+      "law"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.cib.com.cn/",
+    "productSource": "https://www.cib.com.cn/",
+    "website": "https://www.cib.com.cn/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-65886f285b393964eee5.webp",
+        "localPath": "domestic-media/company100-site-65886f285b393964eee5.webp",
+        "source": "https://www.cib.com.cn/cn/index.html",
+        "kind": "screenshot",
+        "label": "兴业银行官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "商业银行与综合金融",
+    "subIndustry": "商业银行与综合金融",
+    "industryEvidenceUrl": "https://www.cib.com.cn/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.cib.com.cn/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "中信银行": {
+    "displayName": "中信银行",
+    "subtitle": "商业银行与综合服务",
+    "summary": "中信银行股份有限公司面向个人、企业及机构客户提供金融服务，并在集团体系内开展综合金融协同。",
+    "description": [
+      "中信银行股份有限公司面向个人、企业及机构客户提供金融服务，并在集团体系内开展综合金融协同。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "银行业务覆盖公司信贷、交易金融、财富管理、金融科技以及合规审查，前中后台工作内容差异很大。 集团其他金融机构与中信银行属于不同招聘主体，不能使用一个品牌词替代法人核验。",
+      "金融、会计、经济、法学、数据与软件开发专业可以结合不同银行岗位路线确定学习重点。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "商业银行与综合服务",
+        "description": "银行业务覆盖公司信贷、交易金融、财富管理、金融科技以及合规审查，前中后台工作内容差异很大。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "集团其他金融机构与中信银行属于不同招聘主体，不能使用一个品牌词替代法人核验。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "金融、会计、经济、法学、数据与软件开发专业可以结合不同银行岗位路线确定学习重点。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "finance",
+      "accounting",
+      "economics",
+      "law",
+      "data-science",
+      "software-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.citicbank.com/",
+    "productSource": "https://www.citicbank.com/",
+    "website": "https://www.citicbank.com/",
+    "brandImage": "",
+    "brandImageSource": "https://www.citicbank.com/",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-592de55f9c15c660827a.webp",
+        "localPath": "domestic-media/company100-site-592de55f9c15c660827a.webp",
+        "source": "https://www.citicbank.com/",
+        "kind": "screenshot",
+        "label": "中信银行官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "商业银行与综合服务",
+    "subIndustry": "商业银行与综合服务",
+    "industryEvidenceUrl": "https://www.citicbank.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.citicbank.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐",
+    "brandLocalPath": "domestic-media/company100-brand-592de55f9c15c660827a.png",
+    "brandIdentityEvidence": "官网页眉 Logo 截图，经图片内容逐张视觉核对：标识包含「中信银行」对应的品牌文字或视觉标志。图片来自档案记录的企业官网页面；不表示 HHBA 获企业授权或合作。",
+    "brandVerifiedAt": "2026-10-24"
+  },
+  "中国人寿": {
+    "displayName": "中国人寿",
+    "subtitle": "寿险保险与资产管理",
+    "summary": "中国人寿保险股份有限公司以寿险、健康险、意外险和相关客户服务为重要经营领域。",
+    "description": [
+      "中国人寿保险股份有限公司以寿险、健康险、意外险和相关客户服务为重要经营领域。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "保险产品、精算定价、投资与风险管理以及保单运营均有不同的数学、业务和监管要求。 中国人寿集团旗下资产管理、财产保险等不同法人业务不可直接视作寿险上市公司招聘。",
+      "金融、经济、会计、数据、法律及市场营销专业可分别了解精算、投资、渠道或运营团队。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "寿险保险与资产管理",
+        "description": "保险产品、精算定价、投资与风险管理以及保单运营均有不同的数学、业务和监管要求。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "中国人寿集团旗下资产管理、财产保险等不同法人业务不可直接视作寿险上市公司招聘。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "金融、经济、会计、数据、法律及市场营销专业可分别了解精算、投资、渠道或运营团队。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "finance",
+      "economics",
+      "accounting",
+      "data-science",
+      "law",
+      "marketing"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.e-chinalife.com/",
+    "productSource": "https://www.e-chinalife.com/",
+    "website": "https://www.e-chinalife.com/",
+    "brandImage": "",
+    "brandImageSource": "https://www.e-chinalife.com/",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-dfb80b004c96aa54de35.webp",
+        "localPath": "domestic-media/company100-site-dfb80b004c96aa54de35.webp",
+        "source": "https://www.e-chinalife.com/",
+        "kind": "screenshot",
+        "label": "中国人寿官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "寿险保险与资产管理",
+    "subIndustry": "寿险保险与资产管理",
+    "industryEvidenceUrl": "https://www.e-chinalife.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.e-chinalife.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐",
+    "brandLocalPath": "domestic-media/company100-brand-dfb80b004c96aa54de35.png",
+    "brandIdentityEvidence": "官网页眉 Logo 截图，经图片内容逐张视觉核对：标识包含「中国人寿」对应的品牌文字或视觉标志。图片来自档案记录的企业官网页面；不表示 HHBA 获企业授权或合作。",
+    "brandVerifiedAt": "2026-10-24"
+  },
+  "迈瑞医疗": {
+    "displayName": "迈瑞医疗",
+    "subtitle": "医疗器械与生命信息",
+    "summary": "深圳迈瑞生物医疗电子股份有限公司以医疗设备研发和全球市场服务为核心，业务涉及生命信息与支持、医学影像、体外诊断。",
+    "description": [
+      "深圳迈瑞生物医疗电子股份有限公司以医疗设备研发和全球市场服务为核心，业务涉及生命信息与支持、医学影像、体外诊断。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "病人监护、超声、检验分析等产品既需要电子硬件和软件，也需要机械设计、算法、医学应用验证及质量体系。 医疗器械产品具有注册监管和长期质量责任，研发、临床应用、制造及国际售后岗位性质不同。",
+      "计算机、电子信息、自动化、机械、材料、数据和市场方向可根据设备类别及法规要求理解岗位。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "医疗器械与生命信息",
+        "description": "病人监护、超声、检验分析等产品既需要电子硬件和软件，也需要机械设计、算法、医学应用验证及质量体系。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "医疗器械产品具有注册监管和长期质量责任，研发、临床应用、制造及国际售后岗位性质不同。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "计算机、电子信息、自动化、机械、材料、数据和市场方向可根据设备类别及法规要求理解岗位。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "electronic-information",
+      "software-engineering",
+      "automation",
+      "mechanical-engineering",
+      "materials-engineering",
+      "marketing"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.mindray.com/cn",
+    "productSource": "https://www.mindray.com/cn",
+    "website": "https://www.mindray.com/cn",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-review-cb0b0e4b48739fd2cd78.webp",
+        "localPath": "domestic-media/company100-review-cb0b0e4b48739fd2cd78.webp",
+        "source": "https://www.zhaopin.com/companydetail/CC000577607.htm",
+        "kind": "office",
+        "label": "智联招聘雇主资料中展示的迈瑞医疗办公大楼照片",
+        "verification": "reviewed_named_corporate_building_image_with_source",
+        "sourceFile": "reviewed-external-scene",
+        "attribution": "智联招聘雇主资料（原摄影作者需另核实）",
+        "license": "employer-posted-photo-rights_not_independently_cleared",
+        "licenseUrl": null,
+        "changes": "resized and transcoded to WebP"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "医疗器械与生命信息",
+    "subIndustry": "医疗器械与生命信息",
+    "industryEvidenceUrl": "https://www.mindray.com/cn",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.mindray.com/cn",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "药明康德": {
+    "displayName": "药明康德",
+    "subtitle": "医药研发服务",
+    "summary": "无锡药明康德新药开发股份有限公司向制药与生物技术客户提供药物研发和实验研究相关服务。",
+    "description": [
+      "无锡药明康德新药开发股份有限公司向制药与生物技术客户提供药物研发和实验研究相关服务。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "业务环节涉及药物化学、生物研究、实验分析、早期开发和项目质量管理，并依赖实验室安全与规范操作。 不同业务平台和境内外经营实体的服务范围、科研岗位及工作地点不尽相同。",
+      "化学工程、材料、生物相关学科、数据、计算机和项目管理方向可根据具体实验和技术岗位核对。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "医药研发服务",
+        "description": "业务环节涉及药物化学、生物研究、实验分析、早期开发和项目质量管理，并依赖实验室安全与规范操作。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "不同业务平台和境内外经营实体的服务范围、科研岗位及工作地点不尽相同。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "化学工程、材料、生物相关学科、数据、计算机和项目管理方向可根据具体实验和技术岗位核对。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "chemical-engineering",
+      "materials-engineering",
+      "data-science",
+      "computer-science",
+      "business-administration",
+      "software-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.wuxiapptec.com/",
+    "productSource": "https://www.wuxiapptec.com/",
+    "website": "https://www.wuxiapptec.com/",
+    "brandImage": "",
+    "brandImageSource": "https://www.wuxiapptec.com/",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-60856a95b4e41852935b.webp",
+        "localPath": "domestic-media/company100-site-60856a95b4e41852935b.webp",
+        "source": "https://www.wuxiapptec.com/",
+        "kind": "screenshot",
+        "label": "药明康德官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "医药研发服务",
+    "subIndustry": "医药研发服务",
+    "industryEvidenceUrl": "https://www.wuxiapptec.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.wuxiapptec.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐",
+    "brandLocalPath": "domestic-media/company100-brand-60856a95b4e41852935b.png",
+    "brandIdentityEvidence": "官网页眉 Logo 截图，经图片内容逐张视觉核对：标识包含「药明康德」对应的品牌文字或视觉标志。图片来自档案记录的企业官网页面；不表示 HHBA 获企业授权或合作。",
+    "brandVerifiedAt": "2026-10-24"
+  },
+  "恒瑞医药": {
+    "displayName": "恒瑞医药",
+    "subtitle": "创新药研发与制药",
+    "summary": "江苏恒瑞医药股份有限公司经营创新药研发、药物生产及药品商业化相关业务。",
+    "description": [
+      "江苏恒瑞医药股份有限公司经营创新药研发、药物生产及药品商业化相关业务。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "新药开发要经历靶点和临床前研究、临床试验、注册申报、质量体系及供应链协同等环节。 研究院、生产基地与市场医学团队角色不同，研发岗位对实验平台与临床方向的要求尤其需要细看。",
+      "化工、材料、软件、统计、财务及生物医学相关专业应以具体岗位公告界定资格。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "创新药研发与制药",
+        "description": "新药开发要经历靶点和临床前研究、临床试验、注册申报、质量体系及供应链协同等环节。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "研究院、生产基地与市场医学团队角色不同，研发岗位对实验平台与临床方向的要求尤其需要细看。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "化工、材料、软件、统计、财务及生物医学相关专业应以具体岗位公告界定资格。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "chemical-engineering",
+      "materials-engineering",
+      "data-science",
+      "software-engineering",
+      "accounting",
+      "marketing"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.hengrui.com/",
+    "productSource": "https://www.hengrui.com/",
+    "website": "https://www.hengrui.com/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-82674fdbcc698714924f.webp",
+        "localPath": "domestic-media/company100-site-82674fdbcc698714924f.webp",
+        "source": "https://www.hengrui.com/",
+        "kind": "screenshot",
+        "label": "恒瑞医药官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "创新药研发与制药",
+    "subIndustry": "创新药研发与制药",
+    "industryEvidenceUrl": "https://www.hengrui.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.hengrui.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "智飞生物": {
+    "displayName": "智飞生物",
+    "subtitle": "生物制品与疫苗",
+    "summary": "重庆智飞生物制品股份有限公司从事疫苗及相关生物制品的研发、生产与推广。",
+    "description": [
+      "重庆智飞生物制品股份有限公司从事疫苗及相关生物制品的研发、生产与推广。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "疫苗研发与商业流通涉及临床研究、质量检定、冷链供应、生产工艺及医学信息传递。 制药企业的研发、生产质量和销售岗位处于不同合规环境，不能把医学相关岗位统称研发。",
+      "化工、生物技术相关学科、物流、数据分析、财务和市场方向可结合岗位的质量和合规要求理解。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "生物制品与疫苗",
+        "description": "疫苗研发与商业流通涉及临床研究、质量检定、冷链供应、生产工艺及医学信息传递。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "制药企业的研发、生产质量和销售岗位处于不同合规环境，不能把医学相关岗位统称研发。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "化工、生物技术相关学科、物流、数据分析、财务和市场方向可结合岗位的质量和合规要求理解。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "chemical-engineering",
+      "logistics",
+      "data-science",
+      "accounting",
+      "marketing",
+      "business-administration"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.zhifeishengwu.com/",
+    "productSource": "https://www.zhifeishengwu.com/",
+    "website": "https://www.zhifeishengwu.com/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-133f7a2b7e61a9ec5f02.webp",
+        "localPath": "domestic-media/company100-site-133f7a2b7e61a9ec5f02.webp",
+        "source": "https://www.zhifeishengwu.com/zh_CN",
+        "kind": "screenshot",
+        "label": "智飞生物官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "生物制品与疫苗",
+    "subIndustry": "生物制品与疫苗",
+    "industryEvidenceUrl": "https://www.zhifeishengwu.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.zhifeishengwu.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "爱尔眼科": {
+    "displayName": "爱尔眼科",
+    "subtitle": "眼科医疗与医疗服务",
+    "summary": "爱尔眼科医院集团股份有限公司提供眼科诊疗、屈光、视光及相关医疗服务，旗下不同地区设有医疗机构。",
+    "description": [
+      "爱尔眼科医院集团股份有限公司提供眼科诊疗、屈光、视光及相关医疗服务，旗下不同地区设有医疗机构。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "临床诊疗团队、医院运营、医学设备维护、信息化以及视光服务有不同专业资格要求。 医生、护士及其他执业相关岗位涉及法定资质，不应仅因专业相近就认定具备报考或上岗资格。",
+      "医学、医疗信息系统、计算机、财务、营销和医院运营方向应以每家医院发布的招聘条件为准。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "眼科医疗与医疗服务",
+        "description": "临床诊疗团队、医院运营、医学设备维护、信息化以及视光服务有不同专业资格要求。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "医生、护士及其他执业相关岗位涉及法定资质，不应仅因专业相近就认定具备报考或上岗资格。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "医学、医疗信息系统、计算机、财务、营销和医院运营方向应以每家医院发布的招聘条件为准。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "computer-science",
+      "software-engineering",
+      "data-science",
+      "accounting",
+      "marketing",
+      "business-administration"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.aierchina.com/",
+    "productSource": "https://www.aierchina.com/",
+    "website": "https://www.aierchina.com/",
+    "brandImage": "",
+    "brandImageSource": "https://www.aierchina.com/",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-9f7c3e56728763537301.webp",
+        "localPath": "domestic-media/company100-site-9f7c3e56728763537301.webp",
+        "source": "https://www.aierchina.com/",
+        "kind": "screenshot",
+        "label": "爱尔眼科官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "眼科医疗与医疗服务",
+    "subIndustry": "眼科医疗与医疗服务",
+    "industryEvidenceUrl": "https://www.aierchina.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.aierchina.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐",
+    "brandLocalPath": "domestic-media/company100-brand-9f7c3e56728763537301.png",
+    "brandIdentityEvidence": "官网页眉 Logo 截图，经图片内容逐张视觉核对：标识包含「爱尔眼科」对应的品牌文字或视觉标志。图片来自档案记录的企业官网页面；不表示 HHBA 获企业授权或合作。",
+    "brandVerifiedAt": "2026-10-24"
+  },
+  "海信视像": {
+    "displayName": "海信视像",
+    "subtitle": "显示终端与智能家电",
+    "summary": "海信视像科技股份有限公司主要围绕电视和显示设备的研发制造开展业务，注重显示技术及用户终端体验。",
+    "description": [
+      "海信视像科技股份有限公司主要围绕电视和显示设备的研发制造开展业务，注重显示技术及用户终端体验。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "显示终端研发涉及面板驱动、图像算法、音视频处理、软件系统、结构设计和量产测试。 集团内其他空调、家电等法人和品牌不能不加区分地当成海信视像本体。",
+      "电子信息、光电、计算机、软件、机械、工业设计及市场营销方向可结合具体产品系列了解。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "显示终端与智能家电",
+        "description": "显示终端研发涉及面板驱动、图像算法、音视频处理、软件系统、结构设计和量产测试。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "集团内其他空调、家电等法人和品牌不能不加区分地当成海信视像本体。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "电子信息、光电、计算机、软件、机械、工业设计及市场营销方向可结合具体产品系列了解。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "electronic-information",
+      "optoelectronics",
+      "computer-science",
+      "software-engineering",
+      "mechanical-engineering",
+      "industrial-design"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.hisense.com/",
+    "productSource": "https://www.hisense.com/",
+    "website": "https://www.hisense.com/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "显示终端与智能家电",
+    "subIndustry": "显示终端与智能家电",
+    "industryEvidenceUrl": "https://www.hisense.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.hisense.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "TCL科技": {
+    "displayName": "TCL科技",
+    "subtitle": "半导体显示与材料科技",
+    "summary": "TCL科技集团股份有限公司以半导体显示及相关产业为重要业务基础，显示产业链覆盖材料工艺到面板研发制造。",
+    "description": [
+      "TCL科技集团股份有限公司以半导体显示及相关产业为重要业务基础，显示产业链覆盖材料工艺到面板研发制造。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "半导体显示制造需要精密工艺、电子、光学、自动化、洁净生产与设备维护，产业投资与运营还涉及管理职能。 TCL科技上市主体与不同 TCL 消费电子业务及子公司之间存在实体差别，岗位不能跨集团默认继承。",
+      "材料工程、光电、电子信息、自动化、机械、软件与工业工程专业可依产品技术路线区分。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "半导体显示与材料科技",
+        "description": "半导体显示制造需要精密工艺、电子、光学、自动化、洁净生产与设备维护，产业投资与运营还涉及管理职能。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "TCL科技上市主体与不同 TCL 消费电子业务及子公司之间存在实体差别，岗位不能跨集团默认继承。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "材料工程、光电、电子信息、自动化、机械、软件与工业工程专业可依产品技术路线区分。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "materials-engineering",
+      "optoelectronics",
+      "electronic-information",
+      "automation",
+      "mechanical-engineering",
+      "industrial-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.tcltech.com/",
+    "productSource": "https://www.tcltech.com/",
+    "website": "https://www.tcltech.com/",
+    "brandImage": "",
+    "brandImageSource": "https://www.tcltech.com/",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-6a5dd350a3708ccdd6ea.webp",
+        "localPath": "domestic-media/company100-site-6a5dd350a3708ccdd6ea.webp",
+        "source": "https://www.tcltech.com/",
+        "kind": "screenshot",
+        "label": "TCL科技官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "半导体显示与材料科技",
+    "subIndustry": "半导体显示与材料科技",
+    "industryEvidenceUrl": "https://www.tcltech.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.tcltech.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐",
+    "brandLocalPath": "domestic-media/company100-brand-6a5dd350a3708ccdd6ea.png",
+    "brandIdentityEvidence": "官网页眉 Logo 截图，经图片内容逐张视觉核对：标识包含「TCL科技」对应的品牌文字或视觉标志。图片来自档案记录的企业官网页面；不表示 HHBA 获企业授权或合作。",
+    "brandVerifiedAt": "2026-10-24"
+  },
+  "宝钢股份": {
+    "displayName": "宝钢股份",
+    "subtitle": "钢铁冶金与先进材料",
+    "summary": "宝山钢铁股份有限公司以钢铁冶炼、轧制和高性能钢材为核心业务，服务汽车、能源、家电和工程制造等行业。",
+    "description": [
+      "宝山钢铁股份有限公司以钢铁冶炼、轧制和高性能钢材为核心业务，服务汽车、能源、家电和工程制造等行业。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "生产涉及冶炼、材料工艺、过程自动化、设备管理、能源环保与产品质量，技术岗位高度贴合现场场景。 中国宝武集团内其他钢铁公司和宝钢股份上市主体不是完全相同的招聘实体。",
+      "材料工程、化学工程、自动化、机械、电气及工业工程专业可按生产厂部与研发部门了解。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "钢铁冶金与先进材料",
+        "description": "生产涉及冶炼、材料工艺、过程自动化、设备管理、能源环保与产品质量，技术岗位高度贴合现场场景。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "中国宝武集团内其他钢铁公司和宝钢股份上市主体不是完全相同的招聘实体。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "材料工程、化学工程、自动化、机械、电气及工业工程专业可按生产厂部与研发部门了解。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "materials-engineering",
+      "chemical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "electrical-engineering",
+      "industrial-engineering"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.baosteel.com/",
+    "productSource": "https://www.baosteel.com/",
+    "website": "https://www.baosteel.com/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-review-13184d8f52bb112d1d5c.webp",
+        "localPath": "domestic-media/company100-review-13184d8f52bb112d1d5c.webp",
+        "source": "https://www.sfccn.com/2021/11-24/zNMDEzODdfMTY4MTkzNA.html",
+        "kind": "office",
+        "label": "南方财经新闻配图中的 BAOSTEEL 企业楼宇外景",
+        "verification": "reviewed_named_corporate_building_image_with_source",
+        "sourceFile": "reviewed-external-scene",
+        "attribution": "南方财经网（原摄影作者需另核实）",
+        "license": "news-photo-rights_not_independently_cleared",
+        "licenseUrl": null,
+        "changes": "resized and transcoded to WebP"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "钢铁冶金与先进材料",
+    "subIndustry": "钢铁冶金与先进材料",
+    "industryEvidenceUrl": "https://www.baosteel.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.baosteel.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "顺丰控股": {
+    "displayName": "顺丰控股",
+    "subtitle": "快递物流与供应链科技",
+    "summary": "顺丰控股股份有限公司经营快递运输、物流网络及供应链服务，业务覆盖航空陆运、仓储和客户交付等环节。",
+    "description": [
+      "顺丰控股股份有限公司经营快递运输、物流网络及供应链服务，业务覆盖航空陆运、仓储和客户交付等环节。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "物流产品不仅涉及揽收和配送，还包括运输网络规划、智能分拣、仓库运营、信息系统和客户服务。 境内外子公司、航空货运与供应链企业的岗位归属不同，不能将集团全部岗位视作上市公司总部职位。",
+      "物流、交通运输、自动化、计算机、数据科学及工商管理方向可分别关注网络、仓配和系统研发。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "快递物流与供应链科技",
+        "description": "物流产品不仅涉及揽收和配送，还包括运输网络规划、智能分拣、仓库运营、信息系统和客户服务。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "境内外子公司、航空货运与供应链企业的岗位归属不同，不能将集团全部岗位视作上市公司总部职位。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "物流、交通运输、自动化、计算机、数据科学及工商管理方向可分别关注网络、仓配和系统研发。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "logistics",
+      "transportation",
+      "automation",
+      "computer-science",
+      "data-science",
+      "business-administration"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.sf-express.com/cn/sc",
+    "productSource": "https://www.sf-express.com/cn/sc",
+    "website": "https://www.sf-express.com/cn/sc",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-bc4d73df39630718bd13.webp",
+        "localPath": "domestic-media/company100-site-bc4d73df39630718bd13.webp",
+        "source": "https://www.sf-express.com/chn/sc",
+        "kind": "screenshot",
+        "label": "顺丰控股官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "快递物流与供应链科技",
+    "subIndustry": "快递物流与供应链科技",
+    "industryEvidenceUrl": "https://www.sf-express.com/cn/sc",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.sf-express.com/cn/sc",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "安克创新": {
+    "displayName": "安克创新",
+    "subtitle": "消费电子与跨境品牌",
+    "summary": "安克创新科技股份有限公司以消费电子产品开发和全球品牌销售为主要业务，品类包含充电、智能硬件与消费科技设备。",
+    "description": [
+      "安克创新科技股份有限公司以消费电子产品开发和全球品牌销售为主要业务，品类包含充电、智能硬件与消费科技设备。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "产品研发涉及电源电子、工业设计、供应链、质量验证及软件系统，跨境市场还需要用户研究与全球渠道运营。 不同海外品牌与业务部门的招聘岗位可能具有研发和营销双重属性，不宜只按电商职位理解企业。",
+      "电子信息、机械、工业设计、市场营销、国际贸易与供应链方向可按产品品牌与团队区分。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "消费电子与跨境品牌",
+        "description": "产品研发涉及电源电子、工业设计、供应链、质量验证及软件系统，跨境市场还需要用户研究与全球渠道运营。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "不同海外品牌与业务部门的招聘岗位可能具有研发和营销双重属性，不宜只按电商职位理解企业。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "电子信息、机械、工业设计、市场营销、国际贸易与供应链方向可按产品品牌与团队区分。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "electronic-information",
+      "mechanical-engineering",
+      "industrial-design",
+      "marketing",
+      "international-trade",
+      "supply-chain"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.anker-in.com/",
+    "productSource": "https://www.anker-in.com/",
+    "website": "https://www.anker-in.com/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-5ba1b699a1052ef78801.webp",
+        "localPath": "domestic-media/company100-site-5ba1b699a1052ef78801.webp",
+        "source": "https://www.anker-in.com/",
+        "kind": "screenshot",
+        "label": "安克创新官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "消费电子与跨境品牌",
+    "subIndustry": "消费电子与跨境品牌",
+    "industryEvidenceUrl": "https://www.anker-in.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.anker-in.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "石头科技": {
+    "displayName": "石头科技",
+    "subtitle": "服务机器人与智能家居",
+    "summary": "北京石头世纪科技股份有限公司围绕智能清洁产品、算法控制及消费电子产品开展业务。",
+    "description": [
+      "北京石头世纪科技股份有限公司围绕智能清洁产品、算法控制及消费电子产品开展业务。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "智能扫地机器人等终端融合传感器、运动控制、环境感知、嵌入式软件、机械结构与供应链工程。 硬件研发、机器人算法、制造测试、海外产品运营和客服支持侧重点各异，需依岗位区分。",
+      "机器人工程、自动化、软件、计算机、机械、工业设计和国际市场方向均可按专业能力继续了解。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "服务机器人与智能家居",
+        "description": "智能扫地机器人等终端融合传感器、运动控制、环境感知、嵌入式软件、机械结构与供应链工程。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "硬件研发、机器人算法、制造测试、海外产品运营和客服支持侧重点各异，需依岗位区分。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "机器人工程、自动化、软件、计算机、机械、工业设计和国际市场方向均可按专业能力继续了解。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "robotics",
+      "automation",
+      "software-engineering",
+      "computer-science",
+      "mechanical-engineering",
+      "industrial-design"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.roborock.com/",
+    "productSource": "https://www.roborock.com/",
+    "website": "https://www.roborock.com/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-3442ec70890655e86891.webp",
+        "localPath": "domestic-media/company100-site-3442ec70890655e86891.webp",
+        "source": "https://us.roborock.com/",
+        "kind": "screenshot",
+        "label": "石头科技官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "服务机器人与智能家居",
+    "subIndustry": "服务机器人与智能家居",
+    "industryEvidenceUrl": "https://www.roborock.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.roborock.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "牧原股份": {
+    "displayName": "牧原股份",
+    "subtitle": "生猪养殖与食品产业",
+    "summary": "牧原食品股份有限公司以生猪养殖及相关产业链经营为核心，规模化养殖与生产运营具有独特管理要求。",
+    "description": [
+      "牧原食品股份有限公司以生猪养殖及相关产业链经营为核心，规模化养殖与生产运营具有独特管理要求。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "饲料营养、繁育育种、疫病防控、养殖场设备、环境控制和物流管理贯穿生产链条。 养殖基地工作现场与总部经营、采购、财务及信息系统岗位差异显著，专业应结合具体场区判断。",
+      "食品工程、自动化、机械、计算机、财务、物流和生物相关专业可从业务岗位中寻找真实对应方向。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "生猪养殖与食品产业",
+        "description": "饲料营养、繁育育种、疫病防控、养殖场设备、环境控制和物流管理贯穿生产链条。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "养殖基地工作现场与总部经营、采购、财务及信息系统岗位差异显著，专业应结合具体场区判断。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "食品工程、自动化、机械、计算机、财务、物流和生物相关专业可从业务岗位中寻找真实对应方向。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "food-engineering",
+      "automation",
+      "mechanical-engineering",
+      "computer-science",
+      "accounting",
+      "logistics"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.muyuanfoods.com/",
+    "productSource": "https://www.muyuanfoods.com/",
+    "website": "https://www.muyuanfoods.com/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "生猪养殖与食品产业",
+    "subIndustry": "生猪养殖与食品产业",
+    "industryEvidenceUrl": "https://www.muyuanfoods.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.muyuanfoods.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "温氏股份": {
+    "displayName": "温氏股份",
+    "subtitle": "畜禽养殖与农业产业",
+    "summary": "温氏食品集团股份有限公司围绕畜禽养殖、饲料营养和农业产业链开展业务，具有多地区养殖与合作经营体系。",
+    "description": [
+      "温氏食品集团股份有限公司围绕畜禽养殖、饲料营养和农业产业链开展业务，具有多地区养殖与合作经营体系。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "业务环节涵盖养殖技术、种源管理、饲料研发、防疫质量、加工物流及农业信息化。 技术服务人员、基地生产团队与集团职能岗位的资格和工作地点可能差异很大。",
+      "食品工程、物流、计算机、机械、自动化、财会和农业相关学科应分别核对岗位实践要求。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "畜禽养殖与农业产业",
+        "description": "业务环节涵盖养殖技术、种源管理、饲料研发、防疫质量、加工物流及农业信息化。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "技术服务人员、基地生产团队与集团职能岗位的资格和工作地点可能差异很大。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "食品工程、物流、计算机、机械、自动化、财会和农业相关学科应分别核对岗位实践要求。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "food-engineering",
+      "logistics",
+      "computer-science",
+      "mechanical-engineering",
+      "automation",
+      "accounting"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.wens.com.cn/",
+    "productSource": "https://www.wens.com.cn/",
+    "website": "https://www.wens.com.cn/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-079ce03536cd607f31c3.webp",
+        "localPath": "domestic-media/company100-site-079ce03536cd607f31c3.webp",
+        "source": "https://www.wens.com.cn/",
+        "kind": "screenshot",
+        "label": "温氏股份官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "畜禽养殖与农业产业",
+    "subIndustry": "畜禽养殖与农业产业",
+    "industryEvidenceUrl": "https://www.wens.com.cn/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.wens.com.cn/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "海大集团": {
+    "displayName": "海大集团",
+    "subtitle": "农牧饲料与养殖服务",
+    "summary": "广东海大集团股份有限公司经营饲料、水产及畜禽养殖相关服务，业务结合营养研发、生产与农牧技术推广。",
+    "description": [
+      "广东海大集团股份有限公司经营饲料、水产及畜禽养殖相关服务，业务结合营养研发、生产与农牧技术推广。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "饲料配方、动物营养、质量检测、工厂装备、客户技术服务和供应链构成不同业务板块。 农牧类专业与食品、机械、财会、物流、信息系统专业可能分别对应产品、制造和经营支持岗位。",
+      "不同区域经营公司与集团总部的招聘主体需要准确标注，岗位要求以企业公告为准。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "农牧饲料与养殖服务",
+        "description": "饲料配方、动物营养、质量检测、工厂装备、客户技术服务和供应链构成不同业务板块。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "农牧类专业与食品、机械、财会、物流、信息系统专业可能分别对应产品、制造和经营支持岗位。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "不同区域经营公司与集团总部的招聘主体需要准确标注，岗位要求以企业公告为准。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "food-engineering",
+      "chemical-engineering",
+      "automation",
+      "mechanical-engineering",
+      "logistics",
+      "marketing"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.haid.com.cn/",
+    "productSource": "https://www.haid.com.cn/",
+    "website": "https://www.haid.com.cn/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "农牧饲料与养殖服务",
+    "subIndustry": "农牧饲料与养殖服务",
+    "industryEvidenceUrl": "https://www.haid.com.cn/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.haid.com.cn/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "汇顶科技": {
+    "displayName": "汇顶科技",
+    "subtitle": "半导体芯片与智能感知",
+    "summary": "深圳市汇顶科技股份有限公司聚焦集成电路及智能终端芯片产品，技术应用涉及人机交互和智能感知。",
+    "description": [
+      "深圳市汇顶科技股份有限公司聚焦集成电路及智能终端芯片产品，技术应用涉及人机交互和智能感知。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "芯片研发的不同岗位覆盖模拟和数字电路、固件、软件、测试验证、器件及产品方案支持。 半导体客户项目通常需要跨芯片设计、应用工程与量产质量团队协作，与一般软件企业岗位区别明显。",
+      "微电子、集成电路、电子信息、软件工程、材料及通信专业可按芯片产品线识别方向。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "半导体芯片与智能感知",
+        "description": "芯片研发的不同岗位覆盖模拟和数字电路、固件、软件、测试验证、器件及产品方案支持。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "半导体客户项目通常需要跨芯片设计、应用工程与量产质量团队协作，与一般软件企业岗位区别明显。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "微电子、集成电路、电子信息、软件工程、材料及通信专业可按芯片产品线识别方向。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "microelectronics",
+      "integrated-circuits",
+      "electronic-information",
+      "software-engineering",
+      "materials-engineering",
+      "communications"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.goodix.com/",
+    "productSource": "https://www.goodix.com/",
+    "website": "https://www.goodix.com/",
+    "brandImage": "",
+    "brandImageSource": "https://www.goodix.com/en",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-65fec4c1938ad5a252a7.webp",
+        "localPath": "domestic-media/company100-site-65fec4c1938ad5a252a7.webp",
+        "source": "https://www.goodix.com/en",
+        "kind": "screenshot",
+        "label": "汇顶科技官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "半导体芯片与智能感知",
+    "subIndustry": "半导体芯片与智能感知",
+    "industryEvidenceUrl": "https://www.goodix.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.goodix.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐",
+    "brandLocalPath": "domestic-media/company100-brand-65fec4c1938ad5a252a7.png",
+    "brandIdentityEvidence": "官网页眉 Logo 截图，经图片内容逐张视觉核对：标识包含「汇顶科技」对应的品牌文字或视觉标志。图片来自档案记录的企业官网页面；不表示 HHBA 获企业授权或合作。",
+    "brandVerifiedAt": "2026-10-24"
+  },
+  "联想集团": {
+    "displayName": "联想集团",
+    "subtitle": "PC智能设备与IT服务",
+    "summary": "联想集团有限公司经营个人计算机、智能设备、服务器基础设施和企业技术服务，面向全球消费和机构市场。",
+    "description": [
+      "联想集团有限公司经营个人计算机、智能设备、服务器基础设施和企业技术服务，面向全球消费和机构市场。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "设备研发涉及计算机硬件、系统软件、散热结构、用户体验和制造测试，企业服务涉及基础设施部署及运维。 研发、全球供应链、产品管理、国际渠道销售和售后体系的岗位类型相差很大。",
+      "计算机、软件、电子、机械、工业设计、供应链和国际贸易专业可以按照业务板块研究需求。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "PC智能设备与IT服务",
+        "description": "设备研发涉及计算机硬件、系统软件、散热结构、用户体验和制造测试，企业服务涉及基础设施部署及运维。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "研发、全球供应链、产品管理、国际渠道销售和售后体系的岗位类型相差很大。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "计算机、软件、电子、机械、工业设计、供应链和国际贸易专业可以按照业务板块研究需求。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "computer-science",
+      "software-engineering",
+      "electronic-information",
+      "mechanical-engineering",
+      "supply-chain",
+      "international-trade"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.lenovo.com/cn/zh/",
+    "productSource": "https://www.lenovo.com/cn/zh/",
+    "website": "https://www.lenovo.com/cn/zh/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "PC智能设备与IT服务",
+    "subIndustry": "PC智能设备与IT服务",
+    "industryEvidenceUrl": "https://www.lenovo.com/cn/zh/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.lenovo.com/cn/zh/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "华为": {
+    "displayName": "华为",
+    "subtitle": "ICT基础设施与智能终端",
+    "summary": "华为技术有限公司面向运营商、企业和消费者提供通信网络、计算、云、终端及相关数字技术产品。",
+    "description": [
+      "华为技术有限公司面向运营商、企业和消费者提供通信网络、计算、云、终端及相关数字技术产品。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "业务板块涵盖无线和光通信、数据中心计算、操作系统、数字能源与智能汽车解决方案，研发体系涉及多种工程学科。 芯片与器件研究、算法、网络规划、企业服务、供应链和财经管理属于不同职位序列。",
+      "通信、计算机、电子信息、软件、电气、材料及财经专业可按公开的业务部门与招聘类别核对要求。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "ICT基础设施与智能终端",
+        "description": "业务板块涵盖无线和光通信、数据中心计算、操作系统、数字能源与智能汽车解决方案，研发体系涉及多种工程学科。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "芯片与器件研究、算法、网络规划、企业服务、供应链和财经管理属于不同职位序列。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "通信、计算机、电子信息、软件、电气、材料及财经专业可按公开的业务部门与招聘类别核对要求。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "communications",
+      "computer-science",
+      "software-engineering",
+      "electronic-information",
+      "electrical-engineering",
+      "finance"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.huawei.com/cn/",
+    "productSource": "https://www.huawei.com/cn/",
+    "website": "https://www.huawei.com/cn/",
+    "brandImage": "",
+    "brandImageSource": "https://www.huawei.com/cn/",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-82eaaba81d9dcc54deab.webp",
+        "localPath": "domestic-media/company100-site-82eaaba81d9dcc54deab.webp",
+        "source": "https://www.huawei.com/cn/",
+        "kind": "screenshot",
+        "label": "华为官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "ICT基础设施与智能终端",
+    "subIndustry": "ICT基础设施与智能终端",
+    "industryEvidenceUrl": "https://www.huawei.com/cn/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.huawei.com/cn/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐",
+    "brandLocalPath": "domestic-media/company100-brand-82eaaba81d9dcc54deab.png",
+    "brandIdentityEvidence": "官网页眉 Logo 截图，经图片内容逐张视觉核对：标识包含「华为」对应的品牌文字或视觉标志。图片来自档案记录的企业官网页面；不表示 HHBA 获企业授权或合作。",
+    "brandVerifiedAt": "2026-10-24"
+  },
+  "腾讯": {
+    "displayName": "腾讯",
+    "subtitle": "互联网平台与数字内容",
+    "summary": "腾讯控股有限公司经营社交通信、数字内容、游戏和企业数字服务等多种业务，包含不同产品与技术团队。",
+    "description": [
+      "腾讯控股有限公司经营社交通信、数字内容、游戏和企业数字服务等多种业务，包含不同产品与技术团队。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "即时通信、内容系统与游戏研发涉及软件架构、算法、图形、网络安全、数据基础设施和商业产品运营。 微信、游戏、广告、云及企业服务拥有不同的产品目标，岗位职责不能以互联网公司笼统归类。",
+      "计算机、软件、数据、信息安全、产品运营、市场营销和财务等专业可依据实际团队分析要求。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "互联网平台与数字内容",
+        "description": "即时通信、内容系统与游戏研发涉及软件架构、算法、图形、网络安全、数据基础设施和商业产品运营。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "微信、游戏、广告、云及企业服务拥有不同的产品目标，岗位职责不能以互联网公司笼统归类。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "计算机、软件、数据、信息安全、产品运营、市场营销和财务等专业可依据实际团队分析要求。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "computer-science",
+      "software-engineering",
+      "data-science",
+      "information-security",
+      "marketing",
+      "accounting"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.tencent.com/zh-cn/",
+    "productSource": "https://www.tencent.com/zh-cn/",
+    "website": "https://www.tencent.com/zh-cn/",
+    "brandImage": "",
+    "brandImageSource": "https://www.tencent.com/zh-cn/",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-53874092e000069bfeda.webp",
+        "localPath": "domestic-media/company100-site-53874092e000069bfeda.webp",
+        "source": "https://www.tencent.com/zh-cn/",
+        "kind": "screenshot",
+        "label": "腾讯官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "互联网平台与数字内容",
+    "subIndustry": "互联网平台与数字内容",
+    "industryEvidenceUrl": "https://www.tencent.com/zh-cn/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.tencent.com/zh-cn/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐",
+    "brandLocalPath": "domestic-media/company100-brand-53874092e000069bfeda.png",
+    "brandIdentityEvidence": "官网页眉 Logo 截图，经图片内容逐张视觉核对：标识包含「腾讯」对应的品牌文字或视觉标志。图片来自档案记录的企业官网页面；不表示 HHBA 获企业授权或合作。",
+    "brandVerifiedAt": "2026-10-24"
+  },
+  "阿里巴巴": {
+    "displayName": "阿里巴巴",
+    "subtitle": "电商平台与云计算",
+    "summary": "阿里巴巴集团控股有限公司主要面向电商、云计算、数字商业和关联服务开展业务。",
+    "description": [
+      "阿里巴巴集团控股有限公司主要面向电商、云计算、数字商业和关联服务开展业务。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "淘宝天猫、国际数字商业、云计算与物流生态的组织结构和技术产品各不相同，岗位归属必须核对业务公司。 技术体系涉及推荐与搜索、数据工程、分布式计算、AI服务、交易安全和商家运营；供应链团队又有独立专业要求。",
+      "计算机、软件、数据、经济、市场营销、物流和国际贸易专业可按所选业务公司分析。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "电商平台与云计算",
+        "description": "淘宝天猫、国际数字商业、云计算与物流生态的组织结构和技术产品各不相同，岗位归属必须核对业务公司。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "技术体系涉及推荐与搜索、数据工程、分布式计算、AI服务、交易安全和商家运营；供应链团队又有独立专业要求。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "计算机、软件、数据、经济、市场营销、物流和国际贸易专业可按所选业务公司分析。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "computer-science",
+      "software-engineering",
+      "data-science",
+      "economics",
+      "marketing",
+      "logistics"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.alibabagroup.com/zh-CN",
+    "productSource": "https://www.alibabagroup.com/zh-CN",
+    "website": "https://www.alibabagroup.com/zh-CN",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-47c1e53c427aafb4556b.webp",
+        "localPath": "domestic-media/company100-site-47c1e53c427aafb4556b.webp",
+        "source": "https://www.alibabagroup.com/zh-CN",
+        "kind": "screenshot",
+        "label": "阿里巴巴官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "电商平台与云计算",
+    "subIndustry": "电商平台与云计算",
+    "industryEvidenceUrl": "https://www.alibabagroup.com/zh-CN",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.alibabagroup.com/zh-CN",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "字节跳动": {
+    "displayName": "字节跳动",
+    "subtitle": "互联网内容与技术平台",
+    "summary": "字节跳动有限公司围绕数字内容、信息分发、企业协同和全球化数字产品开展业务。",
+    "description": [
+      "字节跳动有限公司围绕数字内容、信息分发、企业协同和全球化数字产品开展业务。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "相关产品技术包括推荐算法、内容理解、广告系统、视频工程、数据平台、终端应用及业务运营。 不同产品团队面向的用户、内容与商业模式并不相同；研发与审核治理、商业化和全球运营的岗位要求差别明显。",
+      "计算机、人工智能、软件、数据、设计、市场及法律相关专业可按具体招聘组织研究。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "互联网内容与技术平台",
+        "description": "相关产品技术包括推荐算法、内容理解、广告系统、视频工程、数据平台、终端应用及业务运营。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "不同产品团队面向的用户、内容与商业模式并不相同；研发与审核治理、商业化和全球运营的岗位要求差别明显。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "计算机、人工智能、软件、数据、设计、市场及法律相关专业可按具体招聘组织研究。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "computer-science",
+      "ai",
+      "software-engineering",
+      "data-science",
+      "marketing",
+      "law"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.bytedance.com/zh/",
+    "productSource": "https://www.bytedance.com/zh/",
+    "website": "https://www.bytedance.com/zh/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-702c213feab1671de4c5.webp",
+        "localPath": "domestic-media/company100-site-702c213feab1671de4c5.webp",
+        "source": "https://www.bytedance.com/zh/",
+        "kind": "screenshot",
+        "label": "字节跳动官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "互联网内容与技术平台",
+    "subIndustry": "互联网内容与技术平台",
+    "industryEvidenceUrl": "https://www.bytedance.com/zh/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.bytedance.com/zh/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "小米集团": {
+    "displayName": "小米集团",
+    "subtitle": "智能终端与人车家生态",
+    "summary": "小米集团经营智能手机、智能硬件、IoT、互联网服务及智能电动汽车等业务，构建跨终端产品生态。",
+    "description": [
+      "小米集团经营智能手机、智能硬件、IoT、互联网服务及智能电动汽车等业务，构建跨终端产品生态。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "产品研发覆盖工业设计、消费电子硬件、操作系统、芯片与通信、智能汽车、生产制造及软件平台。 手机、智能家居和汽车项目在研发周期、质量要求、供应链与岗位组织方面差异很大。",
+      "电子信息、计算机、软件、车辆、自动化、工业设计和营销专业可按具体产品事业部了解。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "智能终端与人车家生态",
+        "description": "产品研发覆盖工业设计、消费电子硬件、操作系统、芯片与通信、智能汽车、生产制造及软件平台。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "手机、智能家居和汽车项目在研发周期、质量要求、供应链与岗位组织方面差异很大。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "电子信息、计算机、软件、车辆、自动化、工业设计和营销专业可按具体产品事业部了解。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "electronic-information",
+      "computer-science",
+      "software-engineering",
+      "vehicle-engineering",
+      "automation",
+      "industrial-design"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.mi.com/",
+    "productSource": "https://www.mi.com/",
+    "website": "https://www.mi.com/",
+    "brandImage": "",
+    "brandImageSource": "",
+    "brandAssetStatus": "pending_official_logo",
+    "photos": [
+      {
+        "url": "domestic-media/company100-review-ed0ecc1cefa680fe8266.webp",
+        "localPath": "domestic-media/company100-review-ed0ecc1cefa680fe8266.webp",
+        "source": "https://commons.wikimedia.org/wiki/File:Xiaomi_Science_and_Technology_Park_(20220414090237).jpg",
+        "kind": "headquarters",
+        "label": "小米科技园北京总部大楼实景（摄影 N509FZ，修图 Jacek Halicki，CC BY-SA 4.0）",
+        "verification": "reviewed_named_corporate_building_image_with_source",
+        "sourceFile": "reviewed-external-scene",
+        "attribution": "N509FZ; Jacek Halicki (retouch)",
+        "license": "CC BY-SA 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "changes": "resized and transcoded to WebP"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "智能终端与人车家生态",
+    "subIndustry": "智能终端与人车家生态",
+    "industryEvidenceUrl": "https://www.mi.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.mi.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+  },
+  "京东集团": {
+    "displayName": "京东集团",
+    "subtitle": "电商零售与供应链服务",
+    "summary": "京东集团经营线上零售、物流、供应链技术及相关企业服务，业务覆盖多个独立法人和品牌。",
+    "description": [
+      "京东集团经营线上零售、物流、供应链技术及相关企业服务，业务覆盖多个独立法人和品牌。 对求职者而言，应从企业实际法人主体和业务产品定位理解工作机会，而不能把同一品牌下不同经营组织视为同一招聘单位。",
+      "交易平台、仓储运输、智能分拣、供应链管理、广告营销和金融科技等场景需要不同的技术与运营能力。 零售采销、京东物流和平台技术岗位归属可能不同，不能只依“京东”名称推断签约公司。",
+      "计算机、软件、数据、物流、供应链、营销和财会专业可分别理解平台、仓配和商业团队。 岗位介绍应进一步核对所在地、业务团队及真实用人单位；“相关专业”仅用于解释企业业务与所学知识可能的联系，不代表该公司正公开招聘这些专业。",
+      "在 HHBA 企业发现页面，该企业档案用于帮助用户认识主营业务和寻找相应的官方招聘渠道。招聘公告、岗位是否开放、投递资格与投递截止时间，以企业自己发布的信息为准；未取得独立招聘站证据时，不会把公司普通官网充作投递页面。"
+    ],
+    "business": [
+      {
+        "title": "电商零售与供应链服务",
+        "description": "交易平台、仓储运输、智能分拣、供应链管理、广告营销和金融科技等场景需要不同的技术与运营能力。"
+      },
+      {
+        "title": "研发、生产与运营",
+        "description": "零售采销、京东物流和平台技术岗位归属可能不同，不能只依“京东”名称推断签约公司。"
+      },
+      {
+        "title": "专业与业务应用",
+        "description": "计算机、软件、数据、物流、供应链、营销和财会专业可分别理解平台、仓配和商业团队。"
+      }
+    ],
+    "officeLocations": [],
+    "majorSlugs": [
+      "computer-science",
+      "software-engineering",
+      "data-science",
+      "logistics",
+      "supply-chain",
+      "marketing"
+    ],
+    "careersUrl": "",
+    "careersLabel": "",
+    "officialSource": "https://www.jd.com/",
+    "productSource": "https://www.jd.com/",
+    "website": "https://www.jd.com/",
+    "brandImage": "",
+    "brandImageSource": "https://corporate.jd.com/home",
+    "brandAssetStatus": "official_logo_visually_verified",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-a236d6f921ddf3002e8e.webp",
+        "localPath": "domestic-media/company100-site-a236d6f921ddf3002e8e.webp",
+        "source": "https://corporate.jd.com/home",
+        "kind": "screenshot",
+        "label": "京东集团官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
+    "lastReviewed": "2026-10-24",
+    "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
+    "contentReview": "first_pass_business_background_needs_company_page_confirmation",
+    "primaryIndustry": "电商零售与供应链服务",
+    "subIndustry": "电商零售与供应链服务",
+    "industryEvidenceUrl": "https://www.jd.com/",
+    "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
+    "photoSourcePage": "https://www.jd.com/",
+    "photoSourceLabel": "查看企业网站，图片仍待补齐",
+    "brandLocalPath": "domestic-media/company100-brand-a236d6f921ddf3002e8e.png",
+    "brandIdentityEvidence": "官网页眉 Logo 截图，经图片内容逐张视觉核对：标识包含「京东集团」对应的品牌文字或视觉标志。图片来自档案记录的企业官网页面；不表示 HHBA 获企业授权或合作。",
+    "brandVerifiedAt": "2026-10-24"
   }
 }

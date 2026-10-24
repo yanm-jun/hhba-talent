@@ -1,6 +1,7 @@
 import {useMemo,useState} from 'react';
 import {Building2,ArrowRight,GraduationCap} from 'lucide-react';
 import profiles from '../data/domesticCareerProfiles.json';
+import curated100 from '../data/domesticComplete100Target.json';
 import bundled from '../data/domesticMediaBundle.json';
 import {Link} from '../router';
 import {getDomesticCompanies,searchDomesticCompanies,type DomesticCompany} from '../services/domesticCompanySearch';
@@ -25,6 +26,7 @@ function BrandMark({src,name}:{src?:string;name:string}){
 }
 export function DomesticCompanyResults({query,majorSlug='',scope='',country='',city=''}:Props){
  const all=getDomesticCompanies();
+ const [browse100,setBrowse100]=useState(false);
  const word=query.trim();
  const chosen=majorById(majorSlug);
  const list=useMemo(()=>{
@@ -34,20 +36,30 @@ export function DomesticCompanyResults({query,majorSlug='',scope='',country='',c
   let eligible=chosen?all.filter(company=>company.entityKind!=='business'&&companyMatchesSelectedMajor(company,chosen.slug)):all;
   if(city)eligible=eligible.filter(company=>(company.city||'').includes(city)||(company.province||'').includes(city));
   if(word)return searchDomesticCompanies(eligible,word,36);
+  if(!chosen&&browse100){
+   const ids=new Map((curated100.companyNames as string[]).map((name,i)=>[name,i]));
+   return eligible.filter(company=>ids.has(company.name)).sort((a,b)=>(ids.get(a.name)||0)-(ids.get(b.name)||0)).slice(0,100);
+  }
   return eligible.filter(company=>company.status==='industry_reviewed').sort((a,b)=>{
    const score=(company:DomesticCompany)=>Number(Boolean(rich[company.name]?.summary))*150+
      Number(Boolean(company.careers))*30+Number(Boolean(company.city))*5;
    return score(b)-score(a)||a.name.localeCompare(b.name,'zh-CN');
   }).slice(0,36);
- },[all,word,chosen,city,country,scope]);
- if(!word&&!chosen)return null;
+ },[all,word,chosen,city,country,scope,browse100]);
+ if(!word&&!chosen&&!browse100){
+  if(scope==='global'||country&&!/^(cn|chn|china|中国|中国大陆)$/i.test(country))return null;
+  return <div className="domestic-browse100-entry">
+   <button type="button" onClick={()=>setBrowse100(true)}>浏览已整理的 100 家企业 <ArrowRight size={14}/></button>
+   <small>按企业主体查看真实介绍、相关专业与已登记的官方招聘渠道</small>
+  </div>;
+ }
  if(scope==='global'||country&&!/^(cn|chn|china|中国|中国大陆)$/i.test(country))
   return <section className="domestic-company-result" aria-label="国内企业专业匹配"><p className="domestic-company-caution">「所学专业」用于关联国内企业业务方向。如需查看相关国内企业，请将地区改为“国内外全部”或“中国岗位”。海外岗位仍按照官方岗位条件筛选。</p></section>;
  return <section className="domestic-company-result" aria-label="国内企业搜索结果">
-  <div className="domestic-company-title"><h3>{chosen?'与所学专业相关的国内企业':'相关国内企业'}</h3>
+  <div className="domestic-company-title"><h3>{chosen?'与所学专业相关的国内企业':browse100&&!word?'已整理的 100 家企业':'相关国内企业'}</h3>
    <small>{'显示 '+list.length+' 家 · 企业名录 '+all.length.toLocaleString()+' 条'}</small></div>
   {chosen&&<div className="domestic-major-filter-active"><GraduationCap size={15}/>已选择：<strong>{chosen.name}</strong><span>按业务证据关联，非在招承诺</span></div>}
-  <p className="domestic-company-caution">输入一个汉字即可搜索企业。选择专业后可进一步输入企业名称；进入公司详情可查看已核验的官方招聘渠道。</p>
+  <p className="domestic-company-caution">可按企业名称或专业筛选；部分新增公司图片或招聘入口仍待核验，企业详情将明确展示状态。</p>
   {!list.length&&<p className="domestic-company-empty">当前专业尚无经过业务证据核验的关联企业，或者不符合关键词与地区条件。可以更换专业，或清除专业筛选后直接搜索企业；这不代表没有企业招聘该专业。</p>}
   <div className="domestic-company-grid">{list.map(company=>{
    const editorial=rich[company.name];

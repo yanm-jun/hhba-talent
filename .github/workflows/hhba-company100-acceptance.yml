@@ -1,0 +1,77 @@
+name: HHBA 100 enterprise discovery isolated acceptance
+on:
+  pull_request:
+    branches:
+      - feat/admin-phase31-private-growth-20261021
+    paths:
+      - 'apps/web/src/data/domesticComplete100Target.json'
+      - 'apps/web/src/data/domesticCareerProfiles.json'
+      - 'apps/web/src/data/domesticRecruitmentRegistry.json'
+      - 'apps/web/src/data/domesticMediaBundle.json'
+      - 'apps/web/scripts/audit-domestic-company100.mjs'
+      - 'apps/web/scripts/import-company100-reviewed-scenes.mjs'
+      - '.github/workflows/hhba-company100-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  company100:
+    name: Verify enterprise profiles and import two reviewed real-office images
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.ref == 'feat/domestic-company100-20261024'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout isolated 100-company development branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/domestic-company100-20261024
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install exactly the existing frontend dependencies
+        run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Check source integrity and build existing HHBA UI
+        working-directory: apps/web
+        run: |
+          node --check scripts/import-company100-reviewed-scenes.mjs
+          node --check scripts/audit-domestic-company100.mjs
+          node scripts/audit-domestic-company100.mjs
+          npm run build
+      - name: Install minimal image reader (no browser or source lockfile changes)
+        run: npm install --prefix apps/web --no-save --no-package-lock sharp@0.34.4 --no-audit --no-fund
+      - name: Ingest two individually identified buildings with provenance
+        working-directory: apps/web
+        run: node scripts/import-company100-reviewed-scenes.mjs
+      - name: Revalidate media binaries and generate report
+        working-directory: apps/web
+        run: |
+          node scripts/audit-domestic-company100.mjs
+          npm run build
+      - name: Attach audit and source reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-company100-reviewed-photos
+          retention-days: 30
+          path: |
+            apps/web/preview-reports/company100-quality.json
+            apps/web/preview-reports/company100-reviewed-scenes.json
+      - name: Persist only audited development media and data
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f apps/web/src/data/domesticCareerProfiles.json apps/web/src/data/domesticMediaBundle.json
+          git add -f apps/web/public/domestic-media/company100-review-*.webp || true
+          if ! git diff --cached --quiet; then
+            git commit -m "assets(company100): import attributed company buildings and preserve photo credits"
+            git fetch origin feat/domestic-company100-20261024
+            git rebase origin/feat/domestic-company100-20261024
+            git push origin HEAD:refs/heads/feat/domestic-company100-20261024
+          else
+            echo "Company scene assets are already present."
+          fi
