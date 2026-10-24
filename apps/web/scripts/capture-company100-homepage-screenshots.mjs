@@ -118,6 +118,22 @@ try {
   }
  }));
 }finally{await browser.close()}
+// A metadata reference without an actual committed binary must NEVER appear ready.
+for(const name of group){
+ const profile=profiles[name],record=manifest.companies[name];
+ if(!record)continue;
+ if(record.brand?.state==='ready'&&record.brand.path?.startsWith('domestic-media/company100-brand-')&&
+    !existsSync(path.join('public',record.brand.path))){
+    record.brand={state:'missing',classification:'binary_missing_recheck_required'};
+    if(profile.brandLocalPath?.startsWith('domestic-media/company100-brand-'))delete profile.brandLocalPath;
+    profile.brandAssetStatus='pending_official_logo';
+    delete profile.brandIdentityEvidence;
+ }
+ for(const photo of record.photos||[]){
+  if(photo?.state==='ready'&&photo.path?.startsWith('domestic-media/company100-site-')&&
+     !existsSync(path.join('public',photo.path)))photo.state='binary_missing_recheck_required';
+ }
+}
 manifest.generatedAt=new Date().toISOString();
 writeFileSync(root+'domesticMediaBundle.json',JSON.stringify(manifest,null,2)+'\n');
 writeFileSync(root+'domesticCareerProfiles.json',JSON.stringify(profiles,null,2)+'\n');
