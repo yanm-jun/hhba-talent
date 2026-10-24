@@ -13,7 +13,7 @@ const {chromium}=await import('playwright');
 const {default:sharp}=await import('sharp');
 const existing=new Set(target.firstCohortNames);
 const group=target.secondCohortNames;
-const stats={checked:group.length,screenshots:0,skippedExisting:0,failed:[],saved:[]};
+const stats={checked:group.length,screenshots:0,logoCandidates:0,skippedExisting:0,failed:[],saved:[]};
 mkdirSync('public/domestic-media',{recursive:true});
 mkdirSync('preview-reports',{recursive:true});
 const shortHash=v=>createHash('sha256').update(v).digest('hex').slice(0,20);
@@ -75,6 +75,40 @@ try {
     profile.photos ||= [];
     if(entry>=0){profile.photos[entry]=photo;record.photos[entry]={state:'ready',path:rel,source:final.href,classification:'official_website_screenshot_unreviewed'};}
     else{profile.photos.push(photo);record.photos[profile.photos.length-1]={state:'ready',path:rel,source:final.href,classification:'official_website_screenshot_unreviewed'};}
+    // Capture only a first-party page-header logo candidate, NEVER an arbitrary
+    // sponsor, social icon or logo inside the page body. Review before verification.
+    if(!profile.brandLocalPath || profile.brandAssetStatus==='pending_official_logo'){
+     const matches=page.locator('header img,nav img,[class*="header"] img,[id*="header"] img');
+     const count=Math.min(await matches.count(),18);
+     for(let i=0;i<count;i++){
+      const mark=matches.nth(i);
+      try{
+       if(!await mark.isVisible())continue;
+       const alt=(await mark.getAttribute('alt'))||'';
+       const cls=(await mark.getAttribute('class'))||'';
+       const id=(await mark.getAttribute('id'))||'';
+       const src=(await mark.getAttribute('src'))||'';
+       const cue=alt+' '+cls+' '+id+' '+src;
+       if(!/logo|品牌标识|企业标志|公司标识/i.test(cue))continue;
+       if(/partner|sponsor|accessibility|certification|认证|无障碍|公众号|微信|二维码|logo-list/i.test(cue))continue;
+       const bounds=await mark.boundingBox();
+       if(!bounds||bounds.width<50||bounds.height<18||bounds.width>460||bounds.height>160)continue;
+       const bytes=await mark.screenshot({type:'png',timeout:3000,animations:'disabled'});
+       const normalized=await sharp(bytes).resize({width:500,withoutEnlargement:true}).png({compressionLevel:9}).toBuffer();
+       if(normalized.length<750||normalized.length>350000)continue;
+       const filename='domestic-media/company100-brand-'+shortHash(name)+'.png';
+       writeFileSync(path.join('public',filename),normalized);
+       profile.brandLocalPath=filename;
+       profile.brandImageSource=final.href;
+       profile.brandImage='';
+       profile.brandAssetStatus='official_website_logo_candidate';
+       profile.brandIdentityEvidence='Captured from site header on the matched company site; not independently visually identity verified';
+       record.brand={state:'ready',path:filename,source:final.href,classification:'first_party_header_logo_candidate_unreviewed'};
+       stats.logoCandidates++;
+       break;
+      }catch{ /* One unusable logo candidate must not block the page. */ }
+     }
+    }
     manifest.companies[name]=record;
     stats.screenshots++;
     stats.saved.push({name,path:rel,source:final.href,title:title.slice(0,100)});
@@ -87,4 +121,4 @@ manifest.generatedAt=new Date().toISOString();
 writeFileSync(root+'domesticMediaBundle.json',JSON.stringify(manifest,null,2)+'\n');
 writeFileSync(root+'domesticCareerProfiles.json',JSON.stringify(profiles,null,2)+'\n');
 writeFileSync('preview-reports/company100-screenshot-capture.json',JSON.stringify({...stats,date:new Date().toISOString()},null,2)+'\n');
-console.log('HHBA_COMPANY100_SCREENSHOT_IMPORT',JSON.stringify({checked:stats.checked,success:stats.screenshots,skipped:stats.skippedExisting,failed:stats.failed.length,sampleErrors:stats.failed.slice(0,12)}));
+console.log('HHBA_COMPANY100_SCREENSHOT_IMPORT',JSON.stringify({checked:stats.checked,success:stats.screenshots,logoCandidates:stats.logoCandidates,skipped:stats.skippedExisting,failed:stats.failed.length,sampleErrors:stats.failed.slice(0,12)}));
