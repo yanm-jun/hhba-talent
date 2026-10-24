@@ -26,7 +26,8 @@ export function loadCuratedOffline():Promise<Pack>{
   const response=await fetch(BASE+name,{method:'GET',cache:'force-cache',credentials:'omit'});
   if(!response.ok)throw Error('OFFLINE_CURATED_DATA_MISSING '+name);
   return response.json();
- })).then(([feed,manifest,catalog]:[Feed,Manifest,Catalog])=>{
+ })).then(raw=>{
+  const [feed,manifest,catalog]=raw as [Feed,Manifest,Catalog];
   if(feed.kind!=='HHBA_CURATED_JOBS_V1'||manifest.kind!=='HHBA_CURATED_OFFLINE_V1'||
    catalog.kind!=='HHBA_CURATED_COMPANIES_V1'||
    manifest.externalApiAtRuntime!==false||
