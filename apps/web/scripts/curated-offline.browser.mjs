@@ -8,12 +8,11 @@ const preventOverseas=page=>{
   const host=new URL(request.url()).hostname;
   if(host!=='127.0.0.1')blocked.push(request.url());
  });
- page.route(/https:\/\/(?:[^/]*\.)?(?:ashbyhq\.com|greenhouse\.io|lever\.co|up\.railway\.app)\//,route=>route.abort());
 };
 try{
  const page=await browser.newPage({viewport:{width:1440,height:920}});
  await preventOverseas(page);
- const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>console.log('OFFLINE_REQUEST_FAILED',r.url(),r.failure()?.errorText));
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')console.log('OFFLINE_CONSOLE_ERROR',m.text())});page.on('response',r=>{if(r.url().includes('/assets/'))console.log('OFFLINE_ASSET_RESPONSE',r.status(),r.url(),r.headers()['content-type'])});page.on('requestfailed',r=>console.log('OFFLINE_REQUEST_FAILED',r.url(),r.failure()?.errorText));
  const response=await page.goto(base,{waitUntil:'domcontentloaded'});
  await page.waitForTimeout(2800);
  console.log('OFFLINE_PAGE_DEBUG',JSON.stringify({http:response?.status(),url:page.url(),body:(await page.locator('body').innerText()).slice(0,1200),errors,curated:await page.locator('.curated-market').count()}));
