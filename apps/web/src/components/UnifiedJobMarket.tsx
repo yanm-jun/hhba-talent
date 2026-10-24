@@ -67,7 +67,7 @@ function JobCard({job,lang,asOf}:{job:LiveJob,lang:Language,asOf:string}){
   const source=safeOfficialJobUrl(job);
   const profile=companyProfileForJob(job);
   const companyRoute=companyPageRouteForJob(job);
-  if(!source || !['recent','historical'].includes(officialStatus(job,asOf)))return null;
+  if(!source || officialStatus(job,asOf)!=='recent')return null;
   return <article className="unified-job-card">
     <div className="unified-job-head">
       {profile?<Link className="unified-company-brand" to={'/companies/'+profile.slug}
@@ -185,7 +185,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       .finally(()=>clearTimeout(guard));
     return ()=>{clearTimeout(guard);controller.abort()};
   },[defaultView,retry]);
-  const eligible=useMemo(()=>snapshot?.jobs.filter(j=>['recent','historical'].includes(officialStatus(j,snapshot.updated)))||[],[snapshot]);
+  const eligible=useMemo(()=>snapshot?.jobs.filter(j=>officialStatus(j,snapshot.updated)==='recent')||[],[snapshot]);
   // Only the UNFILTERED first page gets six highlighted jobs. Search,
   // company/city filtering and all other pages retain their normal results.
   const curatedIds=new Set(featured?.map(j=>j.id)||[]);
