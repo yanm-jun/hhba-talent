@@ -5,6 +5,7 @@ const json=p=>JSON.parse(load(p));
 const target=json('src/data/domesticComplete200Target.json');
 const original=json('src/data/domesticComplete100Target.json');
 const additions=json('src/data/domesticCompanyExpansion200Profiles.json');
+const sourceBacked=json('src/data/domesticCompany200VerifiedEditorial.json').entries;
 const registry=json('src/data/domesticRecruitment200Registry.json').entries;
 const joined=target.companyNames;
 assert.equal(joined.length,200);
@@ -20,17 +21,20 @@ for(const name of joined.slice(100)){
  assert(p.majorSlugs?.length>=4,'Each employer must link to at least four majors: '+name);
  if(registry[name])assert(registry[name].recruitmentEntity===name,'Recruiter legal/group identity needs disclosure: '+name);
 }
+const shared200=load('src/services/domesticCompany200Data.ts');
+assert(shared200.includes('domesticCompany200VerifiedEditorial'),'Reviewed enterprise narrative not connected to runtime');
+assert.equal(Object.keys(sourceBacked).length,8,'Eight individually source-backed company profiles');
 const search=load('src/services/domesticCompanySearch.ts');
 const majors=load('src/services/domesticMajors.ts');
 const result=load('src/components/DomesticCompanyResults.tsx');
 const page=load('src/pages/DomesticCompanyPage.tsx');
 for(const [label,source,words] of [
- ['company search',search,['domesticCompanyExpansion200Profiles','domesticRecruitment200Registry','profile.primaryIndustry']],
- ['major search',majors,['domesticCompanyExpansion200Profiles','allReviewedProfiles','biology']],
- ['result list',result,['domesticComplete200Target','browse200','domesticCompanyExpansion200Profiles','domesticMedia200Bundle']],
- ['detail page',page,['domesticCompanyExpansion200Profiles','domesticMedia200Bundle','contentReview']]
+ ['company search',search,['domesticCompany200Data','domesticRecruitment200Registry','profile.primaryIndustry']],
+ ['major search',majors,['domesticCompany200Data','allReviewedProfiles','biology']],
+ ['result list',result,['domesticComplete200Target','browse200','domesticCompany200Data','domesticMedia200Bundle']],
+ ['detail page',page,['domesticCompany200Data','domesticMedia200Bundle','contentReview']]
 ])for(const w of words)assert(source.includes(w),label+' missing source connection: '+w);
 console.log('HHBA_COMPANY200_INTEGRATION_OK',JSON.stringify({
   all:joined.length,added:100,majorsIncluded:joined.slice(100).filter(n=>additions[n].majorSlugs?.length>=4).length,
-  recruitmentWithEvidence:Object.keys(registry).length,pathsVerified:4
+  recruitmentWithEvidence:Object.keys(registry).length,sourceBackedEditorial:Object.keys(sourceBacked).length,pathsVerified:4
 }));
