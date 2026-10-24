@@ -1,0 +1,70 @@
+name: HHBA market and 200 enterprises live browser acceptance
+on:
+  push:
+    branches: [feat/domestic-company200-20261024]
+    paths:
+      - '.github/workflows/hhba-company200-browser-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/domestic-company200-20261024
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install headless browser in disposable runner
+        run: |
+          npm install --no-save --no-package-lock --prefix apps/web playwright@1.56.1 --no-audit --no-fund
+          cd apps/web
+          npx playwright install --with-deps chromium
+      - name: Test original market and additive 200-company page in real browser
+        working-directory: apps/web
+        run: |
+          mkdir -p preview-reports/browser
+          node --input-type=module <<'NODE'
+          import {chromium} from 'playwright';
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          const page=await browser.newPage({viewport:{width:1350,height:960},locale:'zh-CN'});
+          const failures=[];
+          page.on('pageerror',error=>failures.push(error.message));
+          try{
+            const origin='https://yanm-jun.github.io/hhba-talent/';
+            await page.goto(origin,{waitUntil:'domcontentloaded',timeout:45000});
+            await page.locator('.unified-job-card').first().waitFor({timeout:75000});
+            const brands=await page.locator('.unified-job-card .unified-company-brand strong').allTextContents();
+            const three=['OpenAI','Anthropic','SpaceX'];
+            for(const n of three)if(!brands.some(v=>v.includes(n)))throw Error('MISSING_PRIORITY_EMPLOYER_CARD '+n+'; rendered='+brands.slice(0,10));
+            const originals=await page.locator('.unified-job-card').count();
+            if(originals<4)throw Error('ORIGINAL_JOB_MARKET_MISSING_CARDS '+originals);
+            await page.screenshot({path:'preview-reports/browser/market-restored.png',fullPage:true});
+            await page.goto(origin+'companies/discover',{waitUntil:'domcontentloaded',timeout:45000});
+            await page.getByRole('heading',{name:/发现 200 家企业/}).waitFor({timeout:25000});
+            await page.locator('.domestic-company-card').first().waitFor({timeout:25000});
+            const companies=await page.locator('.domestic-company-card').count();
+            if(companies!==200)throw Error('COMPANY_DIRECTORY_NOT_200 '+companies);
+            await page.screenshot({path:'preview-reports/browser/company200-directory.png',fullPage:true});
+            const filter=page.getByRole('textbox',{name:'搜索200家企业'});
+            await filter.fill('理想汽车');
+            await page.getByRole('link',{name:/理想汽车/}).first().click();
+            await page.getByRole('heading',{name:'理想汽车'}).waitFor({timeout:20000});
+            if(failures.length)throw Error('BROWSER_RENDER_ERRORS '+failures.slice(0,4).join(' | '));
+            console.log('HHBA_REAL_BROWSER_OK',JSON.stringify({
+              officialJobCards:originals,priorityBrands:three,companyCards:companies,
+              searchedCompany:'理想汽车',detailOpened:true,site:origin
+            }));
+          }finally{await browser.close();}
+          NODE
+      - name: Retain visual proof of both views
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-original-jobs-plus-200-enterprises-browser
+          path: apps/web/preview-reports/browser/
+          retention-days: 14
+          if-no-files-found: warn
