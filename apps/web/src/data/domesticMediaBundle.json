@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-24T03:47:54.029Z",
+  "generatedAt": "2026-10-24T03:51:30.882Z",
   "companies": {
     "华域视觉科技（上海）有限公司": {
       "brand": {
@@ -1688,6 +1688,52 @@
           "state": "ready",
           "path": "domestic-media/company100-site-133f7a2b7e61a9ec5f02.webp",
           "source": "https://www.zhifeishengwu.com/zh_CN",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "拓斯达": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-87dcba73458dbad3e189.webp",
+          "source": "https://www.topstarltd.com/lang-cn/about.html",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "欣旺达": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-6b6d421f9a1433cbf15c.png",
+        "source": "https://www.sunwoda.com/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-6b6d421f9a1433cbf15c.webp",
+          "source": "https://www.sunwoda.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "长安汽车": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-7117fa8d72fb99b9c07c.png",
+        "source": "https://www.changan.com.cn/",
+        "classification": "first_party_header_logo_candidate_unreviewed"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-7117fa8d72fb99b9c07c.webp",
+          "source": "https://www.changan.com.cn/",
           "classification": "official_website_screenshot_unreviewed"
         }
       ]

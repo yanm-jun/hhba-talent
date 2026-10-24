@@ -1274,7 +1274,17 @@
     "brandImage": "https://topstarltd.com/favicon.ico",
     "brandImageSource": "https://topstarltd.com",
     "brandAssetStatus": "official_domain_favicon_unverified_visual",
-    "photos": [],
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-87dcba73458dbad3e189.webp",
+        "localPath": "domestic-media/company100-site-87dcba73458dbad3e189.webp",
+        "source": "https://www.topstarltd.com/lang-cn/about.html",
+        "kind": "screenshot",
+        "label": "拓斯达官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://topstarltd.com",
@@ -2301,10 +2311,20 @@
     "careersLabel": "欣旺达招聘系统（总部及业务板块）",
     "officialSource": "https://sunwoda.com/",
     "productSource": "https://sunwoda.com",
-    "brandImage": "https://sunwoda.com/favicon.ico",
-    "brandImageSource": "https://sunwoda.com",
-    "brandAssetStatus": "official_domain_favicon_unverified_visual",
-    "photos": [],
+    "brandImage": "",
+    "brandImageSource": "https://www.sunwoda.com/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-6b6d421f9a1433cbf15c.webp",
+        "localPath": "domestic-media/company100-site-6b6d421f9a1433cbf15c.webp",
+        "source": "https://www.sunwoda.com/",
+        "kind": "screenshot",
+        "label": "欣旺达官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "official_source_read",
     "website": "https://sunwoda.com",
@@ -2314,7 +2334,9 @@
     "primaryIndustry": "新能源与储能",
     "subIndustry": "消费电池",
     "industryEvidenceUrl": "https://sunwoda.com/",
-    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺"
+    "majorMappingBasis": "根据公司已公开的主营业务、产品及工程技术方向匹配；非招聘专业承诺",
+    "brandLocalPath": "domestic-media/company100-brand-6b6d421f9a1433cbf15c.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "福耀玻璃": {
     "displayName": "福耀玻璃",
@@ -5349,9 +5371,19 @@
     "productSource": "https://www.changan.com.cn/",
     "website": "https://www.changan.com.cn/",
     "brandImage": "",
-    "brandImageSource": "",
-    "brandAssetStatus": "pending_official_logo",
-    "photos": [],
+    "brandImageSource": "https://www.changan.com.cn/",
+    "brandAssetStatus": "official_website_logo_candidate",
+    "photos": [
+      {
+        "url": "domestic-media/company100-site-7117fa8d72fb99b9c07c.webp",
+        "localPath": "domestic-media/company100-site-7117fa8d72fb99b9c07c.webp",
+        "source": "https://www.changan.com.cn/",
+        "kind": "screenshot",
+        "label": "长安汽车官方网站页面截图（非总部或办公环境实景）",
+        "verification": "company_website_screenshot_unreviewed",
+        "sourceFile": "company100-screenshot"
+      }
+    ],
     "lastReviewed": "2026-10-24",
     "evidenceLevel": "business_profile_compiled_official_homepage_direct_page_review_pending",
     "contentReview": "first_pass_business_background_needs_company_page_confirmation",
@@ -5360,7 +5392,9 @@
     "industryEvidenceUrl": "https://www.changan.com.cn/",
     "majorMappingBasis": "依据主营业务涉及的技术和经营方向进行关联，不表示企业现有职位的专业要求。",
     "photoSourcePage": "https://www.changan.com.cn/",
-    "photoSourceLabel": "查看企业网站，图片仍待补齐"
+    "photoSourceLabel": "查看企业网站，图片仍待补齐",
+    "brandLocalPath": "domestic-media/company100-brand-7117fa8d72fb99b9c07c.png",
+    "brandIdentityEvidence": "Captured from site header on the matched company site; not independently visually identity verified"
   },
   "赛力斯": {
     "displayName": "赛力斯",
