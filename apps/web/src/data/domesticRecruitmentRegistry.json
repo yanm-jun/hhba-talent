@@ -989,6 +989,102 @@
       "verifiedBy": "employer_recruitment_page_or_university_employer_post",
       "aliases": [],
       "notes": "集团招聘平台可能包含多个法人和业务主体，申请时必须核对招聘单位；门户展示不等于当前存在可投岗位，招聘批次和截止日期以实际页面为准。"
+    },
+    "中控技术": {
+      "url": "https://app.mokahr.com/campus-recruitment/supcon/172631",
+      "evidenceUrl": "https://jy.ncut.edu.cn/front/zpxx.jspa?tid=10949",
+      "kind": "official_recruitment_portal",
+      "availability": "campus_only",
+      "label": "中控技术招聘渠道",
+      "recruitmentEntity": "中控技术",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_career_site_or_employer_published_university_post",
+      "aliases": [],
+      "notes": "招聘入口不代表职位或报名期限当前有效。"
+    },
+    "药明康德": {
+      "url": "https://wuxiapptec.zhiye.com/",
+      "evidenceUrl": "https://wuxiapptec.zhiye.com/",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "药明康德招聘渠道",
+      "recruitmentEntity": "药明康德",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_career_site_or_employer_published_university_post",
+      "aliases": [],
+      "notes": "招聘入口不代表职位或报名期限当前有效。"
+    },
+    "爱尔眼科": {
+      "url": "https://zhaopin.aierchina.com/",
+      "evidenceUrl": "https://zhaopin.aierchina.com/",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "爱尔眼科招聘渠道",
+      "recruitmentEntity": "爱尔眼科",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_career_site_or_employer_published_university_post",
+      "aliases": [],
+      "notes": "招聘入口不代表职位或报名期限当前有效。"
+    },
+    "安克创新": {
+      "url": "https://career.anker.com.cn/universities/recruitment/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/116865.html",
+      "kind": "official_recruitment_portal",
+      "availability": "campus_only",
+      "label": "安克创新招聘渠道",
+      "recruitmentEntity": "安克创新",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_career_site_or_employer_published_university_post",
+      "aliases": [],
+      "notes": "招聘入口不代表职位或报名期限当前有效。"
+    },
+    "TCL科技": {
+      "url": "https://campus.tcl.com/campus/recruiting.html?id=65",
+      "evidenceUrl": "https://www.tcltech.com/join-us",
+      "kind": "group_recruitment_portal",
+      "availability": "campus_only",
+      "label": "TCL科技招聘渠道",
+      "recruitmentEntity": "TCL集团",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_career_site_or_employer_published_university_post",
+      "aliases": [],
+      "notes": "集团招聘系统可能覆盖其他法人，请先核对实际用人主体。招聘入口不代表职位或报名期限当前有效。"
+    },
+    "海信视像": {
+      "url": "https://jobs.hisense.com/",
+      "evidenceUrl": "https://jobs.hisense.com/",
+      "kind": "group_recruitment_portal",
+      "availability": "normal",
+      "label": "海信视像招聘渠道",
+      "recruitmentEntity": "海信集团",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_career_site_or_employer_published_university_post",
+      "aliases": [],
+      "notes": "集团招聘系统可能覆盖其他法人，请先核对实际用人主体。招聘入口不代表职位或报名期限当前有效。"
+    },
+    "汇顶科技": {
+      "url": "https://goodix.zhiye.com/",
+      "evidenceUrl": "https://goodix.zhiye.com/",
+      "kind": "official_recruitment_portal",
+      "availability": "normal",
+      "label": "汇顶科技招聘渠道",
+      "recruitmentEntity": "汇顶科技",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_career_site_or_employer_published_university_post",
+      "aliases": [],
+      "notes": "招聘入口不代表职位或报名期限当前有效。"
+    },
+    "中国联通": {
+      "url": "https://zglt.zhaopin.com/",
+      "evidenceUrl": "https://jobcareer.sdu.edu.cn/eweb/jygl/index.so?id=4USL4QnzVW27HgBq1v23GA&lmxhV=0401&modcode=jygl_xjhxxck&rklx=jyw&subsyscode=zpfw&type=ssoXnzpView",
+      "kind": "group_recruitment_portal",
+      "availability": "campus_only",
+      "label": "中国联通招聘渠道",
+      "recruitmentEntity": "中国联通集团",
+      "verifiedOn": "2026-10-24",
+      "verifiedBy": "employer_career_site_or_employer_published_university_post",
+      "aliases": [],
+      "notes": "集团招聘系统可能覆盖其他法人，请先核对实际用人主体。招聘入口不代表职位或报名期限当前有效。"
     }
   }
 }
