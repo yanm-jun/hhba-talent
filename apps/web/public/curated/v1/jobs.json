@@ -4725,7 +4725,7 @@
       "titleZh": "客户经理",
       "titleTranslation": "editorial_checked",
       "locationEn": "Bengaluru, India; Mumbai, India",
-      "locationZh": "班加罗尔 · 印度; 孟买 · 印度",
+      "locationZh": "印度 · 班加罗尔／孟买",
       "countryCode": "IN",
       "cityKey": "mumbai",
       "education": null,
@@ -4750,6 +4750,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "在印度市场开发数据与 AI 平台客户，帮助企业采用 Databricks 的数据智能解决方案。",
+        "responsibilities": [
+          "管理印度地区销售商机，推动从需求沟通到合同签署。",
+          "与技术伙伴合作向客户解释平台价值与实施方向。",
+          "制定区域市场策略并帮助客户推进数据技术转型。"
+        ],
+        "requirements": [
+          "具备企业软件销售与客户高管沟通的能力。",
+          "了解数据分析、云平台或 AI 应用的商务需求。",
+          "能管理复杂销售周期和客户关系。"
+        ],
+        "benefits": [
+          "工作地点班加罗尔或孟买。"
+        ],
+        "originalSummary": "Archived Databricks role: Account Executive. The employer listing is linked for complete English source information.",
+        "source": "https://databricks.com/company/careers/open-positions/job?gh_jid=6918763002"
       }
     },
     {
@@ -4760,7 +4781,7 @@
       "titleZh": "产品经理助理（2027 届毕业生）",
       "titleTranslation": "editorial_checked",
       "locationEn": "Bellevue, Washington; Mountain View, California; San Francisco, California",
-      "locationZh": "Bellevue · Washington; Mountain View · 加利福尼亚州; 旧金山 · 加利福尼亚州",
+      "locationZh": "美国 · 贝尔维尤／山景城／旧金山",
       "countryCode": "US",
       "cityKey": "san francisco",
       "education": "MASTER",
@@ -4787,6 +4808,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "2027 届产品经理助理项目，参与 Databricks 数据平台与人工智能产品开发。",
+        "responsibilities": [
+          "与客户验证产品问题和原型方案。",
+          "与工程师、设计师共同构建功能并全程参与交付。",
+          "管理从产品构想到发布、改进的项目环节。"
+        ],
+        "requirements": [
+          "2026 年秋季或 2027 年春季取得计算机或相关工程本／硕士学位。",
+          "对 SQL、Python 和 AI 工具有实际接触经验。",
+          "能够独立测试、快速学习并利用数据进行决策。"
+        ],
+        "benefits": [
+          "官网基本年薪 133,000—150,000 美元。"
+        ],
+        "originalSummary": "Archived Databricks role: Associate Product Manager, New Grad (2027 Start). The employer listing is linked for complete English source information.",
+        "source": "https://databricks.com/company/careers/open-positions/job?gh_jid=7586263002"
       }
     },
     {
@@ -4797,7 +4839,7 @@
       "titleZh": "国际传播总监",
       "titleTranslation": "editorial_checked",
       "locationEn": "London, United Kingdom",
-      "locationZh": "伦敦 · 英国",
+      "locationZh": "英国 · 伦敦",
       "countryCode": "GB",
       "cityKey": "london",
       "education": null,
@@ -4822,6 +4864,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "为 Databricks 在欧洲、亚洲和美洲市场建立国际传播战略，提升各地业务增长与品牌影响力。",
+        "responsibilities": [
+          "主导跨三大区域、十三个国家的传播计划。",
+          "围绕本地扩张、客户成果、办公室和伙伴项目策划新闻。",
+          "管理地区传播团队和公关机构关系。"
+        ],
+        "requirements": [
+          "十二年以上国际或地区传播经验，企业软件、云计算或 AI 经验优先。",
+          "擅长跨市场媒体关系、代理商管理和团队领导。",
+          "能为地区高管提供企业声誉策略建议。"
+        ],
+        "benefits": [
+          "工作地点英国伦敦。"
+        ],
+        "originalSummary": "Archived Databricks role: Director, International Communications. The employer listing is linked for complete English source information.",
+        "source": "https://databricks.com/company/careers/open-positions/job?gh_jid=8632282002"
       }
     },
     {
@@ -4832,7 +4895,7 @@
       "titleZh": "首席品牌内容与人工智能搜索可见性专家",
       "titleTranslation": "editorial_checked",
       "locationEn": "San Francisco, California",
-      "locationZh": "旧金山 · 加利福尼亚州",
+      "locationZh": "美国 · 旧金山",
       "countryCode": "US",
       "cityKey": "san francisco",
       "education": null,
@@ -4857,6 +4920,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "负责 Databricks 品牌内容与生成式 AI 搜索引擎中的可见度，建设以内容质量为核心的 GEO 工作体系。",
+        "responsibilities": [
+          "分析品牌在 AI 答案引擎中的引用与缺口，制定内容策略。",
+          "协调内部写作、外部机构和 AI Agent 内容流水线。",
+          "审校复杂品牌内容并评价 LLM 曝光、引用和业务效果。"
+        ],
+        "requirements": [
+          "十年以上内容策略或编辑负责人经历。",
+          "了解 SEO 及 GEO/AEO、AI 搜索可见度诊断。",
+          "能管理品牌稿件审校、营销工具及内容代理团队。"
+        ],
+        "benefits": [
+          "官网公布美国一区基本年薪 223,100—306,800 美元。"
+        ],
+        "originalSummary": "Archived Databricks role: Principal Brand Content & AI Search Visibility. The employer listing is linked for complete English source information.",
+        "source": "https://databricks.com/company/careers/open-positions/job?gh_jid=8860653002"
       }
     },
     {
@@ -4867,7 +4951,7 @@
       "titleZh": "人工智能转型负责人",
       "titleTranslation": "editorial_checked",
       "locationEn": "United States",
-      "locationZh": "美国",
+      "locationZh": "美国 · 远程或指定办公地点",
       "countryCode": "US",
       "cityKey": null,
       "education": null,
@@ -4892,6 +4976,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "帮助企业高管规划大规模数据与 AI 转型，把技术平台能力转化为跨部门业务价值。",
+        "responsibilities": [
+          "面向 CEO 等高层分析企业 AI 转型机会和可衡量目标。",
+          "建立从战略、试点到规模化落地的协作计划。",
+          "与客户销售、产品和技术部门协调变革项目。"
+        ],
+        "requirements": [
+          "具备企业数字化或 AI 转型咨询和高层业务沟通经验。",
+          "理解数据平台、人工智能应用及大型企业组织变革。",
+          "能够管理跨部门项目并量化商业价值。"
+        ],
+        "benefits": [
+          "美国地区工作；详细报酬以原始岗位为准。"
+        ],
+        "originalSummary": "Archived Databricks role: AI Transformation Leader. The employer listing is linked for complete English source information.",
+        "source": "https://databricks.com/company/careers/open-positions/job?gh_jid=7803651002"
       }
     },
     {
@@ -4902,7 +5007,7 @@
       "titleZh": "前线部署人工智能工程师",
       "titleTranslation": "editorial_checked",
       "locationEn": "Seoul, South Korea",
-      "locationZh": "地点待核验",
+      "locationZh": "韩国 · 首尔",
       "countryCode": null,
       "cityKey": null,
       "education": null,
@@ -4931,6 +5036,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "面向 Databricks 客户实施生成式 AI 应用，帮助企业从试验构建可上线的智能系统。",
+        "responsibilities": [
+          "与客户共同设计并交付 RAG、多智能体等生成式 AI 系统。",
+          "调试模型性能、建立评测流程并部署生产级应用。",
+          "与平台工程和产品团队合作反馈常见客户技术需求。"
+        ],
+        "requirements": [
+          "七年以上生成式 AI 应用或相关 AI 工程经验。",
+          "熟悉 Hugging Face、LangChain、DSPy、PyTorch 等技术。",
+          "了解 AWS、Azure 或 GCP 云端生产部署。"
+        ],
+        "benefits": [
+          "工作地点韩国首尔；可能需要约每四至八周拜访客户。"
+        ],
+        "originalSummary": "Archived Databricks role: AI Engineer - FDE (Forward Deployed Engineer). The employer listing is linked for complete English source information.",
+        "source": "https://databricks.com/company/careers/open-positions/job?gh_jid=8574655002"
       }
     },
     {
@@ -4941,7 +5067,7 @@
       "titleZh": "新客户拓展经理（商业客户）",
       "titleTranslation": "editorial_checked",
       "locationEn": "Tokyo, Japan",
-      "locationZh": "东京 · 日本",
+      "locationZh": "日本 · 东京",
       "countryCode": "JP",
       "cityKey": "tokyo",
       "education": null,
@@ -4967,6 +5093,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "面向日本成长型企业和中型客户拓展 Databricks 新商机，推动企业采用数据与 AI 平台。",
+        "responsibilities": [
+          "管理尚未由专门客户经理覆盖的成长型账户。",
+          "寻找新业务机会并与企业关键决策者建立关系。",
+          "协调方案工程师共同制定数据与 AI 价值主张。"
+        ],
+        "requirements": [
+          "具备商业 SaaS 或数据平台销售和新客户开拓经验。",
+          "能够独立管理商机管道、客户沟通和技术价值销售。",
+          "了解日本中型企业采购流程并能够开展商务沟通。"
+        ],
+        "benefits": [
+          "岗位位于东京。"
+        ],
+        "originalSummary": "Archived Databricks role: Account Executive, Commercial - Hunter. The employer listing is linked for complete English source information.",
+        "source": "https://databricks.com/company/careers/open-positions/job?gh_jid=8758263002"
       }
     },
     {
@@ -4977,7 +5124,7 @@
       "titleZh": "人工智能产品营销总监",
       "titleTranslation": "editorial_checked",
       "locationEn": "San Francisco, California",
-      "locationZh": "旧金山 · 加利福尼亚州",
+      "locationZh": "美国 · 旧金山",
       "countryCode": "US",
       "cityKey": "san francisco",
       "education": null,
@@ -5002,6 +5149,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "领导 Databricks 人工智能产品营销团队，负责 Agent Bricks 等代理平台和机器学习产品的市场定位。",
+        "responsibilities": [
+          "制定 AI 产品故事、上市计划和营销内容。",
+          "管理产品营销团队，帮助销售和合作伙伴提升客户采用。",
+          "与产品工程团队共同推进发布、品牌宣传及商业线索。"
+        ],
+        "requirements": [
+          "十年以上企业软件技术产品营销经验。",
+          "理解生成式 AI、机器学习技术及企业买家。",
+          "具备团队管理、产品上市策略和销售赋能经历。"
+        ],
+        "benefits": [
+          "官网历史职位基本薪酬范围约 240,000—330,000 美元。"
+        ],
+        "originalSummary": "Archived Databricks role: Director, Product Marketing, AI. The employer listing is linked for complete English source information.",
+        "source": "https://databricks.com/company/careers/open-positions/job?gh_jid=8487145002"
       }
     },
     {
@@ -5012,7 +5180,7 @@
       "titleZh": "人力资源并购总监",
       "titleTranslation": "editorial_checked",
       "locationEn": "San Francisco, California",
-      "locationZh": "旧金山 · 加利福尼亚州",
+      "locationZh": "美国 · 旧金山",
       "countryCode": "US",
       "cityKey": "san francisco",
       "education": null,
@@ -5037,6 +5205,27 @@
       "notices": {
         "en": "Archived public vacancy metadata. Current application availability and complete requirements are not verified.",
         "zh": "历史公开岗位资料：不代表当前在招。学历、经验和技能为历史公开内容提取线索，可能不完整；岗位职责原文未收录。"
+      },
+      "editorial": {
+        "sourceVerifiedAt": "2026-10-24",
+        "verification": "official_page_read",
+        "language": "zh",
+        "overview": "领导 Databricks 员工并购整合（People M&A）团队，负责跨国收购项目中的员工数据、流程和人事系统集成。",
+        "responsibilities": [
+          "制定并执行人员并购整合工作计划，从交易披露到首日入职。",
+          "协调招聘、人力运营、福利、全球流动及 IT 团队。",
+          "运用自动化与 AI 改善员工并购流程，并保证数据完整性。"
+        ],
+        "requirements": [
+          "八年以上并购相关经历，有组织整合或人力资源流程转型经验。",
+          "擅长复杂跨团队并购项目、人员数据和高管沟通。",
+          "熟悉全球员工业务流程及人事自动化。"
+        ],
+        "benefits": [
+          "官网标示美国一区基本薪资约 181,100—249,050 美元。"
+        ],
+        "originalSummary": "Archived Databricks role: Director, People M&A. The employer listing is linked for complete English source information.",
+        "source": "https://databricks.com/company/careers/open-positions/job?gh_jid=8637368002"
       }
     }
   ]
