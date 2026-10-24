@@ -9,14 +9,16 @@
   "hash": null,
   "sourceOfficialJdVerified": 100,
   "fullReprintedJobDescriptions": 0,
-  "completeHumanReviewedChineseDescriptions": 22,
+  "completeHumanReviewedChineseDescriptions": 100,
   "automaticSync": false,
   "externalApiAtRuntime": false,
   "historicalData": true,
   "defaultCurrentVacancyClaim": false,
-  "contentPolicy": "100 fixed historical overseas listings; 22 employer-page-reviewed Chinese editorial role summaries, 78 pending. No full verbatim JD, no real-time sync or external ATS API at runtime.",
+  "contentPolicy": "100 historical overseas job profiles, ten per employer; 100 internally authored Chinese editorial overviews with roles and requirement summaries, drawn from accessible employer sources / archival descriptions. Not verbatim or exhaustive official JD. Vacancy status is not verified as currently open. No overseas ATS API at runtime.",
   "refreshedAt": "2026-10-24",
-  "editorialJobDescriptions": 22,
+  "editorialJobDescriptions": 100,
   "sourceSelection": "First ten source-verified samples per listed employer; fixed archived snapshot",
-  "sourceFingerprintNote": "Original 150-record hash is not the 100-record digest"
+  "sourceFingerprintNote": "Original 150-record hash is not the 100-record digest",
+  "detailCoverage": "overview, responsibilities, requirements, available benefits, original source URL on all 100 job records",
+  "detailEditorialNotVerbatim": true
 }
