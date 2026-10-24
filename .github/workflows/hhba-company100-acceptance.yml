@@ -44,7 +44,53 @@ jobs:
         id: capture_gate
         shell: bash
         run: |
-          if git show --format= --name-only HEAD | grep -q '^apps/web/scripts/capture-company100-homepage-screenshots.mjs$'; then
+          if git show --format= --name-only "${{ github.event.pull_request.head.sha }}" | grep -q '^apps/web/scripts/capture-company100-homepage-screenshots.mjs
+            echo "capture=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "capture=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install isolated browser and screenshot codecs
+        if: steps.capture_gate.outputs.capture == 'true'
+        run: |
+          npm install --prefix apps/web --no-save --no-package-lock playwright@1.56.0 sharp@0.34.4 --no-audit --no-fund
+          cd apps/web && npx playwright install chromium --with-deps
+      - name: Capture only first-party, source-labeled company screenshots
+        if: steps.capture_gate.outputs.capture == 'true'
+        working-directory: apps/web
+        run: node scripts/capture-company100-homepage-screenshots.mjs
+      - name: Prepare codec for audited office/headquarters photos
+        run: npm install --prefix apps/web --no-save --no-package-lock sharp@0.34.4 --no-audit --no-fund
+      - name: Import only specifically attributed real company building photos
+        working-directory: apps/web
+        run: node scripts/import-company100-reviewed-scenes.mjs
+      - name: Validate screenshot metadata after acquisition
+        working-directory: apps/web
+        run: |
+          node scripts/audit-domestic-company100.mjs
+          npm run build
+      - name: Upload company evidence and summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-company100-qa
+          retention-days: 30
+          path: |
+            apps/web/preview-reports/company100-quality.json
+            apps/web/preview-reports/company100-screenshot-capture.json
+            apps/web/preview-reports/company100-reviewed-scenes.json
+      - name: Persist only allowlisted company media files from this source branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f apps/web/src/data/domesticCareerProfiles.json apps/web/src/data/domesticMediaBundle.json
+          git add -f apps/web/public/domestic-media/company100-* || true
+          if ! git diff --cached --quiet; then
+            git commit -m "assets(company100): save first-party screenshots and pending logo candidates"
+            git push origin HEAD:refs/heads/feat/domestic-company100-20261024
+          fi
+; then
             echo "capture=true" >> "$GITHUB_OUTPUT"
           else
             echo "capture=false" >> "$GITHUB_OUTPUT"
