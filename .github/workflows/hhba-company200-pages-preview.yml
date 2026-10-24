@@ -238,10 +238,20 @@ jobs:
             await trigger.focus();
             await menu.waitFor({timeout:7000});
             await menu.getByRole('link',{name:/法律援助/}).click();
-            await page.getByRole('heading',{name:'法律援助'}).waitFor({timeout:10000});
-            await page.getByText('服务筹备中 · 暂未开放案件受理').waitFor({timeout:6000});
-            if(await page.locator('input[type="file"]').count()!==0)throw Error('EVIDENCE_UPLOAD_MUST_NOT_BE_OPEN');
-            await page.screenshot({path:'preview-reports/candidate-menu/legal-aid-placeholder.png',fullPage:true});
+            await page.getByRole('heading',{name:/每一份劳动/}).waitFor({timeout:10000});
+            const legal=page.locator('.hhba-law');
+            await legal.getByText('服务筹备中',{exact:true}).waitFor({timeout:6000});
+            await legal.getByText('暂不接受案件申请或材料提交').waitFor({timeout:6000});
+            if(await legal.locator('.hhba-law-issue-card').count()!==4)throw Error('LEGAL_AID_NEEDS_FOUR_ISSUE_AREAS');
+            if(await legal.locator('.hhba-law-step').count()!==4)throw Error('LEGAL_AID_NEEDS_FOUR_FACT_TO_EVIDENCE_STEPS');
+            if(await page.locator('input[type="file"], textarea, form, button[type="submit"]').count()!==0)
+              throw Error('LEGAL_AID_PREVIEW_MUST_NOT_COLLECT_ANY_DATA');
+            const heroRect=await legal.locator('.hhba-law-hero').boundingBox();
+            const asideRect=await legal.locator('.hhba-law-status').boundingBox();
+            if(!heroRect||!asideRect||asideRect.x-heroRect.x<heroRect.width/2)
+              throw Error('LEGAL_DESKTOP_TWO_COLUMN_HERO_INVALID');
+            await page.screenshot({path:'preview-reports/candidate-menu/legal-aid-editorial-desktop.png',fullPage:true});
+            console.log('HHBA_LEGAL_AID_DESKTOP_OK',JSON.stringify({issueCards:4,legalSteps:4,heroWidth:heroRect.width,previewOnly:true}));
             // Preserve the original job market when entering and leaving the account menu.
             await page.goto(origin+'/',{waitUntil:'domcontentloaded'});
             await page.locator('.unified-job-card').first().waitFor({timeout:50000});
@@ -257,6 +267,18 @@ jobs:
             await mobile.screenshot({path:'preview-reports/candidate-menu/mobile-tap-dropdown.png',fullPage:false});
             await mobile.getByRole('navigation',{name:'个人中心快速导航'}).getByRole('link',{name:/求职偏好/}).click();
             await mobile.getByText('求职偏好',{exact:true}).first().waitFor({timeout:10000});
+            await mobile.goto(origin+'/candidate/account/legal-aid',{waitUntil:'domcontentloaded',timeout:45000});
+            await mobile.getByRole('heading',{name:/每一份劳动/}).waitFor({timeout:16000});
+            if(await mobile.locator('.hhba-law-issue-card').count()!==4)throw Error('LEGAL_MOBILE_CARD_COUNT');
+            const mobileMeasures=await mobile.evaluate(()=>({
+              viewport:document.documentElement.clientWidth,
+              page:document.documentElement.scrollWidth,
+              hero:document.querySelector('.hhba-law-hero')?.getBoundingClientRect().width
+            }));
+            if(mobileMeasures.page>mobileMeasures.viewport+2)
+              throw Error('LEGAL_MOBILE_HORIZONTAL_OVERFLOW '+JSON.stringify(mobileMeasures));
+            await mobile.screenshot({path:'preview-reports/candidate-menu/legal-aid-editorial-mobile.png',fullPage:true});
+            console.log('HHBA_LEGAL_AID_MOBILE_OK',JSON.stringify({...mobileMeasures,previewOnly:true}));
             console.log('HHBA_CANDIDATE_ACCOUNT_MENU_OK',JSON.stringify({
               sevenPathsVerified:true,hover:true,escape:true,keyboardFocus:true,
               mobileTap:true,legalPlaceholder:true,noEvidenceUpload:true,
