@@ -1,8 +1,8 @@
 import {useState} from 'react';
 import {
   ArrowLeft,ArrowRight,BookOpen,CheckCircle2,ChevronRight,ClipboardList,
-  FileCheck2,HandHeart,LockKeyhole,Scale,ShieldCheck,ShieldAlert,
-  UsersRound,Wallet,Clock3
+  FileCheck2,HandHeart,LockKeyhole,ShieldCheck,ShieldAlert,
+  UsersRound,Wallet
 } from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link} from '../router';
@@ -125,7 +125,7 @@ export function LegalAidInterventionPage({user}:{user:User|null}){
      </section>
      <div className="hhba-intervention-final-notice">
       <ShieldCheck size={17} aria-hidden="true"/>
-      <p>HHBA 计划在合法授权与专业律师独立履职的前提下协助劳动者，不保证维权结果，也不能替代法定劳动争议处理机关。**如果你的仲裁、工伤认定等期限临近，请立即向当地主管机关或执业律师咨询，不要等待本站功能开放。**</p>
+      <p>HHBA 计划在合法授权与专业律师独立履职的前提下协助劳动者，不保证维权结果，也不能替代法定劳动争议处理机关。<strong>如果你的仲裁、工伤认定等期限临近，请立即向当地主管机关或执业律师咨询，不要等待本站功能开放。</strong></p>
      </div>
     </div>
     <footer className="hhba-intervention-footer">HHBA · 平台权益支持计划 · 当前仅开放公开法律知识与证据准备参考</footer>
