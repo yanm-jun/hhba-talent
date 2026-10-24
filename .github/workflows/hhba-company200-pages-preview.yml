@@ -1,0 +1,99 @@
+name: HHBA 200-company GitHub Pages isolated preview
+
+on:
+  push:
+    branches: [feat/domestic-company200-20261024]
+    paths:
+      - '.github/workflows/hhba-company200-pages-preview.yml'
+      - 'apps/web/src/pages/Company200PreviewPage.tsx'
+      - 'apps/web/src/components/DomesticCompanyResults.tsx'
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/src/pages/DomesticCompanyPage.tsx'
+      - 'apps/web/src/services/domesticCompanySearch.ts'
+      - 'apps/web/src/services/domesticCompany200Data.ts'
+      - 'apps/web/src/services/domesticMajors.ts'
+      - 'apps/web/src/data/domesticComplete200Target.json'
+      - 'apps/web/src/data/domesticCompanyExpansion200Profiles.json'
+      - 'apps/web/src/data/domesticCompany200VerifiedEditorial.json'
+      - 'apps/web/src/data/domesticRecruitment200Registry.json'
+      - 'apps/web/src/data/domesticMedia200Bundle.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hhba-company200-pages-preview
+  cancel-in-progress: true
+
+jobs:
+  static-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout isolated 200-company source (never touch main or Railway)
+        uses: actions/checkout@v4
+        with:
+          ref: feat/domestic-company200-20261024
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked frontend dependencies
+        run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Verify 200 curated identities and UI integration
+        working-directory: apps/web
+        run: |
+          node scripts/audit-domestic-company200.mjs
+          node scripts/company200-integration.contract.test.mjs
+      - name: Build public preview with Pages base path and without account API
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          VITE_COMPANY200_STATIC_PREVIEW: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_DEMO_ACCOUNT_ENABLED: '0'
+        run: |
+          npm run build
+          cp dist/index.html dist/404.html
+          touch dist/.nojekyll
+      - name: Verify artifact is a subpath-safe SPA and contains compiled company data
+        working-directory: apps/web
+        run: |
+          test -s dist/index.html
+          test -s dist/404.html
+          test -f dist/.nojekyll
+          grep -q '/hhba-talent/assets/' dist/index.html
+          ! grep -R -E 'BEGIN (RSA|OPENSSH) PRIVATE KEY' dist
+          find dist/assets -name '*.js' -print -quit | grep -q .
+      - name: Upload reusable build artifact for independent review
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-company200-static-preview
+          path: apps/web/dist/
+          include-hidden-files: true
+          retention-days: 14
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: apps/web/dist
+
+  deploy-preview:
+    needs: static-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure existing GitHub Pages publishing source
+        uses: actions/configure-pages@v5
+      - name: Publish isolated static preview to GitHub Pages
+        uses: actions/deploy-pages@v4
+        id: deployment
