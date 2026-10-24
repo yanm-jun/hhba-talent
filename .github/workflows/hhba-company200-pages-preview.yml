@@ -191,6 +191,21 @@ jobs:
             if(await trigger.getAttribute('aria-expanded')!=='true')throw Error('HOVER_NOT_OPEN');
             const links=menu.locator('.hhba-account-dropdown-item');
             if(await links.count()!==7)throw Error('EXPECTED_SEVEN_LINKS');
+            // Regression: the global ".topbar nav" flex rule must never affect the nested disclosure.
+            const panelBox=await menu.boundingBox(),titleBox=await menu.locator('.hhba-account-dropdown-heading').boundingBox();
+            if(!panelBox||!titleBox)throw Error('DROPDOWN_BOUNDING_BOX_MISSING');
+            if(panelBox.width<300||panelBox.width>345)throw Error('DROPDOWN_WIDTH_BAD '+panelBox.width);
+            if(titleBox.width<panelBox.width-45)throw Error('HEADING_COLLAPSED_TO_LEFT '+titleBox.width);
+            const bounds=[];
+            for(let n=0;n<7;n++){const b=await links.nth(n).boundingBox();if(!b)throw Error('DROPDOWN_ROW_MISSING_'+n);bounds.push(b);}
+            if(titleBox.y+titleBox.height>bounds[0].y+2)throw Error('TITLE_NOT_ABOVE_ITEMS');
+            for(let n=0;n<bounds.length;n++){
+              if(bounds[n].width<panelBox.width-48)throw Error('ROW_SQUEEZED_TO_RIGHT '+n);
+              if(bounds[n].x<panelBox.x-2||bounds[n].x>panelBox.x+25)throw Error('ROW_NOT_LEFT_ALIGNED '+n);
+              if(n&&bounds[n].y<=bounds[n-1].y+bounds[n-1].height-2)throw Error('ROWS_NOT_VERTICAL '+n);
+            }
+            if((await menu.innerText()).includes('/candidate/'))throw Error('TECHNICAL_ROUTES_VISIBLE');
+            console.log('HHBA_MENU_LAYOUT_OK',JSON.stringify({panelWidth:panelBox.width,headingWidth:titleBox.width,sevenVerticalRows:true,technicalPathsHidden:true}));
             for(const [label,path]of expected){
               const link=menu.getByRole('link',{name:new RegExp(label)}).first();
               const url=await link.getAttribute('href');
