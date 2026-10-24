@@ -50,7 +50,7 @@ export function CandidateAccountDropdown(){
    if(!(next instanceof Node)||!event.currentTarget.contains(next))setOpen(false);
   }}>
   <button ref={trigger} type="button" className="auth hhba-account-dropdown-trigger"
-   aria-expanded={open} aria-controls={id} aria-haspopup="true"
+   aria-expanded={open} aria-controls={id}
    onClick={event=>setOpen(event.detail>0?!pointerWasOpen.current:true)}>
    <UserRound size={15} aria-hidden="true"/><span>个人中心</span><ChevronDown size={13} aria-hidden="true"/>
   </button>
