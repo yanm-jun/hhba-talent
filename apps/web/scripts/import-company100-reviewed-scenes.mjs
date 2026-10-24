@@ -47,6 +47,33 @@ const approved=[
    label:'广州媒体2026年报道中的广汽集团T2园区楼宇照片',
    kind:'office',attribution:'广州媒体华城',license:'news-photo-rights_not_independently_cleared',
    changes:'resized and transcoded to WebP'
+  },
+  {
+   name:'潍柴动力',
+   url:'https://www.weichaipower.com/media_center/dlnews/202301/W020230113485004993384.jpg',
+   host:'www.weichaipower.com',
+   source:'https://www.weichaipower.com/media_center/dlnews/202301/t20230113_90769.html',
+   label:'潍柴动力官网刊载的潍柴高新工业园区照片（企业供图）',
+   kind:'factory',attribution:'潍柴动力股份有限公司官网',license:'first-party-editorial-image_rights_unverified',
+   changes:'resized and transcoded to WebP'
+  },
+  {
+   name:'宝钢股份',
+   url:'https://img.21jingji.com/uploadfile/cover/20211124/1637685219722324.jpg',
+   host:'img.21jingji.com',
+   source:'https://www.sfccn.com/2021/11-24/zNMDEzODdfMTY4MTkzNA.html',
+   label:'南方财经新闻配图中的 BAOSTEEL 企业楼宇外景',
+   kind:'office',attribution:'南方财经网（原摄影作者需另核实）',license:'news-photo-rights_not_independently_cleared',
+   changes:'resized and transcoded to WebP'
+  },
+  {
+   name:'迈瑞医疗',
+   url:'https://storage-public.zhaopin.cn/org/image/1690971171294091233/%E5%A4%A7%E6%A5%BC%E8%88%AA%E6%8B%8D_001-0.5.jpg?x-oss-process=image%2Fauto-orient%2C1%2Fresize%2Cm_mfit%2Cw_800%2Ch_800%2Fquality%2Cq_90',
+   host:'storage-public.zhaopin.cn',
+   source:'https://www.zhaopin.com/companydetail/CC000577607.htm',
+   label:'智联招聘雇主资料中展示的迈瑞医疗办公大楼照片',
+   kind:'office',attribution:'智联招聘雇主资料（原摄影作者需另核实）',license:'employer-posted-photo-rights_not_independently_cleared',
+   changes:'resized and transcoded to WebP'
   }
 ];
 const {default:sharp}=await import('sharp');
