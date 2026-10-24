@@ -37,7 +37,8 @@ test('local curated archive is self-contained, source-audited, and finite',()=>{
   assert.equal(list.length,10);
   assert.equal(list.filter(j=>j.editorial).length,10);
  }
- assert.equal(manifest.completeHumanReviewedChineseDescriptions,100);
+ assert.equal(manifest.completeHumanReviewedChineseDescriptions,0);
+ assert.equal(manifest.chineseEditorialSummaries,100);
  assert.equal(jobs.jobs.filter(j=>j.editorial).length,100);
  for(const job of jobs.jobs.filter(j=>j.editorial)){
   assert.equal(job.editorial.verification,'official_page_read');
