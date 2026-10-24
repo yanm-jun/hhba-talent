@@ -143,3 +143,97 @@ jobs:
       - name: Publish isolated static preview to GitHub Pages
         uses: actions/deploy-pages@v4
         id: deployment
+
+  candidate-menu-browser:
+    needs: deploy-preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - name: Checkout current candidate UI test
+        uses: actions/checkout@v4
+        with:
+          ref: feat/domestic-company200-20261024
+      - name: Install browser tooling
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium for headless navigation test
+        run: |
+          npm install --no-save --no-package-lock --prefix apps/web playwright@1.56.1 --no-audit --no-fund
+          cd apps/web
+          npx playwright install --with-deps chromium
+      - name: Verify hover, keyboard, touch and all seven routes online
+        working-directory: apps/web
+        run: |
+          mkdir -p preview-reports/candidate-menu
+          node --input-type=module <<'NODE'
+          import {chromium} from 'playwright';
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          const origin='https://yanm-jun.github.io/hhba-talent';
+          const expected=[
+            ['工作台','/candidate/account'],
+            ['我的收藏','/candidate/saved'],
+            ['个人资料','/candidate/account/profile'],
+            ['求职偏好','/candidate/account/preferences'],
+            ['我的简历','/candidate/account/resume'],
+            ['求职记录','/candidate/account/applications'],
+            ['法律援助','/candidate/account/legal-aid']
+          ];
+          try{
+            const page=await browser.newPage({viewport:{width:1440,height:950},locale:'zh-CN'});
+            const errors=[];page.on('pageerror',e=>errors.push(e.message));
+            await page.goto(origin+'/',{waitUntil:'domcontentloaded',timeout:50000});
+            const trigger=page.getByRole('button',{name:/个人中心/}).first();
+            await trigger.waitFor({timeout:20000});
+            await trigger.hover();
+            const menu=page.getByRole('navigation',{name:'个人中心快速导航'});
+            await menu.waitFor({timeout:8000});
+            if(await trigger.getAttribute('aria-expanded')!=='true')throw Error('HOVER_NOT_OPEN');
+            const links=menu.locator('.hhba-account-dropdown-item');
+            if(await links.count()!==7)throw Error('EXPECTED_SEVEN_LINKS');
+            for(const [label,path]of expected){
+              const link=menu.getByRole('link',{name:new RegExp(label)}).first();
+              const url=await link.getAttribute('href');
+              if(url!==('/hhba-talent'+path))throw Error('BAD_MENU_LINK '+label+': '+url);
+            }
+            await page.screenshot({path:'preview-reports/candidate-menu/desktop-hover-dropdown.png',fullPage:false});
+            await page.keyboard.press('Escape');
+            if(await menu.count()!==0||await trigger.getAttribute('aria-expanded')!=='false')
+              throw Error('ESCAPE_NOT_CLOSED');
+            await trigger.focus();
+            await menu.waitFor({timeout:7000});
+            await menu.getByRole('link',{name:/法律援助/}).click();
+            await page.getByRole('heading',{name:'法律援助'}).waitFor({timeout:10000});
+            await page.getByText('服务筹备中 · 暂未开放案件受理').waitFor({timeout:6000});
+            if(await page.locator('input[type="file"]').count()!==0)throw Error('EVIDENCE_UPLOAD_MUST_NOT_BE_OPEN');
+            await page.screenshot({path:'preview-reports/candidate-menu/legal-aid-placeholder.png',fullPage:true});
+            // Preserve the original job market when entering and leaving the account menu.
+            await page.goto(origin+'/',{waitUntil:'domcontentloaded'});
+            await page.locator('.unified-job-card').first().waitFor({timeout:50000});
+            const brands=await page.locator('.unified-job-card .unified-company-brand strong').allTextContents();
+            for(const n of ['OpenAI','Anthropic','SpaceX'])
+              if(!brands.some(v=>v.includes(n)))throw Error('ORIGINAL_MARKET_LOST '+n);
+            if(errors.length)throw Error('JS_PAGE_ERRORS '+errors.join(' | '));
+            const mobile=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true,locale:'zh-CN'});
+            await mobile.goto(origin+'/',{waitUntil:'domcontentloaded',timeout:50000});
+            const mTrigger=mobile.getByRole('button',{name:/个人中心/}).first();
+            await mTrigger.click();
+            await mobile.getByRole('navigation',{name:'个人中心快速导航'}).waitFor({timeout:8000});
+            await mobile.screenshot({path:'preview-reports/candidate-menu/mobile-tap-dropdown.png',fullPage:false});
+            await mobile.getByRole('navigation',{name:'个人中心快速导航'}).getByRole('link',{name:/求职偏好/}).click();
+            await mobile.getByText('求职偏好',{exact:true}).first().waitFor({timeout:10000});
+            console.log('HHBA_CANDIDATE_ACCOUNT_MENU_OK',JSON.stringify({
+              sevenPathsVerified:true,hover:true,escape:true,keyboardFocus:true,
+              mobileTap:true,legalPlaceholder:true,noEvidenceUpload:true,
+              jobsRetained:['OpenAI','Anthropic','SpaceX']
+            }));
+          }finally{await browser.close();}
+          NODE
+      - name: Retain navigation screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-candidate-personal-center-dropdown
+          path: apps/web/preview-reports/candidate-menu/
+          retention-days: 14
+          if-no-files-found: warn
