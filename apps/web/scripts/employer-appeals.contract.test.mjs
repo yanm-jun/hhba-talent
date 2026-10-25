@@ -19,7 +19,7 @@ test('appeal writes require independent authenticated API and no fake cases',()=
  assert.match(page,/待安全申诉服务接入/);
  assert.match(page,/待可信员工验证接入/);
  assert.match(page,/待安全审核服务接入/);
- assert.match(page,/不会生成虚构案件/);
+ assert.match(page,/不能生成虚构案件/);
 });
 test('employee case intake is strictly structured without person-specific content',()=>{
  const page=read('src/pages/EmployerAppealsPage.tsx');
