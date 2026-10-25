@@ -50,18 +50,20 @@ jobs:
         run: |
           test -s apps/web/dist/images/hhba-join-team.webp
           node -e "const fs=require('fs');const p='apps/web/dist/images/hhba-join-team.webp';const x=fs.readFileSync(p);if(x.toString('ascii',0,4)!=='RIFF'||x.toString('ascii',8,12)!=='WEBP'||x.length<20000)process.exit(1);console.log('HHBA_REAL_JOIN_PHOTO',x.length)"
-      - name: Verify original HHBA signed manifesto is packaged and no hidden image failure is published
+      - name: Verify founder letter and the handwritten signature asset are in the public build
         run: |
-          test -s apps/web/dist/images/hhba-brand-manifesto.webp
+          test -s apps/web/dist/images/hhba-founder-signature.webp
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
-          const image=fs.readFileSync('apps/web/dist/images/hhba-brand-manifesto.webp');
-          if(image.length<50000||image.toString('ascii',0,4)!=='RIFF'||
-             image.toString('ascii',8,12)!=='WEBP')throw Error('INVALID_HHBA_MANIFESTO_PHOTO');
+          const photo=fs.readFileSync('apps/web/dist/images/hhba-founder-signature.webp');
+          if(photo.length<12000||photo.toString('ascii',0,4)!=='RIFF'||
+             photo.toString('ascii',8,12)!=='WEBP')throw Error('INVALID_HHBA_FOUNDER_SIGNATURE');
           const page=fs.readFileSync('apps/web/src/pages/JoinUsPage.tsx','utf8');
-          if(!page.includes('<BrandManifesto />')||!page.includes('IntersectionObserver'))
-            throw Error('HHBA_MANIFESTO_INTERACTION_MISSING');
-          console.log('HHBA_SIGNED_MANIFESTO_OK',image.length);
+          if(!page.includes('<BrandManifesto />')||!page.includes('A NOTE FROM HHBA')||
+             !page.includes('images/hhba-founder-signature.webp')||
+             page.includes('images/hhba-brand-manifesto.webp'))
+            throw Error('HHBA_FOUNDER_LETTER_NOT_CURRENT');
+          console.log('HHBA_FOUNDER_LETTER_OK',photo.length);
           NODE
       - name: Refresh complete white HHBA job index from 50 verified official ATS boards
         working-directory: apps/web
