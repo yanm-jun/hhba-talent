@@ -123,8 +123,38 @@ export function privateGrowth(period:{days:number;from:string;today:string}){
   definitions:{pv:'经用户主动同意才记录的页面浏览事件；非全站完整流量',dailyUvSum:'按 UTC 天去重访客数之和，同一访客跨天可能重复；不是跨期独立 UV',bookmarks:'当前本设备持久收藏关系，不代表登录用户或投递数'}
  };
 }
+// Private administrative module directory: readiness metadata only.
+// This Railway service does NOT host the isolated employer PostgreSQL workflows,
+// and its password-only session does NOT grant any independent reviewer roles.
+// Null is deliberately distinct from a measured count of 0.
+export function privateAdminWorkspace(){
+ const keys=[
+  ['recruitment','招聘管理'],
+  ['enterprise','企业档案'],
+  ['evidence','企业证据核验'],
+  ['care','员工关怀'],
+  ['scoring','企业双评分'],
+  ['appeals','独立申诉'],
+  ['improvements','企业改善记录'],
+  ['publication','评分发布治理'],
+  ['aid','企业发展帮扶'],
+  ['commercial','客户对接和订单证明']
+ ] as const;
+ return {
+  kind:'HHBA_ADMIN_WORKSPACE_V1',
+  scope:'PRIVATE_ADMIN_NAVIGATION_ONLY',
+  sensitiveData:'not_connected',
+  productionReviewerAuth:'not_connected',
+  workflowDatabase:'not_connected',
+  modules:keys.map(([key,title])=>({key,title,
+    state:'not_connected',pending:null,total:null,updatedAt:null,
+    source:'modules-05-12-isolated-development',
+    reviewAllowed:false})),
+  notice:'原管理员登录已保护此目录，但独立企业审核服务、数据库与 RBAC 尚未挂载；不得将空缺计作零。'
+ };
+}
 const ROOT='/app/admin-console';
-const FILES:{[key:string]:string}={'/management/styles.css':'styles.css','/management/dashboard.js':'dashboard.js','/management/favicon.svg':'favicon.svg'};
+const FILES:{[key:string]:string}={'/management/styles.css':'styles.css','/management/dashboard.js':'dashboard.js','/management/unified-workbench.js':'unified-workbench.js','/management/unified-workbench.css':'unified-workbench.css','/management/favicon.svg':'favicon.svg'};
 const TYPES:{[key:string]:string}={css:'text/css; charset=utf-8',js:'text/javascript; charset=utf-8',svg:'image/svg+xml'};
 export async function handlePrivateAdmin(req:Request,url:URL):Promise<Response|null>{
  const path=url.pathname;
@@ -159,6 +189,7 @@ export async function handlePrivateAdmin(req:Request,url:URL):Promise<Response|n
   if(!sameOrigin(req))return bad('ORIGIN_DENIED',403);
   return new Response(null,{status:303,headers:{...HEADERS,Location:'/management/login','Set-Cookie':clearCookie()}});
  }
+ if(path==='/api/admin/workspace'&&req.method==='GET')return json(privateAdminWorkspace());
  if(path==='/api/admin/growth'&&req.method==='GET')return json(privateGrowth(normalizePeriod(url.searchParams.get('days'),new Date(),url.searchParams.get('from'),url.searchParams.get('to'))));
  if(path==='/api/admin/jobs'&&req.method==='GET'){
   try{
