@@ -106,6 +106,8 @@ def build_evidence_router(
 
 def private_download(row, vault: PrivateEvidenceVault) -> Response:
     """Download is authenticated every time, never exposed as a public URL."""
+    if row["security_status"] != "clean":
+        raise HTTPException(409, detail="FILE_SECURITY_CHECK_REQUIRED")
     body = vault.get(row["private_storage_key"])
     return Response(
         content=body,
