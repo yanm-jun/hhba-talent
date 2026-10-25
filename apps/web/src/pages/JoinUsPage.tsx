@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   ArrowLeft, ArrowRight, ArrowUpRight, BadgeCheck, BriefcaseBusiness, CalendarHeart,
   CheckCircle2, ChevronDown, Clock3, Coins, GraduationCap, Handshake,
@@ -49,50 +49,6 @@ function JumpButton({ onClick, secondary = false, children }: {
   return <button type="button" className={secondary ? 'join-btn join-btn-light' : 'join-btn join-btn-primary'} onClick={onClick}>
     {children}<ArrowUpRight size={16} aria-hidden="true" />
   </button>;
-}
-
-
-function BrandManifesto() {
-  const sectionRef = useRef<HTMLElement | null>(null);
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section || typeof IntersectionObserver === 'undefined' ||
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    const elements = Array.from(section.querySelectorAll<HTMLElement>('[data-manifesto-reveal]'));
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-revealed');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.06 });
-    elements.forEach((element) => observer.observe(element));
-    section.classList.add('join-manifesto-animate');
-    return () => {
-      observer.disconnect();
-      section.classList.remove('join-manifesto-animate');
-    };
-  }, []);
-
-  return <section ref={sectionRef} className="join-manifesto-section" id="join-manifesto" aria-labelledby="join-manifesto-title">
-    <div className="join-manifesto-intro" data-manifesto-reveal>
-      <p className="join-kicker">OUR MANIFESTO · HHBA 品牌宣言</p>
-      <h2 id="join-manifesto-title">有些话，我们想认真地写下来。</h2>
-      <p>一封写给未来同行者的信，也是我们希望一步步践行的信念。</p>
-    </div>
-    <figure className="join-manifesto-letter" data-manifesto-reveal>
-      <img src={import.meta.env.BASE_URL + 'images/hhba-brand-manifesto.webp'}
-           width={1024} height={1536}
-           loading="lazy" decoding="async"
-           alt="HHBA 品牌宣言手写信，标题为让劳动更有尊严、让商业更有温度，正文阐述诚信招聘、善待劳动者和共同成长，末尾保留创办者手写签名。" />
-    </figure>
-    <div className="join-manifesto-signoff" data-manifesto-reveal>
-      <p>我们的承诺，从自己开始。</p>
-    </div>
-  </section>;
 }
 
 export function JoinUsPage({ user }: { user: User | null }) {
@@ -222,8 +178,6 @@ export function JoinUsPage({ user }: { user: User | null }) {
           <li><span className="join-step-dot"><BadgeCheck size={17}/></span><div><small>长期目标</small><h3>完善正式团队与福利制度</h3><p>在合法合规、资金允许的条件下，逐步落实薪酬保障与长期激励。</p></div></li>
         </ol>
       </section>
-
-      <BrandManifesto />
 
       <section className="join-section join-apply-section" id="join-apply" ref={formRef} aria-labelledby="join-apply-title">
         <div className="join-section-head">
