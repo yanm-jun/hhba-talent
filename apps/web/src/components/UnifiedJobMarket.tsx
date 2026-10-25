@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, ExternalLink, MapPin, Search, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ExternalLink, MapPin, RefreshCcw, Search, ShieldCheck } from 'lucide-react';
 import { Link, getJobReturnTarget, navigate } from '../router';
 import { Shell } from './Shell';
 import { DomesticCompanyResults } from './DomesticCompanyResults';
