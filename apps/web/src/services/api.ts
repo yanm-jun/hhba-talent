@@ -10,6 +10,8 @@ const accountApiEnabled = import.meta.env.VITE_HHBA_ACCOUNT_API_ENABLED==='1';
 export const employerApiReady = accountApiEnabled && (configuredApiBase==='/api/v1' || /^https:\/\/[^\s/?#]+\/api\/v1\/?$/.test(configuredApiBase));
 // Evidence is an additional, independently activated capability. Existing employer API readiness is insufficient.
 export const evidenceApiReady = employerApiReady && import.meta.env.VITE_HHBA_EVIDENCE_API_ENABLED==='1';
+// Employee verification and protected feedback run on their own trusted service flag.
+export const employeeFeedbackApiReady = employerApiReady && import.meta.env.VITE_HHBA_EMPLOYEE_FEEDBACK_API_ENABLED==='1';
 const API = configuredApiBase || '/api/v1';
 function errorMessage(detail: unknown) {
   if (typeof detail === 'string') return detail;
@@ -54,6 +56,8 @@ export type EmployerJobApplication = {id:string;posting_id:string;shared_fields:
 export type ApplicationStage = 'submitted'|'reviewing'|'shortlisted'|'interview'|'rejected'|'hired'|'withdrawn';
 export type EmployerPosting = { id:string;company:string;title:string;description:string;requirements:string;location:string;work_mode:'onsite'|'hybrid'|'remote';recruitment_type:'SOCIAL'|'CAMPUS'|'INTERNSHIP';apply_url:string;status:'draft'|'pending_review'|'published'|'rejected'|'closed';published_at?:string|null;expires_at?:string|null;review_reason?:string|null;source_type:'HHBA_VERIFIED_EMPLOYER' };
 export type EmployerPostingInput = Pick<EmployerPosting,'title'|'description'|'requirements'|'location'|'work_mode'|'recruitment_type'|'apply_url'>;
+export type EmployeeFeedbackRatings = {pay:number;insurance:number;rest:number;respect:number;development:number};
+export type PublicFeedbackAggregate = {status:'not_public'|'published';period:string;response_band?:'at_least_10';scores_out_of_5?:EmployeeFeedbackRatings;notice?:string};
 export type EmployerEvidenceCategory = 'pay_and_contracts'|'social_insurance'|'working_hours'|'employee_development'|'recruitment_integrity'|'business_integrity';
 export type EmployerEvidence = {id:string;organization_id:string;category:EmployerEvidenceCategory;statement:string;status:'pending_review'|'verified'|'needs_more_info'|'rejected'|'expired'|'disputed';security_status:'pending_scan'|'clean'|'rejected';file_mime:string;file_size_bytes:number;created_at:string;status_updated_at:string};
 
@@ -106,6 +110,9 @@ export const api = {
   submitPosting: (oid:string,id:string) => request<{status:string}>(`/organizations/${oid}/postings/${id.replace(/^employer-/,'')}/submit`,{method:'POST'}),
   closePosting: (oid:string,id:string) => request<{status:string}>(`/organizations/${oid}/postings/${id.replace(/^employer-/,'')}/close`,{method:'POST'}),
   talentSearch: (oid:string,payload:TalentSearchInput) => request<TalentSearchResponse>(`/organizations/${oid}/talent-search`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),
+  issueEmployeeFeedbackTicket: (organization_id:string) => request<{ticket:string;period:string;notice:string}>('/employee-feedback/ticket',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id})}),
+  submitEmployeeFeedback: (organization_id:string,ticket:string,ratings:EmployeeFeedbackRatings) => request<{accepted:boolean;period:string;notice:string}>('/employee-feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id,ticket,...ratings})}),
+  publicEmployeeFeedbackAggregate: (oid:string,period:string) => request<PublicFeedbackAggregate>(`/public/organizations/${encodeURIComponent(oid)}/employee-feedback/${encodeURIComponent(period)}`),
   employerEvidence: (oid:string) => request<{items:EmployerEvidence[]}>(`/organizations/${encodeURIComponent(oid)}/evidence`),
   submitEmployerEvidence: (oid:string,category:EmployerEvidenceCategory,statement:string,file:File) => {
     const body=new FormData();
