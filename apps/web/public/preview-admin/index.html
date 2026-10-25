@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#f9faf9"/>
+  <meta name="robots" content="noindex,nofollow,noarchive"/>
+  <meta name="description" content="HHBA 管理后台 GitHub Pages 公开静态界面预览；不包含私人业务数据。"/>
+  <title>数据总览 · HHBA 静态管理后台预览</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg"/>
+  <link rel="stylesheet" href="./styles.css"/>
+  <link rel="stylesheet" href="./unified-workbench.css"/>
+  <script type="module" src="./dashboard.js"></script>
+</head>
+<body>
+<div class="app-shell" id="app">
+  <aside class="sidebar" id="sidebar" aria-label="主导航">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true"><span>H</span></div>
+      <div class="brand-wordmark"><strong>HHBA</strong><small>统一管理中心</small></div>
+    </div>
+    <div class="workspace-identity"><span class="workspace-icon">H</span><div><strong>HHBA Workspace</strong><small>GitHub Pages 预览</small></div><span class="workspace-chevron">⌄</span></div>
+    <nav class="nav-area" aria-label="管理页面">
+      <p class="nav-caption">运营总览</p>
+      <button type="button" class="nav-link is-active" data-view="overview" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.4"/><rect x="13" y="3" width="8" height="8" rx="1.4"/><rect x="3" y="13" width="8" height="8" rx="1.4"/><rect x="13" y="13" width="8" height="8" rx="1.4"/></svg> 数据总览</button>
+      <button type="button" class="nav-link" data-view="users"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-2.1c0-2.4 2.4-4.2 5.5-4.2s5.5 1.8 5.5 4.2V19M16 5.5a3 3 0 0 1 0 5.4M17 13c2.3.3 3.5 1.7 3.5 3.9V19"/></svg> 访问与收藏</button>
+      <button type="button" class="nav-link" data-view="market"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7" width="17" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3.5 12h17"/></svg> 岗位与企业</button>
+      <button type="button" class="nav-link" data-view="operations"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h4l3-7 4 12 3-5h4"/></svg> 运营监控 <span class="nav-soon">规划中</span></button>
+      <button type="button" class="nav-link" data-view="finance"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 9h18M15 15h3"/></svg> 财务成本 <span class="nav-soon">规划中</span></button>
+      <p class="nav-caption nav-caption-secondary">PRESENTATION</p>
+      <button type="button" class="nav-link" data-view="investor"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="13" rx="2"/><path d="M12 16v5M8 21h8M8 11l3-3 2 2 3-4"/></svg> 融资展示 <span class="nav-view">查看</span></button>
+      <p class="nav-caption nav-caption-secondary">SYSTEM</p>
+      <button type="button" class="nav-link" data-view="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4"/></svg> 系统设置 <span class="nav-soon">规划中</span></button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="safety-note"><span class="safety-dot"></span><span>静态预览版本</span></div>
+      <p>公开演示页面 · 无账号登录<br/>不连接任何私有数据库</p>
+      <div class="sidebar-separator"></div>
+      <div class="account-row"><span class="avatar">H</span><div><strong>HHBA Admin</strong><small>公开界面预览</small></div><span class="account-more">···</span></div>
+    </div>
+  </aside>
+  <div class="mobile-dim" id="mobile-dim" hidden></div>
+  <div class="main-column">
+    <header class="topbar">
+      <div class="crumb-group">
+        <button id="mobile-menu" class="icon-btn mobile-menu" type="button" aria-label="打开导航" aria-expanded="false">☰</button>
+        <span class="top-workspace">HHBA Workspace</span><span class="slash">/</span><strong id="breadcrumb">数据总览</strong>
+      </div>
+      <div class="top-actions">
+        <span class="top-env"><span class="safety-dot"></span> 公开预览</span>
+        <span class="top-divider"></span><span class="preview-top-marker">仅展示界面</span>
+        <button type="button" class="ghost-btn" id="top-investor"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="13" rx="2"/><path d="M12 16v5M8 21h8"/></svg> 融资视图</button>
+        <span class="avatar avatar-small" aria-label="公开预览">H</span>
+      </div>
+    </header>
+    <main class="content-wrap" id="content">
+      <aside class="preview-notice" role="status"><strong>HHBA 管理后台 · GitHub Pages 静态预览</strong><span>公开可查看。菜单切换与筛选交互可体验，但未连接真实管理员身份、企业数据、审核流程或 Railway 私有接口。所有未接入指标均显示「—」，不代表 0。</span></aside>
+      <section class="page-view" id="view-overview" aria-labelledby="overview-heading">
+        <div class="page-heading">
+          <div><p class="eyebrow">PLATFORM OVERVIEW</p><h1 id="overview-heading">数据总览</h1><p class="page-subtitle">掌握 HHBA 平台规模、数据质量与增长情况。</p></div>
+          <button class="button-outline refresh-button" type="button" id="refresh">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg> 刷新数据
+          </button>
+        </div>
+        <div class="overview-toolbar">
+          <div class="range-group" role="group" aria-label="统计时间范围">
+            <button type="button" data-period="today">今日</button>
+            <button type="button" data-period="7d">近 7 天</button>
+            <button type="button" data-period="30d" class="selected" aria-pressed="true">近 30 天</button>
+            <button type="button" data-period="90d">近 90 天</button>
+            <button type="button" data-period="custom">自定义</button>
+          </div>
+          <span class="updated-note" id="top-source-date">数据源：等待连接</span>
+        </div>
+        <div id="custom-range" class="custom-range" hidden>
+          <label>开始日期 <input type="date" id="date-from"/></label>
+          <label>结束日期 <input type="date" id="date-to"/></label>
+          <button type="button" class="button-outline" id="apply-custom">应用日期</button>
+          <span id="date-error" role="alert" class="validation-note"></span>
+        </div>
+        <div class="context-strip" id="period-notice" role="status">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10v6M12 7.2h.01"/></svg>
+          <span>岗位指标来自公开同步快照；访问与收藏按所选日期查询 Railway 私有聚合数据。</span>
+        </div>
+        <div class="kpi-grid">
+          <article class="kpi-card"><div class="kpi-head"><span>可展示岗位记录</span><span class="metric-icon"><svg viewBox="0 0 24 24"><rect x="3.5" y="7" width="17" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg></span></div><div class="metric-number" id="jobs-count">—</div><p id="jobs-sub" class="kpi-foot">正在核对公开索引</p></article>
+          <article class="kpi-card"><div class="kpi-head"><span>已审计 ATS 来源</span><span class="metric-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span></div><div class="metric-number" id="boards-count">—</div><p id="boards-sub" class="kpi-foot">ATS 招聘来源，非合作企业数</p></article>
+          <article class="kpi-card"><div class="kpi-head"><span>累计注册用户</span><span class="metric-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 19v-2c0-3 2.3-4 6-4s6 1 6 4v2"/></svg></span></div><div class="metric-number pending">—</div><p class="kpi-foot muted">等待接入用户统计接口</p></article>
+          <article class="kpi-card"><div class="kpi-head"><span>近 30 日活跃用户</span><span class="metric-icon"><svg viewBox="0 0 24 24"><path d="M3 13h4l3-7 4 12 3-5h4"/></svg></span></div><div class="metric-number pending">—</div><p class="kpi-foot muted">尚未建立行为事件口径</p></article>
+        </div>
+        <section class="admin-growth-summary" aria-labelledby="growth-heading">
+ <div class="admin-growth-heading"><div><h2 id="growth-heading">访问与收藏 · 真实采集</h2><p>按 UTC 日期展示用户主动同意采集的事件；不代表全站所有访客。</p></div><button type="button" id="growth-open" class="admin-growth-link">查看详情 →</button></div>
+ <div class="admin-growth-cards">
+  <article class="admin-growth-card"><span>页面浏览 PV</span><strong id="ov-pv">—</strong><small>仅同意采集的访问</small></article>
+  <article class="admin-growth-card"><span>日 UV 合计</span><strong id="ov-uv">—</strong><small>跨天可能重复，不是跨期去重 UV</small></article>
+  <article class="admin-growth-card"><span>有效岗位收藏</span><strong id="ov-saves">—</strong><small>本设备收藏关系总量</small></article>
+  <article class="admin-growth-card"><span>官方申请点击</span><strong id="ov-click">—</strong><small>点击行为，不等于投递成功</small></article>
+ </div>
+ <p class="admin-growth-availability" id="growth-quality" role="status">静态预览不读取真实访问量与收藏数据</p>
+</section>
+<div class="kpi-grid phase2-metrics"><article class="kpi-card"><div class="kpi-head"><span>全部索引记录</span></div><div class="metric-number" id="indexed-count">—</div><p class="kpi-foot">原始索引规模，非全部有效在招</p></article><article class="kpi-card"><div class="kpi-head"><span>官网任职要求已核验</span></div><div class="metric-number" id="requirements-count">—</div><p class="kpi-foot">原文证据已核验，非完整翻译数量</p></article><article class="kpi-card"><div class="kpi-head"><span>去重收录企业</span></div><div class="metric-number" id="companies-count">—</div><p class="kpi-foot">按公司名称去重，非签约企业数</p></article></div>
+        <div class="insights-grid">
+          <article class="panel panel-trend">
+            <div class="panel-heading"><div><h2>平台增长趋势</h2><p>仅主动同意的访问 PV 按日趋势</p></div><span class="small-label" id="trend-range-label">近 30 天</span></div>
+            <div class="admin-traffic-chart" id="trend-chart" role="img" aria-label="真实 PV 按日趋势">等待读取真实访问记录…</div>
+            <div class="panel-footnote"><span class="round-info">i</span> 访问数据来自匿名同意采集；未经采集的数据不补造</div>
+          </article>
+          <article class="panel panel-quality">
+            <div class="panel-heading"><div><h2>数据可信度</h2><p>每个指标都应能追溯来源</p></div><span class="small-label">DATA QUALITY</span></div>
+            <div class="source-health"><span class="source-status-dot" id="feed-dot"></span><div><strong id="feed-health">正在核对公开数据源</strong><p id="feed-detail">尚未收到有效快照</p></div></div>
+            <div class="quality-lines">
+              <div><span>岗位同步失败来源</span><strong id="failed-boards">—</strong></div>
+              <div><span>岗位索引时间</span><strong id="snapshot-time">—</strong></div><div><span>官网 JD 审计时间</span><strong id="audit-time">—</strong></div>
+              <div><span>用户留存 / 转化</span><strong class="neutral-value">尚未采集</strong></div>
+            </div>
+            <p class="quality-warning"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 16H3l9-16Z"/><path d="M12 9v4M12 16h.01"/></svg> 来源数量不等于签约企业，岗位数量不等于真实投递或收入。</p>
+          </article>
+        </div>
+        <article class="panel provenance">
+          <div class="panel-heading"><div><h2>数据来源与统计口径</h2><p>优先展示已采集、可复核的指标，不以预测代替事实。</p></div><button class="link-button" type="button" id="show-investor">融资展示视图 →</button></div>
+          <div class="data-table-wrap"><table class="data-table"><thead><tr><th scope="col">统计项目</th><th scope="col">数据来源</th><th scope="col">状态</th></tr></thead><tbody>
+            <tr><td><strong>岗位索引与 ATS 来源</strong><small>本次公开索引同步快照</small></td><td>HHBA Railway 公开只读接口</td><td><span class="table-status waiting" id="jobs-status">核对中</span></td></tr>
+            <tr><td><strong>注册、活跃及用户留存</strong><small>需要鉴权后的聚合统计</small></td><td>用户系统 / 行为事件（未接入）</td><td><span class="table-status waiting">待接入</span></td></tr>
+            <tr><td><strong>申请外链点击 / 商业收入</strong><small>不能使用浏览量估算转化</small></td><td>行为埋点 / 财务账目（未接入）</td><td><span class="table-status waiting">待接入</span></td></tr>
+          </tbody></table></div>
+        </article>
+        <footer class="page-footer">HHBA Management Console · Phase 3.1 私有数据看板 · 所有统计数据均须标明来源、口径与时间</footer>
+      </section>
+      <section class="page-view" id="view-users" hidden aria-labelledby="users-heading">
+ <div class="page-heading"><div><p class="eyebrow">REAL USER BEHAVIOR · PHASE 3.1</p><h1 id="users-heading">访问与收藏分析</h1>
+ <p class="page-subtitle">真实访问及收藏关系的聚合趋势，不展示用户身份、简历或具体个人行为。</p></div></div>
+ <div class="overview-toolbar"><div class="range-group" role="group" aria-label="访问统计时间范围">
+ <button type="button" data-period="today">今日</button><button type="button" data-period="7d">近 7 天</button>
+ <button type="button" data-period="30d" class="selected" aria-pressed="true">近 30 天</button>
+ <button type="button" data-period="90d">近 90 天</button></div><span class="updated-note">本模块日期采用 UTC</span></div>
+ <div class="admin-growth-cards admin-growth-cards-details">
+  <article class="admin-growth-card"><span>页面浏览 PV</span><strong id="growth-pv">—</strong><small>主动同意的匿名访问</small></article>
+  <article class="admin-growth-card"><span>日 UV 合计</span><strong id="growth-uv">—</strong><small>日去重后求和，非跨期独立人数</small></article>
+  <article class="admin-growth-card"><span>岗位详情浏览</span><strong id="growth-views">—</strong><small>已采集的职位浏览事件</small></article>
+  <article class="admin-growth-card"><span>职位搜索次数</span><strong id="growth-search">—</strong><small>不记录具体搜索词</small></article>
+  <article class="admin-growth-card"><span>官方申请点击</span><strong id="growth-click">—</strong><small>不代表成功申请</small></article>
+  <article class="admin-growth-card"><span>有效收藏总数</span><strong id="growth-saved">—</strong><small>全时点总量，不随时间筛选变化</small></article>
+  <article class="admin-growth-card"><span>有收藏的设备数</span><strong id="growth-saved-devices">—</strong><small>匿名设备标识，不是注册用户</small></article>
+  <article class="admin-growth-card"><span>新增 / 取消收藏</span><strong id="growth-changes">—</strong><small>所选范围内实际操作次数</small></article>
+ </div>
+ <article class="panel admin-detail-panel"><div class="panel-heading"><div><h2>页面访问 PV · 每日变化</h2><p id="users-interval">与顶部时间筛选同步（UTC）</p></div><span class="small-label">真实事件记录</span></div>
+ <div class="admin-traffic-chart admin-traffic-chart-large" id="users-chart" role="img" aria-label="每日真实 PV 柱状图">正在加载…</div></article>
+ <article class="panel admin-detail-panel"><h2>数据口径与隐私边界</h2>
+ <p>PV 和日 UV 仅覆盖已同意匿名统计的访客，不能宣称为全站全部流量。收藏按本设备标识保存在 Railway，当前模拟登录不等于正式用户注册。缺失数据会显示“—”，不推算、不伪造历史。</p>
+ <p id="users-data-quality">数据质量：等待查询</p></article>
+</section>
+<section class="page-view" id="view-investor" hidden aria-labelledby="investor-heading">
+        <div class="page-heading investor-heading"><div><p class="eyebrow">INVESTOR DATA ROOM · PREVIEW</p><h1 id="investor-heading">HHBA · 融资数据展示</h1><p class="page-subtitle">可核验的平台基础建设进度，尚未接入的经营指标明确留空。</p></div><div class="heading-actions"><button type="button" class="button-outline" id="export-csv">导出已核验 CSV</button><button type="button" class="button-primary" id="leave-investor">返回管理后台</button></div></div>
+        <div class="investor-statement"><div class="statement-symbol">H</div><div><strong>Human Capability Network</strong><p>全球职位与人才能力连接平台 · HHBA 独立整理公开职位来源，不代表与雇主建立招聘合作。</p></div></div>
+        <div class="investor-kpis"><article><span>可展示职位记录</span><strong id="investor-jobs">—</strong><small id="investor-jobs-label">待核验数据</small></article><article><span>去重收录企业</span><strong id="investor-boards">—</strong><small>索引公司名称去重，非合作伙伴数</small></article><article><span>用户增长</span><strong>—</strong><small>待接入正式用户统计</small></article><article><span>同意采集 PV（所选范围）</span><strong id="investor-pv">—</strong><small>不是全站全部访问量</small></article><article><span>本设备有效岗位收藏</span><strong id="investor-saved">—</strong><small>不是注册用户数</small></article></div>
+        <article class="panel investor-disclosure"><h2>给投资人的数据披露说明</h2><p>此处是公开静态界面预览，尚未获取经管理员授权的招聘、访问、收藏和财务数据。缺失指标统一显示「—」，不能将演示界面当作平台实际经营数据。</p><dl><div><dt>当前索引快照</dt><dd id="investor-asof">—</dd></div><div><dt>索引状态</dt><dd id="investor-quality">等待数据</dd></div><div><dt>增长历史</dt><dd>静态预览未接入访问统计与正式用户留存</dd></div><div><dt>数据采集方式</dt><dd>公开静态预览不采集或展示真实运营数据</dd></div></dl></article>
+        <footer class="page-footer">GitHub Pages 公开静态页面 · 不需管理员登录 · 无真实融资或经营指标，请勿用作实际运营证明。</footer>
+      </section>
+      <section class="page-view" id="view-placeholder" hidden aria-labelledby="placeholder-heading">
+        <div class="page-heading"><div><p class="eyebrow" id="placeholder-eyebrow">PLANNED MODULE</p><h1 id="placeholder-heading">规划中</h1><p class="page-subtitle" id="placeholder-subtitle"></p></div></div>
+        <article class="panel placeholder-panel"><div class="placeholder-visual"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 12h6M12 9v6"/></svg></div><h2>模块接口已预留，暂未启用</h2><p id="placeholder-description">本模块需要进一步接入来源与身份认证。</p><button type="button" class="button-primary" id="back-overview">返回数据总览</button></article>
+      </section>
+    </main>
+  </div>
+</div>
+</body>
+</html>
