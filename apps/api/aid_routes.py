@@ -172,7 +172,8 @@ def build_aid_router(*,resolve_actor:Callable,resolve_certification:Callable,
             raise HTTPException(403,detail="MATCHER_ORGANIZATION_CONFLICT")
         return await commercial.submit_order_proof(
             introduction_id=introduction_id,actor_id=actor.user_id,
-            evidence_reference=body.evidence_reference)
+            evidence_reference=body.evidence_reference,
+            certified=bool(await resolve_certification(org)))
 
     @router.post("/admin/order-proofs/{proof_id}/verify")
     async def verify_order(proof_id:str,body:ProofReview,
