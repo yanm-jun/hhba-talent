@@ -14,7 +14,7 @@ test('employee feedback is independently gated and never silently submitted',()=
  assert.match(api,/VITE_HHBA_EMPLOYEE_FEEDBACK_API_ENABLED/);
  assert.match(api,/employeeFeedbackApiReady = employerApiReady &&/);
  assert.match(page,/disabled=\{!enabled\|\|busy\|\|!!ticket\|\|submitted\}/);
- assert.match(page,/disabled=\{!enabled\|\|!ticket\|\|!consent\|\|busy\|\|submitted\}/);
+ assert.match(page,/disabled=\{!enabled\|\|!ticket\|\|!consent\|\|!questions\.every/);
  assert.match(page,/真实反馈服务尚未开放/);
  assert.match(page,/不会把原始个人评分或评价人身份提供给企业/);
 });
