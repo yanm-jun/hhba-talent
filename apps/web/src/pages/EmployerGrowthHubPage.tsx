@@ -194,7 +194,7 @@ export function EmployerGrowthHubPage({ user, view }: { user: User | null; view:
       </div>}
       {view==='growth'&&<div className="eh-stack">
         <div className="eh-card"><div className="eh-card-head"><div><h2>信誉值与员工善待值</h2><p>两项独立评估，不能简单用高信誉值掩盖低员工善待值。</p></div><span className="eh-tag">暂无经核验分数</span></div><Evaluation/></div>
-        <div className="eh-card"><div className="eh-card-head"><h2>评分依据与核验状态</h2><Link to="/employer/evidence">提交证明材料 <ArrowUpRight size={15}/></Link></div><div className="eh-checklist">{evaluationItems.map(([label,status])=><div key={label}><span>{label}</span><small>{status}</small></div>)}</div><p className="eh-field-help">未来每个评分项必须包含证据来源、核验日期、规则版本、异议处理通道。未经核实的匿名指控不能直接扣分；企业也不能用虚假员工好评刷分。</p></div>
+        <div className="eh-card"><div className="eh-card-head"><h2>评分依据与核验状态</h2><Link to="/employer/scoring">查看双评分规则 <ArrowUpRight size={15}/></Link></div><p className="eh-field-help"><Link to="/employer/evidence">提交证明材料</Link> · 必须经独立核验与评分复核，不能因为上传材料就直接加分。</p><div className="eh-checklist">{evaluationItems.map(([label,status])=><div key={label}><span>{label}</span><small>{status}</small></div>)}</div><p className="eh-field-help">未来每个评分项必须包含证据来源、核验日期、规则版本、异议处理通道。未经核实的匿名指控不能直接扣分；企业也不能用虚假员工好评刷分。</p></div>
         <div className="eh-card"><div className="eh-card-head"><div><h2>成长记录</h2><p>评分变化将展示经核实的改善记录，不会生成虚假的历史曲线。</p></div><TrendingUp size={21}/></div><div className="eh-timeline-empty"><Clock3 size={20}/><span>尚无核验记录。建立可信评分体系后，按实际发生日期展示变化。</span></div></div>
       </div>}
       {view==='aid'&&<div className="eh-stack">

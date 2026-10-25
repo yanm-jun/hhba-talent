@@ -73,7 +73,7 @@ export function EmployerReviewPage({user}:{user:User|null}){
  return <Shell user={user}><main className="employer-review">
   <Link className="employer-review-back" to="/employer/workspace"><ArrowLeft size={14}/> 企业工作台</Link>
   <div className="employer-review-head"><ShieldCheck size={20}/><div><span className="page-kicker">HHBA 审核后台 · 管理员专属</span><h1>企业认证及职位人工审核</h1><p>独立核验材料、招聘主体、职位真实性。任何操作均需服务器管理员权限及 CSRF 令牌，不能靠切换前端状态批准。</p></div></div>
-  <p><Link to="/admin/employer-evidence" className="employer-review-back"><FileCheck2 size={15}/> 进入企业员工关怀证据核验队列</Link></p>
+  <p><Link to="/admin/employer-evidence" className="employer-review-back"><FileCheck2 size={15}/> 进入企业员工关怀证据核验队列</Link></p><p><Link to="/admin/employer-scoring" className="employer-review-back"><ShieldCheck size={15}/> 进入企业双评分内部审核</Link></p>
   <div className="employer-review-tabs"><button className={tab==='jobs'?'selected':''} onClick={()=>setTab('jobs')}>待审核岗位（{jobs.length}）</button><button className={tab==='orgs'?'selected':''} onClick={()=>setTab('orgs')}>待审核企业（{orgs.length}）</button></div>
   <label className="employer-review-reason">审核理由代码<input maxLength={120} value={reviewReason} onChange={e=>setReviewReason(e.target.value)} placeholder="例如：manual_verification_completed"/></label>
   {notice&&<p role="status" className="employer-review-alert">{notice}</p>}
