@@ -408,3 +408,37 @@
     opacity:1!important;transform:none!important;transition:none!important
   }
 }
+
+
+/* Independent HHBA Vision page — navigation is intentionally distinct from Join Us cards. */
+.hhba-vision-page{padding-top:24px}
+.join-vision-navigation{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:14px 4px 24px;color:#75869a;font-size:12px
+}
+.join-vision-back{
+  display:inline-flex;align-items:center;gap:9px;border-radius:8px;
+  text-decoration:none;color:#365577;font-weight:680;padding:9px 10px;
+  margin-left:-10px;transition:background .2s,color .2s
+}
+.join-vision-back:hover{background:#ecf2f7;color:#253f61}
+.join-vision-back:focus-visible,.join-vision-page-footer a:focus-visible{
+  outline:3px solid #8ba4c9;outline-offset:3px
+}
+.join-vision-page-footer{
+  border-top:1px solid #e5eaf0;margin:4px 0 16px;padding:27px 7px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px
+}
+.join-vision-page-footer span{color:#8491a1;font-size:11px}
+.join-vision-page-footer a{
+  display:inline-flex;align-items:center;gap:8px;color:#365577;
+  text-decoration:none;font-size:12px;font-weight:690
+}
+.join-vision-page-footer a:hover{text-decoration:underline}
+.hhba-vision-page .join-vision{margin-top:0}
+@media(max-width:650px){
+  .hhba-vision-page{padding-top:12px}
+  .join-vision-navigation{padding:9px 3px 19px;font-size:11px}
+  .join-vision-navigation>span{font-size:10px}
+  .join-vision-page-footer{flex-direction:column;align-items:flex-start;gap:13px}
+}
