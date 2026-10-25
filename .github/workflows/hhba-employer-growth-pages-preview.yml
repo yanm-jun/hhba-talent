@@ -59,6 +59,10 @@ jobs:
         run: |
           mkdir -p /tmp/hhba-employer-qa/hhba-talent/preview-employer
           cp -a apps/web/dist/. /tmp/hhba-employer-qa/hhba-talent/preview-employer/
+          for route in employer/start employer/onboarding-preview employer/hub employer/growth employer/aid employer/public employer/workspace; do
+            mkdir -p "/tmp/hhba-employer-qa/hhba-talent/preview-employer/$route"
+            cp apps/web/dist/index.html "/tmp/hhba-employer-qa/hhba-talent/preview-employer/$route/index.html"
+          done
           (python3 -m http.server 4173 --bind 127.0.0.1 --directory /tmp/hhba-employer-qa >/tmp/hhba-employer-qa.log 2>&1 &)
       - name: Install Chromium for full navigation tests
         run: |
