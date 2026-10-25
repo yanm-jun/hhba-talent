@@ -91,11 +91,11 @@ test('UI keeps future metrics null and distinguishes current snapshots from hist
  const js=file('../dashboard.js');
  const css=file('../styles.css');
  assert.match(html,/累计注册用户/);
- assert.match(html,/岗位索引记录/);
+ assert.match(html,/全部索引记录/);
  assert.match(html,/融资数据展示/);
  assert.match(html,/近 30 天/);
  assert.match(js,/当前岗位指标为最新索引快照/);
- assert.ok(js.includes("data?.quality==='current'"));
+ assert.ok(js.includes("['current','partial'].includes(data?.quality)"));
  assert.match(js,/function exportCSV/);
  assert.match(css,/prefers-reduced-motion/);
  assert.match(css,/max-width:780px/);
