@@ -67,10 +67,12 @@ def evaluate_candidate(*, findings: list[dict], feedback: dict | None,
     """
     now = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
     by_category: dict[str, dict] = {}
+    seen_categories: set[str] = set()
     for f in findings:
         cat = f.get("category")
-        if cat not in ALL_CATEGORIES or cat in by_category:
+        if cat not in ALL_CATEGORIES or cat in seen_categories:
             continue
+        seen_categories.add(cat)  # Never resurrect an older score if the latest proof was disputed.
         if (f.get("evidence_status") != "verified"
             or f.get("security_status") != "clean"
             or type(f.get("score")) is not int
