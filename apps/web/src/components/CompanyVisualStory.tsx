@@ -22,10 +22,9 @@ function CreditedPhoto({photo,lang,portrait=false}:{
     {lang==='zh'?'图片暂时无法加载':'Image temporarily unavailable'}
    </div>}
   <div className="company-visual-credit">
-    {page?<a href={page} target="_blank" rel="noopener noreferrer"
-      title={lang==='zh'?'查看原始图片与授权信息':'View original image and license'}>
-      {photo.author} · {photo.license} <ExternalLink size={12} aria-hidden="true"/>
-    </a>:<span>{lang==='zh'?'图片来源未核实':'Image source unverified'}</span>}
+    {page?<span title={lang==='zh'?'图片作者及授权信息':'Image author and license'}>
+      {photo.author} · {photo.license}
+    </span>:<span>{lang==='zh'?'图片来源未核实':'Image source unverified'}</span>}
   </div>
  </div>;
 }
