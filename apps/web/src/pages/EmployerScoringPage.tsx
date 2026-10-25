@@ -56,9 +56,9 @@ export function EmployerScoringPage({user}:{user:User|null}){
         <ArrowRight size={18}/>
         <div><Calculator size={18}/><strong>留痕重算</strong><small>固定版本规则、全类别覆盖、结果历史不可无痕更改</small></div>
       </div>
-      <div className="es-notice"><BookOpenCheck size={18}/><span>企业真实改善记录是未来的独立模块：评分变动时应展示经过核实的改善事实。当前不会虚构历史评分或企业成长曲线。</span></div>
+      <div className="es-notice"><BookOpenCheck size={18}/><span>真实改善记录已有独立提交、证据核验与公开审批流程；仍不会依据企业自述虚构评分变化或企业成长曲线。</span></div>
     </div>
-    <div className="es-foot"><Link to="/employer/appeals">提交评分申诉 <ArrowRight size={15}/></Link><Link to="/employer/evidence">进入证明材料核验 <ArrowRight size={15}/></Link><Link to="/employer/aid">了解 HHBA 帮扶标准 <ArrowRight size={15}/></Link></div>
+    <div className="es-foot"><Link to="/employer/improvements">提交真实改善记录 <ArrowRight size={15}/></Link><Link to="/employer/appeals">提交评分申诉 <ArrowRight size={15}/></Link><Link to="/employer/evidence">进入证明材料核验 <ArrowRight size={15}/></Link><Link to="/employer/aid">了解 HHBA 帮扶标准 <ArrowRight size={15}/></Link></div>
   </main></Shell>;
 }
 
@@ -99,7 +99,7 @@ export function AdminEmployerScoringPage({user}:{user:User|null}){
   }
   return <Shell user={user}><main className="es-page">
     <Link className="es-back" to="/admin/employer-evidence"><ArrowLeft size={16}/> 返回证据核验队列</Link>
-    <p className="es-kicker">HHBA · 独立审核管理</p><h1>评分候选值与复核</h1><Link to="/admin/employer-appeals">前往申诉独立复核队列 <ArrowRight size={15}/></Link>
+    <p className="es-kicker">HHBA · 独立审核管理</p><h1>评分候选值与复核</h1><Link to="/admin/employer-appeals">前往申诉独立复核队列 <ArrowRight size={15}/></Link> <Link to="/admin/employer-improvements">前往企业改善核验 <ArrowRight size={15}/></Link>
     <p className="es-subtitle">只有经过服务器独立授权的评分审核员才能操作。资料提交人、文件初审员和评分审核员不能由同一人直接完成全流程。</p>
     {!enabled&&<div className="es-alert" role="status"><LockKeyhole size={20}/><div><strong>独立评分服务尚未开放</strong><p>当前 GitHub Pages 预览没有真实审核权限，提交评估和重算均被禁用。代码不包含管理员万能密码或假评分。</p></div></div>}
     {error&&<p role="alert" className="es-error">{error}</p>}
