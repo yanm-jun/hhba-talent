@@ -1,0 +1,107 @@
+name: HHBA Unified Complete Site Preflight
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-unified-site-preflight.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  web-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/hhba-unified-static-20261025
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked frontend dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Audit company count and archived original company records
+        working-directory: apps/web
+        run: |
+          node scripts/audit-domestic-company200.mjs
+          node scripts/company200-integration.contract.test.mjs
+          node scripts/audit-labor-rights-topics.mjs
+      - name: Test complete candidate, employer, evidence, governance, aid and founder pages
+        working-directory: apps/web
+        run: |
+          node --test scripts/hhba-unified-static.contract.test.mjs \
+            scripts/employer-growth.contract.test.mjs \
+            scripts/curated-offline.contract.test.mjs \
+            scripts/employer-evidence.contract.test.mjs \
+            scripts/employee-feedback.contract.test.mjs \
+            scripts/employer-scoring.contract.test.mjs \
+            scripts/employer-appeals.contract.test.mjs \
+            scripts/employer-improvements.contract.test.mjs \
+            scripts/employer-publication.contract.test.mjs \
+            scripts/employer-aid-commercial.contract.test.mjs
+      - name: Build unified static site with sensitive business services safely disabled
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_HHBA_EVIDENCE_API_ENABLED: '0'
+          VITE_HHBA_EMPLOYEE_FEEDBACK_API_ENABLED: '0'
+          VITE_HHBA_SCORING_API_ENABLED: '0'
+          VITE_HHBA_APPEALS_API_ENABLED: '0'
+          VITE_HHBA_IMPROVEMENTS_API_ENABLED: '0'
+          VITE_HHBA_PUBLICATION_API_ENABLED: '0'
+          VITE_HHBA_AID_COMMERCIAL_API_ENABLED: '0'
+        run: npm run build
+      - name: Package original photos and verify source route mappings
+        working-directory: apps/web
+        run: |
+          cp dist/index.html dist/404.html
+          touch dist/.nojekyll
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const assets=['images/hhba-join-team.webp','images/hhba-founder-signature.webp'];
+          for(const path of assets)if(!fs.existsSync('dist/'+path))throw Error('MISSING_SIGNED_BRAND_ASSET:'+path);
+          const main=fs.readFileSync('src/main.tsx','utf8');
+          for(const route of ['/join','/vision','/employer/start','/employer/hub','/companies/discover'])
+            if(!main.includes("route==='"+route+"'"))throw Error('UNIFIED_ROUTE_MISSING:'+route);
+          if(!fs.existsSync('dist/404.html'))throw Error('NO_DEEP_LINK_FALLBACK');
+          console.log('FULL_STATIC_ROUTING_AND_ASSETS_OK');
+          NODE
+  backend-governance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: hhba_ci
+          POSTGRES_PASSWORD: evidence_ci_test_only
+          POSTGRES_DB: hhba_evidence_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hhba_ci -d hhba_evidence_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      HHBA_EVIDENCE_TEST_PG_DSN: 'postgresql://hhba_ci:evidence_ci_test_only@127.0.0.1:5432/hhba_evidence_ci'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/hhba-unified-static-20261025
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: apps/api/requirements-evidence-dev.txt
+      - name: Install isolated testing requirements
+        run: python -m pip install -r apps/api/requirements-evidence-dev.txt
+      - name: Verify private employer workflows, role segregation and reviewer queues
+        run: python -m unittest discover -s apps/api/tests -v
+      - name: Verify original admin dashboard and reviewer queue contract integrity
+        run: |
+          test -s ops/legacy-marketplace/admin-ui/unified-workbench.js
+          test -s apps/api/admin_workspace_routes.py
+          python -m compileall -q apps/api
