@@ -24,6 +24,8 @@ test('every recruitment link follows a single registration-first policy across r
  assert.ok(policy.includes("SOURCES.test(label)")); // source evidence links stay ungated
  assert.ok(!shell.includes('window.open('));
  assert.ok(!shell.includes('location.href='));
+ assert.ok(shell.includes("route.startsWith('/admin')"));
+ assert.ok(shell.includes("route.startsWith('/employer')"));
 });
 
 test('all known official recruiter endpoints share same outbound marker',()=>{
@@ -31,7 +33,9 @@ test('all known official recruiter endpoints share same outbound marker',()=>{
   'pages/DomesticCompanyPage.tsx','pages/CompanyProfilePage.tsx',
   'pages/IndexedCompanyPage.tsx','components/UnifiedJobMarket.tsx',
   'pages/CandidateJobsPage.tsx','components/RecruitmentMarketplace.tsx',
-  'components/CuratedJobMarket.tsx','pages/EmployerPublicJobsPage.tsx'
+  'components/CuratedJobMarket.tsx','pages/EmployerPublicJobsPage.tsx',
+  'components/AICompanySearch.tsx','components/HomeFeaturedEmployers.tsx',
+  'pages/CandidateMatchPage.tsx','pages/ResumeMatchPage.tsx','pages/MajorCompaniesPage.tsx'
  ];
  for(const file of files){
   const c=src(file);
