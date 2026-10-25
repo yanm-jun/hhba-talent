@@ -58,7 +58,7 @@ export function EmployerScoringPage({user}:{user:User|null}){
       </div>
       <div className="es-notice"><BookOpenCheck size={18}/><span>真实改善记录已有独立提交、证据核验与公开审批流程；仍不会依据企业自述虚构评分变化或企业成长曲线。</span></div>
     </div>
-    <div className="es-foot"><Link to="/employer/verified-profile">查看公众档案 <ArrowRight size={15}/></Link><Link to="/employer/improvements">提交真实改善记录 <ArrowRight size={15}/></Link><Link to="/employer/appeals">提交评分申诉 <ArrowRight size={15}/></Link><Link to="/employer/evidence">进入证明材料核验 <ArrowRight size={15}/></Link><Link to="/employer/aid">了解 HHBA 帮扶标准 <ArrowRight size={15}/></Link></div>
+    <div className="es-foot"><Link to="/employer/verified-profile">查看公众档案 <ArrowRight size={15}/></Link><Link to="/employer/improvements">提交真实改善记录 <ArrowRight size={15}/></Link><Link to="/employer/appeals">提交评分申诉 <ArrowRight size={15}/></Link><Link to="/employer/evidence">进入证明材料核验 <ArrowRight size={15}/></Link><Link to="/employer/aid">了解 HHBA 帮扶标准 <ArrowRight size={15}/></Link> <Link to="/employer/aid/apply">进入帮扶申请 <ArrowRight size={15}/></Link></div>
   </main></Shell>;
 }
 
