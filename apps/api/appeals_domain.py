@@ -73,7 +73,7 @@ def sanitized_case(row: dict, *, reviewer: bool = False) -> dict:
                     explanation=row["explanation"])
     # Employee case has *only fixed reason codes*; no free text.
     if reviewer:
-        data["resolution"] = row.get("resolution")
+        data["resolution"] = row["resolution"]
     return data
 
 
