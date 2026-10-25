@@ -106,8 +106,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
     {article?.photoSourcePage&&!hasReadyPhoto?
      <section className="domestic-editorial-section" aria-label="官方企业实景来源"><h2>企业实景与办公环境</h2>
       <p className="domestic-company-note">图片暂未核验为可在本站稳定展示，避免错用其他企业照片。</p>
-      <a href={article.photoSourcePage} target="_blank" rel="noopener noreferrer" className="domestic-careers-link">
-       {article.photoSourceLabel||'查看官网企业实景资料'} <ExternalLink size={14}/></a></section>:null}
+      <span className="domestic-photo-source-note">企业实景图片的来源信息已登记，当前没有经过核验的可展示照片。</span></section>:null}
     {article?.officeLocations?.length?<section className="domestic-editorial-section" aria-label="办公地点">
       <h2>总部与办公地点</h2>
       <div className="domestic-office-list">{article.officeLocations.map(entry=><div key={entry.address}><MapPin size={17}/><div><strong>{entry.type}</strong><p>{entry.address}</p>
@@ -141,9 +140,8 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
        {recruitment&&<a href={recruitment.evidenceUrl} target="_blank" rel="noopener noreferrer">招聘入口核验依据（{recruitment.verifiedOn}） <ExternalLink size={13}/></a>}
        {article?.industryEvidenceUrl&&<a href={article.industryEvidenceUrl} target="_blank" rel="noopener noreferrer">行业分类核验依据 <ExternalLink size={13}/></a>}
        {article?.productSource&&<a href={article.productSource} target="_blank" rel="noopener noreferrer">公开产品资料 <ExternalLink size={13}/></a>}
-       {article?.imageSource&&<a href={article.imageSource} target="_blank" rel="noopener noreferrer">企业图片来源 <ExternalLink size={13}/></a>}
-       {article?.brandImageSource&&<a href={article.brandImageSource} target="_blank" rel="noopener noreferrer">
-        {article.brandAssetStatus==='official_domain_favicon_unverified_visual'?'企业官网图标来源（品牌Logo待核实）':'品牌图来源'} <ExternalLink size={13}/></a>}
+       {article?.imageSource&&<span className="domestic-photo-source-note">企业图片来源已登记</span>}
+       {article?.brandImageSource&&<span className="domestic-photo-source-note">{article.brandAssetStatus==='official_domain_favicon_unverified_visual'?'企业官网图标来源已登记（品牌 Logo 待核实）':'品牌图来源已登记'}</span>}
        {httpsLink(company.website)&&<a href={httpsLink(company.website)} target="_blank" rel="noopener noreferrer">企业网站 <ExternalLink size={13}/></a>}
        <p>资料日期：{article?.lastReviewed||company.lastReviewed}。企业介绍和专业方向由 HHBA 独立整理，不代表企业招聘合作。</p></div>
       </details>
