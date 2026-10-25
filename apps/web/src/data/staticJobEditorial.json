@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "editorial": [
+    {
+      "company": "OpenAI",
+      "title": "Engineering Manager, Identity Platform",
+      "originalSourcePrefix": "https://jobs.ashbyhq.com/openai/",
+      "evidencePage": "https://openai.com/careers/engineering-manager-identity-platform-san-francisco/",
+      "verifiedOn": "2026-10-25",
+      "location": "San Francisco",
+      "overviewZh": "负责 OpenAI 身份平台的基础服务与工程团队，重点是大规模身份认证、访问安全、低延迟和高可用性。以下内容由 HHBA 根据企业公开招聘页面独立整理，不是官方原文。",
+      "responsibilitiesZh": [
+        "组建、指导和发展身份平台工程团队，支持工程师与技术负责人的长期成长。",
+        "规划核心身份系统的技术方向、产品需求协作、阶段目标与交付。",
+        "负责大规模分布式身份基础设施的架构质量，重点保障可靠性、隐私、安全和响应速度。",
+        "管理登录认证与令牌交换相关的基础设施和运行质量。",
+        "改善登录用户在边缘节点的请求校验，支持高并发和高可靠性。",
+        "推进用户数据受控访问能力，协调基础设施、产品及安全团队。"
+      ],
+      "requirementsZh": [
+        "企业公开要求：具备十年以上大规模分布式系统建设、扩展或运行经验。",
+        "企业公开要求：具备三年以上高绩效工程团队管理经验。",
+        "具备工程团队培养、人员招聘、跨团队沟通和技术决策能力。",
+        "熟悉高规模后端系统的可靠性、延迟、安全治理和生产运维。",
+        "拥有涵盖计算、集群、服务及存储的基础设施经验。"
+      ],
+      "benefitsZh": [
+        "官网当次公开的旧金山基本年薪区间为 293,000—385,000 美元，另有股权；实际待遇和招聘状态请以官网最新信息为准。"
+      ],
+      "overviewEn": "HHBA editorial summary based on OpenAI's published vacancy: leads foundational identity services and the engineering team responsible for reliable, secure access.",
+      "responsibilitiesEn": [
+        "Build, coach and lead the identity engineering team.",
+        "Own the roadmap, architecture and delivery of core identity infrastructure.",
+        "Guide secure, reliable and low-latency large-scale distributed systems.",
+        "Oversee the authentication and token-exchange systems.",
+        "Improve high-throughput request validation and secure user-data access."
+      ],
+      "requirementsEn": [
+        "The published role asks for 10+ years building and operating large-scale distributed systems.",
+        "It also asks for 3+ years leading high-performing engineering teams.",
+        "Experience in production backend reliability, infrastructure and security is relevant.",
+        "Leadership, hiring, mentoring and cross-functional collaboration are important."
+      ],
+      "benefitsEn": [
+        "Base pay listed at review: USD $293,000–$385,000 plus equity; verify the latest details with the employer."
+      ],
+      "rights": "HHBA_ORIGINAL_PARAPHRASE"
+    }
+  ]
+}
