@@ -1,0 +1,44 @@
+name: HHBA Founder Letter Preflight
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-founder-letter-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout updated founder letter branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/founder-letter-rhode-layout-20261025
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci
+      - name: Test founder manifesto, page privacy and visual assets
+        working-directory: apps/web
+        run: node --test scripts/join-us.contract.test.mjs
+      - name: Build HHBA public site
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+        run: npm run build
+      - name: Verify signature and no long-scan hero
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const image=fs.readFileSync('apps/web/dist/images/hhba-founder-signature.webp');
+          const jsx=fs.readFileSync('apps/web/src/pages/JoinUsPage.tsx','utf8');
+          if(image.length<12000||image.toString('ascii',0,4)!=='RIFF'||image.toString('ascii',8,12)!=='WEBP')throw Error('SIGNATURE_ASSET_INVALID');
+          if(jsx.includes('images/hhba-brand-manifesto.webp')||!jsx.includes('A NOTE FROM HHBA'))throw Error('WRONG_BRAND_LETTER');
+          console.log('HHBA_FOUNDER_LETTER_READY',image.length);
+          NODE
