@@ -22,11 +22,24 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p apps/web/public/images
-          curl --fail --show-error --silent --location \
-            --retry 3 --max-time 65 \
-            --user-agent 'HHBA website static asset importer/1.0' \
-            'https://www.axxes.com/uploads/resized/uploads/442640/20250228_AXXES-Gent-02_KP_089__O4A2794_79a5c065a5d4cbb85c9293b8fc974fbd.jpg' \
-            -o apps/web/public/images/hhba-team-collaboration.jpg
+          filename="20250228_AXXES-Gent-02_KP_089__O4A2794"
+          ok=0
+          for url in \
+            "https://www.axxes.com/uploads/442640/${filename}.jpg" \
+            "https://www.axxes.com/uploads/442640/${filename}_79a5c065a5d4cbb85c9293b8fc974fbd.jpg" \
+            "https://www.axxes.com/uploads/${filename}.jpg" \
+            "https://www.axxes.com/uploads/_1024xAUTO_crop_center-center_none/${filename}.jpg" \
+            "https://www.axxes.com/uploads/_1400xAUTO_crop_center-center_none/${filename}.jpg" \
+            "https://www.axxes.com/uploads/resized/uploads/442640/${filename}_79a5c065a5d4cbb85c9293b8fc974fbd.jpg"; do
+            echo "Probing known source variant: $url"
+            if curl --fail --silent --show-error --location --max-time 30 \
+                 --user-agent 'Mozilla/5.0' "$url" \
+                 -o apps/web/public/images/hhba-team-collaboration.jpg; then
+              ok=1
+              break
+            fi
+          done
+          if [ "$ok" != 1 ]; then echo 'Original photo is no longer reachable at known source paths'; exit 9; fi
           file apps/web/public/images/hhba-team-collaboration.jpg
           test "$(file --brief --mime-type apps/web/public/images/hhba-team-collaboration.jpg)" = image/jpeg
           test "$(wc -c < apps/web/public/images/hhba-team-collaboration.jpg)" -gt 15000
