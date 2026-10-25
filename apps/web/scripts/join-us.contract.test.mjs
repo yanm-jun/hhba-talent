@@ -60,20 +60,50 @@ test('selected real team photo is committed locally, is WebP, and is not labelle
   assert.match(css, /\.join-hero-photo img\{/);
 });
 
-test('signed HHBA founder manifesto is positioned after the progress timeline before applicant form', () => {
+test('founder manifesto appears below the four-stage timeline and before applicant form', () => {
   const progress = page.indexOf('className="join-section join-progress-section"');
   const manifesto = page.indexOf('<BrandManifesto />');
   const application = page.indexOf('className="join-section join-apply-section"');
   assert.ok(progress >= 0 && progress < manifesto && manifesto < application);
-  assert.match(page, /有些话，我们想认真地写下来/);
-  assert.match(page, /我们的承诺，从自己开始/);
+  assert.match(page, /A NOTE FROM HHBA'S FOUNDER/);
+  assert.match(page, /让劳动更有尊严，让商业更有温度/);
   assert.match(page, /IntersectionObserver/);
   assert.match(page, /prefers-reduced-motion/);
   assert.match(css, /join-manifesto-animate/);
+  assert.doesNotMatch(page, /images\/hhba-brand-manifesto\.webp/);
+  assert.doesNotMatch(page, /className="join-manifesto-letter"/);
 });
 
-test('signed original visual must be packaged before the public build is published', () => {
-  assert.ok(page.includes('images/hhba-brand-manifesto.webp'));
-  assert.ok(existsSync(new URL('../public/images/hhba-brand-manifesto.webp', import.meta.url)),
-    'The user supplied manifesto image needs to be committed before publishing; never deploy a broken image.');
+test('founder letter keeps the complete user-approved Chinese manifesto in original order', () => {
+  const paragraphs = [
+    '每一份简历背后，都是一个认真生活的人。',
+    '但现实并不总是如此。虚假的招聘信息、不透明的薪酬待遇',
+    '求职者可以不被录用，但不应该被欺骗；员工可以承担责任，但不应该失去尊严；企业可以追求利润，但不应该忽视创造价值的人。',
+    '我们不希望劳动者与企业彼此对立。',
+    '我们不只是希望发现问题，更希望推动问题得到解决。',
+    '我们知道，一个平台无法改变所有问题，但改变，总需要有人开始。',
+    '让劳动获得尊严，让招聘回归诚信。让善待劳动者，成为真正值得坚持的商业选择。',
+    'HHBA — Human Capability Network',
+    '让机会与人才，找到彼此。',
+    '创办者 · 闫明骏'
+  ];
+  let last=-1;
+  const section=page.slice(page.indexOf('function BrandManifesto()'),page.indexOf('export function JoinUsPage'));
+  for(const para of paragraphs){
+    const idx=section.indexOf(para);
+    assert.ok(idx>last,'Manifesto clause missing/out of order: '+para);
+    last=idx;
+  }
+  assert.match(css, /background:#f2f0ed/);
+  assert.match(css, /join-manifesto-signature/);
+  assert.match(css, /@media\(max-width:680px\)/);
+});
+
+test('founder hand-written signature is a nonempty local transparent webp asset', () => {
+  const photo=readFileSync(new URL('../public/images/hhba-founder-signature.webp',import.meta.url));
+  assert.equal(photo.subarray(0,4).toString('ascii'),'RIFF');
+  assert.equal(photo.subarray(8,12).toString('ascii'),'WEBP');
+  assert.ok(photo.byteLength>12000 && photo.byteLength<150000);
+  assert.ok(page.includes('images/hhba-founder-signature.webp'));
+  assert.match(page,/alt="闫明骏的手写姓名签名"/);
 });
