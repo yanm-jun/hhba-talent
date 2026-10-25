@@ -48,7 +48,7 @@ jobs:
       - name: Retain original recruitment reader, ATS links and authenticated apply guards
         working-directory: apps/web
         run: node --test scripts/white-market-detail.contract.test.mjs
-      - name: Build unified HHBA: 200 companies, applicant center, employer governance previews and brand pages
+      - name: "Build unified HHBA - 200 companies, applicant center, employer governance previews and brand pages"
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
