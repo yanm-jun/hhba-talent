@@ -223,7 +223,10 @@ class PostgresCommercialRepository:
                 """SELECT i.*,(p.status='verified') AS order_verified
                    FROM hhba_commercial_introductions_private i
                    LEFT JOIN hhba_commercial_order_proofs_private p ON p.introduction_id=i.id
-                   WHERE i.organization_id=$1 ORDER BY i.created_at DESC,i.id DESC LIMIT 100""",
+                   WHERE i.organization_id=$1
+                     AND i.buyer_consent_verified_by IS NOT NULL
+                     AND i.buyer_consent_reference IS NOT NULL
+                   ORDER BY i.created_at DESC,i.id DESC LIMIT 100""",
                 uuid_or_404(organization_id))
         return [private_lead(x,order_verified=bool(x["order_verified"])) for x in rows]
 
