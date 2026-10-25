@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: feat/hhba-unified-static-20261025
-          # Three experiences: public home, candidate register-first flow, enterprise governance intro.
+          # Public entry cards restored to compact layout; keep three identity paths unchanged.
           # Navigation copy refresh: 企业发现 (without the 200-company count in the tab)
       - uses: actions/setup-node@v4
         with:
@@ -39,6 +39,7 @@ jobs:
           node scripts/company200-integration.contract.test.mjs
           node scripts/audit-labor-rights-topics.mjs
           node --test scripts/hhba-unified-static.contract.test.mjs \
+            scripts/three-entry-experience.contract.test.mjs \
             scripts/employer-growth.contract.test.mjs \
             scripts/employer-evidence.contract.test.mjs \
             scripts/employee-feedback.contract.test.mjs \
