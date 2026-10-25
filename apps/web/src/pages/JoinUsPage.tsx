@@ -113,7 +113,6 @@ export function JoinUsPage({ user }: { user: User | null }) {
           <img src={import.meta.env.BASE_URL + 'images/hhba-join-team.webp'}
             alt="四位同事围绕笔记本电脑讨论项目的真实摄影照片"
             width={900} height={600} loading="eager" decoding="async" />
-          <figcaption>团队协作场景示意 · 非 HHBA 实际团队成员</figcaption>
         </figure>
       </section>
 
