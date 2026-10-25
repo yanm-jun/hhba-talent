@@ -44,6 +44,9 @@ jobs:
         working-directory: apps/web
         run: |
           node --test scripts/join-us.contract.test.mjs
+          grep -q '一个更好的商业社会' src/pages/JoinUsPage.tsx
+          grep -q 'THE WORLD WE ENVISION' src/pages/JoinUsPage.tsx
+          ! grep -q '为什么是 HHBA？' src/pages/JoinUsPage.tsx
           grep -q '技术负责人 / 全栈架构工程师' src/pages/JoinUsPage.tsx
           grep -q '企业治理与劳动权益研究伙伴' src/pages/JoinUsPage.tsx
           grep -q '薪酬与权益现状' src/pages/JoinUsPage.tsx
