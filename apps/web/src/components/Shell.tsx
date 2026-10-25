@@ -31,6 +31,8 @@ export function Shell({ user, children }: { user: User | null; children: React.R
  // Central capture covers all recruiting links across existing company/job pages,
  // not merely the example highlighted by the user.
  function guardRecruitmentClick(event:MouseEvent<HTMLElement>){
+  // Administrative review and employer-side evidence links are not candidate apply actions.
+  if(route.startsWith('/admin')||route.startsWith('/employer')||route.startsWith('/recruiter'))return;
   if(event.defaultPrevented||!(event.target instanceof Element))return;
   const anchor=event.target.closest<HTMLAnchorElement>('a[href]');
   if(!anchor)return;
