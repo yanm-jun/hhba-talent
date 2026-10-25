@@ -1,4 +1,4 @@
-name: HHBA White Site GitHub Pages Preview
+name: HHBA Unified Static Site GitHub Pages
 on:
   push:
     branches: [main]
@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feat/github-pages-white-preview-20261019
+          ref: feat/hhba-unified-static-20261025
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -30,20 +30,43 @@ jobs:
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
-      - name: Enforce white-only current/archive cards, internal JD reader, and verified Apply button
+      - name: Protect 200 company identities, original photographs, personal center and employer governance routes
+        working-directory: apps/web
+        run: |
+          node scripts/audit-domestic-company200.mjs
+          node scripts/company200-integration.contract.test.mjs
+          node scripts/audit-labor-rights-topics.mjs
+          node --test scripts/hhba-unified-static.contract.test.mjs \
+            scripts/employer-growth.contract.test.mjs \
+            scripts/employer-evidence.contract.test.mjs \
+            scripts/employee-feedback.contract.test.mjs \
+            scripts/employer-scoring.contract.test.mjs \
+            scripts/employer-appeals.contract.test.mjs \
+            scripts/employer-improvements.contract.test.mjs \
+            scripts/employer-publication.contract.test.mjs \
+            scripts/employer-aid-commercial.contract.test.mjs
+      - name: Retain original recruitment reader, ATS links and authenticated apply guards
         working-directory: apps/web
         run: node --test scripts/white-market-detail.contract.test.mjs
-      - name: Build HHBA with consent-first candidate applications, employer review progress and separate official ATS listings
+      - name: Build unified HHBA: 200 companies, applicant center, employer governance previews and brand pages
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_HHBA_EVIDENCE_API_ENABLED: '0'
+          VITE_HHBA_EMPLOYEE_FEEDBACK_API_ENABLED: '0'
+          VITE_HHBA_SCORING_API_ENABLED: '0'
+          VITE_HHBA_APPEALS_API_ENABLED: '0'
+          VITE_HHBA_IMPROVEMENTS_API_ENABLED: '0'
+          VITE_HHBA_PUBLICATION_API_ENABLED: '0'
+          VITE_HHBA_AID_COMMERCIAL_API_ENABLED: '0'
           # Public HTTPS backend ORIGIN only. Never put a DeepSeek credential here.
           VITE_HHBA_MATCH_API_ORIGIN: ${{ vars.HHBA_MATCH_API_ORIGIN }}
         run: npm run build
       - name: Verify public HHBA join-us page, application demo privacy and career disclosure
         working-directory: apps/web
         run: |
-          node --test scripts/join-us.contract.test.mjs
+          node --test scripts/hhba-unified-static.contract.test.mjs
           grep -q '为什么是 HHBA？' src/pages/JoinUsPage.tsx
           grep -q '连接更广阔的机会' src/pages/JoinUsPage.tsx
           grep -q 'to="/vision"' src/pages/JoinUsPage.tsx
@@ -74,7 +97,7 @@ jobs:
             throw Error('HHBA_FOUNDER_LETTER_NOT_CURRENT');
           console.log('HHBA_FOUNDER_LETTER_OK',photo.length);
           NODE
-      - name: Refresh complete white HHBA job index from 50 verified official ATS boards
+      - name: Refresh official ATS index while preserving 200-company directory
         working-directory: apps/web
         run: node scripts/prepare-pages-jobs.mjs
       - name: Verify official JD and Chinese structured search regression cases
@@ -208,6 +231,21 @@ jobs:
           node --check apps/web/dist/admin-preview/dashboard.js
           test -s apps/web/dist/admin-preview/index.html
           test -s apps/web/dist/admin-preview/data/overview.json
+      - name: Verify full employer governance and safe public preview
+        run: |
+          test -s apps/web/dist/images/hhba-founder-signature.webp
+          test -s apps/web/dist/images/hhba-join-team.webp
+          test -s apps/web/dist/preview-admin/data/workspace.json
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const source=fs.readFileSync('apps/web/src/main.tsx','utf8');
+          for (const text of ['EmployerAidApplicationPage','AdminAppealsReviewPage','AdminEmployerEvidencePage','EmployerScoringPage','EmployerImprovementsPage','Company200PreviewPage','PersonalCenterPage'])
+            if(!source.includes(text))throw Error('LOST_UNIFIED_MODULE_'+text);
+          const state=JSON.parse(fs.readFileSync('apps/web/dist/preview-admin/data/workspace.json','utf8'));
+          if(state.productionReviewerAuth!=='not_connected'||!state.modules.every(x=>!x.reviewAllowed))
+            throw Error('STATIC_PREVIEW_MUST_NOT_HAVE_LIVE_APPROVAL');
+          console.log('HHBA_COMPLETE_SOURCE_AND_SAFE_PREVIEW_OK');
+          NODE
       - name: Verify newest unified admin preview is truly public-safe and fully static
         run: |
           node --check apps/web/dist/preview-admin/dashboard.js
