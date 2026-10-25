@@ -1,0 +1,50 @@
+name: HHBA Sitewide Recruitment Gate and Nonclickable Photos Preflight
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-recruitment-gate-photos-preflight.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/recruitment-auth-gate-static-photos-20261026
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Test every recruitment outbound family and all public photos, without adding domestic market cards
+        working-directory: apps/web
+        run: |
+          node --test scripts/official-recruitment-gate-photos.contract.test.mjs \
+            scripts/hhba-unified-static.contract.test.mjs \
+            scripts/three-entry-experience.contract.test.mjs \
+            scripts/overseas-curated100-unified.contract.test.mjs \
+            scripts/company200-integration.contract.test.mjs \
+            scripts/white-market-detail.contract.test.mjs \
+            scripts/employer-growth.contract.test.mjs
+      - name: Compile exact public Pages variant
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_HHBA_EVIDENCE_API_ENABLED: '0'
+        run: npm run build
+      - name: Verify old domestic image assets and static international roles remain
+        working-directory: apps/web
+        run: |
+          node scripts/audit-domestic-company200.mjs
+          test -s dist/curated/v1/jobs.json
+          test -s dist/images/hhba-founder-signature.webp
+          test -s dist/images/hhba-join-team.webp
