@@ -101,12 +101,15 @@ class PostgresAppealsRepository:
                    ORDER BY c.created_at DESC,c.id DESC LIMIT 50""",uuid(actor_id))
         return [sanitized_case(row) for row in rows]
 
-    async def list_queue(self) -> list[dict]:
+    async def list_queue(self, *, reviewer_organizations: dict[str,str]) -> list[dict]:
+        """Never show a reviewer employee allegations about their own company."""
+        excluded=[uuid(org_id) for org_id in reviewer_organizations]
         async with self.pool.acquire() as conn:
             rows=await conn.fetch(
                 """SELECT * FROM hhba_appeal_cases_private
                    WHERE status IN ('submitted','under_review','needs_more_info')
-                   ORDER BY created_at ASC,id ASC LIMIT 100""")
+                     AND organization_id != ALL($1::uuid[])
+                   ORDER BY created_at ASC,id ASC LIMIT 100""",excluded)
         return [sanitized_case(row,reviewer=True) for row in rows]
 
     async def decide(self, *, appeal_id: str, reviewer_id: str,
