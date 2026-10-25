@@ -12,6 +12,8 @@ export const employerApiReady = accountApiEnabled && (configuredApiBase==='/api/
 export const evidenceApiReady = employerApiReady && import.meta.env.VITE_HHBA_EVIDENCE_API_ENABLED==='1';
 // Employee verification and protected feedback run on their own trusted service flag.
 export const employeeFeedbackApiReady = employerApiReady && import.meta.env.VITE_HHBA_EMPLOYEE_FEEDBACK_API_ENABLED==='1';
+// Scoring candidates are an independent reviewer-only capability; not public scores.
+export const scoringApiReady = employerApiReady && import.meta.env.VITE_HHBA_SCORING_API_ENABLED==='1';
 const API = configuredApiBase || '/api/v1';
 function errorMessage(detail: unknown) {
   if (typeof detail === 'string') return detail;
@@ -58,6 +60,9 @@ export type EmployerPosting = { id:string;company:string;title:string;descriptio
 export type EmployerPostingInput = Pick<EmployerPosting,'title'|'description'|'requirements'|'location'|'work_mode'|'recruitment_type'|'apply_url'>;
 export type EmployeeFeedbackRatings = {pay:number;insurance:number;rest:number;respect:number;development:number};
 export type PublicFeedbackAggregate = {status:'not_public'|'published';period:string;response_band?:'at_least_10';scores_out_of_5?:EmployeeFeedbackRatings;notice?:string};
+export type ScoringSide = {status:'pending'|'calculated_private';score:number|null;missing:string[]};
+export type ScoringCandidate = {rule_version:string;visibility:'internal_only';publication:string;help_eligibility:string;trust:ScoringSide;care:ScoringSide;inputs:{certified:boolean;evidence_categories:string[];feedback_status:string}};
+export type PrivateScoringRun = {run_id:string;created_at:string;rule_version:string;status:'internal_only';candidate:ScoringCandidate};
 export type EmployerEvidenceCategory = 'pay_and_contracts'|'social_insurance'|'working_hours'|'employee_development'|'recruitment_integrity'|'business_integrity';
 export type EmployerEvidence = {id:string;organization_id:string;category:EmployerEvidenceCategory;statement:string;status:'pending_review'|'verified'|'needs_more_info'|'rejected'|'expired'|'disputed';security_status:'pending_scan'|'clean'|'rejected';file_mime:string;file_size_bytes:number;created_at:string;status_updated_at:string};
 
@@ -113,6 +118,10 @@ export const api = {
   issueEmployeeFeedbackTicket: (organization_id:string) => request<{ticket:string;period:string;notice:string}>('/employee-feedback/ticket',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id})}),
   submitEmployeeFeedback: (organization_id:string,ticket:string,ratings:EmployeeFeedbackRatings) => request<{accepted:boolean;period:string;notice:string}>('/employee-feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id,ticket,...ratings})}),
   publicEmployeeFeedbackAggregate: (oid:string,period:string) => request<PublicFeedbackAggregate>(`/public/organizations/${encodeURIComponent(oid)}/employee-feedback/${encodeURIComponent(period)}`),
+  publicEmployerScoreStatus: (oid:string) => request<{trust:{status:string;score:null};care:{status:string;score:null};rule_version:string;publication:string;notice:string}>(`/public/organizations/${encodeURIComponent(oid)}/scores`),
+  adminCreateScoreFinding: (organization_id:string,evidence_id:string,score:number,reason:string) => request<{id:string;category:string;assessed_score:number}>(`/admin/scoring/assessments`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id,evidence_id,score,reason})}),
+  adminRecalculateScores: (oid:string) => request<PrivateScoringRun>(`/admin/scoring/organizations/${encodeURIComponent(oid)}/calculate`,{method:'POST'}),
+  adminLatestScoreRun: (oid:string) => request<PrivateScoringRun>(`/admin/scoring/organizations/${encodeURIComponent(oid)}/latest`),
   employerEvidence: (oid:string) => request<{items:EmployerEvidence[]}>(`/organizations/${encodeURIComponent(oid)}/evidence`),
   submitEmployerEvidence: (oid:string,category:EmployerEvidenceCategory,statement:string,file:File) => {
     const body=new FormData();
