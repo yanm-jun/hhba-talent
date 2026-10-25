@@ -39,7 +39,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
   event.preventDefault();
   event.stopPropagation();
   rememberRecruitment(destination,anchor.textContent||anchor.getAttribute('aria-label')||'官方招聘渠道',
-   location.pathname+location.search);
+   route+location.search);
   navigate('/candidate/register?next=%2Fcandidate%2Fofficial-outbound');
  }
  return <main onClickCapture={guardRecruitmentClick} className={'app-shell hhba-experience-'+experience}>
