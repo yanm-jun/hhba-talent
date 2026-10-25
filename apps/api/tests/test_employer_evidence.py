@@ -86,6 +86,10 @@ class FakeRepo:
                 for uid, row in self.rows.items()
                 if row["organization_id"] == organization_id]
 
+    async def list_pending_review(self):
+        return [{"id":uid,"status":row["status"]} for uid,row in self.rows.items()
+                if row["status"] in {"pending_review","needs_more_info"}]
+
     async def get_private_item(self, item_id):
         if item_id not in self.rows:
             raise HTTPException(404, detail="EVIDENCE_NOT_FOUND")
@@ -161,6 +165,7 @@ class EvidenceApiTests(unittest.TestCase):
         self.assertEqual(self.client.post(endpoint,json={
             "decision":"verified","reason":"Documents validated in two independent checks."}).status_code,403)
         self.actor[0]=Principal(self.reviewer,{},True)
+        self.assertEqual(len(self.client.get('/api/v1/admin/evidence').json()['items']),1)
         result=self.client.post(endpoint,json={
             "decision":"verified","reason":"Documents validated in two independent checks."})
         self.assertEqual(result.status_code,200,result.text)
