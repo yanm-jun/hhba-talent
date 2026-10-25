@@ -51,7 +51,7 @@ def build_improvements_router(*,resolve_actor:Callable,
     @router.get("/public/organizations/{organization_id}/improvements")
     async def public(organization_id:str,response:Response):
         valid_uuid(organization_id,"ORGANIZATION_NOT_FOUND")
-        response.headers["Cache-Control"]="public, max-age=30"
+        response.headers["Cache-Control"]="no-store"  # Revocation or a disputed source must take effect immediately.
         return {"items":await repository.public_timeline(organization_id=organization_id),
                 "notice":"仅展示经独立审核的改善事实，不代表企业已获整体信用评级或商业帮扶。"}
 
