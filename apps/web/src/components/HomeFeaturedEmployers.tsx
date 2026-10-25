@@ -36,7 +36,7 @@ export function HomeFeaturedEmployers(){
    <p className="hhba-featured-evidence">企业资料已整理 · 当前岗位以官方招聘页为准</p>
    <div className="hhba-featured-actions">
     <Link to={'/companies/'+company.slug}>了解企业 <ArrowRight size={15}/></Link>
-    {officialUrl(company.careers)&&<a href={officialUrl(company.careers)!}
+    {officialUrl(company.careers)&&<a data-hhba-recruitment-outbound="true" href={officialUrl(company.careers)!}
       target="_blank" rel="noopener noreferrer">官方招聘 <ExternalLink size={15}/></a>}
    </div>
   </article>)}</div>
