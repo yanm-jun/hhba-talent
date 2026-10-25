@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feat/recruitment-auth-gate-static-photos-20261026
+          ref: feat/strict-auth-photo-no-outlinks-20261026
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -27,7 +27,8 @@ jobs:
       - name: Test every recruitment outbound family and all public photos, without adding domestic market cards
         working-directory: apps/web
         run: |
-          node --test scripts/official-recruitment-gate-photos.contract.test.mjs \
+          node --test scripts/strict-auth-no-photo-outlinks.behavior.test.mjs \
+            scripts/official-recruitment-gate-photos.contract.test.mjs \
             scripts/hhba-unified-static.contract.test.mjs \
             scripts/three-entry-experience.contract.test.mjs \
             scripts/overseas-curated100-unified.contract.test.mjs \
