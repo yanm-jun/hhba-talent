@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, ExternalLink, MapPin, RefreshCcw, Search, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ExternalLink, MapPin, Search, ShieldCheck } from 'lucide-react';
 import { Link, getJobReturnTarget, navigate } from '../router';
 import { Shell } from './Shell';
 import { DomesticCompanyResults } from './DomesticCompanyResults';
@@ -15,7 +15,7 @@ import { featuredTitle, featuredLocation, isDefaultMarketFilters, loadVerifiedFe
 import type { User } from '../services/api';
 import { getJob, listJobs, localizedCompany, localizedLocation, localizedTitle, officialStatus, safeOfficialJobUrl,
   type Language, type LiveFilters, type LiveJob, type LivePage } from '../services/liveRecruitment';
-import { fetchOfficialJd, fetchPreparedBilingualJd, type OfficialJd } from '../services/officialJd';
+import { readSelfHostedJd, type SelfHostedJd } from '../services/selfHostedJd';
 import { loadDomesticSummary, type DomesticSummary } from '../services/domesticJd';
 import { loadPublicJobAudit, auditForJob, describeAudit, type JobAuditEntry } from '../services/jobSyncStatus';
 import {countryOptions,cityOptions,parseNaturalQuery} from '../services/jobSearchFacets.mjs';
@@ -353,19 +353,15 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  const [detail,setDetail]=useState<Awaited<ReturnType<typeof getJob>>|null>(null);
  const [audit,setAudit]=useState<JobAuditEntry|null>(null);
  const [error,setError]=useState('');
- const [jd,setJd]=useState<OfficialJd|null>(null);
- const [jdError,setJdError]=useState('');
- const [jdLoading,setJdLoading]=useState(false);
- const [jdRetry,setJdRetry]=useState(0);
+ const [staticJd,setStaticJd]=useState<SelfHostedJd|null>(null);
+ const [staticError,setStaticError]=useState('');
+ const [staticLoading,setStaticLoading]=useState(false);
  const [domesticSummary,setDomesticSummary]=useState<DomesticSummary|null>(null);
  const [domesticSummaryError,setDomesticSummaryError]=useState('');
- const [chineseJd,setChineseJd]=useState('');
- const [translationPrepared,setTranslationPrepared]=useState(false);
- const [translateError,setTranslateError]=useState('');
 
  useEffect(()=>{
    const controller=new AbortController();
-   setDetail(null);setError('');setJd(null);setJdError('');
+   setDetail(null);setError('');setStaticJd(null);setStaticError('');
    getJob(jobId,controller.signal).then(result=>{
      if(!controller.signal.aborted)setDetail(result);
    }).catch(e=>{if(!controller.signal.aborted)setError(e instanceof Error?e.message:'岗位详情不可用')});
@@ -397,45 +393,23 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
  useEffect(()=>{
    if(!job)return;
    const controller=new AbortController();
-   setJd(null);setChineseJd('');setTranslateError('');
-   setTranslationPrepared(false);setJdError('');setJdLoading(true);
-   // Campus summaries have a reviewed source URL; do not trigger the overseas ATS JD reader.
-   if(job.recordKind==='CURATED_HISTORICAL'||job.domestic&&job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'){setJdLoading(false);return;}
-   if(job.graduationYear===2027&&job.recordKind==='OFFICIAL_JOB_PAGE_OBSERVED'&&
-      job.responsibilitiesSummary&&job.requirementsSummary){setJdLoading(false);return;}
-   (async()=>{
-     const prepared=await fetchPreparedBilingualJd(job,controller.signal);
-     if(prepared){
-       if(!controller.signal.aborted){
-         setJd(prepared.jd);
-         setChineseJd(prepared.chinese||'');
-         setTranslationPrepared(prepared.ready);
-       }
-       return;
-     }
-     // Unprepared postings remain readable in official English. No user-side MT.
-     const english=await fetchOfficialJd(job,controller.signal);
-     if(!controller.signal.aborted){
-       setJd(english);
-       setTranslateError('中文完整译文正在后台准备，请使用 English 先阅读官方原文。');
-     }
-   })().catch(e=>{
-     if(!controller.signal.aborted)setJdError(e instanceof Error?e.message:'职位原文暂不可用');
-   }).finally(()=>{if(!controller.signal.aborted)setJdLoading(false)});
+   setStaticJd(null);setStaticError('');setStaticLoading(true);
+   // All public details are packaged by HHBA before deployment.
+   // NEVER request third-party ATS/Railway JDs while a visitor reads a job.
+   if(job.recordKind==='CURATED_HISTORICAL'||
+     job.domestic&&job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'||
+     job.graduationYear===2027&&job.recordKind==='OFFICIAL_JOB_PAGE_OBSERVED'&&
+       job.responsibilitiesSummary&&job.requirementsSummary){setStaticLoading(false);return;}
+   readSelfHostedJd(job,controller.signal).then(record=>{
+     if(!controller.signal.aborted)setStaticJd(record);
+   }).catch(e=>{
+     if(!controller.signal.aborted)setStaticError(e instanceof Error?e.message:'本地岗位资料读取失败');
+   }).finally(()=>{if(!controller.signal.aborted)setStaticLoading(false)});
    return()=>controller.abort();
- },[job,jdRetry]);
+ },[job]);
  const official=job?safeOfficialJobUrl(job):null;
  const companyProfile=job?companyProfileForJob(job):null;
  const generalCompanyRoute=job?companyPageRouteForJob(job):null;
- const segmentName:Record<string,{zh:string,en:string}>={
-   responsibilities:{zh:'岗位职责',en:'Responsibilities'},
-   requirements:{zh:'任职资格与技术要求',en:'Requirements and skills'},
-   benefits:{zh:'薪资福利',en:'Benefits and compensation'},
-   other:{zh:'其他职位说明',en:'Other job information'}
- };
- const sections=jd ? ['responsibilities','requirements','benefits','other'].map(kind=>({
-   kind,blocks:jd.blocks.filter(item=>item.section===kind)
- })).filter(group=>group.blocks.length>0):[];
  const returnTarget=getJobReturnTarget();
  return <Shell user={user}><div className="unified-detail">
    <div className="unified-market-heading"><Link to={returnTarget.to} restoreScrollY={returnTarget.scrollY} restoreMarketState={returnTarget.marketState}>
@@ -517,47 +491,60 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
          <section className="unified-jd-section"><h3>任职要求</h3><p>{job.requirementsSummary}</p></section>
          {official&&<a href={official} target="_blank" rel="noopener noreferrer">打开企业官方职位详情，核对完整 JD 与投递状态 <ExternalLink size={14}/></a>}
        </div>:
-     jdLoading?<p role="status">{lang==='zh'?'正在读取官方岗位职责及任职要求…':'Fetching current employer requirements…'}</p>:
-       jdError?<div className="unified-jd-empty" role="status">
-         <p>{lang==='zh'?'该岗位的完整官方职位说明暂未获取成功。':'The full official description for this role is temporarily unavailable.'}</p>
-         <small>{lang==='zh'?jdError:'The employer source could not be verified; requirements will not be invented.'}</small>
-         <button type="button" className="unified-jd-retry" onClick={()=>setJdRetry(n=>n+1)}>
-           <RefreshCcw size={14}/>{lang==='zh'?'重新获取岗位职责与任职要求':'Retry official job description'}
-         </button>
-       </div>:
-       jd?<div className="unified-jd-content">
-         <p className="unified-jd-source">{lang==='zh'?'官方内容核验时间：':'Official content checked: '}
-           {new Date(jd.checkedAt).toLocaleString(lang==='zh'?'zh-CN':'en-US')}</p>
-         {lang==='en'?sections.map(group=><section key={group.kind} className="unified-jd-section">
-           <h3>{segmentName[group.kind].en}</h3>
-           {group.blocks.map((block,i)=>block.kind==='heading'?
-             <h4 key={i}>{block.text}</h4>:block.kind==='bullet'?
-             <p key={i} className="unified-jd-bullet">{block.text}</p>:
-             <p key={i}>{block.text}</p>)}
-         </section>):
-         chineseJd?<section className="unified-jd-section unified-jd-chinese">
-           <h3>官方职位说明 · 中文辅助译文</h3>
-           <p className="unified-jd-machine-notice">以下为机器译文，仅供理解。职责、学历、技能、薪资数字请与英文原文及企业官网核对。</p>
-           {chineseJd.split(/\n{2,}/).filter(Boolean).map((paragraph,i)=>{
-             const trimmed=paragraph.trim();
-             return trimmed.startsWith('# ')?<h4 key={i}>{trimmed.slice(2)}</h4>:
-               <p key={i} className={trimmed.startsWith('- ')?'unified-jd-bullet':''}>
-                 {trimmed.startsWith('- ')?trimmed.slice(2):trimmed}
-               </p>;
-           })}
-         </section>:<div className="unified-jd-translate">
-           <strong>中文职位说明正在后台准备</strong>
-           <p>{translateError||'尚未取得经过完整性校验的中文译文。可直接切换 English 阅读官方原文，稍后刷新页面查看中文。'}</p>
-         </div>}
-       </div>:null}
+     staticLoading?<p role="status">{lang==='zh'?'正在读取 HHBA 已保存的岗位资料…':'Loading saved HHBA job details…'}</p>:
+     staticJd?<div className="unified-jd-content">
+       <p className="unified-jd-source">{lang==='zh'?'HHBA 本地岗位资料 · ':'HHBA self-hosted posting snapshot · '}
+         {staticJd.reviewDate?lang==='zh'?'资料整理：'+staticJd.reviewDate:'Editorial reviewed: '+staticJd.reviewDate:
+           lang==='zh'?'已保存的官方资料提取线索':'Saved source-extracted facts'}</p>
+       <p className="unified-jd-machine-notice">{staticJd.mode==='ARCHIVAL_EDITORIAL'?
+         (lang==='zh'?'以下为此前整理的历史岗位摘要，并非最新官方原文，也不证明当前仍可投递。':'Historical HHBA editorial summary, not current employer text or confirmed availability.'):
+         staticJd.mode==='MANUAL_EDITORIAL'?
+         (lang==='zh'?'以下为 HHBA 根据招聘方公开信息独立整理的职位摘要，并非官方全文；请以官方投递页面为准。':'HHBA independently written summary based on an employer posting, not the complete official description.'):
+         (lang==='zh'?'仅展示原岗位 JD 审计提取的结构化线索，不代表完整的职责或任职要求。':'Only structured signals extracted from the saved source audit; not full role requirements.')}</p>
+       {staticJd.mode!=='EXTRACTED_FACTS'&&lang==='zh'&&<>
+         {staticJd.overviewZh&&<section className="unified-jd-section"><h3>岗位介绍（HHBA 整理）</h3><p>{staticJd.overviewZh}</p></section>}
+         <section className="unified-jd-section"><h3>岗位职责（HHBA 整理）</h3>
+           {staticJd.responsibilitiesZh.map((line,i)=><p key={i} className="unified-jd-bullet">{line}</p>)}
+         </section>
+         <section className="unified-jd-section"><h3>任职要求（HHBA 整理）</h3>
+           {staticJd.requirementsZh.map((line,i)=><p key={i} className="unified-jd-bullet">{line}</p>)}
+         </section>
+         {!!staticJd.benefitsZh.length&&<section className="unified-jd-section"><h3>薪酬及福利线索</h3>
+           {staticJd.benefitsZh.map((line,i)=><p key={i}>{line}</p>)}
+         </section>}
+       </>}
+       {staticJd.mode!=='EXTRACTED_FACTS'&&lang==='en'&&
+         (staticJd.responsibilitiesEn?.length&&staticJd.requirementsEn?.length?<>
+           {staticJd.overviewEn&&<section className="unified-jd-section"><h3>Role overview (HHBA summary)</h3><p>{staticJd.overviewEn}</p></section>}
+           <section className="unified-jd-section"><h3>Responsibilities (HHBA summary)</h3>{staticJd.responsibilitiesEn.map((v,i)=><p key={i} className="unified-jd-bullet">{v}</p>)}</section>
+           <section className="unified-jd-section"><h3>Requirements (HHBA summary)</h3>{staticJd.requirementsEn.map((v,i)=><p key={i} className="unified-jd-bullet">{v}</p>)}</section>
+           {!!staticJd.benefitsEn.length&&<section className="unified-jd-section"><h3>Compensation notes</h3>{staticJd.benefitsEn.map((v,i)=><p key={i}>{v}</p>)}</section>}
+         </>:<p>English editorial summary has not been prepared; select 中文 to view the saved HHBA summary.</p>)}
+       {staticJd.facts&&<section className="unified-jd-section">
+         <h3>{lang==='zh'?'已索引的任职条件线索':'Indexed requirements signals'}</h3>
+         {staticJd.facts.education&&<p>{lang==='zh'?'提及学历：':'Education signal: '}{({UNRESTRICTED:'不限学历',HIGH_SCHOOL:'高中',ASSOCIATE:'专科',BACHELOR:'本科',MASTER:'硕士',PHD:'博士'} as Record<string,string>)[staticJd.facts.education]||staticJd.facts.education}</p>}
+         {staticJd.facts.experienceMinYears!==null&&<p>{lang==='zh'?'提及经验年限：':'Experience signal: '}{staticJd.facts.experienceMinYears}{lang==='zh'?' 年':' years'}</p>}
+         {!!staticJd.facts.skills.length&&<p>{lang==='zh'?'提及技能：':'Skills mentioned: '}{staticJd.facts.skills.join('、')}</p>}
+       </section>}
+       {staticJd.sourcePage&&<p className="unified-jd-source">{lang==='zh'?'资料来源：':'Editorial source: '}
+         <a href={staticJd.sourcePage} target="_blank" rel="noopener noreferrer">{lang==='zh'?'公开招聘来源':'Public employer source'} <ExternalLink size={13}/></a>
+       </p>}
+       {official&&<a href={official} target="_blank" rel="noopener noreferrer">{lang==='zh'?'前往招聘方核对当前岗位与投递状态':'Verify availability with the employer'} <ExternalLink size={14}/></a>}
+     </div>:
+     <div className="unified-jd-empty" role="status">
+       <p>{lang==='zh'?'HHBA 已保存该职位的标题、地点及招聘来源，但尚未取得足以展示的职责和任职要求。':'HHBA has saved this role’s title, location and source, but does not yet hold verified responsibility and requirement notes.'}</p>
+       <small>{lang==='zh'?'本站不会在打开职位时请求境外 ATS，也不会编造尚未取得的要求。':'No browser requests to external job-board APIs, and no invented requirements.'}</small>
+       {staticError&&<small>{lang==='zh'?'本地资料状态：':'Local snapshot status: '}{staticError}</small>}
+       {official&&<a href={official} target="_blank" rel="noopener noreferrer">{lang==='zh'?'查看招聘方公开页面':'View employer listing'} <ExternalLink size={14}/></a>}
+     </div>}
      <div className="unified-job-actions unified-detail-actions">
        <SaveJobButton jobId={job.id}/>
        {official&&<a href={official} onClick={()=>trackEvent('official_apply_click','/candidate/jobs/:job')} target="_blank" rel="noopener noreferrer" aria-label={job.currentApplicationVerified===false?(lang==='zh'?'打开企业官网核实投递状态':'Check employer application status'):(lang==='zh'?'前往企业官网立即申请':'Apply on official employer website')}>
          {job.currentApplicationVerified===false?(lang==='zh'?'查看原始岗位（状态待核实）':'Check original posting'):(lang==='zh'?'立即申请':'Apply now')} <ExternalLink size={15}/></a>}
      </div>
      <p className="unified-detail-footnote">{lang==='zh'?
-       '岗位职责与任职要求直接在 HHBA 白色详情页展示；尚未读取成功的内容不会被编造。申请请以企业官网为准。':
-       'Original job requirements are retrieved on demand from public employer endpoints. Job availability may change.'}</p>
+       'HHBA 优先展示本地保存的岗位整理与条件线索；缺失内容明确标注，不在用户浏览时请求外部 ATS。以招聘方官网为准。':
+       'Only saved HHBA editorial notes and extracted facts are shown. No on-demand employer API requests; verify application status with the employer.'}</p>
    </article>}
  </div></Shell>;
 }
