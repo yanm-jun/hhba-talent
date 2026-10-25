@@ -47,7 +47,14 @@ export function Shell({ user, children }: { user: User | null; children: React.R
    route+location.search);
   navigate('/candidate/register?next=%2Fcandidate%2Fofficial-outbound');
  }
- return <main onClickCapture={guardRecruitmentClick} className={'app-shell hhba-experience-'+experience}>
+ function guardRecruitmentContextMenu(event:MouseEvent<HTMLElement>){
+  if(verifiedCandidate||route.startsWith('/admin')||route.startsWith('/employer')||route.startsWith('/recruiter'))return;
+  if(!(event.target instanceof Element))return;
+  const anchor=event.target.closest<HTMLAnchorElement>('a[href]');
+  if(anchor&&recruitmentTarget(anchor))event.preventDefault();
+ }
+ return <main onClickCapture={guardRecruitmentClick} onAuxClickCapture={guardRecruitmentClick}
+    onContextMenuCapture={guardRecruitmentContextMenu} className={'app-shell hhba-experience-'+experience}>
   <header className="topbar hhba-experience-header">
    <div className="hhba-experience-brand">
     <Link className="logo" to="/" aria-label="HHBA 公共首页">HHBA.</Link>
