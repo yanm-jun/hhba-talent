@@ -104,6 +104,7 @@ class PostgresScoringRepository:
              "reviewed_at":row["reviewed_at"],
              "evidence_status":row["evidence_status"],
              "security_status":row["security_status"],
+             "status_updated_at":row["status_updated_at"],
              "evidence_id":str(row["evidence_id"])}
             for row in rows
         ]
@@ -128,7 +129,8 @@ class PostgresScoringRepository:
                     "finding_refs": [
                         {"id":x["id"],"evidence_id":x["evidence_id"],"score":x["score"],
                          "category":x["category"],"status":x["evidence_status"],
-                         "security":x["security_status"],"reviewed_at":x["reviewed_at"].isoformat()}
+                         "security":x["security_status"],"reviewed_at":x["reviewed_at"].isoformat(),
+                         "evidence_status_updated_at":x["status_updated_at"].isoformat()}
                         for x in findings
                     ],
                     "feedback_period":quarter, "feedback":feedback,
