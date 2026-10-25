@@ -114,6 +114,7 @@ export const api = {
     body.append('file',file,file.name);
     return request<EmployerEvidence>(`/organizations/${encodeURIComponent(oid)}/evidence`,{method:'POST',body});
   },
+  adminPendingEmployerEvidence: () => request<{items:EmployerEvidence[]}>('/admin/evidence'),
   adminReviewEvidence: (evidenceId:string,decision:'verified'|'needs_more_info'|'rejected',reason:string) => request<EmployerEvidence>(`/admin/evidence/${encodeURIComponent(evidenceId)}/reviews`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision,reason})}),
   publicEmployerJobs: (search:string='',offset=0) => request<EmployerPublicJobs>(`/public/employer-postings?q=${encodeURIComponent(search)}&offset=${offset}&limit=20`),
   applicationPreview: (postingId:string) => request<CandidateJobPreview>(`/me/employer-applications/preview/${encodeURIComponent(postingId.replace(/^employer-/,''))}`),
