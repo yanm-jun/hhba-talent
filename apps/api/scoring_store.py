@@ -168,7 +168,7 @@ class PostgresScoringRepository:
             "created_at":row["created_at"].isoformat(),
             "rule_version":row["rule_version"],
             "status":"internal_only",
-            "candidate":result,
+            "candidate":row["result"] if isinstance(row["result"],dict) else json.loads(row["result"]),
         }
 
     async def latest_private(self, *, organization_id: str) -> dict:
@@ -193,5 +193,5 @@ class PostgresScoringRepository:
             "status":"internal_only","run_id":str(row["id"]),
             "created_at":row["created_at"].isoformat(),
             "rule_version":row["rule_version"],
-            "candidate":row["result"] if isinstance(row["result"],dict) else json.loads(row["result"]),
+            "candidate":result,
         }
