@@ -19,24 +19,29 @@ test('job cards only link internally to the white detail page',()=>{
  assert.ok(!card.includes('企业官方页'));
  assert.ok(!card.includes('Official posting'));
 });
-test('white detail includes full JD parsing, retry and verified apply link',()=>{
+test('white detail uses first-party saved job records only, while preserving verified employer apply link',()=>{
  const detail=cards.slice(cards.indexOf('export function UnifiedJobDetail'));
- assert.ok(detail.includes('fetchOfficialJd(job,controller.signal)'));
- assert.ok(detail.includes('fetchPreparedBilingualJd(job,controller.signal)'));
- assert.ok(!detail.includes('translateGreenJd('),'the browser must never translate JD chunks on click');
+ assert.ok(detail.includes('readSelfHostedJd(job,controller.signal)'));
+ assert.ok(!detail.includes('fetchOfficialJd('));
+ assert.ok(!detail.includes('fetchPreparedBilingualJd('));
+ assert.ok(!detail.includes('translateGreenJd('));
+ assert.ok(!detail.includes('setJdRetry'));
  assert.ok(detail.includes('职位说明与任职要求'));
- assert.ok(detail.includes("setJdRetry(n=>n+1)"));
- assert.ok(detail.includes("safeOfficialJobUrl(job)"));
+ assert.ok(detail.includes('safeOfficialJobUrl(job)'));
  assert.ok(detail.includes("'立即申请'"));
+ assert.ok(detail.includes('HHBA 本地岗位资料'));
+ assert.ok(detail.includes('未取得足以展示的职责和任职要求'));
  assert.ok(!detail.includes('greenDetailLink'));
- assert.ok(!detail.includes('原有绿色市场'));
 });
-test('JD fallback keeps strict official identity checks',()=>{
+test('self-hosted JD shards do not call foreign endpoints or invent requirements',()=>{
+ const local=readFileSync(new URL('../src/services/selfHostedJd.ts',import.meta.url),'utf8');
+ assert.ok(local.includes("import.meta.env.BASE_URL+'data/self-hosted-jd/v1/'"));
+ assert.ok(local.includes("row.sourceUrl!==job.url"));
+ assert.ok(local.includes("row.title!==job.title"));
+ assert.ok(local.includes("row.company!==job.company"));
+ assert.ok(!/https:\/\/|JD_API_ORIGIN|boards-api|api\.lever\.co|api\.ashbyhq/.test(local));
+ // Old reader remains in the repository for historical provenance, not in the public detail flow.
  assert.ok(reader.includes('sameOfficialPosting(source.href,expected.href)'));
- assert.ok(reader.includes("body?.status!=='LIVE_CONTENT'"));
- assert.ok(reader.includes("body.description.length>100_000"));
- assert.ok(reader.includes("sourceHash:hash"));
- assert.ok(!reader.includes('原招聘市场查看'));
 });
 
 test('archive listing also keeps official links inside the detail, not cards',()=>{
@@ -62,14 +67,13 @@ test('recruitment market hides all three highlighted notices while retaining fil
    'job detail official source audit must continue to work');
 });
 
-test('cached original and complete Chinese are source-bound, no partial translation UI',()=>{
+test('static details distinguish self-authored summaries from unverified full JD',()=>{
  const detail=cards.slice(cards.indexOf('export function UnifiedJobDetail'));
- assert.ok(detail.includes('setChineseJd(prepared.chinese'));
- assert.ok(detail.includes('setTranslationPrepared(prepared.ready)'));
- assert.ok(detail.includes('fetchOfficialJd(job,controller.signal)'));
- assert.ok(detail.includes('中文完整译文正在后台准备'));
- assert.ok(!detail.includes('翻译进度'));
- assert.ok(reader.includes('/ready-jd'));
- assert.ok(reader.includes('if(sourceHash!==data.sourceHash)'));
- assert.ok(reader.includes('data.sourceUrl!==job.url'));
+ assert.ok(detail.includes("staticJd.mode==='ARCHIVAL_EDITORIAL'"));
+ assert.ok(detail.includes("staticJd.mode==='MANUAL_EDITORIAL'"));
+ assert.ok(detail.includes('EXTRACTED_FACTS'));
+ assert.ok(detail.includes('HHBA 根据招聘方公开信息独立整理'));
+ assert.ok(detail.includes('不会在打开职位时请求境外 ATS'));
+ assert.ok(!detail.includes('中文完整译文正在后台准备'));
+ assert.ok(!detail.includes('正在读取官方岗位职责及任职要求'));
 });
