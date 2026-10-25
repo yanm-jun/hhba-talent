@@ -170,6 +170,8 @@ class PGIntegration(unittest.TestCase):
             self.assertEqual(lead["stage"],"identified")
             self.assertEqual(lead["order_status"],"not_verified")
             self.assertEqual(await commercial.list_company(organization_id=other),[])
+            # Potential buyer identity/reference remains invisible to employer until consent verified.
+            self.assertEqual(await commercial.list_company(organization_id=org),[])
             with self.assertRaises(HTTPException):
                 await commercial.advance(introduction_id=lead["id"],actor_id=matcher,
                                          stage="introduced",certified=True)
