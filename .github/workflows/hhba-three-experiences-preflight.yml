@@ -1,0 +1,60 @@
+name: HHBA Three Experiences Preflight
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-three-experiences-preflight.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  three-experiences:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/three-entry-identity-nav-20261025
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Verify public, candidate and employer routes and non-regression
+        working-directory: apps/web
+        run: |
+          node --test scripts/three-entry-experience.contract.test.mjs \
+            scripts/hhba-unified-static.contract.test.mjs \
+            scripts/overseas-curated100-unified.contract.test.mjs \
+            scripts/employer-growth.contract.test.mjs \
+            scripts/company200-integration.contract.test.mjs \
+            scripts/white-market-detail.contract.test.mjs
+      - name: Build complete unified static website
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_HHBA_EVIDENCE_API_ENABLED: '0'
+          VITE_HHBA_SCORING_API_ENABLED: '0'
+          VITE_HHBA_AID_COMMERCIAL_API_ENABLED: '0'
+        run: npm run build
+      - name: Verify native copies and branded assets survive
+        working-directory: apps/web
+        run: |
+          test -s dist/images/hhba-founder-signature.webp
+          test -s dist/images/hhba-join-team.webp
+          test -s dist/curated/v1/jobs.json
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const j=JSON.parse(fs.readFileSync('dist/curated/v1/jobs.json','utf8'));
+          if(j.jobs.length!==100||new Set(j.jobs.map(x=>x.company)).size!==10)throw Error('OVERSEAS_100_BROKEN');
+          const body=fs.readFileSync('src/pages/HomePage.tsx','utf8');
+          const nav=fs.readFileSync('src/components/Shell.tsx','utf8');
+          if(!body.includes("'/candidate/register':'/employer/start'")||!nav.includes('求职者服务导航')||!nav.includes('企业招聘与治理导航'))
+            throw Error('THREE_ENTRY_NAV_MISSING');
+          console.log('THREE_EXPERIENCES_AND_PROTECTED_MODULES_OK');
+          NODE
