@@ -176,7 +176,7 @@ export function IndexedCompanyPage({encodedId,user}:{encodedId:string;user:User|
      {source.label[lang]} <ExternalLink size={14}/></a>):
     <p>{lang==='zh'?'目前仅核实招聘来源，尚未发布独立核实的企业经营介绍。':
        'Only the recruitment source has been validated; no independently reviewed corporate background has been published.'}</p>}
-   {sourceUrl&&<a href={sourceUrl} target="_blank" rel="noopener noreferrer">
+   {sourceUrl&&<a data-hhba-recruitment-outbound="true" href={sourceUrl} target="_blank" rel="noopener noreferrer">
     {lang==='zh'?'查看该来源的一条官方职位记录':'Open a source-verified job posting'} <ExternalLink size={14}/>
    </a>}
    <small>{editorial
