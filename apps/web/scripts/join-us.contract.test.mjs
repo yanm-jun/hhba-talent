@@ -107,3 +107,42 @@ test('founder hand-written signature is a nonempty local transparent webp asset'
   assert.ok(page.includes('images/hhba-founder-signature.webp'));
   assert.match(page,/alt="闫明骏的手写姓名签名"/);
 });
+
+test('capability-gap recruitment cards define six clear specialty tracks and open self-introduction', () => {
+  const roles = [
+    ['tech-lead','技术负责人 / 全栈架构工程师'],
+    ['backend','后端与数据库工程师'],
+    ['ai-data','招聘数据与 AI 搜索工程师'],
+    ['governance','企业治理与劳动权益研究伙伴'],
+    ['business','企业合作与商业发展伙伴'],
+    ['product','产品设计 / 前端体验伙伴'],
+    ['other','其他专业 / 自荐加入']
+  ];
+  const dataSection = page.slice(page.indexOf('const roles = ['),page.indexOf('type Direction ='));
+  for(const [id,title] of roles){
+    assert.ok(dataSection.includes("id:'"+id+"'"), 'missing track '+id);
+    assert.ok(dataSection.includes("title:'"+title+"'"), 'missing role '+title);
+  }
+  assert.equal((dataSection.match(/\bmission:/g)||[]).length,7);
+  assert.equal((dataSection.match(/\bresponsibilities:/g)||[]).length,7);
+  assert.equal((dataSection.match(/\brequired:/g)||[]).length,7);
+  assert.equal((dataSection.match(/\bpreferred:/g)||[]).length,7);
+  assert.equal((dataSection.match(/\bchallenge:/g)||[]).length,7);
+  assert.equal((dataSection.match(/\bcooperation:/g)||[]).length,7);
+  assert.match(page,/roles\.map\(r => <details/);
+  assert.match(page,/roles\.map\(r=><option/);
+  assert.match(page,/applyFor\(r\.id\)/);
+});
+test('candidate-facing role details include responsibilities, constraints and no fictitious paid positions',()=>{
+  for(const text of [
+    '你将负责什么','我们希望你具备','具备这些会更好',
+    '合作方式与当前阶段','岗位使命','我们会如何了解你的能力',
+    '薪酬与权益现状','不要求无偿完成可直接投入生产的试用项目',
+    '工作时间、交付与知识产权归属','外部专业顾问',
+    '当前最需要：技术负责人、后端数据库、招聘数据与搜索'
+  ])assert.ok(page.includes(text),text);
+  assert.ok(page.includes('未来制度目标不构成自动兑现承诺'));
+  assert.doesNotMatch(page,/正式招聘职位，月薪|月薪.{0,8}[0-9]{4,}/);
+  assert.match(css,/\.join-role-detail-grid\{/);
+  assert.match(css,/@media\(max-width:560px\)/);
+});
