@@ -23,6 +23,7 @@ jobs:
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
+      # Repeat with audited smart-match, featured employers, major pages and admin exceptions.
       - name: Test every recruitment outbound family and all public photos, without adding domestic market cards
         working-directory: apps/web
         run: |
