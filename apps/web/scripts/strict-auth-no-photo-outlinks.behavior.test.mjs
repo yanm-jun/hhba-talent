@@ -1,14 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import ts from 'typescript';
-
+// Node 22 directly strips erasable TypeScript type annotations.
+// Do not depend on the legacy transpileModule API removed in TypeScript 7.
 const read=p=>readFileSync(new URL('../src/'+p,import.meta.url),'utf8');
-const js=ts.transpileModule(read('services/recruitmentOutbound.ts'),{
- compilerOptions:{module:99,target:9}
-}).outputText;
 const {recruitmentTarget,rememberRecruitment,pendingRecruitment,clearPendingRecruitment}=
- await import('data:text/javascript;base64,'+Buffer.from(js).toString('base64'));
+ await import('../src/services/recruitmentOutbound.ts');
 
 function link(href,label,options={}){
  return {href,target:'_blank',textContent:label,title:'',
