@@ -52,7 +52,7 @@ export function EmployerVerifiedProfilePage({user}:{user:User|null}){
       <strong>第 {v.version} 版</strong><small>{v.released_on}</small><span>{v.status==='withdrawn'?'已撤销':'历史发布版本'}</span>
     </div>)}</div>}
   </section>
-  <div className="vp-disclaimer"><BookOpen size={19}/><p>HHBA 评分是限定证据和规则下的评价，不构成劳动法律合规、客户订单或经营履约保证。员工隐私不公开；平台商业帮扶仍需要另外申请和审核。</p></div>
+  <div className="vp-disclaimer"><BookOpen size={19}/><p>HHBA 评分是限定证据和规则下的评价，不构成劳动法律合规、客户订单或经营履约保证。员工隐私不公开；平台商业帮扶仍需要另外申请和审核。<Link to="/employer/aid/apply">了解企业帮扶申请 <ArrowRight size={14}/></Link></p></div>
  </main></Shell>;
 }
 export function AdminEmployerPublicationPage({user}:{user:User|null}){
@@ -110,6 +110,6 @@ export function AdminEmployerPublicationPage({user}:{user:User|null}){
    <label>撤销原因<textarea rows={3} minLength={25} maxLength={1200} disabled={!enabled||busy} value={revokeReason} onChange={e=>setRevokeReason(e.target.value)}/></label>
    <button disabled={!enabled||busy||!isUUID(revokeId)||revokeReason.trim().length<25}>{enabled?'申请独立撤销':'待撤销权限接入'}</button>
   </form>
-  <div className="vp-disclaimer"><BookOpen size={19}/><p>公开制度仍需真实会话、CSRF、审计、人工审核规章以及申诉纠正流程。正式生产未接入前不允许使用演示按钮发布真实企业评价。</p></div>
+  <div className="vp-disclaimer"><BookOpen size={19}/><p>公开制度仍需真实会话、CSRF、审计、人工审核规章以及申诉纠正流程。正式生产未接入前不允许使用演示按钮发布真实企业评价。 <Link to="/admin/employer-aid">转到独立帮扶审核与客户对接记录</Link></p></div>
  </main></Shell>;
 }
