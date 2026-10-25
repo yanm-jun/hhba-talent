@@ -74,7 +74,10 @@ test('all existing domestic, curated overseas, employer and static resources rem
    assert.ok(routes.includes(route),'removed established route '+route);
  }
  assert.ok(home.includes('企业发现 · 200 家国内企业'));
- for(const token of ['hhba-experience-public','hhba-experience-candidate','hhba-experience-employer','hhba-public-entry-grid','hhba-employer-services']){
+ assert.ok(shell.includes("'app-shell hhba-experience-'+experience"));
+ assert.ok(shell.includes("experience==='candidate'"));
+ assert.ok(shell.includes("experience==='employer'"));
+ for(const token of ['hhba-experience-public','hhba-public-entry-grid','hhba-employer-services']){
    assert.ok(register(shell+style).includes(token),'missing responsive navigation style '+token);
  }
  assert.ok(style.includes('@media(max-width:680px)'));
