@@ -130,6 +130,21 @@ class PostgresAppealsRepository:
                     challenged_actor_id=(str(row["challenged_actor_id"])
                                          if row["challenged_actor_id"] else None),
                     reviewer_member=str(row["organization_id"]) in reviewer_organizations)
+                # An original scorer must not adjudicate their own disputed rubric.
+                if row["kind"] == "employer" and row["target_type"] == "evidence":
+                    scoring_conflict=await conn.fetchval(
+                        """SELECT EXISTS(SELECT 1 FROM hhba_scoring_findings_private
+                           WHERE evidence_id=$1 AND assessor_id=$2)""",
+                        row["target_id"],actor)
+                    if scoring_conflict:
+                        raise HTTPException(403,detail="APPEALS_REVIEWER_CONFLICT")
+                if row["kind"] == "employer" and row["target_type"] == "scoring_run":
+                    run_conflict=await conn.fetchval(
+                        """SELECT EXISTS(
+                             SELECT 1 FROM hhba_scoring_runs_private
+                             WHERE id=$1 AND calculated_by=$2)""",row["target_id"],actor)
+                    if run_conflict:
+                        raise HTTPException(403,detail="APPEALS_REVIEWER_CONFLICT")
                 # Compare the reporter privately, never reveal identity to the reviewer.
                 if row["kind"] == "employee_privacy":
                     same_person=await conn.fetchval(
