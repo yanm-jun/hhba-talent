@@ -1,0 +1,23 @@
+name: HHBA protected reviewer queue checks
+on:
+  push:
+    branches:
+      - feat/unified-admin-reviewer-queues-20261025
+  pull_request:
+    paths:
+      - 'apps/api/admin_workspace_routes.py'
+      - 'apps/api/tests/test_admin_workspace_queues.py'
+      - '.github/workflows/hhba-reviewer-queues.yml'
+jobs:
+  independent-reviewer-queue:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r apps/api/requirements-evidence-dev.txt
+      - run: python -m unittest apps.api.tests.test_admin_workspace_queues -v
+      - run: python -m compileall -q apps/api/admin_workspace_routes.py apps/api/tests/test_admin_workspace_queues.py
