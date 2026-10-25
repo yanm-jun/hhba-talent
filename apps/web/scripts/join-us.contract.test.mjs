@@ -55,7 +55,7 @@ test('selected real team photo is committed locally, is WebP, and is not labelle
   assert.ok(photo.byteLength > 20_000 && photo.byteLength < 250_000);
   assert.match(page, /images\/hhba-join-team\.webp/);
   assert.match(page, /alt="四位同事围绕笔记本电脑讨论项目的真实摄影照片"/);
-  assert.match(page, /非 HHBA 实际团队成员/);
+  assert.doesNotMatch(page, /团队协作场景示意 · 非 HHBA 实际团队成员/);
   assert.doesNotMatch(page, /className="join-hero-art"/);
   assert.match(css, /\.join-hero-photo img\{/);
 });
