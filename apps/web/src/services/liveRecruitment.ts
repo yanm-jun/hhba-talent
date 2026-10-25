@@ -187,6 +187,8 @@ type CuratedArchiveRow={
   editorial?:CuratedEditorial;
 };
 const CURATED_100=import.meta.env.VITE_HHBA_CURATED_STATIC==='1';
+// Replace ONLY overseas ATS records on GitHub Pages; preserve existing domestic feed and detail readers.
+const OVERSEAS_CURATED_100=PAGES_PREVIEW && import.meta.env.VITE_HHBA_OVERSEAS_CURATED_100==='1';
 let archivedCache:Promise<CuratedArchiveRow[]>|null=null;
 async function loadArchivedHundred(signal:AbortSignal):Promise<CuratedArchiveRow[]>{
   if(!archivedCache){
@@ -231,6 +233,18 @@ function archivedJob(j:CuratedArchiveRow):LiveJob{
     editorial:j.editorial
   };
 }
+// The original 100 independently authored records already live in the GitHub repository.
+// Their saved job IDs remain unchanged, and this path makes no external network request.
+export async function loadCuratedOverseasJobs(signal:AbortSignal):Promise<LiveJob[]>{
+  const records=await loadArchivedHundred(signal);
+  const jobs=records.map(archivedJob);
+  if(jobs.length!==100||new Set(jobs.map(job=>job.id)).size!==100||
+     jobs.some(job=>job.domestic||job.recordKind!=='CURATED_HISTORICAL'||
+       !job.editorial?.responsibilities?.length||!job.editorial?.requirements?.length||
+       !safeOfficialJobUrl(job)))throw new Error('海外精选职位资料完整性核对失败');
+  return jobs;
+}
+
 async function listArchivedJobs(filters:LiveFilters,offset:number,signal:AbortSignal):Promise<LivePage>{
   const rows=await loadArchivedHundred(signal);
   const parts=filters.q.toLowerCase().trim().split(/\s+/).filter(Boolean);
@@ -259,7 +273,10 @@ async function listArchivedJobs(filters:LiveFilters,offset:number,signal:AbortSi
 export async function listJobs(filters: LiveFilters, offset: number, signal: AbortSignal) {
   if(CURATED_100)return listArchivedJobs(filters,offset,signal);
   if(PAGES_PREVIEW) {
-    const snapshot=await previewSnapshot(signal);
+    const [snapshot,overseas]=await Promise.all([
+      previewSnapshot(signal),
+      OVERSEAS_CURATED_100?loadCuratedOverseasJobs(signal):Promise.resolve([] as LiveJob[])
+    ]);
     // The unfiltered first paint does not use JD-derived education, skills or
     // experience filters. Loading the 14k-row facets file on every initial
     // visit needlessly blocks the home page and the six curated employers.
@@ -284,12 +301,27 @@ export async function listJobs(filters: LiveFilters, offset: number, signal: Abo
     ].includes(entry.status)).map(entry=>entry.job_id));
     // Fresh official campus entries take precedence over matching historical URLs.
     const campusUrls=new Set(campus.map(job=>job.url));
-    const existing=snapshot.jobs.filter(job=>!excluded.has(job.id)&&!campusUrls.has(job.url));
-    const current={...snapshot,jobs:[...campus,...existing],total:campus.length+existing.length};
+    const existing=snapshot.jobs.filter(job=>(!OVERSEAS_CURATED_100||job.domestic)&&
+      !excluded.has(job.id)&&!campusUrls.has(job.url));
+    // All 100 overseas jobs are archived, not asserted to be currently open.
+    // Domestic positions keep their original source list, status, sorting and readers.
+    const combined=[...overseas,...campus,...existing];
+    const current={...snapshot,jobs:combined,total:combined.length};
     // No facet projection is needed to browse the audited, complete index.
     if(unfiltered)return {...current,jobs:current.jobs.slice(offset,offset+30),
       offset,limit:30};
-    return searchPreview(current,filters,offset,index!.facets);
+    // Curated records have their own saved metadata. They must not borrow facts
+    // or source hashes from current ATS jobs, even when original IDs overlap.
+    const searchFacets=new Map(index!.facets);
+    for(const job of overseas){
+      const archive=(await loadArchivedHundred(signal)).find(r=>r.id==='curated-'+job.id)!;
+      searchFacets.set(job.id,{
+        countryCode:archive.countryCode,cityKey:archive.cityKey,
+        education:archive.education,experienceMinYears:archive.experienceMinYears,
+        skills:archive.skillSignals,jobType:archive.jobType==='REGULAR'?'SOCIAL':archive.jobType
+      });
+    }
+    return searchPreview(current,filters,offset,searchFacets);
   }
   const p = new URLSearchParams({ limit:'30',offset:String(offset) });
   if (filters.q.trim()) p.set('q', filters.q.trim().slice(0,100));
@@ -314,6 +346,14 @@ export async function getJob(id: string,signal: AbortSignal) {
     return {job,description:null,richHtml:null,applyUrl:null} as LiveDetail;
   }
   if(PAGES_PREVIEW){
+    if(OVERSEAS_CURATED_100){
+      const archived=(await loadArchivedHundred(signal)).find(row=>row.id==='curated-'+id);
+      if(archived){
+        const job=archivedJob(archived);
+        if(!safeOfficialJobUrl(job))throw new Error('海外岗位来源无效');
+        return {job,description:null,richHtml:null,applyUrl:null} as LiveDetail;
+      }
+    }
     const campus=(await loadCampus2027()).find(j=>j.id===id);
     const listing=campus||(await previewSnapshot(signal)).jobs.find(j=>j.id===id);
     if(!listing||!safeOfficialJobUrl(listing))throw new Error('岗位不存在或来源无效');
