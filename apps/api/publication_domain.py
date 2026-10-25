@@ -5,6 +5,7 @@ business opportunities. All numbers require explicitly approved scoring rules,
 double independent sign-off and continuously valid supporting evidence.
 """
 from __future__ import annotations
+import json
 
 from datetime import datetime,timezone
 from uuid import UUID
@@ -77,6 +78,8 @@ def pending_profile(*,improvements:list[dict]|None=None)->dict:
 
 def published_profile(*,case,improvements:list[dict])->dict:
     snapshot=case["score_snapshot"]
+    if isinstance(snapshot,str):
+        snapshot=json.loads(snapshot)
     return {
       "publication":"published",
       "trust":{"status":"verified_release","score":snapshot["trust"]},
@@ -101,5 +104,5 @@ def private_case(row)->dict:
       "version":row["publication_version"],
       "prepared_at":row["prepared_at"].isoformat(),
       "published_at":row["published_at"].isoformat() if row["published_at"] else None,
-      "candidate":row["score_snapshot"],
+      "candidate":json.loads(row["score_snapshot"]) if isinstance(row["score_snapshot"],str) else row["score_snapshot"],
     }
