@@ -110,7 +110,7 @@ export function PublicEmployerImprovementsPage({user}:{user:User|null}){
   return()=>{active=false};
  },[org]);
  return <Shell user={user}><main className="im-page">
-  <Link to="/employer/public" className="im-back"><ArrowLeft size={15}/> 返回企业公开档案</Link>
+  <Link to="/employer/verified-profile" className="im-back"><ArrowLeft size={15}/> 返回企业成长评分档案</Link>
   <div className="im-heading"><p>HHBA · 企业公开成长档案</p><h1>看得见的员工关怀改善</h1>
    <p>只有已经实施、经独立核实且获准公开的措施才会出现。没有记录，不代表企业一定不好；也不代表企业所有劳动问题已解决。</p></div>
   <Disclaimer/>
