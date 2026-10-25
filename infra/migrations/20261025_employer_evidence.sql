@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS hhba_employer_evidence (
     file_mime TEXT NOT NULL CHECK (file_mime IN ('application/pdf','image/jpeg','image/png')),
     file_size_bytes INTEGER NOT NULL CHECK (file_size_bytes BETWEEN 1 AND 10485760),
     sha256 CHAR(64) NOT NULL,
+    security_status TEXT NOT NULL DEFAULT 'pending_scan' CHECK (security_status IN ('pending_scan','clean','rejected')),
     submitted_by UUID NOT NULL,
     status TEXT NOT NULL DEFAULT 'pending_review' CHECK (status IN (
       'pending_review','verified','needs_more_info','rejected','expired','disputed')),
