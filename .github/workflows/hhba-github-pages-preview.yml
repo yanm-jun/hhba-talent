@@ -44,9 +44,12 @@ jobs:
         working-directory: apps/web
         run: |
           node --test scripts/join-us.contract.test.mjs
-          grep -q '一个更好的商业社会' src/pages/JoinUsPage.tsx
-          grep -q 'THE WORLD WE ENVISION' src/pages/JoinUsPage.tsx
-          ! grep -q '为什么是 HHBA？' src/pages/JoinUsPage.tsx
+          grep -q '为什么是 HHBA？' src/pages/JoinUsPage.tsx
+          grep -q '连接更广阔的机会' src/pages/JoinUsPage.tsx
+          grep -q 'to="/vision"' src/pages/JoinUsPage.tsx
+          grep -q '一个更好的商业社会' src/pages/VisionPage.tsx
+          grep -q 'THE WORLD WE ENVISION' src/pages/VisionPage.tsx
+          grep -q "route==='/vision'" src/main.tsx
           grep -q '技术负责人 / 全栈架构工程师' src/pages/JoinUsPage.tsx
           grep -q '企业治理与劳动权益研究伙伴' src/pages/JoinUsPage.tsx
           grep -q '薪酬与权益现状' src/pages/JoinUsPage.tsx
@@ -118,7 +121,17 @@ jobs:
         run: node scripts/verify-dual-entry.mjs
       - name: Enable deep-link reload fallback
         working-directory: apps/web
-        run: cp dist/index.html dist/404.html
+        run: |
+          cp dist/index.html dist/404.html
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const index=fs.readFileSync('dist/index.html','utf8');
+          const fallback=fs.readFileSync('dist/404.html','utf8');
+          if(index!==fallback)throw Error('SPA_DEEP_LINK_FALLBACK_MISMATCH');
+          const main=fs.readFileSync('src/main.tsx','utf8');
+          if(!main.includes("route==='/vision'"))throw Error('DEDICATED_VISION_ROUTE_MISSING');
+          console.log('HHBA_VISION_DIRECT_LINK_READY');
+          NODE
       - name: Checkout admin UI from the dedicated, non-production preview branch
         uses: actions/checkout@v4
         with:
