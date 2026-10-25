@@ -84,6 +84,22 @@ if(counts.total<1||counts.editorial===0||counts.structuredOnly===0)throw Error('
 const result={kind:'HHBA_SELF_HOSTED_JD_SUMMARIES_V1',snapshotUpdated:feed.updated,
   rightsStatement:'Original HHBA editorial summaries, not reproduced third-party full JD texts.',
   count:Object.keys(byId).length,coverage:counts,jobs:byId};
+// Independent first-party static shards ensure one detail view downloads only a
+// small local JSON file, never a foreign ATS or Railway endpoint.
+const shard=id=>String([...id].reduce((n,ch)=>(n+ch.charCodeAt(0))%32,0)).padStart(2,'0');
+const groups=new Map();
+for(const [id,record] of Object.entries(byId)){
+ const key=shard(id);
+ if(!groups.has(key))groups.set(key,{});
+ groups.get(key)[id]=record;
+}
+await mkdir('dist/data/self-hosted-jd/v1',{recursive:true});
+for(let n=0;n<32;n++){
+ const name=String(n).padStart(2,'0');
+ await writeFile(join('dist/data/self-hosted-jd/v1',name+'.json'),JSON.stringify({
+  kind:'HHBA_SELF_HOSTED_JD_SHARD_V1',snapshotUpdated:feed.updated,jobs:groups.get(name)||{}
+ }),'utf8');
+}
 await mkdir('dist/data',{recursive:true});
 await writeFile(join('dist/data','self-hosted-jd.json'),JSON.stringify(result),'utf8');
 await writeFile(join('dist/data','self-hosted-jd-coverage.json'),JSON.stringify({
