@@ -2,7 +2,7 @@ import {ArrowUpRight,Building2,BriefcaseBusiness} from 'lucide-react';
 import type {MouseEvent} from 'react';
 import {recruitmentTarget,rememberRecruitment} from '../services/recruitmentOutbound';
 import { Link, useNavigate, useRoute } from '../router';
-import type { User } from '../services/api';
+import {employerApiReady,type User} from '../services/api';
 import { CandidateAccountDropdown } from './CandidateAccountDropdown';
 import {demoModeEnabled,useDemoAccount,exitDemoAccount} from '../services/demoAccount';
 import '../styles/demo-nav.css';
@@ -26,6 +26,9 @@ export function Shell({ user, children }: { user: User | null; children: React.R
  const hasCandidate=!!user?.account_types?.includes('candidate');
  const hasRecruiter=!!user?.account_types?.includes('recruiter');
  const candidateSignedIn=hasCandidate||(demoModeEnabled&&!!demo);
+ // Only a verified HHBA account session may unlock official recruiting outlinks.
+ // A local demo account must never satisfy this requirement.
+ const verifiedCandidate=employerApiReady&&hasCandidate;
  const recruiterSignedIn=hasRecruiter;
  const employerEntry=recruiterSignedIn?'/employer/hub':'/employer/onboarding-preview';
  // Central capture covers all recruiting links across existing company/job pages,
@@ -37,7 +40,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
   const anchor=event.target.closest<HTMLAnchorElement>('a[href]');
   if(!anchor)return;
   const destination=recruitmentTarget(anchor);
-  if(!destination||candidateSignedIn)return;
+  if(!destination||verifiedCandidate)return;
   event.preventDefault();
   event.stopPropagation();
   rememberRecruitment(destination,anchor.textContent||anchor.getAttribute('aria-label')||'官方招聘渠道',
