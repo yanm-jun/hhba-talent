@@ -1,0 +1,69 @@
+name: HHBA Self-Hosted JD Static Pipeline Preflight
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-self-hosted-jd-preflight.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-static-jd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 32
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/hhba-static-jd-snapshots-20261025
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install client packages
+        working-directory: apps/web
+        run: npm ci
+      - name: Verify normal public market, employer and logo integration
+        working-directory: apps/web
+        run: |
+          node --test scripts/white-market-detail.contract.test.mjs scripts/featured-brand-jobs.contract.test.mjs scripts/hhba-unified-static.contract.test.mjs
+      - name: Compile modified static JD detail reader
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+        run: npm run build
+      - name: Refresh saved job listing and source audit
+        working-directory: apps/web
+        run: |
+          node scripts/prepare-pages-jobs.mjs
+          node scripts/audit-all-official-jds.mjs
+      - name: Build locally hosted responsibilities and source-extracted requirements
+        working-directory: apps/web
+        run: node scripts/build-self-hosted-jd.mjs
+      - name: Verify real identity matches, immutable shards and explicit coverage
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const c=JSON.parse(fs.readFileSync('dist/data/self-hosted-jd-coverage.json'));
+          const full=JSON.parse(fs.readFileSync('dist/data/self-hosted-jd.json'));
+          const feed=JSON.parse(fs.readFileSync('dist/data/jobs.json'));
+          if(c.total!==feed.total||c.total!==full.coverage.total||
+             c.editorial===0||c.structuredOnly===0||
+             c.editorial!==c.archivedEditorial+c.manuallyReviewed||
+             Object.keys(full.jobs).length!==full.count)
+           throw Error('INVALID_JD_SNAPSHOT_COVERAGE');
+          const ids=new Set(feed.jobs.map(j=>j.id));
+          for(const [id,row] of Object.entries(full.jobs)){
+           if(!ids.has(id)||row.id!==id||!row.sourceUrl.startsWith('https://'))throw Error('INVALID_SOURCE_BINDING_'+id);
+           if(row.mode!=='EXTRACTED_FACTS'&&(!row.requirementsZh.length||!row.responsibilitiesZh.length))throw Error('INVALID_EDITORIAL_'+id);
+          }
+          for(let i=0;i<32;i++){
+           const p='dist/data/self-hosted-jd/v1/'+String(i).padStart(2,'0')+'.json';
+           if(!fs.existsSync(p))throw Error('MISSING_JD_SHARD_'+i);
+           const part=JSON.parse(fs.readFileSync(p));
+           if(part.kind!=='HHBA_SELF_HOSTED_JD_SHARD_V1'||part.snapshotUpdated!==feed.updated)throw Error('UNBOUND_JD_SHARD');
+          }
+          console.log('SELF_HOSTED_JD_COVERAGE',JSON.stringify(c));
+          NODE
