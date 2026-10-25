@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Building2, ExternalLink, ImageOff, UserRound } from 'lucide-react';
+import { Building2, ImageOff, UserRound } from 'lucide-react';
 import type { EmployerIdentity } from '../services/companyDirectory';
 import {
  commonsCredit, commonsImage, visualProfileFor,
