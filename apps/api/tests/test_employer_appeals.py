@@ -80,7 +80,8 @@ class FakeAppeals:
         self.queue.append(case);return case
     async def list_employee(self,**kw):
         return [c for c in self.queue if c["kind"]=="employee_privacy"]
-    async def list_queue(self): return self.queue
+    async def list_queue(self, *, reviewer_organizations):
+        return [c for c in self.queue if c["organization_id"] not in reviewer_organizations]
     async def decide(self,**kw): return {"status":kw["decision"],"id":kw["appeal_id"]}
 
 
@@ -187,6 +188,8 @@ class PostgresAppealTests(unittest.TestCase):
                 actor_id=submitter)
             self.assertEqual(len(await repo.list_employer(organization_id=org)),1)
             self.assertEqual(await repo.list_employer(organization_id=other),[])
+            self.assertEqual(await repo.list_queue(reviewer_organizations={org:"owner"}),[])
+            self.assertEqual(len(await repo.list_queue(reviewer_organizations={})),1)
             self.assertTrue(await repo.has_active_score_appeal(organization_id=org))
             self.assertIsNone((await scorer.latest_private(organization_id=org))["candidate"]["trust"]["score"])
             held=await scorer.calculate_private(organization_id=org,calculated_by=assessor,certified=True)
