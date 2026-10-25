@@ -1,3 +1,4 @@
+import {mountUnifiedWorkbench,workspaceViews,refreshUnifiedWorkbench} from './unified-workbench.js';
 // HHBA Admin Console — private Railway Phase 3.1; all queries require an admin session.
 const byId=id=>document.getElementById(id);
 const fmt=new Intl.NumberFormat('zh-CN');
@@ -10,7 +11,7 @@ const formatTime=value=>{
 };
 let snapshot=null,growth=null,selectedPeriod='30d',customRange=null,activeView='overview';
 const titles={overview:'数据总览',users:'访问与收藏',market:'岗位与企业',operations:'运营监控',
- finance:'财务成本',investor:'融资展示',settings:'系统设置'};
+ finance:'财务成本',investor:'融资展示',settings:'系统设置',...workspaceViews};
 const details={
  market:['企业和岗位质量分析','未来接入岗位状态、ATS 来源及招聘质量报表；当前公开索引汇总在数据总览。'],
  operations:['系统运行与数据同步','未来接入有权限的同步队列和异常日志；当前预览不读取服务器私有日志。'],
@@ -21,7 +22,7 @@ function setView(view){
  if(!Object.hasOwn(titles,view))view='overview';
  activeView=view;
  for(const node of document.querySelectorAll('.page-view'))node.hidden=true;
- byId('view-'+(['investor','overview','users'].includes(view)?view:'placeholder')).hidden=false;
+ (byId('view-'+view)||byId('view-placeholder')).hidden=false;
  byId('breadcrumb').textContent=titles[view];
  document.title=titles[view]+' · HHBA 管理中心';
  document.body.classList.toggle('investor-mode',view==='investor');
@@ -208,6 +209,7 @@ async function refreshGrowth(){
  updateGrowth();
 }
 
+mountUnifiedWorkbench(setView);
 for(const node of document.querySelectorAll('.nav-link'))node.addEventListener('click',()=>{
  setView(node.dataset.view);
 });
@@ -224,7 +226,7 @@ byId('apply-custom').addEventListener('click',()=>{
  alert.textContent='';
  customRange={from,to};choosePeriod('custom');
 });
-byId('refresh').addEventListener('click',()=>{void refresh();void refreshGrowth()});
+byId('refresh').addEventListener('click',()=>{void refresh();void refreshGrowth();void refreshUnifiedWorkbench()});
 byId('growth-open').addEventListener('click',()=>setView('users'));
 byId('top-investor').addEventListener('click',()=>setView('investor'));
 byId('show-investor').addEventListener('click',()=>setView('investor'));
