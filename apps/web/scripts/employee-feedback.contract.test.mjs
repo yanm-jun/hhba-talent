@@ -5,7 +5,7 @@ const source=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 test('feedback route is connected to public employee view',()=>{
  const main=source('src/main.tsx'),publicPage=source('src/pages/EmployerGrowthHubPage.tsx');
  assert.match(main,/if\(route==='\/employee\/feedback'\|\|route==='\/employee\/feedback\/'\)/);
- assert.match(publicPage,/to="\/employee\/feedback"/);
+ assert.match(publicPage,/to=\{employeeFeedbackHref\}/);
  assert.match(main,/EmployerEvidencePage/);
  assert.match(main,/EmployerWorkspacePage/);
 });
