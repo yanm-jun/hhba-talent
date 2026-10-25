@@ -1,0 +1,147 @@
+name: HHBA Employer Growth Hub - independent Pages acceptance
+
+on:
+  push:
+    branches: [feat/employer-growth-hub-20261025]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: hhba-employer-growth-pages-preview
+  cancel-in-progress: true
+
+jobs:
+  verify-and-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout isolated employer feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/employer-growth-hub-20261025
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Recover last validated published HHBA root plus 100-job preview
+        uses: actions/download-artifact@v4
+        with:
+          name: hhba-original-home-plus-curated-100-site
+          run-id: 40093448694
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior-pages
+      - name: Confirm previous root and overseas preview are intact
+        run: |
+          test -s prior-pages/published/index.html
+          test -s prior-pages/published/404.html
+          test -s prior-pages/published/preview-100/index.html
+          test -s prior-pages/published/preview-100/curated/v1/jobs.json
+      - name: Install dependencies
+        run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Contract checks for employer and existing overseas job data
+        working-directory: apps/web
+        run: node --test scripts/employer-growth.contract.test.mjs scripts/curated-offline.contract.test.mjs
+      - name: Build independent employer preview
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/preview-employer/'
+          VITE_HHBA_CURATED_STATIC: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_DEMO_ACCOUNT_ENABLED: '0'
+        run: npm run build
+      - name: Serve local preview at its actual nested GitHub Pages path
+        run: |
+          mkdir -p /tmp/hhba-employer-qa/hhba-talent/preview-employer
+          cp -a apps/web/dist/. /tmp/hhba-employer-qa/hhba-talent/preview-employer/
+          for route in employer/start employer/onboarding-preview employer/hub employer/growth employer/aid employer/public employer/workspace; do
+            mkdir -p "/tmp/hhba-employer-qa/hhba-talent/preview-employer/$route"
+            cp apps/web/dist/index.html "/tmp/hhba-employer-qa/hhba-talent/preview-employer/$route/index.html"
+          done
+          (python3 -m http.server 4173 --bind 127.0.0.1 --directory /tmp/hhba-employer-qa >/tmp/hhba-employer-qa.log 2>&1 &)
+      - name: Install Chromium for full navigation tests
+        run: |
+          npm install --no-save --no-package-lock --prefix apps/web playwright@1.56.1 --no-audit --no-fund
+          cd apps/web
+          npx playwright install --with-deps chromium
+      - name: Verify employer onboarding, dashboard, existing hiring and confidentiality rules
+        working-directory: apps/web
+        run: node scripts/employer-growth.browser.mjs
+      - name: Assemble previous unchanged website and standalone employer preview
+        run: |
+          set -euo pipefail
+          mkdir -p combined/preview-employer
+          cp -a prior-pages/published/. combined/
+          cp -a apps/web/dist/. combined/preview-employer/
+          cp combined/preview-employer/index.html combined/preview-employer/404.html
+          for route in employer/start employer/onboarding-preview employer/hub employer/growth employer/aid employer/public employer/workspace; do
+            mkdir -p "combined/preview-employer/$route"
+            cp combined/preview-employer/index.html "combined/preview-employer/$route/index.html"
+          done
+          cmp prior-pages/published/index.html combined/index.html
+          cmp prior-pages/published/preview-100/index.html combined/preview-100/index.html
+          test -s combined/preview-employer/index.html
+          grep -q '/hhba-talent/preview-employer/assets/' combined/preview-employer/index.html
+          ! grep -R -E 'BEGIN (RSA|OPENSSH) PRIVATE KEY' combined/preview-employer
+          echo 'HHBA_EMPLOYER_PREVIEW_BUILT_EXISTING_PAGES_UNTOUCHED'
+      - name: Preserve screenshots and reviewed static site
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-employer-growth-reviewed-site
+          path: |
+            apps/web/employer-review/
+            combined/
+          retention-days: 14
+      - name: Prepare actual GitHub Pages deployment
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: combined
+
+  deploy-preview:
+    needs: verify-and-package
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: hhba-company200-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  verify-live:
+    needs: deploy-preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Confirm original root, overseas jobs and independent employer preview
+        run: |
+          set -euo pipefail
+          root=https://yanm-jun.github.io/hhba-talent
+          for attempt in 1 2 3 4 5 6; do
+            if curl -fsSL "$root/" -o /tmp/hhba-root.html &&
+               curl -fsSL "$root/preview-100/curated/v1/jobs.json" -o /tmp/hhba-jobs.json &&
+               curl -fsSL "$root/preview-employer/" -o /tmp/hhba-employer.html &&
+               curl -fsSL "$root/preview-employer/employer/growth/" -o /tmp/hhba-growth.html; then break; fi
+            if [ "$attempt" = 6 ]; then echo 'PAGES_HTTPS_FAILED'; exit 1; fi
+            sleep 10
+          done
+          grep -q '/hhba-talent/assets/' /tmp/hhba-root.html
+          grep -q '/hhba-talent/preview-employer/assets/' /tmp/hhba-employer.html
+          grep -q '/hhba-talent/preview-employer/assets/' /tmp/hhba-growth.html
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const data=JSON.parse(fs.readFileSync('/tmp/hhba-jobs.json'));
+          if(data.jobs.length!==100)throw Error('ORIGINAL_100_JOB_PREVIEW_NOT_PRESERVED');
+          console.log('HHBA_EMPLOYER_PUBLIC_OK',JSON.stringify({employerPreview:'/preview-employer/',existingHomeUnchanged:true,archivedJobs:100}));
+          NODE
