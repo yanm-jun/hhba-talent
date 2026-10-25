@@ -5,7 +5,7 @@ import ts from 'typescript';
 
 const read=p=>readFileSync(new URL('../src/'+p,import.meta.url),'utf8');
 const js=ts.transpileModule(read('services/recruitmentOutbound.ts'),{
- compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}
+ compilerOptions:{module:99,target:9}
 }).outputText;
 const {recruitmentTarget,rememberRecruitment,pendingRecruitment,clearPendingRecruitment}=
  await import('data:text/javascript;base64,'+Buffer.from(js).toString('base64'));
