@@ -73,7 +73,7 @@ test('signed HHBA founder manifesto is positioned after the progress timeline be
 });
 
 test('signed original visual must be packaged before the public build is published', () => {
-  assert.match(page, /images\\/hhba-brand-manifesto\\.webp/);
+  assert.ok(page.includes('images/hhba-brand-manifesto.webp'));
   assert.ok(existsSync(new URL('../public/images/hhba-brand-manifesto.webp', import.meta.url)),
     'The user supplied manifesto image needs to be committed before publishing; never deploy a broken image.');
 });
