@@ -82,3 +82,24 @@ test('all existing domestic, curated overseas, employer and static resources rem
  }
  assert.ok(style.includes('@media(max-width:680px)'));
 });
+
+
+test('public entrance cards match original compact size without touching outside sections or business routing',()=>{
+ const css=style;
+ for(const target of [
+  '.hhba-public-entry-grid{max-width:664px;gap:12px}',
+  '.hhba-public-entry-grid .hhba-entry-card{min-height:172px;border-radius:12px;padding:10px;',
+  '.hhba-public-entry-grid .hhba-entry-card .entry-icon{height:43px;border-radius:8px}',
+  '.hhba-public-entry-grid .hhba-entry-card strong{font-size:17px;',
+  '.hhba-public-entry-grid .hhba-entry-card small{margin:0;color:#65768c;font-size:12px;line-height:1.5}',
+  '.hhba-public-entry-grid .hhba-entry-card{min-height:166px}'
+ ])assert.ok(css.includes(target),'compact card style lost: '+target);
+ assert.ok(!css.includes('.hhba-public-entry-grid{max-width:790px;gap:20px}'));
+ assert.ok(!css.includes('.hhba-public-entry-grid .hhba-entry-card{min-height:245px'));
+ assert.ok(home.includes("kind==='candidate'?'/candidate/register':'/employer/start'"));
+ assert.ok(home.includes('HHBA · HUMAN CAPABILITY NETWORK'));
+ assert.ok(home.includes('<div className="home-match-promo">'));
+ assert.ok(home.includes('<UnifiedJobMarket compact/>'));
+ assert.ok(home.includes('<HomeCompanyMarquee/>'));
+ assert.ok(home.includes('<div className="hhba-public-browse"'));
+});
