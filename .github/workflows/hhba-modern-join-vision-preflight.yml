@@ -1,0 +1,42 @@
+name: HHBA Modern Join Vision Integration Preflight
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-modern-join-vision-preflight.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/modern-join-vision-integration-20261025
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Build 200-company current front-end with new brand pages
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+        run: npm run build
+      - name: Verify personal center, navigation, brand content and private static application
+        working-directory: apps/web
+        run: node --test scripts/join-modern-vision.integration.test.mjs
+      - name: Verify both routes, original brand images and latest personal center are present
+        run: |
+          test -s apps/web/dist/images/hhba-join-team.webp
+          test -s apps/web/dist/images/hhba-founder-signature.webp
+          grep -q '个人中心' apps/web/src/components/CandidateAccountDropdown.tsx
+          grep -q '企业发现 · 200家' apps/web/src/components/Shell.tsx
+          grep -q "route==='/vision'" apps/web/src/main.tsx
+          grep -q "route==='/join'" apps/web/src/main.tsx
+          echo "HHBA_MODERN_JOIN_VISION_INTEGRATION_VERIFIED"
