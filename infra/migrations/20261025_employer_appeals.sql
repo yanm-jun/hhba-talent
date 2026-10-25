@@ -35,7 +35,38 @@ CREATE INDEX IF NOT EXISTS hhba_appeal_org_idx ON hhba_appeal_cases_private
 CREATE TABLE IF NOT EXISTS hhba_appeal_employee_owners_private (
   appeal_id UUID PRIMARY KEY REFERENCES hhba_appeal_cases_private(id) ON DELETE RESTRICT,
   employee_id UUID NOT NULL,
-  UNIQUE(appeal_id,employee_id)
+  organization_id UUID NOT NULL,
+  issue TEXT NOT NULL,
+  period TEXT NOT NULL CHECK (period ~ '^20[2-9][0-9]-Q[1-4]
+CREATE INDEX IF NOT EXISTS hhba_appeal_employee_owner_idx
+  ON hhba_appeal_employee_owners_private(employee_id,appeal_id);
+CREATE TABLE IF NOT EXISTS hhba_appeal_events_private (
+  id UUID PRIMARY KEY,
+  appeal_id UUID NOT NULL REFERENCES hhba_appeal_cases_private(id) ON DELETE RESTRICT,
+  actor_id UUID NOT NULL,
+  action TEXT NOT NULL CHECK (action IN ('submitted','decision','clarification')),
+  from_status TEXT,
+  to_status TEXT NOT NULL,
+  reason TEXT,
+  occurred_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS hhba_appeal_events_case_idx
+  ON hhba_appeal_events_private(appeal_id,occurred_at);
+-- Raw changes must never be used to rewrite case history.
+CREATE OR REPLACE FUNCTION hhba_appeal_events_immutable()
+RETURNS trigger AS $$
+BEGIN
+  RAISE EXCEPTION 'IMMUTABLE_APPEAL_AUDIT';
+END; $$ LANGUAGE plpgsql;
+DROP TRIGGER IF EXISTS hhba_appeal_events_lock ON hhba_appeal_events_private;
+CREATE TRIGGER hhba_appeal_events_lock BEFORE UPDATE OR DELETE ON
+  hhba_appeal_events_private FOR EACH ROW EXECUTE FUNCTION hhba_appeal_events_immutable();
+REVOKE ALL ON hhba_appeal_cases_private FROM PUBLIC;
+REVOKE ALL ON hhba_appeal_employee_owners_private FROM PUBLIC;
+REVOKE ALL ON hhba_appeal_events_private FROM PUBLIC;
+COMMIT;
+),
+  UNIQUE(employee_id,organization_id,issue,period)
 );
 CREATE INDEX IF NOT EXISTS hhba_appeal_employee_owner_idx
   ON hhba_appeal_employee_owners_private(employee_id,appeal_id);
