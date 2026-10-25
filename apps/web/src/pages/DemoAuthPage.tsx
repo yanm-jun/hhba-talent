@@ -14,7 +14,8 @@ export function DemoAuthPage({initialMode='login'}:{initialMode?:Mode}){
  const mode=initialMode;
  const existing=readDemoProfile();
  const returnPath=new URLSearchParams(location.search).get('next');
- const next=returnPath&&['/candidate/account','/candidate/saved','/candidate/account/preferences','/candidate/account/profile'].includes(returnPath)?returnPath:'/candidate/account';
+ const next=returnPath&&['/candidate/account','/candidate/saved','/candidate/account/preferences','/candidate/account/profile','/candidate/official-outbound'].includes(returnPath)?returnPath:'/candidate/account';
+ const resumeQuery=returnPath==='/candidate/official-outbound'?'?next=%2Fcandidate%2Fofficial-outbound':'';
  function submit(event:FormEvent<HTMLFormElement>){
   event.preventDefault();setError('');
   if(mode==='register'){
@@ -31,8 +32,8 @@ export function DemoAuthPage({initialMode='login'}:{initialMode?:Mode}){
     <p className="demo-auth-lead">这里先体验完整的求职账户界面，收藏真实职位、管理模拟职业资料，为正式账户上线前确认交互体验。</p>
     <div className="demo-auth-notice"><ShieldCheck size={18}/><span><strong>这是公开前端演示，不是真正注册或登录。</strong> 不要填写真实密码或敏感信息；所有演示资料仅保存在当前浏览器，不会发送到服务器。</span></div>
     <div className="demo-auth-tabs" role="group" aria-label="账户体验方式">
-      <Link className={mode==='login'?'is-active':''} aria-current={mode==='login'?'page':undefined} to="/candidate/login">模拟登录</Link>
-      <Link className={mode==='register'?'is-active':''} aria-current={mode==='register'?'page':undefined} to="/candidate/register">模拟注册</Link>
+      <Link className={mode==='login'?'is-active':''} aria-current={mode==='login'?'page':undefined} to={'/candidate/login'+resumeQuery}>模拟登录</Link>
+      <Link className={mode==='register'?'is-active':''} aria-current={mode==='register'?'page':undefined} to={'/candidate/register'+resumeQuery}>模拟注册</Link>
     </div>
     <form className="demo-auth-form" onSubmit={submit}>
      {mode==='register'?<>
