@@ -51,7 +51,7 @@ function MatchedJobCard({item,order}:{item:MatchedJob;order:number}){
   </div>
   <div className="hhba-ai-job-actions">
     <Link to={'/candidate/jobs/'+encodeURIComponent(item.id)}>查看 HHBA 岗位详情</Link>
-    {official?<a href={official} target="_blank" rel="noopener noreferrer">打开企业官方投递页 <ArrowRight size={14}/></a>:
+    {official?<a data-hhba-recruitment-outbound="true" href={official} target="_blank" rel="noopener noreferrer">打开企业官方投递页 <ArrowRight size={14}/></a>:
       <span>官方链接待重新核验</span>}
   </div>
  </article>;
