@@ -57,6 +57,8 @@ try{
  await at('/employer/workspace');
  await page.getByText(/企业功能预览版/).waitFor();
  await page.getByRole('button',{name:/待连接企业 API 后开放保存/}).waitFor();
+ await go('/employer/growth/');
+ await page.getByRole('heading',{name:'企业成长档案'}).waitFor();
  await page.setViewportSize({width:390,height:844});
  await go('/');
  await page.getByRole('button',{name:/我要招人/}).click();
