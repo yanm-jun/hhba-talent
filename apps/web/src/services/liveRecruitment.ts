@@ -319,7 +319,7 @@ export async function listJobs(filters: LiveFilters, offset: number, signal: Abo
       searchFacets.set(job.id,{
         countryCode:archive.countryCode,cityKey:archive.cityKey,
         education:archive.education,experienceMinYears:archive.experienceMinYears,
-        skills:archive.skillSignals,jobType:archive.jobType==='REGULAR'?'SOCIAL':archive.jobType
+        skills:archive.skillSignals,jobType:archive.jobType==='REGULAR'?'SOCIAL':archive.jobType||'UNKNOWN'
       });
     }
     return searchPreview(current,filters,offset,searchFacets);
