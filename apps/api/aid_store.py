@@ -56,8 +56,11 @@ class PostgresAidRepository:
                     """INSERT INTO hhba_aid_applications_private
                        (id,organization_id,service_type,business_summary,
                         capacity_summary,capacity_evidence_id,submitted_by)
-                       VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING *""",
+                       VALUES($1,$2,$3,$4,$5,$6,$7)
+                       ON CONFLICT DO NOTHING RETURNING *""",
                     uuid4(),org,service_type,business_summary,capacity_summary,proof_id,actor)
+                if item is None:
+                    raise HTTPException(409,detail="ACTIVE_AID_APPLICATION_ALREADY_EXISTS")
                 await conn.execute(
                     """INSERT INTO hhba_aid_events_private
                        (id,application_id,actor_id,action,new_status)
@@ -291,15 +294,25 @@ class PostgresCommercialRepository:
         return private_lead(updated)
 
     async def submit_order_proof(self,*,introduction_id:str,actor_id:str,
-                                 evidence_reference:str)->dict:
+                                 evidence_reference:str,certified:bool)->dict:
         valid_ref(evidence_reference)
         actor=uuid_or_404(actor_id)
+        async with self.pool.acquire() as conn:
+            org=await conn.fetchval(
+                "SELECT organization_id FROM hhba_commercial_introductions_private WHERE id=$1",
+                uuid_or_404(introduction_id))
+        if not org:
+            raise HTTPException(404,detail="INTRODUCTION_NOT_FOUND")
+        await self.aid._live(str(org),certified)
         async with self.pool.acquire() as conn:
             async with conn.transaction():
                 row=await conn.fetchrow(
                     "SELECT * FROM hhba_commercial_introductions_private WHERE id=$1 FOR SHARE",
                     uuid_or_404(introduction_id))
                 if not row:raise HTTPException(404,detail="INTRODUCTION_NOT_FOUND")
+                await self.aid.ensure_approved_live(
+                    conn,application_id=str(row["application_id"]),
+                    organization_id=str(org),certified=certified)
                 if row["stage"] not in ("in_discussion","closed"):
                     raise HTTPException(409,detail="ORDER_PROOF_STAGE_INVALID")
                 proof=await conn.fetchrow(
