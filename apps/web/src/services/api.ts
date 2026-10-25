@@ -55,7 +55,7 @@ export type ApplicationStage = 'submitted'|'reviewing'|'shortlisted'|'interview'
 export type EmployerPosting = { id:string;company:string;title:string;description:string;requirements:string;location:string;work_mode:'onsite'|'hybrid'|'remote';recruitment_type:'SOCIAL'|'CAMPUS'|'INTERNSHIP';apply_url:string;status:'draft'|'pending_review'|'published'|'rejected'|'closed';published_at?:string|null;expires_at?:string|null;review_reason?:string|null;source_type:'HHBA_VERIFIED_EMPLOYER' };
 export type EmployerPostingInput = Pick<EmployerPosting,'title'|'description'|'requirements'|'location'|'work_mode'|'recruitment_type'|'apply_url'>;
 export type EmployerEvidenceCategory = 'pay_and_contracts'|'social_insurance'|'working_hours'|'employee_development'|'recruitment_integrity'|'business_integrity';
-export type EmployerEvidence = {id:string;organization_id:string;category:EmployerEvidenceCategory;statement:string;status:'pending_review'|'verified'|'needs_more_info'|'rejected'|'expired'|'disputed';file_mime:string;file_size_bytes:number;created_at:string;status_updated_at:string};
+export type EmployerEvidence = {id:string;organization_id:string;category:EmployerEvidenceCategory;statement:string;status:'pending_review'|'verified'|'needs_more_info'|'rejected'|'expired'|'disputed';security_status:'pending_scan'|'clean'|'rejected';file_mime:string;file_size_bytes:number;created_at:string;status_updated_at:string};
 
 export type TalentSearchInput = {keywords?:string;skills?:string[];industry?:string;region?:string;work_mode?:string;work_years_min?:number;work_years_max?:number;page?:number;page_size?:number};
 export type TalentSearchResponse = {items:TalentSearchCandidate[];page:number;page_size:number;has_more:boolean};
