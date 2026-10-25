@@ -28,5 +28,5 @@ test('no demo company score, zero as missing data, or automatic aid eligibility'
  for(const line of ['待评估','公开审批','申诉','上一完整季度','材料','重算']) assert.ok(page.includes(line),line);
  assert.ok(!/\b88\b|\b92\b/.test(page));
  assert.ok(!page.includes('恭喜您已获得订单'));
- assert.match(page,/不会自动公开分数/);
+ assert.match(page,/此操作不会公开分数/);
 });
