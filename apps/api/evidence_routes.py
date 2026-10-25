@@ -78,6 +78,11 @@ def build_evidence_router(
             raise HTTPException(404, detail="EVIDENCE_NOT_FOUND")
         return private_download(row, vault)
 
+    @router.get("/admin/evidence")
+    async def pending_evidence(actor: Principal = Depends(resolve_actor)):
+        require_reviewer(actor)
+        return {"items": await repository.list_pending_review()}
+
     @router.get("/admin/evidence/{item_id}/file")
     async def reviewer_download(
         item_id: str, actor: Principal = Depends(resolve_actor),
