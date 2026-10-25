@@ -171,7 +171,7 @@ export function EmployerGrowthHubPage({ user, view }: { user: User | null; view:
       <p className="eh-sidebar-title">企业工作台</p>
       <nav aria-label="企业服务导航">
         {nav.map(({view:v,label,icon:Icon})=><Link className={'eh-sidebar-link '+(view===v?'active':'')} key={v} to={routeFor(v)}><Icon size={17}/>{label}</Link>)}
-        <Link className="eh-sidebar-link" to="/employer/evidence"><FileCheck2 size={17}/>证明材料核验</Link><Link className="eh-sidebar-link" to="/employer/appeals"><ShieldCheck size={17}/>异议与申诉</Link>
+        <Link className="eh-sidebar-link" to="/employer/evidence"><FileCheck2 size={17}/>证明材料核验</Link><Link className="eh-sidebar-link" to="/employer/appeals"><ShieldCheck size={17}/>异议与申诉</Link><Link className="eh-sidebar-link" to="/employer/improvements"><TrendingUp size={17}/>真实改善记录</Link>
         <Link className="eh-sidebar-link" to="/employer/workspace"><BriefcaseBusiness size={17}/>招聘管理</Link>
         <Link className="eh-sidebar-link" to="/employer/workspace"><UsersRound size={17}/>候选人与人才</Link>
         <Link className="eh-sidebar-link" to="/recruiter/onboarding"><UserRoundCheck size={17}/>企业认证</Link>
@@ -195,7 +195,7 @@ export function EmployerGrowthHubPage({ user, view }: { user: User | null; view:
       {view==='growth'&&<div className="eh-stack">
         <div className="eh-card"><div className="eh-card-head"><div><h2>信誉值与员工善待值</h2><p>两项独立评估，不能简单用高信誉值掩盖低员工善待值。</p></div><span className="eh-tag">暂无经核验分数</span></div><Evaluation/></div>
         <div className="eh-card"><div className="eh-card-head"><h2>评分依据与核验状态</h2><Link to="/employer/scoring">查看双评分规则 <ArrowUpRight size={15}/></Link></div><p className="eh-field-help"><Link to="/employer/evidence">提交证明材料</Link> · 必须经独立核验与评分复核，不能因为上传材料就直接加分。</p><div className="eh-checklist">{evaluationItems.map(([label,status])=><div key={label}><span>{label}</span><small>{status}</small></div>)}</div><p className="eh-field-help">未来每个评分项必须包含证据来源、核验日期、规则版本、异议处理通道。未经核实的匿名指控不能直接扣分；企业也不能用虚假员工好评刷分。</p></div>
-        <div className="eh-card"><div className="eh-card-head"><div><h2>成长记录</h2><p>评分变化将展示经核实的改善记录，不会生成虚假的历史曲线。</p></div><TrendingUp size={21}/></div><div className="eh-timeline-empty"><Clock3 size={20}/><span>尚无核验记录。建立可信评分体系后，按实际发生日期展示变化。</span></div></div>
+        <div className="eh-card"><div className="eh-card-head"><div><h2>真实改善记录</h2><p>提交有证据支持的改善事项，独立核验后才可能公开，不会虚构历史曲线。</p></div><Link to="/employer/improvements">进入成长记录 <ArrowUpRight size={15}/></Link></div><div className="eh-timeline-empty"><Clock3 size={20}/><span>公开时间线仅收录经独立核验的实际改善，不会将企业自述直接当成成果。</span></div><p className="eh-field-help"><Link to="/employer/improvements/public">查看公开成长时间线</Link></p></div>
       </div>}
       {view==='aid'&&<div className="eh-stack">
         <div className="eh-aid-banner"><HeartHandshake size={29}/><div><h2>让善待员工的企业获得更多发展机会</h2><p>在招聘服务之外，HHBA 将为符合条件的企业争取客户引荐、业务匹配和合作机会。</p></div></div>

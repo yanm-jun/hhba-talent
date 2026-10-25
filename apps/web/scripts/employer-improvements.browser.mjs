@@ -1,0 +1,36 @@
+import {chromium} from 'playwright';
+import {mkdirSync} from 'node:fs';
+const base=(process.env.HHBA_TEST_BASE||'http://127.0.0.1:4173/hhba-talent/preview-employer/').replace(/\/$/,'');
+const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+const page=await browser.newPage({viewport:{width:1440,height:900},locale:'zh-CN'});
+const errors=[];page.on('pageerror',e=>errors.push(e.message));
+mkdirSync('improvements-review',{recursive:true});
+try{
+ await page.goto(base+'/',{waitUntil:'domcontentloaded',timeout:40000});
+ await page.getByRole('button',{name:/我要招人/}).click();
+ await page.getByRole('link',{name:/进入企业工作台/}).click();
+ await page.getByRole('link',{name:'真实改善记录'}).click();
+ await page.getByRole('heading',{name:'企业真实改善记录'}).waitFor();
+ await page.getByText('真实改善提交尚未开放').waitFor();
+ if(await page.getByRole('button',{name:'待可信认证后台接入'}).isEnabled())throw Error('UNVERIFIED_IMPROVEMENT_SUBMIT');
+ await page.getByText('目前没有真实申报记录。').waitFor();
+ await page.screenshot({path:'improvements-review/company-improvement-desktop.png',fullPage:true});
+ await page.getByRole('link',{name:/查看求职者能看到的成长时间线/}).click();
+ await page.getByRole('heading',{name:'看得见的员工关怀改善'}).waitFor();
+ await page.getByText('真实成长档案尚未接通').waitFor();
+ await page.getByText('暂无可以公开展示的已核验改善事项。').waitFor();
+ await page.screenshot({path:'improvements-review/public-timeline-desktop.png',fullPage:true});
+ await page.goto(base+'/admin/employer-improvements/',{waitUntil:'domcontentloaded'});
+ await page.getByRole('heading',{name:'改善事实独立核验'}).waitFor();
+ await page.getByText('真实改善审核暂未开放').waitFor();
+ if(await page.getByRole('button',{name:'待安全审核系统接入'}).isEnabled())throw Error('UNSAFE_ADMIN_APPROVAL');
+ await page.screenshot({path:'improvements-review/admin-review-disabled.png',fullPage:true});
+ await page.setViewportSize({width:390,height:844});
+ await page.goto(base+'/employer/improvements/',{waitUntil:'domcontentloaded'});
+ await page.getByRole('heading',{name:'企业真实改善记录'}).waitFor();
+ const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth+3);
+ if(overflow)throw Error('IMPROVEMENTS_MOBILE_HORIZONTAL_OVERFLOW');
+ await page.screenshot({path:'improvements-review/company-mobile.png',fullPage:true});
+ if(errors.length)throw Error('BROWSER_ERRORS '+JSON.stringify(errors));
+ console.log('HHBA_IMPROVEMENTS_BROWSER_OK',JSON.stringify({verifiedOnly:true,noFakeRecords:true,noFakeScoreDelta:true,noUpload:true,deepLinks:true,mobile:true}));
+}finally{await browser.close()}
