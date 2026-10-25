@@ -33,6 +33,10 @@ class Principal:
     improvement_reviewer: bool = False
     publication_preparer: bool = False
     publication_reviewer: bool = False
+    aid_reviewer: bool = False
+    business_matcher: bool = False
+    buyer_consent_reviewer: bool = False
+    commercial_evidence_reviewer: bool = False
 
 
 def require_member(principal: Principal | None, organization_id: str) -> None:
