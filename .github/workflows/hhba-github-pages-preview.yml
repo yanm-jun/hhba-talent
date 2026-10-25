@@ -164,6 +164,41 @@ jobs:
           node --check apps/web/dist/admin-preview/dashboard.js
           test -s apps/web/dist/admin-preview/index.html
           test -s apps/web/dist/admin-preview/data/overview.json
+      - name: Verify newest unified admin preview is truly public-safe and fully static
+        run: |
+          node --check apps/web/dist/preview-admin/dashboard.js
+          node --check apps/web/dist/preview-admin/unified-workbench.js
+          node --input-type=module <<'NODE'
+          import {readFileSync,existsSync} from 'node:fs';
+          const root='apps/web/dist/preview-admin/';
+          for (const file of ['index.html','styles.css','unified-workbench.css',
+              'favicon.svg','dashboard.js','unified-workbench.js',
+              'data/jobs.json','data/growth.json','data/workspace.json']) {
+            if (!existsSync(root+file)) throw Error('MISSING_ADMIN_PREVIEW_FILE:'+file);
+          }
+          const html=readFileSync(root+'index.html','utf8');
+          const dashboard=readFileSync(root+'dashboard.js','utf8');
+          const workspaceUi=readFileSync(root+'unified-workbench.js','utf8');
+          if (!html.includes('GitHub Pages 静态预览') ||
+              html.includes('action="/management/logout"') ||
+              !dashboard.includes("fetch('./data/jobs.json'") ||
+              !dashboard.includes("fetch('./data/growth.json?'+params") ||
+              !workspaceUi.includes("fetch('./data/workspace.json'") ||
+              dashboard.includes("fetch('/api/admin/") ||
+              workspaceUi.includes("fetch('/api/admin/"))
+            throw Error('ADMIN_PREVIEW_PRIVATE_SERVICE_LEAK');
+          for(const file of ['jobs.json','growth.json','workspace.json']){
+            const data=JSON.parse(readFileSync(root+'data/'+file,'utf8'));
+            if(file==='jobs.json'&&(data.quality!=='unavailable'||
+               data.counts.displayableJobs!==null))throw Error('FAKE_JOB_TOTAL');
+            if(file==='growth.json'&&(data.traffic.quality!=='unavailable'||
+               data.bookmarks.quality!=='unavailable'))throw Error('FAKE_PRIVATE_METRICS');
+            if(file==='workspace.json'&&(data.productionReviewerAuth!=='not_connected'||
+               !data.modules.every(x=>x.pending===null&&!x.reviewAllowed)))
+              throw Error('UNAUTHORIZED_REVIEWER_STATE');
+          }
+          console.log('HHBA_PUBLIC_STATIC_ADMIN_PREVIEW_VERIFIED',root);
+          NODE
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
         with:
