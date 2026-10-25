@@ -31,6 +31,8 @@ class Principal:
     scoring_reviewer: bool = False
     appeals_reviewer: bool = False
     improvement_reviewer: bool = False
+    publication_preparer: bool = False
+    publication_reviewer: bool = False
 
 
 def require_member(principal: Principal | None, organization_id: str) -> None:
