@@ -1,4 +1,6 @@
 import {ArrowUpRight,Building2,BriefcaseBusiness} from 'lucide-react';
+import type {MouseEvent} from 'react';
+import {recruitmentTarget,rememberRecruitment} from '../services/recruitmentOutbound';
 import { Link, useNavigate, useRoute } from '../router';
 import type { User } from '../services/api';
 import { CandidateAccountDropdown } from './CandidateAccountDropdown';
@@ -26,7 +28,21 @@ export function Shell({ user, children }: { user: User | null; children: React.R
  const candidateSignedIn=hasCandidate||(demoModeEnabled&&!!demo);
  const recruiterSignedIn=hasRecruiter;
  const employerEntry=recruiterSignedIn?'/employer/hub':'/employer/onboarding-preview';
- return <main className={'app-shell hhba-experience-'+experience}>
+ // Central capture covers all recruiting links across existing company/job pages,
+ // not merely the example highlighted by the user.
+ function guardRecruitmentClick(event:MouseEvent<HTMLElement>){
+  if(event.defaultPrevented||!(event.target instanceof Element))return;
+  const anchor=event.target.closest<HTMLAnchorElement>('a[href]');
+  if(!anchor)return;
+  const destination=recruitmentTarget(anchor);
+  if(!destination||candidateSignedIn)return;
+  event.preventDefault();
+  event.stopPropagation();
+  rememberRecruitment(destination,anchor.textContent||anchor.getAttribute('aria-label')||'官方招聘渠道',
+   location.pathname+location.search);
+  navigate('/candidate/register?next=%2Fcandidate%2Fofficial-outbound');
+ }
+ return <main onClickCapture={guardRecruitmentClick} className={'app-shell hhba-experience-'+experience}>
   <header className="topbar hhba-experience-header">
    <div className="hhba-experience-brand">
     <Link className="logo" to="/" aria-label="HHBA 公共首页">HHBA.</Link>
