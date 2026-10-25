@@ -4,6 +4,7 @@ import { readFileSync, existsSync } from 'node:fs';
 
 const src = name => readFileSync(new URL('../src/' + name, import.meta.url), 'utf8');
 const page = src('pages/JoinUsPage.tsx');
+const visionPage = src('pages/VisionPage.tsx');
 const shell = src('components/Shell.tsx');
 const main = src('main.tsx');
 const css = src('styles.css');
@@ -16,7 +17,7 @@ test('home header visibly links to HHBA join-us without replacing account entry'
 
 test('full public careers sections and honest-stage disclaimer remain present', () => {
   for (const expected of [
-    '我们还想创造一家值得工作的公司', '一个更好的商业社会，',
+    '我们还想创造一家值得工作的公司', '为什么是 HHBA',
     '好的工作，不应该只属于别人', '六险二金的保障目标',
     '长期股权激励', '公司筹备与融资前阶段',
     '寻找能够一起把事情做成的人', '公司设立与融资',
@@ -40,7 +41,7 @@ test('public demo keeps applicant PII ephemeral and never calls privileged endpo
 
 test('responsive layout and reduced motion keep entry usable on phones', () => {
   assert.match(css,/\.join-hero\{/);
-  assert.match(css,/\.join-vision-chapters/);
+  assert.match(css,/\.join-values-grid/);
   assert.match(css,/\.join-form-shell/);
   assert.match(css,/@media\(max-width:560px\)/);
   assert.match(css,/prefers-reduced-motion:reduce/);
@@ -147,60 +148,61 @@ test('candidate-facing role details include responsibilities, constraints and no
   assert.match(css,/@media\(max-width:560px\)/);
 });
 
-test('vision link scrolls to the complete future-facing mission instead of four small cards', () => {
-  assert.match(page, /<JumpButton secondary onClick=\{\(\) => jump\(valuesRef\)\}>了解我们的理念/);
-  assert.match(page, /<VisionSection sectionRef=\{valuesRef\} \/>/);
-  assert.match(page, /id="join-values" ref=\{sectionRef\}/);
-  assert.match(page, /data-vision-reveal/);
-  assert.match(page, /join-vision-animate/);
-  assert.doesNotMatch(page, /为什么是 HHBA？|const values = \[|values\.map\(/);
-  assert.doesNotMatch(page, /join-values-grid|join-value-card/);
+test('Join Us restores its original four cards and the hero vision button navigates to a new page', () => {
+  for(const title of ['为什么是 HHBA？','连接更广阔的机会','认真对待劳动者','让技术真正有用','与建设者分享成长']){
+    assert.ok(page.includes(title),'missing restored content: '+title);
+  }
+  assert.match(page,/const values = \[/);
+  assert.match(page,/values\.map\(v => <article/);
+  assert.match(page,/className="join-values-grid"/);
+  assert.match(page,/className="join-btn join-btn-light" to="\/vision">了解我们的理念/);
+  assert.doesNotMatch(page,/<VisionSection|const futureVisions =/);
+  assert.match(main,/import \{ VisionPage \} from '\.\/pages\/VisionPage'/);
+  assert.match(main,/if\(route==='\/vision'\)return <VisionPage user=\{user\}\/>/);
+  assert.match(css,/\.join-values-grid\{/);
 });
-test('four envisioned futures are in the approved order, followed by the emotional climax and company practice', () => {
-  const vision = page.slice(page.indexOf('const futureVisions = ['),page.indexOf('function BrandManifesto()'));
-  const statements = [
-    'FOR EVERY PERSON', '让每一个认真生活的人，都有机会走向更好的生活。',
-    'FOR EVERY ORGANIZATION', '让企业的繁荣与员工的成长，成为彼此成就的力量。',
-    'FOR A BETTER MARKET', '让真正关心员工的企业，拥有被世界认可的机会。',
-    'FOR THE FUTURE OF SOCIETY', '让经济的发展，最终转化为更多人的幸福。',
-    'THE WORLD WE ENVISION', '让人的成长，',
-    'FROM BELIEF TO PRACTICE', '我们所向往的未来，'
+test('separate vision page is accessible with back navigation and preserves all four aspirations', () => {
+  assert.match(visionPage,/export function VisionPage/);
+  assert.match(visionPage,/<Shell user=\{user\}>/);
+  assert.match(visionPage,/className="join-page hhba-vision-page"/);
+  assert.match(visionPage,/aria-label="品牌理念页面导航"/);
+  assert.match(visionPage,/to="\/join"/);
+  assert.match(visionPage,/window\.scrollTo\(0, 0\)/);
+  const terms=[
+    '我们相信，','一个更好的商业社会，','应该让每一个参与创造价值的人，',
+    '都拥有更好的未来。',
+    'FOR EVERY PERSON','让每一个认真生活的人，都有机会走向更好的生活。',
+    'FOR EVERY ORGANIZATION','让企业的繁荣与员工的成长，成为彼此成就的力量。',
+    'FOR A BETTER MARKET','让真正关心员工的企业，拥有被世界认可的机会。',
+    'FOR THE FUTURE OF SOCIETY','让经济的发展，最终转化为更多人的幸福。',
+    'THE WORLD WE ENVISION','让人的成长，',
+    'FROM BELIEF TO PRACTICE','我们所向往的未来，'
   ];
-  let last=-1;
-  for(const statement of statements){
-    const i=vision.indexOf(statement);
-    assert.ok(i>last,'Vision statement missing or out of order: '+statement);
-    last=i;
+  let previous=-1;
+  for(const term of terms){
+    const current=visionPage.indexOf(term);
+    assert.ok(current>previous, 'Vision clause missing or out of order: '+term);
+    previous=current;
   }
-  assert.equal((vision.match(/number: '0[1-4]'/g)||[]).length,4);
-  assert.match(vision,/IntersectionObserver/);
-  assert.match(vision,/prefers-reduced-motion: reduce/);
-  assert.match(css,/\.join-vision-climax\{/);
-  assert.match(css,/background:#263d5c/);
+  assert.equal((visionPage.match(/number: '0[1-4]'/g)||[]).length,4);
+  assert.match(visionPage,/IntersectionObserver/);
+  assert.match(visionPage,/prefers-reduced-motion: reduce/);
+  assert.match(css,/\.join-vision-navigation\{/);
   assert.match(css,/@media\(max-width:650px\)/);
-  assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
 });
-test('future-facing vision does not repeat the full original founder letter or turn into technical strategy', () => {
-  const vision = page.slice(page.indexOf('const futureVisions = ['),page.indexOf('function BrandManifesto()'));
-  const letter = page.slice(page.indexOf('function BrandManifesto()'),page.indexOf('export function JoinUsPage'));
-  for(const phrase of [
+test('original founder manifesto, signed image and recruiting details remain on Join Us, not Vision', () => {
+  for(const wording of [
     '每一份简历背后，都是一个认真生活的人。',
-    '求职者可以不被录用，但不应该被欺骗；',
-    '让劳动获得尊严，让招聘回归诚信。',
-    '让劳动更有尊严，让商业更有温度'
+    '让劳动更有尊严，让商业更有温度',
+    '让劳动获得尊严，让招聘回归诚信。'
   ]){
-    assert.ok(letter.includes(phrase),'original founder letter must be preserved: '+phrase);
-    assert.ok(!vision.includes(phrase),'vision may not duplicate founder letter: '+phrase);
+    assert.ok(page.includes(wording),'founder text lost: '+wording);
+    assert.ok(!visionPage.includes(wording),'vision duplicates letter: '+wording);
   }
-  for(const jargon of ['PostgreSQL','API 接口','技术架构','商业循环图','代码治理']){
-    assert.ok(!vision.includes(jargon),'vision should express social future, not implementation: '+jargon);
-  }
-  const rendered=page.slice(page.indexOf('      <section className="join-hero"'));
-  const a=rendered.indexOf('<VisionSection sectionRef={valuesRef} />');
-  const b=rendered.indexOf('join-benefits-section');
-  const c=rendered.indexOf('join-opportunities');
-  const d=rendered.indexOf('join-progress-section');
-  const e=rendered.indexOf('<BrandManifesto />');
-  const f=rendered.indexOf('join-apply-section');
-  assert.ok(a>=0&&a<b&&b<c&&c<d&&d<e&&e<f,'original join-us section order changed');
+  for(const phrase of [
+    'images/hhba-founder-signature.webp','技术负责人 / 全栈架构工程师',
+    '企业治理与劳动权益研究伙伴','薪酬与权益现状',
+    'join-progress-section','join-apply-section'
+  ])assert.ok(page.includes(phrase),'join page content missing: '+phrase);
+  assert.doesNotMatch(visionPage,/PostgreSQL|API 接口|数据库|代码治理|薪酬与权益现状/);
 });
