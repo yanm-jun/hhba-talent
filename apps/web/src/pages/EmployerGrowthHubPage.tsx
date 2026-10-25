@@ -161,6 +161,11 @@ export function EmployerGrowthHubPage({ user, view }: { user: User | null; view:
   const approved=org?.status==='approved';
   const demo=!employerApiReady;
   const publicPage=view==='public';
+  // Only forward a public organization identifier; never treat it as employment proof.
+  const linkedOrg=new URLSearchParams(window.location.search).get('org')||'';
+  const employeeFeedbackHref=/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(linkedOrg)
+    ? '/employee/feedback?org='+encodeURIComponent(linkedOrg)
+    : '/employee/feedback';
   return <Shell user={user}><div className="eh-layout">
     <aside className="eh-sidebar">
       <p className="eh-sidebar-title">企业工作台</p>
@@ -205,7 +210,7 @@ export function EmployerGrowthHubPage({ user, view }: { user: User | null; view:
           <div className="eh-checklist">{evaluationItems.map(([name,state])=><div key={name}><span>{name}</span><small>{state}</small></div>)}</div>
         </div>
         <div className="eh-card"><div className="eh-card-head"><div><h2>{employeeView?'在职员工视角':'求职者视角'}</h2><p>{employeeView?'反馈前须核实在职关系并严格保护个人身份。':'公开评分应和招聘职位、企业介绍保持一致。'}</p></div><div className="eh-role-switch"><button type="button" aria-pressed={!employeeView} className={!employeeView?'active':''} onClick={()=>setEmployeeView(false)}>求职者</button><button type="button" aria-pressed={employeeView} className={employeeView?'active':''} onClick={()=>setEmployeeView(true)}>员工</button></div></div>
-          {employeeView?<div className="eh-privacy-note"><LockKeyhole size={20}/><p>员工真实反馈入口待建立。平台应保护反馈者身份，提供核实、复核和申诉机制；现阶段不收集任何员工评价。</p></div>:<div className="eh-privacy-note"><BriefcaseBusiness size={20}/><p>求职者将能在查看企业招聘岗位时，看到已公开的可信评分和解释。评分未核验前只显示「待评估」，不影响查看职位。</p></div>}
+          {employeeView?<div className="eh-privacy-note"><LockKeyhole size={20}/><div><p>员工反馈问卷已设计为独立核验、每季度一次、只公开符合人数门槛的汇总数据。当前尚未接入身份核验服务，不收集真实员工评价。</p><Link to={employeeFeedbackHref}>查看员工反馈流程 <ArrowUpRight size={14}/></Link></div></div>:<div className="eh-privacy-note"><BriefcaseBusiness size={20}/><p>求职者将能在查看企业招聘岗位时，看到已公开的可信评分和解释。评分未核验前只显示「待评估」，不影响查看职位。</p></div>}
         </div>
       </div>}
       <div className="eh-footer-nav"><Link to="/employer/start">企业服务入口</Link><Link to="/employer/workspace">现有招聘管理</Link><Link to="/recruiter/onboarding">现有认证流程</Link></div>

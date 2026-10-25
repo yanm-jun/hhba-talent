@@ -51,7 +51,7 @@ try{
  await at('/employer/public');
  await page.getByRole('heading',{name:'企业公开档案（结构预览）'}).waitFor();
  await page.getByRole('button',{name:'员工'}).click();
- await page.getByText(/员工真实反馈入口待建立/).waitFor();
+ await page.getByRole('link',{name:/查看员工反馈流程/}).waitFor();
  await page.screenshot({path:'employer-review/public-employee-view.png',fullPage:true});
  await page.getByRole('link',{name:'现有招聘管理'}).click();
  await at('/employer/workspace');

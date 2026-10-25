@@ -1,0 +1,178 @@
+name: HHBA Employee Feedback Phase 2 - privacy and Pages preview
+
+on:
+  push:
+    branches: [feat/employer-private-feedback-20261025]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: hhba-employee-feedback-phase2
+  cancel-in-progress: true
+
+jobs:
+  verify-and-assemble:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: hhba_ci
+          POSTGRES_PASSWORD: evidence_ci_test_only
+          POSTGRES_DB: hhba_evidence_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hhba_ci -d hhba_evidence_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      HHBA_EVIDENCE_TEST_PG_DSN: 'postgresql://hhba_ci:evidence_ci_test_only@127.0.0.1:5432/hhba_evidence_ci'
+    steps:
+      - name: Checkout isolated evidence branch only
+        uses: actions/checkout@v4
+        with:
+          ref: feat/employer-private-feedback-20261025
+      - name: Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: apps/api/requirements-evidence-dev.txt
+      - name: Install isolated API test dependencies
+        run: python -m pip install -r apps/api/requirements-evidence-dev.txt
+      - name: Verify tenant boundaries, employee feedback tickets and private aggregate thresholds
+        run: python -m unittest discover -s apps/api/tests -v
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install web dependencies
+        run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Run original employer and overseas job regression contracts
+        working-directory: apps/web
+        run: node --test scripts/employer-growth.contract.test.mjs scripts/curated-offline.contract.test.mjs scripts/employer-evidence.contract.test.mjs scripts/employee-feedback.contract.test.mjs
+      - name: Build site with sensitive APIs disabled
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/preview-employer/'
+          VITE_HHBA_CURATED_STATIC: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_HHBA_EVIDENCE_API_ENABLED: '0'
+          VITE_HHBA_EMPLOYEE_FEEDBACK_API_ENABLED: '0'
+          VITE_DEMO_ACCOUNT_ENABLED: '0'
+        run: npm run build
+      - name: Prepare private-free static route refresh paths for browser tests
+        run: |
+          mkdir -p /tmp/hhba-evidence-test/hhba-talent/preview-employer
+          cp -a apps/web/dist/. /tmp/hhba-evidence-test/hhba-talent/preview-employer/
+          for path in employer/start employer/onboarding-preview employer/hub employer/growth employer/aid employer/public employer/workspace employer/evidence admin/employer-evidence employee/feedback; do
+            mkdir -p "/tmp/hhba-evidence-test/hhba-talent/preview-employer/$path"
+            cp apps/web/dist/index.html "/tmp/hhba-evidence-test/hhba-talent/preview-employer/$path/index.html"
+          done
+          (python3 -m http.server 4173 --bind 127.0.0.1 --directory /tmp/hhba-evidence-test >/tmp/hhba-evidence-test.log 2>&1 &)
+      - name: Setup Chromium browser testing
+        run: |
+          npm install --no-save --no-package-lock --prefix apps/web playwright@1.56.1 --no-audit --no-fund
+          cd apps/web
+          npx playwright install --with-deps chromium
+      - name: Walk employee-friendly employer, evidence and admin pages
+        working-directory: apps/web
+        run: |
+          node scripts/employer-growth.browser.mjs
+          node scripts/employer-evidence.browser.mjs
+          node scripts/employee-feedback.browser.mjs
+      - name: Restore last verified site including original homepage and overseas market
+        uses: actions/download-artifact@v4
+        with:
+          name: hhba-employer-evidence-phase1-review
+          run-id: 40163406695
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: previously-published
+      - name: Replace only the employer preview, preserve original and overseas pages
+        run: |
+          set -euo pipefail
+          test -s previously-published/combined/index.html
+          test -s previously-published/combined/preview-100/index.html
+          test -s previously-published/combined/preview-100/curated/v1/jobs.json
+          cp -a previously-published/combined/. combined/
+          rm -rf combined/preview-employer
+          mkdir -p combined/preview-employer
+          cp -a apps/web/dist/. combined/preview-employer/
+          cp combined/preview-employer/index.html combined/preview-employer/404.html
+          for path in employer/start employer/onboarding-preview employer/hub employer/growth employer/aid employer/public employer/workspace employer/evidence admin/employer-evidence employee/feedback; do
+            mkdir -p "combined/preview-employer/$path"
+            cp combined/preview-employer/index.html "combined/preview-employer/$path/index.html"
+          done
+          cmp previously-published/combined/index.html combined/index.html
+          cmp previously-published/combined/preview-100/index.html combined/preview-100/index.html
+          test -s combined/preview-employer/employer/evidence/index.html
+          grep -q '/hhba-talent/preview-employer/assets/' combined/preview-employer/index.html
+          ! grep -R -E 'BEGIN (RSA|OPENSSH) PRIVATE KEY' combined/preview-employer
+          echo 'HHBA_EVIDENCE_PREVIEW_SAFE_TO_DEPLOY'
+      - name: Save screenshots and assembled static preview
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-employee-feedback-phase2-review
+          path: |
+            apps/web/employer-review/
+            apps/web/evidence-review/
+            apps/web/feedback-review/
+            combined/
+          retention-days: 14
+      - name: Package combined Pages site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: combined
+
+  deploy-preview:
+    needs: verify-and-assemble
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: hhba-company200-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  verify-live:
+    needs: deploy-preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Confirm original HHBA, overseas jobs and employee report deep link
+        run: |
+          set -euo pipefail
+          root='https://yanm-jun.github.io/hhba-talent'
+          for try in 1 2 3 4 5 6; do
+            if curl -fsSL "$root/" -o /tmp/hhba-home.html &&
+               curl -fsSL "$root/preview-100/curated/v1/jobs.json" -o /tmp/hhba-jobs.json &&
+               curl -fsSL "$root/preview-employer/employer/evidence/" -o /tmp/hhba-evidence.html &&
+               curl -fsSL "$root/preview-employer/admin/employer-evidence/" -o /tmp/hhba-admin.html &&
+               curl -fsSL "$root/preview-employer/employee/feedback/" -o /tmp/hhba-feedback.html; then break; fi
+            if [ "$try" = 6 ]; then exit 1; fi
+            sleep 10
+          done
+          grep -q '/hhba-talent/assets/' /tmp/hhba-home.html
+          grep -q '/hhba-talent/preview-employer/assets/' /tmp/hhba-evidence.html
+          grep -q '/hhba-talent/preview-employer/assets/' /tmp/hhba-admin.html
+          grep -q '/hhba-talent/preview-employer/assets/' /tmp/hhba-feedback.html
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const data=JSON.parse(fs.readFileSync('/tmp/hhba-jobs.json'));
+          if(data.jobs.length!==100)throw Error('EXISTING_JOB_ARCHIVE_MISSING');
+          console.log('HHBA_FEEDBACK_PREVIEW_PUBLIC_OK',{overseasArchivedJobs:100,originalHomepagePreserved:true,evidenceApiEnabled:false});
+          NODE
