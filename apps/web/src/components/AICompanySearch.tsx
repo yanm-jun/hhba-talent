@@ -128,7 +128,7 @@ export function AICompanySearch(){
        :c.overview.slice(0,150)}</p>
      <div className="ai-company-card-footer"><small>资料记录：{c.lastReviewed||'待核对'}</small>
       {c.route&&<Link to={c.route}>企业介绍 <ArrowRight size={14}/></Link>}
-      {verifiedUrl(c.careers)&&<a href={verifiedUrl(c.careers)} target="_blank" rel="noopener noreferrer">官方招聘 <ExternalLink size={14}/></a>}
+      {verifiedUrl(c.careers)&&<a data-hhba-recruitment-outbound="true" href={verifiedUrl(c.careers)} target="_blank" rel="noopener noreferrer">官方招聘 <ExternalLink size={14}/></a>}
      </div>
     </article>)}</div>}
   </div>}
@@ -141,7 +141,7 @@ export function AICompanySearch(){
      {result.directions.length>0&&<p className="ai-company-directions">{result.directions.join(' · ')}</p>}
      <div className="ai-company-card-footer"><small>不代表当前在招或保证符合任职资格</small>
       {company.route&&<Link to={company.route}>企业介绍 <ArrowRight size={14}/></Link>}
-      {verifiedUrl(company.careers)&&<a href={verifiedUrl(company.careers)} target="_blank" rel="noopener noreferrer">官方招聘 <ExternalLink size={14}/></a>}
+      {verifiedUrl(company.careers)&&<a data-hhba-recruitment-outbound="true" href={verifiedUrl(company.careers)} target="_blank" rel="noopener noreferrer">官方招聘 <ExternalLink size={14}/></a>}
      </div>
     </article>)}</div>}
   </div>}
