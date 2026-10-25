@@ -73,7 +73,7 @@ class FakeRepo:
             "id": uid, "organization_id": kw["organization_id"],
             "private_storage_key": kw["private_storage_key"],
             "submitted_by": kw["actor_id"], "status": "pending_review",
-            "file_mime": kw["mime"],
+            "security_status": "pending_scan", "file_mime": kw["mime"],
         }
         self.rows[uid] = row
         return {"id": uid, "organization_id": row["organization_id"],
@@ -99,6 +99,8 @@ class FakeRepo:
         row = await self.get_private_item(item_id)
         require_independent_review(row["submitted_by"], reviewer_id)
         require_review_transition(row["status"], decision)
+        if decision == "verified" and row["security_status"] != "clean":
+            raise HTTPException(409, detail="FILE_SECURITY_CHECK_REQUIRED")
         if len(reason.strip()) < 12:
             raise HTTPException(422, detail="INVALID_REVIEW_REASON")
         row["status"] = decision
@@ -142,6 +144,9 @@ class EvidenceApiTests(unittest.TestCase):
         self.assertNotIn("private_storage_key", files.text)
         permitted = self.client.get(
             f"/api/v1/organizations/{self.org}/evidence/{uid}/file")
+        self.assertEqual(permitted.status_code, 409)
+        self.repo.rows[uid]["security_status"] = "clean"  # scanner integration simulated in isolated test
+        permitted = self.client.get(f"/api/v1/organizations/{self.org}/evidence/{uid}/file")
         self.assertEqual(permitted.status_code, 200)
         self.assertIn("no-store", permitted.headers["cache-control"])
         self.assertEqual(permitted.content, b"%PDF-1.6\nFAKE UNIT TEST DOCUMENT")
@@ -166,6 +171,9 @@ class EvidenceApiTests(unittest.TestCase):
             "decision":"verified","reason":"Documents validated in two independent checks."}).status_code,403)
         self.actor[0]=Principal(self.reviewer,{},True)
         self.assertEqual(len(self.client.get('/api/v1/admin/evidence').json()['items']),1)
+        self.assertEqual(self.client.post(endpoint,json={
+            "decision":"verified","reason":"File not independently scanned by scanner service."}).status_code,409)
+        self.repo.rows[uid]["security_status"]="clean"  # not exposed by any public API
         result=self.client.post(endpoint,json={
             "decision":"verified","reason":"Documents validated in two independent checks."})
         self.assertEqual(result.status_code,200,result.text)
@@ -209,6 +217,13 @@ class PostgresContractTests(unittest.TestCase):
             with self.assertRaises(HTTPException):
                 await repo.review(item_id=row["id"],decision="verified",
                                   reason="Self-review is not allowed at HHBA.",reviewer_id=actor)
+            with self.assertRaises(HTTPException) as scan_error:
+                await repo.review(
+                    item_id=row["id"], decision="verified",
+                    reason="Missing malware check must fail verification.", reviewer_id=reviewer)
+            self.assertEqual(scan_error.exception.status_code, 409)
+            async with pool.acquire() as conn:
+                await conn.execute("UPDATE hhba_employer_evidence SET security_status='clean' WHERE id=$1",uuid4_from(row["id"]))
             approved=await repo.review(
                 item_id=row["id"],decision="verified",
                 reason="Auditor checked supporting evidence and provenance.",reviewer_id=reviewer)
