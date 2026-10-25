@@ -68,7 +68,7 @@ function BrandManifesto() {
           observer.unobserve(entry.target);
         }
       });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.06 });
+    }, { rootMargin: '0px 0px -4% 0px', threshold: 0.06 });
     elements.forEach((element) => observer.observe(element));
     section.classList.add('join-manifesto-animate');
     return () => {
@@ -78,19 +78,30 @@ function BrandManifesto() {
   }, []);
 
   return <section ref={sectionRef} className="join-manifesto-section" id="join-manifesto" aria-labelledby="join-manifesto-title">
-    <div className="join-manifesto-intro" data-manifesto-reveal>
-      <p className="join-kicker">OUR MANIFESTO · HHBA 品牌宣言</p>
-      <h2 id="join-manifesto-title">有些话，我们想认真地写下来。</h2>
-      <p>一封写给未来同行者的信，也是我们希望一步步践行的信念。</p>
-    </div>
-    <figure className="join-manifesto-letter" data-manifesto-reveal>
-      <img src={import.meta.env.BASE_URL + 'images/hhba-brand-manifesto.webp'}
-           width={1024} height={1536}
-           loading="lazy" decoding="async"
-           alt="HHBA 品牌宣言手写信，标题为让劳动更有尊严、让商业更有温度，正文阐述诚信招聘、善待劳动者和共同成长，末尾保留创办者手写签名。" />
-    </figure>
-    <div className="join-manifesto-signoff" data-manifesto-reveal>
-      <p>我们的承诺，从自己开始。</p>
+    <div className="join-manifesto-inner">
+      <header className="join-manifesto-intro" data-manifesto-reveal>
+        <p className="join-manifesto-eyebrow">A NOTE FROM HHBA'S FOUNDER</p>
+        <h2 id="join-manifesto-title">让劳动更有尊严，让商业更有温度</h2>
+      </header>
+      <article className="join-manifesto-copy" aria-label="HHBA 品牌宣言全文">
+        <p data-manifesto-reveal><strong>每一份简历背后，都是一个认真生活的人。</strong> 有人为了面试奔赴陌生的城市，有人一次次修改简历、等待回应，也有人只是希望通过自己的努力，换来一份稳定的收入和应有的尊重。</p>
+        <p data-manifesto-reveal>但现实并不总是如此。虚假的招聘信息、不透明的薪酬待遇、迟迟没有回应的申请，让许多人的期待变成了失望。</p>
+        <p data-manifesto-reveal>我们始终相信：<strong>求职者可以不被录用，但不应该被欺骗；员工可以承担责任，但不应该失去尊严；企业可以追求利润，但不应该忽视创造价值的人。</strong> 这正是我们创立 HHBA 的初心。</p>
+        <p data-manifesto-reveal>我们不希望劳动者与企业彼此对立。我们相信，员工的幸福与企业的发展，从来不应该是一道单选题。我们希望通过技术与可信的信息，让招聘更加透明，让劳动者的声音被听见，让善待员工的企业获得更多认可，也让愿意改变的企业拥有改善的机会。</p>
+        <p data-manifesto-reveal><strong>我们不只是希望发现问题，更希望推动问题得到解决。</strong> 我们也会从自己做起，将尊重、诚信与责任落实到每一次招聘、每一份协议和每一个决定中。</p>
+        <p data-manifesto-reveal>我们知道，一个平台无法改变所有问题，但改变，总需要有人开始。<strong>愿每一份努力都被尊重，每一份善意都能得到回报。</strong></p>
+        <p className="join-manifesto-closing" data-manifesto-reveal><strong>让劳动获得尊严，让招聘回归诚信。让善待劳动者，成为真正值得坚持的商业选择。</strong></p>
+      </article>
+      <footer className="join-manifesto-signoff" data-manifesto-reveal>
+        <span className="join-manifesto-rule" aria-hidden="true" />
+        <p className="join-manifesto-identity">HHBA — Human Capability Network</p>
+        <p className="join-manifesto-tagline">让机会与人才，找到彼此。</p>
+        <p className="join-manifesto-founder-label">创办者 · 闫明骏</p>
+        <img className="join-manifesto-signature"
+             src={import.meta.env.BASE_URL + 'images/hhba-founder-signature.webp'}
+             alt="闫明骏的手写姓名签名" width={1185} height={503}
+             decoding="async" loading="lazy" />
+      </footer>
     </div>
   </section>;
 }
