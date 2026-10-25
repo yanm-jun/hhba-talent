@@ -1,4 +1,4 @@
-import {useEffect, useState, type FormEvent} from 'react';
+import {useState, type FormEvent} from 'react';
 import {
   ArrowLeft, ArrowRight, BadgeCheck, BookOpenCheck, Calculator, ClipboardCheck,
   FileCheck2, HeartHandshake, LockKeyhole, RefreshCw, Scale, ShieldCheck, Users
@@ -62,7 +62,6 @@ export function EmployerScoringPage({user}:{user:User|null}){
   </main></Shell>;
 }
 
-type Decision = 'verified'|'needs_more_info'|'rejected';
 export function AdminEmployerScoringPage({user}:{user:User|null}){
   const enabled=scoringApiReady&&user?.role==='admin';
   const [orgId,setOrgId]=useState('');
