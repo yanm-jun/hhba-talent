@@ -25,7 +25,6 @@ export function Shell({ user, children }: { user: User | null; children: React.R
  const hasRecruiter=!!user?.account_types?.includes('recruiter');
  const candidateSignedIn=hasCandidate||(demoModeEnabled&&!!demo);
  const recruiterSignedIn=hasRecruiter;
- const candidateEntry=candidateSignedIn?'/candidate/account':'/candidate/register';
  const employerEntry=recruiterSignedIn?'/employer/hub':'/employer/onboarding-preview';
  return <main className={'app-shell hhba-experience-'+experience}>
   <header className="topbar hhba-experience-header">
