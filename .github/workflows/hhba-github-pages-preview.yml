@@ -43,6 +43,10 @@ jobs:
       - name: Verify public HHBA join-us page, application demo privacy and career disclosure
         working-directory: apps/web
         run: node --test scripts/join-us.contract.test.mjs
+      - name: Confirm selected team photograph is packaged for public Pages
+        run: |
+          test -s apps/web/dist/images/hhba-join-team.webp
+          node -e "const fs=require('fs');const p='apps/web/dist/images/hhba-join-team.webp';const x=fs.readFileSync(p);if(x.toString('ascii',0,4)!=='RIFF'||x.toString('ascii',8,12)!=='WEBP'||x.length<20000)process.exit(1);console.log('HHBA_REAL_JOIN_PHOTO',x.length)"
       - name: Refresh complete white HHBA job index from 50 verified official ATS boards
         working-directory: apps/web
         run: node scripts/prepare-pages-jobs.mjs
