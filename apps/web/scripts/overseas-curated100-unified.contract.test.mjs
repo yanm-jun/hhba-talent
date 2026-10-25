@@ -58,7 +58,7 @@ test('all overseas details use the old already-rendered HHBA editorial branch, n
  const at=detail.indexOf("if(job.recordKind==='CURATED_HISTORICAL'");
  const api=detail.indexOf("fetchPreparedBilingualJd(job,controller.signal)");
  assert.ok(at>=0&&api>at,'archived record must short-circuit before external JD fetch');
- assert.ok(original.includes("const url=import.meta.env.BASE_URL+'curated/v1/jobs.json'"));
+ assert.ok(original.includes("fetch(import.meta.env.BASE_URL+'curated/v1/jobs.json'"));
  assert.ok(!original.includes("fetch('https://jobs.ashbyhq.com"));
 });
 test('home highlighted companies reference archived curated positions in static mode',()=>{
