@@ -1,0 +1,50 @@
+name: HHBA Signed Manifesto Pre-release Checks
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-signed-manifesto-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Check out the proposed manifesto branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/join-manifesto-scroll-20261025
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install web dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Build public HHBA site
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+        run: npm run build
+      - name: Run join-us and manifesto tests
+        working-directory: apps/web
+        run: node --test scripts/join-us.contract.test.mjs
+      - name: Verify original signed image is included in built assets
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p='apps/web/dist/images/hhba-brand-manifesto.webp';
+          if(!fs.existsSync(p))throw Error('BRAND_MANIFESTO_IMAGE_MISSING');
+          const b=fs.readFileSync(p);
+          if(b.toString('ascii',0,4)!=='RIFF'||b.toString('ascii',8,12)!=='WEBP'||b.length<50000)
+            throw Error('BRAND_MANIFESTO_IMAGE_CORRUPT');
+          const page=fs.readFileSync('apps/web/src/pages/JoinUsPage.tsx','utf8');
+          const timeline=page.indexOf('join-progress-section');
+          const manifesto=page.indexOf('<BrandManifesto />');
+          const apply=page.indexOf('join-apply-section');
+          if(!(timeline<manifesto && manifesto<apply))throw Error('INCORRECT_MANIFESTO_POSITION');
+          console.log('MANIFESTO_ASSET_INCLUDED',b.length);
+          NODE
