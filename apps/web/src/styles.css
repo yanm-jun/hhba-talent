@@ -154,3 +154,10 @@
  .join-footer{align-items:flex-start;flex-direction:column;gap:6px}
 }
 @media(prefers-reduced-motion:reduce){.join-page *, .join-page *::before, .join-page *::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+
+/* HHBA Join — selected authentic photograph (not an HHBA employee portrait). */
+.join-hero-photo{width:100%;min-width:0;margin:0;align-self:center;border-radius:20px;background:#fff;overflow:hidden;border:1px solid #e7ebf1;box-shadow:0 12px 34px rgba(40,56,78,.07)}
+.join-hero-photo img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;object-position:center center}
+.join-hero-photo figcaption{padding:12px 15px;color:#8492a3;background:#fff;font-size:11px;line-height:1.5}
+@media(max-width:560px){.join-hero-photo{border-radius:15px}.join-hero-photo figcaption{padding:10px 12px}}
