@@ -46,3 +46,16 @@ test('responsive layout and reduced motion keep entry usable on phones', () => {
   assert.match(css,/prefers-reduced-motion:reduce/);
   assert.match(page, /aria-labelledby="join-apply-title"/);
 });
+
+
+test('selected real team photo is committed locally, is WebP, and is not labelled as HHBA employees', () => {
+  const photo = readFileSync(new URL('../public/images/hhba-join-team.webp', import.meta.url));
+  assert.equal(photo.subarray(0, 4).toString('ascii'), 'RIFF');
+  assert.equal(photo.subarray(8, 12).toString('ascii'), 'WEBP');
+  assert.ok(photo.byteLength > 20_000 && photo.byteLength < 250_000);
+  assert.match(page, /images\/hhba-join-team\.webp/);
+  assert.match(page, /alt="四位同事围绕笔记本电脑讨论项目的真实摄影照片"/);
+  assert.match(page, /非 HHBA 实际团队成员/);
+  assert.doesNotMatch(page, /className="join-hero-art"/);
+  assert.match(css, /\.join-hero-photo img\{/);
+});
