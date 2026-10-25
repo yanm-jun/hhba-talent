@@ -13,13 +13,13 @@
 .hhba-experience-header>nav .hhba-account-dropdown-trigger{display:flex;align-items:center;gap:5px;white-space:nowrap}
 .hhba-public-hero{padding-top:clamp(4px,2vw,19px)}
 .hhba-public-eyebrow{margin:0 auto 13px!important;font-size:10px!important;letter-spacing:.13em;color:#478163!important;font-weight:750}
-.hhba-public-entry-grid{max-width:790px;gap:20px}
-.hhba-public-entry-grid .hhba-entry-card{min-height:245px;border-radius:15px;padding:19px;gap:0;text-decoration:none!important}
-.hhba-public-entry-grid .hhba-entry-card .entry-icon{height:67px;border-radius:11px}
-.hhba-entry-copy{display:flex;flex-direction:column;gap:9px;padding-top:17px;flex:1}
-.hhba-public-entry-grid .hhba-entry-card strong{font-size:20px;margin:0;color:#172b40}
-.hhba-public-entry-grid .hhba-entry-card small{margin:0;color:#65768c;font-size:13px;line-height:1.7}
-.hhba-public-entry-grid .hhba-entry-card .entry-footer{padding-top:14px;border-top:1px solid #eef0f2;color:#286a4b;font-weight:700;margin-top:16px}
+.hhba-public-entry-grid{max-width:664px;gap:12px}
+.hhba-public-entry-grid .hhba-entry-card{min-height:172px;border-radius:12px;padding:10px;gap:0;text-decoration:none!important}
+.hhba-public-entry-grid .hhba-entry-card .entry-icon{height:43px;border-radius:8px}
+.hhba-entry-copy{display:flex;flex-direction:column;gap:7px;padding-top:13px;flex:1}
+.hhba-public-entry-grid .hhba-entry-card strong{font-size:17px;margin:0;color:#172b40}
+.hhba-public-entry-grid .hhba-entry-card small{margin:0;color:#65768c;font-size:12px;line-height:1.5}
+.hhba-public-entry-grid .hhba-entry-card .entry-footer{padding-top:12px;border-top:0;color:#286a4b;font-weight:700;margin-top:auto}
 .hhba-public-browse{max-width:790px;margin:18px auto 30px;background:#f3f8f5;border:1px solid #e0ece5;padding:14px 18px;border-radius:11px;display:flex;align-items:center;justify-content:space-between;gap:15px;font-size:12px;color:#456a52}
 .hhba-public-browse>div{display:flex;align-items:center;gap:9px;line-height:1.7}
 .hhba-public-browse>div svg{flex-shrink:0}
@@ -46,7 +46,7 @@
  .hhba-nav-account{padding:8px 10px}
  .hhba-nav-switch{padding:7px}
  .hhba-public-entry-grid{grid-template-columns:1fr;gap:12px}
- .hhba-public-entry-grid .hhba-entry-card{min-height:190px}
+ .hhba-public-entry-grid .hhba-entry-card{min-height:166px}
  .hhba-public-browse{align-items:flex-start;flex-direction:column;gap:12px}
  .hhba-employer-services{grid-template-columns:1fr}
  .hhba-employer-actions{grid-template-columns:1fr}
