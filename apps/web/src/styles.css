@@ -161,3 +161,43 @@
 .join-hero-photo img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;object-position:center center}
 .join-hero-photo figcaption{padding:12px 15px;color:#8492a3;background:#fff;font-size:11px;line-height:1.5}
 @media(max-width:560px){.join-hero-photo{border-radius:15px}.join-hero-photo figcaption{padding:10px 12px}}
+
+
+/* HHBA founder manifesto — intentionally placed between real progress and application. */
+.join-manifesto-section{
+  max-width:920px;margin:44px auto 38px;padding:62px 22px 46px;
+  scroll-margin-top:36px;text-align:center;
+  background:linear-gradient(180deg,#f8f9fa 0%,#f5f1ea 35%,#f8f9fa 100%);
+  border-radius:23px;
+}
+.join-manifesto-intro{max-width:740px;margin:0 auto 34px}
+.join-manifesto-intro .join-kicker{justify-content:center;margin-bottom:15px}
+.join-manifesto-intro h2{margin:0;color:#243448;font-size:clamp(26px,3.3vw,36px);font-weight:760;letter-spacing:-.7px;line-height:1.45}
+.join-manifesto-intro>p:last-child{margin:13px auto 0;color:#7b7c80;font-size:13px;line-height:1.85}
+.join-manifesto-letter{
+  display:block;max-width:770px;width:100%;margin:0 auto;
+  background:#e4d6bb;border:1px solid #e8ded0;border-radius:8px;
+  box-shadow:0 24px 50px rgba(78,62,44,.14),0 5px 14px rgba(72,58,42,.07);
+  overflow:hidden;
+}
+.join-manifesto-letter img{display:block;width:100%;height:auto;aspect-ratio:2/3;object-fit:contain}
+.join-manifesto-signoff{padding:34px 8px 0}
+.join-manifesto-signoff p{font-size:15px;font-weight:650;color:#455a73;margin:0;letter-spacing:.06em}
+.join-manifesto-animate [data-manifesto-reveal]{opacity:0;transform:translate3d(0,21px,0);transition:opacity .78s ease,transform .82s cubic-bezier(.2,.8,.2,1)}
+.join-manifesto-animate [data-manifesto-reveal].is-revealed{opacity:1;transform:translate3d(0,0,0)}
+.join-manifesto-animate .join-manifesto-letter{transition-delay:.11s}
+.join-manifesto-animate .join-manifesto-signoff{transition-delay:.09s}
+@media(max-width:560px){
+  .join-manifesto-section{margin:16px -10px 18px;padding:43px 10px 33px;border-radius:16px}
+  .join-manifesto-intro{margin-bottom:25px}
+  .join-manifesto-intro h2{font-size:25px}
+  .join-manifesto-intro>p:last-child{font-size:12px;padding:0 8px}
+  .join-manifesto-letter{border-radius:5px;box-shadow:0 13px 26px rgba(78,62,44,.12)}
+  .join-manifesto-signoff{padding-top:25px}
+  .join-manifesto-signoff p{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){
+ .join-manifesto-animate [data-manifesto-reveal]{
+   opacity:1!important;transform:none!important;transition:none!important
+ }
+}
