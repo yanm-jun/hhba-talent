@@ -130,7 +130,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
        <small>{recruitment?.availability==='unconfirmed_runtime'?'招聘线索的当前访问状态尚未完成核验，不代表已能直投岗位':recruitment?.kind==='group_recruitment_portal'?'集团统一招聘平台；投递前请核对实际用人公司':recruitment?.availability==='announcement_only'?'仅显示招聘公告，非岗位直投入口':recruitment?.availability==='temporarily_unavailable'?'官网目前显示维护中，暂可能无法投递':'已登记的企业招聘专用渠道'}</small>
        {recruitment?.recruitmentEntity&&recruitment.recruitmentEntity!==company.name?<small>招聘系统归属：{recruitment.recruitmentEntity}（并非 {company.name} 独立招聘系统）</small>:null}
        {recruitment?.notes?<small>{recruitment.notes}</small>:null}</div>
-       <a href={careers} target="_blank" rel="noopener noreferrer" className="domestic-careers-link">{recruitment?.availability==='announcement_only'?'查看招聘公告':recruitment?.availability==='temporarily_unavailable'?'访问招聘系统（维护中）':recruitment?.availability==='unconfirmed_runtime'?'查看待核实招聘线索':'查看招聘官网'} <ExternalLink size={15}/></a></div>:
+       <a data-hhba-recruitment-outbound="true" href={careers} target="_blank" rel="noopener noreferrer" className="domestic-careers-link">{recruitment?.availability==='announcement_only'?'查看招聘公告':recruitment?.availability==='temporarily_unavailable'?'访问招聘系统（维护中）':recruitment?.availability==='unconfirmed_runtime'?'查看待核实招聘线索':'查看招聘官网'} <ExternalLink size={15}/></a></div>:
        <div className="domestic-editorial-limited">尚未核验该主体的官方招聘入口，暂不展示“查看招聘官网”按钮。
        </div>}
     </section>}
