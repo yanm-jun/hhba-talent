@@ -1,7 +1,7 @@
 // One recruitment-outbound policy for every HHBA route and every employer.
 // Non-recruitment sources, photos, normal internal browsing are deliberately excluded.
 const KEY='hhba.recruitment.pending.v1';
-const EXPLICIT=/招聘官网|招聘网站|招聘系统|招聘频道|招聘公告|招聘线索|官方岗位|官方职位|岗位投递|企业投递|前往投递|官网核实完整职位|打开 ATS|完整 JD|去官方投递|投递状态|查看要求|Apply on official|Apply now|Employer careers site|Original employer listing|original job|official job|official application|careers site|job posting|openings|apply to/i;
+const EXPLICIT=/官方招聘|招聘官网|招聘网站|招聘系统|招聘频道|招聘公告|招聘线索|官方岗位|官方原始岗位|官方职位|企业官网核对|岗位投递|企业投递|前往投递|官方投递页|前往官方招聘|官网核实完整职位|打开 ATS|完整 JD|去官方投递|投递状态|查看要求|Apply on official|Apply now|Employer careers site|Original employer listing|original job|official job|official application|careers site|job posting|openings|apply to/i;
 const SOURCES=/核验依据|资料来源|图片来源|照片来源|岗位来源说明|图片授权|品牌图来源|企业公开资料|人物身份来源|地址来源|官网图标来源|source citation|photo credit|image license/i;
 const PATH=/\/(?:careers?|jobs?|openings|apply|applications|positions|recruit|zhaopin|campus|social)(?:\/|[?#]|$)/i;
 export type PendingOfficialRecruitment={url:string;title:string;origin:string;at:number};
