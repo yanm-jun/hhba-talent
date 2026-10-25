@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 
 const src = name => readFileSync(new URL('../src/' + name, import.meta.url), 'utf8');
 const page = src('pages/JoinUsPage.tsx');
@@ -58,4 +58,22 @@ test('selected real team photo is committed locally, is WebP, and is not labelle
   assert.doesNotMatch(page, /团队协作场景示意 · 非 HHBA 实际团队成员/);
   assert.doesNotMatch(page, /className="join-hero-art"/);
   assert.match(css, /\.join-hero-photo img\{/);
+});
+
+test('signed HHBA founder manifesto is positioned after the progress timeline before applicant form', () => {
+  const progress = page.indexOf('className="join-section join-progress-section"');
+  const manifesto = page.indexOf('<BrandManifesto />');
+  const application = page.indexOf('className="join-section join-apply-section"');
+  assert.ok(progress >= 0 && progress < manifesto && manifesto < application);
+  assert.match(page, /有些话，我们想认真地写下来/);
+  assert.match(page, /我们的承诺，从自己开始/);
+  assert.match(page, /IntersectionObserver/);
+  assert.match(page, /prefers-reduced-motion/);
+  assert.match(css, /join-manifesto-animate/);
+});
+
+test('signed original visual must be packaged before the public build is published', () => {
+  assert.match(page, /images\\/hhba-brand-manifesto\\.webp/);
+  assert.ok(existsSync(new URL('../public/images/hhba-brand-manifesto.webp', import.meta.url)),
+    'The user supplied manifesto image needs to be committed before publishing; never deploy a broken image.');
 });
