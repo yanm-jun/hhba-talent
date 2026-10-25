@@ -74,6 +74,6 @@ export function EmployeeFeedbackPage({user}:{user:User|null}) {
         <button className="ef-submit" disabled={!enabled||!ticket||!consent||!questions.every(q=>Number.isInteger(answers[q.key])&&Number(answers[q.key])>=1&&Number(answers[q.key])<=5)||busy||submitted} type="submit">{submitted?'已接收':busy?'处理中…':employeeFeedbackApiReady?'提交本季度反馈':'尚未开放真实提交'}</button>
       </section>
     </form>
-    <div className="ef-footer"><HeartHandshake size={20}/><p>HHBA 希望真实改善员工处境，而不是用好评数量决定企业命运。反馈将与独立的证据核验、申诉和评分规则配合使用。</p></div>
+    <div className="ef-footer"><HeartHandshake size={20}/><div><p>HHBA 希望真实改善员工处境，而不是用好评数量决定企业命运。反馈将与独立的证据核验、申诉和评分规则配合使用。</p><Link to={"/employee/privacy-concerns"+(isUuid(orgId)?"?org="+encodeURIComponent(orgId):"")}>反馈过程有隐私疑虑？查看申诉入口</Link></div></div>
   </main></Shell>;
 }

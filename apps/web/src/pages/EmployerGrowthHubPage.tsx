@@ -171,7 +171,7 @@ export function EmployerGrowthHubPage({ user, view }: { user: User | null; view:
       <p className="eh-sidebar-title">企业工作台</p>
       <nav aria-label="企业服务导航">
         {nav.map(({view:v,label,icon:Icon})=><Link className={'eh-sidebar-link '+(view===v?'active':'')} key={v} to={routeFor(v)}><Icon size={17}/>{label}</Link>)}
-        <Link className="eh-sidebar-link" to="/employer/evidence"><FileCheck2 size={17}/>证明材料核验</Link>
+        <Link className="eh-sidebar-link" to="/employer/evidence"><FileCheck2 size={17}/>证明材料核验</Link><Link className="eh-sidebar-link" to="/employer/appeals"><ShieldCheck size={17}/>异议与申诉</Link>
         <Link className="eh-sidebar-link" to="/employer/workspace"><BriefcaseBusiness size={17}/>招聘管理</Link>
         <Link className="eh-sidebar-link" to="/employer/workspace"><UsersRound size={17}/>候选人与人才</Link>
         <Link className="eh-sidebar-link" to="/recruiter/onboarding"><UserRoundCheck size={17}/>企业认证</Link>
