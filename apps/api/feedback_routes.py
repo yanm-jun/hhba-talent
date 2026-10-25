@@ -9,8 +9,8 @@ from collections.abc import Callable
 from datetime import datetime, timezone
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, Depends, Response
+from pydantic import BaseModel, Field, StrictInt, ConfigDict
 
 from .feedback_domain import (
     DIMENSIONS, EmployeeActor, current_period, identity_hash, new_ticket,
@@ -21,18 +21,20 @@ from .feedback_store import PostgresFeedbackRepository
 
 
 class EligibilityInput(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     organization_id: str
 
 
 class FeedbackInput(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     organization_id: str
     ticket: str = Field(min_length=64, max_length=64)
     # Disallow unbounded comments, personal data and unexpected keys.
-    pay: int = Field(ge=1, le=5)
-    insurance: int = Field(ge=1, le=5)
-    rest: int = Field(ge=1, le=5)
-    respect: int = Field(ge=1, le=5)
-    development: int = Field(ge=1, le=5)
+    pay: StrictInt = Field(ge=1, le=5)
+    insurance: StrictInt = Field(ge=1, le=5)
+    rest: StrictInt = Field(ge=1, le=5)
+    respect: StrictInt = Field(ge=1, le=5)
+    development: StrictInt = Field(ge=1, le=5)
 
 
 def build_feedback_router(
@@ -59,9 +61,11 @@ def build_feedback_router(
         return actor
 
     @router.post("/employee-feedback/ticket")
-    async def issue_ticket(body: EligibilityInput,
+    async def issue_ticket(body: EligibilityInput, response: Response,
                            actor: EmployeeActor = Depends(resolve_employee)):
         actor = await check(actor, body.organization_id)
+        response.headers['Cache-Control'] = 'private, no-store'
+        response.headers['Referrer-Policy'] = 'no-referrer'
         period = current_period()
         token = new_ticket()
         await repository.issue_ticket(
@@ -76,9 +80,10 @@ def build_feedback_router(
         }
 
     @router.post("/employee-feedback", status_code=201)
-    async def submit_feedback(body: FeedbackInput,
+    async def submit_feedback(body: FeedbackInput, response: Response,
                               actor: EmployeeActor = Depends(resolve_employee)):
         actor = await check(actor, body.organization_id)
+        response.headers['Cache-Control'] = 'private, no-store'
         period = current_period()
         ratings = validate_ratings({key:getattr(body,key) for key in DIMENSIONS})
         await repository.redeem(
