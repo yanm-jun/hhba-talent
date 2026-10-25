@@ -1,0 +1,55 @@
+name: HHBA Curated Overseas 100 Integration Preflight
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-curated-overseas100-preflight.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/overseas-curated100-only-20261025
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked frontend packages
+        working-directory: apps/web
+        run: npm ci
+      - name: Verify original 100 jobs, company media, current enterprise and personal-center features
+        working-directory: apps/web
+        run: |
+          node --test scripts/curated-offline.contract.test.mjs \
+            scripts/overseas-curated100-unified.contract.test.mjs \
+            scripts/hhba-unified-static.contract.test.mjs \
+            scripts/featured-brand-jobs.contract.test.mjs \
+            scripts/white-market-detail.contract.test.mjs
+      - name: Build GitHub Pages with curated overseas mode and existing domestic mode untouched
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+        run: npm run build
+      - name: Verify packaged 100 old jobs, original images and independent brand pages
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const data=JSON.parse(fs.readFileSync('dist/curated/v1/jobs.json','utf8'));
+          const companies=new Set(data.jobs.map(j=>j.company));
+          if(data.jobs.length!==100||companies.size!==10)throw Error('CURATED_100_BROKEN');
+          for(const j of data.jobs)if(!j.editorial?.responsibilities?.length||!j.editorial?.requirements?.length)
+            throw Error('CURATED_JD_MISSING_'+j.id);
+          for(const file of ['dist/images/hhba-join-team.webp','dist/images/hhba-founder-signature.webp','dist/preview-admin/data/workspace.json']){
+            if(!fs.existsSync(file))throw Error('PUBLIC_ASSET_LOST_'+file);
+          }
+          console.log('OVERSEAS_CURATED_100_AND_DOMESTIC_PRESERVATION_OK');
+          NODE
