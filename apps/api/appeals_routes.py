@@ -108,7 +108,7 @@ def build_appeals_router(
     @router.get("/admin/appeals")
     async def pending(actor:Principal=Depends(resolve_actor)):
         require_appeals_reviewer(actor)
-        return {"items":await repository.list_queue()}
+        return {"items":await repository.list_queue(reviewer_organizations=dict(actor.organization_roles))}
 
     @router.post("/admin/appeals/{appeal_id}/decisions")
     async def review(appeal_id:str,body:AppealReviewInput,
