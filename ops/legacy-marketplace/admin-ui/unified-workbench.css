@@ -37,3 +37,7 @@
 @media(max-width:980px){.uw-grid-actions{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:660px){.uw-metrics{grid-template-columns:1fr 1fr}.uw-task-row{grid-template-columns:minmax(0,1fr) auto;gap:8px}.uw-task-aside{display:none}.uw-small-action{font-size:11px}.uw-panel{padding:18px}.uw-grid-actions{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:420px){.uw-metrics{grid-template-columns:1fr}.uw-task-row{grid-template-columns:minmax(0,1fr)}.uw-small-action{justify-self:start}}
+
+.uw-overview-shortcuts,.uw-investor-integrity{padding:22px 24px;margin:0 0 18px}
+.uw-overview-shortcuts h2,.uw-investor-integrity h2{margin:0 0 8px;font-size:16px;color:#2e593d}
+.uw-overview-shortcuts .uw-grid-actions{margin-top:12px}
