@@ -277,3 +277,134 @@
   .join-role-advisor-note{padding:16px}
   .join-role-tags{gap:7px}
 }
+
+
+/* HHBA future vision — editorial narrative rather than marketing feature cards. */
+.join-vision{width:100%;margin:25px auto 0;scroll-margin-top:20px;color:#203149}
+.join-vision-opening{
+  background:#f4f6f8;border-radius:20px;min-height:655px;
+  padding:105px 48px 83px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center
+}
+.join-vision-eyebrow{
+  margin:0 0 36px;font-size:11px;font-weight:760;
+  letter-spacing:.165em;color:#637d9c
+}
+.join-vision-opening h2{display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-size:clamp(30px,3.8vw,49px);font-weight:760;
+  letter-spacing:-.045em;line-height:1.34;color:#1d2c40;margin:0;
+  text-wrap:balance
+}
+.join-vision-opening h2 span{display:block;max-width:100%}
+.join-vision-opening h2 .join-vision-emphasis{color:#456489}
+.join-vision-rule{width:66px;height:1px;background:#b5c4d3;margin:38px 0 32px}
+.join-vision-opening-copy{max-width:650px;display:grid;gap:16px}
+.join-vision-opening-copy p{
+  font-size:15px;color:#617185;line-height:2;margin:0;text-wrap:pretty
+}
+.join-vision-scroll-hint{
+  display:flex;align-items:center;flex-direction:column;gap:13px;
+  color:#8796a8;font-size:11px;letter-spacing:.025em;margin-top:55px
+}
+.join-vision-chapters{padding:76px 23px 92px}
+.join-vision-chapter{padding:55px 23px 59px;border-bottom:1px solid #e4e9ef}
+.join-vision-chapter:last-child{border-bottom:0}
+.join-vision-chapter-meta{display:flex;align-items:center;justify-content:space-between;
+  color:#74839a;font-size:11px;letter-spacing:.115em;font-weight:680;margin-bottom:22px
+}
+.join-vision-chapter-symbol{height:49px;width:49px;border:1px solid #e3eaf2;
+  display:grid;place-items:center;border-radius:15px;background:#f6f8fa;color:#66809e
+}
+.join-vision-chapter-content{
+  display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);
+  gap:70px;align-items:start
+}
+.join-vision-chapter h3{
+  color:#253b55;font-size:clamp(25px,2.9vw,35px);
+  letter-spacing:-.035em;line-height:1.56;font-weight:750;
+  max-width:540px;margin:0;text-wrap:balance
+}
+.join-vision-chapter-content>div{padding-top:4px;min-width:0}
+.join-vision-chapter-content p{
+  color:#6a788b;font-size:14px;line-height:2.06;margin:0 0 20px;text-wrap:pretty
+}
+.join-vision-chapter-content .join-vision-conviction{
+  color:#365475;font-size:14px;font-weight:660;margin-top:17px;margin-bottom:0
+}
+.join-vision-climax{
+  border-radius:20px;background:#263d5c;color:#fff;
+  text-align:center;padding:106px 55px 104px;display:flex;
+  flex-direction:column;align-items:center
+}
+.join-vision-climax-eyebrow{
+  color:#b8c9db;font-weight:680;font-size:11px;
+  letter-spacing:.155em;margin:0 0 32px
+}
+.join-vision-climax h3{
+  color:#fff;font-size:clamp(29px,3.5vw,44px);letter-spacing:-.035em;
+  font-weight:690;line-height:1.65;margin:0;text-wrap:balance
+}
+.join-vision-climax h3 span{display:inline}
+.join-vision-climax-rule{width:76px;height:1px;background:#72869d;margin:39px 0 31px}
+.join-vision-climax>p:last-child{
+  max-width:580px;font-size:15px;line-height:2;color:#d6e1eb;margin:0;text-wrap:pretty
+}
+.join-vision-promise{padding:96px 35px 105px;text-align:center;display:flex;
+  flex-direction:column;align-items:center
+}
+.join-vision-promise-eyebrow{
+  font-size:11px;letter-spacing:.15em;font-weight:730;color:#7a8ea7;margin:0 0 28px
+}
+.join-vision-promise h3{
+  font-size:clamp(27px,3.1vw,38px);line-height:1.5;color:#2b405d;
+  font-weight:745;letter-spacing:-.035em;margin:0 0 24px
+}
+.join-vision-promise>p:not(.join-vision-promise-eyebrow){
+  max-width:620px;font-size:14px;line-height:2;color:#6a7c91;margin:0
+}
+.join-vision-next{display:flex;align-items:center;gap:10px;color:#778ba5;font-size:11px;margin-top:48px}
+.join-vision-animate [data-vision-reveal]{
+  opacity:0;transform:translate3d(0,20px,0);
+  transition:opacity .72s ease-out,transform .82s cubic-bezier(.22,.7,.25,1)
+}
+.join-vision-animate [data-vision-reveal].is-revealed{opacity:1;transform:translate3d(0,0,0)}
+@media(max-width:850px){
+  .join-vision-opening{min-height:560px;padding:85px 28px 68px}
+  .join-vision-chapters{padding:46px 11px 58px}
+  .join-vision-chapter{padding:42px 13px 46px}
+  .join-vision-chapter-content{gap:32px;grid-template-columns:1fr 1fr}
+  .join-vision-climax{padding:84px 30px 86px}
+}
+@media(max-width:650px){
+  .join-vision{margin-top:12px;scroll-margin-top:12px}
+  .join-vision-opening{padding:73px 20px 57px;min-height:auto;border-radius:14px}
+  .join-vision-eyebrow{font-size:10px;margin-bottom:26px}
+  .join-vision-opening h2{font-size:clamp(25px,6.3vw,33px);line-height:1.55;letter-spacing:-.035em}
+  .join-vision-rule{margin:29px 0 25px}
+  .join-vision-opening-copy{gap:13px}
+  .join-vision-opening-copy p{font-size:13px;line-height:1.95}
+  .join-vision-scroll-hint{margin-top:37px;font-size:10px}
+  .join-vision-chapters{padding:31px 2px 46px}
+  .join-vision-chapter{padding:35px 13px 39px}
+  .join-vision-chapter-meta{font-size:10px;margin-bottom:17px;gap:13px}
+  .join-vision-chapter-symbol{width:39px;height:39px;border-radius:12px}
+  .join-vision-chapter-content{grid-template-columns:1fr;gap:15px}
+  .join-vision-chapter h3{font-size:clamp(24px,6vw,29px);line-height:1.5}
+  .join-vision-chapter-content p{font-size:13px;line-height:1.92;margin-bottom:13px}
+  .join-vision-chapter-content .join-vision-conviction{font-size:13px;margin-top:9px}
+  .join-vision-climax{border-radius:14px;padding:76px 22px 77px}
+  .join-vision-climax-eyebrow{font-size:10px;margin-bottom:26px}
+  .join-vision-climax h3{font-size:clamp(25px,6.4vw,32px);line-height:1.67}
+  .join-vision-climax-rule{margin:31px 0 25px}
+  .join-vision-climax>p:last-child{font-size:13px;line-height:1.94}
+  .join-vision-promise{padding:72px 16px 74px}
+  .join-vision-promise-eyebrow{font-size:10px;margin-bottom:23px}
+  .join-vision-promise h3{font-size:clamp(24px,6vw,31px)}
+  .join-vision-promise>p:not(.join-vision-promise-eyebrow){font-size:13px;line-height:1.95}
+  .join-vision-next{font-size:10px;margin-top:34px;flex-direction:column;gap:11px}
+}
+@media(prefers-reduced-motion:reduce){
+  .join-vision-animate [data-vision-reveal]{
+    opacity:1!important;transform:none!important;transition:none!important
+  }
+}
