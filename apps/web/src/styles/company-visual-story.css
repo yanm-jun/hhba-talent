@@ -33,3 +33,8 @@
  .company-visual-person-details{padding:12px}
 }
 @media(prefers-reduced-motion:reduce){.company-visual-photo,.company-visual-person{scroll-behavior:auto;transition:none}}
+
+/* No photo tile, founder portrait, or photo credit acts as an external link. */
+.company-visual-photo,.company-visual-photo img,.company-visual-workplace{cursor:default}
+.company-visual-photo img{pointer-events:none}
+.company-visual-identity-credit{font-size:11px;color:#87958b}
