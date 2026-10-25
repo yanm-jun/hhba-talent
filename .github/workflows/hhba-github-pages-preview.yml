@@ -39,6 +39,7 @@ jobs:
           node scripts/company200-integration.contract.test.mjs
           node scripts/audit-labor-rights-topics.mjs
           node --test scripts/hhba-unified-static.contract.test.mjs \
+            scripts/strict-auth-no-photo-outlinks.behavior.test.mjs \
             scripts/official-recruitment-gate-photos.contract.test.mjs \
             scripts/three-entry-experience.contract.test.mjs \
             scripts/employer-growth.contract.test.mjs \
