@@ -169,5 +169,5 @@ jobs:
           import fs from 'node:fs';
           const data=JSON.parse(fs.readFileSync('/tmp/hhba-jobs.json'));
           if(data.jobs.length!==100)throw Error('EXISTING_JOB_ARCHIVE_MISSING');
-          console.log('HHBA_EVIDENCE_PREVIEW_PUBLIC_OK',{overseasArchivedJobs:100,originalHomepagePreserved:true,evidence:falseUntilVerifiedApi:true});
+          console.log('HHBA_EVIDENCE_PREVIEW_PUBLIC_OK',{overseasArchivedJobs:100,originalHomepagePreserved:true,evidenceApiEnabled:false});
           NODE
