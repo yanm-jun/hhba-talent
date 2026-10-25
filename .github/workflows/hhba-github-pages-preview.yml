@@ -44,6 +44,9 @@ jobs:
         working-directory: apps/web
         run: |
           node --test scripts/join-us.contract.test.mjs
+          grep -q '技术负责人 / 全栈架构工程师' src/pages/JoinUsPage.tsx
+          grep -q '企业治理与劳动权益研究伙伴' src/pages/JoinUsPage.tsx
+          grep -q '薪酬与权益现状' src/pages/JoinUsPage.tsx
           ! grep -q '团队协作场景示意 · 非 HHBA 实际团队成员' src/pages/JoinUsPage.tsx
           ! grep -q '<figcaption>' src/pages/JoinUsPage.tsx
       - name: Confirm selected team photograph is packaged for public Pages
