@@ -25,7 +25,8 @@ jobs:
           node --check ops/legacy-marketplace/admin-ui/unified-workbench.js
           node --test ops/legacy-marketplace/tests/unified-workbench.contract.test.mjs
           node --test ops/legacy-marketplace/tests/engagement-core.test.mjs
-          bun test ops/legacy-marketplace/tests/admin-console.test.ts ops/legacy-marketplace/tests/unified-workbench.auth.test.ts
+          bun test ops/legacy-marketplace/tests/admin-console.test.ts
+          bun test ops/legacy-marketplace/tests/unified-workbench.auth.test.ts
       - name: Validate pre-existing official-job contracts
         working-directory: apps/web
         run: node --test scripts/white-market-detail.contract.test.mjs scripts/demo-account.contract.test.mjs
