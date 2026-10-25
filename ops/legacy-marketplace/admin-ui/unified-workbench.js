@@ -137,8 +137,30 @@ function render(key,open){
  panel.append(footer);
  root.append(disconnectedBanner(),panel,auditNotice());
 }
+function mountOverviewShortcuts(open){
+ const overview=byId('view-overview');
+ const firstMetrics=overview?.querySelector('.kpi-grid');
+ if(firstMetrics&&!byId('uw-overview-shortcuts')){
+  const area=document.createElement('section');area.id='uw-overview-shortcuts';
+  area.className='panel uw-overview-shortcuts';
+  area.append(text('h2','','今日需要处理'),text('p','uw-muted','统一进入企业认证、证据审核、评分申诉与帮扶审批。实际待办数量尚未接入，不以空白代表零。'));
+  const actions=document.createElement('div');actions.className='uw-grid-actions';
+  for(const [label,key] of [['审核待办中心','inbox'],['企业档案','enterprise'],['信誉治理','scoring'],['帮扶审批','aid']])
+   actions.append(button(label,key,open));
+  area.append(actions);firstMetrics.after(area);
+ }
+ const investor=byId('view-investor');
+ if(investor&&!byId('uw-investor-integrity')){
+  const box=document.createElement('section');box.className='panel uw-investor-integrity';
+  box.id='uw-investor-integrity';
+  box.append(text('h2','','新增企业业务指标 · 连接进度'),
+    text('p','uw-muted','企业认证、员工关怀评分、帮扶审批、独立核验订单均尚未接入正式业务数据接口。没有可验证的经营记录时不展示虚构数值、增长率或营收。'));
+  investor.append(box);
+ }
+}
 export function mountUnifiedWorkbench(open){
  addNav(open);
+ mountOverviewShortcuts(open);
  for(const key of Object.keys(workspaceViews))render(key,open);
  // This summary endpoint is a private, same-origin authenticated contract. It
  // exposes ONLY connectivity and null counts, not sensitive tenant data.
