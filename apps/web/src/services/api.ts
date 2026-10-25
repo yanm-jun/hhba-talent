@@ -14,6 +14,8 @@ export const evidenceApiReady = employerApiReady && import.meta.env.VITE_HHBA_EV
 export const employeeFeedbackApiReady = employerApiReady && import.meta.env.VITE_HHBA_EMPLOYEE_FEEDBACK_API_ENABLED==='1';
 // Scoring candidates are an independent reviewer-only capability; not public scores.
 export const scoringApiReady = employerApiReady && import.meta.env.VITE_HHBA_SCORING_API_ENABLED==='1';
+// Appeals require a separate trusted server-side enterprise/employee review service.
+export const appealsApiReady = employerApiReady && import.meta.env.VITE_HHBA_APPEALS_API_ENABLED==='1';
 const API = configuredApiBase || '/api/v1';
 function errorMessage(detail: unknown) {
   if (typeof detail === 'string') return detail;
@@ -60,6 +62,7 @@ export type EmployerPosting = { id:string;company:string;title:string;descriptio
 export type EmployerPostingInput = Pick<EmployerPosting,'title'|'description'|'requirements'|'location'|'work_mode'|'recruitment_type'|'apply_url'>;
 export type EmployeeFeedbackRatings = {pay:number;insurance:number;rest:number;respect:number;development:number};
 export type PublicFeedbackAggregate = {status:'not_public'|'published';period:string;response_band?:'at_least_10';scores_out_of_5?:EmployeeFeedbackRatings;notice?:string};
+export type HHBAAppeal = {id:string;organization_id:string;kind:'employer'|'employee_privacy';issue:string;status:'submitted'|'under_review'|'needs_more_info'|'correction_required'|'rejected'|'resolved_after_correction';created_at:string;updated_at:string;target_type?:'evidence'|'scoring_run';target_id?:string;explanation?:string;resolution?:string|null};
 export type ScoringSide = {status:'pending'|'calculated_private';score:number|null;missing:string[]};
 export type ScoringCandidate = {rule_version:string;visibility:'internal_only';publication:string;help_eligibility:string;trust:ScoringSide;care:ScoringSide;inputs:{certified:boolean;evidence_categories:string[];feedback_status:string}};
 export type PrivateScoringRun = {run_id:string;created_at:string;rule_version:string;status:'internal_only';candidate:ScoringCandidate};
@@ -118,6 +121,13 @@ export const api = {
   issueEmployeeFeedbackTicket: (organization_id:string) => request<{ticket:string;period:string;notice:string}>('/employee-feedback/ticket',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id})}),
   submitEmployeeFeedback: (organization_id:string,ticket:string,ratings:EmployeeFeedbackRatings) => request<{accepted:boolean;period:string;notice:string}>('/employee-feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id,ticket,...ratings})}),
   publicEmployeeFeedbackAggregate: (oid:string,period:string) => request<PublicFeedbackAggregate>(`/public/organizations/${encodeURIComponent(oid)}/employee-feedback/${encodeURIComponent(period)}`),
+  submitEmployerAppeal: (organization_id:string,target_type:'evidence'|'scoring_run',target_id:string,issue:string,explanation:string) => request<HHBAAppeal>('/employer/appeals',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id,target_type,target_id,issue,explanation})}),
+  employerAppeals: (organization_id:string) => request<{items:HHBAAppeal[]}>(`/organizations/${encodeURIComponent(organization_id)}/appeals`),
+  clarifyEmployerAppeal: (organization_id:string,appeal_id:string,explanation:string) => request<HHBAAppeal>(`/organizations/${encodeURIComponent(organization_id)}/appeals/${encodeURIComponent(appeal_id)}/clarify`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({explanation})}),
+  submitEmployeePrivacyConcern: (organization_id:string,issue:string) => request<HHBAAppeal>('/employee/privacy-concerns',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id,issue})}),
+  employeePrivacyConcerns: () => request<{items:HHBAAppeal[]}>('/employee/my-privacy-concerns'),
+  adminAppealsQueue: () => request<{items:HHBAAppeal[]}>('/admin/appeals'),
+  adminAppealsDecision: (id:string,decision:'needs_more_info'|'rejected'|'correction_required',reason:string) => request<HHBAAppeal>(`/admin/appeals/${encodeURIComponent(id)}/decisions`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision,reason})}),
   publicEmployerScoreStatus: (oid:string) => request<{trust:{status:string;score:null};care:{status:string;score:null};rule_version:string;publication:string;notice:string}>(`/public/organizations/${encodeURIComponent(oid)}/scores`),
   adminCreateScoreFinding: (organization_id:string,evidence_id:string,score:number,reason:string) => request<{id:string;category:string;assessed_score:number}>(`/admin/scoring/assessments`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id,evidence_id,score,reason})}),
   adminRecalculateScores: (oid:string) => request<PrivateScoringRun>(`/admin/scoring/organizations/${encodeURIComponent(oid)}/calculate`,{method:'POST'}),
