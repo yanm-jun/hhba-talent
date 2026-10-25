@@ -10,9 +10,9 @@ function EntryCard({kind,title,body,footer}:{kind:'candidate'|'employer';title:s
  const target=kind==='candidate'?'/candidate/register':'/employer/start';
  return <Link to={target} className={'entry-card hhba-entry-card hhba-entry-'+kind}
    aria-label={title+'，'+footer}>
-   <span className="entry-icon"><Icon size={25}/></span>
+   <span className="entry-icon"><Icon size={23}/></span>
    <span className="hhba-entry-copy"><strong>{title}</strong><small>{body}</small></span>
-   <span className="entry-footer">{footer}<ArrowUpRight size={17}/></span>
+   <span className="entry-footer">{footer}<ArrowUpRight size={15}/></span>
  </Link>;
 }
 
