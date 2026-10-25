@@ -17,7 +17,7 @@ const media2=load('data/domesticMedia200Bundle.json').companies;
 const combined={...media1,...media2};
 const existsAsset=(p)=>typeof p==='string' && !p.includes('..') && existsSync(new URL('../public/'+p.replace(/^\//,''),import.meta.url));
 test('complete up-to-date enterprise and admin navigation survives',()=>{
- for(const x of ['企业发现','CandidateAccountDropdown','模拟登录 / 注册','招聘市场','加入我们'])
+ for(const x of ['企业发现','CandidateAccountDropdown','登录 / 注册','招聘市场','加入我们'])
    assert.ok(shell.includes(x),'missing navigation '+x);
  for(const x of ['工作台','我的收藏','个人资料','求职偏好','我的简历','求职记录','法律援助'])
    assert.ok(dropdown.includes(x),'missing personal center item '+x);
