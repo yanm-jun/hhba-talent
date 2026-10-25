@@ -13,14 +13,13 @@ const questions: {key:Dimension;title:string;hint:string}[]=[
   {key:'respect',title:'工作尊重与沟通',hint:'在工作中是否受到尊重，能否反馈问题'},
   {key:'development',title:'员工发展与成长',hint:'培训、职业发展和学习机会'}
 ];
-const init:EmployeeFeedbackRatings={pay:3,insurance:3,rest:3,respect:3,development:3};
 const isUuid=(s:string)=>/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(s);
 
 export function EmployeeFeedbackPage({user}:{user:User|null}) {
   // Organization ID must originate from a verified public employer profile.
   // It is NEVER proof of eligibility, which the server independently verifies.
   const orgId=new URLSearchParams(window.location.search).get('org')||'';
-  const [answers,setAnswers]=useState<EmployeeFeedbackRatings>(init);
+  const [answers,setAnswers]=useState<Partial<EmployeeFeedbackRatings>>({});
   const [consent,setConsent]=useState(false);
   const [ticket,setTicket]=useState('');
   const [period,setPeriod]=useState('');
@@ -43,10 +42,10 @@ export function EmployeeFeedbackPage({user}:{user:User|null}) {
   }
   async function submit(e:FormEvent){
     e.preventDefault();
-    if(!enabled||!ticket||!consent)return;
+    if(!enabled||!ticket||!consent||!questions.every(q=>Number.isInteger(answers[q.key])&&Number(answers[q.key])>=1&&Number(answers[q.key])<=5))return;
     setBusy(true);setError('');
     try{
-      await api.submitEmployeeFeedback(orgId,ticket,answers);
+      await api.submitEmployeeFeedback(orgId,ticket,answers as EmployeeFeedbackRatings);
       setTicket('');setSubmitted(true);
     }catch(e){setError(e instanceof Error?e.message:'无法提交反馈');}
     finally{setBusy(false)}
@@ -72,7 +71,7 @@ export function EmployeeFeedbackPage({user}:{user:User|null}) {
         <label className="ef-check"><input type="checkbox" checked={consent} disabled={!ticket||busy||submitted} onChange={e=>setConsent(e.target.checked)}/>我了解隐私保护的局限，确认自愿提供真实体验。</label>
         {error&&<p role="alert" className="ef-error">{error}</p>}
         {submitted&&<p role="status" className="ef-success"><CheckCircle2 size={16}/> 本季度反馈已接收。公开展示需满足季度结束和小样本保护门槛。</p>}
-        <button className="ef-submit" disabled={!enabled||!ticket||!consent||busy||submitted} type="submit">{submitted?'已接收':busy?'处理中…':employeeFeedbackApiReady?'提交本季度反馈':'尚未开放真实提交'}</button>
+        <button className="ef-submit" disabled={!enabled||!ticket||!consent||!questions.every(q=>Number.isInteger(answers[q.key])&&Number(answers[q.key])>=1&&Number(answers[q.key])<=5)||busy||submitted} type="submit">{submitted?'已接收':busy?'处理中…':employeeFeedbackApiReady?'提交本季度反馈':'尚未开放真实提交'}</button>
       </section>
     </form>
     <div className="ef-footer"><HeartHandshake size={20}/><p>HHBA 希望真实改善员工处境，而不是用好评数量决定企业命运。反馈将与独立的证据核验、申诉和评分规则配合使用。</p></div>
