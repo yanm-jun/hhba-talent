@@ -16,7 +16,10 @@ test('every recruitment link follows a single registration-first policy across r
  assert.ok(shell.includes('onClickCapture={guardRecruitmentClick}'));
  assert.ok(shell.includes("event.target.closest<HTMLAnchorElement>('a[href]')"));
  assert.ok(shell.includes('const destination=recruitmentTarget(anchor)'));
- assert.ok(shell.includes('if(!destination||candidateSignedIn)return'));
+ assert.ok(shell.includes('if(!destination||verifiedCandidate)return'));
+ assert.ok(shell.includes('verifiedCandidate=employerApiReady&&hasCandidate'));
+ assert.ok(shell.includes('onAuxClickCapture={guardRecruitmentClick}'));
+ assert.ok(shell.includes('onContextMenuCapture={guardRecruitmentContextMenu}'));
  assert.ok(shell.includes("navigate('/candidate/register?next=%2Fcandidate%2Fofficial-outbound')"));
  assert.ok(shell.includes('route+location.search')); // no /hhba-talent/ duplicated after registration
  assert.ok(policy.includes("data-hhba-recruitment-outbound")||policy.includes("dataset.hhbaRecruitmentOutbound"));
@@ -56,7 +59,13 @@ test('login and demo account routes preserve stored official link without arbitr
  assert.ok(flow.includes('registered')||flow.includes('signed'));
  assert.ok(flow.includes('href={saved.url}'));
  assert.ok(flow.includes('clearPendingRecruitment()'));
- assert.ok(flow.includes('演示账户流程'));
+ assert.ok(flow.includes('正式账户服务尚未开通'));
+ assert.ok(flow.includes('const signed=employerApiReady&&!!user?.account_types?.includes(\'candidate\')'));
+ assert.ok(!flow.includes('useDemoAccount'));
+ assert.ok(!flow.includes('demoModeEnabled&&!!demo'));
+ assert.ok(demoAuth.includes('演示注册无法解锁第三方招聘官网'));
+ assert.ok(flow.indexOf('!employerApiReady')<flow.indexOf('href={saved.url}'));
+
  assert.ok(policy.includes("sessionStorage.setItem(KEY"));
  assert.ok(policy.includes("Date.now()-x.at>30*60*1000"));
  assert.ok(policy.includes("u.protocol==='https:'"));
@@ -75,6 +84,13 @@ test('company photos stay in the same grid with captions but have no source clic
  assert.ok(foreignPhotos.includes('<CreditedPhoto photo={photo} lang={lang}/>'));
  assert.ok(foreignPhotos.includes('{photo.author} · {photo.license}'));
  assert.ok(!foreignPhotos.includes('title={lang===\'zh\'?\'查看原始图片与授权信息\''));
+ assert.ok(!foreignPhotos.includes('<a href={person.source}'));
+ assert.ok(!domestic.includes('<a href={article.photoSourcePage}'));
+ assert.ok(!domestic.includes('<a href={article.imageSource}'));
+ assert.ok(!domestic.includes('<a href={article.brandImageSource}'));
+ assert.ok(domestic.includes('企业图片来源已登记'));
+ assert.ok(domesticCss.includes('.domestic-editorial-photos .domestic-photo-display img{pointer-events:none}'));
+
 });
 
 test('domestic marketplace experiment excluded and original 100 overseas records intact',()=>{
