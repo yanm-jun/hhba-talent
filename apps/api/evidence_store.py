@@ -103,6 +103,15 @@ class PostgresEvidenceRepository:
                 UUID(organization_id))
         return [as_json(row) for row in rows]
 
+    async def list_pending_review(self) -> list[dict]:
+        """Only the authenticated HHBA evidence reviewer may call this query."""
+        async with self.pool.acquire() as conn:
+            rows = await conn.fetch(
+                """SELECT * FROM hhba_employer_evidence
+                   WHERE status IN ('pending_review','needs_more_info')
+                   ORDER BY created_at ASC, id ASC LIMIT 100""")
+        return [as_json(row) for row in rows]
+
     async def get_private_item(self, item_id: str):
         try:
             item_uuid = UUID(item_id)
