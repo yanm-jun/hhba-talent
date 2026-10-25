@@ -140,8 +140,9 @@ jobs:
       - name: Verify stale or withdrawn official jobs cannot appear in active results
         run: |
           node -e "const fs=require('fs');const x=fs.readFileSync('apps/web/src/services/liveRecruitment.ts','utf8');if(!x.includes('MISSING_FROM_OFFICIAL_BOARD')||!x.includes('OFFICIAL_URL_CHANGED')||!x.includes('loadPublicJobAudit'))process.exit(1)"
-      - name: Check Chinese/English and original entry routes
-        run: node scripts/verify-dual-entry.mjs
+      - name: Verify dual-entry home, unified deep links and complete enterprise function routing
+        working-directory: apps/web
+        run: node --test scripts/hhba-unified-static.contract.test.mjs
       - name: Enable deep-link reload fallback
         working-directory: apps/web
         run: |
