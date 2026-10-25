@@ -168,20 +168,30 @@ test('separate vision page is accessible with back navigation and preserves all 
   assert.match(visionPage,/aria-label="品牌理念页面导航"/);
   assert.match(visionPage,/to="\/join"/);
   assert.match(visionPage,/window\.scrollTo\(0, 0\)/);
-  const terms=[
-    '我们相信，','一个更好的商业社会，','应该让每一个参与创造价值的人，',
-    '都拥有更好的未来。',
+  const visionData = visionPage.slice(visionPage.indexOf('const futureVisions = ['),visionPage.indexOf('export function VisionPage'));
+  const visionView = visionPage.slice(visionPage.indexOf('export function VisionPage'));
+  const chapterTerms=[
     'FOR EVERY PERSON','让每一个认真生活的人，都有机会走向更好的生活。',
     'FOR EVERY ORGANIZATION','让企业的繁荣与员工的成长，成为彼此成就的力量。',
     'FOR A BETTER MARKET','让真正关心员工的企业，拥有被世界认可的机会。',
-    'FOR THE FUTURE OF SOCIETY','让经济的发展，最终转化为更多人的幸福。',
+    'FOR THE FUTURE OF SOCIETY','让经济的发展，最终转化为更多人的幸福。'
+  ];
+  let previous=-1;
+  for(const term of chapterTerms){
+    const current=visionData.indexOf(term);
+    assert.ok(current>previous,'Vision chapter missing or out of order: '+term);
+    previous=current;
+  }
+  const viewTerms=[
+    '我们相信，','一个更好的商业社会，','应该让每一个参与创造价值的人，',
+    '都拥有更好的未来。',
     'THE WORLD WE ENVISION','让人的成长，',
     'FROM BELIEF TO PRACTICE','我们所向往的未来，'
   ];
-  let previous=-1;
-  for(const term of terms){
-    const current=visionPage.indexOf(term);
-    assert.ok(current>previous, 'Vision clause missing or out of order: '+term);
+  previous=-1;
+  for(const term of viewTerms){
+    const current=visionView.indexOf(term);
+    assert.ok(current>previous,'Vision sequence missing or out of order: '+term);
     previous=current;
   }
   assert.equal((visionPage.match(/number: '0[1-4]'/g)||[]).length,4);
