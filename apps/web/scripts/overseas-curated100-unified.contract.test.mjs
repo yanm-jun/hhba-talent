@@ -53,7 +53,7 @@ test('all overseas details use the old already-rendered HHBA editorial branch, n
  assert.ok(market.includes("job.editorial?.responsibilities")||market.includes("job.editorial.responsibilities"));
  const detail=market.slice(market.indexOf('export function UnifiedJobDetail'));
  assert.match(detail,/job\.recordKind==='CURATED_HISTORICAL'/);
- assert.match(detail,/岗位职责（HHBA 整理）/);
+ assert.match(detail,/<h3>工作职责<\/h3>/);
  assert.ok(detail.includes('岗位职责')&&detail.includes('任职要求'));
  const at=detail.indexOf("if(job.recordKind==='CURATED_HISTORICAL'");
  const api=detail.indexOf("fetchPreparedBilingualJd(job,controller.signal)");
