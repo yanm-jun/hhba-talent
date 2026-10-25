@@ -130,9 +130,14 @@ class PostgresAppealsRepository:
                     challenged_actor_id=(str(row["challenged_actor_id"])
                                          if row["challenged_actor_id"] else None),
                     reviewer_member=str(row["organization_id"]) in reviewer_organizations)
-                # Employee complainant identity is deliberately not queried.
-                # A trusted authorization service must also prevent assigning
-                # the case to the complainant's own operator before mount.
+                # Compare the reporter privately, never reveal identity to the reviewer.
+                if row["kind"] == "employee_privacy":
+                    same_person=await conn.fetchval(
+                        """SELECT EXISTS(SELECT 1
+                           FROM hhba_appeal_employee_owners_private
+                           WHERE appeal_id=$1 AND employee_id=$2)""",row["id"],actor)
+                    if same_person:
+                        raise HTTPException(403,detail="APPEALS_REVIEWER_CONFLICT")
                 status = decision
                 updated=await conn.fetchrow(
                     """UPDATE hhba_appeal_cases_private
@@ -181,3 +186,15 @@ class PostgresAppealsRepository:
                                     'needs_more_info','correction_required'))""",
                 uuid(organization_id))
         return bool(exists)
+
+    async def state_snapshot(self, *, organization_id: str) -> list[dict]:
+        """Appeal state changes only; no identity, employee feedback or text."""
+        async with self.pool.acquire() as conn:
+            rows=await conn.fetch(
+                """SELECT id,kind,status,updated_at
+                   FROM hhba_appeal_cases_private
+                   WHERE organization_id=$1 ORDER BY created_at,id LIMIT 200""",
+                uuid(organization_id))
+        return [{"id":str(r["id"]),"kind":r["kind"],
+                 "status":r["status"],"updated_at":r["updated_at"].isoformat()}
+                for r in rows]
