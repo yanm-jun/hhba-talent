@@ -60,6 +60,7 @@ def as_json(row):
         "category": row["category"],
         "statement": row["statement"],
         "status": row["status"],
+        "security_status": row["security_status"],
         "file_mime": row["file_mime"],
         "file_size_bytes": row["file_size_bytes"],
         "created_at": row["created_at"].isoformat(),
@@ -140,6 +141,8 @@ class PostgresEvidenceRepository:
                     raise HTTPException(404, detail="EVIDENCE_NOT_FOUND")
                 require_independent_review(str(row["submitted_by"]), reviewer_id)
                 require_review_transition(row["status"], decision)
+                if decision == "verified" and row["security_status"] != "clean":
+                    raise HTTPException(409, detail="FILE_SECURITY_CHECK_REQUIRED")
                 updated = await conn.fetchrow(
                     """UPDATE hhba_employer_evidence
                        SET status=$2, status_updated_at=now()
