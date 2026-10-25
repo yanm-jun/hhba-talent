@@ -47,11 +47,14 @@ jobs:
             scripts/employer-aid-commercial.contract.test.mjs
       - name: Retain original recruitment reader, ATS links and authenticated apply guards
         working-directory: apps/web
-        run: node --test scripts/white-market-detail.contract.test.mjs
+        run: node --test scripts/white-market-detail.contract.test.mjs scripts/curated-offline.contract.test.mjs scripts/overseas-curated100-unified.contract.test.mjs
       - name: "Build unified HHBA - 200 companies, applicant center, employer governance previews and brand pages"
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
+          # Overseas only: use the original 10-company / 100-role JSON catalogue.
+          # All domestic jobs, listings, profiles and protected employer modules are unchanged.
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
           VITE_HHBA_ACCOUNT_API_ENABLED: '0'
           VITE_HHBA_EVIDENCE_API_ENABLED: '0'
           VITE_HHBA_EMPLOYEE_FEEDBACK_API_ENABLED: '0'
@@ -63,6 +66,22 @@ jobs:
           # Public HTTPS backend ORIGIN only. Never put a DeepSeek credential here.
           VITE_HHBA_MATCH_API_ORIGIN: ${{ vars.HHBA_MATCH_API_ORIGIN }}
         run: npm run build
+      - name: Verify old 100 overseas curated jobs were published without changing domestic source
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const j=JSON.parse(fs.readFileSync('dist/curated/v1/jobs.json','utf8'));
+          const companies=new Set(j.jobs.map(x=>x.company));
+          if(j.jobs.length!==100||companies.size!==10||
+            j.jobs.some(x=>!x.editorial?.responsibilities?.length||!x.editorial?.requirements?.length))
+            throw Error('CURATED_OVERSEAS_JOBS_OR_DETAILS_MISSING');
+          const source=fs.readFileSync('src/services/liveRecruitment.ts','utf8');
+          if(!source.includes("const combined=[...overseas,...campus,...existing]")||
+             !source.includes("(!OVERSEAS_CURATED_100||job.domestic)"))
+            throw Error('DOMESTIC_AND_OVERSEAS_ISOLATION_LOST');
+          console.log('HHBA_CURATED_OVERSEAS_100_AND_DOMESTIC_UNCHANGED');
+          NODE
       - name: Verify public HHBA join-us page, application demo privacy and career disclosure
         working-directory: apps/web
         run: |
