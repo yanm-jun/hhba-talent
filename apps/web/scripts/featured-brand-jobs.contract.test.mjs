@@ -58,7 +58,9 @@ test('default market showcases six, filtered search and pagination keep the full
  assert.ok(market.includes('featuredTitle(job,lang)'));
 });
 test('real selected official details and application stay independent of logo source',()=>{
- assert.ok(market.includes('fetchOfficialJd(job,controller.signal)'));
+ assert.ok(market.includes('readSelfHostedJd(job,controller.signal)'));
+ assert.ok(!market.includes('fetchOfficialJd(job,controller.signal)'));
+ assert.ok(!market.includes('fetchPreparedBilingualJd(job,controller.signal)'));
  assert.ok(market.includes('safeOfficialJobUrl(job)'));
  assert.ok(market.includes("'立即申请'"));
  assert.ok(!brands.includes('imagegen'));
