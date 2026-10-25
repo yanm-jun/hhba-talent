@@ -177,7 +177,7 @@ export function CompanyProfilePage({slug,user}:{slug:string;user:User|null}){
      <footer className="company-profile-footer">
        <span>{lang==='zh'?'企业名称、产品和商标归各自权利人所有。HHBA 独立整理，不代表授权或合作。':
          'Names and marks belong to their owners. HHBA is independent and does not claim endorsement.'}</span>
-       <a href={profile.careers} target="_blank" rel="noopener noreferrer">
+       <a data-hhba-recruitment-outbound="true" href={profile.careers} target="_blank" rel="noopener noreferrer">
          {lang==='zh'?'企业官方招聘网站':'Employer careers site'} <ExternalLink size={14}/>
        </a>
      </footer>
