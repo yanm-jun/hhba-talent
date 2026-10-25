@@ -36,9 +36,11 @@ def public_finding(row) -> dict:
 
 
 class PostgresScoringRepository:
-    def __init__(self, pool, feedback_repository):
+    def __init__(self, pool, feedback_repository, appeals_repository=None):
         self.pool = pool
         self.feedback_repository = feedback_repository
+        # Mandatory before production mounting: module 08 appeal holds.
+        self.appeals_repository = appeals_repository
 
     async def assess_evidence(self, *, organization_id: str, evidence_id: str,
                               score: int, reason: str, assessor_id: str) -> dict:
@@ -117,12 +119,21 @@ class PostgresScoringRepository:
         # Closed quarter public aggregate has no employee IDs or raw rows.
         feedback = await self.feedback_repository.public_aggregate(
             organization_id=organization_id, period=quarter)
+        appeal_snapshot = (await self.appeals_repository.state_snapshot(organization_id=organization_id)
+                           if self.appeals_repository else [])
+        appeal_hold = any(a['kind']=='employer' and a['status'] in (
+            'submitted','under_review','needs_more_info','correction_required') for a in appeal_snapshot)
         async with self.pool.acquire() as conn:
             async with conn.transaction(isolation="repeatable_read"):
                 findings = await self.latest_findings(organization_id=organization_id, conn=conn)
                 now = datetime.now(timezone.utc)
                 candidate = evaluate_candidate(
                     findings=findings, feedback=feedback, certified=certified, now=now)
+                if appeal_hold:
+                    for side in ('trust','care'):
+                        candidate[side]['status']='pending_appeal'
+                        candidate[side]['score']=None
+                    candidate['publication']='blocked_by_active_appeal'
                 # Persist only metadata and pre-approved aggregate, never raw employee data.
                 provenance = {
                     "rule": RULE_VERSION, "certified": bool(certified),
@@ -134,6 +145,7 @@ class PostgresScoringRepository:
                         for x in findings
                     ],
                     "feedback_period":quarter, "feedback":feedback,
+                    "appeal_state":appeal_snapshot,
                 }
                 digest = hashlib.sha256(json.dumps(
                     provenance, ensure_ascii=False, sort_keys=True,
@@ -156,7 +168,7 @@ class PostgresScoringRepository:
             "created_at":row["created_at"].isoformat(),
             "rule_version":row["rule_version"],
             "status":"internal_only",
-            "candidate":row["result"] if isinstance(row["result"],dict) else json.loads(row["result"]),
+            "candidate":result,
         }
 
     async def latest_private(self, *, organization_id: str) -> dict:
@@ -167,6 +179,16 @@ class PostgresScoringRepository:
                    ORDER BY run_sequence DESC LIMIT 1""",require_org_id(organization_id))
         if not row:
             return {"status":"not_calculated"}
+        # Never return an old private score as current after an appeal is opened.
+        active=(self.appeals_repository is not None and
+                await self.appeals_repository.has_active_score_appeal(organization_id=organization_id))
+        result=row["result"] if isinstance(row["result"],dict) else json.loads(row["result"])
+        if active:
+            result=json.loads(json.dumps(result))
+            for side in ('trust','care'):
+                result[side]['status']='pending_appeal'
+                result[side]['score']=None
+            result['publication']='blocked_by_active_appeal'
         return {
             "status":"internal_only","run_id":str(row["id"]),
             "created_at":row["created_at"].isoformat(),
