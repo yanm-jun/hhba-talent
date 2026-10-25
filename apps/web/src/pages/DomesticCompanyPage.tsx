@@ -95,10 +95,10 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       <h2>企业照片与办公环境</h2>
       <div className="domestic-editorial-photo-grid">
        {article!.photos!.map((photo,index)=>({photo,index})).filter(({index})=>media?.photos?.[index]?.state==='ready').map(({photo,index})=><figure key={photo.localPath||photo.url} className={'domestic-official-photo'+(photo.kind==='screenshot'?' is-screenshot':'')}>
-        <a href={(photo.source==='user_submission'?'':httpsLink(photo.source))||import.meta.env.BASE_URL+(media?.photos?.[index]?.path||'')} target="_blank" rel="noopener noreferrer" aria-label={'查看'+photo.label}>
+        <div className="domestic-photo-display" aria-label={photo.label}>
          <img src={import.meta.env.BASE_URL+(media?.photos?.[index]?.path||'')} loading="lazy" alt={photo.label} onError={e=>{e.currentTarget.style.display='none';e.currentTarget.parentElement?.classList.add('domestic-photo-unavailable')}}/>
-         <span className="domestic-photo-fallback"><Images size={18}/>打开图片</span>
-        </a>
+         <span className="domestic-photo-fallback"><Images size={18}/>图片暂时无法显示</span>
+        </div>
         <figcaption>{photo.label} · {photo.kind==='product'?'产品照片':photo.kind==='factory'?'工厂照片':photo.kind==='headquarters'?'总部/大楼':photo.kind==='office'?'办公环境':'网页或场景截图'}</figcaption>
        </figure>)}
       </div>
