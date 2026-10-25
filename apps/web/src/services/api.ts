@@ -20,6 +20,8 @@ export const appealsApiReady = employerApiReady && import.meta.env.VITE_HHBA_APP
 export const improvementsApiReady = employerApiReady && import.meta.env.VITE_HHBA_IMPROVEMENTS_API_ENABLED==='1';
 // Public score publication is controlled separately and remains off in static previews.
 export const publicationApiReady = employerApiReady && import.meta.env.VITE_HHBA_PUBLICATION_API_ENABLED==='1';
+// All commercial operations disabled until trusted review, buyer consent and approved policy exist.
+export const aidCommercialApiReady = employerApiReady && import.meta.env.VITE_HHBA_AID_COMMERCIAL_API_ENABLED==='1';
 const API = configuredApiBase || '/api/v1';
 function errorMessage(detail: unknown) {
   if (typeof detail === 'string') return detail;
@@ -66,6 +68,9 @@ export type EmployerPosting = { id:string;company:string;title:string;descriptio
 export type EmployerPostingInput = Pick<EmployerPosting,'title'|'description'|'requirements'|'location'|'work_mode'|'recruitment_type'|'apply_url'>;
 export type EmployeeFeedbackRatings = {pay:number;insurance:number;rest:number;respect:number;development:number};
 export type PublicFeedbackAggregate = {status:'not_public'|'published';period:string;response_band?:'at_least_10';scores_out_of_5?:EmployeeFeedbackRatings;notice?:string};
+export type HHBAAidApplication = {id:string;organization_id:string;service_type:'client_introduction'|'supply_chain'|'visibility';business_summary:string;capacity_summary:string;capacity_evidence_id:string;status:'submitted'|'needs_info'|'approved'|'declined'|'suspended'|'closed';created_at:string;reviewed_at:string|null;notice:string};
+export type HHBAIntroduction = {id:string;organization_id:string;application_id:string;buyer_reference:string;buyer_sector:string;opportunity_type:string;purpose:string;stage:'identified'|'consent_verified'|'introduced'|'in_discussion'|'not_pursued'|'closed';created_at:string;order_status:'independently_verified'|'not_verified';notice:string};
+export type HHBAOrderClaim = {id:string;status:'pending'|'verified'|'rejected';notice:string};
 export type HHBAPublicGrowthProfile = {publication:'pending'|'published';trust:{status:string;score:number|null};care:{status:string;score:number|null};version:number|null;rule_version:string|null;updated_at:string|null;improvements:PublicHHBAImprovement[];notice:string;aid_eligibility:'not_assessed'};
 export type HHBAPublicVersion = {version:number;released_on:string;status:'withdrawn'|'historical_version'};
 export type HHBAPublicationCase = {id:string;organization_id:string;run_id:string;status:'prepared'|'first_approved'|'published'|'rejected'|'revoked';rule_version:string;feedback_period:string;version:number|null;prepared_at:string;published_at:string|null;candidate:{trust:number;care:number}};
@@ -130,6 +135,17 @@ export const api = {
   issueEmployeeFeedbackTicket: (organization_id:string) => request<{ticket:string;period:string;notice:string}>('/employee-feedback/ticket',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id})}),
   submitEmployeeFeedback: (organization_id:string,ticket:string,ratings:EmployeeFeedbackRatings) => request<{accepted:boolean;period:string;notice:string}>('/employee-feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id,ticket,...ratings})}),
   publicEmployeeFeedbackAggregate: (oid:string,period:string) => request<PublicFeedbackAggregate>(`/public/organizations/${encodeURIComponent(oid)}/employee-feedback/${encodeURIComponent(period)}`),
+  submitAidApplication: (oid:string,data:{service_type:string;business_summary:string;capacity_summary:string;capacity_evidence_id:string}) => request<HHBAAidApplication>(`/organizations/${encodeURIComponent(oid)}/aid-applications`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}),
+  employerAidApplications: (oid:string) => request<{items:HHBAAidApplication[]}>(`/organizations/${encodeURIComponent(oid)}/aid-applications`),
+  employerClientIntroductions: (oid:string) => request<{items:HHBAIntroduction[]}>(`/organizations/${encodeURIComponent(oid)}/client-introductions`),
+  adminAidQueue: () => request<{items:HHBAAidApplication[]}>('/admin/aid-applications'),
+  adminAidReview: (id:string,decision:'approved'|'needs_info'|'declined',reason:string) => request<HHBAAidApplication>(`/admin/aid-applications/${encodeURIComponent(id)}/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision,reason})}),
+  adminAidClose: (id:string,reason:string) => request<HHBAAidApplication>(`/admin/aid-applications/${encodeURIComponent(id)}/close`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision:'close',reason})}),
+  adminCreateIntroduction: (data:{application_id:string;organization_id:string;buyer_reference:string;buyer_sector:string;opportunity_type:string;purpose:string}) => request<HHBAIntroduction>('/admin/client-introductions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}),
+  adminVerifyBuyerConsent: (id:string,buyer_consent_reference:string) => request<HHBAIntroduction>(`/admin/client-introductions/${encodeURIComponent(id)}/verify-consent`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({buyer_consent_reference})}),
+  adminAdvanceIntroduction: (id:string,stage:string) => request<HHBAIntroduction>(`/admin/client-introductions/${encodeURIComponent(id)}/stage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({stage})}),
+  adminSubmitOrderProof: (id:string,evidence_reference:string) => request<HHBAOrderClaim>(`/admin/client-introductions/${encodeURIComponent(id)}/order-proof`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({evidence_reference})}),
+  adminVerifyOrderProof: (id:string,accepted:boolean,reason:string) => request<HHBAOrderClaim>(`/admin/order-proofs/${encodeURIComponent(id)}/verify`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accepted,reason})}),
   employerGrowthProfile: (oid:string) => request<HHBAPublicGrowthProfile>(`/public/organizations/${encodeURIComponent(oid)}/growth-profile`),
   employerGrowthVersions: (oid:string) => request<{items:HHBAPublicVersion[]}>(`/public/organizations/${encodeURIComponent(oid)}/growth-profile/versions`),
   adminPreparePublication: (organization_id:string,scoring_run_id:string) => request<HHBAPublicationCase>('/admin/publication/prepare',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({organization_id,scoring_run_id})}),
