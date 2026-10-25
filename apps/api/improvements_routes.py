@@ -7,7 +7,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from datetime import date
 from fastapi import APIRouter,Depends,HTTPException,Response
-from pydantic import BaseModel,Field,ConfigDict
+from pydantic import BaseModel,Field,ConfigDict,StrictBool
 from .evidence_domain import Principal,require_member
 from .improvements_domain import valid_uuid,validate_submission
 from .improvements_store import PostgresImprovementsRepository
@@ -25,7 +25,7 @@ class ReviewInput(BaseModel):
     decision:str
     reason:str=Field(min_length=25,max_length=1200)
     public_summary:str|None=None
-    privacy_checked:bool=False
+    privacy_checked:StrictBool=False
 
 class ClarifyInput(BaseModel):
     model_config=ConfigDict(extra="forbid")
