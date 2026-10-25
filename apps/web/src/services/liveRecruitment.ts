@@ -313,8 +313,9 @@ export async function listJobs(filters: LiveFilters, offset: number, signal: Abo
     // Curated records have their own saved metadata. They must not borrow facts
     // or source hashes from current ATS jobs, even when original IDs overlap.
     const searchFacets=new Map(index!.facets);
+    const archivedRows=new Map((await loadArchivedHundred(signal)).map(r=>[r.id,r]));
     for(const job of overseas){
-      const archive=(await loadArchivedHundred(signal)).find(r=>r.id==='curated-'+job.id)!;
+      const archive=archivedRows.get('curated-'+job.id)!;
       searchFacets.set(job.id,{
         countryCode:archive.countryCode,cityKey:archive.cityKey,
         education:archive.education,experienceMinYears:archive.experienceMinYears,
@@ -356,6 +357,10 @@ export async function getJob(id: string,signal: AbortSignal) {
     }
     const campus=(await loadCampus2027()).find(j=>j.id===id);
     const listing=campus||(await previewSnapshot(signal)).jobs.find(j=>j.id===id);
+    // Do not expose uncurated overseas direct URLs via the older live-ATS reader.
+    // All existing domestic detail lookups and their original status checks stay intact.
+    if(OVERSEAS_CURATED_100&&listing&&!listing.domestic)
+      throw new Error('此海外岗位不在 HHBA 精选静态资料库中');
     if(!listing||!safeOfficialJobUrl(listing))throw new Error('岗位不存在或来源无效');
     return {job:listing,description:null,richHtml:null,applyUrl:null} as LiveDetail;
   }
