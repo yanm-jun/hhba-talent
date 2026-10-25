@@ -42,7 +42,9 @@ jobs:
         run: npm run build
       - name: Verify public HHBA join-us page, application demo privacy and career disclosure
         working-directory: apps/web
-        run: node --test scripts/join-us.contract.test.mjs
+        run: |
+          node --test scripts/join-us.contract.test.mjs
+          ! grep -q '团队协作场景示意 · 非 HHBA 实际团队成员' src/pages/JoinUsPage.tsx
       - name: Confirm selected team photograph is packaged for public Pages
         run: |
           test -s apps/web/dist/images/hhba-join-team.webp
