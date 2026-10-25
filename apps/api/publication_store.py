@@ -124,17 +124,43 @@ class PostgresPublicationRepository:
                 await self._lock_org(conn,row["organization_id"])
                 if row["status"] not in ("prepared","first_approved"):
                     raise HTTPException(409,detail="PUBLICATION_CASE_NOT_REVIEWABLE")
-                live=await self._live(conn,row["organization_id"],row["scoring_run_id"],
-                                      certified=certified)
-                if (live["period"]!=row["feedback_period"] or
-                    live["run"]["input_fingerprint"]!=row["input_fingerprint"]):
-                    raise HTTPException(409,detail="PUBLICATION_SNAPSHOT_STALE")
-                reject_review_conflicts(
-                    actor_id=str(actor),prepared_by=str(row["prepared_by"]),
-                    first_reviewer=str(row["first_reviewer"]) if row["first_reviewer"] else None,
-                    calculated_by=str(live["run"]["calculated_by"]),
-                    company_member=str(row["organization_id"]) in reviewer_organizations,
-                    source_participants=live["participants"])
+                if decision=="reject":
+                    # A stale or non-certified employer must STILL be able to have
+                    # a pending publication explicitly rejected and audit-closed.
+                    # Restrict reviewer conflicts against every source participant.
+                    staff=await conn.fetch(
+                        """SELECT actor_id FROM (
+                             SELECT submitted_by AS actor_id FROM hhba_employer_evidence
+                               WHERE organization_id=$1
+                             UNION SELECT r.reviewer_id FROM hhba_evidence_reviews r
+                               JOIN hhba_employer_evidence e ON e.id=r.evidence_id
+                               WHERE e.organization_id=$1
+                             UNION SELECT assessor_id FROM hhba_scoring_findings_private
+                               WHERE organization_id=$1
+                           ) participating""",row["organization_id"])
+                    run_calculator=await conn.fetchval(
+                        "SELECT calculated_by FROM hhba_scoring_runs_private WHERE id=$1",
+                        row["scoring_run_id"])
+                    participants={str(x["actor_id"]) for x in staff}
+                    participants.add(str(run_calculator))
+                    reject_review_conflicts(
+                        actor_id=str(actor),prepared_by=str(row["prepared_by"]),
+                        first_reviewer=str(row["first_reviewer"]) if row["first_reviewer"] else None,
+                        calculated_by=str(run_calculator),
+                        company_member=str(row["organization_id"]) in reviewer_organizations,
+                        source_participants=participants)
+                else:
+                    live=await self._live(conn,row["organization_id"],row["scoring_run_id"],
+                                          certified=certified)
+                    if (live["period"]!=row["feedback_period"] or
+                        live["run"]["input_fingerprint"]!=row["input_fingerprint"]):
+                        raise HTTPException(409,detail="PUBLICATION_SNAPSHOT_STALE")
+                    reject_review_conflicts(
+                        actor_id=str(actor),prepared_by=str(row["prepared_by"]),
+                        first_reviewer=str(row["first_reviewer"]) if row["first_reviewer"] else None,
+                        calculated_by=str(live["run"]["calculated_by"]),
+                        company_member=str(row["organization_id"]) in reviewer_organizations,
+                        source_participants=live["participants"])
                 before=row["status"]
                 if decision=="reject":
                     next_status="rejected"
@@ -224,9 +250,14 @@ class PostgresPublicationRepository:
                     return pending_profile(improvements=improvements)
                 try:
                     live=await self._live(conn,org,row["scoring_run_id"],certified=certified)
+                    stored=row["score_snapshot"]
+                    if isinstance(stored,str):
+                        stored=json.loads(stored)
+                    current=live["candidate"]
                     if (row["feedback_period"]!=live["period"] or
                         row["input_fingerprint"]!=live["run"]["input_fingerprint"] or
-                        row["rule_version"]!=live["run"]["rule_version"]):
+                        row["rule_version"]!=live["run"]["rule_version"] or
+                        stored!={"trust":current["trust"]["score"],"care":current["care"]["score"]}):
                         return pending_profile(improvements=improvements)
                 except HTTPException as exc:
                     if exc.status_code==409:
