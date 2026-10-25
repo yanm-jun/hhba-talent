@@ -1,0 +1,34 @@
+import {chromium} from 'playwright';
+import {mkdirSync} from 'node:fs';
+const base=(process.env.HHBA_TEST_BASE||'http://127.0.0.1:4173/hhba-talent/preview-employer/').replace(/\/$/,'');
+const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+const page=await browser.newPage({viewport:{width:1440,height:900},locale:'zh-CN'});
+const errors=[];page.on('pageerror',e=>errors.push(e.message));
+mkdirSync('evidence-review',{recursive:true});
+try{
+ await page.goto(base+'/',{waitUntil:'domcontentloaded',timeout:35000});
+ await page.getByRole('button',{name:/我要招人/}).click();
+ await page.getByRole('link',{name:/进入企业工作台/}).click();
+ await page.getByRole('link',{name:/证明材料核验/}).click();
+ await page.getByRole('heading',{name:'企业证明材料'}).waitFor();
+ await page.getByText('安全上传尚未开放').waitFor();
+ if(await page.locator('input[type="file"]').isEnabled())throw Error('PRIVATE_EVIDENCE_UPLOADER_ENABLED_IN_STATIC_PREVIEW');
+ if(await page.getByRole('button',{name:'待安全审核服务接入'}).isEnabled())throw Error('FAKE_UPLOAD_ACTION_ENABLED');
+ if(await page.getByText('暂无可展示的核验材料').count()!==1)throw Error('FAKE_EVIDENCE_LIST');
+ await page.screenshot({path:'evidence-review/evidence-disabled-safe-preview.png',fullPage:true});
+ await page.goto(base+'/employer/evidence/',{waitUntil:'domcontentloaded',timeout:35000});
+ await page.getByRole('heading',{name:'企业证明材料'}).waitFor();
+ await page.goto(base+'/admin/employer-evidence/',{waitUntil:'domcontentloaded',timeout:35000});
+ await page.getByRole('heading',{name:'企业证据核验队列'}).waitFor();
+ await page.getByText('独立审核服务未开放').waitFor();
+ if(await page.getByRole('button',{name:'待审核服务接入'}).isEnabled())throw Error('FAKE_ADMIN_APPROVAL_ENABLED');
+ await page.screenshot({path:'evidence-review/admin-disabled-safe-preview.png',fullPage:true});
+ await page.setViewportSize({width:390,height:844});
+ await page.goto(base+'/employer/evidence/',{waitUntil:'domcontentloaded',timeout:35000});
+ await page.getByRole('heading',{name:'企业证明材料'}).waitFor();
+ const overflowing=await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth+3);
+ if(overflowing)throw Error('EVIDENCE_MOBILE_OVERFLOW');
+ await page.screenshot({path:'evidence-review/evidence-mobile.png',fullPage:true});
+ if(errors.length)throw Error('PAGE_ERRORS '+JSON.stringify(errors));
+ console.log('HHBA_EVIDENCE_STATIC_BROWSER_OK',JSON.stringify({noFakeUploads:true,noFakeReviews:true,mobile:true,privateFormsDisabled:true,deepLinks:true}));
+}finally{await browser.close()}
