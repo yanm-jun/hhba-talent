@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import {
   ArrowLeft, ArrowRight, ArrowUpRight, BadgeCheck, BriefcaseBusiness, CalendarHeart,
   CheckCircle2, ChevronDown, Clock3, Coins, GraduationCap, Handshake,
-  HeartHandshake, Info, Layers3, ShieldPlus, Sparkles, UsersRound, Wallet
+  HeartHandshake, Info, ShieldPlus, Sparkles, UsersRound, Wallet
 } from 'lucide-react';
 import { Shell } from '../components/Shell';
 import type { User } from '../services/api';
@@ -109,15 +109,12 @@ export function JoinUsPage({ user }: { user: User | null }) {
           </div>
           <div className="join-stage-banner"><Info size={16} aria-hidden="true" /><span><strong>真实进展：</strong>HHBA 仍在公司筹备与融资前阶段，目前招募早期合作伙伴，尚未提供已落实的正式薪酬和股权方案。</span></div>
         </div>
-        <div className="join-hero-art" aria-hidden="true">
-          <div className="join-art-orbit join-orbit-one" />
-          <div className="join-art-orbit join-orbit-two" />
-          <div className="join-art-node join-node-one"><UsersRound size={24}/></div>
-          <div className="join-art-node join-node-two"><Layers3 size={24}/></div>
-          <div className="join-art-node join-node-three"><Handshake size={24}/></div>
-          <div className="join-art-core"><span>HHBA</span><small>BUILD TOGETHER</small></div>
-          <p className="join-art-caption">让每一位建设者，都被看见。</p>
-        </div>
+        <figure className="join-hero-photo">
+          <img src={import.meta.env.BASE_URL + 'images/hhba-join-team.webp'}
+            alt="四位同事围绕笔记本电脑讨论项目的真实摄影照片"
+            width={900} height={600} loading="eager" decoding="async" />
+          <figcaption>团队协作场景示意 · 非 HHBA 实际团队成员</figcaption>
+        </figure>
       </section>
 
       <section className="join-section" id="join-values" ref={valuesRef} aria-labelledby="join-values-title">
