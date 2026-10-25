@@ -31,6 +31,7 @@ export function DemoAuthPage({initialMode='login'}:{initialMode?:Mode}){
     <h1>{mode==='register'?'创建你的演示账户':'欢迎来到 HHBA'}</h1>
     <p className="demo-auth-lead">这里先体验完整的求职账户界面，收藏真实职位、管理模拟职业资料，为正式账户上线前确认交互体验。</p>
     <div className="demo-auth-notice"><ShieldCheck size={18}/><span><strong>这是公开前端演示，不是真正注册或登录。</strong> 不要填写真实密码或敏感信息；所有演示资料仅保存在当前浏览器，不会发送到服务器。</span></div>
+    {returnPath==='/candidate/official-outbound'&&<div className="demo-auth-notice" role="status"><LockKeyhole size={18}/><span><strong>正式注册服务尚未开放。</strong> 演示注册无法解锁第三方招聘官网；本站将保留您原先点击的官方招聘地址，在真实账户系统启用后才能继续访问。</span></div>}
     <div className="demo-auth-tabs" role="group" aria-label="账户体验方式">
       <Link className={mode==='login'?'is-active':''} aria-current={mode==='login'?'page':undefined} to={'/candidate/login'+resumeQuery}>模拟登录</Link>
       <Link className={mode==='register'?'is-active':''} aria-current={mode==='register'?'page':undefined} to={'/candidate/register'+resumeQuery}>模拟注册</Link>
