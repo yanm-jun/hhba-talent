@@ -11,12 +11,12 @@ test('existing HHBA homepage keeps original candidate card and company discovery
 });
 test('employer entry, four-step guide, recruit hub, growth, aid, public views are connected',()=>{
  const main=read('src/main.tsx'), hub=read('src/pages/EmployerGrowthHubPage.tsx');
- for(const path of ['/employer/start','/employer/onboarding-preview','/employer/hub','/employer/growth','/employer/aid','/employer/public']) assert.ok(main.includes(path),path);
+ for(const path of ['/employer/start','/employer/onboarding-preview','/employer/hub','/employer/growth','/employer/aid','/employer/public']) { assert.ok(main.includes(path),path); assert.ok(main.includes(path+"/"),path+' trailing slash'); }
  for(const text of ['企业身份','企业信息','经办人身份','核对规则','招聘管理','企业信誉值','员工善待值','HHBA 企业发展帮扶','求职者','员工','待评估']) assert.ok(hub.includes(text),text);
 });
 test('existing real recruiting and certification APIs remain the only source for recruitment actions',()=>{
  const main=read('src/main.tsx'),hub=read('src/pages/EmployerGrowthHubPage.tsx');
- assert.ok(main.includes("if(route==='/employer/workspace')return <EmployerWorkspacePage user={user}/>"));
+ assert.ok(main.includes("if(route==='/employer/workspace'||route==='/employer/workspace/')return <EmployerWorkspacePage user={user}/>"));
  assert.ok(main.includes("if(route==='/recruiter/onboarding')return <RecruiterWelcomePage user={user}/>"));
  assert.match(hub,/api\.organizations\(\)/);
  assert.match(hub,/api\.postings\(oid\)/);
