@@ -40,6 +40,9 @@ jobs:
           # Public HTTPS backend ORIGIN only. Never put a DeepSeek credential here.
           VITE_HHBA_MATCH_API_ORIGIN: ${{ vars.HHBA_MATCH_API_ORIGIN }}
         run: npm run build
+      - name: Verify public HHBA join-us page, application demo privacy and career disclosure
+        working-directory: apps/web
+        run: node --test scripts/join-us.contract.test.mjs
       - name: Refresh complete white HHBA job index from 50 verified official ATS boards
         working-directory: apps/web
         run: node scripts/prepare-pages-jobs.mjs
