@@ -4,6 +4,7 @@ import { Shell } from '../components/Shell';
 import { UnifiedJobMarket } from '../components/UnifiedJobMarket';
 import { HomeCompanyMarquee } from '../components/HomeCompanyMarquee';
 import { HomePeopleBanner } from '../components/HomePeopleBanner';
+import { HomeOpenLetter } from '../components/HomeOpenLetter';
 import type { User } from '../services/api';
 
 function EntryCard({kind,title,body,footer}:{kind:'candidate'|'employer';title:string;body:string;footer:string}){
@@ -23,6 +24,7 @@ export function HomePage({user}:{user:User|null}){
    <p className="hhba-public-eyebrow">HHBA · HUMAN CAPABILITY NETWORK</p>
    <h1>让机会与人才，找到彼此。</h1>
    <p>你来到这里，是为了什么？</p>
+   <button type="button" className="hhba-letter-revisit" onClick={()=>window.dispatchEvent(new Event("hhba:open-letter"))}> <span aria-hidden="true">✉</span> 读一封来自 HHBA 的信</button>
   </section>
   <section className="entry-grid hhba-public-entry-grid" aria-label="选择使用入口">
    <EntryCard kind="candidate" title="我要应聘"
@@ -48,5 +50,6 @@ export function HomePage({user}:{user:User|null}){
   </section>
   <HomeCompanyMarquee/>
   <HomePeopleBanner/>
+  <HomeOpenLetter/>
  </Shell>;
 }
