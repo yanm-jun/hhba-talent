@@ -1,0 +1,45 @@
+name: HHBA Apply Assistant Verified Package
+on:
+  push:
+    branches:
+      - feat/hhba-domestic-apply-assistant-20261027
+    paths:
+      - 'apps/browser-extension/**'
+      - '.github/workflows/hhba-apply-assistant-package.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify extension source and tests
+        run: |
+          node --check apps/browser-extension/content.js
+          node --check apps/browser-extension/popup.js
+          node --check apps/browser-extension/core.mjs
+          node --test apps/browser-extension/tests/core.test.mjs
+      - name: Package installable extension
+        run: |
+          cd apps/browser-extension
+          zip -q /tmp/HHBA-Chrome-Edge-Extension-V0.2.zip manifest.json core.mjs content.js popup.html popup.css popup.js
+          unzip -t /tmp/HHBA-Chrome-Edge-Extension-V0.2.zip
+          python - <<'PY'
+          import json,zipfile
+          p='/tmp/HHBA-Chrome-Edge-Extension-V0.2.zip'
+          with zipfile.ZipFile(p) as z:
+              assert json.loads(z.read('manifest.json'))['version']=='0.2.0'
+              assert z.testzip() is None
+          print('HHBA_V0_2_PACKAGE_INTEGRITY_OK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HHBA-Chrome-Edge-Extension-V0.2
+          path: /tmp/HHBA-Chrome-Edge-Extension-V0.2.zip
+          if-no-files-found: error
+          retention-days: 14

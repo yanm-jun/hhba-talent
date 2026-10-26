@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "HHBA 智能网申助手",
+  "version": "0.2.0",
+  "description": "国内求职网申辅助填写：本地资料、一键预览、真实回填、人工确认与撤销。不会自动提交。",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "sidePanel"
+  ],
+  "action": {
+    "default_title": "HHBA 网申助手",
+    "default_popup": "popup.html"
+  },
+  "side_panel": {
+    "default_path": "popup.html"
+  }
+}
