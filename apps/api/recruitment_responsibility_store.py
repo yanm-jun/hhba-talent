@@ -73,7 +73,7 @@ class PostgresRecruitmentResponsibilityStore:
                     UPDATE hhba_recruitment_responsibilities_private
                        SET state=$2,response_kind=$3,
                            first_meaningful_response_at=CASE WHEN $2='responded'
-                            THEN COALESCE(first_meaningful_response_at,$4) ELSE first_meaningful_response_at END,
+                            THEN COALESCE(first_meaningful_response_at,$4) WHEN $2='withdrawn' THEN NULL ELSE first_meaningful_response_at END,
                            responsible_user_id=COALESCE(responsible_user_id,$5),
                            updated_at=$4
                      WHERE application_id=$1
@@ -91,7 +91,7 @@ class PostgresRecruitmentResponsibilityStore:
         """,uid(organization_id),uid(posting_id))
 
     async def list_for_candidate(self, *, candidate_id: str):
-        return await self._list("candidate_id=$1",uid(candidate_id))
+        return await self._list("candidate_id=$1",uid(candidate_id), redact_handler=True)
 
     async def list_overdue_for_reviewer(self, *, excluded_organizations: list[str]):
         # Reviewer must not audit organizations for which they are a member.
@@ -101,7 +101,7 @@ class PostgresRecruitmentResponsibilityStore:
             state IN ('awaiting','reviewing') AND response_due_at < now()
         """,exclusions)
 
-    async def _list(self, where: str, *values):
+    async def _list(self, where: str, *values, redact_handler: bool=False):
         # WHERE only from three constant, internal SQL fragments above.
         select=f"""
           SELECT application_id,organization_id,posting_id,
@@ -119,8 +119,12 @@ class PostgresRecruitmentResponsibilityStore:
             # Do not expose candidate_id to enterprise/admin read paths.
             rows=await conn.fetch(select,*values)
             total=await conn.fetchval(count,*values)
+        public_rows=[dict(row) for row in rows]
+        if redact_handler:
+            for item in public_rows:
+                item["responsible_user_id"]=None  # No internal HR identity to candidates.
         return {"status":"connected","as_of":datetime.now(timezone.utc),
-                "total":int(total),"items":[dict(row) for row in rows]}
+                "total":int(total),"items":public_rows}
 
     async def note_reminder_delivered(self, *, application_id: str,
                                       delivery_reference: str, sent_at: datetime) -> None:
