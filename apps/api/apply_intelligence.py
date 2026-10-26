@@ -26,13 +26,15 @@ SENSITIVE = re.compile(
     re.I
 )
 
+PERSONAL_PATTERN = re.compile(r"[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}|(?<!\d)1[3-9]\d{9}(?!\d)|(?<!\d)\d{17}[\dXx](?!\w)")
+
 class AIUnavailable(RuntimeError):
     pass
 
 def metadata_only(fields: Sequence[Mapping], allowed_keys: Sequence[str]):
     if isinstance(fields, (str, bytes)) or len(fields) > 30:
         raise ValueError("一次最多处理30个字段")
-    keys = sorted(k for k in set(allowed_keys) if isinstance(k, str) and k in FIELDS)
+    keys = sorted({k for k in allowed_keys if isinstance(k, str) and k in FIELDS})
     result, used = [], set()
     for item in fields:
         if not isinstance(item, Mapping):
@@ -40,7 +42,7 @@ def metadata_only(fields: Sequence[Mapping], allowed_keys: Sequence[str]):
         ident, label, kind = item.get("id"), item.get("label"), item.get("kind")
         if not isinstance(ident, str) or not re.fullmatch(r"f[0-9]{1,3}", ident) or ident in used:
             continue
-        if not isinstance(label, str) or not label.strip() or len(label) > 80 or SENSITIVE.search(label):
+        if not isinstance(label, str) or not label.strip() or len(label) > 80 or SENSITIVE.search(label) or PERSONAL_PATTERN.search(label):
             continue
         if kind not in TYPES:
             continue
@@ -50,7 +52,7 @@ def metadata_only(fields: Sequence[Mapping], allowed_keys: Sequence[str]):
             for opt in item["options"][:16]:
                 if isinstance(opt, Mapping):
                     t = opt.get("text")
-                    if isinstance(t, str) and 0 < len(t.strip()) <= 60 and not SENSITIVE.search(t):
+                    if isinstance(t, str) and 0 < len(t.strip()) <= 60 and not SENSITIVE.search(t) and not PERSONAL_PATTERN.search(t):
                         options.append(t.strip())
         result.append({"id": ident, "label": label.strip(), "kind": kind, "options": options})
     return result, keys

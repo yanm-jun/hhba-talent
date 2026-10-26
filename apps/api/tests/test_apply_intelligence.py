@@ -56,7 +56,9 @@ class ApplyGatewayTest(unittest.TestCase):
     def test_sanitizer_deny_by_default(self):
         fields=[{"id":"f1","kind":"select","label":"最高学历","value":"DO_NOT_SEND","options":[
                 {"text":"本科","value":"secret-id"},{"text":"身份证号码","value":"secret"}]},
-                {"id":"f2","kind":"text","label":"政治面貌"}]
+                {"id":"f2","kind":"text","label":"政治面貌"},
+                {"id":"f3","kind":"text","label":"联系微信 abc@example.com"},
+                {"id":"f4","kind":"text","label":"联系电话 13800138000"}]
         safe,keys=metadata_only(fields,["education","junk"])
         self.assertEqual(keys,["education"])
         self.assertEqual(safe,[{"id":"f1","label":"最高学历","kind":"select","options":["本科"]}])

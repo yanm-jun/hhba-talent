@@ -62,6 +62,7 @@ def main():
             page.screenshot(path="/tmp/hhba-domestic-apply-browser.png",full_page=True)
             # A new user edit after fill must not be undone.
             page.locator("#candidate-name").fill("用户自己修改的姓名")
+            # Repeat after a second scan; previous pending undo snapshots remain.
             print("BROWSER_STEP_UNDO",flush=True)
             undo=send("HHBA_UNDO")
             assert undo["ok"] and undo["restored"]==3,undo
