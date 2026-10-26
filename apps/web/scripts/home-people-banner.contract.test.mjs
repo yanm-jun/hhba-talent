@@ -1,0 +1,23 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const home=fs.readFileSync('src/pages/HomePage.tsx','utf8');
+const card=fs.readFileSync('src/components/HomePeopleBanner.tsx','utf8');
+const style=fs.readFileSync('src/styles/home-people-banner.css','utf8');
+const image=fs.readFileSync('public/images/hhba-people-group.webp');
+test('homepage-only HHBA people banner, no external navigation',()=>{
+ assert.match(home,/import \{ HomePeopleBanner \}/);
+ assert.match(home,/<HomePeopleBanner\/>/);
+ assert.match(card,/从人民中来 到人民中去/);
+ assert.doesNotMatch(card,/<a\b|window\.open|navigate\(/);
+ assert.match(card,/localStorage\.setItem/);
+ assert.match(card,/aria-label="关闭 HHBA 品牌理念展示"/);
+});
+test('optimized locally hosted picture and floating adaptive placement',()=>{
+ assert.equal(image.toString('ascii',0,4),'RIFF');
+ assert.equal(image.toString('ascii',8,12),'WEBP');
+ assert.ok(image.length>5000);
+ assert.match(card,/import\.meta\.env\.BASE_URL/);
+ assert.match(style,/position:fixed/);
+ assert.match(style,/@media\(max-width:560px\)/);
+});

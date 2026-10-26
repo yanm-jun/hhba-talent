@@ -3,6 +3,7 @@ import { Link, navigate } from '../router';
 import { Shell } from '../components/Shell';
 import { UnifiedJobMarket } from '../components/UnifiedJobMarket';
 import { HomeCompanyMarquee } from '../components/HomeCompanyMarquee';
+import { HomePeopleBanner } from '../components/HomePeopleBanner';
 import type { User } from '../services/api';
 
 function EntryCard({kind,title,body,footer}:{kind:'candidate'|'employer';title:string;body:string;footer:string}){
@@ -46,5 +47,6 @@ export function HomePage({user}:{user:User|null}){
    <Link to="/companies/discover" style={{display:'inline-flex',alignItems:'center',gap:7,color:'#265e45',fontSize:13,fontWeight:700,textDecoration:'none'}}>探索 200 家企业 <ArrowUpRight size={15}/></Link>
   </section>
   <HomeCompanyMarquee/>
+  <HomePeopleBanner/>
  </Shell>;
 }
