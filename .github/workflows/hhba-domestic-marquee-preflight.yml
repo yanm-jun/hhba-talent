@@ -1,0 +1,61 @@
+name: HHBA Domestic Brand Marquee Preflight
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-domestic-marquee-preflight.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/domestic-marquee-static-20261026
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Check local logos, correct domestic routes and unchanged animated carousel
+        working-directory: apps/web
+        run: |
+          node --test scripts/home-company-marquee.contract.test.mjs \
+            scripts/three-entry-experience.contract.test.mjs \
+            scripts/strict-auth-no-photo-outlinks.behavior.test.mjs \
+            scripts/overseas-curated100-unified.contract.test.mjs \
+            scripts/hhba-unified-static.contract.test.mjs
+          node scripts/company200-integration.contract.test.mjs
+          node scripts/audit-domestic-company200.mjs
+      - name: Compile whole static Pages site with local domestic carousel
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+        run: npm run build
+      - name: Check packaged assets remain unchanged and domestic logo gallery is self-hosted
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p='dist/curated/v1/jobs.json';
+          if(JSON.parse(fs.readFileSync(p,'utf8')).jobs.length!==100)throw Error('OVERSEAS_ARCHIVE_CHANGED');
+          const c=JSON.parse(fs.readFileSync('src/data/domesticComplete200Target.json','utf8'));
+          if(c.companyNames.length!==200)throw Error('DOMESTIC_COMPANY_LIST_CHANGED');
+          const m=JSON.parse(fs.readFileSync('src/data/domesticMediaBundle.json','utf8'));
+          const ready=c.companyNames.filter(n=>m.companies[n]?.brand?.state==='ready'&&
+           m.companies[n]?.brand?.path);
+          if(ready.length<17)throw Error('TOO_FEW_READY_LOCAL_DOMESTIC_LOGOS');
+          for(const name of ready) {
+           const file='dist/'+m.companies[name].brand.path;
+           if(!fs.existsSync(file))throw Error('LOCAL_BRAND_FILE_NOT_PUBLISHED:'+name);
+          }
+          console.log('DOMESTIC_BRAND_CAROUSEL_READY:',ready.length);
+          NODE
