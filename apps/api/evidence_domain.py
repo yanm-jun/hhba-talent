@@ -37,6 +37,7 @@ class Principal:
     business_matcher: bool = False
     buyer_consent_reviewer: bool = False
     commercial_evidence_reviewer: bool = False
+    recruitment_reviewer: bool = False  # independent recruitment SLA reviewer, not employer/owner
 
 
 def require_member(principal: Principal | None, organization_id: str) -> None:
