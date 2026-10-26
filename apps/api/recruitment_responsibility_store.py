@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from uuid import UUID, uuid4
-from .recruitment_responsibility_domain import BusinessCalendar, deadline_after_workdays, responsibility_change
+from .recruitment_responsibility_domain import BusinessCalendar, MEANINGFUL_RESULTS, deadline_after_workdays, responsibility_change
 
 def uid(value: str) -> UUID:
     return UUID(value)
@@ -66,6 +66,10 @@ class PostgresRecruitmentResponsibilityStore:
                 """,uid(application_id),uid(organization_id),uid(posting_id))
                 if row is None:
                     raise KeyError("DELIVERY_NOT_RECORDED")
+                # A canonical outbox event may be replayed after a successful commit.
+                if (row["state"] == "responded" and
+                    MEANINGFUL_RESULTS.get(canonical_state) == row["response_kind"]):
+                    return "responded"
                 state,kind=responsibility_change(row["state"],canonical_state)
                 if state==row["state"] and kind==row["response_kind"]:
                     return state
