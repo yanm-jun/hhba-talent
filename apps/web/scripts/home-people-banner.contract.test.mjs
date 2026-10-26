@@ -19,5 +19,8 @@ test('optimized locally hosted picture and floating adaptive placement',()=>{
  assert.ok(image.length>5000);
  assert.match(card,/import\.meta\.env\.BASE_URL/);
  assert.match(style,/position:fixed/);
+ assert.match(style,/right:max\(16px,env\(safe-area-inset-right\)\)/);
+ assert.match(style,/color:#b91c1c/);
+ assert.doesNotMatch(style,/left:max/);
  assert.match(style,/@media\(max-width:560px\)/);
 });
