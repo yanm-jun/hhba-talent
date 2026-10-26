@@ -103,6 +103,10 @@ export function CandidateDashboardPage({user}:{user:User|null}){
       </section>
 
       <div className="candidate-dashboard-quick-grid" aria-label="求职工具">
+        <Link className="candidate-dashboard-quick" to="/candidate/apply-assistant">
+          <FileUser size={20} aria-hidden="true"/><strong>智能网申助手</strong>
+          <small>建立本机档案，下载 Chrome / Edge 申请填写助手</small>
+        </Link>
         <Link className="candidate-dashboard-quick" to="/candidate/saved"><BriefcaseBusiness size={20} aria-hidden="true"/><strong>我的收藏</strong><small>查看本设备已收藏的真实职位</small></Link>
         <Link className="candidate-dashboard-quick" to="/candidate/account"><UserRound size={20} aria-hidden="true"/><strong>个人中心</strong><small>管理收藏与访问统计隐私选项</small></Link>
         {employerApiReady?

@@ -1,0 +1,51 @@
+name: HHBA Domestic Apply Assistant CI
+on:
+  push:
+    branches:
+      - feat/hhba-domestic-apply-assistant-20261027
+    paths:
+      - 'apps/browser-extension/**'
+      - 'apps/web/src/pages/CandidateApplyAssistantPage.tsx'
+      - 'apps/web/src/styles/candidate-apply-assistant.css'
+      - 'apps/web/src/pages/PersonalCenterPage.tsx'
+      - 'apps/web/src/pages/CandidateDashboardPage.tsx'
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/scripts/apply-assistant.contract.test.mjs'
+      - '.github/workflows/hhba-apply-assistant-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Syntax and pure matching tests
+        run: |
+          node --check apps/browser-extension/content.js
+          node --check apps/browser-extension/popup.js
+          node --check apps/browser-extension/core.mjs
+          node --test apps/browser-extension/tests/core.test.mjs
+          node --test apps/web/scripts/apply-assistant.contract.test.mjs
+      - name: Build the full HHBA site
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_HHBA_RECRUITMENT_RESPONSIBILITY_API_ENABLED: '0'
+          VITE_HHBA_EVIDENCE_API_ENABLED: '0'
+          VITE_HHBA_EMPLOYEE_FEEDBACK_API_ENABLED: '0'
+          VITE_HHBA_SCORING_API_ENABLED: '0'
+          VITE_HHBA_APPEALS_API_ENABLED: '0'
+          VITE_HHBA_IMPROVEMENTS_API_ENABLED: '0'
+          VITE_HHBA_PUBLICATION_API_ENABLED: '0'
+          VITE_HHBA_AID_COMMERCIAL_API_ENABLED: '0'
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
