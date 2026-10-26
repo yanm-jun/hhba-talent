@@ -36,6 +36,30 @@ class TransitionRules(unittest.TestCase):
     def test_unverified_pseudo_actions_denied(self):
         with self.assertRaises(HTTPException): responsibility_change('awaiting','opened_resume')
 
+class FakeConn:
+    def __init__(self):self.writes=[]
+    async def __aenter__(self):return self
+    async def __aexit__(self,*_):return False
+    def transaction(self):return self
+    async def fetchrow(self,sql,*args):
+        return {'state':'responded','response_kind':'continued'}
+    async def execute(self,*args):self.writes.append(args)
+class FakePool:
+    def __init__(self,conn):self.conn=conn
+    def acquire(self):return self.conn
+class IdempotentOutboxDelivery(unittest.IsolatedAsyncioTestCase):
+    async def test_repeat_of_verified_result_does_not_write_again(self):
+        from apps.api.recruitment_responsibility_store import PostgresRecruitmentResponsibilityStore
+        conn=FakeConn()
+        service=PostgresRecruitmentResponsibilityStore(
+            FakePool(conn),BusinessCalendar('trial-v1',frozenset(),frozenset()))
+        result=await service.record_canonical_transition(
+            application_id=str(uuid4()),organization_id=str(uuid4()),
+            posting_id=str(uuid4()),canonical_state='interview',
+            actor_id=str(uuid4()),occurred_at=datetime.now(timezone.utc))
+        self.assertEqual(result,'responded')
+        self.assertEqual(conn.writes,[])
+
 class FakeStore:
     def __init__(self): self.calls=[]
     async def list_for_employer(self,**kw):
