@@ -31,7 +31,7 @@ const EXCLUDED=/(验证码|校验码|短信|口令|密码|密钥|身份证|证�
 const RULES=[
  ["email",/(电子邮箱|电子邮件|邮箱地址|e-?mail)/i],
  ["phone",/(手机号|手机号码|联系电话|联系手机|本人电话|^手机$|^电话$|phone|mobile|tel\b)/i],
- ["fullName",/(^姓名$|^真实姓名$|^中文姓名$|^应聘人姓名$|^候选人姓名$|^本人姓名$|^name$|^full.name$)/i],
+ ["fullName",/(^姓名$|^真实姓名$|^中文姓名$|^应聘人姓名$|^候选人姓名$|^本人姓名$|^name$|^full.?name$)/i],
  ["school",/(毕业学校|毕业院校|就读院校|学校名称|^学校$|^院校$|university|college|school)/i],
  ["major",/(所学专业|专业名称|毕业专业|^专业$|major\b)/i],
  ["education",/(最高学历|学历层次|^学历$|education.level|academic.qualification)/i],
@@ -62,7 +62,9 @@ export function optionFor(options,value,key){
 }
 export function classifyField(field){
  const label=[field.label,field.placeholder,field.name,field.idAttribute].filter(Boolean).join(" ");
- const primary=String(field.label||field.placeholder||field.name||field.idAttribute||"").trim();
+ const primary=String(field.label||field.placeholder||field.name||field.idAttribute||"")
+  .replace(/[（(]\s*(?:必填|选填|可选|required)\s*[）)]/gi,"")
+  .replace(/[\s*＊:：]/g,"").trim();
  if(field.excluded||EXCLUDED.test(label))return null;
  if(field.kind==="checkbox"||field.kind==="radio"||field.kind==="file"||field.kind==="password")return null;
  if(field.type==="email"&&(!primary||/e-?mail|邮箱/i.test(label)))return "email";

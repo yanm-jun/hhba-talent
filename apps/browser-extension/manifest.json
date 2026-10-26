@@ -6,10 +6,14 @@
   "permissions": [
     "activeTab",
     "scripting",
-    "storage"
+    "storage",
+    "sidePanel"
   ],
   "action": {
     "default_title": "HHBA 网申助手",
     "default_popup": "popup.html"
+  },
+  "side_panel": {
+    "default_path": "popup.html"
   }
 }

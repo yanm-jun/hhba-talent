@@ -84,6 +84,13 @@ function renderPlans(){
  }
  $("fill").classList.toggle("hidden",!eligible.length);
 }
+$("sidepanel").addEventListener("click",()=>{
+ if(!chrome.sidePanel?.open)return status("当前浏览器不支持侧边栏，请继续使用扩展弹窗。",true);
+ chrome.tabs.query({active:true,currentWindow:true},tabs=>{
+  const tab=tabs?.[0];if(!tab?.windowId)return status("无法识别当前窗口。",true);
+  chrome.sidePanel.open({windowId:tab.windowId}).then(()=>window.close()).catch(()=>status("无法打开侧边栏，请继续使用扩展弹窗。",true));
+ });
+});
 $("scan").addEventListener("click",async()=>{
  $("scan").disabled=true;status("正在识别当前表单…");$("results").replaceChildren();
  try{

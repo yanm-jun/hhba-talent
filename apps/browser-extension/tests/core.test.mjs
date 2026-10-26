@@ -40,3 +40,10 @@ test("长文本、日期和最大输入长度不强制误填",()=>{
  assert.equal(planFields([f("b","入学年月","text",[],{type:"month"})],value)[0].eligible,true);
  assert.equal(planFields([f("c","个人简介","text")],value)[0].eligible,false);
 });
+
+test("国内网申的冒号、必填星号与常见括号不会破坏字段识别",()=>{
+ for(const name of ["姓名：*","* 姓名","姓名（必填）","真实姓名（必填）"]){
+  assert.equal(classifyField(f("field",name)),"fullName",name);
+ }
+ assert.equal(classifyField(f("field","FULL NAME")),"fullName");
+});

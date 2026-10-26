@@ -16,3 +16,5 @@ label.field{display:grid;font-size:12px;font-weight:600;gap:5px;margin-bottom:10
 .pricing{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #e2eadf;border-radius:10px;margin-top:11px;padding:11px;background:#f8faf7}
 .pricing strong{font-size:20px;color:#275d40}.pricing small{font-size:10px;font-weight:500}.pricing span{font-size:10px;color:#6c7b71;text-align:right;max-width:165px}
 .focus-field{background:#fff;border:1px solid #d9e6db;padding:5px 8px;font-size:11px;color:#286648;flex:none}
+
+body{width:min(415px,100%)}@media(max-width:380px){.actions>*{flex:1}}
