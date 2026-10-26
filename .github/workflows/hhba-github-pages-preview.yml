@@ -109,6 +109,9 @@ jobs:
           ! grep -q '<figcaption>' src/pages/JoinUsPage.tsx
       - name: Confirm selected team photograph is packaged for public Pages
         run: |
+          test -s apps/web/dist/images/hhba-people-group-hd.avif
+          test -s apps/web/dist/images/hhba-people-group.webp
+          node -e "const fs=require('fs');const a=fs.readFileSync('apps/web/dist/images/hhba-people-group-hd.avif');const w=fs.readFileSync('apps/web/dist/images/hhba-people-group.webp');if(a.length<100000||a.toString('ascii',4,12)!=='ftypavif'||w.length<150000||w.toString('ascii',0,4)!=='RIFF')process.exit(1);console.log('HHBA_HIGH_DEFINITION_WORKERS_PHOTO_OK')"
           test -s apps/web/dist/images/hhba-join-team.webp
           node -e "const fs=require('fs');const p='apps/web/dist/images/hhba-join-team.webp';const x=fs.readFileSync(p);if(x.toString('ascii',0,4)!=='RIFF'||x.toString('ascii',8,12)!=='WEBP'||x.length<20000)process.exit(1);console.log('HHBA_REAL_JOIN_PHOTO',x.length)"
       - name: Verify founder letter and the handwritten signature asset are in the public build
