@@ -39,7 +39,7 @@ jobs:
       - name: Check opening envelope, complete public letter and shareable social entry
         working-directory: apps/web
         run: node --test scripts/home-open-letter.contract.test.mjs
-      - name: Verify recruitment responsibility does not break existing applicant and admin flows
+      - name: Verify recruitment responsibility, loading truth, and existing applicant and admin flows
         working-directory: apps/web
         run: node --test scripts/recruitment-responsibility.contract.test.mjs
       - name: Protect 200 company identities, original photographs, personal center and employer governance routes
