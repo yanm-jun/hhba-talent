@@ -86,7 +86,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verify server-only recruitment workday SLA, identity boundaries and audit rules
+      - name: Verify server-only recruitment workdays, tenant RBAC, and idempotent canonical event replay
         run: |
           python -m pip install --quiet --disable-pip-version-check -r apps/api/requirements-evidence-dev.txt
           python -m unittest apps.api.tests.test_recruitment_responsibility -v
