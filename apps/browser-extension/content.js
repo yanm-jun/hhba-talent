@@ -8,6 +8,13 @@
  const highRisk=/(身份证|证件|政治面貌|民族|家庭|亲属|紧急联系人|密码|验证码|诚信|背景调查|声明|签名|授权|同意|隐私|婚姻|生育|健康|敏感|薪资|社保|银行卡|护照|人脸|企业名称|工作单位|备注.*声明|captcha|otp|consent|agreement|privacy)/i;
  const clean=s=>String(s||"").replace(/[\s\u00a0]+/g," ").trim().slice(0,180);
  const txt=el=>clean(el?.textContent||"");
+ function labelOnlyText(label){
+  // The <label> element can wrap <select> and all its <option> children.
+  // Text from options must not become the field's label.
+  const copy=label.cloneNode(true);
+  copy.querySelectorAll("input,select,textarea,button,option,svg,script,style").forEach(n=>n.remove());
+  return clean(copy.textContent||"");
+ }
  function visible(el){
   if(el.disabled||el.closest('[hidden],[aria-hidden="true"]'))return false;
   const style=getComputedStyle(el);
@@ -15,7 +22,7 @@
   return !!(el.getClientRects().length);
  }
  function fieldLabel(el){
-  const labels=el.labels?Array.from(el.labels).map(txt).filter(Boolean):[];
+  const labels=el.labels?Array.from(el.labels).map(labelOnlyText).filter(Boolean):[];
   if(labels.length)return labels.join(" ").slice(0,180);
   const aria=el.getAttribute("aria-label");if(aria)return clean(aria);
   const labelled=el.getAttribute("aria-labelledby");
@@ -23,7 +30,7 @@
    const str=labelled.split(/\s+/).map(x=>document.getElementById(x)).map(txt).filter(Boolean).join(" ");
    if(str)return str.slice(0,180);
   }
-  const wrap=el.closest("label");if(wrap)return txt(wrap).slice(0,180);
+  const wrap=el.closest("label");if(wrap)return labelOnlyText(wrap).slice(0,180);
   const group=el.closest(".ant-form-item,.el-form-item,.arco-form-item,.form-item,.form-group,.layui-form-item,td");
   if(group){
    const l=group.querySelector("label,.ant-form-item-label,.el-form-item__label,.arco-form-item-label,th");
