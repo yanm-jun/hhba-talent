@@ -11,17 +11,18 @@ export function EmployerApplicantPanel({oid,postings}:{oid:string;postings:Emplo
  const [items,setItems]=useState<EmployerJobApplication[]>([]);
  const [responsibilities,setResponsibilities]=useState<RecruitmentResponsibility[]>([]);
  const [slaError,setSlaError]=useState('');
+ const [slaLoaded,setSlaLoaded]=useState(false);
 
  const [busy,setBusy]=useState(false);
  const [msg,setMsg]=useState('');
  const available=postings.filter(p=>p.status==='published');
- useEffect(()=>{if(!available.some(p=>p.id===pid)){setPid(available[0]?.id||'');setItems([]);setResponsibilities([])}},[oid,postings,pid]);
- useEffect(()=>{if(!pid||!oid||!employerApiReady){setItems([]);setResponsibilities([]);return}
-  let alive=true;setBusy(true);setMsg('');setSlaError('');setResponsibilities([]);
+ useEffect(()=>{if(!available.some(p=>p.id===pid)){setPid(available[0]?.id||'');setItems([]);setResponsibilities([]);setSlaLoaded(false)}},[oid,postings,pid]);
+ useEffect(()=>{if(!pid||!oid||!employerApiReady){setItems([]);setResponsibilities([]);setSlaLoaded(false);return}
+  let alive=true;setBusy(true);setMsg('');setSlaError('');setResponsibilities([]);setSlaLoaded(false);
   api.employerJobApplications(oid,pid).then(r=>{if(alive)setItems(r.items)})
    .catch(e=>{if(alive){setItems([]);setMsg(explain(e))}})
    .finally(()=>{if(alive)setBusy(false)});
-  if(recruitmentResponsibilityApiReady)api.employerRecruitmentResponsibilities(oid,pid).then(r=>{if(alive)setResponsibilities(r.items)}).catch(e=>{if(alive){setResponsibilities([]);setSlaError(explain(e))}});
+  if(recruitmentResponsibilityApiReady)api.employerRecruitmentResponsibilities(oid,pid).then(r=>{if(alive){setResponsibilities(r.items);setSlaLoaded(true)}}).catch(e=>{if(alive){setResponsibilities([]);setSlaLoaded(false);setSlaError(explain(e))}});
   return()=>{alive=false};
  },[oid,pid]);
  async function change(row:EmployerJobApplication,status:ApplicationStage){
@@ -30,7 +31,7 @@ export function EmployerApplicantPanel({oid,postings}:{oid:string;postings:Emplo
    await api.updateEmployerApplicationStatus(oid,pid,row.id,status,row.status as ApplicationStage);
    const r=await api.employerJobApplications(oid,pid);
    setItems(r.items);setMsg('申请状态已更新；责任是否完成由独立服务端履约记录判定。');
-   if(recruitmentResponsibilityApiReady){try{const t=await api.employerRecruitmentResponsibilities(oid,pid);setResponsibilities(t.items);setSlaError('')}catch(e){setResponsibilities([]);setSlaError(explain(e))}}
+   if(recruitmentResponsibilityApiReady){try{const t=await api.employerRecruitmentResponsibilities(oid,pid);setResponsibilities(t.items);setSlaError('');setSlaLoaded(true)}catch(e){setResponsibilities([]);setSlaLoaded(false);setSlaError(explain(e))}}
   }catch(e){setMsg(explain(e));try{const r=await api.employerJobApplications(oid,pid);setItems(r.items)}catch{setItems([])}}
   finally{setBusy(false)}
  }
@@ -43,8 +44,8 @@ export function EmployerApplicantPanel({oid,postings}:{oid:string;postings:Emplo
     <label className="hhba-apply-label">选择已审核的企业直发岗位
      <select value={pid} onChange={e=>setPid(e.target.value)}>{available.map(p=><option key={p.id} value={p.id}>{p.title} · {p.location}</option>)}</select>
     </label>
-    {recruitmentResponsibilityApiReady&&!slaError?<div className="hhba-sla-metrics" aria-label="本岗位招聘责任待办"><div><strong>{responsibilities.filter(r=>['awaiting','reviewing','overdue'].includes(r.state)).length}</strong><small>待处理</small></div><div><strong>{responsibilities.filter(r=>r.state==='overdue').length}</strong><small>超期待核查</small></div><div><strong>{responsibilities.filter(r=>r.state==='responded').length}</strong><small>已初步处理</small></div></div>:
-     <p className="hhba-sla-unavailable">{slaError?'责任服务无法查询：'+slaError:'招聘责任服务尚未接通；不展示虚构待办、期限或逾期数量。'}</p>}
+    {recruitmentResponsibilityApiReady&&slaLoaded&&!slaError?<div className="hhba-sla-metrics" aria-label="本岗位招聘责任待办"><div><strong>{responsibilities.filter(r=>['awaiting','reviewing','overdue'].includes(r.state)).length}</strong><small>待处理</small></div><div><strong>{responsibilities.filter(r=>r.state==='overdue').length}</strong><small>超期待核查</small></div><div><strong>{responsibilities.filter(r=>r.state==='responded').length}</strong><small>已初步处理</small></div></div>:
+     <p className="hhba-sla-unavailable">{slaError?'责任服务无法查询：'+slaError:recruitmentResponsibilityApiReady?'正在读取服务端履约记录；未完成查询前不显示零值。':'招聘责任服务尚未接通；不展示虚构待办、期限或逾期数量。'}</p>}
     {msg&&<p role="status" className="hhba-apply-note">{msg}</p>}
     {busy&&<p className="hhba-applications-muted">正在读取或更新申请…</p>}
     {!busy&&items.length===0&&!msg&&<p className="hhba-applications-muted">此岗位目前没有求职者授权提交的有效申请。</p>}
