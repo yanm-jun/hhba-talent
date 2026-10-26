@@ -21,8 +21,11 @@ export function HomePeopleBanner() {
     <button type="button" className="hhba-people-banner-close" aria-label="关闭 HHBA 品牌理念展示" onClick={dismiss} title="关闭">
       <X size={17} aria-hidden="true"/>
     </button>
-    <img src={`${import.meta.env.BASE_URL}images/hhba-people-group.webp`} width="320" height="180"
-      alt="中国各行各业的劳动者共同合影" loading="lazy" decoding="async"/>
+    <picture>
+      <source type="image/avif" srcSet={`${import.meta.env.BASE_URL}images/hhba-people-group-hd.avif`}/>
+      <img src={`${import.meta.env.BASE_URL}images/hhba-people-group.webp`} width="1200" height="676"
+        alt="中国各行各业的劳动者共同合影" loading="eager" decoding="async"/>
+    </picture>
     <p>从人民中来 到人民中去</p>
   </aside>;
 }

@@ -5,6 +5,7 @@ const home=fs.readFileSync('src/pages/HomePage.tsx','utf8');
 const card=fs.readFileSync('src/components/HomePeopleBanner.tsx','utf8');
 const style=fs.readFileSync('src/styles/home-people-banner.css','utf8');
 const image=fs.readFileSync('public/images/hhba-people-group.webp');
+const avif=fs.readFileSync('public/images/hhba-people-group-hd.avif');
 test('homepage-only HHBA people banner, no external navigation',()=>{
  assert.match(home,/import \{ HomePeopleBanner \}/);
  assert.match(home,/<HomePeopleBanner\/>/);
@@ -16,7 +17,13 @@ test('homepage-only HHBA people banner, no external navigation',()=>{
 test('optimized locally hosted picture and floating adaptive placement',()=>{
  assert.equal(image.toString('ascii',0,4),'RIFF');
  assert.equal(image.toString('ascii',8,12),'WEBP');
- assert.ok(image.length>5000);
+ assert.ok(image.length>150000,'WebP fallback must not be a tiny blurry thumbnail');
+ assert.equal(avif.toString('ascii',4,12),'ftypavif');
+ assert.ok(avif.length>100000,'AVIF primary image must preserve HD detail');
+ assert.match(card,/<picture>/);
+ assert.match(card,/type="image\/avif"/);
+ assert.match(card,/hhba-people-group-hd\.avif/);
+ assert.match(card,/width="1200" height="676"/);
  assert.match(card,/import\.meta\.env\.BASE_URL/);
  assert.match(style,/position:fixed/);
  assert.match(style,/right:max\(16px,env\(safe-area-inset-right\)\)/);
