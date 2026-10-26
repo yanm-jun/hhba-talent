@@ -2,17 +2,18 @@
 // Enhances the EXISTING authenticated /management/ shell. This is a read-only
 // integration surface until tenant-aware admin service and RBAC are available.
 const groups=[
- {heading:'招聘与企业',items:[['recruitment','招聘业务'],['enterprise','企业档案']]},
+ {heading:'招聘与企业',items:[['recruitment','招聘业务'],['response','招聘履约'],['enterprise','企业档案']]},
  {heading:'企业信誉治理',items:[['inbox','审核待办'],['evidence','证据核验'],['care','员工关怀'],['scoring','双评分'],['appeals','申诉复核'],['improvements','真实改善'],['publication','公开发布']]},
  {heading:'企业发展帮扶',items:[['aid','帮扶审批'],['commercial','客户合作']]}
 ];
 export const workspaceViews=Object.freeze({
- recruitment:'招聘业务',enterprise:'企业档案',inbox:'审核待办',
+ recruitment:'招聘业务',response:'招聘履约管理',enterprise:'企业档案',inbox:'审核待办',
  evidence:'证据核验',care:'员工关怀',scoring:'双评分审核',
  appeals:'申诉复核',improvements:'企业改善核验',publication:'公开评分审批',
  aid:'企业帮扶审批',commercial:'客户对接与订单核验'
 });
 const tasks=[
+ {key:'response',title:'招聘责任核查',text:'站内申请送达、处理期限、回应结果和逾期核实'},
  {key:'evidence',title:'企业证据核验',text:'资料有效性、安全扫描与独立审查'},
  {key:'care',title:'员工反馈保护',text:'员工关系核验、隐私聚合与独立处理'},
  {key:'scoring',title:'企业双评分审核',text:'信誉值和善待值的候选结果审查'},
