@@ -26,6 +26,8 @@ test('existing employer applicants tab adds real responsibility but keeps status
  assert.match(panel,/employerRecruitmentResponsibilities/);
  assert.match(panel,/开始审阅（不结束回应责任）/);
  assert.match(panel,/RecruitmentDue/);
+ assert.match(panel,/slaLoaded/);
+ assert.match(panel,/正在读取服务端履约记录/);
 });
 test('candidate withdrawal and admin review unaffected by new modules',()=>{
  const c=read('src/pages/MyEmployerApplicationsPage.tsx');
