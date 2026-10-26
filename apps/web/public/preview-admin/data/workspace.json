@@ -16,6 +16,16 @@
       "reviewAllowed": false
     },
     {
+      "key": "response",
+      "title": "招聘履约管理",
+      "state": "not_connected",
+      "pending": null,
+      "total": null,
+      "updatedAt": null,
+      "source": "public-static-ui-only",
+      "reviewAllowed": false
+    },
+    {
       "key": "enterprise",
       "title": "企业档案",
       "state": "not_connected",
