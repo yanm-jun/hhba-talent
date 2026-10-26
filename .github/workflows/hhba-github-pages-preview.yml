@@ -36,6 +36,9 @@ jobs:
       - name: Check HHBA people-first homepage float (photo, close, responsive)
         working-directory: apps/web
         run: node --test scripts/home-people-banner.contract.test.mjs
+      - name: Check opening envelope, complete public letter and shareable social entry
+        working-directory: apps/web
+        run: node --test scripts/home-open-letter.contract.test.mjs
       - name: Protect 200 company identities, original photographs, personal center and employer governance routes
         working-directory: apps/web
         run: |
@@ -95,6 +98,13 @@ jobs:
           assert not missing, f'Chinese calligraphy glyphs missing: {missing}'
           print('HHBA_XINGSHU_LOCAL_FONT_AND_OFL_OK',font.stat().st_size)
           PY
+      - name: Confirm public letter is packaged at a standalone shareable URL
+        run: |
+          test -s apps/web/dist/letter/index.html
+          grep -q 'og:title' apps/web/dist/letter/index.html
+          grep -q 'og:image' apps/web/dist/letter/index.html
+          grep -q '../?letter=1' apps/web/dist/letter/index.html
+          node -e "const fs=require('fs');const html=fs.readFileSync('apps/web/dist/letter/index.html','utf8');if(!html.includes('致每一个认真生活的人')||!html.includes('yanm-jun.github.io/hhba-talent/letter/'))process.exit(1);console.log('HHBA_SHAREABLE_PUBLIC_LETTER_READY')"
       - name: Verify old 100 overseas curated jobs were published without changing domestic source
         working-directory: apps/web
         run: |
