@@ -16,6 +16,7 @@ def main():
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
             page = browser.new_page()
+            page.set_default_timeout(10000)
             page.goto(f"http://127.0.0.1:{server.server_port}/form-domestic.html")
             page.evaluate("""() => {
               window.__hhbaHandler = null;
@@ -24,9 +25,11 @@ def main():
             page.add_script_tag(content=(EXT / "content.js").read_text("utf-8"))
             def send(kind, **payload):
                 return page.evaluate("""({kind,payload}) => new Promise((resolve,reject) => {
-                  if (!window.__hhbaHandler) return reject(Error("Agent missing"));
-                  window.__hhbaHandler({type:kind,...payload}, {}, resolve);
+                  const timeout=setTimeout(()=>reject(Error("HHBA agent response timed out: "+kind)),8000);
+                  if (!window.__hhbaHandler) {clearTimeout(timeout);return reject(Error("Agent missing"));}
+                  window.__hhbaHandler({type:kind,...payload}, {}, answer=>{clearTimeout(timeout);resolve(answer);});
                 })""", {"kind": kind, "payload": payload})
+            print("BROWSER_STEP_SCAN",flush=True)
             scan=send("HHBA_SCAN")
             assert scan["ok"] and len(scan["fields"]) >= 7, scan
             field={f["label"].strip():f for f in scan["fields"]}
@@ -42,6 +45,7 @@ def main():
               {"id":field["联系邮箱"]["id"],"value":"test@example.com","optionValue":None},
               {"id":field["身份证号码"]["id"],"value":"SHOULD-NOT-WRITE","optionValue":None},
             ]
+            print("BROWSER_STEP_FILL",flush=True)
             filled=send("HHBA_FILL", scanId=scan["scanId"],steps=steps)
             assert filled["ok"] and filled["filled"]==4,filled
             assert page.locator("#candidate-name").input_value()=="测试姓名"
@@ -55,6 +59,7 @@ def main():
             page.screenshot(path="/tmp/hhba-domestic-apply-browser.png",full_page=True)
             # A new user edit after fill must not be undone.
             page.locator("#candidate-name").fill("用户自己修改的姓名")
+            print("BROWSER_STEP_UNDO",flush=True)
             undo=send("HHBA_UNDO")
             assert undo["ok"] and undo["restored"]==3,undo
             assert page.locator("#candidate-name").input_value()=="用户自己修改的姓名"
