@@ -75,7 +75,12 @@ function renderPlans(){
   checkbox.addEventListener("change",()=>p.checked=checkbox.checked);
   text.append(el("strong","",p.label),el("small","",p.reason));
   if(p.eligible)text.append(el("em","",p.value));
-  row.append(checkbox,text);$("plan").append(row);
+  const focusButton=el("button","focus-field","定位");
+  focusButton.type="button";focusButton.addEventListener("click",async()=>{
+   try{const r=await ask("HHBA_FOCUS",{id:p.id});if(!r?.ok)throw Error(r?.error||"无法定位");status("已在招聘网页定位「"+p.label+"」。");}
+   catch(e){status(e.message,true)}
+  });
+  row.append(checkbox,text,focusButton);$("plan").append(row);
  }
  $("fill").classList.toggle("hidden",!eligible.length);
 }

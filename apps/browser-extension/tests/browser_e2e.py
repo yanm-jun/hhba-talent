@@ -37,6 +37,7 @@ def main():
                 assert name in field, (name,list(field))
             assert field["身份证号码"]["excluded"]
             assert field["诚信承诺"]["excluded"]
+            assert all(f["value"] != "already@example.com" for f in scan["fields"]), "Existing personal values must not leave the page via scan"
             steps=[
               {"id":field["姓名"]["id"],"value":"测试姓名","optionValue":None},
               {"id":field["手机号"]["id"],"value":"13800138000","optionValue":None},
@@ -54,6 +55,8 @@ def main():
             assert page.locator("#major").input_value()=="软件工程"
             assert page.locator("#email").input_value()=="already@example.com","existing must not be overwritten"
             assert page.locator("#documentid").input_value()=="","identity must not be filled"
+            focused=send("HHBA_FOCUS",id=field["最高学历"]["id"])
+            assert focused["ok"] and page.evaluate("document.activeElement.id")=="education"
             events=page.evaluate("window.formEvents")
             assert "change:education" in events and "input:candidate-name" in events,events
             page.screenshot(path="/tmp/hhba-domestic-apply-browser.png",full_page=True)

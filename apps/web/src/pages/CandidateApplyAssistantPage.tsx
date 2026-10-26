@@ -81,6 +81,7 @@ export function CandidateApplyAssistantPage({user}:{user:User|null}){
     <h1>认真准备一次，轻松申请更多机会。</h1>
     <p>建立一份自己的求职档案，在 Chrome / Edge 中辅助填写国内企业招聘表单。你决定填写哪些内容，并亲自提交申请。</p>
     <span className="hhba-apply-label">浏览器扩展内测版 · 国内优先 · 本机资料</span>
+    <div className="hhba-apply-price"><strong>¥0.30 <small>/ 次完整网申任务</small></strong><p>正式版拟定价格。目前仍是内测，不收取费用，未接通支付或 DeepSeek 智能服务；请勿向任何人支付所谓内测开通费。</p></div>
    </div>
    <div className="hhba-apply-steps">
     <article><span>01</span><div><strong>整理一份资料</strong><p>准确填写常用信息，或导入已经整理好的 JSON 档案。</p></div></article>
@@ -126,7 +127,7 @@ export function CandidateApplyAssistantPage({user}:{user:User|null}){
      </section>
      <section className="hhba-apply-panel">
       <h2><Info size={20}/> 当前交付范围</h2>
-      <p>内测版已具备标准网页控件的识别、建议预览、回填、核验与撤销。PDF/DOCX 自动解析、账号同步、AI 兜底和复杂 ATS 适配仍在后续开发范围内。</p>
+      <p>内测版已具备标准网页控件的识别、建议预览、回填、核验与撤销。正式版由 HHBA 统一提供智能服务，不需要用户配置 API Key。支付和真实 AI 服务目前尚未开放，PDF/DOCX 解析、账号同步及复杂 ATS 仍待开发验证。</p>
      </section>
     </aside>
    </div>

@@ -18,3 +18,10 @@ test('页面只进行本地个人资料管理，不虚构跨端同步',()=>{
  assert.doesNotMatch(page,/fetch\(/);
  assert.match(page,/当前版本可能需要人工处理/);
 });
+
+test('唯一商业模式: HHBA 统一 AI 服务, UI 不开放自带 API Key',()=>{
+ const page=read('src/pages/CandidateApplyAssistantPage.tsx');
+ assert.match(page,/¥0.30/);assert.match(page,/不需要用户配置 API Key/);
+ assert.match(page,/目前仍是内测，不收取费用/);
+ assert.doesNotMatch(page,/使用自己的 DeepSeek/);
+});

@@ -36,3 +36,5 @@
 .hhba-apply-error{background:#fff4f2;color:#9d3a2c}.hhba-apply-notice{background:#eef8f0;color:#296844}
 @media(max-width:900px){.hhba-apply-layout{grid-template-columns:1fr}.hhba-apply-steps{grid-template-columns:1fr}}
 @media(max-width:560px){.hhba-apply-page{padding:18px 14px 44px}.hhba-apply-panel{padding:17px}.hhba-apply-form{grid-template-columns:1fr}.hhba-apply-panel-head{display:block}.hhba-apply-panel-head>span{display:inline-flex;margin-top:12px}.hhba-apply-head h1{font-size:28px}}
+
+.hhba-apply-price{max-width:610px;margin-top:16px;padding:16px 18px;border:1px solid #e0e8e1;border-radius:14px;background:#f7faf7}.hhba-apply-price strong{font-size:26px;font-weight:780;color:#295f43}.hhba-apply-price strong small{font-size:13px;font-weight:500}.hhba-apply-price p{font-size:12px;line-height:1.8;margin:6px 0 0;color:#6c7b70}

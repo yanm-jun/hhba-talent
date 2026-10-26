@@ -33,3 +33,10 @@ test("未知字段与长篇经历不强制填写",()=>{
  assert.equal(out[0].eligible,false);assert.equal(out[1].eligible,false);
 });
 test("没有档案阻止使用",()=>assert.throws(()=>validateProfile({}),/空的/));
+
+test("长文本、日期和最大输入长度不强制误填",()=>{
+ const value={...base,major:"人工智能",enrollment:"2025-09",summary:"项目成果总结"};
+ assert.equal(planFields([f("a","所学专业","text",[],{maxLength:2})],value)[0].eligible,false);
+ assert.equal(planFields([f("b","入学年月","text",[],{type:"month"})],value)[0].eligible,true);
+ assert.equal(planFields([f("c","个人简介","text")],value)[0].eligible,false);
+});

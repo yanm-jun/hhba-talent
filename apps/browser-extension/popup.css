@@ -12,3 +12,7 @@ button:disabled{opacity:.48;cursor:not-allowed}.hidden{display:none!important}
 .results{font-size:12px;line-height:1.6}.result{padding:8px 3px;border-bottom:1px solid #eef2ed}.success{color:#24764d}.warning{color:#ac7337}.error{color:#b84b42}
 label.field{display:grid;font-size:12px;font-weight:600;gap:5px;margin-bottom:10px}input[type=text],textarea{padding:9px;font:inherit;font-size:13px;border:1px solid #d6e2d8;border-radius:8px;outline:0;width:100%;color:#263d2e}textarea{resize:vertical;min-height:65px}
 .status{min-height:16px;font-size:11px;color:#356c4e;line-height:1.5}footer{border-top:1px solid #edf1ec;padding-top:10px;margin-top:8px;text-align:center;color:#95a39a;font-size:10px}
+
+.pricing{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #e2eadf;border-radius:10px;margin-top:11px;padding:11px;background:#f8faf7}
+.pricing strong{font-size:20px;color:#275d40}.pricing small{font-size:10px;font-weight:500}.pricing span{font-size:10px;color:#6c7b71;text-align:right;max-width:165px}
+.focus-field{background:#fff;border:1px solid #d9e6db;padding:5px 8px;font-size:11px;color:#286648;flex:none}

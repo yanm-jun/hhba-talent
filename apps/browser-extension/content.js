@@ -3,7 +3,7 @@
 (function(){
  if(globalThis.__hhbaApplyAgentInstalled)return;
  globalThis.__hhbaApplyAgentInstalled=true;
- let current=new Map(), scanId="", snapshot=[];
+ let current=new Map(), scanId="", scanUrl="", snapshot=[];
  const forbidden=/(password|hidden|submit|reset|button|image|file|search)/i;
  const highRisk=/(身份证|证件|政治面貌|民族|家庭|亲属|紧急联系人|密码|验证码|诚信|背景调查|声明|签名|授权|同意|隐私|婚姻|生育|健康|敏感|薪资|社保|银行卡|护照|人脸|企业名称|工作单位|备注.*声明|captcha|otp|consent|agreement|privacy)/i;
  const clean=s=>String(s||"").replace(/[\s\u00a0]+/g," ").trim().slice(0,180);
@@ -61,12 +61,13 @@
    current.set(id,el);
    const options=kind==="select"?Array.from(el.options).map(opt=>({text:clean(opt.text),value:opt.value,disabled:opt.disabled})):
     [];
-   fields.push({id,kind,type,label,placeholder,name,idAttribute,options,required:el.required,
-    value:kind==="checkbox"||kind==="radio"?(el.checked?"已选择":""):String(el.value||""),
+   fields.push({id,kind,type,label,placeholder,name,idAttribute,options,required:el.required,maxLength:el.maxLength,
+    value:kind==="checkbox"||kind==="radio"?(el.checked?"已填写":""):(String(el.value||"")?"已填写":""),
     excluded:highRisk.test(context)});
   }
   scanId=String(Date.now())+"-"+Math.random().toString(36).slice(2,8);
-  return {ok:true,scanId,url:location.origin+location.pathname,host:location.hostname,title:document.title,
+  scanUrl=location.href;
+  return {ok:true,scanId,host:location.hostname,title:document.title,
    fields,notice:"只扫描当前网页中的可见标准控件；iframe、复杂自定义控件需人工核对。"};
  }
  function setNative(el,value){
@@ -78,17 +79,19 @@
   el.dispatchEvent(new Event("change",{bubbles:true}));
  }
  function fill(data){
-  if(!data||data.scanId!==scanId)return {ok:false,error:"页面已变化，请重新扫描"};
+  if(!data||data.scanId!==scanId||scanUrl!==location.href)return {ok:false,error:"页面已变化，请重新扫描"};
   if(!Array.isArray(data.steps))return {ok:false,error:"缺少填写指令"};
   if(data.steps.length>200)return {ok:false,error:"单次填写字段过多"};
   const results=[];
-  snapshot=[];
+  // Preserve previous writes across multiple user-triggered batches until explicitly undone.
+  snapshot=snapshot.filter(r=>r.el.isConnected&&String(r.el.value||"")===r.written);
   const done=new Set();
   for(const step of data.steps){
    const el=current.get(step.id),key=step.id;
    if(done.has(key)){results.push({id:key,status:"skipped",reason:"重复字段"});continue}
    done.add(key);
    if(!el||!el.isConnected||!visible(el)){results.push({id:key,status:"failed",reason:"字段已消失或隐藏"});continue}
+   if(el.readOnly||el.disabled){results.push({id:key,status:"skipped",reason:"网页已锁定此字段"});continue}
    if(el.value){results.push({id:key,status:"skipped",reason:"原有内容未覆盖"});continue}
    if(highRisk.test([fieldLabel(el),el.name,el.id,el.placeholder].join(" "))){
     results.push({id:key,status:"skipped",reason:"敏感字段需人工确认"});continue;
@@ -111,10 +114,19 @@
     snapshot.push({el,old,written:actual});
     results.push({id:key,status:"filled",reason:"已写入并回读确认"});
    }catch(e){
+    // No misleading failed status that leaves the invalid value on the live website.
+    if(el.isConnected&&String(el.value||"")!==old){try{setNative(el,old)}catch{}}
     results.push({id:key,status:"failed",reason:e?.message||"写入失败"});
    }
   }
   return {ok:true,results,filled:results.filter(x=>x.status==="filled").length,failures:results.filter(x=>x.status==="failed").length};
+ }
+ function focus(data){
+  const el=current.get(data?.id);
+  if(!el||!el.isConnected)return {ok:false,error:"字段已变化，请重新扫描"};
+  el.scrollIntoView({behavior:"smooth",block:"center"});
+  el.focus({preventScroll:true});
+  return {ok:true};
  }
  function undo(){
   let count=0;
@@ -126,9 +138,9 @@
   return {ok:true,restored:count};
  }
  chrome.runtime.onMessage.addListener((message,_sender,reply)=>{
-  if(!message||typeof message!=="object"||!["HHBA_SCAN","HHBA_FILL","HHBA_UNDO"].includes(message.type))return;
+  if(!message||typeof message!=="object"||!["HHBA_SCAN","HHBA_FILL","HHBA_UNDO","HHBA_FOCUS"].includes(message.type))return;
   try{
-   const result=message.type==="HHBA_SCAN"?scan():message.type==="HHBA_FILL"?fill(message):undo();
+   const result=message.type==="HHBA_SCAN"?scan():message.type==="HHBA_FILL"?fill(message):message.type==="HHBA_FOCUS"?focus(message):undo();
    reply(result);
   }catch(e){reply({ok:false,error:e?.message||"网页处理失败"})}
   return true;

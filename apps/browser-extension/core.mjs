@@ -83,6 +83,7 @@ export function planFields(fields,profile){
   let value=key?p[key]:"";
   let reason="",eligible=false,option=null;
   if(field.value)reason="已有内容，不覆盖";
+  else if(field.required&&field.kind==="select"&&(!Array.isArray(field.options)||!field.options.length))reason="动态下拉组件尚未识别，请手动处理";
   else if(!key)reason=field.excluded?"敏感或声明类字段，请本人操作":"无法可靠识别，留给人工";
   else if(!value)reason="求职档案缺少对应信息";
   else if(field.kind==="select"){
@@ -94,6 +95,7 @@ export function planFields(fields,profile){
    if((key==="experience"||key==="projects"||key==="summary")&&field.kind!=="textarea")reason="长文本需要手动核对";
    else if(field.type==="date"&&!/^\d{4}-\d{2}-\d{2}$/.test(value))reason="日期格式需精确到日，请手动填写";
    else if(field.type==="month"&&!/^\d{4}-\d{2}$/.test(value))reason="需要 YYYY-MM 格式";
+   else if(field.maxLength>0&&value.length>field.maxLength)reason="超过网页允许的最大字数，请手动精简";
    else{eligible=true;reason="根据资料字段准确匹配"}
   }else reason="此控件需要人工处理";
   return {id:field.id,key:key||"",label:field.label||field.placeholder||field.name||"未命名字段",
