@@ -1,0 +1,46 @@
+# Copy to /etc/nginx/sites-available/hhba.conf after replacing __HHBA_DOMAIN__.
+# The release path is switched atomically by deploy/scripts/activate-release.sh.
+server {
+    listen 80;
+    listen [::]:80;
+    server_name __HHBA_DOMAIN__;
+
+    location ^~ /.well-known/acme-challenge/ { root /var/www/acme; default_type "text/plain"; }
+    location / { return 301 https://$host$request_uri; }
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name __HHBA_DOMAIN__;
+
+    # Certbot writes these paths after the certificate is issued.
+    ssl_certificate /etc/letsencrypt/live/__HHBA_DOMAIN__/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/__HHBA_DOMAIN__/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:10m;
+
+    root /srv/hhba/current;
+    index index.html;
+    access_log /var/log/nginx/hhba.access.log;
+    error_log /var/log/nginx/hhba.error.log warn;
+    client_max_body_size 64k;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()" always;
+    add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; object-src 'none'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https:; font-src 'self' data:; upgrade-insecure-requests" always;
+
+    # Phase 1 has no public backend. These blocks make uploads, account operations,
+    # recruitment actions and static admin previews unreachable even if a client calls them directly.
+    location ~* ^/(?:api|recruitment|live-recruitment)(?:/|$) { return 404; }
+    location ^~ /preview-admin/ { return 404; }
+    location ~ /(?:\.|\.env|\.git|.*\.(?:sql|sqlite|log|bak|zip))$ { return 404; }
+    location = /letter/ { return 301 /vision; }
+
+    location /assets/ { try_files $uri =404; expires 30d; add_header Cache-Control "public, max-age=2592000, immutable"; }
+    location ~* \.(?:webp|avif|png|jpe?g|svg|woff2?)$ { try_files $uri =404; expires 7d; add_header Cache-Control "public, max-age=604800"; }
+    location / { try_files $uri $uri/ /index.html; add_header Cache-Control "no-cache"; }
+}

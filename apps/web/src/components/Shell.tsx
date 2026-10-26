@@ -11,6 +11,7 @@ import '../styles/experience-navigation.css';
 // Navigation is contextual: a public landing page is not a candidate account
 // and a recruiter is NEVER granted the internal HHBA reviewer/admin role.
 type Experience='public'|'candidate'|'employer';
+const phase1PublicOnly = import.meta.env.VITE_HHBA_PHASE1_PUBLIC_ONLY === '1';
 function experienceForRoute(route:string):Experience {
  if(route==='/')return 'public';
  if(route.startsWith('/employer')||route.startsWith('/recruiter'))return 'employer';
@@ -61,7 +62,11 @@ export function Shell({ user, children }: { user: User | null; children: React.R
     {experience==='candidate'&&<span className="hhba-experience-label">求职者端</span>}
     {experience==='employer'&&<span className="hhba-experience-label">企业端</span>}
    </div>
-   {experience==='public'?<nav aria-label="公共网站导航">
+   {phase1PublicOnly?<nav aria-label="公共网站导航">
+     <Link className="auth" to="/companies/discover">企业发现</Link>
+     <Link className="join-nav-link" to="/vision">品牌理念</Link>
+     <Link className="auth" to="/candidate/account/legal-aid">劳动权益知识</Link>
+   </nav>:experience==='public'?<nav aria-label="公共网站导航">
      <Link className="auth" to="/candidate/jobs">招聘市场</Link>
      <Link className="auth" to="/companies/discover">企业发现</Link>
      <Link className="join-nav-link" to="/join">加入我们</Link>
