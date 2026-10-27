@@ -1,0 +1,41 @@
+name: HHBA Brand & Login Staging Checks
+on:
+  push:
+    branches:
+      - feat/hhba-brand-v2-preview-20261027
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    name: Check brand assets, navigation and static build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Test new brand integration and existing identity contracts
+        working-directory: apps/web
+        run: node --test scripts/brand-v2.contract.test.mjs scripts/three-entry-experience.contract.test.mjs scripts/demo-account.contract.test.mjs scripts/hhba-unified-static.contract.test.mjs scripts/strict-auth-no-photo-outlinks.behavior.test.mjs
+      - name: Build standalone static preview with ALL credential APIs disabled
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_HHBA_PHONE_AUTH_ENABLED: '0'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+        run: npm run build
+      - name: Save deployable static site for review, without publishing to GitHub Pages
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-brand-v2-standalone-preview
+          path: apps/web/dist
+          if-no-files-found: error
+          retention-days: 7
