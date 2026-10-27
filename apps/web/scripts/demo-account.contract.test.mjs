@@ -3,9 +3,11 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const base=new URL('../src/',import.meta.url);
 const source=path=>readFileSync(new URL(path,base),'utf8');
-test('candidate auth routes use isolated mock only while live account API disabled',()=>{
+test('candidate auth routes expose trusted phone UI instead of mock login',()=>{
  const main=source('main.tsx');
- assert.match(main,/demoModeEnabled\s*\?\s*<DemoAuthPage/);
+ assert.ok(main.includes("route===\u0027/auth\u0027)return <AuthChoicePage/>") || main.includes("route==\u0027/auth\u0027)return <AuthChoicePage/>"));
+ assert.ok(main.includes("PhoneAuthPage"));
+ assert.ok(!main.includes("demoModeEnabled?<DemoAuthPage"));
  assert.match(main,/if\(!employerApiReady\)\{setReady\(true\);return;\}/);
  assert.match(main,/candidate\/account/);
 });

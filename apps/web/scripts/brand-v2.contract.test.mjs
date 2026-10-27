@@ -1,0 +1,42 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync,existsSync} from 'node:fs';
+const src=p=>readFileSync(new URL('../src/'+p,import.meta.url),'utf8');
+test('user-provided SVG is a real checked-in transparent vector asset',()=>{
+ const asset=new URL('../public/images/hhba-logo.svg',import.meta.url);
+ assert.ok(existsSync(asset),'missing original HHBA logo');
+ const svg=readFileSync(asset,'utf8');
+ for(const token of ['<svg','viewBox="15 3 170 170"','url(#lowerBridge)','url(#bridge)','url(#blueHead)','url(#orangeHead)'])assert.ok(svg.includes(token),token);
+ assert.ok(!svg.includes('<image'),'do not swap SVG for embedded bitmap');
+});
+test('global shell, public hero, letter, vision and footer use same component, not copied images',()=>{
+ const shell=src('components/Shell.tsx'),home=src('pages/HomePage.tsx');
+ const letter=src('components/HomeOpenLetter.tsx'),vision=src('pages/VisionPage.tsx');
+ const brand=src('components/BrandMark.tsx');
+ assert.ok(brand.includes('images/hhba-logo.svg'));
+ assert.ok(brand.includes('import.meta.env.BASE_URL'));
+ assert.ok(shell.includes('<BrandMark/>'));
+ assert.ok(home.includes('hhba-public-hero-logo'));
+ assert.ok(home.includes('hhba-brand-home-footer'));
+ assert.ok(letter.includes('hhba-letter-footer-logo'));
+ assert.ok(letter.includes('hhba-letter-envelope-seal'));
+ assert.ok(vision.includes('hhba-vision-brand-intro'));
+ assert.ok(vision.includes('variant="signature"'));
+ const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+ assert.ok(html.includes('%BASE_URL%images/hhba-logo.svg'));
+});
+test('safe cross-identity login selector and consistent centered SVG logo on both account pages',()=>{
+ const main=src('main.tsx'),choice=src('pages/AuthChoicePage.tsx'),auth=src('pages/PhoneAuthPage.tsx');
+ const api=src('services/api.ts'),style=src('styles/role-auth.css');
+ assert.ok(main.includes("route==='/auth')return <AuthChoicePage/>"));
+ assert.ok(choice.includes('to="/recruiter/login"'));
+ assert.ok(choice.includes('/candidate/login'));
+ assert.ok(choice.includes('BrandMark variant="icon"'));
+ assert.ok(auth.includes('BrandMark variant="icon"'));
+ assert.ok(!auth.includes('hhba-phone-aside'));
+ assert.ok(style.includes('.hhba-phone-card'));
+ assert.ok(style.includes('.hhba-auth-page-logo'));
+ assert.ok(api.includes("VITE_HHBA_PHONE_AUTH_ENABLED==='1'"));
+ assert.ok(auth.includes('disabled={!phoneAuthReady||!mobileValid||!codeValid||busy}'));
+ assert.ok(!auth.includes('enterDemoAccount'));
+});
