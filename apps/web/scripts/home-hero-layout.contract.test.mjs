@@ -26,7 +26,10 @@ test('original landing double-entry and real job market are preserved',()=>{
     'title="我要应聘"','title="我要招人"','<UnifiedJobMarket compact/>']){
   assert.ok(home.includes(t),'home content unexpectedly removed: '+t);
  }
- assert.ok(home.includes("navigate(kind === 'candidate' ? '/candidate' : '/recruiter/register')"),
+ // The two entry cards now link directly to candidate registration and employer onboarding.
+ // Verify their actual targets instead of the removed imperative navigate expression.
+ assert.ok(home.includes("const target=kind==='candidate'?'/candidate/register':'/employer/start'"),
    'candidate/employer route changed');
+ assert.ok(home.includes('return <Link to={target}'), 'entry destination is not used by the rendered card');
  assert.ok(home.includes('className="home-match-promo"'),'resume matching link changed');
 });
