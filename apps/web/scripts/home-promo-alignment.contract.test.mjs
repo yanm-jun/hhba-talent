@@ -22,7 +22,7 @@ test('shortened height and mobile stacking retain readable action button',()=>{
 });
 test('original HHBA home CTA, main dual-entry and shared job marketplace stay untouched',()=>{
  assert.ok(home.includes('className="home-match-promo"'));
- assert.ok(home.includes('navigate("/candidate/match")'));
+ assert.match(home, /navigate\(['"]\/candidate\/match['"]\)/, 'AI resume CTA must route to matching');
  assert.ok(home.includes('title="我要应聘"'));
  assert.ok(home.includes('title="我要招人"'));
  assert.ok(home.includes('<UnifiedJobMarket compact/>'));
