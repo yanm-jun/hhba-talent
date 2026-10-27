@@ -25,7 +25,7 @@ test('first visit to home is public and has a real two-intent landing choice',()
 test('candidate has separate register-first navigation and no mandatory login for public listings',()=>{
  for(const text of ['求职者端','求职者服务导航','招聘市场','企业发现','我的收藏','CandidateAccountDropdown','登录 / 注册','我要招人'])
    assert.ok(shell.includes(text),'candidate navigation lost: '+text);
- assert.ok(shell.includes("to=\"/candidate/register\""));
+ assert.ok(shell.includes("to=\"/auth\""));
  assert.ok(shell.includes("to=\"/candidate/jobs\""));
  assert.ok(shell.includes("to=\"/companies/discover\""));
  assert.ok(shell.includes("to=\"/employer/start\""));
