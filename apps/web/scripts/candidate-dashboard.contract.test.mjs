@@ -10,7 +10,10 @@ const market=read('../src/components/UnifiedJobMarket.tsx');
 const styles=read('../src/styles/candidate-dashboard.css');
 
 test('"我要应聘" opens a single candidate workspace, not another five-card directory',()=>{
- assert.ok(app.includes("if(route==='/candidate')return <CandidateDashboardPage user={user}/>"));
+ // The static-curated flag may show the jobs list; normal candidate navigation must
+ // still land in CandidateDashboardPage, preserving the existing workspace.
+ assert.ok(app.includes("if(route==='/candidate')return import.meta.env.VITE_HHBA_CURATED_STATIC==='1'?<UnifiedJobMarket user={user}/>:<CandidateDashboardPage user={user}/>"));
+ assert.ok(app.includes("if(route==='/candidate/apply-assistant')return <CandidateApplyAssistantPage user={user}/>"));
  assert.ok(dashboard.includes('找到适合你的工作'));
  assert.ok(dashboard.includes('我的求职档案'));
  assert.ok(dashboard.includes('我的申请'));
