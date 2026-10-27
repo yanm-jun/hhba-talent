@@ -20,7 +20,10 @@ test('unfiltered market never blocks on the 14k facet index',()=>{
  assert.ok(index.includes('unfiltered?Promise.resolve(null):loadOfficialSearchFacets()'));
  assert.ok(index.includes('if(!audit || audit.summary.indexed_as_of!==snapshot.updated)'));
  assert.ok(index.includes('if(unfiltered)return {...current,jobs:current.jobs.slice(offset,offset+30)'));
- assert.ok(index.includes('return searchPreview(current,filters,offset,index!.facets)'));
+ // The current implementation copies the index facets and augments them for curated entries.
+ // Retain the search behavior guard without requiring an obsolete variable expression.
+ assert.ok(index.includes('const searchFacets=new Map(index!.facets)'));
+ assert.ok(index.includes('return searchPreview(current,filters,offset,searchFacets)'));
  assert.ok(index.includes('loadOfficialPublicSnapshot(signal:AbortSignal):Promise<LivePage>'));
 });
 test('default stays limited to audited true jobs and search pagination still work',()=>{
