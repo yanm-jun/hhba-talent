@@ -22,6 +22,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: feat/hhba-unified-static-20261025
+          # 2026-10-27 branding preview: source now contains user-approved original HHBA SVG and role login UI.
           # The homepage marquee now uses only HHBA local domestic media and exact domestic company profile routes.
           # Public entry cards restored to compact layout; keep three identity paths unchanged.
           # Navigation copy refresh: 企业发现 (without the 200-company count in the tab)
