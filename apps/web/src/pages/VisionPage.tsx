@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { ArrowDown, ArrowLeft, ArrowRight, Building2, Globe2, HeartHandshake, Sunrise } from 'lucide-react';
 import { Link } from '../router';
 import { Shell } from '../components/Shell';
+import { BrandMark } from '../components/BrandMark';
 import type { User } from '../services/api';
 
 /**
@@ -67,6 +68,7 @@ export function VisionPage({ user }: { user: User | null }) {
     </nav>
     <section className="join-vision" id="vision" ref={sectionRef} aria-labelledby="join-values-title">
     <header className="join-vision-opening" data-vision-reveal>
+      <div className="hhba-vision-brand-intro"><BrandMark variant="icon" size="large"/></div>
       <p className="join-vision-eyebrow">OUR VISION · HHBA</p>
       <h2 id="join-values-title">
         <span>我们相信，</span>
@@ -111,7 +113,7 @@ export function VisionPage({ user }: { user: User | null }) {
       <div className="join-vision-next" aria-hidden="true"><span>接下来，了解我们希望建立怎样的团队</span><ArrowDown size={16}/></div>
     </div>
   </section>
-    <footer className="join-vision-page-footer"><span>HHBA — Human Capability Network</span><Link to="/join">了解加入我们的机会 <ArrowRight size={16} aria-hidden="true" /></Link></footer>
+    <footer className="join-vision-page-footer"><BrandMark variant="signature" size="small"/><Link to="/join">了解加入我们的机会 <ArrowRight size={16} aria-hidden="true" /></Link></footer>
   </div></Shell>;
 }
 
