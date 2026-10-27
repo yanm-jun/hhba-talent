@@ -5,6 +5,7 @@ import { UnifiedJobMarket } from '../components/UnifiedJobMarket';
 import { HomeCompanyMarquee } from '../components/HomeCompanyMarquee';
 import { HomePeopleBanner } from '../components/HomePeopleBanner';
 import { HomeOpenLetter } from '../components/HomeOpenLetter';
+import { BrandMark } from '../components/BrandMark';
 import type { User } from '../services/api';
 
 function EntryCard({kind,title,body,footer}:{kind:'candidate'|'employer';title:string;body:string;footer:string}){
@@ -21,6 +22,7 @@ function EntryCard({kind,title,body,footer}:{kind:'candidate'|'employer';title:s
 export function HomePage({user}:{user:User|null}){
  return <Shell user={user}>
   <section className="home-hero hhba-public-hero">
+   <div className="hhba-public-hero-logo"><BrandMark variant="icon" size="hero"/></div>
    <p className="hhba-public-eyebrow">HHBA · HUMAN CAPABILITY NETWORK</p>
    <h1>让机会与人才，找到彼此。</h1>
    <p>你来到这里，是为了什么？</p>
@@ -50,6 +52,7 @@ export function HomePage({user}:{user:User|null}){
   </section>
   <HomeCompanyMarquee/>
   <HomePeopleBanner/>
+  <footer className="hhba-brand-home-footer"><BrandMark variant="signature" size="small"/><p>Human Capability Network · HHBA</p></footer>
   <HomeOpenLetter/>
  </Shell>;
 }
