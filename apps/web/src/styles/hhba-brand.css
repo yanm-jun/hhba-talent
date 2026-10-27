@@ -1,0 +1,37 @@
+/* HHBA official original SVG usage: never crop, recolor or distort the uploaded mark. */
+.hhba-brand-mark{display:inline-flex;align-items:center;gap:9px;vertical-align:middle;min-width:0;color:#192c47;line-height:1}
+.hhba-brand-mark img{display:block;width:36px;height:36px;aspect-ratio:1;object-fit:contain;flex:none}
+.hhba-brand-text{display:flex;align-items:flex-start;flex-direction:column;gap:5px;min-width:0}
+.hhba-brand-text strong{font-size:19px;letter-spacing:-.6px;font-weight:820;line-height:1;color:#192c47}
+.hhba-brand-dot{color:#ff9625}
+.hhba-brand-text small{font-size:11px;color:#76859a;letter-spacing:.04em;line-height:1.4;font-weight:520}
+.hhba-brand-small img{width:25px;height:25px}
+.hhba-brand-small .hhba-brand-text strong{font-size:14px}
+.hhba-brand-hero img{width:70px;height:70px}
+.hhba-brand-large img{width:88px;height:88px}
+.hhba-brand-large .hhba-brand-text strong{font-size:28px;letter-spacing:-1px}
+.hhba-brand-signature{gap:16px}
+.hhba-brand-icon{gap:0}
+.hhba-main-brand-link{display:inline-flex!important;align-items:center;gap:0;text-decoration:none!important;padding:2px 0!important;white-space:nowrap}
+.hhba-main-brand-link:hover{opacity:.9}
+.hhba-public-hero-logo{display:flex;justify-content:center;margin:0 auto 10px}
+.hhba-public-hero-logo .hhba-brand-mark img{width:64px;height:64px}
+.hhba-brand-home-footer{max-width:1120px;margin:48px auto 18px;border-top:1px solid #e1e7eb;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:26px 3px 10px}
+.hhba-brand-home-footer>p{margin:0;color:#82909d;font-size:11px}
+.hhba-brand-home-footer .hhba-brand-signature img{width:37px;height:37px}
+.hhba-brand-home-footer .hhba-brand-text strong{font-size:17px}
+.hhba-vision-brand-intro{margin:0 auto 28px;display:flex;align-items:center;justify-content:center}
+.hhba-vision-brand-intro .hhba-brand-mark{gap:15px}
+.hhba-letter-seal-logo{display:block;width:42px;height:42px;object-fit:contain}
+.hhba-letter-footer-logo{display:flex;align-items:center;justify-content:flex-start;padding:10px 28px;gap:8px;background:#fffcf5;border-top:1px solid #eee5d8}
+.hhba-letter-footer-logo .hhba-brand-text small{font-size:10px;color:#947f69}
+.hhba-letter-footer-logo .hhba-brand-text strong{font-size:14px}
+.hhba-letter-footer-logo img{width:27px;height:27px}
+@media(max-width:680px){
+ .hhba-main-brand-link .hhba-brand-mark img{width:30px;height:30px}
+ .hhba-main-brand-link .hhba-brand-text strong{font-size:17px}
+ .hhba-public-hero-logo .hhba-brand-mark img{width:54px;height:54px}
+ .hhba-brand-home-footer{flex-direction:column;align-items:flex-start;padding:20px 5px;gap:10px}
+ .hhba-brand-signature .hhba-brand-text small{font-size:10px}
+ .hhba-vision-brand-intro .hhba-brand-mark img{width:58px;height:58px}
+}
