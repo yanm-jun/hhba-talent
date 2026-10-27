@@ -8,6 +8,8 @@ const configuredApiBase = String(import.meta.env.VITE_API_BASE || '').trim();
 // Enable account operations only after deploying and verifying that separate API.
 const accountApiEnabled = import.meta.env.VITE_HHBA_ACCOUNT_API_ENABLED==='1';
 export const employerApiReady = accountApiEnabled && (configuredApiBase==='/api/v1' || /^https:\/\/[^\s/?#]+\/api\/v1\/?$/.test(configuredApiBase));
+// Do not send SMS from a public static site. Enable only after dedicated phone auth backend is verified.
+export const phoneAuthReady = employerApiReady && import.meta.env.VITE_HHBA_PHONE_AUTH_ENABLED==='1';
 // Evidence is an additional, independently activated capability. Existing employer API readiness is insufficient.
 export const recruitmentResponsibilityApiReady = employerApiReady && import.meta.env.VITE_HHBA_RECRUITMENT_RESPONSIBILITY_API_ENABLED==='1';
 export const evidenceApiReady = employerApiReady && import.meta.env.VITE_HHBA_EVIDENCE_API_ENABLED==='1';
@@ -99,6 +101,16 @@ export type TalentMatchReason = { field: 'skill' | 'industry' | 'region' | 'work
 export type TalentSearchCandidate = { candidate_ref: CandidateReference; display_name: string | null; headline: string | null; skills: string[]; industries: string[]; location: string | null; service_regions: string[]; work_modes: string[]; work_years: number | null; project_summaries: string[]; match_reasons: TalentMatchReason[] };
 
 export const api = {
+  sendPhoneCode: (phone:string,account_type:AccountType,mode:'login'|'register') => {
+    if(!phoneAuthReady)throw new ApiError(503,'短信登录服务尚未接入。');
+    return request<{retry_after_seconds:number}>('/auth/phone/code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,account_type,mode})});
+  },
+  phoneSession: async (data:{phone:string;code:string;account_type:AccountType;mode:'login'|'register';display_name?:string}) => {
+    if(!phoneAuthReady)throw new ApiError(503,'短信登录服务尚未接入。');
+    const response=await request<{csrf_token:string}>('/auth/phone/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    setCsrfToken(response.csrf_token);
+    return response;
+  },
   me: async () => { const user=await request<User>('/auth/me'); setCsrfToken(user.csrf_token || null); return user; },
   register: (email: string, password: string, displayName: string, accountType: AccountType = 'candidate') => request<{ id: string; account_type: AccountType }>('/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, display_name: displayName, account_type: accountType }) }),
   login: async (email: string, password: string, accountType?: AccountType) => { const data = await request<{ csrf_token: string }>('/auth/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, account_type: accountType }) }); setCsrfToken(data.csrf_token); return data; },
