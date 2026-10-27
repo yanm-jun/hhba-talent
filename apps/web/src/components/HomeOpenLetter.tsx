@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowRight, Copy, MailOpen, Share2, X } from 'lucide-react';
 import { HHBA_PUBLIC_LETTER } from '../data/publicLetter';
+import { BrandMark } from './BrandMark';
 import '../styles/home-open-letter.css';
 
 type Stage = 'envelope' | 'letter' | null;
@@ -106,7 +107,7 @@ export function HomeOpenLetter() {
               <span className="hhba-letter-envelope-back" aria-hidden="true"/>
               <span className="hhba-letter-envelope-flap" aria-hidden="true"/>
               <span className="hhba-letter-envelope-front" aria-hidden="true"/>
-              <span className="hhba-letter-envelope-seal" aria-hidden="true">HHBA</span>
+              <span className="hhba-letter-envelope-seal" aria-hidden="true"><BrandMark variant="icon" size="small"/></span>
             </button>
             <h2 id="hhba-letter-title">致每一个认真生活的人</h2>
             <p className="hhba-letter-teaser">无论你是谁，都想认真地和你说几句话。</p>
@@ -131,6 +132,7 @@ export function HomeOpenLetter() {
             <article className="hhba-letter-paper-scroll" tabIndex={0} aria-label="公开信全文，可向下滚动阅读">
               {HHBA_PUBLIC_LETTER.map((part,index)=><p key={index} className={part.kind ? `hhba-letter-line hhba-letter-${part.kind}` : 'hhba-letter-line'}>{part.text}</p>)}
             </article>
+            <div className="hhba-letter-footer-logo"><BrandMark variant="signature" size="small"/></div>
             <footer className="hhba-letter-paper-footer">
               <button type="button" className="hhba-letter-outline" onClick={share}><Share2 size={16}/> 分享这封信</button>
               <button type="button" className="hhba-letter-copy" onClick={copyLink}><Copy size={15}/> 复制链接</button>
