@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="15 3 170 170" role="img" aria-label="HHBA 蓝橙连接桥标志">
+  <defs>
+    <linearGradient id="personBlue" x1=".08" y1="0" x2=".8" y2="1" objectBoundingBox="true">
+      <stop offset="0%" stop-color="#3998ff"/>
+      <stop offset="53%" stop-color="#1373fa"/>
+      <stop offset="100%" stop-color="#0651dc"/>
+    </linearGradient>
+    <linearGradient id="personOrange" x1="0" y1="0" x2=".92" y2="1" objectBoundingBox="true">
+      <stop offset="0%" stop-color="#ffca44"/>
+      <stop offset="50%" stop-color="#ffa92d"/>
+      <stop offset="100%" stop-color="#ff811c"/>
+    </linearGradient>
+    <linearGradient id="blueBody" x1="0.1" y1="0" x2="0.75" y2="1">
+      <stop offset="0%" stop-color="#3398ff"/>
+      <stop offset="45%" stop-color="#1474fb"/>
+      <stop offset="100%" stop-color="#0050d6"/>
+    </linearGradient>
+    <linearGradient id="orangeBody" x1="0" y1="0" x2=".85" y2="1">
+      <stop offset="0%" stop-color="#ffcf53"/>
+      <stop offset="50%" stop-color="#ffad35"/>
+      <stop offset="100%" stop-color="#ff811d"/>
+    </linearGradient>
+    <linearGradient id="bridge" x1="0%" y1="60%" x2="100%" y2="36%">
+      <stop offset="0%" stop-color="#0061e6"/>
+      <stop offset="23%" stop-color="#338dfa"/>
+      <stop offset="42%" stop-color="#4e91e3"/>
+      <stop offset="56%" stop-color="#a798a2"/>
+      <stop offset="73%" stop-color="#f5ae5b"/>
+      <stop offset="89%" stop-color="#ffb842"/>
+      <stop offset="100%" stop-color="#ff9625"/>
+    </linearGradient>
+    <linearGradient id="lowerBridge" x1="0%" y1="20%" x2="100%" y2="35%">
+      <stop offset="0%" stop-color="#0050ce"/>
+      <stop offset="24%" stop-color="#136ded"/>
+      <stop offset="43%" stop-color="#478dda"/>
+      <stop offset="55%" stop-color="#cf8a75"/>
+      <stop offset="66%" stop-color="#ff792d"/>
+      <stop offset="85%" stop-color="#ff8e20"/>
+      <stop offset="100%" stop-color="#ffad37"/>
+    </linearGradient>
+    <linearGradient id="coolHighlight" x1="10%" y1="0%" x2="90%" y2="100%">
+      <stop offset="0%" stop-color="#eef5ff"/>
+      <stop offset="45%" stop-color="#89bdff"/>
+      <stop offset="100%" stop-color="#3a8efb"/>
+    </linearGradient>
+    <linearGradient id="warmHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#ffedd0"/>
+    </linearGradient>
+    <radialGradient id="blueHead" cx="29%" cy="16%" r="90%">
+      <stop offset="0%" stop-color="#3e9bff"/>
+      <stop offset="62%" stop-color="#1479ff"/>
+      <stop offset="100%" stop-color="#0854e5"/>
+    </radialGradient>
+    <radialGradient id="orangeHead" cx="20%" cy="18%" r="92%">
+      <stop offset="0%" stop-color="#ffcf53"/>
+      <stop offset="64%" stop-color="#ffac2c"/>
+      <stop offset="100%" stop-color="#ff891b"/>
+    </radialGradient>
+  </defs>
+  <!-- Two figures: blue represents talent, orange represents employers. -->
+  <circle cx="48.5" cy="39.3" r="16.4" fill="url(#blueHead)"/>
+  <circle cx="151.4" cy="39.3" r="16.4" fill="url(#orangeHead)"/>
+  <path d="M29 78 C29 64 35 59 47 59 C58 59 67 66 74 79 C82 94 82 114 76 137 C74 145 69 149 61 149 L43 149 C34 149 29 142 29 133 Z" fill="url(#blueBody)"/>
+  <path d="M170 78 C170 64 164 59 153 59 C142 59 133 66 126 79 C118 94 120 115 129 137 C132 145 135 149 143 149 L156 149 C166 149 170 143 170 133 Z" fill="url(#orangeBody)"/>
+  <!-- Light catches the upper edge where the two figures connect. -->
+  <path d="M29 115 C49 91 74 80 102 78 C82 83 50 107 29 131 Z" fill="url(#coolHighlight)"/>
+  <path d="M117 80 C145 82 161 100 170 120 C155 104 137 86 117 80 Z" fill="url(#warmHighlight)"/>
+  <!-- The H-like shared arch is a real vector path, not an embedded bitmap. -->
+  <path d="M29 132 C47 103 72 81 101 79 C131 77 154 93 170 122 L170 135 C170 144 165 149 155 149 L142 149 C134 149 129 143 129 135 C128 115 116 98 101 98 C85 98 70 111 70 135 C70 144 65 149 57 149 L44 149 C34 149 29 143 29 132 Z" fill="url(#lowerBridge)"/>
+  <!-- Satin-finished upper ribbon: blue transitions to warm gold. -->
+  <path d="M29 132 C47 103 72 81 101 79 C131 77 154 93 170 122 C149 100 129 90 103 89 C76 88 50 106 29 132 Z" fill="url(#bridge)"/>
+</svg>
