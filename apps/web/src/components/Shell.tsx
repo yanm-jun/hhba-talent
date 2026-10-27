@@ -31,6 +31,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
  // A local demo account must never satisfy this requirement.
  const verifiedCandidate=employerApiReady&&hasCandidate;
  const recruiterSignedIn=hasRecruiter;
+ const employerEntry=recruiterSignedIn?'/employer/hub':'/employer/onboarding-preview';
  // Central capture covers all recruiting links across existing company/job pages,
  // not merely the example highlighted by the user.
  function guardRecruitmentClick(event:MouseEvent<HTMLElement>){
@@ -85,7 +86,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
      <Link className="auth" to="/employer/aid">发展帮扶</Link>
      <Link className="hhba-nav-switch" to="/candidate/jobs">返回求职端 <BriefcaseBusiness size={13}/></Link>
      {recruiterSignedIn?<Link className="hhba-nav-account" to="/employer/hub"><Building2 size={14}/> 企业账户</Link>:
-       <Link className="hhba-nav-account" to="/auth">登录 / 注册</Link>}
+       <Link className="hhba-nav-account" to={employerEntry}>企业入驻</Link>}
    </nav>}
   </header>
   {children}
