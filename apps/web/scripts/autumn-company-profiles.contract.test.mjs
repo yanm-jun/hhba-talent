@@ -30,7 +30,7 @@ assert(router.includes("autumn\\/cn-autumn-[0-9]{3}"),'Profile navigation must p
 assert(styles.includes('.hhba-autumn-profile-hero')&&styles.includes('.hhba-autumn-company-index-link'),'Profile and identity links styled');
 
 const evidence=JSON.parse(read('src/data/domesticAutumnOfficialEvidence20261028.json')).entries;
-assert.equal(Object.values(evidence).filter(e=>e.intro&&e.source).length,8,'Evidence backed employer introductions');
+assert.equal(Object.values(evidence).filter(e=>e.intro&&e.source).length,10,'Source-backed employer introductions');
 for(const [name,entry] of Object.entries(evidence)){
  assert(companies.some(c=>c.name===name),'Evidence cannot belong to an absent company: '+name);
  if(entry.intro)assert(entry.source?.startsWith('https://'),'No unattributed company introductions');
