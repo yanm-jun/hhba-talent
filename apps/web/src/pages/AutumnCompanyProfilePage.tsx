@@ -3,6 +3,8 @@ import {ArrowLeft,ArrowRight,BookOpen,BriefcaseBusiness,ExternalLink,GraduationC
 import {Shell} from '../components/Shell';
 import {Link,getCompanyReturnTarget} from '../router';
 import {AutumnCompanyBrand} from '../components/AutumnCompanyBrand';
+import mediaA from '../data/domesticMediaBundle.json';
+import mediaB from '../data/domesticMedia200Bundle.json';
 import {getDomesticCompanies,getDomesticRecruitment} from '../services/domesticCompanySearch';
 import domesticProfiles from '../data/domesticCareerProfiles.json';
 import {domestic200Profiles} from '../services/domesticCompany200Data';
@@ -17,6 +19,7 @@ type Editorial={displayName?:string;summary?:string;description?:string[];busine
 const employers=employersJSON.entries as Employer[];
 const jobs=jobsJSON.jobs as RecordInfo[];
 const profiles={...domesticProfiles,...domestic200Profiles} as Record<string,Editorial>;
+const mediaIndex={...mediaA.companies,...mediaB.companies} as Record<string,{photos?:{state:string;path?:string;classification?:string}[]}>;
 const safeUrl=(value?:string|null)=>{
  try{const u=new URL(value||'');return u.protocol==='https:'&&!u.username&&!u.password&&!u.port?u.href:null}
  catch{return null}
@@ -29,6 +32,8 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
  const editorial=employer?profiles[employer.name]:undefined;
  const recruitment=employer?getDomesticRecruitment(employer.name):undefined;
  const matched=employer?jobs.filter(j=>j.company===employer.name):[];
+ const profileMedia=employer?mediaIndex[employer.name]:undefined;
+ const localPhotos=(profileMedia?.photos||[]).filter(photo=>photo.state==='ready'&&typeof photo.path==='string'&&/^domestic-media\/[a-z0-9-]+\.(webp|png|jpg|jpeg)$/i.test(photo.path));
  const primary=safeUrl(employer?.officialUrl)||safeUrl(recruitment?.url);
  const hasRecruitment=Boolean(primary);
  const hasCompanyEditorial=Boolean(editorial?.summary?.trim());
@@ -56,10 +61,19 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
         <p className="hhba-autumn-profile-note">企业信息为已整理资料，深度核验状态以企业完整档案标注为准。</p>
        </>:<>
         <p>这家企业已收录于本次秋招截图名单，但企业业务、总部地址及经营情况尚未完成独立核实。</p>
+        {existing?.overview&&existing.status==='industry_reviewed'&&<p>{existing.overview}</p>}
         {existing?.industry&&existing.industry!=='行业待细分'&&<p>已有名录行业分类：{existing.industry}。此分类不代表该企业正在招聘。</p>}
         {existing?.route&&<Link to={existing.route} className="hhba-autumn-profile-details">查看已有的企业名录资料 <ArrowRight size={15}/></Link>}
        </>}
       {editorial?.officialSource&&safeUrl(editorial.officialSource)&&<a className="hhba-autumn-profile-source" href={safeUrl(editorial.officialSource)!} data-hhba-non-recruitment-link="true" target="_blank" rel="noopener noreferrer">查看企业介绍来源 <BookOpen size={14}/></a>}
+      <div className="hhba-autumn-verified-facts" aria-label="企业档案核验情况">
+       <span>已有 HHBA 企业档案：<b>{existing?'有':'待建立'}</b></span>
+       <span>企业专属介绍：<b>{hasCompanyEditorial?'有资料 · 请核对来源':'待核验'}</b></span>
+       <span>官方招聘入口：<b>{hasRecruitment?'已登记 · 实际状态待核验':'待核验'}</b></span>
+       <span>已有具体岗位／项目：<b>{matched.filter(j=>j.recordKind==='job').length} 条／{matched.filter(j=>j.recordKind==='program').length} 条</b></span>
+       {existing?.stockCode&&<span>证券代码：<b>{existing.stockCode}</b></span>}
+       {existing?.province&&<span>名录登记地区：<b>{[existing.province,existing.city].filter(Boolean).join(' · ')}（非岗位工作地）</b></span>}
+      </div>
      </section>
      <section className="hhba-autumn-profile-recruitment">
       <h2>选择官方招聘渠道</h2>
@@ -70,6 +84,12 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
       {evidence&&<a className="hhba-autumn-profile-source" href={evidence} data-hhba-non-recruitment-link="true" target="_blank" rel="noopener noreferrer">查看招聘公告依据 <BookOpen size={14}/></a>}
      </section>
     </div>
+   </section>
+   <section className="hhba-autumn-profile-panel hhba-autumn-visual-panel" aria-label="企业图片及标识">
+    <h2>企业图片与品牌标识</h2>
+    {localPhotos.length?<><p className="hhba-autumn-profile-note">以下图片来自现有企业媒体档案，为官网页面截图，不代表真实办公环境；点击图片不会跳转第三方网站。</p>
+      <div className="hhba-autumn-local-photo-grid">{localPhotos.map((photo,i)=><figure key={photo.path||i}><img loading="lazy" src={import.meta.env.BASE_URL+photo.path!} alt={employer.name+'企业官方网站页面截图'} onError={e=>{e.currentTarget.style.display='none'}}/><figcaption>企业官网页面截图 · 非办公实景</figcaption></figure>)}</div>
+     </>:<div className="hhba-autumn-no-photo"><AutumnCompanyBrand name={employer.name} large/><p>尚无通过核验并已保存到本地的企业照片或官方 Logo。当前使用 HHBA 企业名称标识（非企业官方商标）。</p></div>}
    </section>
    <section className="hhba-autumn-profile-panel">
     <h2>已整理的相关岗位和招聘项目</h2>
