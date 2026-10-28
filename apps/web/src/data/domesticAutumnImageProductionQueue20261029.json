@@ -1,0 +1,3755 @@
+{
+  "schemaVersion": "1.0",
+  "createdOn": "2026-10-29",
+  "scope": "156 screenshot employers",
+  "policy": "This is the one-by-one independent-photo production queue, not a claim that all photos exist.",
+  "totalEmployers": 156,
+  "totalPlannedScenes": 312,
+  "publishedPreviewScenes": 1,
+  "entries": [
+    {
+      "employerId": "cn-autumn-001",
+      "employerName": "毕马威",
+      "categoryHint": "企业综合服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-001-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-001-01.webp",
+          "visualSubject": "现代企业协作与项目管理办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-001-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-001-02.webp",
+          "visualSubject": "商务会议和专业服务团队工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-002",
+      "employerName": "施耐德电气",
+      "categoryHint": "能源及工程",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-002-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-002-01.webp",
+          "visualSubject": "能源工程设施与电力设备生产场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-002-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-002-02.webp",
+          "visualSubject": "工程师巡视设备与安全生产工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-003",
+      "employerName": "辉瑞",
+      "categoryHint": "医药与生命科学",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-003-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-003-01.webp",
+          "visualSubject": "生命科学实验室与研发仪器场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-003-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-003-02.webp",
+          "visualSubject": "医药研发人员在标准实验场景工作",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-004",
+      "employerName": "中国南方航空",
+      "categoryHint": "航空运输",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-004-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-004-01.webp",
+          "visualSubject": "客机停机坪和航空地面运营场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-004-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-004-02.webp",
+          "visualSubject": "飞行运行控制中心和航空工程技术空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-005",
+      "employerName": "顺丰",
+      "categoryHint": "物流交通及旅游",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-005-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-005-01.webp",
+          "visualSubject": "现代物流配送分拣与运输组织场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-005-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-005-02.webp",
+          "visualSubject": "物流信息调度和运营管理空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-006",
+      "employerName": "网易游戏",
+      "categoryHint": "文化传媒与互联网",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-006-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-006-01.webp",
+          "visualSubject": "数字内容研发与设计制作工作室",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-006-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-006-02.webp",
+          "visualSubject": "视频创作、游戏开发与多媒体办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-007",
+      "employerName": "鹰角网络",
+      "categoryHint": "文化传媒与互联网",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-007-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-007-01.webp",
+          "visualSubject": "数字内容研发与设计制作工作室",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-007-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-007-02.webp",
+          "visualSubject": "视频创作、游戏开发与多媒体办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-008",
+      "employerName": "安克创新",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-008-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-008-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-008-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-008-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-009",
+      "employerName": "徕芬科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-009-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-009-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-009-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-009-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-010",
+      "employerName": "新鸿基地产",
+      "categoryHint": "建设与地产",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-010-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-010-01.webp",
+          "visualSubject": "现代建筑工程协作设计现场",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-010-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-010-02.webp",
+          "visualSubject": "企业管理办公空间与建筑方案展示",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-011",
+      "employerName": "万科泊寓",
+      "categoryHint": "建设与地产",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-011-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-011-01.webp",
+          "visualSubject": "现代建筑工程协作设计现场",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-011-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-011-02.webp",
+          "visualSubject": "企业管理办公空间与建筑方案展示",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-012",
+      "employerName": "远景科技集团",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-012-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-012-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-012-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-012-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-013",
+      "employerName": "蜂巢能源",
+      "categoryHint": "能源及工程",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-013-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-013-01.webp",
+          "visualSubject": "能源工程设施与电力设备生产场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-013-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-013-02.webp",
+          "visualSubject": "工程师巡视设备与安全生产工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-014",
+      "employerName": "中国能建国际集团",
+      "categoryHint": "能源及工程",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-014-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-014-01.webp",
+          "visualSubject": "能源工程设施与电力设备生产场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-014-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-014-02.webp",
+          "visualSubject": "工程师巡视设备与安全生产工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-015",
+      "employerName": "中国煤炭科工",
+      "categoryHint": "能源及工程",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-015-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-015-01.webp",
+          "visualSubject": "能源工程设施与电力设备生产场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-015-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-015-02.webp",
+          "visualSubject": "工程师巡视设备与安全生产工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-016",
+      "employerName": "中国通服广西公司",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-016-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-016-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-016-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-016-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-017",
+      "employerName": "太极股份",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-017-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-017-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-017-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-017-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-018",
+      "employerName": "新奥集团",
+      "categoryHint": "企业综合服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-018-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-018-01.webp",
+          "visualSubject": "现代企业协作与项目管理办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-018-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-018-02.webp",
+          "visualSubject": "商务会议和专业服务团队工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-019",
+      "employerName": "湖南省广播影视集团（湖南广电）",
+      "categoryHint": "文化传媒与互联网",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-019-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-019-01.webp",
+          "visualSubject": "数字内容研发与设计制作工作室",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-019-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-019-02.webp",
+          "visualSubject": "视频创作、游戏开发与多媒体办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-020",
+      "employerName": "紫金集团",
+      "categoryHint": "能源及工程",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-020-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-020-01.webp",
+          "visualSubject": "能源工程设施与电力设备生产场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-020-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-020-02.webp",
+          "visualSubject": "工程师巡视设备与安全生产工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-021",
+      "employerName": "青蛙王子",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-021-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-021-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-021-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-021-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-022",
+      "employerName": "万兴科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-022-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-022-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-022-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-022-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-023",
+      "employerName": "紫龙游戏",
+      "categoryHint": "文化传媒与互联网",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-023-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-023-01.webp",
+          "visualSubject": "数字内容研发与设计制作工作室",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-023-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-023-02.webp",
+          "visualSubject": "视频创作、游戏开发与多媒体办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-024",
+      "employerName": "菲婷丝",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-024-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-024-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-024-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-024-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-025",
+      "employerName": "青岛银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-025-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-025-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "published_preview",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-025-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-025-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-026",
+      "employerName": "南方传媒",
+      "categoryHint": "文化传媒与互联网",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-026-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-026-01.webp",
+          "visualSubject": "数字内容研发与设计制作工作室",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-026-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-026-02.webp",
+          "visualSubject": "视频创作、游戏开发与多媒体办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-027",
+      "employerName": "广之旅",
+      "categoryHint": "物流交通及旅游",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-027-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-027-01.webp",
+          "visualSubject": "现代物流配送分拣与运输组织场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-027-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-027-02.webp",
+          "visualSubject": "物流信息调度和运营管理空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-028",
+      "employerName": "中建路桥",
+      "categoryHint": "建设与地产",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-028-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-028-01.webp",
+          "visualSubject": "现代建筑工程协作设计现场",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-028-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-028-02.webp",
+          "visualSubject": "企业管理办公空间与建筑方案展示",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-029",
+      "employerName": "中电建电力集团",
+      "categoryHint": "能源及工程",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-029-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-029-01.webp",
+          "visualSubject": "能源工程设施与电力设备生产场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-029-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-029-02.webp",
+          "visualSubject": "工程师巡视设备与安全生产工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-030",
+      "employerName": "江苏省国信集团",
+      "categoryHint": "企业综合服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-030-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-030-01.webp",
+          "visualSubject": "现代企业协作与项目管理办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-030-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-030-02.webp",
+          "visualSubject": "商务会议和专业服务团队工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-031",
+      "employerName": "奇正",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-031-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-031-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-031-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-031-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-032",
+      "employerName": "微谱",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-032-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-032-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-032-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-032-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-033",
+      "employerName": "邦德激光",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-033-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-033-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-033-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-033-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-034",
+      "employerName": "鹏芯微",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-034-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-034-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-034-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-034-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-035",
+      "employerName": "佑驾创新",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-035-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-035-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-035-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-035-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-036",
+      "employerName": "南芯科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-036-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-036-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-036-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-036-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-037",
+      "employerName": "炬芯科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-037-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-037-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-037-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-037-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-038",
+      "employerName": "博创科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-038-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-038-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-038-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-038-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-039",
+      "employerName": "安世中国",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-039-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-039-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-039-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-039-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-040",
+      "employerName": "黑格科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-040-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-040-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-040-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-040-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-041",
+      "employerName": "晶云",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-041-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-041-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-041-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-041-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-042",
+      "employerName": "艾普工华",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-042-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-042-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-042-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-042-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-043",
+      "employerName": "迦智科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-043-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-043-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-043-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-043-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-044",
+      "employerName": "博顿光电",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-044-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-044-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-044-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-044-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-045",
+      "employerName": "元夫半导体",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-045-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-045-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-045-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-045-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-046",
+      "employerName": "芯德科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-046-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-046-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-046-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-046-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-047",
+      "employerName": "瀚通通讯",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-047-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-047-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-047-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-047-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-048",
+      "employerName": "元力股份",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-048-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-048-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-048-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-048-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-049",
+      "employerName": "红谱科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-049-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-049-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-049-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-049-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-050",
+      "employerName": "汇蓉国科",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-050-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-050-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-050-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-050-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-051",
+      "employerName": "金中新材",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-051-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-051-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-051-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-051-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-052",
+      "employerName": "宏川集团",
+      "categoryHint": "企业综合服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-052-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-052-01.webp",
+          "visualSubject": "现代企业协作与项目管理办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-052-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-052-02.webp",
+          "visualSubject": "商务会议和专业服务团队工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-053",
+      "employerName": "兰石集团",
+      "categoryHint": "企业综合服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-053-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-053-01.webp",
+          "visualSubject": "现代企业协作与项目管理办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-053-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-053-02.webp",
+          "visualSubject": "商务会议和专业服务团队工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-054",
+      "employerName": "海程邦达",
+      "categoryHint": "物流交通及旅游",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-054-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-054-01.webp",
+          "visualSubject": "现代物流配送分拣与运输组织场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-054-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-054-02.webp",
+          "visualSubject": "物流信息调度和运营管理空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-055",
+      "employerName": "长隆科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-055-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-055-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-055-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-055-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-056",
+      "employerName": "维音",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-056-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-056-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-056-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-056-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-057",
+      "employerName": "line plus",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-057-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-057-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-057-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-057-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-058",
+      "employerName": "招商金科",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-058-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-058-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-058-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-058-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-059",
+      "employerName": "中盈优创",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-059-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-059-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-059-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-059-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-060",
+      "employerName": "云尖信息",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-060-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-060-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-060-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-060-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-061",
+      "employerName": "美迈科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-061-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-061-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-061-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-061-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-062",
+      "employerName": "厦门国资运",
+      "categoryHint": "物流交通及旅游",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-062-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-062-01.webp",
+          "visualSubject": "现代物流配送分拣与运输组织场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-062-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-062-02.webp",
+          "visualSubject": "物流信息调度和运营管理空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-063",
+      "employerName": "桑棋汽配",
+      "categoryHint": "汽车及交通装备",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-063-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-063-01.webp",
+          "visualSubject": "现代汽车研发实验室与工程样车场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-063-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-063-02.webp",
+          "visualSubject": "汽车零部件生产与测试工作空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-064",
+      "employerName": "新海威",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-064-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-064-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-064-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-064-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-065",
+      "employerName": "双视科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-065-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-065-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-065-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-065-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-066",
+      "employerName": "物产道富",
+      "categoryHint": "物流交通及旅游",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-066-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-066-01.webp",
+          "visualSubject": "现代物流配送分拣与运输组织场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-066-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-066-02.webp",
+          "visualSubject": "物流信息调度和运营管理空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-067",
+      "employerName": "弘象",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-067-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-067-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-067-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-067-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-068",
+      "employerName": "甘肃能化集团",
+      "categoryHint": "企业综合服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-068-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-068-01.webp",
+          "visualSubject": "现代企业协作与项目管理办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-068-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-068-02.webp",
+          "visualSubject": "商务会议和专业服务团队工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-069",
+      "employerName": "广东省农信联社",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-069-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-069-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-069-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-069-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-070",
+      "employerName": "青岛成达",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-070-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-070-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-070-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-070-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-071",
+      "employerName": "桃溪集团",
+      "categoryHint": "企业综合服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-071-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-071-01.webp",
+          "visualSubject": "现代企业协作与项目管理办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-071-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-071-02.webp",
+          "visualSubject": "商务会议和专业服务团队工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-072",
+      "employerName": "福州建工集团",
+      "categoryHint": "建设与地产",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-072-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-072-01.webp",
+          "visualSubject": "现代建筑工程协作设计现场",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-072-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-072-02.webp",
+          "visualSubject": "企业管理办公空间与建筑方案展示",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-073",
+      "employerName": "微软",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-073-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-073-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-073-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-073-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-074",
+      "employerName": "大众汽车",
+      "categoryHint": "汽车及交通装备",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-074-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-074-01.webp",
+          "visualSubject": "现代汽车研发实验室与工程样车场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-074-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-074-02.webp",
+          "visualSubject": "汽车零部件生产与测试工作空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-075",
+      "employerName": "强生",
+      "categoryHint": "医药与生命科学",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-075-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-075-01.webp",
+          "visualSubject": "生命科学实验室与研发仪器场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-075-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-075-02.webp",
+          "visualSubject": "医药研发人员在标准实验场景工作",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-076",
+      "employerName": "阿斯利康",
+      "categoryHint": "医药与生命科学",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-076-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-076-01.webp",
+          "visualSubject": "生命科学实验室与研发仪器场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-076-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-076-02.webp",
+          "visualSubject": "医药研发人员在标准实验场景工作",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-077",
+      "employerName": "中国海油",
+      "categoryHint": "能源及工程",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-077-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-077-01.webp",
+          "visualSubject": "能源工程设施与电力设备生产场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-077-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-077-02.webp",
+          "visualSubject": "工程师巡视设备与安全生产工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-078",
+      "employerName": "中国邮政",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-078-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-078-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-078-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-078-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-079",
+      "employerName": "中通快递",
+      "categoryHint": "物流交通及旅游",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-079-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-079-01.webp",
+          "visualSubject": "现代物流配送分拣与运输组织场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-079-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-079-02.webp",
+          "visualSubject": "物流信息调度和运营管理空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-080",
+      "employerName": "达能",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-080-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-080-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-080-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-080-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-081",
+      "employerName": "安利",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-081-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-081-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-081-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-081-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-082",
+      "employerName": "太古集团",
+      "categoryHint": "企业综合服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-082-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-082-01.webp",
+          "visualSubject": "现代企业协作与项目管理办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-082-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-082-02.webp",
+          "visualSubject": "商务会议和专业服务团队工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-083",
+      "employerName": "福特中国",
+      "categoryHint": "汽车及交通装备",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-083-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-083-01.webp",
+          "visualSubject": "现代汽车研发实验室与工程样车场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-083-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-083-02.webp",
+          "visualSubject": "汽车零部件生产与测试工作空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-084",
+      "employerName": "卡夫亨氏",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-084-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-084-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-084-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-084-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-085",
+      "employerName": "汉高",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-085-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-085-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-085-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-085-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-086",
+      "employerName": "利洁时",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-086-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-086-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-086-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-086-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-087",
+      "employerName": "嘉士伯",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-087-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-087-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-087-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-087-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-088",
+      "employerName": "森马",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-088-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-088-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-088-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-088-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-089",
+      "employerName": "无限极",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-089-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-089-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-089-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-089-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-090",
+      "employerName": "阅文集团",
+      "categoryHint": "文化传媒与互联网",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-090-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-090-01.webp",
+          "visualSubject": "数字内容研发与设计制作工作室",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-090-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-090-02.webp",
+          "visualSubject": "视频创作、游戏开发与多媒体办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-091",
+      "employerName": "虎牙",
+      "categoryHint": "文化传媒与互联网",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-091-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-091-01.webp",
+          "visualSubject": "数字内容研发与设计制作工作室",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-091-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-091-02.webp",
+          "visualSubject": "视频创作、游戏开发与多媒体办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-092",
+      "employerName": "爱奇艺重庆",
+      "categoryHint": "文化传媒与互联网",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-092-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-092-01.webp",
+          "visualSubject": "数字内容研发与设计制作工作室",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-092-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-092-02.webp",
+          "visualSubject": "视频创作、游戏开发与多媒体办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-093",
+      "employerName": "中国华能",
+      "categoryHint": "能源及工程",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-093-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-093-01.webp",
+          "visualSubject": "能源工程设施与电力设备生产场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-093-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-093-02.webp",
+          "visualSubject": "工程师巡视设备与安全生产工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-094",
+      "employerName": "中国大唐集团",
+      "categoryHint": "能源及工程",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-094-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-094-01.webp",
+          "visualSubject": "能源工程设施与电力设备生产场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-094-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-094-02.webp",
+          "visualSubject": "工程师巡视设备与安全生产工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-095",
+      "employerName": "广发银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-095-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-095-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-095-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-095-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-096",
+      "employerName": "宁波银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-096-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-096-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-096-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-096-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-097",
+      "employerName": "汇丰中国",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-097-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-097-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-097-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-097-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-098",
+      "employerName": "CASETiFY",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-098-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-098-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-098-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-098-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-099",
+      "employerName": "波士顿科学",
+      "categoryHint": "医药与生命科学",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-099-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-099-01.webp",
+          "visualSubject": "生命科学实验室与研发仪器场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-099-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-099-02.webp",
+          "visualSubject": "医药研发人员在标准实验场景工作",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-100",
+      "employerName": "东软",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-100-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-100-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-100-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-100-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-101",
+      "employerName": "云天化集团",
+      "categoryHint": "企业综合服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-101-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-101-01.webp",
+          "visualSubject": "现代企业协作与项目管理办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-101-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-101-02.webp",
+          "visualSubject": "商务会议和专业服务团队工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-102",
+      "employerName": "陕煤集团",
+      "categoryHint": "能源及工程",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-102-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-102-01.webp",
+          "visualSubject": "能源工程设施与电力设备生产场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-102-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-102-02.webp",
+          "visualSubject": "工程师巡视设备与安全生产工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-103",
+      "employerName": "浙江省交通集团",
+      "categoryHint": "企业综合服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-103-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-103-01.webp",
+          "visualSubject": "现代企业协作与项目管理办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-103-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-103-02.webp",
+          "visualSubject": "商务会议和专业服务团队工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-104",
+      "employerName": "湖南钢铁集团",
+      "categoryHint": "企业综合服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-104-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-104-01.webp",
+          "visualSubject": "现代企业协作与项目管理办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-104-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-104-02.webp",
+          "visualSubject": "商务会议和专业服务团队工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-105",
+      "employerName": "中国融通集团",
+      "categoryHint": "企业综合服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-105-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-105-01.webp",
+          "visualSubject": "现代企业协作与项目管理办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-105-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-105-02.webp",
+          "visualSubject": "商务会议和专业服务团队工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-106",
+      "employerName": "中国信达",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-106-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-106-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-106-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-106-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-107",
+      "employerName": "晶晨半导体",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-107-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-107-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-107-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-107-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-108",
+      "employerName": "复旦微电子",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-108-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-108-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-108-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-108-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-109",
+      "employerName": "金发科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-109-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-109-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-109-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-109-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-110",
+      "employerName": "远光软件",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-110-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-110-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-110-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-110-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-111",
+      "employerName": "钱江摩托",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-111-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-111-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-111-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-111-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-112",
+      "employerName": "舒客电商",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-112-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-112-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-112-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-112-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-113",
+      "employerName": "AIA Digital+",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-113-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-113-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-113-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-113-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-114",
+      "employerName": "索恩格电动",
+      "categoryHint": "汽车及交通装备",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-114-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-114-01.webp",
+          "visualSubject": "现代汽车研发实验室与工程样车场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-114-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-114-02.webp",
+          "visualSubject": "汽车零部件生产与测试工作空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-115",
+      "employerName": "胜帮科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-115-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-115-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-115-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-115-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-116",
+      "employerName": "恒神股份",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-116-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-116-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-116-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-116-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-117",
+      "employerName": "邦盛科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-117-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-117-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-117-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-117-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-118",
+      "employerName": "屹唐半导体",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-118-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-118-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-118-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-118-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-119",
+      "employerName": "飞骧科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-119-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-119-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-119-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-119-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-120",
+      "employerName": "清微智能",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-120-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-120-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-120-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-120-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-121",
+      "employerName": "为旌科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-121-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-121-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-121-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-121-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-122",
+      "employerName": "云圣智能",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-122-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-122-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-122-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-122-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-123",
+      "employerName": "富特科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-123-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-123-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-123-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-123-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-124",
+      "employerName": "拓界科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-124-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-124-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-124-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-124-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-125",
+      "employerName": "姚记科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-125-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-125-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-125-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-125-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-126",
+      "employerName": "算苗科技",
+      "categoryHint": "科技研发与电子制造",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-126-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-126-01.webp",
+          "visualSubject": "现代科技研发办公室与工程团队协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-126-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-126-02.webp",
+          "visualSubject": "电子设备实验室与工业研发空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-127",
+      "employerName": "达飞 GBS 重庆",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-127-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-127-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-127-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-127-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-128",
+      "employerName": "中国大唐集团能源",
+      "categoryHint": "能源及工程",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-128-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-128-01.webp",
+          "visualSubject": "能源工程设施与电力设备生产场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-128-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-128-02.webp",
+          "visualSubject": "工程师巡视设备与安全生产工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-129",
+      "employerName": "中国大唐数科公司",
+      "categoryHint": "能源及工程",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-129-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-129-01.webp",
+          "visualSubject": "能源工程设施与电力设备生产场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-129-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-129-02.webp",
+          "visualSubject": "工程师巡视设备与安全生产工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-130",
+      "employerName": "中国集邮",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-130-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-130-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-130-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-130-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-131",
+      "employerName": "海油发展",
+      "categoryHint": "能源及工程",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-131-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-131-01.webp",
+          "visualSubject": "能源工程设施与电力设备生产场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-131-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-131-02.webp",
+          "visualSubject": "工程师巡视设备与安全生产工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-132",
+      "employerName": "中海石油气电集团",
+      "categoryHint": "能源及工程",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-132-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-132-01.webp",
+          "visualSubject": "能源工程设施与电力设备生产场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-132-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-132-02.webp",
+          "visualSubject": "工程师巡视设备与安全生产工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-133",
+      "employerName": "大华银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-133-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-133-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-133-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-133-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-134",
+      "employerName": "哈尔沃德",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-134-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-134-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-134-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-134-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-135",
+      "employerName": "湖南农业发展集团",
+      "categoryHint": "食品农业及消费服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-135-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-135-01.webp",
+          "visualSubject": "食品质量检测和现代生产工作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-135-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-135-02.webp",
+          "visualSubject": "可持续农业园区与供应链场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-136",
+      "employerName": "徐矿集团",
+      "categoryHint": "企业综合服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-136-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-136-01.webp",
+          "visualSubject": "现代企业协作与项目管理办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-136-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-136-02.webp",
+          "visualSubject": "商务会议和专业服务团队工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-137",
+      "employerName": "广西北部湾银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-137-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-137-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-137-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-137-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-138",
+      "employerName": "广州农商银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-138-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-138-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-138-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-138-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-139",
+      "employerName": "萧山农商银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-139-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-139-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-139-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-139-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-140",
+      "employerName": "杭州联合银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-140-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-140-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-140-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-140-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-141",
+      "employerName": "上海农商银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-141-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-141-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-141-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-141-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-142",
+      "employerName": "南雄农商银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-142-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-142-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-142-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-142-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-143",
+      "employerName": "甘肃农商银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-143-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-143-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-143-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-143-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-144",
+      "employerName": "长沙银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-144-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-144-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-144-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-144-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-145",
+      "employerName": "湖南银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-145-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-145-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-145-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-145-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-146",
+      "employerName": "四川银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-146-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-146-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-146-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-146-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-147",
+      "employerName": "长城华西银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-147-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-147-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-147-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-147-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-148",
+      "employerName": "长沙城市发展集团",
+      "categoryHint": "企业综合服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-148-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-148-01.webp",
+          "visualSubject": "现代企业协作与项目管理办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-148-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-148-02.webp",
+          "visualSubject": "商务会议和专业服务团队工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-149",
+      "employerName": "德康",
+      "categoryHint": "待核验行业",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-149-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-149-01.webp",
+          "visualSubject": "中性企业办公协作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-149-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-149-02.webp",
+          "visualSubject": "不展示未经核实的行业设施、企业总部或品牌商标",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-150",
+      "employerName": "陕西旅游集团",
+      "categoryHint": "物流交通及旅游",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-150-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-150-01.webp",
+          "visualSubject": "现代物流配送分拣与运输组织场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-150-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-150-02.webp",
+          "visualSubject": "物流信息调度和运营管理空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-151",
+      "employerName": "云南交投集团",
+      "categoryHint": "企业综合服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-151-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-151-01.webp",
+          "visualSubject": "现代企业协作与项目管理办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-151-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-151-02.webp",
+          "visualSubject": "商务会议和专业服务团队工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-152",
+      "employerName": "川煤集团",
+      "categoryHint": "能源及工程",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-152-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-152-01.webp",
+          "visualSubject": "能源工程设施与电力设备生产场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-152-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-152-02.webp",
+          "visualSubject": "工程师巡视设备与安全生产工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-153",
+      "employerName": "浙江农商联合银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-153-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-153-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-153-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-153-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-154",
+      "employerName": "大连银行",
+      "categoryHint": "金融服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": true,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-154-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-154-01.webp",
+          "visualSubject": "现代金融服务大厅与客户服务场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-154-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-154-02.webp",
+          "visualSubject": "金融机构科技运营和团队办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-155",
+      "employerName": "江苏农垦",
+      "categoryHint": "食品农业及消费服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-155-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-155-01.webp",
+          "visualSubject": "食品质量检测和现代生产工作场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-155-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-155-02.webp",
+          "visualSubject": "可持续农业园区与供应链场景",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    },
+    {
+      "employerId": "cn-autumn-156",
+      "employerName": "河北水利发展集团",
+      "categoryHint": "企业综合服务",
+      "categoryStatus": "visual_design_hint_not_a_verified_industry_fact",
+      "logoReferenceAvailable": false,
+      "guardrails": "每张图片独立生成，禁止拼图、UI截图、重复换名、伪造真实办公楼和企业官方Logo；AI作品显著标注非企业实景",
+      "slots": [
+        {
+          "photoId": "cn-autumn-156-ai-01",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-156-01.webp",
+          "visualSubject": "现代企业协作与项目管理办公空间",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        },
+        {
+          "photoId": "cn-autumn-156-ai-02",
+          "suggestedPath": "images/autumn-ai-scenes/cn-autumn-156-02.webp",
+          "visualSubject": "商务会议和专业服务团队工作环境",
+          "status": "not_generated",
+          "publishedOnlyAfterImageAssetAndReview": true
+        }
+      ]
+    }
+  ]
+}
