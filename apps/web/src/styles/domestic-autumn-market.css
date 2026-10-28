@@ -128,6 +128,6 @@
 .hhba-autumn-directory-visual img{display:block;width:96px;height:62px;object-fit:cover}
 .hhba-autumn-company-row>a.hhba-autumn-directory-visual{width:96px;height:62px}
 .hhba-autumn-company-row>div:nth-child(2){flex:1}
-.hhba-autumn-brand img{width:100%;height:100%;object-fit:cover}
-.hhba-autumn-brand-large img{width:100%;height:100%;object-fit:cover}
+.hhba-autumn-brand img{width:100%;height:100%;object-fit:contain;background:#fff;padding:3px;box-sizing:border-box}
+.hhba-autumn-brand-large img{width:100%;height:100%;object-fit:contain;background:#fff;padding:5px;box-sizing:border-box}
 @media(max-width:740px){.hhba-autumn-directory-visual,.hhba-autumn-directory-visual img{width:72px;height:54px}.hhba-autumn-company-row>a.hhba-autumn-directory-visual{width:72px;height:54px}.hhba-autumn-job-cover-link{margin:-20px -20px 12px}}
