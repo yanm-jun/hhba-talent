@@ -5,6 +5,7 @@ const companies=JSON.parse(read('src/data/domesticAutumnScreenshot20261028.json'
 const jobs=JSON.parse(read('src/data/domesticAutumnVerifiedJobs20261028.json')).jobs;
 const evidence=JSON.parse(read('src/data/domesticAutumnOfficialEvidence20261028.json')).entries;
 const brandRegistry=JSON.parse(read('src/data/domesticAutumnBrandMediaRegistry.json')).entries;
+const aiSceneRegistry=JSON.parse(read('src/data/domesticAutumnAiScenes.json')).entries;
 const mediaA=JSON.parse(read('src/data/domesticMediaBundle.json')).companies;
 const mediaB=JSON.parse(read('src/data/domesticMedia200Bundle.json')).companies;
 const market=read('src/components/DomesticAutumnMarket.tsx');
@@ -45,13 +46,14 @@ assert(!brand.includes('images/autumn-brand/'),'Never show invented HHBA graphic
 assert(brand.includes('企业Logo待核验'),'Unconfirmed companies must have honest neutral placeholder');
 assert(!brand.includes('http://')&&!brand.includes('https://'),'Brand is always locally hosted');
 assert(cover.includes("photo.classification==='source_backed_named_enterprise_scene'"),'Hero photos require actual source-backed workplace identity');
-assert(cover.includes('if(!scene?.path)return null'),'No fake banners when no real photo exists');
+assert(cover.includes('if(!real?.path&&!ai)return null'),'No banner unless a real photo or correctly labeled AI image exists');
 assert(!cover.includes('images/autumn-cover/'),'Never use faux green illustrations in photo slots');
 assert(market.includes('AutumnCompanyCover name={job.company}')&&market.includes('AutumnCompanyCover name={e.name}'));
 assert(!market.includes('images/autumn-cover/'),'Job market must not reference generated faux art');
 assert(!profile.includes('images/autumn-cover/'),'Profile must not display generated faux company art');
 assert(profile.includes("photo.classification==='source_backed_named_enterprise_scene'"),'Real workplace gallery requires verifiable scene');
 assert(profile.includes('websiteCaptures.length>0'),'Existing website screenshots preserved separately');
+assert(profile.includes('aiPhotos.length>0')&&profile.includes('画面中的建筑'),'AI concept gallery must state that architecture may be invented');
 assert(profile.includes('不是办公实景')&&profile.includes('非企业实景'),'Website captures must not pretend to be real office photos');
 assert(profile.includes('data-hhba-recruitment-outbound="true"'),'Keep external recruiting login gate');
 assert(profile.includes('getDomesticCompanies()')&&profile.includes('getDomesticRecruitment('),'Reuse existing business/recruitment information');
@@ -67,4 +69,17 @@ for(const e of companies){
  assert(!existsSync('public/images/autumn-brand/'+e.id+'.svg'),'Remove false logo artwork from published assets');
  assert(!existsSync('public/images/autumn-cover/'+e.id+'.svg'),'Remove false building/cover art from published assets');
 }
-console.log('AUTUMN_BRAND_EVIDENCE_CONTRACT_OK',JSON.stringify({companies:companies.length,logos:Object.keys(brandRegistry).length,websiteCaptures:captures.length,scenePhotos:scenes.length}));
+for(const [employerId,photos] of Object.entries(aiSceneRegistry)){
+ assert(companies.some(e=>e.id===employerId),'Every AI scene must map to an exact company');
+ for(const item of photos){
+  assert(item.kind==='ai_generated_concept_scene'&&item.status==='published_preview');
+  assert(item.path.startsWith('images/autumn-ai-scenes/'+employerId+'-'));
+  assert(item.alt.includes('非真实')||item.alt.includes('非企业实景')||item.alt.includes('非真实青岛银行总部'));
+  assert(item.sourceLabel.includes('AI')&&item.sourceLabel.includes('非'));
+  const local='public/'+item.path;
+  assert(existsSync(local),'AI scene file must be separate and actually uploaded: '+local);
+  const bytes=readFileSync(local);
+  assert(bytes.subarray(0,4).toString()==='RIFF'&&bytes.subarray(8,12).toString()==='WEBP','Asset must be an actual standalone WebP file');
+ }
+}
+console.log('AUTUMN_BRAND_EVIDENCE_CONTRACT_OK',JSON.stringify({companies:companies.length,logos:Object.keys(brandRegistry).length,aiSceneCompanies:Object.keys(aiSceneRegistry).length,websiteCaptures:captures.length,scenePhotos:scenes.length}));
