@@ -21,7 +21,7 @@ function safeOrigin(to:unknown):to is string{
  if(typeof to!=='string'||to.length>700||!to.startsWith('/')||to.startsWith('//')||to.includes('\\'))return false;
  const path=to.split(/[?#]/,1)[0];
  return detailRoute.test(path)||companyRoute.test(path)||directoryRoute.test(path)||domesticDiscoveryRoute.test(path)||majorRoute.test(path)||path==='/'||path==='/candidate'||path==='/candidate/jobs'||path==='/candidate/match'||
-   path==='/candidate/jobs/archive'||path==='/candidate/employer-jobs';
+   path==='/candidate/jobs/archive'||path==='/candidate/employer-jobs'||path==='/candidate/domestic-autumn';
 }
 const safeScroll=(value:unknown)=>typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<10000000?value:0;
 function saveScrollForCurrentEntry(){
