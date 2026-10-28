@@ -42,3 +42,53 @@
 .hhba-autumn-company-row small{font-size:10px;color:#738579;line-height:1.6}
 .hhba-autumn-company-row a{display:inline-flex;align-items:center;gap:4px;color:#276247;text-decoration:none;white-space:nowrap;font-size:11px;font-weight:650}
 @media(max-width:740px){.hhba-domestic-autumn{padding:14px 11px}.hhba-domestic-autumn-search{grid-template-columns:1fr}.hhba-autumn-company-grid{grid-template-columns:1fr}.hhba-domestic-location-row small{max-width:85px}}
+
+
+/* Unified, locally stored brand image or clearly identified HHBA nameplate */
+.hhba-autumn-brand{display:inline-flex;flex:0 0 40px;width:40px;height:40px;align-items:center;justify-content:center;border:1px solid #d4e4dd;border-radius:10px;background:linear-gradient(145deg,#eaf6f0,#f5f8f5);color:#1f6c59;overflow:hidden}
+.hhba-autumn-brand img{display:block;width:33px;height:33px;object-fit:contain}
+.hhba-autumn-brand-text{font-size:14px;line-height:1;font-weight:800;letter-spacing:-.5px}
+.hhba-autumn-brand-large{width:74px;height:74px;flex-basis:74px;border-radius:17px}
+.hhba-autumn-brand-large .hhba-autumn-brand-text{font-size:25px}
+.hhba-autumn-brand-large img{width:59px;height:59px}
+.hhba-autumn-company-identity{color:var(--ink);text-decoration:none;max-width:100%}
+.hhba-autumn-company-identity strong{text-decoration:none}
+.hhba-autumn-company-identity:hover strong{text-decoration:underline}
+.hhba-autumn-company-identity:focus-visible,.hhba-autumn-company-index-link:focus-visible{outline:2px solid #16866f;outline-offset:4px;border-radius:6px}
+.hhba-autumn-company-index-link{display:inline-flex;align-items:center;gap:9px;color:var(--ink);text-decoration:none;max-width:100%}
+.hhba-autumn-company-row a.hhba-autumn-company-index-link{white-space:normal;font-size:13px;color:var(--ink)}
+.hhba-autumn-company-index-link:hover strong{text-decoration:underline}
+.hhba-autumn-company-row .hhba-autumn-brand{width:31px;height:31px;flex-basis:31px;border-radius:8px}
+.hhba-autumn-company-row .hhba-autumn-brand-text{font-size:11px}
+.hhba-autumn-company-row .hhba-autumn-brand img{width:26px;height:26px}
+.hhba-autumn-company-profile{max-width:1120px;margin:24px auto 80px;padding:0 12px;color:var(--ink)}
+.hhba-autumn-company-back{display:inline-flex;align-items:center;gap:6px;margin-bottom:18px;text-decoration:none;color:#2d7051;font-weight:650;font-size:13px}
+.hhba-autumn-profile-panel{padding:24px;background:#fff;border:1px solid #e1e8e3;border-radius:15px;margin-bottom:15px}
+.hhba-autumn-profile-hero{display:flex;align-items:center;gap:18px}
+.hhba-autumn-profile-hero h1{margin:5px 0 6px;font-size:clamp(24px,4vw,36px)}
+.hhba-autumn-profile-hero p{font-size:14px;color:#64786c;margin:0 0 7px}
+.hhba-autumn-profile-hero small{font-size:11px;color:#748479}
+.hhba-autumn-profile-kicker{font-size:11px;font-weight:750;color:#337556;letter-spacing:.08em}
+.hhba-autumn-profile-sections{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-top:20px}
+.hhba-autumn-profile-sections section{background:#fafcfb;border:1px solid #e8efea;border-radius:12px;padding:16px;min-width:0}
+.hhba-autumn-profile-panel h2{font-size:19px;margin:0 0 11px}
+.hhba-autumn-profile-sections p{font-size:13px;line-height:1.85;color:#4d6255;margin:7px 0 12px}
+.hhba-autumn-profile-note{font-size:12px;color:#77897d;line-height:1.75}
+.hhba-autumn-profile-details,.hhba-autumn-profile-source{display:inline-flex;align-items:center;gap:6px;font-weight:650;text-decoration:none;color:#2e7650;font-size:12px;line-height:1.7;margin:7px 0}
+.hhba-autumn-channel-list{display:flex;flex-direction:column;gap:9px;margin:16px 0}
+.hhba-autumn-channel{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid #cde3d8;border-radius:10px;background:#f1f9f5;color:#265b43;text-decoration:none}
+.hhba-autumn-channel>span{display:flex;flex:1;flex-direction:column;gap:5px}
+.hhba-autumn-channel strong{font-size:13px}
+.hhba-autumn-channel small{font-size:11px;color:#607969}
+.hhba-autumn-channel:hover{border-color:#68b79a;background:#e7f6ed}
+.hhba-autumn-profile-jobs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+.hhba-autumn-profile-job{padding:15px;border:1px solid #e4eae6;border-radius:10px;background:#fafcfb}
+.hhba-autumn-profile-job>div{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hhba-autumn-profile-job>div strong{font-size:14px}
+.hhba-autumn-profile-job>div small{font-size:11px;color:#63786c}
+.hhba-autumn-profile-job p{display:flex;gap:8px;align-items:flex-start;color:#5b6b60;font-size:12px;line-height:1.65;margin:9px 0}
+.hhba-autumn-profile-job p svg{flex-shrink:0;margin-top:3px}
+.hhba-autumn-profile-job a,.hhba-autumn-profile-footer a{display:inline-flex;align-items:center;gap:6px;color:#2f714f;font-size:12px;text-decoration:none;font-weight:650}
+.hhba-autumn-profile-empty{font-size:13px;color:#697c71;line-height:1.8}
+.hhba-autumn-profile-footer{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;padding:15px 6px}
+@media(max-width:740px){.hhba-autumn-profile-panel{padding:16px 12px}.hhba-autumn-profile-sections,.hhba-autumn-profile-jobs{grid-template-columns:1fr}.hhba-autumn-profile-hero{align-items:flex-start}.hhba-autumn-brand-large{width:58px;height:58px;flex-basis:58px}.hhba-autumn-brand-large .hhba-autumn-brand-text{font-size:21px}}
