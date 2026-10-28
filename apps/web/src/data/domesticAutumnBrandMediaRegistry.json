@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "asOf": "2026-10-28",
+  "description": "Only catalogue brand assets assigned to the same explicit employer in user screenshot. No parent-logo substitutions. Verify licensing/mark usage before formal publication.",
+  "entries": {
+    "施耐德电气": {
+      "id": "cn-autumn-002",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/schneider-electric/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-002.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "辉瑞": {
+      "id": "cn-autumn-003",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/pfizer/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-003.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "中国南方航空": {
+      "id": "cn-autumn-004",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/china-southern-airlines/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-004.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "安克创新": {
+      "id": "cn-autumn-008",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/anker/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-008.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "新鸿基地产": {
+      "id": "cn-autumn-010",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/sun-hung-kai/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-010.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "万兴科技": {
+      "id": "cn-autumn-022",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/wondershare/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-022.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "微软": {
+      "id": "cn-autumn-073",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/microsoft/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-073.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "大众汽车": {
+      "id": "cn-autumn-074",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/volkswagen/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-074.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "强生": {
+      "id": "cn-autumn-075",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/johnson-and-johnson/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-075.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "阿斯利康": {
+      "id": "cn-autumn-076",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/astrazeneca/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-076.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "福特中国": {
+      "id": "cn-autumn-083",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/ford/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-083.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "嘉士伯": {
+      "id": "cn-autumn-087",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/carlsberg-group/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-087.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "汇丰中国": {
+      "id": "cn-autumn-097",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/hsbc/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-097.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    }
+  }
+}
