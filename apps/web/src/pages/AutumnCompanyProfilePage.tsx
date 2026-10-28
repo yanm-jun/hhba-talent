@@ -24,7 +24,7 @@ const profiles={...domesticProfiles,...domestic200Profiles} as Record<string,Edi
 type OfficialEditorial={industry:string|null;intro:string|null;source:string|null;officialRecruitment:string|null;recruitmentLabel:string|null;evidenceScope:string};
 const reviewedOfficial=officialEvidence.entries as Record<string,OfficialEditorial>;
 const provenance=brandMedia.entries as Record<string,{source:string;sourceType:string;confidence:string;path:string}>;
-const mediaIndex={...mediaA.companies,...mediaB.companies} as Record<string,{photos?:{state:string;path?:string;classification?:string}[]}>;
+const mediaIndex={...mediaA.companies,...mediaB.companies} as Record<string,{photos?:{state:string;path?:string;classification?:string;source?:string}[]}>;
 const safeUrl=(value?:string|null)=>{
  try{const u=new URL(value||'');return u.protocol==='https:'&&!u.username&&!u.password&&!u.port?u.href:null}
  catch{return null}
