@@ -51,7 +51,7 @@ jobs:
           node scripts/company200-integration.contract.test.mjs
           node scripts/domestic-autumn-market.contract.test.mjs
           node scripts/autumn-company-profiles.contract.test.mjs
-          # Media identity test: 17 source-traced marks, 4 separately labeled website captures, zero fake company photos.
+          # Media identity test: 26 source-traced marks, four separately labeled website captures, zero fictitious company photos.
           # All 312 speculative graphics have been removed; missing authentic images remain explicitly unverified.
           # Static assets: verify 156 original nameplates and 156 distinct visual covers.
           # Batch regression: 156 distinct employer routes + 10 source-backed introductions; preserve registration gate.
