@@ -51,6 +51,23 @@ for(const [name,entry] of Object.entries(evidence)){
  if(entry.intro)assert(entry.source?.startsWith('https://'),'No unattributed company introductions');
  if(entry.officialRecruitment)assert(entry.officialRecruitment.startsWith('https://'),'No insecure recruiting entry');
 }
+const realBrands=JSON.parse(read('src/data/domesticAutumnBrandMediaRegistry.json')).entries;
+const authenticMarks=Object.entries(realBrands);
+assert.equal(authenticMarks.length,13,'Only 13 source-verified catalogue matches in this batch');
+for(const [name,media] of authenticMarks){
+ const employer=companies.find(x=>x.name===name);
+ assert(employer,'Logo must match exactly one employer: '+name);
+ assert.equal(media.path,'images/autumn-real-logos/'+employer.id+'.svg');
+ assert(media.source.startsWith('https://github.com/glincker/thesvg/blob/'),'Logo provenance must identify exact source');
+ const path='public/'+media.path;
+ assert(existsSync(path),'Missing real brand mark: '+path);
+ const svg=read(path);
+ assert(svg.includes('viewBox')&&svg.includes('<svg'),'Brand file must be real SVG');
+ assert(!/<script|<foreignObject|onload\\s*=|onerror\\s*=/i.test(svg),'Unsafe SVG forbidden');
+}
+assert(brand.includes('domesticAutumnBrandMediaRegistry.json'),'Brand component must load reviewed assets');
+assert(brand.includes('images/autumn-real-logos/'),'No arbitrary images in logos');
+
 const allIds=new Set(companies.map(c=>c.id));
 for(const c of companies){
  const path='/companies/autumn/'+c.id;
