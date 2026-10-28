@@ -4,12 +4,21 @@ import {AutumnCompanyBrand} from './AutumnCompanyBrand';
 import {Link} from '../router';
 import employersJSON from '../data/domesticAutumnScreenshot20261028.json';
 import jobsJSON from '../data/domesticAutumnVerifiedJobs20261028.json';
+import officialEvidence from '../data/domesticAutumnOfficialEvidence20261028.json';
 import '../styles/domestic-autumn-market.css';
 
 type Employer={id:string;name:string;screenshotGroup:string;reviewStatus:string;officialUrl:string|null;evidenceUrl:string|null;notes:string|null};
 type DomesticRecord={id:string;company:string;title:string;majors:string[];cities:string[];education:string;recruitmentType:string;recordKind:'job'|'program';locationScope:string;sourceUrl:string;status:string;observedOn:string;note:string};
 const employers=employersJSON.entries as Employer[];
 const jobs=jobsJSON.jobs as DomesticRecord[];
+const additionalEvidence=officialEvidence.entries as Record<string,{officialRecruitment:string|null;source:string|null}>;
+const recruitmentLink=(e:Employer)=>e.officialUrl||additionalEvidence[e.name]?.officialRecruitment||null;
+function evidenceLabel(e:Employer){
+ if(recruitmentLink(e))return '招聘官网入口已定位';
+ if(e.evidenceUrl)return '招聘公告已有来源';
+ if(additionalEvidence[e.name]?.source)return '企业资料已有来源';
+ return '招聘信息待核验';
+}
 const employerIndex=new Map(employers.map(item=>[item.name,item]));
 const normalize=(value:string)=>value.toLocaleLowerCase().replace(/[\\s·（）()_]/g,'');
 const careerAliases:Record<string,string[]>={
@@ -31,7 +40,7 @@ const safeUrl=(value:string|null|undefined)=>{
 };
 function JobTile({job}:{job:DomesticRecord}){
  const employer=employerIndex.get(job.company);
- const official=safeUrl(employer?.officialUrl);
+ const official=employer?safeUrl(recruitmentLink(employer)):null;
  const scope=job.locationScope==='job'?'岗位公开地点':job.locationScope==='not_disclosed'?'岗位地点未披露':'招聘项目城市范围（非逐岗）';
  return <article className="unified-job-card hhba-domestic-job-card">
   <div className="unified-job-head">
@@ -98,8 +107,8 @@ export function DomesticAutumnMarket({compact=false,standalone=false,query='',ma
  const listed=useMemo(()=>employers.filter(item=>{
    if(!normalize(item.name).includes(normalize(directoryText.trim())))return false;
    if(directoryStatus==='with_jobs')return jobs.some(j=>j.company===item.name);
-   if(directoryStatus==='with_entry')return item.reviewStatus==='official_entry_evidenced';
-   if(directoryStatus==='not_checked')return item.reviewStatus==='not_checked';
+   if(directoryStatus==='with_entry')return !!recruitmentLink(item);
+   if(directoryStatus==='not_checked')return !recruitmentLink(item)&&!item.evidenceUrl&&!additionalEvidence[item.name]?.source;
    return true;
  }),[directoryText,directoryStatus]);
  if(foreignOnly&&!standalone)return null;
@@ -131,9 +140,9 @@ export function DomesticAutumnMarket({compact=false,standalone=false,query='',ma
      <small>当前显示 {listed.length} / {employers.length} 家</small>
     </nav>
     <div className="hhba-autumn-company-grid">{listed.map(e=><article key={e.id} className="hhba-autumn-company-row">
-      <div><Link className="hhba-autumn-company-index-link" to={'/companies/autumn/'+e.id} title={'查看'+e.name+'企业档案'}><AutumnCompanyBrand name={e.name}/><strong>{e.name}</strong></Link><small>{e.screenshotGroup.replace('截图组A：','').replace('截图组B：','')} · {e.reviewStatus==='official_entry_evidenced'?'招聘官网入口已定位':e.reviewStatus==='announcement_evidenced'?'招聘公告已找到':'招聘信息待核验'}</small></div>
+      <div><Link className="hhba-autumn-company-index-link" to={'/companies/autumn/'+e.id} title={'查看'+e.name+'企业档案'}><AutumnCompanyBrand name={e.name}/><strong>{e.name}</strong></Link><small>{e.screenshotGroup.replace('截图组A：','').replace('截图组B：','')} · {evidenceLabel(e)}</small></div>
       <div className="hhba-autumn-row-actions"><Link to={'/companies/autumn/'+e.id} className="hhba-autumn-row-detail">企业详情 <ArrowRight size={13}/></Link>
-      {safeUrl(e.officialUrl)?<a href={safeUrl(e.officialUrl)!} data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">招聘官网 <ExternalLink size={14}/></a>:
+      {safeUrl(recruitmentLink(e))?<a href={safeUrl(recruitmentLink(e))!} data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">招聘官网 <ExternalLink size={14}/></a>:
         <span className="hhba-domestic-pending">{e.evidenceUrl?'官网待核验':'待核验'}</span>}</div>
     </article>)}</div>
   </section>}
