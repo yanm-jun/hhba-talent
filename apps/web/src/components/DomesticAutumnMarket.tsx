@@ -6,11 +6,13 @@ import {Link} from '../router';
 import employersJSON from '../data/domesticAutumnScreenshot20261028.json';
 import jobsJSON from '../data/domesticAutumnVerifiedJobs20261028.json';
 import officialEvidence from '../data/domesticAutumnOfficialEvidence20261028.json';
+import brandMedia from '../data/domesticAutumnBrandMediaRegistry.json';
 import '../styles/domestic-autumn-market.css';
 
 type Employer={id:string;name:string;screenshotGroup:string;reviewStatus:string;officialUrl:string|null;evidenceUrl:string|null;notes:string|null};
 type DomesticRecord={id:string;company:string;title:string;majors:string[];cities:string[];education:string;recruitmentType:string;recordKind:'job'|'program';locationScope:string;sourceUrl:string;status:string;observedOn:string;note:string};
 const employers=employersJSON.entries as Employer[];
+const tracedLogos=Object.keys(brandMedia.entries).length;
 const jobs=jobsJSON.jobs as DomesticRecord[];
 const additionalEvidence=officialEvidence.entries as Record<string,{officialRecruitment:string|null;source:string|null}>;
 const recruitmentLink=(e:Employer)=>e.officialUrl||additionalEvidence[e.name]?.officialRecruitment||null;
@@ -119,7 +121,7 @@ export function DomesticAutumnMarket({compact=false,standalone=false,query='',ma
  return <section className={'hhba-domestic-autumn '+(standalone?'hhba-domestic-autumn-full':'')} aria-label="国内秋招官方岗位与企业清单">
   <header className="hhba-domestic-autumn-head">
     <div><small>HHBA · 国内秋招静态来源档案</small><h2>国内企业岗位与专业、工作地点</h2>
-      <p>已收录截图所列 {employers.length} 个不同企业名称。公开岗位与招聘项目分开展示；官网是否仍在招请自行核实。</p>
+      <p>已收录截图所列 {employers.length} 个不同企业名称，{tracedLogos} 家有可追溯的品牌图形，其余企业 Logo 待核验。招聘状态以官网为准；未核实的企业实景照片不展示。</p>
     </div>
     {!standalone&&<Link className="hhba-domestic-autumn-more" to="/candidate/domestic-autumn">查看全部企业和岗位 <ArrowRight size={15}/></Link>}
   </header>
