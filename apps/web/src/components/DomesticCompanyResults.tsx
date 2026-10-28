@@ -29,7 +29,7 @@ function BrandMark({src,name}:{src?:string;name:string}){
 }
 export function DomesticCompanyResults({query,majorSlug='',scope='',country='',city='',browseDefault=false}:Props){
  const all=getDomesticCompanies();
- const [browse200,setBrowse200]=useState(browseDefault);
+ const browse200=browseDefault;
  const word=query.trim();
  const chosen=majorById(majorSlug);
  const list=useMemo(()=>{
@@ -52,7 +52,7 @@ export function DomesticCompanyResults({query,majorSlug='',scope='',country='',c
  if(!word&&!chosen&&!browse200){
   if(scope==='global'||country&&!/^(cn|chn|china|中国|中国大陆)$/i.test(country))return null;
   return <div className="domestic-browse100-entry">
-   <button type="button" onClick={()=>setBrowse200(true)}>浏览企业发现 200 家档案 <ArrowRight size={14}/></button>
+   <Link to="/companies/discover">浏览企业发现 200 家档案 <ArrowRight size={14}/></Link>
    <small>按企业主体查看真实介绍、相关专业与已登记的官方招聘渠道</small>
   </div>;
  }
