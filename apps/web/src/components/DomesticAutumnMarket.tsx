@@ -1,6 +1,7 @@
 import {useMemo,useState} from 'react';
 import {ArrowRight,BookOpen,ExternalLink,GraduationCap,MapPin,Search,ShieldCheck} from 'lucide-react';
 import {AutumnCompanyBrand} from './AutumnCompanyBrand';
+import {AutumnCompanyCover} from './AutumnCompanyCover';
 import {Link} from '../router';
 import employersJSON from '../data/domesticAutumnScreenshot20261028.json';
 import jobsJSON from '../data/domesticAutumnVerifiedJobs20261028.json';
@@ -43,7 +44,7 @@ function JobTile({job}:{job:DomesticRecord}){
  const official=employer?safeUrl(recruitmentLink(employer)):null;
  const scope=job.locationScope==='job'?'岗位公开地点':job.locationScope==='not_disclosed'?'岗位地点未披露':'招聘项目城市范围（非逐岗）';
  return <article className="unified-job-card hhba-domestic-job-card">
-  <Link to={'/companies/autumn/'+employer!.id} className="hhba-autumn-job-cover-link" title={'查看'+job.company+'的HHBA企业档案'}><img loading="lazy" src={import.meta.env.BASE_URL+'images/autumn-cover/'+employer!.id+'.svg'} alt={job.company+' HHBA原创企业主题配图（非真实企业照片）'}/></Link>
+  <Link to={'/companies/autumn/'+employer!.id} className="hhba-autumn-job-cover-link" title={'查看'+job.company+'的HHBA企业档案'}><AutumnCompanyCover name={job.company} id={employer!.id}/></Link>
   <div className="unified-job-head">
    <Link className="unified-company-brand hhba-autumn-company-identity" to={'/companies/autumn/'+employer!.id} title={'查看'+job.company+'的HHBA企业档案'}><AutumnCompanyBrand name={job.company}/><strong>{job.company}</strong></Link>
    <small>2027届 · 当前招聘状态待核实</small>
@@ -143,7 +144,7 @@ export function DomesticAutumnMarket({compact=false,standalone=false,query='',ma
      <small>当前显示 {listed.length} / {employers.length} 家</small>
     </nav>
     <div className="hhba-autumn-company-grid">{listed.map(e=><article key={e.id} className="hhba-autumn-company-row">
-      <Link to={'/companies/autumn/'+e.id} className="hhba-autumn-directory-visual" title={'查看'+e.name+'企业详情'}><img src={import.meta.env.BASE_URL+'images/autumn-cover/'+e.id+'.svg'} loading="lazy" alt={e.name+' HHBA原创主题插画（非实景）'}/></Link>
+      <Link to={'/companies/autumn/'+e.id} className="hhba-autumn-directory-visual" title={'查看'+e.name+'企业详情'}><AutumnCompanyCover name={e.name} id={e.id} kind="directory"/></Link>
       <div><Link className="hhba-autumn-company-index-link" to={'/companies/autumn/'+e.id} title={'查看'+e.name+'企业档案'}><AutumnCompanyBrand name={e.name}/><strong>{e.name}</strong></Link><small>{e.screenshotGroup.replace('截图组A：','').replace('截图组B：','')} · {evidenceLabel(e)}</small></div>
       <div className="hhba-autumn-row-actions"><Link to={'/companies/autumn/'+e.id} className="hhba-autumn-row-detail">企业详情 <ArrowRight size={13}/></Link>
       {safeUrl(recruitmentLink(e))?<a href={safeUrl(recruitmentLink(e))!} data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">招聘官网 <ExternalLink size={14}/></a>:
