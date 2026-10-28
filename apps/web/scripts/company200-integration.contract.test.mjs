@@ -50,6 +50,9 @@ assert(market.includes('loadVerifiedFeaturedJobs')&&market.includes('DomesticCom
 assert(source.includes("company:'OpenAI'")&&source.includes("company:'Anthropic'")&&source.includes("company:'SpaceX'"),'Keep original three priority employers');
 assert(router.includes('domesticDiscoveryRoute'),'New company page must preserve SPA safe return navigation');
 assert(discovery.includes('browseDefault'),'200-company page must show all 200 on direct visit');
+assert(result.includes('<Link to="/companies/discover">浏览企业发现 200 家档案'),'Default entry should navigate to the single 200-company discovery page');
+assert(!result.includes('setBrowse200('),'Default entry must not expand a second inline 200-company list');
+assert(market.includes('!showInlineDiscoveryEntry&&<div className="unified-company-discovery-navigation"'),'Secondary company link must be hidden when the primary entry is shown');
 console.log('HHBA_COMPANY200_INTEGRATION_OK',JSON.stringify({
   all:joined.length,added:100,majorsIncluded:joined.slice(100).filter(n=>additions[n].majorSlugs?.length>=4).length,
   recruitmentWithEvidence:Object.keys(registry).length,sourceBackedEditorial:Object.keys(sourceBacked).length,pathsVerified:4
