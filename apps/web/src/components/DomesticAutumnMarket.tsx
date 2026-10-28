@@ -1,5 +1,6 @@
 import {useMemo,useState} from 'react';
-import {ArrowRight,BookOpen,Building2,ExternalLink,GraduationCap,MapPin,Search,ShieldCheck} from 'lucide-react';
+import {ArrowRight,BookOpen,ExternalLink,GraduationCap,MapPin,Search,ShieldCheck} from 'lucide-react';
+import {AutumnCompanyBrand} from './AutumnCompanyBrand';
 import {Link} from '../router';
 import employersJSON from '../data/domesticAutumnScreenshot20261028.json';
 import jobsJSON from '../data/domesticAutumnVerifiedJobs20261028.json';
@@ -34,7 +35,7 @@ function JobTile({job}:{job:DomesticRecord}){
  const scope=job.locationScope==='job'?'岗位公开地点':job.locationScope==='not_disclosed'?'岗位地点未披露':'招聘项目城市范围（非逐岗）';
  return <article className="unified-job-card hhba-domestic-job-card">
   <div className="unified-job-head">
-   <span className="unified-company-brand"><span className="hhba-domestic-logo"><Building2 size={19}/></span><strong>{job.company}</strong></span>
+   <Link className="unified-company-brand hhba-autumn-company-identity" to={'/companies/autumn/'+employer!.id} title={'查看'+job.company+'的HHBA企业档案'}><AutumnCompanyBrand name={job.company}/><strong>{job.company}</strong></Link>
    <small>2027届 · 当前招聘状态待核实</small>
   </div>
   <h3>{job.title}</h3>
@@ -119,7 +120,7 @@ export function DomesticAutumnMarket({compact=false,standalone=false,query='',ma
     <p>名单全部保留。已核验入口才能点击；缺失官网证据的公司明确标注待核验，不冒充已有岗位。</p>
     <label className="hhba-autumn-company-search"><Search size={16}/><input value={directoryText} onChange={e=>setDirectoryText(e.target.value)} placeholder="搜索156家企业" aria-label="搜索截图企业"/></label>
     <div className="hhba-autumn-company-grid">{listed.map(e=><article key={e.id} className="hhba-autumn-company-row">
-      <div><strong>{e.name}</strong><small>{e.screenshotGroup.replace('截图组A：','').replace('截图组B：','')} · {e.reviewStatus==='official_entry_evidenced'?'招聘官网入口已定位':e.reviewStatus==='announcement_evidenced'?'招聘公告已找到':'招聘信息待核验'}</small></div>
+      <div><Link className="hhba-autumn-company-index-link" to={'/companies/autumn/'+e.id} title={'查看'+e.name+'企业档案'}><AutumnCompanyBrand name={e.name}/><strong>{e.name}</strong></Link><small>{e.screenshotGroup.replace('截图组A：','').replace('截图组B：','')} · {e.reviewStatus==='official_entry_evidenced'?'招聘官网入口已定位':e.reviewStatus==='announcement_evidenced'?'招聘公告已找到':'招聘信息待核验'}</small></div>
       {safeUrl(e.officialUrl)?<a href={safeUrl(e.officialUrl)!} data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">招聘官网 <ExternalLink size={14}/></a>:
         <span className="hhba-domestic-pending">{e.evidenceUrl?'官方入口待核验':'待核验'}</span>}
     </article>)}</div>
