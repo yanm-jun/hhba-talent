@@ -83,6 +83,24 @@
       "officialRecruitment": null,
       "recruitmentLabel": null,
       "evidenceScope": "截图中的名称存在主体歧义，不擅自对应为紫金矿业"
+    },
+    "中国华能": {
+      "name": "中国华能",
+      "industry": "电力、综合能源与新能源",
+      "intro": "中国华能集团是以电为核心的综合能源集团，业务涉及火电、水电、核电、新能源、煤炭、金融与科技等领域。2027年校园招聘由所属企业分别发布岗位；专业和工作地点须按照具体子公司职位对应核对。",
+      "source": "https://www.chng.com.cn/detail_zpxx/-/article/YjJqG0pRRQU6/v/1326793.html",
+      "officialRecruitment": "https://zhaopin.chng.com.cn/",
+      "recruitmentLabel": "中国华能官方校园招聘系统",
+      "evidenceScope": "官方华能招聘页面以及2027校招单位公告，非全部岗位实时开放证明"
+    },
+    "中国大唐集团": {
+      "name": "中国大唐集团",
+      "industry": "电力、综合能源及相关产业",
+      "intro": "中国大唐集团有限公司是中央管理的能源企业，经营方向覆盖电力、煤炭煤化工、环保、金融等领域。集团招聘平台分别列示区域公司、专业公司、科技企业及专项招聘公告，具体岗位和地点由各招聘公告决定。",
+      "source": "https://dtsc.china-cdt.com/dtwz/xwzx/jtxw/2026/9/I1552059660066881536.html",
+      "officialRecruitment": "https://zhaopin.china-cdt.com/zpgg_xyzp.html",
+      "recruitmentLabel": "中国大唐集团官方校园招聘公告目录",
+      "evidenceScope": "集团官方2027届第一批校园招聘公告与招聘系统；各下属用人单位招聘条件需分别核实"
     }
   }
 }
