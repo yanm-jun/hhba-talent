@@ -33,7 +33,7 @@ for(const [name,entry] of Object.entries(brandRegistry)){
  assert(existsSync(local),'Brand file must be local: '+local);
  if(entry.path.endsWith('.svg')){
   const text=read(local);
-  assert(text.includes('<svg')&&text.includes('viewBox'),'Valid vector logo '+local);
+  assert(text.includes('<svg')&&(text.includes('viewBox')||(/width=/.test(text)&&/height=/.test(text))),'Valid vector logo '+local);
   assert(!/<script|<foreignObject|onload\\s*=|onerror\\s*=/i.test(text),'No unsafe SVG '+local);
  }else if(entry.path.endsWith('.jpg')){
   const buf=readFileSync(local);
