@@ -109,27 +109,27 @@
     },
     "青岛银行": {
       "id": "cn-autumn-025",
-      "path": "images/autumn-real-logos/cn-autumn-025.jpg",
-      "source": "https://github.com/cellier/bank-icon-cn/blob/master/JPG/%E9%9D%92%E5%B2%9B%E9%93%B6%E8%A1%8C.jpg",
-      "sourceType": "independent_bank_brand_catalog",
-      "confidence": "name_match_historical_logo_subject_to_official_review",
-      "reviewNote": "Logo from independent bank icon collection; current visual correctness not yet independently confirmed."
+      "path": "images/autumn-real-logos/cn-autumn-025.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/qdccb-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
     },
     "宁波银行": {
       "id": "cn-autumn-096",
-      "path": "images/autumn-real-logos/cn-autumn-096.jpg",
-      "source": "https://github.com/cellier/bank-icon-cn/blob/master/JPG/%E5%AE%81%E6%B3%A2%E9%93%B6%E8%A1%8C.jpg",
-      "sourceType": "independent_bank_brand_catalog",
-      "confidence": "name_match_historical_logo_subject_to_official_review",
-      "reviewNote": "Logo from independent bank icon collection; current visual correctness not yet independently confirmed."
+      "path": "images/autumn-real-logos/cn-autumn-096.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/nbcb-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
     },
     "广发银行": {
       "id": "cn-autumn-095",
       "path": "images/autumn-real-logos/cn-autumn-095.svg",
-      "source": "https://github.com/cellier/bank-icon-cn/blob/master/svg/%E5%B9%BF%E5%8F%91%E9%93%B6%E8%A1%8C@0.5x.svg",
-      "sourceType": "independent_bank_brand_catalog",
-      "confidence": "name_match_historical_logo_subject_to_official_review",
-      "reviewNote": "Logo from independent bank icon collection; current visual correctness not yet independently confirmed."
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/cgbchina-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
     },
     "中国邮政": {
       "id": "cn-autumn-078",
@@ -138,6 +138,54 @@
       "sourceType": "independent_bank_brand_catalog",
       "confidence": "name_match_historical_logo_subject_to_official_review",
       "reviewNote": "Logo from independent bank icon collection; current visual correctness not yet independently confirmed."
+    },
+    "长沙银行": {
+      "id": "cn-autumn-144",
+      "path": "images/autumn-real-logos/cn-autumn-144.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/cscb-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
+    },
+    "大连银行": {
+      "id": "cn-autumn-154",
+      "path": "images/autumn-real-logos/cn-autumn-154.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/bankofdl-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
+    },
+    "大华银行": {
+      "id": "cn-autumn-133",
+      "path": "images/autumn-real-logos/cn-autumn-133.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/uobchina-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
+    },
+    "杭州联合银行": {
+      "id": "cn-autumn-140",
+      "path": "images/autumn-real-logos/cn-autumn-140.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/urcb-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
+    },
+    "广西北部湾银行": {
+      "id": "cn-autumn-137",
+      "path": "images/autumn-real-logos/cn-autumn-137.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/bankofbbg-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
+    },
+    "上海农商银行": {
+      "id": "cn-autumn-141",
+      "path": "images/autumn-real-logos/cn-autumn-141.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/srcb-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
     }
   }
 }
