@@ -46,6 +46,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
   <Link className="hhba-autumn-company-back" to={back.to} restoreScrollY={back.scrollY} restoreMarketState={back.marketState}><ArrowLeft size={16}/> 返回上一页</Link>
   {!employer?<section className="hhba-autumn-profile-panel"><h1>没有找到对应企业档案</h1><Link to="/candidate/domestic-autumn">返回秋招企业清单</Link></section>:<>
    <section className="hhba-autumn-profile-panel">
+    <figure className="hhba-autumn-hero-art"><img src={import.meta.env.BASE_URL+'images/autumn-cover/'+employer.id+'.svg'} alt={employer.name+' HHBA主题原创设计配图（非企业实景）'}/><figcaption>HHBA 设计配图 · 非企业办公实景 · 非官方 Logo</figcaption></figure>
     <header className="hhba-autumn-profile-hero">
      <AutumnCompanyBrand name={employer.name} large/>
      <div>
@@ -95,6 +96,8 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
    </section>
    <section className="hhba-autumn-profile-panel hhba-autumn-visual-panel" aria-label="企业图片及标识">
     <h2>企业图片与品牌标识</h2>
+    <p className="hhba-autumn-profile-note">已为此企业制作独立的 HHBA 主题配图及名称标识，均为设计作品，不是该企业的真实办公照片或官方商标。</p>
+    <figure className="hhba-autumn-art-figure"><img loading="lazy" src={import.meta.env.BASE_URL+'images/autumn-cover/'+employer.id+'.svg'} alt={employer.name+'原创主题配图（非公司实景）'}/><figcaption>企业主题原创插画 · 非企业实景</figcaption></figure>
     {localPhotos.length?<><p className="hhba-autumn-profile-note">以下图片来自现有企业媒体档案，为官网页面截图，不代表真实办公环境；点击图片不会跳转第三方网站。</p>
       <div className="hhba-autumn-local-photo-grid">{localPhotos.map((photo,i)=><figure key={photo.path||i}><img loading="lazy" src={import.meta.env.BASE_URL+photo.path!} alt={employer.name+'企业官方网站页面截图'} onError={e=>{e.currentTarget.style.display='none'}}/><figcaption>企业官网页面截图 · 非办公实景</figcaption></figure>)}</div>
      </>:<div className="hhba-autumn-no-photo"><AutumnCompanyBrand name={employer.name} large/><p>尚无通过核验并已保存到本地的企业照片或官方 Logo。当前使用 HHBA 企业名称标识（非企业官方商标）。</p></div>}
