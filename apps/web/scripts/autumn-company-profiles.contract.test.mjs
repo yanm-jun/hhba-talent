@@ -22,7 +22,7 @@ assert(market.includes("to={'/companies/autumn/'+e.id}"),'Every directory compan
 assert(main.includes("if(/^\\/companies\\/autumn\\/cn-autumn-[0-9]{3}$/.test(route))return <AutumnCompanyProfilePage"));
 assert(router.includes("autumn\\/cn-autumn-[0-9]{3}"));
 
-assert.equal(Object.keys(brandRegistry).length,23,'23 provenance-tracked employer brand assets');
+assert.equal(Object.keys(brandRegistry).length,26,'26 provenance-tracked employer brand assets');
 for(const [name,entry] of Object.entries(brandRegistry)){
  const match=companies.find(x=>x.name===name);
  assert(match,'Logo must map to exact screenshot enterprise '+name);
