@@ -16,7 +16,7 @@ assert(companies.every(c=>/^cn-autumn-[0-9]{3}$/.test(c.id)),'Company IDs must m
 assert(jobs.every(j=>companies.some(c=>c.name===j.company)),'Each job must have an onsite profile');
 assert(market.includes("to={'/companies/autumn/'+employer!.id}"),'Job-card name+brand must link to profile');
 assert(market.includes("to={'/companies/autumn/'+e.id}"),'Every screenshot employer must link to profile');
-assert(brand.includes("state==='ready'")&&brand.includes("brand.path"),'Only existing ready local images can be used');
+assert(brand.includes("logo?.state==='ready'")&&brand.includes('logo.path'),'Only existing ready local images can be used');
 assert(brand.includes('非企业官方Logo'),'Never misrepresent a generated nameplate as an official trademark');
 assert(!brand.includes('http://')&&!brand.includes('https://'),'No hotlinked photo/logo substitutions');
 assert(profile.includes('getDomesticCompanies()')&&profile.includes('domesticProfiles'),'Reuse existing genuine employer files');
