@@ -11,6 +11,7 @@ import {domestic200Profiles} from '../services/domesticCompany200Data';
 import employersJSON from '../data/domesticAutumnScreenshot20261028.json';
 import jobsJSON from '../data/domesticAutumnVerifiedJobs20261028.json';
 import officialEvidence from '../data/domesticAutumnOfficialEvidence20261028.json';
+import brandMedia from '../data/domesticAutumnBrandMediaRegistry.json';
 import type {User} from '../services/api';
 import '../styles/domestic-autumn-market.css';
 
@@ -22,6 +23,7 @@ const jobs=jobsJSON.jobs as RecordInfo[];
 const profiles={...domesticProfiles,...domestic200Profiles} as Record<string,Editorial>;
 type OfficialEditorial={industry:string|null;intro:string|null;source:string|null;officialRecruitment:string|null;recruitmentLabel:string|null;evidenceScope:string};
 const reviewedOfficial=officialEvidence.entries as Record<string,OfficialEditorial>;
+const provenance=brandMedia.entries as Record<string,{source:string;sourceType:string;confidence:string;path:string}>;
 const mediaIndex={...mediaA.companies,...mediaB.companies} as Record<string,{photos?:{state:string;path?:string;classification?:string}[]}>;
 const safeUrl=(value?:string|null)=>{
  try{const u=new URL(value||'');return u.protocol==='https:'&&!u.username&&!u.password&&!u.port?u.href:null}
@@ -34,6 +36,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
  const existing=useMemo(()=>employer?getDomesticCompanies().find(c=>c.name===employer.name):null,[employer?.name]);
  const editorial=employer?profiles[employer.name]:undefined;
  const officialArticle=employer?reviewedOfficial[employer.name]:undefined;
+ const recognizedBrand=employer?provenance[employer.name]:undefined;
  const recruitment=employer?getDomesticRecruitment(employer.name):undefined;
  const matched=employer?jobs.filter(j=>j.company===employer.name):[];
  const profileMedia=employer?mediaIndex[employer.name]:undefined;
@@ -53,10 +56,10 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
       <small className="hhba-autumn-profile-kicker">HHBA · 企业资料与招聘入口</small>
       <h1>{employer.name}</h1>
       <p>{editorial?.primaryIndustry||officialArticle?.industry||existing?.industry||'行业与业务资料待核验'}</p>
-      <small>企业标识：{employer.name} · {employer.reviewStatus==='official_entry_evidenced'?'官方招聘入口已定位':employer.reviewStatus==='announcement_evidenced'?'招聘公告已有来源':'招聘信息尚待核验'}</small>
+      <small>资料核验状态：{employer.reviewStatus==='official_entry_evidenced'?'官方招聘入口已定位':employer.reviewStatus==='announcement_evidenced'?'招聘公告已有来源':'招聘信息尚待核验'}</small>
      </div>
     </header>
-    <p className="hhba-domestic-autumn-disclaimer"><ShieldCheck size={17}/> 这里是 HHBA 站内档案，不是企业官方网站。只展示能追溯的企业资料和历史招聘线索；未经确认的信息不会编造。未取得可核验的品牌图时使用文字占位标识，非官方 Logo。</p>
+    <p className="hhba-domestic-autumn-disclaimer"><ShieldCheck size={17}/> 这里是 HHBA 站内档案，不是企业官方网站。只展示能追溯的企业资料与历史招聘线索；品牌标识如来自独立图标库会单独披露来源。原创插画不是企业实景，企业 Logo 不代表企业与 HHBA 有合作或背书。</p>
     <div className="hhba-autumn-profile-sections">
      <section className="hhba-autumn-profile-info">
       <h2>企业介绍</h2>
@@ -96,7 +99,8 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
    </section>
    <section className="hhba-autumn-profile-panel hhba-autumn-visual-panel" aria-label="企业图片及标识">
     <h2>企业图片与品牌标识</h2>
-    <p className="hhba-autumn-profile-note">已为此企业制作独立的 HHBA 主题配图及名称标识，均为设计作品，不是该企业的真实办公照片或官方商标。</p>
+    <p className="hhba-autumn-profile-note">每家企业均配有 HHBA 原创主题插画（不是公司实景）。{recognizedBrand?'本企业另收录第三方品牌图形库提供的品牌标识，尚未由品牌方直接确认。':'暂未收录可核对的企业原始品牌标识，使用 HHBA 名称设计图。'}</p>
+    {recognizedBrand&&<p className="hhba-autumn-profile-note"><a href={recognizedBrand.source} target="_blank" rel="noopener noreferrer" data-hhba-non-recruitment-link="true">查看品牌 SVG 素材来源（第三方整理）</a> · 仅用于标识企业，不表示合作或官方授权。</p>
     <figure className="hhba-autumn-art-figure"><img loading="lazy" src={import.meta.env.BASE_URL+'images/autumn-cover/'+employer.id+'.svg'} alt={employer.name+'原创主题配图（非公司实景）'}/><figcaption>企业主题原创插画 · 非企业实景</figcaption></figure>
     {localPhotos.length?<><p className="hhba-autumn-profile-note">以下图片来自现有企业媒体档案，为官网页面截图，不代表真实办公环境；点击图片不会跳转第三方网站。</p>
       <div className="hhba-autumn-local-photo-grid">{localPhotos.map((photo,i)=><figure key={photo.path||i}><img loading="lazy" src={import.meta.env.BASE_URL+photo.path!} alt={employer.name+'企业官方网站页面截图'} onError={e=>{e.currentTarget.style.display='none'}}/><figcaption>企业官网页面截图 · 非办公实景</figcaption></figure>)}</div>
