@@ -39,7 +39,7 @@ for(const [name,entry] of Object.entries(evidence)){
 const allIds=new Set(companies.map(c=>c.id));
 for(const c of companies){
  const path='/companies/autumn/'+c.id;
- assert(/^\\/companies\\/autumn\\/cn-autumn-[0-9]{3}$/.test(path),'Every employer must resolve in SPA: '+c.name);
+ assert(new RegExp('^/companies/autumn/cn-autumn-[0-9]{3}$').test(path),'Every employer must resolve in SPA: '+c.name);
  assert(allIds.has(c.id),'Every employer must retain a unique ID: '+c.name);
 }
 assert(market.includes("directoryStatus==='with_jobs'")&&market.includes('hhba-autumn-row-detail'),'All-company directory must provide explicit details and working status filters');
