@@ -68,6 +68,7 @@ export function DomesticAutumnMarket({compact=false,standalone=false,query='',ma
  const [majorText,setMajorText]=useState('');
  const [placeText,setPlaceText]=useState('');
  const [directoryText,setDirectoryText]=useState('');
+ const [directoryStatus,setDirectoryStatus]=useState<'all'|'with_jobs'|'with_entry'|'not_checked'>('all');
  const foreignOnly=scope==='global'||(country!==''&&!/^(cn|chn|china|中国|中国大陆)$/i.test(country));
  const search=standalone?keyword.trim():query.trim();
  const majorSearch=standalone?majorText.trim():major.trim();
@@ -94,7 +95,13 @@ export function DomesticAutumnMarket({compact=false,standalone=false,query='',ma
    for(const job of ordered){if(!picked.includes(job))picked.push(job);}
    return picked.slice(0,compact?6:10);
  },[matched,compact,standalone]);
- const listed=useMemo(()=>employers.filter(item=>normalize(item.name).includes(normalize(directoryText.trim()))),[directoryText]);
+ const listed=useMemo(()=>employers.filter(item=>{
+   if(!normalize(item.name).includes(normalize(directoryText.trim())))return false;
+   if(directoryStatus==='with_jobs')return jobs.some(j=>j.company===item.name);
+   if(directoryStatus==='with_entry')return item.reviewStatus==='official_entry_evidenced';
+   if(directoryStatus==='not_checked')return item.reviewStatus==='not_checked';
+   return true;
+ }),[directoryText,directoryStatus]);
  if(foreignOnly&&!standalone)return null;
  return <section className={'hhba-domestic-autumn '+(standalone?'hhba-domestic-autumn-full':'')} aria-label="国内秋招官方岗位与企业清单">
   <header className="hhba-domestic-autumn-head">
@@ -119,10 +126,15 @@ export function DomesticAutumnMarket({compact=false,standalone=false,query='',ma
     <h3>截图完整企业清单 · {employers.length} 家</h3>
     <p>名单全部保留。已核验入口才能点击；缺失官网证据的公司明确标注待核验，不冒充已有岗位。</p>
     <label className="hhba-autumn-company-search"><Search size={16}/><input value={directoryText} onChange={e=>setDirectoryText(e.target.value)} placeholder="搜索156家企业" aria-label="搜索截图企业"/></label>
+    <nav className="hhba-autumn-directory-filters" aria-label="企业资料进度筛选">
+     {([['all','全部企业'],['with_jobs','有岗位记录'],['with_entry','招聘入口已登记'],['not_checked','待核验']] as const).map(([id,label])=><button type="button" key={id} aria-pressed={directoryStatus===id} onClick={()=>setDirectoryStatus(id)}>{label}</button>)}
+     <small>当前显示 {listed.length} / {employers.length} 家</small>
+    </nav>
     <div className="hhba-autumn-company-grid">{listed.map(e=><article key={e.id} className="hhba-autumn-company-row">
       <div><Link className="hhba-autumn-company-index-link" to={'/companies/autumn/'+e.id} title={'查看'+e.name+'企业档案'}><AutumnCompanyBrand name={e.name}/><strong>{e.name}</strong></Link><small>{e.screenshotGroup.replace('截图组A：','').replace('截图组B：','')} · {e.reviewStatus==='official_entry_evidenced'?'招聘官网入口已定位':e.reviewStatus==='announcement_evidenced'?'招聘公告已找到':'招聘信息待核验'}</small></div>
+      <div className="hhba-autumn-row-actions"><Link to={'/companies/autumn/'+e.id} className="hhba-autumn-row-detail">企业详情 <ArrowRight size={13}/></Link>
       {safeUrl(e.officialUrl)?<a href={safeUrl(e.officialUrl)!} data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">招聘官网 <ExternalLink size={14}/></a>:
-        <span className="hhba-domestic-pending">{e.evidenceUrl?'官方入口待核验':'待核验'}</span>}
+        <span className="hhba-domestic-pending">{e.evidenceUrl?'官网待核验':'待核验'}</span>}</div>
     </article>)}</div>
   </section>}
   {!standalone&&<Link className="hhba-domestic-autumn-bottom" to="/candidate/domestic-autumn">完整查看截图 156 家企业的招聘核验状态与岗位档案 <ArrowRight size={15}/></Link>}
