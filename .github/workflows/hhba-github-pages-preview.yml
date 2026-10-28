@@ -51,6 +51,7 @@ jobs:
           node scripts/company200-integration.contract.test.mjs
           node scripts/domestic-autumn-market.contract.test.mjs
           node scripts/autumn-company-profiles.contract.test.mjs
+          # Real logos: 13 source-traced brand SVGs; 143 retain explicitly labelled design artwork.
           # Static assets: verify 156 original nameplates and 156 distinct visual covers.
           # Batch regression: 156 distinct employer routes + 10 source-backed introductions; preserve registration gate.
           node scripts/audit-labor-rights-topics.mjs
