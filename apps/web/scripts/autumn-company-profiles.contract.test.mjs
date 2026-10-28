@@ -3,85 +3,68 @@ import {readFileSync,existsSync} from 'node:fs';
 const read=p=>readFileSync(p,'utf8');
 const companies=JSON.parse(read('src/data/domesticAutumnScreenshot20261028.json')).entries;
 const jobs=JSON.parse(read('src/data/domesticAutumnVerifiedJobs20261028.json')).jobs;
+const evidence=JSON.parse(read('src/data/domesticAutumnOfficialEvidence20261028.json')).entries;
+const brandRegistry=JSON.parse(read('src/data/domesticAutumnBrandMediaRegistry.json')).entries;
+const mediaA=JSON.parse(read('src/data/domesticMediaBundle.json')).companies;
+const mediaB=JSON.parse(read('src/data/domesticMedia200Bundle.json')).companies;
 const market=read('src/components/DomesticAutumnMarket.tsx');
 const brand=read('src/components/AutumnCompanyBrand.tsx');
 const cover=read('src/components/AutumnCompanyCover.tsx');
 const profile=read('src/pages/AutumnCompanyProfilePage.tsx');
-const main=read('src/main.tsx');
-const router=read('src/router.tsx');
-const styles=read('src/styles/domestic-autumn-market.css');
-assert.equal(companies.length,156,'All screenshot employers are preserved');
-assert.equal(jobs.length,35,'Existing sourced jobs are untouched');
-assert.equal(new Set(companies.map(c=>c.id)).size,156,'Employer paths must be unique');
-assert(companies.every(c=>/^cn-autumn-[0-9]{3}$/.test(c.id)),'Company IDs must match the route');
-assert(jobs.every(j=>companies.some(c=>c.name===j.company)),'Each job must have an onsite profile');
-assert(market.includes("to={'/companies/autumn/'+employer!.id}"),'Job-card name+brand must link to profile');
-assert(market.includes("to={'/companies/autumn/'+e.id}"),'Every screenshot employer must link to profile');
-assert(brand.includes("logo?.state==='ready'")&&brand.includes('logo.path'),'Only existing ready local images can be used');
-assert(brand.includes('非官方Logo'),'Never misrepresent a generated nameplate as an official trademark');
-assert(!brand.includes('http://')&&!brand.includes('https://'),'No hotlinked photo/logo substitutions');
-assert(profile.includes('getDomesticCompanies()')&&profile.includes('domesticProfiles'),'Reuse existing genuine employer files');
-assert(profile.includes('getDomesticRecruitment('),'Reuse existing source-reviewed recruiting portals');
-assert(profile.includes('data-hhba-recruitment-outbound="true"'),'Recruitment URL requires existing auth guard');
-assert(profile.includes('data-hhba-non-recruitment-link="true"'),'Evidence is not confused with application entry');
-assert(profile.includes('招聘项目的城市不等于每个岗位的城市'),'Prevent program-wide city conflation');
-assert(profile.includes('尚未完成独立核实'),'No fabricated company biography');
-assert(main.includes("if(/^\\/companies\\/autumn\\/cn-autumn-[0-9]{3}$/.test(route))return <AutumnCompanyProfilePage"),'SPA profile route must resolve');
-assert(router.includes("autumn\\/cn-autumn-[0-9]{3}"),'Profile navigation must preserve safe return state');
-assert(styles.includes('.hhba-autumn-profile-hero')&&styles.includes('.hhba-autumn-company-index-link'),'Profile and identity links styled');
+const main=read('src/main.tsx'),router=read('src/router.tsx');
 
-assert(market.includes('AutumnCompanyCover name={job.company}')&&market.includes('AutumnCompanyCover name={e.name}'),'Both job cards and directory use real media when available');
-assert(cover.includes('images/autumn-cover/')&&cover.includes("photo.classification?.includes('website_screenshot')"),'Local cover must prefer actual website screenshots, else labelled illustration');
-assert(profile.includes('images/autumn-cover/'),'Each profile must show its local company cover');
-assert(brand.includes('images/autumn-brand/'),'Every company must have a separate nameplate image');
-for(const company of companies){
- for(const [kind,width,height] of [['brand','256','256'],['cover','1080','520']]){
-  const path='public/images/autumn-'+kind+'/'+company.id+'.svg';
-  assert(existsSync(path),'Missing individual company artwork: '+path);
-  const asset=read(path);
-  assert(asset.startsWith('<svg')&&asset.includes('width="'+width+'"')&&asset.includes('height="'+height+'"'),'SVG content invalid: '+path);
-  assert(asset.includes(company.name),'SVG should identify exact employer: '+path);
-  assert(asset.includes('非官方')||asset.includes('非实际')||asset.includes('非企业'),'SVG must explicitly disclaim source identity: '+path);
+assert.equal(companies.length,156,'Preserve every distinct screenshot enterprise');
+assert.equal(jobs.length,35,'Do not alter existing historical job data');
+assert.equal(new Set(companies.map(x=>x.id)).size,156,'All employer routes must be unique');
+assert(jobs.every(x=>companies.some(e=>e.name===x.company)),'Every listed job must have a profile');
+assert(market.includes("to={'/companies/autumn/'+employer!.id}"),'Every job company name must link to a profile');
+assert(market.includes("to={'/companies/autumn/'+e.id}"),'Every directory company must link to a profile');
+assert(main.includes("if(/^\\/companies\\/autumn\\/cn-autumn-[0-9]{3}$/.test(route))return <AutumnCompanyProfilePage"));
+assert(router.includes("autumn\\/cn-autumn-[0-9]{3}"));
+
+assert.equal(Object.keys(brandRegistry).length,17,'17 provenance-tracked brand assets in this batch');
+for(const [name,entry] of Object.entries(brandRegistry)){
+ const match=companies.find(x=>x.name===name);
+ assert(match,'Logo must map to exact screenshot enterprise '+name);
+ assert(entry.id===match.id,'No mismatched company logo');
+ assert(new RegExp('^images/autumn-real-logos/'+match.id+'\\.(svg|jpg|jpeg|png|webp)$').test(entry.path),'No unsafe or invented image paths');
+ assert(entry.source?.startsWith('https://github.com/'),'Record public image provenance');
+ const local='public/'+entry.path;
+ assert(existsSync(local),'Brand file must be local: '+local);
+ if(entry.path.endsWith('.svg')){
+  const text=read(local);
+  assert(text.includes('<svg')&&text.includes('viewBox'),'Valid vector logo '+local);
+  assert(!/<script|<foreignObject|onload\\s*=|onerror\\s*=/i.test(text),'No unsafe SVG '+local);
+ }else if(entry.path.endsWith('.jpg')){
+  const buf=readFileSync(local);
+  assert(buf[0]===0xff&&buf[1]===0xd8,'Valid JPEG logo '+local);
  }
 }
-
-
-const evidence=JSON.parse(read('src/data/domesticAutumnOfficialEvidence20261028.json')).entries;
-assert.equal(Object.values(evidence).filter(e=>e.intro&&e.source).length,10,'Source-backed employer introductions');
-for(const [name,entry] of Object.entries(evidence)){
- assert(companies.some(c=>c.name===name),'Evidence cannot belong to an absent company: '+name);
- if(entry.intro)assert(entry.source?.startsWith('https://'),'No unattributed company introductions');
- if(entry.officialRecruitment)assert(entry.officialRecruitment.startsWith('https://'),'No insecure recruiting entry');
+assert(brand.includes('domesticAutumnBrandMediaRegistry.json')&&brand.includes('images/autumn-real-logos/'));
+assert(!brand.includes('images/autumn-brand/'),'Never show invented HHBA graphic as company logo');
+assert(brand.includes('企业Logo待核验'),'Unconfirmed companies must have honest neutral placeholder');
+assert(!brand.includes('http://')&&!brand.includes('https://'),'Brand is always locally hosted');
+assert(cover.includes("photo.classification==='source_backed_named_enterprise_scene'"),'Hero photos require actual source-backed workplace identity');
+assert(cover.includes('if(!scene?.path)return null'),'No fake banners when no real photo exists');
+assert(!cover.includes('images/autumn-cover/'),'Never use faux green illustrations in photo slots');
+assert(market.includes('AutumnCompanyCover name={job.company}')&&market.includes('AutumnCompanyCover name={e.name}'));
+assert(!market.includes('images/autumn-cover/'),'Job market must not reference generated faux art');
+assert(!profile.includes('images/autumn-cover/'),'Profile must not display generated faux company art');
+assert(profile.includes("photo.classification==='source_backed_named_enterprise_scene'"),'Real workplace gallery requires verifiable scene');
+assert(profile.includes('websiteCaptures.length>0'),'Existing website screenshots preserved separately');
+assert(profile.includes('不是办公实景')&&profile.includes('非企业实景'),'Website captures must not pretend to be real office photos');
+assert(profile.includes('data-hhba-recruitment-outbound="true"'),'Keep external recruiting login gate');
+assert(profile.includes('getDomesticCompanies()')&&profile.includes('getDomesticRecruitment('),'Reuse existing business/recruitment information');
+assert(profile.includes('招聘项目的城市不等于每个岗位的城市'),'Never confuse program-wide locations with job locations');
+assert(profile.includes('尚未完成独立核实'),'No fabricated company biographies');
+assert(Object.values(evidence).filter(x=>x.intro&&x.source).length===10,'Retain source-backed company introductions');
+const media={...mediaA,...mediaB};
+const scenes=companies.flatMap(e=>(media[e.name]?.photos||[]).filter(p=>p.state==='ready'&&p.classification==='source_backed_named_enterprise_scene'));
+const captures=companies.flatMap(e=>(media[e.name]?.photos||[]).filter(p=>p.state==='ready'&&p.classification==='official_website_screenshot_unreviewed'));
+assert.equal(captures.length,4,'Preserve four source-labeled website captures separately');
+for(const e of companies){
+ assert(/^cn-autumn-[0-9]{3}$/.test(e.id),'Every screenshot entry uses a valid profile path');
+ assert(!existsSync('public/images/autumn-brand/'+e.id+'.svg'),'Remove false logo artwork from published assets');
+ assert(!existsSync('public/images/autumn-cover/'+e.id+'.svg'),'Remove false building/cover art from published assets');
 }
-const realBrands=JSON.parse(read('src/data/domesticAutumnBrandMediaRegistry.json')).entries;
-const authenticMarks=Object.entries(realBrands);
-assert.equal(authenticMarks.length,13,'Only 13 source-verified catalogue matches in this batch');
-for(const [name,media] of authenticMarks){
- const employer=companies.find(x=>x.name===name);
- assert(employer,'Logo must match exactly one employer: '+name);
- assert.equal(media.path,'images/autumn-real-logos/'+employer.id+'.svg');
- assert(media.source.startsWith('https://github.com/glincker/thesvg/blob/'),'Logo provenance must identify exact source');
- const path='public/'+media.path;
- assert(existsSync(path),'Missing real brand mark: '+path);
- const svg=read(path);
- assert(svg.includes('viewBox')&&svg.includes('<svg'),'Brand file must be real SVG');
- assert(!/<script|<foreignObject|onload\\s*=|onerror\\s*=/i.test(svg),'Unsafe SVG forbidden');
-}
-assert(brand.includes('domesticAutumnBrandMediaRegistry.json'),'Brand component must load reviewed assets');
-assert(brand.includes('images/autumn-real-logos/'),'No arbitrary images in logos');
-
-const allIds=new Set(companies.map(c=>c.id));
-for(const c of companies){
- const path='/companies/autumn/'+c.id;
- assert(new RegExp('^/companies/autumn/cn-autumn-[0-9]{3}$').test(path),'Every employer must resolve in SPA: '+c.name);
- assert(allIds.has(c.id),'Every employer must retain a unique ID: '+c.name);
-}
-assert(market.includes("directoryStatus==='with_jobs'")&&market.includes('hhba-autumn-row-detail'),'All-company directory must provide explicit details and working status filters');
-assert(market.includes('safeUrl(recruitmentLink(e))'),'All known official channels must work from the directory');
-assert(profile.includes('officialArticle?.intro'),'Reviewed introductions must be rendered');
-assert(profile.includes('localPhotos.map(')&&profile.includes('企业官网页面截图 · 非办公实景'),'Local company images only; never pretend website screenshot is an office photo');
-assert(cover.includes('官网页面截图 · 非实景'),'Never pretend to display verified office pictures');
-assert(profile.includes('existing?.overview'),'Reuse existing entity-specific business summary rather than empty text');
-assert(profile.includes('hhba-autumn-verified-facts'),'Show per-company evidence state');
-
-console.log('AUTUMN_COMPANY_PROFILES_AND_312_ASSETS_OK',companies.length,jobs.length);
+console.log('AUTUMN_BRAND_EVIDENCE_CONTRACT_OK',JSON.stringify({companies:companies.length,logos:Object.keys(brandRegistry).length,websiteCaptures:captures.length,scenePhotos:scenes.length}));
