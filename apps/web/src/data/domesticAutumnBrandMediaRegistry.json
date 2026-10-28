@@ -186,6 +186,30 @@
       "sourceType": "independent_bank_brand_vector_catalog",
       "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
       "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
+    },
+    "虎牙": {
+      "id": "cn-autumn-091",
+      "path": "images/autumn-real-logos/cn-autumn-091.svg",
+      "source": "https://github.com/HeyHuazi/SVGLOGO/blob/main/static/library/social/huYa.svg",
+      "sourceType": "independent_chinese_brand_vector_collection",
+      "confidence": "exact_company_name_in_localized_svg_catalog_current_brand_confirmation_pending",
+      "reviewNote": "Exact Chinese display-name asset match; separately verify official brand specifications."
+    },
+    "长城华西银行": {
+      "id": "cn-autumn-147",
+      "path": "images/autumn-real-logos/cn-autumn-147.svg",
+      "source": "https://github.com/HeyHuazi/SVGLOGO/blob/main/static/library/pay/GWB.svg",
+      "sourceType": "independent_chinese_brand_vector_collection",
+      "confidence": "exact_company_name_in_localized_svg_catalog_current_brand_confirmation_pending",
+      "reviewNote": "Exact Chinese display-name asset match; separately verify official brand specifications."
+    },
+    "四川银行": {
+      "id": "cn-autumn-146",
+      "path": "images/autumn-real-logos/cn-autumn-146.svg",
+      "source": "https://github.com/HeyHuazi/SVGLOGO/blob/main/static/library/pay/SCB.svg",
+      "sourceType": "independent_chinese_brand_vector_collection",
+      "confidence": "exact_company_name_in_localized_svg_catalog_current_brand_confirmation_pending",
+      "reviewNote": "Exact Chinese display-name asset match; separately verify official brand specifications."
     }
   }
 }
