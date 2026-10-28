@@ -1,0 +1,1417 @@
+{
+  "schemaVersion": "1.0",
+  "capturedOn": "2026-10-28",
+  "checkedOn": "2026-10-28",
+  "caption": "截图为用户提供的秋招线索，组别/几日内截止并非HHBA验证过的实时状态；禁止当成当前在招承诺。",
+  "totalScreenshotMentions": 157,
+  "uniqueCompanyNames": 156,
+  "duplicateNames": [
+    "艾普工华"
+  ],
+  "entries": [
+    {
+      "id": "cn-autumn-001",
+      "name": "毕马威",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-002",
+      "name": "施耐德电气",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "announcement_evidenced",
+      "officialUrl": null,
+      "evidenceUrl": "https://career.gdut.edu.cn/teachin/view/id/191449",
+      "notes": "已确认2027秋招多类工程师及招聘城市范围；尚未核实逐岗城市"
+    },
+    {
+      "id": "cn-autumn-003",
+      "name": "辉瑞",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-004",
+      "name": "中国南方航空",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "official_entry_evidenced",
+      "officialUrl": "https://job.csair.cn/",
+      "evidenceUrl": "https://www.5rc.com/zhaokao/632835/",
+      "notes": "2027校招公告包含企业招聘官网；官网的每个具体岗位尚待逐一核实"
+    },
+    {
+      "id": "cn-autumn-005",
+      "name": "顺丰",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "official_entry_evidenced",
+      "officialUrl": "https://campus.sf-express.com/#/homePage",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119482.html",
+      "notes": "本批已核对的是顺丰科技2027校招；顺丰集团其他业务招聘不视为相同岗位"
+    },
+    {
+      "id": "cn-autumn-006",
+      "name": "网易游戏",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "official_entry_evidenced",
+      "officialUrl": "https://campus.game.163.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118238.html",
+      "notes": "网易互娱2027校招，具体岗位城市和专业需进入官网核对"
+    },
+    {
+      "id": "cn-autumn-007",
+      "name": "鹰角网络",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-008",
+      "name": "安克创新",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "official_entry_evidenced",
+      "officialUrl": "https://career.anker.com.cn/universities/recruitment/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/116865.html",
+      "notes": "仅核对了企业2027校园招聘岗位方向与城市集合"
+    },
+    {
+      "id": "cn-autumn-009",
+      "name": "徕芬科技",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-010",
+      "name": "新鸿基地产",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-011",
+      "name": "万科泊寓",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-012",
+      "name": "远景科技集团",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-013",
+      "name": "蜂巢能源",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-014",
+      "name": "中国能建国际集团",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-015",
+      "name": "中国煤炭科工",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-016",
+      "name": "中国通服广西公司",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-017",
+      "name": "太极股份",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-018",
+      "name": "新奥集团",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-019",
+      "name": "湖南省广播影视集团（湖南广电）",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-020",
+      "name": "紫金集团",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-021",
+      "name": "青蛙王子",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-022",
+      "name": "万兴科技",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "official_entry_evidenced",
+      "officialUrl": "https://wondersharecampus.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://ejob.dhu.edu.cn/single/2026/10/27/2610270850580891840719111514160682210002.html",
+      "notes": "2027招聘公告中岗位名称与城市分别公布，不能推断逐岗城市"
+    },
+    {
+      "id": "cn-autumn-023",
+      "name": "紫龙游戏",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-024",
+      "name": "菲婷丝",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-025",
+      "name": "青岛银行",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "official_entry_evidenced",
+      "officialUrl": "https://campus.51job.com/qdccb2027",
+      "evidenceUrl": "https://campus.51job.com/qdccb2027/process.html",
+      "notes": "官方明确委托51job为唯一报名网站；可读取具体岗位专业和工作城市"
+    },
+    {
+      "id": "cn-autumn-026",
+      "name": "南方传媒",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-027",
+      "name": "广之旅",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-028",
+      "name": "中建路桥",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-029",
+      "name": "中电建电力集团",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-030",
+      "name": "江苏省国信集团",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-031",
+      "name": "奇正",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-032",
+      "name": "微谱",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-033",
+      "name": "邦德激光",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-034",
+      "name": "鹏芯微",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-035",
+      "name": "佑驾创新",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-036",
+      "name": "南芯科技",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-037",
+      "name": "炬芯科技",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-038",
+      "name": "博创科技",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-039",
+      "name": "安世中国",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-040",
+      "name": "黑格科技",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-041",
+      "name": "晶云",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-042",
+      "name": "艾普工华",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-043",
+      "name": "迦智科技",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-044",
+      "name": "博顿光电",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-045",
+      "name": "元夫半导体",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-046",
+      "name": "芯德科技",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-047",
+      "name": "瀚通通讯",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-048",
+      "name": "元力股份",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-049",
+      "name": "红谱科技",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-050",
+      "name": "汇蓉国科",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-051",
+      "name": "金中新材",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-052",
+      "name": "宏川集团",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-053",
+      "name": "兰石集团",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-054",
+      "name": "海程邦达",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-055",
+      "name": "长隆科技",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-056",
+      "name": "维音",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-057",
+      "name": "line plus",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-058",
+      "name": "招商金科",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-059",
+      "name": "中盈优创",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-060",
+      "name": "云尖信息",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-061",
+      "name": "美迈科技",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-062",
+      "name": "厦门国资运",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-063",
+      "name": "桑棋汽配",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-064",
+      "name": "新海威",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-065",
+      "name": "双视科技",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-066",
+      "name": "物产道富",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-067",
+      "name": "弘象",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-068",
+      "name": "甘肃能化集团",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-069",
+      "name": "广东省农信联社",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-070",
+      "name": "青岛成达",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-071",
+      "name": "桃溪集团",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-072",
+      "name": "福州建工集团",
+      "screenshotGroup": "截图组A：标注7日内更新",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-073",
+      "name": "微软",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-074",
+      "name": "大众汽车",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-075",
+      "name": "强生",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-076",
+      "name": "阿斯利康",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-077",
+      "name": "中国海油",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "announcement_evidenced",
+      "officialUrl": null,
+      "evidenceUrl": "https://jy.tust.edu.cn/correcruit/content/id/46952.html",
+      "notes": "2027企业联合校园招聘公告；单位和具体岗位需要逐一核实"
+    },
+    {
+      "id": "cn-autumn-078",
+      "name": "中国邮政",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "official_entry_evidenced",
+      "officialUrl": "https://chinapost2027.zhaopin.com/",
+      "evidenceUrl": "https://www.chinapost.com.cn/cn/report/2609/1176-1.htm",
+      "notes": "中国邮政官网2027届招聘公告；各单位职位需进入招聘系统核对"
+    },
+    {
+      "id": "cn-autumn-079",
+      "name": "中通快递",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-080",
+      "name": "达能",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-081",
+      "name": "安利",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-082",
+      "name": "太古集团",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-083",
+      "name": "福特中国",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-084",
+      "name": "卡夫亨氏",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-085",
+      "name": "汉高",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-086",
+      "name": "利洁时",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-087",
+      "name": "嘉士伯",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-088",
+      "name": "森马",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-089",
+      "name": "无限极",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-090",
+      "name": "阅文集团",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-091",
+      "name": "虎牙",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-092",
+      "name": "爱奇艺重庆",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-093",
+      "name": "中国华能",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "official_entry_evidenced",
+      "officialUrl": "https://zhaopin.chng.com.cn/",
+      "evidenceUrl": "https://zhaopin.chng.com.cn/CampusRecruit?aId=2000221",
+      "notes": "华能官方招聘系统展示2027多家单位岗位；有部分逐岗专业和地点"
+    },
+    {
+      "id": "cn-autumn-094",
+      "name": "中国大唐集团",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "official_entry_evidenced",
+      "officialUrl": "https://zhaopin.china-cdt.com/zpgg_xyzp.html",
+      "evidenceUrl": "https://www.dteg.com.cn/dteg/xwzx/jtxw/2026/9/I1552059660066881536.html",
+      "notes": "中国大唐2027年首批招聘和官方岗位公告目录"
+    },
+    {
+      "id": "cn-autumn-095",
+      "name": "广发银行",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "announcement_evidenced",
+      "officialUrl": null,
+      "evidenceUrl": "https://www.ncss.cn/student/jobs/2QNzCztmZsnxQLKKrA9nA3/detail.html",
+      "notes": "核验到2027校招岗位大类与各机构工作城市；尚未找到本轮可确认的独立直达职位URL"
+    },
+    {
+      "id": "cn-autumn-096",
+      "name": "宁波银行",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "official_entry_evidenced",
+      "officialUrl": "https://zhaopin.nbcb.com.cn/",
+      "evidenceUrl": "https://career.nankai.edu.cn/recruitment/content/type/2/id/6152.html",
+      "notes": "科技/量化风控类专业偏好来自2027招聘公告，具体岗位工作城市待核实"
+    },
+    {
+      "id": "cn-autumn-097",
+      "name": "汇丰中国",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-098",
+      "name": "CASETiFY",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-099",
+      "name": "波士顿科学",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-100",
+      "name": "东软",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-101",
+      "name": "云天化集团",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-102",
+      "name": "陕煤集团",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-103",
+      "name": "浙江省交通集团",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "announcement_evidenced",
+      "officialUrl": null,
+      "evidenceUrl": "https://job.tiangong.edu.cn/correcruit/content/id/56355.html",
+      "notes": "2027集团与子公司招聘计划；逐岗要求应进入相关子公司公告"
+    },
+    {
+      "id": "cn-autumn-104",
+      "name": "湖南钢铁集团",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-105",
+      "name": "中国融通集团",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-106",
+      "name": "中国信达",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-107",
+      "name": "晶晨半导体",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-108",
+      "name": "复旦微电子",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "official_entry_evidenced",
+      "officialUrl": "https://app.mokahr.com/campus-recruitment/fmsh",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "notes": "招聘公告指明唯一官方网投地址，已确认部分岗位具体专业，工作城市尚待逐岗核对"
+    },
+    {
+      "id": "cn-autumn-109",
+      "name": "金发科技",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-110",
+      "name": "远光软件",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-111",
+      "name": "钱江摩托",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-112",
+      "name": "舒客电商",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-113",
+      "name": "AIA Digital+",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-114",
+      "name": "索恩格电动",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-115",
+      "name": "胜帮科技",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-116",
+      "name": "恒神股份",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-117",
+      "name": "邦盛科技",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-118",
+      "name": "屹唐半导体",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-119",
+      "name": "飞骧科技",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-120",
+      "name": "清微智能",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-121",
+      "name": "为旌科技",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-122",
+      "name": "云圣智能",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-123",
+      "name": "富特科技",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-124",
+      "name": "拓界科技",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-125",
+      "name": "姚记科技",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-126",
+      "name": "算苗科技",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-127",
+      "name": "达飞 GBS 重庆",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-128",
+      "name": "中国大唐集团能源",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-129",
+      "name": "中国大唐数科公司",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-130",
+      "name": "中国集邮",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-131",
+      "name": "海油发展",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-132",
+      "name": "中海石油气电集团",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-133",
+      "name": "大华银行",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-134",
+      "name": "哈尔沃德",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-135",
+      "name": "湖南农业发展集团",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-136",
+      "name": "徐矿集团",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-137",
+      "name": "广西北部湾银行",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-138",
+      "name": "广州农商银行",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "announcement_evidenced",
+      "officialUrl": null,
+      "evidenceUrl": "https://jy.bhu.edu.cn/detail/online?id=3622116",
+      "notes": "2027届招聘简章可核实，需核验具体职位及报名官网路径"
+    },
+    {
+      "id": "cn-autumn-139",
+      "name": "萧山农商银行",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-140",
+      "name": "杭州联合银行",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-141",
+      "name": "上海农商银行",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-142",
+      "name": "南雄农商银行",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-143",
+      "name": "甘肃农商银行",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-144",
+      "name": "长沙银行",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-145",
+      "name": "湖南银行",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-146",
+      "name": "四川银行",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-147",
+      "name": "长城华西银行",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-148",
+      "name": "长沙城市发展集团",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-149",
+      "name": "德康",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-150",
+      "name": "陕西旅游集团",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-151",
+      "name": "云南交投集团",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-152",
+      "name": "川煤集团",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-153",
+      "name": "浙江农商联合银行",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-154",
+      "name": "大连银行",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-155",
+      "name": "江苏农垦",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    },
+    {
+      "id": "cn-autumn-156",
+      "name": "河北水利发展集团",
+      "screenshotGroup": "截图组B：标注3日内截止",
+      "reviewStatus": "not_checked",
+      "officialUrl": null,
+      "evidenceUrl": null,
+      "notes": null
+    }
+  ]
+}
