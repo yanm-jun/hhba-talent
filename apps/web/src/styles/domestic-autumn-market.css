@@ -92,3 +92,24 @@
 .hhba-autumn-profile-empty{font-size:13px;color:#697c71;line-height:1.8}
 .hhba-autumn-profile-footer{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;padding:15px 6px}
 @media(max-width:740px){.hhba-autumn-profile-panel{padding:16px 12px}.hhba-autumn-profile-sections,.hhba-autumn-profile-jobs{grid-template-columns:1fr}.hhba-autumn-profile-hero{align-items:flex-start}.hhba-autumn-brand-large{width:58px;height:58px;flex-basis:58px}.hhba-autumn-brand-large .hhba-autumn-brand-text{font-size:21px}}
+
+
+/* Source-aware profiles and full screenshot roster */
+.hhba-autumn-verified-facts{margin:13px 0 6px;display:grid;gap:7px;padding:12px;background:#fff;border:1px solid #e2ebe5;border-radius:9px}
+.hhba-autumn-verified-facts span{display:flex;justify-content:space-between;gap:12px;font-size:11px;color:#6e8073;line-height:1.6}
+.hhba-autumn-verified-facts b{font-weight:650;color:#3a6651;text-align:right}
+.hhba-autumn-visual-panel{min-height:146px}
+.hhba-autumn-no-photo{display:flex;align-items:center;gap:18px;padding:15px;background:#f6faf7;border-radius:12px}
+.hhba-autumn-no-photo p{font-size:12px;line-height:1.7;color:#687d6d;max-width:620px}
+.hhba-autumn-local-photo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:14px}
+.hhba-autumn-local-photo-grid figure{margin:0;border:1px solid #e4ece6;border-radius:10px;overflow:hidden}
+.hhba-autumn-local-photo-grid img{display:block;width:100%;height:220px;object-fit:contain;background:#f7faf7}
+.hhba-autumn-local-photo-grid figcaption{padding:10px;font-size:11px;color:#788a7d}
+.hhba-autumn-directory-filters{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
+.hhba-autumn-directory-filters button{padding:7px 11px;background:#fff;border:1px solid #cdded4;color:#385f4b;font-size:12px;border-radius:8px;cursor:pointer}
+.hhba-autumn-directory-filters button[aria-pressed=true]{background:#e8f6ed;border-color:#80b59a;font-weight:700}
+.hhba-autumn-directory-filters small{margin-left:auto;color:#687e71;font-size:11px}
+.hhba-autumn-company-row .hhba-autumn-row-actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px;justify-content:flex-end}
+.hhba-autumn-company-row a.hhba-autumn-row-detail{color:#2f7650;font-size:11px;font-weight:750;white-space:nowrap}
+.hhba-autumn-row-actions .hhba-domestic-pending{font-size:10px;white-space:nowrap}
+@media(max-width:740px){.hhba-autumn-company-row .hhba-autumn-row-actions{justify-content:flex-start}.hhba-autumn-directory-filters small{width:100%;margin-left:0}.hhba-autumn-no-photo{align-items:flex-start}}
