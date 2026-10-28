@@ -20,11 +20,11 @@ function evidenceLabel(e:Employer){
  return '招聘信息待核验';
 }
 const employerIndex=new Map(employers.map(item=>[item.name,item]));
-const normalize=(value:string)=>value.toLocaleLowerCase().replace(/[\\s·（）()_]/g,'');
+const normalize=(value:string)=>value.toLocaleLowerCase().replace(/[\s·（）()_]/g,'');
 const careerAliases:Record<string,string[]>={
  '计算机科学与技术':['计算机类','计算机'],'软件工程':['计算机类'],
- '人工智能':['计算机类','工学类'],'电气工程及其自动化':['电气工程类','电气类','工学类'],
- '机械工程':['机械类','工学类'],'金融学':['金融学类','金融经济类','经济学类'],
+ '人工智能':['计算机类'],'电气工程及其自动化':['电气工程类','电气类'],
+ '机械工程':['机械类'],'金融学':['金融学类','金融经济类','经济学类'],
  '会计学':['财务会计类','管理学类'],'统计学':['数学类','理学类'],
 };
 function matchesMajor(item:DomesticRecord,term:string){
@@ -90,6 +90,8 @@ export function DomesticAutumnMarket({compact=false,standalone=false,query='',ma
    if(text&&!fields.includes(text))return false;
    if(!matchesMajor(item,majorSearch))return false;
    if(placeSearch&&!item.cities.some(c=>normalize(c).includes(normalize(placeSearch))||normalize(placeSearch).includes(normalize(c))))return false;
+   // A project-wide city list cannot establish a true major-and-city match for one job.
+   if(majorSearch&&placeSearch&&item.locationScope!=='job')return false;
    return true;
   });
  },[search,majorSearch,placeSearch,foreignOnly]);
