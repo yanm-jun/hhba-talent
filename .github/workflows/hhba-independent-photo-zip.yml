@@ -1,0 +1,48 @@
+name: HHBA 156 companies independent photographs ZIP
+on:
+  push:
+    paths:
+      - .github/workflows/hhba-independent-photo-zip.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - name: Checkout photo source queue without touching deployment
+        uses: actions/checkout@v4
+        with:
+          ref: feat/hhba-unified-static-20261025
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install image handling
+        run: python -m pip install --quiet pillow requests
+      - name: Generate independent licensed illustrative photo ZIP
+        env:
+          HHBA_PHOTO_LIMIT: "312"
+        run: python -u apps/web/scripts/build_independent_photo_zip.py
+      - name: Verify ZIP has 312 different JPEGs
+        run: |
+          python - <<'PY'
+          import zipfile,json,hashlib
+          fn='hhba_156_companies_312_individual_industry_photos.zip'
+          with zipfile.ZipFile(fn) as z:
+              names=[x for x in z.namelist() if x.lower().endswith('.jpg')]
+              status=json.loads(z.read('STATUS.json'))
+              digests=[hashlib.sha256(z.read(name)).hexdigest() for name in names]
+              assert len(names)==312, (len(names),status)
+              assert len(set(digests))==312, "duplicate photo files are not acceptable"
+              assert len(set(n.split('/')[0] for n in names))==156
+              print('VERIFIED_312_INDEPENDENT_PHOTOGRAPHS',status)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-156-companies-312-individual-industry-photos
+          path: hhba_156_companies_312_individual_industry_photos.zip
+          if-no-files-found: warn
+          retention-days: 30
