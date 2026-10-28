@@ -26,6 +26,7 @@ jobs:
           # The homepage marquee now uses only HHBA local domestic media and exact domestic company profile routes.
           # Public entry cards restored to compact layout; keep three identity paths unchanged.
           # Navigation copy refresh: 企业发现 (without the 200-company count in the tab)
+          # 2026-10-28: rebuild static preview with consolidated 200-company discovery navigation.
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
