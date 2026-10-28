@@ -5,6 +5,7 @@ const companies=JSON.parse(read('src/data/domesticAutumnScreenshot20261028.json'
 const jobs=JSON.parse(read('src/data/domesticAutumnVerifiedJobs20261028.json')).jobs;
 const market=read('src/components/DomesticAutumnMarket.tsx');
 const brand=read('src/components/AutumnCompanyBrand.tsx');
+const cover=read('src/components/AutumnCompanyCover.tsx');
 const profile=read('src/pages/AutumnCompanyProfilePage.tsx');
 const main=read('src/main.tsx');
 const router=read('src/router.tsx');
@@ -29,7 +30,8 @@ assert(main.includes("if(/^\\/companies\\/autumn\\/cn-autumn-[0-9]{3}$/.test(rou
 assert(router.includes("autumn\\/cn-autumn-[0-9]{3}"),'Profile navigation must preserve safe return state');
 assert(styles.includes('.hhba-autumn-profile-hero')&&styles.includes('.hhba-autumn-company-index-link'),'Profile and identity links styled');
 
-assert(market.includes('images/autumn-cover/'),'Job cards must show the new local visual cover');
+assert(market.includes('AutumnCompanyCover name={job.company}')&&market.includes('AutumnCompanyCover name={e.name}'),'Both job cards and directory use real media when available');
+assert(cover.includes('images/autumn-cover/')&&cover.includes("photo.classification?.includes('website_screenshot')"),'Local cover must prefer actual website screenshots, else labelled illustration');
 assert(profile.includes('images/autumn-cover/'),'Each profile must show its local company cover');
 assert(brand.includes('images/autumn-brand/'),'Every company must have a separate nameplate image');
 for(const company of companies){
@@ -78,6 +80,7 @@ assert(market.includes("directoryStatus==='with_jobs'")&&market.includes('hhba-a
 assert(market.includes('safeUrl(recruitmentLink(e))'),'All known official channels must work from the directory');
 assert(profile.includes('officialArticle?.intro'),'Reviewed introductions must be rendered');
 assert(profile.includes('localPhotos.map(')&&profile.includes('企业官网页面截图 · 非办公实景'),'Local company images only; never pretend website screenshot is an office photo');
+assert(cover.includes('官网页面截图 · 非实景'),'Never pretend to display verified office pictures');
 assert(profile.includes('existing?.overview'),'Reuse existing entity-specific business summary rather than empty text');
 assert(profile.includes('hhba-autumn-verified-facts'),'Show per-company evidence state');
 
