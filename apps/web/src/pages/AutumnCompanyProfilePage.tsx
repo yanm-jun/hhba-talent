@@ -12,6 +12,7 @@ import employersJSON from '../data/domesticAutumnScreenshot20261028.json';
 import jobsJSON from '../data/domesticAutumnVerifiedJobs20261028.json';
 import officialEvidence from '../data/domesticAutumnOfficialEvidence20261028.json';
 import brandMedia from '../data/domesticAutumnBrandMediaRegistry.json';
+import generatedScenes from '../data/domesticAutumnAiScenes.json';
 import type {User} from '../services/api';
 import '../styles/domestic-autumn-market.css';
 
@@ -24,6 +25,8 @@ const profiles={...domesticProfiles,...domestic200Profiles} as Record<string,Edi
 type OfficialEditorial={industry:string|null;intro:string|null;source:string|null;officialRecruitment:string|null;recruitmentLabel:string|null;evidenceScope:string};
 const reviewedOfficial=officialEvidence.entries as Record<string,OfficialEditorial>;
 const provenance=brandMedia.entries as Record<string,{source:string;sourceType:string;confidence:string;path:string}>;
+type AiScene={id:string;path:string;kind:string;status:string;sourceLabel:string;alt:string};
+const aiIndex=generatedScenes.entries as Record<string,AiScene[]>;
 const mediaIndex={...mediaA.companies,...mediaB.companies} as Record<string,{photos?:{state:string;path?:string;classification?:string;source?:string}[]}>;
 const safeUrl=(value?:string|null)=>{
  try{const u=new URL(value||'');return u.protocol==='https:'&&!u.username&&!u.password&&!u.port?u.href:null}
@@ -42,6 +45,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
  const profileMedia=employer?mediaIndex[employer.name]:undefined;
  const localPhotos=(profileMedia?.photos||[]).filter(photo=>photo.state==='ready'&&photo.classification==='source_backed_named_enterprise_scene'&&!!photo.source&&typeof photo.path==='string'&&/^domestic-media\/[a-z0-9-]+\.(webp|png|jpg|jpeg)$/i.test(photo.path));
  const websiteCaptures=(profileMedia?.photos||[]).filter(photo=>photo.state==='ready'&&photo.classification==='official_website_screenshot_unreviewed'&&typeof photo.path==='string'&&/^domestic-media\/[a-z0-9-]+\.(webp|png|jpg|jpeg)$/i.test(photo.path));
+ const aiPhotos=(aiIndex[id]||[]).filter(photo=>photo.status==='published_preview'&&photo.kind==='ai_generated_concept_scene'&&/^images\/autumn-ai-scenes\/cn-autumn-[0-9]{3}-[0-9]{2}\.webp$/.test(photo.path)&&photo.path.startsWith('images/autumn-ai-scenes/'+id+'-'));
  const primary=safeUrl(employer?.officialUrl)||safeUrl(recruitment?.url)||safeUrl(officialArticle?.officialRecruitment);
  const hasRecruitment=Boolean(primary);
  const hasCompanyEditorial=Boolean(editorial?.summary?.trim());
@@ -99,9 +103,10 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
    </section>
    <section className="hhba-autumn-profile-panel hhba-autumn-visual-panel" aria-label="企业图片及标识">
     <h2>企业图片与品牌标识</h2>
-    <p className="hhba-autumn-profile-note">{recognizedBrand?'已找到第三方品牌图形库中的企业标识，待品牌方进一步确认。':'企业 Logo 尚待核验，因此不显示编造的品牌标志。'} 企业照片只展示核实属于本企业的真实场景。</p>
+    <p className="hhba-autumn-profile-note">{recognizedBrand?'已找到第三方品牌图形库中的企业标识，待品牌方进一步确认。':'企业 Logo 尚待核验，因此不显示编造的品牌标志。'} 真实企业照片和 AI 场景示意分开展示，AI 场景不代表该企业实际的办公地点。</p>
     {recognizedBrand&&<p className="hhba-autumn-profile-note"><a href={recognizedBrand.source} target="_blank" rel="noopener noreferrer" data-hhba-non-recruitment-link="true">查看企业标识素材来源（第三方目录）</a> · 不表示官方授权或商业合作。</p>}
-    {localPhotos.length?<div className="hhba-autumn-local-photo-grid">{localPhotos.map((photo,i)=><figure key={photo.path||i}><img loading="lazy" src={import.meta.env.BASE_URL+photo.path!} alt={employer.name+'有来源的企业实景'}/><figcaption>企业场景照片 · <a href={photo.source} data-hhba-non-recruitment-link="true" target="_blank" rel="noopener noreferrer">图片来源</a></figcaption></figure>)}</div>:<div className="hhba-autumn-no-photo"><AutumnCompanyBrand name={employer.name} large/><p>真实企业场景照片尚待核验，暂不展示 AI 虚构建筑或未经证实的照片。</p></div>}
+    {localPhotos.length?<div className="hhba-autumn-local-photo-grid">{localPhotos.map((photo,i)=><figure key={photo.path||i}><img loading="lazy" src={import.meta.env.BASE_URL+photo.path!} alt={employer.name+'有来源的企业实景'}/><figcaption>企业场景照片 · <a href={photo.source} data-hhba-non-recruitment-link="true" target="_blank" rel="noopener noreferrer">图片来源</a></figcaption></figure>)}</div>:<div className="hhba-autumn-no-photo"><AutumnCompanyBrand name={employer.name} large/><p>真实企业场景照片尚待核验。下面如有 AI 场景图，仅用于视觉示意，绝不是企业实景。</p></div>}
+    {aiPhotos.length>0&&<><h3 className="hhba-autumn-subsection-title">AI 独立场景图（非企业实景）</h3><p className="hhba-autumn-profile-note">画面中的建筑、空间以及招牌可能由 AI 虚构，不能据此判断企业实际总部、办公楼和现场环境。</p><div className="hhba-autumn-local-photo-grid">{aiPhotos.map(photo=><figure key={photo.id}><img loading="lazy" src={import.meta.env.BASE_URL+photo.path} alt={photo.alt}/><figcaption>{photo.sourceLabel}</figcaption></figure>)}</div></>}
     {websiteCaptures.length>0&&<><h3 className="hhba-autumn-subsection-title">企业网站截图（不是办公实景）</h3><div className="hhba-autumn-local-photo-grid">{websiteCaptures.map((photo,i)=><figure key={photo.path||i}><img loading="lazy" src={import.meta.env.BASE_URL+photo.path!} alt={employer.name+'网站页面截图'}/><figcaption>企业网站页面留档 · 非企业实景</figcaption></figure>)}</div></>}
    </section>
    <section className="hhba-autumn-profile-panel">
