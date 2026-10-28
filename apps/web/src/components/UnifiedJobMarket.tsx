@@ -3,6 +3,7 @@ import { ArrowRight, ExternalLink, MapPin, RefreshCcw, Search, ShieldCheck } fro
 import { Link, getJobReturnTarget, navigate } from '../router';
 import { Shell } from './Shell';
 import { DomesticCompanyResults } from './DomesticCompanyResults';
+import { DomesticAutumnMarket } from './DomesticAutumnMarket';
 import { MajorFilter } from './MajorFilter';
 import { majorById } from '../services/domesticMajors';
 import { SaveJobButton } from './SaveJobButton';
@@ -81,6 +82,7 @@ function JobCard({job,lang,asOf}:{job:LiveJob,lang:Language,asOf:string}){
       <small>{job.recordKind==='CURATED_HISTORICAL'?(lang==='zh'?'历史公开岗位 · 当前状态未核实':'Archived · Status unverified'):job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'?(lang==='zh'?'历史收录 · 状态待核实':'Archived · Availability unverified'):(lang==='zh'?'官方招聘':'Official opening')}</small>
     </div>
     <h3><Link to={'/candidate/jobs/'+encodeURIComponent(job.id)}>{featuredTitle(job,lang)}</Link></h3>
+    <div className="hhba-domestic-major-row"><strong>{lang==='zh'?'专业：':'Major: '}</strong><span>{lang==='zh'?'官方原始岗位未提供可确认的专业字段，请到职位详情核实':'Major requirements not explicitly captured; verify original JD'}</span></div>
     <div className="unified-job-meta"><span><MapPin size={14}/>{featuredLocation(job,lang)||localizedLocation(job,lang)}</span>
       <span>{job.recruitmentType?typeLabel[job.recruitmentType]?.[lang]||job.recruitmentType:(lang==='zh'?'招聘类型待确认':'Type unverified')}</span>
       {job.remote===true&&<span>{lang==='zh'?'远程':'Remote'}</span>}</div>
@@ -293,6 +295,10 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       {aiEvidence.jobs.length===0&&<p className="unified-job-state">暂未检索到具备可核对原文证据的岗位；不会提供虚构的职位。</p>}
     </section>}
     {!showInlineDiscoveryEntry&&<div className="unified-company-discovery-navigation" style={{margin:'18px auto 8px',maxWidth:1120,display:'flex',justifyContent:'flex-end'}}><Link to="/companies/discover" style={{fontSize:13,color:'#265e45',fontWeight:700,textDecoration:'none'}}>浏览全部 200 家企业档案 →</Link></div>}
+    {!curatedHundred&&<DomesticAutumnMarket compact={compact} query={draft}
+      major={majorById(selectedMajor)?.name||''}
+      scope={filters.country} country={filters.location_country||''}
+      city={cityOptions.find(c=>c.value===filters.city)?.zh||''}/>}
     {!curatedHundred&&<DomesticCompanyResults query={draft} majorSlug={selectedMajor}
       scope={filters.country} country={filters.location_country||''}
       city={cityOptions.find(c=>c.value===filters.city)?.zh||''}/>}
