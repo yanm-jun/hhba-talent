@@ -10,6 +10,7 @@ import domesticProfiles from '../data/domesticCareerProfiles.json';
 import {domestic200Profiles} from '../services/domesticCompany200Data';
 import employersJSON from '../data/domesticAutumnScreenshot20261028.json';
 import jobsJSON from '../data/domesticAutumnVerifiedJobs20261028.json';
+import officialEvidence from '../data/domesticAutumnOfficialEvidence20261028.json';
 import type {User} from '../services/api';
 import '../styles/domestic-autumn-market.css';
 
@@ -19,6 +20,8 @@ type Editorial={displayName?:string;summary?:string;description?:string[];busine
 const employers=employersJSON.entries as Employer[];
 const jobs=jobsJSON.jobs as RecordInfo[];
 const profiles={...domesticProfiles,...domestic200Profiles} as Record<string,Editorial>;
+type OfficialEditorial={industry:string|null;intro:string|null;source:string|null;officialRecruitment:string|null;recruitmentLabel:string|null;evidenceScope:string};
+const reviewedOfficial=officialEvidence.entries as Record<string,OfficialEditorial>;
 const mediaIndex={...mediaA.companies,...mediaB.companies} as Record<string,{photos?:{state:string;path?:string;classification?:string}[]}>;
 const safeUrl=(value?:string|null)=>{
  try{const u=new URL(value||'');return u.protocol==='https:'&&!u.username&&!u.password&&!u.port?u.href:null}
@@ -30,11 +33,12 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
  const back=getCompanyReturnTarget();
  const existing=useMemo(()=>employer?getDomesticCompanies().find(c=>c.name===employer.name):null,[employer?.name]);
  const editorial=employer?profiles[employer.name]:undefined;
+ const officialArticle=employer?reviewedOfficial[employer.name]:undefined;
  const recruitment=employer?getDomesticRecruitment(employer.name):undefined;
  const matched=employer?jobs.filter(j=>j.company===employer.name):[];
  const profileMedia=employer?mediaIndex[employer.name]:undefined;
  const localPhotos=(profileMedia?.photos||[]).filter(photo=>photo.state==='ready'&&typeof photo.path==='string'&&/^domestic-media\/[a-z0-9-]+\.(webp|png|jpg|jpeg)$/i.test(photo.path));
- const primary=safeUrl(employer?.officialUrl)||safeUrl(recruitment?.url);
+ const primary=safeUrl(employer?.officialUrl)||safeUrl(recruitment?.url)||safeUrl(officialArticle?.officialRecruitment);
  const hasRecruitment=Boolean(primary);
  const hasCompanyEditorial=Boolean(editorial?.summary?.trim());
  const evidence=safeUrl(employer?.evidenceUrl);
@@ -47,7 +51,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
      <div>
       <small className="hhba-autumn-profile-kicker">HHBA · 企业资料与招聘入口</small>
       <h1>{employer.name}</h1>
-      <p>{editorial?.primaryIndustry||existing?.industry||'行业与业务资料待核验'}</p>
+      <p>{editorial?.primaryIndustry||officialArticle?.industry||existing?.industry||'行业与业务资料待核验'}</p>
       <small>企业标识：{employer.name} · {employer.reviewStatus==='official_entry_evidenced'?'官方招聘入口已定位':employer.reviewStatus==='announcement_evidenced'?'招聘公告已有来源':'招聘信息尚待核验'}</small>
      </div>
     </header>
@@ -59,6 +63,9 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
         {(editorial?.description||[]).slice(0,3).map((p,i)=><p key={i}>{p}</p>)}
         {existing?.route&&<Link to={existing.route} className="hhba-autumn-profile-details">查看 HHBA 已整理的完整企业档案 <ArrowRight size={15}/></Link>}
         <p className="hhba-autumn-profile-note">企业信息为已整理资料，深度核验状态以企业完整档案标注为准。</p>
+       </>:officialArticle?.intro&&officialArticle.source?<>
+         <p>{officialArticle.intro}</p><p className="hhba-autumn-profile-note">这段介绍依据可核对的公开资料整理，不代表已核实所有经营主体、办公地点、在招岗位或人员规模。</p>
+         <a className="hhba-autumn-profile-source" href={officialArticle.source} data-hhba-non-recruitment-link="true" target="_blank" rel="noopener noreferrer">查看企业介绍原始来源 <BookOpen size={14}/></a>
        </>:<>
         <p>这家企业已收录于本次秋招截图名单，但企业业务、总部地址及经营情况尚未完成独立核实。</p>
         {existing?.overview&&existing.status==='industry_reviewed'&&<p>{existing.overview}</p>}
@@ -68,7 +75,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
       {editorial?.officialSource&&safeUrl(editorial.officialSource)&&<a className="hhba-autumn-profile-source" href={safeUrl(editorial.officialSource)!} data-hhba-non-recruitment-link="true" target="_blank" rel="noopener noreferrer">查看企业介绍来源 <BookOpen size={14}/></a>}
       <div className="hhba-autumn-verified-facts" aria-label="企业档案核验情况">
        <span>已有 HHBA 企业档案：<b>{existing?'有':'待建立'}</b></span>
-       <span>企业专属介绍：<b>{hasCompanyEditorial?'有资料 · 请核对来源':'待核验'}</b></span>
+       <span>企业专属介绍：<b>{hasCompanyEditorial||officialArticle?.intro?'有资料 · 请核对来源':'待核验'}</b></span>
        <span>官方招聘入口：<b>{hasRecruitment?'已登记 · 实际状态待核验':'待核验'}</b></span>
        <span>已有具体岗位／项目：<b>{matched.filter(j=>j.recordKind==='job').length} 条／{matched.filter(j=>j.recordKind==='program').length} 条</b></span>
        {existing?.stockCode&&<span>证券代码：<b>{existing.stockCode}</b></span>}
@@ -79,9 +86,10 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
       <h2>选择官方招聘渠道</h2>
       <p>招聘专业、地点和职位是否仍可申请，以企业招聘系统为准。外部官方招聘入口需要通过 HHBA 的真实账户登录验证。</p>
       {hasRecruitment?<div className="hhba-autumn-channel-list">
-        <a className="hhba-autumn-channel" data-hhba-recruitment-outbound="true" href={primary!} target="_blank" rel="noopener noreferrer"><GraduationCap size={19}/><span><strong>查看已定位招聘渠道</strong><small>{recruitment?.availability==='campus_only'?'校园招聘入口':employer.officialUrl?'招聘入口（请在官网区分校招／社招）':recruitment?.label||'招聘入口'} · 招聘状态待核实</small></span><ExternalLink size={16}/></a>
+        <a className="hhba-autumn-channel" data-hhba-recruitment-outbound="true" href={primary!} target="_blank" rel="noopener noreferrer"><GraduationCap size={19}/><span><strong>查看已定位招聘渠道</strong><small>{recruitment?.availability==='campus_only'?'校园招聘入口':officialArticle?.recruitmentLabel||recruitment?.label||'招聘入口（请在官网区分校招／社招）'} · 招聘状态待核实</small></span><ExternalLink size={16}/></a>
        </div>:<p className="hhba-autumn-profile-note">尚未定位可信的企业官方招聘入口，暂不显示可能错误的“立即投递”按钮。</p>}
       {evidence&&<a className="hhba-autumn-profile-source" href={evidence} data-hhba-non-recruitment-link="true" target="_blank" rel="noopener noreferrer">查看招聘公告依据 <BookOpen size={14}/></a>}
+      {officialArticle?.evidenceScope&&<p className="hhba-autumn-profile-note">资料核验范围：{officialArticle.evidenceScope}</p>}
      </section>
     </div>
    </section>
