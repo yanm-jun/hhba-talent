@@ -25,6 +25,10 @@ export function EmployerBrandLogo({job,identity,variant='card'}:LogoProps){
   const cls=variant==='profile'
     ?'company-profile-brand'+(asset?.wide?' company-profile-brand-wide':'')
     :'unified-brand-logo'+(asset?.wide?' unified-brand-logo-wide':'');
+  if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='中信证券')
+    return <span className={cls} title="中信证券（已保存的旧版品牌图，待核验归属）">
+      <img src={import.meta.env.BASE_URL+'domestic-media/user-ed43abe9b2aa6a7d0600525e.png'} alt="中信证券品牌图（来源归属待核验）" loading="eager" decoding="async"/>
+    </span>;
   if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='广发证券')
     return <span className={cls} title="广发证券（旧版品牌素材，身份待最终核验）">
       <img src={import.meta.env.BASE_URL+'domestic-media/user-bc5d9ca993044b7644390553.png'} alt="广发证券旧版 Logo 素材" loading="eager" decoding="async"/>
