@@ -1,11 +1,11 @@
 {
   "schemaVersion": "1.0",
   "source": "HHBA previously assembled 312 independent industry reference photo ZIP, provenance from Wikimedia Commons",
-  "policy": "The approved subset consists of generic licensed industry reference photos, not actual company photography and not AI-generated images. Editorial approval is limited to scene/category plausibility, not employer identity.",
+  "policy": "The conservative subset consists of generic licensed industry reference photos, not actual company photography and not AI-generated images. Matching is scene/category plausibility only, not employer identity.",
   "totalCompanyNamesInSource": 156,
   "totalSourcePhotos": 312,
   "approvedCompanies": 11,
-  "approvedPhotos": 17,
+  "approvedPhotos": 19,
   "entries": {
     "cn-autumn-002": [
       {
@@ -91,6 +91,22 @@
         "credit": "Own work",
         "changes": "根据图库原图裁切并缩放为1200×675（既有照片包操作）",
         "sha256": "c5e7eb8a729191809e4bebae54352bc77502e06a5079bd21ea2a68369570414a"
+      },
+      {
+        "id": "cn-autumn-010-reference-02",
+        "file": "images/autumn-industry-references/cn-autumn-010-02.jpg",
+        "imageType": "licensed_industry_reference_not_actual_employer",
+        "label": "行业场景参考图 · 非该企业实景",
+        "alt": "建设与地产行业参考照片，不是新鸿基地产的真实办公或经营地点",
+        "companyId": "cn-autumn-010",
+        "companyName": "新鸿基地产",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:ACF_60L_Green_Building_Carlton.jpg",
+        "license": "CC BY-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+        "author": "Elekhh",
+        "credit": "Own work",
+        "changes": "根据图库原图裁切并缩放为1200×675（既有照片包操作）",
+        "sha256": "7c62ba160bce20902c230b348720c148b351c00089507836081f907fc1d75636"
       }
     ],
     "cn-autumn-014": [
@@ -109,6 +125,22 @@
         "credit": "Own work",
         "changes": "根据图库原图裁切并缩放为1200×675（既有照片包操作）",
         "sha256": "b731f7af2743ec26261008583a1e117df445cb66620778f27c93665e6fb47de0"
+      },
+      {
+        "id": "cn-autumn-014-reference-02",
+        "file": "images/autumn-industry-references/cn-autumn-014-02.jpg",
+        "imageType": "licensed_industry_reference_not_actual_employer",
+        "label": "行业场景参考图 · 非该企业实景",
+        "alt": "能源及工程行业参考照片，不是中国能建国际集团的真实办公或经营地点",
+        "companyId": "cn-autumn-014",
+        "companyName": "中国能建国际集团",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Photovoltaic-power-station-in-Gelemenovo.jpg",
+        "license": "CC BY-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+        "author": "Edal Anton Lefterov",
+        "credit": "Own work",
+        "changes": "根据图库原图裁切并缩放为1200×675（既有照片包操作）",
+        "sha256": "32a430256b1d3e2bca9280c69d6ffd6d1a6df3314053a617467850d82859f309"
       }
     ],
     "cn-autumn-029": [
@@ -145,38 +177,22 @@
         "sha256": "04056debf7ac335f2e2858814f92680678d1d6d8d5065e65314d00136069b1f5"
       }
     ],
-    "cn-autumn-054": [
+    "cn-autumn-063": [
       {
-        "id": "cn-autumn-054-reference-01",
-        "file": "images/autumn-industry-references/cn-autumn-054-01.jpg",
+        "id": "cn-autumn-063-reference-02",
+        "file": "images/autumn-industry-references/cn-autumn-063-02.jpg",
         "imageType": "licensed_industry_reference_not_actual_employer",
         "label": "行业场景参考图 · 非该企业实景",
-        "alt": "物流交通及旅游行业参考照片，不是海程邦达的真实办公或经营地点",
-        "companyId": "cn-autumn-054",
-        "companyName": "海程邦达",
-        "sourceUrl": "https://commons.wikimedia.org/wiki/File:110322-F-YC711-074_(5551007552).jpg",
-        "license": "Public domain",
-        "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
-        "author": "US Air Force from USA",
-        "credit": "110322-F-YC711-074",
+        "alt": "汽车及交通装备行业参考照片，不是桑棋汽配的真实办公或经营地点",
+        "companyId": "cn-autumn-063",
+        "companyName": "桑棋汽配",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Caterham_factory_visit_-_Flickr_-_exfordy_(1).jpg",
+        "license": "CC BY 2.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+        "author": "Brian Snelson from Hockley, Essex, England",
+        "credit": "Caterham factory visit",
         "changes": "根据图库原图裁切并缩放为1200×675（既有照片包操作）",
-        "sha256": "fe746346afcee94ecb252533d02a3fd4987a963410ea4e92f68d2ad347a51a4b"
-      },
-      {
-        "id": "cn-autumn-054-reference-02",
-        "file": "images/autumn-industry-references/cn-autumn-054-02.jpg",
-        "imageType": "licensed_industry_reference_not_actual_employer",
-        "label": "行业场景参考图 · 非该企业实景",
-        "alt": "物流交通及旅游行业参考照片，不是海程邦达的真实办公或经营地点",
-        "companyId": "cn-autumn-054",
-        "companyName": "海程邦达",
-        "sourceUrl": "https://commons.wikimedia.org/wiki/File:110322-F-YC711-028_(5550420623).jpg",
-        "license": "Public domain",
-        "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
-        "author": "US Air Force from USA",
-        "credit": "110322-F-YC711-028",
-        "changes": "根据图库原图裁切并缩放为1200×675（既有照片包操作）",
-        "sha256": "c7793f58c6343c6bdcde6edb667d7d70bf0a1c781a9c4f279715a7878b298e56"
+        "sha256": "872db197f5c4a7f2282bfd7250d42f460dc9fe5cdbd52fde8f3da337f1cda04a"
       }
     ],
     "cn-autumn-075": [
@@ -195,6 +211,24 @@
         "credit": "http://www.scienceimage.csiro.au/image/2783",
         "changes": "根据图库原图裁切并缩放为1200×675（既有照片包操作）",
         "sha256": "61688d308395ad003f5f89b14c0bd84d45d41747ee6e8b2b9198785211f91fe8"
+      }
+    ],
+    "cn-autumn-079": [
+      {
+        "id": "cn-autumn-079-reference-01",
+        "file": "images/autumn-industry-references/cn-autumn-079-01.jpg",
+        "imageType": "licensed_industry_reference_not_actual_employer",
+        "label": "行业场景参考图 · 非该企业实景",
+        "alt": "物流交通及旅游行业参考照片，不是中通快递的真实办公或经营地点",
+        "companyId": "cn-autumn-079",
+        "companyName": "中通快递",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Vos_Logistics_cargo_truck_warehouse_Oss.jpg",
+        "license": "CC BY-SA 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "author": "Joyce Roosenhart",
+        "credit": "Own work",
+        "changes": "根据图库原图裁切并缩放为1200×675（既有照片包操作）",
+        "sha256": "78a677b1c9acb3965213bfe3738a1c7b89d73de32b3deab29ee08b3397e1298e"
       }
     ],
     "cn-autumn-093": [
@@ -229,24 +263,6 @@
         "credit": "Own work",
         "changes": "根据图库原图裁切并缩放为1200×675（既有照片包操作）",
         "sha256": "9080bdfd7a21afa227c860e88080fbe237eebc2e69e7923fa7890803b4d0d727"
-      }
-    ],
-    "cn-autumn-121": [
-      {
-        "id": "cn-autumn-121-reference-02",
-        "file": "images/autumn-industry-references/cn-autumn-121-02.jpg",
-        "imageType": "licensed_industry_reference_not_actual_employer",
-        "label": "行业场景参考图 · 非该企业实景",
-        "alt": "科技研发与电子制造行业参考照片，不是为旌科技的真实办公或经营地点",
-        "companyId": "cn-autumn-121",
-        "companyName": "为旌科技",
-        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Interior_of_SFLC_India_office.jpg",
-        "license": "CC0",
-        "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-        "author": "Contrapunctus-1",
-        "credit": "Own work",
-        "changes": "根据图库原图裁切并缩放为1200×675（既有照片包操作）",
-        "sha256": "46bfd5492403801cd2626f6829be68e84926cb99794511b695bd51987870de4c"
       }
     ],
     "cn-autumn-128": [
@@ -299,6 +315,22 @@
         "credit": "Own work",
         "changes": "根据图库原图裁切并缩放为1200×675（既有照片包操作）",
         "sha256": "50e9cb19d7f44fc76e463d84dedd7bfd27d39d20d9c8fc424138f029d1f66d85"
+      },
+      {
+        "id": "cn-autumn-155-reference-02",
+        "file": "images/autumn-industry-references/cn-autumn-155-02.jpg",
+        "imageType": "licensed_industry_reference_not_actual_employer",
+        "label": "行业场景参考图 · 非该企业实景",
+        "alt": "食品农业及消费服务行业参考照片，不是江苏农垦的真实办公或经营地点",
+        "companyId": "cn-autumn-155",
+        "companyName": "江苏农垦",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Giant_%22Food_processing_factory%22_building_-_panoramio.jpg",
+        "license": "CC BY 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+        "author": "Arseny Khakhalin",
+        "credit": "https://web.archive.org/web/20161013094903/http://www.panoramio.com/photo/12260009",
+        "changes": "根据图库原图裁切并缩放为1200×675（既有照片包操作）",
+        "sha256": "08dc677ea23124d67ff24a4180d3aaeb053594fc41b1b7a8e78811abb004f75e"
       }
     ]
   }
