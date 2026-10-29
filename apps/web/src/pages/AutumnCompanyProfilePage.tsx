@@ -14,6 +14,7 @@ import businessDraftA from '../data/domesticAutumnBusinessDraft001.json';
 import businessDraftB from '../data/domesticAutumnBusinessDraft002.json';
 import verifiedHistory from '../data/domesticAutumnMilestonesVerified20261029.json';
 import kpmgDossier from '../data/domesticKpmgDetailedDossier20261029.json';
+import {KpmgCompactProfilePage} from './KpmgCompactProfilePage';
 import mediaA from '../data/domesticMediaBundle.json';
 import mediaB from '../data/domesticMedia200Bundle.json';
 import type {User} from '../services/api';
@@ -103,6 +104,9 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
   <p>企业资料尚未建立，不使用其他企业的信息代替。</p>
   <Link to="/candidate/domestic-autumn">返回企业清单 <ArrowRight size={16}/></Link>
  </article></Shell>;
+
+ // Acceptance preview: KPMG only, without changing the other 155 employer pages.
+ if(kpmg)return <KpmgCompactProfilePage user={user}/>;
 
  return <Shell user={user}><article className="company-profile company-profile-autumn" data-company-template="openai" data-employer-id={id}>
   <nav className="company-profile-top" aria-label="企业详情导航">
