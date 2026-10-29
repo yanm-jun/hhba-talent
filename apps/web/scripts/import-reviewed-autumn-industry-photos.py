@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Stage human-reviewed independent Wikimedia Commons reference photographs.
+"""Stage conservatively scene-selected independent Wikimedia Commons reference photographs.
 
 Never label these as employer photographs, founder photographs, AI creations or
 the employer's actual office. Do not import anything absent from this approved
-photo-by-photo whitelist. The original ZIP may contain badly mismatched images.
+photo-by-photo whitelist. The original ZIP contains demonstrably mismatched images; use only the exact selected IDs below.
 """
 import argparse,csv,hashlib,io,json,re,zipfile
 from pathlib import Path
@@ -12,9 +12,19 @@ from PIL import Image
 # IDs individually checked against the 312-photo visual audit contact sheets.
 # This is an approved subset, NOT a claim that all 312 are appropriate.
 APPROVED={
- '002':(1,2),'004':(1,2),'010':(1,),'014':(1,),
- '029':(1,2),'054':(1,2),'075':(2,),'093':(1,2),
- '121':(2,),'128':(1,2),'155':(1,),
+ # Each photo is a DIFFERENT third-party industry reference, never a genuine
+ # photo of the enterprise in the screenshot. Do not infer employer identity.
+ '002':(1,2), # 施耐德电气：能源电气行业光伏设施
+ '004':(1,2), # 中国南方航空：机场停机坪
+ '010':(1,2), # 新鸿基地产：建筑与房地产工程
+ '014':(1,2), # 中国能建国际集团：电力工程设施
+ '029':(1,2), # 中电建电力集团：电力工程设施
+ '063':(2,),  # 桑棋汽配：汽车生产场景（01为武器工厂，禁用）
+ '075':(2,),  # 强生：生命科学实验室（01为体育场，禁用）
+ '079':(1,),  # 中通快递：物流货车仓库（02为政治集会，禁用）
+ '093':(1,2), # 中国华能：发电设施
+ '128':(1,2), # 中国大唐集团能源：能源发电设施
+ '155':(1,2), # 江苏农垦：农业食品生产设施
 }
 def license_url(name):
  n=name.strip().lower()
@@ -77,7 +87,7 @@ def run(inp, webroot):
  manifest={
   'schemaVersion':'1.0',
   'source':'HHBA previously assembled 312 independent industry reference photo ZIP, provenance from Wikimedia Commons',
-  'policy':'The approved subset consists of generic licensed industry reference photos, not actual company photography and not AI-generated images. Editorial approval is limited to scene/category plausibility, not employer identity.',
+  'policy':'The conservative subset consists of generic licensed industry reference photos, not actual company photography and not AI-generated images. Matching is scene/category plausibility only, not employer identity.',
   'totalCompanyNamesInSource':156,
   'totalSourcePhotos':312,
   'approvedCompanies':len(entries),
