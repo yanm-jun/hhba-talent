@@ -1,0 +1,512 @@
+{
+  "schemaVersion": "1.0",
+  "verifiedOn": "2026-10-29",
+  "note": "Milestones linked to individually inspected company official pages, regulators, exchange disclosures, or explicitly identified reputable publications. No timeline inferred from employer name.",
+  "entries": {
+    "cn-autumn-001": {
+      "businessSource": "https://kpmg.com/cn/zh/about/our-history.html",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "1945",
+          "description": "毕马威在香港开展业务。",
+          "source": "https://kpmg.com/cn/zh/about/our-history.html"
+        },
+        {
+          "date": "1983",
+          "description": "在北京设立中国内地首家办事处。",
+          "source": "https://kpmg.com/cn/zh/about/our-history.html"
+        },
+        {
+          "date": "1992",
+          "description": "成为中国内地首家获准开业的中外合作会计师事务所。",
+          "source": "https://kpmg.com/cn/zh/about/our-history.html"
+        },
+        {
+          "date": "2012",
+          "description": "完成本土化转制。",
+          "source": "https://kpmg.com/cn/zh/about/our-history.html"
+        }
+      ]
+    },
+    "cn-autumn-002": {
+      "businessSource": "https://www.schneider-electric.cn/zh/about-us/company-profile/history/schneider-electric-history/",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "1836",
+          "description": "施耐德兄弟接管勒克鲁索铸造厂，集团历史由此开启。",
+          "source": "https://www.schneider-electric.cn/zh/about-us/company-profile/history/schneider-electric-history/"
+        },
+        {
+          "date": "1881",
+          "description": "公司参与巴黎首届国际电力博览会。",
+          "source": "https://www.schneider-electric.cn/zh/about-us/company-profile/history/schneider-electric-history/"
+        },
+        {
+          "date": "1900",
+          "description": "施耐德在巴黎世界博览会上展示工业技术成果。",
+          "source": "https://www.schneider-electric.cn/zh/about-us/company-profile/history/schneider-electric-history/"
+        }
+      ]
+    },
+    "cn-autumn-005": {
+      "businessSource": "https://www.sf.cn/chn/sc/about",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "1993",
+          "description": "顺丰于广东顺德创立。",
+          "source": "https://www.sf.cn/chn/sc/about"
+        },
+        {
+          "date": "2009",
+          "description": "顺丰航空及顺丰科技成立。",
+          "source": "https://www.sf.cn/chn/sc/about"
+        },
+        {
+          "date": "2017",
+          "description": "顺丰控股在深圳证券交易所上市。",
+          "source": "https://www.sf.cn/chn/sc/about"
+        },
+        {
+          "date": "2024",
+          "description": "顺丰控股在香港联合交易所上市，形成A+H股上市架构。",
+          "source": "https://www.sf.cn/chn/sc/about"
+        }
+      ]
+    },
+    "cn-autumn-007": {
+      "businessSource": "https://ak.hypergryph.com/special/recruitment/",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "2017",
+          "description": "鹰角网络正式成立。",
+          "source": "https://ak.hypergryph.com/special/recruitment/"
+        },
+        {
+          "date": "2019",
+          "description": "自研游戏《明日方舟》上线。",
+          "source": "https://ak.hypergryph.com/special/recruitment/"
+        },
+        {
+          "date": "2020",
+          "description": "继续拓展原创内容和音乐等IP业务。",
+          "source": "https://ak.hypergryph.com/special/recruitment/"
+        }
+      ]
+    },
+    "cn-autumn-008": {
+      "businessSource": "https://www.anker.com.cn/story",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "2011",
+          "description": "安克创新创立并开展全球消费硬件业务。",
+          "source": "https://www.anker.com.cn/story"
+        },
+        {
+          "date": "2020",
+          "description": "安克创新在深交所创业板上市。",
+          "source": "https://www.anker.com.cn/story"
+        },
+        {
+          "date": "2026",
+          "description": "公司披露于当年7月完成香港联合交易所上市。",
+          "source": "https://www.anker.com.cn/story"
+        }
+      ]
+    },
+    "cn-autumn-010": {
+      "businessSource": "https://www.shkp.com/zh-CN/about-us",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "1972",
+          "description": "新鸿基地产在香港上市。",
+          "source": "https://www.shkp.com/zh-CN/about-us"
+        }
+      ]
+    },
+    "cn-autumn-011": {
+      "businessSource": "https://www.inboyu.com/about-us/index",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "2007",
+          "description": "万科首个政策性租赁住房项目广州万汇楼面世。",
+          "source": "https://www.inboyu.com/about-us/index"
+        },
+        {
+          "date": "2016",
+          "description": "统一全国青年公寓品牌为泊寓。",
+          "source": "https://www.inboyu.com/about-us/index"
+        },
+        {
+          "date": "2019",
+          "description": "深圳云城旗舰店开业。",
+          "source": "https://www.inboyu.com/about-us/index"
+        },
+        {
+          "date": "2023",
+          "description": "泊寓披露开业间数超过18万。",
+          "source": "https://www.inboyu.com/about-us/index"
+        }
+      ]
+    },
+    "cn-autumn-013": {
+      "businessSource": "https://www.svolt.cn/about/profile",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "2018",
+          "description": "蜂巢能源在常州独立设企。",
+          "source": "https://www.svolt.cn/about/profile"
+        },
+        {
+          "date": "2019",
+          "description": "智能工厂投产。",
+          "source": "https://www.svolt.cn/about/profile"
+        },
+        {
+          "date": "2021",
+          "description": "无钴电池量产，并推动产能扩张。",
+          "source": "https://www.svolt.cn/about/profile"
+        },
+        {
+          "date": "2022",
+          "description": "推出叠片3.0飞叠技术。",
+          "source": "https://www.svolt.cn/about/profile"
+        }
+      ]
+    },
+    "cn-autumn-018": {
+      "businessSource": "https://www.enn.cn/about.html",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "1989",
+          "description": "新奥在河北廊坊创业。",
+          "source": "https://www.enn.cn/about.html"
+        },
+        {
+          "date": "2001",
+          "description": "新奥燃气在香港上市。",
+          "source": "https://www.enn.cn/about.html"
+        },
+        {
+          "date": "2018",
+          "description": "新奥舟山液化天然气接收站投入运营。",
+          "source": "https://www.enn.cn/about.html"
+        }
+      ]
+    },
+    "cn-autumn-022": {
+      "businessSource": "https://www.wondershare.cn/about/history.html",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "2003",
+          "description": "万兴科技成立并推出首款数字创意产品Photo2VCD。",
+          "source": "https://www.wondershare.cn/about/history.html"
+        },
+        {
+          "date": "2010",
+          "description": "面向全球推出视频创意软件Filmora的前身产品。",
+          "source": "https://www.wondershare.cn/about/history.html"
+        },
+        {
+          "date": "2018",
+          "description": "万兴科技在深交所创业板上市。",
+          "source": "https://www.wondershare.cn/about/history.html"
+        }
+      ]
+    },
+    "cn-autumn-025": {
+      "businessSource": "https://www.cs.com.cn/zhzq/ssgs/002948/02/201902/t20190227_5927037.html",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "1996",
+          "description": "青岛银行成立。",
+          "source": "https://www.cs.com.cn/zhzq/ssgs/002948/02/201902/t20190227_5927037.html"
+        },
+        {
+          "date": "2015",
+          "description": "青岛银行在香港联交所上市。",
+          "source": "https://www.cs.com.cn/zhzq/ssgs/002948/02/201902/t20190227_5927037.html"
+        },
+        {
+          "date": "2019",
+          "description": "青岛银行在深圳证券交易所上市。",
+          "source": "https://www.cs.com.cn/zhzq/ssgs/002948/02/201902/t20190227_5927037.html"
+        }
+      ]
+    },
+    "cn-autumn-075": {
+      "businessSource": "https://www.jnj.com.cn/our-company",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "1886",
+          "description": "强生公司成立。",
+          "source": "https://www.jnj.com.cn/our-company"
+        },
+        {
+          "date": "1985",
+          "description": "强生开始进入中国市场。",
+          "source": "https://www.jnj.com.cn/our-company"
+        },
+        {
+          "date": "2023",
+          "description": "强生完成消费者健康业务分拆，聚焦创新制药和医疗科技。",
+          "source": "https://www.jnj.com.cn/our-company"
+        }
+      ]
+    },
+    "cn-autumn-076": {
+      "businessSource": "https://www.astrazeneca.fr/content/az-cn-zh/about-us/milestones.html",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "1993",
+          "description": "阿斯利康在华业务开始发展。",
+          "source": "https://www.astrazeneca.fr/content/az-cn-zh/about-us/milestones.html"
+        },
+        {
+          "date": "2001",
+          "description": "建设无锡生产供应基地。",
+          "source": "https://www.astrazeneca.fr/content/az-cn-zh/about-us/milestones.html"
+        },
+        {
+          "date": "2012",
+          "description": "中国总部落户上海张江。",
+          "source": "https://www.astrazeneca.fr/content/az-cn-zh/about-us/milestones.html"
+        },
+        {
+          "date": "2019",
+          "description": "中国新药研发部升级为全球研发中国中心。",
+          "source": "https://www.astrazeneca.fr/content/az-cn-zh/about-us/milestones.html"
+        }
+      ]
+    },
+    "cn-autumn-077": {
+      "businessSource": "https://www.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032601690_c.pdf",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "1999",
+          "description": "中国海洋石油有限公司在香港注册成立。",
+          "source": "https://www.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032601690_c.pdf"
+        },
+        {
+          "date": "2001",
+          "description": "在香港联合交易所挂牌上市。",
+          "source": "https://www.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032601690_c.pdf"
+        },
+        {
+          "date": "2022",
+          "description": "人民币股份在上海证券交易所上市。",
+          "source": "https://www.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032601690_c.pdf"
+        }
+      ]
+    },
+    "cn-autumn-078": {
+      "businessSource": "https://www.chinapost.com.cn/cn/report/1912/357834-1.htm",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "2019",
+          "description": "中国邮政集团公司完成改制，更名为中国邮政集团有限公司。",
+          "source": "https://www.chinapost.com.cn/cn/report/1912/357834-1.htm"
+        }
+      ]
+    },
+    "cn-autumn-079": {
+      "businessSource": "https://www.zto.com/introduce/about/home",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "2002",
+          "description": "中通快递于5月成立。",
+          "source": "https://www.zto.com/introduce/about/home"
+        },
+        {
+          "date": "2016",
+          "description": "中通快递在纽约证券交易所挂牌上市。",
+          "source": "https://www.zto.com/introduce/about/home"
+        },
+        {
+          "date": "2020",
+          "description": "中通快递在香港联合交易所上市。",
+          "source": "https://www.zto.com/introduce/about/home"
+        }
+      ]
+    },
+    "cn-autumn-080": {
+      "businessSource": "https://www.danone.com.cn/group/about-us/our-history",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "1919",
+          "description": "达能第一款酸奶在西班牙推出。",
+          "source": "https://www.danone.com.cn/group/about-us/our-history"
+        },
+        {
+          "date": "1929",
+          "description": "品牌在法国巴黎开设门店。",
+          "source": "https://www.danone.com.cn/group/about-us/our-history"
+        },
+        {
+          "date": "1942",
+          "description": "在美国开展Dannon品牌业务。",
+          "source": "https://www.danone.com.cn/group/about-us/our-history"
+        },
+        {
+          "date": "1973",
+          "description": "达能与BSN的业务整合完成。",
+          "source": "https://www.danone.com.cn/group/about-us/our-history"
+        }
+      ]
+    },
+    "cn-autumn-083": {
+      "businessSource": "https://www.ford.com.cn/HISTORY",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "1903",
+          "description": "亨利·福特创立福特汽车公司。",
+          "source": "https://www.ford.com.cn/HISTORY"
+        },
+        {
+          "date": "1908",
+          "description": "福特T型车开始量产。",
+          "source": "https://www.ford.com.cn/HISTORY"
+        },
+        {
+          "date": "1913",
+          "description": "福特引入汽车流水生产线。",
+          "source": "https://www.ford.com.cn/HISTORY"
+        },
+        {
+          "date": "1995",
+          "description": "福特汽车（中国）有限公司成立。",
+          "source": "https://www.ford.com.cn/HISTORY"
+        }
+      ]
+    },
+    "cn-autumn-090": {
+      "businessSource": "https://www.yuewen.com/about?part=social",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "2015",
+          "description": "腾讯文学与盛大文学整合，阅文集团成立。",
+          "source": "https://www.yuewen.com/about?part=social"
+        },
+        {
+          "date": "2017",
+          "description": "阅文集团在香港联合交易所上市。",
+          "source": "https://www.yuewen.com/about?part=social"
+        },
+        {
+          "date": "2018",
+          "description": "阅文集团完成收购新丽传媒。",
+          "source": "https://www.yuewen.com/about?part=social"
+        },
+        {
+          "date": "2023",
+          "description": "阅文集团宣布收购腾讯动漫相关业务及IP资产。",
+          "source": "https://www.yuewen.com/about?part=social"
+        }
+      ]
+    },
+    "cn-autumn-093": {
+      "businessSource": "https://www.chng.com.cn/us-ent.html",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "1985",
+          "description": "中国华能集团创立。",
+          "source": "https://www.chng.com.cn/us-ent.html"
+        },
+        {
+          "date": "2023",
+          "description": "集团公开资料披露新能源装机规模持续扩大。",
+          "source": "https://www.chng.com.cn/us-ent.html"
+        }
+      ]
+    },
+    "cn-autumn-094": {
+      "businessSource": "https://www.china-cdt.com/dtwz/gydt/gsjj/A024001001Gone1.html",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "2002",
+          "description": "中国大唐集团于12月29日成立。",
+          "source": "https://www.china-cdt.com/dtwz/gydt/gsjj/A024001001Gone1.html"
+        }
+      ]
+    },
+    "cn-autumn-096": {
+      "businessSource": "https://www.nbcb.com.cn/about_nbcb/profile_of_nbcb/contact_us/",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "1997",
+          "description": "宁波银行于4月10日首次注册登记。",
+          "source": "https://www.nbcb.com.cn/about_nbcb/profile_of_nbcb/contact_us/"
+        }
+      ]
+    },
+    "cn-autumn-106": {
+      "businessSource": "https://www.cinda.com.cn/home/wap/cn/xdjt/gyxd/gsjs/index.shtml",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "1999",
+          "description": "中国信达的前身成立，开展金融资产管理业务。",
+          "source": "https://www.cinda.com.cn/home/wap/cn/xdjt/gyxd/gsjs/index.shtml"
+        },
+        {
+          "date": "2010",
+          "description": "公司完成股份制改造。",
+          "source": "https://www.cinda.com.cn/home/wap/cn/xdjt/gyxd/gsjs/index.shtml"
+        },
+        {
+          "date": "2013",
+          "description": "中国信达在香港联合交易所上市。",
+          "source": "https://www.cinda.com.cn/home/wap/cn/xdjt/gyxd/gsjs/index.shtml"
+        }
+      ]
+    },
+    "cn-autumn-144": {
+      "businessSource": "https://ebank.bankofchangsha.com/site/col30/index.html",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "1997",
+          "description": "长沙银行于5月25日成立。",
+          "source": "https://ebank.bankofchangsha.com/site/col30/index.html"
+        },
+        {
+          "date": "2018",
+          "description": "长沙银行在上海证券交易所上市。",
+          "source": "https://ebank.bankofchangsha.com/site/col30/index.html"
+        }
+      ]
+    },
+    "cn-autumn-146": {
+      "businessSource": "https://www.scbank.cn/cn/col50/index.html",
+      "businessEvidence": "official_or_publication_company_source_reviewed",
+      "milestones": [
+        {
+          "date": "2020",
+          "description": "四川银行于11月7日正式开业。",
+          "source": "https://www.scbank.cn/cn/col50/index.html"
+        }
+      ]
+    }
+  }
+}
