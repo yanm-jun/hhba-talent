@@ -29,6 +29,24 @@ jobs:
           # Public entry cards restored to compact layout; keep three identity paths unchanged.
           # Navigation copy refresh: 企业发现 (without the 200-company count in the tab)
           # 2026-10-28: rebuild static preview with consolidated 200-company discovery navigation.
+      - name: Import the first employer's source-backed KPMG trademark SVG
+        run: |
+          python - <<'PY'
+          import pathlib, re, urllib.request, xml.etree.ElementTree as ET
+          url='https://upload.wikimedia.org/wikipedia/commons/d/db/KPMG_blue_logo.svg'
+          req=urllib.request.Request(url, headers={'User-Agent':'HHBA-Brand-Reference/1.0 (static catalog, educational use)'})
+          with urllib.request.urlopen(req,timeout=40) as resp:
+              svg=resp.read(100000)
+          text=svg.decode('utf-8-sig')
+          assert len(svg)>1000 and '<svg' in text and '</svg>' in text, 'KPMG SVG not retrieved'
+          assert not re.search(r'<script|<foreignObject|onload\\s*=|onerror\\s*=|javascript:',text,re.I), 'Unsafe source SVG'
+          root=ET.fromstring(svg)
+          assert root.tag.endswith('svg'), 'Incorrect file type for KPMG logo'
+          target=pathlib.Path('apps/web/public/images/autumn-real-logos/cn-autumn-001.svg')
+          target.parent.mkdir(parents=True,exist_ok=True)
+          target.write_bytes(svg)
+          print('KPMG_SOURCE_BACKED_LOGO_READY',len(svg),url)
+          PY
       - name: Retrieve original 312 independent reference photos from saved artifact
         env:
           GH_TOKEN: ${{ github.token }}
