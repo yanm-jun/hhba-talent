@@ -68,7 +68,7 @@ function JobCard({job,lang,asOf}:{job:LiveJob,lang:Language,asOf:string}){
   const source=safeOfficialJobUrl(job);
   const profile=companyProfileForJob(job);
   const companyRoute=companyPageRouteForJob(job);
-  if(!source || (job.recordKind!=='CURATED_HISTORICAL' && officialStatus(job,asOf)!=='recent'))return null;
+  if(!source || (!['CURATED_HISTORICAL','DOMESTIC_REBUILT'].includes(job.recordKind||'') && officialStatus(job,asOf)!=='recent'))return null;
   return <article className="unified-job-card">
     <div className="unified-job-head">
       {profile?<Link className="unified-company-brand" to={'/companies/'+profile.slug}
@@ -79,15 +79,15 @@ function JobCard({job,lang,asOf}:{job:LiveJob,lang:Language,asOf:string}){
         <EmployerBrandLogo job={job}/><strong>{localizedCompany(job,lang)}</strong>
       </Link>:<span className="unified-company-brand"><EmployerBrandLogo job={job}/>
         <strong>{localizedCompany(job,lang)}</strong></span>}
-      <small>{job.recordKind==='CURATED_HISTORICAL'?(lang==='zh'?'历史公开岗位 · 当前状态未核实':'Archived · Status unverified'):job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'?(lang==='zh'?'历史收录 · 状态待核实':'Archived · Availability unverified'):(lang==='zh'?'官方招聘':'Official opening')}</small>
+      <small>{job.recordKind==='CURATED_HISTORICAL'?(lang==='zh'?'历史公开岗位 · 当前状态未核实':'Archived · Status unverified'):job.recordKind==='DOMESTIC_REBUILT'?(lang==='zh'?'国内岗位资料 · 申请状态待核实':'China role · Availability unverified'):job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'?(lang==='zh'?'历史收录 · 状态待核实':'Archived · Availability unverified'):(lang==='zh'?'官方招聘':'Official opening')}</small>
     </div>
     <h3><Link to={'/candidate/jobs/'+encodeURIComponent(job.id)}>{featuredTitle(job,lang)}</Link></h3>
-    <div className="hhba-domestic-major-row"><strong>{lang==='zh'?'专业：':'Major: '}</strong><span>{lang==='zh'?'官方原始岗位未提供可确认的专业字段，请到职位详情核实':'Major requirements not explicitly captured; verify original JD'}</span></div>
+    <div className="hhba-domestic-major-row"><strong>{lang==='zh'?'专业：':'Major: '}</strong><span>{job.recordKind==='DOMESTIC_REBUILT'&&job.majorNames?.length?job.majorNames.slice(0,4).join('、'):(lang==='zh'?'官方原始岗位未提供可确认的专业字段，请到职位详情核实':'Major requirements not explicitly captured; verify original JD')}</span></div>
     <div className="unified-job-meta"><span><MapPin size={14}/>{featuredLocation(job,lang)||localizedLocation(job,lang)}</span>
       <span>{job.recruitmentType?typeLabel[job.recruitmentType]?.[lang]||job.recruitmentType:(lang==='zh'?'招聘类型待确认':'Type unverified')}</span>
       {job.remote===true&&<span>{lang==='zh'?'远程':'Remote'}</span>}</div>
     <div className="unified-job-actions"><Link to={'/candidate/jobs/'+encodeURIComponent(job.id)}>
-      {lang==='zh'?'查看岗位':'View role'} <ArrowRight size={14}/></Link><SaveJobButton jobId={job.id}/></div>
+      {lang==='zh'?'查看岗位':'View role'} <ArrowRight size={14}/></Link>{job.recordKind!=='DOMESTIC_REBUILT'&&<SaveJobButton jobId={job.id}/>}</div>
   </article>;
 }
 function LanguageSwitcher({lang,change}:{lang:Language,change:(value:Language)=>void}){
@@ -98,6 +98,7 @@ function LanguageSwitcher({lang,change}:{lang:Language,change:(value:Language)=>
 export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,user?:User|null}){
   const curatedHundred=import.meta.env.VITE_HHBA_CURATED_STATIC==='1';
   const domesticOnly=import.meta.env.VITE_HHBA_DOMESTIC_STATIC_ONLY==='1';
+  const rebuilding=import.meta.env.VITE_HHBA_DOMESTIC_REBUILD_V2==='1';
   const officialThree=import.meta.env.VITE_HHBA_OFFICIAL_THREE_ONLY==='1';
   const {lang,change}=useLanguage();
   const [filters,setFilters]=useState<LiveFilters>(()=>{
@@ -169,7 +170,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   },[compact,filters,draft,page]);
   const defaultView=isDefaultMarketFilters(filters,page);
   useEffect(()=>{
-    if(officialThree||domesticOnly||curatedHundred){setFeatured([]);setFeaturedError('');return;}
+    if(officialThree||domesticOnly||curatedHundred||rebuilding){setFeatured([]);setFeaturedError('');return;}
     if(!defaultView){setFeatured(null);setFeaturedError('');return;}
     const controller=new AbortController();
     setFeatured(null);setFeaturedError('');
@@ -188,15 +189,15 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       .finally(()=>clearTimeout(guard));
     return ()=>{clearTimeout(guard);controller.abort()};
   },[defaultView,retry]);
-  const eligible=useMemo(()=>snapshot?.jobs.filter(j=>j.recordKind==='CURATED_HISTORICAL'||officialStatus(j,snapshot.updated)==='recent')||[],[snapshot]);
+  const eligible=useMemo(()=>snapshot?.jobs.filter(j=>j.recordKind==='CURATED_HISTORICAL'||j.recordKind==='DOMESTIC_REBUILT'||officialStatus(j,snapshot.updated)==='recent')||[],[snapshot]);
   // Only the UNFILTERED first page gets six highlighted jobs. Search,
   // company/city filtering and all other pages retain their normal results.
   const curatedIds=new Set(featured?.map(j=>j.id)||[]);
-  const shown=curatedHundred?(compact?eligible.slice(0,6):eligible):officialThree?(compact?eligible.slice(0,6):eligible):domesticOnly?(compact?eligible.slice(0,8):eligible):defaultView
+  const shown=rebuilding?(compact?eligible.slice(0,6):eligible):curatedHundred?(compact?eligible.slice(0,6):eligible):officialThree?(compact?eligible.slice(0,6):eligible):domesticOnly?(compact?eligible.slice(0,8):eligible):defaultView
     ?(featured ? (compact?featured:[...featured,...eligible.filter(j=>!curatedIds.has(j.id)).slice(0,24)])
       : featuredError ? (compact?eligible.slice(0,8):eligible) : [])
     :(compact?eligible.slice(0,8):eligible);
-  const featuredPending=defaultView && !curatedHundred && !officialThree && !domesticOnly && !featured && !featuredError;
+  const featuredPending=defaultView && !rebuilding && !curatedHundred && !officialThree && !domesticOnly && !featured && !featuredError;
   const interpreted=useMemo(()=>parseNaturalQuery(filters.q),[filters.q]);
   const roleNames:Record<string,string>={software:'软件工程师',sales:'销售',engineer:'工程师',product:'产品经理',intern:'实习',design:'设计',finance:'财务',marketing:'市场营销',operations:'运营'};
   const intentLabels=[
@@ -270,7 +271,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   const market=<section className="unified-market" aria-labelledby="unified-market-title">
     <div className="unified-market-heading"><div><small>HHBA · RECRUITMENT</small>
       <h2 id="unified-market-title">{lang==='zh'?'招聘市场':'Job market'}</h2>
-      <p>{curatedHundred?(lang==='zh'?'精选 10 家知名海外企业 · 100 条已存档岗位（状态待核实）':'100 archived roles from 10 companies; current availability unverified.'):officialThree?(lang==='zh'?'OpenAI、Anthropic、SpaceX 官方公开招聘 · 只展示本次从招聘系统核验到的职位，随时可能变化':'OpenAI, Anthropic and SpaceX public ATS listings · Verified at latest sync'):domesticOnly?(lang==='zh'?'国内历史招聘岗位静态测试 · 岗位状态以企业官网为准':'Historical China listings preview · Check employer for availability'):lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
+      <p>{rebuilding?(lang==='zh'?'海外精选岗位与逐家审核通过的国内岗位 · 使用同一套卡片和站内详情':'Overseas curated jobs and individually reviewed China roles in one layout'):curatedHundred?(lang==='zh'?'精选 10 家知名海外企业 · 100 条已存档岗位（状态待核实）':'100 archived roles from 10 companies; current availability unverified.'):officialThree?(lang==='zh'?'OpenAI、Anthropic、SpaceX 官方公开招聘 · 只展示本次从招聘系统核验到的职位，随时可能变化':'OpenAI, Anthropic and SpaceX public ATS listings · Verified at latest sync'):domesticOnly?(lang==='zh'?'国内历史招聘岗位静态测试 · 岗位状态以企业官网为准':'Historical China listings preview · Check employer for availability'):lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
       <LanguageSwitcher lang={lang} change={change}/></div>
     {controls}
     {!curatedHundred&&aiAvailable&&<div className="unified-ai-discovery">
@@ -295,11 +296,11 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       {aiEvidence.jobs.length===0&&<p className="unified-job-state">暂未检索到具备可核对原文证据的岗位；不会提供虚构的职位。</p>}
     </section>}
     {!showInlineDiscoveryEntry&&<div className="unified-company-discovery-navigation" style={{margin:'18px auto 8px',maxWidth:1120,display:'flex',justifyContent:'flex-end'}}><Link to="/companies/discover" style={{fontSize:13,color:'#265e45',fontWeight:700,textDecoration:'none'}}>浏览全部 200 家企业档案 →</Link></div>}
-    {!curatedHundred&&<DomesticAutumnMarket compact={compact} query={draft}
+    {!rebuilding&&!curatedHundred&&<DomesticAutumnMarket compact={compact} query={draft}
       major={majorById(selectedMajor)?.name||''}
       scope={filters.country} country={filters.location_country||''}
       city={cityOptions.find(c=>c.value===filters.city)?.zh||''}/>}
-    {!curatedHundred&&<DomesticCompanyResults query={draft} majorSlug={selectedMajor}
+    {!rebuilding&&!curatedHundred&&<DomesticCompanyResults query={draft} majorSlug={selectedMajor}
       scope={filters.country} country={filters.location_country||''}
       city={cityOptions.find(c=>c.value===filters.city)?.zh||''}/>}
     {intentLabels.length>0&&<div className="unified-search-interpreted">
