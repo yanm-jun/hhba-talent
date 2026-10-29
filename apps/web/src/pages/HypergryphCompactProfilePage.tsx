@@ -40,7 +40,9 @@ export function HypergryphCompactProfilePage({user}:{user:User|null}){
     </div>
     <p className="hhba-hypergryph-photo-note">图片均为单独上传的原始 PNG，未压缩或生成；场景拍摄时间与海报所属招聘批次未独立核验。</p>
    </section>
-   <CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn-007"/>
+   <CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn-007"
+    majorIntro="鹰角网络的招聘方向涵盖游戏程序、策划、美术表现、发行运营与测试。选择你的专业，下方自动展示相关岗位方向；也可以搜索其他专业或查看全部岗位。"
+    quickMajorNames={['数字媒体艺术','动画','视觉传达设计','计算机科学与技术','软件工程','数字媒体技术','人工智能','汉语言文学','市场营销','人力资源管理']}/>
    <section className="hhba-kpmg-section" aria-labelledby="hypergryph-services-title">
     <div className="hhba-kpmg-section-heading"><div><h2 id="hypergryph-services-title">主要业务与专业服务</h2><p>围绕原创游戏研发与发行的业务方向；以下为 HHBA 内容归类，不代表鹰角官网正式组织架构。</p></div></div>
     <div className="hhba-kpmg-service-grid">
