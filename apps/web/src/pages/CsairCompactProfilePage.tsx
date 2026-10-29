@@ -22,7 +22,7 @@ export function CsairCompactProfilePage({user}:{user:User|null}){
  const [expanded,setExpanded]=useState(false);
  // Original official list doesn't publish majors for these six specific positions.
  // Retain them across all subject choices; never imply official unrestricted eligibility.
- const jobs=rolesData.jobs.filter(job=>major==='全部专业'||major==='不限专业'||job.majors.length===0||job.majors.includes(major));
+ const jobs=rolesData.jobs.filter(job=>major==='全部专业'||major==='不限专业'||job.majors.length===0||(job.majors as string[]).includes(major));
  return <Shell user={user}>
   <article className="company-profile hhba-kpmg-compact hhba-csair-compact" data-company-template="openai" data-employer-id="cn-autumn-004" data-domestic-rebuild="v2">
    <nav className="company-profile-top" aria-label="企业详情导航">
