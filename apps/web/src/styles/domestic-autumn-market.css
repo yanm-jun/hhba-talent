@@ -161,3 +161,9 @@
 .hhba-autumn-ref-links{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .hhba-autumn-ref-links a{display:inline-flex;gap:4px;align-items:center;font-size:11px;color:#24694c;text-decoration:none}
 @media(max-width:680px){.hhba-autumn-references{grid-template-columns:1fr}}
+
+
+.hhba-autumn-profile-business-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.hhba-autumn-profile-business-grid article{background:#fafcfb;border:1px solid #e2e9e4;padding:15px;border-radius:12px}
+.hhba-autumn-profile-business-grid h3{font-size:14px;margin:0 0 9px}
+.hhba-autumn-profile-business-grid p{color:#69786d;font-size:12px;line-height:1.85;margin:0}
