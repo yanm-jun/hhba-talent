@@ -51,6 +51,24 @@ jobs:
           target.write_bytes(svg)
           print('KPMG_SOURCE_BACKED_LOGO_READY',len(svg),url)
           PY
+      - name: Import source-backed Schneider Electric complete wordmark
+        run: |
+          python - <<'PY'
+          import pathlib, re, urllib.request, xml.etree.ElementTree as ET
+          url='https://upload.wikimedia.org/wikipedia/commons/9/95/Schneider_Electric_2007.svg'
+          request=urllib.request.Request(url,headers={'User-Agent':'HHBA-Brand-Reference/1.0 (static enterprise identification)'})
+          with urllib.request.urlopen(request,timeout=45) as resp:
+              svg=resp.read(100000)
+          text=svg.decode('utf-8-sig')
+          assert 8000<len(svg)<60000 and '<svg' in text and '</svg>' in text,'Full Schneider Electric wordmark missing'
+          assert not re.search(r'<script|<foreignObject|onload\s*=|onerror\s*=|javascript:',text,re.I),'Unsafe SVG'
+          tree=ET.fromstring(svg)
+          assert tree.tag.endswith('svg')
+          target=pathlib.Path('apps/web/public/images/autumn-real-logos/cn-autumn-002.svg')
+          target.parent.mkdir(parents=True,exist_ok=True)
+          target.write_bytes(svg)
+          print('SCHNEIDER_SOURCE_BACKED_WORDMARK_READY',len(svg))
+          PY
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -78,6 +96,7 @@ jobs:
           node scripts/autumn-dossier-content.contract.test.mjs
           node scripts/kpmg-deep-editorial.contract.test.mjs
           node scripts/kpmg-recruitment-first.contract.test.mjs
+          node scripts/schneider-recruitment-first.contract.test.mjs
           # Retain photo evidence in source for audit; no legacy gallery is rendered in company profiles.
           node scripts/autumn-approved-industry-images.contract.test.mjs
           # Preserve source-backed logos and only genuine per-employer or labeled AI pictures.
