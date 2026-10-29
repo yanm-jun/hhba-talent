@@ -137,7 +137,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       <details className="domestic-company-sources" key={"sources-"+company.id}>
        <summary>资料来源与核验说明 <ChevronDown size={15}/></summary>
        <div>{httpsLink(article?.officialSource||company.sourceUrl)&&<a href={httpsLink(article?.officialSource||company.sourceUrl)} target="_blank" rel="noopener noreferrer">企业公开资料 <ExternalLink size={13}/></a>}
-       {recruitment&&<a href={recruitment.evidenceUrl} target="_blank" rel="noopener noreferrer">招聘入口核验依据（{recruitment.verifiedOn}） <ExternalLink size={13}/></a>}
+       {recruitment&&<a data-hhba-recruitment-outbound="true" href={recruitment.evidenceUrl} target="_blank" rel="noopener noreferrer">招聘入口核验依据（{recruitment.verifiedOn}） <ExternalLink size={13}/></a>}
        {article?.industryEvidenceUrl&&<a href={article.industryEvidenceUrl} target="_blank" rel="noopener noreferrer">行业分类核验依据 <ExternalLink size={13}/></a>}
        {article?.productSource&&<a href={article.productSource} target="_blank" rel="noopener noreferrer">公开产品资料 <ExternalLink size={13}/></a>}
        {article?.imageSource&&<span className="domestic-photo-source-note">企业图片来源已登记</span>}
