@@ -5,7 +5,7 @@
  */
 import type {LiveJob} from './liveRecruitment';
 import {majorById} from './domesticMajors';
-export type MajorMatch='all'|'related'|'unrestricted'|'unknown';
+export type MajorMatch='all'|'related'|'unrestricted'|'unknown'|'other';
 export const MAJOR_STORAGE_KEY='hhba.company.major';
 const normalize=(s:string)=>s.normalize('NFKC').trim().toLocaleLowerCase().replace(/[\s（）()·．.]/g,'');
 const broadGroups:Record<string,string[]>={
@@ -64,8 +64,9 @@ export function matchRoleToMajor(job:Pick<LiveJob,'majorNames'|'editorialRelated
  const fields=[...(job.majorNames||[]),...(job.editorialRelatedMajors||[])];
  if(fields.some(x=>/^(?:不限专业|专业不限|不限制专业|不限学科|any major)$/i.test(x.trim())))return 'unrestricted';
  if(fields.some(x=>equivalent(x,chosen.name)))return 'related';
- // Empty source metadata is NOT equivalent to 'any major'.
- return 'unknown';
+ // Distinguish an absent major field from a documented but different subject.
+ // A known-other requirement must not be described as 'unreported'.
+ return fields.length?'other':'unknown';
 }
 export function visibleRoleForMajor(job:Pick<LiveJob,'majorNames'|'editorialRelatedMajors'>,
  slug:string,includeUnknown=false){
@@ -74,4 +75,4 @@ export function visibleRoleForMajor(job:Pick<LiveJob,'majorNames'|'editorialRela
 }
 export const majorMatchLabel=(match:MajorMatch)=>match==='unrestricted'?'公开标注不限专业':
  match==='related'?'专业相关 · 资格待核验':
- match==='unknown'?'专业要求未披露 · 待核验':'全部已收录岗位';
+ match==='unknown'?'专业要求未披露 · 待核验':match==='other'?'已列其他专业 · 请核对官方资格':'全部已收录岗位';
