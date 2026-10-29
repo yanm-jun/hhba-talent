@@ -31,7 +31,7 @@ export function CsairCompactProfilePage({user}:{user:User|null}){
    </nav>
    <section className="hhba-kpmg-hero" aria-label="企业标识、建筑及飞机照片">
     <header className="hhba-kpmg-identity">
-     <div className="hhba-kpmg-logo"><img src={photoRoot+'csair-logo.webp'} alt="中国南方航空用户提供的品牌标识"/></div>
+     <div className="hhba-kpmg-logo"><img src={photoRoot+'csair-logo.png'} alt="中国南方航空用户提供的品牌标识"/></div>
      <div className="hhba-kpmg-identity-copy">
       <span className="hhba-kpmg-kicker">HHBA / COMPANY PROFILE</span>
       <h1>中国南方航空 <span>CHINA SOUTHERN AIRLINES</span></h1>
