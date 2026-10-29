@@ -1,6 +1,6 @@
 name: HHBA Unified Static Site GitHub Pages
-# All 156 domestic autumn employer profiles use the existing OpenAI editorial layout.
-# The 156 company-specific business scopes and 25 source-linked histories are separate from unverified recruiting states.
+# Domestic V2: legacy domestic job/channel entries removed from the public MARKET; 100 overseas curated roles preserved.
+# Old employer content and original photos remain archived in Git for rebuilding one company at a time.
 # KPMG + Schneider Electric: four-block pages, exact logos and two independently generated labeled AI images per company.
 # 2026-10-29: Schneider alt text repaired, rerun full static build and source-backed logo checks.
 # KPMG first-employer logo and two labelled independent AI photo assets; QA alt text verified.
@@ -97,6 +97,7 @@ jobs:
           node scripts/kpmg-deep-editorial.contract.test.mjs
           node scripts/kpmg-recruitment-first.contract.test.mjs
           node scripts/schneider-recruitment-first.contract.test.mjs
+          node scripts/domestic-rebuild-v2.contract.test.mjs
           # Retain photo evidence in source for audit; no legacy gallery is rendered in company profiles.
           node scripts/autumn-approved-industry-images.contract.test.mjs
           # Preserve source-backed logos and only genuine per-employer or labeled AI pictures.
@@ -125,6 +126,8 @@ jobs:
           # Overseas only: use the original 10-company / 100-role JSON catalogue.
           # All domestic jobs, listings, profiles and protected employer modules are unchanged.
           VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          # New public market: retain overseas 100; publish only reviewed domestic V2 jobs.
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
           VITE_HHBA_ACCOUNT_API_ENABLED: '0'
           VITE_HHBA_RECRUITMENT_RESPONSIBILITY_API_ENABLED: '0'
           VITE_HHBA_EVIDENCE_API_ENABLED: '0'
@@ -422,6 +425,18 @@ jobs:
           }
           console.log('HHBA_PUBLIC_STATIC_ADMIN_PREVIEW_VERIFIED',root);
           NODE
+      - name: Retire obsolete bulk job feed from PUBLIC V2 deployment
+        run: |
+          # All original source and audit files remain intact in Git.
+          # The V2 browser reads only curated/v1/jobs.json and the individually approved domestic registry.
+          rm -f apps/web/dist/data/jobs.json
+          rm -f apps/web/dist/data/job-sync-status.json
+          rm -f apps/web/dist/data/job-search-facets.json
+          test ! -e apps/web/dist/data/jobs.json
+          test -s apps/web/dist/curated/v1/jobs.json
+          test -s apps/web/dist/images/autumn-ai-scenes/cn-autumn-002-01.avif
+          test -s apps/web/dist/images/autumn-ai-scenes/cn-autumn-002-02.avif
+          echo HHBA_V2_LEGACY_BULK_FEED_NOT_PUBLISHED
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
         with:
