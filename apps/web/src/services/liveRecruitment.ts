@@ -64,7 +64,12 @@ export function safeOfficialJobUrl(job: LiveJob) {
         'tencent-official': 'careers.tencent.com',
         'baidu-official': 'talent.baidu.com'
       };
-      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='kpmg-moka-official'&&job.source==='kpmg'){
+      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='huayu-official-campus'&&job.source==='huayu-vision'){
+        // Each saved role is individually evidenced in the same official 21-role listing.
+        // Never pretend this list URL is a per-position application permalink.
+        if(u.hostname!=='hascovision.zhiye.com'||u.pathname!=='/campus/jobs'||
+           u.search!==''||u.hash!==''||!/^cn-v2-huayu-[a-z-]{5,80}$/.test(job.id))return null;
+      }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='kpmg-moka-official'&&job.source==='kpmg'){
         const jobId=job.id.replace(/^cn-v2-kpmg-/,'');
         const allowedPaths=['/social-recruitment/kpmg/68240','/m/campus-recruitment/kpmg/76195'];
         if(u.hostname!=='app.mokahr.com'||!allowedPaths.includes(u.pathname)||
@@ -342,7 +347,9 @@ export async function listDomesticRebuildMarket(filters:LiveFilters,offset:numbe
  const combined=[...domesticV2Records.slice(0,3),...overseas.slice(0,5),
   ...domesticV2Records.slice(3,6),...overseas.slice(5,10),
   ...domesticV2Records.slice(6,12),...overseas.slice(10,20),
-  ...domesticV2Records.slice(12),...overseas.slice(20)];
+  ...domesticV2Records.slice(12,18),...overseas.slice(20,25),
+  ...domesticV2Records.slice(18,22),...overseas.slice(25,30),
+  ...domesticV2Records.slice(22),...overseas.slice(30)];
  const allowed=combined.filter(job=>!!safeOfficialJobUrl(job)&&rebuildListFilter(job,filters));
  return {jobs:allowed.slice(offset,offset+30),total:allowed.length,offset,limit:30,
    boards:11,failures:0,updated:'2026-10-29T00:00:00Z'};
