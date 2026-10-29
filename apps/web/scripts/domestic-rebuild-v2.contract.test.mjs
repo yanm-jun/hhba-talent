@@ -90,7 +90,22 @@ assert(main.includes("if(route==='/companies/domestic/a-600030')return <CiticsSe
 assert(citicsProfile.includes("const jobs=rolesData.jobs;"),'All majors permitted; do not improperly filter unrestricted trainees');
 assert(citicsProfile.includes("'/candidate/jobs/cn-v2-citics-'+job.id"),'Shared HHBA on-site job pages');
 assert(citicsProfile.includes('归属待核验'),'Legacy image authenticity not invented');
-assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券']"));
+assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券','辉瑞']"));
+const pfizer=JSON.parse(src('src/data/domesticPfizerOfficialJobs20261029.json'));
+const pfizerPage=src('src/pages/PfizerCompactProfilePage.tsx');
+assert.equal(pfizer.jobs.length,4,'Pfizer must have four individually sourced roles');
+assert.equal(new Set(pfizer.jobs.map(j=>j.id)).size,4,'Pfizer role identities unique');
+assert(pfizer.jobs.every(j=>j.company==='辉瑞'&&/^https:\/\/www\.pfizer\.com\/about\/careers\/job\/\d{7}\?langcode=en$/.test(j.sourceUrl)));
+assert(main.includes("if(route==='/companies/autumn/cn-autumn-003')return <PfizerCompactProfilePage user={user}/>;"));
+assert(pfizerPage.includes('hhba-kpmg-compact'),'Pfizer must reuse CITIC compact layout');
+assert(pfizerPage.includes('data-company-template="openai"'));
+assert(pfizerPage.indexOf('适合哪些专业背景？')<pfizerPage.indexOf('招聘岗位'));
+assert(pfizerPage.indexOf('招聘岗位')<pfizerPage.indexOf('主要业务与专业服务'));
+assert(pfizerPage.includes("'/candidate/jobs/cn-v2-pfizer-'"),'Pfizer jobs open shared HHBA details');
+assert(pfizerPage.includes('data-hhba-recruitment-outbound="true"'));
+assert(index.includes("pfizerV2Records.length!==4||domesticV2Records.length!==63"));
+for(const n of ['pfizer-building.webp','pfizer-logo.webp','pfizer-laboratory.webp'])assert(existsSync('public/images/pfizer-user/'+n),'Missing user supplied photo: '+n);
+
 assert(main.includes("if(route==='/companies/domestic/rel-huayu-004')return <HuayuVisionCompactProfilePage user={user}/>"),'Preserve old profile URL');
 assert(huayuProfile.includes("rolesData.jobs.filter"),'Major selector filters real jobs');
 assert(huayuProfile.includes("'/candidate/jobs/cn-v2-huayu-'+job.id"),'Onsite job detail for every role');

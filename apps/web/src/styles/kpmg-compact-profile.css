@@ -84,3 +84,7 @@
  .hhba-kpmg-service-grid{grid-template-columns:1fr}
  .hhba-kpmg-service{padding:15px 16px}
 }
+
+/* Pfizer uses the identical CITIC/KPMG compact layout; only asset-specific sizing. */
+.hhba-pfizer-compact .hhba-kpmg-logo img{max-width:70px;max-height:62px;width:70px;height:62px;object-fit:contain}
+.hhba-pfizer-photo-note{font-size:11px;line-height:1.65;color:#809286;margin:10px 0 0}
