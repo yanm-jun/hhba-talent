@@ -3,6 +3,7 @@ import {ArrowLeft,ArrowRight,BookOpen,BriefcaseBusiness,ExternalLink,GraduationC
 import {Shell} from '../components/Shell';
 import {Link,getCompanyReturnTarget} from '../router';
 import {AutumnCompanyBrand} from '../components/AutumnCompanyBrand';
+import {AutumnIndustryReferenceGallery} from '../components/AutumnIndustryReferenceGallery';
 import mediaA from '../data/domesticMediaBundle.json';
 import mediaB from '../data/domesticMedia200Bundle.json';
 import {getDomesticCompanies,getDomesticRecruitment} from '../services/domesticCompanySearch';
@@ -107,6 +108,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
     {recognizedBrand&&<p className="hhba-autumn-profile-note"><a href={recognizedBrand.source} target="_blank" rel="noopener noreferrer" data-hhba-non-recruitment-link="true">查看企业标识素材来源（第三方目录）</a> · 不表示官方授权或商业合作。</p>}
     {localPhotos.length?<div className="hhba-autumn-local-photo-grid">{localPhotos.map((photo,i)=><figure key={photo.path||i}><img loading="lazy" src={import.meta.env.BASE_URL+photo.path!} alt={employer.name+'有来源的企业实景'}/><figcaption>企业场景照片 · <a href={photo.source} data-hhba-non-recruitment-link="true" target="_blank" rel="noopener noreferrer">图片来源</a></figcaption></figure>)}</div>:<div className="hhba-autumn-no-photo"><AutumnCompanyBrand name={employer.name} large/><p>真实企业场景照片尚待核验。下面如有 AI 场景图，仅用于视觉示意，绝不是企业实景。</p></div>}
     {aiPhotos.length>0&&<><h3 className="hhba-autumn-subsection-title">AI 独立场景图（非企业实景）</h3><p className="hhba-autumn-profile-note">画面中的建筑、空间以及招牌可能由 AI 虚构，不能据此判断企业实际总部、办公楼和现场环境。</p><div className="hhba-autumn-local-photo-grid">{aiPhotos.map(photo=><figure key={photo.id}><img loading="lazy" src={import.meta.env.BASE_URL+photo.path} alt={photo.alt}/><figcaption>{photo.sourceLabel}</figcaption></figure>)}</div></>}
+    <AutumnIndustryReferenceGallery companyId={id} companyName={employer.name}/>
     {websiteCaptures.length>0&&<><h3 className="hhba-autumn-subsection-title">企业网站截图（不是办公实景）</h3><div className="hhba-autumn-local-photo-grid">{websiteCaptures.map((photo,i)=><figure key={photo.path||i}><img loading="lazy" src={import.meta.env.BASE_URL+photo.path!} alt={employer.name+'网站页面截图'}/><figcaption>企业网站页面留档 · 非企业实景</figcaption></figure>)}</div></>}
    </section>
    <section className="hhba-autumn-profile-panel">
