@@ -64,7 +64,12 @@ export function safeOfficialJobUrl(job: LiveJob) {
         'tencent-official': 'careers.tencent.com',
         'baidu-official': 'talent.baidu.com'
       };
-      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='schneider-official'&&job.source==='schneider-electric'){
+      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='kpmg-moka-official'&&job.source==='kpmg'){
+        const jobId=job.id.replace(/^cn-v2-kpmg-/,'');
+        const allowedPaths=['/social-recruitment/kpmg/68240','/m/campus-recruitment/kpmg/76195'];
+        if(u.hostname!=='app.mokahr.com'||!allowedPaths.includes(u.pathname)||
+           u.search!==''||u.hash!=='#/job/'+jobId||!/^[0-9a-f-]{36}$/.test(jobId))return null;
+      }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='schneider-official'&&job.source==='schneider-electric'){
         const match=/^\/jobs\/([0-9]{6})$/.exec(u.pathname);
         if(u.hostname!=='careers.se.com'||!match||job.id!=='cn-v2-schneider-'+match[1]||
           !/^zh-cn$/i.test(u.searchParams.get('lang')||'')||[...u.searchParams.keys()].length!==1)return null;
@@ -336,7 +341,8 @@ export async function listDomesticRebuildMarket(filters:LiveFilters,offset:numbe
  // Keep original 100 records unchanged; interleave the first reviewed China employer.
  const combined=[...domesticV2Records.slice(0,3),...overseas.slice(0,5),
   ...domesticV2Records.slice(3,6),...overseas.slice(5,10),
-  ...domesticV2Records.slice(6),...overseas.slice(10)];
+  ...domesticV2Records.slice(6,12),...overseas.slice(10,20),
+  ...domesticV2Records.slice(12),...overseas.slice(20)];
  const allowed=combined.filter(job=>!!safeOfficialJobUrl(job)&&rebuildListFilter(job,filters));
  return {jobs:allowed.slice(offset,offset+30),total:allowed.length,offset,limit:30,
    boards:11,failures:0,updated:'2026-10-29T00:00:00Z'};
