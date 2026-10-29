@@ -1,5 +1,5 @@
 name: HHBA Unified Static Site GitHub Pages
-# Photo preview integration build: 156 companies, 312 uniquely sourced, individually attributed images; gallery TSX corrected.
+# All 156 domestic autumn employer profiles use the existing OpenAI editorial layout.
 # KPMG first-employer logo and two labelled independent AI photo assets; QA alt text verified.
 on:
   push:
@@ -48,32 +48,6 @@ jobs:
           target.write_bytes(svg)
           print('KPMG_SOURCE_BACKED_LOGO_READY',len(svg),url)
           PY
-      - name: Retrieve original 312 independent reference photos from saved artifact
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          mkdir -p /tmp/hhba-photo-research
-          gh run download 40731442485 --repo yanm-jun/hhba-talent --name hhba-156-companies-312-individual-industry-photos --dir /tmp/hhba-photo-research
-          find /tmp/hhba-photo-research -type f -maxdepth 2 -print
-          python apps/web/scripts/materialize-autumn-photo-research.py /tmp/hhba-photo-research/hhba_156_companies_312_individual_industry_photos.zip
-      - name: Verify 156 company previews have two separate cited local JPEGs each
-        run: |
-          python - <<'PY'
-          import json,hashlib,pathlib
-          base=pathlib.Path('apps/web/public')
-          data=json.loads((base/'data/domestic-autumn-photo-research.json').read_text())
-          assert data['totalCompanies']==156 and data['totalPhotos']==312
-          sha=set()
-          for employer,items in data['entries'].items():
-              assert len(items)==2,employer
-              for item in items:
-                  content=(base/item['file']).read_bytes()
-                  assert content[:2]==bytes((255,216)) and hashlib.sha256(content).hexdigest()==item['sha256']
-                  assert item['sha256'] not in sha,employer
-                  sha.add(item['sha256'])
-          assert len(sha)==312
-          print('HHBA_156_TWO_DISTINCT_WIKIMEDIA_REFERENCES_PER_COMPANY_OK')
-          PY
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -98,12 +72,9 @@ jobs:
           node scripts/company200-integration.contract.test.mjs
           node scripts/domestic-autumn-market.contract.test.mjs
           node scripts/autumn-company-profiles.contract.test.mjs
-          # Reconciled to 19 conservatively selected individual reference pictures from 11 companies.
+          # Retain photo evidence in source for audit; no legacy gallery is rendered in company profiles.
           node scripts/autumn-approved-industry-images.contract.test.mjs
-          # 2026-10-29 final photo QA: 11 verified-scene matched companies, 17 independent stock photos, 295 withheld.
-          # AI preview regression: each scene is an individual real WebP file labelled conceptual, never an authentic office photograph.
-          # 2026-10-29 verified asset review: 26 independently sourced brand marks; all 312 speculative images removed.
-          # Static assets: verify 156 original nameplates and 156 distinct visual covers.
+          # Preserve source-backed logos and only genuine per-employer or labeled AI pictures.
           # Batch regression: 156 distinct employer routes + 10 source-backed introductions; preserve registration gate.
           node scripts/audit-labor-rights-topics.mjs
           node --test scripts/hhba-unified-static.contract.test.mjs \
@@ -141,6 +112,23 @@ jobs:
           # Public HTTPS backend ORIGIN only. Never put a DeepSeek credential here.
           VITE_HHBA_MATCH_API_ORIGIN: ${{ vars.HHBA_MATCH_API_ORIGIN }}
         run: npm run build
+      - name: Strip obsolete industry-stock galleries from the public Pages bundle
+        run: |
+          rm -rf apps/web/dist/images/autumn-photo-research
+          rm -rf apps/web/dist/images/autumn-industry-references
+          rm -f apps/web/dist/data/domestic-autumn-photo-research.json
+          rm -f apps/web/dist/data/domestic-autumn-industry-photos.json
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('apps/web/src/pages/AutumnCompanyProfilePage.tsx').read_text()
+          assert 'data-company-template="openai"' in p
+          assert 'AutumnIndustryReferenceGallery' not in p
+          root=Path('apps/web/dist')
+          for fragment in ['images/autumn-photo-research','images/autumn-industry-references',
+                           'data/domestic-autumn-photo-research.json','data/domestic-autumn-industry-photos.json']:
+              assert not (root/fragment).exists(),fragment
+          print('HHBA_156_OPENAI_TEMPLATE_AND_NO_LEGACY_PHOTO_GALLERIES_OK')
+          PY
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
