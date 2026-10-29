@@ -1,0 +1,352 @@
+{
+  "schemaVersion": "1.0",
+  "id": "cn-autumn-001",
+  "companyName": "毕马威",
+  "language": "zh-CN",
+  "reviewedOn": "2026-10-29",
+  "evidenceLevel": "company_specific_official_pages_reviewed",
+  "publisher": "HHBA独立整理；不代表毕马威官方合作或背书",
+  "website": "https://kpmg.com/cn/zh/about.html",
+  "headline": "独立成员所组成的全球专业服务网络 · 审计与鉴证、税务、咨询",
+  "stats": [
+    {
+      "value": "31",
+      "unit": "个城市",
+      "label": "毕马威中国办事机构覆盖",
+      "source": "about"
+    },
+    {
+      "value": "14,000+",
+      "unit": "人",
+      "label": "中国官网披露合伙人及员工",
+      "source": "about"
+    },
+    {
+      "value": "138",
+      "unit": "个国家和地区",
+      "label": "全球成员网络覆盖范围",
+      "source": "global"
+    }
+  ],
+  "overview": [
+    "毕马威（KPMG）并非一家在全球以单一法人经营的公司，而是由不同司法管辖区的独立成员所组成的专业服务网络。毕马威国际负责网络协调，成员所分别承担自己的法律义务；在中国，客户服务主要涵盖审计与鉴证、税务及咨询。了解这一组织结构有助于求职者区分毕马威中国、香港办事处、交付中心以及不同招聘主体。",
+    "根据毕马威中国官方介绍，其办事机构分布于北京、上海、广州、深圳、香港、澳门等31个城市，合伙人及员工超过14,000名。团队服务的客户涉及金融、能源、制造、资本市场及其他行业。办事处所在城市不意味着各地在同一时点开放相同职位，具体招聘需要按部门、办公地点及申请要求核对。",
+    "毕马威交付的不只是财务报表审计。企业从设立、经营、融资、并购到数字化转型、税务合规、内部控制和可持续发展，可能在不同阶段使用不同专业服务。它以项目团队、行业知识和专业方法论形成服务组合，而不是以单一工业产品作为主营业务。",
+    "对于求职者，审计、税务、咨询是三条主要业务路径；交易、科技、风险、转型及交付中心等方向又存在不同的专业要求。毕马威中国的校招FAQ明确表示招聘对象不限于会计或财务专业，但具体岗位仍以官方招聘系统当期条件为准。"
+  ],
+  "officeLocations": [
+    {
+      "city": "北京",
+      "address": "北京市东长安街1号东方广场毕马威大楼8楼",
+      "source": "offices"
+    },
+    {
+      "city": "上海",
+      "address": "上海市南京西路1266号恒隆广场2号楼25楼",
+      "source": "offices"
+    },
+    {
+      "city": "广州",
+      "address": "广州市珠江新城珠江东路6号周大福金融中心21楼",
+      "source": "offices"
+    },
+    {
+      "city": "深圳",
+      "address": "深圳市南山区科苑南路2666号中国华润大厦15楼",
+      "source": "offices"
+    }
+  ],
+  "services": [
+    {
+      "title": "审计与鉴证",
+      "subtitle": "以独立、专业的核验增强财务信息可信度",
+      "description": "为企业提供财务报表审计与其他鉴证服务，关注财务报告质量、重大错报风险、内部控制及合规披露等。项目通常围绕审计证据、会计准则、业务流程和团队协作展开。",
+      "deliverables": [
+        "财务报表审计及专项鉴证",
+        "财务报告及内部控制相关工作",
+        "上市及资本市场相关财务议题"
+      ],
+      "career": "可关注审计、财务报告、会计技术、数据分析等专业方向；是否招录以岗位说明为准。",
+      "source": "services"
+    },
+    {
+      "title": "企业税务与国际税务",
+      "subtitle": "围绕企业全生命周期的税务合规与筹划",
+      "description": "税务团队提供企业运营税务、投资及融资税务、集团重组、间接税与税务科技等服务，并关注跨境经营中的政策与申报风险。服务内容需结合行业、地区和具体客户情况开展。",
+      "deliverables": [
+        "企业所得税、间接税等税务咨询",
+        "重组、并购及跨境税务议题",
+        "税务科技、数据管理与合规流程"
+      ],
+      "career": "可关注税务咨询、税法研究、转移定价、财税数据与流程技术方向。",
+      "source": "tax"
+    },
+    {
+      "title": "交易咨询",
+      "subtitle": "投资、并购、出售及价值创造",
+      "description": "围绕企业收购、出售、融资和合作等交易环节开展专业支持，帮助客户识别交易风险、理解财务和商业表现，并从交易实施和后续价值实现角度提供建议。",
+      "deliverables": [
+        "交易相关财务尽调与分析",
+        "收购及出售业务支持",
+        "交易后的价值创造与整合议题"
+      ],
+      "career": "可关注企业财务分析、交易服务、估值相关研究与项目管理能力。",
+      "source": "advisory"
+    },
+    {
+      "title": "变革与管理咨询",
+      "subtitle": "业务战略、组织与运营转型",
+      "description": "帮助客户分析经营模式、组织结构、流程绩效与变革实施问题，把战略目标转化为可执行的运营改善项目。相关项目可能跨越人才、流程、数字系统及成本效率。",
+      "deliverables": [
+        "组织及运营模式优化",
+        "绩效与职能转型",
+        "变革项目管理和实施"
+      ],
+      "career": "可关注管理咨询、运营改善、商业分析及变革管理等能力方向。",
+      "source": "advisory"
+    },
+    {
+      "title": "科技与数字化咨询",
+      "subtitle": "云、数据、AI与企业系统",
+      "description": "围绕数字化战略、企业系统、技术架构与网络安全等问题开展咨询服务。不同团队可能参与系统选型、流程数字化、数据治理及技术交付，职责与传统软件开发岗位并不完全相同。",
+      "deliverables": [
+        "科技战略与企业系统咨询",
+        "数据、云计算及信息安全相关议题",
+        "数字化运营与技术转型"
+      ],
+      "career": "可关注信息系统、数据分析、软件、网络安全及跨专业业务沟通方向。",
+      "source": "advisory"
+    },
+    {
+      "title": "风险与合规咨询",
+      "subtitle": "治理、控制与监管要求",
+      "description": "面向组织风险识别、治理机制、财务与资金、监管合规及内部控制问题提供支持，可能涉及合规框架、流程评估、风险建模和改进措施。",
+      "deliverables": [
+        "监管合规与内部控制",
+        "风险评估及治理机制",
+        "企业运营与报告风险改进"
+      ],
+      "career": "可关注审计与风控、合规、财务、信息安全以及数据风险分析方向。",
+      "source": "advisory"
+    },
+    {
+      "title": "可持续发展与ESG",
+      "subtitle": "长期价值与可持续发展规划",
+      "description": "围绕可持续发展治理、披露和实施议题开展相关专业服务。内容可能涉及环境与社会影响信息、治理框架以及相关风险和指标，需区分咨询与鉴证业务的具体职责。",
+      "deliverables": [
+        "可持续发展战略与治理议题",
+        "可持续信息披露相关支持",
+        "ESG相关风险与专业分析"
+      ],
+      "career": "可关注可持续发展、环境数据、披露研究及风险管理等方向。",
+      "source": "services"
+    },
+    {
+      "title": "全球中国业务发展中心",
+      "subtitle": "服务中国企业出海及跨境投资",
+      "description": "通过全球成员所网络衔接本地知识和跨境专业能力，支持中国企业对外投资、海外并购及绿地投资，也为希望来华发展的国际企业提供市场与业务拓展相关服务。",
+      "deliverables": [
+        "跨境投资与业务拓展支持",
+        "海外并购及绿地投资咨询",
+        "多法域项目沟通与专业协同"
+      ],
+      "career": "可关注跨境业务、财务与税务、国际项目协作及语言沟通能力。",
+      "source": "history"
+    }
+  ],
+  "milestones": [
+    {
+      "year": "1945",
+      "title": "进入香港市场",
+      "description": "毕马威在中国香港的业务历史可追溯至1945年，此后成为连接本地企业与国际专业网络的起点之一。",
+      "source": "history",
+      "scope": "中国业务"
+    },
+    {
+      "year": "1983",
+      "title": "中国内地首个办事处",
+      "description": "在北京设立中国内地首个办事处，随后逐步扩展在华专业服务网络。",
+      "source": "history",
+      "scope": "中国业务"
+    },
+    {
+      "year": "1987",
+      "title": "国际网络合并整合",
+      "description": "Peat Marwick International 与 Klynveld Main Goerdeler 的相关网络合并，现代 KPMG 国际品牌由此形成；这一事件属于国际网络历史，并非中国内地法人设立。",
+      "source": "global",
+      "scope": "国际网络"
+    },
+    {
+      "year": "1992",
+      "title": "中外合作会计师事务所",
+      "description": "毕马威成为中国内地首家获准开业的中外合作国际会计师事务所，反映出其在中国专业服务市场的早期布局。",
+      "source": "about",
+      "scope": "中国业务"
+    },
+    {
+      "year": "2012",
+      "title": "中国本土化转制",
+      "description": "2012年8月1日，毕马威完成从中外合作制向特殊普通合伙的转制，是“四大”中率先完成此类转制的事务所。",
+      "source": "about",
+      "scope": "中国业务"
+    },
+    {
+      "year": "2025",
+      "title": "香港业务八十周年",
+      "description": "毕马威发布香港业务八十周年纪念资料，回顾其1945年以来在香港及中国市场的专业服务发展。",
+      "source": "hk80",
+      "scope": "中国业务"
+    }
+  ],
+  "careers": [
+    {
+      "title": "应届生招聘",
+      "tag": "本科及以上应届毕业生",
+      "description": "毕马威中国应届生项目覆盖审计、税务及咨询。官网按业务和地区提供项目入口，并说明在线网申需要提交准确的个人信息；申请与审核安排会根据批次推进。",
+      "eligibility": "官网欢迎本科及以上学历应届毕业生；具体学位、专业、城市与语言要求逐岗核对。",
+      "source": "graduate"
+    },
+    {
+      "title": "在校生实习",
+      "tag": "本科或硕士在读",
+      "description": "官网提供审计、税务、咨询及业务支持方向的实习项目，并按寒假、暑假、常规及长期实习区分不同时间窗口。",
+      "eligibility": "2026—2027寒假、常规实习和2027暑期实习等计划有不同时间安排，开放窗口随岗位变化。",
+      "source": "internships"
+    },
+    {
+      "title": "社会招聘",
+      "tag": "有工作经验的求职者",
+      "description": "按照审计与鉴证、税务、咨询和业务支持等方向查看社会招聘项目。具体职级与经验要求以实际公开职位说明为准。",
+      "eligibility": "适用人群取决于职位要求，不把任何招聘方向标记成持续开放的具体岗位。",
+      "source": "experienced"
+    },
+    {
+      "title": "交付中心与科技岗位",
+      "tag": "共享服务及技术交付",
+      "description": "毕马威交付中心及智能创新空间涉及专业交付、云计算、数据、人工智能等技术服务场景，招聘入口与传统项目团队可能不同。",
+      "eligibility": "需按交付中心所在地、职业类别和申请批次确认。",
+      "source": "delivery"
+    }
+  ],
+  "careerNotes": [
+    {
+      "title": "专业不限于会计",
+      "description": "毕马威中国官方校招FAQ表示欢迎不同学科背景申请；不过专业不限并不意味着每个岗位都无先修知识或资格要求。",
+      "source": "faq"
+    },
+    {
+      "title": "可按地区选择",
+      "description": "毕马威中国将招聘按北方区、华东及华西区、华南区及港澳地区等组织；非本地城市的申请资格及工作许可另行确认。",
+      "source": "graduate"
+    },
+    {
+      "title": "项目经历也重要",
+      "description": "官网鼓励申请人真实展示沟通、分析、团队协作和对行业的兴趣。具体筛选方式以对应招聘项目通知为准。",
+      "source": "faq"
+    },
+    {
+      "title": "员工发展支持",
+      "description": "官网介绍持续学习、职业发展、健康福利、年假和灵活办公等内容；具体政策仍随岗位及所属实体而异。",
+      "source": "working"
+    }
+  ],
+  "applicationProcess": [
+    "确认业务板块和目标城市，在毕马威中国官方招聘页面筛选项目。",
+    "核对学历、专业、毕业时间、工作许可及岗位要求，填写真实准确的网申信息。",
+    "按官方渠道接收申请确认、测评、面试等通知；不要根据过往批次推定固定流程。",
+    "在收到正式录用文件前，对付费培训、代投、所谓“保证录用”及远程付费实习保持警惕。"
+  ],
+  "antiFraud": "毕马威中国官方明确表示招聘过程中不收取任何费用，也未授权第三方有偿提供面试、培训、实习或工作机会；同时提示不存在由第三方提供的付费远程线上实习或工作项目。以官网及“毕马威招聘”官方公众号为准。",
+  "sources": [
+    {
+      "key": "about",
+      "label": "毕马威中国 · 关于我们",
+      "url": "https://kpmg.com/cn/zh/about.html"
+    },
+    {
+      "key": "history",
+      "label": "毕马威中国 · 发展历程",
+      "url": "https://kpmg.com/cn/zh/about/our-history.html"
+    },
+    {
+      "key": "global",
+      "label": "毕马威中国 · 国际网络",
+      "url": "https://kpmg.com/cn/zh/about/our-history.html"
+    },
+    {
+      "key": "offices",
+      "label": "毕马威中国 · 办事处地址",
+      "url": "https://kpmg.com/cn/zh/about/office-locations.html"
+    },
+    {
+      "key": "services",
+      "label": "毕马威中国 · 专业服务总览",
+      "url": "https://kpmg.com/cn/zh/services.html"
+    },
+    {
+      "key": "audit",
+      "label": "毕马威中国 · 审计与鉴证",
+      "url": "https://kpmg.com/cn/zh/services.html"
+    },
+    {
+      "key": "tax",
+      "label": "毕马威中国 · 税务服务",
+      "url": "https://kpmg.com/cn/zh/services/tax.html"
+    },
+    {
+      "key": "advisory",
+      "label": "毕马威中国 · 咨询服务",
+      "url": "https://kpmg.com/cn/zh/services/advisory.html"
+    },
+    {
+      "key": "careers",
+      "label": "毕马威中国 · 招聘主页",
+      "url": "https://kpmg.com/cn/zh/careers.html"
+    },
+    {
+      "key": "campus",
+      "label": "毕马威中国 · 校园招聘",
+      "url": "https://kpmg.com/cn/zh/careers/campus.html"
+    },
+    {
+      "key": "graduate",
+      "label": "毕马威中国 · 应届生项目",
+      "url": "https://kpmg.com/cn/zh/careers/campus/graduate-applications.html"
+    },
+    {
+      "key": "internships",
+      "label": "毕马威中国 · 实习生项目",
+      "url": "https://kpmg.com/cn/zh/careers/campus/basecamp.html"
+    },
+    {
+      "key": "experienced",
+      "label": "毕马威中国 · 社会招聘",
+      "url": "https://kpmg.com/cn/zh/careers/experienced-hires.html"
+    },
+    {
+      "key": "delivery",
+      "label": "毕马威中国 · 交付中心招聘",
+      "url": "https://kpmg.com/cn/zh/careers/delivery-centre-hires.html"
+    },
+    {
+      "key": "faq",
+      "label": "毕马威中国 · 校招常见问题",
+      "url": "https://kpmg.com/cn/zh/careers/campus/faqs.html"
+    },
+    {
+      "key": "working",
+      "label": "毕马威中国 · 工作与发展",
+      "url": "https://kpmg.com/cn/zh/careers/working-at-kpmg.html"
+    },
+    {
+      "key": "safety",
+      "label": "毕马威中国 · 招聘防诈骗公告",
+      "url": "https://kpmg.com/cn/zh/careers/campus.html"
+    },
+    {
+      "key": "hk80",
+      "label": "毕马威中国 · 香港业务八十周年",
+      "url": "https://kpmg.com/cn/zh/media/press-releases/2025/09/kpmg-marks-80-years-in-hk-a-legacy-of-trust-and-future-optimism.html"
+    }
+  ]
+}
