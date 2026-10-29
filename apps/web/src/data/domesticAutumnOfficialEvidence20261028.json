@@ -101,6 +101,15 @@
       "officialRecruitment": "https://zhaopin.china-cdt.com/zpgg_xyzp.html",
       "recruitmentLabel": "中国大唐集团官方校园招聘公告目录",
       "evidenceScope": "集团官方2027届第一批校园招聘公告与招聘系统；各下属用人单位招聘条件需分别核实"
+    },
+    "辉瑞": {
+      "name": "辉瑞",
+      "industry": "生物制药、创新药及疫苗",
+      "intro": "辉瑞（Pfizer）成立于1849年，业务涵盖药物及疫苗研发、生产、供应质量管理及医学商业运营。此为独立编辑企业介绍，不代表企业官方合作。",
+      "source": "https://www.pfizer.com/about",
+      "officialRecruitment": "https://www.pfizer.com/about/careers/search-results",
+      "recruitmentLabel": "辉瑞全球招聘官网（筛选中国岗位）",
+      "evidenceScope": "2026-10-29 确认四条辉瑞中国职位详情页，职位仍否开放须访问官网验证"
     }
   }
 }
