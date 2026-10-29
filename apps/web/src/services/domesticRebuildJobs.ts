@@ -5,9 +5,10 @@
  */
 import schneider from '../data/domesticSchneiderDetailedDossier20261029.json';
 import kpmgJobs from '../data/domesticKpmgConcreteJobs20261029.json';
+import huayuJobs from '../data/domesticHuayuVisionRoles20261029.json';
 import type {LiveJob,LiveFilters,LivePage} from './liveRecruitment';
 
-export const DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威'] as const;
+export const DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司'] as const;
 export const DOMESTIC_REBUILD_VERSION='2026-10-29-v2';
 const schneiderV2Records=schneider.jobs.map(job=>({
  id:'cn-v2-schneider-'+job.id,
@@ -48,7 +49,21 @@ export const kpmgV2Records=kpmgJobs.jobs.map(job=>({
  employerRoute:'/companies/autumn/cn-autumn-001'
 } satisfies LiveJob & {majorNames:string[];employerRoute:string}));
 
-export const domesticV2Records=[...schneiderV2Records,...kpmgV2Records];
+export const huayuV2Records=huayuJobs.jobs.map(job=>({
+ id:'cn-v2-huayu-'+job.id,
+ company:'华域视觉科技（上海）有限公司',companyZh:'华域视觉',
+ title:job.title,titleZh:job.title,location:job.city,locationZh:job.city,
+ platform:'huayu-official-campus',source:'huayu-vision',url:job.sourceUrl,
+ domestic:true,remote:null,recordKind:'DOMESTIC_REBUILT',
+ recruitmentType:'CAMPUS',observedAt:job.observedOn,
+ currentApplicationVerified:false,
+ educationLabel:undefined,experienceLabel:undefined,
+ majorNames:job.majors,responsibilitiesSummary:job.summary,
+ requirementsSummary:job.requirement,
+ employerRoute:'/companies/domestic/rel-huayu-004'
+} satisfies LiveJob & {majorNames:string[];employerRoute:string}));
+
+export const domesticV2Records=[...schneiderV2Records,...kpmgV2Records,...huayuV2Records];
 
 export function domesticV2ById(id:string):LiveJob|undefined{
  return domesticV2Records.find(job=>job.id===id);
@@ -57,7 +72,7 @@ export function filterDomesticRebuildJobs(jobs:LiveJob[],f:LiveFilters):LiveJob[
  const q=f.q.normalize('NFKC').trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
  return jobs.filter(job=>{
   if(f.country==='global')return false;
-  if(f.company&&!('施耐德电气'.includes(f.company)||f.company.toLowerCase().includes('schneider')))return false;
+  if(f.company&&!(['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华域视觉','schneider electric','kpmg','hasco vision'].some(x=>x.toLowerCase().includes(f.company.toLowerCase()))))return false;
   if(f.location_country&&f.location_country.toUpperCase()!=='CN')return false;
   if(f.city&&!job.locationZh?.includes(f.city)&&!(f.city==='shanghai'&&job.locationZh==='上海')&&!(f.city==='beijing'&&job.locationZh==='北京')&&!(f.city==='guangzhou'&&job.locationZh==='广州'))return false;
   if(f.remote)return false;
@@ -73,15 +88,17 @@ export function filterDomesticRebuildJobs(jobs:LiveJob[],f:LiveFilters):LiveJob[
  });
 }
 export function assertDomesticRebuildIntegrity(){
- if(schneiderV2Records.length!==12||kpmgV2Records.length!==6||domesticV2Records.length!==18)
+ if(schneiderV2Records.length!==12||kpmgV2Records.length!==6||huayuV2Records.length!==16||domesticV2Records.length!==34)
   throw Error('REBUILT_COMPANY_JOB_COUNT_CHANGED');
  const ids=new Set<string>(),urls=new Set<string>();
  for(const job of domesticV2Records){
-  if(ids.has(job.id)||urls.has(job.url)||
+  if(ids.has(job.id)||(job.platform!=='huayu-official-campus'&&urls.has(job.url))||
     !(job.platform==='schneider-official'&&/^cn-v2-schneider-[0-9]{6}$/.test(job.id)&&
       /^https:\/\/careers\.se\.com\/jobs\/[0-9]{6}\?lang=zh-(?:CN|cn)$/.test(job.url)||
       job.platform==='kpmg-moka-official'&&/^cn-v2-kpmg-[0-9a-f-]{36}$/.test(job.id)&&
-      /^https:\/\/app\.mokahr\.com\/(?:social-recruitment|m\/campus-recruitment)\/kpmg\/(?:68240|76195)#\/job\/[0-9a-f-]{36}$/.test(job.url))||
+      /^https:\/\/app\.mokahr\.com\/(?:social-recruitment|m\/campus-recruitment)\/kpmg\/(?:68240|76195)#\/job\/[0-9a-f-]{36}$/.test(job.url)||
+      job.platform==='huayu-official-campus'&&/^cn-v2-huayu-[a-z-]{5,80}$/.test(job.id)&&
+      job.url==='https://hascovision.zhiye.com/campus/jobs')||
     !job.titleZh||!job.locationZh||!job.responsibilitiesSummary)
    throw Error('DOMESTIC_REBUILD_SOURCE_INVALID '+job.id);
   ids.add(job.id);urls.add(job.url);
