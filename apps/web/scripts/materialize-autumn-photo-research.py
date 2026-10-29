@@ -50,10 +50,10 @@ def main(archive):
                     if not row or row["employer_name"] != employer_name:
                         raise ValueError("Missing or mismatched employer photo source: " + employer_id)
                     photo_path = row["path"]
-                    if not re.fullmatch(re.escape(employer_id)+r"/"+re.escape(photo_id)+r"\\.jpg",photo_path):
+                    if not re.fullmatch(re.escape(employer_id)+r"/"+re.escape(photo_id)+r"\.jpg",photo_path):
                         raise ValueError("Unexpected ZIP path " + photo_path)
                     data = source.read(photo_path)
-                    if len(data)<7000 or data[:2]!=b"\\xff\\xd8":
+                    if len(data)<7000 or data[:2]!=bytes((0xff,0xd8)):
                         raise ValueError("Invalid independent JPEG " + photo_path)
                     digest = hashlib.sha256(data).hexdigest()
                     if digest in hashes:
@@ -102,7 +102,7 @@ def main(archive):
         "totalCompanies": 156,
         "totalPhotos": 312,
         "entries": image_entries
-    }, ensure_ascii=False, indent=2)+"\\n", encoding="utf-8")
+    }, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
     print("IMPORTED_156_COMPANIES_312_UNIQUE_RESEARCH_PHOTOS",len(image_entries),total)
 
 if __name__=="__main__":
