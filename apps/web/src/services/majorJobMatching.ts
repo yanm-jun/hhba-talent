@@ -46,6 +46,15 @@ export function storeSelectedMajor(slug:string){
   if(verified)sessionStorage.setItem(MAJOR_STORAGE_KEY,verified);
   else sessionStorage.removeItem(MAJOR_STORAGE_KEY);
  }catch{}
+ // Keep a company deep link's major query aligned when users switch subjects there.
+ try{
+  if(location.pathname.includes('/companies/')&&new URLSearchParams(location.search).has('major')){
+   const url=new URL(location.href);
+   if(verified)url.searchParams.set('major',verified);
+   else url.searchParams.delete('major');
+   history.replaceState(history.state,'',url.pathname+url.search+url.hash);
+  }
+ }catch{}
  if(typeof window!=='undefined')window.dispatchEvent(new CustomEvent('hhba-major-changed',{detail:verified}));
 }
 export function majorName(slug:string){return majorById(slug)?.name||'';}
