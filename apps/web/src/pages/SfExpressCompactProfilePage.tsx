@@ -5,6 +5,7 @@ import {Link,getCompanyReturnTarget} from '../router';
 import rolesData from '../data/domesticSfTechCampusRoles20261029.json';
 import type {User} from '../services/api';
 import '../styles/kpmg-compact-profile.css';
+import {CompanyMajorJobs} from '../components/CompanyMajorJobs';
 
 const majors=['全部专业','计算机科学与技术','软件工程','人工智能','数学与统计','工商管理','设计学','其他专业'];
 const services=[
@@ -44,31 +45,8 @@ export function SfExpressCompactProfilePage({user}:{user:User|null}){
     </div>
     <p className="hhba-sf-photo-note">Logo 与两张照片来自你上传的独立素材，图片不跳转第三方；建筑具体位置与拍摄日期未独立核验。</p>
    </section>
-   <section className="hhba-kpmg-section" aria-labelledby="sf-major-title">
-    <div className="hhba-kpmg-section-heading"><div><h2 id="sf-major-title">适合哪些专业背景？</h2><p>按岗位类别的相关专业方向浏览，并非企业公布的逐岗准入条件。具体学历、专业限制以顺丰招聘官网为准。</p></div></div>
-    <div className="hhba-kpmg-major-list" role="group" aria-label="相关专业方向">
-     {majors.map(m=><button key={m} type="button" className={'hhba-kpmg-major'+(major===m?' is-selected':'')} aria-pressed={major===m} onClick={()=>setMajor(m)}>{m}{major===m&&<CheckCircle2 size={13}/>}</button>)}
-    </div>
-   </section>
-   <section className="hhba-kpmg-section" aria-labelledby="sf-job-title">
-    <div className="hhba-kpmg-section-heading">
-     <div><h2 id="sf-job-title">招聘岗位</h2><p>当前方向：<strong>{major}</strong> · 展示 {jobs.length} 个顺丰科技 2027 届秋招公告岗位。实际是否在招请以官网为准。</p></div>
-     <a className="hhba-kpmg-section-link" href="https://campus.sf-express.com/#/homePage" target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">顺丰招聘官网 <ExternalLink size={14}/></a>
-    </div>
-    <div className="hhba-kpmg-role-list">
-     {jobs.map(job=><article key={job.id} className="hhba-kpmg-role">
-      <div className="hhba-kpmg-role-icon"><BriefcaseBusiness size={17}/></div>
-      <div className="hhba-kpmg-role-main">
-       <div className="hhba-kpmg-role-top"><h3>{job.title}</h3><span>{job.category}</span></div>
-       <p>{job.company} · {job.summary}</p>
-       <small>2027届校园招聘 · 深圳/武汉/成都（公告整体工作地，单岗未核实） · 专业要求待核实</small>
-      </div>
-      <Link to={'/candidate/jobs/cn-v2-sftech-'+job.id} aria-label={'查看'+job.title+'站内详情'}>查看详情 <ArrowRight size={14}/></Link>
-     </article>)}
-     {jobs.length===0&&<p className="hhba-kpmg-role-disclaimer">暂无该关联方向的公告岗位，可选择全部专业。未列出不代表企业不接受此专业。</p>}
-    </div>
-    <p className="hhba-kpmg-role-disclaimer"><GraduationCap size={14}/> 以下均为顺丰科技有限公司的 2027 届校招公告岗位，不等同于顺丰集团所有部门职位。来源为高校转载招聘公告；没有独立职位直链和完整逐岗 JD，不能据此断言当前在招。</p>
-   </section>
+   <CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn-005"/>
+
    <section className="hhba-kpmg-section" aria-labelledby="sf-services-title">
     <div className="hhba-kpmg-section-heading"><div><h2 id="sf-services-title">主要业务与专业服务</h2><p>顺丰集团主要业务领域；科技岗位的招聘主体已在上方单独注明。</p></div></div>
     <div className="hhba-kpmg-service-grid">
