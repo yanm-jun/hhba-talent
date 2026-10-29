@@ -58,11 +58,11 @@ export function CompanyMajorJobs({companyRoute,majorIntro,quickMajorNames}:{comp
   <section className="hhba-kpmg-section hhba-major-linked-section" aria-labelledby="hhba-shared-major-title">
    <div className="hhba-kpmg-section-heading"><div>
     <h2 id="hhba-shared-major-title">适合哪些专业背景？</h2>
-    <p>{majorIntro||'选择你的所学专业，查看这家企业已整理的相关职位。'}</p>
+    <p>{majorIntro||'与招聘市场共用一套专业匹配结果。专业相关不等于符合所有招录条件，未披露专业的岗位单独列出。'}</p>
    </div></div>
    {quickMajors.length>0&&<div className="hhba-major-quick-area">
     <span className="hhba-major-quick-caption">快速选择专业</span>
-    <div className="hhba-major-quick-list" role="group" aria-label="鹰角网络岗位相关专业快捷选择">
+    <div className="hhba-major-quick-list" role="group" aria-label="岗位相关专业快捷选择">
      <button type="button" className={'hhba-kpmg-major'+(!slug?' is-selected':'')} aria-pressed={!slug} onClick={()=>select('')}>全部专业 <small>{allJobs.length}</small></button>
      {quickMajors.map(option=>{
       const count=allJobs.filter(job=>{
