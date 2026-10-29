@@ -1,0 +1,35 @@
+name: HHBA Hypergryph Major Choices Gate
+on:
+  push:
+    branches: [fix/hypergryph-major-choices-20261029]
+  pull_request:
+    branches: [feat/hhba-unified-static-20261025]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Check Hypergryph professional chips and original V2 roles
+        working-directory: apps/web
+        run: |
+          node scripts/hypergryph-major-choices.contract.test.mjs
+          node scripts/major-company-job-flow.contract.test.mjs
+          node scripts/domestic-rebuild-v2.contract.test.mjs
+      - name: Production Vite build
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: npm run build
