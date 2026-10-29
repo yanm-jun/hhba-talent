@@ -22,13 +22,24 @@ test('official recruitment links are detected for 200-company profiles, global A
  ]){
   assert.equal(recruitmentTarget(link(url,label)),url,'not gated '+label);
  }
+ for(const [url,label] of [
+   ['https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=test','查看高校平台原始职位公告'],
+   ['https://example.com/notice','招聘入口核验依据'],
+   ['https://example.com/graduate','高校岗位招聘公告']
+ ])assert.equal(recruitmentTarget(link(url,label)),url,'recruitment source must be gated: '+label);
+ assert.equal(recruitmentTarget(link('https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment','华安证券招聘官网',
+   {dataset:{hhbaRecruitmentOutbound:'true'}})),'https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment');
+ assert.equal(recruitmentTarget(link('https://hahr.hazq.com:8083/other','华安证券招聘官网',
+   {dataset:{hhbaRecruitmentOutbound:'true'}})),null);
+ assert.equal(recruitmentTarget(link('https://jobs.example.com:444/jobs','官方招聘',
+   {dataset:{hhbaRecruitmentOutbound:'true'}})),null);
  assert.equal(recruitmentTarget(link('https://unusual.example.com/some-page','目录',{
    dataset:{hhbaRecruitmentOutbound:'true'}
  })),'https://unusual.example.com/some-page');
 });
 test('public source citations, ordinary navigation and invalid outbound URLs are never treated as recruitment links',()=>{
  for(const [url,label] of [
-  ['https://example.com/careers/2026/source','招聘入口核验依据'],
+  ['https://example.com/careers/2026/source','企业内部管理制度核验依据'],
   ['https://example.com/jobs','企业图片来源'],
   ['https://example.com/people','人物身份来源'],
   ['https://example.com/','公司简介']
@@ -74,13 +85,14 @@ test('the official external recruiting gate only accepts a real candidate identi
  const s=read('components/Shell.tsx');
  const next=read('pages/OfficialRecruitmentContinuePage.tsx');
  const demo=read('pages/DemoAuthPage.tsx');
- assert.ok(s.includes('verifiedCandidate=employerApiReady&&hasCandidate'));
+ assert.ok(s.includes('verifiedCandidate=hasCandidate&&(employerApiReady||realAuthReady)'));
+ assert.ok(s.includes("anchor.dataset.hhbaRecruitmentOutbound==='true'"));
  assert.ok(s.includes('if(!destination||verifiedCandidate)return'));
  assert.ok(s.includes('onClickCapture={guardRecruitmentClick}'));
  assert.ok(s.includes('onAuxClickCapture={guardRecruitmentClick}'));
  assert.ok(s.includes('onContextMenuCapture={guardRecruitmentContextMenu}'));
- assert.ok(next.includes("const signed=employerApiReady&&!!user?.account_types?.includes('candidate')"));
- assert.ok(next.includes("!employerApiReady?<><h2>正式账户服务尚未开通"));
+ assert.ok(next.includes("const signed=accountBackendReady&&!!user?.account_types?.includes('candidate')"));
+ assert.ok(next.includes("!accountBackendReady?<><h2>正式账户服务尚未开通"));
  assert.ok(!next.includes('useDemoAccount'));
  assert.ok(demo.includes('演示注册无法解锁第三方招聘官网'));
  assert.ok(s.includes("navigate('/candidate/register?next=%2Fcandidate%2Fofficial-outbound')"));
