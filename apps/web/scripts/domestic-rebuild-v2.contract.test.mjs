@@ -7,6 +7,8 @@ const china=JSON.parse(src('src/data/domesticSchneiderDetailedDossier20261029.js
 const kpmg=JSON.parse(src('src/data/domesticKpmgConcreteJobs20261029.json'));
 const huayu=JSON.parse(src('src/data/domesticHuayuVisionRoles20261029.json'));
 const huaan=JSON.parse(src('src/data/domesticHuaanSecuritiesRoles20261029.json'));
+const guangfa=JSON.parse(src('src/data/domesticGuangfaSecuritiesRoles20261029.json'));
+const guangfaProfile=src('src/pages/GuangfaSecuritiesCompactProfilePage.tsx');
 const huaanProfile=src('src/pages/HuaanSecuritiesCompactProfilePage.tsx');
 const huayuProfile=src('src/pages/HuayuVisionCompactProfilePage.tsx');
 const main=src('src/main.tsx');
@@ -59,7 +61,16 @@ assert(huaanProfile.includes("rolesData.jobs.filter"),'Professional selection fi
 assert(huaanProfile.includes("'/candidate/jobs/cn-v2-huaan-'+job.id"));
 assert(huaanProfile.includes('归属待核验'),'Original photos cannot be claimed authentic');
 assert(huaanProfile.includes('历史职位'));
-assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券']"));
+assert.equal(guangfa.jobCount,10,'Review exactly one new employer');
+assert.equal(new Set(guangfa.jobs.map(j=>j.id)).size,10);
+assert.equal(guangfa.applicationDeadline,'2026-09-30');
+assert(guangfa.jobs.every(j=>j.title&&j.city&&j.summary&&j.requirement&&j.sourceUrl&&j.officialListingUrl==='https://job.gf.com.cn/'&&j.currentOpenVerified===false));
+assert(guangfa.jobs.every(j=>j.deadline<'2026-10-29'),'Must explicitly mark campus jobs historical');
+assert(main.includes("if(route==='/companies/domestic/a-000776')return <GuangfaSecuritiesCompactProfilePage user={user}/>"));
+assert(guangfaProfile.includes("rolesData.jobs.filter"),'Major selector filters actual source-backed roles');
+assert(guangfaProfile.includes("'/candidate/jobs/cn-v2-guangfa-'+job.id"));
+assert(guangfaProfile.includes('归属待核验'),'Old company photos cannot masquerade as verified');
+assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券']"));
 assert(main.includes("if(route==='/companies/domestic/rel-huayu-004')return <HuayuVisionCompactProfilePage user={user}/>"),'Preserve old profile URL');
 assert(huayuProfile.includes("rolesData.jobs.filter"),'Major selector filters real jobs');
 assert(huayuProfile.includes("'/candidate/jobs/cn-v2-huayu-'+job.id"),'Onsite job detail for every role');
@@ -86,6 +97,12 @@ assert(branded.includes("autumn-real-logos/cn-autumn-002.svg"));
 assert(branded.includes("autumn-real-logos/cn-autumn-001.svg"));
 assert(branded.includes('domestic-media/user-f9727f3062cf91da52b3285c.png'));
 assert(branded.includes('domestic-media/user-4e84106ce0d3db721fab644a.png'));
+assert(branded.includes('domestic-media/user-bc5d9ca993044b7644390553.png'));
+assert(recruitment.includes("job.platform==='guangfa-securities-official'"));
+assert(ui.includes("job.platform==='guangfa-securities-official'?'查看广发证券官方招聘首页"));
+for(const f of ['user-bc5d9ca993044b7644390553.png','user-ee7dc13de9387efbca39caf1.webp','user-d1173b668561e62dec056169.webp'])
+ assert(existsSync('public/domestic-media/'+f),'GF existing media must be reused '+f);
+
 assert(recruitment.includes("job.platform==='huaan-securities-official'"));
 assert(ui.includes("job.platform==='huaan-securities-official'?'查看华安证券官方招聘报名系统"));
 for(const file of ['user-4e84106ce0d3db721fab644a.png','user-628c0cb2972a0ee5c3ef77b7.webp','user-0c1364cd23938f72c131e011.webp']){
@@ -100,4 +117,4 @@ for(const suffix of ['01','02']){
  const path='public/images/autumn-ai-scenes/cn-autumn-002-'+suffix+'.avif';
  assert(existsSync(path),'Reusing already created company photo '+path);
 }
-console.log('HHBA_DOMESTIC_V2_100_OVERSEAS_12_SCHNEIDER_6_KPMG_16_HUAYU_10_HUAAN_HISTORICAL_POSITIONS '+workflowBranch);
+console.log('HHBA_DOMESTIC_V2_100_OVERSEAS_12_SCHNEIDER_6_KPMG_16_HUAYU_10_HUAAN_10_GUANGFA_HISTORICAL_POSITIONS '+workflowBranch);
