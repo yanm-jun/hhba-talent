@@ -2,6 +2,7 @@
 import {loadPublicJobAudit} from './jobSyncStatus';
 import {searchJobs, type SearchFacet} from './jobSearchFacets.mjs';
 import {loadOfficialSearchFacets} from './officialSearchIndex';
+import {domesticV2Records, domesticV2ById, assertDomesticRebuildIntegrity} from './domesticRebuildJobs';
 export type Language = 'zh' | 'en';
 export type LiveJob = {
   id: string; company: string; companyZh?: string; title: string; titleZh?: string;
@@ -13,6 +14,7 @@ export type LiveJob = {
   currentApplicationVerified?: boolean;
   graduationYear?: number; responsibilitiesSummary?: string; requirementsSummary?: string;
   editorial?: CuratedEditorial; experienceMinYears?: number|null; skillSignals?: string[];
+  majorNames?: string[]; employerRoute?: string;
 };
 export type LiveFilters = {
   q: string; company: string; country: '' | 'cn' | 'global'; remote: boolean;
@@ -61,7 +63,11 @@ export function safeOfficialJobUrl(job: LiveJob) {
         'tencent-official': 'careers.tencent.com',
         'baidu-official': 'talent.baidu.com'
       };
-      if (u.hostname !== domesticHosts[job.platform || '']) return null;
+      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='schneider-official'&&job.source==='schneider-electric'){
+        const match=/^\/jobs\/([0-9]{6})$/.exec(u.pathname);
+        if(u.hostname!=='careers.se.com'||!match||job.id!=='cn-v2-schneider-'+match[1]||
+          !/^zh-cn$/i.test(u.searchParams.get('lang')||'')||[...u.searchParams.keys()].length!==1)return null;
+      }else if (u.hostname !== domesticHosts[job.platform || '']) return null;
     }
     return u.href;
   } catch { return null; }
@@ -189,6 +195,9 @@ type CuratedArchiveRow={
 const CURATED_100=import.meta.env.VITE_HHBA_CURATED_STATIC==='1';
 // Replace ONLY overseas ATS records on GitHub Pages; preserve existing domestic feed and detail readers.
 const OVERSEAS_CURATED_100=PAGES_PREVIEW && import.meta.env.VITE_HHBA_OVERSEAS_CURATED_100==='1';
+// Only on GitHub Pages: retire the legacy China market from PUBLIC listing.
+// Keep the source files/audits intact, and publish newly rebuilt employers one by one.
+const DOMESTIC_REBUILD_V2=PAGES_PREVIEW && import.meta.env.VITE_HHBA_DOMESTIC_REBUILD_V2==='1';
 let archivedCache:Promise<CuratedArchiveRow[]>|null=null;
 async function loadArchivedHundred(signal:AbortSignal):Promise<CuratedArchiveRow[]>{
   if(!archivedCache){
@@ -270,8 +279,67 @@ async function listArchivedJobs(filters:LiveFilters,offset:number,signal:AbortSi
     total:allowed.length,limit:30,offset,updated,boards:10,failures:0};
 }
 
+function rebuildListFilter(job:LiveJob,f:LiveFilters){
+ const domestic=job.recordKind==='DOMESTIC_REBUILT';
+ if(f.country==='cn'&&!domestic||f.country==='global'&&domestic)return false;
+ if(f.company){
+  const v=f.company.normalize('NFKC').toLowerCase();
+  if(![job.company,job.companyZh||''].some(x=>x.toLowerCase().includes(v))&&
+    !(domestic&&'schneider electric'.includes(v)))return false;
+ }
+ if(f.location_country){
+  const country=domestic?'CN':job.editorial?undefined:undefined;
+  const archiveCountry=job.id.startsWith('ashby-')||job.id.startsWith('greenhouse-')||
+    job.id.startsWith('lever-')?jobCountryCode(job):country;
+  if((archiveCountry||'').toUpperCase()!==f.location_country.toUpperCase())return false;
+ }
+ if(f.city){
+  const city=f.city.toLowerCase();
+  const cnCity:Record<string,string>={shanghai:'上海',beijing:'北京',guangzhou:'广州',shenzhen:'深圳'};
+  const normalized=(job.locationZh||job.location||'').toLowerCase();
+  if(!normalized.includes(city)&&!normalized.includes(cnCity[city]||city))return false;
+ }
+ if(f.remote&&job.remote!==true)return false;
+ if(f.recruitment_type){
+  const type=job.recruitmentType==='REGULAR'?'SOCIAL':job.recruitmentType||'';
+  const wanted=f.recruitment_type==='REGULAR'?'SOCIAL':f.recruitment_type;
+  if(type!==wanted)return false;
+ }
+ if(f.education&&f.education!=='UNRESTRICTED_OR_UNREPORTED'){
+  const labels:Record<string,string>={BACHELOR:'本科',MASTER:'硕士',PHD:'博士',ASSOCIATE:'专科'};
+  const degree=job.educationLabel||'';
+  if(!degree||!degree.includes(labels[f.education]||f.education))return false;
+ }
+ if(f.experience){
+  if(f.experience==='unreported'&&job.experienceMinYears!=null)return false;
+  if(f.experience==='0'&&job.experienceMinYears!==0)return false;
+  const y=job.experienceMinYears;
+  if(f.experience==='1-3'&&(y==null||y<1||y>3))return false;
+  if(f.experience==='3-5'&&(y==null||y<3||y>5))return false;
+  if(f.experience==='5+'&&(y==null||y<5))return false;
+ }
+ const words=f.q.normalize('NFKC').toLowerCase().trim().split(/\s+/).filter(Boolean);
+ const haystack=[job.title,job.titleZh,job.company,job.companyZh,job.location,job.locationZh,
+   ...(job.skillSignals||[]),...(job.majorNames||[]),job.responsibilitiesSummary].filter(Boolean).join(' ').normalize('NFKC').toLowerCase();
+ return words.every(w=>haystack.includes(w));
+}
+function jobCountryCode(job:LiveJob){
+ // All overseas curated data keeps its own country field in the original archive.
+ // Do not infer arbitrary countries from Chinese city names.
+ return job.countryCode||'';
+}
+export async function listDomesticRebuildMarket(filters:LiveFilters,offset:number,signal:AbortSignal):Promise<LivePage>{
+ assertDomesticRebuildIntegrity();
+ const overseas=await loadCuratedOverseasJobs(signal);
+ const combined=[...overseas,...domesticV2Records];
+ const allowed=combined.filter(job=>!!safeOfficialJobUrl(job)&&rebuildListFilter(job,filters));
+ return {jobs:allowed.slice(offset,offset+30),total:allowed.length,offset,limit:30,
+   boards:11,failures:0,updated:'2026-10-29T00:00:00Z'};
+}
+
 export async function listJobs(filters: LiveFilters, offset: number, signal: AbortSignal) {
   if(CURATED_100)return listArchivedJobs(filters,offset,signal);
+  if(DOMESTIC_REBUILD_V2)return listDomesticRebuildMarket(filters,offset,signal);
   if(PAGES_PREVIEW) {
     const [snapshot,overseas]=await Promise.all([
       previewSnapshot(signal),
@@ -339,6 +407,11 @@ export async function listJobs(filters: LiveFilters, offset: number, signal: Abo
 }
 export async function getJob(id: string,signal: AbortSignal) {
   if(!safeId(id)) throw new Error('无效的岗位编号');
+  if(DOMESTIC_REBUILD_V2){
+    const domestic=domesticV2ById(id);
+    if(domestic){if(!safeOfficialJobUrl(domestic))throw new Error('国内岗位来源无效');
+      return {job:domestic,description:null,richHtml:null,applyUrl:null} as LiveDetail;}
+  }
   if(CURATED_100){
     const original=(await loadArchivedHundred(signal)).find(row=>row.id==='curated-'+id);
     if(!original)throw Error('该岗位未在精选资料库中');
