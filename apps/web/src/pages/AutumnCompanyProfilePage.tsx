@@ -21,7 +21,7 @@ import '../styles/company-profiles.css';
 import '../styles/domestic-autumn-market.css';
 
 type Employer={id:string;name:string;reviewStatus:string;officialUrl:string|null;evidenceUrl:string|null;notes:string|null;screenshotGroup:string};
-type RecordInfo={id:string;company:string;title:string;majors:string[];cities:string[];education:string;recruitmentType:string;recordKind:'job'|'program';locationScope:string;sourceUrl:string;observedOn:string;note:string};
+type RecordInfo={id:string;company:string;title:string;majors:string[];cities:string[];education:string;recruitmentType:string;recordKind:'job'|'program';locationScope:string;sourceUrl:string;observedOn:string;note:string;responsibilities?:string;requirements?:string};
 type Editorial={displayName?:string;subtitle?:string;summary?:string;description?:string[];business?:{title:string;description:string}[];officialSource?:string;primaryIndustry?:string;subIndustry?:string;officeLocations?:{type:string;address:string;source:string}[];milestones?:{date:string;description:string}[];contentReview?:string};
 type OfficialEditorial={industry:string|null;intro:string|null;source:string|null;officialRecruitment:string|null;recruitmentLabel:string|null;evidenceScope:string};
 type AiScene={id:string;path:string;kind:string;status:string;sourceLabel:string;alt:string};
@@ -253,6 +253,8 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
    {matched.length?<div className="company-profile-job-grid">
     {matched.map(j=><div key={j.id} className="company-profile-job-card company-profile-autumn-job">
      <strong>{j.title}</strong>
+     {j.responsibilities&&<p><b>岗位职责：</b>{j.responsibilities}</p>}
+     {j.requirements&&<p><b>任职要求：</b>{j.requirements}</p>}
      <span><GraduationCap size={13}/>{j.recordKind==='job'?'有来源的具体岗位':'招聘项目／方向'} · {j.majors.length?j.majors.join('、'):'专业未逐岗披露'}</span>
      <span><MapPin size={13}/>{j.cities.length?j.cities.join('、'):'地点待核验'}{j.locationScope==='program'?'（项目城市）':''}</span>
      {safeUrl(j.sourceUrl)&&<a href={safeUrl(j.sourceUrl)!} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">
