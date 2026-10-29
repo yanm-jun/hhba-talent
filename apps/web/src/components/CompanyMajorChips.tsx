@@ -3,6 +3,7 @@ import {CheckCircle2,ChevronDown} from 'lucide-react';
 import {MAJOR_OPTIONS,majorById} from '../services/domesticMajors';
 import {majorName,matchRoleToMajor} from '../services/majorJobMatching';
 import type {LiveJob} from '../services/liveRecruitment';
+import '../styles/major-company-flow.css';
 
 type IndexedJob=Pick<LiveJob,'majorNames'|'editorialRelatedMajors'|'majorUnrestricted'>;
 type Choice={slug:string;name:string;count:number};
