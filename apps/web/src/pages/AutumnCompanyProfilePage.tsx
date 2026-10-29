@@ -13,6 +13,7 @@ import generatedScenes from '../data/domesticAutumnAiScenes.json';
 import businessDraftA from '../data/domesticAutumnBusinessDraft001.json';
 import businessDraftB from '../data/domesticAutumnBusinessDraft002.json';
 import verifiedHistory from '../data/domesticAutumnMilestonesVerified20261029.json';
+import kpmgDossier from '../data/domesticKpmgDetailedDossier20261029.json';
 import mediaA from '../data/domesticMediaBundle.json';
 import mediaB from '../data/domesticMedia200Bundle.json';
 import type {User} from '../services/api';
@@ -29,6 +30,9 @@ type BusinessItem={title:string;description:string};
 type BusinessDraft={business:BusinessItem[];reviewLevel:string};
 type Milestone={date:string;description:string;source:string};
 type MilestoneEvidence={businessSource:string;businessEvidence:string;milestones:Milestone[]};
+type KpmgSourceKey=typeof kpmgDossier.sources[number]['key'];
+const sourceFromDossier=(key:KpmgSourceKey)=>kpmgDossier.sources.find(s=>s.key===key)?.url||'';
+
 
 const employers=employersJSON.entries as Employer[];
 const jobs=jobsJSON.jobs as RecordInfo[];
@@ -51,6 +55,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
  const existing=useMemo(()=>employer?getDomesticCompanies().find(c=>c.name===employer.name):null,[employer?.name]);
  const editorial=employer?profiles[employer.name]:undefined;
  const officialArticle=employer?reviewedOfficial[employer.name]:undefined;
+ const kpmg=id==='cn-autumn-001'?kpmgDossier:null;
  const businessDraft=businessDrafts[id];
  const documentedHistory=documentedHistories[id];
  const companyBusiness=editorial?.business?.length?editorial.business:businessDraft?.business||[];
@@ -76,7 +81,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
    id:photo.path||String(i),path:photo.path!,alt:employer?.name+'有来源的企业实景',caption:'已记录来源的企业场景照片',isAi:false
  }));
  const primary=safeUrl(employer?.officialUrl)||safeUrl(recruitment?.url)||safeUrl(officialArticle?.officialRecruitment);
- const website=safeUrl(existing?.website);
+ const website=safeUrl(kpmg?.website)||safeUrl(existing?.website);
  const hasCompanyEditorial=Boolean(editorial?.summary?.trim());
  const sourceCandidates=[
    {label:'企业介绍原始来源',url:safeUrl(officialArticle?.source)},
@@ -84,6 +89,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
    {label:'企业名录来源',url:safeUrl(existing?.sourceUrl)},
    {label:'企业发展历程及业务来源',url:safeUrl(documentedHistory?.businessSource)},
    {label:'招聘公告依据',url:safeUrl(employer?.evidenceUrl)},
+   ...(kpmg?kpmg.sources.map(s=>({label:s.label,url:safeUrl(s.url)})):[]),
  ];
  const seen=new Set<string>();
  const sources=sourceCandidates.filter((s):s is {label:string;url:string}=>{
@@ -111,7 +117,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
    <div className="company-profile-identity">
     <div className="company-profile-eyebrow">HHBA · COMPANY PROFILE</div>
     <h1>{employer.name}</h1>
-    <p>{editorial?.subtitle||editorial?.primaryIndustry||officialArticle?.industry||existing?.industry||'企业资料正在完善'}</p>
+    <p>{kpmg?.headline||editorial?.subtitle||editorial?.primaryIndustry||officialArticle?.industry||existing?.industry||'企业资料正在完善'}</p>
    </div>
    {website&&<a className="company-profile-website" href={website} target="_blank" rel="noopener noreferrer" data-hhba-non-recruitment-link="true">
     企业官网 <ExternalLink size={15}/>
@@ -121,19 +127,39 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
    <span>{editorial?.primaryIndustry||officialArticle?.industry||existing?.industry||'行业待核实'}</span>
    {region&&<span>{region}</span>}
    {existing?.stockCode&&<span>证券代码 {existing.stockCode}</span>}
+   {kpmg&&<span>中国业务 · 官方资料核验于 {kpmg.reviewedOn}</span>}
    <span>{employer.reviewStatus==='official_entry_evidenced'?'招聘来源已核对':employer.reviewStatus==='announcement_evidenced'?'招聘公告有依据':'招聘状态待核验'}</span>
   </div>
   <p className="company-profile-editorial"><ShieldCheck size={16}/>
    HHBA 依据公开资料独立整理企业档案，不代表企业官方合作；企业商标归相应权利人所有。
   </p>
+  {kpmg&&<div className="company-profile-autumn-stats" aria-label="毕马威中国官方披露概览">
+    {kpmg.stats.map(stat=><div className="company-profile-autumn-stat" key={stat.label}>
+      <strong>{stat.value}<small>{stat.unit}</small></strong>
+      <span>{stat.label}</span>
+      <a href={sourceFromDossier(stat.source)} target="_blank" rel="noopener noreferrer" data-hhba-non-recruitment-link="true">官网来源 <ExternalLink size={12}/></a>
+    </div>)}
+  </div>}
 
   <section className="company-profile-section">
    <h2>关于企业</h2>
-   {hasCompanyEditorial?<><p>{editorial!.summary}</p>
+   {kpmg?<>{kpmg.overview.map((paragraph,i)=><p key={i}>{paragraph}</p>)}</>:
+   hasCompanyEditorial?<><p>{editorial!.summary}</p>
     {(editorial?.description||[]).slice(0,4).map((paragraph,i)=><p key={i}>{paragraph}</p>)}
    </>:officialArticle?.intro&&safeUrl(officialArticle.source)?<p>{officialArticle.intro}</p>:
     <p>HHBA 收录的 {employer.name} 企业资料主要涉及{companyBusiness.map(b=>b.title).join('、')}等业务领域；这些领域为编辑检索方向，尚不代表已经完成对具体经营主体的官方核验。</p>}
-   {editorial?.officeLocations?.length? <div className="company-profile-autumn-locations">
+   {kpmg&&<div className="company-profile-autumn-verified-offices">
+    <div className="company-profile-autumn-subhead">
+      <h3>中国主要办事处（官网列示地址）</h3>
+      <a href={sourceFromDossier('offices')} target="_blank" rel="noopener noreferrer" data-hhba-non-recruitment-link="true">查看全国办事处 <ExternalLink size={14}/></a>
+    </div>
+    <div className="company-profile-autumn-office-grid">
+      {kpmg.officeLocations.map(office=><div key={office.city}>
+        <strong>{office.city}</strong><span>{office.address}</span>
+      </div>)}
+    </div>
+  </div>}
+   {editorial?.officeLocations?.length&&!kpmg? <div className="company-profile-autumn-locations">
     {editorial.officeLocations.filter(o=>!!safeUrl(o.source)).map((place,i)=><p key={i}><MapPin size={15}/>{place.type}：{place.address}</p>)}
    </div>:null}
    {existing?.route&&<Link to={existing.route} className="company-profile-autumn-more">查看已有的企业档案资料 <ArrowRight size={15}/></Link>}
@@ -159,18 +185,39 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
   </section>
 
   <section className="company-profile-section">
-   <h2>主要业务与代表产品</h2>
-   <div className="company-profile-focus-grid">
+   <h2>{kpmg?'主要业务与专业服务':'主要业务与代表产品'}</h2>
+   {kpmg&&<p className="company-profile-autumn-introline">不同于销售实体产品的公司，毕马威的核心价值来自专业服务团队、行业知识与项目交付。以下依据毕马威中国官方服务栏目，按实际业务路径梳理。</p>}
+   {kpmg?<div className="company-profile-autumn-service-grid">
+    {kpmg.services.map((service,i)=><article className="company-profile-autumn-service" key={service.title}>
+      <div className="company-profile-autumn-service-index">{String(i+1).padStart(2,'0')} · 专业服务</div>
+      <h3>{service.title}</h3><strong>{service.subtitle}</strong>
+      <p>{service.description}</p>
+      <div className="company-profile-autumn-service-detail"><span>典型服务内容</span>
+        <ul>{service.deliverables.map(entry=><li key={entry}>{entry}</li>)}</ul>
+      </div>
+      <div className="company-profile-autumn-career-hint"><span>求职者可关注</span><p>{service.career}</p></div>
+      <a href={sourceFromDossier(service.source)} target="_blank" rel="noopener noreferrer" data-hhba-non-recruitment-link="true">官方服务说明 <ExternalLink size={13}/></a>
+    </article>)}
+   </div>:<div className="company-profile-focus-grid">
     {companyBusiness.map((item,i)=><div className="company-profile-focus" key={i}>
      <h3>{item.title}</h3><p>{item.description}</p>
     </div>)}
-   </div>
-   {!editorial?.business?.length&&!documentedHistory&&<p className="company-profile-autumn-review-note">以上为逐企业整理的业务方向清单，目前属于编辑待核稿，具体经营范围与产品名称以该企业官方资料为准。</p>}
+   </div>}
+   {!kpmg&&!editorial?.business?.length&&!documentedHistory&&<p className="company-profile-autumn-review-note">以上为逐企业整理的业务方向清单，目前属于编辑待核稿，具体经营范围与产品名称以该企业官方资料为准。</p>}
   </section>
 
   <section className="company-profile-section">
    <h2>发展与重要节点</h2>
-   {milestones.length?<div className="company-profile-milestones">
+   {kpmg&&<p className="company-profile-autumn-introline">以下区分毕马威在华发展的关键事件与国际网络历史，避免将全球网络合并视为中国内地法律实体的成立日期。</p>}
+   {kpmg?<div className="company-profile-milestones">
+    {kpmg.milestones.map(item=><div className="company-profile-milestone" key={item.year}>
+      <strong>{item.year}</strong><div className="company-profile-autumn-event">
+        <div className="company-profile-autumn-event-header"><b>{item.title}</b><span>{item.scope}</span></div>
+        <p>{item.description}</p>
+        <a href={sourceFromDossier(item.source)} target="_blank" rel="noopener noreferrer" data-hhba-non-recruitment-link="true">官方历史资料 <ExternalLink size={13}/></a>
+      </div>
+    </div>)}
+   </div>:milestones.length?<div className="company-profile-milestones">
     {milestones.map((item,i)=><div className="company-profile-milestone" key={i}>
      <strong>{item.date}</strong><div className="company-profile-autumn-event"><p>{item.description}</p>
       <a href={item.source} target="_blank" rel="noopener noreferrer" data-hhba-non-recruitment-link="true">节点出处 <ExternalLink size={13}/></a></div>
@@ -186,6 +233,23 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
     </div>
     <Link to="/candidate/jobs">浏览招聘市场 <ArrowRight size={15}/></Link>
    </div>
+   {kpmg&&<>
+    <p className="company-profile-autumn-introline">毕马威中国官网分别提供应届生、实习生、社会招聘与交付中心的独立入口；以下是招聘类别和专业方向，不是 HHBA 实时核验的具体在招职位。</p>
+    <div className="company-profile-autumn-route-grid">
+      {kpmg.careers.map(route=><article className="company-profile-autumn-route" key={route.title}>
+        <span>{route.tag}</span><h3>{route.title}</h3><p>{route.description}</p>
+        <div className="company-profile-autumn-route-eligibility">{route.eligibility}</div>
+        <a href={sourceFromDossier(route.source)} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">查看官方项目入口 <ExternalLink size={14}/></a>
+      </article>)}
+    </div>
+    <h3 className="company-profile-autumn-h3">求职前值得了解的四件事</h3>
+    <div className="company-profile-autumn-tip-grid">
+      {kpmg.careerNotes.map(tip=><div key={tip.title}><strong>{tip.title}</strong><p>{tip.description}</p></div>)}
+    </div>
+    <h3 className="company-profile-autumn-h3">官方网申参考流程</h3>
+    <ol className="company-profile-autumn-steps">{kpmg.applicationProcess.map((step,i)=><li key={i}>{step}</li>)}</ol>
+    <p className="company-profile-autumn-safety"><ShieldCheck size={17}/> <span>{kpmg.antiFraud} <a href={sourceFromDossier('safety')} target="_blank" rel="noopener noreferrer" data-hhba-non-recruitment-link="true">查看官方防诈骗提示 <ExternalLink size={13}/></a></span></p>
+   </>}
    {matched.length?<div className="company-profile-job-grid">
     {matched.map(j=><div key={j.id} className="company-profile-job-card company-profile-autumn-job">
      <strong>{j.title}</strong>
@@ -195,7 +259,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
       查看历史公告来源 <ExternalLink size={14}/>
      </a>}
     </div>)}
-   </div>:<p className="company-profile-jobs-state">当前未找到与该企业准确对应、可确认仍在招的具体职位。收录企业不意味着当前开放招聘。</p>}
+   </div>:!kpmg?<p className="company-profile-jobs-state">当前未找到与该企业准确对应、可确认仍在招的具体职位。收录企业不意味着当前开放招聘。</p>:null}
    {primary?<div className="company-profile-autumn-official">
     <a data-hhba-recruitment-outbound="true" href={primary} target="_blank" rel="noopener noreferrer">
      <GraduationCap size={18}/> 查看已定位的官方招聘渠道 <ExternalLink size={16}/>
@@ -207,6 +271,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
   <section className="company-profile-section company-profile-sources">
    <h2>信息来源</h2>
    <p>企业介绍与历史招聘公告分别对应公开来源，未核实的数据不会标为实时在招。</p>
+   {kpmg&&<p className="company-profile-autumn-review-note">毕马威精品档案核验日期：{kpmg.reviewedOn}。以下为本页业务、历史、地址和招聘指南对应的毕马威官方来源；历史节点和产品/业务方向均可继续独立查证。</p>}
    {sources.length?sources.map(s=><a key={s.url} href={s.url} target="_blank" rel="noopener noreferrer" data-hhba-non-recruitment-link="true">
     {s.label} <ExternalLink size={14}/>
    </a>):<small>该企业暂无可确认的公开介绍来源，相关字段保留待核验状态。</small>}
