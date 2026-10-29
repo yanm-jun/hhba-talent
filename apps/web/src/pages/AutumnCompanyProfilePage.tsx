@@ -111,6 +111,16 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
     <AutumnIndustryReferenceGallery companyId={id} companyName={employer.name}/>
     {websiteCaptures.length>0&&<><h3 className="hhba-autumn-subsection-title">企业网站截图（不是办公实景）</h3><div className="hhba-autumn-local-photo-grid">{websiteCaptures.map((photo,i)=><figure key={photo.path||i}><img loading="lazy" src={import.meta.env.BASE_URL+photo.path!} alt={employer.name+'网站页面截图'}/><figcaption>企业网站页面留档 · 非企业实景</figcaption></figure>)}</div></>}
    </section>
+    <section className="hhba-autumn-profile-panel">
+     <h2>主要业务与代表产品</h2>
+     {editorial?.business?.length?<div className="hhba-autumn-profile-business-grid">{editorial.business.map((item,i)=><article key={i}><h3>{item.title}</h3><p>{item.description}</p></article>)}</div>:
+      <p className="hhba-autumn-profile-note">该企业的具体产品、服务和业务部门正在核验中。暂不根据行业通用描述编造产品或名称。</p>}
+     {editorial?.officialSource&&safeUrl(editorial.officialSource)&&<a href={safeUrl(editorial.officialSource)!} data-hhba-non-recruitment-link="true" target="_blank" rel="noopener noreferrer" className="hhba-autumn-profile-source">查看企业业务资料来源 <BookOpen size={14}/></a>}
+    </section>
+    <section className="hhba-autumn-profile-panel">
+     <h2>发展与重要节点</h2>
+     <p className="hhba-autumn-profile-note">仅在官方公告或可靠企业资料能够明确对应日期与事件后列出时间节点。未经核实的成立年份、融资或发展事件不作展示。</p>
+    </section>
    <section className="hhba-autumn-profile-panel">
     <h2>已整理的相关岗位和招聘项目</h2>
     <p className="hhba-autumn-profile-note">逐岗专业、城市和学历信息仅在公告提供对应证据时展示，招聘项目的城市不等于每个岗位的城市。</p>
