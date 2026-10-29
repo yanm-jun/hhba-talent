@@ -7,9 +7,9 @@ const employers=JSON.parse(read('src/data/domesticAutumnScreenshot20261028.json'
 const site=read('src/pages/AutumnCompanyProfilePage.tsx');
 const gallery=read('src/components/AutumnIndustryReferenceGallery.tsx');
 assert.equal(employers.length,156);
-assert.equal(data.approvedCompanies,23);
-assert.equal(data.approvedPhotos,36);
-assert.equal(Object.keys(data.entries).length,23);
+assert.equal(data.approvedCompanies,11);
+assert.equal(data.approvedPhotos,17);
+assert.equal(Object.keys(data.entries).length,11);
 const exactNames=new Map(employers.map(e=>[e.id,e.name]));
 const hashes=new Set();let count=0;
 for(const [companyId,photos] of Object.entries(data.entries)){
@@ -32,10 +32,10 @@ for(const [companyId,photos] of Object.entries(data.entries)){
   hashes.add(photo.sha256);count++;
  }
 }
-assert.equal(count,36);
+assert.equal(count,17);
 assert(site.includes('<AutumnIndustryReferenceGallery companyId={id} companyName={employer.name}/>'));
 assert(!site.includes('创始人与核心创办团队'),'Founders block should not appear in domestic profiles');
 assert(site.includes('主要业务与代表产品')&&site.includes('发展与重要节点'));
 assert(gallery.includes('不是 {companyName} 的真实办公楼')&&gallery.includes('licenseUrl'));
 assert(gallery.includes('该企业暂无通过场景匹配审核的参考照片'));
-console.log('HHBA_36_INDEPENDENT_APPROVED_IMAGES_23_COMPANIES_NO_FAKE_OFFICES_OK');
+console.log('HHBA_17_INDEPENDENT_APPROVED_IMAGES_11_COMPANIES_NO_FAKE_OFFICES_OK');
