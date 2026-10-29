@@ -1,10 +1,10 @@
 import {useEffect,useState} from 'react';
 import {ArrowRight,BriefcaseBusiness,CheckCircle2,GraduationCap} from 'lucide-react';
-import {Link} from '../router';
+import {Link,getCompanyReturnTarget} from '../router';
 import {MajorFilter} from './MajorFilter';
 import {domesticV2Records} from '../services/domesticRebuildJobs';
 import {majorName,matchRoleToMajor,majorMatchLabel,getSavedMajor,storeSelectedMajor} from '../services/majorJobMatching';
-import {safeOfficialJobUrl} from '../services/liveRecruitment';
+import {safeOfficialJobUrl,rebuildListFilter} from '../services/liveRecruitment';
 import type {LiveJob} from '../services/liveRecruitment';
 import '../styles/major-company-flow.css';
 
@@ -24,20 +24,26 @@ export function useSharedMajorSelection(){
  }
  return {slug,choose};
 }
-type View='matched'|'all'|'unknown';
+type View='matched'|'all'|'unknown'|'included';
 function roleView(job:LiveJob,slug:string,view:View){
  if(view==='all'||!slug)return true;
  const result=matchRoleToMajor(job,slug);
- return view==='unknown'?result==='unknown':result==='related'||result==='unrestricted';
+ return view==='unknown'?result==='unknown':view==='included'?result==='unknown'||result==='related'||result==='unrestricted':result==='related'||result==='unrestricted';
 }
 /** Same job IDs, titles, and matching predicate as /candidate/jobs. No separate employer-specific role cache. */
 export function CompanyMajorJobs({companyRoute}:{companyRoute:string}){
  const {slug,choose}=useSharedMajorSelection();
- const [view,setView]=useState<View>('matched');
- const jobs=domesticV2Records.filter(j=>j.employerRoute===companyRoute&&!!safeOfficialJobUrl(j));
+ const [view,setView]=useState<View>(()=>new URLSearchParams(location.search).get('unknown')==='1'?'included':'matched');
+ const allJobs=domesticV2Records.filter(j=>j.employerRoute===companyRoute&&!!safeOfficialJobUrl(j));
+ const incoming=getCompanyReturnTarget().marketState?.filters;
+ // Carry ALL filters along the market -> employer jump. These are stored by the router
+ // and are ignored for a direct employer deep link without a market origin.
+ const inherited=incoming&&typeof incoming.major_slug==='string'&&incoming.major_slug===slug
+   ?incoming as unknown as import('../services/liveRecruitment').LiveFilters:null;
+ const jobs=inherited?allJobs.filter(j=>rebuildListFilter(j,{...inherited,major_slug:''})):allJobs;
  const related=jobs.filter(j=>roleView(j,slug,'matched'));
  const unknown=slug?jobs.filter(j=>roleView(j,slug,'unknown')):[];
- const current=!slug||view==='all'?jobs:view==='unknown'?unknown:related;
+ const current=!slug||view==='all'?allJobs:view==='unknown'?unknown:view==='included'?jobs.filter(j=>roleView(j,slug,'included')):related;
  const select=(next:string)=>{choose(next);setView('matched')};
  const label=majorName(slug);
  return <>
@@ -55,11 +61,12 @@ export function CompanyMajorJobs({companyRoute}:{companyRoute:string}){
   <section className="hhba-kpmg-section hhba-major-linked-jobs" aria-labelledby="hhba-shared-roles-title">
    <div className="hhba-kpmg-section-heading"><div>
     <h2 id="hhba-shared-roles-title">招聘岗位</h2>
-    <p>{!slug?`已收录 ${jobs.length} 条岗位资料`:`当前专业：${label} · ${related.length} 条相关/不限专业 · ${unknown.length} 条专业未披露`}。是否仍在招聘、学历和专业硬性要求请以官网为准。</p>
+    <p>{!slug?`已收录 ${allJobs.length} 条岗位资料`:`当前专业：${label} · ${related.length} 条相关/不限专业 · ${unknown.length} 条专业未披露`}。是否仍在招聘、学历和专业硬性要求请以官网为准。</p>
    </div></div>
    <div className="hhba-major-view-tabs" role="group" aria-label="岗位筛选方式">
     {slug&&<button type="button" aria-pressed={view==='matched'} className={view==='matched'?'is-selected':''} onClick={()=>setView('matched')}>相关岗位（{related.length}）</button>}
-    <button type="button" aria-pressed={!slug||view==='all'} className={!slug||view==='all'?'is-selected':''} onClick={()=>setView('all')}>查看全部岗位（{jobs.length}）</button>
+    <button type="button" aria-pressed={!slug||view==='all'} className={!slug||view==='all'?'is-selected':''} onClick={()=>setView('all')}>查看全部岗位（{allJobs.length}）</button>
+    {slug&&unknown.length>0&&<button type="button" aria-pressed={view==='included'} className={view==='included'?'is-selected':''} onClick={()=>setView('included')}>包含待核验（{related.length+unknown.length}）</button>
     {slug&&unknown.length>0&&<button type="button" aria-pressed={view==='unknown'} className={view==='unknown'?'is-selected':''} onClick={()=>setView('unknown')}>专业待核验（{unknown.length}）</button>}
    </div>
    <div className="hhba-kpmg-role-list" aria-live="polite">
