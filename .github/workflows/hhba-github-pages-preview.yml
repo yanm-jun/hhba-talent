@@ -1,5 +1,5 @@
 name: HHBA Unified Static Site GitHub Pages
-# Photo preview integration build: 156 companies, 312 uniquely sourced, individually attributed images.
+# Photo preview integration build: 156 companies, 312 uniquely sourced, individually attributed images; gallery TSX corrected.
 on:
   push:
     branches: [main]
