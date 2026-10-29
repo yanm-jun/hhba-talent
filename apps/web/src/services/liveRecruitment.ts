@@ -15,7 +15,7 @@ export type LiveJob = {
   currentApplicationVerified?: boolean;
   graduationYear?: number; responsibilitiesSummary?: string; requirementsSummary?: string;
   editorial?: CuratedEditorial; experienceMinYears?: number|null; skillSignals?: string[];
-  majorNames?: string[]; editorialRelatedMajors?: string[]; employerRoute?: string; positionOrg?: string; evidenceUrl?: string;
+  majorNames?: string[]; majorUnrestricted?: boolean; editorialRelatedMajors?: string[]; employerRoute?: string; positionOrg?: string; evidenceUrl?: string;
   countryCode?: string|null; cityKey?: string|null;
 };
 export type LiveFilters = {
