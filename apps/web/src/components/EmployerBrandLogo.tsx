@@ -26,7 +26,7 @@ export function EmployerBrandLogo({job,identity,variant='card'}:LogoProps){
     ?'company-profile-brand'+(asset?.wide?' company-profile-brand-wide':'')
     :'unified-brand-logo'+(asset?.wide?' unified-brand-logo-wide':'');
   if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='中国南方航空')
-    return <span className={cls} title="中国南方航空（用户提供品牌素材）"><img src={import.meta.env.BASE_URL+'images/csair-user/csair-logo.webp'} alt="中国南方航空品牌图" loading="eager" decoding="async"/></span>;
+    return <span className={cls} title="中国南方航空（用户提供品牌素材）"><img src={import.meta.env.BASE_URL+'images/csair-user/csair-logo.png'} alt="中国南方航空品牌图" loading="eager" decoding="async"/></span>;
   if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='辉瑞')
     return <span className={cls} title="辉瑞 Pfizer"><img src={import.meta.env.BASE_URL+'images/pfizer-user/pfizer-logo.webp'} alt="辉瑞 Pfizer 用户提供的品牌 Logo" loading="eager" decoding="async"/></span>;
   if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='中信证券')
