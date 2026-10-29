@@ -6,6 +6,7 @@ import {domesticV2Records} from '../services/domesticRebuildJobs';
 import {majorName,matchRoleToMajor,majorMatchLabel,getSavedMajor,storeSelectedMajor} from '../services/majorJobMatching';
 import {safeOfficialJobUrl,rebuildListFilter} from '../services/liveRecruitment';
 import type {LiveJob} from '../services/liveRecruitment';
+import '../styles/unified-jobs.css';
 import '../styles/major-company-flow.css';
 
 export function useSharedMajorSelection(){
