@@ -68,4 +68,16 @@ export function AutumnIndustryReferenceGallery({companyId,companyName}:{companyI
      </figcaption>
     </figure>
    )}</div>}
+ {research.length>0&&<div className="hhba-autumn-research-preview">
+   <h3>独立行业图库 · 待逐张匹配核验</h3>
+   <p className="hhba-autumn-profile-note">以下两张属于行业图库参考，尚未逐张核对图片内容是否与 {companyName} 的具体业务吻合，不是该企业真实总部、员工或工厂。</p>
+   <div className="hhba-autumn-local-photo-grid hhba-autumn-references">{research.map(p=><figure key={p.id}>
+     <div className="hhba-autumn-ref-img"><img src={import.meta.env.BASE_URL+p.file} loading="lazy" alt={p.alt}/><span>未核验行业参考 · 非企业实景</span></div>
+     <figcaption><strong>独立照片 · 待人工核验</strong><small>作者：{p.author} · {p.license} · 裁切及缩放</small>
+       <span className="hhba-autumn-ref-links"><a href={p.sourceUrl} target="_blank" rel="noopener noreferrer" data-hhba-non-recruitment-link="true">原图与署名 <ExternalLink size={12}/></a><a href={p.licenseUrl} target="_blank" rel="noopener noreferrer" data-hhba-non-recruitment-link="true">许可 <ExternalLink size={12}/></a></span>
+     </figcaption>
+   </figure>)}</div>
+ </div>}
  </section>;
+}
+
