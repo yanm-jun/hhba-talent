@@ -1,0 +1,55 @@
+name: HHBA Hypergryph Photo + Major Search Acceptance
+on:
+  push:
+    branches: [feat/hypergryph-11th-profile-20261029]
+  pull_request:
+    branches: [feat/hhba-unified-static-20261025]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Confirm all three images are exactly the original bytes
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          import {createHash} from 'node:crypto';
+          const expected={
+            'hypergryph-logo.png':'95da61c478492bc3e523df8bbbf1490d2f2d03c25da124006ab2354e60b7086c',
+            'hypergryph-reception.png':'532a33075ab0b867e1ffd4fd8d919b82f4075283e92018707a2cccc909481f23',
+            'hypergryph-recruitment-art.png':'a84e50f6ee2ce456a2072a34346beedb4b8af8ee65a7ab79d750c718db1b14ca'
+          };
+          for(const [name,sha] of Object.entries(expected)){
+            const bytes=readFileSync('public/images/hypergryph-user/'+name);
+            if(createHash('sha256').update(bytes).digest('hex')!==sha)
+              throw Error('Original user image changed: '+name);
+            console.log('BYTE_IDENTICAL_PNG',name,bytes.length);
+          }
+          NODE
+      - name: Protect previous companies and verify job-major link
+        working-directory: apps/web
+        run: |
+          node scripts/major-company-job-flow.contract.test.mjs
+          node scripts/domestic-rebuild-v2.contract.test.mjs
+          node scripts/kpmg-recruitment-first.contract.test.mjs
+          node scripts/schneider-recruitment-first.contract.test.mjs
+      - name: Build standalone GitHub Pages frontend
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+        run: npm run build

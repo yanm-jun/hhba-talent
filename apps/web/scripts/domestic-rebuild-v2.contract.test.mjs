@@ -93,7 +93,7 @@ assert(citicsProfile.includes('<CompanyMajorJobs companyRoute="/companies/domest
 assert(sharedMatching.includes("return 'unrestricted'"),'Explicit unrestricted roles remain visible for any major');
 assert(sharedJobs.includes("'/candidate/jobs/'+encodeURIComponent(job.id)"),'Shared on-site role detail');
 assert(citicsProfile.includes('归属待核验'),'Legacy image authenticity not invented');
-assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券','辉瑞','中国南方航空','顺丰','网易游戏']"));
+assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券','辉瑞','中国南方航空','顺丰','网易游戏','鹰角网络']"));
 const csair=JSON.parse(src('src/data/domesticCsairVerifiedPositions20261029.json'));
 const csairPage=src('src/pages/CsairCompactProfilePage.tsx');
 assert.equal(csair.jobs.length,6,'Exactly six source-backed China Southern jobs from official listings');
@@ -105,7 +105,7 @@ assert(csairPage.includes('<CompanyMajorJobs companyRoute="/companies/autumn/cn-
 assert(csairPage.indexOf('CompanyMajorJobs')<csairPage.indexOf('主要业务与专业服务'),'Preserve image, major/jobs, business order');
 assert(sharedJobs.includes('encodeURIComponent(job.id)'), 'CSAIR links use unified HHBA detail');
 assert(csairPage.includes('data-hhba-recruitment-outbound="true"'));
-assert(index.includes('csairV2Records.length!==6||sftechV2Records.length!==17||neteaseV2Records.length!==14||domesticV2Records.length!==100'));
+assert(index.includes('csairV2Records.length!==6||sftechV2Records.length!==17||neteaseV2Records.length!==14||hypergryphV2Records.length!==20||domesticV2Records.length!==120'));
 const sf=JSON.parse(src('src/data/domesticSfTechCampusRoles20261029.json'));
 const sfPage=src('src/pages/SfExpressCompactProfilePage.tsx');
 assert.equal(sf.jobs.length,17,'Keep 17 distinct positions evidenced by SF Technology 2027 campus announcement');
@@ -117,11 +117,27 @@ assert(sfPage.includes('<CompanyMajorJobs companyRoute="/companies/autumn/cn-aut
 assert(sfPage.indexOf('CompanyMajorJobs')<sfPage.indexOf('主要业务与专业服务'));
 assert(sharedJobs.includes('encodeURIComponent(job.id)'),'SF Tech jobs use unified details');
 assert(sfPage.includes('data-hhba-recruitment-outbound="true"'));
-assert(index.includes('sftechV2Records.length!==17||neteaseV2Records.length!==14||domesticV2Records.length!==100'));
+assert(index.includes('sftechV2Records.length!==17||neteaseV2Records.length!==14||hypergryphV2Records.length!==20||domesticV2Records.length!==120'));
 assert(recruitment.includes("job.platform==='sftech-2027-campus-list'"));
 for(const name of ['sf-logo.webp','sf-building.webp','sf-logistics.webp'])
  assert(existsSync('public/images/sf-user/'+name),'Missing separately provided SF photo '+name);
 
+
+const hypergryph=JSON.parse(src('src/data/domesticHypergryph2027Roles20261029.json'));
+const hypergryphPage=src('src/pages/HypergryphCompactProfilePage.tsx');
+assert.equal(hypergryph.jobs.length,20,'20 separately indexed 2027 campus role titles with named public source');
+assert.equal(new Set(hypergryph.jobs.map(j=>j.id)).size,20);
+assert(hypergryph.jobs.every(j=>j.company==='上海鹰角网络科技有限公司'&&j.independentOfficialJobVerified===false&&j.currentOpenVerified===false&&j.officialListUrl==='https://career.hypergryph.com/'));
+assert(hypergryph.jobs.every(j=>j.editorialRelatedMajors.length&&j.majors.length===0&&j.evidenceUrl.startsWith('https://')));
+assert(main.includes("if(route==='/companies/autumn/cn-autumn-007')return <HypergryphCompactProfilePage user={user}/>;"));
+assert(hypergryphPage.includes('hhba-kpmg-photo-grid')&&hypergryphPage.includes('<CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn-007"/>'));
+assert(hypergryphPage.indexOf('CompanyMajorJobs')<hypergryphPage.indexOf('主要业务与专业服务'));
+assert(hypergryphPage.includes('data-hhba-recruitment-outbound="true"'));
+assert(index.includes('hypergryphV2Records.length!==20||domesticV2Records.length!==120'));
+assert(recruitment.includes("job.platform==='hypergryph-2027-campus-reported'"));
+for(const file of ['hypergryph-logo.png','hypergryph-reception.png','hypergryph-recruitment-art.png']){
+ assert(existsSync('public/images/hypergryph-user/'+file),'Missing original PNG '+file);
+}
 
 const netease=JSON.parse(src('src/data/domesticNeteaseCampusRoleDirections20261029.json'));
 const neteasePage=src('src/pages/NeteaseGamesCompactProfilePage.tsx');
@@ -136,7 +152,7 @@ assert(neteasePage.includes('<CompanyMajorJobs companyRoute="/companies/autumn/c
 assert(neteasePage.indexOf('CompanyMajorJobs')<neteasePage.indexOf('主要业务与专业服务'));
 assert(sharedJobs.includes('encodeURIComponent(job.id)'),'NetEase jobs retain site detail');
 assert(neteasePage.includes('data-hhba-recruitment-outbound="true"'));
-assert(index.includes('neteaseV2Records.length!==14||domesticV2Records.length!==100'));
+assert(index.includes('neteaseV2Records.length!==14||hypergryphV2Records.length!==20||domesticV2Records.length!==120'));
 assert(recruitment.includes("job.platform==='netease-interactive-2027-direction'"));
 for(const name of ['netease-logo.png','netease-building.png','netease-team.png']){
  assert(existsSync('public/images/netease-user/'+name),'Missing unmodified user original PNG '+name);
@@ -158,7 +174,7 @@ assert(pfizerPage.includes('<CompanyMajorJobs companyRoute="/companies/autumn/cn
 assert(pfizerPage.indexOf('CompanyMajorJobs')<pfizerPage.indexOf('主要业务与专业服务'));
 assert(sharedJobs.includes("'/candidate/jobs/'+encodeURIComponent(job.id)"),'Pfizer jobs open unified HHBA role details');
 assert(pfizerPage.includes('data-hhba-recruitment-outbound="true"'));
-assert(index.includes("pfizerV2Records.length!==4||csairV2Records.length!==6||sftechV2Records.length!==17||neteaseV2Records.length!==14||domesticV2Records.length!==100"));
+assert(index.includes("pfizerV2Records.length!==4||csairV2Records.length!==6||sftechV2Records.length!==17||neteaseV2Records.length!==14||hypergryphV2Records.length!==20||domesticV2Records.length!==120"));
 for(const n of ['pfizer-building.webp','pfizer-logo.webp','pfizer-laboratory.webp'])assert(existsSync('public/images/pfizer-user/'+n),'Missing user supplied photo: '+n);
 
 assert(main.includes("if(route==='/companies/domestic/rel-huayu-004')return <HuayuVisionCompactProfilePage user={user}/>"),'Preserve old profile URL');
@@ -214,4 +230,4 @@ for(const suffix of ['01','02']){
  const path='public/images/autumn-ai-scenes/cn-autumn-002-'+suffix+'.avif';
  assert(existsSync(path),'Reusing already created company photo '+path);
 }
-console.log('HHBA_DOMESTIC_V2_100_OVERSEAS_12_SCHNEIDER_6_KPMG_16_HUAYU_10_HUAAN_10_GUANGFA_5_CITICS_BRANCH_POSITIONS '+workflowBranch);
+console.log('HHBA_DOMESTIC_V2_120_OVERSEAS_12_SCHNEIDER_6_KPMG_16_HUAYU_10_HUAAN_10_GUANGFA_5_CITICS_BRANCH_POSITIONS '+workflowBranch);

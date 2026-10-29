@@ -72,7 +72,12 @@ export function safeOfficialJobUrl(job: LiveJob) {
         'tencent-official': 'careers.tencent.com',
         'baidu-official': 'talent.baidu.com'
       };
-      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='netease-interactive-2027-direction'&&job.source==='netease-interactive'){
+      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='hypergryph-2027-campus-reported'&&job.source==='hypergryph'){
+        // Official Hypergryph job board; title-level evidence is separate and does not
+        // confirm a unique live application URL. Reject every other host/path.
+        if(u.hostname!=='career.hypergryph.com'||u.pathname!=='/'||
+           u.search!==''||u.hash!==''||!/^cn-v2-hypergryph-[a-z0-9-]{5,100}$/.test(job.id))return null;
+      }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='netease-interactive-2027-direction'&&job.source==='netease-interactive'){
         // 2027 NetEase Interactive recruitment board, not confirmed job-specific application.
         if(u.hostname!=='campus.game.163.com'||u.pathname!=='/'||
            u.search!==''||u.hash!==''||!/^cn-v2-netease-[a-z-]{4,100}$/.test(job.id))return null;
