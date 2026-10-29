@@ -45,6 +45,34 @@
         "sourceMethod": "ChatGPT image generation; individually generated; AVIF optimized copy",
         "containsNonVerifiedArchitecture": true
       }
+    ],
+    "cn-autumn-002": [
+      {
+        "id": "cn-autumn-002-ai-scene-01",
+        "path": "images/autumn-ai-scenes/cn-autumn-002-01.avif",
+        "kind": "ai_generated_concept_scene",
+        "status": "published_preview",
+        "sourceLabel": "AI 电气自动化研发场景 · 非施耐德电气真实实验室",
+        "alt": "专业电气研发实验室AI生成场景，非施耐德电气的真实办公室或人员",
+        "thumbnailWidth": 864,
+        "thumbnailHeight": 486,
+        "sourceGeneratedOn": "2026-10-29",
+        "sourceMethod": "ChatGPT image generation; standalone asset 1; AVIF optimization",
+        "containsNonVerifiedArchitecture": true
+      },
+      {
+        "id": "cn-autumn-002-ai-scene-02",
+        "path": "images/autumn-ai-scenes/cn-autumn-002-02.avif",
+        "kind": "ai_generated_concept_scene",
+        "status": "published_preview",
+        "sourceLabel": "AI 工业自动化生产场景 · 非施耐德电气真实工厂",
+        "alt": "现代智能制造生产线AI生成场景，非施耐德电气真实生产厂房",
+        "thumbnailWidth": 864,
+        "thumbnailHeight": 486,
+        "sourceGeneratedOn": "2026-10-29",
+        "sourceMethod": "ChatGPT image generation; standalone asset 2; AVIF optimization",
+        "containsNonVerifiedArchitecture": true
+      }
     ]
   }
 }
