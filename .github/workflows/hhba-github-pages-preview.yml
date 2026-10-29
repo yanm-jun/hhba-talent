@@ -1,3 +1,4 @@
+# 2026-10-29: HHBA employer 11 Hypergryph; 20 additional source-caveated campus role titles and three byte-for-byte original PNG assets. 120 domestic V2 + 100 overseas.
 # 2026-10-29: enable reviewed major -> employer -> job flow, user selection persists; protect 100 domestic and 100 overseas records with shared contracts.
 # NetEase 2026-10-29 follow-up: historical 86-count CI assertions updated to 100 reviewed V2 source records.
 # NetEase Games 2026-10-29: tenth approved company, 3 byte-for-byte original PNG assets, 14 identified campus role directions and 100 total V2 records.
@@ -120,6 +121,19 @@ jobs:
           node scripts/schneider-recruitment-first.contract.test.mjs
           node scripts/domestic-rebuild-v2.contract.test.mjs
           node scripts/major-company-job-flow.contract.test.mjs
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import {createHash} from 'node:crypto';
+          for(const [file,expected] of Object.entries({
+            'hypergryph-logo.png':'95da61c478492bc3e523df8bbbf1490d2f2d03c25da124006ab2354e60b7086c',
+            'hypergryph-reception.png':'532a33075ab0b867e1ffd4fd8d919b82f4075283e92018707a2cccc909481f23',
+            'hypergryph-recruitment-art.png':'a84e50f6ee2ce456a2072a34346beedb4b8af8ee65a7ab79d750c718db1b14ca'
+          })){
+            const b=fs.readFileSync('public/images/hypergryph-user/'+file);
+            if(createHash('sha256').update(b).digest('hex')!==expected)throw Error('Original Hypergryph PNG bytes changed: '+file);
+          }
+          console.log('HHBA_HYPERGRYPH_THREE_UPLOADS_EXACT_PNG_OK');
+          NODE
           # Retain photo evidence in source for audit; no legacy gallery is rendered in company profiles.
           node scripts/autumn-approved-industry-images.contract.test.mjs
           # Preserve source-backed logos and only genuine per-employer or labeled AI pictures.
