@@ -70,7 +70,11 @@ export function safeOfficialJobUrl(job: LiveJob) {
         'tencent-official': 'careers.tencent.com',
         'baidu-official': 'talent.baidu.com'
       };
-      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='huaan-securities-official'&&job.source==='huaan-securities'){
+      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='guangfa-securities-official'&&job.source==='guangfa-securities'){
+        // Career homepage only; ten distinct historic vacancies are evidenced by the university announcement.
+        if(u.hostname!=='job.gf.com.cn'||u.pathname!=='/'||u.search!==''||u.hash!==''||
+           !/^cn-v2-guangfa-[a-z-]{5,80}$/.test(job.id))return null;
+      }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='huaan-securities-official'&&job.source==='huaan-securities'){
         // Job-level details come from the 2026 archived announcement; apply portal is not a job permalink.
         if(!huaanPort)return null;
       }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='huayu-official-campus'&&job.source==='huayu-vision'){
@@ -360,7 +364,9 @@ export async function listDomesticRebuildMarket(filters:LiveFilters,offset:numbe
   ...domesticV2Records.slice(18,22),...overseas.slice(25,30),
   ...domesticV2Records.slice(22,34),...overseas.slice(30,38),
   ...domesticV2Records.slice(34,38),...overseas.slice(38,44),
-  ...domesticV2Records.slice(38),...overseas.slice(44)];
+  ...domesticV2Records.slice(38,44),...overseas.slice(44,50),
+  ...domesticV2Records.slice(44,49),...overseas.slice(50,55),
+  ...domesticV2Records.slice(49),...overseas.slice(55)];
  const allowed=combined.filter(job=>!!safeOfficialJobUrl(job)&&rebuildListFilter(job,filters));
  return {jobs:allowed.slice(offset,offset+30),total:allowed.length,offset,limit:30,
    boards:11,failures:0,updated:'2026-10-29T00:00:00Z'};
