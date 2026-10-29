@@ -26,7 +26,7 @@ assert(!p.includes('信息来源'));
 assert(!p.includes('官方来源'));
 assert(!p.includes('关于企业'));
 assert(!p.includes('官网来源'));
-assert(shared.includes('<MajorFilter value={slug} onChange={select} lang="zh"/>'),'Use the same interactive professional selector as market');
+assert(shared.includes('<CompanyMajorChips jobs={jobs} slug={slug} onChange={choose}'),'Company page uses shared clickable chips, not search input');
 assert(shared.includes('domesticV2Records.filter')&&matcher.includes('matchRoleToMajor'),'Review jobs from one V2 registry and one matcher');
 assert(shared.includes("'/candidate/jobs/'+encodeURIComponent(job.id)"),'Shared HHBA job detail link');
 assert(p.includes('data-hhba-recruitment-outbound="true"'),'Do not bypass HHBA auth gate');
