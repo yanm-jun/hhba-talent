@@ -88,3 +88,7 @@
 /* Pfizer uses the identical CITIC/KPMG compact layout; only asset-specific sizing. */
 .hhba-pfizer-compact .hhba-kpmg-logo img{max-width:70px;max-height:62px;width:70px;height:62px;object-fit:contain}
 .hhba-pfizer-photo-note{font-size:11px;line-height:1.65;color:#809286;margin:10px 0 0}
+
+/* China Southern: same compact layout as CITIC Securities/Pfizer. */
+.hhba-csair-compact .hhba-kpmg-logo img{max-width:70px;max-height:64px;width:70px;height:64px;object-fit:contain}
+.hhba-csair-photo-note{font-size:11px;line-height:1.65;color:#809286;margin:10px 0 0}
