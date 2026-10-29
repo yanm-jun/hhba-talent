@@ -58,9 +58,10 @@ export function storeSelectedMajor(slug:string){
  if(typeof window!=='undefined')window.dispatchEvent(new CustomEvent('hhba-major-changed',{detail:verified}));
 }
 export function majorName(slug:string){return majorById(slug)?.name||'';}
-export function matchRoleToMajor(job:Pick<LiveJob,'majorNames'|'editorialRelatedMajors'>,slug:string):MajorMatch{
+export function matchRoleToMajor(job:Pick<LiveJob,'majorNames'|'editorialRelatedMajors'|'majorUnrestricted'>,slug:string):MajorMatch{
  if(!slug)return 'all';
  const chosen=majorById(slug);if(!chosen)return 'unknown';
+ if(job.majorUnrestricted===true)return 'unrestricted';
  const fields=[...(job.majorNames||[]),...(job.editorialRelatedMajors||[])];
  if(fields.some(x=>/^(?:不限专业|专业不限|不限制专业|不限学科|any major)$/i.test(x.trim())))return 'unrestricted';
  if(fields.some(x=>equivalent(x,chosen.name)))return 'related';
@@ -68,7 +69,7 @@ export function matchRoleToMajor(job:Pick<LiveJob,'majorNames'|'editorialRelated
  // A known-other requirement must not be described as 'unreported'.
  return fields.length?'other':'unknown';
 }
-export function visibleRoleForMajor(job:Pick<LiveJob,'majorNames'|'editorialRelatedMajors'>,
+export function visibleRoleForMajor(job:Pick<LiveJob,'majorNames'|'editorialRelatedMajors'|'majorUnrestricted'>,
  slug:string,includeUnknown=false){
  const status=matchRoleToMajor(job,slug);
  return status==='all'||status==='related'||status==='unrestricted'||includeUnknown&&status==='unknown';
