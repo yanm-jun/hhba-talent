@@ -17,14 +17,16 @@ test('every recruitment link follows a single registration-first policy across r
  assert.ok(shell.includes("event.target.closest<HTMLAnchorElement>('a[href]')"));
  assert.ok(shell.includes('const destination=recruitmentTarget(anchor)'));
  assert.ok(shell.includes('if(!destination||verifiedCandidate)return'));
- assert.ok(shell.includes('verifiedCandidate=employerApiReady&&hasCandidate'));
+ assert.ok(shell.includes("anchor.dataset.hhbaRecruitmentOutbound==='true'"),'invalid marked outlinks must fail closed');
+ assert.ok(shell.includes('verifiedCandidate=hasCandidate&&(employerApiReady||realAuthReady)'));
  assert.ok(shell.includes('onAuxClickCapture={guardRecruitmentClick}'));
  assert.ok(shell.includes('onContextMenuCapture={guardRecruitmentContextMenu}'));
  assert.ok(shell.includes("navigate('/candidate/register?next=%2Fcandidate%2Fofficial-outbound')"));
  assert.ok(shell.includes('route+location.search')); // no /hhba-talent/ duplicated after registration
  assert.ok(policy.includes("data-hhba-recruitment-outbound")||policy.includes("dataset.hhbaRecruitmentOutbound"));
  assert.ok(policy.includes("EXPLICIT.test(label)||PATH.test(path)"));
- assert.ok(policy.includes("SOURCES.test(label)")); // source evidence links stay ungated
+ assert.ok(policy.includes("SOURCES.test(label)")); // ordinary photos and unrelated corporate citations remain public
+ assert.ok(policy.includes("RECRUITMENT_EVIDENCE.test(label)")); // university job notices now require login
  assert.ok(!shell.includes('window.open('));
  assert.ok(!shell.includes('location.href='));
  assert.ok(shell.includes("route.startsWith('/admin')"));
@@ -60,11 +62,12 @@ test('login and demo account routes preserve stored official link without arbitr
  assert.ok(flow.includes('href={saved.url}'));
  assert.ok(flow.includes('clearPendingRecruitment()'));
  assert.ok(flow.includes('正式账户服务尚未开通'));
- assert.ok(flow.includes('const signed=employerApiReady&&!!user?.account_types?.includes(\'candidate\')'));
+ assert.ok(flow.includes('!accountBackendReady?<><h2>正式账户服务尚未开通'));
+ assert.ok(flow.includes("const signed=accountBackendReady&&!!user?.account_types?.includes('candidate')"));
  assert.ok(!flow.includes('useDemoAccount'));
  assert.ok(!flow.includes('demoModeEnabled&&!!demo'));
  assert.ok(demoAuth.includes('演示注册无法解锁第三方招聘官网'));
- assert.ok(flow.indexOf('!employerApiReady')<flow.indexOf('href={saved.url}'));
+ assert.ok(flow.indexOf('!accountBackendReady')<flow.indexOf('href={saved.url}'));
 
  assert.ok(policy.includes("sessionStorage.setItem(KEY"));
  assert.ok(policy.includes("Date.now()-x.at>30*60*1000"));
