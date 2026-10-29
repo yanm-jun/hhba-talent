@@ -5,11 +5,11 @@
   "entries": {
     "施耐德电气": {
       "id": "cn-autumn-002",
-      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/schneider-electric/default.svg",
+      "source": "https://commons.wikimedia.org/wiki/File:Schneider_Electric_2007.svg",
       "path": "images/autumn-real-logos/cn-autumn-002.svg",
-      "sourceType": "catalogue_brand_mark",
+      "sourceType": "wikimedia_build_import",
       "confidence": "brand_identity_matched_not_brand_owner_cleared",
-      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+      "reviewNote": "Source-backed Schneider Electric green wordmark from the Wikimedia logo record originating in Schneider Electric annual report; trademark identification only."
     },
     "辉瑞": {
       "id": "cn-autumn-003",
