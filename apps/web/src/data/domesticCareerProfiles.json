@@ -7718,6 +7718,15 @@
     "subIndustry": "创新药、疫苗及医药商业",
     "website": "https://www.pfizer.com.cn/",
     "careersUrl": "https://www.pfizer.com/about/careers/search-results",
-    "contentReview": "source_backed_pfizer_official_2026-10-29"
+    "contentReview": "source_backed_pfizer_official_2026-10-29",
+    "majorSlugs": [
+      "medicine",
+      "pharmacy",
+      "biomedical-engineering",
+      "biotechnology",
+      "chemistry",
+      "business-administration"
+    ],
+    "lastReviewed": "2026-10-29"
   }
 }
