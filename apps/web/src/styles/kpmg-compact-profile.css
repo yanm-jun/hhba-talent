@@ -96,3 +96,7 @@
 /* SF Express uses the same compact four-section frame as CITIC Securities, Pfizer and China Southern. */
 .hhba-sf-compact .hhba-kpmg-logo img{max-width:70px;max-height:64px;width:70px;height:64px;object-fit:contain}
 .hhba-sf-photo-note{font-size:11px;line-height:1.65;color:#809286;margin:10px 0 0}
+
+/* NetEase compact profile: same frame as CITIC, Pfizer, CSAIR and SF. No image re-encoding. */
+.hhba-netease-compact .hhba-kpmg-logo img{width:100%;height:auto;max-width:86px;max-height:64px;object-fit:contain}
+.hhba-netease-photo-note{font-size:11px;line-height:1.65;color:#809286;margin:10px 0 0}
