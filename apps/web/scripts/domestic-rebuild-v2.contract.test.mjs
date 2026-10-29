@@ -90,7 +90,7 @@ assert(main.includes("if(route==='/companies/domestic/a-600030')return <CiticsSe
 assert(citicsProfile.includes("const jobs=rolesData.jobs;"),'All majors permitted; do not improperly filter unrestricted trainees');
 assert(citicsProfile.includes("'/candidate/jobs/cn-v2-citics-'+job.id"),'Shared HHBA on-site job pages');
 assert(citicsProfile.includes('归属待核验'),'Legacy image authenticity not invented');
-assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券','辉瑞','中国南方航空']"));
+assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券','辉瑞','中国南方航空','顺丰']"));
 const csair=JSON.parse(src('src/data/domesticCsairVerifiedPositions20261029.json'));
 const csairPage=src('src/pages/CsairCompactProfilePage.tsx');
 assert.equal(csair.jobs.length,6,'Exactly six source-backed China Southern jobs from official listings');
@@ -102,7 +102,23 @@ const csairHeadings=['适合哪些专业背景？','招聘岗位','主要业务�
 assert(csairHeadings.map(x=>csairPage.indexOf(x)).every((p,i,a)=>p>0&&(i===0||p>a[i-1])),'Preserve four-block order');
 assert(csairPage.includes("'/candidate/jobs/cn-v2-csair-'"));
 assert(csairPage.includes('data-hhba-recruitment-outbound="true"'));
-assert(index.includes('csairV2Records.length!==6||domesticV2Records.length!==69'));
+assert(index.includes('csairV2Records.length!==6||sftechV2Records.length!==17||domesticV2Records.length!==86'));
+const sf=JSON.parse(src('src/data/domesticSfTechCampusRoles20261029.json'));
+const sfPage=src('src/pages/SfExpressCompactProfilePage.tsx');
+assert.equal(sf.jobs.length,17,'Keep 17 distinct positions evidenced by SF Technology 2027 campus announcement');
+assert.equal(new Set(sf.jobs.map(j=>j.id)).size,17);
+assert(sf.jobs.every(j=>j.company==='顺丰科技有限公司'&&j.currentOpenVerified===false&&j.individualPermalinkVerified===false&&j.sourceUrl==='https://campus.sf-express.com/#/homePage'));
+assert(main.includes("if(route==='/companies/autumn/cn-autumn-005')return <SfExpressCompactProfilePage user={user}/>;"));
+assert(sfPage.includes('hhba-kpmg-compact')&&sfPage.includes('hhba-kpmg-photo-grid'));
+const sfOrder=['适合哪些专业背景？','招聘岗位','主要业务与专业服务'];
+assert(sfOrder.map(x=>sfPage.indexOf(x)).every((p,i,arr)=>p>0&&(i===0||p>arr[i-1])));
+assert(sfPage.includes("'/candidate/jobs/cn-v2-sftech-'"));
+assert(sfPage.includes('data-hhba-recruitment-outbound="true"'));
+assert(index.includes('sftechV2Records.length!==17||domesticV2Records.length!==86'));
+assert(recruitment.includes("job.platform==='sftech-2027-campus-list'"));
+for(const name of ['sf-logo.webp','sf-building.webp','sf-logistics.webp'])
+ assert(existsSync('public/images/sf-user/'+name),'Missing separately provided SF photo '+name);
+
 assert(recruitment.includes("job.platform==='csair-official-list'"));
 for(const f of ['csair-logo.png','csair-building.webp','csair-aircraft.webp'])
  assert(existsSync('public/images/csair-user/'+f),'Missing China Southern image '+f);
