@@ -2,6 +2,7 @@ import {useEffect,useState} from 'react';
 import {ArrowRight,BriefcaseBusiness,CheckCircle2,GraduationCap} from 'lucide-react';
 import {Link,getCompanyReturnTarget} from '../router';
 import {MajorFilter} from './MajorFilter';
+import {MAJOR_OPTIONS} from '../services/domesticMajors';
 import {domesticV2Records} from '../services/domesticRebuildJobs';
 import {majorName,matchRoleToMajor,majorMatchLabel,getSavedMajor,storeSelectedMajor} from '../services/majorJobMatching';
 import {safeOfficialJobUrl,rebuildListFilter} from '../services/liveRecruitment';
@@ -32,7 +33,7 @@ function roleView(job:LiveJob,slug:string,view:View){
  return view==='unknown'?result==='unknown':view==='included'?result==='unknown'||result==='related'||result==='unrestricted':result==='related'||result==='unrestricted';
 }
 /** Same job IDs, titles, and matching predicate as /candidate/jobs. No separate employer-specific role cache. */
-export function CompanyMajorJobs({companyRoute}:{companyRoute:string}){
+export function CompanyMajorJobs({companyRoute,majorIntro,quickMajorNames}:{companyRoute:string;majorIntro?:string;quickMajorNames?:readonly string[]}){
  const {slug,choose}=useSharedMajorSelection();
  const [view,setView]=useState<View>(()=>new URLSearchParams(location.search).get('unknown')==='1'?'included':'matched');
  const allJobs:LiveJob[]=domesticV2Records.filter(j=>j.employerRoute===companyRoute&&!!safeOfficialJobUrl(j));
@@ -47,12 +48,34 @@ export function CompanyMajorJobs({companyRoute}:{companyRoute:string}){
  const current=!slug||view==='all'?allJobs:view==='unknown'?unknown:view==='included'?jobs.filter(j=>roleView(j,slug,'included')):related;
  const select=(next:string)=>{choose(next);setView('matched')};
  const label=majorName(slug);
+ // Keep the official majors index as the single lookup source for quick choices.
+ // No hardcoded alternative slugs, and no duplicated job-matching algorithm.
+ const quickMajors=(quickMajorNames||[]).flatMap(name=>{
+  const option=MAJOR_OPTIONS.find(m=>m.name===name&&m.level==='undergraduate')||MAJOR_OPTIONS.find(m=>m.name===name);
+  return option?[option]:[];
+ });
  return <>
   <section className="hhba-kpmg-section hhba-major-linked-section" aria-labelledby="hhba-shared-major-title">
    <div className="hhba-kpmg-section-heading"><div>
     <h2 id="hhba-shared-major-title">适合哪些专业背景？</h2>
-    <p>与招聘市场共用一套专业匹配结果。专业相关不等于符合所有招录条件，未披露专业的岗位单独列出。</p>
+    <p>{majorIntro||'与招聘市场共用一套专业匹配结果。专业相关不等于符合所有招录条件，未披露专业的岗位单独列出。'}</p>
    </div></div>
+   {quickMajors.length>0&&<div className="hhba-major-quick-area">
+    <span className="hhba-major-quick-caption">快速选择专业</span>
+    <div className="hhba-major-quick-list" role="group" aria-label="岗位相关专业快捷选择">
+     <button type="button" className={'hhba-kpmg-major'+(!slug?' is-selected':'')} aria-pressed={!slug} onClick={()=>select('')}>全部专业 <small>{allJobs.length}</small></button>
+     {quickMajors.map(option=>{
+      const count=allJobs.filter(job=>{
+       const status=matchRoleToMajor(job,option.slug);
+       return status==='related'||status==='unrestricted';
+      }).length;
+      return <button type="button" key={option.slug} className={'hhba-kpmg-major'+(label===option.name?' is-selected':'')} aria-pressed={label===option.name} onClick={()=>select(option.slug)}>
+       {option.name}<small>{count}</small>{label===option.name&&<CheckCircle2 size={13}/>}
+      </button>;
+     })}
+    </div>
+    <p className="hhba-major-quick-footnote">以上数量为 HHBA 已整理的相关岗位方向，不表示企业官方确认专业准入或当前开放申请。</p>
+   </div>}
    <div className="hhba-major-linked-controls">
     <MajorFilter value={slug} onChange={select} lang="zh"/>
     {slug&&<button type="button" className="hhba-kpmg-major is-selected" onClick={()=>select('')}>清除专业 <CheckCircle2 size={13}/></button>}
