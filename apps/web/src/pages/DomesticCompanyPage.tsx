@@ -4,6 +4,10 @@ import {Shell} from '../components/Shell';
 import {Link,getCompanyReturnTarget} from '../router';
 import {getDomesticCompanies,getDomesticRecruitment,companyById,findParentCompany,findRelatedCompanies} from '../services/domesticCompanySearch';
 import {matchingMajors} from '../services/domesticMajors';
+import {CompanyMajorChips} from '../components/CompanyMajorChips';
+import {useSharedMajorSelection} from '../components/CompanyMajorJobs';
+import {domesticV2Records} from '../services/domesticRebuildJobs';
+import {majorName,matchRoleToMajor} from '../services/majorJobMatching';
 import profiles from '../data/domesticCareerProfiles.json';
 import {domestic200Profiles as additionalProfiles} from '../services/domesticCompany200Data';
 import bundled from '../data/domesticMediaBundle.json';
@@ -44,6 +48,12 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
  const media=company?available.companies[company.name]:undefined;
  const brandSrc=media?.brand?.state==='ready'?import.meta.env.BASE_URL+media.brand.path:undefined;
  const majors=company?matchingMajors(company):[];
+ const {slug:selectedMajor,choose:chooseMajor}=useSharedMajorSelection();
+ const indexedJobs=domesticV2Records.filter(j=>j.employerRoute===company?.route);
+ const matchingJobs=!selectedMajor?indexedJobs:indexedJobs.filter(j=>{
+  const result=matchRoleToMajor(j,selectedMajor);
+  return result==='related'||result==='unrestricted';
+ });
  const recruitment=company?getDomesticRecruitment(company.name):undefined;
  const careers=company?httpsLink(company.careers):'';
  const hasReadyPhoto=Boolean(article?.photos?.some((_,i)=>media?.photos?.[i]?.state==='ready'));
@@ -114,14 +124,19 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       <p className="domestic-company-note">办公地址不代表该地点当前正在招聘；若需要前往现场，请先通过企业官网确认。</p>
      </section>:null}
     {article&&<section className="domestic-editorial-section" aria-label="适合哪些专业背景">
-      <h2>适合哪些专业背景？</h2>
-      {majors.length?<div className="domestic-profile-tags domestic-major-tags">
-       {majors.map(major=><Link className="domestic-major-tag" key={major.slug} to={'/majors/'+major.slug}
-        aria-label={'查看与'+major.name+'相关的企业'}>{major.name}<ArrowRight size={13}/></Link>)}</div>:
-       <p className="domestic-editorial-limited">暂无足够资料判断该企业与哪些专业方向相关，正在逐步完善。</p>}
-      <p className="domestic-company-note">根据企业公开业务与技术方向整理的专业关联，不等于该企业正在招聘这些专业的学生。点击专业可发现更多业务相关企业。</p>
-      {article.majorMappingBasis&&<small className="domestic-media-confidence">{article.majorMappingBasis}</small>}
-    </section>}
+       <h2>适合哪些专业背景？</h2>
+       <p className="domestic-company-note">点击专业标签查看该企业已经审核收录的对应岗位；企业业务关联并不等于正在招聘。</p>
+       <CompanyMajorChips jobs={indexedJobs} slug={selectedMajor} onChange={chooseMajor}/>
+       {matchingJobs.length>0?<div className="company-profile-job-grid">
+        {matchingJobs.map(job=><Link key={job.id} className="company-profile-job-card" to={'/candidate/jobs/'+job.id}>
+         <strong>{job.titleZh||job.title}</strong>
+         <p>{job.locationZh||job.location||'地点待核验'}</p>
+         <span>HHBA 站内岗位详情 <ArrowRight size={13}/></span>
+        </Link>)}
+       </div>:<p className="domestic-editorial-limited">{selectedMajor?'暂未收录与「'+majorName(selectedMajor)+'」明确相关的独立岗位，可点击「全部专业」浏览。':'该企业尚未进入已审核逐岗资料库，暂不推断对应招聘岗位；可查看下方官方招聘渠道。'}</p>}
+       {majors.length>0&&<p className="domestic-company-note">另已整理业务相关专业：{majors.slice(0,12).map(m=>m.name).join('、')}。此项是业务关联，不代表招聘资格。</p>}
+       {article.majorMappingBasis&&<small className="domestic-media-confidence">{article.majorMappingBasis}</small>}
+     </section>}
     {(article||recruitment)&&<section className="domestic-editorial-section domestic-careers" aria-label="官方招聘渠道">
       <h2>官方招聘渠道</h2>
       <p>招聘渠道与企业介绍来源分别核验。集团统一招聘站并不代表每个子公司都有开放岗位；具体法人、地区与招聘批次以官方页面为准。</p>

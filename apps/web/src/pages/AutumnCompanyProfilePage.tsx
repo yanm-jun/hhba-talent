@@ -1,4 +1,7 @@
 import {useMemo} from 'react';
+import {CompanyMajorChips} from '../components/CompanyMajorChips';
+import {useSharedMajorSelection} from '../components/CompanyMajorJobs';
+import {matchRoleToMajor,majorName} from '../services/majorJobMatching';
 import {ArrowLeft,ArrowRight,Building2,ExternalLink,GraduationCap,MapPin,ShieldCheck} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,getCompanyReturnTarget} from '../router';
@@ -63,6 +66,12 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
  const milestones=documentedHistory?.milestones||[];
  const recruitment=employer?getDomesticRecruitment(employer.name):undefined;
  const matched=employer?jobs.filter(j=>j.company===employer.name):[];
+ const {slug:selectedMajor,choose:chooseMajor}=useSharedMajorSelection();
+ const majorJobIndex=matched.map(j=>({majorNames:j.majors}));
+ const shownMatched=!selectedMajor?matched:matched.filter(j=>{
+  const match=matchRoleToMajor({majorNames:j.majors},selectedMajor);
+  return match==='related'||match==='unrestricted';
+ });
  const profileMedia=employer?mediaIndex[employer.name]:undefined;
  const localPhotos=(profileMedia?.photos||[]).filter(photo=>
    photo.state==='ready'&&photo.classification==='source_backed_named_enterprise_scene'&&
@@ -226,6 +235,12 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
    </div>:<p className="company-profile-autumn-review-note">本企业暂未取得可逐条追溯的历史事件证据。为避免错误的成立年份、上市时间或母子公司混同，此处不填写推测的时间线。</p>}
   </section>
 
+  <section className="company-profile-section company-profile-major-chips" aria-label="适合哪些专业背景">
+   <h2>适合哪些专业背景？</h2>
+   <p>点击专业标签，下方只展示该企业已收录的关联岗位；未收录岗位的企业不推断招聘专业。</p>
+   <CompanyMajorChips jobs={majorJobIndex} slug={selectedMajor} onChange={chooseMajor}/>
+  </section>
+
   <section className="company-profile-section company-profile-openings" aria-labelledby="company-openings-title">
    <div className="company-profile-section-heading">
     <div>
@@ -251,8 +266,8 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
     <ol className="company-profile-autumn-steps">{kpmg.applicationProcess.map((step,i)=><li key={i}>{step}</li>)}</ol>
     <p className="company-profile-autumn-safety"><ShieldCheck size={17}/> <span>{kpmg.antiFraud} <a href={sourceFromDossier('safety')} target="_blank" rel="noopener noreferrer" data-hhba-non-recruitment-link="true">查看官方防诈骗提示 <ExternalLink size={13}/></a></span></p>
    </>}
-   {matched.length?<div className="company-profile-job-grid">
-    {matched.map(j=><div key={j.id} className="company-profile-job-card company-profile-autumn-job">
+   {shownMatched.length?<div className="company-profile-job-grid">
+    {shownMatched.map(j=><div key={j.id} className="company-profile-job-card company-profile-autumn-job">
      <strong>{j.title}</strong>
      {j.responsibilities&&<p><b>岗位职责：</b>{j.responsibilities}</p>}
      {j.requirements&&<p><b>任职要求：</b>{j.requirements}</p>}
@@ -262,7 +277,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
       查看历史公告来源 <ExternalLink size={14}/>
      </a>}
     </div>)}
-   </div>:!kpmg?<p className="company-profile-jobs-state">当前未找到与该企业准确对应、可确认仍在招的具体职位。收录企业不意味着当前开放招聘。</p>:null}
+   </div>:<p className="company-profile-jobs-state">{selectedMajor?`当前未收录与「${majorName(selectedMajor)}」明确相关的岗位，请点击上方「全部专业」查看其他历史岗位。`:'当前没有已核对来源的具体职位记录；企业档案不代表当前开放招聘。'}</p>}
    {primary?<div className="company-profile-autumn-official">
     <a data-hhba-recruitment-outbound="true" href={primary} target="_blank" rel="noopener noreferrer">
      <GraduationCap size={18}/> 查看已定位的官方招聘渠道 <ExternalLink size={16}/>
