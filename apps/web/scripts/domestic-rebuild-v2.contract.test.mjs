@@ -77,6 +77,12 @@ assert.equal(new Set(citics.jobs.map(j=>j.id)).size,5);
 assert.equal(new Set(citics.jobs.map(j=>j.office)).size,5,'Every job must be from a distinct named CITIC branch');
 assert(citics.jobs.every(j=>j.education==='本科及以上应届毕业生'&&j.majorsRequirement.startsWith('不限专业')));
 assert(citics.jobs.every(j=>j.sourceUrl.startsWith('https://')&&j.currentApplicationVerified===false));
+assert.equal(citics.jobs.find(j=>j.id==='shanghai-branch-trainee').sourceUrl,
+ 'https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=fbce9fb2a1e8489b97b9d5cbb1c7da17');
+assert(citics.jobs.every(j=>{
+ const u=new URL(j.sourceUrl);
+ return ['jdjyw.jlu.edu.cn','www.career.zju.edu.cn','jy.scu.edu.cn'].includes(u.hostname);
+}),'Every campus posting must link to a reviewed university career page');
 assert(citics.jobs.every(j=>j.officialListingUrl==='https://careers.citics.com/campus/branch'));
 assert(citics.jobs.every(j=>j.office.startsWith('中信证券股份有限公司')),'CSC Financial is a different company');
 assert(citics.jobs.every(j=>!j.office.includes('山东')&&!j.office.includes('中信建投')),'Separate subsidiary jobs not folded in');
