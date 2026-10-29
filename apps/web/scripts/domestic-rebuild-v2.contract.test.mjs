@@ -135,7 +135,7 @@ assert(pfizerPage.indexOf('适合哪些专业背景？')<pfizerPage.indexOf('招
 assert(pfizerPage.indexOf('招聘岗位')<pfizerPage.indexOf('主要业务与专业服务'));
 assert(pfizerPage.includes("'/candidate/jobs/cn-v2-pfizer-'"),'Pfizer jobs open shared HHBA details');
 assert(pfizerPage.includes('data-hhba-recruitment-outbound="true"'));
-assert(index.includes("pfizerV2Records.length!==4||csairV2Records.length!==6||domesticV2Records.length!==69"));
+assert(index.includes("pfizerV2Records.length!==4||csairV2Records.length!==6||sftechV2Records.length!==17||domesticV2Records.length!==86"));
 for(const n of ['pfizer-building.webp','pfizer-logo.webp','pfizer-laboratory.webp'])assert(existsSync('public/images/pfizer-user/'+n),'Missing user supplied photo: '+n);
 
 assert(main.includes("if(route==='/companies/domestic/rel-huayu-004')return <HuayuVisionCompactProfilePage user={user}/>"),'Preserve old profile URL');
