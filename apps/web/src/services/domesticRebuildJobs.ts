@@ -27,7 +27,7 @@ export const domesticV2Records=schneider.jobs.map(job=>({
  currentApplicationVerified:false,
  educationLabel:undefined,
  experienceLabel:job.experience,
- majorNames:job.majorSlugs,
+ majorNames:schneider.majors.filter(m=>job.majorSlugs.includes(m.id)).map(m=>m.name),
  responsibilitiesSummary:job.summary,
  requirementsSummary:job.experience,
  employerRoute:'/companies/autumn/cn-autumn-002'
