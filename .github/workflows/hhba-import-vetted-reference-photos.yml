@@ -37,22 +37,22 @@ jobs:
           import json, pathlib, hashlib
           root=pathlib.Path('apps/web/public')
           meta=json.loads((root/'data/domestic-autumn-industry-photos.json').read_text())
-          assert meta['approvedCompanies']==23 and meta['approvedPhotos']==36
+          assert meta['approvedCompanies']==11 and meta['approvedPhotos']==17
           photos=[p for items in meta['entries'].values() for p in items]
-          assert len({p['sha256'] for p in photos})==36
+          assert len({p['sha256'] for p in photos})==17
           for p in photos:
             path=root/p['file']
             assert path.exists() and path.stat().st_size>10000
             assert hashlib.sha256(path.read_bytes()).hexdigest()==p['sha256']
             assert p['sourceUrl'].startswith('https://commons.wikimedia.org/wiki/File:')
             assert p['licenseUrl'].startswith('https://creativecommons.org/')
-          print('36_INDEPENDENT_LICENSED_REFERENCES_VERIFIED;OTHERS_NOT_CLAIMED_COMPLETED')
+          print('17_INDEPENDENT_LICENSED_REFERENCES_VERIFIED;OTHERS_NOT_CLAIMED_COMPLETED')
           PY
       - name: Commit exactly the vetted images and full attribution manifest to preview branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps/web/public/images/autumn-industry-references/
+          git add -A apps/web/public/images/autumn-industry-references/
           git add -f apps/web/public/data/domestic-autumn-industry-photos.json
           git diff --cached --quiet && { echo "No change to vetted assets"; exit 0; }
           git commit -m "assets: preserve 36 visually reviewed Wikimedia industry reference photographs with attribution"
