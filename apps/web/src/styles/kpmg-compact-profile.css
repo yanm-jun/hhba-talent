@@ -100,3 +100,8 @@
 /* NetEase compact profile: same frame as CITIC, Pfizer, CSAIR and SF. No image re-encoding. */
 .hhba-netease-compact .hhba-kpmg-logo img{width:100%;height:auto;max-width:86px;max-height:64px;object-fit:contain}
 .hhba-netease-photo-note{font-size:11px;line-height:1.65;color:#809286;margin:10px 0 0}
+
+/* Hypergryph: preserve full-resolution PNG originals in the underlying asset; only CSS sizes visuals. */
+.hhba-hypergryph-compact .hhba-kpmg-logo{background:#151719}
+.hhba-hypergryph-compact .hhba-kpmg-logo img{width:100%;height:100%;object-fit:contain}
+.hhba-hypergryph-photo-note{font-size:11px;line-height:1.65;color:#7c8980;margin:10px 0 0}
