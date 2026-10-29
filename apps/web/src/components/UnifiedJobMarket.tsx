@@ -569,7 +569,7 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
          </div>}
        </div>:null}
      <div className="unified-job-actions unified-detail-actions">
-       <SaveJobButton jobId={job.id}/>
+       {job.recordKind!=='DOMESTIC_REBUILT'&&<SaveJobButton jobId={job.id}/>}
        {official&&<a data-hhba-recruitment-outbound="true" href={official} onClick={()=>trackEvent('official_apply_click','/candidate/jobs/:job')} target="_blank" rel="noopener noreferrer" aria-label={job.currentApplicationVerified===false?(lang==='zh'?'打开企业官网核实投递状态':'Check employer application status'):(lang==='zh'?'前往企业官网立即申请':'Apply on official employer website')}>
          {job.currentApplicationVerified===false?(lang==='zh'?'查看原始岗位（状态待核实）':'Check original posting'):(lang==='zh'?'立即申请':'Apply now')} <ExternalLink size={15}/></a>}
      </div>
