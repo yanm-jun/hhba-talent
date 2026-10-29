@@ -90,7 +90,7 @@ assert(main.includes("if(route==='/companies/domestic/a-600030')return <CiticsSe
 assert(citicsProfile.includes("const jobs=rolesData.jobs;"),'All majors permitted; do not improperly filter unrestricted trainees');
 assert(citicsProfile.includes("'/candidate/jobs/cn-v2-citics-'+job.id"),'Shared HHBA on-site job pages');
 assert(citicsProfile.includes('归属待核验'),'Legacy image authenticity not invented');
-assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券','辉瑞','中国南方航空','顺丰']"));
+assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券','辉瑞','中国南方航空','顺丰','网易游戏']"));
 const csair=JSON.parse(src('src/data/domesticCsairVerifiedPositions20261029.json'));
 const csairPage=src('src/pages/CsairCompactProfilePage.tsx');
 assert.equal(csair.jobs.length,6,'Exactly six source-backed China Southern jobs from official listings');
@@ -114,10 +114,29 @@ const sfOrder=['适合哪些专业背景？','招聘岗位','主要业务与专�
 assert(sfOrder.map(x=>sfPage.indexOf(x)).every((p,i,arr)=>p>0&&(i===0||p>arr[i-1])));
 assert(sfPage.includes("'/candidate/jobs/cn-v2-sftech-'"));
 assert(sfPage.includes('data-hhba-recruitment-outbound="true"'));
-assert(index.includes('sftechV2Records.length!==17||domesticV2Records.length!==86'));
+assert(index.includes('sftechV2Records.length!==17||neteaseV2Records.length!==14||domesticV2Records.length!==100'));
 assert(recruitment.includes("job.platform==='sftech-2027-campus-list'"));
 for(const name of ['sf-logo.webp','sf-building.webp','sf-logistics.webp'])
  assert(existsSync('public/images/sf-user/'+name),'Missing separately provided SF photo '+name);
+
+
+const netease=JSON.parse(src('src/data/domesticNeteaseCampusRoleDirections20261029.json'));
+const neteasePage=src('src/pages/NeteaseGamesCompactProfilePage.tsx');
+assert.equal(netease.jobs.length,14,'Fourteen evidenced and appropriately caveated role directions');
+assert.equal(new Set(netease.jobs.map(j=>j.id)).size,14);
+assert(netease.jobs.every(j=>j.company==='网易游戏（互娱）'&&j.currentOpenVerified===false&&j.independentOfficialJobVerified===false&&j.recordKind==='position_direction'));
+assert(netease.jobs.every(j=>j.sourceUrl==='https://campus.game.163.com/'&&j.titleEvidenceUrl&&j.summary&&j.requirements));
+assert(main.includes("if(route==='/companies/autumn/cn-autumn-006')return <NeteaseGamesCompactProfilePage user={user}/>;"));
+assert(neteasePage.includes('hhba-kpmg-compact')&&neteasePage.includes('hhba-kpmg-photo-grid'));
+const order=['适合哪些专业背景？','招聘岗位','主要业务与专业服务'];
+assert(order.map(t=>neteasePage.indexOf(t)).every((i,n,arr)=>i>0&&(n===0||i>arr[n-1])));
+assert(neteasePage.includes("'/candidate/jobs/cn-v2-netease-'"));
+assert(neteasePage.includes('data-hhba-recruitment-outbound="true"'));
+assert(index.includes('neteaseV2Records.length!==14||domesticV2Records.length!==100'));
+assert(recruitment.includes("job.platform==='netease-interactive-2027-direction'"));
+for(const name of ['netease-logo.png','netease-building.png','netease-team.png']){
+ assert(existsSync('public/images/netease-user/'+name),'Missing unmodified user original PNG '+name);
+}
 
 assert(recruitment.includes("job.platform==='csair-official-list'"));
 for(const f of ['csair-logo.png','csair-building.webp','csair-aircraft.webp'])
