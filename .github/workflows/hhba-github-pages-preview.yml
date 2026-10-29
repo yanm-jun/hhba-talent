@@ -102,6 +102,7 @@ jobs:
           node scripts/audit-domestic-company200.mjs
           node scripts/company200-integration.contract.test.mjs
           node scripts/domestic-autumn-market.contract.test.mjs
+          node scripts/pfizer-static-regression.contract.test.mjs
           node scripts/autumn-company-profiles.contract.test.mjs
           node scripts/autumn-dossier-content.contract.test.mjs
           node scripts/kpmg-deep-editorial.contract.test.mjs
