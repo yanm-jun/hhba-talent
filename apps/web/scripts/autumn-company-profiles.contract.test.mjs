@@ -76,7 +76,8 @@ assert(profile.includes('尚不代表已经完成对具体经营主体的官方�
 assert(profile.includes('businessDraftA.entries')&&profile.includes('businessDraftB.entries'),'Load all 156 business drafts');
 assert(profile.includes('documentedHistories')&&profile.includes('节点出处'),'Display individually sourced company milestones');
 assert(profile.includes('className="company-profile-autumn-photo-pending"'),'Unfinished photos need only a quiet text note, not fake image tiles');
-assert(Object.values(evidence).filter(x=>x.intro&&x.source).length===10,'Retain source-backed company introductions');
+assert(Object.values(evidence).filter(x=>x.intro&&x.source).length===11,'Preserve original ten introductions plus independently sourced Pfizer');
+assert(evidence['辉瑞']?.officialRecruitment==='https://www.pfizer.com/about/careers/search-results','Pfizer career source must stay the official employer portal');
 const media={...mediaA,...mediaB};
 const scenes=companies.flatMap(e=>(media[e.name]?.photos||[]).filter(p=>p.state==='ready'&&p.classification==='source_backed_named_enterprise_scene'));
 const captures=companies.flatMap(e=>(media[e.name]?.photos||[]).filter(p=>p.state==='ready'&&p.classification==='official_website_screenshot_unreviewed'));
