@@ -1,0 +1,17 @@
+/* Schneider Electric 4-block company preview inherits the already approved KPMG layout. */
+.hhba-schneider-compact .hhba-kpmg-logo{width:142px;flex-basis:142px;height:78px}
+.hhba-schneider-compact .hhba-kpmg-logo .hhba-autumn-brand,
+.hhba-schneider-compact .hhba-kpmg-logo .hhba-autumn-brand-large{width:135px;max-width:135px;height:72px;display:grid;place-items:center}
+.hhba-schneider-compact .hhba-kpmg-logo img{width:128px;max-width:128px;max-height:62px;object-fit:contain}
+.hhba-schneider-compact .hhba-kpmg-identity-copy h1 span{font-size:14px}
+.hhba-schneider-compact .hhba-kpmg-role-main p{display:flex;align-items:flex-start;gap:6px;line-height:1.65}
+.hhba-schneider-compact .hhba-schneider-map-icon{flex-shrink:0;color:#548069;margin-top:3px}
+.hhba-schneider-compact .hhba-schneider-collapse{margin:7px 0 0;display:block;width:100%;border:0;background:transparent;color:#31734f;font-size:12px;padding:9px;cursor:pointer}
+.hhba-schneider-compact .hhba-kpmg-role-top h3{line-height:1.5}
+.hhba-schneider-compact .hhba-kpmg-hero .hhba-kpmg-photo-grid img{aspect-ratio:16/9}
+@media(max-width:760px){
+ .hhba-schneider-compact .hhba-kpmg-logo{width:88px;flex-basis:88px;height:62px}
+ .hhba-schneider-compact .hhba-kpmg-logo .hhba-autumn-brand{width:83px;max-width:83px;height:58px}
+ .hhba-schneider-compact .hhba-kpmg-logo img{width:80px;max-width:80px;max-height:55px}
+ .hhba-schneider-compact .hhba-kpmg-identity-copy h1 span{font-size:12px}
+}
