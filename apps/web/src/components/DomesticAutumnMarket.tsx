@@ -5,6 +5,7 @@ import {AutumnCompanyCover} from './AutumnCompanyCover';
 import {Link} from '../router';
 import employersJSON from '../data/domesticAutumnScreenshot20261028.json';
 import jobsJSON from '../data/domesticAutumnVerifiedJobs20261028.json';
+import pfizerJobsJSON from '../data/domesticPfizerOfficialJobs20261029.json';
 import officialEvidence from '../data/domesticAutumnOfficialEvidence20261028.json';
 import brandMedia from '../data/domesticAutumnBrandMediaRegistry.json';
 import '../styles/domestic-autumn-market.css';
@@ -13,7 +14,7 @@ type Employer={id:string;name:string;screenshotGroup:string;reviewStatus:string;
 type DomesticRecord={id:string;company:string;title:string;majors:string[];cities:string[];education:string;recruitmentType:string;recordKind:'job'|'program';locationScope:string;sourceUrl:string;status:string;observedOn:string;note:string};
 const employers=employersJSON.entries as Employer[];
 const tracedLogos=Object.keys(brandMedia.entries).length;
-const jobs=jobsJSON.jobs as DomesticRecord[];
+const jobs=[...jobsJSON.jobs,...pfizerJobsJSON.jobs] as DomesticRecord[];
 const additionalEvidence=officialEvidence.entries as Record<string,{officialRecruitment:string|null;source:string|null}>;
 const recruitmentLink=(e:Employer)=>e.officialUrl||additionalEvidence[e.name]?.officialRecruitment||null;
 function evidenceLabel(e:Employer){
