@@ -5,6 +5,7 @@ name: HHBA Unified Static Site GitHub Pages
 # Fourth employer Huaan Securities: ten expired but individually described 2026 roles, original media, shared jobs UI; do not mix Huaan Fund.
 # Fifth employer GF Securities: 10 sourced 2027 campus role records, archived after September 30; reuses existing visual assets, shared V2 details.
 # Sixth employer CITIC Securities: five individual 2027 graduate trainee postings from separate branches; nonrestrictive majors; official application status unverified.
+# CITIC employer-identity contract updated to verify actual branch entities, not the disclaimer listing excluded companies.
 # Huayu role source QA: keep genuine concise qualifications; do not pad employer text to satisfy arbitrary minimum length.
 # Old employer content and original photos remain archived in Git for rebuilding one company at a time.
 # KPMG + Schneider Electric: four-block pages, exact logos and two independently generated labeled AI images per company.
