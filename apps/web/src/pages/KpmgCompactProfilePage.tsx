@@ -4,6 +4,7 @@ import {Shell} from '../components/Shell';
 import {Link,getCompanyReturnTarget} from '../router';
 import {AutumnCompanyBrand} from '../components/AutumnCompanyBrand';
 import kpmg from '../data/domesticKpmgDetailedDossier20261029.json';
+import kpmgJobs from '../data/domesticKpmgConcreteJobs20261029.json';
 import type {User} from '../services/api';
 import '../styles/kpmg-compact-profile.css';
 
@@ -28,14 +29,6 @@ const majors=[
  {name:'信息管理与信息系统',categories:['tech','advisory']},
  {name:'其他专业',categories:['audit','tax','advisory','tech']}
 ] as const;
-const roles:{title:string;subtitle:string;group:JobGroup;type:string;official:string;note:string}[]=[
- {title:'应届生 · 审计与鉴证',subtitle:'审计、会计、财务与数据分析方向',group:'audit',type:'校园招聘方向',official:'https://kpmg.com/cn/zh/careers/campus/graduate-applications.html',note:'官方应届生招聘分类；是否有适合你的具体职位，请进入官网筛选'},
- {title:'应届生 · 税务',subtitle:'企业税务、国际税务与相关咨询',group:'tax',type:'校园招聘方向',official:'https://kpmg.com/cn/zh/careers/campus/graduate-applications.html',note:'官方应届生招聘分类；具体学历、专业、地点以当前职位为准'},
- {title:'应届生 · 咨询',subtitle:'管理、风险、科技及业务转型',group:'advisory',type:'校园招聘方向',official:'https://kpmg.com/cn/zh/careers/campus/graduate-applications.html',note:'官方咨询业务招聘分类；不等于所有团队实时开放招聘'},
- {title:'在校生 · 实习项目',subtitle:'审计、税务、咨询及业务支持',group:'audit',type:'实习招聘方向',official:'https://kpmg.com/cn/zh/careers/campus/basecamp.html',note:'2026—2027 年度项目按实际批次开放，具体岗位见官网'},
- {title:'社会招聘 · 咨询与风险',subtitle:'有工作经验的专业服务人才',group:'advisory',type:'社会招聘方向',official:'https://kpmg.com/cn/zh/careers/experienced-hires.html',note:'仅表示官方招聘类别，不能据此认定具体岗位在招'},
- {title:'交付中心 · 科技与专业支持',subtitle:'数据、系统、云及共享交付相关方向',group:'tech',type:'交付中心方向',official:'https://kpmg.com/cn/zh/careers/delivery-centre-hires.html',note:'招聘城市和实际技术岗位，以交付中心官方职位说明为准'}
-];
 const groupName:Record<JobGroup,string>={audit:'审计',tax:'税务',advisory:'咨询',tech:'科技'};
 const serviceTags:Record<string,string>={
  '审计与鉴证':'财务报告 · 内控 · 审计',
@@ -52,7 +45,7 @@ export function KpmgCompactProfilePage({user}:{user:User|null}){
  const [major,setMajor]=useState('不限专业');
  const [showAll,setShowAll]=useState(false);
  const selected=majors.find(x=>x.name===major)||majors[0];
- const filtered=roles.filter(role=>(selected.categories as readonly string[]).includes(role.group));
+ const filtered=kpmgJobs.jobs.filter(job=>(selected.categories as readonly string[]).includes(job.group));
  const back=getCompanyReturnTarget();
  const shown=kpmg.services.slice(0,showAll?8:4);
  return <Shell user={user}>
@@ -98,22 +91,23 @@ export function KpmgCompactProfilePage({user}:{user:User|null}){
    <section className="hhba-kpmg-section" aria-labelledby="kpmg-roles-title">
     <div className="hhba-kpmg-section-heading">
       <div><h2 id="kpmg-roles-title">招聘岗位与职业机会</h2>
-       <p>当前匹配：<strong>{major}</strong> · {filtered.length} 个招聘方向。具体职位名称、地点及开放状态请在官方系统核对。</p>
+       <p>当前匹配：<strong>{major}</strong> · {filtered.length} 条具体历史职位。岗位来源均有独立链接，但当前招聘状态尚未核实。</p>
       </div>
       <a className="hhba-kpmg-section-link" href="https://kpmg.com/cn/zh/careers.html" data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">全部招聘入口 <ExternalLink size={13}/></a>
     </div>
     <div className="hhba-kpmg-role-list">
-      {filtered.map((job,i)=><article className="hhba-kpmg-role" key={job.title}>
+      {filtered.map(job=><article className="hhba-kpmg-role" key={job.id}>
        <div className="hhba-kpmg-role-icon"><BriefcaseBusiness size={17}/></div>
        <div className="hhba-kpmg-role-main">
-        <div className="hhba-kpmg-role-top"><h3>{job.title}</h3><span>{job.type}</span></div>
-        <p>{job.subtitle}</p>
-        <small>{job.note}</small>
+        <div className="hhba-kpmg-role-top"><h3>{job.title}</h3><span>历史职位 · {job.publishedOn}</span></div>
+        <p>{job.city} · {job.summary}</p>
+        <small>{job.requirement}</small>
        </div>
-       <a href={job.official} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true" aria-label={'在毕马威官方招聘网站查看'+job.title}>查看职位 <ArrowRight size={14}/></a>
+       <Link to={'/candidate/jobs/cn-v2-kpmg-'+job.id}>查看详情 <ArrowRight size={14}/></Link>
       </article>)}
+      {filtered.length===0&&<p className="hhba-kpmg-role-disclaimer">尚未收录与该专业明确相关的具体历史岗位，请使用上方官方招聘入口查看企业正在发布的职位。</p>}
     </div>
-    <p className="hhba-kpmg-role-disclaimer"><GraduationCap size={14}/> 此处按毕马威官网招聘类别整理，不代表已核验到 {filtered.length} 条正在招聘的具体职位。</p>
+    <p className="hhba-kpmg-role-disclaimer"><GraduationCap size={14}/> 这里展示的是已查到独立 Moka 岗位页面的历史职位，不代表职位仍可投递；请在官方系统核对。专业标签仅用于辅助匹配。</p>
    </section>
 
    <section className="hhba-kpmg-section" aria-labelledby="kpmg-services-title">
