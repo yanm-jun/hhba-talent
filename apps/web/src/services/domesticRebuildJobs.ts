@@ -8,9 +8,10 @@ import kpmgJobs from '../data/domesticKpmgConcreteJobs20261029.json';
 import huayuJobs from '../data/domesticHuayuVisionRoles20261029.json';
 import huaanJobs from '../data/domesticHuaanSecuritiesRoles20261029.json';
 import guangfaJobs from '../data/domesticGuangfaSecuritiesRoles20261029.json';
+import citicsJobs from '../data/domesticCiticsSecuritiesRoles20261029.json';
 import type {LiveJob,LiveFilters,LivePage} from './liveRecruitment';
 
-export const DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券'] as const;
+export const DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券'] as const;
 export const DOMESTIC_REBUILD_VERSION='2026-10-29-v2';
 const schneiderV2Records=schneider.jobs.map(job=>({
  id:'cn-v2-schneider-'+job.id,
@@ -87,7 +88,22 @@ export const guangfaV2Records=guangfaJobs.jobs.map(job=>({
  employerRoute:'/companies/domestic/a-000776'
 } satisfies LiveJob & {majorNames:string[];employerRoute:string}));
 
-export const domesticV2Records=[...schneiderV2Records,...kpmgV2Records,...huayuV2Records,...huaanV2Records,...guangfaV2Records];
+export const citicsV2Records=citicsJobs.jobs.map(job=>({
+ id:'cn-v2-citics-'+job.id,company:'中信证券',companyZh:'中信证券',
+ title:job.title,titleZh:job.title,location:job.city,locationZh:job.city,
+ platform:'citics-branch-campus-official',source:'citics-securities',
+ url:job.officialListingUrl,
+ domestic:true,remote:null,recordKind:'DOMESTIC_REBUILT',
+ recruitmentType:'CAMPUS',observedAt:job.publishedOn,
+ currentApplicationVerified:false,
+ educationLabel:job.education,experienceLabel:'2027届校招 · 官网申请状态尚未核实',
+ majorNames:job.majors,responsibilitiesSummary:job.responsibilities,
+ requirementsSummary:job.requirements,
+ positionOrg:job.office,evidenceUrl:job.sourceUrl,
+ employerRoute:'/companies/domestic/a-600030'
+} satisfies LiveJob & {majorNames:string[];employerRoute:string;positionOrg:string;evidenceUrl:string}));
+
+export const domesticV2Records=[...schneiderV2Records,...kpmgV2Records,...huayuV2Records,...huaanV2Records,...guangfaV2Records,...citicsV2Records];
 
 export function domesticV2ById(id:string):LiveJob|undefined{
  return domesticV2Records.find(job=>job.id===id);
@@ -96,7 +112,7 @@ export function filterDomesticRebuildJobs(jobs:LiveJob[],f:LiveFilters):LiveJob[
  const q=f.q.normalize('NFKC').trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
  return jobs.filter(job=>{
   if(f.country==='global')return false;
-  if(f.company&&!(['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华域视觉','schneider electric','kpmg','hasco vision','华安证券','huaan securities','广发证券','gf securities'].some(x=>x.toLowerCase().includes(f.company.toLowerCase()))))return false;
+  if(f.company&&!(['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华域视觉','schneider electric','kpmg','hasco vision','华安证券','huaan securities','广发证券','gf securities','中信证券','citic securities'].some(x=>x.toLowerCase().includes(f.company.toLowerCase()))))return false;
   if(f.location_country&&f.location_country.toUpperCase()!=='CN')return false;
   if(f.city&&!job.locationZh?.includes(f.city)&&!(f.city==='shanghai'&&job.locationZh==='上海')&&!(f.city==='beijing'&&job.locationZh==='北京')&&!(f.city==='guangzhou'&&job.locationZh==='广州'))return false;
   if(f.remote)return false;
@@ -112,11 +128,11 @@ export function filterDomesticRebuildJobs(jobs:LiveJob[],f:LiveFilters):LiveJob[
  });
 }
 export function assertDomesticRebuildIntegrity(){
- if(schneiderV2Records.length!==12||kpmgV2Records.length!==6||huayuV2Records.length!==16||huaanV2Records.length!==10||guangfaV2Records.length!==10||domesticV2Records.length!==54)
+ if(schneiderV2Records.length!==12||kpmgV2Records.length!==6||huayuV2Records.length!==16||huaanV2Records.length!==10||guangfaV2Records.length!==10||citicsV2Records.length!==5||domesticV2Records.length!==59)
   throw Error('REBUILT_COMPANY_JOB_COUNT_CHANGED');
  const ids=new Set<string>(),urls=new Set<string>();
  for(const job of domesticV2Records){
-  if(ids.has(job.id)||(!['huayu-official-campus','huaan-securities-official','guangfa-securities-official'].includes(job.platform)&&urls.has(job.url))||
+  if(ids.has(job.id)||(!['huayu-official-campus','huaan-securities-official','guangfa-securities-official','citics-branch-campus-official'].includes(job.platform)&&urls.has(job.url))||
     !(job.platform==='schneider-official'&&/^cn-v2-schneider-[0-9]{6}$/.test(job.id)&&
       /^https:\/\/careers\.se\.com\/jobs\/[0-9]{6}\?lang=zh-(?:CN|cn)$/.test(job.url)||
       job.platform==='kpmg-moka-official'&&/^cn-v2-kpmg-[0-9a-f-]{36}$/.test(job.id)&&
@@ -126,7 +142,9 @@ export function assertDomesticRebuildIntegrity(){
       job.platform==='huaan-securities-official'&&/^cn-v2-huaan-[a-z-]{5,75}$/.test(job.id)&&
       job.url==='https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment'||
       job.platform==='guangfa-securities-official'&&/^cn-v2-guangfa-[a-z-]{5,80}$/.test(job.id)&&
-      job.url==='https://job.gf.com.cn/')||
+      job.url==='https://job.gf.com.cn/'||
+      job.platform==='citics-branch-campus-official'&&/^cn-v2-citics-[a-z-]{5,85}$/.test(job.id)&&
+      job.url==='https://careers.citics.com/campus/branch')||
     !job.titleZh||!job.locationZh||!job.responsibilitiesSummary)
    throw Error('DOMESTIC_REBUILD_SOURCE_INVALID '+job.id);
   ids.add(job.id);urls.add(job.url);
