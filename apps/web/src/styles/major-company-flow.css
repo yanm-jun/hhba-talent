@@ -1,3 +1,19 @@
+/* Universal employer role filter: no search field on any company detail route. */
+.company-profile-major-chips{margin-top:22px}
+.company-profile-major-chips>h2{margin:0 0 10px}
+.company-profile-major-chips>p{color:#688075;line-height:1.65;font-size:13px}
+.hhba-major-quick-list .hhba-kpmg-major{
+ appearance:none;cursor:pointer;border:1px solid #dfe9e3;background:#fff;
+ color:#45685a;padding:8px 12px;border-radius:9px;line-height:1.4;
+ font-family:inherit;font-size:12px;white-space:normal
+}
+.hhba-major-quick-list .hhba-kpmg-major.is-selected{
+ background:#e9f5ed;border-color:#a5d3b3;color:#216c48;font-weight:700
+}
+.hhba-major-quick-list .hhba-kpmg-major:hover{border-color:#90c4a5}
+.hhba-major-quick-list .hhba-kpmg-major.hhba-major-show-more{background:#f8faf8}
+.hhba-major-quick-list .hhba-major-show-more .is-up{transform:rotate(180deg)}
+
 /* Employer-specific quick subjects reuse the same global major and job matcher. */
 .hhba-major-quick-area{margin:14px 0 12px}
 .hhba-major-quick-caption{display:block;font-size:12px;color:#537767;font-weight:700;margin-bottom:8px}
@@ -8,15 +24,6 @@
 .hhba-major-quick-footnote{font-size:11px;line-height:1.65;color:#809287;margin:9px 0 0}
 
 /* HHBA reviewed employer/major matching: visual rhythm inherited from the CITIC compact layout. */
-.hhba-major-linked-controls{display:flex;align-items:flex-start;flex-wrap:wrap;gap:12px;margin:14px 0}
-.hhba-major-linked-controls .unified-major-filter{width:min(100%,480px);position:relative;z-index:3}
-.hhba-major-linked-controls .unified-major-field{background:#fff}
-.hhba-major-linked-controls .hhba-kpmg-major{min-height:40px;display:flex;align-items:center;gap:6px}
-.hhba-major-context-label{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:12px;color:#33654c;line-height:1.6;margin:8px 0 0}
-.hhba-major-view-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
-.hhba-major-view-tabs button{background:#fff;border:1px solid #dce8e1;border-radius:9px;color:#50675d;padding:9px 12px;font:inherit;font-size:12px;cursor:pointer}
-.hhba-major-view-tabs button.is-selected{background:#edf6ef;border-color:#a4d2b2;color:#236746;font-weight:700}
-.hhba-major-view-tabs button:focus-visible,.hhba-major-employer-card:focus-visible{outline:2px solid #217a5a;outline-offset:2px}
 .hhba-major-recommendations{margin:18px 0 24px;padding:22px 24px;background:#fff;border:1px solid #e5ece7;border-radius:16px}
 .hhba-major-recommendations-heading{display:flex;align-items:start;justify-content:space-between;gap:14px}
 .hhba-major-recommendations-heading small{font-size:10px;font-weight:700;letter-spacing:.09em;color:#537968}
@@ -42,5 +49,4 @@
  .hhba-major-recommendations{padding:16px}
  .hhba-major-employer-grid{grid-template-columns:1fr}
  .hhba-major-recommendations-heading h2{font-size:17px}
- .hhba-major-linked-controls .unified-major-filter{width:100%}
 }
