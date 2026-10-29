@@ -1,0 +1,323 @@
+{
+  "schemaVersion": 1,
+  "company": "华域视觉科技（上海）有限公司",
+  "displayName": "华域视觉科技",
+  "employerId": "rel-huayu-004",
+  "verifiedOn": "2026-10-29",
+  "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+  "sourceType": "company_official_campus_jobs_listing",
+  "officialCareerHome": "https://www.hascovision.com/join-us",
+  "officialRecruitment": "https://hascovision.zhiye.com/campus/jobs",
+  "applicationStatus": "individual_positions_on_official_listing; per-role application status not confirmed",
+  "note": "官方校招列表检索到21条职位，本批只人工整理其中12个具有完整标题、城市、职责和任职资格的具体记录；因尚未验证每条职位独立深链，官方跳转使用完整校招职位列表，不能说可直达单岗投递页。",
+  "media": {
+    "logo": "domestic-media/user-f9727f3062cf91da52b3285c.png",
+    "logoStatus": "user_uploaded_unverified_identity",
+    "photos": [
+      {
+        "path": "domestic-media/e58d8ee59f9fe8a786e8a789e7a791e68a80efbc88e4b88ae6b5b7efbc89e69c89e99990e585ace58fb8-photo-0.webp",
+        "label": "华域视觉官网展示的常熟工厂实景",
+        "status": "official_company_photo"
+      },
+      {
+        "path": "domestic-media/user-4f0e78c7cb648df8a4cd2fed.webp",
+        "label": "以前制作的企业建筑素材（归属待核实）",
+        "status": "user_uploaded_identity_unverified"
+      }
+    ]
+  },
+  "majors": [
+    {
+      "name": "不限专业",
+      "groups": [
+        "optics",
+        "electronics",
+        "mechanical",
+        "quality",
+        "automation",
+        "manufacturing",
+        "software"
+      ]
+    },
+    {
+      "name": "光电信息科学与工程",
+      "groups": [
+        "optics"
+      ]
+    },
+    {
+      "name": "光源与照明",
+      "groups": [
+        "optics"
+      ]
+    },
+    {
+      "name": "电子信息工程",
+      "groups": [
+        "electronics",
+        "software"
+      ]
+    },
+    {
+      "name": "电气工程及其自动化",
+      "groups": [
+        "electronics",
+        "automation"
+      ]
+    },
+    {
+      "name": "自动化",
+      "groups": [
+        "electronics",
+        "automation",
+        "manufacturing"
+      ]
+    },
+    {
+      "name": "计算机科学与技术",
+      "groups": [
+        "software"
+      ]
+    },
+    {
+      "name": "软件工程",
+      "groups": [
+        "software"
+      ]
+    },
+    {
+      "name": "机械设计制造及其自动化",
+      "groups": [
+        "mechanical",
+        "manufacturing",
+        "quality",
+        "automation"
+      ]
+    },
+    {
+      "name": "车辆工程",
+      "groups": [
+        "mechanical",
+        "quality",
+        "electronics"
+      ]
+    },
+    {
+      "name": "材料科学与工程",
+      "groups": [
+        "manufacturing"
+      ]
+    },
+    {
+      "name": "工业工程",
+      "groups": [
+        "manufacturing",
+        "quality"
+      ]
+    },
+    {
+      "name": "其他专业",
+      "groups": [
+        "optics",
+        "electronics",
+        "mechanical",
+        "quality",
+        "automation",
+        "manufacturing",
+        "software"
+      ]
+    }
+  ],
+  "services": [
+    {
+      "title": "智能汽车照明",
+      "description": "面向汽车前照灯、尾灯、信号灯等系统开展光学、结构、电子协同设计与量产。",
+      "tags": "前照灯 · 尾灯 · 智能车灯",
+      "deliverables": [
+        "汽车前灯与信号照明",
+        "整车智能照明方案",
+        "面向主机厂的光学设计"
+      ],
+      "career": "光学工程、汽车工程、结构设计"
+    },
+    {
+      "title": "光学与电子控制",
+      "description": "结合光学配光、LED驱动、车灯控制及汽车电子，开发车灯电子与交互功能。",
+      "tags": "光学 · PCB · 车灯电子",
+      "deliverables": [
+        "电子硬件设计与测试",
+        "光学模组验证",
+        "嵌入式软件与控制"
+      ],
+      "career": "电子信息、电气、软件、光电"
+    },
+    {
+      "title": "智能制造与工艺",
+      "description": "利用自动化装备、模具、注塑和产线技术，支持车灯零部件高质量制造。",
+      "tags": "注塑工艺 · 机电 · 自动化",
+      "deliverables": [
+        "制造工艺优化",
+        "设备维修与维护",
+        "模具与工装支持"
+      ],
+      "career": "机械、工业工程、自动化"
+    },
+    {
+      "title": "产品质量与验证",
+      "description": "通过质量管理、客户问题闭环及产品测试验证，保障汽车照明产品性能和可靠性。",
+      "tags": "质量工程 · 验证 · 可靠性",
+      "deliverables": [
+        "产品可靠性测试",
+        "客户质量问题响应",
+        "新项目质量评审"
+      ],
+      "career": "车辆工程、机械、电子、质量管理"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "001",
+      "title": "设备维修工程师",
+      "city": "武汉",
+      "requirements": "本科及以上；机械制造及自动化、电气自动化、机电一体化或工业机器人相关专业",
+      "summary": "参与设备点检、日常保养、基础维修与产线调试。",
+      "category": "automation",
+      "recruitmentType": "CAMPUS",
+      "officialUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "officialSourceType": "individual_job_on_official_shared_job_listing",
+      "currentApplicationVerified": false
+    },
+    {
+      "id": "002",
+      "title": "质量工程师",
+      "city": "武汉",
+      "requirements": "本科及以上；机械、车辆工程等专业；沟通能力与英语口语",
+      "summary": "跟进客户质量问题和数据指标，协助质量异常分析及新项目量产质量控制。",
+      "category": "quality",
+      "recruitmentType": "CAMPUS",
+      "officialUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "officialSourceType": "individual_job_on_official_shared_job_listing",
+      "currentApplicationVerified": false
+    },
+    {
+      "id": "003",
+      "title": "研发工程师（硬件方向）",
+      "city": "武汉",
+      "requirements": "本科及以上；电子工程、通信、自动化、车辆工程等；熟悉PCB与EDA工具优先",
+      "summary": "开展车灯电路原理图、PCB及元器件设计，参与硬件调试、测试与质量分析。",
+      "category": "electronics",
+      "recruitmentType": "CAMPUS",
+      "officialUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "officialSourceType": "individual_job_on_official_shared_job_listing",
+      "currentApplicationVerified": false
+    },
+    {
+      "id": "004",
+      "title": "研发工程师（光学方向）",
+      "city": "武汉",
+      "requirements": "本科及以上；光学、数学、物理或机械工程等专业；三维建模及英语四级",
+      "summary": "参与车灯光学模组设计、验证与光学报告编制，协助对接主机厂。",
+      "category": "optics",
+      "recruitmentType": "CAMPUS",
+      "officialUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "officialSourceType": "individual_job_on_official_shared_job_listing",
+      "currentApplicationVerified": false
+    },
+    {
+      "id": "005",
+      "title": "研发工程师（结构方向）",
+      "city": "武汉",
+      "requirements": "本科及以上；汽车、机械等工程专业；具备建模软件与Office使用能力",
+      "summary": "参与车灯零部件三维建模、二维图纸及BOM维护，协助设计变更。",
+      "category": "mechanical",
+      "recruitmentType": "CAMPUS",
+      "officialUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "officialSourceType": "individual_job_on_official_shared_job_listing",
+      "currentApplicationVerified": false
+    },
+    {
+      "id": "006",
+      "title": "质量工程师",
+      "city": "常熟",
+      "requirements": "本科及以上；机械、汽车等工科专业；能够进行数据分析与报告编写",
+      "summary": "处理客户质量问题、制定改善措施，参与产品检验标准和项目质量评审。",
+      "category": "quality",
+      "recruitmentType": "CAMPUS",
+      "officialUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "officialSourceType": "individual_job_on_official_shared_job_listing",
+      "currentApplicationVerified": false
+    },
+    {
+      "id": "007",
+      "title": "技术员（工艺／SMT）",
+      "city": "常熟",
+      "requirements": "大专及以上；模具、机电、机械、自动化或材料相关专业",
+      "summary": "协助注塑工艺改进、生产设备点检、SMT设备维护和制造质量跟踪。",
+      "category": "manufacturing",
+      "recruitmentType": "CAMPUS",
+      "officialUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "officialSourceType": "individual_job_on_official_shared_job_listing",
+      "currentApplicationVerified": false
+    },
+    {
+      "id": "008",
+      "title": "维修员（设备／模具）",
+      "city": "上海",
+      "requirements": "大专及以上；机电、机械等相关专业；具有维修经验或实习经验者优先",
+      "summary": "协助设备与模具拆装、维修、保养，执行现场点检与工具管理。",
+      "category": "automation",
+      "recruitmentType": "CAMPUS",
+      "officialUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "officialSourceType": "individual_job_on_official_shared_job_listing",
+      "currentApplicationVerified": false
+    },
+    {
+      "id": "009",
+      "title": "工艺工程师",
+      "city": "上海",
+      "requirements": "本科及以上；工程、机械类专业优先；了解制造工艺和FMEA等质量工具",
+      "summary": "参与工艺标准编制、生产巡检、工艺验证、流程改善及异常分析。",
+      "category": "manufacturing",
+      "recruitmentType": "CAMPUS",
+      "officialUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "officialSourceType": "individual_job_on_official_shared_job_listing",
+      "currentApplicationVerified": false
+    },
+    {
+      "id": "010",
+      "title": "研发工程师（光学方向）",
+      "city": "上海",
+      "requirements": "本科及以上；光学、机械或仪器等工科专业；熟悉光学设计软件和测试设备",
+      "summary": "参与汽车照明光学模组设计、整改、认可与测试，协助客户项目开发。",
+      "category": "optics",
+      "recruitmentType": "CAMPUS",
+      "officialUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "officialSourceType": "individual_job_on_official_shared_job_listing",
+      "currentApplicationVerified": false
+    },
+    {
+      "id": "011",
+      "title": "研发工程师（硬件方向）",
+      "city": "上海",
+      "requirements": "本科及以上；电子、通信、自动化或汽车电子等；EDA、硬件调试能力",
+      "summary": "参与汽车灯具硬件电路开发、PCB设计、电路测试及研发技术文档编制。",
+      "category": "electronics",
+      "recruitmentType": "CAMPUS",
+      "officialUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "officialSourceType": "individual_job_on_official_shared_job_listing",
+      "currentApplicationVerified": false
+    },
+    {
+      "id": "012",
+      "title": "研发工程师（软件方向）",
+      "city": "上海",
+      "requirements": "本科及以上；计算机、软件工程、电子信息或自动化等专业；了解嵌入式C",
+      "summary": "参与软件需求分析、编码、单元测试、驱动开发及软硬件集成调试。",
+      "category": "software",
+      "recruitmentType": "CAMPUS",
+      "officialUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "officialSourceType": "individual_job_on_official_shared_job_listing",
+      "currentApplicationVerified": false
+    }
+  ]
+}
