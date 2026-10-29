@@ -1,3 +1,12 @@
+/* Employer-specific quick subjects reuse the same global major and job matcher. */
+.hhba-major-quick-area{margin:14px 0 12px}
+.hhba-major-quick-caption{display:block;font-size:12px;color:#537767;font-weight:700;margin-bottom:8px}
+.hhba-major-quick-list{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hhba-major-quick-list .hhba-kpmg-major{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px}
+.hhba-major-quick-list .hhba-kpmg-major small{font-size:11px;font-weight:600;opacity:.8}
+.hhba-major-quick-list .hhba-kpmg-major:focus-visible{outline:2px solid #217a5a;outline-offset:2px}
+.hhba-major-quick-footnote{font-size:11px;line-height:1.65;color:#809287;margin:9px 0 0}
+
 /* HHBA reviewed employer/major matching: visual rhythm inherited from the CITIC compact layout. */
 .hhba-major-linked-controls{display:flex;align-items:flex-start;flex-wrap:wrap;gap:12px;margin:14px 0}
 .hhba-major-linked-controls .unified-major-filter{width:min(100%,480px);position:relative;z-index:3}
