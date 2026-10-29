@@ -62,7 +62,7 @@ jobs:
           for item in photos:
             photo=p/item['file']
             assert photo.is_file() and photo.stat().st_size>10000
-            assert photo.read_bytes()[:2]==b'\\xff\\xd8'
+            assert photo.read_bytes()[:2]==bytes((0xff,0xd8))
             assert hashlib.sha256(photo.read_bytes()).hexdigest()==item['sha256']
             assert item['licenseUrl'].startswith('https://creativecommons.org/')
           print('HHBA_19_INDEPENDENT_PHOTOS_FROM_312_ARCHIVE_VERIFIED')
