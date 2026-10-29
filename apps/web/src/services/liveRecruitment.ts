@@ -333,7 +333,10 @@ function jobCountryCode(job:LiveJob){
 export async function listDomesticRebuildMarket(filters:LiveFilters,offset:number,signal:AbortSignal):Promise<LivePage>{
  assertDomesticRebuildIntegrity();
  const overseas=await loadCuratedOverseasJobs(signal);
- const combined=[...overseas,...domesticV2Records];
+ // Keep original 100 records unchanged; interleave the first reviewed China employer.
+ const combined=[...domesticV2Records.slice(0,3),...overseas.slice(0,5),
+  ...domesticV2Records.slice(3,6),...overseas.slice(5,10),
+  ...domesticV2Records.slice(6),...overseas.slice(10)];
  const allowed=combined.filter(job=>!!safeOfficialJobUrl(job)&&rebuildListFilter(job,filters));
  return {jobs:allowed.slice(offset,offset+30),total:allowed.length,offset,limit:30,
    boards:11,failures:0,updated:'2026-10-29T00:00:00Z'};
