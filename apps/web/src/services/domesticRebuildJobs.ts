@@ -9,9 +9,10 @@ import huayuJobs from '../data/domesticHuayuVisionRoles20261029.json';
 import huaanJobs from '../data/domesticHuaanSecuritiesRoles20261029.json';
 import guangfaJobs from '../data/domesticGuangfaSecuritiesRoles20261029.json';
 import citicsJobs from '../data/domesticCiticsSecuritiesRoles20261029.json';
+import pfizerJobs from '../data/domesticPfizerOfficialJobs20261029.json';
 import type {LiveJob,LiveFilters,LivePage} from './liveRecruitment';
 
-export const DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券'] as const;
+export const DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券','辉瑞'] as const;
 export const DOMESTIC_REBUILD_VERSION='2026-10-29-v2';
 const schneiderV2Records=schneider.jobs.map(job=>({
  id:'cn-v2-schneider-'+job.id,
@@ -103,7 +104,21 @@ export const citicsV2Records=citicsJobs.jobs.map(job=>({
  employerRoute:'/companies/domestic/a-600030'
 } satisfies LiveJob & {majorNames:string[];employerRoute:string;positionOrg:string;evidenceUrl:string}));
 
-export const domesticV2Records=[...schneiderV2Records,...kpmgV2Records,...huayuV2Records,...huaanV2Records,...guangfaV2Records,...citicsV2Records];
+export const pfizerV2Records=pfizerJobs.jobs.map(job=>({
+ id:'cn-v2-pfizer-'+job.id.replace('cn-autumn-pfizer-',''),
+ company:'辉瑞',companyZh:'辉瑞',
+ title:job.title,titleZh:job.title,location:job.cities[0],locationZh:job.cities[0],
+ platform:'pfizer-official',source:'pfizer',
+ url:job.sourceUrl,domestic:true,remote:null,
+ recordKind:'DOMESTIC_REBUILT',recruitmentType:'SOCIAL',
+ observedAt:job.observedOn,currentApplicationVerified:false,
+ educationLabel:job.education,experienceLabel:'职位是否仍在招请进入辉瑞官网核对',
+ majorNames:job.majors,
+ responsibilitiesSummary:job.responsibilities,requirementsSummary:job.requirements,
+ employerRoute:'/companies/autumn/cn-autumn-003'
+} satisfies LiveJob & {majorNames:string[];employerRoute:string}));
+
+export const domesticV2Records=[...schneiderV2Records,...kpmgV2Records,...huayuV2Records,...huaanV2Records,...guangfaV2Records,...citicsV2Records,...pfizerV2Records];
 
 export function domesticV2ById(id:string):LiveJob|undefined{
  return domesticV2Records.find(job=>job.id===id);
@@ -112,7 +127,7 @@ export function filterDomesticRebuildJobs(jobs:LiveJob[],f:LiveFilters):LiveJob[
  const q=f.q.normalize('NFKC').trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
  return jobs.filter(job=>{
   if(f.country==='global')return false;
-  if(f.company&&!(['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华域视觉','schneider electric','kpmg','hasco vision','华安证券','huaan securities','广发证券','gf securities','中信证券','citic securities'].some(x=>x.toLowerCase().includes(f.company.toLowerCase()))))return false;
+  if(f.company&&!(['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华域视觉','schneider electric','kpmg','hasco vision','华安证券','huaan securities','广发证券','gf securities','中信证券','citic securities','辉瑞','pfizer'].some(x=>x.toLowerCase().includes(f.company.toLowerCase()))))return false;
   if(f.location_country&&f.location_country.toUpperCase()!=='CN')return false;
   if(f.city&&!job.locationZh?.includes(f.city)&&!(f.city==='shanghai'&&job.locationZh==='上海')&&!(f.city==='beijing'&&job.locationZh==='北京')&&!(f.city==='guangzhou'&&job.locationZh==='广州'))return false;
   if(f.remote)return false;
@@ -128,7 +143,7 @@ export function filterDomesticRebuildJobs(jobs:LiveJob[],f:LiveFilters):LiveJob[
  });
 }
 export function assertDomesticRebuildIntegrity(){
- if(schneiderV2Records.length!==12||kpmgV2Records.length!==6||huayuV2Records.length!==16||huaanV2Records.length!==10||guangfaV2Records.length!==10||citicsV2Records.length!==5||domesticV2Records.length!==59)
+ if(schneiderV2Records.length!==12||kpmgV2Records.length!==6||huayuV2Records.length!==16||huaanV2Records.length!==10||guangfaV2Records.length!==10||citicsV2Records.length!==5||pfizerV2Records.length!==4||domesticV2Records.length!==63)
   throw Error('REBUILT_COMPANY_JOB_COUNT_CHANGED');
  const ids=new Set<string>(),urls=new Set<string>();
  for(const job of domesticV2Records){
@@ -145,6 +160,8 @@ export function assertDomesticRebuildIntegrity(){
       job.url==='https://job.gf.com.cn/'||
       job.platform==='citics-branch-campus-official'&&/^cn-v2-citics-[a-z-]{5,85}$/.test(job.id)&&
       job.url==='https://careers.citics.com/campus/branch')||
+      job.platform==='pfizer-official'&&/^cn-v2-pfizer-[0-9]{7}$/.test(job.id)&&
+      job.url==='https://www.pfizer.com/about/careers/job/'+job.id.replace('cn-v2-pfizer-','')+'?langcode=en'||
     !job.titleZh||!job.locationZh||!job.responsibilitiesSummary)
    throw Error('DOMESTIC_REBUILD_SOURCE_INVALID '+job.id);
   ids.add(job.id);urls.add(job.url);
