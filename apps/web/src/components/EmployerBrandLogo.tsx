@@ -25,6 +25,8 @@ export function EmployerBrandLogo({job,identity,variant='card'}:LogoProps){
   const cls=variant==='profile'
     ?'company-profile-brand'+(asset?.wide?' company-profile-brand-wide':'')
     :'unified-brand-logo'+(asset?.wide?' unified-brand-logo-wide':'');
+  if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='上海鹰角网络科技有限公司')
+    return <span className={cls} title="鹰角网络 HYPERGRYPH"><img src={import.meta.env.BASE_URL+'images/hypergryph-user/hypergryph-logo.png'} alt="鹰角网络用户提供品牌Logo" loading="eager" decoding="async"/></span>;
   if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='网易游戏（互娱）')
     return <span className={cls} title="网易游戏（互娱）"><img src={import.meta.env.BASE_URL+'images/netease-user/netease-logo.png'} alt="网易游戏用户提供 Logo 原图" loading="eager" decoding="async"/></span>;
   if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='顺丰科技有限公司')
