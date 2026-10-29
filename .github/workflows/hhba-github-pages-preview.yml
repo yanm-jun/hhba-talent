@@ -115,6 +115,7 @@ jobs:
             scripts/home-company-marquee.contract.test.mjs \
             scripts/strict-auth-no-photo-outlinks.behavior.test.mjs \
             scripts/official-recruitment-gate-photos.contract.test.mjs \
+            scripts/all-recruitment-source-login-gate.contract.test.mjs \
             scripts/three-entry-experience.contract.test.mjs \
             scripts/employer-growth.contract.test.mjs \
             scripts/employer-evidence.contract.test.mjs \
