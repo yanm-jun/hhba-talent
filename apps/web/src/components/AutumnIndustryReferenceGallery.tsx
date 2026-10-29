@@ -38,7 +38,7 @@ export function AutumnIndustryReferenceGallery({companyId,companyName}:{companyI
    <h3>行业场景参考照片</h3>
    <span><ShieldCheck size={14}/> 非该企业真实办公环境</span>
   </div>
-  <p className="hhba-autumn-profile-note">以下仅用于了解相关行业的典型环境。照片来自公开授权摄影图库，**不是 {companyName} 的真实办公楼、团队、工厂、产品或招聘现场**，也不是 AI 生成的照片。图片归属与来源逐张标注。</p>
+  <p className="hhba-autumn-profile-note">以下仅用于了解相关行业的典型环境。照片来自公开授权摄影图库，不是 {companyName} 的真实办公楼、团队、工厂、产品或招聘现场，也不是 AI 生成的照片。图片归属与来源逐张标注。</p>
   {photos===null?<p className="hhba-autumn-profile-note">正在读取已审核的照片索引…</p>:
    photos.length===0?<p className="hhba-autumn-no-qualified-photo"><ImageOff size={21}/> 该企业暂无通过场景匹配审核的参考照片。不会使用不相关的照片凑数。</p>:
    <div className="hhba-autumn-local-photo-grid hhba-autumn-references">{photos.map(p=>
