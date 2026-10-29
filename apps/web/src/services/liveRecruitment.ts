@@ -46,7 +46,13 @@ const BRANDED_GREENHOUSE:Record<string,{host:string;path:string}>={
 export function safeOfficialJobUrl(job: LiveJob) {
   try {
     const u = new URL(job.url);
-    if(u.protocol !== 'https:' || u.username || u.password || u.port) return null;
+    // Huaan Securities' official recruitment service uses a dedicated HTTPS port.
+    // Allow exactly that proven employer ATS endpoint, never an arbitrary custom port.
+    const huaanPort=job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='huaan-securities-official'&&
+      job.source==='huaan-securities'&&u.hostname==='hahr.hazq.com'&&u.port==='8083'&&
+      u.pathname==='/eip4ha-hyapp/recruitment'&&!u.search&&!u.hash&&
+      /^cn-v2-huaan-[a-z-]{5,75}$/.test(job.id);
+    if(u.protocol !== 'https:' || u.username || u.password || (u.port&&!huaanPort)) return null;
     if (!job.domestic) {
       const hosts = allowedHost[String(job.platform||'').toLowerCase()] || [];
       const standard=hosts.includes(u.hostname) && u.pathname.split('/').includes(job.source||'');
@@ -64,7 +70,10 @@ export function safeOfficialJobUrl(job: LiveJob) {
         'tencent-official': 'careers.tencent.com',
         'baidu-official': 'talent.baidu.com'
       };
-      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='huayu-official-campus'&&job.source==='huayu-vision'){
+      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='huaan-securities-official'&&job.source==='huaan-securities'){
+        // Job-level details come from the 2026 archived announcement; apply portal is not a job permalink.
+        if(!huaanPort)return null;
+      }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='huayu-official-campus'&&job.source==='huayu-vision'){
         // Each saved role is individually evidenced in the same official 21-role listing.
         // Never pretend this list URL is a per-position application permalink.
         if(u.hostname!=='hascovision.zhiye.com'||u.pathname!=='/campus/jobs'||
@@ -349,7 +358,9 @@ export async function listDomesticRebuildMarket(filters:LiveFilters,offset:numbe
   ...domesticV2Records.slice(6,12),...overseas.slice(10,20),
   ...domesticV2Records.slice(12,18),...overseas.slice(20,25),
   ...domesticV2Records.slice(18,22),...overseas.slice(25,30),
-  ...domesticV2Records.slice(22),...overseas.slice(30)];
+  ...domesticV2Records.slice(22,34),...overseas.slice(30,38),
+  ...domesticV2Records.slice(34,38),...overseas.slice(38,44),
+  ...domesticV2Records.slice(38),...overseas.slice(44)];
  const allowed=combined.filter(job=>!!safeOfficialJobUrl(job)&&rebuildListFilter(job,filters));
  return {jobs:allowed.slice(offset,offset+30),total:allowed.length,offset,limit:30,
    boards:11,failures:0,updated:'2026-10-29T00:00:00Z'};
