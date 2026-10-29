@@ -29,9 +29,9 @@ for(const [name,entry] of Object.entries(brandRegistry)){
  assert(match,'Logo must map to exact screenshot enterprise '+name);
  assert(entry.id===match.id,'No mismatched company logo');
  assert(new RegExp('^images/autumn-real-logos/'+match.id+'\\.(svg|jpg|jpeg|png|webp)$').test(entry.path),'No unsafe or invented image paths');
- assert(entry.source?.startsWith('https://github.com/')||entry.source==='https://commons.wikimedia.org/wiki/File:KPMG_blue_logo.svg','Record public image provenance');
+ assert(entry.source?.startsWith('https://github.com/')||['https://commons.wikimedia.org/wiki/File:KPMG_blue_logo.svg','https://commons.wikimedia.org/wiki/File:Schneider_Electric_2007.svg'].includes(entry.source),'Record public image provenance');
  if(entry.sourceType==='wikimedia_build_import'){
-  assert(entry.id==='cn-autumn-001'&&entry.path==='images/autumn-real-logos/cn-autumn-001.svg','Only exact source-backed KPMG logo may be downloaded in Pages CI');
+  assert((entry.id==='cn-autumn-001'&&entry.path==='images/autumn-real-logos/cn-autumn-001.svg')||(entry.id==='cn-autumn-002'&&entry.path==='images/autumn-real-logos/cn-autumn-002.svg'),'Only exact source-backed KPMG and Schneider wordmarks may be downloaded in Pages CI');
   continue;
  }
  const local='public/'+entry.path;
