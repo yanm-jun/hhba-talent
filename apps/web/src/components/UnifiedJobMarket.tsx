@@ -492,7 +492,7 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
         <section className="unified-jd-section"><h3>任职要求与经验</h3><p>{job.requirementsSummary||job.experienceLabel||'需核对官方招聘职位要求。'}</p></section>
         {!!job.majorNames?.length&&<section className="unified-jd-section"><h3>相关专业背景</h3><p>{job.majorNames.join('、')}</p><small>专业关联是 HHBA 的辅助匹配，不代表官方逐项规定的招聘专业。</small></section>}
         {job.platform==='citics-branch-campus-official'&&job.positionOrg&&<p className="unified-jd-source">招聘机构：{job.positionOrg}</p>}
-        {job.platform==='citics-branch-campus-official'&&job.evidenceUrl&&<p><a href={job.evidenceUrl} target="_blank" rel="noopener noreferrer">查看高校平台原始职位公告 <ExternalLink size={14}/></a></p>}
+        {job.platform==='citics-branch-campus-official'&&job.evidenceUrl&&<p><a data-hhba-recruitment-outbound="true" href={job.evidenceUrl} target="_blank" rel="noopener noreferrer">查看高校平台原始职位公告 <ExternalLink size={14}/></a></p>}
         {official&&<a data-hhba-recruitment-outbound="true" href={official} target="_blank" rel="noopener noreferrer">{job.platform==='citics-branch-campus-official'?'前往中信证券官方分支机构校招（申请状态待核对）':job.platform==='guangfa-securities-official'?'查看广发证券官方招聘首页（旧校招已截止）':job.platform==='huaan-securities-official'?'查看华安证券官方招聘报名系统（历史岗位已截止）':job.platform==='huayu-official-campus'?'前往官方职位列表核对该岗位':'查看企业官网完整职位'} <ExternalLink size={14}/></a>}
        </div>:
       job.recordKind==='CURATED_HISTORICAL'?<div className="unified-jd-content">
