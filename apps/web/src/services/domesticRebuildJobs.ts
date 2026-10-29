@@ -176,9 +176,9 @@ export function assertDomesticRebuildIntegrity(){
       job.platform==='citics-branch-campus-official'&&/^cn-v2-citics-[a-z-]{5,85}$/.test(job.id)&&
       job.url==='https://careers.citics.com/campus/branch'||
       job.platform==='pfizer-official'&&/^cn-v2-pfizer-[0-9]{7}$/.test(job.id)&&
-      job.url==='https://www.pfizer.com/about/careers/job/'+job.id.replace('cn-v2-pfizer-','')+'?langcode=en')||
+      job.url==='https://www.pfizer.com/about/careers/job/'+job.id.replace('cn-v2-pfizer-','')+'?langcode=en'||
       job.platform==='csair-official-list'&&/^cn-v2-csair-[a-z-]{6,100}$/.test(job.id)&&
-      job.url==='https://job.csair.cn/global'||
+      job.url==='https://job.csair.cn/global')||
     !job.titleZh||!job.locationZh||!job.responsibilitiesSummary)
    throw Error('DOMESTIC_REBUILD_SOURCE_INVALID '+job.id);
   ids.add(job.id);urls.add(job.url);
