@@ -38,7 +38,7 @@ export function MajorEmployerRecommendations({filters}:{filters:LiveFilters}){
   </div>
   {list.length>0?<div className="hhba-major-employer-grid">
    {list.map(company=><Link className="hhba-major-employer-card" key={company.route}
-    to={company.route+'?major='+encodeURIComponent(slug)}>
+    to={company.route+'?major='+encodeURIComponent(slug)+(filters.include_unknown_majors?'&unknown=1':'')}>
     <span className="hhba-major-employer-logo"><EmployerBrandLogo job={company.roles[0]}/></span>
     <span className="hhba-major-employer-info">
      <strong>{company.name}</strong>
