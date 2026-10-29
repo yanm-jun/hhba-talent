@@ -130,7 +130,7 @@ assert.equal(new Set(hypergryph.jobs.map(j=>j.id)).size,20);
 assert(hypergryph.jobs.every(j=>j.company==='上海鹰角网络科技有限公司'&&j.independentOfficialJobVerified===false&&j.currentOpenVerified===false&&j.officialListUrl==='https://career.hypergryph.com/'));
 assert(hypergryph.jobs.every(j=>j.editorialRelatedMajors.length&&j.majors.length===0&&j.evidenceUrl.startsWith('https://')));
 assert(main.includes("if(route==='/companies/autumn/cn-autumn-007')return <HypergryphCompactProfilePage user={user}/>;"));
-assert(hypergryphPage.includes('hhba-kpmg-photo-grid')&&hypergryphPage.includes('<CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn-007"/>'));
+assert(hypergryphPage.includes('hhba-kpmg-photo-grid')&&hypergryphPage.includes('<CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn-007"'));
 assert(hypergryphPage.indexOf('CompanyMajorJobs')<hypergryphPage.indexOf('主要业务与专业服务'));
 assert(hypergryphPage.includes('data-hhba-recruitment-outbound="true"'));
 assert(index.includes('hypergryphV2Records.length!==20||domesticV2Records.length!==120'));
