@@ -5,7 +5,7 @@
   "verifiedOn": "2026-10-29",
   "status": "historical_official_job_links_not_current_openings",
   "officialCareerHome": "https://kpmg.com/cn/zh/careers.html",
-  "note": "岗位名称与独立Moka职位UUID来自有日期的公开记录；原始Moka系统的实时开放状态未确认，不可标注仍在招聘。",
+  "note": "6 条独立职位UUID与岗位城市、内容来自曾公开的KPMG Moka职位链接及历史招聘摘要；没有实时确认任何职位仍在招。",
   "jobs": [
     {
       "id": "833c21f8-d5f4-4611-b6d7-eedabfac3128",
@@ -105,23 +105,23 @@
       "evidenceUrl": "https://www.10100.com/article/31449311"
     },
     {
-      "id": "74b43c96-685c-4beb-ac72-bab4e0076c91",
-      "title": "信息技术审计项目 · 未来之翼（校招）",
-      "city": "城市以具体申请页为准",
-      "recruitmentType": "CAMPUS",
-      "group": "tech",
-      "publishedOn": "2026-05-28",
-      "summary": "毕马威校园招聘相关的信息技术审计项目，公开活动资料提供独立职位链接。",
-      "requirement": "学历、城市及具体应届生资格需打开独立岗位页面核对；不从活动名称推断名额或在招状态。",
+      "id": "c1a11078-6ec6-4b83-a1b6-5ee4dc0a707e",
+      "title": "审计员／助理经理 · 金融审计部（财富与资产管理）",
+      "city": "上海",
+      "recruitmentType": "SOCIAL",
+      "group": "audit",
+      "publishedOn": "2025-09-25",
+      "summary": "为财富与资产管理机构开展审计服务，制定审计计划、执行程序、编制报告，并协助进行项目质量控制和行业监管沟通。",
+      "requirement": "本科及以上、专业不限；历史招聘信息列明约1—5年审计或资产管理估值相关经验，熟悉公私募基金审计优先。",
       "majors": [
-        "信息管理与信息系统",
-        "计算机科学与技术",
-        "软件工程",
+        "会计学",
         "审计学",
-        "会计学"
+        "财务管理",
+        "金融学",
+        "经济学"
       ],
-      "url": "https://app.mokahr.com/m/campus-recruitment/kpmg/76195#/job/74b43c96-685c-4beb-ac72-bab4e0076c91",
-      "evidenceUrl": "https://www.sohu.com/a/1029418027_121124316"
+      "url": "https://app.mokahr.com/social-recruitment/kpmg/68240#/job/c1a11078-6ec6-4b83-a1b6-5ee4dc0a707e",
+      "evidenceUrl": "https://www.10100.com/article/31461410"
     }
   ]
 }
