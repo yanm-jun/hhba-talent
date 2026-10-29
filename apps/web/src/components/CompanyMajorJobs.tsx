@@ -35,7 +35,7 @@ function roleView(job:LiveJob,slug:string,view:View){
 export function CompanyMajorJobs({companyRoute}:{companyRoute:string}){
  const {slug,choose}=useSharedMajorSelection();
  const [view,setView]=useState<View>(()=>new URLSearchParams(location.search).get('unknown')==='1'?'included':'matched');
- const allJobs=domesticV2Records.filter(j=>j.employerRoute===companyRoute&&!!safeOfficialJobUrl(j));
+ const allJobs:LiveJob[]=domesticV2Records.filter(j=>j.employerRoute===companyRoute&&!!safeOfficialJobUrl(j));
  const incoming=getCompanyReturnTarget().marketState?.filters;
  // Carry ALL filters along the market -> employer jump. These are stored by the router
  // and are ignored for a direct employer deep link without a market origin.
