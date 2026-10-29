@@ -96,6 +96,7 @@ jobs:
           node scripts/company200-integration.contract.test.mjs
           node scripts/domestic-autumn-market.contract.test.mjs
           node scripts/autumn-company-profiles.contract.test.mjs
+          # Reconciled to 19 conservatively selected individual reference pictures from 11 companies.
           node scripts/autumn-approved-industry-images.contract.test.mjs
           # 2026-10-29 final photo QA: 11 verified-scene matched companies, 17 independent stock photos, 295 withheld.
           # AI preview regression: each scene is an individual real WebP file labelled conceptual, never an authentic office photograph.
