@@ -8,8 +8,7 @@ on:
   schedule:
     - cron: '15 0,12 * * *'
 permissions:
-  contents: write
-  actions: read
+  contents: read
   pages: write
   id-token: write
 concurrency:
@@ -33,50 +32,6 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
-      - name: Retrieve existing independently photographed industry research archive
-        uses: actions/download-artifact@v4
-        with:
-          name: hhba-156-companies-312-individual-industry-photos
-          run-id: 40731442485
-          repository: yanm-jun/hhba-talent
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: reviewed-source-zip
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install image verifier
-        run: python -m pip install --quiet pillow
-      - name: Stage only the 19 category-reviewed reference photos and their per-photo attribution
-        run: |
-          python apps/web/scripts/import-reviewed-autumn-industry-photos.py \
-            --artifact-dir reviewed-source-zip \
-            --web-root apps/web/public
-          python - <<'PY'
-          from pathlib import Path
-          import json,hashlib
-          p=Path('apps/web/public')
-          meta=json.loads((p/'data/domestic-autumn-industry-photos.json').read_text())
-          assert meta['totalSourcePhotos']==312 and meta['approvedCompanies']==11 and meta['approvedPhotos']==19
-          photos=[x for group in meta['entries'].values() for x in group]
-          assert len({x['sha256'] for x in photos})==19
-          for item in photos:
-            photo=p/item['file']
-            assert photo.is_file() and photo.stat().st_size>10000
-            assert photo.read_bytes()[:2]==bytes((0xff,0xd8))
-            assert hashlib.sha256(photo.read_bytes()).hexdigest()==item['sha256']
-            assert item['licenseUrl'].startswith('https://creativecommons.org/')
-          print('HHBA_19_INDEPENDENT_PHOTOS_FROM_312_ARCHIVE_VERIFIED')
-          PY
-      - name: Persist approved photos and attribution manifest to GitHub testing branch
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f apps/web/public/data/domestic-autumn-industry-photos.json \
-            apps/web/public/images/autumn-industry-references/
-          if ! git diff --cached --quiet; then
-            git commit -m "assets(domestic): integrate 19 individually vetted industry photos with source attribution"
-            git push origin HEAD:feat/hhba-unified-static-20261025
-          fi
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
