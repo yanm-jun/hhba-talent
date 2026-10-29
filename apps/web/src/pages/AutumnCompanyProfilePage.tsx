@@ -10,6 +10,9 @@ import employersJSON from '../data/domesticAutumnScreenshot20261028.json';
 import jobsJSON from '../data/domesticAutumnVerifiedJobs20261028.json';
 import officialEvidence from '../data/domesticAutumnOfficialEvidence20261028.json';
 import generatedScenes from '../data/domesticAutumnAiScenes.json';
+import businessDraftA from '../data/domesticAutumnBusinessDraft001.json';
+import businessDraftB from '../data/domesticAutumnBusinessDraft002.json';
+import verifiedHistory from '../data/domesticAutumnMilestonesVerified20261029.json';
 import mediaA from '../data/domesticMediaBundle.json';
 import mediaB from '../data/domesticMedia200Bundle.json';
 import type {User} from '../services/api';
@@ -22,6 +25,10 @@ type Editorial={displayName?:string;subtitle?:string;summary?:string;description
 type OfficialEditorial={industry:string|null;intro:string|null;source:string|null;officialRecruitment:string|null;recruitmentLabel:string|null;evidenceScope:string};
 type AiScene={id:string;path:string;kind:string;status:string;sourceLabel:string;alt:string};
 type NamedPhoto={state:string;path?:string;classification?:string;source?:string};
+type BusinessItem={title:string;description:string};
+type BusinessDraft={business:BusinessItem[];reviewLevel:string};
+type Milestone={date:string;description:string;source:string};
+type MilestoneEvidence={businessSource:string;businessEvidence:string;milestones:Milestone[]};
 
 const employers=employersJSON.entries as Employer[];
 const jobs=jobsJSON.jobs as RecordInfo[];
@@ -29,6 +36,8 @@ const profiles={...domesticProfiles,...domestic200Profiles} as Record<string,Edi
 const reviewedOfficial=officialEvidence.entries as Record<string,OfficialEditorial>;
 const aiIndex=generatedScenes.entries as Record<string,AiScene[]>;
 const mediaIndex={...mediaA.companies,...mediaB.companies} as Record<string,{photos?:NamedPhoto[]}>;
+const businessDrafts={...businessDraftA.entries,...businessDraftB.entries} as Record<string,BusinessDraft>;
+const documentedHistories=verifiedHistory.entries as Record<string,MilestoneEvidence>;
 
 // External URLs are rendered only when they have an unambiguous HTTPS origin.
 const safeUrl=(value?:string|null)=>{
@@ -42,6 +51,10 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
  const existing=useMemo(()=>employer?getDomesticCompanies().find(c=>c.name===employer.name):null,[employer?.name]);
  const editorial=employer?profiles[employer.name]:undefined;
  const officialArticle=employer?reviewedOfficial[employer.name]:undefined;
+ const businessDraft=businessDrafts[id];
+ const documentedHistory=documentedHistories[id];
+ const companyBusiness=editorial?.business?.length?editorial.business:businessDraft?.business||[];
+ const milestones=documentedHistory?.milestones||[];
  const recruitment=employer?getDomesticRecruitment(employer.name):undefined;
  const matched=employer?jobs.filter(j=>j.company===employer.name):[];
  const profileMedia=employer?mediaIndex[employer.name]:undefined;
@@ -69,6 +82,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
    {label:'企业介绍原始来源',url:safeUrl(officialArticle?.source)},
    {label:'企业业务资料来源',url:safeUrl(editorial?.officialSource)},
    {label:'企业名录来源',url:safeUrl(existing?.sourceUrl)},
+   {label:'企业发展历程及业务来源',url:safeUrl(documentedHistory?.businessSource)},
    {label:'招聘公告依据',url:safeUrl(employer?.evidenceUrl)},
  ];
  const seen=new Set<string>();
@@ -118,7 +132,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
    {hasCompanyEditorial?<><p>{editorial!.summary}</p>
     {(editorial?.description||[]).slice(0,4).map((paragraph,i)=><p key={i}>{paragraph}</p>)}
    </>:officialArticle?.intro&&safeUrl(officialArticle.source)?<p>{officialArticle.intro}</p>:
-    <p>该企业已收录在本次国内企业名录中，详细业务、总部地址及经营情况尚未完成独立核实；不会用其他企业介绍补齐。</p>}
+    <p>HHBA 收录的 {employer.name} 企业资料主要涉及{companyBusiness.map(b=>b.title).join('、')}等业务领域；这些领域为编辑检索方向，尚不代表已经完成对具体经营主体的官方核验。</p>}
    {editorial?.officeLocations?.length? <div className="company-profile-autumn-locations">
     {editorial.officeLocations.filter(o=>!!safeUrl(o.source)).map((place,i)=><p key={i}><MapPin size={15}/>{place.type}：{place.address}</p>)}
    </div>:null}
@@ -146,20 +160,22 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
 
   <section className="company-profile-section">
    <h2>主要业务与代表产品</h2>
-   {editorial?.business?.length?<div className="company-profile-focus-grid">
-    {editorial.business.map((item,i)=><div className="company-profile-focus" key={i}>
+   <div className="company-profile-focus-grid">
+    {companyBusiness.map((item,i)=><div className="company-profile-focus" key={i}>
      <h3>{item.title}</h3><p>{item.description}</p>
     </div>)}
-   </div>:<p>该企业的具体业务及代表产品尚在核验中，暂不套用行业通用描述。</p>}
+   </div>
+   {!editorial?.business?.length&&!documentedHistory&&<p className="company-profile-autumn-review-note">以上为逐企业整理的业务方向清单，目前属于编辑待核稿，具体经营范围与产品名称以该企业官方资料为准。</p>}
   </section>
 
   <section className="company-profile-section">
    <h2>发展与重要节点</h2>
-   {editorial?.milestones?.length?<div className="company-profile-milestones">
-    {editorial.milestones.map((item,i)=><div className="company-profile-milestone" key={i}>
-     <strong>{item.date}</strong><p>{item.description}</p>
+   {milestones.length?<div className="company-profile-milestones">
+    {milestones.map((item,i)=><div className="company-profile-milestone" key={i}>
+     <strong>{item.date}</strong><div className="company-profile-autumn-event"><p>{item.description}</p>
+      <a href={item.source} target="_blank" rel="noopener noreferrer" data-hhba-non-recruitment-link="true">节点出处 <ExternalLink size={13}/></a></div>
     </div>)}
-   </div>:<p>相关年份及发展事件有待逐项核对官方资料，未经核实的时间节点不作展示。</p>}
+   </div>:<p className="company-profile-autumn-review-note">本企业暂未取得可逐条追溯的历史事件证据。为避免错误的成立年份、上市时间或母子公司混同，此处不填写推测的时间线。</p>}
   </section>
 
   <section className="company-profile-section company-profile-openings" aria-labelledby="company-openings-title">
