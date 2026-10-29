@@ -1,3 +1,4 @@
+# 2026-10-29: fix Hypergryph employer-specific selectable majors and job counts; run dedicated regression before Pages release. No original PNG reencoding.
 # 2026-10-29: HHBA employer 11 Hypergryph; 20 additional source-caveated campus role titles and three byte-for-byte original PNG assets. 120 domestic V2 + 100 overseas.
 # 2026-10-29: enable reviewed major -> employer -> job flow, user selection persists; protect 100 domestic and 100 overseas records with shared contracts.
 # NetEase 2026-10-29 follow-up: historical 86-count CI assertions updated to 100 reviewed V2 source records.
@@ -121,6 +122,7 @@ jobs:
           node scripts/schneider-recruitment-first.contract.test.mjs
           node scripts/domestic-rebuild-v2.contract.test.mjs
           node scripts/major-company-job-flow.contract.test.mjs
+          node scripts/hypergryph-major-choices.contract.test.mjs
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           import {createHash} from 'node:crypto';
