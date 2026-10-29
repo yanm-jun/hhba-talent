@@ -425,18 +425,16 @@ jobs:
           }
           console.log('HHBA_PUBLIC_STATIC_ADMIN_PREVIEW_VERIFIED',root);
           NODE
-      - name: Retire obsolete bulk job feed from PUBLIC V2 deployment
+      - name: Verify old bulk snapshot is excluded from V2 market but kept for legacy company directory
         run: |
-          # All original source and audit files remain intact in Git.
-          # The V2 browser reads only curated/v1/jobs.json and the individually approved domestic registry.
-          rm -f apps/web/dist/data/jobs.json
-          rm -f apps/web/dist/data/job-sync-status.json
-          rm -f apps/web/dist/data/job-search-facets.json
-          test ! -e apps/web/dist/data/jobs.json
+          # Other identity-directory routes still rely on these source files.
+          # V2 listJobs/getJob never read them for new China listings.
+          test -s apps/web/dist/data/jobs.json
           test -s apps/web/dist/curated/v1/jobs.json
           test -s apps/web/dist/images/autumn-ai-scenes/cn-autumn-002-01.avif
           test -s apps/web/dist/images/autumn-ai-scenes/cn-autumn-002-02.avif
-          echo HHBA_V2_LEGACY_BULK_FEED_NOT_PUBLISHED
+          grep -q "DOMESTIC_REBUILD_V2" apps/web/src/services/liveRecruitment.ts
+          echo HHBA_V2_LEGACY_SNAPSHOT_COMPATIBILITY_RETAINED_MARKET_V2_ISOLATED
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
         with:
