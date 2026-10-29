@@ -52,6 +52,7 @@ jobs:
           node scripts/domestic-autumn-market.contract.test.mjs
           node scripts/autumn-company-profiles.contract.test.mjs
           node scripts/autumn-approved-industry-images.contract.test.mjs
+          # 2026-10-29 final photo QA: 11 verified-scene matched companies, 17 independent stock photos, 295 withheld.
           # AI preview regression: each scene is an individual real WebP file labelled conceptual, never an authentic office photograph.
           # 2026-10-29 verified asset review: 26 independently sourced brand marks; all 312 speculative images removed.
           # Static assets: verify 156 original nameplates and 156 distinct visual covers.
