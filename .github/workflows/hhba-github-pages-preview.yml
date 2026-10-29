@@ -1,8 +1,8 @@
 name: HHBA Unified Static Site GitHub Pages
 # All 156 domestic autumn employer profiles use the existing OpenAI editorial layout.
 # The 156 company-specific business scopes and 25 source-linked histories are separate from unverified recruiting states.
-# KPMG 2026-10-29 four-block acceptance preview: verified mark plus two AI reference images, major filter, official recruiting tracks and concise services; isolated router.
-# 2026-10-29: verify readable source-linked milestones and 156 individual business dossiers.
+# KPMG + Schneider Electric: four-block pages, exact logos and two independently generated labeled AI images per company.
+# 2026-10-29: Schneider alt text repaired, rerun full static build and source-backed logo checks.
 # KPMG first-employer logo and two labelled independent AI photo assets; QA alt text verified.
 on:
   push:
