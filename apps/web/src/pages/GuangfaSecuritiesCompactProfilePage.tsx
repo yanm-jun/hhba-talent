@@ -6,6 +6,7 @@ import {AutumnCompanyBrand} from '../components/AutumnCompanyBrand';
 import rolesData from '../data/domesticGuangfaSecuritiesRoles20261029.json';
 import type {User} from '../services/api';
 import '../styles/kpmg-compact-profile.css';
+import {CompanyMajorJobs} from '../components/CompanyMajorJobs';
 
 const majors=['全部专业','金融学','经济学','会计学','财务管理','法学','统计学','数学与应用数学',
  '计算机科学与技术','软件工程','人工智能','数据科学与大数据技术','电子信息工程',
@@ -47,29 +48,8 @@ export function GuangfaSecuritiesCompactProfilePage({user}:{user:User|null}){
     </div>
     <p style={{fontSize:11,color:'#809286',margin:'10px 0 0'}}>Logo 和两张企业场景照片均沿用以前保存的素材，品牌及照片归属仍待最终核验。</p>
    </section>
-   <section className="hhba-kpmg-section" aria-labelledby="guangfa-major-title">
-    <div className="hhba-kpmg-section-heading"><div><h2 id="guangfa-major-title">适合哪些专业背景？</h2><p>点击专业，筛选对应专业背景的历史职位；匹配仅供参考。</p></div></div>
-    <div className="hhba-kpmg-major-list" role="group" aria-label="专业选择">
-     {majors.map(x=><button key={x} type="button" className={'hhba-kpmg-major'+(x===major?' is-selected':'')} aria-pressed={x===major} onClick={()=>setMajor(x)}>{x}{x===major&&<CheckCircle2 size={13}/>}</button>)}
-    </div>
-   </section>
-   <section className="hhba-kpmg-section" aria-labelledby="guangfa-job-title">
-    <div className="hhba-kpmg-section-heading">
-     <div><h2 id="guangfa-job-title">招聘岗位</h2><p>当前匹配：<strong>{major}</strong> · {roles.length} 个具体职位。本页先整理2027届校园招聘公告中的 10 个具体岗位，原报名截止2026年9月30日，不能视为仍在招聘。</p></div>
-     <a className="hhba-kpmg-section-link" href="https://job.gf.com.cn/" data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">官方招聘报名系统 <ExternalLink size={14}/></a>
-    </div>
-    <div className="hhba-kpmg-role-list">
-     {roles.map(job=><article className="hhba-kpmg-role" key={job.id}>
-       <div className="hhba-kpmg-role-icon"><BriefcaseBusiness size={17}/></div>
-       <div className="hhba-kpmg-role-main">
-        <div className="hhba-kpmg-role-top"><h3>{job.title}</h3><span>{job.city} · 截止 {job.deadline}</span></div>
-        <p>{job.summary}</p><small>{job.requirement}</small>
-       </div>
-       <Link to={'/candidate/jobs/cn-v2-guangfa-'+job.id} aria-label={'查看'+job.title+'站内详情'}>查看详情 <ArrowRight size={14}/></Link>
-     </article>)}
-    </div>
-    <p className="hhba-kpmg-role-disclaimer"><GraduationCap size={14}/> 10 条职位名称、工作地区和专业信息来自南开大学就业中心公布的广发证券2027届招聘公告；报名截止2026年9月30日。官方按钮指向广发证券招聘首页，并非逐岗申请入口。</p>
-   </section>
+   <CompanyMajorJobs companyRoute="/companies/domestic/a-000776"/>
+
    <section className="hhba-kpmg-section" aria-labelledby="guangfa-services-title">
     <div className="hhba-kpmg-section-heading"><div><h2 id="guangfa-services-title">主要业务与专业服务</h2><p>精简业务卡片，可按需查看详细信息。</p></div></div>
     <div className="hhba-kpmg-service-grid">
