@@ -1,0 +1,232 @@
+{
+  "company": "广发证券",
+  "legalName": "广发证券股份有限公司",
+  "listedCode": "000776",
+  "announcementTitle": "广发证券2027届秋季校园招聘",
+  "announcementPublished": "2026-09-07",
+  "applicationDeadline": "2026-09-30",
+  "reviewedOn": "2026-10-29",
+  "recordStatus": "HISTORICAL_CAMPUS_NOTICE_DEADLINE_PASSED",
+  "officialRecruitmentPortal": "https://job.gf.com.cn/",
+  "noticeUrl": "https://career.nankai.edu.cn/correcruit/content/id/118078.html",
+  "education": "2027届硕士、博士应届毕业生",
+  "sourceNote": "大学就业中心发布的广发证券2027届招聘公告载有逐行岗位名、方向、地点、专业；缺少逐岗独立官网URL，页面只呈现公告明确字段，不把栏目概念充当职位职责。原公告截至2026-09-30，不能标示当前在招。",
+  "schemaVersion": 1,
+  "jobCount": 10,
+  "jobs": [
+    {
+      "id": "equity-ib",
+      "title": "股权投行业务岗",
+      "city": "全国主要城市",
+      "track": "股权业务承做",
+      "summary": "广发证券2027届秋季校园招聘公告列出的具体岗位，招聘方向：股权业务承做。公告未提供可逐项核验的完整岗位职责；应以官方岗位页面为准。",
+      "requirement": "2027届硕士或博士；金融、经济、财会、法学等相关专业背景。",
+      "majors": [
+        "金融学",
+        "经济学",
+        "会计学",
+        "财务管理",
+        "法学"
+      ],
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118078.html",
+      "officialListingUrl": "https://job.gf.com.cn/",
+      "deadline": "2026-09-30",
+      "kind": "campus",
+      "currentOpenVerified": false,
+      "perJobOfficialUrlVerified": false
+    },
+    {
+      "id": "bond-ib",
+      "title": "债券业务岗",
+      "city": "全国主要城市",
+      "track": "债券业务承做",
+      "summary": "广发证券2027届秋季校园招聘公告列出的具体岗位，招聘方向：债券业务承做。公告未提供可逐项核验的完整岗位职责；应以官方岗位页面为准。",
+      "requirement": "2027届硕士或博士；金融、经济、财会、法学等相关专业背景。",
+      "majors": [
+        "金融学",
+        "经济学",
+        "会计学",
+        "财务管理",
+        "法学"
+      ],
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118078.html",
+      "officialListingUrl": "https://job.gf.com.cn/",
+      "deadline": "2026-09-30",
+      "kind": "campus",
+      "currentOpenVerified": false,
+      "perJobOfficialUrlVerified": false
+    },
+    {
+      "id": "mergers-acquisitions",
+      "title": "并购业务岗",
+      "city": "广州、北京",
+      "track": "并购业务承做",
+      "summary": "广发证券2027届秋季校园招聘公告列出的具体岗位，招聘方向：并购业务承做。公告未提供可逐项核验的完整岗位职责；应以官方岗位页面为准。",
+      "requirement": "2027届硕士或博士；金融、经济、财会、法学等相关专业背景。",
+      "majors": [
+        "金融学",
+        "经济学",
+        "会计学",
+        "财务管理",
+        "法学"
+      ],
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118078.html",
+      "officialListingUrl": "https://job.gf.com.cn/",
+      "deadline": "2026-09-30",
+      "kind": "campus",
+      "currentOpenVerified": false,
+      "perJobOfficialUrlVerified": false
+    },
+    {
+      "id": "capital-markets",
+      "title": "投行资本市场业务岗",
+      "city": "广州",
+      "track": "股票发行方向",
+      "summary": "广发证券2027届秋季校园招聘公告列出的具体岗位，招聘方向：股票发行方向。公告未提供可逐项核验的完整岗位职责；应以官方岗位页面为准。",
+      "requirement": "2027届硕士或博士；金融、经济、财会等相关专业背景。",
+      "majors": [
+        "金融学",
+        "经济学",
+        "会计学",
+        "财务管理"
+      ],
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118078.html",
+      "officialListingUrl": "https://job.gf.com.cn/",
+      "deadline": "2026-09-30",
+      "kind": "campus",
+      "currentOpenVerified": false,
+      "perJobOfficialUrlVerified": false
+    },
+    {
+      "id": "sell-side-research",
+      "title": "卖方行业研究岗",
+      "city": "北京、上海、广州、深圳",
+      "track": "宏观、金融地产、科技、先进制造、消费、能源材料等研究领域",
+      "summary": "广发证券2027届秋季校园招聘公告列出的具体岗位，招聘方向：宏观、金融地产、科技、先进制造、消费、能源材料等研究领域。公告未提供可逐项核验的完整岗位职责；应以官方岗位页面为准。",
+      "requirement": "2027届硕士或博士；金融、金融工程、经济、统计、数学或研究领域相关理工科复合专业背景。",
+      "majors": [
+        "金融学",
+        "经济学",
+        "统计学",
+        "数学与应用数学",
+        "电子信息工程",
+        "计算机科学与技术",
+        "机械设计制造及其自动化"
+      ],
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118078.html",
+      "officialListingUrl": "https://job.gf.com.cn/",
+      "deadline": "2026-09-30",
+      "kind": "campus",
+      "currentOpenVerified": false,
+      "perJobOfficialUrlVerified": false
+    },
+    {
+      "id": "equity-investment",
+      "title": "权益投资研究岗",
+      "city": "广州",
+      "track": "硬科技方向（二级市场）",
+      "summary": "广发证券2027届秋季校园招聘公告列出的具体岗位，招聘方向：硬科技方向（二级市场）。公告未提供可逐项核验的完整岗位职责；应以官方岗位页面为准。",
+      "requirement": "2027届硕士或博士；电子信息、微电子、集成电路、数据科学等理工经管复合背景优先。",
+      "majors": [
+        "电子信息工程",
+        "微电子科学与工程",
+        "集成电路设计与集成系统",
+        "数据科学与大数据技术",
+        "金融学"
+      ],
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118078.html",
+      "officialListingUrl": "https://job.gf.com.cn/",
+      "deadline": "2026-09-30",
+      "kind": "campus",
+      "currentOpenVerified": false,
+      "perJobOfficialUrlVerified": false
+    },
+    {
+      "id": "ficc-trading",
+      "title": "FICC 投资交易岗",
+      "city": "广州",
+      "track": "固收+量化研究、债券交易、利率衍生品做市与流动性储备",
+      "summary": "广发证券2027届秋季校园招聘公告列出的具体岗位，招聘方向：固收+量化研究、债券交易、利率衍生品做市与流动性储备。公告未提供可逐项核验的完整岗位职责；应以官方岗位页面为准。",
+      "requirement": "2027届硕士或博士；金融工程、数学、统计、金融、经济、计算机、软件工程、人工智能等专业。",
+      "majors": [
+        "金融学",
+        "经济学",
+        "统计学",
+        "数学与应用数学",
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能"
+      ],
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118078.html",
+      "officialListingUrl": "https://job.gf.com.cn/",
+      "deadline": "2026-09-30",
+      "kind": "campus",
+      "currentOpenVerified": false,
+      "perJobOfficialUrlVerified": false
+    },
+    {
+      "id": "quant-development",
+      "title": "量化策略开发岗",
+      "city": "广州、上海",
+      "track": "股权衍生品业务与资产管理业务方向",
+      "summary": "广发证券2027届秋季校园招聘公告列出的具体岗位，招聘方向：股权衍生品业务与资产管理业务方向。公告未提供可逐项核验的完整岗位职责；应以官方岗位页面为准。",
+      "requirement": "2027届硕士或博士；计算机、数学、物理、统计学、金融工程或工程类学科背景。",
+      "majors": [
+        "计算机科学与技术",
+        "软件工程",
+        "金融学",
+        "统计学",
+        "数学与应用数学",
+        "物理学"
+      ],
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118078.html",
+      "officialListingUrl": "https://job.gf.com.cn/",
+      "deadline": "2026-09-30",
+      "kind": "campus",
+      "currentOpenVerified": false,
+      "perJobOfficialUrlVerified": false
+    },
+    {
+      "id": "ai-product",
+      "title": "产品经理岗（AI方向）",
+      "city": "广州",
+      "track": "AI产品经理方向",
+      "summary": "广发证券2027届秋季校园招聘公告列出的具体岗位，招聘方向：AI产品经理方向。公告未提供可逐项核验的完整岗位职责；应以官方岗位页面为准。",
+      "requirement": "2027届硕士或博士；计算机、软件工程、人工智能、金融经济、商业分析等相关专业。",
+      "majors": [
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能",
+        "金融学",
+        "经济学",
+        "工商管理"
+      ],
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118078.html",
+      "officialListingUrl": "https://job.gf.com.cn/",
+      "deadline": "2026-09-30",
+      "kind": "campus",
+      "currentOpenVerified": false,
+      "perJobOfficialUrlVerified": false
+    },
+    {
+      "id": "fintech-engineering",
+      "title": "金融科技工程师",
+      "city": "广州、深圳",
+      "track": "AI、算法、后端开发、前端开发、终端开发、测试、数据和智能运维",
+      "summary": "广发证券2027届秋季校园招聘公告列出的具体岗位，招聘方向：AI、算法、后端开发、前端开发、终端开发、测试、数据和智能运维。公告未提供可逐项核验的完整岗位职责；应以官方岗位页面为准。",
+      "requirement": "2027届硕士或博士；计算机、软件工程、人工智能等相关专业。",
+      "majors": [
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能",
+        "数据科学与大数据技术"
+      ],
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118078.html",
+      "officialListingUrl": "https://job.gf.com.cn/",
+      "deadline": "2026-09-30",
+      "kind": "campus",
+      "currentOpenVerified": false,
+      "perJobOfficialUrlVerified": false
+    }
+  ]
+}
