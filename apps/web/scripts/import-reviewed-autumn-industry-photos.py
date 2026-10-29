@@ -12,11 +12,9 @@ from PIL import Image
 # IDs individually checked against the 312-photo visual audit contact sheets.
 # This is an approved subset, NOT a claim that all 312 are appropriate.
 APPROVED={
- '002':(1,2),'004':(1,2),'009':(1,2),'010':(1,),'011':(1,),
- '013':(1,2),'014':(1,),'015':(1,2),'020':(1,2),'023':(1,),
- '027':(1,2),'029':(1,2),'054':(1,2),'063':(2,),'075':(2,),
- '079':(1,),'090':(1,),'093':(1,2),'121':(2,),
- '128':(1,2),'131':(1,2),'132':(1,2),'155':(1,),
+ '002':(1,2),'004':(1,2),'010':(1,),'014':(1,),
+ '029':(1,2),'054':(1,2),'075':(2,),'093':(1,2),
+ '121':(2,),'128':(1,2),'155':(1,),
 }
 def license_url(name):
  n=name.strip().lower()
@@ -36,6 +34,10 @@ def run(inp, webroot):
   assert len(rows)==312
   index={(x['employer_id'],x['image_id'][-2:]):x for x in rows}
   entries={}; hashes=set();audit=[]
+  # A subsequent editorial correction must remove old unapproved photos as well.
+  photo_dir=out/'images'/'autumn-industry-references'
+  if photo_dir.exists():
+   for old in photo_dir.glob('cn-autumn-*.jpg'): old.unlink()
   for short,nums in APPROVED.items():
    cid='cn-autumn-'+short; photos=[]
    for num in nums:
