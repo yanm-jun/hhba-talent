@@ -1,5 +1,6 @@
 name: HHBA Unified Static Site GitHub Pages
 # Photo preview integration build: 156 companies, 312 uniquely sourced, individually attributed images; gallery TSX corrected.
+# KPMG first-employer logo and two labelled independent AI photo assets; QA alt text verified.
 on:
   push:
     branches: [main]
