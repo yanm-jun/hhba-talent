@@ -6,6 +6,7 @@ import {AutumnCompanyBrand} from '../components/AutumnCompanyBrand';
 import schneider from '../data/domesticSchneiderDetailedDossier20261029.json';
 import type {User} from '../services/api';
 import '../styles/kpmg-compact-profile.css';
+import {CompanyMajorJobs} from '../components/CompanyMajorJobs';
 import '../styles/schneider-compact-profile.css';
 
 /**
@@ -53,49 +54,7 @@ export function SchneiderCompactProfilePage({user}:{user:User|null}){
     </div>
    </section>
 
-   <section className="hhba-kpmg-section" aria-labelledby="schneider-majors">
-    <div className="hhba-kpmg-section-heading"><div>
-     <h2 id="schneider-majors">适合哪些专业背景？</h2>
-     <p>选择专业后，下方仅展示业务相关的官方职位记录；具体报考资格以职位要求为准。</p>
-    </div></div>
-    <div className="hhba-kpmg-major-list" role="group" aria-label="选择所学专业">
-     {schneider.majors.map(item=><button type="button" key={item.name}
-      className={'hhba-kpmg-major'+(major===item.name?' is-selected':'')}
-      aria-pressed={major===item.name}
-      onClick={()=>{setMajor(item.name);setShowAllJobs(false)}}>
-      {item.name}{major===item.name&&<CheckCircle2 size={13}/>}
-     </button>)}
-    </div>
-   </section>
-
-   <section className="hhba-kpmg-section" aria-labelledby="schneider-jobs">
-    <div className="hhba-kpmg-section-heading">
-     <div><h2 id="schneider-jobs">招聘岗位与职业机会</h2>
-      <p>已收录 <strong>{schneider.jobs.length}</strong> 个官方具体职位页面 · 当前专业匹配 <strong>{filtered.length}</strong> 个</p>
-     </div>
-     <a className="hhba-kpmg-section-link" href={schneider.recruitmentHomepage}
-      target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">招聘官网 <ExternalLink size={13}/></a>
-    </div>
-    <div className="hhba-kpmg-role-list" aria-live="polite">
-      {shownJobs.map(job=><article className="hhba-kpmg-role" key={job.id}>
-        <div className="hhba-kpmg-role-icon"><BriefcaseBusiness size={17}/></div>
-        <div className="hhba-kpmg-role-main">
-         <div className="hhba-kpmg-role-top"><h3>{job.title}</h3><span>{job.type}</span></div>
-         <p><MapPin size={12} className="hhba-schneider-map-icon"/>{job.city} · {job.summary}</p>
-         <small>{job.experience} · 官网职位编号 {job.id}</small>
-        </div>
-        <a href={job.url} target="_blank" rel="noopener noreferrer"
-         data-hhba-recruitment-outbound="true" aria-label={'查看施耐德电气官方岗位'+job.title}>
-         查看岗位 <ArrowRight size={14}/></a>
-      </article>)}
-    </div>
-    {filtered.length>shownJobs.length&&<button className="hhba-kpmg-service-more" type="button" onClick={()=>setShowAllJobs(true)}>
-      查看其余 {filtered.length-shownJobs.length} 个官方职位 <ChevronDown size={16}/>
-    </button>}
-    {showAllJobs&&filtered.length>5&&<button className="hhba-schneider-collapse" type="button" onClick={()=>setShowAllJobs(false)}>收起职位</button>}
-    {selected.id==='other'&&<p className="hhba-kpmg-role-disclaimer">其他专业仅展示可探索的岗位，不代表符合招聘资格。</p>}
-    <p className="hhba-kpmg-role-disclaimer"><GraduationCap size={14}/>{schneider.jobStatusNote}</p>
-   </section>
+   <CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn-002"/>
 
    <section className="hhba-kpmg-section" aria-labelledby="schneider-services">
     <div className="hhba-kpmg-section-heading"><div>
