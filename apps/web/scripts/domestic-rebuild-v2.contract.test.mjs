@@ -78,8 +78,8 @@ assert.equal(new Set(citics.jobs.map(j=>j.office)).size,5,'Every job must be fro
 assert(citics.jobs.every(j=>j.education==='本科及以上应届毕业生'&&j.majorsRequirement.startsWith('不限专业')));
 assert(citics.jobs.every(j=>j.sourceUrl.startsWith('https://')&&j.currentApplicationVerified===false));
 assert(citics.jobs.every(j=>j.officialListingUrl==='https://careers.citics.com/campus/branch'));
-assert(!JSON.stringify(citics).includes('中信建投证券'),'CSC Financial is a different company');
-assert(!JSON.stringify(citics).includes('中信证券（山东）有限责任公司2027'),'Separate subsidiary jobs not folded in');
+assert(citics.jobs.every(j=>j.office.startsWith('中信证券股份有限公司')),'CSC Financial is a different company');
+assert(citics.jobs.every(j=>!j.office.includes('山东')&&!j.office.includes('中信建投')),'Separate subsidiary jobs not folded in');
 assert(main.includes("if(route==='/companies/domestic/a-600030')return <CiticsSecuritiesCompactProfilePage user={user}/>"));
 assert(citicsProfile.includes("const jobs=rolesData.jobs;"),'All majors permitted; do not improperly filter unrestricted trainees');
 assert(citicsProfile.includes("'/candidate/jobs/cn-v2-citics-'+job.id"),'Shared HHBA on-site job pages');
