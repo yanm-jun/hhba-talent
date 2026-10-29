@@ -41,7 +41,7 @@ assert.equal(huayu.indexedRoleCountOnOfficialPage,21);
 for(const job of huayu.jobs){
  const u=new URL(job.sourceUrl);
  assert.equal(u.href,'https://hascovision.zhiye.com/campus/jobs');
- assert(job.title.length>2&&job.city&&job.summary.length>24&&job.requirement.length>15);
+ assert(job.title.length>=2&&job.city&&job.summary.length>24&&job.requirement.length>=8,'Short genuine employer qualification must not be padded with invented detail: '+job.id);
  assert(job.currentOpenVerified===false,'Do not invent current application status');
 }
 assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司']"));
