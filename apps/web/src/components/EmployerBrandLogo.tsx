@@ -25,6 +25,10 @@ export function EmployerBrandLogo({job,identity,variant='card'}:LogoProps){
   const cls=variant==='profile'
     ?'company-profile-brand'+(asset?.wide?' company-profile-brand-wide':'')
     :'unified-brand-logo'+(asset?.wide?' unified-brand-logo-wide':'');
+  if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='华安证券')
+    return <span className={cls} title="华安证券（旧版已存品牌素材，尚待归属核验）">
+      <img src={import.meta.env.BASE_URL+'domestic-media/user-4e84106ce0d3db721fab644a.png'} alt="华安证券旧版品牌图" loading="eager" decoding="async"/>
+    </span>;
   if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='华域视觉科技（上海）有限公司')
     return <span className={cls} title="华域视觉（旧版用户上传 Logo，身份待核验）">
       <img src={import.meta.env.BASE_URL+'domestic-media/user-f9727f3062cf91da52b3285c.png'} alt="华域视觉原有品牌素材，待最终核对" loading="eager" decoding="async"/>
