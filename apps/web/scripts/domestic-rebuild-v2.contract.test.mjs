@@ -6,6 +6,8 @@ const overseas=JSON.parse(src('public/curated/v1/jobs.json')).jobs;
 const china=JSON.parse(src('src/data/domesticSchneiderDetailedDossier20261029.json'));
 const kpmg=JSON.parse(src('src/data/domesticKpmgConcreteJobs20261029.json'));
 const huayu=JSON.parse(src('src/data/domesticHuayuVisionRoles20261029.json'));
+const huaan=JSON.parse(src('src/data/domesticHuaanSecuritiesRoles20261029.json'));
+const huaanProfile=src('src/pages/HuaanSecuritiesCompactProfilePage.tsx');
 const huayuProfile=src('src/pages/HuayuVisionCompactProfilePage.tsx');
 const main=src('src/main.tsx');
 const kpmgProfile=src('src/pages/KpmgCompactProfilePage.tsx');
@@ -44,7 +46,20 @@ for(const job of huayu.jobs){
  assert(job.title.length>=2&&job.city&&job.summary.length>24&&job.requirement.length>=8,'Short genuine employer qualification must not be padded with invented detail: '+job.id);
  assert(job.currentOpenVerified===false,'Do not invent current application status');
 }
-assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司']"));
+assert.equal(huaan.jobs.length,10,'Huaan Securities specific historical role evidence count');
+assert.equal(new Set(huaan.jobs.map(j=>j.id)).size,10);
+assert.equal(huaan.announcementRoleCount,10);
+assert.equal(huaan.company,'华安证券');
+assert.equal(huaan.officialRecruitmentPortal,'https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment');
+assert(huaan.jobs.every(j=>j.title&&j.city&&j.summary.length>20&&j.requirement.length>20&&j.currentOpenVerified===false));
+assert(huaan.jobs.every(j=>j.deadline<'2026-10-29'),'All historical application deadlines passed');
+assert(!JSON.stringify(huaan).includes('huaan.zhiye.com'),'Never confuse Huaan Fund and Huaan Securities');
+assert(main.includes("if(route==='/companies/domestic/a-600909')return <HuaanSecuritiesCompactProfilePage user={user}/>"));
+assert(huaanProfile.includes("rolesData.jobs.filter"),'Professional selection filters specific jobs');
+assert(huaanProfile.includes("'/candidate/jobs/cn-v2-huaan-'+job.id"));
+assert(huaanProfile.includes('归属待核验'),'Original photos cannot be claimed authentic');
+assert(huaanProfile.includes('历史职位'));
+assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券']"));
 assert(main.includes("if(route==='/companies/domestic/rel-huayu-004')return <HuayuVisionCompactProfilePage user={user}/>"),'Preserve old profile URL');
 assert(huayuProfile.includes("rolesData.jobs.filter"),'Major selector filters real jobs');
 assert(huayuProfile.includes("'/candidate/jobs/cn-v2-huayu-'+job.id"),'Onsite job detail for every role');
@@ -70,6 +85,12 @@ assert(ui.includes("job.recordKind!=='DOMESTIC_REBUILT'&&<SaveJobButton jobId={j
 assert(branded.includes("autumn-real-logos/cn-autumn-002.svg"));
 assert(branded.includes("autumn-real-logos/cn-autumn-001.svg"));
 assert(branded.includes('domestic-media/user-f9727f3062cf91da52b3285c.png'));
+assert(branded.includes('domestic-media/user-4e84106ce0d3db721fab644a.png'));
+assert(recruitment.includes("job.platform==='huaan-securities-official'"));
+assert(ui.includes("job.platform==='huaan-securities-official'?'查看华安证券官方招聘报名系统"));
+for(const file of ['user-4e84106ce0d3db721fab644a.png','user-628c0cb2972a0ee5c3ef77b7.webp','user-0c1364cd23938f72c131e011.webp']){
+ assert(existsSync('public/domestic-media/'+file),'Old Huaan image must be reused, not regenerated');
+}
 assert(recruitment.includes("job.platform==='huayu-official-campus'"));
 assert(ui.includes("job.platform==='huayu-official-campus'?'前往官方职位列表核对该岗位'"));
 assert(recruitment.includes("job.platform==='kpmg-moka-official'"));
@@ -79,4 +100,4 @@ for(const suffix of ['01','02']){
  const path='public/images/autumn-ai-scenes/cn-autumn-002-'+suffix+'.avif';
  assert(existsSync(path),'Reusing already created company photo '+path);
 }
-console.log('HHBA_DOMESTIC_V2_100_OVERSEAS_12_SCHNEIDER_6_HISTORICAL_KPMG_16_HUAYU_OFFICIAL_LIST_ROLES '+workflowBranch);
+console.log('HHBA_DOMESTIC_V2_100_OVERSEAS_12_SCHNEIDER_6_KPMG_16_HUAYU_10_HUAAN_HISTORICAL_POSITIONS '+workflowBranch);
