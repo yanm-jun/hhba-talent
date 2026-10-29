@@ -5,6 +5,9 @@ const root='src/';
 const overseas=JSON.parse(src('public/curated/v1/jobs.json')).jobs;
 const china=JSON.parse(src('src/data/domesticSchneiderDetailedDossier20261029.json'));
 const kpmg=JSON.parse(src('src/data/domesticKpmgConcreteJobs20261029.json'));
+const huayu=JSON.parse(src('src/data/domesticHuayuVisionRoles20261029.json'));
+const huayuProfile=src('src/pages/HuayuVisionCompactProfilePage.tsx');
+const main=src('src/main.tsx');
 const kpmgProfile=src('src/pages/KpmgCompactProfilePage.tsx');
 const recruitment=src(root+'services/liveRecruitment.ts');
 const ui=src(root+'components/UnifiedJobMarket.tsx');
@@ -32,7 +35,25 @@ for(const job of kpmg.jobs){
  assert(/^#\/job\/[0-9a-f-]{36}$/.test(u.hash),'Must be specific Moka job UUID, not a recruitment board');
  assert(job.title&&job.city&&job.summary&&job.requirement&&job.evidenceUrl);
 }
-assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威']"));
+assert.equal(huayu.jobs.length,16,'Huayu official campus 21-role list, 16 source-backed role summaries in V2');
+assert.equal(new Set(huayu.jobs.map(j=>j.id)).size,16);
+assert.equal(huayu.indexedRoleCountOnOfficialPage,21);
+for(const job of huayu.jobs){
+ const u=new URL(job.sourceUrl);
+ assert.equal(u.href,'https://hascovision.zhiye.com/campus/jobs');
+ assert(job.title.length>2&&job.city&&job.summary.length>24&&job.requirement.length>15);
+ assert(job.currentOpenVerified===false,'Do not invent current application status');
+}
+assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司']"));
+assert(main.includes("if(route==='/companies/domestic/rel-huayu-004')return <HuayuVisionCompactProfilePage user={user}/>"),'Preserve old profile URL');
+assert(huayuProfile.includes("rolesData.jobs.filter"),'Major selector filters real jobs');
+assert(huayuProfile.includes("'/candidate/jobs/cn-v2-huayu-'+job.id"),'Onsite job detail for every role');
+const headings=['适合哪些专业背景？','招聘岗位','主要业务与专业服务'];
+assert(headings.map(h=>huayuProfile.indexOf(h)).every((v,i,a)=>v>=0&&(i===0||v>a[i-1])),'Four block order');
+assert(huayuProfile.includes('domestic-media/user-4f0e78c7cb648df8a4cd2fed.webp'));
+assert(huayuProfile.includes('企业官网公开照片')&&huayuProfile.includes('归属待核验'));
+assert(huayuProfile.includes('原有建筑场景素材'));
+
 assert(index.includes("id:'cn-v2-schneider-'"));
 assert(index.includes("recordKind:'DOMESTIC_REBUILT'"));
 assert(!index.includes('domesticAutumnVerifiedJobs20261028'),'Old mixed program/channel data must not feed new index');
@@ -48,6 +69,9 @@ assert(ui.includes("j.recordKind==='DOMESTIC_REBUILT'"));
 assert(ui.includes("job.recordKind!=='DOMESTIC_REBUILT'&&<SaveJobButton jobId={job.id}/>"));
 assert(branded.includes("autumn-real-logos/cn-autumn-002.svg"));
 assert(branded.includes("autumn-real-logos/cn-autumn-001.svg"));
+assert(branded.includes('domestic-media/user-f9727f3062cf91da52b3285c.png'));
+assert(recruitment.includes("job.platform==='huayu-official-campus'"));
+assert(ui.includes("job.platform==='huayu-official-campus'?'前往官方职位列表核对该岗位'"));
 assert(recruitment.includes("job.platform==='kpmg-moka-official'"));
 assert(kpmgProfile.includes('kpmgJobs.jobs.filter'));
 assert(kpmgProfile.includes("'/candidate/jobs/cn-v2-kpmg-'+job.id"));
@@ -55,4 +79,4 @@ for(const suffix of ['01','02']){
  const path='public/images/autumn-ai-scenes/cn-autumn-002-'+suffix+'.avif';
  assert(existsSync(path),'Reusing already created company photo '+path);
 }
-console.log('HHBA_DOMESTIC_V2_100_OVERSEAS_12_SCHNEIDER_6_HISTORICAL_KPMG_JOBS_NO_LEGACY_PORTALS '+workflowBranch);
+console.log('HHBA_DOMESTIC_V2_100_OVERSEAS_12_SCHNEIDER_6_HISTORICAL_KPMG_16_HUAYU_OFFICIAL_LIST_ROLES '+workflowBranch);
