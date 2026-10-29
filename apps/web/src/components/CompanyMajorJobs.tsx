@@ -67,7 +67,7 @@ export function CompanyMajorJobs({companyRoute}:{companyRoute:string}){
    <div className="hhba-major-view-tabs" role="group" aria-label="岗位筛选方式">
     {slug&&<button type="button" aria-pressed={view==='matched'} className={view==='matched'?'is-selected':''} onClick={()=>setView('matched')}>相关岗位（{related.length}）</button>}
     <button type="button" aria-pressed={!slug||view==='all'} className={!slug||view==='all'?'is-selected':''} onClick={()=>setView('all')}>查看全部岗位（{allJobs.length}）</button>
-    {slug&&unknown.length>0&&<button type="button" aria-pressed={view==='included'} className={view==='included'?'is-selected':''} onClick={()=>setView('included')}>包含待核验（{related.length+unknown.length}）</button>
+    {slug&&unknown.length>0&&<button type="button" aria-pressed={view==='included'} className={view==='included'?'is-selected':''} onClick={()=>setView('included')}>包含待核验（{related.length+unknown.length}）</button>}
     {slug&&unknown.length>0&&<button type="button" aria-pressed={view==='unknown'} className={view==='unknown'?'is-selected':''} onClick={()=>setView('unknown')}>专业待核验（{unknown.length}）</button>}
    </div>
    <div className="hhba-kpmg-role-list" aria-live="polite">
