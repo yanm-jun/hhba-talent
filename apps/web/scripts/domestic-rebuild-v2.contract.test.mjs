@@ -90,7 +90,23 @@ assert(main.includes("if(route==='/companies/domestic/a-600030')return <CiticsSe
 assert(citicsProfile.includes("const jobs=rolesData.jobs;"),'All majors permitted; do not improperly filter unrestricted trainees');
 assert(citicsProfile.includes("'/candidate/jobs/cn-v2-citics-'+job.id"),'Shared HHBA on-site job pages');
 assert(citicsProfile.includes('归属待核验'),'Legacy image authenticity not invented');
-assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券','辉瑞']"));
+assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券','辉瑞','中国南方航空']"));
+const csair=JSON.parse(src('src/data/domesticCsairVerifiedPositions20261029.json'));
+const csairPage=src('src/pages/CsairCompactProfilePage.tsx');
+assert.equal(csair.jobs.length,6,'Exactly six source-backed China Southern jobs from official listings');
+assert.equal(new Set(csair.jobs.map(j=>j.id)).size,6,'No duplicate China Southern jobs');
+assert(csair.jobs.every(j=>j.company==='中国南方航空'&&j.city&&j.title&&j.date&&j.sourceUrl==='https://job.csair.cn/global'&&j.currentOpenVerified===false));
+assert(main.includes("if(route==='/companies/autumn/cn-autumn-004')return <CsairCompactProfilePage user={user}/>;"));
+assert(csairPage.includes('hhba-kpmg-compact')&&csairPage.includes('hhba-kpmg-photo-grid'));
+const csairHeadings=['适合哪些专业背景？','招聘岗位','主要业务与专业服务'];
+assert(csairHeadings.map(x=>csairPage.indexOf(x)).every((p,i,a)=>p>0&&(i===0||p>a[i-1])),'Preserve four-block order');
+assert(csairPage.includes("'/candidate/jobs/cn-v2-csair-'"));
+assert(csairPage.includes('data-hhba-recruitment-outbound="true"'));
+assert(index.includes('csairV2Records.length!==6||domesticV2Records.length!==69'));
+assert(recruitment.includes("job.platform==='csair-official-list'"));
+for(const f of ['csair-logo.png','csair-building.webp','csair-aircraft.webp'])
+ assert(existsSync('public/images/csair-user/'+f),'Missing China Southern image '+f);
+
 const pfizer=JSON.parse(src('src/data/domesticPfizerOfficialJobs20261029.json'));
 const pfizerPage=src('src/pages/PfizerCompactProfilePage.tsx');
 assert.equal(pfizer.jobs.length,4,'Pfizer must have four individually sourced roles');
