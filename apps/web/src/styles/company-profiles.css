@@ -136,3 +136,10 @@
  .company-profile-autumn .company-visual-workplace-grid{grid-template-columns:1fr}
  .company-profile-autumn .company-profile-autumn-official>a{max-width:100%;white-space:normal}
 }
+
+/* Company-specific editable dossiers: business drafts are never styled as confirmed official facts. */
+.company-profile-autumn .company-profile-autumn-review-note{max-width:900px;font-size:12px;line-height:1.85;color:#768379;margin-top:15px}
+.company-profile-autumn .company-profile-autumn-event{display:flex;flex-direction:column;gap:4px;min-width:0}
+.company-profile-autumn .company-profile-autumn-event p{margin:0;color:#566577;font-size:13px;line-height:1.8}
+.company-profile-autumn .company-profile-autumn-event a{display:inline-flex;gap:5px;align-items:center;align-self:flex-start;color:#377453;text-decoration:none;font-size:11px}
+.company-profile-autumn .company-profile-autumn-event a:hover{text-decoration:underline}
