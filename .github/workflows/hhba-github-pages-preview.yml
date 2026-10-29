@@ -1,6 +1,7 @@
 name: HHBA Unified Static Site GitHub Pages
 # All 156 domestic autumn employer profiles use the existing OpenAI editorial layout.
 # The 156 company-specific business scopes and 25 source-linked histories are separate from unverified recruiting states.
+# KPMG 2026-10-29 deep editorial: official services, locations, history, careers, citations and protected outbound links.
 # 2026-10-29: verify readable source-linked milestones and 156 individual business dossiers.
 # KPMG first-employer logo and two labelled independent AI photo assets; QA alt text verified.
 on:
@@ -75,6 +76,7 @@ jobs:
           node scripts/domestic-autumn-market.contract.test.mjs
           node scripts/autumn-company-profiles.contract.test.mjs
           node scripts/autumn-dossier-content.contract.test.mjs
+          node scripts/kpmg-deep-editorial.contract.test.mjs
           # Retain photo evidence in source for audit; no legacy gallery is rendered in company profiles.
           node scripts/autumn-approved-industry-images.contract.test.mjs
           # Preserve source-backed logos and only genuine per-employer or labeled AI pictures.
