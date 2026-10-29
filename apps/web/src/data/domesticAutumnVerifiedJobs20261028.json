@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "checkedOn": "2026-10-28",
+  "checkedOn": "2026-10-29",
   "note": "岗位/招聘方向为已观察的公开历史记录，并非实时开放招聘。program不能视为逐岗专业与城市匹配；地区未知不可猜测。",
   "jobs": [
     {
@@ -781,6 +781,94 @@
       "status": "historical_public_announcement_current_open_unverified",
       "observedOn": "2026-10-28",
       "note": "未找到本轮可直接核实岗位、专业及工作地相互对应的具体职位"
+    },
+    {
+      "id": "cn-autumn-pfizer-4966538",
+      "company": "辉瑞",
+      "title": "高级医学信息沟通专员",
+      "majors": [
+        "医学",
+        "药学",
+        "生命科学"
+      ],
+      "cities": [
+        "运城"
+      ],
+      "education": "大学专科及以上",
+      "recruitmentType": "全职招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://www.pfizer.com/about/careers/job/4966538?langcode=en",
+      "status": "official_job_page_observed_current_open_unverified",
+      "observedOn": "2026-10-29",
+      "note": "已核对辉瑞官方职位页面；职位及申请状态请以官网为准。",
+      "responsibilities": "在公司政策下为客户提供医学信息支持，开展专业沟通与学术交流活动，收集反馈，与团队协作。",
+      "requirements": "相关专业优先；熟练使用办公软件，具备沟通与学习能力，医药行业经验优先。"
+    },
+    {
+      "id": "cn-autumn-pfizer-4966533",
+      "company": "辉瑞",
+      "title": "Supply Operation Quality Associate（供应运营质量专员）",
+      "majors": [],
+      "cities": [
+        "上海"
+      ],
+      "education": "以官方职位说明为准",
+      "recruitmentType": "全职招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://www.pfizer.com/about/careers/job/4966533?langcode=en",
+      "status": "official_job_page_observed_current_open_unverified",
+      "observedOn": "2026-10-29",
+      "note": "已核对辉瑞官方职位页面；职位及申请状态请以官网为准。",
+      "responsibilities": "审核药品批次及流程质量资料，支持质量控制、偏差与变更流程及质量改进。",
+      "requirements": "以官网列明的学历、工作经验及质量体系能力要求为准；不猜测具体专业限制。"
+    },
+    {
+      "id": "cn-autumn-pfizer-4966532",
+      "company": "辉瑞",
+      "title": "代谢事业部－医学信息沟通专员－太原",
+      "majors": [
+        "医学",
+        "药学",
+        "生命科学"
+      ],
+      "cities": [
+        "太原"
+      ],
+      "education": "大学专科及以上",
+      "recruitmentType": "全职招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://www.pfizer.com/about/careers/job/4966532?langcode=en",
+      "status": "official_job_page_observed_current_open_unverified",
+      "observedOn": "2026-10-29",
+      "note": "已核对辉瑞官方职位页面；职位及申请状态请以官网为准。",
+      "responsibilities": "按公司政策提供专业支持，规划学术活动，分析客户反馈，与内部团队协作。",
+      "requirements": "相关专业优先，熟练MS Office，英语良好，医药行业经验优先。"
+    },
+    {
+      "id": "cn-autumn-pfizer-4966494",
+      "company": "辉瑞",
+      "title": "辉瑞生物制药－零售关键客户主管－南京",
+      "majors": [
+        "医学",
+        "药学",
+        "生命科学"
+      ],
+      "cities": [
+        "南京"
+      ],
+      "education": "大学本科及以上",
+      "recruitmentType": "全职招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://www.pfizer.com/about/careers/job/4966494?langcode=en",
+      "status": "official_job_page_observed_current_open_unverified",
+      "observedOn": "2026-10-29",
+      "note": "已核对辉瑞官方职位页面；职位及申请状态请以官网为准。",
+      "responsibilities": "制定并执行区域关键客户销售计划，分析渠道数据，推进重点客户合作及跨部门项目。",
+      "requirements": "医药相关专业优先；外部应聘者需3年及以上制药行业同等公司销售经验，2年以上销售管理或KA管理经验优先。"
     }
   ]
 }

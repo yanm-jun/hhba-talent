@@ -507,6 +507,27 @@
           "source": "https://www.scbank.cn/cn/col50/index.html"
         }
       ]
+    },
+    "cn-autumn-003": {
+      "businessSource": "https://www.pfizer.com/about/history",
+      "businessEvidence": "pfizer_official_history_checked_2026-10-29",
+      "milestones": [
+        {
+          "date": "1849",
+          "description": "查尔斯·辉瑞与查尔斯·厄尔哈特在美国纽约布鲁克林创立公司（辉瑞全球企业历史）。",
+          "source": "https://www.pfizer.com/about/history"
+        },
+        {
+          "date": "1995",
+          "description": "辉瑞在中国大连建立制药工厂，这是辉瑞全球官网历史资料中记载的中国业务发展节点。",
+          "source": "https://www.pfizer.com/about/history"
+        },
+        {
+          "date": "2024",
+          "description": "辉瑞迎来成立175周年。",
+          "source": "https://www.pfizer.com/about/history"
+        }
+      ]
     }
   }
 }

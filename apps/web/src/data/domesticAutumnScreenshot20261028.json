@@ -31,10 +31,10 @@
       "id": "cn-autumn-003",
       "name": "辉瑞",
       "screenshotGroup": "截图组A：标注7日内更新",
-      "reviewStatus": "not_checked",
-      "officialUrl": null,
-      "evidenceUrl": null,
-      "notes": null
+      "reviewStatus": "official_entry_evidenced",
+      "officialUrl": "https://www.pfizer.com/about/careers/search-results",
+      "evidenceUrl": "https://www.pfizer.com/about/careers/job/4966533?langcode=en",
+      "notes": "2026-10-29 已核对辉瑞官方招聘入口及四条中国职位页面；不承诺持续在招。"
     },
     {
       "id": "cn-autumn-004",
