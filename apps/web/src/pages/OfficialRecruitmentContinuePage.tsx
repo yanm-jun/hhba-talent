@@ -2,13 +2,15 @@ import {ArrowLeft,ArrowUpRight,ExternalLink,ShieldCheck} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link} from '../router';
 import {employerApiReady,type User} from '../services/api';
+import {realAuthReady} from '../services/realAuth';
 import {clearPendingRecruitment,pendingRecruitment} from '../services/recruitmentOutbound';
 import '../styles/recruitment-outbound.css';
 
 // The destination is kept in tab-local sessionStorage, NOT an unvalidated next= URL.
 // Users consent to leaving HHBA with an explicit click after finishing login.
 export function OfficialRecruitmentContinuePage({user}:{user:User|null}){
- const signed=employerApiReady&&!!user?.account_types?.includes('candidate');
+ const accountBackendReady=employerApiReady||realAuthReady;
+ const signed=accountBackendReady&&!!user?.account_types?.includes('candidate');
  const saved=pendingRecruitment();
  const back=saved?.origin&&saved.origin.startsWith('/')&&!saved.origin.startsWith('//')?
   saved.origin:'/candidate/jobs';
@@ -19,7 +21,7 @@ export function OfficialRecruitmentContinuePage({user}:{user:User|null}){
     <span>您浏览过的企业与岗位信息仍然保留；仅在前往企业外部招聘系统前核对账户状态。</span>
    </div>
    <div className="hhba-outbound-panel">
-    {!employerApiReady?<><h2>正式账户服务尚未开通</h2>
+    {!accountBackendReady?<><h2>正式账户服务尚未开通</h2>
       <p>当前 HHBA 静态网站只提供前端账户体验，并没有连接真实注册与登录服务器。
        模拟注册和模拟登录不属于正式 HHBA 注册用户，因此暂时不能解锁跳转到外部招聘官网。</p>
       <p>你可以继续免费浏览全部企业介绍、专业信息和岗位详情。等正式账户服务接入后，完成求职者注册或登录才能继续前往官方招聘页面。</p>
