@@ -255,7 +255,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
      <strong>{j.title}</strong>
      <span><GraduationCap size={13}/>{j.recordKind==='job'?'有来源的具体岗位':'招聘项目／方向'} · {j.majors.length?j.majors.join('、'):'专业未逐岗披露'}</span>
      <span><MapPin size={13}/>{j.cities.length?j.cities.join('、'):'地点待核验'}{j.locationScope==='program'?'（项目城市）':''}</span>
-     {safeUrl(j.sourceUrl)&&<a href={safeUrl(j.sourceUrl)!} target="_blank" rel="noopener noreferrer" data-hhba-non-recruitment-link="true">
+     {safeUrl(j.sourceUrl)&&<a href={safeUrl(j.sourceUrl)!} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">
       查看历史公告来源 <ExternalLink size={14}/>
      </a>}
     </div>)}
