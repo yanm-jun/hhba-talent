@@ -49,6 +49,7 @@ export function employerIdentityMatches(job:LiveJob,identity:EmployerIdentity){
 export function companyPageRouteForJob(job:LiveJob):string|null{
  if(!safeOfficialJobUrl(job))return null;
  if(job.recordKind==='DOMESTIC_REBUILT'&&job.id.startsWith('cn-v2-schneider-'))return '/companies/autumn/cn-autumn-002';
+ if(job.recordKind==='DOMESTIC_REBUILT'&&job.id.startsWith('cn-v2-kpmg-'))return '/companies/autumn/cn-autumn-001';
  const brand=verifiedBrandKey(job);
  if(brand)return '/companies/'+brand;
  const identity=employerIdentity(job);
