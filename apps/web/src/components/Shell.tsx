@@ -3,6 +3,7 @@ import type {MouseEvent} from 'react';
 import {recruitmentTarget,rememberRecruitment} from '../services/recruitmentOutbound';
 import { Link, useNavigate, useRoute } from '../router';
 import {employerApiReady,type User} from '../services/api';
+import {realAuthReady} from '../services/realAuth';
 import { CandidateAccountDropdown } from './CandidateAccountDropdown';
 import { BrandMark } from './BrandMark';
 import {demoModeEnabled,useDemoAccount,exitDemoAccount} from '../services/demoAccount';
@@ -29,7 +30,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
  const candidateSignedIn=hasCandidate||(demoModeEnabled&&!!demo);
  // Only a verified HHBA account session may unlock official recruiting outlinks.
  // A local demo account must never satisfy this requirement.
- const verifiedCandidate=employerApiReady&&hasCandidate;
+ const verifiedCandidate=hasCandidate&&(employerApiReady||realAuthReady);
  const recruiterSignedIn=hasRecruiter;
  const employerEntry=recruiterSignedIn?'/employer/hub':'/employer/onboarding-preview';
  // Central capture covers all recruiting links across existing company/job pages,
@@ -41,6 +42,11 @@ export function Shell({ user, children }: { user: User | null; children: React.R
   const anchor=event.target.closest<HTMLAnchorElement>('a[href]');
   if(!anchor)return;
   const destination=recruitmentTarget(anchor);
+  // Explicitly marked application links must NEVER silently bypass the gate when
+  // their URL is invalid or unsupported (e.g. HTTP or unexpected custom ports).
+  if(!destination&&anchor.dataset.hhbaRecruitmentOutbound==='true'){
+   event.preventDefault();event.stopPropagation();return;
+  }
   if(!destination||verifiedCandidate)return;
   event.preventDefault();
   event.stopPropagation();
@@ -52,7 +58,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
   if(verifiedCandidate||route.startsWith('/admin')||route.startsWith('/employer')||route.startsWith('/recruiter'))return;
   if(!(event.target instanceof Element))return;
   const anchor=event.target.closest<HTMLAnchorElement>('a[href]');
-  if(anchor&&recruitmentTarget(anchor))event.preventDefault();
+  if(anchor&&(recruitmentTarget(anchor)||anchor.dataset.hhbaRecruitmentOutbound==='true'))event.preventDefault();
  }
  return <main onClickCapture={guardRecruitmentClick} onAuxClickCapture={guardRecruitmentClick}
     onContextMenuCapture={guardRecruitmentContextMenu} className={'app-shell hhba-experience-'+experience}>
