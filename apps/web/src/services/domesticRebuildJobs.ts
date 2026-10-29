@@ -13,9 +13,10 @@ import pfizerJobs from '../data/domesticPfizerOfficialJobs20261029.json';
 import csairJobs from '../data/domesticCsairVerifiedPositions20261029.json';
 import sftechJobs from '../data/domesticSfTechCampusRoles20261029.json';
 import neteaseJobs from '../data/domesticNeteaseCampusRoleDirections20261029.json';
+import hypergryphJobs from '../data/domesticHypergryph2027Roles20261029.json';
 import type {LiveJob,LiveFilters,LivePage} from './liveRecruitment';
 
-export const DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券','辉瑞','中国南方航空','顺丰','网易游戏'] as const;
+export const DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券','辉瑞','中国南方航空','顺丰','网易游戏','鹰角网络'] as const;
 export const DOMESTIC_REBUILD_VERSION='2026-10-29-v2';
 const schneiderV2Records=schneider.jobs.map(job=>({
  id:'cn-v2-schneider-'+job.id,
@@ -167,7 +168,22 @@ export const neteaseV2Records=neteaseJobs.jobs.map(job=>({
  employerRoute:'/companies/autumn/cn-autumn-006'
 } satisfies LiveJob & {majorNames:string[];positionOrg:string;evidenceUrl:string;employerRoute:string}));
 
-export const domesticV2Records=[...schneiderV2Records,...kpmgV2Records,...huayuV2Records,...huaanV2Records,...guangfaV2Records,...citicsV2Records,...pfizerV2Records,...csairV2Records,...sftechV2Records,...neteaseV2Records];
+export const hypergryphV2Records=hypergryphJobs.jobs.map(job=>({
+ id:'cn-v2-hypergryph-'+job.id,
+ company:'上海鹰角网络科技有限公司',companyZh:'鹰角网络',
+ title:job.title,titleZh:job.title,location:job.city,locationZh:job.city+'（公告项目城市，逐岗待核实）',
+ platform:'hypergryph-2027-campus-reported',source:'hypergryph',
+ url:job.officialListUrl,domestic:true,remote:null,
+ recordKind:'DOMESTIC_REBUILT',recruitmentType:'CAMPUS',
+ observedAt:job.observedOn,currentApplicationVerified:false,
+ educationLabel:job.education,experienceLabel:'2027届秋招岗位名称公开提及 · 独立职位链接和专业资格待官方核实',
+ majorNames:job.majors,editorialRelatedMajors:job.editorialRelatedMajors,
+ responsibilitiesSummary:job.summary,requirementsSummary:job.requirements,
+ positionOrg:job.company,evidenceUrl:job.evidenceUrl,
+ employerRoute:'/companies/autumn/cn-autumn-007'
+} satisfies LiveJob & {majorNames:string[];editorialRelatedMajors:string[];positionOrg:string;evidenceUrl:string;employerRoute:string}));
+
+export const domesticV2Records=[...schneiderV2Records,...kpmgV2Records,...huayuV2Records,...huaanV2Records,...guangfaV2Records,...citicsV2Records,...pfizerV2Records,...csairV2Records,...sftechV2Records,...neteaseV2Records,...hypergryphV2Records];
 
 export function domesticV2ById(id:string):LiveJob|undefined{
  return domesticV2Records.find(job=>job.id===id);
@@ -176,7 +192,7 @@ export function filterDomesticRebuildJobs(jobs:LiveJob[],f:LiveFilters):LiveJob[
  const q=f.q.normalize('NFKC').trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
  return jobs.filter(job=>{
   if(f.country==='global')return false;
-  if(f.company&&!(['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华域视觉','schneider electric','kpmg','hasco vision','华安证券','huaan securities','广发证券','gf securities','中信证券','citic securities','辉瑞','pfizer','中国南方航空','南航','china southern','顺丰','顺丰科技','sf express','sf technology','网易游戏','网易互娱','netease games','netease'].some(x=>x.toLowerCase().includes(f.company.toLowerCase()))))return false;
+  if(f.company&&!(['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华域视觉','schneider electric','kpmg','hasco vision','华安证券','huaan securities','广发证券','gf securities','中信证券','citic securities','辉瑞','pfizer','中国南方航空','南航','china southern','顺丰','顺丰科技','sf express','sf technology','网易游戏','网易互娱','netease games','netease','鹰角网络','hypergryph'].some(x=>x.toLowerCase().includes(f.company.toLowerCase()))))return false;
   if(f.location_country&&f.location_country.toUpperCase()!=='CN')return false;
   if(f.city&&!job.locationZh?.includes(f.city)&&!(f.city==='shanghai'&&job.locationZh==='上海')&&!(f.city==='beijing'&&job.locationZh==='北京')&&!(f.city==='guangzhou'&&job.locationZh==='广州'))return false;
   if(f.remote)return false;
@@ -192,11 +208,11 @@ export function filterDomesticRebuildJobs(jobs:LiveJob[],f:LiveFilters):LiveJob[
  });
 }
 export function assertDomesticRebuildIntegrity(){
- if(schneiderV2Records.length!==12||kpmgV2Records.length!==6||huayuV2Records.length!==16||huaanV2Records.length!==10||guangfaV2Records.length!==10||citicsV2Records.length!==5||pfizerV2Records.length!==4||csairV2Records.length!==6||sftechV2Records.length!==17||neteaseV2Records.length!==14||domesticV2Records.length!==100)
+ if(schneiderV2Records.length!==12||kpmgV2Records.length!==6||huayuV2Records.length!==16||huaanV2Records.length!==10||guangfaV2Records.length!==10||citicsV2Records.length!==5||pfizerV2Records.length!==4||csairV2Records.length!==6||sftechV2Records.length!==17||neteaseV2Records.length!==14||hypergryphV2Records.length!==20||domesticV2Records.length!==120)
   throw Error('REBUILT_COMPANY_JOB_COUNT_CHANGED');
  const ids=new Set<string>(),urls=new Set<string>();
  for(const job of domesticV2Records){
-  if(ids.has(job.id)||(!['huayu-official-campus','huaan-securities-official','guangfa-securities-official','citics-branch-campus-official','csair-official-list','sftech-2027-campus-list','netease-interactive-2027-direction'].includes(job.platform)&&urls.has(job.url))||
+  if(ids.has(job.id)||(!['huayu-official-campus','huaan-securities-official','guangfa-securities-official','citics-branch-campus-official','csair-official-list','sftech-2027-campus-list','netease-interactive-2027-direction','hypergryph-2027-campus-reported'].includes(job.platform)&&urls.has(job.url))||
     !(job.platform==='schneider-official'&&/^cn-v2-schneider-[0-9]{6}$/.test(job.id)&&
       /^https:\/\/careers\.se\.com\/jobs\/[0-9]{6}\?lang=zh-(?:CN|cn)$/.test(job.url)||
       job.platform==='kpmg-moka-official'&&/^cn-v2-kpmg-[0-9a-f-]{36}$/.test(job.id)&&
@@ -216,7 +232,9 @@ export function assertDomesticRebuildIntegrity(){
       job.platform==='sftech-2027-campus-list'&&/^cn-v2-sftech-[a-z0-9-]{5,100}$/.test(job.id)&&
       job.url==='https://campus.sf-express.com/#/homePage'||
       job.platform==='netease-interactive-2027-direction'&&/^cn-v2-netease-[a-z-]{4,100}$/.test(job.id)&&
-      job.url==='https://campus.game.163.com/')||
+      job.url==='https://campus.game.163.com/'||
+      job.platform==='hypergryph-2027-campus-reported'&&/^cn-v2-hypergryph-[a-z0-9-]{5,100}$/.test(job.id)&&
+      job.url==='https://career.hypergryph.com/')||
     !job.titleZh||!job.locationZh||!job.responsibilitiesSummary)
    throw Error('DOMESTIC_REBUILD_SOURCE_INVALID '+job.id);
   ids.add(job.id);urls.add(job.url);
