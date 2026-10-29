@@ -15,6 +15,7 @@ export type LiveJob = {
   graduationYear?: number; responsibilitiesSummary?: string; requirementsSummary?: string;
   editorial?: CuratedEditorial; experienceMinYears?: number|null; skillSignals?: string[];
   majorNames?: string[]; employerRoute?: string;
+  countryCode?: string|null; cityKey?: string|null;
 };
 export type LiveFilters = {
   q: string; company: string; country: '' | 'cn' | 'global'; remote: boolean;
@@ -239,6 +240,7 @@ function archivedJob(j:CuratedArchiveRow):LiveJob{
     educationLabel:j.education?degree[j.education]||j.education:undefined,
     experienceLabel:j.experienceMinYears!==null?j.experienceMinYears+' 年及以上':undefined,
     experienceMinYears:j.experienceMinYears,skillSignals:j.skillSignals,
+    countryCode:j.countryCode,cityKey:j.cityKey,
     editorial:j.editorial
   };
 }
