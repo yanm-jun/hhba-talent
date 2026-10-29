@@ -101,7 +101,7 @@ export const citicsV2Records=citicsJobs.jobs.map(job=>({
  recruitmentType:'CAMPUS',observedAt:job.publishedOn,
  currentApplicationVerified:false,
  educationLabel:job.education,experienceLabel:'2027届校招 · 官网申请状态尚未核实',
- majorNames:job.majors,responsibilitiesSummary:job.responsibilities,
+ majorNames:job.majors,majorUnrestricted:job.majorsRequirement.startsWith('不限专业'),responsibilitiesSummary:job.responsibilities,
  requirementsSummary:job.requirements,
  positionOrg:job.office,evidenceUrl:job.sourceUrl,
  employerRoute:'/companies/domestic/a-600030'
