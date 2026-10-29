@@ -70,7 +70,11 @@ export function safeOfficialJobUrl(job: LiveJob) {
         'tencent-official': 'careers.tencent.com',
         'baidu-official': 'talent.baidu.com'
       };
-      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='pfizer-official'&&job.source==='pfizer'){
+      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='csair-official-list'&&job.source==='china-southern'){
+        // Official jobs index; six individual titles validated, no invented per-job application URLs.
+        if(u.hostname!=='job.csair.cn'||u.pathname!=='/global'||
+           u.search!==''||u.hash!==''||!/^cn-v2-csair-[a-z-]{6,100}$/.test(job.id))return null;
+      }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='pfizer-official'&&job.source==='pfizer'){
         if(u.hostname!=='www.pfizer.com'||u.pathname!=='/about/careers/job/'+job.id.replace('cn-v2-pfizer-','')||
            u.searchParams.get('langcode')!=='en'||[...u.searchParams.keys()].length!==1||
            !/^cn-v2-pfizer-[0-9]{7}$/.test(job.id))return null;
