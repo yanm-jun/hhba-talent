@@ -72,7 +72,9 @@ assert(profile.includes('data-hhba-recruitment-outbound="true"'),'Keep login gat
 assert(profile.includes('data-hhba-non-recruitment-link="true"'),'Public citations remain inspectable');
 assert(profile.includes('getDomesticCompanies()')&&profile.includes('getDomesticRecruitment('),'Preserve the existing real data join');
 assert(profile.includes('招聘项目的城市不等于每个岗位的城市'),'Never present program locations as exact job locations');
-assert(profile.includes('尚未完成独立核实'),'Never invent unknown company biographies');
+assert(profile.includes('尚不代表已经完成对具体经营主体的官方核验'),'Do not present draft business scope as independently verified');
+assert(profile.includes('businessDraftA.entries')&&profile.includes('businessDraftB.entries'),'Load all 156 business drafts');
+assert(profile.includes('documentedHistories')&&profile.includes('节点出处'),'Display individually sourced company milestones');
 assert(profile.includes('className="company-profile-autumn-photo-pending"'),'Unfinished photos need only a quiet text note, not fake image tiles');
 assert(Object.values(evidence).filter(x=>x.intro&&x.source).length===10,'Retain source-backed company introductions');
 const media={...mediaA,...mediaB};
