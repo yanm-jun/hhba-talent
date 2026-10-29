@@ -5,6 +5,7 @@ import {Link,getCompanyReturnTarget} from '../router';
 import rolesData from '../data/domesticPfizerOfficialJobs20261029.json';
 import type {User} from '../services/api';
 import '../styles/kpmg-compact-profile.css';
+import {CompanyMajorJobs} from '../components/CompanyMajorJobs';
 
 /** HHBA Pfizer: four-block format is intentionally identical to the approved CITIC Securities compact page.
  * The three visual assets are supplied by the user. The pictured building bears a historical Pfizer sign;
@@ -54,31 +55,8 @@ export function PfizerCompactProfilePage({user}:{user:User|null}){
     </div>
     <p className="hhba-pfizer-photo-note">三张素材均来自本次上传，未拼接或 AI 重绘。图片所示地点及研发人员身份未独立核验，不将建筑照片标为“现总部”。</p>
    </section>
-   <section className="hhba-kpmg-section" aria-labelledby="pfizer-major-title">
-    <div className="hhba-kpmg-section-heading"><div><h2 id="pfizer-major-title">适合哪些专业背景？</h2><p>依据岗位公布的专业优先项筛选；“优先”不等于硬性限制。部分职位未披露专业要求，筛选时仍会保留并标注。</p></div></div>
-    <div className="hhba-kpmg-major-list" role="group" aria-label="专业选择">
-     {majors.map(x=><button key={x} type="button" className={'hhba-kpmg-major'+(major===x?' is-selected':'')} aria-pressed={major===x} onClick={()=>setMajor(x)}>{x}{major===x&&<CheckCircle2 size={13}/>}</button>)}
-    </div>
-   </section>
-   <section className="hhba-kpmg-section" aria-labelledby="pfizer-job-title">
-    <div className="hhba-kpmg-section-heading">
-     <div><h2 id="pfizer-job-title">招聘岗位</h2><p>当前专业：<strong>{major}</strong> · {jobs.length} 条匹配或专业未披露的官方职位资料。具体岗位是否仍开放，以辉瑞官方招聘系统为准。</p></div>
-     <a className="hhba-kpmg-section-link" href="https://www.pfizer.com/about/careers/search-results" data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">辉瑞官方招聘 <ExternalLink size={14}/></a>
-    </div>
-    <div className="hhba-kpmg-role-list">
-     {jobs.map(job=><article className="hhba-kpmg-role" key={job.id}>
-      <div className="hhba-kpmg-role-icon"><BriefcaseBusiness size={17}/></div>
-      <div className="hhba-kpmg-role-main">
-       <div className="hhba-kpmg-role-top"><h3>{job.title}</h3><span>{job.cities.join('、')}</span></div>
-       <p>{job.responsibilities}</p>
-       <small>{job.education} · {job.majors.length?'相关专业优先：'+job.majors.join('、'):'专业要求未披露'} · 申请状态需官网核对</small>
-      </div>
-      <Link to={'/candidate/jobs/cn-v2-pfizer-'+job.id.replace('cn-autumn-pfizer-','')} aria-label={'查看'+job.title+'站内详情'}>查看详情 <ArrowRight size={14}/></Link>
-     </article>)}
-     {!jobs.length&&<p className="hhba-kpmg-role-disclaimer">未发现明确符合所选专业的已核对岗位，请尝试“全部专业”。</p>}
-    </div>
-    <p className="hhba-kpmg-role-disclaimer"><GraduationCap size={14}/> 以上为 2026-10-29 整理的四条辉瑞中国具体职位信息，不保证当前仍可投递；官方岗位页面及完整条件见站内职位详情。</p>
-   </section>
+   <CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn-003"/>
+
    <section className="hhba-kpmg-section" aria-labelledby="pfizer-services-title">
     <div className="hhba-kpmg-section-heading"><div><h2 id="pfizer-services-title">主要业务与专业服务</h2><p>核心业务摘要，点击卡片可展开详细内容。</p></div></div>
     <div className="hhba-kpmg-service-grid">
