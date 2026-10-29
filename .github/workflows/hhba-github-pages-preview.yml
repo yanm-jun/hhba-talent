@@ -9,6 +9,7 @@ on:
     - cron: '15 0,12 * * *'
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 concurrency:
@@ -27,6 +28,32 @@ jobs:
           # Public entry cards restored to compact layout; keep three identity paths unchanged.
           # Navigation copy refresh: 企业发现 (without the 200-company count in the tab)
           # 2026-10-28: rebuild static preview with consolidated 200-company discovery navigation.
+      - name: Retrieve original 312 independent reference photos from saved artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/hhba-photo-research
+          gh run download 40731442485 --repo yanm-jun/hhba-talent --name hhba-156-companies-312-individual-industry-photos --dir /tmp/hhba-photo-research
+          find /tmp/hhba-photo-research -type f -maxdepth 2 -print
+          python apps/web/scripts/materialize-autumn-photo-research.py /tmp/hhba-photo-research/hhba_156_companies_312_individual_industry_photos.zip
+      - name: Verify 156 company previews have two separate cited local JPEGs each
+        run: |
+          python - <<'PY'
+          import json,hashlib,pathlib
+          base=pathlib.Path('apps/web/public')
+          data=json.loads((base/'data/domestic-autumn-photo-research.json').read_text())
+          assert data['totalCompanies']==156 and data['totalPhotos']==312
+          sha=set()
+          for employer,items in data['entries'].items():
+              assert len(items)==2,employer
+              for item in items:
+                  content=(base/item['file']).read_bytes()
+                  assert content[:2]==bytes((255,216)) and hashlib.sha256(content).hexdigest()==item['sha256']
+                  assert item['sha256'] not in sha,employer
+                  sha.add(item['sha256'])
+          assert len(sha)==312
+          print('HHBA_156_TWO_DISTINCT_WIKIMEDIA_REFERENCES_PER_COMPANY_OK')
+          PY
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
