@@ -5,6 +5,7 @@ import {Link,getCompanyReturnTarget} from '../router';
 import rolesData from '../data/domesticNeteaseCampusRoleDirections20261029.json';
 import type {User} from '../services/api';
 import '../styles/kpmg-compact-profile.css';
+import {CompanyMajorJobs} from '../components/CompanyMajorJobs';
 
 const majors=['全部专业','计算机科学与技术','软件工程','人工智能','数学与统计','数字媒体技术','数字媒体艺术','动画','设计学','工商管理','其他专业'];
 const services=[
@@ -44,31 +45,8 @@ export function NeteaseGamesCompactProfilePage({user}:{user:User|null}){
     </div>
     <p className="hhba-netease-photo-note">Logo 与两张照片均按你上传的原始 PNG 独立存储，未降低画质或拼图。照片人物、具体办公楼与拍摄时间未独立核验。</p>
    </section>
-   <section className="hhba-kpmg-section" aria-labelledby="netease-major-title">
-    <div className="hhba-kpmg-section-heading"><div><h2 id="netease-major-title">适合哪些专业背景？</h2><p>点击专业浏览相关岗位方向。这里是 HHBA 内容关联，不是网易互娱公布的逐岗专业限制。</p></div></div>
-    <div className="hhba-kpmg-major-list" role="group" aria-label="相关专业方向">
-     {majors.map(m=><button key={m} type="button" className={'hhba-kpmg-major'+(major===m?' is-selected':'')} aria-pressed={major===m} onClick={()=>setMajor(m)}>{m}{major===m&&<CheckCircle2 size={13}/>}</button>)}
-    </div>
-   </section>
-   <section className="hhba-kpmg-section" aria-labelledby="netease-jobs-title">
-    <div className="hhba-kpmg-section-heading">
-     <div><h2 id="netease-jobs-title">招聘岗位</h2><p>当前关联方向：<strong>{major}</strong> · {jobs.length} 条岗位方向记录。未获得独立官方岗位链接，不代表当前开放申请。</p></div>
-     <a className="hhba-kpmg-section-link" href="https://campus.game.163.com/" target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">网易互娱官方校招 <ExternalLink size={14}/></a>
-    </div>
-    <div className="hhba-kpmg-role-list">
-     {jobs.map(job=><article className="hhba-kpmg-role" key={job.id}>
-      <div className="hhba-kpmg-role-icon"><BriefcaseBusiness size={17}/></div>
-      <div className="hhba-kpmg-role-main">
-       <div className="hhba-kpmg-role-top"><h3>{job.title}</h3><span>{job.category}</span></div>
-       <p>网易游戏（互娱） · {job.summary}</p>
-       <small>2027届校招方向 · 广州/杭州/上海（项目级地点） · 逐岗专业条件待核验</small>
-      </div>
-      <Link to={'/candidate/jobs/cn-v2-netease-'+job.id} aria-label={'查看'+job.title+'站内资料'}>查看详情 <ArrowRight size={14}/></Link>
-     </article>)}
-     {!jobs.length&&<p className="hhba-kpmg-role-disclaimer">暂无该专业关联方向的已整理资料，可切换为全部专业；这不代表企业不接受该专业。</p>}
-    </div>
-    <p className="hhba-kpmg-role-disclaimer"><GraduationCap size={14}/> 网易互娱2027届校招公布了职位类别与项目城市；细分岗位名称参考公开招聘汇总。这里展示的是待单岗核验的岗位方向，而不是已经确认在招、可直接投递的独立岗位。网易雷火招聘未混入本页。</p>
-   </section>
+   <CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn-006"/>
+
    <section className="hhba-kpmg-section" aria-labelledby="netease-services-title">
     <div className="hhba-kpmg-section-heading"><div><h2 id="netease-services-title">主要业务与专业服务</h2><p>默认显示四个板块，可展开其余两个方向。</p></div></div>
     <div className="hhba-kpmg-service-grid">
