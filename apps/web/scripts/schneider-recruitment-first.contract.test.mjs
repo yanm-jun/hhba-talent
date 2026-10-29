@@ -4,6 +4,7 @@ const data=JSON.parse(readFileSync('src/data/domesticSchneiderDetailedDossier202
 const registry=JSON.parse(readFileSync('src/data/domesticAutumnAiScenes.json','utf8')).entries;
 const companies=JSON.parse(readFileSync('src/data/domesticAutumnScreenshot20261028.json','utf8')).entries;
 const page=readFileSync('src/pages/SchneiderCompactProfilePage.tsx','utf8');
+const shared=readFileSync('src/components/CompanyMajorJobs.tsx','utf8');
 const main=readFileSync('src/main.tsx','utf8');
 const logo=JSON.parse(readFileSync('src/data/domesticAutumnBrandMediaRegistry.json','utf8')).entries['施耐德电气'];
 assert.equal(companies.length,156);
@@ -37,11 +38,12 @@ for(const job of data.jobs){
 assert(cities.size>=3,'Jobs should show distinct grounded cities');
 assert(data.majors.length>=12);
 assert(main.includes("if(route==='/companies/autumn/cn-autumn-002')return <SchneiderCompactProfilePage user={user}/>"));
-const heads=['适合哪些专业背景？','招聘岗位与职业机会','主要业务与专业服务'];
-assert(heads.map(s=>page.indexOf(s)).every((pos,i,arr)=>pos>0&&(i===0||pos>arr[i-1])),'Only 4 blocks in exact user order');
+assert(page.includes('<CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn-002"/>'),'Schneider uses unified major and role sections');
+assert(shared.includes('适合哪些专业背景？')&&shared.includes('招聘岗位'));
+assert(page.indexOf('CompanyMajorJobs')<page.indexOf('主要业务与专业服务'),'Original four-block order preserved');
 for(const forbidden of ['信息来源','发展与重要节点','关于企业','官网来源']) assert(!page.includes(forbidden));
 assert(page.indexOf('<AutumnCompanyBrand name="施耐德电气" large/>')<page.indexOf('<div className="hhba-kpmg-photo-grid">'));
-assert(page.includes('setMajor(item.name)')&&page.includes('filtered=selected.id')&&page.includes('filter(job=>job.majorSlugs.includes(selected.id))'),'Professional selection actually filters job links');
+assert(shared.includes('domesticV2Records.filter')&&shared.includes('matchRoleToMajor(job,slug)'),'Shared major selection filters evidence-bound V2 records');
 assert(page.includes('data-hhba-recruitment-outbound="true"'),'Retain login protection on outgoing careers');
 assert(page.includes('showAllServices?schneider.services.length:4')&&page.includes('<details>'),'Compact expandable services');
 assert(page.includes('AI 场景示意'));

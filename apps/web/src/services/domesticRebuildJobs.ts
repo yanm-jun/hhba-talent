@@ -101,7 +101,7 @@ export const citicsV2Records=citicsJobs.jobs.map(job=>({
  recruitmentType:'CAMPUS',observedAt:job.publishedOn,
  currentApplicationVerified:false,
  educationLabel:job.education,experienceLabel:'2027届校招 · 官网申请状态尚未核实',
- majorNames:job.majors,responsibilitiesSummary:job.responsibilities,
+ majorNames:job.majors,majorUnrestricted:job.majorsRequirement.startsWith('不限专业'),responsibilitiesSummary:job.responsibilities,
  requirementsSummary:job.requirements,
  positionOrg:job.office,evidenceUrl:job.sourceUrl,
  employerRoute:'/companies/domestic/a-600030'
@@ -145,7 +145,7 @@ export const sftechV2Records=sftechJobs.jobs.map(job=>({
  recordKind:'DOMESTIC_REBUILT',recruitmentType:'CAMPUS',
  observedAt:job.evidencePublicationDate,currentApplicationVerified:false,
  educationLabel:job.education,experienceLabel:'2027届校园招聘 · 单岗专业与岗位状态待官方核对',
- majorNames:job.majors,responsibilitiesSummary:job.summary,
+ majorNames:job.majors,editorialRelatedMajors:job.editorialRelatedMajors,responsibilitiesSummary:job.summary,
  requirementsSummary:job.requirements,
  positionOrg:'顺丰科技有限公司',evidenceUrl:job.evidenceUrl,
  employerRoute:'/companies/autumn/cn-autumn-005'
@@ -161,7 +161,7 @@ export const neteaseV2Records=neteaseJobs.jobs.map(job=>({
  recordKind:'DOMESTIC_REBUILT',recruitmentType:'CAMPUS',
  observedAt:job.publishedOn,currentApplicationVerified:false,
  educationLabel:job.education,experienceLabel:'2027届网易互娱校招 · 独立官方职位页面暂未核实',
- majorNames:job.majors,responsibilitiesSummary:job.summary,
+ majorNames:job.majors,editorialRelatedMajors:job.editorialRelatedMajors,responsibilitiesSummary:job.summary,
  requirementsSummary:job.requirements,
  positionOrg:job.company,evidenceUrl:job.titleEvidenceUrl,
  employerRoute:'/companies/autumn/cn-autumn-006'

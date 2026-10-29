@@ -7,6 +7,7 @@ import kpmg from '../data/domesticKpmgDetailedDossier20261029.json';
 import kpmgJobs from '../data/domesticKpmgConcreteJobs20261029.json';
 import type {User} from '../services/api';
 import '../styles/kpmg-compact-profile.css';
+import {CompanyMajorJobs} from '../components/CompanyMajorJobs';
 
 /** This preview changes ONLY cn-autumn-001. Other 155 employer routes are untouched.
  * The two individually produced images are AI illustrations, never actual KPMG premises.
@@ -77,38 +78,7 @@ export function KpmgCompactProfilePage({user}:{user:User|null}){
     </div>
    </section>
 
-   <section className="hhba-kpmg-section" aria-labelledby="kpmg-majors-title">
-    <div className="hhba-kpmg-section-heading">
-     <div><h2 id="kpmg-majors-title">适合哪些专业背景？</h2><p>选择你的专业，下面的招聘方向会随之筛选。</p></div>
-    </div>
-    <div className="hhba-kpmg-major-list" role="group" aria-label="选择所学专业">
-     {majors.map(item=><button type="button" key={item.name} className={'hhba-kpmg-major'+(major===item.name?' is-selected':'')} aria-pressed={major===item.name} onClick={()=>setMajor(item.name)}>
-       {item.name}{major===item.name&&<CheckCircle2 size={13}/>}
-     </button>)}
-    </div>
-   </section>
-
-   <section className="hhba-kpmg-section" aria-labelledby="kpmg-roles-title">
-    <div className="hhba-kpmg-section-heading">
-      <div><h2 id="kpmg-roles-title">招聘岗位与职业机会</h2>
-       <p>当前匹配：<strong>{major}</strong> · {filtered.length} 条具体历史职位。岗位来源均有独立链接，但当前招聘状态尚未核实。</p>
-      </div>
-      <a className="hhba-kpmg-section-link" href="https://kpmg.com/cn/zh/careers.html" data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">全部招聘入口 <ExternalLink size={13}/></a>
-    </div>
-    <div className="hhba-kpmg-role-list">
-      {filtered.map(job=><article className="hhba-kpmg-role" key={job.id}>
-       <div className="hhba-kpmg-role-icon"><BriefcaseBusiness size={17}/></div>
-       <div className="hhba-kpmg-role-main">
-        <div className="hhba-kpmg-role-top"><h3>{job.title}</h3><span>历史职位 · {job.publishedOn}</span></div>
-        <p>{job.city} · {job.summary}</p>
-        <small>{job.requirement}</small>
-       </div>
-       <Link to={'/candidate/jobs/cn-v2-kpmg-'+job.id}>查看详情 <ArrowRight size={14}/></Link>
-      </article>)}
-      {filtered.length===0&&<p className="hhba-kpmg-role-disclaimer">尚未收录与该专业明确相关的具体历史岗位，请使用上方官方招聘入口查看企业正在发布的职位。</p>}
-    </div>
-    <p className="hhba-kpmg-role-disclaimer"><GraduationCap size={14}/> 这里展示的是已查到独立 Moka 岗位页面的历史职位，不代表职位仍可投递；请在官方系统核对。专业标签仅用于辅助匹配。</p>
-   </section>
+   <CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn-001"/>
 
    <section className="hhba-kpmg-section" aria-labelledby="kpmg-services-title">
     <div className="hhba-kpmg-section-heading"><div>

@@ -3,6 +3,7 @@ import {loadPublicJobAudit} from './jobSyncStatus';
 import {searchJobs, type SearchFacet} from './jobSearchFacets.mjs';
 import {loadOfficialSearchFacets} from './officialSearchIndex';
 import {domesticV2Records, domesticV2ById, assertDomesticRebuildIntegrity} from './domesticRebuildJobs';
+import {visibleRoleForMajor} from './majorJobMatching';
 export type Language = 'zh' | 'en';
 export type LiveJob = {
   id: string; company: string; companyZh?: string; title: string; titleZh?: string;
@@ -14,13 +15,14 @@ export type LiveJob = {
   currentApplicationVerified?: boolean;
   graduationYear?: number; responsibilitiesSummary?: string; requirementsSummary?: string;
   editorial?: CuratedEditorial; experienceMinYears?: number|null; skillSignals?: string[];
-  majorNames?: string[]; employerRoute?: string; positionOrg?: string; evidenceUrl?: string;
+  majorNames?: string[]; majorUnrestricted?: boolean; editorialRelatedMajors?: string[]; employerRoute?: string; positionOrg?: string; evidenceUrl?: string;
   countryCode?: string|null; cityKey?: string|null;
 };
 export type LiveFilters = {
   q: string; company: string; country: '' | 'cn' | 'global'; remote: boolean;
   recruitment_type: '' | 'REGULAR' | 'SOCIAL' | 'CAMPUS' | 'INTERNSHIP';
   location_country?: string; city?: string; education?: string; experience?: string;
+  major_slug?: string; include_unknown_majors?: boolean;
 };
 export type LivePage = {
   jobs: LiveJob[]; total: number; limit: number; offset: number;
@@ -325,9 +327,10 @@ async function listArchivedJobs(filters:LiveFilters,offset:number,signal:AbortSi
     total:allowed.length,limit:30,offset,updated,boards:10,failures:0};
 }
 
-function rebuildListFilter(job:LiveJob,f:LiveFilters){
+export function rebuildListFilter(job:LiveJob,f:LiveFilters){
  const domestic=job.recordKind==='DOMESTIC_REBUILT';
  if(f.country==='cn'&&!domestic||f.country==='global'&&domestic)return false;
+ if(f.major_slug&&!visibleRoleForMajor(job,f.major_slug,f.include_unknown_majors===true))return false;
  if(f.company){
   const v=f.company.normalize('NFKC').toLowerCase();
   if(![job.company,job.companyZh||''].some(x=>x.toLowerCase().includes(v))&&

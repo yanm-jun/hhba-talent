@@ -6,6 +6,7 @@ import {AutumnCompanyBrand} from '../components/AutumnCompanyBrand';
 import rolesData from '../data/domesticCiticsSecuritiesRoles20261029.json';
 import type {User} from '../services/api';
 import '../styles/kpmg-compact-profile.css';
+import {CompanyMajorJobs} from '../components/CompanyMajorJobs';
 
 /** CITIC Securities (600030), not CITIC Securities (Shandong) LLC and not CSC Financial.
  * All five job instances are separately sourced listings for different named branches.
@@ -48,30 +49,8 @@ export function CiticsSecuritiesCompactProfilePage({user}:{user:User|null}){
     </div>
     <p style={{fontSize:11,color:'#809286',margin:'10px 0 0'}}>Logo 和两张图片直接复用旧版素材，没有重新生成；图片及品牌归属尚待逐张核验。</p>
    </section>
-   <section className="hhba-kpmg-section" aria-labelledby="citics-major-title">
-    <div className="hhba-kpmg-section-heading"><div><h2 id="citics-major-title">适合哪些专业背景？</h2><p>这批分支机构校招培训生岗位公开要求为不限专业。选择任何专业均保留全部岗位，不能误把其他专业排除。</p></div></div>
-    <div className="hhba-kpmg-major-list" role="group" aria-label="专业选择">
-     {majors.map(x=><button key={x} type="button" className={'hhba-kpmg-major'+(major===x?' is-selected':'')} aria-pressed={major===x} onClick={()=>setMajor(x)}>{x}{major===x&&<CheckCircle2 size={13}/>}</button>)}
-    </div>
-   </section>
-   <section className="hhba-kpmg-section" aria-labelledby="citics-job-title">
-    <div className="hhba-kpmg-section-heading">
-     <div><h2 id="citics-job-title">招聘岗位</h2><p>当前专业：<strong>{major}</strong> · {jobs.length} 个有单独公开职位依据的分支机构岗位。大学就业平台所列有效期不代表官网实时接受投递。</p></div>
-     <a className="hhba-kpmg-section-link" href="https://careers.citics.com/campus/branch" data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">官方分支机构校招 <ExternalLink size={14}/></a>
-    </div>
-    <div className="hhba-kpmg-role-list">
-     {jobs.map(job=><article className="hhba-kpmg-role" key={job.id}>
-      <div className="hhba-kpmg-role-icon"><BriefcaseBusiness size={17}/></div>
-      <div className="hhba-kpmg-role-main">
-       <div className="hhba-kpmg-role-top"><h3>{job.title}</h3><span>{job.city}</span></div>
-       <p>{job.office} · {job.responsibilities}</p>
-       <small>本科及以上 · 不限专业 · 高校记录有效期至 {job.deadline}</small>
-      </div>
-      <Link to={'/candidate/jobs/cn-v2-citics-'+job.id} aria-label={'查看'+job.title+'站内详情'}>查看详情 <ArrowRight size={14}/></Link>
-     </article>)}
-    </div>
-    <p className="hhba-kpmg-role-disclaimer"><GraduationCap size={14}/> 这 5 条是不同分支机构／营业部的同类培训生岗位，均有独立高校招聘页面；不是中信证券总部的五种不同工种。官方申请需进入企业招聘系统确认具体机构、岗位及开放状态。</p>
-   </section>
+   <CompanyMajorJobs companyRoute="/companies/domestic/a-600030"/>
+
    <section className="hhba-kpmg-section" aria-labelledby="citics-services-title">
     <div className="hhba-kpmg-section-heading"><div><h2 id="citics-services-title">主要业务与专业服务</h2><p>核心业务摘要，可展开详细信息。</p></div></div>
     <div className="hhba-kpmg-service-grid">

@@ -6,6 +6,7 @@ import {AutumnCompanyBrand} from '../components/AutumnCompanyBrand';
 import rolesData from '../data/domesticHuayuVisionRoles20261029.json';
 import type {User} from '../services/api';
 import '../styles/kpmg-compact-profile.css';
+import {CompanyMajorJobs} from '../components/CompanyMajorJobs';
 
 const majors=['全部专业','光电信息科学与工程','机械设计制造及其自动化','车辆工程','电子信息工程',
  '电气工程及其自动化','自动化','计算机科学与技术','软件工程','材料科学与工程','工业工程','机械电子工程'];
@@ -46,29 +47,8 @@ export function HuayuVisionCompactProfilePage({user}:{user:User|null}){
     </div>
     <p style={{fontSize:11,color:'#809286',margin:'10px 0 0'}}>Logo 沿用旧版已上传素材，品牌归属仍待最终核验；两张照片均为旧素材，未重新生成。</p>
    </section>
-   <section className="hhba-kpmg-section" aria-labelledby="huayu-major-title">
-    <div className="hhba-kpmg-section-heading"><div><h2 id="huayu-major-title">适合哪些专业背景？</h2><p>点击专业，筛选有相关专业要求的具体职位；匹配仅供参考。</p></div></div>
-    <div className="hhba-kpmg-major-list" role="group" aria-label="专业选择">
-     {majors.map(x=><button key={x} type="button" className={'hhba-kpmg-major'+(x===major?' is-selected':'')} aria-pressed={x===major} onClick={()=>setMajor(x)}>{x}{x===major&&<CheckCircle2 size={13}/>}</button>)}
-    </div>
-   </section>
-   <section className="hhba-kpmg-section" aria-labelledby="huayu-job-title">
-    <div className="hhba-kpmg-section-heading">
-     <div><h2 id="huayu-job-title">招聘岗位</h2><p>当前匹配：<strong>{major}</strong> · {roles.length} 个具体职位。官方校招列表共展示 21 个岗位，以下为已整理的 16 个。具体开放状态以官网为准。</p></div>
-     <a className="hhba-kpmg-section-link" href="https://hascovision.zhiye.com/campus/jobs" data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">官方全部职位 <ExternalLink size={14}/></a>
-    </div>
-    <div className="hhba-kpmg-role-list">
-     {roles.map(job=><article className="hhba-kpmg-role" key={job.id}>
-       <div className="hhba-kpmg-role-icon"><BriefcaseBusiness size={17}/></div>
-       <div className="hhba-kpmg-role-main">
-        <div className="hhba-kpmg-role-top"><h3>{job.title}</h3><span>{job.city}</span></div>
-        <p>{job.summary}</p><small>{job.requirement}</small>
-       </div>
-       <Link to={'/candidate/jobs/cn-v2-huayu-'+job.id} aria-label={'查看'+job.title+'站内详情'}>查看详情 <ArrowRight size={14}/></Link>
-     </article>)}
-    </div>
-    <p className="hhba-kpmg-role-disclaimer"><GraduationCap size={14}/> 职位名称、城市和职责来自企业官方校招职位列表；未取得逐岗官网直达链接，岗位详情提供官方列表入口供查找核对。</p>
-   </section>
+   <CompanyMajorJobs companyRoute="/companies/domestic/rel-huayu-004"/>
+
    <section className="hhba-kpmg-section" aria-labelledby="huayu-services-title">
     <div className="hhba-kpmg-section-heading"><div><h2 id="huayu-services-title">主要业务与专业服务</h2><p>精简业务卡片，可按需查看详细信息。</p></div></div>
     <div className="hhba-kpmg-service-grid">
