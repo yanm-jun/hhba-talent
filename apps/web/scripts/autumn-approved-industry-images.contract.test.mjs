@@ -33,9 +33,10 @@ for(const [companyId,photos] of Object.entries(data.entries)){
  }
 }
 assert.equal(count,19);
-assert(site.includes('<AutumnIndustryReferenceGallery companyId={id} companyName={employer.name}/>'));
+assert(!site.includes('AutumnIndustryReferenceGallery'),'Keep the 19-image research archive offline, never render it in employer pages');
+assert(!site.includes('industry-photos.json')&&!site.includes('photo-research'),'No Wikimedia photo references should appear in the OpenAI-format employer page');
 assert(!site.includes('创始人与核心创办团队'),'Founders block should not appear in domestic profiles');
 assert(site.includes('主要业务与代表产品')&&site.includes('发展与重要节点'));
 assert(gallery.includes('不是 {companyName} 的真实办公楼')&&gallery.includes('licenseUrl'));
 assert(gallery.includes('该企业暂无通过场景匹配审核的参考照片'));
-console.log('HHBA_19_INDEPENDENT_APPROVED_IMAGES_11_COMPANIES_NO_FAKE_OFFICES_OK');
+console.log('HHBA_19_SOURCE_ATTRIBUTED_RESEARCH_IMAGES_ARCHIVED_NOT_PUBLISHED_IN_PROFILES_OK');
