@@ -8,6 +8,8 @@ const kpmg=JSON.parse(src('src/data/domesticKpmgConcreteJobs20261029.json'));
 const huayu=JSON.parse(src('src/data/domesticHuayuVisionRoles20261029.json'));
 const huaan=JSON.parse(src('src/data/domesticHuaanSecuritiesRoles20261029.json'));
 const guangfa=JSON.parse(src('src/data/domesticGuangfaSecuritiesRoles20261029.json'));
+const citics=JSON.parse(src('src/data/domesticCiticsSecuritiesRoles20261029.json'));
+const citicsProfile=src('src/pages/CiticsSecuritiesCompactProfilePage.tsx');
 const guangfaProfile=src('src/pages/GuangfaSecuritiesCompactProfilePage.tsx');
 const huaanProfile=src('src/pages/HuaanSecuritiesCompactProfilePage.tsx');
 const huayuProfile=src('src/pages/HuayuVisionCompactProfilePage.tsx');
@@ -70,7 +72,19 @@ assert(main.includes("if(route==='/companies/domestic/a-000776')return <GuangfaS
 assert(guangfaProfile.includes("rolesData.jobs.filter"),'Major selector filters actual source-backed roles');
 assert(guangfaProfile.includes("'/candidate/jobs/cn-v2-guangfa-'+job.id"));
 assert(guangfaProfile.includes('归属待核验'),'Old company photos cannot masquerade as verified');
-assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券']"));
+assert.equal(citics.jobCount,5,'Only one new employer, five separately sourced branch vacancies');
+assert.equal(new Set(citics.jobs.map(j=>j.id)).size,5);
+assert.equal(new Set(citics.jobs.map(j=>j.office)).size,5,'Every job must be from a distinct named CITIC branch');
+assert(citics.jobs.every(j=>j.education==='本科及以上应届毕业生'&&j.majorsRequirement.startsWith('不限专业')));
+assert(citics.jobs.every(j=>j.sourceUrl.startsWith('https://')&&j.currentApplicationVerified===false));
+assert(citics.jobs.every(j=>j.officialListingUrl==='https://careers.citics.com/campus/branch'));
+assert(!JSON.stringify(citics).includes('中信建投证券'),'CSC Financial is a different company');
+assert(!JSON.stringify(citics).includes('中信证券（山东）有限责任公司2027'),'Separate subsidiary jobs not folded in');
+assert(main.includes("if(route==='/companies/domestic/a-600030')return <CiticsSecuritiesCompactProfilePage user={user}/>"));
+assert(citicsProfile.includes("const jobs=rolesData.jobs;"),'All majors permitted; do not improperly filter unrestricted trainees');
+assert(citicsProfile.includes("'/candidate/jobs/cn-v2-citics-'+job.id"),'Shared HHBA on-site job pages');
+assert(citicsProfile.includes('归属待核验'),'Legacy image authenticity not invented');
+assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券']"));
 assert(main.includes("if(route==='/companies/domestic/rel-huayu-004')return <HuayuVisionCompactProfilePage user={user}/>"),'Preserve old profile URL');
 assert(huayuProfile.includes("rolesData.jobs.filter"),'Major selector filters real jobs');
 assert(huayuProfile.includes("'/candidate/jobs/cn-v2-huayu-'+job.id"),'Onsite job detail for every role');
@@ -98,6 +112,14 @@ assert(branded.includes("autumn-real-logos/cn-autumn-001.svg"));
 assert(branded.includes('domestic-media/user-f9727f3062cf91da52b3285c.png'));
 assert(branded.includes('domestic-media/user-4e84106ce0d3db721fab644a.png'));
 assert(branded.includes('domestic-media/user-bc5d9ca993044b7644390553.png'));
+assert(branded.includes('domestic-media/user-ed43abe9b2aa6a7d0600525e.png'));
+assert(recruitment.includes("job.platform==='citics-branch-campus-official'"));
+assert(recruitment.includes('job.positionOrg'));
+assert(ui.includes("job.platform==='citics-branch-campus-official'"));
+assert(ui.includes('job.evidenceUrl'));
+for(const p of ['user-ed43abe9b2aa6a7d0600525e.png','user-f330eee0347f310e7c9fcb2d.webp','user-f9608fde8808381f0d17894b.webp'])
+ assert(existsSync('public/domestic-media/'+p),'Reused CITIC visual must exist: '+p);
+
 assert(recruitment.includes("job.platform==='guangfa-securities-official'"));
 assert(ui.includes("job.platform==='guangfa-securities-official'?'查看广发证券官方招聘首页"));
 for(const f of ['user-bc5d9ca993044b7644390553.png','user-ee7dc13de9387efbca39caf1.webp','user-d1173b668561e62dec056169.webp'])
@@ -117,4 +139,4 @@ for(const suffix of ['01','02']){
  const path='public/images/autumn-ai-scenes/cn-autumn-002-'+suffix+'.avif';
  assert(existsSync(path),'Reusing already created company photo '+path);
 }
-console.log('HHBA_DOMESTIC_V2_100_OVERSEAS_12_SCHNEIDER_6_KPMG_16_HUAYU_10_HUAAN_10_GUANGFA_HISTORICAL_POSITIONS '+workflowBranch);
+console.log('HHBA_DOMESTIC_V2_100_OVERSEAS_12_SCHNEIDER_6_KPMG_16_HUAYU_10_HUAAN_10_GUANGFA_5_CITICS_BRANCH_POSITIONS '+workflowBranch);
