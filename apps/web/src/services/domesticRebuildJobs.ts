@@ -4,11 +4,12 @@
  * 绝不从只有招聘官网的企业自动生成岗位。
  */
 import schneider from '../data/domesticSchneiderDetailedDossier20261029.json';
+import kpmgJobs from '../data/domesticKpmgConcreteJobs20261029.json';
 import type {LiveJob,LiveFilters,LivePage} from './liveRecruitment';
 
-export const DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气'] as const;
+export const DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威'] as const;
 export const DOMESTIC_REBUILD_VERSION='2026-10-29-v2';
-export const domesticV2Records=schneider.jobs.map(job=>({
+const schneiderV2Records=schneider.jobs.map(job=>({
  id:'cn-v2-schneider-'+job.id,
  company:'施耐德电气',
  companyZh:'施耐德电气',
@@ -33,6 +34,22 @@ export const domesticV2Records=schneider.jobs.map(job=>({
  employerRoute:'/companies/autumn/cn-autumn-002'
 } satisfies LiveJob & {majorNames:string[];employerRoute:string}));
 
+export const kpmgV2Records=kpmgJobs.jobs.map(job=>({
+ id:'cn-v2-kpmg-'+job.id,
+ company:'毕马威',companyZh:'毕马威',title:job.title,titleZh:job.title,
+ location:job.city,locationZh:job.city,
+ platform:'kpmg-moka-official',source:'kpmg',url:job.url,
+ domestic:true,remote:null,recordKind:'DOMESTIC_REBUILT',
+ recruitmentType:job.recruitmentType,observedAt:job.publishedOn,
+ currentApplicationVerified:false,
+ experienceLabel:'历史招聘记录 · 当前岗位状态未核实',
+ majorNames:job.majors,
+ responsibilitiesSummary:job.summary,requirementsSummary:job.requirement,
+ employerRoute:'/companies/autumn/cn-autumn-001'
+} satisfies LiveJob & {majorNames:string[];employerRoute:string}));
+
+export const domesticV2Records=[...schneiderV2Records,...kpmgV2Records];
+
 export function domesticV2ById(id:string):LiveJob|undefined{
  return domesticV2Records.find(job=>job.id===id);
 }
@@ -56,11 +73,15 @@ export function filterDomesticRebuildJobs(jobs:LiveJob[],f:LiveFilters):LiveJob[
  });
 }
 export function assertDomesticRebuildIntegrity(){
- if(domesticV2Records.length!==12)throw Error('SCHNEIDER_SOURCE_RECORD_COUNT_CHANGED');
+ if(schneiderV2Records.length!==12||kpmgV2Records.length!==6||domesticV2Records.length!==18)
+  throw Error('REBUILT_COMPANY_JOB_COUNT_CHANGED');
  const ids=new Set<string>(),urls=new Set<string>();
  for(const job of domesticV2Records){
-  if(ids.has(job.id)||urls.has(job.url)||!/^cn-v2-schneider-[0-9]{6}$/.test(job.id)||
-    !/^https:\/\/careers\.se\.com\/jobs\/[0-9]{6}\?lang=zh-(?:CN|cn)$/.test(job.url)||
+  if(ids.has(job.id)||urls.has(job.url)||
+    !(job.platform==='schneider-official'&&/^cn-v2-schneider-[0-9]{6}$/.test(job.id)&&
+      /^https:\/\/careers\.se\.com\/jobs\/[0-9]{6}\?lang=zh-(?:CN|cn)$/.test(job.url)||
+      job.platform==='kpmg-moka-official'&&/^cn-v2-kpmg-[0-9a-f-]{36}$/.test(job.id)&&
+      /^https:\/\/app\.mokahr\.com\/(?:social-recruitment|m\/campus-recruitment)\/kpmg\/(?:68240|76195)#\/job\/[0-9a-f-]{36}$/.test(job.url))||
     !job.titleZh||!job.locationZh||!job.responsibilitiesSummary)
    throw Error('DOMESTIC_REBUILD_SOURCE_INVALID '+job.id);
   ids.add(job.id);urls.add(job.url);
