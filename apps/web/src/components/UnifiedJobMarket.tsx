@@ -5,6 +5,9 @@ import { Shell } from './Shell';
 import { DomesticCompanyResults } from './DomesticCompanyResults';
 import { DomesticAutumnMarket } from './DomesticAutumnMarket';
 import { MajorFilter } from './MajorFilter';
+import {useSharedMajorSelection} from './CompanyMajorJobs';
+import {MajorEmployerRecommendations} from './MajorEmployerRecommendations';
+import {getSavedMajor,majorName} from '../services/majorJobMatching';
 import { majorById } from '../services/domesticMajors';
 import { SaveJobButton } from './SaveJobButton';
 import { trackEvent } from '../services/engagement';
@@ -29,7 +32,7 @@ function readMarketState(compact:boolean):PersistedMarketState|null{
  if(typeof state.draft!=='string'||state.draft.length>100||!Number.isSafeInteger(state.page)||state.page<0)return null;
  return state;
 }
-const emptyFilters: LiveFilters={q:'',company:'',country:'',remote:false,recruitment_type:'',location_country:'',city:'',education:'',experience:''};
+const emptyFilters: LiveFilters={q:'',company:'',country:'',remote:false,recruitment_type:'',location_country:'',city:'',education:'',experience:'',major_slug:'',include_unknown_majors:false};
 function initialCompanyQuery(){
  try{const company=new URLSearchParams(location.search).get('company');
    return ['OpenAI','Anthropic','SpaceX'].includes(company||'')?company!:'';
@@ -105,16 +108,15 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
     const previous=readMarketState(compact);
     const saved=previous?.filters.company;
     return {...emptyFilters,...previous?.filters,
+      major_slug:getSavedMajor(),include_unknown_majors:previous?.filters.include_unknown_majors===true,
       q:previous?.draft??initialJobQuery(),
       company:typeof saved==='string'&&saved.length<=100?saved:initialCompanyQuery()};
   });
-  const [selectedMajor,setSelectedMajor]=useState(()=>{
-    try{const saved=sessionStorage.getItem('hhba.company.major')||'';return saved&&majorById(saved)?saved:''}catch{return ''}
-  });
-  const selectMajor=(slug:string)=>{
-    setSelectedMajor(slug);
-    try{if(slug)sessionStorage.setItem('hhba.company.major',slug);else sessionStorage.removeItem('hhba.company.major')}catch{}
-  };
+  const {slug:selectedMajor,choose:selectMajor}=useSharedMajorSelection();
+  useEffect(()=>{
+    setPage(0);
+    setFilters(f=>f.major_slug===selectedMajor?f:{...f,major_slug:selectedMajor});
+  },[selectedMajor]);
   const [draft,setDraft]=useState(()=>readMarketState(compact)?.draft??initialJobQuery());
   const [page,setPage]=useState(()=>readMarketState(compact)?.page??0);
   const [snapshot,setSnapshot]=useState<LivePage|null>(null);
@@ -264,6 +266,10 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       <option value="unreported">{lang==='zh'?'经验要求未识别':'Experience unspecified'}</option>
     </select>
     <MajorFilter value={selectedMajor} onChange={selectMajor} lang={lang}/>
+    {selectedMajor&&<div className="hhba-major-market-state"><span>已选择：<strong>{majorName(selectedMajor)}</strong></span>
+      <label><input type="checkbox" checked={filters.include_unknown_majors===true} onChange={e=>{setPage(0);setFilters(f=>({...f,include_unknown_majors:e.target.checked}))}}/> 也查看专业要求未披露的岗位（需自行核验）</label>
+      <button type="button" onClick={()=>{selectMajor('');setPage(0);setFilters(f=>({...f,major_slug:'',include_unknown_majors:false}))}}>清除专业</button>
+    </div>}
     <label className="unified-job-remote"><input type="checkbox" checked={filters.remote}
       onChange={e=>{setPage(0);setFilters(f=>({...f,remote:e.target.checked}))}}/>
       {lang==='zh'?'仅远程岗位':'Remote only'}</label>
@@ -274,6 +280,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       <p>{rebuilding?(lang==='zh'?'海外精选岗位与逐家审核通过的国内岗位 · 使用同一套卡片和站内详情':'Overseas curated jobs and individually reviewed China roles in one layout'):curatedHundred?(lang==='zh'?'精选 10 家知名海外企业 · 100 条已存档岗位（状态待核实）':'100 archived roles from 10 companies; current availability unverified.'):officialThree?(lang==='zh'?'OpenAI、Anthropic、SpaceX 官方公开招聘 · 只展示本次从招聘系统核验到的职位，随时可能变化':'OpenAI, Anthropic and SpaceX public ATS listings · Verified at latest sync'):domesticOnly?(lang==='zh'?'国内历史招聘岗位静态测试 · 岗位状态以企业官网为准':'Historical China listings preview · Check employer for availability'):lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
       <LanguageSwitcher lang={lang} change={change}/></div>
     {controls}
+    {rebuilding&&selectedMajor&&<MajorEmployerRecommendations filters={filters.major_slug===selectedMajor?filters:{...filters,major_slug:selectedMajor}}/>}
     {!curatedHundred&&aiAvailable&&<div className="unified-ai-discovery">
       <label><input type="checkbox" checked={aiConsent} onChange={e=>setAiConsent(e.target.checked)}/>
         同意将本次搜索描述发送给 DeepSeek 联网查找国内招聘官网；请勿输入身份证等敏感资料。</label>
