@@ -14,7 +14,7 @@ export type LiveJob = {
   currentApplicationVerified?: boolean;
   graduationYear?: number; responsibilitiesSummary?: string; requirementsSummary?: string;
   editorial?: CuratedEditorial; experienceMinYears?: number|null; skillSignals?: string[];
-  majorNames?: string[]; employerRoute?: string;
+  majorNames?: string[]; employerRoute?: string; positionOrg?: string; evidenceUrl?: string;
   countryCode?: string|null; cityKey?: string|null;
 };
 export type LiveFilters = {
@@ -70,7 +70,12 @@ export function safeOfficialJobUrl(job: LiveJob) {
         'tencent-official': 'careers.tencent.com',
         'baidu-official': 'talent.baidu.com'
       };
-      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='guangfa-securities-official'&&job.source==='guangfa-securities'){
+      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='citics-branch-campus-official'&&job.source==='citics-securities'){
+        // 2027 graduate trainee positions are evidenced on separate university pages.
+        // This is the shared official application listing, never a fabricated deep link.
+        if(u.hostname!=='careers.citics.com'||u.pathname!=='/campus/branch'||
+          u.search!==''||u.hash!==''||!/^cn-v2-citics-[a-z-]{5,85}$/.test(job.id))return null;
+      }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='guangfa-securities-official'&&job.source==='guangfa-securities'){
         // Career homepage only; ten distinct historic vacancies are evidenced by the university announcement.
         if(u.hostname!=='job.gf.com.cn'||u.pathname!=='/'||u.search!==''||u.hash!==''||
            !/^cn-v2-guangfa-[a-z-]{5,80}$/.test(job.id))return null;
@@ -345,7 +350,7 @@ function rebuildListFilter(job:LiveJob,f:LiveFilters){
  }
  const words=f.q.normalize('NFKC').toLowerCase().trim().split(/\s+/).filter(Boolean);
  const haystack=[job.title,job.titleZh,job.company,job.companyZh,job.location,job.locationZh,
-   ...(job.skillSignals||[]),...(job.majorNames||[]),job.responsibilitiesSummary].filter(Boolean).join(' ').normalize('NFKC').toLowerCase();
+   ...(job.skillSignals||[]),...(job.majorNames||[]),job.responsibilitiesSummary,job.positionOrg].filter(Boolean).join(' ').normalize('NFKC').toLowerCase();
  return words.every(w=>haystack.includes(w));
 }
 function jobCountryCode(job:LiveJob){
@@ -366,7 +371,8 @@ export async function listDomesticRebuildMarket(filters:LiveFilters,offset:numbe
   ...domesticV2Records.slice(34,38),...overseas.slice(38,44),
   ...domesticV2Records.slice(38,44),...overseas.slice(44,50),
   ...domesticV2Records.slice(44,49),...overseas.slice(50,55),
-  ...domesticV2Records.slice(49),...overseas.slice(55)];
+  ...domesticV2Records.slice(49,54),...overseas.slice(55,60),
+  ...domesticV2Records.slice(54),...overseas.slice(60)];
  const allowed=combined.filter(job=>!!safeOfficialJobUrl(job)&&rebuildListFilter(job,filters));
  return {jobs:allowed.slice(offset,offset+30),total:allowed.length,offset,limit:30,
    boards:11,failures:0,updated:'2026-10-29T00:00:00Z'};
