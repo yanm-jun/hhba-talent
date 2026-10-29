@@ -69,7 +69,7 @@ function JobTile({job}:{job:DomesticRecord}){
   <div className="unified-job-actions hhba-domestic-job-actions">
    {official?<a href={official} data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">前往官方招聘入口 <ExternalLink size={14}/></a>:
      <span className="hhba-domestic-pending">官方直达入口待核验</span>}
-   <a href={job.sourceUrl} data-hhba-non-recruitment-link="true" target="_blank" rel="noopener noreferrer">查看公开证据 <BookOpen size={14}/></a>
+   <a href={job.sourceUrl} data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">查看公开证据 <BookOpen size={14}/></a>
   </div>
   <p className="hhba-domestic-observation">资料采集：{job.observedOn} · 来源状态：历史公开记录，非实时在招证明</p>
  </article>;
