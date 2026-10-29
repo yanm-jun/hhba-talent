@@ -43,7 +43,7 @@ assert(shared.includes('适合哪些专业背景？')&&shared.includes('招聘�
 assert(page.indexOf('CompanyMajorJobs')<page.indexOf('主要业务与专业服务'),'Original four-block order preserved');
 for(const forbidden of ['信息来源','发展与重要节点','关于企业','官网来源']) assert(!page.includes(forbidden));
 assert(page.indexOf('<AutumnCompanyBrand name="施耐德电气" large/>')<page.indexOf('<div className="hhba-kpmg-photo-grid">'));
-assert(shared.includes('domesticV2Records.filter')&&shared.includes('matchRoleToMajor(job,slug)'),'Shared major selection filters evidence-bound V2 records');
+assert(shared.includes('domesticV2Records.filter')&&shared.includes('matchRoleToMajor(j,slug)'),'Shared clickable major selector filters V2 job evidence');
 assert(page.includes('data-hhba-recruitment-outbound="true"'),'Retain login protection on outgoing careers');
 assert(page.includes('showAllServices?schneider.services.length:4')&&page.includes('<details>'),'Compact expandable services');
 assert(page.includes('AI 场景示意'));
