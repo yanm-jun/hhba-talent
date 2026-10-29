@@ -25,6 +25,8 @@ export function EmployerBrandLogo({job,identity,variant='card'}:LogoProps){
   const cls=variant==='profile'
     ?'company-profile-brand'+(asset?.wide?' company-profile-brand-wide':'')
     :'unified-brand-logo'+(asset?.wide?' unified-brand-logo-wide':'');
+  if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='施耐德电气')
+    return <span className={cls} title="施耐德电气"><img src={import.meta.env.BASE_URL+'images/autumn-real-logos/cn-autumn-002.svg'} alt="施耐德电气 Logo" loading="eager" decoding="async"/></span>;
   return <span className={cls} title={alt||'企业身份以官方招聘来源为准'}>
     {url&&!broken?
       <img src={url} alt={alt} loading="eager"
