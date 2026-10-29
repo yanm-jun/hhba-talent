@@ -104,7 +104,7 @@ assert(csairPage.includes("'/candidate/jobs/cn-v2-csair-'"));
 assert(csairPage.includes('data-hhba-recruitment-outbound="true"'));
 assert(index.includes('csairV2Records.length!==6||domesticV2Records.length!==69'));
 assert(recruitment.includes("job.platform==='csair-official-list'"));
-for(const f of ['csair-logo.webp','csair-building.webp','csair-aircraft.webp'])
+for(const f of ['csair-logo.png','csair-building.webp','csair-aircraft.webp'])
  assert(existsSync('public/images/csair-user/'+f),'Missing China Southern image '+f);
 
 const pfizer=JSON.parse(src('src/data/domesticPfizerOfficialJobs20261029.json'));
