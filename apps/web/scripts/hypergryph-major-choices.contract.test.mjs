@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const read=(p)=>readFileSync(p,'utf8');
+const page=read('src/pages/HypergryphCompactProfilePage.tsx');
+const component=read('src/components/CompanyMajorJobs.tsx');
+const styles=read('src/styles/major-company-flow.css');
+const matching=read('src/services/majorJobMatching.ts');
+const data=JSON.parse(read('src/data/domesticHypergryph2027Roles20261029.json'));
+const catalog=JSON.parse(read('src/data/officialAcademicMajors.json'));
+const options=Object.values(catalog.records||[]).map(r=>r.name);
+const presets=['数字媒体艺术','动画','视觉传达设计','计算机科学与技术','软件工程','数字媒体技术','人工智能','汉语言文学','市场营销','人力资源管理'];
+assert.equal(data.jobs.length,20,'Never discard the 20 recorded campus directions');
+for(const name of presets){
+ assert(page.includes("'"+name+"'"),'Missing quick major '+name);
+ assert(options.includes(name),'Quick major not in published academic catalog: '+name);
+ assert(data.jobs.some(j=>(j.editorialRelatedMajors||[]).includes(name)),'Quick major without associated employer jobs: '+name);
+}
+assert(page.includes('companyRoute="/companies/autumn/cn-autumn-007"'));
+assert(page.includes('majorIntro="鹰角网络的招聘方向'), 'Employer page should not display only generic template disclaimer');
+assert(component.includes('majorIntro||'), 'Generic companies still have their own default text');
+assert(component.includes('quickMajors.map(option=>'), 'Quick major chips missing');
+assert(component.includes('onClick={()=>select(option.slug)}'), 'Quick major selection must update shared slug');
+assert(component.includes("matchRoleToMajor(job,option.slug)"), 'Count must derive from shared matcher, not hardcoded totals');
+assert(component.includes('const related=jobs.filter'), 'On-page jobs and market must share filtered records');
+assert(component.includes('<MajorFilter value={slug}'), 'Keep global full-catalog search');
+assert(component.includes("domesticV2Records.filter(j=>j.employerRoute===companyRoute"), 'Use original V2 job records');
+assert(component.includes('查看全部岗位（{allJobs.length}）'), 'Cross-major browsing must remain available');
+assert(component.includes("'/candidate/jobs/'+encodeURIComponent(job.id)"), 'Onsite job details must remain');
+assert(styles.includes('.hhba-major-quick-list'), 'Quick-chip layout must be styled');
+assert(matching.includes("return fields.length?'other':'unknown'"), 'Do not fabricate professional eligibility');
+console.log('HYPERGRYPH_MAJOR_QUICK_CHOICES_OK',presets.length,'presets',data.jobs.length,'directions');
