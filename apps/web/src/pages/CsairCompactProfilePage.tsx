@@ -5,6 +5,7 @@ import {Link,getCompanyReturnTarget} from '../router';
 import rolesData from '../data/domesticCsairVerifiedPositions20261029.json';
 import type {User} from '../services/api';
 import '../styles/kpmg-compact-profile.css';
+import {CompanyMajorJobs} from '../components/CompanyMajorJobs';
 
 const majors=['全部专业','不限专业','交通运输','航空航天类','机械工程','电子信息','计算机科学与技术','工商管理','英语','其他专业'];
 const services=[
@@ -45,30 +46,8 @@ export function CsairCompactProfilePage({user}:{user:User|null}){
     </div>
     <p className="hhba-csair-photo-note">三张图片由用户提供，分别独立展示。建筑具体楼宇信息和照片拍摄时间尚未独立核验，不标注为当前公司总部。</p>
    </section>
-   <section className="hhba-kpmg-section" aria-labelledby="csair-major-title">
-    <div className="hhba-kpmg-section-heading"><div><h2 id="csair-major-title">适合哪些专业背景？</h2><p>可选择相关专业查看职位。此批职位在官网首页未披露专业条件，暂不因所选专业排除岗位；专业选择不构成招聘资格承诺。</p></div></div>
-    <div className="hhba-kpmg-major-list" role="group" aria-label="专业选择">
-     {majors.map(x=><button key={x} type="button" className={'hhba-kpmg-major'+(major===x?' is-selected':'')} aria-pressed={major===x} onClick={()=>setMajor(x)}>{x}{major===x&&<CheckCircle2 size={13}/>}</button>)}
-    </div>
-   </section>
-   <section className="hhba-kpmg-section" aria-labelledby="csair-jobs-title">
-    <div className="hhba-kpmg-section-heading">
-     <div><h2 id="csair-jobs-title">招聘岗位</h2><p>当前专业：<strong>{major}</strong> · {jobs.length} 个南航官方招聘首页列出的具体职位；专业要求和是否开放投递尚待单岗核对。</p></div>
-     <a className="hhba-kpmg-section-link" href="https://job.csair.cn/global" data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">南航官方招聘列表 <ExternalLink size={14}/></a>
-    </div>
-    <div className="hhba-kpmg-role-list">
-     {jobs.map(job=><article className="hhba-kpmg-role" key={job.id}>
-      <div className="hhba-kpmg-role-icon"><BriefcaseBusiness size={17}/></div>
-      <div className="hhba-kpmg-role-main">
-       <div className="hhba-kpmg-role-top"><h3>{job.title}</h3><span>{job.city}</span></div>
-       <p>{job.summary}</p>
-       <small>{job.typeLabel} · 专业/学历条件未公开 · 官网列表发布 {job.date}</small>
-      </div>
-      <Link to={'/candidate/jobs/cn-v2-csair-'+job.id} aria-label={'查看'+job.title+'站内详情'}>查看详情 <ArrowRight size={14}/></Link>
-     </article>)}
-    </div>
-    <p className="hhba-kpmg-role-disclaimer"><GraduationCap size={14}/> 岗位名称、地点、类别和发布时间有南航招聘首页依据，尚无逐岗直链和完整 JD；“查看详情”为 HHBA 站内整理，不代表该岗位目前开放申请。</p>
-   </section>
+   <CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn-004"/>
+
    <section className="hhba-kpmg-section" aria-labelledby="csair-services-title">
     <div className="hhba-kpmg-section-heading"><div><h2 id="csair-services-title">主要业务与专业服务</h2><p>核心业务概要，可展开查看详细内容。</p></div></div>
     <div className="hhba-kpmg-service-grid">
