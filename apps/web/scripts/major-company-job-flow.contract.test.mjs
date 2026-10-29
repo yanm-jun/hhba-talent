@@ -41,5 +41,5 @@ assert(employer.includes('rebuildListFilter(job,filters)'), 'Employer counts mus
 assert(router.includes('job.employerRoute'), 'Job cards must lead back to reviewed employer page');
 assert(catalog.includes('sftechV2Records.length!==17')&&catalog.includes('neteaseV2Records.length!==14')&&catalog.includes('domesticV2Records.length!==100'), 'Preserve all existing 100 domestic jobs');
 assert(catalog.includes('editorialRelatedMajors:job.editorialRelatedMajors'), 'Do not silently drop published editorial mapping');
-assert(existsSync('styles/major-company-flow.css'));
+assert(existsSync('src/styles/major-company-flow.css'));
 console.log('MAJOR_TO_COMPANY_TO_JOB_CONTRACT_OK',routes.length,'reviewed employers');
