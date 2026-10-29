@@ -102,7 +102,7 @@ const csairHeadings=['适合哪些专业背景？','招聘岗位','主要业务�
 assert(csairHeadings.map(x=>csairPage.indexOf(x)).every((p,i,a)=>p>0&&(i===0||p>a[i-1])),'Preserve four-block order');
 assert(csairPage.includes("'/candidate/jobs/cn-v2-csair-'"));
 assert(csairPage.includes('data-hhba-recruitment-outbound="true"'));
-assert(index.includes('csairV2Records.length!==6||sftechV2Records.length!==17||domesticV2Records.length!==86'));
+assert(index.includes('csairV2Records.length!==6||sftechV2Records.length!==17||neteaseV2Records.length!==14||domesticV2Records.length!==100'));
 const sf=JSON.parse(src('src/data/domesticSfTechCampusRoles20261029.json'));
 const sfPage=src('src/pages/SfExpressCompactProfilePage.tsx');
 assert.equal(sf.jobs.length,17,'Keep 17 distinct positions evidenced by SF Technology 2027 campus announcement');
