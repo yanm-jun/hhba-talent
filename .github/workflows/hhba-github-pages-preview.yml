@@ -1,6 +1,7 @@
 name: HHBA Unified Static Site GitHub Pages
 # Domestic V2: legacy domestic job/channel entries removed from the public MARKET; 100 overseas curated roles preserved.
 # KPMG now joins the shared market with 6 source-traceable historical Moka job details.
+# Huayu Vision third rebuild: 16 individual official campus role descriptions, original photos/logo reused; ATS detail links currently lead to official job listing.
 # Old employer content and original photos remain archived in Git for rebuilding one company at a time.
 # KPMG + Schneider Electric: four-block pages, exact logos and two independently generated labeled AI images per company.
 # 2026-10-29: Schneider alt text repaired, rerun full static build and source-backed logo checks.
