@@ -479,7 +479,9 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
      </p>}
      <h2>{lang==='zh'?'职位说明与任职要求':'Description and job requirements'}</h2>
      {job.recordKind==='DOMESTIC_REBUILT'?<div className="unified-jd-content">
-        <p className="unified-jd-machine-notice">{job.platform==='huaan-securities-official'?
+        <p className="unified-jd-machine-notice">{job.platform==='guangfa-securities-official'?
+          '广发证券2027届秋季校园招聘的历史职位：原公告报名截止2026年9月30日，已过期。公布的信息以职位名称、招聘方向、城市和专业为主；未提供可逐项核实的完整岗位职责。下方官网入口是企业招聘首页，不是当前职位的直投链接。':
+          job.platform==='huaan-securities-official'?
           '华安证券2026年7月公开招聘公告中的历史具体岗位；公告报名期限已于2026年7月至9月截止。职责和任职要求为历史公告摘要，不代表目前在招。外链为企业官方招聘报名入口，并非逐岗投递链接。':
           job.platform==='huayu-official-campus'?
           '本岗位名称、工作城市、职责和资格来自华域视觉官方校园招聘职位列表。官网显示21个职位，HHBA已整理其中16个；尚未取得逐岗直达链接，请进入官网职位列表搜索对应岗位，核对是否仍开放投递。':
@@ -487,7 +489,7 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
         <section className="unified-jd-section"><h3>岗位职责概览</h3><p>{job.responsibilitiesSummary||'具体职责需查阅企业官方职位。'}</p></section>
         <section className="unified-jd-section"><h3>任职要求与经验</h3><p>{job.requirementsSummary||job.experienceLabel||'需核对官方招聘职位要求。'}</p></section>
         {!!job.majorNames?.length&&<section className="unified-jd-section"><h3>相关专业背景</h3><p>{job.majorNames.join('、')}</p><small>专业关联是 HHBA 的辅助匹配，不代表官方逐项规定的招聘专业。</small></section>}
-        {official&&<a data-hhba-recruitment-outbound="true" href={official} target="_blank" rel="noopener noreferrer">{job.platform==='huaan-securities-official'?'查看华安证券官方招聘报名系统（历史岗位已截止）':job.platform==='huayu-official-campus'?'前往官方职位列表核对该岗位':'查看企业官网完整职位'} <ExternalLink size={14}/></a>}
+        {official&&<a data-hhba-recruitment-outbound="true" href={official} target="_blank" rel="noopener noreferrer">{job.platform==='guangfa-securities-official'?'查看广发证券官方招聘首页（旧校招已截止）':job.platform==='huaan-securities-official'?'查看华安证券官方招聘报名系统（历史岗位已截止）':job.platform==='huayu-official-campus'?'前往官方职位列表核对该岗位':'查看企业官网完整职位'} <ExternalLink size={14}/></a>}
        </div>:
       job.recordKind==='CURATED_HISTORICAL'?<div className="unified-jd-content">
         <p className="unified-jd-source">{lang==='zh'?'岗位资料快照：':'Archived job snapshot: '}{formatDate(job.observedAt)}</p>
