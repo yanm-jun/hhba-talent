@@ -1,0 +1,40 @@
+name: HHBA All Companies Major Chips Gate
+on:
+  push:
+    branches: [feat/unify-all-company-major-chips-20261029]
+  pull_request:
+    branches: [feat/hhba-unified-static-20261025]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Verify all employer chips and legacy photographic/job contracts
+        working-directory: apps/web
+        run: |
+          node scripts/all-company-major-chips.contract.test.mjs
+          node scripts/major-company-job-flow.contract.test.mjs
+          node scripts/hypergryph-major-choices.contract.test.mjs
+          node scripts/kpmg-recruitment-first.contract.test.mjs
+          node scripts/schneider-recruitment-first.contract.test.mjs
+          node scripts/domestic-rebuild-v2.contract.test.mjs
+          node scripts/autumn-company-profiles.contract.test.mjs
+      - name: Build GitHub Pages static application
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+        run: npm run build
