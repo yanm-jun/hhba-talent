@@ -11,7 +11,7 @@ const mediaIndex={...mediaA.companies,...mediaB.companies} as Record<string,{
 type AiScene={id:string;path:string;kind:string;status:string;sourceLabel:string;alt:string};
 const aiIndex=generatedScenes.entries as Record<string,AiScene[]>;
 const scenePath=/^domestic-media\/[a-z0-9-]+\.(?:webp|png|jpg|jpeg)$/i;
-const aiPath=/^images\/autumn-ai-scenes\/(cn-autumn-[0-9]{3})-[0-9]{2}\.webp$/;
+const aiPath=/^images\/autumn-ai-scenes\/(cn-autumn-[0-9]{3})-[0-9]{2}\.(?:webp|avif)$/;
 
 export function AutumnCompanyCover({name,id,kind='card'}:{name:string;id:string;kind?:'card'|'directory'}){
  const real=mediaIndex[name]?.photos?.find(photo=>

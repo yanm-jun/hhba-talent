@@ -23,13 +23,17 @@ assert(market.includes("to={'/companies/autumn/'+e.id}"),'Every directory compan
 assert(main.includes("if(/^\\/companies\\/autumn\\/cn-autumn-[0-9]{3}$/.test(route))return <AutumnCompanyProfilePage"));
 assert(router.includes("autumn\\/cn-autumn-[0-9]{3}"));
 
-assert.equal(Object.keys(brandRegistry).length,26,'26 provenance-tracked employer brand assets');
+assert.equal(Object.keys(brandRegistry).length,27,'27 provenance-tracked employer brand assets');
 for(const [name,entry] of Object.entries(brandRegistry)){
  const match=companies.find(x=>x.name===name);
  assert(match,'Logo must map to exact screenshot enterprise '+name);
  assert(entry.id===match.id,'No mismatched company logo');
  assert(new RegExp('^images/autumn-real-logos/'+match.id+'\\.(svg|jpg|jpeg|png|webp)$').test(entry.path),'No unsafe or invented image paths');
- assert(entry.source?.startsWith('https://github.com/'),'Record public image provenance');
+ assert(entry.source?.startsWith('https://github.com/')||entry.source==='https://commons.wikimedia.org/wiki/File:KPMG_blue_logo.svg','Record public image provenance');
+ if(entry.sourceType==='wikimedia_build_import'){
+  assert(entry.id==='cn-autumn-001'&&entry.path==='images/autumn-real-logos/cn-autumn-001.svg','Only exact source-backed KPMG logo may be downloaded in Pages CI');
+  continue;
+ }
  const local='public/'+entry.path;
  assert(existsSync(local),'Brand file must be local: '+local);
  if(entry.path.endsWith('.svg')){
@@ -79,7 +83,9 @@ for(const [employerId,photos] of Object.entries(aiSceneRegistry)){
   const local='public/'+item.path;
   assert(existsSync(local),'AI scene file must be separate and actually uploaded: '+local);
   const bytes=readFileSync(local);
-  assert(bytes.subarray(0,4).toString()==='RIFF'&&bytes.subarray(8,12).toString()==='WEBP','Asset must be an actual standalone WebP file');
+  const validWebp=bytes.subarray(0,4).toString()==='RIFF'&&bytes.subarray(8,12).toString()==='WEBP';
+  const validAvif=bytes.length>15000&&bytes.subarray(4,12).toString()==='ftypavif';
+  assert(validWebp||validAvif,'AI asset must be a real independent WebP/AVIF image');
  }
 }
 console.log('AUTUMN_BRAND_EVIDENCE_CONTRACT_OK',JSON.stringify({companies:companies.length,logos:Object.keys(brandRegistry).length,aiSceneCompanies:Object.keys(aiSceneRegistry).length,websiteCaptures:captures.length,scenePhotos:scenes.length}));

@@ -46,7 +46,7 @@ export function AutumnCompanyProfilePage({user,id}:{user:User|null;id:string}){
  const profileMedia=employer?mediaIndex[employer.name]:undefined;
  const localPhotos=(profileMedia?.photos||[]).filter(photo=>photo.state==='ready'&&photo.classification==='source_backed_named_enterprise_scene'&&!!photo.source&&typeof photo.path==='string'&&/^domestic-media\/[a-z0-9-]+\.(webp|png|jpg|jpeg)$/i.test(photo.path));
  const websiteCaptures=(profileMedia?.photos||[]).filter(photo=>photo.state==='ready'&&photo.classification==='official_website_screenshot_unreviewed'&&typeof photo.path==='string'&&/^domestic-media\/[a-z0-9-]+\.(webp|png|jpg|jpeg)$/i.test(photo.path));
- const aiPhotos=(aiIndex[id]||[]).filter(photo=>photo.status==='published_preview'&&photo.kind==='ai_generated_concept_scene'&&/^images\/autumn-ai-scenes\/cn-autumn-[0-9]{3}-[0-9]{2}\.webp$/.test(photo.path)&&photo.path.startsWith('images/autumn-ai-scenes/'+id+'-'));
+ const aiPhotos=(aiIndex[id]||[]).filter(photo=>photo.status==='published_preview'&&photo.kind==='ai_generated_concept_scene'&&/^images\/autumn-ai-scenes\/cn-autumn-[0-9]{3}-[0-9]{2}\.(?:webp|avif)$/.test(photo.path)&&photo.path.startsWith('images/autumn-ai-scenes/'+id+'-'));
  const primary=safeUrl(employer?.officialUrl)||safeUrl(recruitment?.url)||safeUrl(officialArticle?.officialRecruitment);
  const hasRecruitment=Boolean(primary);
  const hasCompanyEditorial=Boolean(editorial?.summary?.trim());

@@ -210,6 +210,14 @@
       "sourceType": "independent_chinese_brand_vector_collection",
       "confidence": "exact_company_name_in_localized_svg_catalog_current_brand_confirmation_pending",
       "reviewNote": "Exact Chinese display-name asset match; separately verify official brand specifications."
+    },
+    "毕马威": {
+      "id": "cn-autumn-001",
+      "source": "https://commons.wikimedia.org/wiki/File:KPMG_blue_logo.svg",
+      "path": "images/autumn-real-logos/cn-autumn-001.svg",
+      "sourceType": "wikimedia_build_import",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Real KPMG brand SVG originally from KPMG and mirrored by Wikimedia Commons; trademark restrictions and non-affiliation apply. Imported into public static build at CI time."
     }
   }
 }

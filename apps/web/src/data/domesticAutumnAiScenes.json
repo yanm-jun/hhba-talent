@@ -17,6 +17,34 @@
         "status": "published_preview",
         "containsNonVerifiedArchitecture": true
       }
+    ],
+    "cn-autumn-001": [
+      {
+        "id": "cn-autumn-001-ai-scene-01",
+        "path": "images/autumn-ai-scenes/cn-autumn-001-01.avif",
+        "kind": "ai_generated_concept_scene",
+        "status": "published_preview",
+        "sourceLabel": "AI 办公场景示意 1 · 非毕马威真实办公环境",
+        "alt": "专业咨询团队办公主题 AI 场景示意图 1，非毕马威真实办公室或员工照片",
+        "thumbnailWidth": 1024,
+        "thumbnailHeight": 768,
+        "sourceGeneratedOn": "2026-10-29",
+        "sourceMethod": "ChatGPT image generation; individually generated; AVIF optimized copy",
+        "containsNonVerifiedArchitecture": true
+      },
+      {
+        "id": "cn-autumn-001-ai-scene-02",
+        "path": "images/autumn-ai-scenes/cn-autumn-001-02.avif",
+        "kind": "ai_generated_concept_scene",
+        "status": "published_preview",
+        "sourceLabel": "AI 办公场景示意 2 · 非毕马威真实办公环境",
+        "alt": "专业咨询团队办公主题 AI 场景示意图 2，非毕马威真实办公室或员工照片",
+        "thumbnailWidth": 1024,
+        "thumbnailHeight": 768,
+        "sourceGeneratedOn": "2026-10-29",
+        "sourceMethod": "ChatGPT image generation; individually generated; AVIF optimized copy",
+        "containsNonVerifiedArchitecture": true
+      }
     ]
   }
 }
