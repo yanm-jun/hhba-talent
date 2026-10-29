@@ -70,7 +70,11 @@ export function safeOfficialJobUrl(job: LiveJob) {
         'tencent-official': 'careers.tencent.com',
         'baidu-official': 'talent.baidu.com'
       };
-      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='csair-official-list'&&job.source==='china-southern'){
+      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='sftech-2027-campus-list'&&job.source==='sf-tech'){
+        // Verified school notice lists titles, not individual job permalinks.
+        if(u.hostname!=='campus.sf-express.com'||u.pathname!=='/'||
+           u.search!==''||u.hash!=='#/homePage'||!/^cn-v2-sftech-[a-z0-9-]{5,100}$/.test(job.id))return null;
+      }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='csair-official-list'&&job.source==='china-southern'){
         // Official jobs index; six individual titles validated, no invented per-job application URLs.
         if(u.hostname!=='job.csair.cn'||u.pathname!=='/global'||
            u.search!==''||u.hash!==''||!/^cn-v2-csair-[a-z-]{6,100}$/.test(job.id))return null;
