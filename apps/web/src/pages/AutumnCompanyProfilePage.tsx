@@ -8,6 +8,7 @@ import domesticProfiles from '../data/domesticCareerProfiles.json';
 import {domestic200Profiles} from '../services/domesticCompany200Data';
 import employersJSON from '../data/domesticAutumnScreenshot20261028.json';
 import jobsJSON from '../data/domesticAutumnVerifiedJobs20261028.json';
+import pfizerJobsJSON from '../data/domesticPfizerOfficialJobs20261029.json';
 import officialEvidence from '../data/domesticAutumnOfficialEvidence20261028.json';
 import generatedScenes from '../data/domesticAutumnAiScenes.json';
 import businessDraftA from '../data/domesticAutumnBusinessDraft001.json';
@@ -35,7 +36,7 @@ const sourceFromDossier=(key:KpmgSourceKey)=>kpmgDossier.sources.find(s=>s.key==
 
 
 const employers=employersJSON.entries as Employer[];
-const jobs=jobsJSON.jobs as RecordInfo[];
+const jobs=[...jobsJSON.jobs,...pfizerJobsJSON.jobs] as RecordInfo[];
 const profiles={...domesticProfiles,...domestic200Profiles} as Record<string,Editorial>;
 const reviewedOfficial=officialEvidence.entries as Record<string,OfficialEditorial>;
 const aiIndex=generatedScenes.entries as Record<string,AiScene[]>;
