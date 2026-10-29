@@ -23,7 +23,7 @@ for(const employer of roster){
   titles.add(card.title);
  }
 }
-assert.equal(Object.keys(history).length,25);
+assert.equal(Object.keys(history).length,26);
 let events=0;
 for(const [id,v] of Object.entries(history)){
  assert(scope[id],id+' source-backed timeline has no company');
@@ -40,10 +40,10 @@ for(const [id,v] of Object.entries(history)){
   events++;
  }
 }
-assert.equal(events,71);
+assert.equal(events,74);
 assert(source.includes('businessDraftA.entries')&&source.includes('businessDraftB.entries'));
 assert(source.includes('documentedHistories'));
 assert(source.includes('editorial?.business?.length?editorial.business:businessDraft?.business||[]'),'Prefer existing vetted deep business descriptions');
 assert(source.includes('data-hhba-recruitment-outbound="true"'),'Protect outbound official recruitment');
 assert(!source.includes('AutumnIndustryReferenceGallery'),'No industry stock photos');
-console.log('AUTUMN_DOSSIER_SCOPE_156_AND_SOURCED_HISTORY_25_COMPANIES_71_EVENTS_OK');
+console.log('AUTUMN_DOSSIER_SCOPE_156_AND_SOURCED_HISTORY_26_COMPANIES_74_EVENTS_OK');
