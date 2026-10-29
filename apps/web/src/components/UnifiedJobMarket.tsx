@@ -395,7 +395,7 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
    return ()=>controller.abort();
  },[job]);
  useEffect(()=>{
-   if(!job||job.recordKind==='CURATED_HISTORICAL')return;
+   if(!job||job.recordKind==='CURATED_HISTORICAL'||job.recordKind==='DOMESTIC_REBUILT')return;
    let active=true;
    loadPublicJobAudit().then(report=>{
      if(!active||!report||Date.now()-Date.parse(report.summary.checked_at)>24*3600_000)return;
@@ -411,7 +411,7 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
    setJd(null);setChineseJd('');setTranslateError('');
    setTranslationPrepared(false);setJdError('');setJdLoading(true);
    // Campus summaries have a reviewed source URL; do not trigger the overseas ATS JD reader.
-   if(job.recordKind==='CURATED_HISTORICAL'||job.domestic&&job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'){setJdLoading(false);return;}
+   if(job.recordKind==='CURATED_HISTORICAL'||job.recordKind==='DOMESTIC_REBUILT'||job.domestic&&job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'){setJdLoading(false);return;}
    if(job.graduationYear===2027&&job.recordKind==='OFFICIAL_JOB_PAGE_OBSERVED'&&
       job.responsibilitiesSummary&&job.requirementsSummary){setJdLoading(false);return;}
    (async()=>{
@@ -471,14 +471,21 @@ export function UnifiedJobDetail({user,jobId}:{user:User|null,jobId:string}){
      <h1>{featuredTitle(job,lang)}</h1>
      <p><MapPin size={15}/>{localizedLocation(job,lang)}</p>
      <div className="unified-detail-warning"><ShieldCheck size={17}/>
-       {job.recordKind==='CURATED_HISTORICAL'?(lang==='zh'?'精选海外历史岗位资料 · 招聘状态尚未重新核实':'Archived overseas role · Current status unverified'):job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'?(lang==='zh'?`历史收录：${formatDate(job.observedAt)}。招聘状态尚未重新核实，以企业官网为准。`:`Archived on ${formatDate(job.observedAt)}. Application status unverified.`):lang==='zh'?'正在核对企业官方职位内容。最新投递状态以官网为准。':
+       {job.recordKind==='CURATED_HISTORICAL'?(lang==='zh'?'精选海外历史岗位资料 · 招聘状态尚未重新核实':'Archived overseas role · Current status unverified'):job.recordKind==='DOMESTIC_REBUILT'?(lang==='zh'?'国内已重做岗位资料 · 最新投递状态请进入官网确认':'Rebuilt China job · Check employer site for current availability'):job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'?(lang==='zh'?`历史收录：${formatDate(job.observedAt)}。招聘状态尚未重新核实，以企业官网为准。`:`Archived on ${formatDate(job.observedAt)}. Application status unverified.`):lang==='zh'?'正在核对企业官方职位内容。最新投递状态以官网为准。':
          'Checking the employer’s published job details. Confirm application availability on the official site.'}</div>
      {audit && <p className="unified-job-audit"><ShieldCheck size={16}/>
        {describeAudit(audit.status,lang)}
        {audit.official_checked_at && <small>{lang==='zh'?'核验：':'Checked: '}{audit.official_checked_at.slice(0,10)}</small>}
      </p>}
      <h2>{lang==='zh'?'职位说明与任职要求':'Description and job requirements'}</h2>
-     {job.recordKind==='CURATED_HISTORICAL'?<div className="unified-jd-content">
+     {job.recordKind==='DOMESTIC_REBUILT'?<div className="unified-jd-content">
+        <p className="unified-jd-machine-notice">此处仅根据企业已记录的官方具体职位页面整理：职位、地点、业务摘要和经验线索。完整任职条件与实际投递开放状态以官方页面为准；不将招聘官网入口冒充独立岗位。</p>
+        <section className="unified-jd-section"><h3>岗位职责概览</h3><p>{job.responsibilitiesSummary||'具体职责需查阅企业官方职位。'}</p></section>
+        <section className="unified-jd-section"><h3>任职要求与经验</h3><p>{job.requirementsSummary||job.experienceLabel||'需核对官方招聘职位要求。'}</p></section>
+        {!!job.majorNames?.length&&<section className="unified-jd-section"><h3>相关专业背景</h3><p>{job.majorNames.join('、')}</p><small>专业关联是 HHBA 的辅助匹配，不代表官方逐项规定的招聘专业。</small></section>}
+        {official&&<a data-hhba-recruitment-outbound="true" href={official} target="_blank" rel="noopener noreferrer">查看企业官网完整职位 <ExternalLink size={14}/></a>}
+       </div>:
+      job.recordKind==='CURATED_HISTORICAL'?<div className="unified-jd-content">
         <p className="unified-jd-source">{lang==='zh'?'岗位资料快照：':'Archived job snapshot: '}{formatDate(job.observedAt)}</p>
         {job.editorial?<>
           <p className="unified-jd-machine-notice">{lang==='zh'?
