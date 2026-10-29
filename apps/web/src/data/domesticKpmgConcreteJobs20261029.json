@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "1.0",
+  "company": "毕马威",
+  "employerId": "cn-autumn-001",
+  "verifiedOn": "2026-10-29",
+  "status": "historical_official_job_links_not_current_openings",
+  "officialCareerHome": "https://kpmg.com/cn/zh/careers.html",
+  "note": "岗位名称与独立Moka职位UUID来自有日期的公开记录；原始Moka系统的实时开放状态未确认，不可标注仍在招聘。",
+  "jobs": [
+    {
+      "id": "833c21f8-d5f4-4611-b6d7-eedabfac3128",
+      "title": "顾问 · 金融风险管理（FRM）",
+      "city": "上海",
+      "recruitmentType": "SOCIAL",
+      "group": "advisory",
+      "publishedOn": "2025-01-23",
+      "summary": "为金融机构开发信贷风险模型、反欺诈评分卡和贷前贷后风险策略，并支持风险模型交付。",
+      "requirement": "本科或研究生；金融工程、数学、经济、金融、统计等相关专业优先；Python、SAS、R或VBA能力优先。",
+      "majors": [
+        "金融学",
+        "经济学",
+        "统计学",
+        "数据科学与大数据技术",
+        "数学与应用数学",
+        "计算机科学与技术"
+      ],
+      "url": "https://app.mokahr.com/social-recruitment/kpmg/68240#/job/833c21f8-d5f4-4611-b6d7-eedabfac3128",
+      "evidenceUrl": "https://www.sohu.com/a/855504751_121124320"
+    },
+    {
+      "id": "032cc209-749f-451e-ae1f-6635da110b5c",
+      "title": "顾问／高级顾问 · 金融风险咨询",
+      "city": "北京",
+      "recruitmentType": "SOCIAL",
+      "group": "advisory",
+      "publishedOn": "2025-01-23",
+      "summary": "协助金融机构搭建风险管理体系、验证风险计量模型、分析监管规则，并推动风险系统实施。",
+      "requirement": "数学、金融、经济、统计或计算机等相关专业；金融风险、模型分析与编程经验优先。",
+      "majors": [
+        "金融学",
+        "经济学",
+        "统计学",
+        "数据科学与大数据技术",
+        "计算机科学与技术",
+        "数学与应用数学"
+      ],
+      "url": "https://app.mokahr.com/social-recruitment/kpmg/68240#/job/032cc209-749f-451e-ae1f-6635da110b5c",
+      "evidenceUrl": "https://www.sohu.com/a/855504751_121124320"
+    },
+    {
+      "id": "4d4e847c-3fef-49f7-9729-c3bfc9ce4ec2",
+      "title": "顾问／高级顾问 · 财务管理咨询",
+      "city": "北京",
+      "recruitmentType": "SOCIAL",
+      "group": "advisory",
+      "publishedOn": "2025-01-16",
+      "summary": "参与管理会计、财务规划、预算、经营分析、成本分摊及相关财务管理系统项目。",
+      "requirement": "本科及以上学历；具备财务咨询或大型企业财务管理相关经验者优先，重视英语沟通和财务分析能力。",
+      "majors": [
+        "会计学",
+        "财务管理",
+        "金融学",
+        "经济学",
+        "工商管理"
+      ],
+      "url": "https://app.mokahr.com/social-recruitment/kpmg/68240#/job/4d4e847c-3fef-49f7-9729-c3bfc9ce4ec2",
+      "evidenceUrl": "https://www.sohu.com/a/855504751_121124320"
+    },
+    {
+      "id": "1105b81d-4216-4977-aa20-f7fe74b759d8",
+      "title": "专业服务助理 · 税务合规（KDC）",
+      "city": "南京",
+      "recruitmentType": "SOCIAL",
+      "group": "tax",
+      "publishedOn": "2025-11-04",
+      "summary": "协助个人所得税计算和申报、跨境外派人员税务合规、股权收入申报及发票合规检查。",
+      "requirement": "本科及以上，专业不限；历史招聘文本提及1—2年财税经验、英语四级以及Excel和Word应用能力。",
+      "majors": [
+        "税收学",
+        "会计学",
+        "财务管理",
+        "金融学",
+        "法学",
+        "工商管理"
+      ],
+      "url": "https://app.mokahr.com/social-recruitment/kpmg/68240#/job/1105b81d-4216-4977-aa20-f7fe74b759d8",
+      "evidenceUrl": "https://www.10100.com/article/31446776"
+    },
+    {
+      "id": "501e4914-96d0-4a06-84cb-5e6f8e723426",
+      "title": "行政业务伙伴 · IT 审计部门",
+      "city": "香港",
+      "recruitmentType": "SOCIAL",
+      "group": "tech",
+      "publishedOn": "2025-10-08",
+      "summary": "为IT审计团队提供管理报表、资源排班、行政流程及入离职工作支持。",
+      "requirement": "大学学位，历史招聘文本列明至少5年相关经验，要求良好英语和粤语沟通及Excel能力。",
+      "majors": [
+        "工商管理",
+        "财务管理",
+        "信息管理与信息系统",
+        "计算机科学与技术"
+      ],
+      "url": "https://app.mokahr.com/social-recruitment/kpmg/68240#/job/501e4914-96d0-4a06-84cb-5e6f8e723426",
+      "evidenceUrl": "https://www.10100.com/article/31449311"
+    },
+    {
+      "id": "74b43c96-685c-4beb-ac72-bab4e0076c91",
+      "title": "信息技术审计项目 · 未来之翼（校招）",
+      "city": "城市以具体申请页为准",
+      "recruitmentType": "CAMPUS",
+      "group": "tech",
+      "publishedOn": "2026-05-28",
+      "summary": "毕马威校园招聘相关的信息技术审计项目，公开活动资料提供独立职位链接。",
+      "requirement": "学历、城市及具体应届生资格需打开独立岗位页面核对；不从活动名称推断名额或在招状态。",
+      "majors": [
+        "信息管理与信息系统",
+        "计算机科学与技术",
+        "软件工程",
+        "审计学",
+        "会计学"
+      ],
+      "url": "https://app.mokahr.com/m/campus-recruitment/kpmg/76195#/job/74b43c96-685c-4beb-ac72-bab4e0076c91",
+      "evidenceUrl": "https://www.sohu.com/a/1029418027_121124316"
+    }
+  ]
+}
