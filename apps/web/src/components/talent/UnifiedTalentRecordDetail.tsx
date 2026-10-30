@@ -12,7 +12,9 @@ const fullGuide=(id:string)=>({
  'sd-jinan-2026-talent-living':'/talent-service/policy-guide-preview/jinan',
  'qd-rent-25':'/talent-service/policy-guide-preview/qingdao/housing',
  'sd-qingdao-2026-free-housing':'/talent-service/policy-guide-preview/qingdao/stay',
- 'qd-laoshan-202610':'/talent-service/policy-guide-preview/qingdao/laoshan'
+ 'qd-laoshan-202610':'/talent-service/policy-guide-preview/qingdao/laoshan',
+ 'sd-yantai-2026-youth-living':'/talent-service/policy-guide-preview/yantai/living',
+ 'sd-yantai-2026-purchase':'/talent-service/policy-guide-preview/yantai/home'
 } as Record<string,string>)[id];
 
 export function UnifiedTalentRecordDetail({policy,housing}:{policy?:TalentPolicyRecord;housing?:TalentHousingRecord}){
