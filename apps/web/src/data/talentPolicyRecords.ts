@@ -8,6 +8,16 @@ export type TalentPolicyRecord={
 };
 export const TALENT_POLICY_REVIEW_DATE='2026-10-30';
 export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
+ {id:'qd-laoshan-202610',city:'青岛',district:'崂山区',title:'崂山区2026年第二批次租赁型人才住房配租',category:'租房安居',
+ summary:'2026年10月28日公布午山馨苑482套、海逸公馆10套，经过申请登记、单位初审、资格审核、公示与选房。',
+ benefit:'公告配租总量492套（不等于剩余房源）；优惠面积内首个租期一般按市场租金60%计收。',
+ eligibility:'符合人才准入条件，崂山区用人单位优先；需核对学历、就业登记、社保、住房限制等。',
+ application:'用人单位于2026年11月6日前注册，符合条件的个人2026年11月10日前通过青岛人才住房信息管理系统申请。',
+ department:'青岛市崂山区住房和城乡建设局等',published:'2026-10-28',
+ sourceUrl:'https://zhufang.qingdao.gov.cn/rczf/web/announcement/detail/986342070313422851',
+ sourceName:'崂山区2026年第二批次租赁型人才住房配租公告',
+ applicationUrl:'https://zhufang.qingdao.gov.cn/rczf/',temporal:'policy',
+ keywords:['青岛','崂山','住房','人才公寓','午山馨苑','海逸公馆','硕士','本科','专科','2026']},
  {id:'hz-grad-living',city:'杭州',title:'应届毕业生生活补贴',category:'生活补贴',
  summary:'杭州对来杭工作符合条件的全球本科及以上学历应届毕业生提供生活补贴，通常按连续参保节点分两笔发放。',
  benefit:'本科 1 万元 / 硕士 3 万元 / 博士 10 万元（按官方规则申请）',
@@ -68,8 +78,8 @@ export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
  eligibility:'毕业 3 年内（含毕业学年）全日制专科及以上学历毕业生，并满足求职或就业创业状态等条件。',
  application:'通过“爱山东”App 或小程序搜索“青岛市免租金住宿保障平台”，按要求信息采集、选房。',
  department:'青岛市人力资源和社会保障局等部门',published:'2026-06-30',
- sourceUrl:'https://qydjfw.qingdao.gov.cn/OPC_ajlh.dhtml',sourceName:'青岛市政务服务平台安居落户政策汇总（青人社发〔2026〕3号）',
- applicationUrl:'https://qydjfw.qingdao.gov.cn/OPC_ajlh.dhtml',temporal:'policy',
+ sourceUrl:'https://www.qingdao.gov.cn/zwgk/xxgk/rlshbz/gkml/gwfg/202606/t20260630_10647826.shtml',sourceName:'青岛市政务服务平台安居落户政策汇总（青人社发〔2026〕3号）',
+ applicationUrl:'https://www.qingdao.gov.cn/zwgk/xxgk/rlshbz/gkml/gwfg/202606/t20260630_10647826.shtml',temporal:'policy',
  keywords:['专科','本科','硕士','博士','住宿','免租','人才公寓','租房','求职','房源']},
  {id:'qd-settlement',city:'青岛',title:'青年人才一次性安家费',category:'购房补贴',
  summary:'符合条件的研究生学历青年人才在青就业创业、落户并购置唯一商品住房，可申请一次性安家费。',
