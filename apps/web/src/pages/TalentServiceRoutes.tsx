@@ -88,20 +88,7 @@ function CityHub({city}:{city:string}){
   </section>
   <section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>{city} · 住房项目</h2><Link to={talentListUrl('housing',city)}>所有项目 <ArrowRight size={15}/></Link></div>
    {homes.length?<div className="ts-sub-grid">{homes.slice(0,2).map(h=><HousingTile data={h} key={h.id}/>)}</div>:<Empty city={city} kind="人才公寓"/>}
-  </section>;
-}
-function Guide({city}:{city:string}){
- return <>
-  <Bread city={city} current="申请指南"/>
-  <section className="ts-sub-header"><span className="ts-section-kicker">HOW TO APPLY / 办事指南</span><h1>{city} · 人才政策申请指南</h1>
-   <p>这是共通办理框架，不替代某项政策的官方材料清单和办理须知。</p></section>
-  <div className="ts-sub-guide">{[
-   ['01','确认政策与申报批次','先进入城市人才政策或人才公寓列表，查找具体政府发布文件及申报窗口。'],
-   ['02','逐项核对个人资格','学历认证、毕业年限、社保、户籍、居住及家庭住房情况均可能影响资格。'],
-   ['03','根据原文准备材料','以相应政策原文的材料目录为准，通常涉及身份、学历、单位和就业情况等。'],
-   ['04','官方渠道申报与审核','通过政策详情给出的官方办理入口提交；依相关主管部门审核及公示结果为准。']
-  ].map(item=><article key={item[0]}><b>{item[0]}</b><h2>{item[1]}</h2><p>{item[2]}</p></article>)}</div>
-  <section className="ts-sub-section"><h2>找到具体办理入口</h2><div className="ts-sub-two-links"><Link to={talentListUrl('policies',city)}>查看{city}人才政策 <ArrowRight size={17}/></Link><Link to={talentListUrl('housing',city)}>查看{city}人才公寓 <ArrowRight size={17}/></Link></div></section>;
+  </section></>;
 }
 function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';query?:string}){
  const [filter,setFilter]=useState('全部类型');
