@@ -200,6 +200,9 @@ jobs:
       - name: Verify Dongying V5.1 2026 policy transition and housing-source guard
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-dongying-city-v51.mjs
+      - name: Verify Taian V5.1 city policy, rental eligibility and official process guides
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-taian-city-v51.mjs
       - name: Lock future city template, certify full policy guides and protect 95 historical record IDs
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
