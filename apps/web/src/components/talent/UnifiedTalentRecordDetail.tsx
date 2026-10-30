@@ -12,6 +12,9 @@ const fullGuide=(id:string)=>({
  'sd-dongying-talent-2026':'/talent-service/policy-guide-preview/dongying/transition',
  'sd-jinan-2026-talent-living':'/talent-service/policy-guide-preview/jinan',
  'zb-2026-living-reviewed':'/talent-service/policy-guide-preview/zibo/living',
+ 'ta-2026-living-guide':'/talent-service/policy-guide-preview/taian/living',
+ 'ta-2026-first-home-guide':'/talent-service/policy-guide-preview/taian/purchase',
+ 'ta-2026-rent-relief':'/talent-service/policy-guide-preview/taian/housing',
  'zb-2026-purchase-reviewed':'/talent-service/policy-guide-preview/zibo/purchase',
  'qd-rent-25':'/talent-service/policy-guide-preview/qingdao/housing',
  'sd-qingdao-2026-free-housing':'/talent-service/policy-guide-preview/qingdao/stay',
@@ -26,7 +29,7 @@ export function UnifiedTalentRecordDetail({policy,housing}:{policy?:TalentPolicy
  const quality=policy?assessPolicy(policy):assessHousing(housing!);
  const application=policy?.applicationUrl||housing?.applyUrl;
  const route=policy?'/talent-service/list/policies/':'/talent-service/list/housing/';
- const housingGuide=housing&&['zb-zichuan-shuian-202606','zb-zichuan-yuting-202606'].includes(housing.id)?'/talent-service/policy-guide-preview/zibo/housing':undefined;
+ const housingGuide=housing&&['ta-2026-city-affordable-rental','ta-2026-new-worker-public-rent'].includes(housing.id)?'/talent-service/policy-guide-preview/taian/housing':housing&&['zb-zichuan-shuian-202606','zb-zichuan-yuting-202606'].includes(housing.id)?'/talent-service/policy-guide-preview/zibo/housing':undefined;
  const link=policy?fullGuide(policy.id):housingGuide;
  return <main className="jgd-page">
   <nav className="jgd-breadcrumb"><Link to="/talent-service">人才服务</Link><span>›</span><Link to={'/talent-service/city/'+encodeURIComponent(item.city)}>{item.city}</Link><span>›</span>{policy?'人才政策':housing?.housingCategory||'人才住房'}</nav>
