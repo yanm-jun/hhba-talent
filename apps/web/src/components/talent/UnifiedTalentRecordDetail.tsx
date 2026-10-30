@@ -9,6 +9,7 @@ function Panel({title,children}:{title:string;children:React.ReactNode}){
  return <section className="jgd-panel"><div className="jgd-section-heading"><span className="jgd-section-icon"><FileText size={18}/></span><div><h2>{title}</h2></div></div>{children}</section>;
 }
 const fullGuide=(id:string)=>({
+ 'sd-dongying-talent-2026':'/talent-service/policy-guide-preview/dongying/transition',
  'sd-jinan-2026-talent-living':'/talent-service/policy-guide-preview/jinan',
  'zb-2026-living-reviewed':'/talent-service/policy-guide-preview/zibo/living',
  'zb-2026-purchase-reviewed':'/talent-service/policy-guide-preview/zibo/purchase',
