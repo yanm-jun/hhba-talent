@@ -1,3 +1,4 @@
+import {DEZHOU_HOUSING_RECORDS} from './dezhouHousingRecords.ts';
 import {ZAOZHUANG_HOUSING_RECORDS} from './zaozhuangHousingRecords.ts';
 import {ZIBO_HOUSING_RECORDS} from './ziboHousingRecords.ts';
 import {WEIFANG_HOUSING_RECORDS} from './weifangHousingRecords.ts';
@@ -64,4 +65,5 @@ export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
 ...WEIFANG_HOUSING_RECORDS,
 ...ZIBO_HOUSING_RECORDS,
 ...ZAOZHUANG_HOUSING_RECORDS,
+...DEZHOU_HOUSING_RECORDS,
 ];
