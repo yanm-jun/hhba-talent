@@ -1,0 +1,75 @@
+name: HHBA employer factory V1 build and browser gate
+on:
+  push:
+    branches: [feat/employer-factory-v1-20261030]
+    paths:
+      - '.github/workflows/hhba-employer-factory-v1.yml'
+      - 'apps/web/src/**'
+      - 'apps/web/scripts/employer-*'
+      - 'apps/web/scripts/factory-*'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/employer-factory-v1-20261030
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install once
+        run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Validate every company data file and asset; old 160-job baseline unchanged
+        working-directory: apps/web
+        run: |
+          node scripts/employer-factory-check.mjs
+          node scripts/company-brand-unified.contract.test.mjs
+          node scripts/company-single-char-search.contract.test.mjs
+          node scripts/boyu-15.contract.test.mjs
+          node scripts/domestic-rebuild-v2.contract.test.mjs
+          node scripts/major-company-job-flow.contract.test.mjs
+      - name: Build generic company page and shared search
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/preview-factory/'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_DEMO_ACCOUNT_ENABLED: '0'
+        run: |
+          npm run build
+          test -s dist/images/boyu-user/boyu-logo.webp
+          test -s dist/images/boyu-user/boyu-exterior.webp
+          test -s dist/images/boyu-user/boyu-lobby.webp
+      - name: Browser dependencies
+        working-directory: apps/web
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Real browser regression with current data-only Boyu pilot
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/preview-factory/'
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/factory-vite.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/hhba-talent/preview-factory/ >/dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/factory-v1.browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-employer-factory-v1-browser-evidence
+          path: apps/web/factory-proof/
+          retention-days: 14
+          if-no-files-found: ignore
