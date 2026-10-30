@@ -19,7 +19,7 @@ assert(page.includes('CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn
 assert(page.includes('hhba-kpmg-photo-grid')&&page.includes('主要业务与专业服务'));
 assert(page.includes('data-hhba-recruitment-outbound="true"'));
 assert(route.includes("if(route==='/companies/autumn/cn-autumn-010')return <ShkpCompactProfilePage user={user}/>"));
-assert(index.includes('...shkpV2Records]')&&index.includes('shkpV2Records.length!==8||domesticV2Records.length!==158'));
+assert(index.includes('...shkpV2Records,...boyuV2Records]')&&index.includes('shkpV2Records.length!==8||boyuV2Records.length!==2||domesticV2Records.length!==160'));
 assert(live.includes("job.platform==='shkp-official-detail'")&&live.includes("'Sun Hung Kai Properties'"));
 assert(brand.includes("images/shkp-user/shkp-logo.webp"));
 for(const file of ['shkp-logo.webp','shkp-icc.webp','shkp-mall.webp'])assert(existsSync('public/images/shkp-user/'+file),'Missing user photo: '+file);

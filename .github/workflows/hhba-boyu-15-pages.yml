@@ -4,6 +4,9 @@ on:
     branches: [feat/boyu-15-static-v2-20261030]
     paths:
       - '.github/workflows/hhba-boyu-15-pages.yml'
+      - 'apps/web/scripts/laifen-13.contract.test.mjs'
+      - 'apps/web/scripts/shkp-14.contract.test.mjs'
+      - 'apps/web/scripts/all-company-major-chips.contract.test.mjs'
   workflow_dispatch:
 permissions:
   contents: read
