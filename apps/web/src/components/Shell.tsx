@@ -71,6 +71,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
    {experience==='public'?<nav aria-label="公共网站导航">
      <Link className="auth" to="/candidate/jobs">招聘市场</Link>
      <Link className="auth" to="/companies/discover">企业发现</Link>
+     <Link className="auth" to="/talent-service">人才服务</Link>
      <Link className="join-nav-link" to="/join">加入我们</Link>
      {candidateSignedIn?<Link className="hhba-nav-account" to="/candidate/account">个人中心</Link>:
        recruiterSignedIn?<Link className="hhba-nav-account" to="/employer/hub">企业账户</Link>:
