@@ -69,12 +69,30 @@ try {
    await page.goto(base+'candidate/jobs/',{waitUntil:'domcontentloaded',timeout:45000});
    const search=page.getByRole('textbox',{name:'自然语言搜索岗位'});
    await search.waitFor({timeout:20000});
-   const tests=[p.name,p.name.charAt(0),p.englishName].filter(Boolean);
+   // Full name, two Han characters, one Han character and English alias
+   // all must resolve the SAME employer record, even with no fresh openings.
+   const tests=[p.name,p.name.slice(0,2),p.name.charAt(0),p.englishName].filter(Boolean);
    for(const keyword of tests){
     await search.fill(keyword);
     const company=page.locator('.domestic-company-card').filter({hasText:p.name}).first();
-    await company.waitFor({timeout:20000});
+    await company.waitFor({timeout:20000,state:'visible'});
+    assert(await company.isVisible(),'Employer card is hidden for '+keyword);
     assert((await company.getAttribute('href'))?.endsWith('/companies/autumn/'+id),'Enterprise search route mismatch: '+keyword);
+    if(keyword===p.name.slice(0,2)){
+     await company.scrollIntoViewIfNeeded();
+     await page.screenshot({path:out+'/'+id+'-short-search.png',fullPage:true});
+    }
+   }
+   // Frog Prince is an explicitly reported failure: the two-character query
+   // must return both the employer card and its source-labeled historic roles.
+   if(id==='cn-autumn-021'){
+    await search.fill('青蛙');
+    await page.locator('.domestic-company-card').filter({hasText:'青蛙王子'}).first().waitFor({state:'visible'});
+    await page.getByText('国贸业务代表',{exact:false}).first().waitFor({timeout:20000});
+    assert((await page.locator('.unified-job-card').count())>0,'Two-character search must resolve saved domestic job records');
+    assert(!(await page.locator('.unified-job-footer').innerText()).includes('共匹配 0 条'),
+      'Do not show zero jobs when this saved employer has matched historical records');
+    await page.screenshot({path:out+'/frog-prince-two-character-search.png',fullPage:true});
    }
    result.search=true;
    await page.goto(base,{waitUntil:'domcontentloaded'});
