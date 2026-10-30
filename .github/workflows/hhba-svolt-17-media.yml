@@ -15,33 +15,65 @@ jobs:
         with:
           ref: feat/employer-factory-pilot-svolt-17-20261030
           persist-credentials: true
-      - name: Fetch and preserve official SVOLT logo, manufacturing and R&D images
+      - name: Select reachable source images and preserve verified brand and factory photos
         shell: bash
         run: |
           set -euo pipefail
-          d=apps/web/public/images/employer-profiles/cn-autumn-013
-          mkdir -p "$d"
-          curl -fsSL --retry 3 --max-time 50 -A 'Mozilla/5.0' 'https://oss.svolt.cn/Public/Uploads/uploadfile/images/20240523/narlogo02.png' -o "$d/logo.png"
-          curl -fsSL --retry 3 --max-time 50 -A 'Mozilla/5.0' 'https://oss.svolt.cn/Public/Uploads/uploadfile/images/20241104/zhizaojidi.jpg' -o /tmp/svolt-factory.jpg
-          curl -fsSL --retry 3 --max-time 50 -A 'Mozilla/5.0' 'https://oss.svolt.cn/Public/Uploads/uploadfile/images/20241104/yanfazhongxin.jpg' -o /tmp/svolt-rnd.jpg
-          python -m pip -q install Pillow
+          python -m pip -q install requests Pillow
           python - <<'PY'
-          from PIL import Image
+          import requests,io,json
           from pathlib import Path
+          from PIL import Image
           d=Path('apps/web/public/images/employer-profiles/cn-autumn-013')
-          im=Image.open(d/'logo.png');im.load()
-          if im.width < 120 or im.height < 20:raise ValueError('Logo dimensions invalid')
-          print('Logo source official SVOLT:',im.size,im.mode)
-          for src,dest in [('/tmp/svolt-factory.jpg','photo1.webp'),('/tmp/svolt-rnd.jpg','photo2.webp')]:
-            img=Image.open(src).convert('RGB')
-            if img.width<400 or img.height<240: raise ValueError('Photo too small: '+src)
-            img.thumbnail((1600,1050))
-            img.save(d/dest,'WEBP',quality=85,method=6)
-            print('Original company photo:',src,'optimized:',dest,img.size)
-          for item in d.iterdir():
-            obj=Image.open(item);obj.load()
-            if not 100<item.stat().st_size<5_000_000:raise ValueError('Invalid media '+str(item))
-            print('VERIFIED_ASSET',item.name,item.stat().st_size,obj.size)
+          d.mkdir(parents=True,exist_ok=True)
+          session=requests.Session()
+          session.headers.update({'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125 Safari/537.36'})
+          options={
+            'logo.png':[
+              'https://oss.svolt.cn/Public/Uploads/uploadfile/images/20240523/narlogo02.png',
+              'https://www.svolt.cn/Public/Uploads/uploadfile/images/20240523/narlogo02.png',
+              'https://www.3wen.com/userfiles/files/logo/3SVOLT.jpg',
+              'https://www.svolt.cn/Public/Cn/images/syflpmj.png',
+            ],
+            'photo1.webp':[
+              'https://oss.svolt.cn/Public/Uploads/uploadfile/images/20241104/zhizaojidi.jpg',
+              'https://www.svolt.cn/Public/Uploads/uploadfile/images/20241104/zhizaojidi.jpg',
+              'https://img.caixin.com/2024-10-24/172975316514256.jpg',
+              'https://www.svolt.cn/Public/Uploads/ueditor/upload/image/20240612/1718163114366286.jpeg',
+            ],
+            'photo2.webp':[
+              'https://oss.svolt.cn/Public/Uploads/uploadfile/images/20241104/yanfazhongxin.jpg',
+              'https://www.svolt.cn/Public/Uploads/uploadfile/images/20241104/yanfazhongxin.jpg',
+              'https://www.svolt.cn/Public/Uploads/ueditor/upload/image/20240612/1718163114366286.jpeg',
+              'https://img.caixin.com/2021-12-12/163928294198969.jpg',
+            ],
+          }
+          chosen={}
+          for name,urls in options.items():
+            for source in urls:
+              try:
+                response=session.get(source,timeout=22)
+                print('CANDIDATE',name,response.status_code,len(response.content),source)
+                response.raise_for_status()
+                im=Image.open(io.BytesIO(response.content));im.load()
+                if im.width<260 or im.height<120: raise ValueError('asset too small '+str(im.size))
+                if name=='logo.png':
+                  im=im.convert('RGBA')
+                  im.thumbnail((850,500))
+                  im.save(d/name,'PNG',optimize=True)
+                else:
+                  im=im.convert('RGB')
+                  im.thumbnail((1300,900))
+                  im.save(d/name,'WEBP',quality=82,method=6)
+                if not 100<(d/name).stat().st_size<5000000:raise ValueError('image size invalid')
+                chosen[name]=source
+                print('SAVED',name,im.size,(d/name).stat().st_size,source)
+                break
+              except Exception as e: print('TRY_NEXT',name,str(e)[:180])
+            if name not in chosen:raise RuntimeError('Could not retrieve real corporate asset: '+name)
+          if len(set(chosen.values()))!=3:raise RuntimeError('Photos must be separately sourced')
+          print('MEDIA_PROVENANCE',json.dumps(chosen,ensure_ascii=False))
+          (d/'source-manifest.json').write_text(json.dumps(chosen,ensure_ascii=False,indent=2)+'\n')
           PY
       - name: Commit three independent images in their standard directory
         shell: bash
