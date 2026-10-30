@@ -5,3 +5,19 @@
 .ts-sub-policy-note{display:flex;gap:10px;align-items:flex-start;margin:14px 0;border:1px solid #f3e3c8;border-radius:9px;padding:13px 15px;background:#fff9ee;color:#9d6b28}
 .ts-sub-policy-note svg{flex:none;margin-top:3px}
 .ts-sub-policy-note p{margin:0!important;color:#886736!important;font-size:12px!important;line-height:1.7!important}
+
+/* Source-backed housing projects: compact filters, location, room/rent evidence. */
+.ts-housing-short-facts{display:grid;gap:6px;background:#f6f9fd;border:1px solid #edf1f8;border-radius:10px;padding:14px}
+.ts-housing-short-facts>small{font-size:10px;color:#8c9aab}
+.ts-housing-short-facts>p{font-size:12px;color:#4f6684;margin:0 0 5px;line-height:1.7}
+.ts-housing-short-facts>strong{font-size:12px;color:#305f9e;font-weight:700;line-height:1.7}
+.ts-sub-tile p.ts-housing-location{font-size:12px;color:#698098;line-height:1.7;gap:7px}
+.ts-housing-location svg{flex:none;margin-top:3px}
+.ts-sub-tile p.ts-housing-inventory-note{font-size:11px;color:#8b765b;line-height:1.7;margin:0}
+.ts-housing-districts{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+.ts-housing-districts button{border-radius:18px;border:1px solid #dee8f6;color:#4f79aa;background:#fff;padding:8px 12px;font-size:12px}
+.ts-housing-districts button.active,.ts-housing-districts button[aria-pressed="true"]{background:#296cc5;color:#fff;border-color:#296cc5}
+.ts-housing-filter-empty{font-size:12px;color:#8b96a7;padding:19px;border:1px dashed #d5ddea;border-radius:9px}
+.ts-sub-detail-body section a{color:#2672c6;display:inline-flex;align-items:center;gap:6px}
+.ts-sub-detail-body section small{font-size:11px;color:#8794a5;display:block;margin-top:5px}
+@media(max-width:720px){.ts-housing-short-facts{padding:12px}.ts-housing-districts{gap:6px}.ts-housing-districts button{font-size:11px}}

@@ -28,6 +28,26 @@ assert.ok(policy.includes('deadline:"2026-10-31"'),'Tianjin 2027 application cut
 assert.ok(policy.includes('deadline:"2025-12-31"'),'Expired Chongqing 12-county recognition window must be explicit');
 
 assert.ok(housingIds.length>=10 && policyIds.length>=16,'Insufficient source-backed records');
+const housingProjectIds=['bj-yiliangma-2026','bj-hongxin-2026','tj-ruixin-2026','tj-hechuang-2026','tj-songyu-2026','tj-jintie-liyu-2026','sh-zhangjiang-2026','cq-sanyu-2026','cq-wufeng-2026','cq-longsheng-2026'];
+assert.ok(housingIds.length>=23,'Expected previous 13 housing records plus 10 new concrete official projects');
+for(const id of housingProjectIds){
+ const start=housing.indexOf('id:"'+id+'"');
+ assert.ok(start>=0,'New housing project missing: '+id);
+ const end=housing.indexOf('},',start);
+ const record=housing.slice(start,end);
+ assert.ok(record.includes('kind:"project"'),'Real site must not be confused with generic program: '+id);
+ for(const field of ['address:','units:','rent:','eligibility:','published:','statusNote:','steps:','reviewedAt:']){
+  assert.ok(record.includes(field),'Missing source-required field '+field+' for '+id);
+ }
+ const official=record.match(/sourceUrl:"(https:\/\/[^"]+)"/)?.[1];
+ assert.ok(official&&new URL(official).hostname.endsWith('.gov.cn'),'Project must have government source '+id);
+ assert.ok(/当前|现时|实时|不等于|需向|待/.test(record),'Project must warn against assuming live inventory '+id);
+}
+for(const municipality of ['北京','天津','上海','重庆']){
+ const records=[...housing.matchAll(new RegExp('city:"'+municipality+'"','g'))].length;
+ assert.ok(records>=3,'Every municipality must have multiple actual housing sources '+municipality);
+}
+
 assert.equal(new Set(housingIds).size,housingIds.length,'Duplicate housing IDs');
 assert.equal(new Set(policyIds).size,policyIds.length,'Duplicate policy IDs');
 const urls=[...housing.matchAll(/sourceUrl:"(https:\/\/[^"]+)"/g)].map(m=>m[1]);
@@ -67,6 +87,10 @@ for(const c of ['北京','天津','上海','重庆']){
 assert.ok(landing.includes('suggestTalentCities(keyword)'),'Search autocomplete must be connected');
 assert.ok(landing.includes('parseTalentCityQuery(keyword,city)'),'City alias matcher must be connected');
 assert.ok(details.includes('ts-v4-two-kinds'),'City pages must have exactly two core service entrances');
+assert.ok(details.includes('ts-housing-districts')&&details.includes('shownHomes.map(h=>'),'Housing list must support region filters and render filtered results');
+assert.ok(details.includes('h.contactPhone')&&details.includes('h.photoEvidence'),'Housing detail must separate sourced contact info and official media from generic images');
+assert.ok(details.includes('housingFirst'),'Specific verified projects must be listed before general housing programs');
+
 assert.ok(details.includes('policyStatus(data)')&&details.includes('data.targetGroup'),'Policy listings must expose application status and eligible population');
 assert.ok(details.includes('p.deadline')&&details.includes('p.reviewNote')&&details.includes('p.scope'),'Policy detail page must show cutoffs and territorial limitations');
 
