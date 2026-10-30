@@ -1,0 +1,215 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-030",
+  "name": "江苏省国信集团",
+  "englishName": "Jiangsu Guoxin Group",
+  "aliases": [
+    "江苏省国信集团有限公司",
+    "江苏国信集团",
+    "江苏国信",
+    "国信集团",
+    "JSGX",
+    "Jiangsu Guoxin",
+    "江苏省国信集团招聘"
+  ],
+  "industry": "综合能源 · 电力投资运营 · 信托金融 · 战略性新兴产业投资",
+  "subtitle": "江苏省国信集团有限公司 · 江苏省属国有独资企业 · 总部南京",
+  "overview": "江苏省国信集团有限公司成立于2001年8月，是江苏省属大型国有独资企业集团及省级国有资本投资运营公司。主要形成综合能源、金融、战略性新兴产业投资三大业务方向，旗下拥有江苏国信与江苏新能两家上市公司。能源业务覆盖火电、风电、光伏、天然气与储能等多能互补体系；金融业务涉及信托、期货、财务和保险经纪等。招聘主体包括集团及所属单位，应以网申系统中实际用人公司和职位说明区分。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://jsgzw.jiangsu.gov.cn/col/col11788/index.html?pageNum=20&uid=253948",
+    "https://www.jseia.net/member-detail?id=42",
+    "https://zjzx.91job.org.cn/index.php?m=home&c=article&a=show&site=1&id=11190",
+    "https://www.shanganclaw.com/announcements/200544/",
+    "https://www.zhipin.com/dz/jsgx2026/",
+    "https://www.njit.edu.cn/info/1042/23079.htm",
+    "https://www.ceeia.com/QYDT/d/202412/dad566f79f2444e5998e5e583c981f7b.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-030/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-030/photo1.jpg",
+        "caption": "江苏省国信集团火电集控值班员技能竞赛 · 2024年",
+        "alt": "南京工程学院拍摄的江苏省国信集团火电集控值班员技能竞赛开幕活动现场",
+        "note": "南京工程学院2024年报道的第四届江苏省国信集团职工技能竞赛现场；属于集团组织的员工技能活动，并非总部办公楼。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-030/photo2.jpg",
+        "caption": "江苏国信滨海港电厂3号机组试运行活动 · 2024年",
+        "alt": "江苏国信滨海港电厂3号机组168小时试运行完成活动，发电厂内人员合影",
+        "note": "中国电器工业协会2024年报道江苏国信滨海港发电项目3号机组试运行的实景；属于集团相关能源项目，不是集团总部。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.zhipin.com/dz/jsgx2026/",
+    "label": "江苏省国信集团2026年秋季集中招聘 · 指定网申",
+    "status": "official_portal",
+    "subject": "江苏省国信集团有限公司及36家所属用人单位",
+    "note": "2026年10月26日集团秋季集中招聘公告：36家用人单位招聘219人，其中校园招聘186人、社会招聘33人；2027届定向管培生共16人。报名公告截止2026年11月15日18时。此处展示经公告确认的4个管培生招聘方向，而不是36家单位逐条职位；各方向的具体专业、岗位、实际用人主体、城市和投递状态请以官方网申为准。"
+  },
+  "majorIntro": "坚持逐方向专业匹配：能源电力管培生仅匹配能源电力类，金融管培生仅匹配金融财会相关类，人工智能管培生仅匹配AI/计算机相关类。综合方向公告未逐条披露专业条件，暂不当作不限专业职位；36家用人单位各自的专业岗位未逐一获取时不虚构岗位，搜索机械不会凭集团业务自动展示全部岗位。",
+  "preferredMajors": [
+    "电气工程及其自动化",
+    "能源与动力工程",
+    "新能源科学与工程",
+    "油气储运工程",
+    "金融学",
+    "会计学",
+    "审计学",
+    "人工智能",
+    "计算机科学与技术",
+    "软件工程"
+  ],
+  "photoNote": "标识使用用户提供的JSGX原始标志，仅作识别。两张照片分别对应江苏省国信集团组织的技能竞赛和集团相关滨海港发电项目，由公开报道取得并在静态构建时留存两张独立本地图片和来源记录；照片及商标权属原权利人，HHBA独立整理公开资料，不代表企业授权合作。",
+  "business": [
+    {
+      "title": "电力与综合能源投资运营",
+      "description": "统筹火力发电及新能源项目投资、建设、运行和管理。",
+      "tags": "火电 · 风电 · 光伏",
+      "details": [
+        "传统电源与清洁能源协同",
+        "电力机组建设和安全运维",
+        "新能源项目开发与投资"
+      ]
+    },
+    {
+      "title": "天然气与储能",
+      "description": "布局天然气管道、能源交易及新型储能项目。",
+      "tags": "天然气 · 储能",
+      "details": [
+        "天然气产业链与能源保障",
+        "压缩空气储能等能源项目",
+        "能源系统协同管理"
+      ]
+    },
+    {
+      "title": "信托与综合金融服务",
+      "description": "布局信托、财务公司、期货、保险经纪和担保相关机构。",
+      "tags": "信托 · 金融",
+      "details": [
+        "金融服务实体经济",
+        "金融风险管理与运营",
+        "投资业务管理"
+      ]
+    },
+    {
+      "title": "战略性新兴产业投资",
+      "description": "参与科技创新及新兴产业相关投资。",
+      "tags": "产业投资 · 科创",
+      "details": [
+        "战略产业项目投资",
+        "国有资本运营",
+        "创新产业协同发展"
+      ]
+    },
+    {
+      "title": "数字化与科研",
+      "description": "为集团能源与金融业务提供信息化、技术研发等支持。",
+      "tags": "数据 · 人工智能",
+      "details": [
+        "智慧能源和数字化",
+        "专业技术人才培养",
+        "能源及金融技术研发"
+      ]
+    },
+    {
+      "title": "集团职能与经营管理",
+      "description": "承担集团及所属单位的人才培养、经营管理和财务风控。",
+      "tags": "经营管理 · 人才",
+      "details": [
+        "管培生项目",
+        "财务审计与合规",
+        "集团与子公司管理"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "trainee-power",
+      "title": "能源电力方向管培生",
+      "city": "用人单位及工作城市以官方岗位页为准",
+      "url": "https://www.zhipin.com/dz/jsgx2026/",
+      "evidenceUrl": "https://zjzx.91job.org.cn/index.php?m=home&c=article&a=show&site=1&id=11190",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏省国信集团有限公司2026年秋季集中招聘（管理培训生方向）",
+      "summary": "集团2026年秋季集中招聘公开列出的能源电力方向管培生项目；实际岗位工作内容、培养安排和具体用人单位以指定网申页面为准。",
+      "requirements": "2026年10月26日秋季集中招聘公告列明该方向；管培生总体计划16人，不是该单个方向各招16人。能源电力相关专业；面向2027届名校优生，学历及年龄、资格要求以当次公告及岗位报名页为准。 公告截至2026年11月15日18时；当前是否可投递须以指定官方招聘页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "电气工程",
+        "能源与动力工程",
+        "新能源科学与工程",
+        "油气储运工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "以2026年秋季集团招聘公告及逐岗页面为准（校招通常本科及以上）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "trainee-finance",
+      "title": "金融方向管培生",
+      "city": "用人单位及工作城市以官方岗位页为准",
+      "url": "https://www.zhipin.com/dz/jsgx2026/",
+      "evidenceUrl": "https://zjzx.91job.org.cn/index.php?m=home&c=article&a=show&site=1&id=11190",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏省国信集团有限公司2026年秋季集中招聘（管理培训生方向）",
+      "summary": "集团2026年秋招列明的金融方向管理培训生；不等于金融板块全部子公司均开放该职位。",
+      "requirements": "2026年10月26日秋季集中招聘公告列明该方向；管培生总体计划16人，不是该单个方向各招16人。金融相关专业；面向2027届名校优生，岗位具体专业条件以官方报名页面为准。 公告截至2026年11月15日18时；当前是否可投递须以指定官方招聘页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "金融学",
+        "经济学",
+        "会计学",
+        "财务管理",
+        "审计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "以2026年秋季集团招聘公告及逐岗页面为准（校招通常本科及以上）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "trainee-ai",
+      "title": "人工智能方向管培生",
+      "city": "用人单位及工作城市以官方岗位页为准",
+      "url": "https://www.zhipin.com/dz/jsgx2026/",
+      "evidenceUrl": "https://zjzx.91job.org.cn/index.php?m=home&c=article&a=show&site=1&id=11190",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏省国信集团有限公司2026年秋季集中招聘（管理培训生方向）",
+      "summary": "集团2026年秋招列明的人工智能方向管培生；涉及实际工作内容及部署单位需通过官方网申核对。",
+      "requirements": "2026年10月26日秋季集中招聘公告列明该方向；管培生总体计划16人，不是该单个方向各招16人。人工智能相关专业；面向2027届名校优生，实际可报专业范围以网申系统原始岗位为准。 公告截至2026年11月15日18时；当前是否可投递须以指定官方招聘页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "软件工程",
+        "数据科学与大数据技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "以2026年秋季集团招聘公告及逐岗页面为准（校招通常本科及以上）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "trainee-general",
+      "title": "综合方向管培生",
+      "city": "用人单位及工作城市以官方岗位页为准",
+      "url": "https://www.zhipin.com/dz/jsgx2026/",
+      "evidenceUrl": "https://zjzx.91job.org.cn/index.php?m=home&c=article&a=show&site=1&id=11190",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏省国信集团有限公司2026年秋季集中招聘（管理培训生方向）",
+      "summary": "集团2026年秋招列明的综合方向管培生；公开公告未逐项披露专业准入表，本平台不作不限专业推定。",
+      "requirements": "2026年10月26日秋季集中招聘公告列明该方向；管培生总体计划16人，不是该单个方向各招16人。公告列示综合方向，具体是否不限专业、学历、资格条件及岗位所在地请在招聘平台核对。 公告截至2026年11月15日18时；当前是否可投递须以指定官方招聘页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "以2026年秋季集团招聘公告及逐岗页面为准（校招通常本科及以上）",
+      "currentOpenVerified": false
+    }
+  ]
+}

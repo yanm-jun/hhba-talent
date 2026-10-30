@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {existsSync,readFileSync} from 'node:fs';
 const read=p=>readFileSync(p,'utf8');
-const ids=Array.from({length:18},(_,i)=>'cn-autumn-'+String(i+12).padStart(3,'0'));
+const ids=Array.from({length:19},(_,i)=>'cn-autumn-'+String(i+12).padStart(3,'0'));
 const rows=ids.map(id=>{
  const file='src/data/employerProfiles/'+id+'.json';
  assert(existsSync(file),'V2 source must be IN main: '+file);
@@ -10,22 +10,23 @@ const rows=ids.map(id=>{
  assert.equal(p.schemaVersion,1);
  assert.equal(p.media.photos.length,2);
  for(const image of [p.media.logo,...p.media.photos.map(x=>x.path)]){
-  if(!['cn-autumn-027','cn-autumn-028','cn-autumn-029'].includes(id))assert(existsSync('public/'+image),'V2 main-site photo missing: '+image);
+  if(!['cn-autumn-027','cn-autumn-028','cn-autumn-029','cn-autumn-030'].includes(id))assert(existsSync('public/'+image),'V2 main-site photo missing: '+image);
  }
  return p;
 });
-assert.equal(rows.length,18,'Missing a reviewed employer');
-assert.equal(rows.reduce((sum,p)=>sum+p.jobs.length,0),144,'Preserve 124 V2 role directions');
+assert.equal(rows.length,19,'Missing a reviewed employer');
+assert.equal(rows.reduce((sum,p)=>sum+p.jobs.length,0),148,'Preserve previous 144 directions plus four sourced Guoxin categories');
 assert(rows.some(p=>p.id==='cn-autumn-026'&&p.name==='南方传媒'&&p.jobs.length===6));
 assert(rows.some(p=>p.id==='cn-autumn-027'&&p.name==='广之旅'&&p.jobs.length===8));
 assert(rows.some(p=>p.id==='cn-autumn-028'&&p.name==='中建路桥'&&p.jobs.length===12));
 assert(rows.some(p=>p.id==='cn-autumn-029'&&p.name==='中电建电力投资集团'&&p.jobs.length===8));
+assert(rows.some(p=>p.id==='cn-autumn-030'&&p.name==='江苏省国信集团'&&p.jobs.length===4));
 const names=p=>[p.name,p.englishName,...p.aliases].map(s=>s.normalize('NFKC').toLocaleLowerCase());
 const match=q=>rows.filter(p=>names(p).some(n=>n.includes(q.normalize('NFKC').toLowerCase())));
 for(const [q,id] of [
  ['南方传媒','cn-autumn-026'],['南方','cn-autumn-026'],
  ['广之','cn-autumn-027'],['广之旅','cn-autumn-027'],
- ['广州广之旅国际旅行社','cn-autumn-027'],['GZL','cn-autumn-027'],['中建路桥','cn-autumn-028'],['中建路','cn-autumn-028'],['中电建电力集团','cn-autumn-029'],['中电建电力投资集团','cn-autumn-029'],['电建电投','cn-autumn-029']
+ ['广州广之旅国际旅行社','cn-autumn-027'],['GZL','cn-autumn-027'],['中建路桥','cn-autumn-028'],['中建路','cn-autumn-028'],['中电建电力集团','cn-autumn-029'],['中电建电力投资集团','cn-autumn-029'],['电建电投','cn-autumn-029'],['江苏省国信集团','cn-autumn-030'],['江苏国信','cn-autumn-030'],['JSGX','cn-autumn-030']
 ])assert(match(q).some(p=>p.id===id),'Search does not match '+q);
 for(const p of rows){
  assert(match(p.name).some(c=>c.id===p.id),'Unsearchable V2 company '+p.name);

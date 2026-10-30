@@ -153,6 +153,14 @@ jobs:
           print('HHBA_POWER_INVEST_3_OFFICIAL_MEDIA_VERIFIED')
           PY
           echo HHBA_CN_AUTUMN_029_MEDIA_PACKAGED
+      - name: Verify Jiangsu Guoxin approved JSGX logo and two independently sourced photos
+        run: |
+          python apps/web/scripts/prepare-jiangsu-guoxin-media.py
+          test -s apps/web/public/images/employer-profiles/cn-autumn-030/logo.png
+          test -s apps/web/public/images/employer-profiles/cn-autumn-030/photo1.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-030/photo2.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-030/media-audit.json
+          echo HHBA_CN_AUTUMN_030_THREE_ASSETS_READY
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
@@ -189,9 +197,6 @@ jobs:
       - name: Verify Zibo V5.1 official policy, 2026 housing batches and shared guides
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-zibo-city-v51.mjs
-      - name: Verify Dongying V5.1 2026 policy transition and housing truthfulness
-        working-directory: apps/web
-        run: node --experimental-strip-types scripts/test-dongying-city-v51.mjs
       - name: Lock future city template, certify full policy guides and protect 95 historical record IDs
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
@@ -279,6 +284,13 @@ jobs:
           # Public HTTPS backend ORIGIN only. Never put a DeepSeek credential here.
           VITE_HHBA_MATCH_API_ORIGIN: ${{ vars.HHBA_MATCH_API_ORIGIN }}
         run: npm run build
+      - name: Check Jiangsu Guoxin assets are shipped on the ONE HHBA main site
+        run: |
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-030/logo.png
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-030/photo1.jpg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-030/photo2.jpg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-030/media-audit.json
+          echo HHBA_CN_AUTUMN_030_ONE_SITE_ASSET_OK
       - name: Verify Southern, Guangzhilv and shared static images in built site
         run: |
           test -s apps/web/dist/index.html

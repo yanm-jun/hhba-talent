@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {searchEmployersByIndividualRoles,isMajorSearch,matchesJobMajor} from '../src/services/employerJobSearch.mjs';
-const ids=Array.from({length:18},(_,i)=>'cn-autumn-'+String(i+12).padStart(3,'0'));
+const ids=Array.from({length:19},(_,i)=>'cn-autumn-'+String(i+12).padStart(3,'0'));
 const employers=ids.map(id=>JSON.parse(readFileSync('src/data/employerProfiles/'+id+'.json','utf8')));
 const majors=JSON.parse(readFileSync('src/data/officialAcademicMajors.json','utf8')).records.map(r=>r.name);
 const search=(q,selectedMajor='')=>searchEmployersByIndividualRoles(employers,q,{selectedMajor,knownMajors:majors});
@@ -69,6 +69,16 @@ const noInventedMechanical=search('机械').find(x=>x.profile.id==='cn-autumn-02
 assert(!noInventedMechanical,'2027 eight-position list has no explicitly mechanical job; do not infer all power jobs match');
 const manuallyFilter=search('中电建电力集团','自动化').find(x=>x.profile.id==='cn-autumn-029');
 assert(manuallyFilter&&manuallyFilter.jobs.length===1&&manuallyFilter.jobs[0].id==='thermal-control');
+const guoxin=search('江苏省国信集团').find(x=>x.profile.id==='cn-autumn-030');
+assert(guoxin&&guoxin.jobs.length===4&&guoxin.matchedBy==='company',
+ 'JSGX four official recruitment categories must be searchable on main');
+const guoxinAi=search('人工智能').find(x=>x.profile.id==='cn-autumn-030');
+assert(guoxinAi&&guoxinAi.jobs.length===1&&guoxinAi.jobs[0].id==='trainee-ai',
+ 'AI major must show only AI trainee direction, not all Guoxin jobs');
+assert(!search('机械').some(x=>x.profile.id==='cn-autumn-030'),
+ 'Group energy business must not fabricate a mechanical job');
+assert(search('江苏国信','金融学').find(x=>x.profile.id==='cn-autumn-030')?.jobs[0]?.id==='trainee-finance',
+ 'Company alias + finance major must show only the finance trainee');
 const it=search('IT').find(x=>x.profile.id===envis.id);
 assert(it&&it.jobs.length>0&&it.jobs.length<envis.jobs.length,
  'Role-title search should also show only matching individual roles');
