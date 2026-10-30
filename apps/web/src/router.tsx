@@ -5,7 +5,8 @@ const prefix = import.meta.env.BASE_URL.replace(/\/$/,'');
 const href = (to: string) => prefix + (to.startsWith('/') ? to : '/'+to);
 function currentRoute() {
   const path = location.pathname;
-  return prefix && path.startsWith(prefix + '/') ? path.slice(prefix.length) : (path === prefix ? '/' : path);
+  const internal=prefix && path.startsWith(prefix + '/') ? path.slice(prefix.length) : (path === prefix ? '/' : path);
+  return internal.replace(/\/+$/, '') || '/';
 }
 
 type MarketState={scope:'home'|'jobs';filters:Record<string,unknown>;draft:string;page:number};
