@@ -1,4 +1,5 @@
 name: HHBA Envision company 16 factory preview
+# Release candidate: data-only enterprise 16; prior public site must be preserved.
 on:
   push:
     branches: [feat/employer-factory-pilot-envision-16-20261030]
