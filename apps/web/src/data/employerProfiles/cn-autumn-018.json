@@ -1,0 +1,481 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-018",
+  "name": "新奥集团",
+  "englishName": "ENN Group",
+  "aliases": [
+    "新奥",
+    "新奥集团股份有限公司",
+    "新奥集团有限公司",
+    "ENN",
+    "ENN Group",
+    "新奥能源集团",
+    "新奥校招"
+  ],
+  "industry": "清洁能源 · 天然气全产业链 · 泛能服务 · 产业智能 · 品质生活",
+  "subtitle": "1989年创立于河北廊坊 · 旗下多家独立上市公司 · 官方2027届校园招聘资料已收录",
+  "overview": "新奥集团1989年在河北廊坊创业，现有清洁能源与品质生活两大事业领域，涵盖城市燃气、天然气供应链、综合能源服务、能源数智化，以及智能家、文旅与健康服务。官网披露旗下上市平台包括新奥能源（02688.HK）、新奥股份（600803.SH）、新智认知（603869.SH）和西藏旅游（600749.SH）；集团主体与各上市公司及城市燃气子公司的招聘身份应分别核对。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://www.enn.cn/about.html",
+    "https://www.enn.cn/",
+    "https://enn.zhiye.com/campus?c=4403",
+    "https://career.nankai.edu.cn/correcruit/content/id/120062.html",
+    "https://www.xinaogas.com/cn/our-business/",
+    "https://ennresearch.com/about/",
+    "https://www.ennpower.com/about"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-018/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-018/photo1.webp",
+        "caption": "新奥科技相关园区建筑",
+        "note": "来自新奥科技发展有限公司官网（ennresearch.com）的集团介绍页面 · 属旗下企业场景，并非集团总部唯一办公楼",
+        "alt": "新奥科技办公园区玻璃建筑和红色雕塑，建筑顶部显示新奥品牌标识"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-018/photo2.webp",
+        "caption": "新奥动力相关研发生产办公建筑",
+        "note": "来自新奥动力官网（ennpower.com）2026年公开图片 · 为集团旗下能源装备企业建筑，不代表全集团所有办公场景",
+        "alt": "新奥动力官网展示的现代化办公研发建筑，楼顶有ENN新奥标识"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://enn.zhiye.com/campus?c=4403",
+    "label": "新奥集团官方校园招聘",
+    "status": "official_portal",
+    "subject": "新奥集团及相关所属公司（逐岗位核对招聘主体）",
+    "note": "官网入口 enn.zhiye.com 确认为新奥集团校园招聘渠道；2027届高校公告列有需求专业，但官网动态岗位列表抓取时可能显示零条，不能据此宣称没有岗位或每个方向正在开放。请以官方页面实时展示为准。"
+  },
+  "majorIntro": "根据2026年10月23日南开大学就业平台发布的新奥集团2027届校园招聘公告，整理15组公开的专业需求方向。它们不是15个已核验的独立职位；下方专业切换表示信息关联，不能代替官网核对具体岗位、地点、学历及在招状态。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "软件工程",
+    "人工智能",
+    "电气工程及其自动化",
+    "能源与动力工程",
+    "自动化",
+    "机械设计制造及其自动化",
+    "安全工程",
+    "工程管理",
+    "法学",
+    "市场营销",
+    "会计学",
+    "舞蹈学"
+  ],
+  "photoNote": "品牌图为智联招聘平台标注的新奥集团Logo素材；两张真实企业照片分别来自新奥科技与新奥动力官方网站，均属于新奥集团旗下企业，不应误标为同一集团总部大楼。素材已存为网站本地三份独立文件，点击图片不外链。商标展示不表示新奥集团与HHBA合作。",
+  "business": [
+    {
+      "title": "城市燃气与客户服务",
+      "description": "以新奥能源等业务平台开展城市燃气服务，为居民与工商业客户提供天然气和安全运营服务。",
+      "tags": "城市燃气 · 客户服务 · 安全运营",
+      "details": [
+        "城市燃气管道网络及服务",
+        "燃气安全保障与客户运营",
+        "家庭与企业能源需求服务"
+      ]
+    },
+    {
+      "title": "天然气供应链与基础设施",
+      "description": "围绕天然气贸易、输储、接收站及工程建造提供资源与履约交付能力。",
+      "tags": "LNG · 能源贸易 · 设施运营",
+      "details": [
+        "天然气资源采购与供应链",
+        "LNG接收及储运服务",
+        "天然气基础设施工程"
+      ]
+    },
+    {
+      "title": "综合能源与低碳服务",
+      "description": "针对工业与商业场景提供分布式、低碳、多能互补的用能与管理解决方案。",
+      "tags": "泛能 · 光伏 · 能碳管理",
+      "details": [
+        "综合能源系统规划建设",
+        "能源使用效率优化",
+        "低碳与能碳管理服务"
+      ]
+    },
+    {
+      "title": "产业智能与数字平台",
+      "description": "借助物联、人工智能和数字平台实现能源运营与产业服务智能化。",
+      "tags": "物联网 · AI · 恩牛网",
+      "details": [
+        "能源设备物联感知",
+        "企业智能体与数智运营",
+        "能源产业智能管理平台"
+      ]
+    },
+    {
+      "title": "能源科技与高端研发",
+      "description": "旗下相关科研和制造主体涉及燃气轮机等能源装备研发及聚变技术前瞻研究。",
+      "tags": "燃机 · 能源装备 · 聚变研发",
+      "details": [
+        "分布式能源装备研制",
+        "智能制造与技术服务",
+        "前沿能源技术研究"
+      ]
+    },
+    {
+      "title": "品质生活与智能家",
+      "description": "围绕智能家庭、文化旅游和健康服务形成与能源业务不同的生活服务板块。",
+      "tags": "智家 · 文旅 · 健康",
+      "details": [
+        "智能家居及家庭服务",
+        "文化旅游相关业务",
+        "健康与品质生活服务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "computing-software",
+      "title": "计算机与软件类（2027届专业需求方向）",
+      "city": "全国业务单位（具体地点以官方招聘岗位为准）",
+      "url": "https://enn.zhiye.com/campus?c=4403",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/120062.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "新奥集团股份有限公司及所属招聘主体",
+      "summary": "2027届集团招聘公告列示的计算机科学与技术、软件工程、人工智能、数据科学与大数据技术、网络工程、信息安全需求范围。本条为有来源的专业招聘方向，不是已核验的独立在招岗位，不代表上述专业均符合全部职位条件。",
+      "requirements": "集团2027届校园招聘公告列出此专业方向，但未披露各独立岗位的完整职责、人数、地点及专业限制；学历范围包括本科、硕士、博士，需在新奥官方招聘平台逐条确认。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能",
+        "数据科学与大数据技术",
+        "网络工程",
+        "信息安全"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "infomanagement-math",
+      "title": "信息管理与数理类（2027届专业需求方向）",
+      "city": "全国业务单位（具体地点以官方招聘岗位为准）",
+      "url": "https://enn.zhiye.com/campus?c=4403",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/120062.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "新奥集团股份有限公司及所属招聘主体",
+      "summary": "2027届集团招聘公告列示的信息管理、统计和应用数理相关背景需求范围。本条为有来源的专业招聘方向，不是已核验的独立在招岗位，不代表上述专业均符合全部职位条件。",
+      "requirements": "集团2027届校园招聘公告列出此专业方向，但未披露各独立岗位的完整职责、人数、地点及专业限制；学历范围包括本科、硕士、博士，需在新奥官方招聘平台逐条确认。",
+      "majorNames": [
+        "信息管理与信息系统",
+        "管理科学与工程",
+        "工业工程",
+        "数学与应用数学",
+        "统计学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "electronics-automation",
+      "title": "电子与自动化类（2027届专业需求方向）",
+      "city": "全国业务单位（具体地点以官方招聘岗位为准）",
+      "url": "https://enn.zhiye.com/campus?c=4403",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/120062.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "新奥集团股份有限公司及所属招聘主体",
+      "summary": "2027届集团招聘公告列示的电子信息、通信、自动化及机器人工程相关背景需求范围。本条为有来源的专业招聘方向，不是已核验的独立在招岗位，不代表上述专业均符合全部职位条件。",
+      "requirements": "集团2027届校园招聘公告列出此专业方向，但未披露各独立岗位的完整职责、人数、地点及专业限制；学历范围包括本科、硕士、博士，需在新奥官方招聘平台逐条确认。",
+      "majorNames": [
+        "电子信息工程",
+        "通信工程",
+        "自动化",
+        "控制科学与工程",
+        "机器人工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "energy-power-electrical",
+      "title": "能源动力与电气类（2027届专业需求方向）",
+      "city": "全国业务单位（具体地点以官方招聘岗位为准）",
+      "url": "https://enn.zhiye.com/campus?c=4403",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/120062.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "新奥集团股份有限公司及所属招聘主体",
+      "summary": "2027届集团招聘公告列示的能源动力、电气、储能与智能电网相关背景需求范围。本条为有来源的专业招聘方向，不是已核验的独立在招岗位，不代表上述专业均符合全部职位条件。",
+      "requirements": "集团2027届校园招聘公告列出此专业方向，但未披露各独立岗位的完整职责、人数、地点及专业限制；学历范围包括本科、硕士、博士，需在新奥官方招聘平台逐条确认。",
+      "majorNames": [
+        "电气工程及其自动化",
+        "能源与动力工程",
+        "新能源科学与工程",
+        "储能科学与工程",
+        "智能电网信息工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "construction-municipal",
+      "title": "建筑与市政工程类（2027届专业需求方向）",
+      "city": "全国业务单位（具体地点以官方招聘岗位为准）",
+      "url": "https://enn.zhiye.com/campus?c=4403",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/120062.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "新奥集团股份有限公司及所属招聘主体",
+      "summary": "2027届集团招聘公告列示的建筑、市政设施、供热供燃气与工程管理相关背景需求范围。本条为有来源的专业招聘方向，不是已核验的独立在招岗位，不代表上述专业均符合全部职位条件。",
+      "requirements": "集团2027届校园招聘公告列出此专业方向，但未披露各独立岗位的完整职责、人数、地点及专业限制；学历范围包括本科、硕士、博士，需在新奥官方招聘平台逐条确认。",
+      "majorNames": [
+        "土木工程",
+        "建筑环境与能源应用工程",
+        "工程管理",
+        "智能建造",
+        "给排水科学与工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "petroleum-safety",
+      "title": "石油与安全工程类（2027届专业需求方向）",
+      "city": "全国业务单位（具体地点以官方招聘岗位为准）",
+      "url": "https://enn.zhiye.com/campus?c=4403",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/120062.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "新奥集团股份有限公司及所属招聘主体",
+      "summary": "2027届集团招聘公告列示的油气储运、石油、安全与消防相关背景需求范围。本条为有来源的专业招聘方向，不是已核验的独立在招岗位，不代表上述专业均符合全部职位条件。",
+      "requirements": "集团2027届校园招聘公告列出此专业方向，但未披露各独立岗位的完整职责、人数、地点及专业限制；学历范围包括本科、硕士、博士，需在新奥官方招聘平台逐条确认。",
+      "majorNames": [
+        "石油工程",
+        "油气储运工程",
+        "安全工程",
+        "消防工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "mechanical-shipbuilding",
+      "title": "机械与船舶工程类（2027届专业需求方向）",
+      "city": "全国业务单位（具体地点以官方招聘岗位为准）",
+      "url": "https://enn.zhiye.com/campus?c=4403",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/120062.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "新奥集团股份有限公司及所属招聘主体",
+      "summary": "2027届集团招聘公告列示的机械、过程装备、测控以及船舶工程相关背景需求范围。本条为有来源的专业招聘方向，不是已核验的独立在招岗位，不代表上述专业均符合全部职位条件。",
+      "requirements": "集团2027届校园招聘公告列出此专业方向，但未披露各独立岗位的完整职责、人数、地点及专业限制；学历范围包括本科、硕士、博士，需在新奥官方招聘平台逐条确认。",
+      "majorNames": [
+        "机械设计制造及其自动化",
+        "机械电子工程",
+        "过程装备与控制工程",
+        "船舶与海洋工程",
+        "轮机工程",
+        "测控技术与仪器"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "materials-physics",
+      "title": "物理材料与测绘类（2027届专业需求方向）",
+      "city": "全国业务单位（具体地点以官方招聘岗位为准）",
+      "url": "https://enn.zhiye.com/campus?c=4403",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/120062.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "新奥集团股份有限公司及所属招聘主体",
+      "summary": "2027届集团招聘公告列示的材料、电子、光学、测绘与聚变相关研究背景需求范围。本条为有来源的专业招聘方向，不是已核验的独立在招岗位，不代表上述专业均符合全部职位条件。",
+      "requirements": "集团2027届校园招聘公告列出此专业方向，但未披露各独立岗位的完整职责、人数、地点及专业限制；学历范围包括本科、硕士、博士，需在新奥官方招聘平台逐条确认。",
+      "majorNames": [
+        "材料科学与工程",
+        "光学工程",
+        "电子科学与技术",
+        "测绘工程",
+        "核科学与技术",
+        "核工程与核技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "corporate-management",
+      "title": "企业管理与公共管理类（2027届专业需求方向）",
+      "city": "全国业务单位（具体地点以官方招聘岗位为准）",
+      "url": "https://enn.zhiye.com/campus?c=4403",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/120062.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "新奥集团股份有限公司及所属招聘主体",
+      "summary": "2027届集团招聘公告列示的企业管理、人力资源、行政与公共管理背景需求范围。本条为有来源的专业招聘方向，不是已核验的独立在招岗位，不代表上述专业均符合全部职位条件。",
+      "requirements": "集团2027届校园招聘公告列出此专业方向，但未披露各独立岗位的完整职责、人数、地点及专业限制；学历范围包括本科、硕士、博士，需在新奥官方招聘平台逐条确认。",
+      "majorNames": [
+        "工商管理",
+        "人力资源管理",
+        "行政管理",
+        "公共管理"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "law-humanities",
+      "title": "人文社科与法务类（2027届专业需求方向）",
+      "city": "全国业务单位（具体地点以官方招聘岗位为准）",
+      "url": "https://enn.zhiye.com/campus?c=4403",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/120062.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "新奥集团股份有限公司及所属招聘主体",
+      "summary": "2027届集团招聘公告列示的法学、文学、新闻、社会学及心理学相关背景需求范围。本条为有来源的专业招聘方向，不是已核验的独立在招岗位，不代表上述专业均符合全部职位条件。",
+      "requirements": "集团2027届校园招聘公告列出此专业方向，但未披露各独立岗位的完整职责、人数、地点及专业限制；学历范围包括本科、硕士、博士，需在新奥官方招聘平台逐条确认。",
+      "majorNames": [
+        "法学",
+        "汉语言文学",
+        "新闻学",
+        "社会学",
+        "心理学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "tourism-arts",
+      "title": "文旅艺术类（2027届专业需求方向）",
+      "city": "全国业务单位（具体地点以官方招聘岗位为准）",
+      "url": "https://enn.zhiye.com/campus?c=4403",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/120062.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "新奥集团股份有限公司及所属招聘主体",
+      "summary": "2027届集团招聘公告列示的旅游管理、酒店管理、表演、舞蹈表演与舞台技术相关背景需求范围。本条为有来源的专业招聘方向，不是已核验的独立在招岗位，不代表上述专业均符合全部职位条件。",
+      "requirements": "集团2027届校园招聘公告列出此专业方向，但未披露各独立岗位的完整职责、人数、地点及专业限制；学历范围包括本科、硕士、博士，需在新奥官方招聘平台逐条确认。",
+      "majorNames": [
+        "旅游管理",
+        "酒店管理",
+        "表演",
+        "舞蹈表演",
+        "舞蹈学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "marketing-trade",
+      "title": "营销与贸易类（2027届专业需求方向）",
+      "city": "全国业务单位（具体地点以官方招聘岗位为准）",
+      "url": "https://enn.zhiye.com/campus?c=4403",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/120062.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "新奥集团股份有限公司及所属招聘主体",
+      "summary": "2027届集团招聘公告列示的营销、国际贸易、电子商务与物流管理相关背景需求范围。本条为有来源的专业招聘方向，不是已核验的独立在招岗位，不代表上述专业均符合全部职位条件。",
+      "requirements": "集团2027届校园招聘公告列出此专业方向，但未披露各独立岗位的完整职责、人数、地点及专业限制；学历范围包括本科、硕士、博士，需在新奥官方招聘平台逐条确认。",
+      "majorNames": [
+        "市场营销",
+        "电子商务",
+        "国际经济与贸易",
+        "物流管理"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "brand-media-design",
+      "title": "品牌传播与设计类（2027届专业需求方向）",
+      "city": "全国业务单位（具体地点以官方招聘岗位为准）",
+      "url": "https://enn.zhiye.com/campus?c=4403",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/120062.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "新奥集团股份有限公司及所属招聘主体",
+      "summary": "2027届集团招聘公告列示的广告、传媒、工业设计、产品设计与数字媒体技术背景需求范围。本条为有来源的专业招聘方向，不是已核验的独立在招岗位，不代表上述专业均符合全部职位条件。",
+      "requirements": "集团2027届校园招聘公告列出此专业方向，但未披露各独立岗位的完整职责、人数、地点及专业限制；学历范围包括本科、硕士、博士，需在新奥官方招聘平台逐条确认。",
+      "majorNames": [
+        "广告学",
+        "网络与新媒体",
+        "工业设计",
+        "产品设计",
+        "数字媒体技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "accounting-audit",
+      "title": "财会与审计类（2027届专业需求方向）",
+      "city": "全国业务单位（具体地点以官方招聘岗位为准）",
+      "url": "https://enn.zhiye.com/campus?c=4403",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/120062.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "新奥集团股份有限公司及所属招聘主体",
+      "summary": "2027届集团招聘公告列示的会计、财务管理和审计相关背景需求范围。本条为有来源的专业招聘方向，不是已核验的独立在招岗位，不代表上述专业均符合全部职位条件。",
+      "requirements": "集团2027届校园招聘公告列出此专业方向，但未披露各独立岗位的完整职责、人数、地点及专业限制；学历范围包括本科、硕士、博士，需在新奥官方招聘平台逐条确认。",
+      "majorNames": [
+        "会计学",
+        "财务管理",
+        "审计学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "finance-economics",
+      "title": "金融与经济类（2027届专业需求方向）",
+      "city": "全国业务单位（具体地点以官方招聘岗位为准）",
+      "url": "https://enn.zhiye.com/campus?c=4403",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/120062.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "新奥集团股份有限公司及所属招聘主体",
+      "summary": "2027届集团招聘公告列示的金融、投资、经济、能源经济等相关背景需求范围。本条为有来源的专业招聘方向，不是已核验的独立在招岗位，不代表上述专业均符合全部职位条件。",
+      "requirements": "集团2027届校园招聘公告列出此专业方向，但未披露各独立岗位的完整职责、人数、地点及专业限制；学历范围包括本科、硕士、博士，需在新奥官方招聘平台逐条确认。",
+      "majorNames": [
+        "金融学",
+        "投资学",
+        "经济学",
+        "应用经济学",
+        "能源经济"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
+      "currentOpenVerified": false
+    }
+  ],
+  "mediaSources": {
+    "logo": "https://storage-public.zhaopin.cn/org/logo/1698206823667244241/%E6%96%B0%E5%A5%A5%E9%9B%86%E5%9B%A2-logo.png",
+    "photo1": "https://ennresearch.com/uploads/260528/1-26052QI143101.jpg",
+    "photo2": "https://www.ennpower.com/local/static/upload/upload/2026-04-03/1775193276733_a7770ccc-1ad7-42b5-9667-4e755e4e62d5.png"
+  }
+}
