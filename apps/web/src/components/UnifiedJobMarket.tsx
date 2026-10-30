@@ -289,7 +289,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   const market=<section className="unified-market" aria-labelledby="unified-market-title">
     <div className="unified-market-heading"><div><small>HHBA · RECRUITMENT</small>
       <h2 id="unified-market-title">{lang==='zh'?'招聘市场':'Job market'}</h2>
-       {import.meta.env.BASE_URL.includes('/preview-factory-v2/')&&<small data-hhba-preview-version="factory-v2" className="unified-preview-label">{lang==='zh'?'企业工厂 V2 · 独立验收预览（非正式主站）':'Employer Factory V2 · Review preview (not the live site)'}</small>}
+       {/\/preview-(factory|integration)-v2\//.test(import.meta.env.BASE_URL)&&<small data-hhba-preview-version="factory-v2" className="unified-preview-label">{lang==='zh'?'企业工厂 V2 · 整站整合验收预览（未覆盖正式站）':'Employer Factory V2 · Review preview (not the live site)'}</small>}
       <p>{rebuilding?(lang==='zh'?'海外精选岗位与逐家审核通过的国内岗位 · 使用同一套卡片和站内详情':'Overseas curated jobs and individually reviewed China roles in one layout'):curatedHundred?(lang==='zh'?'精选 10 家知名海外企业 · 100 条已存档岗位（状态待核实）':'100 archived roles from 10 companies; current availability unverified.'):officialThree?(lang==='zh'?'OpenAI、Anthropic、SpaceX 官方公开招聘 · 只展示本次从招聘系统核验到的职位，随时可能变化':'OpenAI, Anthropic and SpaceX public ATS listings · Verified at latest sync'):domesticOnly?(lang==='zh'?'国内历史招聘岗位静态测试 · 岗位状态以企业官网为准':'Historical China listings preview · Check employer for availability'):lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
       <LanguageSwitcher lang={lang} change={change}/></div>
     {controls}
