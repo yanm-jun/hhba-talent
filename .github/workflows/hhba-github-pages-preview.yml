@@ -1,3 +1,4 @@
+# 2026-10-30: refresh public HHBA header with 人才政策 first; target /talent-service; retain existing Pages feature-branch build.
 # 2026-10-30: publish reviewed talent service static demo from preview branch (six city experience, policies, housing guides).
 # 2026-10-29: all 11 reviewed and remaining company templates use chip-only profession filtering; remove employer professional search boxes, preserve the recruitment-market filter.
 # 2026-10-29: fix Hypergryph employer-specific selectable majors and job counts; run dedicated regression before Pages release. No original PNG reencoding.
