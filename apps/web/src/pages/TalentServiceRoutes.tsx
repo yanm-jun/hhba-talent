@@ -82,7 +82,7 @@ function PolicyTile({data}:{data:TalentPolicyRecord}){
 }
 function HousingTile({data}:{data:TalentHousingRecord}){
  return <Link to={talentHousingUrl(data.id)} className="ts-sub-tile">
-  <div className="ts-sub-tile-top"><span>{data.kind==='program'?'住房政策入口':'官方真实项目'}</span><small>{housingStatus(data)}</small></div>
+  <div className="ts-sub-tile-top"><span>{data.housingCategory|| (data.kind==='program'?'住房政策入口':'官方真实项目')}</span><small>{housingStatus(data)}</small></div>
   <h3>{data.title}</h3>
   <p className="ts-housing-location"><MapPin size={14}/>{data.district} · {data.address}</p>
   <div className="ts-housing-short-facts"><small>政府公开房型 / 项目规模</small><p>{data.units}</p><small>公告租金 / 费用说明</small><strong>{data.rent}</strong></div>
