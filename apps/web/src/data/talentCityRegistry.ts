@@ -19,6 +19,7 @@ export const TALENT_LEGACY_CITIES:TalentCity[]=[
  {name:'临沂',official:'临沂市',province:'山东',level:'prefecture-preview',intro:'临沂青年人才津贴、首次购房补贴、首次创业扶持与租赁型人才公寓政策；2026年人才公寓批次已截止',aliases:['临沂','临沂市','linyi','lin yi']},
  {name:'东营',official:'东营市',province:'山东',level:'prefecture-preview',intro:'2026年8月人才新政与旧补贴衔接、首次创业支持及人才安居资料核验',aliases:['东营','东营市','dongying','dong ying']},
  {name:'济宁',official:'济宁市',province:'山东',level:'prefecture-preview',intro:'青年引才补贴、首次创业、OPC企业用工支持、主城区租房补贴及保租房政策入口；住房项目空房以官方公告为准',aliases:['济宁','济宁市','jining','ji ning']},
+ {name:'滨州',official:'滨州市',province:'山东',level:'prefecture-preview',intro:'2026年大学生购房与生活补助历史批次、创业与灵活就业补贴、邹平天健苑及创新人才公寓资料',aliases:['滨州','滨州市','binzhou','bin zhou']},
 ];
 
 const prefectureRaw=`130100|石家庄市|河北省|shi jia zhuang
