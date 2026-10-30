@@ -24,15 +24,15 @@
     "photos": [
       {
         "path": "images/employer-profiles/cn-autumn-013/photo1.webp",
-        "caption": "蜂巢能源制造基地",
-        "note": "蜂巢能源官网「公司概况」图片 · 独立本地副本",
-        "alt": "蜂巢能源官网公开的制造基地图片"
+        "caption": "蜂巢能源生产园区建筑",
+        "note": "财新网 2024 年新闻报道图片 · 展示蜂巢能源园区",
+        "alt": "带有 SVOLT 蜂巢能源企业标志的建筑外观照片"
       },
       {
         "path": "images/employer-profiles/cn-autumn-013/photo2.webp",
-        "caption": "蜂巢能源研发中心",
-        "note": "蜂巢能源官网「公司概况」图片 · 独立本地副本",
-        "alt": "蜂巢能源官网公开的研发中心图片"
+        "caption": "蜂巢能源盐城基地生产线",
+        "note": "蜂巢能源官网新闻图片 · 盐城生产线投产现场",
+        "alt": "蜂巢能源盐城基地生产线投产活动及员工合影"
       }
     ]
   },
@@ -55,7 +55,7 @@
     "工业工程",
     "物流管理"
   ],
-  "photoNote": "Logo、制造基地及研发中心图片均来源于蜂巢能源官方网站，作为各自独立的本站静态素材保存；点击照片不跳第三方。校招类别按中国科学技术大学公开简章整理，岗位实时开放情况尚未核实。",
+  "photoNote": "三张图片是独立的本站静态文件。Logo 图片来自第三方品牌资料页（待企业官方品牌资源二次核准），园区照片来自财新新闻报道，生产线照片来自蜂巢能源官网。图片无第三方点击跳转。招聘资料来自中国科学技术大学2027届公开校招简章，实时可投递状态尚未核实。",
   "business": [
     {
       "title": "新能源汽车动力电池",
@@ -292,10 +292,10 @@
     }
   ],
   "mediaSources": {
-    "logo": "https://oss.svolt.cn/Public/Uploads/uploadfile/images/20240523/narlogo02.png",
+    "logo": "https://www.3wen.com/userfiles/files/logo/3SVOLT.jpg",
     "photos": [
-      "https://oss.svolt.cn/Public/Uploads/uploadfile/images/20241104/zhizaojidi.jpg",
-      "https://oss.svolt.cn/Public/Uploads/uploadfile/images/20241104/yanfazhongxin.jpg"
+      "https://img.caixin.com/2024-10-24/172975316514256.jpg",
+      "https://www.svolt.cn/Public/Uploads/ueditor/upload/image/20240612/1718163114366286.jpeg"
     ],
     "jobSummary": "https://job.ustc.edu.cn/Specialrecruitment/info.aspx?itemid=10162"
   }
