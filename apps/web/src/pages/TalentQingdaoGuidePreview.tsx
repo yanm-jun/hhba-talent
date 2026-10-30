@@ -75,7 +75,6 @@ const stay:Guide={
  ],
  officialUrl:'https://www.qingdao.gov.cn/zwgk/xxgk/rlshbz/gkml/gwfg/202606/t20260630_10647826.shtml',officialLabel:'查看官方“爱山东”操作说明',officialNote:'操作入口在“爱山东”App / 微信小程序内搜索“青岛市免租金住宿保障平台”，政府原文不是选房页面。',phone:'0532-85912361'
 };
-const configs:Record<GuideKind,Guide>={housing,stay};
 
 function mappedGuide(kind:GuideKind):CompleteGuide{
  const data=kind==='housing'?housing:stay;

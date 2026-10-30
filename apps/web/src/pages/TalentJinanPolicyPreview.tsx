@@ -1,4 +1,5 @@
 import {UnifiedPolicyList,type CityPolicyConfig} from '../components/talent/UnifiedPolicyList';
+import {TALENT_POLICY_RECORDS} from '../data/talentPolicyRecords';
 import './talentJinanPolicyPreview.css';
 
 const all=TALENT_POLICY_RECORDS.filter(x=>x.city==='济南');

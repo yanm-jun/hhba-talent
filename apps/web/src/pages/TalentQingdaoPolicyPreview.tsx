@@ -1,9 +1,7 @@
 import {UnifiedPolicyList,type CityPolicyConfig} from '../components/talent/UnifiedPolicyList';
-import {TALENT_POLICY_RECORDS,type TalentPolicyRecord} from '../data/talentPolicyRecords';
 import './talentJinanPolicyPreview.css';
 
 const selectedIds=['qd-rent-25','sd-qingdao-2026-free-housing','qd-home-25','qd-start-25','qd-laoshan-202610'] as const;
-const policies=selectedIds.map(id=>TALENT_POLICY_RECORDS.find(p=>p.id===id)).filter((p):p is TalentPolicyRecord=>Boolean(p));
 const summaries:Record<string,{category:string;benefit:string;unit:string;detail:string;condition:string;status:string;guide?:string}>={
  'qd-rent-25':{category:'住房补贴',benefit:'¥500—1,200',unit:'／月 · 最长36个月',detail:'本科500元、硕士800元、博士1200元/月，具体按本人学历、就业与政策条件审核。',condition:'毕业年限 · 青岛户籍（另有例外） · 在青就业创业与参保',status:'政策依据有效期至2027年3月，个别受理状态以平台为准',guide:'housing'},
  'sd-qingdao-2026-free-housing':{category:'免租金住宿',benefit:'最长12个月',unit:'按求职与就业状态计算',detail:'来青求职累计最多6个月；在青就业创业后可按规定合并计算，最长12个月，须有可选房源。',condition:'毕业3年内（含毕业学年） · 认证与选房 · 区分求职和就业参保',status:'2026年新规已施行 · 房源与预约实时核实',guide:'stay'},
