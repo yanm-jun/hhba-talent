@@ -1,0 +1,56 @@
+name: HHBA Envision 16 fetch sourced independent images
+on:
+  push:
+    branches: [feat/employer-factory-pilot-envision-16-20261030]
+    paths:
+      - '.github/workflows/hhba-envision-16-assets.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  download-authentic-brand-assets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/employer-factory-pilot-envision-16-20261030
+          persist-credentials: true
+      - name: Copy separately sourced Envision logo and two photos into repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          dest=apps/web/public/images/employer-profiles/cn-autumn-012
+          mkdir -p "$dest"
+          curl -fLsS --retry 3 --max-time 55 --user-agent 'HHBA research media preservation (+https://github.com/yanm-jun/hhba-talent)' \
+            'https://commons.wikimedia.org/wiki/Special:Redirect/file/Logo_envision.png' -o "$dest/logo.png"
+          curl -fLsS --retry 3 --max-time 55 --user-agent 'Mozilla/5.0' \
+            'https://www.envision-group.com/version/1773382442356/image/section-4-2.4401312.jpg' -o /tmp/envision-factory.jpg
+          curl -fLsS --retry 3 --max-time 55 --user-agent 'Mozilla/5.0' \
+            'https://aesccdn.creatby.com/materials/95622/origin/4326ca19bd92ff9dc2d62855a5be4ae8_origin.jpg' -o /tmp/envision-wind.jpg
+          python -m pip -q install Pillow
+          python - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          d=Path('apps/web/public/images/employer-profiles/cn-autumn-012')
+          logo=Image.open(d/'logo.png');logo.verify()
+          for source,name in [('/tmp/envision-factory.jpg','photo1.webp'),('/tmp/envision-wind.jpg','photo2.webp')]:
+              img=Image.open(source).convert('RGB')
+              if img.width<600 or img.height<350: raise ValueError(f'Photo unexpectedly small: {source} {img.size}')
+              img.thumbnail((1600,1100))
+              img.save(d/name,format='WEBP',quality=87,method=6)
+          for p in sorted(d.iterdir()):
+              im=Image.open(p);im.load()
+              if p.stat().st_size>5_000_000 or p.stat().st_size<100:raise ValueError(f'Invalid image: {p}')
+              print(p.name,im.size,p.stat().st_size)
+          PY
+      - name: Commit three independent images to pilot branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/web/public/images/employer-profiles/cn-autumn-012/
+          git diff --cached --quiet && exit 0
+          git commit -m 'assets(envision): archive brand logo and two separately sourced corporate photos'
+          git push origin HEAD:refs/heads/feat/employer-factory-pilot-envision-16-20261030
