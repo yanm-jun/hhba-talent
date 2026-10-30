@@ -15,6 +15,7 @@ import {TalentQingdaoPolicyPreview} from './TalentQingdaoPolicyPreview';
 import {TalentQingdaoGuidePreview} from './TalentQingdaoGuidePreview';
 import {TalentLaoshanGuide} from './TalentLaoshanGuide';
 import {UnifiedTalentRecordDetail} from '../components/talent/UnifiedTalentRecordDetail';
+import {UnifiedPolicyList,buildCityPolicyConfig} from '../components/talent/UnifiedPolicyList';
 import '../styles/talent-service.css';
 import '../styles/talent-subpages.css';
 
@@ -183,6 +184,7 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  let body;
  if(kind==='cities')body=<TalentCityDirectory key={route} initialProvince={fragments[2]==='search'?'':decode(fragments[2]||'')} initialQuery={fragments[2]==='search'?decode(fragments[3]||''):''}/>;
  else if(kind==='city')body=<CityHub city={decode(fragments[2]||'北京')||'北京'}/>;
+ else if(kind==='list'&&fragments[2]==='policies')body=city==='济南'?<TalentJinanPolicyPreview/>:city==='青岛'?<TalentQingdaoPolicyPreview/>:<UnifiedPolicyList config={buildCityPolicyConfig(city)}/>;
  else if(kind==='list'&&['policies','benefits','housing','guide'].includes(fragments[2]))body=<ListPage city={city} kind={fragments[2] as TalentListKind}/>;
  else if(kind==='search')body=<ListPage key={route} city={decode(fragments[2]||'杭州')||'杭州'} kind="search" query={decode(fragments.slice(3).join('/'))}/>;
  else if(kind==='policy-layout-preview'&&fragments[2]==='jinan')body=<TalentJinanPolicyPreview/>;

@@ -24,6 +24,22 @@ function Tile({item,record}:{item:PolicyTile;record:TalentPolicyRecord}){
   </div>
  </article>;
 }
+/** Fallback coverage for all existing cities; avoids inventing benefit amounts or eligibility. */
+export function buildCityPolicyConfig(city:string):CityPolicyConfig{
+ const rows=TALENT_POLICY_RECORDS.filter(p=>p.city===city);
+ const clip=(value:string,max:number)=>value.length<=max?value:value.slice(0,max-1).replace(/[，,、;\s]+$/,'')+'…';
+ return {
+  city,subtitle:'全国统一V3列表。按已核验资料检索真实政策；待遇和资格请在详情及原文中核对。',
+  notes:'仅济南、青岛等已逐条复核的事项展示明确政策金额；其余城市按原始资料摘要展示，完整办事指南正在逐条补充。',
+  tiles:rows.map(p=>({
+   id:p.id,category:p.category==='购房补贴'?'购房安家':p.category,
+   amount:'按政策类别核定',unit:'以官方条件为准',
+   description:clip(p.benefit,112),condition:clip(p.eligibility,92),
+   status:'基础资料 · 申领状态待核验'
+  }))
+ };
+}
+
 export function UnifiedPolicyList({config}:{config:CityPolicyConfig}){
  const [category,setCategory]=useState('all');
  const entries=useMemo(()=>config.tiles.map(tile=>({tile,record:TALENT_POLICY_RECORDS.find(p=>p.id===tile.id)})).filter((x):x is {tile:PolicyTile;record:TalentPolicyRecord}=>Boolean(x.record&&x.record.city===config.city)),[config]);
