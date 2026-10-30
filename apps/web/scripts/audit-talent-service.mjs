@@ -62,7 +62,7 @@ for(const city of ['杭州','深圳','青岛','上海','北京','济南']){
 const details=readFileSync(new URL('pages/TalentServiceRoutes.tsx',root),'utf8');
 const entry=readFileSync(new URL('main.tsx',root),'utf8');
 assert.ok(!landing.includes('<TalentHousingSection')&&!landing.includes('<TalentPolicySearch'),'Portal must not render full policy or housing lists');
-assert.ok(landing.includes('talentCityUrl(c.name)')&&landing.includes('talentSearchUrl(parsed.city,q)'),'Homepage city cards and search must use separate routes');
+assert.ok(landing.includes('talentCityUrl(name)')&&landing.includes('talentSearchUrl(parsed.city,q)'),'Homepage city cards and search must use separate routes');
 assert.ok(landing.includes('talentListUrl(item.kind'),'Home navigation tiles must open independent list pages');
 const approved=['htl-intro','htl-quick','htl-city-grid','htl-housing-grid','htl-policy-list','htl-match'];
 let lastIndex=-1;
@@ -114,6 +114,15 @@ assert.ok(details.includes('policyStatus(data)')&&details.includes('data.targetG
 assert.ok(details.includes('p.deadline')&&details.includes('p.reviewNote')&&details.includes('p.scope'),'Policy detail page must show cutoffs and territorial limitations');
 
 assert.ok(!landing.includes('ts-match-form'),'Old generic matching UI should not return');
+const directory=readFileSync(new URL('pages/TalentCityDirectory.tsx',root),'utf8');
+assert.ok(cityRegistry.includes('export const TALENT_PREFECTURE_CITIES'),'293-city code registry missing');
+assert.ok(cityRegistry.includes('export const TALENT_CITY_INDEX'),'National city index missing');
+assert.ok(landing.includes("navigate('/talent-service/cities')"),'Homepage view-all must open independent city directory');
+assert.ok(landing.includes('TALENT_PROVINCES.map(p=>'),'Province dropdown missing');
+assert.ok(details.includes("kind==='cities'")&&details.includes('<TalentCityDirectory'),'297-city directory route disconnected');
+assert.ok(directory.includes('queryTalentCities(query,province)')&&directory.includes('setProvince'),'Province and text filters must use the national search index');
+assert.ok(details.includes('资料整理中'),'Unverified cities must explicitly show pending content');
+
 
 assert.ok(details.includes('function CityHub(')&&details.includes('function ListPage(')&&details.includes('function DetailPage('),'City/list/detail page hierarchy missing');
 assert.ok(details.includes('talentPolicyUrl(data.id)')&&details.includes('talentHousingUrl(data.id)'),'Detail deep-links missing');
