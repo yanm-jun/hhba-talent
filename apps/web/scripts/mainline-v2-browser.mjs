@@ -9,7 +9,7 @@ const base=(process.env.HHBA_TEST_BASE||'http://127.0.0.1:4173/hhba-talent/').re
 const out='mainline-v2-browser-proof';
 mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
-const result={base,desktop:false,mobile:false,southern:false,guangzhilv:false,shortSearch:false,details:false,images:false,qingdaoCaptions:false};
+const result={base,desktop:false,mobile:false,southern:false,guangzhilv:false,shortSearch:false,details:false,images:false,qingdaoCaptions:false,mechanicalRoleFilter:false};
 async function dismiss(page){
  const btn=page.getByRole('button',{name:'暂不同意'});
  if(await btn.isVisible().catch(()=>false))await btn.click();
@@ -40,6 +40,29 @@ try{
    await page.screenshot({path:out+'/DEBUG-main-'+width+'.png',fullPage:true});
    throw err;
   }
+  // One market search: query a profession, not an employer name.
+  // The Envision company has six sourced directions, but only a subset
+  // has explicit mechanical-major evidence.
+  await input.fill('机械');
+  const mechanicalCard=page.locator('[data-v2-search-company="cn-autumn-012"]');
+  await mechanicalCard.waitFor({state:'visible',timeout:20000});
+  assert.equal(await mechanicalCard.getAttribute('data-v2-match-kind'),'major');
+  const mechanicalJobs=mechanicalCard.locator('.hhba-v2-job-result');
+  const mechanicalCount=await mechanicalJobs.count();
+  assert(mechanicalCount>0&&mechanicalCount<6,'Mechanical search must show subset of Envision six roles');
+  const mechanicalTitles=await mechanicalJobs.locator('b').allTextContents();
+  assert(!mechanicalTitles.some(t=>/IT开发/i.test(t)),
+   'Unrelated IT role must never show under mechanical-major search');
+  for(const employerCard of await page.locator('[data-v2-search-company]').all()){
+   assert((await employerCard.locator('.hhba-v2-job-result').count())>0,'No empty employer should be displayed');
+   assert.equal(await employerCard.getAttribute('data-v2-match-kind'),'major');
+  }
+  await page.screenshot({path:out+'/mechanical-'+width+'-only-related-jobs.png',fullPage:true});
+  await input.fill('远景科技集团');
+  await mechanicalCard.waitFor({state:'visible',timeout:20000});
+  assert.equal(await mechanicalCard.locator('.hhba-v2-job-result').count(),6,
+   'Full employer-name search must still display all six reviewed directions');
+  result.mechanicalRoleFilter=true;
   const checks=[
     ['南方传媒','cn-autumn-026',6],
     ['南方','cn-autumn-026',6],
@@ -114,7 +137,7 @@ try{
   if(width===390)result.mobile=true;else result.desktop=true;
   await page.close();
  }
- assert(result.desktop&&result.mobile&&result.southern&&result.guangzhilv&&result.shortSearch&&result.details&&result.images&&result.qingdaoCaptions);
+ assert(result.desktop&&result.mobile&&result.southern&&result.guangzhilv&&result.shortSearch&&result.details&&result.images&&result.qingdaoCaptions&&result.mechanicalRoleFilter);
  result.status='PASS';
  writeFileSync(out+'/result.json',JSON.stringify(result,null,2)+'\n');
  console.log('HHBA_ONE_MAIN_BROWSER_SEARCH_AND_DETAILS_PASS',JSON.stringify(result));
