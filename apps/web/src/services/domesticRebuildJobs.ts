@@ -21,7 +21,11 @@ import boyuJobs from '../data/domesticBoyu2026OfficialSchoolRoles20261030.json';
 import type {LiveJob,LiveFilters,LivePage} from './liveRecruitment';
 import {employerProfiles,employerProfileByRoute,profileAliasesForJob} from './employerProfiles';
 
-export const DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券','辉瑞','中国南方航空','顺丰','网易游戏','鹰角网络','安克创新','徕芬科技','新鸿基地产','万科泊寓'] as const;
+const LEGACY_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券','辉瑞','中国南方航空','顺丰','网易游戏','鹰角网络','安克创新','徕芬科技','新鸿基地产','万科泊寓'] as const;
+export const DOMESTIC_REBUILD_APPROVED_COMPANIES=[
+ ...LEGACY_APPROVED_COMPANIES,
+ ...employerProfiles.filter(p=>!LEGACY_APPROVED_COMPANIES.some(name=>name===p.name)).map(p=>p.name)
+] as readonly string[];
 export const DOMESTIC_REBUILD_VERSION='2026-10-29-v2';
 const schneiderV2Records=schneider.jobs.map(job=>({
  id:'cn-v2-schneider-'+job.id,
