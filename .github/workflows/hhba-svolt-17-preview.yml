@@ -1,4 +1,5 @@
 name: HHBA SVOLT company 17 factory preview
+# Final acceptance: on [preview] execute Chromium tests and additive GitHub Pages deploy.
 # Release candidate: data-only enterprise 17; prior public site must be preserved.
 on:
   push:
