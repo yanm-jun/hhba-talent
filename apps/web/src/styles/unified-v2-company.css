@@ -15,23 +15,28 @@
 .hhba-v2-company-no-roles{font-size:13px;color:#6d8272}
 @media(max-width:680px){.hhba-v2-company-role-grid{grid-template-columns:1fr}}
 
-/* The user-approved four-card 031 layout; other enterprises retain their existing template. */
-.hhba-v2-qizheng .hhba-kpmg-hero{margin-bottom:15px}
-.hhba-v2-qizheng .hhba-kpmg-section{background:#fff;border:1px solid #e3e8ed;border-radius:14px;padding:24px;margin:0 0 15px}
-.hhba-v2-qizheng .hhba-v2-company-chips{margin:12px 0 0}
-.hhba-v2-qizheng .hhba-v2-company-chips button{color:#647286;background:#fff;border-color:#dfe6ed}
-.hhba-v2-qizheng .hhba-v2-company-chips button.selected{background:#0964a9;color:#fff;border-color:#0964a9}
-.hhba-v2-qizheng .hhba-v2-company-role-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-.hhba-v2-qizheng .hhba-v2-company-role{display:flex;flex-direction:column;border:1px solid #e3e8ed;border-radius:11px;min-height:145px}
-.hhba-v2-qizheng-role-actions{margin-top:auto;padding-top:9px;display:flex;justify-content:flex-end;gap:16px}
-.hhba-v2-qizheng-role-actions a{display:inline-flex;align-items:center;gap:4px;text-decoration:none;color:#07649d;font-size:12px;font-weight:700}
-.hhba-v2-qizheng .hhba-kpmg-service-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
-.hhba-v2-qizheng .hhba-kpmg-service{border-color:#e3e8ed}
-.hhba-v2-qizheng .hhba-kpmg-service-tags{color:#9a7955}
+/* Approved shared 4-card V2 layout used by 031 Qizheng and 032 WEIPU; other enterprise templates are unchanged. */
+.hhba-v2-showcase .hhba-kpmg-hero{margin-bottom:15px}
+.hhba-v2-showcase .hhba-kpmg-section{background:#fff;border:1px solid #e3e8ed;border-radius:14px;padding:24px;margin:0 0 15px}
+.hhba-v2-showcase .hhba-v2-company-chips{margin:12px 0 0}
+.hhba-v2-showcase .hhba-v2-company-chips button{color:#647286;background:#fff;border-color:#dfe6ed}
+.hhba-v2-showcase .hhba-v2-company-chips button.selected{background:#0964a9;color:#fff;border-color:#0964a9}
+.hhba-v2-showcase .hhba-v2-company-role-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.hhba-v2-showcase .hhba-v2-company-role{display:flex;flex-direction:column;border:1px solid #e3e8ed;border-radius:11px;min-height:145px}
+.hhba-v2-showcase-role-actions{margin-top:auto;padding-top:9px;display:flex;justify-content:flex-end;gap:16px}
+.hhba-v2-showcase-role-actions a{display:inline-flex;align-items:center;gap:4px;text-decoration:none;color:#07649d;font-size:12px;font-weight:700}
+.hhba-v2-showcase .hhba-kpmg-service-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.hhba-v2-showcase .hhba-kpmg-service{border-color:#e3e8ed}
+.hhba-v2-showcase .hhba-kpmg-service-tags{color:#9a7955}
 @media(max-width:760px){
- .hhba-v2-qizheng .hhba-kpmg-section{padding:17px 15px}
- .hhba-v2-qizheng .hhba-v2-company-role-grid,.hhba-v2-qizheng .hhba-kpmg-service-grid{grid-template-columns:1fr}
+ .hhba-v2-showcase .hhba-kpmg-section{padding:17px 15px}
+ .hhba-v2-showcase .hhba-v2-company-role-grid,.hhba-v2-showcase .hhba-kpmg-service-grid{grid-template-columns:1fr}
 }
 @media(min-width:761px) and (max-width:900px){
- .hhba-v2-qizheng .hhba-kpmg-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .hhba-v2-showcase .hhba-kpmg-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+/* WEIPU supplied wordmark stays legible in the standard brand header. */
+.hhba-v2-weipu .hhba-kpmg-logo img{max-width:73px;max-height:56px;width:100%;height:auto;object-fit:contain}
+.hhba-v2-weipu .hhba-kpmg-service-number{color:#8da2b5}
+.hhba-v2-weipu .hhba-kpmg-photo-grid img{object-position:center}

@@ -166,9 +166,19 @@ jobs:
           python apps/web/scripts/prepare-qizheng-media.py
           test -s apps/web/public/images/employer-profiles/cn-autumn-031/photo1.jpg
           test -s apps/web/public/images/employer-profiles/cn-autumn-031/photo2.jpg
+      - name: Prepare WEIPU approved logo and two independently sourced corporate images
+        run: |
+          python apps/web/scripts/prepare-weipu-media.py
+          test -s apps/web/public/images/employer-profiles/cn-autumn-032/logo.webp
+          test -s apps/web/public/images/employer-profiles/cn-autumn-032/photo1.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-032/photo2.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-032/media-audit.json
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
+      - name: Verify WEIPU screenshot layout, major matching and source provenance
+        working-directory: apps/web
+        run: node scripts/weipu-v2.contract.test.mjs
       - name: Validate source-backed talent policies and housing records
         working-directory: apps/web
         run: node scripts/audit-talent-service.mjs

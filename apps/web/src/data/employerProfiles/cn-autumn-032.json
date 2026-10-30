@@ -1,0 +1,357 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-032",
+  "name": "微谱",
+  "displayName": "微谱集团",
+  "englishName": "WEIPU GROUP",
+  "aliases": [
+    "上海微谱检测科技集团股份有限公司",
+    "微谱科技集团",
+    "微谱检测",
+    "WEIPU",
+    "WEIPU GROUP",
+    "Weipu Testing",
+    "微谱招聘",
+    "微谱2027校招"
+  ],
+  "industry": "检验检测 · 科研技术服务 · 新材料 · 生物医药",
+  "subtitle": "上海微谱检测科技集团股份有限公司 · 始于2008年 · 上海总部",
+  "overview": "微谱始于2008年，总部位于上海，是面向先进制造和生命科学领域的大型研究型检测机构。业务涵盖新材料及化学品、汽车与电子电器、生物医药、化妆品、生态环境和食品农产品等领域，提供分析测试、检测评价、研发服务、计量校准、认证审核、知识产权等科技服务。微谱招聘门户所列岗位分属不同部门和地区，具体要求以各岗位页面为准。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://www.weipuchem.net/abouts/1.html",
+    "https://www.weipuyiyao.com/",
+    "https://weipugroup.zhiye.com/",
+    "https://weipugroup.zhiye.com/campus/jobs",
+    "https://jinliqiuzhi.com/companies/%E5%BE%AE%E8%B0%B1",
+    "https://www.o-hr.com/recruit/company/detail/JvDwiNgD",
+    "https://www.weipuyiyao.com/project/yiliaoqixieyanjiu/huaxuebiaozhengyanjiu",
+    "https://english.shyp.gov.cn/ywb/Infocus/20240423/453190.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-032/logo.webp",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-032/photo1.jpg",
+        "caption": "微谱集团 · 医药分析实验室实景",
+        "alt": "微谱实验室技术人员操作高效液相色谱质谱仪",
+        "note": "照片来源：微谱药物及医疗器械实验室服务官网；为实际实验室场景，不是集团总部大楼。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-032/photo2.jpg",
+        "caption": "微谱集团 · 企业科技展示空间",
+        "alt": "上海杨浦区政府报道中微谱集团的企业科技成果展示区",
+        "note": "照片来源：上海市杨浦区政府英文网站2024年企业调研报道，展示的是微谱集团企业展区。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://weipugroup.zhiye.com/campus/jobs",
+    "label": "微谱集团官方招聘入口",
+    "status": "official_portal",
+    "subject": "微谱集团（职位最终用人主体以官方招聘系统为准）",
+    "note": "入口为微谱企业招聘门户；岗位资料整理自2026年9—10月的2027届秋招职位编号存档。部分列表通过动态接口加载，本平台不能据此断言每条岗位仍在招。"
+  },
+  "majorIntro": "选择专业方向，下方仅呈现与具体职位相关的岗位；例如机械/车辆只匹配汽车检测技术管培生，不展示全部化工、财务或营销职位。关联专业不等于满足官方投递资格。",
+  "preferredMajors": [
+    "化学",
+    "应用化学",
+    "化学工程与工艺",
+    "材料科学与工程",
+    "高分子材料与工程",
+    "车辆工程",
+    "机械工程",
+    "自动化",
+    "电气工程及其自动化",
+    "生物技术",
+    "药学",
+    "化妆品科学与技术",
+    "质量管理工程",
+    "食品科学与工程",
+    "计算机科学与技术",
+    "网络空间安全",
+    "人工智能",
+    "市场营销",
+    "会计学",
+    "财务管理"
+  ],
+  "photoNote": "企业Logo使用用户提供的WEIPU标志本地副本。两张独立企业照片来自微谱旗下实验室官网与上海市杨浦区政府公开报道，在GitHub Pages构建时打包为本地静态文件；图片无点击跳转。图片及商标权属各原权利人，HHBA不是微谱官方招聘代理。",
+  "business": [
+    {
+      "title": "新材料与化学品分析",
+      "description": "针对材料与化学品开展成分分析、异物分析、结构解析等。",
+      "tags": "化学 · 材料",
+      "details": [
+        "高分子与复合材料分析",
+        "化学成分与物性测试",
+        "产品失效与质量改善"
+      ]
+    },
+    {
+      "title": "先进制造与汽车检测",
+      "description": "服务汽车、电子电器及先进制造业的性能与可靠性验证。",
+      "tags": "机械 · 汽车",
+      "details": [
+        "新能源汽车整车及零部件测试",
+        "设备运行与可靠性试验",
+        "工业产品检测评价"
+      ]
+    },
+    {
+      "title": "生物医药与医疗器械",
+      "description": "为药物研发、生物分析与医疗器械提供实验室技术服务。",
+      "tags": "药学 · 生物",
+      "details": [
+        "药学研发及生物分析",
+        "医疗器械检测",
+        "分析方法开发与验证"
+      ]
+    },
+    {
+      "title": "美丽健康与化妆品",
+      "description": "覆盖化妆品功效、安全性、配方及法规技术服务。",
+      "tags": "化妆品 · 功效",
+      "details": [
+        "化妆品人体功效评价",
+        "消毒产品与法规注册",
+        "分析检测与技术咨询"
+      ]
+    },
+    {
+      "title": "生态环境与食品农产品",
+      "description": "面向生态环境、食品及农业提供检测分析与技术评价。",
+      "tags": "环保 · 食品",
+      "details": [
+        "环境监测与分析",
+        "食品农产品检测",
+        "检测报告与方法研究"
+      ]
+    },
+    {
+      "title": "计量校准与质量认证",
+      "description": "提供仪器计量校准、质量评价、认证审核与技术咨询。",
+      "tags": "质量 · 认证",
+      "details": [
+        "实验室质量体系服务",
+        "仪器计量校准",
+        "认证审核与知识产权服务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "j11547-aibp",
+      "title": "AIBP管培生（2027届）",
+      "city": "上海、合肥",
+      "url": "https://weipugroup.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://jinliqiuzhi.com/companies/%E5%BE%AE%E8%B0%B1",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "微谱集团招聘门户（具体用人单位请以职位页为准）",
+      "summary": "深入业务一线梳理需求，使用AI、编程或低代码工具建立业务应用原型。",
+      "requirements": "职位编号：J11547。J11547，2026-10-29发布，硕士学历。正式专业准入条件以原岗为准。 本站保留可查证的2026年秋季招聘资料；未验证每条职位今天仍开放申请。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "软件工程",
+        "信息管理与信息系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11545-sales",
+      "title": "销售管培生（2027届·西安）",
+      "city": "西安",
+      "url": "https://weipugroup.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://jinliqiuzhi.com/companies/%E5%BE%AE%E8%B0%B1",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "微谱集团招聘门户（具体用人单位请以职位页为准）",
+      "summary": "2027届销售管培生方向，参与业务拓展与客户沟通。",
+      "requirements": "职位编号：J11545。J11545，2026-10-28记录；岗位专业条件待官网逐项核对。 本站保留可查证的2026年秋季招聘资料；未验证每条职位今天仍开放申请。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "化学工程与工艺"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "以官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11530-vehicle",
+      "title": "技术管培生（2027届·汽车检测）",
+      "city": "广州",
+      "url": "https://weipugroup.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://jinliqiuzhi.com/companies/%E5%BE%AE%E8%B0%B1",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "微谱集团招聘门户（具体用人单位请以职位页为准）",
+      "summary": "协助新能源汽车整车测试、设备调试及检测数据整理。",
+      "requirements": "职位编号：J11530。J11530，2026-10-21记录；专业为根据汽车测试工作内容作编辑性关联。 本站保留可查证的2026年秋季招聘资料；未验证每条职位今天仍开放申请。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "车辆工程",
+        "机械工程",
+        "机械设计制造及其自动化",
+        "自动化",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11519-quality",
+      "title": "质量管培生（2027届）",
+      "city": "苏州",
+      "url": "https://weipugroup.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://jinliqiuzhi.com/companies/%E5%BE%AE%E8%B0%B1",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "微谱集团招聘门户（具体用人单位请以职位页为准）",
+      "summary": "参与质量管理体系学习、质量流程优化与业务质量协同。",
+      "requirements": "职位编号：J11519。J11519，2026-10-19记录，硕士学历；逐岗位专业要求以招聘系统为准。 本站保留可查证的2026年秋季招聘资料；未验证每条职位今天仍开放申请。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "质量管理工程",
+        "化学",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11506-sales-suzhou",
+      "title": "销售管培生（2027届·苏州）",
+      "city": "苏州",
+      "url": "https://weipugroup.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://jinliqiuzhi.com/companies/%E5%BE%AE%E8%B0%B1",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "微谱集团招聘门户（具体用人单位请以职位页为准）",
+      "summary": "负责区域客户开发与维护，开展行业研究并推进客户合作。",
+      "requirements": "职位编号：J11506。J11506，2026-10-19记录，包含行业轮岗与销售培养方向。 本站保留可查证的2026年秋季招聘资料；未验证每条职位今天仍开放申请。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理",
+        "化学",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11503-sales-shanghai",
+      "title": "销售管培生（2027届·上海）",
+      "city": "上海",
+      "url": "https://weipugroup.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://jinliqiuzhi.com/companies/%E5%BE%AE%E8%B0%B1",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "微谱集团招聘门户（具体用人单位请以职位页为准）",
+      "summary": "面向汽车材料检测需求开展技术服务与业务客户沟通。",
+      "requirements": "职位编号：J11503。J11503，2026-10-15记录；岗位明确提及化学、材料、化工相关专业背景。 本站保留可查证的2026年秋季招聘资料；未验证每条职位今天仍开放申请。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "化学",
+        "化学工程与工艺",
+        "材料科学与工程",
+        "高分子材料与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11473-cosmetic",
+      "title": "功效检测实习生（2027届）",
+      "city": "洛阳",
+      "url": "https://weipugroup.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://jinliqiuzhi.com/companies/%E5%BE%AE%E8%B0%B1",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "INTERNSHIP",
+      "recruitmentSubject": "微谱集团招聘门户（具体用人单位请以职位页为准）",
+      "summary": "协助化妆品人体皮肤功效测试、仪器操作及报告整理。",
+      "requirements": "职位编号：J11473。J11473，2026-10-08记录；专业要求包含化妆品、药学、生物、微生物、食品。 本站保留可查证的2026年秋季招聘资料；未验证每条职位今天仍开放申请。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "化妆品科学与技术",
+        "药学",
+        "生物技术",
+        "食品科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "大专及以上",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11458-cyber",
+      "title": "技术实习生（等保测评）",
+      "city": "上海",
+      "url": "https://weipugroup.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://jinliqiuzhi.com/companies/%E5%BE%AE%E8%B0%B1",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "INTERNSHIP",
+      "recruitmentSubject": "微谱集团招聘门户（具体用人单位请以职位页为准）",
+      "summary": "参与网络安全等保备案、报告审核和安全测评服务。",
+      "requirements": "职位编号：J11458。J11458，2026-09-26记录；明确计算机或网络安全相关专业。 本站保留可查证的2026年秋季招聘资料；未验证每条职位今天仍开放申请。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "网络空间安全",
+        "信息安全"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11426-finance",
+      "title": "财务管培生（2027届）",
+      "city": "上海",
+      "url": "https://weipugroup.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://jinliqiuzhi.com/companies/%E5%BE%AE%E8%B0%B1",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "微谱集团招聘门户（具体用人单位请以职位页为准）",
+      "summary": "参与账务处理、凭证录入、发票台账及财务管理学习。",
+      "requirements": "职位编号：J11426。J11426，2026-09-21记录；财会背景匹配为基于职责的辅助关联。 本站保留可查证的2026年秋季招聘资料；未验证每条职位今天仍开放申请。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "会计学",
+        "财务管理",
+        "审计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11425-finance-intern",
+      "title": "财务实习生（2027/2028届）",
+      "city": "上海",
+      "url": "https://weipugroup.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://jinliqiuzhi.com/companies/%E5%BE%AE%E8%B0%B1",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "INTERNSHIP",
+      "recruitmentSubject": "微谱集团招聘门户（具体用人单位请以职位页为准）",
+      "summary": "协助财务日常账务、单据整理与凭证归档。",
+      "requirements": "职位编号：J11425。J11425，2026-09-21记录；2027/2028届实习方向。 本站保留可查证的2026年秋季招聘资料；未验证每条职位今天仍开放申请。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "会计学",
+        "财务管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "以官网为准",
+      "currentOpenVerified": false
+    }
+  ]
+}
