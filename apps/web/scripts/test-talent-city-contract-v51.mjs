@@ -3,6 +3,7 @@ import {readFileSync,readdirSync} from 'node:fs';
 import {TALENT_POLICY_RECORDS} from '../src/data/talentPolicyRecords.ts';
 import {TALENT_HOUSING_RECORDS} from '../src/data/talentHousingRecords.ts';
 import {TALENT_HOUSING_RESEARCH_LEADS} from '../src/data/talentHousingResearch.ts';
+import {LIAOCHENG_POLICY_RECORDS} from '../src/data/liaochengPolicyRecords.ts';
 import {CERTIFIED_TALENT_GUIDES,CERTIFIED_TALENT_HOUSING_GUIDES,ACCEPTED_TALENT_CITIES,talentSourceKind,assessPolicy,assessHousing,assessTalentCity} from '../src/data/talentQuality.ts';
 
 const base=JSON.parse(readFileSync(new URL('../src/data/talentBaselineIds.json',import.meta.url),'utf8'));
@@ -215,9 +216,11 @@ check('Liaocheng V5.1: 2026 employment subsidies, historical housing and source-
   assert.notEqual(assessPolicy(p,'2026-10-30').grade,'A');
  }
  for(const id of ['lc-housing-rental-2022-history','lc-purchase-housing-2022-history']){
-  const p=current.find(x=>x.id===id);
+  const p=LIAOCHENG_POLICY_RECORDS.find(x=>x.id===id);
   assert.ok(p&&p.temporal==='historical'&&p.materials?.length>=3&&p.applicationSteps?.length>=4);
+  assert.equal(talentSourceKind(p.sourceUrl),'secondary');
   assert.equal(assessPolicy(p,'2026-10-30').grade,'C');
+  assert.ok(!current.some(x=>x.id===id),'Secondary history must not bypass government-only policy contract');
  }
  const leads=TALENT_HOUSING_RESEARCH_LEADS.filter(x=>x.city===city);
  assert.equal(leads.length,3,'Three distinct public reporting leads required');
@@ -232,6 +235,7 @@ check('Liaocheng V5.1: 2026 employment subsidies, historical housing and source-
  const cityCode=code('TalentServiceRoutes.tsx');
  assert.ok(cityCode.includes('housingResearchLeads(match.name)'));
  assert.ok(cityCode.includes('<UnifiedTalentHousingResearch city={city} query={query}/>'));
+ assert.ok(shared('UnifiedTalentHousingResearch.tsx').includes('housingPolicyResearch'),'History research must remain visible');
  assert.equal(ACCEPTED_TALENT_CITIES.includes(city),false);
 });
 console.log(JSON.stringify({passed,baseline:base.policyIds.length+base.housingIds.length,certified:Object.keys(CERTIFIED_TALENT_GUIDES).length,acceptedCities:ACCEPTED_TALENT_CITIES.length},null,2));
