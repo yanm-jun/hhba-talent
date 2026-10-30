@@ -1,13 +1,13 @@
 name: HHBA SVOLT company 17 factory preview
-# Release candidate: data-only enterprise 16; prior public site must be preserved.
+# Release candidate: data-only enterprise 17; prior public site must be preserved.
 on:
   push:
     branches: [feat/employer-factory-pilot-svolt-17-20261030]
     paths:
-      - '.github/workflows/hhba-svolt-16-preview.yml'
+      - '.github/workflows/hhba-svolt-17-preview.yml'
       - 'apps/web/src/data/employerProfiles/cn-autumn-013.json'
       - 'apps/web/public/images/employer-profiles/cn-autumn-013/**'
-      - 'apps/web/scripts/svolt-16.browser.mjs'
+      - 'apps/web/scripts/svolt-17.browser.mjs'
   workflow_dispatch:
 permissions:
   contents: read
@@ -15,7 +15,7 @@ permissions:
   pages: write
   id-token: write
 concurrency:
-  group: hhba-svolt-factory-16-preview
+  group: hhba-svolt-factory-17-preview
   cancel-in-progress: false
 jobs:
   build-and-test:
@@ -72,13 +72,13 @@ jobs:
             if curl -fsS http://127.0.0.1:4173/hhba-talent/preview-svolt/ >/dev/null; then break; fi
             sleep 1
           done
-          node scripts/svolt-16.browser.mjs
+          node scripts/svolt-17.browser.mjs
       - name: Upload screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: svolt-16-factory-evidence
-          path: apps/web/svolt-16-proof/
+          name: svolt-17-factory-evidence
+          path: apps/web/svolt-17-proof/
           if-no-files-found: ignore
           retention-days: 14
       - name: Add deep links for new data-driven company and roles
