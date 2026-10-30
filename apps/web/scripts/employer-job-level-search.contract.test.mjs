@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {searchEmployersByIndividualRoles,isMajorSearch,matchesJobMajor} from '../src/services/employerJobSearch.mjs';
-const ids=Array.from({length:17},(_,i)=>'cn-autumn-'+String(i+12).padStart(3,'0'));
+const ids=Array.from({length:18},(_,i)=>'cn-autumn-'+String(i+12).padStart(3,'0'));
 const employers=ids.map(id=>JSON.parse(readFileSync('src/data/employerProfiles/'+id+'.json','utf8')));
 const majors=JSON.parse(readFileSync('src/data/officialAcademicMajors.json','utf8')).records.map(r=>r.name);
 const search=(q,selectedMajor='')=>searchEmployersByIndividualRoles(employers,q,{selectedMajor,knownMajors:majors});
@@ -54,6 +54,21 @@ assert(selectedRoad&&majorRoad&&selectedRoad.jobs.length===1&&majorRoad.jobs.len
  'Road & Bridge mechanical search should show ONLY its mechanical-equipment position');
 assert.equal(majorRoad.jobs[0].id,'mechanical-equipment');
 assert(!majorRoad.jobs.some(j=>/财务|法务|行政|施工技术/.test(j.title)));
+const power=search('中电建电力集团').find(x=>x.profile.id==='cn-autumn-029');
+assert(power&&power.jobs.length===8,'Short power company name should surface 8 actual 2027 roles');
+const control=search('自动化').find(x=>x.profile.id==='cn-autumn-029');
+assert(control&&control.jobs.length===1&&control.jobs[0].id==='thermal-control',
+  'Automation search must show thermal control role, not all 8 power positions');
+const computer=search('计算机科学与技术').find(x=>x.profile.id==='cn-autumn-029');
+assert(computer&&computer.jobs.length===1&&computer.jobs[0].id==='it-engineer',
+ 'Computer science should show only the IT engineer');
+const electric=search('电气工程及其自动化').find(x=>x.profile.id==='cn-autumn-029');
+assert(electric&&electric.jobs.length===1&&electric.jobs[0].id==='thermal-electrical',
+ 'Electrical engineering must show power electrical position only');
+const noInventedMechanical=search('机械').find(x=>x.profile.id==='cn-autumn-029');
+assert(!noInventedMechanical,'2027 eight-position list has no explicitly mechanical job; do not infer all power jobs match');
+const manuallyFilter=search('中电建电力集团','自动化').find(x=>x.profile.id==='cn-autumn-029');
+assert(manuallyFilter&&manuallyFilter.jobs.length===1&&manuallyFilter.jobs[0].id==='thermal-control');
 const it=search('IT').find(x=>x.profile.id===envis.id);
 assert(it&&it.jobs.length>0&&it.jobs.length<envis.jobs.length,
  'Role-title search should also show only matching individual roles');
