@@ -1,0 +1,156 @@
+name: HHBA Boyu 15 isolated Pages preview
+on:
+  push:
+    branches: [feat/boyu-15-static-v2-20261030]
+    paths:
+      - '.github/workflows/hhba-boyu-15-pages.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: hhba-boyu-15-pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/boyu-15-static-v2-20261030
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Locked dependencies
+        run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Verify prior companies, two sourced Boyu roles, major and shared logo registry
+        working-directory: apps/web
+        run: |
+          node scripts/boyu-15.contract.test.mjs
+          node scripts/domestic-rebuild-v2.contract.test.mjs
+          node scripts/anker-2027.contract.test.mjs
+          node scripts/laifen-13.contract.test.mjs
+          node scripts/shkp-14.contract.test.mjs
+          node scripts/major-company-job-flow.contract.test.mjs
+          node scripts/all-company-major-chips.contract.test.mjs
+          node scripts/company-brand-unified.contract.test.mjs
+          node scripts/company-single-char-search.contract.test.mjs
+      - name: Build independently at nested Pages base
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/preview-boyu/'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_DEMO_ACCOUNT_ENABLED: '0'
+        run: |
+          npm run build
+          cp dist/index.html dist/404.html
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const roles=JSON.parse(fs.readFileSync('src/data/domesticBoyu2026OfficialSchoolRoles20261030.json','utf8')).jobs;
+          const routes=['companies/autumn/cn-autumn-011','candidate/jobs',...roles.map(j=>'candidate/jobs/cn-v2-boyu-'+j.id)];
+          if(routes.length!==4)throw Error('Incorrect role deep-links');
+          for(const route of routes){fs.mkdirSync('dist/'+route,{recursive:true});fs.copyFileSync('dist/index.html','dist/'+route+'/index.html')}
+          fs.writeFileSync('dist/.nojekyll','');
+          NODE
+          test -s dist/images/boyu-user/boyu-logo.webp
+          test -s dist/images/boyu-user/boyu-exterior.webp
+          test -s dist/images/boyu-user/boyu-lobby.webp
+          test -s dist/curated/v1/jobs.json
+          grep -q '/hhba-talent/preview-boyu/assets/' dist/index.html
+      - name: Install Playwright
+        working-directory: apps/web
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Browser-test original photos, single Han, English search, jobs, chips and mobile
+        working-directory: apps/web
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/boyu-vite.log 2>&1 &
+          for i in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:4173/hhba-talent/preview-boyu/ >/dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/boyu-15.browser.mjs
+      - name: Save visual review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-boyu-15-desktop-mobile
+          path: apps/web/boyu-15-review/
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Recover last verified public Pages output without replacing existing pages
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 41002250357
+          github-token: ${{ github.token }}
+          path: prior-pages
+      - name: Protect existing home and 12-14 previews, add independent Boyu preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          asset=$(find prior-pages -type f -name 'artifact.tar*' -print -quit)
+          test -n "$asset"
+          mkdir -p published
+          if [[ "$asset" == *.gz ]]; then tar -xzf "$asset" -C published; else tar -xf "$asset" -C published; fi
+          for f in published/index.html published/preview-anker/index.html published/preview-laifen/index.html published/preview-shkp/index.html; do test -s "$f"; done
+          curl -fsSL --retry 3 --max-time 45 'https://yanm-jun.github.io/hhba-talent/' -o /tmp/root-current
+          curl -fsSL --retry 3 --max-time 45 'https://yanm-jun.github.io/hhba-talent/preview-shkp/' -o /tmp/shkp-current
+          cmp published/index.html /tmp/root-current
+          cmp published/preview-shkp/index.html /tmp/shkp-current
+          test ! -e published/preview-boyu
+          mkdir -p published/preview-boyu
+          cp -a apps/web/dist/. published/preview-boyu/
+          cmp published/index.html /tmp/root-current
+          cmp published/preview-shkp/index.html /tmp/shkp-current
+          test -s published/preview-boyu/companies/autumn/cn-autumn-011/index.html
+          touch published/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: published
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    environment:
+      name: hhba-company200-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify public URLs and image files
+        run: |
+          set -euo pipefail
+          root='https://yanm-jun.github.io/hhba-talent'
+          for i in 1 2 3 4 5 6; do
+            if curl -fsSL "$root/preview-boyu/companies/autumn/cn-autumn-011/" -o /tmp/boyu.html &&
+               curl -fsSL "$root/preview-boyu/images/boyu-user/boyu-logo.webp" -o /tmp/logo.webp &&
+               curl -fsSL "$root/preview-boyu/images/boyu-user/boyu-exterior.webp" -o /tmp/exterior.webp &&
+               curl -fsSL "$root/preview-boyu/images/boyu-user/boyu-lobby.webp" -o /tmp/lobby.webp &&
+               curl -fsSL "$root/preview-boyu/candidate/jobs/cn-v2-boyu-wanyusheng-tianjin/" -o /tmp/detail.html; then break; fi
+            if [ "$i" = 6 ]; then exit 1; fi
+            sleep 10
+          done
+          grep -q '/hhba-talent/preview-boyu/assets/' /tmp/boyu.html
+          test $(wc -c </tmp/logo.webp) -gt 2000
+          test $(wc -c </tmp/exterior.webp) -gt 7000
+          test $(wc -c </tmp/lobby.webp) -gt 5000
+          grep -q '/hhba-talent/preview-boyu/assets/' /tmp/detail.html
+          curl -fsSL "$root/" -o /tmp/old-home
+          grep -q '/hhba-talent/assets/' /tmp/old-home
+          echo HHBA_BOYU_15_PAGES_PUBLISHED_AND_VERIFIED
