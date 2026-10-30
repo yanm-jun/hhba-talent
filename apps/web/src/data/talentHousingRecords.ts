@@ -1,3 +1,4 @@
+import {ZIBO_HOUSING_RECORDS} from './ziboHousingRecords.ts';
 import {WEIFANG_HOUSING_RECORDS} from './weifangHousingRecords.ts';
 // HHBA 住房项目：仅采用政府及政务服务官方来源，记录批次不等于实时房源。
 export type TalentHousingRecord={id:string;city:string;district:string;title:string;address:string;units:string;rent:string;eligibility:string;sourceUrl:string;published:string;applicationEnd?:string;statusNote:string;steps:string[];applyUrl?:string;kind:'project'|'program';reviewedAt:string;contactPhone?:string;contactSourceUrl?:string;photoEvidence?:'source';housingCategory?:'人才公寓'|'保障性租赁住房'|'其他住房';};
@@ -57,4 +58,5 @@ export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
 {id:"cq-xinfeng-housing",city:"重庆",district:"重庆高新区（政策入口）",title:"重庆高新区新凤人才公寓住房支持",address:"仅重庆高新区政策适用区域；项目名称、地址及房源通过“渝才荟”最新公告核对",units:"符合条件的高新区人才公寓支持政策，不是某个具体公寓项目，也不代表有空房",rent:"符合条件博士可享3年免租；特定紧缺岗位硕士等符合资格者租金实付30%补贴，最高每月600元、最长2年",eligibility:"首次在渝全职就业、与高新区企业签约3年以上，满足人才认定、无房条件及补贴互斥规则",sourceUrl:"https://gxq.cq.gov.cn/zwgk_202/zfxxgkml/zcwj/xzgfxwj/202606/t20260617_15759907.html",published:"2026-06-17",statusNote:"高新区制度型住房支持，具体公寓实时房源和申请批次需通过“渝快办-渝才荟”核验",steps:["核对重庆高新区新凤人才类别与就业资格","对照细则确认购房补贴、安家补贴和租房支持的互斥情况","由工作单位按规定在“渝快办-渝才荟”办理","审核合格后按实际房源或补贴发放规则执行"],kind:"program",reviewedAt:"2026-10-30"},
 
 ...WEIFANG_HOUSING_RECORDS,
+...ZIBO_HOUSING_RECORDS,
 ];
