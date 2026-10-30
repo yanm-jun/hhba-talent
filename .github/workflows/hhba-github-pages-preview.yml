@@ -142,6 +142,15 @@ jobs:
           test -s apps/web/public/images/employer-profiles/cn-autumn-029/photo1.jpg
           test -s apps/web/public/images/employer-profiles/cn-autumn-029/photo2.jpg
           test -s apps/web/public/images/employer-profiles/cn-autumn-029/media-audit.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('apps/web/public/images/employer-profiles/cn-autumn-029/media-audit.json')
+          a=json.loads(p.read_text())
+          assert len(a)==3 and all(v.get('verified') for v in a.values()),'029 must use 3 actual official images, not placeholders'
+          assert len({v['sha256'] for v in a.values()})==3,'029 corporate assets must be independent'
+          print('HHBA_POWER_INVEST_3_OFFICIAL_MEDIA_VERIFIED')
+          PY
           echo HHBA_CN_AUTUMN_029_MEDIA_PACKAGED
       - name: Install dependencies
         working-directory: apps/web
