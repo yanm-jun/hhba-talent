@@ -29,7 +29,7 @@ export function buildCityPolicyConfig(city:string):CityPolicyConfig{
  const rows=TALENT_POLICY_RECORDS.filter(p=>p.city===city);
  const clip=(value:string,max:number)=>value.length<=max?value:value.slice(0,max-1).replace(/[，,、;\s]+$/,'')+'…';
  return {
-  city,subtitle:'全国统一V3列表。按已核验资料检索真实政策；待遇和资格请在详情及原文中核对。',
+  city,subtitle:'全国统一V5.1标准。按已收录政策核对来源、待遇、资格和办理流程；基础资料不代表当前可申领。',
   notes:'只有已经核实的政策才会显示对应待遇；未获得独立完整指南认证的记录保持基础资料等级。',
   tiles:rows.map(p=>({
    id:p.id,category:p.category==='购房补贴'?'购房安家':p.category,
