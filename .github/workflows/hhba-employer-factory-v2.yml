@@ -7,6 +7,8 @@ on:
       - 'apps/web/src/data/employerProfiles/**'
       - 'apps/web/public/images/employer-profiles/**'
       - 'apps/web/scripts/factory-v2-*'
+      - 'apps/web/scripts/company-single-char-search.contract.test.mjs'
+      - 'apps/web/src/components/UnifiedJobMarket.tsx'
       - 'apps/web/src/styles/kpmg-compact-profile.css'
       - 'apps/web/src/components/HomeCompanyMarquee.tsx'
   workflow_dispatch:
