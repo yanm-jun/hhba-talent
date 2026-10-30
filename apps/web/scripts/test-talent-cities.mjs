@@ -21,9 +21,14 @@ check('2025 city codes and Chinese full names',()=>{
  }
 });
 check('pinyin, initials and uppercase names recognized',()=>{
- for(const [query,name] of [['linyi','临沂'],['LINYI','临沂'],['ly','临沂'],['lianyun gang','连云港'],['liaocheng','聊城'],['jinan','济南'],['shenzhen','深圳'],['beijing','北京'],['cq','重庆'],['ri ka ze','日喀则']]){
+ for(const [query,name] of [['linyi','临沂'],['LINYI','临沂'],['lianyun gang','连云港'],['liaocheng','聊城'],['jinan','济南'],['shenzhen','深圳'],['beijing','北京'],['cq','重庆'],['ri ka ze','日喀则']]){
   assert.equal(findTalentCity(query)?.name,name,query);
  }
+});
+check('ambiguous initials do not silently open the wrong city',()=>{
+ assert.equal(findTalentCity('ly'),null);
+ const suggested=suggestTalentCities('ly',30).map(x=>x.name);
+ assert.ok(suggested.includes('临沂')&&suggested.includes('龙岩'));
 });
 check('prefecture cities resolve province-prefixed city phrases without inventing policy',()=>{
  assert.equal(parseTalentCityQuery('山东省临沂市').city,'临沂');
@@ -59,4 +64,4 @@ check('unknown city is not misidentified as a city',()=>{
  assert.equal(findTalentCity('不存在的城市'),null);
  assert.equal(parseTalentCityQuery('不存在的城市').matchedCity,false);
 });
-console.log(JSON.stringify({passed,expected:11,municipalities:4,prefectureCities:293,totalCities:297,provinceGroups:TALENT_PROVINCES.length},null,2));
+console.log(JSON.stringify({passed,expected:12,municipalities:4,prefectureCities:293,totalCities:297,provinceGroups:TALENT_PROVINCES.length},null,2));
