@@ -38,9 +38,12 @@ function initialCompanyQuery(){
    return ['OpenAI','Anthropic','SpaceX'].includes(company||'')?company!:'';
  }catch{return ''}
 }
-function initialJobQuery(){
-  try{return new URLSearchParams(location.search).get('q')?.trim().slice(0,100)||'';}
-  catch{return '';}
+function explicitUrlJobQuery():string|null{
+  // Shared URL overrides an older history.state search.
+  try{
+    const params=new URLSearchParams(location.search);
+    return params.has('q')?(params.get('q')||'').trim().slice(0,100):null;
+  }catch{return null;}
 }
 const typeLabel: Record<string,{zh:string,en:string}>={SOCIAL:{zh:'社会招聘',en:'Professional'},CAMPUS:{zh:'校园招聘',en:'Graduate'},INTERNSHIP:{zh:'实习招聘',en:'Internship'},SPECIAL:{zh:'专项招聘',en:'Special program'}};
 const formatDate=(value?:string)=>value&&Number.isFinite(Date.parse(value)) ? value.slice(0,10) : '--';
@@ -109,7 +112,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
     const saved=previous?.filters.company;
     return {...emptyFilters,...previous?.filters,
       major_slug:getSavedMajor(),include_unknown_majors:previous?.filters.include_unknown_majors===true,
-      q:previous?.draft??initialJobQuery(),
+      q:explicitUrlJobQuery()??previous?.draft??'',
       company:typeof saved==='string'&&saved.length<=100?saved:initialCompanyQuery()};
   });
   const {slug:selectedMajor,choose:selectMajor}=useSharedMajorSelection();
@@ -117,8 +120,8 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
     setPage(0);
     setFilters(f=>f.major_slug===selectedMajor?f:{...f,major_slug:selectedMajor});
   },[selectedMajor]);
-  const [draft,setDraft]=useState(()=>readMarketState(compact)?.draft??initialJobQuery());
-  const [page,setPage]=useState(()=>readMarketState(compact)?.page??0);
+  const [draft,setDraft]=useState(()=>explicitUrlJobQuery()??readMarketState(compact)?.draft??'');
+  const [page,setPage]=useState(()=>explicitUrlJobQuery()!==null?0:readMarketState(compact)?.page??0);
   const [snapshot,setSnapshot]=useState<LivePage|null>(null);
   const [error,setError]=useState('');
   const [loading,setLoading]=useState(true);
@@ -168,7 +171,12 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   useEffect(()=>{
     const state={scope:compact?'home' as const:'jobs' as const,filters,draft,page};
     const previous=history.state&&typeof history.state==='object'?history.state:{};
-    history.replaceState({...previous,hhbaMarketState:state},'');
+    // Shareable query: synchronize the address bar, not only history.state.
+    const url=new URL(location.href);
+    const searchText=draft.trim();
+    if(searchText)url.searchParams.set('q',searchText);
+    else url.searchParams.delete('q');
+    history.replaceState({...previous,hhbaMarketState:state},'',url.pathname+url.search+url.hash);
   },[compact,filters,draft,page]);
   const defaultView=isDefaultMarketFilters(filters,page);
   useEffect(()=>{
@@ -281,6 +289,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   const market=<section className="unified-market" aria-labelledby="unified-market-title">
     <div className="unified-market-heading"><div><small>HHBA · RECRUITMENT</small>
       <h2 id="unified-market-title">{lang==='zh'?'招聘市场':'Job market'}</h2>
+       {import.meta.env.BASE_URL.includes('/preview-factory-v2/')&&<small data-hhba-preview-version="factory-v2" className="unified-preview-label">{lang==='zh'?'企业工厂 V2 · 独立验收预览（非正式主站）':'Employer Factory V2 · Review preview (not the live site)'}</small>}
       <p>{rebuilding?(lang==='zh'?'海外精选岗位与逐家审核通过的国内岗位 · 使用同一套卡片和站内详情':'Overseas curated jobs and individually reviewed China roles in one layout'):curatedHundred?(lang==='zh'?'精选 10 家知名海外企业 · 100 条已存档岗位（状态待核实）':'100 archived roles from 10 companies; current availability unverified.'):officialThree?(lang==='zh'?'OpenAI、Anthropic、SpaceX 官方公开招聘 · 只展示本次从招聘系统核验到的职位，随时可能变化':'OpenAI, Anthropic and SpaceX public ATS listings · Verified at latest sync'):domesticOnly?(lang==='zh'?'国内历史招聘岗位静态测试 · 岗位状态以企业官网为准':'Historical China listings preview · Check employer for availability'):lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
       <LanguageSwitcher lang={lang} change={change}/></div>
     {controls}
