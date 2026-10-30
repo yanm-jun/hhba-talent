@@ -59,7 +59,7 @@ test('country, city, type, education, experience and skills use AND not fuzzy OR
   .rows.map(j=>j.id),['e']);
  assert.deepEqual(searchJobs(jobs,{q:'新加坡 python 软件工程师',education:'BACHELOR',experience:'1-3'},facets)
   .rows.map(j=>j.id),['a']);
- assert.equal(searchJobs(jobs,{q:'新加坡 python 软件工程师',education:'MASTER'},facets).rows.length,0);
+ assert.deepEqual(searchJobs(jobs,{q:'新加坡 python 软件工程师',education:'MASTER'},facets).rows.map(j=>j.id),['a'],'硕士应看到最低本科的相关岗位');
  assert.deepEqual(searchJobs(jobs,{experience:'unreported',location_country:'US'},facets).rows.map(j=>j.id),['d']);
 });
 test('classifies internships and campus positions without calling all ordinary titles officially social',()=>{
