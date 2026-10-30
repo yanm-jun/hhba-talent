@@ -1,5 +1,5 @@
 import {useMemo,useState} from 'react';
-import {ArrowLeft,ArrowRight,ArrowUpRight,CheckCircle2,Clock3,FileText,ShieldCheck,SlidersHorizontal} from 'lucide-react';
+import {ArrowLeft,ArrowRight,ArrowUpRight,Clock3,FileText,ShieldCheck,SlidersHorizontal} from 'lucide-react';
 import {Link} from '../router';
 import {TALENT_POLICY_RECORDS,type TalentPolicyRecord} from '../data/talentPolicyRecords';
 import './talentJinanPolicyPreview.css';
