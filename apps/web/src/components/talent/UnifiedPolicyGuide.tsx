@@ -27,7 +27,7 @@ export function UnifiedPolicyGuide({data}:{data:CompleteGuide}){
  const selectedContact=data.contacts.find(c=>c.name===contact)||data.contacts[0];
  const availablePortal=Boolean(data.officialUrl);
  return <main className="jgd-page">
-  <nav className="jgd-breadcrumb"><Link to="/talent-service">人才服务</Link><span>›</span><Link to={data.listPath}>{data.city}人才政策</Link><span>›</span>{data.qualityLevel==='B'?'分步办理资料 · 基础等级':data.qualityLevel==='C'?'历史配租资料 · 已截止':'完整办理指南'}</nav>
+  <nav className="jgd-breadcrumb"><Link to="/talent-service">人才服务</Link><span>›</span><Link to={data.listPath}>{data.city}人才政策</Link><span>›</span>{data.qualityLevel==='B'?'分步办理资料 · 基础等级':data.qualityLevel==='C'?'历史或已截止资料 · 不可直接申报':'完整办理指南'}</nav>
   <header className="jgd-hero"><div className="jgd-hero-text"><span className="jgd-kicker">HHBA / {data.kicker}</span><h1>{data.title}</h1><p>{data.desc}</p>
    <div className="jgd-tags"><span>政府来源可追溯</span><span>按不同资格核对</span><span>{data.review}</span></div></div>
    <div className="jgd-hero-aside"><span>政策支持／配租规模</span><strong>{data.support}</strong><small>{data.unit}</small><span>{data.limit}</span></div>
