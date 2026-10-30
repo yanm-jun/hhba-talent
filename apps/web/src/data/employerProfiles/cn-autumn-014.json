@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-014",
+  "name": "中国能建国际集团",
+  "englishName": "Energy China International Group",
+  "aliases": [
+    "能建国际",
+    "中国能建国际",
+    "中能建国际建设集团有限公司",
+    "中国能建国际集团",
+    "CEEC International",
+    "Energy China International"
+  ],
+  "industry": "海外能源工程 · 国际项目管理 · 新能源与基础设施 · 工程投资",
+  "subtitle": "中国能源建设股份有限公司全资子公司 · 海外投资、市场开发与工程履约管理",
+  "overview": "中国能建国际集团（中能建国际建设集团有限公司）是中国能建国际业务发展的核心统筹平台。国际工程公司是集团下属的海外项目实施主体，两者不等同于中国能建母公司其他用人单位。本页招聘仅对应国际集团。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://www.gjjt.ceec.net.cn/col/col56814/index.html",
+    "https://www.gjjt.ceec.net.cn/col/col56825/index.html",
+    "https://job.hust.edu.cn/zpinfo1/2435714.htm",
+    "https://career.nankai.edu.cn/correcruit/content/id/119338.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-014/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-014/photo1.webp",
+        "caption": "沙特哈登光伏项目",
+        "note": "中国能建国际工程公司官网项目图片 · 国际集团下属项目实施主体",
+        "alt": "中国能建海外沙特哈登光伏项目现场人员与施工区域"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-014/photo2.webp",
+        "caption": "海外项目工程建设现场",
+        "note": "中国能建国际工程公司官网海外工程项目图片 · 非国际集团总部照片",
+        "alt": "沙特哈登光伏项目升压站施工现场与工程团队"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://xyz.51job.com/consumer/pc/home/index?ctmid=8912309",
+    "label": "中国能建国际集团2027届校招入口",
+    "status": "official_portal",
+    "subject": "中能建国际建设集团有限公司",
+    "note": "华中科技大学、南开大学2026年9月发布校招说明中列明同一2027届网申链接。岗位类型来源于公开简章，具体职位链接与实时可投状态尚未逐项核实。"
+  },
+  "majorIntro": "依据华中科技大学2026年9月16日发布的中国能建国际集团2027届校招简章，以及高校就业平台的岗位方向归纳。以下5项为招聘岗位类别，通常要求2027届硕士，工作地点北京或海外，部分岗位需要接受海外常驻及具备语言能力。并非5个已确认实时开放的独立职位。",
+  "preferredMajors": [
+    "电气工程及其自动化",
+    "能源与动力工程",
+    "新能源科学与工程",
+    "工程管理",
+    "工程造价",
+    "安全工程",
+    "法学",
+    "物流管理",
+    "管理科学与工程"
+  ],
+  "photoNote": "本页 Logo 使用中国能建体系的官方集团品牌标识，不代表额外创造的‘国际集团专属 Logo’。两张独立项目照片来自中国能建国际工程公司（国际集团下属的海外项目实施主体）官网；图片本身不设置外链。岗位依据高校公开校招简章，具体投递请在校招系统核验。",
+  "business": [
+    {
+      "title": "国际能源电力工程",
+      "description": "围绕海外能源电力项目的规划、工程建设和履约管理提供综合服务。",
+      "tags": "电力工程 · 国际 EPC · 工程履约",
+      "details": [
+        "海外发电项目工程管理",
+        "电力系统建设",
+        "国际总承包协同"
+      ]
+    },
+    {
+      "title": "新能源与光储项目",
+      "description": "在海外开展光伏、风电和储能等清洁能源项目的开发、投资与项目建设。",
+      "tags": "光伏 · 风电 · 储能",
+      "details": [
+        "新能源工程项目",
+        "国际新能源投资开发",
+        "清洁能源系统建设"
+      ]
+    },
+    {
+      "title": "海外市场与投资",
+      "description": "为集团国际项目统筹市场开拓、经营布局和投融资资源对接。",
+      "tags": "国际投资 · 商务开发 · 全球市场",
+      "details": [
+        "国际市场开发与统筹",
+        "能源项目投资合作",
+        "海外业务发展规划"
+      ]
+    },
+    {
+      "title": "国际项目履约管理",
+      "description": "协调海外在建项目进度、成本、质量、安全与分包管理，实现工程交付。",
+      "tags": "项目管理 · 商务合同 · 安全质量",
+      "details": [
+        "国际合同及进度管理",
+        "项目风险控制",
+        "海外工程协同履约"
+      ]
+    },
+    {
+      "title": "水利交通与基础设施",
+      "description": "协同中国能建有关企业承接海外水利、交通、市政及其他基础设施项目。",
+      "tags": "水利 · 交通 · 市政",
+      "details": [
+        "水利水电工程合作",
+        "道路交通和市政建设",
+        "基础设施项目交付"
+      ]
+    },
+    {
+      "title": "海外合规与资源协同",
+      "description": "统筹不同国家和地区的法务、物流、采购及组织保障。",
+      "tags": "涉外法务 · 国际物流 · 人才培养",
+      "details": [
+        "国际法务与商业合规",
+        "跨境物流和物资管理",
+        "海外人员及业务保障"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "technical-management-2027",
+      "title": "技术管理岗",
+      "majorNames": [
+        "能源与动力工程",
+        "新能源科学与工程",
+        "储能科学与工程",
+        "电气工程及其自动化"
+      ],
+      "editorialRelatedMajors": [
+        "自动化",
+        "电力系统及其自动化"
+      ],
+      "summary": "对应国际能源电力、新能源和储能项目的技术管理方向；具体工作任务以中国能建国际集团校招职位为准。",
+      "requirements": "2027届硕士毕业生；能源动力、新能源、储能、电气工程等专业背景；按校招说明应能接受海外工作安排。",
+      "city": "北京 / 海外（方向性地点）",
+      "url": "https://xyz.51job.com/consumer/pc/home/index?ctmid=8912309",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2435714.htm",
+      "observedOn": "2026-09-16",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中能建国际建设集团有限公司",
+      "majorUnrestricted": false,
+      "educationLabel": "2027届硕士毕业生",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "commercial-contract-2027",
+      "title": "商务合同管理岗",
+      "majorNames": [
+        "管理科学与工程",
+        "工程管理",
+        "工程造价",
+        "经济学",
+        "统计学"
+      ],
+      "editorialRelatedMajors": [
+        "国际经济与贸易"
+      ],
+      "summary": "对应海外工程商务合同、成本管理、工程预算及相关经济管理支持方向。",
+      "requirements": "2027届硕士；管理科学与工程、工程管理、造价、经济或统计学等方向，语言能力与驻外要求以招聘公告为准。",
+      "city": "北京 / 海外（方向性地点）",
+      "url": "https://xyz.51job.com/consumer/pc/home/index?ctmid=8912309",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2435714.htm",
+      "observedOn": "2026-09-16",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中能建国际建设集团有限公司",
+      "majorUnrestricted": false,
+      "educationLabel": "2027届硕士毕业生",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "legal-affairs-2027",
+      "title": "法务管理岗",
+      "majorNames": [
+        "法学",
+        "国际法",
+        "经济法",
+        "民商法"
+      ],
+      "editorialRelatedMajors": [
+        "国际经济与贸易"
+      ],
+      "summary": "对应海外投资项目和国际合同履约的法律支持、合同合规及跨境业务法务方向。",
+      "requirements": "2027届硕士；法学、国际法、经济法、民商法等相关专业，具备适合海外业务的语言与合规基础。",
+      "city": "北京 / 海外（方向性地点）",
+      "url": "https://xyz.51job.com/consumer/pc/home/index?ctmid=8912309",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2435714.htm",
+      "observedOn": "2026-09-16",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中能建国际建设集团有限公司",
+      "majorUnrestricted": false,
+      "educationLabel": "2027届硕士毕业生",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "qhsse-safety-2027",
+      "title": "安全管理岗",
+      "majorNames": [
+        "安全工程",
+        "安全科学与工程"
+      ],
+      "editorialRelatedMajors": [
+        "环境工程",
+        "工程管理"
+      ],
+      "summary": "对应海外工程建设项目安全管理、风险识别及现场施工安全管理方向。",
+      "requirements": "2027届硕士；安全工程、安全科学与工程等专业方向；可接受国际项目驻外。",
+      "city": "北京 / 海外（方向性地点）",
+      "url": "https://xyz.51job.com/consumer/pc/home/index?ctmid=8912309",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2435714.htm",
+      "observedOn": "2026-09-16",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中能建国际建设集团有限公司",
+      "majorUnrestricted": false,
+      "educationLabel": "2027届硕士毕业生",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "overseas-logistics-2027",
+      "title": "物流管理岗",
+      "majorNames": [
+        "物流管理",
+        "交通运输",
+        "交通运输工程"
+      ],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "管理科学与工程"
+      ],
+      "summary": "对应海外项目物资供应、物流运输协调及国际项目配套物流管理方向。",
+      "requirements": "2027届硕士；物流管理与工程、交通运输管理等相关背景；具体工作地点及驻外要求以官网为准。",
+      "city": "北京 / 海外（方向性地点）",
+      "url": "https://xyz.51job.com/consumer/pc/home/index?ctmid=8912309",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2435714.htm",
+      "observedOn": "2026-09-16",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中能建国际建设集团有限公司",
+      "majorUnrestricted": false,
+      "educationLabel": "2027届硕士毕业生",
+      "currentOpenVerified": false
+    }
+  ],
+  "mediaSources": {
+    "logo": "中国能建官方品牌标识，图片实际来源见附件 source-manifest.json",
+    "photoSources": [
+      "https://www.intl.ceec.net.cn/picture/0/s_c9ba131e5df74da49c49b9b8554535b2.jpg",
+      "https://www.intl.ceec.net.cn/picture/0/s_68e4ddf32e01414496a8b92e772f0871.jpg"
+    ],
+    "recruitmentSource": "https://job.hust.edu.cn/zpinfo1/2435714.htm"
+  }
+}
