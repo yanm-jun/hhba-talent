@@ -72,7 +72,23 @@ export function safeOfficialJobUrl(job: LiveJob) {
         'tencent-official': 'careers.tencent.com',
         'baidu-official': 'talent.baidu.com'
       };
-      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='hypergryph-2027-campus-reported'&&job.source==='hypergryph'){
+      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='anker-2027-campus-official'&&job.source==='anker-innovations'){
+        if(u.hostname!=='career.anker.com.cn'||!/^cn-v2-anker-[a-z0-9-]{5,100}$/.test(job.id))return null;
+        const list=u.pathname==='/universities/recruitment/jobPosts/'&&
+          [...u.searchParams.keys()].sort().join(',')==='direction,from'&&
+          u.searchParams.get('from')==='campus'&&
+          ['algorithm','software_embedded','hardware_dev','marketing_brand','channel_customer','finance_investment'].includes(u.searchParams.get('direction')||'')&&
+          u.hash==='';
+        const knownDetail:Record<string,{path:string;id:string}>={
+          'cn-v2-anker-multimodal-ai':{path:'/jobDetail/',id:'7671180235925244214'},
+          'cn-v2-anker-ai-app':{path:'/larkJobDetail/',id:'7670845024406849818'}
+        };
+        const detail=knownDetail[job.id];
+        const individuallyChecked=!!detail&&u.pathname===detail.path&&u.searchParams.get('jobId')===detail.id&&
+          u.searchParams.get('websiteId')==='6962795203808217351'&&
+          [...u.searchParams.keys()].sort().join(',')==='jobId,websiteId'&&u.hash==='';
+        if(!list&&!individuallyChecked)return null;
+      }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='hypergryph-2027-campus-reported'&&job.source==='hypergryph'){
         // Official Hypergryph job board; title-level evidence is separate and does not
         // confirm a unique live application URL. Reject every other host/path.
         if(u.hostname!=='career.hypergryph.com'||u.pathname!=='/'||
