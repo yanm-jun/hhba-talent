@@ -18,6 +18,7 @@ import {UnifiedPolicyGuide} from '../components/talent/UnifiedPolicyGuide';
 import {yantaiLivingGuide,yantaiHomeGuide} from '../data/talentYantaiGuide';
 import {linyiLivingGuide} from '../data/talentLinyiGuide';
 import {UnifiedTalentRecordDetail} from '../components/talent/UnifiedTalentRecordDetail';
+import {UnifiedTalentHousingResearch,housingResearchLeads} from '../components/talent/UnifiedTalentHousingResearch';
 import {UnifiedPolicyList,buildCityPolicyConfig} from '../components/talent/UnifiedPolicyList';
 import '../styles/talent-service.css';
 import '../styles/talent-subpages.css';
@@ -102,6 +103,7 @@ function CityHub({city}:{city:string}){
  if(!match)return <><Bread current="城市尚未收录"/><section className="ts-sub-header"><h1>该城市尚未加入本次城市名录</h1><p>当前目标范围是4个直辖市和293个地级市，不包含县级市、自治州、地区和盟。请先到全国城市目录核对名称。</p><Link to="/talent-service/cities">返回全国城市目录 <ArrowRight size={16}/></Link></section></>;
  const policies=TALENT_POLICY_RECORDS.filter(p=>p.city===match.name).sort(recentPolicies);
  const homes=TALENT_HOUSING_RECORDS.filter(h=>h.city===match.name);
+ const researchHousing=housingResearchLeads(match.name).length;
  const allHousingHistorical=homes.length>0&&homes.every(h=>Boolean(h.applicationEnd&&h.applicationEnd<new Date().toISOString().slice(0,10)));
  const hasSources=policies.length+homes.length>0;
  return <>
@@ -111,13 +113,13 @@ function CityHub({city}:{city:string}){
    <h1>{match.official} · 人才服务</h1>
    <p>{hasSources?match.intro+'。从下面两个入口查看已有政府来源的政策和住房资料。':'该城市入口已开通，人才政策与住房资料正在整理。我们不会生成未经核验的补贴金额、公寓或申请入口。'}</p>
    {allHousingHistorical&&<p>住房资料均为已结束的公开配租批次，不代表当前有空房或可直接申报；请关注住建部门新公告。</p>}
-   <div className="ts-sub-counts"><QuickCount count={policies.length} label="已收录政策"/><QuickCount count={homes.length} label={allHousingHistorical?'住房历史配租资料':'已收录住房资料'}/>{!hasSources&&<span className="ts-v4-data-pending">官方资料整理中</span>}</div>
+   <div className="ts-sub-counts"><QuickCount count={policies.length} label="已收录政策"/><QuickCount count={homes.length} label={allHousingHistorical?'住房历史配租资料':'已收录住房资料'}/>{researchHousing>0&&<span className="ts-v4-data-pending">{researchHousing} 条人才公寓线索待官方核验，不计入已收录住房</span>}{!hasSources&&<span className="ts-v4-data-pending">官方资料整理中</span>}</div>
   </section>
   <section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>你想了解什么？</h2><Link to="/talent-service/cities">更换城市 <ArrowRight size={15}/></Link></div>
    <div className="ts-sub-kinds ts-v4-two-kinds">
     {kinds.map(k=><Link key={k.id} className="ts-sub-kind" to={match.name==='青岛'&&k.id==='policies'?'/talent-service/policy-layout-preview/qingdao':talentListUrl(k.id,match.name)}>
       <k.icon size={25}/><strong>{k.name}</strong><small>{k.description}</small>
-      <span className="ts-v4-kind-count">{k.id==='policies'?policies.length:homes.length} 条已收录{k.id==='housing'&&allHousingHistorical?' · 历史批次':''} <ArrowRight size={15}/></span>
+      <span className="ts-v4-kind-count">{k.id==='policies'?policies.length:homes.length} 条已收录{k.id==='housing'&&allHousingHistorical?' · 历史批次':''}{k.id==='housing'&&researchHousing>0?' · 另有'+researchHousing+'条待核验线索':''} <ArrowRight size={15}/></span>
      </Link>)}
    </div>
   </section>
@@ -136,6 +138,7 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
  const title=searchMode?'搜索结果':housingMode?'人才公寓':kind==='benefits'?'补贴与福利':guideMode?'申请指南':'人才政策';
  const resultPolicies=TALENT_POLICY_RECORDS.filter(p=>p.city===city&&(!query||matchesPolicy(p,query,city))&&(!housingMode)&&(kind!=='benefits'||benefit(p))).sort(recentPolicies);
  const resultHomes=TALENT_HOUSING_RECORDS.filter(p=>p.city===city&&(housingMode||searchMode)&&(!query||matchesHousing(p,query,city))).sort(housingFirst);
+ const pendingHousingCount=(housingMode||searchMode)?housingResearchLeads(city,query||'').length:0;
  const housingDistricts=['全部区域',...new Set(resultHomes.map(p=>p.district))];
  const activeDistrict=housingDistricts.includes(housingDistrict)?housingDistrict:'全部区域';
  const shownHomes=resultHomes.filter(p=>activeDistrict==='全部区域'||p.district===activeDistrict);
@@ -148,7 +151,7 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
   <section className="ts-sub-header">
    <span className="ts-section-kicker">{searchMode?'SEARCH RESULTS':'CITY SERVICES'} / {city}</span><h1>{city} · {title}</h1>
    <p>{searchMode?'搜索政府公开政策和具体人才公寓项目。结果仅来自已收录的数据。':'按实际城市整理有官方来源的资料，点击卡片进入单独的详情页。'}</p>
-   <div className="ts-sub-counts"><QuickCount count={shownPolicies.length} label="政策结果"/>{(housingMode||searchMode)&&<QuickCount count={shownHomes.length} label="住房结果"/>}</div>
+   <div className="ts-sub-counts"><QuickCount count={shownPolicies.length} label="政策结果"/>{(housingMode||searchMode)&&<QuickCount count={shownHomes.length} label="已核实住房"/>}{pendingHousingCount>0&&<QuickCount count={pendingHousingCount} label="待核验公寓线索"/>}</div>
   </section>
   <form className="ts-sub-search" onSubmit={e=>{e.preventDefault();doSearch()}}><Search size={18}/><input value={draft} onChange={e=>setDraft(e.target.value)} placeholder={'搜索'+city+'硕士补贴、住房项目…'} aria-label="搜索人才服务"/><button type="submit">搜索 <ArrowRight size={15}/></button></form>
   {searchMode&&query&&<p className="ts-sub-found">关键词：<strong>{query}</strong> · 实际匹配 {shownPolicies.length+shownHomes.length} 条</p>}
@@ -159,7 +162,8 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
    {housingMode&&housingDistricts.length>2&&<div className="ts-housing-districts" aria-label="按区域筛选住房项目">{housingDistricts.map(d=><button type="button" key={d} aria-pressed={activeDistrict===d} className={activeDistrict===d?'active':''} onClick={()=>setHousingDistrict(d)}>{d}</button>)}</div>}
    {shownHomes.length?<div className="ts-sub-grid">{shownHomes.map(h=><HousingTile data={h} key={h.id}/>)}</div>:<p className="ts-housing-filter-empty">该区域没有匹配的已核验项目，试试“全部区域”。</p>}
   </section>}
-  {!shownPolicies.length&&!resultHomes.length&&<Empty city={city} kind={searchMode?'匹配结果':title}/>}
+  {(housingMode||searchMode)&&<UnifiedTalentHousingResearch city={city} query={query}/>}
+  {!shownPolicies.length&&!resultHomes.length&&!pendingHousingCount&&<Empty city={city} kind={searchMode?'匹配结果':title}/>}
   <section className="ts-sub-cross"><ShieldCheck size={17}/><span>静态官方资料索引，非政府实时申报系统。补贴金额、资格、截止时间和剩余房源以最新官方公告为准。政策整理日期：{TALENT_POLICY_REVIEW_DATE}；项目整理日期：{HOUSING_REVIEW_DATE}。</span></section>
   </>}
  </>;
