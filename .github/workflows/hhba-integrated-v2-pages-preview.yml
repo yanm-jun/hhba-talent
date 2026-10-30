@@ -89,13 +89,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh api "repos/$GITHUB_REPOSITORY/actions/runs?status=success&per_page=100" --jq '[.workflow_runs[].id]' > /tmp/previous-success.json
-          selected=''
-          while IFS= read -r run; do
-            artifact=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run/artifacts?per_page=50" --jq '[.artifacts[] | select(.name == "github-pages" and .expired == false) | .id][0] // empty')
-            if [ -n "$artifact" ]; then selected="$run"; break; fi
-          done < <(jq -r '.[]' /tmp/previous-success.json)
-          test -n "$selected" || { echo 'No backup artifact, refusing Pages publication' >&2; exit 1; }
+          # Pinned and previously verified published artifact from 2026-10-30:
+          # this run contains the current homepage AND /preview-factory-v2/.
+          # Never use an arbitrary newer Pages artifact missing those folders.
+          selected='41040716146'
+          artifact=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$selected/artifacts?per_page=50" --jq '[.artifacts[] | select(.name == "github-pages" and .expired == false) | .id][0] // empty')
+          test -n "$artifact" || { echo 'Pinned complete Pages backup is missing; refuse publication' >&2; exit 1; }
           echo "run_id=$selected" >> "$GITHUB_OUTPUT"
       - uses: actions/download-artifact@v4
         with:
