@@ -32,7 +32,7 @@ check('Direct official application portal and individual government documents ar
  assert.ok(page.includes("portal:'https://rc.jinan.gov.cn/'"));
  const governmentLinks=[...page.matchAll(/https:\/\/(?:www|jnxxq)\.jinan\.gov\.cn\/[^']+/g)];
  assert.ok(governmentLinks.length>=7,'Need 2026 government guidance and local official release');
- assert.ok(page.includes('网站当前可达性及登录后页面未能实时验证'));
+ assert.ok(page.includes('登录后的当前申报状态须以实际页面为准'));
 });
 check('Policy descriptions preserve 2026 district filing rules and categories without college promises',()=>{
  for(const s of ['5,000 元/月','4,000 元/月','3,000 元/月','2,000 元/月','1,500 元/月','1,000 元/月'])assert.ok(page.includes(s));
