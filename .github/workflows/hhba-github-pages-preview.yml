@@ -1,3 +1,4 @@
+# 2026-10-30: actual government-listed housing inventory, city-linked search, and source consistency audit.
 # 2026-10-30: talent policy search QA refresh — generic subsidy matching, filter reset, Qingdao verified source.
 # 2026-10-30: deploy 15 government-sourced policy records, multi-city search and accessible photo carousel.
 # 2026-10-30: deploy HHBA talent-policy brand-color and sourced city-photo hero from feat/hhba-unified-static-20261025.
@@ -105,6 +106,9 @@ jobs:
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
+      - name: Validate source-backed talent policies and housing records
+        working-directory: apps/web
+        run: node scripts/audit-talent-service.mjs
       - name: Check HHBA people-first homepage float (photo, close, responsive)
         working-directory: apps/web
         run: node --test scripts/home-people-banner.contract.test.mjs
