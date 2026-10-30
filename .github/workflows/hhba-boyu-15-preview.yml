@@ -93,33 +93,56 @@ jobs:
           path: apps/web/boyu-15-review/
           retention-days: 14
           if-no-files-found: ignore
-      - name: Recover last confirmed GitHub Pages public artifact
+      - name: Recover latest official main Pages release
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 41009967801
+          github-token: ${{ github.token }}
+          path: main-pages
+      - name: Recover previous independently tested employer previews
         uses: actions/download-artifact@v4
         with:
           name: github-pages
           run-id: 41002250357
           github-token: ${{ github.token }}
-          path: prior-pages
-      - name: Preserve home and all previous company previews
+          path: former-pages
+      - name: Keep live main byte-identical and restore prior previews before appending Boyu
         shell: bash
         run: |
           set -euo pipefail
-          archive=$(find prior-pages -type f -name 'artifact.tar*' -print -quit)
-          test -n "$archive"
-          mkdir -p published
-          if [[ "$archive" == *.gz ]]; then tar -xzf "$archive" -C published; else tar -xf "$archive" -C published; fi
-          for f in index.html preview-anker/index.html preview-shkp/index.html preview-laifen/index.html; do test -s "published/$f"; done
-          for p in "" preview-anker/ preview-shkp/ preview-laifen/; do
-            curl -fsSL --retry 3 --max-time 45 "https://yanm-jun.github.io/hhba-talent/$p" -o /tmp/boyu-live-check.html
-            cmp "published/${p}index.html" /tmp/boyu-live-check.html
+          main_archive=$(find main-pages -type f -name 'artifact.tar*' -print -quit)
+          prior_archive=$(find former-pages -type f -name 'artifact.tar*' -print -quit)
+          test -n "$main_archive" && test -n "$prior_archive"
+          mkdir -p published previous
+          if [[ "$main_archive" == *.gz ]]; then tar -xzf "$main_archive" -C published; else tar -xf "$main_archive" -C published; fi
+          if [[ "$prior_archive" == *.gz ]]; then tar -xzf "$prior_archive" -C previous; else tar -xf "$prior_archive" -C previous; fi
+          test -s published/index.html
+          test -s previous/preview-shkp/index.html
+          test -s previous/preview-anker/index.html
+          test -s previous/preview-laifen/index.html
+          curl -fsSL --retry 3 --max-time 45 https://yanm-jun.github.io/hhba-talent/ -o /tmp/hhba-main-live
+          cmp published/index.html /tmp/hhba-main-live
+          for p in preview-anker preview-laifen preview-shkp; do
+            if [ -d "published/$p" ]; then
+              if curl -fsSL --max-time 25 "https://yanm-jun.github.io/hhba-talent/$p/" -o /tmp/hhba-prior-live; then
+                cmp "published/$p/index.html" /tmp/hhba-prior-live
+              fi
+            else
+              cp -a "previous/$p" "published/$p"
+            fi
+            test -s "published/$p/index.html"
           done
           test ! -e published/preview-boyu
           mkdir -p published/preview-boyu
           cp -a apps/web/dist/. published/preview-boyu/
           test -s published/preview-boyu/companies/autumn/cn-autumn-011/index.html
-          for f in boyu-logo.webp boyu-exterior.webp boyu-lobby.webp; do test -s "published/preview-boyu/images/boyu-user/$f"; done
+          for f in boyu-logo.webp boyu-exterior.webp boyu-lobby.webp; do
+            test -s "published/preview-boyu/images/boyu-user/$f"
+          done
+          cmp published/index.html /tmp/hhba-main-live
           touch published/.nojekyll
-          echo BOYU_ADDED_PREVIOUS_RELEASE_UNCHANGED
+          echo LATEST_HHBA_MAIN_PRESERVED_PREVIOUS_PREVIEWS_RESTORED_BOYU_ADDED
       - uses: actions/upload-pages-artifact@v3
         with:
           path: published
