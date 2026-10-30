@@ -106,7 +106,7 @@ for(const c of ['北京','天津','上海','重庆']){
 assert.ok(landing.includes('suggestTalentCities(keyword)'),'Search autocomplete must be connected');
 assert.ok(landing.includes('parseTalentCityQuery(keyword,city)'),'City alias matcher must be connected');
 assert.ok(details.includes('ts-v4-two-kinds'),'City pages must have exactly two core service entrances');
-assert.ok(details.includes('ts-housing-districts')&&details.includes('shownHomes.map(h=>'),'Housing list must support region filters and render filtered results');
+assert.ok(details.includes('ts-housing-districts')&&details.includes('shownProjects.map(h=>')&&details.includes('shownProjects=housingProjects.filter(p=>activeDistrict')&&details.includes('housingPrograms.map(h=>'),'Housing list must filter independent projects by region while preserving municipality-wide program entries');
 const shared=readFileSync(new URL('components/talent/UnifiedTalentRecordDetail.tsx',root),'utf8');
 assert.ok(shared.includes('housing?.contactPhone')&&shared.includes('housing?.statusNote'),'Shared housing detail must distinguish evidence and current room status');
 assert.ok(details.includes('housingFirst'),'Specific verified projects must be listed before general housing programs');
