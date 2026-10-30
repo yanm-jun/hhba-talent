@@ -27,7 +27,7 @@ check('Exactly one shared policy list, one complete-guide template and one truth
  assert.ok(sharedDetail.includes('quality.missing.map('));
 });
 check('Every base record gets a graded quality state without claiming B is completed',()=>{
- for(const x of ['TalentQualityGrade','completeGuides','grade===\\'A\\'','grade===\\'B\\'','grade===\\'C\\'','grade===\\'D\\'','TALENT_QUALITY_SUMMARY'])assert.ok(quality.includes(x),x);
+ for(const x of ['TalentQualityGrade','completeGuides',"grade==='A'","grade==='B'","grade==='C'","grade==='D'",'TALENT_QUALITY_SUMMARY'])assert.ok(quality.includes(x),x);
  assert.ok(sharedDetail.includes('资料')&&sharedDetail.includes('待核实'));
 });
 check('No completion-grade A except dedicated sourced guides and actual complete source',()=>{
