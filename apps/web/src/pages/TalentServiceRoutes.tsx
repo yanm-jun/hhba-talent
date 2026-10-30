@@ -3,6 +3,7 @@ import {ArrowLeft,ArrowRight,ArrowUpRight,Building2,CheckCircle2,ClipboardCheck,
 import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
 import {parsePolicyQuery} from '../components/TalentPolicySearch';
+import {findTalentCity,parseTalentCityQuery,TALENT_MUNICIPALITIES} from '../data/talentCityRegistry';
 import {TALENT_POLICY_RECORDS,TALENT_POLICY_REVIEW_DATE,type TalentPolicyRecord} from '../data/talentPolicyRecords';
 import {TALENT_HOUSING_RECORDS,HOUSING_REVIEW_DATE,type TalentHousingRecord} from '../data/talentHousingRecords';
 import type {User} from '../services/api';
@@ -17,10 +18,8 @@ export const talentPolicyUrl=(id:string)=>'/talent-service/policy/'+encodeURICom
 export const talentHousingUrl=(id:string)=>'/talent-service/housing/'+encodeURIComponent(id);
 
 const kinds:{id:TalentListKind;name:string;description:string;icon:typeof FileText}[]=[
- {id:'housing',name:'人才公寓',description:'具体项目、地址、房型与官方申请渠道',icon:Building2},
- {id:'policies',name:'人才政策',description:'人才引进、落户、就业与政策支持',icon:FileText},
- {id:'benefits',name:'补贴与福利',description:'生活、住房、安家及其他福利',icon:Wallet},
- {id:'guide',name:'申请指南',description:'申报材料、资格核验与办理步骤',icon:ClipboardCheck}
+ {id:'policies',name:'政策与补贴',description:'生活补贴、人才引进、落户与就业支持',icon:FileText},
+ {id:'housing',name:'人才安居',description:'公寓项目、租金、住房支持与申请资格',icon:Building2}
 ];
 const benefit=(p:TalentPolicyRecord)=>p.category==='生活补贴'||p.category==='购房补贴'||p.category==='交通福利'||p.category==='就业创业'||p.title.includes('补贴');
 const housingStatus=(r:TalentHousingRecord)=>{
@@ -73,22 +72,30 @@ function Empty({city,kind}:{city:string;kind:string}){
  </div>;
 }
 function CityHub({city}:{city:string}){
+ const match=findTalentCity(city);
+ if(!match)return <><Bread current="城市尚未开通"/><section className="ts-sub-header"><h1>该城市尚未加入当前测试名单</h1><p>当前正式建立四个直辖市入口，另外保留已有资料城市。其余地级市仍待分批导入。</p><Link to="/talent-service">返回城市选择 <ArrowRight size={16}/></Link></section></>;
  const policies=TALENT_POLICY_RECORDS.filter(p=>p.city===city);
  const homes=TALENT_HOUSING_RECORDS.filter(h=>h.city===city);
- const benefits=policies.filter(benefit);
  return <>
   <Bread current={city+' · 人才服务'}/>
-  <section className="ts-sub-header"><span className="ts-section-kicker">CITY SERVICES / 城市人才服务</span><h1>{city} · 人才服务</h1>
-   <p>查看当地已整理的人才政策、补贴福利、具体住房项目以及办理指南。未收录的信息如实标注。</p>
-   <div className="ts-sub-counts"><QuickCount count={policies.length} label="政策资料"/><QuickCount count={homes.length} label="住房资料"/><QuickCount count={benefits.length} label="福利政策"/></div>
+  <section className="ts-sub-header ts-v4-city-hero">
+   <span className="ts-section-kicker">{match.level==='municipality'?'MUNICIPALITY / 直辖市':'CITY SERVICES / 已收录城市'}</span>
+   <h1>{match.official} · 人才服务</h1>
+   <p>{match.intro}。从下面两个入口开始，查看已经整理的政府来源信息。</p>
+   <div className="ts-sub-counts"><QuickCount count={policies.length} label="政策与补贴资料"/><QuickCount count={homes.length} label="住房项目与制度入口"/></div>
   </section>
-  <section className="ts-sub-section"><h2>选择服务</h2><div className="ts-sub-kinds">{kinds.map(k=><Link key={k.id} className="ts-sub-kind" to={talentListUrl(k.id,city)}><k.icon size={24}/><strong>{k.name}</strong><small>{k.description}</small><ArrowRight size={16}/></Link>)}</div></section>
-  <section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>{city} · 精选政策</h2><Link to={talentListUrl('policies',city)}>全部政策 <ArrowRight size={15}/></Link></div>
-   {policies.length?<div className="ts-sub-grid">{policies.slice(0,2).map(p=><PolicyTile data={p} key={p.id}/>)}</div>:<Empty city={city} kind="人才政策"/>}
+  <section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>你想了解什么？</h2><Link to="/talent-service">更换城市 <ArrowRight size={15}/></Link></div>
+   <div className="ts-sub-kinds ts-v4-two-kinds">
+    {kinds.map(k=><Link key={k.id} className="ts-sub-kind" to={talentListUrl(k.id,city)}>
+      <k.icon size={25}/><strong>{k.name}</strong><small>{k.description}</small>
+      <span className="ts-v4-kind-count">{k.id==='policies'?policies.length:homes.length} 条已收录 <ArrowRight size={15}/></span>
+     </Link>)}
+   </div>
   </section>
-  <section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>{city} · 住房项目</h2><Link to={talentListUrl('housing',city)}>所有项目 <ArrowRight size={15}/></Link></div>
-   {homes.length?<div className="ts-sub-grid">{homes.slice(0,2).map(h=><HousingTile data={h} key={h.id}/>)}</div>:<Empty city={city} kind="人才公寓"/>}
-  </section></>;
+  <section className="ts-v4-city-note"><ShieldCheck size={18}/>
+   <div><strong>政策以当地官方发布和审核结果为准</strong><p>部分支持政策只适用于特定区县或人才类别；没有核验的项目不会以虚拟补贴或虚假房源填充。申请材料和流程放在具体政策或住房详情中。</p></div>
+  </section>
+ </>;
 }
 function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';query?:string}){
  const [filter,setFilter]=useState('全部类型');
@@ -102,7 +109,7 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
  const cats=['全部类型',...new Set(resultPolicies.map(p=>p.category))];
  const shownPolicies=filter==='全部类型'?resultPolicies:resultPolicies.filter(p=>p.category===filter);
  const relatedLink=(kindName:TalentListKind)=>talentListUrl(kindName,city);
- const doSearch=()=>navigate(draft.trim()?talentSearchUrl(parsePolicyQuery(draft.trim(),city).city,draft.trim()):talentListUrl('policies',city));
+ const doSearch=()=>{const parsed=parseTalentCityQuery(draft.trim(),city);navigate(!draft.trim()||(parsed.matchedCity&&parsed.cityOnly)?talentCityUrl(parsed.matchedCity?parsed.city:city):talentSearchUrl(parsed.city,draft.trim()))};
  return <><Bread city={city} current={title}/>
   {guideMode?<GuideContent city={city}/>:<>
   <section className="ts-sub-header">
@@ -173,9 +180,9 @@ function DetailPage({kind,id}:{kind:'policy'|'housing';id:string}){
 export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  const fragments=route.split('/').filter(Boolean);
  const kind=fragments[1]||'';
- const city=decode(fragments[3]||fragments[2]||'杭州').slice(0,60)||'杭州';
+ const city=decode(fragments[3]||fragments[2]||'北京').slice(0,60)||'北京';
  let body;
- if(kind==='city')body=<CityHub city={decode(fragments[2]||'杭州')||'杭州'}/>;
+ if(kind==='city')body=<CityHub city={decode(fragments[2]||'北京')||'北京'}/>;
  else if(kind==='list'&&['policies','benefits','housing','guide'].includes(fragments[2]))body=<ListPage city={city} kind={fragments[2] as TalentListKind}/>;
  else if(kind==='search')body=<ListPage key={route} city={decode(fragments[2]||'杭州')||'杭州'} kind="search" query={decode(fragments.slice(3).join('/'))}/>;
  else if(kind==='policy'||kind==='housing')body=<DetailPage kind={kind} id={decode(fragments[2]||'')}/>;
