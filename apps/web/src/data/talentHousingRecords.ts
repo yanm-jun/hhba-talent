@@ -1,3 +1,4 @@
+import {ZAOZHUANG_HOUSING_RECORDS} from './zaozhuangHousingRecords.ts';
 import {ZIBO_HOUSING_RECORDS} from './ziboHousingRecords.ts';
 import {WEIFANG_HOUSING_RECORDS} from './weifangHousingRecords.ts';
 // HHBA 住房项目：仅采用政府及政务服务官方来源，记录批次不等于实时房源。
@@ -60,4 +61,5 @@ export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
 
 ...WEIFANG_HOUSING_RECORDS,
 ...ZIBO_HOUSING_RECORDS,
+...ZAOZHUANG_HOUSING_RECORDS,
 ];
