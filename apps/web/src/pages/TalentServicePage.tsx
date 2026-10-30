@@ -3,7 +3,7 @@ import {ArrowRight,ArrowUpRight,Building2,ChevronDown,ClipboardList,FileText,Gra
 import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
 import type {User} from '../services/api';
-import {TALENT_CITY_INDEX,TALENT_MUNICIPALITIES,TALENT_LEGACY_CITIES,parseTalentCityQuery,suggestTalentCities} from '../data/talentCityRegistry';
+import {TALENT_CITY_INDEX,TALENT_MUNICIPALITIES,TALENT_LEGACY_CITIES,TALENT_PROVINCES,findTalentProvince,parseTalentCityQuery,suggestTalentCities} from '../data/talentCityRegistry';
 import {TALENT_POLICY_RECORDS} from '../data/talentPolicyRecords';
 import {TALENT_HOUSING_RECORDS} from '../data/talentHousingRecords';
 import {talentCityUrl,talentListUrl,talentSearchUrl,talentPolicyUrl,talentHousingUrl} from './TalentServiceRoutes';
@@ -16,13 +16,27 @@ const policyIds=['hz-grad-living','qd-graduate-house','sz-youth-rent-subsidy'];
 export function TalentServicePage({user}:{user:User|null}){
  const [city,setCity]=useState('北京'),[chosen,setChosen]=useState(false),[keyword,setKeyword]=useState('');
  const [cityOpen,setCityOpen]=useState(false),[suggestOpen,setSuggestOpen]=useState(false),[suggestIndex,setSuggestIndex]=useState(-1);
- const [allCities,setAllCities]=useState(false),[matchOpen,setMatchOpen]=useState(false);
+ const [matchOpen,setMatchOpen]=useState(false);
+ const [searchNotice,setSearchNotice]=useState('');
  const [degree,setDegree]=useState('本科'),[grad,setGrad]=useState('unknown'),[matchCity,setMatchCity]=useState('北京');
  const [badImages,setBadImages]=useState<string[]>([]);
  const parsed=parseTalentCityQuery(keyword,city);
  const suggestions=suggestTalentCities(keyword);
- const choose=(name:string)=>{setCity(name);setChosen(true);setCityOpen(false);setSuggestOpen(false)};
- const search=()=>{const q=keyword.trim();setSuggestOpen(false);navigate(!q||(parsed.matchedCity&&parsed.cityOnly)?talentCityUrl(parsed.matchedCity?parsed.city:city):talentSearchUrl(parsed.city,q))};
+ const choose=(name:string)=>{setCity(name);setChosen(true);setCityOpen(false);setSuggestOpen(false);setSearchNotice('')};
+ const search=()=>{
+  const q=keyword.trim();setSuggestOpen(false);setSearchNotice('');
+  if(!q){navigate(chosen?talentCityUrl(city):'/talent-service/cities');return}
+  const p=findTalentProvince(q);
+  if(p){navigate('/talent-service/cities/'+encodeURIComponent(p.official));return}
+  if(parsed.matchedCity){
+   navigate(parsed.cityOnly?talentCityUrl(parsed.city):talentSearchUrl(parsed.city,q));return
+  }
+  if(chosen){navigate(talentSearchUrl(city,q));return}
+  if(/补贴|政策|住房|人才公寓|租房|就业|落户|申请/.test(q)){
+   setSearchNotice('请先选择目标城市，或在搜索框中输入城市名称，例如“临沂硕士补贴”。');return
+  }
+  navigate('/talent-service/cities/search/'+encodeURIComponent(q.slice(0,100)));
+ };
  const keydown=(e:KeyboardEvent<HTMLInputElement>)=>{
   if(e.key==='Escape'){setSuggestOpen(false);setSuggestIndex(-1)}
   if(suggestOpen&&suggestions.length&&(e.key==='ArrowDown'||e.key==='ArrowUp')){e.preventDefault();setSuggestIndex(i=>(i+(e.key==='ArrowDown'?1:-1)+suggestions.length)%suggestions.length)}
@@ -40,8 +54,10 @@ export function TalentServicePage({user}:{user:User|null}){
       <button className="htl-city-picker" type="button" onClick={()=>{setCityOpen(v=>!v);setSuggestOpen(false)}} aria-expanded={cityOpen}><MapPin size={16}/><span>{chosen?TALENT_CITY_INDEX.find(c=>c.name===city)?.official:'选择省份 / 城市'}</span><ChevronDown size={15}/></button>
       {cityOpen&&<div className="htl-dropdown" role="group" aria-label="选择城市"><div className="htl-menu-label">四个直辖市</div>
        {TALENT_MUNICIPALITIES.map(c=><button key={c.name} type="button" onClick={()=>choose(c.name)}>{c.official}<small>直辖市</small></button>)}
-       <div className="htl-menu-label">此前已收录城市</div>
+       <div className="htl-menu-label">常用城市</div>
        {TALENT_LEGACY_CITIES.map(c=><button key={c.name} type="button" onClick={()=>choose(c.name)}>{c.official}<small>{c.province}</small></button>)}
+       <div className="htl-menu-label">按省份浏览 293 个地级市</div>
+       {TALENT_PROVINCES.map(p=><button key={p.code} type="button" onClick={()=>navigate('/talent-service/cities/'+encodeURIComponent(p.official))}>{p.official}<small>查看城市</small></button>)}
       </div>}
      </div>
      <div className="htl-search-cell" onBlur={e=>{if(!e.currentTarget.contains(e.relatedTarget as Node|null))setSuggestOpen(false)}}>
@@ -52,6 +68,7 @@ export function TalentServicePage({user}:{user:User|null}){
       </div>}
      </div>
     </div>
+    {searchNotice&&<p className="htl-search-notice" role="status">{searchNotice}</p>}
     <div className="htl-hot">热门城市：{hot.map((name,i)=><span key={name}><button type="button" onClick={()=>navigate(talentCityUrl(name))}>{name}</button>{i<hot.length-1&&' · '}</span>)}</div>
    </section>
    <section className="htl-quick" aria-label="人才服务快捷入口">
@@ -63,11 +80,11 @@ export function TalentServicePage({user}:{user:User|null}){
     ].map(item=><button type="button" key={item.kind} onClick={()=>navigate(talentListUrl(item.kind,city))}><item.Icon size={21} strokeWidth={1.8}/><span>{item.name}</span></button>)}
    </section>
    <section className="htl-section" aria-labelledby="htl-city-title">
-    <div className="htl-heading"><h2 id="htl-city-title">热门人才城市</h2><button type="button" onClick={()=>setAllCities(x=>!x)} aria-expanded={allCities}>{allCities?'收起城市':'查看全部城市'} ›</button></div>
+    <div className="htl-heading"><h2 id="htl-city-title">热门人才城市</h2><button type="button" onClick={()=>navigate('/talent-service/cities')}>查看全部城市 ›</button></div>
     <div className="htl-city-grid">{featured.map(name=>{const c=TALENT_CITY_INDEX.find(v=>v.name===name);return <Link key={name} to={talentCityUrl(name)} className="htl-city-card">
      <div className="htl-city-photo">{c?.photo&&!badImages.includes(name)?<img src={c.photo} loading="lazy" alt={name+'城市实景'} onError={()=>failImage(name)}/>:<div className="htl-city-fallback"><MapPin size={20}/>{name}</div>}</div>
      <div className="htl-city-caption"><strong>{name}</strong><small>政策 · 安居 · 补贴</small></div></Link>})}</div>
-    {allCities?<div className="htl-all-cities"><p>当前已接入的四个直辖市及此前已有城市</p>{TALENT_CITY_INDEX.map(c=><Link key={c.name} to={talentCityUrl(c.name)}>{c.official} <ArrowUpRight size={13}/></Link>)}</div>:<div className="htl-down" aria-hidden="true">⌄</div>}
+    <div className="htl-down" aria-hidden="true">⌄</div>
    </section>
    <div className="htl-divider"/>
    <section className="htl-section" aria-labelledby="htl-housing-title">
