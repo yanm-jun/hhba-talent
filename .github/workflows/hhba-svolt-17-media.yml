@@ -1,0 +1,45 @@
+name: HHBA inspect SVOLT official media sources
+on:
+  push:
+    branches: [feat/employer-factory-pilot-svolt-17-20261030]
+    paths: ['.github/workflows/hhba-svolt-17-media.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/employer-factory-pilot-svolt-17-20261030
+      - name: Inspect website official media paths and source sizes
+        shell: bash
+        run: |
+          python -m pip -q install requests beautifulsoup4 Pillow
+          python - <<'PY'
+          import requests
+          from bs4 import BeautifulSoup
+          from urllib.parse import urljoin
+          s=requests.Session()
+          s.headers['User-Agent']='Mozilla/5.0'
+          for base in ['https://www.svolt.cn/','https://www.svolt.cn/about/profile','https://www.svolt.cn/news/79']:
+              try:
+                  r=s.get(base,timeout=17);r.raise_for_status()
+                  soup=BeautifulSoup(r.content,'html.parser')
+                  print('SOURCE',base,len(r.content),'TITLE',soup.title.string.strip() if soup.title and soup.title.string else 'none')
+                  pics=[]
+                  for tag in soup.find_all(['img','source','link']):
+                      for field in ['src','data-src','data-original','srcset','href']:
+                          src=tag.get(field)
+                          if not src:continue
+                          src=src.split(' ')[0]
+                          if field=='href' and not (src.lower().endswith(('.png','.jpg','.jpeg','.svg','.webp')) or 'logo' in src.lower()):continue
+                          if src.startswith('data:'):continue
+                          u=urljoin(base,src)
+                          if u not in pics:pics.append(u)
+                  print('PICTURES',len(pics))
+                  for u in pics[:100]:print('IMAGE',u)
+              except Exception as e:print('ERROR',base,repr(e))
+          PY
