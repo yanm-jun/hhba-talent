@@ -115,7 +115,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          run_id=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs?branch=main&status=success&per_page=60" --jq '.workflow_runs[] | select(.name == "HHBA Unified Static Site GitHub Pages") | .id' | head -n 1)
+          run_id=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs?branch=main&status=success&per_page=60" --jq '[.workflow_runs[] | select(.name == "HHBA Unified Static Site GitHub Pages") | .id][0] // empty')
           test -n "$run_id"
           echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
           echo "Preserve latest successful main run $run_id"
