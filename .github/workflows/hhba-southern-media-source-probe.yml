@@ -1,0 +1,46 @@
+name: HHBA Southern Media Source Probe (Read Only)
+on:
+  push:
+    branches: [feat/integrate-employer-v2-into-unified-20261030]
+    paths: ['.github/workflows/hhba-southern-media-source-probe.yml']
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Find cited company logo and two distinct real-image sources
+        run: |
+          python3 -m pip -q install requests beautifulsoup4 pillow
+          python3 - <<'PY'
+          from urllib.parse import urljoin
+          import requests,bs4
+          urls={
+           'newseed-logo':'https://www.newseed.cn/vc/39409',
+           'people-building':'https://media.people.com.cn/n1/2020/0525/c40606-31722481.html',
+           'writer-2026-event':'https://www.chinawriter.com.cn/n1/2026/0901/c403994-40790500.html',
+           'publisher-site':'https://www.nfcb.com.cn/',
+           'nppa-2026':'https://www.nppa.gov.cn/xxfb/dfgz/202608/t20260824_1004473.html',
+           'xinhuanet-2026':'https://www.xinhuanet.com/book/20260902/8a5b1b8d691248059a17ad55da732187/c.html'
+          }
+          sess=requests.Session()
+          sess.headers.update({'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/122.0 Safari/537.36'})
+          for label,url in urls.items():
+           try:
+            r=sess.get(url,timeout=14);print('SOURCE',label,r.status_code,len(r.content),r.url,flush=True)
+            if not r.ok:continue
+            s=bs4.BeautifulSoup(r.text,'html.parser')
+            out=[]
+            for img in s.find_all('img')[:120]:
+             src=img.get('data-original') or img.get('data-src') or img.get('src') or ''
+             alt=(img.get('alt') or '').strip()[:70]
+             if not src:continue
+             full=urljoin(r.url,src)
+             if full.startswith('https://') or full.startswith('http://'):
+              out.append((alt,full))
+            print('OG',[(m.get('property') or m.get('name'),m.get('content')) for m in s.find_all('meta') if (m.get('property') or m.get('name') or '') in ('og:image','twitter:image')][:4])
+            print('IMAGES',label,len(out),out[:30],flush=True)
+           except Exception as e: print('FAIL',label,type(e).__name__,str(e)[:350],flush=True)
+          PY
