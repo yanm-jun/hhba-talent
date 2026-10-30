@@ -78,6 +78,25 @@ assert.ok(landing.includes("const featured=['杭州','深圳','青岛']"),'Prese
 assert.ok(landing.includes("const apartmentIds=['hz-xiyue','sz-young']"),'Housing preview must use existing named records');
 assert.ok(landing.includes('项目实景待官方核验'),'Do not pass stock apartment interiors as real listings');
 assert.ok(landing.includes('htl-match-panel'),'Keep the bottom matching entry point without false eligibility claims');
+
+const matchEngine=readFileSync(new URL('data/talentMatchEngine.ts',root),'utf8');
+const matchPage=readFileSync(new URL('pages/TalentMatchingPage.tsx',root),'utf8');
+const navigation=readFileSync(new URL('router.tsx',root),'utf8');
+assert.ok(landing.includes("navigate('/talent-service/match/'"),'Home matching submit must open separate eligibility screening page');
+assert.ok(landing.includes("talentMatchDraft:{city:matchCity"),'Home matching selections must flow to screen without personal data URL');
+assert.ok(navigation.includes('state.hhbaTalentMatchDraft=options.talentMatchDraft'),'Profile selections must use browser navigation state');
+assert.ok(details.includes("kind==='match'")&&details.includes('<TalentMatchingPage city='),'Matching deep link not registered');
+assert.ok(matchPage.includes('evaluateTalentPolicies(TALENT_POLICY_RECORDS,form)'),'Matching must use source-backed rule engine');
+assert.ok(matchPage.includes('还需要核验的关键条件')&&matchPage.includes('政府原文'),'No explainable pending conditions and official sources');
+for(const status of ["focus","review","archive","excluded"]){
+ assert.ok(matchEngine.includes("'"+status+"'"),'Matching status missing: '+status);
+}
+for(const city of ['北京','天津','上海','重庆'])assert.ok(matchEngine.includes("'"+city+"'"),'Matcher city not supported: '+city);
+for(const rule of ['bj-jobseeker-grant','tj-2027-jobseek-grant','sh-2026-first-startup','cq-2026-shortage-job','cq-2025-twelve-counties']){
+ assert.ok(matchEngine.includes("case '"+rule+"'"),'Key government eligibility rules missing: '+rule);
+}
+assert.ok(!matchPage.includes('身份证号')&&!matchPage.includes('姓名输入'),'Matching must not collect identifying documents');
+
 const cityRegistry=readFileSync(new URL('data/talentCityRegistry.ts',root),'utf8');
 for(const c of ['北京','天津','上海','重庆']){
  assert.ok(cityRegistry.includes("name:'"+c+"'")&&cityRegistry.includes("official:'"+c+"市'"),'Municipality missing: '+c);
