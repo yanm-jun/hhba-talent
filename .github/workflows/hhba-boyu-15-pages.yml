@@ -7,6 +7,7 @@ on:
       - 'apps/web/scripts/laifen-13.contract.test.mjs'
       - 'apps/web/scripts/shkp-14.contract.test.mjs'
       - 'apps/web/scripts/all-company-major-chips.contract.test.mjs'
+      - 'apps/web/src/router.tsx'
   workflow_dispatch:
 permissions:
   contents: read
