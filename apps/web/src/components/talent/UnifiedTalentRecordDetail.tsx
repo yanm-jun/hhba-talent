@@ -25,7 +25,7 @@ export function UnifiedTalentRecordDetail({policy,housing}:{policy?:TalentPolicy
  const route=policy?'/talent-service/list/policies/':'/talent-service/list/housing/';
  const link=policy?fullGuide(policy.id):undefined;
  return <main className="jgd-page">
-  <nav className="jgd-breadcrumb"><Link to="/talent-service">人才服务</Link><span>›</span><Link to={'/talent-service/city/'+encodeURIComponent(item.city)}>{item.city}</Link><span>›</span>{policy?'人才政策':'人才公寓'}</nav>
+  <nav className="jgd-breadcrumb"><Link to="/talent-service">人才服务</Link><span>›</span><Link to={'/talent-service/city/'+encodeURIComponent(item.city)}>{item.city}</Link><span>›</span>{policy?'人才政策':housing?.housingCategory||'人才住房'}</nav>
   <header className="jgd-hero"><div className="jgd-hero-text"><span className="jgd-kicker">HHBA / 全国统一政策详情标准</span><h1>{item.title}</h1><p>{policy?.summary||housing?.statusNote}</p>
    <div className="jgd-tags"><span>{quality.label}</span><span>官方资料日期 {item.published}</span><span>不代表当前申请成功或有实时房源</span></div></div>
    <div className="jgd-hero-aside"><span>支持方向</span><strong style={{fontSize:20}}>{policy?.category||'人才住房'}</strong><small>{policy?'待遇金额和具体资格请查看下方完整说明':'房源租金和入住要求请查看下方完整说明'}</small><span>按官方资格与实际审核认定</span></div>
