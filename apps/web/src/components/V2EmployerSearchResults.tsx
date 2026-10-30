@@ -43,7 +43,7 @@ export function V2EmployerSearchResults({query,scope='',country='',major='',onMa
  if(!matches.length)return null;
  return <section className="hhba-v2-search" aria-label="HHBA V2 已收录企业与校招岗位">
   <div className="hhba-v2-search-heading">
-   <h2>HHBA V2 企业与岗位</h2>
+   <h2>招聘市场</h2>
    <span>{matches.length} 家企业 · 独立核验的招聘方向，开放状态待官网确认</span>
   </div>
   {matches.map(p=>{
