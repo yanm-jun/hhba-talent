@@ -1,0 +1,164 @@
+name: HHBA SVOLT company 17 factory preview
+# Release candidate: data-only enterprise 16; prior public site must be preserved.
+on:
+  push:
+    branches: [feat/employer-factory-pilot-svolt-17-20261030]
+    paths:
+      - '.github/workflows/hhba-svolt-16-preview.yml'
+      - 'apps/web/src/data/employerProfiles/cn-autumn-013.json'
+      - 'apps/web/public/images/employer-profiles/cn-autumn-013/**'
+      - 'apps/web/scripts/svolt-16.browser.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: hhba-svolt-factory-16-preview
+  cancel-in-progress: false
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/employer-factory-pilot-svolt-17-20261030
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Validate data-driven company 17, original 160 jobs, logos, sources
+        working-directory: apps/web
+        run: |
+          node scripts/employer-factory-check.mjs
+          node scripts/company-brand-unified.contract.test.mjs
+          node scripts/company-single-char-search.contract.test.mjs
+          node scripts/domestic-rebuild-v2.contract.test.mjs
+          node scripts/major-company-job-flow.contract.test.mjs
+          node scripts/boyu-15.contract.test.mjs
+      - name: Build new company solely from JSON and 3 individual local photos
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/preview-svolt/'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_DEMO_ACCOUNT_ENABLED: '0'
+        run: |
+          npm run build
+          for f in logo.png photo1.webp photo2.webp; do test -s "dist/images/employer-profiles/cn-autumn-013/$f"; done
+      - name: Prepare browser dependencies
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview]')
+        working-directory: apps/web
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Test SVOLT real browser on mobile and desktop
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview]')
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/preview-svolt/'
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/svolt-vite.log 2>&1 &
+          for i in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:4173/hhba-talent/preview-svolt/ >/dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/svolt-16.browser.mjs
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: svolt-16-factory-evidence
+          path: apps/web/svolt-16-proof/
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Add deep links for new data-driven company and roles
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview]')
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const f=JSON.parse(fs.readFileSync('src/data/employerProfiles/cn-autumn-013.json','utf8'));
+          const routes=['companies/autumn/'+f.id,'candidate/jobs','companies/discover',...f.jobs.map(j=>'candidate/jobs/cn-v2-profile-'+f.id+'-'+j.id)];
+          if(routes.length!==10)throw Error('Invalid new employer routes');
+          for(const route of routes){fs.mkdirSync('dist/'+route,{recursive:true});fs.copyFileSync('dist/index.html','dist/'+route+'/index.html')}
+          fs.copyFileSync('dist/index.html','dist/404.html');
+          fs.writeFileSync('dist/.nojekyll','');
+          NODE
+      - name: Retrieve verified existing public Pages artifact
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview]')
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 41013735730
+          github-token: ${{ github.token }}
+          path: previous
+      - name: Keep current home and all prior previews byte-for-byte
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview]')
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive=$(find previous -type f -name 'artifact.tar*' -print -quit)
+          test -n "$archive"
+          mkdir -p published
+          if [[ "$archive" == *.gz ]]; then tar -xzf "$archive" -C published; else tar -xf "$archive" -C published; fi
+          for f in index.html preview-envision/index.html preview-factory/index.html preview-boyu/index.html preview-anker/index.html preview-laifen/index.html preview-shkp/index.html; do
+            test -s "published/$f"
+          done
+          for p in '' preview-envision/ preview-factory/ preview-boyu/ preview-anker/ preview-laifen/ preview-shkp/; do
+            curl -fsSL --retry 3 --max-time 45 "https://yanm-jun.github.io/hhba-talent/$p" -o /tmp/svolt-check
+            cmp "published/${p}index.html" /tmp/svolt-check
+          done
+          test ! -e published/preview-svolt
+          mkdir -p published/preview-svolt
+          cp -a apps/web/dist/. published/preview-svolt/
+          test -s published/preview-svolt/companies/autumn/cn-autumn-013/index.html
+          test -s published/preview-svolt/images/employer-profiles/cn-autumn-013/logo.png
+          touch published/.nojekyll
+          echo PREVIOUS_PAGES_UNCHANGED_SVOLT_ADDED
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview]')
+        with:
+          path: published
+  deploy:
+    needs: build-and-test
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    environment:
+      name: hhba-company200-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify public SVOLT 16 URLs and three local images
+        run: |
+          set -euo pipefail
+          root=https://yanm-jun.github.io/hhba-talent
+          for i in 1 2 3 4 5 6; do
+            if curl -fsSL "$root/preview-svolt/companies/autumn/cn-autumn-013/" -o /tmp/page &&
+               curl -fsSL "$root/preview-svolt/images/employer-profiles/cn-autumn-013/logo.png" -o /tmp/logo &&
+               curl -fsSL "$root/preview-svolt/images/employer-profiles/cn-autumn-013/photo1.webp" -o /tmp/photo1 &&
+               curl -fsSL "$root/preview-svolt/images/employer-profiles/cn-autumn-013/photo2.webp" -o /tmp/photo2; then break; fi
+            if [ "$i" = 6 ]; then exit 1; fi
+            sleep 10
+          done
+          grep -q '/hhba-talent/preview-svolt/assets/' /tmp/page
+          test $(wc -c </tmp/logo) -gt 1000
+          test $(wc -c </tmp/photo1) -gt 10000
+          test $(wc -c </tmp/photo2) -gt 10000
+          echo HHBA_SVOLT_16_PUBLIC_FACTORY_PREVIEW_PASS
