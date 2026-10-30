@@ -16,7 +16,7 @@ type Role={
 };
 type Photo={path:string;caption:string;note:string;alt:string};
 type Company={
- id:string;name:string;englishName:string;industry:string;subtitle:string;
+ id:string;name:string;displayName?:string;englishName:string;industry:string;subtitle:string;
  overview:string;lastReviewed:string;media:{logo:string;photos:Photo[]};
  recruitment:{url:string;label:string;status:string;subject:string;note:string};
  photoNote:string;majorIntro:string;preferredMajors:string[];
@@ -51,7 +51,7 @@ export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
      <div className="hhba-kpmg-logo"><img src={asset(p.media.logo)} alt={p.name+' Logo'} loading="eager"/></div>
      <div className="hhba-kpmg-identity-copy">
       <span className="hhba-kpmg-kicker">HHBA / COMPANY PROFILE</span>
-      <h1>{p.name} <span>{p.englishName}</span></h1><p>{p.subtitle}</p>
+      <h1>{p.displayName||p.name} <span>{p.englishName}</span></h1><p>{p.subtitle}</p>
      </div>
      {p.recruitment.status!=='unconfirmed'&&<a className="hhba-kpmg-quick-link" data-hhba-recruitment-outbound="true"
       href={p.recruitment.url} rel="noopener noreferrer" target="_blank">{p.recruitment.label} <ExternalLink size={14}/></a>}

@@ -1,0 +1,297 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-031",
+  "name": "奇正",
+  "displayName": "奇正集团",
+  "englishName": "Cheezheng Group",
+  "aliases": [
+    "奇正集团",
+    "甘肃奇正实业集团有限公司",
+    "奇正藏药",
+    "Cheezheng",
+    "Qizheng"
+  ],
+  "industry": "藏药 · 中药 · 大健康 · 食品与医疗",
+  "subtitle": "甘肃奇正实业集团有限公司 · 1993年创立 · 甘肃兰州",
+  "overview": "奇正集团创建于1993年，覆盖藏药、中药材及饮片、青稞食品、医疗服务、健康产品、文旅与康养等领域。旗下的西藏奇正藏药股份有限公司为上市公司。该集团招聘页面收录的职位分别属于不同业务主体。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://www.qzh.cn/col_gsjs/index/",
+    "https://www.qzh.cn/col_rlzy/index/",
+    "https://www.qzh.cn/hdapp/bas/col_rczp.php"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-031/logo.webp",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-031/photo1.jpg",
+        "caption": "奇正集团 · 公开企业资料图（一）",
+        "alt": "奇正集团官方资料图片一",
+        "note": "源自奇正集团官网；若原图不可用，展示明确标注的不可用提示图，不冒充企业实景。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-031/photo2.jpg",
+        "caption": "奇正集团 · 公开企业资料图（二）",
+        "alt": "奇正集团官方资料图片二",
+        "note": "源自奇正集团官网；若原图不可用，展示明确标注的不可用提示图，不冒充企业实景。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+    "label": "奇正集团官方招聘",
+    "status": "official_portal",
+    "subject": "甘肃奇正实业集团有限公司及关联业务主体",
+    "note": "官网社会招聘页面公开9条2026-03-19岗位记录。未核实每个岗位2026-10-30是否继续开放。"
+  },
+  "majorIntro": "仅按照每条职位的具体业务方向关联专业；不因为集团经营医药业务，就认定所有职位都招聘药学人才。编辑性专业匹配不代表官方报考资格。",
+  "preferredMajors": [
+    "机械工程",
+    "机械设计制造及其自动化",
+    "电气工程及其自动化",
+    "自动化",
+    "中医学",
+    "藏医学",
+    "中药学",
+    "药学",
+    "康复治疗学",
+    "食品科学与工程",
+    "市场营销"
+  ],
+  "photoNote": "Logo由用户提供的原图转换为站内静态WebP；企业照片通过官网来源准备脚本独立获取，来源受限时显示明确不可用提示。不代表企业授权。",
+  "business": [
+    {
+      "title": "藏药研发与生产",
+      "description": "藏医药文化传承与药品研发生产",
+      "tags": "藏药 · 研发",
+      "details": [
+        "藏医药文化传承与药品研发生产"
+      ]
+    },
+    {
+      "title": "中药饮片",
+      "description": "中药材加工、检测与中药饮片",
+      "tags": "中药 · 质检",
+      "details": [
+        "中药材加工、检测与中药饮片"
+      ]
+    },
+    {
+      "title": "健康食品",
+      "description": "高原特色健康品与保健食品",
+      "tags": "保健食品",
+      "details": [
+        "高原特色健康品与保健食品"
+      ]
+    },
+    {
+      "title": "青稞食品",
+      "description": "青稞及特色食品研发加工和销售",
+      "tags": "食品 · 加工",
+      "details": [
+        "青稞及特色食品研发加工和销售"
+      ]
+    },
+    {
+      "title": "中藏医服务",
+      "description": "中藏医特色诊疗和服务",
+      "tags": "医学 · 医疗",
+      "details": [
+        "中藏医特色诊疗和服务"
+      ]
+    },
+    {
+      "title": "文旅与康养",
+      "description": "特色文旅、文化传播与康养",
+      "tags": "文旅 · 康养",
+      "details": [
+        "特色文旅、文化传播与康养"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "qizheng-role-01",
+      "title": "青稞销售",
+      "city": "上海、杭州、西藏、北京",
+      "url": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "evidenceUrl": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "奇正青稞",
+      "summary": "青稞食品销售与市场调研",
+      "requirements": "2026-03-19奇正集团官网招聘记录。专业关联由HHBA根据岗位内容编辑归类，原始页面未披露完整专业与学历条件。 当前开放状态以官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "食品科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以招聘官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "qizheng-role-02",
+      "title": "中医医师岗",
+      "city": "甘肃兰州",
+      "url": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "evidenceUrl": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "奇正医疗",
+      "summary": "中医学研究生及以上，具有医师资格证，规培经历优先",
+      "requirements": "2026-03-19奇正集团官网招聘记录。官网明确要求中医学专业研究生及以上、医师资格证；有规培经历者优先。 当前开放状态以官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "中医学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "研究生及以上",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "qizheng-role-03",
+      "title": "质量注册部经理",
+      "city": "西藏林芝",
+      "url": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "evidenceUrl": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "林芝雪域",
+      "summary": "建立质量体系和质量标准",
+      "requirements": "2026-03-19奇正集团官网招聘记录。专业关联由HHBA根据岗位内容编辑归类，原始页面未披露完整专业与学历条件。 当前开放状态以官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "药学",
+        "中药学",
+        "制药工程",
+        "质量管理工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以招聘官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "qizheng-role-04",
+      "title": "理疗培训师",
+      "city": "全国",
+      "url": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "evidenceUrl": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "奇正健康",
+      "summary": "养生技能培训和服务项目开发",
+      "requirements": "2026-03-19奇正集团官网招聘记录。专业关联由HHBA根据岗位内容编辑归类，原始页面未披露完整专业与学历条件。 当前开放状态以官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "康复治疗学",
+        "针灸推拿学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以招聘官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "qizheng-role-05",
+      "title": "专职讲师",
+      "city": "全国",
+      "url": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "evidenceUrl": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "奇正健康",
+      "summary": "健康科普、产品宣讲和客户活动",
+      "requirements": "2026-03-19奇正集团官网招聘记录。专业关联由HHBA根据岗位内容编辑归类，原始页面未披露完整专业与学历条件。 当前开放状态以官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "健康服务与管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以招聘官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "qizheng-role-06",
+      "title": "招商经理",
+      "city": "全国",
+      "url": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "evidenceUrl": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "奇正健康",
+      "summary": "保健食品招商和客户维护",
+      "requirements": "2026-03-19奇正集团官网招聘记录。专业关联由HHBA根据岗位内容编辑归类，原始页面未披露完整专业与学历条件。 当前开放状态以官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以招聘官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "qizheng-role-07",
+      "title": "机电维修工程师",
+      "city": "西藏林芝",
+      "url": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "evidenceUrl": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "林芝雪域",
+      "summary": "设备维修与维护",
+      "requirements": "2026-03-19奇正集团官网招聘记录。专业关联由HHBA根据岗位内容编辑归类，原始页面未披露完整专业与学历条件。 当前开放状态以官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以招聘官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "qizheng-role-08",
+      "title": "资深藏医专家",
+      "city": "甘肃兰州雁滩",
+      "url": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "evidenceUrl": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "奇正医疗",
+      "summary": "藏医相关临床诊疗，要求丰富临床经验",
+      "requirements": "2026-03-19奇正集团官网招聘记录。专业关联由HHBA根据岗位内容编辑归类，原始页面未披露完整专业与学历条件。 当前开放状态以官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "藏医学",
+        "中医学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以招聘官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "qizheng-role-09",
+      "title": "礼品销售",
+      "city": "兰州、西安、北京",
+      "url": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "evidenceUrl": "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "九色鹿鸣",
+      "summary": "陶瓷杯与茶咖杯等礼品销售",
+      "requirements": "2026-03-19奇正集团官网招聘记录。专业关联由HHBA根据岗位内容编辑归类，原始页面未披露完整专业与学历条件。 当前开放状态以官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以招聘官网为准",
+      "currentOpenVerified": false
+    }
+  ]
+}

@@ -161,6 +161,11 @@ jobs:
           test -s apps/web/public/images/employer-profiles/cn-autumn-030/photo2.jpg
           test -s apps/web/public/images/employer-profiles/cn-autumn-030/media-audit.json
           echo HHBA_CN_AUTUMN_030_THREE_ASSETS_READY
+      - name: Package Qizheng official-source photos and approved logo
+        run: |
+          python apps/web/scripts/prepare-qizheng-media.py
+          test -s apps/web/public/images/employer-profiles/cn-autumn-031/photo1.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-031/photo2.jpg
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
