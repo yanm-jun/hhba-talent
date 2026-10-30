@@ -20,6 +20,10 @@ function experienceForRoute(route:string):Experience {
     route.startsWith('/majors')||route.startsWith('/public/'))return 'candidate';
  return 'public';
 }
+// The talent-service entry must be identical in all three navigation contexts.
+function TalentPolicyNavLink({active}:{active:boolean}){
+ return <Link className="auth hhba-talent-policy-nav" to="/talent-service" aria-current={active?'page':undefined}>人才政策</Link>;
+}
 export function Shell({ user, children }: { user: User | null; children: React.ReactNode }) {
  const navigate=useNavigate();
  const route=useRoute();
@@ -69,7 +73,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
     {experience==='employer'&&<span className="hhba-experience-label">企业端</span>}
    </div>
    {experience==='public'?<nav aria-label="公共网站导航">
-     <Link className="auth" to="/talent-service">人才政策</Link>
+     <TalentPolicyNavLink active={route.startsWith('/talent-service')}/>
      <Link className="auth" to="/candidate/jobs">招聘市场</Link>
      <Link className="auth" to="/companies/discover">企业发现</Link>
      <Link className="join-nav-link" to="/join">加入我们</Link>
@@ -77,6 +81,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
        recruiterSignedIn?<Link className="hhba-nav-account" to="/employer/hub">企业账户</Link>:
        <Link className="hhba-nav-account" to="/auth">登录 / 注册</Link>}
    </nav>:experience==='candidate'?<nav aria-label="求职者服务导航">
+     <TalentPolicyNavLink active={route.startsWith('/talent-service')}/>
      <Link className="auth" to="/candidate/jobs">招聘市场</Link>
      <Link className="auth" to="/companies/discover">企业发现</Link>
      <Link className="auth" to="/candidate/saved">我的收藏</Link>
@@ -86,6 +91,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
        {hasCandidate&&<Link className="hhba-nav-account" to="/candidate/account">{user?.display_name||'个人中心'}</Link>}
       </>:<Link className="hhba-nav-account" to="/auth">登录 / 注册</Link>}
    </nav>:<nav aria-label="企业招聘与治理导航">
+     <TalentPolicyNavLink active={route.startsWith('/talent-service')}/>
      <Link className="auth" to="/employer/start">企业服务</Link>
      <Link className="auth" to="/employer/hub">企业工作台</Link>
      <Link className="auth" to="/employer/workspace">职位与人才</Link>
