@@ -1,4 +1,5 @@
 name: HHBA employer factory V1 build and browser gate
+# [preview] commit or manual dispatch runs browser proof and additive Pages preview.
 on:
   push:
     branches: [feat/employer-factory-v1-20261030]
