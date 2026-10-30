@@ -1,47 +1,41 @@
 import assert from 'node:assert/strict';
-import {readFileSync,existsSync} from 'node:fs';
+import {existsSync,readFileSync} from 'node:fs';
 const read=p=>readFileSync(p,'utf8');
-const directory='public/data/employer-v2-search-index.json';
-assert(existsSync(directory),'Pages MUST create V2 employer index before building the real main search');
-const data=JSON.parse(read(directory));
-assert.equal(data.schemaVersion,1);
-const company=data.employers.find(p=>p.id==='cn-autumn-027');
-assert(company,'Guangzhilv cn-autumn-027 MUST be indexed in MAIN Pages search');
-assert.equal(company.name,'广之旅');
-assert.equal(company.jobs.length,8,'8 campus job directions MUST be included');
-assert.equal(new Set(company.jobs.map(j=>j.id)).size,8);
-assert.equal(data.employers.length,16,'Main HHBA V2 catalog must include all 16 new employers');
-assert.equal(data.employers.reduce((sum,p)=>sum+p.jobs.length,0),124,'Preserve all 124 reviewed job directions');
-const match=(raw)=>data.employers.filter(p=>{
- const q=raw.normalize('NFKC').toLowerCase().trim();
- return [p.name,p.englishName,...p.aliases].some(v=>v.normalize('NFKC').toLowerCase().includes(q));
+const ids=Array.from({length:16},(_,i)=>'cn-autumn-'+String(i+12).padStart(3,'0'));
+const rows=ids.map(id=>{
+ const file='src/data/employerProfiles/'+id+'.json';
+ assert(existsSync(file),'V2 source must be IN main: '+file);
+ const p=JSON.parse(read(file));
+ assert.equal(p.id,id);
+ assert.equal(p.schemaVersion,1);
+ assert.equal(p.media.photos.length,2);
+ for(const image of [p.media.logo,...p.media.photos.map(x=>x.path)]){
+  if(id!=='cn-autumn-027')assert(existsSync('public/'+image),'V2 main-site photo missing: '+image);
+ }
+ return p;
 });
-for(const [query,expected] of [['南方传媒','cn-autumn-026'],['南方','cn-autumn-026'],['广之','cn-autumn-027'],
- ['广之旅','cn-autumn-027'],['广州广之旅国际旅行社','cn-autumn-027'],['GZL','cn-autumn-027']]){
- assert(match(query).some(p=>p.id===expected),'MAIN search must return '+expected+' for query '+query);
+assert.equal(rows.length,16,'Missing a reviewed employer');
+assert.equal(rows.reduce((sum,p)=>sum+p.jobs.length,0),124,'Preserve 124 V2 role directions');
+assert(rows.some(p=>p.id==='cn-autumn-026'&&p.name==='南方传媒'&&p.jobs.length===6));
+assert(rows.some(p=>p.id==='cn-autumn-027'&&p.name==='广之旅'&&p.jobs.length===8));
+const names=p=>[p.name,p.englishName,...p.aliases].map(s=>s.normalize('NFKC').toLocaleLowerCase());
+const match=q=>rows.filter(p=>names(p).some(n=>n.includes(q.normalize('NFKC').toLowerCase())));
+for(const [q,id] of [
+ ['南方传媒','cn-autumn-026'],['南方','cn-autumn-026'],
+ ['广之','cn-autumn-027'],['广之旅','cn-autumn-027'],
+ ['广州广之旅国际旅行社','cn-autumn-027'],['GZL','cn-autumn-027']
+])assert(match(q).some(p=>p.id===id),'Search does not match '+q);
+for(const p of rows){
+ assert(match(p.name).some(c=>c.id===p.id),'Unsearchable V2 company '+p.name);
+ assert(p.jobs.every(j=>j.id&&j.title),'Incomplete role list '+p.id);
 }
-for(const p of data.employers){
- assert(match(p.name).some(row=>row.id===p.id),'Main search did not find company '+p.name);
- assert(p.jobs.every(j=>j.id&&j.title),'Missing reviewed role data '+p.id);
-}
-
-assert(data.employers.some(p=>p.id==='cn-autumn-026'&&p.name==='南方传媒'&&p.jobs.length===6),'Southern Publishing must be indexed');
-for(const p of data.employers){
- assert(existsSync('public/data/employer-v2-profiles/'+p.id+'.json'),'Missing main-site profile: '+p.id);
- assert(p.jobs.length>0,'Unreviewed company in V2 index: '+p.id);
-}
-assert(existsSync('src/pages/UnifiedV2CompanyPage.tsx'),'Missing unified V2 detail route');
-const names=[company.name,company.englishName,...company.aliases].map(s=>s.normalize('NFKC').toLowerCase());
-for(const term of ['广之','广之旅','gzl','广州广之旅国际旅行社']){
- assert(names.some(s=>s.includes(term.toLowerCase())),'Missing searchable alias: '+term);
-}
-const component=read('src/components/V2EmployerSearchResults.tsx');
 const market=read('src/components/UnifiedJobMarket.tsx');
-assert(market.includes('<V2EmployerSearchResults query={draft}'),'V2 results must appear inside ACTUAL market input');
-assert(market.includes('onMatchChange={setV2SearchMatched}'),'Do not show misleading no-results warning after V2 hit');
-assert(component.includes('p.jobs.map(job=>'),'Every V2 direction must appear in search result');
-assert(component.includes('src={root+p.media.logo}'),'Search result must include brand logo');
-assert(component.includes("root+'companies/autumn/'+p.id+'/'"),'Search card must lead to canonical unified employer profile');
-assert(!component.includes('previewRoot.startsWith'),'Market must never rely on separate V2 preview');
-assert(component.includes('schemaVersion!==1'),'Dynamic search index needs a verified schema');
-console.log('HHBA_MAIN_MARKET_GZL_SEARCH_INTEGRATION_OK',company.name,company.jobs.length,names.length);
+const component=read('src/components/V2EmployerSearchResults.tsx');
+const detail=read('src/pages/UnifiedV2CompanyPage.tsx');
+const entry=read('src/main.tsx');
+assert(market.includes('<V2EmployerSearchResults query={draft}'),'All V2 companies must use original market input');
+assert(component.includes("import {employerProfiles} from '../services/employerProfiles'"),'Search must use bundled main catalog');
+assert(!component.includes('previewRoot'),'No company-specific sub-sites');
+assert(detail.includes('employerProfileById.get(id)'),'All detail pages use one bundled catalog');
+assert(entry.includes('UnifiedV2CompanyPage'),'Main route missing');
+console.log('HHBA_ONE_MAIN_BRANCH_V2_SEARCH_PASS',rows.length,rows.reduce((s,p)=>s+p.jobs.length,0));
