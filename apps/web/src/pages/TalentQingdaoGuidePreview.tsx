@@ -1,6 +1,4 @@
-import {useMemo,useState} from 'react';
-import {ArrowLeft,ArrowRight,ArrowUpRight,CheckCircle2,ChevronDown,ClipboardCheck,ExternalLink,FileCheck2,HelpCircle,Info,Landmark,Phone,ShieldCheck,Wallet,AlertTriangle} from 'lucide-react';
-import {Link} from '../router';
+import {UnifiedPolicyGuide,type CompleteGuide} from '../components/talent/UnifiedPolicyGuide';
 import '../styles/talent-jinan-guide-preview.css';
 
 type GuideKind='housing'|'stay';
@@ -78,58 +76,20 @@ const stay:Guide={
  officialUrl:'https://www.qingdao.gov.cn/zwgk/xxgk/rlshbz/gkml/gwfg/202606/t20260630_10647826.shtml',officialLabel:'查看官方“爱山东”操作说明',officialNote:'操作入口在“爱山东”App / 微信小程序内搜索“青岛市免租金住宿保障平台”，政府原文不是选房页面。',phone:'0532-85912361'
 };
 const configs:Record<GuideKind,Guide>={housing,stay};
-export function TalentQingdaoGuidePreview({kind}:{kind:GuideKind}){
- const data=configs[kind];
- const [branch,setBranch]=useState(kind==='housing'?'master':'search');
- const [selected,setSelected]=useState<Record<string,boolean>>({});
- const [openFaq,setOpenFaq]=useState<number|null>(0);
- const [faqQuery,setFaqQuery]=useState('');
- const cases=useMemo(()=>data.faq.map(([q,a],i)=>({q,a,i})).filter(item=>(item.q+item.a).includes(faqQuery.trim())),[data,faqQuery]);
- const current=data.branches[branch]||Object.values(data.branches)[0];
- const completed=data.checks.filter((_,i)=>selected[String(i)]).length;
- return <main className="jgd-page">
-  <nav className="jgd-breadcrumb"><Link to="/talent-service">人才服务</Link><span>›</span>
-   <Link to="/talent-service/policy-layout-preview/qingdao">青岛政策新版列表</Link><span>›</span>完整办理指南</nav>
-  <header className="jgd-hero"><div className="jgd-hero-text"><span className="jgd-kicker">HHBA / {data.kicker}</span><h1>{data.title}</h1><p>{data.desc}</p>
-   <div className="jgd-tags"><span>政府来源可追溯</span><span>按个人情况切换说明</span><span>{data.review}</span></div></div>
-   <div className="jgd-hero-aside"><span>主要待遇</span><strong>{data.support}</strong><small>{data.unit}</small><span>{data.limit}</span></div>
-  </header>
-  <nav className="jgd-page-nav" aria-label="页面快速导航"><a href="#qdg-benefit">补贴待遇</a><a href="#qdg-conditions">申请资格</a><a href="#qdg-steps">六步指南</a><a href="#qdg-checks">准备清单</a><a href="#qdg-faq">常见疑问</a><a href="#qdg-official">官方入口</a></nav>
-  <div className="jgd-layout"><div className="jgd-main">
-   <section className="jgd-panel" id="qdg-benefit"><div className="jgd-section-heading"><span className="jgd-section-icon"><Wallet size={18}/></span><div><h2>01 政策标准与期限</h2><p>不同对象的待遇差异，按政府文件分别列明。</p></div></div>
-    <div className="jgd-money-table"><table><thead><tr><th>适用类别</th><th>待遇</th><th>限制</th></tr></thead><tbody>{data.amounts.map(row=><tr key={row[0]}>{row.map((x,i)=><td key={i}>{x}</td>)}</tr>)}</tbody></table></div>
-    <div className="jgd-tip"><Info size={16}/><p>{data.review} 具体资格及当前受理请以官方经办平台为准。</p></div>
-   </section>
-   <section className="jgd-panel" id="qdg-conditions"><div className="jgd-section-heading"><span className="jgd-section-icon"><ShieldCheck size={18}/></span><div><h2>02 按本人情况核对资格</h2><p>切换不同申请路径，条件和材料同步变化。</p></div></div>
-    <div className="jgd-track-tabs" role="group" aria-label="选择申请人类别">{Object.entries(data.branches).map(([value,item])=><button type="button" key={value} className={branch===value?'active':''} aria-pressed={branch===value} onClick={()=>setBranch(value)}>{item.label}</button>)}</div>
-    <div className="jgd-track-box"><h3>{current.label}</h3><p>{current.desc}</p><ul>{current.conditions.map((s,i)=><li key={i}><CheckCircle2 size={15}/><span>{s}</span></li>)}</ul>
-     <div className="jgd-track-remark"><AlertTriangle size={16}/><span>{current.warning}</span></div>
-    </div>
-   </section>
-   <section className="jgd-panel" id="qdg-steps"><div className="jgd-section-heading"><span className="jgd-section-icon"><ClipboardCheck size={18}/></span><div><h2>03 六步实际办理指南</h2><p>每一步有行动、原因和完成标志；不是泛泛的“按规定申报”。</p></div></div>
-    <ol className="jgd-step-list">{data.steps.map((step,i)=><li className="jgd-step" key={i}><span className="jgd-step-index">{i+1}</span><div className="jgd-step-content"><h3>{step.title}</h3>
-     <div className="jgd-step-detail"><p><strong>为什么做</strong>{step.why}</p><p><strong>具体怎么做</strong>{step.action}</p><p><strong>完成标志</strong>{step.done}</p></div>
-     {step.note&&<p className="jgd-step-note">{step.note}</p>}
-     {i===3&&<a className="jgd-step-action" href={data.officialUrl} target="_blank" rel="noopener noreferrer">{data.officialLabel} <ArrowUpRight size={14}/></a>}
-    </div></li>)}</ol>
-   </section>
-   <section className="jgd-panel" id="qdg-checks"><div className="jgd-section-heading"><span className="jgd-section-icon"><FileCheck2 size={18}/></span><div><h2>04 办理前材料与自查清单</h2><p>只在当前浏览器勾选，不上传任何个人证明材料。</p></div></div>
-    <div className="jgd-progress"><span>已确认 {completed}/{data.checks.length} 项</span><div role="progressbar" aria-label="准备事项进度" aria-valuemin={0} aria-valuemax={data.checks.length} aria-valuenow={completed}><span style={{width:(completed/data.checks.length*100)+'%'}}/></div></div>
-    <div className="jgd-checklist">{data.checks.map((s,i)=><label key={s}><input type="checkbox" checked={Boolean(selected[String(i)])} onChange={e=>setSelected(prev=>({...prev,[String(i)]:e.target.checked}))}/><span>{s}</span></label>)}</div>
-    <h3 className="jgd-material-heading">{current.label} · 建议材料</h3><ul className="jgd-materials">{current.materials.map((s,i)=><li key={i}>{s}</li>)}</ul><p className="jgd-mutedsmall">材料是根据已核实政策整理的准备方向；以官方最新受理界面为准，不代表已通过资格认证。</p>
-   </section>
-   <section className="jgd-panel" id="qdg-faq"><div className="jgd-section-heading"><span className="jgd-section-icon"><HelpCircle size={18}/></span><div><h2>05 常见问题</h2><p>可搜索关键词，点击展开对应规则解释。</p></div></div>
-    <label className="jgd-faq-search">查找常见问题<input type="search" value={faqQuery} onChange={e=>setFaqQuery(e.target.value)} placeholder="输入学历、社保、到账、房源……"/></label>
-    <div className="jgd-faq-list">{cases.map(item=><div className="jgd-faq-item" key={item.i}><button type="button" aria-expanded={openFaq===item.i} onClick={()=>setOpenFaq(v=>v===item.i?null:item.i)}><span>{item.q}</span><ChevronDown size={16} className={openFaq===item.i?'opened':''}/></button>{openFaq===item.i&&<p>{item.a}</p>}</div>)}{cases.length===0&&<p className="jgd-no-results">没有找到匹配的问题，可以清空搜索后浏览全部。</p>}</div>
-   </section>
-   <section className="jgd-panel" id="qdg-official"><div className="jgd-section-heading"><span className="jgd-section-icon"><Landmark size={18}/></span><div><h2>06 官方申报入口、联系方式与原文</h2><p>政府政策介绍页与实际申报入口严格区分。</p></div></div>
-    <div className="jgd-portal"><div><strong>{kind==='housing'?'青岛人才网':'爱山东 · 青岛免租金住宿保障平台'}</strong><span>{kind==='housing'?'高校毕业生住房补贴由本人在线申请':'在爱山东客户端或微信小程序内搜索平台办理'}</span><small>{data.officialNote}</small></div><a href={data.officialUrl} rel="noopener noreferrer" target="_blank">{data.officialLabel} <ExternalLink size={14}/></a></div>
-    <p className="jgd-portal-warning"><AlertTriangle size={15}/>{kind==='housing'?'网站提供政府指明的办理入口；无法保证当前登录后的审核或按钮状态。':'政府公开文件是办理依据；请进入爱山东平台查询选房申请，不能在本文直接选房。'}</p>
-    <div className="jgd-contact"><div><span>青岛市政府公开政策咨询电话</span><strong>{data.phone}</strong><small>{kind==='housing'?'市公共就业和人才服务中心人才服务部':'市人社局就业促进与失业保险处'} · 请核对接听时间</small></div><a href={'tel:'+data.phone}><Phone size={15}/>拨打咨询</a></div>
-    <div className="jgd-sources"><h3>原始政策与办理依据</h3>{data.sources.map(([text,url])=><a href={url} key={url} target="_blank" rel="noopener noreferrer">{text}<ArrowUpRight size={14}/></a>)}</div>
-   </section>
-  </div><aside className="jgd-side"><div className="jgd-side-card"><span>重点提醒</span><h3>{kind==='housing'?'个人申请 · 最多36个月':'申请房源 · 不是直接发钱'}</h3><p>{data.review}</p><a href={data.officialUrl} target="_blank" rel="noopener noreferrer">查看官方办理入口 <ArrowUpRight size={13}/></a></div>
-   <div className="jgd-side-card"><span>同城另一项政策</span><p>{kind==='housing'?'来青岛求职的毕业生还可以了解2026年免租金住宿保障，但两项政策不能自动同时享受。':'青岛还有按学历分档、最长36个月的高校毕业生现金住房补贴，资格条件与本项不同。'}</p><Link to={'/talent-service/policy-guide-preview/qingdao/'+(kind==='housing'?'stay':'housing')}>切换查看 <ArrowRight size={14}/></Link></div></aside></div>
-  <footer className="jgd-footer"><Link to="/talent-service/policy-layout-preview/qingdao"><ArrowLeft size={14}/> 返回青岛政策列表</Link><span>资料整理核验2026-10-30 · HHBA不代替官方资格审核或申领</span></footer>
- </main>;
+
+function mappedGuide(kind:GuideKind):CompleteGuide{
+ const data=kind==='housing'?housing:stay;
+ return {
+  city:'青岛',title:data.title,kicker:data.kicker,desc:data.desc,
+  support:data.support,unit:data.unit,limit:data.limit,review:data.review,
+  amounts:data.amounts,branches:data.branches,defaultBranch:kind==='housing'?'master':'search',
+  steps:data.steps,checks:data.checks,faq:data.faq,sources:data.sources,
+  officialUrl:data.officialUrl,officialLabel:data.officialLabel,officialNote:data.officialNote,
+  contacts:[{name:kind==='housing'?'人才服务政策咨询':'免租金住宿政策咨询',phone:data.phone}],
+  listPath:'/talent-service/policy-layout-preview/qingdao',stepPortalIndex:3,
+  otherRoute:'/talent-service/policy-guide-preview/qingdao/'+(kind==='housing'?'stay':'housing'),
+  otherLabel:kind==='housing'?'查看免租金住宿指南':'查看住房补贴指南',
+  detailPath:'/talent-service/policy/'+(kind==='housing'?'qd-rent-25':'sd-qingdao-2026-free-housing')
+ };
 }
+export function TalentQingdaoGuidePreview({kind}:{kind:GuideKind}){return <UnifiedPolicyGuide data={mappedGuide(kind)}/>;}

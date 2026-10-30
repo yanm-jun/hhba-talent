@@ -1,6 +1,4 @@
-import {useMemo,useState} from 'react';
-import {ArrowLeft,ArrowRight,ArrowUpRight,CheckCircle2,ChevronDown,ClipboardCheck,ExternalLink,FileCheck2,FileText,HelpCircle,Info,Landmark,MapPin,Phone,ShieldCheck,Wallet,AlertTriangle} from 'lucide-react';
-import {Link} from '../router';
+import {UnifiedPolicyGuide,type CompleteGuide} from '../components/talent/UnifiedPolicyGuide';
 import '../styles/talent-jinan-guide-preview.css';
 
 type Track='senior'|'doctor'|'master';
@@ -139,79 +137,31 @@ const districts=[
  {name:'南部山区',phone:'0531-88112713'},
  {name:'起步区',phone:'0531-66604391'}
 ];
-export function TalentJinanGuidePreview(){
- const [track,setTrack]=useState<Track>('master');
- const [selected,setSelected]=useState<Record<string,boolean>>({});
- const [district,setDistrict]=useState('历下区');
- const [openFaq,setOpenFaq]=useState<number|null>(0);
- const [searchFaq,setSearchFaq]=useState('');
- const items=useMemo(()=>questions.map(([q,a],i)=>({q,a,i})).filter(x=>(x.q+x.a).includes(searchFaq.trim())),[searchFaq]);
- const progress=checks.filter(x=>selected[x.id]).length;
- const active=trackInfo[track];
- const selectedDistrict=districts.find(x=>x.name===district)!;
- return <main className="jgd-page">
-   <nav className="jgd-breadcrumb" aria-label="当前位置"><Link to="/talent-service">人才服务</Link><span>›</span><Link to="/talent-service/policy-layout-preview/jinan">济南政策样板</Link><span>›</span>详细办理指南</nav>
-   <header className="jgd-hero">
-    <div className="jgd-hero-text"><span className="jgd-kicker">HHBA / TALENT POLICY SERVICE · 济南单城V3.1样板</span><h1>济南市高层次人才生活补贴</h1>
-     <p>从“我能不能申请”到“去哪里申请、怎样拿到补贴”，按照官方发布的流程一步步说明。</p>
-     <div className="jgd-tags"><span>2026年官方问答已核对</span><span>线上申报</span><span>资格及受理状态以政府核定为准</span></div>
-    </div>
-    <div className="jgd-hero-aside"><span>符合条件的不同类别标准</span><strong>¥1,000—5,000</strong><small>每月 · 按人才类别分别核定</small><span>最长3—5年 · 不可视为人人可领</span></div>
-   </header>
-   <nav className="jgd-page-nav" aria-label="本页快速导航"><a href="#jgd-money">补贴标准</a><a href="#jgd-eligibility">资格条件</a><a href="#jgd-steps">6步申请指南</a><a href="#jgd-checks">材料自查</a><a href="#jgd-faq">常见疑问</a><a href="#jgd-source">官方入口</a></nav>
-   <div className="jgd-layout"><div className="jgd-main">
-    <section id="jgd-money" className="jgd-panel"><div className="jgd-section-heading"><span className="jgd-section-icon"><Wallet size={18}/></span><div><h2>01 政策支持与补贴标准</h2><p>按人才类别分别认定，不是“学历达到就能直接领取”。</p></div></div>
-     <div className="jgd-money-table"><table><thead><tr><th>人才类别</th><th>月度补贴标准</th><th>最长期限</th></tr></thead><tbody>{pay.map(row=><tr key={row[0]}>{row.map((value,i)=><td key={i}>{value}</td>)}</tr>)}</tbody></table></div>
-     <div className="jgd-tip"><Info size={16}/><p>表格金额来源于济南市人社局2026年1月30日官方答复。申报资格及发放时间按个人类别、实际审批和当期公告确定。<a href={OFFICIAL.amount} target="_blank" rel="noopener noreferrer">查看官方金额说明 <ArrowUpRight size={12}/></a></p></div>
-    </section>
-    <section id="jgd-eligibility" className="jgd-panel"><div className="jgd-section-heading"><span className="jgd-section-icon"><ShieldCheck size={18}/></span><div><h2>02 谁可以申请？需要满足什么条件？</h2><p>选择与你相符的类别，页面会展示对应条件及准备资料。</p></div></div>
-     <div className="jgd-track-tabs" role="group" aria-label="选择人才类型">
-      {([['master','全日制硕士'],['doctor','全日制博士'],['senior','A—D类认定人才']] as const).map(([value,label])=><button key={value} type="button" aria-pressed={track===value} className={track===value?'active':''} onClick={()=>setTrack(value)}>{label}</button>)}
-     </div>
-     <div className="jgd-track-box"><h3>{active.label}</h3><p>{active.subtitle}</p><ul>{active.conditions.map((c,i)=><li key={i}><CheckCircle2 size={15}/><span>{c}</span></li>)}</ul>
-      <div className="jgd-track-remark"><AlertTriangle size={16}/>{active.remark}</div>
-     </div>
-     <a className="jgd-inline-ref" href={OFFICIAL.conditions} target="_blank" rel="noopener noreferrer"><FileText size={14}/> 济南市人社局2026年申请条件原文 <ArrowUpRight size={13}/></a>
-    </section>
-    <section id="jgd-steps" className="jgd-panel"><div className="jgd-section-heading"><span className="jgd-section-icon"><ClipboardCheck size={18}/></span><div><h2>03 申请办理：从准备到发放的6个步骤</h2><p>每一步都解释“为什么做、具体做什么、完成后应该看到什么”。</p></div></div>
-     <ol className="jgd-step-list">{steps.map((step,i)=><li className="jgd-step" key={step.title}>
-      <span className="jgd-step-index">{i+1}</span><div className="jgd-step-content"><h3>{step.title}</h3>
-       <div className="jgd-step-detail"><p><strong>为什么要做</strong>{step.why}</p><p><strong>具体怎么做</strong>{step.action}</p><p><strong>完成后的确认</strong>{step.done}</p></div>
-       {step.note&&<p className="jgd-step-note">{step.note}</p>}
-       {i===2&&<a className="jgd-step-action" href={OFFICIAL.portal} target="_blank" rel="noopener noreferrer">打开济南人才网官方入口 <ArrowUpRight size={14}/></a>}
-      </div>
-     </li>)}</ol>
-     <div className="jgd-tip"><Info size={16}/><p>申报顺序以济南市人社局2026年1月30日说明为依据；材料补正、所在区县审核周期及页面功能以系统实际显示为准。<a href={OFFICIAL.process} target="_blank" rel="noopener noreferrer">核对官方办理说明 <ArrowUpRight size={12}/></a></p></div>
-    </section>
-    <section id="jgd-checks" className="jgd-panel"><div className="jgd-section-heading"><span className="jgd-section-icon"><FileCheck2 size={18}/></span><div><h2>04 申请前检查清单</h2><p>勾选已确认的事项，仅保留于当前网页，不上传个人数据。</p></div></div>
-     <div className="jgd-progress"><span>已确认 {progress}/{checks.length} 项</span><div role="progressbar" aria-label="申请前准备进度" aria-valuemin={0} aria-valuemax={checks.length} aria-valuenow={progress}><span style={{width:(progress/checks.length*100)+'%'}}/></div></div>
-     <div className="jgd-checklist">{checks.map(row=><label key={row.id}><input type="checkbox" checked={Boolean(selected[row.id])} onChange={e=>setSelected(x=>({...x,[row.id]:e.target.checked}))}/><span>{row.text}</span></label>)}</div>
-     <h3 className="jgd-material-heading">当前选中类别建议提前准备</h3><ul className="jgd-materials">{active.materials.map((x,i)=><li key={i}>{x}</li>)}</ul>
-     <p className="jgd-mutedsmall">这是一份准备建议，不是政府系统的最终材料清单，也不表示已通过资格审核。</p>
-    </section>
-    <section id="jgd-faq" className="jgd-panel"><div className="jgd-section-heading"><span className="jgd-section-icon"><HelpCircle size={18}/></span><div><h2>05 常见问题与容易踩的坑</h2><p>从学历要求、单位授权、重复享受到补贴不到账，逐项解释。</p></div></div>
-     <label className="jgd-faq-search">快速查找问题 <input type="search" value={searchFaq} onChange={e=>setSearchFaq(e.target.value)} placeholder="例如：社保、硕士、到账、购房..." /></label>
-     <div className="jgd-faq-list">{items.map(item=><div className="jgd-faq-item" key={item.i}><button type="button" aria-expanded={openFaq===item.i} onClick={()=>setOpenFaq(x=>x===item.i?null:item.i)}><span>{item.q}</span><ChevronDown size={16} className={openFaq===item.i?'opened':''}/></button>{openFaq===item.i&&<p>{item.a}</p>}</div>)}{!items.length&&<p className="jgd-no-results">没有匹配的问题，请尝试“补贴”“申报”等关键词。</p>}</div>
-    </section>
-    <section id="jgd-source" className="jgd-panel"><div className="jgd-section-heading"><span className="jgd-section-icon"><Landmark size={18}/></span><div><h2>06 官方申报入口与咨询方式</h2><p>清楚区分“直接申报平台”和“官方依据文档”。</p></div></div>
-      <div className="jgd-portal"><div><strong>济南人才网</strong><span>市人社局指明的在线申报平台</span><small>个人和单位分别注册；单位先开通个人申报权限。</small></div><a href={OFFICIAL.portal} target="_blank" rel="noopener noreferrer">进入官方平台 <ExternalLink size={15}/></a></div>
-      <p className="jgd-portal-warning"><AlertTriangle size={15}/> 官方入口由市人社局2026年答复确认；本次仅能核实其官方指向，网站当前可达性及登录后页面未能实时验证。</p>
-      <label className="jgd-district"><MapPin size={15}/> 选择单位所在区县 <select value={district} onChange={e=>setDistrict(e.target.value)}>{districts.map(d=><option value={d.name} key={d.name}>{d.name}</option>)}</select></label>
-      <div className="jgd-contact"><div><span>{selectedDistrict.name} · 人才生活补贴咨询</span><strong>{selectedDistrict.phone}</strong><small>咨询前可准备毕业年限、单位区县、合同及参保信息；不要在公共网站提交证件号码。</small></div><a href={'tel:'+selectedDistrict.phone}><Phone size={15}/> 拨打电话</a></div>
-      <a className="jgd-inline-ref" href={OFFICIAL.contact} target="_blank" rel="noopener noreferrer">查看济南市人社局2026年区县完整电话及窗口地址 <ArrowUpRight size={14}/></a>
-      <div className="jgd-sources"><h3>核验过的官方依据</h3>
-       {[
-        ['2026-01-30 · 申报流程及单位授权',OFFICIAL.process],
-        ['2026-01-30 · 支持对象及申请条件',OFFICIAL.conditions],
-        ['2026-01-30 · 补贴金额与期限',OFFICIAL.amount],
-        ['2026-01-30 · 审核通过后的发放时间',OFFICIAL.payment],
-        ['2026-01-30 · 与住房类补贴的互斥要求',OFFICIAL.conflict],
-        ['2026-01-30 · 补贴未到账排查方法',OFFICIAL.missing],
-        ['2026-04-01 · 济南起步区2026版补贴公示',OFFICIAL.evidence]
-       ].map(([label,url])=><a key={url} href={url} rel="noopener noreferrer" target="_blank">{label}<ArrowUpRight size={13}/></a>)}
-      </div>
-    </section>
-   </div><aside className="jgd-side"><div className="jgd-side-card"><span>办理重点</span><h3>先确认资格，再开始网申</h3><ul><li>这项补贴有不同人才通道</li><li>单位须开通申报权限</li><li>按单位所在地的区县审核</li><li>审核通过通常下季度到账</li></ul><a href={OFFICIAL.portal} target="_blank" rel="noopener noreferrer">济南人才网 <ArrowUpRight size={13}/></a></div><div className="jgd-side-card"><span>页面状态</span><p>单项政策V3.1独立预览。其他城市、旧版详情和首页未修改。</p><Link to="/talent-service/policy/sd-jinan-2026-talent-living">对比原详情页 <ArrowRight size={13}/></Link></div></aside></div>
-   <footer className="jgd-footer"><Link to="/talent-service/policy-layout-preview/jinan"><ArrowLeft size={14}/> 返回济南政策新版列表</Link><span>2026-10-30 核验 · HHBA 信息整理，仅供辅助理解，不替代政府审核</span></footer>
- </main>;
-}
+
+const jinanGuide:CompleteGuide={
+ city:'济南',title:'济南市高层次人才生活补贴',kicker:'TALENT POLICY SERVICE · 济南',
+ desc:'按人才分类核对就业、参保和申报资格；从判断类别到办理和发放，一步步解释清楚。',
+ support:'¥1,000—5,000',unit:'每月 · 按人才类别分别核定',limit:'最长3—5年，实际待遇须审核',
+ review:'2026年济南市人社局官方答复已核对；当前受理状态按人才网申报窗口为准。',
+ amounts:pay,branches:Object.fromEntries(Object.entries(trackInfo).map(([key,item])=>[key,{
+  label:item.label,desc:item.subtitle,conditions:item.conditions,materials:item.materials,warning:item.remark
+ }])),
+ defaultBranch:'master',steps,checks:checks.map(x=>x.text),
+ faq:questions.map(([q,a])=>[q,a] as [string,string]),
+ sources:[
+  ['2026年官方补贴金额和期限',OFFICIAL.amount],
+  ['适用对象及人才类别区分',OFFICIAL.conditions],
+  ['申请平台和单位授权流程',OFFICIAL.process],
+  ['补贴发放时限与账户',OFFICIAL.payment],
+  ['购房、住房待遇互斥说明',OFFICIAL.conflict],
+  ['补贴未到账处理办法',OFFICIAL.missing],
+  ['济南市2026年区县经办电话',OFFICIAL.contact],
+  ['济南起步区2026年落实公示',OFFICIAL.evidence]
+ ],
+ officialUrl:OFFICIAL.portal,officialLabel:'济南人才网',
+ officialNote:'个人与单位分别注册、由单位开通申报权限。登录后的当前申报状态须以实际页面为准。',
+ contacts:districts,contactSource:OFFICIAL.contact,
+ listPath:'/talent-service/policy-layout-preview/jinan',
+ detailPath:'/talent-service/policy/sd-jinan-2026-talent-living',stepPortalIndex:2
+};
+export function TalentJinanGuidePreview(){return <UnifiedPolicyGuide data={jinanGuide}/>;}
