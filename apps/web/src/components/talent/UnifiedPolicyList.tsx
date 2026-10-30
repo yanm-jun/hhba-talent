@@ -33,7 +33,7 @@ export function buildCityPolicyConfig(city:string):CityPolicyConfig{
   notes:'只有已经核实的政策才会显示对应待遇；未获得独立完整指南认证的记录保持基础资料等级。',
   tiles:rows.map(p=>({
    id:p.id,category:p.category==='购房补贴'?'购房安家':p.category,
-   amount:p.city==='烟台'&&p.id==='sd-yantai-2026-youth-living'?'¥6,000—36,000':p.city==='烟台'&&p.id==='sd-yantai-2026-purchase'?'最高¥260,000':'按政策类别核定',unit:p.city==='烟台'&&p.id==='sd-yantai-2026-youth-living'?'每年 · 分类核定':p.city==='烟台'&&p.id==='sd-yantai-2026-purchase'?'一次性 · 房款30%封顶':'以官方条件为准',
+   amount:p.headlineAmount||p.city==='烟台'&&p.id==='sd-yantai-2026-youth-living'?'¥6,000—36,000':p.city==='烟台'&&p.id==='sd-yantai-2026-purchase'?'最高¥260,000':'按政策类别核定',unit:p.headlineUnit||p.city==='烟台'&&p.id==='sd-yantai-2026-youth-living'?'每年 · 分类核定':p.city==='烟台'&&p.id==='sd-yantai-2026-purchase'?'一次性 · 房款30%封顶':'以官方条件为准',
    description:clip(p.benefit,112),condition:clip(p.eligibility,92),
    status:'基础资料 · 申领状态待核验',detailPath:p.id==='sd-yantai-2026-youth-living'?'/talent-service/policy-guide-preview/yantai/living':p.id==='sd-yantai-2026-purchase'?'/talent-service/policy-guide-preview/yantai/home':undefined
   }))
