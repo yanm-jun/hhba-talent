@@ -221,6 +221,7 @@ export const ziboLivingGuide:CompleteGuide={
 };
 export const ziboPurchaseGuide:CompleteGuide={
  "city": "淄博",
+ "qualityLevel": "B",
  "kicker": "TALENT POLICY SERVICE · 淄博",
  "officialLabel": "独立申报直达页待核验",
  "officialNote": "2022年淄博市人社局公开说明在“淄博百事通人才管理服务系统→人才服务→享补贴”查询及办理。2026年是否仍提供同一路径、本人能否申报，以当前实际政务系统及经办机构为准；这里不以官网首页冒充申报入口。",
