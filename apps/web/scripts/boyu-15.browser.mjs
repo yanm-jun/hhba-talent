@@ -8,7 +8,8 @@ try{
  const page=await browser.newPage({viewport:{width:1440,height:930},locale:'zh-CN'});
  const errors=[];page.on('pageerror',err=>errors.push(err.message));
  await page.goto(base+'companies/autumn/cn-autumn-011',{waitUntil:'domcontentloaded',timeout:45000});
- const root=page.locator('[data-employer-id="cn-autumn-011"]');await root.waitFor({timeout:25000});
+ console.log('BOYU_DIAG',JSON.stringify({url:page.url(),body:(await page.locator('body').innerText()).slice(0,1250),errors:errors.slice(0,5),title:await page.title()}));
+ const root=page.locator('[data-employer-id="cn-autumn-011"]');await root.waitFor({timeout:9000});
  const img=root.locator('.hhba-kpmg-logo img,.hhba-kpmg-photo-grid img');
  assert.equal(await img.count(),3,'Three distinct user images');
  for(const image of await img.all())await image.evaluate(async el=>{if(!el.complete)await new Promise(resolve=>{el.onload=resolve;el.onerror=resolve});if(!el.naturalWidth)throw Error('Image missing: '+el.src)});
