@@ -24,7 +24,7 @@ check('Five independent 2026-09-30 public rental community leads total 112 publi
   const id='hz-mudan-20260930-'+items[i]+'-lead';
   const h=leads.find(x=>x.id===id);
   assert.ok(h,id);
-  assert.equal(h.city,'菏泽');assert.equal(h.category,'保障性租赁住房'); // 平台分类；正文明确这是公共租赁住房
+  assert.equal(h.city,'菏泽');assert.equal(h.category,'公共租赁住房'); // 与官方通告的住房类型一致
   assert.ok(h.units.includes(counts[i]+'套'));assert.ok(h.units.includes('不是10月底实时空房'));
   assert.ok(h.statusNote.includes('待核验'));assert.ok(h.steps.length>=4);
   assert.notEqual(talentSourceKind(h.sourceUrl),'government');
