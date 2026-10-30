@@ -27,14 +27,14 @@
       {
         "path": "images/employer-profiles/cn-autumn-014/photo1.webp",
         "caption": "沙特哈登光伏项目",
-        "note": "中国能建国际工程公司官网项目图片 · 国际集团下属项目实施主体",
+        "note": "中国能建国际集团官方网站（ceecgroup.com）沙特哈登光伏项目施工人员合影 · 实际项目图片",
         "alt": "中国能建海外沙特哈登光伏项目现场人员与施工区域"
       },
       {
         "path": "images/employer-profiles/cn-autumn-014/photo2.webp",
-        "caption": "海外项目工程建设现场",
-        "note": "中国能建国际工程公司官网海外工程项目图片 · 非国际集团总部照片",
-        "alt": "沙特哈登光伏项目升压站施工现场与工程团队"
+        "caption": "沙特哈登光伏项目升压站",
+        "note": "中国能建国际集团官方网站（ceecgroup.com）沙特哈登光伏项目升压站送电纪念照片",
+        "alt": "中国能建沙特哈登光伏项目升压站建筑前的工程团队合影"
       }
     ]
   },
@@ -57,7 +57,7 @@
     "物流管理",
     "管理科学与工程"
   ],
-  "photoNote": "本页 Logo 使用中国能建体系的官方集团品牌标识，不代表额外创造的‘国际集团专属 Logo’。两张独立项目照片来自中国能建国际工程公司（国际集团下属的海外项目实施主体）官网；图片本身不设置外链。岗位依据高校公开校招简章，具体投递请在校招系统核验。",
+  "photoNote": "集团 Logo 来自中国能建（ceec.net.cn）官方品牌标识；两张照片来自中国能建国际集团官方网站（ceecgroup.com）沙特哈登光伏项目资料，分别展示组件安装和升压站送电节点。均为本站独立静态副本，点击图片不跳第三方网站。2027届岗位类别依据高校公开招聘简章，不表示当前实时开放。",
   "business": [
     {
       "title": "国际能源电力工程",
@@ -244,10 +244,10 @@
     }
   ],
   "mediaSources": {
-    "logo": "中国能建官方品牌标识，图片实际来源见附件 source-manifest.json",
+    "logo": "https://www.ceec.net.cn/images/3795/img-logo-1.png",
     "photoSources": [
-      "https://www.intl.ceec.net.cn/picture/0/s_c9ba131e5df74da49c49b9b8554535b2.jpg",
-      "https://www.intl.ceec.net.cn/picture/0/s_68e4ddf32e01414496a8b92e772f0871.jpg"
+      "https://www.ceecgroup.com/uploads/general-pictures/11e4_%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_2025-11-26_103141_378.jpg",
+      "https://www.ceecgroup.com/media/cache/banner/uploads/news-covers/6a164d0fedc97184797797.jpg"
     ],
     "recruitmentSource": "https://job.hust.edu.cn/zpinfo1/2435714.htm"
   }
