@@ -11,6 +11,8 @@ try{
   await page.goto(base+'companies/autumn/cn-autumn-018/',{waitUntil:'domcontentloaded',timeout:50000});
   const root=page.locator('[data-company-template="factory-v1"][data-employer-id="cn-autumn-018"]');
   await root.waitFor({timeout:30000});
+  const consent=page.getByRole('button',{name:'暂不同意'});
+  if(await consent.isVisible().catch(()=>false))await consent.click();
   assert((await root.locator('h1').innerText()).includes('新奥集团'),'wrong company identity');
   const imgs=root.locator('.hhba-kpmg-logo img,.hhba-kpmg-photo-grid img');
   assert.equal(await imgs.count(),3);
