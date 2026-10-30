@@ -1,0 +1,33 @@
+{
+  "company": "青蛙王子",
+  "employer_id": "cn-autumn-021",
+  "assets": {
+    "logo": {
+      "path": "images/employer-profiles/cn-autumn-021/logo.png",
+      "source": "https://www.3wen.com/userfiles/editor/baozhuang/3qiwan.jpg",
+      "sha256": "35b13eeab562478b093db55e708d5fc4d46340a8f0937d83c6743e42e901cd23",
+      "dimensions": [
+        1200,
+        800
+      ]
+    },
+    "photo1": {
+      "path": "images/employer-profiles/cn-autumn-021/photo1.webp",
+      "source": "https://img.waimaoniu.net/3922/3922-202510241221360963.jpg",
+      "sha256": "194e46c58ed7360cf2031e5034e530915a8a3a3f10c72164dbacb6839d371498",
+      "dimensions": [
+        1280,
+        853
+      ]
+    },
+    "photo2": {
+      "path": "images/employer-profiles/cn-autumn-021/photo2.webp",
+      "source": "https://img.waimaoniu.net/3922/3922-202404071513591709.jpg",
+      "sha256": "3615a06b7d2c73dfae50ddedfe12a88e5fd5ebef205ff8ace7039e46cb7321ca",
+      "dimensions": [
+        1600,
+        1066
+      ]
+    }
+  }
+}

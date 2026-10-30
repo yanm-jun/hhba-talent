@@ -1,0 +1,99 @@
+name: HHBA Integrate V2 Employers into Full Site (review only)
+on:
+  push:
+    branches: [feat/integrate-employer-v2-into-unified-20261030]
+    paths:
+      - '.github/workflows/hhba-integrate-employer-v2-review.yml'
+      - 'apps/web/scripts/integrate-employer-v2-into-unified.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: hhba-integrate-v2-review
+  cancel-in-progress: false
+jobs:
+  integrate:
+    if: github.ref == 'refs/heads/feat/integrate-employer-v2-into-unified-20261030'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      HHBA_GITHUB_PAGES: '1'
+      HHBA_PAGES_BASE: '/hhba-talent/preview-integration-v2/'
+      VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+      VITE_HHBA_OVERSEAS_CURATED_100: '1'
+      VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+      VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+      VITE_DEMO_ACCOUNT_ENABLED: '0'
+    steps:
+      - name: Checkout unified full site only; never replace with V2 site wholesale
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Selective merge of reviewed V2 files with non-destructive 3-way safety gate
+        run: |
+          set -euo pipefail
+          git fetch origin refs/heads/feat/hhba-unified-static-20261025:refs/remotes/origin/feat/hhba-unified-static-20261025
+          git fetch origin refs/heads/fix/search-actual-published-urls-20261030:refs/remotes/origin/fix/search-actual-published-urls-20261030
+          if test -s apps/web/src/data/employerProfiles/cn-autumn-025.json &&
+             test -s apps/web/src/pages/ConfiguredEmployerProfilePage.tsx; then
+            echo "V2 selective import is present; preserve subsequent integration fixes"
+          else
+            python3 apps/web/scripts/integrate-employer-v2-into-unified.py
+          fi
+      - name: Commit selective import ONLY on isolated review branch
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if ! git diff --cached --quiet; then
+            git commit -m "feat(review): integrate V2 employer directory into current unified site [skip ci]"
+            git push origin HEAD:refs/heads/feat/integrate-employer-v2-into-unified-20261030
+          fi
+      - name: Build exact integrated full-site branch (NOT production root)
+        working-directory: apps/web
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          node scripts/employer-factory-check.mjs
+          node scripts/factory-v2-validate.mjs --all
+          node scripts/company-single-char-search.contract.test.mjs
+          node scripts/company-brand-unified.contract.test.mjs
+          npm run build
+          node scripts/factory-v2-routes.mjs
+          grep -Fq '/hhba-talent/preview-integration-v2/assets/' dist/index.html
+      - name: Install one reusable Chrome browser
+        working-directory: apps/web
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Verify full-home brand, company profile, 2-char search, and desktop/mobile
+        working-directory: apps/web
+        env:
+          HHBA_EMPLOYER_ID: cn-autumn-025
+          HHBA_TEST_BASE: 'http://127.0.0.1:4173/hhba-talent/preview-integration-v2/'
+        run: |
+          set -euo pipefail
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/hhba-v2-integration.log 2>&1 &
+          for i in $(seq 1 35); do
+            if curl -fsS "$HHBA_TEST_BASE" >/dev/null 2>&1; then break; fi
+            sleep 1
+          done
+          curl -fsS "$HHBA_TEST_BASE" >/dev/null
+          node scripts/factory-v2-browser.mjs
+      - name: Save full-site review dist and screenshots (NOT live deployment)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-integrated-v2-review-compiled-and-screenshots
+          path: |
+            apps/web/factory-v2-browser-proof/
+            apps/web/dist/
+          if-no-files-found: ignore
+          retention-days: 14

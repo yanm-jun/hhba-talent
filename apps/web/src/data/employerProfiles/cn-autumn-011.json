@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-011",
+  "name": "万科泊寓",
+  "englishName": "PORT APARTMENT",
+  "aliases": [
+    "泊寓",
+    "PORT",
+    "PORT APARTMENT"
+  ],
+  "industry": "长租公寓 · 租赁住宅 · 青年社区",
+  "subtitle": "万科集团长租公寓品牌 · 青年租住 · 公寓运营 · 保障性租赁住房",
+  "overview": "万科旗下长租公寓品牌，围绕青年租住、租赁住宅产品和社区服务开展业务。具体岗位招聘主体与集团其他业务区分。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://www.inboyu.com/",
+    "https://career.tjcu.edu.cn/company/index/id/5132.html"
+  ],
+  "media": {
+    "logo": "images/boyu-user/boyu-logo.webp",
+    "photos": [
+      {
+        "path": "images/boyu-user/boyu-exterior.webp",
+        "caption": "泊寓公寓门店",
+        "note": "用户上传照片 · 具体门店位置未核验",
+        "alt": "用户提供的泊寓门店外立面及休憩空间"
+      },
+      {
+        "path": "images/boyu-user/boyu-lobby.webp",
+        "caption": "公寓前台及公共空间",
+        "note": "用户上传照片 · 拍摄时间未核验",
+        "alt": "用户提供的泊寓前台及室内公共空间"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://career.tjcu.edu.cn/company/index/id/5132.html",
+    "label": "核实的招聘来源",
+    "status": "archived_source",
+    "subject": "天津市万泊商业运营管理有限公司",
+    "note": "不代表集团全国招聘入口或当前可投递"
+  },
+  "majorIntro": "已收录天津市万泊商业运营管理有限公司于2026年9月11日公开的2条具体岗位；万寓生标注专业不限，泊寓运营官注明部分专业优先。当前开放状态未核实。",
+  "preferredMajors": [
+    "酒店管理",
+    "市场营销",
+    "工商管理",
+    "物业管理",
+    "工程管理",
+    "计算机科学与技术",
+    "财务管理",
+    "环境设计"
+  ],
+  "photoNote": "照片来自用户提供的独立文件，图片不设外链。2027届全国万寓生项目与天津地区两个具体岗位不能混同。",
+  "business": [
+    {
+      "title": "集中式长租公寓运营",
+      "description": "为城市青年和新市民提供长租公寓及门店经营管理。",
+      "tags": "招租服务 · 租务经营 · 客户体验",
+      "details": [
+        "招租与入住退租服务",
+        "门店管理和日常经营"
+      ]
+    },
+    {
+      "title": "青年社区与社群服务",
+      "description": "运营兼具社交、学习及生活体验的居住社区。",
+      "tags": "社区活动 · 公共空间 · 客户服务",
+      "details": [
+        "公共空间服务",
+        "社区活动和用户参与"
+      ]
+    },
+    {
+      "title": "租赁住宅产品设计",
+      "description": "提供青年公寓、多人宿舍和中高端服务式公寓产品。",
+      "tags": "空间设计 · 居住产品 · 更新改造",
+      "details": [
+        "产品设计与更新改造",
+        "不同客群居住体验"
+      ]
+    },
+    {
+      "title": "保障性租赁住房",
+      "description": "参与城市保障性租赁住房的运营服务。",
+      "tags": "保租房 · 人才安居",
+      "details": [
+        "运营标准",
+        "项目服务和安全管理"
+      ]
+    },
+    {
+      "title": "数字化租住服务",
+      "description": "数字化看房、签约、房态管理及维修服务。",
+      "tags": "数字签约 · 服务平台",
+      "details": [
+        "线上找房与签约",
+        "报修及房态管理"
+      ]
+    },
+    {
+      "title": "企业宿舍与资产运营",
+      "description": "满足企业住宿需求并协助租赁物业运营。",
+      "tags": "企业住宿 · 资产管理",
+      "details": [
+        "企业住宿",
+        "运营协同"
+      ]
+    }
+  ],
+  "jobs": []
+}

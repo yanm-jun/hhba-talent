@@ -5,6 +5,7 @@ import curated200 from '../data/domesticComplete200Target.json';
 import originalMedia from '../data/domesticMediaBundle.json';
 import expandedMedia from '../data/domesticMedia200Bundle.json';
 import {getDomesticCompanies} from '../services/domesticCompanySearch';
+import {employerProfiles} from '../services/employerProfiles';
 import '../styles/home-company-marquee.css';
 
 // Static HHBA-owned Chinese company records only. Never query an overseas ATS,
@@ -20,7 +21,7 @@ const domesticMedia={
 };
 const targetNames=curated200.companyNames as string[];
 const indexedCompanies=new Map(getDomesticCompanies().map(company=>[company.name,company]));
-const brands:BrandTile[]=targetNames.flatMap(name=>{
+const legacyBrands:BrandTile[]=targetNames.flatMap(name=>{
  const company=indexedCompanies.get(name);
  const logo=domesticMedia[name]?.brand;
  if(!company||!company.route.startsWith('/companies/domestic/')||
@@ -30,6 +31,10 @@ const brands:BrandTile[]=targetNames.flatMap(name=>{
  return [{name,route:company.route,file:logo.path,
    verified:logo.classification==='logo_identity_checked'}];
 }).sort((a,b)=>Number(b.verified)-Number(a.verified));
+// Data-driven factory employers have their own locally saved Logo and searchable page.
+// Include them automatically on the public home marquee without manual per-company edits.
+const factoryBrands:BrandTile[]=employerProfiles.map(p=>({name:p.name,route:'/companies/autumn/'+p.id,file:p.media.logo,verified:false}));
+const brands:BrandTile[]=[...factoryBrands,...legacyBrands.filter(b=>!factoryBrands.some(p=>p.name===b.name))];
 
 function MarqueeBrand({brand,clone,index}:{brand:BrandTile;clone:boolean;index:number}){
  const [broken,setBroken]=useState(false);

@@ -1,0 +1,33 @@
+{
+  "company": "菲婷丝",
+  "employer_id": "cn-autumn-024",
+  "assets": {
+    "logo": {
+      "path": "images/employer-profiles/cn-autumn-024/logo.png",
+      "source": "https://www.finetoday.com/jp/cmn/images/ogp_1200_630.png",
+      "sha256": "a6c8cc756b60cb4103111a7ab4ebec6a58c1b79b90865c0e08f79b8b1be973e8",
+      "dimensions": [
+        1200,
+        630
+      ]
+    },
+    "photo1": {
+      "path": "images/employer-profiles/cn-autumn-024/photo1.webp",
+      "source": "https://image.nbd.com.cn/uploads/articles/images/1596693/_____20240704190204.jpg",
+      "sha256": "24f9330ac2ad6cca2c9abae77afc74b64d354638034f94975b93a6c28723b049",
+      "dimensions": [
+        1601,
+        1200
+      ]
+    },
+    "photo2": {
+      "path": "images/employer-profiles/cn-autumn-024/photo2.webp",
+      "source": "https://www.finetoday.com/jp/uploadimages/SUS-cca_img4_JP.jpg",
+      "sha256": "f23b6e65ae7446ad2d851f60584d804ab54587cf556d21097d3f2d987a0af10a",
+      "dimensions": [
+        1122,
+        696
+      ]
+    }
+  }
+}

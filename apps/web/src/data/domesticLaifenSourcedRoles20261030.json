@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "checkedOn": "2026-10-30",
+  "company": "深圳术叶创新科技有限公司（徕芬品牌）",
+  "brand": "徕芬科技",
+  "parentEmployerId": "cn-autumn-009",
+  "officialRecruitment": "https://app.mokahr.com/campus-recruitment/laifen/146139?locale=zh-CN",
+  "officialSocial": "https://app.mokahr.com/social-recruitment/laifen/146138",
+  "evidenceSources": [
+    "https://career.gdut.edu.cn/campus/view/id/1020410",
+    "https://www.nowcoder.com/discuss/945278585470803968",
+    "https://www.wondercv.com/xiaozhao/laifen-2026-spring-shenzhen-8332-bbfa26/"
+  ],
+  "independentOfficialJobVerifiedCount": 0,
+  "disclaimer": "6条有公开名称的岗位资料；其中1条来自2027届校招第三方摘要，5条为2026年历史岗位。官方逐岗直达链接未取得，学历、城市、专业要求和投递开放状态均须逐岗核对。旧校招大类不冒充职位。",
+  "media": "用户提供的原图网页优化WebP；Logo、吹风机、牙刷照片分别独立保存。",
+  "jobs": [
+    {
+      "id": "motor-assistant-2027",
+      "title": "电机助理",
+      "city": "深圳／珠海（校招项目公布地区，逐岗待核对）",
+      "recruitmentType": "CAMPUS",
+      "observedOn": "2026-10-29",
+      "cohort": "2027届",
+      "evidenceUrl": "https://www.nowcoder.com/discuss/945278585470803968",
+      "sourceUrl": "https://app.mokahr.com/campus-recruitment/laifen/146139?locale=zh-CN",
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "自动化",
+        "机械电子工程",
+        "机械工程"
+      ],
+      "summary": "公开校招汇总列明“电机助理”岗位，但未披露可逐项核验的岗位职责；实际工作内容请向徕芬招聘方核实。",
+      "requirements": "仅有第三方公开岗位名称和校招城市范围记录，未核验独立职位说明、岗位专业门槛及现时开放状态。",
+      "recordKind": "third_party_named_role_2027",
+      "majors": [],
+      "currentOpenVerified": false,
+      "independentOfficialJobVerified": false,
+      "individualPermalinkVerified": false
+    },
+    {
+      "id": "supply-chain-trainee-2026",
+      "title": "供应链管培生（采购／计划／仓储物流）",
+      "city": "深圳",
+      "recruitmentType": "CAMPUS",
+      "observedOn": "2026-04-25",
+      "cohort": "2026届已截止",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/laifen-2026-spring-shenzhen-8332-bbfa26/",
+      "sourceUrl": "https://app.mokahr.com/campus-recruitment/laifen/146139?locale=zh-CN",
+      "editorialRelatedMajors": [
+        "物流管理",
+        "供应链管理",
+        "工商管理",
+        "信息管理与信息系统",
+        "统计学"
+      ],
+      "summary": "历史校招资料记载在采购、计划、仓储物流三个方向轮岗，参与日常协作及数据分析。",
+      "requirements": "2026届本科及以上；有 Python 基础优先、英语四级及以上（历史公开汇总口径）。本批次2026年4月30日已截止。",
+      "recordKind": "archived_named_role_2026",
+      "majors": [],
+      "currentOpenVerified": false,
+      "independentOfficialJobVerified": false,
+      "individualPermalinkVerified": false
+    },
+    {
+      "id": "hardware-engineer-2026",
+      "title": "硬件工程师",
+      "city": "深圳",
+      "recruitmentType": "SOCIAL",
+      "observedOn": "2026-04-25",
+      "cohort": "2026年历史岗位",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/laifen-2026-spring-shenzhen-8332-bbfa26/",
+      "sourceUrl": "https://app.mokahr.com/social-recruitment/laifen/146138",
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "电气工程及其自动化",
+        "自动化",
+        "通信工程",
+        "计算机科学与技术"
+      ],
+      "summary": "历史资料记载消费电子控制板硬件方案、MCU与接口设计及系统联调工作。",
+      "requirements": "历史汇总描述为有3年嵌入式或消费电子硬件设计经验；不是应届零经验岗位，现时开放状态未知。",
+      "recordKind": "archived_named_role_2026",
+      "majors": [],
+      "currentOpenVerified": false,
+      "independentOfficialJobVerified": false,
+      "individualPermalinkVerified": false
+    },
+    {
+      "id": "public-opinion-specialist-2026",
+      "title": "舆情专员",
+      "city": "东莞",
+      "recruitmentType": "SOCIAL",
+      "observedOn": "2026-04-25",
+      "cohort": "2026年历史岗位",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/laifen-2026-spring-shenzhen-8332-bbfa26/",
+      "sourceUrl": "https://app.mokahr.com/social-recruitment/laifen/146138",
+      "editorialRelatedMajors": [
+        "新闻学",
+        "传播学",
+        "市场营销",
+        "工商管理"
+      ],
+      "summary": "历史招聘汇总描述舆情工单、数据分析、报告撰写和跨部门沟通。",
+      "requirements": "历史汇总记载本科及以上、约2年舆情或客诉相关经验；需以招聘方核对。",
+      "recordKind": "archived_named_role_2026",
+      "majors": [],
+      "currentOpenVerified": false,
+      "independentOfficialJobVerified": false,
+      "individualPermalinkVerified": false
+    },
+    {
+      "id": "north-america-channel-sales-2026",
+      "title": "北美渠道销售",
+      "city": "深圳",
+      "recruitmentType": "SOCIAL",
+      "observedOn": "2026-04-25",
+      "cohort": "2026年历史岗位",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/laifen-2026-spring-shenzhen-8332-bbfa26/",
+      "sourceUrl": "https://app.mokahr.com/social-recruitment/laifen/146138",
+      "editorialRelatedMajors": [
+        "国际经济与贸易",
+        "市场营销",
+        "商务英语",
+        "工商管理"
+      ],
+      "summary": "历史资料记载拓展北美市场渠道、维护分销商并开展销售及市场分析。",
+      "requirements": "历史汇总记载约2年北美渠道销售经验、英语工作能力；当前在招状态未知。",
+      "recordKind": "archived_named_role_2026",
+      "majors": [],
+      "currentOpenVerified": false,
+      "independentOfficialJobVerified": false,
+      "individualPermalinkVerified": false
+    },
+    {
+      "id": "japan-sales-2026",
+      "title": "日本销售／经理",
+      "city": "深圳",
+      "recruitmentType": "SOCIAL",
+      "observedOn": "2026-04-25",
+      "cohort": "2026年历史岗位",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/laifen-2026-spring-shenzhen-8332-bbfa26/",
+      "sourceUrl": "https://app.mokahr.com/social-recruitment/laifen/146138",
+      "editorialRelatedMajors": [
+        "日语",
+        "国际经济与贸易",
+        "市场营销",
+        "工商管理"
+      ],
+      "summary": "历史资料记载日本市场开拓、销售策略制定和客户关系维护。",
+      "requirements": "历史汇总记载约5年销售经验并要求日语能力；不属于未验证的2027应届岗位。",
+      "recordKind": "archived_named_role_2026",
+      "majors": [],
+      "currentOpenVerified": false,
+      "independentOfficialJobVerified": false,
+      "individualPermalinkVerified": false
+    }
+  ]
+}

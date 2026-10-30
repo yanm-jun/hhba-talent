@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "checkedOn": "2026-10-30",
+  "brand": "万科泊寓",
+  "employerId": "cn-autumn-011",
+  "employer": "天津市万泊商业运营管理有限公司",
+  "brandSource": "https://www.inboyu.com/",
+  "employmentProof": "https://career.tjcu.edu.cn/company/index/id/5132.html",
+  "note": "两条天津地区2026-09-11发布的具体职位，公开学校招聘页面可追溯；开放状态待核实。万科其他业务不等于泊寓岗位。2027万寓生项目作为项目提示另列，不将方向编成独立岗位。",
+  "jobs": [
+    {
+      "id": "wanyusheng-tianjin",
+      "title": "万寓生",
+      "city": "天津市",
+      "url": "https://career.tjcu.edu.cn/correcruit/content/id/12292.html",
+      "type": "CAMPUS",
+      "education": "本科（学校平台标注）",
+      "majors": [],
+      "related": [],
+      "summary": "负责公寓租赁客户服务，参与销售拓客、租务运营、对客服务和社群活动策划等门店经营工作。",
+      "requirements": "公开招聘标注专业不限，工作地点天津，发布时间2026-09-11，是否仍可投递待核实。"
+    },
+    {
+      "id": "operations-tianjin",
+      "title": "泊寓运营官",
+      "city": "天津市",
+      "url": "https://career.tjcu.edu.cn/correcruit/content/id/9565.html",
+      "type": "SOCIAL",
+      "education": "本科（学校列表）；详情说明大专以上、本科优先",
+      "majors": [],
+      "related": [
+        "酒店管理",
+        "物业管理",
+        "市场营销",
+        "工商管理",
+        "旅游管理"
+      ],
+      "summary": "负责门店招租与运营执行，租赁签约、入住、转租、退房、社区活动、安全及售后事务。",
+      "requirements": "大专以上学历，本科优先；酒店、物业、营销专业或服务业经验优先。发布时间2026-09-11。"
+    }
+  ]
+}

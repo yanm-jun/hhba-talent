@@ -1,0 +1,33 @@
+{
+  "company": "万兴科技",
+  "employer_id": "cn-autumn-022",
+  "assets": {
+    "logo": {
+      "path": "images/employer-profiles/cn-autumn-022/logo.png",
+      "source": "https://channel-static-resource-online.oss-cn-hangzhou.aliyuncs.com/bp-admin/sr-T6JIHXS737NGC0OF.png",
+      "sha256": "79ceaafe455dfc3b582fbfe691cc2a516c296b38152c069fa78d427ae1a7f8a2",
+      "dimensions": [
+        1800,
+        1162
+      ]
+    },
+    "photo1": {
+      "path": "images/employer-profiles/cn-autumn-022/photo1.webp",
+      "source": "https://www.wondershare.cn/images/images2024/social/huanjing8.png",
+      "sha256": "1f243f92474a7e55437ee682e8f907ee443ddee514935ddbe460751608d74fdb",
+      "dimensions": [
+        1170,
+        520
+      ]
+    },
+    "photo2": {
+      "path": "images/employer-profiles/cn-autumn-022/photo2.webp",
+      "source": "https://www.wondershare.cn/images/images2023/social-recruit/env-img1.png",
+      "sha256": "061b445ac5021eeab0fd77d2c60376131bbc4c2041a10fa9b4182d28dec0a65b",
+      "dimensions": [
+        930,
+        400
+      ]
+    }
+  }
+}

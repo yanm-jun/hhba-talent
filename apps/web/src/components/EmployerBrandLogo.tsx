@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Building2 } from 'lucide-react';
 import type { LiveJob } from '../services/liveRecruitment';
+import {domesticBrandFor} from '../services/domesticCompanyBrand';
 import { verifiedBrandForEmployer, verifiedBrandAssetUrl,
  type BrandIdentity } from '../services/verifiedBrandRegistry';
 
@@ -18,15 +19,24 @@ export function EmployerBrandLogo({job,identity,variant='card'}:LogoProps){
   const asset=target?verifiedBrandForEmployer(target):null;
   const file=asset?.file||null;
   const [broken,setBroken]=useState(false);
-  useEffect(()=>setBroken(false),[file]);
+  const domesticAsset=job?.recordKind==='DOMESTIC_REBUILT'?domesticBrandFor({name:job.companyZh||job.company,route:job.employerRoute}):null;
+  useEffect(()=>setBroken(false),[file,domesticAsset?.path]);
   const alt=asset?.company==='Anthropic'?'Claude 品牌标识（Anthropic）':
     asset?.company?asset.company+' 品牌标识':'';
   const url=target?verifiedBrandAssetUrl(target):null;
   const cls=variant==='profile'
     ?'company-profile-brand'+(asset?.wide?' company-profile-brand-wide':'')
     :'unified-brand-logo'+(asset?.wide?' unified-brand-logo-wide':'');
+  if(domesticAsset)return <span className={cls} title={(job?.companyZh||job?.company||'企业')+' 品牌素材'}>
+    {!broken?<img src={import.meta.env.BASE_URL+domesticAsset.path} alt={(job?.companyZh||job?.company||'企业')+' Logo'} loading="eager" decoding="async" onError={()=>setBroken(true)}/>:
+      <Building2 size={variant==='profile'?28:18} aria-label="品牌图片加载失败"/>}
+  </span>;
+  if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='新鸿基地产')
+    return <span className={cls} title="新鸿基地产 SHKP"><img src={import.meta.env.BASE_URL+'images/shkp-user/shkp-logo.webp'} alt="新鸿基地产用户提供的品牌标识" loading="eager" decoding="async"/></span>;
+  if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='深圳术叶创新科技有限公司')
+    return <span className={cls} title="徕芬科技 LAIFEN"><img src={import.meta.env.BASE_URL+'images/laifen-user/laifen-logo.webp'} alt="徕芬 Laifen 用户提供的品牌标识" loading="eager" decoding="async"/></span>;
   if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='安克创新科技股份有限公司')
-    return <span className={cls} title="安克创新 ANKER INNOVATIONS"><img src={import.meta.env.BASE_URL+'images/anker-user/anker-logo.png'} alt="安克创新 ANKER 用户提供的标识原图" loading="eager" decoding="async"/></span>;
+    return <span className={cls} title="安克创新 ANKER INNOVATIONS"><img src={import.meta.env.BASE_URL+'images/autumn-real-logos/cn-autumn-008.svg'} alt="Anker Innovations 用户确认的蓝色品牌标识" loading="eager" decoding="async"/></span>;
   if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='上海鹰角网络科技有限公司')
     return <span className={cls} title="鹰角网络 HYPERGRYPH"><img src={import.meta.env.BASE_URL+'images/hypergryph-user/hypergryph-logo.png'} alt="鹰角网络用户提供品牌Logo" loading="eager" decoding="async"/></span>;
   if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='网易游戏（互娱）')

@@ -3,6 +3,7 @@ import {loadPublicJobAudit} from './jobSyncStatus';
 import {searchJobs, type SearchFacet} from './jobSearchFacets.mjs';
 import {loadOfficialSearchFacets} from './officialSearchIndex';
 import {domesticV2Records, domesticV2ById, assertDomesticRebuildIntegrity} from './domesticRebuildJobs';
+import {allowedEmployerProfileJobLink,profileAliasesForJob} from './employerProfiles';
 import {visibleRoleForMajor} from './majorJobMatching';
 export type Language = 'zh' | 'en';
 export type LiveJob = {
@@ -72,7 +73,20 @@ export function safeOfficialJobUrl(job: LiveJob) {
         'tencent-official': 'careers.tencent.com',
         'baidu-official': 'talent.baidu.com'
       };
-      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='anker-2027-campus-official'&&job.source==='anker-innovations'){
+      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='hhba-employer-profile'){
+        if(!allowedEmployerProfileJobLink(job.id,job.url))return null;
+      }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='boyu-tjcu-source'&&job.source==='boyu-tianjin'){
+        if(u.hostname!=='career.tjcu.edu.cn'||!/^cn-v2-boyu-[a-z0-9-]{5,100}$/.test(job.id)||
+        !['/correcruit/content/id/12292.html','/correcruit/content/id/9565.html'].includes(u.pathname)||u.search||u.hash)return null;
+      }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='shkp-official-detail'&&job.source==='sun-hung-kai-properties'){
+        if(u.hostname!=='www.shkp.com'||!/^cn-v2-shkp-[a-z0-9-]{5,100}$/.test(job.id)||
+           !/^\/en-US\/work-with-us\/job-vacancies\/[a-z-]+\/[a-z0-9-]+$/.test(u.pathname)||
+           u.search!==''||u.hash!=='')return null;
+      }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='laifen-sourced-archived'&&job.source==='laifen'){
+        const eligible=job.id.startsWith('cn-v2-laifen-')&&u.hostname==='app.mokahr.com'&&u.hash===''&&
+          (u.href==='https://app.mokahr.com/campus-recruitment/laifen/146139?locale=zh-CN'||u.href==='https://app.mokahr.com/social-recruitment/laifen/146138');
+        if(!eligible)return null;
+      }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='anker-2027-campus-official'&&job.source==='anker-innovations'){
         if(u.hostname!=='career.anker.com.cn'||!/^cn-v2-anker-[a-z0-9-]{5,100}$/.test(job.id))return null;
         const list=u.pathname==='/universities/recruitment/jobPosts/'&&
           [...u.searchParams.keys()].sort().join(',')==='direction,from'&&
@@ -354,7 +368,11 @@ export function rebuildListFilter(job:LiveJob,f:LiveFilters){
  if(f.major_slug&&!visibleRoleForMajor(job,f.major_slug,f.include_unknown_majors===true))return false;
  if(f.company){
   const v=f.company.normalize('NFKC').toLowerCase();
-  if(![job.company,job.companyZh||''].some(x=>x.toLowerCase().includes(v))&&
+  const ankerAliases=domestic&&job.company==='安克创新科技股份有限公司'?['Anker','Anker Innovations']:
+    domestic&&job.company==='深圳术叶创新科技有限公司'?['徕芬','徕芬科技','Laifen']:
+    domestic&&job.company==='新鸿基地产'?['SHKP','Sun Hung Kai Properties','新鴻基地產']:
+    domestic&&job.company==='万科泊寓'?['泊寓','PORT','PORT APARTMENT']:[];
+  if(![job.company,job.companyZh||'',...ankerAliases,...profileAliasesForJob(job)].some(x=>x.toLowerCase().includes(v))&&
     !(domestic&&'schneider electric'.includes(v)))return false;
  }
  if(f.location_country){
@@ -389,8 +407,12 @@ export function rebuildListFilter(job:LiveJob,f:LiveFilters){
   if(f.experience==='5+'&&(y==null||y<5))return false;
  }
  const words=f.q.normalize('NFKC').toLowerCase().trim().split(/\s+/).filter(Boolean);
- const haystack=[job.title,job.titleZh,job.company,job.companyZh,job.location,job.locationZh,
-   ...(job.skillSignals||[]),...(job.majorNames||[]),job.responsibilitiesSummary,job.positionOrg].filter(Boolean).join(' ').normalize('NFKC').toLowerCase();
+ const nameAliases=domestic&&job.company==='安克创新科技股份有限公司'?['Anker','Anker Innovations']:
+   domestic&&job.company==='深圳术叶创新科技有限公司'?['徕芬','徕芬科技','Laifen']:
+   domestic&&job.company==='新鸿基地产'?['SHKP','Sun Hung Kai Properties','新鴻基地產']:
+    domestic&&job.company==='万科泊寓'?['泊寓','PORT','PORT APARTMENT']:[];
+ const haystack=[job.title,job.titleZh,job.company,job.companyZh,...nameAliases,...profileAliasesForJob(job),job.location,job.locationZh,
+   ...(job.skillSignals||[]),...(job.majorNames||[]),...(job.editorialRelatedMajors||[]),job.responsibilitiesSummary,job.positionOrg].filter(Boolean).join(' ').normalize('NFKC').toLowerCase();
  return words.every(w=>haystack.includes(w));
 }
 function jobCountryCode(job:LiveJob){
@@ -414,6 +436,23 @@ export async function listDomesticRebuildMarket(filters:LiveFilters,offset:numbe
   ...domesticV2Records.slice(49,54),...overseas.slice(55,60),
   ...domesticV2Records.slice(54),...overseas.slice(60)];
  const allowed=combined.filter(job=>!!safeOfficialJobUrl(job)&&rebuildListFilter(job,filters));
+ // Name matches must not be hidden behind 30 unrelated job-summary hits.
+ // Apply relevance ordering AFTER all filters and BEFORE pagination.
+ const term=filters.q.normalize('NFKC').toLowerCase().trim();
+ if(term){
+  const nameScore=(job:LiveJob)=>{
+   const aliases=job.platform==='shkp-official-detail'?' SHKP Sun Hung Kai Properties 新鴻基地產':
+    job.platform==='anker-2027-campus-official'?' Anker Innovations':
+    job.platform==='laifen-sourced-archived'?' Laifen':job.platform==='boyu-tjcu-source'?' PORT APARTMENT 泊寓 万科泊寓':'';
+   const names=(job.company+' '+(job.companyZh||'')+aliases).normalize('NFKC').toLowerCase();
+   if(!names.includes(term))return 0;
+   if(job.companyZh?.normalize('NFKC').toLowerCase()===term)return 3;
+   if(job.companyZh?.normalize('NFKC').toLowerCase().startsWith(term)||
+      job.company.normalize('NFKC').toLowerCase().startsWith(term))return 2;
+   return 1;
+  };
+  allowed.sort((a,b)=>nameScore(b)-nameScore(a));
+ }
  return {jobs:allowed.slice(offset,offset+30),total:allowed.length,offset,limit:30,
    boards:11,failures:0,updated:'2026-10-29T00:00:00Z'};
 }

@@ -1,0 +1,33 @@
+{
+  "company": "紫龙游戏",
+  "employer_id": "cn-autumn-023",
+  "assets": {
+    "logo": {
+      "path": "images/employer-profiles/cn-autumn-023/logo.png",
+      "source": "https://q1.itc.cn/q_70/images03/20241017/e2020a271e324f2182b677b41f552022.jpeg",
+      "sha256": "a6514fd4dcdb2074dc3a104075b741e606b661c874a4d3671bc8ef3f095a8722",
+      "dimensions": [
+        780,
+        780
+      ]
+    },
+    "photo1": {
+      "path": "images/employer-profiles/cn-autumn-023/photo1.webp",
+      "source": "https://5b0988e595225.cdn.sohucs.com/images/20171025/e75150b017d94c12a212e24e829736e1.jpeg",
+      "sha256": "fb1c4a351b9ef2638a54ed030b719f42d3b493227955c239906538e9bed90616",
+      "dimensions": [
+        640,
+        426
+      ]
+    },
+    "photo2": {
+      "path": "images/employer-profiles/cn-autumn-023/photo2.webp",
+      "source": "https://5b0988e595225.cdn.sohucs.com/images/20171025/ed1ee754fbee4d798379460248434aeb.jpeg",
+      "sha256": "a19e2e3daeb740ce2b81d52398278ae66998b0a7c75aeb7541e514862fe48c4b",
+      "dimensions": [
+        640,
+        401
+      ]
+    }
+  }
+}

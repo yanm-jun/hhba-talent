@@ -1,0 +1,195 @@
+name: HHBA Full Site + Employer V2 Isolated Review Preview
+on:
+  push:
+    branches: [feat/integrate-employer-v2-into-unified-20261030]
+    paths:
+      - '.github/workflows/hhba-integrated-v2-pages-preview.yml'
+      - 'apps/web/src/data/employerProfiles/cn-autumn-026.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: hhba-integrated-v2-review-only
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      HHBA_GITHUB_PAGES: '1'
+      HHBA_PAGES_BASE: '/hhba-talent/preview-integration-v2/'
+      VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+      VITE_HHBA_OVERSEAS_CURATED_100: '1'
+      VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+      VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+      VITE_DEMO_ACCOUNT_ENABLED: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Verify all company files are versioned (NOT ignored local-only files)
+        run: |
+          set -euo pipefail
+          test "$(git ls-files apps/web/src/data/employerProfiles/cn-autumn-*.json | wc -l)" -ge 15
+          git ls-files --error-unmatch apps/web/src/data/employerProfiles/cn-autumn-021.json
+          git ls-files --error-unmatch apps/web/src/data/employerProfiles/cn-autumn-025.json
+          test -s apps/web/src/pages/TalentServicePage.tsx
+          test -s apps/web/src/pages/ConfiguredEmployerProfilePage.tsx
+      - name: Validate whole-site employer, job and brand indices
+        working-directory: apps/web
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          node scripts/employer-factory-check.mjs
+          node scripts/factory-v2-validate.mjs --all
+          node scripts/company-single-char-search.contract.test.mjs
+          node scripts/company-brand-unified.contract.test.mjs
+          npm run build
+          node scripts/factory-v2-routes.mjs
+          test -s dist/companies/autumn/cn-autumn-026/index.html
+          grep -Fq '/hhba-talent/preview-integration-v2/assets/' dist/index.html
+          test -s dist/companies/autumn/cn-autumn-025/index.html
+          test -s dist/companies/autumn/cn-autumn-021/index.html
+          test -s dist/images/employer-profiles/cn-autumn-026/logo.png
+          test -s dist/images/employer-profiles/cn-autumn-026/photo1.webp
+          test -s dist/images/employer-profiles/cn-autumn-026/photo2.webp
+          test -s dist/candidate/jobs/index.html
+      - name: Chromium installed for both short-name regression cases
+        working-directory: apps/web
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Run actual integrated browser against Qingdao and Frog Prince
+        working-directory: apps/web
+        env:
+          HHBA_TEST_BASE: 'http://127.0.0.1:4173/hhba-talent/preview-integration-v2/'
+        run: |
+          set -euo pipefail
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/hhba-integration-v2.log 2>&1 &
+          for i in $(seq 1 40); do
+            if curl -fsS "$HHBA_TEST_BASE" >/dev/null 2>&1; then break; fi
+            sleep 1
+          done
+          curl -fsS "$HHBA_TEST_BASE" >/dev/null
+          HHBA_EMPLOYER_ID=cn-autumn-025 node scripts/factory-v2-browser.mjs
+          HHBA_EMPLOYER_ID=cn-autumn-021 node scripts/factory-v2-browser.mjs
+          HHBA_EMPLOYER_ID=cn-autumn-026 node scripts/factory-v2-browser.mjs
+      - name: Preserve screenshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-integrated-v2-screenshots
+          path: apps/web/factory-v2-browser-proof/
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Find a successful GitHub Pages backup; fail closed when missing
+        id: base
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The public homepage may have changed since an older V2 snapshot.
+          # Start with the latest successfully deployed Pages artifact, then
+          # verify byte-for-byte against LIVE public root before re-publishing.
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs?status=success&per_page=100" --jq '[.workflow_runs[].id]' > /tmp/previous-success.json
+          selected=''
+          while IFS= read -r run; do
+            artifact=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run/artifacts?per_page=50" --jq '[.artifacts[] | select(.name == "github-pages" and .expired == false) | .id][0] // empty')
+            if [ -n "$artifact" ]; then selected="$run"; break; fi
+          done < <(jq -r '.[]' /tmp/previous-success.json)
+          test -n "$selected" || { echo 'No successful current Pages artifact; refusing publication' >&2; exit 1; }
+          echo "run_id=$selected" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: ${{ steps.base.outputs.run_id }}
+          github-token: ${{ github.token }}
+          path: previous
+      - name: Fail-closed root and old previews checksum, add ONLY integrated review folder
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive=$(find previous -type f -name 'artifact.tar*' -print -quit)
+          test -n "$archive"
+          mkdir -p published
+          if [[ "$archive" == *.gz ]]; then tar -xzf "$archive" -C published; else tar -xf "$archive" -C published; fi
+          test -s published/index.html
+          curl -fsSL --max-time 40 --retry 3 https://yanm-jun.github.io/hhba-talent/ -o /tmp/hhba-existing-home
+          cmp published/index.html /tmp/hhba-existing-home || { echo 'Public homepage differs from backup; refuse to overwrite' >&2; exit 1; }
+          # Old preview may have been removed by another independent Pages run.
+          # Preserve it byte-for-byte IF it is currently published; do not mistake
+          # the site's SPA fallback HTML for a real preview.
+          if curl -fsSL --max-time 40 --retry 3 https://yanm-jun.github.io/hhba-talent/preview-factory-v2/ -o /tmp/hhba-existing-factory &&
+             grep -Fq '/hhba-talent/preview-factory-v2/assets/' /tmp/hhba-existing-factory; then
+            test -s published/preview-factory-v2/index.html || { echo 'Current public V2 preview missing in backup; stop' >&2; exit 1; }
+            cmp published/preview-factory-v2/index.html /tmp/hhba-existing-factory || { echo 'Current public V2 preview differs from backup; stop' >&2; exit 1; }
+          fi
+          for prior in preview-anker preview-taiji preview-enn preview-ccteg preview-boyu preview-factory; do
+            if curl -fsSL --max-time 25 "https://yanm-jun.github.io/hhba-talent/$prior/" -o /tmp/hhba-existing-prior; then
+              if grep -Fq "/hhba-talent/$prior/assets/" /tmp/hhba-existing-prior; then
+                test -s "published/$prior/index.html"
+                cmp "published/$prior/index.html" /tmp/hhba-existing-prior || { echo "Old preview $prior changed; refuse overwrite" >&2; exit 1; }
+              fi
+            fi
+          done
+          rm -rf published/preview-integration-v2
+          mkdir -p published/preview-integration-v2
+          cp -a apps/web/dist/. published/preview-integration-v2/
+          test -s published/preview-integration-v2/index.html
+          test -s published/preview-integration-v2/companies/autumn/cn-autumn-025/index.html
+          cmp published/index.html /tmp/hhba-existing-home
+          touch published/.nojekyll
+          echo HHBA_EXISTING_HOME_AND_OLD_PREVIEWS_PRESERVED
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: published
+  deploy-review-only:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: hhba-company200-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
+  live-browser-acceptance:
+    needs: deploy-review-only
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install real-browser checker
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Inspect actual PUBLIC Pages candidate search Qingdao (not local Vite)
+        working-directory: apps/web
+        env:
+          HHBA_PUBLIC_BASE: https://yanm-jun.github.io/hhba-talent/preview-integration-v2/
+          HHBA_EMPLOYER_ID: cn-autumn-025
+          HHBA_PUBLIC_SEARCH: 青岛
+        run: |
+          set -euo pipefail
+          node scripts/factory-v2-public-search.mjs
+          HHBA_EMPLOYER_ID=cn-autumn-026 HHBA_PUBLIC_SEARCH=南方 node scripts/factory-v2-public-search.mjs
+      - name: Collect externally-visible screenshots and browser measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-integrated-v2-real-public-pages-proof
+          path: apps/web/factory-v2-live-search-proof/
+          if-no-files-found: ignore
+          retention-days: 14

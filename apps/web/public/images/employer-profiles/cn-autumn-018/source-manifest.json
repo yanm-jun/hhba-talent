@@ -1,0 +1,23 @@
+{
+  "logo.png": {
+    "source": "https://storage-public.zhaopin.cn/org/logo/1698206823667244241/%E6%96%B0%E5%A5%A5%E9%9B%86%E5%9B%A2-logo.png",
+    "dimensions": [
+      1200,
+      484
+    ]
+  },
+  "photo1.webp": {
+    "source": "https://www.ennresearch.com/uploads/260528/1-26052QI143101.jpg",
+    "dimensions": [
+      1000,
+      667
+    ]
+  },
+  "photo2.webp": {
+    "source": "https://www.ennpower.com/local/static/upload/upload/2026-04-03/1775193276733_a7770ccc-1ad7-42b5-9667-4e755e4e62d5.png",
+    "dimensions": [
+      1125,
+      747
+    ]
+  }
+}
