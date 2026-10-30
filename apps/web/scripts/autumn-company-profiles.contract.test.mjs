@@ -10,6 +10,8 @@ const mediaA=JSON.parse(read('src/data/domesticMediaBundle.json')).companies;
 const mediaB=JSON.parse(read('src/data/domesticMedia200Bundle.json')).companies;
 const market=read('src/components/DomesticAutumnMarket.tsx');
 const brand=read('src/components/AutumnCompanyBrand.tsx');
+const brandSource=read('src/services/domesticCompanyBrand.ts');
+const brandMark=read('src/components/DomesticBrandMark.tsx');
 const cover=read('src/components/AutumnCompanyCover.tsx');
 const profile=read('src/pages/AutumnCompanyProfilePage.tsx');
 const main=read('src/main.tsx'),router=read('src/router.tsx');
@@ -45,9 +47,9 @@ for(const [name,entry] of Object.entries(brandRegistry)){
   assert(buf[0]===0xff&&buf[1]===0xd8,'Valid JPEG logo '+local);
  }
 }
-assert(brand.includes('domesticAutumnBrandMediaRegistry.json')&&brand.includes('images/autumn-real-logos/'));
+assert(brand.includes('DomesticBrandMark')&&brandSource.includes('domesticAutumnBrandMediaRegistry.json')&&brandSource.includes('images/autumn-real-logos/'),'Unified brand resolver must use traceable, exact-identity local assets');
 assert(!brand.includes('images/autumn-brand/'),'Never show invented HHBA graphic as company logo');
-assert(brand.includes('企业Logo待核验'),'Unconfirmed companies must have honest neutral placeholder');
+assert(brandMark.includes('Logo 待核验')&&brandMark.includes('<Building2'),'Unconfirmed companies must have honest neutral placeholder');
 assert(!brand.includes('http://')&&!brand.includes('https://'),'Brand is always locally hosted');
 assert(cover.includes("photo.classification==='source_backed_named_enterprise_scene'"),'Hero photos require actual source-backed workplace identity');
 assert(cover.includes('if(!real?.path&&!ai)return null'),'No banner unless a real photo or correctly labeled AI image exists');
