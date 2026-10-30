@@ -208,6 +208,7 @@ export function filterDomesticRebuildJobs(jobs:LiveJob[],f:LiveFilters):LiveJob[
  const q=f.q.normalize('NFKC').trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
  return jobs.filter(job=>{
   if(f.country==='global')return false;
+  if(f.company&&['安克创新','anker innovations','anker'].some(alias=>alias.includes(f.company.trim().toLocaleLowerCase())||f.company.trim().toLocaleLowerCase().includes(alias))&&job.company!=='安克创新科技股份有限公司')return false;
   if(f.company&&!(['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华域视觉','schneider electric','kpmg','hasco vision','华安证券','huaan securities','广发证券','gf securities','中信证券','citic securities','辉瑞','pfizer','中国南方航空','南航','china southern','顺丰','顺丰科技','sf express','sf technology','网易游戏','网易互娱','netease games','netease','鹰角网络','hypergryph','安克创新','anker innovations','anker'].some(x=>x.toLowerCase().includes(f.company.toLowerCase()))))return false;
   if(f.location_country&&f.location_country.toUpperCase()!=='CN')return false;
   if(f.city&&!job.locationZh?.includes(f.city)&&!(f.city==='shanghai'&&job.locationZh==='上海')&&!(f.city==='beijing'&&job.locationZh==='北京')&&!(f.city==='guangzhou'&&job.locationZh==='广州'))return false;
@@ -218,7 +219,7 @@ export function filterDomesticRebuildJobs(jobs:LiveJob[],f:LiveFilters):LiveJob[
   }
   if(f.education&&!['UNRESTRICTED_OR_UNREPORTED'].includes(f.education))return false;
   if(f.experience&&f.experience!=='unreported')return false;
-  const text=[job.company,job.titleZh,job.locationZh,job.responsibilitiesSummary,job.requirementsSummary,
+  const text=[job.company,job.companyZh,job.platform==='anker-2027-campus-official'?'Anker Innovations Anker 安克创新':'',job.titleZh,job.locationZh,job.responsibilitiesSummary,job.requirementsSummary,
    ...(job.majorNames||[]),...(job.editorialRelatedMajors||[])].join(' ').normalize('NFKC').toLocaleLowerCase();
   return q.every(term=>text.includes(term));
  });

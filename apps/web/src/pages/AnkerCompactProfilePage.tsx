@@ -26,7 +26,7 @@ export function AnkerCompactProfilePage({user}:{user:User|null}){
    </nav>
    <section className="hhba-kpmg-hero" aria-label="安克创新品牌标识与企业资料图片">
     <header className="hhba-kpmg-identity">
-     <div className="hhba-kpmg-logo"><img src={gallery+'anker-logo.png'} alt="用户提供的 ANKER 品牌标识原始 PNG" loading="eager"/></div>
+     <div className="hhba-kpmg-logo"><img src={import.meta.env.BASE_URL+'images/autumn-real-logos/cn-autumn-008.svg'} alt="根据用户本次提供的 Anker Innovations 蓝色品牌图制作的矢量标识" loading="eager"/></div>
      <div className="hhba-kpmg-identity-copy">
       <span className="hhba-kpmg-kicker">HHBA / COMPANY PROFILE</span>
       <h1>安克创新 <span>ANKER INNOVATIONS</span></h1>

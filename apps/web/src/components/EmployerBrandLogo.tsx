@@ -26,7 +26,7 @@ export function EmployerBrandLogo({job,identity,variant='card'}:LogoProps){
     ?'company-profile-brand'+(asset?.wide?' company-profile-brand-wide':'')
     :'unified-brand-logo'+(asset?.wide?' unified-brand-logo-wide':'');
   if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='安克创新科技股份有限公司')
-    return <span className={cls} title="安克创新 ANKER INNOVATIONS"><img src={import.meta.env.BASE_URL+'images/anker-user/anker-logo.png'} alt="安克创新 ANKER 用户提供的标识原图" loading="eager" decoding="async"/></span>;
+    return <span className={cls} title="安克创新 ANKER INNOVATIONS"><img src={import.meta.env.BASE_URL+'images/autumn-real-logos/cn-autumn-008.svg'} alt="Anker Innovations 用户确认的蓝色品牌标识" loading="eager" decoding="async"/></span>;
   if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='上海鹰角网络科技有限公司')
     return <span className={cls} title="鹰角网络 HYPERGRYPH"><img src={import.meta.env.BASE_URL+'images/hypergryph-user/hypergryph-logo.png'} alt="鹰角网络用户提供品牌Logo" loading="eager" decoding="async"/></span>;
   if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='网易游戏（互娱）')
