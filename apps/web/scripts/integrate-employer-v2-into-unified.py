@@ -46,6 +46,7 @@ def allowed(path):
  "apps/web/src/data/domesticLaifenSourcedRoles20261030.json",
  "apps/web/src/data/domesticShkp2026SourcedRoles20261030.json",
  "apps/web/src/components/AutumnCompanyBrand.tsx",
+ "apps/web/src/components/AICompanySearch.tsx",
  "apps/web/src/components/DomesticBrandMark.tsx",
  "apps/web/src/components/DomesticCompanyResults.tsx",
  "apps/web/src/components/EmployerBrandLogo.tsx",
@@ -103,6 +104,8 @@ def main():
   if path=="apps/web/src/main.tsx":
    if existing is None:raise RuntimeError("Missing original full-site entrypoint")
    target=existing
+   if "ConfiguredEmployerProfilePage" in target:
+    preserved.append(path);continue  # repeat run must not append duplicate routes
    after="import { AnkerCompactProfilePage } from './pages/AnkerCompactProfilePage';"
    more="""import { LaifenCompactProfilePage } from './pages/LaifenCompactProfilePage';
  import { ShkpCompactProfilePage } from './pages/ShkpCompactProfilePage';
