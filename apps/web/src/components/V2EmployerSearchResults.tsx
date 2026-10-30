@@ -1,5 +1,6 @@
 import {useEffect,useMemo,useState} from 'react';
-import {majorNamesRelated} from '../services/majorEligibility.mjs';
+import {searchEmployersByIndividualRoles,isMajorSearch} from '../services/employerJobSearch.mjs';
+import {MAJOR_OPTIONS} from '../services/domesticMajors';
 import {ArrowRight,Building2} from 'lucide-react';
 import {employerProfiles} from '../services/employerProfiles';
 import '../styles/employer-v2-search.css';
@@ -15,7 +16,7 @@ type V2Index={schemaVersion:1;employers:PublishedV2Employer[]};
 function approvedV2Employers():Promise<PublishedV2Employer[]>{
  return Promise.resolve(employerProfiles.filter(p=>p.jobs.length>0));
 }
-const normalized=(text:string)=>text.normalize('NFKC').toLocaleLowerCase().replace(/\s+/g,' ').trim();
+const knownMajorNames=MAJOR_OPTIONS.map(m=>m.name);
 export function V2EmployerSearchResults({query,scope='',country='',major='',onMatchChange}:{
  query:string;scope?:string;country?:string;major?:string;onMatchChange?:(yes:boolean)=>void
 }){
@@ -28,16 +29,10 @@ export function V2EmployerSearchResults({query,scope='',country='',major='',onMa
   return()=>{active=false};
  },[]);
  const matches=useMemo(()=>{
-  const q=normalized(query);
-  if(!q||scope==='global'||country&&!/^(cn|chn|china|中国|中国大陆)$/i.test(country))return [];
-  const terms=q.split(/\s+/);
-  return employers.filter(p=>{
-   const labels=[p.name,p.englishName,...p.aliases].map(normalized);
-   const jobFields=p.jobs.map(job=>[job.title,job.city,...job.majorNames,...job.editorialRelatedMajors].join(' '));
-   const fields=normalized([p.industry,p.overview,...jobFields].join(' '));
-   return terms.every(word=>labels.some(label=>label.includes(word))||fields.includes(word));
-  }).filter(p=>!major||p.jobs.some(j=>[...j.majorNames,...j.editorialRelatedMajors].some(n=>majorNamesRelated(n,major))));
+  if(!query.trim()||scope==='global'||(country&&!/^(cn|chn|china|中国|中国大陆)$/i.test(country)))return [];
+  return searchEmployersByIndividualRoles(employers,query,{selectedMajor:major,knownMajors:knownMajorNames});
  },[employers,query,scope,country,major]);
+ const majorIntent=isMajorSearch(query,knownMajorNames);
  useEffect(()=>{onMatchChange?.(matches.length>0)},[matches.length,onMatchChange]);
  if(!query.trim()||scope==='global'||country&&!/^(cn|chn|china|中国|中国大陆)$/i.test(country))return null;
  if(error)return <p className="hhba-v2-search-alert" role="status">V2 企业数据暂时无法读取：{error}</p>;
@@ -47,10 +42,10 @@ export function V2EmployerSearchResults({query,scope='',country='',major='',onMa
    <h2>招聘市场</h2>
    <span>{matches.length} 家企业 · 独立核验的招聘方向，开放状态待官网确认</span>
   </div>
-  {matches.map(p=>{
+  {matches.map(({profile:p,jobs,matchedBy})=>{
    const root=import.meta.env.BASE_URL;
    const detail=root+'companies/autumn/'+p.id+'/';
-   return <article key={p.id} className="hhba-v2-employer-hit" data-v2-search-company={p.id}>
+   return <article key={p.id} className="hhba-v2-employer-hit" data-v2-search-company={p.id} data-v2-match-kind={matchedBy}>
     <div className="hhba-v2-employer-heading">
      <div className="hhba-v2-employer-logo">
       {p.media?.logo?<img alt={p.name+'品牌Logo'} src={root+p.media.logo} onError={e=>{e.currentTarget.style.visibility='hidden'}}/>:<Building2 size={22}/>}
@@ -61,9 +56,9 @@ export function V2EmployerSearchResults({query,scope='',country='',major='',onMa
      <a href={detail}>查看企业详情 <ArrowRight size={15}/></a>
     </div>
     <p className="hhba-v2-employer-overview">{p.overview}</p>
-    <div className="hhba-v2-job-subheading">已收录的 {p.jobs.length} 个岗位方向 <small>历史校招资料 · 当前投递状态未确认</small></div>
+    <div className="hhba-v2-job-subheading">{matchedBy==='company'&&!major?'已收录的':'筛选匹配的'} {jobs.length} 个岗位方向 <small>{majorIntent?'按专业关联逐岗筛选 · 非官方资格认定 · ':''}历史校招资料 · 当前投递状态未确认</small></div>
     <div className="hhba-v2-job-list">
-     {p.jobs.map(job=><a key={job.id} href={detail+'?role='+encodeURIComponent(job.id)} className="hhba-v2-job-result">
+     {jobs.map(job=><a key={job.id} href={detail+'?role='+encodeURIComponent(job.id)} className="hhba-v2-job-result">
       <b>{job.title}</b><small>{job.city}</small><span>查看岗位与专业匹配 <ArrowRight size={13}/></span>
      </a>)}
     </div>
