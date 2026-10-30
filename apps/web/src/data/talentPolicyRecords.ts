@@ -152,7 +152,7 @@ export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
  department:'济南市人民政府办公厅',published:'2024-05-23',
  sourceUrl:'https://www.jinan.gov.cn/col2614/art/2024/art_2614_4981104.html',sourceName:'济南支持高校毕业生就业创业政策40条（2024版）',
  applicationUrl:'https://www.jinan.gov.cn/col2614/art/2024/art_2614_4981104.html',temporal:'historical',
- keywords:['本科','硕士','博士','交通','公交','地铁','人才卡','就业']}
+ keywords:['本科','硕士','博士','交通','公交','地铁','人才卡','就业']},
 
  {id:'tj-talent-2025',city:'天津',title:'加快引进培养用好人才服务新质生产力发展若干措施',category:'落户引进',
  summary:'天津市2025年出台的综合性人才政策，包含高校毕业生落户、人才服务、海河英才卡、人才公寓等配套举措，不等同于人人可申领固定现金补贴。',
