@@ -1,3 +1,4 @@
+import {DEZHOU_POLICY_RECORDS} from './dezhouPolicyRecords.ts';
 import {ZIBO_POLICY_RECORDS} from './ziboPolicyRecords.ts';
 import {WEIFANG_POLICY_RECORDS} from './weifangPolicyRecords.ts';
 // HHBA policy index v1. All entries are traceable to public government primary sources.
@@ -429,4 +430,5 @@ export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
 
 ...WEIFANG_POLICY_RECORDS,
 ...ZIBO_POLICY_RECORDS,
+...DEZHOU_POLICY_RECORDS,
 ];
