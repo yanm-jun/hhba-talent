@@ -10,6 +10,12 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: hhba-employer-factory-isolated-preview
+  cancel-in-progress: false
 jobs:
   validate-and-build:
     runs-on: ubuntu-latest
@@ -50,11 +56,13 @@ jobs:
           test -s dist/images/boyu-user/boyu-exterior.webp
           test -s dist/images/boyu-user/boyu-lobby.webp
       - name: Browser dependencies
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview]')
         working-directory: apps/web
         run: |
           npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
           npx playwright install --with-deps chromium
       - name: Real browser regression with current data-only Boyu pilot
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview]')
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
@@ -67,9 +75,96 @@ jobs:
           done
           node scripts/factory-v1.browser.mjs
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview]')
         with:
           name: hhba-employer-factory-v1-browser-evidence
           path: apps/web/factory-proof/
           retention-days: 14
           if-no-files-found: ignore
+
+      - name: Generate all data-profile direct-refresh pages
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview]')
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const folder='src/data/employerProfiles';
+          const files=fs.readdirSync(folder).filter(name=>name.endsWith('.json'));
+          const routes=['candidate/jobs','companies/discover'];
+          for(const name of files){
+            const p=JSON.parse(fs.readFileSync(folder+'/'+name,'utf8'));
+            routes.push('companies/autumn/'+p.id);
+            for(const job of p.jobs)routes.push('candidate/jobs/cn-v2-profile-'+p.id+'-'+job.id);
+          }
+          for(const route of routes){
+            const out='dist/'+route;
+            fs.mkdirSync(out,{recursive:true});
+            fs.copyFileSync('dist/index.html',out+'/index.html');
+          }
+          fs.copyFileSync('dist/index.html','dist/404.html');
+          fs.writeFileSync('dist/.nojekyll','');
+          console.log('FACTORY_STATIC_ROUTES',routes.length);
+          NODE
+      - name: Recover last confirmed public HHBA Pages artifact
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview]')
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 41010492266
+          github-token: ${{ github.token }}
+          path: prior-pages
+      - name: Preserve public site and prior previews; append only factory preview
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview]')
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive=$(find prior-pages -type f -name 'artifact.tar*' -print -quit)
+          test -n "$archive"
+          mkdir -p published
+          if [[ "$archive" == *.gz ]]; then tar -xzf "$archive" -C published; else tar -xf "$archive" -C published; fi
+          for f in index.html preview-boyu/index.html preview-shkp/index.html preview-laifen/index.html preview-anker/index.html; do test -s "published/$f"; done
+          for p in "" preview-boyu/ preview-shkp/ preview-laifen/ preview-anker/; do
+            curl -fsSL --retry 3 --max-time 45 "https://yanm-jun.github.io/hhba-talent/$p" -o /tmp/factory-prior-live
+            cmp "published/${p}index.html" /tmp/factory-prior-live
+          done
+          if [ -e published/preview-factory ]; then rm -rf published/preview-factory; fi
+          mkdir -p published/preview-factory
+          cp -a apps/web/dist/. published/preview-factory/
+          test -s published/preview-factory/companies/autumn/cn-autumn-011/index.html
+          test -s published/preview-factory/images/boyu-user/boyu-logo.webp
+          echo HHBA_EXISTING_PUBLIC_FILES_PRESERVED_FACTORY_PREVIEW_ADDED
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview]')
+        with:
+          path: published
+  deploy-preview:
+    needs: validate-and-build
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    environment:
+      name: hhba-company200-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
+  verify-online:
+    needs: deploy-preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify real public generic company and prior site
+        run: |
+          set -euo pipefail
+          root=https://yanm-jun.github.io/hhba-talent
+          for i in 1 2 3 4 5 6; do
+            if curl -fsSL "$root/preview-factory/companies/autumn/cn-autumn-011/" -o /tmp/factory-page &&
+               curl -fsSL "$root/preview-factory/images/boyu-user/boyu-logo.webp" -o /tmp/factory-logo; then break; fi
+            if [ "$i" = 6 ]; then exit 1; fi
+            sleep 10
+          done
+          grep -q '/hhba-talent/preview-factory/assets/' /tmp/factory-page
+          test $(wc -c </tmp/factory-logo) -gt 1000
+          curl -fsSL "$root/" -o /tmp/hhba-homepage
+          grep -q '/hhba-talent/assets/' /tmp/hhba-homepage
+          echo HHBA_DATA_DRIVEN_FACTORY_PUBLIC_PREVIEW_PASS
