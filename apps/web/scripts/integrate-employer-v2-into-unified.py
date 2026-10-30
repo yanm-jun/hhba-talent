@@ -84,7 +84,10 @@ def main():
   src=blob(SOURCE_REF,path)
   existing=blob("HEAD",path)
   base=blob(ancestor,path)
-   # These files were independently extended for the same employer in both
+   if path=="apps/web/src/components/UnifiedJobMarket.tsx" and existing and
+   "showCompanyDirectoryMatches" in existing and "preview-integration-v2" in existing:
+   preserved.append(path);continue  # Already integrated and manually verified.
+  # These files were independently extended for the same employer in both
   # branches. The V2 versions are proven supersets (Anker plus Laifen/SHKP/Boyu
   # and 15 sourced employer dossiers); retain the release-only route below.
   source_wins={
