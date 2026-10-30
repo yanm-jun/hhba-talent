@@ -5,6 +5,7 @@
  */
 import type {LiveJob} from './liveRecruitment';
 import {majorById} from './domesticMajors';
+import {majorNamesRelated} from './majorEligibility.mjs';
 export type MajorMatch='all'|'related'|'unrestricted'|'unknown'|'other';
 export const MAJOR_STORAGE_KEY='hhba.company.major';
 const normalize=(s:string)=>s.normalize('NFKC').trim().toLocaleLowerCase().replace(/[\s（）()·．.]/g,'');
@@ -32,7 +33,7 @@ function equivalent(label:string,major:string){
  if(a===b)return true;
  // Strictly allow a *named category*, never substring guesses such as '艺术'
  // accidentally matching computer graphics or '管理' matching every role.
- return groupsFor(major).includes(a);
+ return majorNamesRelated(label,major)||groupsFor(major).includes(a);
 }
 export function validMajorSlug(slug:string){
  return !!slug&&!!majorById(slug);
