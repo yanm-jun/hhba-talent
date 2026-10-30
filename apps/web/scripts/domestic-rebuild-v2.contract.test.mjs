@@ -105,7 +105,7 @@ assert(csairPage.includes('<CompanyMajorJobs companyRoute="/companies/autumn/cn-
 assert(csairPage.indexOf('CompanyMajorJobs')<csairPage.indexOf('主要业务与专业服务'),'Preserve image, major/jobs, business order');
 assert(sharedJobs.includes('encodeURIComponent(job.id)'), 'CSAIR links use unified HHBA detail');
 assert(csairPage.includes('data-hhba-recruitment-outbound="true"'));
-assert(index.includes('csairV2Records.length!==6||sftechV2Records.length!==17||neteaseV2Records.length!==14||hypergryphV2Records.length!==20||domesticV2Records.length!==120'));
+assert(index.includes('csairV2Records.length!==6||sftechV2Records.length!==17||neteaseV2Records.length!==14||hypergryphV2Records.length!==20||ankerV2Records.length!==24||domesticV2Records.length!==144'));
 const sf=JSON.parse(src('src/data/domesticSfTechCampusRoles20261029.json'));
 const sfPage=src('src/pages/SfExpressCompactProfilePage.tsx');
 assert.equal(sf.jobs.length,17,'Keep 17 distinct positions evidenced by SF Technology 2027 campus announcement');
@@ -117,7 +117,7 @@ assert(sfPage.includes('<CompanyMajorJobs companyRoute="/companies/autumn/cn-aut
 assert(sfPage.indexOf('CompanyMajorJobs')<sfPage.indexOf('主要业务与专业服务'));
 assert(sharedJobs.includes('encodeURIComponent(job.id)'),'SF Tech jobs use unified details');
 assert(sfPage.includes('data-hhba-recruitment-outbound="true"'));
-assert(index.includes('sftechV2Records.length!==17||neteaseV2Records.length!==14||hypergryphV2Records.length!==20||domesticV2Records.length!==120'));
+assert(index.includes('sftechV2Records.length!==17||neteaseV2Records.length!==14||hypergryphV2Records.length!==20||ankerV2Records.length!==24||domesticV2Records.length!==144'));
 assert(recruitment.includes("job.platform==='sftech-2027-campus-list'"));
 for(const name of ['sf-logo.webp','sf-building.webp','sf-logistics.webp'])
  assert(existsSync('public/images/sf-user/'+name),'Missing separately provided SF photo '+name);
@@ -133,11 +133,28 @@ assert(main.includes("if(route==='/companies/autumn/cn-autumn-007')return <Hyper
 assert(hypergryphPage.includes('hhba-kpmg-photo-grid')&&hypergryphPage.includes('<CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn-007"'));
 assert(hypergryphPage.indexOf('CompanyMajorJobs')<hypergryphPage.indexOf('主要业务与专业服务'));
 assert(hypergryphPage.includes('data-hhba-recruitment-outbound="true"'));
-assert(index.includes('hypergryphV2Records.length!==20||domesticV2Records.length!==120'));
+assert(index.includes('hypergryphV2Records.length!==20||ankerV2Records.length!==24||domesticV2Records.length!==144'));
 assert(recruitment.includes("job.platform==='hypergryph-2027-campus-reported'"));
 for(const file of ['hypergryph-logo.png','hypergryph-reception.png','hypergryph-recruitment-art.png']){
  assert(existsSync('public/images/hypergryph-user/'+file),'Missing original PNG '+file);
 }
+
+const anker=JSON.parse(src('src/data/domesticAnker2027OfficialRoles20261030.json'));
+const ankerPage=src('src/pages/AnkerCompactProfilePage.tsx');
+assert.equal(anker.jobs.length,24,'24 distinct real Anker 2027 official campus role titles');
+assert.equal(new Set(anker.jobs.map(j=>j.id)).size,24);
+assert(anker.jobs.every(j=>j.company==='安克创新科技股份有限公司'&&j.evidenceUrl.startsWith('https://career.anker.com.cn/universities/recruitment/jobPosts/')));
+assert.equal(anker.jobs.filter(j=>j.individualPermalinkVerified).length,2,'Only two individually verified job deep links');
+assert(anker.jobs.every(j=>j.currentOpenVerified===false),'Do not claim real-time availability');
+assert(anker.jobs.every(j=>j.majors.length>0||j.editorialRelatedMajors.length>0));
+assert(main.includes("if(route==='/companies/autumn/cn-autumn-008')return <AnkerCompactProfilePage user={user}/>;"));
+assert(ankerPage.includes('hhba-kpmg-photo-grid')&&ankerPage.includes('<CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn-008"'));
+assert(ankerPage.indexOf('CompanyMajorJobs')<ankerPage.indexOf('主要业务与专业服务'));
+assert(ankerPage.includes('data-hhba-recruitment-outbound="true"'));
+assert(index.includes('ankerV2Records.length!==24||domesticV2Records.length!==144'));
+assert(recruitment.includes("job.platform==='anker-2027-campus-official'"));
+for(const file of ['anker-logo.png','anker-brand-vision.png','anker-building.png'])
+ assert(existsSync('public/images/anker-user/'+file),'Missing original Anker PNG '+file);
 
 const netease=JSON.parse(src('src/data/domesticNeteaseCampusRoleDirections20261029.json'));
 const neteasePage=src('src/pages/NeteaseGamesCompactProfilePage.tsx');
@@ -152,7 +169,7 @@ assert(neteasePage.includes('<CompanyMajorJobs companyRoute="/companies/autumn/c
 assert(neteasePage.indexOf('CompanyMajorJobs')<neteasePage.indexOf('主要业务与专业服务'));
 assert(sharedJobs.includes('encodeURIComponent(job.id)'),'NetEase jobs retain site detail');
 assert(neteasePage.includes('data-hhba-recruitment-outbound="true"'));
-assert(index.includes('neteaseV2Records.length!==14||hypergryphV2Records.length!==20||domesticV2Records.length!==120'));
+assert(index.includes('neteaseV2Records.length!==14||hypergryphV2Records.length!==20||ankerV2Records.length!==24||domesticV2Records.length!==144'));
 assert(recruitment.includes("job.platform==='netease-interactive-2027-direction'"));
 for(const name of ['netease-logo.png','netease-building.png','netease-team.png']){
  assert(existsSync('public/images/netease-user/'+name),'Missing unmodified user original PNG '+name);
@@ -174,7 +191,7 @@ assert(pfizerPage.includes('<CompanyMajorJobs companyRoute="/companies/autumn/cn
 assert(pfizerPage.indexOf('CompanyMajorJobs')<pfizerPage.indexOf('主要业务与专业服务'));
 assert(sharedJobs.includes("'/candidate/jobs/'+encodeURIComponent(job.id)"),'Pfizer jobs open unified HHBA role details');
 assert(pfizerPage.includes('data-hhba-recruitment-outbound="true"'));
-assert(index.includes("pfizerV2Records.length!==4||csairV2Records.length!==6||sftechV2Records.length!==17||neteaseV2Records.length!==14||hypergryphV2Records.length!==20||domesticV2Records.length!==120"));
+assert(index.includes("pfizerV2Records.length!==4||csairV2Records.length!==6||sftechV2Records.length!==17||neteaseV2Records.length!==14||hypergryphV2Records.length!==20||ankerV2Records.length!==24||domesticV2Records.length!==144"));
 for(const n of ['pfizer-building.webp','pfizer-logo.webp','pfizer-laboratory.webp'])assert(existsSync('public/images/pfizer-user/'+n),'Missing user supplied photo: '+n);
 
 assert(main.includes("if(route==='/companies/domestic/rel-huayu-004')return <HuayuVisionCompactProfilePage user={user}/>"),'Preserve old profile URL');
@@ -230,4 +247,4 @@ for(const suffix of ['01','02']){
  const path='public/images/autumn-ai-scenes/cn-autumn-002-'+suffix+'.avif';
  assert(existsSync(path),'Reusing already created company photo '+path);
 }
-console.log('HHBA_DOMESTIC_V2_120_OVERSEAS_12_SCHNEIDER_6_KPMG_16_HUAYU_10_HUAAN_10_GUANGFA_5_CITICS_BRANCH_POSITIONS '+workflowBranch);
+console.log('HHBA_DOMESTIC_V2_144_OVERSEAS_12_SCHNEIDER_6_KPMG_16_HUAYU_10_HUAAN_10_GUANGFA_5_CITICS_BRANCH_POSITIONS '+workflowBranch);
