@@ -18,6 +18,14 @@ article1='https://gs.powerchina.cn/col/col8855/art/2026/art_a3bd5bd98d594c49bb67
 article2='https://gs.powerchina.cn/col/col8855/art/2026/art_f9b4b94a210d427da7fe06d6dad62b7e.html'
 article3='https://gs.powerchina.cn/col/col8855/art/2025/art_01d0b0fa242d47b7a5f4a4d8774849db.html'
 pages={'logo.png':[base,'https://www.powerchina.cn/'],'photo1.jpg':[article1,article3], 'photo2.jpg':[article2,article3]}
+# Two actual views of this exact invested Pannan 2x660MW project, not another utility.
+# These original images are published by POWERCHINA and a POWERCHINA EPC entity.
+direct_photos={
+ 'photo1.jpg':[('https://www.powerchina.cn/cms_files/filemanager/1789/picture/20264/d235184c1121464e8091f2bfb83ee404.jpg',
+                'https://www.powerchina.cn/col/col7440/art/2026/art_5da26c3edda040679b1f867dc6d86e27.html')],
+ 'photo2.jpg':[('https://gepcc.powerchina.cn/cms_files/filemanager/57/picture/20256/1b892fc428924165bde56dc27f1167a8.jpg',
+                'https://gepcc.powerchina.cn/col/col503/art/2025/art_e14cdb073ef2437ab9413b3f291fbb55.html')]
+}
 headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36','Accept':'text/html,image/avif,image/webp,image/jpeg,image/png,image/*;q=0.8'}
 class Images(HTMLParser):
  def __init__(self): super().__init__();self.data=[]
@@ -58,7 +66,20 @@ audit={};hashes=set()
 for name,sources in pages.items():
  started=time.monotonic()
  chosen=None
- for page in sources:
+ for url,article in direct_photos.get(name,[]):
+  try:
+   raw=read(url)
+   chk=Image.open(BytesIO(raw));chk.verify()
+   im=ImageOps.exif_transpose(Image.open(BytesIO(raw))).convert('RGB')
+   if im.width<580 or im.height<290:raise ValueError('photo dimensions too small')
+   h=sha256(raw).hexdigest()
+   if h in hashes:raise ValueError('duplicate source image')
+   chosen=(im,url,article,h)
+   print('POWER_INVEST_VERIFIED_SOURCE_PHOTO',name,url,im.size)
+   break
+  except Exception as e:
+   print('POWER_INVEST_OFFICIAL_PHOTO_SOURCE_REJECTED',name,url,str(e)[:150])
+ for page in ([] if chosen else sources):
   if time.monotonic()-started>65:
    print('POWER_INVEST_FETCH_BUDGET_EXHAUSTED',name)
    break
