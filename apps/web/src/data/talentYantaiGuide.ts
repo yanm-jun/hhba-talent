@@ -14,12 +14,12 @@ const sourceList:[string,string][]=[
  ['海阳市人社局：政策申报及审核解读',CURRENT],
  ['烟台市人社局：2026年就业和人才政策手册',HANDBOOK]
 ];
-const contact=[{name:'烟台民生热线（请转人才补贴经办部门）',phone:'0535-6251234'}];
+const contact: {name:string;phone:string}[]=[];
 const common={
  city:'烟台',kicker:'TALENT POLICY SERVICE · 烟台',review:'已核对2026年3月实施细则与2026年人社解读；是否开放办理请以当前网厅及区市经办部门为准。',
  officialUrl:CITY,officialLabel:'烟台市人社局官网（首页进入“网上办事大厅”，非申报直达链接）',
  officialNote:'从人社局官网点击“烟台人社网上办事大厅”→个人登录→“生活补贴个人申请”或“购房补贴个人申请”；用人单位随后在线初审。本链接是官网导航页，不是已登录的申报表。',
- contacts:contact,contactSource:QNA,sources:sourceList,
+ contacts:contact,sources:sourceList,
  listPath:'/talent-service/list/policies/烟台',stepPortalIndex:3
 };
 const sharedChecks=[
