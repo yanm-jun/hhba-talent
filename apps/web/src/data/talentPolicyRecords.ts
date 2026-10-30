@@ -1,4 +1,4 @@
-import {WEIFANG_POLICY_RECORDS} from './weifangPolicyRecords';
+import {WEIFANG_POLICY_RECORDS} from './weifangPolicyRecords.ts';
 // HHBA policy index v1. All entries are traceable to public government primary sources.
 // Static snapshots as reviewed 2026-10-30; NEVER claim live availability, eligibility, or vacancy.
 export type TalentPolicyRecord={
