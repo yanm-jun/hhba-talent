@@ -64,8 +64,19 @@ for(const id of selected){
   assert(photo.alt?.trim()&&photo.caption?.trim()&&photo.note?.trim(),'Missing caption/credit for photo '+(i+1));
  }
  if(p.mediaSources){
-  const sourceUrls=['logo','photo1','photo2'].map(key=>asUrl(p.mediaSources[key],key+' media provenance').href);
-  assert(new Set(sourceUrls).size===3,'Media sources must be independent');
+  // Earlier accepted companies use mediaSources.photos or mediaSources.photoSources.
+  // V2 accepts all three legacy formats without modifying their saved evidence.
+  const media=p.mediaSources;
+  const photoSources=Array.isArray(media.photos)?media.photos:
+   Array.isArray(media.photoSources)?media.photoSources:[media.photo1,media.photo2];
+  assert(photoSources.length===2,'Two separate photo source records required');
+  const validPhotos=photoSources.map((source,i)=>asUrl(source,'Photo '+(i+1)+' provenance').href);
+  const logoUrl=typeof media.logo==='string'&&media.logo.startsWith('https://')
+   ?asUrl(media.logo,'Logo provenance').href:null;
+  if(!logoUrl)assert(typeof media.logo==='string'&&media.logo.includes('用户提供'),
+    'Legacy user-supplied logo must be labeled, not passed off as an official URL');
+  assert(new Set([...validPhotos,...(logoUrl?[logoUrl]:[])]).size===(logoUrl?3:2),
+    'Media sources must be independent');
  }
  const roleIds=new Set();
  for(const role of p.jobs){
