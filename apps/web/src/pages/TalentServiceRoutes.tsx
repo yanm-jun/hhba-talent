@@ -124,7 +124,7 @@ function CityHub({city}:{city:string}){
    </div>
   </section>
   <section className="ts-v4-city-note"><ShieldCheck size={18}/>
-   <div><strong>{hasSources?'政策以当地官方发布和审核结果为准':'城市入口已开通，政策资料尚在核验'}</strong><p>只有政府来源确认的信息才会展示。没有核验的城市不展示虚拟补贴或虚假房源；申请材料和步骤以具体政策原文为准。</p></div>
+   <div><strong>{hasSources?'政策以当地官方发布和审核结果为准':'城市入口已开通，政策资料尚在核验'}</strong><p>正式住房资料仅采用符合标准的政府来源；参考报道与待核验项目单独标注，不作为当前可申领依据。申请材料和步骤以主管部门最新原文为准。</p></div>
   </section>
  </>;
 }
@@ -150,7 +150,7 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
   {guideMode?<GuideContent city={city}/>:<>
   <section className="ts-sub-header">
    <span className="ts-section-kicker">{searchMode?'SEARCH RESULTS':'CITY SERVICES'} / {city}</span><h1>{city} · {title}</h1>
-   <p>{searchMode?'搜索政府公开政策和具体人才公寓项目。结果仅来自已收录的数据。':'按实际城市整理有官方来源的资料，点击卡片进入单独的详情页。'}</p>
+   <p>{searchMode?'搜索已收录政策、住房和明确标注的待核验项目；仅政府核实的资料可作为正式申报依据。':'按城市分类查看已收录政策和住房；政府原文、媒体转载、待核验项目会分别标明，不能据此认定正在受理或有空房。'}</p>
    <div className="ts-sub-counts"><QuickCount count={shownPolicies.length} label="政策结果"/>{(housingMode||searchMode)&&<QuickCount count={shownHomes.length} label="已核实住房"/>}{pendingHousingCount>0&&<QuickCount count={pendingHousingCount} label="待核验公寓线索"/>}</div>
   </section>
   <form className="ts-sub-search" onSubmit={e=>{e.preventDefault();doSearch()}}><Search size={18}/><input value={draft} onChange={e=>setDraft(e.target.value)} placeholder={'搜索'+city+'硕士补贴、住房项目…'} aria-label="搜索人才服务"/><button type="submit">搜索 <ArrowRight size={15}/></button></form>
