@@ -8,13 +8,13 @@ import '../styles/talent-service.css';
 type City={name:string;province:string;photo?:string;credit?:string;photoPage?:string;intro:string};
 type Detail={title:string;kind:'housing'|'policy'|'guide';summary:string;tags:string[];steps:string[]};
 const CITIES:City[]=[
- {name:'杭州',province:'浙江',photo:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Hangzhou%20CBD.jpg?width=1000',credit:'Baycrest / Wikimedia Commons · CC BY-SA 2.5',photoPage:'https://commons.wikimedia.org/wiki/File:Hangzhou_CBD.jpg',intro:'数字经济、先进制造与青年人才发展'},
- {name:'深圳',province:'广东',photo:'https://upload.wikimedia.org/wikipedia/commons/e/e3/Commercial_area_of_futian_to_east2020.jpg',credit:'Wikimedia Commons',photoPage:'https://commons.wikimedia.org/wiki/File:Commercial_area_of_futian_to_east2020.jpg',intro:'科技创新、产业人才与城市安居'},
- {name:'青岛',province:'山东',photo:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Qingdao%20%2831424840488%29.jpg?width=1000',credit:'Wikimedia Commons',photoPage:'https://commons.wikimedia.org/wiki/File:Qingdao_(31424840488).jpg',intro:'海洋产业、先进制造与青年就业'},
- {name:'上海',province:'上海',intro:'金融、科技创新与多层次人才保障'},
- {name:'北京',province:'北京',intro:'研发创新、公共服务与人才发展'},
- {name:'济南',province:'山东',intro:'省会就业机会与青年人才支持'}
-];
+ {name:'杭州',province:'浙江',photo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/%E6%9D%AD%E5%B7%9E%E9%92%B1%E6%B1%9F%E6%96%B0%E5%9F%8E.jpg/1280px-%E6%9D%AD%E5%B7%9E%E9%92%B1%E6%B1%9F%E6%96%B0%E5%9F%8E.jpg',credit:'EditQ · CC BY-SA 4.0',photoPage:'https://commons.wikimedia.org/wiki/File:%E6%9D%AD%E5%B7%9E%E9%92%B1%E6%B1%9F%E6%96%B0%E5%9F%8E.jpg',intro:'数字经济、先进制造与青年人才发展'},
+ {name:'深圳',province:'广东',photo:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Skyline_in_Shenzhen_%2820250327%29.jpg?width=1280',credit:'Fumikas Sagisavas · CC0',photoPage:'https://commons.wikimedia.org/wiki/File:Skyline_in_Shenzhen_(20250327).jpg',intro:'科技创新、产业人才与城市安居'},
+ {name:'青岛',province:'山东',photo:'https://commons.wikimedia.org/wiki/Special:Redirect/file/%E9%9D%92%E5%B2%9B%E5%A4%A9%E9%99%85%E7%BA%BF201809.jpg?width=1280',credit:'WFan · CC BY-SA 4.0',photoPage:'https://commons.wikimedia.org/wiki/File:%E9%9D%92%E5%B2%9B%E5%A4%A9%E9%99%85%E7%BA%BF201809.jpg',intro:'海洋产业、先进制造与青年就业'},
+ {name:'上海',province:'上海',photo:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Shanghai_skyline.jpg?width=1280',credit:'Rose Abrams · Wikimedia Commons',photoPage:'https://commons.wikimedia.org/wiki/File:Shanghai_skyline.jpg',intro:'金融、科技创新与多层次人才保障'},
+ {name:'北京',province:'北京',photo:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Guomao_Skyline.jpg?width=1280',credit:'郭友柏 · CC BY-SA 4.0',photoPage:'https://commons.wikimedia.org/wiki/File:Guomao_Skyline.jpg',intro:'研发创新、公共服务与人才发展'},
+ {name:'济南',province:'山东',photo:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Jinan_CBD_skyline_June_2023.jpg?width=1280',credit:'Percival Kestreltail · CC BY-SA 4.0',photoPage:'https://commons.wikimedia.org/wiki/File:Jinan_CBD_skyline_June_2023.jpg',intro:'省会就业机会与青年人才支持'}
+]
 const BENEFITS=[
  {title:'高校毕业生生活支持',detail:'了解学历层次、毕业年限、劳动合同及社保等常见核验项目。',tags:['毕业生','生活补贴']},
  {title:'租房补贴与住房保障',detail:'查询租房补贴、保障性租赁住房、人才公寓等不同保障渠道。',tags:['租房','安居保障']},
@@ -65,7 +65,16 @@ export function TalentServicePage({user}:{user:User|null}){
      <div className="ts-hot-cities"><span>热门城市</span>{CITIES.slice(0,6).map(c=><button key={c.name} type="button" className={c.name===city?'active':''} onClick={()=>chooseCity(c.name)}>{c.name}</button>)}</div>
      <div className="ts-trust-note"><ShieldCheck size={15}/> 功能预览 · 城市政策及房源尚未接入实时官方数据，申请前请核对政府公告</div>
     </div>
-    <div className="ts-hero-art" aria-hidden="true"><div className="ts-orbit orbit-one"/><div className="ts-orbit orbit-two"/><div className="ts-hero-art-card"><span>YOUR NEXT CITY</span><strong>{current.name}</strong><small>{current.province} · 人才发展与生活服务</small></div><div className="ts-art-pill pill-one"><Home size={16}/> 安居保障</div><div className="ts-art-pill pill-two"><Wallet size={16}/> 福利支持</div></div>
+    <div className="ts-hero-art">
+     <div className="ts-hero-photo-halo" aria-hidden="true"/>
+     <figure className="ts-hero-photo">
+      <img key={current.name} src={current.photo} alt={current.name+'城市风貌实景照片'} loading="eager" decoding="async" />
+      <span className="ts-photo-topline" aria-hidden="true">CITY IN FOCUS <span>●</span> {current.province}</span>
+      <figcaption className="ts-photo-caption"><span>DISCOVER YOUR NEXT CITY</span><strong>{current.name}</strong><small>{current.province} · 城市实景</small></figcaption>
+     </figure>
+     <span className="ts-photo-chip ts-photo-chip-blue" aria-hidden="true"><Home size={16}/> 安居保障</span>
+     <span className="ts-photo-chip ts-photo-chip-orange" aria-hidden="true"><Wallet size={16}/> 人才福利</span>
+    </div>
    </section>
 
    <section className="ts-quick-wrap" aria-label="人才服务快捷入口">
@@ -102,7 +111,7 @@ export function TalentServicePage({user}:{user:User|null}){
     {matchVisible&&<div role="status" className="ts-match-result"><CheckCircle2 size={17}/><div><strong>{city} · {education} · {grad}</strong><p>建议优先查询：{grad==='在校学生'?'实习就业支持、毕业生服务、人才落户条件':'毕业生就业支持、住房保障、人才引进与落户'}。此结果不代表符合申领资格，具体以官方政策审核为准。</p><button type="button" onClick={()=>scrollToSection('ts-policies')}>查看政策栏目 <ArrowRight size={14}/></button></div></div>}</div>
    </section>
    <footer className="ts-footer"><span>HHBA · 让劳动更有尊严，让商业更有温度。</span><Link to="/candidate/jobs">返回招聘市场 <ArrowRight size={14}/></Link></footer>
-   <p className="ts-photo-credit">城市图片来源：{CITIES.slice(0,3).map((c,i)=><span key={c.name}>{i>0?' · ':''}<a href={c.photoPage} target="_blank" rel="noreferrer noopener">{c.name} / {c.credit}</a></span>)}。公寓照片为 Unsplash 场景示意，不代表真实人才公寓项目。</p>
+   <p className="ts-photo-credit">城市图片来源：{CITIES.map((c,i)=><span key={c.name}>{i>0?' · ':''}<a href={c.photoPage} target="_blank" rel="noreferrer noopener">{c.name} / {c.credit}</a></span>)}。公寓照片为 Unsplash 场景示意，不代表真实人才公寓项目。</p>
   </div>
   {detail&&<div className="ts-modal-backdrop" role="presentation" onMouseDown={()=>setDetail(null)}><section className="ts-modal" role="dialog" aria-modal="true" aria-label={detail.title} onMouseDown={e=>e.stopPropagation()}><button type="button" aria-label="关闭说明" className="ts-modal-close" onClick={()=>setDetail(null)}><X size={20}/></button><span className="ts-section-kicker">{detail.kind==='housing'?'HOUSING GUIDE':'POLICY GUIDE'} · 资料预览</span><h2>{detail.title}</h2><p>{detail.summary}</p><div className="ts-modal-notice"><ShieldCheck size={18}/> 尚未接入该城市的官方实时政策及房源数据，以下是办理方向说明，不是实际可领取的补贴或可申请房源。</div><h3>申请前需要核实</h3><ol>{detail.steps.map(s=><li key={s}>{s}</li>)}</ol><a href="https://www.gov.cn/" target="_blank" rel="noreferrer noopener" className="ts-modal-official">前往中国政府网 <ExternalLink size={15}/></a></section></div>}
  </Shell>;
