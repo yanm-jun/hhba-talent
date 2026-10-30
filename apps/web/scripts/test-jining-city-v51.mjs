@@ -1,0 +1,47 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {TALENT_POLICY_RECORDS} from '../src/data/talentPolicyRecords.ts';
+import {TALENT_HOUSING_RECORDS} from '../src/data/talentHousingRecords.ts';
+import {assessPolicy,assessHousing,assessTalentCity} from '../src/data/talentQuality.ts';
+import {findTalentCity} from '../src/data/talentCityRegistry.ts';
+import {jiningYouthGuide,jiningRentGuide} from '../src/data/talentJiningGuides.ts';
+
+const policies=TALENT_POLICY_RECORDS.filter(p=>p.city==='济宁');
+const homes=TALENT_HOUSING_RECORDS.filter(h=>h.city==='济宁');
+const byId=(id)=>{const x=policies.find(p=>p.id===id);assert.ok(x,'missing policy '+id);return x};
+for(const id of ['sd-jining-2026-introduction','jn-start-26','jn-opc-insurance-26','jn-maincity-rent-2026','jn-houseticket-2022-history'])byId(id);
+assert.ok(policies.length>=5,'original three policy IDs plus two new researched records must survive');
+assert.equal(new Set(policies.map(p=>p.id)).size,policies.length);
+assert.equal(byId('sd-jining-2026-introduction').payoutTo,'用人单位');
+assert.equal(byId('jn-opc-insurance-26').payoutTo,'用人单位');
+assert.equal(byId('jn-start-26').payoutTo,'个人');
+assert.ok(byId('sd-jining-2026-introduction').applicationSteps.length>=5);
+assert.ok(byId('sd-jining-2026-introduction').reviewNote.includes('单位'));
+assert.equal(byId('jn-houseticket-2022-history').temporal,'historical');
+assert.equal(assessPolicy(byId('jn-houseticket-2022-history'),'2026-10-30').grade,'C');
+assert.equal(assessPolicy(byId('jn-maincity-rent-2026'),'2026-10-30').grade,'B');
+assert.ok(byId('jn-maincity-rent-2026').eligibility.includes('毕业不满5周年'));
+assert.ok(byId('jn-maincity-rent-2026').reviewNote.includes('2026'));
+assert.ok(homes.length>=2,'at least the two truthful government housing programs');
+for(const id of ['jn-maincity-housing-program-2026','jn-protected-rental-program-2022']){
+ const h=homes.find(h=>h.id===id);assert.ok(h,'missing housing program '+id);
+ assert.equal(h.kind,'program','government policy is not a rental building');
+ assert.equal(assessHousing(h,'2026-10-30').grade,'B');
+ assert.ok(h.statusNote.includes('申报入口待核'));
+ assert.equal(h.applyUrl,undefined);
+ assert.ok(h.steps.length>=4&&h.rent&&h.eligibility&&h.sourceUrl.includes('.gov.cn'));
+}
+assert.equal(homes.filter(h=>h.kind==='project').length,0,'no invented apartment projects or real-time vacancies');
+assert.equal(findTalentCity('jining')?.name,'济宁');
+assert.equal(assessTalentCity('济宁','2026-10-30').accepted,false,'cannot mark city as A-certified');
+assert.equal(jiningYouthGuide.qualityLevel,'B');assert.equal(jiningRentGuide.qualityLevel,'B');
+assert.ok(jiningYouthGuide.steps.length>=6&&jiningRentGuide.steps.length>=6);
+assert.ok(Object.keys(jiningYouthGuide.branches).length>=4&&Object.keys(jiningRentGuide.branches).length>=3);
+assert.ok(jiningYouthGuide.faq.length>=6&&jiningRentGuide.faq.length>=6);
+assert.equal(jiningYouthGuide.officialUrl,undefined);
+assert.equal(jiningRentGuide.officialUrl,undefined);
+const read=p=>readFileSync(new URL('../src/'+p,import.meta.url),'utf8');
+assert.ok(read('pages/TalentServiceRoutes.tsx').includes("fragments[2]==='jining'"));
+assert.ok(read('components/talent/UnifiedPolicyList.tsx').includes("detailPath:p.id==='sd-jining-2026-introduction'"));
+assert.ok(read('components/talent/UnifiedTalentRecordDetail.tsx').includes("'jn-maincity-rent-2026':'/talent-service/policy-guide-preview/jining/rent'"));
+console.log('Jining V5.1 PASS: 5+ distinct policies, 2 honest housing programs, no invented projects, youth & rent guides.');
