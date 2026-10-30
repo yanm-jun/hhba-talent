@@ -21,8 +21,15 @@ for(const raw of urls){
 for(const city of ['杭州','深圳','青岛','上海','北京','济南']){
  assert.ok(housing.includes('city:"'+city+'"'),'Missing housing city '+city);
 }
-assert.ok(landing.includes('<TalentHousingSection city={city} query={submittedQuery}'),'Housing not wired to selected city');
-assert.ok(landing.includes('<TalentPolicySearch city={city} query={submittedQuery}'),'Policy not wired to selected city');
+const details=readFileSync(new URL('pages/TalentServiceRoutes.tsx',root),'utf8');
+const entry=readFileSync(new URL('main.tsx',root),'utf8');
+assert.ok(!landing.includes('<TalentHousingSection')&&!landing.includes('<TalentPolicySearch'),'Portal must not render full policy or housing lists');
+assert.ok(landing.includes('talentCityUrl(c.name)')&&landing.includes('talentSearchUrl(matchedCity,query)'),'Homepage city cards and search must use separate routes');
+assert.ok(landing.includes('talentListUrl(item.kind'),'Home navigation tiles must open independent list pages');
+assert.ok(details.includes('function CityHub(')&&details.includes('function ListPage(')&&details.includes('function DetailPage('),'City/list/detail page hierarchy missing');
+assert.ok(details.includes('talentPolicyUrl(data.id)')&&details.includes('talentHousingUrl(data.id)'),'Detail deep-links missing');
+assert.ok(details.includes('TALENT_POLICY_RECORDS')&&details.includes('TALENT_HOUSING_RECORDS'),'Historic official data must be preserved');
+assert.ok(entry.includes("route.startsWith('/talent-service/')"),'SPA deep-link route handling missing');
 assert.ok(!landing.includes('images.unsplash.com'),'Stock photos cannot represent real projects');
 assert.ok(housingView.includes('today>r.applicationEnd'),'Expired application windows must be flagged');
 assert.ok(policyView.includes('TALENT_POLICY_RECORDS'),'Policy source index missing');
