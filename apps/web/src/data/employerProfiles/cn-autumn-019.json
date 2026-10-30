@@ -27,22 +27,24 @@
     "https://hr.mgtv.com/",
     "https://www.3wen.com/wenzhang/id/6131.html",
     "https://commons.wikimedia.org/wiki/File:Hunan_Broadcasting_System_Building,_29_June_2019.jpg",
-    "https://commons.wikimedia.org/wiki/File:Studio_Audience_at_Hu_Nan_Tv.jpg"
+    "https://commons.wikimedia.org/wiki/File:Studio_Audience_at_Hu_Nan_Tv.jpg",
+    "https://www.sohu.com/a/459817566_542552",
+    "https://www.gooood.cn/hunan-broadcasting-system-hbs-program-production-centre-by-hpp.htm"
   ],
   "media": {
     "logo": "images/employer-profiles/cn-autumn-019/logo.png",
     "photos": [
       {
         "path": "images/employer-profiles/cn-autumn-019/photo1.webp",
-        "caption": "湖南广播电视台大楼 · 长沙",
-        "note": "2019年实景摄影 · Huangdan2060 / Wikimedia Commons · CC BY 3.0；图像裁切压缩用于展示。非2026年新拍摄。",
-        "alt": "长沙湖南广播电视台大楼及其周边建筑"
+        "caption": "湖南广电总部建筑 · 长沙",
+        "note": "2021年媒体报道所附湖南广电大楼实景，来源：搜狐号图文；非2026年新拍摄。仅用于企业场景说明，使用权待进一步核验。",
+        "alt": "长沙湖南广电金鹰影视文化城总部标志性高层建筑"
       },
       {
         "path": "images/employer-profiles/cn-autumn-019/photo2.webp",
-        "caption": "湖南广电电视节目录制现场 · 历史照片",
-        "note": "2009年湖南电视台演播现场 · Plastered T-shirts / Wikimedia Commons · CC BY-SA 2.0；为历史节目场景，非当下办公环境。",
-        "alt": "2009年湖南电视台录制现场演播室观众席"
+        "caption": "湖南广播电视台节目生产基地 · 七彩盒子",
+        "note": "2022年HPP Architects项目图，来源：谷德设计网；为制作基地建筑实景，图片使用权待进一步核验。",
+        "alt": "湖南广播电视台节目生产基地现代建筑和橙色芒果标识"
       }
     ]
   },
@@ -67,7 +69,7 @@
     "计算机科学与技术",
     "软件工程"
   ],
-  "photoNote": "湖南广电集团品牌标识参考GBS历史标志实景照片（2021年设计案例，非官方授权矢量LOGO），两张图片使用有署名及许可条件的历史实景素材，非AI制作。图库照片点击不跳转其他网站。展示该品牌不代表企业与HHBA合作。",
+  "photoNote": "品牌图采用公开GBS标识实景照片，非官方授权矢量Logo；两张图片是2021年传媒报道总部及2022年建筑项目图，不是近期办公环境。均保留媒体来源且不外链，图片再使用授权待核验。公开展示不表示湖南广电与HHBA建立合作。",
   "business": [
     {
       "title": "电视与广播内容制作播出",
@@ -201,7 +203,7 @@
   ],
   "mediaSources": {
     "logo": "https://www.3wen.com/userfiles/images/81o1.jpg",
-    "photo1": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Hunan_Broadcasting_System_Building%2C_29_June_2019.jpg",
-    "photo2": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Studio_Audience_at_Hu_Nan_Tv.jpg"
+    "photo1": "https://p3.itc.cn/images01/20210409/fa8ee7eb8ea148e6a05110e4ecd67d47.jpeg",
+    "photo2": "https://oss.gooood.cn/uploads/2022/11/028-hunan-broadcasting-system-hbs-program-production-centre-by-hpp.jpg"
   }
 }
