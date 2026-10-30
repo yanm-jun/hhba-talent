@@ -10,7 +10,7 @@ from html.parser import HTMLParser
 from io import BytesIO
 from hashlib import sha256
 from PIL import Image,ImageOps,ImageDraw,ImageFont
-import json,re
+import json,re,time
 root=Path(__file__).resolve().parents[1]/'public/images/employer-profiles/cn-autumn-029'
 root.mkdir(parents=True,exist_ok=True)
 base='https://gs.powerchina.cn/'
@@ -30,7 +30,7 @@ class Images(HTMLParser):
 cache={}
 def read(url,limit=9_000_000):
  req=Request(url,headers=headers)
- with urlopen(req,timeout=13) as resp:
+ with urlopen(req,timeout=9) as resp:
   data=resp.read(limit+1)
  if not 150<len(data)<=limit:raise ValueError('response size')
  return data
@@ -56,8 +56,12 @@ def placeholder(name):
  return im
 audit={};hashes=set()
 for name,sources in pages.items():
+ started=time.monotonic()
  chosen=None
  for page in sources:
+  if time.monotonic()-started>65:
+   print('POWER_INVEST_FETCH_BUDGET_EXHAUSTED',name)
+   break
   try:
    entries=candidates(page)
    ranked=[]
@@ -73,7 +77,8 @@ for name,sources in pages.items():
      score=(6 if re.search('/picture/|/uploads?/|/images?/|/img/|/art/',absolute.lower()) else 0)
     ranked.append((score,absolute))
    ranked.sort(reverse=True)
-   for score,url in ranked[:18]:
+   for score,url in ranked[:7]:
+    if time.monotonic()-started>65:break
     try:
      raw=read(url)
      check=Image.open(BytesIO(raw));check.verify()
