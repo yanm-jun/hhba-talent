@@ -533,6 +533,8 @@ jobs:
       - name: Browser-test Southern and Guangzhilv through the ACTUAL main search, desktop and mobile
         working-directory: apps/web
         env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
           HHBA_TEST_BASE: 'http://127.0.0.1:4173/hhba-talent/'
         run: |
           npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/hhba-mainline-v2.log 2>&1 &
