@@ -1,4 +1,4 @@
-import {useMemo,useState} from 'react';
+import {useEffect,useMemo,useState} from 'react';
 import {ArrowRight,ArrowUpRight,ExternalLink,FileSearch,FilterX,MapPin,ShieldCheck,X} from 'lucide-react';
 import {TALENT_POLICY_RECORDS,TALENT_POLICY_REVIEW_DATE,type TalentPolicyRecord} from '../data/talentPolicyRecords';
 import '../styles/talent-policy-search.css';
@@ -15,6 +15,7 @@ const concepts:{words:string[];match:(item:TalentPolicyRecord)=>boolean}[]=[
  {words:['交通','地铁','公交'],match:x=>x.category==='交通福利'},
  {words:['创业','就业扶持'],match:x=>x.category==='就业创业'||x.summary.includes('创业')},
  {words:['生活补贴'],match:x=>x.category==='生活补贴'},
+ {words:['补贴'],match:x=>x.title.includes('补贴')||x.category==='生活补贴'||x.category==='购房补贴'||x.benefit.includes('补贴')},
  {words:['应届','毕业生'],match:x=>/应届|毕业/.test(x.title+' '+x.eligibility+' '+x.keywords.join(' '))}
 ];
 export function parsePolicyQuery(query:string,selectedCity:string){
@@ -50,6 +51,7 @@ const statusText:Record<TalentPolicyRecord['temporal'],string>={
 export function TalentPolicySearch({city,query,onCityClick}:{city:string;query:string;onCityClick:(city:string)=>void}){
  const [opened,setOpened]=useState<TalentPolicyRecord|null>(null);
  const [category,setCategory]=useState('全部类型');
+ useEffect(()=>setCategory('全部类型'),[city,query]);
  const search=useMemo(()=>parsePolicyQuery(query,city),[query,city]);
  const cityRecords=TALENT_POLICY_RECORDS.filter(x=>x.city===search.city);
  const matched=useMemo(()=>TALENT_POLICY_RECORDS.map(x=>({item:x,score:rankMatches(x,search)}))
