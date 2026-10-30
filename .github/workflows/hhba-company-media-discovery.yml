@@ -1,0 +1,46 @@
+name: HHBA Generic Company Media Link Discovery
+on:
+  push:
+    branches: [feat/employer-v2-zlongame-27-20261030]
+    paths: [.github/workflows/hhba-company-media-discovery.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Find original historical office photo source URLs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip -q install requests beautifulsoup4
+          python - <<'PY'
+          import requests, bs4, urllib.parse,re
+          ss=requests.Session()
+          ss.headers.update({'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/127 Safari/537.36'})
+          for u in ['https://www.ustudies.cn/cn','https://www.ustudies.cn/en','https://www.banjiajia.com/posts/30069','https://www.sohu.com/a/200085057_799493']:
+           try:
+            r=ss.get(u,timeout=18);r.raise_for_status()
+            s=bs4.BeautifulSoup(r.text,'html.parser')
+            print('PAGE',u,'bytes',len(r.content),'title',str(s.title)[:130])
+            if 'ustudies' in u:
+             for e in s.find_all(['a','img']):
+              title=e.get_text(' ',strip=True)[:70]+' '+str(e.get('alt',''))+' '+str(e.get('title',''))
+              if re.search('紫龙|ZLong|Zilong',title,re.I):
+               print('CANDIDATE_LINK',str(e)[:1200])
+               href=e.get('href') or (e.parent.get('href') if e.parent else '')
+               if href:
+                url=urllib.parse.urljoin(u,href);rr=ss.get(url,timeout=18)
+                print('OFFICE_PAGE',url,rr.status_code,len(rr.content))
+                doc=bs4.BeautifulSoup(rr.text,'html.parser')
+                for im in doc.find_all('img')[:25]:
+                 src=im.get('data-src') or im.get('src') or ''
+                 if src:print('OFFICE_IMAGE',urllib.parse.urljoin(url,src))
+            elif 'banjiajia' in u or 'sohu' in u:
+             for im in s.find_all('img')[:30]:
+              v=im.get('data-original') or im.get('data-src') or im.get('src') or ''
+              if v and not any(z in v for z in ['logo','icon','avatar','face']):print('ARTICLE_IMAGE',urllib.parse.urljoin(u,v)[:400])
+           except Exception as e:print('PROBE_ERROR',u,str(e)[:300])
+          PY
