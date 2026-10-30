@@ -1,0 +1,397 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-028",
+  "name": "中建路桥",
+  "englishName": "CSCEC Road & Bridge Group Co., Ltd.",
+  "aliases": [
+    "中建路桥集团有限公司",
+    "中建路桥集团",
+    "中国建筑中建路桥集团",
+    "中建路桥招聘",
+    "中建路桥校招",
+    "中建路桥2026校园招聘",
+    "CSCEC Road & Bridge",
+    "CSCEC Road Bridge",
+    "中建路桥机械"
+  ],
+  "industry": "公路与桥梁工程 · 市政工程 · 勘察设计 · 装配式建造 · 项目工程管理",
+  "subtitle": "中建路桥集团有限公司 · 中国建筑所属企业 · 总部河北石家庄 · 基础设施建设",
+  "overview": "中建路桥集团有限公司由中国建筑与河北省合作，对1950年起步的河北路桥集团进行战略重组设立，是中国建筑股份有限公司所属的路桥基础设施企业。业务覆盖公路与桥梁、市政、装配式建筑、勘察设计、工程养护、投资运营、科技研发及海外工程。岗位可能安排在项目一线和不同省份，具体用人主体、工作地区和任职资格以当次官方招聘公告为准。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://rb.cscec.com/gywm/gsjj/",
+    "https://rb.cscec.com/zpzb/rcyj/",
+    "https://career.hebut.edu.cn/home/company/index/sxid/36/id/886.html",
+    "https://career.hebut.edu.cn/recruitment/content/type/2/id/5102.html",
+    "https://jobs.tiangong.edu.cn/recruitment/content/type/2/id/2688.html",
+    "https://rb.cscec.com/",
+    "https://campus.51job.com/zjlq2024/about.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-028/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-028/photo1.jpg",
+        "caption": "中建路桥官方项目图 · 公路桥梁精品工程",
+        "alt": "中建路桥官方项目展示中的公路桥梁工程实景",
+        "note": "来源于中建路桥集团有限公司官网“业务领域—精品工程”公开历史图片；项目拍摄日期和现状不明。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-028/photo2.jpg",
+        "caption": "中建路桥官方项目图 · 交通基础设施",
+        "alt": "中建路桥集团官方企业项目图中的交通基础设施实景",
+        "note": "来源于中建路桥集团有限公司官网公开项目展示；属于企业工程案例历史资料，不代表当前正在施工。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://rb.cscec.com/zpzb/rcyj/",
+    "label": "中建路桥官方人才引进与招聘公告",
+    "status": "official_portal",
+    "subject": "中建路桥集团有限公司",
+    "note": "官方“人才引进”页面提供历史校园招聘公告；2026届宣讲资料见高校就业中心。2026届宣讲活动已发生，不等于岗位当前仍可投递。岗位方向整理自高校发布的中建路桥招聘信息，非2027届实时空缺。查看最新公告和投递渠道请以官方页面为准。"
+  },
+  "majorIntro": "岗位方向来自河北工业大学就业中心收录的中建路桥企业招聘信息及2025、2026届招聘专业公告。每个岗位按对应专业单独匹配；“机械”搜索只展示机械设备岗位，不能把工程、财务及行政岗位全部混入。所选专业仅供辅助发现，不表示符合企业全部录用条件。",
+  "preferredMajors": [
+    "土木工程",
+    "道路桥梁与渡河工程",
+    "交通工程",
+    "测绘工程",
+    "工程造价",
+    "工程管理",
+    "安全工程",
+    "材料科学与工程",
+    "机械工程",
+    "机械设计制造及其自动化",
+    "电气工程及其自动化",
+    "会计学",
+    "财务管理",
+    "审计学",
+    "人力资源管理",
+    "法学",
+    "计算机科学与技术",
+    "汉语言文学"
+  ],
+  "photoNote": "Logo和两张独立工程实景图片的选定来源为企业历史校招网站与中建路桥官网公开项目图库，随主站打包为静态资源。若媒体来源不可用，仅展示明确标记的不可用占位图，不用其他企业项目图冒充。图像和商标权属原权利人；HHBA独立整理资料，不代表官方认证或合作。",
+  "business": [
+    {
+      "title": "公路与桥梁工程",
+      "description": "公路路基、路面、桥梁及交通基础设施总承包与项目现场管理。",
+      "tags": "路桥 · 公路 · 施工技术",
+      "details": [
+        "道路、桥梁与高速公路施工组织",
+        "现场质量、技术与工程安全管理",
+        "交通基础设施建设与维护"
+      ]
+    },
+    {
+      "title": "市政与城市基础设施",
+      "description": "市政道路、地下工程及综合交通基础设施项目建设。",
+      "tags": "市政 · 地下空间 · 交通",
+      "details": [
+        "城市道路和市政公共工程",
+        "地下空间与基础设施配套",
+        "现场施工技术、测量和管理"
+      ]
+    },
+    {
+      "title": "装配式建筑与工程制造",
+      "description": "装配式构件、桥梁预制及相关建筑工程施工。",
+      "tags": "装配式 · 结构 · 构件",
+      "details": [
+        "桥梁构配件制造与安装",
+        "建筑构件生产及材料工艺",
+        "生产现场质量管理与设备配套"
+      ]
+    },
+    {
+      "title": "勘察设计与工程检测",
+      "description": "围绕公路桥梁提供勘察设计、测绘、试验检测及相关咨询。",
+      "tags": "设计 · 测绘 · 试验",
+      "details": [
+        "工程勘察与测量",
+        "路桥设计、方案及技术咨询",
+        "材料试验与质量检测"
+      ]
+    },
+    {
+      "title": "项目商务与投资运营",
+      "description": "项目预算、工程造价、合约和投融资配套管理。",
+      "tags": "造价 · 合约 · 投资",
+      "details": [
+        "项目预算编制及商务合约管理",
+        "工程投融资、建设运营协同",
+        "施工物资、采购及成本管控"
+      ]
+    },
+    {
+      "title": "科技研发及海外业务",
+      "description": "公路绿色施工、装配式桥梁科研及海外道路工程项目。",
+      "tags": "科技研发 · 海外项目 · 工程创新",
+      "details": [
+        "绿色施工技术创新",
+        "公路桥梁研发应用及科技成果转化",
+        "海外项目施工及工程协作"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "road-technical-management",
+      "title": "施工技术与现场管理",
+      "city": "河北及全国项目所在地（具体工作城市以当期岗位信息为准）",
+      "url": "https://rb.cscec.com/zpzb/rcyj/",
+      "evidenceUrl": "https://career.hebut.edu.cn/home/company/index/sxid/36/id/886.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中建路桥集团有限公司及其所属单位（具体合同主体以官方公告为准）",
+      "summary": "土木工程、路桥及地下工程方向的项目施工技术管理。",
+      "requirements": "历年高校就业中心公开的中建路桥企业招聘岗位方向；较早资料涉及本科、研究生项目招聘，2026届宣讲涉及财务类专业。当前批次、工作地点、实际岗位职责、学历及应聘截止日未逐岗位确认。HHBA不展示为实时招聘空缺；请以中建路桥官网最新公告及当次岗位要求为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "土木工程",
+        "道路桥梁与渡河工程",
+        "交通工程",
+        "城市地下空间工程",
+        "工程力学",
+        "结构工程",
+        "市政工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "历史招聘方向 · 本科/研究生等条件须以本次官方公告核实",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "cost-contract",
+      "title": "工程造价与商务合约",
+      "city": "河北及全国项目所在地（具体工作城市以当期岗位信息为准）",
+      "url": "https://rb.cscec.com/zpzb/rcyj/",
+      "evidenceUrl": "https://career.hebut.edu.cn/home/company/index/sxid/36/id/886.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中建路桥集团有限公司及其所属单位（具体合同主体以官方公告为准）",
+      "summary": "公开企业招聘信息列示工程造价预算、商务合约和合同管理方向。",
+      "requirements": "历年高校就业中心公开的中建路桥企业招聘岗位方向；较早资料涉及本科、研究生项目招聘，2026届宣讲涉及财务类专业。当前批次、工作地点、实际岗位职责、学历及应聘截止日未逐岗位确认。HHBA不展示为实时招聘空缺；请以中建路桥官网最新公告及当次岗位要求为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工程造价",
+        "工程管理",
+        "管理科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "历史招聘方向 · 本科/研究生等条件须以本次官方公告核实",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "surveying",
+      "title": "工程测量与现场测绘",
+      "city": "河北及全国项目所在地（具体工作城市以当期岗位信息为准）",
+      "url": "https://rb.cscec.com/zpzb/rcyj/",
+      "evidenceUrl": "https://career.hebut.edu.cn/home/company/index/sxid/36/id/886.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中建路桥集团有限公司及其所属单位（具体合同主体以官方公告为准）",
+      "summary": "工程项目施工测量、测绘与技术管理方向，具体岗位名称和任务随项目变化。",
+      "requirements": "历年高校就业中心公开的中建路桥企业招聘岗位方向；较早资料涉及本科、研究生项目招聘，2026届宣讲涉及财务类专业。当前批次、工作地点、实际岗位职责、学历及应聘截止日未逐岗位确认。HHBA不展示为实时招聘空缺；请以中建路桥官网最新公告及当次岗位要求为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "测绘工程",
+        "测绘科学与技术",
+        "地理信息科学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "历史招聘方向 · 本科/研究生等条件须以本次官方公告核实",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "materials-testing",
+      "title": "材料试验与工程检测",
+      "city": "河北及全国项目所在地（具体工作城市以当期岗位信息为准）",
+      "url": "https://rb.cscec.com/zpzb/rcyj/",
+      "evidenceUrl": "https://career.hebut.edu.cn/home/company/index/sxid/36/id/886.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中建路桥集团有限公司及其所属单位（具体合同主体以官方公告为准）",
+      "summary": "施工现场试验检测、工程材料质量检查及相关技术管理方向。",
+      "requirements": "历年高校就业中心公开的中建路桥企业招聘岗位方向；较早资料涉及本科、研究生项目招聘，2026届宣讲涉及财务类专业。当前批次、工作地点、实际岗位职责、学历及应聘截止日未逐岗位确认。HHBA不展示为实时招聘空缺；请以中建路桥官网最新公告及当次岗位要求为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "材料科学与工程",
+        "无机非金属材料工程",
+        "道路工程检测技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "历史招聘方向 · 本科/研究生等条件须以本次官方公告核实",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "mechanical-equipment",
+      "title": "机械责任师（施工机械设备管理）",
+      "city": "河北及全国项目所在地（具体工作城市以当期岗位信息为准）",
+      "url": "https://rb.cscec.com/zpzb/rcyj/",
+      "evidenceUrl": "https://career.hebut.edu.cn/home/company/index/sxid/36/id/886.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中建路桥集团有限公司及其所属单位（具体合同主体以官方公告为准）",
+      "summary": "对应高校招聘信息中明确列示的机械责任师：负责施工现场机械设备的维护、使用和管理。",
+      "requirements": "历年高校就业中心公开的中建路桥企业招聘岗位方向；较早资料涉及本科、研究生项目招聘，2026届宣讲涉及财务类专业。当前批次、工作地点、实际岗位职责、学历及应聘截止日未逐岗位确认。HHBA不展示为实时招聘空缺；请以中建路桥官网最新公告及当次岗位要求为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械设计制造及其自动化",
+        "机械工程",
+        "机械电子工程",
+        "机械制造及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "历史招聘方向 · 本科/研究生等条件须以本次官方公告核实",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "electrical-construction",
+      "title": "机电工程施工管理",
+      "city": "河北及全国项目所在地（具体工作城市以当期岗位信息为准）",
+      "url": "https://rb.cscec.com/zpzb/rcyj/",
+      "evidenceUrl": "https://career.hebut.edu.cn/home/company/index/sxid/36/id/886.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中建路桥集团有限公司及其所属单位（具体合同主体以官方公告为准）",
+      "summary": "对应高校招聘信息的机电工程施工管理岗位方向。",
+      "requirements": "历年高校就业中心公开的中建路桥企业招聘岗位方向；较早资料涉及本科、研究生项目招聘，2026届宣讲涉及财务类专业。当前批次、工作地点、实际岗位职责、学历及应聘截止日未逐岗位确认。HHBA不展示为实时招聘空缺；请以中建路桥官网最新公告及当次岗位要求为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "电气工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "历史招聘方向 · 本科/研究生等条件须以本次官方公告核实",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "safety-management",
+      "title": "施工安全与现场管理",
+      "city": "河北及全国项目所在地（具体工作城市以当期岗位信息为准）",
+      "url": "https://rb.cscec.com/zpzb/rcyj/",
+      "evidenceUrl": "https://career.hebut.edu.cn/home/company/index/sxid/36/id/886.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中建路桥集团有限公司及其所属单位（具体合同主体以官方公告为准）",
+      "summary": "工程项目安全管理相关方向；具体岗位设立和岗位名称以当期公告为准。",
+      "requirements": "历年高校就业中心公开的中建路桥企业招聘岗位方向；较早资料涉及本科、研究生项目招聘，2026届宣讲涉及财务类专业。当前批次、工作地点、实际岗位职责、学历及应聘截止日未逐岗位确认。HHBA不展示为实时招聘空缺；请以中建路桥官网最新公告及当次岗位要求为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "安全工程",
+        "安全科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "历史招聘方向 · 本科/研究生等条件须以本次官方公告核实",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "financial-accounting",
+      "title": "财务会计与项目财务",
+      "city": "河北及全国项目所在地（具体工作城市以当期岗位信息为准）",
+      "url": "https://rb.cscec.com/zpzb/rcyj/",
+      "evidenceUrl": "https://career.hebut.edu.cn/recruitment/content/type/2/id/5102.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中建路桥集团有限公司及其所属单位（具体合同主体以官方公告为准）",
+      "summary": "2026届校园宣讲明确招收财务管理和会计等专业；企业资料亦列出财务会计及成本管理方向。",
+      "requirements": "历年高校就业中心公开的中建路桥企业招聘岗位方向；较早资料涉及本科、研究生项目招聘，2026届宣讲涉及财务类专业。当前批次、工作地点、实际岗位职责、学历及应聘截止日未逐岗位确认。HHBA不展示为实时招聘空缺；请以中建路桥官网最新公告及当次岗位要求为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "会计学",
+        "财务管理",
+        "审计学",
+        "税收学",
+        "投资学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "历史招聘方向 · 本科/研究生等条件须以本次官方公告核实",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "human-resources",
+      "title": "人事与人力资源管理",
+      "city": "河北及全国项目所在地（具体工作城市以当期岗位信息为准）",
+      "url": "https://rb.cscec.com/zpzb/rcyj/",
+      "evidenceUrl": "https://career.hebut.edu.cn/home/company/index/sxid/36/id/886.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中建路桥集团有限公司及其所属单位（具体合同主体以官方公告为准）",
+      "summary": "企业招聘资料列出人事专员及职能管理方向，工作内容包括人事管理和行政协作。",
+      "requirements": "历年高校就业中心公开的中建路桥企业招聘岗位方向；较早资料涉及本科、研究生项目招聘，2026届宣讲涉及财务类专业。当前批次、工作地点、实际岗位职责、学历及应聘截止日未逐岗位确认。HHBA不展示为实时招聘空缺；请以中建路桥官网最新公告及当次岗位要求为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人力资源管理",
+        "工商管理",
+        "企业管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "历史招聘方向 · 本科/研究生等条件须以本次官方公告核实",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "publicity-admin",
+      "title": "行政与宣传管理",
+      "city": "河北及全国项目所在地（具体工作城市以当期岗位信息为准）",
+      "url": "https://rb.cscec.com/zpzb/rcyj/",
+      "evidenceUrl": "https://career.hebut.edu.cn/home/company/index/sxid/36/id/886.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中建路桥集团有限公司及其所属单位（具体合同主体以官方公告为准）",
+      "summary": "企业招聘资料列出行政管理、宣传管理及档案管理方向。",
+      "requirements": "历年高校就业中心公开的中建路桥企业招聘岗位方向；较早资料涉及本科、研究生项目招聘，2026届宣讲涉及财务类专业。当前批次、工作地点、实际岗位职责、学历及应聘截止日未逐岗位确认。HHBA不展示为实时招聘空缺；请以中建路桥官网最新公告及当次岗位要求为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "汉语言文学",
+        "新闻学",
+        "传播学",
+        "行政管理",
+        "档案学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "历史招聘方向 · 本科/研究生等条件须以本次官方公告核实",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "digital-management",
+      "title": "信息化管理",
+      "city": "河北及全国项目所在地（具体工作城市以当期岗位信息为准）",
+      "url": "https://rb.cscec.com/zpzb/rcyj/",
+      "evidenceUrl": "https://career.hebut.edu.cn/home/company/index/sxid/36/id/886.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中建路桥集团有限公司及其所属单位（具体合同主体以官方公告为准）",
+      "summary": "企业招聘资料列出信息化管理岗位方向，不等同于所有软件开发岗位。",
+      "requirements": "历年高校就业中心公开的中建路桥企业招聘岗位方向；较早资料涉及本科、研究生项目招聘，2026届宣讲涉及财务类专业。当前批次、工作地点、实际岗位职责、学历及应聘截止日未逐岗位确认。HHBA不展示为实时招聘空缺；请以中建路桥官网最新公告及当次岗位要求为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "信息管理与信息系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "历史招聘方向 · 本科/研究生等条件须以本次官方公告核实",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "legal-management",
+      "title": "法务管理",
+      "city": "河北及全国项目所在地（具体工作城市以当期岗位信息为准）",
+      "url": "https://rb.cscec.com/zpzb/rcyj/",
+      "evidenceUrl": "https://career.hebut.edu.cn/home/company/index/sxid/36/id/886.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中建路桥集团有限公司及其所属单位（具体合同主体以官方公告为准）",
+      "summary": "企业招聘信息列出项目法务管理方向，具体法学资格与其他条件需核实。",
+      "requirements": "历年高校就业中心公开的中建路桥企业招聘岗位方向；较早资料涉及本科、研究生项目招聘，2026届宣讲涉及财务类专业。当前批次、工作地点、实际岗位职责、学历及应聘截止日未逐岗位确认。HHBA不展示为实时招聘空缺；请以中建路桥官网最新公告及当次岗位要求为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "法学",
+        "法律"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "历史招聘方向 · 本科/研究生等条件须以本次官方公告核实",
+      "currentOpenVerified": false
+    }
+  ]
+}
