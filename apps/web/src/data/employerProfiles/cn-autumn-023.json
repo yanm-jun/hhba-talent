@@ -1,0 +1,405 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-023",
+  "name": "紫龙游戏",
+  "englishName": "ZLONGAME",
+  "aliases": [
+    "紫龙",
+    "紫龙游戏上海研发中心",
+    "紫龙游戏北京总部",
+    "ZLONGAME",
+    "Zlongame",
+    "Zilong Games",
+    "紫龙互娱",
+    "上海紫灏信息技术有限公司",
+    "Blackjack Studio",
+    "黑杰克工作室",
+    "天津紫龙奇点互动娱乐有限公司"
+  ],
+  "industry": "电子游戏研发与发行 · 战棋策略RPG · 游戏引擎 · 海外发行",
+  "subtitle": "紫龙游戏（ZLONGAME）· 北京总部／上海研发中心 · 2027届上海研发中心校招已收录",
+  "overview": "紫龙游戏（ZLONGAME）是以移动端和PC游戏研发、发行为核心的游戏品牌，官网介绍其总部位于北京，上海设有研发中心，并面向日本、韩国、东南亚、欧美等国际市场运营。旗下产品包括《梦幻模拟战》《天地劫》《钢岚》《第二银河》等。该品牌涉及北京紫御科技有限公司、上海紫灏信息技术有限公司及其他关联主体，不能把品牌名直接当作同一用人单位。本站校招记录特指上海紫灏信息技术有限公司发布的2027届上海研发中心招聘资料。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://www.zlongame.com/html/aboutus.html",
+    "https://www.zlongame.com/html/index.html",
+    "https://www.zlongame.com/html/contact.html",
+    "https://www.zlongame.com/m/html/product.html",
+    "https://fgy.ncss.cn/student/jobs/2rLxVSzdnFvhsCjiKkusw9/corp.html",
+    "https://www.91wllm.cn/campusUnion/view/id/1001563",
+    "https://hbnu.91wllm.cn/campus/view/id/1001563",
+    "https://app.mokahr.com/campus_apply/zlongame/6103",
+    "https://www.banjiajia.com/posts/30069",
+    "https://www.sohu.com/a/200085057_799493",
+    "https://www.sohu.com/a/817344581_121124287"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-023/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-023/photo1.webp",
+        "caption": "紫龙游戏北京办公室 · 2017年实景",
+        "note": "2017年北京朝阳区达美中心紫龙游戏办公项目实景，来自2017年10月域式建筑报道，摄影署名：存在建筑-建筑摄影。历史办公环境，不代表2026年现址。",
+        "alt": "2017年紫龙游戏北京达美中心办公空间实景照片之一"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-023/photo2.webp",
+        "caption": "紫龙游戏北京办公室 · 2017年另一视角",
+        "note": "同一办公项目的另一张独立实景照片，来源：域式建筑办公室项目媒体报道；不作为2026年办公环境现状。",
+        "alt": "2017年紫龙游戏北京达美中心办公室室内空间另一视角"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://app.mokahr.com/campus_apply/zlongame/6103",
+    "label": "紫龙游戏上海研发中心校园招聘（Moka）",
+    "status": "official_portal",
+    "subject": "上海紫灏信息技术有限公司（Blackjack Studio）",
+    "note": "国家大学生就业服务平台公开的上海紫灏招聘档案将此Moka站点列为企业官网招聘入口。紫龙游戏官网另设“加入紫龙”页面，部分职位可能未显示动态列表；2027届上海研发中心公告提供公众号“紫龙游戏上海研发中心招聘”和公开招聘邮箱作为另一投递渠道。岗位是否仍开放以企业实际系统为准。"
+  },
+  "majorIntro": "按照2027届校招公开公告整理12条具有明确名称的研发、策划、美术和测试岗位，招聘主体是上海紫灏信息技术有限公司。岗位标签与用户专业的关联为HHBA辅助推荐，并非官方专业要求；不保证所有岗位实时开放。公告投递期为8月1日至11月30日，实际截止请在官方招聘入口核验。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "软件工程",
+    "人工智能",
+    "数字媒体技术",
+    "动画",
+    "数字媒体艺术",
+    "视觉传达设计",
+    "汉语言文学",
+    "戏剧影视文学",
+    "产品设计",
+    "网络工程"
+  ],
+  "photoNote": "品牌Logo为2024年高校就业宣传材料所载紫龙游戏图标；两张独立的北京办公室室内照片来自2017年域式建筑项目报道，与2026年办公室现状可能不同。三张图独立保存为本地静态素材，点击照片不跳转外部网站；商标与摄影版权归原权利人，HHBA展示不代表企业合作或素材授权。",
+  "business": [
+    {
+      "title": "游戏研发与策划",
+      "description": "以策略RPG、战棋及其他品类为中心开发游戏玩法、系统、战斗和关卡内容。",
+      "tags": "策略战棋 · RPG · 游戏策划",
+      "details": [
+        "游戏核心玩法与系统设计",
+        "关卡战斗及数值设计",
+        "自研游戏产品研发迭代"
+      ]
+    },
+    {
+      "title": "客户端与服务端技术",
+      "description": "围绕游戏客户端、后端服务器和运行架构开展产品开发、运维与技术优化。",
+      "tags": "客户端 · 服务器 · 引擎",
+      "details": [
+        "客户端开发和交互实现",
+        "游戏服务器开发和维护",
+        "内部引擎与性能优化"
+      ]
+    },
+    {
+      "title": "美术设计与动画",
+      "description": "在游戏创作中涉及角色原画、UI、3D动画及Spine动画等多种数字内容制作环节。",
+      "tags": "原画 · UI · 动画",
+      "details": [
+        "角色美术和世界观表达",
+        "游戏UI与动效设计",
+        "2D/3D角色动画制作"
+      ]
+    },
+    {
+      "title": "游戏发行与运营",
+      "description": "覆盖国内发行、渠道合作、玩家沟通、活动运营及游戏数据管理。",
+      "tags": "全球发行 · 渠道 · 运营",
+      "details": [
+        "国内游戏发行推广",
+        "用户运营和社群服务",
+        "游戏内容与活动运营"
+      ]
+    },
+    {
+      "title": "国际化发行",
+      "description": "支持多个国家和地区的语言本地化、产品发行、运营和商务合作。",
+      "tags": "日本 · 韩国 · 东南亚",
+      "details": [
+        "多地区产品发行与本地化",
+        "跨文化内容和客户服务",
+        "海外运营与渠道协作"
+      ]
+    },
+    {
+      "title": "技术测试与质量保障",
+      "description": "围绕游戏产品的功能、兼容性、性能和体验持续开展测试与质量管理。",
+      "tags": "QA · 游戏测试 · 性能",
+      "details": [
+        "游戏测试方案和脚本",
+        "不同平台兼容性验证",
+        "质量与交付保障"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "system-design",
+      "title": "游戏系统策划",
+      "city": "上海·长宁区（2027届上海研发中心校招公告）",
+      "url": "https://app.mokahr.com/campus_apply/zlongame/6103",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1001563",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海紫灏信息技术有限公司（紫龙游戏旗下上海研发／Blackjack Studio）",
+      "summary": "校招公告明确列有系统策划，涉及游戏玩法、功能与用户体验相关的策划工作；逐岗具体责任按招聘页核对。 该岗位名称确实出现在2027届官方校招高校转载公告中，不能据此保证目前仍有可投名额。",
+      "requirements": "校招对象为2027届海内外毕业生。官方高校公告列出岗位名称、投递日期8月1日至11月30日，以及微信公众号“紫龙游戏上海研发中心招聘”和企业招聘邮箱；但逐岗学历、专业、职责及实时开放状态须在官方招聘系统或投递通道核实。本页专业为HHBA编辑相关性匹配，不代表招聘方的专业硬性要求。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "数字媒体技术",
+        "信息管理与信息系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "combat-ai-native",
+      "title": "游戏战斗策划（AI Native方向）",
+      "city": "上海·长宁区（2027届上海研发中心校招公告）",
+      "url": "https://app.mokahr.com/campus_apply/zlongame/6103",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1001563",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海紫灏信息技术有限公司（紫龙游戏旗下上海研发／Blackjack Studio）",
+      "summary": "2027届公告列示战斗策划AI Native方向；相关专业为HHBA编辑匹配，不是企业逐岗专业门槛。 该岗位名称确实出现在2027届官方校招高校转载公告中，不能据此保证目前仍有可投名额。",
+      "requirements": "校招对象为2027届海内外毕业生。官方高校公告列出岗位名称、投递日期8月1日至11月30日，以及微信公众号“紫龙游戏上海研发中心招聘”和企业招聘邮箱；但逐岗学历、专业、职责及实时开放状态须在官方招聘系统或投递通道核实。本页专业为HHBA编辑相关性匹配，不代表招聘方的专业硬性要求。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "人工智能",
+        "软件工程",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "narrative",
+      "title": "游戏文案策划",
+      "city": "上海·长宁区（2027届上海研发中心校招公告）",
+      "url": "https://app.mokahr.com/campus_apply/zlongame/6103",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1001563",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海紫灏信息技术有限公司（紫龙游戏旗下上海研发／Blackjack Studio）",
+      "summary": "2027届公告列有游戏文案策划方向；文字内容与叙事创作以原岗位描述为准。 该岗位名称确实出现在2027届官方校招高校转载公告中，不能据此保证目前仍有可投名额。",
+      "requirements": "校招对象为2027届海内外毕业生。官方高校公告列出岗位名称、投递日期8月1日至11月30日，以及微信公众号“紫龙游戏上海研发中心招聘”和企业招聘邮箱；但逐岗学历、专业、职责及实时开放状态须在官方招聘系统或投递通道核实。本页专业为HHBA编辑相关性匹配，不代表招聘方的专业硬性要求。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "汉语言文学",
+        "戏剧影视文学",
+        "网络与新媒体",
+        "广播电视编导"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ai-art",
+      "title": "游戏AI美术",
+      "city": "上海·长宁区（2027届上海研发中心校招公告）",
+      "url": "https://app.mokahr.com/campus_apply/zlongame/6103",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1001563",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海紫灏信息技术有限公司（紫龙游戏旗下上海研发／Blackjack Studio）",
+      "summary": "校招公告列有游戏AI美术；涉及AI创作能力的具体工具、作品集与专业限制未逐岗核实。 该岗位名称确实出现在2027届官方校招高校转载公告中，不能据此保证目前仍有可投名额。",
+      "requirements": "校招对象为2027届海内外毕业生。官方高校公告列出岗位名称、投递日期8月1日至11月30日，以及微信公众号“紫龙游戏上海研发中心招聘”和企业招聘邮箱；但逐岗学历、专业、职责及实时开放状态须在官方招聘系统或投递通道核实。本页专业为HHBA编辑相关性匹配，不代表招聘方的专业硬性要求。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "数字媒体艺术",
+        "视觉传达设计",
+        "动画",
+        "人工智能"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ui-motion",
+      "title": "游戏UI动效",
+      "city": "上海·长宁区（2027届上海研发中心校招公告）",
+      "url": "https://app.mokahr.com/campus_apply/zlongame/6103",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1001563",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海紫灏信息技术有限公司（紫龙游戏旗下上海研发／Blackjack Studio）",
+      "summary": "校招公告列有游戏UI动效；美术类应按原公告准备作品集。 该岗位名称确实出现在2027届官方校招高校转载公告中，不能据此保证目前仍有可投名额。",
+      "requirements": "校招对象为2027届海内外毕业生。官方高校公告列出岗位名称、投递日期8月1日至11月30日，以及微信公众号“紫龙游戏上海研发中心招聘”和企业招聘邮箱；但逐岗学历、专业、职责及实时开放状态须在官方招聘系统或投递通道核实。本页专业为HHBA编辑相关性匹配，不代表招聘方的专业硬性要求。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "数字媒体艺术",
+        "动画",
+        "视觉传达设计",
+        "数字媒体技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ui-design",
+      "title": "游戏UI设计师",
+      "city": "上海·长宁区（2027届上海研发中心校招公告）",
+      "url": "https://app.mokahr.com/campus_apply/zlongame/6103",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1001563",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海紫灏信息技术有限公司（紫龙游戏旗下上海研发／Blackjack Studio）",
+      "summary": "校招公告列有游戏UI设计师；实际岗位专业及技术工具需以发布的独立职位为准。 该岗位名称确实出现在2027届官方校招高校转载公告中，不能据此保证目前仍有可投名额。",
+      "requirements": "校招对象为2027届海内外毕业生。官方高校公告列出岗位名称、投递日期8月1日至11月30日，以及微信公众号“紫龙游戏上海研发中心招聘”和企业招聘邮箱；但逐岗学历、专业、职责及实时开放状态须在官方招聘系统或投递通道核实。本页专业为HHBA编辑相关性匹配，不代表招聘方的专业硬性要求。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "视觉传达设计",
+        "数字媒体艺术",
+        "产品设计",
+        "动画"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "spine-animation",
+      "title": "游戏Spine动画",
+      "city": "上海·长宁区（2027届上海研发中心校招公告）",
+      "url": "https://app.mokahr.com/campus_apply/zlongame/6103",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1001563",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海紫灏信息技术有限公司（紫龙游戏旗下上海研发／Blackjack Studio）",
+      "summary": "校招公告列有Spine动画；独立岗位条件以企业招聘页面为准。 该岗位名称确实出现在2027届官方校招高校转载公告中，不能据此保证目前仍有可投名额。",
+      "requirements": "校招对象为2027届海内外毕业生。官方高校公告列出岗位名称、投递日期8月1日至11月30日，以及微信公众号“紫龙游戏上海研发中心招聘”和企业招聘邮箱；但逐岗学历、专业、职责及实时开放状态须在官方招聘系统或投递通道核实。本页专业为HHBA编辑相关性匹配，不代表招聘方的专业硬性要求。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "动画",
+        "数字媒体艺术",
+        "视觉传达设计"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "character-original-art",
+      "title": "游戏原画设计师（角色）",
+      "city": "上海·长宁区（2027届上海研发中心校招公告）",
+      "url": "https://app.mokahr.com/campus_apply/zlongame/6103",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1001563",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海紫灏信息技术有限公司（紫龙游戏旗下上海研发／Blackjack Studio）",
+      "summary": "校招公告列有角色原画设计师；美术作品集和经历条件按具体岗位公告核实。 该岗位名称确实出现在2027届官方校招高校转载公告中，不能据此保证目前仍有可投名额。",
+      "requirements": "校招对象为2027届海内外毕业生。官方高校公告列出岗位名称、投递日期8月1日至11月30日，以及微信公众号“紫龙游戏上海研发中心招聘”和企业招聘邮箱；但逐岗学历、专业、职责及实时开放状态须在官方招聘系统或投递通道核实。本页专业为HHBA编辑相关性匹配，不代表招聘方的专业硬性要求。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "动画",
+        "美术学",
+        "视觉传达设计",
+        "数字媒体艺术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "client-development",
+      "title": "游戏客户端开发工程师",
+      "city": "上海·长宁区（2027届上海研发中心校招公告）",
+      "url": "https://app.mokahr.com/campus_apply/zlongame/6103",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1001563",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海紫灏信息技术有限公司（紫龙游戏旗下上海研发／Blackjack Studio）",
+      "summary": "校招公告列有客户端开发工程师；引擎、编程语言与项目要求须以独立岗位为准。 该岗位名称确实出现在2027届官方校招高校转载公告中，不能据此保证目前仍有可投名额。",
+      "requirements": "校招对象为2027届海内外毕业生。官方高校公告列出岗位名称、投递日期8月1日至11月30日，以及微信公众号“紫龙游戏上海研发中心招聘”和企业招聘邮箱；但逐岗学历、专业、职责及实时开放状态须在官方招聘系统或投递通道核实。本页专业为HHBA编辑相关性匹配，不代表招聘方的专业硬性要求。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "数字媒体技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "server-development",
+      "title": "游戏服务端开发工程师",
+      "city": "上海·长宁区（2027届上海研发中心校招公告）",
+      "url": "https://app.mokahr.com/campus_apply/zlongame/6103",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1001563",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海紫灏信息技术有限公司（紫龙游戏旗下上海研发／Blackjack Studio）",
+      "summary": "校招公告列有服务端开发工程师；服务端架构、性能及语言要求需向官方岗位核验。 该岗位名称确实出现在2027届官方校招高校转载公告中，不能据此保证目前仍有可投名额。",
+      "requirements": "校招对象为2027届海内外毕业生。官方高校公告列出岗位名称、投递日期8月1日至11月30日，以及微信公众号“紫龙游戏上海研发中心招聘”和企业招聘邮箱；但逐岗学历、专业、职责及实时开放状态须在官方招聘系统或投递通道核实。本页专业为HHBA编辑相关性匹配，不代表招聘方的专业硬性要求。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "网络工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "qa-engineer",
+      "title": "游戏测试开发工程师",
+      "city": "上海·长宁区（2027届上海研发中心校招公告）",
+      "url": "https://app.mokahr.com/campus_apply/zlongame/6103",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1001563",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海紫灏信息技术有限公司（紫龙游戏旗下上海研发／Blackjack Studio）",
+      "summary": "校招公告列有测试开发工程师；逐岗测试开发职责和资格仍需核对。 该岗位名称确实出现在2027届官方校招高校转载公告中，不能据此保证目前仍有可投名额。",
+      "requirements": "校招对象为2027届海内外毕业生。官方高校公告列出岗位名称、投递日期8月1日至11月30日，以及微信公众号“紫龙游戏上海研发中心招聘”和企业招聘邮箱；但逐岗学历、专业、职责及实时开放状态须在官方招聘系统或投递通道核实。本页专业为HHBA编辑相关性匹配，不代表招聘方的专业硬性要求。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "网络工程",
+        "数据科学与大数据技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ui-intern",
+      "title": "实习-游戏UI设计师",
+      "city": "上海·长宁区（2027届上海研发中心校招公告）",
+      "url": "https://app.mokahr.com/campus_apply/zlongame/6103",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1001563",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海紫灏信息技术有限公司（紫龙游戏旗下上海研发／Blackjack Studio）",
+      "summary": "校招简章列有游戏UI设计实习方向；具体实习期限、学校及作品要求以企业招聘系统为准。 该岗位名称确实出现在2027届官方校招高校转载公告中，不能据此保证目前仍有可投名额。",
+      "requirements": "校招对象为2027届海内外毕业生。官方高校公告列出岗位名称、投递日期8月1日至11月30日，以及微信公众号“紫龙游戏上海研发中心招聘”和企业招聘邮箱；但逐岗学历、专业、职责及实时开放状态须在官方招聘系统或投递通道核实。本页专业为HHBA编辑相关性匹配，不代表招聘方的专业硬性要求。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "视觉传达设计",
+        "数字媒体艺术",
+        "动画",
+        "产品设计"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
+      "currentOpenVerified": false
+    }
+  ],
+  "mediaSources": {
+    "logo": "https://q1.itc.cn/q_70/images03/20241017/e2020a271e324f2182b677b41f552022.jpeg",
+    "photo1": "https://5b0988e595225.cdn.sohucs.com/images/20171025/e75150b017d94c12a212e24e829736e1.jpeg",
+    "photo2": "https://5b0988e595225.cdn.sohucs.com/images/20171025/ed1ee754fbee4d798379460248434aeb.jpeg"
+  }
+}
