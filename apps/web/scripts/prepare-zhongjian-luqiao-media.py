@@ -50,10 +50,13 @@ for name,urls in sources.items():
    if not 2500<len(raw)<12_000_000:raise ValueError('media length outside expected bounds')
    rawim=Image.open(BytesIO(raw));rawim.verify()
    image=ImageOps.exif_transpose(Image.open(BytesIO(raw))).convert('RGB')
-   if image.width<220 or image.height<120:raise ValueError('media dimensions too small')
+   # Wordmarks are often long and short; projects must be full photographs.
+   min_width,min_height=(100,28) if name=='logo.png' else (300,180)
+   if image.width<min_width or image.height<min_height:raise ValueError('media dimensions too small')
    status[name]={'source':url,'verified':True,'original_size':image.size}
    break
   except Exception as exc:
+   image=None  # A rejected source must never bypass the honest placeholder.
    print('ZHONGLUQIAO_MEDIA_SOURCE_UNAVAILABLE',name,url,str(exc)[:130])
  if image is None:
   image=unavailable(name)
