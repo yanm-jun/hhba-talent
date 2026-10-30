@@ -69,6 +69,7 @@ export function MajorFilter({value,onChange,lang}:Props){
         onMouseDown={e=>e.preventDefault()} onClick={()=>{setLevel(key);setFocusIndex(0)}}>
          {title}</button>)}
      </div>
+     <small>本科、研究生是专业目录分类，不代表岗位仅招该学历；实际筛选请使用上方「我的学历」。</small>
      {!query&&<small>当前类别 {displayedTotal} 项，输入文字可查找全部结果</small>}
      {matches.map((major,i)=><button id={'major-opt-'+major.slug} role="option" aria-selected={value===major.slug}
       type="button" key={major.slug} className={i===focusIndex?'is-focused':''} onMouseDown={e=>e.preventDefault()} onClick={()=>choose(major.slug)}>
