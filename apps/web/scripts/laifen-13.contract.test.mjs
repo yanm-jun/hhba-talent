@@ -1,0 +1,34 @@
+import assert from 'node:assert/strict';
+import {readFileSync,existsSync} from 'node:fs';
+const read=p=>readFileSync(p,'utf8');
+const data=JSON.parse(read('src/data/domesticLaifenSourcedRoles20261030.json'));
+const page=read('src/pages/LaifenCompactProfilePage.tsx');
+const catalog=read('src/services/domesticRebuildJobs.ts');
+const live=read('src/services/liveRecruitment.ts');
+const market=read('src/components/UnifiedJobMarket.tsx');
+const brand=read('src/components/EmployerBrandLogo.tsx');
+const routes=read('src/main.tsx');
+assert.equal(data.parentEmployerId,'cn-autumn-009');
+assert.equal(data.jobs.length,6);
+assert.equal(new Set(data.jobs.map(j=>j.id)).size,6);
+assert.equal(data.jobs.filter(j=>j.recordKind==='third_party_named_role_2027').length,1);
+assert.equal(data.jobs.filter(j=>j.recordKind==='archived_named_role_2026').length,5);
+assert.equal(data.independentOfficialJobVerifiedCount,0);
+assert(data.jobs.every(j=>j.currentOpenVerified===false&&!j.individualPermalinkVerified&&j.majors.length===0&&j.editorialRelatedMajors.length>0));
+assert(data.jobs.every(j=>j.title&&j.city&&j.summary&&j.requirements&&j.evidenceUrl));
+assert(page.includes('data-employer-id="cn-autumn-009"'));
+assert(page.includes('CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn-009"'));
+assert(page.includes('hhba-kpmg-photo-grid')&&page.includes('主要业务与专业服务'));
+assert(!page.includes('<MajorFilter')&&!page.includes('清除专业'));
+assert(page.includes('data-hhba-recruitment-outbound="true"'));
+assert(routes.includes("if(route==='/companies/autumn/cn-autumn-009')return <LaifenCompactProfilePage user={user}/>"));
+assert(catalog.includes('...ankerV2Records,...laifenV2Records]'));
+assert(catalog.includes('laifenV2Records.length!==6||domesticV2Records.length!==150'));
+assert(live.includes("job.platform==='laifen-sourced-archived'"));
+assert(live.includes("'Laifen'")&&live.includes("'徕芬科技'"));
+assert(brand.includes('images/laifen-user/laifen-logo.webp'));
+assert(market.includes('MajorEmployerRecommendations'));
+for(const img of ['laifen-logo.webp','laifen-dryer.webp','laifen-toothbrush.webp']){
+ assert(existsSync('public/images/laifen-user/'+img),'Missing separately uploaded product photo or logo: '+img);
+}
+console.log('HHBA_LAIFEN_SIX_SOURCED_ROLES_THREE_INDEPENDENT_IMAGES_SEARCH_OK');
