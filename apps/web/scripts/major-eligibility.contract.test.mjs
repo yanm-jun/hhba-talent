@@ -29,7 +29,7 @@ for(const jobMajor of ['机械工程','机械制造及其自动化','机械设�
 const degreeCases=['高中','专科','本科','硕士'];
 const accepted=level=>degreeCases.filter(required=>educationMatchesApplicant(level,required));
 assert(accepted('MASTER').length>=accepted('BACHELOR').length,
- 'A master's applicant must not lose bachelor-minimum roles');
+ "A master’s applicant must not lose bachelor-minimum roles");
 
 for(const lower of ['本科','本科及以上','BACHELOR','专科及以上','ASSOCIATE','不限学历']){
  assert(educationMatchesApplicant('MASTER',lower),'Master should not lose lower-minimum job '+lower);
