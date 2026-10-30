@@ -1,5 +1,6 @@
 name: HHBA CEEC International company 18 factory preview
 # Final acceptance: on [preview] execute Chromium tests and additive GitHub Pages deploy.
+# Company 18 final review: original Pages remains untouched; only nested preview added.
 # Release candidate: data-only enterprise 18; prior public site must be preserved.
 on:
   push:
