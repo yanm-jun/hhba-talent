@@ -1,4 +1,5 @@
 import {useEffect,useMemo,useState} from 'react';
+import {majorNamesRelated} from '../services/majorEligibility.mjs';
 import {ArrowRight,Building2} from 'lucide-react';
 import {employerProfiles} from '../services/employerProfiles';
 import '../styles/employer-v2-search.css';
@@ -35,7 +36,7 @@ export function V2EmployerSearchResults({query,scope='',country='',major='',onMa
    const jobFields=p.jobs.map(job=>[job.title,job.city,...job.majorNames,...job.editorialRelatedMajors].join(' '));
    const fields=normalized([p.industry,p.overview,...jobFields].join(' '));
    return terms.every(word=>labels.some(label=>label.includes(word))||fields.includes(word));
-  }).filter(p=>!major||p.jobs.some(j=>[...j.majorNames,...j.editorialRelatedMajors].some(n=>normalized(n).includes(normalized(major)))));
+  }).filter(p=>!major||p.jobs.some(j=>[...j.majorNames,...j.editorialRelatedMajors].some(n=>majorNamesRelated(n,major))));
  },[employers,query,scope,country,major]);
  useEffect(()=>{onMatchChange?.(matches.length>0)},[matches.length,onMatchChange]);
  if(!query.trim()||scope==='global'||country&&!/^(cn|chn|china|中国|中国大陆)$/i.test(country))return null;
