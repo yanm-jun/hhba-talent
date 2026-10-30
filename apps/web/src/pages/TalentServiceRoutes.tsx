@@ -4,6 +4,7 @@ import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
 import {parsePolicyQuery} from '../components/TalentPolicySearch';
 import {findTalentCity,parseTalentCityQuery,TALENT_MUNICIPALITIES} from '../data/talentCityRegistry';
+import {TalentCityDirectory} from './TalentCityDirectory';
 import {TALENT_POLICY_RECORDS,TALENT_POLICY_REVIEW_DATE,type TalentPolicyRecord} from '../data/talentPolicyRecords';
 import {TALENT_HOUSING_RECORDS,HOUSING_REVIEW_DATE,type TalentHousingRecord} from '../data/talentHousingRecords';
 import type {User} from '../services/api';
@@ -87,27 +88,28 @@ function Empty({city,kind}:{city:string;kind:string}){
 }
 function CityHub({city}:{city:string}){
  const match=findTalentCity(city);
- if(!match)return <><Bread current="城市尚未开通"/><section className="ts-sub-header"><h1>该城市尚未加入当前测试名单</h1><p>当前正式建立四个直辖市入口，另外保留已有资料城市。其余地级市仍待分批导入。</p><Link to="/talent-service">返回城市选择 <ArrowRight size={16}/></Link></section></>;
- const policies=TALENT_POLICY_RECORDS.filter(p=>p.city===city).sort(recentPolicies);
- const homes=TALENT_HOUSING_RECORDS.filter(h=>h.city===city);
+ if(!match)return <><Bread current="城市尚未收录"/><section className="ts-sub-header"><h1>该城市尚未加入本次城市名录</h1><p>当前目标范围是4个直辖市和293个地级市，不包含县级市、自治州、地区和盟。请先到全国城市目录核对名称。</p><Link to="/talent-service/cities">返回全国城市目录 <ArrowRight size={16}/></Link></section></>;
+ const policies=TALENT_POLICY_RECORDS.filter(p=>p.city===match.name).sort(recentPolicies);
+ const homes=TALENT_HOUSING_RECORDS.filter(h=>h.city===match.name);
+ const hasSources=policies.length+homes.length>0;
  return <>
-  <Bread current={city+' · 人才服务'}/>
+  <Bread current={match.official+' · 人才服务'}/>
   <section className="ts-sub-header ts-v4-city-hero">
    <span className="ts-section-kicker">{match.level==='municipality'?'MUNICIPALITY / 直辖市':'CITY SERVICES / 已收录城市'}</span>
    <h1>{match.official} · 人才服务</h1>
-   <p>{match.intro}。从下面两个入口开始，查看已经整理的政府来源信息。</p>
-   <div className="ts-sub-counts"><QuickCount count={policies.length} label="政策与补贴资料"/><QuickCount count={homes.length} label="住房项目与制度入口"/></div>
+   <p>{hasSources?match.intro+'。从下面两个入口查看已有政府来源的政策和住房资料。':'该城市入口已开通，人才政策与住房资料正在整理。我们不会生成未经核验的补贴金额、公寓或申请入口。'}</p>
+   <div className="ts-sub-counts"><QuickCount count={policies.length} label="已收录政策"/><QuickCount count={homes.length} label="已收录住房资料"/>{!hasSources&&<span className="ts-v4-data-pending">官方资料整理中</span>}</div>
   </section>
-  <section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>你想了解什么？</h2><Link to="/talent-service">更换城市 <ArrowRight size={15}/></Link></div>
+  <section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>你想了解什么？</h2><Link to="/talent-service/cities">更换城市 <ArrowRight size={15}/></Link></div>
    <div className="ts-sub-kinds ts-v4-two-kinds">
-    {kinds.map(k=><Link key={k.id} className="ts-sub-kind" to={talentListUrl(k.id,city)}>
+    {kinds.map(k=><Link key={k.id} className="ts-sub-kind" to={talentListUrl(k.id,match.name)}>
       <k.icon size={25}/><strong>{k.name}</strong><small>{k.description}</small>
       <span className="ts-v4-kind-count">{k.id==='policies'?policies.length:homes.length} 条已收录 <ArrowRight size={15}/></span>
      </Link>)}
    </div>
   </section>
   <section className="ts-v4-city-note"><ShieldCheck size={18}/>
-   <div><strong>政策以当地官方发布和审核结果为准</strong><p>部分支持政策只适用于特定区县或人才类别；没有核验的项目不会以虚拟补贴或虚假房源填充。申请材料和流程放在具体政策或住房详情中。</p></div>
+   <div><strong>{hasSources?'政策以当地官方发布和审核结果为准':'城市入口已开通，政策资料尚在核验'}</strong><p>只有政府来源确认的信息才会展示。没有核验的城市不展示虚拟补贴或虚假房源；申请材料和步骤以具体政策原文为准。</p></div>
   </section>
  </>;
 }
@@ -208,7 +210,8 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  const kind=fragments[1]||'';
  const city=decode(fragments[3]||fragments[2]||'北京').slice(0,60)||'北京';
  let body;
- if(kind==='city')body=<CityHub city={decode(fragments[2]||'北京')||'北京'}/>;
+ if(kind==='cities')body=<TalentCityDirectory key={route} initialProvince={fragments[2]==='search'?'':decode(fragments[2]||'')} initialQuery={fragments[2]==='search'?decode(fragments[3]||''):''}/>;
+ else if(kind==='city')body=<CityHub city={decode(fragments[2]||'北京')||'北京'}/>;
  else if(kind==='list'&&['policies','benefits','housing','guide'].includes(fragments[2]))body=<ListPage city={city} kind={fragments[2] as TalentListKind}/>;
  else if(kind==='search')body=<ListPage key={route} city={decode(fragments[2]||'杭州')||'杭州'} kind="search" query={decode(fragments.slice(3).join('/'))}/>;
  else if(kind==='match')body=<TalentMatchingPage city={decode(fragments[2]||'北京')||'北京'}/>;
