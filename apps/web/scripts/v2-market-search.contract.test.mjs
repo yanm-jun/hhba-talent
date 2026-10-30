@@ -33,6 +33,10 @@ const market=read('src/components/UnifiedJobMarket.tsx');
 const component=read('src/components/V2EmployerSearchResults.tsx');
 const detail=read('src/pages/UnifiedV2CompanyPage.tsx');
 const entry=read('src/main.tsx');
+const router=read('src/router.tsx');
+assert(router.includes(String.raw`return internal.replace(/\/+$/, '') || '/';`),
+  'Direct GitHub Pages links with trailing slash MUST resolve to the same market and company routes');
+
 assert(market.includes('<V2EmployerSearchResults query={draft}'),'All V2 companies must use original market input');
 assert(component.includes("import {employerProfiles} from '../services/employerProfiles'"),'Search must use bundled main catalog');
 assert(!component.includes('previewRoot'),'No company-specific sub-sites');
