@@ -17,7 +17,7 @@ export function TalentServicePage({user}:{user:User|null}){
  const [city,setCity]=useState('北京'),[chosen,setChosen]=useState(false),[keyword,setKeyword]=useState('');
  const [cityOpen,setCityOpen]=useState(false),[suggestOpen,setSuggestOpen]=useState(false),[suggestIndex,setSuggestIndex]=useState(-1);
  const [allCities,setAllCities]=useState(false),[matchOpen,setMatchOpen]=useState(false);
- const [degree,setDegree]=useState('本科'),[grad,setGrad]=useState('应届'),[matchCity,setMatchCity]=useState('北京');
+ const [degree,setDegree]=useState('本科'),[grad,setGrad]=useState('unknown'),[matchCity,setMatchCity]=useState('北京');
  const [badImages,setBadImages]=useState<string[]>([]);
  const parsed=parseTalentCityQuery(keyword,city);
  const suggestions=suggestTalentCities(keyword);
@@ -88,11 +88,11 @@ export function TalentServicePage({user}:{user:User|null}){
    <section className="htl-match"><div className="htl-match-heading"><div><h2>看看你可能符合哪些人才政策？</h2><p>输入学历、毕业时间、目标城市等信息，辅助筛选适用政策。</p></div><GraduationCap size={22}/></div>
     <button className="htl-match-button" type="button" onClick={()=>setMatchOpen(x=>!x)} aria-expanded={matchOpen}>{matchOpen?'收起初步筛选':'开始政策匹配 →'}</button>
     {matchOpen&&<div className="htl-match-panel"><div className="htl-match-fields">
-     <label>目标城市<select value={matchCity} onChange={e=>setMatchCity(e.target.value)}>{TALENT_CITY_INDEX.map(c=><option key={c.name} value={c.name}>{c.official}</option>)}</select></label>
+     <label>目标城市<select value={matchCity} onChange={e=>setMatchCity(e.target.value)}>{TALENT_MUNICIPALITIES.map(c=><option key={c.name} value={c.name}>{c.official}</option>)}</select></label>
      <label>学历<select value={degree} onChange={e=>setDegree(e.target.value)}>{['专科','本科','硕士','博士'].map(d=><option key={d}>{d}</option>)}</select></label>
-     <label>毕业情况<select value={grad} onChange={e=>setGrad(e.target.value)}>{['应届','毕业三年内','其他'].map(d=><option key={d}>{d}</option>)}</select></label>
-    </div><p>当前仅按已收录的政策信息初步检索，不判断实际申领资格；社保、户籍和住房条件仍须核对。</p>
-    <button type="button" onClick={()=>navigate(talentSearchUrl(matchCity,matchCity+' '+degree+(grad==='应届'?'应届毕业生':'人才政策')))}>查询相关政策 <ArrowRight size={14}/></button></div>}
+     <label>毕业情况<select value={grad} onChange={e=>setGrad(e.target.value)}>{[['unknown','暂不确定'],['2027','2027届'],['2026','2026届'],['2025','2025届'],['2024-older','2024届及更早']].map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
+    </div><p>首批仅支持北京、天津、上海、重庆；点击后进入独立预筛页面。资料在浏览器内比对，无法代替官方资格认定。</p>
+    <button type="button" onClick={()=>navigate('/talent-service/match/'+encodeURIComponent(matchCity),{talentMatchDraft:{city:matchCity,education:({'专科':'college','本科':'bachelor','硕士':'master','博士':'doctor'} as Record<string,string>)[degree]||'unknown',grad}})}>查询相关政策 <ArrowRight size={14}/></button></div>}
    </section>
   </div>
   <footer className="htl-footer"><span>HHBA · 让劳动更有尊严，让商业更有温度</span><span>页面布局 · <Link to="/talent-service/city/北京">城市独立服务页</Link></span></footer>
