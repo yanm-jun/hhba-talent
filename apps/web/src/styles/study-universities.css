@@ -1,0 +1,77 @@
+/* Module 01: real school/program catalogue, visually integrated with Study Abroad V1. */
+.hhba-uni-directory{scroll-margin-top:16px}
+.hhba-uni-directory .hhba-study-section-head{align-items:center}
+.hhba-uni-directory .hhba-study-eyebrow{margin:0 0 8px;font-size:10px}
+.hhba-uni-registry-count{padding:9px 12px;border:1px solid #d6e8dc;border-radius:7px;background:#f0f7f2;color:#317755;font-size:11px;font-weight:750;white-space:nowrap}
+.hhba-uni-filter-bar{display:grid;grid-template-columns:auto repeat(4,minmax(120px,1fr)) auto;gap:11px;align-items:end;padding:15px;border:1px solid #dfe9e3;border-radius:12px;background:#fff}
+.hhba-uni-filter-label{align-self:center;display:flex;gap:6px;align-items:center;color:#367452;white-space:nowrap;font-weight:750}
+.hhba-uni-filter-bar label{display:flex;flex-direction:column;gap:6px;font-size:11px;font-weight:700;color:#637788}
+.hhba-uni-filter-bar select{width:100%;min-height:38px;border:1px solid #d9e5de;border-radius:7px;background:#fbfdfb;color:#243b48;padding:5px 9px;font-size:12px;cursor:pointer}
+.hhba-uni-filter-bar select:focus-visible,.hhba-uni-clear:focus-visible,.hhba-uni-program-link:focus-visible{outline:2px solid #2b8759;outline-offset:2px}
+.hhba-uni-clear{border:0;color:#2b7d51;font-weight:750;background:#f0f8f2;border-radius:7px;min-height:38px;padding:5px 10px;white-space:nowrap;font-size:11px}
+.hhba-uni-result-summary{color:#657c6e;font-size:12px;margin:17px 0 16px}
+.hhba-uni-result-summary strong{color:#287952}
+.hhba-uni-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.hhba-uni-school-card{padding:21px;background:#fff;border:1px solid #e0eae5;border-radius:12px;display:flex;flex-direction:column;min-width:0}
+.hhba-uni-school-card:hover{box-shadow:0 9px 25px #193a2810;border-color:#b9d7c2}
+.hhba-uni-school-card-top{display:flex;align-items:center;justify-content:space-between}
+.hhba-uni-school-avatar{display:grid;place-items:center;width:46px;height:46px;color:#2e8657;background:#eaf5ee;border-radius:10px}
+.hhba-uni-school-location{font-size:11px;color:#557360}
+.hhba-uni-school-card h3{font-size:18px;color:#1a3542;margin:13px 0 2px}
+.hhba-uni-school-card h3 a{color:inherit}
+.hhba-uni-school-card h3 a:hover{color:#24764f}
+.hhba-uni-school-english{font-size:11px;color:#8b9aa5;margin:2px 0 9px}
+.hhba-uni-school-place{display:flex;gap:5px;align-items:center;color:#708b7d;font-size:11px;margin:0 0 14px}
+.hhba-uni-offerings{flex:1;display:flex;flex-direction:column;gap:6px;border-top:1px solid #edf2ee;padding:13px 0}
+.hhba-uni-offerings>strong{font-size:11px;color:#496c59;margin-bottom:5px}
+.hhba-uni-program-link{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f8fbf8;border:1px solid #edf3ed;border-radius:7px;padding:10px 11px;color:#254d37;min-width:0}
+.hhba-uni-program-link:hover{background:#eaf7ee}
+.hhba-uni-program-link>span{font-weight:750;font-size:12px;min-width:0}
+.hhba-uni-program-link small{display:block;font-size:10px;font-weight:450;color:#82938a;overflow-wrap:anywhere}
+.hhba-uni-program-link>svg{flex:none}
+.hhba-uni-card-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid #edf2ee;padding-top:12px}
+.hhba-uni-card-foot>span{display:flex;gap:6px;align-items:center;font-size:10px;color:#649076}
+.hhba-uni-card-foot>a{display:flex;gap:5px;align-items:center;font-weight:750;font-size:11px;color:#277550}
+.hhba-uni-no-results{text-align:center;border:1px dashed #b2d5bd;background:#fff;padding:32px 15px;border-radius:10px;color:#71897a}
+.hhba-uni-no-results h3{font-size:16px;margin:11px 0 5px;color:#344a3f}
+.hhba-uni-no-results p{font-size:12px;max-width:580px;margin:0 auto 13px}
+.hhba-uni-source-note{display:flex;gap:9px;padding:13px 15px;margin:20px 0 0;border:1px solid #d8e9db;color:#688274;background:#f2f8f3;border-radius:9px;font-size:11px;line-height:1.8}
+.hhba-uni-source-note>svg{flex:none;margin-top:3px}
+.hhba-uni-detail-page{max-width:1120px;margin:auto}
+.hhba-uni-detail-hero{padding:29px 31px;border:1px solid #d7e7dc;border-radius:14px;background:linear-gradient(125deg,#ebf6ee,#fff)}
+.hhba-uni-detail-hero h1{font-size:clamp(24px,3.3vw,34px);margin:12px 0 0;line-height:1.25;color:#1d3741}
+.hhba-uni-detail-en{color:#7c9385;font-size:15px;margin:7px 0 13px}
+.hhba-uni-detail-hero>p:not(.hhba-study-eyebrow){display:flex;align-items:center;gap:6px}
+.hhba-uni-detail-intro{font-size:13px;line-height:1.9;max-width:770px;color:#627b71}
+.hhba-uni-detail-actions{display:flex;align-items:center;flex-wrap:wrap;gap:11px;margin-top:20px}
+.hhba-uni-detail-actions>span{display:flex;align-items:center;gap:5px;font-size:11px;color:#70977d}
+.hhba-uni-detail-section{margin-top:31px}
+.hhba-uni-degree-list{display:flex;flex-direction:column;gap:11px}
+.hhba-uni-degree-row{display:flex;justify-content:space-between;align-items:center;gap:15px;background:#fff;border:1px solid #dfe8e3;border-radius:11px;padding:21px}
+.hhba-uni-degree-row>div{flex:1;min-width:0}
+.hhba-uni-degree-kicker{color:#2e8257;font-size:11px;font-weight:750}
+.hhba-uni-degree-row h3{font-size:17px;margin:6px 0 2px;color:#203a42}
+.hhba-uni-degree-en{font-size:11px;color:#81968d;margin:0 0 10px}
+.hhba-uni-degree-row>div>p:not(.hhba-uni-degree-en){font-size:12px;color:#697e75;line-height:1.75;margin:0}
+.hhba-uni-degree-meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.hhba-uni-degree-meta>span{background:#eff6f1;color:#497259;border-radius:5px;padding:4px 8px;font-size:10px}
+.hhba-uni-degree-row>a{display:flex;gap:6px;align-items:center;color:#277a52;font-weight:750;font-size:12px;white-space:nowrap}
+.hhba-uni-program-breadcrumb{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:0 0 16px;color:#7d8e83;font-size:11px}
+.hhba-uni-program-breadcrumb a{color:#2d7752}
+.hhba-uni-program-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(245px,1fr);gap:20px;margin-top:25px}
+.hhba-uni-program-layout h2{color:#263f44;font-size:19px;margin:0 0 13px}
+.hhba-uni-info-list{display:flex;flex-direction:column;gap:10px}
+.hhba-uni-info-list>section{background:#fff;border:1px solid #e2ebe5;border-radius:10px;padding:17px 19px}
+.hhba-uni-info-list h3{color:#3d6d52;font-size:12px;margin:0 0 8px}
+.hhba-uni-info-list p{color:#647c74;font-size:12px;line-height:1.8;margin:0}
+.hhba-uni-pathway{border-color:#cce6d2!important;background:#f6fbf7!important}
+.hhba-uni-program-source{position:sticky;top:17px;padding:23px;background:#fff;border:1px solid #dfeae2;border-radius:11px}
+.hhba-uni-program-source h2{display:flex;gap:7px;align-items:center;font-size:16px;margin:0 0 20px}
+.hhba-uni-program-source p{display:flex;align-items:center;gap:7px;color:#698175;font-size:12px;margin:10px 0}
+.hhba-uni-program-source a{display:flex;gap:7px;align-items:center;color:#24794d;font-weight:750;font-size:12px;margin:20px 0}
+.hhba-uni-program-source small{display:block;border-top:1px solid #e7eee8;padding-top:13px;color:#829189;font-size:11px;line-height:1.8}
+.hhba-uni-school-back{font-size:12px;color:#307955;display:flex;gap:7px;align-items:center}
+.hhba-uni-not-found{text-align:center;margin:75px auto}
+@media(max-width:1060px){.hhba-uni-filter-bar{grid-template-columns:repeat(4,minmax(100px,1fr))}.hhba-uni-filter-label{grid-column:1/-1}.hhba-uni-clear{grid-column:1/-1;justify-self:start}}
+@media(max-width:700px){.hhba-uni-directory .hhba-study-section-head{align-items:flex-start;flex-direction:column}.hhba-uni-filter-bar{grid-template-columns:repeat(2,minmax(0,1fr))}.hhba-uni-filter-label,.hhba-uni-clear{grid-column:1/-1}.hhba-uni-grid,.hhba-uni-program-layout{grid-template-columns:1fr}.hhba-uni-program-source{position:static}}
+@media(max-width:420px){.hhba-uni-school-card{padding:15px}.hhba-uni-detail-hero{padding:20px}.hhba-uni-degree-row{flex-direction:column;align-items:stretch}.hhba-uni-degree-row>a{justify-content:flex-end}.hhba-uni-detail-actions .hhba-study-btn{width:100%}}

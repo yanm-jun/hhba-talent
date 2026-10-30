@@ -1,0 +1,61 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {universities,universityPrograms,searchUniversityPrograms,findProgram,programsForUniversity,studyFieldLabels} from '../src/data/studyUniversities.ts';
+const file=p=>readFileSync(new URL('../src/'+p,import.meta.url),'utf8');
+const all={country:'',degree:'',field:'',language:'',keyword:''};
+test('8 verified universities / 15 distinct first-party program records / six original countries',()=>{
+ assert.equal(universities.length,8);
+ assert.equal(universityPrograms.length,15);
+ assert.equal(new Set(universities.map(u=>u.id)).size,8);
+ assert.equal(new Set(universityPrograms.map(p=>p.id)).size,15);
+ assert.deepEqual([...new Set(universities.map(u=>u.country))].sort(),['au','de','jp','nz','uk','us']);
+ for(const p of universityPrograms){
+  assert.ok(universities.some(u=>u.id===p.universityId),p.id);
+  assert.equal(p.degree,'master');
+  assert.equal(p.checkedAt,'2026-10-31');
+  assert.ok(p.officialProgramUrl.startsWith('https://'),p.id);
+  assert.ok(p.description.length>35&&p.admissions.length>30&&p.tuitionNote.length>8,p.id);
+  assert.ok(p.sourceQuality==='official-program'||p.sourceQuality==='official-catalog',p.id);
+  const domain=new URL(p.officialProgramUrl).hostname;
+  assert.ok(['minotstateu.edu','usd.edu','tamiu.edu','birmingham.ac.uk','monash.edu','tum.de','kyoto-u.ac.jp','auckland.ac.nz'].some(x=>domain===x||domain.endsWith('.'+x)),p.id+' source host '+domain);
+  assert.ok(!/guarantee|100% admission|保录|保证获得录取/i.test(p.description),p.id);
+  if(p.tuitionStatus==='published')assert.ok(p.tuitionYear&&p.tuitionNote.includes(p.tuitionYear));
+ }
+ for(const u of universities)assert.ok(programsForUniversity(u.id).length>=1,u.id);
+});
+test('Query matches specific programs, not whole unrelated university curriculum',()=>{
+ const programs=searchUniversityPrograms({...all,keyword:'网络安全'});
+ assert.equal(programs.length,1);assert.equal(programs[0].id,'minot-cyber-ms');
+ const birmingham=searchUniversityPrograms({...all,keyword:'伯明翰'});
+ assert.equal(birmingham.length,2);
+ assert.ok(birmingham.every(p=>p.universityId==='birmingham'));
+ const data=searchUniversityPrograms({...all,field:'data'});
+ assert.deepEqual(data.map(x=>x.id),['usd-business-analytics-ms','auckland-business-analytics']);
+ const us=searchUniversityPrograms({...all,country:'us'});
+ assert.equal(us.length,6);
+ const germanEnglish=searchUniversityPrograms({...all,country:'de',language:'en'});
+ assert.deepEqual(germanEnglish.map(p=>p.id),['tum-informatics-ms']);
+ const machine=searchUniversityPrograms({...all,keyword:'机械'});
+ assert.equal(machine.length,0,'unlisted subject must not silently return unrelated roles');
+ assert.equal(searchUniversityPrograms({...all,degree:'bachelor'}).length,0);
+ assert.equal(searchUniversityPrograms({...all,keyword:'Management',country:'jp'}).length,0);
+ assert.ok(findProgram('birmingham-cs-conversion')?.pathwayNote);
+});
+test('Search entry and country cards open exact program catalogue; deep routes retain original Shell',()=>{
+ const page=file('pages/StudyAbroadPage.tsx');
+ const dir=file('components/StudyUniversityDirectory.tsx');
+ const css=file('styles/study-universities.css');
+ assert.ok(page.includes('goUniversities();'), 'search and countries should drive directory');
+ assert.ok(page.includes('id="study-university-directory"'), 'insert directory on original home');
+ assert.ok(page.includes('onCountryChange={setCountry}'));
+ assert.ok(page.includes("slug?.startsWith('university/')"));
+ assert.ok(page.includes("slug?.startsWith('program/')"));
+ assert.ok(dir.includes('searchUniversityPrograms({country,keyword:query,degree,field,language})'));
+ assert.ok(dir.includes("'/study-abroad/university/'+school.id"));
+ assert.ok(dir.includes("'/study-abroad/program/'+p.id"));
+ assert.ok(dir.includes('target="_blank" rel="noopener noreferrer"'));
+ assert.ok(dir.includes('aria-label="筛选国家"')&&!dir.includes('onChange={()=>{}} disabled'));
+ assert.ok(css.includes('@media(max-width:700px)'));
+ assert.ok(Object.keys(studyFieldLabels).length>=5);
+});

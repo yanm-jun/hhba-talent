@@ -299,6 +299,9 @@ jobs:
       - name: Verify study abroad V1 nav, 6 official national gateways and static routes
         working-directory: apps/web
         run: node --test scripts/study-abroad.contract.test.mjs
+      - name: Verify real university and program database links, precise search and integrated study route
+        working-directory: apps/web
+        run: node --experimental-strip-types --test scripts/study-universities.contract.test.mjs
       - name: "Build unified HHBA - 200 companies, applicant center, employer governance previews and brand pages"
         working-directory: apps/web
         env:

@@ -3,6 +3,7 @@ import {ArrowLeft,ArrowRight,ArrowUpRight,BookOpen,BriefcaseBusiness,CheckCircle
 import {Link} from '../router';
 import {Shell} from '../components/Shell';
 import {BrandMark} from '../components/BrandMark';
+import {StudyUniversityDirectory,StudyUniversityDetail,StudyProgramDetail} from '../components/StudyUniversityDirectory';
 import type {User} from '../services/api';
 import {matchesStudyDirection,studyCountries,studyCountry,studyDirections,studyGoalLabels,type StudyCountryCode,type StudyGoal,type StudyDirection} from '../data/studyAbroad';
 import '../styles/study-abroad.css';
@@ -61,12 +62,16 @@ export function StudyAbroadPage({user,slug}:{user:User|null;slug?:string}){
  const [draft,setDraft]=useState('');
  const [query,setQuery]=useState('');
  const resultsRef=useRef<HTMLElement>(null);
+ const universityRef=useRef<HTMLElement>(null);
  const direction=slug?studyDirections.find(d=>d.id===slug):undefined;
- const matches=useMemo(()=>studyDirections.filter(d=>matchesStudyDirection(d,goal,country,query)),[goal,country,query]);
+ const matches=useMemo(()=>studyDirections.filter(d=>matchesStudyDirection(d,goal,country,'')),[goal,country]);
  const goResults=()=>{resultsRef.current?.scrollIntoView({behavior:'smooth',block:'start'});};
+ const goUniversities=()=>{universityRef.current?.scrollIntoView({behavior:'smooth',block:'start'});};
  const chooseGoal=(next:StudyGoal)=>{setGoal(next);goResults();};
- const chooseCountry=(next:StudyCountryCode)=>{setCountry(prev=>prev===next?'':next);goResults();};
+ const chooseCountry=(next:StudyCountryCode)=>{setCountry(prev=>prev===next?'':next);goUniversities();};
  const reset=()=>{setCountry('');setGoal('all');setDraft('');setQuery('');};
+ if(slug?.startsWith('university/'))return <StudyUniversityDetail user={user} id={slug.slice('university/'.length)}/>;
+ if(slug?.startsWith('program/'))return <StudyProgramDetail user={user} id={slug.slice('program/'.length)}/>;
  if(slug){
   return direction?<StudyDetail user={user} direction={direction}/>:
    <Shell user={user}><div className="hhba-study hhba-study-missing"><h1>暂未找到该留学方向</h1><p>该项目尚未收录，或链接已经调整。</p><Link to="/study-abroad" className="hhba-study-btn">返回留学机会 <ArrowRight size={16}/></Link></div></Shell>;
@@ -77,10 +82,10 @@ export function StudyAbroadPage({user,slug}:{user:User|null;slug?:string}){
     <p className="hhba-study-eyebrow"><Globe2 size={14}/> HHBA · GLOBAL STUDY OPPORTUNITIES</p>
     <h1>让留学机会，不再遥不可及。</h1>
     <p className="hhba-study-hero-lead">不只是寻找一所大学，更是找到一条适合自己的未来之路。<br/>按预算、专业与发展目标，发现属于你的海外升学方向。</p>
-    <form className="hhba-study-search" role="search" onSubmit={e=>{e.preventDefault();setQuery(draft.trim());goResults();}}>
+    <form className="hhba-study-search" role="search" onSubmit={e=>{e.preventDefault();setQuery(draft.trim());goUniversities();}}>
      <Search size={19} aria-hidden="true"/>
      <label className="hhba-study-sr" htmlFor="hhba-study-q">搜索国家或留学方向</label>
-     <input id="hhba-study-q" value={draft} onChange={e=>setDraft(e.target.value)} placeholder="搜索国家、大学方向、专业背景或留学关键词…" />
+     <input id="hhba-study-q" value={draft} onChange={e=>setDraft(e.target.value)} placeholder="搜索真实大学、专业、课程名称或国家（中英文）…" />
      <button type="submit" className="hhba-study-btn">搜索留学机会 <ArrowUpRight size={15}/></button>
     </form>
     <div className="hhba-study-quick" aria-label="热门方向">
@@ -94,13 +99,16 @@ export function StudyAbroadPage({user,slug}:{user:User|null;slug?:string}){
      <div className="hhba-study-goal-grid">{goals.map(g=><button type="button" className={'hhba-study-goal '+(goal===g.id?'is-active':'')} key={g.id} aria-pressed={goal===g.id} onClick={()=>chooseGoal(g.id)}><span className="hhba-study-goal-icon"><g.icon size={23}/></span><strong>{g.title}</strong><span>{g.copy}</span><ArrowUpRight className="hhba-study-goal-arrow" size={16}/></button>)}</div>
     </section>
     <section className="hhba-study-section" aria-labelledby="hhba-study-countries">
-     <div className="hhba-study-section-head"><div><h2 id="hhba-study-countries">按国家探索留学机会</h2><p>先看六个目的地，后续再按真实资料扩展。</p></div><button type="button" className="hhba-study-link" onClick={()=>{setCountry('');goResults();}}>查看全部国家 <ArrowRight size={15}/></button></div>
+     <div className="hhba-study-section-head"><div><h2 id="hhba-study-countries">按国家探索留学机会</h2><p>国家卡片与下方真实大学数据库联动，点击筛选对应的学校和专业。</p></div><button type="button" className="hhba-study-link" onClick={()=>{setCountry('');goUniversities();}}>查看全部国家 <ArrowRight size={15}/></button></div>
      <div className="hhba-study-country-grid">
       {studyCountries.map(c=><button type="button" key={c.code} className={'hhba-study-country '+(country===c.code?'is-active':'')} aria-pressed={country===c.code} onClick={()=>chooseCountry(c.code)}><span className="hhba-study-flag" aria-hidden="true">{c.flag}</span><strong>{c.name}</strong><small>{c.english}</small></button>)}
      </div>
     </section>
+    <section className="hhba-study-section" id="study-university-directory" ref={universityRef} aria-labelledby="hhba-uni-directory-heading">
+      <StudyUniversityDirectory country={country} query={query} onCountryChange={setCountry} onClear={()=>{setCountry('');setQuery('');setDraft('');}}/>
+    </section>
     <section className="hhba-study-section" id="study-directions" ref={resultsRef} aria-labelledby="hhba-study-list">
-     <div className="hhba-study-section-head"><div><h2 id="hhba-study-list">发现适合你的升学方向</h2><p aria-live="polite">{country?studyCountry(country).name+' · ':''}{studyGoalLabels[goal]} · {matches.length} 条研究方向</p></div><button type="button" className="hhba-study-link" onClick={reset}>重置筛选 ↺</button></div>
+     <div className="hhba-study-section-head"><div><h2 id="hhba-study-list">延伸了解 · 各国升学方向</h2><p aria-live="polite">{country?studyCountry(country).name+' · ':''}{studyGoalLabels[goal]} · {matches.length} 条研究方向</p></div><button type="button" className="hhba-study-link" onClick={reset}>重置筛选 ↺</button></div>
      <div className="hhba-study-filters" aria-label="升学方向筛选">
       {(Object.keys(studyGoalLabels) as StudyGoal[]).map(g=><button key={g} type="button" className={goal===g?'is-active':''} aria-pressed={goal===g} onClick={()=>setGoal(g)}>{studyGoalLabels[g]}</button>)}
      </div>

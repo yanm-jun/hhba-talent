@@ -1,0 +1,76 @@
+/* HHBA Study Abroad Module 01: official-university-led seed registry.
+ * 8 distinct schools, 15 real graduate offerings, 6 countries.
+ * Verified 2026-10-31 from first-party university sites. Neither active intake
+ * nor international eligibility is inferred. Keep all unknown fees unknown.
+ */
+import {studyCountries,type StudyCountryCode} from './studyAbroad.ts';
+export type StudyDegree='master'|'bachelor'|'doctorate';
+export type StudyField='business'|'computing'|'data'|'security'|'social';
+export type StudyLanguage='en'|'unknown';
+export type StudyMode='campus'|'campus-and-online'|'unknown';
+export type SourceQuality='official-program'|'official-catalog';
+export interface UniversityRecord {
+ id:string; chinese:string; english:string; aliases:string[]; country:StudyCountryCode;
+ city:string; ownership:'公立'|'公立研究型'|'公立大学'; officialSite:string; introduction:string;
+ verifiedAt:string;
+}
+export interface UniversityProgram {
+ id:string; universityId:string; chinese:string; english:string; degree:StudyDegree;
+ field:StudyField; keywords:string[]; language:StudyLanguage; mode:StudyMode;
+ description:string; admissions:string; tuitionNote:string; tuitionStatus:'published'|'unverified';
+ tuitionYear?:string; officialProgramUrl:string; sourceQuality:SourceQuality;
+ checkedAt:string; pathwayNote?:string;
+}
+export const universities:UniversityRecord[]=[
+ {id:'minot-state',chinese:'迈诺特州立大学',english:'Minot State University',aliases:['MSU','迈诺特大学','北达科他州立迈诺特'],country:'us',city:'Minot, North Dakota',ownership:'公立',officialSite:'https://www.minotstateu.edu/',introduction:'位于美国北达科他州迈诺特的公立大学。首批收录两项官方明确提供校园授课选项的研究生项目。',verifiedAt:'2026-10-31'},
+ {id:'south-dakota',chinese:'南达科他大学',english:'University of South Dakota',aliases:['USD','南达科他州大学','南达科他'],country:'us',city:'Vermillion, South Dakota',ownership:'公立',officialSite:'https://www.usd.edu/',introduction:'美国南达科他州公立大学，首批收录商科、分析与计算机科学的校园硕士项目。',verifiedAt:'2026-10-31'},
+ {id:'tamiu',chinese:'德州农工国际大学',english:'Texas A&M International University',aliases:['TAMIU','Texas A and M International','德州农工国际'],country:'us',city:'Laredo, Texas',ownership:'公立',officialSite:'https://www.tamiu.edu/',introduction:'位于美国得克萨斯州拉雷多的公立大学，MBA 项目存在由官方研究生院和课程目录直接证明。',verifiedAt:'2026-10-31'},
+ {id:'birmingham',chinese:'伯明翰大学',english:'University of Birmingham',aliases:['Birmingham','英国伯明翰'],country:'uk',city:'Birmingham, England',ownership:'公立研究型',officialSite:'https://www.birmingham.ac.uk/',introduction:'英国伯明翰大学提供面向非计算机本科背景申请者的计算机转换型硕士课程。',verifiedAt:'2026-10-31'},
+ {id:'monash',chinese:'蒙纳士大学',english:'Monash University',aliases:['莫纳什大学','Monash','蒙纳士'],country:'au',city:'Melbourne (Clayton), Victoria',ownership:'公立研究型',officialSite:'https://www.monash.edu/',introduction:'澳大利亚公立研究型大学；本批选取两项官方列明 Clayton 校区授课的 IT 硕士。',verifiedAt:'2026-10-31'},
+ {id:'tum',chinese:'慕尼黑工业大学',english:'Technical University of Munich',aliases:['TUM','德国慕尼黑工业大学'],country:'de',city:'Garching, Bavaria',ownership:'公立研究型',officialSite:'https://www.tum.de/',introduction:'德国慕尼黑工业大学，以计算机科学为基础的 Informatics 硕士官方设有英语授课路径。',verifiedAt:'2026-10-31'},
+ {id:'kyoto',chinese:'京都大学',english:'Kyoto University',aliases:['KyotoU','京大'],country:'jp',city:'Kyoto, Japan',ownership:'公立研究型',officialSite:'https://www.kyoto-u.ac.jp/',introduction:'日本国立研究型大学，大学官方公布信息学研究科英语授课的国际硕士项目。',verifiedAt:'2026-10-31'},
+ {id:'auckland',chinese:'奥克兰大学',english:'University of Auckland',aliases:['Auckland','奥克兰'],country:'nz',city:'Auckland, New Zealand',ownership:'公立研究型',officialSite:'https://www.auckland.ac.nz/',introduction:'新西兰公立研究型大学，官方列明信息技术与商业分析方向研究生课程。',verifiedAt:'2026-10-31'}
+];
+export const universityPrograms:UniversityProgram[]=[
+ {id:'minot-management-ms',universityId:'minot-state',chinese:'管理学理学硕士',english:'Master of Science in Management',degree:'master',field:'business',keywords:['管理','工商管理','管理学','市场营销','人力资源','跨专业','management','msm'],language:'unknown',mode:'campus-and-online',description:'学校明确提供校园及在线学习选项，官方标注 30 学分，并说明无需事先具备商科背景。',admissions:'官网表示不要求商科先修背景；本科文凭与 GPA 等要求仍需按官方研究生申请标准逐项核实。',tuitionNote:'国际生项目总费用待核验，不能按本州学费推断。',tuitionStatus:'unverified',officialProgramUrl:'https://www.minotstateu.edu/graduate/future_students/programs/management.shtml',sourceQuality:'official-program',checkedAt:'2026-10-31',pathwayNote:'学校页面明确表示不要求事先具备商科学习背景。'},
+ {id:'minot-cyber-ms',universityId:'minot-state',chinese:'网络安全与信息保障理学硕士',english:'M.S. in Cybersecurity and Information Assurance',degree:'master',field:'security',keywords:['网络安全','信息安全','计算机','cybersecurity','MSCIA','数据','技术'],language:'unknown',mode:'campus-and-online',description:'30 学分，学校官网明确提供校园与在线形式，内容涵盖安全、合规、信息保障和数字取证。',admissions:'官方申请条件强调技术或商科背景，或相关领域工作经验；非相关背景不应默认符合要求。',tuitionNote:'项目国际生学费待核验。',tuitionStatus:'unverified',officialProgramUrl:'https://www.minotstateu.edu/graduate/future_students/programs/cybersecurity-information-assurance.shtml',sourceQuality:'official-program',checkedAt:'2026-10-31'},
+ {id:'usd-business-analytics-ms',universityId:'south-dakota',chinese:'商业分析理学硕士',english:'M.S. in Business Analytics',degree:'master',field:'data',keywords:['商业分析','数据分析','数据科学','business analytics','统计','分析'],language:'unknown',mode:'campus',description:'学校明确在 Vermillion 校区开设，项目涉及数据管理、分析、可视化及优化。',admissions:'该项目存在已核验；先修课程、语言成绩、国际生资格与具体申请期限需查看招生要求。',tuitionNote:'国际生课程费用及生活费待核验。',tuitionStatus:'unverified',officialProgramUrl:'https://www.usd.edu/Academics/Graduate-Programs/Business-Analytics',sourceQuality:'official-program',checkedAt:'2026-10-31'},
+ {id:'usd-mba',universityId:'south-dakota',chinese:'工商管理硕士',english:'Master of Business Administration (MBA)',degree:'master',field:'business',keywords:['MBA','工商管理','管理','市场','金融','business administration'],language:'unknown',mode:'campus-and-online',description:'学校在 Vermillion 校区、Sioux Falls 与在线形式提供该 MBA；校区与具体方向的上课方式需分别确认。',admissions:'根据目标 MBA 项目当年官网要求核实学历、成绩、语言与先修课程。',tuitionNote:'国际生 MBA 实际学费待核验。',tuitionStatus:'unverified',officialProgramUrl:'https://www.usd.edu/Academics/Graduate-Programs/Business-Administration',sourceQuality:'official-program',checkedAt:'2026-10-31'},
+ {id:'usd-cs-ms',universityId:'south-dakota',chinese:'计算机科学理学硕士',english:'M.S. in Computer Science',degree:'master',field:'computing',keywords:['计算机','软件','人工智能','AI','CS','computer science'],language:'unknown',mode:'campus',description:'学校公布 Vermillion 校区的计算机科学硕士项目，30 学分并提供论文与非论文选项。',admissions:'计算机基础、数学先修及其他录取要求必须以研究生招生说明为准。',tuitionNote:'国际学生学费待核验。',tuitionStatus:'unverified',officialProgramUrl:'https://www.usd.edu/Academics/Graduate-Programs/Computer-Science',sourceQuality:'official-program',checkedAt:'2026-10-31'},
+ {id:'tamiu-mba',universityId:'tamiu',chinese:'工商管理硕士',english:'Master of Business Administration (MBA)',degree:'master',field:'business',keywords:['MBA','工商管理','国际商务','国际贸易','管理','business'],language:'unknown',mode:'unknown',description:'官方研究生院明确列出 MBA，官方学术目录说明课程结构与可选择的国际商务、金融等内容。',admissions:'本页尚未逐项验证具体授课地点、国际学生入学条件和当年申请截止日；进入官方项目目录查询。',tuitionNote:'国际学生费用待核验。',tuitionStatus:'unverified',officialProgramUrl:'https://catalog.tamiu.edu/graduate-information/a-r-sanchez-jr-business/master-business-administration-mba/',sourceQuality:'official-catalog',checkedAt:'2026-10-31'},
+ {id:'birmingham-cs-conversion',universityId:'birmingham',chinese:'计算机科学转换型硕士',english:'MSc Computer Science (conversion)',degree:'master',field:'computing',keywords:['跨专业','计算机','软件开发','编程','conversion','computer science','理科'],language:'en',mode:'campus',description:'英国伯明翰大学明确将本项目设为面向非计算机本科毕业生的全日制转换型硕士。',admissions:'适用于希望转换计算机方向的申请者，但实际成绩、英语及申请资格需要按照当年度项目页面逐条核实。',tuitionNote:'国际生学费需在官方项目页选择对应入学年份核验，暂不发布猜测金额。',tuitionStatus:'unverified',officialProgramUrl:'https://www.birmingham.ac.uk/study/postgraduate/subjects/computer-science-and-data-science-courses/computer-science-msc',sourceQuality:'official-program',checkedAt:'2026-10-31',pathwayNote:'官方明确：适合非计算机本科背景的转换课程。'},
+ {id:'birmingham-ai-conversion',universityId:'birmingham',chinese:'人工智能与计算机科学转换型硕士',english:'MSc Artificial Intelligence and Computer Science',degree:'master',field:'computing',keywords:['跨专业','人工智能','机器学习','AI','computer science','conversion','编程'],language:'en',mode:'campus',description:'学校说明本项目是为没有计算机本科背景的学生设计的 AI/计算机科学转换课程。',admissions:'官方说明要求非计算机学科背景的相应学位成绩；国际学历对照、语言和申请细节必须复核。',tuitionNote:'国际学生收费与入学批次待核验。',tuitionStatus:'unverified',officialProgramUrl:'https://www.birmingham.ac.uk/study/postgraduate/subjects/computer-science-and-data-science-courses/artificial-intelligence-ai-and-computer-science-msc',sourceQuality:'official-program',checkedAt:'2026-10-31',pathwayNote:'官方明确：为非计算机专业毕业生设计。'},
+ {id:'monash-it-master',universityId:'monash',chinese:'信息技术硕士',english:'Master of Information Technology',degree:'master',field:'computing',keywords:['跨专业','IT','信息技术','计算机','软件','information technology'],language:'en',mode:'campus',description:'澳大利亚蒙纳士大学 C6001，官网明确在 Clayton 开设全日制课程，欢迎 IT 和非 IT 背景。',admissions:'官方说明两年制路径可接受非 IT 本科学位背景，另有平均分与语言等要求；须按申请年度核对。',tuitionNote:'官方在课程页有不同身份、学年的收费项目；本页不将本地学生费用误作国际生费用。',tuitionStatus:'unverified',officialProgramUrl:'https://www.monash.edu/study/courses/find-a-course/information-technology-c6001',sourceQuality:'official-program',checkedAt:'2026-10-31',pathwayNote:'学校官方：非 IT 本科背景可考虑指定的两年制入学路径。'},
+ {id:'monash-bis-master',universityId:'monash',chinese:'商业信息系统硕士',english:'Master of Business Information Systems',degree:'master',field:'computing',keywords:['商业信息系统','管理','计算机','信息系统','business information systems'],language:'en',mode:'campus',description:'澳大利亚蒙纳士大学 C6003，官方列明 Clayton 校区全日制课程，学制按先前学历可能不同。',admissions:'具体先修、均分、语言要求须查看官方国际学生课程信息。',tuitionNote:'学校国际课程页标示 2027 年 A$57,540（每 48 学分标准全年负荷）；并非完整学位总费用。',tuitionStatus:'published',tuitionYear:'2027',officialProgramUrl:'https://www.monash.edu/study/courses/find-a-course/business-information-systems-c6003?international=true',sourceQuality:'official-program',checkedAt:'2026-10-31'},
+ {id:'tum-informatics-ms',universityId:'tum',chinese:'信息学理学硕士',english:'M.Sc. Informatics',degree:'master',field:'computing',keywords:['计算机','信息学','人工智能','informatics','software','算法'],language:'en',mode:'campus',description:'慕尼黑工业大学官网列出位于 Garching 的四学期、120 ECTS 英语授课 Informatics 硕士。',admissions:'学校明确是以本科计算机科学基础为前提的进阶课程，并实行能力评估；不默认接受任意跨专业。',tuitionNote:'学校提示非欧盟国际生学费及学期杂费，应按学生身份核实；不能把杂费当总学费。',tuitionStatus:'unverified',officialProgramUrl:'https://www.cit.tum.de/en/cit/studies/degree-programs/master-informatics/',sourceQuality:'official-program',checkedAt:'2026-10-31'},
+ {id:'kyoto-intelligence-master',universityId:'kyoto',chinese:'智能科学与技术国际硕士项目',english:'International Program in Intelligence Science and Technology',degree:'master',field:'computing',keywords:['智能科学','计算机','人工智能','AI','机器学习','认知','intelligence science'],language:'en',mode:'campus',description:'京都大学官方英语授课项目目录列出信息学研究科国际硕士课程，含智能算法、学习与认知等内容。',admissions:'国际课程有独立募集要项与时间安排；需以当年正式公告确定申请资格与是否开放。',tuitionNote:'学费、入学金和减免资格须按京都大学当年度官方政策核对。',tuitionStatus:'unverified',officialProgramUrl:'https://www.kyoto-u.ac.jp/index.php/en/education-campus/education-and-admissions/english-taught-degree-programs',sourceQuality:'official-catalog',checkedAt:'2026-10-31'},
+ {id:'kyoto-social-informatics',universityId:'kyoto',chinese:'社会信息学国际硕士项目',english:'International Program in Social Informatics',degree:'master',field:'social',keywords:['社会信息','信息管理','数据','社会科学','social informatics','信息系统'],language:'en',mode:'campus',description:'京都大学官方英语项目目录列出的社会信息学国际硕士课程，涵盖信息管理与社会信息系统。',admissions:'院校英语项目目录证明项目存在，不代表申请窗口当前开放；应查看当年度研究科募集要项。',tuitionNote:'该项目国际生实际收费与资助资格尚未逐项核验。',tuitionStatus:'unverified',officialProgramUrl:'https://www.kyoto-u.ac.jp/index.php/en/education-campus/education-and-admissions/english-taught-degree-programs',sourceQuality:'official-catalog',checkedAt:'2026-10-31'},
+ {id:'auckland-info-tech',universityId:'auckland',chinese:'信息技术硕士',english:'Master of Information Technology',degree:'master',field:'computing',keywords:['跨专业','计算机','信息技术','IT','软件','240学分','information technology'],language:'en',mode:'campus',description:'官方列明在 City 校区授课，提供 120/180/240 学分不同背景路径及实践实习环节。',admissions:'官网显示 240 学分方向可面向任意本科学科背景申请，但有 GPE 等具体成绩与英语要求。',tuitionNote:'官网列示 2027 年国际学生参考学费 NZ$55,214／年，未含学生服务费、保险和生活费；非整个学位总花费。',tuitionStatus:'published',tuitionYear:'2027',officialProgramUrl:'https://www.auckland.ac.nz/en/study/study-options/find-a-study-option/master-of-information-technology-minfotech.html',sourceQuality:'official-program',checkedAt:'2026-10-31',pathwayNote:'官方明确：240 学分路径面向符合条件的任意本科学科背景。'},
+ {id:'auckland-business-analytics',universityId:'auckland',chinese:'商业分析硕士',english:'Master of Business Analytics',degree:'master',field:'data',keywords:['跨专业','商业分析','数据分析','商业','市场','供应链','business analytics'],language:'en',mode:'campus',description:'学校官网在 City 校区提供 180 学分的商业分析硕士，面向商科及非商科毕业生的不同背景。',admissions:'官方表示欢迎非商科毕业生，但对已有商业分析或数据科学主修背景设有限制，需核对完整条件。',tuitionNote:'2027 年国际生费用须按官网项目收费栏确认，本目录暂未核算。',tuitionStatus:'unverified',officialProgramUrl:'https://www.auckland.ac.nz/en/study/study-options/find-a-study-option/master-of-business-analytics.html',sourceQuality:'official-program',checkedAt:'2026-10-31',pathwayNote:'官网明确：非商科本科毕业生可按条件申请。'}
+];
+export const studyFieldLabels:Record<StudyField,string>={business:'商科管理',computing:'计算机与信息技术',data:'数据与分析',security:'网络与信息安全',social:'社会与信息系统'};
+export const studyDegreeLabels:Record<StudyDegree,string>={master:'硕士',bachelor:'本科',doctorate:'博士'};
+export const studyLanguageLabels:Record<StudyLanguage,string>={en:'英语（官方项目页）',unknown:'授课语言待核验'};
+export const studyModeLabels:Record<StudyMode,string>={campus:'校内授课', 'campus-and-online':'校内及在线选项',unknown:'授课形式待核验'};
+export function findUniversity(id:string){return universities.find(u=>u.id===id);}
+export function findProgram(id:string){return universityPrograms.find(p=>p.id===id);}
+export function programsForUniversity(id:string){return universityPrograms.filter(p=>p.universityId===id);}
+export type DirectoryFilters={country:StudyCountryCode|''; degree:StudyDegree|''; field:StudyField|''; language:'en'|''; keyword:string};
+const normalize=(text:string)=>text.toLocaleLowerCase().normalize('NFKC').replace(/\s+/g,' ').trim();
+export function searchUniversityPrograms(f:DirectoryFilters){
+ const terms=normalize(f.keyword).split(/\s+/).filter(Boolean);
+ return universityPrograms.filter(p=>{
+  const u=findUniversity(p.universityId);
+  if(!u)return false;
+  if(f.country&&u.country!==f.country)return false;
+  if(f.degree&&p.degree!==f.degree)return false;
+  if(f.field&&p.field!==f.field)return false;
+  if(f.language&&p.language!==f.language)return false;
+  const nation=studyCountries.find(c=>c.code===u.country);
+  const schoolText=normalize([u.chinese,u.english,...u.aliases,u.city,nation?.name||'',nation?.english||''].join(' '));
+  const progText=normalize([p.chinese,p.english,p.description,p.field,studyFieldLabels[p.field],...p.keywords].join(' '));
+  // A university-name search intentionally shows all of that university’s projects;
+  // a subject search only returns the matching programme, not every subject taught there.
+  return terms.every(term=>schoolText.includes(term)||progText.includes(term));
+ });
+}
