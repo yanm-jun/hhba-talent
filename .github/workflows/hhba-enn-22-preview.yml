@@ -1,0 +1,168 @@
+name: HHBA ENN Group 22 factory website preview
+on:
+  push:
+    branches: [feat/employer-factory-pilot-enn-22-20261030]
+    paths:
+      - '.github/workflows/hhba-enn-22-preview.yml'
+      - 'apps/web/src/data/employerProfiles/cn-autumn-018.json'
+      - 'apps/web/public/images/employer-profiles/cn-autumn-018/**'
+      - 'apps/web/scripts/enn-22.browser.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: hhba-enn-22-pages
+  cancel-in-progress: false
+jobs:
+  verify-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/employer-factory-pilot-enn-22-20261030
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Validate factory data plus prior employers
+        working-directory: apps/web
+        run: |
+          node scripts/employer-factory-check.mjs
+          node scripts/company-single-char-search.contract.test.mjs
+          node scripts/company-brand-unified.contract.test.mjs
+      - name: Verify only audited positions and exact ENN brand and search aliases
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import fs from 'node:fs';
+          const p=JSON.parse(fs.readFileSync('src/data/employerProfiles/cn-autumn-018.json','utf8'));
+          assert.equal(p.id,'cn-autumn-018');
+          assert.equal(p.jobs.length,15);
+          assert.equal(p.media.photos.length,2);
+          assert(p.aliases.includes('新奥集团股份有限公司')&&p.aliases.includes('ENN Group'));
+          assert(p.jobs.every(j=>j.title.includes('专业需求方向')&&j.currentOpenVerified===false));
+          assert(p.jobs.every(j=>j.url.startsWith('https://enn.zhiye.com/')));
+          for(const file of [p.media.logo,...p.media.photos.map(x=>x.path)]){
+           assert(fs.statSync('public/'+file).size>6000,'Missing standalone company image: '+file);
+          }
+          const home=fs.readFileSync('src/components/HomeCompanyMarquee.tsx','utf8');
+          assert(home.includes('employerProfiles.map('),'Homepage must auto-register new company logo');
+          console.log('ENN_FACTORY_SEARCH_15_DIRECTIONS_HOME_LOGO_PASS');
+          NODE
+      - name: Build new ENN nested preview
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/preview-enn/'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_DEMO_ACCOUNT_ENABLED: '0'
+        run: |
+          npm run build
+          for f in logo.png photo1.webp photo2.webp; do test -s dist/images/employer-profiles/cn-autumn-018/$f; done
+          grep -q '/hhba-talent/preview-enn/assets/' dist/index.html
+      - name: Write refresh-safe deep links
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p=JSON.parse(fs.readFileSync('src/data/employerProfiles/cn-autumn-018.json','utf8'));
+          const routes=['companies/autumn/'+p.id,'candidate/jobs','companies/discover',...p.jobs.map(j=>'candidate/jobs/cn-v2-profile-'+p.id+'-'+j.id)];
+          for(const route of routes){fs.mkdirSync('dist/'+route,{recursive:true});fs.copyFileSync('dist/index.html','dist/'+route+'/index.html');}
+          fs.copyFileSync('dist/index.html','dist/404.html');fs.writeFileSync('dist/.nojekyll','');
+          console.log('ENN_REFRESHABLE_DEEPLINKS',routes.length);
+          NODE
+      - name: Install Chromium test dependencies
+        working-directory: apps/web
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Test real search, homepage, 3 pictures, major selection and 390px mobile
+        working-directory: apps/web
+        run: |
+          set -euo pipefail
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/hhba-enn-preview.log 2>&1 &
+          for i in $(seq 1 40); do
+           if curl -fsS http://127.0.0.1:4173/hhba-talent/preview-enn/ >/dev/null; then break; fi
+           sleep 1
+          done
+          node scripts/enn-22.browser.mjs
+      - name: Upload screenshots and browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-enn-22-browser-screenshots
+          path: apps/web/enn-22-proof/
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Retrieve most recent confirmed public site bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 41023029233
+          github-token: ${{ github.token }}
+          path: previous
+      - name: Preserve all current public site files, add only /preview-enn/
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive=$(find previous -type f -name 'artifact.tar*' -print -quit)
+          test -n "$archive"
+          mkdir -p published
+          if [[ "$archive" == *.gz ]]; then tar -xzf "$archive" -C published; else tar -xf "$archive" -C published; fi
+          test -s published/index.html
+          curl -fsSL --retry 3 --max-time 45 https://yanm-jun.github.io/hhba-talent/ -o /tmp/enn-live-home-index
+          cmp published/index.html /tmp/enn-live-home-index
+          test ! -e published/preview-enn
+          mkdir -p published/preview-enn
+          cp -a apps/web/dist/. published/preview-enn/
+          cmp published/index.html /tmp/enn-live-home-index
+          touch published/.nojekyll
+          echo EXISTING_PUBLIC_SITE_PRESERVED_ENTIRELY
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: published
+  deploy:
+    needs: verify-and-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    environment:
+      name: hhba-company200-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify the actual public ENN profile and three standalone company photos
+        shell: bash
+        run: |
+          set -euo pipefail
+          root=https://yanm-jun.github.io/hhba-talent/preview-enn
+          for i in 1 2 3 4 5 6 7 8; do
+           if curl -fsSL "$root/companies/autumn/cn-autumn-018/" -o /tmp/enn-profile &&
+              curl -fsSL "$root/images/employer-profiles/cn-autumn-018/logo.png" -o /tmp/enn-logo &&
+              curl -fsSL "$root/images/employer-profiles/cn-autumn-018/photo1.webp" -o /tmp/enn-photo1 &&
+              curl -fsSL "$root/images/employer-profiles/cn-autumn-018/photo2.webp" -o /tmp/enn-photo2; then break; fi
+           if [ "$i" = 8 ]; then exit 1; fi
+           sleep 10
+          done
+          grep -q '/hhba-talent/preview-enn/assets/' /tmp/enn-profile
+          test $(wc -c </tmp/enn-logo) -gt 6000
+          test $(wc -c </tmp/enn-photo1) -gt 6000
+          test $(wc -c </tmp/enn-photo2) -gt 6000
+          curl -fsSL https://yanm-jun.github.io/hhba-talent/ -o /tmp/enn-root
+          grep -q '/hhba-talent/assets/' /tmp/enn-root
+          echo HHBA_ENN_GROUP_22_PUBLIC_PREVIEW_PASS
