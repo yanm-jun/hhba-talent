@@ -20,6 +20,17 @@ for(const [a,b] of [
  ['艺术','人工智能'],['自动化','软件工程']
 ])assert(!majorNamesRelated(a,b),'Unsupported inferred match: '+a+' → '+b);
 assert(majorFamilies('机械').includes('mechanical'));
+const officialCatalog=JSON.parse(readFileSync('src/data/officialAcademicMajors.json','utf8')).records;
+const graduate=officialCatalog.find(r=>r.id==='pg-0855'&&r.name==='机械'&&r.level==='postgraduate');
+const undergraduate=officialCatalog.find(r=>r.id==='ug-080202'&&r.name==='机械设计制造及其自动化');
+assert(graduate&&undergraduate,'Use REAL graduate/undergraduate major directory entries');
+for(const jobMajor of ['机械工程','机械制造及其自动化','机械设计制造及其自动化','机械电子工程','智能制造工程'])
+ assert(majorNamesRelated(jobMajor,graduate.name),'2022 graduate 0855 mechanical missed '+jobMajor);
+const degreeCases=['高中','专科','本科','硕士'];
+const accepted=level=>degreeCases.filter(required=>educationMatchesApplicant(level,required));
+assert(accepted('MASTER').length>=accepted('BACHELOR').length,
+ 'A master's applicant must not lose bachelor-minimum roles');
+
 for(const lower of ['本科','本科及以上','BACHELOR','专科及以上','ASSOCIATE','不限学历']){
  assert(educationMatchesApplicant('MASTER',lower),'Master should not lose lower-minimum job '+lower);
 }
