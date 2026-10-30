@@ -1,3 +1,4 @@
+import {ZIBO_POLICY_RECORDS} from './ziboPolicyRecords.ts';
 import {WEIFANG_POLICY_RECORDS} from './weifangPolicyRecords.ts';
 // HHBA policy index v1. All entries are traceable to public government primary sources.
 // Static snapshots as reviewed 2026-10-30; NEVER claim live availability, eligibility, or vacancy.
@@ -425,4 +426,5 @@ export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
  keywords:['重庆','重庆市','高校毕业生','本科','硕士','博士','就业','社保','补贴','求职','灵活就业','毕业']},
 
 ...WEIFANG_POLICY_RECORDS,
+...ZIBO_POLICY_RECORDS,
 ];
