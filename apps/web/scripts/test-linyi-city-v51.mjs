@@ -14,7 +14,9 @@ assert.equal(homes.reduce((n,h)=>n+Number(/配租分配项(\d+)套/.exec(h.units
 assert.ok(homes.every(h=>h.sourceUrl.includes('lyjs.linyi.gov.cn')&&h.applicationEnd==='2026-07-16'));
 assert.ok(homes.every(h=>assessHousing(h,'2026-10-30').grade==='C'));
 assert.ok(homes.every(h=>h.steps.length>=4&&h.contactPhone));
-assert.ok(policies.every(x=>x.materials?.length>=3&&x.applicationSteps?.length>=4&&x.reviewedAt));
+const current=policies.filter(x=>x.id!=='sd-linyi-youth-2025');
+assert.equal(current.length,4,'Four detailed active records must remain');
+assert.ok(current.every(x=>x.materials?.length>=3&&x.applicationSteps?.length>=4&&x.reviewedAt), 'New Linyi items must have materials, steps and review date');
 assert.ok(policies.filter(x=>x.id!=='sd-linyi-youth-2025').every(x=>assessPolicy(x,'2026-10-30').grade==='B'),'Current Linyi policies remain B until certified');
 assert.equal(assessPolicy(policies.find(x=>x.id==='sd-linyi-youth-2025'),'2026-10-30').grade,'C','2025 archived guide must not masquerade as another current policy');
 assert.equal(assessTalentCity('临沂','2026-10-30').accepted,false);
