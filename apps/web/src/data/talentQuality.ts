@@ -57,6 +57,10 @@ export function talentSourceKind(raw:string):TalentSourceKind{
   const host=url.hostname.toLowerCase();
   if(!host||host==='localhost'||host.endsWith('.localhost')||host==='example.com')return 'unverified';
   if(host==='gov.cn'||host.endsWith('.gov.cn'))return 'government';
+  // Scoped exception: www.zoupingrc.cn is the official talent site explicitly operated
+  // by 邹平市人力资源和社会保障局 (public footer + signed 2026 announcements).
+  // Approve only its official /ywdt/ announcements; no other non-gov domain is trusted.
+  if(host==='www.zoupingrc.cn'&&url.pathname.startsWith('/ywdt/'))return 'government';
   // An educational portal or a news reprint can be useful evidence, not a
   // governmental primary source. Do not silently label media as official.
   return 'secondary';
