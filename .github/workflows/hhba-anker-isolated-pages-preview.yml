@@ -63,6 +63,7 @@ jobs:
         env:
           HHBA_PAGES_BASE: /hhba-talent/preview-anker/
           HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
           VITE_HHBA_OVERSEAS_CURATED_100: '1'
           VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
           VITE_HHBA_ACCOUNT_API_ENABLED: '0'
