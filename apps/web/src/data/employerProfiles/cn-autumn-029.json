@@ -23,22 +23,24 @@
     "https://m.fenbi.com/page/exam-information-detail/469959023551488",
     "https://www.fenbi.com/page/fenxiaozhaokaodetail/15/2894/469959023551488",
     "https://gs.powerchina.cn/col/col8855/art/2026/art_a3bd5bd98d594c49bb67a4eb7aee70b5.html",
-    "https://gs.powerchina.cn/col/col8855/art/2026/art_f9b4b94a210d427da7fe06d6dad62b7e.html"
+    "https://gs.powerchina.cn/col/col8855/art/2026/art_f9b4b94a210d427da7fe06d6dad62b7e.html",
+    "https://www.powerchina.cn/col/col7440/art/2026/art_5da26c3edda040679b1f867dc6d86e27.html",
+    "https://gepcc.powerchina.cn/col/col503/art/2025/art_e14cdb073ef2437ab9413b3f291fbb55.html"
   ],
   "media": {
     "logo": "images/employer-profiles/cn-autumn-029/logo.png",
     "photos": [
       {
         "path": "images/employer-profiles/cn-autumn-029/photo1.jpg",
-        "caption": "电建电投旗下盘南发电项目 · 官方新闻图",
-        "alt": "电建电投官方新闻展示的贵州盘南发电项目实景",
-        "note": "拟取自电建电投官方网站2026年1月盘南项目新闻附图；历史项目照片，不代表目前工况。素材来源详见媒体核验清单。"
+        "caption": "中国电建盘南发电项目实景 · 2026年",
+        "alt": "中国电建官方报道的贵州盘南发电项目电厂冷却塔与发电设施实景",
+        "note": "中国电建集团官网2026年盘南项目1号机组商业运营报道配图；该项目由中电建电力投资集团投资建设，非公司总部办公楼。"
       },
       {
         "path": "images/employer-profiles/cn-autumn-029/photo2.jpg",
-        "caption": "电建电投盘州项目现场 · 官方新闻图",
-        "alt": "电建电投官方新闻展示的盘州发电项目调研现场或建设现场",
-        "note": "拟取自电建电投官方网站2026年1月项目调研及建设报道附图；非总部大楼照片，来源见媒体核验清单。"
+        "caption": "盘南发电项目建设阶段实景 · 2025年",
+        "alt": "中国电建所属贵州工程公司发布的盘南2×660兆瓦项目工地建设实景",
+        "note": "中国电建所属贵州工程公司公开的2025年盘南电厂项目建设阶段照片；该项目属于中电建电投投资的盘南项目，照片不代表当前建设状态。"
       }
     ]
   },
@@ -69,7 +71,7 @@
     "法学",
     "机械设计制造及其自动化"
   ],
-  "photoNote": "企业 Logo 和两张项目图片均应优先使用中国电建/电建电投官方静态资源、在主站构建时保存独立本地副本；验证失败时明确提示资源不可用，不以其他电力公司照片冒充。商标和图片归原权利人所有，HHBA独立整理信息，不代表获得企业合作授权。",
+  "photoNote": "企业 Logo 采用中国电建官方品牌图；两张独立照片分别来自中国电建集团官网和所属贵州工程公司对中电建电投投资的盘南2×660MW发电项目的报道，构建时保存本地静态副本并留媒体来源记录。图片与商标权属原权利人，HHBA独立整理公开资料，不代表官方合作授权。",
   "business": [
     {
       "title": "火力发电及电源项目投资",
