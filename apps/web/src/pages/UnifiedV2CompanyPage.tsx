@@ -109,10 +109,19 @@ export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
     </>}
     <div className="hhba-v2-company-role-grid">{matches.map(job=>
      <article className="hhba-v2-company-role" key={job.id} id={'role-'+job.id} data-focus={focusedRole===job.id?'true':'false'}>
-      <div className="hhba-v2-company-role-head"><h3>{job.title}</h3><small>{job.educationLabel}</small></div>
-      <p>{job.summary}</p><small>{job.city}</small>
-      <details open={focusedRole===job.id}><summary>查看岗位要求 <ChevronDown size={14}/></summary><p>{job.requirements}</p></details>
-      {showcase&&<div className="hhba-v2-qizheng-role-actions">
+      <div className="hhba-v2-company-role-head"><h3>{job.title}</h3>{!weipu&&<small>{job.educationLabel}</small>}</div>
+      {weipu&&<p className="hhba-v2-weipu-education">{job.educationLabel} · 具体条件以官方岗位为准</p>}
+      <p className={weipu?'hhba-v2-weipu-description':''}>{job.summary}</p>
+      <small className={weipu?'hhba-v2-weipu-location':''}>{weipu?'工作地点：'+job.city:job.city}</small>
+      <details open={focusedRole===job.id}>
+       <summary>查看岗位要求 <ChevronDown size={14}/></summary>
+       <p>{job.requirements}</p>
+       {weipu&&<div className="hhba-v2-weipu-detail-links">
+        <Link to={'/candidate/jobs/'+encodeURIComponent('cn-v2-profile-'+p.id+'-'+job.id)}>站内岗位详情 <ArrowRight size={13}/></Link>
+        <a href={p.recruitment.url} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">官方招聘入口 <ExternalLink size={13}/></a>
+       </div>}
+      </details>
+      {showcase&&!weipu&&<div className="hhba-v2-qizheng-role-actions">
        <Link to={'/candidate/jobs/'+encodeURIComponent('cn-v2-profile-'+p.id+'-'+job.id)}>查看详情 <ArrowRight size={13}/></Link>
        <a href={p.recruitment.url} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">查看官网 <ExternalLink size={13}/></a>
       </div>}

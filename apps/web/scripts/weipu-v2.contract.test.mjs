@@ -35,3 +35,13 @@ assert(audit['logo.webp'].verified,'User-approved Logo lost');
 assert(audit['photo1.jpg'].verified&&audit['photo2.jpg'].verified,'WEIPU requires 2 real verified source photos, not placeholders');
 assert.notEqual(audit['photo1.jpg'].sha256,audit['photo2.jpg'].sha256);
 console.log('WEIPU_032_V2_CONTRACT_OK',JSON.stringify({jobs:p.jobs.length,services:p.business.length,photos:2,template:'screenshot-approved',majorFilter:true}));
+
+/* Screenshot regression: enough descriptive content, no browser-default link row */
+assert(page.includes('hhba-v2-weipu-education'));
+assert(page.includes('hhba-v2-weipu-description'));
+assert(page.includes('hhba-v2-weipu-location'));
+assert(page.includes('{showcase&&!weipu&&'));
+assert(page.includes('{weipu&&<div className="hhba-v2-weipu-detail-links"'));
+assert(css.includes('.hhba-v2-weipu .hhba-v2-company-role details summary'));
+assert(css.includes('.hhba-v2-qizheng-role-actions a{'));
+assert(p.jobs.every(j=>j.summary.length>=50),'WEIPU roles need detailed, individual explanations');
