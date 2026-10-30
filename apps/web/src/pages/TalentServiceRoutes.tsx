@@ -67,6 +67,7 @@ function PolicyTile({data}:{data:TalentPolicyRecord}){
   <h3>{data.title}</h3><p>{data.summary}</p>
   {data.targetGroup&&<p className="ts-policy-audience"><b>适用人群：</b>{data.targetGroup}</p>}
   <div className="ts-sub-tile-benefit">{data.benefit}</div>
+  {data.payoutTo&&data.payoutTo!=='个人'&&<p className="ts-sub-payout-hint">扶持性质：{data.payoutTo==='用人单位'?'单位补助':data.payoutTo==='非现金贷款'?'需偿还贷款':data.payoutTo==='住房折扣'?'房款折扣':data.payoutTo}</p>}
   <footer><small>{data.department} · {data.published}</small><ArrowUpRight size={18}/></footer>
  </Link>;
 }
@@ -184,6 +185,9 @@ function DetailPage({kind,id}:{kind:'policy'|'housing';id:string}){
       <section><h2>申请条件</h2><p>{p.eligibility}</p></section>
       {p.deadline&&<section><h2>公告申报截止日期</h2><p className="ts-sub-emphasis">{p.deadline}{p.deadline<new Date().toISOString().slice(0,10)?' · 已截止，请查后续新批次':' · 请再次核对政府官网'}</p></section>}
       <section><h2>办理流程与入口</h2><p>{p.application}</p></section>
+      {p.applicationSteps&&p.applicationSteps.length>0&&<section className="ts-sub-detailed-guidance"><h2>具体办理步骤</h2><ol>{p.applicationSteps.map((step,i)=><li key={i}>{step}</li>)}</ol></section>}
+      {p.materials&&p.materials.length>0&&<section className="ts-sub-detailed-guidance"><h2>建议准备的申请材料</h2><p className="ts-sub-material-caveat">下列是政策原文与经办要求整理的准备方向，并非官方最终申领清单，以当地受理页面实际要求为准。</p><ul>{p.materials.map((material,i)=><li key={i}>{material}</li>)}</ul></section>}
+      {p.payoutTo&&<section><h2>补贴发放或扶持对象</h2><p>{p.payoutTo==='用人单位'?'政策资金由符合条件的用人单位申报和享受，毕业生个人不应误认为自动到账。':p.payoutTo==='非现金贷款'?'本项是需要偿还的贷款融资，不是财政一次性现金补贴。':p.payoutTo==='住房折扣'?'属于指定项目购房折扣或抵扣，不属于可自由领取的现金。':'主要面向经资格核验的个人；须核查是否通过用人单位申报。'}</p></section>}
       {p.reviewNote&&<aside className="ts-sub-policy-note"><ShieldCheck size={15}/><p>{p.reviewNote}</p></aside>}
       <section><h2>政府发布部门与文件</h2><p>{p.department} · {p.sourceName} · {p.published}</p></section>
     </>:h?<><section><h2>项目地址</h2><p>{h.address}</p></section>
