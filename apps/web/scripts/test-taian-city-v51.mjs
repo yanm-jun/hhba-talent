@@ -25,7 +25,7 @@ check('Money recipients, current law and noncash mortgage are distinguished',()=
  assert.equal(p('ta-2026-rent-relief').headlineAmount,'≥¥300');
 });
 check('Housing is accurately labelled as a policy program, not a current apartment listing',()=>{
- for(const id of homes){const rows=TALENT_HOUSING_RECORDS.filter(h=>h.id===id);assert.equal(rows.length,1);const h=rows[0];assert.equal(h.city,'泰安');assert.equal(h.kind,'program');assert.equal(talentSourceKind(h.sourceUrl),'government');assert.ok(h.steps.length>=4);assert.match(h.statusNote,/不代表|非实时|没有/);assert.match(h.statusNote,/申报入口未公开/);assert.ok(!h.applyUrl);assert.equal(assessHousing(h,'2026-10-30').grade,'B');}
+ for(const id of homes){const rows=TALENT_HOUSING_RECORDS.filter(h=>h.id===id);assert.equal(rows.length,1);const h=rows[0];assert.equal(h.city,'泰安');assert.equal(h.kind,'program');assert.equal(talentSourceKind(h.sourceUrl),'government');assert.ok(h.steps.length>=4);assert.match(h.statusNote,/不代表|非实时|没有|尚无[^。]*实时空房/);assert.match(h.statusNote,/申报入口未公开/);assert.ok(!h.applyUrl);assert.equal(assessHousing(h,'2026-10-30').grade,'B');}
 });
 check('Three B-grade guides use the shared V5.1 renderer, with official sources and applicant branches',()=>{
  for(const guide of [taianLivingGuide,taianPurchaseGuide,taianHousingGuide]){
