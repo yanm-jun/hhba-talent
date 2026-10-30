@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-024",
+  "name": "菲婷丝",
+  "englishName": "FineToday",
+  "aliases": [
+    "菲婷丝中国",
+    "FineToday菲婷丝",
+    "FineToday",
+    "Fine Today",
+    "FineToday China",
+    "上海菲婷丝",
+    "上海菲婷丝化妆品经营有限公司",
+    "Shanghai FTS Cosmetics",
+    "finetoday集团",
+    "菲婷丝招聘",
+    "fino芬浓",
+    "可悠然",
+    "珊珂",
+    "菲婷丝2027校招",
+    "FineToday Campus",
+    "FineToday菲婷丝2027届校园招聘"
+  ],
+  "industry": "个人护理用品 · 化妆品 · 洗护产品 · 品牌营销 · 品质管理",
+  "subtitle": "上海菲婷丝化妆品经营有限公司 · 上海静安区 · FineToday集团中国子公司",
+  "overview": "上海菲婷丝化妆品经营有限公司是FineToday集团在中国的个人护理业务主体，成立于2021年，总部办公地址为上海市静安区南京西路1168号中信泰富广场1201—1206。FineToday的业务承接自原资生堂个人护理板块，在中国经营fino芬浓、KUYURA可悠然、SUPER MiLD惠润、AQUAIR水之密语、SENKA珊珂、TSUBAKI丝蓓绮、uno吾诺等品牌，围绕头发护理、皮肤清洁、身体洗护与男性护理开展产品运营、品牌传播、市场渠道和品质管理。招聘主体应为中国区公司，不能与日本母公司或台湾子公司混同。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://www.finetoday.cn/company.html",
+    "https://www.finetoday.cn/brand/",
+    "https://www.finetoday.cn/brand/fino.html",
+    "https://www.finetoday.cn/news.html",
+    "https://www.finetoday.cn/recruit.html",
+    "https://www.finetoday.cn/recruit/graduates_detailed01.html",
+    "https://www.finetoday.cn/recruit/graduates_detailed02.html",
+    "https://www.finetoday.com/jp/company/",
+    "https://www.finetoday.com/en/sustainability/community-contribution-activities/",
+    "https://www.mrjjxw.com/articles/2024-07-04/3453870.html",
+    "https://www.shfia.cn/uploads/20260121/429e5c01e92bcc963e8b8dd472786349.pdf"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-024/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-024/photo1.webp",
+        "caption": "FineToday 中国区品牌展示空间",
+        "note": "每日经济新闻2024年7月企业采访中的品牌展示区照片，可见FineToday蓝色Logo与旗下洗护产品。是产品展示场景，不是集团总部大楼；摄影版权归原发布方。",
+        "alt": "白墙上蓝色FineToday品牌标识和前方陈列fino等产品的展示台"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-024/photo2.webp",
+        "caption": "FineToday 中国区公益活动现场",
+        "note": "FineToday集团官方可持续发展页面展示的中国区美好守护计划活动实景；为历史活动照片，不代表现时办公环境。摄影版权归原权利人。",
+        "alt": "FineToday美好守护计划活动背景板前的志愿参与者合影"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.finetoday.cn/recruit.html",
+    "label": "菲婷丝中国官网招聘入口",
+    "status": "official_portal",
+    "subject": "上海菲婷丝化妆品经营有限公司",
+    "note": "已找到官网两个明确标注2027届应届毕业生的独立岗位页面：市场培训生、品证培训生。岗位原始链接优先于一般企业主页。官网页可能更新，最新投递开放状态及截止日期请以企业官方申请渠道为准；本站未做实时席位确认。 如不同招聘平台显示的截止日期互相矛盾，以菲婷丝官网岗位页或官方申请页面为准。"
+  },
+  "majorIntro": "收录菲婷丝中国官网明确发布的2条2027届应届培训生岗位；下方专业标签按官网优先专业与HHBA编辑相关专业分别关联，且不等于录用资格。两个岗位均要求本科及以上；外语、院校背景与具体条件以官网原文为准。",
+  "preferredMajors": [
+    "市场营销",
+    "新闻学",
+    "传播学",
+    "社会学",
+    "广告学",
+    "化学",
+    "应用化学",
+    "生物技术",
+    "生物工程",
+    "药学",
+    "食品科学与工程",
+    "化妆品技术与工程",
+    "质量管理工程"
+  ],
+  "photoNote": "首页与公司页面使用FineToday集团官方网页品牌图的本地副本；两张独立照片分别来自2024年新闻采访及集团官方中国区公益活动页面，不伪装成当前办公楼，也不点击跳转第三方。品牌、照片版权归原权利人，HHBA展示不表示与企业建立合作。",
+  "business": [
+    {
+      "title": "护发与头皮护理",
+      "description": "经营fino芬浓、丝蓓绮、水之密语等洗护品牌，覆盖发膜、洗发、护发与相关产品。",
+      "tags": "fino · TSUBAKI · AQUAIR",
+      "details": [
+        "洗发和护发产品运营",
+        "发膜与精华类产品",
+        "新品组合与品牌管理"
+      ]
+    },
+    {
+      "title": "洁面与皮肤护理",
+      "description": "以SENKA珊珂等品牌为核心提供洁面及皮肤护理产品。",
+      "tags": "SENKA · 洁面 · 护肤",
+      "details": [
+        "洁面与清洁护理",
+        "肌肤护理产品上市",
+        "消费者沟通和渠道运营"
+      ]
+    },
+    {
+      "title": "沐浴及身体护理",
+      "description": "围绕KUYURA可悠然、SUPER MiLD惠润等品牌开展沐浴、身体清洁与舒适洗护产品经营。",
+      "tags": "KUYURA · SUPER MiLD",
+      "details": [
+        "身体洗护产品",
+        "分系列产品上市",
+        "品牌传播与消费者体验"
+      ]
+    },
+    {
+      "title": "男士个人护理",
+      "description": "运营uno吾诺等男性个人护理品牌，服务洁面、护肤和造型用品消费需求。",
+      "tags": "uno · 男士洁面 · 造型",
+      "details": [
+        "男士个人清洁",
+        "男士护肤与造型",
+        "男性消费者产品营销"
+      ]
+    },
+    {
+      "title": "质量保证与产品合规",
+      "description": "开展品质管理体系、产品验证、风险监控及相关数据改善。",
+      "tags": "品证 · 质量监控 · 合规",
+      "details": [
+        "新产品导入与验证",
+        "品质监测和问题改善",
+        "产品安全及风险管理"
+      ]
+    },
+    {
+      "title": "市场营销与渠道运营",
+      "description": "开展品牌年度营销计划、社交媒体、电商和销售渠道协作，推动市场数据分析和本地化推广。",
+      "tags": "品牌传播 · 内容电商 · 营销",
+      "details": [
+        "市场活动与品牌传播",
+        "内容电商及渠道运营",
+        "消费者洞察和经营复盘"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "quality-assurance-trainee-2027",
+      "title": "品证培训生（2027届）",
+      "city": "上海市·静安区",
+      "url": "https://www.finetoday.cn/recruit/graduates_detailed01.html",
+      "evidenceUrl": "https://www.finetoday.cn/recruit/graduates_detailed01.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海菲婷丝化妆品经营有限公司",
+      "summary": "企业官方2027届招聘页披露：参与品质管理体系建设和日常运营、新品导入与验证、品质监测及风险管理，通过质量数据分析和跨部门协作持续改善产品质量；可能出差。",
+      "requirements": "2027届应届毕业生，本科及以上；化妆品、化学、生物、医学、药学、食品等相关专业优先；日语或英语读写能力，口语流利加分；具备合规意识、沟通协作、分析与执行能力。高校层次及其他条件以企业原始岗位页面为准。",
+      "majorNames": [
+        "化学",
+        "应用化学",
+        "生物科学",
+        "生物技术",
+        "生物工程",
+        "药学",
+        "食品科学与工程",
+        "化妆品技术与工程",
+        "临床医学"
+      ],
+      "editorialRelatedMajors": [
+        "化学工程与工艺",
+        "质量管理工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届应届 · 本科及以上（企业官网）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "marketing-trainee-2027",
+      "title": "市场培训生（2027届）",
+      "city": "上海市·静安区",
+      "url": "https://www.finetoday.cn/recruit/graduates_detailed02.html",
+      "evidenceUrl": "https://www.finetoday.cn/recruit/graduates_detailed02.html",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海菲婷丝化妆品经营有限公司",
+      "summary": "企业官方2027届招聘页披露：参与品牌年度计划、品牌传播、社交媒体与内容电商运营，跟进新品上市与线下渠道推广，并分析市场数据、编制报告和经营复盘。",
+      "requirements": "2027届应届毕业生，本科及以上；市场营销、新闻传播、社会学、公关等相关专业优先；日语或英语听说读写流利、可作为工作语言，具备商业洞察、逻辑思考、数据分析与沟通协作能力。具体录用条件以企业官网为准。",
+      "majorNames": [
+        "市场营销",
+        "新闻学",
+        "传播学",
+        "网络与新媒体",
+        "社会学",
+        "公共关系学"
+      ],
+      "editorialRelatedMajors": [
+        "广告学",
+        "国际经济与贸易",
+        "电子商务"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届应届 · 本科及以上（企业官网）",
+      "currentOpenVerified": false
+    }
+  ],
+  "mediaSources": {
+    "logo": "https://www.finetoday.com/jp/cmn/images/ogp_1200_630.png",
+    "photo1": "https://image.nbd.com.cn/uploads/articles/images/1596693/_____20240704190204.jpg",
+    "photo2": "https://www.finetoday.com/jp/uploadimages/SUS-cca_img4_JP.jpg"
+  }
+}

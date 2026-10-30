@@ -1,0 +1,425 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-016",
+  "name": "中国通服广西公司",
+  "englishName": "China Comservice Guangxi",
+  "aliases": [
+    "中国通信服务广西公司",
+    "广西通服",
+    "广西壮族自治区通信产业服务有限公司",
+    "广西通信产业服务",
+    "China Comservice Guangxi",
+    "China Comservice",
+    "中国通服"
+  ],
+  "industry": "数字基础设施 · ICT系统集成 · 网络安全 · 通信工程 · 软件开发",
+  "subtitle": "广西壮族自治区通信产业服务有限公司 · 中国通信服务股份有限公司省级全资子公司",
+  "overview": "广西壮族自治区通信产业服务有限公司（中国通服广西公司）于2007年成立，是中国通信服务股份有限公司在广西设立的省级全资子公司。业务覆盖通信网络规划设计、工程建设、网络维护、ICT集成、软件开发及数字化运营，业务遍及广西各地市。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://www.chinaccs.com.hk/tc/media/logo.php",
+    "https://www.chinaccs.com.hk/tc/media/photo.php",
+    "https://www.guet.edu.cn/bh_jy/2025/1028/c4024a144310/page.htm",
+    "https://www.wondercv.com/xiaozhao/china-tower-guangxi-2027-campus-19979-4ab84a/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-016/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-016/photo1.webp",
+        "caption": "中国通服电信基础设施业务",
+        "note": "中国通信服务集团官方网站图库 · 非广西公司单独项目",
+        "alt": "中国通信服务集团官方媒体图库中的电信基础设施服务业务展示"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-016/photo2.webp",
+        "caption": "中国通服数字化服务业务",
+        "note": "中国通信服务集团官方网站图库 · 非广西公司办公环境",
+        "alt": "中国通信服务集团官方媒体图库的数字化或应用服务业务展示"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://wejob.chinatelecom.com.cn/wt/TELE/web/index?brandCode=1",
+    "label": "中国电信集团招聘平台（核对招聘主体）",
+    "status": "official_portal",
+    "subject": "广西壮族自治区通信产业服务有限公司",
+    "note": "2027届招聘信息提及通过中国电信招聘入口投递，但本链接为集团招聘总入口而非广西通服独立职位页。需自行核对是否有广西通服岗位以及投递状态。"
+  },
+  "majorIntro": "2027届广西通服招聘资料列出12个岗位方向；目前仅有第三方汇总信息，尚未取得12个职位在企业招聘系统中的独立链接。以下是信息可追溯的招聘类别，不承诺它们全部正在开放。专业关联为编辑辅助匹配，逐岗资格请以官方系统为准。",
+  "preferredMajors": [
+    "通信工程",
+    "计算机科学与技术",
+    "软件工程",
+    "人工智能",
+    "网络工程",
+    "信息安全",
+    "电子信息工程",
+    "电气工程及其自动化",
+    "市场营销",
+    "工商管理",
+    "法学",
+    "工程管理"
+  ],
+  "photoNote": "Logo 使用中国通信服务股份有限公司官方品牌标志；两张照片由母公司官方媒体图库提供，并非广西公司办公楼或员工实拍。本页是广西省级子公司，不能与中国电信广西公司、中国移动广西公司混同。三张素材均为本站独立文件且不设置第三方图片跳转。",
+  "business": [
+    {
+      "title": "通信网络规划与咨询",
+      "description": "为通信运营商和行业客户提供网络规划、设计、勘察咨询与技术论证等服务。",
+      "tags": "通信规划 · 数字咨询",
+      "details": [
+        "通信网络规划设计",
+        "工程咨询与技术论证",
+        "数字化方案规划"
+      ]
+    },
+    {
+      "title": "数字基础设施工程",
+      "description": "承担通信设施及数字化基础设施建设、工程施工和相关交付管理。",
+      "tags": "通信建设 · 工程交付",
+      "details": [
+        "通信基建工程",
+        "弱电智能化项目",
+        "项目建设及施工管理"
+      ]
+    },
+    {
+      "title": "网络维护与运营支撑",
+      "description": "提供通信网络维护、网络运维及信息技术基础设施运营保障服务。",
+      "tags": "网络运维 · 技术支撑",
+      "details": [
+        "网络维护保障",
+        "信息系统运维",
+        "现场与远程技术支撑"
+      ]
+    },
+    {
+      "title": "ICT集成和软件开发",
+      "description": "开展信息系统集成、行业数字化解决方案、软件及平台开发交付。",
+      "tags": "ICT · 软件 · 云平台",
+      "details": [
+        "系统集成与交付",
+        "企业应用软件开发",
+        "数字化业务服务"
+      ]
+    },
+    {
+      "title": "数字安全与智慧行业",
+      "description": "服务智慧城市、智慧园区、智慧安防和智慧交通等场景。",
+      "tags": "网络安全 · 智慧城市",
+      "details": [
+        "网络与信息安全",
+        "智慧城市与园区",
+        "智慧安防及交通"
+      ]
+    },
+    {
+      "title": "通信服务与培训运营",
+      "description": "提供招标代理、产业培训、物业管理及部分业务流程外包等配套服务。",
+      "tags": "招投标 · 培训 · 物业",
+      "details": [
+        "项目招投标及代理",
+        "通信技术培训",
+        "物业和设施运营"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "planning-consulting-2027",
+      "title": "规划咨询",
+      "city": "广西区内多地（具体以职位为准）",
+      "url": "https://wejob.chinatelecom.com.cn/wt/TELE/web/index?brandCode=1",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/china-tower-guangxi-2027-campus-19979-4ab84a/",
+      "observedOn": "2026-10-29",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广西壮族自治区通信产业服务有限公司",
+      "summary": "面向通信网络建设与数字化项目的规划咨询方向；具体服务项目、职责以及工作城市以正式岗位为准。",
+      "requirements": "2027届及符合公告条件的2026届未就业毕业生；公开汇总未逐岗披露学历、精确城市及完整专业要求，须在招聘平台按用人主体和正式职位核实。",
+      "majorNames": [
+        "通信工程",
+        "电子信息工程",
+        "信息工程",
+        "工程管理"
+      ],
+      "editorialRelatedMajors": [
+        "管理科学与工程",
+        "网络工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科或研究生；逐岗条件待核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ai-bigdata-rd-2027",
+      "title": "AI大数据研发",
+      "city": "广西区内多地（具体以职位为准）",
+      "url": "https://wejob.chinatelecom.com.cn/wt/TELE/web/index?brandCode=1",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/china-tower-guangxi-2027-campus-19979-4ab84a/",
+      "observedOn": "2026-10-29",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广西壮族自治区通信产业服务有限公司",
+      "summary": "围绕人工智能和大数据技术应用的研发招聘方向；未公开独立岗位技术栈及实时岗位链接。",
+      "requirements": "2027届及符合公告条件的2026届未就业毕业生；公开汇总未逐岗披露学历、精确城市及完整专业要求，须在招聘平台按用人主体和正式职位核实。",
+      "majorNames": [
+        "人工智能",
+        "计算机科学与技术",
+        "软件工程",
+        "数据科学与大数据技术"
+      ],
+      "editorialRelatedMajors": [
+        "数学与应用数学",
+        "统计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科或研究生；逐岗条件待核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ai-agent-application-2027",
+      "title": "AI智能体应用开发",
+      "city": "广西区内多地（具体以职位为准）",
+      "url": "https://wejob.chinatelecom.com.cn/wt/TELE/web/index?brandCode=1",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/china-tower-guangxi-2027-campus-19979-4ab84a/",
+      "observedOn": "2026-10-29",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广西壮族自治区通信产业服务有限公司",
+      "summary": "AI智能体和企业数字化应用开发方向；具体需求、开发框架和录用条件请以官方职位为准。",
+      "requirements": "2027届及符合公告条件的2026届未就业毕业生；公开汇总未逐岗披露学历、精确城市及完整专业要求，须在招聘平台按用人主体和正式职位核实。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能"
+      ],
+      "editorialRelatedMajors": [
+        "数据科学与大数据技术",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科或研究生；逐岗条件待核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "network-security-2027",
+      "title": "网络安全管理",
+      "city": "广西区内多地（具体以职位为准）",
+      "url": "https://wejob.chinatelecom.com.cn/wt/TELE/web/index?brandCode=1",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/china-tower-guangxi-2027-campus-19979-4ab84a/",
+      "observedOn": "2026-10-29",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广西壮族自治区通信产业服务有限公司",
+      "summary": "围绕客户系统与通信网络的信息安全管理及保障方向，专业标签为相关性编辑关联。",
+      "requirements": "2027届及符合公告条件的2026届未就业毕业生；公开汇总未逐岗披露学历、精确城市及完整专业要求，须在招聘平台按用人主体和正式职位核实。",
+      "majorNames": [
+        "信息安全",
+        "网络空间安全",
+        "网络工程",
+        "计算机科学与技术"
+      ],
+      "editorialRelatedMajors": [
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科或研究生；逐岗条件待核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "info-comms-management-2027",
+      "title": "信息与通信管理",
+      "city": "广西区内多地（具体以职位为准）",
+      "url": "https://wejob.chinatelecom.com.cn/wt/TELE/web/index?brandCode=1",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/china-tower-guangxi-2027-campus-19979-4ab84a/",
+      "observedOn": "2026-10-29",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广西壮族自治区通信产业服务有限公司",
+      "summary": "通信信息化建设、系统及业务管理方向；职位具体岗位职责以官网发布为准。",
+      "requirements": "2027届及符合公告条件的2026届未就业毕业生；公开汇总未逐岗披露学历、精确城市及完整专业要求，须在招聘平台按用人主体和正式职位核实。",
+      "majorNames": [
+        "通信工程",
+        "信息工程",
+        "电子信息工程",
+        "网络工程"
+      ],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科或研究生；逐岗条件待核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "customer-marketing-2027",
+      "title": "客户营销",
+      "city": "广西区内多地（具体以职位为准）",
+      "url": "https://wejob.chinatelecom.com.cn/wt/TELE/web/index?brandCode=1",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/china-tower-guangxi-2027-campus-19979-4ab84a/",
+      "observedOn": "2026-10-29",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广西壮族自治区通信产业服务有限公司",
+      "summary": "面向行业客户及通信信息化解决方案的营销服务招聘方向，薪资与岗位地点待官方核对。",
+      "requirements": "2027届及符合公告条件的2026届未就业毕业生；公开汇总未逐岗披露学历、精确城市及完整专业要求，须在招聘平台按用人主体和正式职位核实。",
+      "majorNames": [
+        "市场营销",
+        "工商管理"
+      ],
+      "editorialRelatedMajors": [
+        "电子商务",
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科或研究生；逐岗条件待核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "customer-support-2027",
+      "title": "客户支撑",
+      "city": "广西区内多地（具体以职位为准）",
+      "url": "https://wejob.chinatelecom.com.cn/wt/TELE/web/index?brandCode=1",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/china-tower-guangxi-2027-campus-19979-4ab84a/",
+      "observedOn": "2026-10-29",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广西壮族自治区通信产业服务有限公司",
+      "summary": "围绕客户通信服务、业务服务和信息化项目的支撑方向，实际所属单位以官网为准。",
+      "requirements": "2027届及符合公告条件的2026届未就业毕业生；公开汇总未逐岗披露学历、精确城市及完整专业要求，须在招聘平台按用人主体和正式职位核实。",
+      "majorNames": [
+        "通信工程",
+        "计算机科学与技术",
+        "电子信息工程"
+      ],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "信息管理与信息系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科或研究生；逐岗条件待核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "training-project-management-2027",
+      "title": "培训项目管理",
+      "city": "广西区内多地（具体以职位为准）",
+      "url": "https://wejob.chinatelecom.com.cn/wt/TELE/web/index?brandCode=1",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/china-tower-guangxi-2027-campus-19979-4ab84a/",
+      "observedOn": "2026-10-29",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广西壮族自治区通信产业服务有限公司",
+      "summary": "面向科技培训和项目组织协调方向，属2027招聘信息提及的岗位类别。",
+      "requirements": "2027届及符合公告条件的2026届未就业毕业生；公开汇总未逐岗披露学历、精确城市及完整专业要求，须在招聘平台按用人主体和正式职位核实。",
+      "majorNames": [
+        "教育技术学",
+        "工商管理",
+        "人力资源管理"
+      ],
+      "editorialRelatedMajors": [
+        "信息管理与信息系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科或研究生；逐岗条件待核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "solution-management-2027",
+      "title": "解决方案管理",
+      "city": "广西区内多地（具体以职位为准）",
+      "url": "https://wejob.chinatelecom.com.cn/wt/TELE/web/index?brandCode=1",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/china-tower-guangxi-2027-campus-19979-4ab84a/",
+      "observedOn": "2026-10-29",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广西壮族自治区通信产业服务有限公司",
+      "summary": "行业客户ICT及数字化项目的解决方案管理方向，具体技术要求尚未逐岗公开。",
+      "requirements": "2027届及符合公告条件的2026届未就业毕业生；公开汇总未逐岗披露学历、精确城市及完整专业要求，须在招聘平台按用人主体和正式职位核实。",
+      "majorNames": [
+        "计算机科学与技术",
+        "通信工程",
+        "电子信息工程"
+      ],
+      "editorialRelatedMajors": [
+        "信息管理与信息系统",
+        "人工智能",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科或研究生；逐岗条件待核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "corporate-legal-2027",
+      "title": "公司法务",
+      "city": "广西区内多地（具体以职位为准）",
+      "url": "https://wejob.chinatelecom.com.cn/wt/TELE/web/index?brandCode=1",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/china-tower-guangxi-2027-campus-19979-4ab84a/",
+      "observedOn": "2026-10-29",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广西壮族自治区通信产业服务有限公司",
+      "summary": "企业法律事务与合同合规方向，正式录用及学历要求以公司校招公告为准。",
+      "requirements": "2027届及符合公告条件的2026届未就业毕业生；公开汇总未逐岗披露学历、精确城市及完整专业要求，须在招聘平台按用人主体和正式职位核实。",
+      "majorNames": [
+        "法学"
+      ],
+      "editorialRelatedMajors": [
+        "知识产权"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科或研究生；逐岗条件待核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "bidding-management-2027",
+      "title": "招投标管理",
+      "city": "广西区内多地（具体以职位为准）",
+      "url": "https://wejob.chinatelecom.com.cn/wt/TELE/web/index?brandCode=1",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/china-tower-guangxi-2027-campus-19979-4ab84a/",
+      "observedOn": "2026-10-29",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广西壮族自治区通信产业服务有限公司",
+      "summary": "通信信息化工程项目招投标及商务流程支持方向，专业关联不是限制性报名要求。",
+      "requirements": "2027届及符合公告条件的2026届未就业毕业生；公开汇总未逐岗披露学历、精确城市及完整专业要求，须在招聘平台按用人主体和正式职位核实。",
+      "majorNames": [
+        "工程管理",
+        "工程造价",
+        "工商管理"
+      ],
+      "editorialRelatedMajors": [
+        "法学",
+        "市场营销",
+        "管理科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科或研究生；逐岗条件待核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "property-management-2027",
+      "title": "物业管理",
+      "city": "广西区内多地（具体以职位为准）",
+      "url": "https://wejob.chinatelecom.com.cn/wt/TELE/web/index?brandCode=1",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/china-tower-guangxi-2027-campus-19979-4ab84a/",
+      "observedOn": "2026-10-29",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广西壮族自治区通信产业服务有限公司",
+      "summary": "中国通服广西公司物业业务服务管理方向，具体任职资格和工作地点请向岗位发布主体核对。",
+      "requirements": "2027届及符合公告条件的2026届未就业毕业生；公开汇总未逐岗披露学历、精确城市及完整专业要求，须在招聘平台按用人主体和正式职位核实。",
+      "majorNames": [
+        "物业管理",
+        "工商管理"
+      ],
+      "editorialRelatedMajors": [
+        "工程管理",
+        "土木工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科或研究生；逐岗条件待核对",
+      "currentOpenVerified": false
+    }
+  ],
+  "mediaSources": {
+    "logo": "https://www.chinaccs.com.hk/tc/images/media/logo.png",
+    "photos": [
+      "https://www.chinaccs.com.hk/en/images/media/tis/photo_img1_s.jpg",
+      "https://www.chinaccs.com.hk/en/images/media/acos/photo_img7_s.jpg"
+    ],
+    "rolesSource": "https://www.wondercv.com/xiaozhao/china-tower-guangxi-2027-campus-19979-4ab84a/",
+    "sourceLevel": "2027岗位类别来自第三方汇总；2026年学校就业公告独立证明主体与经营范围"
+  }
+}
