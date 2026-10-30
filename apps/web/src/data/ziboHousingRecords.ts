@@ -45,7 +45,7 @@ export const ZIBO_HOUSING_RECORDS:TalentHousingRecord[]=[
   "sourceUrl": "https://js.zibo.gov.cn/gongkai/channel_c_5f9fa491ab327f36e4c1305d_n_1605682452.3014/doc_6a33581397765960288b9391.html",
   "contactPhone": "0533-5281761",
   "contactSourceUrl": "https://js.zibo.gov.cn/gongkai/channel_c_5f9fa491ab327f36e4c1305d_n_1605682452.3014/doc_6a33581397765960288b9391.html",
-  "statusNote": "2026年7月3日申报已截止；8套属于当时公告房源，具体后续房源需核实。不提供虚假在线申请入口；新批次申报渠道未公布，关注淄川区住建局。",
+  "statusNote": "2026年7月3日申报已截止；8套属于当时公告房源，不等于当前空房数量；具体后续房源需核实。不提供虚假在线申请入口；新批次申报渠道未公布，关注淄川区住建局。",
   "steps": [
    "核对2026年6月18日淄川区住建局公告、本人首次合同与养老保险日期、家庭住房情况，明确原批次截止",
    "由本人向单位提出申请，准备申请表、家庭身份证明、毕业学历学位与合同、单身或婚姻资料和诚信授权查询书",
