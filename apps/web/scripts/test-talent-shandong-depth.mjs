@@ -18,5 +18,12 @@ check('Old cohorts, regional limits, employer payments and loans remain explicit
  assert.equal(all.find(x=>x.id==='rz-rent-buy-26')?.payoutTo,'住房折扣');
  assert.equal(all.find(x=>x.id==='sd-lc-insurance-2026')?.deadline,'2026-12-31');
 });
-check('No city subsidy may be marked auto-approved',()=>{for(const r of extended)assert.ok(!/已通过审核|保证可领|实时开放|当前有房源/.test(r.summary+r.reviewNote),r.id)});
+check('No city subsidy may be marked auto-approved',()=>{
+ for(const r of extended){
+  const text=(r.summary+r.reviewNote).replace(
+   /(?:不代表|不等于|并非|不意味着|不能证明|未证实|不能据此认定)[^。；\\n]{0,35}(?:当前有房源|实时开放)/g,''
+  );
+  assert.ok(!/已通过审核|保证可领|实时开放|当前有房源/.test(text),r.id);
+ }
+});
 console.log(JSON.stringify({passed,shandongPolicies:all.length,extended:extended.length,cities:cities.length},null,2));
