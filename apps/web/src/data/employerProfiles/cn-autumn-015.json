@@ -1,0 +1,319 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-015",
+  "name": "中国煤炭科工",
+  "englishName": "China Coal Technology & Engineering Group",
+  "aliases": [
+    "中国煤科",
+    "中国煤炭科工集团",
+    "中国煤炭科工集团有限公司",
+    "CCTEG",
+    "煤炭科工"
+  ],
+  "industry": "煤炭科技 · 智能矿山 · 装备制造 · 绿色开采 · 安全工程",
+  "subtitle": "中国煤炭科工集团有限公司 · 国资委监管中央企业 · 智慧矿山与安全绿色开采",
+  "overview": "中国煤炭科工集团有限公司（中国煤科/CCTEG）是国务院国资委监管的中央企业，专注煤炭行业科技创新，业务包括智能煤机装备、安全技术、清洁能源、矿业设计建设等。不是中国中煤能源集团。展示的2027届职位来自其下属上海公司，不能误称为集团总部独立在招岗位。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://www.ccteg.cn/",
+    "https://cg.ccteg.cn/cms/channel/gsjj/index.htm",
+    "https://www.hwlxsjob.com/news/news-show.php?id=8381",
+    "https://www.gaoxiaojob.com/announcement/detail/431526.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-015/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-015/photo1.webp",
+        "caption": "天玛智控智能化装备展示",
+        "note": "新浪财经 2023 年现场报道 · 中国煤科所属天玛智控顺义创新基地",
+        "alt": "天玛智控顺义创新基地智能采煤装备展示场景"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-015/photo2.webp",
+        "caption": "天玛智控采煤装备成套展示",
+        "note": "新浪财经 2024 年产品报道 · 中国煤科所属天玛智控研发装备",
+        "alt": "天玛智控高端智能采煤装备及液压支护设备展示"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://cctegjob.iguopin.com/campus",
+    "label": "中国煤科官方校园招聘平台",
+    "status": "official_portal",
+    "subject": "中煤科工集团上海有限公司（所属企业职位信息）",
+    "note": "官网校园招聘平台经上海公司 2027 届校招公告指向；该公司不同于集团总部，岗位名称有来源但未核实每条当前开放状态。"
+  },
+  "majorIntro": "本页依据中煤科工集团上海有限公司于2026年9月发布的2027届招聘资料，收录8个有明确名称的校招岗位类别。学校专业、职位地点和职责以官网为准；专业标签用于相关性导航，不代表严格的录用资格。各岗位未核实独立实时投递链接或目前在招状态。",
+  "preferredMajors": [
+    "机械设计制造及其自动化",
+    "电气工程及其自动化",
+    "自动化",
+    "计算机科学与技术",
+    "软件工程",
+    "电子信息工程",
+    "测控技术与仪器",
+    "机械电子工程"
+  ],
+  "photoNote": "品牌 Logo 根据国聘公开企业档案（中国煤科/CCTEG）保存；两张图片来自媒体报道的天玛智控装备展示，天玛智控属于中国煤科体系，图片均为本站独立副本，点击不外跳。8类职位来源为中煤科工集团上海有限公司2027届校招简章，不代表集团总部或其他下属企业在招。",
+  "business": [
+    {
+      "title": "智能矿山与开采技术",
+      "description": "开展煤炭安全高效开采技术、智能工作面与矿山综合技术研发。",
+      "tags": "智能矿山 · 采煤技术",
+      "details": [
+        "矿山智能化系统",
+        "安全高效开采技术",
+        "示范工程与应用"
+      ]
+    },
+    {
+      "title": "煤机智能制造",
+      "description": "研发和制造煤矿采掘、运输、支护及机电成套装备。",
+      "tags": "采煤装备 · 智能制造",
+      "details": [
+        "智能掘进采煤设备",
+        "机电和液压成套装备",
+        "设备工艺与可靠性"
+      ]
+    },
+    {
+      "title": "矿山安全技术装备",
+      "description": "支持矿井安全检测、风险防控、监控及安全工程相关技术。",
+      "tags": "安全监测 · 风险防控",
+      "details": [
+        "安全监测技术",
+        "矿井灾害防控",
+        "矿用产品检测和认证"
+      ]
+    },
+    {
+      "title": "清洁能源与低碳利用",
+      "description": "研究煤炭清洁高效利用、节能降碳及多能互补等技术。",
+      "tags": "清洁煤利用 · 节能降碳",
+      "details": [
+        "清洁能源综合服务",
+        "煤化工节能技术",
+        "资源利用与减排"
+      ]
+    },
+    {
+      "title": "矿业设计与工程建设",
+      "description": "开展矿山相关工程咨询、勘察设计、项目建设及技术服务。",
+      "tags": "工程设计 · 项目建设",
+      "details": [
+        "矿井设计咨询",
+        "建设工程服务",
+        "智能矿山系统工程"
+      ]
+    },
+    {
+      "title": "科研创新与技术服务",
+      "description": "建设和运营研究平台，为行业提供标准、科研、检测及成果转化服务。",
+      "tags": "科研院所 · 标准检测",
+      "details": [
+        "基础研究与成果转化",
+        "科技创新平台",
+        "试验检测与行业服务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "mechanical-engineer",
+      "title": "机械工程师",
+      "city": "上海等地（具体地点以官方岗位为准）",
+      "url": "https://cctegjob.iguopin.com/campus",
+      "evidenceUrl": "https://www.hwlxsjob.com/news/news-show.php?id=8381",
+      "observedOn": "2026-09-11",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中煤科工集团上海有限公司",
+      "summary": "机电装备机械类研发与设计岗位类别；招聘公告仅列岗位名称，具体职责和岗位地点需登录官方招聘系统核实。",
+      "requirements": "2027届招聘简章列出该岗位和机械、电气、电子信息、自动化、计算机等大类专业，未公开逐个岗位的完整学历、城市及任职门槛；请在中国煤科官方校招平台按所属单位查询。",
+      "majorNames": [
+        "机械设计制造及其自动化",
+        "机械工程",
+        "机械电子工程"
+      ],
+      "editorialRelatedMajors": [
+        "工业设计",
+        "车辆工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "以企业官方岗位要求为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "electrical-engineer",
+      "title": "电气工程师",
+      "city": "上海等地（具体地点以官方岗位为准）",
+      "url": "https://cctegjob.iguopin.com/campus",
+      "evidenceUrl": "https://www.hwlxsjob.com/news/news-show.php?id=8381",
+      "observedOn": "2026-09-11",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中煤科工集团上海有限公司",
+      "summary": "电气技术与电气装备岗位类别；具体岗位说明、考核和城市以官方投递页面为准。",
+      "requirements": "2027届招聘简章列出该岗位和机械、电气、电子信息、自动化、计算机等大类专业，未公开逐个岗位的完整学历、城市及任职门槛；请在中国煤科官方校招平台按所属单位查询。",
+      "majorNames": [
+        "电气工程及其自动化",
+        "电气工程"
+      ],
+      "editorialRelatedMajors": [
+        "自动化",
+        "能源与动力工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "以企业官方岗位要求为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hydraulic-engineer",
+      "title": "液压工程师",
+      "city": "上海等地（具体地点以官方岗位为准）",
+      "url": "https://cctegjob.iguopin.com/campus",
+      "evidenceUrl": "https://www.hwlxsjob.com/news/news-show.php?id=8381",
+      "observedOn": "2026-09-11",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中煤科工集团上海有限公司",
+      "summary": "液压传动及机电装备方向的岗位类别；招聘简章未逐岗列明详细岗位职责。",
+      "requirements": "2027届招聘简章列出该岗位和机械、电气、电子信息、自动化、计算机等大类专业，未公开逐个岗位的完整学历、城市及任职门槛；请在中国煤科官方校招平台按所属单位查询。",
+      "majorNames": [
+        "机械工程",
+        "机械设计制造及其自动化"
+      ],
+      "editorialRelatedMajors": [
+        "机械电子工程",
+        "能源与动力工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "以企业官方岗位要求为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "intelligent-control-rd",
+      "title": "智能控制系统研发工程师",
+      "city": "上海等地（具体地点以官方岗位为准）",
+      "url": "https://cctegjob.iguopin.com/campus",
+      "evidenceUrl": "https://www.hwlxsjob.com/news/news-show.php?id=8381",
+      "observedOn": "2026-09-11",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中煤科工集团上海有限公司",
+      "summary": "智能控制与装备自动化研发相关岗位类别；是否仍在招聘需核实。",
+      "requirements": "2027届招聘简章列出该岗位和机械、电气、电子信息、自动化、计算机等大类专业，未公开逐个岗位的完整学历、城市及任职门槛；请在中国煤科官方校招平台按所属单位查询。",
+      "majorNames": [
+        "自动化",
+        "控制科学与工程",
+        "电气工程及其自动化"
+      ],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "以企业官方岗位要求为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "software-engineer",
+      "title": "软件工程师",
+      "city": "上海等地（具体地点以官方岗位为准）",
+      "url": "https://cctegjob.iguopin.com/campus",
+      "evidenceUrl": "https://www.hwlxsjob.com/news/news-show.php?id=8381",
+      "observedOn": "2026-09-11",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中煤科工集团上海有限公司",
+      "summary": "软件研发类岗位名称来自该公司校招简章，具体编程技术栈及工作内容未逐一披露。",
+      "requirements": "2027届招聘简章列出该岗位和机械、电气、电子信息、自动化、计算机等大类专业，未公开逐个岗位的完整学历、城市及任职门槛；请在中国煤科官方校招平台按所属单位查询。",
+      "majorNames": [
+        "软件工程",
+        "计算机科学与技术"
+      ],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "以企业官方岗位要求为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "inverter-rd",
+      "title": "变频器开发工程师",
+      "city": "上海等地（具体地点以官方岗位为准）",
+      "url": "https://cctegjob.iguopin.com/campus",
+      "evidenceUrl": "https://www.hwlxsjob.com/news/news-show.php?id=8381",
+      "observedOn": "2026-09-11",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中煤科工集团上海有限公司",
+      "summary": "变频器及电力电子开发方向的招聘岗位类别；项目和具体要求以职位详情为准。",
+      "requirements": "2027届招聘简章列出该岗位和机械、电气、电子信息、自动化、计算机等大类专业，未公开逐个岗位的完整学历、城市及任职门槛；请在中国煤科官方校招平台按所属单位查询。",
+      "majorNames": [
+        "电气工程及其自动化",
+        "电子信息工程"
+      ],
+      "editorialRelatedMajors": [
+        "自动化",
+        "电力电子与电力传动"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "以企业官方岗位要求为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "test-engineer",
+      "title": "检测工程师",
+      "city": "上海等地（具体地点以官方岗位为准）",
+      "url": "https://cctegjob.iguopin.com/campus",
+      "evidenceUrl": "https://www.hwlxsjob.com/news/news-show.php?id=8381",
+      "observedOn": "2026-09-11",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中煤科工集团上海有限公司",
+      "summary": "装备产品检测、测试类岗位名称来自招聘简章，检测对象及任职条件以官方页面为准。",
+      "requirements": "2027届招聘简章列出该岗位和机械、电气、电子信息、自动化、计算机等大类专业，未公开逐个岗位的完整学历、城市及任职门槛；请在中国煤科官方校招平台按所属单位查询。",
+      "majorNames": [
+        "测控技术与仪器",
+        "自动化",
+        "电子信息工程"
+      ],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "机械电子工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "以企业官方岗位要求为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "embedded-hardware-rd",
+      "title": "嵌入式硬件研发工程师",
+      "city": "上海等地（具体地点以官方岗位为准）",
+      "url": "https://cctegjob.iguopin.com/campus",
+      "evidenceUrl": "https://www.hwlxsjob.com/news/news-show.php?id=8381",
+      "observedOn": "2026-09-11",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中煤科工集团上海有限公司",
+      "summary": "嵌入式电子硬件研发岗位类别，详细硬件架构和技能条件需查询官方岗位说明。",
+      "requirements": "2027届招聘简章列出该岗位和机械、电气、电子信息、自动化、计算机等大类专业，未公开逐个岗位的完整学历、城市及任职门槛；请在中国煤科官方校招平台按所属单位查询。",
+      "majorNames": [
+        "电子信息工程",
+        "电子科学与技术",
+        "计算机科学与技术"
+      ],
+      "editorialRelatedMajors": [
+        "自动化",
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "以企业官方岗位要求为准",
+      "currentOpenVerified": false
+    }
+  ],
+  "mediaSources": {
+    "logo": "https://iguopin-company.oss-cn-beijing.aliyuncs.com/10685382754151861/logo/20230707/78aa4e5f78d0289f989b05f8e081a149.jpg",
+    "photos": [
+      "https://n.sinaimg.cn/sinakd20231029s/201/w1080h721/20231029/f69f-94ce1816b494a27af6f9b43c47e5669a.jpg",
+      "https://n.sinaimg.cn/spider20241122/126/w1080h646/20241122/2a99-c9c7ba17f2fe007c0391a6645040fa6d.jpg"
+    ],
+    "recruitment": "https://www.hwlxsjob.com/news/news-show.php?id=8381"
+  }
+}

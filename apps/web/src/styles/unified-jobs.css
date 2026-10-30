@@ -1,0 +1,156 @@
+.unified-market{max-width:1120px;margin:58px auto 82px;padding:0 12px;color:var(--ink)}
+.unified-market-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:0 0 24px}
+.unified-market-heading small{color:#587165;font-size:10px;font-weight:800;letter-spacing:.12em}
+.unified-market-heading h2{margin:7px 0;font-size:clamp(24px,3vw,34px);line-height:1.3;letter-spacing:-.8px}
+.unified-market-heading p{color:var(--muted);font-size:13px;line-height:1.7;margin:4px 0}
+.unified-lang{display:flex;flex-shrink:0;border:1px solid var(--line);border-radius:9px;background:#fff;padding:3px;gap:2px}
+.unified-lang button{padding:7px 10px;font-size:12px;color:var(--muted);border:none;border-radius:6px;background:transparent}
+.unified-lang button[aria-pressed=true]{background:#ebf3ef;color:#215e45;font-weight:700}
+.unified-job-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.unified-job-search{flex:2 1 300px;display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);padding:12px;border-radius:10px;color:var(--muted)}
+.unified-job-search input{border:0;outline:0;min-width:0;flex:1;background:transparent;font-size:13px;color:var(--ink)}
+.unified-job-controls select{border:1px solid var(--line);background:#fff;border-radius:9px;min-height:43px;padding:8px 10px;font-size:12px;color:var(--ink)}
+.unified-job-remote{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.unified-job-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+.unified-job-card{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:20px;min-width:0}
+.unified-job-head,.unified-job-meta,.unified-job-actions,.unified-job-footer{display:flex;align-items:center;flex-wrap:wrap;gap:12px;justify-content:space-between}
+.unified-job-head span,.unified-job-meta span,.unified-job-actions a,.unified-job-actions button{display:inline-flex;align-items:center;gap:6px}
+.unified-job-head span{font-size:12px;font-weight:650}
+.unified-company-brand{display:inline-flex;align-items:center;gap:11px;min-width:0}
+.unified-company-brand strong{font-size:13px;font-weight:750;color:var(--ink)}
+.unified-brand-logo{display:inline-flex;flex:0 0 42px;width:42px;height:42px;align-items:center;justify-content:center;
+  border:1px solid #e8eced;border-radius:10px;background:#fff;overflow:hidden}
+.unified-brand-logo img{display:block;width:32px;height:32px;object-fit:contain}
+.unified-brand-logo svg{color:#7b8791}
+.unified-brand-logo-wide{width:82px;flex-basis:82px}
+.unified-brand-logo-wide img{width:74px;height:24px}
+.unified-detail-employer{display:flex;align-items:center;gap:12px}
+.unified-detail-employer small{color:#2d7556;font-size:13px;font-weight:700}
+.unified-job-card:hover{border-color:#c5d5cd;box-shadow:0 5px 18px rgba(31,55,39,.035)}
+
+.unified-job-head small{color:var(--muted);font-size:11px}
+.unified-job-card h3{font-size:16px;line-height:1.45;margin:16px 0 13px;min-height:46px}
+.unified-job-card h3 a{color:var(--ink);text-decoration:none}
+.unified-job-card h3 a:hover{text-decoration:underline}
+.unified-job-meta{justify-content:flex-start;gap:8px 15px;color:var(--muted);font-size:12px}
+.unified-job-meta{margin-bottom:19px}
+.unified-job-proof{display:flex;align-items:center;gap:7px;font-size:11px;color:#5a806c;margin:17px 0}
+.unified-job-actions{border-top:1px solid var(--line);padding-top:12px}
+.unified-job-actions a{font-size:12px;text-decoration:none;color:#315e48;font-weight:650}
+.unified-job-actions a:hover{text-decoration:underline}
+.unified-job-state{padding:30px 20px;display:flex;flex-direction:column;align-items:center;gap:14px;justify-content:center;color:var(--muted);border:1px dashed var(--line);border-radius:10px;margin:15px 0}
+.unified-job-state button,.unified-job-paging button{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--line);border-radius:7px;padding:8px 12px;font-size:12px;color:var(--ink)}
+.unified-job-paging button:disabled{opacity:.4;cursor:not-allowed}
+.unified-job-footer{margin-top:20px;font-size:12px;color:var(--muted)}
+.unified-job-footer a,.unified-job-history a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:#315e48;font-weight:650}
+.unified-job-paging{display:flex;align-items:center;gap:10px}
+.unified-job-history{font-size:12px;color:var(--muted);margin-top:20px}
+.unified-detail{max-width:920px;margin:54px auto 90px}
+.unified-detail-card{border:1px solid var(--line);border-radius:14px;background:#fff;padding:clamp(20px,4vw,38px)}
+.unified-detail-card>small{color:#2d7556;font-size:12px}
+.unified-detail-card h1{font-size:clamp(22px,4vw,34px);margin:10px 0 20px;line-height:1.3}
+.unified-detail-card h2{margin-top:26px;font-size:17px}
+.unified-detail-card p{color:var(--muted);line-height:1.8;font-size:13px}
+.unified-detail-card>p:first-of-type{display:flex;gap:8px;align-items:center}
+.unified-detail-warning{display:flex;gap:10px;align-items:center;color:#476a57;background:#f0f6f2;border-radius:9px;padding:13px;font-size:12px}
+.unified-detail .unified-market-heading>a{color:var(--muted);font-size:13px;text-decoration:none}
+.unified-detail-footnote{margin-top:26px;border-top:1px solid var(--line);padding-top:18px;font-size:12px}
+@media(max-width:720px){.unified-market{margin:35px auto 50px}.unified-market-heading{align-items:flex-start;gap:12px}.unified-job-grid{grid-template-columns:1fr}.unified-job-controls select{flex:1;min-width:120px}.unified-job-footer{align-items:flex-start;gap:12px}.unified-detail{margin:35px auto}.unified-market-heading h2{font-size:24px}}
+
+.unified-jd-content{padding:4px 0 14px}
+.unified-jd-source{font-size:12px!important;color:#517560!important;margin:8px 0 18px!important}
+.unified-jd-section{padding:12px 0 20px;border-top:1px solid var(--line)}
+.unified-jd-section h3{font-size:18px;letter-spacing:-.3px;margin:17px 0}
+.unified-jd-section h4{font-size:14px;margin:19px 0 9px;line-height:1.5;color:var(--ink)}
+.unified-jd-section p{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.9;margin:9px 0;color:#344054}
+.unified-jd-bullet{position:relative;padding-left:18px}
+.unified-jd-bullet:before{content:"•";position:absolute;left:2px;color:#4d8166;font-size:16px}
+.unified-jd-empty,.unified-jd-translate{background:#f4f8f5;border:1px solid #e3ebe5;border-radius:10px;padding:14px 18px;margin:12px 0 22px}
+.unified-jd-translate strong{font-size:14px}
+.unified-jd-translate p,.unified-jd-empty p{margin:9px 0;line-height:1.8;color:#53675d}
+.unified-jd-empty small{font-size:11px;color:var(--muted)}
+.unified-detail-actions{justify-content:flex-start;gap:12px;flex-wrap:wrap;margin:18px 0}
+.unified-detail-actions a{display:inline-flex;border:1px solid #cbded1;border-radius:9px;padding:11px 13px;background:#f4f8f5}
+.unified-detail-actions a:hover{background:#edf5ef}
+
+.unified-job-audit{display:flex;align-items:center;flex-wrap:wrap;gap:7px;background:#f7faf8;border:1px solid #e5eee8;border-radius:8px;padding:10px 12px;color:#496c59!important;font-size:12px!important;line-height:1.5!important}
+.unified-job-audit small{margin-left:auto;font-size:11px;color:#697f72}
+@media(max-width:720px){.unified-job-audit small{margin-left:0}}
+
+
+/* Source-grounded Chinese/English job search controls */
+.unified-job-controls{align-items:stretch;gap:9px}
+.unified-job-controls .unified-job-search{flex:1 1 100%;min-height:45px}
+.unified-job-controls select{flex:1 1 144px;max-width:220px}
+.unified-job-remote{padding:8px 2px;white-space:nowrap}
+.unified-search-interpreted{background:#f7faf8;border:1px solid #e1ece5;border-radius:8px;color:#315b45;padding:9px 12px;margin:12px 0 0;font-size:12px;line-height:1.7}
+@media(max-width:720px){
+ .unified-job-controls .unified-job-search{flex-basis:100%}
+ .unified-job-controls select{flex:1 1 calc(50% - 6px);max-width:none;min-width:0}
+ .unified-job-remote{flex:1 1 100%}
+}
+
+.unified-search-fallback{margin:14px 0;border:1px solid #e3e0d7;border-radius:9px;background:#fbfaf6;padding:13px 15px;color:#665f4e;font-size:12px;line-height:1.8}
+.unified-search-fallback p{margin:0 0 9px}
+.unified-search-fallback button{padding:9px 12px;border:1px solid #bccfbf;border-radius:8px;color:#315f45;background:#fff;font-size:12px;font-weight:600;cursor:pointer}
+.unified-search-fallback button:hover{background:#f3f8f3}
+.unified-search-fallback-active{border-left:3px solid #b6a77e;padding:8px 12px;margin:12px 0;color:#675f4c;background:#fbfaf6;font-size:12px;line-height:1.7}
+
+/* Non-blocking fallback: other source-audited posts remain browsable. */
+.unified-featured-fallback{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  border:1px solid #dce8df;background:#f8fbf9;color:#53685d;border-radius:9px;
+  padding:10px 13px;margin-top:13px;font-size:12px;line-height:1.6}
+.unified-featured-fallback button{border:1px solid #c5d8ca;background:white;border-radius:7px;
+  padding:6px 10px;font:inherit;font-weight:650;color:#315e48;display:inline-flex;align-items:center;gap:6px}
+
+/* Company identity opens HHBA's independent, sourced company overview. */
+a.unified-company-brand{color:inherit;text-decoration:none;border-radius:8px}
+a.unified-company-brand:hover strong{color:#256746;text-decoration:underline}
+a.unified-company-brand:focus-visible,.unified-detail-company-link:focus-visible{outline:2px solid #3b8563;outline-offset:3px}
+.unified-detail-company-link{display:inline-flex;align-items:center;gap:12px;color:#2d7556;text-decoration:none;border-radius:8px}
+.unified-detail-company-link:hover small{text-decoration:underline}
+.unified-company-filter-clear{margin-left:9px;border:1px solid #c4d9cb;color:#2b6044;padding:3px 8px;background:#fff;border-radius:6px;font-size:11px;cursor:pointer}
+.unified-company-filter-clear:hover{background:#edf6ef}
+
+.unified-job-browse-links{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.unified-job-browse-links>a{display:inline-flex;gap:6px;align-items:center;color:#2a6749;text-decoration:none;font-size:12px;font-weight:650}
+.unified-job-browse-links>a:hover{text-decoration:underline}
+
+/* Optional live DeepSeek discovery augments the original search surface only when
+   a configured backend reports enabled; never creates a second large AI panel. */
+.unified-ai-discovery{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:12px 0 10px;font-size:12px;color:#66766b}
+.unified-ai-discovery label{display:flex;align-items:flex-start;gap:7px;line-height:1.5}
+.unified-ai-discovery label input{accent-color:#276147;margin-top:2px}
+.unified-ai-discovery button{display:inline-flex;align-items:center;gap:7px;border:1px solid #bfd5c6;background:#eff7f0;color:#23593c;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:650;white-space:nowrap}
+.unified-ai-discovery button:disabled{opacity:.55;cursor:wait}
+.unified-ai-results{margin:23px 0 30px;padding:20px 0;border-top:1px solid #e6ebe8;border-bottom:1px solid #e6ebe8}
+.unified-ai-results .unified-market-heading h2{font-size:20px}
+.unified-ai-results .unified-job-card h3{font-size:17px}
+.unified-ai-results .unified-job-actions a{display:inline-flex;align-items:center;gap:6px;color:#286447;font-size:12px;text-decoration:none}
+.unified-ai-quote{font-size:12px;color:#65736c;line-height:1.65}
+
+/* Inline searchable academic-major picker: visually consistent with existing compact selects. */
+.unified-major-filter{flex:1 1 185px;min-width:165px;position:relative;z-index:6}
+.unified-major-field{display:flex;align-items:center;min-height:43px;padding:0 9px 0 11px;background:#fff;border:1px solid var(--line);border-radius:9px;color:var(--ink)}
+.unified-major-field:focus-within{outline:2px solid #b7d4c0;outline-offset:1px}
+.unified-major-field input{border:0;outline:0;background:transparent;width:100%;min-width:0;font-size:12px;line-height:1.4;color:var(--ink);padding:11px 0}
+.unified-major-field input::placeholder{color:#717d73}
+.unified-major-arrow{flex-shrink:0;color:#68776e;margin-left:4px}
+.unified-major-clear{display:grid;place-items:center;border:0;border-radius:6px;background:#f2f6f3;color:#386d50;padding:5px;cursor:pointer}
+.unified-major-options{position:absolute;z-index:40;top:calc(100% + 6px);left:0;right:0;width:max(100%,260px);max-width:min(360px,calc(100vw - 32px));max-height:310px;overflow-y:auto;background:#fff;border:1px solid #dbe8df;border-radius:10px;box-shadow:0 8px 25px #173b2621;padding:8px}
+.unified-major-options>small{display:block;color:#728078;padding:8px 7px;font-size:11px}
+.unified-major-options button{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;background:transparent;border:0;border-radius:6px;padding:9px 8px;text-align:left;font-size:12px;color:#344b3b;cursor:pointer}
+.unified-major-options button:hover,.unified-major-options button.is-focused{background:#edf6f0}
+.unified-major-no-match{font-size:12px;color:#76857a;padding:12px 8px}
+@media(max-width:740px){.unified-major-filter{flex:1 1 calc(50% - 6px);min-width:0}.unified-major-options{width:calc(200% + 8px)}}
+
+/* Academic-major catalogue 2026: compact tier tabs, code labels, and fallback entry. */
+.unified-major-options{width:max(100%,340px);max-width:min(420px,calc(100vw - 32px));max-height:350px}
+.unified-major-levels{display:flex;gap:4px;border-radius:8px;padding:4px;background:#f3f7f4;margin:6px 3px}
+.unified-major-levels button{flex:1 1 0;font-size:11px!important;text-align:center!important;justify-content:center!important;min-width:0;padding:8px 3px!important}
+.unified-major-levels button.is-active{background:#fff!important;color:#225a40!important;font-weight:700;box-shadow:0 1px 4px #234a3017}
+.unified-major-options [role="option"]>span{display:flex;flex-direction:column;gap:3px}
+.unified-major-options [role="option"] small,.unified-major-custom small{display:block;font-size:10px;color:#829087;font-weight:400}
+.unified-major-options .unified-major-custom{border-top:1px solid #e5ece6;border-radius:0;color:#276146}
+.unified-major-options [role="option"]{min-height:45px}
+@media(max-width:740px){.unified-major-options{width:min(420px,calc(100vw - 32px));max-width:calc(100vw - 32px)}}

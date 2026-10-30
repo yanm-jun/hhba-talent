@@ -1,0 +1,972 @@
+{
+  "profiles": [
+    {
+      "id": "WyJncmVlbmhvdXNlIiwic3RyaXBlIiwiU3RyaXBlIl0",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "stripe",
+        "company": "Stripe"
+      },
+      "name": "Stripe",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "在线支付及互联网金融基础设施",
+        "en": "Online payments and financial infrastructure"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2010",
+      "tagline": {
+        "zh": "为互联网企业提供支付与资金流转基础设施。",
+        "en": "Financial infrastructure for internet businesses."
+      },
+      "overview": [
+        {
+          "zh": "Stripe 是一家美国金融科技企业，为各规模公司提供线上收款、订阅计费和资金管理软件。其服务嵌入商家的数字业务流程，支持跨境支付及平台型业务的收付款。",
+          "en": "Stripe is a US financial technology company supplying online payment acceptance, subscription billing and money-management software to businesses of different sizes. Its infrastructure supports digital commerce, international payments and platform transactions."
+        },
+        {
+          "zh": "除核心支付服务外，Stripe 还提供 Connect 多方结算、Billing 经常性收入管理等开发者和企业工具。不同岗位涉及支付风控、工程、合规、客户服务及销售，具体以官方招聘为准。",
+          "en": "Beyond payments, Stripe offers Connect for marketplace payouts and Billing for recurring revenue. Roles can span payment risk, engineering, compliance, customer operations and sales; official listings control the precise requirements."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Payments 支付",
+            "en": "Payments"
+          },
+          "description": {
+            "zh": "面向商家与应用的全球在线收款。",
+            "en": "Global online payments for merchants and applications."
+          }
+        },
+        {
+          "name": {
+            "zh": "Connect 平台支付",
+            "en": "Connect"
+          },
+          "description": {
+            "zh": "支持平台和市场向多方收款、分账与付款。",
+            "en": "Payments and payouts for platforms and marketplaces."
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2010",
+          "description": {
+            "zh": "Stripe 的成立或正式公司化年份。",
+            "en": "Stripe's founding or incorporation year."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Stripe 官方介绍",
+            "en": "Stripe official overview"
+          },
+          "url": "https://stripe.com/"
+        },
+        {
+          "label": {
+            "zh": "Stripe 官方产品或业务",
+            "en": "Stripe official products or business"
+          },
+          "url": "https://stripe.com/connect"
+        },
+        {
+          "label": {
+            "zh": "Stripe 官方招聘来源",
+            "en": "Stripe official job board"
+          },
+          "url": "https://job-boards.greenhouse.io/stripe"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJncmVlbmhvdXNlIiwiY29pbmJhc2UiLCJDb2luYmFzZSJd",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "coinbase",
+        "company": "Coinbase"
+      },
+      "name": "Coinbase",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "数字资产交易与金融基础设施",
+        "en": "Digital asset exchange and financial infrastructure"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2012",
+      "tagline": {
+        "zh": "面向个人、机构和开发者构建加密资产金融服务。",
+        "en": "Crypto services for consumers, institutions and builders."
+      },
+      "overview": [
+        {
+          "zh": "Coinbase 是一家美国数字资产平台，提供加密资产交易、托管及面向机构的金融服务。公司通过消费者应用、Coinbase Prime 等业务服务不同类型用户。",
+          "en": "Coinbase is a US digital-asset platform offering trading, custody and institutional financial services. Its consumer applications and Coinbase Prime address different customer needs."
+        },
+        {
+          "zh": "Coinbase 的开发者产品还提供钱包、链上支付及相关基础设施。加密资产服务具有地域和监管差异，HHBA 只介绍企业，不构成产品推荐或对招聘资格的保证。",
+          "en": "Coinbase also offers developer services including wallets and onchain infrastructure. Crypto services vary by jurisdiction and regulation; HHBA does not endorse trading products or guarantee job eligibility."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "交易与托管",
+            "en": "Trading and custody"
+          },
+          "description": {
+            "zh": "支持数字资产交易及资产托管。",
+            "en": "Digital asset trading and custody."
+          }
+        },
+        {
+          "name": {
+            "zh": "Coinbase Prime",
+            "en": "Coinbase Prime"
+          },
+          "description": {
+            "zh": "面向机构的交易、托管及经纪服务。",
+            "en": "Trading, custody and prime brokerage for institutions."
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2012",
+          "description": {
+            "zh": "Coinbase 的成立或正式公司化年份。",
+            "en": "Coinbase's founding or incorporation year."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Coinbase 官方介绍",
+            "en": "Coinbase official overview"
+          },
+          "url": "https://www.coinbase.com/about"
+        },
+        {
+          "label": {
+            "zh": "Coinbase 官方产品或业务",
+            "en": "Coinbase official products or business"
+          },
+          "url": "https://www.coinbase.com/products"
+        },
+        {
+          "label": {
+            "zh": "Coinbase 官方招聘来源",
+            "en": "Coinbase official job board"
+          },
+          "url": "https://job-boards.greenhouse.io/coinbase"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJncmVlbmhvdXNlIiwiZG9vcmRhc2h1c2EiLCJEb29yRGFzaCJd",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "doordashusa",
+        "company": "DoorDash"
+      },
+      "name": "DoorDash",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "本地生活服务与配送平台",
+        "en": "Local commerce and delivery marketplace"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2013",
+      "tagline": {
+        "zh": "连接消费者、商户与配送员的本地商业平台。",
+        "en": "A local commerce platform connecting consumers, merchants and couriers."
+      },
+      "overview": [
+        {
+          "zh": "DoorDash 是 2013 年创立的美国本地商业平台，通过应用连接消费者、餐饮与零售商家，以及提供履约服务的配送员。其服务覆盖外卖、杂货和零售配送等领域。",
+          "en": "Founded in 2013, DoorDash is a US local commerce platform connecting consumers, restaurants, retailers and delivery providers through its marketplace. Services include meals, groceries and retail delivery."
+        },
+        {
+          "zh": "DoorDash 还为商户提供线上订单、配送及商业增长工具。招聘岗位可能属于配送网络运营、数据、平台技术、消费者产品和商业拓展。",
+          "en": "DoorDash also provides online ordering, fulfillment and growth tools for merchants. Roles span logistics, operations, data, platform engineering, consumer products and commercial growth."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "DoorDash Marketplace",
+            "en": "DoorDash Marketplace"
+          },
+          "description": {
+            "zh": "消费者查找商品与本地配送服务的平台。",
+            "en": "Consumer discovery and local delivery marketplace."
+          }
+        },
+        {
+          "name": {
+            "zh": "Commerce Platform",
+            "en": "Commerce Platform"
+          },
+          "description": {
+            "zh": "帮助商户建设在线订购及履约能力。",
+            "en": "Commerce and fulfillment capabilities for merchants."
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2013",
+          "description": {
+            "zh": "DoorDash 的成立或正式公司化年份。",
+            "en": "DoorDash's founding or incorporation year."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "DoorDash 官方介绍",
+            "en": "DoorDash official overview"
+          },
+          "url": "https://about.doordash.com/en-us/company"
+        },
+        {
+          "label": {
+            "zh": "DoorDash 官方产品或业务",
+            "en": "DoorDash official products or business"
+          },
+          "url": "https://about.doordash.com/en-us/company"
+        },
+        {
+          "label": {
+            "zh": "DoorDash 官方招聘来源",
+            "en": "DoorDash official job board"
+          },
+          "url": "https://job-boards.greenhouse.io/doordashusa"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJsZXZlciIsInNwb3RpZnkiLCJTcG90aWZ5Il0",
+      "identity": {
+        "platform": "lever",
+        "source": "spotify",
+        "company": "Spotify"
+      },
+      "name": "Spotify",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "音乐、播客与有声内容流媒体",
+        "en": "Music, podcasts and audio streaming"
+      },
+      "country": {
+        "zh": "瑞典",
+        "en": "Sweden"
+      },
+      "founded": "2006",
+      "tagline": {
+        "zh": "通过数字平台连接创作者与全球听众。",
+        "en": "Connecting creators and listeners through audio streaming."
+      },
+      "overview": [
+        {
+          "zh": "Spotify 是一家成立于瑞典的流媒体音频服务公司，面向全球用户提供音乐、播客和其他音频内容的发现、收听与个性化推荐功能。",
+          "en": "Spotify is a Swedish audio streaming company offering music, podcasts and other audio content with discovery, listening and personalized recommendations."
+        },
+        {
+          "zh": "平台面向听众提供免费和付费订阅服务，也向音乐人及播客创作者提供发行展示与受众分析工具。岗位涵盖内容、推荐算法、商业化和软件工程。",
+          "en": "Spotify combines free and premium listening options with tools for artists and podcast creators, including audience insights. Its roles can cover content, recommendations, monetization and software engineering."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Spotify 音频平台",
+            "en": "Spotify audio service"
+          },
+          "description": {
+            "zh": "音乐和播客的搜索、推荐与播放。",
+            "en": "Music and podcasts discovery, recommendation and playback."
+          }
+        },
+        {
+          "name": {
+            "zh": "Spotify for Artists",
+            "en": "Spotify for Artists"
+          },
+          "description": {
+            "zh": "服务音乐创作者的受众与作品管理工具。",
+            "en": "Tools for creators to manage music and audiences."
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2006",
+          "description": {
+            "zh": "Spotify 的成立或正式公司化年份。",
+            "en": "Spotify's founding or incorporation year."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Spotify 官方介绍",
+            "en": "Spotify official overview"
+          },
+          "url": "https://www.spotify.com/us/about-us/contact/"
+        },
+        {
+          "label": {
+            "zh": "Spotify 官方产品或业务",
+            "en": "Spotify official products or business"
+          },
+          "url": "https://artists.spotify.com/"
+        },
+        {
+          "label": {
+            "zh": "Spotify 官方招聘来源",
+            "en": "Spotify official job board"
+          },
+          "url": "https://jobs.lever.co/spotify"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJncmVlbmhvdXNlIiwiY2Fub25pY2FsIiwiQ2Fub25pY2FsIl0",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "canonical",
+        "company": "Canonical"
+      },
+      "name": "Canonical",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "开源软件、Linux 与企业云基础设施",
+        "en": "Open-source software, Linux and enterprise cloud"
+      },
+      "country": {
+        "zh": "英国",
+        "en": "United Kingdom"
+      },
+      "founded": "2004",
+      "tagline": {
+        "zh": "以 Ubuntu 为核心提供开源操作系统与企业级支持。",
+        "en": "Enterprise open-source solutions built around Ubuntu."
+      },
+      "overview": [
+        {
+          "zh": "Canonical 成立于 2004 年，是 Ubuntu Linux 发行版背后的商业公司，参与操作系统发行、维护和开源生态建设。Ubuntu 提供桌面、服务器、云与设备等多种发行形态。",
+          "en": "Founded in 2004, Canonical is the company behind the Ubuntu Linux distribution. It develops, releases and supports open-source systems spanning desktops, servers, cloud environments and devices."
+        },
+        {
+          "zh": "Canonical 围绕 Ubuntu 提供长期支持、安全维护、系统管理及云平台方案。相关岗位常涉及 Linux 内核、云计算、企业客户支持与开源社区协作。",
+          "en": "Canonical provides long-term support, security maintenance, systems management and cloud solutions around Ubuntu. Work can involve Linux internals, cloud platforms, enterprise support and open-source collaboration."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Ubuntu",
+            "en": "Ubuntu"
+          },
+          "description": {
+            "zh": "免费的 Linux 操作系统，包含 LTS 长期支持版本。",
+            "en": "Linux operating system with long-term support releases."
+          }
+        },
+        {
+          "name": {
+            "zh": "企业基础设施",
+            "en": "Enterprise infrastructure"
+          },
+          "description": {
+            "zh": "商业支持、安全维护和云环境管理工具。",
+            "en": "Commercial support, security maintenance and cloud management."
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2004",
+          "description": {
+            "zh": "Canonical 的成立或正式公司化年份。",
+            "en": "Canonical's founding or incorporation year."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Canonical 官方介绍",
+            "en": "Canonical official overview"
+          },
+          "url": "https://canonical.com/"
+        },
+        {
+          "label": {
+            "zh": "Canonical 官方产品或业务",
+            "en": "Canonical official products or business"
+          },
+          "url": "https://ubuntu.com/about"
+        },
+        {
+          "label": {
+            "zh": "Canonical 官方招聘来源",
+            "en": "Canonical official job board"
+          },
+          "url": "https://job-boards.greenhouse.io/canonical"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJsZXZlciIsInBhbGFudGlyIiwiUGFsYW50aXIiXQ",
+      "identity": {
+        "platform": "lever",
+        "source": "palantir",
+        "company": "Palantir"
+      },
+      "name": "Palantir",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "企业数据平台与人工智能决策软件",
+        "en": "Enterprise data platforms and decision software"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2003",
+      "tagline": {
+        "zh": "将复杂数据与实际运营决策相连接。",
+        "en": "Connecting complex data with operational decisions."
+      },
+      "overview": [
+        {
+          "zh": "Palantir 是一家成立于 2003 年的美国软件企业，为政府机构与商业客户提供数据整合、分析和运营决策平台。早期面向情报应用，后来延伸至制造、医疗和其他商业场景。",
+          "en": "Founded in 2003, Palantir develops software for government and commercial organizations to integrate data, analyze complex systems and support operational decisions. Its early work served intelligence use cases before expanding into commercial industries."
+        },
+        {
+          "zh": "其主要平台包括 Gotham、Foundry、Apollo 与 Artificial Intelligence Platform（AIP），分别涉及情报分析、数据运营、部署编排和 AI 工作流。招聘需求需逐岗位核对。",
+          "en": "Its principal platforms include Gotham, Foundry, Apollo and the Artificial Intelligence Platform (AIP), covering intelligence, data operations, software deployment and AI workflows. Role requirements should be reviewed individually."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Foundry 数据平台",
+            "en": "Foundry"
+          },
+          "description": {
+            "zh": "统一数据建模、分析和业务流程。",
+            "en": "Data modeling, analytics and operational workflows."
+          }
+        },
+        {
+          "name": {
+            "zh": "AIP 人工智能平台",
+            "en": "Artificial Intelligence Platform"
+          },
+          "description": {
+            "zh": "将 AI 模型与业务数据和流程连接。",
+            "en": "Connects AI models with operational data and workflows."
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2003",
+          "description": {
+            "zh": "Palantir 的成立或正式公司化年份。",
+            "en": "Palantir's founding or incorporation year."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Palantir 官方介绍",
+            "en": "Palantir official overview"
+          },
+          "url": "https://www.palantir.com/about/"
+        },
+        {
+          "label": {
+            "zh": "Palantir 官方产品或业务",
+            "en": "Palantir official products or business"
+          },
+          "url": "https://www.palantir.com/platforms/"
+        },
+        {
+          "label": {
+            "zh": "Palantir 官方招聘来源",
+            "en": "Palantir official job board"
+          },
+          "url": "https://jobs.lever.co/palantir"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJncmVlbmhvdXNlIiwiZGlzY29yZCIsIkRpc2NvcmQiXQ",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "discord",
+        "company": "Discord"
+      },
+      "name": "Discord",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "实时通信与在线社区平台",
+        "en": "Real-time communication and communities"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2015",
+      "tagline": {
+        "zh": "为游戏与兴趣社群提供语音、视频和文字交流空间。",
+        "en": "Voice, video and text communication for communities."
+      },
+      "overview": [
+        {
+          "zh": "Discord 是一家美国实时通信软件企业，2015 年推出面向游戏玩家的在线交流平台。用户可加入服务器与频道，通过文字、语音和视频维系社区关系。",
+          "en": "Discord is a US communication software company whose service launched in 2015 for gaming communities. Users gather in servers and channels and communicate using text, voice and video."
+        },
+        {
+          "zh": "其产品支持社区管理、群组对话和跨设备协作，服务游戏社群及其他兴趣团体。招聘岗位可涉及语音基础设施、客户端、安全与社区产品。",
+          "en": "The product supports community administration, group communication and cross-device use for gaming and other interest groups. Roles span voice infrastructure, clients, safety and community features."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "服务器与频道",
+            "en": "Servers and channels"
+          },
+          "description": {
+            "zh": "组织社群成员与多主题讨论。",
+            "en": "Organize members and topic-based conversations."
+          }
+        },
+        {
+          "name": {
+            "zh": "语音与视频",
+            "en": "Voice and video"
+          },
+          "description": {
+            "zh": "实时音视频通话、活动及共享功能。",
+            "en": "Real-time communication, events and screen sharing."
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2015",
+          "description": {
+            "zh": "Discord 的成立或正式公司化年份。",
+            "en": "Discord's founding or incorporation year."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Discord 官方介绍",
+            "en": "Discord official overview"
+          },
+          "url": "https://discord.com/company"
+        },
+        {
+          "label": {
+            "zh": "Discord 官方产品或业务",
+            "en": "Discord official products or business"
+          },
+          "url": "https://discord.com/"
+        },
+        {
+          "label": {
+            "zh": "Discord 官方招聘来源",
+            "en": "Discord official job board"
+          },
+          "url": "https://job-boards.greenhouse.io/discord"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJncmVlbmhvdXNlIiwicmVkZGl0IiwiUmVkZGl0Il0",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "reddit",
+        "company": "Reddit"
+      },
+      "name": "Reddit",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "在线兴趣社区与内容讨论平台",
+        "en": "Online discussion and interest communities"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2005",
+      "tagline": {
+        "zh": "让围绕不同兴趣形成的社区分享与讨论信息。",
+        "en": "Communities sharing and discussing topics of interest."
+      },
+      "overview": [
+        {
+          "zh": "Reddit 是一家美国在线社区平台，用户围绕不同话题组建 subreddit，发布帖子、评论并通过社区投票决定内容的曝光顺序。",
+          "en": "Reddit is a US online community platform where users gather in subreddits to post, comment and vote on topic-specific discussions."
+        },
+        {
+          "zh": "其产品还涉及社区审核工具、广告商业化及开发者接口。由于内容由社区产生，不应将用户帖子视作企业官方声明；招聘信息仍须以原始招聘页面为准。",
+          "en": "Its business includes community moderation tools, advertising and developer interfaces. Community posts are not official company statements; job details should be checked at the original source."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Subreddits 社区",
+            "en": "Subreddits"
+          },
+          "description": {
+            "zh": "围绕兴趣与主题管理内容讨论。",
+            "en": "Topic-driven discussion communities."
+          }
+        },
+        {
+          "name": {
+            "zh": "广告与社区工具",
+            "en": "Advertising and community tools"
+          },
+          "description": {
+            "zh": "支持广告主触达受众与版主管理社区。",
+            "en": "Advertiser products and moderation tools."
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2005",
+          "description": {
+            "zh": "Reddit 的成立或正式公司化年份。",
+            "en": "Reddit's founding or incorporation year."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Reddit 官方介绍",
+            "en": "Reddit official overview"
+          },
+          "url": "https://www.redditinc.com/"
+        },
+        {
+          "label": {
+            "zh": "Reddit 官方产品或业务",
+            "en": "Reddit official products or business"
+          },
+          "url": "https://www.redditinc.com/about"
+        },
+        {
+          "label": {
+            "zh": "Reddit 官方招聘来源",
+            "en": "Reddit official job board"
+          },
+          "url": "https://job-boards.greenhouse.io/reddit"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJncmVlbmhvdXNlIiwiYWlydGFibGUiLCJBaXJ0YWJsZSJd",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "airtable",
+        "company": "Airtable"
+      },
+      "name": "Airtable",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "协作数据库与无代码业务应用",
+        "en": "Collaborative databases and no-code applications"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2012",
+      "tagline": {
+        "zh": "将结构化数据转化为团队可协作的业务应用。",
+        "en": "Turning structured data into collaborative business applications."
+      },
+      "overview": [
+        {
+          "zh": "Airtable 是一家美国企业软件公司，将关系数据表、可配置视图与应用界面结合，帮助团队在同一套数据基础上组织项目、流程和运营工作。",
+          "en": "Airtable is a US enterprise software company combining relational data tables, configurable views and app interfaces to help teams organize projects, workflows and operations on shared data."
+        },
+        {
+          "zh": "其产品支持自动化、权限管理、跨团队协作以及与其他软件集成。岗位涉及企业 SaaS、低代码产品、平台工程和客户成功。",
+          "en": "Its platform supports automation, permissions, cross-team collaboration and integrations. Roles span enterprise SaaS, no-code products, platform engineering and customer success."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Airtable 平台",
+            "en": "Airtable Platform"
+          },
+          "description": {
+            "zh": "建立关系数据表、视图和可视化工作界面。",
+            "en": "Relational tables, views and workflow interfaces."
+          }
+        },
+        {
+          "name": {
+            "zh": "Automations",
+            "en": "Automations"
+          },
+          "description": {
+            "zh": "触发业务操作与跨工具的工作流。",
+            "en": "Automated workflow actions and integrations."
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2012",
+          "description": {
+            "zh": "Airtable 的成立或正式公司化年份。",
+            "en": "Airtable's founding or incorporation year."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Airtable 官方介绍",
+            "en": "Airtable official overview"
+          },
+          "url": "https://www.airtable.com/"
+        },
+        {
+          "label": {
+            "zh": "Airtable 官方产品或业务",
+            "en": "Airtable official products or business"
+          },
+          "url": "https://www.airtable.com/platform"
+        },
+        {
+          "label": {
+            "zh": "Airtable 官方招聘来源",
+            "en": "Airtable official job board"
+          },
+          "url": "https://job-boards.greenhouse.io/airtable"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJncmVlbmhvdXNlIiwicm9iaW5ob29kIiwiUm9iaW5ob29kIl0",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "robinhood",
+        "company": "Robinhood"
+      },
+      "name": "Robinhood",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "个人投资与金融科技",
+        "en": "Retail investing and financial technology"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2013",
+      "tagline": {
+        "zh": "通过移动与网页平台提供投资及金融账户工具。",
+        "en": "Investment and financial account tools via web and mobile."
+      },
+      "overview": [
+        {
+          "zh": "Robinhood 是一家美国金融科技企业，向符合条件的用户提供证券及相关金融产品的交易服务。其产品面向零售投资者，也提供账户和交易管理工具。",
+          "en": "Robinhood is a US financial technology company offering eligible customers access to securities and other financial products through mobile and web trading services."
+        },
+        {
+          "zh": "Robinhood 的业务受到证券及地区监管要求约束；部分服务可能由不同受监管主体运营。HHBA 仅展示其公司业务背景，具体岗位与资质条件必须查阅官方招聘页。",
+          "en": "Robinhood products are subject to securities regulations and geographic restrictions, and services may be provided by separate regulated entities. HHBA supplies company context, not investment advice or an employment guarantee."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "投资交易应用",
+            "en": "Investing application"
+          },
+          "description": {
+            "zh": "股票及其他适用投资产品的交易界面。",
+            "en": "Trading interfaces for available investment products."
+          }
+        },
+        {
+          "name": {
+            "zh": "账户与金融服务",
+            "en": "Financial accounts and services"
+          },
+          "description": {
+            "zh": "提供余额、账户与相关服务管理。",
+            "en": "Account, balances and related service management."
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2013",
+          "description": {
+            "zh": "Robinhood 的成立或正式公司化年份。",
+            "en": "Robinhood's founding or incorporation year."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Robinhood 官方介绍",
+            "en": "Robinhood official overview"
+          },
+          "url": "https://robinhood.com/us/en/about-us/"
+        },
+        {
+          "label": {
+            "zh": "Robinhood 官方产品或业务",
+            "en": "Robinhood official products or business"
+          },
+          "url": "https://robinhood.com/us/en/"
+        },
+        {
+          "label": {
+            "zh": "Robinhood 官方招聘来源",
+            "en": "Robinhood official job board"
+          },
+          "url": "https://job-boards.greenhouse.io/robinhood"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJncmVlbmhvdXNlIiwiZ2l0bGFiIiwiR2l0TGFiIl0",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "gitlab",
+        "company": "GitLab"
+      },
+      "name": "GitLab",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "软件研发、DevSecOps 与源代码协作",
+        "en": "Software development and DevSecOps collaboration"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2014",
+      "tagline": {
+        "zh": "将规划、编码、测试和交付工作置于统一平台。",
+        "en": "Unified software planning, coding, testing and delivery."
+      },
+      "overview": [
+        {
+          "zh": "GitLab 的开源项目于 2011 年启动，GitLab 公司于 2014 年成立。其平台围绕 Git 仓库和软件开发生命周期，连接开发、安全与运维团队。",
+          "en": "The GitLab open-source project began in 2011, and the company was incorporated in 2014. Its platform brings together teams around Git repositories and the software development lifecycle."
+        },
+        {
+          "zh": "GitLab 提供代码托管、持续集成与交付、安全扫描和协作工作流。公司以远程优先团队实践著称，但具体工作地点和雇佣要求由每个官方职位确定。",
+          "en": "GitLab provides code hosting, CI/CD, security scanning and collaborative workflows. It is known for remote-first operations, though location and hiring eligibility are determined by each posting."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "GitLab DevSecOps",
+            "en": "GitLab DevSecOps"
+          },
+          "description": {
+            "zh": "代码、流水线与软件安全管理。",
+            "en": "Code, pipelines and software security management."
+          }
+        },
+        {
+          "name": {
+            "zh": "GitLab CI/CD",
+            "en": "GitLab CI/CD"
+          },
+          "description": {
+            "zh": "自动化构建、测试和部署流程。",
+            "en": "Automated build, test and deployment pipelines."
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2014",
+          "description": {
+            "zh": "GitLab 的成立或正式公司化年份。",
+            "en": "GitLab's founding or incorporation year."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "GitLab 官方介绍",
+            "en": "GitLab official overview"
+          },
+          "url": "https://about.gitlab.com/company/team/"
+        },
+        {
+          "label": {
+            "zh": "GitLab 官方产品或业务",
+            "en": "GitLab official products or business"
+          },
+          "url": "https://about.gitlab.com/"
+        },
+        {
+          "label": {
+            "zh": "GitLab 官方招聘来源",
+            "en": "GitLab official job board"
+          },
+          "url": "https://job-boards.greenhouse.io/gitlab"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    }
+  ]
+}

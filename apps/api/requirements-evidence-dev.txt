@@ -1,0 +1,6 @@
+# Isolated evidence-module CI / local acceptance dependencies.
+# Existing HHBA auth service has not yet been merged into apps/api.
+fastapi>=0.115,<1
+httpx>=0.27,<1
+python-multipart>=0.0.9,<1
+asyncpg>=0.30,<1

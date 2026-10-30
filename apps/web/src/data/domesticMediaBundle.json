@@ -1,0 +1,1911 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-24T04:29:24.342Z",
+  "companies": {
+    "华域视觉科技（上海）有限公司": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-f9727f3062cf91da52b3285c.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/e58d8ee59f9fe8a786e8a789e7a791e68a80efbc88e4b88ae6b5b7efbc89e69c89e99990e585ace58fb8-photo-0.webp",
+          "bytes": 65872,
+          "source": "https://www.hascovision.com/Public/Uploads/uploadfile/images/20260313/changshuxingongchang.jpg",
+          "sourcePage": "https://www.hascovision.com/about/about-us"
+        },
+        {
+          "state": "pending_photo_identity_or_source"
+        },
+        {
+          "state": "pending_photo_identity_or_source"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-3a6fba8fe089a185025f6112.webp",
+          "source": "domestic-media/user-3a6fba8fe089a185025f6112.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-4f0e78c7cb648df8a4cd2fed.webp",
+          "source": "domestic-media/user-4f0e78c7cb648df8a4cd2fed.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-1cb65a148c018a100be91709.webp",
+          "source": "domestic-media/user-1cb65a148c018a100be91709.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "华域汽车": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-16e9b765158a1c40a0c0782b.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-f358b75208376cd45f48324e.webp",
+          "source": "domestic-media/user-f358b75208376cd45f48324e.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-002031621879e68461ab19bb.webp",
+          "source": "domestic-media/user-002031621879e68461ab19bb.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "上汽集团": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-ffa40505001b6a760bf71652.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/e4b88ae6b1bde99b86e59ba2-photo-0.webp",
+          "bytes": 33670,
+          "source": "https://www.saicmotor.com/chinese/images/xwzx/mtbd/2025/2025/4/9/9A7452D93ABC496D97C8725C5A980401.jpg",
+          "sourcePage": "https://www.saicmotor.com/chinese/xwzx/mtbd/2025/61304.shtml"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-b069062b35cacc0d8be80ec8.webp",
+          "source": "domestic-media/user-b069062b35cacc0d8be80ec8.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-15eab87211f5ba4b873ac9fd.webp",
+          "source": "domestic-media/user-15eab87211f5ba4b873ac9fd.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "汇川技术": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-d00781d74988739b5880640f.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-c71d246ef6d877e4ec845ce1.webp",
+          "source": "domestic-media/user-c71d246ef6d877e4ec845ce1.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-d8b7e9cfd5366b4d1f3ba36d.webp",
+          "source": "domestic-media/user-d8b7e9cfd5366b4d1f3ba36d.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-d77767e3514f7b52e3dbf0f9.webp",
+          "source": "domestic-media/user-d77767e3514f7b52e3dbf0f9.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "中国中车": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-f1121b0e33026f267943c36c.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-a77fc3f345de406dcb97a81e.webp",
+          "source": "domestic-media/user-a77fc3f345de406dcb97a81e.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-6d69f7bf4ef88d4590831c50.webp",
+          "source": "domestic-media/user-6d69f7bf4ef88d4590831c50.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-98cbf572dc8a1e21c96cda89.webp",
+          "source": "domestic-media/user-98cbf572dc8a1e21c96cda89.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "美的集团": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-da3ca3a915589bd52322570f.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-d46c576fd5a58a1e8880888a.webp",
+          "source": "domestic-media/user-d46c576fd5a58a1e8880888a.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-229e2d21faa4676de98bd0db.webp",
+          "source": "domestic-media/user-229e2d21faa4676de98bd0db.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-2fd6d2f1e8a5495f78a662f9.webp",
+          "source": "domestic-media/user-2fd6d2f1e8a5495f78a662f9.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "雷赛智能": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-5cee6ac5936b816e546a1a96.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-6eea9e3b4f3131a11aef778b.webp",
+          "source": "domestic-media/user-6eea9e3b4f3131a11aef778b.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-e1af4e59e98025709699dcf8.webp",
+          "source": "domestic-media/user-e1af4e59e98025709699dcf8.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-4b3992a2ca29f33f2ba1e0c4.webp",
+          "source": "domestic-media/user-4b3992a2ca29f33f2ba1e0c4.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "正泰电器": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-5f2ce11ddb76883a4ab0ac56.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-2ba1e7ffbf190100ebebc870.webp",
+          "source": "domestic-media/user-2ba1e7ffbf190100ebebc870.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-349ad890357cfed8d8395736.webp",
+          "source": "domestic-media/user-349ad890357cfed8d8395736.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-1cf289ae71260b046354a8af.webp",
+          "source": "domestic-media/user-1cf289ae71260b046354a8af.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "英威腾": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-111b26916b6befb873f8ed94.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-64b3554efadfcd2bb1ecf5be.webp",
+          "source": "domestic-media/user-64b3554efadfcd2bb1ecf5be.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-6bba5a5571e7120ac9a4e61a.webp",
+          "source": "domestic-media/user-6bba5a5571e7120ac9a4e61a.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "思源电气": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-02b33e5e5a5b6b6fc64ec0e5.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-baacafe8a0c0f59677d7d865.webp",
+          "source": "domestic-media/user-baacafe8a0c0f59677d7d865.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-be152eb3a6784794b31ae05b.webp",
+          "source": "domestic-media/user-be152eb3a6784794b31ae05b.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-7f8561f205f70e53599c3515.webp",
+          "source": "domestic-media/user-7f8561f205f70e53599c3515.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "许继电气": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-3b84de98bf7ebd07d89b1d62.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-7afc9a3ad7d0f2d14627e889.webp",
+          "source": "domestic-media/user-7afc9a3ad7d0f2d14627e889.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-c7cb962653cf926250582f5c.webp",
+          "source": "domestic-media/user-c7cb962653cf926250582f5c.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-a48ce27998e10daac3956f04.webp",
+          "source": "domestic-media/user-a48ce27998e10daac3956f04.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "国电南瑞": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-9050c7822fe5f10053f7516b.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-6811d1faa71143c3d0f10ba7.webp",
+          "source": "domestic-media/user-6811d1faa71143c3d0f10ba7.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-ca0df61b2e131fe2c5271139.webp",
+          "source": "domestic-media/user-ca0df61b2e131fe2c5271139.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-d42e4acf68d845ff40c8865f.webp",
+          "source": "domestic-media/user-d42e4acf68d845ff40c8865f.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "埃斯顿": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-57e09e2fc9e29aa9db5eb67c.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-54c80a368773e1e3e641e927.webp",
+          "source": "domestic-media/user-54c80a368773e1e3e641e927.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-dd1a656a43f46a4819a4ad89.webp",
+          "source": "domestic-media/user-dd1a656a43f46a4819a4ad89.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-b8675655fb6c90e040c13995.webp",
+          "source": "domestic-media/user-b8675655fb6c90e040c13995.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "德赛西威": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-3f81752022949a98fe1c503b.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-577c0934b385f858016d2ce1.webp",
+          "source": "domestic-media/user-577c0934b385f858016d2ce1.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-83b66c4ea8bf0d15cbd0c19c.webp",
+          "source": "domestic-media/user-83b66c4ea8bf0d15cbd0c19c.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "京东方Ａ": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-275c87d4e514e342dee0e967.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "pending_photo_identity_or_source"
+        },
+        {
+          "state": "pending_photo_identity_or_source"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-fbde18a1caeec412d35960ca.webp",
+          "source": "domestic-media/user-fbde18a1caeec412d35960ca.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "歌尔股份": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-5ca02b3431edd97186f9cfba.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-b4d27c03d396461af667460f.webp",
+          "source": "domestic-media/user-b4d27c03d396461af667460f.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-2862893cd0214049cba25737.webp",
+          "source": "domestic-media/user-2862893cd0214049cba25737.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "中兴通讯": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-06e9b6ce8480f4be47781d0b.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-dd34feb888f66f256a853f74.webp",
+          "source": "domestic-media/user-dd34feb888f66f256a853f74.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-97f9e4d79f069466a7fab5dc.webp",
+          "source": "domestic-media/user-97f9e4d79f069466a7fab5dc.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-5acce4c98955c9ed0fdcdd11.webp",
+          "source": "domestic-media/user-5acce4c98955c9ed0fdcdd11.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "兆易创新": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-9559df65f0f34a66e8911991.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-a6df2b85e44590853929299b.webp",
+          "source": "domestic-media/user-a6df2b85e44590853929299b.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-69b7d8a6674de8b39a910a08.webp",
+          "source": "domestic-media/user-69b7d8a6674de8b39a910a08.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "隆基绿能": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-f65fe2586168224edbc1e1fb.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-22ab76d9f83e30a243430e58.webp",
+          "source": "domestic-media/user-22ab76d9f83e30a243430e58.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-e89b0060262eaabb7b50435a.webp",
+          "source": "domestic-media/user-e89b0060262eaabb7b50435a.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-06cf473bc519705a66d44c4c.webp",
+          "source": "domestic-media/user-06cf473bc519705a66d44c4c.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "亿纬锂能": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-13ec7dcb9bf6242416d32985.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "http_404",
+          "sourcePage": "https://www.evebattery.com/about"
+        },
+        {
+          "state": "http_404",
+          "sourcePage": "https://www.evebattery.com/about"
+        },
+        {
+          "state": "http_404",
+          "sourcePage": "https://www.evebattery.com/about"
+        },
+        {
+          "state": "http_404",
+          "sourcePage": "https://www.evebattery.com/about"
+        },
+        {
+          "state": "http_404",
+          "sourcePage": "https://www.evebattery.com/advanced-manufacturing"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-d2380dcf1aca0362a796e946.webp",
+          "source": "domestic-media/user-d2380dcf1aca0362a796e946.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-2d3659395824448c6fb9b3b8.webp",
+          "source": "domestic-media/user-2d3659395824448c6fb9b3b8.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "福耀玻璃": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-2bccebea52c52676e8df80af.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-cc432e864abd528e329f782b.webp",
+          "source": "domestic-media/user-cc432e864abd528e329f782b.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-6922a03c1a6b3358251d9e11.webp",
+          "source": "domestic-media/user-6922a03c1a6b3358251d9e11.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "紫光股份": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-d37d7a871791940c6f4312e7.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-8987716fceaa7a1a1566a618.webp",
+          "source": "domestic-media/user-8987716fceaa7a1a1566a618.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-1a070df430ad03a358242b9e.webp",
+          "source": "domestic-media/user-1a070df430ad03a358242b9e.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "海尔智家": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-ef9621734929d5ef2b5314a9.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-4c5f02481a15e7f7f026c922.webp",
+          "source": "domestic-media/user-4c5f02481a15e7f7f026c922.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-4fcb173488cfdb8bf2734e5b.webp",
+          "source": "domestic-media/user-4fcb173488cfdb8bf2734e5b.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-bd6d30d16843ef78783c0bc7.webp",
+          "source": "domestic-media/user-bd6d30d16843ef78783c0bc7.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "阳光电源": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-653bae3142b608315ac24477.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/e998b3e58589e794b5e6ba90-photo-0.webp",
+          "bytes": 22338,
+          "source": "https://official-oversears-file.sungrowpower.com/news-images/c0981ae7-a998-433b-b9b4-78127ea55996.png",
+          "sourcePage": "https://www.sungrowpower.com/demo/zh/products/string-inverter"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/e998b3e58589e794b5e6ba90-photo-1.webp",
+          "bytes": 73282,
+          "source": "https://fra.sungrowpower.com/upload/6385632548369337056336172.jpg",
+          "sourcePage": "https://fra.sungrowpower.com/AboutSungrow"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-2e86bda6921e86580c185b46.webp",
+          "source": "domestic-media/user-2e86bda6921e86580c185b46.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-23a28b52df56300c2c2f6f7f.webp",
+          "source": "domestic-media/user-23a28b52df56300c2c2f6f7f.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-24923fdf787601144adf1372.webp",
+          "source": "domestic-media/user-24923fdf787601144adf1372.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "海康机器人": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-da97ecb275cb69d1139e0009.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-e6543d8147feb8748daccd80.webp",
+          "source": "domestic-media/user-e6543d8147feb8748daccd80.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-36f2b0b2dfec545d52c05fe7.webp",
+          "source": "domestic-media/user-36f2b0b2dfec545d52c05fe7.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-064d5d076cfd602b60e1804d.webp",
+          "source": "domestic-media/user-064d5d076cfd602b60e1804d.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "立讯精密": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-370fa9533fb1d7d48ffed422.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-cdc5cec2329a04ef681c54bc.webp",
+          "source": "domestic-media/user-cdc5cec2329a04ef681c54bc.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-9ed6afe96ee054587042bb24.webp",
+          "source": "domestic-media/user-9ed6afe96ee054587042bb24.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-8dbf1ad6027bd7196a639dc9.webp",
+          "source": "domestic-media/user-8dbf1ad6027bd7196a639dc9.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "宁德时代": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-f42f8bb9bd347b3776968ab5.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/e5ae81e5beb7e697b6e4bba3-photo-0.webp",
+          "bytes": 93600,
+          "source": "https://www.catl.com/uploads/1/image/public/202008/20200818161807_q641cuoh2y.png",
+          "sourcePage": "https://www.catl.com/about/profile/"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-337888a30b38c8cfcd77ef77.webp",
+          "source": "domestic-media/user-337888a30b38c8cfcd77ef77.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-14b48d825bb1bafe03d432f6.webp",
+          "source": "domestic-media/user-14b48d825bb1bafe03d432f6.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "海康威视": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-58bf1b9df6cf986d59881476.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-a64d41ffa9b72c8ce1d533de.webp",
+          "source": "domestic-media/user-a64d41ffa9b72c8ce1d533de.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-19ca40e50472625b36a7ccb4.webp",
+          "source": "domestic-media/user-19ca40e50472625b36a7ccb4.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-74606fe59e4e80affb1c2361.webp",
+          "source": "domestic-media/user-74606fe59e4e80affb1c2361.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "北方华创": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-83454635c34950cf48df1e0c.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-2520b973c88e405a43bc476e.webp",
+          "source": "domestic-media/user-2520b973c88e405a43bc476e.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-161522786fbd1a5c3e6bca6b.webp",
+          "source": "domestic-media/user-161522786fbd1a5c3e6bca6b.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-9e66ad9da367045d129da869.webp",
+          "source": "domestic-media/user-9e66ad9da367045d129da869.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "华安证券": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-4e84106ce0d3db721fab644a.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-628c0cb2972a0ee5c3ef77b7.webp",
+          "source": "domestic-media/user-628c0cb2972a0ee5c3ef77b7.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-0c1364cd23938f72c131e011.webp",
+          "source": "domestic-media/user-0c1364cd23938f72c131e011.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "广发证券": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-bc5d9ca993044b7644390553.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-ee7dc13de9387efbca39caf1.webp",
+          "source": "domestic-media/user-ee7dc13de9387efbca39caf1.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-d1173b668561e62dec056169.webp",
+          "source": "domestic-media/user-d1173b668561e62dec056169.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "中信证券": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-ed43abe9b2aa6a7d0600525e.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-f330eee0347f310e7c9fcb2d.webp",
+          "source": "domestic-media/user-f330eee0347f310e7c9fcb2d.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-f9608fde8808381f0d17894b.webp",
+          "source": "domestic-media/user-f9608fde8808381f0d17894b.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "东方证券": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-8e7b32670f1a7f33cd9c3420.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-5e9374b354fc12564441d2c2.webp",
+          "source": "domestic-media/user-5e9374b354fc12564441d2c2.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "华泰证券": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-e52528576ba7eb0d31e3357a.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-d64d775ec7cc95f472ef0529.webp",
+          "source": "domestic-media/user-d64d775ec7cc95f472ef0529.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-8a598c56cc01625f734ff221.webp",
+          "source": "domestic-media/user-8a598c56cc01625f734ff221.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "光大证券": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-8c3639b23aa7f1104e888462.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-e76c5a474ad3669da81c359e.webp",
+          "source": "domestic-media/user-e76c5a474ad3669da81c359e.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-443b19deb36763ac4e9f670e.webp",
+          "source": "domestic-media/user-443b19deb36763ac4e9f670e.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "比亚迪": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-0e995b591802e506fd01f99a.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/e6af94e4ba9ae8bfaa-official-caption-0.jpg",
+          "source": "https://www.bydglobal.com/material/group-official-website/cn/about/pinpai.jpg",
+          "sourcePage": "https://www.bydglobal.com/cn/about.html",
+          "classification": "publisher_image_not_independently_visual_verified"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-ec9d3caae7f037ec2790b59a.webp",
+          "source": "domestic-media/user-ec9d3caae7f037ec2790b59a.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-e1f2162474c05cd8f7f9f485.webp",
+          "source": "domestic-media/user-e1f2162474c05cd8f7f9f485.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-b9ebe9592e5d7a96b190c986.webp",
+          "source": "domestic-media/user-b9ebe9592e5d7a96b190c986.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "中国平安": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-beadcf18c18251a08ab701b8.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-0cc614afa1b79098e99324e6.webp",
+          "source": "domestic-media/user-0cc614afa1b79098e99324e6.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-5ccb6527387a08f92d4cb6f5.webp",
+          "source": "domestic-media/user-5ccb6527387a08f92d4cb6f5.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "贵州茅台": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-2c3d8b517c178a7cf37fbd6f.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-c05893345a0964c5ac1c3067.webp",
+          "source": "domestic-media/user-c05893345a0964c5ac1c3067.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-812b96b34b576b6b81524887.webp",
+          "source": "domestic-media/user-812b96b34b576b6b81524887.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-6bbae56e1b674b5fba35e6aa.webp",
+          "source": "domestic-media/user-6bbae56e1b674b5fba35e6aa.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "格力电器": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-8553633eec968c41946971f8.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-52c0548b678e95a9a1a32daf.webp",
+          "source": "domestic-media/user-52c0548b678e95a9a1a32daf.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-866117737e30bf735b2c74a2.webp",
+          "source": "domestic-media/user-866117737e30bf735b2c74a2.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-511a3ee56fa09cf0ae0032da.webp",
+          "source": "domestic-media/user-511a3ee56fa09cf0ae0032da.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "浦发银行": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-1e24faba60d67e7edfedacda.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-4fc4b15778533391ec8420c0.webp",
+          "source": "domestic-media/user-4fc4b15778533391ec8420c0.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-53dd5ca0f129b92734a59bd0.webp",
+          "source": "domestic-media/user-53dd5ca0f129b92734a59bd0.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "招商银行": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-650df2a420293a14a617131b.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-98d9a779c678a3130ce063ec.webp",
+          "source": "domestic-media/user-98d9a779c678a3130ce063ec.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-edf8ce1b718cf834ae9987c9.webp",
+          "source": "domestic-media/user-edf8ce1b718cf834ae9987c9.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "海天味业": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-39d935e1193de99d7cd4b0df.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-c4f2a25c9dc704ab9ed0c2b1.webp",
+          "source": "domestic-media/user-c4f2a25c9dc704ab9ed0c2b1.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-94d11cf27773f3d59d32ebda.webp",
+          "source": "domestic-media/user-94d11cf27773f3d59d32ebda.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-27c161b7266f7769c230b292.webp",
+          "source": "domestic-media/user-27c161b7266f7769c230b292.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "中国建筑": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-a4c5d24255583a2d2384b595.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-8ccf0b06e56319c2d5ecc6c5.webp",
+          "source": "domestic-media/user-8ccf0b06e56319c2d5ecc6c5.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-9dfe877b629fdd6063fec7a9.webp",
+          "source": "domestic-media/user-9dfe877b629fdd6063fec7a9.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "上海机场": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-1c28cde457ca12c49835b3d0.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-0161b6ac37274510840ee0dc.webp",
+          "source": "domestic-media/user-0161b6ac37274510840ee0dc.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-7e40761f1269f12e4eab99e7.webp",
+          "source": "domestic-media/user-7e40761f1269f12e4eab99e7.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "伊利股份": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-b0cc61666d2986a7ebbfdc00.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-0348421ec39dcf66f8ca1c6b.webp",
+          "source": "domestic-media/user-0348421ec39dcf66f8ca1c6b.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-5865f9de31973ebcd9497b45.webp",
+          "source": "domestic-media/user-5865f9de31973ebcd9497b45.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-1908495773a099e988ecf614.webp",
+          "source": "domestic-media/user-1908495773a099e988ecf614.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "农业银行": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-44bd3292558e8167af10b0c4.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-a1606aabf51f3e1a73e77b2f.webp",
+          "source": "domestic-media/user-a1606aabf51f3e1a73e77b2f.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-2b243e28ffd36094a76c47a0.webp",
+          "source": "domestic-media/user-2b243e28ffd36094a76c47a0.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "建设银行": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-b9d878145f8ad81178b9fdf7.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-b1b58676df5a5949de0daae0.webp",
+          "source": "domestic-media/user-b1b58676df5a5949de0daae0.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-008f4a1bcd7ad8bf18d5191f.webp",
+          "source": "domestic-media/user-008f4a1bcd7ad8bf18d5191f.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "中国银行": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-b7ff625a6456434bf2fe74e1.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-29a7c35815124a5291d9b443.webp",
+          "source": "domestic-media/user-29a7c35815124a5291d9b443.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-b8721b79356337dd09a5c7cf.webp",
+          "source": "domestic-media/user-b8721b79356337dd09a5c7cf.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "中国移动": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-cbc26fd6793039516ee017d5.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-4b7ff817d9ddd07437edbe35.webp",
+          "source": "domestic-media/user-4b7ff817d9ddd07437edbe35.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-3c32802c0f1beabc1590921f.webp",
+          "source": "domestic-media/user-3c32802c0f1beabc1590921f.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "中国电信": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/user-4637dc7db40564dd92de011c.png",
+        "source": "user_submission",
+        "classification": "user_submitted_logo_pending_identity"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/user-8014e379e959d71cac979e97.webp",
+          "source": "domestic-media/user-8014e379e959d71cac979e97.webp",
+          "classification": "user_supplied_company_image"
+        },
+        {
+          "state": "ready",
+          "path": "domestic-media/user-b4b11293e602bf3d24a9b340.webp",
+          "source": "domestic-media/user-b4b11293e602bf3d24a9b340.webp",
+          "classification": "user_supplied_company_image"
+        }
+      ]
+    },
+    "阳光电动力": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-56ba771c42b7c293e6c9.png",
+        "source": "https://www.sungrowev.com/",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-56ba771c42b7c293e6c9.webp",
+          "source": "https://www.sungrowev.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "赛力斯": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-7f6333102da9e8bda2a5.png",
+        "source": "https://www.seres.cn/",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-7f6333102da9e8bda2a5.webp",
+          "source": "https://www.seres.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "宇通客车": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-4c0e5edf81ba50538238.webp",
+          "source": "https://en.yutong.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "江淮汽车": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-21618745f28ae4599590.png",
+        "source": "https://www.jac.com.cn/",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-21618745f28ae4599590.webp",
+          "source": "https://www.jac.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "中国海油": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-42d0faa9154c340b11b5.webp",
+          "source": "https://www.cnooc.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "工商银行": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-e7e901fd1d79de188b9b.webp",
+          "source": "https://icbc.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "中信银行": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-592de55f9c15c660827a.png",
+        "source": "https://www.citicbank.com/",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-592de55f9c15c660827a.webp",
+          "source": "https://www.citicbank.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "兴业银行": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-65886f285b393964eee5.webp",
+          "source": "https://www.cib.com.cn/cn/index.html",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "中国人寿": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-dfb80b004c96aa54de35.png",
+        "source": "https://www.e-chinalife.com/",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-dfb80b004c96aa54de35.webp",
+          "source": "https://www.e-chinalife.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "药明康德": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-60856a95b4e41852935b.png",
+        "source": "https://www.wuxiapptec.com/",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-60856a95b4e41852935b.webp",
+          "source": "https://www.wuxiapptec.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "恒瑞医药": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-82674fdbcc698714924f.webp",
+          "source": "https://www.hengrui.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "TCL科技": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-6a5dd350a3708ccdd6ea.png",
+        "source": "https://www.tcltech.com/",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-6a5dd350a3708ccdd6ea.webp",
+          "source": "https://www.tcltech.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "爱尔眼科": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-9f7c3e56728763537301.png",
+        "source": "https://www.aierchina.com/",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-9f7c3e56728763537301.webp",
+          "source": "https://www.aierchina.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "顺丰控股": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-bc4d73df39630718bd13.webp",
+          "source": "https://www.sf-express.com/chn/sc",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "安克创新": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-5ba1b699a1052ef78801.webp",
+          "source": "https://www.anker-in.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "石头科技": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-3442ec70890655e86891.webp",
+          "source": "https://us.roborock.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "汇顶科技": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-65fec4c1938ad5a252a7.png",
+        "source": "https://www.goodix.com/en",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-65fec4c1938ad5a252a7.webp",
+          "source": "https://www.goodix.com/en",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "温氏股份": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-079ce03536cd607f31c3.webp",
+          "source": "https://www.wens.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "腾讯": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-53874092e000069bfeda.png",
+        "source": "https://www.tencent.com/zh-cn/",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-53874092e000069bfeda.webp",
+          "source": "https://www.tencent.com/zh-cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "华为": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-82eaaba81d9dcc54deab.png",
+        "source": "https://www.huawei.com/cn/",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-82eaaba81d9dcc54deab.webp",
+          "source": "https://www.huawei.com/cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "阿里巴巴": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-47c1e53c427aafb4556b.webp",
+          "source": "https://www.alibabagroup.com/zh-CN",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "字节跳动": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-702c213feab1671de4c5.webp",
+          "source": "https://www.bytedance.com/zh/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "京东集团": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-a236d6f921ddf3002e8e.png",
+        "source": "https://corporate.jd.com/home",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-a236d6f921ddf3002e8e.webp",
+          "source": "https://corporate.jd.com/home",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "晶科能源": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-465bc4bfae1be70e4ae7.png",
+        "source": "https://www.jinkosolar.com/en/site/tigerneo_5",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-465bc4bfae1be70e4ae7.webp",
+          "source": "https://www.jinkosolar.com/en/site/tigerneo_5",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "中国邮政": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-432fc8c66640bfe1f847.webp",
+          "source": "https://www.chinapost.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "智飞生物": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-133f7a2b7e61a9ec5f02.webp",
+          "source": "https://www.zhifeishengwu.com/zh_CN",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "拓斯达": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-87dcba73458dbad3e189.webp",
+          "source": "https://www.topstarltd.com/lang-cn/about.html",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "欣旺达": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-6b6d421f9a1433cbf15c.png",
+        "source": "https://www.sunwoda.com/",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-6b6d421f9a1433cbf15c.webp",
+          "source": "https://www.sunwoda.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "长安汽车": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/company100-brand-7117fa8d72fb99b9c07c.png",
+        "source": "https://www.changan.com.cn/",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-7117fa8d72fb99b9c07c.webp",
+          "source": "https://www.changan.com.cn/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "浪潮信息": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/fe44c3909bf328e-website-brand-candidate.png",
+        "source": "https://ieisystem.com/",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-fe44c3909bf328ecdc0f.webp",
+          "source": "https://en.ieisystem.com/",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "科大讯飞": {
+      "brand": {
+        "state": "missing",
+        "classification": "identity_not_yet_verified"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-site-7ca2b7da6e0f8654c088.webp",
+          "source": "https://www.xfyun.cn/introduction",
+          "classification": "official_website_screenshot_unreviewed"
+        }
+      ]
+    },
+    "小米集团": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-review-ed0ecc1cefa680fe8266.webp",
+          "source": "https://commons.wikimedia.org/wiki/File:Xiaomi_Science_and_Technology_Park_(20220414090237).jpg",
+          "classification": "source_backed_named_enterprise_scene",
+          "reviewDate": "2026-10-24"
+        }
+      ]
+    },
+    "长城汽车": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-review-9e193b14cd5739886f93.webp",
+          "source": "https://www.gwm.com.cn/news/3403600.html",
+          "classification": "source_backed_named_enterprise_scene",
+          "reviewDate": "2026-10-24"
+        }
+      ]
+    },
+    "三一重工": {
+      "brand": {
+        "state": "ready",
+        "path": "domestic-media/d5adb014d4d826f-website-brand-candidate.png",
+        "source": "https://sanygroup.com/",
+        "classification": "logo_identity_checked",
+        "reviewDate": "2026-10-24"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-review-d5adb014d4d826fb6b36.webp",
+          "source": "https://www.sanygroup.com/news/11374.html",
+          "classification": "source_backed_named_enterprise_scene",
+          "reviewDate": "2026-10-24"
+        }
+      ]
+    },
+    "中国联通": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-review-7b88db32109256770f78.webp",
+          "source": "https://commons.wikimedia.org/wiki/File:%E4%B8%AD%E5%9B%BD%E8%81%94%E9%80%9A%E6%B7%B1%E5%9C%B3%E5%88%86%E5%85%AC%E5%8F%B8.jpg",
+          "classification": "source_backed_named_enterprise_scene",
+          "reviewDate": "2026-10-24"
+        }
+      ]
+    },
+    "广汽集团": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-review-5865d0d40a2939f75a07.webp",
+          "source": "https://huacheng.gz-cmc.com/pages/2026/02/01/29d5156007bc4881a29146865010f259.html",
+          "classification": "source_backed_named_enterprise_scene",
+          "reviewDate": "2026-10-24"
+        }
+      ]
+    },
+    "宝钢股份": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-review-13184d8f52bb112d1d5c.webp",
+          "source": "https://www.sfccn.com/2021/11-24/zNMDEzODdfMTY4MTkzNA.html",
+          "classification": "source_backed_named_enterprise_scene",
+          "reviewDate": "2026-10-24"
+        }
+      ]
+    },
+    "迈瑞医疗": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-review-cb0b0e4b48739fd2cd78.webp",
+          "source": "https://www.zhaopin.com/companydetail/CC000577607.htm",
+          "classification": "source_backed_named_enterprise_scene",
+          "reviewDate": "2026-10-24"
+        }
+      ]
+    },
+    "潍柴动力": {
+      "brand": {
+        "state": "missing"
+      },
+      "photos": [
+        {
+          "state": "ready",
+          "path": "domestic-media/company100-review-99bc5eb7f0f4e360c070.webp",
+          "source": "https://www.xinhuanet.com/2021-08/05/c_1127733854.htm",
+          "classification": "source_backed_named_enterprise_scene",
+          "reviewDate": "2026-10-24"
+        }
+      ]
+    },
+    "平高电气": {
+      "brand": {
+        "state": "missing",
+        "classification": "candidate_rejected_wrong_identity",
+        "reviewDate": "2026-10-24"
+      }
+    }
+  }
+}

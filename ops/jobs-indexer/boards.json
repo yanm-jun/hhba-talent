@@ -1,0 +1,246 @@
+{
+  "version": 1,
+  "description": "Official public Greenhouse, Ashby, Lever boards. Candidate boards count only after successful current API check.",
+  "boards": [
+    {
+      "platform": "greenhouse",
+      "company": "Greenhouse",
+      "slug": "greenhouse",
+      "website": "greenhouse.com"
+    },
+    {
+      "platform": "ashby",
+      "company": "Ashby",
+      "slug": "ashby",
+      "website": "ashbyhq.com"
+    },
+    {
+      "platform": "lever",
+      "company": "Spotify",
+      "slug": "spotify",
+      "website": "spotify.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Canonical",
+      "slug": "canonical",
+      "website": "canonical.com"
+    },
+    {
+      "platform": "ashby",
+      "company": "Airwallex",
+      "slug": "airwallex",
+      "website": "airwallex.com"
+    },
+    {
+      "platform": "lever",
+      "company": "Palantir",
+      "slug": "palantir",
+      "website": "palantir.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Figma",
+      "slug": "figma",
+      "website": "figma.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Anduril",
+      "slug": "andurilindustries",
+      "website": "anduril.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Discord",
+      "slug": "discord",
+      "website": "discord.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Reddit",
+      "slug": "reddit",
+      "website": "reddit.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Airtable",
+      "slug": "airtable",
+      "website": "airtable.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Flexport",
+      "slug": "flexport",
+      "website": "flexport.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Robinhood",
+      "slug": "robinhood",
+      "website": "robinhood.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "GitLab",
+      "slug": "gitlab",
+      "website": "gitlab.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Twilio",
+      "slug": "twilio",
+      "website": "twilio.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Cloudflare",
+      "slug": "cloudflare",
+      "website": "cloudflare.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Vercel",
+      "slug": "vercel",
+      "website": "vercel.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Gusto",
+      "slug": "gusto",
+      "website": "gusto.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Wise",
+      "slug": "wise",
+      "website": "wise.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "Coursera",
+      "slug": "coursera",
+      "website": "coursera.org"
+    },
+    {
+      "platform": "ashby",
+      "company": "OpenAI",
+      "slug": "openai",
+      "website": "openai.com"
+    },
+    {
+      "platform": "ashby",
+      "company": "Notion",
+      "slug": "notion",
+      "website": "notion.so"
+    },
+    {
+      "platform": "ashby",
+      "company": "Ramp",
+      "slug": "ramp",
+      "website": "ramp.com"
+    },
+    {
+      "platform": "ashby",
+      "company": "Linear",
+      "slug": "linear",
+      "website": "linear.app"
+    },
+    {
+      "platform": "ashby",
+      "company": "Perplexity",
+      "slug": "perplexity",
+      "website": "perplexity.ai"
+    },
+    {
+      "platform": "ashby",
+      "company": "ElevenLabs",
+      "slug": "elevenlabs",
+      "website": "elevenlabs.io"
+    },
+    {
+      "platform": "ashby",
+      "company": "Vanta",
+      "slug": "vanta",
+      "website": "vanta.com"
+    },
+    {
+      "platform": "ashby",
+      "company": "Harvey",
+      "slug": "harvey",
+      "website": "harvey.ai"
+    },
+    {
+      "platform": "ashby",
+      "company": "Headway",
+      "slug": "headway",
+      "website": "headway.co"
+    },
+    {
+      "platform": "lever",
+      "company": "Binance",
+      "slug": "binance",
+      "website": "binance.com"
+    },
+    {
+      "platform": "ashby",
+      "company": "Cognition",
+      "slug": "cognition",
+      "website": "cognition.ai"
+    },
+    {
+      "platform": "ashby",
+      "company": "Replit",
+      "slug": "replit",
+      "website": "replit.com"
+    },
+    {
+      "platform": "ashby",
+      "company": "PostHog",
+      "slug": "posthog",
+      "website": "posthog.com"
+    },
+    {
+      "platform": "ashby",
+      "company": "ClickUp",
+      "slug": "clickup",
+      "website": "clickup.com"
+    },
+    {
+      "platform": "ashby",
+      "company": "Cursor",
+      "slug": "cursor",
+      "website": "cursor.com"
+    },
+    {
+      "platform": "ashby",
+      "company": "Mercor",
+      "slug": "mercor",
+      "website": "mercor.com"
+    },
+    {
+      "platform": "ashby",
+      "company": "Form Energy",
+      "slug": "formenergy",
+      "website": "formenergy.com"
+    },
+    {
+      "platform": "lever",
+      "company": "ShopBack",
+      "slug": "shopback-2",
+      "website": "shopback.com"
+    },
+    {
+      "platform": "greenhouse",
+      "company": "AlphaSights Campus Recruiting",
+      "slug": "alphasightsresumedrop",
+      "website": "alphasights.com"
+    },
+    {
+      "platform": "ashby",
+      "company": "General Robotics",
+      "slug": "generalrobotics",
+      "website": "generalrobotics.company"
+    }
+  ]
+}

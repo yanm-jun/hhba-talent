@@ -1,0 +1,43 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const home=fs.readFileSync('src/pages/HomePage.tsx','utf8');
+const card=fs.readFileSync('src/components/HomePeopleBanner.tsx','utf8');
+const style=fs.readFileSync('src/styles/home-people-banner.css','utf8');
+const image=fs.readFileSync('public/images/hhba-people-group.webp');
+const avif=fs.readFileSync('public/images/hhba-people-group-hd.avif');
+test('only homepage shows banner; close does not persist across refresh or return',()=>{
+ assert.match(home,/import \{ HomePeopleBanner \}/);
+ assert.match(home,/<HomePeopleBanner\/>/);
+ assert.match(card,/从人民中来 到人民中去/);
+ assert.doesNotMatch(card,/<a\b|window\.open|navigate\(/);
+ assert.match(card,/useState\(false\)/);
+ assert.match(card,/setDismissed\(true\)/);
+ assert.doesNotMatch(card,/(?:localStorage|sessionStorage|document\.cookie)/);
+ assert.match(card,/aria-label="关闭 HHBA 品牌理念展示"/);
+});
+test('sharp locally hosted photograph, right aligned, red calligraphy',()=>{
+ assert.equal(image.toString('ascii',0,4),'RIFF');
+ assert.equal(image.toString('ascii',8,12),'WEBP');
+ assert.ok(image.length>150000);
+ assert.equal(avif.toString('ascii',4,12),'ftypavif');
+ assert.ok(avif.length>100000);
+ assert.match(card,/<picture>/);
+ assert.match(card,/width="1200" height="676"/);
+ assert.match(card,/font-display:swap/);
+ assert.match(card,/hhba-people-xingshu\.woff2/);
+ assert.match(card,/import\.meta\.env\.BASE_URL/);
+ assert.match(style,/position:fixed/);
+ assert.match(style,/right:max\(16px,env\(safe-area-inset-right\)\)/);
+ assert.match(style,/color:#b91c1c/);
+ assert.match(style,/font-family:"HHBA People Xingshu"/);
+ assert.doesNotMatch(style,/left:max/);
+ assert.match(style,/@media\(max-width:560px\)/);
+});
+test('licensed subset generation retained in deployment scripts',()=>{
+ const script=fs.readFileSync('scripts/prepare-home-xingshu-font.py','utf8');
+ assert.match(script,/ZhiMangXing-Regular\.ttf/);
+ assert.match(script,/OFL\.txt/);
+ assert.match(script,/hhba-people-xingshu\.woff2/);
+ assert.match(script,/subset\.Subsetter/);
+});

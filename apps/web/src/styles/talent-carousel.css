@@ -1,0 +1,19 @@
+/* HHBA talent photo-carousel controls. The carousel does not mutate the policy filter
+   during automatic playback: a visitor explicitly chooses "查看城市政策". */
+.ts-carousel{overflow:visible}
+.ts-carousel .ts-hero-photo{min-height:340px}
+.ts-carousel .ts-photo-caption{bottom:96px}
+.ts-carousel-arrow{position:absolute;z-index:5;top:43%;transform:translateY(-50%);width:37px;height:42px;border:1px solid #ffffffbe;border-radius:10px;background:#ffffffec;color:#245caa;display:grid;place-items:center;font-size:30px;line-height:1;font-weight:400;padding:0;box-shadow:0 6px 20px #142a4b36;transition:background .15s}
+.ts-carousel-arrow:hover{background:#fff}
+.ts-carousel-prev{left:17px}
+.ts-carousel-next{right:17px}
+.ts-carousel-bottom{display:flex;position:absolute;bottom:23px;left:26px;right:25px;z-index:6;align-items:center;justify-content:space-between;gap:9px;color:#fff}
+.ts-carousel-count{font-size:11px;letter-spacing:.05em;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ts-carousel-dots{display:flex;gap:6px;align-items:center;justify-content:center}
+.ts-carousel-dots button{width:7px;height:7px;background:#ffffff99;box-shadow:0 0 0 1px #ffffff47;border:0;border-radius:99px;padding:0;transition:width .15s,background .15s}
+.ts-carousel-dots button.active{width:22px;background:#ffac45}
+.ts-carousel-to-policy{font-size:10px;white-space:nowrap;font-weight:750;display:inline-flex;gap:5px;align-items:center;color:#fff;border:1px solid #ffffff9c;border-radius:8px;background:#ffffff22;padding:7px 8px;backdrop-filter:blur(4px)}
+.ts-carousel-to-policy:hover{background:#ffffff4d}
+@media(max-width:1050px){.ts-carousel .ts-hero-photo{min-height:305px}.ts-carousel-bottom{left:19px;right:19px;bottom:18px}.ts-carousel .ts-photo-caption{bottom:84px}}
+@media(max-width:740px){.ts-carousel .ts-hero-photo{min-height:250px;height:265px}.ts-carousel .ts-photo-caption{bottom:75px}.ts-carousel-arrow{width:31px;height:36px;font-size:26px;top:43%}.ts-carousel-prev{left:11px}.ts-carousel-next{right:11px}.ts-carousel-bottom{left:19px;right:18px;bottom:25px}.ts-carousel-to-policy{font-size:9px;padding:6px}.ts-carousel-dots{gap:5px}}
+@media(prefers-reduced-motion:reduce){.ts-carousel-dots button,.ts-carousel-arrow{transition:none}}

@@ -1,0 +1,56 @@
+/* HHBA identity-scoped navigation and role entrance: all legacy business pages unchanged. */
+.hhba-experience-header{gap:18px;align-items:center;min-height:48px}
+.hhba-experience-brand{display:inline-flex;gap:11px;align-items:center;flex:none}
+.hhba-experience-label{border-radius:6px;padding:5px 9px;font-size:11px;font-weight:700;white-space:nowrap;background:#eaf0f8;color:#315674}
+.hhba-experience-public .hhba-experience-label{display:none}
+.hhba-experience-header>nav{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:clamp(6px,1.5vw,18px);min-width:0}
+.hhba-experience-header>nav .auth,.hhba-experience-header>nav .join-nav-link{color:#53637a;font-weight:600;font-size:12px;white-space:nowrap;padding:8px 2px;text-decoration:none}
+.hhba-experience-header>nav .auth:hover,.hhba-experience-header>nav .join-nav-link:hover{color:#28674c}
+.hhba-nav-account{border-radius:8px;background:#263c57;color:#fff!important;text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:10px 14px;font-weight:700;font-size:12px;white-space:nowrap}
+.hhba-nav-account:hover{background:#315473}
+.hhba-nav-switch{display:inline-flex;align-items:center;gap:5px;color:#35624d;text-decoration:none;padding:8px 10px;border:1px solid #d9e5df;border-radius:8px;font-weight:650;font-size:12px;white-space:nowrap}
+.hhba-nav-switch:hover{background:#f2f8f4;border-color:#8db59c}
+.hhba-experience-header>nav .hhba-account-dropdown-trigger{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.hhba-public-hero{padding-top:clamp(4px,2vw,19px)}
+.hhba-public-eyebrow{margin:0 auto 13px!important;font-size:10px!important;letter-spacing:.13em;color:#478163!important;font-weight:750}
+.hhba-public-entry-grid{max-width:664px;gap:12px}
+.hhba-public-entry-grid .hhba-entry-card{min-height:172px;border-radius:12px;padding:10px;gap:0;text-decoration:none!important}
+.hhba-public-entry-grid .hhba-entry-card .entry-icon{height:43px;border-radius:8px}
+.hhba-entry-copy{display:flex;flex-direction:column;gap:7px;padding-top:13px;flex:1}
+.hhba-public-entry-grid .hhba-entry-card strong{font-size:17px;margin:0;color:#172b40}
+.hhba-public-entry-grid .hhba-entry-card small{margin:0;color:#65768c;font-size:12px;line-height:1.5}
+.hhba-public-entry-grid .hhba-entry-card .entry-footer{padding-top:12px;border-top:0;color:#286a4b;font-weight:700;margin-top:auto}
+.hhba-public-browse{max-width:790px;margin:18px auto 30px;background:#f3f8f5;border:1px solid #e0ece5;padding:14px 18px;border-radius:11px;display:flex;align-items:center;justify-content:space-between;gap:15px;font-size:12px;color:#456a52}
+.hhba-public-browse>div{display:flex;align-items:center;gap:9px;line-height:1.7}
+.hhba-public-browse>div svg{flex-shrink:0}
+.hhba-public-browse>a{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;color:#2b674a;font-weight:700;text-decoration:none}
+.hhba-employer-intro .hhba-employer-intro-hero{max-width:870px}
+.hhba-employer-intro .hhba-employer-intro-hero h1{max-width:830px}
+.hhba-employer-services{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-top:29px}
+.hhba-employer-service{display:flex;flex-direction:column;gap:9px;padding:20px 17px}
+.hhba-employer-service>svg{color:#3a7184}
+.hhba-employer-service h2{font-size:15px}
+.hhba-employer-service p{flex:1;font-size:12px;margin:0;line-height:1.8}
+.hhba-employer-service>a{font-size:12px;font-weight:700;color:#286a4b;display:flex;align-items:center;gap:5px;text-decoration:none}
+.hhba-employer-actions{margin-top:23px}
+.hhba-employer-actions .eh-entry-option{min-height:210px}
+@media(max-width:1000px){
+ .hhba-employer-services{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .hhba-experience-header>nav{gap:7px}
+}
+@media(max-width:680px){
+ .hhba-experience-header{flex-wrap:wrap;justify-content:space-between;align-items:flex-start}
+ .hhba-experience-header>nav{width:100%;justify-content:flex-start;gap:6px 12px}
+ .hhba-experience-header>nav .auth,.hhba-experience-header>nav .join-nav-link{padding:6px 2px}
+ .hhba-experience-label{font-size:10px}
+ .hhba-nav-account{padding:8px 10px}
+ .hhba-nav-switch{padding:7px}
+ .hhba-public-entry-grid{grid-template-columns:1fr;gap:12px}
+ .hhba-public-entry-grid .hhba-entry-card{min-height:166px}
+ .hhba-public-browse{align-items:flex-start;flex-direction:column;gap:12px}
+ .hhba-employer-services{grid-template-columns:1fr}
+ .hhba-employer-actions{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+ .hhba-entry-card{transition:none!important;transform:none!important}
+}

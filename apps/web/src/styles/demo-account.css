@@ -1,0 +1,80 @@
+.hhba-account-page{max-width:1160px;margin:0 auto}
+.hhba-account-header{display:flex;gap:20px;align-items:center;background:#fff;border:1px solid #e4eae5;border-radius:16px;padding:27px 30px;margin-bottom:14px}
+.hhba-account-avatar{width:68px;height:68px;flex-shrink:0;border-radius:19px;background:linear-gradient(140deg,#e5f1e9,#d5e4d8);color:#376849;display:grid;place-items:center}
+.hhba-account-identity{flex:1;min-width:0}
+.hhba-account-identity h1{margin:8px 0 7px;font-size:clamp(22px,3vw,27px);letter-spacing:-.5px;color:#26392c}
+.hhba-account-identity p{margin:0 0 10px;font-size:13px;color:#778679;line-height:1.6}
+.hhba-account-eyebrow{font-size:10px;letter-spacing:.13em;font-weight:750;color:#688474}
+.hhba-account-chip{display:inline-flex;align-items:center;border:1px solid #d8e7dc;border-radius:50px;padding:4px 9px;background:#f0f6f1;color:#477050;font-size:10px;font-weight:700}
+.hhba-account-exit{display:inline-flex;align-items:center;gap:6px;border:1px solid #dce7df;background:#fff;padding:9px 11px;border-radius:8px;font-size:12px;color:#607768;cursor:pointer}
+.hhba-account-warning{display:flex;align-items:flex-start;gap:9px;background:#f3f7f4;border:1px solid #deeadf;border-radius:10px;color:#577563;font-size:12px;line-height:1.75;padding:11px 15px;margin:0 0 19px}
+.hhba-account-warning svg{flex:none;margin-top:2px}
+.hhba-account-entry{background:#fff;border:1px solid #e1e8e2;border-radius:13px;padding:20px 22px;margin-bottom:17px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.hhba-account-entry strong{font-size:15px;color:#254131}
+.hhba-account-entry p{margin:7px 0 0;color:#77887b;font-size:12px;line-height:1.6}
+.hhba-account-actions{display:flex;gap:8px;flex-shrink:0}
+.hhba-account-actions a{padding:10px 13px;border-radius:8px;background:#f2f7f3;border:1px solid #dae8dc;color:#356547;font-size:12px;text-decoration:none;white-space:nowrap}
+.hhba-account-actions a:first-child{background:#285e42;color:#fff;border-color:#285e42}
+.hhba-account-grid{display:grid;grid-template-columns:220px minmax(0,1fr);gap:20px;align-items:start}
+.hhba-account-sidebar{background:#fff;border:1px solid #e3eae5;border-radius:14px;padding:19px 10px;display:flex;flex-direction:column;gap:3px}
+.hhba-account-sidebar>p{padding:0 13px;margin:3px 0 13px;color:#89988c;font-size:11px;font-weight:700;letter-spacing:.08em}
+.hhba-account-sidebar a{display:flex;align-items:center;gap:10px;border-radius:9px;color:#52675a;text-decoration:none;font-size:13px;padding:12px 13px;min-height:43px}
+.hhba-account-sidebar a svg:first-child{color:#658572;flex-shrink:0}
+.hhba-account-sidebar a span{flex:1}
+.hhba-account-sidebar a:hover{background:#f5f9f6}
+.hhba-account-sidebar a.active{background:#eaf3ec;color:#275139;font-weight:730}
+.hhba-account-chevron{opacity:.45}
+.hhba-account-content{min-width:0}
+.hhba-account-section-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:2px 0 16px}
+.hhba-account-section-heading h2{margin:0;font-size:21px;letter-spacing:-.35px;color:#273b2f}
+.hhba-account-section-heading h3{margin:0;font-size:17px;color:#273c30}
+.hhba-account-section-heading p{font-size:12px;line-height:1.7;color:#859185;margin:5px 0 0}
+.hhba-account-section-heading a{display:flex;align-items:center;gap:6px;font-size:12px;color:#336747;text-decoration:none;flex-shrink:0}
+.hhba-account-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:19px}
+.hhba-account-stat-grid>a{padding:20px 19px;display:flex;flex-direction:column;gap:9px;background:#fff;border:1px solid #e3e9e5;border-radius:13px;text-decoration:none;color:#273c2d}
+.hhba-account-stat-grid>a svg{color:#528565}
+.hhba-account-stat-grid span{font-size:12px;font-weight:600;color:#728574}
+.hhba-account-stat-grid strong{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums}
+.hhba-account-stat-grid small{font-size:10px;color:#89968b;line-height:1.5}
+.hhba-account-panel{background:#fff;border:1px solid #e2e9e4;border-radius:13px;padding:24px 26px;margin-bottom:20px;min-width:0}
+.hhba-account-panel>p{font-size:13px;line-height:1.75;color:#7c8b7f}
+.hhba-account-tool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.hhba-account-tool-grid>a.hhba-account-tool-card{display:grid;grid-template-columns:20px minmax(0,1fr) 15px;align-items:center;column-gap:12px;min-height:88px;padding:14px 16px;background:#fbfcfb;border:1px solid #e7ede8;border-radius:11px;text-decoration:none;color:#2d4836;transition:background-color .15s,border-color .15s}
+.hhba-account-tool-grid>a.hhba-account-tool-card:hover{background:#f3f8f4;border-color:#bcd7c4}
+.hhba-account-tool-grid>a.hhba-account-tool-card:focus-visible{outline:2px solid #4b8760;outline-offset:2px}
+.hhba-account-tool-icon{color:#4e7e5e;flex-shrink:0}
+.hhba-account-tool-copy{display:flex;flex-direction:column;gap:5px;min-width:0;overflow-wrap:normal;word-break:normal;white-space:normal;writing-mode:horizontal-tb}
+.hhba-account-tool-copy strong{display:block;font-size:13px;line-height:1.4;font-weight:730;white-space:normal}
+.hhba-account-tool-copy small{display:block;font-size:11px;line-height:1.55;color:#89968a;white-space:normal;word-break:normal;overflow-wrap:break-word}
+.hhba-account-tool-arrow{color:#839988;justify-self:end;flex-shrink:0}
+.hhba-account-form{display:flex;flex-direction:column;gap:17px}
+.hhba-account-form-row{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.hhba-account-form label{display:flex;flex-direction:column;gap:7px;font-size:12px;font-weight:700;color:#3a4b3e}
+.hhba-account-form input,.hhba-account-form textarea,.hhba-account-form select{width:100%;border:1px solid #dbe5dd;border-radius:9px;background:#fff;padding:12px 13px;font-size:13px;color:#283e30;outline:0;line-height:1.5}
+.hhba-account-form input:focus,.hhba-account-form textarea:focus,.hhba-account-form select:focus{border-color:#629d76;box-shadow:0 0 0 3px #6ca77d18}
+.hhba-account-form-actions{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin-top:7px}
+.hhba-account-form-actions button{border:0;border-radius:8px;background:#2c6345;color:#fff;padding:11px 19px;font-size:13px;font-weight:730;cursor:pointer}
+.hhba-account-form-actions button:disabled{background:#b9c9bf;cursor:default}
+.hhba-account-form-actions small{font-size:11px;color:#96a098}
+.hhba-account-notice{color:#386e4c!important;background:#f0f7f2;border:1px solid #d9ebdb;padding:10px;border-radius:8px;font-size:12px!important;overflow-wrap:anywhere}
+.hhba-account-muted{font-size:11px!important;color:#8d9990!important;line-height:1.7}
+.hhba-account-empty{padding:35px 14px;text-align:center;display:flex;flex-direction:column;gap:11px;align-items:center;color:#7f9183}
+.hhba-account-empty>svg{color:#82ac8e}
+.hhba-account-empty strong{font-size:16px;color:#304737}
+.hhba-account-empty p{margin:0;max-width:440px;font-size:12px;line-height:1.75}
+.hhba-account-empty a{color:#2d6243;border:1px solid #d8e7da;padding:9px 14px;border-radius:8px;text-decoration:none;margin-top:5px;font-size:12px}
+.hhba-account-upload{padding:30px 15px;border:1.5px dashed #cfe0d4;border-radius:12px;background:#f9fcfa;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+.hhba-account-upload svg{color:#5a8869}
+.hhba-account-upload h3{margin:0;font-size:17px;color:#304937}
+.hhba-account-upload p{margin:0;font-size:12px;line-height:1.8;color:#86978a}
+.hhba-account-upload-button{cursor:pointer;display:inline-block;background:#2b6046;color:#fff;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:700}
+.hhba-account-upload-button input{display:none}
+.hhba-account-privacy-row{border-top:1px solid #eaf0eb;padding:18px 0;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.hhba-account-privacy-row strong{display:flex;align-items:center;gap:8px;font-size:14px;color:#354a3a}
+.hhba-account-privacy-row strong svg{color:#6b9a79}
+.hhba-account-privacy-row p{margin:8px 0 0;font-size:12px;color:#89968d;line-height:1.6;max-width:480px}
+.hhba-account-danger{border:1px solid #e4c8c8;background:#fff7f7;color:#ab4242;border-radius:8px;padding:9px 12px;font-size:12px;cursor:pointer;flex-shrink:0}
+.hhba-account-danger:disabled{opacity:.5;cursor:not-allowed}
+.hhba-account-footer{display:flex;align-items:center;gap:8px;color:#88978d;font-size:11px;margin:20px 0 0}
+@media(max-width:900px){.hhba-account-grid{grid-template-columns:1fr;gap:12px}.hhba-account-sidebar{display:flex;flex-direction:row;flex-wrap:wrap;padding:10px;gap:4px}.hhba-account-sidebar>p{display:none}.hhba-account-sidebar a{padding:9px 11px;min-height:38px}.hhba-account-chevron{display:none}}
+@media(max-width:620px){.hhba-account-header{padding:19px;gap:12px;flex-wrap:wrap}.hhba-account-avatar{width:48px;height:48px;border-radius:12px}.hhba-account-exit{margin-left:auto}.hhba-account-sidebar a{font-size:12px}.hhba-account-stat-grid{gap:7px}.hhba-account-stat-grid>a{padding:13px 10px}.hhba-account-stat-grid strong{font-size:22px}.hhba-account-panel{padding:18px 15px}.hhba-account-form-row{grid-template-columns:1fr}.hhba-account-tool-grid{grid-template-columns:1fr}.hhba-account-tool-grid>a.hhba-account-tool-card{min-height:76px;padding:12px 14px;column-gap:11px}.hhba-account-entry{flex-direction:column;align-items:flex-start}.hhba-account-privacy-row{flex-direction:column;align-items:flex-start}.hhba-account-section-heading h2{font-size:19px}}

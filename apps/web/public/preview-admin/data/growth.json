@@ -1,0 +1,28 @@
+{
+  "kind": "HHBA_PRIVATE_GROWTH_V1",
+  "asOf": null,
+  "period": null,
+  "traffic": {
+    "quality": "unavailable",
+    "pv": null,
+    "dailyUvSum": null,
+    "jobViews": null,
+    "searches": null,
+    "applyClicks": null,
+    "series": []
+  },
+  "bookmarks": {
+    "quality": "unavailable",
+    "totalActive": null,
+    "devicesWithBookmarks": null,
+    "added": null,
+    "removed": null
+  },
+  "unavailable": {
+    "registeredUsers": null,
+    "dau": null,
+    "mau": null,
+    "revenueCny": null
+  },
+  "definitions": {}
+}

@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "reviewedOn": "2026-10-28",
+  "disclaimer": "仅对同名主体的可追溯官方业务事实和招聘首页作补充；并非逐岗仍开放或逐岗专业/城市证明。",
+  "entries": {
+    "毕马威": {
+      "name": "毕马威",
+      "industry": "审计、税务及咨询服务",
+      "intro": "毕马威是由独立成员所组成的全球性专业服务组织，在中国开展审计、税务与咨询等业务。其中国业务覆盖多个城市，具体求职职位、部门和工作地点应在官方招聘页逐项查看。",
+      "source": "https://kpmg.com/cn/zh/about.html",
+      "officialRecruitment": "https://kpmg.com/cn/zh/careers.html",
+      "recruitmentLabel": "校招、社招等招聘入口（官网内选择）",
+      "evidenceScope": "企业官方介绍与招聘总入口；没有核实本轮逐岗当前可投递状态"
+    },
+    "施耐德电气": {
+      "name": "施耐德电气",
+      "industry": "能源科技、工业自动化与数字化",
+      "intro": "施耐德电气提供电气化、自动化和数智化方案，业务涉及智能设备、软件、数字化服务以及楼宇、数据中心、工厂和电网等场景。中国招聘主页公开了研发、商业、供应链、数字化等校园培养项目。",
+      "source": "https://careers.se.com/china",
+      "officialRecruitment": "https://careers.se.com/china",
+      "recruitmentLabel": "中国官方招聘页面（校招／社招）",
+      "evidenceScope": "企业招聘官网官方介绍及项目入口；专业与工作城市须按具体职位核对"
+    },
+    "鹰角网络": {
+      "name": "鹰角网络",
+      "industry": "电子游戏研发与发行",
+      "intro": "鹰角网络以游戏创作为主要业务，在官方招聘网站展示美术、策划、程序、发行市场、职能及质量管理等方向，并发布2027秋招动态。岗位类别不等于每个岗位当前仍开放。",
+      "source": "https://career.hypergryph.com/",
+      "officialRecruitment": "https://career.hypergryph.com/",
+      "recruitmentLabel": "官方招聘网站（校园招聘／社会招聘）",
+      "evidenceScope": "企业招聘官网的岗位方向及历史招募资讯"
+    },
+    "徕芬科技": {
+      "name": "徕芬科技",
+      "industry": "消费科技、个人护理与工业设计",
+      "intro": "徕芬的官方介绍将其定位为技术与设计驱动的消费科技品牌，展示高速吹风机、扫振电动牙刷等产品研发与品牌发展信息；招聘职位和工作地点仍需另行核实。",
+      "source": "https://mp.laifen.net/about",
+      "officialRecruitment": null,
+      "recruitmentLabel": null,
+      "evidenceScope": "官方企业及品牌介绍；尚未核对到独立招聘官网"
+    },
+    "中国南方航空": {
+      "name": "中国南方航空",
+      "industry": "航空客货运输",
+      "intro": "中国南方航空股份有限公司是中国南方航空集团有限公司控股的运输航空企业，总部位于广州，经营航空运输业务。官方招聘系统分别提供校园招聘、社会招聘、实习和其他类别的职位导航。",
+      "source": "https://www.csair.cn/sg/zh/about/",
+      "officialRecruitment": "https://job.csair.cn/global",
+      "recruitmentLabel": "南方航空官方招聘系统（校招／社招／实习）",
+      "evidenceScope": "官方公司简介及官方招聘网站分类；各岗位是否开放需核实"
+    },
+    "顺丰": {
+      "name": "顺丰",
+      "industry": "快递物流、供应链及物流科技",
+      "intro": "顺丰集团以快递、快运、冷运与医药、同城配送、供应链及国际物流等服务为业务方向，并以科技技术支持物流经营。截图中的“顺丰”是集团品牌，具体岗位必须以招聘页面列出的用人单位为准。",
+      "source": "https://jobs.blcu.edu.cn/front/zph.jspa?channelId=766&tid=2100842873438781441",
+      "officialRecruitment": "https://campus.sf-express.com/#/homePage",
+      "recruitmentLabel": "顺丰集团校园招聘入口",
+      "evidenceScope": "高校发布的2027届校招简章与此前核验的集团校招入口；顺丰科技岗位不自动视为所有集团岗位"
+    },
+    "新鸿基地产": {
+      "name": "新鸿基地产",
+      "industry": "房地产开发、租赁与物业相关服务",
+      "intro": "新鸿基地产是香港主要地产发展商之一，官方招聘中心列出香港与内地职位、内地管理培训生计划及不同职能岗位类别。具体公司、工作地区和投递条件按官方职位核对。",
+      "source": "https://www.shkp.com/zh-CN/work-with-us",
+      "officialRecruitment": "https://www.shkp.com/zh-CN/work-with-us/job-vacancies",
+      "recruitmentLabel": "招聘职位及内地管理培训生（官网内选择）",
+      "evidenceScope": "企业官方招聘主页与职位目录；公开的内地管理培训生申请截止日期需单独核实"
+    },
+    "万科泊寓": {
+      "name": "万科泊寓",
+      "industry": "长租公寓与租赁住房运营",
+      "intro": "泊寓是万科旗下的长租公寓品牌，面向城市青年提供租赁住房与运营服务。泊寓属于品牌及业务体系，不能据此将万科集团所有岗位归属泊寓，尚未核实独立招聘渠道。",
+      "source": "https://vanke.com/about/overview",
+      "officialRecruitment": null,
+      "recruitmentLabel": null,
+      "evidenceScope": "万科集团官网对泊寓业务的介绍；未证实品牌独立招聘入口"
+    },
+    "紫金集团": {
+      "name": "紫金集团",
+      "industry": null,
+      "intro": null,
+      "source": null,
+      "officialRecruitment": null,
+      "recruitmentLabel": null,
+      "evidenceScope": "截图中的名称存在主体歧义，不擅自对应为紫金矿业"
+    },
+    "中国华能": {
+      "name": "中国华能",
+      "industry": "电力、综合能源与新能源",
+      "intro": "中国华能集团是以电为核心的综合能源集团，业务涉及火电、水电、核电、新能源、煤炭、金融与科技等领域。2027年校园招聘由所属企业分别发布岗位；专业和工作地点须按照具体子公司职位对应核对。",
+      "source": "https://www.chng.com.cn/detail_zpxx/-/article/YjJqG0pRRQU6/v/1326793.html",
+      "officialRecruitment": "https://zhaopin.chng.com.cn/",
+      "recruitmentLabel": "中国华能官方校园招聘系统",
+      "evidenceScope": "官方华能招聘页面以及2027校招单位公告，非全部岗位实时开放证明"
+    },
+    "中国大唐集团": {
+      "name": "中国大唐集团",
+      "industry": "电力、综合能源及相关产业",
+      "intro": "中国大唐集团有限公司是中央管理的能源企业，经营方向覆盖电力、煤炭煤化工、环保、金融等领域。集团招聘平台分别列示区域公司、专业公司、科技企业及专项招聘公告，具体岗位和地点由各招聘公告决定。",
+      "source": "https://dtsc.china-cdt.com/dtwz/xwzx/jtxw/2026/9/I1552059660066881536.html",
+      "officialRecruitment": "https://zhaopin.china-cdt.com/zpgg_xyzp.html",
+      "recruitmentLabel": "中国大唐集团官方校园招聘公告目录",
+      "evidenceScope": "集团官方2027届第一批校园招聘公告与招聘系统；各下属用人单位招聘条件需分别核实"
+    },
+    "辉瑞": {
+      "name": "辉瑞",
+      "industry": "生物制药、创新药及疫苗",
+      "intro": "辉瑞（Pfizer）成立于1849年，业务涵盖药物及疫苗研发、生产、供应质量管理及医学商业运营。此为独立编辑企业介绍，不代表企业官方合作。",
+      "source": "https://www.pfizer.com/about",
+      "officialRecruitment": "https://www.pfizer.com/about/careers/search-results",
+      "recruitmentLabel": "辉瑞全球招聘官网（筛选中国岗位）",
+      "evidenceScope": "2026-10-29 确认四条辉瑞中国职位详情页，职位仍否开放须访问官网验证"
+    }
+  }
+}

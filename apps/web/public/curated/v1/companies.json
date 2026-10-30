@@ -1,0 +1,75 @@
+{
+  "kind": "HHBA_CURATED_COMPANIES_V1",
+  "companies": [
+    {
+      "id": "openai",
+      "name": "OpenAI",
+      "nameZh": "OpenAI",
+      "originalPlatform": "ashby",
+      "jobsCount": 10
+    },
+    {
+      "id": "anthropic",
+      "name": "Anthropic",
+      "nameZh": "Anthropic",
+      "originalPlatform": "greenhouse",
+      "jobsCount": 10
+    },
+    {
+      "id": "spacex",
+      "name": "SpaceX",
+      "nameZh": "SpaceX",
+      "originalPlatform": "greenhouse",
+      "jobsCount": 10
+    },
+    {
+      "id": "stripe",
+      "name": "Stripe",
+      "nameZh": "Stripe",
+      "originalPlatform": "greenhouse",
+      "jobsCount": 10
+    },
+    {
+      "id": "airbnb",
+      "name": "Airbnb",
+      "nameZh": "爱彼迎",
+      "originalPlatform": "greenhouse",
+      "jobsCount": 10
+    },
+    {
+      "id": "notion",
+      "name": "Notion",
+      "nameZh": "Notion",
+      "originalPlatform": "ashby",
+      "jobsCount": 10
+    },
+    {
+      "id": "figma",
+      "name": "Figma",
+      "nameZh": "Figma",
+      "originalPlatform": "greenhouse",
+      "jobsCount": 10
+    },
+    {
+      "id": "spotify",
+      "name": "Spotify",
+      "nameZh": "Spotify",
+      "originalPlatform": "lever",
+      "jobsCount": 10
+    },
+    {
+      "id": "reddit",
+      "name": "Reddit",
+      "nameZh": "Reddit",
+      "originalPlatform": "greenhouse",
+      "jobsCount": 10
+    },
+    {
+      "id": "databricks",
+      "name": "Databricks",
+      "nameZh": "Databricks",
+      "originalPlatform": "greenhouse",
+      "jobsCount": 10
+    }
+  ]
+}

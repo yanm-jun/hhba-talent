@@ -1,0 +1,45 @@
+{
+  "company": "南方传媒",
+  "employer_id": "cn-autumn-026",
+  "assets": {
+    "logo": {
+      "path": "images/employer-profiles/cn-autumn-026/logo.png",
+      "size": 37003,
+      "dimensions": [
+        274,
+        127
+      ],
+      "sha256": "2f08bf28003398ad7a65dfda55d0761df79f31fac645b0e4c4ca68cd38634e85",
+      "source": "https://static.cninfo.com.cn/finalpage/2016-11-05/1202816070.PDF",
+      "sourceType": "public disclosure PDF p.1 embedded image",
+      "pdfRect": [
+        194.89999389648438,
+        125.74998474121094,
+        400.45001220703125,
+        221.04998779296875
+      ]
+    },
+    "photo1": {
+      "path": "images/employer-profiles/cn-autumn-026/photo1.webp",
+      "size": 178838,
+      "dimensions": [
+        1376,
+        917
+      ],
+      "sha256": "04a7bf26eefae7842caaab338c576c552c1c1674ffa7bd0185e6599b0d26aa49",
+      "source": "https://www.chinawriter.com.cn/NMediaFile/2026/0901/MAIN1788253493176JIF9B4CGS9.png",
+      "sourceType": "independent published news/event photography"
+    },
+    "photo2": {
+      "path": "images/employer-profiles/cn-autumn-026/photo2.webp",
+      "size": 79908,
+      "dimensions": [
+        800,
+        451
+      ],
+      "sha256": "4599a50c268abdcf7d9b7f71fc6972e9067ff6299316c4b078504bf94b7e37a7",
+      "source": "https://www.xinhuanet.com/book/20260902/8a5b1b8d691248059a17ad55da732187/202609028a5b1b8d691248059a17ad55da732187_20260902a7f58af6b12247189e3cc98955dc6591.jpg",
+      "sourceType": "independent published news/event photography"
+    }
+  }
+}

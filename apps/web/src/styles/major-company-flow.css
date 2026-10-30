@@ -1,0 +1,52 @@
+/* Universal employer role filter: no search field on any company detail route. */
+.company-profile-major-chips{margin-top:22px}
+.company-profile-major-chips>h2{margin:0 0 10px}
+.company-profile-major-chips>p{color:#688075;line-height:1.65;font-size:13px}
+.hhba-major-quick-list .hhba-kpmg-major{
+ appearance:none;cursor:pointer;border:1px solid #dfe9e3;background:#fff;
+ color:#45685a;padding:8px 12px;border-radius:9px;line-height:1.4;
+ font-family:inherit;font-size:12px;white-space:normal
+}
+.hhba-major-quick-list .hhba-kpmg-major.is-selected{
+ background:#e9f5ed;border-color:#a5d3b3;color:#216c48;font-weight:700
+}
+.hhba-major-quick-list .hhba-kpmg-major:hover{border-color:#90c4a5}
+.hhba-major-quick-list .hhba-kpmg-major.hhba-major-show-more{background:#f8faf8}
+.hhba-major-quick-list .hhba-major-show-more .is-up{transform:rotate(180deg)}
+
+/* Employer-specific quick subjects reuse the same global major and job matcher. */
+.hhba-major-quick-area{margin:14px 0 12px}
+.hhba-major-quick-caption{display:block;font-size:12px;color:#537767;font-weight:700;margin-bottom:8px}
+.hhba-major-quick-list{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hhba-major-quick-list .hhba-kpmg-major{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px}
+.hhba-major-quick-list .hhba-kpmg-major small{font-size:11px;font-weight:600;opacity:.8}
+.hhba-major-quick-list .hhba-kpmg-major:focus-visible{outline:2px solid #217a5a;outline-offset:2px}
+.hhba-major-quick-footnote{font-size:11px;line-height:1.65;color:#809287;margin:9px 0 0}
+
+/* HHBA reviewed employer/major matching: visual rhythm inherited from the CITIC compact layout. */
+.hhba-major-recommendations{margin:18px 0 24px;padding:22px 24px;background:#fff;border:1px solid #e5ece7;border-radius:16px}
+.hhba-major-recommendations-heading{display:flex;align-items:start;justify-content:space-between;gap:14px}
+.hhba-major-recommendations-heading small{font-size:10px;font-weight:700;letter-spacing:.09em;color:#537968}
+.hhba-major-recommendations-heading h2{font-size:20px;margin:5px 0 8px;display:flex;align-items:center;gap:8px;color:#182f28}
+.hhba-major-recommendations-heading p{font-size:12px;color:#698179;line-height:1.7;margin:0}
+.hhba-major-recommendations-heading>span{white-space:nowrap;background:#f4f8f5;padding:7px 10px;border-radius:9px;font-size:12px;color:#2a7356}
+.hhba-major-employer-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:17px 0}
+.hhba-major-employer-card{border:1px solid #e0e9e3;border-radius:12px;background:#fff;padding:15px;display:flex;gap:13px;text-decoration:none;color:inherit;min-width:0;align-items:center;transition:border-color .15s}
+.hhba-major-employer-card:hover{border-color:#8fc2a6}
+.hhba-major-employer-logo{height:50px;width:50px;flex-shrink:0;border:1px solid #eaf0ec;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.hhba-major-employer-logo img{width:100%;height:100%;object-fit:contain}
+.hhba-major-employer-info{display:flex;flex-direction:column;gap:5px;min-width:0}
+.hhba-major-employer-info strong{font-size:14px;color:#223d32}
+.hhba-major-employer-info small{font-size:11px;color:#71857a}
+.hhba-major-employer-info>span{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:#2b7853}
+.hhba-major-no-company{margin-top:16px;display:flex;gap:10px;border-radius:9px;background:#f6f8f7;padding:15px;color:#5a6d62;font-size:12px;line-height:1.7}
+.hhba-major-no-company p{margin:0}
+.hhba-major-recommendations-footnote{font-size:11px;color:#7d9084;margin:12px 0 0;line-height:1.7}
+.hhba-major-market-state{display:flex;gap:12px;flex-wrap:wrap;align-items:center;color:#537764;font-size:12px;margin:10px 0}
+.hhba-major-market-state label{display:flex;gap:6px;align-items:center}
+.hhba-major-market-state button{border:1px solid #b9d8c4;background:#f7faf7;color:#276d49;padding:6px 10px;border-radius:8px;cursor:pointer}
+@media (max-width:720px){
+ .hhba-major-recommendations{padding:16px}
+ .hhba-major-employer-grid{grid-template-columns:1fr}
+ .hhba-major-recommendations-heading h2{font-size:17px}
+}

@@ -1,0 +1,860 @@
+{
+  "profiles": [
+    {
+      "id": "WyJhc2hieSIsImNvaGVyZSIsIkNvaGVyZSJd",
+      "identity": {
+        "platform": "ashby",
+        "source": "cohere",
+        "company": "Cohere"
+      },
+      "name": "Cohere",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "企业级基础模型与人工智能软件",
+        "en": "Enterprise foundation models and AI software"
+      },
+      "country": {
+        "zh": "加拿大",
+        "en": "Canada"
+      },
+      "founded": "2019",
+      "tagline": {
+        "zh": "面向企业环境提供 AI 模型与应用能力。",
+        "en": "Models and AI applications built for enterprise use."
+      },
+      "overview": [
+        {
+          "zh": "Cohere 于 2019 年创立于多伦多，开发面向企业的基础语言模型和人工智能应用产品，强调可部署性、隐私和业务场景适配。",
+          "en": "Founded in Toronto in 2019, Cohere develops foundation language models and AI solutions for businesses, with emphasis on deployment flexibility, privacy and real-world applications."
+        },
+        {
+          "zh": "其官方产品覆盖文本生成、检索与企业知识工作流。企业用户可以在不同云与私有环境中部署支持的模型。",
+          "en": "Its portfolio supports text generation, retrieval and enterprise knowledge workflows, including deployment options across cloud and supported private environments."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Command 模型",
+            "en": "Command models"
+          },
+          "description": {
+            "zh": "服务企业应用的语言模型",
+            "en": "Language models for enterprise applications"
+          }
+        },
+        {
+          "name": {
+            "zh": "Embed 检索模型",
+            "en": "Embed models"
+          },
+          "description": {
+            "zh": "用于文本嵌入与语义检索",
+            "en": "Text embeddings and semantic retrieval"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2019",
+          "description": {
+            "zh": "Cohere 成立或开始开展核心业务。",
+            "en": "Cohere was founded or started its core activity."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Cohere 公司或招聘来源官方说明",
+            "en": "Cohere official source overview"
+          },
+          "url": "https://cohere.com/about"
+        },
+        {
+          "label": {
+            "zh": "Cohere 官方产品与发展资料",
+            "en": "Cohere official product and history"
+          },
+          "url": "https://cohere.com/"
+        },
+        {
+          "label": {
+            "zh": "Cohere 招聘板链接",
+            "en": "Cohere recruitment board"
+          },
+          "url": "https://jobs.ashbyhq.com/cohere"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJhc2hieSIsIm1lcmNvciIsIk1lcmNvciJd",
+      "identity": {
+        "platform": "ashby",
+        "source": "mercor",
+        "company": "Mercor"
+      },
+      "name": "Mercor",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "专家人才网络与 AI 训练服务",
+        "en": "Expert talent networks and AI training services"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2023",
+      "tagline": {
+        "zh": "连接专业人才与人工智能研究所需的知识工作。",
+        "en": "Connecting human expertise with AI development."
+      },
+      "overview": [
+        {
+          "zh": "Mercor 创立于 2023 年，最初开发 AI 辅助人才评估与匹配平台，后来扩展到连接领域专家与 AI 实验室、企业之间的知识工作。",
+          "en": "Founded in 2023, Mercor began with AI-assisted candidate evaluation and matching and expanded into connecting domain experts with AI labs and enterprises."
+        },
+        {
+          "zh": "其业务涉及专家筛选、项目匹配、专业知识收集和模型评估。与 HHBA 的平台定位可能有相似之处，但两者不存在已知合作关系。",
+          "en": "Its work includes expert screening, project matching, knowledge contribution and model evaluation. Some activities resemble HHBA's talent focus but no business partnership is implied."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "专家匹配",
+            "en": "Expert matching"
+          },
+          "description": {
+            "zh": "根据专业能力连接项目需求",
+            "en": "Connect expertise with project demand"
+          }
+        },
+        {
+          "name": {
+            "zh": "模型训练与评估",
+            "en": "AI training and evaluation"
+          },
+          "description": {
+            "zh": "组织专家参与模型改进和专业评测",
+            "en": "Coordinate expert contributions to model improvement"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2023",
+          "description": {
+            "zh": "Mercor 成立或开始开展核心业务。",
+            "en": "Mercor was founded or started its core activity."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Mercor 公司或招聘来源官方说明",
+            "en": "Mercor official source overview"
+          },
+          "url": "https://www.mercor.com/mission/"
+        },
+        {
+          "label": {
+            "zh": "Mercor 官方产品与发展资料",
+            "en": "Mercor official product and history"
+          },
+          "url": "https://www.mercor.com/blog/1/"
+        },
+        {
+          "label": {
+            "zh": "Mercor 招聘板链接",
+            "en": "Mercor recruitment board"
+          },
+          "url": "https://jobs.ashbyhq.com/mercor"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJhc2hieSIsImNvZ25pdGlvbiIsIkNvZ25pdGlvbiJd",
+      "identity": {
+        "platform": "ashby",
+        "source": "cognition",
+        "company": "Cognition"
+      },
+      "name": "Cognition",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "AI 软件工程 Agent",
+        "en": "AI software engineering agents"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "—",
+      "tagline": {
+        "zh": "研发能够执行软件开发任务的 AI 工程代理。",
+        "en": "Agents for executing software engineering tasks."
+      },
+      "overview": [
+        {
+          "zh": "Cognition 是开发 Devin AI 编程产品的美国人工智能企业。Devin 被定位为能够围绕代码库执行开发任务、使用工具及报告结果的软件工程 AI Agent。",
+          "en": "Cognition is a US AI company behind Devin, an AI software engineering agent designed to work with codebases, use development tools and report task results."
+        },
+        {
+          "zh": "其产品面向软件研发团队，关注从任务描述到代码实现的工作流程。由于企业成立年份没有在本批所用官方资料中独立核实，HHBA 不显示猜测年份。",
+          "en": "Its products address workflows from issue descriptions to software implementation. As the company founding year was not independently confirmed from the sources used in this batch, HHBA does not invent a date."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Devin",
+            "en": "Devin"
+          },
+          "description": {
+            "zh": "使用开发工具执行与反馈工程任务",
+            "en": "AI agent for development workflows"
+          }
+        },
+        {
+          "name": {
+            "zh": "团队工程协作",
+            "en": "Engineering collaboration"
+          },
+          "description": {
+            "zh": "协助处理代码库中的重复开发任务",
+            "en": "Assists teams with codebase engineering work"
+          }
+        }
+      ],
+      "milestones": [],
+      "sources": [
+        {
+          "label": {
+            "zh": "Cognition 公司或招聘来源官方说明",
+            "en": "Cognition official source overview"
+          },
+          "url": "https://cognition.ai/"
+        },
+        {
+          "label": {
+            "zh": "Cognition 官方产品与发展资料",
+            "en": "Cognition official product and history"
+          },
+          "url": "https://cognition.ai/blog"
+        },
+        {
+          "label": {
+            "zh": "Cognition 招聘板链接",
+            "en": "Cognition recruitment board"
+          },
+          "url": "https://jobs.ashbyhq.com/cognition"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJsZXZlciIsInNob3BiYWNrLTIiLCJTaG9wQmFjayJd",
+      "identity": {
+        "platform": "lever",
+        "source": "shopback-2",
+        "company": "ShopBack"
+      },
+      "name": "ShopBack",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "现金返还、电商优惠与购物平台",
+        "en": "Cashback, commerce rewards and shopping platform"
+      },
+      "country": {
+        "zh": "新加坡",
+        "en": "Singapore"
+      },
+      "founded": "2014",
+      "tagline": {
+        "zh": "通过购物返现连接消费者与商户。",
+        "en": "Shopping rewards connecting customers and merchants."
+      },
+      "overview": [
+        {
+          "zh": "ShopBack 于 2014 年创立于新加坡，运营购物返现和优惠服务平台，让消费者经由其应用或网站访问合作商家并获得合规适用的奖励。",
+          "en": "Founded in Singapore in 2014, ShopBack operates a cashback and shopping rewards service connecting consumers with participating merchants through its site and app."
+        },
+        {
+          "zh": "其业务也为商户提供营销触达、返现激励与合作推广工具，覆盖多个市场；实际优惠与返现规则依据当地服务条件。",
+          "en": "Its merchant services include performance marketing, rewards and campaign partnerships across multiple markets; actual benefits depend on local terms."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Cashback 返现",
+            "en": "Cashback rewards"
+          },
+          "description": {
+            "zh": "按条件返还部分合资格购物金额",
+            "en": "Conditional cashback on eligible purchases"
+          }
+        },
+        {
+          "name": {
+            "zh": "商户合作平台",
+            "en": "Merchant partnerships"
+          },
+          "description": {
+            "zh": "帮助品牌通过奖励活动获取客户",
+            "en": "Reward-based customer acquisition for brands"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2014",
+          "description": {
+            "zh": "ShopBack 成立或开始开展核心业务。",
+            "en": "ShopBack was founded or started its core activity."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "ShopBack 公司或招聘来源官方说明",
+            "en": "ShopBack official source overview"
+          },
+          "url": "https://corporate.shopback.com/about/"
+        },
+        {
+          "label": {
+            "zh": "ShopBack 官方产品与发展资料",
+            "en": "ShopBack official product and history"
+          },
+          "url": "https://docs.shopback.com/docs/what-is-shopback"
+        },
+        {
+          "label": {
+            "zh": "ShopBack 招聘板链接",
+            "en": "ShopBack recruitment board"
+          },
+          "url": "https://jobs.lever.co/shopback-2"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJhc2hieSIsInZhbnRhIiwiVmFudGEiXQ",
+      "identity": {
+        "platform": "ashby",
+        "source": "vanta",
+        "company": "Vanta"
+      },
+      "name": "Vanta",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "信息安全合规自动化与信任管理",
+        "en": "Security compliance automation and trust management"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2018",
+      "tagline": {
+        "zh": "帮助企业持续验证并展示安全控制。",
+        "en": "Continuous security evidence and trust management."
+      },
+      "overview": [
+        {
+          "zh": "Vanta 创立于 2018 年，开发信息安全合规与信任管理平台，帮助企业整理证据、跟踪安全控制并为审计做准备。",
+          "en": "Founded in 2018, Vanta builds security compliance and trust-management software that helps companies collect evidence, monitor controls and prepare for audits."
+        },
+        {
+          "zh": "其产品覆盖 SOC 2、ISO 27001 等管理标准的准备过程，也涉及供应商风险、信任中心和客户问卷。是否通过认证由独立审核机构确定，软件不能自行颁发认证。",
+          "en": "Its software supports workflows for frameworks such as SOC 2 and ISO 27001, vendor risk, trust centers and questionnaires. Certification is determined by independent assessors, not by the tool itself."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Compliance Automation",
+            "en": "Compliance automation"
+          },
+          "description": {
+            "zh": "自动汇集安全控制和合规证据",
+            "en": "Automated collection of control evidence"
+          }
+        },
+        {
+          "name": {
+            "zh": "Trust Center",
+            "en": "Trust Center"
+          },
+          "description": {
+            "zh": "向授权对象展示公司安全资料",
+            "en": "Controlled sharing of company security materials"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2018",
+          "description": {
+            "zh": "Vanta 成立或开始开展核心业务。",
+            "en": "Vanta was founded or started its core activity."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Vanta 公司或招聘来源官方说明",
+            "en": "Vanta official source overview"
+          },
+          "url": "https://www.vanta.com/resources/vanta-announces-series-c"
+        },
+        {
+          "label": {
+            "zh": "Vanta 官方产品与发展资料",
+            "en": "Vanta official product and history"
+          },
+          "url": "https://www.vanta.com/"
+        },
+        {
+          "label": {
+            "zh": "Vanta 招聘板链接",
+            "en": "Vanta recruitment board"
+          },
+          "url": "https://jobs.ashbyhq.com/vanta"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJhc2hieSIsImFzaGJ5IiwiQXNoYnkiXQ",
+      "identity": {
+        "platform": "ashby",
+        "source": "ashby",
+        "company": "Ashby"
+      },
+      "name": "Ashby",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "企业招聘管理系统与招聘分析",
+        "en": "Applicant tracking systems and recruiting analytics"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2018",
+      "tagline": {
+        "zh": "连接 ATS、面试排期和招聘分析。",
+        "en": "Connecting ATS, scheduling and recruiting analytics."
+      },
+      "overview": [
+        {
+          "zh": "Ashby 团队于 2018 年开始构建招聘技术平台，为企业人才团队提供岗位管理、候选人追踪、面试排期以及招聘分析能力。",
+          "en": "Ashby's team started building its recruiting platform in 2018, providing applicant tracking, interview scheduling and recruiting analytics for talent teams."
+        },
+        {
+          "zh": "HHBA 索引的部分海外职位通过 Ashby 公开 Job Board 发布。Ashby 是技术服务平台，不表示所有使用 Ashby 招聘系统的企业与 HHBA 或 Ashby 存在联合招聘。",
+          "en": "Some international roles indexed by HHBA are published through Ashby Job Boards. Use of Ashby software does not imply a recruiting partnership between employers, HHBA and Ashby."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "Ashby ATS",
+            "en": "Ashby ATS"
+          },
+          "description": {
+            "zh": "跟踪招聘申请和面试流程",
+            "en": "Applicant tracking and interview workflows"
+          }
+        },
+        {
+          "name": {
+            "zh": "招聘分析",
+            "en": "Recruiting analytics"
+          },
+          "description": {
+            "zh": "查看招聘漏斗、团队效率和流程数据",
+            "en": "Insights into recruiting pipelines and operations"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2018",
+          "description": {
+            "zh": "Ashby 成立或开始开展核心业务。",
+            "en": "Ashby was founded or started its core activity."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Ashby 公司或招聘来源官方说明",
+            "en": "Ashby official source overview"
+          },
+          "url": "https://www.ashbyhq.com/blog/culture/series-c"
+        },
+        {
+          "label": {
+            "zh": "Ashby 官方产品与发展资料",
+            "en": "Ashby official product and history"
+          },
+          "url": "https://www.ashbyhq.com/"
+        },
+        {
+          "label": {
+            "zh": "Ashby 招聘板链接",
+            "en": "Ashby recruitment board"
+          },
+          "url": "https://jobs.ashbyhq.com/ashby"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJncmVlbmhvdXNlIiwiYWxwaGFzaWdodHNyZXN1bWVkcm9wIiwiQWxwaGFTaWdodHMgQ2FtcHVzIFJlY3J1aXRpbmciXQ",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "alphasightsresumedrop",
+        "company": "AlphaSights Campus Recruiting"
+      },
+      "name": "AlphaSights Campus Recruiting",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "专家知识服务与校园招聘来源",
+        "en": "Expert knowledge services and campus recruitment source"
+      },
+      "country": {
+        "zh": "英国",
+        "en": "United Kingdom"
+      },
+      "founded": "2008",
+      "tagline": {
+        "zh": "AlphaSights 的校园招聘入口，并非独立新企业。",
+        "en": "The campus hiring board of AlphaSights, not a separate company."
+      },
+      "overview": [
+        {
+          "zh": "本记录对应 AlphaSights 在 Greenhouse 的校园招聘来源，其招聘主体是 AlphaSights，并非一家名为“AlphaSights Campus Recruiting”的独立法人。AlphaSights 于 2008 年创立，向企业和投资机构提供按需专家知识服务。",
+          "en": "This record is AlphaSights' Greenhouse campus recruitment source, not a separate legal entity named “AlphaSights Campus Recruiting.” Founded in 2008, AlphaSights connects businesses and investors with expert knowledge on demand."
+        },
+        {
+          "zh": "AlphaSights 为决策者组织行业专家交流与知识服务。HHBA 保留校园招聘板来源标识以避免误合并职位，但企业背景归属于 AlphaSights。",
+          "en": "AlphaSights facilitates expert interactions and knowledge services for decision-makers. HHBA preserves the campus board's source identity for job accuracy while attributing the company background to AlphaSights."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "专家知识对接",
+            "en": "Knowledge-on-demand"
+          },
+          "description": {
+            "zh": "帮助客户找到相关行业专家",
+            "en": "Connect clients to relevant sector specialists"
+          }
+        },
+        {
+          "name": {
+            "zh": "校园招聘入口",
+            "en": "Campus recruitment board"
+          },
+          "description": {
+            "zh": "面向校招候选人的岗位来源",
+            "en": "Recruiting source for student candidates"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2008",
+          "description": {
+            "zh": "AlphaSights 主体成立，校园招聘记录不构成新公司。",
+            "en": "AlphaSights was founded; the campus board is not a separate company."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "AlphaSights Campus Recruiting 公司或招聘来源官方说明",
+            "en": "AlphaSights Campus Recruiting official source overview"
+          },
+          "url": "https://www.alphasights.com/company/"
+        },
+        {
+          "label": {
+            "zh": "AlphaSights Campus Recruiting 官方产品与发展资料",
+            "en": "AlphaSights Campus Recruiting official product and history"
+          },
+          "url": "https://www.alphasights.com/zh-hans/company/"
+        },
+        {
+          "label": {
+            "zh": "AlphaSights Campus Recruiting 招聘板链接",
+            "en": "AlphaSights Campus Recruiting recruitment board"
+          },
+          "url": "https://job-boards.greenhouse.io/alphasightsresumedrop"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJhc2hieSIsImdlbmVyYWxyb2JvdGljcyIsIkdlbmVyYWwgUm9ib3RpY3MiXQ",
+      "identity": {
+        "platform": "ashby",
+        "source": "generalrobotics",
+        "company": "General Robotics"
+      },
+      "name": "General Robotics",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "机器人通用智能与实体 AI",
+        "en": "General robot intelligence and physical AI"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "—",
+      "tagline": {
+        "zh": "构建适配不同机器人平台的智能技术。",
+        "en": "Robot intelligence for diverse physical platforms."
+      },
+      "overview": [
+        {
+          "zh": "General Robotics 是一家从事机器人 AI 研究和部署的企业，其官方介绍关注让不同形态机器人具备更通用的感知、规划和行动能力。公开招聘板列示团队在美国华盛顿州雷德蒙德的岗位。",
+          "en": "General Robotics develops and deploys robotics AI, focusing on adaptable perception, planning and action across different robot types. Its public recruiting board lists positions in Redmond, Washington."
+        },
+        {
+          "zh": "公司公开展示 GRID 机器人智能平台，将基础模型、仿真和机器人技能结合。成立年份尚缺可直接确认的正式来源，故本页不猜测。",
+          "en": "The company describes its GRID robotics platform combining foundation models, simulation and robot skills. An independently established incorporation date was not available in the reviewed material and is therefore not guessed."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "GRID 智能平台",
+            "en": "GRID intelligence platform"
+          },
+          "description": {
+            "zh": "整合机器人模型、仿真与技能能力",
+            "en": "Integrates robot models, simulation and skills"
+          }
+        },
+        {
+          "name": {
+            "zh": "实体 AI 系统",
+            "en": "Physical AI systems"
+          },
+          "description": {
+            "zh": "探索机器人在现实环境中的感知与动作",
+            "en": "Perception and action for robots in physical settings"
+          }
+        }
+      ],
+      "milestones": [],
+      "sources": [
+        {
+          "label": {
+            "zh": "General Robotics 公司或招聘来源官方说明",
+            "en": "General Robotics official source overview"
+          },
+          "url": "https://www.generalrobotics.company/company"
+        },
+        {
+          "label": {
+            "zh": "General Robotics 官方产品与发展资料",
+            "en": "General Robotics official product and history"
+          },
+          "url": "https://www.generalrobotics.company/post/hello-world-launch-of-scaled-foundations-robotics-ai-development-platform"
+        },
+        {
+          "label": {
+            "zh": "General Robotics 招聘板链接",
+            "en": "General Robotics recruitment board"
+          },
+          "url": "https://jobs.ashbyhq.com/generalrobotics"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJncmVlbmhvdXNlIiwic3BhY2V4Z2xvYmFsIiwiU3BhY2VYIEdsb2JhbCJd",
+      "identity": {
+        "platform": "greenhouse",
+        "source": "spacexglobal",
+        "company": "SpaceX Global"
+      },
+      "name": "SpaceX Global",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "SpaceX 国际招聘板与 Starlink 业务岗位",
+        "en": "SpaceX international hiring source and Starlink roles"
+      },
+      "country": {
+        "zh": "美国（国际招聘来源）",
+        "en": "United States (international hiring board)"
+      },
+      "founded": "—",
+      "tagline": {
+        "zh": "SpaceX 国际岗位招聘来源，不是经证实的独立新公司。",
+        "en": "SpaceX's international recruiting board, not a verified separate company."
+      },
+      "overview": [
+        {
+          "zh": "“SpaceX Global” 是 Greenhouse 上的 SpaceX 国际职位招聘板标识，其公开页面以“Current openings at SpaceX”为标题，主要列示 Starlink 国际销售、供应链及相关业务职位。",
+          "en": "“SpaceX Global” is a Greenhouse recruiting board label for SpaceX international roles. The public board identifies openings at SpaceX, including Starlink international sales and supply chain positions."
+        },
+        {
+          "zh": "HHBA 保留该独立招聘来源记录，方便按原始岗位来源筛选，但不宣称 SpaceX Global 是独立法人，也不单独编造成立年份；公司背景应参考 SpaceX 官方资料。",
+          "en": "HHBA keeps the separate board identity for accurate job matching, without claiming a separate corporation or inventing a founding year. Company context comes from official SpaceX materials."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "国际 Starlink 岗位",
+            "en": "International Starlink roles"
+          },
+          "description": {
+            "zh": "覆盖多个市场的商业拓展与技术职位",
+            "en": "Commercial and technical roles across markets"
+          }
+        },
+        {
+          "name": {
+            "zh": "SpaceX 招聘体系",
+            "en": "SpaceX recruiting"
+          },
+          "description": {
+            "zh": "从官方 Greenhouse 国际板发布岗位",
+            "en": "International postings from its Greenhouse job board"
+          }
+        }
+      ],
+      "milestones": [],
+      "sources": [
+        {
+          "label": {
+            "zh": "SpaceX Global 公司或招聘来源官方说明",
+            "en": "SpaceX Global official source overview"
+          },
+          "url": "https://www.spacex.com/careers"
+        },
+        {
+          "label": {
+            "zh": "SpaceX Global 官方产品与发展资料",
+            "en": "SpaceX Global official product and history"
+          },
+          "url": "https://job-boards.greenhouse.io/spacexglobal"
+        },
+        {
+          "label": {
+            "zh": "SpaceX Global 招聘板链接",
+            "en": "SpaceX Global recruitment board"
+          },
+          "url": "https://job-boards.greenhouse.io/spacexglobal"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    },
+    {
+      "id": "WyJhc2hieSIsImhlYWR3YXkiLCJIZWFkd2F5Il0",
+      "identity": {
+        "platform": "ashby",
+        "source": "headway",
+        "company": "Headway"
+      },
+      "name": "Headway",
+      "status": "VERIFIED",
+      "industry": {
+        "zh": "心理健康就医与保险支付支持平台",
+        "en": "Mental healthcare access and insurance workflows"
+      },
+      "country": {
+        "zh": "美国",
+        "en": "United States"
+      },
+      "founded": "2019",
+      "tagline": {
+        "zh": "通过软件连接患者、治疗师与医疗保险支付体系。",
+        "en": "Connecting patients, therapists and insurance through software."
+      },
+      "overview": [
+        {
+          "zh": "Headway 于 2019 年推出，致力于降低美国心理健康服务的费用与预约门槛。其平台帮助患者寻找可接受保险的心理健康专业人士。",
+          "en": "Launched in 2019, Headway aims to reduce barriers to mental healthcare in the US by helping patients find providers who accept insurance."
+        },
+        {
+          "zh": "平台还帮助治疗师管理保险资格认证、理赔、支付与诊所运营。医疗服务由相关专业人士提供，HHBA 仅描述科技平台背景，不提供医疗建议。",
+          "en": "The platform also helps therapists with credentialing, insurance claims, payments and practice operations. Care is provided by licensed professionals; HHBA presents company context, not medical guidance."
+        }
+      ],
+      "focus": [
+        {
+          "name": {
+            "zh": "寻找治疗师",
+            "en": "Find a therapist"
+          },
+          "description": {
+            "zh": "帮助患者搜索保险适用的治疗服务",
+            "en": "Search for therapy covered by insurance"
+          }
+        },
+        {
+          "name": {
+            "zh": "治疗师运营工具",
+            "en": "Provider practice tools"
+          },
+          "description": {
+            "zh": "辅助认证、账单和理赔管理",
+            "en": "Credentialing, billing and claims workflows"
+          }
+        }
+      ],
+      "milestones": [
+        {
+          "date": "2019",
+          "description": {
+            "zh": "Headway 成立或开始开展核心业务。",
+            "en": "Headway was founded or started its core activity."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "label": {
+            "zh": "Headway 公司或招聘来源官方说明",
+            "en": "Headway official source overview"
+          },
+          "url": "https://headway.co/about-us"
+        },
+        {
+          "label": {
+            "zh": "Headway 官方产品与发展资料",
+            "en": "Headway official product and history"
+          },
+          "url": "https://headway.co/blog/series-b-announcement"
+        },
+        {
+          "label": {
+            "zh": "Headway 招聘板链接",
+            "en": "Headway recruitment board"
+          },
+          "url": "https://jobs.ashbyhq.com/headway"
+        }
+      ],
+      "lastReviewed": "2026-10-21"
+    }
+  ]
+}

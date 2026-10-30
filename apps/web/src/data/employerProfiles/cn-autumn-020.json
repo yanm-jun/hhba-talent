@@ -1,0 +1,298 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-020",
+  "name": "紫金集团",
+  "englishName": "Zijin Mining Group",
+  "aliases": [
+    "紫金矿业",
+    "紫金矿业集团",
+    "紫金矿业集团股份有限公司",
+    "Zijin Mining",
+    "Zijin Mining Group",
+    "ZIJIN",
+    "紫金矿业招聘",
+    "601899",
+    "02899",
+    "2899",
+    "Zijin Mining Group Company Limited",
+    "紫金矿业校园招聘"
+  ],
+  "industry": "有色金属矿业 · 铜 · 金 · 锌 · 锂 · 全球矿产资源开发",
+  "subtitle": "紫金矿业集团股份有限公司 · 福建上杭 / 厦门 · 上交所601899、港交所02899",
+  "overview": "本档案的“紫金集团”特指紫金矿业集团股份有限公司（Zijin Mining Group Co., Ltd.），是全球矿产勘探、开采与冶炼企业，重点业务涉及铜、金、锌、锂、银等资源，在国内及海外运营多个矿业项目，设有采矿工程、选冶、环境管理、设备维护、智能矿山和国际业务职能。请注意：紫金矿业与南京紫金投资集团有限责任公司不是同一家公司，搜索本公司不能混用后者的岗位或图片。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://www.zjky.cn/",
+    "https://www.zjky.cn/join/join-us.htm",
+    "https://www.zjky.cn/join/campus-recruitment.htm",
+    "https://www.zjky.cn/join/campus-recruitment-FAQ.htm",
+    "https://jdjywpt.jlu.edu.cn/portal/jyzp/recruit/details?id=9d72d1ca3d1a4e1daeeefb94598c7f47",
+    "https://www.zijinmining.com/news/news-detail-121625.htm",
+    "https://www.zijinmining.com/global/copper-new.htm",
+    "https://platinuminvestment.com/partnering-us"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-020/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-020/photo1.webp",
+        "caption": "紫金山铜金矿 · 福建上杭",
+        "note": "紫金矿业英文官网2024年12月发布的矿山实景摄影；为旗下紫金山矿区，不是集团总部办公楼。原始图像版权归相应权利人，页面仅标注来源。",
+        "alt": "云雾中的紫金山铜金矿山坡、矿区道路与厂房"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-020/photo2.webp",
+        "caption": "西藏巨龙铜矿 · 项目生产区域",
+        "note": "紫金矿业英文官网铜业务页面的巨龙铜矿实景图，为旗下矿业项目，不是总公司大楼；保留来源说明。",
+        "alt": "高原山区的巨龙铜矿工业设施、厂房及运输皮带"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.zjky.cn/join/campus-recruitment.htm",
+    "label": "紫金矿业官方校园招聘",
+    "status": "official_portal",
+    "subject": "紫金矿业集团股份有限公司及官方系统公示的所属公司",
+    "note": "官方招聘系统同时区分校园招聘、社会招聘和工匠招聘，具体岗位应以企业系统最新列表为准；本页面展示的6组内容是2027届校招简章里的专业需求类别，不代表六个独立职位或实时录用名额。"
+  },
+  "majorIntro": "根据紫金矿业2027届全球校园招聘简章的六大岗位类别整理为6组专业需求方向，不虚构具体岗位或所在城市。点击专业标签显示关联方向，实际报名条件和岗位状态请以官方校园招聘系统为准。",
+  "preferredMajors": [
+    "采矿工程",
+    "地质工程",
+    "矿物加工工程",
+    "冶金工程",
+    "机械工程",
+    "电气工程及其自动化",
+    "自动化",
+    "计算机科学与技术",
+    "软件工程",
+    "人工智能",
+    "材料科学与工程",
+    "会计学",
+    "法学",
+    "英语"
+  ],
+  "photoNote": "三张独立素材分别为由世界铂金投资协会合作伙伴页面展示的紫金矿业商标图、紫金矿业官方发布的紫金山矿山图、官方铜业务页面的巨龙铜矿图。素材用于企业识别和信息说明，不代表紫金矿业与HHBA有合作或授权关系，商业使用需遵守权利人许可。",
+  "business": [
+    {
+      "title": "铜矿资源开发",
+      "description": "以国内及海外铜矿项目为基础，进行资源勘探、采矿、选矿和冶炼等相关经营。",
+      "tags": "铜矿 · 巨龙 · 国际项目",
+      "details": [
+        "铜矿资源勘查与矿山建设",
+        "铜矿选矿加工及配套冶炼",
+        "矿区生产组织和工程技术"
+      ]
+    },
+    {
+      "title": "金矿资源与黄金业务",
+      "description": "开展黄金资源勘探、采选、冶炼与黄金产品相关业务。",
+      "tags": "黄金 · 紫金山 · 选冶",
+      "details": [
+        "金矿勘探及矿区开发",
+        "黄金提取及加工",
+        "技术管理与运营"
+      ]
+    },
+    {
+      "title": "锌、铅及其他有色金属",
+      "description": "拓展锌铅、银、钼等金属资源开采与综合利用。",
+      "tags": "锌铅 · 银 · 钼",
+      "details": [
+        "有色金属项目勘查",
+        "多金属矿山运营",
+        "资源综合回收与利用"
+      ]
+    },
+    {
+      "title": "锂资源与新能源金属",
+      "description": "在锂等新能源产业链相关矿产资源方面开展资源布局及开发。",
+      "tags": "锂 · 新能源材料 · 矿产",
+      "details": [
+        "锂矿与盐湖资源项目",
+        "新能源金属采选与开发",
+        "配套技术和资源管理"
+      ]
+    },
+    {
+      "title": "智能矿山与技术研发",
+      "description": "开展矿山数字化、智能设备及矿业工程技术应用，提高生产效率和安全管理能力。",
+      "tags": "智能矿山 · 自动化 · 工程",
+      "details": [
+        "数字化矿山和生产调度",
+        "机械电气自动化系统",
+        "矿山工程技术及研发"
+      ]
+    },
+    {
+      "title": "全球运营与可持续发展",
+      "description": "服务跨国项目运营、供应链、合规、环境保护与职业健康安全等业务需求。",
+      "tags": "全球运营 · HSE · 供应链",
+      "details": [
+        "海外项目运营与跨文化协同",
+        "环境保护及职业健康安全",
+        "物流供应链与集团管理服务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "mining-geology",
+      "title": "2027届｜矿业与地质工程方向",
+      "city": "国内外矿山及业务单位（逐岗地点以官方平台为准）",
+      "url": "https://www.zjky.cn/join/campus-recruitment.htm",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/portal/jyzp/recruit/details?id=9d72d1ca3d1a4e1daeeefb94598c7f47",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "紫金矿业集团股份有限公司及其在校招公告中列明的招聘主体",
+      "summary": "公开招聘简章将地质（含水文）、采矿、选矿、冶金、安全、环保、矿建、测绘等列为矿业类需求专业。 本站按照官方公告原有类别汇总，不代表这里列出的是一条独立的实时岗位。",
+      "requirements": "根据紫金矿业2027届全球校园招聘简章公布的岗位类别及专业需求整理。公告涉及本科、硕士及博士毕业生，具体招聘人数、岗位职责、地点、专业限制、投递状态及截止日期请在紫金矿业官方招聘平台核对。这里为专业需求方向，未逐岗证实在招。",
+      "majorNames": [
+        "地质学",
+        "地质工程",
+        "资源勘查工程",
+        "采矿工程",
+        "矿物加工工程",
+        "冶金工程",
+        "安全工程",
+        "环境工程",
+        "测绘工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届全球校园招聘 · 本科/硕士/博士（依岗位而异）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "electrical-automation",
+      "title": "2027届｜机电与自动化方向",
+      "city": "国内外矿山及业务单位（逐岗地点以官方平台为准）",
+      "url": "https://www.zjky.cn/join/campus-recruitment.htm",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/portal/jyzp/recruit/details?id=9d72d1ca3d1a4e1daeeefb94598c7f47",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "紫金矿业集团股份有限公司及其在校招公告中列明的招聘主体",
+      "summary": "2027届校招的机电自动化类别涵盖机械、电气、仪表、自动化、测控、能源与动力、智能制造等，另有机电专项。 本站按照官方公告原有类别汇总，不代表这里列出的是一条独立的实时岗位。",
+      "requirements": "根据紫金矿业2027届全球校园招聘简章公布的岗位类别及专业需求整理。公告涉及本科、硕士及博士毕业生，具体招聘人数、岗位职责、地点、专业限制、投递状态及截止日期请在紫金矿业官方招聘平台核对。这里为专业需求方向，未逐岗证实在招。",
+      "majorNames": [
+        "机械设计制造及其自动化",
+        "机械工程",
+        "电气工程及其自动化",
+        "自动化",
+        "测控技术与仪器",
+        "能源与动力工程",
+        "智能制造工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届全球校园招聘 · 本科/硕士/博士（依岗位而异）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "digital-and-ai",
+      "title": "2027届｜信息化与人工智能方向",
+      "city": "国内外矿山及业务单位（逐岗地点以官方平台为准）",
+      "url": "https://www.zjky.cn/join/campus-recruitment.htm",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/portal/jyzp/recruit/details?id=9d72d1ca3d1a4e1daeeefb94598c7f47",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "紫金矿业集团股份有限公司及其在校招公告中列明的招聘主体",
+      "summary": "2027届校招在信息化类别明确列出计算机科学与技术、软件工程、人工智能、机器人工程等相关专业。 本站按照官方公告原有类别汇总，不代表这里列出的是一条独立的实时岗位。",
+      "requirements": "根据紫金矿业2027届全球校园招聘简章公布的岗位类别及专业需求整理。公告涉及本科、硕士及博士毕业生，具体招聘人数、岗位职责、地点、专业限制、投递状态及截止日期请在紫金矿业官方招聘平台核对。这里为专业需求方向，未逐岗证实在招。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能",
+        "机器人工程",
+        "数据科学与大数据技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届全球校园招聘 · 本科/硕士/博士（依岗位而异）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "chemical-materials",
+      "title": "2027届｜化工材料及技术方向",
+      "city": "国内外矿山及业务单位（逐岗地点以官方平台为准）",
+      "url": "https://www.zjky.cn/join/campus-recruitment.htm",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/portal/jyzp/recruit/details?id=9d72d1ca3d1a4e1daeeefb94598c7f47",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "紫金矿业集团股份有限公司及其在校招公告中列明的招聘主体",
+      "summary": "招聘简章技术类别涵盖化学与化工、材料、工程造价、物理及相关专业。 本站按照官方公告原有类别汇总，不代表这里列出的是一条独立的实时岗位。",
+      "requirements": "根据紫金矿业2027届全球校园招聘简章公布的岗位类别及专业需求整理。公告涉及本科、硕士及博士毕业生，具体招聘人数、岗位职责、地点、专业限制、投递状态及截止日期请在紫金矿业官方招聘平台核对。这里为专业需求方向，未逐岗证实在招。",
+      "majorNames": [
+        "化学",
+        "应用化学",
+        "化学工程与工艺",
+        "材料科学与工程",
+        "工程造价",
+        "物理学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届全球校园招聘 · 本科/硕士/博士（依岗位而异）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "corporate-services",
+      "title": "2027届｜财会法务与综合职能方向",
+      "city": "国内外矿山及业务单位（逐岗地点以官方平台为准）",
+      "url": "https://www.zjky.cn/join/campus-recruitment.htm",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/portal/jyzp/recruit/details?id=9d72d1ca3d1a4e1daeeefb94598c7f47",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "紫金矿业集团股份有限公司及其在校招公告中列明的招聘主体",
+      "summary": "2027届校招职能类别包括物流、供应链、会计、税务、汉语言文学、新闻传播、审计、法务、人力资源及数学统计相关专业。 本站按照官方公告原有类别汇总，不代表这里列出的是一条独立的实时岗位。",
+      "requirements": "根据紫金矿业2027届全球校园招聘简章公布的岗位类别及专业需求整理。公告涉及本科、硕士及博士毕业生，具体招聘人数、岗位职责、地点、专业限制、投递状态及截止日期请在紫金矿业官方招聘平台核对。这里为专业需求方向，未逐岗证实在招。",
+      "majorNames": [
+        "物流管理",
+        "供应链管理",
+        "会计学",
+        "税收学",
+        "汉语言文学",
+        "新闻学",
+        "传播学",
+        "审计学",
+        "法学",
+        "人力资源管理",
+        "数学与应用数学",
+        "统计学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届全球校园招聘 · 本科/硕士/博士（依岗位而异）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "foreign-languages",
+      "title": "2027届｜国际业务与多语种方向",
+      "city": "国内外矿山及业务单位（逐岗地点以官方平台为准）",
+      "url": "https://www.zjky.cn/join/campus-recruitment.htm",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/portal/jyzp/recruit/details?id=9d72d1ca3d1a4e1daeeefb94598c7f47",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "紫金矿业集团股份有限公司及其在校招公告中列明的招聘主体",
+      "summary": "2027届校招语言类别列有俄语、法语、西班牙语、塞尔维亚语、英语、斯瓦希里语；复合专业方向另有专项。 本站按照官方公告原有类别汇总，不代表这里列出的是一条独立的实时岗位。",
+      "requirements": "根据紫金矿业2027届全球校园招聘简章公布的岗位类别及专业需求整理。公告涉及本科、硕士及博士毕业生，具体招聘人数、岗位职责、地点、专业限制、投递状态及截止日期请在紫金矿业官方招聘平台核对。这里为专业需求方向，未逐岗证实在招。",
+      "majorNames": [
+        "俄语",
+        "法语",
+        "西班牙语",
+        "塞尔维亚语",
+        "英语",
+        "斯瓦希里语"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届全球校园招聘 · 本科/硕士/博士（依岗位而异）",
+      "currentOpenVerified": false
+    }
+  ],
+  "mediaSources": {
+    "logo": "https://platinuminvestment.com/images/partners/zijin.png",
+    "photo1": "https://www.zijinmining.com/upload/images/2024/12/03/ce53d7ff0bfa4e7aaec5d68f3d342e90.jpg",
+    "photo2": "https://www.zijinmining.com/upload/images/2024/06/26/6ea46cd63b1644de9ad41966996d028c.jpg"
+  }
+}

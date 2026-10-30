@@ -1,0 +1,8 @@
+.hhba-people-banner{position:fixed;z-index:60;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));width:300px;max-width:calc(100vw - 32px);background:#fff;border:1px solid #e0e9e2;border-radius:13px;box-shadow:0 8px 28px rgba(24,45,34,.15);overflow:hidden;text-align:center}
+.hhba-people-banner img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
+.hhba-people-banner p{margin:0;padding:10px 8px 12px;color:#b91c1c;font-family:"HHBA People Xingshu","STXingkai","华文行楷","KaiTi","楷体",cursive;font-size:23px;font-weight:400;line-height:1.45;letter-spacing:.01em;white-space:nowrap}
+.hhba-people-banner-close{position:absolute;right:8px;top:8px;display:flex;justify-content:center;align-items:center;width:32px;height:32px;padding:0;color:#fff;background:rgba(18,34,28,.72);border:1px solid rgba(255,255,255,.6);border-radius:50%;cursor:pointer}
+.hhba-people-banner-close:hover{background:rgba(18,34,28,.92)}
+.hhba-people-banner-close:focus-visible{outline:3px solid #76b791;outline-offset:2px}
+@media(max-width:560px){.hhba-people-banner{width:220px;right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));max-width:calc(100vw - 24px)}.hhba-people-banner p{font-size:18px;padding:9px 5px 10px}}
+@media(max-height:450px){.hhba-people-banner{width:180px}.hhba-people-banner p{font-size:15px;padding:7px 4px}}

@@ -1,0 +1,289 @@
+{
+  "schemaVersion": 1,
+  "company": "华域视觉科技（上海）有限公司",
+  "reviewedOn": "2026-10-29",
+  "officialRecruitmentIndex": "https://hascovision.zhiye.com/campus/jobs",
+  "indexedRoleCountOnOfficialPage": 21,
+  "sourceConfidence": "official_role_description_and_qualification_on_employer_ATS_list",
+  "officialDirectPerJobUrlsAvailable": false,
+  "note": "16个可在企业官方校招21职位列表内按名称城市查到的具体岗位；官网列表目前未获取可靠的逐岗直达链接，因此所有外部按钮明确为官方职位列表而不是逐岗投递。正式招聘开放状态以官网为准。",
+  "jobs": [
+    {
+      "id": "equipment-wuhan",
+      "title": "设备维修工程师",
+      "city": "武汉",
+      "category": "mechanical",
+      "requirement": "本科及以上；机械制造与自动化、电气自动化、机电一体化或工业机器人等相关方向。",
+      "summary": "协助设备故障排查、部件更换、日常点检及基础保养，记录维护与运行异常。",
+      "majors": [
+        "机械设计制造及其自动化",
+        "电气工程及其自动化",
+        "自动化",
+        "机器人工程"
+      ],
+      "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "sourceType": "official_role_on_aggregated_jobs_page",
+      "observedOn": "2026-10-29",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "process-wuhan",
+      "title": "工艺员",
+      "city": "武汉",
+      "category": "manufacturing",
+      "requirement": "大专学历，机械相关专业。其他条件以企业官方职位页面说明为准。",
+      "summary": "负责生产工艺巡检与记录，协助处理现场工艺问题、工装维护及作业文件更新。",
+      "majors": [
+        "机械设计制造及其自动化",
+        "工业工程",
+        "自动化"
+      ],
+      "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "sourceType": "official_role_on_aggregated_jobs_page",
+      "observedOn": "2026-10-29",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "maintenance-changsha",
+      "title": "维修员",
+      "city": "长沙",
+      "category": "mechanical",
+      "requirement": "大专及以上；机电、机械相关专业，有维修经验或实习经验者优先。",
+      "summary": "开展设备日常保养、检修、故障分析与维修记录，保障生产设备正常运行。",
+      "majors": [
+        "机械设计制造及其自动化",
+        "机械电子工程",
+        "自动化"
+      ],
+      "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "sourceType": "official_role_on_aggregated_jobs_page",
+      "observedOn": "2026-10-29",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "quality-wuhan",
+      "title": "质量工程师",
+      "city": "武汉",
+      "category": "quality",
+      "requirement": "机械或车辆工程相关本科及以上，要求良好英语沟通能力。",
+      "summary": "处理客户质量问题与内部异常，分析质量数据，跟进新项目量产和改善闭环。",
+      "majors": [
+        "车辆工程",
+        "机械设计制造及其自动化",
+        "工业工程"
+      ],
+      "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "sourceType": "official_role_on_aggregated_jobs_page",
+      "observedOn": "2026-10-29",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hardware-wuhan",
+      "title": "研发工程师（硬件方向）",
+      "city": "武汉",
+      "category": "electronic",
+      "requirement": "电子工程、电子技术、通信、自动化、车辆工程等相关本科背景；熟悉EDA及基础电路开发和测试。",
+      "summary": "开展车灯控制相关电路设计、PCB开发、元器件选型、硬件调试与测试验证。",
+      "majors": [
+        "电子信息工程",
+        "电气工程及其自动化",
+        "自动化",
+        "车辆工程"
+      ],
+      "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "sourceType": "official_role_on_aggregated_jobs_page",
+      "observedOn": "2026-10-29",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "optical-wuhan",
+      "title": "研发工程师（光学方向）",
+      "city": "武汉",
+      "category": "optical",
+      "requirement": "本科及以上；光学、数学、物理、机械工程等方向，三维建模能力及英语四级。",
+      "summary": "进行车灯光学模组设计、整改验证与报告编写，配合整车厂客户解决设计问题。",
+      "majors": [
+        "光电信息科学与工程",
+        "机械设计制造及其自动化",
+        "车辆工程"
+      ],
+      "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "sourceType": "official_role_on_aggregated_jobs_page",
+      "observedOn": "2026-10-29",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "structural-wuhan",
+      "title": "研发工程师（结构方向）",
+      "city": "武汉",
+      "category": "mechanical",
+      "requirement": "本科及以上；汽车、机械相关专业，能够使用三维建模工具，英语四级。",
+      "summary": "进行车灯零件3D设计、2D图纸和BOM更新，参与设计变更与模具基础开发协作。",
+      "majors": [
+        "机械设计制造及其自动化",
+        "车辆工程",
+        "材料科学与工程"
+      ],
+      "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "sourceType": "official_role_on_aggregated_jobs_page",
+      "observedOn": "2026-10-29",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "quality-changshu",
+      "title": "质量工程师（客户质量）",
+      "city": "常熟",
+      "category": "quality",
+      "requirement": "本科及以上；机械、汽车等工科专业，能熟练处理质量数据及报告。",
+      "summary": "制定质量检查标准，响应主机厂客户反馈，跟进量产项目质量与售后问题。",
+      "majors": [
+        "车辆工程",
+        "机械设计制造及其自动化",
+        "工业工程"
+      ],
+      "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "sourceType": "official_role_on_aggregated_jobs_page",
+      "observedOn": "2026-10-29",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "mold-changshu",
+      "title": "维修员（模具方向）",
+      "city": "常熟",
+      "category": "manufacturing",
+      "requirement": "大专及以上；机械、模具相关专业优先。",
+      "summary": "开展注塑模具装配、拆卸、维护和优化，并协助更新模具工艺文件。",
+      "majors": [
+        "机械设计制造及其自动化",
+        "材料科学与工程",
+        "机械电子工程"
+      ],
+      "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "sourceType": "official_role_on_aggregated_jobs_page",
+      "observedOn": "2026-10-29",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "technician-changshu",
+      "title": "技术员（工艺）",
+      "city": "常熟",
+      "category": "manufacturing",
+      "requirement": "大专及以上；模具、机电、机械、自动化、材料相关专业。",
+      "summary": "参与注塑或SMT制造工艺设备点检、异常分析、试模与作业指导书更新。",
+      "majors": [
+        "机械电子工程",
+        "机械设计制造及其自动化",
+        "自动化",
+        "材料科学与工程"
+      ],
+      "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "sourceType": "official_role_on_aggregated_jobs_page",
+      "observedOn": "2026-10-29",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "process-shanghai",
+      "title": "工艺工程师",
+      "city": "上海",
+      "category": "manufacturing",
+      "requirement": "本科及以上；工程或机械方向优先，了解装配工艺、FMEA、CP、PPAP/APQP等。",
+      "summary": "辅助编制工艺标准与文件，参与生产工艺巡检、工艺验证和制造过程持续改善。",
+      "majors": [
+        "机械设计制造及其自动化",
+        "工业工程",
+        "车辆工程"
+      ],
+      "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "sourceType": "official_role_on_aggregated_jobs_page",
+      "observedOn": "2026-10-29",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "quality-shanghai",
+      "title": "质量工程师",
+      "city": "上海",
+      "category": "quality",
+      "requirement": "本科及以上；掌握质量管理基础，熟悉数据整理、Office和审核记录。",
+      "summary": "跟踪项目质量指标、客户质量沟通、PPAP文件与控制计划，协助实施质量审核。",
+      "majors": [
+        "车辆工程",
+        "工业工程",
+        "机械设计制造及其自动化"
+      ],
+      "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "sourceType": "official_role_on_aggregated_jobs_page",
+      "observedOn": "2026-10-29",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "mold-shanghai",
+      "title": "模具工程师",
+      "city": "上海",
+      "category": "manufacturing",
+      "requirement": "本科及以上；模具、机械或材料专业，熟悉三维建模与模具设计，英语四级。",
+      "summary": "开展注塑模具方案、三维模型与图纸设计，参与模流分析、加工及试模验证。",
+      "majors": [
+        "机械设计制造及其自动化",
+        "材料科学与工程",
+        "机械电子工程"
+      ],
+      "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "sourceType": "official_role_on_aggregated_jobs_page",
+      "observedOn": "2026-10-29",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "optical-shanghai",
+      "title": "研发工程师（光学方向）",
+      "city": "上海",
+      "category": "optical",
+      "requirement": "本科及以上；光学、机械或仪器相关专业，熟悉Lucidshape及灯具光学设计工具。",
+      "summary": "执行车灯近光、远光及光学模组设计、测试与优化，支持主机厂项目。",
+      "majors": [
+        "光电信息科学与工程",
+        "机械设计制造及其自动化",
+        "车辆工程"
+      ],
+      "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "sourceType": "official_role_on_aggregated_jobs_page",
+      "observedOn": "2026-10-29",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hardware-shanghai",
+      "title": "研发工程师（硬件方向）",
+      "city": "上海",
+      "category": "electronic",
+      "requirement": "本科及以上；电子、通信、自动化或车辆电子相关专业；了解EDA、电路调试与EMC。",
+      "summary": "完成电路原理图、PCB、BOM、电子系统调试及产品开发中的硬件可靠性验证。",
+      "majors": [
+        "电子信息工程",
+        "电气工程及其自动化",
+        "自动化",
+        "车辆工程"
+      ],
+      "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "sourceType": "official_role_on_aggregated_jobs_page",
+      "observedOn": "2026-10-29",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "software-shanghai",
+      "title": "研发工程师（软件方向）",
+      "city": "上海",
+      "category": "software",
+      "requirement": "本科及以上；计算机、软件、电子信息、自动化等相关专业，了解嵌入式C及测试。",
+      "summary": "参与车灯控制软件开发、调试与单元测试，协作硬件、系统和测试团队开展量产研发。",
+      "majors": [
+        "计算机科学与技术",
+        "软件工程",
+        "电子信息工程",
+        "自动化"
+      ],
+      "sourceUrl": "https://hascovision.zhiye.com/campus/jobs",
+      "sourceType": "official_role_on_aggregated_jobs_page",
+      "observedOn": "2026-10-29",
+      "currentOpenVerified": false
+    }
+  ]
+}

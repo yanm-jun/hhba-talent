@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-012",
+  "name": "远景科技集团",
+  "englishName": "Envision Group",
+  "aliases": [
+    "远景",
+    "远景集团",
+    "Envision",
+    "远景能源"
+  ],
+  "industry": "新能源 · 智能风电 · 智慧储能 · 绿色氢能 · 能源数字化",
+  "subtitle": "新型能源系统 · 智能风电与储能 · 绿色氢能 · 能源人工智能",
+  "overview": "远景科技集团围绕风电、储能、绿氢和新型电力系统发展能源科技业务，相关业务板块包括远景能源、远景动力、远景智能等。不同业务主体的招聘不可合并视为同一职位。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://www.envision-group.com/cn/",
+    "https://www.envision-group.com/net-zero-industrial-park",
+    "https://envision-career.com/",
+    "https://www.job.sjtu.edu.cn/career/zpxx/view/zpxx/229634472520323072"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-012/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-012/photo1.webp",
+        "caption": "远景零碳产业设施",
+        "note": "远景集团官方产品设施图片，非办公总部",
+        "alt": "远景官方展示的工业设施外景，建筑外立面可见 Envision 标识"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-012/photo2.webp",
+        "caption": "远景智能风电设备",
+        "note": "远景集团官方风机产品宣传图",
+        "alt": "远景公司风电机组在绿色田野上的设备图片"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://envision-career.com/",
+    "label": "远景能源 2027 校招官网",
+    "status": "official_portal",
+    "subject": "远景能源有限公司",
+    "note": "此链接经2026年高校校招公告披露，仅对应远景能源校招。远景动力等其他集团业务招聘需另查主体官网。"
+  },
+  "majorIntro": "本页收录6条2026年第三方留存的2027届远景能源具体职位资料，岗位名称、职责和专业均有对应来源；尚未取得这些职位的官网独立直链，故每条岗位使用远景能源公开校招主页作为核对入口，不表示职位当前仍开放。远景动力岗位没有混入。",
+  "preferredMajors": [
+    "电气工程及其自动化",
+    "自动化",
+    "机械设计制造及其自动化",
+    "计算机科学与技术",
+    "软件工程",
+    "材料科学与工程",
+    "工业工程",
+    "能源与动力工程"
+  ],
+  "photoNote": "Logo 来源：Wikimedia Commons《Logo envision.png》，作者 Hahaheditor12667，CC BY-SA 4.0（历史版标识）；产业设施与风机照片来自远景集团官方展示材料。所有图片均保存在本站、互相独立，点击照片不会外跳。职位依据第三方留存记录，申请状态待官网复核。",
+  "business": [
+    {
+      "title": "智能风电系统",
+      "description": "研发制造智能风机及相关控制技术，为风电场提供产品和系统级解决方案。",
+      "tags": "智能风机 · 控制算法 · 风电工程",
+      "details": [
+        "风机整机与关键部件",
+        "智能风场运行优化",
+        "风力发电系统技术"
+      ]
+    },
+    {
+      "title": "智慧储能技术",
+      "description": "面向新能源电力系统提供储能产品、智能调度和系统集成能力。",
+      "tags": "储能系统 · 电池管理 · 系统集成",
+      "details": [
+        "储能系统技术",
+        "电力系统协同",
+        "能量管理和优化"
+      ]
+    },
+    {
+      "title": "绿色氢能与零碳产业园",
+      "description": "推动风光储与绿氢氨等产业耦合，服务低碳工业转型。",
+      "tags": "绿色氢能 · 零碳产业园",
+      "details": [
+        "绿色氢氨项目",
+        "绿色工业园区",
+        "绿色能源协同"
+      ]
+    },
+    {
+      "title": "能源人工智能与数字平台",
+      "description": "将能源大模型、天气预测和能源物联网应用于能源生产及调度运营。",
+      "tags": "能源 AI · 数字平台 · 预测调度",
+      "details": [
+        "能源大模型与气象模型",
+        "风光预测与智能调度",
+        "能源数字管理"
+      ]
+    },
+    {
+      "title": "新能源动力电池",
+      "description": "集团旗下远景动力面向动力与储能电池应用开展研发与制造。",
+      "tags": "远景动力 · 动力电池",
+      "details": [
+        "电池材料及技术",
+        "电池制造和测试",
+        "不同招聘主体单独核实"
+      ]
+    },
+    {
+      "title": "绿色能源项目与解决方案",
+      "description": "为企业和机构提供能源系统与低碳运营方案。",
+      "tags": "电力系统 · 碳管理 · 项目服务",
+      "details": [
+        "绿色能源系统规划",
+        "新能源项目运营",
+        "行业客户与机构合作"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "recruitmentType": "CAMPUS",
+      "url": "https://envision-career.com/",
+      "currentOpenVerified": false,
+      "educationLabel": "以职位来源的岗位要求为准",
+      "id": "it-delivery-2027",
+      "title": "IT开发与实施",
+      "city": "上海",
+      "evidenceUrl": "https://www.shushuqiuzhi.com/position/415487",
+      "observedOn": "2026-07-14",
+      "recruitmentSubject": "远景能源（第三方职位来源标注）",
+      "summary": "参与业务需求分析、IT解决方案实施、数据工程开发、React/TypeScript前端与Java后端建设，以及风电和储能IT支持。",
+      "requirements": "本科及以上，计算机、软件、信息管理、自动化、工业工程等相关专业；有相关开发和沟通协作基础。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息管理与信息系统",
+        "自动化"
+      ],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "工业工程"
+      ],
+      "majorUnrestricted": false
+    },
+    {
+      "recruitmentType": "CAMPUS",
+      "url": "https://envision-career.com/",
+      "currentOpenVerified": false,
+      "educationLabel": "以职位来源的岗位要求为准",
+      "id": "composite-structural-2027",
+      "title": "复合材料结构设计",
+      "city": "上海",
+      "evidenceUrl": "https://www.shushuqiuzhi.com/position/415496",
+      "observedOn": "2026-07-13",
+      "recruitmentSubject": "远景能源（第三方职位来源标注）",
+      "summary": "面向风电叶片开展复合材料结构设计、有限元建模、失效分析、全尺寸测试设计及验证。",
+      "requirements": "来源说明硕士及以上，固体力学、机械、复合材料、飞行器设计等背景；需要建模和工程计算能力。",
+      "majorNames": [
+        "材料科学与工程",
+        "机械设计制造及其自动化",
+        "飞行器设计与工程"
+      ],
+      "editorialRelatedMajors": [
+        "工程力学"
+      ],
+      "majorUnrestricted": false
+    },
+    {
+      "recruitmentType": "CAMPUS",
+      "url": "https://envision-career.com/",
+      "currentOpenVerified": false,
+      "educationLabel": "以职位来源的岗位要求为准",
+      "id": "windfarm-integration-2027",
+      "title": "场站一体化工程师",
+      "city": "上海",
+      "evidenceUrl": "https://www.shushuqiuzhi.com/position/415596",
+      "observedOn": "2026-07-13",
+      "recruitmentSubject": "远景能源（第三方职位来源标注）",
+      "summary": "支持风电场站运行管理、检修计划、故障分析、设备风险闭环及站点运行数据整理。",
+      "requirements": "来源说明本科及以上，电气或相关专业背景；接受长期出差并具备协作沟通能力。",
+      "majorNames": [
+        "电气工程及其自动化"
+      ],
+      "editorialRelatedMajors": [
+        "自动化",
+        "机械设计制造及其自动化"
+      ],
+      "majorUnrestricted": false
+    },
+    {
+      "recruitmentType": "CAMPUS",
+      "url": "https://envision-career.com/",
+      "currentOpenVerified": false,
+      "educationLabel": "以职位来源的岗位要求为准",
+      "id": "turbine-electrical-process-2027",
+      "title": "整机工艺工程师（电气）",
+      "city": "无锡、上海",
+      "evidenceUrl": "https://www.shushuqiuzhi.com/position/415261",
+      "observedOn": "2026-08-05",
+      "recruitmentSubject": "远景能源（第三方职位来源标注）",
+      "summary": "负责风电机组电气布线及线束工艺设计、建模出图、BOM搭建和试制现场技术问题闭环。",
+      "requirements": "本科及以上、硕士优先，电气、自动化、电机、机电一体化等专业；了解整机布线与三维建模。",
+      "majorNames": [
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "editorialRelatedMajors": [
+        "机械设计制造及其自动化",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false
+    },
+    {
+      "recruitmentType": "CAMPUS",
+      "url": "https://envision-career.com/",
+      "currentOpenVerified": false,
+      "educationLabel": "以职位来源的岗位要求为准",
+      "id": "industrial-engineering-2027",
+      "title": "工业工程工程师",
+      "city": "上海",
+      "evidenceUrl": "https://www.shushuqiuzhi.com/position/415571",
+      "observedOn": "2026-07-16",
+      "recruitmentSubject": "远景能源（第三方职位来源标注）",
+      "summary": "开展制造流程改善、产线布局、价值流分析和工时管理，协同提升效率、质量及成本表现。",
+      "requirements": "来源说明硕士及以上、理工科背景，工业工程、管理科学等相关专业优先。",
+      "majorNames": [
+        "工业工程"
+      ],
+      "editorialRelatedMajors": [
+        "机械设计制造及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false
+    },
+    {
+      "recruitmentType": "CAMPUS",
+      "url": "https://envision-career.com/",
+      "currentOpenVerified": false,
+      "educationLabel": "以职位来源的岗位要求为准",
+      "id": "wind-turbine-product-solution-2027",
+      "title": "产品解决方案工程师（风机整机）",
+      "city": "上海",
+      "evidenceUrl": "https://www.shushuqiuzhi.com/position/415539",
+      "observedOn": "2026-07-13",
+      "recruitmentSubject": "远景能源（第三方职位来源标注）",
+      "summary": "沟通市场需求与风机产品研发，支持整机产品路线规划、投标技术要求、产品解决方案及交付优化。",
+      "requirements": "本科及以上，硕博优先，控制、电气、机械相关专业；理解风机系统设计者优先。",
+      "majorNames": [
+        "机械设计制造及其自动化",
+        "电气工程及其自动化"
+      ],
+      "editorialRelatedMajors": [
+        "自动化",
+        "能源与动力工程"
+      ],
+      "majorUnrestricted": false
+    }
+  ],
+  "mediaSources": {
+    "logo": "https://commons.wikimedia.org/wiki/File:Logo_envision.png",
+    "photos": [
+      "https://www.envision-group.com/version/1773382442356/image/section-4-2.4401312.jpg",
+      "https://aesccdn.creatby.com/materials/95622/origin/4326ca19bd92ff9dc2d62855a5be4ae8_origin.jpg"
+    ],
+    "logoLicense": "CC BY-SA 4.0, Hahaheditor12667; original 2015 logo reused without redrawing",
+    "positionsEvidenceType": "third_party_archival"
+  }
+}

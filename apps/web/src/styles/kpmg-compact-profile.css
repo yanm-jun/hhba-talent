@@ -1,0 +1,107 @@
+
+/* HHBA KPMG | 4-section recruitment-first acceptance preview.
+   Intentionally isolated to this employer, never overrides the other 155. */
+.hhba-kpmg-compact{max-width:1060px;margin-top:24px;color:#22372b}
+.hhba-kpmg-compact .company-profile-top{margin:0 0 16px}
+.hhba-kpmg-hero{background:#fff;border:1px solid #e3e9e5;border-radius:15px;padding:23px;margin:0 0 24px}
+.hhba-kpmg-identity{display:flex;align-items:center;gap:17px;margin:0 0 18px}
+.hhba-kpmg-logo{border:1px solid #e6ece7;width:80px;height:72px;border-radius:11px;display:grid;place-items:center;flex:none;background:#fff}
+.hhba-kpmg-logo .hhba-autumn-brand,.hhba-kpmg-logo .hhba-autumn-brand-large{width:72px;height:65px;border:0!important;background:transparent!important;display:grid;place-items:center;box-shadow:none}
+.hhba-kpmg-logo img{max-width:68px;max-height:50px;object-fit:contain}
+.hhba-kpmg-identity-copy{flex:1;min-width:0}
+.hhba-kpmg-kicker{font-size:10px;letter-spacing:.1em;font-weight:750;color:#63826d}
+.hhba-kpmg-identity-copy h1{font-size:28px;line-height:1.25;font-weight:750;letter-spacing:-.6px;margin:5px 0}
+.hhba-kpmg-identity-copy h1 span{font-size:16px;font-weight:550;color:#75857a}
+.hhba-kpmg-identity-copy p{font-size:12px;margin:0;color:#738075}
+.hhba-kpmg-quick-link{background:#2c7150;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:11px 14px;border-radius:8px;font-size:12px;font-weight:750;white-space:nowrap}
+.hhba-kpmg-quick-link:hover{background:#255e43}
+.hhba-kpmg-photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.hhba-kpmg-photo-grid figure{margin:0;border:1px solid #e5ebe6;border-radius:10px;overflow:hidden;background:#f3f6f4;min-width:0}
+.hhba-kpmg-photo-grid img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;pointer-events:none}
+.hhba-kpmg-photo-grid figure:nth-child(2) img{object-position:40% 50%}
+.hhba-kpmg-photo-grid figcaption{display:flex;justify-content:space-between;align-items:center;gap:9px;padding:10px 13px;color:#526b59;font-size:12px}
+.hhba-kpmg-photo-grid figcaption small{background:#f2f6f2;border-radius:5px;padding:3px 6px;font-size:10px;color:#7c9280;white-space:nowrap}
+.hhba-kpmg-section{border-top:1px solid #e4eae5;padding:27px 0 25px}
+.hhba-kpmg-section-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:17px}
+.hhba-kpmg-section-heading h2{font-size:21px;line-height:1.4;margin:0 0 7px;letter-spacing:-.4px}
+.hhba-kpmg-section-heading p{font-size:12px;line-height:1.7;margin:0;color:#7b8a80}
+.hhba-kpmg-section-heading p strong{color:#2e7351}
+.hhba-kpmg-section-link{color:#327250;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-size:12px;text-decoration:none;margin-top:5px}
+.hhba-kpmg-major-list{display:flex;gap:8px;flex-wrap:wrap}
+.hhba-kpmg-major{appearance:none;cursor:pointer;border:1px solid #dfe8e1;border-radius:7px;background:#fff;padding:9px 12px;color:#44644f;font-size:12px;line-height:1.2;display:inline-flex;align-items:center;gap:5px;transition:background .15s ease,border-color .15s ease}
+.hhba-kpmg-major:hover{border-color:#a9cdb3;background:#f7faf7}
+.hhba-kpmg-major.is-selected{background:#e9f4eb;color:#206340;border-color:#a6d0af;font-weight:750}
+.hhba-kpmg-major:focus-visible,.hhba-kpmg-service-more:focus-visible,.hhba-kpmg-service summary:focus-visible{outline:2px solid #327e58;outline-offset:3px}
+.hhba-kpmg-role-list{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.hhba-kpmg-role{background:#fff;border:1px solid #e1e9e3;border-radius:10px;padding:15px 16px;display:flex;align-items:center;gap:15px}
+.hhba-kpmg-role-icon{background:#f2f7f3;color:#498266;width:38px;height:38px;border-radius:9px;display:grid;place-items:center;flex:none}
+.hhba-kpmg-role-main{flex:1;min-width:0}
+.hhba-kpmg-role-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.hhba-kpmg-role-top h3{font-size:14px;margin:0;color:#263d2e;font-weight:750}
+.hhba-kpmg-role-top span{font-size:10px;color:#5d886b;background:#eff7f1;padding:3px 7px;border-radius:20px}
+.hhba-kpmg-role-main p{margin:5px 0 3px;font-size:12px;color:#586c60;line-height:1.5}
+.hhba-kpmg-role-main small{font-size:11px;color:#89968c;line-height:1.5}
+.hhba-kpmg-role>a{flex:none;border:1px solid #cddfd1;border-radius:8px;color:#2c7250;padding:9px 11px;display:inline-flex;gap:7px;align-items:center;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap}
+.hhba-kpmg-role>a:hover{background:#f3f8f3}
+.hhba-kpmg-role-disclaimer{font-size:11px!important;line-height:1.7!important;display:flex;gap:7px;align-items:flex-start;color:#8a988d!important;margin:12px 0 0!important}
+.hhba-kpmg-role-disclaimer svg{flex:none;margin-top:2px}
+.hhba-kpmg-service-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.hhba-kpmg-service{background:#fff;border:1px solid #e1e8e2;border-radius:11px;padding:17px 19px;display:flex;flex-direction:column;min-width:0}
+.hhba-kpmg-service-number{font-size:10px;font-weight:700;letter-spacing:.05em;color:#81a08c}
+.hhba-kpmg-service h3{font-size:15px;line-height:1.4;margin:8px 0 8px;color:#283f31}
+.hhba-kpmg-service>p{color:#64756b;font-size:12px;line-height:1.75;margin:0 0 12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hhba-kpmg-service-tags{font-size:11px;color:#4a8060;line-height:1.5}
+.hhba-kpmg-service details{border-top:1px solid #edf0ed;margin-top:13px;padding-top:9px}
+.hhba-kpmg-service summary{display:flex;gap:6px;align-items:center;list-style:none;cursor:pointer;color:#31734f;font-size:12px}
+.hhba-kpmg-service summary::-webkit-details-marker{display:none}
+.hhba-kpmg-service summary svg{transition:transform .15s}
+.hhba-kpmg-service details[open] summary svg{transform:rotate(180deg)}
+.hhba-kpmg-service-detail{color:#5d7163;font-size:12px;line-height:1.7;padding-top:12px}
+.hhba-kpmg-service-detail strong{font-size:11px;color:#335c43}
+.hhba-kpmg-service-detail ul{margin:7px 0 12px;padding-left:19px}
+.hhba-kpmg-service-detail li{margin:4px 0}
+.hhba-kpmg-service-detail p{margin:6px 0 0}
+.hhba-kpmg-service-more{margin-top:12px;width:100%;background:#f4f8f5;border:1px solid #dce9df;border-radius:8px;padding:12px;font-size:12px;color:#2c724c;font-weight:750;display:flex;justify-content:center;align-items:center;gap:8px;cursor:pointer}
+.hhba-kpmg-service-more:hover{background:#eef5ef}
+.hhba-kpmg-service-more .is-up{transform:rotate(180deg)}
+@media(max-width:760px){
+ .hhba-kpmg-compact{padding:0 12px;margin-top:18px}
+ .hhba-kpmg-hero{padding:16px;margin-bottom:17px}
+ .hhba-kpmg-identity{gap:11px;flex-wrap:wrap;margin-bottom:13px}
+ .hhba-kpmg-logo{width:63px;height:60px}
+ .hhba-kpmg-logo .hhba-autumn-brand{width:56px;height:55px}
+ .hhba-kpmg-logo img{max-width:51px}
+ .hhba-kpmg-identity-copy h1{font-size:24px}
+ .hhba-kpmg-quick-link{width:100%;justify-content:center}
+ .hhba-kpmg-photo-grid{grid-template-columns:1fr;gap:9px}
+ .hhba-kpmg-photo-grid img{aspect-ratio:16/8.5}
+ .hhba-kpmg-section{padding:21px 0}
+ .hhba-kpmg-section-heading{flex-wrap:wrap;gap:4px}
+ .hhba-kpmg-section-heading h2{font-size:19px}
+ .hhba-kpmg-role{align-items:flex-start;padding:13px;gap:9px;flex-wrap:wrap}
+ .hhba-kpmg-role-icon{width:33px;height:33px}
+ .hhba-kpmg-role>a{margin-left:42px}
+ .hhba-kpmg-service-grid{grid-template-columns:1fr}
+ .hhba-kpmg-service{padding:15px 16px}
+}
+
+/* Pfizer uses the identical CITIC/KPMG compact layout; only asset-specific sizing. */
+.hhba-pfizer-compact .hhba-kpmg-logo img{max-width:70px;max-height:62px;width:70px;height:62px;object-fit:contain}
+.hhba-pfizer-photo-note{font-size:11px;line-height:1.65;color:#809286;margin:10px 0 0}
+
+/* China Southern: same compact layout as CITIC Securities/Pfizer. */
+.hhba-csair-compact .hhba-kpmg-logo img{max-width:70px;max-height:64px;width:70px;height:64px;object-fit:contain}
+.hhba-csair-photo-note{font-size:11px;line-height:1.65;color:#809286;margin:10px 0 0}
+
+/* SF Express uses the same compact four-section frame as CITIC Securities, Pfizer and China Southern. */
+.hhba-sf-compact .hhba-kpmg-logo img{max-width:70px;max-height:64px;width:70px;height:64px;object-fit:contain}
+.hhba-sf-photo-note{font-size:11px;line-height:1.65;color:#809286;margin:10px 0 0}
+
+/* NetEase compact profile: same frame as CITIC, Pfizer, CSAIR and SF. No image re-encoding. */
+.hhba-netease-compact .hhba-kpmg-logo img{width:100%;height:auto;max-width:86px;max-height:64px;object-fit:contain}
+.hhba-netease-photo-note{font-size:11px;line-height:1.65;color:#809286;margin:10px 0 0}
+
+/* Hypergryph: preserve full-resolution PNG originals in the underlying asset; only CSS sizes visuals. */
+.hhba-hypergryph-compact .hhba-kpmg-logo{background:#151719}
+.hhba-hypergryph-compact .hhba-kpmg-logo img{width:100%;height:100%;object-fit:contain}
+.hhba-hypergryph-photo-note{font-size:11px;line-height:1.65;color:#7c8980;margin:10px 0 0}

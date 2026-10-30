@@ -1,13 +1,86 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-
-function App() {
-  return (
-    <main style={{ fontFamily: "system-ui", padding: 40 }}>
-      <h1>HHBA · Phase 0</h1>
-      <p>开发环境准备阶段，前端骨架验证通过。</p>
-    </main>
-  );
-}
-
-createRoot(document.getElementById("root")!).render(<App />);
+import { createRoot } from 'react-dom/client';
+import { useEffect, useState } from 'react';
+import './styles.css';
+import { api, ApiError, type User } from './services/api';
+import { useRoute, navigate } from './router';
+import { HomePage } from './pages/HomePage';
+import { JoinUsPage } from './pages/JoinUsPage';
+import { VisionPage } from './pages/VisionPage';
+import { TalentServicePage } from './pages/TalentServicePage';
+import { TalentServiceRoutes } from './pages/TalentServiceRoutes';
+import './styles/join-vision.css';
+import { MajorCompaniesPage } from './pages/MajorCompaniesPage';
+import { DomesticCompanyPage } from './pages/DomesticCompanyPage';
+import { Company200PreviewPage } from './pages/Company200PreviewPage';
+import { DomesticAutumnPage } from './pages/DomesticAutumnPage';
+import { AutumnCompanyProfilePage } from './pages/AutumnCompanyProfilePage';
+import { UnifiedV2CompanyPage } from './pages/UnifiedV2CompanyPage';
+import { KpmgCompactProfilePage } from './pages/KpmgCompactProfilePage';
+import { SchneiderCompactProfilePage } from './pages/SchneiderCompactProfilePage';
+import { HuayuVisionCompactProfilePage } from './pages/HuayuVisionCompactProfilePage';
+import { HuaanSecuritiesCompactProfilePage } from './pages/HuaanSecuritiesCompactProfilePage';
+import { GuangfaSecuritiesCompactProfilePage } from './pages/GuangfaSecuritiesCompactProfilePage';
+import { CiticsSecuritiesCompactProfilePage } from './pages/CiticsSecuritiesCompactProfilePage';
+import { PfizerCompactProfilePage } from './pages/PfizerCompactProfilePage';
+import { CsairCompactProfilePage } from './pages/CsairCompactProfilePage';
+import { SfExpressCompactProfilePage } from './pages/SfExpressCompactProfilePage';
+import { NeteaseGamesCompactProfilePage } from './pages/NeteaseGamesCompactProfilePage';
+import { HypergryphCompactProfilePage } from './pages/HypergryphCompactProfilePage';
+import { AnkerCompactProfilePage } from './pages/AnkerCompactProfilePage';
+import { LaifenCompactProfilePage } from './pages/LaifenCompactProfilePage';
+import { ShkpCompactProfilePage } from './pages/ShkpCompactProfilePage';
+import { BoyuCompactProfilePage } from './pages/BoyuCompactProfilePage';
+import { CompanyProfilePage } from './pages/CompanyProfilePage';
+import { IndexedCompanyPage } from './pages/IndexedCompanyPage';
+import { CompanyDirectoryPage } from './pages/CompanyDirectoryPage';
+import { CandidateMatchPage } from './pages/CandidateMatchPage';
+import { AuthPage } from './pages/AuthPage';
+import { AuthChoicePage } from './pages/AuthChoicePage';
+import { PhoneAuthPage } from './pages/PhoneAuthPage';
+import { OfficialRecruitmentContinuePage } from './pages/OfficialRecruitmentContinuePage';
+import { employerApiReady } from './services/api';
+import { ResumeUploadPage, ProfilePage, PublicProfilePage, ResumePage, ReviewPage } from './pages/CandidatePages';
+import { CandidateDashboardPage } from './pages/CandidateDashboardPage';
+import { PersonalCenterPage } from './pages/PersonalCenterPage';
+import { LegalAidLandingPage } from './pages/LegalAidLandingPage';
+import { LegalAidInterventionPage } from './pages/LegalAidInterventionPage';
+import { LegalAidTopicPage } from './pages/LegalAidTopicPage';
+import { AnalyticsConsent } from './components/AnalyticsConsent';
+import { EmployerStartPage, EmployerOnboardingPreviewPage, EmployerGrowthHubPage } from './pages/EmployerGrowthHubPage';
+import { EmployerEvidencePage, AdminEmployerEvidencePage } from './pages/EmployerEvidencePage';
+import { EmployeeFeedbackPage } from './pages/EmployeeFeedbackPage';
+import { EmployerScoringPage, AdminEmployerScoringPage } from './pages/EmployerScoringPage';
+import { EmployerAppealsPage, EmployeePrivacyConcernsPage, AdminAppealsReviewPage } from './pages/EmployerAppealsPage';
+import { EmployerImprovementsPage, PublicEmployerImprovementsPage, AdminEmployerImprovementsPage } from './pages/EmployerImprovementsPage';
+import { EmployerVerifiedProfilePage, AdminEmployerPublicationPage } from './pages/EmployerVerifiedProfilePage';
+import { EmployerAidApplicationPage, EmployerCommercialPage, AdminAidCommercialPage } from './pages/EmployerAidCommercialPage';
+import { EmployerPage } from './pages/EmployerPage';
+import { EmployerWorkspacePage } from './pages/EmployerWorkspacePage';
+import { EmployerPublicJobsPage, EmployerPublicJobDetail } from './pages/EmployerPublicJobsPage';
+import { MyEmployerApplicationsPage } from './pages/MyEmployerApplicationsPage';
+import { EmployerReviewPage } from './pages/EmployerReviewPage';
+import { AdminRecruitmentPage } from './pages/AdminRecruitmentPage';
+import { CandidateJobsPage, CandidateJobDetailPage } from './pages/CandidateJobsPage';
+import { UnifiedJobMarket, UnifiedJobDetail } from './components/UnifiedJobMarket';
+import { CompanyStepPage, DocumentsStepPage, RecruiterWelcomePage, RepresentativeStepPage, SubmitReviewPage } from './pages/recruiter/RecruiterOnboarding';
+import { WorkspacePage } from './pages/WorkspacePage';
+function App(){const route=useRoute();const [user,setUser]=useState<User|null>(null);const [ready,setReady]=useState(false);useEffect(()=>{if(!employerApiReady){setReady(true);return;}api.me().then(setUser).catch((e)=>{if(!(e instanceof ApiError&&e.status===401))console.warn('Unable to restore session',e);}).finally(()=>setReady(true));},[]);const logout=async()=>{try{await api.logout();}finally{setUser(null);navigate('/');}};if(!ready)return <main className="app-shell" aria-busy="true"/>;if(route==='/')return <HomePage user={user}/>;if(route==='/join')return <JoinUsPage user={user}/>;if(route==='/vision')return <VisionPage user={user}/>;if(route==='/talent-service')return <TalentServicePage user={user}/>;if(route.startsWith('/talent-service/'))return <TalentServiceRoutes key={route} user={user} route={route}/>;if(route==='/companies/discover')return <Company200PreviewPage user={user}/>;if(route==='/candidate/domestic-autumn')return <DomesticAutumnPage user={user}/>;if(route==='/companies/autumn/cn-autumn-001')return <KpmgCompactProfilePage user={user}/>;if(route==='/companies/autumn/cn-autumn-002')return <SchneiderCompactProfilePage user={user}/>;if(route==='/companies/autumn/cn-autumn-003')return <PfizerCompactProfilePage user={user}/>;if(route==='/companies/autumn/cn-autumn-004')return <CsairCompactProfilePage user={user}/>;if(route==='/companies/autumn/cn-autumn-005')return <SfExpressCompactProfilePage user={user}/>;if(route==='/companies/autumn/cn-autumn-006')return <NeteaseGamesCompactProfilePage user={user}/>;if(route==='/companies/autumn/cn-autumn-007')return <HypergryphCompactProfilePage user={user}/>;if(route==='/companies/autumn/cn-autumn-008')return <AnkerCompactProfilePage user={user}/>;if(route==='/companies/autumn/cn-autumn-009')return <LaifenCompactProfilePage user={user}/>;
+ if(route==='/companies/autumn/cn-autumn-010')return <ShkpCompactProfilePage user={user}/>;
+ if(route==='/companies/autumn/cn-autumn-011')return <BoyuCompactProfilePage user={user}/>;
+ if(/^\/companies\/autumn\/cn-autumn-0(?:1[2-9]|2[0-7])$/.test(route))return <UnifiedV2CompanyPage user={user} id={route.split('/').pop()!}/>;if(/^\/companies\/autumn\/cn-autumn-[0-9]{3}$/.test(route))return <AutumnCompanyProfilePage user={user} id={route.split('/').pop()!}/>;if(route==='/companies/domestic/rel-huayu-004')return <HuayuVisionCompactProfilePage user={user}/>;if(route==='/companies/domestic/a-600909')return <HuaanSecuritiesCompactProfilePage user={user}/>;if(route==='/companies/domestic/a-000776')return <GuangfaSecuritiesCompactProfilePage user={user}/>;if(route==='/companies/domestic/a-600030')return <CiticsSecuritiesCompactProfilePage user={user}/>;if(/^\/companies\/domestic\/(?:a-[0-9]{6}|cn-B1-[0-9]{3}|spot-[^/]{2,100}|rel-[a-z]+-[0-9]{3}|group-geely|profile-[a-z0-9-]{3,150})$/.test(route))return <DomesticCompanyPage user={user} id={decodeURIComponent(route.split('/').pop()!)}/>;if(/^\/majors\/[a-z-]{3,80}$/.test(route))return <MajorCompaniesPage user={user} slug={route.split('/').pop()!}/>;if(route==='/companies')return <CompanyDirectoryPage user={user}/>;
+  if(/^\/companies\/id\/[A-Za-z0-9_-]{12,600}$/.test(route))return <IndexedCompanyPage user={user} encodedId={route.split('/').pop()!}/>;
+  if(/^\/companies\/[a-z-]{2,60}$/.test(route))return <CompanyProfilePage user={user} slug={route.split('/').pop()!}/>;if(route==='/auth')return <AuthChoicePage/>;if(route==='/candidate/login'||route==='/candidate/register')return <PhoneAuthPage user={user} onUser={setUser} accountType="candidate" initialMode={route.endsWith('/register')?'register':'login'}/>;if(route==='/recruiter/login'||route==='/recruiter/register'||route==='/recruiter')return <PhoneAuthPage user={user} onUser={setUser} accountType="recruiter" initialMode={route.endsWith('/register')?'register':'login'}/>;if(route==='/candidate/email-login'||route==='/candidate/email-register')return <AuthPage user={user} onUser={setUser} accountType="candidate" initialMode={route.endsWith('register')?'register':'login'}/>;if(route==='/recruiter/email-login'||route==='/recruiter/email-register')return <AuthPage user={user} onUser={setUser} accountType="recruiter" initialMode={route.endsWith('register')?'register':'login'}/>;if(route==='/recruiter/onboarding')return <RecruiterWelcomePage user={user}/>;if(route==='/recruiter/onboarding/company')return <CompanyStepPage user={user}/>;if(route==='/recruiter/onboarding/documents')return <DocumentsStepPage user={user}/>;if(route==='/recruiter/onboarding/representative')return <RepresentativeStepPage user={user}/>;if(route==='/recruiter/onboarding/submit')return <SubmitReviewPage user={user}/>;if(route==='/candidate/official-outbound')return <OfficialRecruitmentContinuePage user={user}/>;if(route==='/candidate')return import.meta.env.VITE_HHBA_CURATED_STATIC==='1'?<UnifiedJobMarket user={user}/>:<CandidateDashboardPage user={user}/>;if(route==='/candidate/account')return <PersonalCenterPage user={user}/>;if(/^\/candidate\/account\/(profile|preferences|resume|applications|privacy)$/.test(route))return <PersonalCenterPage user={user} section={route.split('/').pop() as 'profile'|'preferences'|'resume'|'applications'|'privacy'}/>;if(route==='/candidate/saved')return <PersonalCenterPage user={user} onlySaved/>;if(route==='/candidate/account/legal-aid')return <LegalAidLandingPage user={user}/>;if(route==='/candidate/account/legal-aid/intervention')return <LegalAidInterventionPage user={user}/>;if(/^\/candidate\/account\/legal-aid\/[a-z-]{5,60}$/.test(route))return <LegalAidTopicPage user={user} slug={route.split('/').pop()!}/>;if(route==='/candidate/resume/new')return <ResumeUploadPage user={user}/>;if(route==='/candidate/match')return <CandidateMatchPage user={user}/>;if(route==='/candidate/jobs')return <UnifiedJobMarket user={user}/>;if(route==='/candidate/jobs/archive')return <CandidateJobsPage user={user}/>;if(/^\/candidate\/jobs\/[A-Za-z0-9_-]{1,180}$/.test(route)){const id=route.split('/').pop()!;return /^(JOB-|ATS-)/.test(id)?<CandidateJobDetailPage user={user} jobId={id}/>:<UnifiedJobDetail user={user} jobId={id}/>;}if(route.startsWith('/candidate/resume/'))return <ResumePage user={user} resumeId={route.split('/').pop()!}/>;if(route==='/candidate/review')return <ReviewPage user={user}/>;if(route==='/candidate/profile')return <ProfilePage user={user}/>;if(route.startsWith('/public/'))return <PublicProfilePage slug={route.split('/').pop()!}/>;if(route==='/admin/recruitment')return <AdminRecruitmentPage user={user}/>;if(route==='/candidate/employer-jobs')return <EmployerPublicJobsPage user={user}/>;if(route==='/candidate/my-applications')return <MyEmployerApplicationsPage user={user}/>;if(/^\/candidate\/employer-jobs\/[a-fA-F0-9-]{36}$/.test(route))return <EmployerPublicJobDetail user={user} id={route.split('/').pop()!}/>;if(route==='/admin/employer-review')return <EmployerReviewPage user={user}/>;if(route==='/employer/start'||route==='/employer/start/')return <EmployerStartPage user={user}/>;if(route==='/employer/onboarding-preview'||route==='/employer/onboarding-preview/')return <EmployerOnboardingPreviewPage user={user}/>;if(route==='/employer/aid/apply'||route==='/employer/aid/apply/')return <EmployerAidApplicationPage user={user}/>;
+if(route==='/employer/commercial'||route==='/employer/commercial/')return <EmployerCommercialPage user={user}/>;
+if(route==='/admin/employer-aid'||route==='/admin/employer-aid/')return <AdminAidCommercialPage user={user}/>;
+if(route==='/employer/verified-profile'||route==='/employer/verified-profile/')return <EmployerVerifiedProfilePage user={user}/>;
+if(route==='/admin/employer-publication'||route==='/admin/employer-publication/')return <AdminEmployerPublicationPage user={user}/>;
+if(route==='/employer/improvements'||route==='/employer/improvements/')return <EmployerImprovementsPage user={user}/>;
+if(route==='/employer/improvements/public'||route==='/employer/improvements/public/')return <PublicEmployerImprovementsPage user={user}/>;
+if(route==='/admin/employer-improvements'||route==='/admin/employer-improvements/')return <AdminEmployerImprovementsPage user={user}/>;
+if(route==='/employer/appeals'||route==='/employer/appeals/')return <EmployerAppealsPage user={user}/>;
+if(route==='/employee/privacy-concerns'||route==='/employee/privacy-concerns/')return <EmployeePrivacyConcernsPage user={user}/>;
+if(route==='/admin/employer-appeals'||route==='/admin/employer-appeals/')return <AdminAppealsReviewPage user={user}/>;
+if(route==='/employer/scoring'||route==='/employer/scoring/')return <EmployerScoringPage user={user}/>;
+if(route==='/admin/employer-scoring'||route==='/admin/employer-scoring/')return <AdminEmployerScoringPage user={user}/>;
+if(route==='/employee/feedback'||route==='/employee/feedback/')return <EmployeeFeedbackPage user={user}/>;if(route==='/employer/evidence'||route==='/employer/evidence/')return <EmployerEvidencePage user={user}/>;if(route==='/admin/employer-evidence'||route==='/admin/employer-evidence/')return <AdminEmployerEvidencePage user={user}/>;if(route==='/employer/hub'||route==='/employer/hub/')return <EmployerGrowthHubPage user={user} view="dashboard"/>;if(route==='/employer/growth'||route==='/employer/growth/')return <EmployerGrowthHubPage user={user} view="growth"/>;if(route==='/employer/aid'||route==='/employer/aid/')return <EmployerGrowthHubPage user={user} view="aid"/>;if(route==='/employer/public'||route==='/employer/public/')return <EmployerGrowthHubPage user={user} view="public"/>;if(route==='/employer/workspace'||route==='/employer/workspace/')return <EmployerWorkspacePage user={user}/>;if(route==='/employer')return <EmployerPage user={user}/>;if(route==='/workspace'&&user)return <WorkspacePage user={user} onLogout={logout}/>;navigate('/');return null;}
+createRoot(document.getElementById('root')!).render(<><App/><AnalyticsConsent/></>);

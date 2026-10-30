@@ -1,0 +1,33 @@
+{
+  "company": "紫金集团",
+  "employer_id": "cn-autumn-020",
+  "assets": {
+    "logo": {
+      "path": "images/employer-profiles/cn-autumn-020/logo.png",
+      "source": "https://platinuminvestment.com/images/partners/zijin.png",
+      "sha256": "9d4d10204cf2282d440f3454bce5409c9fd961714e14f25812c40729081fe94d",
+      "dimensions": [
+        916,
+        500
+      ]
+    },
+    "photo1": {
+      "path": "images/employer-profiles/cn-autumn-020/photo1.webp",
+      "source": "https://www.zijinmining.com/upload/images/2024/12/03/ce53d7ff0bfa4e7aaec5d68f3d342e90.jpg",
+      "sha256": "506a66d9eecdb0dd6e9b9974d722463c7ac9c8371f2afe49a5f7cc8c7693ce16",
+      "dimensions": [
+        800,
+        450
+      ]
+    },
+    "photo2": {
+      "path": "images/employer-profiles/cn-autumn-020/photo2.webp",
+      "source": "https://www.zijinmining.com/upload/images/2024/06/26/6ea46cd63b1644de9ad41966996d028c.jpg",
+      "sha256": "6c7f01c36ccc8fd6f4e12c8061708a9428f46e648a13134b0f2cabbe7f3c3911",
+      "dimensions": [
+        740,
+        520
+      ]
+    }
+  }
+}

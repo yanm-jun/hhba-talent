@@ -1,0 +1,302 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-013",
+  "name": "蜂巢能源",
+  "englishName": "SVOLT Energy",
+  "aliases": [
+    "SVOLT",
+    "蜂巢能源科技股份有限公司",
+    "蜂巢",
+    "Svolt Energy"
+  ],
+  "industry": "动力电池 · 储能系统 · 智能制造 · 电池材料",
+  "subtitle": "蜂巢能源科技股份有限公司 · 动力与储能电池研发制造 · 常州",
+  "overview": "蜂巢能源科技股份有限公司成立于2018年，总部位于江苏省常州市金坛区，业务覆盖电芯、模组、电池包、储能系统、锂电材料与电池管理技术。2027届校园招聘简章由中国科学技术大学就业信息网公开刊载。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://www.svolt.cn/",
+    "https://www.svolt.cn/about/profile",
+    "https://www.svolt.cn/product",
+    "https://job.ustc.edu.cn/Specialrecruitment/info.aspx?itemid=10162"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-013/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-013/photo1.webp",
+        "caption": "蜂巢能源生产园区建筑",
+        "note": "财新网 2024 年新闻报道图片 · 展示蜂巢能源园区",
+        "alt": "带有 SVOLT 蜂巢能源企业标志的建筑外观照片"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-013/photo2.webp",
+        "caption": "蜂巢能源盐城基地生产线",
+        "note": "蜂巢能源官网新闻图片 · 盐城生产线投产现场",
+        "alt": "蜂巢能源盐城基地生产线投产活动及员工合影"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://svolt.zhiye.com/campus/jobs",
+    "label": "蜂巢能源官方校园招聘入口",
+    "status": "official_portal",
+    "subject": "蜂巢能源科技股份有限公司",
+    "note": "中国科学技术大学2027届校招简章明确该招聘地址；以下7项属于学校公告的招聘岗位类别，未核实独立职位直链和实时开放状态。"
+  },
+  "majorIntro": "中国科学技术大学2027届校园招聘简章列出7类岗位及适配专业。它们是官方招聘类别，不等于7个已核实单独岗位或实时录用名额。选择专业后可查看匹配的官方校招类别，具体职位、城市和截止时间请以校招官网为准。",
+  "preferredMajors": [
+    "电气工程及其自动化",
+    "自动化",
+    "材料科学与工程",
+    "机械设计制造及其自动化",
+    "能源与动力工程",
+    "化学工程与工艺",
+    "电子信息工程",
+    "工业工程",
+    "物流管理"
+  ],
+  "photoNote": "三张图片是独立的本站静态文件。Logo 图片来自第三方品牌资料页（待企业官方品牌资源二次核准），园区照片来自财新新闻报道，生产线照片来自蜂巢能源官网。图片无第三方点击跳转。招聘资料来自中国科学技术大学2027届公开校招简章，实时可投递状态尚未核实。",
+  "business": [
+    {
+      "title": "新能源汽车动力电池",
+      "description": "开展动力电池电芯、模组与电池包研发和制造，适用于纯电及混动车型。",
+      "tags": "BEV · PHEV · HEV",
+      "details": [
+        "动力电池及电芯产品",
+        "模组与电池系统",
+        "快充电池与系统集成"
+      ]
+    },
+    {
+      "title": "储能系统与解决方案",
+      "description": "提供不同规模的储能产品、系统集成和相关运营服务。",
+      "tags": "电网储能 · 工商业储能",
+      "details": [
+        "大储与工商业储能",
+        "储能系统研发生产",
+        "储能系统运维"
+      ]
+    },
+    {
+      "title": "电池研发与材料技术",
+      "description": "围绕电芯体系、锂电材料、结构设计和安全技术持续研发。",
+      "tags": "电池材料 · 电化学 · BMS",
+      "details": [
+        "正负极及电解液相关研究",
+        "电池结构和安全技术",
+        "电池管理系统"
+      ]
+    },
+    {
+      "title": "智能电池制造",
+      "description": "采用先进叠片工艺、智能工厂与自动化生产技术提升生产管理能力。",
+      "tags": "智能制造 · 设备工程 · 自动化",
+      "details": [
+        "自动化产线",
+        "生产工艺技术",
+        "质量管理体系"
+      ]
+    },
+    {
+      "title": "商用与特种车辆应用",
+      "description": "提供商用车及不同工业场景所需的动力电池产品。",
+      "tags": "商用车 · 工程装备",
+      "details": [
+        "商用车型电池适配",
+        "不同工业应用场景",
+        "产品验证与工程支持"
+      ]
+    },
+    {
+      "title": "电池全生命周期服务",
+      "description": "将研发、制造、使用和回收相衔接，推动电池技术的可持续发展。",
+      "tags": "材料循环 · 低碳制造",
+      "details": [
+        "产品全生命周期管理",
+        "回收及再生利用",
+        "绿色供应链"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "research-technical-2027",
+      "title": "研发技术岗",
+      "city": "常州、无锡、保定等校招城市",
+      "url": "https://svolt.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://job.ustc.edu.cn/Specialrecruitment/info.aspx?itemid=10162",
+      "observedOn": "2026-10-20",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "蜂巢能源科技股份有限公司",
+      "summary": "面向电芯、电池材料、能源动力、自动化及储能技术的研发方向。",
+      "requirements": "2027届校招简章：本科及以上；专业方向为能源动力类、材料类、化学类、自动化类、储能类。",
+      "majorNames": [
+        "能源与动力工程",
+        "材料科学与工程",
+        "化学工程与工艺",
+        "自动化",
+        "储能科学与工程"
+      ],
+      "editorialRelatedMajors": [
+        "新能源科学与工程",
+        "应用化学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "research-support-2027",
+      "title": "研发支持岗",
+      "city": "常州、无锡、保定等校招城市",
+      "url": "https://svolt.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://job.ustc.edu.cn/Specialrecruitment/info.aspx?itemid=10162",
+      "observedOn": "2026-10-20",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "蜂巢能源科技股份有限公司",
+      "summary": "围绕电池研发与测试配套支持相关技术活动。",
+      "requirements": "2027届校招简章：本科及以上；专业方向为材料类、化学类、电气及其自动化。",
+      "majorNames": [
+        "材料科学与工程",
+        "化学工程与工艺",
+        "电气工程及其自动化"
+      ],
+      "editorialRelatedMajors": [
+        "应用化学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "intelligent-manufacturing-2027",
+      "title": "智能制造岗",
+      "city": "常州、无锡、保定等校招城市",
+      "url": "https://svolt.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://job.ustc.edu.cn/Specialrecruitment/info.aspx?itemid=10162",
+      "observedOn": "2026-10-20",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "蜂巢能源科技股份有限公司",
+      "summary": "从事智能制造、生产设备及自动化相关工作方向。",
+      "requirements": "2027届校招简章：本科及以上；自动化类、机械类、电气类、化学类专业。",
+      "majorNames": [
+        "自动化",
+        "机械设计制造及其自动化",
+        "电气工程及其自动化",
+        "化学工程与工艺"
+      ],
+      "editorialRelatedMajors": [
+        "机械电子工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "production-technical-2027",
+      "title": "生产技术岗",
+      "city": "常州、无锡、保定等校招城市",
+      "url": "https://svolt.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://job.ustc.edu.cn/Specialrecruitment/info.aspx?itemid=10162",
+      "observedOn": "2026-10-20",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "蜂巢能源科技股份有限公司",
+      "summary": "面向电池生产现场的工艺、工程与技术支持。",
+      "requirements": "2027届校招简章：本科及以上；自动化、机械、材料、电子信息、电气、工业工程类专业。",
+      "majorNames": [
+        "自动化",
+        "机械设计制造及其自动化",
+        "材料科学与工程",
+        "电子信息工程",
+        "电气工程及其自动化",
+        "工业工程"
+      ],
+      "editorialRelatedMajors": [
+        "机械电子工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "operations-management-2027",
+      "title": "运营管理岗",
+      "city": "常州、无锡、保定等校招城市",
+      "url": "https://svolt.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://job.ustc.edu.cn/Specialrecruitment/info.aspx?itemid=10162",
+      "observedOn": "2026-10-20",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "蜂巢能源科技股份有限公司",
+      "summary": "围绕新能源电池运营、流程协同、物流及生产经营管理。",
+      "requirements": "2027届校招简章：本科及以上；机械、化学、材料、电子信息、能源动力、工业工程、自动化、物流管理与工程等专业。",
+      "majorNames": [
+        "机械设计制造及其自动化",
+        "材料科学与工程",
+        "电子信息工程",
+        "能源与动力工程",
+        "工业工程",
+        "自动化",
+        "物流管理"
+      ],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "化学工程与工艺"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "marketing-planning-2027",
+      "title": "营销策划岗",
+      "city": "常州、无锡、保定等校招城市",
+      "url": "https://svolt.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://job.ustc.edu.cn/Specialrecruitment/info.aspx?itemid=10162",
+      "observedOn": "2026-10-20",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "蜂巢能源科技股份有限公司",
+      "summary": "面向电力系统、能源客户的技术交流及营销策划方向。",
+      "requirements": "2027届校招简章：本科及以上；专业方向为电力系统、电气工程、自动化。",
+      "majorNames": [
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "editorialRelatedMajors": [
+        "能源与动力工程",
+        "市场营销"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "management-trainee-2027",
+      "title": "管培生",
+      "city": "常州、无锡、保定等校招城市",
+      "url": "https://svolt.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://job.ustc.edu.cn/Specialrecruitment/info.aspx?itemid=10162",
+      "observedOn": "2026-10-20",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "蜂巢能源科技股份有限公司",
+      "summary": "2027届校招管理培训生类别，具体分配方向与岗位要求以招聘平台公布为准。",
+      "requirements": "2027届校招简章：专科及以上，专业不限，理工类和管理类背景为主。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工商管理",
+        "工业工程",
+        "物流管理"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "专科及以上",
+      "currentOpenVerified": false
+    }
+  ],
+  "mediaSources": {
+    "logo": "https://www.3wen.com/userfiles/files/logo/3SVOLT.jpg",
+    "photos": [
+      "https://img.caixin.com/2024-10-24/172975316514256.jpg",
+      "https://www.svolt.cn/Public/Uploads/ueditor/upload/image/20240612/1718163114366286.jpeg"
+    ],
+    "jobSummary": "https://job.ustc.edu.cn/Specialrecruitment/info.aspx?itemid=10162"
+  }
+}

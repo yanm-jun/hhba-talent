@@ -1,0 +1,270 @@
+{
+  "schemaVersion": 1,
+  "reviewedOn": "2026-10-24",
+  "policy": "Overrides only verified factual editorial sections; majormatching, media, and recruiting remain independently sourced and do not inherit identity",
+  "entries": {
+    "理想汽车": {
+      "summary": "理想汽车是一家面向家庭用户的智能电动汽车企业，覆盖增程电动与纯电动产品，已形成理想L系列SUV、MEGA家用MPV及i系列纯电SUV等产品布局。",
+      "description": [
+        "理想汽车的公司投资者关系资料明确说明，企业的核心活动是设计、研发、制造与销售高端智能电动车。它面向的主要使用场景是家庭出行，强调安全、舒适和便利，这决定了它需要协调整车空间布局、动力系统、座舱交互、汽车软件和售后服务等不同岗位。它并非简单从事传统燃油车销售的公司。",
+        "理想汽车在中国较早将增程式电动车推向规模化市场，同时建立纯电车型平台。企业在投资者介绍中明确列出对增程系统、创新电驱和智能汽车解决方案的自主研发投入。其车系覆盖L系列增程SUV、MEGA家庭MPV和i系列纯电SUV，两个动力技术路线的工程开发、质量验证及生产制造环节各有特点。",
+        "根据理想汽车披露的公司发展资料，其规模量产开始于2019年11月。随着整车业务扩展，软硬件研发和供应链、工厂生产、区域零售、客户交付等职能会产生不同的人才需求。了解企业时，应将研发总部、制造基地和区域商业团队分开看待，不能据集团业务范围推测某一城市正在招聘具体职位。",
+        "车辆工程、机械、电气、电子信息、自动化、计算机、软件及市场营销等专业都可从其产品和运营体系寻找关联方向；但这仅是企业业务与学科的对应，不代表最新校招或社招岗位允许所有这些专业报考。具体学历、经验、岗位属地和用人法人，以理想汽车招聘平台公开的职位说明为准。"
+      ],
+      "business": [
+        {
+          "title": "增程与纯电整车",
+          "description": "L系列增程SUV与i系列纯电SUV等整车平台，涉及动力、车身和整车集成。"
+        },
+        {
+          "title": "家庭智能汽车体验",
+          "description": "面向家庭的座舱、车载电子、智能化产品体验与相关软件系统。"
+        },
+        {
+          "title": "制造与服务体系",
+          "description": "整车制造、质量验证、供应链、客户交付及售后服务；各岗位以实际招聘单位为准。"
+        }
+      ],
+      "officialSource": "https://ir.lixiang.com/zh-hans/",
+      "reviewEvidenceUrls": [
+        "https://ir.lixiang.com/zh-hans/",
+        "https://ir.lixiang.com/zh-hans/touzizhechangjianwenti/"
+      ],
+      "evidenceLevel": "company_specific_official_page_reviewed",
+      "contentReview": "company_specific_official_page_verified",
+      "lastReviewed": "2026-10-24",
+      "productSource": "https://ir.lixiang.com/zh-hans/",
+      "industryEvidenceUrl": "https://ir.lixiang.com/zh-hans/"
+    },
+    "蔚来汽车": {
+      "summary": "蔚来汽车是蔚来集团旗下的高端智能电动车品牌；集团还拥有面向家庭的乐道和小型高端车品牌萤火虫，研发、产品与用户服务需分品牌区分。",
+      "description": [
+        "蔚来集团在其投资者关系网站中披露，公司成立于2014年11月，主要从事智能电动汽车的设计、研发、制造和销售。它的企业介绍强调技术突破、产品体验以及和用户社区共同成长，而不仅仅是单一汽车型号的销售。企业品牌和具体上市主体、用工法人之间仍需按照招聘公告分别确认。",
+        "官方资料将蔚来品牌定位在高端智能电动车市场；乐道面向家庭智能电动汽车用户；萤火虫则提供小型高端智能电动车。这种多品牌安排意味着车身平台、设计语言、用户定位、价格与服务策略不完全相同，了解职位时要看所属品牌、业务团队及实际经营单位。",
+        "智能电动车的研制涉及机械结构、动力电池和电驱系统、电子电气架构、软件、测试验证和工业生产；面向用户的工作则包括产品销售、服务交付、社区运营和数字化支持。以上为根据公司披露业务形成的岗位方向分析，不代表蔚来承诺某个团队目前有职位空缺。",
+        "车辆工程、机械工程、自动化、电气工程、计算机、电子信息和市场营销等学科，可分别观察其技术研发、制造或商业业务。点击招聘专用站时还应区分蔚来集团不同品牌和实际招聘主体；校招、实习与社会招聘的申请条件及开放日期必须以企业自己发布的信息为准。"
+      ],
+      "business": [
+        {
+          "title": "蔚来品牌",
+          "description": "面向高端智能电动车市场的设计研发、制造与产品服务。"
+        },
+        {
+          "title": "乐道与萤火虫品牌",
+          "description": "分别面向家庭用户以及小型高端智能电动车市场的不同产品定位。"
+        },
+        {
+          "title": "技术与用户体验",
+          "description": "智能汽车核心技术、产品使用体验、社区与服务体系。"
+        }
+      ],
+      "officialSource": "https://ir.nio.com/zh-hans/overview",
+      "reviewEvidenceUrls": [
+        "https://ir.nio.com/zh-hans/overview"
+      ],
+      "evidenceLevel": "company_specific_official_page_reviewed",
+      "contentReview": "company_specific_official_page_verified",
+      "lastReviewed": "2026-10-24",
+      "productSource": "https://ir.nio.com/zh-hans/overview",
+      "industryEvidenceUrl": "https://ir.nio.com/zh-hans/overview"
+    },
+    "OPPO": {
+      "summary": "OPPO是提供手机、平板、耳机、智能穿戴及ColorOS等产品与服务的全球移动智能科技品牌，面向消费终端、软件系统、影像技术与国际市场。",
+      "description": [
+        "OPPO官网的企业介绍显示，它是一家以移动智能科技产品与服务为核心的全球品牌。公司2004年成立，产品不止智能手机，还包括平板、耳机、智能穿戴和面向多设备体验的ColorOS系统。求职者在判断其岗位性质时，不应把整个OPPO理解成手机销售门店，而要同时关注产品研发、系统软件、制造和渠道运营。",
+        "品牌官网公开展示手机影像、设计与流畅交互体验方向，并介绍与哈苏在移动影像上的技术合作。影像系统背后通常涉及光学、图像算法、电子电路、软硬件协同与质量验证；这里描述的是相关业务逻辑，不能推断任一具体岗位由哪个团队招聘。",
+        "官网还介绍了OPPO的全球创新和制造网络、智能终端产品线，以及多个国家和地区的业务覆盖。相应工作可按研发工程、供应链制造、全球市场、服务支持和产品运营等不同类型观察；但总部、子公司、海外区域主体在招人时各有独立条件，品牌统一不代表法律实体统一。",
+        "电子信息、通信、计算机、软件、自动化、机械、工业设计和市场营销等方向，与其公开业务具有不同程度的学科联系。申请时应到OPPO招聘专用入口，核对岗位职责、城市、语言、学历、工作经验、校招或社招类型，不能仅凭本页的专业标签判断是否可以投递。"
+      ],
+      "business": [
+        {
+          "title": "移动终端及穿戴",
+          "description": "手机、平板、耳机与智能穿戴等消费电子产品。"
+        },
+        {
+          "title": "ColorOS与智能体验",
+          "description": "移动操作系统、跨设备交互、智能终端软件与AI应用。"
+        },
+        {
+          "title": "影像及全球运营",
+          "description": "移动影像技术、产品制造、全球品牌与市场渠道。"
+        }
+      ],
+      "officialSource": "https://www.oppo.com/cn/about/",
+      "reviewEvidenceUrls": [
+        "https://www.oppo.com/cn/about/",
+        "https://www.oppo.com/cn/"
+      ],
+      "evidenceLevel": "company_specific_official_page_reviewed",
+      "contentReview": "company_specific_official_page_verified",
+      "lastReviewed": "2026-10-24",
+      "productSource": "https://www.oppo.com/cn/about/",
+      "industryEvidenceUrl": "https://www.oppo.com/cn/about/"
+    },
+    "vivo": {
+      "summary": "vivo以智能终端、影像技术和智慧服务为业务核心，总部位于东莞，在多地布局研发网络，覆盖5G、人工智能、工业设计和移动操作系统。",
+      "description": [
+        "vivo官方网站把企业定位为以智能终端和智慧服务为核心的科技公司，总部位于广东东莞。官网公布的研发网络包括深圳、东莞、南京、北京、杭州、上海和西安，涉及5G通信、人工智能、工业设计与影像等方向。这说明vivo的工作场景既有产品研发，也有跨地区的协同和智能制造环节。",
+        "从产品和技术发展看，vivo官网近年来持续披露移动影像战略、影像芯片与算法、OriginOS操作系统以及蓝心智能相关研发。2026年的企业新闻还介绍了原系统7和蓝河操作系统4。对求职者而言，计算摄影、操作系统与硬件协同可能属于不同团队，不能把这些技术名称都当作同一个招聘岗位。",
+        "企业官网同时介绍了生产制造网络和覆盖多地的业务与用户服务。产品设计、硬件工程、图像软件、测试可靠性、生产质量、渠道销售与零售服务，有不同的技能要求。与消费电子产业链伙伴协作，也并不意味着供应商员工就是vivo本体员工，需要分开核验。",
+        "电子信息、通信工程、计算机、软件、机械、自动化、工业设计和营销等专业能从vivo不同产品线中找到相应业务联系。本站仅提供企业认识和专业探索线索；申请者仍应进入vivo官方招聘系统，依据职位原文核对具体岗位、学历、地点和招聘主体。"
+      ],
+      "business": [
+        {
+          "title": "智能手机与终端产品",
+          "description": "面向用户的智能终端、产品设计、硬件与制造技术。"
+        },
+        {
+          "title": "影像、AI及操作系统",
+          "description": "移动摄影技术、影像算法、蓝心智能、OriginOS及相关系统研发。"
+        },
+        {
+          "title": "全球渠道与客户服务",
+          "description": "产品市场推广、渠道网络、用户服务及跨区域协作。"
+        }
+      ],
+      "officialSource": "https://www.vivo.com.cn/brand/about/",
+      "reviewEvidenceUrls": [
+        "https://www.vivo.com.cn/brand/about/",
+        "https://www.vivo.com.cn/brand/news/detail?id=1389&type=0"
+      ],
+      "evidenceLevel": "company_specific_official_page_reviewed",
+      "contentReview": "company_specific_official_page_verified",
+      "lastReviewed": "2026-10-24",
+      "productSource": "https://www.vivo.com.cn/brand/about/",
+      "industryEvidenceUrl": "https://www.vivo.com.cn/brand/about/"
+    },
+    "大疆创新": {
+      "summary": "大疆创新2006年成立于深圳，业务由无人机扩展到手持影像、飞行系统及行业技术解决方案，覆盖拍摄创作、农业和专业应用场景。",
+      "description": [
+        "大疆招聘官网公开介绍，深圳市大疆创新科技有限公司成立于2006年，总部位于深圳。从最初的无人机研发扩展至多元化产品体系，企业在无人机、手持影像系统等领域推出软硬件产品。企业的招聘方向不能只理解为无人机飞手，还涉及核心技术工程、制造及业务支持。",
+        "公司官方介绍提及飞行与影像稳定系统，通过软硬件研发使复杂技术更容易被使用。产品从消费影像创作延伸到专业影视、农业、环境保护、搜救、能源基础设施等应用。不同产品线会涉及飞行控制、机械结构、导航传感、嵌入式软件、影像处理和安全验证等能力。",
+        "大疆官网还披露，在多个国家和地区设有办公室，业务范围广。其生产研发、全球销售、专业行业解决方案和服务业务各自对应不同工作内容。了解企业的全球化业务并不等于某一境外职位可以跨国远程申请，必须以各招聘实体的真实岗位条件为准。",
+        "航空航天相关知识、自动化、电子信息、机械工程、计算机、软件、工业设计以及市场与国际业务等专业均可观察相关团队，但具体专业要求可能严格到研究方向、硬件平台或语言技能。本页是专业探索，不是岗位匹配结论，需打开大疆官方招聘平台核对。"
+      ],
+      "business": [
+        {
+          "title": "无人机及飞行系统",
+          "description": "无人机平台、飞控系统、航拍设备及相关软硬件能力。"
+        },
+        {
+          "title": "手持影像与稳定系统",
+          "description": "手持摄影设备、增稳与影像技术以及消费和专业创作体验。"
+        },
+        {
+          "title": "行业应用",
+          "description": "农业、搜救、能源巡检与专业影像等不同产业场景的产品和解决方案。"
+        }
+      ],
+      "officialSource": "https://careers.dji.com/zh-CN/about",
+      "reviewEvidenceUrls": [
+        "https://careers.dji.com/zh-CN/about",
+        "https://www.dji.com/company"
+      ],
+      "evidenceLevel": "company_specific_official_page_reviewed",
+      "contentReview": "company_specific_official_page_verified",
+      "lastReviewed": "2026-10-24",
+      "productSource": "https://careers.dji.com/zh-CN/about",
+      "industryEvidenceUrl": "https://careers.dji.com/zh-CN/about"
+    },
+    "万华化学": {
+      "summary": "万华化学是全球化运营的化工新材料公司，业务围绕聚氨酯、石化、精细化学品、新兴材料及未来产业五大产业集群展开。",
+      "description": [
+        "万华化学集团官网明确介绍，公司是一家全球化运营的化工新材料企业，强调依托自主创新技术、工业装置和运营体系提供产品方案。官方资料将业务划分为聚氨酯、石化、精细化学品、新兴材料和未来产业五大产业集群，不能用“普通化工贸易公司”来概括其主要经营形式。",
+        "从应用端观察，万华材料广泛面向生活家居、汽车交通、建筑、电子电气、个人护理与绿色能源等产业。上游原料与化学工艺、材料研发、中试放大、工业设备以及终端应用开发之间形成不同分工，工程开发与工厂生产岗位的工作环境和风险控制要求也不相同。",
+        "官网展示万华在烟台、蓬莱、宁波、四川、福建、珠海等国内地区以及匈牙利、捷克等地的生产基地，并布局烟台、宁波、上海、北京、深圳等研发中心。企业多基地、多部门协作会带来工艺、设备、安全环保、采购物流、供应链和商业支持等工作，但具体在哪一基地开放岗位须通过官方招聘资料核实。",
+        "化学工程、材料、能源、电气、自动化、环境工程、机械、计算机及财务等学科与其产业环节可能有关。化工生产和安全岗位往往有专业资质及经验要求，本站的企业业务标签不会替代正式任职资格。本档案只使用万华公开公司介绍支撑企业事实。"
+      ],
+      "business": [
+        {
+          "title": "聚氨酯与石化",
+          "description": "聚氨酯及石化产业集群中的原料、工艺制造与产品方案。"
+        },
+        {
+          "title": "精细化学品和新材料",
+          "description": "多行业应用的功能材料、新兴材料与产品创新。"
+        },
+        {
+          "title": "全球化制造与研发",
+          "description": "多地工厂、研发中心、供应链和工程运营体系。"
+        }
+      ],
+      "officialSource": "https://www.whchem.com/column/79/",
+      "reviewEvidenceUrls": [
+        "https://www.whchem.com/column/79/",
+        "https://www.whchem.com/"
+      ],
+      "evidenceLevel": "company_specific_official_page_reviewed",
+      "contentReview": "company_specific_official_page_verified",
+      "lastReviewed": "2026-10-24",
+      "productSource": "https://www.whchem.com/column/79/",
+      "industryEvidenceUrl": "https://www.whchem.com/column/79/"
+    },
+    "金蝶国际": {
+      "summary": "金蝶国际始创于1993年，总部在深圳、港交所主板上市，提供企业管理云软件和AI平台，旗下有金蝶云·苍穹、星瀚、星空、星辰等产品线。",
+      "description": [
+        "金蝶官方网站介绍，金蝶国际软件集团始创于1993年，1999年在香港联交所创业板上市，之后转至主板（股票代码0268.HK）。总部设在深圳，是企业管理软件和云服务供应商。理解金蝶的业务，重点不在消费互联网流量，而在企业客户如何管理财务、人力、供应链、制造和业务流程。",
+        "金蝶现有产品中，金蝶云·苍穹定位企业级AI或PaaS平台，星瀚服务大型企业，星空面向高成长企业，星辰偏向小微企业。不同规模客户采用的组织架构、业务流程和部署方式不同，因此ERP产品、云架构、数据和业务咨询需要不同的专业分工。具体产品能力应以金蝶持续更新的官方产品说明为准。",
+        "软件公司的岗位不仅是写代码。面向企业客户的需求分析、实施交付、财税管理、客户成功、售前方案与培训同样重要。金蝶的产品涉及企业管理模型与行业流程，技术团队和业务顾问的知识结构明显不同；服务商、生态伙伴与金蝶集团也并非天然为同一个聘用主体。",
+        "计算机、软件工程、数据科学、会计学、财务管理、工商管理、市场营销等专业在企业云软件的研发、交付和经营中各有实际应用。岗位要求可能侧重编程语言、财务准则、项目交付经验或客户行业知识，求职者应打开官方招聘系统核对，不可将本页专业建议视作正式资格认定。"
+      ],
+      "business": [
+        {
+          "title": "企业级AI及云平台",
+          "description": "金蝶云·苍穹等企业级AI/云基础平台与应用开发能力。"
+        },
+        {
+          "title": "大型及成长型企业管理",
+          "description": "星瀚、星空等面向不同企业规模的管理SaaS与业务流程服务。"
+        },
+        {
+          "title": "小微企业及实施服务",
+          "description": "面向小微企业的云产品，以及企业系统实施、培训、客户服务和生态支持。"
+        }
+      ],
+      "officialSource": "https://www.kingdee.com/company",
+      "reviewEvidenceUrls": [
+        "https://www.kingdee.com/company",
+        "https://investor.kingdee.com/understand/profile/"
+      ],
+      "evidenceLevel": "company_specific_official_page_reviewed",
+      "contentReview": "company_specific_official_page_verified",
+      "lastReviewed": "2026-10-24",
+      "productSource": "https://www.kingdee.com/company",
+      "industryEvidenceUrl": "https://www.kingdee.com/company"
+    },
+    "金山办公": {
+      "summary": "金山办公（688111.SH）从事办公软件研发与服务，旗下包括WPS Office、WPS 365和WPS AI，服务个人创作、组织协作和企业办公数字化。",
+      "description": [
+        "金山办公官网介绍，北京金山办公软件股份有限公司于2019年11月18日在上海证券交易所上市（证券代码688111.SH）。公司长期围绕文档、表格、演示等办公软件提供产品与服务，核心业务并非泛娱乐互联网，而是帮助个人和组织完成文档创作、表达与协同。",
+        "官网目前突出WPS Office、面向组织和企业的WPS 365以及WPS AI。三类产品分别涉及传统桌面与移动端办公体验、企业协作与文档管理、基于AI的智能办公辅助。文档内核、格式兼容、跨端同步、协作权限、信息安全和办公智能化由不同的技术和产品能力支撑。",
+        "办公软件面向个人、企业和公共组织，产品稳定性、兼容性、交付和运维与大型商业系统紧密相关。除此之外，金山办公的企业客户服务、解决方案咨询、客户成功、市场销售和生态运营也需要与研发团队合作。不同招聘主体的业务方向应以官方职位归属为准。",
+        "计算机、软件、人工智能、数据、产品设计、工商管理、市场营销等专业可以从技术研发、用户体验、产品运营和企业解决方案中找到学习方向。金山办公与同属金山体系的其他独立公司不能直接混为一体；申请时仍应对照金山办公自己的招聘公告、工作城市及具体任职要求。"
+      ],
+      "business": [
+        {
+          "title": "WPS Office",
+          "description": "桌面、移动和多端办公软件的文档、表格与演示产品。"
+        },
+        {
+          "title": "WPS 365",
+          "description": "面向企业组织的办公协作、文档管理和数字化服务。"
+        },
+        {
+          "title": "WPS AI",
+          "description": "智能办公辅助及相关AI应用、产品设计和软件工程。"
+        }
+      ],
+      "officialSource": "https://www.wps.cn/KINGSOFT",
+      "reviewEvidenceUrls": [
+        "https://www.wps.cn/KINGSOFT",
+        "https://ep.wps.cn/about/"
+      ],
+      "evidenceLevel": "company_specific_official_page_reviewed",
+      "contentReview": "company_specific_official_page_verified",
+      "lastReviewed": "2026-10-24",
+      "productSource": "https://www.wps.cn/KINGSOFT",
+      "industryEvidenceUrl": "https://www.wps.cn/KINGSOFT"
+    }
+  }
+}

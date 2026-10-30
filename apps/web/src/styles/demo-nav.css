@@ -1,0 +1,2 @@
+.topbar > nav{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}.topbar > nav .auth{display:inline-flex;align-items:center;gap:5px;text-decoration:none}.topbar > nav .text-button{white-space:nowrap}
+@media(max-width:600px){.topbar > nav{gap:3px}.topbar > nav .auth,.topbar > nav .text-button{font-size:11px;padding:5px 4px}.topbar > nav .auth svg{width:13px;height:13px}}

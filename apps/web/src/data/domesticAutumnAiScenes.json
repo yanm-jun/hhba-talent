@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "createdOn": "2026-10-29",
+  "policy": "Every AI scene is a distinct, standalone image associated with an exact screenshot employer ID; never claim the scene is that employer's physical office, HQ, factory, product, or authenticated current brand photograph.",
+  "entries": {
+    "cn-autumn-025": [
+      {
+        "id": "cn-autumn-025-ai-scene-01",
+        "path": "images/autumn-ai-scenes/cn-autumn-025-01.webp",
+        "kind": "ai_generated_concept_scene",
+        "sourceLabel": "AI 场景示意 · 非青岛银行真实总部",
+        "alt": "青岛银行主题 AI 构想建筑场景，非真实青岛银行总部照片",
+        "thumbnailWidth": 250,
+        "thumbnailHeight": 141,
+        "sourceGeneratedOn": "2026-10-29",
+        "sourceMethod": "ChatGPT image generation",
+        "status": "published_preview",
+        "containsNonVerifiedArchitecture": true
+      }
+    ],
+    "cn-autumn-001": [
+      {
+        "id": "cn-autumn-001-ai-scene-01",
+        "path": "images/autumn-ai-scenes/cn-autumn-001-01.avif",
+        "kind": "ai_generated_concept_scene",
+        "status": "published_preview",
+        "sourceLabel": "AI 办公场景示意 1 · 非毕马威真实办公环境",
+        "alt": "专业咨询团队办公主题 AI 场景示意图 1，非毕马威真实办公室或员工照片；非企业实景",
+        "thumbnailWidth": 1024,
+        "thumbnailHeight": 768,
+        "sourceGeneratedOn": "2026-10-29",
+        "sourceMethod": "ChatGPT image generation; individually generated; AVIF optimized copy",
+        "containsNonVerifiedArchitecture": true
+      },
+      {
+        "id": "cn-autumn-001-ai-scene-02",
+        "path": "images/autumn-ai-scenes/cn-autumn-001-02.avif",
+        "kind": "ai_generated_concept_scene",
+        "status": "published_preview",
+        "sourceLabel": "AI 办公场景示意 2 · 非毕马威真实办公环境",
+        "alt": "专业咨询团队办公主题 AI 场景示意图 2，非毕马威真实办公室或员工照片；非企业实景",
+        "thumbnailWidth": 1024,
+        "thumbnailHeight": 768,
+        "sourceGeneratedOn": "2026-10-29",
+        "sourceMethod": "ChatGPT image generation; individually generated; AVIF optimized copy",
+        "containsNonVerifiedArchitecture": true
+      }
+    ],
+    "cn-autumn-002": [
+      {
+        "id": "cn-autumn-002-ai-scene-01",
+        "path": "images/autumn-ai-scenes/cn-autumn-002-01.avif",
+        "kind": "ai_generated_concept_scene",
+        "status": "published_preview",
+        "sourceLabel": "AI 电气自动化研发场景 · 非施耐德电气真实实验室",
+        "alt": "专业电气研发实验室 AI 场景示意，非真实施耐德电气办公室、员工或研发现场",
+        "thumbnailWidth": 864,
+        "thumbnailHeight": 486,
+        "sourceGeneratedOn": "2026-10-29",
+        "sourceMethod": "ChatGPT image generation; standalone asset 1; AVIF optimization",
+        "containsNonVerifiedArchitecture": true
+      },
+      {
+        "id": "cn-autumn-002-ai-scene-02",
+        "path": "images/autumn-ai-scenes/cn-autumn-002-02.avif",
+        "kind": "ai_generated_concept_scene",
+        "status": "published_preview",
+        "sourceLabel": "AI 工业自动化生产场景 · 非施耐德电气真实工厂",
+        "alt": "工业自动化厂房 AI 场景示意，非真实施耐德电气工厂或生产基地",
+        "thumbnailWidth": 864,
+        "thumbnailHeight": 486,
+        "sourceGeneratedOn": "2026-10-29",
+        "sourceMethod": "ChatGPT image generation; standalone asset 2; AVIF optimization",
+        "containsNonVerifiedArchitecture": true
+      }
+    ]
+  }
+}

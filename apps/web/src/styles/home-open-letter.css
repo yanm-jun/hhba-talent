@@ -1,0 +1,52 @@
+/* HHBA letter-of-introduction: isolated overlay, does not restructure the current site. */
+.hhba-letter-revisit{display:inline-flex;align-items:center;gap:6px;margin:14px auto 0;padding:6px 12px;border:1px solid #ded6c8;border-radius:999px;background:#fffefa;color:#80543f;font-size:12px;line-height:1.3;transition:background .2s,border-color .2s}
+.hhba-letter-revisit:hover{background:#fff3e4;border-color:#c0a78b}
+.hhba-letter-revisit:focus-visible{outline:3px solid #d4b398;outline-offset:2px}
+.hhba-letter-hidden-reopen{display:none}
+.hhba-letter-overlay{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px 16px;background:rgba(24,28,27,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hhba-letter-panel{width:100%;max-width:740px;max-height:100%;display:flex;align-items:center;justify-content:center;min-height:0}
+.hhba-letter-intro{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;width:100%;max-width:560px;max-height:calc(100dvh - 40px);overflow:auto;padding:31px 32px 22px;border-radius:18px;background:#fcfaf4;box-shadow:0 24px 80px #0004;text-align:center;animation:hhba-letter-rise .45s ease both}
+.hhba-letter-kicker{margin:0 0 11px!important;font-size:10px!important;letter-spacing:.14em;color:#96836c!important;font-weight:650}
+.hhba-letter-eyebrow{margin:0 0 12px!important;font-size:14px!important;color:#63594d!important}
+.hhba-letter-intro h2{margin:16px 0 8px;font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif;font-size:clamp(22px,4vw,28px);line-height:1.35;font-weight:750;color:#302c28}
+.hhba-letter-teaser{font-size:13px!important;line-height:1.65!important;color:#766d61!important;margin:0 0 18px!important}
+.hhba-letter-envelope{position:relative;display:block;flex:none;width:min(100%,410px);aspect-ratio:1.72;border:0;background:transparent;cursor:pointer;filter:drop-shadow(0 14px 20px rgba(79,52,23,.2));transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.hhba-letter-envelope:hover{transform:translateY(-5px) rotate(-1deg)}
+.hhba-letter-envelope:focus-visible{outline:3px solid #aa3534;outline-offset:7px;border-radius:8px}
+.hhba-letter-envelope-paper{position:absolute;inset:7% 11% 12%;background:#fffaf0;border:1px solid #e4ceaa;border-radius:4px;transform:translateY(-8%);box-shadow:0 2px 8px #8c6d4233}
+.hhba-letter-envelope-back{position:absolute;inset:8% 3% 4%;border:1px solid #c6ae84;background:#ecd9b3;border-radius:5px}
+.hhba-letter-envelope-flap{position:absolute;z-index:2;left:3%;right:3%;top:8%;height:65%;background:linear-gradient(150deg,#f7e7c5,#e5cba2);clip-path:polygon(0 0,100% 0,50% 90%);filter:drop-shadow(0 2px 2px #bba17b)}
+.hhba-letter-envelope-front{position:absolute;z-index:3;inset:8% 3% 4%;background:linear-gradient(145deg,#f6e5c4,#ead6ad);clip-path:polygon(0 0,50% 68%,100% 0,100% 100%,0 100%);border-radius:4px}
+.hhba-letter-envelope-seal{position:absolute;z-index:4;top:48%;left:50%;transform:translate(-50%,-50%);display:grid;place-items:center;width:59px;height:59px;border-radius:50%;border:4px double #dc9087;background:radial-gradient(circle at 35% 26%,#c04b46,#a02e2b 75%);box-shadow:0 3px 8px #572b254d;color:#fff5e9;font-size:12px;letter-spacing:.04em;font-weight:800}
+.hhba-letter-close{display:grid;place-items:center;width:36px;height:36px;min-width:36px;border:0;border-radius:50%;background:transparent;color:#766c61}
+.hhba-letter-close:hover{background:#e9e0d3;color:#332d27}
+.hhba-letter-close:focus-visible,.hhba-letter-intro-actions button:focus-visible,.hhba-letter-primary:focus-visible,.hhba-letter-outline:focus-visible,.hhba-letter-copy:focus-visible{outline:3px solid #c56c55;outline-offset:2px}
+.hhba-letter-intro>.hhba-letter-close{position:absolute;right:15px;top:15px}
+.hhba-letter-primary{display:inline-flex;justify-content:center;align-items:center;gap:8px;min-height:42px;border:1px solid #a82f30;border-radius:8px;padding:10px 19px;background:#ab3432;color:#fff9f4;font-weight:700;font-size:14px;cursor:pointer;transition:background .2s}
+.hhba-letter-primary:hover{background:#902927}
+.hhba-letter-intro-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 14px;margin-top:11px}
+.hhba-letter-intro-actions button{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;color:#736557;font-size:12px;cursor:pointer;padding:7px}
+.hhba-letter-intro-actions button:hover{text-decoration:underline}
+.hhba-letter-feedback{min-height:14px;margin:4px 0 0!important;color:#2e6749!important;font-size:11px!important}
+.hhba-letter-paper{display:flex;flex-direction:column;min-height:0;width:100%;max-width:740px;max-height:min(86dvh,830px);border:1px solid #e9dcca;border-radius:8px;background:#fffcf5;box-shadow:0 30px 88px #0005;animation:hhba-letter-unfold .58s cubic-bezier(.18,.8,.24,1) both;color:#443c33}
+.hhba-letter-paper-head{display:flex;align-items:center;justify-content:space-between;flex:none;padding:16px 27px 0}
+.hhba-letter-paper-head>span{color:#9d896f;font-size:10px;font-weight:650;letter-spacing:.12em}
+.hhba-letter-paper-title{flex:none;text-align:center;padding:0 24px 18px}
+.hhba-letter-paper-title p{margin:0 0 5px!important;color:#8c7863!important;font-size:12px!important}
+.hhba-letter-paper-title h2{font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif;margin:0;color:#302e28;line-height:1.3;font-size:clamp(23px,3.6vw,32px);font-weight:750}
+.hhba-letter-red-rule{display:block;background:#af3935;width:50px;height:2px;margin:16px auto 0}
+.hhba-letter-paper-scroll{overflow:auto;flex:1;min-height:0;overscroll-behavior:contain;padding:8px clamp(20px,6vw,66px) 30px;scrollbar-color:#ccb89b transparent}
+.hhba-letter-paper-scroll:focus-visible{outline:2px solid #bc8070;outline-offset:-2px}
+.hhba-letter-line{font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif!important;font-size:15px!important;line-height:2.02!important;color:#403a33!important;letter-spacing:.015em!important;margin:0 0 18px!important;text-align:justify}
+.hhba-letter-salutation{font-weight:700!important}
+.hhba-letter-emphasis{font-weight:750!important;color:#942d2b!important}
+.hhba-letter-signature{text-align:right!important;font-weight:650!important;margin-bottom:5px!important}
+.hhba-letter-paper-footer{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex:none;padding:14px 26px 8px;border-top:1px solid #ece2d6;background:#fffcf5}
+.hhba-letter-outline,.hhba-letter-copy{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:40px;padding:8px 10px;border:1px solid #e7d9c8;border-radius:8px;background:transparent;color:#80543f;font-size:12px;cursor:pointer}
+.hhba-letter-outline:hover,.hhba-letter-copy:hover{background:#f7ecdc}
+.hhba-letter-paper-status{margin:0!important;min-height:20px;padding:0 26px 7px;color:#2e6749!important;font-size:11px!important;text-align:right}
+@keyframes hhba-letter-rise{from{opacity:0;transform:translateY(15px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes hhba-letter-unfold{from{opacity:0;transform:translateY(25px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:560px){.hhba-letter-overlay{padding:9px 8px}.hhba-letter-intro{padding:38px 16px 15px;max-height:calc(100dvh - 18px)}.hhba-letter-envelope{width:min(100%,360px)}.hhba-letter-paper{max-height:calc(100dvh - 18px)}.hhba-letter-paper-head{padding:11px 14px 0}.hhba-letter-paper-title{padding:0 12px 11px}.hhba-letter-paper-title h2{font-size:23px}.hhba-letter-paper-scroll{padding:4px 17px 20px}.hhba-letter-line{font-size:14px!important;line-height:1.92!important;margin-bottom:15px!important}.hhba-letter-paper-footer{padding:9px 10px 7px;display:grid;grid-template-columns:1fr 1fr;gap:6px}.hhba-letter-paper-footer .hhba-letter-primary{grid-column:1/-1;order:-1}.hhba-letter-paper-status{padding:0 10px 4px;text-align:center}.hhba-letter-revisit{margin-top:10px}}
+@media(max-height:560px){.hhba-letter-intro{padding-top:38px;justify-content:flex-start}.hhba-letter-envelope{width:min(100%,260px)}}
+@media(prefers-reduced-motion:reduce){.hhba-letter-intro,.hhba-letter-paper{animation:none!important}.hhba-letter-envelope{transition:none!important}}

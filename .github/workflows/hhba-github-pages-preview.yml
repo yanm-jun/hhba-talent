@@ -50,8 +50,6 @@ name: HHBA Unified Static Site GitHub Pages
 on:
   push:
     branches: [main]
-    paths:
-      - '.github/workflows/hhba-github-pages-preview.yml'
   workflow_dispatch:
   schedule:
     - cron: '15 0,12 * * *'
@@ -69,13 +67,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: feat/hhba-unified-static-20261025
-          # 2026-10-27 branding preview: source now contains user-approved original HHBA SVG and role login UI.
-          # The homepage marquee now uses only HHBA local domestic media and exact domestic company profile routes.
-          # Public entry cards restored to compact layout; keep three identity paths unchanged.
-          # Navigation copy refresh: 企业发现 (without the 200-company count in the tab)
-          # 2026-10-28: rebuild static preview with consolidated 200-company discovery navigation.
+        # One source branch only: triggering main commit.
       - name: Import the first employer's source-backed KPMG trademark SVG
         run: |
           python - <<'PY'
@@ -117,56 +109,16 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
-      # The source checkout above is the approved public HHBA site, while
-      # newly reviewed V2 data lives in its own isolated branch. Before the
-      # MAIN Pages build, feed those reviewed employers into the SAME job
-      # search field; not a separate employer preview site.
-      - name: Checkout isolated Guangzhilv V2 content
-        uses: actions/checkout@v4
-        with:
-          ref: feat/employer-v2-gzl-027-20261030
-          path: _hhba_gzl_source
-          persist-credentials: false
-      - name: Generate one canonical HHBA V2 index and 16 company dossiers
-        run: |
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          import path from 'node:path';
-          const origin='_hhba_gzl_source/apps/web';
-          const ids=Array.from({length:16},(_,i)=>'cn-autumn-'+String(i+12).padStart(3,'0'));
-          const employers=[];
-          for(const id of ids){
-            const input=path.join(origin,'src/data/employerProfiles',id+'.json');
-            const p=JSON.parse(fs.readFileSync(input,'utf8'));
-            if(p.schemaVersion!==1||p.id!==id||!p.name||!Array.isArray(p.jobs)||
-                !p.jobs.length||p.media.photos.length!==2)throw Error('Incomplete V2 company '+id);
-            const output='apps/web/public/data/employer-v2-profiles/'+id+'.json';
-            fs.mkdirSync(path.dirname(output),{recursive:true});fs.copyFileSync(input,output);
-            if(id!=='cn-autumn-027'){
-              for(const media of [p.media.logo,...p.media.photos.map(x=>x.path)]){
-                const from=path.join(origin,'public',media),to=path.join('apps/web/public',media);
-                if(!fs.existsSync(from)||fs.statSync(from).size<1000)throw Error('V2 media missing '+from);
-                fs.mkdirSync(path.dirname(to),{recursive:true});fs.copyFileSync(from,to);
-              }
-            }
-            employers.push({id,name:p.name,englishName:p.englishName,aliases:p.aliases,industry:p.industry,
-              overview:p.overview,media:{logo:p.media.logo},lastReviewed:p.lastReviewed,
-              jobs:p.jobs.map(j=>({id:j.id,title:j.title,city:j.city,
-                majorNames:j.majorNames,editorialRelatedMajors:j.editorialRelatedMajors}))});
-          }
-          const total=employers.reduce((sum,p)=>sum+p.jobs.length,0);
-          if(employers.length!==16||total!==124||
-             !employers.some(p=>p.name==='南方传媒'&&p.jobs.length===6)||
-             !employers.some(p=>p.name==='广之旅'&&p.jobs.length===8))
-            throw Error('Unified V2 search index is incomplete');
-          fs.mkdirSync('apps/web/public/data',{recursive:true});
-          fs.writeFileSync('apps/web/public/data/employer-v2-search-index.json',
-            JSON.stringify({schemaVersion:1,employers},null,2)+'\n');
-          console.log('HHBA_ONE_SITE_SEARCH_V2_READY',employers.length,total);
-          NODE
-      - name: Test MAIN search company/job index before production Pages build
+      - name: Verify bundled V2 employers and search aliases
         working-directory: apps/web
         run: node scripts/v2-market-search.contract.test.mjs
+      - name: Prepare Guangzhilv three static assets inside the main checkout
+        run: |
+          python -m pip install --quiet Pillow
+          python apps/web/scripts/prepare-guangzhilv-media.py
+          test -s apps/web/public/images/employer-profiles/cn-autumn-027/logo.png
+          test -s apps/web/public/images/employer-profiles/cn-autumn-027/photo1.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-027/photo2.jpg
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
@@ -272,20 +224,16 @@ jobs:
           # Public HTTPS backend ORIGIN only. Never put a DeepSeek credential here.
           VITE_HHBA_MATCH_API_ORIGIN: ${{ vars.HHBA_MATCH_API_ORIGIN }}
         run: npm run build
-      - name: Verify all 16 V2 dossiers and 124 directions are in the MAIN site build
+      - name: Verify Southern, Guangzhilv and shared static images in built site
         run: |
-          test -s apps/web/dist/data/employer-v2-search-index.json
-          test -s apps/web/dist/data/employer-v2-profiles/cn-autumn-026.json
-          test -s apps/web/dist/data/employer-v2-profiles/cn-autumn-027.json
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          const x=JSON.parse(fs.readFileSync('apps/web/dist/data/employer-v2-search-index.json','utf8'));
-          if(x.employers.length!==16||x.employers.reduce((n,p)=>n+p.jobs.length,0)!==124||
-             !x.employers.some(p=>p.name==='南方传媒'&&p.jobs.length===6)||
-             !x.employers.some(p=>p.name==='广之旅'&&p.jobs.length===8))
-            throw Error('V2 unified main search build incomplete');
-          console.log('HHBA_MAIN_SITE_ALL_16_V2_EMPLOYERS_PACKAGED');
-          NODE
+          test -s apps/web/dist/index.html
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-026/logo.png
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-026/photo1.webp
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-026/photo2.webp
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-027/logo.png
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-027/photo1.jpg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-027/photo2.jpg
+          echo HHBA_MAIN_V2_MEDIA_AND_SEARCH_READY
       - name: Strip obsolete industry-stock galleries from the public Pages bundle
         run: |
           rm -rf apps/web/dist/images/autumn-photo-research
@@ -445,25 +393,20 @@ jobs:
           if(!main.includes("route==='/vision'"))throw Error('DEDICATED_VISION_ROUTE_MISSING');
           console.log('HHBA_VISION_DIRECT_LINK_READY');
           NODE
-      - name: Checkout admin UI from the dedicated, non-production preview branch
-        uses: actions/checkout@v4
-        with:
-          ref: feat/admin-investor-console-phase2-20261021
-          path: _hhba_admin_source
-          persist-credentials: false
+      # Admin preview source is now versioned in apps/admin-preview on main.
       - name: Check admin static preview security and functional contracts
         run: |
-          node --check _hhba_admin_source/apps/admin-preview/dashboard.js
-          node --check _hhba_admin_source/apps/admin-preview/metrics.mjs
-          node --check _hhba_admin_source/apps/admin-preview/phase2-metrics.mjs
-          node --test _hhba_admin_source/apps/admin-preview/tests/*.test.mjs
+          node --check apps/admin-preview/dashboard.js
+          node --check apps/admin-preview/metrics.mjs
+          node --check apps/admin-preview/phase2-metrics.mjs
+          node --test apps/admin-preview/tests/*.test.mjs
       - name: Embed public-only admin static preview at /hhba-talent/admin-preview/
         run: |
           mkdir -p apps/web/dist/admin-preview/data
-          cp _hhba_admin_source/apps/admin-preview/index.html \
-             _hhba_admin_source/apps/admin-preview/styles.css \
-             _hhba_admin_source/apps/admin-preview/dashboard.js \
-             _hhba_admin_source/apps/admin-preview/favicon.svg \
+          cp apps/admin-preview/index.html \
+             apps/admin-preview/styles.css \
+             apps/admin-preview/dashboard.js \
+             apps/admin-preview/favicon.svg \
              apps/web/dist/admin-preview/
           node --input-type=module <<'NODE'
           import {readFileSync,writeFileSync} from 'node:fs';
@@ -493,7 +436,7 @@ jobs:
         run: |
           node --input-type=module <<'NODE'
           import {readFileSync,writeFileSync} from 'node:fs';
-          import {buildPhase2Overview} from './_hhba_admin_source/apps/admin-preview/phase2-metrics.mjs';
+          import {buildPhase2Overview} from './apps/admin-preview/phase2-metrics.mjs';
           const root='apps/web/dist/data/';
           let result;
           try {
@@ -581,17 +524,7 @@ jobs:
           test -s apps/web/dist/images/autumn-ai-scenes/cn-autumn-002-02.avif
           grep -q "DOMESTIC_REBUILD_V2" apps/web/src/services/liveRecruitment.ts
           echo HHBA_V2_LEGACY_SNAPSHOT_COMPATIBILITY_RETAINED_MARKET_V2_ISOLATED
-      # All images ship in the MAIN HHBA site. No new company mini-site.
-      - name: Package Guangzhilv images within the one HHBA root
-        run: |
-          python -m pip install --quiet Pillow
-          python _hhba_gzl_source/apps/web/scripts/prepare-guangzhilv-media.py
-          mkdir -p apps/web/dist/images/employer-profiles/cn-autumn-027
-          cp _hhba_gzl_source/apps/web/public/images/employer-profiles/cn-autumn-027/* apps/web/dist/images/employer-profiles/cn-autumn-027/
-          test -s apps/web/dist/images/employer-profiles/cn-autumn-027/logo.png
-          test -s apps/web/dist/images/employer-profiles/cn-autumn-027/photo1.jpg
-          test -s apps/web/dist/images/employer-profiles/cn-autumn-027/photo2.jpg
-          echo HHBA_GZL_MEDIA_PACKAGED_IN_MAIN_SITE
+      # All company media and profiles are versioned on this one main branch.
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
         with:
@@ -611,27 +544,22 @@ jobs:
       - name: Publish the white HHBA site
         id: deployment
         uses: actions/deploy-pages@v4
-      - name: Verify real public Pages V2 employer search index after deployment
+      - name: Smoke-test published ONE HHBA root and company logos
         run: |
           python - <<'PY'
-          import json, time, urllib.request
-          url='https://yanm-jun.github.io/hhba-talent/data/employer-v2-search-index.json'
-          for attempt in range(18):
+          import urllib.request,time
+          root='https://yanm-jun.github.io/hhba-talent/'
+          for attempt in range(12):
               try:
-                  request=urllib.request.Request(url+'?verify='+str(attempt),headers={'Cache-Control':'no-cache','User-Agent':'HHBA-V2-Pages-QA'})
-                  with urllib.request.urlopen(request,timeout=15) as response:
-                      data=json.load(response)
-                  guangzhilv=next((p for p in data['employers'] if p['id']=='cn-autumn-027'),None)
-                  assert len(data['employers'])==16
-                  assert sum(len(x['jobs']) for x in data['employers'])==124
-                  southern=next((p for p in data['employers'] if p['id']=='cn-autumn-026'),None)
-                  assert southern and southern['name']=='南方传媒' and len(southern['jobs'])==6
-                  assert guangzhilv and guangzhilv['name']=='广之旅' and len(guangzhilv['jobs'])==8
-                  assert all(t in [guangzhilv['name'],*guangzhilv['aliases']] or any(t in name for name in [guangzhilv['name'],*guangzhilv['aliases']]) for t in ['广之','广之旅','GZL'])
-                  print('HHBA_PUBLIC_MAIN_SITE_ALL_16_SEARCH_VERIFIED',url,len(guangzhilv['jobs']))
+                  for path in ['', 'images/employer-profiles/cn-autumn-026/logo.png',
+                               'images/employer-profiles/cn-autumn-027/logo.png']:
+                      req=urllib.request.Request(root+path+'?verify='+str(attempt),headers={'Cache-Control':'no-cache'})
+                      with urllib.request.urlopen(req,timeout=18) as response:
+                          assert response.status==200 and len(response.read(2500))>120
+                  print('HHBA_MAIN_PAGES_ASSETS_OK',root)
                   break
               except Exception as exc:
-                  print('PUBLIC_INDEX_NOT_READY',attempt+1,type(exc).__name__,str(exc)[:180])
-                  if attempt==17: raise
+                  print('PAGES_PROPAGATING',attempt,str(exc)[:140])
+                  if attempt==11:raise
                   time.sleep(10)
           PY

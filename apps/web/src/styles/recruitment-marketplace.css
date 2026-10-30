@@ -1,0 +1,95 @@
+
+/* HHBA original two-entry homepage, followed by source-bound genuine recruitment market. */
+.home-marketplace{max-width:1120px;margin:66px auto 85px;padding:0 12px;color:#233a2e}
+.market-head{display:flex;align-items:end;justify-content:space-between;gap:25px;margin-bottom:24px}
+.market-eyebrow{color:#708e71;font-weight:800;letter-spacing:1.6px;font-size:10px}
+.market-eyebrow-line{display:inline-block;width:22px;height:1px;background:currentColor;vertical-align:middle;margin-right:10px}
+.market-head h2{font-size:clamp(26px,3vw,35px);line-height:1.25;letter-spacing:-1px;margin:12px 0 8px}
+.market-head p{color:#77887d;font-size:13px;line-height:1.8;max-width:700px;margin:0}
+.market-more,.market-bottom a{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:850;color:#265c3e;text-decoration:none;white-space:nowrap}
+.market-more:hover,.market-bottom a:hover{text-decoration:underline}
+.market-search{display:grid;grid-template-columns:auto minmax(120px,1fr) auto minmax(125px,190px) auto;gap:10px;align-items:center;border:1px solid #d9e5db;background:#fff;border-radius:14px;padding:11px 12px 11px 20px}
+.market-search label{color:#486b50;font-size:12px;font-weight:750;white-space:nowrap}
+.market-search .market-input{display:flex;align-items:center;gap:9px;min-width:0;padding:0 8px}
+.market-input svg{flex:none;color:#73947c}
+.market-search input{border:0;outline:0;background:transparent;min-width:0;width:100%;height:38px;font-size:13px;color:#283d31}
+.market-search input::placeholder{color:#9bad9e}
+.market-search .market-city{border-left:1px solid #dce6dd;padding-left:14px}
+.market-search button{display:inline-flex;align-items:center;justify-content:space-between;gap:11px;background:#254c39;border:0;border-radius:9px;color:#fff;font-weight:850;font-size:12px;padding:13px 17px;white-space:nowrap;min-height:43px}
+.market-search button:hover{background:#326343}
+.market-channels{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:22px 0 17px;border-bottom:1px solid #dfe8df}
+.market-channels button{background:#fff;border:1px solid #d9e6db;border-radius:9px;color:#67806f;font-size:12px;font-weight:750;padding:10px 16px}
+.market-channels button[aria-pressed="true"]{background:#254a38;color:white;border-color:#254a38}
+.market-total{margin-left:auto;font-size:11px;color:#899a8e}
+.market-caution{display:flex;align-items:flex-start;gap:10px;background:#fbfaf1;border:1px solid #ece9d8;border-radius:11px;padding:13px 15px;margin:16px 0;color:#7f7c5a;font-size:12px;line-height:1.8}
+.market-caution svg{flex:none;margin-top:2px}
+.market-caution strong{color:#65643c}
+.market-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.market-card{background:#fff;border:1px solid #dde7dd;border-radius:14px;padding:22px 24px;min-width:0;transition:box-shadow .2s,border-color .2s}
+.market-card:hover{border-color:#b9cfb7;box-shadow:0 12px 28px #152c1b0d}
+.market-card-top{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.market-company{display:inline-flex;align-items:center;gap:7px;color:#356444;font-size:12px;font-weight:850;min-width:0;overflow-wrap:anywhere}
+.market-company svg{flex:none}
+.market-source{color:#92a398;font-size:10px;max-width:45%;text-align:right}
+.market-card h3{font-size:18px;letter-spacing:-.4px;line-height:1.55;color:#1e3628;margin:19px 0 13px}
+.market-card h3 a{text-decoration:none;color:inherit}.market-card h3 a:hover{text-decoration:underline;text-underline-offset:4px;color:#326c40}
+.market-meta{display:flex;gap:7px;flex-wrap:wrap}
+.market-meta span{background:#f5f7f4;border:1px solid #e9efea;color:#6d8070;border-radius:6px;font-size:11px;padding:6px 9px;display:inline-flex;align-items:center;gap:5px}
+.market-meta .market-type{background:#eaf5e8;border-color:#dcebd9;color:#397c45;font-weight:800}
+.market-card-proof{display:flex;align-items:center;gap:7px;font-size:11px;margin-top:17px;color:#7c895d}
+.market-card-proof svg{flex:none}
+.market-card-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-top:1px solid #eaf0e9;margin-top:17px;padding-top:14px}
+.market-card-foot>div:first-child{display:grid;gap:5px;color:#96a59a;font-size:10px;line-height:1.5}
+.market-card-links{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+.market-card-links a{display:inline-flex;align-items:center;gap:3px;color:#2b6941;text-decoration:none;font-size:11px;font-weight:850;white-space:nowrap}
+.market-card-links a:hover{text-decoration:underline}
+.market-state{border:1px dashed #d0dfd1;background:#fff;border-radius:14px;padding:46px 25px;text-align:center;color:#6d8471;font-size:13px;line-height:1.9}
+.market-state p{margin:0 0 12px}.market-state button{border:1px solid #bad5ba;background:#f1f8ee;border-radius:8px;color:#316a45;display:inline-flex;align-items:center;gap:8px;padding:10px 17px;font-size:12px;font-weight:850}
+.market-bottom{display:flex;justify-content:space-between;align-items:center;gap:13px;margin-top:22px}
+.market-bottom span{font-size:11px;color:#91a196;line-height:1.7}
+@media(max-width:900px){.market-search{grid-template-columns:auto 1fr auto 130px}.market-search button{grid-column:1/-1}.market-head{align-items:start;flex-direction:column}.market-total{width:100%;margin:6px 0 0}}
+@media(max-width:680px){.home-marketplace{margin:47px auto 55px;padding:0 1px}.market-list{grid-template-columns:1fr}.market-card{padding:18px}.market-search{grid-template-columns:1fr;gap:6px;padding:15px}.market-search label{margin-top:3px}.market-search .market-input{padding:0}.market-search input,.market-search .market-city{height:39px;border:1px solid #dce7db;border-radius:8px;padding:0 12px}.market-search .market-city{border-left:1px solid #dce7db}.market-search button{grid-column:auto;margin-top:5px}.market-card-foot{align-items:start;flex-direction:column;gap:12px}.market-bottom{align-items:start;flex-direction:column}.market-channels button{padding:9px 12px}}
+
+.market-card-links a.market-verified-apply{background:#dff8aa;color:#204b32;border-radius:7px;padding:8px 11px;font-weight:900}.market-card-links a.market-verified-apply:hover{background:#c8ed85;text-decoration:none}
+
+
+/* Keep the unified market visually consistent with the original neutral HHBA homepage. */
+.home-marketplace{margin-top:54px;color:#171717}
+.market-eyebrow{color:#667085}
+.market-eyebrow-line{color:#c4cbd5}
+.market-head h2{color:#171717}
+.market-head p{color:#667085}
+.market-more,.market-bottom a{color:#263d5c}
+.market-search{border-color:#e4e7ec;box-shadow:0 5px 18px rgba(23,29,38,.025)}
+.market-search label{color:#475467}
+.market-search .market-input svg{color:#667085}
+.market-search input{color:#171717}
+.market-search input::placeholder{color:#98a2b3}
+.market-search .market-city{border-left-color:#e4e7ec}
+.market-search button{background:#263d5c}
+.market-search button:hover{background:#1d304a}
+.market-channels{border-bottom-color:#e4e7ec}
+.market-channels button{border-color:#e4e7ec;color:#475467}
+.market-channels button[aria-pressed="true"]{background:#263d5c;border-color:#263d5c;color:#fff}
+.market-total{color:#667085}
+.market-caution{background:#f9fafb;border-color:#e4e7ec;color:#667085}
+.market-caution strong{color:#344054}
+.market-list .market-card{border-color:#e4e7ec}
+.market-list .market-card:hover{border-color:#c4ceda;box-shadow:0 10px 25px rgba(23,29,38,.06)}
+.market-company{color:#344054}
+.market-source{color:#98a2b3}
+.market-card h3{color:#171717}
+.market-card h3 a:hover{color:#263d5c}
+.market-meta span{background:#f8f9fa;border-color:#e4e7ec;color:#667085}
+.market-meta .market-type{background:#eef2f7;border-color:#dbe3ed;color:#344054}
+.market-card-proof{color:#667085}
+.market-card-foot{border-top-color:#e4e7ec}
+.market-card-foot>div:first-child{color:#98a2b3}
+.market-card-links a{color:#263d5c}
+.market-state{border-color:#d0d5dd;color:#667085}
+.market-state button{border-color:#c4ceda;background:#f8f9fa;color:#263d5c}
+.market-bottom span{color:#98a2b3}
+@media(max-width:680px){.home-marketplace{margin-top:45px}}
+
+.market-staging-notice{display:flex;align-items:flex-start;gap:10px;margin:14px 0;padding:12px 14px;border:1px solid #e8c878;border-radius:10px;background:#fff9e9;color:#6f4b0c;font-size:13px;line-height:1.65}
+.market-staging-notice svg{flex:0 0 auto;margin-top:2px}

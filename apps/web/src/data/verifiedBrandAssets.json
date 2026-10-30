@@ -1,0 +1,455 @@
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "company": "OpenAI",
+      "platform": "ashby",
+      "source": "openai",
+      "file": "openai.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "original-source"
+    },
+    {
+      "company": "Anthropic",
+      "platform": "greenhouse",
+      "source": "anthropic",
+      "file": "claude.svg",
+      "color": "#D97757",
+      "wide": false,
+      "kind": "original-source"
+    },
+    {
+      "company": "SpaceX",
+      "platform": "greenhouse",
+      "source": "spacex",
+      "file": "spacex.svg",
+      "color": "#000000",
+      "wide": true,
+      "kind": "original-source"
+    },
+    {
+      "company": "Stripe",
+      "platform": "greenhouse",
+      "source": "stripe",
+      "file": "si-stripe.svg",
+      "color": "#635BFF",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Coinbase",
+      "platform": "greenhouse",
+      "source": "coinbase",
+      "file": "si-coinbase.svg",
+      "color": "#0052FF",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Airbnb",
+      "platform": "greenhouse",
+      "source": "airbnb",
+      "file": "si-airbnb.svg",
+      "color": "#FF5A5F",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Databricks",
+      "platform": "greenhouse",
+      "source": "databricks",
+      "file": "si-databricks.svg",
+      "color": "#FF3621",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "DoorDash",
+      "platform": "greenhouse",
+      "source": "doordashusa",
+      "file": "si-doordash.svg",
+      "color": "#FF3008",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Spotify",
+      "platform": "lever",
+      "source": "spotify",
+      "file": "si-spotify.svg",
+      "color": "#1ED760",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Canonical",
+      "platform": "greenhouse",
+      "source": "canonical",
+      "file": "si-canonical.svg",
+      "color": "#E95420",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Palantir",
+      "platform": "lever",
+      "source": "palantir",
+      "file": "si-palantir.svg",
+      "color": "#101113",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Figma",
+      "platform": "greenhouse",
+      "source": "figma",
+      "file": "si-figma.svg",
+      "color": "#F24E1E",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Discord",
+      "platform": "greenhouse",
+      "source": "discord",
+      "file": "si-discord.svg",
+      "color": "#5865F2",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Reddit",
+      "platform": "greenhouse",
+      "source": "reddit",
+      "file": "si-reddit.svg",
+      "color": "#FF4500",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Airtable",
+      "platform": "greenhouse",
+      "source": "airtable",
+      "file": "si-airtable.svg",
+      "color": "#18BFFF",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Robinhood",
+      "platform": "greenhouse",
+      "source": "robinhood",
+      "file": "si-robinhood.svg",
+      "color": "#CCFF00",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "GitLab",
+      "platform": "greenhouse",
+      "source": "gitlab",
+      "file": "si-gitlab.svg",
+      "color": "#FC6D26",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Cloudflare",
+      "platform": "greenhouse",
+      "source": "cloudflare",
+      "file": "si-cloudflare.svg",
+      "color": "#F38020",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Vercel",
+      "platform": "greenhouse",
+      "source": "vercel",
+      "file": "si-vercel.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Wise",
+      "platform": "greenhouse",
+      "source": "wise",
+      "file": "si-wise.svg",
+      "color": "#9FE870",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Coursera",
+      "platform": "greenhouse",
+      "source": "coursera",
+      "file": "si-coursera.svg",
+      "color": "#0056D2",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Notion",
+      "platform": "ashby",
+      "source": "notion",
+      "file": "si-notion.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Linear",
+      "platform": "ashby",
+      "source": "linear",
+      "file": "si-linear.svg",
+      "color": "#5E6AD2",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Perplexity",
+      "platform": "ashby",
+      "source": "perplexity",
+      "file": "si-perplexity.svg",
+      "color": "#1FB8CD",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "ElevenLabs",
+      "platform": "ashby",
+      "source": "elevenlabs",
+      "file": "si-elevenlabs.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Cursor",
+      "platform": "ashby",
+      "source": "cursor",
+      "file": "si-cursor.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Replit",
+      "platform": "ashby",
+      "source": "replit",
+      "file": "si-replit.svg",
+      "color": "#F26207",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "PostHog",
+      "platform": "ashby",
+      "source": "posthog",
+      "file": "si-posthog.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Gusto",
+      "platform": "greenhouse",
+      "source": "gusto",
+      "file": "si-gusto.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Deepgram",
+      "platform": "ashby",
+      "source": "deepgram",
+      "file": "si-deepgram.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "ClickUp",
+      "platform": "ashby",
+      "source": "clickup",
+      "file": "si-clickup.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Greenhouse",
+      "platform": "greenhouse",
+      "source": "greenhouse",
+      "file": "si-greenhouse.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Binance",
+      "platform": "lever",
+      "source": "binance",
+      "file": "si-binance.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "source-traced-vector"
+    },
+    {
+      "company": "Anduril",
+      "platform": "greenhouse",
+      "source": "andurilindustries",
+      "file": "brand-anduril.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Airwallex",
+      "platform": "ashby",
+      "source": "airwallex",
+      "file": "brand-airwallex.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Harvey",
+      "platform": "ashby",
+      "source": "harvey",
+      "file": "brand-harvey.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Flexport",
+      "platform": "greenhouse",
+      "source": "flexport",
+      "file": "brand-flexport.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Form Energy",
+      "platform": "ashby",
+      "source": "formenergy",
+      "file": "brand-formenergy.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Ramp",
+      "platform": "ashby",
+      "source": "ramp",
+      "file": "brand-ramp.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Twilio",
+      "platform": "greenhouse",
+      "source": "twilio",
+      "file": "brand-twilio.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Cohere",
+      "platform": "ashby",
+      "source": "cohere",
+      "file": "brand-cohere.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Mercor",
+      "platform": "ashby",
+      "source": "mercor",
+      "file": "brand-mercor.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Cognition",
+      "platform": "ashby",
+      "source": "cognition",
+      "file": "brand-cognition.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "ShopBack",
+      "platform": "lever",
+      "source": "shopback-2",
+      "file": "brand-shopback.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Vanta",
+      "platform": "ashby",
+      "source": "vanta",
+      "file": "brand-vanta.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "Ashby",
+      "platform": "ashby",
+      "source": "ashby",
+      "file": "brand-ashby.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "AlphaSights Campus Recruiting",
+      "platform": "greenhouse",
+      "source": "alphasightsresumedrop",
+      "file": "brand-alphasightscampusrecruiting.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "General Robotics",
+      "platform": "ashby",
+      "source": "generalrobotics",
+      "file": "brand-generalrobotics.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-site-icon"
+    },
+    {
+      "company": "SpaceX Global",
+      "platform": "greenhouse",
+      "source": "spacexglobal",
+      "file": "brand-spacexglobal.svg",
+      "color": "#000000",
+      "wide": false,
+      "kind": "original-source"
+    },
+    {
+      "company": "Headway",
+      "platform": "ashby",
+      "source": "headway",
+      "file": "brand-headway.png",
+      "color": "#000000",
+      "wide": false,
+      "kind": "brand-board-icon"
+    }
+  ]
+}

@@ -1,0 +1,350 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-017",
+  "name": "太极股份",
+  "englishName": "TAIJI Computer Corporation Limited",
+  "aliases": [
+    "太极计算机",
+    "太极计算机股份有限公司",
+    "太极电脑",
+    "TAIJI",
+    "TAIJI Computer",
+    "太极股份002368",
+    "002368"
+  ],
+  "industry": "软件与信息技术服务 · 数字政府 · 云与数据 · 自主软件 · 智慧城市",
+  "subtitle": "太极计算机股份有限公司 · 中国电科体系企业 · 深交所上市公司（002368）",
+  "overview": "太极计算机股份有限公司（太极股份）是面向数字政府、智慧城市与重点行业的数字化服务提供商，2010年在深圳证券交易所上市。公司公开披露四大业务板块：云与数据服务、自主软件产品、数字解决方案、数字基础设施。企业主体为信息技术公司，与从事医药业务的“太极集团”不同。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://www.taiji.com.cn/TaijiCMS/html/gywm.html",
+    "https://www.iguopin.com/company?id=10685711949965164",
+    "https://www.iguopin.com/job/detail?id=211089845001390326",
+    "https://static.cninfo.com.cn/finalpage/2026-08-24/1225490832.PDF"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-017/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-017/photo1.webp",
+        "caption": "太极信息技术产业园 · 企业建筑",
+        "note": "2024年媒体报道所配太极总部建筑图 · 原始发布见素材来源清单",
+        "alt": "太极信息技术产业园建筑入口，正面可见TAIJI蓝色标识"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-017/photo2.webp",
+        "caption": "太极数字解决方案中心 · 企业办公环境",
+        "note": "2020年太极校招宣传图所示数字解决方案中心接待区 · 非近期实拍",
+        "alt": "太极数字解决方案中心办公接待区域，配有TAIJI品牌展示"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.iguopin.com/company?id=10685711949965164",
+    "label": "国聘 · 太极股份招聘资料（第三方）",
+    "status": "archived_source",
+    "subject": "太极计算机股份有限公司",
+    "note": "目前没有核验到太极股份独立可直达的官方网页招聘系统。企业2027校招宣讲材料提示通过微信公众号“太极微招聘”进入极之校招；国聘为第三方职位来源。部分岗位报名时间已过，所有岗位均不承诺实时开放。"
+  },
+  "majorIntro": "依据国聘公开展示的太极计算机股份有限公司2027届招聘记录整理10条具体岗位，专业标签只表示相关性，不代表公司正式限定或当前在招。算法工程师原岗位注明2026年10月24日截止，已到期；其他岗位的截止时间仍需核对。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "软件工程",
+    "人工智能",
+    "网络空间安全",
+    "网络工程",
+    "电子信息工程",
+    "信息管理与信息系统",
+    "工程管理"
+  ],
+  "photoNote": "真实太极股份Logo依据国聘企业档案保存；建筑照片及数字解决方案中心内部照片来自不同年份的企业相关媒体材料，均独立保存于本站，图片不含外链；2020年接待区图片并非2026年办公环境。企业Logo仅用于识别企业，不表示企业与HHBA存在合作。",
+  "business": [
+    {
+      "title": "云与数据服务",
+      "description": "围绕云基础设施、数据治理与行业数据应用提供建设、运营和技术服务。",
+      "tags": "政务云 · 数据治理 · 数字运营",
+      "details": [
+        "云资源与运营服务",
+        "数据治理、集成和共享",
+        "行业数据应用与运营支撑"
+      ]
+    },
+    {
+      "title": "自主软件产品",
+      "description": "面向关键行业信创与基础软件需求，布局国产化软件产品及生态适配。",
+      "tags": "自主可控 · 国产软件 · 信创",
+      "details": [
+        "自主软件及产品生态",
+        "信创环境建设与适配",
+        "行业基础软件能力"
+      ]
+    },
+    {
+      "title": "数字解决方案",
+      "description": "面向数字政府、公共安全、智慧城市等行业构建业务系统和智能应用。",
+      "tags": "数字政府 · 智慧城市 · 业务系统",
+      "details": [
+        "电子政务与行业信息系统",
+        "智慧城市及政法行业解决方案",
+        "行业软件开发与应用集成"
+      ]
+    },
+    {
+      "title": "数字基础设施",
+      "description": "为大型信息系统提供基础设施设计、建设、系统集成和运行保障。",
+      "tags": "系统集成 · 数字基础设施 · 运营保障",
+      "details": [
+        "大型信息系统建设",
+        "网络、算力等基础设施集成",
+        "信息系统运维及安全保障"
+      ]
+    },
+    {
+      "title": "网络信息安全",
+      "description": "围绕公共部门及关键行业的信息系统需求开展安全建设与配套技术服务。",
+      "tags": "网络安全 · 系统安全 · 合规",
+      "details": [
+        "信息系统安全建设",
+        "安全保障与体系集成",
+        "行业安全解决方案"
+      ]
+    },
+    {
+      "title": "重点行业数字化",
+      "description": "以面向政府、公共安全、国防、能源和大型集团客户的行业实践形成应用能力。",
+      "tags": "政府 · 公共安全 · 能源",
+      "details": [
+        "公共部门数字化",
+        "大型企业业务数字化",
+        "重点行业智能化应用"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "project-lanzhou-2027",
+      "title": "项目经理（2027届）·兰州",
+      "city": "兰州·城关区",
+      "url": "https://www.iguopin.com/company?id=10685711949965164",
+      "evidenceUrl": "https://www.iguopin.com/company?id=10685711949965164",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "太极计算机股份有限公司",
+      "summary": "国聘公开汇总显示兰州地区项目经理校招岗位，具体工作职责及所需技能以原始岗位为准。",
+      "requirements": "国聘2027届岗位摘要显示硕士、应届生等条件；逐岗具体专业、学历、人数、截止时间和投递状态请核对原页面。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息管理与信息系统",
+        "工程管理"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 硕士（摘要信息）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "project-taiyuan-2027",
+      "title": "项目经理（2027届）·太原",
+      "city": "太原·小店区",
+      "url": "https://www.iguopin.com/company?id=10685711949965164",
+      "evidenceUrl": "https://www.iguopin.com/company?id=10685711949965164",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "太极计算机股份有限公司",
+      "summary": "国聘公开汇总显示太原地区项目经理校招岗位，具体业务方向与职责需查阅岗位原文。",
+      "requirements": "国聘2027届岗位摘要显示硕士、应届生等条件；逐岗具体专业、学历、人数、截止时间和投递状态请核对原页面。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息管理与信息系统",
+        "工程管理"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 硕士（摘要信息）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "project-xian-2027",
+      "title": "项目经理（2027届）·西安",
+      "city": "西安·雁塔区",
+      "url": "https://www.iguopin.com/company?id=10685711949965164",
+      "evidenceUrl": "https://www.iguopin.com/company?id=10685711949965164",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "太极计算机股份有限公司",
+      "summary": "国聘公开汇总显示西安地区项目经理校招岗位，涉及项目沟通与交付的具体责任以公告为准。",
+      "requirements": "国聘2027届岗位摘要显示硕士、应届生等条件；逐岗具体专业、学历、人数、截止时间和投递状态请核对原页面。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "项目管理",
+        "信息管理与信息系统"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 硕士（摘要信息）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "product-chongqing-2027",
+      "title": "产品经理（2027届）·重庆",
+      "city": "重庆·大渡口区",
+      "url": "https://www.iguopin.com/company?id=10685711949965164",
+      "evidenceUrl": "https://www.iguopin.com/company?id=10685711949965164",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "太极计算机股份有限公司",
+      "summary": "国聘公开汇总显示重庆地区软件产品经理校招岗位，产品方向及能力要求以该招聘记录为准。",
+      "requirements": "国聘2027届岗位摘要显示硕士、应届生等条件；逐岗具体专业、学历、人数、截止时间和投递状态请核对原页面。",
+      "majorNames": [
+        "软件工程",
+        "计算机科学与技术",
+        "信息管理与信息系统",
+        "人工智能"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 硕士（摘要信息）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "project-nanchang-2027",
+      "title": "项目经理（2027届）·南昌",
+      "city": "南昌·红谷滩区",
+      "url": "https://www.iguopin.com/company?id=10685711949965164",
+      "evidenceUrl": "https://www.iguopin.com/company?id=10685711949965164",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "太极计算机股份有限公司",
+      "summary": "国聘公开汇总显示南昌地区项目经理校招岗位，具体项目类型未在摘要中完整披露。",
+      "requirements": "国聘2027届岗位摘要显示硕士、应届生等条件；逐岗具体专业、学历、人数、截止时间和投递状态请核对原页面。",
+      "majorNames": [
+        "软件工程",
+        "计算机科学与技术",
+        "信息管理与信息系统",
+        "工程管理"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 硕士（摘要信息）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "product-nanchang-2027",
+      "title": "产品经理（2027届）·南昌",
+      "city": "南昌·红谷滩区",
+      "url": "https://www.iguopin.com/company?id=10685711949965164",
+      "evidenceUrl": "https://www.iguopin.com/company?id=10685711949965164",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "太极计算机股份有限公司",
+      "summary": "国聘公开汇总显示南昌地区产品经理校招岗位，职责与录用条件请以原招聘信息为准。",
+      "requirements": "国聘2027届岗位摘要显示硕士、应届生等条件；逐岗具体专业、学历、人数、截止时间和投递状态请核对原页面。",
+      "majorNames": [
+        "软件工程",
+        "计算机科学与技术",
+        "信息管理与信息系统"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 硕士（摘要信息）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "presales-nanchang-2027",
+      "title": "售前技术支持方向（2027届）·南昌",
+      "city": "南昌·红谷滩区",
+      "url": "https://www.iguopin.com/company?id=10685711949965164",
+      "evidenceUrl": "https://www.iguopin.com/company?id=10685711949965164",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "太极计算机股份有限公司",
+      "summary": "国聘公开摘要中该条以产品经理标题出现、职位类别标为售前技术支持；本页明确显示分类歧义，须核对原始职位。",
+      "requirements": "国聘2027届岗位摘要显示硕士、应届生等条件；逐岗具体专业、学历、人数、截止时间和投递状态请核对原页面。",
+      "majorNames": [
+        "计算机科学与技术",
+        "网络工程",
+        "电子信息工程",
+        "软件工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 硕士（摘要信息）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "presales-beijing-2027",
+      "title": "售前咨询工程师（2027届）·北京",
+      "city": "北京·朝阳区",
+      "url": "https://www.iguopin.com/company?id=10685711949965164",
+      "evidenceUrl": "https://www.iguopin.com/company?id=10685711949965164",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "太极计算机股份有限公司",
+      "summary": "国聘公开汇总显示北京地区售前咨询工程师校招岗位，具体行业、售前职责及经验要求以公告为准。",
+      "requirements": "国聘2027届岗位摘要显示硕士、应届生等条件；逐岗具体专业、学历、人数、截止时间和投递状态请核对原页面。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "网络工程",
+        "信息管理与信息系统"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 硕士（摘要信息）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "algorithm-beijing-2027",
+      "title": "算法工程师（2027届）·北京",
+      "city": "北京·朝阳区",
+      "url": "https://www.iguopin.com/job/detail?id=211089845001390326",
+      "evidenceUrl": "https://www.iguopin.com/job/detail?id=211089845001390326",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "太极计算机股份有限公司",
+      "summary": "国聘岗位原文提及人工智能算法设计、优化与应用，使用 Python、TensorFlow 或 PyTorch 等技术；本条明确显示的报名截止时间为2026年10月24日。",
+      "requirements": "国聘2027届校招岗位原文：硕士，应届；计算机、软件工程、电子信息、网络安全、人工智能等相关专业。原职位报名截止2026年10月24日，已过期。",
+      "majorNames": [
+        "人工智能",
+        "计算机科学与技术",
+        "软件工程",
+        "电子信息工程",
+        "网络空间安全"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 硕士（摘要信息）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "java-beijing-2027",
+      "title": "Java开发工程师（2027届）·北京",
+      "city": "北京·朝阳区",
+      "url": "https://www.iguopin.com/company?id=10685711949965164",
+      "evidenceUrl": "https://www.iguopin.com/company?id=10685711949965164",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "太极计算机股份有限公司",
+      "summary": "国聘公开汇总显示北京地区 Java 开发工程师校招岗位，具体技术栈、工作内容和申请状态请查看原岗位。",
+      "requirements": "国聘2027届岗位摘要显示硕士、应届生等条件；逐岗具体专业、学历、人数、截止时间和投递状态请核对原页面。",
+      "majorNames": [
+        "软件工程",
+        "计算机科学与技术",
+        "信息安全",
+        "电子信息工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 硕士（摘要信息）",
+      "currentOpenVerified": false
+    }
+  ],
+  "mediaSources": {
+    "logo": "https://iguopin-company.oss-cn-beijing.aliyuncs.com/10685711949965164/logo/20230630/9db3015b9a1c2f82ae75a2bbc2055223.jpg",
+    "photo1": "https://q3.itc.cn/q_70/images03/20240507/6b693593f9764eb59c540784258fb01b.jpeg",
+    "photo2": "https://p3.itc.cn/q_70/images03/20201011/fc6844a040ce45f5a673bd0b7f3ebbc0.jpeg"
+  }
+}

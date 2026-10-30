@@ -1,0 +1,14 @@
+{
+  "name": "hhba-original-market-staging",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "bun run server.ts"
+  },
+  "dependencies": {
+    "html-to-text": "9.0.5",
+    "sanitize-html": "2.17.0",
+    "html-entities": "2.6.0",
+    "htmlparser2": "10.0.0"
+  }
+}

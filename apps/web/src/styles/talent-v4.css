@@ -1,0 +1,35 @@
+/* HHBA V4.1: municipality-first search and two business entries */
+.ts-page .ts-hero{position:relative;z-index:4;overflow:visible}
+.ts-page .ts-searchbar{position:relative;z-index:8}
+.ts-page .ts-city-select{flex-basis:142px}
+.ts-page .ts-city-select select{width:88px;max-width:100%;color:#24568c}
+.ts-page .ts-query-container{position:relative;display:flex;flex:1;min-width:0;height:100%;align-items:stretch}
+.ts-page .ts-query-container .ts-query-field{flex:1;min-width:0;display:flex;align-items:center}
+.ts-city-suggestions{position:absolute;z-index:70;top:calc(100% + 9px);left:0;right:0;background:#fff;border:1px solid #dae7f8;box-shadow:0 15px 40px #204c842b;border-radius:12px;padding:6px;max-height:290px;overflow:auto}
+.ts-city-suggestions button{width:100%;border:0;display:flex;align-items:center;gap:10px;background:#fff;text-align:left;border-radius:8px;color:#2a69b9;padding:11px 12px;cursor:pointer}
+.ts-city-suggestions button:hover,.ts-city-suggestions button.active{background:#edf5ff}
+.ts-city-suggestions button strong{font-size:13px;color:#244976}
+.ts-city-suggestions button small{font-size:11px;color:#8196af;margin-left:auto}
+.ts-city-suggestions button>svg:last-child{flex:none}
+.ts-page .ts-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.ts-page .ts-quick-card{padding:24px 26px}
+.ts-page .ts-quick-card small,.ts-page .ts-quick-arrow{display:block}
+.ts-v4-cities .ts-city-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+.ts-v4-cities .ts-city-photo{height:160px}
+.ts-v4-cities .ts-city-info{padding:17px 15px}
+.ts-v4-cities .ts-city-info h3{font-size:18px}
+.ts-v4-cities .ts-city-info p{font-size:10px}
+.ts-v4-cities .ts-circle-arrow{height:30px;width:30px;flex:none}
+.ts-v4-city-hero{background:radial-gradient(circle at 95% 0%,#ffe5c7 0,transparent 34%),linear-gradient(110deg,#edf5ff,#f9fbff)}
+.ts-v4-two-kinds{grid-template-columns:repeat(2,minmax(0,1fr))}
+.ts-v4-two-kinds .ts-sub-kind{min-height:192px;gap:11px;padding:25px}
+.ts-v4-two-kinds .ts-sub-kind>svg:last-child{display:none}
+.ts-v4-two-kinds .ts-sub-kind strong{font-size:19px}
+.ts-v4-kind-count{color:#2e71c9;display:flex;gap:8px;align-items:center;font-size:12px;font-weight:750;margin-top:auto}
+.ts-v4-city-note{display:flex;align-items:flex-start;gap:12px;background:#f5f8fe;border-radius:13px;padding:19px 21px;color:#4177b9}
+.ts-v4-city-note svg{flex:none}
+.ts-v4-city-note strong{font-size:13px;color:#315681}
+.ts-v4-city-note p{font-size:12px;line-height:1.8;color:#8493a8;margin:7px 0 0}
+@media(max-width:1030px){.ts-v4-cities .ts-city-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ts-v4-cities .ts-city-photo{height:190px}}
+@media(max-width:740px){.ts-page .ts-searchbar{flex-wrap:wrap;gap:0}.ts-page .ts-city-select{flex:0 0 130px;height:44px}.ts-page .ts-query-container{flex:1;height:44px}.ts-page .ts-query-container .ts-query-field{min-height:44px}.ts-page .ts-city-suggestions{left:-130px;top:calc(100% + 42px)}.ts-page .ts-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:12px}.ts-page .ts-quick-card{padding:14px;min-height:83px}.ts-page .ts-quick-card small{display:block;font-size:9px}.ts-page .ts-quick-arrow{display:none}.ts-v4-cities .ts-city-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.ts-v4-cities .ts-city-photo{height:118px}.ts-v4-cities .ts-city-info{padding:12px}.ts-v4-cities .ts-city-info h3{font-size:15px}.ts-v4-cities .ts-city-info p{font-size:9px}.ts-v4-cities .ts-circle-arrow{height:26px;width:26px}.ts-v4-two-kinds{grid-template-columns:1fr}.ts-v4-two-kinds .ts-sub-kind{min-height:154px;padding:20px}}
+@media(max-width:390px){.ts-page .ts-quick-grid{grid-template-columns:1fr}.ts-v4-cities .ts-city-grid{grid-template-columns:1fr}.ts-v4-cities .ts-city-photo{height:160px}}

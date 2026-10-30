@@ -1,0 +1,42 @@
+# Build HHBA white dual-entry web with the SAME verified ATS search index
+# previously used on GitHub Pages. Existing Railway job API remains intact.
+FROM node:22-alpine AS white-builder
+WORKDIR /build/apps/web
+COPY apps/web/package.json apps/web/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY apps/web/ ./
+ENV HHBA_GITHUB_PAGES=0
+ENV VITE_HHBA_VERIFIED_SNAPSHOT=1
+ENV VITE_HHBA_ACCOUNT_API_ENABLED=0
+RUN node --test scripts/white-market-detail.contract.test.mjs && npm run build
+RUN test -s dist/index.html
+
+FROM oven/bun:1.3
+WORKDIR /app
+COPY ops/legacy-marketplace/package.json ./package.json
+RUN bun install --production
+COPY ops/legacy-marketplace/railway-function-20261018.ts ./server.ts
+COPY ops/legacy-marketplace/jd-sync-store.mjs ./jd-sync-store.mjs
+COPY ops/legacy-marketplace/engagement.ts ./engagement.ts
+COPY ops/legacy-marketplace/saved.ts ./saved.ts
+COPY ops/legacy-marketplace/admin-console.ts ./admin-console.ts
+COPY ops/legacy-marketplace/admin-ui/ /app/admin-console/
+COPY ops/legacy-marketplace/engagement-core.mjs ./engagement-core.mjs
+COPY ops/legacy-marketplace/jd-sync-worker.mjs ./jd-sync-worker.mjs
+COPY ops/legacy-marketplace/jd-sync-runner.mjs ./jd-sync-runner.mjs
+COPY ops/legacy-marketplace/number-locked-translation.mjs ./number-locked-translation.mjs
+COPY ops/legacy-marketplace/read-official-index.mjs ./read-official-index.mjs
+COPY ops/legacy-marketplace/publish-official-index.mjs ./publish-official-index.mjs
+# Run the official metadata fetch + 50-board audit inside Railway when
+# enabled; no GitHub Pages data publisher is required for native mode.
+COPY apps/web/scripts/prepare-pages-jobs.mjs ./index-builder/scripts/prepare-pages-jobs.mjs
+COPY apps/web/scripts/audit-all-official-jds.mjs ./index-builder/scripts/audit-all-official-jds.mjs
+COPY apps/web/src/services/jobSearchFacets.mjs ./index-builder/src/services/jobSearchFacets.mjs
+
+COPY --from=white-builder /build/apps/web/dist /app/white-site
+# Bun's native execution uses package names, not Railway Function versioned names.
+RUN sed -i 's/"html-to-text@9"/"html-to-text"/;s/"sanitize-html@2"/"sanitize-html"/' server.ts
+RUN test -s /app/white-site/index.html
+ENV NODE_ENV=production
+EXPOSE 8080
+CMD ["bun","run","server.ts"]

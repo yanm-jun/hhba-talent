@@ -1,0 +1,40 @@
+/* Source-attributed, deliberately restrained people / workplace visuals. */
+.company-visual-heading{display:flex;align-items:start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.company-visual-heading h2{margin-bottom:6px}
+.company-visual-heading p{font-size:12px;color:#7b8791;line-height:1.75;margin:0;max-width:780px}
+.company-visual-affiliation{margin:0 0 16px!important;font-size:13px!important;color:#6b7280!important}
+.company-visual-people-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+.company-visual-person{display:flex;flex-direction:column;overflow:hidden;border:1px solid #e5eae7;border-radius:12px;background:#fff;min-width:0}
+.company-visual-photo{position:relative;min-width:0;background:#f5f8f5;overflow:hidden}
+.company-visual-photo img{display:block;width:100%;height:100%;object-fit:cover;aspect-ratio:16/10}
+.company-visual-photo.is-portrait img{aspect-ratio:4/4.3;object-position:center 27%}
+.company-visual-credit{position:absolute;bottom:0;left:0;right:0;padding:14px 8px 7px;background:linear-gradient(transparent,#17201acb);font-size:10px;line-height:1.25;color:#fff}
+.company-visual-credit a{color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:3px;overflow-wrap:anywhere}
+.company-visual-credit a:hover{text-decoration:underline}
+.company-visual-person-details{padding:14px;display:flex;flex-direction:column;gap:5px;min-width:0}
+.company-visual-person-details strong{font-size:14px;overflow-wrap:anywhere}
+.company-visual-person-details span{font-size:12px;color:#6b7970}
+.company-visual-person-details a{font-size:11px;color:#327354;display:inline-flex;align-items:center;gap:5px;margin-top:6px;line-height:1.45;text-decoration:none}
+.company-visual-unavailable-portrait{aspect-ratio:4/4.3;background:#f5f8f6;color:#9aa9a0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px}
+.company-visual-unavailable-portrait span{font-size:11px;text-align:center;padding:0 8px}
+.company-visual-media-unavailable{aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;gap:8px;flex-direction:column;color:#839189;font-size:12px}
+.company-visual-photo.is-portrait .company-visual-media-unavailable{aspect-ratio:4/4.3}
+.company-visual-workplace-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.company-visual-workplace{margin:0;min-width:0;border-radius:12px;overflow:hidden;border:1px solid #e3e9e5;background:#fff}
+.company-visual-workplace figcaption{padding:13px 15px 16px;display:flex;flex-direction:column;gap:6px}
+.company-visual-workplace figcaption strong{font-size:13px;line-height:1.6;color:#25372e}
+.company-visual-workplace figcaption span{font-size:11px;color:#7b8990;display:flex;gap:5px;align-items:center}
+.company-visual-unknown{border:1px dashed #dce5df;border-radius:12px;background:#fafcfb;color:#718176;min-height:98px;padding:17px 19px;display:flex;align-items:center;gap:13px;font-size:13px;line-height:1.7}
+.company-visual-unknown svg{flex-shrink:0}
+@media(max-width:920px){.company-visual-people-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){
+ .company-visual-people-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .company-visual-workplace-grid{grid-template-columns:1fr}
+ .company-visual-person-details{padding:12px}
+}
+@media(prefers-reduced-motion:reduce){.company-visual-photo,.company-visual-person{scroll-behavior:auto;transition:none}}
+
+/* No photo tile, founder portrait, or photo credit acts as an external link. */
+.company-visual-photo,.company-visual-photo img,.company-visual-workplace{cursor:default}
+.company-visual-photo img{pointer-events:none}
+.company-visual-identity-credit{font-size:11px;color:#87958b}
