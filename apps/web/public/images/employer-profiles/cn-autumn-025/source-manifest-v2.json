@@ -1,0 +1,33 @@
+{
+  "company": "青岛银行",
+  "employer_id": "cn-autumn-025",
+  "assets": {
+    "logo": {
+      "path": "images/employer-profiles/cn-autumn-025/logo.png",
+      "source": "https://i9.hexun.com/2020-08-05/201822168.jpg",
+      "sha256": "1e342e5e56562771b4de15ef1dbf7f932e398e273347f4b6f48b124f2df43e91",
+      "dimensions": [
+        640,
+        638
+      ]
+    },
+    "photo1": {
+      "path": "images/employer-profiles/cn-autumn-025/photo1.webp",
+      "source": "https://finance.qingdaonews.com/images/2025-07/04/94d945ad-3b62-4946-8f0f-7ac85d1fdbdd.jpg",
+      "sha256": "3dbe170fe1c78db754e0a61ea33397f12c5331e82173d24da16969b0926b805e",
+      "dimensions": [
+        1080,
+        608
+      ]
+    },
+    "photo2": {
+      "path": "images/employer-profiles/cn-autumn-025/photo2.webp",
+      "source": "https://finance.qingdaonews.com/images/2022-11/21/173c5f4d-4504-4e45-bd45-1e2ce5c20d59.jpg",
+      "sha256": "1d5ce4987ff6492d21aa837a072bd09d5db0eb50d213a2cb40ea2124828291f1",
+      "dimensions": [
+        1800,
+        1192
+      ]
+    }
+  }
+}
