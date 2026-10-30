@@ -72,7 +72,11 @@ export function safeOfficialJobUrl(job: LiveJob) {
         'tencent-official': 'careers.tencent.com',
         'baidu-official': 'talent.baidu.com'
       };
-      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='laifen-sourced-archived'&&job.source==='laifen'){
+      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='shkp-official-detail'&&job.source==='sun-hung-kai-properties'){
+        if(u.hostname!=='www.shkp.com'||!/^cn-v2-shkp-[a-z0-9-]{5,100}$/.test(job.id)||
+           !/^\/en-US\/work-with-us\/job-vacancies\/[a-z-]+\/[a-z0-9-]+$/.test(u.pathname)||
+           u.search!==''||u.hash!=='')return null;
+      }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='laifen-sourced-archived'&&job.source==='laifen'){
         const eligible=job.id.startsWith('cn-v2-laifen-')&&u.hostname==='app.mokahr.com'&&u.hash===''&&
           (u.href==='https://app.mokahr.com/campus-recruitment/laifen/146139?locale=zh-CN'||u.href==='https://app.mokahr.com/social-recruitment/laifen/146138');
         if(!eligible)return null;
@@ -359,7 +363,8 @@ export function rebuildListFilter(job:LiveJob,f:LiveFilters){
  if(f.company){
   const v=f.company.normalize('NFKC').toLowerCase();
   const ankerAliases=domestic&&job.company==='安克创新科技股份有限公司'?['Anker','Anker Innovations']:
-    domestic&&job.company==='深圳术叶创新科技有限公司'?['徕芬','徕芬科技','Laifen']:[];
+    domestic&&job.company==='深圳术叶创新科技有限公司'?['徕芬','徕芬科技','Laifen']:
+    domestic&&job.company==='新鸿基地产'?['SHKP','Sun Hung Kai Properties','新鴻基地產']:[];
   if(![job.company,job.companyZh||'',...ankerAliases].some(x=>x.toLowerCase().includes(v))&&
     !(domestic&&'schneider electric'.includes(v)))return false;
  }
@@ -396,7 +401,8 @@ export function rebuildListFilter(job:LiveJob,f:LiveFilters){
  }
  const words=f.q.normalize('NFKC').toLowerCase().trim().split(/\s+/).filter(Boolean);
  const nameAliases=domestic&&job.company==='安克创新科技股份有限公司'?['Anker','Anker Innovations']:
-   domestic&&job.company==='深圳术叶创新科技有限公司'?['徕芬','徕芬科技','Laifen']:[];
+   domestic&&job.company==='深圳术叶创新科技有限公司'?['徕芬','徕芬科技','Laifen']:
+   domestic&&job.company==='新鸿基地产'?['SHKP','Sun Hung Kai Properties','新鴻基地產']:[];
  const haystack=[job.title,job.titleZh,job.company,job.companyZh,...nameAliases,job.location,job.locationZh,
    ...(job.skillSignals||[]),...(job.majorNames||[]),...(job.editorialRelatedMajors||[]),job.responsibilitiesSummary,job.positionOrg].filter(Boolean).join(' ').normalize('NFKC').toLowerCase();
  return words.every(w=>haystack.includes(w));
