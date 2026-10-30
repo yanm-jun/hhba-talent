@@ -1,0 +1,104 @@
+name: HHBA China Energy Intl group 18 media sourcing
+on:
+  push:
+    branches: [feat/employer-factory-pilot-ceec-intl-18-20261030]
+    paths: ['.github/workflows/hhba-ceec-18-media.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/employer-factory-pilot-ceec-intl-18-20261030
+          persist-credentials: true
+      - name: Get parent corporate CEEC logo and two subsidiary project site photographs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip -q install requests beautifulsoup4 Pillow
+          python - <<'PY'
+          import requests,io,re,json
+          from pathlib import Path
+          from PIL import Image
+          from bs4 import BeautifulSoup
+          from urllib.parse import urljoin
+          dst=Path('apps/web/public/images/employer-profiles/cn-autumn-014')
+          dst.mkdir(parents=True,exist_ok=True)
+          s=requests.Session()
+          s.headers['User-Agent']='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/128 Safari/537.36'
+          options=[
+           'https://www.ceecgroup.com/en/',
+           'https://www.ceecgroup.com/',
+           'https://www.gjjt.ceec.net.cn/index.html',
+           'https://www.intl.ceec.net.cn/index.html',
+           'https://www.ceec.net.cn/index.html'
+          ]
+          candidates=[]
+          for site in options:
+           try:
+            r=s.get(site,timeout=13);r.raise_for_status()
+            soup=BeautifulSoup(r.content,'html.parser')
+            print('BRAND_SOURCE',site,r.status_code,len(r.content),flush=True)
+            for img in soup.select('img,link'):
+             for key in ('src','data-src','href'):
+              value=img.get(key)
+              if not value or value.startswith('data:'):continue
+              if re.search('logo|brand|favicon|标识',value+' '+str(img.get('class',''))+' '+str(img.get('alt','')),re.I):
+               u=urljoin(site,value)
+               if u not in candidates:candidates.append(u)
+           except Exception as e:print('BRAND_PAGE_FAIL',site,str(e)[:120],flush=True)
+          print('BRAND_CANDIDATES',json.dumps(candidates[:35],ensure_ascii=False),flush=True)
+          candidates+= [
+           'https://www.ceecgroup.com/images/logo.png',
+           'https://www.ceec.net.cn/picture/0/logo.png',
+           'https://www.gjjt.ceec.net.cn/favicon.ico'
+          ]
+          selected={}
+          for target,links in [
+           ('logo.png',candidates),
+           ('photo1.webp',[
+            'https://www.intl.ceec.net.cn/picture/0/s_c9ba131e5df74da49c49b9b8554535b2.jpg',
+            'https://www.ceecgroup.com/uploads/general-pictures/11e4_%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_2025-11-26_103141_378.jpg',
+            'https://www.ceec.net.cn/picture/-1/240820152021411583.png'
+           ]),
+           ('photo2.webp',[
+            'https://www.intl.ceec.net.cn/picture/0/s_68e4ddf32e01414496a8b92e772f0871.jpg',
+            'https://www.intl.ceec.net.cn/picture/0/s_333b2b6875a44d7294b1212cee71b889.jpg',
+            'https://www.ceecgroup.com/media/cache/banner/uploads/news-covers/6a164d0fedc97184797797.jpg'
+           ])]:
+           for u in links:
+            try:
+             r=s.get(u,timeout=17);r.raise_for_status()
+             im=Image.open(io.BytesIO(r.content));im.load()
+             if target=='logo.png':
+              if im.width<100 or im.height<25 or im.width/im.height<1.3: raise ValueError('Logo dimensions do not look like CEEC corporate wordmark '+str(im.size))
+              im=im.convert('RGBA')
+              im.thumbnail((1100,440))
+              im.save(dst/target,'PNG',optimize=True)
+             else:
+              if im.width<260 or im.height<230:raise ValueError('Photo too small '+str(im.size))
+              im=im.convert('RGB');im.thumbnail((1300,900));im.save(dst/target,'WEBP',quality=83,method=6)
+             if not 100<(dst/target).stat().st_size<5_000_000:raise ValueError('Invalid asset')
+             print('ASSET_OK',target,im.size,(dst/target).stat().st_size,u,flush=True)
+             selected[target]=u
+             break
+            except Exception as e:print('ASSET_NEXT',target,u,str(e)[:160],flush=True)
+           if target not in selected:raise RuntimeError('No trustworthy CEEC media retrieved for '+target)
+          (dst/'source-manifest.json').write_text(json.dumps(selected,ensure_ascii=False,indent=2)+'\n')
+          print('MEDIA_SOURCE_OK',json.dumps(selected,ensure_ascii=False))
+          PY
+      - name: Archive 3 independent images
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/web/public/images/employer-profiles/cn-autumn-014/
+          git diff --cached --quiet && exit 0
+          git commit -m 'assets(ceec): store sourced corporate logo and two independent overseas project photos'
+          git pull --rebase origin feat/employer-factory-pilot-ceec-intl-18-20261030
+          git push origin HEAD:refs/heads/feat/employer-factory-pilot-ceec-intl-18-20261030
