@@ -1,0 +1,142 @@
+name: HHBA Taiji 21 static acceptance preview
+on:
+  push:
+    branches: [feat/employer-factory-pilot-taiji-21-20261030]
+    paths:
+      - '.github/workflows/hhba-taiji-21-preview.yml'
+      - 'apps/web/src/data/employerProfiles/cn-autumn-017.json'
+      - 'apps/web/public/images/employer-profiles/cn-autumn-017/**'
+      - 'apps/web/src/components/HomeCompanyMarquee.tsx'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: hhba-taiji-21-pages
+  cancel-in-progress: false
+jobs:
+  verify-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/employer-factory-pilot-taiji-21-20261030
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Verify all factory profiles and company-specific assets
+        working-directory: apps/web
+        run: |
+          node scripts/employer-factory-check.mjs
+          node scripts/company-single-char-search.contract.test.mjs
+          node scripts/company-brand-unified.contract.test.mjs
+      - name: Verify Taiji identity, job records, name search and logo marquee auto-registration
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import fs from 'node:fs';
+          const p=JSON.parse(fs.readFileSync('src/data/employerProfiles/cn-autumn-017.json'));
+          assert.equal(p.id,'cn-autumn-017');
+          assert.equal(p.jobs.length,10);
+          assert.equal(p.media.photos.length,2);
+          assert(p.aliases.includes('太极计算机股份有限公司')&&p.aliases.includes('002368'));
+          assert(p.jobs.every(j=>j.currentOpenVerified===false));
+          assert(p.jobs.every(j=>j.url.startsWith('https://www.iguopin.com/')));
+          for(const f of [p.media.logo,...p.media.photos.map(x=>x.path)]){
+            assert(fs.statSync('public/'+f).size>5000,'Missing company image '+f);
+          }
+          const marquee=fs.readFileSync('src/components/HomeCompanyMarquee.tsx','utf8');
+          assert(marquee.includes('employerProfiles.map('),'Homepage must automatically display factory Logo');
+          console.log('TAIJI_SEARCH_BRAND_JOBS_CONTRACT_PASS');
+          NODE
+      - name: Build separate, safe static review website
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/preview-taiji/'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_DEMO_ACCOUNT_ENABLED: '0'
+        run: |
+          npm run build
+          for f in logo.png photo1.webp photo2.webp; do test -s dist/images/employer-profiles/cn-autumn-017/$f; done
+          grep -q '/hhba-talent/preview-taiji/assets/' dist/index.html
+      - name: Add static routes to survive direct refresh
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p=JSON.parse(fs.readFileSync('src/data/employerProfiles/cn-autumn-017.json','utf8'));
+          const routes=['companies/autumn/'+p.id,'candidate/jobs','companies/discover',...p.jobs.map(j=>'candidate/jobs/cn-v2-profile-'+p.id+'-'+j.id)];
+          for(const route of routes){fs.mkdirSync('dist/'+route,{recursive:true});fs.copyFileSync('dist/index.html','dist/'+route+'/index.html');}
+          fs.copyFileSync('dist/index.html','dist/404.html');
+          fs.writeFileSync('dist/.nojekyll','');
+          console.log('TAIJI_21_STATIC_ROUTES_READY',routes.length);
+          NODE
+      - name: Retrieve last successful public homepage artifact (preserve byte-for-byte)
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 41022327071
+          github-token: ${{ github.token }}
+          path: previous
+      - name: Preserve live root, add only nested Taiji preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive=$(find previous -type f -name 'artifact.tar*' -print -quit)
+          test -n "$archive"
+          mkdir -p published
+          if [[ "$archive" == *.gz ]]; then tar -xzf "$archive" -C published; else tar -xf "$archive" -C published; fi
+          test -s published/index.html
+          curl -fsSL --retry 2 --max-time 35 https://yanm-jun.github.io/hhba-talent/ -o /tmp/hhba-root
+          cmp published/index.html /tmp/hhba-root
+          test ! -e published/preview-taiji
+          mkdir -p published/preview-taiji
+          cp -a apps/web/dist/. published/preview-taiji/
+          cmp published/index.html /tmp/hhba-root
+          touch published/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: published
+  deploy:
+    needs: verify-and-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: hhba-company200-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Confirm actual public Taiji route and all three static images
+        run: |
+          set -euo pipefail
+          root=https://yanm-jun.github.io/hhba-talent/preview-taiji
+          for i in 1 2 3 4 5 6 7; do
+            if curl -fsSL "$root/companies/autumn/cn-autumn-017/" -o /tmp/taiji-page &&
+               curl -fsSL "$root/images/employer-profiles/cn-autumn-017/logo.png" -o /tmp/taiji-logo &&
+               curl -fsSL "$root/images/employer-profiles/cn-autumn-017/photo1.webp" -o /tmp/taiji-p1 &&
+               curl -fsSL "$root/images/employer-profiles/cn-autumn-017/photo2.webp" -o /tmp/taiji-p2; then break; fi
+            if [ "$i" = 7 ]; then exit 1; fi
+            sleep 10
+          done
+          grep -q '/hhba-talent/preview-taiji/assets/' /tmp/taiji-page
+          test $(wc -c </tmp/taiji-logo) -gt 5000
+          test $(wc -c </tmp/taiji-p1) -gt 5000
+          test $(wc -c </tmp/taiji-p2) -gt 5000
+          echo HHBA_TAIJI_PUBLIC_PREVIEW_PASS
