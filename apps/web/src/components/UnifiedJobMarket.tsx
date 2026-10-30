@@ -248,15 +248,15 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       <option value="INTERNSHIP">{lang==='zh'?'实习':'Internship'}</option>
     </select>
     <select value={filters.education||''} onChange={e=>{setPage(0);setFilters(f=>({...f,education:e.target.value}))}}
-      aria-label={lang==='zh'?'学历要求':'Education requirements'}>
-      <option value="">{lang==='zh'?'全部学历要求':'Any education requirement'}</option>
-      <option value="UNRESTRICTED">{lang==='zh'?'明确不限学历':'Explicitly no degree required'}</option>
-      <option value="UNRESTRICTED_OR_UNREPORTED">{lang==='zh'?'不限学历或要求未识别（需核实）':'No degree requirement or unknown (verify)'}</option>
-      <option value="HIGH_SCHOOL">{lang==='zh'?'要求高中学历':'High school requirement'}</option>
-      <option value="ASSOCIATE">{lang==='zh'?'要求专科学历':'Associate requirement'}</option>
-      <option value="BACHELOR">{lang==='zh'?'要求本科学历':'Bachelor requirement'}</option>
-      <option value="MASTER">{lang==='zh'?'要求硕士学历':'Master requirement'}</option>
-      <option value="PHD">{lang==='zh'?'要求博士学历':'Doctoral requirement'}</option>
+      aria-label={lang==='zh'?'我的最高学历（按岗位最低学历要求筛选）':'My highest education (against job minimum)'}>
+      <option value="">{lang==='zh'?'全部学历（不筛选）':'Any education'}</option>
+      <option value="UNRESTRICTED">{lang==='zh'?'仅看明确不限学历':'Only explicitly unrestricted'}</option>
+      <option value="UNRESTRICTED_OR_UNREPORTED">{lang==='zh'?'仅看不限或未披露（待核验）':'Unrestricted or unreported (verify)'}</option>
+      <option value="HIGH_SCHOOL">{lang==='zh'?'我的学历：高中/中专':'My education: high school'}</option>
+      <option value="ASSOCIATE">{lang==='zh'?'我的学历：专科':'My education: associate'}</option>
+      <option value="BACHELOR">{lang==='zh'?'我的学历：本科':'My education: bachelor'}</option>
+      <option value="MASTER">{lang==='zh'?'我的学历：硕士':'My education: master'}</option>
+      <option value="PHD">{lang==='zh'?'我的学历：博士':'My education: doctorate'}</option>
     </select>
     <select value={filters.experience||''} onChange={e=>{setPage(0);setFilters(f=>({...f,experience:e.target.value}))}}
       aria-label={lang==='zh'?'经验要求':'Experience requirement'}>
