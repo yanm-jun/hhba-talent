@@ -24,8 +24,19 @@ for(const city of ['杭州','深圳','青岛','上海','北京','济南']){
 const details=readFileSync(new URL('pages/TalentServiceRoutes.tsx',root),'utf8');
 const entry=readFileSync(new URL('main.tsx',root),'utf8');
 assert.ok(!landing.includes('<TalentHousingSection')&&!landing.includes('<TalentPolicySearch'),'Portal must not render full policy or housing lists');
-assert.ok(landing.includes('talentCityUrl(c.name)')&&landing.includes('talentSearchUrl(matchedCity,query)'),'Homepage city cards and search must use separate routes');
+assert.ok(landing.includes('talentCityUrl(c.name)')&&landing.includes('talentSearchUrl(parsed.city,q)'),'Homepage city cards and search must use separate routes');
 assert.ok(landing.includes('talentListUrl(item.kind'),'Home navigation tiles must open independent list pages');
+const cityRegistry=readFileSync(new URL('data/talentCityRegistry.ts',root),'utf8');
+for(const c of ['北京','天津','上海','重庆']){
+ assert.ok(cityRegistry.includes("name:'"+c+"'")&&cityRegistry.includes("official:'"+c+"市'"),'Municipality missing: '+c);
+ assert.ok(policy.includes("city:'"+c+"'"),'No sourced policy record for '+c);
+ assert.ok(housing.includes('city:"'+c+'"'),'No sourced housing record for '+c);
+}
+assert.ok(landing.includes('suggestTalentCities(keyword)'),'Search autocomplete must be connected');
+assert.ok(landing.includes('parseTalentCityQuery(keyword,city)'),'City alias matcher must be connected');
+assert.ok(details.includes('ts-v4-two-kinds'),'City pages must have exactly two core service entrances');
+assert.ok(!landing.includes('ts-match-form'),'Old generic matching UI should not return');
+
 assert.ok(details.includes('function CityHub(')&&details.includes('function ListPage(')&&details.includes('function DetailPage('),'City/list/detail page hierarchy missing');
 assert.ok(details.includes('talentPolicyUrl(data.id)')&&details.includes('talentHousingUrl(data.id)'),'Detail deep-links missing');
 assert.ok(details.includes('TALENT_POLICY_RECORDS')&&details.includes('TALENT_HOUSING_RECORDS'),'Historic official data must be preserved');
