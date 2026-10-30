@@ -1,3 +1,4 @@
+import {TAIAN_POLICY_RECORDS} from './taianPolicyRecords.ts';
 import {DEZHOU_POLICY_RECORDS} from './dezhouPolicyRecords.ts';
 import {ZIBO_POLICY_RECORDS} from './ziboPolicyRecords.ts';
 import {WEIFANG_POLICY_RECORDS} from './weifangPolicyRecords.ts';
@@ -430,5 +431,6 @@ export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
 
 ...WEIFANG_POLICY_RECORDS,
 ...ZIBO_POLICY_RECORDS,
+...TAIAN_POLICY_RECORDS,
 ...DEZHOU_POLICY_RECORDS,
 ];
