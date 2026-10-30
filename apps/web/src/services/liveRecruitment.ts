@@ -354,7 +354,8 @@ export function rebuildListFilter(job:LiveJob,f:LiveFilters){
  if(f.major_slug&&!visibleRoleForMajor(job,f.major_slug,f.include_unknown_majors===true))return false;
  if(f.company){
   const v=f.company.normalize('NFKC').toLowerCase();
-  if(![job.company,job.companyZh||''].some(x=>x.toLowerCase().includes(v))&&
+  const ankerAliases=domestic&&job.company==='安克创新科技股份有限公司'?['Anker','Anker Innovations']:[];
+  if(![job.company,job.companyZh||'',...ankerAliases].some(x=>x.toLowerCase().includes(v))&&
     !(domestic&&'schneider electric'.includes(v)))return false;
  }
  if(f.location_country){
@@ -389,8 +390,9 @@ export function rebuildListFilter(job:LiveJob,f:LiveFilters){
   if(f.experience==='5+'&&(y==null||y<5))return false;
  }
  const words=f.q.normalize('NFKC').toLowerCase().trim().split(/\s+/).filter(Boolean);
- const haystack=[job.title,job.titleZh,job.company,job.companyZh,job.location,job.locationZh,
-   ...(job.skillSignals||[]),...(job.majorNames||[]),job.responsibilitiesSummary,job.positionOrg].filter(Boolean).join(' ').normalize('NFKC').toLowerCase();
+ const nameAliases=domestic&&job.company==='安克创新科技股份有限公司'?['Anker','Anker Innovations']:[];
+ const haystack=[job.title,job.titleZh,job.company,job.companyZh,...nameAliases,job.location,job.locationZh,
+   ...(job.skillSignals||[]),...(job.majorNames||[]),...(job.editorialRelatedMajors||[]),job.responsibilitiesSummary,job.positionOrg].filter(Boolean).join(' ').normalize('NFKC').toLowerCase();
  return words.every(w=>haystack.includes(w));
 }
 function jobCountryCode(job:LiveJob){

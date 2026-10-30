@@ -40,6 +40,9 @@ const userLogo=read('public/images/autumn-real-logos/cn-autumn-008.svg');
 assert(userLogo.includes('Anker Innovations')&&userLogo.includes('fill="#071689"'));
 assert(index.includes("Anker Innovations Anker 安克创新"));
 assert(index.includes("job.company!=='安克创新科技股份有限公司'"));
+assert(live.includes("ankerAliases=domestic&&job.company==='安克创新科技股份有限公司'"));
+assert(live.includes("nameAliases=domestic&&job.company==='安克创新科技股份有限公司'"));
+assert(live.includes("...(job.editorialRelatedMajors||[])"));
 const hashes={
  'anker-logo.png':'f21c99496eaa7ae2704902a36dc8be65cc96c601a97f1efc271f4f534e6d6d42',
  'anker-brand-vision.png':'4f0bde576ec8491c9ac01a1e742e17dedef0c3211f3e00e4323cbb0ba87291ae',

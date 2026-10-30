@@ -38,7 +38,7 @@ export function AnkerCompactProfilePage({user}:{user:User|null}){
      <figure><img src={gallery+'anker-brand-vision.png'} alt="用户提供的安克创新全球化智能硬件品牌介绍截图原始 PNG" loading="eager"/><figcaption><span>品牌理念与全球业务展示</span><small>上传原始 PNG · 未重新编码</small></figcaption></figure>
      <figure><img src={gallery+'anker-building.png'} alt="用户提供的安克创新办公建筑介绍截图原始 PNG" loading="eager"/><figcaption><span>企业建筑资料展示</span><small>上传原始 PNG · 未重新编码</small></figcaption></figure>
     </div>
-    <p className="hhba-hypergryph-photo-note">三张素材均为你提供的原始 PNG；以上品牌和建筑资料展示图保留原图内容，建筑地点、拍摄日期与图中文字未由 HHBA 独立核验。</p>
+    <p className="hhba-hypergryph-photo-note">Logo 为依据你提供的品牌图片制作的蓝色 SVG，另外两张企业资料图保留原始 PNG，未经重新编码；建筑地点和拍摄日期尚未独立核验。</p>
    </section>
    <CompanyMajorJobs companyRoute="/companies/autumn/cn-autumn-008"
     majorIntro="2027届校招涉及算法、软硬件开发、市场与运营、供应链及职能等方向。点击专业标签，下方会显示与之关联的安克创新具体岗位；选择「全部专业」可以浏览全部收录职位。"
