@@ -1,4 +1,5 @@
 import {useMemo,useState} from 'react';
+import {majorNamesRelated} from '../services/majorEligibility.mjs';
 import {employerProfileById} from '../services/employerProfiles';
 import {ArrowLeft,ArrowRight,ChevronDown,ExternalLink,GraduationCap} from 'lucide-react';
 import {Shell} from '../components/Shell';
@@ -25,8 +26,7 @@ const asset=(path:string)=>import.meta.env.BASE_URL+path;
 function normalized(s:string){return s.normalize('NFKC').trim().toLocaleLowerCase()}
 function roleMatches(role:Role,major:string){
  if(!major||role.majorUnrestricted)return true;
- const chosen=normalized(major);
- return [...role.majorNames,...role.editorialRelatedMajors].some(x=>normalized(x)===chosen);
+ return [...role.majorNames,...role.editorialRelatedMajors].some(x=>majorNamesRelated(x,major));
 }
 export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
  const p=employerProfileById.get(id) as Company|undefined;
