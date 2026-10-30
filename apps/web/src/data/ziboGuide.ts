@@ -2,6 +2,7 @@
 import type {CompleteGuide} from '../components/talent/UnifiedPolicyGuide';
 export const ziboLivingGuide:CompleteGuide={
  "city": "淄博",
+ "qualityLevel": "B",
  "kicker": "TALENT POLICY SERVICE · 淄博",
  "officialLabel": "独立申报直达页待核验",
  "officialNote": "2022年淄博市人社局公开说明在“淄博百事通人才管理服务系统→人才服务→享补贴”查询及办理。2026年是否仍提供同一路径、本人能否申报，以当前实际政务系统及经办机构为准；这里不以官网首页冒充申报入口。",
@@ -436,6 +437,7 @@ export const ziboPurchaseGuide:CompleteGuide={
 };
 export const ziboZichuanHousingGuide:CompleteGuide={
  "city": "淄博",
+ "qualityLevel": "C",
  "kicker": "TALENT HOUSING · 淄川区",
  "title": "淄川区2026年两处租赁型人才公寓 · 历史配租指南",
  "desc": "水岸新城9套、御廷豪景8套为2026年6月正式公布的历史批次；原申报于7月3日截止。保留可核对的申请条件、材料、评分选房和租金规则供下一批参考。",
