@@ -25,11 +25,11 @@
 .hhba-kpmg-photo-grid figure figcaption{
  display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
  gap:6px;padding:11px 13px;color:#526b59;font-size:12px;line-height:1.55;
- min-width:0;max-width:100%;height:auto;text-align:left;
+ min-width:0;max-width:100%;height:auto;text-align:left;box-sizing:border-box;
  writing-mode:horizontal-tb;white-space:normal;word-break:normal;overflow-wrap:anywhere
 }
 .hhba-kpmg-photo-grid figure figcaption>span{
- display:block;width:100%;min-width:0;max-width:100%;
+ display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box;
  font-weight:650;line-height:1.5;white-space:normal;writing-mode:horizontal-tb;overflow-wrap:anywhere
 }
 .hhba-kpmg-photo-grid figure figcaption>small{
