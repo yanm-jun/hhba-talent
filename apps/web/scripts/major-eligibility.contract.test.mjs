@@ -50,7 +50,8 @@ const links=[
  ['src/services/domesticMajors.ts','majorNamesRelated(m.name,major.name)'],
  ['src/services/liveRecruitment.ts','educationMatchesApplicant(f.education,job.educationLabel)'],
  ['src/services/jobSearchFacets.mjs','educationMatchesApplicant(education,f.education||null)'],
- ['src/components/V2EmployerSearchResults.tsx','majorNamesRelated(n,major)'],
+ ['src/components/V2EmployerSearchResults.tsx','searchEmployersByIndividualRoles(employers,query'],
+ ['src/services/employerJobSearch.mjs','majorNamesRelated(name,major)'],
  ['src/pages/UnifiedV2CompanyPage.tsx','majorNamesRelated(x,major)']
 ];
 for(const [path,needle] of links)assert(readFileSync(path,'utf8').includes(needle),'Not using shared matching rule: '+path);
