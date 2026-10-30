@@ -1,0 +1,23 @@
+.hhba-v2-search{max-width:1120px;margin:22px auto;padding:0 0 12px}
+.hhba-v2-search-heading{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:13px}
+.hhba-v2-search-heading h2{font-size:20px;margin:0;color:#173f30}
+.hhba-v2-search-heading span{font-size:12px;color:#687970}
+.hhba-v2-employer-hit{border:1px solid #dce7e1;border-radius:14px;padding:18px 20px;background:white;margin-bottom:12px}
+.hhba-v2-employer-heading{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hhba-v2-employer-logo{width:60px;height:55px;display:grid;place-items:center;background:#f5f8f6;border:1px solid #e3e8e4;border-radius:9px;overflow:hidden;flex:none}
+.hhba-v2-employer-logo img{width:94%;height:94%;object-fit:contain}
+.hhba-v2-employer-identity{flex:1;display:flex;flex-direction:column;gap:3px;min-width:190px}
+.hhba-v2-employer-identity strong{font-size:20px;color:#162d24}
+.hhba-v2-employer-identity span,.hhba-v2-employer-overview{font-size:13px;color:#596f65;line-height:1.75}
+.hhba-v2-employer-heading>a{display:flex;align-items:center;gap:5px;color:#1b6e4c;font-size:13px;font-weight:700;text-decoration:none}
+.hhba-v2-employer-overview{margin:12px 0 15px}
+.hhba-v2-job-subheading{font-size:14px;font-weight:700;color:#22372d;margin-bottom:9px}
+.hhba-v2-job-subheading small{font-weight:400;color:#7e8a82;font-size:12px;margin-left:7px}
+.hhba-v2-job-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.hhba-v2-job-result{display:flex;flex-direction:column;gap:5px;padding:12px 13px;border:1px solid #e4eae6;border-radius:9px;background:#f9fbfa;color:#234834;text-decoration:none}
+.hhba-v2-job-result:hover{border-color:#80ae92;background:#f3f9f5}
+.hhba-v2-job-result b{font-size:14px}
+.hhba-v2-job-result small{font-size:12px;color:#647c70}
+.hhba-v2-job-result span{display:flex;align-items:center;gap:4px;font-size:12px;color:#237451}
+.hhba-v2-search-alert{max-width:1120px;margin:12px auto;color:#9a5e20;font-size:12px}
+@media(max-width:640px){.hhba-v2-job-list{grid-template-columns:1fr}.hhba-v2-employer-hit{padding:14px}.hhba-v2-employer-heading>a{width:100%;margin-top:5px}}
