@@ -11,6 +11,8 @@ import type {User} from '../services/api';
 import {TalentMatchingPage} from './TalentMatchingPage';
 import {TalentJinanPolicyPreview} from './TalentJinanPolicyPreview';
 import {TalentJinanGuidePreview} from './TalentJinanGuidePreview';
+import {TalentQingdaoPolicyPreview} from './TalentQingdaoPolicyPreview';
+import {TalentQingdaoGuidePreview} from './TalentQingdaoGuidePreview';
 import '../styles/talent-service.css';
 import '../styles/talent-subpages.css';
 
@@ -105,7 +107,7 @@ function CityHub({city}:{city:string}){
   </section>
   <section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>你想了解什么？</h2><Link to="/talent-service/cities">更换城市 <ArrowRight size={15}/></Link></div>
    <div className="ts-sub-kinds ts-v4-two-kinds">
-    {kinds.map(k=><Link key={k.id} className="ts-sub-kind" to={talentListUrl(k.id,match.name)}>
+    {kinds.map(k=><Link key={k.id} className="ts-sub-kind" to={match.name==='青岛'&&k.id==='policies'?'/talent-service/policy-layout-preview/qingdao':talentListUrl(k.id,match.name)}>
       <k.icon size={25}/><strong>{k.name}</strong><small>{k.description}</small>
       <span className="ts-v4-kind-count">{k.id==='policies'?policies.length:homes.length} 条已收录 <ArrowRight size={15}/></span>
      </Link>)}
@@ -222,6 +224,8 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  else if(kind==='search')body=<ListPage key={route} city={decode(fragments[2]||'杭州')||'杭州'} kind="search" query={decode(fragments.slice(3).join('/'))}/>;
  else if(kind==='policy-layout-preview'&&fragments[2]==='jinan')body=<TalentJinanPolicyPreview/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='jinan')body=<TalentJinanGuidePreview/>;
+ else if(kind==='policy-layout-preview'&&fragments[2]==='qingdao')body=<TalentQingdaoPolicyPreview/>;
+ else if(kind==='policy-guide-preview'&&fragments[2]==='qingdao')body=<TalentQingdaoGuidePreview kind={fragments[3]==='stay'?'stay':'housing'}/>;
  else if(kind==='match')body=<TalentMatchingPage city={decode(fragments[2]||'北京')||'北京'}/>;
  else if(kind==='policy'||kind==='housing')body=<DetailPage kind={kind} id={decode(fragments[2]||'')}/>;
  else body=<><Bread current="页面未找到"/><section className="ts-sub-header"><h1>暂时找不到这个页面</h1><Link to="/talent-service">返回人才政策首页 <ArrowRight size={16}/></Link></section></>;
