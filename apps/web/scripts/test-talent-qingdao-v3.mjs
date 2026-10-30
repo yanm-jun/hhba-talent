@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {TALENT_POLICY_RECORDS} from '../src/data/talentPolicyRecords.ts';
 const page=readFileSync(new URL('../src/pages/TalentQingdaoPolicyPreview.tsx',import.meta.url),'utf8');
+const sharedList=readFileSync(new URL('../src/components/talent/UnifiedPolicyList.tsx',import.meta.url),'utf8');
+const sharedGuide=readFileSync(new URL('../src/components/talent/UnifiedPolicyGuide.tsx',import.meta.url),'utf8');
 const guide=readFileSync(new URL('../src/pages/TalentQingdaoGuidePreview.tsx',import.meta.url),'utf8');
 const routes=readFileSync(new URL('../src/pages/TalentServiceRoutes.tsx',import.meta.url),'utf8');
 const jinan=readFileSync(new URL('../src/pages/TalentJinanGuidePreview.tsx',import.meta.url),'utf8');
@@ -13,14 +15,14 @@ let n=0;function check(label,fn){fn();n++;console.log('✓ '+label)}
 check('Exactly 5 distinct municipal policy directions, 2 full guides; duplicate records suppressed',()=>{
  for(const id of policies){const rec=TALENT_POLICY_RECORDS.find(p=>p.id===id);assert.ok(rec&&rec.city==='青岛',id);assert.ok(page.includes("'"+id+"'"),'Missing visible item '+id);}
  assert.equal(policies.length,5);
- assert.ok(page.includes('selectedIds.map(id=>TALENT_POLICY_RECORDS.find'));
+ assert.ok(page.includes('tiles:selectedIds.map(id=>')&&sharedList.includes('TALENT_POLICY_RECORDS.find(p=>p.id===tile.id)'));
  assert.ok(page.includes('住房补贴')&&page.includes('免租金住宿')&&page.includes('购房安家')&&page.includes('就业创业')&&page.includes('人才住房'));
 });
 check('Interactive city categories are wired to client state and accessibility',()=>{
- assert.ok(page.includes("useState<Kind>('all')"));
- assert.ok(page.includes('aria-pressed={filter===id}'));
- assert.ok(page.includes('onClick={()=>setFilter(id)}'));
- assert.ok(page.includes("filter==='all'||summaries[p.id].category===filter"));
+ assert.ok(sharedList.includes("useState('all')"));
+ assert.ok(sharedList.includes('aria-pressed={category===id}'));
+ assert.ok(sharedList.includes('onClick={()=>setCategory(id)}'));
+ assert.ok(sharedList.includes("category==='all'||(category==='history'?historical(x.record):x.tile.category===category)"));
 });
 check('Housing subsidy shows verified 500/800/1200 and correct policy validity',()=>{
  for(const s of ['500元/月','800元/月','1,200元/月','最长36个月','2027-03-31','青岛户籍','社会保险'])assert.ok(guide.includes(s),s);
@@ -44,9 +46,9 @@ check('Each official channel and source is identified rather than a generic gove
  for(const phone of ['0532-66711723','0532-85912361'])assert.ok(guide.includes(phone));
 });
 check('Guide inputs and checklists stay browser only; no personal secrets collected',()=>{
- assert.ok(guide.includes('aria-pressed={branch===value}'));
- assert.ok(guide.includes('setFaqQuery(e.target.value)'));
- assert.ok(guide.includes('checked={Boolean(selected[String(i)])}'));
+ assert.ok(sharedGuide.includes('aria-pressed={branch===key}'));
+ assert.ok(sharedGuide.includes('setFaqQuery(e.target.value)'));
+ assert.ok(sharedGuide.includes('checked={Boolean(selected[String(i)])}'));
  assert.ok(!guide.includes('localStorage')&&!guide.includes('fetch(')&&!guide.includes('身份证号'));
 });
 check('Qingdao normal city route points to V3, all other cities use legacy unchanged',()=>{
@@ -55,7 +57,7 @@ check('Qingdao normal city route points to V3, all other cities use legacy uncha
  assert.ok(routes.includes("kind==='policy-guide-preview'&&fragments[2]==='qingdao'"));
  assert.ok(routes.includes("fragments[3]==='stay'?'stay':'housing'"));
  assert.ok(routes.includes("talentListUrl(k.id,match.name)"));
- assert.ok(page.includes('/talent-service/list/policies/%E9%9D%92%E5%B2%9B'));
+ assert.ok(sharedList.includes("'/talent-service/list/policies/'+encodeURIComponent(config.city)"));
 });
 check('Main homepage & Jinan V3.1 remain untouched and available',()=>{
  for(const b of ['htl-intro','htl-quick','htl-city-grid','htl-housing-grid','htl-policy-list','htl-match'])assert.ok(home.includes(b));
