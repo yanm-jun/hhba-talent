@@ -89,12 +89,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # Pinned and previously verified published artifact from 2026-10-30:
-          # this run contains the current homepage AND /preview-factory-v2/.
-          # Never use an arbitrary newer Pages artifact missing those folders.
-          selected='41040716146'
-          artifact=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$selected/artifacts?per_page=50" --jq '[.artifacts[] | select(.name == "github-pages" and .expired == false) | .id][0] // empty')
-          test -n "$artifact" || { echo 'Pinned complete Pages backup is missing; refuse publication' >&2; exit 1; }
+          # The public homepage may have changed since an older V2 snapshot.
+          # Start with the latest successfully deployed Pages artifact, then
+          # verify byte-for-byte against LIVE public root before re-publishing.
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs?status=success&per_page=100" --jq '[.workflow_runs[].id]' > /tmp/previous-success.json
+          selected=''
+          while IFS= read -r run; do
+            artifact=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run/artifacts?per_page=50" --jq '[.artifacts[] | select(.name == "github-pages" and .expired == false) | .id][0] // empty')
+            if [ -n "$artifact" ]; then selected="$run"; break; fi
+          done < <(jq -r '.[]' /tmp/previous-success.json)
+          test -n "$selected" || { echo 'No successful current Pages artifact; refusing publication' >&2; exit 1; }
           echo "run_id=$selected" >> "$GITHUB_OUTPUT"
       - uses: actions/download-artifact@v4
         with:
@@ -113,9 +117,14 @@ jobs:
           test -s published/index.html
           curl -fsSL --max-time 40 --retry 3 https://yanm-jun.github.io/hhba-talent/ -o /tmp/hhba-existing-home
           cmp published/index.html /tmp/hhba-existing-home || { echo 'Public homepage differs from backup; refuse to overwrite' >&2; exit 1; }
-          test -s published/preview-factory-v2/index.html
-          curl -fsSL --max-time 40 --retry 3 https://yanm-jun.github.io/hhba-talent/preview-factory-v2/ -o /tmp/hhba-existing-factory
-          cmp published/preview-factory-v2/index.html /tmp/hhba-existing-factory || { echo 'V2 independent factory preview differs from backup; refuse to overwrite' >&2; exit 1; }
+          # Old preview may have been removed by another independent Pages run.
+          # Preserve it byte-for-byte IF it is currently published; do not mistake
+          # the site's SPA fallback HTML for a real preview.
+          if curl -fsSL --max-time 40 --retry 3 https://yanm-jun.github.io/hhba-talent/preview-factory-v2/ -o /tmp/hhba-existing-factory &&
+             grep -Fq '/hhba-talent/preview-factory-v2/assets/' /tmp/hhba-existing-factory; then
+            test -s published/preview-factory-v2/index.html || { echo 'Current public V2 preview missing in backup; stop' >&2; exit 1; }
+            cmp published/preview-factory-v2/index.html /tmp/hhba-existing-factory || { echo 'Current public V2 preview differs from backup; stop' >&2; exit 1; }
+          fi
           for prior in preview-anker preview-taiji preview-enn preview-ccteg preview-boyu preview-factory; do
             if curl -fsSL --max-time 25 "https://yanm-jun.github.io/hhba-talent/$prior/" -o /tmp/hhba-existing-prior; then
               if grep -Fq "/hhba-talent/$prior/assets/" /tmp/hhba-existing-prior; then
