@@ -108,11 +108,22 @@ jobs:
           path: apps/web/enn-22-proof/
           if-no-files-found: ignore
           retention-days: 14
+      - name: Resolve latest successful public home bundle
+        id: base
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          run_id=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs?branch=main&status=success&per_page=60" --jq '.workflow_runs[] | select(.name == "HHBA Unified Static Site GitHub Pages") | .id' | head -n 1)
+          test -n "$run_id"
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "Preserve latest successful main run $run_id"
       - name: Retrieve most recent confirmed public site bundle
         uses: actions/download-artifact@v4
         with:
           name: github-pages
-          run-id: 41023029233
+          run-id: ${{ steps.base.outputs.run_id }}
           github-token: ${{ github.token }}
           path: previous
       - name: Preserve all current public site files, add only /preview-enn/
@@ -126,7 +137,8 @@ jobs:
           test -s published/index.html
           curl -fsSL --retry 3 --max-time 45 https://yanm-jun.github.io/hhba-talent/ -o /tmp/enn-live-home-index
           cmp published/index.html /tmp/enn-live-home-index
-          test ! -e published/preview-enn
+          # Replace only this project's isolated preview folder; keep root and other previews.
+          rm -rf published/preview-enn
           mkdir -p published/preview-enn
           cp -a apps/web/dist/. published/preview-enn/
           cmp published/index.html /tmp/enn-live-home-index
