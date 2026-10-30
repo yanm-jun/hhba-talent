@@ -41,6 +41,8 @@ test('Query matches specific programs, not whole unrelated university curriculum
  assert.equal(searchUniversityPrograms({...all,degree:'bachelor'}).length,0);
  assert.equal(searchUniversityPrograms({...all,keyword:'Management',country:'jp'}).length,0);
  assert.ok(findProgram('birmingham-cs-conversion')?.pathwayNote);
+ assert.ok(findProgram('minot-cyber-ms')?.visaNote?.includes('I-20'));
+ assert.ok(findProgram('minot-cyber-ms')?.visaSourceUrl?.startsWith('https://www.minotstateu.edu/'));
 });
 test('Search entry and country cards open exact program catalogue; deep routes retain original Shell',()=>{
  const page=file('pages/StudyAbroadPage.tsx');

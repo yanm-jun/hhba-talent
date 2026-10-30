@@ -116,6 +116,7 @@ export function StudyProgramDetail({user,id}:{user:User|null;id:string}){
   <div className="hhba-uni-program-layout">
    <div><h2>项目资料</h2><div className="hhba-uni-info-list">{rows.map(row=><section key={row.name}><h3>{row.name}</h3><p>{row.value}</p></section>)}
     {p.pathwayNote&&<section className="hhba-uni-pathway"><h3>跨学科申请提示</h3><p>{p.pathwayNote}</p></section>}
+    {p.visaNote&&<section className="hhba-uni-pathway"><h3>国际学生签证与在校资格特别提示</h3><p>{p.visaNote}</p>{p.visaSourceUrl&&<a href={p.visaSourceUrl} target="_blank" rel="noopener noreferrer" className="hhba-uni-visa-source">核对学校国际申请资格说明 <ExternalLink size={14}/></a>}</section>}
    </div></div>
    <aside className="hhba-uni-program-source">
     <h2><BookOpen size={19}/> 信息核验</h2><p><CheckCircle2 size={16}/> 官方来源：{p.sourceQuality==='official-program'?'学校项目说明':'学校正式课程目录'}</p>
