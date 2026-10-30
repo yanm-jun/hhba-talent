@@ -1,3 +1,4 @@
+# 2026-10-30: Jinan V3 policy cards single-city prototype; seven A/B isolation tests; do not change other cities.
 # 2026-10-30: V4.7 detailed policy quality rerun — fuller historical eligibility, media provenance and materials.
 # 2026-10-30: V4.6 add one official-backed employment or talent policy for each Shandong prefecture, with attribution and privacy guardrails.
 # 2026-10-30: V4.5 national city directory — validate 4+293 city registry, province/pinyin search and compact V4 layout.
@@ -128,6 +129,9 @@ jobs:
       - name: Validate detailed Shandong 16-city guides, historical rules and payment subjects
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-shandong-depth.mjs
+      - name: Validate Jinan-only compact policy layout preview and A/B isolation
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-jinan-policy-preview.mjs
       - name: Test four-municipality talent policy matching, deadlines, exclusions and privacy
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-match.mjs
