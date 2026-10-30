@@ -1,10 +1,10 @@
-import {useMemo,useState} from 'react';
-import {Building2,ArrowRight,GraduationCap} from 'lucide-react';
+import {useMemo} from 'react';
+import {ArrowRight,GraduationCap} from 'lucide-react';
 import profiles from '../data/domesticCareerProfiles.json';
 import {domestic200Profiles as additionalProfiles} from '../services/domesticCompany200Data';
 import curated200 from '../data/domesticComplete200Target.json';
-import bundled from '../data/domesticMediaBundle.json';
-import additionalMedia from '../data/domesticMedia200Bundle.json';
+import {DomesticBrandMark} from './DomesticBrandMark';
+import {domesticV2Records} from '../services/domesticRebuildJobs';
 import {Link} from '../router';
 import {getDomesticCompanies,searchDomesticCompanies,type DomesticCompany} from '../services/domesticCompanySearch';
 import {companyMatchesSelectedMajor,majorById} from '../services/domesticMajors';
@@ -20,12 +20,12 @@ const isSubstantive=(name:string)=>{
  const majors=record?.majorSlugs||[];
  return Boolean(record?.contentReview!=='first_pass_industry_explanation_not_official_company_detail_audited'&&record?.officialSource&&paragraphs.length>=3&&paragraphs.join('').length>=280&&business.length>=3&&majors.length>=4);
 };
-const available={companies:{...bundled.companies,...additionalMedia.companies}} as {companies:Record<string,{brand?:{state:string;path?:string}}>};
+
 type Props={query:string;majorSlug?:string;scope?:string;country?:string;city?:string;browseDefault?:boolean};
-function BrandMark({src,name}:{src?:string;name:string}){
- const [failed,setFailed]=useState(false);
- if(!src||failed)return <Building2 size={19} aria-label="企业图标待补充"/>;
- return <img loading="lazy" src={src} alt={name+'的企业网站图标'} onError={()=>setFailed(true)}/>;
+const reviewedJobCount=new Map<string,number>();
+for(const job of domesticV2Records){
+ if(!job.employerRoute)continue;
+ reviewedJobCount.set(job.employerRoute,(reviewedJobCount.get(job.employerRoute)||0)+1);
 }
 export function DomesticCompanyResults({query,majorSlug='',scope='',country='',city='',browseDefault=false}:Props){
  const all=getDomesticCompanies();
@@ -66,16 +66,20 @@ export function DomesticCompanyResults({query,majorSlug='',scope='',country='',c
   {!list.length&&<p className="domestic-company-empty">当前专业尚无经过业务证据核验的关联企业，或者不符合关键词与地区条件。可以更换专业，或清除专业筛选后直接搜索企业；这不代表没有企业招聘该专业。</p>}
   <div className="domestic-company-grid">{list.map(company=>{
    const editorial=rich[company.name];
+   const reviewedJobs=reviewedJobCount.get(company.route)||0;
+   const hasReviewedPage=reviewedJobs>0;
+   const visibleIndustry=hasReviewedPage&&company.industry==='国内企业档案'?'已整理企业详细档案':company.industry;
    return <Link className="domestic-company-card" key={company.id} to={company.route}>
     <div className="domestic-company-card-head"><span className="domestic-result-brand" aria-hidden="true">
-      <BrandMark src={available.companies[company.name]?.brand?.state==='ready'&&available.companies[company.name]?.brand?.path?import.meta.env.BASE_URL+(available.companies[company.name]?.brand?.path||''):undefined} name={company.name}/>
+      <DomesticBrandMark name={company.name} route={company.route}/>
      </span><strong>{editorial?.displayName||company.name}</strong></div>
-    <small>{company.industry}{company.city?' · '+company.city:''}{company.parentName?' · 关联：'+company.parentName:''}</small>
+    <small>{visibleIndustry}{company.city?' · '+company.city:''}{company.parentName?' · 关联：'+company.parentName:''}</small>
     {editorial?.displayName&&editorial.displayName!==company.name&&<small className="domestic-card-legal">企业主体：{company.name}</small>}
-    {hasDeepProfile(company.name)?<p>{editorial?.summary}</p>:
+    {hasReviewedPage?<p>HHBA 已建设企业详情页，整理 {reviewedJobs} 条有来源的岗位资料。部分职位属于历史招聘记录，当前开放状态请以招聘官网为准。</p>:
+     hasDeepProfile(company.name)?<p>{editorial?.summary}</p>:
      <p className="domestic-directory-card-description">上市主体名录记录；当前尚无足够的企业官网证据支持详细业务介绍。{company.stockCode?'证券代码：'+company.stockCode+'。':''}</p>}
-    <footer><span>{isSubstantive(company.name)?'有来源的深度介绍':hasDeepProfile(company.name)?'已整理业务内容 · 仍需完善':'仅名录信息 · 不冒充深度介绍'}</span>
-     <span>{hasDeepProfile(company.name)?'查看企业详情':'查看名录事实'} <ArrowRight size={14}/></span></footer>
+    <footer><span>{hasReviewedPage?'已整理企业详情 · 岗位状态待核验':isSubstantive(company.name)?'有来源的深度介绍':hasDeepProfile(company.name)?'已整理业务内容 · 仍需完善':'仅名录信息 · 不冒充深度介绍'}</span>
+     <span>{hasReviewedPage||hasDeepProfile(company.name)?'查看企业详情':'查看名录事实'} <ArrowRight size={14}/></span></footer>
    </Link>})}</div>
   </section>;
 }
