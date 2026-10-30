@@ -20,6 +20,7 @@ const routes=[
  ['LaifenCompactProfilePage.tsx','/companies/autumn/cn-autumn-009'],
  ['ShkpCompactProfilePage.tsx','/companies/autumn/cn-autumn-010'],
  ['BoyuCompactProfilePage.tsx','/companies/autumn/cn-autumn-011'],
+ ['BoyuCompactProfilePage.tsx','/companies/autumn/cn-autumn-011'],
  ['HuayuVisionCompactProfilePage.tsx','/companies/domestic/rel-huayu-004'],
  ['HuaanSecuritiesCompactProfilePage.tsx','/companies/domestic/a-600909'],
  ['GuangfaSecuritiesCompactProfilePage.tsx','/companies/domestic/a-000776'],
