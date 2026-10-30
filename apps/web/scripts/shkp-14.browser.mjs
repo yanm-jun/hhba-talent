@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {chromium} from 'playwright';
-const base=(process.env.HHBA_TEST_BASE||'http://127.0.0.1:4173/hhba-talent/preview-shkp/').replace(/\\/?$/,'/');
+const rawBase=process.env.HHBA_TEST_BASE||'http://127.0.0.1:4173/hhba-talent/preview-shkp/';
+const base=rawBase.endsWith('/')?rawBase:rawBase+'/';
 const out='shkp-review';mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 try{
