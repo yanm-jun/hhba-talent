@@ -1,0 +1,33 @@
+{
+  "company": "湖南省广播影视集团（湖南广电）",
+  "employer_id": "cn-autumn-019",
+  "assets": {
+    "logo": {
+      "path": "images/employer-profiles/cn-autumn-019/logo.png",
+      "source": "https://www.3wen.com/userfiles/images/81o1.jpg",
+      "sha256": "2f93b43cc25ad4af1fddce4d23365f398e90a61c3fe8e6913024d325acb44c36",
+      "dimensions": [
+        527,
+        395
+      ]
+    },
+    "photo1": {
+      "path": "images/employer-profiles/cn-autumn-019/photo1.webp",
+      "source": "https://p3.itc.cn/images01/20210409/fa8ee7eb8ea148e6a05110e4ecd67d47.jpeg",
+      "sha256": "662baee8a607e3e4de1e8c77d5faa4686761706e7b08e894e2e2c39ad63304e2",
+      "dimensions": [
+        1242,
+        828
+      ]
+    },
+    "photo2": {
+      "path": "images/employer-profiles/cn-autumn-019/photo2.webp",
+      "source": "https://oss.gooood.cn/uploads/2022/11/028-hunan-broadcasting-system-hbs-program-production-centre-by-hpp.jpg",
+      "sha256": "25a2ac5a1e1d3611d075e7c840744ddfd59e698dc685fb1873a0dfb6287420c6",
+      "dimensions": [
+        1657,
+        1200
+      ]
+    }
+  }
+}

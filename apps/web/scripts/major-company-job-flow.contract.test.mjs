@@ -17,6 +17,10 @@ const routes=[
  ['NeteaseGamesCompactProfilePage.tsx','/companies/autumn/cn-autumn-006'],
  ['HypergryphCompactProfilePage.tsx','/companies/autumn/cn-autumn-007'],
  ['AnkerCompactProfilePage.tsx','/companies/autumn/cn-autumn-008'],
+ ['LaifenCompactProfilePage.tsx','/companies/autumn/cn-autumn-009'],
+ ['ShkpCompactProfilePage.tsx','/companies/autumn/cn-autumn-010'],
+ ['BoyuCompactProfilePage.tsx','/companies/autumn/cn-autumn-011'],
+ ['BoyuCompactProfilePage.tsx','/companies/autumn/cn-autumn-011'],
  ['HuayuVisionCompactProfilePage.tsx','/companies/domestic/rel-huayu-004'],
  ['HuaanSecuritiesCompactProfilePage.tsx','/companies/domestic/a-600909'],
  ['GuangfaSecuritiesCompactProfilePage.tsx','/companies/domestic/a-000776'],
@@ -41,7 +45,7 @@ assert(company.includes("domesticV2Records.filter(j=>j.employerRoute===companyRo
 assert(company.includes("'\/candidate\/jobs\/'+encodeURIComponent(job.id)"),'Must open HHBA on-site job detail');
 assert(employer.includes('rebuildListFilter(job,filters)'), 'Employer counts must use same market filters');
 assert(router.includes('job.employerRoute'), 'Job cards must lead back to reviewed employer page');
-assert(catalog.includes('sftechV2Records.length!==17')&&catalog.includes('neteaseV2Records.length!==14')&&catalog.includes('hypergryphV2Records.length!==20')&&catalog.includes('ankerV2Records.length!==24')&&catalog.includes('domesticV2Records.length!==144'), 'Preserve 100 previous + 20 new domestic jobs');
+assert(catalog.includes('sftechV2Records.length!==17')&&catalog.includes('neteaseV2Records.length!==14')&&catalog.includes('hypergryphV2Records.length!==20')&&catalog.includes('ankerV2Records.length!==24')&&catalog.includes('domesticV2Records.length!==160'), 'Preserve 100 previous + 20 new domestic jobs');
 assert(catalog.includes('editorialRelatedMajors:job.editorialRelatedMajors'), 'Do not silently drop published editorial mapping');
 assert(existsSync('src/styles/major-company-flow.css'));
 console.log('MAJOR_TO_COMPANY_TO_JOB_CONTRACT_OK',routes.length,'reviewed employers');
