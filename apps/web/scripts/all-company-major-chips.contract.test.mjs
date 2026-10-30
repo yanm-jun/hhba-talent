@@ -10,7 +10,7 @@ const overseas=read('pages/CompanyProfilePage.tsx');
 const matcher=read('services/majorJobMatching.ts');
 const idx=read('services/domesticRebuildJobs.ts');
 const hypergryph=read('pages/HypergryphCompactProfilePage.tsx');
-const pages=['Kpmg','Schneider','HuayuVision','HuaanSecurities','GuangfaSecurities','CiticsSecurities','Pfizer','Csair','SfExpress','NeteaseGames','Hypergryph'];
+const pages=['Kpmg','Schneider','HuayuVision','HuaanSecurities','GuangfaSecurities','CiticsSecurities','Pfizer','Csair','SfExpress','NeteaseGames','Hypergryph','Anker'];
 for(const p of pages){
  const s=read('pages/'+p+'CompactProfilePage.tsx');
  assert(s.includes('<CompanyMajorJobs companyRoute='),p+' did not use the universal major chips');
@@ -32,7 +32,7 @@ assert(overseas.includes('matchedJobs.slice(0,shown)'),'International official r
 assert(domestic.includes('该企业尚未进入已审核逐岗资料库'),'No invented jobs for unfinished company profiles');
 assert(market.includes('<MajorFilter value={selectedMajor}'),'The main recruitment market MUST retain its professional search');
 assert(matcher.includes("return fields.length?'other':'unknown'"),'No unsupported eligibility assumptions');
-assert(idx.includes('domesticV2Records.length!==120'),'Preserve 120 existing reviewed Chinese job records');
+assert(idx.includes('domesticV2Records.length!==144'),'Preserve 120 existing reviewed Chinese job records');
 assert(hypergryph.includes('hypergryph-logo.png')&&hypergryph.includes('hypergryph-reception.png')&&hypergryph.includes('hypergryph-recruitment-art.png'),'Keep 3 original Hypergryph PNG assets');
 assert(existsSync('src/styles/major-company-flow.css'),'Shared chip styles missing');
 console.log('ALL_COMPANY_CHIP_ONLY_MATCHING_OK',pages.length,'reviewed employers + generic 156, domestic and international templates');
