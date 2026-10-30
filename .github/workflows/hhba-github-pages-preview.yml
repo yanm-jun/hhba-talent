@@ -135,6 +135,14 @@ jobs:
           test -s apps/web/public/images/employer-profiles/cn-autumn-028/photo2.jpg
           test -s apps/web/public/images/employer-profiles/cn-autumn-028/media-audit.json
           echo HHBA_CN_AUTUMN_028_LOCAL_ASSETS_PRESENT
+      - name: Package POWERCHINA Power Investment company logo and two original project photos
+        run: |
+          python apps/web/scripts/prepare-power-invest-media.py
+          test -s apps/web/public/images/employer-profiles/cn-autumn-029/logo.png
+          test -s apps/web/public/images/employer-profiles/cn-autumn-029/photo1.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-029/photo2.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-029/media-audit.json
+          echo HHBA_CN_AUTUMN_029_MEDIA_PACKAGED
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
@@ -266,6 +274,13 @@ jobs:
           test -s apps/web/dist/images/employer-profiles/cn-autumn-028/photo2.jpg
           test -s apps/web/dist/images/employer-profiles/cn-autumn-028/media-audit.json
           echo HHBA_CN_AUTUMN_028_SAME_SITE_STATIC_ASSETS_OK
+      - name: Verify power investment employer photos and audit are part of original HHBA website
+        run: |
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-029/logo.png
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-029/photo1.jpg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-029/photo2.jpg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-029/media-audit.json
+          echo HHBA_CN_AUTUMN_029_ONE_MAIN_SITE_MEDIA_OK
       - name: Strip obsolete industry-stock galleries from the public Pages bundle
         run: |
           rm -rf apps/web/dist/images/autumn-photo-research
