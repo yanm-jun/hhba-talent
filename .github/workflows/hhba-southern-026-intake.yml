@@ -1,0 +1,58 @@
+name: HHBA Employer V2 Southern Media Intake (integrated preview only)
+on:
+  push:
+    branches: [feat/integrate-employer-v2-into-unified-20261030]
+    paths:
+      - '.github/workflows/hhba-southern-026-intake.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: hhba-employer-026-media
+  cancel-in-progress: false
+jobs:
+  media-and-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Import actual logo and independently sourced company/event photographs
+        working-directory: apps/web
+        run: |
+          set -euo pipefail
+          python -m pip install -q requests pillow pymupdf
+          python scripts/factory-v2-southern-media.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Validate all 16 companies, logo/photo provenance, and whole-site
+        working-directory: apps/web
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          node scripts/employer-factory-check.mjs
+          node scripts/factory-v2-validate.mjs --all
+          node scripts/company-single-char-search.contract.test.mjs
+          node scripts/company-brand-unified.contract.test.mjs
+          HHBA_GITHUB_PAGES=1 HHBA_PAGES_BASE=/hhba-talent/preview-integration-v2/ VITE_HHBA_DOMESTIC_REBUILD_V2=1 VITE_HHBA_OVERSEAS_CURATED_100=1 npm run build
+          node scripts/factory-v2-routes.mjs
+          test -s dist/companies/autumn/cn-autumn-026/index.html
+      - name: Commit reviewed images to integrated review BRANCH, never publish root
+        run: |
+          set -euo pipefail
+          git add -f apps/web/src/data/employerProfiles/cn-autumn-026.json
+          git add -f apps/web/public/images/employer-profiles/cn-autumn-026/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if ! git diff --cached --quiet; then
+            git commit -m 'assets(southern-026): preserve verified logo, two separate photos and evidence [skip ci]'
+            git push origin HEAD:refs/heads/feat/integrate-employer-v2-into-unified-20261030
+          fi
