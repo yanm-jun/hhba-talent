@@ -9,7 +9,7 @@ const base=(process.env.HHBA_TEST_BASE||'http://127.0.0.1:4173/hhba-talent/').re
 const out='mainline-v2-browser-proof';
 mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
-const result={base,desktop:false,mobile:false,southern:false,guangzhilv:false,shortSearch:false,details:false,images:false,qingdaoCaptions:false,mechanicalRoleFilter:false,roadBridgeMajor:false};
+const result={base,desktop:false,mobile:false,southern:false,guangzhilv:false,shortSearch:false,details:false,images:false,qingdaoCaptions:false,mechanicalRoleFilter:false,roadBridgeMajor:false,powerInvestment:false};
 async function dismiss(page){
  const btn=page.getByRole('button',{name:'暂不同意'});
  if(await btn.isVisible().catch(()=>false))await btn.click();
@@ -72,6 +72,24 @@ try{
     'Zhongjian Road & Bridge must show exactly its mechanical-equipment role');
   assert((await roadCard.locator('.hhba-v2-job-result').innerText()).includes('机械责任师'));
   await page.screenshot({path:out+'/cn-autumn-028-mechanical-'+width+'.png',fullPage:true});
+  // Power Investment 2027 graduate roles: company name returns all eight;
+  // specialised major queries must show only the individually sourced job.
+  await input.fill('自动化');
+  const investment=page.locator('[data-v2-search-company="cn-autumn-029"]');
+  await investment.waitFor({state:'visible',timeout:20000});
+  assert.equal(await investment.getAttribute('data-v2-match-kind'),'major');
+  assert.equal(await investment.locator('.hhba-v2-job-result').count(),1,
+   'Power Investment automation search must show only the thermal-control engineer');
+  assert((await investment.locator('.hhba-v2-job-result').innerText()).includes('热控工程师'));
+  await input.fill('计算机科学与技术');
+  await investment.waitFor({state:'visible',timeout:20000});
+  assert.equal(await investment.locator('.hhba-v2-job-result').count(),1,
+   'Computer major search must show only information technology engineer');
+  await input.fill('中电建电力集团');
+  await investment.waitFor({state:'visible',timeout:20000});
+  assert.equal(await investment.locator('.hhba-v2-job-result').count(),8);
+  await page.screenshot({path:out+'/cn-autumn-029-search-'+width+'.png',fullPage:true});
+  result.powerInvestment=true;
   result.roadBridgeMajor=true;
   result.mechanicalRoleFilter=true;
   const checks=[
@@ -82,6 +100,8 @@ try{
     ['GZL','cn-autumn-027',8],
     ['中建路桥','cn-autumn-028',12],
     ['中建路','cn-autumn-028',12],
+    ['中电建电力集团','cn-autumn-029',8],
+    ['电建电投','cn-autumn-029',8],
   ];
   for(const [query,id,count] of checks){
    await input.fill(query);
@@ -95,12 +115,12 @@ try{
    if(query==='南方传媒')result.southern=true;
    if(query==='广之')result.shortSearch=true;
    if(query==='广之旅')result.guangzhilv=true;
-   if(query==='广之旅'||query==='南方传媒'||query==='中建路桥'){
+   if(query==='广之旅'||query==='南方传媒'||query==='中建路桥'||query==='中电建电力集团'){
     await page.screenshot({path:out+'/'+id+'-'+width+'-search.png',fullPage:true});
     await link.click();
     const detail=page.locator('[data-company-template="unified-v2"][data-employer-id="'+id+'"]');
     await detail.waitFor({state:'visible',timeout:25000});
-    assert((await detail.locator('h1').innerText()).includes(id==='cn-autumn-026'?'南方传媒':id==='cn-autumn-028'?'中建路桥':'广之旅'));
+    assert((await detail.locator('h1').innerText()).includes(id==='cn-autumn-026'?'南方传媒':id==='cn-autumn-028'?'中建路桥':id==='cn-autumn-029'?'中电建电力投资集团':'广之旅'));
     assert.equal(await detail.locator('.hhba-v2-company-role').count(),count);
     await loaded(detail.locator('.hhba-kpmg-logo img'));
     const pics=detail.locator('.hhba-kpmg-photo-grid img');
@@ -150,7 +170,7 @@ try{
   if(width===390)result.mobile=true;else result.desktop=true;
   await page.close();
  }
- assert(result.desktop&&result.mobile&&result.southern&&result.guangzhilv&&result.shortSearch&&result.details&&result.images&&result.qingdaoCaptions&&result.mechanicalRoleFilter&&result.roadBridgeMajor);
+ assert(result.desktop&&result.mobile&&result.southern&&result.guangzhilv&&result.shortSearch&&result.details&&result.images&&result.qingdaoCaptions&&result.mechanicalRoleFilter&&result.roadBridgeMajor&&result.powerInvestment);
  result.status='PASS';
  writeFileSync(out+'/result.json',JSON.stringify(result,null,2)+'\n');
  console.log('HHBA_ONE_MAIN_BROWSER_SEARCH_AND_DETAILS_PASS',JSON.stringify(result));
