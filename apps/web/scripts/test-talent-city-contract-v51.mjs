@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,readdirSync} from 'node:fs';
 import {TALENT_POLICY_RECORDS} from '../src/data/talentPolicyRecords.ts';
 import {TALENT_HOUSING_RECORDS} from '../src/data/talentHousingRecords.ts';
+import {TALENT_HOUSING_RESEARCH_LEADS} from '../src/data/talentHousingResearch.ts';
 import {CERTIFIED_TALENT_GUIDES,CERTIFIED_TALENT_HOUSING_GUIDES,ACCEPTED_TALENT_CITIES,talentSourceKind,assessPolicy,assessHousing,assessTalentCity} from '../src/data/talentQuality.ts';
 
 const base=JSON.parse(readFileSync(new URL('../src/data/talentBaselineIds.json',import.meta.url),'utf8'));
@@ -125,5 +126,24 @@ check('Weihai 2026 official housing evidence and historic youth batch obey V5.1'
   assert.ok(home&&home.city==='威海'&&home.kind==='project'&&home.steps.length>=4&&home.contactPhone);
   assert.equal(assessHousing(home,'2026-10-30').grade,'B');
  }
+});
+check('Rizhao research housing remains separate from official verified inventory',()=>{
+ const leads=TALENT_HOUSING_RESEARCH_LEADS.filter(x=>x.city==='日照');
+ assert.ok(leads.length>=3,'missing Rizhao housing projects research');
+ assert.equal(TALENT_HOUSING_RECORDS.filter(x=>x.city==='日照').length,0,'unverified leads must not be automatically promoted');
+ for(const x of leads){
+  assert.ok(x.title&&x.address&&x.statusNote&&x.eligibility);
+  assert.ok(x.steps.length>=4);
+  assert.notEqual(talentSourceKind(x.sourceUrl),'government','sources remain labeled as reprints');
+  assert.ok(!TALENT_HOUSING_RECORDS.some(y=>y.id===x.id),'unverified lead must not be a verified housing record');
+ }
+ const policy=TALENT_POLICY_RECORDS.find(x=>x.id==='rz-rent-buy-26');
+ const youth=TALENT_POLICY_RECORDS.find(x=>x.id==='sd-rizhao-youth-2026');
+ assert.ok(policy?.applicationSteps?.length>=4&&policy?.materials?.length>=3);
+ assert.ok(youth?.applicationSteps?.length>=4&&youth?.materials?.length>=3);
+ assert.equal(policy.payoutTo,'住房折扣');
+ assert.notEqual(assessPolicy(policy,'2026-10-30').grade,'A');
+ assert.notEqual(assessPolicy(youth,'2026-10-30').grade,'A');
+ assert.ok(routes.includes('<UnifiedTalentHousingResearch city={city} query={query}/>'));
 });
 console.log(JSON.stringify({passed,baseline:base.policyIds.length+base.housingIds.length,certified:Object.keys(CERTIFIED_TALENT_GUIDES).length,acceptedCities:ACCEPTED_TALENT_CITIES.length},null,2));
