@@ -102,7 +102,7 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
  const cats=['全部类型',...new Set(resultPolicies.map(p=>p.category))];
  const shownPolicies=filter==='全部类型'?resultPolicies:resultPolicies.filter(p=>p.category===filter);
  const relatedLink=(kindName:TalentListKind)=>talentListUrl(kindName,city);
- const doSearch=()=>navigate(draft.trim()?talentSearchUrl(city,draft.trim()):talentListUrl('policies',city));
+ const doSearch=()=>navigate(draft.trim()?talentSearchUrl(parsePolicyQuery(draft.trim(),city).city,draft.trim()):talentListUrl('policies',city));
  return <><Bread city={city} current={title}/>
   {guideMode?<GuideContent city={city}/>:<>
   <section className="ts-sub-header">
@@ -162,7 +162,7 @@ function DetailPage({kind,id}:{kind:'policy'|'housing';id:string}){
     </>:null}
     <aside className="ts-sub-warning"><ShieldCheck size={19}/><span>这是政府公开文件的整理索引，不代表资格审核已通过。历史配租套数不是当前剩余房源，申请期与政策待遇请以政府最新通知为准。</span></aside>
     <div className="ts-sub-detail-links"><a href={x.sourceUrl} rel="noopener noreferrer" target="_blank">查看政府原文 <ExternalLink size={16}/></a>
-      {x.applyUrl&&<a href={x.applyUrl} rel="noopener noreferrer" target="_blank">官方申请渠道 / 说明 <ArrowUpRight size={16}/></a>}
+      {h?.applyUrl&&<a href={h.applyUrl} rel="noopener noreferrer" target="_blank">官方申请渠道 / 说明 <ArrowUpRight size={16}/></a>}
       {p?.applicationUrl&&<a href={p.applicationUrl} rel="noopener noreferrer" target="_blank">官方办理渠道 / 说明 <ArrowUpRight size={16}/></a>}
     </div>
    </div>
