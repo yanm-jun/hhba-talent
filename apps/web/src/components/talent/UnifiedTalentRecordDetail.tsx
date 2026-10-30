@@ -12,6 +12,7 @@ const fullGuide=(id:string)=>({
  'bz-2026-home-closed':'/talent-service/policy-guide-preview/binzhou/purchase',
  'bz-2026-living-archived':'/talent-service/policy-guide-preview/binzhou/living',
  'sd-jining-2026-introduction':'/talent-service/policy-guide-preview/jining/youth',
+ 'sd-heze-2026-startup':'/talent-service/policy-guide-preview/heze/startup',
  'jn-maincity-rent-2026':'/talent-service/policy-guide-preview/jining/rent',
  'sd-dongying-talent-2026':'/talent-service/policy-guide-preview/dongying/transition',
  'sd-jinan-2026-talent-living':'/talent-service/policy-guide-preview/jinan',
