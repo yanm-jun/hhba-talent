@@ -28,7 +28,15 @@ const housingStatus=(r:TalentHousingRecord)=>{
  if(r.applicationEnd&&r.applicationEnd>=today)return '公告申报期内 · 房源需核验';
  return r.kind==='program'?'住房制度 · 具体项目待核验':'真实项目 · 剩余房源待核验';
 };
-const policyStatus=(r:TalentPolicyRecord)=>r.temporal==='past-window'?'历史批次 · 申请状态待核验':r.temporal==='historical'?'历史政策 · 需核对现行规则':'政策参考 · 以政府公告为准';
+const policyStatus=(r:TalentPolicyRecord)=>{
+ if(r.deadline&&r.deadline<new Date().toISOString().slice(0,10))return '该批次申请已截止';
+ if(r.deadline)return '公告申请截止 '+r.deadline;
+ if(r.temporal==='past-window')return '年度批次 · 申请状态待核验';
+ if(r.temporal==='historical')return '历史规则 · 现行政策待核验';
+ return '政策参考 · 资格按官方核验';
+};
+const policyPriority=(r:TalentPolicyRecord)=>r.temporal==='historical'?2:r.deadline&&r.deadline<new Date().toISOString().slice(0,10)?1:0;
+const recentPolicies=(a:TalentPolicyRecord,b:TalentPolicyRecord)=>policyPriority(a)-policyPriority(b)||b.published.localeCompare(a.published,'zh-CN');
 const decode=(s:string)=>{try{return decodeURIComponent(s)}catch{return ''}};
 function matchesPolicy(p:TalentPolicyRecord,query:string,city:string){
  const parsed=parsePolicyQuery(query,city);
@@ -52,8 +60,10 @@ function Bread({city,current,parent}:{city?:string;current:string;parent?:{title
 function QuickCount({count,label}:{count:number;label:string}){return <span className="ts-sub-count"><strong>{count}</strong><small>{label}</small></span>}
 function PolicyTile({data}:{data:TalentPolicyRecord}){
  return <Link to={talentPolicyUrl(data.id)} className="ts-sub-tile">
-  <div className="ts-sub-tile-top"><span>{data.category}</span><small>{policyStatus(data)}</small></div>
-  <h3>{data.title}</h3><p>{data.summary}</p><div className="ts-sub-tile-benefit">{data.benefit}</div>
+  <div className="ts-sub-tile-top"><span>{data.category}{data.scope?' · '+data.scope:''}</span><small>{policyStatus(data)}</small></div>
+  <h3>{data.title}</h3><p>{data.summary}</p>
+  {data.targetGroup&&<p className="ts-policy-audience"><b>适用人群：</b>{data.targetGroup}</p>}
+  <div className="ts-sub-tile-benefit">{data.benefit}</div>
   <footer><small>{data.department} · {data.published}</small><ArrowUpRight size={18}/></footer>
  </Link>;
 }
@@ -74,7 +84,7 @@ function Empty({city,kind}:{city:string;kind:string}){
 function CityHub({city}:{city:string}){
  const match=findTalentCity(city);
  if(!match)return <><Bread current="城市尚未开通"/><section className="ts-sub-header"><h1>该城市尚未加入当前测试名单</h1><p>当前正式建立四个直辖市入口，另外保留已有资料城市。其余地级市仍待分批导入。</p><Link to="/talent-service">返回城市选择 <ArrowRight size={16}/></Link></section></>;
- const policies=TALENT_POLICY_RECORDS.filter(p=>p.city===city);
+ const policies=TALENT_POLICY_RECORDS.filter(p=>p.city===city).sort(recentPolicies);
  const homes=TALENT_HOUSING_RECORDS.filter(h=>h.city===city);
  return <>
   <Bread current={city+' · 人才服务'}/>
@@ -104,7 +114,7 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
  const housingMode=kind==='housing';
  const guideMode=kind==='guide';
  const title=searchMode?'搜索结果':housingMode?'人才公寓':kind==='benefits'?'补贴与福利':guideMode?'申请指南':'人才政策';
- const resultPolicies=TALENT_POLICY_RECORDS.filter(p=>p.city===city&&(!query||matchesPolicy(p,query,city))&&(!housingMode)&&(kind!=='benefits'||benefit(p)));
+ const resultPolicies=TALENT_POLICY_RECORDS.filter(p=>p.city===city&&(!query||matchesPolicy(p,query,city))&&(!housingMode)&&(kind!=='benefits'||benefit(p))).sort(recentPolicies);
  const resultHomes=TALENT_HOUSING_RECORDS.filter(p=>p.city===city&&(housingMode||searchMode)&&(!query||matchesHousing(p,query,city)));
  const cats=['全部类型',...new Set(resultPolicies.map(p=>p.category))];
  const shownPolicies=filter==='全部类型'?resultPolicies:resultPolicies.filter(p=>p.category===filter);
@@ -153,13 +163,17 @@ function DetailPage({kind,id}:{kind:'policy'|'housing';id:string}){
    <div className="ts-sub-detail-hero">
     <span className="ts-section-kicker">{kind==='housing'?'HOUSING DETAILS':'POLICY DETAILS'} / {city}</span>
     <h1>{x.title}</h1><p>{kind==='housing'?(h?.district+' · '+h?.address):(p?.summary)}</p>
-    <div className="ts-sub-detail-tags"><span>{kind==='housing'?housingStatus(h!):policyStatus(p!)}</span><span>来源 {kind==='housing'?h?.published:p?.published}</span><span>整理 {kind==='housing'?h?.reviewedAt:TALENT_POLICY_REVIEW_DATE}</span></div>
+    <div className="ts-sub-detail-tags"><span>{kind==='housing'?housingStatus(h!):policyStatus(p!)}</span>{p?.scope&&<span>政策范围：{p.scope}{p.district?' · '+p.district:''}</span>}
+    <span>来源 {kind==='housing'?h?.published:p?.published}</span><span>资料整理 {kind==='housing'?h?.reviewedAt:(p?.reviewedAt||TALENT_POLICY_REVIEW_DATE)}</span></div>
    </div>
    <div className="ts-sub-detail-body">
     {p?<><section><h2>政策支持 / 福利待遇</h2><p className="ts-sub-emphasis">{p.benefit}</p></section>
+      {p.targetGroup&&<section><h2>适用对象与政策范围</h2><p>{p.targetGroup}{p.scope?' · '+p.scope:''}{p.district?' · '+p.district:''}</p></section>}
       <section><h2>申请条件</h2><p>{p.eligibility}</p></section>
+      {p.deadline&&<section><h2>公告申报截止日期</h2><p className="ts-sub-emphasis">{p.deadline}{p.deadline<new Date().toISOString().slice(0,10)?' · 已截止，请查后续新批次':' · 请再次核对政府官网'}</p></section>}
       <section><h2>办理流程与入口</h2><p>{p.application}</p></section>
-      <section><h2>政府发布部门</h2><p>{p.department} · {p.sourceName} · {p.published}</p></section>
+      {p.reviewNote&&<aside className="ts-sub-policy-note"><ShieldCheck size={15}/><p>{p.reviewNote}</p></aside>}
+      <section><h2>政府发布部门与文件</h2><p>{p.department} · {p.sourceName} · {p.published}</p></section>
     </>:h?<><section><h2>项目地址</h2><p>{h.address}</p></section>
       <section><h2>房源规模与户型</h2><p>{h.units}</p></section>
       <section><h2>租金及费用</h2><p className="ts-sub-emphasis">{h.rent}</p></section>
