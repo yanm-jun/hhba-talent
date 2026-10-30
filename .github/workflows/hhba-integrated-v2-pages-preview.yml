@@ -4,6 +4,7 @@ on:
     branches: [feat/integrate-employer-v2-into-unified-20261030]
     paths:
       - '.github/workflows/hhba-integrated-v2-pages-preview.yml'
+      - 'apps/web/src/data/employerProfiles/cn-autumn-026.json'
   workflow_dispatch:
 permissions:
   contents: read
@@ -51,9 +52,13 @@ jobs:
           node scripts/company-brand-unified.contract.test.mjs
           npm run build
           node scripts/factory-v2-routes.mjs
+          test -s dist/companies/autumn/cn-autumn-026/index.html
           grep -Fq '/hhba-talent/preview-integration-v2/assets/' dist/index.html
           test -s dist/companies/autumn/cn-autumn-025/index.html
           test -s dist/companies/autumn/cn-autumn-021/index.html
+          test -s dist/images/employer-profiles/cn-autumn-026/logo.png
+          test -s dist/images/employer-profiles/cn-autumn-026/photo1.webp
+          test -s dist/images/employer-profiles/cn-autumn-026/photo2.webp
           test -s dist/candidate/jobs/index.html
       - name: Chromium installed for both short-name regression cases
         working-directory: apps/web
@@ -74,6 +79,7 @@ jobs:
           curl -fsS "$HHBA_TEST_BASE" >/dev/null
           HHBA_EMPLOYER_ID=cn-autumn-025 node scripts/factory-v2-browser.mjs
           HHBA_EMPLOYER_ID=cn-autumn-021 node scripts/factory-v2-browser.mjs
+          HHBA_EMPLOYER_ID=cn-autumn-026 node scripts/factory-v2-browser.mjs
       - name: Preserve screenshot evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -178,6 +184,7 @@ jobs:
         run: |
           set -euo pipefail
           node scripts/factory-v2-public-search.mjs
+          HHBA_EMPLOYER_ID=cn-autumn-026 HHBA_PUBLIC_SEARCH=南方 node scripts/factory-v2-public-search.mjs
       - name: Collect externally-visible screenshots and browser measurements
         if: always()
         uses: actions/upload-artifact@v4
