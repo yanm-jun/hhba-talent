@@ -110,4 +110,20 @@ check('Historical policies are downgraded automatically, not stuck at a fixed 20
  assert.equal(assessPolicy(r,'2026-10-30').grade,'A');
  assert.equal(assessPolicy(r,'2026-11-11').grade,'C');
 });
+check('Weihai 2026 official housing evidence and historic youth batch obey V5.1',()=>{
+ const rental=TALENT_POLICY_RECORDS.find(p=>p.id==='wh-rent-26');
+ assert.ok(rental&&rental.city==='威海'&&rental.sourceUrl.includes('/2026/7/29/'));
+ assert.ok(rental.materials?.length>=3&&rental.applicationSteps?.length>=4);
+ assert.equal(assessPolicy(rental,'2026-10-30').grade,'B');
+ const district=TALENT_POLICY_RECORDS.find(p=>p.id==='wh-jingqu-talent-apartment-2026');
+ assert.ok(district&&district.city==='威海'&&district.scope==='特定区域'&&district.applicationSteps?.length>=4);
+ const old=TALENT_POLICY_RECORDS.find(p=>p.id==='sd-weihai-youth-2025');
+ assert.ok(old&&old.deadline==='2025-12-19');
+ assert.equal(assessPolicy(old,'2026-10-30').grade,'C');
+ for(const id of ['wh-zhonghan-youth-2026','wh-shanwei-xuefu-2026']){
+  const home=TALENT_HOUSING_RECORDS.find(h=>h.id===id);
+  assert.ok(home&&home.city==='威海'&&home.kind==='project'&&home.steps.length>=4&&home.contactPhone);
+  assert.equal(assessHousing(home,'2026-10-30').grade,'B');
+ }
+});
 console.log(JSON.stringify({passed,baseline:base.policyIds.length+base.housingIds.length,certified:Object.keys(CERTIFIED_TALENT_GUIDES).length,acceptedCities:ACCEPTED_TALENT_CITIES.length},null,2));
