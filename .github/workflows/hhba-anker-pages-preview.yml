@@ -51,6 +51,17 @@ jobs:
         run: |
           npm run build
           cp dist/index.html dist/404.html
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const jobs=JSON.parse(fs.readFileSync('src/data/domesticAnker2027OfficialRoles20261030.json','utf8')).jobs;
+          const routes=['companies/autumn/cn-autumn-008','candidate/jobs',...jobs.map(j=>'candidate/jobs/cn-v2-anker-'+j.id)];
+          for(const route of routes){
+            fs.mkdirSync('dist/'+route,{recursive:true});
+            fs.copyFileSync('dist/index.html','dist/'+route+'/index.html');
+          }
+          if(routes.length!==26)throw Error('Missing Anker job detail deep-links');
+          console.log('ANKER_DIRECT_PAGE_LINKS',routes.length);
+          NODE
           touch dist/.nojekyll
           test -s dist/curated/v1/jobs.json
           test -s dist/images/anker-user/anker-brand-vision.png
