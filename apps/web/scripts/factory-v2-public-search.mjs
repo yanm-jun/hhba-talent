@@ -12,7 +12,7 @@ import fs from 'node:fs';
 import {chromium} from 'playwright';
 const base=(process.env.HHBA_PUBLIC_BASE||'https://yanm-jun.github.io/hhba-talent/preview-factory-v2/').replace(/\/?$/,'/');
 const id=process.env.HHBA_EMPLOYER_ID||'cn-autumn-025';
-assert(/^https:\/\/yanm-jun\.github\.io\/hhba-talent\/preview-factory-v2\/$/.test(base),'Never test or mutate production via this preview checker');
+assert(/^https:\/\/yanm-jun\.github\.io\/hhba-talent\/preview-(factory|integration)-v2\/$/.test(base),'Never test or mutate production via this preview checker');
 assert(/^cn-autumn-\d{3}$/.test(id));
 const p=JSON.parse(fs.readFileSync('src/data/employerProfiles/'+id+'.json','utf8'));
 const query=process.env.HHBA_PUBLIC_SEARCH||p.name.slice(0,2);
