@@ -4,7 +4,9 @@ import {TALENT_POLICY_RECORDS} from '../src/data/talentPolicyRecords.ts';
 const cities=['济南','青岛','淄博','枣庄','东营','烟台','潍坊','济宁','泰安','威海','日照','临沂','德州','聊城','滨州','菏泽'];
 let passed=0;
 const check=(name,fn)=>{fn();passed++;console.log('✓ '+name)};
-const added=TALENT_POLICY_RECORDS.filter(r=>r.id.startsWith('sd-'));
+// Regression protects original V4.6 16 IDs; V4.7 deeper records are checked separately.
+const newV47=new Set(['sd-zz-job-2026','sd-lc-insurance-2026']);
+const added=TALENT_POLICY_RECORDS.filter(r=>r.id.startsWith('sd-')&&!newV47.has(r.id));
 check('All 16 Shandong prefectures present',()=>{assert.deepEqual(new Set(queryTalentCities('','山东省').map(c=>c.name)),new Set(cities))});
 check('Exactly one new sourced item for each Shandong city',()=>{
  assert.equal(added.length,16);
