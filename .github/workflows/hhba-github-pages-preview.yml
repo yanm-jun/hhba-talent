@@ -296,6 +296,9 @@ jobs:
       - name: Retain original recruitment reader, ATS links and authenticated apply guards
         working-directory: apps/web
         run: node --test scripts/white-market-detail.contract.test.mjs scripts/curated-offline.contract.test.mjs scripts/overseas-curated100-unified.contract.test.mjs
+      - name: Verify study abroad V1 nav, 6 official national gateways and static routes
+        working-directory: apps/web
+        run: node --test scripts/study-abroad.contract.test.mjs
       - name: "Build unified HHBA - 200 companies, applicant center, employer governance previews and brand pages"
         working-directory: apps/web
         env:

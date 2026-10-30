@@ -1,0 +1,93 @@
+/* HHBA 留学机会 V1: isolated visual system, same main Site Shell and brand. */
+.hhba-study{color:#1b2d40;font-size:13px;line-height:1.6}
+.hhba-study a{text-decoration:none}
+.hhba-study .hhba-study-wrap{max-width:1080px;padding:0 20px;margin:0 auto}
+.hhba-study-hero{text-align:center;padding:62px 20px 41px;margin:16px -18px 0;background:radial-gradient(ellipse at 50% 10%,#e5f2ec 0%,#f6faf8 55%,#f8f9fa 100%)}
+.hhba-study-eyebrow{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:11px;letter-spacing:.055em;font-weight:750;color:#357d5b;margin:0}
+.hhba-study-hero h1{font-size:clamp(27px,4vw,39px);color:#172b3c;line-height:1.3;letter-spacing:-.6px;margin:17px auto 10px}
+.hhba-study-hero-lead{font-size:14px;color:#728594;line-height:1.9;max-width:720px;margin:0 auto 25px}
+.hhba-study-search{max-width:664px;display:flex;gap:11px;align-items:center;padding:7px 7px 7px 15px;background:#fff;border:1px solid #dfe9e3;box-shadow:0 8px 30px #37664b0a;border-radius:12px;margin:auto}
+.hhba-study-search>svg{color:#879a90;flex-shrink:0}
+.hhba-study-search input{border:0;min-width:0;flex:1;font-size:13px;background:transparent;color:#1e3446;outline:0}
+.hhba-study-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:12px 18px;background:#28734f;border:1px solid #28734f;border-radius:8px;color:#fff!important;font-size:12px;font-weight:750;white-space:nowrap;text-decoration:none;transition:background .18s}
+.hhba-study-btn:hover{background:#205d41}
+.hhba-study-quick{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:16px auto 0}
+.hhba-study-quick button{border:1px solid #dce8df;border-radius:22px;color:#5d796c;background:#fff;font-size:11px;padding:7px 13px}
+.hhba-study-quick button:hover{border-color:#94bc9f;background:#f4faf6}
+.hhba-study-trust{margin:0 -18px;background:#f1f7f3;border-top:1px solid #e0eee3;border-bottom:1px solid #e0eee3;display:flex;gap:13px 27px;justify-content:center;flex-wrap:wrap;padding:17px;color:#5c7869;font-size:12px}
+.hhba-study-trust span{display:inline-flex;align-items:center;gap:7px}
+.hhba-study-section{margin-top:44px}
+.hhba-study-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:19px}
+.hhba-study-section-head h2{font-size:21px;line-height:1.4;letter-spacing:-.3px;color:#1b303e;margin:0 0 5px}
+.hhba-study-section-head p{font-size:12px;color:#85939f;margin:0}
+.hhba-study-link{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:6px 0;color:#26734d;font-weight:750;font-size:12px;white-space:nowrap}
+.hhba-study-goal-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+.hhba-study-goal{position:relative;display:flex;flex-direction:column;text-align:left;gap:8px;min-height:169px;background:#fff;border:1px solid #e4ece9;padding:20px 16px;border-radius:12px;color:#243748;transition:box-shadow .15s,border-color .15s}
+.hhba-study-goal:hover,.hhba-study-country:hover,.hhba-study-card:hover{border-color:#bddbc7;box-shadow:0 8px 22px #1a4e3310}
+.hhba-study-goal.is-active,.hhba-study-country.is-active{border-color:#65ad85;background:#f4faf6}
+.hhba-study-goal-icon{display:grid;place-items:center;width:43px;height:43px;border-radius:10px;background:#eaf5ef;color:#2c7d59;margin-bottom:2px}
+.hhba-study-goal:nth-child(2) .hhba-study-goal-icon{background:#eaf1fb;color:#4278bd}
+.hhba-study-goal:nth-child(3) .hhba-study-goal-icon{background:#fff4e5;color:#a87932}
+.hhba-study-goal:nth-child(4) .hhba-study-goal-icon{background:#f1eefd;color:#7c62ae}
+.hhba-study-goal strong{font-size:14px}
+.hhba-study-goal>span:not(.hhba-study-goal-icon){font-size:12px;color:#82909c;line-height:1.7;padding-right:10px}
+.hhba-study-goal-arrow{position:absolute;right:14px;top:18px;color:#a9bbb2}
+.hhba-study-country-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.hhba-study-country{display:flex;flex-direction:column;align-items:center;gap:4px;background:#fff;border:1px solid #e3ece8;border-radius:12px;padding:16px 8px;color:#243b4d}
+.hhba-study-flag{font-size:32px;line-height:1.7}
+.hhba-study-country strong{font-size:13px}
+.hhba-study-country small{font-size:10px;color:#93a1aa}
+.hhba-study-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.hhba-study-filters button{font-size:12px;background:#fff;border:1px solid #e1e9e6;color:#6d7d88;border-radius:7px;padding:8px 13px}
+.hhba-study-filters button.is-active{border-color:#a8d0b5;background:#ecf7f0;color:#2b7854;font-weight:750}
+.hhba-study-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.hhba-study-card{display:flex;flex-direction:column;overflow:hidden;background:#fff;border:1px solid #e4ece9;border-radius:12px;min-width:0}
+.hhba-study-card-cover{height:110px;position:relative;display:grid;place-items:center;background:linear-gradient(125deg,#d7e9df,#f1f7f2);color:#84a892}
+.hhba-study-cover-de,.hhba-study-cover-au{background:linear-gradient(125deg,#dfebf7,#f3f7fb);color:#8ba9c7}
+.hhba-study-cover-jp,.hhba-study-cover-nz{background:linear-gradient(125deg,#f3e9dc,#f8f4ed);color:#c2ad8b}
+.hhba-study-card-cover>span{position:absolute;top:12px;left:13px;color:#3c7659;background:#fff;box-shadow:0 2px 12px #314a3410;padding:5px 9px;font-weight:700;font-size:10px;border-radius:5px}
+.hhba-study-card-copy{padding:16px;display:flex;flex-direction:column;flex:1}
+.hhba-study-card-copy>small{color:#8798a2;font-size:11px}
+.hhba-study-card h3{font-size:15px;color:#243748;margin:7px 0}
+.hhba-study-card p{color:#7d8b97;font-size:12px;line-height:1.7;margin:0;flex:1}
+.hhba-study-tags{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}
+.hhba-study-tags span{background:#f0f6f2;color:#5b7965;padding:5px 8px;border-radius:5px;font-size:10px}
+.hhba-study-card-footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid #edf1ef;padding-top:13px}
+.hhba-study-card-footer small{font-size:10px;color:#9da8ae}
+.hhba-study-card-footer a{display:inline-flex;align-items:center;gap:5px;color:#27714f;font-size:11px;font-weight:750}
+.hhba-study-empty{border:1px dashed #b4d1bd;background:#fff;text-align:center;padding:35px 15px;border-radius:12px;color:#6f8290}
+.hhba-study-empty svg{color:#397b57}
+.hhba-study-empty h3{font-size:15px;color:#344b5a}
+.hhba-study-empty p{font-size:12px}
+.hhba-study-note,.hhba-study-disclosure{display:flex;align-items:flex-start;gap:8px;padding:13px 16px;background:#fff9ed;color:#8b6a36;border:1px solid #f0e0be;border-radius:9px;line-height:1.75;font-size:11px;margin-top:20px}
+.hhba-study-note svg,.hhba-study-disclosure svg{flex-shrink:0;margin-top:2px}
+.hhba-study-career{margin-top:46px;padding:25px;display:flex;align-items:center;justify-content:space-between;gap:18px;background:linear-gradient(115deg,#e6f3eb,#f2f8f3);border:1px solid #d8e9df;border-radius:13px}
+.hhba-study-career h2{font-size:18px;margin:4px 0 6px;color:#253d39}
+.hhba-study-career p:not(.hhba-study-eyebrow){color:#6b8175;font-size:12px;margin:0}
+.hhba-study-guides{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-size:11px;color:#87928c;margin-top:24px}
+.hhba-study-guides span{display:inline-flex;gap:7px;align-items:center}
+.hhba-study-footer{margin-top:45px;padding:25px 0 12px;border-top:1px solid #e0e8e3;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+.hhba-study-footer p{color:#94a0a8;font-size:11px}
+.hhba-study-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.hhba-study-back{display:inline-flex;gap:8px;align-items:center;font-size:12px;color:#327451;margin:28px 0 20px}
+.hhba-study-detail-head{background:linear-gradient(110deg,#eff8f2,#fff);padding:32px;border:1px solid #dcece1;border-radius:13px}
+.hhba-study-detail-head h1{font-size:clamp(24px,3vw,32px);color:#20384a;margin:12px 0}
+.hhba-study-detail-head>p:not(.hhba-study-eyebrow){color:#71818e;font-size:14px;line-height:1.8;margin:0}
+.hhba-study-detail-head .hhba-study-disclosure{margin:18px 0 0}
+.hhba-study-detail-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(240px,1fr);gap:22px;margin-top:23px;align-items:start}
+.hhba-study-detail-main{display:grid;gap:12px}
+.hhba-study-detail-panel{display:flex;gap:17px;background:#fff;border:1px solid #e2e9e5;border-radius:11px;padding:22px}
+.hhba-study-step{flex:none;font-size:14px;color:#2b8557;font-weight:800}
+.hhba-study-detail-panel h2{margin:0 0 8px;font-size:16px;color:#2b4050}
+.hhba-study-detail-panel p{margin:0;font-size:12px;color:#728490;line-height:1.85}
+.hhba-study-source-box{background:#fff;border:1px solid #e0e8e3;border-radius:12px;padding:22px;position:sticky;top:20px}
+.hhba-study-source-box h2{font-size:16px;margin:12px 0;color:#263e4d}
+.hhba-study-source-box p:not(.hhba-study-eyebrow){font-size:12px;color:#728491;line-height:1.8}
+.hhba-study-source-box .hhba-study-btn{width:100%;margin-top:12px}
+.hhba-study-source-back{color:#2b7952;display:flex;justify-content:center;align-items:center;gap:6px;font-size:12px;font-weight:700;margin:18px 0}
+.hhba-study-source-box small{font-size:10px;color:#9ca8b0;line-height:1.7;display:block}
+.hhba-study-missing{max-width:760px;text-align:center;margin:80px auto}
+.hhba-study-missing p{color:#748390}
+@media(max-width:830px){.hhba-study-goal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hhba-study-country-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hhba-study-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.hhba-study .hhba-study-wrap{padding:0 4px}.hhba-study-hero{padding:45px 18px 34px}.hhba-study-hero-lead br{display:none}.hhba-study-search{flex-wrap:wrap}.hhba-study-search input{font-size:12px}.hhba-study-search .hhba-study-btn{width:100%}.hhba-study-trust{gap:9px 15px;font-size:10px}.hhba-study-section-head{align-items:start}.hhba-study-section-head h2{font-size:18px}.hhba-study-goal{padding:14px;min-height:160px}.hhba-study-card-grid{grid-template-columns:1fr}.hhba-study-detail-layout{grid-template-columns:1fr}.hhba-study-source-box{position:static}.hhba-study-detail-head{padding:20px}.hhba-study-detail-panel{padding:17px}.hhba-study-career{flex-direction:column;align-items:flex-start;padding:20px}.hhba-study-career .hhba-study-btn{width:100%}.hhba-study-footer{margin-top:30px}}
+@media(prefers-reduced-motion:reduce){.hhba-study *{scroll-behavior:auto!important;transition:none!important}}
