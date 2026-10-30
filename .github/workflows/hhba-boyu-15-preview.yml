@@ -1,0 +1,156 @@
+name: HHBA Boyu 15 isolated static preview
+on:
+  push:
+    branches: [feat/boyu-15-static-v2-20261030]
+    paths:
+      - '.github/workflows/hhba-boyu-15-preview.yml'
+      - 'apps/web/src/**'
+      - 'apps/web/public/images/boyu-user/**'
+      - 'apps/web/scripts/boyu-15.*'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: hhba-boyu-15-pages-preview
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/boyu-15-static-v2-20261030
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Check 15 employers, 160 domestic jobs and previous regressions
+        working-directory: apps/web
+        run: |
+          node scripts/boyu-15.contract.test.mjs
+          node scripts/company-brand-unified.contract.test.mjs
+          node scripts/company-single-char-search.contract.test.mjs
+          node scripts/shkp-14.contract.test.mjs
+          node scripts/laifen-13.contract.test.mjs
+          node scripts/anker-2027.contract.test.mjs
+          node scripts/domestic-rebuild-v2.contract.test.mjs
+          node scripts/major-company-job-flow.contract.test.mjs
+          node scripts/all-company-major-chips.contract.test.mjs
+          node scripts/hypergryph-major-choices.contract.test.mjs
+      - name: Build standalone Boyu static preview
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/preview-boyu/'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_DEMO_ACCOUNT_ENABLED: '0'
+        run: |
+          npm run build
+          cp dist/index.html dist/404.html
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const jobs=JSON.parse(fs.readFileSync('src/data/domesticBoyu2026OfficialSchoolRoles20261030.json','utf8')).jobs;
+          const routes=['companies/autumn/cn-autumn-011','candidate/jobs','companies/discover',...jobs.map(j=>'candidate/jobs/cn-v2-boyu-'+j.id)];
+          if(routes.length!==5)throw Error('Boyu direct URL routes changed');
+          for(const route of routes){fs.mkdirSync('dist/'+route,{recursive:true});fs.copyFileSync('dist/index.html','dist/'+route+'/index.html')}
+          fs.writeFileSync('dist/.nojekyll','');
+          NODE
+          for f in boyu-logo.webp boyu-exterior.webp boyu-lobby.webp; do test -s "dist/images/boyu-user/$f"; done
+          test -s dist/curated/v1/jobs.json
+          grep -q '/hhba-talent/preview-boyu/assets/' dist/index.html
+      - name: Install browser
+        working-directory: apps/web
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Real-browser check for photos, logo, single-character search and professions
+        working-directory: apps/web
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/boyu-vite.log 2>&1 &
+          for i in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:4173/hhba-talent/preview-boyu/ >/dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/boyu-15.browser.mjs
+      - name: Keep desktop/mobile screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: boyu-15-desktop-mobile-evidence
+          path: apps/web/boyu-15-review/
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Recover last confirmed GitHub Pages public artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 41002250357
+          github-token: ${{ github.token }}
+          path: prior-pages
+      - name: Preserve home and all previous company previews
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive=$(find prior-pages -type f -name 'artifact.tar*' -print -quit)
+          test -n "$archive"
+          mkdir -p published
+          if [[ "$archive" == *.gz ]]; then tar -xzf "$archive" -C published; else tar -xf "$archive" -C published; fi
+          for f in index.html preview-anker/index.html preview-shkp/index.html preview-laifen/index.html; do test -s "published/$f"; done
+          for p in "" preview-anker/ preview-shkp/ preview-laifen/; do
+            curl -fsSL --retry 3 --max-time 45 "https://yanm-jun.github.io/hhba-talent/$p" -o /tmp/boyu-live-check.html
+            cmp "published/${p}index.html" /tmp/boyu-live-check.html
+          done
+          test ! -e published/preview-boyu
+          mkdir -p published/preview-boyu
+          cp -a apps/web/dist/. published/preview-boyu/
+          test -s published/preview-boyu/companies/autumn/cn-autumn-011/index.html
+          for f in boyu-logo.webp boyu-exterior.webp boyu-lobby.webp; do test -s "published/preview-boyu/images/boyu-user/$f"; done
+          touch published/.nojekyll
+          echo BOYU_ADDED_PREVIOUS_RELEASE_UNCHANGED
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: published
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    environment:
+      name: hhba-company200-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify public Boyu page, logo, photos and preserved home
+        run: |
+          set -euo pipefail
+          root=https://yanm-jun.github.io/hhba-talent
+          for i in 1 2 3 4 5 6; do
+            if curl -fsSL "$root/preview-boyu/companies/autumn/cn-autumn-011/" -o /tmp/boyu-page &&
+               curl -fsSL "$root/preview-boyu/images/boyu-user/boyu-logo.webp" -o /tmp/boyu-logo &&
+               curl -fsSL "$root/preview-boyu/images/boyu-user/boyu-exterior.webp" -o /tmp/boyu-exterior &&
+               curl -fsSL "$root/preview-boyu/images/boyu-user/boyu-lobby.webp" -o /tmp/boyu-lobby; then break; fi
+            if [ "$i" = 6 ]; then exit 1; fi
+            sleep 10
+          done
+          grep -q '/hhba-talent/preview-boyu/assets/' /tmp/boyu-page
+          test $(wc -c </tmp/boyu-logo) -gt 1600
+          test $(wc -c </tmp/boyu-exterior) -gt 5000
+          test $(wc -c </tmp/boyu-lobby) -gt 3500
+          curl -fsSL "$root/" -o /tmp/root-live
+          grep -q '/hhba-talent/assets/' /tmp/root-live
+          echo BOYU_PREVIEW_PUBLICLY_VERIFIED
