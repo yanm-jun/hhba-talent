@@ -3,6 +3,7 @@ import { ArrowRight, ExternalLink, MapPin, RefreshCcw, Search, ShieldCheck } fro
 import { Link, getJobReturnTarget, navigate } from '../router';
 import { Shell } from './Shell';
 import { DomesticCompanyResults } from './DomesticCompanyResults';
+import { V2EmployerSearchResults } from './V2EmployerSearchResults';
 import { DomesticAutumnMarket } from './DomesticAutumnMarket';
 import { MajorFilter } from './MajorFilter';
 import {useSharedMajorSelection} from './CompanyMajorJobs';
@@ -118,6 +119,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
     setFilters(f=>f.major_slug===selectedMajor?f:{...f,major_slug:selectedMajor});
   },[selectedMajor]);
   const [draft,setDraft]=useState(()=>readMarketState(compact)?.draft??initialJobQuery());
+  const [v2SearchMatched,setV2SearchMatched]=useState(false);
   const [page,setPage]=useState(()=>readMarketState(compact)?.page??0);
   const [snapshot,setSnapshot]=useState<LivePage|null>(null);
   const [error,setError]=useState('');
@@ -303,6 +305,9 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       {aiEvidence.jobs.length===0&&<p className="unified-job-state">暂未检索到具备可核对原文证据的岗位；不会提供虚构的职位。</p>}
     </section>}
     {!showInlineDiscoveryEntry&&<div className="unified-company-discovery-navigation" style={{margin:'18px auto 8px',maxWidth:1120,display:'flex',justifyContent:'flex-end'}}><Link to="/companies/discover" style={{fontSize:13,color:'#265e45',fontWeight:700,textDecoration:'none'}}>浏览全部 200 家企业档案 →</Link></div>}
+    <V2EmployerSearchResults query={draft} scope={filters.country}
+      country={filters.location_country||''} major={majorById(selectedMajor)?.name||''}
+      onMatchChange={setV2SearchMatched}/>
     {!rebuilding&&!curatedHundred&&<DomesticAutumnMarket compact={compact} query={draft}
       major={majorById(selectedMajor)?.name||''}
       scope={filters.country} country={filters.location_country||''}
@@ -336,7 +341,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       :(featuredPending?'Verifying six highlighted official jobs…':'Loading jobs…')}</p>:
       error?<div className="unified-job-state" role="alert">{lang==='zh'?error:'Jobs temporarily unavailable. Please retry.'}<button type="button" onClick={()=>setRetry(x=>x+1)}><RefreshCcw size={15}/> {lang==='zh'?'重试':'Retry'}</button></div>:
       shown.length?<div className="unified-job-grid">{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated}/>)}</div>:
-        <div className="unified-job-state">{domesticOnly?(lang==='zh'?'当前没有符合条件的历史岗位。':'No matching archived jobs.'):lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
+        <div className="unified-job-state">{domesticOnly?(lang==='zh'?'当前没有符合条件的历史岗位。':'No matching archived jobs.'):v2SearchMatched?(lang==='zh'?'以上已找到匹配的 V2 企业及其岗位方向；当前正式岗位列表未有其他近期核验结果。':'The V2 employer and its archived role directions are shown above; no additional recently verified jobs match.'):lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
     {!curatedHundred&&!domesticOnly&&!loading&&defaultView&&featuredError&&
       <div className="unified-featured-fallback" role="status">
         <span>{lang==='zh'?'六个精选岗位未能及时完成最新核验，当前显示其他近期核验的真实职位。':
