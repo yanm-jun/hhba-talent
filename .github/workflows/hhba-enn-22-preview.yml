@@ -88,6 +88,9 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Test real search, homepage, 3 pictures, major selection and 390px mobile
         working-directory: apps/web
+        env:
+          HHBA_PAGES_BASE: '/hhba-talent/preview-enn/'
+          HHBA_GITHUB_PAGES: '1'
         run: |
           set -euo pipefail
           npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/hhba-enn-preview.log 2>&1 &
