@@ -1,3 +1,4 @@
+# 2026-10-30: V4.6 add one official-backed employment or talent policy for each Shandong prefecture, with attribution and privacy guardrails.
 # 2026-10-30: V4.5 national city directory — validate 4+293 city registry, province/pinyin search and compact V4 layout.
 # 2026-10-30: V4.4 policy matching — deterministic 13-rule safety checks, four-city browser-only screening, approved homepage preserved.
 # 2026-10-30: talent housing V4.3 QA rerun — eleven sourced projects and flexible inventory disclosure checks.
@@ -120,6 +121,9 @@ jobs:
       - name: Validate nationwide 297 city codes, province filters and city-search aliases
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-cities.mjs
+      - name: Validate source-backed Shandong 16-city talent policies and applicability
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-shandong.mjs
       - name: Test four-municipality talent policy matching, deadlines, exclusions and privacy
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-match.mjs
