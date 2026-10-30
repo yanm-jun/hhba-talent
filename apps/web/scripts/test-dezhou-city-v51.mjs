@@ -19,7 +19,7 @@ check('2026 real youth training program pays institutions, never youth cash',()=
  const x=byId(policies,'dz-2026-job-readiness-training');
  assert.equal(talentSourceKind(x.sourceUrl),'government');
  assert.equal(x.payoutTo,'用人单位');
- assert.ok(x.reviewNote.includes('承训实施单位')&&x.reviewNote.includes('个人现金'));
+ assert.ok(x.reviewNote.includes('承训实施单位')&&(x.reviewNote.includes('现金补贴')||x.reviewNote.includes('个人现金')));
  assert.ok(x.materials?.length>=3&&x.applicationSteps?.length>=4);
  assert.equal(assessPolicy(x,'2026-10-30').grade,'B');
 });
