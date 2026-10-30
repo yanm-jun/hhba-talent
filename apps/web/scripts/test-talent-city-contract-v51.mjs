@@ -42,7 +42,13 @@ check('Every certified A guide has actual detailed steps, branches and a live ro
   assert.equal(spec.branches.length,cert.branchCount);
   for(const branch of spec.branches)assert.ok(page.includes(branch),id+' missing '+branch);
   assert.ok(page.includes(spec.source),id+' no official portal');
-  assert.ok(cert.faqCount>=5,id+' too few questions');
+  const faqStart=page.indexOf(id==='sd-jinan-2026-talent-living'?'const questions=[':'faq:[',start);
+  const faqStop=page.indexOf(id==='sd-jinan-2026-talent-living'?'const districts=':'sources:[',faqStart);
+  assert.ok(faqStart>=start&&faqStop>faqStart,id+' missing FAQ section');
+  const faqText=page.slice(faqStart,faqStop);
+  assert.equal(count(faqText,"['"),cert.faqCount,id+' actual FAQ count mismatches certification');
+  for(const evidence of cert.evidenceUrls)assert.ok(page.includes(evidence),id+' listed government evidence not present in actual guide');
+
  }
  assert.deepEqual(Object.keys(CERTIFIED_TALENT_HOUSING_GUIDES),[]);
 });
