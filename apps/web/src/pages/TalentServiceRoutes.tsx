@@ -15,6 +15,7 @@ import {TalentQingdaoPolicyPreview} from './TalentQingdaoPolicyPreview';
 import {TalentQingdaoGuidePreview} from './TalentQingdaoGuidePreview';
 import {TalentLaoshanGuide} from './TalentLaoshanGuide';
 import {UnifiedPolicyGuide} from '../components/talent/UnifiedPolicyGuide';
+import {taianLivingGuide,taianPurchaseGuide,taianHousingGuide} from '../data/taianGuide';
 import {ziboLivingGuide,ziboPurchaseGuide,ziboZichuanHousingGuide} from '../data/ziboGuide';
 import {yantaiLivingGuide,yantaiHomeGuide} from '../data/talentYantaiGuide';
 import {linyiLivingGuide} from '../data/talentLinyiGuide';
@@ -227,6 +228,7 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  else if(kind==='search')body=<ListPage key={route} city={decode(fragments[2]||'杭州')||'杭州'} kind="search" query={decode(fragments.slice(3).join('/'))}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='dongying'&&fragments[3]==='transition')body=<UnifiedPolicyGuide data={dongyingTransitionGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='linyi'&&fragments[3]==='living')body=<UnifiedPolicyGuide data={linyiLivingGuide}/>;
+ else if(kind==='policy-guide-preview'&&fragments[2]==='taian')body=<UnifiedPolicyGuide data={fragments[3]==='purchase'?taianPurchaseGuide:fragments[3]==='housing'?taianHousingGuide:taianLivingGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='zibo')body=<UnifiedPolicyGuide data={fragments[3]==='purchase'?ziboPurchaseGuide:fragments[3]==='housing'?ziboZichuanHousingGuide:ziboLivingGuide}/>;
   else if(kind==='policy-guide-preview'&&fragments[2]==='yantai')body=<UnifiedPolicyGuide data={fragments[3]==='home'?yantaiHomeGuide:yantaiLivingGuide}/>;
   else if(kind==='policy-layout-preview'&&fragments[2]==='jinan')body=<TalentJinanPolicyPreview/>;
