@@ -1,3 +1,4 @@
+import {educationMatchesApplicant} from './majorEligibility.mjs';
 // Conservative public ATS metadata matching, never redistribute an employer JD.
 const norm=v=>String(v||'').toLowerCase().normalize('NFKC').trim();
 const esc=v=>v.replace(/[-/\\^$*+?.()|[\]{}]/g,'\\$&');
@@ -152,12 +153,7 @@ export function searchJobs(jobs,filters={},facets=new Map()){
   if(company&&![job.company,job.companyZh].some(t=>norm(t).includes(company)))continue;
   const actualType=f.jobType||classifyJobType(job.title,job.recruitmentType).jobType;
   if(type&&type!==actualType&&!(type==='REGULAR'&&actualType==='SOCIAL'))continue;
-  if(education){
-   const known=f.education||null;
-   if(education==='UNRESTRICTED_OR_UNREPORTED'){
-    if(known!==null&&known!=='UNRESTRICTED')continue;
-   }else if(known!==education)continue;
-  }
+  if(education&&!educationMatchesApplicant(education,f.education||null))continue;
   const years=Number.isFinite(f.experienceMinYears)?f.experienceMinYears:null;
   if(experience){
    if(experience==='unreported'){if(years!==null)continue}
