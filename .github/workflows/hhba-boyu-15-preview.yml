@@ -75,6 +75,9 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Real-browser check for photos, logo, single-character search and professions
         working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/preview-boyu/'
         run: |
           npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/boyu-vite.log 2>&1 &
           for i in $(seq 1 40); do
