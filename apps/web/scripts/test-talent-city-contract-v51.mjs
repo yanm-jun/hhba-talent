@@ -98,6 +98,21 @@ check('New housing records require independent qualification, steps and vacancy 
   assert.ok(h.applyUrl||/申报(入口|渠道).*?(未公开|待核|未公布)/.test(h.statusNote),h.id+' channel must be traceable');
  }
 });
+check('Housing pages must display real housing-related policies while separating programs from projects',()=>{
+ const page=code('TalentServiceRoutes.tsx');
+ assert.ok(page.includes("(!housingMode||isHousingPolicy(p))"),'Housing view wrongly excludes all policies');
+ assert.ok(page.includes("p.category==='购房补贴'||p.category==='租房安居'"),'Housing categories absent');
+ assert.ok(page.includes("housingPrograms=resultHomes.filter(p=>p.kind==='program')"),'Program separation missing');
+ assert.ok(page.includes("housingProjects=resultHomes.filter(p=>p.kind==='project')"),'Real project separation missing');
+ assert.ok(page.includes('住房政策与保障通道')&&page.includes('已核实独立项目'),'Housing counters mislabelled');
+ const policies=TALENT_POLICY_RECORDS.filter(p=>p.city==='潍坊'&&['购房补贴','租房安居'].includes(p.category));
+ const homes=TALENT_HOUSING_RECORDS.filter(h=>h.city==='潍坊');
+ assert.ok(policies.some(p=>p.id==='wf-home-history'),'Existing Weifang historical purchase policy lost');
+ assert.equal(assessPolicy(policies.find(p=>p.id==='wf-home-history'),'2026-10-30').grade,'C','Historical purchase policy must stay historical');
+ assert.ok(homes.some(h=>h.id==='wf-citywide-talent-housing-2025'&&h.kind==='program'));
+ assert.ok(homes.some(h=>h.id==='wf-municipal-talent-housing-2025'&&h.kind==='program'));
+ assert.ok(policies.length+homes.filter(h=>h.kind==='program').length>=3,'Housing page should not show 0 policies / programs');
+});
 check('City acceptance cannot be claimed while any current policy remains incomplete',()=>{
  for(const city of ACCEPTED_TALENT_CITIES){
   const m=assessTalentCity(city,'2026-10-30');
