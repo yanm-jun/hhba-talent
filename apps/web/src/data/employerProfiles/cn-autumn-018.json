@@ -9,7 +9,6 @@
     "新奥集团有限公司",
     "ENN",
     "ENN Group",
-    "新奥能源集团",
     "新奥校招"
   ],
   "industry": "清洁能源 · 天然气全产业链 · 泛能服务 · 产业智能 · 品质生活",
@@ -375,10 +374,11 @@
         "旅游管理",
         "酒店管理",
         "表演",
-        "舞蹈表演",
+        "舞蹈表演"
+      ],
+      "editorialRelatedMajors": [
         "舞蹈学"
       ],
-      "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
       "currentOpenVerified": false
