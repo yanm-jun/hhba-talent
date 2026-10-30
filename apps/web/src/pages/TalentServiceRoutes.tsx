@@ -18,6 +18,7 @@ import {UnifiedPolicyGuide} from '../components/talent/UnifiedPolicyGuide';
 import {ziboLivingGuide,ziboPurchaseGuide,ziboZichuanHousingGuide} from '../data/ziboGuide';
 import {yantaiLivingGuide,yantaiHomeGuide} from '../data/talentYantaiGuide';
 import {linyiLivingGuide} from '../data/talentLinyiGuide';
+import {dongyingTransitionGuide} from '../data/talentDongyingGuide';
 import {UnifiedTalentRecordDetail} from '../components/talent/UnifiedTalentRecordDetail';
 import {UnifiedTalentHousingResearch,housingResearchLeads} from '../components/talent/UnifiedTalentHousingResearch';
 import {UnifiedPolicyList,buildCityPolicyConfig} from '../components/talent/UnifiedPolicyList';
@@ -125,6 +126,7 @@ function CityHub({city}:{city:string}){
      </Link>)}
    </div>
   </section>
+  {match.name==='东营'&&<section className="ts-sub-section"><h2>东营 · 2026政策衔接与安居核验</h2><p>2026年8月人才新政出台，原2022版人才补贴已废止；旧规补报在9月30日结束。原博士4000元／月、硕士2000元／月与首购补贴等旧数字，仅作历史参考。新进人才请核对新规正式申请细则。</p><p>住房线索：河口区三义和住宅小区二期在2026年5月曾公告70套保租房统筹配租，报名6月30日截止。现仅核验到对区住建局公告的媒体转载，政府官网原文及新批次尚待核验。因此不将70套冒充当前可租房源，也不纳入已确认住房项目。</p><p><a href="https://ady.dongyingnews.cn/share/YS01MzctNDM0NzYxOTM.html" target="_blank" rel="noopener noreferrer">查看2026年河口区住房旧批次公告转载（非官方办理入口）</a></p><p><Link to="/talent-service/policy-guide-preview/dongying/transition">查看2026新旧政策核查指南 <ArrowRight size={14}/></Link></p></section>}
   <section className="ts-v4-city-note"><ShieldCheck size={18}/>
    <div><strong>{hasSources?'政策以当地官方发布和审核结果为准':'城市入口已开通，政策资料尚在核验'}</strong><p>正式住房资料仅采用符合标准的政府来源；参考报道与待核验项目单独标注，不作为当前可申领依据。申请材料和步骤以主管部门最新原文为准。</p></div>
   </section>
@@ -206,6 +208,7 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  else if(kind==='list'&&fragments[2]==='policies')body=city==='济南'?<TalentJinanPolicyPreview/>:city==='青岛'?<TalentQingdaoPolicyPreview/>:<UnifiedPolicyList config={buildCityPolicyConfig(city)}/>;
  else if(kind==='list'&&['policies','benefits','housing','guide'].includes(fragments[2]))body=<ListPage city={city} kind={fragments[2] as TalentListKind}/>;
  else if(kind==='search')body=<ListPage key={route} city={decode(fragments[2]||'杭州')||'杭州'} kind="search" query={decode(fragments.slice(3).join('/'))}/>;
+ else if(kind==='policy-guide-preview'&&fragments[2]==='dongying'&&fragments[3]==='transition')body=<UnifiedPolicyGuide data={dongyingTransitionGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='linyi'&&fragments[3]==='living')body=<UnifiedPolicyGuide data={linyiLivingGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='zibo')body=<UnifiedPolicyGuide data={fragments[3]==='purchase'?ziboPurchaseGuide:fragments[3]==='housing'?ziboZichuanHousingGuide:ziboLivingGuide}/>;
   else if(kind==='policy-guide-preview'&&fragments[2]==='yantai')body=<UnifiedPolicyGuide data={fragments[3]==='home'?yantaiHomeGuide:yantaiLivingGuide}/>;
