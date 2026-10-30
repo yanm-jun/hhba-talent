@@ -63,7 +63,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -511,6 +511,69 @@ jobs:
           test -s apps/web/dist/images/autumn-ai-scenes/cn-autumn-002-02.avif
           grep -q "DOMESTIC_REBUILD_V2" apps/web/src/services/liveRecruitment.ts
           echo HHBA_V2_LEGACY_SNAPSHOT_COMPATIBILITY_RETAINED_MARKET_V2_ISOLATED
+      # Build Guangzhou Guangzhilv on the reviewed employer V2 branch,
+      # publish to a subpath. The existing HHBA public homepage stays unchanged.
+      - name: Checkout isolated Guangzhilv V2 content
+        uses: actions/checkout@v4
+        with:
+          ref: feat/employer-v2-gzl-027-20261030
+          path: _hhba_gzl_source
+          persist-credentials: false
+      - name: Install editor-approved image decoder for local static media
+        run: python -m pip install --quiet Pillow
+      - name: Download source-backed local Guangzhilv logo and two photos
+        run: python _hhba_gzl_source/apps/web/scripts/prepare-guangzhilv-media.py
+      - name: Verify Guangzhilv profile, eight roles and isolated media assets
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('_hhba_gzl_source/apps/web')
+          p=json.loads((root/'src/data/employerProfiles/cn-autumn-027.json').read_text())
+          assert p['id']=='cn-autumn-027' and p['name']=='广之旅'
+          assert len(p['jobs'])==8 and len({j['id'] for j in p['jobs']})==8
+          assert all(j['currentOpenVerified'] is False for j in p['jobs'])
+          for image in [p['media']['logo'], *[x['path'] for x in p['media']['photos']]]:
+              assert (root/'public'/image).stat().st_size>1000,image
+          print('HHBA_GZL_V2_PROFILE_JOB_MEDIA_CONTRACT_OK')
+          PY
+      - name: Install dedicated V2 dependencies
+        working-directory: _hhba_gzl_source/apps/web
+        run: npm ci
+      - name: Verify V2 whole-market search and major-chip integration
+        working-directory: _hhba_gzl_source/apps/web
+        run: |
+          node scripts/domestic-rebuild-v2.contract.test.mjs
+          node scripts/all-company-major-chips.contract.test.mjs
+          node scripts/major-company-job-flow.contract.test.mjs
+      - name: Build isolated Guangzhilv V2 preview inside the existing GitHub Pages site
+        working-directory: _hhba_gzl_source/apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/preview-gzl/'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_HHBA_RECRUITMENT_RESPONSIBILITY_API_ENABLED: '0'
+          VITE_HHBA_EVIDENCE_API_ENABLED: '0'
+          VITE_HHBA_EMPLOYEE_FEEDBACK_API_ENABLED: '0'
+          VITE_HHBA_SCORING_API_ENABLED: '0'
+          VITE_HHBA_APPEALS_API_ENABLED: '0'
+          VITE_HHBA_IMPROVEMENTS_API_ENABLED: '0'
+          VITE_HHBA_PUBLICATION_API_ENABLED: '0'
+          VITE_HHBA_AID_COMMERCIAL_API_ENABLED: '0'
+        run: npm run build
+      - name: Package Guangzhilv deep link under /preview-gzl/ without replacing main HHBA
+        run: |
+          mkdir -p apps/web/dist/preview-gzl/companies/autumn/cn-autumn-027
+          cp -a _hhba_gzl_source/apps/web/dist/. apps/web/dist/preview-gzl/
+          cp _hhba_gzl_source/apps/web/dist/index.html apps/web/dist/preview-gzl/companies/autumn/cn-autumn-027/index.html
+          test -s apps/web/dist/preview-gzl/index.html
+          test -s apps/web/dist/preview-gzl/images/employer-profiles/cn-autumn-027/logo.png
+          test -s apps/web/dist/preview-gzl/images/employer-profiles/cn-autumn-027/photo1.jpg
+          test -s apps/web/dist/preview-gzl/images/employer-profiles/cn-autumn-027/photo2.jpg
+          printf 'HHBA GZL V2 isolated preview: cn-autumn-027\n' > apps/web/dist/preview-gzl/BUILD-INFO.txt
+          echo HHBA_V2_GUANGZHILV_STATIC_DEEP_LINK_PACKAGED
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
         with:
