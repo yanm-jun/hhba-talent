@@ -1,0 +1,175 @@
+name: HHBA Anker 12 isolated Pages review
+on:
+  push:
+    branches: [feat/anker-12-static-v2-20261030]
+    paths:
+      - '.github/workflows/hhba-anker-isolated-pages-preview.yml'
+      - 'apps/web/scripts/anker-preview.browser.mjs'
+      - 'apps/web/src/services/liveRecruitment.ts'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: hhba-anker-isolated-pages-preview
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/anker-12-static-v2-20261030
+      - name: Retrieve the verified existing public Pages artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 40930944761
+          github-token: ${{ github.token }}
+          path: previous-pages-artifact
+      - name: Unpack and verify byte-for-byte existing homepage before publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive=$(find previous-pages-artifact -maxdepth 2 -type f -name 'artifact.tar*' -print -quit)
+          test -n "$archive"
+          mkdir -p unchanged-site
+          if [[ "$archive" == *.gz ]]; then tar -xzf "$archive" -C unchanged-site; else tar -xf "$archive" -C unchanged-site; fi
+          test -s unchanged-site/index.html
+          test -s unchanged-site/404.html
+          test -s unchanged-site/curated/v1/jobs.json
+          curl -fsSL --retry 3 --connect-timeout 10 --max-time 50 https://yanm-jun.github.io/hhba-talent/ -o /tmp/hhba-live-index-before.html
+          cmp -s unchanged-site/index.html /tmp/hhba-live-index-before.html || { echo 'Pages homepage has changed; refuse to overwrite'; exit 1; }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify Anker original media, jobs and other reviewed companies
+        working-directory: apps/web
+        run: |
+          node scripts/anker-2027.contract.test.mjs
+          node scripts/domestic-rebuild-v2.contract.test.mjs
+          node scripts/major-company-job-flow.contract.test.mjs
+          node scripts/all-company-major-chips.contract.test.mjs
+      - name: Build nested, read-only preview using the shared site source
+        working-directory: apps/web
+        env:
+          HHBA_PAGES_BASE: /hhba-talent/preview-anker/
+          HHBA_GITHUB_PAGES: '1'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_DEMO_ACCOUNT_ENABLED: '0'
+        run: npm run build
+      - name: Verify the nested preview assets and refresh-safe deep links
+        working-directory: apps/web
+        run: |
+          set -euo pipefail
+          test -s dist/index.html
+          test -s dist/images/autumn-real-logos/cn-autumn-008.svg
+          test -s dist/images/anker-user/anker-brand-vision.png
+          test -s dist/images/anker-user/anker-building.png
+          test -s dist/curated/v1/jobs.json
+          grep -q '/hhba-talent/preview-anker/assets/' dist/index.html
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const data=JSON.parse(fs.readFileSync('src/data/domesticAnker2027OfficialRoles20261030.json','utf8'));
+          if(data.jobs.length!==24||data.jobs.filter(x=>x.individualPermalinkVerified).length!==2)throw Error('ANKER_ROLE_EVIDENCE_CHANGED');
+          const routes=['companies/autumn/cn-autumn-008','candidate/jobs'];
+          for(const job of data.jobs)routes.push('candidate/jobs/cn-v2-anker-'+job.id);
+          for(const route of routes){
+            const dest='dist/'+route;fs.mkdirSync(dest,{recursive:true});
+            fs.copyFileSync('dist/index.html',dest+'/index.html');
+          }
+          fs.copyFileSync('dist/index.html','dist/404.html');
+          fs.writeFileSync('dist/.nojekyll','');
+          console.log('HHBA_ANKER_DEEP_LINKS_READY',routes.length);
+          NODE
+      - name: Install isolated Chromium browser test dependencies
+        working-directory: apps/web
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Test full Anker page, shared search and mobile navigation
+        working-directory: apps/web
+        env:
+          HHBA_PAGES_BASE: /hhba-talent/preview-anker/
+          HHBA_TEST_BASE: http://127.0.0.1:4173/hhba-talent/preview-anker/
+        run: |
+          set -euo pipefail
+          npx vite preview --host 127.0.0.1 --port 4173 >/tmp/anker-preview-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" || true' EXIT
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -fsS http://127.0.0.1:4173/hhba-talent/preview-anker/ >/dev/null; then break; fi
+            sleep 2
+          done
+          node scripts/anker-preview.browser.mjs
+      - name: Recheck live site and merge only into /preview-anker/
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL --retry 3 --connect-timeout 10 --max-time 50 https://yanm-jun.github.io/hhba-talent/ -o /tmp/hhba-live-index-now.html
+          cmp -s unchanged-site/index.html /tmp/hhba-live-index-now.html || { echo 'Pages root changed during build; refuse to deploy'; exit 1; }
+          mkdir -p published/preview-anker
+          cp -a unchanged-site/. published/
+          cp -a apps/web/dist/. published/preview-anker/
+          cmp -s unchanged-site/index.html published/index.html
+          cmp -s unchanged-site/404.html published/404.html
+          cmp -s unchanged-site/curated/v1/jobs.json published/curated/v1/jobs.json
+          test -s published/preview-anker/index.html
+          ! grep -R -E 'BEGIN (RSA|OPENSSH) PRIVATE KEY' published/preview-anker
+          echo HHBA_ANKER_EXISTING_PAGES_PRESERVED
+      - name: Save screenshots and browser test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-anker-browser-review
+          path: apps/web/anker-preview-evidence/
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Package preserved root and one new preview folder
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: published
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: hhba-company200-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish review-only preview
+        uses: actions/deploy-pages@v4
+        id: deployment
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify public Anker URL and preserved root
+        run: |
+          set -euo pipefail
+          root=https://yanm-jun.github.io/hhba-talent
+          for attempt in 1 2 3 4 5 6 7 8; do
+            if curl -fsSL --max-time 30 "$root/preview-anker/" -o /tmp/anker-html && curl -fsSL --max-time 30 "$root/preview-anker/images/autumn-real-logos/cn-autumn-008.svg" -o /tmp/anker-logo; then break; fi
+            if [ "$attempt" = 8 ]; then exit 1; fi
+            sleep 10
+          done
+          grep -q '/hhba-talent/preview-anker/assets/' /tmp/anker-html
+          grep -q 'Anker Innovations' /tmp/anker-logo
+          curl -fsSL "$root/" -o /tmp/old-root
+          grep -q '/hhba-talent/assets/' /tmp/old-root
+          echo HHBA_ANKER_ISOLATED_PUBLIC_PREVIEW_VERIFIED
