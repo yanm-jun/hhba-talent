@@ -66,7 +66,7 @@ function Card({record}:{record:TalentPolicyRecord}){
    <div className="jpp-source"><span>{policyTime(record)}</span><span>·</span><span>来源可查</span></div>
    <div className="jpp-links">
     <a href={record.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={'查看'+title+'来源原文'}>政府原文 <ArrowUpRight size={13}/></a>
-    <Link to={'/talent-service/policy/'+encodeURIComponent(record.id)}>查看详情 <ArrowRight size={14}/></Link>
+    <Link to={record.id==='sd-jinan-2026-talent-living'?'/talent-service/policy-guide-preview/jinan':'/talent-service/policy/'+encodeURIComponent(record.id)}>查看详情 <ArrowRight size={14}/></Link>
    </div>
   </div>
  </article>;

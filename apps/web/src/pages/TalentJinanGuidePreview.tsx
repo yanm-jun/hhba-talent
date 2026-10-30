@@ -1,5 +1,5 @@
 import {useMemo,useState} from 'react';
-import {ArrowLeft,ArrowRight,ArrowUpRight,BookOpen,CheckCircle2,ChevronDown,ClipboardCheck,Clock3,ExternalLink,FileCheck2,FileText,HelpCircle,Info,Landmark,MapPin,Phone,ShieldCheck,Wallet,AlertTriangle} from 'lucide-react';
+import {ArrowLeft,ArrowRight,ArrowUpRight,CheckCircle2,ChevronDown,ClipboardCheck,ExternalLink,FileCheck2,FileText,HelpCircle,Info,Landmark,MapPin,Phone,ShieldCheck,Wallet,AlertTriangle} from 'lucide-react';
 import {Link} from '../router';
 import '../styles/talent-jinan-guide-preview.css';
 
