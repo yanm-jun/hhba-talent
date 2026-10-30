@@ -75,3 +75,5 @@
 @media(max-width:1060px){.hhba-uni-filter-bar{grid-template-columns:repeat(4,minmax(100px,1fr))}.hhba-uni-filter-label{grid-column:1/-1}.hhba-uni-clear{grid-column:1/-1;justify-self:start}}
 @media(max-width:700px){.hhba-uni-directory .hhba-study-section-head{align-items:flex-start;flex-direction:column}.hhba-uni-filter-bar{grid-template-columns:repeat(2,minmax(0,1fr))}.hhba-uni-filter-label,.hhba-uni-clear{grid-column:1/-1}.hhba-uni-grid,.hhba-uni-program-layout{grid-template-columns:1fr}.hhba-uni-program-source{position:static}}
 @media(max-width:420px){.hhba-uni-school-card{padding:15px}.hhba-uni-detail-hero{padding:20px}.hhba-uni-degree-row{flex-direction:column;align-items:stretch}.hhba-uni-degree-row>a{justify-content:flex-end}.hhba-uni-detail-actions .hhba-study-btn{width:100%}}
+
+.hhba-uni-visa-source{display:inline-flex;align-items:center;gap:6px;color:#257a50;font-size:11px;font-weight:750;margin-top:10px}

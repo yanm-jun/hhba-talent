@@ -664,6 +664,7 @@ jobs:
           done
           curl -fsS "$HHBA_TEST_BASE" >/dev/null
           node scripts/mainline-v2-browser.mjs
+          node scripts/study-universities.browser.mjs
       - name: Save screenshots and the real search/browser verification results
         if: always()
         uses: actions/upload-artifact@v4
