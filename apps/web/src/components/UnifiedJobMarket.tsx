@@ -215,6 +215,10 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
 
   // The default unfiltered market already displays the prominent company-discovery CTA.
   // Keep this secondary link only when filters hide that CTA, never twice on one screen.
+  // An employer match is independent from current job availability.
+  // Reuse this input for both, including curated-only job modes.
+  const companyQueryActive=Boolean(draft.trim()||selectedMajor);
+  const showCompanyDirectoryMatches=companyQueryActive||(!curatedHundred&&!rebuilding);
   const showInlineDiscoveryEntry=!curatedHundred&&!draft.trim()&&!selectedMajor&&filters.country!=='global'&&
     (!filters.location_country||/^(cn|chn|china|中国|中国大陆)$/i.test(filters.location_country));
   const controls=<div className="unified-job-controls">
@@ -307,7 +311,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       major={majorById(selectedMajor)?.name||''}
       scope={filters.country} country={filters.location_country||''}
       city={cityOptions.find(c=>c.value===filters.city)?.zh||''}/>}
-    {!curatedHundred&&(!rebuilding||draft.trim())&&<DomesticCompanyResults query={draft} majorSlug={selectedMajor}
+    {showCompanyDirectoryMatches&&<DomesticCompanyResults query={draft} majorSlug={selectedMajor}
       scope={filters.country} country={filters.location_country||''}
       city={cityOptions.find(c=>c.value===filters.city)?.zh||''}/>}
     {intentLabels.length>0&&<div className="unified-search-interpreted">
@@ -336,7 +340,10 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       :(featuredPending?'Verifying six highlighted official jobs…':'Loading jobs…')}</p>:
       error?<div className="unified-job-state" role="alert">{lang==='zh'?error:'Jobs temporarily unavailable. Please retry.'}<button type="button" onClick={()=>setRetry(x=>x+1)}><RefreshCcw size={15}/> {lang==='zh'?'重试':'Retry'}</button></div>:
       shown.length?<div className="unified-job-grid">{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated}/>)}</div>:
-        <div className="unified-job-state">{domesticOnly?(lang==='zh'?'当前没有符合条件的历史岗位。':'No matching archived jobs.'):lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
+        <div className="unified-job-state">{companyQueryActive
+          ?(lang==='zh'?'当前没有符合筛选条件的岗位记录。上方企业资料搜索独立展示匹配结果；找到企业不代表正在招聘。':'No matching job records. Company profiles are shown separately above; a company match does not mean jobs are open.')
+          :domesticOnly?(lang==='zh'?'当前没有符合条件的历史岗位。':'No matching archived jobs.')
+          :lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
     {!curatedHundred&&!domesticOnly&&!loading&&defaultView&&featuredError&&
       <div className="unified-featured-fallback" role="status">
         <span>{lang==='zh'?'六个精选岗位未能及时完成最新核验，当前显示其他近期核验的真实职位。':
