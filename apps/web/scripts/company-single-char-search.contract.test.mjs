@@ -21,5 +21,7 @@ assert(ai.includes("setLocalResults(value.trim()?keywordSearch(value):null)"),'T
 assert(ai.includes("if(value.length<5){setLocalResults(keywordSearch(value))"),'Short names should never be blocked by AI consent/character limits');
 assert(market.includes("{!curatedHundred&&(!rebuilding||draft.trim())&&<DomesticCompanyResults"),'Unified job market must display enterprise matches during V2 rebuilding');
 assert(result.includes("return searchDomesticCompanies(eligible,word,36)"));
+const live=read('services/liveRecruitment.ts');
+assert(live.includes('allowed.sort((a,b)=>nameScore(b)-nameScore(a))'),'Name-hit roles must rank before summary hits and pagination');
 assert(market.includes('MajorEmployerRecommendations filters='),'Preserve old major-matching');
 console.log('HHBA_SINGLE_HAN_COMPANY_SEARCH_CONTRACT_OK',roster.entries.length);
