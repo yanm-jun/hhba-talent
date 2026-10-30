@@ -5,7 +5,7 @@ import {HEZE_HOUSING_RESEARCH_LEADS} from './hezeHousingLeads.ts';
  * Media reproductions may be valuable leads, but do not establish current inventory.
  */
 export type TalentHousingResearchLead={
- id:string;city:string;district:string;title:string;category:'人才公寓'|'保障性租赁住房';
+ id:string;city:string;district:string;title:string;category:'人才公寓'|'保障性租赁住房'|'公共租赁住房';
  address:string;units:string;rent:string;eligibility:string;published:string;
  sourceUrl:string;sourceName:string;statusNote:string;steps:string[];reviewedAt:string;
 };
