@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {searchEmployersByIndividualRoles,isMajorSearch,matchesJobMajor} from '../src/services/employerJobSearch.mjs';
-const ids=Array.from({length:16},(_,i)=>'cn-autumn-'+String(i+12).padStart(3,'0'));
+const ids=Array.from({length:17},(_,i)=>'cn-autumn-'+String(i+12).padStart(3,'0'));
 const employers=ids.map(id=>JSON.parse(readFileSync('src/data/employerProfiles/'+id+'.json','utf8')));
 const majors=JSON.parse(readFileSync('src/data/officialAcademicMajors.json','utf8')).records.map(r=>r.name);
 const search=(q,selectedMajor='')=>searchEmployersByIndividualRoles(employers,q,{selectedMajor,knownMajors:majors});
@@ -45,6 +45,15 @@ for(const [q,name,total] of [
  assert(p&&p.jobs.length===total&&p.matchedBy==='company',
   'Company-name search regression: '+q);
 }
+const roadBridge=search('中建路桥').find(x=>x.profile.id==='cn-autumn-028');
+assert(roadBridge&&roadBridge.jobs.length===12&&roadBridge.matchedBy==='company',
+ 'Zhongjian Road & Bridge company search must show twelve sourced role directions');
+const selectedRoad=search('中建路桥','机械').find(x=>x.profile.id==='cn-autumn-028');
+const majorRoad=search('机械').find(x=>x.profile.id==='cn-autumn-028');
+assert(selectedRoad&&majorRoad&&selectedRoad.jobs.length===1&&majorRoad.jobs.length===1,
+ 'Road & Bridge mechanical search should show ONLY its mechanical-equipment position');
+assert.equal(majorRoad.jobs[0].id,'mechanical-equipment');
+assert(!majorRoad.jobs.some(j=>/财务|法务|行政|施工技术/.test(j.title)));
 const it=search('IT').find(x=>x.profile.id===envis.id);
 assert(it&&it.jobs.length>0&&it.jobs.length<envis.jobs.length,
  'Role-title search should also show only matching individual roles');
