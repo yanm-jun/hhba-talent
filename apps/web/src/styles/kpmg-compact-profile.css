@@ -16,11 +16,14 @@
 .hhba-kpmg-quick-link{background:#2c7150;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:11px 14px;border-radius:8px;font-size:12px;font-weight:750;white-space:nowrap}
 .hhba-kpmg-quick-link:hover{background:#255e43}
 .hhba-kpmg-photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.hhba-kpmg-photo-grid figure{margin:0;border:1px solid #e5ebe6;border-radius:10px;overflow:hidden;background:#f3f6f4;min-width:0}
+.hhba-kpmg-photo-grid figure{margin:0;border:1px solid #e5ebe6;border-radius:10px;overflow:hidden;background:#f3f6f4;min-width:0;display:flex;flex-direction:column}
 .hhba-kpmg-photo-grid img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;pointer-events:none}
 .hhba-kpmg-photo-grid figure:nth-child(2) img{object-position:40% 50%}
-.hhba-kpmg-photo-grid figcaption{display:flex;justify-content:space-between;align-items:center;gap:9px;padding:10px 13px;color:#526b59;font-size:12px}
-.hhba-kpmg-photo-grid figcaption small{background:#f2f6f2;border-radius:5px;padding:3px 6px;font-size:10px;color:#7c9280;white-space:nowrap}
+/* Every employer uses the same 2-photo caption layout. A long source note must
+   never compress its title to one Chinese character or overflow the image card. */
+.hhba-kpmg-photo-grid figcaption{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:6px;padding:11px 13px;color:#526b59;font-size:12px;line-height:1.6;min-width:0;max-width:100%;white-space:normal;writing-mode:horizontal-tb}
+.hhba-kpmg-photo-grid figcaption span{display:block;width:100%;min-width:0;max-width:100%;font-size:12px;line-height:1.5;font-weight:650;white-space:normal;overflow-wrap:anywhere;writing-mode:horizontal-tb}
+.hhba-kpmg-photo-grid figcaption small{display:block;width:100%;min-width:0;max-width:100%;background:#f2f6f2;border-radius:5px;padding:6px 8px;font-size:11px;line-height:1.7;color:#6b8272;white-space:normal;overflow-wrap:anywhere;writing-mode:horizontal-tb}
 .hhba-kpmg-section{border-top:1px solid #e4eae5;padding:27px 0 25px}
 .hhba-kpmg-section-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:17px}
 .hhba-kpmg-section-heading h2{font-size:21px;line-height:1.4;margin:0 0 7px;letter-spacing:-.4px}
