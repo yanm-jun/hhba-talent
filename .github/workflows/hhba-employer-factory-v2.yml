@@ -1,7 +1,7 @@
 name: HHBA Employer Factory V2
 on:
   push:
-    branches: ['feat/employer-factory-v2-*', 'feat/employer-v2-*']
+    branches: ['feat/employer-factory-v2-*', 'feat/employer-v2-*', 'fix/search-*']
     paths:
       - '.github/workflows/hhba-employer-factory-v2.yml'
       - 'apps/web/src/data/employerProfiles/**'
@@ -227,3 +227,28 @@ jobs:
           curl -fsSL https://yanm-jun.github.io/hhba-talent/ -o /tmp/hhba-root
           grep -Fq '/hhba-talent/assets/' /tmp/hhba-root
           echo HHBA_FACTORY_V2_PUBLIC_PREVIEW_PASS
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Confirm REAL published pages show the searched enterprise and jobs
+        working-directory: apps/web
+        env:
+          HHBA_EMPLOYER_ID: ${{ needs.validate-and-build.outputs.employer_id }}
+          HHBA_PUBLIC_SEARCH: '青岛'
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          node scripts/factory-v2-public-search.mjs
+      - name: Save live website screenshots and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-v2-published-search-proof
+          path: apps/web/factory-v2-live-search-proof/
+          if-no-files-found: ignore
+          retention-days: 14
