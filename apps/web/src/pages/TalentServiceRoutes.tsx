@@ -20,6 +20,7 @@ import {ziboLivingGuide,ziboPurchaseGuide,ziboZichuanHousingGuide} from '../data
 import {yantaiLivingGuide,yantaiHomeGuide} from '../data/talentYantaiGuide';
 import {linyiLivingGuide} from '../data/talentLinyiGuide';
 import {dongyingTransitionGuide} from '../data/talentDongyingGuide';
+import {jiningYouthGuide,jiningRentGuide} from '../data/talentJiningGuides';
 import {UnifiedTalentRecordDetail} from '../components/talent/UnifiedTalentRecordDetail';
 import {UnifiedTalentHousingResearch,housingResearchLeads} from '../components/talent/UnifiedTalentHousingResearch';
 import {UnifiedPolicyList,buildCityPolicyConfig} from '../components/talent/UnifiedPolicyList';
@@ -226,6 +227,7 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  else if(kind==='list'&&fragments[2]==='policies')body=city==='济南'?<TalentJinanPolicyPreview/>:city==='青岛'?<TalentQingdaoPolicyPreview/>:<UnifiedPolicyList config={buildCityPolicyConfig(city)}/>;
  else if(kind==='list'&&['policies','benefits','housing','guide'].includes(fragments[2]))body=<ListPage city={city} kind={fragments[2] as TalentListKind}/>;
  else if(kind==='search')body=<ListPage key={route} city={decode(fragments[2]||'杭州')||'杭州'} kind="search" query={decode(fragments.slice(3).join('/'))}/>;
+ else if(kind==='policy-guide-preview'&&fragments[2]==='jining')body=<UnifiedPolicyGuide data={fragments[3]==='rent'?jiningRentGuide:jiningYouthGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='dongying'&&fragments[3]==='transition')body=<UnifiedPolicyGuide data={dongyingTransitionGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='linyi'&&fragments[3]==='living')body=<UnifiedPolicyGuide data={linyiLivingGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='taian')body=<UnifiedPolicyGuide data={fragments[3]==='purchase'?taianPurchaseGuide:fragments[3]==='housing'?taianHousingGuide:taianLivingGuide}/>;
