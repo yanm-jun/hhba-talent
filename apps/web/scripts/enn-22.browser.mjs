@@ -21,6 +21,33 @@ try{
    if(!el.naturalWidth)throw Error('Company picture failed: '+el.src);
   });
   assert.equal(await root.locator('.hhba-kpmg-photo-grid a').count(),0,'photos must not link third parties');
+  // Regression: the photo title must read horizontally and its source note must wrap
+  // within the card. Previous flex row + nowrap produced one-character-wide titles.
+  for(const caption of await root.locator('.hhba-kmpg-photo-grid figure figcaption, .hhba-kpmg-photo-grid figure figcaption').all()){
+   const actual=await caption.evaluate(el=>{
+    const title=el.querySelector('span'),note=el.querySelector('small');
+    const outer=el.getBoundingClientRect();
+    const titleRect=title?.getBoundingClientRect();
+    const noteRect=note?.getBoundingClientRect();
+    const style=getComputedStyle(el);
+    const sourceStyle=note?getComputedStyle(note):null;
+    return {
+     outerWidth:outer.width,titleWidth:titleRect?.width||0,noteWidth:noteRect?.width||0,
+     outerOverflow:el.scrollWidth>el.clientWidth+2,
+     noteOverflow:!!note&&note.scrollWidth>note.clientWidth+2,
+     direction:style.flexDirection,sourceWrap:sourceStyle?.whiteSpace,
+     writing:style.writingMode,visible:outer.height>0
+    };
+   });
+   assert(actual.visible&&actual.outerWidth>210,'Photo caption is too narrow or hidden');
+   assert.equal(actual.direction,'column','Caption must stack title and source vertically');
+   assert.equal(actual.writing,'horizontal-tb','Caption writing direction must be horizontal');
+   assert.equal(actual.sourceWrap,'normal','Source note must be allowed to wrap');
+   assert(actual.titleWidth>actual.outerWidth*.70,'Title is still squeezed into a vertical strip');
+   assert(actual.noteWidth>actual.outerWidth*.70,'Source note still overflows horizontally');
+   assert(!actual.outerOverflow&&!actual.noteOverflow,'Photo caption text overflows its card');
+  }
+
   const jobs=root.locator('.hhba-major-linked-jobs .hhba-kpmg-role');
   assert.equal(await jobs.count(),15,'should display 15 sourced professional directions');
   for(const major of ['计算机科学与技术','市场营销']){
