@@ -160,18 +160,25 @@ export function getDomesticCompanies():DomesticCompany[]{
   // Keep existing legal identities, but route an exact-name match to the reviewed
   // autumn page; never fabricate a recruitment portal or job.
   const knownNames=createCompanyIndex(map);
+  const reviewedAliases:Record<string,string[]>={
+    '新鸿基地产':['SHKP','Sun Hung Kai Properties','新鴻基地產'],
+    '安克创新':['Anker','Anker Innovations'],
+    '徕芬科技':['徕芬','Laifen']
+  };
   for(const row of autumnCompanies.entries){
     const key=normalize(row.name);
     const existing=knownNames.get(key);
     if(existing){
       if(normalize(existing.name)===key)existing.route='/companies/autumn/'+row.id;
+      if(reviewedAliases[row.name])
+        existing.aliases=[...new Set([...(existing.aliases||[]),...reviewedAliases[row.name]])];
       continue;
     }
     const item:DomesticCompany={
       id:row.id,name:row.name,
       industry:'国内企业档案',overview:'已登记国内企业名称，业务、招聘信息以逐家核验资料为准。',
       sourceUrl:row.evidenceUrl||'',lastReviewed:autumnCompanies.checkedOn,
-      tags:[],route:'/companies/autumn/'+row.id,
+      tags:[],aliases:reviewedAliases[row.name]||[],route:'/companies/autumn/'+row.id,
       status:'official_entry_only',entityKind:'company'
     };
     map.push(item);knownNames.set(key,item);
