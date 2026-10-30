@@ -24,7 +24,7 @@ import {dongyingTransitionGuide} from '../data/talentDongyingGuide';
 import {jiningYouthGuide,jiningRentGuide} from '../data/talentJiningGuides';
 import {binzhouPurchaseGuide,binzhouLivingGuide,binzhouHousingGuide} from '../data/binzhouGuides';
 import {UnifiedTalentRecordDetail} from '../components/talent/UnifiedTalentRecordDetail';
-import {UnifiedTalentHousingResearch,housingResearchLeads} from '../components/talent/UnifiedTalentHousingResearch';
+import {UnifiedTalentHousingResearch,housingResearchLeads,housingPolicyResearch} from '../components/talent/UnifiedTalentHousingResearch';
 import {UnifiedPolicyList,buildCityPolicyConfig} from '../components/talent/UnifiedPolicyList';
 import '../styles/talent-service.css';
 import '../styles/talent-subpages.css';
@@ -112,6 +112,7 @@ function CityHub({city}:{city:string}){
  const homes=TALENT_HOUSING_RECORDS.filter(h=>h.city===match.name);
  const housingPolicies=policies.filter(isHousingPolicy);
  const housingLeads=housingResearchLeads(match.name);
+ const housingHistory=housingPolicyResearch(match.name).length;
  const researchHousing=housingLeads.length;
  const allHousingHistorical=homes.length>0&&homes.every(h=>Boolean(h.applicationEnd&&h.applicationEnd<new Date().toISOString().slice(0,10)));
  const hasSources=policies.length+homes.length>0;
@@ -123,7 +124,7 @@ function CityHub({city}:{city:string}){
    <p>{hasSources?match.intro+'。可查看已收录政策、住房支持及有出处的公寓项目信息；待核验线索不代表可以立即申报。':'该城市入口已开通，人才政策与住房资料正在整理。我们不会生成未经核验的补贴金额、公寓或申请入口。'}</p>
    {allHousingHistorical&&<p>住房资料均为已结束的公开配租批次，不代表当前有空房或可直接申报；请关注住建部门新公告。</p>}
    <div className="ts-sub-counts"><QuickCount count={policies.length} label="已收录政策"/>{housingPolicies.length>0&&<QuickCount count={housingPolicies.length} label="住房支持政策"/>}{homes.length>0&&<QuickCount count={homes.length} label={allHousingHistorical?'住房历史配租资料':'已收录住房资料'}/>}
-    {researchHousing>0&&<QuickCount count={researchHousing} label="人才公寓线索 · 待核验"/>}{!hasSources&&!researchHousing&&<span className="ts-v4-data-pending">官方资料整理中</span>}</div>
+    {housingHistory>0&&<QuickCount count={housingHistory} label="历史住房政策 · 仅参考"/>}{researchHousing>0&&<QuickCount count={researchHousing} label="人才公寓线索 · 待核验"/>}{!hasSources&&!researchHousing&&<span className="ts-v4-data-pending">官方资料整理中</span>}</div>
   </section>
   <section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>你想了解什么？</h2><Link to="/talent-service/cities">更换城市 <ArrowRight size={15}/></Link></div>
    <div className="ts-sub-kinds ts-v4-two-kinds">
@@ -132,6 +133,7 @@ function CityHub({city}:{city:string}){
       <span className="ts-v4-kind-count">{k.id==='policies'?policies.length+' 条已收录':[
        housingPolicies.length>0?housingPolicies.length+' 项住房支持政策':'',
        homes.length>0?homes.length+' 条已收录住房'+(allHousingHistorical?'（历史批次）':''):'',
+       housingHistory>0?housingHistory+' 条历史住房政策（非现行申报）':'',
        researchHousing>0?researchHousing+' 处人才公寓线索（待核验）':''
       ].filter(Boolean).join(' · ')||'住房资料核验中'} <ArrowRight size={15}/></span>
      </Link>)}
@@ -172,6 +174,7 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
  const resultPolicies=TALENT_POLICY_RECORDS.filter(p=>p.city===city&&(!query||matchesPolicy(p,query,city))&&(!housingMode||isHousingPolicy(p))&&(kind!=='benefits'||benefit(p))).sort(recentPolicies);
  const resultHomes=TALENT_HOUSING_RECORDS.filter(p=>p.city===city&&(housingMode||searchMode)&&(!query||matchesHousing(p,query,city))).sort(housingFirst);
  const pendingHousingCount=(housingMode||searchMode)?housingResearchLeads(city,query||'').length:0;
+ const housingHistoricalCount=(housingMode||searchMode)?housingPolicyResearch(city,query||'').length:0;
  const housingPrograms=resultHomes.filter(p=>p.kind==='program');
  const housingProjects=resultHomes.filter(p=>p.kind==='project');
  const housingDistricts=['全部区域',...new Set(housingProjects.map(p=>p.district))];
@@ -188,10 +191,10 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
   <section className="ts-sub-header">
    <span className="ts-section-kicker">{searchMode?'SEARCH RESULTS':'CITY SERVICES'} / {city}</span><h1>{city} · {title}</h1>
    <p>{searchMode?'搜索已收录政策、住房和明确标注的待核验项目；仅政府核实的资料可作为正式申报依据。':'按城市分类查看已收录政策和住房；政府原文、媒体转载、待核验项目会分别标明，不能据此认定正在受理或有空房。'}</p>
-   <div className="ts-sub-counts">{housingMode?<><QuickCount count={housingPolicyCount} label="住房政策与保障通道"/><QuickCount count={shownProjects.length} label="已核实独立项目"/></>:<><QuickCount count={shownPolicies.length} label="政策结果"/>{searchMode&&<QuickCount count={shownHomes.length} label="住房资料"/>}</>}{pendingHousingCount>0&&<QuickCount count={pendingHousingCount} label="待核验公寓线索"/>}</div>
+   <div className="ts-sub-counts">{housingMode?<><QuickCount count={housingPolicyCount} label="住房政策与保障通道"/><QuickCount count={shownProjects.length} label="已核实独立项目"/></>:<><QuickCount count={shownPolicies.length} label="政策结果"/>{searchMode&&<QuickCount count={shownHomes.length} label="住房资料"/>}</>}{pendingHousingCount>0&&<QuickCount count={pendingHousingCount} label="待核验公寓线索"/>}{housingHistoricalCount>0&&<QuickCount count={housingHistoricalCount} label="历史住房政策参考"/>}</div>
   </section>
   <form className="ts-sub-search" onSubmit={e=>{e.preventDefault();doSearch()}}><Search size={18}/><input value={draft} onChange={e=>setDraft(e.target.value)} placeholder={'搜索'+city+'硕士补贴、住房项目…'} aria-label="搜索人才服务"/><button type="submit">搜索 <ArrowRight size={15}/></button></form>
-  {searchMode&&query&&<p className="ts-sub-found">关键词：<strong>{query}</strong> · 实际匹配 {shownPolicies.length+shownHomes.length+pendingHousingCount} 条（含待核验项目线索）</p>}
+  {searchMode&&query&&<p className="ts-sub-found">关键词：<strong>{query}</strong> · 实际匹配 {shownPolicies.length+shownHomes.length+pendingHousingCount+housingHistoricalCount} 条（含待核验项目与历史参考）</p>}
   {resultPolicies.length>0&&<div className="ts-sub-filters">{cats.map(c=><button key={c} type="button" aria-pressed={filter===c} className={filter===c?'active':''} onClick={()=>setFilter(c)}>{c}</button>)}</div>}
   {shownPolicies.length>0&&<section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>{housingMode?'购房与租赁相关补贴政策':'人才政策与福利'}</h2>{searchMode&&<Link to={relatedLink('policies')}>浏览全部政策 <ArrowRight size={15}/></Link>}</div>
    <div className="ts-sub-grid">{shownPolicies.map(p=><PolicyTile data={p} key={p.id}/>)}</div></section>}
