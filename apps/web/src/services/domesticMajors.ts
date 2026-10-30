@@ -1,3 +1,4 @@
+import {majorNamesRelated} from './majorEligibility.mjs';
 import { getDomesticCompanies, type DomesticCompany } from './domesticCompanySearch';
 import higherCatalog from '../data/officialAcademicMajors.json';
 import vocationalCatalog from '../data/officialVocationalMajors.json';
@@ -130,7 +131,7 @@ export function companyMatchesSelectedMajor(company:DomesticCompany,slug:string)
  const major=majorById(slug);if(!major)return false;
  const canonical=canonicalMajorSlug(major);
  if(!canonical)return false; // Avoid inventing matches from a major name alone.
- return matchingMajors(company).some(m=>m.slug===canonical);
+ return matchingMajors(company).some(m=>m.slug===canonical||majorNamesRelated(m.name,major.name));
 }
 const normalized=(x:string)=>x.toLocaleLowerCase().replace(/\s+/g,'');
 const aliases:Record<string,string[]>={
