@@ -17,7 +17,7 @@ base='https://gs.powerchina.cn/'
 article1='https://gs.powerchina.cn/col/col8855/art/2026/art_a3bd5bd98d594c49bb67a4eb7aee70b5.html'
 article2='https://gs.powerchina.cn/col/col8855/art/2026/art_f9b4b94a210d427da7fe06d6dad62b7e.html'
 article3='https://gs.powerchina.cn/col/col8855/art/2025/art_01d0b0fa242d47b7a5f4a4d8774849db.html'
-pages={'logo.png':[base,'https://www.powerchina.cn/'],'photo1.jpg':[article1,article3], 'photo2.jpg':[article2,article3]}
+pages={'logo.png':[base,'https://www.powerchina.cn/'],'photo1.jpg':[article1,article3], 'photo2.jpg':['https://www.powerchina.cn/zxzx/gsyw/art/2026/art_7dc5e0d1e4c54c69ad343f4c1510ae89.html',article2,article3]}
 # Two actual views of this exact invested Pannan 2x660MW project, not another utility.
 # These original images are published by POWERCHINA and a POWERCHINA EPC entity.
 direct_photos={
@@ -36,9 +36,9 @@ class Images(HTMLParser):
    u=attrs.get(key)
    if u and not u.startswith('data:'): self.data.append((u,attrs))
 cache={}
-def read(url,limit=9_000_000):
+def read(url,limit=9_000_000,timeout=9):
  req=Request(url,headers=headers)
- with urlopen(req,timeout=9) as resp:
+ with urlopen(req,timeout=timeout) as resp:
   data=resp.read(limit+1)
  if not 150<len(data)<=limit:raise ValueError('response size')
  return data
@@ -68,7 +68,7 @@ for name,sources in pages.items():
  chosen=None
  for url,article in direct_photos.get(name,[]):
   try:
-   raw=read(url)
+   raw=read(url,timeout=20 if name=='photo2.jpg' else 9)
    chk=Image.open(BytesIO(raw));chk.verify()
    im=ImageOps.exif_transpose(Image.open(BytesIO(raw))).convert('RGB')
    if im.width<580 or im.height<290:raise ValueError('photo dimensions too small')
