@@ -3,6 +3,7 @@ import {loadPublicJobAudit} from './jobSyncStatus';
 import {searchJobs, type SearchFacet} from './jobSearchFacets.mjs';
 import {loadOfficialSearchFacets} from './officialSearchIndex';
 import {domesticV2Records, domesticV2ById, assertDomesticRebuildIntegrity} from './domesticRebuildJobs';
+import {allowedEmployerProfileJobLink,profileAliasesForJob} from './employerProfiles';
 import {visibleRoleForMajor} from './majorJobMatching';
 export type Language = 'zh' | 'en';
 export type LiveJob = {
@@ -72,7 +73,9 @@ export function safeOfficialJobUrl(job: LiveJob) {
         'tencent-official': 'careers.tencent.com',
         'baidu-official': 'talent.baidu.com'
       };
-      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='boyu-tjcu-source'&&job.source==='boyu-tianjin'){
+      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='hhba-employer-profile'){
+        if(!allowedEmployerProfileJobLink(job.id,job.url))return null;
+      }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='boyu-tjcu-source'&&job.source==='boyu-tianjin'){
         if(u.hostname!=='career.tjcu.edu.cn'||!/^cn-v2-boyu-[a-z0-9-]{5,100}$/.test(job.id)||
         !['/correcruit/content/id/12292.html','/correcruit/content/id/9565.html'].includes(u.pathname)||u.search||u.hash)return null;
       }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='shkp-official-detail'&&job.source==='sun-hung-kai-properties'){
@@ -369,7 +372,7 @@ export function rebuildListFilter(job:LiveJob,f:LiveFilters){
     domestic&&job.company==='深圳术叶创新科技有限公司'?['徕芬','徕芬科技','Laifen']:
     domestic&&job.company==='新鸿基地产'?['SHKP','Sun Hung Kai Properties','新鴻基地產']:
     domestic&&job.company==='万科泊寓'?['泊寓','PORT','PORT APARTMENT']:[];
-  if(![job.company,job.companyZh||'',...ankerAliases].some(x=>x.toLowerCase().includes(v))&&
+  if(![job.company,job.companyZh||'',...ankerAliases,...profileAliasesForJob(job)].some(x=>x.toLowerCase().includes(v))&&
     !(domestic&&'schneider electric'.includes(v)))return false;
  }
  if(f.location_country){
@@ -408,7 +411,7 @@ export function rebuildListFilter(job:LiveJob,f:LiveFilters){
    domestic&&job.company==='深圳术叶创新科技有限公司'?['徕芬','徕芬科技','Laifen']:
    domestic&&job.company==='新鸿基地产'?['SHKP','Sun Hung Kai Properties','新鴻基地產']:
     domestic&&job.company==='万科泊寓'?['泊寓','PORT','PORT APARTMENT']:[];
- const haystack=[job.title,job.titleZh,job.company,job.companyZh,...nameAliases,job.location,job.locationZh,
+ const haystack=[job.title,job.titleZh,job.company,job.companyZh,...nameAliases,...profileAliasesForJob(job),job.location,job.locationZh,
    ...(job.skillSignals||[]),...(job.majorNames||[]),...(job.editorialRelatedMajors||[]),job.responsibilitiesSummary,job.positionOrg].filter(Boolean).join(' ').normalize('NFKC').toLowerCase();
  return words.every(w=>haystack.includes(w));
 }

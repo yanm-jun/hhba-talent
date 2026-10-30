@@ -19,6 +19,7 @@ import laifenJobs from '../data/domesticLaifenSourcedRoles20261030.json';
 import shkpJobs from '../data/domesticShkp2026SourcedRoles20261030.json';
 import boyuJobs from '../data/domesticBoyu2026OfficialSchoolRoles20261030.json';
 import type {LiveJob,LiveFilters,LivePage} from './liveRecruitment';
+import {employerProfiles,employerProfileByRoute,profileAliasesForJob} from './employerProfiles';
 
 export const DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券','辉瑞','中国南方航空','顺丰','网易游戏','鹰角网络','安克创新','徕芬科技','新鸿基地产','万科泊寓'] as const;
 export const DOMESTIC_REBUILD_VERSION='2026-10-29-v2';
@@ -236,7 +237,21 @@ export const boyuV2Records=boyuJobs.jobs.map(job=>({
  responsibilitiesSummary:job.summary,requirementsSummary:job.requirements,
  evidenceUrl:job.url,positionOrg:boyuJobs.employer,employerRoute:'/companies/autumn/cn-autumn-011'
 } satisfies LiveJob & {majorNames:string[];editorialRelatedMajors:string[];evidenceUrl:string;positionOrg:string;employerRoute:string}));
-export const domesticV2Records=[...schneiderV2Records,...kpmgV2Records,...huayuV2Records,...huaanV2Records,...guangfaV2Records,...citicsV2Records,...pfizerV2Records,...csairV2Records,...sftechV2Records,...neteaseV2Records,...hypergryphV2Records,...ankerV2Records,...laifenV2Records,...shkpV2Records,...boyuV2Records];
+const legacyDomesticV2Records=[...schneiderV2Records,...kpmgV2Records,...huayuV2Records,...huaanV2Records,...guangfaV2Records,...citicsV2Records,...pfizerV2Records,...csairV2Records,...sftechV2Records,...neteaseV2Records,...hypergryphV2Records,...ankerV2Records,...laifenV2Records,...shkpV2Records,...boyuV2Records];
+export const profileV2Records=employerProfiles.flatMap(profile=>profile.jobs.map(job=>({
+ id:'cn-v2-profile-'+profile.id+'-'+job.id,
+ company:profile.name,companyZh:profile.name,title:job.title,titleZh:job.title,
+ location:job.city,locationZh:job.city,url:job.url,
+ platform:'hhba-employer-profile',source:profile.id,domestic:true,remote:null,
+ recordKind:'DOMESTIC_REBUILT',recruitmentType:job.recruitmentType,
+ observedAt:job.observedOn,currentApplicationVerified:false,
+ educationLabel:job.educationLabel,experienceLabel:'来源已存档 · 当前投递状态未确认',
+ majorNames:job.majorNames,editorialRelatedMajors:job.editorialRelatedMajors,
+ majorUnrestricted:job.majorUnrestricted,responsibilitiesSummary:job.summary,
+ requirementsSummary:job.requirements,positionOrg:job.recruitmentSubject,
+ evidenceUrl:job.evidenceUrl,employerRoute:'/companies/autumn/'+profile.id
+} satisfies LiveJob & {employerRoute:string;positionOrg:string;evidenceUrl:string})));
+export const domesticV2Records=[...legacyDomesticV2Records,...profileV2Records];
 
 export function domesticV2ById(id:string):LiveJob|undefined{
  return domesticV2Records.find(job=>job.id===id);
@@ -245,11 +260,16 @@ export function filterDomesticRebuildJobs(jobs:LiveJob[],f:LiveFilters):LiveJob[
  const q=f.q.normalize('NFKC').trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
  return jobs.filter(job=>{
   if(f.country==='global')return false;
+  if(f.company){
+   const term=f.company.normalize('NFKC').toLowerCase().trim();
+   const profile=employerProfiles.find(p=>[p.name,p.englishName,...p.aliases].some(x=>x.normalize('NFKC').toLowerCase().includes(term)));
+   if(profile&&job.employerRoute!=='/companies/autumn/'+profile.id)return false;
+  }
   if(f.company&&['万科泊寓','泊寓','port apartment','port'].some(alias=>alias.includes(f.company.trim().toLowerCase())||f.company.trim().toLowerCase().includes(alias))&&job.company!=='万科泊寓')return false;
   if(f.company&&['新鸿基地产','新鴻基地產','shkp','sun hung kai properties'].some(alias=>alias.includes(f.company.trim().toLowerCase())||f.company.trim().toLowerCase().includes(alias))&&job.company!=='新鸿基地产')return false;
   if(f.company&&['徕芬科技','徕芬','laifen'].some(alias=>alias.includes(f.company.trim().toLowerCase())||f.company.trim().toLowerCase().includes(alias))&&job.company!=='深圳术叶创新科技有限公司')return false;
   if(f.company&&['安克创新','anker innovations','anker'].some(alias=>alias.includes(f.company.trim().toLocaleLowerCase())||f.company.trim().toLocaleLowerCase().includes(alias))&&job.company!=='安克创新科技股份有限公司')return false;
-  if(f.company&&!(['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华域视觉','schneider electric','kpmg','hasco vision','华安证券','huaan securities','广发证券','gf securities','中信证券','citic securities','辉瑞','pfizer','中国南方航空','南航','china southern','顺丰','顺丰科技','sf express','sf technology','网易游戏','网易互娱','netease games','netease','鹰角网络','hypergryph','安克创新','anker innovations','anker','徕芬科技','徕芬','laifen','新鸿基地产','新鴻基地產','shkp','sun hung kai properties','万科泊寓','泊寓','port apartment','port'].some(x=>x.toLowerCase().includes(f.company.toLowerCase()))))return false;
+  if(f.company&&!(['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华域视觉','schneider electric','kpmg','hasco vision','华安证券','huaan securities','广发证券','gf securities','中信证券','citic securities','辉瑞','pfizer','中国南方航空','南航','china southern','顺丰','顺丰科技','sf express','sf technology','网易游戏','网易互娱','netease games','netease','鹰角网络','hypergryph','安克创新','anker innovations','anker','徕芬科技','徕芬','laifen','新鸿基地产','新鴻基地產','shkp','sun hung kai properties','万科泊寓','泊寓','port apartment','port'].some(x=>x.toLowerCase().includes(f.company.toLowerCase()))||employerProfiles.some(p=>[p.name,p.englishName,...p.aliases].some(x=>x.toLowerCase().includes(f.company.toLowerCase())))))return false;
   if(f.location_country&&f.location_country.toUpperCase()!=='CN')return false;
   if(f.city&&!job.locationZh?.includes(f.city)&&!(f.city==='shanghai'&&job.locationZh==='上海')&&!(f.city==='beijing'&&job.locationZh==='北京')&&!(f.city==='guangzhou'&&job.locationZh==='广州'))return false;
   if(f.remote)return false;
@@ -259,17 +279,17 @@ export function filterDomesticRebuildJobs(jobs:LiveJob[],f:LiveFilters):LiveJob[
   }
   if(f.education&&!['UNRESTRICTED_OR_UNREPORTED'].includes(f.education))return false;
   if(f.experience&&f.experience!=='unreported')return false;
-  const text=[job.company,job.companyZh,job.platform==='anker-2027-campus-official'?'Anker Innovations Anker 安克创新':'',job.platform==='laifen-sourced-archived'?'Laifen 徕芬科技 徕芬':'' ,job.platform==='shkp-official-detail'?'Sun Hung Kai Properties SHKP 新鸿基地产 新鴻基地產':'' ,job.platform==='boyu-tjcu-source'?'Port Apartment PORT 泊寓 万科泊寓':'' ,job.titleZh,job.locationZh,job.responsibilitiesSummary,job.requirementsSummary,
+  const text=[job.company,job.companyZh,...profileAliasesForJob(job),job.platform==='anker-2027-campus-official'?'Anker Innovations Anker 安克创新':'',job.platform==='laifen-sourced-archived'?'Laifen 徕芬科技 徕芬':'' ,job.platform==='shkp-official-detail'?'Sun Hung Kai Properties SHKP 新鸿基地产 新鴻基地產':'' ,job.platform==='boyu-tjcu-source'?'Port Apartment PORT 泊寓 万科泊寓':'' ,job.titleZh,job.locationZh,job.responsibilitiesSummary,job.requirementsSummary,
    ...(job.majorNames||[]),...(job.editorialRelatedMajors||[])].join(' ').normalize('NFKC').toLocaleLowerCase();
   return q.every(term=>text.includes(term));
  });
 }
 export function assertDomesticRebuildIntegrity(){
- if(schneiderV2Records.length!==12||kpmgV2Records.length!==6||huayuV2Records.length!==16||huaanV2Records.length!==10||guangfaV2Records.length!==10||citicsV2Records.length!==5||pfizerV2Records.length!==4||csairV2Records.length!==6||sftechV2Records.length!==17||neteaseV2Records.length!==14||hypergryphV2Records.length!==20||ankerV2Records.length!==24||laifenV2Records.length!==6||shkpV2Records.length!==8||boyuV2Records.length!==2||domesticV2Records.length!==160)
+ if(schneiderV2Records.length!==12||kpmgV2Records.length!==6||huayuV2Records.length!==16||huaanV2Records.length!==10||guangfaV2Records.length!==10||citicsV2Records.length!==5||pfizerV2Records.length!==4||csairV2Records.length!==6||sftechV2Records.length!==17||neteaseV2Records.length!==14||hypergryphV2Records.length!==20||ankerV2Records.length!==24||laifenV2Records.length!==6||shkpV2Records.length!==8||boyuV2Records.length!==2||domesticV2Records.length!==160+profileV2Records.length)
   throw Error('REBUILT_COMPANY_JOB_COUNT_CHANGED');
  const ids=new Set<string>(),urls=new Set<string>();
  for(const job of domesticV2Records){
-  if(ids.has(job.id)||(!['huayu-official-campus','huaan-securities-official','guangfa-securities-official','citics-branch-campus-official','csair-official-list','sftech-2027-campus-list','netease-interactive-2027-direction','hypergryph-2027-campus-reported','anker-2027-campus-official','laifen-sourced-archived','shkp-official-detail','boyu-tjcu-source'].includes(job.platform)&&urls.has(job.url))||
+  if(ids.has(job.id)||(!['huayu-official-campus','huaan-securities-official','guangfa-securities-official','citics-branch-campus-official','csair-official-list','sftech-2027-campus-list','netease-interactive-2027-direction','hypergryph-2027-campus-reported','anker-2027-campus-official','laifen-sourced-archived','shkp-official-detail','boyu-tjcu-source','hhba-employer-profile'].includes(job.platform)&&urls.has(job.url))||
     !(job.platform==='schneider-official'&&/^cn-v2-schneider-[0-9]{6}$/.test(job.id)&&
       /^https:\/\/careers\.se\.com\/jobs\/[0-9]{6}\?lang=zh-(?:CN|cn)$/.test(job.url)||
       job.platform==='kpmg-moka-official'&&/^cn-v2-kpmg-[0-9a-f-]{36}$/.test(job.id)&&
@@ -292,6 +312,9 @@ export function assertDomesticRebuildIntegrity(){
       job.url==='https://campus.game.163.com/'||
       job.platform==='hypergryph-2027-campus-reported'&&/^cn-v2-hypergryph-[a-z0-9-]{5,100}$/.test(job.id)&&
       job.url==='https://career.hypergryph.com/'||
+      job.platform==='hhba-employer-profile'&&/^cn-v2-profile-cn-autumn-[0-9]{3}-[a-z0-9-]{3,70}$/.test(job.id)&&
+      employerProfileByRoute.get(job.employerRoute||'')?.jobs.some(row=>
+        job.id==='cn-v2-profile-'+job.source+'-'+row.id&&job.url===row.url)||
       job.platform==='boyu-tjcu-source'&&/^cn-v2-boyu-[a-z0-9-]{5,100}$/.test(job.id)&&
       ['https://career.tjcu.edu.cn/correcruit/content/id/12292.html','https://career.tjcu.edu.cn/correcruit/content/id/9565.html'].includes(job.url)||
       job.platform==='shkp-official-detail'&&/^cn-v2-shkp-[a-z0-9-]{5,100}$/.test(job.id)&&
