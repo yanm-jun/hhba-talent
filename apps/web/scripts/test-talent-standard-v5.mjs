@@ -32,7 +32,7 @@ check('Every base record gets a graded quality state without claiming B is compl
 });
 check('No completion-grade A except dedicated sourced guides and actual complete source',()=>{
  for(const id of ['sd-jinan-2026-talent-living','qd-rent-25','sd-qingdao-2026-free-housing','qd-laoshan-202610'])assert.ok(quality.includes("'"+id+"'"));
- assert.ok(!quality.includes('grade:sourceUrl?\\'A\\''));
+ assert.ok(!quality.includes("grade:sourceUrl?'A'"));
 });
 check('Specific 2026 Laoshan source lists three different deadlines and seven structured steps',()=>{
  assert.ok(laoshan);
