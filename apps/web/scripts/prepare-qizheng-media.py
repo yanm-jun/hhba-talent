@@ -11,7 +11,7 @@ logo=d/'logo.webp'
 assert hashlib.sha256(logo.read_bytes()).hexdigest()=='2e463d79273336e655dab3ba8adb5806e6d3c27bc3392bd837f8c8beb871abb2'
 images=[
  ('photo1.jpg','https://www.qzh.cn/hdupf/img/202206/202206101654825819351225.jpg'),
- ('photo2.jpg','https://www.qzh.cn/hdupf/img/202501/202501221737541200351262.jpg')
+ ('photo2.jpg','https://www.qzh.cn/hdupf/img/202305/202305171684307923165772.jpg')
 ]
 audit={'logo.webp':{'verified':True,'source':'user-provided logo','sha256':hashlib.sha256(logo.read_bytes()).hexdigest()}}
 for filename,url in images:

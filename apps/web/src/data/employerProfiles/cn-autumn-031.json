@@ -18,22 +18,24 @@
   "sources": [
     "https://www.qzh.cn/col_gsjs/index/",
     "https://www.qzh.cn/col_rlzy/index/",
-    "https://www.qzh.cn/hdapp/bas/col_rczp.php"
+    "https://www.qzh.cn/hdapp/bas/col_rczp.php",
+    "https://www.qzh.cn/col_qzfc/202206/4388584D2A3DC0B33216B74911787D9A.htm",
+    "https://www.qzh.cn/col_qxgs/202205/7D66D72B3AD11ACFCCC6534B314F9548.htm"
   ],
   "media": {
     "logo": "images/employer-profiles/cn-autumn-031/logo.webp",
     "photos": [
       {
         "path": "images/employer-profiles/cn-autumn-031/photo1.jpg",
-        "caption": "奇正集团 · 公开企业资料图（一）",
-        "alt": "奇正集团官方资料图片一",
-        "note": "源自奇正集团官网；若原图不可用，展示明确标注的不可用提示图，不冒充企业实景。"
+        "caption": "兰州奇正生态健康品公司 · 厂区实景",
+        "alt": "奇正健康品工厂楼体及企业标识与庭院",
+        "note": "奇正集团官网“奇正风采”收录，集团旗下兰州奇正生态健康品公司厂区，非集团总部。"
       },
       {
         "path": "images/employer-profiles/cn-autumn-031/photo2.jpg",
-        "caption": "奇正集团 · 公开企业资料图（二）",
-        "alt": "奇正集团官方资料图片二",
-        "note": "源自奇正集团官网；若原图不可用，展示明确标注的不可用提示图，不冒充企业实景。"
+        "caption": "西藏奇正藏药股份有限公司 · 园区实景",
+        "alt": "具有藏式建筑特色的西藏奇正藏药股份有限公司办公建筑",
+        "note": "奇正集团官网旗下公司介绍图片，地点为奇正藏药企业园区，非集团总部。"
       }
     ]
   },
@@ -58,7 +60,7 @@
     "食品科学与工程",
     "市场营销"
   ],
-  "photoNote": "Logo由用户提供的原图转换为站内静态WebP；企业照片通过官网来源准备脚本独立获取，来源受限时显示明确不可用提示。不代表企业授权。",
+  "photoNote": "品牌Logo由用户提供并存为本地静态WebP；两张不同的企业实景图片来源于奇正集团官网，构建时各自保存为本地静态照片。所有图片仅展示不设置外链；若图片主机拒绝访问则显示明确标记的不可用提示。图片与商标版权归各权利人所有，HHBA独立整理资料，不代表奇正集团授权合作。",
   "business": [
     {
       "title": "藏药研发与生产",
