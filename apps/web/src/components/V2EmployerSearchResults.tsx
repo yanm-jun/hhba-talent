@@ -1,5 +1,6 @@
 import {useEffect,useMemo,useState} from 'react';
 import {ArrowRight,Building2} from 'lucide-react';
+import {employerProfiles} from '../services/employerProfiles';
 import '../styles/employer-v2-search.css';
 
 type PublishedV2Employer={
@@ -8,18 +9,10 @@ type PublishedV2Employer={
  lastReviewed:string;
 };
 type V2Index={schemaVersion:1;employers:PublishedV2Employer[]};
-let cached:Promise<PublishedV2Employer[]>|null=null;
+// The ONE maintained employer catalog is bundled from the same main branch.
+// Never fetch a separately generated branch index at runtime.
 function approvedV2Employers():Promise<PublishedV2Employer[]>{
- if(!cached)cached=fetch(import.meta.env.BASE_URL+'data/employer-v2-search-index.json',{
-  credentials:'omit',cache:'no-store',headers:{Accept:'application/json'}
- }).then(async res=>{
-  if(!res.ok)throw Error('V2 企业索引尚未发布');
-  const data=await res.json() as V2Index;
-  if(data.schemaVersion!==1||!Array.isArray(data.employers))throw Error('V2 企业索引格式无效');
-  return data.employers.filter(p=>/^cn-autumn-\d{3}$/.test(p.id)&&
-   Array.isArray(p.jobs)&&Array.isArray(p.aliases));
- }).catch(error=>{cached=null;throw error});
- return cached;
+ return Promise.resolve(employerProfiles.filter(p=>p.jobs.length>0));
 }
 const normalized=(text:string)=>text.normalize('NFKC').toLocaleLowerCase().replace(/\s+/g,' ').trim();
 export function V2EmployerSearchResults({query,scope='',country='',major='',onMatchChange}:{
