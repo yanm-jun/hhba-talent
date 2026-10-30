@@ -20,7 +20,7 @@ check('Interactive city categories are wired to client state and accessibility',
  assert.ok(page.includes("useState<Kind>('all')"));
  assert.ok(page.includes('aria-pressed={filter===id}'));
  assert.ok(page.includes('onClick={()=>setFilter(id)}'));
- assert.ok(page.includes('filter===\\'all\\'||summaries[p.id].category===filter'));
+ assert.ok(page.includes("filter==='all'||summaries[p.id].category===filter"));
 });
 check('Housing subsidy shows verified 500/800/1200 and correct policy validity',()=>{
  for(const s of ['500元/月','800元/月','1,200元/月','最长36个月','2027-03-31','青岛户籍','社会保险'])assert.ok(guide.includes(s),s);
