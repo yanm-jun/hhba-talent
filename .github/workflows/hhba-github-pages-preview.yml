@@ -206,6 +206,9 @@ jobs:
       - name: Verify Dezhou V5.1 current policies, historical settlement, housing programs and unverified apartments
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-dezhou-city-v51.mjs
+      - name: Verify Jining V5.1 government policies, true beneficiaries, housing programs, and shared guides
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-jining-city-v51.mjs
       - name: Lock future city template, certify full policy guides and protect 95 historical record IDs
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
