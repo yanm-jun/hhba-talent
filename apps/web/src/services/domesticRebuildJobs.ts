@@ -250,7 +250,12 @@ export function assertDomesticRebuildIntegrity(){
       job.platform==='netease-interactive-2027-direction'&&/^cn-v2-netease-[a-z-]{4,100}$/.test(job.id)&&
       job.url==='https://campus.game.163.com/'||
       job.platform==='hypergryph-2027-campus-reported'&&/^cn-v2-hypergryph-[a-z0-9-]{5,100}$/.test(job.id)&&
-      job.url==='https://career.hypergryph.com/')||
+      job.url==='https://career.hypergryph.com/'||
+      job.platform==='anker-2027-campus-official'&&/^cn-v2-anker-[a-z0-9-]{5,100}$/.test(job.id)&&
+      (job.url.startsWith('https://career.anker.com.cn/universities/recruitment/jobPosts/?direction=')&&
+       ['algorithm','software_embedded','hardware_dev','marketing_brand','channel_customer','finance_investment'].some(d=>job.url==='https://career.anker.com.cn/universities/recruitment/jobPosts/?direction='+d+'&from=campus')||
+       ['https://career.anker.com.cn/jobDetail/?jobId=7671180235925244214&websiteId=6962795203808217351',
+        'https://career.anker.com.cn/larkJobDetail/?jobId=7670845024406849818&websiteId=6962795203808217351'].includes(job.url)))||
     !job.titleZh||!job.locationZh||!job.responsibilitiesSummary)
    throw Error('DOMESTIC_REBUILD_SOURCE_INVALID '+job.id);
   ids.add(job.id);urls.add(job.url);
