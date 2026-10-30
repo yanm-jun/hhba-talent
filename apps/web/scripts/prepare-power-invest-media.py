@@ -64,6 +64,24 @@ def placeholder(name):
  return im
 audit={};hashes=set()
 for name,sources in pages.items():
+ if name=='logo.png':
+  # Manually approved canonical POWERCHINA wordmark, committed to main.
+  # Do NOT scrape the first arbitrary <img> from the company homepage again.
+  dest=root/'logo.png'
+  if not dest.is_file():raise FileNotFoundError('Approved logo must be checked into main: '+str(dest))
+  raw=dest.read_bytes()
+  h=sha256(raw).hexdigest()
+  expected='e37af87dfb32a1a6fa74e59304987ddf7ad08a48de11ba3060ae37a7c5789c31'
+  if h!=expected:raise ValueError('Approved POWERCHINA logo differs from canonical asset: '+h)
+  im=Image.open(BytesIO(raw));im.verify()
+  im=Image.open(BytesIO(raw))
+  if im.size!=(266,76):raise ValueError('Approved wordmark dimensions changed')
+  hashes.add(h)
+  audit[name]={'verified':True,'source':'user-approved POWERCHINA corporate wordmark',
+               'article':None,'sha256':h,'dimensions':[im.width,im.height],
+               'fixedAsset':'apps/web/public/images/employer-profiles/cn-autumn-029/logo.png'}
+  print('POWER_INVEST_APPROVED_LOGO_LOCKED',name,im.size,h)
+  continue
  started=time.monotonic()
  chosen=None
  for url,article in direct_photos.get(name,[]):
