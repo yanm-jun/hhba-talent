@@ -1,0 +1,135 @@
+import {useMemo,useState} from 'react';
+import {ArrowLeft,ArrowRight,ArrowUpRight,CheckCircle2,ChevronDown,ClipboardCheck,ExternalLink,FileCheck2,HelpCircle,Info,Landmark,Phone,ShieldCheck,Wallet,AlertTriangle} from 'lucide-react';
+import {Link} from '../router';
+import '../styles/talent-jinan-guide-preview.css';
+
+type GuideKind='housing'|'stay';
+type Step={title:string;why:string;action:string;done:string;note?:string};
+type Branch={label:string;desc:string;conditions:string[];materials:string[];warning:string};
+type Guide={title:string;kicker:string;desc:string;support:string;unit:string;limit:string;review:string;amounts:string[][];branches:Record<string,Branch>;steps:Step[];checks:string[];faq:[string,string][];sources:[string,string][];officialUrl:string;officialLabel:string;officialNote:string;phone:string;};
+const housing:Guide={
+ title:'青岛市高校毕业生住房补贴',
+ kicker:'V3.1 山东省第二城 · 现金住房补贴',desc:'按本科、硕士、博士实际学历分别审核，以社保、落户和毕业年限为关键条件。',
+ support:'¥500—1,200',unit:'每月 · 按学历分档',limit:'累计最多36个月',review:'政策依据青人社发〔2024〕6号，有效期至2027-03-31；实时受理请在平台查看。',
+ amounts:[['全日制本科','500元/月','最多36个月'],['全日制硕士','800元/月','最多36个月'],['全日制博士','1,200元/月','最多36个月']],
+ branches:{
+ bachelor:{label:'全日制本科',desc:'国内高校毕业生与国（境）外学历人员的认定路径有所区别',conditions:['国内普通高校统招全日制本科毕业不超过3年，取得学士学位；境外本科学历毕业生须符合毕业3年内等规定。','申报时具有青岛户籍；外籍及港澳台高校毕业生有政策规定的户籍例外。','在青岛就业创业并依法缴纳城镇职工社会保险，合同、就业或创业登记符合经办要求。','不能属于在职期间提高学历等政策排除情形，也须核验购房安家和其他住房待遇的互斥规定。'],materials:['本科毕业证、学位证或国（境）外学历学位认证材料','学历电子注册备案表等系统提示的认证资料','就业合同、在青就业创业登记及社保缴费信息','户籍资料、本人收款社保卡金融账号或银行卡信息（按系统提示）'],warning:'本科住房补贴与免租金住宿不同；学历达标不等于自动获批。'},
+ master:{label:'全日制硕士',desc:'毕业时间、青岛户籍及就业社保缺一不可',conditions:['国内全日制硕士毕业不超过3年；国（境）外硕士应在取得最高学历后3年内来青就业创业，按境外学历认证要求核验。','除外籍、港澳台毕业生等政策列明的例外，申报时需具有青岛市户籍。','就业或创业实体按规定缴纳青岛城镇职工社会保险，工作与首次申请时间符合规定。','未享受政策禁止重复领取的安家费、博士后补贴等项目；在职期间提高学历通常不享受。'],materials:['硕士毕业证、学位证、学历认证或留学服务中心认证','毕业日期、国内学历汇核验相关资料','青岛就业/创业登记、社会保险缴费证明和户籍信息','社保卡金融账户或本人开户行与银行卡号（由官方系统填写）'],warning:'硕士每月800元是对应一般档次；不要把其他紧缺专业或高层次人才金额自动加上。'},
+ doctor:{label:'全日制博士',desc:'博士补贴标准与其他专项安家待遇要区分',conditions:['属于毕业年限与取得学位符合条件的博士研究生；境外研究生以最高学历来青就业创业时间核验。','符合在青就业或创业、社会保险及户籍条件（外籍或港澳台适用法定例外）。','确认本人未享受不可重复领取的博士后安家、青年人才一次性安家费或其他列明补贴。','首次享受月份、已领取月数和再提高学历的剩余月份应据实申报，最多36个月。'],materials:['博士毕业证、学位证及学历认证材料','青岛就业创业登记、社会保险缴费与户籍信息','首次申请日期、既往住房补贴月数和其他安家资助记录','本人用于补贴到账的社保卡金融账户或银行账号'],warning:'博士每月1200元是本项一般标准，与博士后专项支持不能混为一谈。'}
+ },
+ steps:[
+  {title:'先确认毕业学历和首次申报时间',why:'住房补贴对学历类型、毕业时间、在青就业时间有明确限制。',action:'对照2024年青人社发〔2024〕6号，确定本人属于国内全日制本科以上、境外本科或境外研究生等哪一类；查毕业证日期，核对首次申请是否在规定时点内。',done:'确定学历申报类别，准备毕业证、学位证及相应认证信息。'},
+  {title:'核实落户、就业登记与社保缴费',why:'不满足户籍或在青就业创业参保，不能只凭毕业证领现金补贴。',action:'核对青岛户籍及外籍、港澳台例外；查看劳动合同或创业主体登记和在青城镇职工社保缴费记录，特别核对申请的补贴月份是否均有符合要求的参保。',done:'明确符合哪些月份、缺少哪类证明，避免申请失败。'},
+  {title:'在青岛人才网完成学历或学籍认证',why:'官方申报系统会对学历真实性进行核验，首次申请可能需要补充认证。',action:'打开青岛人才网，进入“青岛人社·学历汇”；根据毕业学历选择国内或境外认证。若系统已自动核验可直接确认；遇国家学历接口暂停或自动比对失败，再按平台提示补录材料。',done:'获得学历核验结果，系统识别你的最高学历。'},
+  {title:'进入“高校毕业生住房补贴”模块提交',why:'该项由本人通过青岛人才网申请，不要把政府介绍页当成申报入口。',action:'在青岛人才网选择“高校毕业生住房补贴”，实名认证后核对基础信息，按要求填写申报月份、银行/社保卡金融账户信息，签署真实信息电子承诺书后提交。',done:'页面出现申请记录或提交成功状态，保留申报月份和受理信息。',note:'2023年1月1日以后毕业者申领该项时不再需要就业报到证。'},
+  {title:'查看区市审核、公示及材料补正',why:'提交申请不代表审核通过，系统自动核验不通过时仍可能要求人工补充。',action:'按就业或创业实体注册地所属区市关注审核与通知；区市人社部门通常在次月开始核查，必要时补交不能共享的数据；符合条件的按规定公示5个工作日。',done:'查到官方审核、公示结果，并确认是否有补正要求。'},
+  {title:'核对补贴发放及后续月份',why:'每人最多36个月，补贴享受与真实就业社保状态相关。',action:'核对社保卡金融账户是否开通；区市人社部门在财政资金到账后按规定发放。若换学历、就业中断或已领过住房补贴，应向属地区市确认暂停、重新申报和剩余月份计算。',done:'核对个人到账记录、已享受月份及剩余可申请月份。',note:'不能承诺“提交后几天到账”；具体发放时间取决于区市审核与财政拨款。'}
+ ],
+ checks:['已确认自己符合毕业时间及全日制学历范围','已核对在青户籍要求或适用例外','已核对就业创业登记、合同与社保记录','已完成青岛人才网学历汇核验','已检查是否与安家费、博士后等其他补贴互斥','已核对本人收款账户及官方申请记录'],
+ faq:[
+  ['专科毕业生可以申请每月500元住房补贴吗？','此项现金住房补贴通常针对本科及以上符合条件人员。专科毕业生可另查2026年免租金住宿保障，不要混同两个政策。'],
+  ['住房补贴需要先买房或租房才能申报吗？','本项为高校毕业生住房补贴，申报核心是符合学历、户籍、就业创业参保等规定；不要自行臆造所有人都必须提交租房合同。实际材料以系统为准。'],
+  ['硕士和博士每个月能拿多少钱？','按本项一般标准硕士800元/月、博士1200元/月，最长36个月。其他专项人才待遇和紧缺专业调整须单独核实，不能自动叠加。'],
+  ['外籍、港澳台毕业生没有青岛户籍怎么办？','官方文件对外籍及港澳台高校毕业生列有户籍条件例外，但仍要满足其毕业时间、在青就业创业、学历学位认证及参保等规则。'],
+  ['申报后为什么没到账？','先看青岛人才网申请状态和区市公示，核对收款账户，并咨询单位所在地或创业实体注册区市人社部门；不存在提交即必然发放的承诺。'],
+  ['之前领取了安家费还能申请住房补贴吗？','青人社发〔2024〕6号列明青年人才一次性安家费及部分人才住房资助的互斥/抵扣规则；已领取人员须如实申报，不能直接重复享受。']
+ ],
+ sources:[
+ ['2024-04-11 住房补贴政策文件（有效期至2027-03-31）','https://www.qingdao.gov.cn/zwgk/xxgk/rlshbz/gkml/gwfg/202404/t20240411_7996962.shtml'],
+ ['2025-05-26 政府办理问答：标准与网上申报','https://www.qingdao.gov.cn/zwgk/xxgk/rlshbz/ywfl/rcfw/202505/t20250526_9552432.shtml'],
+ ['青岛市官方创业服务云平台政策汇总','https://hrss.qingdao.gov.cn/cy/policy/fileDetail.html?id=24b27964119142da8c7f6de7cbaacbc1&type=1'],
+ ['2025市政府青年人才措施：住房与安家费区别','https://www.qingdao.gov.cn/zwgk/xxgk/rlshbz/gkml/gwfg/202506/t20250625_9734429.shtml']
+ ],
+ officialUrl:'https://rc.qingdao.gov.cn/',officialLabel:'进入青岛人才网申报',officialNote:'这是青岛政府指明的在线办理网站，登录后具体模块和当前受理状态须以实际页面为准。',phone:'0532-66711723'
+};
+const stay:Guide={
+ title:'青岛2026年高校毕业生免租金住宿保障',
+ kicker:'V3.1 山东省第二城 · 2026免租住宿',desc:'区别于每月现金住房补贴：本项提供符合条件的实际住宿服务，并且需要预约房源和现场办理入住。',
+ support:'最长12个月',unit:'求职最多6个月',limit:'房源不足时不能保证入住',review:'青人社发〔2026〕3号：2026-07-01至2029-06-30。政策有效不代表有空房。',
+ amounts:[['来青求职','最长累计6个月','须符合未就业参保条件'],['已在青就业创业','最长12个月','符合就业登记与参保'],['先求职后就业','两阶段合计最长12个月','需重新按规定申请']],
+ branches:{
+ search:{label:'来青求职',desc:'关键是求职状态和未在青参保条件',conditions:['毕业3年内（含毕业学年）全日制专科及以上学历高校毕业生，或规定技工院校毕业生。','在青岛处于未就业、未创业状态，并且未在青岛缴纳城镇企业职工基本养老保险。','完成“爱山东”实名认证及学历/学籍认证，通过平台核验。','按实际房源预约，求职累计不超过6个月；热点社区可能有单次3个月限制。'],materials:['本人身份证、社会保障卡或其他有效身份文件（现场核验）','通过青岛“学历汇”验证的毕业证、学籍信息或留服认证','毕业学年学生需准备院系盖章的校外租房知情同意书原件','平台要求补交的就业/未就业及其他证明材料'],warning:'政策最多6个月不是保证有房；请查看本周平台发布的实际房源与选房安排。'},
+ employed:{label:'已在青就业或创业',desc:'有就业登记和养老保险缴费要求',conditions:['毕业3年内（含毕业学年）的规定高校或技工院校毕业生。','在青岛单位就业、灵活就业或创办创业实体并按规定完成就业登记。','在青岛依法缴纳城镇企业职工基本养老保险。','如先通过求职阶段入住，再就业后可按规定重新申请，全部阶段合计不超过12个月；须符合当前房源管理要求。'],materials:['身份证、社保卡及实名信息','学历认证、毕业证或毕业学年学籍核验结果','青岛就业登记、创业主体证明及养老保险缴费记录','平台通知的选房成功信息、预约入住材料'],warning:'已在青就业却未完成就业登记或参保，可能无法满足已就业人员申请条件。'}
+ },
+ steps:[
+  {title:'判断申请人处于求职还是在青就业状态',why:'两种对象的社保要求和可住期限不同。',action:'查看毕业证上的时间是否处于毕业3年内（含毕业学年）；若求职，确认没有在青就业创业且未缴当地城镇企业职工养老保险；已就业创业者需确认就业登记和正常参保。',done:'确定应申请“求职住宿”还是“就业创业住宿”并知道对应时间上限。'},
+  {title:'在“爱山东”完成本人实名认证',why:'平台要求实名认证后才能匹配实名学历与就业信息。',action:'使用“爱山东”手机客户端，或“爱山东政务服务”微信小程序，按官方流程完成个人身份认证；不要在HHBA上传身份证。',done:'本人在爱山东的实名状态有效，可进入住宿平台。'},
+  {title:'通过“学历汇”认证学历或学籍',why:'系统要判断毕业届别和高校/技工院校身份。',action:'普通高校毕业生到青岛市人社局官方网站“学历汇”完成毕业学历认证；毕业学年学生完成学籍认证。技工院校信息按2026年规定自动核验，外省院校毕业学年需按要求补充学籍证明。',done:'学历、学籍或技术院校信息被官方系统接受；失败时按平台提示补充材料。'},
+  {title:'在官方住宿平台完成信息采集',why:'选房前需要资格认证和信息核验，不是进平台就能直接领到房间。',action:'回到“爱山东”搜索“青岛市免租金住宿保障平台”，完成个人信息、毕业身份、求职或就业状态采集。符合低保优先保障的，按要求录入对应身份信息。',done:'系统显示已完成信息采集或指出需要补交的证明。'},
+  {title:'根据当前公布房源选房、等待派房结果',why:'房源由平台按求职或就业情形分配，名额与开放时间并非固定。',action:'按照平台开放的本批次选房安排申请。求职人员按房源属性和申请时间匹配；已就业人员结合就业登记/创业日期排序及可选房源分配。未匹配成功可在下批继续申请。',done:'收到官方选房结果或匹配通知，明确实际社区、房间及办入住时限。',note:'例如2026年8月公布过47间的历史批次，不能把这47间当作今天仍然剩余。'},
+  {title:'5日内现场办理入住，遵守后续租住规则',why:'超过规定期限不办理可能被视为放弃房源。',action:'匹配成功后原则上5日内携带本人身份证、社会保障卡等有效证件到现场办理；毕业学年学生另带院系盖章的校外租房知情同意书原件。入住后就业身份变化，应及时在平台核实续住或重新申请程序。',done:'现场核验完成并取得真实入住确认，了解退房、续租及违规退出要求。',note:'一年内两次无正当理由超时放弃入住，可自第二次放弃起一年内取消选房资格。'}
+ ],
+ checks:['已核对毕业3年内（含毕业学年）和学历类别','已确认求职或就业创业身份及对应参保要求','已完成爱山东实名认证','已在学历汇完成学历/学籍认证','已进入官方免租金住宿平台完成资料采集','已核对当前房源、派房结果和5日内入住要求'],
+ faq:[
+  ['免租金住宿就是直接给我发租房补贴吗？','不是。它提供符合条件的房间住宿，不是每月向个人发500、800或1200元；现金住房补贴属于另一个政策事项。'],
+  ['还没在青岛找到工作能申请吗？','有可能。求职类毕业生要求在青处于未就业创业状态，并未在青缴纳城镇企业职工养老保险，还须符合毕业年限、学历认证等条件。'],
+  ['就业后还可以继续免租住吗？','符合2026年规则时可以重新申请，求职与就业阶段合计最长12个月；具体房间是否可继续住及是否需换房以平台为准。'],
+  ['求职6个月、就业12个月可以加起来住18个月吗？','不可以。求职阶段最长累计6个月，在青就业创业后两阶段合并最多12个月，不能理解成6个月再加12个月。'],
+  ['官方公布某一批房源后，我现在还能申请那一批吗？','不一定。房源按批次开放，过往公告的套数不等于当前剩余房源，需要到爱山东对应平台看当批次是否仍开放。'],
+  ['已经申请租赁型人才住房或保障性租赁住房还能同时享受吗？','2026年政府文件对不同住房保障有互斥与管理规定，通常不能同时重复占用；最终以官方平台认定为准。'],
+  ['匹配房源成功但超过5天没有办入住怎么办？','原则上超过5日无正当理由未办理视为放弃；一年内两次超时放弃的，自第二次起一年内取消选房资格。出现特殊情况要及时联系平台。']
+ ],
+ sources:[
+ ['2026-06-30 青人社发〔2026〕3号与实施细则','https://www.qingdao.gov.cn/zwgk/xxgk/rlshbz/gkml/gwfg/202606/t20260630_10647826.shtml'],
+ ['2026-07-01 青岛市政府解释最长入住期','https://www.qingdao.gov.cn/ywdt/zwzl/zxwdpt_00/zxwdpt_10/202607/t20260701_10648916.shtml'],
+ ['2026-08-21 官方第32批历史房源（不作实时余房）','https://hrss.qingdao.gov.cn/zxzx_47/tzgg_47/202608/t20260821_10706114.shtml'],
+ ['青岛政府企业服务平台：安居落户政策汇总','https://qydjfw.qingdao.gov.cn/OPC_ajlh.dhtml']
+ ],
+ officialUrl:'https://www.qingdao.gov.cn/zwgk/xxgk/rlshbz/gkml/gwfg/202606/t20260630_10647826.shtml',officialLabel:'查看官方“爱山东”操作说明',officialNote:'操作入口在“爱山东”App / 微信小程序内搜索“青岛市免租金住宿保障平台”，政府原文不是选房页面。',phone:'0532-85912361'
+};
+const configs:Record<GuideKind,Guide>={housing,stay};
+export function TalentQingdaoGuidePreview({kind}:{kind:GuideKind}){
+ const data=configs[kind];
+ const [branch,setBranch]=useState(kind==='housing'?'master':'search');
+ const [selected,setSelected]=useState<Record<string,boolean>>({});
+ const [openFaq,setOpenFaq]=useState<number|null>(0);
+ const [faqQuery,setFaqQuery]=useState('');
+ const cases=useMemo(()=>data.faq.map(([q,a],i)=>({q,a,i})).filter(item=>(item.q+item.a).includes(faqQuery.trim())),[data,faqQuery]);
+ const current=data.branches[branch]||Object.values(data.branches)[0];
+ const completed=data.checks.filter((_,i)=>selected[String(i)]).length;
+ return <main className="jgd-page">
+  <nav className="jgd-breadcrumb"><Link to="/talent-service">人才服务</Link><span>›</span>
+   <Link to="/talent-service/policy-layout-preview/qingdao">青岛政策新版列表</Link><span>›</span>完整办理指南</nav>
+  <header className="jgd-hero"><div className="jgd-hero-text"><span className="jgd-kicker">HHBA / {data.kicker}</span><h1>{data.title}</h1><p>{data.desc}</p>
+   <div className="jgd-tags"><span>政府来源可追溯</span><span>按个人情况切换说明</span><span>{data.review}</span></div></div>
+   <div className="jgd-hero-aside"><span>主要待遇</span><strong>{data.support}</strong><small>{data.unit}</small><span>{data.limit}</span></div>
+  </header>
+  <nav className="jgd-page-nav" aria-label="页面快速导航"><a href="#qdg-benefit">补贴待遇</a><a href="#qdg-conditions">申请资格</a><a href="#qdg-steps">六步指南</a><a href="#qdg-checks">准备清单</a><a href="#qdg-faq">常见疑问</a><a href="#qdg-official">官方入口</a></nav>
+  <div className="jgd-layout"><div className="jgd-main">
+   <section className="jgd-panel" id="qdg-benefit"><div className="jgd-section-heading"><span className="jgd-section-icon"><Wallet size={18}/></span><div><h2>01 政策标准与期限</h2><p>不同对象的待遇差异，按政府文件分别列明。</p></div></div>
+    <div className="jgd-money-table"><table><thead><tr><th>适用类别</th><th>待遇</th><th>限制</th></tr></thead><tbody>{data.amounts.map(row=><tr key={row[0]}>{row.map((x,i)=><td key={i}>{x}</td>)}</tr>)}</tbody></table></div>
+    <div className="jgd-tip"><Info size={16}/><p>{data.review} 具体资格及当前受理请以官方经办平台为准。</p></div>
+   </section>
+   <section className="jgd-panel" id="qdg-conditions"><div className="jgd-section-heading"><span className="jgd-section-icon"><ShieldCheck size={18}/></span><div><h2>02 按本人情况核对资格</h2><p>切换不同申请路径，条件和材料同步变化。</p></div></div>
+    <div className="jgd-track-tabs" role="group" aria-label="选择申请人类别">{Object.entries(data.branches).map(([value,item])=><button type="button" key={value} className={branch===value?'active':''} aria-pressed={branch===value} onClick={()=>setBranch(value)}>{item.label}</button>)}</div>
+    <div className="jgd-track-box"><h3>{current.label}</h3><p>{current.desc}</p><ul>{current.conditions.map((s,i)=><li key={i}><CheckCircle2 size={15}/><span>{s}</span></li>)}</ul>
+     <div className="jgd-track-remark"><AlertTriangle size={16}/><span>{current.warning}</span></div>
+    </div>
+   </section>
+   <section className="jgd-panel" id="qdg-steps"><div className="jgd-section-heading"><span className="jgd-section-icon"><ClipboardCheck size={18}/></span><div><h2>03 六步实际办理指南</h2><p>每一步有行动、原因和完成标志；不是泛泛的“按规定申报”。</p></div></div>
+    <ol className="jgd-step-list">{data.steps.map((step,i)=><li className="jgd-step" key={i}><span className="jgd-step-index">{i+1}</span><div className="jgd-step-content"><h3>{step.title}</h3>
+     <div className="jgd-step-detail"><p><strong>为什么做</strong>{step.why}</p><p><strong>具体怎么做</strong>{step.action}</p><p><strong>完成标志</strong>{step.done}</p></div>
+     {step.note&&<p className="jgd-step-note">{step.note}</p>}
+     {i===3&&<a className="jgd-step-action" href={data.officialUrl} target="_blank" rel="noopener noreferrer">{data.officialLabel} <ArrowUpRight size={14}/></a>}
+    </div></li>)}</ol>
+   </section>
+   <section className="jgd-panel" id="qdg-checks"><div className="jgd-section-heading"><span className="jgd-section-icon"><FileCheck2 size={18}/></span><div><h2>04 办理前材料与自查清单</h2><p>只在当前浏览器勾选，不上传任何个人证明材料。</p></div></div>
+    <div className="jgd-progress"><span>已确认 {completed}/{data.checks.length} 项</span><div role="progressbar" aria-label="准备事项进度" aria-valuemin={0} aria-valuemax={data.checks.length} aria-valuenow={completed}><span style={{width:(completed/data.checks.length*100)+'%'}}/></div></div>
+    <div className="jgd-checklist">{data.checks.map((s,i)=><label key={s}><input type="checkbox" checked={Boolean(selected[String(i)])} onChange={e=>setSelected(prev=>({...prev,[String(i)]:e.target.checked}))}/><span>{s}</span></label>)}</div>
+    <h3 className="jgd-material-heading">{current.label} · 建议材料</h3><ul className="jgd-materials">{current.materials.map((s,i)=><li key={i}>{s}</li>)}</ul><p className="jgd-mutedsmall">材料是根据已核实政策整理的准备方向；以官方最新受理界面为准，不代表已通过资格认证。</p>
+   </section>
+   <section className="jgd-panel" id="qdg-faq"><div className="jgd-section-heading"><span className="jgd-section-icon"><HelpCircle size={18}/></span><div><h2>05 常见问题</h2><p>可搜索关键词，点击展开对应规则解释。</p></div></div>
+    <label className="jgd-faq-search">查找常见问题<input type="search" value={faqQuery} onChange={e=>setFaqQuery(e.target.value)} placeholder="输入学历、社保、到账、房源……"/></label>
+    <div className="jgd-faq-list">{cases.map(item=><div className="jgd-faq-item" key={item.i}><button type="button" aria-expanded={openFaq===item.i} onClick={()=>setOpenFaq(v=>v===item.i?null:item.i)}><span>{item.q}</span><ChevronDown size={16} className={openFaq===item.i?'opened':''}/></button>{openFaq===item.i&&<p>{item.a}</p>}</div>)}{cases.length===0&&<p className="jgd-no-results">没有找到匹配的问题，可以清空搜索后浏览全部。</p>}</div>
+   </section>
+   <section className="jgd-panel" id="qdg-official"><div className="jgd-section-heading"><span className="jgd-section-icon"><Landmark size={18}/></span><div><h2>06 官方申报入口、联系方式与原文</h2><p>政府政策介绍页与实际申报入口严格区分。</p></div></div>
+    <div className="jgd-portal"><div><strong>{kind==='housing'?'青岛人才网':'爱山东 · 青岛免租金住宿保障平台'}</strong><span>{kind==='housing'?'高校毕业生住房补贴由本人在线申请':'在爱山东客户端或微信小程序内搜索平台办理'}</span><small>{data.officialNote}</small></div><a href={data.officialUrl} rel="noopener noreferrer" target="_blank">{data.officialLabel} <ExternalLink size={14}/></a></div>
+    <p className="jgd-portal-warning"><AlertTriangle size={15}/>{kind==='housing'?'网站提供政府指明的办理入口；无法保证当前登录后的审核或按钮状态。':'政府公开文件是办理依据；请进入爱山东平台查询选房申请，不能在本文直接选房。'}</p>
+    <div className="jgd-contact"><div><span>青岛市政府公开政策咨询电话</span><strong>{data.phone}</strong><small>{kind==='housing'?'市公共就业和人才服务中心人才服务部':'市人社局就业促进与失业保险处'} · 请核对接听时间</small></div><a href={'tel:'+data.phone}><Phone size={15}/>拨打咨询</a></div>
+    <div className="jgd-sources"><h3>原始政策与办理依据</h3>{data.sources.map(([text,url])=><a href={url} key={url} target="_blank" rel="noopener noreferrer">{text}<ArrowUpRight size={14}/></a>)}</div>
+   </section>
+  </div><aside className="jgd-side"><div className="jgd-side-card"><span>重点提醒</span><h3>{kind==='housing'?'个人申请 · 最多36个月':'申请房源 · 不是直接发钱'}</h3><p>{data.review}</p><a href={data.officialUrl} target="_blank" rel="noopener noreferrer">查看官方办理入口 <ArrowUpRight size={13}/></a></div>
+   <div className="jgd-side-card"><span>同城另一项政策</span><p>{kind==='housing'?'来青岛求职的毕业生还可以了解2026年免租金住宿保障，但两项政策不能自动同时享受。':'青岛还有按学历分档、最长36个月的高校毕业生现金住房补贴，资格条件与本项不同。'}</p><Link to={'/talent-service/policy-guide-preview/qingdao/'+(kind==='housing'?'stay':'housing')}>切换查看 <ArrowRight size={14}/></Link></div></aside></div>
+  <footer className="jgd-footer"><Link to="/talent-service/policy-layout-preview/qingdao"><ArrowLeft size={14}/> 返回青岛政策列表</Link><span>资料整理核验2026-10-30 · HHBA不代替官方资格审核或申领</span></footer>
+ </main>;
+}
