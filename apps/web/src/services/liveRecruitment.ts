@@ -428,6 +428,23 @@ export async function listDomesticRebuildMarket(filters:LiveFilters,offset:numbe
   ...domesticV2Records.slice(49,54),...overseas.slice(55,60),
   ...domesticV2Records.slice(54),...overseas.slice(60)];
  const allowed=combined.filter(job=>!!safeOfficialJobUrl(job)&&rebuildListFilter(job,filters));
+ // Name matches must not be hidden behind 30 unrelated job-summary hits.
+ // Apply relevance ordering AFTER all filters and BEFORE pagination.
+ const term=filters.q.normalize('NFKC').toLowerCase().trim();
+ if(term){
+  const nameScore=(job:LiveJob)=>{
+   const aliases=job.platform==='shkp-official-detail'?' SHKP Sun Hung Kai Properties 新鴻基地產':
+    job.platform==='anker-2027-campus-official'?' Anker Innovations':
+    job.platform==='laifen-sourced-archived'?' Laifen':'';
+   const names=(job.company+' '+(job.companyZh||'')+aliases).normalize('NFKC').toLowerCase();
+   if(!names.includes(term))return 0;
+   if(job.companyZh?.normalize('NFKC').toLowerCase()===term)return 3;
+   if(job.companyZh?.normalize('NFKC').toLowerCase().startsWith(term)||
+      job.company.normalize('NFKC').toLowerCase().startsWith(term))return 2;
+   return 1;
+  };
+  allowed.sort((a,b)=>nameScore(b)-nameScore(a));
+ }
  return {jobs:allowed.slice(offset,offset+30),total:allowed.length,offset,limit:30,
    boards:11,failures:0,updated:'2026-10-29T00:00:00Z'};
 }
