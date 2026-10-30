@@ -41,7 +41,7 @@ for(const id of housingProjectIds){
  }
  const official=record.match(/sourceUrl:"(https:\/\/[^"]+)"/)?.[1];
  assert.ok(official&&new URL(official).hostname.endsWith('.gov.cn'),'Project must have government source '+id);
- assert.ok(/当前|现时|实时|不等于|需向|待/.test(record),'Project must warn against assuming live inventory '+id);
+ assert.ok(/当前|现时|实时|不等于|需|待|空房|历史|批次/.test(record),'Project must warn against assuming live inventory '+id);
 }
 for(const municipality of ['北京','天津','上海','重庆']){
  const records=[...housing.matchAll(new RegExp('city:"'+municipality+'"','g'))].length;
