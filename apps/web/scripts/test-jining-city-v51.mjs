@@ -42,6 +42,6 @@ assert.equal(jiningYouthGuide.officialUrl,undefined);
 assert.equal(jiningRentGuide.officialUrl,undefined);
 const read=p=>readFileSync(new URL('../src/'+p,import.meta.url),'utf8');
 assert.ok(read('pages/TalentServiceRoutes.tsx').includes("fragments[2]==='jining'"));
-assert.ok(read('components/talent/UnifiedPolicyList.tsx').includes("detailPath:p.id==='sd-jining-2026-introduction'"));
+assert.ok(read('components/talent/UnifiedPolicyList.tsx').includes("p.id==='sd-jining-2026-introduction'?'/talent-service/policy-guide-preview/jining/youth'"),"Jining guide link remains reachable regardless of the order other cities are added");
 assert.ok(read('components/talent/UnifiedTalentRecordDetail.tsx').includes("'jn-maincity-rent-2026':'/talent-service/policy-guide-preview/jining/rent'"));
 console.log('Jining V5.1 PASS: 5+ distinct policies, 2 honest housing programs, no invented projects, youth & rent guides.');
