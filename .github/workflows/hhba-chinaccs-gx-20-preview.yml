@@ -1,4 +1,5 @@
 name: HHBA China Comservice Guangxi 20 factory preview
+# Run full browser and isolated public preview for company 20; preserve all previous site files.
 # Final acceptance: on [preview] execute Chromium tests and additive GitHub Pages deploy.
 # Company 20 final review: original Pages remains untouched; only nested preview added.
 # Release candidate: data-only enterprise 20; prior public site must be preserved.
