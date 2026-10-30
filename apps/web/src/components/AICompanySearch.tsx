@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { ArrowRight, ExternalLink, Search, Sparkles, Building2 } from 'lucide-react';
 import catalog from '../data/aiCompanyCatalog.json';
+import {getDomesticCompanies,searchDomesticCompanies} from '../services/domesticCompanySearch';
 import { verifiedBrandRecords } from '../services/verifiedBrandRegistry';
 import { Link } from '../router';
 import '../styles/ai-company-search.css';
@@ -34,10 +35,17 @@ const keywords=['OpenAI','Anthropic','SpaceX','比亚迪','上汽','长城汽车
  '汽车','人工智能','教育','零售','制造','物流','能源','金融','支付','互联网','网络安全','软件','电商','航天'];
 function keywordSearch(input:string):Company[]{
  const text=normalize(input);
- if(text.length<2)return [];
+ if(!text)return [];
+ // Same reviewed employer directory and ranker used in enterprise discovery;
+ // one Chinese character is already a valid exact-name substring search.
+ const domestic=searchDomesticCompanies(getDomesticCompanies(),input,60).map(c=>({
+  id:'domestic-'+c.id,name:c.name,industry:c.industry,
+  overview:c.overview,route:c.route,careers:c.careers||null,
+  lastReviewed:c.lastReviewed,provenance:'domestic_enterprise_directory'
+ }));
  const terms=keywords.filter(term=>text.includes(normalize(term)));
  if(!terms.length)terms.push(text);
- return companies.map(company=>{
+ const curatedMatches=companies.map(company=>{
   const target=normalize([company.name,company.industry,company.overview].join(' '));
   const name=normalize(company.name);
   const rank=terms.reduce((total,term)=>{
@@ -45,8 +53,15 @@ function keywordSearch(input:string):Company[]{
    return total+(name.includes(t)?4:target.includes(t)?1:0);
   },0);
   return {company,rank};
- }).filter(row=>row.rank>0).sort((a,b)=>b.rank-a.rank||a.company.name.localeCompare(b.company.name,'zh-CN'))
-   .slice(0,12).map(row=>row.company);
+ }).filter(row=>row.rank>0).sort((a,b)=>b.rank-a.rank||a.company.name.localeCompare(b.company.name,'zh-CN')).map(row=>row.company);
+ const results:Company[]=[];const seen=new Set<string>();
+ for(const company of [...domestic,...curatedMatches]){
+  const key=normalize(company.name);
+  if(seen.has(key))continue;
+  seen.add(key);results.push(company);
+  if(results.length>=36)break;
+ }
+ return results;
 }
 
 export function AICompanySearch(){
@@ -74,9 +89,9 @@ export function AICompanySearch(){
  async function submit(event:FormEvent<HTMLFormElement>){
   event.preventDefault();
   const value=query.trim();
-  if(value.length<2){setError('请输入企业名称、行业或你的求职方向。');return;}
+  if(!value){setError('请输入企业名称、行业或你的求职方向。');return;}
   if(busy)return;
-  if(status==='ready'&&value.length<5){setError('请多描述一点你的学历、经历或求职方向。');return;}
+  if(value.length<5){setLocalResults(keywordSearch(value));setAiResults(null);setError('');return;}
   if(status==='ready'&&!consent){setError('使用 AI 前请先同意下方的信息处理说明。');return;}
   setLocalResults(null);setAiResults(null);setError('');
   if(status!=='ready'){
@@ -96,7 +111,12 @@ export function AICompanySearch(){
   }catch(cause){setError(cause instanceof Error?cause.message:'连接失败，请稍后重试。')}
   finally{setBusy(false)}
  }
- function updateQuery(value:string){setQuery(value);setError('');setLocalResults(null);setAiResults(null)}
+ function updateQuery(value:string){
+  setQuery(value);setError('');setAiResults(null);
+  // Instant offline name lookup, including single Han characters, regardless
+  // of whether DeepSeek is configured. Never send a keystroke to the API.
+  setLocalResults(value.trim()?keywordSearch(value):null);
+ }
  const isAi=status==='ready';
  return <section className="ai-company-search" aria-label="企业智能搜索">
   <form className="ai-company-single-search" onSubmit={submit} role="search">
