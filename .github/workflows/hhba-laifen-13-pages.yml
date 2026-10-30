@@ -4,6 +4,10 @@ on:
     branches: [feat/laifen-13-static-v2-20261030]
     paths:
       - '.github/workflows/hhba-laifen-13-pages.yml'
+      - 'apps/web/scripts/domestic-rebuild-v2.contract.test.mjs'
+      - 'apps/web/src/data/domesticLaifenSourcedRoles20261030.json'
+      - 'apps/web/src/pages/LaifenCompactProfilePage.tsx'
+      - 'apps/web/public/images/laifen-user/**'
   workflow_dispatch:
 permissions:
   contents: read
