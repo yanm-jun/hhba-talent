@@ -2,19 +2,24 @@ import {useEffect,useState} from 'react';
 import {ClipboardCheck,ShieldCheck} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
-import {api,ApiError,type EmployerPosting,type User} from '../services/api';
+import {api,ApiError,recruitmentResponsibilityApiReady,type RecruitmentResponsibilityQueue,type EmployerPosting,type User} from '../services/api';
 import '../styles/employer-workspace.css';
+import '../styles/recruitment-responsibility.css';
 type Applicant={organization_id:string;legal_name:string;status:string;revision:number;representative_name?:string;evidence_snapshot_id?:string};
 function err(e:unknown){return e instanceof ApiError?e.message:'管理接口当前不可用'}
 export function AdminRecruitmentPage({user}:{user:User|null}){
  const [applications,setApplications]=useState<Applicant[]>([]);
  const [postings,setPostings]=useState<EmployerPosting[]>([]);
+ const [responsibilityQueue,setResponsibilityQueue]=useState<RecruitmentResponsibilityQueue|null>(null);
+ const [responsibilityError,setResponsibilityError]=useState('');
  const [reasons,setReasons]=useState<Record<string,string>>({});
  const [notice,setNotice]=useState('');
  const [busy,setBusy]=useState(false);
  async function refresh(){
   try{const [a,b]=await Promise.all([api.adminVerificationQueue(),api.adminPendingPostings()]);
-   setApplications(a.items);setPostings(b.items);setNotice('')}
+   setApplications(a.items);setPostings(b.items);setNotice('');
+   if(recruitmentResponsibilityApiReady){try{const q=await api.adminRecruitmentResponsibilities();setResponsibilityQueue(q);setResponsibilityError('')}catch(e){setResponsibilityQueue(null);setResponsibilityError(err(e))}}
+  }
   catch(e){setNotice(err(e))}
  }
  useEffect(()=>{if(user?.role==='admin')void refresh()},[user]);
@@ -45,5 +50,14 @@ export function AdminRecruitmentPage({user}:{user:User|null}){
     </article>)}
    </section>
   </div>
+  <section className="employer-ws-card hhba-sla-admin" aria-label="招聘履约管理">
+   <div className="employer-ws-card-heading"><ClipboardCheck size={20}/><div><h2>招聘履约管理</h2><p>直接在原管理后台核查站内申请是否按期获得初步回应，不把审阅中当成已完成，不自动处罚企业。</p></div></div>
+   {!recruitmentResponsibilityApiReady?<p className="hhba-sla-unavailable">真实责任服务和独立审核权限尚未接通。当前没有可核实的履约统计，未知不等于零。</p>:
+     responsibilityError?<p role="alert" className="hhba-sla-unavailable">{responsibilityError}</p>:
+     !responsibilityQueue?<p className="hhba-sla-unavailable">正在核实履约记录…</p>:
+     <><p className="hhba-sla-admin-summary">逾期待核查记录：<strong>{responsibilityQueue.total??'未核实'}</strong></p>
+      {responsibilityQueue.items.length===0?<p className="employer-ws-muted">本次查询没有返回待核查记录，不代表未查询范围也是零。</p>:
+       <div className="hhba-sla-admin-list">{responsibilityQueue.items.map(r=><article key={r.application_id}><strong>申请编号：{r.application_id}</strong><small>组织：{r.organization_id} · 岗位：{r.posting_id}</small><small>回应期限：{r.response_due_at}</small><span>超期待复核</span></article>)}</div>}</>}
+  </section>
  </main></Shell>
 }

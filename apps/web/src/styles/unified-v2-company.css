@@ -1,0 +1,16 @@
+.hhba-v2-company-status{max-width:960px;margin:48px auto;padding:20px}
+.hhba-v2-company-chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.hhba-v2-company-chips button{border:1px solid #d8e4dd;border-radius:99px;padding:8px 12px;background:#fff;color:#426451;font-size:13px;cursor:pointer}
+.hhba-v2-company-chips button.selected{background:#1f6446;border-color:#1f6446;color:#fff;font-weight:700}
+.hhba-v2-company-note{display:flex;align-items:center;gap:6px;font-size:12px;color:#62776b;line-height:1.6;margin:12px 0 18px}
+.hhba-v2-company-role-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.hhba-v2-company-role{padding:18px;border:1px solid #dfe9e3;border-radius:12px;background:white;min-width:0}
+.hhba-v2-company-role[data-focus="true"]{border-color:#397d55;box-shadow:0 0 0 2px #d8ece0}
+.hhba-v2-company-role-head{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.hhba-v2-company-role h3{font-size:16px;margin:0;color:#263b2f}
+.hhba-v2-company-role-head small,.hhba-v2-company-role>small{font-size:12px;color:#738278}
+.hhba-v2-company-role p{line-height:1.75;font-size:13px;color:#536b5d}
+.hhba-v2-company-role details{margin-top:12px;font-size:13px}
+.hhba-v2-company-role summary{cursor:pointer;color:#21724a;display:flex;align-items:center;gap:4px}
+.hhba-v2-company-no-roles{font-size:13px;color:#6d8272}
+@media(max-width:680px){.hhba-v2-company-role-grid{grid-template-columns:1fr}}

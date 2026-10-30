@@ -150,7 +150,7 @@ function InternalATSJD({job}:{job:Job}) {
        {(!detail.responsibilities||!detail.requirements)&&<p className="hhba-internal-note">部分章节没有独立标题，下面保留完整原文供人工核对，不自动编造或分类。</p>}
        <details><summary>查看官方 JD 全文（原始语言）</summary><p className="hhba-jd-text">{detail.full_text}</p></details>
        <div className="hhba-jd-proof"><ShieldCheck size={16}/><span>源站现场读取 · SHA-256：{detail.jd_sha256.slice(0,12)}… · {day(detail.observed_at)}。此结果不证明岗位仍开放，也不代表获得转载授权。</span>
-       <a href={detail.source_url} rel="noopener noreferrer" target="_blank">打开官方岗位 <ArrowRight size={14}/></a></div>
+       <a data-hhba-recruitment-outbound="true" href={detail.source_url} rel="noopener noreferrer" target="_blank">打开官方岗位 <ArrowRight size={14}/></a></div>
     </div>}
  </section>;
 }
@@ -220,7 +220,7 @@ function ReviewedJobDescription({job}:{job:Job}){
      {attributes.filter(([,v])=>Boolean(v?.trim())).map(([key,v])=><div key={key}><strong>{key}</strong><p className="hhba-jd-text">{v}</p></div>)}
    </div>}
    <div className="hhba-jd-proof"><ShieldCheck size={16}/><span>内容经人工对照原始来源并核对展示权限。审核日期：{content.content_reviewed_at} · 权利方：{content.rights_holder}。职位是否仍可申请，以企业官网为准。</span>
-    <a href={content.source_url} rel="noopener noreferrer" target="_blank">核对官方原文 <ArrowRight size={14}/></a></div>
+    <a data-hhba-recruitment-outbound="true" href={content.source_url} rel="noopener noreferrer" target="_blank">核对官方原文 <ArrowRight size={14}/></a></div>
  </section>;
 }
 export function CandidateJobDetailPage({user,jobId}:{user:User|null;jobId:string}) {
@@ -253,9 +253,9 @@ export function CandidateJobDetailPage({user,jobId}:{user:User|null;jobId:string
    {loading?<div className="hhba-jobs-empty" role="status">正在读取历史职位详情…</div>:
    error||!job?<div className="hhba-jobs-empty" role="alert">无法获取这条历史职位。<p><Link to="/candidate/jobs">返回岗位搜索</Link></p></div>:
    <><header className="hhba-jobs-hero"><span className="page-kicker">{job.record_kind==='ATS_STAGING_PREVIEW'?'INTERNAL STAGING · 内部验收预览':job.record_kind==='ATS_OFFICIAL_METADATA'?'OFFICIAL ATS · 官方招聘板已核对':job.record_kind==='OFFICIAL_LIST_OBSERVED'?'OFFICIAL LIST · 官方岗位列表采集':'HISTORICAL RECORD · 历史记录'}</span><h1>{label(job.job_title,'岗位未命名')}</h1><p>{label(job.company_display_name,'企业未披露')} · {label(job.work_city,'城市未披露')}</p>{job.record_kind==='ATS_STAGING_PREVIEW'&&<p className="hhba-detail-note" role="alert">仅供内部验收：该 ATS 来源的企业归属与元数据公开使用权限尚未人工审核。岗位并非已核验可投递，不得将此预览直接作为公网正式内容。</p>}<div className="hhba-position-tags"><span>{names[job.primary_recruitment_type||'']||'类型待确认'}</span><span>{states[job.job_status||'']||'历史状态待确认'}</span></div>
-     {direct ? <a className="primary-button hhba-official" href={direct} target="_blank" rel="noopener noreferrer">去官方投递 · 已核验入口 <ArrowRight size={16}/></a>
-       : link ? <a className="primary-button hhba-official" href={link} target="_blank" rel="noopener noreferrer">{job.record_kind==='ATS_STAGING_PREVIEW'?'打开 ATS 原始岗位页面核对 · 非投递确认':'前往企业官网核对 · 投递未确认'} <ArrowRight size={16}/></a>
-       : listLink ? <a className="primary-button hhba-official" href={listLink} target="_blank" rel="noopener noreferrer">查看企业招聘频道 · 不是该岗位投递地址 <ArrowRight size={16}/></a>
+     {direct ? <a data-hhba-recruitment-outbound="true" className="primary-button hhba-official" href={direct} target="_blank" rel="noopener noreferrer">去官方投递 · 已核验入口 <ArrowRight size={16}/></a>
+       : link ? <a data-hhba-recruitment-outbound="true" className="primary-button hhba-official" href={link} target="_blank" rel="noopener noreferrer">{job.record_kind==='ATS_STAGING_PREVIEW'?'打开 ATS 原始岗位页面核对 · 非投递确认':'前往企业官网核对 · 投递未确认'} <ArrowRight size={16}/></a>
+       : listLink ? <a data-hhba-recruitment-outbound="true" className="primary-button hhba-official" href={listLink} target="_blank" rel="noopener noreferrer">查看企业招聘频道 · 不是该岗位投递地址 <ArrowRight size={16}/></a>
        : <p>官方详情链接尚未核实，暂不提供投递入口。</p>}
    </header><InternalATSJD job={job}/><PublicATSOriginalJD job={job}/>{job.record_kind!=='ATS_OFFICIAL_METADATA'&&<ReviewedJobDescription job={job}/>}<div className="hhba-job-detail-grid"><article className="hhba-position-card"><h2>职位基本信息</h2><dl className="hhba-detail-facts">
      <dt>工作地点</dt><dd>{label(job.work_city)}</dd><dt>最低学历</dt><dd>{label(job.education_min)}</dd><dt>最近检查</dt><dd>{day(job.status_checked_at||job.last_verified_at)}</dd>

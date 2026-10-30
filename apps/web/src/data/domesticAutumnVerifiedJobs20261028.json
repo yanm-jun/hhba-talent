@@ -1,0 +1,786 @@
+{
+  "schemaVersion": "1.0",
+  "checkedOn": "2026-10-28",
+  "note": "岗位/招聘方向为已观察的公开历史记录，并非实时开放招聘。program不能视为逐岗专业与城市匹配；地区未知不可猜测。",
+  "jobs": [
+    {
+      "id": "cn-autumn-job-001",
+      "company": "青岛银行",
+      "title": "客户经理",
+      "majors": [
+        "不限专业"
+      ],
+      "cities": [
+        "济南",
+        "东营",
+        "威海",
+        "淄博",
+        "德州",
+        "枣庄",
+        "烟台",
+        "滨州",
+        "潍坊",
+        "临沂",
+        "济宁",
+        "泰安",
+        "菏泽",
+        "日照",
+        "聊城",
+        "青岛"
+      ],
+      "education": "本科及以上",
+      "recruitmentType": "校园招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://campus.51job.com/qdccb2027/process.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "官方页面按辖区列出可报名工作城市，各城市的具体名额以官网为准"
+    },
+    {
+      "id": "cn-autumn-job-002",
+      "company": "青岛银行",
+      "title": "运营支持",
+      "majors": [
+        "不限专业"
+      ],
+      "cities": [
+        "济南",
+        "东营",
+        "威海",
+        "淄博",
+        "德州",
+        "枣庄",
+        "烟台",
+        "滨州",
+        "潍坊",
+        "临沂",
+        "济宁",
+        "泰安",
+        "菏泽",
+        "日照",
+        "聊城",
+        "青岛"
+      ],
+      "education": "本科及以上",
+      "recruitmentType": "校园招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://campus.51job.com/qdccb2027/process.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "官方页面按辖区列出可报名工作城市，各城市的具体名额以官网为准"
+    },
+    {
+      "id": "cn-autumn-job-003",
+      "company": "青岛银行",
+      "title": "厅堂服务",
+      "majors": [
+        "不限专业"
+      ],
+      "cities": [
+        "济南",
+        "东营",
+        "威海",
+        "淄博",
+        "德州",
+        "枣庄",
+        "烟台",
+        "滨州",
+        "潍坊",
+        "临沂",
+        "济宁",
+        "泰安",
+        "菏泽",
+        "日照",
+        "聊城",
+        "青岛"
+      ],
+      "education": "本科及以上",
+      "recruitmentType": "校园招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://campus.51job.com/qdccb2027/process.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "官方页面按辖区列出可报名工作城市，各城市的具体名额以官网为准"
+    },
+    {
+      "id": "cn-autumn-job-004",
+      "company": "青岛银行",
+      "title": "管辖行管理培训生",
+      "majors": [
+        "理学类",
+        "工学类",
+        "经济学类",
+        "法学类",
+        "管理学类"
+      ],
+      "cities": [
+        "济南",
+        "东营",
+        "威海",
+        "淄博",
+        "德州",
+        "枣庄",
+        "烟台",
+        "滨州",
+        "潍坊",
+        "临沂",
+        "济宁",
+        "泰安",
+        "菏泽",
+        "日照",
+        "聊城",
+        "青岛"
+      ],
+      "education": "硕士研究生及以上",
+      "recruitmentType": "校园招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://campus.51job.com/qdccb2027/process.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "按工作地点定向报名"
+    },
+    {
+      "id": "cn-autumn-job-005",
+      "company": "青岛银行",
+      "title": "总行管理培训生",
+      "majors": [
+        "理学类",
+        "工学类",
+        "经济学类",
+        "法学类",
+        "管理学类"
+      ],
+      "cities": [
+        "青岛"
+      ],
+      "education": "硕士研究生及以上",
+      "recruitmentType": "校园招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://campus.51job.com/qdccb2027/process.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": ""
+    },
+    {
+      "id": "cn-autumn-job-006",
+      "company": "青岛银行",
+      "title": "总行金融科技岗位",
+      "majors": [
+        "计算机类",
+        "软件工程",
+        "人工智能",
+        "数学类",
+        "统计学",
+        "电子信息类",
+        "信息安全类",
+        "金融学类"
+      ],
+      "cities": [
+        "青岛"
+      ],
+      "education": "本科及以上",
+      "recruitmentType": "校园招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://campus.51job.com/qdccb2027/process.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "官方还列有通信与网络、管理科学与工程、大数据技术等专业，详情以原文为准"
+    },
+    {
+      "id": "cn-autumn-job-007",
+      "company": "青岛银行",
+      "title": "总行博士后研究岗",
+      "majors": [
+        "经济学相关学科",
+        "金融学相关学科",
+        "管理学相关学科",
+        "数学类",
+        "统计学",
+        "计算机类"
+      ],
+      "cities": [
+        "青岛"
+      ],
+      "education": "博士",
+      "recruitmentType": "校园招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://campus.51job.com/qdccb2027/process.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": ""
+    },
+    {
+      "id": "cn-autumn-job-008",
+      "company": "中国华能",
+      "title": "工程技经中心 · 电力技经岗",
+      "majors": [
+        "新能源科学与工程",
+        "电气工程及其自动化",
+        "智慧能源工程",
+        "能源与动力工程"
+      ],
+      "cities": [
+        "雄安"
+      ],
+      "education": "硕士及以上",
+      "recruitmentType": "校园招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://zhaopin.chng.com.cn/CampusRecruit?aId=2000109",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "雄安为公告标示的单位所在地，具体岗位工作地请再次进入官网核对"
+    },
+    {
+      "id": "cn-autumn-job-009",
+      "company": "中国华能",
+      "title": "工程技经中心 · 电气业务岗",
+      "majors": [
+        "电气工程及其自动化",
+        "发电厂及电力系统",
+        "电力系统自动化技术"
+      ],
+      "cities": [
+        "雄安"
+      ],
+      "education": "硕士及以上",
+      "recruitmentType": "校园招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://zhaopin.chng.com.cn/CampusRecruit?aId=2000109",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "雄安为公告标示的单位所在地，具体岗位工作地请再次进入官网核对"
+    },
+    {
+      "id": "cn-autumn-job-010",
+      "company": "中国华能",
+      "title": "工程技经中心 · 质量监督岗",
+      "majors": [
+        "土木工程",
+        "岩土工程",
+        "结构工程",
+        "建筑环境与能源应用工程"
+      ],
+      "cities": [
+        "雄安"
+      ],
+      "education": "硕士及以上",
+      "recruitmentType": "校园招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://zhaopin.chng.com.cn/CampusRecruit?aId=2000109",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "雄安为公告标示的单位所在地，具体岗位工作地请再次进入官网核对"
+    },
+    {
+      "id": "cn-autumn-job-011",
+      "company": "中国华能",
+      "title": "华北分公司 · 生产管理岗（电气）",
+      "majors": [
+        "电气工程类"
+      ],
+      "cities": [
+        "北京",
+        "天津"
+      ],
+      "education": "硕士研究生",
+      "recruitmentType": "校园招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://hera-webapp.fenbi.com/api/website/article/detail?apcid=0&app=web&av=100&client_context_id=60d9aa6de244c80fc374645132f71128&deviceType=3&hav=100&id=469092691891200",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "招聘公告明确标示该岗位可选北京、天津"
+    },
+    {
+      "id": "cn-autumn-job-012",
+      "company": "中国华能",
+      "title": "华北分公司 · 生产管理岗（热动）",
+      "majors": [
+        "能源动力类",
+        "动力工程及工程热物理类"
+      ],
+      "cities": [
+        "北京",
+        "天津"
+      ],
+      "education": "硕士研究生",
+      "recruitmentType": "校园招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://hera-webapp.fenbi.com/api/website/article/detail?apcid=0&app=web&av=100&client_context_id=60d9aa6de244c80fc374645132f71128&deviceType=3&hav=100&id=469092691891200",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": ""
+    },
+    {
+      "id": "cn-autumn-job-013",
+      "company": "中国华能",
+      "title": "华北分公司 · 财务管理岗",
+      "majors": [
+        "税务",
+        "资产评估",
+        "财务管理",
+        "会计学"
+      ],
+      "cities": [
+        "北京",
+        "天津"
+      ],
+      "education": "硕士研究生",
+      "recruitmentType": "校园招聘",
+      "recordKind": "job",
+      "locationScope": "job",
+      "sourceUrl": "https://hera-webapp.fenbi.com/api/website/article/detail?apcid=0&app=web&av=100&client_context_id=60d9aa6de244c80fc374645132f71128&deviceType=3&hav=100&id=469092691891200",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": ""
+    },
+    {
+      "id": "cn-autumn-job-014",
+      "company": "复旦微电子",
+      "title": "数字前端工程师",
+      "majors": [
+        "电子学",
+        "微电子学及相关专业"
+      ],
+      "cities": [],
+      "education": "硕士及以上",
+      "recruitmentType": "校园招聘",
+      "recordKind": "job",
+      "locationScope": "not_disclosed",
+      "sourceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "校园招聘简章明确岗位专业，但本轮未核实逐岗工作地点"
+    },
+    {
+      "id": "cn-autumn-job-015",
+      "company": "复旦微电子",
+      "title": "模拟前端工程师",
+      "majors": [
+        "电子学",
+        "微电子学及相关专业"
+      ],
+      "cities": [],
+      "education": "硕士及以上",
+      "recruitmentType": "校园招聘",
+      "recordKind": "job",
+      "locationScope": "not_disclosed",
+      "sourceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "校园招聘简章明确岗位专业，但本轮未核实逐岗工作地点"
+    },
+    {
+      "id": "cn-autumn-job-016",
+      "company": "复旦微电子",
+      "title": "后端／版图工程师",
+      "majors": [
+        "微电子学相关专业"
+      ],
+      "cities": [],
+      "education": "本科及以上",
+      "recruitmentType": "校园招聘",
+      "recordKind": "job",
+      "locationScope": "not_disclosed",
+      "sourceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "校园招聘简章明确岗位专业，但本轮未核实逐岗工作地点"
+    },
+    {
+      "id": "cn-autumn-job-017",
+      "company": "顺丰",
+      "title": "顺丰科技 · 大模型算法工程师",
+      "majors": [],
+      "cities": [
+        "深圳",
+        "武汉",
+        "成都"
+      ],
+      "education": "本科／硕士／博士",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "program",
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119482.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "岗位名称和工作城市来自同一招聘项目，但未证实该岗位在每个城市都有职位；逐岗专业未披露"
+    },
+    {
+      "id": "cn-autumn-job-018",
+      "company": "顺丰",
+      "title": "顺丰科技 · Java开发工程师",
+      "majors": [],
+      "cities": [
+        "深圳",
+        "武汉",
+        "成都"
+      ],
+      "education": "本科／硕士／博士",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "program",
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119482.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "工作城市属于顺丰科技2027招聘项目整体范围，非逐岗城市"
+    },
+    {
+      "id": "cn-autumn-job-019",
+      "company": "顺丰",
+      "title": "顺丰科技 · 交互设计师",
+      "majors": [],
+      "cities": [
+        "深圳",
+        "武汉",
+        "成都"
+      ],
+      "education": "本科／硕士／博士",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "program",
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119482.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "工作城市属于招聘项目范围；招聘专业需要在官方详情核实"
+    },
+    {
+      "id": "cn-autumn-job-020",
+      "company": "施耐德电气",
+      "title": "研发新星 · 电力电子工程师",
+      "majors": [],
+      "cities": [
+        "上海",
+        "西安",
+        "无锡",
+        "苏州",
+        "厦门",
+        "广州"
+      ],
+      "education": "2026—2027届毕业生",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "program",
+      "sourceUrl": "https://career.gdut.edu.cn/teachin/view/id/191449",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "所列城市为研发新星项目范围，不能用于逐岗城市精确匹配"
+    },
+    {
+      "id": "cn-autumn-job-021",
+      "company": "施耐德电气",
+      "title": "供应链新星 · 自动化工程师",
+      "majors": [],
+      "cities": [
+        "北京",
+        "上海",
+        "无锡",
+        "厦门",
+        "珠海",
+        "武汉",
+        "广州",
+        "西安"
+      ],
+      "education": "2026—2027届毕业生",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "program",
+      "sourceUrl": "https://career.gdut.edu.cn/teachin/view/id/191449",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "所列城市为供应链新星项目范围，逐岗专业待核实"
+    },
+    {
+      "id": "cn-autumn-job-022",
+      "company": "安克创新",
+      "title": "研发技术类（招聘方向）",
+      "majors": [],
+      "cities": [
+        "深圳",
+        "长沙",
+        "北京",
+        "苏州",
+        "上海",
+        "杭州",
+        "西安"
+      ],
+      "education": "2027届毕业生",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "program",
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/116865.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "岗位类别与城市为全项目范围，非逐岗对应"
+    },
+    {
+      "id": "cn-autumn-job-023",
+      "company": "安克创新",
+      "title": "设计类（招聘方向）",
+      "majors": [],
+      "cities": [
+        "深圳",
+        "长沙",
+        "北京",
+        "苏州",
+        "上海",
+        "杭州",
+        "西安"
+      ],
+      "education": "2027届毕业生",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "program",
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/116865.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "公开招聘方向，不代表此类职位覆盖所有城市"
+    },
+    {
+      "id": "cn-autumn-job-024",
+      "company": "网易游戏",
+      "title": "游戏研发与技术类（岗位方向）",
+      "majors": [],
+      "cities": [
+        "广州",
+        "杭州",
+        "上海"
+      ],
+      "education": "2027届毕业生",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "program",
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118238.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "专业条件暂未逐岗披露，工作城市为网易互娱校招项目范围"
+    },
+    {
+      "id": "cn-autumn-job-025",
+      "company": "网易游戏",
+      "title": "游戏策划类（岗位方向）",
+      "majors": [],
+      "cities": [
+        "广州",
+        "杭州",
+        "上海"
+      ],
+      "education": "2027届毕业生",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "program",
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118238.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "专业条件暂未逐岗披露，工作城市为网易互娱校招项目范围"
+    },
+    {
+      "id": "cn-autumn-job-026",
+      "company": "万兴科技",
+      "title": "AI产品经理（秋招方向）",
+      "majors": [
+        "不限专业"
+      ],
+      "cities": [
+        "长沙",
+        "深圳",
+        "杭州",
+        "北京"
+      ],
+      "education": "本科／硕士／博士",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "program",
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/116994.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "城市为项目整体范围，无法推断逐岗可选城市"
+    },
+    {
+      "id": "cn-autumn-job-027",
+      "company": "万兴科技",
+      "title": "AI创意设计（秋招方向）",
+      "majors": [
+        "不限专业"
+      ],
+      "cities": [
+        "长沙",
+        "深圳",
+        "杭州",
+        "北京"
+      ],
+      "education": "本科／硕士／博士",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "program",
+      "sourceUrl": "https://career.nankai.edu.cn/correcruit/content/id/116994.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "专业不限为招聘简章整体条件，具体岗位以官网为准"
+    },
+    {
+      "id": "cn-autumn-job-028",
+      "company": "中国邮政",
+      "title": "2027联合校招 · 岗位方向",
+      "majors": [
+        "邮政类",
+        "交通运输与物流类",
+        "金融经济类",
+        "电子商务类",
+        "工商管理类",
+        "计算机类",
+        "财务会计类",
+        "法律",
+        "中文"
+      ],
+      "cities": [],
+      "education": "2027届毕业生",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "not_disclosed",
+      "sourceUrl": "https://www.chinapost.com.cn/cn/report/2609/1176-1.htm",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "集团专业总体需求，不是一个可直接报名的具体职位"
+    },
+    {
+      "id": "cn-autumn-job-029",
+      "company": "中国大唐集团",
+      "title": "2027年度首批校园招聘（集团计划）",
+      "majors": [],
+      "cities": [],
+      "education": "2027届毕业生",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "not_disclosed",
+      "sourceUrl": "https://www.dteg.com.cn/dteg/xwzx/jtxw/2026/9/I1552059660066881536.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "集团下属单位岗位、专业、地点需按实际职位查询"
+    },
+    {
+      "id": "cn-autumn-job-030",
+      "company": "中国海油",
+      "title": "2027届校园招聘（集团项目）",
+      "majors": [
+        "石油化工类",
+        "计算机类",
+        "地质类",
+        "传媒类"
+      ],
+      "cities": [],
+      "education": "本科及以上",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "not_disclosed",
+      "sourceUrl": "https://jy.tust.edu.cn/correcruit/content/id/46952.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "招聘简章总体专业范围，不能给每个具体岗位赋予这些要求"
+    },
+    {
+      "id": "cn-autumn-job-031",
+      "company": "宁波银行",
+      "title": "科技／量化风控类（招聘方向）",
+      "majors": [
+        "数学",
+        "计算机",
+        "软件工程",
+        "统计学"
+      ],
+      "cities": [],
+      "education": "2027届毕业生",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "not_disclosed",
+      "sourceUrl": "https://career.nankai.edu.cn/recruitment/content/type/2/id/6152.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "专业为公告中的优先背景，非硬性限定；工作地点待核实"
+    },
+    {
+      "id": "cn-autumn-job-032",
+      "company": "广发银行",
+      "title": "金融科技类（招聘方向）",
+      "majors": [
+        "理学类",
+        "工学类",
+        "经济学类",
+        "法学类",
+        "管理学类"
+      ],
+      "cities": [
+        "广州",
+        "北京",
+        "上海",
+        "佛山"
+      ],
+      "education": "2027届毕业生",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "program",
+      "sourceUrl": "https://www.ncss.cn/student/jobs/2QNzCztmZsnxQLKKrA9nA3/detail.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "城市是总行多个岗位类别的整体范围；专业为全校招重点方向，不能视为本岗位精确要求"
+    },
+    {
+      "id": "cn-autumn-job-033",
+      "company": "广州农商银行",
+      "title": "2027届校园招聘（招聘项目）",
+      "majors": [],
+      "cities": [
+        "广州"
+      ],
+      "education": "本科及以上",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "program",
+      "sourceUrl": "https://jy.bhu.edu.cn/detail/online?id=3622116",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "公告确认招聘项目，具体岗位及专业尚未按职位对应"
+    },
+    {
+      "id": "cn-autumn-job-034",
+      "company": "浙江省交通集团",
+      "title": "2027届校园招聘（集团及下属企业）",
+      "majors": [],
+      "cities": [],
+      "education": "2027届毕业生",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "not_disclosed",
+      "sourceUrl": "https://job.tiangong.edu.cn/correcruit/content/id/56355.html",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "集团约20余家子公司招聘计划，不可将集团地点当岗位地点"
+    },
+    {
+      "id": "cn-autumn-job-035",
+      "company": "中国南方航空",
+      "title": "2027届秋招（项目入口）",
+      "majors": [],
+      "cities": [],
+      "education": "2027届毕业生",
+      "recruitmentType": "校园招聘",
+      "recordKind": "program",
+      "locationScope": "not_disclosed",
+      "sourceUrl": "https://www.5rc.com/zhaokao/632835/",
+      "status": "historical_public_announcement_current_open_unverified",
+      "observedOn": "2026-10-28",
+      "note": "未找到本轮可直接核实岗位、专业及工作地相互对应的具体职位"
+    }
+  ]
+}

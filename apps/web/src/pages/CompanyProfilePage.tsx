@@ -6,6 +6,9 @@ import { CompanyVisualStory } from '../components/CompanyVisualStory';
 import { verifiedBrandKey } from '../components/EmployerBrandLogo';
 import { companyProfiles, profileFromSlug, type CompanySlug } from '../services/companyProfiles';
 import { CURATED_JOBS, featuredTitle, featuredLocation } from '../services/featuredOfficialJobs';
+import {CompanyMajorChips} from '../components/CompanyMajorChips';
+import {useSharedMajorSelection} from '../components/CompanyMajorJobs';
+import {matchRoleToMajor,majorName} from '../services/majorJobMatching';
 import { loadOfficialPublicSnapshot, localizedLocation, officialStatus, safeOfficialJobUrl,
   type Language, type LiveJob } from '../services/liveRecruitment';
 import { loadPublicJobAudit } from '../services/jobSyncStatus';
@@ -26,6 +29,11 @@ export function CompanyProfilePage({slug,user}:{slug:string;user:User|null}){
    catch{return 'zh'}
  });
  const [jobs,setJobs]=useState<LiveJob[]>([]);
+ const {slug:selectedMajor,choose:chooseMajor}=useSharedMajorSelection();
+ const matchedJobs=!selectedMajor?jobs:jobs.filter(j=>{
+  const result=matchRoleToMajor(j,selectedMajor);
+  return result==='related'||result==='unrestricted';
+ });
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState('');
  const [updated,setUpdated]=useState('');
@@ -128,7 +136,12 @@ export function CompanyProfilePage({slug,user}:{slug:string;user:User|null}){
          </div>)}
        </div>
      </section>
-     <section className="company-profile-section company-profile-openings" aria-labelledby="company-openings-title">
+     <section className="company-profile-section company-profile-major-chips" aria-label="适合哪些专业背景">
+       <h2>{lang==='zh'?'适合哪些专业背景？':'Relevant academic backgrounds'}</h2>
+       <p>{lang==='zh'?'点击专业查看已核验岗位；未披露专业的国际岗位不会被擅自标记为匹配。':'Choose an academic subject to filter evidence-backed jobs; unknown requirements are not assumed eligible.'}</p>
+       <CompanyMajorChips jobs={jobs} slug={selectedMajor} onChange={chooseMajor}/>
+      </section>
+      <section className="company-profile-section company-profile-openings" aria-labelledby="company-openings-title">
        <div className="company-profile-section-heading">
          <div>
            <h2 id="company-openings-title">{lang==='zh'?'该企业的真实招聘岗位':'Official job listings'}</h2>
@@ -148,11 +161,11 @@ export function CompanyProfilePage({slug,user}:{slug:string;user:User|null}){
            {lang==='zh'?'目前没有通过近期来源核验的在招岗位。':'No recently verified listings available.'}</p>:
         <>
           <p className="company-profile-job-count">{lang==='zh'
-            ?'当前索引中符合核验条件的岗位：'+jobs.length.toLocaleString()+' 条'
-            :jobs.length.toLocaleString()+' recently source-verified listings in the index'}
+            ?(selectedMajor?'与「'+majorName(selectedMajor)+'」相关的已核验岗位：'+matchedJobs.length+' 条':'当前索引中符合核验条件的岗位：'+jobs.length.toLocaleString()+' 条')
+            :(selectedMajor?matchedJobs.length+' matching roles with verified subjects':jobs.length.toLocaleString()+' recently source-verified listings in the index')}
             {updated?' · '+updated.slice(0,10):''}</p>
           <div className="company-profile-job-grid">
-            {jobs.slice(0,shown).map(job=><Link key={job.id}
+            {matchedJobs.slice(0,shown).map(job=><Link key={job.id}
               to={'/candidate/jobs/'+encodeURIComponent(job.id)} className="company-profile-job-card">
               <strong>{featuredTitle(job,lang)}</strong>
               <span><MapPin size={13}/>{featuredLocation(job,lang)||localizedLocation(job,lang)}
@@ -160,7 +173,7 @@ export function CompanyProfilePage({slug,user}:{slug:string;user:User|null}){
               <em>{lang==='zh'?'查看岗位说明':'View job details'} <ArrowRight size={14}/></em>
             </Link>)}
           </div>
-          {jobs.length>shown&&<button className="company-profile-load-more" type="button"
+          {matchedJobs.length>shown&&<button className="company-profile-load-more" type="button"
             onClick={()=>setShown(n=>n+8)}>
             {lang==='zh'?'查看更多岗位':'Show more roles'} <ArrowRight size={14}/>
           </button>}
@@ -177,7 +190,7 @@ export function CompanyProfilePage({slug,user}:{slug:string;user:User|null}){
      <footer className="company-profile-footer">
        <span>{lang==='zh'?'企业名称、产品和商标归各自权利人所有。HHBA 独立整理，不代表授权或合作。':
          'Names and marks belong to their owners. HHBA is independent and does not claim endorsement.'}</span>
-       <a href={profile.careers} target="_blank" rel="noopener noreferrer">
+       <a data-hhba-recruitment-outbound="true" href={profile.careers} target="_blank" rel="noopener noreferrer">
          {lang==='zh'?'企业官方招聘网站':'Employer careers site'} <ExternalLink size={14}/>
        </a>
      </footer>

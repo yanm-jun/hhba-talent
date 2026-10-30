@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Building2, ExternalLink, ImageOff, UserRound } from 'lucide-react';
+import { Building2, ImageOff, UserRound } from 'lucide-react';
 import type { EmployerIdentity } from '../services/companyDirectory';
 import {
  commonsCredit, commonsImage, visualProfileFor,
@@ -22,10 +22,9 @@ function CreditedPhoto({photo,lang,portrait=false}:{
     {lang==='zh'?'图片暂时无法加载':'Image temporarily unavailable'}
    </div>}
   <div className="company-visual-credit">
-    {page?<a href={page} target="_blank" rel="noopener noreferrer"
-      title={lang==='zh'?'查看原始图片与授权信息':'View original image and license'}>
-      {photo.author} · {photo.license} <ExternalLink size={12} aria-hidden="true"/>
-    </a>:<span>{lang==='zh'?'图片来源未核实':'Image source unverified'}</span>}
+    {page?<span title={lang==='zh'?'图片作者及授权信息':'Image author and license'}>
+      {photo.author} · {photo.license}
+    </span>:<span>{lang==='zh'?'图片来源未核实':'Image source unverified'}</span>}
   </div>
  </div>;
 }
@@ -52,9 +51,9 @@ export function CompanyVisualStory({identity,lang}:{
       </div>}
      <div className="company-visual-person-details">
       <strong>{person.name}</strong><span>{person.role[lang]}</span>
-      <a href={person.source} target="_blank" rel="noopener noreferrer">
-       {lang==='zh'?'人物身份来源':'Founder identity source'} <ExternalLink size={12} aria-hidden="true"/>
-      </a>
+      <span className="company-visual-identity-credit">
+       {lang==='zh'?'人物身份来源已核对':'Founder identity source reviewed'}
+      </span>
      </div>
     </article>)}
    </div>:<div className="company-visual-unknown">

@@ -159,7 +159,7 @@ export function CuratedJobDetail({user,jobId}:{user:User|null;jobId:string}){
       <div><dt>招聘状态</dt><dd>未经实时核验</dd></div>
       <div><dt>中文标题</dt><dd>机器翻译，待人工审校</dd></div></dl>
     <p>海外官方网页可能无法在中国大陆直接访问。这里保留原始来源供核对，不要求用户访问才能阅读本页。</p>
-    <a target="_blank" rel="noopener noreferrer" href={job.originalUrl}>访问原始职位页面 <ExternalLink size={15}/></a>
+    <a data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer" href={job.originalUrl}>访问原始职位页面 <ExternalLink size={15}/></a>
     <p className="curated-caveat">该链接可能失效，并不表示职位仍在招聘。</p>
    </aside></div>
   </>}

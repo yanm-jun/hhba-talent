@@ -1,0 +1,223 @@
+{
+  "version": 1,
+  "asOf": "2026-10-28",
+  "description": "Only catalogue brand assets assigned to the same explicit employer in user screenshot. No parent-logo substitutions. Verify licensing/mark usage before formal publication.",
+  "entries": {
+    "施耐德电气": {
+      "id": "cn-autumn-002",
+      "source": "https://commons.wikimedia.org/wiki/File:Schneider_Electric_2007.svg",
+      "path": "images/autumn-real-logos/cn-autumn-002.svg",
+      "sourceType": "wikimedia_build_import",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Source-backed Schneider Electric green wordmark from the Wikimedia logo record originating in Schneider Electric annual report; trademark identification only."
+    },
+    "辉瑞": {
+      "id": "cn-autumn-003",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/pfizer/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-003.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "中国南方航空": {
+      "id": "cn-autumn-004",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/china-southern-airlines/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-004.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "安克创新": {
+      "id": "cn-autumn-008",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/anker/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-008.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "新鸿基地产": {
+      "id": "cn-autumn-010",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/sun-hung-kai/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-010.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "万兴科技": {
+      "id": "cn-autumn-022",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/wondershare/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-022.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "微软": {
+      "id": "cn-autumn-073",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/microsoft/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-073.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "大众汽车": {
+      "id": "cn-autumn-074",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/volkswagen/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-074.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "强生": {
+      "id": "cn-autumn-075",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/johnson-and-johnson/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-075.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "阿斯利康": {
+      "id": "cn-autumn-076",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/astrazeneca/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-076.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "福特中国": {
+      "id": "cn-autumn-083",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/ford/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-083.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "嘉士伯": {
+      "id": "cn-autumn-087",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/carlsberg-group/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-087.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "汇丰中国": {
+      "id": "cn-autumn-097",
+      "source": "https://github.com/glincker/thesvg/blob/main/public/icons/hsbc/default.svg",
+      "path": "images/autumn-real-logos/cn-autumn-097.svg",
+      "sourceType": "catalogue_brand_mark",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Independent SVG logo catalog; brand owner and current trademark usage require additional confirmation."
+    },
+    "青岛银行": {
+      "id": "cn-autumn-025",
+      "path": "images/autumn-real-logos/cn-autumn-025.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/qdccb-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
+    },
+    "宁波银行": {
+      "id": "cn-autumn-096",
+      "path": "images/autumn-real-logos/cn-autumn-096.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/nbcb-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
+    },
+    "广发银行": {
+      "id": "cn-autumn-095",
+      "path": "images/autumn-real-logos/cn-autumn-095.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/cgbchina-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
+    },
+    "中国邮政": {
+      "id": "cn-autumn-078",
+      "path": "images/autumn-real-logos/cn-autumn-078.svg",
+      "source": "https://github.com/cellier/bank-icon-cn/blob/master/svg/%E4%B8%AD%E5%9B%BD%E9%82%AE%E6%94%BF@0.5x.svg",
+      "sourceType": "independent_bank_brand_catalog",
+      "confidence": "name_match_historical_logo_subject_to_official_review",
+      "reviewNote": "Logo from independent bank icon collection; current visual correctness not yet independently confirmed."
+    },
+    "长沙银行": {
+      "id": "cn-autumn-144",
+      "path": "images/autumn-real-logos/cn-autumn-144.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/cscb-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
+    },
+    "大连银行": {
+      "id": "cn-autumn-154",
+      "path": "images/autumn-real-logos/cn-autumn-154.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/bankofdl-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
+    },
+    "大华银行": {
+      "id": "cn-autumn-133",
+      "path": "images/autumn-real-logos/cn-autumn-133.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/uobchina-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
+    },
+    "杭州联合银行": {
+      "id": "cn-autumn-140",
+      "path": "images/autumn-real-logos/cn-autumn-140.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/urcb-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
+    },
+    "广西北部湾银行": {
+      "id": "cn-autumn-137",
+      "path": "images/autumn-real-logos/cn-autumn-137.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/bankofbbg-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
+    },
+    "上海农商银行": {
+      "id": "cn-autumn-141",
+      "path": "images/autumn-real-logos/cn-autumn-141.svg",
+      "source": "https://github.com/icongo/bank-logos/blob/main/logos/srcb-rect.svg",
+      "sourceType": "independent_bank_brand_vector_catalog",
+      "confidence": "identity_exact_in_repository_readme_historical_asset_current_brand_confirmation_pending",
+      "reviewNote": "Matched exact Chinese company name in bank icon catalogue's published brand list; current brand usage to be confirmed."
+    },
+    "虎牙": {
+      "id": "cn-autumn-091",
+      "path": "images/autumn-real-logos/cn-autumn-091.svg",
+      "source": "https://github.com/HeyHuazi/SVGLOGO/blob/main/static/library/social/huYa.svg",
+      "sourceType": "independent_chinese_brand_vector_collection",
+      "confidence": "exact_company_name_in_localized_svg_catalog_current_brand_confirmation_pending",
+      "reviewNote": "Exact Chinese display-name asset match; separately verify official brand specifications."
+    },
+    "长城华西银行": {
+      "id": "cn-autumn-147",
+      "path": "images/autumn-real-logos/cn-autumn-147.svg",
+      "source": "https://github.com/HeyHuazi/SVGLOGO/blob/main/static/library/pay/GWB.svg",
+      "sourceType": "independent_chinese_brand_vector_collection",
+      "confidence": "exact_company_name_in_localized_svg_catalog_current_brand_confirmation_pending",
+      "reviewNote": "Exact Chinese display-name asset match; separately verify official brand specifications."
+    },
+    "四川银行": {
+      "id": "cn-autumn-146",
+      "path": "images/autumn-real-logos/cn-autumn-146.svg",
+      "source": "https://github.com/HeyHuazi/SVGLOGO/blob/main/static/library/pay/SCB.svg",
+      "sourceType": "independent_chinese_brand_vector_collection",
+      "confidence": "exact_company_name_in_localized_svg_catalog_current_brand_confirmation_pending",
+      "reviewNote": "Exact Chinese display-name asset match; separately verify official brand specifications."
+    },
+    "毕马威": {
+      "id": "cn-autumn-001",
+      "source": "https://commons.wikimedia.org/wiki/File:KPMG_blue_logo.svg",
+      "path": "images/autumn-real-logos/cn-autumn-001.svg",
+      "sourceType": "wikimedia_build_import",
+      "confidence": "brand_identity_matched_not_brand_owner_cleared",
+      "reviewNote": "Real KPMG brand SVG originally from KPMG and mirrored by Wikimedia Commons; trademark restrictions and non-affiliation apply. Imported into public static build at CI time."
+    }
+  }
+}

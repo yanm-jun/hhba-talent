@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const read=(p)=>readFileSync(p,'utf8');
+const page=read('src/pages/HypergryphCompactProfilePage.tsx');
+const component=read('src/components/CompanyMajorJobs.tsx');
+const chips=read('src/components/CompanyMajorChips.tsx');
+const styles=read('src/styles/major-company-flow.css');
+const matching=read('src/services/majorJobMatching.ts');
+const data=JSON.parse(read('src/data/domesticHypergryph2027Roles20261029.json'));
+const catalog=JSON.parse(read('src/data/officialAcademicMajors.json'));
+const options=Object.values(catalog.records||[]).map(r=>r.name);
+const presets=['数字媒体艺术','动画','视觉传达设计','计算机科学与技术','软件工程','数字媒体技术','人工智能','汉语言文学','市场营销','人力资源管理'];
+assert.equal(data.jobs.length,20,'Never discard the 20 recorded campus directions');
+for(const name of presets){
+ assert(page.includes("'"+name+"'"),'Missing quick major '+name);
+ assert(options.includes(name),'Quick major not in published academic catalog: '+name);
+ assert(data.jobs.some(j=>(j.editorialRelatedMajors||[]).includes(name)),'Quick major without associated employer jobs: '+name);
+}
+assert(page.includes('companyRoute="/companies/autumn/cn-autumn-007"'));
+assert(page.includes('majorIntro="鹰角网络的招聘方向'), 'Employer page should not display only generic template disclaimer');
+assert(component.includes('majorIntro||'), 'Generic companies still have their own default text');
+assert(chips.includes('shown.map(option=>'), 'All employer chips use a common selector');
+assert(chips.includes('onClick={()=>onChange(option.slug)}'), 'Clicking a chip must update the shared professional selection');
+assert(chips.includes("matchRoleToMajor(j,x.slug)"), 'Chip count must come from shared matcher, never hardcoded totals');
+assert(component.includes('const related=jobs.filter'), 'On-page jobs and market must share filtered records');
+assert(!component.includes('<MajorFilter')&&!component.includes('清除专业')&&!component.includes('已继承所学专业'), 'No enterprise professional search, clear button or redundant inherited-major message');
+assert(component.includes("domesticV2Records.filter(j=>j.employerRoute===companyRoute"), 'Use original V2 job records');
+assert(chips.includes('全部专业 <small>{jobs.length}</small>'), 'All-major chip retains all-role browsing');
+assert(component.includes("'/candidate/jobs/'+encodeURIComponent(job.id)"), 'Onsite job details must remain');
+assert(styles.includes('.hhba-major-quick-list'), 'Quick-chip layout must be styled');
+assert(matching.includes("return fields.length?'other':'unknown'"), 'Do not fabricate professional eligibility');
+console.log('HYPERGRYPH_MAJOR_QUICK_CHOICES_OK',presets.length,'presets',data.jobs.length,'directions');

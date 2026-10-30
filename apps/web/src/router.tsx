@@ -9,10 +9,10 @@ function currentRoute() {
 }
 
 type MarketState={scope:'home'|'jobs';filters:Record<string,unknown>;draft:string;page:number};
-type InternalNavigation={scrollY?:number;restoreMarketState?:MarketState};
+type InternalNavigation={scrollY?:number;restoreMarketState?:MarketState;talentMatchDraft?:{city:string;education:string;grad:string}};
 type JobOrigin={to:string;scrollY:number;marketState?:MarketState};
 const detailRoute=/^\/candidate\/jobs\/[A-Za-z0-9_-]{1,180}$/;
-const companyRoute=/^\/companies\/(?:openai|anthropic|spacex|id\/[A-Za-z0-9_-]{12,600}|domestic\/(?:a-[0-9]{6}|cn-B1-[0-9]{3}|spot-[^/]{2,100}|rel-[a-z]+-[0-9]{3}|group-geely|profile-[a-z0-9-]{3,150}))$/;
+const companyRoute=/^\/companies\/(?:openai|anthropic|spacex|id\/[A-Za-z0-9_-]{12,600}|domestic\/(?:a-[0-9]{6}|cn-B1-[0-9]{3}|spot-[^/]{2,100}|rel-[a-z]+-[0-9]{3}|group-geely|profile-[a-z0-9-]{3,150})|autumn\/cn-autumn-[0-9]{3})$/;
 const directoryRoute=/^\/companies$/;
 const domesticDiscoveryRoute=/^\/companies\/discover$/;
 const majorRoute=/^\/majors\/[a-z-]{3,80}$/;
@@ -21,7 +21,7 @@ function safeOrigin(to:unknown):to is string{
  if(typeof to!=='string'||to.length>700||!to.startsWith('/')||to.startsWith('//')||to.includes('\\'))return false;
  const path=to.split(/[?#]/,1)[0];
  return detailRoute.test(path)||companyRoute.test(path)||directoryRoute.test(path)||domesticDiscoveryRoute.test(path)||majorRoute.test(path)||path==='/'||path==='/candidate'||path==='/candidate/jobs'||path==='/candidate/match'||
-   path==='/candidate/jobs/archive'||path==='/candidate/employer-jobs';
+   path==='/candidate/jobs/archive'||path==='/candidate/employer-jobs'||path==='/candidate/domestic-autumn';
 }
 const safeScroll=(value:unknown)=>typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<10000000?value:0;
 function saveScrollForCurrentEntry(){
@@ -58,6 +58,7 @@ export function navigate(to:string,options:InternalNavigation={}){
      safeOrigin(source.hhbaJobOrigin.to))state.hhbaReturnJobOrigin=source.hhbaJobOrigin;
  }
  if(options.restoreMarketState)state.hhbaMarketState=options.restoreMarketState;
+ if(options.talentMatchDraft&&to.startsWith('/talent-service/match/'))state.hhbaTalentMatchDraft=options.talentMatchDraft;
  history.pushState(state,'',href(to));
  dispatchEvent(new PopStateEvent('popstate',{state}));
 }

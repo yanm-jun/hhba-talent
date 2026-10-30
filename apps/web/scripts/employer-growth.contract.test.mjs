@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 const read = path => readFileSync(new URL('../'+path, import.meta.url),'utf8');
 test('existing HHBA homepage keeps original candidate card and company discovery',()=>{
  const home=read('src/pages/HomePage.tsx');
- assert.match(home,/kind === 'candidate' \? '\/candidate' : '\/employer\/start'/);
+ assert.ok(home.includes("kind==='candidate'?'/candidate/register':'/employer/start'"));
  assert.match(home,/UnifiedJobMarket compact/);
  assert.match(home,/HomeCompanyMarquee/);
  assert.match(home,/企业发现 · 200 家国内企业/);

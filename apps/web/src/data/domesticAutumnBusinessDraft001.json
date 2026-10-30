@@ -1,0 +1,1339 @@
+{
+  "schemaVersion": "1.1",
+  "createdOn": "2026-10-29",
+  "note": "Unique company-specific editorial business scopes; not a substitute for independent official verification. Records without exact official source are draft editorial.",
+  "entries": {
+    "cn-autumn-001": {
+      "business": [
+        {
+          "title": "审计与鉴证",
+          "description": "财务报表审计、财务报告和风险鉴证"
+        },
+        {
+          "title": "税务服务",
+          "description": "企业税务合规、税务咨询及跨境税务议题"
+        },
+        {
+          "title": "专业咨询",
+          "description": "管理咨询、风险管理、数字化及交易相关服务"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-002": {
+      "business": [
+        {
+          "title": "电气化设备",
+          "description": "低压配电、能效管理与电气基础设施"
+        },
+        {
+          "title": "工业自动化",
+          "description": "工业控制、机器自动化及数字化软件"
+        },
+        {
+          "title": "数字能源",
+          "description": "面向楼宇、数据中心和电网的解决方案"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-003": {
+      "business": [
+        {
+          "title": "创新药研发",
+          "description": "医药创新、临床研究与药物开发"
+        },
+        {
+          "title": "生物制药",
+          "description": "疫苗及相关生物技术产品"
+        },
+        {
+          "title": "医药运营",
+          "description": "药品生产、质量和医疗健康服务支持"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-004": {
+      "business": [
+        {
+          "title": "航空客运",
+          "description": "国内与国际航线的旅客运输"
+        },
+        {
+          "title": "航空货运",
+          "description": "航空物流和货物运输服务"
+        },
+        {
+          "title": "航空运营",
+          "description": "机务维修、地面服务及运行保障"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-005": {
+      "business": [
+        {
+          "title": "时效快递",
+          "description": "时效性寄递与经济型快递产品"
+        },
+        {
+          "title": "综合物流",
+          "description": "快运、冷链、医药物流与同城配送"
+        },
+        {
+          "title": "供应链服务",
+          "description": "国际货运和企业供应链解决方案"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-006": {
+      "business": [
+        {
+          "title": "游戏研发",
+          "description": "游戏客户端、服务端及交互玩法开发"
+        },
+        {
+          "title": "游戏发行",
+          "description": "游戏运营、用户服务与全球发行"
+        },
+        {
+          "title": "内容技术",
+          "description": "美术、引擎、技术平台和内容制作"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-007": {
+      "business": [
+        {
+          "title": "游戏开发",
+          "description": "以原创游戏和世界观为核心的研发"
+        },
+        {
+          "title": "内容与音乐",
+          "description": "与原创游戏相关的音乐、艺术及衍生内容"
+        },
+        {
+          "title": "IP运营",
+          "description": "游戏运营及原创知识产权内容延伸"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-008": {
+      "business": [
+        {
+          "title": "移动充电",
+          "description": "移动电源、充电器与数码配件"
+        },
+        {
+          "title": "智能家居",
+          "description": "智能家居、家庭安防和清洁设备"
+        },
+        {
+          "title": "音频与能源",
+          "description": "音频设备和家庭储能等消费科技"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-009": {
+      "business": [
+        {
+          "title": "高速吹风机",
+          "description": "家用高速电吹风与护发电器"
+        },
+        {
+          "title": "口腔护理",
+          "description": "电动牙刷与相关护理产品"
+        },
+        {
+          "title": "产品研发",
+          "description": "电机、结构、外观和消费电器工程设计"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-010": {
+      "business": [
+        {
+          "title": "物业发展",
+          "description": "住宅及综合物业项目开发"
+        },
+        {
+          "title": "商业物业",
+          "description": "商场、写字楼运营与资产管理"
+        },
+        {
+          "title": "酒店与服务",
+          "description": "酒店及配套地产服务"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-011": {
+      "business": [
+        {
+          "title": "集中式租赁住房",
+          "description": "长租青年公寓和租赁社区"
+        },
+        {
+          "title": "住房运营",
+          "description": "租务管理、社区服务和物业维护"
+        },
+        {
+          "title": "保障性租赁",
+          "description": "相关租赁住房项目的建设与运营服务"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-012": {
+      "business": [
+        {
+          "title": "新能源装备",
+          "description": "风力发电及能源设备技术"
+        },
+        {
+          "title": "动力电池",
+          "description": "电池制造与能源储存产业链"
+        },
+        {
+          "title": "数字能源",
+          "description": "能源物联网、工业智能和低碳解决方案"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-013": {
+      "business": [
+        {
+          "title": "动力电池",
+          "description": "动力电芯、模组和电池包研发制造"
+        },
+        {
+          "title": "储能产品",
+          "description": "大型与家庭储能系统和相关电池产品"
+        },
+        {
+          "title": "电池技术",
+          "description": "材料、制造工艺与质量验证"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-014": {
+      "business": [
+        {
+          "title": "国际能源工程",
+          "description": "海外电力和新能源项目工程服务"
+        },
+        {
+          "title": "工程建设",
+          "description": "跨区域工程总承包及项目管理"
+        },
+        {
+          "title": "投资与咨询",
+          "description": "国际业务开发、工程咨询与运营支持"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-015": {
+      "business": [
+        {
+          "title": "煤炭工程技术",
+          "description": "煤矿开采与安全生产技术"
+        },
+        {
+          "title": "智能矿山",
+          "description": "矿山自动化与智能装备"
+        },
+        {
+          "title": "科研服务",
+          "description": "煤炭行业研发检测及工程设计"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-016": {
+      "business": [
+        {
+          "title": "通信工程服务",
+          "description": "通信网络规划建设与工程实施"
+        },
+        {
+          "title": "数字化服务",
+          "description": "企业信息化及智慧城市项目"
+        },
+        {
+          "title": "运维外包",
+          "description": "网络维护、业务支持和综合服务"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-017": {
+      "business": [
+        {
+          "title": "政企信息系统",
+          "description": "政府和企业数字化解决方案"
+        },
+        {
+          "title": "软件与集成",
+          "description": "基础软件、行业应用与系统集成"
+        },
+        {
+          "title": "网络安全",
+          "description": "信息安全与信息技术服务"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-018": {
+      "business": [
+        {
+          "title": "清洁能源",
+          "description": "城市燃气、天然气供应链与能源服务"
+        },
+        {
+          "title": "智能能源",
+          "description": "能耗管理、智慧能源解决方案"
+        },
+        {
+          "title": "生活服务",
+          "description": "集团相关品质生活和健康服务业务"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-019": {
+      "business": [
+        {
+          "title": "广播电视",
+          "description": "电视节目制作与播出业务"
+        },
+        {
+          "title": "内容创作",
+          "description": "影视综艺、文化传媒和数字内容"
+        },
+        {
+          "title": "传媒运营",
+          "description": "媒体平台运营、版权及内容产业开发"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-020": {
+      "business": [
+        {
+          "title": "矿业资源",
+          "description": "有色金属及矿产资源勘查开发"
+        },
+        {
+          "title": "矿山运营",
+          "description": "选矿、冶炼及相关工业服务"
+        },
+        {
+          "title": "资源贸易",
+          "description": "矿业产业链供应和销售"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-021": {
+      "business": [
+        {
+          "title": "儿童个护",
+          "description": "儿童洗护与护理类消费品"
+        },
+        {
+          "title": "家庭日化",
+          "description": "消费日化相关品牌与渠道"
+        },
+        {
+          "title": "品牌运营",
+          "description": "产品开发、零售及供应链"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-022": {
+      "business": [
+        {
+          "title": "视频创作软件",
+          "description": "视频剪辑、特效和数字创意工具"
+        },
+        {
+          "title": "办公效率软件",
+          "description": "PDF、绘图与可视化工具"
+        },
+        {
+          "title": "AI创作应用",
+          "description": "生成式内容和视频创作服务"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-023": {
+      "business": [
+        {
+          "title": "电子游戏",
+          "description": "移动及在线游戏研发"
+        },
+        {
+          "title": "游戏发行",
+          "description": "内容本地化、运营与发行"
+        },
+        {
+          "title": "创意技术",
+          "description": "程序、美术和游戏交互制作"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-024": {
+      "business": [
+        {
+          "title": "企业身份待确认",
+          "description": "该简称对应的经营主体尚需核对"
+        },
+        {
+          "title": "业务范围待确认",
+          "description": "需以正式工商名称或官方产品页面确认"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-025": {
+      "business": [
+        {
+          "title": "公司金融",
+          "description": "企业存贷款、结算和金融服务"
+        },
+        {
+          "title": "零售金融",
+          "description": "个人储蓄、贷款和支付服务"
+        },
+        {
+          "title": "财富服务",
+          "description": "银行财富管理与金融科技渠道"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-026": {
+      "business": [
+        {
+          "title": "出版发行",
+          "description": "图书、教材及出版物发行"
+        },
+        {
+          "title": "传媒内容",
+          "description": "出版传媒与数字阅读服务"
+        },
+        {
+          "title": "文化产业",
+          "description": "版权运营和相关文化服务"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-027": {
+      "business": [
+        {
+          "title": "旅游服务",
+          "description": "团队旅游、定制出游和出境旅游服务"
+        },
+        {
+          "title": "商务会奖",
+          "description": "企业商旅、会展和团建服务"
+        },
+        {
+          "title": "旅游运营",
+          "description": "旅行社产品设计与渠道运营"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-028": {
+      "business": [
+        {
+          "title": "交通基建",
+          "description": "公路桥梁和交通工程施工"
+        },
+        {
+          "title": "工程项目",
+          "description": "施工总承包和建设管理"
+        },
+        {
+          "title": "工程服务",
+          "description": "路桥工程技术与基础设施维护"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-029": {
+      "business": [
+        {
+          "title": "电力工程",
+          "description": "火电、新能源及电网相关工程服务"
+        },
+        {
+          "title": "工程建设",
+          "description": "电力工程项目建设和运维"
+        },
+        {
+          "title": "新能源建设",
+          "description": "光伏、风电等发电设施工程"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-030": {
+      "business": [
+        {
+          "title": "能源投资",
+          "description": "电力能源项目投资和运营"
+        },
+        {
+          "title": "国有资本",
+          "description": "产业投资与资产管理"
+        },
+        {
+          "title": "综合服务",
+          "description": "金融及相关多元化经营"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-031": {
+      "business": [
+        {
+          "title": "名称待辨认",
+          "description": "奇正可能涉及多个不同经营主体"
+        },
+        {
+          "title": "业务身份核实",
+          "description": "具体产品及公司历史须按全称确认"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-032": {
+      "business": [
+        {
+          "title": "检验检测",
+          "description": "材料、化学和生物等分析检测"
+        },
+        {
+          "title": "研发分析",
+          "description": "研发测试与科学技术服务"
+        },
+        {
+          "title": "质量技术",
+          "description": "第三方检测与标准相关服务"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-033": {
+      "business": [
+        {
+          "title": "激光加工设备",
+          "description": "工业激光切割和相关设备"
+        },
+        {
+          "title": "智能制造",
+          "description": "加工自动化和数字控制"
+        },
+        {
+          "title": "制造服务",
+          "description": "工业设备销售、支持与售后"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-034": {
+      "business": [
+        {
+          "title": "半导体芯片",
+          "description": "集成电路研发与设计"
+        },
+        {
+          "title": "芯片工程",
+          "description": "器件工艺、验证测试等工程环节"
+        },
+        {
+          "title": "供应链服务",
+          "description": "相关器件产品与技术支持"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-035": {
+      "business": [
+        {
+          "title": "智能驾驶",
+          "description": "驾驶辅助与智能汽车解决方案"
+        },
+        {
+          "title": "车载系统",
+          "description": "感知、计算与汽车电子技术"
+        },
+        {
+          "title": "研发测试",
+          "description": "智能驾驶软硬件和系统验证"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-036": {
+      "business": [
+        {
+          "title": "电源管理芯片",
+          "description": "电源控制、充电与电池管理器件"
+        },
+        {
+          "title": "芯片设计",
+          "description": "模拟和混合信号集成电路研发"
+        },
+        {
+          "title": "半导体技术",
+          "description": "应用支持、测试和验证"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-037": {
+      "business": [
+        {
+          "title": "智能音频芯片",
+          "description": "无线音频及相关芯片产品"
+        },
+        {
+          "title": "物联网芯片",
+          "description": "低功耗智能终端半导体技术"
+        },
+        {
+          "title": "芯片研发",
+          "description": "软件、算法和系统集成"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-038": {
+      "business": [
+        {
+          "title": "光通信器件",
+          "description": "光纤通信模块和光器件"
+        },
+        {
+          "title": "数据中心互联",
+          "description": "面向数据传输的光通信产品"
+        },
+        {
+          "title": "研发制造",
+          "description": "光电子封装、检测与制造"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-039": {
+      "business": [
+        {
+          "title": "功率半导体",
+          "description": "分立器件及功率管理技术"
+        },
+        {
+          "title": "汽车电子",
+          "description": "用于汽车和工业领域的半导体"
+        },
+        {
+          "title": "电子制造",
+          "description": "器件应用、测试和供应链"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-040": {
+      "business": [
+        {
+          "title": "增材制造",
+          "description": "工业级3D打印设备及服务"
+        },
+        {
+          "title": "数字化生产",
+          "description": "三维打印工艺与生产应用"
+        },
+        {
+          "title": "材料研发",
+          "description": "打印材料与智能制造技术"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-041": {
+      "business": [
+        {
+          "title": "身份需核实",
+          "description": "晶云对应的企业全称与所在行业待明确"
+        },
+        {
+          "title": "产品需核实",
+          "description": "具体业务应以官网或工商全称确定"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-042": {
+      "business": [
+        {
+          "title": "工业信息化",
+          "description": "制造执行系统与生产数字化"
+        },
+        {
+          "title": "生产管理",
+          "description": "制造运营信息与智能工厂"
+        },
+        {
+          "title": "系统集成",
+          "description": "工业软件实施及技术服务"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-043": {
+      "business": [
+        {
+          "title": "工业移动机器人",
+          "description": "仓储及制造场景移动机器人"
+        },
+        {
+          "title": "自动化物流",
+          "description": "厂内搬运和机器人调度"
+        },
+        {
+          "title": "机器人技术",
+          "description": "智能控制与系统集成"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-044": {
+      "business": [
+        {
+          "title": "光电技术",
+          "description": "光学与光电子器件研发"
+        },
+        {
+          "title": "精密制造",
+          "description": "光学加工、检测及器件应用"
+        },
+        {
+          "title": "工程服务",
+          "description": "相关光电产品与技术支持"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-045": {
+      "business": [
+        {
+          "title": "半导体技术",
+          "description": "芯片及器件相关研发方向"
+        },
+        {
+          "title": "集成电路",
+          "description": "半导体产品设计与产业应用"
+        },
+        {
+          "title": "工程验证",
+          "description": "芯片测试与质量技术"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-046": {
+      "business": [
+        {
+          "title": "芯片技术",
+          "description": "集成电路研发和产业技术"
+        },
+        {
+          "title": "半导体制造",
+          "description": "芯片封装、测试及供应链环节"
+        },
+        {
+          "title": "技术服务",
+          "description": "电子器件和研发支持"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-047": {
+      "business": [
+        {
+          "title": "通信技术",
+          "description": "通信网络和设备相关产品"
+        },
+        {
+          "title": "系统服务",
+          "description": "通信系统集成和网络技术"
+        },
+        {
+          "title": "信息工程",
+          "description": "数字通信工程实施"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-048": {
+      "business": [
+        {
+          "title": "功能材料",
+          "description": "材料及化工相关产品"
+        },
+        {
+          "title": "产业制造",
+          "description": "产品生产、工艺和应用开发"
+        },
+        {
+          "title": "技术服务",
+          "description": "工业材料相关解决方案"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-049": {
+      "business": [
+        {
+          "title": "光谱技术",
+          "description": "光谱探测及分析技术"
+        },
+        {
+          "title": "光电设备",
+          "description": "光学仪器与设备研发"
+        },
+        {
+          "title": "工程应用",
+          "description": "光谱识别和检测场景"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-050": {
+      "business": [
+        {
+          "title": "科研技术",
+          "description": "科技研发与成果应用"
+        },
+        {
+          "title": "产业服务",
+          "description": "技术咨询和产业项目服务"
+        },
+        {
+          "title": "身份校核",
+          "description": "具体经营主体及正式产品须进一步比对"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-051": {
+      "business": [
+        {
+          "title": "新材料",
+          "description": "材料研发和工业用途"
+        },
+        {
+          "title": "材料制造",
+          "description": "工艺开发、生产与品质控制"
+        },
+        {
+          "title": "工业应用",
+          "description": "新材料的行业应用"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-052": {
+      "business": [
+        {
+          "title": "化工物流",
+          "description": "液体化工品储运和仓储"
+        },
+        {
+          "title": "能源化工",
+          "description": "化工供应链及相关设施服务"
+        },
+        {
+          "title": "产业运营",
+          "description": "仓储码头与物流管理"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-053": {
+      "business": [
+        {
+          "title": "能源装备",
+          "description": "石油化工及能源装备制造"
+        },
+        {
+          "title": "工业设备",
+          "description": "压力容器、机械和相关设备"
+        },
+        {
+          "title": "工程服务",
+          "description": "工业装备技术与工程管理"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-054": {
+      "business": [
+        {
+          "title": "国际货运",
+          "description": "海运、空运及国际物流代理"
+        },
+        {
+          "title": "供应链",
+          "description": "跨境物流和企业供应链服务"
+        },
+        {
+          "title": "仓储配送",
+          "description": "仓储、报关及运输管理"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-055": {
+      "business": [
+        {
+          "title": "环境技术",
+          "description": "工业水处理和环保技术"
+        },
+        {
+          "title": "研发制造",
+          "description": "环保材料、设备或技术产品"
+        },
+        {
+          "title": "工程应用",
+          "description": "环保工程与技术服务"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-056": {
+      "business": [
+        {
+          "title": "客户联络",
+          "description": "客户服务中心及多渠道客户支持"
+        },
+        {
+          "title": "业务流程外包",
+          "description": "客户运营和流程支持"
+        },
+        {
+          "title": "数字化服务",
+          "description": "客服系统与企业服务平台"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-057": {
+      "business": [
+        {
+          "title": "互联网产品",
+          "description": "LINE相关互联网平台技术"
+        },
+        {
+          "title": "数字服务",
+          "description": "互联网应用开发与平台运营"
+        },
+        {
+          "title": "全球技术",
+          "description": "软件工程和产品研发"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-058": {
+      "business": [
+        {
+          "title": "金融科技",
+          "description": "金融机构信息系统与技术支持"
+        },
+        {
+          "title": "数字化运营",
+          "description": "金融业务平台及数字服务"
+        },
+        {
+          "title": "IT服务",
+          "description": "应用研发、实施和运维"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-059": {
+      "business": [
+        {
+          "title": "企业IT",
+          "description": "数据技术、软件开发及系统实施"
+        },
+        {
+          "title": "网络通信",
+          "description": "信息网络系统和业务支撑"
+        },
+        {
+          "title": "技术服务",
+          "description": "研发运维与数字化集成"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-060": {
+      "business": [
+        {
+          "title": "网络硬件",
+          "description": "通信与服务器相关电子产品"
+        },
+        {
+          "title": "硬件研发",
+          "description": "电子产品结构与硬件开发"
+        },
+        {
+          "title": "产品制造",
+          "description": "通信设备研发及生产供应"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-061": {
+      "business": [
+        {
+          "title": "跨境消费",
+          "description": "相关产品与品牌全球化业务"
+        },
+        {
+          "title": "电商运营",
+          "description": "跨境销售、内容与渠道管理"
+        },
+        {
+          "title": "研发供应",
+          "description": "消费产品研发及供应链"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-062": {
+      "business": [
+        {
+          "title": "国资运营",
+          "description": "地方国有资产投资和管理"
+        },
+        {
+          "title": "产业服务",
+          "description": "国资投资运营与项目管理"
+        },
+        {
+          "title": "身份校核",
+          "description": "具体法人及集团业务须按官方主体区分"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-063": {
+      "business": [
+        {
+          "title": "汽车零部件",
+          "description": "汽车相关配件与部件供应"
+        },
+        {
+          "title": "制造服务",
+          "description": "零部件生产与质量控制"
+        },
+        {
+          "title": "客户协作",
+          "description": "汽车产业链配套业务"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-064": {
+      "business": [
+        {
+          "title": "企业身份核对",
+          "description": "新海威同名企业较多，需核对全称"
+        },
+        {
+          "title": "产品核对",
+          "description": "不得把同名企业产品混入本档案"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-065": {
+      "business": [
+        {
+          "title": "视觉技术",
+          "description": "图像处理及机器视觉"
+        },
+        {
+          "title": "智能识别",
+          "description": "视觉检测和工业感知"
+        },
+        {
+          "title": "技术研发",
+          "description": "相关软件与硬件系统"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-066": {
+      "business": [
+        {
+          "title": "产业物流",
+          "description": "供应链物流与产业服务"
+        },
+        {
+          "title": "资产运营",
+          "description": "产业投资及贸易相关服务"
+        },
+        {
+          "title": "实体关联",
+          "description": "经营主体和业务需核对"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-067": {
+      "business": [
+        {
+          "title": "企业身份核对",
+          "description": "弘象可能涉及多家同名主体"
+        },
+        {
+          "title": "业务验证",
+          "description": "产品和服务以官方主体信息为准"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-068": {
+      "business": [
+        {
+          "title": "能源化工",
+          "description": "煤炭及能源化工相关产业"
+        },
+        {
+          "title": "资源运营",
+          "description": "煤炭资源开发与能源供给"
+        },
+        {
+          "title": "资本管理",
+          "description": "集团产业投资与运营"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-069": {
+      "business": [
+        {
+          "title": "农村金融",
+          "description": "农信社系统服务与管理"
+        },
+        {
+          "title": "金融科技",
+          "description": "区域农村金融业务支持"
+        },
+        {
+          "title": "机构协同",
+          "description": "省内农信法人机构相关管理"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-070": {
+      "business": [
+        {
+          "title": "企业身份核对",
+          "description": "青岛成达同名主体需确认"
+        },
+        {
+          "title": "经营范围核对",
+          "description": "需按完整名称与官方资料确定产品"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-071": {
+      "business": [
+        {
+          "title": "集团身份核对",
+          "description": "桃溪集团所指主体需要确认"
+        },
+        {
+          "title": "产业布局核对",
+          "description": "不根据名称推定具体产品线"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-072": {
+      "business": [
+        {
+          "title": "建设工程",
+          "description": "建筑施工及工程项目"
+        },
+        {
+          "title": "城市建设",
+          "description": "市政与基础设施工程"
+        },
+        {
+          "title": "工程管理",
+          "description": "项目总包、设计与施工管理"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-073": {
+      "business": [
+        {
+          "title": "操作系统与云",
+          "description": "Windows、Azure等平台"
+        },
+        {
+          "title": "办公与协作",
+          "description": "Microsoft 365等生产力产品"
+        },
+        {
+          "title": "企业智能",
+          "description": "AI、开发工具和企业软件"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-074": {
+      "business": [
+        {
+          "title": "汽车整车",
+          "description": "大众集团相关乘用车品牌与车型"
+        },
+        {
+          "title": "汽车技术",
+          "description": "动力系统、软件及智能制造"
+        },
+        {
+          "title": "品牌服务",
+          "description": "汽车营销、销售与售后"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-075": {
+      "business": [
+        {
+          "title": "医疗科技",
+          "description": "手术设备、介入和医疗器械"
+        },
+        {
+          "title": "创新制药",
+          "description": "医药研发及创新药物"
+        },
+        {
+          "title": "医疗生态",
+          "description": "面向医疗机构的技术支持"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-076": {
+      "business": [
+        {
+          "title": "创新药",
+          "description": "肿瘤、心血管等领域的处方药研发"
+        },
+        {
+          "title": "生物技术",
+          "description": "药物开发及临床研究"
+        },
+        {
+          "title": "医药运营",
+          "description": "生产、医学与市场准入相关业务"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-077": {
+      "business": [
+        {
+          "title": "海上油气",
+          "description": "海洋油气勘探与开发生产"
+        },
+        {
+          "title": "天然气",
+          "description": "油气资源开发与能源供应"
+        },
+        {
+          "title": "能源运营",
+          "description": "海上工程、油气生产技术"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-078": {
+      "business": [
+        {
+          "title": "邮政服务",
+          "description": "邮件寄递、网点及邮政普遍服务"
+        },
+        {
+          "title": "快递物流",
+          "description": "包裹配送、综合物流与运输"
+        },
+        {
+          "title": "金融服务",
+          "description": "邮政储蓄及邮政相关业务"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-079": {
+      "business": [
+        {
+          "title": "快递网络",
+          "description": "包裹收寄、干线转运和末端配送"
+        },
+        {
+          "title": "物流延伸",
+          "description": "快运、国际物流和云仓服务"
+        },
+        {
+          "title": "运输运营",
+          "description": "分拣与数字化物流网络"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    },
+    "cn-autumn-080": {
+      "business": [
+        {
+          "title": "乳制品与植物基",
+          "description": "乳制品和植物基食品"
+        },
+        {
+          "title": "饮用水",
+          "description": "饮用水和相关饮料产品"
+        },
+        {
+          "title": "专业营养",
+          "description": "婴幼儿及医学相关营养产品"
+        }
+      ],
+      "reviewLevel": "editorial_business_scope_requires_source_check"
+    }
+  }
+}

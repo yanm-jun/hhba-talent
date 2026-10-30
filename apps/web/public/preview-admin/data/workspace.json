@@ -1,0 +1,120 @@
+{
+  "kind": "HHBA_ADMIN_WORKSPACE_V1",
+  "scope": "PUBLIC_STATIC_NAVIGATION_ONLY",
+  "sensitiveData": "not_connected",
+  "productionReviewerAuth": "not_connected",
+  "workflowDatabase": "not_connected",
+  "modules": [
+    {
+      "key": "recruitment",
+      "title": "招聘管理",
+      "state": "not_connected",
+      "pending": null,
+      "total": null,
+      "updatedAt": null,
+      "source": "public-static-ui-only",
+      "reviewAllowed": false
+    },
+    {
+      "key": "response",
+      "title": "招聘履约管理",
+      "state": "not_connected",
+      "pending": null,
+      "total": null,
+      "updatedAt": null,
+      "source": "public-static-ui-only",
+      "reviewAllowed": false
+    },
+    {
+      "key": "enterprise",
+      "title": "企业档案",
+      "state": "not_connected",
+      "pending": null,
+      "total": null,
+      "updatedAt": null,
+      "source": "public-static-ui-only",
+      "reviewAllowed": false
+    },
+    {
+      "key": "evidence",
+      "title": "企业证据核验",
+      "state": "not_connected",
+      "pending": null,
+      "total": null,
+      "updatedAt": null,
+      "source": "public-static-ui-only",
+      "reviewAllowed": false
+    },
+    {
+      "key": "care",
+      "title": "员工关怀",
+      "state": "not_connected",
+      "pending": null,
+      "total": null,
+      "updatedAt": null,
+      "source": "public-static-ui-only",
+      "reviewAllowed": false
+    },
+    {
+      "key": "scoring",
+      "title": "企业双评分",
+      "state": "not_connected",
+      "pending": null,
+      "total": null,
+      "updatedAt": null,
+      "source": "public-static-ui-only",
+      "reviewAllowed": false
+    },
+    {
+      "key": "appeals",
+      "title": "独立申诉",
+      "state": "not_connected",
+      "pending": null,
+      "total": null,
+      "updatedAt": null,
+      "source": "public-static-ui-only",
+      "reviewAllowed": false
+    },
+    {
+      "key": "improvements",
+      "title": "企业改善记录",
+      "state": "not_connected",
+      "pending": null,
+      "total": null,
+      "updatedAt": null,
+      "source": "public-static-ui-only",
+      "reviewAllowed": false
+    },
+    {
+      "key": "publication",
+      "title": "评分发布治理",
+      "state": "not_connected",
+      "pending": null,
+      "total": null,
+      "updatedAt": null,
+      "source": "public-static-ui-only",
+      "reviewAllowed": false
+    },
+    {
+      "key": "aid",
+      "title": "企业发展帮扶",
+      "state": "not_connected",
+      "pending": null,
+      "total": null,
+      "updatedAt": null,
+      "source": "public-static-ui-only",
+      "reviewAllowed": false
+    },
+    {
+      "key": "commercial",
+      "title": "客户对接和订单证明",
+      "state": "not_connected",
+      "pending": null,
+      "total": null,
+      "updatedAt": null,
+      "source": "public-static-ui-only",
+      "reviewAllowed": false
+    }
+  ],
+  "notice": "静态界面预览：不得将「—」解释为零待办或零客户。"
+}

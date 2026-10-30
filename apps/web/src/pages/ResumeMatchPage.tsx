@@ -148,7 +148,7 @@ export function ResumeMatchPage({user}:{user:User|null}){
      {m.needs_verification.length>0&&<div className="resume-match-reason"><h5>仍需核实</h5>{m.needs_verification.map((s,i)=><p key={i}>{s}</p>)}</div>}
      <div className="resume-match-job-actions">
       <Link to={'/candidate/jobs/'+encodeURIComponent(m.id)}>查看 HHBA 岗位详情</Link>
-      <a href={m.official_url} target="_blank" rel="noopener noreferrer">前往官方招聘页面 <ArrowRight size={14}/></a>
+      <a data-hhba-recruitment-outbound="true" href={m.official_url} target="_blank" rel="noopener noreferrer">前往官方招聘页面 <ArrowRight size={14}/></a>
      </div>
     </article>)}</div>
     <p className="resume-match-fineprint">{result.disclaimer}</p>

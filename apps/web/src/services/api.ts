@@ -8,7 +8,10 @@ const configuredApiBase = String(import.meta.env.VITE_API_BASE || '').trim();
 // Enable account operations only after deploying and verifying that separate API.
 const accountApiEnabled = import.meta.env.VITE_HHBA_ACCOUNT_API_ENABLED==='1';
 export const employerApiReady = accountApiEnabled && (configuredApiBase==='/api/v1' || /^https:\/\/[^\s/?#]+\/api\/v1\/?$/.test(configuredApiBase));
+// Do not send SMS from a public static site. Enable only after dedicated phone auth backend is verified.
+export const phoneAuthReady = employerApiReady && import.meta.env.VITE_HHBA_PHONE_AUTH_ENABLED==='1';
 // Evidence is an additional, independently activated capability. Existing employer API readiness is insufficient.
+export const recruitmentResponsibilityApiReady = employerApiReady && import.meta.env.VITE_HHBA_RECRUITMENT_RESPONSIBILITY_API_ENABLED==='1';
 export const evidenceApiReady = employerApiReady && import.meta.env.VITE_HHBA_EVIDENCE_API_ENABLED==='1';
 // Employee verification and protected feedback run on their own trusted service flag.
 export const employeeFeedbackApiReady = employerApiReady && import.meta.env.VITE_HHBA_EMPLOYEE_FEEDBACK_API_ENABLED==='1';
@@ -64,6 +67,9 @@ export type CandidateJobPreview = {eligible:boolean;reason:'CONFIRMED_PROFILE_RE
 export type CandidateJobApplication = {id:string;posting_id:string;company:string;title:string;location:string;status:string;created_at:string;updated_at:string};
 export type EmployerJobApplication = {id:string;posting_id:string;shared_fields:ApplicationSharedFields;cover_note:string;status:string;created_at:string;updated_at:string};
 export type ApplicationStage = 'submitted'|'reviewing'|'shortlisted'|'interview'|'rejected'|'hired'|'withdrawn';
+export type RecruitmentResponsibility = {application_id:string;organization_id:string;posting_id:string;state:'awaiting'|'reviewing'|'responded'|'overdue'|'paused'|'withdrawn';delivered_at:string;response_due_at:string;first_meaningful_response_at:string|null;responsible_user_id:string|null;response_kind:'continued'|'declined'|'cancelled'|null;calendar_version:string};
+export type RecruitmentResponsibilityQueue = {items:RecruitmentResponsibility[];total:number|null;as_of:string;status:'connected'};
+
 export type EmployerPosting = { id:string;company:string;title:string;description:string;requirements:string;location:string;work_mode:'onsite'|'hybrid'|'remote';recruitment_type:'SOCIAL'|'CAMPUS'|'INTERNSHIP';apply_url:string;status:'draft'|'pending_review'|'published'|'rejected'|'closed';published_at?:string|null;expires_at?:string|null;review_reason?:string|null;source_type:'HHBA_VERIFIED_EMPLOYER' };
 export type EmployerPostingInput = Pick<EmployerPosting,'title'|'description'|'requirements'|'location'|'work_mode'|'recruitment_type'|'apply_url'>;
 export type EmployeeFeedbackRatings = {pay:number;insurance:number;rest:number;respect:number;development:number};
@@ -95,6 +101,16 @@ export type TalentMatchReason = { field: 'skill' | 'industry' | 'region' | 'work
 export type TalentSearchCandidate = { candidate_ref: CandidateReference; display_name: string | null; headline: string | null; skills: string[]; industries: string[]; location: string | null; service_regions: string[]; work_modes: string[]; work_years: number | null; project_summaries: string[]; match_reasons: TalentMatchReason[] };
 
 export const api = {
+  sendPhoneCode: (phone:string,account_type:AccountType,mode:'login'|'register') => {
+    if(!phoneAuthReady)throw new ApiError(503,'短信登录服务尚未接入。');
+    return request<{retry_after_seconds:number}>('/auth/phone/code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,account_type,mode})});
+  },
+  phoneSession: async (data:{phone:string;code:string;account_type:AccountType;mode:'login'|'register';display_name?:string}) => {
+    if(!phoneAuthReady)throw new ApiError(503,'短信登录服务尚未接入。');
+    const response=await request<{csrf_token:string}>('/auth/phone/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    setCsrfToken(response.csrf_token);
+    return response;
+  },
   me: async () => { const user=await request<User>('/auth/me'); setCsrfToken(user.csrf_token || null); return user; },
   register: (email: string, password: string, displayName: string, accountType: AccountType = 'candidate') => request<{ id: string; account_type: AccountType }>('/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, display_name: displayName, account_type: accountType }) }),
   login: async (email: string, password: string, accountType?: AccountType) => { const data = await request<{ csrf_token: string }>('/auth/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, account_type: accountType }) }); setCsrfToken(data.csrf_token); return data; },
@@ -185,6 +201,9 @@ export const api = {
   applyEmployerJob: (postingId:string,confirmed_share:boolean,cover_note:string) => request<{id:string;status:string;notice:string}>(`/me/employer-applications/${encodeURIComponent(postingId.replace(/^employer-/,''))}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirmed_share,cover_note})}),
   myEmployerApplications: () => request<{items:CandidateJobApplication[]}>('/me/employer-applications'),
   withdrawEmployerApplication: (id:string) => request<{id:string;status:string}>(`/me/employer-applications/${encodeURIComponent(id)}/withdraw`,{method:'POST'}),
+  employerRecruitmentResponsibilities: (oid:string,pid:string) => request<RecruitmentResponsibilityQueue>(`/organizations/${encodeURIComponent(oid)}/postings/${encodeURIComponent(pid.replace(/^employer-/,''))}/recruitment-responsibilities`),
+  myRecruitmentResponsibilities: () => request<RecruitmentResponsibilityQueue>('/me/recruitment-responsibilities'),
+  adminRecruitmentResponsibilities: () => request<RecruitmentResponsibilityQueue>('/admin/recruitment-responsibilities?view=overdue'),
   employerJobApplications: (oid:string,postingId:string) => request<{items:EmployerJobApplication[]}>(`/organizations/${encodeURIComponent(oid)}/postings/${encodeURIComponent(postingId.replace(/^employer-/,''))}/applications`),
   updateEmployerApplicationStatus: (oid:string,postingId:string,id:string,status:ApplicationStage,expected_status:ApplicationStage) => request<{id:string;status:string}>(`/organizations/${encodeURIComponent(oid)}/postings/${encodeURIComponent(postingId.replace(/^employer-/,''))}/applications/${encodeURIComponent(id)}/status`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({status,expected_status})}),
 

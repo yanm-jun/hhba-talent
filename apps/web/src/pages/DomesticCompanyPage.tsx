@@ -4,6 +4,10 @@ import {Shell} from '../components/Shell';
 import {Link,getCompanyReturnTarget} from '../router';
 import {getDomesticCompanies,getDomesticRecruitment,companyById,findParentCompany,findRelatedCompanies} from '../services/domesticCompanySearch';
 import {matchingMajors} from '../services/domesticMajors';
+import {CompanyMajorChips} from '../components/CompanyMajorChips';
+import {useSharedMajorSelection} from '../components/CompanyMajorJobs';
+import {domesticV2Records} from '../services/domesticRebuildJobs';
+import {majorName,matchRoleToMajor} from '../services/majorJobMatching';
 import profiles from '../data/domesticCareerProfiles.json';
 import {domestic200Profiles as additionalProfiles} from '../services/domesticCompany200Data';
 import bundled from '../data/domesticMediaBundle.json';
@@ -44,6 +48,12 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
  const media=company?available.companies[company.name]:undefined;
  const brandSrc=media?.brand?.state==='ready'?import.meta.env.BASE_URL+media.brand.path:undefined;
  const majors=company?matchingMajors(company):[];
+ const {slug:selectedMajor,choose:chooseMajor}=useSharedMajorSelection();
+ const indexedJobs=domesticV2Records.filter(j=>j.employerRoute===company?.route);
+ const matchingJobs=!selectedMajor?indexedJobs:indexedJobs.filter(j=>{
+  const result=matchRoleToMajor(j,selectedMajor);
+  return result==='related'||result==='unrestricted';
+ });
  const recruitment=company?getDomesticRecruitment(company.name):undefined;
  const careers=company?httpsLink(company.careers):'';
  const hasReadyPhoto=Boolean(article?.photos?.some((_,i)=>media?.photos?.[i]?.state==='ready'));
@@ -95,10 +105,10 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       <h2>企业照片与办公环境</h2>
       <div className="domestic-editorial-photo-grid">
        {article!.photos!.map((photo,index)=>({photo,index})).filter(({index})=>media?.photos?.[index]?.state==='ready').map(({photo,index})=><figure key={photo.localPath||photo.url} className={'domestic-official-photo'+(photo.kind==='screenshot'?' is-screenshot':'')}>
-        <a href={(photo.source==='user_submission'?'':httpsLink(photo.source))||import.meta.env.BASE_URL+(media?.photos?.[index]?.path||'')} target="_blank" rel="noopener noreferrer" aria-label={'查看'+photo.label}>
+        <div className="domestic-photo-display" aria-label={photo.label}>
          <img src={import.meta.env.BASE_URL+(media?.photos?.[index]?.path||'')} loading="lazy" alt={photo.label} onError={e=>{e.currentTarget.style.display='none';e.currentTarget.parentElement?.classList.add('domestic-photo-unavailable')}}/>
-         <span className="domestic-photo-fallback"><Images size={18}/>打开图片</span>
-        </a>
+         <span className="domestic-photo-fallback"><Images size={18}/>图片暂时无法显示</span>
+        </div>
         <figcaption>{photo.label} · {photo.kind==='product'?'产品照片':photo.kind==='factory'?'工厂照片':photo.kind==='headquarters'?'总部/大楼':photo.kind==='office'?'办公环境':'网页或场景截图'}</figcaption>
        </figure>)}
       </div>
@@ -106,8 +116,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
     {article?.photoSourcePage&&!hasReadyPhoto?
      <section className="domestic-editorial-section" aria-label="官方企业实景来源"><h2>企业实景与办公环境</h2>
       <p className="domestic-company-note">图片暂未核验为可在本站稳定展示，避免错用其他企业照片。</p>
-      <a href={article.photoSourcePage} target="_blank" rel="noopener noreferrer" className="domestic-careers-link">
-       {article.photoSourceLabel||'查看官网企业实景资料'} <ExternalLink size={14}/></a></section>:null}
+      <span className="domestic-photo-source-note">企业实景图片的来源信息已登记，当前没有经过核验的可展示照片。</span></section>:null}
     {article?.officeLocations?.length?<section className="domestic-editorial-section" aria-label="办公地点">
       <h2>总部与办公地点</h2>
       <div className="domestic-office-list">{article.officeLocations.map(entry=><div key={entry.address}><MapPin size={17}/><div><strong>{entry.type}</strong><p>{entry.address}</p>
@@ -115,14 +124,19 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       <p className="domestic-company-note">办公地址不代表该地点当前正在招聘；若需要前往现场，请先通过企业官网确认。</p>
      </section>:null}
     {article&&<section className="domestic-editorial-section" aria-label="适合哪些专业背景">
-      <h2>适合哪些专业背景？</h2>
-      {majors.length?<div className="domestic-profile-tags domestic-major-tags">
-       {majors.map(major=><Link className="domestic-major-tag" key={major.slug} to={'/majors/'+major.slug}
-        aria-label={'查看与'+major.name+'相关的企业'}>{major.name}<ArrowRight size={13}/></Link>)}</div>:
-       <p className="domestic-editorial-limited">暂无足够资料判断该企业与哪些专业方向相关，正在逐步完善。</p>}
-      <p className="domestic-company-note">根据企业公开业务与技术方向整理的专业关联，不等于该企业正在招聘这些专业的学生。点击专业可发现更多业务相关企业。</p>
-      {article.majorMappingBasis&&<small className="domestic-media-confidence">{article.majorMappingBasis}</small>}
-    </section>}
+       <h2>适合哪些专业背景？</h2>
+       <p className="domestic-company-note">点击专业标签查看该企业已经审核收录的对应岗位；企业业务关联并不等于正在招聘。</p>
+       <CompanyMajorChips jobs={indexedJobs} slug={selectedMajor} onChange={chooseMajor}/>
+       {matchingJobs.length>0?<div className="company-profile-job-grid">
+        {matchingJobs.map(job=><Link key={job.id} className="company-profile-job-card" to={'/candidate/jobs/'+job.id}>
+         <strong>{job.titleZh||job.title}</strong>
+         <p>{job.locationZh||job.location||'地点待核验'}</p>
+         <span>HHBA 站内岗位详情 <ArrowRight size={13}/></span>
+        </Link>)}
+       </div>:<p className="domestic-editorial-limited">{selectedMajor?'暂未收录与「'+majorName(selectedMajor)+'」明确相关的独立岗位，可点击「全部专业」浏览。':'该企业尚未进入已审核逐岗资料库，暂不推断对应招聘岗位；可查看下方官方招聘渠道。'}</p>}
+       {majors.length>0&&<p className="domestic-company-note">另已整理业务相关专业：{majors.slice(0,12).map(m=>m.name).join('、')}。此项是业务关联，不代表招聘资格。</p>}
+       {article.majorMappingBasis&&<small className="domestic-media-confidence">{article.majorMappingBasis}</small>}
+     </section>}
     {(article||recruitment)&&<section className="domestic-editorial-section domestic-careers" aria-label="官方招聘渠道">
       <h2>官方招聘渠道</h2>
       <p>招聘渠道与企业介绍来源分别核验。集团统一招聘站并不代表每个子公司都有开放岗位；具体法人、地区与招聘批次以官方页面为准。</p>
@@ -130,7 +144,7 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
        <small>{recruitment?.availability==='unconfirmed_runtime'?'招聘线索的当前访问状态尚未完成核验，不代表已能直投岗位':recruitment?.kind==='group_recruitment_portal'?'集团统一招聘平台；投递前请核对实际用人公司':recruitment?.availability==='announcement_only'?'仅显示招聘公告，非岗位直投入口':recruitment?.availability==='temporarily_unavailable'?'官网目前显示维护中，暂可能无法投递':'已登记的企业招聘专用渠道'}</small>
        {recruitment?.recruitmentEntity&&recruitment.recruitmentEntity!==company.name?<small>招聘系统归属：{recruitment.recruitmentEntity}（并非 {company.name} 独立招聘系统）</small>:null}
        {recruitment?.notes?<small>{recruitment.notes}</small>:null}</div>
-       <a href={careers} target="_blank" rel="noopener noreferrer" className="domestic-careers-link">{recruitment?.availability==='announcement_only'?'查看招聘公告':recruitment?.availability==='temporarily_unavailable'?'访问招聘系统（维护中）':recruitment?.availability==='unconfirmed_runtime'?'查看待核实招聘线索':'查看招聘官网'} <ExternalLink size={15}/></a></div>:
+       <a data-hhba-recruitment-outbound="true" href={careers} target="_blank" rel="noopener noreferrer" className="domestic-careers-link">{recruitment?.availability==='announcement_only'?'查看招聘公告':recruitment?.availability==='temporarily_unavailable'?'访问招聘系统（维护中）':recruitment?.availability==='unconfirmed_runtime'?'查看待核实招聘线索':'查看招聘官网'} <ExternalLink size={15}/></a></div>:
        <div className="domestic-editorial-limited">尚未核验该主体的官方招聘入口，暂不展示“查看招聘官网”按钮。
        </div>}
     </section>}
@@ -138,12 +152,11 @@ export function DomesticCompanyPage({user,id}:{user:User|null;id:string}){
       <details className="domestic-company-sources" key={"sources-"+company.id}>
        <summary>资料来源与核验说明 <ChevronDown size={15}/></summary>
        <div>{httpsLink(article?.officialSource||company.sourceUrl)&&<a href={httpsLink(article?.officialSource||company.sourceUrl)} target="_blank" rel="noopener noreferrer">企业公开资料 <ExternalLink size={13}/></a>}
-       {recruitment&&<a href={recruitment.evidenceUrl} target="_blank" rel="noopener noreferrer">招聘入口核验依据（{recruitment.verifiedOn}） <ExternalLink size={13}/></a>}
+       {recruitment&&<a data-hhba-recruitment-outbound="true" href={recruitment.evidenceUrl} target="_blank" rel="noopener noreferrer">招聘入口核验依据（{recruitment.verifiedOn}） <ExternalLink size={13}/></a>}
        {article?.industryEvidenceUrl&&<a href={article.industryEvidenceUrl} target="_blank" rel="noopener noreferrer">行业分类核验依据 <ExternalLink size={13}/></a>}
        {article?.productSource&&<a href={article.productSource} target="_blank" rel="noopener noreferrer">公开产品资料 <ExternalLink size={13}/></a>}
-       {article?.imageSource&&<a href={article.imageSource} target="_blank" rel="noopener noreferrer">企业图片来源 <ExternalLink size={13}/></a>}
-       {article?.brandImageSource&&<a href={article.brandImageSource} target="_blank" rel="noopener noreferrer">
-        {article.brandAssetStatus==='official_domain_favicon_unverified_visual'?'企业官网图标来源（品牌Logo待核实）':'品牌图来源'} <ExternalLink size={13}/></a>}
+       {article?.imageSource&&<span className="domestic-photo-source-note">企业图片来源已登记</span>}
+       {article?.brandImageSource&&<span className="domestic-photo-source-note">{article.brandAssetStatus==='official_domain_favicon_unverified_visual'?'企业官网图标来源已登记（品牌 Logo 待核实）':'品牌图来源已登记'}</span>}
        {httpsLink(company.website)&&<a href={httpsLink(company.website)} target="_blank" rel="noopener noreferrer">企业网站 <ExternalLink size={13}/></a>}
        <p>资料日期：{article?.lastReviewed||company.lastReviewed}。企业介绍和专业方向由 HHBA 独立整理，不代表企业招聘合作。</p></div>
       </details>

@@ -26,7 +26,7 @@ test('original landing double-entry and real job market are preserved',()=>{
     'title="我要应聘"','title="我要招人"','<UnifiedJobMarket compact/>']){
   assert.ok(home.includes(t),'home content unexpectedly removed: '+t);
  }
- assert.ok(home.includes("navigate(kind === 'candidate' ? '/candidate' : '/recruiter/register')"),
+ assert.ok(home.includes("kind==='candidate'?'/candidate/register':'/employer/start'"),
    'candidate/employer route changed');
  assert.ok(home.includes('className="home-match-promo"'),'resume matching link changed');
 });

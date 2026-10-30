@@ -1,4 +1,4 @@
-import { loadOfficialPublicSnapshot, officialStatus, safeOfficialJobUrl, localizedTitle,
+import { loadCuratedOverseasJobs, loadOfficialPublicSnapshot, officialStatus, safeOfficialJobUrl, localizedTitle,
   type LiveFilters, type LiveJob, type Language } from './liveRecruitment';
 import { loadPublicJobAudit } from './jobSyncStatus';
 
@@ -52,6 +52,18 @@ export function featuredLocation(job:LiveJob,lang:Language){
   return lang==='zh'&&entry?entry.zhLocation:null;
 }
 export async function loadVerifiedFeaturedJobs(signal:AbortSignal):Promise<LiveJob[]>{
+ // The static overseas-only catalogue was already completed on Oct 24.
+ // Feature six of these records; never mix the old live ATS six with the 100.
+ if(import.meta.env.VITE_HHBA_OVERSEAS_CURATED_100==='1'&&
+    (import.meta.env.BASE_URL==='/hhba-talent/'||import.meta.env.VITE_HHBA_VERIFIED_SNAPSHOT==='1')){
+   const archived=await loadCuratedOverseasJobs(signal);
+   const selected=['OpenAI','Anthropic','SpaceX'].flatMap(company=>
+     archived.filter(job=>job.company===company).slice(0,2));
+   if(selected.length!==6||selected.some(job=>job.recordKind!=='CURATED_HISTORICAL'))
+     throw new Error('静态精选岗位不足');
+   return selected;
+ }
+
  // Both callers (home and /candidate/jobs) reuse ONE cached full snapshot.
  // This avoids three full 15k-job searches and repeated index parsing.
  const [snapshot,audit]=await Promise.all([

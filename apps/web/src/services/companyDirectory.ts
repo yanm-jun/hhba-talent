@@ -48,6 +48,13 @@ export function employerIdentityMatches(job:LiveJob,identity:EmployerIdentity){
 }
 export function companyPageRouteForJob(job:LiveJob):string|null{
  if(!safeOfficialJobUrl(job))return null;
+ if(job.recordKind==='DOMESTIC_REBUILT'&&job.employerRoute&&/^\/companies\/(?:autumn\/cn-autumn-[0-9]{3}|domestic\/(?:a-[0-9]{6}|rel-[a-z]+-[0-9]{3}))$/.test(job.employerRoute))return job.employerRoute;
+ if(job.recordKind==='DOMESTIC_REBUILT'&&job.id.startsWith('cn-v2-schneider-'))return '/companies/autumn/cn-autumn-002';
+ if(job.recordKind==='DOMESTIC_REBUILT'&&job.id.startsWith('cn-v2-kpmg-'))return '/companies/autumn/cn-autumn-001';
+ if(job.recordKind==='DOMESTIC_REBUILT'&&job.id.startsWith('cn-v2-huayu-'))return '/companies/domestic/rel-huayu-004';
+ if(job.recordKind==='DOMESTIC_REBUILT'&&job.id.startsWith('cn-v2-huaan-'))return '/companies/domestic/a-600909';
+ if(job.recordKind==='DOMESTIC_REBUILT'&&job.id.startsWith('cn-v2-guangfa-'))return '/companies/domestic/a-000776';
+ if(job.recordKind==='DOMESTIC_REBUILT'&&job.id.startsWith('cn-v2-citics-'))return '/companies/domestic/a-600030';
  const brand=verifiedBrandKey(job);
  if(brand)return '/companies/'+brand;
  const identity=employerIdentity(job);

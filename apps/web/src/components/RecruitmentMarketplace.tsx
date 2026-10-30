@@ -63,7 +63,7 @@ function MarketCard({job}: {job: MarketJob}) {
   return <article className="market-card">
     <div className="market-card-top"><span className="market-company"><Building2 size={15}/>{readable(job.company_display_name, '企业名称未披露')}</span><span className="market-source">官方来源 · {readable(job.source_platform, '平台未标注')}</span></div>
     <h3>{officialATS && href ? <Link to={href}>{readable(job.job_title, '职位未命名')}</Link>
-      : application ? <a href={application} target="_blank" rel="noopener noreferrer" aria-label={'直达'+readable(job.job_title)+'官方岗位投递入口'}>{readable(job.job_title, '职位未命名')} ↗</a>
+      : application ? <a data-hhba-recruitment-outbound="true" href={application} target="_blank" rel="noopener noreferrer" aria-label={'直达'+readable(job.job_title)+'官方岗位投递入口'}>{readable(job.job_title, '职位未命名')} ↗</a>
       : href ? <Link to={href}>{readable(job.job_title, '职位未命名')}</Link> : readable(job.job_title, '职位未命名')}</h3>
     <div className="market-meta">
       <span className="market-type">{tags[job.primary_recruitment_type || ''] || '类型未分类'}</span>
@@ -75,10 +75,10 @@ function MarketCard({job}: {job: MarketJob}) {
     <div className="market-card-foot"><div><span>最近来源核验 {published(job.last_verified_at)}</span><span>发布时间 {published(job.published_at)}</span></div>
       <div className="market-card-links">{href && <Link to={href}>{officialATS?"站内查看职位详情":"查看记录"} <ArrowRight size={14}/></Link>}
         {application
-          ? <a className="market-verified-apply" href={application} target="_blank" rel="noopener noreferrer">去官方投递 ↗</a>
+          ? <a data-hhba-recruitment-outbound="true" className="market-verified-apply" href={application} target="_blank" rel="noopener noreferrer">去官方投递 ↗</a>
           : listOnly && listUrl
-            ? <a href={listUrl} target="_blank" rel="noopener noreferrer">查看企业招聘频道 · 非岗位直达 ↗</a>
-            : official && <a href={official} target="_blank" rel="noopener noreferrer">{officialATS ? '企业官方岗位详情 · 查看要求 ↗' : '官网核对 · 投递未确认 ↗'}</a>}</div></div>
+            ? <a data-hhba-recruitment-outbound="true" href={listUrl} target="_blank" rel="noopener noreferrer">查看企业招聘频道 · 非岗位直达 ↗</a>
+            : official && <a data-hhba-recruitment-outbound="true" href={official} target="_blank" rel="noopener noreferrer">{officialATS ? '企业官方岗位详情 · 查看要求 ↗' : '官网核对 · 投递未确认 ↗'}</a>}</div></div>
   </article>;
 }
 export function RecruitmentMarketplace() {

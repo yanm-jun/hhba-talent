@@ -61,7 +61,7 @@ export function EmployerPublicJobDetail({user,id}:{user:User|null;id:string}){
     <section className="employer-public-description-block"><h2>任职要求</h2><p>{job.requirements}</p></section>
     <p className="employer-public-disclaimer">本岗位由认证企业发布，经过 HHBA 独立审核，不属于第三方 ATS 官方同步；招聘条件及录用结果由发布企业负责。截止时间：{job.expires_at?.slice(0,10)||'请向企业确认'}。</p>
     <EmployerJobApplicationForm id={id} user={user}/>
-        {link?<a href={link} target="_blank" rel="noopener noreferrer" className="employer-public-apply">前往企业投递页面 <ExternalLink size={17}/></a>:<p className="employer-public-notice">企业提供的投递地址不符合 HTTPS 安全要求，暂不提供跳转。</p>}
+        {link?<a data-hhba-recruitment-outbound="true" href={link} target="_blank" rel="noopener noreferrer" className="employer-public-apply">前往企业投递页面 <ExternalLink size={17}/></a>:<p className="employer-public-notice">企业提供的投递地址不符合 HTTPS 安全要求，暂不提供跳转。</p>}
    </>}
  </main></Shell>
 }

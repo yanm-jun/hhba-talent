@@ -28,7 +28,7 @@ export function MajorCompaniesPage({user,slug}:{user:User|null;slug:string}){
      <div className="domestic-major-company-identity"><Building2 size={22}/><div><strong>{company.name}</strong><small>{company.industry}{company.city?' · '+company.city:''}</small>{company.parentName&&<small>关联：{company.parentName}</small>}</div></div>
      <p>{matchedTags.length?('业务关联：'+matchedTags.join('、')):'业务方向与本专业存在关联，具体工作内容请以企业官网说明为准。'}</p>
      <div className="domestic-major-actions"><Link to={company.route}>了解企业 <ArrowRight size={15}/></Link>
-      {httpsLink(company.careers)&&<a target="_blank" rel="noopener noreferrer" href={httpsLink(company.careers)}>查看官方招聘入口 <ExternalLink size={15}/></a>}</div>
+      {httpsLink(company.careers)&&<a data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer" href={httpsLink(company.careers)}>查看官方招聘入口 <ExternalLink size={15}/></a>}</div>
     </div>)}</div>
     {!filtered.length&&<p className="domestic-company-note">当前没有符合条件的关联企业。</p>}
     {relatedCompanyCount(slug)>records.length&&<p className="domestic-company-note">优先展示资料较完整的前 {records.length} 家，其余企业可通过 HHBA 搜索框按名称查询。</p>}

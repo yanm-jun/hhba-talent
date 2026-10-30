@@ -1,0 +1,18 @@
+{
+  "kind": "HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2",
+  "sourceType": "PUBLIC_STATIC_UI_PREVIEW_NO_DATA",
+  "quality": "unavailable",
+  "asOf": null,
+  "auditCheckedAt": null,
+  "counts": {
+    "indexedJobs": null,
+    "displayableJobs": null,
+    "auditedJobRequirements": null,
+    "distinctIndexedCompanies": null,
+    "checkedAtsSources": null,
+    "failedAtsSources": null,
+    "unclassifiedOrUnverifiedJobs": null
+  },
+  "definitions": {},
+  "future": {}
+}

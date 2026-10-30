@@ -29,27 +29,58 @@ function entryRoute(user: User | null) {
 }
 
 export function EmployerStartPage({ user }: { user: User | null }) {
-  return <Shell user={user}><main className="eh-entry">
-    <p className="eh-kicker">HHBA · 企业服务</p>
-    <h1>招到合适的人，成为更值得信赖的企业。</h1>
-    <p className="eh-lead">发布真实岗位、管理候选人、检索已授权的人才。员工关怀和诚信表现将来可以经过核验，形成公开的企业成长档案，符合条件的企业有机会申请 HHBA 发展帮扶。</p>
-    <div className="eh-entry-grid">
-      <section className="eh-card eh-entry-option">
-        <Building2 size={25} aria-hidden="true"/>
-        <h2>首次入驻企业</h2>
-        <p>完成身份验证、企业主体信息、招聘经办人授权与资料审核。</p>
-        <Link className="eh-primary" to={entryRoute(user)}>开始企业入驻 <ArrowRight size={16}/></Link>
-      </section>
-      <section className="eh-card eh-entry-option">
-        <BriefcaseBusiness size={25} aria-hidden="true"/>
-        <h2>已有企业账户</h2>
-        <p>进入工作台，管理职位、人才和企业成长信息。</p>
-        <Link className="eh-secondary" to="/employer/hub">进入企业工作台 <ArrowRight size={16}/></Link>
-      </section>
-    </div>
-    {!employerApiReady && <p className="eh-status" role="status"><ShieldCheck size={17}/> 当前为 GitHub Pages 静态功能预览。正式账户认证、发布招聘和帮扶申请须连接独立的企业业务后端；预览不采集企业隐私材料。</p>}
-    <div className="eh-promise"><HeartHandshake size={21}/><div><strong>让善待员工的企业获得更多发展机会</strong><p>信誉值与员工善待值仅在证据充分、独立核验和申诉机制建立后公开；不能付费购买高评分，也不承诺一定获得订单。</p></div></div>
-  </main></Shell>;
+ return <Shell user={user}><main className="eh-entry hhba-employer-intro">
+  <div className="hhba-employer-intro-hero">
+   <p className="eh-kicker">HHBA · ENTERPRISE SERVICES</p>
+   <h1>让招聘更透明，让企业更值得信赖。</h1>
+   <p className="eh-lead">从企业招聘与授权人才搜索，到员工反馈、信誉核验和发展帮扶。
+     先了解平台服务，再决定是否入驻；不需要进入首页就提交认证材料。</p>
+  </div>
+  <section className="hhba-employer-services" aria-label="企业招聘与治理服务">
+   <article className="eh-card hhba-employer-service"><Building2 size={22}/>
+    <h2>企业入驻与认证</h2>
+    <p>核验企业主体及招聘经办人授权，明确组织成员与使用权限。</p>
+    <Link to={entryRoute(user)}>了解入驻流程 <ChevronRight size={15}/></Link>
+   </article>
+   <article className="eh-card hhba-employer-service"><BriefcaseBusiness size={22}/>
+    <h2>招聘与人才管理</h2>
+    <p>维护岗位、跟进申请，并在候选人明确授权的范围内检索人才。</p>
+    <Link to="/employer/workspace">查看招聘能力 <ChevronRight size={15}/></Link>
+   </article>
+   <article className="eh-card hhba-employer-service"><ShieldCheck size={22}/>
+    <h2>企业信誉与治理</h2>
+    <p>了解员工反馈保护、证据核验、双评分、申诉与真实改善机制。</p>
+    <Link to="/employer/growth">了解治理规则 <ChevronRight size={15}/></Link>
+   </article>
+   <article className="eh-card hhba-employer-service"><HeartHandshake size={22}/>
+    <h2>企业发展帮扶</h2>
+    <p>查看可信评价、帮扶申请及企业合作对接的具体规则和边界。</p>
+    <Link to="/employer/aid">查看发展帮扶 <ChevronRight size={15}/></Link>
+   </article>
+  </section>
+  <div className="eh-entry-grid hhba-employer-actions">
+   <section className="eh-card eh-entry-option">
+    <Building2 size={25} aria-hidden="true"/>
+    <h2>首次来到 HHBA 的企业</h2>
+    <p>从企业服务介绍进入身份与资质认证；只有审核通过的经办人才能使用对应业务权限。</p>
+    <Link className="eh-primary" to={entryRoute(user)}>开始企业入驻 <ArrowRight size={16}/></Link>
+   </section>
+   <section className="eh-card eh-entry-option">
+    <LayoutDashboard size={25} aria-hidden="true"/>
+    <h2>已有企业账户</h2>
+    <p>进入企业工作台，管理招聘事务、企业成长信息与后续申请。</p>
+    <Link className="eh-secondary" to="/employer/hub">查看企业工作台 <ArrowRight size={16}/></Link>
+   </section>
+  </div>
+  {!employerApiReady&&<p className="eh-status" role="status"><ShieldCheck size={17}/>
+    当前为 GitHub Pages 静态功能预览。正式企业认证、招聘发布、人才检索和证据提交需要独立的受保护后端；演示不收集企业隐私资料。
+   </p>}
+  <div className="eh-promise"><HeartHandshake size={21}/><div>
+   <strong>让善待员工的企业获得更多发展机会</strong>
+   <p>企业信誉与员工善待表现需要证据、独立核验、隐私保护及申诉机制。
+    分数不可购买，也不能承诺一定获得商业订单；企业招聘账户不等于 HHBA 内部审核账户。</p>
+  </div></div>
+ </main></Shell>;
 }
 
 export function EmployerOnboardingPreviewPage({ user }: { user: User | null }) {

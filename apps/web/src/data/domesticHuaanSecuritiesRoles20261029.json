@@ -1,0 +1,216 @@
+{
+  "schemaVersion": 1,
+  "company": "华安证券",
+  "legalName": "华安证券股份有限公司",
+  "listedTicker": "600909",
+  "reviewedOn": "2026-10-29",
+  "announcementDate": "2026-07-21",
+  "announcementRoleCount": 10,
+  "status": "archived_recruitment_notice_expired_application_windows",
+  "officialRecruitmentPortal": "https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment",
+  "postingSource": "https://www.shanganclaw.com/announcements/141956/",
+  "companyWebsite": "https://www.hazq.com",
+  "note": "10条真实岗位名称、明确工作地、岗位职责和条件来自华安证券2026年7月公开招聘公告转载。原公告报名期至2026年7—9月，均按历史职位展示，不宣称目前在招。官方投递端口8083能否访问需要用户现场核实。绝不能混入华安基金招聘数据。",
+  "jobs": [
+    {
+      "id": "pb-support",
+      "title": "专业化交易支持",
+      "city": "合肥",
+      "department": "机构与企业客户部",
+      "deadline": "2026-09-16",
+      "group": "institutional",
+      "summary": "配合机构客户的专业化交易系统支持、PB运维及量化算法系统保障。",
+      "requirement": "硕士及以上；计算机相关专业，了解Oracle、MySQL、Unix/Linux以及证券行业系统运维。",
+      "majors": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息管理与信息系统"
+      ],
+      "sourceUrl": "https://www.shanganclaw.com/announcements/141956/",
+      "sourceType": "reproduced_company_hiring_notice_with_role_level_details",
+      "currentOpenVerified": false,
+      "officialListingUrl": "https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment"
+    },
+    {
+      "id": "frontend-engineer",
+      "title": "前端开发工程师",
+      "city": "合肥",
+      "department": "金融科技部",
+      "deadline": "2026-09-16",
+      "group": "technology",
+      "summary": "开发金融科技平台Web、H5与移动端界面，参与前端架构、组件开发及性能优化。",
+      "requirement": "研究生及以上；计算机相关专业，熟悉Vue、JavaScript、HTML/CSS及至少一种移动端开发方式。",
+      "majors": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息管理与信息系统"
+      ],
+      "sourceUrl": "https://www.shanganclaw.com/announcements/141956/",
+      "sourceType": "reproduced_company_hiring_notice_with_role_level_details",
+      "currentOpenVerified": false,
+      "officialListingUrl": "https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment"
+    },
+    {
+      "id": "ai-engineer",
+      "title": "AI应用工程师",
+      "city": "合肥",
+      "department": "金融科技部",
+      "deadline": "2026-09-16",
+      "group": "technology",
+      "summary": "参与AI中台与知识中台建设，完善RAG检索、GraphRAG和智能体工具编排的金融业务应用。",
+      "requirement": "硕士及以上；计算机相关专业，了解Python/Java、Agent、RAG、SQL、向量数据库及容器部署。",
+      "majors": [
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能",
+        "数据科学与大数据技术"
+      ],
+      "sourceUrl": "https://www.shanganclaw.com/announcements/141956/",
+      "sourceType": "reproduced_company_hiring_notice_with_role_level_details",
+      "currentOpenVerified": false,
+      "officialListingUrl": "https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment"
+    },
+    {
+      "id": "qa-engineer",
+      "title": "软件测试工程师",
+      "city": "合肥",
+      "department": "金融科技部",
+      "deadline": "2026-09-16",
+      "group": "technology",
+      "summary": "设计功能与性能测试方案、组织自动化测试并跟踪缺陷修复，保障系统交付质量。",
+      "requirement": "硕士及以上；计算机相关专业，熟悉自动化测试框架及Python、Java、C或JavaScript中至少一种语言。",
+      "majors": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息管理与信息系统"
+      ],
+      "sourceUrl": "https://www.shanganclaw.com/announcements/141956/",
+      "sourceType": "reproduced_company_hiring_notice_with_role_level_details",
+      "currentOpenVerified": false,
+      "officialListingUrl": "https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment"
+    },
+    {
+      "id": "fintech-product",
+      "title": "产品经理（金融科技）",
+      "city": "合肥",
+      "department": "金融科技部",
+      "deadline": "2026-09-16",
+      "group": "technology",
+      "summary": "梳理金融业务需求，完成产品功能规划、页面原型和说明文档，推动研发项目交付。",
+      "requirement": "硕士及以上；计算机、交互设计、统计相关专业；具备原型设计、需求文档及跨部门协作能力。",
+      "majors": [
+        "计算机科学与技术",
+        "软件工程",
+        "统计学",
+        "工业设计",
+        "工商管理"
+      ],
+      "sourceUrl": "https://www.shanganclaw.com/announcements/141956/",
+      "sourceType": "reproduced_company_hiring_notice_with_role_level_details",
+      "currentOpenVerified": false,
+      "officialListingUrl": "https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment"
+    },
+    {
+      "id": "rates-trader",
+      "title": "利率交易岗",
+      "city": "上海",
+      "department": "金融市场投资总部",
+      "deadline": "2026-08-31",
+      "group": "trading",
+      "summary": "研究利率债行情，协助制定交易策略、执行利率债交易、分析投资组合及维护数据。",
+      "requirement": "硕士及以上；金融、经济、数学、统计相关背景优先；2年以上利率债及衍生品投资交易经验。",
+      "majors": [
+        "金融学",
+        "经济学",
+        "统计学",
+        "数学与应用数学"
+      ],
+      "sourceUrl": "https://www.shanganclaw.com/announcements/141956/",
+      "sourceType": "reproduced_company_hiring_notice_with_role_level_details",
+      "currentOpenVerified": false,
+      "officialListingUrl": "https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment"
+    },
+    {
+      "id": "derivatives-pm",
+      "title": "衍生品产品经理岗",
+      "city": "合肥",
+      "department": "金融市场投资总部",
+      "deadline": "2026-08-31",
+      "group": "trading",
+      "summary": "设计衍生品结构和产品文件，分析机构客户资产配置需求并优化定价策略。",
+      "requirement": "硕士及以上；金融、经济、管理学相关专业；熟悉金融衍生品与市场基础知识。",
+      "majors": [
+        "金融学",
+        "经济学",
+        "工商管理",
+        "财务管理"
+      ],
+      "sourceUrl": "https://www.shanganclaw.com/announcements/141956/",
+      "sourceType": "reproduced_company_hiring_notice_with_role_level_details",
+      "currentOpenVerified": false,
+      "officialListingUrl": "https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment"
+    },
+    {
+      "id": "quant-research",
+      "title": "高频策略研发岗",
+      "city": "合肥",
+      "department": "金融市场投资总部",
+      "deadline": "2026-08-31",
+      "group": "trading",
+      "summary": "研究并复现量化策略，参与ETF、期货等高频交易策略开发以及柜台交易API测试。",
+      "requirement": "硕士及以上；数学、计算机、金融工程方向；1年以上程序化交易经验，熟悉Python和C++。",
+      "majors": [
+        "金融学",
+        "计算机科学与技术",
+        "软件工程",
+        "统计学",
+        "数学与应用数学"
+      ],
+      "sourceUrl": "https://www.shanganclaw.com/announcements/141956/",
+      "sourceType": "reproduced_company_hiring_notice_with_role_level_details",
+      "currentOpenVerified": false,
+      "officialListingUrl": "https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment"
+    },
+    {
+      "id": "institutional-sales",
+      "title": "机构销售",
+      "city": "上海／北京／深圳",
+      "department": "研究所",
+      "deadline": "2026-07-31",
+      "group": "research",
+      "summary": "向公募、保险、私募等机构客户提供投研活动与金融服务，开展机构关系维护及业务拓展。",
+      "requirement": "硕士及以上；金融、经济、市场营销相关专业；1—2年以上金融相关经历及相关从业资格。",
+      "majors": [
+        "金融学",
+        "经济学",
+        "市场营销",
+        "工商管理"
+      ],
+      "sourceUrl": "https://www.shanganclaw.com/announcements/141956/",
+      "sourceType": "reproduced_company_hiring_notice_with_role_level_details",
+      "currentOpenVerified": false,
+      "officialListingUrl": "https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment"
+    },
+    {
+      "id": "equity-analyst",
+      "title": "研究员",
+      "city": "上海／北京／深圳",
+      "department": "研究所",
+      "deadline": "2026-07-31",
+      "group": "research",
+      "summary": "对上市公司与行业进行跟踪研究，建立估值模型，撰写行业及公司报告并支持机构客户投研交流。",
+      "requirement": "硕士及以上；具备金融、经济及相关产业分析背景，研究经验和证券相关资格优先。",
+      "majors": [
+        "金融学",
+        "经济学",
+        "会计学",
+        "财务管理",
+        "统计学"
+      ],
+      "sourceUrl": "https://www.shanganclaw.com/announcements/141956/",
+      "sourceType": "reproduced_company_hiring_notice_with_role_level_details",
+      "currentOpenVerified": false,
+      "officialListingUrl": "https://hahr.hazq.com:8083/eip4ha-hyapp/recruitment"
+    }
+  ]
+}

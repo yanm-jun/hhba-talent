@@ -7685,5 +7685,48 @@
     "brandLocalPath": "domestic-media/company100-brand-a236d6f921ddf3002e8e.png",
     "brandIdentityEvidence": "官网页眉 Logo 截图，经图片内容逐张视觉核对：标识包含「京东集团」对应的品牌文字或视觉标志。图片来自档案记录的企业官网页面；不表示 HHBA 获企业授权或合作。",
     "brandVerifiedAt": "2026-10-24"
+  },
+  "辉瑞": {
+    "displayName": "辉瑞 Pfizer",
+    "subtitle": "创新生物制药 · 医学信息沟通 · 供应运营质量",
+    "summary": "辉瑞（Pfizer）创立于1849年，是一家全球生物制药企业。其业务覆盖创新药物及疫苗研究、临床开发、生产质量管理与商业运营；在华招聘职位包括医学信息沟通、供应运营质量及零售关键客户等。",
+    "description": [
+      "公司全球业务与中国地区具体招聘主体应予区分。实际岗位职责、资格与招聘状态以辉瑞官方职位详情页为准。",
+      "医药、药学及生命科学相关专业与部分医学信息沟通岗位有关；质量管理及商业运营岗位可能有不同的学历和工作经验条件，不能仅凭企业行业判断全部岗位的专业限制。",
+      "HHBA 的企业资料来自公开来源，为独立信息整理，不代表与辉瑞存在招聘合作。"
+    ],
+    "business": [
+      {
+        "title": "创新药物研发",
+        "description": "研究与开发创新治疗方案，包括药物发现、临床研究和研发项目管理。"
+      },
+      {
+        "title": "疫苗与疾病预防",
+        "description": "研究开发疫苗，并开展相关生产和质量保障工作。"
+      },
+      {
+        "title": "生产与供应质量",
+        "description": "管理药品生产和供应流程中的质量文件、质量控制与合规流程。"
+      },
+      {
+        "title": "医学信息与商业运营",
+        "description": "按公司政策开展合规医学信息沟通、零售客户协作和医药商业运营。"
+      }
+    ],
+    "officialSource": "https://www.pfizer.com/about",
+    "primaryIndustry": "生物医药",
+    "subIndustry": "创新药、疫苗及医药商业",
+    "website": "https://www.pfizer.com.cn/",
+    "careersUrl": "https://www.pfizer.com/about/careers/search-results",
+    "contentReview": "source_backed_pfizer_official_2026-10-29",
+    "majorSlugs": [
+      "medicine",
+      "pharmacy",
+      "biomedical-engineering",
+      "biotechnology",
+      "chemistry",
+      "business-administration"
+    ],
+    "lastReviewed": "2026-10-29"
   }
 }
