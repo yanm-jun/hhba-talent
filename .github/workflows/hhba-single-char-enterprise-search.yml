@@ -9,6 +9,7 @@ on:
       - 'apps/web/src/services/domesticCompanySearch.ts'
       - 'apps/web/src/components/AICompanySearch.tsx'
       - 'apps/web/src/components/UnifiedJobMarket.tsx'
+      - 'apps/web/src/services/liveRecruitment.ts'
       - 'apps/web/scripts/domestic-rebuild-v2.contract.test.mjs'
   workflow_dispatch:
 permissions:
