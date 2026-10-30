@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {TALENT_POLICY_RECORDS} from '../src/data/talentPolicyRecords.ts';
 import {TALENT_HOUSING_RECORDS} from '../src/data/talentHousingRecords.ts';
+import {TALENT_QUALITY_AUDIT,CERTIFIED_TALENT_GUIDES,assessPolicy,assessTalentCity} from '../src/data/talentQuality.ts';
 const dir=new URL('../src/',import.meta.url);
 const sharedList=readFileSync(new URL('components/talent/UnifiedPolicyList.tsx',dir),'utf8');
 const sharedGuide=readFileSync(new URL('components/talent/UnifiedPolicyGuide.tsx',dir),'utf8');
@@ -26,13 +27,21 @@ check('Exactly one shared policy list, one complete-guide template and one truth
  assert.ok(sharedGuide.includes('data.steps.map('));
  assert.ok(sharedDetail.includes('quality.missing.map('));
 });
-check('Every base record gets a graded quality state without claiming B is completed',()=>{
- for(const x of ['TalentQualityGrade','CERTIFIED_TALENT_GUIDES',"grade==='A'","grade==='B'","grade==='C'",'TALENT_QUALITY_SUMMARY'])assert.ok(quality.includes(x),x);
+check('Every record gets a real quality assessment; B and C cannot masquerade as full guides',()=>{
+ assert.equal(TALENT_QUALITY_AUDIT.length,TALENT_POLICY_RECORDS.length+TALENT_HOUSING_RECORDS.length);
+ assert.ok(TALENT_QUALITY_AUDIT.every(x=>['A','B','C','D'].includes(x.grade)));
+ const b=TALENT_QUALITY_AUDIT.filter(x=>x.grade==='B');
+ assert.ok(b.length>0&&b.every(x=>!x.guideRoute&&x.label.includes('待完善')));
+ assert.ok(quality.includes('CERTIFIED_TALENT_GUIDES')&&quality.includes('TALENT_QUALITY_SUMMARY'));
  assert.ok(sharedDetail.includes('资料')&&sharedDetail.includes('尚待逐项核实'));
 });
-check('No completion-grade A except dedicated sourced guides and actual complete source',()=>{
- for(const id of ['sd-jinan-2026-talent-living','qd-rent-25','sd-qingdao-2026-free-housing','qd-laoshan-202610'])assert.ok(quality.includes("'"+id+"'"));
- assert.ok(quality.includes('certified.city===p.city')&&quality.includes("sourceKind==='government'"));
+check('A certification needs matching city, government provenance and a real guide route',()=>{
+ for(const [id,cert] of Object.entries(CERTIFIED_TALENT_GUIDES)){
+  const r=TALENT_POLICY_RECORDS.find(x=>x.id===id);assert.ok(r);
+  assert.equal(r.city,cert.city);
+  assert.equal(assessPolicy(r,'2026-10-30').grade,'A');
+ }
+ assert.equal(assessTalentCity('济南','2026-10-30').accepted,false);
 });
 check('Specific 2026 Laoshan source lists three different deadlines and seven structured steps',()=>{
  assert.ok(laoshan);
