@@ -12,6 +12,19 @@ assert.equal(company.jobs.length,8,'8 campus job directions MUST be included');
 assert.equal(new Set(company.jobs.map(j=>j.id)).size,8);
 assert.equal(data.employers.length,16,'Main HHBA V2 catalog must include all 16 new employers');
 assert.equal(data.employers.reduce((sum,p)=>sum+p.jobs.length,0),124,'Preserve all 124 reviewed job directions');
+const match=(raw)=>data.employers.filter(p=>{
+ const q=raw.normalize('NFKC').toLowerCase().trim();
+ return [p.name,p.englishName,...p.aliases].some(v=>v.normalize('NFKC').toLowerCase().includes(q));
+});
+for(const [query,expected] of [['南方传媒','cn-autumn-026'],['南方','cn-autumn-026'],['广之','cn-autumn-027'],
+ ['广之旅','cn-autumn-027'],['广州广之旅国际旅行社','cn-autumn-027'],['GZL','cn-autumn-027']]){
+ assert(match(query).some(p=>p.id===expected),'MAIN search must return '+expected+' for query '+query);
+}
+for(const p of data.employers){
+ assert(match(p.name).some(row=>row.id===p.id),'Main search did not find company '+p.name);
+ assert(p.jobs.every(j=>j.id&&j.title),'Missing reviewed role data '+p.id);
+}
+
 assert(data.employers.some(p=>p.id==='cn-autumn-026'&&p.name==='南方传媒'&&p.jobs.length===6),'Southern Publishing must be indexed');
 for(const p of data.employers){
  assert(existsSync('public/data/employer-v2-profiles/'+p.id+'.json'),'Missing main-site profile: '+p.id);
