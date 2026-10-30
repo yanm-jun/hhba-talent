@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-019",
+  "name": "湖南省广播影视集团（湖南广电）",
+  "englishName": "Hunan Broadcasting System · HBS",
+  "aliases": [
+    "湖南广电",
+    "湖南广播影视集团",
+    "湖南广播影视集团有限公司",
+    "湖南广播电视台",
+    "湖南电视台",
+    "湖南卫视",
+    "Hunan Broadcasting System",
+    "Hunan Broadcasting",
+    "HBS",
+    "GBS",
+    "芒果传媒集团"
+  ],
+  "industry": "广播电视 · 数字媒体 · 影视制作 · 互联网视频 · 文化科技",
+  "subtitle": "湖南广播影视集团有限公司（湖南广播电视台）· 湖南省属国有文化企业 · 长沙市开福区",
+  "overview": "湖南广播影视集团有限公司（湖南广播电视台，简称湖南广电）是湖南省属国有文化企业。根据2025年度社会责任报告，旗下媒体矩阵涵盖湖南卫视等电视频道、广播频率、芒果TV及国际APP、风芒、山海、小芒电商等，拥有芒果超媒和电广传媒两家上市公司。集团企业与芒果TV运营主体湖南快乐阳光互动娱乐传媒有限公司并非同一招聘法人，求职时应分别核对。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://www.hunantoday.cn/news/xhn/202606/32985035.html",
+    "https://gbdsj.hunan.gov.cn/gbdsj/xxgk/gzdt/hyxx/202501/t20250122_33572412.html",
+    "https://scdc.jnu.edu.cn/campus/view/id/1035180",
+    "https://hr.mgtv.com/",
+    "https://www.3wen.com/wenzhang/id/6131.html",
+    "https://commons.wikimedia.org/wiki/File:Hunan_Broadcasting_System_Building,_29_June_2019.jpg",
+    "https://commons.wikimedia.org/wiki/File:Studio_Audience_at_Hu_Nan_Tv.jpg"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-019/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-019/photo1.webp",
+        "caption": "湖南广播电视台大楼 · 长沙",
+        "note": "2019年实景摄影 · Huangdan2060 / Wikimedia Commons · CC BY 3.0；图像裁切压缩用于展示。非2026年新拍摄。",
+        "alt": "长沙湖南广播电视台大楼及其周边建筑"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-019/photo2.webp",
+        "caption": "湖南广电电视节目录制现场 · 历史照片",
+        "note": "2009年湖南电视台演播现场 · Plastered T-shirts / Wikimedia Commons · CC BY-SA 2.0；为历史节目场景，非当下办公环境。",
+        "alt": "2009年湖南电视台录制现场演播室观众席"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://hr.mgtv.com/",
+    "label": "旗下芒果TV招聘官网（非集团统一入口）",
+    "status": "official_portal",
+    "subject": "湖南快乐阳光互动娱乐传媒有限公司（芒果TV）",
+    "note": "目前未核验到可直接使用的湖南广播影视集团统一公开岗位系统。此链接是芒果TV旗下公司官方招聘主页，与集团主体及其余子公司的招聘不可混为一谈。下方展示的芒果TV2026「青芒计划」是历史公告，已经过期，并非实时开放岗位。"
+  },
+  "majorIntro": "已收录芒果TV2026「青芒计划」高校招聘公告里真实列出的专业，将其整理成3组历史校招专业方向（不是3个独立岗位）。原公告截至2026年5月20日已过期。点击标签仅查看相关方向，具体2027届和最新岗位以所属企业官方招聘网站为准。",
+  "preferredMajors": [
+    "广播电视学",
+    "新闻学",
+    "网络与新媒体",
+    "动画",
+    "戏剧影视导演",
+    "戏剧影视文学",
+    "播音与主持艺术",
+    "广告学",
+    "市场营销",
+    "计算机科学与技术",
+    "软件工程"
+  ],
+  "photoNote": "湖南广电集团品牌标识参考GBS历史标志实景照片（2021年设计案例，非官方授权矢量LOGO），两张图片使用有署名及许可条件的历史实景素材，非AI制作。图库照片点击不跳转其他网站。展示该品牌不代表企业与HHBA合作。",
+  "business": [
+    {
+      "title": "电视与广播内容制作播出",
+      "description": "以湖南卫视等电视频道和广播频率为基础，开展新闻、专题、综艺、生活及公共服务内容制作与播出。",
+      "tags": "电视台 · 广播 · 节目生产",
+      "details": [
+        "电视与广播节目策划制作",
+        "综艺及新闻栏目播出",
+        "广播电视传媒技术与播出安全"
+      ]
+    },
+    {
+      "title": "芒果TV与网络视听平台",
+      "description": "旗下芒果超媒体系运营芒果TV及数字产品，将节目内容与互联网视频、会员服务和互动传播结合。",
+      "tags": "长视频 · 会员 · OTT",
+      "details": [
+        "视频平台运营与产品研发",
+        "网络视听内容策划和分发",
+        "用户增长、会员、品牌运营"
+      ]
+    },
+    {
+      "title": "影视剧与新内容产业",
+      "description": "开展影视剧、纪录片、短剧、综艺及其他视听内容的开发、制作和相关版权经营。",
+      "tags": "影视制作 · 版权 · 微短剧",
+      "details": [
+        "影视作品内容开发与制作",
+        "节目版权及衍生内容经营",
+        "文化科技融合的内容创新"
+      ]
+    },
+    {
+      "title": "数字技术与新型传播",
+      "description": "围绕芒果大模型、超高清制作、智能剪辑及国际视听传播推进媒体智能化。",
+      "tags": "AIGC · 超高清 · 智能剪辑",
+      "details": [
+        "智能视听内容生产工具",
+        "媒体融合采编和播出技术",
+        "音视频技术研发及应用"
+      ]
+    },
+    {
+      "title": "文化旅游与线下场景",
+      "description": "依托集团旗下相关主体开展文化旅游、演出和文创项目，将广电影视内容延伸到线下消费场景。",
+      "tags": "文旅 · 活动 · 文创",
+      "details": [
+        "文化体验及线下场景经营",
+        "文创IP衍生品与活动",
+        "影视文旅融合项目"
+      ]
+    },
+    {
+      "title": "商业服务与传播运营",
+      "description": "围绕品牌广告、商业合作、媒介经营、小芒电商及跨屏传播提供综合传媒服务。",
+      "tags": "广告 · 商业合作 · 电商",
+      "details": [
+        "媒介广告与品牌策划",
+        "线上线下内容营销",
+        "电商及衍生商业模式"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "2026-qingmang-film-media-historical",
+      "title": "2026青芒计划｜影视内容方向（历史专业汇总）",
+      "city": "湖南·长沙（历史校招资料）",
+      "url": "https://hr.mgtv.com/",
+      "evidenceUrl": "https://scdc.jnu.edu.cn/campus/view/id/1035180",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "湖南快乐阳光互动娱乐传媒有限公司（芒果TV，集团旗下企业，非集团统一招聘）",
+      "summary": "根据暨南大学就业平台已过期的「芒果TV2026青芒计划」招聘简章，将公开列出的动画、广播电视学、录音艺术、戏剧影视导演、戏剧影视文学、播音与主持艺术等专业整理为影视内容方向。该方向是HHBA分类汇总，并非招聘方单独发布的岗位名称。",
+      "requirements": "依据暨南大学就业平台公开的芒果TV2026「青芒计划」校园招聘历史公告；所列专业为该届招聘简章中的专业集合，具体岗位职责、专业限制、学历和招录资格未逐岗核实。原项目已于2026年5月20日过期，无法视为正在招聘。",
+      "majorNames": [
+        "动画",
+        "广播电视学",
+        "录音艺术",
+        "戏剧影视导演",
+        "戏剧影视文学",
+        "播音与主持艺术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2026届历史校招 · 公告含本科需求",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "2026-qingmang-editorial-media-historical",
+      "title": "2026青芒计划｜新闻传播与营销方向（历史专业汇总）",
+      "city": "湖南·长沙（历史校招资料）",
+      "url": "https://hr.mgtv.com/",
+      "evidenceUrl": "https://scdc.jnu.edu.cn/campus/view/id/1035180",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "湖南快乐阳光互动娱乐传媒有限公司（芒果TV，集团旗下企业，非集团统一招聘）",
+      "summary": "根据暨南大学就业平台已过期的「芒果TV2026青芒计划」招聘简章，将公开列出的新闻学、汉语言文学、网络与新媒体、广告学、市场营销等专业整理为新闻传播与营销方向。该方向并非独立职位，也不代表今日开放申请。",
+      "requirements": "依据暨南大学就业平台公开的芒果TV2026「青芒计划」校园招聘历史公告；所列专业为该届招聘简章中的专业集合，具体岗位职责、专业限制、学历和招录资格未逐岗核实。原项目已于2026年5月20日过期，无法视为正在招聘。",
+      "majorNames": [
+        "新闻学",
+        "汉语言文学",
+        "网络与新媒体",
+        "广告学",
+        "市场营销"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2026届历史校招 · 公告含本科需求",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "2026-qingmang-computing-historical",
+      "title": "2026青芒计划｜计算机与软件方向（历史专业汇总）",
+      "city": "湖南·长沙（历史校招资料）",
+      "url": "https://hr.mgtv.com/",
+      "evidenceUrl": "https://scdc.jnu.edu.cn/campus/view/id/1035180",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "湖南快乐阳光互动娱乐传媒有限公司（芒果TV，集团旗下企业，非集团统一招聘）",
+      "summary": "根据暨南大学就业平台已过期的「芒果TV2026青芒计划」招聘简章，将公开列出的计算机科学与技术、软件工程专业整理为计算机与软件方向。该方向是专业分类，不是已核验的独立技术岗位。",
+      "requirements": "依据暨南大学就业平台公开的芒果TV2026「青芒计划」校园招聘历史公告；所列专业为该届招聘简章中的专业集合，具体岗位职责、专业限制、学历和招录资格未逐岗核实。原项目已于2026年5月20日过期，无法视为正在招聘。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2026届历史校招 · 公告含本科需求",
+      "currentOpenVerified": false
+    }
+  ],
+  "mediaSources": {
+    "logo": "https://www.3wen.com/userfiles/images/81o1.jpg",
+    "photo1": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Hunan_Broadcasting_System_Building%2C_29_June_2019.jpg",
+    "photo2": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Studio_Audience_at_Hu_Nan_Tv.jpg"
+  }
+}
