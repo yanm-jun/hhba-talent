@@ -93,7 +93,8 @@ assert(citicsProfile.includes('<CompanyMajorJobs companyRoute="/companies/domest
 assert(sharedMatching.includes("return 'unrestricted'"),'Explicit unrestricted roles remain visible for any major');
 assert(sharedJobs.includes("'/candidate/jobs/'+encodeURIComponent(job.id)"),'Shared on-site role detail');
 assert(citicsProfile.includes('归属待核验'),'Legacy image authenticity not invented');
-assert(index.includes("DOMESTIC_REBUILD_APPROVED_COMPANIES=['施耐德电气','毕马威','华域视觉科技（上海）有限公司','华安证券','广发证券','中信证券','辉瑞','中国南方航空','顺丰','网易游戏','鹰角网络','安克创新','徕芬科技','新鸿基地产','万科泊寓']"));
+assert(index.includes('LEGACY_APPROVED_COMPANIES=['), 'Original 15 employer approvals must remain');
+assert(index.includes('...employerProfiles.filter('), 'New approved employers must derive from data, never manual array edits');
 const csair=JSON.parse(src('src/data/domesticCsairVerifiedPositions20261029.json'));
 const csairPage=src('src/pages/CsairCompactProfilePage.tsx');
 assert.equal(csair.jobs.length,6,'Exactly six source-backed China Southern jobs from official listings');
