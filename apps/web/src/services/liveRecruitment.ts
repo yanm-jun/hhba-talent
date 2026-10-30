@@ -72,7 +72,10 @@ export function safeOfficialJobUrl(job: LiveJob) {
         'tencent-official': 'careers.tencent.com',
         'baidu-official': 'talent.baidu.com'
       };
-      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='shkp-official-detail'&&job.source==='sun-hung-kai-properties'){
+      if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='boyu-tjcu-source'&&job.source==='boyu-tianjin'){
+        if(u.hostname!=='career.tjcu.edu.cn'||!/^cn-v2-boyu-[a-z0-9-]{5,100}$/.test(job.id)||
+        !['/correcruit/content/id/12292.html','/correcruit/content/id/9565.html'].includes(u.pathname)||u.search||u.hash)return null;
+      }else if(job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='shkp-official-detail'&&job.source==='sun-hung-kai-properties'){
         if(u.hostname!=='www.shkp.com'||!/^cn-v2-shkp-[a-z0-9-]{5,100}$/.test(job.id)||
            !/^\/en-US\/work-with-us\/job-vacancies\/[a-z-]+\/[a-z0-9-]+$/.test(u.pathname)||
            u.search!==''||u.hash!=='')return null;
@@ -364,7 +367,8 @@ export function rebuildListFilter(job:LiveJob,f:LiveFilters){
   const v=f.company.normalize('NFKC').toLowerCase();
   const ankerAliases=domestic&&job.company==='安克创新科技股份有限公司'?['Anker','Anker Innovations']:
     domestic&&job.company==='深圳术叶创新科技有限公司'?['徕芬','徕芬科技','Laifen']:
-    domestic&&job.company==='新鸿基地产'?['SHKP','Sun Hung Kai Properties','新鴻基地產']:[];
+    domestic&&job.company==='新鸿基地产'?['SHKP','Sun Hung Kai Properties','新鴻基地產']:
+    domestic&&job.company==='万科泊寓'?['泊寓','PORT','PORT APARTMENT']:[];
   if(![job.company,job.companyZh||'',...ankerAliases].some(x=>x.toLowerCase().includes(v))&&
     !(domestic&&'schneider electric'.includes(v)))return false;
  }
@@ -402,7 +406,8 @@ export function rebuildListFilter(job:LiveJob,f:LiveFilters){
  const words=f.q.normalize('NFKC').toLowerCase().trim().split(/\s+/).filter(Boolean);
  const nameAliases=domestic&&job.company==='安克创新科技股份有限公司'?['Anker','Anker Innovations']:
    domestic&&job.company==='深圳术叶创新科技有限公司'?['徕芬','徕芬科技','Laifen']:
-   domestic&&job.company==='新鸿基地产'?['SHKP','Sun Hung Kai Properties','新鴻基地產']:[];
+   domestic&&job.company==='新鸿基地产'?['SHKP','Sun Hung Kai Properties','新鴻基地產']:
+    domestic&&job.company==='万科泊寓'?['泊寓','PORT','PORT APARTMENT']:[];
  const haystack=[job.title,job.titleZh,job.company,job.companyZh,...nameAliases,job.location,job.locationZh,
    ...(job.skillSignals||[]),...(job.majorNames||[]),...(job.editorialRelatedMajors||[]),job.responsibilitiesSummary,job.positionOrg].filter(Boolean).join(' ').normalize('NFKC').toLowerCase();
  return words.every(w=>haystack.includes(w));
@@ -435,7 +440,7 @@ export async function listDomesticRebuildMarket(filters:LiveFilters,offset:numbe
   const nameScore=(job:LiveJob)=>{
    const aliases=job.platform==='shkp-official-detail'?' SHKP Sun Hung Kai Properties 新鴻基地產':
     job.platform==='anker-2027-campus-official'?' Anker Innovations':
-    job.platform==='laifen-sourced-archived'?' Laifen':'';
+    job.platform==='laifen-sourced-archived'?' Laifen':job.platform==='boyu-tjcu-source'?' PORT APARTMENT 泊寓 万科泊寓':'';
    const names=(job.company+' '+(job.companyZh||'')+aliases).normalize('NFKC').toLowerCase();
    if(!names.includes(term))return 0;
    if(job.companyZh?.normalize('NFKC').toLowerCase()===term)return 3;

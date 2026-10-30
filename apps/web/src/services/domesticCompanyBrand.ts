@@ -20,7 +20,8 @@ const uploaded:Record<string,string>={
  'cn-autumn-007':'images/hypergryph-user/hypergryph-logo.png',
  'cn-autumn-008':'images/autumn-real-logos/cn-autumn-008.svg',
  'cn-autumn-009':'images/laifen-user/laifen-logo.webp',
- 'cn-autumn-010':'images/shkp-user/shkp-logo.webp'
+ 'cn-autumn-010':'images/shkp-user/shkp-logo.webp',
+ 'cn-autumn-011':'images/boyu-user/boyu-logo.webp'
 };
 const byName=new Map(autumn.entries.map(e=>[e.name,e.id]));
 const jobRoutes=new Map<string,string>();

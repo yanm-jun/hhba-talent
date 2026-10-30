@@ -163,7 +163,8 @@ export function getDomesticCompanies():DomesticCompany[]{
   const reviewedAliases:Record<string,string[]>={
     '新鸿基地产':['SHKP','Sun Hung Kai Properties','新鴻基地產'],
     '安克创新':['Anker','Anker Innovations'],
-    '徕芬科技':['徕芬','Laifen']
+    '徕芬科技':['徕芬','Laifen'],
+    '万科泊寓':['泊寓','PORT APARTMENT','PORT']
   };
   for(const row of autumnCompanies.entries){
     const key=normalize(row.name);
