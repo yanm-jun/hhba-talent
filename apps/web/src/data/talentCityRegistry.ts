@@ -17,6 +17,7 @@ export const TALENT_LEGACY_CITIES:TalentCity[]=[
  {name:'青岛',official:'青岛市',province:'山东',level:'prefecture-preview',intro:'海洋产业、先进制造与青年就业',aliases:['青岛','青岛市','qingdao'],photo:'https://commons.wikimedia.org/wiki/Special:Redirect/file/%E9%9D%92%E5%B2%9B%E5%A4%A9%E9%99%85%E7%BA%BF201809.jpg?width=1280',credit:'WFan · CC BY-SA 4.0',photoPage:'https://commons.wikimedia.org/wiki/File:%E9%9D%92%E5%B2%9B%E5%A4%A9%E9%99%85%E7%BA%BF201809.jpg'},
  {name:'济南',official:'济南市',province:'山东',level:'prefecture-preview',intro:'省会就业机会与青年人才支持',aliases:['济南','济南市','jinan'],photo:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Jinan_CBD_skyline_June_2023.jpg?width=1280',credit:'Percival Kestreltail · CC BY-SA 4.0',photoPage:'https://commons.wikimedia.org/wiki/File:Jinan_CBD_skyline_June_2023.jpg'},
  {name:'临沂',official:'临沂市',province:'山东',level:'prefecture-preview',intro:'临沂青年人才津贴、首次购房补贴、首次创业扶持与租赁型人才公寓政策；2026年人才公寓批次已截止',aliases:['临沂','临沂市','linyi','lin yi']}
+ {name:'东营',official:'东营市',province:'山东',level:'prefecture-preview',intro:'2026年8月人才新政与旧补贴衔接、首次创业支持及人才安居资料核验',aliases:['东营','东营市','dongying','dong ying']},
 ];
 
 const prefectureRaw=`130100|石家庄市|河北省|shi jia zhuang
