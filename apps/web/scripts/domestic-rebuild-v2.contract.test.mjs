@@ -211,7 +211,7 @@ assert(recruitment.includes("if(DOMESTIC_REBUILD_V2){"));
 assert(recruitment.includes('loadCuratedOverseasJobs(signal)'));
 assert(recruitment.includes("job.recordKind==='DOMESTIC_REBUILT'&&job.platform==='schneider-official'"));
 assert(ui.includes("!rebuilding&&!curatedHundred&&<DomesticAutumnMarket"));
-assert(ui.includes("!rebuilding&&!curatedHundred&&<DomesticCompanyResults"));
+assert(ui.includes("!curatedHundred&&(!rebuilding||draft.trim())&&<DomesticCompanyResults"),'Only user-initiated enterprise lookup appears in rebuilt market');
 assert(ui.includes("job.recordKind==='DOMESTIC_REBUILT'?<div className=\"unified-jd-content\""));
 assert(ui.includes("j.recordKind==='DOMESTIC_REBUILT'"));
 assert(ui.includes("job.recordKind!=='DOMESTIC_REBUILT'&&<SaveJobButton jobId={job.id}/>"));
