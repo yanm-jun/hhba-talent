@@ -1,0 +1,64 @@
+name: HHBA CCTEG company 19 source media
+on:
+  push:
+    branches: [feat/employer-factory-pilot-ccteg-19-20261030]
+    paths: ['.github/workflows/hhba-ccteg-19-media.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/employer-factory-pilot-ccteg-19-20261030
+          persist-credentials: true
+      - name: Save real China Coal Technology and Engineering logo plus two distinct Tianma subsidiary equipment photos
+        shell: bash
+        run: |
+          python -m pip -q install requests Pillow
+          python - <<'PY'
+          import requests,io,json
+          from pathlib import Path
+          from PIL import Image
+          d=Path('apps/web/public/images/employer-profiles/cn-autumn-015')
+          d.mkdir(parents=True,exist_ok=True)
+          client=requests.Session()
+          client.headers.update({'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36','Referer':'https://finance.sina.com.cn/'})
+          sources={
+            'logo.png':['https://iguopin-company.oss-cn-beijing.aliyuncs.com/10685382754151861/logo/20230707/78aa4e5f78d0289f989b05f8e081a149.jpg'],
+            'photo1.webp':['https://n.sinaimg.cn/sinakd20231029s/201/w1080h721/20231029/f69f-94ce1816b494a27af6f9b43c47e5669a.jpg'],
+            'photo2.webp':['https://n.sinaimg.cn/spider20241122/126/w1080h646/20241122/2a99-c9c7ba17f2fe007c0391a6645040fa6d.jpg']
+          }
+          chosen={}
+          for name,urls in sources.items():
+            for url in urls:
+              try:
+                response=client.get(url,timeout=30);response.raise_for_status()
+                im=Image.open(io.BytesIO(response.content));im.load()
+                if im.width<350 or im.height<230:raise ValueError('Image too small')
+                if name.endswith('.png'):
+                  im=im.convert('RGBA');im.thumbnail((850,850));im.save(d/name,'PNG',optimize=True)
+                else:
+                  im=im.convert('RGB');im.thumbnail((1500,1000));im.save(d/name,'WEBP',quality=85,method=6)
+                if not 2000<(d/name).stat().st_size<5_000_000:raise ValueError('Invalid file size')
+                chosen[name]=url
+                print('SOURCE_OK',name,im.size,(d/name).stat().st_size,url,flush=True)
+                break
+              except Exception as e:print('SOURCE_FAILED',name,url,str(e)[:150],flush=True)
+            if name not in chosen:raise RuntimeError('Required real sourced media unavailable: '+name)
+          (d/'source-manifest.json').write_text(json.dumps(chosen,indent=2,ensure_ascii=False)+'\n')
+          PY
+      - name: Commit separate logo and photos
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/web/public/images/employer-profiles/cn-autumn-015/
+          git diff --cached --quiet && exit 0
+          git commit -m 'assets(ccteg): store sourced logo and two independent subsidiary equipment photographs'
+          git pull --rebase origin feat/employer-factory-pilot-ccteg-19-20261030
+          git push origin HEAD:refs/heads/feat/employer-factory-pilot-ccteg-19-20261030
