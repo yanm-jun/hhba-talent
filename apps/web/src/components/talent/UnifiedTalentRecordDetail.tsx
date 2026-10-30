@@ -10,6 +10,8 @@ function Panel({title,children}:{title:string;children:React.ReactNode}){
 }
 const fullGuide=(id:string)=>({
  'sd-jinan-2026-talent-living':'/talent-service/policy-guide-preview/jinan',
+ 'zb-2026-living-reviewed':'/talent-service/policy-guide-preview/zibo/living',
+ 'zb-2026-purchase-reviewed':'/talent-service/policy-guide-preview/zibo/purchase',
  'qd-rent-25':'/talent-service/policy-guide-preview/qingdao/housing',
  'sd-qingdao-2026-free-housing':'/talent-service/policy-guide-preview/qingdao/stay',
  'qd-laoshan-202610':'/talent-service/policy-guide-preview/qingdao/laoshan',
@@ -23,14 +25,15 @@ export function UnifiedTalentRecordDetail({policy,housing}:{policy?:TalentPolicy
  const quality=policy?assessPolicy(policy):assessHousing(housing!);
  const application=policy?.applicationUrl||housing?.applyUrl;
  const route=policy?'/talent-service/list/policies/':'/talent-service/list/housing/';
- const link=policy?fullGuide(policy.id):undefined;
+ const housingGuide=housing&&['zb-zichuan-shuian-202606','zb-zichuan-yuting-202606'].includes(housing.id)?'/talent-service/policy-guide-preview/zibo/housing':undefined;
+ const link=policy?fullGuide(policy.id):housingGuide;
  return <main className="jgd-page">
   <nav className="jgd-breadcrumb"><Link to="/talent-service">人才服务</Link><span>›</span><Link to={'/talent-service/city/'+encodeURIComponent(item.city)}>{item.city}</Link><span>›</span>{policy?'人才政策':housing?.housingCategory||'人才住房'}</nav>
   <header className="jgd-hero"><div className="jgd-hero-text"><span className="jgd-kicker">HHBA / 全国统一政策详情标准</span><h1>{item.title}</h1><p>{policy?.summary||housing?.statusNote}</p>
    <div className="jgd-tags"><span>{quality.label}</span><span>官方资料日期 {item.published}</span><span>不代表当前申请成功或有实时房源</span></div></div>
    <div className="jgd-hero-aside"><span>支持方向</span><strong style={{fontSize:20}}>{policy?.category||'人才住房'}</strong><small>{policy?'待遇金额和具体资格请查看下方完整说明':'房源租金和入住要求请查看下方完整说明'}</small><span>按官方资格与实际审核认定</span></div>
   </header>
-  {link&&<div className="jgd-tip"><ShieldCheck size={16}/><p>这项政策已有独立完整指南，可查看分类资格、材料、办事步骤、常见问题和咨询入口。 <Link to={link}>打开详细办事指南 <ArrowUpRight size={13}/></Link></p></div>}
+  {link&&<div className="jgd-tip"><ShieldCheck size={16}/><p>这项资料已核对详细流程，可查看分类资格、材料、办事步骤和常见问题。正式A级认证另须经过独立V5.1验收；历史住房批次不可作为当前申报依据。 <Link to={link}>打开详细办事指南 <ArrowUpRight size={13}/></Link></p></div>}
   <div style={{marginTop:22}}>
    {policy?<><Panel title="01 政策待遇与适用人群"><p>{policy.benefit}</p>{policy.targetGroup&&<p>面向对象：{policy.targetGroup}</p>}{policy.payoutTo&&<p>扶持主体：{policy.payoutTo==='用人单位'?'用人单位（并非个人现金补贴）':policy.payoutTo==='非现金贷款'?'贷款，需还款':policy.payoutTo==='住房折扣'?'指定房源的购房优惠':policy.payoutTo}</p>}</Panel>
     <Panel title="02 具体申请条件"><p>{policy.eligibility}</p>{policy.deadline&&<p>当前记录的申请截止日期：{policy.deadline}（请核验是否有新的批次）。</p>}</Panel>
