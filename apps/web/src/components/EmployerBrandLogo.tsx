@@ -25,6 +25,8 @@ export function EmployerBrandLogo({job,identity,variant='card'}:LogoProps){
   const cls=variant==='profile'
     ?'company-profile-brand'+(asset?.wide?' company-profile-brand-wide':'')
     :'unified-brand-logo'+(asset?.wide?' unified-brand-logo-wide':'');
+  if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='深圳术叶创新科技有限公司')
+    return <span className={cls} title="徕芬科技 LAIFEN"><img src={import.meta.env.BASE_URL+'images/laifen-user/laifen-logo.webp'} alt="徕芬 Laifen 用户提供的品牌标识" loading="eager" decoding="async"/></span>;
   if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='安克创新科技股份有限公司')
     return <span className={cls} title="安克创新 ANKER INNOVATIONS"><img src={import.meta.env.BASE_URL+'images/autumn-real-logos/cn-autumn-008.svg'} alt="Anker Innovations 用户确认的蓝色品牌标识" loading="eager" decoding="async"/></span>;
   if(job?.recordKind==='DOMESTIC_REBUILT'&&job.company==='上海鹰角网络科技有限公司')
