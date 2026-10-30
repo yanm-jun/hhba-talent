@@ -232,7 +232,7 @@ export const boyuV2Records=boyuJobs.jobs.map(job=>({
  url:job.url,domestic:true,remote:null,recordKind:'DOMESTIC_REBUILT',
  recruitmentType:job.type,observedAt:'2026-09-11',currentApplicationVerified:false,
  educationLabel:job.education,experienceLabel:'学校招聘公开记录 · 当前开放状态未核验',
- majorNames:job.majors,editorialRelatedMajors:job.related,
+ majorNames:job.majors,editorialRelatedMajors:job.related,majorUnrestricted:job.title==='万寓生',
  responsibilitiesSummary:job.summary,requirementsSummary:job.requirements,
  evidenceUrl:job.url,positionOrg:boyuJobs.employer,employerRoute:'/companies/autumn/cn-autumn-011'
 } satisfies LiveJob & {majorNames:string[];editorialRelatedMajors:string[];evidenceUrl:string;positionOrg:string;employerRoute:string}));
