@@ -161,4 +161,16 @@ check('Rizhao research housing remains separate from official verified inventory
  assert.notEqual(assessPolicy(youth,'2026-10-30').grade,'A');
  assert.ok(routes.includes('<UnifiedTalentHousingResearch city={city} query={query}/>'));
 });
+check('City hub prominently counts housing support and unverified apartment references separately',()=>{
+ const hub=code('TalentServiceRoutes.tsx');
+ const cityIndex=readFileSync(new URL('../src/data/talentCityRegistry.ts',import.meta.url),'utf8');
+ assert.ok(hub.includes('const housingPolicies=policies.filter(isHousingPolicy)'), 'city hub must include housing-support policies');
+ assert.ok(hub.includes('const housingLeads=housingResearchLeads(match.name)'), 'city hub must load apartment references');
+ assert.ok(hub.includes('label="住房支持政策"'), 'main city counter must display housing policy count');
+ assert.ok(hub.includes('label="人才公寓线索 · 待核验"'), 'apartment references must be visible in summary');
+ assert.ok(hub.includes('人才公寓在哪里？'), 'city hub must show apartment preview with navigation');
+ assert.ok(hub.includes("k.id==='policies'?policies.length+' 条已收录'"), 'housing card must not treat reference-only city as empty');
+ assert.ok(cityIndex.includes("name==='日照'"), 'Rizhao description should not incorrectly claim there is no housing information');
+ assert.equal(TALENT_HOUSING_RESEARCH_LEADS.filter(x=>x.city==='日照').length,3);
+});
 console.log(JSON.stringify({passed,baseline:base.policyIds.length+base.housingIds.length,certified:Object.keys(CERTIFIED_TALENT_GUIDES).length,acceptedCities:ACCEPTED_TALENT_CITIES.length},null,2));
