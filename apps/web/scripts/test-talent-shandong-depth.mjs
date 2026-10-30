@@ -8,7 +8,7 @@ check('16 Shandong cities each have at least two different policies',()=>{for(co
 check('At least 25 detailed additions and 41 total Shandong references',()=>{assert.ok(extended.length>=25,'detailed '+extended.length);assert.ok(all.length>=41,'total '+all.length)});
 check('Extended policies include materials, staged steps and exact benefit limitations',()=>{for(const r of extended){assert.ok(r.materials.length>=2,r.id);assert.ok(r.applicationSteps.length>=3,r.id);assert.ok(r.benefit.length>=30,r.id);assert.ok(r.eligibility.length>=40,r.id);assert.ok(r.reviewNote.length>=20,r.id)}});
 check('All source URLs use audited host allowlist and non-official sources disclose limitations',()=>{
- const allowed=['www.rznews.cn','m.thepaper.cn','www.sdfzxy.edu.cn','weifang.sdnews.com.cn','liaocheng.sdnews.com.cn'];
+ const allowed=['www.rznews.cn','m.thepaper.cn','www.sdfzxy.edu.cn','school.gxjy.sdei.edu.cn','weifang.sdnews.com.cn','liaocheng.sdnews.com.cn'];
  for(const r of extended){const host=new URL(r.sourceUrl).hostname;const strong=host.endsWith('.gov.cn')||host.endsWith('.ncss.cn');assert.ok(strong||allowed.includes(host),r.id+' '+host);if(!strong)assert.ok(/转载|报道|历史|复核|核实|原文|汇编|媒体|旧版|来源/.test(r.reviewNote),r.id)}
 });
 check('Old cohorts, regional limits, employer payments and loans remain explicit',()=>{
