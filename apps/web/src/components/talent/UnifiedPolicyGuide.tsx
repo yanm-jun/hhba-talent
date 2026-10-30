@@ -72,7 +72,7 @@ export function UnifiedPolicyGuide({data}:{data:CompleteGuide}){
     <div className="jgd-sources"><h3>官方依据与重要附件</h3>{data.sources.map(([title,url],i)=><a key={i} target="_blank" rel="noopener noreferrer" href={url}>{title}<ArrowUpRight size={13}/></a>)}</div>
    </section>
   </div><aside className="jgd-side"><div className="jgd-side-card"><span>办理重点</span><h3>先核实本人资格，再按官方步骤申请</h3><p>{data.review}</p>{data.officialUrl&&<a href={data.officialUrl} target="_blank" rel="noopener noreferrer">官方办理入口 <ArrowUpRight size={13}/></a>}</div>
-   <div className="jgd-side-card"><span>资料质量</span><p>此页面为已核对政府原文的完整指南。其他尚未核实的城市政策不自动归入此等级。</p>{data.otherRoute&&<Link to={data.otherRoute}>{data.otherLabel||'查看同城其他政策'} <ArrowRight size={13}/></Link>}
+   <div className="jgd-side-card"><span>资料质量</span><p>本页依据官方公开资料编排办事步骤。资料内容与政府最终资格认定有别，是否获得V5.1 A级认证以政策列表的质量标识为准。</p>{data.otherRoute&&<Link to={data.otherRoute}>{data.otherLabel||'查看同城其他政策'} <ArrowRight size={13}/></Link>}
      {data.detailPath&&<Link to={data.detailPath}>查看原始政策记录 <ArrowRight size={13}/></Link>}</div></aside></div>
   <footer className="jgd-footer"><Link to={data.listPath}><ArrowLeft size={14}/> 返回{data.city}政策列表</Link><span>HHBA · 资料整理由官方原文核对，不替代政府经办审核</span></footer>
  </main>;
