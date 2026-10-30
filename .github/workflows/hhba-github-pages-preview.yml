@@ -1,3 +1,4 @@
+# 2026-10-30: V5.1 National talent city template is contract-locked: source grades, A guide certification, 95 baseline IDs, future-city CI gate.
 # 2026-10-30 HHBA Talent V5: national unified list/guide/detail components, A-B-C-D content grading, seven-step Laoshan official housing guide.
 # 2026-10-30: Qingdao second Shandong city V3+V3.1, main branch, verified housing subsidy & 2026 rent-free lodging guides.
 # 2026-10-30: consolidated V2 search replay: 16 new employers, 124 role directions; verify 南方传媒 and 广之旅 on one HHBA site.
@@ -182,6 +183,9 @@ jobs:
       - name: Enforce 95-record unified talent template, truthful quality grades and Laoshan complete application workflow
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-standard-v5.mjs
+      - name: Lock future city template, certify full policy guides and protect 95 historical record IDs
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
       - name: Test four-municipality talent policy matching, deadlines, exclusions and privacy
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-match.mjs
