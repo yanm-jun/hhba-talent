@@ -5,13 +5,23 @@ const cities=['济南','青岛','淄博','枣庄','东营','烟台','潍坊','�
 let passed=0;
 const check=(name,fn)=>{fn();passed++;console.log('✓ '+name)};
 // Regression protects original V4.6 16 IDs; V4.7 deeper records are checked separately.
-const newV47=new Set(['sd-zz-job-2026','sd-lc-insurance-2026']);
-const added=TALENT_POLICY_RECORDS.filter(r=>r.id.startsWith('sd-')&&!newV47.has(r.id));
+const originalSixteen=new Set(['sd-jinan-2026-talent-living','sd-qingdao-2026-free-housing','sd-zibo-2026-training','sd-zaozhuang-2026-first-startup','sd-dongying-talent-2026','sd-yantai-2026-youth-living','sd-weifang-2025-subsidy','sd-jining-2026-introduction','sd-taian-2025-youth','sd-weihai-youth-2025','sd-rizhao-youth-2026','sd-linyi-youth-2025','sd-dezhou-2026-startup','sd-liaocheng-2026-living','sd-binzhou-2026-flex','sd-heze-2026-startup']);
+// Keep the original city coverage contract fixed; later independently sourced records must not break this baseline.
+const added=TALENT_POLICY_RECORDS.filter(r=>originalSixteen.has(r.id));
 check('All 16 Shandong prefectures present',()=>{assert.deepEqual(new Set(queryTalentCities('','山东省').map(c=>c.name)),new Set(cities))});
 check('Exactly one new sourced item for each Shandong city',()=>{
  assert.equal(added.length,16);
  assert.equal(new Set(added.map(r=>r.city)).size,16);
  for(const c of cities)assert.equal(added.filter(r=>r.city===c).length,1,c);
+});
+check('Extra 2026 Weifang records preserve historical IDs and distinguish recipients',()=>{
+ const expansion=TALENT_POLICY_RECORDS.find(r=>r.id==='sd-weifang-2026-expansion');
+ const skill=TALENT_POLICY_RECORDS.find(r=>r.id==='sd-weifang-2026-skills');
+ assert.ok(expansion&&skill);
+ assert.equal(expansion.payoutTo,'用人单位');
+ assert.equal(skill.payoutTo,'个人');
+ assert.ok(expansion.applicationSteps?.length>=4&&skill.applicationSteps?.length>=4);
+ assert.ok(expansion.sourceUrl.includes('.gov.cn')&&skill.sourceUrl.includes('.gov.cn'));
 });
 check('Source links are government or National Graduate Employment Service',()=>{
  for(const row of added){
