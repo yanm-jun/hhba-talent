@@ -44,6 +44,8 @@ jobs:
       VITE_DEMO_ACCOUNT_ENABLED: '0'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 35
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -60,7 +62,8 @@ jobs:
           set -euo pipefail
           id="$REQUESTED_ID"
           if [ -z "$id" ]; then
-            id=$(git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA" | sed -n -E 's@^apps/web/src/data/employerProfiles/(cn-autumn-[0-9]{3})\.json$@\1@p' | sort -u)
+            id=$(git log -n 35 --pretty=format: --name-only -- apps/web/src/data/employerProfiles/ |
+              sed -n -E 's@^apps/web/src/data/employerProfiles/(cn-autumn-[0-9]{3})\.json$@\1@p' | sed -n '1p')
             if [ -z "$id" ] && [ "$GITHUB_REF_NAME" = "feat/employer-factory-v2-20261030" ]; then id="cn-autumn-018"; fi
           fi
           [[ "$id" =~ ^cn-autumn-[0-9]{3}$ ]] || { echo 'Specify exactly one company JSON or employer_id.' >&2; exit 1; }
