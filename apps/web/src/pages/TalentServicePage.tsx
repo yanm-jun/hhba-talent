@@ -1,9 +1,11 @@
-import {useMemo,useState} from 'react';
+import {useEffect,useMemo,useState} from 'react';
 import {ArrowRight,ArrowUpRight,Building2,CalendarDays,CheckCircle2,ChevronDown,ClipboardCheck,ExternalLink,FileText,GraduationCap,Home,MapPin,Search,ShieldCheck,Sparkles,Wallet,X} from 'lucide-react';
 import {Shell} from '../components/Shell';
+import {TalentPolicySearch} from '../components/TalentPolicySearch';
 import {Link} from '../router';
 import type {User} from '../services/api';
 import '../styles/talent-service.css';
+import '../styles/talent-carousel.css';
 
 type City={name:string;province:string;photo?:string;credit?:string;photoPage?:string;intro:string};
 type Detail={title:string;kind:'housing'|'policy'|'guide';summary:string;tags:string[];steps:string[]};
@@ -35,15 +37,33 @@ const scrollToSection=(id:string)=>document.getElementById(id)?.scrollIntoView({
 export function TalentServicePage({user}:{user:User|null}){
  const [city,setCity]=useState('杭州');
  const [keyword,setKeyword]=useState('');
+ const [submittedQuery,setSubmittedQuery]=useState('');
+ const [slideIndex,setSlideIndex]=useState(0);
+ const [slideshowPaused,setSlideshowPaused]=useState(false);
+ const [photoFailed,setPhotoFailed]=useState(false);
+ useEffect(()=>{
+  if(slideshowPaused||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const id=window.setInterval(()=>setSlideIndex(index=>(index+1)%CITIES.length),6500);
+  return ()=>window.clearInterval(id);
+ },[slideshowPaused]);
+ useEffect(()=>setPhotoFailed(false),[slideIndex]);
  const [detail,setDetail]=useState<Detail|null>(null);
  const [education,setEducation]=useState('本科');
  const [grad,setGrad]=useState('应届毕业生');
  const [matchVisible,setMatchVisible]=useState(false);
  const current=CITIES.find(c=>c.name===city)||CITIES[0];
+ const slideCity=CITIES[slideIndex]||CITIES[0];
  const q=keyword.trim().toLowerCase();
  const policies=useMemo(()=>BENEFITS.filter(p=>!q||(p.title+p.detail+p.tags.join('')+city).toLowerCase().includes(q)),[q,city]);
  const housings=useMemo(()=>HOUSING.filter(p=>!q||(p.title+p.subtitle+p.tags.join('')+city).toLowerCase().includes(q)),[q,city]);
- const chooseCity=(name:string)=>{setCity(name);setMatchVisible(false);setKeyword('');};
+ const chooseCity=(name:string)=>{setCity(name);setMatchVisible(false);setKeyword('');setSubmittedQuery('');const i=CITIES.findIndex(c=>c.name===name);if(i>=0)setSlideIndex(i);};
+ const submitSearch=()=>{
+  const findCity=CITIES.find(c=>keyword.includes(c.name));
+  if(findCity){setCity(findCity.name);setSlideIndex(CITIES.indexOf(findCity));}
+  setSubmittedQuery(keyword);
+  requestAnimationFrame(()=>document.getElementById('ts-policies')?.scrollIntoView({behavior:'smooth',block:'start'}));
+ };
+ const slideBy=(delta:number)=>setSlideIndex(i=>(i+delta+CITIES.length)%CITIES.length);
  function showPolicy(title:string,summary:string,tags:string[]){
   setDetail({title:city+' · '+title,kind:'policy',summary,tags,steps:['在当地政府门户核对政策全文、适用区域及有效期','核对个人学历、毕业时间、就业和社保等申报条件','从发布机关提供的官方申报入口办理','保留申报凭证并关注主管部门审核通知']});
  }
@@ -59,21 +79,27 @@ export function TalentServicePage({user}:{user:User|null}){
      <p className="ts-lead">从一份工作，到一座城市的生活。人才政策、安居保障、生活补贴与办事指南，帮你把未来看得更清楚。</p>
      <div className="ts-searchbar">
       <label className="ts-city-select"><MapPin size={17} aria-hidden="true"/><span className="sr-only">选择城市</span><select value={city} onChange={e=>chooseCity(e.target.value)} aria-label="选择城市">{CITIES.map(c=><option key={c.name} value={c.name}>{c.name}</option>)}</select><ChevronDown size={15} aria-hidden="true"/></label>
-      <label className="ts-query-field"><Search size={19} aria-hidden="true"/><span className="sr-only">搜索人才服务</span><input value={keyword} onChange={e=>setKeyword(e.target.value)} placeholder="搜索政策、公寓、补贴、办理事项…" aria-label="搜索人才政策、公寓和补贴"/></label>
-      <button className="ts-search-submit" type="button" onClick={()=>scrollToSection('ts-policies')}>搜索 <ArrowRight size={17}/></button>
+      <label className="ts-query-field"><Search size={19} aria-hidden="true"/><span className="sr-only">搜索人才服务</span><input value={keyword} onChange={e=>setKeyword(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();submitSearch();}}} placeholder="输入杭州硕士补贴、青岛人才公寓…" aria-label="搜索人才政策、公寓和补贴"/></label>
+      <button className="ts-search-submit" type="button" onClick={submitSearch}>搜索 <ArrowRight size={17}/></button>
      </div>
      <div className="ts-hot-cities"><span>热门城市</span>{CITIES.slice(0,6).map(c=><button key={c.name} type="button" className={c.name===city?'active':''} onClick={()=>chooseCity(c.name)}>{c.name}</button>)}</div>
-     <div className="ts-trust-note"><ShieldCheck size={15}/> 功能预览 · 城市政策及房源尚未接入实时官方数据，申请前请核对政府公告</div>
+     <div className="ts-trust-note"><ShieldCheck size={15}/> 已接入首批政府来源政策索引 · 非实时全网搜索，申报前请核对最新政府公告</div>
     </div>
-    <div className="ts-hero-art">
+    <div className="ts-hero-art ts-carousel" role="region" aria-roledescription="轮播" aria-label="热门城市实景照片"
+      onMouseEnter={()=>setSlideshowPaused(true)} onMouseLeave={()=>setSlideshowPaused(false)}
+      onFocusCapture={()=>setSlideshowPaused(true)} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget as Node|null))setSlideshowPaused(false)}}>
      <div className="ts-hero-photo-halo" aria-hidden="true"/>
      <figure className="ts-hero-photo">
-      <img key={current.name} src={current.photo} alt={current.name+'城市风貌实景照片'} loading="eager" decoding="async" />
-      <span className="ts-photo-topline" aria-hidden="true">CITY IN FOCUS <span>●</span> {current.province}</span>
-      <figcaption className="ts-photo-caption"><span>DISCOVER YOUR NEXT CITY</span><strong>{current.name}</strong><small>{current.province} · 城市实景</small></figcaption>
+      {!photoFailed&&<img key={slideCity.name} src={slideCity.photo} onError={()=>setPhotoFailed(true)} alt={slideCity.name+'城市实景照片'} loading="eager" decoding="async"/>}
+      <span className="ts-photo-topline" aria-hidden="true">CITY IN FOCUS <span>●</span> {slideCity.province}</span>
+      <figcaption className="ts-photo-caption"><span>DISCOVER YOUR NEXT CITY</span><strong>{slideCity.name}</strong><small>{slideCity.province} · 城市实景</small></figcaption>
      </figure>
-     <span className="ts-photo-chip ts-photo-chip-blue" aria-hidden="true"><Home size={16}/> 安居保障</span>
-     <span className="ts-photo-chip ts-photo-chip-orange" aria-hidden="true"><Wallet size={16}/> 人才福利</span>
+     <button type="button" className="ts-carousel-arrow ts-carousel-prev" aria-label="上一座城市" onClick={()=>slideBy(-1)}>‹</button>
+     <button type="button" className="ts-carousel-arrow ts-carousel-next" aria-label="下一座城市" onClick={()=>slideBy(1)}>›</button>
+     <div className="ts-carousel-bottom"><span className="ts-carousel-count">{slideIndex+1} / {CITIES.length}</span>
+      <div className="ts-carousel-dots" aria-label="选择轮播城市">{CITIES.map((c,i)=><button type="button" key={c.name} aria-label={'查看'+c.name+'照片'} aria-pressed={i===slideIndex} className={i===slideIndex?'active':''} onClick={()=>setSlideIndex(i)}/>)}</div>
+      <button type="button" className="ts-carousel-to-policy" onClick={()=>{chooseCity(slideCity.name);scrollToSection('ts-policies')}}>查看{slideCity.name}政策 <ArrowRight size={13}/></button>
+     </div>
     </div>
    </section>
 
@@ -94,10 +120,7 @@ export function TalentServicePage({user}:{user:User|null}){
     {housings.length?<div className="ts-housing-grid">{housings.map(h=><article className="ts-house-card" key={h.title}><div className="ts-house-photo"><img src={h.image} alt="现代公寓居住环境示意图，非具体房源实拍" loading="lazy"/><span>场景示意 · 非实际房源</span></div><div className="ts-house-copy"><span className="ts-card-eyebrow"><MapPin size={13}/> {city} · 安居服务</span><h3>{h.title}</h3><p>{h.subtitle}</p><div className="ts-tags">{h.tags.map(t=><span key={t}>{t}</span>)}</div><button type="button" onClick={()=>showHousing(h.title,h.subtitle,h.tags)}>查看申请说明 <ArrowRight size={16}/></button></div></article>)}</div>:<div className="ts-no-result">暂未找到与“{keyword}”匹配的安居栏目，请尝试其他关键词。</div>}
    </section>
 
-   <section className="ts-section" id="ts-policies">
-    <div className="ts-section-heading"><div><span className="ts-section-kicker">POLICIES & BENEFITS / 政策与福利</span><h2>{city} · 人才政策与福利</h2><p>按政策类型快速了解办理方向。以下是栏目示例，不是已核验的现行政策公告。</p></div><span className="ts-sample-label">政策信息待逐城核验</span></div>
-    <div className="ts-policy-list">{policies.length?policies.map((p,i)=><button className="ts-policy-row" type="button" key={p.title} onClick={()=>showPolicy(p.title,p.detail,p.tags)}><span className="ts-policy-number">{String(i+1).padStart(2,'0')}</span><span className="ts-policy-text"><strong>{p.title}</strong><small>{p.detail}</small><span className="ts-tags">{p.tags.map(t=><span key={t}>{t}</span>)}</span></span><span className="ts-policy-status">待核验</span><ArrowUpRight size={19} className="ts-policy-arrow"/></button>):<div className="ts-no-result">没有找到与“{keyword}”匹配的政策栏目。可以搜索“住房”“落户”或“毕业生”。</div>}</div>
-   </section>
+   <TalentPolicySearch city={city} query={submittedQuery} onCityClick={chooseCity}/>
 
    <section className="ts-section" id="ts-guide">
     <div className="ts-section-heading"><div><span className="ts-section-kicker">HOW IT WORKS / 申请指南</span><h2>清楚每一步，少走一点弯路</h2><p>不同城市和政策的申报规则不同，以下为办理流程框架。</p></div></div>
