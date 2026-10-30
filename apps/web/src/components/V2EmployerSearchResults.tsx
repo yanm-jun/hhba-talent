@@ -16,7 +16,7 @@ function approvedV2Employers():Promise<PublishedV2Employer[]>{
   if(!res.ok)throw Error('V2 企业索引尚未发布');
   const data=await res.json() as V2Index;
   if(data.schemaVersion!==1||!Array.isArray(data.employers))throw Error('V2 企业索引格式无效');
-  return data.employers.filter(p=>/^cn-autumn-\d{3}$/.test(p.id)&&p.previewRoot.startsWith('preview-')&&
+  return data.employers.filter(p=>/^cn-autumn-\d{3}$/.test(p.id)&&
    Array.isArray(p.jobs)&&Array.isArray(p.aliases));
  }).catch(error=>{cached=null;throw error});
  return cached;
