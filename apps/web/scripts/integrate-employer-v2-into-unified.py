@@ -14,6 +14,10 @@ def git(*args, check=True):
  if p.returncode and check: raise RuntimeError(f"git {args}: {p.stderr[:600]}")
  return p
 def blob(ref,path):
+ # Git blob SHA is sufficient for binary assets, without decoding image bytes.
+ if path.startswith("apps/web/public/"):
+  r=git("rev-parse","--verify",f"{ref}:{path}",check=False)
+  return r.stdout.strip() if r.returncode==0 else None
  r=git("show",f"{ref}:{path}",check=False)
  return r.stdout if r.returncode==0 else None
 def write(path,contents):
