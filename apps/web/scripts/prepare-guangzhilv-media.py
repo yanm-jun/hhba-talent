@@ -9,7 +9,7 @@ root = Path(__file__).resolve().parents[1] / "public/images/employer-profiles/cn
 root.mkdir(parents=True, exist_ok=True)
 sources = {
     "logo.png": "https://img.traveldaily.cn/user/photo/20000/29078_a800eab4e2b0ca78.png",
-    "photo1.jpg": "https://gzw.gz.gov.cn/img/0/251/251984/6881721.png",
+    "photo1.jpg": "https://mma.prnasia.com/media2/2728894/Image4.jpg?p=medium600",
     "photo2.jpg": "https://p8.itc.cn/q_70/images03/20230323/3690fdf1616f46e6a101e157bb96bae9.jpeg",
 }
 for name, url in sources.items():
