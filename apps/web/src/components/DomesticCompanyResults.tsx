@@ -65,11 +65,11 @@ export function DomesticCompanyResults({query,majorSlug='',scope='',country='',c
  }
  if(scope==='global'||country&&!/^(cn|chn|china|中国|中国大陆)$/i.test(country))
   return <section className="domestic-company-result" aria-label="国内企业专业匹配"><p className="domestic-company-caution">「所学专业」用于关联国内企业业务方向。如需查看相关国内企业，请将地区改为“国内外全部”或“中国岗位”。海外岗位仍按照官方岗位条件筛选。</p></section>;
- return <section className="domestic-company-result" aria-label="国内企业搜索结果">
-  <div className="domestic-company-title"><h3>{chosen?'与所学专业相关的国内企业':browse200&&!word?'企业发现 · 200 家档案':'相关国内企业'}</h3>
+ return <section className="domestic-company-result" aria-label="国内企业搜索结果" data-hhba-company-search="true">
+  <div className="domestic-company-title"><h3>{chosen?'与所学专业相关的国内企业':browse200&&!word?'企业发现 · 200 家档案':word?'企业资料匹配结果':'相关国内企业'}</h3>
    <small>{'显示 '+list.length+' 家 · 企业名录 '+all.length.toLocaleString()+' 条'}</small></div>
   {chosen&&<div className="domestic-major-filter-active"><GraduationCap size={15}/>已选择：<strong>{chosen.name}</strong><span>按业务证据关联，非在招承诺</span></div>}
-  <p className="domestic-company-caution">可按企业名称或专业筛选；部分新增公司图片或招聘入口仍待核验，企业详情将明确展示状态。</p>
+  <p className="domestic-company-caution">以下是企业资料搜索结果，与实时在招岗位数量分开统计。可按企业名称或专业筛选；企业详情会注明招聘入口和资料核验状态。</p>
   {!list.length&&<p className="domestic-company-empty">当前专业尚无经过业务证据核验的关联企业，或者不符合关键词与地区条件。可以更换专业，或清除专业筛选后直接搜索企业；这不代表没有企业招聘该专业。</p>}
   <div className="domestic-company-grid">{list.map(company=>{
    const editorial=rich[company.name];
