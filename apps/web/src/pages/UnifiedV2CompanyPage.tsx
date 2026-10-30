@@ -1,4 +1,5 @@
-import {useEffect,useMemo,useState} from 'react';
+import {useMemo,useState} from 'react';
+import {employerProfileById} from '../services/employerProfiles';
 import {ArrowLeft,ArrowRight,ChevronDown,ExternalLink,GraduationCap} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,getCompanyReturnTarget} from '../router';
@@ -28,30 +29,17 @@ function roleMatches(role:Role,major:string){
  return [...role.majorNames,...role.editorialRelatedMajors].some(x=>normalized(x)===chosen);
 }
 export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
- const [p,setP]=useState<Company|null>(null);
- const [error,setError]=useState('');
+ const p=employerProfileById.get(id) as Company|undefined;
  const [major,setMajor]=useState('');
  const [expanded,setExpanded]=useState(false);
  const [focusedRole]=useState(()=>new URLSearchParams(location.search).get('role')||'');
  const back=getCompanyReturnTarget();
- useEffect(()=>{
-  const control=new AbortController();
-  fetch(asset('data/employer-v2-profiles/'+id+'.json'),{signal:control.signal,credentials:'omit'})
-   .then(async r=>{if(!r.ok)throw Error('企业资料尚未发布');return r.json() as Promise<Company>})
-   .then(data=>{
-    if(data.id!==id||!Array.isArray(data.jobs)||!Array.isArray(data.business))
-      throw Error('企业资料格式不正确');
-    if(!control.signal.aborted){setP(data);setError('')}
-   }).catch(e=>{if(!control.signal.aborted)setError(e instanceof Error?e.message:'资料读取失败')});
-  return()=>control.abort();
- },[id]);
  const choices=useMemo(()=>p?[...new Set([
   ...p.preferredMajors,
   ...p.jobs.flatMap(j=>[...j.majorNames,...j.editorialRelatedMajors])
  ])].slice(0,22):[],[p]);
  const matches=useMemo(()=>p?.jobs.filter(job=>roleMatches(job,major))||[],[p,major]);
- if(error)return <Shell user={user}><section className="hhba-v2-company-status" role="alert">{error}<p><Link to="/candidate/jobs">返回招聘市场</Link></p></section></Shell>;
- if(!p)return <Shell user={user}><section className="hhba-v2-company-status" role="status">正在读取已审核企业资料…</section></Shell>;
+ if(!p)return <Shell user={user}><section className="hhba-v2-company-status" role="alert">企业档案未加入主站数据目录。<p><Link to="/candidate/jobs">返回招聘市场</Link></p></section></Shell>;
  return <Shell user={user}>
   <article className="company-profile hhba-kpmg-compact" data-company-template="unified-v2" data-domestic-rebuild="v2" data-employer-id={p.id}>
    <nav className="company-profile-top" aria-label="企业详情导航">
