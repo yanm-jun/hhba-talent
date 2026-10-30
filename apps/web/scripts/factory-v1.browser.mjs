@@ -11,6 +11,11 @@ try{
   await page.goto(base+'companies/autumn/cn-autumn-011',{waitUntil:'domcontentloaded',timeout:45000});
   const profile=page.locator('[data-company-template="factory-v1"][data-employer-id="cn-autumn-011"]');
   await profile.waitFor({timeout:20000});
+  // Public site shows an optional anonymous-analytics consent sheet on
+  // first visit. Close it before checking real user interactions.
+  const consent=page.getByRole('button',{name:'暂不同意'});
+  if(await consent.isVisible().catch(()=>false))await consent.click();
+
   const all=profile.locator('.hhba-kpmg-logo img, .hhba-kpmg-photo-grid img');
   assert.equal(await all.count(),3);
   for(const img of await all.all())await img.evaluate(async e=>{
