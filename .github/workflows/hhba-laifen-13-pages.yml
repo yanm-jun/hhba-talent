@@ -1,0 +1,158 @@
+name: HHBA Laifen 13 isolated review
+on:
+  push:
+    branches: [feat/laifen-13-static-v2-20261030]
+    paths:
+      - '.github/workflows/hhba-laifen-13-pages.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: hhba-laifen-13-isolated-preview
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/laifen-13-static-v2-20261030
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Validate Laifen data, all 13 employers and historical overseas records
+        working-directory: apps/web
+        run: |
+          node scripts/laifen-13.contract.test.mjs
+          node scripts/anker-2027.contract.test.mjs
+          node scripts/domestic-rebuild-v2.contract.test.mjs
+          node scripts/major-company-job-flow.contract.test.mjs
+          node scripts/all-company-major-chips.contract.test.mjs
+          node scripts/hypergryph-major-choices.contract.test.mjs
+      - name: Build isolated preview preserving source search
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/preview-laifen/'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_DEMO_ACCOUNT_ENABLED: '0'
+        run: |
+          npm run build
+          cp dist/index.html dist/404.html
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const jobs=JSON.parse(fs.readFileSync('src/data/domesticLaifenSourcedRoles20261030.json','utf8')).jobs;
+          const urls=['companies/autumn/cn-autumn-009','candidate/jobs',...jobs.map(j=>'candidate/jobs/cn-v2-laifen-'+j.id)];
+          if(urls.length!==8)throw Error('Expected 8 Laifen refresh-safe deep links');
+          for(const route of urls){fs.mkdirSync('dist/'+route,{recursive:true});fs.copyFileSync('dist/index.html','dist/'+route+'/index.html');}
+          fs.writeFileSync('dist/.nojekyll','');
+          NODE
+          for f in laifen-logo.webp laifen-dryer.webp laifen-toothbrush.webp; do test -s dist/images/laifen-user/"$f"; done
+          test -s dist/curated/v1/jobs.json
+          grep -q '/hhba-talent/preview-laifen/assets/' dist/index.html
+      - name: Browser tools
+        working-directory: apps/web
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Browser test real user interactions and mobile view
+        working-directory: apps/web
+        env:
+          HHBA_PAGES_BASE: /hhba-talent/preview-laifen/
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/laifen-vite.log 2>&1 &
+          for i in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:4173/hhba-talent/preview-laifen/ >/dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/laifen-13.browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-laifen-13-browser-review
+          path: apps/web/laifen-review/
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Download last successful Pages release (home and Anker preview)
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 40995682305
+          github-token: ${{ github.token }}
+          path: old-pages-artifact
+      - name: Refuse overwrite if existing site differs; add only Laifen directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p published
+          archive=$(find old-pages-artifact -type f -name 'artifact.tar*' -print -quit)
+          test -n "$archive"
+          if [[ "$archive" == *.gz ]]; then tar -xzf "$archive" -C published; else tar -xf "$archive" -C published; fi
+          test -s published/index.html
+          test -s published/preview-anker/index.html
+          test ! -e published/preview-laifen
+          curl -fsSL --connect-timeout 10 --max-time 40 'https://yanm-jun.github.io/hhba-talent/' -o /tmp/hhba-home-live
+          curl -fsSL --connect-timeout 10 --max-time 40 'https://yanm-jun.github.io/hhba-talent/preview-anker/' -o /tmp/anker-live
+          cmp published/index.html /tmp/hhba-home-live
+          cmp published/preview-anker/index.html /tmp/anker-live
+          mkdir -p published/preview-laifen
+          cp -a apps/web/dist/. published/preview-laifen/
+          cmp published/index.html /tmp/hhba-home-live
+          cmp published/preview-anker/index.html /tmp/anker-live
+          test -s published/preview-laifen/images/laifen-user/laifen-logo.webp
+          test -s published/preview-laifen/companies/autumn/cn-autumn-009/index.html
+          touch published/.nojekyll
+          echo EXISTING_HOME_AND_ANKER_PRESERVED_LAIFEN_NESTED_ONLY
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: published
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: hhba-company200-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Check new public URL and preserved previous pages
+        run: |
+          set -euo pipefail
+          root='https://yanm-jun.github.io/hhba-talent'
+          for i in 1 2 3 4 5 6; do
+            if curl -fsSL "$root/preview-laifen/" -o /tmp/laifen-html &&
+               curl -fsSL "$root/preview-laifen/images/laifen-user/laifen-logo.webp" -o /tmp/laifen-logo &&
+               curl -fsSL "$root/preview-laifen/images/laifen-user/laifen-dryer.webp" -o /tmp/laifen-dryer &&
+               curl -fsSL "$root/preview-laifen/images/laifen-user/laifen-toothbrush.webp" -o /tmp/laifen-toothbrush; then break; fi
+            if [ "$i" = 6 ]; then exit 1; fi
+            sleep 10
+          done
+          grep -q '/hhba-talent/preview-laifen/assets/' /tmp/laifen-html
+          test $(wc -c </tmp/laifen-logo) -gt 2000
+          test $(wc -c </tmp/laifen-dryer) -gt 3000
+          test $(wc -c </tmp/laifen-toothbrush) -gt 3000
+          curl -fsSL "$root/" | grep -q '/hhba-talent/assets/'
+          curl -fsSL "$root/preview-anker/" | grep -q '/hhba-talent/preview-anker/assets/'
+          echo LAIFEN_PUBLIC_PREVIEW_VERIFIED_PREVIOUS_SITE_PRESERVED
