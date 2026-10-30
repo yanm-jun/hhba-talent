@@ -173,4 +173,36 @@ check('City hub prominently counts housing support and unverified apartment refe
  assert.ok(cityIndex.includes("name==='日照'"), 'Rizhao description should not incorrectly claim there is no housing information');
  assert.equal(TALENT_HOUSING_RESEARCH_LEADS.filter(x=>x.city==='日照').length,3);
 });
+check('Zaozhuang V5.1: two detailed policies, truthful pilot program, three housing leads and shared routes',()=>{
+ const city='枣庄';
+ const p=TALENT_POLICY_RECORDS.filter(x=>x.city===city);
+ const employee=p.find(x=>x.id==='sd-zz-job-2026');
+ const startup=p.find(x=>x.id==='sd-zaozhuang-2026-first-startup');
+ assert.ok(employee&&startup,'Zaozhuang existing 2026 policies must remain');
+ for(const item of [employee,startup]){
+  assert.ok(item.materials?.length>=3,item.id+' missing material checklist');
+  assert.ok(item.applicationSteps?.length>=4,item.id+' missing real-world process');
+  assert.ok(item.reviewNote?.includes('办理入口待核实'),item.id+' may not invent online portal');
+  assert.notEqual(assessPolicy(item,'2026-10-30').grade,'A','Do not self certify Zaozhuang policy');
+ }
+ assert.equal(employee.headlineAmount,'¥2,000–5,000');
+ const housing=TALENT_HOUSING_RECORDS.filter(x=>x.city===city);
+ assert.ok(housing.some(x=>x.id==='zz-talent-home-pilots-202605'&&x.kind==='program'), '2026 pilot home program not connected');
+ const pilot=housing.find(x=>x.id==='zz-talent-home-pilots-202605');
+ assert.equal(talentSourceKind(pilot.sourceUrl),'government');
+ assert.ok(pilot.statusNote.includes('不是个人')||pilot.statusNote.includes('不等于个人'));
+ assert.ok(pilot.statusNote.includes('申报入口未公布'));
+ assert.ok(pilot.steps.length>=4&&pilot.units.includes('不是人才公寓可租套数'));
+ assert.equal(assessHousing(pilot,'2026-10-30').grade,'B','Never promote pilot list to A');
+ const leads=TALENT_HOUSING_RESEARCH_LEADS.filter(x=>x.city===city);
+ assert.equal(leads.length,3,'Zaozhuang needs real housing leads in homepage');
+ for(const lead of leads){
+  assert.ok(lead.steps.length>=4&&lead.address&&lead.units&&lead.statusNote);
+  assert.notEqual(talentSourceKind(lead.sourceUrl),'government','unverified reprints must not count as official projects');
+  assert.ok(!housing.some(h=>h.id===lead.id),'research leads cannot be disguised as certified housing');
+ }
+ const cityCode=code('TalentServiceRoutes.tsx');
+ assert.ok(cityCode.includes('housingResearchLeads(match.name)'), 'homepage must surface Zaozhuang leads');
+ assert.ok(cityCode.includes('<UnifiedTalentHousingResearch city={city} query={query}/>'));
+});
 console.log(JSON.stringify({passed,baseline:base.policyIds.length+base.housingIds.length,certified:Object.keys(CERTIFIED_TALENT_GUIDES).length,acceptedCities:ACCEPTED_TALENT_CITIES.length},null,2));
