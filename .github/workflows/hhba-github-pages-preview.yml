@@ -145,6 +145,9 @@ jobs:
       - name: Validate Jinan-only compact policy layout preview and A/B isolation
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-jinan-policy-preview.mjs
+      - name: Guard talent policy navigation on public, recruitment, companies and employer pages
+        working-directory: apps/web
+        run: node scripts/global-talent-nav.contract.test.mjs
       - name: Test Jinan living subsidy V3.1 six-step sourced application guide only
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-jinan-talent-guide-preview.mjs
