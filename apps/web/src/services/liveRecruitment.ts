@@ -5,6 +5,7 @@ import {loadOfficialSearchFacets} from './officialSearchIndex';
 import {domesticV2Records, domesticV2ById, assertDomesticRebuildIntegrity} from './domesticRebuildJobs';
 import {allowedEmployerProfileJobLink,profileAliasesForJob} from './employerProfiles';
 import {visibleRoleForMajor} from './majorJobMatching';
+import {educationMatchesApplicant} from './majorEligibility.mjs';
 export type Language = 'zh' | 'en';
 export type LiveJob = {
   id: string; company: string; companyZh?: string; title: string; titleZh?: string;
@@ -346,8 +347,7 @@ async function listArchivedJobs(filters:LiveFilters,offset:number,signal:AbortSi
     if(filters.city&&j.cityKey!==filters.city)return false;
     if(filters.remote&&!/\bremote\b/i.test(j.locationEn))return false;
     if(filters.recruitment_type&&filters.recruitment_type!==j.jobType)return false;
-    if(filters.education&&filters.education!=='UNRESTRICTED_OR_UNREPORTED'&&filters.education!==j.education)return false;
-    if(filters.education==='UNRESTRICTED_OR_UNREPORTED'&&j.education!==null&&j.education!=='UNRESTRICTED')return false;
+    if(filters.education&&!educationMatchesApplicant(filters.education,j.education))return false;
     if(filters.experience==='unreported'&&j.experienceMinYears!==null)return false;
     if(filters.experience==='0'&&j.experienceMinYears!==0)return false;
     if(filters.experience==='1-3'&&(j.experienceMinYears===null||j.experienceMinYears<1||j.experienceMinYears>3))return false;
@@ -393,11 +393,7 @@ export function rebuildListFilter(job:LiveJob,f:LiveFilters){
   const wanted=f.recruitment_type==='REGULAR'?'SOCIAL':f.recruitment_type;
   if(type!==wanted)return false;
  }
- if(f.education&&f.education!=='UNRESTRICTED_OR_UNREPORTED'){
-  const labels:Record<string,string>={BACHELOR:'本科',MASTER:'硕士',PHD:'博士',ASSOCIATE:'专科'};
-  const degree=job.educationLabel||'';
-  if(!degree||!degree.includes(labels[f.education]||f.education))return false;
- }
+ if(f.education&&!educationMatchesApplicant(f.education,job.educationLabel))return false;
  if(f.experience){
   if(f.experience==='unreported'&&job.experienceMinYears!=null)return false;
   if(f.experience==='0'&&job.experienceMinYears!==0)return false;
