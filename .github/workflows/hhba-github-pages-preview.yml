@@ -110,6 +110,9 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
+      - name: Verify mechanical-major families and applicant education hierarchy
+        working-directory: apps/web
+        run: node scripts/major-eligibility.contract.test.mjs
       - name: Verify bundled V2 employers and search aliases
         working-directory: apps/web
         run: node scripts/v2-market-search.contract.test.mjs
