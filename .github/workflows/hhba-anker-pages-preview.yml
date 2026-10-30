@@ -121,7 +121,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     environment:
-      name: github-pages
+      name: hhba-company200-preview
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy nested Anker preview only (Alibaba untouched)
