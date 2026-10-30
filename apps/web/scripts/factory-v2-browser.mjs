@@ -53,7 +53,10 @@ try {
   const all=root.locator('.hhba-major-quick-list button').filter({hasText:'全部专业'}).first();
   await all.click();
   assert.equal(await roles.count(),p.jobs.length,'Published roles must be driven by one company JSON');
-  const selected=p.preferredMajors.find(major=>p.jobs.some(j=>j.majorNames.includes(major)))||null;
+  // Do not skip major-switch tests when the source announced named positions
+  // without official per-position majors; editorial tags still power filtering.
+  const selected=p.preferredMajors.find(major=>p.jobs.some(j=>
+   j.majorNames.includes(major)||j.editorialRelatedMajors.includes(major)))||null;
   if(selected){
    const button=root.locator('.hhba-major-quick-list button').filter({hasText:selected}).first();
    await button.click();
