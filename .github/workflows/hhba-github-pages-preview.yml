@@ -183,6 +183,9 @@ jobs:
       - name: Enforce 95-record unified talent template, truthful quality grades and Laoshan complete application workflow
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-standard-v5.mjs
+      - name: Verify Linyi V5.1 city policies and expired housing inventory
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-linyi-city-v51.mjs
       - name: Lock future city template, certify full policy guides and protect 95 historical record IDs
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
