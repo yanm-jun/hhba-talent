@@ -26,6 +26,20 @@ const entry=readFileSync(new URL('main.tsx',root),'utf8');
 assert.ok(!landing.includes('<TalentHousingSection')&&!landing.includes('<TalentPolicySearch'),'Portal must not render full policy or housing lists');
 assert.ok(landing.includes('talentCityUrl(c.name)')&&landing.includes('talentSearchUrl(parsed.city,q)'),'Homepage city cards and search must use separate routes');
 assert.ok(landing.includes('talentListUrl(item.kind'),'Home navigation tiles must open independent list pages');
+const approved=['htl-intro','htl-quick','htl-city-grid','htl-housing-grid','htl-policy-list','htl-match'];
+let lastIndex=-1;
+for(const block of approved){
+ const current=landing.indexOf(block);
+ assert.ok(current>lastIndex,'Approved V4 homepage section order or section missing: '+block);
+ lastIndex=current;
+}
+for(const entry of ["'housing' as const","'policies' as const","'benefits' as const","'guide' as const"]){
+ assert.ok(landing.includes(entry),'Approved four quick entries must remain: '+entry);
+}
+assert.ok(landing.includes("const featured=['杭州','深圳','青岛']"),'Preserve approved three prominent city images');
+assert.ok(landing.includes("const apartmentIds=['hz-xiyue','sz-young']"),'Housing preview must use existing named records');
+assert.ok(landing.includes('项目实景待官方核验'),'Do not pass stock apartment interiors as real listings');
+assert.ok(landing.includes('htl-match-panel'),'Keep the bottom matching entry point without false eligibility claims');
 const cityRegistry=readFileSync(new URL('data/talentCityRegistry.ts',root),'utf8');
 for(const c of ['北京','天津','上海','重庆']){
  assert.ok(cityRegistry.includes("name:'"+c+"'")&&cityRegistry.includes("official:'"+c+"市'"),'Municipality missing: '+c);
