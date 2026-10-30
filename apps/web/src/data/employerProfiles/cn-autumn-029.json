@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-029",
+  "name": "中电建电力投资集团",
+  "englishName": "POWERCHINA Power Investment Group Co., Ltd.",
+  "aliases": [
+    "中电建电力集团",
+    "中电建电力投资集团有限公司",
+    "电建电投",
+    "电建电投公司",
+    "中国电建电力投资集团",
+    "中国电建电力集团",
+    "POWERCHINA Power Investment"
+  ],
+  "industry": "能源电力投资 · 火力发电 · 抽水蓄能 · 电力运维 · 电力交易",
+  "subtitle": "中电建电力投资集团有限公司 · 中国电建所属企业 · 总部甘肃兰州",
+  "overview": "中电建电力投资集团有限公司成立于2010年10月，总部位于甘肃兰州，是中国电力建设集团有限公司下属的能源电力投资运营平台。公司业务涉及煤电投资、抽水蓄能投资、电站运行维护、国内外能源项目服务与电力交易。“中电建电力集团”为本平台企业来源名单中的简称，此处采用经核实的完整企业主体名称，避免与中国电建旗下其他电建、新能源、核电和水电开发集团混淆。",
+  "lastReviewed": "2026-10-30",
+  "sources": [
+    "https://gs.powerchina.cn/",
+    "https://gs.powerchina.cn/col/col16830/index.html",
+    "https://zhaopin.powerchina.cn/index",
+    "https://m.fenbi.com/page/exam-information-detail/469959023551488",
+    "https://www.fenbi.com/page/fenxiaozhaokaodetail/15/2894/469959023551488",
+    "https://gs.powerchina.cn/col/col8855/art/2026/art_a3bd5bd98d594c49bb67a4eb7aee70b5.html",
+    "https://gs.powerchina.cn/col/col8855/art/2026/art_f9b4b94a210d427da7fe06d6dad62b7e.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-029/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-029/photo1.jpg",
+        "caption": "电建电投旗下盘南发电项目 · 官方新闻图",
+        "alt": "电建电投官方新闻展示的贵州盘南发电项目实景",
+        "note": "拟取自电建电投官方网站2026年1月盘南项目新闻附图；历史项目照片，不代表目前工况。素材来源详见媒体核验清单。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-029/photo2.jpg",
+        "caption": "电建电投盘州项目现场 · 官方新闻图",
+        "alt": "电建电投官方新闻展示的盘州发电项目调研现场或建设现场",
+        "note": "拟取自电建电投官方网站2026年1月项目调研及建设报道附图；非总部大楼照片，来源见媒体核验清单。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://zhaopin.powerchina.cn/index",
+    "label": "中国电建官方招聘平台",
+    "status": "official_portal",
+    "subject": "中电建电力投资集团有限公司及相关所属单位",
+    "note": "来源为2027届秋季招聘公开信息，投递统一指向中国电建招聘平台；岗位名称、最低学历、地点据公开职位表整理。不同转载页面对人数与报名截止日期存在差异，HHBA不据此展示确定的剩余名额或有效报名期限；投递前必须以官方招聘系统为准。"
+  },
+  "majorIntro": "采用逐岗位专业匹配：电气工程师只对应电气相关专业，热控工程师只对应自动化/控制方向，信息技术岗位对应计算机相关专业；不因公司整体招聘专业包含机械，就将全部岗位认定为机械岗位。本轮8个公开职位表岗位未单独列明机械工程岗位，机械检索不得凭空出现专属职位。",
+  "preferredMajors": [
+    "电气工程及其自动化",
+    "电气工程",
+    "能源与动力工程",
+    "自动化",
+    "控制工程",
+    "应用化学",
+    "化学工程与工艺",
+    "水利水电工程",
+    "计算机科学与技术",
+    "信息安全",
+    "人力资源管理",
+    "会计学",
+    "财务管理",
+    "汉语言文学",
+    "经济学",
+    "法学",
+    "机械设计制造及其自动化"
+  ],
+  "photoNote": "企业 Logo 和两张项目图片均应优先使用中国电建/电建电投官方静态资源、在主站构建时保存独立本地副本；验证失败时明确提示资源不可用，不以其他电力公司照片冒充。商标和图片归原权利人所有，HHBA独立整理信息，不代表获得企业合作授权。",
+  "business": [
+    {
+      "title": "火力发电及电源项目投资",
+      "description": "参与火电项目投资建设、投产运行和发电资产管理。",
+      "tags": "煤电 · 电源投资 · 投建营",
+      "details": [
+        "煤电项目投资和运营管理",
+        "发电机组投产与运行安全",
+        "经营绩效及资产管理"
+      ]
+    },
+    {
+      "title": "抽水蓄能与清洁能源",
+      "description": "开展抽蓄项目投资开发与新能源项目的运行管理。",
+      "tags": "抽水蓄能 · 绿色能源",
+      "details": [
+        "抽蓄电站项目推进",
+        "新能源资产开发和运行",
+        "能源结构转型"
+      ]
+    },
+    {
+      "title": "发电厂生产技术与运维",
+      "description": "提供电气、热动、热控、化学水处理等电站技术与运维服务。",
+      "tags": "电气 · 热动 · 热控",
+      "details": [
+        "设备运行维护及检修",
+        "自动化控制与电站安全",
+        "锅炉、汽机和水处理技术"
+      ]
+    },
+    {
+      "title": "国内外电力运营服务",
+      "description": "向境内外电力项目提供专业化运行维护及人员培训支持。",
+      "tags": "国内运维 · 海外项目",
+      "details": [
+        "运行维护服务",
+        "国际项目技术管理",
+        "本地化培训与协同"
+      ]
+    },
+    {
+      "title": "电力交易与售电",
+      "description": "开展电力交易、售电和相关市场化服务。",
+      "tags": "电力营销 · 售电",
+      "details": [
+        "电力交易策略",
+        "电力市场服务",
+        "新能源场站交易管理"
+      ]
+    },
+    {
+      "title": "能源科技与经营支持",
+      "description": "为能源投资运营提供信息化、科技创新、财务人力和合规风控支撑。",
+      "tags": "信息化 · 财务 · 合规",
+      "details": [
+        "生产数据和信息化支持",
+        "财务与职能管理",
+        "法律风险与内控管理"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "thermal-electrical",
+      "title": "火力发电厂电气工程师",
+      "city": "甘肃平凉、甘肃张掖、贵州毕节、陕西西安",
+      "url": "https://zhaopin.powerchina.cn/index",
+      "evidenceUrl": "https://m.fenbi.com/page/exam-information-detail/469959023551488",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中电建电力投资集团有限公司及其所属单位（实际录用主体以官方公告为准）",
+      "summary": "从事火电站电气专业技术相关工作；具体职责以岗位详情为准。",
+      "requirements": "2027届校园招聘公开职位表列示岗位；需符合当次公告对毕业生身份、学籍、成绩、专业、身体条件等要求。岗位是否仍在招聘、用人主体和报名截止日请以中国电建招聘平台实时公告为准；HHBA专业匹配不等于官方资格认定。 公开要求：电气相关专业；大学本科及以上学历。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "电气工程",
+        "电力系统及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（2027届公开招聘信息）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "thermal-energy",
+      "title": "火力发电厂热动工程师",
+      "city": "甘肃平凉、甘肃张掖、贵州毕节、陕西西安",
+      "url": "https://zhaopin.powerchina.cn/index",
+      "evidenceUrl": "https://m.fenbi.com/page/exam-information-detail/469959023551488",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中电建电力投资集团有限公司及其所属单位（实际录用主体以官方公告为准）",
+      "summary": "从事火电站热能动力专业技术相关工作。",
+      "requirements": "2027届校园招聘公开职位表列示岗位；需符合当次公告对毕业生身份、学籍、成绩、专业、身体条件等要求。岗位是否仍在招聘、用人主体和报名截止日请以中国电建招聘平台实时公告为准；HHBA专业匹配不等于官方资格认定。 公开要求：能源与动力工程（热动方向）等相关专业；大学本科及以上学历。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "能源与动力工程",
+        "热能工程",
+        "动力工程及工程热物理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（2027届公开招聘信息）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "thermal-chemistry",
+      "title": "火力发电厂化学专业工程师",
+      "city": "甘肃平凉、贵州毕节",
+      "url": "https://zhaopin.powerchina.cn/index",
+      "evidenceUrl": "https://m.fenbi.com/page/exam-information-detail/469959023551488",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中电建电力投资集团有限公司及其所属单位（实际录用主体以官方公告为准）",
+      "summary": "从事电站化学专业相关技术工作；具体要求以公告为准。",
+      "requirements": "2027届校园招聘公开职位表列示岗位；需符合当次公告对毕业生身份、学籍、成绩、专业、身体条件等要求。岗位是否仍在招聘、用人主体和报名截止日请以中国电建招聘平台实时公告为准；HHBA专业匹配不等于官方资格认定。 公开要求：化学等相关专业；大学本科及以上学历。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "应用化学",
+        "化学",
+        "化学工程与工艺"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（2027届公开招聘信息）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "thermal-control",
+      "title": "火力发电厂热控工程师",
+      "city": "甘肃平凉、贵州毕节、陕西西安",
+      "url": "https://zhaopin.powerchina.cn/index",
+      "evidenceUrl": "https://m.fenbi.com/page/exam-information-detail/469959023551488",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中电建电力投资集团有限公司及其所属单位（实际录用主体以官方公告为准）",
+      "summary": "从事发电生产热工控制、自动化等相关技术工作。",
+      "requirements": "2027届校园招聘公开职位表列示岗位；需符合当次公告对毕业生身份、学籍、成绩、专业、身体条件等要求。岗位是否仍在招聘、用人主体和报名截止日请以中国电建招聘平台实时公告为准；HHBA专业匹配不等于官方资格认定。 公开要求：自动化等相关专业；大学本科及以上学历。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "自动化",
+        "控制工程",
+        "控制科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（2027届公开招聘信息）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "general-management",
+      "title": "职能管理岗",
+      "city": "甘肃兰州、甘肃平凉、甘肃张掖、山东龙口、贵州毕节",
+      "url": "https://zhaopin.powerchina.cn/index",
+      "evidenceUrl": "https://m.fenbi.com/page/exam-information-detail/469959023551488",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中电建电力投资集团有限公司及其所属单位（实际录用主体以官方公告为准）",
+      "summary": "提供人力资源、财务、行政等岗位方向的企业经营管理支撑。",
+      "requirements": "2027届校园招聘公开职位表列示岗位；需符合当次公告对毕业生身份、学籍、成绩、专业、身体条件等要求。岗位是否仍在招聘、用人主体和报名截止日请以中国电建招聘平台实时公告为准；HHBA专业匹配不等于官方资格认定。 公开要求：人力资源管理、会计学、汉语言文学、管理学、经济学等专业；大学本科及以上学历。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人力资源管理",
+        "会计学",
+        "财务管理",
+        "汉语言文学",
+        "工商管理",
+        "经济学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（2027届公开招聘信息）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "it-engineer",
+      "title": "信息技术专业工程师",
+      "city": "陕西西安",
+      "url": "https://zhaopin.powerchina.cn/index",
+      "evidenceUrl": "https://m.fenbi.com/page/exam-information-detail/469959023551488",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中电建电力投资集团有限公司及其所属单位（实际录用主体以官方公告为准）",
+      "summary": "承担公司信息技术支持、信息安全或系统应用相关工作。",
+      "requirements": "2027届校园招聘公开职位表列示岗位；需符合当次公告对毕业生身份、学籍、成绩、专业、身体条件等要求。岗位是否仍在招聘、用人主体和报名截止日请以中国电建招聘平台实时公告为准；HHBA专业匹配不等于官方资格认定。 公开要求：计算机科学与技术、信息安全等相关专业；大学本科及以上学历。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "信息安全",
+        "计算机技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（2027届公开招聘信息）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hydraulic-engineer",
+      "title": "水利水电专业工程师",
+      "city": "山东龙口",
+      "url": "https://zhaopin.powerchina.cn/index",
+      "evidenceUrl": "https://m.fenbi.com/page/exam-information-detail/469959023551488",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中电建电力投资集团有限公司及其所属单位（实际录用主体以官方公告为准）",
+      "summary": "从事水利水电或抽水蓄能相关工程技术工作，实际职责以官方岗位为准。",
+      "requirements": "2027届校园招聘公开职位表列示岗位；需符合当次公告对毕业生身份、学籍、成绩、专业、身体条件等要求。岗位是否仍在招聘、用人主体和报名截止日请以中国电建招聘平台实时公告为准；HHBA专业匹配不等于官方资格认定。 公开要求：水利水电工程、能源与动力工程（水动）等相关专业；大学本科及以上学历。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "水利水电工程",
+        "水利工程",
+        "能源与动力工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（2027届公开招聘信息）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "legal-risk",
+      "title": "法律风控主管",
+      "city": "陕西西安",
+      "url": "https://zhaopin.powerchina.cn/index",
+      "evidenceUrl": "https://m.fenbi.com/page/exam-information-detail/469959023551488",
+      "observedOn": "2026-10-30",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中电建电力投资集团有限公司及其所属单位（实际录用主体以官方公告为准）",
+      "summary": "从事法务及风险控制相关工作；主管职级和具体条件须以当次公告为准。",
+      "requirements": "2027届校园招聘公开职位表列示岗位；需符合当次公告对毕业生身份、学籍、成绩、专业、身体条件等要求。岗位是否仍在招聘、用人主体和报名截止日请以中国电建招聘平台实时公告为准；HHBA专业匹配不等于官方资格认定。 公开要求：法学、法律学；大学本科及以上学历。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "法学",
+        "法律"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（2027届公开招聘信息）",
+      "currentOpenVerified": false
+    }
+  ]
+}
