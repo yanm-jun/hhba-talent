@@ -22,6 +22,7 @@ try{
  await page.screenshot({path:out+'/desktop.png',fullPage:true});
  await roles.first().getByRole('link',{name:/查看/}).click();
  await page.waitForURL(/\/candidate\/jobs\/cn-v2-anker-/, {timeout:15000});
+ await page.waitForFunction(()=>document.body.innerText.includes('安克创新'),null,{timeout:18000});
  assert.match(await page.locator('body').innerText(),/安克创新/);
  await page.goto(base+'candidate/jobs',{waitUntil:'domcontentloaded'});
  const query=page.getByRole('textbox',{name:'自然语言搜索岗位'});
