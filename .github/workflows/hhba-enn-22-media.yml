@@ -1,0 +1,69 @@
+name: HHBA ENN Group 22 independent image sources
+on:
+  push:
+    branches: [feat/employer-factory-pilot-enn-22-20261030]
+    paths: ['.github/workflows/hhba-enn-22-media.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/employer-factory-pilot-enn-22-20261030
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Save independently sourced ENN group logo and subsidiary business photos
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip -q install requests Pillow
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          from io import BytesIO
+          import requests,json
+          dest=Path('apps/web/public/images/employer-profiles/cn-autumn-018');dest.mkdir(parents=True,exist_ok=True)
+          urls={
+            'logo.png':'https://storage-public.zhaopin.cn/org/logo/1698206823667244241/%E6%96%B0%E5%A5%A5%E9%9B%86%E5%9B%A2-logo.png',
+            'photo1.webp':'https://ennresearch.com/uploads/260528/1-26052QI143101.jpg',
+            'photo2.webp':'https://www.ennpower.com/local/static/upload/upload/2026-04-03/1775193276733_a7770ccc-1ad7-42b5-9667-4e755e4e62d5.png'
+          }
+          s=requests.Session()
+          s.headers.update({'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36','Accept':'image/avif,image/webp,image/apng,image/*,*/*;q=0.8'})
+          info={}
+          for name,url in urls.items():
+            r=s.get(url,timeout=28);r.raise_for_status()
+            im=Image.open(BytesIO(r.content));im.load()
+            print('SOURCE',name,url,im.size,im.format,flush=True)
+            if name=='logo.png':
+              if im.width<250 or im.height<150:raise ValueError('Logo too small')
+              im=im.convert('RGBA')
+              im.thumbnail((1200,800))
+              im.save(dest/name,'PNG',optimize=True)
+            else:
+              if im.width<350 or im.height<250:raise ValueError('Photo too small')
+              im=im.convert('RGB')
+              im.thumbnail((1600,1100))
+              im.save(dest/name,'WEBP',quality=88,method=6)
+            if not 1500<(dest/name).stat().st_size<5_000_000:raise ValueError('Unexpected asset size '+name)
+            info[name]={'source':url,'dimensions':[im.width,im.height]}
+          if len({i['source'] for i in info.values()})!=3:raise ValueError('Sources must be independent')
+          (dest/'source-manifest.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+          print('ENN_22_THREE_SEPARATE_IMAGES_SAVED',flush=True)
+          PY
+      - name: Commit three photos as independent repository assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/web/public/images/employer-profiles/cn-autumn-018/
+          git diff --cached --quiet && exit 0
+          git commit -m 'assets(enn): record company logo and two sourced subsidiary buildings'
+          git pull --rebase origin feat/employer-factory-pilot-enn-22-20261030
+          git push origin HEAD:refs/heads/feat/employer-factory-pilot-enn-22-20261030
