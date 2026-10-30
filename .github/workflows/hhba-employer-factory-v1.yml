@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/hhba-employer-factory-v1.yml'
       - 'apps/web/src/**'
+      - 'apps/web/public/images/employer-profiles/**'
       - 'apps/web/scripts/employer-*'
       - 'apps/web/scripts/factory-*'
   workflow_dispatch:
