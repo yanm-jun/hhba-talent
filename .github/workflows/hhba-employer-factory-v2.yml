@@ -1,0 +1,205 @@
+name: HHBA Employer Factory V2
+on:
+  push:
+    branches: ['feat/employer-factory-v2-*', 'feat/employer-v2-*']
+    paths:
+      - '.github/workflows/hhba-employer-factory-v2.yml'
+      - 'apps/web/src/data/employerProfiles/**'
+      - 'apps/web/public/images/employer-profiles/**'
+      - 'apps/web/scripts/factory-v2-*'
+  workflow_dispatch:
+    inputs:
+      employer_id:
+        description: 'Company ID e.g. cn-autumn-019'
+        type: string
+        required: true
+      publish_preview:
+        description: 'Publish only the protected V2 GitHub Pages preview'
+        type: boolean
+        default: false
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: hhba-employer-factory-v2-publish
+  cancel-in-progress: false
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    outputs:
+      employer_id: ${{ steps.target.outputs.id }}
+      publish: ${{ steps.target.outputs.publish }}
+    env:
+      HHBA_GITHUB_PAGES: '1'
+      HHBA_PAGES_BASE: '/hhba-talent/preview-factory-v2/'
+      VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+      VITE_HHBA_OVERSEAS_CURATED_100: '1'
+      VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+      VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+      VITE_DEMO_ACCOUNT_ENABLED: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Select one company, fail closed on ambiguity
+        id: target
+        shell: bash
+        env:
+          REQUESTED_ID: ${{ inputs.employer_id || '' }}
+          REQUESTED_PREVIEW: ${{ inputs.publish_preview || false }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message || '' }}
+        run: |
+          set -euo pipefail
+          id="$REQUESTED_ID"
+          if [ -z "$id" ]; then
+            id=$(git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA" | sed -n -E 's@^apps/web/src/data/employerProfiles/(cn-autumn-[0-9]{3})\.json$@\1@p' | sort -u)
+            if [ -z "$id" ] && [ "$GITHUB_REF_NAME" = "feat/employer-factory-v2-20261030" ]; then id="cn-autumn-018"; fi
+          fi
+          [[ "$id" =~ ^cn-autumn-[0-9]{3}$ ]] || { echo 'Specify exactly one company JSON or employer_id.' >&2; exit 1; }
+          test -s "apps/web/src/data/employerProfiles/$id.json"
+          publish=false
+          if [ "$REQUESTED_PREVIEW" = true ] || [[ "$COMMIT_MESSAGE" == *'[preview-v2]'* ]]; then publish=true; fi
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+          echo "publish=$publish" >> "$GITHUB_OUTPUT"
+          echo "TARGET_COMPANY=$id PUBLISH_PREVIEW=$publish"
+      - name: Reuse original factory and global search tests
+        working-directory: apps/web
+        env:
+          EMPLOYER: ${{ steps.target.outputs.id }}
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          node scripts/employer-factory-check.mjs
+          node scripts/factory-v2-validate.mjs --all
+          node scripts/factory-v2-validate.mjs "$EMPLOYER"
+          node scripts/company-single-char-search.contract.test.mjs
+          node scripts/company-brand-unified.contract.test.mjs
+      - name: Compile once and generate all factory company/role URLs
+        working-directory: apps/web
+        run: |
+          set -euo pipefail
+          npm run build
+          node scripts/factory-v2-routes.mjs
+          grep -Fq '/hhba-talent/preview-factory-v2/assets/' dist/index.html
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: hhba-factory-v2-chromium-1.56.1-${{ runner.os }}
+      - name: Install reusable Chromium browser
+        working-directory: apps/web
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Run generic desktop and mobile UI regression
+        working-directory: apps/web
+        env:
+          HHBA_EMPLOYER_ID: ${{ steps.target.outputs.id }}
+          HHBA_TEST_BASE: 'http://127.0.0.1:4173/hhba-talent/preview-factory-v2/'
+        run: |
+          set -euo pipefail
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/hhba-factory-v2.log 2>&1 &
+          for i in $(seq 1 40); do
+            if curl -fsS "$HHBA_TEST_BASE" >/dev/null 2>&1; then break; fi
+            sleep 1
+          done
+          curl -fsS "$HHBA_TEST_BASE" >/dev/null
+          node scripts/factory-v2-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-factory-v2-browser-evidence
+          path: apps/web/factory-v2-browser-proof/
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Find latest successful Pages backup
+        id: base
+        if: steps.target.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs?status=success&per_page=100" --jq '[.workflow_runs[].id]' > /tmp/runs.json
+          selected=''
+          while IFS= read -r run; do
+            artifact=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run/artifacts?per_page=50" --jq '[.artifacts[] | select(.name == "github-pages" and .expired == false) | .id][0] // empty')
+            if [ -n "$artifact" ]; then selected="$run"; break; fi
+          done < <(jq -r '.[]' /tmp/runs.json)
+          test -n "$selected" || { echo 'No safe prior Pages backup; stop publishing.' >&2; exit 1; }
+          echo "run_id=$selected" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v4
+        if: steps.target.outputs.publish == 'true'
+        with:
+          name: github-pages
+          run-id: ${{ steps.base.outputs.run_id }}
+          github-token: ${{ github.token }}
+          path: previous
+      - name: Preserve existing homepage, all other previews and only add V2 folder
+        if: steps.target.outputs.publish == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive=$(find previous -type f -name 'artifact.tar*' -print -quit)
+          test -n "$archive"
+          mkdir -p published
+          if [[ "$archive" == *.gz ]]; then tar -xzf "$archive" -C published; else tar -xf "$archive" -C published; fi
+          test -s published/index.html
+          curl -fsSL --retry 3 --max-time 40 https://yanm-jun.github.io/hhba-talent/ -o /tmp/hhba-live-index
+          cmp published/index.html /tmp/hhba-live-index || { echo 'Homepage has changed; refuse overwrite' >&2; exit 1; }
+          for prior in preview-anker preview-taiji preview-enn preview-ccteg preview-boyu preview-factory; do
+            if curl -fsSL --max-time 25 "https://yanm-jun.github.io/hhba-talent/$prior/" -o /tmp/hhba-existing; then
+              if grep -Fq "/hhba-talent/$prior/assets/" /tmp/hhba-existing; then
+                test -s "published/$prior/index.html"
+                cmp "published/$prior/index.html" /tmp/hhba-existing || { echo "Previous preview $prior changed; refuse overwrite" >&2; exit 1; }
+              fi
+            fi
+          done
+          rm -rf published/preview-factory-v2
+          mkdir -p published/preview-factory-v2
+          cp -a apps/web/dist/. published/preview-factory-v2/
+          test -s "published/preview-factory-v2/companies/autumn/${{ steps.target.outputs.id }}/index.html"
+          cmp published/index.html /tmp/hhba-live-index
+          touch published/.nojekyll
+          echo HHBA_FACTORY_V2_EXISTING_SITE_PRESERVED
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.target.outputs.publish == 'true'
+        with:
+          path: published
+  deploy:
+    needs: validate-and-build
+    if: needs.validate-and-build.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: hhba-company200-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
+  verify:
+    needs: [validate-and-build,deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Confirm new V2 preview, brand Logo and preserved homepage
+        env:
+          COMPANY: ${{ needs.validate-and-build.outputs.employer_id }}
+        run: |
+          set -euo pipefail
+          base=https://yanm-jun.github.io/hhba-talent/preview-factory-v2
+          for i in 1 2 3 4 5 6 7 8; do
+            if curl -fsSL "$base/companies/autumn/$COMPANY/" -o /tmp/hhba-company &&
+              curl -fsSL "$base/images/employer-profiles/$COMPANY/logo.png" -o /tmp/hhba-company-logo; then break; fi
+            if [ "$i" = 8 ]; then exit 1; fi
+            sleep 10
+          done
+          grep -Fq '/hhba-talent/preview-factory-v2/assets/' /tmp/hhba-company
+          test $(wc -c </tmp/hhba-company-logo) -gt 500
+          curl -fsSL https://yanm-jun.github.io/hhba-talent/ -o /tmp/hhba-root
+          grep -Fq '/hhba-talent/assets/' /tmp/hhba-root
+          echo HHBA_FACTORY_V2_PUBLIC_PREVIEW_PASS
