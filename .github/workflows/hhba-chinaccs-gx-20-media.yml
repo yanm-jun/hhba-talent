@@ -14,35 +14,62 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: feat/employer-factory-pilot-chinaccs-gx-20-20261030
-      - name: Source corporate mark and inspect genuine China Comservice photo gallery
+      - name: Download parent-company official brand and two independently sourced service photos
         shell: bash
         run: |
+          set -euo pipefail
           python -m pip -q install requests Pillow beautifulsoup4
           python - <<'PY'
-          import requests
+          import requests,io,json
+          from PIL import Image
+          from pathlib import Path
           from bs4 import BeautifulSoup
           from urllib.parse import urljoin
-          s=requests.Session()
-          s.headers.update({'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126 Safari/537.36'})
-          pages=[
-          'https://www.chinaccs.com.hk/tc/media/photo.php',
-          'https://www.chinaccs.com.hk/tc/media/logo.php',
-          'http://guangxi.chinaccs.cn/',
-          'https://www.chinaccs.cn/',
-          'https://www.chinaccs.com.hk/sc/media/photo.php']
-          for site in pages:
-           try:
-            r=s.get(site,timeout=15)
-            print('SOURCE',site,r.status_code,len(r.content),r.url,flush=True)
-            if r.status_code!=200:continue
-            soup=BeautifulSoup(r.content,'html.parser')
-            items=[]
-            for tag in soup.select('img,source'):
-             src=tag.get('data-src') or tag.get('src')
-             if not src or src.startswith('data:'):continue
-             url=urljoin(r.url,src)
-             if url not in items:items.append(url)
-            print('IMAGE_LIST',site,len(items),flush=True)
-            for item in items[:90]:print('IMG',item,flush=True)
-           except Exception as e:print('SOURCE_ERROR',site,str(e)[:150],flush=True)
+          root='https://www.chinaccs.com.hk'
+          dest=Path('apps/web/public/images/employer-profiles/cn-autumn-016')
+          dest.mkdir(parents=True,exist_ok=True)
+          s=requests.Session();s.headers.update({'User-Agent':'Mozilla/5.0 AppleWebKit/537.36 Chrome/126 Safari/537.36'})
+          sources={}
+          logo=root+'/tc/images/media/logo.png'
+          r=s.get(logo,timeout=20);r.raise_for_status()
+          im=Image.open(io.BytesIO(r.content));im.load()
+          print('OFFICIAL_LOGO',im.size,flush=True)
+          if im.width<110 or im.height<30:raise ValueError('Bad official China Comservice Logo')
+          im=im.convert('RGBA');im.thumbnail((950,480));im.save(dest/'logo.png','PNG',optimize=True)
+          sources['logo.png']=logo
+          for name,section,index in [('photo1.webp','tis',1),('photo2.webp','acos',7)]:
+           base=root+'/en/images/media/'+section+'/photo_img'+str(index)
+           attempts=[base+'.jpg',base+'_b.jpg',base+'_l.jpg',base+'_s.jpg',base+'.png']
+           best=None
+           for u in attempts:
+            try:
+             rr=s.get(u,timeout=16);rr.raise_for_status()
+             original=Image.open(io.BytesIO(rr.content));original.load()
+             print('PHOTO_CANDIDATE',name,u,original.size,flush=True)
+             if original.width<180 or original.height<120:continue
+             if best is None or original.width*original.height>best[0].width*best[0].height:
+              best=(original,u)
+            except Exception as e:print('PHOTO_ATTEMPT_FAILED',u,str(e)[:100],flush=True)
+           if not best:raise RuntimeError('Missing independently sourced parent-company photo '+name)
+           image,u=best
+           image=image.convert('RGB');image.thumbnail((1600,1020))
+           image.save(dest/name,'WEBP',quality=88,method=6)
+           sources[name]=u
+           print('PHOTO_SAVED',name,image.size,(dest/name).stat().st_size,flush=True)
+          if len(set(sources.values()))!=3:raise ValueError('Photos must be independent')
+          for p in dest.iterdir():
+           if not 100<p.stat().st_size<5_000_000:raise RuntimeError('Invalid asset '+p.name)
+          (dest/'source-manifest.json').write_text(json.dumps(sources,ensure_ascii=False,indent=2)+'\n')
+          print('SOURCES',json.dumps(sources,ensure_ascii=False),flush=True)
           PY
+      - name: Commit three distinct local images on company 20 branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/web/public/images/employer-profiles/cn-autumn-016/
+          git diff --cached --quiet && exit 0
+          git commit -m 'assets(chinaccs-gx): save parent official Logo and two separate group service gallery images'
+          git pull --rebase origin feat/employer-factory-pilot-chinaccs-gx-20-20261030
+          git push origin HEAD:refs/heads/feat/employer-factory-pilot-chinaccs-gx-20-20261030
