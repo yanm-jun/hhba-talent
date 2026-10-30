@@ -58,6 +58,8 @@ jobs:
           folder=Path('apps/web/public/images/employer-profiles/cn-autumn-029')
           audit=json.loads((folder/'media-audit.json').read_text())
           assert set(audit)=={'logo.png','photo1.jpg','photo2.jpg'}
+          assert all(v['verified'] for v in audit.values()),'029 official photos/logo are required, not placeholder images'
+          assert len({v['sha256'] for v in audit.values()})==3
           for name,entry in audit.items():
               assert (folder/name).stat().st_size>1500
               print('POWER_INVEST_029_MEDIA',name,'VERIFIED' if entry['verified'] else 'HONEST_PLACEHOLDER',entry.get('source'))
