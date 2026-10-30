@@ -1,0 +1,147 @@
+name: HHBA Anker isolated Pages acceptance preview
+on:
+  push:
+    branches: [feat/anker-12-static-v2-20261030]
+    paths:
+      - '.github/workflows/hhba-anker-pages-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: hhba-isolated-anker-preview
+  cancel-in-progress: false
+jobs:
+  build-and-protect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout tested Anker feature (not main)
+        uses: actions/checkout@v4
+        with:
+          ref: feat/anker-12-static-v2-20261030
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Protect Anker jobs, pictures, matching and original overseas records
+        working-directory: apps/web
+        run: |
+          node scripts/anker-2027.contract.test.mjs
+          node scripts/domestic-rebuild-v2.contract.test.mjs
+          node scripts/major-company-job-flow.contract.test.mjs
+          node scripts/all-company-major-chips.contract.test.mjs
+          node scripts/hypergryph-major-choices.contract.test.mjs
+      - name: Build isolated Anker preview without replacing root
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/preview-anker/'
+          VITE_HHBA_VERIFIED_SNAPSHOT: '1'
+          VITE_HHBA_OVERSEAS_CURATED_100: '1'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+          VITE_HHBA_ACCOUNT_API_ENABLED: '0'
+          VITE_DEMO_ACCOUNT_ENABLED: '0'
+        run: |
+          npm run build
+          cp dist/index.html dist/404.html
+          touch dist/.nojekyll
+          test -s dist/curated/v1/jobs.json
+          test -s dist/images/anker-user/anker-brand-vision.png
+          test -s dist/images/anker-user/anker-building.png
+          test -s dist/images/autumn-real-logos/cn-autumn-008.svg
+          grep -q '/hhba-talent/preview-anker/assets/' dist/index.html
+      - name: Install Chromium
+        run: |
+          npm install --no-save --no-package-lock --prefix apps/web playwright@1.56.1 --no-audit --no-fund
+          (cd apps/web && npx playwright install --with-deps chromium)
+      - name: Browser test desktop, mobile, search, profession and job detail
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/preview-anker/'
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/hhba-anker-preview.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/hhba-talent/preview-anker/ >/dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/anker-preview.browser.mjs
+      - name: Retain browser QA screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-anker-desktop-mobile-evidence
+          path: apps/web/anker-preview-evidence/
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Download last verified live Pages output
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 40930944761
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: previous-pages
+      - name: Compare existing homepage to live and append only Anker preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir published
+          asset=$(find previous-pages -type f -name 'artifact.tar*' -print -quit)
+          test -n "$asset"
+          if [[ "$asset" == *.gz ]]; then tar -xzf "$asset" -C published; else tar -xf "$asset" -C published; fi
+          test -s published/index.html
+          test -s published/404.html
+          test -s published/curated/v1/jobs.json
+          grep -q '/hhba-talent/assets/' published/index.html
+          curl -fsSL --retry 3 'https://yanm-jun.github.io/hhba-talent/' -o /tmp/hhba-live.html
+          cmp published/index.html /tmp/hhba-live.html
+          sha256sum published/index.html published/404.html > /tmp/hhba-preserved.sha256
+          test ! -e published/preview-anker
+          mkdir -p published/preview-anker
+          cp -a apps/web/dist/. published/preview-anker/
+          sha256sum -c /tmp/hhba-preserved.sha256
+          test -s published/preview-anker/index.html
+          test -s published/preview-anker/images/autumn-real-logos/cn-autumn-008.svg
+          test -s published/preview-anker/curated/v1/jobs.json
+          touch published/.nojekyll
+          echo EXISTING_HHBA_HOME_UNCHANGED_ANKER_PREVIEW_ADDED
+      - name: Upload combined site for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: published
+  publish-preview:
+    needs: build-and-protect
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy nested Anker preview only (Alibaba untouched)
+        id: deployment
+        uses: actions/deploy-pages@v4
+  verify-public:
+    needs: publish-preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify live homepage remains and Anker preview assets work
+        run: |
+          set -euo pipefail
+          root=https://yanm-jun.github.io/hhba-talent
+          for i in 1 2 3 4 5 6; do
+            if curl -fsSL "$root/" -o /tmp/hhba-after.html && curl -fsSL "$root/preview-anker/" -o /tmp/anker-after.html && curl -fsSL "$root/preview-anker/images/autumn-real-logos/cn-autumn-008.svg" -o /tmp/anker-logo.svg; then break; fi
+            if [ "$i" = 6 ]; then echo PAGES_ONLINE_UNAVAILABLE; exit 1; fi
+            sleep 10
+          done
+          grep -q '/hhba-talent/assets/' /tmp/hhba-after.html
+          grep -q '/hhba-talent/preview-anker/assets/' /tmp/anker-after.html
+          grep -q 'Anker Innovations' /tmp/anker-logo.svg
+          echo HHBA_ANKER_PUBLIC_PREVIEW_VERIFIED
