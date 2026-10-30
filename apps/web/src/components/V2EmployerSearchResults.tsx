@@ -5,7 +5,7 @@ import '../styles/employer-v2-search.css';
 type PublishedV2Employer={
  id:string;name:string;englishName:string;aliases:string[];industry:string;
  overview:string;media:{logo:string};jobs:{id:string;title:string;city:string;majorNames:string[];editorialRelatedMajors:string[]}[];
- previewRoot:string;lastReviewed:string;
+ lastReviewed:string;
 };
 type V2Index={schemaVersion:1;employers:PublishedV2Employer[]};
 let cached:Promise<PublishedV2Employer[]>|null=null;
@@ -54,7 +54,7 @@ export function V2EmployerSearchResults({query,scope='',country='',major='',onMa
    <span>{matches.length} 家企业 · 独立核验的招聘方向，开放状态待官网确认</span>
   </div>
   {matches.map(p=>{
-   const root=import.meta.env.BASE_URL+p.previewRoot+'/';
+   const root=import.meta.env.BASE_URL;
    const detail=root+'companies/autumn/'+p.id+'/';
    return <article key={p.id} className="hhba-v2-employer-hit" data-v2-search-company={p.id}>
     <div className="hhba-v2-employer-heading">
@@ -69,7 +69,7 @@ export function V2EmployerSearchResults({query,scope='',country='',major='',onMa
     <p className="hhba-v2-employer-overview">{p.overview}</p>
     <div className="hhba-v2-job-subheading">已收录的 {p.jobs.length} 个岗位方向 <small>历史校招资料 · 当前投递状态未确认</small></div>
     <div className="hhba-v2-job-list">
-     {p.jobs.map(job=><a key={job.id} href={detail} className="hhba-v2-job-result">
+     {p.jobs.map(job=><a key={job.id} href={detail+'?role='+encodeURIComponent(job.id)} className="hhba-v2-job-result">
       <b>{job.title}</b><small>{job.city}</small><span>查看岗位与专业匹配 <ArrowRight size={13}/></span>
      </a>)}
     </div>
