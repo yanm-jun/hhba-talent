@@ -1,4 +1,4 @@
-name: HHBA inspect SVOLT official media sources
+name: HHBA SVOLT 17 import authentic corporate images
 on:
   push:
     branches: [feat/employer-factory-pilot-svolt-17-20261030]
@@ -7,39 +7,50 @@ on:
 permissions:
   contents: write
 jobs:
-  fetch:
+  import:
     runs-on: ubuntu-latest
-    timeout-minutes: 9
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
         with:
           ref: feat/employer-factory-pilot-svolt-17-20261030
-      - name: Inspect website official media paths and source sizes
+          persist-credentials: true
+      - name: Fetch and preserve official SVOLT logo, manufacturing and R&D images
         shell: bash
         run: |
-          python -m pip -q install requests beautifulsoup4 Pillow
+          set -euo pipefail
+          d=apps/web/public/images/employer-profiles/cn-autumn-013
+          mkdir -p "$d"
+          curl -fsSL --retry 3 --max-time 50 -A 'Mozilla/5.0' 'https://oss.svolt.cn/Public/Uploads/uploadfile/images/20240523/narlogo02.png' -o "$d/logo.png"
+          curl -fsSL --retry 3 --max-time 50 -A 'Mozilla/5.0' 'https://oss.svolt.cn/Public/Uploads/uploadfile/images/20241104/zhizaojidi.jpg' -o /tmp/svolt-factory.jpg
+          curl -fsSL --retry 3 --max-time 50 -A 'Mozilla/5.0' 'https://oss.svolt.cn/Public/Uploads/uploadfile/images/20241104/yanfazhongxin.jpg' -o /tmp/svolt-rnd.jpg
+          python -m pip -q install Pillow
           python - <<'PY'
-          import requests
-          from bs4 import BeautifulSoup
-          from urllib.parse import urljoin
-          s=requests.Session()
-          s.headers['User-Agent']='Mozilla/5.0'
-          for base in ['https://www.svolt.cn/','https://www.svolt.cn/about/profile','https://www.svolt.cn/news/79']:
-              try:
-                  r=s.get(base,timeout=17);r.raise_for_status()
-                  soup=BeautifulSoup(r.content,'html.parser')
-                  print('SOURCE',base,len(r.content),'TITLE',soup.title.string.strip() if soup.title and soup.title.string else 'none')
-                  pics=[]
-                  for tag in soup.find_all(['img','source','link']):
-                      for field in ['src','data-src','data-original','srcset','href']:
-                          src=tag.get(field)
-                          if not src:continue
-                          src=src.split(' ')[0]
-                          if field=='href' and not (src.lower().endswith(('.png','.jpg','.jpeg','.svg','.webp')) or 'logo' in src.lower()):continue
-                          if src.startswith('data:'):continue
-                          u=urljoin(base,src)
-                          if u not in pics:pics.append(u)
-                  print('PICTURES',len(pics))
-                  for u in pics[:100]:print('IMAGE',u)
-              except Exception as e:print('ERROR',base,repr(e))
+          from PIL import Image
+          from pathlib import Path
+          d=Path('apps/web/public/images/employer-profiles/cn-autumn-013')
+          im=Image.open(d/'logo.png');im.load()
+          if im.width < 120 or im.height < 20:raise ValueError('Logo dimensions invalid')
+          print('Logo source official SVOLT:',im.size,im.mode)
+          for src,dest in [('/tmp/svolt-factory.jpg','photo1.webp'),('/tmp/svolt-rnd.jpg','photo2.webp')]:
+            img=Image.open(src).convert('RGB')
+            if img.width<400 or img.height<240: raise ValueError('Photo too small: '+src)
+            img.thumbnail((1600,1050))
+            img.save(d/dest,'WEBP',quality=85,method=6)
+            print('Original company photo:',src,'optimized:',dest,img.size)
+          for item in d.iterdir():
+            obj=Image.open(item);obj.load()
+            if not 100<item.stat().st_size<5_000_000:raise ValueError('Invalid media '+str(item))
+            print('VERIFIED_ASSET',item.name,item.stat().st_size,obj.size)
           PY
+      - name: Commit three independent images in their standard directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/web/public/images/employer-profiles/cn-autumn-013/
+          git diff --cached --quiet && exit 0
+          git commit -m 'assets(svolt): archive three independently sourced official corporate visuals'
+          git pull --rebase origin feat/employer-factory-pilot-svolt-17-20261030
+          git push origin HEAD:refs/heads/feat/employer-factory-pilot-svolt-17-20261030
