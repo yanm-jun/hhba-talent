@@ -27,7 +27,19 @@ try{
   await page.goto(base+'candidate/jobs/',{waitUntil:'domcontentloaded',timeout:60000});
   await dismiss(page);
   const input=page.getByRole('textbox',{name:'自然语言搜索岗位'});
-  await input.waitFor({timeout:20000});
+  try{
+   await input.waitFor({timeout:9000});
+  }catch(err){
+   const debug={
+    url:page.url(),title:await page.title(),errors:pageErrors,
+    bodyText:(await page.locator('body').innerText().catch(()=>'' )).slice(0,2500),
+    inputCount:await page.locator('input').count(),
+    htmlHead:(await page.locator('body').innerHTML().catch(()=>'' )).slice(0,1800)
+   };
+   console.error('HHBA_V2_MAIN_BROWSER_DEBUG',JSON.stringify(debug));
+   await page.screenshot({path:out+'/DEBUG-main-'+width+'.png',fullPage:true});
+   throw err;
+  }
   const checks=[
     ['南方传媒','cn-autumn-026',6],
     ['南方','cn-autumn-026',6],
