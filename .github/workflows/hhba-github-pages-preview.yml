@@ -127,6 +127,14 @@ jobs:
           test -s apps/web/public/images/employer-profiles/cn-autumn-027/logo.png
           test -s apps/web/public/images/employer-profiles/cn-autumn-027/photo1.jpg
           test -s apps/web/public/images/employer-profiles/cn-autumn-027/photo2.jpg
+      - name: Package Zhongjian Road & Bridge official logo and project photos on the main site
+        run: |
+          python apps/web/scripts/prepare-zhongjian-luqiao-media.py
+          test -s apps/web/public/images/employer-profiles/cn-autumn-028/logo.png
+          test -s apps/web/public/images/employer-profiles/cn-autumn-028/photo1.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-028/photo2.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-028/media-audit.json
+          echo HHBA_CN_AUTUMN_028_LOCAL_ASSETS_PRESENT
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
@@ -251,6 +259,13 @@ jobs:
           test -s apps/web/dist/images/employer-profiles/cn-autumn-027/photo1.jpg
           test -s apps/web/dist/images/employer-profiles/cn-autumn-027/photo2.jpg
           echo HHBA_MAIN_V2_MEDIA_AND_SEARCH_READY
+      - name: Confirm Zhongjian Road & Bridge profile and three images ship with the ONE site
+        run: |
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-028/logo.png
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-028/photo1.jpg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-028/photo2.jpg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-028/media-audit.json
+          echo HHBA_CN_AUTUMN_028_SAME_SITE_STATIC_ASSETS_OK
       - name: Strip obsolete industry-stock galleries from the public Pages bundle
         run: |
           rm -rf apps/web/dist/images/autumn-photo-research
