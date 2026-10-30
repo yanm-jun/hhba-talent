@@ -6,9 +6,9 @@ const dir='boyu-15-review';mkdirSync(dir,{recursive:true});
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 try{
  const page=await browser.newPage({viewport:{width:1440,height:930},locale:'zh-CN'});
- const errors=[];page.on('pageerror',err=>errors.push(err.message));
+ const errors=[],consoleErrors=[],badResponses=[];page.on('pageerror',err=>errors.push(err.message));page.on('console',msg=>{if(msg.type()==='error')consoleErrors.push(msg.text())});page.on('response',res=>{if(res.status()>=400)badResponses.push(res.status()+' '+res.url())});
  await page.goto(base+'companies/autumn/cn-autumn-011',{waitUntil:'domcontentloaded',timeout:45000});
- console.log('BOYU_DIAG',JSON.stringify({url:page.url(),body:(await page.locator('body').innerText()).slice(0,1250),errors:errors.slice(0,5),title:await page.title()}));
+ await page.waitForTimeout(2000);console.log('BOYU_DIAG',JSON.stringify({url:page.url(),body:(await page.locator('body').innerText()).slice(0,1250),errors:errors.slice(0,5),consoleErrors:consoleErrors.slice(0,6),badResponses:badResponses.slice(0,8),scriptSrcs:await page.locator('script[src]').evaluateAll(a=>a.map(x=>x.src)),title:await page.title()}));
  const root=page.locator('[data-employer-id="cn-autumn-011"]');await root.waitFor({timeout:9000});
  const img=root.locator('.hhba-kpmg-logo img,.hhba-kpmg-photo-grid img');
  assert.equal(await img.count(),3,'Three distinct user images');
