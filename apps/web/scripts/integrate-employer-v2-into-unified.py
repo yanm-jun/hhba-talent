@@ -83,45 +83,45 @@ def main():
   src=blob(SOURCE_REF,path)
   existing=blob("HEAD",path)
   base=blob(ancestor,path)
-  # These files were independently extended for the same employer in both
- # branches. The V2 versions are proven supersets (Anker plus Laifen/SHKP/Boyu
- # and 15 sourced employer dossiers); retain the release-only route below.
- source_wins={
-  "apps/web/src/services/domesticRebuildJobs.ts",
-  "apps/web/src/services/liveRecruitment.ts",
-  "apps/web/src/components/EmployerBrandLogo.tsx",
-  "apps/web/src/pages/AnkerCompactProfilePage.tsx",
-  "apps/web/scripts/all-company-major-chips.contract.test.mjs",
-  "apps/web/scripts/domestic-rebuild-v2.contract.test.mjs",
-  "apps/web/scripts/major-company-job-flow.contract.test.mjs",
- }
- if path in source_wins:
-  git("restore","--source",SOURCE_REF,"--",path)
-  merged.append(path);continue
- # Preserve the full mainline app (including Talent Service), adding only the
- # reviewed V2 company routes and imports. Never restore V2 main.tsx as a whole.
- if path=="apps/web/src/main.tsx":
-  if existing is None:raise RuntimeError("Missing original full-site entrypoint")
-  target=existing
-  after="import { AnkerCompactProfilePage } from './pages/AnkerCompactProfilePage';"
-  more="""import { LaifenCompactProfilePage } from './pages/LaifenCompactProfilePage';
-import { ShkpCompactProfilePage } from './pages/ShkpCompactProfilePage';
-import { BoyuCompactProfilePage } from './pages/BoyuCompactProfilePage';
-import { ConfiguredEmployerProfilePage } from './pages/ConfiguredEmployerProfilePage';
-import { employerProfileById } from './services/employerProfiles';"""
-  if after not in target:raise RuntimeError("Release Anker import moved; review manually")
-  if "ConfiguredEmployerProfilePage" not in target:
-   target=target.replace(after,after+"\\n"+more,1)
-  anchor="if(/^\\/companies\\/autumn\\/cn-autumn-[0-9]{3}$/.test(route))return <AutumnCompanyProfilePage user={user} id={route.split('/').pop()!}/>;"
-  routes="""if(route==='/companies/autumn/cn-autumn-009')return <LaifenCompactProfilePage user={user}/>;
-if(route==='/companies/autumn/cn-autumn-010')return <ShkpCompactProfilePage user={user}/>;
-if(/^\\/companies\\/autumn\\/cn-autumn-[0-9]{3}$/.test(route)&&employerProfileById.has(route.split('/').pop()!))return <ConfiguredEmployerProfilePage user={user} id={route.split('/').pop()!}/>;
-if(route==='/companies/autumn/cn-autumn-011')return <BoyuCompactProfilePage user={user}/>;"""
-  if anchor not in target:raise RuntimeError("Release autumn fallback route moved; review manually")
-  target=target.replace(anchor,routes+anchor,1)
-  assert "TalentServicePage" in target, "Must retain full mainline Talent Service"
-  write(path,target);merged.append(path);continue
- if existing==src:preserved.append(path);continue
+   # These files were independently extended for the same employer in both
+  # branches. The V2 versions are proven supersets (Anker plus Laifen/SHKP/Boyu
+  # and 15 sourced employer dossiers); retain the release-only route below.
+  source_wins={
+   "apps/web/src/services/domesticRebuildJobs.ts",
+   "apps/web/src/services/liveRecruitment.ts",
+   "apps/web/src/components/EmployerBrandLogo.tsx",
+   "apps/web/src/pages/AnkerCompactProfilePage.tsx",
+   "apps/web/scripts/all-company-major-chips.contract.test.mjs",
+   "apps/web/scripts/domestic-rebuild-v2.contract.test.mjs",
+   "apps/web/scripts/major-company-job-flow.contract.test.mjs",
+  }
+  if path in source_wins:
+   git("restore","--source",SOURCE_REF,"--",path)
+   merged.append(path);continue
+  # Preserve the full mainline app (including Talent Service), adding only the
+  # reviewed V2 company routes and imports. Never restore V2 main.tsx as a whole.
+  if path=="apps/web/src/main.tsx":
+   if existing is None:raise RuntimeError("Missing original full-site entrypoint")
+   target=existing
+   after="import { AnkerCompactProfilePage } from './pages/AnkerCompactProfilePage';"
+   more="""import { LaifenCompactProfilePage } from './pages/LaifenCompactProfilePage';
+ import { ShkpCompactProfilePage } from './pages/ShkpCompactProfilePage';
+ import { BoyuCompactProfilePage } from './pages/BoyuCompactProfilePage';
+ import { ConfiguredEmployerProfilePage } from './pages/ConfiguredEmployerProfilePage';
+ import { employerProfileById } from './services/employerProfiles';"""
+   if after not in target:raise RuntimeError("Release Anker import moved; review manually")
+   if "ConfiguredEmployerProfilePage" not in target:
+    target=target.replace(after,after+"\n"+more,1)
+   anchor="if(/^\\/companies\\/autumn\\/cn-autumn-[0-9]{3}$/.test(route))return <AutumnCompanyProfilePage user={user} id={route.split('/').pop()!}/>;"
+   routes="""if(route==='/companies/autumn/cn-autumn-009')return <LaifenCompactProfilePage user={user}/>;
+ if(route==='/companies/autumn/cn-autumn-010')return <ShkpCompactProfilePage user={user}/>;
+ if(/^\\/companies\\/autumn\\/cn-autumn-[0-9]{3}$/.test(route)&&employerProfileById.has(route.split('/').pop()!))return <ConfiguredEmployerProfilePage user={user} id={route.split('/').pop()!}/>;
+ if(route==='/companies/autumn/cn-autumn-011')return <BoyuCompactProfilePage user={user}/>;"""
+   if anchor not in target:raise RuntimeError("Release autumn fallback route moved; review manually")
+   target=target.replace(anchor,routes+anchor,1)
+   assert "TalentServicePage" in target, "Must retain full mainline Talent Service"
+   write(path,target);merged.append(path);continue
+  if existing==src:preserved.append(path);continue
   if existing is None or existing==base:
    # Git checkout handles media binary files and freshly added JSON, CSS, TS.
    git("restore","--source",SOURCE_REF,"--",path)
