@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/hhba-shkp-14-pages.yml'
       - 'apps/web/scripts/shkp-14.browser.mjs'
+      - 'apps/web/scripts/domestic-rebuild-v2.contract.test.mjs'
   workflow_dispatch:
 permissions:
   contents: read
