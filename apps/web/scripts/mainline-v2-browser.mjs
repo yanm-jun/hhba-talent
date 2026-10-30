@@ -9,7 +9,7 @@ const base=(process.env.HHBA_TEST_BASE||'http://127.0.0.1:4173/hhba-talent/').re
 const out='mainline-v2-browser-proof';
 mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
-const result={base,desktop:false,mobile:false,southern:false,guangzhilv:false,shortSearch:false,details:false,images:false};
+const result={base,desktop:false,mobile:false,southern:false,guangzhilv:false,shortSearch:false,details:false,images:false,qingdaoCaptions:false};
 async function dismiss(page){
  const btn=page.getByRole('button',{name:'暂不同意'});
  if(await btn.isVisible().catch(()=>false))await btn.click();
@@ -77,11 +77,44 @@ try{
     await input.waitFor({state:'visible'});
    }
   }
+  // Qingdao Bank regression: the previously horizontal flex caption squeezed
+  // a Chinese title into vertical characters and forced its source note off-card.
+  await page.goto(base+'companies/autumn/cn-autumn-025/',{waitUntil:'domcontentloaded',timeout:45000});
+  const qingdao=page.locator('[data-company-template="unified-v2"][data-employer-id="cn-autumn-025"]');
+  await qingdao.waitFor({state:'visible',timeout:25000});
+  assert((await qingdao.locator('h1').innerText()).includes('青岛银行'),'Wrong Qingdao bank profile');
+  const captions=qingdao.locator('.hhba-kpmg-photo-grid figcaption');
+  assert.equal(await captions.count(),2,'Qingdao Bank must keep two independent photos with captions');
+  for(const caption of await captions.all()){
+   const layout=await caption.evaluate(el=>{
+    const title=el.querySelector('span');
+    const note=el.querySelector('small');
+    const cs=getComputedStyle(el), ts=title&&getComputedStyle(title), ns=note&&getComputedStyle(note);
+    return {
+     direction:cs.flexDirection,alignment:cs.alignItems,writing:cs.writingMode,
+     cardWidth:el.clientWidth,titleWidth:title?.getBoundingClientRect().width||0,
+     noteWrap:ns?.whiteSpace,captionOverflow:el.scrollWidth>el.clientWidth+2,
+     titleOverflow:!!title&&title.scrollWidth>title.clientWidth+2,
+     noteOverflow:!!note&&note.scrollWidth>note.clientWidth+2,
+     titleWriting:ts?.writingMode,noteWriting:ns?.writingMode
+    };
+   });
+   assert.equal(layout.direction,'column','Qingdao photo title and source must stack vertically');
+   assert.equal(layout.writing,'horizontal-tb','Captions must use horizontal text');
+   assert.equal(layout.titleWriting,'horizontal-tb','Title must not render as a vertical line');
+   assert.equal(layout.noteWriting,'horizontal-tb','Source note must be horizontally written');
+   assert.equal(layout.noteWrap,'normal','Long source notes must wrap naturally');
+   assert(layout.titleWidth>layout.cardWidth*0.75,'Photo title was squeezed into a one-character column');
+   assert(!layout.captionOverflow&&!layout.titleOverflow&&!layout.noteOverflow,
+    'Qingdao source note overflows photo card: '+JSON.stringify(layout));
+  }
+  await page.screenshot({path:out+'/qingdao-bank-'+width+'-captions.png',fullPage:true});
+  result.qingdaoCaptions=true;
   assert.deepEqual(pageErrors,[],'Uncaught browser JavaScript errors');
   if(width===390)result.mobile=true;else result.desktop=true;
   await page.close();
  }
- assert(result.desktop&&result.mobile&&result.southern&&result.guangzhilv&&result.shortSearch&&result.details&&result.images);
+ assert(result.desktop&&result.mobile&&result.southern&&result.guangzhilv&&result.shortSearch&&result.details&&result.images&&result.qingdaoCaptions);
  result.status='PASS';
  writeFileSync(out+'/result.json',JSON.stringify(result,null,2)+'\n');
  console.log('HHBA_ONE_MAIN_BROWSER_SEARCH_AND_DETAILS_PASS',JSON.stringify(result));
