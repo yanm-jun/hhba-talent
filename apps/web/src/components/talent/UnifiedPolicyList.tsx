@@ -19,7 +19,7 @@ function Tile({item,record}:{item:PolicyTile;record:TalentPolicyRecord}){
   <div className="jpp-benefit"><span className="jpp-benefit-label">主要待遇／住房规模</span><div className="jpp-amount"><strong>{item.amount}</strong><span>{item.unit}</span></div><p>{item.description}</p></div>
   <div className="jpp-condition"><span>核心条件</span><p>{item.condition}</p></div>
   <div className="jpp-card-bottom"><div className="jpp-source"><span>{record.published.slice(0,4)}年资料</span><span>·</span><span>来源可查</span></div>
-   <div className="jpp-links"><a href={record.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={'打开'+record.title+'原文'}>政府政策原文 <ArrowUpRight size={13}/></a>
+   <div className="jpp-links"><a href={record.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={'打开'+record.title+'原文'}>{quality.sourceKind==='government'?'政府政策原文':'公开资料来源'} <ArrowUpRight size={13}/></a>
     <Link to={route}>{item.detailPath?'完整办事指南':'查看政策资料'} <ArrowRight size={14}/></Link></div>
   </div>
  </article>;

@@ -40,8 +40,8 @@ export function UnifiedTalentRecordDetail({policy,housing}:{policy?:TalentPolicy
     <Panel title="02 住房资格、截止日期"><p>{housing?.eligibility}</p>{housing?.applicationEnd&&<p>公告批次截止日期：{housing.applicationEnd}（不等于实时有空房）。</p>}</Panel>
     <Panel title="03 选房及签约步骤"><ol>{housing?.steps.map((s,i)=><li key={i} style={{lineHeight:1.9,marginBottom:9}}>{s}</li>)}</ol></Panel>
     <Panel title="04 咨询与项目限制">{housing?.contactPhone?<p>公开咨询电话：<a href={'tel:'+housing.contactPhone}>{housing.contactPhone}</a>（接通情况未核验）</p>:<p>公开咨询电话尚未确认，应核对官方原文。</p>}</Panel></>}
-   <Panel title="05 官方原文与办理渠道"><div className="jgd-portal"><div><strong>政策政府原文</strong><span>公开时间：{item.published}</span><small>本站仅提供政策信息，不收集个人身份证、学历证明或银行卡材料。</small></div>
-    <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer">查看官方原文 <ExternalLink size={14}/></a></div>
+   <Panel title="05 官方原文与办理渠道"><div className="jgd-portal"><div><strong>{quality.sourceKind==='government'?'政府政策原文':'公开资料来源 · 非政府一手出处'}</strong><span>公开时间：{item.published}</span><small>本站仅提供政策信息，不收集个人身份证、学历证明或银行卡材料。</small></div>
+    <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer">{quality.sourceKind==='government'?'查看官方原文':'核对参考来源'} <ExternalLink size={14}/></a></div>
     {application?<div className="jgd-portal" style={{marginTop:12}}><div><strong>相关政府办理系统</strong><span>实际受理状态须以政府系统确认。</span></div><a href={application} target="_blank" rel="noopener noreferrer">查看办理平台 <ExternalLink size={14}/></a></div>:
     <p className="jgd-portal-warning">独立申报入口待核验，政府介绍页不等于已经开放申请。</p>}</Panel>
    <Panel title="06 信息完整度与补全情况"><p>当前等级：<strong>{quality.grade} · {quality.label}</strong></p>
