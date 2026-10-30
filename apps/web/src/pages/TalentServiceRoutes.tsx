@@ -138,6 +138,14 @@ function CityHub({city}:{city:string}){
    </div>
   </section>
   {match.name==='东营'&&<section className="ts-sub-section"><h2>东营 · 2026政策衔接与安居核验</h2><p>2026年8月人才新政出台，原2022版人才补贴已废止；旧规补报在9月30日结束。原博士4000元／月、硕士2000元／月与首购补贴等旧数字，仅作历史参考。新进人才请核对新规正式申请细则。</p><p>住房线索：河口区三义和住宅小区二期在2026年5月曾公告70套保租房统筹配租，报名6月30日截止。现仅核验到对区住建局公告的媒体转载，政府官网原文及新批次尚待核验。因此不将70套冒充当前可租房源，也不纳入已确认住房项目。</p><p><a href="https://ady.dongyingnews.cn/share/YS01MzctNDM0NzYxOTM.html" target="_blank" rel="noopener noreferrer">查看2026年河口区住房旧批次公告转载（非官方办理入口）</a></p><p><Link to="/talent-service/policy-guide-preview/dongying/transition">查看2026新旧政策核查指南 <ArrowRight size={14}/></Link></p></section>}
+  {match.name==='菏泽'&&<section className="ts-sub-section" aria-label="菏泽重点人才政策指南"><div className="ts-sub-section-heading"><h2>菏泽 · 2026政策与人才安居核验</h2></div>
+   <p>企业新引进高校毕业生生活补贴按学历与市县配套核算；博士硕士2026年5月购房补贴原批次已截止。牡丹区2026年9月公租房通告转载列有五小区112套历史数据，官方原始房源及实时空房尚待核实；人才集团有住房管理服务但未取得2026独立公寓项目清单。</p>
+   <div className="ts-sub-grid">
+    <Link to="/talent-service/policy-guide-preview/heze/living" className="ts-sub-tile"><strong>企业生活补贴</strong><span>分学历及市县1:1配套核查</span><ArrowRight size={15}/></Link>
+    <Link to="/talent-service/policy-guide-preview/heze/purchase" className="ts-sub-tile"><strong>博士硕士购房补贴</strong><span>2026年5月批次已截止</span><ArrowRight size={15}/></Link>
+    <Link to="/talent-service/policy-guide-preview/heze/startup" className="ts-sub-tile"><strong>一次性创业补贴</strong><span>经营与参保条件及办理步骤</span><ArrowRight size={15}/></Link>
+    <Link to="/talent-service/policy-guide-preview/heze/housing" className="ts-sub-tile"><strong>人才公寓和公租房</strong><span>五小区住房线索及真实申报核验</span><ArrowRight size={15}/></Link>
+   </div></section>}
   {housingLeads.length>0&&<section className="ts-sub-section" aria-label="人才公寓项目线索预览">
    <div className="ts-sub-section-heading"><h2>人才公寓在哪里？</h2><Link to={talentListUrl('housing',match.name)}>查看全部住房政策与公寓资料 <ArrowRight size={15}/></Link></div>
    <p className="ts-housing-inventory-note">以下公寓点位有公开报道可追溯，但当期项目原文、空房及申请入口仍待核验；不是已经开放的房源。</p>
