@@ -7,7 +7,7 @@ No network call or production deployment is performed by this script.
 """
 import pathlib, subprocess, sys
 ROOT=pathlib.Path(__file__).resolve().parents[3]
-BASE_REF="origin/feat/hhba-unified-static-20261025"
+BASE_REF="0016a2ce8be492bfe6ae823c817fa6b8d0211b92"  # pinned reviewed unified baseline, not a moving branch tip
 SOURCE_REF="origin/fix/search-actual-published-urls-20261030"
 def git(*args, check=True):
  p=subprocess.run(["git",*args],cwd=ROOT,text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
