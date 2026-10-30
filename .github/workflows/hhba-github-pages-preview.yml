@@ -640,3 +640,23 @@ jobs:
       - name: Publish the white HHBA site
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify real public Pages V2 employer search index after deployment
+        run: |
+          python - <<'PY'
+          import json, time, urllib.request
+          url='https://yanm-jun.github.io/hhba-talent/data/employer-v2-search-index.json'
+          for attempt in range(18):
+              try:
+                  request=urllib.request.Request(url+'?verify='+str(attempt),headers={'Cache-Control':'no-cache','User-Agent':'HHBA-V2-Pages-QA'})
+                  with urllib.request.urlopen(request,timeout=15) as response:
+                      data=json.load(response)
+                  guangzhilv=next((p for p in data['employers'] if p['id']=='cn-autumn-027'),None)
+                  assert guangzhilv and guangzhilv['name']=='广之旅' and len(guangzhilv['jobs'])==8
+                  assert all(t in [guangzhilv['name'],*guangzhilv['aliases']] or any(t in name for name in [guangzhilv['name'],*guangzhilv['aliases']]) for t in ['广之','广之旅','GZL'])
+                  print('HHBA_PUBLIC_GZL_SEARCH_INDEX_VERIFIED',url,len(guangzhilv['jobs']))
+                  break
+              except Exception as exc:
+                  print('PUBLIC_INDEX_NOT_READY',attempt+1,type(exc).__name__,str(exc)[:180])
+                  if attempt==17: raise
+                  time.sleep(10)
+          PY
