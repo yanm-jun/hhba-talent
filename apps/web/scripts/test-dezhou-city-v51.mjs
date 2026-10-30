@@ -45,14 +45,14 @@ check('Official housing historical totals are not advertised as current vacancie
  assert.equal(homes.filter(h=>h.kind==='project').length,0,'Do not certify a project without direct governmental project notice');
 });
 check('Real Yingcai, Youlai and Dongcheng leads are distinct and clearly pending',()=>{
- for(const id of ['dz-yingcai-140-2024-lead','dz-you-lai-youth-2025-lead','dz-dongcheng-mingzhu-2026-lead']){
+ for(const id of ['dz-yingcai-140-2024-lead','dz-you-lai-youth-2025-lead','dz-dongcheng-mingzhu-2026-lead','dz-linzhuang-199-2026-lead']){
   const lead=byId(leads,id);assert.ok(lead,id);
   assert.notEqual(talentSourceKind(lead.sourceUrl),'government');
   assert.ok(lead.address&&lead.units&&lead.rent&&lead.eligibility&&lead.steps.length>=4);
   assert.match(lead.statusNote,/待核|不等于/);
   assert.ok(!homes.some(h=>h.id===id));
  }
- assert.equal(leads.length,3);
+ assert.equal(leads.length,4);
 });
 check('Dezhou search and housing route use shared city renderer and lead discovery',()=>{
  const routes=readFileSync(new URL('../src/pages/TalentServiceRoutes.tsx',import.meta.url),'utf8');
