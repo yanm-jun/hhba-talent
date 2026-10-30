@@ -5,12 +5,13 @@
 统一入口：`/talent-service/list/housing/{城市}`，点击卡片进入 `/talent-service/housing/{项目ID}`。
 所有公开信息为官方公告日期对应的项目规模/租金情况，不是实时房源、保证有房或资格审批结果。
 
-## 本批新增 10 个项目
+## 本批新增 11 个项目
 - 北京：壹亮马、泓鑫家园。2026年6月朝阳区577套毕业生专项配租报道，截止6月29日。来源 https://www.beijing.gov.cn/fuwu/bmfw/sy/jrts/202606/t20260603_4683824.html
 - 天津：瑞馨公寓、河创智家公寓（2026年4月经开区两处新获市级人才公寓认定），官方 https://www.teda.gov.cn/contents/21/107332.html 。瑞馨联系方式来自天津经开区官方人才港目录 https://www.teda.gov.cn/szym/channels/2616.html ，当前电话真实性和租金需运营方再确认。
 - 天津：松寓一期，2026年6月公布291套与平均1800—2200元/月，官方 https://www.tj.gov.cn/sy/tpxw/202606/t20260623_7322106.html
 - 天津：津铁·礼寓，2026年2月东侧楼144套交付，官方 https://www.tj.gov.cn/zmhd/hygqx/202602/t20260227_7251333.html
 - 上海：城投宽庭·张江社区二期，2026年5月3180套精装房源入市，官方 https://www.shanghai.gov.cn/nw4411/20260520/b124a02d44de4506af446a261ae9c3f4.html
+- 上海：陆家嘴悦庭·数智天地，浦东新区2025年12月政府报道介绍2025年初入市约2000套，未公布固定房价和准确门牌，官方 https://www.shanghai.gov.cn/nw15343/20251223/72a17d0becfc4931b5199435ad23bc7a.html
 - 重庆：三榆青年公寓、舞凤嘉苑，2026年6月公告房型和租金，官方 https://zfcxjw.cq.gov.cn/zwxx_166/bmdt/bmdt_23631/202606/t20260618_15764660.html
 - 重庆：龙盛xin智寓，2026年5月公告465套，官方 https://zfcxjw.cq.gov.cn/zwxx_166/bmdt/bmdt_23631/202605/t20260511_15666993.html
 

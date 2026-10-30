@@ -28,8 +28,8 @@ assert.ok(policy.includes('deadline:"2026-10-31"'),'Tianjin 2027 application cut
 assert.ok(policy.includes('deadline:"2025-12-31"'),'Expired Chongqing 12-county recognition window must be explicit');
 
 assert.ok(housingIds.length>=10 && policyIds.length>=16,'Insufficient source-backed records');
-const housingProjectIds=['bj-yiliangma-2026','bj-hongxin-2026','tj-ruixin-2026','tj-hechuang-2026','tj-songyu-2026','tj-jintie-liyu-2026','sh-zhangjiang-2026','cq-sanyu-2026','cq-wufeng-2026','cq-longsheng-2026'];
-assert.ok(housingIds.length>=23,'Expected previous 13 housing records plus 10 new concrete official projects');
+const housingProjectIds=['bj-yiliangma-2026','bj-hongxin-2026','tj-ruixin-2026','tj-hechuang-2026','tj-songyu-2026','tj-jintie-liyu-2026','sh-zhangjiang-2026','sh-yueting-2025','cq-sanyu-2026','cq-wufeng-2026','cq-longsheng-2026'];
+assert.ok(housingIds.length>=24,'Expected previous 13 housing records plus 11 new concrete official projects');
 for(const id of housingProjectIds){
  const start=housing.indexOf('id:"'+id+'"');
  assert.ok(start>=0,'New housing project missing: '+id);
