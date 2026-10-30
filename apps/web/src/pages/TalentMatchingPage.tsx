@@ -71,7 +71,7 @@ export function TalentMatchingPage({city}:{city:string}){
   <section className="tm-form-box" aria-labelledby="tm-form-heading">
    <div className="tm-form-top"><h2 id="tm-form-heading">基础情况</h2><span>可只填写已知信息，其余保留“暂不确定”</span></div>
    <div className="tm-fields">
-    {field('目标城市','city',MUNICIPAL_MATCH_CITIES.map(c=>[c,c+'市']))}
+    {field('目标城市','city',MUNICIPAL_MATCH_CITIES.map(c=>[c,c+'市'] as const))}
     {field('最高学历','education',degrees)}
     {field('毕业届别','grad',grads)}
     {field('当前就业状态','work',occupations)}
@@ -106,7 +106,7 @@ export function TalentMatchingPage({city}:{city:string}){
      <footer><Link to={'/talent-service/policy/'+encodeURIComponent(record.id)}>查看申请资格和办理流程 <ArrowRight size={14}/></Link><a href={record.sourceUrl} target="_blank" rel="noopener noreferrer">政府原文 <ExternalLink size={14}/></a></footer>
     </article>)}
    </div>
-   <div className="tm-caveat"><ShieldCheck size={19}/><p>匹配仅根据你填写的部分信息排除显著冲突并提示核验要点。政策未收录、资格细则缺失、批次变化和当地审批规则均可能导致误差。**任何结果都不是“符合申领条件”的确认**；申报前务必核对政府原文与经办机构。</p></div>
+   <div className="tm-caveat"><ShieldCheck size={19}/><p>匹配仅根据你填写的部分信息排除显著冲突并提示核验要点。政策未收录、资格细则缺失、批次变化和当地审批规则均可能导致误差。<strong>任何结果都不是“符合申领条件”的确认</strong>；申报前务必核对政府原文与经办机构。</p></div>
   </section>}
   <div className="tm-bottom-link"><Link to={'/talent-service/list/policies/'+encodeURIComponent(form.city)}><ArrowLeft size={15}/> 浏览{form.city}全部人才政策</Link></div>
  </div>;
