@@ -364,7 +364,9 @@ export function findTalentProvince(input:string){
 }
 export function findTalentCity(input:string){
  const q=normalize(input);
- return q?TALENT_CITY_INDEX.find(c=>c.aliases.some(a=>normalize(a)===q))||null:null;
+ if(!q)return null;
+ const matches=TALENT_CITY_INDEX.filter(c=>c.aliases.some(a=>normalize(a)===q));
+ return matches.length===1?matches[0]:null; // Avoid silently selecting a wrong city for ambiguous pinyin initials.
 }
 const matchingAliases=TALENT_CITY_INDEX.flatMap(city=>city.aliases
  .filter(a=>!(/^[a-z]{2}$/i.test(a)))
