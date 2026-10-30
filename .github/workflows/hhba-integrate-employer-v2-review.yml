@@ -41,7 +41,12 @@ jobs:
           set -euo pipefail
           git fetch origin refs/heads/feat/hhba-unified-static-20261025:refs/remotes/origin/feat/hhba-unified-static-20261025
           git fetch origin refs/heads/fix/search-actual-published-urls-20261030:refs/remotes/origin/fix/search-actual-published-urls-20261030
-          python3 apps/web/scripts/integrate-employer-v2-into-unified.py
+          if test -s apps/web/src/data/employerProfiles/cn-autumn-025.json &&
+             test -s apps/web/src/pages/ConfiguredEmployerProfilePage.tsx; then
+            echo "V2 selective import is present; preserve subsequent integration fixes"
+          else
+            python3 apps/web/scripts/integrate-employer-v2-into-unified.py
+          fi
       - name: Commit selective import ONLY on isolated review branch
         run: |
           set -euo pipefail
