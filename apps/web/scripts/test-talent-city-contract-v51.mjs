@@ -205,4 +205,33 @@ check('Zaozhuang V5.1: two detailed policies, truthful pilot program, three hous
  assert.ok(cityCode.includes('housingResearchLeads(match.name)'), 'homepage must surface Zaozhuang leads');
  assert.ok(cityCode.includes('<UnifiedTalentHousingResearch city={city} query={query}/>'));
 });
+check('Liaocheng V5.1: 2026 employment subsidies, historical housing and source-labeled apartments',()=>{
+ const city='聊城';
+ const current=TALENT_POLICY_RECORDS.filter(x=>x.city===city);
+ for(const id of ['sd-lc-insurance-2026','sd-liaocheng-2026-living']){
+  const p=current.find(x=>x.id===id);
+  assert.ok(p&&p.materials?.length>=3&&p.applicationSteps?.length>=4,id+' must be actionable');
+  assert.ok(p.reviewNote.includes('办理入口待核实'),id+' must not claim verified application portal');
+  assert.notEqual(assessPolicy(p,'2026-10-30').grade,'A');
+ }
+ for(const id of ['lc-housing-rental-2022-history','lc-purchase-housing-2022-history']){
+  const p=current.find(x=>x.id===id);
+  assert.ok(p&&p.temporal==='historical'&&p.materials?.length>=3&&p.applicationSteps?.length>=4);
+  assert.equal(assessPolicy(p,'2026-10-30').grade,'C');
+ }
+ const leads=TALENT_HOUSING_RESEARCH_LEADS.filter(x=>x.city===city);
+ assert.equal(leads.length,3,'Three distinct public reporting leads required');
+ for(const l of leads){
+  assert.ok(l.address&&l.sourceUrl&&l.statusNote&&l.eligibility&&l.steps.length>=4);
+  assert.notEqual(talentSourceKind(l.sourceUrl),'government');
+  assert.ok(!TALENT_HOUSING_RECORDS.some(h=>h.id===l.id),'No unverified listing may appear as verified project');
+ }
+ assert.ok(leads.some(x=>x.id==='lc-jingkai-2026-batches-lead'));
+ assert.ok(leads.some(x=>x.id==='lc-gaotang-biotech-2026-lead'));
+ assert.ok(leads.some(x=>x.id==='lc-jingkai-140-2022-lead'));
+ const cityCode=code('TalentServiceRoutes.tsx');
+ assert.ok(cityCode.includes('housingResearchLeads(match.name)'));
+ assert.ok(cityCode.includes('<UnifiedTalentHousingResearch city={city} query={query}/>'));
+ assert.equal(ACCEPTED_TALENT_CITIES.includes(city),false);
+});
 console.log(JSON.stringify({passed,baseline:base.policyIds.length+base.housingIds.length,certified:Object.keys(CERTIFIED_TALENT_GUIDES).length,acceptedCities:ACCEPTED_TALENT_CITIES.length},null,2));
