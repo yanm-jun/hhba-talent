@@ -56,6 +56,7 @@ jobs:
         run: |
           npm run build
           for f in logo.png photo1.webp photo2.webp; do test -s "dist/images/employer-profiles/cn-autumn-014/$f"; done
+          echo "6c08df96d86cf3c6b13cbcf3b5be70a2924c2bedf0b80a3957c5deae4b06aff6  dist/images/employer-profiles/cn-autumn-014/logo.png" | sha256sum -c -
       - name: Prepare browser dependencies
         if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview]')
         working-directory: apps/web
@@ -161,6 +162,7 @@ jobs:
           done
           grep -q '/hhba-talent/preview-ceec-intl/assets/' /tmp/page
           test $(wc -c </tmp/logo) -gt 1000
+          echo "6c08df96d86cf3c6b13cbcf3b5be70a2924c2bedf0b80a3957c5deae4b06aff6  /tmp/logo" | sha256sum -c -
           test $(wc -c </tmp/photo1) -gt 10000
           test $(wc -c </tmp/photo2) -gt 10000
           echo HHBA_CEEC_16_PUBLIC_FACTORY_PREVIEW_PASS
