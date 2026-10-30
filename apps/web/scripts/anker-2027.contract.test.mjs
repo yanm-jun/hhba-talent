@@ -26,7 +26,7 @@ assert(page.includes('hhba-kpmg-photo-grid')&&page.includes('主要业务与专�
 assert(!page.includes('<MajorFilter')&&!page.includes('清除专业'));
 assert(page.includes('data-hhba-recruitment-outbound="true"'));
 assert(main.includes("if(route==='/companies/autumn/cn-autumn-008')return <AnkerCompactProfilePage user={user}/>;"));
-assert(index.includes('...hypergryphV2Records,...ankerV2Records,...laifenV2Records,...shkpV2Records]')&&index.includes('domesticV2Records.length!==158'));
+assert(index.includes('...hypergryphV2Records,...ankerV2Records,...laifenV2Records,...shkpV2Records,...boyuV2Records]')&&index.includes('domesticV2Records.length!==160'));
 assert(index.includes('editorialRelatedMajors:job.editorialRelatedMajors'));
 assert(live.includes("job.platform==='anker-2027-campus-official'")&&live.includes("job.source==='anker-innovations'"));
 assert(live.includes("'cn-v2-anker-multimodal-ai'")&&live.includes("'cn-v2-anker-ai-app'"));
