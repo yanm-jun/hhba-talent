@@ -237,7 +237,6 @@ jobs:
         working-directory: apps/web
         env:
           HHBA_EMPLOYER_ID: ${{ needs.validate-and-build.outputs.employer_id }}
-          HHBA_PUBLIC_SEARCH: '青岛'
         run: |
           set -euo pipefail
           npm ci --no-audit --no-fund
