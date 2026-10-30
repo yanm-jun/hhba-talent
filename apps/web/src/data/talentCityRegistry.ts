@@ -404,7 +404,8 @@ export function queryTalentCities(input:string,province=''){
  const q=normalize(input);
  const prov=findTalentProvince(q);
  return TALENT_CITY_INDEX.filter(c=>{
-  if(province&&c.province!==province)return false;
+  if(province==='直辖市'&&c.level!=='municipality')return false;
+  if(province&&province!=='直辖市'&&c.province!==province)return false;
   if(!q)return true;
   if(prov)return c.province===prov.official;
   return c.aliases.some(a=>normalize(a).includes(q))||normalize(c.province).includes(q);
