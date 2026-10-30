@@ -9,6 +9,24 @@ const housingView=readFileSync(new URL('components/TalentHousingSection.tsx',roo
 const policyView=readFileSync(new URL('components/TalentPolicySearch.tsx',root),'utf8');
 const housingIds=[...housing.matchAll(/id:"([^"]+)"/g)].map(m=>m[1]);
 const policyIds=[...policy.matchAll(/id:'([^']+)'/g)].map(m=>m[1]);
+const scopedIds=['bj-jobseeker-grant','bj-flex-insurance','tj-2027-jobseek-grant','tj-grad-business-loan','tj-graduate-flex-insurance',
+ 'sh-2026-jobseek-grant','sh-2026-flex-insurance','sh-2026-first-startup',
+ 'cq-2026-jobseek','cq-2026-shortage-job','cq-2025-twelve-counties'];
+for(const id of scopedIds){
+ const start=policy.indexOf("id:'"+id+"'");
+ assert.ok(start>=0,'Missing newly researched official municipal policy '+id);
+ const next=policy.indexOf("},",start);
+ const row=policy.slice(start,next);
+ assert.ok(row.includes('scope:')&&row.includes('targetGroup:')&&row.includes('reviewNote:'),'Municipal policy must identify scope and qualifications: '+id);
+ const source=/sourceUrl:\s*"([^"]+)"/.exec(row);
+ assert.ok(source&&new URL(source[1]).hostname.endsWith('.gov.cn'),'Each new policy must link to an official Chinese government site: '+id);
+}
+for(const city of ['北京','天津','上海','重庆']){
+ assert.ok([...policy.matchAll(new RegExp("city:'"+city+"'","g"))].length>=4,'Insufficient researched policy coverage for '+city);
+}
+assert.ok(policy.includes('deadline:"2026-10-31"'),'Tianjin 2027 application cut-off must be explicit');
+assert.ok(policy.includes('deadline:"2025-12-31"'),'Expired Chongqing 12-county recognition window must be explicit');
+
 assert.ok(housingIds.length>=10 && policyIds.length>=16,'Insufficient source-backed records');
 assert.equal(new Set(housingIds).size,housingIds.length,'Duplicate housing IDs');
 assert.equal(new Set(policyIds).size,policyIds.length,'Duplicate policy IDs');
@@ -49,6 +67,9 @@ for(const c of ['北京','天津','上海','重庆']){
 assert.ok(landing.includes('suggestTalentCities(keyword)'),'Search autocomplete must be connected');
 assert.ok(landing.includes('parseTalentCityQuery(keyword,city)'),'City alias matcher must be connected');
 assert.ok(details.includes('ts-v4-two-kinds'),'City pages must have exactly two core service entrances');
+assert.ok(details.includes('policyStatus(data)')&&details.includes('data.targetGroup'),'Policy listings must expose application status and eligible population');
+assert.ok(details.includes('p.deadline')&&details.includes('p.reviewNote')&&details.includes('p.scope'),'Policy detail page must show cutoffs and territorial limitations');
+
 assert.ok(!landing.includes('ts-match-form'),'Old generic matching UI should not return');
 
 assert.ok(details.includes('function CityHub(')&&details.includes('function ListPage(')&&details.includes('function DetailPage('),'City/list/detail page hierarchy missing');
