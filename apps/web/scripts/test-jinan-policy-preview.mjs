@@ -5,6 +5,7 @@ import {TALENT_POLICY_RECORDS} from '../src/data/talentPolicyRecords.ts';
 const path=new URL('../src/pages/',import.meta.url);
 const routes=readFileSync(new URL('TalentServiceRoutes.tsx',path),'utf8');
 const preview=readFileSync(new URL('TalentJinanPolicyPreview.tsx',path),'utf8');
+const shared=readFileSync(new URL('../components/talent/UnifiedPolicyList.tsx',path),'utf8');
 const style=readFileSync(new URL('talentJinanPolicyPreview.css',path),'utf8');
 const homepage=readFileSync(new URL('TalentServicePage.tsx',path),'utf8');
 let done=0;
@@ -19,27 +20,27 @@ test('Two 2024 historical records never mixed into application-status-unknown po
  const archive=policies.filter(p=>p.temporal==='historical'||p.temporal==='past-window');
  assert.equal(archive.length,2);
  assert.deepEqual(archive.map(p=>p.id).sort(),['jn-graduate-housing','jn-transport']);
- assert.ok(preview.includes('fresh=sources.filter(p=>!isHistorical(p))'));
- assert.ok(preview.includes('archive=sources.filter(isHistorical)'));
+ assert.ok(shared.includes('const fresh=filtered.filter(x=>!historical(x.record));'));
+ assert.ok(shared.includes('const archives=entries.filter(x=>historical(x.record));')&&shared.includes('const old=filtered.filter(x=>historical(x.record));'));
 });
 test('All four policy classifications have real source-grounded benefit presentation',()=>{
  for(const p of policies)assert.ok(preview.includes("'"+p.id+"':{"),'No highlight for '+p.id);
  assert.ok(preview.includes('房款50%')&&preview.includes('100万/70万/40万元'));
- assert.ok(preview.includes('申领状态待核验'));
+ assert.ok(preview.includes('现行申领状态需要官方确认')&&shared.includes('资料待核对申领状态'));
 });
 test('Policy categories are wired to stateful filters, not decorations',()=>{
- assert.ok(preview.includes("useState('all')")&&preview.includes('onClick={()=>setCategory(c.id)}'));
- assert.ok(preview.includes("category==='history'?isHistorical(p):p.category===category"));
+ assert.ok(shared.includes("useState('all')")&&shared.includes('onClick={()=>setCategory(id)}'));
+ assert.ok(shared.includes("category==='history'?historical(x.record):x.tile.category===category"));
 });
 test('Each card links to existing policy details and official original without nested anchors',()=>{
- assert.ok(preview.includes("'/talent-service/policy/'+encodeURIComponent(record.id)"));
- assert.ok(preview.includes('href={record.sourceUrl}'));
- assert.ok(preview.includes('rel="noopener noreferrer"'));
+ assert.ok(shared.includes("'/talent-service/policy/'+encodeURIComponent(item.id)"));
+ assert.ok(shared.includes('href={record.sourceUrl}'));
+ assert.ok(shared.includes('rel="noopener noreferrer"'));
 });
 test('Standalone route is exclusive to Jinan sample; existing list route stays available',()=>{
  assert.ok(routes.includes("kind==='policy-layout-preview'&&fragments[2]==='jinan'"));
  assert.ok(routes.includes("else if(kind==='list'&&['policies','benefits','housing','guide'].includes"));
- assert.ok(preview.includes("to=\"/talent-service/list/policies/%E6%B5%8E%E5%8D%97\""));
+ assert.ok(shared.includes("'/talent-service/list/policies/'+encodeURIComponent(config.city)"));
 });
 test('New presentation is independently CSS scoped and homepage untouched',()=>{
  assert.ok(style.includes('.jpp-grid')&&style.includes('.jpp-card-archive'));
