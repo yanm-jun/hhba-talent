@@ -1,5 +1,5 @@
-import {TALENT_POLICY_RECORDS,type TalentPolicyRecord} from './talentPolicyRecords';
-import {TALENT_HOUSING_RECORDS,type TalentHousingRecord} from './talentHousingRecords';
+import {TALENT_POLICY_RECORDS,type TalentPolicyRecord} from './talentPolicyRecords.ts';
+import {TALENT_HOUSING_RECORDS,type TalentHousingRecord} from './talentHousingRecords.ts';
 
 export type TalentQualityGrade='A'|'B'|'C'|'D';
 export type TalentSourceKind='government'|'secondary'|'unverified';
