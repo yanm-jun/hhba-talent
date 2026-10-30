@@ -34,6 +34,7 @@ const kinds:{id:TalentListKind;name:string;description:string;icon:typeof FileTe
  {id:'policies',name:'政策与补贴',description:'生活补贴、人才引进、落户与就业支持',icon:FileText},
  {id:'housing',name:'人才安居',description:'公寓项目、租金、住房支持与申请资格',icon:Building2}
 ];
+const isHousingPolicy=(p:TalentPolicyRecord)=>p.category==='购房补贴'||p.category==='租房安居';
 const benefit=(p:TalentPolicyRecord)=>p.category==='生活补贴'||p.category==='购房补贴'||p.category==='交通福利'||p.category==='就业创业'||p.title.includes('补贴');
 const housingStatus=(r:TalentHousingRecord)=>{
  const today=new Date().toISOString().slice(0,10);
@@ -84,10 +85,10 @@ function PolicyTile({data}:{data:TalentPolicyRecord}){
 }
 function HousingTile({data}:{data:TalentHousingRecord}){
  return <Link to={talentHousingUrl(data.id)} className="ts-sub-tile">
-  <div className="ts-sub-tile-top"><span>{data.housingCategory|| (data.kind==='program'?'住房政策入口':'官方真实项目')}</span><small>{housingStatus(data)}</small></div>
+  <div className="ts-sub-tile-top"><span>{data.kind==='program'?'住房保障制度 / 项目总览':data.housingCategory||'官方真实项目'}</span><small>{housingStatus(data)}</small></div>
   <h3>{data.title}</h3>
-  <p className="ts-housing-location"><MapPin size={14}/>{data.district} · {data.address}</p>
-  <div className="ts-housing-short-facts"><small>政府公开房型 / 项目规模</small><p>{data.units}</p><small>公告租金 / 费用说明</small><strong>{data.rent}</strong></div>
+  <p className="ts-housing-location"><MapPin size={14}/>{data.kind==='program'?'覆盖范围：':'项目位置：'}{data.district} · {data.address}</p>
+  <div className="ts-housing-short-facts"><small>{data.kind==='program'?'政府公开的历史筹集 / 配租规模':'政府公开房型 / 项目规模'}</small><p>{data.units}</p><small>公告租金 / 费用说明</small><strong>{data.rent}</strong></div>
   <p className="ts-housing-inventory-note">{data.statusNote}</p>
   <footer><small>官方公告 {data.published} · 核验 {data.reviewedAt}</small><ArrowUpRight size={18}/></footer>
  </Link>;
@@ -135,15 +136,19 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
  const searchMode=kind==='search';
  const housingMode=kind==='housing';
  const guideMode=kind==='guide';
- const title=searchMode?'搜索结果':housingMode?'人才公寓':kind==='benefits'?'补贴与福利':guideMode?'申请指南':'人才政策';
- const resultPolicies=TALENT_POLICY_RECORDS.filter(p=>p.city===city&&(!query||matchesPolicy(p,query,city))&&(!housingMode)&&(kind!=='benefits'||benefit(p))).sort(recentPolicies);
+ const title=searchMode?'搜索结果':housingMode?'人才安居':kind==='benefits'?'补贴与福利':guideMode?'申请指南':'人才政策';
+ const resultPolicies=TALENT_POLICY_RECORDS.filter(p=>p.city===city&&(!query||matchesPolicy(p,query,city))&&(!housingMode||isHousingPolicy(p))&&(kind!=='benefits'||benefit(p))).sort(recentPolicies);
  const resultHomes=TALENT_HOUSING_RECORDS.filter(p=>p.city===city&&(housingMode||searchMode)&&(!query||matchesHousing(p,query,city))).sort(housingFirst);
  const pendingHousingCount=(housingMode||searchMode)?housingResearchLeads(city,query||'').length:0;
- const housingDistricts=['全部区域',...new Set(resultHomes.map(p=>p.district))];
+ const housingPrograms=resultHomes.filter(p=>p.kind==='program');
+ const housingProjects=resultHomes.filter(p=>p.kind==='project');
+ const housingDistricts=['全部区域',...new Set(housingProjects.map(p=>p.district))];
  const activeDistrict=housingDistricts.includes(housingDistrict)?housingDistrict:'全部区域';
- const shownHomes=resultHomes.filter(p=>activeDistrict==='全部区域'||p.district===activeDistrict);
+ const shownProjects=housingProjects.filter(p=>activeDistrict==='全部区域'||p.district===activeDistrict);
+ const shownHomes=[...housingPrograms,...shownProjects];
  const cats=['全部类型',...new Set(resultPolicies.map(p=>p.category))];
  const shownPolicies=filter==='全部类型'?resultPolicies:resultPolicies.filter(p=>p.category===filter);
+ const housingPolicyCount=shownPolicies.length+housingPrograms.length;
  const relatedLink=(kindName:TalentListKind)=>talentListUrl(kindName,city);
  const doSearch=()=>{const parsed=parseTalentCityQuery(draft.trim(),city);navigate(!draft.trim()||(parsed.matchedCity&&parsed.cityOnly)?talentCityUrl(parsed.matchedCity?parsed.city:city):talentSearchUrl(parsed.city,draft.trim()))};
  return <><Bread city={city} current={title}/>
@@ -151,17 +156,21 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
   <section className="ts-sub-header">
    <span className="ts-section-kicker">{searchMode?'SEARCH RESULTS':'CITY SERVICES'} / {city}</span><h1>{city} · {title}</h1>
    <p>{searchMode?'搜索已收录政策、住房和明确标注的待核验项目；仅政府核实的资料可作为正式申报依据。':'按城市分类查看已收录政策和住房；政府原文、媒体转载、待核验项目会分别标明，不能据此认定正在受理或有空房。'}</p>
-   <div className="ts-sub-counts"><QuickCount count={shownPolicies.length} label="政策结果"/>{(housingMode||searchMode)&&<QuickCount count={shownHomes.length} label="已核实住房"/>}{pendingHousingCount>0&&<QuickCount count={pendingHousingCount} label="待核验公寓线索"/>}</div>
+   <div className="ts-sub-counts">{housingMode?<><QuickCount count={housingPolicyCount} label="住房政策与保障通道"/><QuickCount count={shownProjects.length} label="已核实独立项目"/></>:<><QuickCount count={shownPolicies.length} label="政策结果"/>{searchMode&&<QuickCount count={shownHomes.length} label="住房资料"/>}</>}{pendingHousingCount>0&&<QuickCount count={pendingHousingCount} label="待核验公寓线索"/>}</div>
   </section>
   <form className="ts-sub-search" onSubmit={e=>{e.preventDefault();doSearch()}}><Search size={18}/><input value={draft} onChange={e=>setDraft(e.target.value)} placeholder={'搜索'+city+'硕士补贴、住房项目…'} aria-label="搜索人才服务"/><button type="submit">搜索 <ArrowRight size={15}/></button></form>
   {searchMode&&query&&<p className="ts-sub-found">关键词：<strong>{query}</strong> · 实际匹配 {shownPolicies.length+shownHomes.length} 条</p>}
   {resultPolicies.length>0&&<div className="ts-sub-filters">{cats.map(c=><button key={c} type="button" aria-pressed={filter===c} className={filter===c?'active':''} onClick={()=>setFilter(c)}>{c}</button>)}</div>}
-  {shownPolicies.length>0&&<section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>人才政策与福利</h2>{searchMode&&<Link to={relatedLink('policies')}>浏览全部政策 <ArrowRight size={15}/></Link>}</div>
+  {shownPolicies.length>0&&<section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>{housingMode?'购房与租赁相关补贴政策':'人才政策与福利'}</h2>{searchMode&&<Link to={relatedLink('policies')}>浏览全部政策 <ArrowRight size={15}/></Link>}</div>
    <div className="ts-sub-grid">{shownPolicies.map(p=><PolicyTile data={p} key={p.id}/>)}</div></section>}
-  {resultHomes.length>0&&<section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>真实人才公寓与住房项目</h2>{searchMode&&<Link to={relatedLink('housing')}>浏览全部项目 <ArrowRight size={15}/></Link>}</div>
+  {housingPrograms.length>0&&<section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>人才住房保障制度与申请通道</h2>{searchMode&&<Link to={relatedLink('housing')}>浏览全部住房资料 <ArrowRight size={15}/></Link>}</div>
+   <p className="ts-housing-inventory-note">此处为政府公开的住房制度或累计项目总览，不是独立公寓、实时空房或已开放的申请批次。</p>
+   <div className="ts-sub-grid">{housingPrograms.map(h=><HousingTile data={h} key={h.id}/>)}</div></section>}
+  {housingProjects.length>0&&<section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>已核验的独立人才公寓与住房项目</h2>{searchMode&&<Link to={relatedLink('housing')}>浏览全部项目 <ArrowRight size={15}/></Link>}</div>
    {housingMode&&housingDistricts.length>2&&<div className="ts-housing-districts" aria-label="按区域筛选住房项目">{housingDistricts.map(d=><button type="button" key={d} aria-pressed={activeDistrict===d} className={activeDistrict===d?'active':''} onClick={()=>setHousingDistrict(d)}>{d}</button>)}</div>}
-   {shownHomes.length?<div className="ts-sub-grid">{shownHomes.map(h=><HousingTile data={h} key={h.id}/>)}</div>:<p className="ts-housing-filter-empty">该区域没有匹配的已核验项目，试试“全部区域”。</p>}
+   {shownProjects.length?<div className="ts-sub-grid">{shownProjects.map(h=><HousingTile data={h} key={h.id}/>)}</div>:<p className="ts-housing-filter-empty">该区域没有匹配的已核验项目，试试“全部区域”。</p>}
   </section>}
+  {housingMode&&!housingProjects.length&&<section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>独立人才公寓项目核验进度</h2></div><p className="ts-housing-inventory-note">目前尚未核实可按具体地址与批次申报的独立人才公寓项目。下方线索仍待官方配租公告确认，不能据此宣称有实时空房。</p></section>}
   {(housingMode||searchMode)&&<UnifiedTalentHousingResearch city={city} query={query}/>}
   {!shownPolicies.length&&!resultHomes.length&&!pendingHousingCount&&<Empty city={city} kind={searchMode?'匹配结果':title}/>}
   <section className="ts-sub-cross"><ShieldCheck size={17}/><span>静态官方资料索引，非政府实时申报系统。补贴金额、资格、截止时间和剩余房源以最新官方公告为准。政策整理日期：{TALENT_POLICY_REVIEW_DATE}；项目整理日期：{HOUSING_REVIEW_DATE}。</span></section>
