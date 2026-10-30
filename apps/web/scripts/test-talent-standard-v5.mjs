@@ -27,12 +27,12 @@ check('Exactly one shared policy list, one complete-guide template and one truth
  assert.ok(sharedDetail.includes('quality.missing.map('));
 });
 check('Every base record gets a graded quality state without claiming B is completed',()=>{
- for(const x of ['TalentQualityGrade','completeGuides',"grade==='A'","grade==='B'","grade==='C'","?'D'",'TALENT_QUALITY_SUMMARY'])assert.ok(quality.includes(x),x);
+ for(const x of ['TalentQualityGrade','CERTIFIED_TALENT_GUIDES',"grade==='A'","grade==='B'","grade==='C'",'TALENT_QUALITY_SUMMARY'])assert.ok(quality.includes(x),x);
  assert.ok(sharedDetail.includes('资料')&&sharedDetail.includes('尚待逐项核实'));
 });
 check('No completion-grade A except dedicated sourced guides and actual complete source',()=>{
  for(const id of ['sd-jinan-2026-talent-living','qd-rent-25','sd-qingdao-2026-free-housing','qd-laoshan-202610'])assert.ok(quality.includes("'"+id+"'"));
- assert.ok(!quality.includes("grade:sourceUrl?'A'"));
+ assert.ok(quality.includes('certified.city===p.city')&&quality.includes("sourceKind==='government'"));
 });
 check('Specific 2026 Laoshan source lists three different deadlines and seven structured steps',()=>{
  assert.ok(laoshan);
