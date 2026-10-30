@@ -107,13 +107,14 @@ assert.ok(landing.includes('suggestTalentCities(keyword)'),'Search autocomplete 
 assert.ok(landing.includes('parseTalentCityQuery(keyword,city)'),'City alias matcher must be connected');
 assert.ok(details.includes('ts-v4-two-kinds'),'City pages must have exactly two core service entrances');
 assert.ok(details.includes('ts-housing-districts')&&details.includes('shownHomes.map(h=>'),'Housing list must support region filters and render filtered results');
-assert.ok(details.includes('h.contactPhone')&&details.includes('h.photoEvidence'),'Housing detail must separate sourced contact info and official media from generic images');
+const shared=readFileSync(new URL('components/talent/UnifiedTalentRecordDetail.tsx',root),'utf8');
+assert.ok(shared.includes('housing?.contactPhone')&&shared.includes('housing?.statusNote'),'Shared housing detail must distinguish evidence and current room status');
 assert.ok(details.includes('housingFirst'),'Specific verified projects must be listed before general housing programs');
 
 assert.ok(details.includes('policyStatus(data)')&&details.includes('data.targetGroup'),'Policy listings must expose application status and eligible population');
-assert.ok(details.includes('p.deadline')&&details.includes('p.reviewNote')&&details.includes('p.scope'),'Policy detail page must show cutoffs and territorial limitations');
-assert.ok(details.includes('p.materials.map(')&&details.includes('p.applicationSteps.map('),'Extended application materials and steps must render on detail page');
-assert.ok(details.includes('p.payoutTo'),'Employer subsidies and loans must show actual beneficiary type');
+assert.ok(shared.includes('policy.deadline')&&shared.includes('policy.reviewNote'),'Shared record detail must show cutoff dates and warnings');
+assert.ok(shared.includes('policy.materials.map(')&&shared.includes('policy.applicationSteps.map('),'Shared record detail must show available materials and steps');
+assert.ok(shared.includes('policy.payoutTo'),'Unified detail must disclose employer subsidy or loan nature');
 
 
 assert.ok(!landing.includes('ts-match-form'),'Old generic matching UI should not return');

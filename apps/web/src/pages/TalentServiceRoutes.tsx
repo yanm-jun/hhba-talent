@@ -1,5 +1,5 @@
 import {useMemo,useState} from 'react';
-import {ArrowLeft,ArrowRight,ArrowUpRight,Building2,CheckCircle2,ClipboardCheck,ExternalLink,FileSearch,FileText,GraduationCap,Home,MapPin,Search,ShieldCheck,Wallet} from 'lucide-react';
+import {ArrowLeft,ArrowRight,ArrowUpRight,Building2,CheckCircle2,ClipboardCheck,FileSearch,FileText,GraduationCap,Home,MapPin,Search,ShieldCheck,Wallet} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
 import {parsePolicyQuery} from '../components/TalentPolicySearch';
@@ -13,6 +13,8 @@ import {TalentJinanPolicyPreview} from './TalentJinanPolicyPreview';
 import {TalentJinanGuidePreview} from './TalentJinanGuidePreview';
 import {TalentQingdaoPolicyPreview} from './TalentQingdaoPolicyPreview';
 import {TalentQingdaoGuidePreview} from './TalentQingdaoGuidePreview';
+import {TalentLaoshanGuide} from './TalentLaoshanGuide';
+import {UnifiedTalentRecordDetail} from '../components/talent/UnifiedTalentRecordDetail';
 import '../styles/talent-service.css';
 import '../styles/talent-subpages.css';
 
@@ -171,47 +173,8 @@ function GuideContent({city}:{city:string}){
 function DetailPage({kind,id}:{kind:'policy'|'housing';id:string}){
  const p=kind==='policy'?TALENT_POLICY_RECORDS.find(x=>x.id===id):undefined;
  const h=kind==='housing'?TALENT_HOUSING_RECORDS.find(x=>x.id===id):undefined;
- const x=p||h;
- if(!x)return <><Bread current="未找到该条资料"/><Empty city="所选城市" kind="详情"/></>;
- const city=x.city;
- const parent=kind==='housing'?{title:'人才公寓',to:talentListUrl('housing',city)}:{title:'人才政策',to:talentListUrl('policies',city)};
- return <><Bread city={city} parent={parent} current={x.title}/>
-  <article className="ts-sub-detail">
-   <div className="ts-sub-detail-hero">
-    <span className="ts-section-kicker">{kind==='housing'?'HOUSING DETAILS':'POLICY DETAILS'} / {city}</span>
-    <h1>{x.title}</h1><p>{kind==='housing'?(h?.district+' · '+h?.address):(p?.summary)}</p>
-    <div className="ts-sub-detail-tags"><span>{kind==='housing'?housingStatus(h!):policyStatus(p!)}</span>{p?.scope&&<span>政策范围：{p.scope}{p.district?' · '+p.district:''}</span>}
-    <span>来源 {kind==='housing'?h?.published:p?.published}</span><span>资料整理 {kind==='housing'?h?.reviewedAt:(p?.reviewedAt||TALENT_POLICY_REVIEW_DATE)}</span></div>
-   </div>
-   <div className="ts-sub-detail-body">
-    {p?<><section><h2>政策支持 / 福利待遇</h2><p className="ts-sub-emphasis">{p.benefit}</p></section>
-      {p.targetGroup&&<section><h2>适用对象与政策范围</h2><p>{p.targetGroup}{p.scope?' · '+p.scope:''}{p.district?' · '+p.district:''}</p></section>}
-      <section><h2>申请条件</h2><p>{p.eligibility}</p></section>
-      {p.deadline&&<section><h2>公告申报截止日期</h2><p className="ts-sub-emphasis">{p.deadline}{p.deadline<new Date().toISOString().slice(0,10)?' · 已截止，请查后续新批次':' · 请再次核对政府官网'}</p></section>}
-      <section><h2>办理流程与入口</h2><p>{p.application}</p></section>
-      {p.applicationSteps&&p.applicationSteps.length>0&&<section className="ts-sub-detailed-guidance"><h2>具体办理步骤</h2><ol>{p.applicationSteps.map((step,i)=><li key={i}>{step}</li>)}</ol></section>}
-      {p.materials&&p.materials.length>0&&<section className="ts-sub-detailed-guidance"><h2>建议准备的申请材料</h2><p className="ts-sub-material-caveat">下列是政策原文与经办要求整理的准备方向，并非官方最终申领清单，以当地受理页面实际要求为准。</p><ul>{p.materials.map((material,i)=><li key={i}>{material}</li>)}</ul></section>}
-      {p.payoutTo&&<section><h2>补贴发放或扶持对象</h2><p>{p.payoutTo==='用人单位'?'政策资金由符合条件的用人单位申报和享受，毕业生个人不应误认为自动到账。':p.payoutTo==='非现金贷款'?'本项是需要偿还的贷款融资，不是财政一次性现金补贴。':p.payoutTo==='住房折扣'?'属于指定项目购房折扣或抵扣，不属于可自由领取的现金。':'主要面向经资格核验的个人；须核查是否通过用人单位申报。'}</p></section>}
-      {p.reviewNote&&<aside className="ts-sub-policy-note"><ShieldCheck size={15}/><p>{p.reviewNote}</p></aside>}
-      <section><h2>政府发布部门与文件</h2><p>{p.department} · {p.sourceName} · {p.published}</p></section>
-    </>:h?<><section><h2>项目地址</h2><p>{h.address}</p></section>
-      <section><h2>房源规模与户型</h2><p>{h.units}</p></section>
-      <section><h2>租金及费用</h2><p className="ts-sub-emphasis">{h.rent}</p></section>
-      <section><h2>申请资格</h2><p>{h.eligibility}</p></section>
-      <section><h2>项目状态及实时空房说明</h2><p>{h.statusNote}</p></section>
-      {h.contactPhone&&<section><h2>官方目录公示咨询电话</h2><p><a href={'tel:'+h.contactPhone}>{h.contactPhone}</a> <small>号码来源于官方项目目录，接通与服务时间未核实。</small></p>{h.contactSourceUrl&&<p><a href={h.contactSourceUrl} rel="noopener noreferrer" target="_blank">查看政府发布的联系电话 <ExternalLink size={14}/></a></p>}</section>}
-      {h.photoEvidence==='source'&&<section><h2>官方项目实景资料</h2><p>政府或官方项目报道包含实景资料。当前平台未取得这些图片的再发布授权，点击下方“查看政府原文”可以核对真实项目照片；本站不使用通用住宅图片冒充。</p></section>}
-      <section><h2>申请办理步骤</h2><ol>{h.steps.map(step=><li key={step}>{step}</li>)}</ol></section>
-    </>:null}
-    <aside className="ts-sub-warning"><ShieldCheck size={19}/><span>这是政府公开文件的整理索引，不代表资格审核已通过。历史配租套数不是当前剩余房源，申请期与政策待遇请以政府最新通知为准。</span></aside>
-    <div className="ts-sub-detail-links"><a href={x.sourceUrl} rel="noopener noreferrer" target="_blank">查看政府原文 <ExternalLink size={16}/></a>
-      {h?.applyUrl&&<a href={h.applyUrl} rel="noopener noreferrer" target="_blank">官方申请渠道 / 说明 <ArrowUpRight size={16}/></a>}
-      {p?.applicationUrl&&<a href={p.applicationUrl} rel="noopener noreferrer" target="_blank">官方办理渠道 / 说明 <ArrowUpRight size={16}/></a>}
-    </div>
-   </div>
-  </article>
-  <div className="ts-sub-return"><Link to={parent.to}><ArrowLeft size={16}/> 返回{city}{parent.title}</Link></div>
- </>;
+ if(!p&&!h)return <><Bread current="未找到该条资料"/><Empty city="所选城市" kind="详情"/></>;
+ return <UnifiedTalentRecordDetail policy={p} housing={h}/>;
 }
 export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  const fragments=route.split('/').filter(Boolean);
@@ -225,6 +188,7 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  else if(kind==='policy-layout-preview'&&fragments[2]==='jinan')body=<TalentJinanPolicyPreview/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='jinan')body=<TalentJinanGuidePreview/>;
  else if(kind==='policy-layout-preview'&&fragments[2]==='qingdao')body=<TalentQingdaoPolicyPreview/>;
+ else if(kind==='policy-guide-preview'&&fragments[2]==='qingdao'&&fragments[3]==='laoshan')body=<TalentLaoshanGuide/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='qingdao')body=<TalentQingdaoGuidePreview kind={fragments[3]==='stay'?'stay':'housing'}/>;
  else if(kind==='match')body=<TalentMatchingPage city={decode(fragments[2]||'北京')||'北京'}/>;
  else if(kind==='policy'||kind==='housing')body=<DetailPage kind={kind} id={decode(fragments[2]||'')}/>;
