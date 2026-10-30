@@ -80,7 +80,7 @@ export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
  title:"天津高校毕业生灵活就业社会保险补贴",
  category:"就业创业",
  scope:"全市",
- published:"2024-12-01",
+ published:"2024年（具体日期待核验）",
  temporal:"historical",
  summary:"天津人社公开服务资料列有离校两年内未就业高校毕业生的灵活就业社保补贴规则。",
  benefit:"养老保险每月补贴600元、医疗保险每月200元；同时参保最高每月800元，补贴最长两年（依参保月份核算）。",
