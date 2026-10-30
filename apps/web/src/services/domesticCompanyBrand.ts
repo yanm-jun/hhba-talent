@@ -3,6 +3,7 @@ import media from '../data/domesticMediaBundle.json';
 import media200 from '../data/domesticMedia200Bundle.json';
 import catalogue from '../data/domesticAutumnBrandMediaRegistry.json';
 import {domesticV2Records} from './domesticRebuildJobs';
+import {employerProfileFor} from './employerProfiles';
 
 /**
  * One resolved asset per employer identity, reused by search cards, autumn
@@ -44,6 +45,8 @@ const findId=(name:string,route?:string)=>{
  return idFromRoute(route)||byName.get(name)||idFromRoute(jobRoutes.get(name))||null;
 };
 export function domesticBrandFor(input:{name:string;route?:string}):DomesticBrand|null{
+ const configured=employerProfileFor(input);
+ if(configured)return {path:configured.media.logo,source:'user_supplied',verifiedByOwner:false};
  const id=findId(input.name,input.route);
  if(id&&uploaded[id]&&safePath(uploaded[id]))return {path:uploaded[id],source:'user_supplied',verifiedByOwner:false};
  const saved=mediaBrands[input.name]?.brand;

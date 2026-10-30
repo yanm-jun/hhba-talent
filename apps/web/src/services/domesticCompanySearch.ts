@@ -1,6 +1,7 @@
 import curated from '../data/aiCompanyCatalog.json';
 import autumnCompanies from '../data/domesticAutumnScreenshot20261028.json';
 import {domesticV2Records} from './domesticRebuildJobs';
+import {employerProfiles} from './employerProfiles';
 import editorial from '../data/domesticCompanyEditorial.json';
 import careerProfiles from '../data/domesticCareerProfiles.json';
 import {domestic200Profiles as careerProfiles200} from './domesticCompany200Data';
@@ -211,6 +212,22 @@ export function getDomesticCompanies():DomesticCompany[]{
    if(record?.aliases?.length){
     item.aliases=[...new Set([...(item.aliases||[]),...record.aliases])];
    }
+  }
+  // Data-only profiles override stale roster cards and register their aliases.
+  for(const profile of employerProfiles){
+    const route='/companies/autumn/'+profile.id;
+    let item=map.find(c=>c.route===route);
+    if(!item){
+      item={id:profile.id,name:profile.name,industry:profile.industry,overview:profile.overview,
+        sourceUrl:profile.sources[0]||'',lastReviewed:profile.lastReviewed,tags:[],
+        route,status:'industry_reviewed',entityKind:'company'};
+      map.push(item);
+    }
+    item.name=profile.name;item.industry=profile.industry;item.overview=profile.overview;
+    item.sourceUrl=profile.sources[0]||item.sourceUrl;item.lastReviewed=profile.lastReviewed;
+    item.status='industry_reviewed';
+    item.aliases=[...new Set([...(item.aliases||[]),profile.englishName,...profile.aliases])];
+    if(profile.recruitment.status==='official_portal')item.careers=profile.recruitment.url;
   }
   cache=map;
   return map;
