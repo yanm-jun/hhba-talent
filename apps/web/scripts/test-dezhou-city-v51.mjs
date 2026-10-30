@@ -49,7 +49,7 @@ check('Real Yingcai, Youlai and Dongcheng leads are distinct and clearly pending
   const lead=byId(leads,id);assert.ok(lead,id);
   assert.notEqual(talentSourceKind(lead.sourceUrl),'government');
   assert.ok(lead.address&&lead.units&&lead.rent&&lead.eligibility&&lead.steps.length>=4);
-  assert.match(lead.statusNote,/待核|不等于/);
+  assert.match(lead.statusNote,/待核|待.*核验|未核验|不等于/);
   assert.ok(!homes.some(h=>h.id===id));
  }
  assert.equal(leads.length,4);
