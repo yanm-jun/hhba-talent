@@ -8,6 +8,7 @@ import {domesticV2Records} from '../services/domesticRebuildJobs';
 import {Link} from '../router';
 import {getDomesticCompanies,searchDomesticCompanies,type DomesticCompany} from '../services/domesticCompanySearch';
 import {companyMatchesSelectedMajor,majorById} from '../services/domesticMajors';
+import {visibleRoleForMajor} from '../services/majorJobMatching';
 import '../styles/domestic-company-search.css';
 type Preview={displayName?:string;summary?:string;brandImage?:string;officeLocations?:unknown[];photos?:unknown[];brandAssetStatus?:string};
 const allProfiles={...profiles,...additionalProfiles};
@@ -36,7 +37,13 @@ export function DomesticCompanyResults({query,majorSlug='',scope='',country='',c
   if(scope==='global')return [];
   // This control discovers Chinese business-related employers; it does not filter foreign ATS job openings.
   if(country&&!/^(cn|chn|china|中国|中国大陆)$/i.test(country))return [];
-  let eligible=chosen?all.filter(company=>company.entityKind!=='business'&&companyMatchesSelectedMajor(company,chosen.slug)):all;
+  // Company/major search must reuse the exact job-major matcher used inside
+  // rebuilt employer pages, not only legacy business-sector associations.
+  const reviewedRoutes=chosen?new Set(domesticV2Records
+    .filter(job=>job.employerRoute&&visibleRoleForMajor(job,chosen.slug,false))
+    .map(job=>job.employerRoute)) : null;
+  let eligible=chosen?all.filter(company=>company.entityKind!=='business'&&
+    (companyMatchesSelectedMajor(company,chosen.slug)||!!reviewedRoutes?.has(company.route))):all;
   if(city)eligible=eligible.filter(company=>(company.city||'').includes(city)||(company.province||'').includes(city));
   if(word)return searchDomesticCompanies(eligible,word,36);
   if(!chosen&&browse200){
