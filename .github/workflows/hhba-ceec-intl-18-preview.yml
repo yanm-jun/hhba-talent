@@ -1,4 +1,4 @@
-name: HHBA CEEC company 18 factory preview
+name: HHBA CEEC International company 18 factory preview
 # Final acceptance: on [preview] execute Chromium tests and additive GitHub Pages deploy.
 # Release candidate: data-only enterprise 18; prior public site must be preserved.
 on:
@@ -70,7 +70,7 @@ jobs:
         run: |
           npm run preview -- --host 127.0.0.1 --port 4183 >/tmp/ceec-intl-vite.log 2>&1 &
           for i in $(seq 1 40); do
-            if curl -fsS http://127.0.0.1:4183/hhba-talent/preview-ceec-intl/ >/dev/null; then break; fi
+            if curl -fsS http://127.0.0.1:4173/hhba-talent/preview-ceec-intl/ >/dev/null; then break; fi
             sleep 1
           done
           node scripts/ceec-intl-18.browser.mjs

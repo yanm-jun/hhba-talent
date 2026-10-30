@@ -29,7 +29,7 @@ try{
   assert.equal(await root.locator('.hhba-kpmg-service').count(),4);
   await root.getByRole('button',{name:/查看更多业务/}).click();
   assert.equal(await root.locator('.hhba-kpmg-service').count(),6);
-  await page.screenshot({path:dir+'/svolt-'+width+'.png',fullPage:true});
+  await page.screenshot({path:dir+'/ceec-'+width+'.png',fullPage:true});
   if(width===1440){
    await page.goto(base+'candidate/jobs',{waitUntil:'domcontentloaded'});
    const search=page.getByRole('textbox',{name:'自然语言搜索岗位'});
@@ -42,7 +42,7 @@ try{
     const mark=card.locator('.domestic-result-brand img');await mark.waitFor();
     await mark.evaluate(async el=>{if(!el.complete)await new Promise(r=>{el.onload=r;el.onerror=r});if(!el.naturalWidth)throw Error('Search result CEEC logo missing')});
    }
-   await search.fill('CEEC');await page.screenshot({path:dir+'/search-svolt.png',fullPage:true});
+   await search.fill('CEEC');await page.screenshot({path:dir+'/search-ceec.png',fullPage:true});
    await page.goto(base+'candidate/jobs/cn-v2-profile-cn-autumn-014-technical-management-2027',{waitUntil:'domcontentloaded'});
    await page.getByText('技术管理岗',{exact:false}).first().waitFor({timeout:17000});
   }
@@ -50,5 +50,5 @@ try{
   await page.close();
  }
  writeFileSync(dir+'/result.json',JSON.stringify({profile:'cn-autumn-014',roleCategories:5,assets:3,template:'factory-v1',search:['能建','中国能建国际集团','CEEC'],major:true,mobile:true,status:'source-backed-categories-open-state-not-verified',result:'PASS'},null,2));
- console.log('HHBA_CEEC_17_FACTORY_3_IMAGES_7_CAMPUS_CATEGORIES_SEARCH_MAJORS_PASS');
+ console.log('HHBA_CEEC_18_FACTORY_3_IMAGES_5_CAMPUS_CATEGORIES_SEARCH_MAJORS_PASS');
 }finally{await browser.close()}
