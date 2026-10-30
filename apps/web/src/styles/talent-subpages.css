@@ -21,3 +21,12 @@
 .ts-sub-detail-body section a{color:#2672c6;display:inline-flex;align-items:center;gap:6px}
 .ts-sub-detail-body section small{font-size:11px;color:#8794a5;display:block;margin-top:5px}
 @media(max-width:720px){.ts-housing-short-facts{padding:12px}.ts-housing-districts{gap:6px}.ts-housing-districts button{font-size:11px}}
+
+/* HHBA V4.7: detailed official-policy reading structure, no homepage changes. */
+.ts-sub-detailed-guidance{background:#fbfcff;border:1px solid #ebf0f9;border-radius:12px;padding:17px 20px;margin-top:14px}
+.ts-sub-detailed-guidance h2{color:#2d568c}
+.ts-sub-detailed-guidance ol,.ts-sub-detailed-guidance ul{padding-left:22px;margin:10px 0 0;color:#4d617b;line-height:1.9;font-size:13px}
+.ts-sub-detailed-guidance li+li{margin-top:8px}
+.ts-sub-detailed-guidance .ts-sub-material-caveat{margin:5px 0 9px;color:#887652;font-size:12px;line-height:1.7}
+.ts-sub-tile p.ts-sub-payout-hint{font-size:11px;color:#9a754b;background:#fff7e9;border-radius:7px;padding:8px 11px;margin:8px 0}
+@media(max-width:680px){.ts-sub-detailed-guidance{padding:14px 15px}}

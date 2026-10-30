@@ -112,6 +112,9 @@ assert.ok(details.includes('housingFirst'),'Specific verified projects must be l
 
 assert.ok(details.includes('policyStatus(data)')&&details.includes('data.targetGroup'),'Policy listings must expose application status and eligible population');
 assert.ok(details.includes('p.deadline')&&details.includes('p.reviewNote')&&details.includes('p.scope'),'Policy detail page must show cutoffs and territorial limitations');
+assert.ok(details.includes('p.materials.map(')&&details.includes('p.applicationSteps.map('),'Extended application materials and steps must render on detail page');
+assert.ok(details.includes('p.payoutTo'),'Employer subsidies and loans must show actual beneficiary type');
+
 
 assert.ok(!landing.includes('ts-match-form'),'Old generic matching UI should not return');
 const directory=readFileSync(new URL('pages/TalentCityDirectory.tsx',root),'utf8');
