@@ -153,5 +153,13 @@ def main():
  "profile_count":len(list((ROOT/"apps/web/src/data/employerProfiles").glob("cn-autumn-*.json")))
  })
  git("add","--","apps/web/src","apps/web/public/images","apps/web/scripts")
+ # Repo .gitignore contains a broad 'data/' rule. These reviewed JSON files
+ # are intentionally versioned source, NOT local user test data.
+ for path in eligible:
+  if path.startswith("apps/web/src/data/") and (ROOT/path).is_file():
+   git("add","-f","--",path)
+ for required in ["cn-autumn-021.json","cn-autumn-025.json"]:
+  if not git("ls-files","--error-unmatch","--","apps/web/src/data/employerProfiles/"+required,check=False).returncode==0:
+   raise RuntimeError("Missing staged reviewed employer: "+required)
  print(git("status","--short").stdout[:18000])
 if __name__=="__main__":main()
