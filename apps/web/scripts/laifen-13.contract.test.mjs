@@ -22,8 +22,8 @@ assert(page.includes('hhba-kpmg-photo-grid')&&page.includes('主要业务与专�
 assert(!page.includes('<MajorFilter')&&!page.includes('清除专业'));
 assert(page.includes('data-hhba-recruitment-outbound="true"'));
 assert(routes.includes("if(route==='/companies/autumn/cn-autumn-009')return <LaifenCompactProfilePage user={user}/>"));
-assert(catalog.includes('...ankerV2Records,...laifenV2Records]'));
-assert(catalog.includes('laifenV2Records.length!==6||domesticV2Records.length!==150'));
+assert(catalog.includes('...ankerV2Records,...laifenV2Records,...shkpV2Records]'));
+assert(catalog.includes('laifenV2Records.length!==6||shkpV2Records.length!==8||domesticV2Records.length!==158'));
 assert(live.includes("job.platform==='laifen-sourced-archived'"));
 assert(live.includes("'Laifen'")&&live.includes("'徕芬科技'"));
 assert(brand.includes('images/laifen-user/laifen-logo.webp'));
