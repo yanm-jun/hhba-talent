@@ -97,6 +97,25 @@ try {
       'Do not show zero jobs when this saved employer has matched historical records');
     await page.screenshot({path:out+'/frog-prince-two-character-search.png',fullPage:true});
    }
+   // Regression for the actual reported symptom: "青岛" must show a company,
+   // sourced job records, and a sharable search URL. A reload must not lose it.
+   if(id==='cn-autumn-025'){
+    await search.fill('青岛');
+    const bank=page.locator('.domestic-company-card').filter({hasText:'青岛银行'}).first();
+    await bank.waitFor({state:'visible',timeout:20000});
+    await page.getByText('所辖分支机构 · 客户经理岗位',{exact:false}).first().waitFor({timeout:20000});
+    await page.waitForFunction(()=>new URLSearchParams(location.search).get('q')==='青岛',{timeout:10000});
+    assert.equal(await page.locator('[data-hhba-company-search="true"]').count(),1,'No independent employer search section');
+    assert.equal(await page.locator('[data-hhba-preview-version="factory-v2"]').count(),1,'Must show a clear preview version label');
+    assert.equal(await page.getByText('当前没有通过近期核验的岗位，请尝试其他筛选条件。',{exact:true}).count(),0,'Old false empty-state visible');
+    await page.screenshot({path:out+'/qingdao-short-search-before-reload.png',fullPage:true});
+    await page.reload({waitUntil:'domcontentloaded'});
+    await page.getByRole('textbox',{name:'自然语言搜索岗位'}).waitFor();
+    assert.equal(await page.getByRole('textbox',{name:'自然语言搜索岗位'}).inputValue(),'青岛','Search URL must survive reload');
+    await page.locator('.domestic-company-card').filter({hasText:'青岛银行'}).first().waitFor({state:'visible',timeout:20000});
+    await page.getByText('所辖分支机构 · 客户经理岗位',{exact:false}).first().waitFor({timeout:20000});
+    await page.screenshot({path:out+'/qingdao-short-search-after-reload.png',fullPage:true});
+   }
    result.search=true;
    await page.goto(base,{waitUntil:'domcontentloaded'});
    const logo=page.locator('.home-company-marquee-item img[alt*="'+p.name+'"]').first();
