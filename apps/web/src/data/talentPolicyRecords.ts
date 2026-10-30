@@ -1,3 +1,4 @@
+import {WEIFANG_POLICY_RECORDS} from './weifangPolicyRecords';
 // HHBA policy index v1. All entries are traceable to public government primary sources.
 // Static snapshots as reviewed 2026-10-30; NEVER claim live availability, eligibility, or vacancy.
 export type TalentPolicyRecord={
@@ -6,7 +7,7 @@ export type TalentPolicyRecord={
  published:string;sourceUrl:string;sourceName:string;applicationUrl?:string;
  temporal:'policy'|'past-window'|'historical';keywords:string[];
  scope?:'全市'|'特定区域'|'年度批次'; deadline?:string; targetGroup?:string; reviewNote?:string; reviewedAt?:string;
- materials?:string[];applicationSteps?:string[];payoutTo?:'个人'|'用人单位'|'非现金贷款'|'住房折扣';
+ materials?:string[];applicationSteps?:string[];payoutTo?:'个人'|'用人单位'|'非现金贷款'|'住房折扣';headlineAmount?:string;headlineUnit?:string;
 };
 export const TALENT_POLICY_REVIEW_DATE='2026-10-30';
 export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
@@ -420,4 +421,5 @@ export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
  sourceName:'重庆市政府网：高校毕业生等青年就业补贴政策新闻解读',temporal:'policy',
  keywords:['重庆','重庆市','高校毕业生','本科','硕士','博士','就业','社保','补贴','求职','灵活就业','毕业']},
 
+...WEIFANG_POLICY_RECORDS,
 ];
