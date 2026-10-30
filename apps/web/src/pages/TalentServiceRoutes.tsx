@@ -102,6 +102,7 @@ function CityHub({city}:{city:string}){
  if(!match)return <><Bread current="城市尚未收录"/><section className="ts-sub-header"><h1>该城市尚未加入本次城市名录</h1><p>当前目标范围是4个直辖市和293个地级市，不包含县级市、自治州、地区和盟。请先到全国城市目录核对名称。</p><Link to="/talent-service/cities">返回全国城市目录 <ArrowRight size={16}/></Link></section></>;
  const policies=TALENT_POLICY_RECORDS.filter(p=>p.city===match.name).sort(recentPolicies);
  const homes=TALENT_HOUSING_RECORDS.filter(h=>h.city===match.name);
+ const allHousingHistorical=homes.length>0&&homes.every(h=>Boolean(h.applicationEnd&&h.applicationEnd<new Date().toISOString().slice(0,10)));
  const hasSources=policies.length+homes.length>0;
  return <>
   <Bread current={match.official+' · 人才服务'}/>
@@ -109,13 +110,14 @@ function CityHub({city}:{city:string}){
    <span className="ts-section-kicker">{match.level==='municipality'?'MUNICIPALITY / 直辖市':'CITY SERVICES / 已收录城市'}</span>
    <h1>{match.official} · 人才服务</h1>
    <p>{hasSources?match.intro+'。从下面两个入口查看已有政府来源的政策和住房资料。':'该城市入口已开通，人才政策与住房资料正在整理。我们不会生成未经核验的补贴金额、公寓或申请入口。'}</p>
-   <div className="ts-sub-counts"><QuickCount count={policies.length} label="已收录政策"/><QuickCount count={homes.length} label="已收录住房资料"/>{!hasSources&&<span className="ts-v4-data-pending">官方资料整理中</span>}</div>
+   {allHousingHistorical&&<p>住房资料均为已结束的公开配租批次，不代表当前有空房或可直接申报；请关注住建部门新公告。</p>}
+   <div className="ts-sub-counts"><QuickCount count={policies.length} label="已收录政策"/><QuickCount count={homes.length} label={allHousingHistorical?'住房历史配租资料':'已收录住房资料'}/>{!hasSources&&<span className="ts-v4-data-pending">官方资料整理中</span>}</div>
   </section>
   <section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>你想了解什么？</h2><Link to="/talent-service/cities">更换城市 <ArrowRight size={15}/></Link></div>
    <div className="ts-sub-kinds ts-v4-two-kinds">
     {kinds.map(k=><Link key={k.id} className="ts-sub-kind" to={match.name==='青岛'&&k.id==='policies'?'/talent-service/policy-layout-preview/qingdao':talentListUrl(k.id,match.name)}>
       <k.icon size={25}/><strong>{k.name}</strong><small>{k.description}</small>
-      <span className="ts-v4-kind-count">{k.id==='policies'?policies.length:homes.length} 条已收录 <ArrowRight size={15}/></span>
+      <span className="ts-v4-kind-count">{k.id==='policies'?policies.length:homes.length} 条已收录{k.id==='housing'&&allHousingHistorical?' · 历史批次':''} <ArrowRight size={15}/></span>
      </Link>)}
    </div>
   </section>
