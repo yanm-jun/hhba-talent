@@ -1,0 +1,48 @@
+name: HHBA China Comservice GX 20 source brand images
+on:
+  push:
+    branches: [feat/employer-factory-pilot-chinaccs-gx-20-20261030]
+    paths: ['.github/workflows/hhba-chinaccs-gx-20-media.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/employer-factory-pilot-chinaccs-gx-20-20261030
+      - name: Source corporate mark and inspect genuine China Comservice photo gallery
+        shell: bash
+        run: |
+          python -m pip -q install requests Pillow beautifulsoup4
+          python - <<'PY'
+          import requests
+          from bs4 import BeautifulSoup
+          from urllib.parse import urljoin
+          s=requests.Session()
+          s.headers.update({'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126 Safari/537.36'})
+          pages=[
+          'https://www.chinaccs.com.hk/tc/media/photo.php',
+          'https://www.chinaccs.com.hk/tc/media/logo.php',
+          'http://guangxi.chinaccs.cn/',
+          'https://www.chinaccs.cn/',
+          'https://www.chinaccs.com.hk/sc/media/photo.php']
+          for site in pages:
+           try:
+            r=s.get(site,timeout=15)
+            print('SOURCE',site,r.status_code,len(r.content),r.url,flush=True)
+            if r.status_code!=200:continue
+            soup=BeautifulSoup(r.content,'html.parser')
+            items=[]
+            for tag in soup.select('img,source'):
+             src=tag.get('data-src') or tag.get('src')
+             if not src or src.startswith('data:'):continue
+             url=urljoin(r.url,src)
+             if url not in items:items.append(url)
+            print('IMAGE_LIST',site,len(items),flush=True)
+            for item in items[:90]:print('IMG',item,flush=True)
+           except Exception as e:print('SOURCE_ERROR',site,str(e)[:150],flush=True)
+          PY
