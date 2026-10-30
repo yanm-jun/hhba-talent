@@ -307,7 +307,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       major={majorById(selectedMajor)?.name||''}
       scope={filters.country} country={filters.location_country||''}
       city={cityOptions.find(c=>c.value===filters.city)?.zh||''}/>}
-    {!rebuilding&&!curatedHundred&&<DomesticCompanyResults query={draft} majorSlug={selectedMajor}
+    {!curatedHundred&&(!rebuilding||draft.trim())&&<DomesticCompanyResults query={draft} majorSlug={selectedMajor}
       scope={filters.country} country={filters.location_country||''}
       city={cityOptions.find(c=>c.value===filters.city)?.zh||''}/>}
     {intentLabels.length>0&&<div className="unified-search-interpreted">

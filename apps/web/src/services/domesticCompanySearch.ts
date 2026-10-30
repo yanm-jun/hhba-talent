@@ -1,4 +1,6 @@
 import curated from '../data/aiCompanyCatalog.json';
+import autumnCompanies from '../data/domesticAutumnScreenshot20261028.json';
+import {domesticV2Records} from './domesticRebuildJobs';
 import editorial from '../data/domesticCompanyEditorial.json';
 import careerProfiles from '../data/domesticCareerProfiles.json';
 import {domestic200Profiles as careerProfiles200} from './domesticCompany200Data';
@@ -153,6 +155,27 @@ export function getDomesticCompanies():DomesticCompany[]{
    map.push(entry);
    indexed.set(normalize(companyName),entry);
   }
+  // The 156 unique user-supplied autumn employers are part of HHBA's company
+  // directory, even if they have no currently verified individual job posting.
+  // Keep existing legal identities, but route an exact-name match to the reviewed
+  // autumn page; never fabricate a recruitment portal or job.
+  const knownNames=createCompanyIndex(map);
+  for(const row of autumnCompanies.entries){
+    const key=normalize(row.name);
+    const existing=knownNames.get(key);
+    if(existing){
+      if(normalize(existing.name)===key)existing.route='/companies/autumn/'+row.id;
+      continue;
+    }
+    const item:DomesticCompany={
+      id:row.id,name:row.name,
+      industry:'国内企业档案',overview:'已登记国内企业名称，业务、招聘信息以逐家核验资料为准。',
+      sourceUrl:row.evidenceUrl||'',lastReviewed:autumnCompanies.checkedOn,
+      tags:[],route:'/companies/autumn/'+row.id,
+      status:'official_entry_only',entityKind:'company'
+    };
+    map.push(item);knownNames.set(key,item);
+  }
   // Recruitment links must be verified for the *exact* employer; no inherited group portal.
   for(const item of map){
    const exact=verifiedCareerProfiles[item.name];
@@ -185,6 +208,10 @@ export function getDomesticCompanies():DomesticCompany[]{
   return map;
 }
 export function loadDomesticCompanies():Promise<DomesticCompany[]>{return Promise.resolve(getDomesticCompanies());}
+// Prioritize actual reviewed HHBA domestic employers in broad one-character
+// searches, rather than dropping the requested company behind an arbitrary top 16.
+const reviewedEmployerRoutes=new Set(domesticV2Records.map(job=>job.employerRoute).filter(Boolean));
+const autumnEmployerRoutes=new Set(autumnCompanies.entries.map(item=>'/companies/autumn/'+item.id));
 const synonyms:Record<string,string[]>={
  '电气自动化':['电气','自动化','电力','工业控制','控制系统','PLC','伺服','变频','机电','智能制造','电网','输配电','机器人'],
  '机械制造':['机械','机床','工业装备','智能制造','工程机械','机器人','制造'],
@@ -197,7 +224,7 @@ export function searchDomesticCompanies(all:DomesticCompany[],raw:string,limit=3
  const query=normalize(raw.trim());
  if(!query)return [];
  const oneCharacter=Array.from(query).length===1;
- const take=oneCharacter?Math.min(limit,16):limit;
+ const take=Math.max(1,Math.min(limit,100));
  const parts=raw.trim().split(/[\s,，、；;]+/).map(normalize).filter(Boolean);
  const words=parts.length>1?parts:[query];
  const expansions=oneCharacter?[]:[...new Set(Object.entries(synonyms).filter(([k])=>query.includes(normalize(k))||normalize(k).includes(query))
@@ -230,6 +257,8 @@ export function searchDomesticCompanies(all:DomesticCompany[],raw:string,limit=3
   }
   // One-character Chinese queries ONLY search names; avoid 5,000 unrelated industry matches.
   if(oneCharacter&&!named)score=0;
+  if(score>0&&reviewedEmployerRoutes.has(company.route))score+=4200;
+  else if(score>0&&autumnEmployerRoutes.has(company.route))score+=550;
   if(score>0&&company.status==='industry_reviewed')score+=95;
   if(score>0&&verifiedCareerProfiles[company.name]?.summary)score+=170;
   return {company,score};
