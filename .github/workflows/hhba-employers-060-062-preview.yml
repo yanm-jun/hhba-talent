@@ -1,0 +1,57 @@
+name: HHBA employers 060-062 independent four-block preview
+on:
+  push:
+    branches: [feature/employers-060-062-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-employers-060-062-static-build
+  cancel-in-progress: true
+jobs:
+  validate-static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install exact front-end dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Validate prior-batch and current-batch four-block contracts
+        working-directory: apps/web
+        run: |
+          node scripts/employers-054-056-v2.contract.test.mjs
+          node scripts/employers-057-059-v2.contract.test.mjs
+          node scripts/employers-060-062-v2.contract.test.mjs
+      - name: Guard recruitment market regressions
+        working-directory: apps/web
+        run: node scripts/recruitment-market-source-invalid.regression.test.mjs
+      - name: Build independent full V2 static snapshot
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: |
+          npm run build
+          node scripts/materialize-company-route-entries.mjs
+      - name: Assert 60-62 assets included in output
+        run: |
+          test -s apps/web/dist/index.html
+          for id in 060 061 062; do
+            for f in logo.svg photo1.svg photo2.svg; do
+              test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/$f"
+            done
+          done
+      - name: Upload review-only static artifact, never overwrite Pages main
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-employers-060-062-four-panel-review-static
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
