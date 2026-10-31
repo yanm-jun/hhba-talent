@@ -37,5 +37,7 @@ jobs:
         run: node --experimental-strip-types scripts/test-hainan-sourced-v51.mjs
       - name: Check sourced Shenyang 2026 housing record
         run: node --experimental-strip-types scripts/test-shenyang-housing-gap-v51.mjs
+      - name: Verify new prefecture-level administrative catalog
+        run: node --experimental-strip-types scripts/test-talent-prefecture-25-v51.mjs
       - name: Confirm static build
         run: npm run build

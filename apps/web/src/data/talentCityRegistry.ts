@@ -621,6 +621,485 @@ export const TALENT_HEILONGJIANG_DISTRICTS:TalentCity[]=[{
 }];
 export const TALENT_HUBEI_PREFECTURE:TalentCity={name:'恩施',official:'恩施土家族苗族自治州',province:'湖北省',level:'prefecture',intro:'湖北省恩施州人才政策基础资料，具体市州待遇和申报批次待核验',aliases:['恩施','恩施州','恩施土家族苗族自治州','enshi','en shi','湖北恩施','湖北省恩施'],code:'422800',pinyin:'en shi',initials:'es'};
 export const TALENT_HUNAN_AUTONOMOUS_PREFECTURES:TalentCity[]=[{name:'湘西',official:'湘西土家族苗族自治州',province:'湖南省',level:'prefecture',intro:'2026湖南省创业求职扶持、青年安居“一间房”制度和支持湘西自治州高质量发展政策；实物房源及地方专项需逐项核实',code:'433100',pinyin:'xiang xi',initials:'xx',aliases:['湘西','湘西州','湘西自治州','湘西土家族苗族自治州','湖南湘西','湖南省湘西土家族苗族自治州','xiang xi','xiangxi','xxz']}];
+/** 25 prefecture-level autonomous prefectures/districts recognized in the project's PCA source.
+ * These are directory-only entries. No B or A grade policy record is implied. */
+export const TALENT_NEW_PREFECTURES_20261031:TalentCity[]=[
+  {
+    "province": "四川省",
+    "name": "阿坝",
+    "official": "阿坝藏族羌族自治州",
+    "code": "513200",
+    "pinyin": "a ba",
+    "initials": "ab",
+    "level": "prefecture",
+    "intro": "阿坝藏族羌族自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "阿坝",
+      "阿坝藏族羌族自治州",
+      "四川省阿坝藏族羌族自治州",
+      "四川省阿坝",
+      "a ba",
+      "aba",
+      "ab"
+    ]
+  },
+  {
+    "province": "四川省",
+    "name": "甘孜",
+    "official": "甘孜藏族自治州",
+    "code": "513300",
+    "pinyin": "gan zi",
+    "initials": "gz",
+    "level": "prefecture",
+    "intro": "甘孜藏族自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "甘孜",
+      "甘孜藏族自治州",
+      "四川省甘孜藏族自治州",
+      "四川省甘孜",
+      "gan zi",
+      "ganzi",
+      "gz"
+    ]
+  },
+  {
+    "province": "四川省",
+    "name": "凉山",
+    "official": "凉山彝族自治州",
+    "code": "513400",
+    "pinyin": "liang shan",
+    "initials": "ls",
+    "level": "prefecture",
+    "intro": "凉山彝族自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "凉山",
+      "凉山彝族自治州",
+      "四川省凉山彝族自治州",
+      "四川省凉山",
+      "liang shan",
+      "liangshan",
+      "ls"
+    ]
+  },
+  {
+    "province": "贵州省",
+    "name": "黔西南",
+    "official": "黔西南布依族苗族自治州",
+    "code": "522300",
+    "pinyin": "qian xi nan",
+    "initials": "qxn",
+    "level": "prefecture",
+    "intro": "黔西南布依族苗族自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "黔西南",
+      "黔西南布依族苗族自治州",
+      "贵州省黔西南布依族苗族自治州",
+      "贵州省黔西南",
+      "qian xi nan",
+      "qianxinan",
+      "qxn"
+    ]
+  },
+  {
+    "province": "贵州省",
+    "name": "黔东南",
+    "official": "黔东南苗族侗族自治州",
+    "code": "522600",
+    "pinyin": "qian dong nan",
+    "initials": "qdn",
+    "level": "prefecture",
+    "intro": "黔东南苗族侗族自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "黔东南",
+      "黔东南苗族侗族自治州",
+      "贵州省黔东南苗族侗族自治州",
+      "贵州省黔东南",
+      "qian dong nan",
+      "qiandongnan",
+      "qdn"
+    ]
+  },
+  {
+    "province": "贵州省",
+    "name": "黔南",
+    "official": "黔南布依族苗族自治州",
+    "code": "522700",
+    "pinyin": "qian nan",
+    "initials": "qn",
+    "level": "prefecture",
+    "intro": "黔南布依族苗族自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "黔南",
+      "黔南布依族苗族自治州",
+      "贵州省黔南布依族苗族自治州",
+      "贵州省黔南",
+      "qian nan",
+      "qiannan",
+      "qn"
+    ]
+  },
+  {
+    "province": "西藏自治区",
+    "name": "阿里",
+    "official": "阿里地区",
+    "code": "542500",
+    "pinyin": "a li",
+    "initials": "al",
+    "level": "prefecture",
+    "intro": "阿里地区已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "阿里",
+      "阿里地区",
+      "西藏自治区阿里地区",
+      "西藏自治区阿里",
+      "a li",
+      "ali",
+      "al"
+    ]
+  },
+  {
+    "province": "甘肃省",
+    "name": "临夏",
+    "official": "临夏回族自治州",
+    "code": "622900",
+    "pinyin": "lin xia",
+    "initials": "lx",
+    "level": "prefecture",
+    "intro": "临夏回族自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "临夏",
+      "临夏回族自治州",
+      "甘肃省临夏回族自治州",
+      "甘肃省临夏",
+      "lin xia",
+      "linxia",
+      "lx"
+    ]
+  },
+  {
+    "province": "甘肃省",
+    "name": "甘南",
+    "official": "甘南藏族自治州",
+    "code": "623000",
+    "pinyin": "gan nan",
+    "initials": "gn",
+    "level": "prefecture",
+    "intro": "甘南藏族自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "甘南",
+      "甘南藏族自治州",
+      "甘肃省甘南藏族自治州",
+      "甘肃省甘南",
+      "gan nan",
+      "gannan",
+      "gn"
+    ]
+  },
+  {
+    "province": "青海省",
+    "name": "海北",
+    "official": "海北藏族自治州",
+    "code": "632200",
+    "pinyin": "hai bei",
+    "initials": "hb",
+    "level": "prefecture",
+    "intro": "海北藏族自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "海北",
+      "海北藏族自治州",
+      "青海省海北藏族自治州",
+      "青海省海北",
+      "hai bei",
+      "haibei",
+      "hb"
+    ]
+  },
+  {
+    "province": "青海省",
+    "name": "黄南",
+    "official": "黄南藏族自治州",
+    "code": "632300",
+    "pinyin": "huang nan",
+    "initials": "hn",
+    "level": "prefecture",
+    "intro": "黄南藏族自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "黄南",
+      "黄南藏族自治州",
+      "青海省黄南藏族自治州",
+      "青海省黄南",
+      "huang nan",
+      "huangnan",
+      "hn"
+    ]
+  },
+  {
+    "province": "青海省",
+    "name": "海南州",
+    "official": "海南藏族自治州",
+    "code": "632500",
+    "pinyin": "hai nan zhou",
+    "initials": "hnz",
+    "level": "prefecture",
+    "intro": "海南藏族自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "海南州",
+      "海南藏族自治州",
+      "青海省海南藏族自治州",
+      "青海省海南州",
+      "hai nan zhou",
+      "hainanzhou",
+      "hnz"
+    ]
+  },
+  {
+    "province": "青海省",
+    "name": "果洛",
+    "official": "果洛藏族自治州",
+    "code": "632600",
+    "pinyin": "guo luo",
+    "initials": "gl",
+    "level": "prefecture",
+    "intro": "果洛藏族自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "果洛",
+      "果洛藏族自治州",
+      "青海省果洛藏族自治州",
+      "青海省果洛",
+      "guo luo",
+      "guoluo",
+      "gl"
+    ]
+  },
+  {
+    "province": "青海省",
+    "name": "玉树",
+    "official": "玉树藏族自治州",
+    "code": "632700",
+    "pinyin": "yu shu",
+    "initials": "ys",
+    "level": "prefecture",
+    "intro": "玉树藏族自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "玉树",
+      "玉树藏族自治州",
+      "青海省玉树藏族自治州",
+      "青海省玉树",
+      "yu shu",
+      "yushu",
+      "ys"
+    ]
+  },
+  {
+    "province": "青海省",
+    "name": "海西",
+    "official": "海西蒙古族藏族自治州",
+    "code": "632800",
+    "pinyin": "hai xi",
+    "initials": "hx",
+    "level": "prefecture",
+    "intro": "海西蒙古族藏族自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "海西",
+      "海西蒙古族藏族自治州",
+      "青海省海西蒙古族藏族自治州",
+      "青海省海西",
+      "hai xi",
+      "haixi",
+      "hx"
+    ]
+  },
+  {
+    "province": "新疆维吾尔自治区",
+    "name": "昌吉",
+    "official": "昌吉回族自治州",
+    "code": "652300",
+    "pinyin": "chang ji",
+    "initials": "cj",
+    "level": "prefecture",
+    "intro": "昌吉回族自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "昌吉",
+      "昌吉回族自治州",
+      "新疆维吾尔自治区昌吉回族自治州",
+      "新疆维吾尔自治区昌吉",
+      "chang ji",
+      "changji",
+      "cj"
+    ]
+  },
+  {
+    "province": "新疆维吾尔自治区",
+    "name": "博尔塔拉",
+    "official": "博尔塔拉蒙古自治州",
+    "code": "652700",
+    "pinyin": "bo er ta la",
+    "initials": "betl",
+    "level": "prefecture",
+    "intro": "博尔塔拉蒙古自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "博尔塔拉",
+      "博尔塔拉蒙古自治州",
+      "新疆维吾尔自治区博尔塔拉蒙古自治州",
+      "新疆维吾尔自治区博尔塔拉",
+      "bo er ta la",
+      "boertala",
+      "betl"
+    ]
+  },
+  {
+    "province": "新疆维吾尔自治区",
+    "name": "巴音郭楞",
+    "official": "巴音郭楞蒙古自治州",
+    "code": "652800",
+    "pinyin": "ba yin guo leng",
+    "initials": "bygl",
+    "level": "prefecture",
+    "intro": "巴音郭楞蒙古自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "巴音郭楞",
+      "巴音郭楞蒙古自治州",
+      "新疆维吾尔自治区巴音郭楞蒙古自治州",
+      "新疆维吾尔自治区巴音郭楞",
+      "ba yin guo leng",
+      "bayinguoleng",
+      "bygl"
+    ]
+  },
+  {
+    "province": "新疆维吾尔自治区",
+    "name": "阿克苏",
+    "official": "阿克苏地区",
+    "code": "652900",
+    "pinyin": "a ke su",
+    "initials": "aks",
+    "level": "prefecture",
+    "intro": "阿克苏地区已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "阿克苏",
+      "阿克苏地区",
+      "新疆维吾尔自治区阿克苏地区",
+      "新疆维吾尔自治区阿克苏",
+      "a ke su",
+      "akesu",
+      "aks"
+    ]
+  },
+  {
+    "province": "新疆维吾尔自治区",
+    "name": "克孜勒苏",
+    "official": "克孜勒苏柯尔克孜自治州",
+    "code": "653000",
+    "pinyin": "ke zi le su",
+    "initials": "kzls",
+    "level": "prefecture",
+    "intro": "克孜勒苏柯尔克孜自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "克孜勒苏",
+      "克孜勒苏柯尔克孜自治州",
+      "新疆维吾尔自治区克孜勒苏柯尔克孜自治州",
+      "新疆维吾尔自治区克孜勒苏",
+      "ke zi le su",
+      "kezilesu",
+      "kzls"
+    ]
+  },
+  {
+    "province": "新疆维吾尔自治区",
+    "name": "喀什",
+    "official": "喀什地区",
+    "code": "653100",
+    "pinyin": "ka shi",
+    "initials": "ks",
+    "level": "prefecture",
+    "intro": "喀什地区已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "喀什",
+      "喀什地区",
+      "新疆维吾尔自治区喀什地区",
+      "新疆维吾尔自治区喀什",
+      "ka shi",
+      "kashi",
+      "ks"
+    ]
+  },
+  {
+    "province": "新疆维吾尔自治区",
+    "name": "和田",
+    "official": "和田地区",
+    "code": "653200",
+    "pinyin": "he tian",
+    "initials": "ht",
+    "level": "prefecture",
+    "intro": "和田地区已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "和田",
+      "和田地区",
+      "新疆维吾尔自治区和田地区",
+      "新疆维吾尔自治区和田",
+      "he tian",
+      "hetian",
+      "ht"
+    ]
+  },
+  {
+    "province": "新疆维吾尔自治区",
+    "name": "伊犁",
+    "official": "伊犁哈萨克自治州",
+    "code": "654000",
+    "pinyin": "yi li",
+    "initials": "yl",
+    "level": "prefecture",
+    "intro": "伊犁哈萨克自治州已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "伊犁",
+      "伊犁哈萨克自治州",
+      "新疆维吾尔自治区伊犁哈萨克自治州",
+      "新疆维吾尔自治区伊犁",
+      "yi li",
+      "yili",
+      "yl"
+    ]
+  },
+  {
+    "province": "新疆维吾尔自治区",
+    "name": "塔城",
+    "official": "塔城地区",
+    "code": "654200",
+    "pinyin": "ta cheng",
+    "initials": "tc",
+    "level": "prefecture",
+    "intro": "塔城地区已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "塔城",
+      "塔城地区",
+      "新疆维吾尔自治区塔城地区",
+      "新疆维吾尔自治区塔城",
+      "ta cheng",
+      "tacheng",
+      "tc"
+    ]
+  },
+  {
+    "province": "新疆维吾尔自治区",
+    "name": "阿勒泰",
+    "official": "阿勒泰地区",
+    "code": "654300",
+    "pinyin": "a le tai",
+    "initials": "alt",
+    "level": "prefecture",
+    "intro": "阿勒泰地区已纳入HHBA行政区划目录；地方人才补贴、申报入口与住房项目尚待核验政府一手文件，不代表当前可申请或有实时空房。",
+    "aliases": [
+      "阿勒泰",
+      "阿勒泰地区",
+      "新疆维吾尔自治区阿勒泰地区",
+      "新疆维吾尔自治区阿勒泰",
+      "a le tai",
+      "aletai",
+      "alt"
+    ]
+  }
+];
 const municipalityCode:Record<string,string>={北京:'110000',天津:'120000',上海:'310000',重庆:'500000'};
 export const TALENT_CITY_INDEX:TalentCity[]=[
  ...TALENT_MUNICIPALITIES.map(c=>({...c,code:municipalityCode[c.name]})),
@@ -630,7 +1109,8 @@ export const TALENT_CITY_INDEX:TalentCity[]=[
  ...TALENT_JILIN_PREFECTURES,
  ...TALENT_HEILONGJIANG_DISTRICTS,
  TALENT_HUBEI_PREFECTURE,
- ...TALENT_HUNAN_AUTONOMOUS_PREFECTURES
+ ...TALENT_HUNAN_AUTONOMOUS_PREFECTURES,
+ ...TALENT_NEW_PREFECTURES_20261031
 ];
 const normalize=(text:string)=>text.trim().toLowerCase().replace(/[\s，。,.、·•\-]/g,'');
 export function findTalentProvince(input:string){

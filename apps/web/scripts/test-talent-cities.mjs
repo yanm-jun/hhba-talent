@@ -2,14 +2,14 @@ import assert from 'node:assert/strict';
 import {TALENT_CITY_INDEX,TALENT_MUNICIPALITIES,TALENT_PREFECTURE_CITIES,TALENT_YUNNAN_PREFECTURES,TALENT_PROVINCES,
  findTalentCity,findTalentProvince,parseTalentCityQuery,suggestTalentCities,queryTalentCities} from '../src/data/talentCityRegistry.ts';
 let passed=0;const check=(name,fn)=>{fn();passed++;console.log('✓ '+name)};
-check('312 regional entries = 4 municipalities + 293 prefecture cities + 8 Yunnan autonomous prefectures + 7 other regional units',()=>{
- assert.equal(TALENT_MUNICIPALITIES.length,4);assert.equal(TALENT_PREFECTURE_CITIES.length,293);assert.equal(TALENT_YUNNAN_PREFECTURES.length,8);assert.equal(TALENT_CITY_INDEX.length,312);
+check('337 regional entries = 4 municipalities + 293 prefecture cities + 8 Yunnan autonomous prefectures + 7 other regional units',()=>{
+ assert.equal(TALENT_MUNICIPALITIES.length,4);assert.equal(TALENT_PREFECTURE_CITIES.length,293);assert.equal(TALENT_YUNNAN_PREFECTURES.length,8);assert.equal(TALENT_CITY_INDEX.length,337);
 });
 check('all six-digit codes are unique and geographic level verified',()=>{
  const codes=TALENT_CITY_INDEX.map(x=>x.code);
  assert.ok(codes.every(x=>/^\d{6}$/.test(x)));
- assert.equal(new Set(codes).size,312);
- assert.equal(new Set(TALENT_CITY_INDEX.map(x=>x.name)).size,312);
+ assert.equal(new Set(codes).size,337);
+ assert.equal(new Set(TALENT_CITY_INDEX.map(x=>x.name)).size,337);
  assert.ok(TALENT_PREFECTURE_CITIES.every(x=>x.code.endsWith('00')&&!x.code.endsWith('0000')&&x.official.endsWith('市')));
  assert.ok(TALENT_YUNNAN_PREFECTURES.every(x=>x.code.endsWith('00')&&x.province==='云南省'&&x.official.endsWith('自治州')));
  assert.deepEqual(TALENT_YUNNAN_PREFECTURES.map(x=>x.name),['楚雄','红河','文山','西双版纳','大理','德宏','怒江','迪庆']);
@@ -61,10 +61,12 @@ check('search suggestions return leading 8 while exact city remains accessible',
 check('preserve former cities and their real photo sources',()=>{
  for(const n of ['杭州','深圳','青岛','济南'])assert.ok(findTalentCity(n)?.photo?.startsWith('https://'));
 });
-check('excluded non-city administrative levels and county-level cities',()=>{
- for(const n of ['阿里地区','伊犁哈萨克自治州','五指山市','济源市','博乐市']){
+check('exclude county-level units but index prefecture-level districts',()=>{
+ for(const n of ['五指山市','济源市','博乐市']){
   assert.equal(findTalentCity(n),null,n);
  }
+ assert.equal(findTalentCity('阿里地区')?.name,'阿里');
+ assert.equal(findTalentCity('伊犁哈萨克自治州')?.name,'伊犁');
 });
 check('unknown city is not misidentified as a city',()=>{
  assert.equal(findTalentCity('不存在的城市'),null);
