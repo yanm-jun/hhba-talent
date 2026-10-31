@@ -1,0 +1,77 @@
+name: HHBA employers 039-041 independent four-panel preview
+on:
+  push:
+    branches: [feature/employers-039-041-v2]
+    paths:
+      - 'apps/web/src/data/employerProfiles/cn-autumn-039.json'
+      - 'apps/web/src/data/employerProfiles/cn-autumn-040.json'
+      - 'apps/web/src/data/employerProfiles/cn-autumn-041.json'
+      - 'apps/web/src/pages/UnifiedV2CompanyPage.tsx'
+      - 'apps/web/scripts/employers-039-041-v2.contract.test.mjs'
+      - 'apps/web/scripts/prepare-employers-039-041-media.py'
+      - '.github/workflows/hhba-employers-039-041-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  verify-and-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out this batch only
+        uses: actions/checkout@v4
+        with:
+          ref: feature/employers-039-041-v2
+          persist-credentials: true
+      - name: Install image processors
+        run: python -m pip install pillow cairosvg
+      - name: Download and audit 9 separate real logos and photos
+        run: python apps/web/scripts/prepare-employers-039-041-media.py
+      - name: Commit real media and SHA provenance to this branch ONLY
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/public/images/employer-profiles/cn-autumn-039 \
+                  apps/web/public/images/employer-profiles/cn-autumn-040 \
+                  apps/web/public/images/employer-profiles/cn-autumn-041
+          if ! git diff --cached --quiet; then
+            git commit -m "assets(employers3941): pin 9 independently audited real company images"
+            git push origin HEAD:feature/employers-039-041-v2
+          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install exact dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Validate 3x four-panel layouts, job filters and nine local media
+        working-directory: apps/web
+        run: node scripts/employers-039-041-v2.contract.test.mjs
+      - name: Diagnose inherited factory media gaps (not silently passed)
+        working-directory: apps/web
+        continue-on-error: true
+        run: node scripts/employer-factory-check.mjs
+      - name: Build unchanged entire HHBA frontend and all three company pages
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: npm run build
+      - name: Verify all 9 images and built site exist locally
+        run: |
+          test -s apps/web/dist/index.html
+          for n in 039 040 041; do
+            test -s apps/web/dist/images/employer-profiles/cn-autumn-$n/logo.png
+            test -s apps/web/dist/images/employer-profiles/cn-autumn-$n/photo1.jpg
+            test -s apps/web/dist/images/employer-profiles/cn-autumn-$n/photo2.jpg
+          done
+      - name: Upload isolated static preview artifact (does NOT publish main Pages)
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-employers-039-041-full-static-preview
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
