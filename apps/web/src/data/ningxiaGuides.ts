@@ -25,7 +25,8 @@ export function buildNingxiaGuide(kind:'policy'|'housing',id:string):CompleteGui
  const h=kind==='housing'?NINGXIA_HOUSING_RECORDS.find(x=>x.id===id):undefined;
  if(!p&&!h)return null;
  const data=p||h!,today=new Date().toISOString().slice(0,10);
- const archive=p?Boolean(p.temporal!=='policy'||p.deadline&&p.deadline<today):Boolean(h?.applicationEnd&&h.applicationEnd<today);
+ const housingExpired=Boolean(h&&(h.id==='nx-zhongwei-housing-rent2024'||h.id==='nx-zhongwei-housing-talent2024'||h.id.includes('2026-qualification-draft')||h.id.includes('sale-2026-draft')));
+ const archive=p?Boolean(p.temporal!=='policy'||p.deadline&&p.deadline<today):Boolean(housingExpired||h?.applicationEnd&&h.applicationEnd<today);
  const caveat=p?.reviewNote||h?.statusNote||'应以最新官方办理资料核验';
  const materials=p?.materials?.length?p.materials:[
   '身份证、婚姻状况及共同家庭成员关系证明（按住房对象实际需要）',
