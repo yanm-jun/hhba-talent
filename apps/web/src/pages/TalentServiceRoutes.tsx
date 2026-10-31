@@ -1,3 +1,10 @@
+import {buildHunanGuide} from '../data/hunanGuides';
+import {getHubeiGuide} from '../data/hubeiGuides';
+import {buildJiangxiGuide} from '../data/jiangxiGuides';
+import {buildHeilongjiangGuide} from '../data/heilongjiangGuides';
+import {getFujianGuide} from '../data/fujianGuides';
+import {buildJilinGuide} from '../data/jilinGuides';
+import {buildInnerMongoliaGuide} from '../data/innerMongoliaGuides';
 import {useMemo,useState} from 'react';
 import {ArrowLeft,ArrowRight,ArrowUpRight,Building2,CheckCircle2,ClipboardCheck,FileSearch,FileText,GraduationCap,Home,MapPin,Search,ShieldCheck,Wallet} from 'lucide-react';
 import {Shell} from '../components/Shell';
@@ -328,6 +335,17 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  else if(kind==='list'&&fragments[2]==='policies')body=city==='济南'?<TalentJinanPolicyPreview/>:city==='青岛'?<TalentQingdaoPolicyPreview/>:<UnifiedPolicyList config={buildCityPolicyConfig(city)}/>;
  else if(kind==='list'&&['policies','benefits','housing','guide'].includes(fragments[2]))body=<ListPage city={city} kind={fragments[2] as TalentListKind}/>;
  else if(kind==='search')body=<ListPage key={route} city={decode(fragments[2]||'杭州')||'杭州'} kind="search" query={decode(fragments.slice(3).join('/'))}/>;
+ else if(kind==='policy-guide-preview'&&['inner-mongolia','jilin','fujian','heilongjiang','jiangxi','hubei','hunan'].includes(fragments[2]||'')){
+  const province=fragments[2];
+  const guide=province==='fujian'?getFujianGuide(fragments[3]||'',decode(fragments[4]||'')):
+   province==='hubei'?getHubeiGuide(fragments[3]||'',decode(fragments[4]||'')):
+   province==='inner-mongolia'?buildInnerMongoliaGuide(decode(fragments[3]||'')):
+   province==='jilin'?buildJilinGuide(decode(fragments[3]||'')):
+   province==='heilongjiang'?buildHeilongjiangGuide(decode(fragments[3]||'')):
+   province==='jiangxi'?buildJiangxiGuide(decode(fragments[3]||'')):
+   buildHunanGuide(decode(fragments[3]||''));
+  body=guide?<UnifiedPolicyGuide data={guide}/>:<><Bread current="指南尚未收录"/><section className="ts-sub-header"><h1>该指南暂未核验</h1><Link to="/talent-service/cities">返回城市目录</Link></section></>;
+ }
  else if(kind==='policy-guide-preview'&&fragments[2]==='jiangsu'){
   const guide=getJiangsuGuide(fragments[3]||'',decode(fragments[4]||''));
   body=guide?<UnifiedPolicyGuide data={guide}/>:<><Bread current="未找到江苏省指南"/><section className="ts-sub-header"><h1>该指南尚未收录</h1><Link to="/talent-service/cities">返回城市列表 <ArrowRight size={16}/></Link></section></>;
