@@ -41,6 +41,8 @@ for(let i=0;i<3;i++){
 assert(p[0].jobs.some(j=>j.title.includes('软件工程师')&&j.majorNames.includes('计算机科学与技术')),'Software roles not misfiled');
 assert(p[0].jobs.some(j=>j.title.includes('生产管培生')&&j.majorNames.includes('机械工程')),'Mechanical major supported');
 assert(p[1].jobs.length===3&&p[1].jobs.every(j=>j.evidenceUrl.includes('vsol.com.cn/join-us/campus-recruitment')),'Three direct official source jobs');
+const vsolMedia=JSON.parse(read('public/images/employer-profiles/cn-autumn-046/media-audit.json'));
+assert(/images\\.crunchbase\\.com|smartgridmexico\\.mx/.test(vsolMedia['logo.png'].source),'Brand mark must belong to Guangzhou optical equipment manufacturer; unrelated Korean Wikimedia mark prohibited');
 assert(p[2].name==='瀚通通讯'&&p[2].displayName.includes('瀛通通讯（名录原标：瀚通通讯）'),'Original name retained without asserting legal identity');
 assert(p[2].jobs.every(j=>j.recruitmentSubject==='瀛通通讯股份有限公司'),'Do not fabricate a HanTong legal entity');
 console.log('HHBA_045_046_047_FOUR_PANEL_SUMMARY_17_JOBS_18_SERVICES_9_IMAGES_OK');
