@@ -1,0 +1,41 @@
+{
+  "logo.png": {
+    "company": "海程邦达",
+    "verified": true,
+    "editorialFallback": false,
+    "source": "https://www.bondex.com.cn/Upload/20180704/0A4D701F4422103DA91E0D0E1E051C8A.png",
+    "sourcePage": "https://www.bondex.com.cn/about/wenhua",
+    "sha256": "9eae22dc0598d9f6527ed10ad6a86e44b2ab96408f64c0c2e69e4e2b462e075a",
+    "sourceSha256": "f5ad25f7694c47c4009f1e78cf3e5f6516d610c2ea36c985105d203a2b7b522a",
+    "width": 700,
+    "height": 171,
+    "sourceNote": "Corporate site or identifiable same-company recruitment page, no claim of office photos",
+    "copyright": "Original rights holders retain copyright"
+  },
+  "photo1.jpg": {
+    "company": "海程邦达",
+    "verified": true,
+    "editorialFallback": false,
+    "source": "https://www.bondex.com.cn/Upload/20200707/F630EB46F9C8A2909F576DF900B508FC.jpg",
+    "sourcePage": "https://www.bondex.com.cn/about",
+    "sha256": "7dd6826e2e0d6b1a30e1694d6f231aef69bcce59cb46e663f4d97379f82a0388",
+    "sourceSha256": "1a310787d9c00cd1fab59160ca28760a223d4c552cc77b7bb5ec368b790046ed",
+    "width": 1024,
+    "height": 366,
+    "sourceNote": "Corporate site or identifiable same-company recruitment page, no claim of office photos",
+    "copyright": "Original rights holders retain copyright"
+  },
+  "photo2.jpg": {
+    "company": "海程邦达",
+    "verified": true,
+    "editorialFallback": false,
+    "source": "https://www.bondex.com.cn/Upload/20240726/66BCC687F10738374B6B467ED32D35E9.jpg",
+    "sourcePage": "https://www.bondex.com.cn/wuliu/haiyun",
+    "sha256": "2a1d09fd5d4ef945695343b967f3f924cfd1ac440339076520dd054aed2ba39a",
+    "sourceSha256": "07cd4ede3bd6d94dbcb31e4a251fd86276e36def1b8013d0a8f03ffe27b70d81",
+    "width": 700,
+    "height": 453,
+    "sourceNote": "Corporate site or identifiable same-company recruitment page, no claim of office photos",
+    "copyright": "Original rights holders retain copyright"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "logo.png": {
+    "company": "维音",
+    "verified": true,
+    "editorialFallback": false,
+    "source": "https://www.vxichina.cn/Images/logo.png?t=20261023105719",
+    "sourcePage": "https://www.vxichina.cn/AboutStd_806.html",
+    "sha256": "e47354091f045fcfea3393e871ac97e40b2b92a2e7fa8a804fb4b725df457c59",
+    "sourceSha256": "0faa5e354398f9afac3b7f9b5a44a1aa707536f14cabf2012b1eedcf4933b5ff",
+    "width": 700,
+    "height": 206,
+    "sourceNote": "Corporate site or identifiable same-company recruitment page, no claim of office photos",
+    "copyright": "Original rights holders retain copyright"
+  },
+  "photo1.jpg": {
+    "company": "维音",
+    "verified": true,
+    "editorialFallback": false,
+    "source": "https://rc2.zihu.com/g5/M00/12/88/CgAGbGXlrn6AXw5fAABm4izI2Vw692.png",
+    "sourcePage": "https://www.vxichina.cn/AboutStd_1070.html",
+    "sha256": "c9ae6367e6eaa786cb726ce28642b99e30a1f468608295105f11990aea00a374",
+    "sourceSha256": "c1b7b6d5981456965e65b06db615292e1de2415171c5607159808a71f7e5e125",
+    "width": 700,
+    "height": 700,
+    "sourceNote": "Corporate site or identifiable same-company recruitment page, no claim of office photos",
+    "copyright": "Original rights holders retain copyright"
+  },
+  "photo2.jpg": {
+    "company": "维音",
+    "verified": true,
+    "editorialFallback": false,
+    "source": "https://rc00.zihu.com/g4/M00/5D/49/CgAG0mLjs5GALIkFAAInHXJPV7g269.jpg",
+    "sourcePage": "https://www.vxichina.cn/AboutStd_1070.html",
+    "sha256": "a574126f5ae42cc7b3e12a9846f43c9eca4f5e352be0ec88515e8dc9b34f445d",
+    "sourceSha256": "25a0c8003cc0c1539fdda9d348a63e4b272ace9144e06991d40bff0b085771cc",
+    "width": 700,
+    "height": 395,
+    "sourceNote": "Corporate site or identifiable same-company recruitment page, no claim of office photos",
+    "copyright": "Original rights holders retain copyright"
+  }
+}
