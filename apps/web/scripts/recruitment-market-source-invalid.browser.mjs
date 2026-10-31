@@ -9,7 +9,11 @@ try{
   page.on('pageerror',error=>runtimeErrors.push(error.message));
   await page.goto(root+'candidate/jobs/',{waitUntil:'domcontentloaded',timeout:60000});
   const input=page.getByRole('textbox',{name:'自然语言搜索岗位'});
-  await input.waitFor({timeout:16000});
+  try{await input.waitFor({timeout:16000});}
+  catch(error){
+   console.error('HHBA_RECRUITMENT_BROWSER_DIAGNOSTIC',JSON.stringify({url:page.url(),errors:runtimeErrors,body:(await page.locator('body').innerText().catch(()=>'' )).slice(0,2600),html:(await page.locator('body').innerHTML().catch(()=>'' )).slice(0,900)}));
+   throw error;
+  }
   await page.waitForFunction(()=>{const text=document.body.innerText;return /共匹配\s*[1-9][0-9]*\s*条/.test(text)||text.includes('DOMESTIC_REBUILD_SOURCE_INVALID')},{timeout:25000});
   const firstPaint=await page.locator('body').innerText();
   assert(!firstPaint.includes('DOMESTIC_REBUILD_SOURCE_INVALID'),'No full-market invalid-source crash');
