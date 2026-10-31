@@ -185,7 +185,7 @@ const raw:Raw[]=[
     "apply": "先联系葫芦岛市人社局确认政策问答适用年份、2026现行细则与申请对象、租赁合同备案和社保资料，再使用辽宁政务服务网的真实申领事项，不把常见问答作为申报表单。"
   }
 ];
-export const LIAONING_MUNICIPAL_POLICY_RECORDS:TalentPolicyRecord[]=raw.map(p=>{
+const mapMunicipal=(p:Raw):TalentPolicyRecord=>{
  const limited=p.city==='阜新'||p.city==='辽阳'||p.city==='鞍山'||p.city==='本溪';
  const historic=false; // 鞍山房交会截至2026-11-06尚未过期；不要提前归档
  const withoutOriginal=['沈阳','锦州','铁岭','鞍山'].includes(p.city);
@@ -217,4 +217,7 @@ export const LIAONING_MUNICIPAL_POLICY_RECORDS:TalentPolicyRecord[]=raw.map(p=>{
  '按主管部门实际审核、异议、公示和拨付结果判断是否获得资格和到账，变化时核对停发、退还或重复享受规则。'
  ]
  };
-});
+};
+const researchCityNames=new Set(['沈阳','鞍山','锦州','铁岭']);
+export const LIAONING_MUNICIPAL_POLICY_RECORDS:TalentPolicyRecord[]=raw.filter(p=>!researchCityNames.has(p.city)).map(mapMunicipal);
+export const LIAONING_MUNICIPAL_RESEARCH_RECORDS:TalentPolicyRecord[]=raw.filter(p=>researchCityNames.has(p.city)).map(mapMunicipal);
