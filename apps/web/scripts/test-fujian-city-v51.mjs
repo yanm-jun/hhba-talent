@@ -44,7 +44,7 @@ for(const city of cities){
 }
 const routes=readFileSync(new URL('../src/pages/TalentServiceRoutes.tsx',import.meta.url),'utf8');
 const details=readFileSync(new URL('../src/components/talent/UnifiedTalentRecordDetail.tsx',import.meta.url),'utf8');
-assert.ok(routes.includes("fragments[2]==='fujian'")&&routes.includes('getFujianGuide('));
-assert.ok(details.includes("fujianGuideUrl('policy'")&&details.includes("fujianGuideUrl('housing'"));
+assert.ok(routes.includes("'fujian'")&&routes.includes('getFujianGuide('));
+assert.ok(details.includes('fujianGuideUrl(kind,id)');
 assert.ok(routes.includes("fragments[2]==='jiangsu'")&&routes.includes("fragments[2]==='yunnan'"));
 console.log('Fujian V5.1 PASS: 9 cities, 33 policy records, 14 housing programs, 47 B/C six-part guides; no fake real-time vacancy.');

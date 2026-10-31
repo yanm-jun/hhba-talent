@@ -42,5 +42,5 @@ assert.ok(HUBEI_HOUSING_RECORDS.find(x=>x.id==='hb-huangshi-gangyou-2026')?.addr
 const r=readFileSync(new URL('../src/pages/TalentServiceRoutes.tsx',import.meta.url),'utf8');
 const d=readFileSync(new URL('../src/components/talent/UnifiedTalentRecordDetail.tsx',import.meta.url),'utf8');
 assert.ok(r.includes("fragments[2]==='hubei'")&&r.includes('getHubeiGuide('));
-assert.ok(d.includes("hubeiGuideUrl('policy'")&&d.includes("hubeiGuideUrl('housing'"));
+assert.ok(d.includes('hubeiGuideUrl(kind,id)');
 console.log('HUBEI V5.1 OK 13 cities 59 policies 16 housing 75 shared B/C guides');
