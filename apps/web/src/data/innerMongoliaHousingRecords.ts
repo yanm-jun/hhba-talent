@@ -564,7 +564,7 @@ export const INNER_MONGOLIA_HOUSING_RECORDS:TalentHousingRecord[]=[
     "eligibility": "求职5天免费住宿/实习3个月短租/就业5年优惠长租均有各自资格与项目条件",
     "sourceUrl": "https://chinajob.mohrss.gov.cn/c/2026-09-01/597128.shtml",
     "published": "2026-09-01",
-    "statusNote": "仅核实政策/住房服务制度或历史状态，未核实2026年10月可入住实际单体项目和空房，非实时空房；申请入口未公布，须查主管部门当期项目通告。",
+    "statusNote": "仅核实政策/住房服务制度或历史状态，未核实2026年10月可入住实际单体项目和空房，非实时空房；申报入口未公布，须查主管部门当期项目通告。",
     "kind": "program",
     "reviewedAt": "2026-10-31",
     "steps": [
@@ -587,7 +587,7 @@ export const INNER_MONGOLIA_HOUSING_RECORDS:TalentHousingRecord[]=[
     "eligibility": "符合包头引进人才分类、落户与对应项目准入的申请人，实际住房与租补存在互斥要求",
     "sourceUrl": "https://baotou.gov.cn/hdjl/hdjl_xwfbh/202605/t20260507_903010.html",
     "published": "2026-05-07",
-    "statusNote": "仅核实政策/住房服务制度或历史状态，未核实2026年10月可入住实际单体项目和空房，非实时空房；申请入口未公布，须查主管部门当期项目通告。",
+    "statusNote": "仅核实政策/住房服务制度或历史状态，未核实2026年10月可入住实际单体项目和空房，非实时空房；申报入口未公布，须查主管部门当期项目通告。",
     "kind": "program",
     "reviewedAt": "2026-10-31",
     "steps": [
@@ -610,7 +610,7 @@ export const INNER_MONGOLIA_HOUSING_RECORDS:TalentHousingRecord[]=[
     "eligibility": "本地企业引进、研究生以上学历且经产业紧缺认定；非所有研究生都适用",
     "sourceUrl": "https://fgw.wuhai.gov.cn/xywh/zzqzc/7883667.jhtml",
     "published": "2026-06-01",
-    "statusNote": "仅核实政策/住房服务制度或历史状态，未核实2026年10月可入住实际单体项目和空房，非实时空房；申请入口未公布，须查主管部门当期项目通告。",
+    "statusNote": "仅核实政策/住房服务制度或历史状态，未核实2026年10月可入住实际单体项目和空房，非实时空房；申报入口未公布，须查主管部门当期项目通告。",
     "kind": "program",
     "reviewedAt": "2026-10-31",
     "steps": [
@@ -633,7 +633,7 @@ export const INNER_MONGOLIA_HOUSING_RECORDS:TalentHousingRecord[]=[
     "eligibility": "博士2000元/月、硕士等1500元/月最长36个月，需合同、中心城区、无房及互斥核验",
     "sourceUrl": "https://rsj.ordos.gov.cn/ztzl_146775/sbjjhjyzxbz_150814/sbjjhjyzxbz_150816/202412/t20241219_1578206.html",
     "published": "2024-12-19",
-    "statusNote": "仅核实政策/住房服务制度或历史状态，未核实2026年10月可入住实际单体项目和空房，非实时空房；申请入口未公布，须查主管部门当期项目通告。",
+    "statusNote": "仅核实政策/住房服务制度或历史状态，未核实2026年10月可入住实际单体项目和空房，非实时空房；申报入口未公布，须查主管部门当期项目通告。",
     "kind": "program",
     "reviewedAt": "2026-10-31",
     "steps": [
@@ -656,7 +656,7 @@ export const INNER_MONGOLIA_HOUSING_RECORDS:TalentHousingRecord[]=[
     "eligibility": "毕业2年内就业创业并租房无房可核实月租补、毕业5年内首次购房可咨询当地补贴；具体各旗县财政实施不同",
     "sourceUrl": "https://www.bynr.gov.cn/zfxxgk/zfxxgk/xxyxgfxwjk/zfjqbm/rmzf/202607/t20260702_292220.html",
     "published": "2026-07-03",
-    "statusNote": "仅核实政策/住房服务制度或历史状态，未核实2026年10月可入住实际单体项目和空房，非实时空房；申请入口未公布，须查主管部门当期项目通告。",
+    "statusNote": "仅核实政策/住房服务制度或历史状态，未核实2026年10月可入住实际单体项目和空房，非实时空房；申报入口未公布，须查主管部门当期项目通告。",
     "kind": "program",
     "reviewedAt": "2026-10-31",
     "steps": [
@@ -679,7 +679,7 @@ export const INNER_MONGOLIA_HOUSING_RECORDS:TalentHousingRecord[]=[
     "eligibility": "依实际引进单位、人员分类和招聘公告时间生效制度判断；2022旧批次不得直接套用",
     "sourceUrl": "https://xfj.xlgl.gov.cn/eportal/ui?articleKey=d850e6e319be486090804ead50067cad&columnId=dc1fcbc213134132adb783de2c8cebcb&pageId=d0852b6bbaaa4031b97493c643f1e6a0",
     "published": "2022-08-28",
-    "statusNote": "仅核实政策/住房服务制度或历史状态，未核实2026年10月可入住实际单体项目和空房，非实时空房；申请入口未公布，须查主管部门当期项目通告。",
+    "statusNote": "仅核实政策/住房服务制度或历史状态，未核实2026年10月可入住实际单体项目和空房，非实时空房；申报入口未公布，须查主管部门当期项目通告。",
     "kind": "program",
     "reviewedAt": "2026-10-31",
     "steps": [
@@ -702,7 +702,7 @@ export const INNER_MONGOLIA_HOUSING_RECORDS:TalentHousingRecord[]=[
     "eligibility": "需阿拉善引进人才认定、全日制本科以上资格、租住指定青年人才公寓；部分补贴原则上就高不叠加",
     "sourceUrl": "https://fgw.als.gov.cn/module/download/downfile.jsp?classid=0&filename=6a3b05a37ba74ac8879a7f1b41c0f84b.pdf",
     "published": "2025-07-01",
-    "statusNote": "仅核实政策/住房服务制度或历史状态，未核实2026年10月可入住实际单体项目和空房，非实时空房；申请入口未公布，须查主管部门当期项目通告。",
+    "statusNote": "仅核实政策/住房服务制度或历史状态，未核实2026年10月可入住实际单体项目和空房，非实时空房；申报入口未公布，须查主管部门当期项目通告。",
     "kind": "program",
     "reviewedAt": "2026-10-31",
     "steps": [
