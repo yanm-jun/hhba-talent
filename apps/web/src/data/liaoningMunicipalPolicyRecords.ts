@@ -178,7 +178,7 @@ const raw:Raw[]=[
     "category": "租房安居",
     "url": "https://www.lnzwfw.gov.cn/znsscjwt/cjwtxq/?id=99083",
     "source": "辽宁省政务服务网 · 葫芦岛市人社局租补官方问答（未标明原问答政策有效期）",
-    "published": "2026-01-01",
+    "published": "2026-10-31",
     "amount": "400—1400元/月",
     "benefit": "政务问答公开标准为博士每月1400元、硕士1000元、毕业年度全日制本科400元，最长3年；该页面未显示当期发放批次、金额调整和2026有效期限，须与人社窗口复核。",
     "elig": "对应政策针对符合葫芦岛市高校毕业生就业租房补贴条件的博士、硕士及毕业年度全日制本科毕业生；海外毕业生政策问答称同等待遇，但实际在葫就业参保、户籍住房、租赁合同要求需核原办法。",
@@ -187,7 +187,7 @@ const raw:Raw[]=[
 ];
 export const LIAONING_MUNICIPAL_POLICY_RECORDS:TalentPolicyRecord[]=raw.map(p=>{
  const limited=p.city==='阜新'||p.city==='辽阳'||p.city==='鞍山'||p.city==='本溪';
- const historic=p.city==='鞍山';
+ const historic=false; // 鞍山房交会截至2026-11-06尚未过期；不要提前归档
  const withoutOriginal=['沈阳','锦州','铁岭','鞍山'].includes(p.city);
  const faq=p.city==='辽阳'?'本条仅是官方购房政策信息索引，既非确定的个人现金补贴，也非申报系统。':p.city==='丹东'?'第72批为历史核准公示，申请人仍须通过当前有效批次审核，不能用该批平均数推算自己待遇。':'具体资金、资料及所需期限以政策文件和当期官方审核为准，不得自动享有。';
  return {
@@ -199,8 +199,8 @@ export const LIAONING_MUNICIPAL_POLICY_RECORDS:TalentPolicyRecord[]=raw.map(p=>{
  targetGroup:p.elig,
  payoutTo:p.city==='本溪'||p.city==='辽阳'?'非现金服务':'个人',
  headlineAmount:p.amount,headlineUnit:'市级政策依据 · 以实际资格审核和现行受理为准',
- reviewedAt:'2026-10-31',deadline:historic?'2026-11-06':undefined,
- reviewNote:(withoutOriginal?'政策摘要/新闻报道未取得市级原始全套办理细则，B级基础资料。':'可查政府/官方政务公开来源，但当前经办平台或申请是否开放仍需核实；B级。')+' '+faq+' 办理入口待核实：仅对政府已明确公布的真实经办模块提供文字指引，不将报道或门户首页当作在线申请成功。',
+ reviewedAt:'2026-10-31',deadline:p.city==='鞍山'?'2026-11-06':undefined,
+ reviewNote:(withoutOriginal?'政策摘要/新闻报道未取得市级原始全套办理细则，B级基础资料。':'可查政府/官方政务公开来源，但当前经办平台或申请是否开放仍需核实；B级。')+' '+faq+' 办理入口待核实：仅对政府已明确公布的真实经办模块提供文字指引，不将报道或门户首页当作在线申请成功。'+(p.city==='葫芦岛'?' 葫芦岛政务服务问答未给出原发文日，本条published仅为2026-10-31索引核查日，不可作为正式政策发布日期。':'')',
  keywords:[p.city,'辽宁','2026','人才','大学生','高校毕业生',...p.title.match(/购房|租房|生活|补贴|就业|住房/g)||[]],
  materials:[
  '申请人身份证、毕业证及学历学位验证材料（按具体项目）',
