@@ -1,0 +1,37 @@
+name: HHBA National Talent Main Audit
+on:
+  pull_request:
+    paths:
+      - 'apps/web/src/data/**'
+      - 'apps/web/src/components/talent/**'
+      - 'apps/web/scripts/audit-talent-national-main.mjs'
+      - '.github/workflows/hhba-talent-national-main-audit.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/src/data/**'
+      - 'apps/web/src/components/talent/**'
+      - 'apps/web/scripts/audit-talent-national-main.mjs'
+  workflow_dispatch:
+jobs:
+  national-talent-audit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - name: Strict nationwide data/route audit
+        run: node --experimental-strip-types scripts/audit-talent-national-main.mjs
+      - name: Existing nationwide regression suite
+        run: |
+          node --experimental-strip-types scripts/test-talent-cities.mjs
+          node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - name: Confirm static build
+        run: npm run build
