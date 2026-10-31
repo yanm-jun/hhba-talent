@@ -43,7 +43,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "高新技术企业",
       "高校毕业生",
       "1000元"
-    ]
+    ],
+    "targetGroup": "2026年在江西基层专精特新或高新技术企业新就业、毕业2年内的合规高校毕业生"
   },
   {
     "temporal": "policy",
@@ -82,7 +83,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "国家助学贷款",
       "1000元",
       "毕业学年"
-    ]
+    ],
+    "targetGroup": "江西学校毕业学年具有法定困难类别的应届毕业生"
   },
   {
     "temporal": "policy",
@@ -119,7 +121,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "社保补贴",
       "企业端",
       "就业"
-    ]
+    ],
+    "targetGroup": "实际录用高校毕业生并缴纳单位社保的小微企业和家庭服务业企业"
   },
   {
     "temporal": "policy",
@@ -163,7 +166,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "高新技术企业",
       "高校毕业生",
       "1000元"
-    ]
+    ],
+    "targetGroup": "2026年在江西基层专精特新或高新技术企业新就业、毕业2年内的合规高校毕业生"
   },
   {
     "temporal": "policy",
@@ -202,7 +206,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "国家助学贷款",
       "1000元",
       "毕业学年"
-    ]
+    ],
+    "targetGroup": "江西学校毕业学年具有法定困难类别的应届毕业生"
   },
   {
     "temporal": "policy",
@@ -239,7 +244,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "社保补贴",
       "企业端",
       "就业"
-    ]
+    ],
+    "targetGroup": "实际录用高校毕业生并缴纳单位社保的小微企业和家庭服务业企业"
   },
   {
     "temporal": "policy",
@@ -283,7 +289,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "高新技术企业",
       "高校毕业生",
       "1000元"
-    ]
+    ],
+    "targetGroup": "2026年在江西基层专精特新或高新技术企业新就业、毕业2年内的合规高校毕业生"
   },
   {
     "temporal": "policy",
@@ -322,7 +329,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "国家助学贷款",
       "1000元",
       "毕业学年"
-    ]
+    ],
+    "targetGroup": "江西学校毕业学年具有法定困难类别的应届毕业生"
   },
   {
     "temporal": "policy",
@@ -359,7 +367,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "社保补贴",
       "企业端",
       "就业"
-    ]
+    ],
+    "targetGroup": "实际录用高校毕业生并缴纳单位社保的小微企业和家庭服务业企业"
   },
   {
     "temporal": "policy",
@@ -403,7 +412,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "高新技术企业",
       "高校毕业生",
       "1000元"
-    ]
+    ],
+    "targetGroup": "2026年在江西基层专精特新或高新技术企业新就业、毕业2年内的合规高校毕业生"
   },
   {
     "temporal": "policy",
@@ -442,7 +452,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "国家助学贷款",
       "1000元",
       "毕业学年"
-    ]
+    ],
+    "targetGroup": "江西学校毕业学年具有法定困难类别的应届毕业生"
   },
   {
     "temporal": "policy",
@@ -479,7 +490,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "社保补贴",
       "企业端",
       "就业"
-    ]
+    ],
+    "targetGroup": "实际录用高校毕业生并缴纳单位社保的小微企业和家庭服务业企业"
   },
   {
     "temporal": "policy",
@@ -523,7 +535,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "高新技术企业",
       "高校毕业生",
       "1000元"
-    ]
+    ],
+    "targetGroup": "2026年在江西基层专精特新或高新技术企业新就业、毕业2年内的合规高校毕业生"
   },
   {
     "temporal": "policy",
@@ -562,7 +575,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "国家助学贷款",
       "1000元",
       "毕业学年"
-    ]
+    ],
+    "targetGroup": "江西学校毕业学年具有法定困难类别的应届毕业生"
   },
   {
     "temporal": "policy",
@@ -599,7 +613,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "社保补贴",
       "企业端",
       "就业"
-    ]
+    ],
+    "targetGroup": "实际录用高校毕业生并缴纳单位社保的小微企业和家庭服务业企业"
   },
   {
     "temporal": "policy",
@@ -643,7 +658,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "高新技术企业",
       "高校毕业生",
       "1000元"
-    ]
+    ],
+    "targetGroup": "2026年在江西基层专精特新或高新技术企业新就业、毕业2年内的合规高校毕业生"
   },
   {
     "temporal": "policy",
@@ -682,7 +698,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "国家助学贷款",
       "1000元",
       "毕业学年"
-    ]
+    ],
+    "targetGroup": "江西学校毕业学年具有法定困难类别的应届毕业生"
   },
   {
     "temporal": "policy",
@@ -719,7 +736,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "社保补贴",
       "企业端",
       "就业"
-    ]
+    ],
+    "targetGroup": "实际录用高校毕业生并缴纳单位社保的小微企业和家庭服务业企业"
   },
   {
     "temporal": "policy",
@@ -763,7 +781,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "高新技术企业",
       "高校毕业生",
       "1000元"
-    ]
+    ],
+    "targetGroup": "2026年在江西基层专精特新或高新技术企业新就业、毕业2年内的合规高校毕业生"
   },
   {
     "temporal": "policy",
@@ -802,7 +821,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "国家助学贷款",
       "1000元",
       "毕业学年"
-    ]
+    ],
+    "targetGroup": "江西学校毕业学年具有法定困难类别的应届毕业生"
   },
   {
     "temporal": "policy",
@@ -839,7 +859,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "社保补贴",
       "企业端",
       "就业"
-    ]
+    ],
+    "targetGroup": "实际录用高校毕业生并缴纳单位社保的小微企业和家庭服务业企业"
   },
   {
     "temporal": "policy",
@@ -883,7 +904,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "高新技术企业",
       "高校毕业生",
       "1000元"
-    ]
+    ],
+    "targetGroup": "2026年在江西基层专精特新或高新技术企业新就业、毕业2年内的合规高校毕业生"
   },
   {
     "temporal": "policy",
@@ -922,7 +944,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "国家助学贷款",
       "1000元",
       "毕业学年"
-    ]
+    ],
+    "targetGroup": "江西学校毕业学年具有法定困难类别的应届毕业生"
   },
   {
     "temporal": "policy",
@@ -959,7 +982,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "社保补贴",
       "企业端",
       "就业"
-    ]
+    ],
+    "targetGroup": "实际录用高校毕业生并缴纳单位社保的小微企业和家庭服务业企业"
   },
   {
     "temporal": "policy",
@@ -1003,7 +1027,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "高新技术企业",
       "高校毕业生",
       "1000元"
-    ]
+    ],
+    "targetGroup": "2026年在江西基层专精特新或高新技术企业新就业、毕业2年内的合规高校毕业生"
   },
   {
     "temporal": "policy",
@@ -1042,7 +1067,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "国家助学贷款",
       "1000元",
       "毕业学年"
-    ]
+    ],
+    "targetGroup": "江西学校毕业学年具有法定困难类别的应届毕业生"
   },
   {
     "temporal": "policy",
@@ -1079,7 +1105,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "社保补贴",
       "企业端",
       "就业"
-    ]
+    ],
+    "targetGroup": "实际录用高校毕业生并缴纳单位社保的小微企业和家庭服务业企业"
   },
   {
     "temporal": "policy",
@@ -1123,7 +1150,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "高新技术企业",
       "高校毕业生",
       "1000元"
-    ]
+    ],
+    "targetGroup": "2026年在江西基层专精特新或高新技术企业新就业、毕业2年内的合规高校毕业生"
   },
   {
     "temporal": "policy",
@@ -1162,7 +1190,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "国家助学贷款",
       "1000元",
       "毕业学年"
-    ]
+    ],
+    "targetGroup": "江西学校毕业学年具有法定困难类别的应届毕业生"
   },
   {
     "temporal": "policy",
@@ -1199,7 +1228,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "社保补贴",
       "企业端",
       "就业"
-    ]
+    ],
+    "targetGroup": "实际录用高校毕业生并缴纳单位社保的小微企业和家庭服务业企业"
   },
   {
     "temporal": "policy",
@@ -1243,7 +1273,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "高新技术企业",
       "高校毕业生",
       "1000元"
-    ]
+    ],
+    "targetGroup": "2026年在江西基层专精特新或高新技术企业新就业、毕业2年内的合规高校毕业生"
   },
   {
     "temporal": "policy",
@@ -1282,7 +1313,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "国家助学贷款",
       "1000元",
       "毕业学年"
-    ]
+    ],
+    "targetGroup": "江西学校毕业学年具有法定困难类别的应届毕业生"
   },
   {
     "temporal": "policy",
@@ -1319,7 +1351,8 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
       "社保补贴",
       "企业端",
       "就业"
-    ]
+    ],
+    "targetGroup": "实际录用高校毕业生并缴纳单位社保的小微企业和家庭服务业企业"
   },
   {
     "temporal": "policy",
@@ -1333,7 +1366,6 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
     "eligibility": "政策印发后首次来昌工作的规定学历或技能青年，首次在南昌登记参保并同时缴纳养老和工伤保险；是否适用机关事业单位和具体年龄以原文件逐项核查。",
     "sourceUrl": "https://rsj.nc.gov.cn/ncsrsj/tzgg/202404/1ebcb69c35384162bcba12dc4089b2dc.shtml",
     "published": "2024-04-17",
-    "category2": "生活补贴",
     "department": "南昌市人社局",
     "targetGroup": "符合该市规定学历、人才分类、毕业年限或专项资助门槛的申请人",
     "application": "南昌对应人才或人社主管部门按原公告办理；项目直达线上入口未完成核验，不能直接将政府政策原文当申报页。",
@@ -1653,71 +1685,74 @@ export const JIANGXI_POLICY_RECORDS:TalentPolicyRecord[]=[
     "reviewedAt": "2026-10-31",
     "city": "吉安",
     "id": "jx-ja-2026-youth-free-stay",
-    "title": "吉安2026人才求职驿站最长12个月免费住宿",
+    "title": "江西省2025公租房配租管理办法在吉安的属地保障制度",
     "category": "租房安居",
-    "benefit": "符合条件在吉安市中心城区求职创业人才可申请最长12个月免费住宿（租金和物业费为0），入住超过1个月的水电燃气网费用据实分摊；不是无条件免费住房。",
-    "eligibility": "毕业5年内有意来吉安市中心城区就业或创业、全日制大专及以上学历或技工高级工资格，中心城区无房且尚未在吉安缴纳城镇职工养老保险，需在线申请资格审核。",
-    "sourceUrl": "https://jxja.jxnews.com.cn/system/2026/05/11/031128636.shtml",
-    "published": "2026-05-11",
-    "department": "吉安市人才服务和驿站运营机构",
+    "benefit": "符合吉安市当期住房保障资格的家庭可进入公租房实物配租轮候，具体租金、套数和租赁补贴由实际区县公布，不能预设固定金额。",
+    "eligibility": "应符合吉安市住房保障部门公布的家庭住房困难、实际居住工作、收入及住房政策互斥条件。新就业群体的学历与社保条件以吉安本地现行受理公告为准，不是只凭学历就能入住人才公寓。",
+    "sourceUrl": "https://www.quannan.gov.cn/qnxxxgk/wfgzf/202604/38b5916992fb43ef80767b1dd5d6ea99.shtml",
+    "published": "2025-12-15",
+    "department": "吉安市住房城乡建设局及县区住房保障部门",
     "targetGroup": "符合该市规定学历、人才分类、毕业年限或专项资助门槛的申请人",
-    "application": "吉安对应人才或人社主管部门按原公告办理；项目直达线上入口未完成核验，不能直接将政府政策原文当申报页。",
-    "sourceName": "吉安2026人才求职驿站最长12个月免费住宿",
+    "application": "向吉安市实际区县住房保障部门查询当前公租房申请事项、核对准入条件并根据正式通知申请；本条省级制度不含吉安2026实时项目空房或青年驿站网上申报深链接。",
+    "sourceName": "江西省住房城乡建设厅赣建字〔2025〕13号（全南县政府公布省级原文）",
     "keywords": [
       "吉安",
-      "吉安2026人才求职驿站最长12个月免费住宿",
-      "租房安居",
-      "人才政策",
-      "江西"
+      "江西省",
+      "公共租赁住房",
+      "新就业人员",
+      "轮候",
+      "住房保障"
     ],
     "applicationSteps": [
-      "核对在吉安中心城区无房、毕业5年内且尚未在吉安缴纳城镇职工养老保险",
-      "打开“吉才e家”小程序实名注册、人才认领上传学历和身份凭证",
-      "在人才求职驿站栏目提前2天提出申请并等待结果",
-      "通过后线上签协议缴500元保证金、入住佳和西苑19栋，超过一月按实际分摊水电网"
+      "辨认本人是否属于吉安市区县实际公租房申请类别及住房困难家庭或新市民",
+      "核查家庭成员、收入、已有住房和真实就业社保等准入要求",
+      "按吉安市区县住房保障当期申请事项提交身份、住房和工作材料，配合审核公示",
+      "符合条件列入轮候名单后，根据官方实际配租计划选房或办理相关保障措施"
     ],
     "materials": [
-      "本人身份证和毕业证或学生证学信网材料",
-      "吉安中心城区无房资格和参保证明",
-      "人才驿站电子申请与500元押金凭证"
+      "本人及家庭有效身份、户籍婚姻和住房证明",
+      "实际就业、社保及相关收入证明（按适用对象）",
+      "区县主管部门公布的公租房资格和申请材料清单"
     ],
-    "reviewNote": "办理入口待核实；请区分省级与市级规定及当前批次。项目与政策原文不等于当前正在受理，已截止窗口须等新公告。"
+    "reviewNote": "办理入口待核实；此条仅为适用于吉安的江西省公租房制度，并非经政府一手确认的吉安求职驿站12个月免费住宿政策，实时住房项目待核验。",
+    "summary": "赣建字〔2025〕13号为江西省公共租赁住房配租管理的统一规范，适用于吉安市依实际区县准入公告确定的保障家庭与新市民；不意味着吉安青年驿站12个月免费住宿经过政府一手验证。"
   },
   {
-    "temporal": "policy",
+    "temporal": "historical",
     "scope": "全市",
     "reviewedAt": "2026-10-31",
     "city": "宜春",
     "id": "jx-yc-2024-talent-rent",
-    "title": "宜春市人才引进培养办法：人才分类租房支持",
+    "title": "江西宜春多层次住房保障与人才专项租赁住房历史资料",
     "category": "租房安居",
-    "benefit": "符合条件在宜全职引进第一至四类人才无房租赁补贴每月分别3000、2000、1500、1000元，支持3年；第五类每月600元支持1年；与人才公寓减免租金不可同时领取。",
-    "eligibility": "经宜春市人才分类办法正式认定的一至五类全职引进人才，单位所在地辖区无自有住房，单位人才类型及实际住房资格符合类别规则；普通硕博学位不直接等于一至五类。",
-    "sourceUrl": "https://rsc.jxycu.edu.cn/2025/1125/c2494a147206/page.htm",
-    "published": "2024-07-05",
-    "department": "宜春市委人才办、人社局",
+    "benefit": "按宜春相应县区当期公租房、人才专项租赁住房或职工宿舍准入规则确定租金和保障方式，没有核实统一现行每月补贴金额。",
+    "eligibility": "需在宜春相关区县实际工作和居住、满足对应公租房或人才专项租赁住房的家庭无房、就业、收入或人才认定条件；不能将人才公寓与公租房资格混同。",
+    "sourceUrl": "https://chinajob.mohrss.gov.cn/h5/c/2023-09-06/386021.shtml",
+    "published": "2023-09-06",
+    "department": "宜春市住房城乡建设局及县区住房保障机构",
     "targetGroup": "符合该市规定学历、人才分类、毕业年限或专项资助门槛的申请人",
-    "application": "宜春对应人才或人社主管部门按原公告办理；项目直达线上入口未完成核验，不能直接将政府政策原文当申报页。",
-    "sourceName": "宜春市人才引进培养办法：人才分类租房支持",
+    "application": "向宜春市县区住建住房保障机构核对当前项目、租金和真实受理窗口；原2023年报道没有2026年独立人才公寓报名直达地址。",
+    "sourceName": "人社部中国就业网·江西宜春积极构建多元化住房保障体系",
     "keywords": [
       "宜春",
-      "宜春市人才引进培养办法：人才分类租房支持",
-      "租房安居",
-      "人才政策",
-      "江西"
+      "住房保障",
+      "公租房",
+      "人才专项租赁住房",
+      "历史资料"
     ],
     "applicationSteps": [
-      "先由主管部门认定宜春人才第一至第五类及全职引进身份",
-      "核对单位所在辖区无自住房和此前是否领取其他人才租住支持",
-      "根据分类选择租房补贴或入住人才公寓，不可同时享受租金减免",
-      "按宜春现行人才申领窗口提交合同、认定与租赁资料待核"
+      "核实在宜春需要申请的住房类型：公租房、青年宿舍或人才专项租赁住房",
+      "自查实际居住工作、家庭无房、收入或分类人才认定条件",
+      "查看宜春住建住房保障部门当前项目、户型租金与申报公告",
+      "依实际县区受理通道提交、审核、轮候与合同办理，不将历史建设套数当作空房"
     ],
     "materials": [
-      "宜春市一至五类人才正式认定书",
-      "正式全职聘用合同及社保",
-      "单位所在辖区家庭住房及真实租房凭证"
+      "个人身份、户籍或居住工作证明",
+      "家庭住房及收入、参保就业情况核查材料",
+      "实际项目受理部门要求的申请表与人才层次认定资料（如适用）"
     ],
-    "reviewNote": "办理入口待核实；请区分省级与市级规定及当前批次。项目与政策原文不等于当前正在受理，已截止窗口须等新公告。"
+    "reviewNote": "办理入口待核实；该资料属于2023年住房保障体系的政府网站历史报道，无法证明2026具体人才住房补贴、空房和申报窗口仍开放。",
+    "summary": "人社部中国就业网转载宜春住房保障发展情况，披露人才专项租赁住房、租赁型职工宿舍及创业公寓等多类住房保障方式；2023年统计不能用作2026年实时可配租库存。"
   },
   {
     "temporal": "policy",
