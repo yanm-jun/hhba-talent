@@ -16,6 +16,7 @@ import {TalentQingdaoGuidePreview} from './TalentQingdaoGuidePreview';
 import {TalentLaoshanGuide} from './TalentLaoshanGuide';
 import {getJiangsuGuide,jiangsuGuideUrl,JIANGSU_CITY_SLUGS} from '../data/jiangsuGuides';
 import {UnifiedPolicyGuide} from '../components/talent/UnifiedPolicyGuide';
+import {buildGuangdongGuide} from '../data/guangdongGuides';
 import {beijingPublicRentalGuide,beijingMarketRentGuide,beijingGraduateSettlementGuide,beijingJobGrantGuide,beijingFlexSocialGuide,beijingYouthHousingGuide,beijingHaidianHousingGuide} from '../data/beijingGuides';
 import {chongqingHomeGuide,chongqingPurchaseGuide,chongqingRentalGuide,chongqingCountiesGuide,chongqingPolicyGuide,chongqingJobseekGuide,chongqingShortageGuide} from '../data/chongqingGuides';
 import {tianjinHaiheGuide,tianjinApartmentGuide,tianjinRentalGuide,tianjinPublicGuide,tianjinStartupGuide,tianjinGrantGuide} from '../data/tianjinGuides';
@@ -295,6 +296,10 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  else if(kind==='policy-guide-preview'&&fragments[2]==='jiangsu'){
   const guide=getJiangsuGuide(fragments[3]||'',decode(fragments[4]||''));
   body=guide?<UnifiedPolicyGuide data={guide}/>:<><Bread current="未找到江苏省指南"/><section className="ts-sub-header"><h1>该指南尚未收录</h1><Link to="/talent-service/cities">返回城市列表 <ArrowRight size={16}/></Link></section></>;
+ }
+ else if(kind==='policy-guide-preview'&&fragments[2]==='guangdong'){
+   const guide=buildGuangdongGuide(decode(fragments[3]||''));
+   body=guide?<UnifiedPolicyGuide data={guide}/>:<div className="ts-sub-empty"><h2>该政策办理指南尚未收录</h2><Link to="/talent-service/cities">返回全国城市目录</Link></div>;
  }
  else if(kind==='policy-guide-preview'&&fragments[2]==='beijing')body=<UnifiedPolicyGuide data={fragments[3]==='public-rental'?beijingPublicRentalGuide:fragments[3]==='market-rent'?beijingMarketRentGuide:fragments[3]==='youth-housing'?beijingYouthHousingGuide:fragments[3]==='haidian'?beijingHaidianHousingGuide:fragments[3]==='graduate-settlement'?beijingGraduateSettlementGuide:fragments[3]==='job-grant'?beijingJobGrantGuide:beijingFlexSocialGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='chongqing')body=<UnifiedPolicyGuide data={fragments[3]==='home'?chongqingHomeGuide:fragments[3]==='purchase'?chongqingPurchaseGuide:fragments[3]==='rental'?chongqingRentalGuide:fragments[3]==='counties'?chongqingCountiesGuide:fragments[3]==='policy'?chongqingPolicyGuide:fragments[3]==='jobseek'?chongqingJobseekGuide:chongqingShortageGuide}/>;
