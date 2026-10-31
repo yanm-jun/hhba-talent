@@ -37,7 +37,6 @@ for(const id of ['gd-sz-high-talent-rent-202608','gd-dg-guanai-home-202609','gd-
 const province=data('guangdongProvincialPolicyRecords.ts');
 const regionalRecords=ids(province).filter(id=>id.includes('-yddxb-youth-'));
 assert.equal(regionalRecords.length,12);
-for(const city of ['广州','深圳','佛山','东莞','珠海','中山','惠州','江门','肇庆'])assert.ok(!regionalRecords.some(id=>province.includes('"city": "'+city+'"')&&id===id),'Regional grant excludes nine Pearl River Delta cities');
 // Region ID list must match exact eastern/western/northern 12 cities, not any GBA/Pearl Delta cities.
 assert.ok(!regionalRecords.some(id=>['gz','sz','fs','dg','zh','zs','hz','jm','zq'].some(x=>id.endsWith('-'+x))));
 console.log('PASS Guangdong V5.1: '+cities.length+' cities, '+P.length+' sourced municipal/provincial policy records, '+H.length+' housing records, 12 region-specific graduation grants, 6-section shared B/C guides');
