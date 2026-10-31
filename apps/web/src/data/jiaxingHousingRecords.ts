@@ -7,7 +7,7 @@ export const JIAXING_HOUSING_RECORDS:TalentHousingRecord[]=[
     "district": "嘉兴市区配售型保障性住房制度",
     "title": "嘉兴市区人才配售型保障性住房申请制度",
     "address": "嘉兴市区配售型保障性住房制度，具体楼盘房号待公示",
-    "published": "2025-06-01",
+    "published": "2025-05-28",
     "sourceUrl": "https://zjjcmspublic.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/jcms_files/jcms1/web2778/site/attach/0/64e16f1a173b4461810ec1cc9e0dbb64.pdf",
     "units": "配售型保障性住房以家庭申请，部分经嘉兴认定人才码人员可以作为申请对象，须以市区最新完整细则核对；不得等同普遍购房现金补贴。",
     "rent": "以配售项目公布的保障性住房价格与房源为准，非人才现金补助；不能冒充固定房价或当前空房。",
