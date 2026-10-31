@@ -1,0 +1,32 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const root=new URL('../src/data/',import.meta.url);
+const read=(name)=>fs.readFileSync(new URL(name,root),'utf8');
+const policy=read('hangzhouPolicyRecords.ts');
+const housing=read('hangzhouHousingRecords.ts');
+const policyIndex=read('talentPolicyRecords.ts');
+const housingIndex=read('talentHousingRecords.ts');
+const registry=read('talentCityRegistry.ts');
+assert.match(policyIndex,/import \\{HANGZHOU_POLICY_RECORDS\\}/);
+assert.match(policyIndex,/\\.\\.\\.HANGZHOU_POLICY_RECORDS/);
+assert.match(housingIndex,/import \\{HANGZHOU_HOUSING_RECORDS\\}/);
+assert.match(housingIndex,/\\.\\.\\.HANGZHOU_HOUSING_RECORDS/);
+assert.match(registry,/330100\\|杭州市\\|浙江省/);
+assert.match(policy,/hz-2026-graduate-rent/);
+assert.match(policy,/hz-2026-high-purchase/);
+assert.match(policy,/hz-2026-high-rental/);
+assert.match(policy,/hz-2026-talent-rental-policy/);
+assert.match(policy,/hz-2023-2025-graduate-living-base/);
+assert.match(policy,/https:\\/\\/ql\\.hangzhou\\.gov\\.cn/);
+assert.match(policy,/https:\\/\\/zfgb\\.hangzhou\\.gov\\.cn/);
+assert.match(policy,/\"temporal\": \"historical\"/);
+assert.match(housing,/不是房源项目地址/);
+assert.match(housing,/不是具体公寓地址/);
+for(const file of [policy,housing]){
+ assert.doesNotMatch(file,/example\\.com|TODO|虚构房源/);
+ assert.match(file,/2026-10-31/);
+}
+const ids=[...policy.matchAll(/\\"id\\": \\"([^\\"]+)\\"/g),...housing.matchAll(/\\"id\\": \\"([^\\"]+)\\"/g)].map(x=>x[1]);
+assert.equal(ids.length,new Set(ids).size,'IDs unique');
+assert.equal(ids.length,7);
+console.log('HANGZHOU_V51_SOURCE_AND_REGISTRY_OK',ids.length);
