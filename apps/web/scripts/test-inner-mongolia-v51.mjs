@@ -14,13 +14,13 @@ assert.equal(queryTalentCities('','内蒙古自治区').length,12);
 for(const q of ['兴安盟','锡林郭勒盟','阿拉善盟'])assert.equal(findTalentCity(q)?.name,q);
 const policies=TALENT_POLICY_RECORDS.filter(p=>p.id.startsWith('nm-'));
 const houses=TALENT_HOUSING_RECORDS.filter(h=>h.id.startsWith('nm-'));
-assert.equal(policies.length,36);
-assert.equal(houses.length,31);
-assert.equal(new Set([...policies,...houses].map(x=>x.id)).size,67);
+assert.equal(policies.length,37);
+assert.equal(houses.length,33);
+assert.equal(new Set([...policies,...houses].map(x=>x.id)).size,70);
 for(const city of cities){
  assert.equal(findTalentCity(city)?.name,city);
  const pr=policies.filter(p=>p.city===city),hr=houses.filter(h=>h.city===city);
- assert.equal(pr.length,3,'2 region-wide and 1 local reference: '+city);
+ assert.equal(pr.length,city==='赤峰'?4:3,'2 region-wide + city-specific records: '+city);
  assert.ok(hr.length>=2,'housing records '+city);
  assert.equal(pr.filter(x=>x.id.includes('-province-')).length,2);
  for(const p of pr){
@@ -46,4 +46,4 @@ const read=path=>readFileSync(new URL('../src/'+path,import.meta.url),'utf8');
 assert.ok(read('pages/TalentServiceRoutes.tsx').includes("fragments[2]==='inner-mongolia'"));
 assert.ok(read('components/talent/UnifiedPolicyList.tsx').includes("p.id.startsWith('nm-')"));
 assert.ok(read('pages/TalentCityDirectory.tsx').includes('totals.leagues'));
-console.log('PASS Inner Mongolia V5.1 12 regions, 36 policies (24 province shared), 31 housing reference programs, 36 B/C guides and 308 national entries.');
+console.log('PASS Inner Mongolia V5.1 12 regions, 37 policies (24 province shared), 33 housing reference programs, 37 B/C guides and 308 national entries.');
