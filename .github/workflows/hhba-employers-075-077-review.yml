@@ -1,0 +1,73 @@
+name: HHBA employers 075-077 isolated static review
+on:
+  push:
+    branches: [feature/employers-075-077-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-employers-075-077-review
+  cancel-in-progress: true
+jobs:
+  build-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install image validation library
+        run: python -m pip install --quiet Pillow
+      - name: Package inherited 072-074 official-source images
+        working-directory: apps/web
+        run: python scripts/prepare-employers-072-074-sourced-media.py
+      - name: Package inherited 069-071 official-source images
+        working-directory: apps/web
+        run: python scripts/prepare-employers-069-071-source-media.py
+      - name: Package inherited 066-068 official-source images
+        working-directory: apps/web
+        run: python scripts/prepare-employers-066-068-real-media.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install pinned dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Run company batch and search regression contracts
+        working-directory: apps/web
+        run: |
+          for id in 054-056 057-059 060-062 063-065 066-068 069-071 072-074 075-077; do
+            node "scripts/employers-$id-v2.contract.test.mjs"
+          done
+          node scripts/recruitment-market-source-invalid.regression.test.mjs
+          node scripts/employer-job-level-search.contract.test.mjs
+      - name: Create isolated GitHub Pages-shaped static output (no deploy)
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: |
+          npm run build
+          node scripts/materialize-company-route-entries.mjs
+      - name: Check direct company routes and three independently hosted media assets
+        run: |
+          test -s apps/web/dist/index.html
+          for id in 075 076 077; do
+            test -s "apps/web/dist/companies/autumn/cn-autumn-$id/index.html"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/photo1.svg"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/photo2.svg"
+          done
+          test -s apps/web/dist/images/autumn-real-logos/cn-autumn-075.svg
+          test -s apps/web/dist/images/autumn-real-logos/cn-autumn-076.svg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-077/logo.svg
+      - name: Upload full independent review website
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-employers-075-077-static-review
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
