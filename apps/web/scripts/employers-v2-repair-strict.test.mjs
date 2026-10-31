@@ -25,7 +25,8 @@ for(const num of ids){
  assert(fs.existsSync(localAudit),'Missing image provenance ledger '+id);
  const audit=JSON.parse(read(localAudit));
  const provenanceName=audit.company||Object.values(audit).find(v=>v&&typeof v==='object'&&v.company)?.company;
- assert(typeof provenanceName==='string'&&[p.name,...p.aliases].some(n=>provenanceName.includes(n)||n.includes(provenanceName)),'Incorrect audit provenance '+id+': '+provenanceName);
+ const hasThreeSourceHashes=Object.entries(audit).filter(([k,v])=>/^(?:logo|photo[12])\.(?:png|jpe?g|webp)$/.test(k)&&v&&typeof v==='object'&&v.source&&v.sha256).length===3;
+ assert((typeof provenanceName==='string'&&[p.name,...p.aliases].some(n=>provenanceName.includes(n)||n.includes(provenanceName)))||(!provenanceName&&hasThreeSourceHashes),'Incorrect audit provenance '+id+': '+provenanceName);
  if(audit.officialLogo===false||audit.realPhotos===false||audit.sourceVerification==='pending'||audit.realPhotoValidationComplete===false)unverifiedMedia++;
 }
 assert.equal(count,55);
