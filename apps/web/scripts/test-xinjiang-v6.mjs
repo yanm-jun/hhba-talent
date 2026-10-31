@@ -37,7 +37,7 @@ for(const city of cities){
  for(const x of h){
   assert.ok(x.sourceUrl.startsWith('https://')&&x.title&&x.address&&x.units&&x.eligibility.length>=80,x.id);
   assert.ok(x.steps?.length>=5&&x.statusNote?.includes('非实时空房')&&x.statusNote?.includes('申报入口待核实'),x.id);
-  assert.ok(talentSourceKind(x.sourceUrl)==='government'||x.city==='阿克苏'&&x.sourceUrl.includes('aksxw.com'),x.id+' must be government verified or explicitly labeled local secondary source');
+  assert.equal(talentSourceKind(x.sourceUrl),'government',x.id+' must have direct government source');
   assert.equal(TALENT_HOUSING_RECORDS.filter(y=>y.id===x.id).length,1,x.id+' missing/duplicate nationwide housing index');
   const g=buildXinjiangGuide('housing',x.id);
   assert.ok(g&&g.faq.length>=10&&g.steps.length>=5&&g.branches.verify,x.id+' missing housing eligibility/FAQ');
