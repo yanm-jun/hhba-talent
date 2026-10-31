@@ -287,7 +287,7 @@ export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
        <p>{job.requirements}</p>
        {detailedCards&&<div className="hhba-v2-weipu-detail-links">
         <Link to={'/candidate/jobs/'+encodeURIComponent('cn-v2-profile-'+p.id+'-'+job.id)}>站内岗位详情 <ArrowRight size={13}/></Link>
-        <a href={p.recruitment.url} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">官方招聘入口 <ExternalLink size={13}/></a>
+        <a href={p.recruitment.url} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">{p.recruitment.status==='unconfirmed'?'招聘公告／企业资料（入口待核）':'官方招聘入口'} <ExternalLink size={13}/></a>
        </div>}
       </details>
       {showcase&&!detailedCards&&<div className="hhba-v2-qizheng-role-actions">
