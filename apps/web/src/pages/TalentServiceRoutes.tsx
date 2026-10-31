@@ -15,6 +15,7 @@ import {TalentQingdaoPolicyPreview} from './TalentQingdaoPolicyPreview';
 import {TalentQingdaoGuidePreview} from './TalentQingdaoGuidePreview';
 import {TalentLaoshanGuide} from './TalentLaoshanGuide';
 import {UnifiedPolicyGuide} from '../components/talent/UnifiedPolicyGuide';
+import {shijiazhuangRentGuide,shijiazhuangBuyGuide,shijiazhuangSettlementGuide,shijiazhuangHousingGuide} from '../data/shijiazhuangGuides';
 import {hezeLivingGuide,hezePurchaseGuide,hezeStartupGuide,hezeHousingGuide} from '../data/talentHezeGuides';
 import {taianLivingGuide,taianPurchaseGuide,taianHousingGuide} from '../data/taianGuide';
 import {ziboLivingGuide,ziboPurchaseGuide,ziboZichuanHousingGuide} from '../data/ziboGuide';
@@ -245,6 +246,7 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  else if(kind==='policy-guide-preview'&&fragments[2]==='dongying'&&fragments[3]==='transition')body=<UnifiedPolicyGuide data={dongyingTransitionGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='linyi'&&fragments[3]==='living')body=<UnifiedPolicyGuide data={linyiLivingGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='heze')body=<UnifiedPolicyGuide data={fragments[3]==='purchase'?hezePurchaseGuide:fragments[3]==='startup'?hezeStartupGuide:fragments[3]==='housing'?hezeHousingGuide:hezeLivingGuide}/>;
+ else if(kind==='policy-guide-preview'&&fragments[2]==='shijiazhuang')body=<UnifiedPolicyGuide data={fragments[3]==='home'?shijiazhuangBuyGuide:fragments[3]==='settlement'?shijiazhuangSettlementGuide:fragments[3]==='housing'?shijiazhuangHousingGuide:shijiazhuangRentGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='taian')body=<UnifiedPolicyGuide data={fragments[3]==='purchase'?taianPurchaseGuide:fragments[3]==='housing'?taianHousingGuide:taianLivingGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='zibo')body=<UnifiedPolicyGuide data={fragments[3]==='purchase'?ziboPurchaseGuide:fragments[3]==='housing'?ziboZichuanHousingGuide:ziboLivingGuide}/>;
   else if(kind==='policy-guide-preview'&&fragments[2]==='yantai')body=<UnifiedPolicyGuide data={fragments[3]==='home'?yantaiHomeGuide:yantaiLivingGuide}/>;
