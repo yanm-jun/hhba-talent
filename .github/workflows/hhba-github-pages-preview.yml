@@ -63,7 +63,8 @@ permissions:
   id-token: write
 concurrency:
   group: hhba-github-pages-preview
-  cancel-in-progress: false
+  # Deploy only the latest main commit; obsolete runs must not block new releases.
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -781,12 +782,15 @@ jobs:
           grep -q "DOMESTIC_REBUILD_V2" apps/web/src/services/liveRecruitment.ts
           echo HHBA_V2_LEGACY_SNAPSHOT_COMPATIBILITY_RETAINED_MARKET_V2_ISOLATED
       # All company media and profiles are versioned on this one main branch.
+      # Full Chromium E2E runs on workflow_dispatch, never blocks routine main pushes.
       - name: Install Chromium for genuine same-site V2 search acceptance
+        if: github.event_name == 'workflow_dispatch'
         working-directory: apps/web
         run: |
           npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
           npx playwright install --with-deps chromium
       - name: Browser-test Southern and Guangzhilv through the ACTUAL main search, desktop and mobile
+        if: github.event_name == 'workflow_dispatch'
         working-directory: apps/web
         env:
           HHBA_GITHUB_PAGES: '1'
@@ -811,7 +815,7 @@ jobs:
           node scripts/monash.browser.mjs
           node scripts/tum.browser.mjs
       - name: Save screenshots and the real search/browser verification results
-        if: always()
+        if: github.event_name == 'workflow_dispatch' && always()
         uses: actions/upload-artifact@v4
         with:
           name: hhba-mainline-v2-browser-proof
