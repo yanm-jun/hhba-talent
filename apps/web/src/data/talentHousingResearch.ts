@@ -1,3 +1,4 @@
+import {XINGTAI_HOUSING_RESEARCH_LEADS} from './xingtaiHousingLeads.ts';
 import {QINHUANGDAO_HOUSING_LEADS} from './qinhuangdaoHousingLeads.ts';
 import {HEZE_HOUSING_RESEARCH_LEADS} from './hezeHousingLeads.ts';
 /**
@@ -12,6 +13,7 @@ export type TalentHousingResearchLead={
 };
 export const TALENT_HOUSING_RESEARCH_LEADS:TalentHousingResearchLead[]=[
 ...QINHUANGDAO_HOUSING_LEADS,
+...XINGTAI_HOUSING_RESEARCH_LEADS,
 {
   id: "lc-jingkai-2026-batches-lead",
   city: "聊城",
