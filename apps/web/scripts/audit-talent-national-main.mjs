@@ -29,8 +29,13 @@ assert.equal(names.size,TALENT_CITY_INDEX.length,'duplicate region names');
 assert.equal(new Set(TALENT_CITY_INDEX.map(c=>c.code)).size,TALENT_CITY_INDEX.length,'duplicate region codes');
 assert.equal(TALENT_PREFECTURE_CITIES.length,293,'original prefecture-city baseline was modified');
 assert.equal(TALENT_CITY_INDEX.length,337,'25 additional prefecture-level administrative regions must be indexed');
+// Explicitly allow ONLY registered Qinghai province-wide shared records; reject arbitrary orphan city names.
+const approvedProvincialIds=new Set([
+ ...QINGHAI_SHARED_POLICY_RECORDS,
+ ...QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS.filter(h=>h.city==='青海省')
+].map(r=>r.id));
 for(const r of [...TALENT_POLICY_RECORDS,...TALENT_HOUSING_RECORDS]){
- assert.ok(names.has(r.city),'orphan data points to an unknown region: '+r.city+' / '+r.id);
+ assert.ok(names.has(r.city)||(r.city==='青海省'&&approvedProvincialIds.has(r.id)),'orphan data points to an unknown region: '+r.city+' / '+r.id);
  assert.ok(r.id&&r.sourceUrl&&r.published,'missing ID, evidence or published date: '+r.id);
 }
 const provinceCoverage=Object.entries(provincialTargets).map(([province,expected])=>{
