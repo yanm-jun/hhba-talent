@@ -42,7 +42,7 @@ jobs:
       - name: Install locked frontend dependencies
         working-directory: apps/web
         run: npm ci --no-audit --no-fund
-      - name: Run all eight historical employer batches, current batch, and search security regression
+      - name: Run 054-083 employer batches and job-level search/security regressions
         working-directory: apps/web
         run: |
           for id in 054-056 057-059 060-062 063-065 066-068 069-071 072-074 075-077 078-080 081-083; do
@@ -68,17 +68,17 @@ jobs:
             test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/photo2.svg"
             test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/media-sources.json"
           done
-          test -s apps/web/dist/images/autumn-real-logos/cn-autumn-078.svg
-          test -s apps/web/dist/images/employer-profiles/cn-autumn-079/logo.svg
-          test -s apps/web/dist/images/employer-profiles/cn-autumn-080/logo.svg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-081/logo.svg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-082/logo.svg
+          test -s apps/web/dist/images/autumn-real-logos/cn-autumn-083.svg
       - name: Preserve actual photograph provenance and copyright caveats
         uses: actions/upload-artifact@v4
         with:
           name: hhba-081-083-photography-source-and-permission-audit
           path: |
-            apps/web/public/images/employer-profiles/cn-autumn-078/media-sources.json
-            apps/web/public/images/employer-profiles/cn-autumn-079/media-sources.json
-            apps/web/public/images/employer-profiles/cn-autumn-080/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-081/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-082/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-083/media-sources.json
           retention-days: 30
           if-no-files-found: error
       - name: Upload complete build for independent user review, not deployment
