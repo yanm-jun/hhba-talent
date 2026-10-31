@@ -19,7 +19,7 @@ export function AnkerCompactProfilePage({user}:{user:User|null}){
  const back=getCompanyReturnTarget();
  const [expanded,setExpanded]=useState(false);
  return <Shell user={user}>
-  <article className="company-profile hhba-kpmg-compact hhba-anker-compact" data-company-template="unified-v2" data-four-block-contract="hero,majors,jobs,business" data-domestic-rebuild="v2" data-employer-id="cn-autumn-008">
+  <article className="company-profile hhba-kpmg-compact hhba-anker-compact" data-company-template="openai" data-four-block-contract="hero,majors,jobs,business" data-domestic-rebuild="v2" data-employer-id="cn-autumn-008">
    <nav className="company-profile-top" aria-label="企业详情导航">
     <Link to={back.to} restoreScrollY={back.scrollY} restoreMarketState={back.marketState}><ArrowLeft size={15}/> 返回上一页</Link>
     <Link to="/candidate/jobs">招聘市场 <ArrowRight size={15}/></Link>
