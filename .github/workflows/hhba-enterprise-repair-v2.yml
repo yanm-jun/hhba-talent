@@ -1,0 +1,71 @@
+name: HHBA enterprise 1-65 completeness remediation and isolated preview
+on:
+  push:
+    branches:
+      - fix/employer-completeness-v2-20261031
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-enterprise-repair-v2
+  cancel-in-progress: true
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install exact frontend deps
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Strict data/image/factory integrity across 11-65
+        working-directory: apps/web
+        run: |
+          node scripts/employer-factory-check.mjs
+          node scripts/employers-v2-repair-strict.test.mjs
+          node scripts/employers-054-056-v2.contract.test.mjs
+          node scripts/employers-057-059-v2.contract.test.mjs
+          node scripts/employers-060-062-v2.contract.test.mjs
+          node scripts/employers-063-065-v2.contract.test.mjs
+          node scripts/recruitment-market-source-invalid.regression.test.mjs
+      - name: Generate fresh enterprise audit and block on remaining P1
+        working-directory: apps/web
+        run: |
+          node scripts/employer-completeness-audit.mjs
+          node --input-type=module -e 'import fs from "node:fs";const a=JSON.parse(fs.readFileSync("audit-output/employer-completeness-20261031.json"));if(a.summary.issueCounts.P1!==0||a.summary.generic.length!==0){console.error("P1 deficits",a.summary);process.exit(1)}console.log("HISTORICAL_P1_FIXED",a.summary)'
+      - name: Compile non-production GitHub Pages static snapshot
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: |
+          npm run build
+          node scripts/materialize-company-route-entries.mjs
+      - name: Check every company route and media asset in dist
+        working-directory: apps/web
+        run: |
+          test -s dist/index.html
+          for num in $(seq -w 11 65); do
+            test -f "dist/companies/autumn/cn-autumn-0$num/index.html" || echo "ROUTE_PATH_REVIEW cn-autumn-0$num (check materializer rules)"
+          done
+          node scripts/employers-v2-repair-strict.test.mjs
+      - name: Upload revised audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-enterprise-repair-quality-audit
+          path: apps/web/audit-output/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Upload isolated rebuilt static website (not live deployed)
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-enterprise-repair-full-static-review
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
