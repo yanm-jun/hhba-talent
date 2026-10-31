@@ -64,6 +64,7 @@ def normalize(raw,kind):
     rate=700/im.width;im=im.resize((700,round(im.height*rate)),Image.Resampling.LANCZOS)
    im.thumbnail((1300,900))
   else:
+   if im.width/im.height>3.6 or im.height/im.width>3.2:raise ValueError('website decoration/banner rather than company photo')
    if im.width<120 or im.height<85:raise ValueError('company image not legible even as source thumbnail')
    im=im.convert('RGB')
    # Company product directory listings frequently expose only verified thumbnails.
@@ -128,6 +129,9 @@ for num,cfg in CFG.items():
  used=set()
  for name in ['logo.png','photo1.jpg','photo2.jpg']:
   f=root/name;old=audit.get(name)
+  if num=='050' and name=='photo1.jpg' and old and old.get('source','').startswith('https://saas-chengdu.oss-cn-chengdu.aliyuncs.com/uploads/20230726/c0624d61'):
+   # Visually inspected: this is the CHAMBER logo banner, not a Huirong company picture.
+   print('REJECT_NONCOMPANY_TIANFU_CHAMBER_BANNER',flush=True);old=None
   if old and old.get('sha256') and f.is_file() and f.stat().st_size>2500 and sha256(f.read_bytes()).hexdigest()==old['sha256']:
    used.add(old.get('sourceSha256','editorial-'+num)); print('PINNED_VISUAL',num,name,flush=True);continue
   if num=='048' and name=='logo.png':
