@@ -15,6 +15,8 @@ import {TalentQingdaoPolicyPreview} from './TalentQingdaoPolicyPreview';
 import {TalentQingdaoGuidePreview} from './TalentQingdaoGuidePreview';
 import {TalentLaoshanGuide} from './TalentLaoshanGuide';
 import {UnifiedPolicyGuide} from '../components/talent/UnifiedPolicyGuide';
+import {GUANGXI_RENT_RESEARCH_RECORDS} from '../data/guangxiRentPolicyResearch';
+import {buildGuangxiGuide,GUANGXI_14_CITIES} from '../data/guangxiGuides';
 import {beijingPublicRentalGuide,beijingMarketRentGuide,beijingGraduateSettlementGuide,beijingJobGrantGuide,beijingFlexSocialGuide,beijingYouthHousingGuide,beijingHaidianHousingGuide} from '../data/beijingGuides';
 import {chongqingHomeGuide,chongqingPurchaseGuide,chongqingRentalGuide,chongqingCountiesGuide,chongqingPolicyGuide,chongqingJobseekGuide,chongqingShortageGuide} from '../data/chongqingGuides';
 import {tianjinHaiheGuide,tianjinApartmentGuide,tianjinRentalGuide,tianjinPublicGuide,tianjinStartupGuide,tianjinGrantGuide} from '../data/tianjinGuides';
@@ -191,6 +193,15 @@ function CityHub({city}:{city:string}){
     <Link to="/talent-service/policy-guide-preview/heze/startup" className="ts-sub-tile"><strong>一次性创业补贴</strong><span>经营与参保条件及办理步骤</span><ArrowRight size={15}/></Link>
     <Link to="/talent-service/policy-guide-preview/heze/housing" className="ts-sub-tile"><strong>人才公寓和公租房</strong><span>五小区住房线索及真实申报核验</span><ArrowRight size={15}/></Link>
    </div></section>}
+  {GUANGXI_14_CITIES.includes(match.name)&&<section className="ts-sub-section" aria-label="广西自治区2026人才政策及历史招募指南">
+   <div className="ts-sub-section-heading"><h2>{match.name} · 广西人才政策与安居</h2><Link to={talentListUrl('policies',match.name)}>查看全部政策资料 <ArrowRight size={15}/></Link></div>
+   <p>已收录自治区2026购新补贴、2026高校毕业生保障性租赁住房补贴，以及2026年已截止的“三支一扶”基层招募。以上属自治区统一政策在{match.name}的属地检索，并非该市自行制定的三个独立人才补贴。当地人才公寓、保租房具体项目与市级安家支持须以当地主管部门的真实公告为准。</p>
+   <div className="ts-sub-grid">
+    <Link to={'/talent-service/policy-guide-preview/guangxi/'+encodeURIComponent(match.name)+'/purchase'} className="ts-sub-tile"><strong>2026自治区购房补贴</strong><span>新建商品住房8000—10000元基础档，符合特殊条件可叠加，最高3万元</span><ArrowRight size={15}/></Link>
+    <Link to={'/talent-service/policy-guide-preview/guangxi/'+encodeURIComponent(match.name)+'/rental'} className="ts-sub-tile"><strong>高校毕业生保租房安居补贴</strong><span>实缴3个月租金的50%基础支持，详查房源、资格与云闪付申报</span><ArrowRight size={15}/></Link>
+    <Link to={'/talent-service/policy-guide-preview/guangxi/'+encodeURIComponent(match.name)+'/three-support'} className="ts-sub-tile"><strong>2026三支一扶历史招募</strong><span>报名已于2026年6月16日截止，查看岗位资格、考试流程与在岗待遇</span><ArrowRight size={15}/></Link>
+   </div>
+  </section>}
   {housingLeads.length>0&&<section className="ts-sub-section" aria-label="人才公寓项目线索预览">
    <div className="ts-sub-section-heading"><h2>人才公寓在哪里？</h2><Link to={talentListUrl('housing',match.name)}>查看全部住房政策与公寓资料 <ArrowRight size={15}/></Link></div>
    <p className="ts-housing-inventory-note">以下公寓点位有公开报道可追溯，但当期项目原文、空房及申请入口仍待核验；不是已经开放的房源。</p>
@@ -214,7 +225,7 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
  const housingMode=kind==='housing';
  const guideMode=kind==='guide';
  const title=searchMode?'搜索结果':housingMode?'人才安居':kind==='benefits'?'补贴与福利':guideMode?'申请指南':'人才政策';
- const resultPolicies=(searchMode?[...TALENT_POLICY_RECORDS,...XINGTAI_POLICY_RESEARCH_RECORDS]:TALENT_POLICY_RECORDS).filter(p=>p.city===city&&(!query||matchesPolicy(p,query,city))&&(!housingMode||isHousingPolicy(p))&&(kind!=='benefits'||benefit(p))).sort(recentPolicies);
+ const resultPolicies=([...TALENT_POLICY_RECORDS,...GUANGXI_RENT_RESEARCH_RECORDS,...(searchMode?XINGTAI_POLICY_RESEARCH_RECORDS:[])]).filter(p=>p.city===city&&(!query||matchesPolicy(p,query,city))&&(!housingMode||isHousingPolicy(p))&&(kind!=='benefits'||benefit(p))).sort(recentPolicies);
  const resultHomes=TALENT_HOUSING_RECORDS.filter(p=>p.city===city&&(housingMode||searchMode)&&(!query||matchesHousing(p,query,city))).sort(housingFirst);
  const pendingHousingCount=(housingMode||searchMode)?housingResearchLeads(city,query||'').length:0;
  const housingHistoricalCount=(housingMode||searchMode)?housingPolicyResearch(city,query||'').length:0;
@@ -268,7 +279,7 @@ function GuideContent({city}:{city:string}){
  </>;
 }
 function DetailPage({kind,id}:{kind:'policy'|'housing';id:string}){
- const p=kind==='policy'?(TALENT_POLICY_RECORDS.find(x=>x.id===id)||XINGTAI_POLICY_RESEARCH_RECORDS.find(x=>x.id===id)):undefined;
+ const p=kind==='policy'?(TALENT_POLICY_RECORDS.find(x=>x.id===id)||GUANGXI_RENT_RESEARCH_RECORDS.find(x=>x.id===id)||XINGTAI_POLICY_RESEARCH_RECORDS.find(x=>x.id===id)):undefined;
  const h=kind==='housing'?TALENT_HOUSING_RECORDS.find(x=>x.id===id):undefined;
  if(!p&&!h)return <><Bread current="未找到该条资料"/><Empty city="所选城市" kind="详情"/></>;
  return <UnifiedTalentRecordDetail policy={p} housing={h}/>;
