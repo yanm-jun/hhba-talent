@@ -1,0 +1,50 @@
+name: HHBA Zhejiang production integration zero-card guard
+on:
+  push:
+    branches: [fix/talent-zhejiang-main-zero-20261031]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/data/*PolicyRecords.ts'
+      - 'apps/web/src/data/*HousingRecords.ts'
+      - 'apps/web/scripts/audit-talent-city-zero-coverage.mjs'
+      - 'apps/web/scripts/test-talent-city-contract-v51.mjs'
+      - '.github/workflows/hhba-zhejiang-main-integration-verify.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Audit all national cities and enforce Zhejiang no-zero rule
+        working-directory: apps/web
+        run: |
+          node --experimental-strip-types scripts/audit-talent-city-zero-coverage.mjs
+          node --experimental-strip-types scripts/test-zhejiang-11city-v51.mjs
+          node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+          node --experimental-strip-types scripts/test-talent-cities.mjs
+          node --experimental-strip-types scripts/test-talent-housing-card-coverage.mjs
+          node scripts/global-talent-nav.contract.test.mjs
+      - name: Compile preserved main website as isolated preview
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '0'
+          HHBA_PAGES_BASE: '/'
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zhejiang-main-rebase-static-preview
+          path: apps/web/dist
+          if-no-files-found: error
+          retention-days: 7

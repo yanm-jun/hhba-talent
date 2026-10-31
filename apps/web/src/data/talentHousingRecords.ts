@@ -1,3 +1,14 @@
+import {HANGZHOU_HOUSING_RECORDS} from './hangzhouHousingRecords.ts';
+import {NINGBO_HOUSING_RECORDS} from './ningboHousingRecords.ts';
+import {WENZHOU_HOUSING_RECORDS} from './wenzhouHousingRecords.ts';
+import {JIAXING_HOUSING_RECORDS} from './jiaxingHousingRecords.ts';
+import {HUZHOU_HOUSING_RECORDS} from './huzhouHousingRecords.ts';
+import {SHAOXING_HOUSING_RECORDS} from './shaoxingHousingRecords.ts';
+import {JINHUA_HOUSING_RECORDS} from './jinhuaHousingRecords.ts';
+import {QUZHOU_HOUSING_RECORDS} from './quzhouHousingRecords.ts';
+import {ZHOUSHAN_HOUSING_RECORDS} from './zhoushanHousingRecords.ts';
+import {TAIZHOU_HOUSING_RECORDS} from './taizhouHousingRecords.ts';
+import {LISHUI_HOUSING_RECORDS} from './lishuiHousingRecords.ts';
 import {TALENT_HOUSING_COVERAGE_FIX_20261031} from './talentHousingCoverageFix20261031.ts';
 import {JIANGSU_HOUSING_RECORDS} from './jiangsuHousingRecords.ts';
 import {GUANGDONG_HOUSING_RECORDS} from './guangdongHousingRecords.ts';
@@ -27,6 +38,17 @@ import {WEIFANG_HOUSING_RECORDS} from './weifangHousingRecords.ts';
 export type TalentHousingRecord={id:string;city:string;district:string;title:string;address:string;units:string;rent:string;eligibility:string;sourceUrl:string;published:string;applicationEnd?:string;statusNote:string;steps:string[];applyUrl?:string;kind:'project'|'program';reviewedAt:string;contactPhone?:string;contactSourceUrl?:string;photoEvidence?:'source';housingCategory?:'人才公寓'|'保障性租赁住房'|'其他住房';};
 export const HOUSING_REVIEW_DATE='2026-10-30';
 export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
+...HANGZHOU_HOUSING_RECORDS,
+...NINGBO_HOUSING_RECORDS,
+...WENZHOU_HOUSING_RECORDS,
+...JIAXING_HOUSING_RECORDS,
+...HUZHOU_HOUSING_RECORDS,
+...SHAOXING_HOUSING_RECORDS,
+...JINHUA_HOUSING_RECORDS,
+...QUZHOU_HOUSING_RECORDS,
+...ZHOUSHAN_HOUSING_RECORDS,
+...TAIZHOU_HOUSING_RECORDS,
+...LISHUI_HOUSING_RECORDS,
 ...GUANGXI_HOUSING_RECORDS,
 ...TALENT_HOUSING_COVERAGE_FIX_20261031,
 ...JIANGSU_HOUSING_RECORDS,
