@@ -70,7 +70,7 @@ export const birminghamPrograms={
   ],
   intlTuition:[],
   feesStatus:'国际生学费尚未在核对的项目页得到清晰可复核的金额；不得引用 UK/Ireland £12,780 作为国际生收费',
-  note:'国际生应选择课程官网的 international 身份及相应入学年份，核实收费、CAS 押金和生活预算；没有足够证据时不能填写“预计收费”。',
+  note:'国际生应选择课程官网的 international 身份及相应入学年份，核实收费、CAS 押金和生活预算；在缺少足够官方证据时，不得把英国本地生 £12,780 的费用冒充国际生学费，也不得填写推测金额。',
   courseUrl:birminghamSources.aics.url
  }
 } as const;
