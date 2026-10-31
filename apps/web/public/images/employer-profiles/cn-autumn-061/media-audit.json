@@ -1,0 +1,31 @@
+{
+  "company": "美迈科技",
+  "source": "HHBA original editorial vector graphics for placeholders",
+  "rights": "Original HHBA illustration; NOT company media",
+  "officialLogo": false,
+  "realPhotos": false,
+  "files": [
+    {
+      "filename": "logo.svg",
+      "format": "SVG",
+      "source": "HHBA original",
+      "editorialFallback": true,
+      "verifiedOfficial": false
+    },
+    {
+      "filename": "photo1.svg",
+      "format": "SVG",
+      "source": "HHBA original",
+      "editorialFallback": true,
+      "verifiedOfficial": false
+    },
+    {
+      "filename": "photo2.svg",
+      "format": "SVG",
+      "source": "HHBA original",
+      "editorialFallback": true,
+      "verifiedOfficial": false
+    }
+  ],
+  "replaceBeforeOfficialLaunch": true
+}
