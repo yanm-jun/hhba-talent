@@ -38,6 +38,7 @@ const meimai=JSON.parse(read('src/data/employerProfiles/cn-autumn-061.json'));
 assert(meimai.jobs.some(j=>j.title.includes('TikTok')||j.title.includes('Tiktok')));
 assert(meimai.jobs.some(j=>j.majorUnrestricted),'Unrestricted-major roles must remain unrestricted');
 const xiamen=JSON.parse(read('src/data/employerProfiles/cn-autumn-062.json'));
-assert.equal(xiamen.recruitment.status,'unconfirmed');
+assert.equal(xiamen.recruitment.status,'archived_source');
+assert(xiamen.recruitment.label.includes('非网申'),'Archived university source must not impersonate official application');
 assert(xiamen.jobs.every(j=>j.requirements.includes('冲突')),'Conflicting degree reports must be disclosed');
 console.log('HHBA_060_062_ALL_PASS: 20 sourced recruitment records, 18 business cards, 9 independent editorial SVG assets');
