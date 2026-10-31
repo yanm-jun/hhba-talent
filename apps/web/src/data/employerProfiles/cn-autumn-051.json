@@ -1,0 +1,323 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-051",
+  "name": "金中新材",
+  "displayName": "金中新材",
+  "englishName": "Liaoning Jinzhong New Materials",
+  "aliases": [
+    "辽宁金中新材料产业集团有限公司",
+    "辽宁金中新材",
+    "金中公司",
+    "金隅金中新材",
+    "Jinzhong Materials"
+  ],
+  "industry": "水泥与绿色建材 · 矿山资源 · 非金属矿 · 产业运营",
+  "subtitle": "辽宁金中新材料产业集团有限公司 · 沈阳 · 金隅冀东与天山材料合资平台",
+  "overview": "金中新材成立于2023年，是金隅冀东与天山材料共同出资的辽宁建材产业平台，围绕水泥熟料、建材、新型非金属矿材料和区域产业整合展开业务。其公开招聘项目涉及沈阳、辽阳和本溪的投资、采矿、安全、机械、电气和质控职能；不把其他同名企业的高性能合金业务误当作金中新材主营业务。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+    "https://static.cninfo.com.cn/finalpage/2026-05-25/1225328172.PDF",
+    "https://finance.sina.com.cn/jjxw/2025-02-26/doc-inemtyiv9315181.shtml"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-051/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-051/photo1.jpg",
+        "caption": "金中新材相关绿色建材项目",
+        "alt": "与金中新材业务明确关联的辽宁地区建材工厂报道照片",
+        "note": "图片来源为明确提及金中新材或下属项目的报道；如仅为关联企业厂区则注明关联身份，不能冒称金中新材总部实拍。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-051/photo2.jpg",
+        "caption": "金中新材矿山和建材产业链",
+        "alt": "金中公司相关水泥矿山或建材产业链公开资料图片",
+        "note": "来自可核验金中新材项目的新闻现场，不把不相关企业照片冒作金中新材实景。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+    "label": "2027届金中新材校招岗位公开汇总（非官方投递页）",
+    "status": "unconfirmed",
+    "subject": "辽宁金中新材料产业集团有限公司",
+    "note": "公开2027校招材料列明九个岗位以及专业、学历和沈阳/辽阳/本溪工作地点。尚无独立核验的企业官方在线投递系统；本链接仅是第三方招聘摘要，不能宣称职位实时在招。"
+  },
+  "majorIntro": "按九条有出处的校招岗位进行机械、电气、采矿、地质、质检、投资管理等分组，点击方向只看该组岗位；学历最低门槛按公开岗位表保留。",
+  "preferredMajors": [
+    "采矿工程",
+    "地质工程",
+    "安全工程",
+    "机械工程",
+    "机械设计制造及其自动化",
+    "电气工程及其自动化",
+    "无机非金属材料工程",
+    "财务管理",
+    "工商管理",
+    "经济学",
+    "金融学",
+    "法学",
+    "国际经济与贸易"
+  ],
+  "photoNote": "金中新材尚无可确认为企业独立商标的官方品牌Logo下载渠道，暂用明确注明“非企业官方Logo”的HHBA企业名称识别图；两张公司/关联项目业务照片要求附原文来源，不得用同名金属材料公司或别的矿山照片冒充。",
+  "business": [
+    {
+      "title": "辽宁建材产业整合",
+      "description": "发挥金隅冀东和天山材料股东协同，推动辽宁水泥与建材业务资源整合。",
+      "tags": "区域整合 · 水泥",
+      "details": [
+        "辽宁地区产业资产运营",
+        "区域生产供应协调",
+        "股东投资与产业管理"
+      ]
+    },
+    {
+      "title": "水泥与熟料产业",
+      "description": "围绕参股或所属水泥生产单位开展熟料生产、工艺管理及建材市场服务。",
+      "tags": "熟料 · 水泥",
+      "details": [
+        "非金属原料配比及磨制",
+        "水泥生产现场质量控制",
+        "区域客户和建筑市场服务"
+      ]
+    },
+    {
+      "title": "矿山资源与开采",
+      "description": "依托石灰石等非金属矿资源开展采矿安全、地质测量和矿区运营协同。",
+      "tags": "矿山 · 地质",
+      "details": [
+        "非金属矿产资源管理",
+        "矿山开采与测绘",
+        "安全监管及环保复垦协同"
+      ]
+    },
+    {
+      "title": "绿色材料与循环发展",
+      "description": "推进水泥生产绿色化、低碳化和非金属新材料技术研发与推广。",
+      "tags": "绿色建材 · 新材料",
+      "details": [
+        "低碳工艺与节能",
+        "新材料技术研发协作",
+        "工业副产物资源化探讨"
+      ]
+    },
+    {
+      "title": "设备运维与智能制造",
+      "description": "依托建材生产线进行机械电气设备运维、生产自动化与工程技术管理。",
+      "tags": "机械 · 电气",
+      "details": [
+        "机电设备可靠性",
+        "自动化维护与技术改善",
+        "设备检修与安全保障"
+      ]
+    },
+    {
+      "title": "投资经营与产业供应链",
+      "description": "提供投资管理、经营分析、营销、物料运输及区域供应链协同等职能支持。",
+      "tags": "投资 · 供应链",
+      "details": [
+        "项目投资与经营台账",
+        "建材商务管理",
+        "区域物流与客户协同"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "investment",
+      "title": "投资管理岗",
+      "category": "投资财务与管理",
+      "city": "辽宁沈阳",
+      "summary": "参与产业投资可行性资料整理、项目管理和集团经营资料分析。",
+      "requirements": "2027届公开岗位表明确此岗位的所在地、专业大类及学历门槛（本科及以上）；具体岗位职责在公开摘要中没有逐项披露，以上工作描述仅是按岗位职能的辅助解释，最终以招聘单位原始JD为准。",
+      "majorNames": [
+        "财务管理",
+        "工商管理",
+        "经济学",
+        "金融学",
+        "法学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027届",
+      "url": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "辽宁金中新材料产业集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "biz",
+      "title": "业务管理岗",
+      "category": "市场与商务",
+      "city": "辽宁沈阳",
+      "summary": "负责材料市场客户管理、销售项目跟踪及区域业务协调相关工作。",
+      "requirements": "2027届公开岗位表明确此岗位的所在地、专业大类及学历门槛（硕士研究生及以上）；具体岗位职责在公开摘要中没有逐项披露，以上工作描述仅是按岗位职能的辅助解释，最终以招聘单位原始JD为准。",
+      "majorNames": [
+        "市场营销",
+        "国际经济与贸易"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士研究生及以上 · 2027届",
+      "url": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "辽宁金中新材料产业集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "mine",
+      "title": "采矿工程师岗",
+      "category": "矿业与地质",
+      "city": "辽宁辽阳",
+      "summary": "参与非金属矿开采计划、现场采掘工艺及矿区生产技术管理。",
+      "requirements": "2027届公开岗位表明确此岗位的所在地、专业大类及学历门槛（本科及以上）；具体岗位职责在公开摘要中没有逐项披露，以上工作描述仅是按岗位职能的辅助解释，最终以招聘单位原始JD为准。",
+      "majorNames": [
+        "采矿工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027届",
+      "url": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "辽宁金中新材料产业集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "geo",
+      "title": "地质测量工程师岗",
+      "category": "矿业与地质",
+      "city": "辽宁辽阳",
+      "summary": "开展矿山地质资料整理、测量数据分析和资源开采技术支持。",
+      "requirements": "2027届公开岗位表明确此岗位的所在地、专业大类及学历门槛（本科及以上）；具体岗位职责在公开摘要中没有逐项披露，以上工作描述仅是按岗位职能的辅助解释，最终以招聘单位原始JD为准。",
+      "majorNames": [
+        "地质工程",
+        "勘查技术与工程",
+        "测绘工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027届",
+      "url": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "辽宁金中新材料产业集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "safety",
+      "title": "安全管理岗",
+      "category": "安全与质量",
+      "city": "辽宁辽阳",
+      "summary": "开展矿山和建材生产现场安全巡查、安全台账及隐患整改跟踪。",
+      "requirements": "2027届公开岗位表明确此岗位的所在地、专业大类及学历门槛（本科及以上）；具体岗位职责在公开摘要中没有逐项披露，以上工作描述仅是按岗位职能的辅助解释，最终以招聘单位原始JD为准。",
+      "majorNames": [
+        "安全工程",
+        "采矿工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027届",
+      "url": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "辽宁金中新材料产业集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "mechanical-engineer",
+      "title": "机械工程师岗",
+      "category": "机械设备",
+      "city": "辽宁辽阳",
+      "summary": "参与矿山和生产线机械设备维护、技术升级和机械改造方案支持。",
+      "requirements": "2027届公开岗位表明确此岗位的所在地、专业大类及学历门槛（本科及以上）；具体岗位职责在公开摘要中没有逐项披露，以上工作描述仅是按岗位职能的辅助解释，最终以招聘单位原始JD为准。",
+      "majorNames": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "机械电子工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027届",
+      "url": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "辽宁金中新材料产业集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "electrical",
+      "title": "电气维修岗",
+      "category": "电气与自动化",
+      "city": "辽宁辽阳",
+      "summary": "参与水泥或材料产线电气设备巡检、维护和故障排查。",
+      "requirements": "2027届公开岗位表明确此岗位的所在地、专业大类及学历门槛（大专及以上）；具体岗位职责在公开摘要中没有逐项披露，以上工作描述仅是按岗位职能的辅助解释，最终以招聘单位原始JD为准。",
+      "majorNames": [
+        "电气工程及其自动化",
+        "电气自动化技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "大专及以上 · 2027届",
+      "url": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "辽宁金中新材料产业集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "mechanical-maintenance",
+      "title": "机械维修岗",
+      "category": "机械设备",
+      "city": "辽宁本溪",
+      "summary": "负责车间机械设备日常维护、备件管理和检修协作。",
+      "requirements": "2027届公开岗位表明确此岗位的所在地、专业大类及学历门槛（大专及以上）；具体岗位职责在公开摘要中没有逐项披露，以上工作描述仅是按岗位职能的辅助解释，最终以招聘单位原始JD为准。",
+      "majorNames": [
+        "机械工程",
+        "机械设计与制造",
+        "机电一体化技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "大专及以上 · 2027届",
+      "url": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "辽宁金中新材料产业集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "quality",
+      "title": "质量工程师岗",
+      "category": "安全与质量",
+      "city": "辽宁本溪",
+      "summary": "参与水泥及建材产品的检测、工艺质量记录和生产异常跟踪。",
+      "requirements": "2027届公开岗位表明确此岗位的所在地、专业大类及学历门槛（本科及以上）；具体岗位职责在公开摘要中没有逐项披露，以上工作描述仅是按岗位职能的辅助解释，最终以招聘单位原始JD为准。",
+      "majorNames": [
+        "材料科学与工程",
+        "无机非金属材料工程",
+        "材料工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027届",
+      "url": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "辽宁金中新材料产业集团有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}
