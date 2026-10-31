@@ -1,0 +1,132 @@
+name: HHBA Chengde V5.1 Verified Static Pages Deployment
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-chengde-static-deploy.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: hhba-chengde-verified-pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the current main branch revision
+        uses: actions/checkout@v4
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify Chengde V5.1 official policy, housing programs and city routes
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-chengde-city-v51.mjs
+      - name: Verify national V5.1 city source and template contract
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - name: Build the full HHBA frontend for GitHub Pages, not a new landing page
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_MATCH_API_ORIGIN: ${{ vars.HHBA_MATCH_API_ORIGIN }}
+        run: npm run build
+      - name: Preserve authentic already-published company photos when source public lacks CI-generated media
+        run: |
+          python - <<'PY'
+          import json, pathlib, urllib.request, urllib.error, concurrent.futures
+          profiles=pathlib.Path('apps/web/src/data/employerProfiles')
+          root=pathlib.Path('apps/web/dist')
+          base='https://yanm-jun.github.io/hhba-talent/'
+          paths=set()
+          for src in profiles.glob('*.json'):
+              try:data=json.loads(src.read_text(encoding='utf-8'))
+              except Exception:continue
+              media=data.get('media') or {}
+              logo=media.get('logo')
+              if isinstance(logo,str) and logo.startswith('images/'):paths.add(logo)
+              for photo in media.get('photos',[]):
+                  p=photo.get('path') if isinstance(photo,dict) else None
+                  if isinstance(p,str) and p.startswith('images/'):paths.add(p)
+          missing=sorted(p for p in paths if not (root/p).is_file())
+          print('HHBA_EXISTING_MEDIA_REFERENCES',len(paths),'MISSING_IN_BUILD',len(missing))
+          def restore(p):
+              if '..' in pathlib.PurePosixPath(p).parts:return p,'invalid path'
+              target=root/p;target.parent.mkdir(parents=True,exist_ok=True)
+              try:
+                  req=urllib.request.Request(base+p,headers={'User-Agent':'HHBA-static-page-media-restoration/1.0'})
+                  with urllib.request.urlopen(req,timeout=12) as res:
+                      raw=res.read(8_000_000)
+                      contenttype=res.headers.get('Content-Type','')
+                      if res.status!=200 or len(raw)<500 or 'text/html' in contenttype:
+                          raise ValueError('not previously published image')
+                  target.write_bytes(raw)
+                  return p,'restored'
+              except Exception as exc:return p,'unavailable: '+str(exc)[:90]
+          with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+              results=list(pool.map(restore,missing))
+          print('RESTORED_PUBLISHED_MEDIA',sum(1 for _,status in results if status=='restored'))
+          for p,status in results:
+              if status!='restored':print('UNVERIFIED_UNAVAILABLE_MEDIA',p,status)
+          # No fabricated logo/photo, no third-party image redirects and no assertions of verified missing assets.
+          PY
+      - name: Verify the Chengde routes resolve in the built single-page website
+        run: |
+          test -s apps/web/dist/index.html
+          test -d apps/web/dist/assets
+          grep -q 'hhba-talent' apps/web/dist/index.html
+          python - <<'PY'
+          import pathlib
+          policy=pathlib.Path('apps/web/src/data/chengdePolicyRecords.ts').read_text()
+          housing=pathlib.Path('apps/web/src/data/chengdeHousingRecords.ts').read_text()
+          assert 'CHENGDE_POLICY_RECORDS' in pathlib.Path('apps/web/src/data/talentPolicyRecords.ts').read_text()
+          assert 'CHENGDE_HOUSING_RECORDS' in pathlib.Path('apps/web/src/data/talentHousingRecords.ts').read_text()
+          assert policy.count('"id":')>=7 and housing.count('"id":')>=3
+          js=''.join(x.read_text(errors='ignore') for x in pathlib.Path('apps/web/dist/assets').glob('*.js'))
+          assert '承德' in js and '承德主导产业' in js, 'Chengde policies missing from deployed JS'
+          print('HHBA_CHENGDE_BUNDLED_AND_READY')
+          PY
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload rebuilt HHBA full static site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/web/dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish HHBA Chengde V5.1 on the existing GitHub Pages domain
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Confirm published HHBA Pages root
+        run: |
+          python - <<'PY'
+          import urllib.request,time
+          url='https://yanm-jun.github.io/hhba-talent/'
+          for n in range(12):
+              try:
+                  req=urllib.request.Request(url+'?chengde_v51='+str(n),headers={'Cache-Control':'no-cache'})
+                  with urllib.request.urlopen(req,timeout=18) as r:
+                      html=r.read(300000).decode('utf8','replace')
+                      assert r.status==200 and 'hhba-talent' in html
+                  print('HHBA_CHENGDE_PAGES_PUBLISHED',url)
+                  break
+              except Exception as exc:
+                  if n==11:raise
+                  print('PAGES_PROPAGATING',n,str(exc)[:160]);time.sleep(10)
+          PY
