@@ -17,7 +17,7 @@ const commonFaq:[string,string][]=[
  ['网站可以替我审核或保证公寓选房吗？','HHBA仅整理政府公开资料和申请路径，不提供政府审批服务，不承诺房源、待遇、录取或资金兑付。'],
  ['政府新闻、政府采购或规划能直接当作申请入口吗？','不能。政府采购证明拟采购服务、规划证明建设方向；只有正式申报批次/运营方和主管部门确认才可申请。']
 ];
-const deadlines=(published:string,deadline?:string,archive=false)=>{
+const deadlines=(deadline?:string,archive=false)=>{
  const today=new Date().toISOString().slice(0,10);
  return archive||(Boolean(deadline&&deadline<today));
 };
@@ -26,7 +26,7 @@ export function buildShaanxiGuide(kind:'policy'|'housing',id:string):CompleteGui
  const h=kind==='housing'?SHAANXI_HOUSING_RECORDS.find(r=>r.id===id):undefined;
  if(!p&&!h)return null;
  const item=p||h!;
- const archival=p?deadlines(p.published,p.deadline,p.temporal!=='policy'):Boolean(h?.applicationEnd&&h.applicationEnd<new Date().toISOString().slice(0,10));
+ const archival=p?deadlines(p.deadline,p.temporal!=='policy'):Boolean(h?.applicationEnd&&h.applicationEnd<new Date().toISOString().slice(0,10));
  const warning=p?.reviewNote||h?.statusNote||'正式受理应向主管部门核实';
  const material=p?.materials?.length?p.materials:[
   '本人及家庭共同申请人的有效身份证明、真实联系方式',
