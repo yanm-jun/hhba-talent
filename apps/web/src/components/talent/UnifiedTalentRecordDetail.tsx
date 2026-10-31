@@ -12,6 +12,10 @@ const fullGuide=(id:string)=>({
  'bz-2026-home-closed':'/talent-service/policy-guide-preview/binzhou/purchase',
  'bz-2026-living-archived':'/talent-service/policy-guide-preview/binzhou/living',
  'sd-jining-2026-introduction':'/talent-service/policy-guide-preview/jining/youth',
+ 'sjz-2026-bcard-rent':'/talent-service/policy-guide-preview/shijiazhuang/rent',
+ 'sjz-2026-bcard-home':'/talent-service/policy-guide-preview/shijiazhuang/home',
+ 'sjz-2026-graduate-settle':'/talent-service/policy-guide-preview/shijiazhuang/settlement',
+ 'sjz-2026-bcard-eligibility':'/talent-service/policy-guide-preview/shijiazhuang/rent',
  'sd-heze-2026-startup':'/talent-service/policy-guide-preview/heze/startup',
  'jn-maincity-rent-2026':'/talent-service/policy-guide-preview/jining/rent',
  'sd-dongying-talent-2026':'/talent-service/policy-guide-preview/dongying/transition',
@@ -34,7 +38,7 @@ export function UnifiedTalentRecordDetail({policy,housing}:{policy?:TalentPolicy
  const quality=policy?assessPolicy(policy):assessHousing(housing!);
  const application=policy?.applicationUrl||housing?.applyUrl;
  const route=policy?'/talent-service/list/policies/':'/talent-service/list/housing/';
- const housingGuide=housing&&['ta-2026-city-affordable-rental','ta-2026-new-worker-public-rent'].includes(housing.id)?'/talent-service/policy-guide-preview/taian/housing':housing&&['zb-zichuan-shuian-202606','zb-zichuan-yuting-202606'].includes(housing.id)?'/talent-service/policy-guide-preview/zibo/housing':undefined;
+ const housingGuide=housing&&['sjz-2026-talent-574','sjz-2026-affordable-rental','sjz-2026-public-rental-yishui','sjz-2026-public-rental-tanan','sjz-2026-public-rental-shenghe'].includes(housing.id)?'/talent-service/policy-guide-preview/shijiazhuang/housing':housing&&['ta-2026-city-affordable-rental','ta-2026-new-worker-public-rent'].includes(housing.id)?'/talent-service/policy-guide-preview/taian/housing':housing&&['zb-zichuan-shuian-202606','zb-zichuan-yuting-202606'].includes(housing.id)?'/talent-service/policy-guide-preview/zibo/housing':undefined;
  const link=policy?fullGuide(policy.id):housingGuide;
  return <main className="jgd-page">
   <nav className="jgd-breadcrumb"><Link to="/talent-service">人才服务</Link><span>›</span><Link to={'/talent-service/city/'+encodeURIComponent(item.city)}>{item.city}</Link><span>›</span>{policy?'人才政策':housing?.housingCategory||'人才住房'}</nav>
