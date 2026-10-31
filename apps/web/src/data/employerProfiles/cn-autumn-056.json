@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-056",
+  "name": "维音",
+  "displayName": "维音（VXI）",
+  "englishName": "VXI China",
+  "aliases": [
+    "维音信息",
+    "成都维音信息技术有限公司",
+    "维音中国",
+    "VXI China",
+    "上海维音",
+    "维音2027秋招"
+  ],
+  "industry": "智能云联络中心 · 客户体验外包 · AI客服 · 全球多语言支持",
+  "subtitle": "维音信息（VXI China）· 上海总部及西安、成都等多个运营中心",
+  "overview": "维音提供智能联络中心运营、客户服务外包与AI客服技术系统，业务涵盖消费者服务、内容审核、国际语言服务及智能客服工具。官网介绍联络中心产品VisionCC、VisionAICC、智能培训等系统。2027秋招公开摘要中的招聘主体为成都维音信息技术有限公司，而工作地点为西安，需以官方运营中心招聘渠道重新确认企业法定用人主体。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.vxichina.cn/",
+    "https://www.vxichina.cn/ContactSt_zgdo.html",
+    "https://www.vxichina.cn/qsxx_xa_0014_015.html",
+    "https://www.wondercv.com/xiaozhao/weiyin-xian-2027-autumn-campus-19930-72bad6/",
+    "https://www.wondercv.com/xiaozhao/vxi-xian-2027-campus-19838-7dea54/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-056/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-056/photo1.jpg",
+        "caption": "维音 · 客户体验与联络中心",
+        "alt": "维音官网展示的客服和客户联络中心业务图",
+        "note": "维音企业官网公开的客户服务运营场景/业务视觉，不将行业素材误标为确定的办公室实拍。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-056/photo2.jpg",
+        "caption": "维音 · 智能客服技术平台",
+        "alt": "维音官方网站发布的智能客服或联络中心产品视觉",
+        "note": "官网另一个独立产品服务视觉，本地保存并标注真实业务内容。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.vxichina.cn/qsxx_xa_0014_015.html",
+    "label": "维音官网西安岗位入口（2027校招主体待核）",
+    "status": "unconfirmed",
+    "subject": "成都维音信息技术有限公司（2027摘要所写）",
+    "note": "2027年第三方校招资料仅确认西安两个英文服务方向，未公开完整学历和专业门槛；维音官网西安页含社会招聘岗位，仅用于核对企业运营和招聘入口，不能把其社会岗位直接标记成2027校招实时职位。"
+  },
+  "majorIntro": "2027校招仅可确认英文技术支持、英文邮件处理两个方向；相关语言和IT专业为岗位能力的编辑性适配建议，不代表企业已公布专业限制，学历需以官方最终JD核对。",
+  "preferredMajors": [
+    "英语",
+    "商务英语",
+    "翻译",
+    "计算机科学与技术",
+    "软件工程",
+    "信息管理与信息系统",
+    "国际经济与贸易",
+    "电子商务"
+  ],
+  "photoNote": "维音官网品牌标识与两张独立客户服务/AI客服业务图片本地入库，媒体审计保留原始地址；图片按实际业务内容标注，不冒称为西安办公室照片。",
+  "business": [
+    {
+      "title": "智能联络中心外包",
+      "description": "面向电商、金融、汽车等行业提供客户咨询、售后处理及全渠道联络服务。",
+      "tags": "BPO · 客服",
+      "details": [
+        "多渠道用户咨询运营",
+        "售后订单和投诉处理",
+        "客户体验指标和服务管理"
+      ]
+    },
+    {
+      "title": "国际多语言客户支持",
+      "description": "针对跨境品牌提供英文等多语言客服、邮件、在线聊天及电话业务。",
+      "tags": "英语 · 国际服务",
+      "details": [
+        "国际消费者售后响应",
+        "英文邮件及工单处理",
+        "跨时区客服中心交付"
+      ]
+    },
+    {
+      "title": "VisionCC 智能云联络中心",
+      "description": "提供多渠道联络中心平台、坐席工作台及业务接入解决方案。",
+      "tags": "VisionCC · 云联络",
+      "details": [
+        "全渠道坐席接入",
+        "客户联络数据管理",
+        "在线运营支持"
+      ]
+    },
+    {
+      "title": "VisionAICC AI智能客服",
+      "description": "结合知识库、智能问答与自动化技术提高客户沟通效率。",
+      "tags": "AI · 客服机器人",
+      "details": [
+        "自然语言理解和对话",
+        "AI客服模型应用",
+        "知识库和人机协同"
+      ]
+    },
+    {
+      "title": "质检、培训与排班产品",
+      "description": "提供VisionTSIM、VisionWFM等智能培训和排班功能，协助运营管理。",
+      "tags": "质检 · 培训 · WFM",
+      "details": [
+        "智能模拟训练",
+        "服务质检和运营分析",
+        "人员排班与实时状态管理"
+      ]
+    },
+    {
+      "title": "行业服务与内容审核",
+      "description": "支持业务拓展、内容审核、客户运营及智能应收等多样化BPO服务。",
+      "tags": "审核 · 营销运营",
+      "details": [
+        "内容审核与合规管理",
+        "客户运营和销售支持",
+        "业务数据与自动化服务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "overseas-english-support",
+      "title": "海外英文技术支持方向（2027届）",
+      "category": "英文技术支持",
+      "city": "陕西西安",
+      "summary": "面向海外客户的英文咨询、技术问题记录、沟通协作和售后工单流转方向。",
+      "requirements": "第三方2027校招摘要仅明确此方向名称与西安城市；未披露学历、具体专业限制、语言等级或技术栈。英语与计算机相关性为编辑性建议，不可当作官方录用标准。",
+      "majorNames": [
+        "英语",
+        "商务英语",
+        "计算机科学与技术",
+        "软件工程",
+        "信息管理与信息系统"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历未披露",
+      "url": "https://www.vxichina.cn/qsxx_xa_0014_015.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/weiyin-xian-2027-autumn-campus-19930-72bad6/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "成都维音信息技术有限公司（摘要所写）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "english-email",
+      "title": "英文邮件处理专员方向（2027届）",
+      "category": "英文邮件与客服",
+      "city": "陕西西安",
+      "summary": "面向国际消费者的英文邮件服务、订单售后查询、问题分类跟进及客户沟通支持方向。",
+      "requirements": "2027秋招摘要明确英文邮件处理方向，但未提供独立完整JD、学历及官方英语等级要求；维音西安官网另有同类社招岗位，仅用作业务背景证据，不等同于本届正式岗位要求。",
+      "majorNames": [
+        "英语",
+        "商务英语",
+        "翻译",
+        "国际经济与贸易",
+        "电子商务"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历未披露",
+      "url": "https://www.vxichina.cn/qsxx_xa_0014_015.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/weiyin-xian-2027-autumn-campus-19930-72bad6/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "成都维音信息技术有限公司（摘要所写）",
+      "currentOpenVerified": false
+    }
+  ]
+}
