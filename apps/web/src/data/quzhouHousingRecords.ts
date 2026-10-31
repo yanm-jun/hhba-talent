@@ -2,7 +2,7 @@ import type {TalentHousingRecord} from './talentHousingRecords.ts';
 /** No claim of available apartments or real-time inventory. */
 export const QUZHOU_HOUSING_RECORDS:TalentHousingRecord[]=[
   {
-    "id": "qz-2025-housing-framework",
+    "id": "qz-2021-housing-framework",
     "city": "衢州",
     "title": "衢州高层次人才购租房保障制度（项目待核）",
     "district": "衢州市高层次人才住房保障制度，具体人才公寓地址待核验",
@@ -11,7 +11,7 @@ export const QUZHOU_HOUSING_RECORDS:TalentHousingRecord[]=[
     "rent": "未从本份官方规划核实具体人才公寓租价及购租补助额度，不将运营采购规模冒充租房优惠。",
     "eligibility": "须分别符合衢州市最新人才分类认定、在衢实际工作和家庭住房等对应购房租房政策条件。",
     "sourceUrl": "https://zjjcmspublic.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/jcms_files/jcms1/web2771/site/attach/0/08924256c2b040d583a51c5aa87f5598.pdf",
-    "published": "2025-07-01",
+    "published": "2021",
     "kind": "program",
     "housingCategory": "其他住房",
     "reviewedAt": "2026-10-31",
