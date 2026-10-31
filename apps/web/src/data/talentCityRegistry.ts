@@ -23,6 +23,7 @@ export const TALENT_LEGACY_CITIES:TalentCity[]=[
  {name:'唐山',official:'唐山市',province:'河北',level:'prefecture-preview',intro:'凤凰英才2024/2026奖补对照、博士硕士本科生活与购房政策、高新区数字经济产业园青年公寓及市级租赁制度',aliases:['唐山','唐山市','tangshan','tang shan']},
  {name:'衡水',official:'衡水市',province:'河北',level:'prefecture-preview',intro:'2024引才新十四条：毕业生安家补助、湖城英才卡租购房、人才公寓和技能奖励；2026办理入口及在租项目待核',aliases:['衡水','衡水市','hengshui','heng shui','hs']},
  {name:'张家口',official:'张家口市',province:'河北',level:'prefecture-preview',intro:'2026硕博引进博士住房15万历史批次、医院硕博专项资助、高创园人才公寓与创业办公扶持、桥东2026保障房改造事实核查',aliases:['张家口','张家口市','zhangjiakou','zhang jia kou','zjk']},
+ {name:'廊坊',official:'廊坊市',province:'河北',level:'prefecture-preview',intro:'2025租购房人才补贴分档、2026公租房冀时办申请、固安人才家园和人才住房历史项目资料',aliases:['廊坊','廊坊市','langfang','lang fang','lf']},
 ];
 
 const prefectureRaw=`130100|石家庄市|河北省|shi jia zhuang
