@@ -1,0 +1,384 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-085",
+  "name": "汉高",
+  "displayName": "汉高（中国）",
+  "englishName": "Henkel",
+  "aliases": [
+    "Henkel",
+    "Henkel China",
+    "汉高中国",
+    "汉高2027校招",
+    "施华蔻",
+    "汉高粘合剂",
+    "汉高消费品牌"
+  ],
+  "industry": "粘合剂技术 · 消费品牌 · 工业制造 · 研发 · AI数字化",
+  "subtitle": "汉高中国 · 上海、太仓、广州及全国各区域",
+  "overview": "汉高在中国经营粘合剂技术与消费品牌两大业务，服务工业材料、电子、汽车、新能源制造及专业美发等市场。汉高与前程无忧共同运营的2027届校园招聘网页明确列出11个岗位，覆盖消费品牌供应链、研发、销售、粘合剂制造与数字化管理。2027项目网申时间为2026年9月21日至10月31日，当前应按历史校招岗位而非实时开放招聘展示。",
+  "lastReviewed": "2026-11-01",
+  "sources": [
+    "https://campus.51job.com/Henkel2027/p3.html",
+    "https://campus.51job.com/Henkel2027/p4.html",
+    "https://job.hust.edu.cn/zpinfo1/2449143.htm",
+    "https://www.henkel.cn/careers/jobs-and-application",
+    "https://www.henkel.cn/brands-businesses/adhesive-technologies/open-innovation-and-venturing/inspiration-center-shanghai",
+    "https://campus.51job.com/Henkel2027"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-085/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-085/photo1.svg",
+        "caption": "汉高 · 业务编辑示意（非实景）",
+        "alt": "汉高企业业务主题示意，非真实企业照片",
+        "note": "非实景：初始SVG为HHBA编辑性示意图，非任何企业实拍。CI仅在验证同名公司的新闻/官网原始图片后替换为JPEG并写入SHA256；尚未获得图像商业转载许可。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-085/photo2.svg",
+        "caption": "汉高 · 业务编辑示意（非实景）",
+        "alt": "汉高企业业务主题示意，非真实企业照片",
+        "note": "非实景：初始SVG为HHBA编辑性示意图，非任何企业实拍。CI仅在验证同名公司的新闻/官网原始图片后替换为JPEG并写入SHA256；尚未获得图像商业转载许可。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://campus.51job.com/Henkel2027",
+    "label": "汉高2027官方指定前程无忧校园招聘专题",
+    "status": "official_portal",
+    "subject": "汉高中国各事业部2027校招用人单位（岗位主体以51job详细申请页为准）",
+    "note": "官方2027校园招聘FAQ明确报名2026-09-21至2026-10-31；每位同学最多同时申请2个岗位。部分岗位有严格专业、学历、英语及轮岗要求；报名截至日已过，不标为目前开放。"
+  },
+  "majorIntro": "以下11条岗位来自汉高2027校招官方专题及高校转载同一职位名单，逐条标明事业部和地点。消费品销售项目明确“非艺术类专业不限”，但研发与工程项目存在较严格专业条件，不能混为一谈。",
+  "preferredMajors": [
+    "机械工程",
+    "机械电子工程",
+    "电气工程及其自动化",
+    "自动化",
+    "工业工程",
+    "化学",
+    "高分子材料与工程",
+    "材料科学与工程",
+    "生物工程",
+    "供应链管理",
+    "物流管理",
+    "市场营销",
+    "工商管理",
+    "人工智能",
+    "计算机科学与技术",
+    "数据科学与大数据技术"
+  ],
+  "photoNote": "优先使用可信企业官方网站、大学、政府/行业公开报道中能确认公司或生产项目的真实照片，两张分别独立存档并记录原始文章、原图、尺寸、哈希。素材的再次商业使用许可尚未核实，验证失败则保留明确标注的非实景SVG，不冒充真实图片。",
+  "business": [
+    {
+      "title": "粘合剂技术和先进材料",
+      "description": "面向汽车、电子、工业制造和新能源应用开展粘合剂研发与销售。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "化工 · 材料",
+      "details": [
+        "工业粘接及功能材料",
+        "汽车与电子制造材料",
+        "胶粘技术应用服务"
+      ]
+    },
+    {
+      "title": "消费品牌与专业美发",
+      "description": "经营洗护和美发等消费品牌及相关市场与客户服务。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "消费品牌",
+      "details": [
+        "头发护理及专业美发",
+        "快消品品牌运营",
+        "客户和渠道支持"
+      ]
+    },
+    {
+      "title": "上海创新体验中心与研发",
+      "description": "结合应用实验室和跨行业创新中心支持材料产品研究、开发及客户测试。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "研发 · 创新",
+      "details": [
+        "上海粘合剂创新中心",
+        "化学材料实验与试制",
+        "国际研发团队协同"
+      ]
+    },
+    {
+      "title": "工厂制造和设备工程",
+      "description": "支持汉高各地工厂的生产运营、工程、自动化和流程改善。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "制造 · 自动化",
+      "details": [
+        "太仓生产运营",
+        "广州粘合剂工程",
+        "设备与精益生产"
+      ]
+    },
+    {
+      "title": "供应链和第三方制造",
+      "description": "推动采购、供应、质量、第三方制造管理与物流运营。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "供应链 · 3PM",
+      "details": [
+        "物料及供应计划",
+        "第三方生产管理",
+        "运营优化与质量"
+      ]
+    },
+    {
+      "title": "数据平台和数字化管理",
+      "description": "围绕AI、数据、IT项目和企业数字化运营开展跨部门协作。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "数字化 · AI",
+      "details": [
+        "AI与数据管理",
+        "企业IT项目管理",
+        "数字化供应链"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "consumer-manufacturing",
+      "title": "消费品牌事业部供应链管理培训生—生产运营方向",
+      "category": "制造 / 供应链",
+      "city": "太仓",
+      "summary": "汉高2027官方校招设立的消费品牌生产运营管培生，涉及生产管理、质量管理、工艺工程、精益改善和物流等跨部门轮岗。",
+      "requirements": "本科及以上，理工类专业优先，良好英语能力、英语六级及以上、熟悉Office；面向应届或毕业一年内人才，实际岗位条件以官方专题详细内容为准。申请截止2026年10月31日。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "自动化",
+        "工业工程",
+        "供应链管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.01—2027.08毕业窗口与每个项目资格各异",
+      "url": "https://campus.51job.com/Henkel2027",
+      "evidenceUrl": "https://campus.51job.com/Henkel2027/p3.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "汉高中国各事业部2027校招用人单位（岗位主体以51job详细申请页为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "consumer-scm-market",
+      "title": "消费品牌事业部供应链管理培训生—供应链市场方向",
+      "category": "供应链 / 商业",
+      "city": "上海",
+      "summary": "汉高2027官方公告明确列出的消费品牌供应链市场方向，岗位区别于太仓生产运营培训生，工作地上海。",
+      "requirements": "校招专题可核实项目名称与上海城市。供应链、物流与数据背景是岗位相关专业建议，完整教育资格、英语要求和轮岗职责须按汉高原职位详情逐项核对；已过原截止时间。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "物流管理",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.01—2027.08毕业窗口与每个项目资格各异",
+      "url": "https://campus.51job.com/Henkel2027",
+      "evidenceUrl": "https://campus.51job.com/Henkel2027/p3.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "汉高中国各事业部2027校招用人单位（岗位主体以51job详细申请页为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "consumer-rd",
+      "title": "消费品牌事业部研发管理培训生",
+      "category": "研发 / 化学",
+      "city": "上海",
+      "summary": "参与新产品开发、产品维护、知识产权与实验室管理，并和亚太及全球消费品研发团队协作。",
+      "requirements": "官方逐岗要求2026年9月至2027年8月毕业、硕士及以上（博士优先），生物学、高分子化学、化学、化工、材料科学或相关理工科优先；须核对更具体实验与工作能力要求。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "化学",
+        "高分子材料与工程",
+        "材料科学与工程",
+        "生物工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.01—2027.08毕业窗口与每个项目资格各异",
+      "url": "https://campus.51job.com/Henkel2027",
+      "evidenceUrl": "https://campus.51job.com/Henkel2027/p3.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "汉高中国各事业部2027校招用人单位（岗位主体以51job详细申请页为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "consumer-brand",
+      "title": "消费品牌事业部品牌管理培训生",
+      "category": "品牌 / 市场",
+      "city": "上海",
+      "summary": "汉高2027校招岗位表明确消费品牌品牌管理培训生，工作地上海，关注消费者洞察、品牌运营及商业项目。",
+      "requirements": "官方网页明确项目名称与上海工作地点，但本摘要没有完整单岗专业、语言及任职条件，市场营销与工商管理为编辑相关度建议。原申请截止10月31日。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.01—2027.08毕业窗口与每个项目资格各异",
+      "url": "https://campus.51job.com/Henkel2027",
+      "evidenceUrl": "https://campus.51job.com/Henkel2027/p3.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "汉高中国各事业部2027校招用人单位（岗位主体以51job详细申请页为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "consumer-sales",
+      "title": "消费品牌事业部销售管理培训生",
+      "category": "销售 / 消费品",
+      "city": "全国定岗",
+      "summary": "在销售、市场、营销、客户发展及技术教育等职能轮岗，参与消费品牌渠道、沙龙客户和业务拓展。",
+      "requirements": "官方职位要求本科及以上，专业不限但**非艺术生**；应届或毕业一年内人才，英语六级及以上，接受跨城市轮岗；销售及市场实习经历优先。不能把“专业不限”扩大为全体专业无资格限制。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理",
+        "国际经济与贸易"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.01—2027.08毕业窗口与每个项目资格各异",
+      "url": "https://campus.51job.com/Henkel2027",
+      "evidenceUrl": "https://campus.51job.com/Henkel2027/p3.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "汉高中国各事业部2027校招用人单位（岗位主体以51job详细申请页为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "adhesive-sales",
+      "title": "粘合剂事业部销售管理培训生",
+      "category": "销售 / 粘合剂",
+      "city": "全国定岗",
+      "summary": "汉高粘合剂事业部校招独立的销售管培生，参与上海总部及各业务职能跨岗学习，面向工业客户市场与销售。",
+      "requirements": "招聘专题列有约12—18个月培养安排；相关理工、化学材料与市场商务专业可作为建议，实际学历、语言和岗位资格应核对官方详细职位要求。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "化学",
+        "高分子材料与工程",
+        "市场营销",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.01—2027.08毕业窗口与每个项目资格各异",
+      "url": "https://campus.51job.com/Henkel2027",
+      "evidenceUrl": "https://campus.51job.com/Henkel2027/p3.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "汉高中国各事业部2027校招用人单位（岗位主体以51job详细申请页为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "adhesive-plant",
+      "title": "粘合剂事业部生产运营管理培训生—工程或生产方向",
+      "category": "机械 / 自动化",
+      "city": "广州",
+      "summary": "汉高粘合剂事业部广州工程或生产管培项目，为期约18个月，轮岗涉及自动化、维修、安全、质量、工程、物流与精益改善。",
+      "requirements": "官方招聘要求机械、电气、机电、电子、工业工程、工业设计、自动化、数字化等相关专业学士或硕士，良好英语，愿意赴工厂轮岗，制造/工程实习经验及编程数据技能优先。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械电子工程",
+        "电气工程及其自动化",
+        "自动化",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.01—2027.08毕业窗口与每个项目资格各异",
+      "url": "https://campus.51job.com/Henkel2027",
+      "evidenceUrl": "https://campus.51job.com/Henkel2027/p3.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "汉高中国各事业部2027校招用人单位（岗位主体以51job详细申请页为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "adhesive-3pm",
+      "title": "粘合剂事业部生产运营管理培训生—3PM方向",
+      "category": "制造 / 第三方管理",
+      "city": "上海",
+      "summary": "汉高2027校招粘合剂CHAiNGERS项目3PM方向，聚焦生产价值链、外部制造协作与跨部门管理，地点上海。",
+      "requirements": "官方专题确认3PM和上海工作城市，但3PM具体资质要求须查单岗详情。供应链、工业工程、化学及管理类关联专业仅供参考，不能据项目名称判断所有申请者具资格。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "工业工程",
+        "化学工程与工艺"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.01—2027.08毕业窗口与每个项目资格各异",
+      "url": "https://campus.51job.com/Henkel2027",
+      "evidenceUrl": "https://campus.51job.com/Henkel2027/p3.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "汉高中国各事业部2027校招用人单位（岗位主体以51job详细申请页为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "adhesive-digital",
+      "title": "粘合剂事业部生产运营管理培训生—Digital方向",
+      "category": "数字化 / 制造",
+      "city": "上海",
+      "summary": "CHAiNGERS粘合剂制造数字化管理培训生，轮岗覆盖运营、数据化流程改进与跨职能生产管理。",
+      "requirements": "官方招聘列名Digital方向，地点上海；AI、计算机和自动化背景是编辑关联，学历、语言、工具和经验要求仍以汉高官方详单为准；原校招截至10月31日。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "数据科学与大数据技术",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.01—2027.08毕业窗口与每个项目资格各异",
+      "url": "https://campus.51job.com/Henkel2027",
+      "evidenceUrl": "https://campus.51job.com/Henkel2027/p3.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "汉高中国各事业部2027校招用人单位（岗位主体以51job详细申请页为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "adhesive-ops",
+      "title": "粘合剂事业部生产运营管理培训生—Operations方向",
+      "category": "运营 / 制造",
+      "city": "上海",
+      "summary": "CHAiNGERS生产运营方向，关注生产流程、效率、供应计划和跨团队运营学习，区别于3PM及Digital项目。",
+      "requirements": "招聘专题列名Operations方向和上海工作地，官方专业资格以岗位详情为准；工业工程、物流、供应链背景为编辑参考，不标注实时空缺。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工业工程",
+        "物流管理",
+        "供应链管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.01—2027.08毕业窗口与每个项目资格各异",
+      "url": "https://campus.51job.com/Henkel2027",
+      "evidenceUrl": "https://campus.51job.com/Henkel2027/p3.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "汉高中国各事业部2027校招用人单位（岗位主体以51job详细申请页为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "digital-business",
+      "title": "数字化业务部管理培训生",
+      "category": "IT / 数字化",
+      "city": "上海",
+      "summary": "在汉高中国IT团队的AI与数据、PMO、数字化创新等领域轮岗，参与业务分析、项目管理及智能化业务解决方案。",
+      "requirements": "官方明确本科及以上、理工科优先，良好英语听说读写，对AI、数据分析、数字化项目有兴趣，相关实习经验优先。原校招2026年10月31日截止。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "软件工程",
+        "数据科学与大数据技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.01—2027.08毕业窗口与每个项目资格各异",
+      "url": "https://campus.51job.com/Henkel2027",
+      "evidenceUrl": "https://campus.51job.com/Henkel2027/p3.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "汉高中国各事业部2027校招用人单位（岗位主体以51job详细申请页为准）",
+      "currentOpenVerified": false
+    }
+  ]
+}
