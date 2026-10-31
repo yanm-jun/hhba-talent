@@ -7,15 +7,15 @@ import {assessPolicy,assessHousing,talentSourceKind} from '../src/data/talentQua
 import {findTalentCity,queryTalentCities} from '../src/data/talentCityRegistry.ts';
 import {readFileSync} from 'node:fs';
 
-assert.equal(HAINAN_POLICY_RECORDS.length,3);
-assert.equal(HAINAN_HOUSING_RECORDS.length,3);
+assert.equal(HAINAN_POLICY_RECORDS.length,5);
+assert.equal(HAINAN_HOUSING_RECORDS.length,4);
 assert.equal(queryTalentCities('','海南省').length,4);
-const auditedCities=['海口','三亚','儋州'];
+const auditedCities=['海口','三亚','儋州','三沙'];
 for(const city of auditedCities){
  assert.equal(findTalentCity(city)?.name,city);
  const p=HAINAN_POLICY_RECORDS.filter(x=>x.city===city);
  const h=HAINAN_HOUSING_RECORDS.filter(x=>x.city===city);
- assert.equal(p.length,1);
+ assert.ok(p.length>=1);
  assert.equal(h.length,1);
  assert.ok(TALENT_POLICY_RECORDS.some(x=>x.id===p[0].id));
  assert.ok(TALENT_HOUSING_RECORDS.some(x=>x.id===h[0].id));
@@ -31,8 +31,10 @@ for(const city of auditedCities){
 }
 assert.equal(HAINAN_POLICY_RECORDS.find(x=>x.city==='儋州').published,'2026-06-01');
 assert.ok(HAINAN_POLICY_RECORDS.find(x=>x.city==='儋州').reviewNote.includes('2026年12月31日'));
-assert.ok(!HAINAN_POLICY_RECORDS.some(x=>x.city==='三沙'),'unverified Sansha city-wide subsidies must not be fabricated');
+const sansha=HAINAN_POLICY_RECORDS.find(x=>x.city==='三沙');
+assert.ok(sansha?.benefit.includes('没有可核实的三沙普惠现金补贴金额'));
+assert.ok(sansha?.reviewNote.includes('办理入口待核实'));
 const routes=readFileSync(new URL('../src/pages/TalentServiceRoutes.tsx',import.meta.url),'utf8');
 assert.ok(routes.includes('buildCityPolicyConfig(city)'));
 assert.ok(routes.includes('TALENT_HOUSING_RECORDS'));
-console.log('PASS Hainan source-backed policy/housing 3+3, 1 city still pending independent evidence');
+console.log('PASS Hainan all 4 cities source-backed with separate Sansha special provisions');

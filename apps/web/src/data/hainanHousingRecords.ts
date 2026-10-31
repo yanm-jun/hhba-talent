@@ -1,6 +1,29 @@
 import type {TalentHousingRecord} from './talentHousingRecords.ts';
 /** Independent housing-program records: NOT advertised vacant apartments. */
 export const HAINAN_HOUSING_RECORDS:TalentHousingRecord[]=[
+{
+  "id": "hi-sansha-2026-crosscounty-anjufang-program",
+  "city": "三沙",
+  "district": "三沙市与海南省相关市、县、自治县（承接市县待正式明确）",
+  "title": "三沙市居民与引进人才安居房跨市县统筹保障制度",
+  "address": "省级统筹制度，无单一房源地址；实际房源所在市县和办事窗口由三沙及相关市县共同制定",
+  "units": "未核验具体安居房项目、销售套数、可选房号或实际承接市县；无实时可购住房库存",
+  "rent": "安居房属政策性共有产权购房保障，并非按月出租的公寓；具体销售定价与产权规则、个人承担金额须以承接地区公开方案核对",
+  "eligibility": "《海南省安居房管理办法》第44条明确三沙居民家庭和引进人才的安居房纳入本省相关市县统筹，具体由三沙市会同相关市县制定办法；在找到三沙特别实施办法之前不能直接套用其他市县一般申购条件为已生效的三沙申报规则。",
+  "sourceUrl": "https://jyj.haikou.gov.cn/hksjyj/zcwj/202603/eb3fe4dd21aa4a7dba691c1c2b15cef0.shtml",
+  "published": "2025-12-30",
+  "statusNote": "这是一条2026年施行的省级安居房制度三沙特别条款，不是三沙当前已开放的项目，不是人才公寓租赁或现金住房补贴；无实时空房，三沙专属实施细则、实际承接市县和申报入口待核实。",
+  "steps": [
+    "查阅2026年施行的琼府办〔2025〕55号第44条，确认三沙采用与相关市县统筹保障的特殊规则",
+    "核查三沙市政府与相关市县政府是否已经联合公布具体实施办法和承接属地，不以其他城市一般规则替代",
+    "根据正式公布的承接地要求核实本人三沙工作、人才身份、家庭住房和社保税务证明",
+    "咨询实际承接市县住房保障实施机构确认受理渠道、申请材料以及是否有资格轮候",
+    "取得明确受理信息后才申请、参加公示和选房流程；没有项目公告时不得宣称有现成房源"
+  ],
+  "kind": "program",
+  "reviewedAt": "2026-10-31",
+  "housingCategory": "其他住房"
+},
   {
     "id": "hi-haikou-housing-program-202606",
     "city": "海口",
