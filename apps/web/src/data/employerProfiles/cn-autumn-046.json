@@ -24,7 +24,8 @@
     "https://www.vsol.com.cn/join-us/campus-recruitment/embedded-software-engineer-1",
     "https://www.vsol.com.cn/join-us/campus-recruitment/hardware-development-engineer-1",
     "https://www.vsol.com.cn/join-us/campus-recruitment/9328-2",
-    "https://www.vsol.com.cn/about"
+    "https://www.vsol.com.cn/about",
+    "https://commons.wikimedia.org/wiki/File:VSOL_LOGO.jpg"
   ],
   "media": {
     "logo": "images/employer-profiles/cn-autumn-046/logo.png",
@@ -65,7 +66,7 @@
     "国际经济与贸易",
     "市场营销"
   ],
-  "photoNote": "官方品牌Logo及两张不同的通信产品图均来自V-SOL自有网站；图片本地化存储、无第三方跳转，说明为产品视觉而不冒充办公室。素材权利归各原权利人。",
+  "photoNote": "企业Logo来自Wikimedia Commons上2021年发布的V-SOL真实品牌标识（CC BY-SA授权，需保留原作者署名和许可）；两张独立业务/产品图片来自芯德官网。本地静态展示，不跳转原始图片来源，也不将品牌故事海报冒充企业Logo。",
   "business": [
     {
       "title": "PON光接入OLT设备",
