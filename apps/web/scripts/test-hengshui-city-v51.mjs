@@ -13,7 +13,7 @@ assert.ok(ps.find(p=>p.id==='hs-2024-card-home').benefit.includes('博士15万�
 assert.ok(ps.find(p=>p.id==='hs-2024-graduate-settlement').eligibility.includes('毕业2年内'));
 assert.ok(hs.find(h=>h.id==='hs-2022-affordable-housing-policy').units.includes('320套'));
 for(const g of [hengshuiGraduateGuide,hengshuiRentBuyGuide,hengshuiApartmentGuide,hengshuiSkillsGuide]){assert.equal(g.city,'衡水');assert.equal(g.qualityLevel,'B');assert.equal(g.officialUrl,undefined);assert.ok(g.steps.length>=6&&g.faq.length>=6&&Object.keys(g.branches).length>=3);assert.ok(g.steps.every(s=>s.title&&s.why&&s.action&&s.done));}
-assert.equal(findTalentCity('hengshui')?.name,'衡水');assert.equal(findTalentCity('hs')?.name,'衡水');assert.equal(assessTalentCity('衡水','2026-10-31').accepted,false);
+assert.equal(findTalentCity('hengshui')?.name,'衡水');assert.equal(findTalentCity('hs'),null,'HS is shared by Hengshui and Huangshan; ambiguous initials must never silently choose a city');assert.equal(assessTalentCity('衡水','2026-10-31').accepted,false);
 const read=f=>readFileSync(new URL('../src/'+f,import.meta.url),'utf8');
 assert.ok(read('pages/TalentServiceRoutes.tsx').includes("fragments[2]==='hengshui'"));
 assert.ok(read('pages/TalentServiceRoutes.tsx').includes("match.name==='衡水'"));
