@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {TALENT_CITY_INDEX,TALENT_MUNICIPALITIES,TALENT_PREFECTURE_CITIES,TALENT_YUNNAN_PREFECTURES,TALENT_PROVINCES,
  findTalentCity,findTalentProvince,parseTalentCityQuery,suggestTalentCities,queryTalentCities} from '../src/data/talentCityRegistry.ts';
 let passed=0;const check=(name,fn)=>{fn();passed++;console.log('✓ '+name)};
-check('306 city entries = original 306 + Hubei Enshi autonomous prefecture',()=>{
+check('306 city entries = 4 municipalities + 293 prefecture cities + 8 Yunnan autonomous prefectures + 1 Hubei autonomous prefecture',()=>{
  assert.equal(TALENT_MUNICIPALITIES.length,4);assert.equal(TALENT_PREFECTURE_CITIES.length,293);assert.equal(TALENT_YUNNAN_PREFECTURES.length,8);assert.equal(TALENT_CITY_INDEX.length,306);assert.equal(findTalentCity('恩施土家族苗族自治州')?.name,'恩施');
 });
 check('all six-digit codes are unique and geographic level verified',()=>{

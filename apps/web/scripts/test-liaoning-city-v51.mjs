@@ -1,0 +1,80 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {LIAONING_PROVINCIAL_POLICY_RECORDS,LIAONING_CITY_CONTACTS} from '../src/data/liaoningProvincialPolicyRecords.ts';
+import {LIAONING_MUNICIPAL_POLICY_RECORDS,LIAONING_MUNICIPAL_RESEARCH_RECORDS} from '../src/data/liaoningMunicipalPolicyRecords.ts';
+import {LIAONING_EXPANDED_PROVINCIAL_POLICY_RECORDS} from '../src/data/liaoningExpandedProvincialPolicyRecords.ts';
+import {LIAONING_HOUSING_RECORDS} from '../src/data/liaoningHousingRecords.ts';
+import {LIAONING_14_CITIES,LIAONING_GUIDE_RECORDS,buildLiaoningGuide,liaoningGuideRoute} from '../src/data/liaoningGuides.ts';
+import {TALENT_POLICY_RECORDS} from '../src/data/talentPolicyRecords.ts';
+import {TALENT_HOUSING_RECORDS} from '../src/data/talentHousingRecords.ts';
+import {TALENT_CITY_INDEX} from '../src/data/talentCityRegistry.ts';
+import {assessPolicy,talentSourceKind} from '../src/data/talentQuality.ts';
+const expected=['沈阳','大连','鞍山','抚顺','本溪','丹东','锦州','营口','阜新','辽阳','盘锦','铁岭','朝阳','葫芦岛'];
+assert.deepEqual(LIAONING_14_CITIES,expected);
+assert.equal(LIAONING_CITY_CONTACTS.length,14);
+assert.equal(LIAONING_PROVINCIAL_POLICY_RECORDS.length,42);
+assert.equal(LIAONING_EXPANDED_PROVINCIAL_POLICY_RECORDS.length,196);
+assert.equal(new Set(LIAONING_EXPANDED_PROVINCIAL_POLICY_RECORDS.map(x=>x.id)).size,196);
+assert.equal(new Set(LIAONING_EXPANDED_PROVINCIAL_POLICY_RECORDS.map(x=>x.id.split('-provincial-')[1])).size,14,'14 different extra policy categories');
+assert.equal(LIAONING_MUNICIPAL_POLICY_RECORDS.length,10);
+assert.equal(LIAONING_MUNICIPAL_RESEARCH_RECORDS.length,4);
+assert.equal(LIAONING_GUIDE_RECORDS.length,252);
+assert.equal(LIAONING_HOUSING_RECORDS.length,4);
+assert.equal(new Set(LIAONING_GUIDE_RECORDS.map(p=>p.id)).size,252);
+const routes=readFileSync(new URL('../src/pages/TalentServiceRoutes.tsx',import.meta.url),'utf8');
+const listing=readFileSync(new URL('../src/components/talent/UnifiedPolicyList.tsx',import.meta.url),'utf8');
+const index=readFileSync(new URL('../src/data/talentHousingRecords.ts',import.meta.url),'utf8');
+const pi=readFileSync(new URL('../src/data/talentPolicyRecords.ts',import.meta.url),'utf8');
+for(const city of expected){
+ const ci=TALENT_CITY_INDEX.find(c=>c.name===city);
+ assert.ok(ci&&ci.province==='辽宁省','Missing city registry '+city);
+ const provincial=LIAONING_PROVINCIAL_POLICY_RECORDS.filter(p=>p.city===city);
+ const extra=LIAONING_EXPANDED_PROVINCIAL_POLICY_RECORDS.filter(p=>p.city===city);
+ const local=LIAONING_MUNICIPAL_POLICY_RECORDS.filter(p=>p.city===city);
+ const research=LIAONING_MUNICIPAL_RESEARCH_RECORDS.filter(p=>p.city===city);
+ assert.equal(provincial.length,3,city+' must have 2 provincial plus historic recruitment');
+ assert.equal(extra.length,14,city+' must have all other 14 provincial support programs');
+ assert.ok(extra.every(p=>talentSourceKind(p.sourceUrl)==='government'&&p.payoutTo),'province supports must have government original and correct recipient class');
+ assert.ok(extra.some(p=>p.payoutTo==='用人单位')&&extra.some(p=>p.payoutTo==='非现金贷款'),'enterprise vs loans not differentiated');
+ assert.equal(local.length+research.length,1,city+' must have one distinct city-specific source or research item');
+ assert.equal(TALENT_POLICY_RECORDS.filter(p=>p.city===city&&p.id.startsWith('ln-')).length,17+local.length,city+' all 16 provincial policies plus historic recruitment + government city policy in formal index');
+ assert.ok(local.every(p=>talentSourceKind(p.sourceUrl)==='government'),city+' local primary evidence only');
+ assert.ok(research.every(p=>talentSourceKind(p.sourceUrl)==='secondary'),city+' secondary sources must stay outside official index');
+ const historical=provincial.find(p=>p.id.endsWith('-three-support-closed'));
+ assert.ok(historical&&historical.temporal==='past-window'&&historical.deadline==='2026-07-17');
+ assert.equal(assessPolicy(historical,'2026-10-31').grade,'C',city+' expired recruitment must be C');
+ assert.ok(historical.reviewNote.includes('2026-07-24')&&historical.reviewNote.includes('2026报名截止7月17日'),city+' recruitment publication-date discrepancy must be surfaced');
+ for(const p of [...provincial,...extra,...local,...research]){
+  assert.ok(p.sourceUrl.startsWith('https://'),p.id+' no unsupported HTTP or fabricated URL');
+  assert.ok(p.reviewedAt&&p.reviewNote&&p.benefit&&p.eligibility&&p.application);
+  assert.ok(p.applicationSteps.length>=5&&p.materials.length>=4,p.id+' V5.1 detail requirement');
+  assert.notEqual(assessPolicy(p,'2026-10-31').grade,'A',p.id+' no unverified certification');
+  const g=buildLiaoningGuide(p.id);
+  assert.equal(g.city,city,p.id+' wrong guide city');
+  assert.equal(g.qualityLevel,p.temporal==='past-window'?'C':'B');
+  assert.ok(g.steps.length>=6&&g.steps.every(x=>x.title&&x.why&&x.action&&x.done));
+  assert.ok(g.checks.length>=5&&g.faq.length>=6&&Object.keys(g.branches).length===2);
+  assert.equal(g.sources[0][1],p.sourceUrl);
+  assert.equal(g.officialUrl,undefined,'Do not invent applicant portal from policy article');
+  assert.ok(liaoningGuideRoute(p.id).includes(encodeURIComponent(p.id)));
+ }
+ assert.ok(provincial.filter(p=>p.id.includes('-provincial-')).every(p=>talentSourceKind(p.sourceUrl)==='government'),city+' provincial original');
+}
+assert.ok(LIAONING_MUNICIPAL_RESEARCH_RECORDS.find(p=>p.city==='鞍山').deadline==='2026-11-06','Anshan property fair not expired on Oct 31');
+assert.equal(LIAONING_MUNICIPAL_RESEARCH_RECORDS.find(p=>p.city==='鞍山').temporal,'policy');
+for(const [city,deadline] of [['本溪','2026-09-25'],['丹东','2026-09-17']]){const p=LIAONING_MUNICIPAL_POLICY_RECORDS.find(x=>x.city===city);assert.ok(p&&p.temporal==='past-window'&&p.deadline===deadline,city+' ended 2026 cycle must be C history');assert.equal(assessPolicy(p,'2026-10-31').grade,'C');}
+assert.ok(LIAONING_MUNICIPAL_POLICY_RECORDS.find(p=>p.city==='辽阳').benefit.includes('查询入口'),'Liaoyang is only a housing info index');
+for(const h of LIAONING_HOUSING_RECORDS){
+ assert.ok(TALENT_HOUSING_RECORDS.some(x=>x.id===h.id),h.city+' housing missing shared list');
+ assert.equal(h.kind,'program','No confirmed 2026 live apartments have been demonstrated');
+ assert.ok(h.statusNote.includes('不是即时出租'));
+ assert.ok(h.steps.length>=5&&h.sourceUrl.startsWith('https://'));
+ assert.ok(['大连','营口','盘锦','朝阳'].includes(h.city));
+}
+for(const frag of ["fragments[2]==='liaoning'","buildLiaoningGuide(decode(fragments[3]))","LIAONING_14_CITIES.includes(match.name)","LIAONING_PROVINCIAL_POLICY_RECORDS.filter(p=>p.city===match.name)"])assert.ok(routes.includes(frag),'City hub or dynamic route missing '+frag);
+assert.ok(listing.includes("p.id.startsWith('ln-')?'/talent-service/policy-guide-preview/liaoning/'")&&listing.includes('LIAONING_MUNICIPAL_RESEARCH_RECORDS'),'Policy list must link actual Liaoning guides');
+assert.ok(routes.includes('LIAONING_MUNICIPAL_RESEARCH_RECORDS.filter(p=>p.city===match.name)'), 'Research must show on all city hub cards');
+assert.ok(index.includes('...LIAONING_HOUSING_RECORDS'),'Housing records disconnected');
+assert.ok(pi.includes('...LIAONING_MUNICIPAL_POLICY_RECORDS')&&pi.includes('...LIAONING_PROVINCIAL_POLICY_RECORDS')&&pi.includes('...LIAONING_EXPANDED_PROVINCIAL_POLICY_RECORDS'),'Policy records disconnected');
+console.log('PASS Liaoning: 14 cities, 238 provincial views (16 province policies + historic Three Supports per city), 10 local government records, 4 secondary research leads, 252 interactive V5.1 guides; 4 genuine housing programs');
+console.log('PASS: current Anshan 2026-11-06 deadline, historic Three Supports, province/local distinct, no fake apartment vacancy, no A certification');
