@@ -1,3 +1,4 @@
+import {TALENT_HOUSING_COVERAGE_FIX_20261031} from './talentHousingCoverageFix20261031.ts';
 import {JIANGSU_HOUSING_RECORDS} from './jiangsuHousingRecords.ts';
 import {GUANGDONG_HOUSING_RECORDS} from './guangdongHousingRecords.ts';
 import {GUANGDONG_EXPANDED_HOUSING_RECORDS} from './guangdongExpandedHousingRecords.ts';
@@ -25,6 +26,7 @@ import {WEIFANG_HOUSING_RECORDS} from './weifangHousingRecords.ts';
 export type TalentHousingRecord={id:string;city:string;district:string;title:string;address:string;units:string;rent:string;eligibility:string;sourceUrl:string;published:string;applicationEnd?:string;statusNote:string;steps:string[];applyUrl?:string;kind:'project'|'program';reviewedAt:string;contactPhone?:string;contactSourceUrl?:string;photoEvidence?:'source';housingCategory?:'人才公寓'|'保障性租赁住房'|'其他住房';};
 export const HOUSING_REVIEW_DATE='2026-10-30';
 export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
+...TALENT_HOUSING_COVERAGE_FIX_20261031,
 ...JIANGSU_HOUSING_RECORDS,
 ...GUANGDONG_HOUSING_RECORDS,
 ...GUANGDONG_EXPANDED_HOUSING_RECORDS,
