@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const read=p=>fs.readFileSync(p,'utf8');
+const p=JSON.parse(read('src/data/employerProfiles/cn-autumn-037.json'));
+assert.equal(p.schemaVersion,1);
+assert.equal(p.id,'cn-autumn-037');
+assert.equal(p.name,'炬芯科技');
+assert.equal(p.englishName,'Actions Technology');
+assert.equal(p.jobs.length,10,'10 concrete 2027 campus role directions, no fabricated listings');
+assert.equal(p.business.length,6,'Six researched business cards');
+const categories={'数字IC设计与验证':2,'模拟与射频IC':2,'算法与软件':2,'电源与系统':2,'测试与版图':2};
+for (const [group,count] of Object.entries(categories))assert.equal(p.jobs.filter(j=>j.category===group).length,count,group);
+assert.equal(new Set(p.jobs.map(j=>j.id)).size,10,'Job ids unique');
+assert(p.jobs.every(j=>j.currentOpenVerified===false),'2026-10-18 cutoff: no realtime openings falsely asserted');
+assert(p.jobs.every(j=>j.recruitmentType==='CAMPUS'&&j.educationLabel&&j.requirements.length>=125));
+assert(p.jobs.every(j=>j.url==='https://actionstech.zhiye.com/'&&j.evidenceUrl.startsWith('https://gdjy.hfut.edu.cn/')),'Official portal and university announcement');
+assert(p.jobs.some(j=>j.title.includes('电源系统设计')&&j.educationLabel.includes('本科')),'Undergraduate roles preserved');
+assert(p.jobs.some(j=>j.title.includes('版图设计')&&j.educationLabel.includes('本科')),'Layout role correctly labeled');
+const code=read('src/pages/UnifiedV2CompanyPage.tsx');
+assert(code.includes("actions37=id==='cn-autumn-037'"),'No new company page layout');
+assert(code.includes('actions37Groups'),'Major chips must be present');
+assert(code.includes('if(minieye||actions37)return job.category===major'),'Different major groups show different role subsets');
+assert(code.includes('j.category===g.label'),'Chip counters are per-role');
+assert(code.includes('hhba-v2-bodor'),'Detail card layout inherited');
+assert(code.includes('data-hhba-recruitment-outbound="true"'),'Auth gate hook retained');
+assert(code.includes('站内岗位详情'),'Job detail navigation retained');
+const names=[p.media.logo,...p.media.photos.map(x=>x.path)];
+assert.equal(new Set(names).size,3,'One logo and 2 separate photos');
+for(const name of names){
+ assert(fs.existsSync('public/'+name),'missing actual local image '+name);
+ assert(fs.statSync('public/'+name).size>2600,'file too small '+name);
+}
+const media=JSON.parse(read('public/images/employer-profiles/cn-autumn-037/media-audit.json'));
+assert.deepEqual(Object.keys(media).sort(),['logo.png','photo1.jpg','photo2.jpg']);
+assert(Object.values(media).every(v=>v.verified&&v.company==='炬芯科技股份有限公司'&&v.sha256),'Photos need provenance');
+assert(Object.values(media).filter(v=>v.sourcePage==='https://www.actionstech.com/index.php?id=join').length===2,'Both real images from official recruiting page');
+assert.equal(new Set(Object.values(media).map(v=>v.sourceSha256)).size,3,'No repeated media');
+console.log('ACTIONS_037_COMPLETE_4_PANELS_10_JOBS_3_AUDITED_MEDIA_PASS');
