@@ -1,0 +1,45 @@
+name: Guangxi V5.1 independent verification
+on:
+  push:
+    branches: [feature/talent-guangxi]
+  pull_request:
+    paths:
+      - 'apps/web/src/data/guangxiPolicyRecords.ts'
+      - 'apps/web/src/data/talentPolicyRecords.ts'
+      - 'apps/web/scripts/test-guangxi-city-v51.mjs'
+      - '.github/workflows/hhba-guangxi-branch-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-guangxi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Test Guangxi city coverage
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-guangxi-city-v51.mjs
+      - name: National V5.1 contract regression
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - name: Build HHBA static web
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: guangxi-v51-static
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
