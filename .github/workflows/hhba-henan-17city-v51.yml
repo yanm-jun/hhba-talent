@@ -1,0 +1,51 @@
+name: HHBA Henan 17-city V5.1 isolated review (NO main Pages)
+on:
+  push:
+    branches: [feature/talent-henan-v51-20261031]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Henan 17-city and national V5.1 regressions
+        working-directory: apps/web
+        run: |
+          node --experimental-strip-types scripts/test-henan-17city-v51.mjs
+          node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+          node --experimental-strip-types scripts/test-talent-cities.mjs
+          node --experimental-strip-types scripts/test-talent-housing-card-coverage.mjs
+          node scripts/global-talent-nav.contract.test.mjs
+      - name: Isolated static website build
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '0'
+          HHBA_PAGES_BASE: '/'
+        run: npm run build
+      - name: Check all 17 cities and records in static assets
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const js=fs.readdirSync('dist/assets').filter(x=>x.endsWith('.js')).map(x=>fs.readFileSync('dist/assets/'+x,'utf8')).join('');
+          for(const c of ["郑州","开封","洛阳","平顶山","安阳","鹤壁","新乡","焦作","濮阳","许昌","漯河","三门峡","南阳","商丘","信阳","周口","驻马店"])if(!js.includes(c))throw Error('Missing Henan '+c);
+          for(const id of ['hn-zhengzhou-p1-202610','hn-xinyang-housing-202610','hn-zhoukou-p1-202610'])if(!js.includes(id))throw Error('Missing '+id);
+          if(!fs.existsSync('dist/index.html'))throw Error('No static entry');console.log('HENAN_STATIC_ASSET_OK');
+          JS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: henan-17city-isolated-static-preview
+          path: apps/web/dist/
+          if-no-files-found: error
+          retention-days: 14
