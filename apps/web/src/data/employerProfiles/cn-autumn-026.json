@@ -172,7 +172,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "学历依各岗位要求 · 2027届校招（类别信息）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "marketing-operations",
@@ -201,7 +202,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "学历依各岗位要求 · 2027届校招（类别信息）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "市场 / 商务"
     },
     {
       "id": "tech-design",
@@ -231,7 +233,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "学历依各岗位要求 · 2027届校招（类别信息）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "finance-invest",
@@ -257,7 +260,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "学历依各岗位要求 · 2027届校招（类别信息）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "财务 / 金融"
     },
     {
       "id": "general-management",
@@ -284,7 +288,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "学历依各岗位要求 · 2027届校招（类别信息）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "管理 / 运营"
     },
     {
       "id": "printing-operations",
@@ -308,7 +313,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "学历依各岗位要求 · 2027届校招（类别信息）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     }
   ],
   "mediaSources": {

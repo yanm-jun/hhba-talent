@@ -1,0 +1,29 @@
+{
+  "company": "紫龙游戏",
+  "reviewedOn": "2026-10-31",
+  "realPhotoValidationComplete": false,
+  "licenseReviewed": false,
+  "reason": "Historic imagery audit; replaced only missing files with explicit nonofficial editorial assets.",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-023/logo.png",
+      "verifiedOriginalSource": false,
+      "editorialReplacement": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-023/photo1.webp",
+      "sourceNote": "2017年北京朝阳区达美中心紫龙游戏办公项目实景，来自2017年10月域式建筑报道，摄影署名：存在建筑-建筑摄影。历史办公环境，不代表2026年现址。",
+      "verifiedOriginalSource": false,
+      "editorialReplacement": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-023/photo2.webp",
+      "sourceNote": "同一办公项目的另一张独立实景照片，来源：域式建筑办公室项目媒体报道；不作为2026年办公环境现状。",
+      "verifiedOriginalSource": false,
+      "editorialReplacement": false
+    }
+  ]
+}

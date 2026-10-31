@@ -26,16 +26,16 @@
     "logo": "images/employer-profiles/cn-autumn-031/logo.webp",
     "photos": [
       {
-        "path": "images/employer-profiles/cn-autumn-031/photo1.jpg",
-        "caption": "兰州奇正生态健康品公司 · 厂区实景",
-        "alt": "奇正健康品工厂楼体及企业标识与庭院",
-        "note": "奇正集团官网“奇正风采”收录，集团旗下兰州奇正生态健康品公司厂区，非集团总部。"
+        "path": "images/employer-profiles/cn-autumn-031/repair-photo1.svg",
+        "caption": "奇正 · HHBA非实景业务示意（修复缺图）",
+        "alt": "奇正原创业务主题矢量示意图",
+        "note": "原图文件在仓库中缺失；临时采用独立HHBA原创SVG避免断图。不是企业实景或官方素材，尚需授权真实照片替换。"
       },
       {
-        "path": "images/employer-profiles/cn-autumn-031/photo2.jpg",
-        "caption": "西藏奇正藏药股份有限公司 · 园区实景",
-        "alt": "具有藏式建筑特色的西藏奇正藏药股份有限公司办公建筑",
-        "note": "奇正集团官网旗下公司介绍图片，地点为奇正藏药企业园区，非集团总部。"
+        "path": "images/employer-profiles/cn-autumn-031/repair-photo2.svg",
+        "caption": "奇正 · HHBA非实景业务示意（修复缺图）",
+        "alt": "奇正原创业务主题矢量示意图",
+        "note": "原图文件在仓库中缺失；临时采用独立HHBA原创SVG避免断图。不是企业实景或官方素材，尚需授权真实照片替换。"
       }
     ]
   },
@@ -60,7 +60,7 @@
     "食品科学与工程",
     "市场营销"
   ],
-  "photoNote": "品牌Logo由用户提供并存为本地静态WebP；两张不同的企业实景图片来源于奇正集团官网，构建时各自保存为本地静态照片。所有图片仅展示不设置外链；若图片主机拒绝访问则显示明确标记的不可用提示。图片与商标版权归各权利人所有，HHBA独立整理资料，不代表奇正集团授权合作。",
+  "photoNote": "品牌Logo由用户提供并存为本地静态WebP；两张不同的企业实景图片来源于奇正集团官网，构建时各自保存为本地静态照片。所有图片仅展示不设置外链；若图片主机拒绝访问则显示明确标记的不可用提示。图片与商标版权归各权利人所有，HHBA独立整理资料，不代表奇正集团授权合作。 部分旧图片已失效，现显示明显标注的HHBA编辑性占位图片；不视为企业真实照片。",
   "business": [
     {
       "title": "藏药研发与生产",
@@ -130,7 +130,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "学历以招聘官网为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "市场 / 商务"
     },
     {
       "id": "qizheng-role-02",
@@ -149,7 +150,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "研究生及以上",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "qizheng-role-03",
@@ -171,7 +173,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "学历以招聘官网为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "测试 / 质量"
     },
     {
       "id": "qizheng-role-04",
@@ -191,7 +194,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "学历以招聘官网为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "qizheng-role-05",
@@ -211,7 +215,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "学历以招聘官网为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "qizheng-role-06",
@@ -231,7 +236,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "学历以招聘官网为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "qizheng-role-07",
@@ -253,7 +259,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "学历以招聘官网为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "qizheng-role-08",
@@ -273,7 +280,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "学历以招聘官网为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "qizheng-role-09",
@@ -293,7 +301,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "学历以招聘官网为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "市场 / 商务"
     }
   ]
 }

@@ -1,0 +1,29 @@
+{
+  "company": "南方传媒",
+  "reviewedOn": "2026-10-31",
+  "realPhotoValidationComplete": false,
+  "licenseReviewed": false,
+  "reason": "Historic imagery audit; replaced only missing files with explicit nonofficial editorial assets.",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-026/logo.png",
+      "verifiedOriginalSource": false,
+      "editorialReplacement": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-026/photo1.webp",
+      "sourceNote": "中国作家网2026年9月1日报道：大会由南方传媒与百道网联合主办。此为活动现场照片，不是总部办公楼；版权归原权利人。",
+      "verifiedOriginalSource": false,
+      "editorialReplacement": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-026/photo2.webp",
+      "sourceNote": "新华社2026年9月2日南国书香节报道，南方传媒为该活动承办单位之一。此图为书展实景，不表示全部展区均由南方传媒独立运营；版权归原权利人。",
+      "verifiedOriginalSource": false,
+      "editorialReplacement": false
+    }
+  ]
+}

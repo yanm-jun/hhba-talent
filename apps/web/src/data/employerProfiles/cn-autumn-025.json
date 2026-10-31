@@ -160,7 +160,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": true,
       "educationLabel": "本科及以上 · 不限专业",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "市场 / 商务"
     },
     {
       "id": "branch-operation-support",
@@ -177,7 +178,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": true,
       "educationLabel": "本科及以上 · 不限专业",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "管理 / 运营"
     },
     {
       "id": "branch-hall-service",
@@ -194,7 +196,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": true,
       "educationLabel": "本科及以上 · 不限专业",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "branch-management-trainee",
@@ -229,7 +232,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "硕士研究生及以上 · 指定学科大类",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "管理 / 运营"
     },
     {
       "id": "head-office-management-trainee",
@@ -262,7 +266,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "硕士研究生及以上 · 指定学科大类",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "管理 / 运营"
     },
     {
       "id": "head-office-fintech",
@@ -297,7 +302,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "本科及以上 · 计算机与数理等相关专业",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "财务 / 金融"
     },
     {
       "id": "head-office-postdoc",
@@ -325,7 +331,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "博士学位／博士后出站 · 全脱产研究",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     }
   ],
   "mediaSources": {

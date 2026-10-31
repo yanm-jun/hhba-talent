@@ -35,19 +35,19 @@
     "https://hotel26548.round-world-trip.com/newsdetail-822211.html"
   ],
   "media": {
-    "logo": "images/employer-profiles/cn-autumn-027/logo.png",
+    "logo": "images/employer-profiles/cn-autumn-027/repair-logo.svg",
     "photos": [
       {
-        "path": "images/employer-profiles/cn-autumn-027/photo1.jpg",
-        "caption": "广之旅主题门店活动实景 · 2025年",
-        "alt": "广之旅国际旅行社门店举办北京环球度假区夏季主题活动的现场",
-        "note": "2025年广之旅与北京环球度假区夏季主题营销公开报道配图；门店主题布置为当期活动场景，不代表目前陈列状态。"
+        "path": "images/employer-profiles/cn-autumn-027/repair-photo1.svg",
+        "caption": "广之旅 · HHBA非实景业务示意（修复缺图）",
+        "alt": "广之旅原创业务主题矢量示意图",
+        "note": "原图文件在仓库中缺失；临时采用独立HHBA原创SVG避免断图。不是企业实景或官方素材，尚需授权真实照片替换。"
       },
       {
-        "path": "images/employer-profiles/cn-autumn-027/photo2.jpg",
-        "caption": "广之旅阳江门店开业实景 · 2023年",
-        "alt": "广之旅国际旅行社门店招牌及开业现场合影",
-        "note": "2023年3月公开报道的阳江门店开业照片；不是广州总部办公楼，也不代表2026年所有门店现状。"
+        "path": "images/employer-profiles/cn-autumn-027/repair-photo2.svg",
+        "caption": "广之旅 · HHBA非实景业务示意（修复缺图）",
+        "alt": "广之旅原创业务主题矢量示意图",
+        "note": "原图文件在仓库中缺失；临时采用独立HHBA原创SVG避免断图。不是企业实景或官方素材，尚需授权真实照片替换。"
       }
     ]
   },
@@ -77,7 +77,7 @@
     "信息安全",
     "数据科学与大数据技术"
   ],
-  "photoNote": "Logo 采自旅游行业企业档案页面；两张独立实景分别源于2025年广之旅主题门店公开报道和2023年阳江门店开业报道。素材来自第三方公开页面，不代表广之旅官方授权或HHBA与企业合作。图片独立保存为本地静态文件，点击不跳转外部网站。",
+  "photoNote": "Logo 采自旅游行业企业档案页面；两张独立实景分别源于2025年广之旅主题门店公开报道和2023年阳江门店开业报道。素材来自第三方公开页面，不代表广之旅官方授权或HHBA与企业合作。图片独立保存为本地静态文件，点击不跳转外部网站。 部分旧图片已失效，现显示明显标注的HHBA编辑性占位图片；不视为企业真实照片。",
   "business": [
     {
       "title": "出境与入境旅游",
@@ -163,7 +163,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 逐岗学历及专业要求待官网核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "management-trainee",
@@ -187,7 +188,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 逐岗学历及专业要求待官网核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "管理 / 运营"
     },
     {
       "id": "tour-leader-trainee",
@@ -211,7 +213,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 逐岗学历及专业要求待官网核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "outbound-tour-operations",
@@ -235,7 +238,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 逐岗学历及专业要求待官网核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "corporate-sales",
@@ -259,7 +263,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 逐岗学历及专业要求待官网核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "市场 / 商务"
     },
     {
       "id": "travel-advisor",
@@ -283,7 +288,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 逐岗学历及专业要求待官网核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "市场 / 商务"
     },
     {
       "id": "operations-engineer",
@@ -307,7 +313,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 逐岗学历及专业要求待官网核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "软件 / 数字技术"
     },
     {
       "id": "java-engineer",
@@ -331,7 +338,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 逐岗学历及专业要求待官网核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "软件 / 数字技术"
     }
   ]
 }

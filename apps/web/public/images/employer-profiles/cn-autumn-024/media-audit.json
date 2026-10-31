@@ -1,0 +1,29 @@
+{
+  "company": "菲婷丝",
+  "reviewedOn": "2026-10-31",
+  "realPhotoValidationComplete": false,
+  "licenseReviewed": false,
+  "reason": "Historic imagery audit; replaced only missing files with explicit nonofficial editorial assets.",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-024/logo.png",
+      "verifiedOriginalSource": false,
+      "editorialReplacement": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-024/photo1.webp",
+      "sourceNote": "每日经济新闻2024年7月企业采访中的品牌展示区照片，可见FineToday蓝色Logo与旗下洗护产品。是产品展示场景，不是集团总部大楼；摄影版权归原发布方。",
+      "verifiedOriginalSource": false,
+      "editorialReplacement": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-024/photo2.webp",
+      "sourceNote": "FineToday集团官方可持续发展页面展示的中国区美好守护计划活动实景；为历史活动照片，不代表现时办公环境。摄影版权归原权利人。",
+      "verifiedOriginalSource": false,
+      "editorialReplacement": false
+    }
+  ]
+}
