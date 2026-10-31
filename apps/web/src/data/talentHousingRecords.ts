@@ -1,3 +1,4 @@
+import {BEIJING_HOUSING_RECORDS} from './beijingHousingRecords.ts';
 import {LANGFANG_HOUSING_RECORDS} from './langfangHousingRecords.ts';
 import {CANGZHOU_HOUSING_RECORDS} from './cangzhouHousingRecords.ts';
 import {HENGSHUI_HOUSING_RECORDS} from './hengshuiHousingRecords.ts';
@@ -18,6 +19,7 @@ import {WEIFANG_HOUSING_RECORDS} from './weifangHousingRecords.ts';
 export type TalentHousingRecord={id:string;city:string;district:string;title:string;address:string;units:string;rent:string;eligibility:string;sourceUrl:string;published:string;applicationEnd?:string;statusNote:string;steps:string[];applyUrl?:string;kind:'project'|'program';reviewedAt:string;contactPhone?:string;contactSourceUrl?:string;photoEvidence?:'source';housingCategory?:'人才公寓'|'保障性租赁住房'|'其他住房';};
 export const HOUSING_REVIEW_DATE='2026-10-30';
 export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
+...BEIJING_HOUSING_RECORDS,
 ...HENGSHUI_HOUSING_RECORDS,
 ...LANGFANG_HOUSING_RECORDS,
 ...CANGZHOU_HOUSING_RECORDS,
