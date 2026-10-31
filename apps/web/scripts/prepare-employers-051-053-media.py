@@ -24,8 +24,8 @@ CFG={
  "052":{"name":"宏川集团","logoFallback":True,
    "logo":[],"logoFind":["https://grgroup.cc/","https://grgroup.cc/about.html","https://www.grgroup.cc/human/005002.html"],
    "photo1":["https://career.cup.edu.cn/attachment/cup/ueditor/images/20181026/1540535814524187.jpg"],
-   "photo2":["https://newspaper.gzdaily.cn/pc/resfile/2026-04-29/A15/15194468_huangwx_1777206517314_s.jpg"],
-   "find":[],"note":"Headquarters image from university company listing; terminal from Guangzhou Daily for subsidiary Hongchuan Smart."},
+   "photo2":[],
+   "find":[],"note":"Headquarters image from university company listing; second picture from Hongchuan Group official Nangtong port operations news."},
  "053":{"name":"兰石集团","logoFallback":True,"logo":[],
    "logoFind":["https://www.lsjt.com.cn/","https://www.lansland.com/","https://www.lsjt.com.cn/lsgroup/lsgroup/guanyulanshijt/fazhanlicheng/index.html"],
    "photo1":["https://www.lsjt.com.cn/upload/1/cms/content/20251228/2005153501508898816.jpg"],
@@ -109,6 +109,13 @@ for number,cfg in CFG.items():
     try:
      options.extend([u for u,sc in article_images(page,True)[:7]])
     except Exception as e:print('LOGO_FIND_FAIL',number,str(e)[:90],flush=True)
+  if filename=='photo2.jpg' and number=='052':
+   for page in ['https://www.grgroup.cc/newsview/17571.html','https://www.grgroup.cc/newsview/18029.html']:
+    try:
+     listed=article_images(page)
+     print('OFFICIAL_HONGCHUAN_PHOTO_CANDIDATES',page,listed[:9],flush=True)
+     options.extend(u for u,sc in listed if sc>=2 and not re.search('logo|icon|banner|share',u,re.I))
+    except Exception as e:print('HONGCHUAN_PAGE_WARN',page,str(e)[:130],flush=True)
   if filename=='photo2.jpg' and number=='051':
    for page in cfg['find']:
     try:
