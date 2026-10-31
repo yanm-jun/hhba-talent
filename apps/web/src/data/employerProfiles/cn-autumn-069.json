@@ -1,0 +1,388 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-069",
+  "name": "广东省农村信用社联合社",
+  "displayName": "广东省农信联社",
+  "englishName": "Guangdong Rural Credit Union",
+  "aliases": [
+    "广东农信",
+    "广东农商",
+    "广东省农村信用社联合社",
+    "广东农信联社",
+    "gdrcu",
+    "广东省农信联社2027校招"
+  ],
+  "industry": "区域农信体系服务 · 金融科技 · 风险管理 · 普惠金融",
+  "subtitle": "广东省农村信用社联合社 · 广州 · 省级农信体系行业管理与科技服务平台",
+  "overview": "广东省农村信用社联合社成立于2005年，是广东省内农商银行行业管理与科技服务机构。公开2027届秋季招聘公告列10个岗位，工作地广州和佛山，要求2027届硕士研究生及以上，网上报名截止2026年11月29日23:59。本页描述的是省联社总部/科技平台岗位，不等同于省内所有农商行各自招聘。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.gdrcu.com/gdrcunew/index.html",
+    "https://hzau.91wllm.cn/campus/view/id/1008450",
+    "https://job.hust.edu.cn/zpinfo1/2463584.htm",
+    "https://gdrcu2027.iguopin.com/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-069/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-069/photo1.jpg",
+        "caption": "广东农信 · 来源明确的实际活动照片1",
+        "alt": "广东农信公开报道活动现场照片1",
+        "note": "源自实际公司相关机构公开新闻，不意味着总部/工作地点或拥有转载授权；确切照片来源经构建清单追溯。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-069/photo2.jpg",
+        "caption": "广东农信 · 来源明确的实际活动照片2",
+        "alt": "广东农信公开报道活动现场照片2",
+        "note": "源自实际公司相关机构公开新闻，不意味着总部/工作地点或拥有转载授权；确切照片来源经构建清单追溯。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://gdrcu2027.iguopin.com/",
+    "label": "2027广东省农信联社官方指定网申",
+    "status": "official_portal",
+    "subject": "广东省农村信用社联合社",
+    "note": "2026年10月省联社发布的招聘公告明确这一专用网申地址、单人限报一个意向岗位，报名截止2026-11-29 23:59；本平台未取得该站的实时席位确认。"
+  },
+  "majorIntro": "10个岗位来自2027招聘公告附件，按附件所列专业范围筛选。学历全日制硕士及以上；岗位方向与申请资格须逐项对照官方职位表，综合类岗位不等于专业不限。",
+  "preferredMajors": [
+    "金融学",
+    "经济学",
+    "法学",
+    "工商管理",
+    "计算机科学与技术",
+    "软件工程",
+    "数据科学与大数据技术",
+    "统计学",
+    "人工智能",
+    "电气工程及其自动化",
+    "人力资源管理"
+  ],
+  "photoNote": "计划从广东农信官方网站新闻素材中筛选两张能明确追溯来源的真实农信业务活动照片。真实图片不一定是省联社本部办公照；若来源不足，须显式标注业务插画，不得冒充总部。商业转载许可仍需核实。",
+  "business": [
+    {
+      "title": "省内农商行协同管理",
+      "description": "按政府授权开展辖内农商行制度、业务和发展方向的管理、指导及协调，服务行业高质量发展。",
+      "tags": "行业管理 · 金融",
+      "details": [
+        "法人机构管理服务",
+        "业务制度与协调",
+        "普惠金融战略支持"
+      ]
+    },
+    {
+      "title": "核心银行与数字金融系统",
+      "description": "为辖内农商行提供银行核心业务、线上金融渠道及应用平台的科技规划与开发运维服务。",
+      "tags": "银行IT · 科技",
+      "details": [
+        "核心系统规划与研发",
+        "电子银行与支付系统",
+        "业务应用可靠性保障"
+      ]
+    },
+    {
+      "title": "科技风险与网络安全",
+      "description": "建设安全体系、识别信息科技风险、开展技术合规和网络资产风险监控，确保金融系统稳定运行。",
+      "tags": "网络安全 · 合规",
+      "details": [
+        "信息科技合规内控",
+        "网络风险管理",
+        "系统审计与应急响应"
+      ]
+    },
+    {
+      "title": "金融数据与AI应用",
+      "description": "开展经营分析、客户分析、信贷风险模型和人工智能应用研究，支撑农商行业务决策。",
+      "tags": "数据 · AI",
+      "details": [
+        "数据治理和建模",
+        "金融风控策略分析",
+        "AI业务创新"
+      ]
+    },
+    {
+      "title": "资金清算与金融服务",
+      "description": "统筹体系内支付清算、资金服务与业务协同，服务普惠小微、乡村振兴及地方实体经济。",
+      "tags": "清算 · 普惠",
+      "details": [
+        "支付结算支持",
+        "资金流转管理",
+        "普惠业务支持"
+      ]
+    },
+    {
+      "title": "人才培养与组织管理",
+      "description": "建设省级行业人才发展、培训与管理体系，为农商行及科技平台干部员工提供专业化能力支撑。",
+      "tags": "人才 · 组织",
+      "details": [
+        "省级人才培养",
+        "培训与绩效体系",
+        "职业发展和干部管理"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "general",
+      "title": "综合管理岗（2027届）",
+      "category": "综合管理",
+      "city": "广州市天河区",
+      "summary": "行政工作、文稿起草、组织人事、战略研究、财务与采购项目的协调和实施。",
+      "requirements": "官方2027附件列经济学类、金融学类、管理学类、法学类、中文类及计算机类；具体条件以官方网申单岗资格表为准。",
+      "majorNames": [
+        "经济学",
+        "金融学",
+        "工商管理",
+        "法学",
+        "汉语言文学",
+        "计算机科学与技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://gdrcu2027.iguopin.com/",
+      "evidenceUrl": "https://hzau.91wllm.cn/campus/view/id/1008450",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东省农村信用社联合社",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "risk",
+      "title": "经营风控岗（2027届）",
+      "category": "金融 / 风控",
+      "city": "广州市天河区",
+      "summary": "普惠业务督导、信贷风险统计、非现场风险监控，以及资金交易业务相关运营与分析。",
+      "requirements": "官方2027附件列经济学类、金融学类、管理学类、法学类、数学类、统计学类及计算机类；硕士及以上。",
+      "majorNames": [
+        "经济学",
+        "金融学",
+        "工商管理",
+        "法学",
+        "数学与应用数学",
+        "统计学",
+        "计算机科学与技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://gdrcu2027.iguopin.com/",
+      "evidenceUrl": "https://hzau.91wllm.cn/campus/view/id/1008450",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东省农村信用社联合社",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "compliance",
+      "title": "合规监督岗（2027届）",
+      "category": "法务 / 合规",
+      "city": "广州市天河区",
+      "summary": "参与监督检查、安全保卫、合规内控、纪检监察及现场审计等相关工作。",
+      "requirements": "2027岗位附件列经济学、金融学、管理学、公安学、法学、数学、统计学、计算机、马克思主义理论等学科，资格以岗位表为准。",
+      "majorNames": [
+        "法学",
+        "审计学",
+        "金融学",
+        "计算机科学与技术",
+        "统计学",
+        "马克思主义理论"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://gdrcu2027.iguopin.com/",
+      "evidenceUrl": "https://hzau.91wllm.cn/campus/view/id/1008450",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东省农村信用社联合社",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "software",
+      "title": "软件开发工程师（2027届）",
+      "category": "软件 / 开发",
+      "city": "佛山市南海区",
+      "summary": "银行信息系统软件设计开发、技术文档、生产运维、系统升级、故障响应和持续缺陷治理。",
+      "requirements": "2027附件明确计算机、电子信息、自动化、数学、统计、物理、化学及信息管理类专业；实际技术考核以招聘页面为准。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "数据科学与大数据技术",
+        "信息管理与信息系统",
+        "电子信息工程",
+        "自动化",
+        "应用数学",
+        "统计学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://gdrcu2027.iguopin.com/",
+      "evidenceUrl": "https://hzau.91wllm.cn/campus/view/id/1008450",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东省农村信用社联合社",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "it-risk",
+      "title": "科技风险管理岗（2027届）",
+      "category": "信息安全 / 风控",
+      "city": "佛山市南海区",
+      "summary": "信息科技风险体系与制度建设，识别、监控、评估科技合规风险，协同监管和审计工作。",
+      "requirements": "2027官方附件列计算机、电子信息、自动化、数学、统计、物理、化学、信息管理等相关学科；不虚构额外证照。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "数据科学与大数据技术",
+        "信息管理与信息系统",
+        "电子信息工程",
+        "自动化",
+        "应用数学",
+        "统计学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://gdrcu2027.iguopin.com/",
+      "evidenceUrl": "https://hzau.91wllm.cn/campus/view/id/1008450",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东省农村信用社联合社",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "analytics",
+      "title": "数据分析师（2027届）",
+      "category": "数据分析",
+      "city": "佛山市南海区",
+      "summary": "围绕客户经营、机构绩效及风险模型策略开展数据分析，并推动优化建议在业务中实施。",
+      "requirements": "2027官方附件列计算机、电子信息、自动化、数学、统计、物理、化学及信息管理等相关专业；工具语言具体要求以岗内说明为准。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "数据科学与大数据技术",
+        "信息管理与信息系统",
+        "电子信息工程",
+        "自动化",
+        "应用数学",
+        "统计学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://gdrcu2027.iguopin.com/",
+      "evidenceUrl": "https://hzau.91wllm.cn/campus/view/id/1008450",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东省农村信用社联合社",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ai",
+      "title": "人工智能研究与应用工程师（2027届）",
+      "category": "人工智能 / 算法",
+      "city": "佛山市南海区",
+      "summary": "设计银行业务AI场景解决方案，推进模型优化、应用运营维护和人工智能新技术跟踪。",
+      "requirements": "2027官方附件列计算机、电子信息、自动化、数学、统计、物理、化学及信息管理相关专业；硕士及以上。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "数据科学与大数据技术",
+        "信息管理与信息系统",
+        "电子信息工程",
+        "自动化",
+        "应用数学",
+        "统计学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://gdrcu2027.iguopin.com/",
+      "evidenceUrl": "https://hzau.91wllm.cn/campus/view/id/1008450",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东省农村信用社联合社",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "network",
+      "title": "网络工程师（2027届）",
+      "category": "网络 / 安全",
+      "city": "广州市天河区／佛山市南海区",
+      "summary": "网络基础设施和网络安全的规划建设，流量监测、运行维护、应急处置与容量优化。",
+      "requirements": "2027附件列计算机、电子信息、自动化、数学、统计、物理、化学、信息管理等相关专业；分配地点以官方网申结果为准。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "数据科学与大数据技术",
+        "信息管理与信息系统",
+        "电子信息工程",
+        "自动化",
+        "应用数学",
+        "统计学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://gdrcu2027.iguopin.com/",
+      "evidenceUrl": "https://hzau.91wllm.cn/campus/view/id/1008450",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东省农村信用社联合社",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "infra",
+      "title": "基础设施管理岗（2027届）",
+      "category": "机房 / 电气工程",
+      "city": "佛山市南海区",
+      "summary": "数据中心机房机电系统设计建设、日常巡检、故障应急和设施资源效率优化。",
+      "requirements": "2027官方附件主要列能源动力类、电气类、自动化类以及建筑环境与能源应用工程等专业；本科生不能将该岗位当作已满足学历。",
+      "majorNames": [
+        "能源与动力工程",
+        "电气工程及其自动化",
+        "自动化",
+        "建筑环境与能源应用工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://gdrcu2027.iguopin.com/",
+      "evidenceUrl": "https://hzau.91wllm.cn/campus/view/id/1008450",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东省农村信用社联合社",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "talent",
+      "title": "科技人才发展岗（2027届）",
+      "category": "人力资源 / 组织发展",
+      "city": "佛山市南海区",
+      "summary": "负责银信中心培训管理、人才培养和干部管理，并按需支持招聘、绩效、薪酬和员工关系。",
+      "requirements": "官方2027附件列人力资源管理、劳动关系、劳动经济学、劳动与社会保障、行政管理、工商管理、心理学等专业。",
+      "majorNames": [
+        "人力资源管理",
+        "劳动关系",
+        "劳动经济学",
+        "劳动与社会保障",
+        "行政管理",
+        "工商管理",
+        "心理学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://gdrcu2027.iguopin.com/",
+      "evidenceUrl": "https://hzau.91wllm.cn/campus/view/id/1008450",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东省农村信用社联合社",
+      "currentOpenVerified": false
+    }
+  ]
+}
