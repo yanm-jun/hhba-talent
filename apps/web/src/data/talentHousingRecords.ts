@@ -1,4 +1,5 @@
 import {QINGHAI_HOUSING_RECORDS} from './qinghaiHousingRecords.ts';
+import {QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS} from './qinghaiVerifiedHousing.ts';
 import {GUIZHOU_HOUSING_RECORDS} from './guizhouHousingRecords.ts';
 import {SICHUAN_HOUSING_RECORDS} from './sichuanHousingRecords.ts';
 import {LESHAN_HOUSING_RECORDS} from './leshanHousingRecords.ts';
@@ -57,6 +58,7 @@ export type TalentHousingRecord={id:string;city:string;district:string;title:str
 export const HOUSING_REVIEW_DATE='2026-10-30';
 export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
  ...QINGHAI_HOUSING_RECORDS,
+ ...QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS,
  ...GUIZHOU_HOUSING_RECORDS,
  ...SICHUAN_HOUSING_RECORDS,
  ...LESHAN_HOUSING_RECORDS,
