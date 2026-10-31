@@ -1,0 +1,90 @@
+name: HHBA employers 081-083 source-backed isolated static review
+on:
+  push:
+    branches: [feature/employers-081-083-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-employers-081-083-static-review
+  cancel-in-progress: true
+jobs:
+  isolated-static-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Pillow for image provenance verification
+        run: python -m pip install --quiet Pillow
+      - name: Generate source-audited 081-083 documentary photography and visible non-real fallbacks
+        working-directory: apps/web
+        run: python scripts/prepare-employers-081-083-photo-evidence.py
+      - name: Package inherited 078-080 evidence-backed imagery
+        working-directory: apps/web
+        run: python scripts/prepare-employers-078-080-source-media.py
+      - name: Package inherited 072-074 real-source imagery
+        working-directory: apps/web
+        run: python scripts/prepare-employers-072-074-sourced-media.py
+      - name: Package inherited 069-071 real-source imagery
+        working-directory: apps/web
+        run: python scripts/prepare-employers-069-071-source-media.py
+      - name: Package inherited 066-068 real-source imagery
+        working-directory: apps/web
+        run: python scripts/prepare-employers-066-068-real-media.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked frontend dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Run all eight historical employer batches, current batch, and search security regression
+        working-directory: apps/web
+        run: |
+          for id in 054-056 057-059 060-062 063-065 066-068 069-071 072-074 075-077 078-080 081-083; do
+            node "scripts/employers-$id-v2.contract.test.mjs"
+          done
+          node scripts/employer-job-level-search.contract.test.mjs
+          node scripts/recruitment-market-source-invalid.regression.test.mjs
+      - name: Full static preview build without touching the official GitHub Pages site
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: |
+          npm run build
+          node scripts/materialize-company-route-entries.mjs
+      - name: Assert three direct deep links and independent company media
+        run: |
+          test -s apps/web/dist/index.html
+          for id in 081 082 083; do
+            test -s "apps/web/dist/companies/autumn/cn-autumn-$id/index.html"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/photo1.svg"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/photo2.svg"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/media-sources.json"
+          done
+          test -s apps/web/dist/images/autumn-real-logos/cn-autumn-078.svg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-079/logo.svg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-080/logo.svg
+      - name: Preserve actual photograph provenance and copyright caveats
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-081-083-photography-source-and-permission-audit
+          path: |
+            apps/web/public/images/employer-profiles/cn-autumn-078/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-079/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-080/media-sources.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Upload complete build for independent user review, not deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-employers-081-083-full-static-preview
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
