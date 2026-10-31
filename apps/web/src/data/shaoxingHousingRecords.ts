@@ -7,7 +7,7 @@ export const SHAOXING_HOUSING_RECORDS:TalentHousingRecord[]=[
     "district": "全市人才住房保障制度",
     "title": "绍兴人才公寓及保障性租赁住房政策通道",
     "address": "全市人才住房保障制度，具体公寓项目须查询绍兴人才码",
-    "published": "2024-04-07",
+    "published": "2024-04-08",
     "sourceUrl": "https://sxrd.sx.gov.cn/art/2024/4/8/art_1488387_58881663.html",
     "units": "条例要求鼓励企业事业单位建设人才公寓、配套住房，并整合绍兴人才码住房服务；未披露2026具体可申请公寓、租金和空置量。",
     "rent": "货币补助与实物住房按当期市区住房政策执行，具体租金必须以公告为准，不存在条例统一免费租价。",
