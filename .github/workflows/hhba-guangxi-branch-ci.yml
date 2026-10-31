@@ -4,7 +4,10 @@ on:
     branches: [feature/talent-guangxi]
   pull_request:
     paths:
-      - 'apps/web/src/data/guangxiPolicyRecords.ts'
+      - 'apps/web/src/data/guangxi*.ts'
+      - 'apps/web/src/data/talentHousingRecords.ts'
+      - 'apps/web/src/data/talentHousingResearch.ts'
+      - 'apps/web/src/components/talent/UnifiedPolicyList.tsx'
       - 'apps/web/src/data/talentPolicyRecords.ts'
       - 'apps/web/scripts/test-guangxi-city-v51.mjs'
       - '.github/workflows/hhba-guangxi-branch-ci.yml'
