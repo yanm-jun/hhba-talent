@@ -299,6 +299,12 @@ jobs:
       - name: Lock future city template, certify full policy guides and protect 95 historical record IDs
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - name: Block blank talent-housing cards for verified city sources
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-housing-card-coverage.mjs
+      - name: Validate 14-city Guangxi guide and policy coverage
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-guangxi-city-v51.mjs
       - name: Test four-municipality talent policy matching, deadlines, exclusions and privacy
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-match.mjs
