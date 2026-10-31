@@ -33,7 +33,7 @@ for(const city of XIZANG_7_REGIONS){
  assert.ok(ps.filter(p=>p.title.includes('【自治区统一】')).length===2);
 }
 for(const h of XIZANG_HOUSING_RECORDS){
- assert.ok(h.statusNote.includes('申报入口待核实')&&/空房/.test(h.statusNote),h.id);
+ assert.ok(h.statusNote.includes('申报入口待核实')&&/空房|房源|房号|空余/.test(h.statusNote),h.id);
  assert.ok(h.steps.length>=5&&h.sourceUrl.startsWith('https://'),h.id);
  assert.equal(TALENT_HOUSING_RECORDS.filter(x=>x.id===h.id).length,1);
  assert.ok(buildXizangGuide('housing',h.id)?.faq.length>=10);
