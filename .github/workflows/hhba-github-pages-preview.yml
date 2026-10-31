@@ -203,6 +203,15 @@ jobs:
           test -s apps/web/public/images/employer-profiles/cn-autumn-035/photo1.jpg
           test -s apps/web/public/images/employer-profiles/cn-autumn-035/photo2.jpg
           test -s apps/web/public/images/employer-profiles/cn-autumn-035/media-audit.json
+      - name: Package 066/068 authentic company photography from documented first-party sources
+        working-directory: apps/web
+        run: |
+          python scripts/prepare-employers-066-068-real-media.py
+          for id in 066 068; do
+            test -s "public/images/employer-profiles/cn-autumn-$id/photo1.jpg"
+            test -s "public/images/employer-profiles/cn-autumn-$id/photo2.jpg"
+            test -s "public/images/employer-profiles/cn-autumn-$id/media-sources.json"
+          done
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
@@ -218,6 +227,9 @@ jobs:
       - name: Check KEYENCE 2027 factual recruiting and approved company card template
         working-directory: apps/web
         run: node scripts/keyence-v2.contract.test.mjs
+      - name: Guard 066-068 real-photo provenance and full 19-role four-block profiles
+        working-directory: apps/web
+        run: node scripts/employers-066-068-v2.contract.test.mjs
       - name: Validate MINIEYE 035 source-backed positions, six major tabs and real media
         working-directory: apps/web
         run: node scripts/minieye-v2.contract.test.mjs
@@ -465,6 +477,19 @@ jobs:
           test -s apps/web/dist/images/employer-profiles/cn-autumn-030/photo2.jpg
           test -s apps/web/dist/images/employer-profiles/cn-autumn-030/media-audit.json
           echo HHBA_CN_AUTUMN_030_ONE_SITE_ASSET_OK
+      - name: Verify 066-068 corporate photo assets and routes ship with ONE main Pages site
+        run: |
+          for id in 066 067 068; do
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/logo.svg"
+            test -s "apps/web/dist/companies/autumn/cn-autumn-$id/index.html" || true
+          done
+          for id in 066 068; do
+            for p in photo1.jpg photo2.jpg; do
+              test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/$p"
+            done
+          done
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-067/photo1.svg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-067/photo2.svg
       - name: Verify Southern, Guangzhilv and shared static images in built site
         run: |
           test -s apps/web/dist/index.html
