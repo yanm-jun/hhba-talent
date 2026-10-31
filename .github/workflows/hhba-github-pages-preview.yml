@@ -386,6 +386,11 @@ jobs:
         run: node --experimental-strip-types --test scripts/tamiu.contract.test.mjs
       - name: Package 3 authentic licensed TAMIU campus photos as local site assets
         run: python apps/web/scripts/package-tamiu-campus-photos.py
+      - name: Verify Birmingham real conversion degrees, 2027 tuition, photographs and routes
+        working-directory: apps/web
+        run: node --experimental-strip-types --test scripts/birmingham.contract.test.mjs
+      - name: Package authentic licensed University of Birmingham campus photographs
+        run: python apps/web/scripts/package-birmingham-campus-photos.py
       - name: "Build unified HHBA - 200 companies, applicant center, employer governance previews and brand pages"
         working-directory: apps/web
         env:
@@ -753,6 +758,7 @@ jobs:
           node scripts/minot-state.browser.mjs
           node scripts/south-dakota.browser.mjs
           node scripts/tamiu.browser.mjs
+          node scripts/birmingham.browser.mjs
       - name: Save screenshots and the real search/browser verification results
         if: always()
         uses: actions/upload-artifact@v4

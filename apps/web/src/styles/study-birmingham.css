@@ -1,0 +1,16 @@
+/* Fourth verified school: preserve the existing HHBA hero, homepage, navigation, Minot and USD design language. */
+.hhba-bham .hhba-minot-hero{background:radial-gradient(ellipse at 88% 2%,#d6eadd,transparent 48%),linear-gradient(120deg,#edf8f0,#fff)}
+.hhba-bham .hhba-minot-program-card{min-width:0}
+.hhba-bham .hhba-minot-gallery-grid img{object-fit:cover}
+.hhba-bham .hhba-minot-program-card .hhba-minot-program-summary{line-height:1.9}
+.hhba-bham .hhba-minot-photo-credit .hhba-minot-source-link{margin-right:8px}
+.hhba-bham .hhba-minot-program-card h3{font-size:18px}
+.hhba-bham .hhba-minot-metadata>div{min-width:0}
+.hhba-bham .hhba-minot-lightbox a{color:#c9f1db}
+.hhba-bham .hhba-minot-lightbox>p{color:#d7e0da}
+.hhba-bham .hhba-minot-faq-item button:focus-visible,.hhba-bham .hhba-minot-photo-trigger:focus-visible,.hhba-bham .hhba-minot-thumb:focus-visible{outline:2px solid #328b58;outline-offset:2px}
+.hhba-bham .hhba-minot-narrative h3{overflow-wrap:anywhere}
+.hhba-bham-description{font-size:13px;line-height:1.9;color:#5e7b6b;margin:0 0 20px}
+.hhba-bham .hhba-minot-fee-wrap th,.hhba-bham .hhba-minot-fee-wrap td{min-width:110px}
+.hhba-bham .hhba-minot-small-links{flex-wrap:wrap}
+@media(max-width:680px){.hhba-bham .hhba-minot-program-grid{grid-template-columns:1fr}.hhba-bham .hhba-minot-degree-hero h1{font-size:26px}.hhba-bham .hhba-minot-hero-actions>a{max-width:100%}.hhba-bham .hhba-minot-deadlines{grid-template-columns:1fr}}
