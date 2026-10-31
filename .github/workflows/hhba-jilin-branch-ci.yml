@@ -32,6 +32,8 @@ jobs:
         run: |
           node scripts/test-jilin-city-v51.mjs
           node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+          node --experimental-strip-types scripts/test-talent-cities.mjs
+          node --experimental-strip-types scripts/test-yunnan-city-v51.mjs
       - name: Build complete HHBA static site
         working-directory: apps/web
         run: npm run build
