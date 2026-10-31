@@ -17,8 +17,8 @@ assert.equal(findTalentCity('xiangxi')?.code,'433100');
 const policies=TALENT_POLICY_RECORDS.filter(x=>x.id.startsWith('hn-'));
 const housing=TALENT_HOUSING_RECORDS.filter(x=>x.id.startsWith('hn-'));
 assert.equal(policies.length,56,'14x3 province policies +14 locally oriented records');
-assert.equal(housing.length,28,'14x2 province housing policy references');
-assert.equal(new Set([...policies,...housing].map(x=>x.id)).size,84);
+assert.equal(housing.length,37,'14x2 provincial programs plus 9 local source-backed records');
+assert.equal(new Set([...policies,...housing].map(x=>x.id)).size,93);
 assert.equal(policies.filter(x=>x.id.includes('-prov-')).length,42);
 assert.equal(policies.filter(x=>x.id.includes('-local-')).length,14);
 const early=new Set(['长沙','株洲','湘潭','衡阳','岳阳']);
@@ -26,7 +26,8 @@ for(const city of cities){
  assert.equal(findTalentCity(city)?.name,city,city);
  const cp=policies.filter(p=>p.city===city),ch=housing.filter(h=>h.city===city);
  assert.equal(cp.length,4,city+' missing province or local policies');
- assert.equal(ch.length,2,city+' missing provincial one-room/youth-station housing');
+ assert.ok(ch.length>=2,city+' missing housing programs');
+ assert.equal(ch.filter(h=>h.id.includes('-one-room-')||h.id.includes('-youth-station-')).length,2,city+' missing province programs');
  assert.equal(cp.filter(p=>p.id.includes('-prov-')).length,3);
  for(const p of cp){
    assert.equal(talentSourceKind(p.sourceUrl),'government',p.id+' government primary source');
@@ -57,4 +58,4 @@ const read=p=>readFileSync(new URL('../src/'+p,import.meta.url),'utf8');
 assert.ok(read('components/talent/UnifiedPolicyList.tsx').includes("p.id.startsWith('hn-')"));
 assert.ok(read('pages/TalentServiceRoutes.tsx').includes("fragments[2]==='hunan'"));
 assert.ok(read('pages/TalentCityDirectory.tsx').includes('totals.hunan'));
-console.log('PASS Hunan V5.1: 14 regions, 56 policy records, 28 housing programmes, 56 real routed B/C guides, 306 nationwide index entries.');
+console.log('PASS Hunan V5.1: 14 regions, 56 policy records, 37 housing programmes, 56 real routed B/C guides, 306 nationwide index entries.');
