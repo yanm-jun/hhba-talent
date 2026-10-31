@@ -354,7 +354,7 @@ export const TALENT_PREFECTURE_CITIES:TalentCity[]=prefectureRaw.trim().split('\
  const sh=shortProvince(province);
  const aliases=[name,official,py,initials,pinyin,province+name,province+official,sh+name,sh+official,...(old?.aliases||[])];
  return {...old,name,official,province,code,pinyin,initials,level:'prefecture' as const,
-  aliases:[...new Set(aliases)],intro:old?.intro||(name==='日照'?'已收录青年人才补贴、先租后购住房优惠，并整理市级及高新区人才公寓历史资料':name==='枣庄'?'已收录2026青年就业创业补贴、首批高层次人才家园试点，另有薛城保租房和高新区公寓待核验线索':name==='聊城'?'已收录2026青年人才生活及社保补贴；人才住房三年免租和购房支持为2022历史政策，另有3处公寓或工程待核验线索':'人才政策与住房资料正在逐步核验')};
+  aliases:[...new Set(aliases)],intro:old?.intro||(name==='日照'?'已收录青年人才补贴、先租后购住房优惠，并整理市级及高新区人才公寓历史资料':name==='枣庄'?'已收录2026青年就业创业补贴、首批高层次人才家园试点，另有薛城保租房和高新区公寓待核验线索':name==='聊城'?'已收录2026青年人才生活及社保补贴；人才住房三年免租和购房支持为2022历史政策，另有3处公寓或工程待核验线索':name==='秦皇岛'?'已收录秦皇岛经开区官方人才公寓政策及配租流程；锦绣佳成与科技大厦项目依据2025年报道列为待核验房源线索':'人才政策与住房资料正在逐步核验')};
 });
 const municipalityCode:Record<string,string>={北京:'110000',天津:'120000',上海:'310000',重庆:'500000'};
 export const TALENT_CITY_INDEX:TalentCity[]=[
