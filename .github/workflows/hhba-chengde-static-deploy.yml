@@ -1,4 +1,4 @@
-name: HHBA Chengde V5.1 Verified Static Pages Deployment
+name: HHBA Chengde V5.1 Source Verification (unified Pages publisher)
 on:
   push:
     branches: [main]
@@ -8,8 +8,6 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
-  pages: write
-  id-token: write
 concurrency:
   group: hhba-chengde-verified-pages
   cancel-in-progress: false
@@ -97,37 +95,7 @@ jobs:
           assert '承德' in js and '承德主导产业' in js, 'Chengde policies missing from deployed JS'
           print('HHBA_CHENGDE_BUNDLED_AND_READY')
           PY
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-      - name: Upload rebuilt HHBA full static site
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: apps/web/dist
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Publish HHBA Chengde V5.1 on the existing GitHub Pages domain
-        id: deployment
-        uses: actions/deploy-pages@v4
-      - name: Confirm published HHBA Pages root
+      - name: Hand off deployment to the sole unified GitHub Pages workflow
         run: |
-          python - <<'PY'
-          import urllib.request,time
-          url='https://yanm-jun.github.io/hhba-talent/'
-          for n in range(12):
-              try:
-                  req=urllib.request.Request(url+'?chengde_v51='+str(n),headers={'Cache-Control':'no-cache'})
-                  with urllib.request.urlopen(req,timeout=18) as r:
-                      html=r.read(300000).decode('utf8','replace')
-                      assert r.status==200 and 'hhba-talent' in html
-                  print('HHBA_CHENGDE_PAGES_PUBLISHED',url)
-                  break
-              except Exception as exc:
-                  if n==11:raise
-                  print('PAGES_PROPAGATING',n,str(exc)[:160]);time.sleep(10)
-          PY
+          test -s apps/web/dist/index.html
+          echo "CHENGDE_V51_VERIFIED — only hhba-github-pages-preview.yml publishes Pages"
