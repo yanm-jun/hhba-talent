@@ -247,6 +247,9 @@ jobs:
       - name: Verify Hebei Shijiazhuang V5.1 government policies and honest housing batches
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-shijiazhuang-city-v51.mjs
+      - name: Verify Tangshan V5.1 government policies, 2026 version guard and truthful housing
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-tangshan-city-v51.mjs
       - name: Lock future city template, certify full policy guides and protect 95 historical record IDs
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
