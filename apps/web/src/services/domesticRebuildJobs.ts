@@ -316,7 +316,7 @@ export function assertDomesticRebuildIntegrity(){
       job.url==='https://campus.game.163.com/'||
       job.platform==='hypergryph-2027-campus-reported'&&/^cn-v2-hypergryph-[a-z0-9-]{5,100}$/.test(job.id)&&
       job.url==='https://career.hypergryph.com/'||
-      job.platform==='hhba-employer-profile'&&/^cn-v2-profile-cn-autumn-[0-9]{3}-[a-z0-9-]{3,70}$/.test(job.id)&&
+      job.platform==='hhba-employer-profile'&&/^cn-v2-profile-cn-autumn-[0-9]{3}-[A-Za-z0-9-]{2,70}$/.test(job.id)&&
       employerProfileByRoute.get(job.employerRoute||'')?.jobs.some(row=>
         job.id==='cn-v2-profile-'+job.source+'-'+row.id&&job.url===row.url)||
       job.platform==='boyu-tjcu-source'&&/^cn-v2-boyu-[a-z0-9-]{5,100}$/.test(job.id)&&

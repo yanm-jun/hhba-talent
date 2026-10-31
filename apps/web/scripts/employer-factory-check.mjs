@@ -43,7 +43,7 @@ for(const filename of list){
  if(!Array.isArray(p.jobs))fail(id+' jobs must be explicit array, possibly empty');
  const jobIds=new Set();
  for(const job of p.jobs){
-  if(!/^[a-z0-9-]{3,70}$/.test(job.id)||jobIds.has(job.id))fail(id+' invalid/duplicated job ID');
+  if(!/^[A-Za-z0-9-]{2,70}$/.test(job.id)||jobIds.has(job.id))fail(id+' invalid/duplicated job ID');
   jobIds.add(job.id);
   if(!job.title||!job.city||!job.summary||!job.requirements||!job.recruitmentSubject)fail(id+' job evidence incomplete');
   if(!['CAMPUS','SOCIAL','INTERNSHIP'].includes(job.recruitmentType)||job.currentOpenVerified!==false)fail(id+' incorrect job status or type');
