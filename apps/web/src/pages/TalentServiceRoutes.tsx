@@ -16,6 +16,7 @@ import {TalentQingdaoGuidePreview} from './TalentQingdaoGuidePreview';
 import {TalentLaoshanGuide} from './TalentLaoshanGuide';
 import {UnifiedPolicyGuide} from '../components/talent/UnifiedPolicyGuide';
 import {GUANGXI_RENT_RESEARCH_RECORDS} from '../data/guangxiRentPolicyResearch';
+import {GUANGXI_MUNICIPAL_RESEARCH_RECORDS} from '../data/guangxiMunicipalResearch';
 import {buildGuangxiGuide,GUANGXI_14_CITIES} from '../data/guangxiGuides';
 import {beijingPublicRentalGuide,beijingMarketRentGuide,beijingGraduateSettlementGuide,beijingJobGrantGuide,beijingFlexSocialGuide,beijingYouthHousingGuide,beijingHaidianHousingGuide} from '../data/beijingGuides';
 import {chongqingHomeGuide,chongqingPurchaseGuide,chongqingRentalGuide,chongqingCountiesGuide,chongqingPolicyGuide,chongqingJobseekGuide,chongqingShortageGuide} from '../data/chongqingGuides';
@@ -225,7 +226,7 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
  const housingMode=kind==='housing';
  const guideMode=kind==='guide';
  const title=searchMode?'搜索结果':housingMode?'人才安居':kind==='benefits'?'补贴与福利':guideMode?'申请指南':'人才政策';
- const resultPolicies=([...TALENT_POLICY_RECORDS,...GUANGXI_RENT_RESEARCH_RECORDS,...(searchMode?XINGTAI_POLICY_RESEARCH_RECORDS:[])]).filter(p=>p.city===city&&(!query||matchesPolicy(p,query,city))&&(!housingMode||isHousingPolicy(p))&&(kind!=='benefits'||benefit(p))).sort(recentPolicies);
+ const resultPolicies=([...TALENT_POLICY_RECORDS,...GUANGXI_RENT_RESEARCH_RECORDS,...GUANGXI_MUNICIPAL_RESEARCH_RECORDS,...(searchMode?XINGTAI_POLICY_RESEARCH_RECORDS:[])]).filter(p=>p.city===city&&(!query||matchesPolicy(p,query,city))&&(!housingMode||isHousingPolicy(p))&&(kind!=='benefits'||benefit(p))).sort(recentPolicies);
  const resultHomes=TALENT_HOUSING_RECORDS.filter(p=>p.city===city&&(housingMode||searchMode)&&(!query||matchesHousing(p,query,city))).sort(housingFirst);
  const pendingHousingCount=(housingMode||searchMode)?housingResearchLeads(city,query||'').length:0;
  const housingHistoricalCount=(housingMode||searchMode)?housingPolicyResearch(city,query||'').length:0;
@@ -279,7 +280,7 @@ function GuideContent({city}:{city:string}){
  </>;
 }
 function DetailPage({kind,id}:{kind:'policy'|'housing';id:string}){
- const p=kind==='policy'?(TALENT_POLICY_RECORDS.find(x=>x.id===id)||GUANGXI_RENT_RESEARCH_RECORDS.find(x=>x.id===id)||XINGTAI_POLICY_RESEARCH_RECORDS.find(x=>x.id===id)):undefined;
+ const p=kind==='policy'?(TALENT_POLICY_RECORDS.find(x=>x.id===id)||GUANGXI_RENT_RESEARCH_RECORDS.find(x=>x.id===id)||GUANGXI_MUNICIPAL_RESEARCH_RECORDS.find(x=>x.id===id)||XINGTAI_POLICY_RESEARCH_RECORDS.find(x=>x.id===id)):undefined;
  const h=kind==='housing'?TALENT_HOUSING_RECORDS.find(x=>x.id===id):undefined;
  if(!p&&!h)return <><Bread current="未找到该条资料"/><Empty city="所选城市" kind="详情"/></>;
  return <UnifiedTalentRecordDetail policy={p} housing={h}/>;
