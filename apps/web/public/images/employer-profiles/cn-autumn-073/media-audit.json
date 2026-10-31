@@ -1,0 +1,29 @@
+{
+  "company": "微软",
+  "reviewedAt": "2026-10-31",
+  "sourceVerification": "build-time SHA-256 validation",
+  "officialLogo": false,
+  "rightsForCommercialReuseConfirmed": false,
+  "logo": {
+    "path": "images/employer-profiles/cn-autumn-073/logo.svg",
+    "origin": "HHBA nonofficial original identifier; not a real corporate trademark"
+  },
+  "mediaSlots": [
+    {
+      "slot": "photo1",
+      "default": "images/employer-profiles/cn-autumn-073/photo1.svg",
+      "defaultType": "HHBA illustration, NOT a real company photo",
+      "ifDownloaded": "images/employer-profiles/cn-autumn-073/photo1.jpg",
+      "actualDownloadEvidence": "media-sources.json in CI artifact, with source article, byte dimensions and image SHA256"
+    },
+    {
+      "slot": "photo2",
+      "default": "images/employer-profiles/cn-autumn-073/photo2.svg",
+      "defaultType": "HHBA illustration, NOT a real company photo",
+      "ifDownloaded": "images/employer-profiles/cn-autumn-073/photo2.jpg",
+      "actualDownloadEvidence": "media-sources.json in CI artifact, with source article, byte dimensions and image SHA256"
+    }
+  ],
+  "officialOrGovernmentEvidence": "https://www.microsoft.com/en-us/research/labs-locations/",
+  "caution": "Only assets actually fetched and validated from identified company/government pages may be described as original-site photos; online publication does not constitute an unrestricted commercial-use license."
+}
