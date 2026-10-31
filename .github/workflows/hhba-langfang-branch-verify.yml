@@ -35,7 +35,7 @@ jobs:
         working-directory: apps/web
         run: |
           node --experimental-strip-types scripts/test-talent-match.mjs
-          node --experimental-strip-types scripts/test-talent-city-registry.mjs
+          node --experimental-strip-types scripts/test-talent-cities.mjs
       - name: Build complete HHBA static frontend (isolated; not deployed to Pages)
         working-directory: apps/web
         env:
