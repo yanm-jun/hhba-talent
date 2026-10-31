@@ -197,7 +197,7 @@ export const tangshanYouthGuide:CompleteGuide={
   ],
   "officialLabel": "2026青年人才奖补正式备案申领渠道",
   "officialNote": "2024版公布过唐山人才综合服务平台：https://rcpc.hfclass.com。该历史地址与2026政策最新适用手续尚待核验，不直接称为当前对全部申请人开放。",
-  "detailPath": "/talent-service/policy/ts-enterprise-master-2026-updated"
+  "detailPath": "/talent-service/policy/ts-youth-2024-base"
 };
 export const tangshanPurchaseGuide:CompleteGuide={
   "city": "唐山",
