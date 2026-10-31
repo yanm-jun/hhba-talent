@@ -39,7 +39,7 @@ export function buildXizangGuide(kind:'policy'|'housing',id:string):CompleteGuid
  review:warning,qualityLevel:outdated?'C':'B',
  amounts:[[p?.category||h?.housingCategory||'住房',p?.benefit||h?.rent||'','按现行规定核验'],['所属地区',p?.district||h?.district||r.city,'不得跨地区套用']],
  branches,defaultBranch:'eligible',steps,checks:['核对政府原文与发布机构','确认自治区与地市政策层级','核实资格与截止日期',...material,'获取当前受理窗口及官方办理方式','如为住房须核实当期具体空房和正式选房规则'],
- faq:notes.concat(p?.category==='购房补贴'?[['拉萨购房能领16万元吗？','只有符合特定地区、房价、网签时限和高校毕业生身份的人才可能达到相应上限；市级资金可能提前用尽。']]:[]),
+ faq:notes.concat(p?.city==='拉萨'&&p?.category==='购房补贴'?([['拉萨购房能领16万元吗？','只有符合特定地区、房价、网签时限和高校毕业生身份的人才可能达到相应上限；市级资金可能提前用尽。']] as [string,string][]):[]),
  sources:[[p?.sourceName||'住建主管部门公开资料',r.sourceUrl]],officialUrl:p?.applicationUrl||h?.applyUrl,officialLabel:'正式事项申报入口待核验',officialNote:warning,contacts:[],
  listPath:'/talent-service/list/'+(p?'policies':'housing')+'/'+encodeURIComponent(r.city),
  detailPath:'/talent-service/'+(p?'policy':'housing')+'/'+encodeURIComponent(r.id)};
