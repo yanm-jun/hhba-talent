@@ -3,7 +3,10 @@ import {existsSync,readFileSync} from 'node:fs';
 const root='src/data/employerProfiles/';
 const expected=[['057','line plus',4],['058','招商金科',1],['059','中盈优创',3]];
 const page=readFileSync('src/pages/UnifiedV2CompanyPage.tsx','utf8');
-assert(page.includes("06[0-9]|07[0-4])$/.test(id)"),"V2 includes 057-059 and 060-062");
+const routeSource=page.split('const batch3756=/')[1]?.split('/.test(id)')[0];
+assert(routeSource,'Missing V2 employer route regex');
+const routePattern=new RegExp(routeSource);
+assert((routePattern.test('cn-autumn-057')&&routePattern.test('cn-autumn-059')&&routePattern.test('cn-autumn-077')),"V2 includes 057-059 and 060-062");
 assert(page.includes("if(batch3756)return job.category===major"),'category job filtering missing');
 for(const [num,name,count] of expected){
  const id='cn-autumn-'+num,p=JSON.parse(readFileSync(root+id+'.json','utf8'));
