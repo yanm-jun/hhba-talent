@@ -238,4 +238,34 @@ check('Liaocheng V5.1: 2026 employment subsidies, historical housing and source-
  assert.ok(shared('UnifiedTalentHousingResearch.tsx').includes('housingPolicyResearch'),'History research must remain visible');
  assert.equal(ACCEPTED_TALENT_CITIES.includes(city),false);
 });
+check('Qinhuangdao V5.1 government EDZ apartment policy and separately sourced named buildings',()=>{
+ const city='秦皇岛';
+ const policy=TALENT_POLICY_RECORDS.find(p=>p.id==='qhd-etdz-talent-apartment-2024');
+ assert.ok(policy&&policy.city===city);
+ assert.equal(talentSourceKind(policy.sourceUrl),'government');
+ assert.equal(policy.category,'租房安居');
+ assert.ok(policy.benefit.includes('4元/㎡')&&policy.benefit.includes('免租'));
+ assert.ok(policy.eligibility.includes('2024年10月1日')&&policy.eligibility.includes('3年以上'));
+ assert.ok(policy.materials?.length>=3&&policy.applicationSteps?.length>=4);
+ assert.ok(policy.reviewNote?.includes('办理入口待核实'));
+ assert.equal(assessPolicy(policy,'2026-10-31').grade,'B','Government original does not certify live applications');
+ const housing=TALENT_HOUSING_RECORDS.find(h=>h.id==='qhd-etdz-official-talent-housing-2024');
+ assert.ok(housing&&housing.city===city&&housing.kind==='program');
+ assert.equal(talentSourceKind(housing.sourceUrl),'government');
+ assert.equal(assessHousing(housing,'2026-10-31').grade,'B');
+ assert.ok(housing.steps.length>=4&&housing.statusNote.includes('申报入口未公布'));
+ const leads=TALENT_HOUSING_RESEARCH_LEADS.filter(h=>h.city===city);
+ assert.equal(leads.length,2,'Need two documented actual Qinhuangdao apartment points');
+ for(const lead of leads){
+  assert.ok(lead.category==='人才公寓'&&lead.sourceUrl&&lead.address&&lead.steps.length>=4);
+  assert.notEqual(talentSourceKind(lead.sourceUrl),'government');
+  assert.ok(/2026|空房/.test(lead.statusNote));
+  assert.ok(!TALENT_HOUSING_RECORDS.some(h=>h.id===lead.id),'2025 media counts are not verified 2026 apartments');
+ }
+ assert.ok(leads.some(h=>h.id==='qhd-jinxiujiacheng-2025'));
+ assert.ok(leads.some(h=>h.id==='qhd-kejidasha-2025'));
+ const page=code('TalentServiceRoutes.tsx');
+ assert.ok(page.includes('housingResearchLeads(match.name)')&&page.includes('<UnifiedTalentHousingResearch city={city} query={query}/>'));
+ assert.equal(ACCEPTED_TALENT_CITIES.includes(city),false);
+});
 console.log(JSON.stringify({passed,baseline:base.policyIds.length+base.housingIds.length,certified:Object.keys(CERTIFIED_TALENT_GUIDES).length,acceptedCities:ACCEPTED_TALENT_CITIES.length},null,2));
