@@ -40,7 +40,8 @@ console.log('WEIPU_032_V2_CONTRACT_OK',JSON.stringify({jobs:p.jobs.length,servic
 assert(page.includes('hhba-v2-weipu-education'));
 assert(page.includes('hhba-v2-weipu-description'));
 assert(page.includes('hhba-v2-weipu-location'));
-assert(page.includes('{showcase&&!weipu&&'));
+assert(page.includes('{showcase&&!detailedCards&&'),'Only compact legacy 031 shows persistent role links');
+assert(page.includes('detailedCards=weipu||bodor'),'Both 032 and 033 require links inside expanded requirements');
 assert(page.includes('{weipu&&<div className="hhba-v2-weipu-detail-links"'));
 assert(css.includes('.hhba-v2-weipu .hhba-v2-company-role details summary'));
 assert(css.includes('.hhba-v2-qizheng-role-actions a{'));
