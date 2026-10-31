@@ -1,0 +1,52 @@
+name: HHBA employers 057-059 independent static preview
+on:
+  push:
+    branches:
+      - feature/employers-057-059-v2
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify three employer profiles and frontend contract
+        working-directory: apps/web
+        run: node scripts/employers-057-059-v2.contract.test.mjs
+      - name: Verify job source and market regression
+        working-directory: apps/web
+        run: node scripts/recruitment-market-source-invalid.regression.test.mjs
+      - name: Build isolated static preview, do not deploy Pages
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: |
+          npm run build
+          node scripts/materialize-company-route-entries.mjs
+      - name: Validate three media assets in built pages
+        run: |
+          test -s apps/web/dist/index.html
+          for id in 057 058 059; do
+            for file in logo.svg photo1.svg photo2.svg; do
+              test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/$file"
+            done
+          done
+      - name: Upload artifact ONLY, never overwrite main GitHub Pages
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-employers-057-059-reviewable-static-site
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error

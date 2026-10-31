@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-059",
+  "name": "中盈优创",
+  "displayName": "中盈优创",
+  "englishName": "China Unitechs",
+  "aliases": [
+    "中盈优创资讯科技有限公司",
+    "China Unitechs",
+    "Unitechs",
+    "中盈优创2027",
+    "中盈优创校园招聘"
+  ],
+  "industry": "数字基础设施 · 智慧云网 · AI网络运维 · 信息安全与卫星互联网",
+  "subtitle": "中盈优创资讯科技有限公司 · 上海总部 · 2003年创立",
+  "overview": "中盈优创资讯科技有限公司创立于2003年，总部位于上海，向电信运营商、卫星互联网、政府和大型行业客户提供云网运营、AI、数据和网络信息安全等解决方案。官网2026年发布“1+3”业务与技术战略，并于10月27日发布2027校园招聘启动消息；第三方汇总仅能确认AI管培、产品技术与市场营销三个招聘方向，完整职位描述须以官方页面为准。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.unitechs.com/about.html",
+    "https://www.unitechs.com/news.html",
+    "https://www.unitechs.com/news-details/27.html",
+    "https://www.unitechs.com/xyzp.html",
+    "https://www.wondercv.com/xiaozhao/zhongying-youchuang-2027-campus-recruitment-19952-a26262/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-059/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-059/photo1.svg",
+        "caption": "中盈优创 · 业务主题示意图1",
+        "alt": "中盈优创业务板块信息可视化插画",
+        "note": "HHBA原创说明性视觉，非企业真实办公现场或官方产品摄影。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-059/photo2.svg",
+        "caption": "中盈优创 · 业务主题示意图2",
+        "alt": "中盈优创业务板块信息可视化插画",
+        "note": "HHBA原创说明性视觉，非企业真实办公现场或官方产品摄影。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.unitechs.com/xyzp.html",
+    "label": "中盈优创官方校园招聘",
+    "status": "official_portal",
+    "subject": "中盈优创资讯科技有限公司",
+    "note": "官网2026-10-27新闻确认2027校招启动；第三方摘要归纳AI管培生、产品技术、市场营销三类方向，未核实单岗JD、学历或任职资格；官网实际开放职位及属地可能更新。"
+  },
+  "majorIntro": "2027校招来源有AI方向管培、产品技术类、市场营销类三个参考方向；专业关联均是编辑性匹配，非企业已公开的限制条件。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "人工智能",
+    "软件工程",
+    "网络工程",
+    "通信工程",
+    "电子信息工程",
+    "数据科学与大数据技术",
+    "信息安全",
+    "市场营销",
+    "工商管理",
+    "数学与应用数学"
+  ],
+  "photoNote": "当前提供3张相互独立的本地SVG视觉（1张非官方字标、2张原创业务示意图）。均非官方Logo或真实企业照片，不能冒充实景；待取得可核验、可使用的官方图片后再替换。",
+  "business": [
+    {
+      "title": "UniOS数字基础设施操作系统",
+      "description": "通过云原生和微服务平台支撑数字基础设施管控及上层数字业务应用。",
+      "tags": "UniOS · 云原生",
+      "details": [
+        "底层网络资源管控",
+        "微服务架构与云原生",
+        "数字业务应用平台"
+      ]
+    },
+    {
+      "title": "智慧云网与网络控制",
+      "description": "覆盖云网智慧控制、IP运维工作台、网络采控及运维自动化。",
+      "tags": "云网 · IP网络",
+      "details": [
+        "跨网络设备采集控制",
+        "IP网络运营维护",
+        "网络故障定位和可视化"
+      ]
+    },
+    {
+      "title": "AI原生运维与数字孪生",
+      "description": "依托AI运维智能体及IP数字孪生工具，开展网络运营自动化与仿真分析。",
+      "tags": "AI · 孪生",
+      "details": [
+        "AI辅助运维与告警",
+        "IP网络数字孪生",
+        "仿真与优化验证"
+      ]
+    },
+    {
+      "title": "5G、算力与数据基础设施",
+      "description": "针对5G物联网、移动核心网、算力网关和云可观测场景开发平台产品。",
+      "tags": "5G · 算力",
+      "details": [
+        "5G端到端诊断",
+        "云与算力服务网关",
+        "数据基础设施和可观测"
+      ]
+    },
+    {
+      "title": "网络安全与态势感知",
+      "description": "提供安全态势分析、DDoS防护、流量监测、IDC/ISP信息安全管理。",
+      "tags": "安全 · 风控",
+      "details": [
+        "企业安全运营体系",
+        "网络流量监测分析",
+        "抗DDoS及安全管控"
+      ]
+    },
+    {
+      "title": "行业数字化与技术服务",
+      "description": "服务电信、电力、矿山、医疗、政府等行业的网络系统建设和应用集成。",
+      "tags": "政企 · 技术服务",
+      "details": [
+        "IP网络综合技术服务",
+        "软硬一体化云集成",
+        "行业数字化解决方案"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "ai-trainee-2027",
+      "title": "AI方向管培生（2027届招聘方向参考）",
+      "category": "AI / 管培",
+      "city": "北京、杭州、上海、重庆、广州、成都、南京、西安（批次城市，单岗待核）",
+      "summary": "2027校招二级来源列有AI方向管培生类别，具体团队、培训体系及岗位职责未单独公布。",
+      "requirements": "不能将AI算法、大模型开发或网络运维的行业通用技能硬性写入该职位。专业、学历、工作城市分配、应聘流程和截止日期须以企业官方职位JD为准。",
+      "majorNames": [
+        "人工智能",
+        "计算机科学与技术",
+        "数据科学与大数据技术",
+        "数学与应用数学",
+        "软件工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历要求未披露",
+      "url": "https://www.unitechs.com/xyzp.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/zhongying-youchuang-2027-campus-recruitment-19952-a26262/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中盈优创资讯科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "product-tech-2027",
+      "title": "产品技术类（2027届招聘方向参考）",
+      "category": "产品 / 技术",
+      "city": "企业校招所列8座城市，单岗位城市待核",
+      "summary": "第三方校招摘要提及产品技术类，企业业务涉及UniOS、云网管控、AI、网络与信息安全等技术产品，但不能据此虚构已发布具体研发职位。",
+      "requirements": "仅确认产品技术这一招聘大类，尚未获得官方逐项职位描述；技术栈、毕业专业、项目经验、学历与用人部门均须在公司官方校园招聘系统核实。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "通信工程",
+        "网络工程",
+        "电子信息工程",
+        "信息安全"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历和经验待核",
+      "url": "https://www.unitechs.com/xyzp.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/zhongying-youchuang-2027-campus-recruitment-19952-a26262/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中盈优创资讯科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "marketing-2027",
+      "title": "市场营销类（2027届招聘方向参考）",
+      "category": "市场 / 商务",
+      "city": "企业校招所列8座城市，单岗位城市待核",
+      "summary": "第三方招聘摘要提到市场营销类，企业面向运营商及行业政企提供产品与服务，具体销售岗位及区域安排并未公开核实。",
+      "requirements": "市场营销、工商管理等为编辑性相关专业，无法据此声称企业对本岗位有专属专业要求；岗位性质、学历、销售范围和出差安排应以正式JD为准。",
+      "majorNames": [
+        "市场营销",
+        "工商管理",
+        "国际经济与贸易",
+        "信息管理与信息系统",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历要求未披露",
+      "url": "https://www.unitechs.com/xyzp.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/zhongying-youchuang-2027-campus-recruitment-19952-a26262/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中盈优创资讯科技有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}

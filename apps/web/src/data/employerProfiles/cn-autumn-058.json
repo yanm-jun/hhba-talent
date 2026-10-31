@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-058",
+  "name": "招商金科",
+  "displayName": "招商金科",
+  "englishName": "China Merchants Fintech",
+  "aliases": [
+    "招商局金融科技有限公司",
+    "CMG Fintech",
+    "招商金融科技",
+    "招商金科2027"
+  ],
+  "industry": "金融科技 · 央企数智化 · 云计算与大数据 · AI应用",
+  "subtitle": "招商局金融科技有限公司 · 广东深圳 · 招商局集团数智技术研发中心",
+  "overview": "招商局金融科技有限公司于2017年在深圳注册，是招商局集团数字化转型的重要建设单位及招商金控金融科技平台。公司官网介绍其2025年成立集团数智技术研发中心，持续布局招商云、数据平台、AI及金融业务信息系统。2027届校招二级公开摘要可以确认招聘批次，尚不能确认具体岗位名和学历要求，不能将行业热门词条当作已发布的正式JD。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.cmft.com/index?categoryId=1&positionTypeId=2",
+    "https://ris.cmft.com/",
+    "https://www.wondercv.com/xiaozhao/cmhk-fintech-2027-campus-shenzhen-19953-552a44/",
+    "https://wap.sasac.gov.cn/n2588035/n2588325/n2588350/c33553382/content.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-058/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-058/photo1.svg",
+        "caption": "招商金科 · 业务主题示意图1",
+        "alt": "招商金科业务板块信息可视化插画",
+        "note": "HHBA原创说明性视觉，非企业真实办公现场或官方产品摄影。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-058/photo2.svg",
+        "caption": "招商金科 · 业务主题示意图2",
+        "alt": "招商金科业务板块信息可视化插画",
+        "note": "HHBA原创说明性视觉，非企业真实办公现场或官方产品摄影。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://ris.cmft.com/",
+    "label": "招商金科官方招聘入口",
+    "status": "official_portal",
+    "subject": "招商局金融科技有限公司",
+    "note": "官方站提供校园与社会招聘入口；2027第三方发布摘要只确认招聘批次，未给出逐岗名称、学历、详细任职条件。此处只保留一条校招项目总入口，不编造AI算法等具体岗位。"
+  },
+  "majorIntro": "2027校招的逐岗专业要求尚未公布。以下所列计算机、金融、数据及工程方向仅因公司业务相关而提供探索参考，不是企业公开的报考门槛。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "软件工程",
+    "人工智能",
+    "数据科学与大数据技术",
+    "信息安全",
+    "金融学",
+    "数学与应用数学",
+    "信息管理与信息系统",
+    "电子信息工程",
+    "工商管理"
+  ],
+  "photoNote": "当前提供3张相互独立的本地SVG视觉（1张非官方字标、2张原创业务示意图）。均非官方Logo或真实企业照片，不能冒充实景；待取得可核验、可使用的官方图片后再替换。",
+  "business": [
+    {
+      "title": "招商云与混合云平台",
+      "description": "支撑招商局成员企业上云、混合多云和信息技术基础设施建设。",
+      "tags": "云平台 · 信创",
+      "details": [
+        "混合云基础设施",
+        "容器和云原生平台",
+        "跨数据中心业务连续性"
+      ]
+    },
+    {
+      "title": "数据湖与数据治理",
+      "description": "建设集团数据湖和主数据平台，促进跨业务数据共享、分析及治理。",
+      "tags": "大数据 · 数据治理",
+      "details": [
+        "数据集成与资产管理",
+        "数仓与经营数据分析",
+        "主数据治理服务"
+      ]
+    },
+    {
+      "title": "招商智脑与智能分析",
+      "description": "推动经营分析、数据可视化与人工智能在集团业务场景的落地。",
+      "tags": "BI · 人工智能",
+      "details": [
+        "经营指标可视化",
+        "算法和智能数据分析",
+        "AI辅助业务洞察"
+      ]
+    },
+    {
+      "title": "金融业务信息化",
+      "description": "为金控、资管、保险等领域提供系统建设及数字化交付能力。",
+      "tags": "金控 · 保险 · 资管",
+      "details": [
+        "金融业务系统开发",
+        "合规风险数字化支撑",
+        "资产与保险业务信息平台"
+      ]
+    },
+    {
+      "title": "集团协同办公与数字员工",
+      "description": "围绕招商随行、招商如影等产品提供办公协同、流程自动化和数字员工能力。",
+      "tags": "协同 · RPA",
+      "details": [
+        "移动协同与业务流程",
+        "自动化办公工具",
+        "智能数字员工应用"
+      ]
+    },
+    {
+      "title": "AI Native与集团数智研发",
+      "description": "围绕2025年设立的数智技术研发中心及后续AI Native探索提供技术研发与平台服务。",
+      "tags": "研发 · AI",
+      "details": [
+        "人工智能平台探索",
+        "数智技术底座研发",
+        "企业级科技应用服务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "campus-project-2027",
+      "title": "2027届校园招聘项目（具体职位待官方核实）",
+      "category": "校园招聘总入口",
+      "city": "企业官方站公布深圳、南京办公地址；本届具体工作城市待核",
+      "summary": "二级校招摘要确认招商局金融科技有限公司2027届校园招聘批次；官方招聘网站提供校园招聘入口，但本届的逐岗清单与岗位职责未核实。",
+      "requirements": "不把第三方关键词“AI平台开发”“AI算法”等认定为正式发布的岗位。学历、专业、招聘城市、薪资、报名截止及岗位数量，均须进入官方校园招聘页面确认。所列专业为企业业务关联建议，并非官方资格限制。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能",
+        "数据科学与大数据技术",
+        "金融学",
+        "电子信息工程",
+        "数学与应用数学",
+        "信息安全"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历未在可核实摘要中披露",
+      "url": "https://ris.cmft.com/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/cmhk-fintech-2027-campus-shenzhen-19953-552a44/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "招商局金融科技有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}

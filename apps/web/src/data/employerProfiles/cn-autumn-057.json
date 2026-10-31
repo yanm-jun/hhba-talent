@@ -1,0 +1,221 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-057",
+  "name": "line plus",
+  "displayName": "LINE Plus",
+  "englishName": "LINE Plus Corporation",
+  "aliases": [
+    "LINE Plus",
+    "LINE PLUS",
+    "LINE Plus Corporation",
+    "LINE플러스",
+    "라인플러스",
+    "LINE韩国",
+    "LINE Plus 2026"
+  ],
+  "industry": "即时通讯 · 全球产品研发 · 数据安全 · AI与商业平台",
+  "subtitle": "LINE Plus Corporation · 韩国京畿道城南市盆唐区 · LY Corporation 集团",
+  "overview": "LINE Plus成立于2013年，是总部位于韩国的LINE全球业务公司，隶属于LY Corporation。与日本运营LINE的LY Corporation和其他国家的LINE当地法人区分。企业团队覆盖工程研发、产品规划、设计、商务及全球业务协同。2026年10月LINE Careers公开LINE Plus所属的工程、数据与平台岗位，但这些为具体全职岗位，不能直接宣称为2027届中国校园招聘。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.linepluscorp.com/en/company/info",
+    "https://careers.linecorp.com/ko/jobs/?ca=All&cp=LINE+Plus",
+    "https://careers.linecorp.com/faqs",
+    "https://www.linepluscorp.com/en"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-057/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-057/photo1.svg",
+        "caption": "LINE Plus · 业务主题示意图1",
+        "alt": "LINE Plus业务板块信息可视化插画",
+        "note": "HHBA原创说明性视觉，非企业真实办公现场或官方产品摄影。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-057/photo2.svg",
+        "caption": "LINE Plus · 业务主题示意图2",
+        "alt": "LINE Plus业务板块信息可视化插画",
+        "note": "HHBA原创说明性视觉，非企业真实办公现场或官方产品摄影。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://careers.linecorp.com/ko/jobs/?ca=All&cp=LINE+Plus",
+    "label": "LINE Careers · LINE Plus官方筛选页",
+    "status": "official_portal",
+    "subject": "LINE Plus Corporation",
+    "note": "官网2026-10-31可观察到LINE Plus所属全职岗位；没有证据表明本批岗位属于2027届中国校招，职位可能随时变化。具体学历、经验、语言能力以原始职位详情为准。"
+  },
+  "majorIntro": "仅将官方招聘列表观察到的职位名称列出；专业关联是HHBA根据岗位领域做的探索建议，不是企业公布的专业或录用资格。部分岗位为资深社会招聘。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "软件工程",
+    "网络空间安全",
+    "信息安全",
+    "数据科学与大数据技术",
+    "统计学",
+    "人工智能",
+    "数学与应用数学",
+    "信息管理与信息系统",
+    "工商管理"
+  ],
+  "photoNote": "当前提供3张相互独立的本地SVG视觉（1张非官方字标、2张原创业务示意图）。均非官方Logo或真实企业照片，不能冒充实景；待取得可核验、可使用的官方图片后再替换。",
+  "business": [
+    {
+      "title": "LINE通讯产品与全球运营",
+      "description": "围绕LINE Messenger及关联服务，为跨地区用户提供日常沟通与内容交互产品支持。",
+      "tags": "通讯 · 全球市场",
+      "details": [
+        "移动通信产品与用户体验",
+        "跨地区产品协作和本地化",
+        "服务稳定性与全球运营"
+      ]
+    },
+    {
+      "title": "服务端与基础设施工程",
+      "description": "支撑规模化移动互联网服务的服务端、平台工程、站点可靠性与质量保障。",
+      "tags": "后端 · SRE",
+      "details": [
+        "高可用在线服务系统",
+        "平台监控及容量可靠性",
+        "自动化测试与工程效能"
+      ]
+    },
+    {
+      "title": "数据分析与反滥用技术",
+      "description": "围绕通讯服务安全、异常行为和数据治理开展数据工程及分析研发。",
+      "tags": "数据 · 反滥用",
+      "details": [
+        "反滥用数据处理分析",
+        "数据管道与治理",
+        "用户安全相关技术"
+      ]
+    },
+    {
+      "title": "AI产品与商业平台",
+      "description": "推进广告平台、AI SaaS及企业业务领域的产品创新与对外合作。",
+      "tags": "AI · 广告",
+      "details": [
+        "AI广告平台规划",
+        "企业AI产品市场探索",
+        "商业平台生态合作"
+      ]
+    },
+    {
+      "title": "信息安全与云安全",
+      "description": "通过SOC/CSIRT、安全工程和云安全能力保护大规模应用及基础设施。",
+      "tags": "安全 · 云",
+      "details": [
+        "安全监控与应急响应",
+        "云环境安全防护",
+        "安全工程流程建设"
+      ]
+    },
+    {
+      "title": "产品规划与全球商业协同",
+      "description": "在规划、设计、销售与市场等团队之间开展跨文化协作和全球项目推进。",
+      "tags": "规划 · 国际业务",
+      "details": [
+        "国际业务产品规划",
+        "设计与用户研究协作",
+        "市场与合作伙伴沟通"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "sre-dev-2026",
+      "title": "LINE SRE Dev Engineer（官网全职岗位）",
+      "category": "服务端 / SRE",
+      "city": "韩国京畿道盆唐（Bundang）",
+      "summary": "LINE Careers中标注为LINE Plus Engineering的SRE开发工程岗位，涉及大规模服务的可靠性工程方向。",
+      "requirements": "官网职位列表可确认标题、公司、工程类别和地点；未逐条核验学历、编程语言、年限与招聘截止日期，不将SRE通用技能写成该岗位强制要求。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息安全",
+        "网络工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "全职 · 是否接受应届生未核实",
+      "url": "https://careers.linecorp.com/ko/jobs/?ca=All&cp=LINE+Plus",
+      "evidenceUrl": "https://careers.linecorp.com/ko/jobs/?ca=All&cp=LINE+Plus",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "LINE Plus Corporation",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "anti-abuse-data-engineer-2026",
+      "title": "Messaging Anti-Abuse Data Engineer（官网全职岗位）",
+      "category": "数据工程 / 安全",
+      "city": "韩国京畿道盆唐（Bundang）",
+      "summary": "官网列示的消息系统反滥用数据工程岗位，方向属于数据处理与平台安全支持。",
+      "requirements": "仅确认职位名称、工程类别和韩国盆唐位置；学历、工作年限及具体语言或数据栈要求须以单个官网JD为准，专业为编辑匹配建议。",
+      "majorNames": [
+        "数据科学与大数据技术",
+        "计算机科学与技术",
+        "软件工程",
+        "信息安全"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "全职 · 具体资格查看官网",
+      "url": "https://careers.linecorp.com/ko/jobs/?ca=All&cp=LINE+Plus",
+      "evidenceUrl": "https://careers.linecorp.com/ko/jobs/?ca=All&cp=LINE+Plus",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "LINE Plus Corporation",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "anti-abuse-scientist-2026",
+      "title": "Messaging Anti-Abuse Data Scientist（官网全职岗位）",
+      "category": "数据科学 / AI",
+      "city": "韩国京畿道盆唐（Bundang）",
+      "summary": "官网列示的通讯反滥用数据科学岗位，研究与分析服务异常、风险及用户安全相关数据。",
+      "requirements": "官方汇总页没有逐项披露教育背景、算法经验和面试要求，人工智能及数学统计专业仅为岗位方向建议。",
+      "majorNames": [
+        "统计学",
+        "数学与应用数学",
+        "人工智能",
+        "数据科学与大数据技术",
+        "计算机科学与技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "全职 · 学历及工作经验待核",
+      "url": "https://careers.linecorp.com/ko/jobs/?ca=All&cp=LINE+Plus",
+      "evidenceUrl": "https://careers.linecorp.com/ko/jobs/?ca=All&cp=LINE+Plus",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "LINE Plus Corporation",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ai-ad-platform-pm-2026",
+      "title": "AI Ad Platform PM（官网全职岗位）",
+      "category": "产品规划 / AI",
+      "city": "韩国京畿道盆唐（Bundang）",
+      "summary": "官方职位名称为AI广告平台产品经理，处于规划（Planning）类别，关注AI广告相关产品规划。",
+      "requirements": "职位目录能确认岗位名称、归属类别与工作城市；产品经验、学位、语言及其他任职门槛仍应点击官网原始职位逐项确认。",
+      "majorNames": [
+        "人工智能",
+        "信息管理与信息系统",
+        "计算机科学与技术",
+        "工商管理"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "全职 · 经验条件待官网核实",
+      "url": "https://careers.linecorp.com/ko/jobs/?ca=All&cp=LINE+Plus",
+      "evidenceUrl": "https://careers.linecorp.com/ko/jobs/?ca=All&cp=LINE+Plus",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "LINE Plus Corporation",
+      "currentOpenVerified": false
+    }
+  ]
+}
