@@ -221,7 +221,7 @@ export const JIANGSU_HOUSING_RECORDS:TalentHousingRecord[]=[
     "published": "2026-03-16",
     "kind": "program",
     "housingCategory": "其他住房",
-    "statusNote": "2026-03公布站点18处和超过500间是建设/可提供服务规模，不等于2026-10-31尚存空房；各区县免费天数不同，苏青驿站平台单次准入与申报详情须核实。",
+    "statusNote": "2026-03公布站点18处和超过500间是建设/可提供服务规模，不等于2026-10-31尚存空房；各区县免费天数不同，苏青驿站平台单次准入与申报详情须核实。；申报入口未公布，实际项目业务需主管部门确认。",
     "steps": [
       "核实本人是非连云港户籍全日制本科及以上应届或毕业两年内未就业人员",
       "收集拟在连云港求职招聘活动通知、单位面试邀请及学历毕业证明",
@@ -314,7 +314,7 @@ export const JIANGSU_HOUSING_RECORDS:TalentHousingRecord[]=[
     "applicationEnd": "2026-06-08",
     "kind": "program",
     "housingCategory": "保障性租赁住房",
-    "statusNote": "2026-06-01至06-08首批报名已截止，2026-06-18摇号并于06-22公示；100套是该历史配租规模不是2026-10-31可申请空房。后续常态化配租按新公告重新核验。",
+    "statusNote": "2026-06-01至06-08首批报名已截止，2026-06-18摇号并于06-22公示；100套是该历史配租规模不是2026-10-31可申请空房。后续常态化配租按新公告重新核验。；申报入口未公布，实际项目业务需主管部门确认。",
     "contactPhone": "0523-86880883",
     "contactSourceUrl": "https://jsj.taizhou.gov.cn/ztzl/zfztfw/zcxx/art/2026/art_f0cebf60532442daa98c851bf1787875.html",
     "steps": [
