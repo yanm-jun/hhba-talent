@@ -15,7 +15,7 @@ export type TalentPolicyRecord={
  published:string;sourceUrl:string;sourceName:string;applicationUrl?:string;
  temporal:'policy'|'past-window'|'historical';keywords:string[];
  scope?:'全市'|'特定区域'|'年度批次'; deadline?:string; targetGroup?:string; reviewNote?:string; reviewedAt?:string;
- materials?:string[];applicationSteps?:string[];payoutTo?:'个人'|'用人单位'|'非现金贷款'|'住房折扣';headlineAmount?:string;headlineUnit?:string;
+ materials?:string[];applicationSteps?:string[];payoutTo?:'个人'|'用人单位'|'非现金贷款'|'住房折扣'|'非现金服务';headlineAmount?:string;headlineUnit?:string;
 };
 export const TALENT_POLICY_REVIEW_DATE='2026-10-30';
 export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[

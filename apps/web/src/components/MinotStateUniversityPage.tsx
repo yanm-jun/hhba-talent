@@ -66,7 +66,7 @@ function MinotFrame({children}:{children:React.ReactNode}){
 }
 function Advisory({children}:{children:React.ReactNode}){return <div className="hhba-minot-warning"><ShieldAlert size={20}/><p>{children}</p></div>;}
 function FeeTable(){return <div className="hhba-minot-fee-wrap"><table><thead><tr><th>费用项目</th><th>美元参考金额</th><th>口径说明</th></tr></thead><tbody>{minotTuitionRows.map(r=><tr key={r.label}><th scope="row">{r.label}</th><td>{r.value}</td><td>{r.tip}</td></tr>)}</tbody></table></div>;}
-function ProgramCards(){const cards=['minot-management-ms','minot-cyber-ms'];return <section className="hhba-minot-section" id="minot-programs">
+function ProgramCards(){const cards=['minot-management-ms','minot-cyber-ms'] as const;return <section className="hhba-minot-section" id="minot-programs">
  <SectionTitle eyebrow="ACADEMICS · 2 VERIFIED PROGRAMS" title="真正开设的研究生专业" summary="我们先把两项官方确认的硕士项目研究透，再逐校增加。以下既有亮点，也有必须面对的申请限制。"/>
  <div className="hhba-minot-program-grid">
  {cards.map(id=>{const p=findProgram(id)!,info=minotPrograms[id];return <article key={id} className={'hhba-minot-program-card '+(id==='minot-cyber-ms'?'caution':'')}>
@@ -114,7 +114,7 @@ export function MinotStateUniversityPage({user}:{user:User|null}){
    </div>
    <h3 className="hhba-minot-subtitle">申请资料核对 · 7 个步骤</h3>
    <div className="hhba-minot-steps">{minotAdmissions.documents.map((t,i)=><div className="hhba-minot-step" key={i}><span>{i+1}</span><p>{t}</p></div>)}</div>
-   <Advisory>管理学硕士属于学校列出的 I-20/F-1 适用研究生方向，但网络安全硕士不在当前公布清单。有校园课程不等于能取得 F-1 学生签证文件。规划赴美线下学习前，先检查具体项目的资格，不能混为一谈。</Advisory>
+   <Advisory>管理学硕士属于学校列出的 I-20/F-1 适用研究生方向，但网络安全硕士不在当前公布清单。**有校园课程≠能取得 F-1 学生签证文件**。规划赴美线下学习前，先检查具体项目的资格，不能混为一谈。</Advisory>
    <div className="hhba-minot-small-links">{src(minotSources.deadlines)}{src(minotSources.admission)}</div>
   </section>
   <section className="hhba-minot-section" id="minot-cost">
