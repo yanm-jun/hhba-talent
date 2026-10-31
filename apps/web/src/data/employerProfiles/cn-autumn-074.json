@@ -1,0 +1,268 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-074",
+  "name": "大众汽车",
+  "displayName": "大众汽车集团（中国）",
+  "englishName": "Volkswagen Group China",
+  "aliases": [
+    "大众汽车集团中国",
+    "Volkswagen",
+    "Volkswagen Group",
+    "大众安徽",
+    "大众汽车（安徽）有限公司",
+    "大众汽车中国招聘",
+    "大众汽车2027校招"
+  ],
+  "industry": "整车研发与生产 · 新能源汽车 · 自动驾驶 · 汽车软件 · 全球采购",
+  "subtitle": "大众汽车集团中国及旗下招聘主体 · 北京／上海／合肥／大连",
+  "overview": "大众汽车集团在中国通过上汽大众、一汽-大众、大众汽车（安徽）及研发科技机构开展整车研发、生产、软件、自动驾驶和供应链业务。2026年9月合肥工业大学就业站披露以大众汽车（安徽）有限公司名义发布的集团中国2026—2027届校园招聘项目，目标毕业时间2026年1月至2027年12月，工作地北京、上海、合肥、大连，岗位由集团指定Moka校园网申平台发布。不同合作公司（如一汽-大众）有独立网申站，不能合并成同一个岗位库。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://gdjy.hfut.edu.cn/detail/online?id=3593858",
+    "https://www.volkswagen-newsroom.com/en/volkswagen-group-china-4068",
+    "https://newsroom.vw.com.cn/Home/AllPic",
+    "https://www.upcv.tech/xiaozhao/cmto5fwa200p0m9thfq6hlqon.html",
+    "https://app.mokahr.com/campus-recruitment/vwa/168597#/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-074/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-074/photo1.jpg",
+        "caption": "大众汽车中国官方或机构原始页面的实际现场图片 1（来源见审计）",
+        "alt": "大众汽车中国与业务实体关联的真实场景照片 1",
+        "note": "照片仅限能由官网/权威机构原始新闻明确归属的场景；不得将外单位照片或产品渲染图标注为实景；来源、SHA-256及版权状态见media-sources.json。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-074/photo2.jpg",
+        "caption": "大众汽车中国官方或机构原始页面的实际现场图片 2（来源见审计）",
+        "alt": "大众汽车中国与业务实体关联的真实场景照片 2",
+        "note": "照片仅限能由官网/权威机构原始新闻明确归属的场景；不得将外单位照片或产品渲染图标注为实景；来源、SHA-256及版权状态见media-sources.json。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://app.mokahr.com/campus-recruitment/vwa/168597#/",
+    "label": "大众汽车集团中国2026—2027届Moka官方指定校招入口",
+    "status": "official_portal",
+    "subject": "大众汽车（安徽）有限公司及大众汽车集团中国参与用人单位",
+    "note": "高校企业公告明确Moka网址，目标2026—2027届、工作地点合肥、大连、上海、北京。以下各方向是招聘项目公布的类别，不等于已核实多个独立实时开放岗位，不混入一汽-大众或大众汽车金融招聘门户。"
+  },
+  "majorIntro": "招聘项目公开的主要方向包括整车研发、智能网联、IT、智能制造与职能。专业标签是项目相关专业参考，并非每个方向均有同名具体岗位；申请以官方Moka逐项发布的实际职位为准。",
+  "preferredMajors": [
+    "车辆工程",
+    "机械工程",
+    "电气工程及其自动化",
+    "软件工程",
+    "计算机科学与技术",
+    "电子信息工程",
+    "自动化",
+    "人工智能",
+    "材料科学与工程",
+    "工业设计",
+    "工商管理",
+    "人力资源管理"
+  ],
+  "photoNote": "优先使用大众汽车官方图片中心2026年已发布的安徽生产线及整车质量检测实拍，图片详情具有明确Volkswagen AG署名和“editorial purposes free of charge”的编辑用途说明。HHBA网站用途是否符合授权须谨慎核对，绝不使用AI伪造汽车工厂。",
+  "business": [
+    {
+      "title": "整车研发与平台工程",
+      "description": "在华研发新能源及燃油车整车产品、电子电气架构、底盘及整车工程验证。",
+      "tags": "整车 · 研发",
+      "details": [
+        "整车架构及车身研发",
+        "结构与底盘仿真",
+        "整车性能及测试"
+      ]
+    },
+    {
+      "title": "新能源汽车及电池系统",
+      "description": "面向电动车型研发电池系统、能源管理和驱动电机电控，推动本地平台量产与性能优化。",
+      "tags": "新能源 · 电池",
+      "details": [
+        "动力电池系统",
+        "热管理及高压安全",
+        "高效电驱与整车集成"
+      ]
+    },
+    {
+      "title": "车联网与智能驾驶",
+      "description": "开发车载互联、驾驶辅助、智能网联座舱及相关软硬件平台。",
+      "tags": "智驾 · 网联",
+      "details": [
+        "高级驾驶辅助系统",
+        "座舱及云端协同",
+        "控制算法及数据服务"
+      ]
+    },
+    {
+      "title": "汽车电子与软件研发",
+      "description": "在中国研发电子电气架构、软件定义汽车与车载系统，推进系统集成和OTA迭代。",
+      "tags": "软件 · 电子电气",
+      "details": [
+        "软件架构与集成",
+        "整车通信与信息安全",
+        "车端软件验证"
+      ]
+    },
+    {
+      "title": "制造工艺与质量管理",
+      "description": "在安徽等生产基地开展焊装、涂装、总装、制造自动化和质量工程建设与运营。",
+      "tags": "智能制造 · 品质",
+      "details": [
+        "生产工艺设计",
+        "机器人及自动化设备",
+        "整车质量检测"
+      ]
+    },
+    {
+      "title": "品牌营销与供应链采购",
+      "description": "协同旗下品牌与供应商开展产品市场、渠道、供应链采购和企业职能运营。",
+      "tags": "品牌 · 供应链",
+      "details": [
+        "汽车市场与品牌传播",
+        "零部件本地化采购",
+        "财务人资与运营管理"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "rd-engineering-2027",
+      "title": "研发类：整车／电子电气架构／电池研发（校招方向）",
+      "category": "研发 / 整车",
+      "city": "合肥／大连／上海／北京（项目范围）",
+      "summary": "2026—2027招聘项目说明研发方向包括整车、电池零部件、电子电气架构及软件应用等领域；各具体工作地点需以Moka里的单岗位为准。",
+      "requirements": "公告面向2026年1月至2027年12月毕业生，相关学科包括计算机、电子信息、电气、机械、材料、设计等，本科及以上；分类不代表可对所有毕业生开放同一个岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "车辆工程",
+        "机械工程",
+        "电气工程及其自动化",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.01—2027.12毕业、本科及以上",
+      "url": "https://app.mokahr.com/campus-recruitment/vwa/168597#/",
+      "evidenceUrl": "https://gdjy.hfut.edu.cn/detail/online?id=3593858",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "大众汽车（安徽）有限公司及集团中国项目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "connected-cockpit-2027",
+      "title": "车联网与电子架构方向（校招方向）",
+      "category": "车联网 / 软件",
+      "city": "合肥／上海／北京等（项目范围）",
+      "summary": "应届生招聘方向包含车载通信、整车互联与电子架构技术，可关注智能座舱、控制系统和车载软件相关团队。",
+      "requirements": "招聘公告要求以集团中国Moka实际发布的岗位专业和语言要求为准；信息通信、软件、电子、自动化背景适配，当前来源没有逐个职位编号或薪资保证。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "通信工程",
+        "计算机科学与技术",
+        "软件工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026/2027届本科及以上",
+      "url": "https://app.mokahr.com/campus-recruitment/vwa/168597#/",
+      "evidenceUrl": "https://gdjy.hfut.edu.cn/detail/online?id=3593858",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "大众汽车集团中国项目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "digital-it-2027",
+      "title": "数字化技术与AI方向（校招方向）",
+      "category": "数字化 / AI",
+      "city": "合肥／大连／北京／上海（项目范围）",
+      "summary": "面向汽车企业数字化研发、软件平台、数据应用、DevOps及人工智能技术协同的校园招聘领域。",
+      "requirements": "此条是2026—2027届项目岗位方向，不代表所有细分技术岗位均已在招；计算机、软件工程、信息技术和统计等专业参考需逐岗核实。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "人工智能",
+        "统计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026/2027届本科及以上",
+      "url": "https://app.mokahr.com/campus-recruitment/vwa/168597#/",
+      "evidenceUrl": "https://gdjy.hfut.edu.cn/detail/online?id=3593858",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "大众汽车集团中国项目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "manufacturing-2027",
+      "title": "智能制造及工艺质量方向（校招方向）",
+      "category": "制造工艺 / 质量",
+      "city": "合肥／大连等生产及技术机构（项目范围）",
+      "summary": "与集团在华智能制造相关的工艺设计、生产自动化、供应商质量和整车质量测试招聘领域。",
+      "requirements": "项目公告专业参考电气、机械、材料、自动化等方向，具体制造基地和岗位职责须以Moka岗位名称核准，不将中国各合资工厂独立招聘混入。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026/2027届本科及以上",
+      "url": "https://app.mokahr.com/campus-recruitment/vwa/168597#/",
+      "evidenceUrl": "https://gdjy.hfut.edu.cn/detail/online?id=3593858",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "大众汽车集团中国项目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "design-2027",
+      "title": "汽车造型与产品管理方向（校招方向）",
+      "category": "设计 / 产品",
+      "city": "合肥／上海／北京（项目范围）",
+      "summary": "校招领域涉及汽车造型、用户体验、产品开发、成本和项目管理协同，具体团队发布职位时可能有不同专业和作品集要求。",
+      "requirements": "项目归类为公开招聘方向，并非已验证同名正式JD。工业设计、交互设计、车辆工程等为相关专业建议，实际作品集、学历与技术限制必须依据官方职位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工业设计",
+        "产品设计",
+        "车辆工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026/2027届学历以具体岗位为准",
+      "url": "https://app.mokahr.com/campus-recruitment/vwa/168597#/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmto5fwa200p0m9thfq6hlqon.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "大众汽车集团中国项目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "corporate-function-2027",
+      "title": "职能管理与采购方向（校招方向）",
+      "category": "职能 / 采购",
+      "city": "北京／上海／合肥／大连（项目范围）",
+      "summary": "围绕企业财务、人力资源、采购、安全及商业运营开展的集团职能招聘方向，具体职位由不同招聘法人和团队发布。",
+      "requirements": "工商管理、人力资源、财务、供应链等专业可对照实际JD查看；该方向不等于“专业不限”，高校摘要和岗位图片不能代替官方逐岗条件。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工商管理",
+        "人力资源管理",
+        "会计学",
+        "供应链管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026/2027届，岗位细则以Moka为准",
+      "url": "https://app.mokahr.com/campus-recruitment/vwa/168597#/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmto5fwa200p0m9thfq6hlqon.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "大众汽车集团中国项目",
+      "currentOpenVerified": false
+    }
+  ]
+}
