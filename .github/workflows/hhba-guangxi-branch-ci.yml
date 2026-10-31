@@ -1,7 +1,7 @@
 name: Guangxi V5.1 independent verification
 on:
   push:
-    branches: [feature/talent-guangxi]
+    branches: [feature/talent-guangxi, feature/talent-guangxi-main-housingfix-20261031]
   pull_request:
     paths:
       - 'apps/web/src/data/guangxi*.ts'
@@ -10,6 +10,8 @@ on:
       - 'apps/web/src/components/talent/UnifiedPolicyList.tsx'
       - 'apps/web/src/data/talentPolicyRecords.ts'
       - 'apps/web/scripts/test-guangxi-city-v51.mjs'
+      - 'apps/web/scripts/test-talent-housing-card-coverage.mjs'
+      - 'apps/web/src/pages/TalentServiceRoutes.tsx'
       - '.github/workflows/hhba-guangxi-branch-ci.yml'
   workflow_dispatch:
 permissions:
@@ -31,6 +33,9 @@ jobs:
       - name: Test Guangxi city coverage
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-guangxi-city-v51.mjs
+      - name: Assert national city housing cards never regress to blank
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-housing-card-coverage.mjs
       - name: National V5.1 contract regression
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
