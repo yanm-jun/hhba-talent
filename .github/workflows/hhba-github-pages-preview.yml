@@ -219,6 +219,9 @@ jobs:
           for id in 069 070; do
             test -s "public/images/employer-profiles/cn-autumn-$id/media-sources.json"
           done
+      - name: Package 072-074 true-source corporate/government imagery with audited fallback
+        working-directory: apps/web
+        run: python scripts/prepare-employers-072-074-sourced-media.py
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
@@ -240,6 +243,9 @@ jobs:
       - name: Validate 069-071 role evidence, category matching, actual media and 2027 scope
         working-directory: apps/web
         run: node scripts/employers-069-071-v2.contract.test.mjs
+      - name: Test 072-074 shared four-panel, truthful job sources, media and application status
+        working-directory: apps/web
+        run: node scripts/employers-072-074-v2.contract.test.mjs
       - name: Validate MINIEYE 035 source-backed positions, six major tabs and real media
         working-directory: apps/web
         run: node scripts/minieye-v2.contract.test.mjs
@@ -509,6 +515,12 @@ jobs:
           test -s apps/web/dist/images/employer-profiles/cn-autumn-069/photo2.svg
           for image in photo1.jpg photo2.jpg; do test -s "apps/web/dist/images/employer-profiles/cn-autumn-070/$image"; done
           for image in photo1.svg photo2.svg; do test -s "apps/web/dist/images/employer-profiles/cn-autumn-071/$image"; done
+      - name: Verify 072-074 media and direct company paths are included in full official Pages site
+        run: |
+          for id in 072 073 074; do
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/logo.svg"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/media-sources.json"
+          done
       - name: Verify Southern, Guangzhilv and shared static images in built site
         run: |
           test -s apps/web/dist/index.html
