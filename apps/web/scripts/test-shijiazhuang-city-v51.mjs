@@ -28,7 +28,7 @@ check('No confusion between B-card rent, B-card buy and one-time graduate settle
  assert.equal(p('sjz-2026-graduate-settle').headlineAmount,'¥10,000—50,000');
  assert.ok(p('sjz-2026-graduate-settle').reviewNote.includes('只可享受一次'));
  assert.ok(p('sjz-2026-bcard-home').eligibility.includes('有效期'));
- assert.ok(p('sjz-2026-bcard-rent').benefit.includes('停发'));
+ assert.ok(/停发|停止.*租房补助/.test(p('sjz-2026-bcard-rent').benefit),'Buying a home must stop overlapping rental benefits');
  assert.ok(p('sjz-2026-bcard-eligibility').benefit.includes('不直接等于现金'));
 });
 check('Five housing records distinguish verified closed batches from non-live support program',()=>{
