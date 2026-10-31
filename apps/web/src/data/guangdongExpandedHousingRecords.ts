@@ -152,7 +152,7 @@ export const GUANGDONG_EXPANDED_HOUSING_RECORDS:TalentHousingRecord[]=[
     "kind": "program",
     "housingCategory": "保障性租赁住房",
     "reviewedAt": "2026-10-31",
-    "statusNote": "英德住建公开的全市制度资料并不是清远各县区统一配租公告；项目地址、当地资格、金额、具体当期申请入口均待核实，房源非实时。",
+    "statusNote": "英德住建公开的全市制度资料并不是清远各县区统一配租公告；项目地址、当地资格、金额、具体当期申请入口均待核实，房源非实时。 申报入口待核实；是否开放需以所在地住房主管部门最新公告为准。",
     "steps": [
       "确认所在地适用的清远住房保障实施办法与县区政策",
       "对照住房和收入、就业情况准备身份及住房收入资料",
