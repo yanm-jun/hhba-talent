@@ -50,7 +50,7 @@ export function KpmgCompactProfilePage({user}:{user:User|null}){
  const back=getCompanyReturnTarget();
  const shown=kpmg.services.slice(0,showAll?8:4);
  return <Shell user={user}>
-  <article className="company-profile hhba-kpmg-compact" data-company-template="unified-v2" data-employer-id="cn-autumn-001" data-four-block-contract="hero,majors,jobs,business" data-kpmg-profile-version="recruitment-first">
+  <article className="company-profile hhba-kpmg-compact" data-company-template="openai" data-employer-id="cn-autumn-001" data-four-block-contract="hero,majors,jobs,business" data-kpmg-profile-version="recruitment-first">
    <nav className="company-profile-top" aria-label="企业详情导航">
     <Link to={back.to} restoreScrollY={back.scrollY} restoreMarketState={back.marketState}><ArrowLeft size={15}/> 返回上一页</Link>
     <Link to="/candidate/domestic-autumn">所有企业 <ArrowRight size={15}/></Link>
