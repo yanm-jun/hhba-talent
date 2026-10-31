@@ -602,6 +602,13 @@ jobs:
           if(!main.includes("route==='/vision'"))throw Error('DEDICATED_VISION_ROUTE_MISSING');
           console.log('HHBA_VISION_DIRECT_LINK_READY');
           NODE
+      - name: Materialize every HHBA V2 company deep link as a physical GitHub Pages index
+        working-directory: apps/web
+        run: |
+          node scripts/materialize-company-route-entries.mjs
+          test -s dist/companies/autumn/cn-autumn-034/index.html
+          cmp dist/index.html dist/companies/autumn/cn-autumn-034/index.html
+          test -s dist/404.html
       # Admin preview source is now versioned in apps/admin-preview on main.
       - name: Check admin static preview security and functional contracts
         run: |
@@ -794,7 +801,12 @@ jobs:
           for attempt in range(12):
               try:
                   for path in ['', 'images/employer-profiles/cn-autumn-026/logo.png',
-                               'images/employer-profiles/cn-autumn-027/logo.png']:
+                               'images/employer-profiles/cn-autumn-027/logo.png',
+                               'companies/autumn/cn-autumn-034/',
+                               'companies/autumn/cn-autumn-034/index.html',
+                               'images/employer-profiles/cn-autumn-034/logo.webp',
+                               'images/employer-profiles/cn-autumn-034/photo1.jpg',
+                               'images/employer-profiles/cn-autumn-034/photo2.jpg']:
                       req=urllib.request.Request(root+path+'?verify='+str(attempt),headers={'Cache-Control':'no-cache'})
                       with urllib.request.urlopen(req,timeout=18) as response:
                           assert response.status==200 and len(response.read(2500))>120
