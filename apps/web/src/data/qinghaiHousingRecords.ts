@@ -165,4 +165,4 @@ export const QINGHAI_HOUSING_RESEARCH_RECORDS:TalentHousingRecord[]=[
 ];
 
 /** Formal V5.1 index requires first-party government policy source, not recruitment/media reprints. */
-export const QINGHAI_HOUSING_RECORDS:TalentHousingRecord[]=QINGHAI_HOUSING_RESEARCH_RECORDS.filter(r=>{try{return new URL(r.sourceUrl).hostname.endsWith('.gov.cn')}catch{return false}});
+export const QINGHAI_HOUSING_RECORDS:TalentHousingRecord[]=QINGHAI_HOUSING_RESEARCH_RECORDS.filter(r=>{try{return new URL(r.sourceUrl).hostname.endsWith('.gov.cn')}catch{return false}}).map(r=>({...r,statusNote:r.statusNote+' 不提供实时空房或可租房源，申报入口待核实。'}));
