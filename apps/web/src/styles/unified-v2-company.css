@@ -135,3 +135,12 @@
 .hhba-v2-bodor .hhba-kpmg-photo-grid img{object-fit:cover;object-position:center}
 .hhba-v2-bodor .hhba-v2-company-role .hhba-v2-weipu-education{color:#81908e}
 .hhba-v2-bodor .hhba-v2-company-role details summary{color:#298055;text-decoration:none}
+
+/* PXW #034: inherit Bodor's screenshot-approved green detailed-job card style.
+   This changes only PXW identity and photo treatment, not previous employers. */
+.hhba-v2-pxw .hhba-kpmg-logo img{max-width:82px;max-height:76px;object-fit:contain}
+.hhba-v2-pxw .hhba-kpmg-photo-grid figure{overflow:hidden}
+.hhba-v2-pxw .hhba-kpmg-photo-grid img{object-fit:cover;object-position:50% 42%}
+.hhba-v2-pxw .hhba-v2-company-role details summary{color:#2d8056}
+.hhba-v2-pxw .hhba-v2-company-role>small.hhba-v2-weipu-location{color:#73817d}
+@media(max-width:760px){.hhba-v2-pxw .hhba-kpmg-logo img{max-width:65px}}
