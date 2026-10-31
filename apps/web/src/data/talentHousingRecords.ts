@@ -1,3 +1,4 @@
+import {SHIJIAZHUANG_HOUSING_RECORDS} from './shijiazhuangHousingRecords.ts';
 import {HANDAN_HOUSING_RECORDS} from './handanHousingRecords.ts';
 import {QINHUANGDAO_HOUSING_RECORDS} from './qinhuangdaoHousingRecords.ts';
 import {BINZHOU_HOUSING_RECORDS} from './binzhouHousingRecords.ts';
@@ -70,6 +71,7 @@ export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
 ...WEIFANG_HOUSING_RECORDS,
 ...ZIBO_HOUSING_RECORDS,
 ...TAIAN_HOUSING_RECORDS,
+...SHIJIAZHUANG_HOUSING_RECORDS,
 ...ZAOZHUANG_HOUSING_RECORDS,
 ...DEZHOU_HOUSING_RECORDS,
 ...QINHUANGDAO_HOUSING_RECORDS,
