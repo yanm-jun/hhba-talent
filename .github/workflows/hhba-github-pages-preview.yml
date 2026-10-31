@@ -381,6 +381,11 @@ jobs:
         run: node --experimental-strip-types --test scripts/south-dakota.contract.test.mjs
       - name: Package three licensed USD real campus photos for same-site static Pages
         run: python apps/web/scripts/package-usd-campus-photos.py
+      - name: Verify TAMIU detailed MBA university dossier and image license provenance
+        working-directory: apps/web
+        run: node --experimental-strip-types --test scripts/tamiu.contract.test.mjs
+      - name: Package 3 authentic licensed TAMIU campus photos as local site assets
+        run: python apps/web/scripts/package-tamiu-campus-photos.py
       - name: "Build unified HHBA - 200 companies, applicant center, employer governance previews and brand pages"
         working-directory: apps/web
         env:
@@ -747,6 +752,7 @@ jobs:
           node scripts/study-universities.browser.mjs
           node scripts/minot-state.browser.mjs
           node scripts/south-dakota.browser.mjs
+          node scripts/tamiu.browser.mjs
       - name: Save screenshots and the real search/browser verification results
         if: always()
         uses: actions/upload-artifact@v4

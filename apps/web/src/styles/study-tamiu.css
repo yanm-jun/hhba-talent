@@ -1,0 +1,23 @@
+/* HHBA TAMIU: clicked-in deep page only; leave existing /study-abroad homepage unchanged. */
+.hhba-tamiu .hhba-minot-hero{background:radial-gradient(ellipse at 85% 2%,#d7ebdf,transparent 48%),linear-gradient(115deg,#eaf6ef,#fff)}
+.hhba-tamiu .hhba-minot-hero .hhba-minot-overline{letter-spacing:.06em}
+.hhba-tamiu .hhba-minot-narrative{min-width:0}
+.hhba-tamiu .hhba-minot-photo-trigger img{object-fit:cover}
+.hhba-tamiu-primary-program{display:flex;align-items:center;justify-content:space-between;gap:20px;border:1px solid #d5e5d9;background:linear-gradient(125deg,#f1faf3,#fff);padding:21px;border-radius:12px;margin-bottom:22px}
+.hhba-tamiu-primary-program>div{flex:1;min-width:0}
+.hhba-tamiu-primary-program h3{font-size:20px;color:#285c40;margin:0 0 6px}
+.hhba-tamiu-primary-program p{color:#607b6a;font-size:12px;line-height:1.9;margin:6px 0}
+.hhba-tamiu-primary-program>a{white-space:nowrap;flex:none}
+.hhba-tamiu-course{font-size:11px!important;color:#2f8053!important;font-weight:800!important;margin:0 0 7px!important}
+.hhba-tamiu-concentrations{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.hhba-tamiu-concentrations article{border:1px solid #e1e9e3;background:#fff;border-radius:10px;padding:19px;min-width:0}
+.hhba-tamiu-concentrations article h3{color:#285b40;font-size:15px;margin:0 0 5px}
+.hhba-tamiu-concentrations article small{display:block;color:#91a293;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+.hhba-tamiu-concentrations article strong{display:block;color:#24754e;font-size:14px;margin-top:9px}
+.hhba-tamiu-concentrations article p{line-height:1.9;color:#627e6e;font-size:12px;margin:9px 0 0}
+.hhba-tamiu .hhba-minot-lightbox a{color:#b8edce}
+.hhba-tamiu .hhba-minot-source-link{margin-right:11px}
+.hhba-tamiu .hhba-minot-steps>div{min-width:0}
+.hhba-tamiu .hhba-minot-jump>a:focus-visible,.hhba-tamiu .hhba-minot-photo-trigger:focus-visible,.hhba-tamiu .hhba-minot-thumb:focus-visible{outline:2px solid #29885b;outline-offset:2px}
+@media(max-width:900px){.hhba-tamiu-concentrations{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.hhba-tamiu-concentrations{grid-template-columns:1fr}.hhba-tamiu-primary-program{align-items:stretch;flex-direction:column}.hhba-tamiu-primary-program>a{width:100%;justify-content:center}.hhba-tamiu .hhba-minot-hero-actions{align-items:stretch}.hhba-tamiu .hhba-minot-hero-actions>a{max-width:100%}}
