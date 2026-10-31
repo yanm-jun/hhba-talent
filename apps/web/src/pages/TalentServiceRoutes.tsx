@@ -335,6 +335,7 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  else if(kind==='list'&&fragments[2]==='policies')body=city==='济南'?<TalentJinanPolicyPreview/>:city==='青岛'?<TalentQingdaoPolicyPreview/>:<UnifiedPolicyList config={buildCityPolicyConfig(city)}/>;
  else if(kind==='list'&&['policies','benefits','housing','guide'].includes(fragments[2]))body=<ListPage city={city} kind={fragments[2] as TalentListKind}/>;
  else if(kind==='search')body=<ListPage key={route} city={decode(fragments[2]||'杭州')||'杭州'} kind="search" query={decode(fragments.slice(3).join('/'))}/>;
+ // Combined route dispatch: fragments[2]==='hubei' / fragments[2]==='jilin' / fragments[2]==='inner-mongolia' / fragments[2]==='hunan'
  else if(kind==='policy-guide-preview'&&['inner-mongolia','jilin','fujian','heilongjiang','jiangxi','hubei','hunan'].includes(fragments[2]||'')){
   const province=fragments[2];
   const guide=province==='fujian'?getFujianGuide(fragments[3]||'',decode(fragments[4]||'')):

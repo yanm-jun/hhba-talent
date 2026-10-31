@@ -6,6 +6,7 @@ import {HEILONGJIANG_POLICY_RECORDS} from './heilongjiangPolicyRecords.ts';
 import {FUJIAN_POLICY_RECORDS} from './fujianPolicyRecords.ts';
 import {ANHUI_POLICY_RECORDS} from './anhuiPolicyRecords.ts';
 import {JILIN_POLICY_RECORDS} from './jilinPolicyRecords.ts';
+import {JILIN_SUPPLEMENT_POLICY_RECORDS} from './jilinSupplementPolicyRecords.ts';
 import {INNER_MONGOLIA_POLICY_RECORDS} from './innerMongoliaPolicyRecords.ts';
 import {SHANXI_POLICY_RECORDS} from './shanxiPolicyRecords.ts';
 import {HANGZHOU_POLICY_RECORDS} from './hangzhouPolicyRecords.ts';
@@ -70,6 +71,7 @@ export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
  ...FUJIAN_POLICY_RECORDS,
  ...ANHUI_POLICY_RECORDS,
  ...JILIN_POLICY_RECORDS,
+ ...JILIN_SUPPLEMENT_POLICY_RECORDS,
  ...INNER_MONGOLIA_POLICY_RECORDS,
  ...SHANXI_POLICY_RECORDS,
 ...LIAONING_PROVINCIAL_POLICY_RECORDS,

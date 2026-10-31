@@ -1,3 +1,5 @@
+import {hubeiGuideUrl} from '../../data/hubeiGuides';
+import {fujianGuideUrl} from '../../data/fujianGuides';
 import {ArrowLeft,ArrowUpRight,ExternalLink,FileText,Info,ShieldCheck} from 'lucide-react';
 import {Link} from '../../router';
 import type {TalentPolicyRecord} from '../../data/talentPolicyRecords';
