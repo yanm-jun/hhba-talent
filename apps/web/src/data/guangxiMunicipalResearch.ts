@@ -54,7 +54,7 @@ export const GUANGXI_MUNICIPAL_RESEARCH_RECORDS:TalentPolicyRecord[]=[
  {
  id:'gx-qinzhou-2026-high-talent-research',city:'钦州',category:'落户引进',
  title:'钦州市2026“钦聚英才”专项引进高层次人才待遇（招聘历史，具体奖补待核）',
- scope:'特定区域',temporal:'past-window',deadline:'2026-06-30',published:'2026-02-28',
+ scope:'特定区域',temporal:'historical',published:'2026-02-28',
  sourceUrl:'https://www.gxqzxw.com/folder401/folder943/folder955/2026-02-28/274281.html',
  sourceName:'钦州市新闻传媒中心、钦州日报2026年招聘公告转载（非政府原始办法）',
  summary:'钦州市2026年“钦聚英才”春季引进人才公告披露：符合高层次人才分类的硕士、博士及规定岗位可享生活、购房、租房补助和人才公寓等待遇；不等于全市所有硕博都可领取。',
@@ -77,7 +77,7 @@ export const GUANGXI_MUNICIPAL_RESEARCH_RECORDS:TalentPolicyRecord[]=[
  {
  id:'gx-laibin-talent-service-research',city:'来宾',category:'落户引进',
  title:'来宾市高层次人才一站式服务及人才公寓、安家费、购房补贴办理指南',
- scope:'特定区域',temporal:'policy',published:'2025-12-17',
+ scope:'特定区域',temporal:'policy',published:'2024-09-11',
  sourceUrl:'https://lbrencai.com/contents/3/19.html',
  sourceName:'来宾市人社局主办高层次人才服务平台，附6份办事指南PDF（非gov.cn域名）',
  summary:'来宾市人力资源和社会保障局主办的来宾高层次人才服务平台设有人才认定、人才公寓入住、配偶就业、安家费与生活补助、购房补贴及学历提升奖励等六类专项办理指南。',
