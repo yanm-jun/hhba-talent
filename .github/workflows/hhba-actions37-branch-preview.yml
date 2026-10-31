@@ -1,0 +1,71 @@
+name: HHBA Actions 037 - isolated full four-panel preview
+on:
+  push:
+    branches:
+      - feature/employer-actions-037
+    paths:
+      - 'apps/web/src/data/employerProfiles/cn-autumn-037.json'
+      - 'apps/web/src/pages/UnifiedV2CompanyPage.tsx'
+      - 'apps/web/scripts/actions37-v2.contract.test.mjs'
+      - 'apps/web/scripts/prepare-actions37-media.py'
+      - '.github/workflows/hhba-actions37-branch-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  verify-and-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out isolated enterprise branch only
+        uses: actions/checkout@v4
+        with:
+          ref: feature/employer-actions-037
+          persist-credentials: true
+      - name: Install Python image verification
+        run: python -m pip install pillow
+      - name: Retrieve 1 genuine logo plus 2 different photos from verified sources
+        run: python apps/web/scripts/prepare-actions37-media.py
+      - name: Commit local media and SHA provenance into same branch, never main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/public/images/employer-profiles/cn-autumn-037
+          if ! git diff --cached --quiet; then
+            git commit -m "assets(actions37): vendor verified official logo and two workplace photos"
+            git push origin HEAD:feature/employer-actions-037
+          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install exact web dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Test all four visible sections and three separate image files
+        working-directory: apps/web
+        run: node scripts/actions37-v2.contract.test.mjs
+      - name: Regression test the company V2 factory
+        working-directory: apps/web
+        run: node scripts/employer-factory-check.mjs
+      - name: Build full HHBA V2 shell, not a replacement website
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: npm run build
+      - name: Check all three photos and built site present
+        run: |
+          test -s apps/web/dist/index.html
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-037/logo.png
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-037/photo1.jpg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-037/photo2.jpg
+      - name: Upload independent static site for review (no Pages publish)
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-actions-037-four-panel-static-preview
+          path: apps/web/dist/
+          if-no-files-found: error
+          retention-days: 14
