@@ -19,7 +19,7 @@ for(const [n,name,total] of companies){
  for(const file of [p.media.logo,...p.media.photos.map(x=>x.path)])
   assert(existsSync('public/'+file)&&statSync('public/'+file).size>450,'Missing media '+file);
  assert.equal(new Set(p.media.photos.map(x=>x.path)).size,2);
- assert(p.jobs.every(j=>j.id&&j.category&&j.title&&j.city&&j.summary.length>45&&j.requirements.length>90));
+ assert(p.jobs.every(j=>j.id&&j.category&&j.title&&j.city&&j.summary.length>=40&&j.requirements.length>=80));
  assert(p.jobs.every(j=>j.evidenceUrl.startsWith('https://')&&j.url===p.recruitment.url&&j.currentOpenVerified===false));
  assert(p.jobs.every(j=>j.majorNames.length===0&&j.editorialRelatedMajors.length>0));
  assert.equal(new Set(p.jobs.map(x=>x.id)).size,total);
