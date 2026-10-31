@@ -1,0 +1,239 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-077",
+  "name": "中国海油",
+  "displayName": "中国海洋石油集团有限公司",
+  "englishName": "China National Offshore Oil Corporation",
+  "aliases": [
+    "CNOOC",
+    "中海油",
+    "中国海洋石油集团",
+    "中国海洋石油有限公司",
+    "中国海油2027届校招"
+  ],
+  "industry": "海上油气 · 海洋工程 · 油田服务 · 炼化天然气 · 新能源",
+  "subtitle": "中国海油集团 · 全国所属用人单位独立招聘",
+  "overview": "中国海油集团主要从事海上油气勘探开发、油田服务、海洋工程、炼化销售、天然气发电与新能源相关业务。国资委转发2027届招聘启动公告，集团指定统一网申系统、由下属单位逐岗发布条件。公告报名时间为2026年9月30日至10月31日24时，统一考试原定11月7日。下方仅列公开业务对应的校招方向，不能冒充已经逐岗验证的具体JD。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://career.nankai.edu.cn/recruitment/content/type/2/id/6265.html",
+    "https://cnooc.zhaopin.com/",
+    "https://wap.sasac.gov.cn/n2588035/n2588325/c36034794/content.html",
+    "https://www.cnooc.com.cn/index.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-077/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-077/photo1.svg",
+        "caption": "中国海洋石油集团有限公司 · HHBA独立业务示意（非真实公司照片）",
+        "alt": "中国海油相关主题示意，明确非公司实景照片",
+        "note": "非官方非实景SVG占位；独立预览构建将尝试取得同名企业官方或政府来源的真实照片，验真失败不能冒充实景。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-077/photo2.svg",
+        "caption": "中国海洋石油集团有限公司 · HHBA独立业务示意（非真实公司照片）",
+        "alt": "中国海油相关主题示意，明确非公司实景照片",
+        "note": "非官方非实景SVG占位；独立预览构建将尝试取得同名企业官方或政府来源的真实照片，验真失败不能冒充实景。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://cnooc.zhaopin.com/",
+    "label": "中国海油2027届官方指定网申系统",
+    "status": "official_portal",
+    "subject": "中国海洋石油集团有限公司",
+    "note": "集团公告规定每人最多申请3岗，可跨单位投递，报名截止2026-10-31 24:00；本科外语原则上达大学英语四级，研究生达六级水平，其他语种另有要求。"
+  },
+  "majorIntro": "集团2027招聘按不同用人单位设岗位；下列方向是专业导航，不是已经核实实时在招的同名职位。单位、城市、专业与海上作业要求必须逐岗核对。",
+  "preferredMajors": [
+    "石油工程",
+    "地质工程",
+    "资源勘查工程",
+    "海洋工程与技术",
+    "机械工程",
+    "电气工程及其自动化",
+    "自动化",
+    "化学工程与工艺",
+    "能源与动力工程",
+    "安全工程",
+    "计算机科学与技术",
+    "软件工程",
+    "新能源科学与工程"
+  ],
+  "photoNote": "优先采用 中国海油 已实名确认的官方或政府网页中的真实设施及业务场景，逐张验证原始图片、像素与SHA-256。图片再次商业发布的授权尚未核实；任何下载失败均保留显著标注的非实景SVG。",
+  "business": [
+    {
+      "title": "海上油气勘探开发",
+      "description": "开展近海油气地质评价、勘探钻井、油气田开发与生产作业。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "地质 / 油气",
+      "details": [
+        "油气地质研究",
+        "油气开发工程",
+        "海上生产运维"
+      ]
+    },
+    {
+      "title": "油田专业技术服务",
+      "description": "面向钻探、测井、定向井与工程作业提供油田技术服务。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "油田服务",
+      "details": [
+        "钻完井技术",
+        "地球物理服务",
+        "装备技术支持"
+      ]
+    },
+    {
+      "title": "海洋工程与装备",
+      "description": "开展海上平台、海底管线、海工设施设计建造与安装运维。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "海工",
+      "details": [
+        "海洋平台工程",
+        "海底管线施工",
+        "船舶与海工装备"
+      ]
+    },
+    {
+      "title": "炼化与油品销售",
+      "description": "开展石油炼制及石油化工产品生产和销售相关业务。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "炼化",
+      "details": [
+        "炼油工艺",
+        "化工生产",
+        "质量与安全"
+      ]
+    },
+    {
+      "title": "天然气与发电",
+      "description": "围绕LNG、天然气供应及发电开展能源生产和运营。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "天然气",
+      "details": [
+        "天然气储运",
+        "能源运行",
+        "LNG产业链"
+      ]
+    },
+    {
+      "title": "海上新能源与数字化",
+      "description": "推进海上风电等新能源应用及油田运营数字化。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "新能源",
+      "details": [
+        "海上风电",
+        "数字油田",
+        "电力与控制工程"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "oil-exploration-2027",
+      "title": "油气勘探开发方向（招聘领域参考，非具体JD）",
+      "category": "石油 / 地质",
+      "city": "集团各招聘单位，城市以岗位表为准",
+      "summary": "集团公开海上油气勘探开发业务对应的专业方向，不能因此断言存在某个同名在招职位；须在官方集团岗位库逐条筛选。",
+      "requirements": "公开2027届基本条件涉及应届和特定离校未就业毕业生；本科外语四级、研究生六级水平为一般条件。石油地质专业建议不是各单位正式岗位专业目录。 具体投递资格及项目状态以招聘官网当前公开的职位为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "石油工程",
+        "地质工程",
+        "资源勘查工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "集团2027校招条件，逐单位核实",
+      "url": "https://cnooc.zhaopin.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/recruitment/content/type/2/id/6265.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国海油集团2027届所属单位（具体岗位待核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "offshore-equipment-2027",
+      "title": "海洋工程装备方向（招聘领域参考，非具体JD）",
+      "category": "海工 / 机械",
+      "city": "下属海洋工程企业，地点待核",
+      "summary": "公司有海洋工程与油田服务等业务；本条仅为海工、机械专业找岗位的导航，不含实际招聘职位编号。",
+      "requirements": "具体海工/船舶相关职位的学历、专业、海上工作要求、地点与招聘法人需在招聘系统逐一核验；本条不可当作实际空缺证明。 具体投递资格及项目状态以招聘官网当前公开的职位为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "海洋工程与技术",
+        "机械工程",
+        "船舶与海洋工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "集团2027校招条件，逐单位核实",
+      "url": "https://cnooc.zhaopin.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/recruitment/content/type/2/id/6265.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国海油集团2027届所属单位（具体岗位待核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "electric-automation-2027",
+      "title": "机械电气自动化方向（招聘领域参考，非具体JD）",
+      "category": "机械 / 电气",
+      "city": "海上与陆上运营单位，城市待核",
+      "summary": "集团海上生产、工程技术及天然气业务涉及设备维护与控制，机械和电气相关专业可参考，但并未验证对应岗位名。",
+      "requirements": "机械工程、电气、自动化、能源动力是业务相关专业建议，集团公告还要求应届资格和外语条件；岗位业务资质和实际城市不能推定。 具体投递资格及项目状态以招聘官网当前公开的职位为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "集团2027校招条件，逐单位核实",
+      "url": "https://cnooc.zhaopin.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/recruitment/content/type/2/id/6265.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国海油集团2027届所属单位（具体岗位待核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "refining-gas-2027",
+      "title": "炼化天然气能源方向（招聘领域参考，非具体JD）",
+      "category": "化工 / 能源",
+      "city": "炼化及气电有关单位，地点待核",
+      "summary": "集团公开主营业务有炼化、天然气及发电，相关专业可以据此检索旗下公司实际岗位，本记录不是实名岗位。",
+      "requirements": "化工、安全、能源与动力专业为编辑关联信息，正式职业资质、学历和工作地点必须依据具体公司JD。原集团报名截至2026年10月31日24时。 具体投递资格及项目状态以招聘官网当前公开的职位为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "化学工程与工艺",
+        "安全工程",
+        "能源与动力工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "集团2027校招条件，逐单位核实",
+      "url": "https://cnooc.zhaopin.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/recruitment/content/type/2/id/6265.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国海油集团2027届所属单位（具体岗位待核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "it-new-energy-2027",
+      "title": "数字技术新能源方向（招聘领域参考，非具体JD）",
+      "category": "软件 / 新能源",
+      "city": "集团相关单位，具体工作地待核",
+      "summary": "中国海油探索海上新能源与工业数字化，计算机及新能源相关专业可关注各公司招聘平台，未证实存在同名职位。",
+      "requirements": "计算机、软件、新能源、电气匹配只是编辑导航，不能把集团业务介绍视为逐岗资格证明；招录专业、招聘法人、城市及剩余名额均需官网核查。 具体投递资格及项目状态以招聘官网当前公开的职位为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "新能源科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "集团2027校招条件，逐单位核实",
+      "url": "https://cnooc.zhaopin.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/recruitment/content/type/2/id/6265.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国海油集团2027届所属单位（具体岗位待核）",
+      "currentOpenVerified": false
+    }
+  ]
+}

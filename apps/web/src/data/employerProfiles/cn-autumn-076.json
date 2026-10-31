@@ -1,0 +1,221 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-076",
+  "name": "阿斯利康",
+  "displayName": "阿斯利康（中国）",
+  "englishName": "AstraZeneca",
+  "aliases": [
+    "AstraZeneca",
+    "阿斯利康中国",
+    "阿斯利康投资（中国）有限公司",
+    "amAZinger",
+    "阿斯利康2027校招"
+  ],
+  "industry": "创新药研发 · 临床试验 · 生物制药 · 智能制造",
+  "subtitle": "上海／北京研发中心 · 无锡／泰州等供应基地",
+  "overview": "阿斯利康在中国开展创新药研发、临床试验、生产供应及商业运营。2027届amAZinger公开招聘简章列出事业部管理、临床研究、生产质量与智能制造四类明确岗位，分别规定不同毕业窗口、专业和城市。原公告网申截止日为2026年10月31日，不能将该批2027校招岗位长期标注为正在招募。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://career.nankai.edu.cn/correcruit/content/id/118801.html",
+    "https://app.mokahr.com/campus-recruitment/astrazeneca/144981?locale=zh-CN#/",
+    "https://careers.astrazeneca.com/china-zh",
+    "https://en.wuxi.gov.cn/2022-11/23/c_833332.htm"
+  ],
+  "media": {
+    "logo": "images/autumn-real-logos/cn-autumn-076.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-076/photo1.svg",
+        "caption": "阿斯利康（中国） · HHBA独立业务示意（非真实公司照片）",
+        "alt": "阿斯利康相关主题示意，明确非公司实景照片",
+        "note": "非官方非实景SVG占位；独立预览构建将尝试取得同名企业官方或政府来源的真实照片，验真失败不能冒充实景。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-076/photo2.svg",
+        "caption": "阿斯利康（中国） · HHBA独立业务示意（非真实公司照片）",
+        "alt": "阿斯利康相关主题示意，明确非公司实景照片",
+        "note": "非官方非实景SVG占位；独立预览构建将尝试取得同名企业官方或政府来源的真实照片，验真失败不能冒充实景。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://app.mokahr.com/campus-recruitment/astrazeneca/144981?locale=zh-CN#/",
+    "label": "阿斯利康2027 amAZinger官方指定校招系统",
+    "status": "official_portal",
+    "subject": "阿斯利康（中国）",
+    "note": "学校公告明确网申截止2026-10-31；即使入口仍可访问，也不能视为每一条岗位目前均可申请。"
+  },
+  "majorIntro": "本页四项培训生职位均有高校发布的逐项要求；除明确列明专业与工作地点外，不外推资质或实时开放状态。",
+  "preferredMajors": [
+    "药学",
+    "临床医学",
+    "生物科学",
+    "微生物学",
+    "化学",
+    "机械电子工程",
+    "自动化",
+    "工业工程",
+    "数学与应用数学",
+    "供应链管理",
+    "食品科学与工程",
+    "工商管理"
+  ],
+  "photoNote": "优先采用 阿斯利康 已实名确认的官方或政府网页中的真实设施及业务场景，逐张验证原始图片、像素与SHA-256。图片再次商业发布的授权尚未核实；任何下载失败均保留显著标注的非实景SVG。",
+  "business": [
+    {
+      "title": "全球创新药研发",
+      "description": "围绕治疗领域开展创新药物研发与技术创新。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "创新研发",
+      "details": [
+        "治疗领域研究",
+        "创新药物开发",
+        "研发项目管理"
+      ]
+    },
+    {
+      "title": "临床试验与数据",
+      "description": "开展临床研究、试验管理和临床数据相关业务。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "临床研究",
+      "details": [
+        "临床研究协调",
+        "试验数据管理",
+        "研究中心合作"
+      ]
+    },
+    {
+      "title": "药品生产运营",
+      "description": "依托全球供应基地实施药品生产、质量与制造管理。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "医药制造",
+      "details": [
+        "生产工艺",
+        "供应基地运营",
+        "制造质量体系"
+      ]
+    },
+    {
+      "title": "医药智能制造",
+      "description": "在供应基地推动自动化、智能工程与生产数据应用。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "自动化工程",
+      "details": [
+        "生产自动化",
+        "工程设备与数字化",
+        "供应基地优化"
+      ]
+    },
+    {
+      "title": "注册安全与合规",
+      "description": "支持药品注册、质量规范与药物安全等工作。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "药品合规",
+      "details": [
+        "法规事务",
+        "质量审查",
+        "药物安全支持"
+      ]
+    },
+    {
+      "title": "商业运营与患者服务",
+      "description": "在合法合规框架下拓展区域商业服务与创新治疗相关合作。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "商业运营",
+      "details": [
+        "区域业务管理",
+        "商业团队培养",
+        "跨职能协作"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "business-mt-2027",
+      "title": "事业部管理培训生（amAZinger）",
+      "category": "医药 / 商业运营",
+      "city": "上海（轮岗城市可能调整）",
+      "summary": "2027届公开商业运营管理培训生项目，含3年体系化轮岗、部门直培与发展计划。项目工作地上海，轮岗期间可能调整。",
+      "requirements": "明确要求医药相关专业、2026年1月至2027年6月毕业；面向国内外应届生并要求流利英文。原公告申请截止2026年10月31日。 具体投递资格及项目状态以招聘官网当前公开的职位为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "药学",
+        "临床医学",
+        "生物科学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "各岗位对应的2026—2027届毕业窗口",
+      "url": "https://app.mokahr.com/campus-recruitment/astrazeneca/144981?locale=zh-CN#/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118801.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "阿斯利康（中国）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "clinical-research-2027",
+      "title": "Clinical Research Associate Trainee",
+      "category": "临床 / 研发",
+      "city": "北京、上海、广州、香港（香港需相应身份）",
+      "summary": "约18个月研发培训生项目，校招简章明确临床研究培训生以及北京、上海、广州、香港工作范围。",
+      "requirements": "医药相关专业，毕业时间2026年8月至2027年7月；申请香港岗位需香港身份；项目要求流利英文，原简章截止2026年10月31日。 具体投递资格及项目状态以招聘官网当前公开的职位为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "临床医学",
+        "药学",
+        "生物科学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "各岗位对应的2026—2027届毕业窗口",
+      "url": "https://app.mokahr.com/campus-recruitment/astrazeneca/144981?locale=zh-CN#/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118801.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "阿斯利康（中国）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "quality-2027",
+      "title": "生产运营管理培训生—质量方向",
+      "category": "药化 / 质量",
+      "city": "无锡起始；后续无锡／泰州／青岛／上海",
+      "summary": "两年生产运营培训生项目，初始工作地点无锡供应基地质量部，最终发展单位为亚太质量部门多个城市。",
+      "requirements": "药学、化学、微生物相关专业，数字化、自动化及工业工程跨学科基础优先；毕业时间2026年1月至2027年6月，需流利英语，原公告截止10月31日。 具体投递资格及项目状态以招聘官网当前公开的职位为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "药学",
+        "化学",
+        "微生物学",
+        "自动化",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "各岗位对应的2026—2027届毕业窗口",
+      "url": "https://app.mokahr.com/campus-recruitment/astrazeneca/144981?locale=zh-CN#/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118801.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "阿斯利康（中国）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "smart-manufacturing-2027",
+      "title": "生产运营管理培训生—智能制造方向",
+      "category": "机械 / 自动化",
+      "city": "无锡／泰州供应基地",
+      "summary": "两年生产运营智能制造项目，初始与目标地点均在无锡、泰州基地，参与医药生产运营和工程数字化相关培养。",
+      "requirements": "药学、化学、生物、制造工程、机械电子、食品工程、供应链、数字化、自动化、数学建模等相关专业，毕业时间2026年1月至2027年6月；原截止10月31日。 具体投递资格及项目状态以招聘官网当前公开的职位为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械电子工程",
+        "自动化",
+        "工业工程",
+        "供应链管理",
+        "食品科学与工程",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "各岗位对应的2026—2027届毕业窗口",
+      "url": "https://app.mokahr.com/campus-recruitment/astrazeneca/144981?locale=zh-CN#/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/118801.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "阿斯利康（中国）",
+      "currentOpenVerified": false
+    }
+  ]
+}

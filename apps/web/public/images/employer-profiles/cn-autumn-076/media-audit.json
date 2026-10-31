@@ -1,0 +1,22 @@
+{
+  "company": "阿斯利康",
+  "reviewedAt": "2026-10-31",
+  "officialLogo": true,
+  "logoSource": "既存同名企业媒体档案 images/autumn-real-logos/cn-autumn-076.svg（商标使用权待核）",
+  "rightsForCommercialReuseConfirmed": false,
+  "sourceReportGeneratedByBuild": "media-sources.json",
+  "slots": [
+    {
+      "slot": 1,
+      "default": "images/employer-profiles/cn-autumn-076/photo1.svg",
+      "defaultType": "HHBA illustration, NOT company photograph",
+      "onVerified": "images/employer-profiles/cn-autumn-076/photo1.jpg"
+    },
+    {
+      "slot": 2,
+      "default": "images/employer-profiles/cn-autumn-076/photo2.svg",
+      "defaultType": "HHBA illustration, NOT company photograph",
+      "onVerified": "images/employer-profiles/cn-autumn-076/photo2.jpg"
+    }
+  ]
+}

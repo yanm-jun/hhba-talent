@@ -1,0 +1,22 @@
+{
+  "company": "中国海油",
+  "reviewedAt": "2026-10-31",
+  "officialLogo": false,
+  "logoSource": "HHBA独立字标，非官方Logo",
+  "rightsForCommercialReuseConfirmed": false,
+  "sourceReportGeneratedByBuild": "media-sources.json",
+  "slots": [
+    {
+      "slot": 1,
+      "default": "images/employer-profiles/cn-autumn-077/photo1.svg",
+      "defaultType": "HHBA illustration, NOT company photograph",
+      "onVerified": "images/employer-profiles/cn-autumn-077/photo1.jpg"
+    },
+    {
+      "slot": 2,
+      "default": "images/employer-profiles/cn-autumn-077/photo2.svg",
+      "defaultType": "HHBA illustration, NOT company photograph",
+      "onVerified": "images/employer-profiles/cn-autumn-077/photo2.jpg"
+    }
+  ]
+}
