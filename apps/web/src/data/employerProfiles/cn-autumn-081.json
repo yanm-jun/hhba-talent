@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-081",
+  "name": "安利",
+  "displayName": "安利（中国）日用品有限公司",
+  "englishName": "Amway (China)",
+  "aliases": [
+    "安利中国",
+    "Amway",
+    "Amway China",
+    "纽崔莱",
+    "雅姿",
+    "安利校园招聘"
+  ],
+  "industry": "植物营养 · 消费健康 · 智能制造 · 数智创新 · 区域运营",
+  "subtitle": "安利中国广州总部 · 上海研发与全国区域业务",
+  "overview": "安利中国成立于1995年，在营养健康、植物科学、个人护理、生产供应、数字创新及全国区域经营领域开展业务。安利官方校园招聘栏目公开研发管理培训生、Gen AI数字产品师、北京数据分析与全国市场赋能等具体职位名称。2027届秋招第三方汇总显示10月30日或31日截止的不同口径，不能把官方招聘页面的存在当作今天仍有空缺。",
+  "lastReviewed": "2026-11-01",
+  "sources": [
+    "https://www.amway.com.cn/hrSchool",
+    "https://www.amway.com.cn/job",
+    "https://www.amway.com.cn/news-2026/Amway_Global_CEO_China_Visit_Key_Highlights/news?channelId=100000584&contentId=2042570387060768770",
+    "https://qiuzhaowangzhan.com/jobs/campus-supplement-52753?from=%2Fcampus-recruitment%2Fforeign-companies"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-081/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-081/photo1.svg",
+        "caption": "安利 · HHBA编辑业务场景示意（非实景）",
+        "alt": "安利相关业务示意，并非真实企业照片",
+        "note": "原始版本为独立非实景SVG；审查构建仅在来源照片经验证后尝试替换，未核版权不得声称已有商用授权。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-081/photo2.svg",
+        "caption": "安利 · HHBA编辑业务场景示意（非实景）",
+        "alt": "安利相关业务示意，并非真实企业照片",
+        "note": "原始版本为独立非实景SVG；审查构建仅在来源照片经验证后尝试替换，未核版权不得声称已有商用授权。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.amway.com.cn/hrSchool",
+    "label": "安利中国官方校园招聘职位栏目",
+    "status": "official_portal",
+    "subject": "安利（中国）日用品有限公司",
+    "note": "官网岗位索引列出了职位名称及地点，但没有逐条公示完整JD与当前空缺。2027秋招截止日第三方来源分别称2026年10月30日和31日，均已过期，应以官网实际申请页面为准。"
+  },
+  "majorIntro": "点击专业方向按钮后仅展示对应类别，不将相关专业推荐误认为符合岗位真实学历与资格条件。",
+  "preferredMajors": [
+    "药学",
+    "生物科学",
+    "植物科学与技术",
+    "食品科学与工程",
+    "人工智能",
+    "软件工程",
+    "统计学",
+    "市场营销",
+    "工商管理",
+    "合规管理"
+  ],
+  "photoNote": "优先选择安利官方网站或实名媒体报道的广州工厂、植物研发中心真实实景，单张验证图片地址、来源、像素和SHA256；无法核实时显著保留非实景示意，版权许可未确认。",
+  "business": [
+    {
+      "title": "植物研发与营养创新",
+      "description": "研发营养、植物活性成分及大健康科学产品。 业务场景与岗位开放情况不作自动等同。",
+      "tags": "研发 · 营养",
+      "details": [
+        "植物原料研究",
+        "健康营养科技",
+        "应用实验和产品研究"
+      ]
+    },
+    {
+      "title": "个人护理与健康产品",
+      "description": "提供营养、个人护理、美容及家居生活相关产品体系。 业务场景与岗位开放情况不作自动等同。",
+      "tags": "消费健康",
+      "details": [
+        "纽崔莱营养产品",
+        "雅姿个人护理",
+        "健康生活服务"
+      ]
+    },
+    {
+      "title": "广州生产与供应链",
+      "description": "围绕广州工厂及相关基地推进生产、制造管理和品质保障。 业务场景与岗位开放情况不作自动等同。",
+      "tags": "制造 · 供应链",
+      "details": [
+        "广州制造基地",
+        "质量管理体系",
+        "物流及供应协调"
+      ]
+    },
+    {
+      "title": "数智创新与Gen AI",
+      "description": "借助AI、数据产品和数字化运营改进业务和客户服务流程。 业务场景与岗位开放情况不作自动等同。",
+      "tags": "人工智能",
+      "details": [
+        "Gen AI产品方向",
+        "IT与数据系统",
+        "数字化平台运营"
+      ]
+    },
+    {
+      "title": "区域业务与营销赋能",
+      "description": "在全国城市群开展区域业务支持、市场策划及日常经营赋能。 业务场景与岗位开放情况不作自动等同。",
+      "tags": "区域 · 营销",
+      "details": [
+        "营销策划执行",
+        "区域运营支持",
+        "客户体验管理"
+      ]
+    },
+    {
+      "title": "合规管理与企业职能",
+      "description": "开展区域合规、公共事务、财务及人才管理等支持。 业务场景与岗位开放情况不作自动等同。",
+      "tags": "职能 · 合规",
+      "details": [
+        "区域合规管理",
+        "财务和数据分析",
+        "人力资源与公共事务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "plant-research",
+      "title": "研发管理培训生（植物研究方向）",
+      "category": "植物 / 研发",
+      "city": "上海",
+      "summary": "安利中国官方网站的校园招聘栏目公开“研发管理培训生（植物研究方向）”，并标明工作地点为上海，这是具名职位记录，非泛化招聘方向。",
+      "requirements": "安利官方岗位索引只确定岗位名称、所属部门及工作城市，并未完整给出该职位的学历、专业资格、技术技能、薪酬和截至日期。页面展示的适合专业属于HHBA编辑相关度建议，实际申请应以原企业岗位详情页为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "生物科学",
+        "植物科学与技术",
+        "食品科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官方岗位列表公开名称与城市，逐岗教育要求待核",
+      "url": "https://www.amway.com.cn/hrSchool",
+      "evidenceUrl": "https://www.amway.com.cn/hrSchool",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安利中国官方网站校招栏目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "anti-aging",
+      "title": "研发管理培训生（抗衰研究方向）",
+      "category": "植物 / 研发",
+      "city": "上海",
+      "summary": "安利中国官方网站的校园招聘栏目公开“研发管理培训生（抗衰研究方向）”，并标明工作地点为上海，这是具名职位记录，非泛化招聘方向。",
+      "requirements": "安利官方岗位索引只确定岗位名称、所属部门及工作城市，并未完整给出该职位的学历、专业资格、技术技能、薪酬和截至日期。页面展示的适合专业属于HHBA编辑相关度建议，实际申请应以原企业岗位详情页为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "药学",
+        "生物科学",
+        "化学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官方岗位列表公开名称与城市，逐岗教育要求待核",
+      "url": "https://www.amway.com.cn/hrSchool",
+      "evidenceUrl": "https://www.amway.com.cn/hrSchool",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安利中国官方网站校招栏目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "tech-services",
+      "title": "研发技术服务工程师",
+      "category": "研发 / 技术",
+      "city": "广州",
+      "summary": "安利中国官方网站的校园招聘栏目公开“研发技术服务工程师”，并标明工作地点为广州，这是具名职位记录，非泛化招聘方向。",
+      "requirements": "安利官方岗位索引只确定岗位名称、所属部门及工作城市，并未完整给出该职位的学历、专业资格、技术技能、薪酬和截至日期。页面展示的适合专业属于HHBA编辑相关度建议，实际申请应以原企业岗位详情页为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "生物工程",
+        "食品科学与工程",
+        "化学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官方岗位列表公开名称与城市，逐岗教育要求待核",
+      "url": "https://www.amway.com.cn/hrSchool",
+      "evidenceUrl": "https://www.amway.com.cn/hrSchool",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安利中国官方网站校招栏目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "gen-ai",
+      "title": "数字产品师（Gen AI 方向）",
+      "category": "数智 / AI",
+      "city": "广州／北京",
+      "summary": "安利中国官方网站的校园招聘栏目公开“数字产品师（Gen AI 方向）”，并标明工作地点为广州／北京，这是具名职位记录，非泛化招聘方向。",
+      "requirements": "安利官方岗位索引只确定岗位名称、所属部门及工作城市，并未完整给出该职位的学历、专业资格、技术技能、薪酬和截至日期。页面展示的适合专业属于HHBA编辑相关度建议，实际申请应以原企业岗位详情页为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "软件工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官方岗位列表公开名称与城市，逐岗教育要求待核",
+      "url": "https://www.amway.com.cn/hrSchool",
+      "evidenceUrl": "https://www.amway.com.cn/hrSchool",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安利中国官方网站校招栏目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ops-beijing",
+      "title": "业务主任—运营支持（区域业务部）",
+      "category": "区域 / 运营",
+      "city": "北京",
+      "summary": "安利中国官方网站的校园招聘栏目公开“业务主任—运营支持（区域业务部）”，并标明工作地点为北京，这是具名职位记录，非泛化招聘方向。",
+      "requirements": "安利官方岗位索引只确定岗位名称、所属部门及工作城市，并未完整给出该职位的学历、专业资格、技术技能、薪酬和截至日期。页面展示的适合专业属于HHBA编辑相关度建议，实际申请应以原企业岗位详情页为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工商管理",
+        "市场营销",
+        "统计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官方岗位列表公开名称与城市，逐岗教育要求待核",
+      "url": "https://www.amway.com.cn/hrSchool",
+      "evidenceUrl": "https://www.amway.com.cn/hrSchool",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安利中国官方网站校招栏目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "compliance-beijing",
+      "title": "业务主任—合规管理（区域业务部）",
+      "category": "区域 / 合规",
+      "city": "北京",
+      "summary": "安利中国官方网站的校园招聘栏目公开“业务主任—合规管理（区域业务部）”，并标明工作地点为北京，这是具名职位记录，非泛化招聘方向。",
+      "requirements": "安利官方岗位索引只确定岗位名称、所属部门及工作城市，并未完整给出该职位的学历、专业资格、技术技能、薪酬和截至日期。页面展示的适合专业属于HHBA编辑相关度建议，实际申请应以原企业岗位详情页为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "法学",
+        "工商管理",
+        "合规管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官方岗位列表公开名称与城市，逐岗教育要求待核",
+      "url": "https://www.amway.com.cn/hrSchool",
+      "evidenceUrl": "https://www.amway.com.cn/hrSchool",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安利中国官方网站校招栏目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "data-beijing",
+      "title": "业务主任—数据分析（区域业务部）",
+      "category": "数据 / 分析",
+      "city": "北京",
+      "summary": "安利中国官方网站的校园招聘栏目公开“业务主任—数据分析（区域业务部）”，并标明工作地点为北京，这是具名职位记录，非泛化招聘方向。",
+      "requirements": "安利官方岗位索引只确定岗位名称、所属部门及工作城市，并未完整给出该职位的学历、专业资格、技术技能、薪酬和截至日期。页面展示的适合专业属于HHBA编辑相关度建议，实际申请应以原企业岗位详情页为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "数据科学与大数据技术",
+        "统计学",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官方岗位列表公开名称与城市，逐岗教育要求待核",
+      "url": "https://www.amway.com.cn/hrSchool",
+      "evidenceUrl": "https://www.amway.com.cn/hrSchool",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安利中国官方网站校招栏目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "data-huhehaote",
+      "title": "业务主任—数据分析（呼和浩特分公司）",
+      "category": "数据 / 分析",
+      "city": "呼和浩特",
+      "summary": "安利中国官方网站的校园招聘栏目公开“业务主任—数据分析（呼和浩特分公司）”，并标明工作地点为呼和浩特，这是具名职位记录，非泛化招聘方向。",
+      "requirements": "安利官方岗位索引只确定岗位名称、所属部门及工作城市，并未完整给出该职位的学历、专业资格、技术技能、薪酬和截至日期。页面展示的适合专业属于HHBA编辑相关度建议，实际申请应以原企业岗位详情页为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "数据科学与大数据技术",
+        "统计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官方岗位列表公开名称与城市，逐岗教育要求待核",
+      "url": "https://www.amway.com.cn/hrSchool",
+      "evidenceUrl": "https://www.amway.com.cn/hrSchool",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安利中国官方网站校招栏目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "market-nantong",
+      "title": "业务高级助理—市场赋能（南通分公司）",
+      "category": "市场 / 区域",
+      "city": "南通",
+      "summary": "安利中国官方网站的校园招聘栏目公开“业务高级助理—市场赋能（南通分公司）”，并标明工作地点为南通，这是具名职位记录，非泛化招聘方向。",
+      "requirements": "安利官方岗位索引只确定岗位名称、所属部门及工作城市，并未完整给出该职位的学历、专业资格、技术技能、薪酬和截至日期。页面展示的适合专业属于HHBA编辑相关度建议，实际申请应以原企业岗位详情页为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官方岗位列表公开名称与城市，逐岗教育要求待核",
+      "url": "https://www.amway.com.cn/hrSchool",
+      "evidenceUrl": "https://www.amway.com.cn/hrSchool",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安利中国官方网站校招栏目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "market-hefei",
+      "title": "业务高级助理—市场赋能（合肥分公司）",
+      "category": "市场 / 区域",
+      "city": "合肥",
+      "summary": "安利中国官方网站的校园招聘栏目公开“业务高级助理—市场赋能（合肥分公司）”，并标明工作地点为合肥，这是具名职位记录，非泛化招聘方向。",
+      "requirements": "安利官方岗位索引只确定岗位名称、所属部门及工作城市，并未完整给出该职位的学历、专业资格、技术技能、薪酬和截至日期。页面展示的适合专业属于HHBA编辑相关度建议，实际申请应以原企业岗位详情页为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官方岗位列表公开名称与城市，逐岗教育要求待核",
+      "url": "https://www.amway.com.cn/hrSchool",
+      "evidenceUrl": "https://www.amway.com.cn/hrSchool",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安利中国官方网站校招栏目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "market-taizhou",
+      "title": "业务高级助理—市场赋能（泰州分公司）",
+      "category": "市场 / 区域",
+      "city": "泰州",
+      "summary": "安利中国官方网站的校园招聘栏目公开“业务高级助理—市场赋能（泰州分公司）”，并标明工作地点为泰州，这是具名职位记录，非泛化招聘方向。",
+      "requirements": "安利官方岗位索引只确定岗位名称、所属部门及工作城市，并未完整给出该职位的学历、专业资格、技术技能、薪酬和截至日期。页面展示的适合专业属于HHBA编辑相关度建议，实际申请应以原企业岗位详情页为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官方岗位列表公开名称与城市，逐岗教育要求待核",
+      "url": "https://www.amway.com.cn/hrSchool",
+      "evidenceUrl": "https://www.amway.com.cn/hrSchool",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安利中国官方网站校招栏目",
+      "currentOpenVerified": false
+    }
+  ]
+}

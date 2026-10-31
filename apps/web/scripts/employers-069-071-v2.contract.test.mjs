@@ -5,7 +5,7 @@ const page=read('src/pages/UnifiedV2CompanyPage.tsx');
 const routeSource=page.split('const batch3756=/')[1]?.split('/.test(id)')[0];
 assert(routeSource,'Missing configured shared V2 route regex');
 const routePattern=new RegExp(routeSource);
-assert((routePattern.test('cn-autumn-069')&&routePattern.test('cn-autumn-071')&&routePattern.test('cn-autumn-080')),'All three next firms need existing four-panel V2 route');
+assert((routePattern.test('cn-autumn-069')&&routePattern.test('cn-autumn-071')&&routePattern.test('cn-autumn-083')),'All three next firms need existing four-panel V2 route');
 assert(page.includes('if(batch3756)return job.category===major'),'Exact category filter missing');
 assert(page.includes('hhba-kpmg-photo-grid')&&page.includes('hhba-kpmg-service-grid'),'Four sections changed');
 const roster=JSON.parse(read('src/data/domesticAutumnScreenshot20261028.json'));

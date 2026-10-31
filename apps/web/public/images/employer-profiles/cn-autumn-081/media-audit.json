@@ -1,0 +1,21 @@
+{
+  "company": "安利",
+  "reviewedAt": "2026-11-01",
+  "officialLogo": false,
+  "commercialReusePermissionConfirmed": false,
+  "mediaSourceNote": "During isolated CI the photo preparation step audits exact article/image URLs and SHA256, writing media-sources.json.",
+  "slots": [
+    {
+      "slot": 1,
+      "fallback": "images/employer-profiles/cn-autumn-081/photo1.svg",
+      "fallbackType": "NON-REAL HHBA illustration",
+      "onValidated": "images/employer-profiles/cn-autumn-081/photo1.jpg"
+    },
+    {
+      "slot": 2,
+      "fallback": "images/employer-profiles/cn-autumn-081/photo2.svg",
+      "fallbackType": "NON-REAL HHBA illustration",
+      "onValidated": "images/employer-profiles/cn-autumn-081/photo2.jpg"
+    }
+  ]
+}
