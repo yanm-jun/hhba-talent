@@ -8,10 +8,12 @@ import {assessPolicy,assessHousing} from '../../data/talentQuality';
 import {jiangsuGuideUrl} from '../../data/jiangsuGuides';
 import '../../styles/talent-jinan-guide-preview.css';
 
-function nationalRecordGuideUrl(kind:'policy'|'housing',id:string):string|undefined{
+function nationalRecordGuideUrl(kind:'policy'|'housing',id:string,city:string):string|undefined{
  if(id.startsWith('hb-'))return hubeiGuideUrl(kind,id);
  if(id.startsWith('fj-'))return fujianGuideUrl(kind,id);
  if(kind==='housing')return undefined;
+ // 河南 and 湖南 both use hn- policy IDs. The city must decide whether a Hunan guide exists.
+ if(id.startsWith('hn-')&&!['长沙','株洲','湘潭','衡阳','邵阳','岳阳','常德','张家界','益阳','郴州','永州','怀化','娄底','湘西'].includes(city))return undefined;
  const route:Record<string,string>={'nm-':'inner-mongolia','jl-':'jilin','hlj-':'heilongjiang','jx-':'jiangxi','hn-':'hunan'};
  for(const [prefix,slug]of Object.entries(route))if(id.startsWith(prefix))return '/talent-service/policy-guide-preview/'+slug+'/'+encodeURIComponent(id);
  return undefined;
@@ -65,7 +67,7 @@ export function UnifiedTalentRecordDetail({policy,housing}:{policy?:TalentPolicy
  const application=policy?.applicationUrl||housing?.applyUrl;
  const route=policy?'/talent-service/list/policies/':'/talent-service/list/housing/';
  const housingGuide=housing&&['hs-2024-talents-apartment-program','hs-2022-affordable-housing-policy'].includes(housing.id)?'/talent-service/policy-guide-preview/hengshui/apartment':housing&&['sjz-2026-talent-574','sjz-2026-affordable-rental','sjz-2026-public-rental-yishui','sjz-2026-public-rental-tanan','sjz-2026-public-rental-shenghe'].includes(housing.id)?'/talent-service/policy-guide-preview/shijiazhuang/housing':housing&&['ta-2026-city-affordable-rental','ta-2026-new-worker-public-rent'].includes(housing.id)?'/talent-service/policy-guide-preview/taian/housing':housing&&['zb-zichuan-shuian-202606','zb-zichuan-yuting-202606'].includes(housing.id)?'/talent-service/policy-guide-preview/zibo/housing':undefined;
- const link=policy?(policy.id.startsWith('js-')?jiangsuGuideUrl('policy',policy.id):nationalRecordGuideUrl('policy',policy.id)||fullGuide(policy.id)):housing?(housing.id.startsWith('js-')?jiangsuGuideUrl('housing',housing.id):nationalRecordGuideUrl('housing',housing.id)||housingGuide):undefined;
+ const link=policy?(policy.id.startsWith('js-')?jiangsuGuideUrl('policy',policy.id):nationalRecordGuideUrl('policy',policy.id,policy.city)||fullGuide(policy.id)):housing?(housing.id.startsWith('js-')?jiangsuGuideUrl('housing',housing.id):nationalRecordGuideUrl('housing',housing.id,housing.city)||housingGuide):undefined;
  return <main className="jgd-page">
   <nav className="jgd-breadcrumb"><Link to="/talent-service">人才服务</Link><span>›</span><Link to={'/talent-service/city/'+encodeURIComponent(item.city)}>{item.city}</Link><span>›</span>{policy?'人才政策':housing?.housingCategory||'人才住房'}</nav>
   <header className="jgd-hero"><div className="jgd-hero-text"><span className="jgd-kicker">HHBA / 全国统一政策详情标准</span><h1>{item.title}</h1><p>{policy?.summary||housing?.statusNote}</p>
