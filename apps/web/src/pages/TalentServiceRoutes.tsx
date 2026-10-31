@@ -1,3 +1,4 @@
+import {SICHUAN_21_REGIONS,sichuanGuideUrl,buildSichuanGuide} from '../data/sichuanGuides';
 import {buildHainanGuide,hainanGuideUrl,HAINAN_TALENT_CITIES} from '../data/hainanGuides';
 import {buildHunanGuide} from '../data/hunanGuides';
 import {getHubeiGuide} from '../data/hubeiGuides';
@@ -174,7 +175,15 @@ function CityHub({city}:{city:string}){
      </Link>)}
    </div>
   </section>
-  {HAINAN_TALENT_CITIES.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="海南省四城人才政策及住房V5.1指南">
+  {SICHUAN_21_REGIONS.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="四川省人才服务V5.1分步办理">
+ <div className="ts-sub-section-heading"><h2>{match.name} · 政策与人才安居分步核验</h2></div>
+ <p>{policies.length?'本市（州）已核实的政策提供资格分支、材料清单、办理步骤和政府原文。当前事项是否开放及人才公寓剩余房源仍需官方确认。':'已进入四川省21个地级行政区服务目录。本地政府政策和独立住房一手资料尚未核实，暂不编造补贴、申请入口或房源。'}</p>
+ {policies.length+homes.length>0&&<div className="ts-sub-grid">
+  {policies.map(p=><Link key={p.id} className="ts-sub-tile" to={sichuanGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>{p.category} · 政策资料按B/C分级 · {policyStatus(p)}</span><ArrowRight size={15}/></Link>)}
+  {homes.map(h=><Link key={h.id} className="ts-sub-tile" to={sichuanGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>住房{h.kind==='program'?'管理制度':'具体项目'} · {housingStatus(h)}</span><ArrowRight size={15}/></Link>)}
+ </div>}
+ </section>}
+ {HAINAN_TALENT_CITIES.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="海南省四城人才政策及住房V5.1指南">
  <div className="ts-sub-section-heading"><h2>{match.name} · 人才政策与住房分步办理指南</h2></div>
  <p>{match.name==='三沙'?'三沙适用海南2026安居房管理办法第44条跨市县统筹规则；联合实施细则、受理入口和可选房源尚待核验。':'正式来源及分步核查均为B级资料，当前政策受理及空房需以政府最新公告为准。'}</p>
  <div className="ts-sub-grid">
@@ -354,6 +363,11 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
    province==='jiangxi'?buildJiangxiGuide(decode(fragments[3]||'')):
    buildHunanGuide(decode(fragments[3]||''));
   body=guide?<UnifiedPolicyGuide data={guide}/>:<><Bread current="指南尚未收录"/><section className="ts-sub-header"><h1>该指南暂未核验</h1><Link to="/talent-service/cities">返回城市目录</Link></section></>;
+ }
+ else if(kind==='policy-guide-preview'&&fragments[2]==='sichuan'){
+  const t=fragments[3]==='housing'?'housing':fragments[3]==='policy'?'policy':null;
+  const guide=t?buildSichuanGuide(t,decode(fragments[4]||'')):null;
+  body=guide?<UnifiedPolicyGuide data={guide}/>:<section className="ts-sub-header"><h1>该四川地区政策或住房指南尚待核验</h1><Link to="/talent-service/cities">返回城市目录</Link></section>;
  }
  else if(kind==='policy-guide-preview'&&fragments[2]==='hainan'){
   const t=fragments[3]==='housing'?'housing':fragments[3]==='policy'?'policy':null;
