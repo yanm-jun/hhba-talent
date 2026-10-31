@@ -195,6 +195,13 @@ jobs:
           test -s apps/web/public/images/employer-profiles/cn-autumn-157/photo1.jpg
           test -s apps/web/public/images/employer-profiles/cn-autumn-157/photo2.jpg
           test -s apps/web/public/images/employer-profiles/cn-autumn-157/media-audit.json
+      - name: Verify MINIEYE #035 brand and two different documentary show photos
+        run: |
+          python apps/web/scripts/prepare-minieye-media.py
+          test -s apps/web/public/images/employer-profiles/cn-autumn-035/logo.webp
+          test -s apps/web/public/images/employer-profiles/cn-autumn-035/photo1.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-035/photo2.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-035/media-audit.json
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
@@ -210,6 +217,9 @@ jobs:
       - name: Check KEYENCE 2027 factual recruiting and approved company card template
         working-directory: apps/web
         run: node scripts/keyence-v2.contract.test.mjs
+      - name: Validate MINIEYE 035 source-backed positions, six major tabs and real media
+        working-directory: apps/web
+        run: node scripts/minieye-v2.contract.test.mjs
       - name: Validate source-backed talent policies and housing records
         working-directory: apps/web
         run: node scripts/audit-talent-service.mjs
@@ -622,6 +632,8 @@ jobs:
         run: |
           node scripts/materialize-company-route-entries.mjs
           test -s dist/companies/autumn/cn-autumn-034/index.html
+          test -s dist/companies/autumn/cn-autumn-035/index.html
+          cmp dist/index.html dist/companies/autumn/cn-autumn-035/index.html
           test -s dist/companies/autumn/cn-autumn-157/index.html
           cmp dist/index.html dist/companies/autumn/cn-autumn-157/index.html
           cmp dist/index.html dist/companies/autumn/cn-autumn-034/index.html
@@ -778,6 +790,7 @@ jobs:
           curl -fsS "$HHBA_TEST_BASE" >/dev/null
           node scripts/mainline-v2-browser.mjs
           node scripts/pxw-v2.browser.mjs
+          node scripts/minieye-v2.browser.mjs
           node scripts/keyence-v2.browser.mjs
           node scripts/study-universities.browser.mjs
           node scripts/minot-state.browser.mjs
@@ -823,6 +836,11 @@ jobs:
                                'images/employer-profiles/cn-autumn-027/logo.png',
                                'companies/autumn/cn-autumn-034/',
                                'companies/autumn/cn-autumn-034/index.html',
+                               'companies/autumn/cn-autumn-035/',
+                               'companies/autumn/cn-autumn-035/index.html',
+                               'images/employer-profiles/cn-autumn-035/logo.webp',
+                               'images/employer-profiles/cn-autumn-035/photo1.jpg',
+                               'images/employer-profiles/cn-autumn-035/photo2.jpg',
                                'companies/autumn/cn-autumn-157/',
                                'companies/autumn/cn-autumn-157/index.html',
                                'images/employer-profiles/cn-autumn-157/logo.webp',
