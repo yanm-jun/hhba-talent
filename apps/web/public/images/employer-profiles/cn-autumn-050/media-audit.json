@@ -1,0 +1,39 @@
+{
+  "logo.png": {
+    "company": "汇蓉国科",
+    "source": "editorial-text-only",
+    "sourcePage": "https://www.cwrep.cn/news/zhxw/380.html",
+    "sha256": "888af0b45a55074edfdbdc91b610cbb4eb4816e2f32a24ac58b59341bde50705",
+    "sourceSha256": "editorial-050",
+    "width": 1000,
+    "height": 280,
+    "verified": false,
+    "editorialFallback": true,
+    "companyIdentityFrom": "user-registered company list",
+    "note": "Distinct text identification graphic; NOT the company's official trademark"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "editorialFallback": false,
+    "company": "汇蓉国科",
+    "source": "https://saas-chengdu.oss-cn-chengdu.aliyuncs.com/uploads/20230726/c0624d61bcfc7be82283e4dea62962eb.png?imageView2/2/w/2000/q/89/format/webp",
+    "sourcePage": "https://tfxqsh.com/4/31325/1981832",
+    "sourceSha256": "74c5f479a07022d93cf77b6673dfdd176d42ef658b200bf1f92e752174b8d4ea",
+    "sha256": "6f47505d698303886a4dcfd750c662b28b5937f2564b31e14d980b05c261504c",
+    "width": 1450,
+    "height": 239,
+    "note": "Genuine source company-associated graphic; does not alone prove office photo"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "editorialFallback": false,
+    "company": "汇蓉国科",
+    "source": "https://img-z.kczg.org.cn/2023/02/15/news/554802.png",
+    "sourcePage": "https://www.kczg.org.cn/annualmeeting/rankdetail?id=547",
+    "sourceSha256": "7a7c85e0aa5f1593c585f75f626e945244b2245df575af38fb9c91056e78a8a3",
+    "sha256": "825628e441315a3eb67bf506cda449417569f96da7fbfe48125fd45e5e3489dd",
+    "width": 1259,
+    "height": 672,
+    "note": "Genuine source company-associated graphic; does not alone prove office photo"
+  }
+}
