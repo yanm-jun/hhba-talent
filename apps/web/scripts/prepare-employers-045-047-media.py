@@ -85,7 +85,7 @@ for num,company in CONFIG.items():
  targets=[('logo.png',company['home']),('photo1.jpg',company['photos'][0]),('photo2.jpg',company['photos'][1])]
  for name,pages in targets:
   dst=root/name;entry=audit.get(name)
-  if num=='046' and name=='logo.png' and entry and not entry.get('source','').startswith('https://commons.wikimedia.org/wiki/Special:FilePath/VSOL_LOGO.jpg'):
+  if num=='046' and name=='logo.png' and entry and not entry.get('source','').startswith(('https://images.crunchbase.com/image/upload/','https://smartgridmexico.mx/img/')):
    print('HHBA_REJECT_046_NONLOGO_BRAND_STORY_IMAGE',entry.get('source'),flush=True);entry=None
   if entry and entry.get('verified') and dst.is_file() and len(dst.read_bytes())>2000 and sha256(dst.read_bytes()).hexdigest()==entry.get('sha256'):
    used.add(entry['sourceSha256']);print('HHBA_PINNED_MEDIA',num,name,flush=True);continue
@@ -105,8 +105,9 @@ for num,company in CONFIG.items():
    except Exception as err:print('HHBA_MEDIA_PAGE_WARNING',num,name,page,str(err)[:130],flush=True)
   candidates.sort(reverse=True)
   if num=='046' and name=='logo.png':
-   # Brand wordmark with 2021 Wikimedia Commons attribution. Never use About Us banner as logo.
-   candidates=[(100,'https://commons.wikimedia.org/wiki/Special:FilePath/VSOL_LOGO.jpg','https://commons.wikimedia.org/wiki/File:VSOL_LOGO.jpg')]+candidates
+   # VSOL optical networking company brand as shown on its Crunchbase company profile.
+   # Caution: Wikimedia VSOL_LOGO.jpg belongs to a DIFFERENT Korean brand; never use it.
+   candidates=[(105,'https://images.crunchbase.com/image/upload/c_pad%2Cf_auto%2Cq_auto%3Aeco%2Cdpr_1/mbr3wxhvhheugurnptma?ik-sanitizeSvg=true','https://www.crunchbase.com/organization/v-solution-telecommunication-technology-co-ltd'),(104,'https://smartgridmexico.mx/img/p/4/0/6/3/1/40631-large_default.jpg','https://smartgridmexico.mx/21489-olt-modular-tipo-chasis-gpon-xgs-pon-combo-7-ranuras-de-servicio-incluye-1-tarjeta-de-servicio-de-16-puertos-gpon.html')]+candidates
   dedup={}; ordered=[]
   for metric,u,page in candidates:
    if u not in dedup:
