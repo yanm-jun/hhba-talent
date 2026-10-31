@@ -141,6 +141,16 @@ function CityHub({city}:{city:string}){
    </div>
   </section>
   {match.name==='东营'&&<section className="ts-sub-section"><h2>东营 · 2026政策衔接与安居核验</h2><p>2026年8月人才新政出台，原2022版人才补贴已废止；旧规补报在9月30日结束。原博士4000元／月、硕士2000元／月与首购补贴等旧数字，仅作历史参考。新进人才请核对新规正式申请细则。</p><p>住房线索：河口区三义和住宅小区二期在2026年5月曾公告70套保租房统筹配租，报名6月30日截止。现仅核验到对区住建局公告的媒体转载，政府官网原文及新批次尚待核验。因此不将70套冒充当前可租房源，也不纳入已确认住房项目。</p><p><a href="https://ady.dongyingnews.cn/share/YS01MzctNDM0NzYxOTM.html" target="_blank" rel="noopener noreferrer">查看2026年河口区住房旧批次公告转载（非官方办理入口）</a></p><p><Link to="/talent-service/policy-guide-preview/dongying/transition">查看2026新旧政策核查指南 <ArrowRight size={14}/></Link></p></section>}
+  {match.name==='石家庄'&&<section className="ts-sub-section" aria-label="石家庄人才政策与住房指南">
+   <div className="ts-sub-section-heading"><h2>石家庄 · 2026人才绿卡与住房保障</h2></div>
+   <p>河北第一城。市级人才绿卡B卡租房补助按学士1000元/月、硕士1500元/月、博士3000元/月核定；购房补贴按学士5万、硕士10万、博士30万元核定。高校毕业生一次性安家补贴另按博士5万、硕士3万、学士1万办理。市级人才公寓第九批574套和市区公租房2026年8月批次都已结束，不能当作实时空房。</p>
+   <div className="ts-sub-grid">
+    <Link to="/talent-service/policy-guide-preview/shijiazhuang/rent" className="ts-sub-tile"><strong>B卡房租补助</strong><span>核对卡有效期、5年期限和季度办理</span><ArrowRight size={15}/></Link>
+    <Link to="/talent-service/policy-guide-preview/shijiazhuang/home" className="ts-sub-tile"><strong>B卡首套房购房补贴</strong><span>博士30万、硕士10万、学士5万</span><ArrowRight size={15}/></Link>
+    <Link to="/talent-service/policy-guide-preview/shijiazhuang/settlement" className="ts-sub-tile"><strong>毕业生一次性安家补贴</strong><span>企业就业与首次创业两条路径</span><ArrowRight size={15}/></Link>
+    <Link to="/talent-service/policy-guide-preview/shijiazhuang/housing" className="ts-sub-tile"><strong>人才公寓与住房保障</strong><span>第九批574套、保租房及公租房历史数据</span><ArrowRight size={15}/></Link>
+   </div>
+  </section>}
   {match.name==='菏泽'&&<section className="ts-sub-section" aria-label="菏泽重点人才政策指南"><div className="ts-sub-section-heading"><h2>菏泽 · 2026政策与人才安居核验</h2></div>
    <p>企业新引进高校毕业生生活补贴按学历与市县配套核算；博士硕士2026年5月购房补贴原批次已截止。牡丹区2026年9月公租房通告转载列有五小区112套历史数据，官方原始房源及实时空房尚待核实；人才集团有住房管理服务但未取得2026独立公寓项目清单。</p>
    <div className="ts-sub-grid">
