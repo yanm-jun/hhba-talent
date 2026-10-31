@@ -1,0 +1,57 @@
+name: HHBA Zhejiang 11-city V5.1 isolated acceptance (no production Pages)
+on:
+  push:
+    branches:
+      - feature/talent-zhejiang
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-zhejiang-11city-v51
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Run Zhejiang 11-city and national V5.1 contracts
+        working-directory: apps/web
+        run: |
+          node --experimental-strip-types scripts/test-zhejiang-11city-v51.mjs
+          node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+          node --experimental-strip-types scripts/test-talent-cities.mjs
+          node scripts/global-talent-nav.contract.test.mjs
+      - name: Compile static preview without touching official Pages
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '0'
+          HHBA_PAGES_BASE: '/'
+          VITE_HHBA_MATCH_API_ORIGIN: ''
+        run: npm run build
+      - name: Ensure all Zhejiang city names are in the deployed JS bundle
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const js=fs.readdirSync('dist/assets').filter(f=>f.endsWith('.js')).map(f=>fs.readFileSync('dist/assets/'+f,'utf8')).join('');
+          for(const name of ['杭州','宁波','温州','嘉兴','湖州','绍兴','金华','衢州','舟山','台州','丽水'])if(!js.includes(name))throw Error('Zhejiang city missing: '+name);
+          for(const id of ['hz-2026-graduate-rent','nb-fh-2026-rent','tz-2026-youth-house-voucher','ls-2026-bihu-apartment-construction'])if(!js.includes(id))throw Error('Source record not bundled: '+id);
+          if(!fs.existsSync('dist/index.html'))throw Error('No generated index.html');
+          console.log('ZHEJIANG_11_CITY_STATIC_BUNDLE_OK');
+          JS
+      - name: Upload isolated static site for manual review
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-zhejiang-11cities-static
+          path: apps/web/dist/
+          if-no-files-found: error
+          retention-days: 14
