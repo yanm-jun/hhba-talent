@@ -1,0 +1,272 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-063",
+  "name": "桑椹汽配",
+  "displayName": "桑椹汽配",
+  "englishName": "Suncent",
+  "aliases": [
+    "桑棋汽配",
+    "桑椹",
+    "深圳桑椹汽配科技有限公司",
+    "SUNCENT",
+    "桑椹汽配27秋招",
+    "桑椹汽配2027"
+  ],
+  "industry": "汽车后市场 · 汽车照明 · 汽配产品 · 跨境电商",
+  "subtitle": "深圳桑椹汽配科技有限公司 · 广东深圳 · 2016年成立",
+  "overview": "桑椹汽配成立于2016年，总部位于深圳，主营汽车照明、汽车用品、汽车维修配件和汽车电子的设计研发与全球销售，旗下有SEALIGHT、Torchbeam、KYX、KAX、SHOCKFLO等品牌，面向北美、欧洲、日本等市场开展电商与品牌运营。2027届校招聚合资料披露AI技术、产品、供应链、业务和综合培养等方向，真实招聘官网未核实本届全部逐岗JD，不将同类岗位随意拆分为已开放独立职位。原名单“桑棋汽配”为错别字，保留为搜索别名。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.suncentgroup.com/about/",
+    "https://www.suncentgroup.com/contact/",
+    "https://www.suncentgroup.com/join_us/job-list.html",
+    "https://www.wondercv.com/xiaozhao/suncent-auto-parts-2027-campus-autumn-19808-5aa6c9/",
+    "https://www.wondercv.com/xiaozhao/sangchen-auto-parts-2027-global-campus-19826-c0186f/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-063/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-063/photo1.svg",
+        "caption": "HHBA 业务示意图 1（非企业实景）",
+        "alt": "HHBA原创独立业务主题示意插图，非真实企业照片",
+        "note": "非企业实景、非官方拍摄，图像来源在同目录media-audit.json留存"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-063/photo2.svg",
+        "caption": "HHBA 业务示意图 2（非企业实景）",
+        "alt": "HHBA原创独立业务主题示意插图，非真实企业照片",
+        "note": "非企业实景、非官方拍摄，图像来源在同目录media-audit.json留存"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.suncentgroup.com/join_us/job-list.html",
+    "label": "桑椹汽配官网招聘栏目（2027岗位需复核）",
+    "status": "unconfirmed",
+    "subject": "深圳桑椹汽配科技有限公司",
+    "note": "2027届方向来自二级汇总；公司官网招聘栏目可核实企业主体，但当前页面未显示完整2027职位，不能当成已经开放申请的2027专用网申链接。招聘邮箱由公司官方联系方式提供。"
+  },
+  "majorIntro": "按2027届二级校招来源中已披露的方向分组，专业标签是探索推荐。部分专业、技能细则来自公开摘要，而非每个职位的官方终版JD。",
+  "preferredMajors": [
+    "人工智能",
+    "计算机科学与技术",
+    "软件工程",
+    "数据科学与大数据技术",
+    "车辆工程",
+    "机械设计制造及其自动化",
+    "电子信息工程",
+    "产品设计",
+    "物流管理",
+    "供应链管理",
+    "电子商务",
+    "市场营销",
+    "财务管理"
+  ],
+  "photoNote": "本批媒体暂用3张彼此独立的SVG原创示意文件：1张标注非官方的品牌字标、2张标注非实景的业务插画，不冒充官方Logo或办公室照片。真实图片和商标需独立核验来源及使用授权。",
+  "business": [
+    {
+      "title": "汽车照明品牌及光学研发",
+      "description": "旗下SEALIGHT与Torchbeam品牌面向全球汽车照明改装和替换市场，围绕光效、适配性和体验开展产品创新。",
+      "tags": "照明 · 研发",
+      "details": [
+        "汽车灯泡及照明方案",
+        "光学设计与测试",
+        "车型与适配研发"
+      ]
+    },
+    {
+      "title": "汽车用品与户外场景",
+      "description": "KYX品牌覆盖汽车用品及车主出行场景需求，将产品设计、材料和用户体验结合。",
+      "tags": "车用品 · 产品",
+      "details": [
+        "车辆用品产品企划",
+        "出行场景消费者研究",
+        "外观与结构优化"
+      ]
+    },
+    {
+      "title": "汽车维修替换配件",
+      "description": "KAX品牌面向汽车维修零部件市场，提供相关汽车配件和采购服务。",
+      "tags": "配件 · 维修",
+      "details": [
+        "维修配件产品开发",
+        "适配与目录管理",
+        "全球汽配销售"
+      ]
+    },
+    {
+      "title": "汽车电子与充电产品",
+      "description": "SHOCKFLO品牌聚焦汽车电子及相关实用电子产品，结合硬件设计与全球渠道开发。",
+      "tags": "汽车电子 · 硬件",
+      "details": [
+        "汽车电子产品规划",
+        "PCB电子技术应用",
+        "功能与可靠性验证"
+      ]
+    },
+    {
+      "title": "跨境品牌与电商渠道",
+      "description": "通过Amazon、eBay、Walmart及自有独立站等国际渠道开展品牌销售及客户运营。",
+      "tags": "跨境 · 品牌",
+      "details": [
+        "海外电商运营",
+        "国际广告与用户增长",
+        "多市场品牌协同"
+      ]
+    },
+    {
+      "title": "全球物流与供应链协作",
+      "description": "连接产品研发、供货、质量、渠道和美国物流中转设施，支持海外订单交付与履约。",
+      "tags": "供应链 · 物流",
+      "details": [
+        "生产和采购计划",
+        "国际物流交付",
+        "供应商与库存协同"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "ai-shenzhen-2027",
+      "title": "AI技术类方向（深圳，2027届）",
+      "category": "AI / 开发",
+      "city": "广东深圳",
+      "summary": "公开2027招聘摘要明确深圳AI技术类岗位方向，涉及LLM应用、RAG、Agent及业务场景工具化。",
+      "requirements": "来源说明使用Python开展AI应用探索，并在供应链预测、内容、客服等场景推进部署与迭代；具体学历、技术考核、团队名及招聘状态须核对官网最终招聘信息。",
+      "majorNames": [
+        "人工智能",
+        "计算机科学与技术",
+        "软件工程",
+        "数据科学与大数据技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
+      "url": "https://www.suncentgroup.com/join_us/job-list.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/suncent-auto-parts-2027-campus-autumn-19808-5aa6c9/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳桑椹汽配科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ai-changsha-2027",
+      "title": "AI技术类方向（长沙，2027届）",
+      "category": "AI / 开发",
+      "city": "湖南长沙",
+      "summary": "2027公开摘要明确长沙AI技术方向，研发重点在企业跨境业务及自动化工具的模型应用落地。",
+      "requirements": "公开描述提及Python、大模型提示词、检索增强、Agent、向量库和评估流程；这些是来源所提技术方向，不代表所有应届申请者必须同时精通每项技术。",
+      "majorNames": [
+        "人工智能",
+        "软件工程",
+        "计算机科学与技术",
+        "数据科学与大数据技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
+      "url": "https://www.suncentgroup.com/join_us/job-list.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/suncent-auto-parts-2027-campus-autumn-19808-5aa6c9/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳桑椹汽配科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "product-2027",
+      "title": "产品类方向（2027届）",
+      "category": "产品 / 车辆",
+      "city": "湖南长沙",
+      "summary": "校招摘要将车辆应用工程师、汽配目录工程师及产品企划归入产品类，涉及车型适配与市场产品研发。",
+      "requirements": "招聘方向涵盖产品市场调研、PRD协作、拆装测试、车型适配与目录数据标准化；未核实逐岗准确名称和全部专业要求，不能把产品类方向直接视为单一正式职位。",
+      "majorNames": [
+        "车辆工程",
+        "机械设计制造及其自动化",
+        "汽车服务工程",
+        "产品设计"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
+      "url": "https://www.suncentgroup.com/join_us/job-list.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/suncent-auto-parts-2027-campus-autumn-19808-5aa6c9/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳桑椹汽配科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "supply-2027",
+      "title": "供应链类方向（2027届）",
+      "category": "供应链 / 制造",
+      "city": "广东深圳／湖南长沙／浙江宁波余姚（实际单岗待核）",
+      "summary": "招聘摘要披露供应链计划、物流、SOP、供应商质量工程等方向，围绕跨境汽配产品交付开展工作。",
+      "requirements": "公开方向涉及跟踪生产进度、库存周转、运输协调和订单交付，并区分计划、物流与质量模块；工作地点请依据最新岗位JD确定，不能视为全部城市可任选。",
+      "majorNames": [
+        "物流管理",
+        "供应链管理",
+        "工业工程",
+        "质量管理工程",
+        "机械设计制造及其自动化"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
+      "url": "https://www.suncentgroup.com/join_us/job-list.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/suncent-auto-parts-2027-campus-autumn-19808-5aa6c9/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳桑椹汽配科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "business-2027",
+      "title": "业务类方向（2027届）",
+      "category": "海外业务 / 营销",
+      "city": "深圳／长沙／宁波（按校招批次，具体待核）",
+      "summary": "2027汇总来源列出业务类招聘大类，结合企业汽配国际品牌运营，适合关注营销和海外渠道。",
+      "requirements": "仅可确认业务类大方向及本批招聘涉及城市，未得到官网完整职位列表、英语等级、薪资、所负责市场及客户种类等细则；以下专业关联属于平台探索建议。",
+      "majorNames": [
+        "国际经济与贸易",
+        "电子商务",
+        "市场营销",
+        "英语",
+        "商务英语"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
+      "url": "https://www.suncentgroup.com/join_us/job-list.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/suncent-auto-parts-2027-campus-autumn-19808-5aa6c9/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳桑椹汽配科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "management-2027",
+      "title": "综合职能／管培方向（2027届）",
+      "category": "综合职能 / 管培",
+      "city": "深圳／长沙（具体待核）",
+      "summary": "二级校招资料列出职能类和管培生类招聘方向，主要对应企业运营支持与人才培养通道。",
+      "requirements": "未能确认财务、人资、行政等细分岗位是否逐项发布；此处只展示职能与培养大类，学历、部门、地点及专业限制均以公司最终公告为准，不伪造职位详情。",
+      "majorNames": [
+        "工商管理",
+        "人力资源管理",
+        "财务管理",
+        "会计学",
+        "法学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
+      "url": "https://www.suncentgroup.com/join_us/job-list.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/suncent-auto-parts-2027-campus-autumn-19808-5aa6c9/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳桑椹汽配科技有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}

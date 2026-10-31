@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-064",
+  "name": "新海威",
+  "displayName": "新海威",
+  "englishName": "Ningbo New Highway Import & Export",
+  "aliases": [
+    "宁波新海威进出口有限公司",
+    "宁波新海威",
+    "新海威进出口",
+    "新海威2027",
+    "海威星计划",
+    "Ningbo New Highway"
+  ],
+  "industry": "国际贸易 · 日用消费品出口 · 跨境电商 · 海外仓",
+  "subtitle": "宁波新海威进出口有限公司 · 浙江宁波 · 2005年成立",
+  "overview": "宁波新海威进出口有限公司是一家宁波日用消费品出口和跨境电商企业，业务以厨房、卫浴、宠物、户外、园林及电子日用品为主，2027届“海威星计划”招聘公开材料列有外销、采购、跟单、财务、行政五类助理岗位，工作地点主要宁波，学历条件为统招本科。需要特别与其他名叫“新海威”的电子科技企业区分，不混用其嵌入式、FPGA或AI算法招聘岗位。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.wondercv.com/xiaozhao/xinhaiwei-2027-campus-recruitment-19722-a1d91f/",
+    "https://www.wondercv.com/xiaozhao/xinhaiwei-ningbo-2027-campus-19758-80b6db/",
+    "https://ycyg.nbhr.org.cn/JobFairJob/info?guid=173c215a-f12e-40bd-8cfc-d8201b860e8e",
+    "https://m.zhipin.com/companys/646371ffba38d6e41HNz2dm0.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-064/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-064/photo1.svg",
+        "caption": "HHBA 业务示意图 1（非企业实景）",
+        "alt": "HHBA原创独立业务主题示意插图，非真实企业照片",
+        "note": "非企业实景、非官方拍摄，图像来源在同目录media-audit.json留存"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-064/photo2.svg",
+        "caption": "HHBA 业务示意图 2（非企业实景）",
+        "alt": "HHBA原创独立业务主题示意插图，非真实企业照片",
+        "note": "非企业实景、非官方拍摄，图像来源在同目录media-audit.json留存"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://ycyg.nbhr.org.cn/JobFairJob/info?guid=173c215a-f12e-40bd-8cfc-d8201b860e8e",
+    "label": "宁波人社平台企业岗位页（非2027专属网申）",
+    "status": "unconfirmed",
+    "subject": "宁波新海威进出口有限公司",
+    "note": "宁波市人社平台可核实招聘主体及部分助理类职位，但不是已核实的2027届专门投递页面。校招简章在第三方平台公布，需以企业HR或原始公告核对邮箱、仍在招聘状态和具体批次。"
+  },
+  "majorIntro": "仅采用主体为宁波新海威进出口有限公司的2027海威星计划五类助理职位；外销助理英语CET6/TEM4+来源明确，其余岗位的具体学历为统一统招本科口径，专业系关联建议。",
+  "preferredMajors": [
+    "国际经济与贸易",
+    "英语",
+    "商务英语",
+    "采购管理",
+    "供应链管理",
+    "物流管理",
+    "会计学",
+    "财务管理",
+    "工商管理",
+    "行政管理",
+    "电子商务"
+  ],
+  "photoNote": "3张本地原创SVG为非官方字标及两张业务信息示意，不是企业Logo、真实办公楼或员工实景；待获取企业许可的真实照片再更新。",
+  "business": [
+    {
+      "title": "B2B日用消费品出口",
+      "description": "为全球客户供应厨房、卫浴、清洁等家庭日用消费品，提供出口贸易与客户需求跟进。",
+      "tags": "出口贸易 · B2B",
+      "details": [
+        "厨房与卫浴产品外销",
+        "贸易订单管理",
+        "国际客户协作"
+      ]
+    },
+    {
+      "title": "宠物与户外园林品类",
+      "description": "围绕宠物生活、户外及园林消费品等多种家庭用品品类组织选品、供应及国际销售。",
+      "tags": "宠物 · 户外",
+      "details": [
+        "宠物用品产品组合",
+        "户外园林商品",
+        "多品类开发"
+      ]
+    },
+    {
+      "title": "跨境自有品牌运营",
+      "description": "布局B2C跨境品牌，开展商品上架、定价、内容运营及销售数据分析。",
+      "tags": "品牌 · B2C",
+      "details": [
+        "自有品牌经营",
+        "跨境电商商品规划",
+        "销售及消费者分析"
+      ]
+    },
+    {
+      "title": "全球多平台电商",
+      "description": "在Amazon、Walmart和TEMU等平台开展跨境销售、流量运营与订单履约。",
+      "tags": "电商 · 全球市场",
+      "details": [
+        "全球平台选品",
+        "平台销售与营销",
+        "跨境物流协作"
+      ]
+    },
+    {
+      "title": "美国海外仓与配送",
+      "description": "通过美国东部、西部及中部海外仓业务安排开展库存管理、备货和订单履约支持。",
+      "tags": "海外仓 · 物流",
+      "details": [
+        "库存预测与调拨",
+        "仓配交付服务",
+        "海外订单履约"
+      ]
+    },
+    {
+      "title": "采购品控和国际跟单",
+      "description": "连接工厂、采购、商品开发、报关与运输环节，保障出口贸易订单质量和交期。",
+      "tags": "采购 · 品控",
+      "details": [
+        "供应商与采购协同",
+        "外贸跟单与验货",
+        "国际贸易交付"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "export-assistant-2027",
+      "title": "外销助理（2027届）",
+      "category": "外贸 / 销售",
+      "city": "浙江宁波",
+      "summary": "协助海外客户沟通、销售订单及业务跟进，属于海威星计划外贸业务类的明确助理岗位。",
+      "requirements": "2027校招简章注明统招本科应届毕业生、外销岗英语CET6或TEM4及以上；具体其他语言能力、提成、销售市场、岗位直属部门仍以企业正式JD为准。",
+      "majorNames": [
+        "国际经济与贸易",
+        "英语",
+        "商务英语",
+        "市场营销"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
+      "url": "https://ycyg.nbhr.org.cn/JobFairJob/info?guid=173c215a-f12e-40bd-8cfc-d8201b860e8e",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/xinhaiwei-2027-campus-recruitment-19722-a1d91f/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "宁波新海威进出口有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "procurement-assistant-2027",
+      "title": "采购助理（2027届）",
+      "category": "采购 / 供应链",
+      "city": "浙江宁波",
+      "summary": "协助家庭消费品采购、供应商联系和产品交付计划，是2027海威星计划公开的外贸业务类职位。",
+      "requirements": "二级校招材料明确为统招本科及岗位相关专业，未披露供应商议价、品类范围、考证要求等完整单岗细则；采购管理和物流专业关联属于平台探索建议。",
+      "majorNames": [
+        "采购管理",
+        "供应链管理",
+        "物流管理",
+        "国际经济与贸易"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
+      "url": "https://ycyg.nbhr.org.cn/JobFairJob/info?guid=173c215a-f12e-40bd-8cfc-d8201b860e8e",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/xinhaiwei-2027-campus-recruitment-19722-a1d91f/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "宁波新海威进出口有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "order-followup-2027",
+      "title": "跟单助理（2027届）",
+      "category": "外贸 / 跟单",
+      "city": "浙江宁波",
+      "summary": "参与国际贸易订单处理、交货节点跟踪、订单单据协同和客户沟通的辅助工作。",
+      "requirements": "来源能够确认岗位名称、2027届统招本科及相关专业要求，但未公开该岗位语言证书、工作时段和具体外贸系统经验；不将外销助理的CET6要求自动加到本岗。",
+      "majorNames": [
+        "国际经济与贸易",
+        "物流管理",
+        "供应链管理",
+        "英语"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
+      "url": "https://ycyg.nbhr.org.cn/JobFairJob/info?guid=173c215a-f12e-40bd-8cfc-d8201b860e8e",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/xinhaiwei-2027-campus-recruitment-19722-a1d91f/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "宁波新海威进出口有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "finance-assistant-2027",
+      "title": "财务助理（2027届）",
+      "category": "财务 / 职能",
+      "city": "浙江宁波",
+      "summary": "在贸易企业财务管理和订单财务协作等方向工作，是2027海威星计划列明的职能管理类职位。",
+      "requirements": "公开简章只明确统招本科、岗位相关专业及财务助理名称，具体会计证书、资金结算业务、税务职责和软件条件未逐项公布；相关专业为推荐关注方向。",
+      "majorNames": [
+        "会计学",
+        "财务管理",
+        "审计学",
+        "金融学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
+      "url": "https://ycyg.nbhr.org.cn/JobFairJob/info?guid=173c215a-f12e-40bd-8cfc-d8201b860e8e",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/xinhaiwei-2027-campus-recruitment-19722-a1d91f/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "宁波新海威进出口有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "administration-assistant-2027",
+      "title": "行政助理（2027届）",
+      "category": "行政 / 职能",
+      "city": "浙江宁波",
+      "summary": "支持行政流程、部门协同、综合事务和日常办公服务，属于2027届职能管理类职位。",
+      "requirements": "校招汇总披露岗位及统招本科背景；尚无可核实的单岗办公技能、行政专业限制、部门轮岗和福利条款，所有条件应在实际应聘时以公司HR或正式JD确认。",
+      "majorNames": [
+        "行政管理",
+        "工商管理",
+        "人力资源管理",
+        "公共事业管理"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
+      "url": "https://ycyg.nbhr.org.cn/JobFairJob/info?guid=173c215a-f12e-40bd-8cfc-d8201b860e8e",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/xinhaiwei-2027-campus-recruitment-19722-a1d91f/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "宁波新海威进出口有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}
