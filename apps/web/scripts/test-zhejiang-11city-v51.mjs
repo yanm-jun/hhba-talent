@@ -8,7 +8,7 @@ const cities=['杭州','宁波','温州','嘉兴','湖州','绍兴','金华','�
 const ids=new Set();const baseline=JSON.parse(fs.readFileSync(new URL('../src/data/talentBaselineIds.json',import.meta.url),'utf8'));const legacyPolicies=new Set(baseline.policyIds),legacyHomes=new Set(baseline.housingIds);let totalPolicy=0,totalHousing=0;
 for(const city of cities){
  const entry=findTalentCity(city);
- assert.ok(entry&&entry.province==='浙江',city+' not indexed in Zhejiang');
+ assert.ok(entry&&entry.province==='浙江省',city+' not indexed in Zhejiang');
  const ps=TALENT_POLICY_RECORDS.filter(p=>p.city===city);
  const hs=TALENT_HOUSING_RECORDS.filter(h=>h.city===city);
  assert.ok(ps.length>=1,city+' missing policies');assert.ok(hs.length>=1,city+' missing housing');
