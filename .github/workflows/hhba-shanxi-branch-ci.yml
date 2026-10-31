@@ -1,0 +1,48 @@
+name: Shanxi 11-city V5.1 isolated verification
+on:
+  push:
+    branches:
+      - feature/talent-shanxi
+  pull_request:
+    paths:
+      - 'apps/web/src/data/shanxi*.ts'
+      - 'apps/web/src/data/talentPolicyRecords.ts'
+      - 'apps/web/src/data/talentHousingRecords.ts'
+      - 'apps/web/src/data/talentCityRegistry.ts'
+      - 'apps/web/src/pages/TalentServiceRoutes.tsx'
+      - 'apps/web/src/components/talent/UnifiedTalentRecordDetail.tsx'
+      - 'apps/web/scripts/test-shanxi-city-v51.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-shanxi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify Shanxi
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-shanxi-city-v51.mjs
+      - name: Verify national cities
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-cities.mjs
+      - name: Build standalone review artifact
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shanxi-11-city-static-review
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
