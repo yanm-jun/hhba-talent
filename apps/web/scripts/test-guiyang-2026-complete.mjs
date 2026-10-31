@@ -51,7 +51,7 @@ for(const id of ['gz-guiyang-2026-enterprise-salary-grant','gz-guiyang-2026-ente
 const autumn=gy.find(p=>p.id==='gz-guiyang-2026-autumn-public-recruitment');
 assert.equal(autumn?.deadline,'2026-11-30');
 assert.equal(autumn?.temporal,'policy');
-assert.ok(autumn?.benefit.includes('不是所有毕业生'));
+assert.ok(autumn?.summary.includes('不是所有毕业生')&&autumn?.benefit.includes('不是')===false,'clear separation between autumn job postings and cash policy');
 assert.equal(assessPolicy(autumn,'2026-12-01').grade,'C','past application window must auto archive');
 assert.ok(gy.some(x=>x.category==='租房安居')&&gy.some(x=>x.category==='购房补贴')&&gy.some(x=>x.category==='生活补贴'));
 assert.ok(gyh.some(h=>h.id==='gz-guiyang-2026-zhumeng-stay-program')&&gyh.some(h=>h.id==='gz-guiyang-rental-stipend-2026'));
