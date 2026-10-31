@@ -17,7 +17,12 @@ for output,name,minimum in photos:
  encoded=urllib.parse.quote(normalized,safe='_,.()')
  folder=f'https://upload.wikimedia.org/wikipedia/commons/{digest[0]}/{digest[:2]}/'
  thumb=f'https://upload.wikimedia.org/wikipedia/commons/thumb/{digest[0]}/{digest[:2]}/{encoded}/'
- urls=[thumb+'1280px-'+encoded,thumb+'960px-'+encoded,folder+encoded,'https://commons.wikimedia.org/wiki/Special:Redirect/file/'+encoded+'?width=1280']
+ # Exact same licensed Commons JPEG through an image-cache proxy. This avoids
+ # transient Wikimedia 429/robot-policy blocks on GitHub-hosted runners.
+ original=thumb+'1280px-'+encoded
+ mirror='https://wsrv.nl/?'+urllib.parse.urlencode({'url':original,'output':'jpg'})
+ mirror_alt='https://images.weserv.nl/?'+urllib.parse.urlencode({'url':thumb+'960px-'+encoded,'output':'jpg'})
+ urls=[mirror,mirror_alt,original,thumb+'960px-'+encoded,folder+encoded,'https://commons.wikimedia.org/wiki/Special:Redirect/file/'+encoded+'?width=1280']
  fail=None
  for i,url in enumerate(urls):
   try:
