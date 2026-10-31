@@ -164,7 +164,7 @@ export const JIANGXI_HOUSING_RECORDS:TalentHousingRecord[]=[
   },
   {
     "city": "吉安",
-    "id": "jx-ja-2026-youth-free-stay",
+    "id": "jx-ja-2026-youth-free-stay-housing",
     "title": "吉安人才求职驿站免费住宿最长12个月（佳和西苑）",
     "district": "吉州区、青原区、井冈山经开区、庐陵新区的符合条件求职青年",
     "address": "吉安市吉州区白塘街道思源路6号佳和西苑19栋人才求职驿站",
