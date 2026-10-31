@@ -1,0 +1,51 @@
+name: Liaoning V5.1 independent branch verification
+on:
+  push:
+    branches: [feature/talent-liaoning]
+  pull_request:
+    paths:
+      - 'apps/web/src/data/liaoning*.ts'
+      - 'apps/web/src/data/talentHousingRecords.ts'
+      - 'apps/web/src/data/talentPolicyRecords.ts'
+      - 'apps/web/src/components/talent/UnifiedPolicyList.tsx'
+      - 'apps/web/src/pages/TalentServiceRoutes.tsx'
+      - 'apps/web/scripts/test-liaoning-city-v51.mjs'
+      - '.github/workflows/hhba-liaoning-branch-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-liaoning:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Liaoning 14-city V5.1 detailed guide checks
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-liaoning-city-v51.mjs
+      - name: National certified-policy and housing regression checks
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - name: No blank Guangzhou / Guangdong housing cards
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-housing-card-coverage.mjs
+      - name: Static web build
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: liaoning-v51-static-branch
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error

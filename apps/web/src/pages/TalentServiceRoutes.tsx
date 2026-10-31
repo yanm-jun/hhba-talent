@@ -19,6 +19,9 @@ import {UnifiedPolicyGuide} from '../components/talent/UnifiedPolicyGuide';
 import {GUANGXI_RENT_RESEARCH_RECORDS} from '../data/guangxiRentPolicyResearch';
 import {GUANGXI_MUNICIPAL_RESEARCH_RECORDS} from '../data/guangxiMunicipalResearch';
 import {buildGuangxiGuide,GUANGXI_14_CITIES} from '../data/guangxiGuides';
+import {buildLiaoningGuide,LIAONING_14_CITIES,liaoningGuideRoute} from '../data/liaoningGuides';
+import {LIAONING_PROVINCIAL_POLICY_RECORDS} from '../data/liaoningProvincialPolicyRecords';
+import {LIAONING_MUNICIPAL_RESEARCH_RECORDS} from '../data/liaoningMunicipalPolicyRecords.ts';
 import {buildGuangdongGuide} from '../data/guangdongGuides';
 import {buildYunnanGuide} from '../data/yunnanGuides';
 import {beijingPublicRentalGuide,beijingMarketRentGuide,beijingGraduateSettlementGuide,beijingJobGrantGuide,beijingFlexSocialGuide,beijingYouthHousingGuide,beijingHaidianHousingGuide} from '../data/beijingGuides';
@@ -136,7 +139,9 @@ function CityHub({city}:{city:string}){
  const researchHousing=housingLeads.length;
  const guangxiRentalResearch=GUANGXI_RENT_RESEARCH_RECORDS.filter(p=>p.city===match.name&&isHousingPolicy(p)).length;
  const allHousingHistorical=homes.length>0&&homes.every(h=>Boolean(h.applicationEnd&&h.applicationEnd<new Date().toISOString().slice(0,10)));
- const hasSources=policies.length+homes.length+guangxiRentalResearch>0;
+ const hasSources=policies.length+homes.length+guangxiRentalResearch+LIAONING_MUNICIPAL_RESEARCH_RECORDS.filter(p=>p.city===match.name).length>0;
+ const liaoningHousingPolicyCount=LIAONING_14_CITIES.includes(match.name)?[...policies,...LIAONING_MUNICIPAL_RESEARCH_RECORDS.filter(p=>p.city===match.name)].filter(isHousingPolicy).length:0;
+ const liaoningLocalResearch=LIAONING_MUNICIPAL_RESEARCH_RECORDS.filter(p=>p.city===match.name);
  return <>
   <Bread current={match.official+' · 人才服务'}/>
   <section className="ts-sub-header ts-v4-city-hero">
@@ -145,7 +150,7 @@ function CityHub({city}:{city:string}){
    <p>{hasSources?match.intro+'。可查看已收录政策、住房支持及有出处的公寓项目信息；待核验线索不代表可以立即申报。':'该城市入口已开通，人才政策与住房资料正在整理。我们不会生成未经核验的补贴金额、公寓或申请入口。'}</p>
    {allHousingHistorical&&<p>住房资料均为已结束的公开配租批次，不代表当前有空房或可直接申报；请关注住建部门新公告。</p>}
    <div className="ts-sub-counts"><QuickCount count={policies.length} label="政府来源政策"/>{researchPolicyCount>0&&<QuickCount count={researchPolicyCount} label="公开政策资料 · 待核验"/>}{housingPolicies.length>0&&<QuickCount count={housingPolicies.length} label="住房支持政策"/>}{homes.length>0&&<QuickCount count={homes.length} label={allHousingHistorical?'住房历史配租资料':'已收录住房资料'}/>}
-    {housingHistory>0&&<QuickCount count={housingHistory} label="历史住房政策 · 仅参考"/>}{researchHousing>0&&<QuickCount count={researchHousing} label="住房线索 · 待核验"/>}{guangxiRentalResearch>0&&<QuickCount count={guangxiRentalResearch} label="自治区安居研究资料 · 待核验"/>}{!hasSources&&!researchHousing&&<span className="ts-v4-data-pending">官方资料整理中</span>}</div>
+    {housingHistory>0&&<QuickCount count={housingHistory} label="历史住房政策 · 仅参考"/>}{researchHousing>0&&<QuickCount count={researchHousing} label="住房线索 · 待核验"/>}{guangxiRentalResearch>0&&<QuickCount count={guangxiRentalResearch} label="自治区安居研究资料 · 待核验"/>}{liaoningLocalResearch.length>0&&<QuickCount count={liaoningLocalResearch.length} label="辽宁市级政策研究资料"/>}{!hasSources&&!researchHousing&&<span className="ts-v4-data-pending">官方资料整理中</span>}</div>
   </section>
   <section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>你想了解什么？</h2><Link to="/talent-service/cities">更换城市 <ArrowRight size={15}/></Link></div>
    <div className="ts-sub-kinds ts-v4-two-kinds">
@@ -207,6 +212,16 @@ function CityHub({city}:{city:string}){
     <Link to="/talent-service/policy-guide-preview/heze/startup" className="ts-sub-tile"><strong>一次性创业补贴</strong><span>经营与参保条件及办理步骤</span><ArrowRight size={15}/></Link>
     <Link to="/talent-service/policy-guide-preview/heze/housing" className="ts-sub-tile"><strong>人才公寓和公租房</strong><span>五小区住房线索及真实申报核验</span><ArrowRight size={15}/></Link>
    </div></section>}
+  {LIAONING_14_CITIES.includes(match.name)&&<section className="ts-sub-section" aria-label="辽宁省14市人才政策和安居资料">
+   <div className="ts-sub-section-heading"><h2>{match.name} · 辽宁2026人才政策与住房指南</h2><Link to={talentListUrl('policies',match.name)}>查看全部政策 <ArrowRight size={15}/></Link></div>
+   <p>辽宁省政府2026年高校毕业生就业创业支持清单有16项，另收录2026年已截止的“三支一扶”历史批次；均为省级政策属地视图，不是17项由本市另发的补贴。个人现金支持、企业补助、可偿还贷款、税费扣减和服务政策必须区分；另有{match.name}相关人才制度及住房政策资料。具体公寓地址、租金与空房必须查看政府最新配租批次，不能从住房补贴制度推定已有现房。</p>
+   <div className="ts-sub-grid">
+    {LIAONING_PROVINCIAL_POLICY_RECORDS.filter(p=>p.city===match.name).map(p=><Link key={p.id} className="ts-sub-tile" to={liaoningGuideRoute(p.id)}><strong>{p.title}</strong><span>{p.temporal==='past-window'?'2026报名已截止 · 历史资料':p.headlineUnit||'辽宁省统一政策，按城市属地申请'}</span><ArrowRight size={15}/></Link>)}
+    {[...policies,...liaoningLocalResearch].filter(p=>p.id.startsWith('ln-')&&!p.id.includes('-provincial-')&&!p.id.endsWith('-three-support-closed')).map(p=><Link key={p.id} className="ts-sub-tile" to={liaoningGuideRoute(p.id)}><strong>{p.title}</strong><span>{p.category} · 地方政策来源与完整资格步骤</span><ArrowRight size={15}/></Link>)}
+   </div>
+   <p>住房查询：{homes.length>0?'已收录'+homes.length+'条真实政府住房支持制度（非实时空房）。':liaoningHousingPolicyCount>0?'有住房支持政策，但未核验到具体公寓项目与实时房源。':'尚未核验到独立的本市人才公寓具体项目，不虚构房源。'} 辽宁住建厅已发布2026年各市购房支持政策汇总，可查市级项目适用范围和专项办理事项。</p>
+   <p><a href="https://zjt.ln.gov.cn/zjt/gsgg/2026020611093590717/index.shtml" target="_blank" rel="noopener noreferrer">打开辽宁省住建厅各市购房支持政策索引</a>（为政策信息查询页，非申请表单）</p>
+  </section>}
   {GUANGXI_14_CITIES.includes(match.name)&&<section className="ts-sub-section" aria-label="广西自治区2026人才政策及历史招募指南">
     <div className="ts-sub-section-heading"><h2>{match.name} · 广西人才政策与安居资料</h2><Link to={talentListUrl('policies',match.name)}>查看政策索引 <ArrowRight size={15}/></Link></div>
     <p>已收录自治区新建商品房补贴、2026高校毕业生保障性租赁住房支持，以及报名已截止的2026年“三支一扶”。自治区政策按城市属地检索，不等于当地另外发布了相同金额的市级补贴；房源、受理资格与申报资金均须核验。</p>
@@ -239,7 +254,7 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
  const housingMode=kind==='housing';
  const guideMode=kind==='guide';
  const title=searchMode?'搜索结果':housingMode?'人才安居':kind==='benefits'?'补贴与福利':guideMode?'申请指南':'人才政策';
- const resultPolicies=(searchMode?[...TALENT_POLICY_RECORDS,...XINGTAI_POLICY_RESEARCH_RECORDS,...GUANGXI_RENT_RESEARCH_RECORDS,...GUANGXI_MUNICIPAL_RESEARCH_RECORDS]:[...TALENT_POLICY_RECORDS,...GUANGXI_RENT_RESEARCH_RECORDS,...GUANGXI_MUNICIPAL_RESEARCH_RECORDS]).filter(p=>p.city===city&&(!query||matchesPolicy(p,query,city))&&(!housingMode||isHousingPolicy(p))&&(kind!=='benefits'||benefit(p))).sort(recentPolicies);
+ const resultPolicies=(searchMode?[...TALENT_POLICY_RECORDS,...XINGTAI_POLICY_RESEARCH_RECORDS,...GUANGXI_RENT_RESEARCH_RECORDS,...GUANGXI_MUNICIPAL_RESEARCH_RECORDS,...LIAONING_MUNICIPAL_RESEARCH_RECORDS]:[...TALENT_POLICY_RECORDS,...GUANGXI_RENT_RESEARCH_RECORDS,...GUANGXI_MUNICIPAL_RESEARCH_RECORDS,...LIAONING_MUNICIPAL_RESEARCH_RECORDS]).filter(p=>p.city===city&&(!query||matchesPolicy(p,query,city))&&(!housingMode||isHousingPolicy(p))&&(kind!=='benefits'||benefit(p))).sort(recentPolicies);
  const resultHomes=TALENT_HOUSING_RECORDS.filter(p=>p.city===city&&(housingMode||searchMode)&&(!query||matchesHousing(p,query,city))).sort(housingFirst);
  const pendingHousingCount=(housingMode||searchMode)?housingResearchLeads(city,query||'').length:0;
  const housingHistoricalCount=(housingMode||searchMode)?housingPolicyResearch(city,query||'').length:0;
@@ -259,7 +274,7 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
   <section className="ts-sub-header">
    <span className="ts-section-kicker">{searchMode?'SEARCH RESULTS':'CITY SERVICES'} / {city}</span><h1>{city} · {title}</h1>
    <p>{searchMode?'搜索已收录政策、住房和明确标注的待核验项目；仅政府核实的资料可作为正式申报依据。':'按城市分类查看已收录政策和住房；政府原文、媒体转载、待核验项目会分别标明，不能据此认定正在受理或有空房。'}</p>
-   <div className="ts-sub-counts">{housingMode?<><QuickCount count={housingPolicyCount} label="住房政策与保障通道"/><QuickCount count={shownProjects.length} label="已核实独立项目"/></>:<><QuickCount count={shownPolicies.length} label="政策结果"/>{searchMode&&<QuickCount count={shownHomes.length} label="住房资料"/>}</>}{pendingHousingCount>0&&<QuickCount count={pendingHousingCount} label="待核验公寓线索"/>}{housingHistoricalCount>0&&<QuickCount count={housingHistoricalCount} label="历史住房政策参考"/>}</div>
+   <div className="ts-sub-counts">{housingMode?<><QuickCount count={housingPolicyCount} label="住房政策与保障通道"/><QuickCount count={shownProjects.length} label="已核实独立项目"/>{LIAONING_14_CITIES.includes(city)&&<QuickCount count={1} label="省住建厅购房政策查询入口"/>}</>:<><QuickCount count={shownPolicies.length} label="政策结果"/>{searchMode&&<QuickCount count={shownHomes.length} label="住房资料"/>}</>}{pendingHousingCount>0&&<QuickCount count={pendingHousingCount} label="待核验公寓线索"/>}{housingHistoricalCount>0&&<QuickCount count={housingHistoricalCount} label="历史住房政策参考"/>}</div>
   </section>
   <form className="ts-sub-search" onSubmit={e=>{e.preventDefault();doSearch()}}><Search size={18}/><input value={draft} onChange={e=>setDraft(e.target.value)} placeholder={'搜索'+city+'硕士补贴、住房项目…'} aria-label="搜索人才服务"/><button type="submit">搜索 <ArrowRight size={15}/></button></form>
   {searchMode&&query&&<p className="ts-sub-found">关键词：<strong>{query}</strong> · 实际匹配 {shownPolicies.length+shownHomes.length+pendingHousingCount+housingHistoricalCount} 条（含待核验项目与历史参考）</p>}
@@ -273,9 +288,14 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
    {housingMode&&housingDistricts.length>2&&<div className="ts-housing-districts" aria-label="按区域筛选住房项目">{housingDistricts.map(d=><button type="button" key={d} aria-pressed={activeDistrict===d} className={activeDistrict===d?'active':''} onClick={()=>setHousingDistrict(d)}>{d}</button>)}</div>}
    {shownProjects.length?<div className="ts-sub-grid">{shownProjects.map(h=><HousingTile data={h} key={h.id}/>)}</div>:<p className="ts-housing-filter-empty">该区域没有匹配的已核验项目，试试“全部区域”。</p>}
   </section>}
+  {housingMode&&LIAONING_14_CITIES.includes(city)&&<section className="ts-sub-section" aria-label="辽宁2026住房政策官方查询入口">
+    <div className="ts-sub-section-heading"><h2>{city} · 市级住房支持政策查询</h2></div>
+    <p>辽宁省住房和城乡建设厅2026年2月6日整理各市购房支持政策，包含人才、购房补贴、契税、住房公积金和贷款等不同事项。该汇总**仅提供真实政府政策检索线索**，不代表{city}存在可立即入住的人才公寓、固定金额购房补贴或实时可选房源。住房政策适用范围须以{city}的本市住建部门最新公告核对。</p>
+    <p><a href="https://zjt.ln.gov.cn/zjt/gsgg/2026020611093590717/index.shtml" target="_blank" rel="noopener noreferrer">打开辽宁省住建厅2026各市商品房购房支持政策汇总（官方网站）</a>。本页不是房屋预定平台；若当期没有合法公寓名单，将明确标注未核实，不展示虚构房号。</p>
+  </section>}
   {housingMode&&!housingProjects.length&&<section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>独立人才公寓项目核验进度</h2></div><p className="ts-housing-inventory-note">目前尚未核实可按具体地址与批次申报的独立人才公寓项目。下方线索仍待官方配租公告确认，不能据此宣称有实时空房。</p></section>}
   {(housingMode||searchMode)&&<UnifiedTalentHousingResearch city={city} query={query}/>}
-  {!shownPolicies.length&&!resultHomes.length&&!pendingHousingCount&&<Empty city={city} kind={searchMode?'匹配结果':title}/>}
+  {!shownPolicies.length&&!resultHomes.length&&!pendingHousingCount&&!(housingMode&&LIAONING_14_CITIES.includes(city))&&<Empty city={city} kind={searchMode?'匹配结果':title}/>}
   <section className="ts-sub-cross"><ShieldCheck size={17}/><span>静态官方资料索引，非政府实时申报系统。补贴金额、资格、截止时间和剩余房源以最新官方公告为准。政策整理日期：{TALENT_POLICY_REVIEW_DATE}；项目整理日期：{HOUSING_REVIEW_DATE}。</span></section>
   </>}
  </>;
@@ -293,7 +313,7 @@ function GuideContent({city}:{city:string}){
  </>;
 }
 function DetailPage({kind,id}:{kind:'policy'|'housing';id:string}){
- const p=kind==='policy'?(TALENT_POLICY_RECORDS.find(x=>x.id===id)||GUANGXI_RENT_RESEARCH_RECORDS.find(x=>x.id===id)||GUANGXI_MUNICIPAL_RESEARCH_RECORDS.find(x=>x.id===id)||XINGTAI_POLICY_RESEARCH_RECORDS.find(x=>x.id===id)):undefined;
+ const p=kind==='policy'?(TALENT_POLICY_RECORDS.find(x=>x.id===id)||GUANGXI_RENT_RESEARCH_RECORDS.find(x=>x.id===id)||GUANGXI_MUNICIPAL_RESEARCH_RECORDS.find(x=>x.id===id)||LIAONING_MUNICIPAL_RESEARCH_RECORDS.find(x=>x.id===id)||XINGTAI_POLICY_RESEARCH_RECORDS.find(x=>x.id===id)):undefined;
  const h=kind==='housing'?TALENT_HOUSING_RECORDS.find(x=>x.id===id):undefined;
  if(!p&&!h)return <><Bread current="未找到该条资料"/><Empty city="所选城市" kind="详情"/></>;
  return <UnifiedTalentRecordDetail policy={p} housing={h}/>;
@@ -320,6 +340,7 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
    const guide=buildGuangdongGuide(decode(fragments[3]||''));
    body=guide?<UnifiedPolicyGuide data={guide}/>:<div className="ts-sub-empty"><h2>该政策办理指南尚未收录</h2><Link to="/talent-service/cities">返回全国城市目录</Link></div>;
  }
+ else if(kind==='policy-guide-preview'&&fragments[2]==='liaoning'&&fragments[3])body=<UnifiedPolicyGuide data={buildLiaoningGuide(decode(fragments[3]))}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='guangxi'&&GUANGXI_14_CITIES.includes(decode(fragments[3]||''))&&['purchase','rental','three-support'].includes(fragments[4]||''))body=<UnifiedPolicyGuide data={buildGuangxiGuide(decode(fragments[3]||''),fragments[4] as 'purchase'|'rental'|'three-support')}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='beijing')body=<UnifiedPolicyGuide data={fragments[3]==='public-rental'?beijingPublicRentalGuide:fragments[3]==='market-rent'?beijingMarketRentGuide:fragments[3]==='youth-housing'?beijingYouthHousingGuide:fragments[3]==='haidian'?beijingHaidianHousingGuide:fragments[3]==='graduate-settlement'?beijingGraduateSettlementGuide:fragments[3]==='job-grant'?beijingJobGrantGuide:beijingFlexSocialGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='chongqing')body=<UnifiedPolicyGuide data={fragments[3]==='home'?chongqingHomeGuide:fragments[3]==='purchase'?chongqingPurchaseGuide:fragments[3]==='rental'?chongqingRentalGuide:fragments[3]==='counties'?chongqingCountiesGuide:fragments[3]==='policy'?chongqingPolicyGuide:fragments[3]==='jobseek'?chongqingJobseekGuide:chongqingShortageGuide}/>;
