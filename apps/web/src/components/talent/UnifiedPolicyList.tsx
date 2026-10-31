@@ -23,7 +23,7 @@ function Tile({item,record}:{item:PolicyTile;record:TalentPolicyRecord}){
   <div className="jpp-benefit"><span className="jpp-benefit-label">主要待遇／住房规模</span><div className="jpp-amount"><strong>{item.amount}</strong><span>{item.unit}</span></div><p>{item.description}</p></div>
   <div className="jpp-condition"><span>核心条件</span><p>{item.condition}</p></div>
   <div className="jpp-card-bottom"><div className="jpp-source"><span>{record.published.slice(0,4)}年资料</span><span>·</span><span>来源可查</span></div>
-   <div className="jpp-links"><a href={record.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={'打开'+record.title+'原文'}>{quality.sourceKind==='government'?'政府政策原文':'公开资料来源'} <ArrowUpRight size={13}/></a>
+   <div className="jpp-links"><a href={record.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={'打开'+record.title+'原文'}>{item.id.endsWith('-provincial-purchase')?'政府网站转载报道':item.id==='gx-liuzhou-2026-2027-shortage-talents'?'政府网站发布的市级公告':quality.sourceKind==='government'?'政府政策原文':'公开资料来源'} <ArrowUpRight size={13}/></a>
     <Link to={route}>{item.detailPath?(quality.grade==='A'?'完整办事指南':'查看分步办理指南'):'查看政策资料'} <ArrowRight size={14}/></Link></div>
   </div>
  </article>;
@@ -56,7 +56,7 @@ export function UnifiedPolicyList({config}:{config:CityPolicyConfig}){
    <nav className="jpp-breadcrumb" aria-label="当前位置"><Link to="/talent-service">人才服务</Link><span>›</span><Link to={'/talent-service/city/'+encodeURIComponent(config.city)}>{config.city}市</Link><span>›</span>政策列表</nav>
    <header className="jpp-heading"><div><span className="jpp-eyebrow">HHBA · 全国统一政策展示标准</span><h1>{config.city}市人才政策</h1><p>{config.subtitle||'政策卡片看重点，完整条件与办理指南进入详情查看。'}</p></div>
     <Link className="jpp-old-link" to={config.legacyLink||'/talent-service/list/policies/'+encodeURIComponent(config.city)}><ArrowLeft size={14}/> 对照原始资料</Link></header>
-   <div className="jpp-overview" role="group" aria-label="政策资料覆盖"><div><strong>{entries.length}</strong><span>独立政策事项</span></div><div><strong>{fresh.length}</strong><span>资料待核对申领状态</span></div><div><strong>{archives.length}</strong><span>历史资料</span></div><p><ShieldCheck size={16}/> 收录不代表申请资格已通过，也不表示当前正在受理。</p></div>
+   <div className="jpp-overview" role="group" aria-label="政策资料覆盖"><div><strong>{entries.length}</strong><span>{guangxi?'政策属地检索视图':'独立政策事项'}</span></div><div><strong>{fresh.length}</strong><span>资料待核对申领状态</span></div><div><strong>{archives.length}</strong><span>历史资料</span></div><p><ShieldCheck size={16}/> 收录不代表申请资格已通过，也不表示当前正在受理。</p></div>
    <section className="jpp-filter-panel" aria-label="按政策类别筛选"><div className="jpp-filter-title"><SlidersHorizontal size={16}/><strong>政策分类</strong><span>按类别快速切换</span></div>
     <div className="jpp-filter-buttons">{groups.map(id=><button type="button" key={id} aria-pressed={category===id} className={category===id?'selected':''} onClick={()=>setCategory(id)}>
      {id==='all'?'全部政策':id==='history'?'历史政策':id}{id==='history'&&<span className="jpp-filter-count">{archives.length}</span>}</button>)}</div></section>
