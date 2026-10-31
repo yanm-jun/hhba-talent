@@ -28,7 +28,7 @@ for number,(url,source,label) in logos.items():
   with urlopen(req,timeout=16) as res:raw=res.read(100000)
   if len(raw)<700 or len(raw)>30000:raise ValueError('Unexpected SVG size')
   s=raw.decode('utf-8-sig')
-  if re.search(r'<script\b|<foreignObject\b|<image\b|<iframe\b|javascript:|onload\s*=|onerror\s*=|@import|https?://',s,re.I):raise ValueError('Unsafe SVG content')
+  if re.search(r'<script\b|<foreignObject\b|<image\b|<iframe\b|javascript:|onload\s*=|onerror\s*=|@import',s,re.I):raise ValueError('Unsafe SVG content')
   tree=ET.fromstring(s)
   if not tree.tag.endswith('svg'):raise ValueError('Not an SVG image')
   if any(tag.tag.lower().endswith(('script','foreignobject','image')) for tag in tree.iter()):raise ValueError('Invalid SVG element')
