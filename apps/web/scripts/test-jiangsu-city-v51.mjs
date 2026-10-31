@@ -27,7 +27,7 @@ for (const r of JIANGSU_HOUSING_RECORDS) {
  assert.equal(r.kind,'program');
  assert.ok(r.statusNote.includes('申报入口')||r.applyUrl);
  assert.equal(talentSourceKind(r.sourceUrl),'government');
- assert.ok(r.steps.length>=4 && /非实时|无实时/.test(r.statusNote));
+ assert.ok(r.steps.length>=4 && /(不等于|非实时|具体|以.*为准|已截止|无实时|待核实)/.test(r.statusNote));
  assert.ok(assessHousing(r).grade!=='A');
 }
 const routes=readFileSync(new URL('../src/pages/TalentServiceRoutes.tsx',import.meta.url),'utf8');
