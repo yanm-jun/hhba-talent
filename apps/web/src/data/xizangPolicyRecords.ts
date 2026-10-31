@@ -18,20 +18,8 @@ function p(region:typeof REGIONS[number],key:string,values:Omit<TalentPolicyReco
  const enterprise=values.payoutTo==='用人单位';
  return {
   id:'xz-'+region.slug+'-'+key,city:region.city,district:values.district||region.city+'行政区域（自治区共性政策须按本地受理口径核查）',scope:values.scope||'全市',reviewedAt:'2026-10-31',
-  materials:values.materials||[
-   '本人身份证及毕业证、学籍或学历学位核验资料（以该项目对象要求为准）',
-   '与就业或服务项目有关的劳动合同、参保缴费及所在单位证明（按该事项适用）',
-   '符合该项目的就业失业登记、人才类别或困难身份材料（按当期公告提供）',
-   '主管部门正式申请表、承诺书及其他当期要求的材料'],
-  applicationSteps:values.applicationSteps||[
-   '查阅本条所列自治区官方制度原文，确认适用对象、政策版本及本地执行细则',
-   '按本人户籍生源、学历毕业年限、就业地点、合同参保条件逐项核验；企业补助与个人补助不可互换',
-   '按照公告列明的主体准备身份证明、劳动合同、毕业证和项目指定附件，不上传无关敏感资料',
-   '联系'+region.office+'（'+region.phone+'）核验本年度受理窗口、是否仍可申请及真实提交渠道',
-   '经确认仍在办理后通过主管部门指定路径提交，跟踪资格审核、公示与兑现结果；不得把政策介绍当作获批证明'],
   keywords:values.keywords||[region.city,'西藏','自治区统一政策','2026','高校毕业生'],
   targetGroup:values.targetGroup||(enterprise?'在'+region.city+'符合本政策申报条件的用人单位':'符合本条限定条件的高校毕业生或服务对象'),
-  reviewNote:values.reviewNote||'本条属西藏自治区统一规定的'+region.city+'属地查询入口，不代表'+region.city+'另发一份同额地方补助。官方原文可查，但当期办理入口、个人资格及实际申报窗口需向属地经办机构核验；办理入口待核实。',
   ...values,
   reviewNote:values.reviewNote?(values.reviewNote.includes('办理入口待核实')?values.reviewNote:values.reviewNote+' 办理入口待核实。'):'本项官方政策及本地受理条件、当期窗口尚需核实，办理入口待核实。',
   materials:values.materials?.length?values.materials:[
