@@ -155,3 +155,12 @@
 .hhba-v2-keyence .hhba-v2-company-role details summary{color:#2d8056}
 .hhba-v2-keyence .hhba-v2-qizheng-majors .hhba-v2-company-chips{gap:9px}
 @media(min-width:850px){.hhba-v2-keyence .hhba-v2-company-role-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* MINIEYE 035: screenshot-approved detailed role card and editorial real photos. */
+.hhba-v2-minieye .hhba-kpmg-hero{border-top:3px solid #e34063}
+.hhba-v2-minieye .hhba-kpmg-logo img{max-width:100%;max-height:88px;object-fit:contain}
+.hhba-v2-minieye .hhba-kpmg-photo-grid img{object-fit:cover;object-position:center}
+.hhba-v2-minieye .hhba-v2-company-role h3{font-size:16px;line-height:1.55}
+.hhba-v2-minieye .hhba-v2-company-role details summary{color:#298055;text-decoration:none}
+.hhba-v2-minieye .hhba-v2-company-role>small.hhba-v2-weipu-location{color:#82908f}
+@media(max-width:760px){.hhba-v2-minieye .hhba-kpmg-logo img{max-height:66px}}
