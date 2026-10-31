@@ -549,11 +549,14 @@ export const TALENT_YUNNAN_PREFECTURES:TalentCity[]=[
     "initials": "dq"
   }
 ] as TalentCity[];
+/** 湖南省湘西自治州（433100）：行政区划未属于293个地级市，不得改动原市级基准。 */
+export const TALENT_HUNAN_AUTONOMOUS_PREFECTURES:TalentCity[]=[{name:'湘西',official:'湘西土家族苗族自治州',province:'湖南省',level:'prefecture',intro:'2026湖南省创业求职扶持、青年安居“一间房”制度和支持湘西自治州高质量发展政策；实物房源及地方专项需逐项核实',code:'433100',pinyin:'xiang xi',initials:'xx',aliases:['湘西','湘西州','湘西自治州','湘西土家族苗族自治州','湖南湘西','湖南省湘西土家族苗族自治州','xiang xi','xiangxi','xxz']}];
 const municipalityCode:Record<string,string>={北京:'110000',天津:'120000',上海:'310000',重庆:'500000'};
 export const TALENT_CITY_INDEX:TalentCity[]=[
  ...TALENT_MUNICIPALITIES.map(c=>({...c,code:municipalityCode[c.name]})),
  ...TALENT_PREFECTURE_CITIES,
- ...TALENT_YUNNAN_PREFECTURES
+ ...TALENT_YUNNAN_PREFECTURES,
+ ...TALENT_HUNAN_AUTONOMOUS_PREFECTURES
 ];
 const normalize=(text:string)=>text.trim().toLowerCase().replace(/[\s，。,.、·•\-]/g,'');
 export function findTalentProvince(input:string){

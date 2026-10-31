@@ -8,7 +8,7 @@ import {readFileSync} from 'node:fs';
 const regions=["昆明","曲靖","玉溪","保山","昭通","丽江","普洱","临沧","楚雄","红河","文山","西双版纳","大理","德宏","怒江","迪庆"];
 assert.equal(regions.length,16);
 const all=new Set(TALENT_CITY_INDEX.map(x=>x.name));
-assert.equal(TALENT_CITY_INDEX.length,305,'293+4 baseline plus 8 Yunnan autonomous prefectures');
+assert.equal(TALENT_CITY_INDEX.length,306,'293+4 baseline plus Yunnan 8 and Hunan Xiangxi 1');
 assert.equal(new Set(queryTalentCities('','云南省').map(x=>x.name)).size,16);
 const policies=TALENT_POLICY_RECORDS.filter(x=>x.id.startsWith('yn-'));
 const housing=TALENT_HOUSING_RECORDS.filter(x=>x.id.startsWith('yn-'));

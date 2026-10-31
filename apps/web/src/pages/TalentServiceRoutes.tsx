@@ -21,6 +21,7 @@ import {GUANGXI_MUNICIPAL_RESEARCH_RECORDS} from '../data/guangxiMunicipalResear
 import {buildGuangxiGuide,GUANGXI_14_CITIES} from '../data/guangxiGuides';
 import {buildGuangdongGuide} from '../data/guangdongGuides';
 import {buildYunnanGuide} from '../data/yunnanGuides';
+import {buildHunanGuide} from '../data/hunanGuides';
 import {beijingPublicRentalGuide,beijingMarketRentGuide,beijingGraduateSettlementGuide,beijingJobGrantGuide,beijingFlexSocialGuide,beijingYouthHousingGuide,beijingHaidianHousingGuide} from '../data/beijingGuides';
 import {chongqingHomeGuide,chongqingPurchaseGuide,chongqingRentalGuide,chongqingCountiesGuide,chongqingPolicyGuide,chongqingJobseekGuide,chongqingShortageGuide} from '../data/chongqingGuides';
 import {tianjinHaiheGuide,tianjinApartmentGuide,tianjinRentalGuide,tianjinPublicGuide,tianjinStartupGuide,tianjinGrantGuide} from '../data/tianjinGuides';
@@ -126,7 +127,7 @@ function Empty({city,kind}:{city:string;kind:string}){
 }
 function CityHub({city}:{city:string}){
  const match=findTalentCity(city);
- if(!match)return <><Bread current="城市尚未收录"/><section className="ts-sub-header"><h1>该城市尚未加入本次城市名录</h1><p>当前目标范围是4个直辖市和293个地级市，云南8个自治州已接入，其他未收录县级市、自治州、地区和盟请先到全国城市目录核对名称。</p><Link to="/talent-service/cities">返回全国城市目录 <ArrowRight size={16}/></Link></section></>;
+ if(!match)return <><Bread current="城市尚未收录"/><section className="ts-sub-header"><h1>该城市尚未加入本次城市名录</h1><p>当前目标范围是4个直辖市和293个地级市，云南8个自治州、湖南湘西自治州已接入，其他未收录县级市、自治州、地区和盟请先到全国城市目录核对名称。</p><Link to="/talent-service/cities">返回全国城市目录 <ArrowRight size={16}/></Link></section></>;
  const policies=TALENT_POLICY_RECORDS.filter(p=>p.city===match.name).sort(recentPolicies);
  const researchPolicyCount=match.name==='邢台'?XINGTAI_POLICY_RESEARCH_RECORDS.length:0;
  const homes=TALENT_HOUSING_RECORDS.filter(h=>h.city===match.name);
@@ -312,6 +313,10 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
   const guide=getJiangsuGuide(fragments[3]||'',decode(fragments[4]||''));
   body=guide?<UnifiedPolicyGuide data={guide}/>:<><Bread current="未找到江苏省指南"/><section className="ts-sub-header"><h1>该指南尚未收录</h1><Link to="/talent-service/cities">返回城市列表 <ArrowRight size={16}/></Link></section></>;
  }
+ else if(kind==='policy-guide-preview'&&fragments[2]==='hunan'){
+    const guide=buildHunanGuide(decode(fragments[3]||''));
+    body=guide?<UnifiedPolicyGuide data={guide}/>:<div className="ts-sub-empty"><h2>湖南政策办理指南尚未收录</h2><Link to="/talent-service/cities">返回全国城市目录</Link></div>;
+  }
  else if(kind==='policy-guide-preview'&&fragments[2]==='yunnan'){
     const guide=buildYunnanGuide(decode(fragments[3]||''));
     body=guide?<UnifiedPolicyGuide data={guide}/>:<div className="ts-sub-empty"><h2>云南政策办理指南尚未收录</h2><Link to="/talent-service/cities">返回全国城市目录</Link></div>;
