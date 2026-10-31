@@ -1,0 +1,52 @@
+name: HHBA Hengshui isolated branch acceptance
+on:
+  push:
+    branches:
+      - feature/talent-hengshui
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'apps/web/src/data/hengshui*'
+      - 'apps/web/scripts/test-hengshui-city-v51.mjs'
+      - 'docs/TALENT_HENGSHUI*'
+      - '.github/workflows/hhba-hengshui-branch-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-and-package:
+    if: github.ref == 'refs/heads/feature/talent-hengshui' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci
+      - name: Verify Hengshui V5.1 and national template contract
+        working-directory: apps/web
+        run: |
+          node --experimental-strip-types scripts/test-hengshui-city-v51.mjs
+          node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+          node --experimental-strip-types scripts/test-talent-cities.mjs
+          node scripts/global-talent-nav.contract.test.mjs
+      - name: Compile independently for isolated root hosting
+        working-directory: apps/web
+        env:
+          HHBA_PAGES_BASE: /
+        run: npm run build
+      - name: Bundle standalone static HTML+assets without publishing production Pages
+        run: |
+          cp apps/web/dist/index.html apps/web/dist/404.html
+          cd apps/web/dist
+          zip -q -r ../../../hengshui-static-preview.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hengshui-isolated-static-preview
+          path: hengshui-static-preview.zip
+          retention-days: 14
