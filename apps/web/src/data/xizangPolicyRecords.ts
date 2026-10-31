@@ -32,7 +32,16 @@ function p(region:typeof REGIONS[number],key:string,values:Omit<TalentPolicyReco
   keywords:values.keywords||[region.city,'西藏','自治区统一政策','2026','高校毕业生'],
   targetGroup:values.targetGroup||(enterprise?'在'+region.city+'符合本政策申报条件的用人单位':'符合本条限定条件的高校毕业生或服务对象'),
   reviewNote:values.reviewNote||'本条属西藏自治区统一规定的'+region.city+'属地查询入口，不代表'+region.city+'另发一份同额地方补助。官方原文可查，但当期办理入口、个人资格及实际申报窗口需向属地经办机构核验；办理入口待核实。',
-  ...values
+  ...values,
+  materials:values.materials?.length?values.materials:[
+   '身份证明及学历学位/技能资格材料（按本事项要求）','就业或服务所在单位及社保合同证明（按实际适用）','本人所符合的人才类别、就业或购房项目资格凭证','该事项正式公告要求的申请表与补充附件'],
+  applicationSteps:values.applicationSteps?.length?values.applicationSteps:[
+   '查阅该条所附官方文件及相关附件，确认是否已截止或属于历史批次',
+   '逐项核验'+region.city+'真实属地、学历、生源、合同、购房或岗位条件',
+   '按实际申报主体准备身份证、学历证明、合同社保及公告要求的其他材料',
+   '联系'+region.office+'，通过'+region.phone+'核实当前申报渠道及办理时间',
+   '通过主管部门正式入口办理、参加资格审核并依据公示结果确认，不以资料介绍代替批准']
+  ]
  };
 }
 const shared:TalentPolicyRecord[]=REGIONS.flatMap(region=>[
