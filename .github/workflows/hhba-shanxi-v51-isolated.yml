@@ -1,0 +1,52 @@
+name: HHBA Shanxi 11-city V5.1 independent build (no Pages publishing)
+on:
+  push:
+    branches:
+      - feature/talent-shanxi-v51-20261031
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: All 11 Shanxi plus nationwide V5.1 contracts
+        working-directory: apps/web
+        run: |
+          node --experimental-strip-types scripts/test-shanxi-11city-v51.mjs
+          node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+          node --experimental-strip-types scripts/test-talent-cities.mjs
+          node --experimental-strip-types scripts/test-talent-housing-card-coverage.mjs
+          node scripts/global-talent-nav.contract.test.mjs
+      - name: Static build isolated from public GitHub Pages
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '0'
+          HHBA_PAGES_BASE: '/'
+        run: npm run build
+      - name: Ensure all 11 cities and source rows ship in compiled JS
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const js=fs.readdirSync('dist/assets').filter(x=>x.endsWith('.js')).map(x=>fs.readFileSync('dist/assets/'+x,'utf8')).join('');
+          for(const city of ["太原","大同","阳泉","长治","晋城","朔州","晋中","运城","忻州","临汾","吕梁"])if(!js.includes(city))throw Error('Missing Shanxi city '+city);
+          for(const id of ['sx-datong-1-2026','sx-yangquan-housing-2026','sx-lvliang-2-2026'])if(!js.includes(id))throw Error('Missing '+id);
+          if(!fs.existsSync('dist/index.html'))throw Error('No index.html');console.log('SHANXI_STATIC_SITE_BUNDLED');
+          JS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shanxi-11city-isolated-static-preview
+          path: apps/web/dist/
+          if-no-files-found: error
+          retention-days: 14
