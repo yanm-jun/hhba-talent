@@ -20,6 +20,7 @@ import {GUANGXI_RENT_RESEARCH_RECORDS} from '../data/guangxiRentPolicyResearch';
 import {GUANGXI_MUNICIPAL_RESEARCH_RECORDS} from '../data/guangxiMunicipalResearch';
 import {buildGuangxiGuide,GUANGXI_14_CITIES} from '../data/guangxiGuides';
 import {buildGuangdongGuide} from '../data/guangdongGuides';
+import {buildJilinGuide} from '../data/jilinGuides';
 import {buildYunnanGuide} from '../data/yunnanGuides';
 import {beijingPublicRentalGuide,beijingMarketRentGuide,beijingGraduateSettlementGuide,beijingJobGrantGuide,beijingFlexSocialGuide,beijingYouthHousingGuide,beijingHaidianHousingGuide} from '../data/beijingGuides';
 import {chongqingHomeGuide,chongqingPurchaseGuide,chongqingRentalGuide,chongqingCountiesGuide,chongqingPolicyGuide,chongqingJobseekGuide,chongqingShortageGuide} from '../data/chongqingGuides';
@@ -311,6 +312,10 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  else if(kind==='policy-guide-preview'&&fragments[2]==='jiangsu'){
   const guide=getJiangsuGuide(fragments[3]||'',decode(fragments[4]||''));
   body=guide?<UnifiedPolicyGuide data={guide}/>:<><Bread current="未找到江苏省指南"/><section className="ts-sub-header"><h1>该指南尚未收录</h1><Link to="/talent-service/cities">返回城市列表 <ArrowRight size={16}/></Link></section></>;
+ }
+ else if(kind==='policy-guide-preview'&&fragments[2]==='jilin'){
+  const guide=buildJilinGuide(decode(fragments[3]||''));
+  body=guide?<UnifiedPolicyGuide data={guide}/>:<><Bread current="未找到吉林省指南"/><section className="ts-sub-header"><h1>本政策办理指南暂未收录</h1><Link to="/talent-service/cities">返回城市目录 <ArrowRight size={16}/></Link></section></>;
  }
  else if(kind==='policy-guide-preview'&&fragments[2]==='yunnan'){
     const guide=buildYunnanGuide(decode(fragments[3]||''));

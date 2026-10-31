@@ -1,18 +1,20 @@
 import assert from 'node:assert/strict';
-import {TALENT_CITY_INDEX,TALENT_MUNICIPALITIES,TALENT_PREFECTURE_CITIES,TALENT_YUNNAN_PREFECTURES,TALENT_PROVINCES,
+import {TALENT_CITY_INDEX,TALENT_MUNICIPALITIES,TALENT_PREFECTURE_CITIES,TALENT_YUNNAN_PREFECTURES,TALENT_JILIN_PREFECTURES,TALENT_PROVINCES,
  findTalentCity,findTalentProvince,parseTalentCityQuery,suggestTalentCities,queryTalentCities} from '../src/data/talentCityRegistry.ts';
 let passed=0;const check=(name,fn)=>{fn();passed++;console.log('✓ '+name)};
-check('305 city entries = 4 municipalities + 293 prefecture cities + 8 Yunnan autonomous prefectures',()=>{
- assert.equal(TALENT_MUNICIPALITIES.length,4);assert.equal(TALENT_PREFECTURE_CITIES.length,293);assert.equal(TALENT_YUNNAN_PREFECTURES.length,8);assert.equal(TALENT_CITY_INDEX.length,305);
+check('306 entries = 4 municipalities + 293 prefecture cities + 8 Yunnan prefectures + Yanbian',()=>{
+ assert.equal(TALENT_MUNICIPALITIES.length,4);assert.equal(TALENT_PREFECTURE_CITIES.length,293);assert.equal(TALENT_YUNNAN_PREFECTURES.length,8);assert.equal(TALENT_JILIN_PREFECTURES.length,1);assert.equal(TALENT_CITY_INDEX.length,306);
 });
 check('all six-digit codes are unique and geographic level verified',()=>{
  const codes=TALENT_CITY_INDEX.map(x=>x.code);
  assert.ok(codes.every(x=>/^\d{6}$/.test(x)));
- assert.equal(new Set(codes).size,305);
- assert.equal(new Set(TALENT_CITY_INDEX.map(x=>x.name)).size,305);
+ assert.equal(new Set(codes).size,306);
+ assert.equal(new Set(TALENT_CITY_INDEX.map(x=>x.name)).size,306);
  assert.ok(TALENT_PREFECTURE_CITIES.every(x=>x.code.endsWith('00')&&!x.code.endsWith('0000')&&x.official.endsWith('市')));
  assert.ok(TALENT_YUNNAN_PREFECTURES.every(x=>x.code.endsWith('00')&&x.province==='云南省'&&x.official.endsWith('自治州')));
  assert.deepEqual(TALENT_YUNNAN_PREFECTURES.map(x=>x.name),['楚雄','红河','文山','西双版纳','大理','德宏','怒江','迪庆']);
+ assert.equal(TALENT_JILIN_PREFECTURES[0]?.code,'222400');
+ assert.equal(TALENT_JILIN_PREFECTURES[0]?.official,'延边朝鲜族自治州');
 });
 check('exact Chinese municipality names and all four direct routes',()=>{
  for(const name of ['北京','天津','上海','重庆']){assert.equal(findTalentCity(name)?.name,name);assert.equal(findTalentCity(name+'市')?.name,name);}
@@ -49,6 +51,8 @@ check('province filtering uses 27 correct province and autonomous region parent 
  assert.equal(queryTalentCities('linyi','山东省').length,1);
  assert.equal(queryTalentCities('','广东省').length,21);
  assert.equal(queryTalentCities('','云南省').length,16);
+ assert.equal(queryTalentCities('','吉林省').length,9);
+ assert.equal(findTalentCity('延边朝鲜族自治州')?.name,'延边');
  assert.equal(queryTalentCities('云南省').length,16);
  assert.equal(findTalentCity('楚雄彝族自治州')?.name,'楚雄');
  assert.equal(findTalentCity('西双版纳傣族自治州')?.name,'西双版纳');
@@ -70,4 +74,4 @@ check('unknown city is not misidentified as a city',()=>{
  assert.equal(findTalentCity('不存在的城市'),null);
  assert.equal(parseTalentCityQuery('不存在的城市').matchedCity,false);
 });
-console.log(JSON.stringify({passed,expected:12,municipalities:4,prefectureCities:293,totalCities:305,provinceGroups:TALENT_PROVINCES.length},null,2));
+console.log(JSON.stringify({passed,expected:12,municipalities:4,prefectureCities:293,totalCities:306,provinceGroups:TALENT_PROVINCES.length},null,2));
