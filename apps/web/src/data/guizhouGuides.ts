@@ -18,7 +18,7 @@ export function buildGuizhouGuide(kind:'policy'|'housing',id:string):CompleteGui
  if(!p&&!h)return null;
  const item=p||h!;
  const housing=!!h;
- const outdated=p?.temporal!=='policy'||Boolean(p?.deadline&&p.deadline<'2026-10-31');
+ const outdated=!!p&&(p.temporal!=='policy'||Boolean(p.deadline&&p.deadline<'2026-10-31'));
  const material=p?.materials?.length?p.materials:[
  '本人身份、学历学位及工作单位证明（按适用事项）',
  '本人及家庭住房信息、既有住房保障记录（按当期项目要求）',
