@@ -114,7 +114,7 @@ export function MinotStateUniversityPage({user}:{user:User|null}){
    </div>
    <h3 className="hhba-minot-subtitle">申请资料核对 · 7 个步骤</h3>
    <div className="hhba-minot-steps">{minotAdmissions.documents.map((t,i)=><div className="hhba-minot-step" key={i}><span>{i+1}</span><p>{t}</p></div>)}</div>
-   <Advisory>管理学硕士属于学校列出的 I-20/F-1 适用研究生方向，但网络安全硕士不在当前公布清单。**有校园课程≠能取得 F-1 学生签证文件**。规划赴美线下学习前，先检查具体项目的资格，不能混为一谈。</Advisory>
+   <Advisory>管理学硕士属于学校列出的 I-20/F-1 适用研究生方向，但网络安全硕士不在当前公布清单。有校园课程不等于能取得 F-1 学生签证文件。规划赴美线下学习前，先检查具体项目的资格，不能混为一谈。</Advisory>
    <div className="hhba-minot-small-links">{src(minotSources.deadlines)}{src(minotSources.admission)}</div>
   </section>
   <section className="hhba-minot-section" id="minot-cost">
