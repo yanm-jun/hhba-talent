@@ -3,7 +3,7 @@ import {existsSync,readFileSync} from 'node:fs';
 const root='src/data/employerProfiles/';
 const expected=[['057','line plus',4],['058','招商金科',1],['059','中盈优创',3]];
 const page=readFileSync('src/pages/UnifiedV2CompanyPage.tsx','utf8');
-const routeSource=page.match(/const batch3756=\\/(.+?)\\/\\.test\\(id\\)/)?.[1];
+const routeSource=page.split('const batch3756=/')[1]?.split('/.test(id)')[0];
 assert(routeSource,'Missing configured shared V2 route regex');
 const routePattern=new RegExp(routeSource);
 assert((routePattern.test('cn-autumn-057')&&routePattern.test('cn-autumn-059')&&routePattern.test('cn-autumn-080')),"V2 includes 057-059 and 060-062");

@@ -5,7 +5,7 @@ const ids=['060','061','062'];
 const names=['云尖信息','美迈科技','厦门国资运'];
 const counts=[10,8,2];
 const page=read('src/pages/UnifiedV2CompanyPage.tsx');
-const routeSource=page.match(/const batch3756=\\/(.+?)\\/\\.test\\(id\\)/)?.[1];
+const routeSource=page.split('const batch3756=/')[1]?.split('/.test(id)')[0];
 assert(routeSource,'Missing configured shared V2 route regex');
 const routePattern=new RegExp(routeSource);
 assert((routePattern.test('cn-autumn-060')&&routePattern.test('cn-autumn-062')&&routePattern.test('cn-autumn-080')), 'New employer IDs must use existing four-panel renderer');

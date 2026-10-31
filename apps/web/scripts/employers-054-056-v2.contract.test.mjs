@@ -4,7 +4,7 @@ import {createHash} from 'node:crypto';
 const read=p=>readFileSync(p,'utf8');
 const ids=['054','055','056'],names=['海程邦达','长隆科技','维音'],jobCount=[1,5,2];
 const page=read('src/pages/UnifiedV2CompanyPage.tsx');
-const routeSource=page.match(/const batch3756=\\/(.+?)\\/\\.test\\(id\\)/)?.[1];
+const routeSource=page.split('const batch3756=/')[1]?.split('/.test(id)')[0];
 assert(routeSource,'Missing configured shared V2 route regex');
 const routePattern=new RegExp(routeSource);
 assert(page.includes("const batch3756=/^cn-autumn-")&&(routePattern.test('cn-autumn-054')&&routePattern.test('cn-autumn-056')&&routePattern.test('cn-autumn-080')),"V2 template covers all existing batches");

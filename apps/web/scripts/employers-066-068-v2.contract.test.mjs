@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {existsSync,readFileSync,statSync} from 'node:fs';
 const read=p=>readFileSync(p,'utf8');
 const page=read('src/pages/UnifiedV2CompanyPage.tsx');
-const routeSource=page.match(/const batch3756=\\/(.+?)\\/\\.test\\(id\\)/)?.[1];
+const routeSource=page.split('const batch3756=/')[1]?.split('/.test(id)')[0];
 assert(routeSource,'Missing configured shared V2 route regex');
 const routePattern=new RegExp(routeSource);
 assert((routePattern.test('cn-autumn-066')&&routePattern.test('cn-autumn-068')&&routePattern.test('cn-autumn-080')),'063-068 must share the same four-block layout');
