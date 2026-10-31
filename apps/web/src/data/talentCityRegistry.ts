@@ -549,11 +549,72 @@ export const TALENT_YUNNAN_PREFECTURES:TalentCity[]=[
     "initials": "dq"
   }
 ] as TalentCity[];
+/** 内蒙古3个盟：和原293地级市、云南8自治州分开追加，保护既有地级市数量统计。 */
+export const TALENT_INNER_MONGOLIA_LEAGUES:TalentCity[]=[
+  {
+    "name": "兴安盟",
+    "official": "兴安盟",
+    "province": "内蒙古自治区",
+    "level": "prefecture",
+    "intro": "内蒙古2026就业创业、人才引进与保障安居基础索引，实际本盟政策及实时公寓房源仍须专项核验。",
+    "code": "152200",
+    "pinyin": "xing an meng",
+    "initials": "xam",
+    "aliases": [
+      "兴安盟",
+      "兴安",
+      "xing an meng",
+      "xinganmeng",
+      "xam",
+      "内蒙古兴安盟",
+      "内蒙古自治区兴安盟"
+    ]
+  },
+  {
+    "name": "锡林郭勒盟",
+    "official": "锡林郭勒盟",
+    "province": "内蒙古自治区",
+    "level": "prefecture",
+    "intro": "内蒙古2026就业创业、人才引进与保障安居基础索引，实际本盟政策及实时公寓房源仍须专项核验。",
+    "code": "152500",
+    "pinyin": "xi lin guo le meng",
+    "initials": "xlglm",
+    "aliases": [
+      "锡林郭勒盟",
+      "锡林郭勒",
+      "xi lin guo le meng",
+      "xilinguolemeng",
+      "xlglm",
+      "内蒙古锡林郭勒盟",
+      "内蒙古自治区锡林郭勒盟"
+    ]
+  },
+  {
+    "name": "阿拉善盟",
+    "official": "阿拉善盟",
+    "province": "内蒙古自治区",
+    "level": "prefecture",
+    "intro": "内蒙古2026就业创业、人才引进与保障安居基础索引，实际本盟政策及实时公寓房源仍须专项核验。",
+    "code": "152900",
+    "pinyin": "a la shan meng",
+    "initials": "alsm",
+    "aliases": [
+      "阿拉善盟",
+      "阿拉善",
+      "a la shan meng",
+      "alashanmeng",
+      "alsm",
+      "内蒙古阿拉善盟",
+      "内蒙古自治区阿拉善盟"
+    ]
+  }
+] as TalentCity[];
 const municipalityCode:Record<string,string>={北京:'110000',天津:'120000',上海:'310000',重庆:'500000'};
 export const TALENT_CITY_INDEX:TalentCity[]=[
  ...TALENT_MUNICIPALITIES.map(c=>({...c,code:municipalityCode[c.name]})),
  ...TALENT_PREFECTURE_CITIES,
- ...TALENT_YUNNAN_PREFECTURES
+ ...TALENT_YUNNAN_PREFECTURES,
+ ...TALENT_INNER_MONGOLIA_LEAGUES
 ];
 const normalize=(text:string)=>text.trim().toLowerCase().replace(/[\s，。,.、·•\-]/g,'');
 export function findTalentProvince(input:string){
