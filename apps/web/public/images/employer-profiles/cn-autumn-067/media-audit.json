@@ -1,5 +1,5 @@
 {
-  "company": "弘象科技",
+  "company": "弘象",
   "reviewDate": "2026-10-31",
   "officialLogo": false,
   "commercialLicenseVerified": false,
@@ -16,5 +16,6 @@
     }
   ],
   "photoMaterialization": "Via scripts/prepare-employers-066-068-real-media.py in isolated CI build; image URLs and hashes written into build output media-sources.json",
-  "notes": "Real photos and official product visuals are attributed but online publication permission remains unverified. Editorial SVG is never to be represented as a real photo."
+  "notes": "Real photos and official product visuals are attributed but online publication permission remains unverified. Editorial SVG is never to be represented as a real photo.",
+  "legalEntity": "北京弘象科技有限公司"
 }
