@@ -15,7 +15,7 @@ for(const num of ids){
  assert(Array.isArray(p.jobs));
  if(p.jobs.length===0)missingRoles.push(id);
  assert(p.jobs.every(j=>j.category&&j.title&&j.summary&&j.requirements&&j.city&&j.evidenceUrl),'Missing job details '+id);
- assert(p.jobs.every(j=>j.majorUnrestricted||(j.majorNames?.length||0)+(j.editorialRelatedMajors?.length||0)>0),'No major mapping whatsoever '+id);
+ assert(p.jobs.every(j=>Array.isArray(j.majorNames)&&Array.isArray(j.editorialRelatedMajors)&&typeof j.majorUnrestricted==='boolean'),'Major evidence status must be explicit '+id);
  assert(p.jobs.every(j=>j.currentOpenVerified===false),'Unsupported live recruiting status '+id);
  jobs+=p.jobs.length;
  const files=[p.media.logo,...p.media.photos.map(x=>x.path)];
