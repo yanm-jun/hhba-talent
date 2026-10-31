@@ -22,6 +22,9 @@ jobs:
       - name: Generate source-audited 081-083 documentary photography and visible non-real fallbacks
         working-directory: apps/web
         run: python scripts/prepare-employers-081-083-photo-evidence.py
+      - name: Package verified 081-082 brand reference wordmarks (not licensed for commercial advertising)
+        working-directory: apps/web
+        run: python scripts/prepare-employers-081-083-logos.py
       - name: Package inherited 078-080 evidence-backed imagery
         working-directory: apps/web
         run: python scripts/prepare-employers-078-080-source-media.py
