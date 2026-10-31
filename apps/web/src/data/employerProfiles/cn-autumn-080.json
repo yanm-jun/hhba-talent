@@ -1,0 +1,397 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-080",
+  "name": "达能",
+  "displayName": "达能（中国）",
+  "englishName": "Danone",
+  "aliases": [
+    "Danone",
+    "达能中国",
+    "达能亚太",
+    "达能亚太（上海）管理有限公司",
+    "2027达能管培生",
+    "纽迪希亚",
+    "Nutricia"
+  ],
+  "industry": "食品饮料 · 生命早期营养 · 医学营养 · 食品研发 · 制造供应链",
+  "subtitle": "达能中国饮料／生命早期营养／成人医学营养 · 多地2027届管培生",
+  "overview": "达能在中国围绕饮料及饮用水、生命早期营养、成人医学营养等业务发展，2027届校招简章明确职能管理培训生和医药管理培训生两大项目。其官方校招专页列出区域制造、质量、研发、营销、电商与医药多种岗位和相应城市。官方说明2025-01-01至2027-07-31毕业的本科及以上毕业生可以申报，部分医学/研发类岗位有资格限制；2027届高校招聘公告给出的网申截止时间是2026-10-31，不可声称仍在招。",
+  "lastReviewed": "2026-11-01",
+  "sources": [
+    "https://careersite.danone.com.cn/zh_CN/careers/Campus/index.html",
+    "https://job.hust.edu.cn/zpinfo1/2431809.htm",
+    "https://fimmu.jobsys.cn/index.php/web/index/jobs-brief-detail?id=S0UXSQG",
+    "https://myjob.dlmu.edu.cn/campus/view/id/869026",
+    "https://www.danone.com.cn/newsroom/press-releases/danone-expands-nutricia-wuxi"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-080/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-080/photo1.svg",
+        "caption": "达能 · HHBA原创建模业务示意（非企业实景）",
+        "alt": "达能业务编辑示意图，非真实企业场景照片",
+        "note": "源码采用显著标注的独立非实景SVG，独立审查构建尝试以媒体来源证据替换为实际新闻照片，图像转载许可尚待核查。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-080/photo2.svg",
+        "caption": "达能 · HHBA原创建模业务示意（非企业实景）",
+        "alt": "达能业务编辑示意图，非真实企业场景照片",
+        "note": "源码采用显著标注的独立非实景SVG，独立审查构建尝试以媒体来源证据替换为实际新闻照片，图像转载许可尚待核查。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://app.mokahr.com/campus-recruitment/danone/170511?locale=zh-CN#/jobs",
+    "label": "达能2027届官方指定Moka校园招聘职位列表",
+    "status": "official_portal",
+    "subject": "达能（中国）",
+    "note": "高校2027届校招公告注明2026-10-31截止。达能校招专页披露滚动招聘、招满即止、2025-01-01至2027-07-31毕业的本科及以上范围；具体岗位的继续开放状态须逐项登录Moka核查。"
+  },
+  "majorIntro": "职位名称与地点来自达能官方校招页面，专业标签是HHBA辅助归类。医药管培生必须核对医学药学相关资格及医药代表备案专业要求；市场营销等岗位与研发岗位不能一概视为“专业不限”。",
+  "preferredMajors": [
+    "食品科学与工程",
+    "机械工程",
+    "自动化",
+    "工业工程",
+    "生物工程",
+    "化学",
+    "质量管理工程",
+    "市场营销",
+    "工商管理",
+    "电子商务",
+    "药学",
+    "临床医学",
+    "营养学",
+    "公共卫生与预防医学",
+    "供应链管理"
+  ],
+  "photoNote": "媒体审计优先核查该企业名称明确匹配的实际场景新闻图片，逐张记录原图地址、图片所在新闻文章、尺寸和SHA-256。未取得可验证的原图则保留显著非实景示意，真实来源图片的再次商业转载许可尚未确认。",
+  "business": [
+    {
+      "title": "饮料与饮用水业务",
+      "description": "在中国开展脉动等饮料及依云等品牌相关运营和消费品市场业务。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "饮料 · 消费品",
+      "details": [
+        "饮料产品及品牌",
+        "制造供应与质量",
+        "渠道及消费者运营"
+      ]
+    },
+    {
+      "title": "生命早期营养",
+      "description": "依托婴幼儿和特殊配方营养产品开展研发、供应与市场服务。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "营养 · 科研",
+      "details": [
+        "婴幼儿营养产品",
+        "食品科学与研发",
+        "供应与合规"
+      ]
+    },
+    {
+      "title": "成人医学营养",
+      "description": "开展医学营养、肠内营养和特殊医学用途营养领域业务。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "临床营养",
+      "details": [
+        "医学营养产品",
+        "专业医学沟通",
+        "特殊医学用途食品"
+      ]
+    },
+    {
+      "title": "食品科技与研发创新",
+      "description": "开展营养科学、产品工艺、食品配方、包装与质量技术研究。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "研发 · 食品科技",
+      "details": [
+        "食品产品研发",
+        "功能与营养研究",
+        "包装与工艺创新"
+      ]
+    },
+    {
+      "title": "饮料及营养制造运营",
+      "description": "在中国生产基地开展制造、自动化、设备工程及质量体系管理。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "工业制造",
+      "details": [
+        "营运管培生培养",
+        "设备与流程工程",
+        "食品安全与质量"
+      ]
+    },
+    {
+      "title": "市场与电商职能",
+      "description": "面向消费者运营、品牌营销、电子商务和全球供应链协同开展管理工作。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "商业 · 供应链",
+      "details": [
+        "市场营销和渠道",
+        "数字商务运营",
+        "供应链及职能管理"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "bev-manufacturing-wuhan",
+      "title": "营运管培生—区域制造（达能中国饮料·武汉）",
+      "category": "制造 / 运营",
+      "city": "武汉",
+      "summary": "达能官方2027管培生职位列表列示达能中国饮料区域制造武汉岗位，属于制造运营与现场管理方向，不等同于其他制造基地同一个岗位。",
+      "requirements": "官方说明2025-01-01至2027-07-31毕业，本科及以上；制造岗位可能有专业要求，食品、机械、自动化、工业工程相关度为参考，需核实JD具体条件。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "食品科学与工程",
+        "机械工程",
+        "自动化",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2025.01—2027.07毕业，本科及以上",
+      "url": "https://app.mokahr.com/campus-recruitment/danone/170511?locale=zh-CN#/jobs",
+      "evidenceUrl": "https://careersite.danone.com.cn/zh_CN/careers/Campus/index.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "达能2027届招聘项目及下属业务实体",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "bev-manufacturing-tangshan",
+      "title": "营运管培生—区域制造（达能中国饮料·唐山丰润）",
+      "category": "制造 / 运营",
+      "city": "唐山市丰润区",
+      "summary": "达能校招官网独立列示唐山丰润区域制造管培生，不应与武汉制造岗位合并地点。",
+      "requirements": "招聘基本毕业窗口和学历以达能官方2027简章为准，制造工作通常涉及工艺与质量，专业建议不等于岗位公示精确限制。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "自动化",
+        "食品科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2025.01—2027.07毕业，本科及以上",
+      "url": "https://app.mokahr.com/campus-recruitment/danone/170511?locale=zh-CN#/jobs",
+      "evidenceUrl": "https://careersite.danone.com.cn/zh_CN/careers/Campus/index.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "达能2027届招聘项目及下属业务实体",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "bev-quality-qionglai",
+      "title": "营运管培生—区域质量（达能中国饮料）",
+      "category": "质量 / 食品",
+      "city": "成都市邛崃市",
+      "summary": "达能官网职位列表中独立出现区域质量营运管培生、工作地点邛崃，面向饮料制造质量与合规方向。",
+      "requirements": "官方提示制造/质量岗位存在专业要求；食品科学、化学和质量工程为参考学科，质量体系、实验能力等具体要求须查看官方单职位。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "食品科学与工程",
+        "质量管理工程",
+        "化学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2025.01—2027.07毕业，本科及以上",
+      "url": "https://app.mokahr.com/campus-recruitment/danone/170511?locale=zh-CN#/jobs",
+      "evidenceUrl": "https://careersite.danone.com.cn/zh_CN/careers/Campus/index.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "达能2027届招聘项目及下属业务实体",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "research-shanghai",
+      "title": "研发管培生（达能中国）",
+      "category": "食品 / 研发",
+      "city": "上海",
+      "summary": "官方2027校招直接列示研发管培生上海岗位，工作内容与食品及营养产品研发相关，项目及用人实体均以当前JD为准。",
+      "requirements": "研发职位存在专业条件，不能将营销岗位无专业限制套用；食品工程、生物工程、营养相关学科为参考，实际学历及研究技能要求需核。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "食品科学与工程",
+        "生物工程",
+        "营养学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2025.01—2027.07毕业，本科及以上",
+      "url": "https://app.mokahr.com/campus-recruitment/danone/170511?locale=zh-CN#/jobs",
+      "evidenceUrl": "https://careersite.danone.com.cn/zh_CN/careers/Campus/index.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "达能2027届招聘项目及下属业务实体",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "marketing-multi",
+      "title": "市场营销管培生（达能中国）",
+      "category": "市场 / 商业",
+      "city": "上海／广州／香港（岗位说明范围）",
+      "summary": "官方校招列表列出达能中国市场营销管培生，工作地上海、广州及香港；相关申请资格和区域派驻规则应以对应职位详情为准。",
+      "requirements": "达能官方问答称市场营销管培生无专业限制；招聘时间和工作地点仍以实际岗位为准，香港工作资格不得自动假定。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理",
+        "电子商务"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "2025.01—2027.07毕业，本科及以上",
+      "url": "https://app.mokahr.com/campus-recruitment/danone/170511?locale=zh-CN#/jobs",
+      "evidenceUrl": "https://careersite.danone.com.cn/zh_CN/careers/Campus/index.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "达能2027届招聘项目及下属业务实体",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "early-medical-market",
+      "title": "医学市场管培生（生命早期营养·儿科）",
+      "category": "医学 / 营养",
+      "city": "上海",
+      "summary": "官方校招职位列有生命早期营养事业部医学市场管培生（儿科方向）上海岗位，涉及医学与专业营养市场相关培养。",
+      "requirements": "医学市场类为有专业要求的职位，医学、药学、营养相关只是匹配建议，具体注册备案要求和专业范围以官方职位及监管规则为准。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "临床医学",
+        "药学",
+        "营养学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2025.01—2027.07毕业，本科及以上",
+      "url": "https://app.mokahr.com/campus-recruitment/danone/170511?locale=zh-CN#/jobs",
+      "evidenceUrl": "https://careersite.danone.com.cn/zh_CN/careers/Campus/index.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "达能2027届招聘项目及下属业务实体",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "early-operations",
+      "title": "营运管培生（生命早期营养）",
+      "category": "制造 / 运营",
+      "city": "上海",
+      "summary": "达能官方列示生命早期营养营运管培生上海岗位，属于该事业部运营管理培养，不能混入达能中国饮料的制造项目。",
+      "requirements": "营运培养项目的毕业资格按达能2027届公告，实际岗位可能设置专业门槛；食品与工业工程为相关度参考，具体条件以职位详情为准。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "食品科学与工程",
+        "工业工程",
+        "供应链管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2025.01—2027.07毕业，本科及以上",
+      "url": "https://app.mokahr.com/campus-recruitment/danone/170511?locale=zh-CN#/jobs",
+      "evidenceUrl": "https://careersite.danone.com.cn/zh_CN/careers/Campus/index.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "达能2027届招聘项目及下属业务实体",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "early-ecommerce",
+      "title": "商务管培生—电商（生命早期营养）",
+      "category": "商务 / 电商",
+      "city": "上海",
+      "summary": "达能官方校招项目列有生命早期营养电商商务管理培训生，负责数字商务相关方向并设独立上海岗位。",
+      "requirements": "电子商务、市场营销、工商管理属于编辑匹配；校招官网没有在列表中证明无专业限制，需确认该项目的具体工作职责与毕业要求。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子商务",
+        "市场营销",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2025.01—2027.07毕业，本科及以上",
+      "url": "https://app.mokahr.com/campus-recruitment/danone/170511?locale=zh-CN#/jobs",
+      "evidenceUrl": "https://careersite.danone.com.cn/zh_CN/careers/Campus/index.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "达能2027届招聘项目及下属业务实体",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "adult-medical-beijing",
+      "title": "医药管培生（成人医学营养·北京）",
+      "category": "医药 / 临床营养",
+      "city": "北京",
+      "summary": "官方达能校招专页列出成人医学营养事业部北京医药管理培训生项目，主要面向医学营养领域。",
+      "requirements": "官方明确仅面向医学、药学以及列入《医药代表备案专业参考目录》的相关专业；应核对专业及课程证明，毕业时间2025-01-01至2027-07-31，本科及以上。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "药学",
+        "临床医学",
+        "营养学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2025.01—2027.07毕业，本科及以上",
+      "url": "https://app.mokahr.com/campus-recruitment/danone/170511?locale=zh-CN#/jobs",
+      "evidenceUrl": "https://careersite.danone.com.cn/zh_CN/careers/Campus/index.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "达能2027届招聘项目及下属业务实体",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "adult-medical-nanjing",
+      "title": "医药管培生（成人医学营养·南京）",
+      "category": "医药 / 临床营养",
+      "city": "南京",
+      "summary": "达能校招官网明确列示南京成人医学营养医药管培生岗位，不将其他城市管培生合并展示。",
+      "requirements": "医学药学及医药代表备案专业资格要求适用，需逐人核对学历和课程；医药相关专业的推荐不意味着必然符合注册条件。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "药学",
+        "临床医学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2025.01—2027.07毕业，本科及以上",
+      "url": "https://app.mokahr.com/campus-recruitment/danone/170511?locale=zh-CN#/jobs",
+      "evidenceUrl": "https://careersite.danone.com.cn/zh_CN/careers/Campus/index.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "达能2027届招聘项目及下属业务实体",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "adult-medical-hangzhou",
+      "title": "医药管培生（成人医学营养·杭州）",
+      "category": "医药 / 临床营养",
+      "city": "杭州",
+      "summary": "达能2027官方项目列有成人医学营养杭州医药培训生，在专业营养与医学市场业务体系培养。",
+      "requirements": "需具有医学、药学或符合医药代表备案目录的相关专业背景；学历为本科及以上，实际报考及备案结果以公司和监管要求为准。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "药学",
+        "临床医学",
+        "营养学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2025.01—2027.07毕业，本科及以上",
+      "url": "https://app.mokahr.com/campus-recruitment/danone/170511?locale=zh-CN#/jobs",
+      "evidenceUrl": "https://careersite.danone.com.cn/zh_CN/careers/Campus/index.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "达能2027届招聘项目及下属业务实体",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "adult-medical-guangzhou",
+      "title": "医药管培生（成人医学营养·广州）",
+      "category": "医药 / 临床营养",
+      "city": "广州",
+      "summary": "达能官方校招官网列有成人医学营养广州医药管培生，招聘主体区别于早期营养以及饮料业务。",
+      "requirements": "公司官方强调医学、药学及备案目录专业要求，单个职位的剩余名额、具体资格及申请截止状态须以Moka当期JD为准。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "药学",
+        "临床医学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2025.01—2027.07毕业，本科及以上",
+      "url": "https://app.mokahr.com/campus-recruitment/danone/170511?locale=zh-CN#/jobs",
+      "evidenceUrl": "https://careersite.danone.com.cn/zh_CN/careers/Campus/index.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "达能2027届招聘项目及下属业务实体",
+      "currentOpenVerified": false
+    }
+  ]
+}

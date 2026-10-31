@@ -1,0 +1,21 @@
+{
+  "company": "达能",
+  "reviewedAt": "2026-11-01",
+  "logoOfficialVerified": false,
+  "logoSource": "Independent HHBA editorial text mark, not official logo",
+  "commercialReuseRightsVerified": false,
+  "mediaSlots": [
+    {
+      "slot": 1,
+      "fallback": "images/employer-profiles/cn-autumn-080/photo1.svg",
+      "fallbackType": "HHBA editorial graphic, NOT ACTUAL corporate photo",
+      "ifValidated": "images/employer-profiles/cn-autumn-080/photo1.jpg"
+    },
+    {
+      "slot": 2,
+      "fallback": "images/employer-profiles/cn-autumn-080/photo2.svg",
+      "fallbackType": "HHBA editorial graphic, NOT ACTUAL corporate photo",
+      "ifValidated": "images/employer-profiles/cn-autumn-080/photo2.jpg"
+    }
+  ]
+}

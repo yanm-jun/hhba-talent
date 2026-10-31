@@ -1,0 +1,21 @@
+{
+  "company": "中国邮政",
+  "reviewedAt": "2026-11-01",
+  "logoOfficialVerified": false,
+  "logoSource": "existing same-brand logo from repository cn-autumn-078.svg, rights not cleared",
+  "commercialReuseRightsVerified": false,
+  "mediaSlots": [
+    {
+      "slot": 1,
+      "fallback": "images/employer-profiles/cn-autumn-078/photo1.svg",
+      "fallbackType": "HHBA editorial graphic, NOT ACTUAL corporate photo",
+      "ifValidated": "images/employer-profiles/cn-autumn-078/photo1.jpg"
+    },
+    {
+      "slot": 2,
+      "fallback": "images/employer-profiles/cn-autumn-078/photo2.svg",
+      "fallbackType": "HHBA editorial graphic, NOT ACTUAL corporate photo",
+      "ifValidated": "images/employer-profiles/cn-autumn-078/photo2.jpg"
+    }
+  ]
+}
