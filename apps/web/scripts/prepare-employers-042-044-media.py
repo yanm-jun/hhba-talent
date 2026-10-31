@@ -51,6 +51,30 @@ def logo_candidates(home):
     if urlparse(u).hostname==urlparse(homepage).hostname:records[u]=max(records.get(u,0),9)
   except Exception as e:print('LOGO_HTML_WARNING',homepage,str(e)[:130],flush=True)
  return [u for u,s in sorted(records.items(),key=lambda x:-x[1])]
+def company_product_images(page, keywords):
+  try:
+    raw=read(page).decode('utf-8','replace')
+    doc=BeautifulSoup(raw,'html.parser')
+    found=[]
+    for im in doc.select('img,source'):
+      label=' '.join(str(im.get(k,'')) for k in ['alt','title','class','data-name'])
+      if not any(k.lower() in label.lower() for k in keywords):continue
+      for attr in ('src','data-src','data-original','data-lazy-src'):
+        value=im.get(attr)
+        if not value or value.startswith('data:'):continue
+        url=urljoin(page,html.unescape(value))
+        if urlparse(url).scheme not in ('https','http'):continue
+        if urlparse(url).hostname not in ['www.iplusmobot.cn','iplusmobot.cn','www.iplusmobot.com','iplusmobot.com']:continue
+        found.append((url,page))
+    uniq=[];seen=set()
+    for u,p in found:
+      if u not in seen:uniq.append((u,p));seen.add(u)
+    print('PRODUCT_IMAGE_DISCOVER',page,keywords,uniq[:12],flush=True)
+    return uniq
+  except Exception as e:
+    print('PRODUCT_IMAGE_DISCOVER_FAILED',page,str(e)[:150],flush=True)
+    return []
+
 def convert(raw,name):
  if b'<svg' in raw[:6000]:
   raw=cairosvg.svg2png(bytestring=raw,output_width=1000)
@@ -81,6 +105,17 @@ for num,c in CONFIG.items():
  except Exception:audit={}
  used=set()
  images={'logo.png':[(u,c['home'][0]) for u in logo_candidates(c['home'])],**c['images']}
+ if num=='043':
+  images['photo1.jpg']=(
+     company_product_images('https://www.iplusmobot.cn/',['EMMA','标准 AMR','标准AMR'])+
+     company_product_images('https://www.iplusmobot.cn/products/emma-k/',['EMMA 400K','EMMA K','EMMA'])+
+     images['photo1.jpg']
+  )
+  images['photo2.jpg']=(
+     company_product_images('https://www.iplusmobot.cn/',['OMNI','FOLA','NERA'])+
+     company_product_images('https://www.iplusmobot.cn/about.html',['OMNI','FOLA','NERA'])+
+     images['photo2.jpg']
+  )
  print('LOGO_CANDIDATES',num,images['logo.png'][:9],flush=True)
  for name,options in images.items():
   filename=path/name
