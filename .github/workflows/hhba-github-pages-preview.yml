@@ -228,6 +228,9 @@ jobs:
       - name: Package source-audited 081-083 company documentary photographs after approval
         working-directory: apps/web
         run: python scripts/prepare-employers-081-083-photo-evidence.py
+      - name: Package verified 081-082 brand reference wordmarks (not licensed for commercial advertising)
+        working-directory: apps/web
+        run: python scripts/prepare-employers-081-083-logos.py
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
