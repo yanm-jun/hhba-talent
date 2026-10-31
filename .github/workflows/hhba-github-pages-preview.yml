@@ -240,6 +240,9 @@ jobs:
       - name: Package 087-089 source-backed company photos after user-approved merge
         working-directory: apps/web
         run: python scripts/prepare-employers-087-089-photo-evidence.py
+      - name: Package verified 087-089 corporate identification wordmarks with trademark audit
+        working-directory: apps/web
+        run: python scripts/prepare-employers-087-089-logo-references.py
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci

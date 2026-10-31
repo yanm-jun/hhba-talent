@@ -22,6 +22,9 @@ jobs:
       - name: Source original company photos and verify identity, dimensions, SHA256
         working-directory: apps/web
         run: python scripts/prepare-employers-087-089-photo-evidence.py
+      - name: Package verified 087-089 corporate identification wordmarks with trademark audit
+        working-directory: apps/web
+        run: python scripts/prepare-employers-087-089-logo-references.py
       - name: Repackage inherited 084-086 photos and logo-source evidence
         working-directory: apps/web
         run: |
@@ -87,6 +90,9 @@ jobs:
             apps/web/public/images/employer-profiles/cn-autumn-087/media-sources.json
             apps/web/public/images/employer-profiles/cn-autumn-088/media-sources.json
             apps/web/public/images/employer-profiles/cn-autumn-089/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-087/logo-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-088/logo-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-089/logo-sources.json
             apps/web/public/images/employer-profiles/cn-autumn-084/logo-sources.json
             apps/web/public/images/employer-profiles/cn-autumn-085/logo-sources.json
           retention-days: 30
