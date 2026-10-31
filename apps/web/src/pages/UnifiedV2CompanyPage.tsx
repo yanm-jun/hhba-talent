@@ -144,6 +144,56 @@ const pxwGroups=[
  }
 ] as const;
 const keyenceGroups=[{label:'专业不限',majors:[]}] as const;
+const minieyeGroups=[
+ {
+  "label": "算法 / AI",
+  "majors": [
+   "人工智能",
+   "计算机科学与技术",
+   "控制科学与工程"
+  ]
+ },
+ {
+  "label": "软件 / 数据",
+  "majors": [
+   "计算机科学与技术",
+   "软件工程",
+   "数据科学与大数据技术"
+  ]
+ },
+ {
+  "label": "嵌入式 / 硬件",
+  "majors": [
+   "电子信息工程",
+   "电气工程及其自动化",
+   "自动化"
+  ]
+ },
+ {
+  "label": "测试 / 验证",
+  "majors": [
+   "软件工程",
+   "自动化",
+   "电子信息工程"
+  ]
+ },
+ {
+  "label": "项目 / 管培",
+  "majors": [
+   "工程管理",
+   "工业工程",
+   "日语"
+  ]
+ },
+ {
+  "label": "供应链",
+  "majors": [
+   "供应链管理",
+   "物流管理",
+   "工业工程"
+  ]
+ }
+] as const;
 function roleMatches(role:Role,major:string){
  if(!major||role.majorUnrestricted)return true;
  return [...role.majorNames,...role.editorialRelatedMajors].some(x=>majorNamesRelated(x,major));
@@ -155,10 +205,11 @@ export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
  const weipu=id==='cn-autumn-032';
  const bodor=id==='cn-autumn-033';
  const pxw=id==='cn-autumn-034';
+ const minieye=id==='cn-autumn-035';
  const keyence=id==='cn-autumn-157';
- const showcase=qizheng||weipu||bodor||pxw||keyence;
- const detailedCards=weipu||bodor||pxw||keyence;
- const majorGroups=keyence?keyenceGroups:(pxw?pxwGroups:(bodor?bodorGroups:(weipu?weipuGroups:qizhengGroups)));
+ const showcase=qizheng||weipu||bodor||pxw||minieye||keyence;
+ const detailedCards=weipu||bodor||pxw||minieye||keyence;
+ const majorGroups=minieye?minieyeGroups:(keyence?keyenceGroups:(pxw?pxwGroups:(bodor?bodorGroups:(weipu?weipuGroups:qizhengGroups))));
  const [expanded,setExpanded]=useState(false);
  const [focusedRole]=useState(()=>new URLSearchParams(location.search).get('role')||'');
  const back=getCompanyReturnTarget();
@@ -170,13 +221,14 @@ export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
   if(!major)return true;
   if(bodor)return job.category===major;
   if(pxw)return job.category===major;
+  if(minieye)return job.category===major;
   if(keyence)return major==='专业不限'&&job.majorUnrestricted;
   if(showcase){const g=majorGroups.find(g=>g.label===major);return !!g&&g.majors.some(name=>roleMatches(job,name));}
   return roleMatches(job,major);
- })||[],[p,major,bodor,pxw,keyence,showcase,majorGroups]);
+ })||[],[p,major,bodor,pxw,minieye,keyence,showcase,majorGroups]);
  if(!p)return <Shell user={user}><section className="hhba-v2-company-status" role="alert">企业档案未加入主站数据目录。<p><Link to="/candidate/jobs">返回招聘市场</Link></p></section></Shell>;
  return <Shell user={user}>
-  <article className={"company-profile hhba-kpmg-compact"+(showcase?" hhba-v2-showcase":"")+(weipu?" hhba-v2-weipu":"")+(bodor||pxw||keyence?" hhba-v2-bodor":"")+(pxw?" hhba-v2-pxw":"")+(keyence?" hhba-v2-keyence":"")+(qizheng?" hhba-v2-qizheng":"")} data-company-template="unified-v2" data-domestic-rebuild="v2" data-employer-id={p.id}>
+  <article className={"company-profile hhba-kpmg-compact"+(showcase?" hhba-v2-showcase":"")+(weipu?" hhba-v2-weipu":"")+(bodor||pxw||keyence||minieye?" hhba-v2-bodor":"")+(pxw?" hhba-v2-pxw":"")+(minieye?" hhba-v2-minieye":"")+(keyence?" hhba-v2-keyence":"")+(qizheng?" hhba-v2-qizheng":"")} data-company-template="unified-v2" data-domestic-rebuild="v2" data-employer-id={p.id}>
    <nav className="company-profile-top" aria-label="企业详情导航">
     <Link to={back.to} restoreScrollY={back.scrollY} restoreMarketState={back.marketState}><ArrowLeft size={15}/> 返回上一页</Link>
     <Link to="/candidate/jobs">招聘市场 <ArrowRight size={15}/></Link>
@@ -202,11 +254,11 @@ export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
      <div className="hhba-v2-company-chips">
       <button type="button" className={!major?'selected':''} onClick={()=>setMajor('')}>全部专业 ({p.jobs.length})</button>
       {majorGroups.map(g=><button type="button" key={g.label} className={major===g.label?'selected':''} onClick={()=>setMajor(g.label)}>
-       {g.label} ({p.jobs.filter(j=>keyence?g.label==='专业不限'&&j.majorUnrestricted:(bodor||pxw?j.category===g.label:g.majors.some(name=>roleMatches(j,name)))).length})</button>)}
+       {g.label} ({p.jobs.filter(j=>keyence?g.label==='专业不限'&&j.majorUnrestricted:(bodor||pxw||minieye?j.category===g.label:g.majors.some(name=>roleMatches(j,name)))).length})</button>)}
      </div>
     </section>}
    <section className="hhba-kpmg-section hhba-v2-company-jobs" aria-label="招聘岗位">
-    {showcase?<div className="hhba-kpmg-section-heading"><div><h2>招聘岗位</h2><p>{major||'全部专业'} · {matches.length} 条岗位资料。当前申请状态请以{keyence?'基恩士官方招聘系统':(pxw?'鹏芯微校园招聘系统':(bodor?'邦德激光招聘系统':(weipu?'微谱招聘系统':'奇正集团官网')))}为准。</p></div></div>:null}
+    {showcase?<div className="hhba-kpmg-section-heading"><div><h2>招聘岗位</h2><p>{major||'全部专业'} · {matches.length} 条岗位资料。当前申请状态请以{minieye?'佑驾创新2027校园招聘系统':(keyence?'基恩士官方招聘系统':(pxw?'鹏芯微校园招聘系统':(bodor?'邦德激光招聘系统':(weipu?'微谱招聘系统':'奇正集团官网'))))}为准。</p></div></div>:null}
     {!showcase&&<>
     <div className="hhba-kpmg-section-heading"><div><h2>岗位与所学专业</h2>
      <p>{p.majorIntro}</p></div></div>
