@@ -318,3 +318,11 @@ check('Zhejiang 11 cities have actual policy and housing rows on the deployment 
   for(const x of [...p,...h])assert.ok(x.sourceUrl,city+' unsourced row');
  }
 });
+
+check('Shanxi 11 prefectures must not ship a zero-policy or zero-housing city card',()=>{
+ const cities=["太原","大同","阳泉","长治","晋城","朔州","晋中","运城","忻州","临汾","吕梁"];
+ for(const city of cities){
+  assert.ok(TALENT_POLICY_RECORDS.some(r=>r.city===city&&r.id.startsWith('sx-')),city+' missing Shanxi policy import');
+  assert.ok(TALENT_HOUSING_RECORDS.some(r=>r.city===city&&r.id.startsWith('sx-')),city+' missing Shanxi housing import');
+ }
+});
