@@ -214,7 +214,7 @@ function CityHub({city}:{city:string}){
    </div></section>}
   {LIAONING_14_CITIES.includes(match.name)&&<section className="ts-sub-section" aria-label="辽宁省14市人才政策和安居资料">
    <div className="ts-sub-section-heading"><h2>{match.name} · 辽宁2026人才政策与住房指南</h2><Link to={talentListUrl('policies',match.name)}>查看全部政策 <ArrowRight size={15}/></Link></div>
-   <p>辽宁全省2026高校毕业生就业创业清单和2026已截止的“三支一扶”仅为省级政策的属地视图，不是独立市级补贴；另有{match.name}相关人才制度及住房政策资料。具体公寓地址、租金与空房必须查看政府最新配租批次，不能从住房补贴制度推定已有现房。</p>
+   <p>辽宁省政府2026年高校毕业生就业创业支持清单有16项，另收录2026年已截止的“三支一扶”历史批次；均为省级政策属地视图，不是17项由本市另发的补贴。个人现金支持、企业补助、可偿还贷款、税费扣减和服务政策必须区分；另有{match.name}相关人才制度及住房政策资料。具体公寓地址、租金与空房必须查看政府最新配租批次，不能从住房补贴制度推定已有现房。</p>
    <div className="ts-sub-grid">
     {LIAONING_PROVINCIAL_POLICY_RECORDS.filter(p=>p.city===match.name).map(p=><Link key={p.id} className="ts-sub-tile" to={liaoningGuideRoute(p.id)}><strong>{p.title}</strong><span>{p.temporal==='past-window'?'2026报名已截止 · 历史资料':p.headlineUnit||'辽宁省统一政策，按城市属地申请'}</span><ArrowRight size={15}/></Link>)}
     {[...policies,...liaoningLocalResearch].filter(p=>p.id.startsWith('ln-')&&!p.id.includes('-provincial-')&&!p.id.endsWith('-three-support-closed')).map(p=><Link key={p.id} className="ts-sub-tile" to={liaoningGuideRoute(p.id)}><strong>{p.title}</strong><span>{p.category} · 地方政策来源与完整资格步骤</span><ArrowRight size={15}/></Link>)}
