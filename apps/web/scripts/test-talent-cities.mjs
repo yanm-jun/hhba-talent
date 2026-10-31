@@ -66,8 +66,8 @@ check('search suggestions return leading 8 while exact city remains accessible',
 check('preserve former cities and their real photo sources',()=>{
  for(const n of ['杭州','深圳','青岛','济南'])assert.ok(findTalentCity(n)?.photo?.startsWith('https://'));
 });
-check('excluded non-city administrative levels and county-level cities',()=>{
- for(const n of ['阿里地区','伊犁哈萨克自治州','阿拉善盟','五指山市','济源市','博乐市']){
+check('preserve out-of-scope provinces and county-level cities, while Inner Mongolia leagues are newly included',()=>{
+ for(const n of ['阿里地区','伊犁哈萨克自治州','阿坝藏族羌族自治州','五指山市','济源市','博乐市']){
   assert.equal(findTalentCity(n),null,n);
  }
 });
