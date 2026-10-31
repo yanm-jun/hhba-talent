@@ -39,7 +39,7 @@ for(let i=0;i<3;i++){
  assert(audit['photo1.jpg'].verified&&audit['photo2.jpg'].verified,'Both photos from known associated entities');
  if(audit['logo.png'].editorialFallback)assert(p.photoNote.includes('非企业官方')||p.photoNote.includes('禁止以'),'Text logo not official, disclosure required');
  if(n==='051'){
-  assert(p.overview.includes('水泥')&&!p.overview.includes('高性能合金'),'Jinzhong is Jidong/Tianshan cement-backed, not fake metal-alloy enterprise');
+  assert(p.overview.includes('水泥')&&p.industry.includes('水泥')&&!p.industry.includes('合金'),'Jinzhong actual industry must be cement-backed, without assuming bogus alloy operations');
   assert(p.recruitment.status==='unconfirmed','No official online ATS found');
  }
  if(n==='052')assert(p.jobs.every(j=>j.title.includes('方向')),'Only 5 confirmed direction categories, no fake specific JD');
