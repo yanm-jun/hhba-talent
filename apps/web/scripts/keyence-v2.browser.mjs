@@ -17,7 +17,7 @@ try{
   for(const img of await root.locator('.hhba-kpmg-photo-grid img').all()){
    await img.evaluate(async el=>{
      if(!el.complete)await new Promise(done=>{el.addEventListener('load',done,{once:true});el.addEventListener('error',done,{once:true})});
-     assert.ok(el.naturalWidth>100,'Broken KEYENCE image');
+     if(el.naturalWidth<100)throw Error('Broken KEYENCE image');
    });
   }
   const logo=root.locator('.hhba-kpmg-logo img');
