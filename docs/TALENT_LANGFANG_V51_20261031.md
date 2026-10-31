@@ -20,3 +20,14 @@
 - 人才服务城市首页保留原有布局，并增加三张导航卡片；全国城市检索和城市政策列表通过共享注册表加载。
 - 不加入`ACCEPTED_TALENT_CITIES`，不得说整城100%完成。
 - 质量检查：`node --experimental-strip-types apps/web/scripts/test-langfang-city-v51.mjs`（在apps/web下运行需删去路径前缀）。Pages成功部署后核验路线与资源数据。
+
+## 2026燕赵英才A/B卡住房公积金贷款（2026-10-31补充）
+- [市政府转载公积金管委会2026-04-30通知](https://www.lf.gov.cn/Item/155350.aspx)：5月15日起合格A/B卡家庭贷款最高120万元。这是需偿还本息的**公积金贷款上限**，不是个人现金购房补贴，也非确定获贷数额。
+- 列入 `lf-2026-yanzhao-ab-provident-loan`：类别使用现有“购房补贴”菜单但摘要和详情明确非现金贷款；独立 `/talent-service/policy-guide-preview/langfang/provident` 展示A卡、B卡、普通缴存与未持卡四分支。
+- 本条B级基础办事资料，实际贷款申请深链和银行受托清单待核实，不伪造申请入口。
+
+## 新分支开发及验收边界
+- 独立开发分支：`feature/talent-langfang`，由 `main@1ad726f1316c4056a83fac6ba9d8a368982ee607` 建立。
+- 禁止推送 `main`；CI仅针对本分支构建及上传artifact，不允许触发正式GitHub Pages发布。
+- Cloudflare Pages Git连接创建尝试返回HTTP 401、内部Git安装错误；**尚未产生预览站网址**，不能冒充已部署。
+- 只有用户查验独立可点击静态预览并明确批准后才可合并。阿里云正式环境完全不操作。
