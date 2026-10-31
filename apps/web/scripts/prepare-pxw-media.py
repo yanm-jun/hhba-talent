@@ -23,8 +23,8 @@ items=[
   ('https://i5.szhomeimg.com/o/2024/01/19/011919244918191.JPG','https://bbs.szhome.com/30-30430-detail-178644741.html')
  ]),
  ('photo2.jpg',[
-  ('https://www.sz.gov.cn/img/3/3931/3931062/10525622.png','https://www.sz.gov.cn/cn/xxgk/zfxxgj/bmdt/content/mpost_10525622.html'),
-  ('https://www.sz.gov.cn/img/3/3931/3931063/10525622.png','https://www.sz.gov.cn/cn/xxgk/zfxxgj/bmdt/content/mpost_10525622.html')
+  ('https://static2.xunxiang.site/uploads/sites/210/2025/03/8681d2fd0faebdc026de88d40dd0e2a9.jpg','https://www.pxwsemi.com/%E7%94%9F%E6%B4%BB%E4%B8%8E%E7%A6%8F%E5%88%A9'),
+  ('https://static2.xunxiang.site/uploads/sites/210/2025/03/20141639e41fdc4204c74239d287e422.jpg','https://www.pxwsemi.com/%E7%94%9F%E6%B4%BB%E4%B8%8E%E7%A6%8F%E5%88%A9')
  ])
 ]
 audit={}
@@ -48,6 +48,8 @@ for filename,alternatives in items:
      photo.save(out/filename,'WEBP',quality=90,method=5)
     else:
      if photo.width<350 or photo.height<240:raise ValueError('photo resolution')
+     if filename=='photo2.jpg' and photo.height>=460:
+      photo=photo.crop((0,0,photo.width,int(photo.height*0.52))) # real activity scene, not an assembled collage
      photo.thumbnail((1600,1150))
      photo.save(out/filename,'JPEG',quality=87,optimize=True)
     if (out/filename).stat().st_size<1800:raise ValueError('converted image too small')
