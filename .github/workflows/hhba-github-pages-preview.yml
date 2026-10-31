@@ -253,6 +253,9 @@ jobs:
       - name: Verify Chengde V5.1 official talent aid, 2025 housing, historical policies and no live vacancy claims
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-chengde-city-v51.mjs
+      - name: Verify Hebei Xingtai V5.1 2026 purchase and rental guides and honest housing leads
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-xingtai-city-v51.mjs
       - name: Lock future city template, certify full policy guides and protect 95 historical record IDs
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
