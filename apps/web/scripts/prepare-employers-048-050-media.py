@@ -70,6 +70,33 @@ def normalize(raw,kind):
   content=buf.getvalue()
   if len(content)<2500:raise ValueError('image suspiciously tiny')
   return content,(im.width,im.height)
+def annual_report_logo():
+ """Crop Yuanli's OFFICIAL 2025 annual report cover, page 1:
+ company red mark and 'Yuanli元力' wordmark; not generative art.
+ The page was visually inspected, so the clipped bounds are grounded.
+ """
+ import fitz
+ url='https://static.cninfo.com.cn/finalpage/2026-04-16/1225105339.PDF'
+ request=Request(url,headers={'User-Agent':'Mozilla/5.0 Chrome/133.0','Accept':'application/pdf'})
+ with urlopen(request,timeout=28) as response:pdf=response.read(29_000_000)
+ if not pdf.startswith(b'%PDF') or len(pdf)>28_900_000:raise ValueError('Invalid official annual report')
+ doc=fitz.open(stream=pdf,filetype='pdf')
+ page=doc[0];rect=page.rect
+ clip=fitz.Rect(rect.width*.35,rect.height*.51,rect.width*.68,rect.height*.77)
+ pix=page.get_pixmap(matrix=fitz.Matrix(3,3),clip=clip,alpha=False)
+ raw=pix.tobytes('png')
+ with Image.open(BytesIO(raw)) as im:
+  im=im.convert('RGBA')
+  canvas=BytesIO()
+  im.save(canvas,'PNG',optimize=True)
+  content=canvas.getvalue()
+ audit={'verified':True,'editorialFallback':False,'source':url,'sourcePage':url+'#page=1',
+  'sourceSha256':sha256(pdf).hexdigest(),'sha256':sha256(content).hexdigest(),
+  'width':pix.width,'height':pix.height,
+  'note':'Official company mark and Yuanli wordmark cropped from 2025 annual report cover, issued 2026-04-16'}
+ print('YUANLI_LOGO_FROM_OFFICIAL_ANNUAL_REPORT',pix.width,pix.height,flush=True)
+ return content,audit
+
 def editorial_logo(text,root):
  import os
  canvas=Image.new('RGBA',(1000,280),(247,250,253,255))
@@ -98,6 +125,15 @@ for num,cfg in CFG.items():
   f=root/name;old=audit.get(name)
   if old and old.get('sha256') and f.is_file() and f.stat().st_size>2500 and sha256(f.read_bytes()).hexdigest()==old['sha256']:
    used.add(old.get('sourceSha256','editorial-'+num)); print('PINNED_VISUAL',num,name,flush=True);continue
+  if num=='048' and name=='logo.png':
+   try:
+    content,record=annual_report_logo()
+    f.write_bytes(content)
+    audit[name]={'company':cfg['name'],**record}
+    used.add(record['sourceSha256'])
+    continue
+   except Exception as e:
+    print('ANNUAL_REPORT_LOGO_FALLBACK',str(e)[:180],flush=True)
   pages=(cfg['logoPages'] if name=='logo.png' else cfg['photoPages'])
   candidates=[]
   for page in pages:
