@@ -1,0 +1,70 @@
+name: HHBA employers 063-065 and enterprise completeness audit
+on:
+  push:
+    branches: [feature/employers-063-065-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-employers-063-065-isolated
+  cancel-in-progress: true
+jobs:
+  validate-and-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked web dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Check all four batches and job-source regression
+        working-directory: apps/web
+        run: |
+          node scripts/employers-054-056-v2.contract.test.mjs
+          node scripts/employers-057-059-v2.contract.test.mjs
+          node scripts/employers-060-062-v2.contract.test.mjs
+          node scripts/employers-063-065-v2.contract.test.mjs
+          node scripts/recruitment-market-source-invalid.regression.test.mjs
+      - name: Audit 1-65 enterprise profiles, image sources, jobs, official portals and missing company IDs
+        working-directory: apps/web
+        run: node scripts/employer-completeness-audit.mjs
+      - name: Check complete enterprise factory including historic records
+        working-directory: apps/web
+        continue-on-error: true
+        run: node scripts/employer-factory-check.mjs
+      - name: Build static V2 review without deploying official main
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: |
+          npm run build
+          node scripts/materialize-company-route-entries.mjs
+      - name: Confirm all nine new local assets included
+        run: |
+          test -s apps/web/dist/index.html
+          for id in 063 064 065; do
+            for name in logo.svg photo1.svg photo2.svg; do
+              test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/$name"
+            done
+          done
+      - name: Upload auditable completeness problem list and machine-readable JSON
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-enterprise-audit-1-65-20261031
+          path: apps/web/audit-output/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Upload independent complete static preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-employers-063-065-review-static
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
