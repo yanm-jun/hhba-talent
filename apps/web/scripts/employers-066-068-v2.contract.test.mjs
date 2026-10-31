@@ -30,7 +30,7 @@ for(const [i,name,n] of firms){
    assert(p.jobs.some(x=>x.recruitmentType==='SOCIAL'));
  }
  if(i==='067'){
-   assert(photos[0].note.includes('产品')&&photos[1].note.includes('非官方'));
+   assert(photos.every(x=>x.path.endsWith('.svg')&&x.note.includes('非')),'No unverified Hongxiang office photo claims');
    assert.equal(p.recruitment.status,'archived_source');
  }
  if(i==='068'){
