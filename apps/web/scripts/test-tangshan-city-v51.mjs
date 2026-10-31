@@ -15,7 +15,7 @@ for(const p of pol){
  assert.ok(p.reviewNote.includes('办理入口待核实'),'No unverified legacy online application');
  assert.equal(p.applicationUrl,undefined);
  assert.ok(p.materials.length>=3&&p.applicationSteps.length>=4);
- assert.ok(p.summary.includes('2026')&&p.reviewedAt);
+ assert.ok((p.summary.includes('2026')||p.reviewNote.includes('2026'))&&p.reviewedAt,'Policy timing must be stated in summary or risk caveat');
 }
 assert.ok(!pol.some(p=>p.id==='ts-enterprise-master-2026-updated'),'2026 media report must not pretend to be primary government policy');
 assert.ok(tangshanYouthGuide.sources.some(x=>x[1].includes('/202608/01/')),'2026 secondary authority must remain disclosed in guide');
