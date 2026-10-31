@@ -7,7 +7,7 @@ for(const [i,n] of legacy.entries()){
  const id='cn-autumn-'+String(i+1).padStart(3,'0');
  const t=read('src/pages/'+n+'CompactProfilePage.tsx');
  assert(main.includes("route==='/companies/autumn/"+id+"'"),id+' route lost');
- assert(t.includes('data-company-template="unified-v2"'),id+' shared V2 page semantics missing');
+ assert(t.includes('data-company-template="openai"'),id+' original approved compact template semantics missing');
  assert(t.includes('data-four-block-contract="hero,majors,jobs,business"'),id+' four panel contract missing');
  assert(t.includes('data-employer-id="'+id+'"'),id+' wrong company');
  assert(t.includes('hhba-kpmg-hero')&&t.includes('hhba-kpmg-photo-grid'),id+' logo/photos panel missing');
