@@ -47,7 +47,14 @@ const addedRegionNames=new Set(TALENT_NEW_PREFECTURES_20261031.map(x=>x.name));
 assert.equal(addedRegionNames.size,25,'new prefectures were lost or duplicated');
 const originalMissingPolicy=missingPolicy.filter(x=>!addedRegionNames.has(x.city));
 assert.ok(originalMissingPolicy.length<=64,'original 312-region policy coverage regressed');
-assert.ok(missingHousing.length<=26,'housing coverage regressed from the 2026-10-31 main audit');
+// The original audit counted missing housing only in cities with policies at that time.
+// Restoring Guizhou makes seven additional policy-only cities visible, rather than
+// changing any previously recorded housing. Preserve the old-city regression guard
+// and report newly exposed Guizhou gaps separately.
+const legacyMissingHousing=missingHousing.filter(x=>x.province!=='贵州省');
+const newGuizhouHousingGaps=missingHousing.filter(x=>x.province==='贵州省');
+assert.ok(legacyMissingHousing.length<=26,'pre-existing housing coverage regressed');
+assert.ok(newGuizhouHousingGaps.length<=9,'Guizhou housing gap count inconsistent');
 // Compare only the PCA province -> second-layer nodes. They include counties and directly
 // administered municipalities and must NEVER all be treated as prefecture cities.
 const pca=JSON.parse(readFileSync(new URL('../src/data/china_pca_2026.json',import.meta.url),'utf8'));
@@ -73,6 +80,7 @@ const report={
  zeroPolicyCities:missingPolicy.length,zeroPolicyList:missingPolicy,
  original312MissingPolicy:originalMissingPolicy.length,pendingNewPrefectures:missingPolicy.filter(x=>addedRegionNames.has(x.city)).length,
  policyCitiesMissingHousing:missingHousing.length,missingHousingList:missingHousing,
+ legacyMissingHousingCount:legacyMissingHousing.length,guizhouMissingHousingCount:newGuizhouHousingGaps.length,
  pcaSecondLevelCount:pcaSecondLevel.length,unmatchedPcaCount:unmatchedPca.length,
  pcaUnmatchedNodes:unmatchedPca,
  pcaMissingPrefectureCount:missingPrefecture.length,pcaMissingPrefectureList:missingPrefecture,

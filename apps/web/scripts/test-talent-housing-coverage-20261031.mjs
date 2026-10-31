@@ -23,7 +23,8 @@ for(const h of housing){
   assert.ok(/申报(入口|渠道).*?(未公开|待核|未公布)/.test(h.statusNote)||h.applyUrl,h.id+' need portal qualification');
 }
 const routes=readFileSync(path.join(here,'../src/pages/TalentServiceRoutes.tsx'),'utf8');
-assert.ok(routes.includes('const homes=TALENT_HOUSING_RECORDS.filter(h=>h.city===match.name)'),'city hub must use national housing records');
+assert.ok(routes.includes('getTalentCitySnapshot(match.name)'), 'city hub must use shared, audited national policy/housing snapshot');
+assert.ok(src('talentCitySnapshot.ts').includes('TALENT_HOUSING_RECORDS.filter(h=>h.city===city)'), 'shared snapshot must read national housing records');
 assert.ok(routes.includes("const resultHomes=TALENT_HOUSING_RECORDS.filter(p=>p.city===city"),'housing list must use national housing records');
 // Other four were already research-only: do not silently promote secondary-source leads as A/B government verified housing projects.
 const research=src('talentHousingResearch.ts');
