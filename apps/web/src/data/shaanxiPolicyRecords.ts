@@ -154,7 +154,7 @@ const local:Spec[]=[
 function complete(s:Spec):TalentPolicyRecord{
  const {id,city,...r}=s;
  const risk=(s.reviewNote?s.reviewNote+' ':'')+'正式办事入口及2026当前受理批次须由主管部门核验。办理入口待核实。';
- return {...r,id,city,scope:s.scope||'特定区域',reviewedAt:'2026-10-31',
+ return {...r,id,city,eligibility:s.eligibility+'。申报还应逐项核对真实工作和住房属地、本人及共同申请人身份、当期经办材料、其他已享保障是否互斥和公告时效，不符合者不可仅凭学历或身份推定待遇。',scope:s.scope||'特定区域',reviewedAt:'2026-10-31',
   keywords:s.keywords||[city,'陕西','人才','政策','2026',s.title],
   targetGroup:s.targetGroup||s.eligibility,
   reviewNote:risk,
