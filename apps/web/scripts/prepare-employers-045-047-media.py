@@ -85,6 +85,8 @@ for num,company in CONFIG.items():
  targets=[('logo.png',company['home']),('photo1.jpg',company['photos'][0]),('photo2.jpg',company['photos'][1])]
  for name,pages in targets:
   dst=root/name;entry=audit.get(name)
+  if num=='046' and name=='logo.png' and entry and not entry.get('source','').startswith('https://commons.wikimedia.org/wiki/Special:FilePath/VSOL_LOGO.jpg'):
+   print('HHBA_REJECT_046_NONLOGO_BRAND_STORY_IMAGE',entry.get('source'),flush=True);entry=None
   if entry and entry.get('verified') and dst.is_file() and len(dst.read_bytes())>2000 and sha256(dst.read_bytes()).hexdigest()==entry.get('sha256'):
    used.add(entry['sourceSha256']);print('HHBA_PINNED_MEDIA',num,name,flush=True);continue
   candidates=[]
@@ -102,6 +104,9 @@ for num,company in CONFIG.items():
      candidates.append((metric,u,page))
    except Exception as err:print('HHBA_MEDIA_PAGE_WARNING',num,name,page,str(err)[:130],flush=True)
   candidates.sort(reverse=True)
+  if num=='046' and name=='logo.png':
+   # Brand wordmark with 2021 Wikimedia Commons attribution. Never use About Us banner as logo.
+   candidates=[(100,'https://commons.wikimedia.org/wiki/Special:FilePath/VSOL_LOGO.jpg','https://commons.wikimedia.org/wiki/File:VSOL_LOGO.jpg')]+candidates
   dedup={}; ordered=[]
   for metric,u,page in candidates:
    if u not in dedup:
