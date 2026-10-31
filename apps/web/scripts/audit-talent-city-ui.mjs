@@ -1,12 +1,15 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {TALENT_CITY_INDEX,findTalentCity} from '../src/data/talentCityRegistry.ts';
+import {QINGHAI_SHARED_POLICY_RECORDS} from '../src/data/qinghaiSharedPolicies.ts';
+import {QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS} from '../src/data/qinghaiVerifiedHousing.ts';
 import {TALENT_POLICY_RECORDS} from '../src/data/talentPolicyRecords.ts';
 import {TALENT_HOUSING_RECORDS} from '../src/data/talentHousingRecords.ts';
 import {getTalentCitySnapshot} from '../src/data/talentCitySnapshot.ts';
 assert.equal(TALENT_CITY_INDEX.length,337,'national registry count changed unexpectedly');
 const names=new Set(TALENT_CITY_INDEX.map(x=>x.name));
-for(const r of [...TALENT_POLICY_RECORDS,...TALENT_HOUSING_RECORDS])assert.ok(names.has(r.city),'record references missing city: '+r.id);
+const qinghaiApprovedProvinceIds=new Set([...QINGHAI_SHARED_POLICY_RECORDS,...QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS.filter(h=>h.city==='青海省')].map(r=>r.id));
+for(const r of [...TALENT_POLICY_RECORDS,...TALENT_HOUSING_RECORDS])assert.ok(names.has(r.city)||(r.city==='青海省'&&qinghaiApprovedProvinceIds.has(r.id)),'record references missing city: '+r.id);
 const summary=TALENT_CITY_INDEX.map(c=>{
  const s=getTalentCitySnapshot(c.name);
  const p=TALENT_POLICY_RECORDS.filter(r=>r.city===c.name).length;

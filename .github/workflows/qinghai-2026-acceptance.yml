@@ -1,0 +1,39 @@
+name: Qinghai 2026 talent policy and housing V5.1 QA
+on:
+  pull_request:
+    paths:
+      - 'apps/web/src/data/qinghai*.ts'
+      - 'apps/web/src/data/talentPolicyRecords.ts'
+      - 'apps/web/src/data/talentHousingRecords.ts'
+      - 'apps/web/src/pages/TalentServiceRoutes.tsx'
+      - 'apps/web/scripts/test-qinghai-2026-complete.mjs'
+      - '.github/workflows/qinghai-2026-acceptance.yml'
+  workflow_dispatch:
+jobs:
+  verify-qinghai:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: node --experimental-strip-types scripts/test-qinghai-2026-complete.mjs
+      - run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - run: node --experimental-strip-types scripts/test-guiyang-2026-complete.mjs
+      - run: npm run build
+      - name: Package isolated Qinghai static preview (no production deployment)
+        run: |
+          cp dist/index.html dist/404.html
+          cd dist
+          zip -q -r ../../../qinghai-2026-static-preview.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qinghai-2026-isolated-static-preview
+          path: qinghai-2026-static-preview.zip
+          retention-days: 14

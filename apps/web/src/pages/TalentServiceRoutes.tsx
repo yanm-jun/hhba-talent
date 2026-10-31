@@ -1,3 +1,8 @@
+import {QINGHAI_SHARED_POLICY_RECORDS} from '../data/qinghaiSharedPolicies';
+import {QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS} from '../data/qinghaiVerifiedHousing';
+import {QINGHAI_POLICY_RESEARCH_RECORDS} from '../data/qinghaiPolicyRecords';
+import {QINGHAI_HOUSING_RESEARCH_RECORDS} from '../data/qinghaiHousingRecords';
+import {QINGHAI_8_REGIONS,qinghaiGuideUrl,buildQinghaiGuide} from '../data/qinghaiGuides';
 import {GUIZHOU_9_REGIONS,guizhouGuideUrl,buildGuizhouGuide} from '../data/guizhouGuides';
 import {getTalentCitySnapshot} from '../data/talentCitySnapshot';
 import {SICHUAN_21_REGIONS,sichuanGuideUrl,buildSichuanGuide} from '../data/sichuanGuides';
@@ -142,6 +147,9 @@ function CityHub({city}:{city:string}){
  const match=findTalentCity(city);
  if(!match)return <><Bread current="城市尚未收录"/><section className="ts-sub-header"><h1>该城市尚未加入本次城市名录</h1><p>当前目标范围是4个直辖市和293个地级市，云南8个自治州已接入，其他未收录县级市、自治州、地区和盟请先到全国城市目录核对名称。</p><Link to="/talent-service/cities">返回全国城市目录 <ArrowRight size={16}/></Link></section></>;
  const {policies,homes}=getTalentCitySnapshot(match.name);
+ const isQinghai=QINGHAI_8_REGIONS.some(c=>c===match.name);
+ const qinghaiSharedPolicies=isQinghai?QINGHAI_SHARED_POLICY_RECORDS:[];
+ const qinghaiSharedHousing=isQinghai?QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS.filter(h=>h.city==='青海省'):[];
  policies.sort(recentPolicies);
  const researchPolicyCount=match.name==='邢台'?XINGTAI_POLICY_RESEARCH_RECORDS.length:0;
 
@@ -151,7 +159,7 @@ function CityHub({city}:{city:string}){
  const researchHousing=housingLeads.length;
  const guangxiRentalResearch=GUANGXI_RENT_RESEARCH_RECORDS.filter(p=>p.city===match.name&&isHousingPolicy(p)).length;
  const allHousingHistorical=homes.length>0&&homes.every(h=>Boolean(h.applicationEnd&&h.applicationEnd<new Date().toISOString().slice(0,10)));
- const hasSources=policies.length+homes.length+guangxiRentalResearch+LIAONING_MUNICIPAL_RESEARCH_RECORDS.filter(p=>p.city===match.name).length>0;
+ const hasSources=policies.length+homes.length+qinghaiSharedPolicies.length+qinghaiSharedHousing.length+guangxiRentalResearch+LIAONING_MUNICIPAL_RESEARCH_RECORDS.filter(p=>p.city===match.name).length>0;
  const liaoningHousingPolicyCount=LIAONING_14_CITIES.includes(match.name)?[...policies,...LIAONING_MUNICIPAL_RESEARCH_RECORDS.filter(p=>p.city===match.name)].filter(isHousingPolicy).length:0;
  const liaoningLocalResearch=LIAONING_MUNICIPAL_RESEARCH_RECORDS.filter(p=>p.city===match.name);
  return <>
@@ -161,7 +169,7 @@ function CityHub({city}:{city:string}){
    <h1>{match.official} · 人才服务</h1>
    <p>{hasSources?match.intro+'。可查看已收录政策、住房支持及有出处的公寓项目信息；待核验线索不代表可以立即申报。':'该城市入口已开通，人才政策与住房资料正在整理。我们不会生成未经核验的补贴金额、公寓或申请入口。'}</p>
    {allHousingHistorical&&<p>住房资料均为已结束的公开配租批次，不代表当前有空房或可直接申报；请关注住建部门新公告。</p>}
-   <div className="ts-sub-counts"><QuickCount count={policies.length} label="政府来源政策"/>{researchPolicyCount>0&&<QuickCount count={researchPolicyCount} label="公开政策资料 · 待核验"/>}{housingPolicies.length>0&&<QuickCount count={housingPolicies.length} label="住房支持政策"/>}{homes.length>0&&<QuickCount count={homes.length} label={allHousingHistorical?'住房历史配租资料':'已收录住房资料'}/>}
+   <div className="ts-sub-counts"><QuickCount count={policies.length} label="政府来源政策"/>{researchPolicyCount>0&&<QuickCount count={researchPolicyCount} label="公开政策资料 · 待核验"/>}{qinghaiSharedPolicies.length>0&&<QuickCount count={qinghaiSharedPolicies.length} label="全省共享政策 · 不重复统计"/>}{qinghaiSharedHousing.length>0&&<QuickCount count={qinghaiSharedHousing.length} label="全省共享住房制度"/>}{housingPolicies.length>0&&<QuickCount count={housingPolicies.length} label="住房支持政策"/>}{homes.length>0&&<QuickCount count={homes.length} label={allHousingHistorical?'住房历史配租资料':'已收录住房资料'}/>}
     {housingHistory>0&&<QuickCount count={housingHistory} label="历史住房政策 · 仅参考"/>}{researchHousing>0&&<QuickCount count={researchHousing} label="住房线索 · 待核验"/>}{guangxiRentalResearch>0&&<QuickCount count={guangxiRentalResearch} label="自治区安居研究资料 · 待核验"/>}{liaoningLocalResearch.length>0&&<QuickCount count={liaoningLocalResearch.length} label="辽宁市级政策研究资料"/>}{!hasSources&&!researchHousing&&<span className="ts-v4-data-pending">官方资料整理中</span>}</div>
   </section>
   <section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>你想了解什么？</h2><Link to="/talent-service/cities">更换城市 <ArrowRight size={15}/></Link></div>
@@ -208,6 +216,27 @@ function CityHub({city}:{city:string}){
  {policies.map(p=><Link key={p.id} className="ts-sub-tile" to={guizhouGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>{p.category} · {policyStatus(p)} · 查看分步指南</span><ArrowRight size={15}/></Link>)}
  {homes.map(h=><Link key={h.id} className="ts-sub-tile" to={guizhouGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>{h.kind==='program'?'住房制度':'住房项目'} · {housingStatus(h)} · 非实时空房</span><ArrowRight size={15}/></Link>)}
  </div>:<div className="ts-sub-empty"><p>尚无可核实的正式政府资料，不能因此推断当地没有人才政策。</p></div>}
+ </section>}
+ {QINGHAI_8_REGIONS.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="青海省2026人才政策和安居指南">
+  <div className="ts-sub-section-heading"><h2>{match.name} · 2026人才政策与人才安居详细指南</h2></div>
+  <p>青海海南州不是海南省；具体市州及县区政策各有资格条件，已建公寓套数和招标计划均非当前剩余房源。</p>
+  <div className="ts-sub-grid">
+  {policies.map(p=><Link key={p.id} className="ts-sub-tile" to={qinghaiGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>{p.category} · {policyStatus(p)} · 查看政策详解</span><ArrowRight size={15}/></Link>)}
+  {homes.map(h=><Link key={h.id} className="ts-sub-tile" to={qinghaiGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>{h.kind==='program'?'住房制度/建设线索':'住房项目'} · {housingStatus(h)} · 空房待核实</span><ArrowRight size={15}/></Link>)}
+  </div>
+  <div className="ts-sub-section-heading"><h3>全省共享政策与省级住房保障（全省只建一套数据）</h3></div>
+  <p>以下是2026年适用、由政府发布或公布的省级通用政策：在8市州分别可以查看和搜索，但不计作8次市州自有政策。青海省直事业单位2026引才安家费只适用于对应省直岗位；其他全省政策仍须由本人工作地或户籍地主管部门核准。</p>
+  <div className="ts-sub-grid">
+   {qinghaiSharedPolicies.map(p=><Link key={p.id} className="ts-sub-tile" to={qinghaiGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>青海全省通用 · {p.headlineAmount||p.category} · 实际受理待核</span><ArrowRight size={15}/></Link>)}
+   {qinghaiSharedHousing.map(h=><Link key={h.id} className="ts-sub-tile" to={qinghaiGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>省级住房制度 · 无实时房源数据</span><ArrowRight size={15}/></Link>)}
+  </div>
+  <div className="ts-sub-section-heading"><h3>2026引才宣讲与待核线索（不计入政府原文认证政策）</h3></div>
+  <p>以下项目存在2026宣传材料或新闻证据，但缺当地主办部门正式实施细则或直接政府原文；仅供进一步核查，不能作为已开放申报的承诺。</p>
+  <div className="ts-sub-grid">
+   {QINGHAI_POLICY_RESEARCH_RECORDS.filter(p=>p.city===match.name&&!policies.some(x=>x.id===p.id)).map(p=><Link key={p.id} className="ts-sub-tile" to={qinghaiGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>待核原始实施细则 · {policyStatus(p)}</span><ArrowRight size={15}/></Link>)}
+   {QINGHAI_HOUSING_RESEARCH_RECORDS.filter(h=>h.city===match.name&&!homes.some(x=>x.id===h.id)).map(h=><Link key={h.id} className="ts-sub-tile" to={qinghaiGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>住房新闻线索 · 不代表现时有房</span><ArrowRight size={15}/></Link>)}
+  </div>
+
  </section>}
  {SICHUAN_21_REGIONS.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="四川省人才服务V5.1分步办理">
  <div className="ts-sub-section-heading"><h2>{match.name} · 政策与人才安居分步核验</h2></div>
@@ -312,8 +341,12 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
  const housingMode=kind==='housing';
  const guideMode=kind==='guide';
  const title=searchMode?'搜索结果':housingMode?'人才安居':kind==='benefits'?'补贴与福利':guideMode?'申请指南':'人才政策';
- const resultPolicies=(searchMode?[...TALENT_POLICY_RECORDS,...XINGTAI_POLICY_RESEARCH_RECORDS,...GUANGXI_RENT_RESEARCH_RECORDS,...GUANGXI_MUNICIPAL_RESEARCH_RECORDS,...LIAONING_MUNICIPAL_RESEARCH_RECORDS]:[...TALENT_POLICY_RECORDS,...GUANGXI_RENT_RESEARCH_RECORDS,...GUANGXI_MUNICIPAL_RESEARCH_RECORDS,...LIAONING_MUNICIPAL_RESEARCH_RECORDS]).filter(p=>p.city===city&&(!query||matchesPolicy(p,query,city))&&(!housingMode||isHousingPolicy(p))&&(kind!=='benefits'||benefit(p))).sort(recentPolicies);
- const resultHomes=TALENT_HOUSING_RECORDS.filter(p=>p.city===city&&(housingMode||searchMode)&&(!query||matchesHousing(p,query,city))).sort(housingFirst);
+ const qhCity=QINGHAI_8_REGIONS.some(c=>c===city);
+ const eligibleRegion=(recordCity:string)=>recordCity===city||(qhCity&&recordCity==='青海省');
+ const qhPolicyMatch=(p:TalentPolicyRecord)=>!query||matchesPolicy(p.city==='青海省'?{...p,city}:p,query,city);
+ const qhHousingMatch=(h:TalentHousingRecord)=>!query||matchesHousing(h.city==='青海省'?{...h,city}:h,query,city);
+ const resultPolicies=(searchMode?[...TALENT_POLICY_RECORDS,...XINGTAI_POLICY_RESEARCH_RECORDS,...GUANGXI_RENT_RESEARCH_RECORDS,...GUANGXI_MUNICIPAL_RESEARCH_RECORDS,...LIAONING_MUNICIPAL_RESEARCH_RECORDS]:[...TALENT_POLICY_RECORDS,...GUANGXI_RENT_RESEARCH_RECORDS,...GUANGXI_MUNICIPAL_RESEARCH_RECORDS,...LIAONING_MUNICIPAL_RESEARCH_RECORDS]).filter(p=>eligibleRegion(p.city)&&qhPolicyMatch(p)&&(!housingMode||isHousingPolicy(p))&&(kind!=='benefits'||benefit(p))).sort(recentPolicies);
+ const resultHomes=TALENT_HOUSING_RECORDS.filter(p=>p.city===city||(qhCity&&p.city==='青海省')).filter(p=>(housingMode||searchMode)&&qhHousingMatch(p)).sort(housingFirst);
  const pendingHousingCount=(housingMode||searchMode)?housingResearchLeads(city,query||'').length:0;
  const housingHistoricalCount=(housingMode||searchMode)?housingPolicyResearch(city,query||'').length:0;
  const housingPrograms=resultHomes.filter(p=>p.kind==='program');
@@ -324,6 +357,8 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
  const shownHomes=[...housingPrograms,...shownProjects];
  const cats=['全部类型',...new Set(resultPolicies.map(p=>p.category))];
  const shownPolicies=filter==='全部类型'?resultPolicies:resultPolicies.filter(p=>p.category===filter);
+ const qinghaiSharedResultCount=shownPolicies.filter(p=>p.city==='青海省').length;
+ const qinghaiSharedHousingCount=resultHomes.filter(h=>h.city==='青海省').length;
  const housingPolicyCount=shownPolicies.length+housingPrograms.length;
  const relatedLink=(kindName:TalentListKind)=>talentListUrl(kindName,city);
  const doSearch=()=>{const parsed=parseTalentCityQuery(draft.trim(),city);navigate(!draft.trim()||(parsed.matchedCity&&parsed.cityOnly)?talentCityUrl(parsed.matchedCity?parsed.city:city):talentSearchUrl(parsed.city,draft.trim()))};
@@ -332,7 +367,7 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
   <section className="ts-sub-header">
    <span className="ts-section-kicker">{searchMode?'SEARCH RESULTS':'CITY SERVICES'} / {city}</span><h1>{city} · {title}</h1>
    <p>{searchMode?'搜索已收录政策、住房和明确标注的待核验项目；仅政府核实的资料可作为正式申报依据。':'按城市分类查看已收录政策和住房；政府原文、媒体转载、待核验项目会分别标明，不能据此认定正在受理或有空房。'}</p>
-   <div className="ts-sub-counts">{housingMode?<><QuickCount count={housingPolicyCount} label="住房政策与保障通道"/><QuickCount count={shownProjects.length} label="已核实独立项目"/>{LIAONING_14_CITIES.includes(city)&&<QuickCount count={1} label="省住建厅购房政策查询入口"/>}</>:<><QuickCount count={shownPolicies.length} label="政策结果"/>{searchMode&&<QuickCount count={shownHomes.length} label="住房资料"/>}</>}{pendingHousingCount>0&&<QuickCount count={pendingHousingCount} label="待核验公寓线索"/>}{housingHistoricalCount>0&&<QuickCount count={housingHistoricalCount} label="历史住房政策参考"/>}</div>
+   <div className="ts-sub-counts">{housingMode?<><QuickCount count={housingPolicyCount} label="住房政策与保障通道"/><QuickCount count={shownProjects.length} label="已核实独立项目"/>{LIAONING_14_CITIES.includes(city)&&<QuickCount count={1} label="省住建厅购房政策查询入口"/>}</>:<><QuickCount count={shownPolicies.length} label="政策结果"/>{qinghaiSharedResultCount>0&&<QuickCount count={qinghaiSharedResultCount} label="其中省级共享政策"/>}{qinghaiSharedHousingCount>0&&<QuickCount count={qinghaiSharedHousingCount} label="全省共享住房 · 去重"/>}{searchMode&&<QuickCount count={shownHomes.length} label="住房资料"/>}</>}{pendingHousingCount>0&&<QuickCount count={pendingHousingCount} label="待核验公寓线索"/>}{housingHistoricalCount>0&&<QuickCount count={housingHistoricalCount} label="历史住房政策参考"/>}</div>
   </section>
   <form className="ts-sub-search" onSubmit={e=>{e.preventDefault();doSearch()}}><Search size={18}/><input value={draft} onChange={e=>setDraft(e.target.value)} placeholder={'搜索'+city+'硕士补贴、住房项目…'} aria-label="搜索人才服务"/><button type="submit">搜索 <ArrowRight size={15}/></button></form>
   {searchMode&&query&&<p className="ts-sub-found">关键词：<strong>{query}</strong> · 实际匹配 {shownPolicies.length+shownHomes.length+pendingHousingCount+housingHistoricalCount} 条（含待核验项目与历史参考）</p>}
@@ -397,6 +432,11 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
    province==='jiangxi'?buildJiangxiGuide(decode(fragments[3]||'')):
    buildHunanGuide(decode(fragments[3]||''));
   body=guide?<UnifiedPolicyGuide data={guide}/>:<><Bread current="指南尚未收录"/><section className="ts-sub-header"><h1>该指南暂未核验</h1><Link to="/talent-service/cities">返回城市目录</Link></section></>;
+ }
+ else if(kind==='policy-guide-preview'&&fragments[2]==='qinghai'){
+  const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
+  const guide=t?buildQinghaiGuide(t,decode(fragments[4]||'')):null;
+  body=guide?<UnifiedPolicyGuide data={guide}/>:<section className="ts-sub-header"><h1>该青海事项尚未核实</h1><Link to="/talent-service/cities">返回城市目录</Link></section>;
  }
  else if(kind==='policy-guide-preview'&&fragments[2]==='guizhou'){
  const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
