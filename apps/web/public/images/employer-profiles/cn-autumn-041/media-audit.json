@@ -1,0 +1,41 @@
+{
+  "logo.png": {
+    "verified": true,
+    "company": "晶云",
+    "source": "https://www.crystalpharmatech.com/uploads/image/20250928/%5BSVG_Edited_%E7%94%BB%E6%9D%BF%E5%B0%BA%E5%AF%B8%E8%B0%83%E6%95%B4%5D_%E6%99%B6%E4%BA%91%E8%8B%B1%E6%96%87%E6%A0%87%E5%BF%97-%E6%A8%AA%E7%89%88_%E7%94%BB%E6%9D%BF_1.webp",
+    "sourcePage": "https://www.crystalpharmatech.com/",
+    "retrievedFrom": "https://www.crystalpharmatech.com/uploads/image/20250928/%5BSVG_Edited_%E7%94%BB%E6%9D%BF%E5%B0%BA%E5%AF%B8%E8%B0%83%E6%95%B4%5D_%E6%99%B6%E4%BA%91%E8%8B%B1%E6%96%87%E6%A0%87%E5%BF%97-%E6%A8%AA%E7%89%88_%E7%94%BB%E6%9D%BF_1.webp",
+    "sourceSha256": "4723f58933f7870d3adaf49dd4cb520535de7239a9e7733c3dcd80e473aea5d3",
+    "sha256": "4e7c6ff698b5a94906fd6300c8534666a2c4da163a5f5b75f5681be95bd59604",
+    "width": 1200,
+    "height": 302,
+    "note": "Real logo",
+    "copyright": "Original rights holders retain rights"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "company": "晶云",
+    "source": "https://www.crystalpharmatech.com.cn/Uploadfiles/Picture/2024-3-29/20243291717291120.jpg",
+    "sourcePage": "https://www.crystalpharmatech.com.cn/news_view.aspx?contentid=108&t=15",
+    "retrievedFrom": "https://www.crystalpharmatech.com.cn/Uploadfiles/Picture/2024-3-29/20243291717291120.jpg",
+    "sourceSha256": "5e57ff00ae03ef03b23b43ec20e275b8c537862f2be6d75c868e0906da9b03e4",
+    "sha256": "66099f74a97aa626992d50b2533b938ae936bb8c368434115aef8f1f7f311769",
+    "width": 1080,
+    "height": 712,
+    "note": "Real corporate or event photograph",
+    "copyright": "Original rights holders retain rights"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "company": "晶云",
+    "source": "https://www.crystalpharmatech.com.cn/Uploadfiles/Picture/2025-8-5/2025851525386179.jpg",
+    "sourcePage": "https://www.crystalpharmatech.com.cn/news_view.aspx?contentid=205&t=15",
+    "retrievedFrom": "https://www.crystalpharmatech.com.cn/Uploadfiles/Picture/2025-8-5/2025851525386179.jpg",
+    "sourceSha256": "da892e50e5b7af3325ae1372fee93d61b068fcd0197a0e0d2229fdbf7bbb7fbb",
+    "sha256": "185bc899b6c82812ec7e297938dff7b036829b5745c6ae8aed682fe5484ed154",
+    "width": 650,
+    "height": 433,
+    "note": "Real corporate or event photograph",
+    "copyright": "Original rights holders retain rights"
+  }
+}
