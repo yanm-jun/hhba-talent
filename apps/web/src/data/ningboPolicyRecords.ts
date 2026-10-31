@@ -8,7 +8,7 @@ export const NINGBO_POLICY_RECORDS:TalentPolicyRecord[]=[
     "title": "奉化区2025年度人才租房补贴（2026年10—11月申报）",
     "category": "租房安居",
     "scope": "特定区域",
-    "temporal": "past-window",
+    "temporal": "policy",
     "published": "2026-10-16",
     "sourceUrl": "https://qf.ningbo.gov.cn/qykj/easy-public/2747",
     "sourceName": "奉化区人才住房保障工作管理办公室2026年10月16日申请公告",
