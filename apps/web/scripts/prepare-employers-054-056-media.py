@@ -20,10 +20,12 @@ CFG={
   "photoPages":["https://www.bondex.com.cn/about","https://www.bondex.com.cn/wuliu/haiyun"],
   "logoPages":["https://www.bondex.com.cn/","https://www.bondex.com.cn/about/wenhua"],
   "hint":["bondex","邦达","物流"],"editorialLogo":True},
- "055":{"name":"长隆科技","photoPages":["https://a617645265.cn.goepe.com/","https://clkj888888.gys.cn/","https://changlong6.gys.cn/","https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822"],
+ "055":{"name":"长隆科技","trustedLogo":"https://job.hdu.edu.cn/attachment/hdu/company/202605/11/sZTQabjwE848.png",
+  "directPhotos":["https://img.goworkla.cn/department/6041eb8ac6234711c430ead2/editor/images/1f5e3fc61d084513b684e016ba6b1071.jpg","https://img1.goepe.com/2021016/0_1611546256_3332.jpg_360x360.jpg"],
+  "photoPages":["https://a617645265.cn.goepe.com/","https://clkj888888.gys.cn/","https://changlong6.gys.cn/","https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822"],
   "logoPages":["https://a617645265.cn.goepe.com/","https://clkj888888.gys.cn/"],
   "hint":["长隆科技","changlong","cl39","深圳长隆"],"editorialLogo":True},
- "056":{"name":"维音","photoPages":["https://www.vxichina.cn/","https://www.vxichina.cn/AboutStd_806.html"],
+ "056":{"name":"维音","photoPages":["https://www.vxichina.cn/AboutStd_1070.html","https://www.vxichina.cn/"],
   "logoPages":["https://www.vxichina.cn/","https://www.vxichina.cn/AboutStd_806.html"],
   "hint":["维音","VXI","联络中心"],"editorialLogo":True}
 }
@@ -101,16 +103,25 @@ for no,cfg in CFG.items():
    print('MEDIA_PINNED',no,name,flush=True);used.add(prior['sourceSha256']);continue
   logo=name=='logo.png'
   options=[]
+  if no=='055' and logo:
+   options.append((120,cfg['trustedLogo'],'https://job.hdu.edu.cn/company/view?id=895204'))
+  if no=='055' and not logo:
+   options.append((120,cfg['directPhotos'][0 if name=='photo1.jpg' else 1],
+       'https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822' if name=='photo1.jpg' else 'https://a617645265.cn.goepe.com/'))
   if no=='054' and not logo:
    preferred=cfg['directPhotos'][0 if name=='photo1.jpg' else 1]
    options.append((90,preferred,'https://www.bondex.com.cn/about' if name=='photo1.jpg' else 'https://www.bondex.com.cn/wuliu/haiyun'))
-  for page in cfg['logoPages' if logo else 'photoPages']:
+  pages=cfg['logoPages' if logo else 'photoPages']
+  if no=='054' and not logo:pages=[] # known source-pinned official image already confirmed
+  if no=='055' and logo:pages=[] # avoid mistaking third-party supplier portal mark as company mark
+  for page in pages:
    try:
     a=candidates(page,logo)
     print('MEDIA_DISCOVER',no,name,page,a[:8],flush=True)
     for url,score in a:
      if score<(-2 if logo else 0):continue
      if not logo and re.search('logo|header|banner|favicon|footer|icon',url,re.I):continue
+     if no=='056' and not logo and re.search(r'rc2[.]zihu[.]com/g5/M00/09/(1D|12)/',url,re.I):continue
      options.append((score,url,page))
    except Exception as e:print('MEDIA_PAGE_WARN',no,name,page,str(e)[:110],flush=True)
   options.sort(key=lambda a:-a[0])
