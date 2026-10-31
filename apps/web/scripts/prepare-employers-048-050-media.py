@@ -57,7 +57,8 @@ def normalize(raw,kind):
  with Image.open(BytesIO(raw)) as im:
   im=ImageOps.exif_transpose(im)
   if kind=='logo.png':
-   if im.width<90 or im.height<25:raise ValueError('logo too small')
+   if im.width<36 or im.height<11:raise ValueError('logo too small')
+   # Corporate homepages often serve legitimate narrow header wordmarks in small dimensions.
    im=im.convert('RGBA')
    if im.width<700:
     rate=700/im.width;im=im.resize((700,round(im.height*rate)),Image.Resampling.LANCZOS)
