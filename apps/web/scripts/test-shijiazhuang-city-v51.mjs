@@ -29,7 +29,7 @@ check('No confusion between B-card rent, B-card buy and one-time graduate settle
  assert.ok(p('sjz-2026-graduate-settle').reviewNote.includes('只可享受一次'));
  assert.ok(p('sjz-2026-bcard-home').eligibility.includes('有效期'));
  assert.ok(p('sjz-2026-bcard-rent').benefit.includes('停发'));
- assert.equal(p('sjz-2026-bcard-eligibility').payoutTo,'非现金服务');
+ assert.ok(p('sjz-2026-bcard-eligibility').benefit.includes('不直接等于现金'));
 });
 check('Five housing records distinguish verified closed batches from non-live support program',()=>{
  for(const id of hids){const items=TALENT_HOUSING_RECORDS.filter(p=>p.id===id);assert.equal(items.length,1,id);const h=items[0];
