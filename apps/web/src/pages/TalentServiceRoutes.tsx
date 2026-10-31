@@ -23,6 +23,7 @@ import {buildLiaoningGuide,LIAONING_14_CITIES,liaoningGuideRoute} from '../data/
 import {LIAONING_PROVINCIAL_POLICY_RECORDS} from '../data/liaoningProvincialPolicyRecords';
 import {LIAONING_MUNICIPAL_RESEARCH_RECORDS} from '../data/liaoningMunicipalPolicyRecords.ts';
 import {buildGuangdongGuide} from '../data/guangdongGuides';
+import {buildJiangxiGuide} from '../data/jiangxiGuides';
 import {buildYunnanGuide} from '../data/yunnanGuides';
 import {beijingPublicRentalGuide,beijingMarketRentGuide,beijingGraduateSettlementGuide,beijingJobGrantGuide,beijingFlexSocialGuide,beijingYouthHousingGuide,beijingHaidianHousingGuide} from '../data/beijingGuides';
 import {chongqingHomeGuide,chongqingPurchaseGuide,chongqingRentalGuide,chongqingCountiesGuide,chongqingPolicyGuide,chongqingJobseekGuide,chongqingShortageGuide} from '../data/chongqingGuides';
@@ -336,6 +337,10 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
     const guide=buildYunnanGuide(decode(fragments[3]||''));
     body=guide?<UnifiedPolicyGuide data={guide}/>:<div className="ts-sub-empty"><h2>云南政策办理指南尚未收录</h2><Link to="/talent-service/cities">返回全国城市目录</Link></div>;
   }
+ else if(kind==='policy-guide-preview'&&fragments[2]==='jiangxi'){
+  const guide=buildJiangxiGuide(decode(fragments[3]||''));
+  body=guide?<UnifiedPolicyGuide data={guide}/>:<div className="ts-sub-empty"><h2>江西省政策指南尚未收录</h2><Link to="/talent-service/cities">返回全国城市目录</Link></div>;
+ }
  else if(kind==='policy-guide-preview'&&fragments[2]==='guangdong'){
    const guide=buildGuangdongGuide(decode(fragments[3]||''));
    body=guide?<UnifiedPolicyGuide data={guide}/>:<div className="ts-sub-empty"><h2>该政策办理指南尚未收录</h2><Link to="/talent-service/cities">返回全国城市目录</Link></div>;
