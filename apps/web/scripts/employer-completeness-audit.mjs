@@ -26,8 +26,8 @@ for(const x of manifest.entries){
  if(p.name!==x.name&&!p.aliases?.includes(x.name))issue(p.id,p.name,'P1','ROSTER_NAME_MISMATCH','Screenshot name '+x.name+' differs and is not captured by aliases');
  if((p.jobs||[]).length===0)issue(p.id,p.name,'P1','EMPTY_JOBS','No reviewed job/direction records');
  if((p.business||[]).length<6)issue(p.id,p.name,'P1','BUSINESS_UNDER_SIX','Only '+(p.business||[]).length+' business blocks');
- if((p.jobs||[]).some(j=>!j.title||!j.summary||!j.requirements||!j.city||!j.category||!j.evidenceUrl||!j.majorNames?.length))
-   issue(p.id,p.name,'P1','INCOMPLETE_JOB_FIELDS','One or more job records have missing source/major/details');
+ const badJobs=(p.jobs||[]).map(j=>({id:j.id,missing:['title','summary','requirements','city','category','evidenceUrl'].filter(k=>!j[k]).concat(!Array.isArray(j.majorNames)||!j.majorNames.length?'majorNames':[])})).filter(x=>x.missing.length);
+ if(badJobs.length)issue(p.id,p.name,'P1','INCOMPLETE_JOB_FIELDS',badJobs.length+' jobs; missing fields: '+[...new Set(badJobs.flatMap(x=>x.missing))].join(', ')+'; examples: '+badJobs.slice(0,3).map(x=>x.id).join(', '));
  if(p.recruitment?.status==='unconfirmed'){unconfirmed++;issue(p.id,p.name,'P2','UNCONFIRMED_RECRUITMENT','2027 recruitment link or application status unconfirmed');}
  const media=[p.media?.logo,...(p.media?.photos||[]).map(m=>m.path)];
  if(media.length!==3){issue(p.id,p.name,'P1','MEDIA_SLOT_COUNT','Expected 1 logo+2 separate pictures, found '+media.length);continue;}
@@ -81,5 +81,7 @@ fs.mkdirSync('audit-output',{recursive:true});
 fs.writeFileSync('audit-output/employer-completeness-20261031.md',lines.join('\n')+'\n');
 fs.writeFileSync('audit-output/employer-completeness-20261031.json',JSON.stringify({summary:{roster:manifest.entries.length,profiles:profiles.length,missingV2:allMissing,legacy:custom,generic,slots,missingMedia,unconfirmed,backlog:backlog.length,issueCounts:{P1:groups.P1.length,P2:groups.P2.length}},issues:notes},null,2));
 console.log('HHBA_ENTERPRISE_AUDIT_SUMMARY',JSON.stringify({roster:manifest.entries.length,profiles:profiles.length,missingV2:allMissing,legacy:custom,generic,slots,missingMedia,unconfirmed,backlog:backlog.length,issueCounts:{P1:groups.P1.length,P2:groups.P2.length}}));
-for(const x of notes)if(x.level==='P1')console.log('HHBA_AUDIT_P1',x.id,x.name,x.code,x.details);
+for(const x of notes){if(x.level==='P1')console.log('HHBA_AUDIT_P1',x.id,x.name,x.code,x.details);else console.log('HHBA_AUDIT_P2',x.id,x.name,x.code,x.details);}
+const perCode=Object.fromEntries([...new Set(notes.map(x=>x.code))].map(code=>[code,{issues:notes.filter(x=>x.code===code).length,companies:[...new Set(notes.filter(x=>x.code===code).map(x=>x.id+' '+x.name))]}]));
+console.log('HHBA_ENTERPRISE_AUDIT_BY_CODE',JSON.stringify(perCode));
 console.log('HHBA_ENTERPRISE_AUDIT_REPORT_READY audit-output/employer-completeness-20261031.md');
