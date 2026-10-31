@@ -201,7 +201,7 @@ export const HANGZHOU_POLICY_RECORDS:TalentPolicyRecord[]=[
     "category": "生活补贴",
     "scope": "全市",
     "temporal": "historical",
-    "published": "2023-04-28",
+    "published": "2023-06-28",
     "sourceUrl": "https://zfgb.hangzhou.gov.cn/10/105220253/t117220253054/518833.shtml",
     "sourceName": "杭州市人民政府办公厅《杭向未来·大学生创新创业三年行动计划（2023—2025年）》",
     "summary": "2023—2025行动计划明确应届本科1万、硕士3万、博士10万，缴社保6个月与12个月分两次发放；2026具体受理资格和平台版本尚需核验，不能把已结束三年计划视为2026当期公告。",
