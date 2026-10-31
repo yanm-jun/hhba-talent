@@ -21,6 +21,7 @@ export const TALENT_LEGACY_CITIES:TalentCity[]=[
  {name:'济宁',official:'济宁市',province:'山东',level:'prefecture-preview',intro:'青年引才补贴、首次创业、OPC企业用工支持、主城区租房补贴及保租房政策入口；住房项目空房以官方公告为准',aliases:['济宁','济宁市','jining','ji ning']},
  {name:'滨州',official:'滨州市',province:'山东',level:'prefecture-preview',intro:'2026年大学生购房与生活补助历史批次、创业与灵活就业补贴、邹平天健苑及创新人才公寓资料',aliases:['滨州','滨州市','binzhou','bin zhou']},
  {name:'唐山',official:'唐山市',province:'河北',level:'prefecture-preview',intro:'凤凰英才2024/2026奖补对照、博士硕士本科生活与购房政策、高新区数字经济产业园青年公寓及市级租赁制度',aliases:['唐山','唐山市','tangshan','tang shan']},
+ {name:'张家口',official:'张家口市',province:'河北',level:'prefecture-preview',intro:'2026硕博引进博士住房15万历史批次、医院硕博专项资助、高创园人才公寓与创业办公扶持、桥东2026保障房改造事实核查',aliases:['张家口','张家口市','zhangjiakou','zhang jia kou','zjk']},
 ];
 
 const prefectureRaw=`130100|石家庄市|河北省|shi jia zhuang
