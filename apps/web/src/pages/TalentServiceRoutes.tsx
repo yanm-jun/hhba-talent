@@ -24,6 +24,7 @@ import {linyiLivingGuide} from '../data/talentLinyiGuide';
 import {dongyingTransitionGuide} from '../data/talentDongyingGuide';
 import {jiningYouthGuide,jiningRentGuide} from '../data/talentJiningGuides';
 import {binzhouPurchaseGuide,binzhouLivingGuide,binzhouHousingGuide} from '../data/binzhouGuides';
+import {tangshanYouthGuide,tangshanPurchaseGuide,tangshanHousingGuide} from '../data/tangshanGuides';
 import {UnifiedTalentRecordDetail} from '../components/talent/UnifiedTalentRecordDetail';
 import {UnifiedTalentHousingResearch,housingResearchLeads,housingPolicyResearch} from '../components/talent/UnifiedTalentHousingResearch';
 import {UnifiedPolicyList,buildCityPolicyConfig} from '../components/talent/UnifiedPolicyList';
@@ -140,6 +141,7 @@ function CityHub({city}:{city:string}){
      </Link>)}
    </div>
   </section>
+  {match.name==='唐山'&&<section className="ts-sub-section"><h2>唐山市2024/2026政策版本提醒</h2><p>2024青年人才奖补修订版与2026年3月新人才措施对于部分企业硕士的支持不同。本站对两版分别说明；2026报道引用的政策条款政府正式全文尚待核实，不根据旧版数据直接承诺新人才可领。</p><p>住房方面，唐山高新区数字经济产业园青年公寓2024年项目规模134套，是历史总量而非实时空房；市级凤凰英才公寓是住房保障制度，并不等于第二处具体可租公寓。</p><p><Link to="/talent-service/policy-guide-preview/tangshan/youth">查看分学历人才奖补指南 <ArrowRight size={14}/></Link></p><p><Link to="/talent-service/policy-guide-preview/tangshan/housing">查看真实青年公寓与住房租赁指南 <ArrowRight size={14}/></Link></p></section>}
   {match.name==='东营'&&<section className="ts-sub-section"><h2>东营 · 2026政策衔接与安居核验</h2><p>2026年8月人才新政出台，原2022版人才补贴已废止；旧规补报在9月30日结束。原博士4000元／月、硕士2000元／月与首购补贴等旧数字，仅作历史参考。新进人才请核对新规正式申请细则。</p><p>住房线索：河口区三义和住宅小区二期在2026年5月曾公告70套保租房统筹配租，报名6月30日截止。现仅核验到对区住建局公告的媒体转载，政府官网原文及新批次尚待核验。因此不将70套冒充当前可租房源，也不纳入已确认住房项目。</p><p><a href="https://ady.dongyingnews.cn/share/YS01MzctNDM0NzYxOTM.html" target="_blank" rel="noopener noreferrer">查看2026年河口区住房旧批次公告转载（非官方办理入口）</a></p><p><Link to="/talent-service/policy-guide-preview/dongying/transition">查看2026新旧政策核查指南 <ArrowRight size={14}/></Link></p></section>}
   {match.name==='石家庄'&&<section className="ts-sub-section" aria-label="石家庄人才政策与住房指南">
    <div className="ts-sub-section-heading"><h2>石家庄 · 2026人才绿卡与住房保障</h2></div>
@@ -251,6 +253,7 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  else if(kind==='list'&&fragments[2]==='policies')body=city==='济南'?<TalentJinanPolicyPreview/>:city==='青岛'?<TalentQingdaoPolicyPreview/>:<UnifiedPolicyList config={buildCityPolicyConfig(city)}/>;
  else if(kind==='list'&&['policies','benefits','housing','guide'].includes(fragments[2]))body=<ListPage city={city} kind={fragments[2] as TalentListKind}/>;
  else if(kind==='search')body=<ListPage key={route} city={decode(fragments[2]||'杭州')||'杭州'} kind="search" query={decode(fragments.slice(3).join('/'))}/>;
+ else if(kind==='policy-guide-preview'&&fragments[2]==='tangshan')body=<UnifiedPolicyGuide data={fragments[3]==='purchase'?tangshanPurchaseGuide:fragments[3]==='housing'?tangshanHousingGuide:tangshanYouthGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='binzhou')body=<UnifiedPolicyGuide data={fragments[3]==='housing'?binzhouHousingGuide:fragments[3]==='living'?binzhouLivingGuide:binzhouPurchaseGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='jining')body=<UnifiedPolicyGuide data={fragments[3]==='rent'?jiningRentGuide:jiningYouthGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='dongying'&&fragments[3]==='transition')body=<UnifiedPolicyGuide data={dongyingTransitionGuide}/>;
