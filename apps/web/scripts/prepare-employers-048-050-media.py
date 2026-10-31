@@ -15,7 +15,7 @@ from bs4 import BeautifulSoup
 import cairosvg
 
 ROOT=Path(__file__).resolve().parents[1]/'public/images/employer-profiles'
-CFG=json.loads(r'''{"048":{"name":"元力股份","company":"福建元力活性炭股份有限公司","logoPages":["https://www.yuanlicarbon.com/"],"photoPages":["https://www.yuanlicarbon.com/","https://www.yuanlicarbon.com/"],"domainHints":["yuanlicarbon.com","wemorefun.com"],"allowEditorialLogo":false},"049":{"name":"红谱科技","company":"浙江红谱科技有限公司","logoPages":["https://www.hongpu-tech.com/","https://www.antpedia.com/ibook3491/","https://job.hdu.edu.cn/company/view/id/895841"],"photoPages":["https://www.antpedia.com/ibook3491/","https://www.antpedia.com/ibook3491/brand","https://www.antpedia.com/ibook3491/t","https://job.hdu.edu.cn/company/view/id/895841"],"domainHints":["hongpu-tech.com","antpedia.com","job.hdu.edu.cn"],"allowEditorialLogo":true},"050":{"name":"汇蓉国科","company":"成都汇蓉国科微系统技术有限公司","logoPages":["https://www.cwrep.cn/news/zhxw/380.html","https://www.kczg.org.cn/annualmeeting/rankdetail?id=547","https://www.cc-airshow.com/czqy-105.html"],"photoPages":["https://www.zhanhuiku.com/zixun/5939.html","https://tfxqsh.com/4/31325/1981832","https://www.kczg.org.cn/annualmeeting/rankdetail?id=547","https://www.sohu.com/a/1022488640_670423"],"domainHints":["tfxqsh.com","cwrep.cn","cc-airshow.com","kczg.org.cn"],"allowEditorialLogo":true}}''')
+CFG=json.loads(r'''{"048":{"name":"元力股份","company":"福建元力活性炭股份有限公司","logoPages":["https://www.yuanlicarbon.com/"],"photoPages":["https://www.yuanlicarbon.com/","https://www.yuanlicarbon.com/"],"domainHints":["yuanlicarbon.com","wemorefun.com"],"allowEditorialLogo":false},"049":{"name":"红谱科技","company":"浙江红谱科技有限公司","logoPages":["https://www.hongpu-tech.com/","https://www.antpedia.com/ibook3491/","https://job.hdu.edu.cn/company/view/id/895841"],"photoPages":["https://www.antpedia.com/ibook3491/","https://www.antpedia.com/ibook3491/brand","https://www.antpedia.com/ibook3491/t","https://job.hdu.edu.cn/company/view/id/895841"],"domainHints":["hongpu-tech.com","antpedia.com","job.hdu.edu.cn"],"allowEditorialLogo":true},"050":{"name":"汇蓉国科","company":"成都汇蓉国科微系统技术有限公司","logoPages":["https://www.cwrep.cn/news/zhxw/380.html","https://www.kczg.org.cn/annualmeeting/rankdetail?id=547","https://www.cc-airshow.com/czqy-105.html"],"photoPages":["https://www.shifair.com/informationDetails/345909.html","https://www.anfangnews.com/2026/0530/16001.shtml","https://www.zhanhuiku.com/zixun/5939.html","https://www.kczg.org.cn/annualmeeting/rankdetail?id=547"],"domainHints":["tfxqsh.com","cwrep.cn","cc-airshow.com","kczg.org.cn"],"allowEditorialLogo":true}}''')
 def req(url,ref=None):
  r=Request(url,headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/133.0 Safari/537.36',
  'Accept':'image/png,image/webp,image/jpeg,image/svg+xml,image/*,text/html;q=0.9,*/*;q=0.8',
@@ -134,7 +134,7 @@ for num,cfg in CFG.items():
    used.add(d.get('sourceSha256',''))
  for name in ['logo.png','photo1.jpg','photo2.jpg']:
   f=root/name;old=audit.get(name)
-  if num=='050' and name=='photo1.jpg' and old and (old.get('source','').startswith('https://saas-chengdu.oss-cn-chengdu.aliyuncs.com/uploads/20230726/c0624d61') or 'parkworld.net' in old.get('source','')):
+  if num=='050' and name=='photo1.jpg' and old and (old.get('source','').startswith('https://saas-chengdu.oss-cn-chengdu.aliyuncs.com/uploads/20230726/c0624d61') or 'parkworld.net' in old.get('source','') or 'q5.itc.cn/q_70/images03/20260514/943d9d62' in old.get('source','')):
    # Visually inspected: this is the CHAMBER logo banner, not a Huirong company picture.
    print('REJECT_NONCOMPANY_TIANFU_CHAMBER_BANNER',flush=True);old=None
   if old and old.get('sha256') and f.is_file() and f.stat().st_size>2500 and sha256(f.read_bytes()).hexdigest()==old['sha256']:
@@ -158,6 +158,8 @@ for num,cfg in CFG.items():
      if name=='logo.png' and num!='048':continue # no safe official logo known; editorial text is preferable to wrong trademark
      if name!='logo.png' and score<0:continue
      if name!='logo.png' and re.search('logo|icon|erweima|code|qr|weixin',url,re.I):continue
+     if num=='050' and name=='photo1.jpg' and 'shifair.com/informationDetails/345909.html' in page:score+=20
+     if num=='050' and name=='photo1.jpg' and 'zhanhuiku.com' in page:score+=10
      candidates.append((score,url,page))
    except Exception as exc:print('PAGE_WARNING',num,name,page,str(exc)[:100],flush=True)
   candidates.sort(key=lambda x:-x[0])
