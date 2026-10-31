@@ -1,3 +1,4 @@
+import {LANGFANG_HOUSING_RECORDS} from './langfangHousingRecords.ts';
 import {CANGZHOU_HOUSING_RECORDS} from './cangzhouHousingRecords.ts';
 import {HENGSHUI_HOUSING_RECORDS} from './hengshuiHousingRecords.ts';
 import {ZHANGJIAKOU_HOUSING_RECORDS} from './zhangjiakouHousingRecords.ts';
@@ -18,6 +19,7 @@ export type TalentHousingRecord={id:string;city:string;district:string;title:str
 export const HOUSING_REVIEW_DATE='2026-10-30';
 export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
 ...HENGSHUI_HOUSING_RECORDS,
+...LANGFANG_HOUSING_RECORDS,
 ...CANGZHOU_HOUSING_RECORDS,
 ...ZHANGJIAKOU_HOUSING_RECORDS,
 ...TANGSHAN_HOUSING_RECORDS,
