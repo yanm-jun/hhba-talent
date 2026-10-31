@@ -1,11 +1,11 @@
 import type {CompleteGuide,GuideStep,GuideBranch} from '../components/talent/UnifiedPolicyGuide';
-import {QINGHAI_POLICY_RECORDS} from './qinghaiPolicyRecords.ts';
-import {QINGHAI_HOUSING_RECORDS} from './qinghaiHousingRecords.ts';
+import {QINGHAI_POLICY_RESEARCH_RECORDS} from './qinghaiPolicyRecords.ts';
+import {QINGHAI_HOUSING_RESEARCH_RECORDS} from './qinghaiHousingRecords.ts';
 export const QINGHAI_8_REGIONS=['西宁','海东','海北','黄南','海南州','果洛','玉树','海西'] as const;
 export const qinghaiGuideUrl=(kind:'policy'|'housing',id:string)=>'/talent-service/policy-guide-preview/qinghai/'+kind+'/'+encodeURIComponent(id);
 export function buildQinghaiGuide(kind:'policy'|'housing',id:string):CompleteGuide|null{
- const p=kind==='policy'?QINGHAI_POLICY_RECORDS.find(x=>x.id===id):undefined;
- const h=kind==='housing'?QINGHAI_HOUSING_RECORDS.find(x=>x.id===id):undefined;
+ const p=kind==='policy'?QINGHAI_POLICY_RESEARCH_RECORDS.find(x=>x.id===id):undefined;
+ const h=kind==='housing'?QINGHAI_HOUSING_RESEARCH_RECORDS.find(x=>x.id===id):undefined;
  if(!p&&!h)return null;
  const r=p||h!,city=r.city, today=new Date().toISOString().slice(0,10);
  const overdue=!!p&&(p.temporal!=='policy'||!!p.deadline&&p.deadline<today);
