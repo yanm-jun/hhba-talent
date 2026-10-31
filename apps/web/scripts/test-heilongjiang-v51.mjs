@@ -7,7 +7,7 @@ import {buildHeilongjiangGuide} from '../src/data/heilongjiangGuides.ts';
 import {assessPolicy,assessHousing,talentSourceKind} from '../src/data/talentQuality.ts';
 const cities=["哈尔滨","齐齐哈尔","鸡西","鹤岗","双鸭山","大庆","伊春","佳木斯","七台河","牡丹江","黑河","绥化","大兴安岭"];
 assert.equal(cities.length,13,'12地级市+大兴安岭地区');
-assert.equal(TALENT_CITY_INDEX.length,306,'national 305 + 大兴安岭地区');
+assert.equal(TALENT_CITY_INDEX.length,312,'national 305 + 大兴安岭地区');
 assert.equal(TALENT_HEILONGJIANG_DISTRICTS.length,1);
 assert.equal(findTalentProvince('黑龙江省')?.name,'黑龙江');
 assert.equal(queryTalentCities('','黑龙江省').length,13);

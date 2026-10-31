@@ -7,7 +7,7 @@ import {assessPolicy,assessHousing,talentSourceKind} from '../src/data/talentQua
 import {readFileSync} from 'node:fs';
 const cities=["呼和浩特","包头","乌海","赤峰","通辽","鄂尔多斯","呼伦贝尔","巴彦淖尔","乌兰察布","兴安盟","锡林郭勒盟","阿拉善盟"];
 assert.equal(cities.length,12);
-assert.equal(TALENT_CITY_INDEX.length,308);
+assert.equal(TALENT_CITY_INDEX.length,312);
 assert.equal(findTalentProvince('内蒙古')?.official,'内蒙古自治区');
 assert.equal(queryTalentCities('内蒙古').length,12);
 assert.equal(queryTalentCities('','内蒙古自治区').length,12);
