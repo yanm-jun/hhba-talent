@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const read=p=>fs.readFileSync(p,'utf8');
 const page=read('src/pages/UnifiedV2CompanyPage.tsx');
-assert(page.includes('06[0-9]|07[0-1])$/.test(id)'),'All three next firms need existing four-panel V2 route');
+assert(page.includes('06[0-9]|07[0-4])$/.test(id)'),'All three next firms need existing four-panel V2 route');
 assert(page.includes('if(batch3756)return job.category===major'),'Exact category filter missing');
 assert(page.includes('hhba-kpmg-photo-grid')&&page.includes('hhba-kpmg-service-grid'),'Four sections changed');
 const roster=JSON.parse(read('src/data/domesticAutumnScreenshot20261028.json'));
