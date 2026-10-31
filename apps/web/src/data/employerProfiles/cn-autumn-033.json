@@ -28,22 +28,25 @@
     "https://www.zhaopin.com/jobdetail/CC323684010J41033399404.htm",
     "https://51uns.bysjy.com.cn/Position/Details/3241634?schoolCode=10720",
     "https://www.goldmantis.com/en/projects/337",
-    "https://www.iteschina.com/zh-cn/exhibitor-list/details/13472/jinan-bodor-cnc-machine"
+    "https://www.iteschina.com/zh-cn/exhibitor-list/details/13472/jinan-bodor-cnc-machine",
+    "https://www.sohu.com/a/833840148_99978832",
+    "https://www.geekpark.net/news/328666",
+    "https://www.tolerie-mag.com/publi-info/bodor-laser-se-classe-n1-mondial-des-ventes-de-machines-de-decoupe-laser-a-fibre-pour-la-sixieme-annee-consecutive/"
   ],
   "media": {
     "logo": "images/employer-profiles/cn-autumn-033/logo.webp",
     "photos": [
       {
         "path": "images/employer-profiles/cn-autumn-033/photo1.jpg",
-        "caption": "邦德激光 · Dream Park全球总部基地",
-        "alt": "济南邦德激光Dream Park全球总部基地建筑与厂区航拍",
-        "note": "图片来自邦德激光官方网站“关于邦德”，为全球总部基地实景；本地静态副本。"
+        "caption": "邦德激光 · Dream Park超级工厂实景",
+        "alt": "济南邦德激光Dream Park大型智能工厂及激光切割设备",
+        "note": "独立媒体对邦德Dream Park工厂的实景报道；原官网图片服务器对自动化访问返回404/418，因此改用真实新闻报道照片。"
       },
       {
         "path": "images/employer-profiles/cn-autumn-033/photo2.jpg",
-        "caption": "邦德激光 · Dream Park总部建筑",
-        "alt": "邦德激光全球总部基地的环形总部楼宇黄昏外景",
-        "note": "图片来自Dream Park项目承建方金螳螂项目介绍，显示已建成的总部建筑；本地静态副本。"
+        "caption": "邦德激光 · 企业总部建筑实景",
+        "alt": "邦德激光Dream Park总部建筑或企业楼宇实景",
+        "note": "优先采用Dream Park项目承建方金螳螂发布的真实总部建筑照片，如不可访问则使用有来源的旧厂区建筑报道图，具体来源以图片核验记录为准。"
       }
     ]
   },
@@ -79,7 +82,7 @@
     "材料成型及控制工程",
     "供应链管理"
   ],
-  "photoNote": "Bodor品牌logo取自中国工业展官方参展商信息；两张独立公司照片取自邦德官网与其总部项目承建方公开资料，构建时下载、核验并保存为本站静态图片。图片不可点击外跳；权利归各自原权利人，HHBA不代表企业官方。",
+  "photoNote": "Bodor品牌Logo来自中国工业展官方参展商资料；两张不同的公司建筑或工厂实景照片取自独立报道与项目建筑方，构建时核实原图有效性后分别保存到本站，不使用AI代替真实照片。图像无外跳，权利归原权利人，HHBA非邦德官方招聘代理。",
   "business": [
     {
       "title": "激光切板设备",
