@@ -84,9 +84,9 @@ jobs:
         with:
           name: hhba-087-089-media-source-rights-audit
           path: |
-            apps/web/public/images/employer-profiles/cn-autumn-084/media-sources.json
-            apps/web/public/images/employer-profiles/cn-autumn-085/media-sources.json
-            apps/web/public/images/employer-profiles/cn-autumn-086/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-087/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-088/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-089/media-sources.json
             apps/web/public/images/employer-profiles/cn-autumn-084/logo-sources.json
             apps/web/public/images/employer-profiles/cn-autumn-085/logo-sources.json
           retention-days: 30
