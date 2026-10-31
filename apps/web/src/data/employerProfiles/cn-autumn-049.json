@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-049",
+  "name": "红谱科技",
+  "displayName": "红谱科技",
+  "englishName": "Hongpu Technology",
+  "aliases": [
+    "浙江红谱科技有限公司",
+    "浙江红谱科技股份有限公司",
+    "红谱",
+    "Hongpu",
+    "Hongpu Tech",
+    "杭州红谱科技"
+  ],
+  "industry": "红外光电检测 · 紫外成像 · 声学成像 · 工业监测仪器",
+  "subtitle": "浙江红谱科技有限公司 · 浙江杭州 · 光电智能检测高端仪器",
+  "overview": "浙江红谱科技于2016年创建，主要从事红外热成像、紫外成像、声学成像、局部放电检测和拉曼光谱等高端仪器研发，产品服务电力巡检、工业过程监测、消防应急及环境领域。注意并非北京红谱光电科技有限公司，两者不应混为一家公司。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.wondercv.com/xiaozhao/hongpu-tech-hangzhou-2027-campus-19945-f42086/",
+    "https://job.hdu.edu.cn/company/view/id/895841",
+    "https://www.antpedia.com/ibook3491/t",
+    "https://m.zhipin.com/companys/ba03aab6b75fbf3b03x53t28EVI~.html",
+    "https://www.hongpu-tech.com/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-049/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-049/photo1.jpg",
+        "caption": "红谱科技 · 检测仪器产品视觉",
+        "alt": "浙江红谱科技公开企业资料中的仪器产品或检测技术图片",
+        "note": "来自有红谱明确品牌主体的第三方公司产品目录或高校资料，不使用北京同名红谱光电照片。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-049/photo2.jpg",
+        "caption": "红谱科技 · 工业检测应用",
+        "alt": "浙江红谱科技公开产品/工业检测业务场景配图",
+        "note": "来自与浙江红谱科技主体直接关联的公开企业介绍页面，非未经确认的办公室照片。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://job.hdu.edu.cn/company/view/id/895841",
+    "label": "杭州电子科技大学企业档案与2027校招资料",
+    "status": "external_evidence",
+    "subject": "浙江红谱科技有限公司",
+    "note": "2027秋招汇总仅公开算法、软件、嵌入式、结构／硬件四个招聘方向，不是四条经官方逐岗核验的具体招聘JD。高校企业档案用于核对企业名称及业务，实时投递入口应向公司核实。"
+  },
+  "majorIntro": "四类原始招聘方向按专业划分；结构／硬件为同一公开方向，不虚构独立的机械与电气职位，类别筛选准确展示对应方向。",
+  "preferredMajors": [
+    "光电信息科学与工程",
+    "电子信息工程",
+    "电子科学与技术",
+    "机械工程",
+    "自动化",
+    "通信工程",
+    "计算机科学与技术",
+    "软件工程",
+    "人工智能",
+    "测控技术与仪器"
+  ],
+  "photoNote": "只接受与浙江红谱科技明确关联的品牌/产品视觉；素材将做本地来源审计。如第三方资料没有清晰Logo或两张独立公司图，必须保留未完成状态，禁止以北京红谱光电等相似公司替代。",
+  "business": [
+    {
+      "title": "红外热成像检测",
+      "description": "研发非制冷及制冷型红外热成像设备，为复杂工业设备和电力巡检提供温度异常识别。",
+      "tags": "红外 · 热成像",
+      "details": [
+        "红外测温及故障定位",
+        "设备热异常监测",
+        "全天候红外分析"
+      ]
+    },
+    {
+      "title": "紫外成像检测",
+      "description": "提供紫外电晕等检测工具，支持电力设施放电异常可视化监测。",
+      "tags": "紫外 · 电力",
+      "details": [
+        "高压设备电晕识别",
+        "紫外成像与图像增强",
+        "电网运维现场检查"
+      ]
+    },
+    {
+      "title": "声学成像及检测",
+      "description": "通过麦克风阵列和声源定位技术定位工业气体泄漏、电气局放等问题。",
+      "tags": "声学 · 阵列",
+      "details": [
+        "声源定位和可视化",
+        "泄漏检测与巡检",
+        "设备状态监测"
+      ]
+    },
+    {
+      "title": "局部放电与电力安全",
+      "description": "布局局放检测设备、综合在线监测及多模态数据诊断。",
+      "tags": "局放 · 在线监测",
+      "details": [
+        "变电站及输电巡检",
+        "绝缘缺陷与故障评估",
+        "智能告警与数据留痕"
+      ]
+    },
+    {
+      "title": "拉曼和光谱检测",
+      "description": "以光谱分析仪器开展材料、化学及工业检验方向的能力建设。",
+      "tags": "拉曼 · 光谱",
+      "details": [
+        "光谱信号采集",
+        "工业检测与科研分析",
+        "复杂场景的信号处理"
+      ]
+    },
+    {
+      "title": "工业视觉、软件与算法",
+      "description": "研究传感器、图像处理、嵌入式软件与仪器结构协同，为产品交付提供系统支撑。",
+      "tags": "嵌入式 · AI",
+      "details": [
+        "光学与数字处理算法",
+        "结构、电子和软件系统",
+        "工业监测整体解决方案"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "algorithm-2027",
+      "title": "算法方向（2027届）",
+      "category": "算法与图像处理",
+      "city": "浙江杭州（秋招汇总城市）",
+      "summary": "红外/可见光图像处理、智能识别与检测算法等相关研发岗位方向。",
+      "requirements": "光电工程、图像处理、计算机、人工智能或数学相关背景；招聘汇总仅公开算法方向，未披露该方向的具体编程语言、研究生要求与单岗位职责，不能虚构。 2027年公开秋招汇总称本科可投、截止2026-12-28，但未取得企业官网逐岗原文，具体资格及投递渠道以企业和高校核验为准。",
+      "majorNames": [
+        "计算机科学与技术",
+        "人工智能",
+        "光电信息科学与工程"
+      ],
+      "editorialRelatedMajors": [
+        "数学与应用数学",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科可投 · 2027届（汇总口径）",
+      "url": "https://job.hdu.edu.cn/company/view/id/895841",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hongpu-tech-hangzhou-2027-campus-19945-f42086/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江红谱科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "software-2027",
+      "title": "软件方向（2027届）",
+      "category": "软件研发",
+      "city": "浙江杭州（秋招汇总城市）",
+      "summary": "参与光学检测仪器的软件、设备控制与图像展示等相关软件研发方向。",
+      "requirements": "软件工程、计算机相关专业为编辑性适配；公开公告没有单岗明确具体职责、开发语言或工具链，需进一步核对公司完整岗位JD。 2027年公开秋招汇总称本科可投、截止2026-12-28，但未取得企业官网逐岗原文，具体资格及投递渠道以企业和高校核验为准。",
+      "majorNames": [
+        "软件工程",
+        "计算机科学与技术"
+      ],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科可投 · 2027届（汇总口径）",
+      "url": "https://job.hdu.edu.cn/company/view/id/895841",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hongpu-tech-hangzhou-2027-campus-19945-f42086/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江红谱科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "embedded-2027",
+      "title": "嵌入式方向（2027届）",
+      "category": "嵌入式与硬件",
+      "city": "浙江杭州（秋招汇总城市）",
+      "summary": "围绕光电测量设备开展嵌入式控制、数据采集与系统调试等应用方向。",
+      "requirements": "通信、电子、自动化、嵌入式相关背景；公告仅列嵌入式方向，具体学历、底层平台与工作职责应以企业补充信息为准。 2027年公开秋招汇总称本科可投、截止2026-12-28，但未取得企业官网逐岗原文，具体资格及投递渠道以企业和高校核验为准。",
+      "majorNames": [
+        "电子信息工程",
+        "自动化",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "测控技术与仪器"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科可投 · 2027届（汇总口径）",
+      "url": "https://job.hdu.edu.cn/company/view/id/895841",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hongpu-tech-hangzhou-2027-campus-19945-f42086/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江红谱科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "structure-hardware-2027",
+      "title": "结构／硬件方向（2027届）",
+      "category": "机械结构与硬件",
+      "city": "浙江杭州（秋招汇总城市）",
+      "summary": "面向手持或在线监测仪器的结构部件、电子硬件和系统工程相关工作方向。",
+      "requirements": "机械、测控、电子、光电类专业均可能相关；此为公开“结构/硬件”方向的原始合并名称，不拆成两个已确认独立岗位。 2027年公开秋招汇总称本科可投、截止2026-12-28，但未取得企业官网逐岗原文，具体资格及投递渠道以企业和高校核验为准。",
+      "majorNames": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "电子信息工程"
+      ],
+      "editorialRelatedMajors": [
+        "光电信息科学与工程",
+        "测控技术与仪器"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科可投 · 2027届（汇总口径）",
+      "url": "https://job.hdu.edu.cn/company/view/id/895841",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hongpu-tech-hangzhou-2027-campus-19945-f42086/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江红谱科技有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}
