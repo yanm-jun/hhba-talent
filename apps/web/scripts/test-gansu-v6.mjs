@@ -21,8 +21,8 @@ for(const city of cities){
  const houses=GANSU_HOUSING_RECORDS.filter(x=>x.city===city);
  assert.ok(policies.length>=1,'missing unique researched policy for '+city);
  assert.ok(houses.length>=1,'missing source-backed housing evidence for '+city);
- assert.equal(getTalentCitySnapshot(city).policyCount,policies.length,city+' policy list not integrated');
- assert.equal(getTalentCitySnapshot(city).housingCount,houses.length,city+' housing missing from nationwide index');
+ assert.ok(getTalentCitySnapshot(city).policyCount>=policies.length,city+' initial policies missing from expanded nationwide index');
+ assert.ok(getTalentCitySnapshot(city).housingCount>=houses.length,city+' initial housing missing from expanded nationwide index');
  for(const p of policies){
   assert.ok(p.sourceUrl.startsWith('https://')&&p.title&&p.eligibility.length>=80&&p.summary.length>=50,p.id);
   assert.ok(p.targetGroup&&p.payoutTo&&p.reviewNote.includes('办理入口待核实'),p.id);
