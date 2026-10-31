@@ -1,0 +1,39 @@
+{
+  "logo.png": {
+    "verified": true,
+    "editorialFallback": false,
+    "company": "宏川集团",
+    "source": "https://grgroup.cc/phone/images/new/logo.png",
+    "sourceSha256": "2afc0785fc7c4cc6621d213ebb9fac29f953f66865096f3d3718563f663c449f",
+    "sha256": "d76fe7ad2fdb5e59a3816dac705700bc41aa882b39d5505119404a2a00b06b27",
+    "width": 744,
+    "height": 312,
+    "sourceNote": "Headquarters image from university company listing; second picture from Hongchuan Group official Nangtong port operations news.",
+    "copyright": "Image rights retained by original publisher",
+    "presentation": "Official white wordmark preserved on dark-navy readability background"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "editorialFallback": false,
+    "company": "宏川集团",
+    "source": "https://career.cup.edu.cn/attachment/cup/ueditor/images/20181026/1540535814524187.jpg",
+    "sourceSha256": "b1969f9c045fb21a00fb44671811ab486c8771063e38d7fd685f55ba76ed7c3d",
+    "sha256": "1a94f559f60182a7d7550e169da3886feabc598b11167de234c648ae7caccd3d",
+    "width": 800,
+    "height": 605,
+    "sourceNote": "Headquarters image from university company listing; second picture from Hongchuan Group official Nangtong port operations news.",
+    "copyright": "Image rights retained by original publisher"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "editorialFallback": false,
+    "company": "宏川集团",
+    "source": "https://www.grgroup.cc/Upfile/image/20240514/17156538681300031.jpg",
+    "sourceSha256": "75e3730913ea9a361bb4071777623825ac987920dc395af6a5499bfdcbda09ce",
+    "sha256": "f41b9313d38be8516e038d23867385cd87568e82b6cb44d813b3034dc5207f41",
+    "width": 1220,
+    "height": 759,
+    "sourceNote": "Headquarters image from university company listing; second picture from Hongchuan Group official Nangtong port operations news.",
+    "copyright": "Image rights retained by original publisher"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "logo.png": {
+    "verified": false,
+    "editorialFallback": true,
+    "company": "金中新材",
+    "source": "HHBA-editorial-text-only",
+    "sourceSha256": "7a929856c4498a1adb93b443f6c2ac2f637e5efdb7b649e50dc52f8e70d047e3",
+    "sha256": "7a929856c4498a1adb93b443f6c2ac2f637e5efdb7b649e50dc52f8e70d047e3",
+    "width": 1000,
+    "height": 275,
+    "sourceNote": "Not official logo; no fake claim of ownership"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "editorialFallback": false,
+    "company": "金中新材",
+    "source": "https://p7.itc.cn/images03/20200529/b7dd6e81b0f74e0c9a3e458d1e05e495.jpeg",
+    "sourceSha256": "b23ac597fc4b4f0dde537018d955232fb13c536d5a38414b1f6adf02d0b125d4",
+    "sha256": "9b506d3fbc193677a542b14ab37e8cf888c0a748a840089688e3a32a30046b81",
+    "width": 1080,
+    "height": 720,
+    "sourceNote": "photo1 is affiliated shareholder Jinyu Jidong plant, NOT Jinzhong HQ; photo2 is Jinzhong/Hengwei transaction or affiliated project.",
+    "copyright": "Image rights retained by original publisher"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "editorialFallback": false,
+    "company": "金中新材",
+    "source": "https://img7.ccement.com/news/2502/richtext/img/zu1bw9tii7a1740707950197.png",
+    "sourceSha256": "1b5d44ea20f1e28899aace372423358397bf5f78f7725adb4bf8c2f612e710e0",
+    "sha256": "18b92cbb5c184c22ecbf3cdc8fb9e3a9417cbcdc86cad927bb8e059ceae72c2c",
+    "width": 1080,
+    "height": 697,
+    "sourceNote": "photo1 is affiliated shareholder Jinyu Jidong plant, NOT Jinzhong HQ; photo2 is Jinzhong/Hengwei transaction or affiliated project.",
+    "copyright": "Image rights retained by original publisher"
+  }
+}

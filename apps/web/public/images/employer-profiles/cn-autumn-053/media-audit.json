@@ -1,0 +1,39 @@
+{
+  "logo.png": {
+    "verified": true,
+    "editorialFallback": false,
+    "company": "兰石集团",
+    "source": "https://www.lansland.com/template/1/lsgroup/static/images/logo.png",
+    "sourceSha256": "d0badb447882b8689eb156b15665d974a4658affdab050fc94c4cb135b6cd44c",
+    "sha256": "929b6010457faa761d4ad34d6a998748eb203fc42e4b718a1b7f43f6a386d992",
+    "width": 1464,
+    "height": 288,
+    "sourceNote": "Official group industrial park and government reported 125MN press of Lanshi subsidiary.",
+    "copyright": "Image rights retained by original publisher",
+    "presentation": "Official white wordmark preserved on dark-navy readability background"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "editorialFallback": false,
+    "company": "兰石集团",
+    "source": "https://www.lansland.com/upload/1/cms/content/20251228/2005153501508898816.jpg",
+    "sourceSha256": "a8c6a13693833f6de6e82e020cb8190d9019b1ea2cdac4262d2ebb96322af49e",
+    "sha256": "c6236d33d65e42908d7265029113a5dbc7fb6433b6d4a6ad59f43b022c0d0726",
+    "width": 1400,
+    "height": 1050,
+    "sourceNote": "Official group industrial park and government reported 125MN press of Lanshi subsidiary.",
+    "copyright": "Image rights retained by original publisher"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "editorialFallback": false,
+    "company": "兰石集团",
+    "source": "https://www.lzxq.gov.cn/pic/003/020/730/00302073073_379c00e6.jpg",
+    "sourceSha256": "73255abb6468d700e1a7f9a23d6aa3fe992b1325b09d6a5aea68e0a0aecc1e24",
+    "sha256": "9129503a5e6837f910ae7c2c25457b71d3de807d8776bd1343a254238b8507fc",
+    "width": 1100,
+    "height": 619,
+    "sourceNote": "Official group industrial park and government reported 125MN press of Lanshi subsidiary.",
+    "copyright": "Image rights retained by original publisher"
+  }
+}

@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-053",
+  "name": "兰石集团",
+  "displayName": "兰石集团",
+  "englishName": "Lanzhou Lanshi Group",
+  "aliases": [
+    "兰州兰石集团有限公司",
+    "兰州兰石",
+    "LSJT",
+    "Lanshi Group",
+    "兰石重装"
+  ],
+  "industry": "能源装备制造 · 石化压力容器 · 氢能核能装备 · 工业工程",
+  "subtitle": "兰州兰石集团有限公司 · 甘肃兰州 · 创建于1953年",
+  "overview": "兰石集团起源于1953年的兰州石油机械和石油化工设备产业，现从事高端能源装备研发设计、装备制造、工程服务，以及核能、氢能、新材料和工业智能等产业。2027校园招聘公开四大类方向，面向机械、电气、焊接、材料、测控、计算机、工程和综合管理等专业。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.lansland.com/",
+    "https://www.lsjt.com.cn/",
+    "https://www.lansland.com/lsgroup/lsgroup/lianxiwomen/index.html",
+    "https://www.wondercv.com/xiaozhao/lanshi-group-2027-campus-recruitment-19788-8fdd72/",
+    "https://wust.91wllm.cn/teachin/view/id/252606"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-053/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-053/photo1.jpg",
+        "caption": "兰石集团 · 兰州新区高端装备产业园",
+        "alt": "兰石集团官方网站刊发的兰石高端装备制造产业园建筑和生产车间航拍",
+        "note": "企业官方站点‘关于兰石’栏目提供的园区实拍；具体厂区位置以官网为准。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-053/photo2.jpg",
+        "caption": "兰石集团子企业 · 125MN快锻液压机组",
+        "alt": "兰州新区政府报道的兰石超合金125MN快锻液压机组正式投产现场照片",
+        "note": "来自兰州新区政府2025年5月报道，设备明确标注兰石超合金，属于集团相关产业装备实拍。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.lansland.com/lsgroup/lsgroup/lianxiwomen/index.html",
+    "label": "兰石集团官方2027届校园招聘公告",
+    "status": "official_portal",
+    "subject": "兰州兰石集团有限公司",
+    "note": "兰石集团官网2026-10-27发布2027届校园招聘公告；本页四条为招聘大类而非公司官网逐项岗位清单。具体岗位、学历、地点及投递方法请查看官方公告；第三方资料所述截止时间须以公司公告为准。"
+  },
+  "majorIntro": "四类招聘方向按机械能源装备、工程建造、工艺检测与数字化、财务法务职能分类，点击专业方向查看同类岗位；专业匹配不代表满足单岗所有条件。",
+  "preferredMajors": [
+    "机械工程",
+    "过程装备与控制工程",
+    "焊接技术与工程",
+    "材料成型及控制工程",
+    "电气工程及其自动化",
+    "自动化",
+    "测控技术与仪器",
+    "计算机科学与技术",
+    "软件工程",
+    "新能源科学与工程",
+    "土木工程",
+    "安全工程",
+    "财务管理",
+    "法学"
+  ],
+  "photoNote": "品牌标识及园区图片来自兰石集团有效官方域名 lansland.com；第二张图片是兰州新区政府公开的兰石超合金125MN锻造机组实拍。来源与SHA-256独立记录，均非AI生成。",
+  "business": [
+    {
+      "title": "石油化工高端装备",
+      "description": "研发生产压力容器、换热设备和大型石化工艺装备，服务油气和石化能源项目。",
+      "tags": "压力容器 · 石化",
+      "details": [
+        "石化压力容器设计制造",
+        "大型装备焊接与检验",
+        "产品现场工程服务"
+      ]
+    },
+    {
+      "title": "油气钻采装备",
+      "description": "依托兰石石油机械产业积淀开展钻井和油气开采设备相关技术服务。",
+      "tags": "钻采 · 油气",
+      "details": [
+        "石油钻采装备技术",
+        "关键机械结构研发",
+        "装备售后及工程协作"
+      ]
+    },
+    {
+      "title": "氢能和新能源装备",
+      "description": "聚焦氢能储运、储能及新能源成套装备的研发制造，支持产业链设备升级。",
+      "tags": "氢能 · 储能",
+      "details": [
+        "氢能储运核心装备",
+        "新能源装备工艺",
+        "成套系统技术研究"
+      ]
+    },
+    {
+      "title": "核能与重大工程装备",
+      "description": "开展核能工程和其他重大能源项目配套的压力设备及特殊制造工艺。",
+      "tags": "核能 · 重装",
+      "details": [
+        "高可靠装备制造",
+        "特殊材料和焊接质量",
+        "重大工程项目协作"
+      ]
+    },
+    {
+      "title": "装备工程与项目总承包",
+      "description": "通过研发、项目管理、制造、交付及现场服务提供能源装备工程化能力。",
+      "tags": "工程 · EPC",
+      "details": [
+        "产品及工程项目实施",
+        "成套装备现场交付",
+        "设备可靠性和安全管理"
+      ]
+    },
+    {
+      "title": "智能制造与工业材料",
+      "description": "在装备制造中结合数字化控制、工艺研发、工业检测和材料技术提升生产能力。",
+      "tags": "数字化 · 材料",
+      "details": [
+        "工业自动化控制",
+        "质量检测与无损检测",
+        "生产管理和信息化"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "research",
+      "title": "研发设计类（2027届）",
+      "category": "装备研发与设计",
+      "city": "兰州／天津／青岛／西安／上海／广州等集团基地（具体岗位以原公告为准）",
+      "summary": "高端能源装备的机械、材料、焊接、电控及新能源研发设计方向，参与方案验证、设备创新和项目技术支持。",
+      "requirements": "兰石集团官方2027届招聘公告和高校宣讲材料面向本科及以上应届毕业生，岗位类别与相关专业范围已公开，但未将每个具体岗位JD逐项公开在本摘要中。此为招聘大方向，细分岗位、实际工作地点及具体专业门槛需从集团官网2027公告核验。",
+      "majorNames": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "过程装备与控制工程",
+        "材料成型及控制工程",
+        "焊接技术与工程",
+        "电气工程及其自动化",
+        "新能源科学与工程",
+        "氢能科学与工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科及以上 · 具体单岗以官方公告为准",
+      "url": "https://www.lansland.com/lsgroup/lsgroup/lianxiwomen/index.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/lanshi-group-2027-campus-recruitment-19788-8fdd72/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "兰州兰石集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "engineering",
+      "title": "工程建设类（2027届）",
+      "category": "工程项目与安全",
+      "city": "兰州／天津／青岛／西安／上海／广州等集团基地（具体岗位以原公告为准）",
+      "summary": "面向制造工程、工厂基建、工程项目执行、安全环保与项目管理的校招方向。",
+      "requirements": "兰石集团官方2027届招聘公告和高校宣讲材料面向本科及以上应届毕业生，岗位类别与相关专业范围已公开，但未将每个具体岗位JD逐项公开在本摘要中。此为招聘大方向，细分岗位、实际工作地点及具体专业门槛需从集团官网2027公告核验。",
+      "majorNames": [
+        "土木工程",
+        "给排水科学与工程",
+        "安全工程",
+        "环境工程",
+        "工业工程",
+        "工程管理"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科及以上 · 具体单岗以官方公告为准",
+      "url": "https://www.lansland.com/lsgroup/lsgroup/lianxiwomen/index.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/lanshi-group-2027-campus-recruitment-19788-8fdd72/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "兰州兰石集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "technology",
+      "title": "技术工艺类（2027届）",
+      "category": "工艺、检测与数字化",
+      "city": "兰州／天津／青岛／西安／上海／广州等集团基地（具体岗位以原公告为准）",
+      "summary": "参与产品工艺优化、检测质量、测控仪表及数字化生产技术方向的培养。",
+      "requirements": "兰石集团官方2027届招聘公告和高校宣讲材料面向本科及以上应届毕业生，岗位类别与相关专业范围已公开，但未将每个具体岗位JD逐项公开在本摘要中。此为招聘大方向，细分岗位、实际工作地点及具体专业门槛需从集团官网2027公告核验。",
+      "majorNames": [
+        "金属材料工程",
+        "测控技术与仪器",
+        "无损检测技术",
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能",
+        "数据科学与大数据技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科及以上 · 具体单岗以官方公告为准",
+      "url": "https://www.lansland.com/lsgroup/lsgroup/lianxiwomen/index.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/lanshi-group-2027-campus-recruitment-19788-8fdd72/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "兰州兰石集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "functions",
+      "title": "综合职能类（2027届）",
+      "category": "综合职能",
+      "city": "兰州／天津／青岛／西安／上海／广州等集团基地（具体岗位以原公告为准）",
+      "summary": "围绕总部和成员企业的财务审计、人力、法务、文秘及外语业务支持开展校招。",
+      "requirements": "兰石集团官方2027届招聘公告和高校宣讲材料面向本科及以上应届毕业生，岗位类别与相关专业范围已公开，但未将每个具体岗位JD逐项公开在本摘要中。此为招聘大方向，细分岗位、实际工作地点及具体专业门槛需从集团官网2027公告核验。",
+      "majorNames": [
+        "财务管理",
+        "会计学",
+        "审计学",
+        "人力资源管理",
+        "法学",
+        "汉语言文学",
+        "新闻传播学",
+        "英语"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科及以上 · 具体单岗以官方公告为准",
+      "url": "https://www.lansland.com/lsgroup/lsgroup/lianxiwomen/index.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/lanshi-group-2027-campus-recruitment-19788-8fdd72/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "兰州兰石集团有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}
