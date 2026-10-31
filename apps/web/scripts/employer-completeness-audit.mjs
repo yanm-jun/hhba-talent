@@ -23,7 +23,7 @@ for(const x of manifest.entries){
     const legacyPages=['Kpmg','Schneider','Pfizer','Csair','SfExpress','NeteaseGames','Hypergryph','Anker','Laifen','Shkp'];
     const pageFile='src/pages/'+legacyPages[n-1]+'CompactProfilePage.tsx';
     const contents=fs.existsSync(pageFile)?read(pageFile):'';
-    const fourBlocks=contents.includes('data-company-template="unified-v2"')&&contents.includes('data-four-block-contract="hero,majors,jobs,business"')&&contents.includes('hhba-kpmg-hero')&&contents.includes('hhba-kpmg-photo-grid')&&contents.includes('<CompanyMajorJobs')&&contents.includes('主要业务与专业服务');
+    const fourBlocks=contents.includes('data-company-template="openai"')&&contents.includes('data-four-block-contract="hero,majors,jobs,business"')&&contents.includes('hhba-kpmg-hero')&&contents.includes('hhba-kpmg-photo-grid')&&contents.includes('<CompanyMajorJobs')&&contents.includes('主要业务与专业服务');
     if(!fourBlocks){custom.push(x.id);issue(x.id,x.name,'P2','LEGACY_FOUR_BLOCK_INCOMPLETE','Earlier standalone page does not meet shared four-block contract');}
    }
    else {generic.push(x.id);issue(x.id,x.name,'P1','NO_V2_PROFILE','Only generic fallback, lacks independent four-section V2 employer profile');}
