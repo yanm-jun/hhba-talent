@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readdirSync,readFileSync} from 'node:fs';
 const root='src/data/employerProfiles';
-const files=readdirSync(root).filter(f=>/^cn-autumn-\\d{3}\\.json$/.test(f));
+const files=readdirSync(root).filter(f=>/^cn-autumn-[0-9]{3}[.]json$/.test(f));
 let total=0, hashRoutes=0;
 const ids=new Set();
 for(const file of files){
