@@ -13,6 +13,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+concurrency:
+  group: hhba-employers-039-041-isolated
+  cancel-in-progress: true
 jobs:
   verify-and-package:
     runs-on: ubuntu-latest
