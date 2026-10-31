@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-073",
+  "name": "微软",
+  "displayName": "微软 Microsoft",
+  "englishName": "Microsoft Corporation",
+  "aliases": [
+    "Microsoft",
+    "微软中国",
+    "微软亚太研发集团",
+    "Microsoft APRD",
+    "Microsoft Research Asia",
+    "MSRA",
+    "微软2027校招"
+  ],
+  "industry": "云计算 · 人工智能 · 企业软件 · 开发者平台 · 安全",
+  "subtitle": "微软（中国）有限公司及微软亚太研发体系 · 北京／苏州／上海 · 全球科技企业",
+  "overview": "微软于中国设研发、云服务、企业软件和商业服务团队。微软亚太研发官方页面确认面向计算机、软件等背景的本科、硕士、博士应届生及暑期实习生，北京、上海、苏州、深圳为主要研发办公地点。2027届公开招聘二级摘要显示Software Engineer、Applied Scientist、Product Manager等方向，其中2026年9月—2027年8月为目标毕业窗口；另有高校公开2027非研发岗位项目，招聘截止口径因批次而异，所有岗位必须在微软官方Careers确认当前仍开放。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.microsoft.com/zh-cn/aprd/recruitment/",
+    "https://careers.microsoft.com/v2/global/en/locations/gcr.html",
+    "https://careers.microsoft.com/v2/global/en/locations/beijing.html",
+    "https://www.wondercv.com/xiaozhao/microsoft-2027-campus-recruitment-rd-beijing-suzhou-15558-abd159/",
+    "https://www.chaojijianli.com/xiaozhao/microsoft-2027-campus-recruitment-rd-15829-77779e/",
+    "https://career.cuhk.edu.cn/job/view/id/469909"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-073/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-073/photo1.svg",
+        "caption": "微软 Microsoft · HHBA独立业务示意（等待真实图片校验）",
+        "alt": "微软相关业务示意图，明确不是真实企业照片",
+        "note": "当前源码使用非官方独立SVG占位。预览构建将首先尝试按原始机构新闻/官方网站取得真实照片并保存原图SHA-256，获取成功后构建脚本会自动换为独立jpg，获取失败则仍明确标注为非实景。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-073/photo2.svg",
+        "caption": "微软 Microsoft · HHBA独立业务示意（等待真实图片校验）",
+        "alt": "微软相关业务示意图，明确不是真实企业照片",
+        "note": "当前源码使用非官方独立SVG占位。预览构建将首先尝试按原始机构新闻/官方网站取得真实照片并保存原图SHA-256，获取成功后构建脚本会自动换为独立jpg，获取失败则仍明确标注为非实景。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://careers.microsoft.com/v2/global/en/locations/gcr.html",
+    "label": "Microsoft Careers 大中华区官方职位检索",
+    "status": "official_portal",
+    "subject": "微软（中国）有限公司及微软研发相关法人",
+    "note": "已核微软全球官方求职入口，但2027校园岗位ID的实时空缺及准确结束日未核；2027研发二级摘要显示历史岗位ID，必须在Careers查当前空缺，不能将历史截止日期当成今天仍可投递。"
+  },
+  "majorIntro": "官方微软亚太研发主页明确技术相关学科背景；2027研发岗位的名称与编号以第三方公开信息核对。专业建议不等于所有岗位均对全部专业开放，具体岗位资格依Microsoft Careers当前JD。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "软件工程",
+    "人工智能",
+    "数学与应用数学",
+    "统计学",
+    "电子信息工程",
+    "信息安全",
+    "通信工程",
+    "人机交互",
+    "产品设计",
+    "工商管理"
+  ],
+  "photoNote": "优先下载Microsoft Careers大中华区中国办公室真实图片（北京、上海），不使用“苏州城市天际线”等与办公场所无关的图替代；源图版权归微软或授权摄影师，独立商业转载使用许可未核。 构建程序按实名公司来源验证真实照片，取得并完成图片校验后将自动替换占位图；无法取得时保留明显非实景标注，不捏造。",
+  "business": [
+    {
+      "title": "Microsoft Azure与企业云",
+      "description": "提供公有云、数据库、混合云及云原生应用平台，支持企业智能化、全球部署和运营。",
+      "tags": "云计算 · Azure",
+      "details": [
+        "云原生架构与开发",
+        "数据与AI服务",
+        "企业基础设施与安全"
+      ]
+    },
+    {
+      "title": "Copilot与人工智能研发",
+      "description": "开发Microsoft Copilot与Microsoft 365 Copilot等产品，将生成式AI模型、搜索和智能体整合至应用。",
+      "tags": "Copilot · AI",
+      "details": [
+        "生成式AI产品研发",
+        "模型推理与搜索",
+        "智能办公自动化"
+      ]
+    },
+    {
+      "title": "Microsoft 365生产力工具",
+      "description": "提供Teams、Office、Outlook、SharePoint等协同工具及企业生产力解决方案。",
+      "tags": "协作 · 办公",
+      "details": [
+        "文档和信息协同",
+        "视频会议与通讯",
+        "组织知识管理"
+      ]
+    },
+    {
+      "title": "Windows及开发者技术",
+      "description": "开发Windows平台、开发者工具和跨端软件生态，支持企业、个人开发者与ISV应用构建。",
+      "tags": "Windows · 开发",
+      "details": [
+        "操作系统与平台研发",
+        "Visual Studio开发工具",
+        "应用与生态支持"
+      ]
+    },
+    {
+      "title": "网络安全与身份管理",
+      "description": "依托Microsoft Security、Entra和Defender等产品提供身份、终端、云工作负载安全服务。",
+      "tags": "安全 · 身份",
+      "details": [
+        "身份访问管理",
+        "安全威胁防护",
+        "企业合规和数据安全"
+      ]
+    },
+    {
+      "title": "微软亚洲研究院与研发合作",
+      "description": "通过科研机构和亚太研发组织在机器学习、系统、HCI及软件工程等方向开展研究和产学合作。",
+      "tags": "研究 · 创新",
+      "details": [
+        "应用与基础研究",
+        "高校科研合作",
+        "研发成果产业化"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "software-engineer-200055320",
+      "title": "Software Engineer 软件工程师（2027届公开摘要）",
+      "category": "软件 / 开发",
+      "city": "北京／苏州",
+      "summary": "2027研发招聘公开摘要明确Software Engineer方向和岗位编号200055320；方向聚焦大型软件服务的设计、开发与测试，产品线与组别由微软官方具体职位确定。",
+      "requirements": "公开2027招聘资料面向2026年9月至2027年8月的应届毕业生，软件工程、计算机、信息技术相关背景为适配方向；详细学历、技术栈与面试要求以微软Careers的对应职位为准，不承诺该ID现在仍开放。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.09—2027.08毕业窗口（公开摘要）",
+      "url": "https://careers.microsoft.com/v2/global/en/locations/gcr.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/microsoft-2027-campus-recruitment-rd-beijing-suzhou-15558-abd159/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "微软亚太研发集团",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "applied-scientist-200055326",
+      "title": "Applied Scientist 应用科学家（2027届公开摘要）",
+      "category": "算法 / AI研究",
+      "city": "北京／苏州",
+      "summary": "2027研发招聘公开摘要明确Applied Scientist方向及岗位编号200055326，与模型、数据算法和研发实验相关，具体团队研究课题需要通过微软官方岗位页复核。",
+      "requirements": "公开招聘简介为2027届应届方向，人工智能、计算机、数学、统计等学科是编辑推荐的相关背景；官方单岗硬性专业、科研成果、论文要求和学历条件未核准，不得据此筛除其他符合条件人员。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "数学与应用数学",
+        "计算机科学与技术",
+        "统计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "毕业时间须核对微软原岗公告",
+      "url": "https://careers.microsoft.com/v2/global/en/locations/gcr.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/microsoft-2027-campus-recruitment-rd-beijing-suzhou-15558-abd159/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "微软亚太研发集团",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "product-manager-200055327",
+      "title": "Product Manager 产品经理（2027届公开摘要）",
+      "category": "产品管理",
+      "city": "北京／苏州",
+      "summary": "2027校招二级材料披露Product Manager职位编号200055327，方向连接用户研究、功能设计、工程落地与产品运营，具体团队职责以微软职位页为准。",
+      "requirements": "公开2027批次包含产品管理方向，计算机、软件、信息管理、交互设计等专业可以探索；现有证据不能证明固定学历门槛、当前面试安排或每个城市都有同一岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "信息管理与信息系统",
+        "工业设计"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届招聘摘要，具体岗位资格待核",
+      "url": "https://careers.microsoft.com/v2/global/en/locations/gcr.html",
+      "evidenceUrl": "https://www.chaojijianli.com/xiaozhao/microsoft-2027-campus-recruitment-rd-15829-77779e/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "微软亚太研发集团",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "non-rd-program-2027",
+      "title": "2027校园招聘非研发方向（高校公开项目，岗位待细分）",
+      "category": "非研发 / 待核岗位",
+      "city": "大中华区相关城市（以微软Careers为准）",
+      "summary": "2026年10月高校公布微软2027校园招聘非研发方向项目，公开页面未披露可逐项核对的岗位名称或具体专业条件，此处仅作为公开招聘项目登记。",
+      "requirements": "香港中文大学（深圳）2026年10月16日发布招聘消息、页面标示结束时间2026年11月27日，具体部门、正式岗位、资格和城市应在官方微软Careers逐项核对，**不能推断这是一条可直接申请的具体职位**。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理",
+        "经济学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "项目公告，尚无官方细分岗位表",
+      "url": "https://careers.microsoft.com/v2/global/en/locations/gcr.html",
+      "evidenceUrl": "https://career.cuhk.edu.cn/job/view/id/469909",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "微软（中国）有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}
