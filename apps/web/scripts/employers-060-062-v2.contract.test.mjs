@@ -8,7 +8,7 @@ const page=read('src/pages/UnifiedV2CompanyPage.tsx');
 const routeSource=page.split('const batch3756=/')[1]?.split('/.test(id)')[0];
 assert(routeSource,'Missing configured shared V2 route regex');
 const routePattern=new RegExp(routeSource);
-assert((routePattern.test('cn-autumn-060')&&routePattern.test('cn-autumn-062')&&routePattern.test('cn-autumn-080')), 'New employer IDs must use existing four-panel renderer');
+assert((routePattern.test('cn-autumn-060')&&routePattern.test('cn-autumn-062')&&routePattern.test('cn-autumn-083')), 'New employer IDs must use existing four-panel renderer');
 assert(page.includes('hhba-kpmg-photo-grid')&&page.includes('hhba-kpmg-service-grid'),'Original four-panel layout changed');
 assert(page.includes('if(batch3756)return job.category===major'),'Category filtering missing');
 assert(page.includes('站内岗位详情')&&page.includes('data-hhba-recruitment-outbound="true"'),'Job details and existing link gating missing');

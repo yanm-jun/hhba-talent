@@ -7,7 +7,7 @@ const page=read('src/pages/UnifiedV2CompanyPage.tsx');
 const routeSource=page.split('const batch3756=/')[1]?.split('/.test(id)')[0];
 assert(routeSource,'Missing configured shared V2 route regex');
 const routePattern=new RegExp(routeSource);
-assert(page.includes("const batch3756=/^cn-autumn-")&&(routePattern.test('cn-autumn-054')&&routePattern.test('cn-autumn-056')&&routePattern.test('cn-autumn-080')),"V2 template covers all existing batches");
+assert(page.includes("const batch3756=/^cn-autumn-")&&(routePattern.test('cn-autumn-054')&&routePattern.test('cn-autumn-056')&&routePattern.test('cn-autumn-083')),"V2 template covers all existing batches");
 assert(page.includes('if(batch3756)return job.category===major'),'Exact role category filters');
 assert(page.includes('j.category===g.label'),'Job group counts');
 assert(page.includes('hhba-kpmg-photo-grid')&&page.includes('hhba-kpmg-service-grid'),'2-photo panel and business panels');

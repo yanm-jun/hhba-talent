@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,existsSync,statSync} from 'node:fs';
 const read=p=>readFileSync(p,'utf8');
 const page=read('src/pages/UnifiedV2CompanyPage.tsx');
-assert(page.includes('07[0-9]|080)$/.test(id)'),'Shared V2 four-block page must cover 078-080');
+assert(page.includes('07[0-9]|08[0-3])$/.test(id)'),'Shared V2 four-block page must cover 078-080');
 assert(page.includes('if(batch3756)return job.category===major'),'Professional chips must filter exact matching role category');
 assert(page.includes('hhba-kpmg-photo-grid')&&page.includes('hhba-kpmg-service-grid'),'Existing four-section layout must remain');
 const profiles=JSON.parse(read('src/data/domesticAutumnScreenshot20261028.json')).entries;

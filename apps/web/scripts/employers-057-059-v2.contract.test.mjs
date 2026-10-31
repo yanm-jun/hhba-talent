@@ -6,7 +6,7 @@ const page=readFileSync('src/pages/UnifiedV2CompanyPage.tsx','utf8');
 const routeSource=page.split('const batch3756=/')[1]?.split('/.test(id)')[0];
 assert(routeSource,'Missing configured shared V2 route regex');
 const routePattern=new RegExp(routeSource);
-assert((routePattern.test('cn-autumn-057')&&routePattern.test('cn-autumn-059')&&routePattern.test('cn-autumn-080')),"V2 includes 057-059 and 060-062");
+assert((routePattern.test('cn-autumn-057')&&routePattern.test('cn-autumn-059')&&routePattern.test('cn-autumn-083')),"V2 includes 057-059 and 060-062");
 assert(page.includes("if(batch3756)return job.category===major"),'category job filtering missing');
 for(const [num,name,count] of expected){
  const id='cn-autumn-'+num,p=JSON.parse(readFileSync(root+id+'.json','utf8'));
