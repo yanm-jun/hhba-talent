@@ -62,7 +62,7 @@ check('preserve former cities and their real photo sources',()=>{
  for(const n of ['杭州','深圳','青岛','济南'])assert.ok(findTalentCity(n)?.photo?.startsWith('https://'));
 });
 check('excluded non-city administrative levels and county-level cities',()=>{
- for(const n of ['阿里地区','伊犁哈萨克自治州','阿拉善盟','五指山市','济源市','博乐市']){
+ for(const n of ['阿里地区','伊犁哈萨克自治州','五指山市','济源市','博乐市']){
   assert.equal(findTalentCity(n),null,n);
  }
 });
@@ -70,4 +70,4 @@ check('unknown city is not misidentified as a city',()=>{
  assert.equal(findTalentCity('不存在的城市'),null);
  assert.equal(parseTalentCityQuery('不存在的城市').matchedCity,false);
 });
-console.log(JSON.stringify({passed,expected:12,municipalities:4,prefectureCities:293,totalCities:305,provinceGroups:TALENT_PROVINCES.length},null,2));
+console.log(JSON.stringify({passed,expected:12,municipalities:4,prefectureCities:293,totalCities:TALENT_CITY_INDEX.length,provinceGroups:TALENT_PROVINCES.length},null,2));

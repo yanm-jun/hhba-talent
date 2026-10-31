@@ -8,6 +8,14 @@ import {assessPolicy,assessHousing} from '../../data/talentQuality';
 import {jiangsuGuideUrl} from '../../data/jiangsuGuides';
 import '../../styles/talent-jinan-guide-preview.css';
 
+function nationalRecordGuideUrl(kind:'policy'|'housing',id:string):string|undefined{
+ if(id.startsWith('hb-'))return hubeiGuideUrl(kind,id);
+ if(id.startsWith('fj-'))return fujianGuideUrl(kind,id);
+ if(kind==='housing')return undefined;
+ const route:Record<string,string>={'nm-':'inner-mongolia','jl-':'jilin','hlj-':'heilongjiang','jx-':'jiangxi','hn-':'hunan'};
+ for(const [prefix,slug]of Object.entries(route))if(id.startsWith(prefix))return '/talent-service/policy-guide-preview/'+slug+'/'+encodeURIComponent(id);
+ return undefined;
+}
 function Panel({title,children}:{title:string;children:React.ReactNode}){
  return <section className="jgd-panel"><div className="jgd-section-heading"><span className="jgd-section-icon"><FileText size={18}/></span><div><h2>{title}</h2></div></div>{children}</section>;
 }
