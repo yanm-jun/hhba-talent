@@ -7,7 +7,7 @@ import {assessPolicy,assessHousing,talentSourceKind} from '../src/data/talentQua
 import {readFileSync} from 'node:fs';
 const cities=["呼和浩特","包头","乌海","赤峰","通辽","鄂尔多斯","呼伦贝尔","巴彦淖尔","乌兰察布","兴安盟","锡林郭勒盟","阿拉善盟"];
 assert.equal(cities.length,12);
-assert.equal(TALENT_CITY_INDEX.length,312);
+assert.equal(TALENT_CITY_INDEX.length,337);
 assert.equal(findTalentProvince('内蒙古')?.official,'内蒙古自治区');
 assert.equal(queryTalentCities('内蒙古').length,12);
 assert.equal(queryTalentCities('','内蒙古自治区').length,12);
@@ -46,4 +46,4 @@ const read=path=>readFileSync(new URL('../src/'+path,import.meta.url),'utf8');
 assert.ok(read('pages/TalentServiceRoutes.tsx').includes("fragments[2]==='inner-mongolia'"));
 assert.ok(read('components/talent/UnifiedPolicyList.tsx').includes("'nm-'"));
 assert.ok(read('pages/TalentCityDirectory.tsx').includes('totals.otherPrefectures'));
-console.log('PASS Inner Mongolia V5.1 12 regions, 37 policies (24 province shared), 33 housing reference programs, 37 B/C guides and 308 national entries.');
+console.log('PASS Inner Mongolia V5.1 12 regions, 37 policies (24 province shared), 33 housing reference programs, 37 B/C guides and 337 national entries.');

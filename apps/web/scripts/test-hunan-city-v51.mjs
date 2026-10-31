@@ -7,7 +7,7 @@ import {buildHunanGuide} from '../src/data/hunanGuides.ts';
 import {assessPolicy,assessHousing,talentSourceKind} from '../src/data/talentQuality.ts';
 const cities=["长沙","株洲","湘潭","衡阳","邵阳","岳阳","常德","张家界","益阳","郴州","永州","怀化","娄底","湘西"];
 assert.equal(cities.length,14);
-assert.equal(TALENT_CITY_INDEX.length,312);
+assert.equal(TALENT_CITY_INDEX.length,337);
 assert.equal(TALENT_HUNAN_AUTONOMOUS_PREFECTURES.length,1);
 assert.equal(findTalentProvince('湖南')?.official,'湖南省');
 assert.equal(queryTalentCities('湖南').length,14);
