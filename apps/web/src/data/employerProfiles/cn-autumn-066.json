@@ -1,0 +1,260 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-066",
+  "name": "物产道富",
+  "displayName": "物产道富",
+  "englishName": "Zhejiang Dao Fortune",
+  "aliases": [
+    "浙江物产道富有限公司",
+    "浙江物产道富",
+    "Dao Fortune",
+    "Daofortune",
+    "物产道富2027"
+  ],
+  "industry": "钢铁及黑色大宗商品贸易 · 进出口 · 国际供应链",
+  "subtitle": "浙江物产道富有限公司 · 浙江杭州 · 物产中大集团成员企业",
+  "overview": "浙江物产道富有限公司隶属于物产中大集团，是杭州钱江新城的大宗商品综合服务商，经营黑色金属、钢材和原材料进出口、国际转口、内贸业务及供应链服务。官网拥有实有职位及员工风采：国际贸易业务管培生页面明确主要面向2024—2026届高校毕业生，不能冒充为已核实2027届校招。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.daofortune.com/",
+    "https://www.daofortune.com/About.html",
+    "https://www.daofortune.com/Join.html",
+    "https://www.daofortune.com/Business_Details/2060272087576154112.html",
+    "https://www.daofortune.com/registration_form.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-066/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-066/photo1.jpg",
+        "caption": "物产道富官网2026工作会议现场（来源待图像级复核）",
+        "alt": "物产道富企业官网年度工作会议真实活动照片，非办公楼示意图",
+        "note": "采集自物产道富官方网站2026年工作会议；展示企业活动实际场景，不表示当前招聘岗位的办公地点。图片版权归原权利人，公开展示许可待核。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-066/photo2.jpg",
+        "caption": "物产道富官网员工风采／公司活动（来源待图像级复核）",
+        "alt": "物产道富官网员工活动实景照片",
+        "note": "采集自企业官网员工风采或新闻栏目；非虚构建筑，照片内容与具体职位无关，版权及转载许可待核。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.daofortune.com/Join.html",
+    "label": "物产道富官网人才招聘栏目",
+    "status": "official_portal",
+    "subject": "浙江物产道富有限公司",
+    "note": "官网当前展示国际贸易业务管培生及外贸、内贸钢材岗位；其管培生学历届次是2024—2026，不是已核实的2027秋招。所有岗位当前开放状态须以官网即时为准。"
+  },
+  "majorIntro": "以下是物产道富官网能核实的岗位及工作经验要求。管培生为2024—2026届历史招聘条目；外贸、内贸精英多要求3年以上从业经验。专业不限（若官网明确）与推荐相关专业分开记录。",
+  "preferredMajors": [
+    "国际经济与贸易",
+    "经济学",
+    "金融学",
+    "英语",
+    "法语",
+    "阿拉伯语",
+    "商务英语",
+    "物流管理",
+    "供应链管理",
+    "冶金工程",
+    "材料科学与工程",
+    "工商管理"
+  ],
+  "photoNote": "优先使用物产道富官网的真实工作会议和员工活动照片，不采用AI生成的伪实景；文字标识暂非官方商标。官网公开照片不等于已获得再发布许可，暂按审校用途记录来源。",
+  "business": [
+    {
+      "title": "国际钢铁产品进出口",
+      "description": "面向东亚、南亚、东南亚、欧洲、中东、非洲及美洲等市场开展钢材贸易及国际业务拓展。",
+      "tags": "国际贸易 · 钢铁",
+      "details": [
+        "国外客户开发与维护",
+        "出口合同和信用风险管理",
+        "国际贸易履约与结算"
+      ]
+    },
+    {
+      "title": "国际转口贸易",
+      "description": "依托海外贸易节点和伙伴资源开展钢材及原材料国际转口业务，灵活组织跨区域商品流通。",
+      "tags": "转口 · 国际市场",
+      "details": [
+        "跨境采购与销售",
+        "国际物流及货物流转",
+        "汇率价格与期现风险研究"
+      ]
+    },
+    {
+      "title": "国内钢材贸易",
+      "description": "覆盖钢坯、热轧卷板、冷轧基料、钢带等品类，为工程、装备、家电和汽车等客户供货。",
+      "tags": "内贸 · 钢材",
+      "details": [
+        "大宗钢材采销",
+        "国内客户和钢厂协同",
+        "现货价格与库存经营"
+      ]
+    },
+    {
+      "title": "钢铁原料进口",
+      "description": "围绕铁矿石、焦煤焦炭及半成品资源开发原料进口，链接钢厂生产与海外供应方。",
+      "tags": "原料 · 进口",
+      "details": [
+        "铁矿石与焦煤采销",
+        "上游采购渠道开发",
+        "原料交付和质量协同"
+      ]
+    },
+    {
+      "title": "集采分销与供应链服务",
+      "description": "通过集购分销、配供配送、增值加工和物流配套，连接供应商与终端制造客户。",
+      "tags": "供应链 · 配送",
+      "details": [
+        "集采和分销业务设计",
+        "工程配供配送",
+        "综合物流与加工服务"
+      ]
+    },
+    {
+      "title": "研究驱动和经营风控",
+      "description": "围绕钢铁产业链市场变化、国际合同、货款和运输风险构建研究支持和风险管理机制。",
+      "tags": "市场研究 · 风控",
+      "details": [
+        "大宗行情研究",
+        "合同合规与业务风控",
+        "经营数据和供应链分析"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "international-trainee",
+      "title": "国际贸易业务管培生（官网历史届次：2024—2026）",
+      "category": "国际贸易 / 培养",
+      "city": "浙江杭州及海外业务驻地",
+      "summary": "官网招录8人，负责国际钢铁客户开发、区域市场研究、大宗商品信息收集、国际商务谈判与合同履约；该岗位现有页面注明毕业届次为2024—2026，不是确认的2027届岗位。",
+      "requirements": "官网要求重点高校本科及以上，专业不限，国际贸易、经济金融和商务语言专业优先；须熟练掌握英语、法语、阿拉伯语、马来语、泰语等至少一门语言，能适应海外派驻及跨文化工作。来源公开首年薪酬区间15—25万元，实际待遇以招聘时公示为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "国际经济与贸易",
+        "金融学",
+        "英语",
+        "商务英语"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "重点高校本科及以上；2024—2026届（官网记录）",
+      "url": "https://www.daofortune.com/Join.html",
+      "evidenceUrl": "https://www.daofortune.com/Join.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江物产道富有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "coking-coal-foreign-trade",
+      "title": "外贸业务精英（焦煤／焦炭）",
+      "category": "海外贸易 / 销售",
+      "city": "浙江杭州",
+      "summary": "负责焦煤和焦炭海外市场销售、国际现货渠道拓展、跟进贸易单证与合同执行，识别并控制客户和商品风险。",
+      "requirements": "官网招聘要求本科及以上、专业不限、三年以上焦煤焦炭相关从业经验，熟悉国际进出口渠道和现货业务，能够出差。该岗位属于有经验人才招聘，不能当作2027届应届毕业生职位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "国际经济与贸易",
+        "冶金工程"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "本科及以上，三年以上行业经验（社招）",
+      "url": "https://www.daofortune.com/Join.html",
+      "evidenceUrl": "https://www.daofortune.com/Join.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "浙江物产道富有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "steel-domestic",
+      "title": "内贸业务精英（钢坯／铁矿／焦煤焦炭／卷板）",
+      "category": "国内贸易 / 销售",
+      "city": "杭州／唐山",
+      "summary": "负责钢材与黑色原料国内采销业务、客户开拓与维护、行情信息收集以及销售进展跟踪。",
+      "requirements": "官网要求本科及以上、专业不限，三年以上钢贸销售相关经历，熟悉钢材品类及加工流程，能够出差并具备团队协作能力；工作地点为杭州或唐山。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "国际经济与贸易",
+        "市场营销",
+        "冶金工程"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "本科及以上，三年以上钢贸经验（社招）",
+      "url": "https://www.daofortune.com/Join.html",
+      "evidenceUrl": "https://www.daofortune.com/Join.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "浙江物产道富有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "coil-domestic",
+      "title": "内贸卷板业务精英",
+      "category": "国内贸易 / 卷板",
+      "city": "杭州／唐山／博兴／乐从／上海／宁波／沈阳",
+      "summary": "聚焦热卷、冷轧基料、钢带和轧硬等卷板品种，负责采销、市场情报反馈、业务进度管理和客户服务。",
+      "requirements": "官网要求本科及以上、专业不限，三年以上钢材销售经验，了解钢材加工流程并能接受出差；不同城市的编制和即时空缺须由企业确认。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "国际经济与贸易"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "本科及以上，三年以上经验（社招）",
+      "url": "https://www.daofortune.com/Join.html",
+      "evidenceUrl": "https://www.daofortune.com/Join.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "浙江物产道富有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "special-steel-foreign",
+      "title": "外贸业务精英（优特钢）",
+      "category": "海外贸易 / 优特钢",
+      "city": "杭州或其他城市（官网原文）",
+      "summary": "开发特钢国际业务客户，建立稳定的采购资源和销售渠道，参与国际钢铁产业链的合同执行与客户关系维护。",
+      "requirements": "官网要求本科及以上、三年以上优特钢贸易经验，掌握优特钢产业供需和采销流程，具备采购渠道与客户资源，可接受出差；该职位不是面向无经验应届生的2027专岗。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "国际经济与贸易",
+        "材料科学与工程",
+        "冶金工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上，三年以上优特钢经验（社招）",
+      "url": "https://www.daofortune.com/Join.html",
+      "evidenceUrl": "https://www.daofortune.com/Join.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "浙江物产道富有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "scrap-foreign",
+      "title": "外贸业务精英（废钢／热卷／中板等）",
+      "category": "海外贸易 / 钢材",
+      "city": "浙江杭州",
+      "summary": "面向废钢、热轧卷板、中板、钢坯、冷轧和镀锌等品类开展海外现货采销、客户维护和合同交付。",
+      "requirements": "官网列明本科及以上、三年以上相关钢材现货经验，具有期现业务基础、英语六级以上、良好沟通与抗压能力；本岗必须如实保留经验门槛。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "国际经济与贸易",
+        "商务英语",
+        "冶金工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上，三年以上现货经验（社招）",
+      "url": "https://www.daofortune.com/Join.html",
+      "evidenceUrl": "https://www.daofortune.com/Join.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "浙江物产道富有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}
