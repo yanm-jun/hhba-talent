@@ -92,6 +92,7 @@ for page in base_pages:
     # Some CMS templates hold article pictures as JSON strings or CSS backgrounds.
     candidates += [(x,"","html-image-reference") for x in re.findall(r'(?:(?:https?:)?//[^"<>\\\\\\s]+|/[^"<>\\\\\\s]+)\\.(?:jpg|jpeg|png|webp)(?:\\?[^"<>\\\\\\s]*)?',html,re.I)]
     print("HHBA_066_CANDIDATE_COUNT",page,len(candidates))
+    print("HHBA_066_CANDIDATE_URLS",page,json.dumps(candidates[:28],ensure_ascii=False))
     for src,alt,origin in candidates[:75]:
         url=urljoin(page,unescape(src).replace("\\/","/"))
         host=(urlparse(url).hostname or "").lower()
