@@ -17,12 +17,14 @@ assert.equal(findTalentCity('daxinganling')?.code,'232700');
 const policies=TALENT_POLICY_RECORDS.filter(x=>x.id.startsWith('hlj-'));
 const housing=TALENT_HOUSING_RECORDS.filter(x=>x.id.startsWith('hlj-'));
 assert.equal(policies.length,52);
-assert.equal(housing.length,30);
-assert.equal(new Set([...policies,...housing].map(x=>x.id)).size,82);
+assert.equal(housing.length,32);
+assert.equal(new Set([...policies,...housing].map(x=>x.id)).size,84);
 assert.equal(policies.filter(x=>x.id.includes('-prov-')).length,39);
 assert.equal(policies.filter(x=>x.id.includes('-local-')).length,13);
 assert.equal(housing.filter(x=>x.id.includes('-housing-')).length,26);
 assert.equal(housing.filter(x=>x.id.includes('-local-')).length,4);
+assert.equal(housing.filter(x=>x.kind==='project').length,2);
+assert.ok(housing.some(x=>x.address.includes('学府路56号'))&&housing.some(x=>x.address.includes('师专路98-1号')),'Known project locations missing');
 for(const city of cities){
  assert.equal(findTalentCity(city)?.name,city);
  assert.equal(policies.filter(x=>x.city===city).length,4,city+' missing provincial or local item');
@@ -37,8 +39,10 @@ for(const city of cities){
    assert.ok(guide&&guide.steps?.length>=5&&guide.faq?.length>=5&&guide.qualityLevel!=='A',p.id+' guide path');
  }
  for(const h of housing.filter(x=>x.city===city)){
-   assert.equal(talentSourceKind(h.sourceUrl),'government',h.id+' government-only housing');
-   assert.equal(h.kind,'program',h.id+' no fake live units');
+   if(h.id.includes('xuefu56'))assert.equal(talentSourceKind(h.sourceUrl),'secondary','university notice is NOT a government source');
+   else assert.equal(talentSourceKind(h.sourceUrl),'government',h.id+' government-only housing');
+   assert.ok(['program','project'].includes(h.kind),h.id+' invalid housing kind');
+   if(h.kind==='project')assert.equal(h.city,'哈尔滨');
    assert.ok(h.statusNote.includes('非实时')&&h.statusNote.includes('申报入口未公布'),h.id+' availability disclosure');
    assert.ok(h.steps.length>=5,h.id+' incomplete housing guide');
    assert.ok(assessHousing(h,'2026-10-31').grade!=='A',h.id+' not certified A');
@@ -51,4 +55,4 @@ const read=p=>readFileSync(new URL('../src/'+p,import.meta.url),'utf8');
 assert.ok(read('components/talent/UnifiedPolicyList.tsx').includes("p.id.startsWith('hlj-')"));
 assert.ok(read('pages/TalentServiceRoutes.tsx').includes("fragments[2]==='heilongjiang'"));
 assert.ok(read('pages/TalentCityDirectory.tsx').includes('totals.regions'));
-console.log('PASS Heilongjiang V5.1: 13 regions, 52 policy entries, 30 housing references, 52 shared guides, 306 national entries.');
+console.log('PASS Heilongjiang V5.1: 13 regions, 52 policy entries, 32 housing references, 52 shared guides, 306 national entries.');
