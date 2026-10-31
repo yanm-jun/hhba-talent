@@ -28,15 +28,15 @@
     "photos": [
       {
         "path": "images/employer-profiles/cn-autumn-039/photo1.jpg",
-        "caption": "安世半导体 · 东莞制造基地",
+        "caption": "安世中国 · 东莞工厂外景实拍",
         "alt": "Nexperia官方制造页面展示的东莞半导体生产园区外景",
-        "note": "来自Nexperia官方制造地点页面的工厂实景，非AI图。"
+        "note": "来自公开媒体对安世中国东莞工厂的现场实拍，并非Nexperia官网来源；现场建筑可识别安世公司名称，非AI图。"
       },
       {
         "path": "images/employer-profiles/cn-autumn-039/photo2.jpg",
         "caption": "安世半导体 · 企业生产园区",
         "alt": "安世半导体园区建筑与Nexperia标识外景",
-        "note": "来自安世中国相关公开报道的实拍工厂外景，保持独立来源；非办公内景。"
+        "note": "来自公开半导体新闻报道中的安世东莞园区照片；两张图片为独立原始来源，非同一照片重复。"
       }
     ]
   },
@@ -60,7 +60,7 @@
     "材料科学与工程",
     "供应链管理"
   ],
-  "photoNote": "品牌Logo来自Nexperia官方站点，工厂图片使用可核实的Nexperia真实外景；图片只在站内静态展示，不转跳第三方。商标与图片权属原权利方，HHBA不是官方招聘代理。",
+  "photoNote": "Nexperia公司历史品牌标识来自维基共享资源上标注来源为企业官网的原始Logo；两张实拍照片来自新闻媒体对安世中国东莞厂区的报道，已附具体来源与SHA校验。不冒称当前全球生产基地归属与经营状态，图片不外跳。",
   "business": [
     {
       "title": "分立半导体与双极晶体管",
