@@ -63,3 +63,48 @@ def run(id, sources):
  (folder/"media-sources.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
  print("HHBA_078_080_PHOTO_AUDIT",id, sourced, "/ 2")
 for id,src in MEDIA.items():run(id,src)
+
+
+# Prefer verified-brand logos when obtainable; the committed editorial marks remain fallback.
+# No logo is treated as an approved commercial trademark use.
+from html.parser import HTMLParser
+from urllib.parse import urljoin,urlparse
+class BrandImages(HTMLParser):
+ def __init__(self):super().__init__();self.images=[]
+ def handle_starttag(self,tag,attrs):
+  if tag!='img':return
+  a=dict(attrs);alt=(a.get('alt') or '')+(a.get('title') or '')
+  src=a.get('src') or a.get('data-src') or a.get('data-original')
+  if src and ('logo' in alt.lower() or '中通快递' in alt):self.images.append((src,alt))
+def logo(id,url,source,restrictions):
+ file=PROFILES/("cn-autumn-"+id+".json")
+ prof=json.loads(file.read_text(encoding="utf-8"))
+ dest=ROOT/("cn-autumn-"+id)/"logo.png"
+ try:
+  raw=download(url,source)
+  im=Image.open(BytesIO(raw));im.load()
+  w,h=im.size
+  if w<170 or h<28 or w/h>12 or w/h<.5:raise RuntimeError("Logo dimensions rejected "+str((w,h)))
+  im.save(dest,"PNG",optimize=True)
+  stamp=hashlib.sha256(dest.read_bytes()).hexdigest()
+  prof["media"]["logo"]="images/employer-profiles/cn-autumn-"+id+"/logo.png"
+  file.write_text(json.dumps(prof,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+  manifest={"companyId":id,"imageUrl":url,"officialOrReferencePage":source,"sha256":stamp,"pixels":[w,h],"brandAuthenticity":restrictions,"commercialTrademarkLicense":False}
+  (dest.parent/"logo-sources.json").write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+  print("HHBA_AUTHENTIC_BRAND_REFERENCE",id,str((w,h)),stamp[:12])
+ except Exception as exc:
+  print("HHBA_LOGO_FALLBACK_EDITORIAL",id,str(exc)[:150])
+  dest.unlink(missing_ok=True)
+# ZTO official owned website: use only an IMG tag captioned as the company logo, same-company host.
+try:
+ raw=download("https://www.zto.com/","https://www.zto.com/")
+ parser=BrandImages();parser.feed(raw.decode("utf-8","ignore"))
+ candidates=[urljoin("https://www.zto.com/",u) for u,alt in parser.images if ('中通' in alt or 'zto' in alt.lower())]
+ candidates=[u for u in candidates if (urlparse(u).hostname or '').endswith("zto.com")]
+ if candidates:logo("079",candidates[0],"https://www.zto.com/","Official company website logo candidate; source identity and design to be visually checked")
+ else:print("HHBA_ZTO_LOGO_NO_COMPANY_CANDIDATE")
+except Exception as exc:print("HHBA_ZTO_LOGO_UNAVAILABLE",str(exc)[:150])
+# Danone historical wordmark is independently documented as PD-textlogo at Wikimedia Commons.
+logo("080","https://commons.wikimedia.org/wiki/Special:FilePath/Danone_Logo.png",
+ "https://commons.wikimedia.org/wiki/File:Danone_Logo.png",
+ "Wikimedia trademark-identified Danone wordmark (2019 file); current brand version and trademark restrictions to be reviewed")
