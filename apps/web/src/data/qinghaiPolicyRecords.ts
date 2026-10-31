@@ -1,6 +1,6 @@
 import type {TalentPolicyRecord} from './talentPolicyRecords.ts';
 /** 青海8市州：2026官方原文与官方招聘活动材料分层登记；无市州正式细则不升级A级。 */
-export const QINGHAI_POLICY_RECORDS:TalentPolicyRecord[]=[
+export const QINGHAI_POLICY_RESEARCH_RECORDS:TalentPolicyRecord[]=[
   {
     "id": "qh-xining-2026",
     "city": "西宁",
@@ -751,3 +751,6 @@ export const QINGHAI_POLICY_RECORDS:TalentPolicyRecord[]=[
     "deadline": "2026-02-08"
   }
 ];
+
+/** Formal V5.1 index requires first-party government policy source, not recruitment/media reprints. */
+export const QINGHAI_POLICY_RECORDS:TalentPolicyRecord[]=QINGHAI_POLICY_RESEARCH_RECORDS.filter(r=>{try{return new URL(r.sourceUrl).hostname.endsWith('.gov.cn')}catch{return false}});
