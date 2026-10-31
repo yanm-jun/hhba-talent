@@ -1,6 +1,7 @@
 import {GUANGDONG_POLICY_RECORDS} from './guangdongPolicyRecords.ts';
 import {GUANGDONG_EXPANDED_POLICY_RECORDS} from './guangdongExpandedPolicyRecords.ts';
 import {GUANGDONG_FINAL_CITIES_POLICY_RECORDS} from './guangdongFinalCitiesPolicyRecords.ts';
+import {GUANGDONG_PROVINCIAL_POLICY_RECORDS} from './guangdongProvincialPolicyRecords.ts';
 import {BEIJING_POLICY_RECORDS} from './beijingPolicyRecords.ts';
 import {CHONGQING_POLICY_RECORDS} from './chongqingPolicyRecords.ts';
 import {TIANJIN_POLICY_RECORDS} from './tianjinPolicyRecords.ts';
@@ -36,6 +37,7 @@ export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
 ...GUANGDONG_POLICY_RECORDS,
 ...GUANGDONG_EXPANDED_POLICY_RECORDS,
 ...GUANGDONG_FINAL_CITIES_POLICY_RECORDS,
+...GUANGDONG_PROVINCIAL_POLICY_RECORDS,
 ...CHONGQING_POLICY_RECORDS,
 ...TIANJIN_POLICY_RECORDS,
 ...SHANGHAI_POLICY_RECORDS,
