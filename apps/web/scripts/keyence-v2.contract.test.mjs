@@ -20,7 +20,7 @@ assert.equal(p.media.photos.length,2);
 const page=read('src/pages/UnifiedV2CompanyPage.tsx');
 const styles=read('src/styles/unified-v2-company.css');
 assert(page.includes("keyence=id==='cn-autumn-157'"),'Use existing HHBA V2 template');
-assert(page.includes("detailedCards=weipu||bodor||pxw||keyence"),'Detailed green expandable second-image card required');
+assert(['weipu','bodor','pxw','keyence'].every(name=>(page.match(/const detailedCards=([^;]+)/)?.[1]||'').split('||').includes(name)),'Detailed green expandable second-image card required');
 assert(page.includes("if(keyence)return major==='专业不限'&&job.majorUnrestricted"),'Do not suppress unrestricted role');
 assert(page.includes('data-hhba-recruitment-outbound="true"'),'Login-first official outbound');
 assert(styles.includes('.hhba-v2-keyence .hhba-v2-company-role'));
