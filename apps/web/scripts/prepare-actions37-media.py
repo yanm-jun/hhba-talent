@@ -13,6 +13,23 @@ import json, time
 
 root = Path(__file__).resolve().parents[1] / 'public/images/employer-profiles/cn-autumn-037'
 root.mkdir(parents=True, exist_ok=True)
+# Once authentic media are checked into the branch, builds must be deterministic
+# even when the company's image origin is temporarily unreachable.
+audit_file = root / 'media-audit.json'
+if audit_file.is_file():
+  try:
+    old_audit=json.loads(audit_file.read_text(encoding='utf-8'))
+    expected={'logo.png','photo1.jpg','photo2.jpg'}
+    if set(old_audit)==expected and all(
+      old_audit[n].get('verified') and
+      (root/n).is_file() and (root/n).stat().st_size>2600 and
+      sha256((root/n).read_bytes()).hexdigest()==old_audit[n].get('sha256')
+      for n in expected
+    ):
+      print('ACTIONS_037_THREE_VERIFIED_LOCAL_MEDIA_ALREADY_PINNED',flush=True)
+      raise SystemExit(0)
+  except (OSError,ValueError,KeyError):
+    pass
 media = {
   'logo.png': [
     ('https://www.gmitec.com/wp-content/uploads/2022/05/%E7%82%AC%E8%8A%AF.png',
