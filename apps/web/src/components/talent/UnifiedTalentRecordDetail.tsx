@@ -9,6 +9,10 @@ function Panel({title,children}:{title:string;children:React.ReactNode}){
  return <section className="jgd-panel"><div className="jgd-section-heading"><span className="jgd-section-icon"><FileText size={18}/></span><div><h2>{title}</h2></div></div>{children}</section>;
 }
 const fullGuide=(id:string)=>({
+ 'zjk-2026-shuobo-doctor':'/talent-service/policy-guide-preview/zhangjiakou/shuobo',
+ 'zjk-2026-shuobo-hospital':'/talent-service/policy-guide-preview/zhangjiakou/shuobo',
+ 'zjk-2024-highpark-apartment':'/talent-service/policy-guide-preview/zhangjiakou/park',
+ 'zjk-2024-highpark-office':'/talent-service/policy-guide-preview/zhangjiakou/park',
  'xt-2026-talent-purchase':'/talent-service/policy-guide-preview/xingtai/purchase',
  'xt-2026-talent-rental':'/talent-service/policy-guide-preview/xingtai/rental',
  'ts-youth-2024-base':'/talent-service/policy-guide-preview/tangshan/youth',
