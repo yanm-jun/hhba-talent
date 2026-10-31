@@ -304,7 +304,7 @@ check('Baoding V5.1: official 2026 four-community rental allocation and historic
  assert.ok(program.steps.length>=4&&program.statusNote.includes('不等于2026年10月实时空房'));
  const cityCode=code('TalentServiceRoutes.tsx');
  assert.ok(cityCode.includes("const housingPolicies=policies.filter(isHousingPolicy)"));
- assert.ok(cityCode.includes("k.id==='policies'?policies.length+' 条已收录'"));
+ assert.ok(cityCode.includes("k.id==='policies'?(policies.length+researchPolicyCount)+' 条已收录（含分级资料）'"),'Baoding should count graded government and research policies without pretending research is verified');
  assert.equal(ACCEPTED_TALENT_CITIES.includes(city),false);
 });
 console.log(JSON.stringify({passed,baseline:base.policyIds.length+base.housingIds.length,certified:Object.keys(CERTIFIED_TALENT_GUIDES).length,acceptedCities:ACCEPTED_TALENT_CITIES.length},null,2));
