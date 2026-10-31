@@ -1,5 +1,5 @@
 import type {CompleteGuide,GuideBranch,GuideStep} from '../components/talent/UnifiedPolicyGuide';
-import {GANSU_POLICY_RECORDS,GANSU_14_REGIONS} from './gansuPolicyRecords.ts';
+import {GANSU_POLICY_RECORDS} from './gansuPolicyRecords.ts';
 import {GANSU_HOUSING_RECORDS} from './gansuHousingRecords.ts';
 export {GANSU_14_REGIONS} from './gansuPolicyRecords.ts';
 export function gansuGuideUrl(kind:'policy'|'housing',id:string):string{
