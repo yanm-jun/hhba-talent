@@ -151,4 +151,19 @@ const locals=localSpecs.map(v=>{
   materials:v.materials||undefined,applicationSteps:v.applicationSteps||undefined,
   keywords:[region.city,'2026',v.title,'政策办理','官方公告']});
 });
-export const XIZANG_POLICY_RECORDS:TalentPolicyRecord[]=[...shared,...locals];
+const naquRentalPolicy:TalentPolicyRecord={
+ id:'xz-naqu-2026-rent-incentive',city:'那曲',district:'那曲市各县区按三档核算',title:'那曲2026机关事业单位及基层服务人员租房激励补贴',category:'租房安居',
+ summary:'2026年8月自治区政府公开报道，那曲市从6月1日起试行城镇住房租赁激励2年，按实际工作县域给符合条件的机关事业单位职工与基层服务人员发放租房激励，不是所有求职大学生都能领取。',
+ benefit:'市本级、色尼区、比如县、索县、巴青县每人每月最高600元；嘉黎县、安多县、聂荣县500元；班戈县、申扎县、尼玛县、双湖县400元。本人实付租金低于档位按实付计算，合租人员补助总额不得高于总租金；同地夫妻原则上仅一人领取。',
+ eligibility:'政策适用人员为全市各级机关、事业单位在编干部职工及三支一扶、西部计划志愿者、公益性岗位、政府购买服务在岗人员等；租赁房屋须是城镇居民合法产权闲置住房，需有有效租赁合同并按规定接受所在单位和主管部门审核。资金先申先审、用完即止，不是毕业证即享受。',
+ application:'官方报道指向那曲市人社快办平台（rskbpt.nqrsj.gov.cn），填报申请表、本人身份证与正规租赁合同，所在单位初审、人社复审公示后住建终审，按资金安排发放。',
+ department:'那曲市住房和城乡建设局、那曲市人力资源和社会保障局',published:'2026-08-04',sourceUrl:'https://www.xizang.gov.cn/xwzx_406/dsdt/202608/t20260804_552452.html',
+ sourceName:'西藏自治区人民政府2026-08-04《政策上线！在那曲租房可以申领补贴了》',temporal:'policy',scope:'全市',
+ keywords:['那曲','租房','住房补贴','三支一扶','西部计划','机关事业单位','600','500','400','2026'],
+ targetGroup:'那曲符合范围的在编干部职工及在岗基层服务人员',payoutTo:'个人',headlineAmount:'¥400—600/人·月',headlineUnit:'按县区分档/实际月租封顶',
+ reviewNote:'2026年6月1日起试行两年；2026-10-31平台是否仍正常受理、专项资金余额以及本人实付租金均需核实。官方报道提供办理平台地址但非本站实时授权结果，办理入口待核实。',
+ reviewedAt:'2026-10-31',
+ materials:['本人身份证件及有效在岗身份、所在单位资格材料','真实合法的城镇居民私有闲置住房租赁合同','那曲人社快办官方申请表及实际支付租金凭据（依系统要求）','证明住房保障、夫妻异地就业与合租等相关情况的必要材料'],
+ applicationSteps:['查阅自治区人民政府2026年8月4日正式政策报道，核对2026年6月1日起试行两年及适用在岗身份','按工作地点核实对应600元、500元或400元档次，核对实付租金低于补贴按实付结算、夫妻同地仅一人的要求','准备身份证、政策申请表、租赁合同和单位证明，不使用虚构房屋合同','通过那曲人社快办平台核实最新受理，按所在单位初审、那曲人社局线上复审流程提交','经不少于5个工作日公示和住建最终核验后统一兑付；若资金用完则不保证到账，咨询0896-3721016']
+};
+export const XIZANG_POLICY_RECORDS:TalentPolicyRecord[]=[...shared,...locals,naquRentalPolicy];
