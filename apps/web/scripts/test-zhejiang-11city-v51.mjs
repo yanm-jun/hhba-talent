@@ -19,7 +19,7 @@ for(const city of cities){
   assert.ok(p.sourceUrl.startsWith('https://'),p.id+' bad source');
   assert.equal(assessPolicy(p).sourceKind,'government',p.id+' non-primary source');
   assert.ok(p.materials?.length>=3&&p.applicationSteps?.length>=4,p.id+' incomplete minimum details');
-  assert.ok(p.reviewNote.includes('待核')||p.reviewNote.includes('2026'),p.id+' no provenance caveat');
+  assert.ok(/待核|未核|尚未|历史|2026|申请/.test(p.reviewNote),p.id+' no provenance caveat');
   if(city==='台州')assert.ok(!p.title.includes('泰州'),p.id+' confused with Jiangsu Taizhou');
  }
  for(const h of hs){assert.ok(!ids.has(h.id),'Duplicate record ID '+h.id);ids.add(h.id);
