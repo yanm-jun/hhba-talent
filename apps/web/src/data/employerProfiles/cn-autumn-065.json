@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-065",
+  "name": "双视科技",
+  "displayName": "双视科技",
+  "englishName": "Zhejiang Suangsi Technology",
+  "aliases": [
+    "浙江双视科技股份有限公司",
+    "SUANGSI",
+    "双视科技2027",
+    "双视科技杭州"
+  ],
+  "industry": "机器视觉 · 红外热成像 · 工业防爆设备 · 多模态智能巡检",
+  "subtitle": "浙江双视科技股份有限公司 · 浙江杭州 · 成立于2014年（企业官网）",
+  "overview": "浙江双视科技股份有限公司2014年成立于杭州，专注红外机器视觉、智能感知及应用研发，向电力、煤矿、石化、冶金等高风险场景提供红外热成像仪、矿用本安摄像机、双光谱监测、防爆云台及机器人集成感知解决方案。2027校招二级资料列出杭州测试工程师、交付／售前、销售、视觉设计、项目运营五类具体岗位；企业官网没有直接发布这批次的完整校招JD，不能误称官方在招。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.suangsi.com/about.html",
+    "https://www.suangsi.com/",
+    "https://www.wondercv.com/xiaozhao/shuangsi-hangzhou-2027-autumn-campus-19713-73f0c1/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-065/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-065/photo1.svg",
+        "caption": "HHBA 业务示意图 1（非企业实景）",
+        "alt": "HHBA原创独立业务主题示意插图，非真实企业照片",
+        "note": "非企业实景、非官方拍摄，图像来源在同目录media-audit.json留存"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-065/photo2.svg",
+        "caption": "HHBA 业务示意图 2（非企业实景）",
+        "alt": "HHBA原创独立业务主题示意插图，非真实企业照片",
+        "note": "非企业实景、非官方拍摄，图像来源在同目录media-audit.json留存"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.suangsi.com/",
+    "label": "浙江双视官网（2027投递渠道未核实）",
+    "status": "unconfirmed",
+    "subject": "浙江双视科技股份有限公司",
+    "note": "官网产品与主体可核，官网所载社招入口指向第三方平台，不能视为本批2027校招专用入口。校招岗位依据二级转载，具体邮箱及申请方式请核验原公告。"
+  },
+  "majorIntro": "2027二级校招摘要披露5个具体岗位及专业技能概要，适配电气、自动化、电子信息、计算机、机电、设计和营销专业；专业限制以原招聘公告为准。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "软件工程",
+    "电子信息工程",
+    "通信工程",
+    "电气工程及其自动化",
+    "自动化",
+    "机械工程",
+    "机电一体化技术",
+    "市场营销",
+    "视觉传达设计",
+    "数字媒体艺术",
+    "工程管理"
+  ],
+  "photoNote": "三张本地原创SVG（非官方文字字标及两张工业视觉主题示意图）均有明显非实景、非官方标识；暂未提供真正企业实拍照片或官方Logo。",
+  "business": [
+    {
+      "title": "红外热成像机芯与模组",
+      "description": "研发红外成像、测温机芯与视觉模组，面向专业设备集成提供热成像基础组件。",
+      "tags": "红外 · 机芯",
+      "details": [
+        "红外成像机芯",
+        "测温组件设计",
+        "专业模组集成"
+      ]
+    },
+    {
+      "title": "矿用本安视觉设备",
+      "description": "面向煤矿井下场景提供矿用本安摄像机、红外热像仪及危险环境感知产品。",
+      "tags": "矿山 · 本安",
+      "details": [
+        "矿用本安型摄像机",
+        "井下热成像监测",
+        "工业粉尘与暗光感知"
+      ]
+    },
+    {
+      "title": "双光谱防爆云台系统",
+      "description": "将可见光和红外热成像融合到多种防爆云台及测温一体化产品中。",
+      "tags": "双光谱 · 防爆",
+      "details": [
+        "可见光与红外融合",
+        "防爆云台与远程监控",
+        "石化能源设备测温"
+      ]
+    },
+    {
+      "title": "工业机器人巡检感知",
+      "description": "为能源巡检机器人、矿用移动平台和机器狗提供多模态视觉、温度及其他感知设备集成。",
+      "tags": "机器人 · 感知",
+      "details": [
+        "巡检机器人传感器集成",
+        "声学与气体检测支持",
+        "工业设备智能预警"
+      ]
+    },
+    {
+      "title": "电力与石化能源解决方案",
+      "description": "针对电力设施、煤化工和石油石化生产环境配置可视化测温、监测与安全告警方案。",
+      "tags": "能源 · 安全",
+      "details": [
+        "电力设备测温预警",
+        "石化防爆监测",
+        "工业现场远程巡检"
+      ]
+    },
+    {
+      "title": "工业技术支持与工程交付",
+      "description": "提供工业成像设备部署、接口调试、系统集成及现场维保等技术支持服务。",
+      "tags": "售前 · 交付",
+      "details": [
+        "产品场景选型",
+        "现场集成调试",
+        "售前技术及售后支持"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "test-2027",
+      "title": "测试工程师（2027届）",
+      "category": "测试 / 软件",
+      "city": "浙江杭州",
+      "summary": "为工业视觉、物联网及视频监控相关平台开展基础测试与质量验证，是2027校招公布的具体职位。",
+      "requirements": "校招摘要列计算机、软件工程、通信和电子信息等相关专业，了解测试基础概念；有Web、物联网、视频监控或安防平台实习经验者优先，企业官网未核实时效。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "通信工程",
+        "电子信息工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
+      "url": "https://www.suangsi.com/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/shuangsi-hangzhou-2027-autumn-campus-19713-73f0c1/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江双视科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "presales-2027",
+      "title": "交付／售前工程师（2027届）",
+      "category": "交付 / 售前",
+      "city": "浙江杭州",
+      "summary": "参与工业感知方案交付及客户场景支撑，涉及弱电、计算机网络和变电站等工业应用。",
+      "requirements": "校招摘要要求电气、自动化、电子信息、计算机、机电相关专业，能够用Office制作文档与PPT，了解弱电、监控和网络基础优先，需接受短途出差及短期现场支撑。",
+      "majorNames": [
+        "电气工程及其自动化",
+        "自动化",
+        "电子信息工程",
+        "计算机科学与技术",
+        "机械工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
+      "url": "https://www.suangsi.com/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/shuangsi-hangzhou-2027-autumn-campus-19713-73f0c1/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江双视科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sales-2027",
+      "title": "销售工程师（2027届）",
+      "category": "技术销售",
+      "city": "浙江杭州",
+      "summary": "面向工业电力及能源巡检市场开展技术产品销售和客户沟通的工程型岗位。",
+      "requirements": "2027校招摘要指出计算机、自动化、机电或市场营销等背景，强调沟通能力、目标感、抗压能力，能够接受商务出差；销售区域及绩效制度未从原始官网确认。",
+      "majorNames": [
+        "市场营销",
+        "自动化",
+        "计算机科学与技术",
+        "机械工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
+      "url": "https://www.suangsi.com/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/shuangsi-hangzhou-2027-autumn-campus-19713-73f0c1/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江双视科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "visual-design-2027",
+      "title": "视觉设计师（2027届）",
+      "category": "视觉设计",
+      "city": "浙江杭州",
+      "summary": "制作与工业品牌传播相关的视觉宣传素材，协同宣传设计和品牌推广项目。",
+      "requirements": "公开摘要要求设计相关专业，熟练PS/AI设计工具，具备独立视觉物料设计和审美能力，投递简历需附带作品集；薪酬、具体创意管理要求以正式JD为准。",
+      "majorNames": [
+        "视觉传达设计",
+        "数字媒体艺术",
+        "艺术设计学",
+        "产品设计"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
+      "url": "https://www.suangsi.com/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/shuangsi-hangzhou-2027-autumn-campus-19713-73f0c1/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江双视科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "project-ops-2027",
+      "title": "项目运营专员（2027届）",
+      "category": "项目运营",
+      "city": "浙江杭州",
+      "summary": "负责工业感知项目的进度协调、文件管理、跨部门沟通及项目资料整理等运营支持。",
+      "requirements": "招聘摘要说明计算机、电子信息、机械、机电及工程相关理工科优先，熟悉Excel和文档管理，有条理、善于跨部门沟通和追踪节点；具体项目属地需核对。",
+      "majorNames": [
+        "工程管理",
+        "机械工程",
+        "电子信息工程",
+        "计算机科学与技术",
+        "工业工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
+      "url": "https://www.suangsi.com/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/shuangsi-hangzhou-2027-autumn-campus-19713-73f0c1/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江双视科技股份有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}
