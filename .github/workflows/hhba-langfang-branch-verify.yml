@@ -1,0 +1,64 @@
+name: HHBA Langfang V5.1 isolated branch CI (NO Pages publishing)
+on:
+  push:
+    branches:
+      - feature/talent-langfang
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: langfang-v51-branch-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify-langfang:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout only the independent Langfang branch
+        uses: actions/checkout@v4
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install existing frontend dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Enforce Langfang V5.1 official source and guide contracts
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-langfang-city-v51.mjs
+      - name: Enforce nationwide V5.1 city contracts
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - name: Ensure unrelated talent policies and search remain valid
+        working-directory: apps/web
+        run: |
+          node --experimental-strip-types scripts/test-talent-match.mjs
+          node --experimental-strip-types scripts/test-talent-cities.mjs
+      - name: Build complete HHBA static frontend (isolated; not deployed to Pages)
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '0'
+          HHBA_PAGES_BASE: '/'
+          VITE_HHBA_MATCH_API_ORIGIN: ''
+        run: npm run build
+      - name: Assert Langfang guide routes and actual policy content are bundled
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const js=fs.readdirSync('dist/assets').filter(f=>f.endsWith('.js')).map(f=>fs.readFileSync('dist/assets/'+f,'utf8')).join('');
+          for(const needle of ['廊坊','lf-2026-yanzhao-ab-provident-loan','廊坊2025年度人才','langfang']) {
+            if(!js.includes(needle))throw new Error('Langfang content not packaged: '+needle);
+          }
+          if(!fs.existsSync('dist/index.html'))throw new Error('Missing static index.html');
+          console.log('LANGFANG_STATIC_BUNDLE_OK');
+          JS
+      - name: Upload isolated branch build for review (not the official website)
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-langfang-static-preview
+          path: apps/web/dist/
+          if-no-files-found: error
+          retention-days: 7
