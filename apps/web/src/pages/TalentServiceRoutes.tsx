@@ -15,6 +15,7 @@ import {TalentQingdaoPolicyPreview} from './TalentQingdaoPolicyPreview';
 import {TalentQingdaoGuidePreview} from './TalentQingdaoGuidePreview';
 import {TalentLaoshanGuide} from './TalentLaoshanGuide';
 import {UnifiedPolicyGuide} from '../components/talent/UnifiedPolicyGuide';
+import {xingtaiPurchaseGuide,xingtaiRentalGuide,xingtaiHousingGuide} from '../data/xingtaiGuides';
 import {shijiazhuangRentGuide,shijiazhuangBuyGuide,shijiazhuangSettlementGuide,shijiazhuangHousingGuide} from '../data/shijiazhuangGuides';
 import {hezeLivingGuide,hezePurchaseGuide,hezeStartupGuide,hezeHousingGuide} from '../data/talentHezeGuides';
 import {taianLivingGuide,taianPurchaseGuide,taianHousingGuide} from '../data/taianGuide';
@@ -141,6 +142,16 @@ function CityHub({city}:{city:string}){
      </Link>)}
    </div>
   </section>
+  {match.name==='邢台'&&<section className="ts-sub-section" aria-label="邢台人才购租房与住房保障分步指南">
+   <div className="ts-sub-section-heading"><h2>邢台 · 2026回邢来邢人才安居政策</h2></div>
+   <p>住建部门2026年发布的购租房指南覆盖信都、襄都、经开、高新区、任泽、南和六区。购房补贴博士30万、硕士10万、毕业五年内“双一流”本科5万元，分3年发放；租房补贴博士2000、硕士1500、本科1000元/月，最长36个月。住建局原始文件页面待核实，现依据全文转载展示B级资料。2026年7月488套公租房和人才公寓施工采购资料均不是当期空房。</p>
+   <div className="ts-sub-grid">
+    <Link to="/talent-service/policy-guide-preview/xingtai/purchase" className="ts-sub-tile"><strong>人才首套房购房补贴</strong><span>分三年领取；住房互斥与租补扣减</span><ArrowRight size={15}/></Link>
+    <Link to="/talent-service/policy-guide-preview/xingtai/rental" className="ts-sub-tile"><strong>人才租房补贴</strong><span>每月1000—2000元，最多36个月</span><ArrowRight size={15}/></Link>
+    <Link to="/talent-service/policy-guide-preview/xingtai/housing" className="ts-sub-tile"><strong>人才公寓与公租房</strong><span>旧批次轮候、保租房资格和人才之家服务</span><ArrowRight size={15}/></Link>
+    <Link to="/talent-service/list/policies/%E9%82%A2%E5%8F%B0" className="ts-sub-tile"><strong>全部人才政策与就业支持</strong><span>含2026就业促进服务及历史引才公告</span><ArrowRight size={15}/></Link>
+   </div>
+  </section>}
   {match.name==='唐山'&&<section className="ts-sub-section"><h2>唐山市2024/2026政策版本提醒</h2><p>2024青年人才奖补修订版与2026年3月新人才措施对于部分企业硕士的支持不同。本站对两版分别说明；2026报道引用的政策条款政府正式全文尚待核实，不根据旧版数据直接承诺新人才可领。</p><p>住房方面，唐山高新区数字经济产业园青年公寓2024年项目规模134套，是历史总量而非实时空房；市级凤凰英才公寓是住房保障制度，并不等于第二处具体可租公寓。</p><p><Link to="/talent-service/policy-guide-preview/tangshan/youth">查看分学历人才奖补指南 <ArrowRight size={14}/></Link></p><p><Link to="/talent-service/policy-guide-preview/tangshan/housing">查看真实青年公寓与住房租赁指南 <ArrowRight size={14}/></Link></p></section>}
   {match.name==='东营'&&<section className="ts-sub-section"><h2>东营 · 2026政策衔接与安居核验</h2><p>2026年8月人才新政出台，原2022版人才补贴已废止；旧规补报在9月30日结束。原博士4000元／月、硕士2000元／月与首购补贴等旧数字，仅作历史参考。新进人才请核对新规正式申请细则。</p><p>住房线索：河口区三义和住宅小区二期在2026年5月曾公告70套保租房统筹配租，报名6月30日截止。现仅核验到对区住建局公告的媒体转载，政府官网原文及新批次尚待核验。因此不将70套冒充当前可租房源，也不纳入已确认住房项目。</p><p><a href="https://ady.dongyingnews.cn/share/YS01MzctNDM0NzYxOTM.html" target="_blank" rel="noopener noreferrer">查看2026年河口区住房旧批次公告转载（非官方办理入口）</a></p><p><Link to="/talent-service/policy-guide-preview/dongying/transition">查看2026新旧政策核查指南 <ArrowRight size={14}/></Link></p></section>}
   {match.name==='石家庄'&&<section className="ts-sub-section" aria-label="石家庄人才政策与住房指南">
@@ -253,6 +264,7 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  else if(kind==='list'&&fragments[2]==='policies')body=city==='济南'?<TalentJinanPolicyPreview/>:city==='青岛'?<TalentQingdaoPolicyPreview/>:<UnifiedPolicyList config={buildCityPolicyConfig(city)}/>;
  else if(kind==='list'&&['policies','benefits','housing','guide'].includes(fragments[2]))body=<ListPage city={city} kind={fragments[2] as TalentListKind}/>;
  else if(kind==='search')body=<ListPage key={route} city={decode(fragments[2]||'杭州')||'杭州'} kind="search" query={decode(fragments.slice(3).join('/'))}/>;
+ else if(kind==='policy-guide-preview'&&fragments[2]==='xingtai')body=<UnifiedPolicyGuide data={fragments[3]==='purchase'?xingtaiPurchaseGuide:fragments[3]==='housing'?xingtaiHousingGuide:xingtaiRentalGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='tangshan')body=<UnifiedPolicyGuide data={fragments[3]==='purchase'?tangshanPurchaseGuide:fragments[3]==='housing'?tangshanHousingGuide:tangshanYouthGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='binzhou')body=<UnifiedPolicyGuide data={fragments[3]==='housing'?binzhouHousingGuide:fragments[3]==='living'?binzhouLivingGuide:binzhouPurchaseGuide}/>;
  else if(kind==='policy-guide-preview'&&fragments[2]==='jining')body=<UnifiedPolicyGuide data={fragments[3]==='rent'?jiningRentGuide:jiningYouthGuide}/>;
