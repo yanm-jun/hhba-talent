@@ -1,6 +1,6 @@
 import type {CompleteGuide,GuideStep} from '../components/talent/UnifiedPolicyGuide';
-import {GUANGXI_CITY_CONTACTS,GUANGXI_POLICY_RECORDS} from './guangxiPolicyRecords';
-import {GUANGXI_RENT_RESEARCH_RECORDS} from './guangxiRentPolicyResearch';
+import {GUANGXI_CITY_CONTACTS,GUANGXI_POLICY_RECORDS} from './guangxiPolicyRecords.ts';
+import {GUANGXI_RENT_RESEARCH_RECORDS} from './guangxiRentPolicyResearch.ts';
 
 /**
  * 统一 V5.1 详情：同一自治区政策按市定位，但绝不声称每市有独立不同额度。
