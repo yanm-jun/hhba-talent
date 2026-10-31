@@ -54,7 +54,8 @@ assert(!brand.includes('http://')&&!brand.includes('https://'),'Brand is always 
 assert(cover.includes("photo.classification==='source_backed_named_enterprise_scene'"),'Hero photos require actual source-backed workplace identity');
 assert(cover.includes('if(!real?.path&&!ai)return null'),'No banner unless a real photo or correctly labeled AI image exists');
 assert(!cover.includes('images/autumn-cover/'),'Never use faux green illustrations in photo slots');
-assert(market.includes('AutumnCompanyCover name={job.company}')&&market.includes('AutumnCompanyCover name={e.name}'));
+assert(market.includes('AutumnCompanyCover name={job.company}')&&market.includes('AutumnCompanyCover name={displayCompany(e)}'),'Show source-bound job company and verified V2 company name in directory');
+assert(market.includes('const displayCompany=(e:Employer)=>reviewed(e)?.name||e.name;'),'Preserve exact verified employer identity corrections and screenshot name fallbacks');
 assert(!market.includes('images/autumn-cover/'),'Job market must not reference generated faux art');
 assert(!profile.includes('images/autumn-cover/'),'No placeholder company art');
 assert(profile.includes('className="company-profile company-profile-autumn"'),'All 156 use the OpenAI design root');
