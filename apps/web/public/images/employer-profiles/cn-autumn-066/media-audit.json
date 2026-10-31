@@ -1,0 +1,20 @@
+{
+  "company": "物产道富",
+  "reviewDate": "2026-10-31",
+  "officialLogo": false,
+  "commercialLicenseVerified": false,
+  "photoSourceEvidence": [
+    {
+      "file": "photo1.jpg",
+      "sourcePage": "https://www.daofortune.com/Business_Details/2060272087576154112.html",
+      "status": "target company annual meeting on official site; exact downloaded image logged at build"
+    },
+    {
+      "file": "photo2.jpg",
+      "sourcePage": "https://www.daofortune.com/About.html",
+      "status": "target company staff event, exact downloaded image logged at build"
+    }
+  ],
+  "photoMaterialization": "Via scripts/prepare-employers-066-068-real-media.py in isolated CI build; image URLs and hashes written into build output media-sources.json",
+  "notes": "Real photos and official product visuals are attributed but online publication permission remains unverified. Editorial SVG is never to be represented as a real photo."
+}

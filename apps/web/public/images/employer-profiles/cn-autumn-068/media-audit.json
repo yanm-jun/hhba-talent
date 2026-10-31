@@ -1,0 +1,20 @@
+{
+  "company": "甘肃能化集团",
+  "reviewDate": "2026-10-31",
+  "officialLogo": false,
+  "commercialLicenseVerified": false,
+  "photoSourceEvidence": [
+    {
+      "file": "photo1.jpg",
+      "sourcePage": "https://liuhuahuagong.com/",
+      "status": "real industrial facility in group-operated LiuHua Chemical subsidiary"
+    },
+    {
+      "file": "photo2.jpg",
+      "sourcePage": "https://www.liuhuahuagong.com/col_xwzx1/202509/27352E666DC3E4FDCBC8D1F091EEB43B.htm",
+      "status": "real air separation installation in group-operated LiuHua Chemical subsidiary"
+    }
+  ],
+  "photoMaterialization": "Via scripts/prepare-employers-066-068-real-media.py in isolated CI build; image URLs and hashes written into build output media-sources.json",
+  "notes": "Real photos and official product visuals are attributed but online publication permission remains unverified. Editorial SVG is never to be represented as a real photo."
+}
