@@ -21,11 +21,11 @@ CFG={
   "logoPages":["https://www.bondex.com.cn/","https://www.bondex.com.cn/about/wenhua"],
   "hint":["bondex","邦达","物流"],"editorialLogo":True},
  "055":{"name":"长隆科技","trustedLogo":"https://job.hdu.edu.cn/attachment/hdu/company/202605/11/sZTQabjwE848.png",
-  "directPhotos":["https://img.goworkla.cn/department/6041eb8ac6234711c430ead2/editor/images/1f5e3fc61d084513b684e016ba6b1071.jpg","https://img1.goepe.com/2021016/0_1611546256_3332.jpg_360x360.jpg"],
+  "directPhotos":["https://img1.goepe.com/2022082/0_1660012531_1611.jpg_360x360.jpg","https://img1.goepe.com/2021016/0_1611546256_3332.jpg_360x360.jpg"],
   "photoPages":["https://a617645265.cn.goepe.com/","https://clkj888888.gys.cn/","https://changlong6.gys.cn/","https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822"],
   "logoPages":["https://a617645265.cn.goepe.com/","https://clkj888888.gys.cn/"],
   "hint":["长隆科技","changlong","cl39","深圳长隆"],"editorialLogo":True},
- "056":{"name":"维音","photoPages":["https://www.vxichina.cn/AboutStd_1070.html","https://www.vxichina.cn/"],
+ "056":{"name":"维音","directPhotos":["https://rc00.zihu.com/g4/M00/5D/49/CgAG0mLjtASAUw8-AAI7bsSLgqs637.jpg","https://rc00.zihu.com/g4/M00/5D/49/CgAG0mLjs5GALIkFAAInHXJPV7g269.jpg"],"photoPages":["https://www.vxichina.cn/AboutStd_1070.html"],
   "logoPages":["https://www.vxichina.cn/","https://www.vxichina.cn/AboutStd_806.html"],
   "hint":["维音","VXI","联络中心"],"editorialLogo":True}
 }
@@ -99,10 +99,18 @@ for no,cfg in CFG.items():
  used=set()
  for name in ['logo.png','photo1.jpg','photo2.jpg']:
   f=dest/name;prior=audit.get(name)
+  if prior and no=='055' and name=='logo.png' and 'res.gys.cn' in prior.get('source',''):
+   print('REJECT_SUPPLIER_PLATFORM_LOGO',flush=True);prior=None
+  if prior and no=='055' and name=='photo1.jpg' and '1f5e3fc61d084513b684e016ba6b1071.jpg' in prior.get('source',''):
+   print('REJECT_JOB_APPLICATION_QR_AS_CORPORATE_PHOTO',flush=True);prior=None
+  if prior and no=='056' and name=='photo1.jpg' and 'CgAGbGXlrn6AXw5fAABm4izI2Vw692.png' in prior.get('source',''):
+   print('REJECT_WECHAT_QR_AS_CORPORATE_PHOTO',flush=True);prior=None
   if prior and f.exists() and sha256(f.read_bytes()).hexdigest()==prior.get('sha256'):
    print('MEDIA_PINNED',no,name,flush=True);used.add(prior['sourceSha256']);continue
   logo=name=='logo.png'
   options=[]
+  if no=='056' and not logo:
+   options.append((125,cfg['directPhotos'][0 if name=='photo1.jpg' else 1],'https://www.vxichina.cn/AboutStd_1070.html'))
   if no=='055' and logo:
    options.append((120,cfg['trustedLogo'],'https://job.hdu.edu.cn/company/view?id=895204'))
   if no=='055' and not logo:
