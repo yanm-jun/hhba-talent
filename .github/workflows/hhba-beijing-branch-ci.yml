@@ -1,0 +1,56 @@
+name: Beijing V5.1 independent branch acceptance
+on:
+  push:
+    branches:
+      - feature/talent-beijing
+  pull_request:
+    paths:
+      - 'apps/web/src/data/beijing*.ts'
+      - 'apps/web/src/data/talentPolicyRecords.ts'
+      - 'apps/web/src/data/talentHousingRecords.ts'
+      - 'apps/web/src/data/talentCityRegistry.ts'
+      - 'apps/web/src/pages/TalentServiceRoutes.tsx'
+      - 'apps/web/src/components/talent/UnifiedPolicyList.tsx'
+      - 'apps/web/scripts/test-beijing-city-v51.mjs'
+      - '.github/workflows/hhba-beijing-branch-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-beijing-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify-beijing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout branch under test
+        uses: actions/checkout@v4
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install site dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Beijing independent policy and housing data and guide acceptance
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-beijing-city-v51.mjs
+      - name: National V5.1 policy and housing contract regression
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - name: Build entire HHBA website for static hosting without publishing the main Pages site
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+        run: npm run build
+      - name: Preserve isolated preview build artifact without publishing
+        uses: actions/upload-artifact@v4
+        with:
+          name: beijing-v51-static-preview
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
