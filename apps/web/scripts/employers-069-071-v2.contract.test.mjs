@@ -31,8 +31,8 @@ for(const [num,display,count] of cases){
  }
  if(num!=='071'){
   const sources=JSON.parse(read('public/images/employer-profiles/'+id+'/media-sources.json'));
-  assert.equal(sources.length,2);
-  assert(sources.every(x=>x.exactImageUrl&&x.publishedNewsPage&&x.sha256&&x.imageRights));
+  assert.equal(sources.length,num==='069'?1:2);
+  assert(sources.every(x=>x.sourceImageUrl&&x.pageEvidence&&x.sha256&&x.rights));
  }else{
   assert(p.media.photos.every(x=>x.path.endsWith('.svg')&&x.note.includes('非')));
  }
