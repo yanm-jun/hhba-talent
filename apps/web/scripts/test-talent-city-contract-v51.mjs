@@ -318,3 +318,10 @@ check('Zhejiang 11 cities have actual policy and housing rows on the deployment 
   for(const x of [...p,...h])assert.ok(x.sourceUrl,city+' unsourced row');
  }
 });
+
+check('Henan 17 cities always show nonzero policy and housing in the main Pages build',()=>{
+for(const city of ["郑州","开封","洛阳","平顶山","安阳","鹤壁","新乡","焦作","濮阳","许昌","漯河","三门峡","南阳","商丘","信阳","周口","驻马店"]){
+assert.ok(TALENT_POLICY_RECORDS.some(p=>p.city===city&&p.id.startsWith('hn-')),city+' policy missing');
+assert.ok(TALENT_HOUSING_RECORDS.some(h=>h.city===city&&h.id.startsWith('hn-')),city+' housing missing');
+}
+});
