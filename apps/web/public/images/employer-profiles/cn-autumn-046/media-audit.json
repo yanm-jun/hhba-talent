@@ -2,12 +2,12 @@
   "logo.png": {
     "verified": true,
     "company": "芯德科技",
-    "source": "https://www.vsol.com.cn/wp-content/uploads/2024/12/VSOL-AboutUs_OurStory.jpg",
-    "sourcePage": "https://www.vsol.com.cn/",
-    "sourceSha256": "f7191e223e52bd0dab4f83f5a315c87bb74769990553c7a3f292a6237eeaa93e",
-    "sha256": "36befd8556773b3c65140bf10c4b90ff42d89121cb10634e5ef33642fc91c4a7",
-    "width": 1250,
-    "height": 521,
+    "source": "https://images.crunchbase.com/image/upload/c_pad%2Cf_auto%2Cq_auto%3Aeco%2Cdpr_1/mbr3wxhvhheugurnptma?ik-sanitizeSvg=true",
+    "sourcePage": "https://www.crunchbase.com/organization/v-solution-telecommunication-technology-co-ltd",
+    "sourceSha256": "44f0242a508511fbcb38a8b21216cb988718953a61c054faaab1bf84bc15af73",
+    "sha256": "af229776a95e222045ede378e0494727346c037bb01caa54abf3d4a60f7601ed",
+    "width": 800,
+    "height": 800,
     "type": "company logo",
     "copyright": "Rights remain with the original owner"
   },
