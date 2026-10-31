@@ -369,6 +369,17 @@ const GUANGDONG_CITY_INTROS:Readonly<Record<string,string>>={
  "河源": "河源2026阶段性新房购房补贴、粤东北地区毕业生就业支持与省级创业资助",
  "梅州": "梅州来梅创业人才最长6个月免费住宿制度、粤东北高校毕业生就业补贴；两类免费住宿资格不同"
 };
+const FUJIAN_CITY_INTROS:Readonly<Record<string,string>>={
+  "福州": "福建省福州四城区“好年华 聚福州”五类人才住房资格、2026省级困难毕业生求职补贴与创业项目历史批次；人才租购政策有互斥。",
+  "厦门": "厦门2026人才生活补贴按教育部政策汇编分类、单位申报与人社平台办理；住房保障项目须核实年度细则和真实房源。",
+  "莆田": "福建省就业创业政策与莆田毕业生生活补贴的地方汇编；本市原实施细则和公寓项目仍待独立核实。",
+  "三明": "三明2025医卫人才租房500/1000元月度专项、2026人才房票与青年人才公寓制度；历史规模不是现时空房。",
+  "泉州": "泉州人才人口双增计划包含首次来泉青年就业生活及安居支持；政府最高金额和保租房建设目标不是个人保证待遇。",
+  "漳州": "漳州2025配售型保障性住房制度与省级2026就业创业支持；配售购房与人才租赁公寓不可混同。",
+  "南平": "南平2026福建省级就业创业制度已接入，本市独立安家补助和人才住房需进一步核实政府原件与经办深链。",
+  "龙岩": "龙岩2026人才及毕业生先落户后就业制度，配合省级2026创业、求职及青年就业服务；暂无已核实本地可租公寓空房。",
+  "宁德": "宁德省级2026毕业生就业创业服务已接入，天湖人才独立住房补助及公寓资格需要核实本地政府原文和在线办理事项。"
+};
 const prefectureLegacy=new Map(TALENT_LEGACY_CITIES.map(c=>[c.name,c]));
 function shortProvince(s:string){return s.replace(/维吾尔自治区|壮族自治区|回族自治区|自治区|省$/,'')}
 export const TALENT_PROVINCES=provinceRaw.trim().split('\n').map(v=>{const [code,official]=v.split('|');return {code,official,name:shortProvince(official)}});
@@ -384,7 +395,7 @@ export const TALENT_PREFECTURE_CITIES:TalentCity[]=prefectureRaw.trim().split('\
   photo:old?.photo||(name==='邢台'?'https://commons.wikimedia.org/wiki/Special:Redirect/file/Xingtai_Taihang_International_Convention_and_Exhibition_Center.jpg?width=1280':name==='石家庄'?'https://commons.wikimedia.org/wiki/Special:Redirect/file/Skyline_of_Shijiazhuang_2012.jpg?width=1280':undefined),
   credit:old?.credit||(name==='邢台'?'Wcr1993 · Wikimedia Commons':name==='石家庄'?'ping lin · CC0 · Wikimedia Commons':undefined),
   photoPage:old?.photoPage||(name==='邢台'?'https://commons.wikimedia.org/wiki/File:Xingtai_Taihang_International_Convention_and_Exhibition_Center.jpg':name==='石家庄'?'https://commons.wikimedia.org/wiki/File:Skyline_of_Shijiazhuang_2012.jpg':undefined),
-  aliases:[...new Set(aliases)],intro:province==='广东省'?(GUANGDONG_CITY_INTROS[name]||'广东省人才政策及住房基础资料正在持续核验'):old?.intro||(name==='沧州'?'已收录2025人才新政生活与购房补贴、人才公寓免租及岭贤府和经开区历史住房资料；2026办理入口与实时房源待核验':name==='邢台'?'已收录2026回邢来邢人才三年分期购房补贴、36个月租房补贴、就业支持及真实住房待核验线索':name==='石家庄'?'河北首站：市级B卡租购房补贴、毕业生一次性安家补贴、2026人才公寓与公租房历史项目':name==='日照'?'已收录青年人才补贴、先租后购住房优惠，并整理市级及高新区人才公寓历史资料':name==='枣庄'?'已收录2026青年就业创业补贴、首批高层次人才家园试点，另有薛城保租房和高新区公寓待核验线索':name==='聊城'?'已收录2026青年人才生活及社保补贴；人才住房三年免租和购房支持为2022历史政策，另有3处公寓或工程待核验线索':name==='承德'?'已收录2026年主导产业租房与一次性生活补助、燕赵英才卡、配售型保障住房以及京津科技人才公寓历史制度；具体空房和申报直达入口待核验':name==='秦皇岛'?'已收录秦皇岛经开区官方人才公寓政策及配租流程；锦绣佳成与科技大厦项目依据2025年报道列为待核验房源线索':name==='保定'?'已收录2026国控高新区四小区保租房与公积金租房提取制度，2022毕业生租购房补贴作为历史政策参考；284套为四小区批次总量，不是实时空房':'人才政策与住房资料正在逐步核验')};
+  aliases:[...new Set(aliases)],intro:province==='福建省'?(FUJIAN_CITY_INTROS[name]||'福建省人才政策及住房资料待核'):province==='广东省'?(GUANGDONG_CITY_INTROS[name]||'广东省人才政策及住房基础资料正在持续核验'):old?.intro||(name==='沧州'?'已收录2025人才新政生活与购房补贴、人才公寓免租及岭贤府和经开区历史住房资料；2026办理入口与实时房源待核验':name==='邢台'?'已收录2026回邢来邢人才三年分期购房补贴、36个月租房补贴、就业支持及真实住房待核验线索':name==='石家庄'?'河北首站：市级B卡租购房补贴、毕业生一次性安家补贴、2026人才公寓与公租房历史项目':name==='日照'?'已收录青年人才补贴、先租后购住房优惠，并整理市级及高新区人才公寓历史资料':name==='枣庄'?'已收录2026青年就业创业补贴、首批高层次人才家园试点，另有薛城保租房和高新区公寓待核验线索':name==='聊城'?'已收录2026青年人才生活及社保补贴；人才住房三年免租和购房支持为2022历史政策，另有3处公寓或工程待核验线索':name==='承德'?'已收录2026年主导产业租房与一次性生活补助、燕赵英才卡、配售型保障住房以及京津科技人才公寓历史制度；具体空房和申报直达入口待核验':name==='秦皇岛'?'已收录秦皇岛经开区官方人才公寓政策及配租流程；锦绣佳成与科技大厦项目依据2025年报道列为待核验房源线索':name==='保定'?'已收录2026国控高新区四小区保租房与公积金租房提取制度，2022毕业生租购房补贴作为历史政策参考；284套为四小区批次总量，不是实时空房':'人才政策与住房资料正在逐步核验')};
 });
 /** 云南8个自治州：加入目录而不改变原293地级市基准，避免全局统计与既有测试失效。 */
 export const TALENT_YUNNAN_PREFECTURES:TalentCity[]=[
