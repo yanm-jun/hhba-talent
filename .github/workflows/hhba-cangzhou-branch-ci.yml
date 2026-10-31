@@ -1,0 +1,46 @@
+name: Cangzhou V5.1 isolated branch acceptance
+on:
+  push:
+    branches:
+      - feature/talent-cangzhou
+  pull_request:
+    paths:
+      - 'apps/web/src/data/cangzhou*.ts'
+      - 'apps/web/scripts/test-cangzhou-city-v51.mjs'
+      - 'apps/web/src/pages/TalentServiceRoutes.tsx'
+      - '.github/workflows/hhba-cangzhou-branch-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-cangzhou:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Test Cangzhou independently
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-cangzhou-city-v51.mjs
+      - name: Test national V5.1 city contract
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - name: Build website as isolated branch artifact (NEVER deploy Pages)
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+        run: npm run build
+      - name: Save testable static build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cangzhou-v51-static-preview
+          path: apps/web/dist/
+          retention-days: 14
