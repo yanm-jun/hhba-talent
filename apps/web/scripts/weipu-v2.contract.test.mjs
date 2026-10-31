@@ -42,7 +42,7 @@ assert(page.includes('hhba-v2-weipu-description'));
 assert(page.includes('hhba-v2-weipu-location'));
 assert(page.includes('{showcase&&!detailedCards&&'),'Only compact legacy 031 shows persistent role links');
 assert(page.includes('detailedCards=weipu||bodor'),'Both 032 and 033 require links inside expanded requirements');
-assert(page.includes('{weipu&&<div className="hhba-v2-weipu-detail-links"'));
+assert(page.includes('{detailedCards&&<div className="hhba-v2-weipu-detail-links"'),'Only expanded details expose employer links for 032 and 033');
 assert(css.includes('.hhba-v2-weipu .hhba-v2-company-role details summary'));
 assert(css.includes('.hhba-v2-qizheng-role-actions a{'));
 assert(p.jobs.every(j=>j.summary.length>=50),'WEIPU roles need detailed, individual explanations');
