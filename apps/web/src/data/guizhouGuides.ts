@@ -18,7 +18,8 @@ export function buildGuizhouGuide(kind:'policy'|'housing',id:string):CompleteGui
  if(!p&&!h)return null;
  const item=p||h!;
  const housing=!!h;
- const outdated=!!p&&(p.temporal!=='policy'||Boolean(p.deadline&&p.deadline<'2026-10-31'));
+ const today=new Date().toISOString().slice(0,10);
+ const outdated=!!p&&(p.temporal!=='policy'||Boolean(p.deadline&&p.deadline<today));
  const material=p?.materials?.length?p.materials:[
  '本人身份、学历学位及工作单位证明（按适用事项）',
  '本人及家庭住房信息、既有住房保障记录（按当期项目要求）',
@@ -26,7 +27,7 @@ export function buildGuizhouGuide(kind:'policy'|'housing',id:string):CompleteGui
  const limitation=p?.reviewNote||h?.statusNote||'受理情况需以最新政府公告为准';
  const guiyang=item.city==='贵阳';
  const enterprise=p?.payoutTo==='用人单位';
- const currentDeadline=p?.deadline&&p.deadline>='2026-10-31'?'本公告截止'+p.deadline+'；仅以主管部门最新变更为准。':'';
+ const currentDeadline=p?.deadline&&p.deadline>=today?'本公告截止'+p.deadline+'；仅以主管部门最新变更为准。':'';
  const usefulOfficialUrl=p?.applicationUrl||h?.applyUrl;
 
  const branches:Record<string,GuideBranch>={
