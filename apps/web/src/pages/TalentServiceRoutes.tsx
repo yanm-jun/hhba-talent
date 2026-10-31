@@ -1,3 +1,4 @@
+import {getTalentCitySnapshot} from '../data/talentCitySnapshot';
 import {SICHUAN_21_REGIONS,sichuanGuideUrl,buildSichuanGuide} from '../data/sichuanGuides';
 import {buildHainanGuide,hainanGuideUrl,HAINAN_TALENT_CITIES} from '../data/hainanGuides';
 import {buildHunanGuide} from '../data/hunanGuides';
@@ -139,9 +140,10 @@ function Empty({city,kind}:{city:string;kind:string}){
 function CityHub({city}:{city:string}){
  const match=findTalentCity(city);
  if(!match)return <><Bread current="城市尚未收录"/><section className="ts-sub-header"><h1>该城市尚未加入本次城市名录</h1><p>当前目标范围是4个直辖市和293个地级市，云南8个自治州已接入，其他未收录县级市、自治州、地区和盟请先到全国城市目录核对名称。</p><Link to="/talent-service/cities">返回全国城市目录 <ArrowRight size={16}/></Link></section></>;
- const policies=TALENT_POLICY_RECORDS.filter(p=>p.city===match.name).sort(recentPolicies);
+ const {policies,homes}=getTalentCitySnapshot(match.name);
+ policies.sort(recentPolicies);
  const researchPolicyCount=match.name==='邢台'?XINGTAI_POLICY_RESEARCH_RECORDS.length:0;
- const homes=TALENT_HOUSING_RECORDS.filter(h=>h.city===match.name);
+
  const housingPolicies=policies.filter(isHousingPolicy);
  const housingLeads=housingResearchLeads(match.name);
  const housingHistory=housingPolicyResearch(match.name).length;

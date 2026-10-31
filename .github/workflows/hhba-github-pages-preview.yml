@@ -221,6 +221,9 @@ jobs:
       - name: Validate MINIEYE 035 source-backed positions, six major tabs and real media
         working-directory: apps/web
         run: node scripts/minieye-v2.contract.test.mjs
+      - name: Guard all 337 city policy/housing counters against stale empty cards
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/audit-talent-city-ui.mjs
       - name: Validate source-backed talent policies and housing records
         working-directory: apps/web
         run: node scripts/audit-talent-service.mjs
@@ -835,6 +838,9 @@ jobs:
         uses: actions/configure-pages@v5
         with:
           enablement: true
+      - name: Record deployed commit and 337 official data counts in Pages manifest
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/write-talent-city-manifest.mjs
       - name: Upload exactly the public built site
         uses: actions/upload-pages-artifact@v3
         with:
