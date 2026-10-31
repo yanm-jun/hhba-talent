@@ -16,6 +16,7 @@ import {TalentQingdaoGuidePreview} from './TalentQingdaoGuidePreview';
 import {TalentLaoshanGuide} from './TalentLaoshanGuide';
 import {UnifiedPolicyGuide} from '../components/talent/UnifiedPolicyGuide';
 import {xingtaiPurchaseGuide,xingtaiRentalGuide,xingtaiHousingGuide} from '../data/xingtaiGuides';
+import {XINGTAI_POLICY_RESEARCH_RECORDS} from '../data/xingtaiPolicyResearch';
 import {shijiazhuangRentGuide,shijiazhuangBuyGuide,shijiazhuangSettlementGuide,shijiazhuangHousingGuide} from '../data/shijiazhuangGuides';
 import {hezeLivingGuide,hezePurchaseGuide,hezeStartupGuide,hezeHousingGuide} from '../data/talentHezeGuides';
 import {taianLivingGuide,taianPurchaseGuide,taianHousingGuide} from '../data/taianGuide';
@@ -113,6 +114,7 @@ function CityHub({city}:{city:string}){
  const match=findTalentCity(city);
  if(!match)return <><Bread current="城市尚未收录"/><section className="ts-sub-header"><h1>该城市尚未加入本次城市名录</h1><p>当前目标范围是4个直辖市和293个地级市，不包含县级市、自治州、地区和盟。请先到全国城市目录核对名称。</p><Link to="/talent-service/cities">返回全国城市目录 <ArrowRight size={16}/></Link></section></>;
  const policies=TALENT_POLICY_RECORDS.filter(p=>p.city===match.name).sort(recentPolicies);
+ const researchPolicyCount=match.name==='邢台'?XINGTAI_POLICY_RESEARCH_RECORDS.length:0;
  const homes=TALENT_HOUSING_RECORDS.filter(h=>h.city===match.name);
  const housingPolicies=policies.filter(isHousingPolicy);
  const housingLeads=housingResearchLeads(match.name);
@@ -127,14 +129,14 @@ function CityHub({city}:{city:string}){
    <h1>{match.official} · 人才服务</h1>
    <p>{hasSources?match.intro+'。可查看已收录政策、住房支持及有出处的公寓项目信息；待核验线索不代表可以立即申报。':'该城市入口已开通，人才政策与住房资料正在整理。我们不会生成未经核验的补贴金额、公寓或申请入口。'}</p>
    {allHousingHistorical&&<p>住房资料均为已结束的公开配租批次，不代表当前有空房或可直接申报；请关注住建部门新公告。</p>}
-   <div className="ts-sub-counts"><QuickCount count={policies.length} label="已收录政策"/>{housingPolicies.length>0&&<QuickCount count={housingPolicies.length} label="住房支持政策"/>}{homes.length>0&&<QuickCount count={homes.length} label={allHousingHistorical?'住房历史配租资料':'已收录住房资料'}/>}
-    {housingHistory>0&&<QuickCount count={housingHistory} label="历史住房政策 · 仅参考"/>}{researchHousing>0&&<QuickCount count={researchHousing} label="人才公寓线索 · 待核验"/>}{!hasSources&&!researchHousing&&<span className="ts-v4-data-pending">官方资料整理中</span>}</div>
+   <div className="ts-sub-counts"><QuickCount count={policies.length} label="政府来源政策"/>{researchPolicyCount>0&&<QuickCount count={researchPolicyCount} label="公开政策资料 · 待核验"/>}{housingPolicies.length>0&&<QuickCount count={housingPolicies.length} label="住房支持政策"/>}{homes.length>0&&<QuickCount count={homes.length} label={allHousingHistorical?'住房历史配租资料':'已收录住房资料'}/>}
+    {housingHistory>0&&<QuickCount count={housingHistory} label="历史住房政策 · 仅参考"/>}{researchHousing>0&&<QuickCount count={researchHousing} label="住房线索 · 待核验"/>}{!hasSources&&!researchHousing&&<span className="ts-v4-data-pending">官方资料整理中</span>}</div>
   </section>
   <section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>你想了解什么？</h2><Link to="/talent-service/cities">更换城市 <ArrowRight size={15}/></Link></div>
    <div className="ts-sub-kinds ts-v4-two-kinds">
     {kinds.map(k=><Link key={k.id} className="ts-sub-kind" to={match.name==='青岛'&&k.id==='policies'?'/talent-service/policy-layout-preview/qingdao':talentListUrl(k.id,match.name)}>
       <k.icon size={25}/><strong>{k.name}</strong><small>{k.description}</small>
-      <span className="ts-v4-kind-count">{k.id==='policies'?policies.length+' 条已收录':[
+      <span className="ts-v4-kind-count">{k.id==='policies'?(policies.length+researchPolicyCount)+' 条已收录（含分级资料）':[
        housingPolicies.length>0?housingPolicies.length+' 项住房支持政策':'',
        homes.length>0?homes.length+' 条已收录住房'+(allHousingHistorical?'（历史批次）':''):'',
        housingHistory>0?housingHistory+' 条历史住房政策（非现行申报）':'',
