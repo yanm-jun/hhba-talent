@@ -1,0 +1,50 @@
+name: Shanghai V5.1 independent branch acceptance
+on:
+  push:
+    branches:
+      - feature/talent-shanghai
+  pull_request:
+    paths:
+      - 'apps/web/src/data/shanghai*.ts'
+      - 'apps/web/src/data/talentPolicyRecords.ts'
+      - 'apps/web/src/data/talentHousingRecords.ts'
+      - 'apps/web/src/pages/TalentServiceRoutes.tsx'
+      - 'apps/web/src/components/talent/UnifiedPolicyList.tsx'
+      - 'apps/web/scripts/test-shanghai-city-v51.mjs'
+      - '.github/workflows/hhba-shanghai-branch-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-shanghai:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Test Shanghai independent city policy and housing
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-shanghai-city-v51.mjs
+      - name: National V5.1 contract
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - name: Build whole HHBA static site without publishing
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+        run: npm run build
+      - name: Save isolated built static artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: shanghai-v51-static-preview
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
