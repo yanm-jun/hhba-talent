@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-067",
+  "name": "弘象",
+  "displayName": "弘象科技",
+  "englishName": "Hongxiang Technology · SkyNexus",
+  "aliases": [
+    "弘象科技",
+    "北京弘象科技有限公司",
+    "Presky",
+    "cnpresky",
+    "弘象科技27秋招"
+  ],
+  "industry": "商业气象 · AI气象预测 · 云边端平台 · 能源交通行业服务",
+  "subtitle": "北京弘象科技有限公司 · 北京海淀 · 2016年成立",
+  "overview": "弘象科技是北京商业气象应用技术企业，官网披露SkyNexus系列数值预报、AI气象模型、气象云平台及能源、交通等行业服务。2027年秋招公开聚合页列出数据分析师、产品经理、算法工程师三类岗位，城市包括北京、上海及深圳；具体年薪和截止日期仅来自二级资料，未证实企业官网专用网申链接。另有2026年高校宣讲的研发、实施、商务方向，但不与2027招聘条目混同。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.cnpresky.com/",
+    "https://www.wondercv.com/xiaozhao/hongxiang-tech-2027-autumn-campus-recruitment-19871-2cedcd/",
+    "https://career.hebut.edu.cn/recruitment/content/type/2/id/5083.html",
+    "https://jdjywpt.jlu.edu.cn/portal/recruit/details?id=b05fbe81fb0747719a614e85049d8027"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-067/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-067/photo1.svg",
+        "caption": "弘象科技SkyNexus产品架构（HHBA非官方示意）",
+        "alt": "数据采集、气象预测模型和行业应用的非官方结构示意图",
+        "note": "根据公司官网业务体系制作的HHBA独立示意图。并非弘象办公或员工真实照片，未用于伪装企业现场。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-067/photo2.svg",
+        "caption": "SkyNexus数据—模型—行业应用结构示意（HHBA原创）",
+        "alt": "HHBA独立制作的弘象科技业务结构示意图，非企业实景",
+        "note": "根据弘象官网公开的产品技术链制作的非官方编辑示意图，非公司真实实景。缺少可核实的第二张照片，不使用无关企业素材。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.wondercv.com/xiaozhao/hongxiang-tech-2027-autumn-campus-recruitment-19871-2cedcd/",
+    "label": "2027届秋招公开摘要（非官方网投）",
+    "status": "archived_source",
+    "subject": "北京弘象科技有限公司",
+    "note": "第三方摘要给出3类岗位及城市，预计截止2027-03-31，但尚未核到企业官网本批网投页；2026高校宣讲提到的hr@cnpresky.com邮箱不能自动证明2027招聘接受邮件。"
+  },
+  "majorIntro": "2027公开汇总列出3类岗位；专业标签按来源直接披露和平台建议区分。官网及2026高校宣讲只支持公司真实技术能力，不直接等同于2027岗位细则。",
+  "preferredMajors": [
+    "大气科学",
+    "应用气象学",
+    "数学与应用数学",
+    "统计学",
+    "数据科学与大数据技术",
+    "人工智能",
+    "计算机科学与技术",
+    "软件工程",
+    "地理信息科学",
+    "遥感科学与技术",
+    "信息管理与信息系统"
+  ],
+  "photoNote": "当前弘象官方站公开了业务和产品体系，但未获得能够独立核实并成功下载的办公楼或团队实景照片。本批使用两张分别制作的业务示意SVG，页面明确标注“非官方、非实景”，后续须替换为真实且有使用许可的企业图片。",
+  "business": [
+    {
+      "title": "SkyNexus数值天气预报",
+      "description": "自主数值预报模式面向全球和区域精细化气象模拟，依托高性能计算与预报模型开展天气和气候预测。",
+      "tags": "数值预报 · 模型",
+      "details": [
+        "全球与区域数值模式",
+        "高性能计算基础设施",
+        "预报结果检验与服务"
+      ]
+    },
+    {
+      "title": "气象AI大模型",
+      "description": "利用机器学习和AI气象大模型处理复杂多源数据，构建精细化气象预测与风险提示。",
+      "tags": "AI · 预测",
+      "details": [
+        "多源气象特征建模",
+        "气象AI模型评估",
+        "天气异常预测应用"
+      ]
+    },
+    {
+      "title": "气象数据云平台",
+      "description": "SkyNexus-Cloud汇聚监测、雷达、卫星与模式结果，为科研、业务和SaaS服务提供数据标准化接口。",
+      "tags": "云平台 · 数据",
+      "details": [
+        "多源数据汇聚与质控",
+        "标准API和可视化",
+        "模型训练推理编排"
+      ]
+    },
+    {
+      "title": "智能气象监测设备",
+      "description": "围绕多源自然环境感知提供智能监测、遥感数据与设备接入，支持城市和行业监测网建设。",
+      "tags": "物联网 · 监测",
+      "details": [
+        "观测设备接入",
+        "物联网监测链路",
+        "气象数据质量保障"
+      ]
+    },
+    {
+      "title": "能源与电力气象服务",
+      "description": "服务新能源发电、电网调度、电力交易与灾害防控，以气象预测改善运行计划和风险管理。",
+      "tags": "能源 · 电力",
+      "details": [
+        "风光功率预测支持",
+        "电力运行风险提示",
+        "能源市场决策辅助"
+      ]
+    },
+    {
+      "title": "交通航空与公共安全",
+      "description": "面向道路、低空航空、应急、水利等行业提供精细化气象预报、风险预警与专业气象决策服务。",
+      "tags": "交通 · 公共安全",
+      "details": [
+        "交通气象风险监测",
+        "低空飞行气象保障",
+        "城市应急防灾预警"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "data-analysis-2027",
+      "title": "数据分析师（2027届公开摘要）",
+      "category": "数据分析",
+      "city": "北京／深圳",
+      "summary": "利用气象监测与业务数据完成SQL数据处理、统计分析及图表展示，支持气象服务质量和行业决策。",
+      "requirements": "二级2027招聘摘要写明本科及以上，统计、数据分析、经济等相关专业，要求熟悉Excel、SQL和Tableau等分析工具；年薪和截止时间未经企业官方确认，不作为确定待遇承诺。",
+      "majorNames": [
+        "统计学",
+        "数据科学与大数据技术",
+        "经济统计学"
+      ],
+      "editorialRelatedMajors": [
+        "应用气象学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（2027届二级公开招聘摘要）",
+      "url": "https://www.wondercv.com/xiaozhao/hongxiang-tech-2027-autumn-campus-recruitment-19871-2cedcd/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hongxiang-tech-2027-autumn-campus-recruitment-19871-2cedcd/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京弘象科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "product-manager-2027",
+      "title": "产品经理（2027届公开摘要）",
+      "category": "产品管理",
+      "city": "上海／深圳",
+      "summary": "负责商业气象产品用户需求梳理、功能设计、原型协作与项目推进，连接算法、研发及行业客户。",
+      "requirements": "二级2027招聘摘要描述本科及以上，有产品实习经历优先，重视用户洞察、结构化表达和跨部门协作；未查到公司原始JD的强制专业限制，专业匹配仅为平台建议。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "信息管理与信息系统",
+        "软件工程",
+        "应用气象学",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（2027届二级公开招聘摘要）",
+      "url": "https://www.wondercv.com/xiaozhao/hongxiang-tech-2027-autumn-campus-recruitment-19871-2cedcd/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hongxiang-tech-2027-autumn-campus-recruitment-19871-2cedcd/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京弘象科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "algorithm-2027",
+      "title": "算法工程师（2027届公开摘要）",
+      "category": "AI / 气象算法",
+      "city": "北京／上海",
+      "summary": "参与气象预测算法及AI模型的研发、训练、评估和优化，服务天气预报与产业气象解决方案。",
+      "requirements": "二级2027招聘摘要写明本科及以上，计算机、数学、统计学相关专业，熟悉Python和机器学习基础；暂无企业原始2027逐岗JD，不将薪酬上限当作实际录用标准。",
+      "majorNames": [
+        "计算机科学与技术",
+        "数学与应用数学",
+        "统计学",
+        "人工智能"
+      ],
+      "editorialRelatedMajors": [
+        "大气科学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（2027届二级公开招聘摘要）",
+      "url": "https://www.wondercv.com/xiaozhao/hongxiang-tech-2027-autumn-campus-recruitment-19871-2cedcd/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hongxiang-tech-2027-autumn-campus-recruitment-19871-2cedcd/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京弘象科技有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}

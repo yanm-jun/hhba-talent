@@ -1,0 +1,21 @@
+{
+  "company": "弘象",
+  "reviewDate": "2026-10-31",
+  "officialLogo": false,
+  "commercialLicenseVerified": false,
+  "photoSourceEvidence": [
+    {
+      "file": "photo1.png",
+      "sourcePage": "https://www.cnpresky.com/img/jingzhun.52bb8582.png",
+      "status": "real official product visual; NOT a workplace photograph"
+    },
+    {
+      "file": "photo2.svg",
+      "sourcePage": "https://www.cnpresky.com/",
+      "status": "HHBA editorial graphic; NOT a company photo"
+    }
+  ],
+  "photoMaterialization": "Via scripts/prepare-employers-066-068-real-media.py in isolated CI build; image URLs and hashes written into build output media-sources.json",
+  "notes": "Real photos and official product visuals are attributed but online publication permission remains unverified. Editorial SVG is never to be represented as a real photo.",
+  "legalEntity": "北京弘象科技有限公司"
+}
