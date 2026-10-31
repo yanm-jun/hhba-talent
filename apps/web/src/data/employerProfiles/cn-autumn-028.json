@@ -28,19 +28,19 @@
     "https://campus.51job.com/zjlq2024/about.html"
   ],
   "media": {
-    "logo": "images/employer-profiles/cn-autumn-028/repair-logo.svg",
+    "logo": "images/employer-profiles/cn-autumn-028/logo.png",
     "photos": [
       {
-        "path": "images/employer-profiles/cn-autumn-028/repair-photo1.svg",
-        "caption": "中建路桥 · HHBA非实景业务示意（修复缺图）",
-        "alt": "中建路桥原创业务主题矢量示意图",
-        "note": "原图文件在仓库中缺失；临时采用独立HHBA原创SVG避免断图。不是企业实景或官方素材，尚需授权真实照片替换。"
+        "path": "images/employer-profiles/cn-autumn-028/photo1.jpg",
+        "caption": "中建路桥官方项目图 · 公路桥梁精品工程",
+        "alt": "中建路桥官方项目展示中的公路桥梁工程实景",
+        "note": "来源于中建路桥集团有限公司官网“业务领域—精品工程”公开历史图片；项目拍摄日期和现状不明。"
       },
       {
-        "path": "images/employer-profiles/cn-autumn-028/repair-photo2.svg",
-        "caption": "中建路桥 · HHBA非实景业务示意（修复缺图）",
-        "alt": "中建路桥原创业务主题矢量示意图",
-        "note": "原图文件在仓库中缺失；临时采用独立HHBA原创SVG避免断图。不是企业实景或官方素材，尚需授权真实照片替换。"
+        "path": "images/employer-profiles/cn-autumn-028/photo2.jpg",
+        "caption": "中建路桥官方项目图 · 交通基础设施",
+        "alt": "中建路桥集团官方企业项目图中的交通基础设施实景",
+        "note": "来源于中建路桥集团有限公司官网公开项目展示；属于企业工程案例历史资料，不代表当前正在施工。"
       }
     ]
   },
@@ -72,7 +72,7 @@
     "计算机科学与技术",
     "汉语言文学"
   ],
-  "photoNote": "Logo和两张独立工程实景图片的选定来源为企业历史校招网站与中建路桥官网公开项目图库，随主站打包为静态资源。若媒体来源不可用，仅展示明确标记的不可用占位图，不用其他企业项目图冒充。图像和商标权属原权利人；HHBA独立整理资料，不代表官方认证或合作。 部分旧图片已失效，现显示明显标注的HHBA编辑性占位图片；不视为企业真实照片。",
+  "photoNote": "Logo和两张独立工程实景图片的选定来源为企业历史校招网站与中建路桥官网公开项目图库，随主站打包为静态资源。若媒体来源不可用，仅展示明确标记的不可用占位图，不用其他企业项目图冒充。图像和商标权属原权利人；HHBA独立整理资料，不代表官方认证或合作。",
   "business": [
     {
       "title": "公路与桥梁工程",
