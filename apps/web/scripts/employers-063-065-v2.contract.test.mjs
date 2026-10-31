@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {existsSync,readFileSync,statSync} from 'node:fs';
 const read=p=>readFileSync(p,'utf8');
 const page=read('src/pages/UnifiedV2CompanyPage.tsx');
-assert(page.includes('06[0-9]|07[0-1])$/.test(id)'),'Four-block V2 template must route all three new companies');
+assert(page.includes('06[0-9]|07[0-4])$/.test(id)'),'Four-block V2 template must route all three new companies');
 assert(page.includes('if(batch3756)return job.category===major'),'Role category selector must filter company roles');
 assert(page.includes('hhba-kpmg-photo-grid')&&page.includes('hhba-kpmg-service-grid'),'Four fixed sections must remain');
 assert(page.includes('站内岗位详情'),'Each role must have internal detail route');
