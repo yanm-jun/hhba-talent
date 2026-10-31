@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {TALENT_CITY_INDEX,TALENT_PREFECTURE_CITIES} from '../src/data/talentCityRegistry.ts';
+import {TALENT_CITY_INDEX,TALENT_PREFECTURE_CITIES,TALENT_NEW_PREFECTURES_20261031} from '../src/data/talentCityRegistry.ts';
 import {TALENT_POLICY_RECORDS} from '../src/data/talentPolicyRecords.ts';
 import {TALENT_HOUSING_RECORDS} from '../src/data/talentHousingRecords.ts';
 import {ACCEPTED_TALENT_CITIES,TALENT_QUALITY_SUMMARY,assessPolicy,assessHousing} from '../src/data/talentQuality.ts';
@@ -26,7 +26,7 @@ assert.equal(new Set(housingIds).size,housingIds.length,'duplicate housing IDs a
 assert.equal(names.size,TALENT_CITY_INDEX.length,'duplicate region names');
 assert.equal(new Set(TALENT_CITY_INDEX.map(c=>c.code)).size,TALENT_CITY_INDEX.length,'duplicate region codes');
 assert.equal(TALENT_PREFECTURE_CITIES.length,293,'original prefecture-city baseline was modified');
-assert.equal(TALENT_CITY_INDEX.length,312,'new regions must be merged without dropping original regions');
+assert.equal(TALENT_CITY_INDEX.length,337,'25 additional prefecture-level administrative regions must be indexed');
 for(const r of [...TALENT_POLICY_RECORDS,...TALENT_HOUSING_RECORDS]){
  assert.ok(names.has(r.city),'orphan data points to an unknown region: '+r.city+' / '+r.id);
  assert.ok(r.id&&r.sourceUrl&&r.published,'missing ID, evidence or published date: '+r.id);
@@ -43,7 +43,10 @@ const provinceCoverage=Object.entries(provincialTargets).map(([province,expected
 });
 const missingPolicy=TALENT_CITY_INDEX.filter(c=>!byPolicy.has(c.name)).map(c=>({province:c.province,city:c.name}));
 const missingHousing=TALENT_CITY_INDEX.filter(c=>byPolicy.has(c.name)&&!byHousing.has(c.name)).map(c=>({province:c.province,city:c.name}));
-assert.ok(missingPolicy.length<=67,'policy coverage regressed from the 2026-10-31 main audit');
+const addedRegionNames=new Set(TALENT_NEW_PREFECTURES_20261031.map(x=>x.name));
+assert.equal(addedRegionNames.size,25,'new prefectures were lost or duplicated');
+const originalMissingPolicy=missingPolicy.filter(x=>!addedRegionNames.has(x.city));
+assert.ok(originalMissingPolicy.length<=64,'original 312-region policy coverage regressed');
 assert.ok(missingHousing.length<=26,'housing coverage regressed from the 2026-10-31 main audit');
 // Compare only the PCA province -> second-layer nodes. They include counties and directly
 // administered municipalities and must NEVER all be treated as prefecture cities.
@@ -68,6 +71,7 @@ const report={
  provinceCoverage,policyQuality,housingQuality,
  qualitySummaryByGrade:TALENT_QUALITY_SUMMARY.byGrade,acceptedCities:ACCEPTED_TALENT_CITIES.length,
  zeroPolicyCities:missingPolicy.length,zeroPolicyList:missingPolicy,
+ original312MissingPolicy:originalMissingPolicy.length,pendingNewPrefectures:missingPolicy.filter(x=>addedRegionNames.has(x.city)).length,
  policyCitiesMissingHousing:missingHousing.length,missingHousingList:missingHousing,
  pcaSecondLevelCount:pcaSecondLevel.length,unmatchedPcaCount:unmatchedPca.length,
  pcaUnmatchedNodes:unmatchedPca,

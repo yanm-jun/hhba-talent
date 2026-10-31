@@ -7,7 +7,7 @@ import {TALENT_HOUSING_RECORDS} from '../data/talentHousingRecords';
 import '../styles/talent-city-directory.css';
 
 const PAGE_SIZE=24;
-const totals={city:TALENT_CITY_INDEX.length,prefecture:293,municipality:4,autonomous:8,otherPrefectures:7};
+const totals={city:TALENT_CITY_INDEX.length,prefecture:293,municipality:4,autonomous:8,otherPrefectures:32};
 const policyCounts=new Map<string,number>();
 const housingCounts=new Map<string,number>();
 for(const p of TALENT_POLICY_RECORDS)policyCounts.set(p.city,(policyCounts.get(p.city)||0)+1);
@@ -48,11 +48,11 @@ export function TalentCityDirectory({initialProvince='',initialQuery=''}:{initia
       <div className="tcd-card-meta">{a+b?<><span><FileText size={12}/> {a} 条政策</span><span><Building2 size={12}/> {b} 条住房资料</span></>:<span className="tcd-preparing">政策数据整理中 · 城市入口已开通</span>}</div>
      </Link>})}
   </div>:<div className="tcd-empty"><Search size={24}/><strong>没有找到符合条件的地级市或直辖市</strong>
-   <p>请尝试完整城市名称、拼音或更换省份。当前已包含云南省8个自治州，但其他地区的自治州、县级市、地区和盟尚未完整收录。</p><button type="button" onClick={()=>{pickProvince('');editQuery('')}}>清除筛选条件</button></div>}
+   <p>请尝试完整城市名称、拼音或更换省份。当前已包含云南省8个自治州，目前已补充地级自治州、盟和地区入口；省直管县级市、县与林区仍须独立层级管理。</p><button type="button" onClick={()=>{pickProvince('');editQuery('')}}>清除筛选条件</button></div>}
   {pages>1&&<nav className="tcd-pager" aria-label="城市列表翻页">
    <button disabled={current===1} type="button" onClick={()=>setPage(x=>Math.max(1,x-1))}><ArrowLeft size={14}/>上一页</button>
    <span>第 {current} / {pages} 页</span>
    <button disabled={current===pages} type="button" onClick={()=>setPage(x=>Math.min(pages,x+1))}>下一页<ArrowRight size={14}/></button></nav>}
-  <aside className="tcd-note"><ShieldCheck size={16}/><span>名录采用2025年县以上行政区划代码整理，基础范围为4个直辖市和293个地级市，另新增云南省8个自治州。这里提供城市搜索与页面入口，<strong>不代表已收录每个城市的实时政策、申请渠道和住房空房</strong>。</span></aside>
+  <aside className="tcd-note"><ShieldCheck size={16}/><span>名录采用2025年县以上行政区划代码整理，基础范围为4个直辖市和293个地级市，另接入云南省8个自治州和其他32个盟州地区。这里提供城市搜索与页面入口，<strong>不代表已收录每个城市的实时政策、申请渠道和住房空房</strong>。</span></aside>
  </div>;
 }
