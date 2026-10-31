@@ -29,8 +29,8 @@ jobs:
       - run: npm run build
       - name: Package isolated Qinghai static preview (no production deployment)
         run: |
-          cp apps/web/dist/index.html apps/web/dist/404.html
-          cd apps/web/dist
+          cp dist/index.html dist/404.html
+          cd dist
           zip -q -r ../../../qinghai-2026-static-preview.zip .
       - uses: actions/upload-artifact@v4
         with:
