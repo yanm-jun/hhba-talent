@@ -200,7 +200,7 @@ export const LIAONING_MUNICIPAL_POLICY_RECORDS:TalentPolicyRecord[]=raw.map(p=>{
  payoutTo:p.city==='本溪'||p.city==='辽阳'?'非现金服务':'个人',
  headlineAmount:p.amount,headlineUnit:'市级政策依据 · 以实际资格审核和现行受理为准',
  reviewedAt:'2026-10-31',deadline:p.city==='鞍山'?'2026-11-06':undefined,
- reviewNote:(withoutOriginal?'政策摘要/新闻报道未取得市级原始全套办理细则，B级基础资料。':'可查政府/官方政务公开来源，但当前经办平台或申请是否开放仍需核实；B级。')+' '+faq+' 办理入口待核实：仅对政府已明确公布的真实经办模块提供文字指引，不将报道或门户首页当作在线申请成功。'+(p.city==='葫芦岛'?' 葫芦岛政务服务问答未给出原发文日，本条published仅为2026-10-31索引核查日，不可作为正式政策发布日期。':'')',
+ reviewNote:(withoutOriginal?'政策摘要/新闻报道未取得市级原始全套办理细则，B级基础资料。':'可查政府/官方政务公开来源，但当前经办平台或申请是否开放仍需核实；B级。')+' '+faq+' 办理入口待核实：仅对政府已明确公布的真实经办模块提供文字指引，不将报道或门户首页当作在线申请成功。'+(p.city==='葫芦岛'?' 葫芦岛政务服务问答未给出原发文日，本条published仅为2026-10-31索引核查日，不可作为正式政策发布日期。':''),
  keywords:[p.city,'辽宁','2026','人才','大学生','高校毕业生',...p.title.match(/购房|租房|生活|补贴|就业|住房/g)||[]],
  materials:[
  '申请人身份证、毕业证及学历学位验证材料（按具体项目）',
