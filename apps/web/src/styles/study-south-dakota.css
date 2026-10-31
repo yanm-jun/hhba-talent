@@ -1,0 +1,16 @@
+/* South Dakota deep profile extends the existing Minot tested detailed-page visual language.
+   No homepage CSS, routes, or global Shell layout changes. */
+.hhba-usd .hhba-minot-hero{background:radial-gradient(ellipse at 83% 0%,#d4e9de,transparent 50%),linear-gradient(118deg,#eaf5ee,#fff)}
+.hhba-usd-program-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hhba-usd-program-grid .hhba-minot-program-card{min-width:0;padding:20px}
+.hhba-usd-program-grid .hhba-minot-program-summary{line-height:1.9}
+.hhba-usd .hhba-minot-photo-credit a,.hhba-usd .hhba-minot-lightbox a{color:#286e49}
+.hhba-usd .hhba-minot-gallery-grid .hhba-minot-feature-photo{background:#e5ece9}
+.hhba-usd .hhba-minot-budget-note{align-items:flex-start}
+.hhba-usd .hhba-minot-source-link{margin-right:12px}
+.hhba-usd .hhba-minot-gallery-thumbs .hhba-minot-thumb{min-width:0}
+.hhba-usd .hhba-minot-program-card .hhba-minot-overline{line-height:1.75}
+.hhba-usd .hhba-minot-lightbox{background:#111d19f5}
+.hhba-usd .hhba-minot-lightbox a{color:#b1ebca}
+@media(max-width:900px){.hhba-usd-program-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.hhba-usd-program-grid{grid-template-columns:1fr}.hhba-usd .hhba-minot-program-card{padding:18px}.hhba-usd .hhba-minot-hero-actions>a{max-width:100%}}
