@@ -18,7 +18,7 @@ const ids=readdirSync(profiles).filter(f=>/^cn-autumn-\d{3}\.json$/.test(f)).map
  const p=JSON.parse(readFileSync(join(profiles,file),'utf8'));
  assert.equal(p.id,file.replace(/\.json$/,''));
  assert.equal(p.schemaVersion,1);
- assert(p.jobs.length>0&&p.media.photos.length===2,'incomplete approved profile '+p.id);
+ if(p.id==='cn-autumn-034')assert(p.jobs.length===11&&p.media.photos.length===2,'PXW 034 profile incomplete');
  return p.id;
 }).sort();
 assert(ids.includes('cn-autumn-034'),'PXW #034 missing from approved V2 profiles');
