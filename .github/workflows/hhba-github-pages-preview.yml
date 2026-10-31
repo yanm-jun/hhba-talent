@@ -292,6 +292,9 @@ jobs:
       - name: Verify Hengshui V5.1 sourced policies, housing caveats and four shared guides
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-hengshui-city-v51.mjs
+      - name: Verify Langfang V5.1 policies, housing programs, source-graded leads and full guides
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-langfang-city-v51.mjs
       - name: Lock future city template, certify full policy guides and protect 95 historical record IDs
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
