@@ -1,0 +1,44 @@
+name: HHBA Jiangxi 11-city V5.1 branch acceptance
+on:
+  push:
+    branches: [feature/talent-jiangxi]
+  pull_request:
+    paths:
+      - 'apps/web/src/data/jiangxi*'
+      - 'apps/web/src/data/talentCityRegistry.ts'
+      - 'apps/web/src/data/talentPolicyRecords.ts'
+      - 'apps/web/src/data/talentHousingRecords.ts'
+      - 'apps/web/src/pages/TalentServiceRoutes.tsx'
+      - 'apps/web/src/components/talent/UnifiedPolicyList.tsx'
+      - 'apps/web/scripts/test-jiangxi-city-v51.mjs'
+      - '.github/workflows/hhba-jiangxi-branch-ci.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Jiangxi cities, housing, sources, search and guides
+        working-directory: apps/web
+        run: |
+          node scripts/test-jiangxi-city-v51.mjs
+          node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+          node --experimental-strip-types scripts/test-talent-cities.mjs
+      - name: Build complete HHBA website without deployment
+        working-directory: apps/web
+        run: npm run build
+      - name: Upload isolated static preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jiangxi-11-city-v51-static-preview-build
+          path: apps/web/dist/
+          if-no-files-found: error
