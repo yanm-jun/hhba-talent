@@ -1,0 +1,313 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-061",
+  "name": "美迈科技",
+  "displayName": "美迈科技",
+  "englishName": "Miracle Miles",
+  "aliases": [
+    "美迈科技有限公司",
+    "Miracle Miles",
+    "Dream Pairs",
+    "Bruno Marc",
+    "Nortiv8",
+    "美迈科技2027校招"
+  ],
+  "industry": "全球鞋履品牌 · 跨境零售 · 产品设计 · 数据驱动电商",
+  "subtitle": "美迈科技有限公司 · 湖南长沙 · 海外品牌与跨境鞋履运营",
+  "overview": "美迈科技（Miracle Miles）成立于2017年，以长沙为总部，在深圳、福州等地及海外设有团队，拥有Dream Pairs、Bruno Marc、Nortiv8等鞋履品牌。公司发展依靠自主鞋履品牌、跨境平台运营、产品企划、海外营销和供应链能力。暨南大学就业网站刊载了2027届校招简章及各岗位的城市、简介和要求；具体开放情况以其官网校招通道为准。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.mirmiles.com/",
+    "https://www.mirmiles.com/join.html",
+    "https://scdc.jnu.edu.cn/campus/view/id/1037976",
+    "https://mirmiles.zhiye.com/campus"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-061/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-061/photo1.svg",
+        "caption": "美迈科技 · 鞋履品牌业务示意",
+        "alt": "鞋履产品、品牌研发主题的非实景信息图",
+        "note": "HHBA原创示意图，不是公司品牌或产品原始摄影。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-061/photo2.svg",
+        "caption": "美迈科技 · 全球电商与供应链业务示意",
+        "alt": "跨境电商运营与物流场景的非实景图",
+        "note": "HHBA独立制作的信息图，非公司仓库现场实拍。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://mirmiles.zhiye.com/campus",
+    "label": "美迈科技官方2027校园招聘",
+    "status": "official_portal",
+    "subject": "美迈科技有限公司",
+    "note": "官方加入我们页明确连接此校招系统，岗位来自2027年暨南大学公开的校招简章。系统职位列表可能动态为0，平台仅保留来源记录和历史观察，不宣称实时开放。"
+  },
+  "majorIntro": "美迈科技2027届校招简章明确岗位、工作城市、部分语言条件与专业偏好；标为不限专业的岗位不因建议性专业列表而排除其他专业。",
+  "preferredMajors": [
+    "电子商务",
+    "市场营销",
+    "国际商务",
+    "服装与服饰设计",
+    "产品设计",
+    "视觉传达设计",
+    "数字媒体艺术",
+    "物流管理",
+    "供应链管理",
+    "人力资源管理",
+    "工商管理",
+    "英语"
+  ],
+  "photoNote": "目前保留三张独立的本地原创SVG示意图，包括明确标注非官方的文字识别图及两张业务图；不是企业官网Logo或真实鞋履产品摄影，取得可核验正式素材后再换。",
+  "business": [
+    {
+      "title": "全球鞋履自主品牌",
+      "description": "围绕Dream Pairs、Dream Pairs Kids、Bruno Marc、Nortiv8等品牌服务不同国家、性别与场景的鞋履消费者。",
+      "tags": "品牌 · 鞋履",
+      "details": [
+        "女鞋与童鞋品牌",
+        "男鞋时尚生活方式",
+        "户外及运动鞋履"
+      ]
+    },
+    {
+      "title": "鞋类产品企划与设计",
+      "description": "研究趋势与消费者需求，完成鞋款企划、样品、材质、视觉和上市全流程协同。",
+      "tags": "产品 · 设计",
+      "details": [
+        "鞋类创意设计",
+        "市场趋势与需求洞察",
+        "设计与生产开发协作"
+      ]
+    },
+    {
+      "title": "全球电商销售运营",
+      "description": "面向海外主流电商渠道开展商品运营、增长分析、定价和经营管理。",
+      "tags": "电商 · 数据",
+      "details": [
+        "跨境平台运营",
+        "商品生命周期管理",
+        "数据驱动销售分析"
+      ]
+    },
+    {
+      "title": "海外品牌营销与内容",
+      "description": "开展海外营销投放、KOL合作、Deals渠道、社媒与短视频业务，支持品牌建设。",
+      "tags": "海外营销 · TikTok",
+      "details": [
+        "海外达人与社媒营销",
+        "国际广告与活动策划",
+        "TikTok内容电商"
+      ]
+    },
+    {
+      "title": "全球供应链与海外仓",
+      "description": "连接鞋履研发、生产供应商、质量控制、物流和海外仓仓配履约。",
+      "tags": "供应链 · 仓储",
+      "details": [
+        "供应计划管理",
+        "海外仓运作",
+        "质量与物流交付"
+      ]
+    },
+    {
+      "title": "科技系统与组织支持",
+      "description": "通过IT数据技术、AI辅助创意和组织人力等职能赋能品牌和跨境业务运营。",
+      "tags": "数字化 · HR",
+      "details": [
+        "AI辅助创意设计",
+        "营销及运营数据系统",
+        "招聘培养与组织发展"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "sales-ops",
+      "title": "销售运营专员（2027届）",
+      "category": "跨境电商运营",
+      "summary": "参与跨境电商平台重点鞋履品类销售运营，关注消费者需求、商品表现及销售数据分析。",
+      "requirements": "校招简章写明不限专业、CET-6，期待数据敏感、逻辑清晰、具有商业思维与沟通推进能力；该岗位明确在长沙。",
+      "majorNames": [
+        "电子商务",
+        "国际商务",
+        "市场营销",
+        "统计学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": true,
+      "educationLabel": "2027届 · 专业不限 · CET-6",
+      "city": "长沙",
+      "url": "https://mirmiles.zhiye.com/campus",
+      "evidenceUrl": "https://scdc.jnu.edu.cn/campus/view/id/1037976",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "美迈科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "marketing",
+      "title": "营销推广专员（2027届）",
+      "category": "海外市场营销",
+      "summary": "参与海外达人合作、广告投放、渠道推广和营销项目推进，方向包括KOL、Deals及Ads。",
+      "requirements": "简章要求英语可作为工作语言，专业不限；重视主动性、数据理解和海外营销兴趣，海外生活或留学经历优先。招募方向明确涉及KOL、Deals和Ads，具体团队按官网分配。",
+      "majorNames": [
+        "市场营销",
+        "广告学",
+        "英语",
+        "网络与新媒体"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": true,
+      "educationLabel": "2027届 · 专业不限 · 英语工作语言",
+      "city": "长沙／深圳",
+      "url": "https://mirmiles.zhiye.com/campus",
+      "evidenceUrl": "https://scdc.jnu.edu.cn/campus/view/id/1037976",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "美迈科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "tiktok",
+      "title": "TikTok运营专员（2027届）",
+      "category": "海外电商 / 内容",
+      "summary": "参与TikTok店铺策略、商品投放与内容营销，跟踪数据并开展优化复盘。",
+      "requirements": "简章列深圳、专业不限、CET-6；重视内容平台兴趣、数据分析、细致耐心与复盘能力。校招正文强调数据复盘，不据此推断额外学历和年限。",
+      "majorNames": [
+        "电子商务",
+        "网络与新媒体",
+        "市场营销",
+        "数据科学与大数据技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": true,
+      "educationLabel": "2027届 · 专业不限 · CET-6",
+      "city": "深圳",
+      "url": "https://mirmiles.zhiye.com/campus",
+      "evidenceUrl": "https://scdc.jnu.edu.cn/campus/view/id/1037976",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "美迈科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "product-planning",
+      "title": "产品企划专员（2027届）",
+      "category": "鞋履产品企划",
+      "summary": "参与鞋履市场趋势、选品企划、产品上市和销售数据复盘，协同团队把商品机会转为产品计划。",
+      "requirements": "简章标注不限专业，需对时尚鞋服有兴趣，具备逻辑思考、市场洞察及数据分析意识；工作城市长沙或深圳。岗位需参与从新品企划到上市表现复盘的跨部门流程。",
+      "majorNames": [
+        "工业设计",
+        "产品设计",
+        "市场营销",
+        "服装与服饰设计"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": true,
+      "educationLabel": "2027届 · 专业不限",
+      "city": "长沙／深圳",
+      "url": "https://mirmiles.zhiye.com/campus",
+      "evidenceUrl": "https://scdc.jnu.edu.cn/campus/view/id/1037976",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "美迈科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "shoe-design",
+      "title": "产品设计专员（2027届）",
+      "category": "鞋履设计",
+      "summary": "参与鞋款设计全流程，从趋势、手绘和样品开发到量产上架。",
+      "requirements": "简章列服装与服饰设计等设计类专业优先，重视手绘、审美、颜色与材质感觉及PS/AI技能；地点长沙或深圳。",
+      "majorNames": [
+        "服装与服饰设计",
+        "产品设计",
+        "视觉传达设计",
+        "工业设计"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 设计类专业优先",
+      "city": "长沙／深圳",
+      "url": "https://mirmiles.zhiye.com/campus",
+      "evidenceUrl": "https://scdc.jnu.edu.cn/campus/view/id/1037976",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "美迈科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ai-graphic",
+      "title": "AI平面设计师（2027届）",
+      "category": "创意视觉设计",
+      "summary": "使用AI工具与设计方法参与品牌视觉体系及海外商业视觉素材制作。",
+      "requirements": "简章列视觉传达类专业优先，重视视觉审美、系列化创意能力和AI辅助设计；海外经历为加分项，工作地长沙。",
+      "majorNames": [
+        "视觉传达设计",
+        "数字媒体艺术",
+        "艺术设计学",
+        "产品设计"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 视觉传达类优先",
+      "city": "长沙",
+      "url": "https://mirmiles.zhiye.com/campus",
+      "evidenceUrl": "https://scdc.jnu.edu.cn/campus/view/id/1037976",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "美迈科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "overseas-warehouse",
+      "title": "海外仓运营专员（2027届）",
+      "category": "物流 / 供应链",
+      "summary": "支持美国海外仓库存、物流协调、订单履约和跨境销售交付。",
+      "requirements": "简章列物流及供应链专业优先、英语可作为工作语言、可以赴美国出差；需注重细节、供应链逻辑和执行协作。此处赴美为出差要求，并非默认长期外派岗位。",
+      "majorNames": [
+        "物流管理",
+        "供应链管理",
+        "国际经济与贸易",
+        "电子商务"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 物流/供应链专业优先",
+      "city": "长沙",
+      "url": "https://mirmiles.zhiye.com/campus",
+      "evidenceUrl": "https://scdc.jnu.edu.cn/campus/view/id/1037976",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "美迈科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hr",
+      "title": "人力资源专员（2027届）",
+      "category": "人力资源管理",
+      "summary": "在招聘、培训、绩效及员工关系等模块参与轮岗，支持人力资源项目。",
+      "requirements": "简章注明不限专业，期待沟通协调、人际洞察、自驱和运用AI工具提升效率；工作地长沙。校招正文提及参与不同HR模块轮岗，不等于承诺固定轮岗周期。",
+      "majorNames": [
+        "人力资源管理",
+        "工商管理",
+        "心理学",
+        "劳动与社会保障"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": true,
+      "educationLabel": "2027届 · 专业不限",
+      "city": "长沙",
+      "url": "https://mirmiles.zhiye.com/campus",
+      "evidenceUrl": "https://scdc.jnu.edu.cn/campus/view/id/1037976",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "美迈科技有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}

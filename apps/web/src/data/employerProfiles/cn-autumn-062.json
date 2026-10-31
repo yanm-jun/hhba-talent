@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-062",
+  "name": "厦门国资运",
+  "displayName": "厦门国有资本运营",
+  "englishName": "Xiamen State-owned Capital Operation",
+  "aliases": [
+    "厦门国有资本运营有限责任公司",
+    "厦门国有资本公司",
+    "厦门国资运营",
+    "厦门国资运",
+    "厦门国有资本2027届管培生"
+  ],
+  "industry": "国有资本运营 · 产业投资 · 资产盘活 · 片区开发",
+  "subtitle": "厦门国有资本运营有限责任公司 · 福建厦门 · 市属国有资本运营平台",
+  "overview": "厦门国有资本运营有限责任公司2020年8月挂牌，定位为厦门市产业投资平台，围绕产业投资、资本运作、资产盘活和片区开发开展业务，旗下包括文旅投资、国有资本投资、基金管理及城市规划设计等主体。2027届管培生招录公开转载资料显示“综合管理”与“专业技术”两个方向，以及2026年11月30日投递截止信息；学历信息在不同平台存在本科和硕士两种说法，页面采用明确标注的谨慎口径。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.xmzbyy.com/Home/About",
+    "https://www.eoffcn.com/kszx/detail/2226487.html",
+    "https://cqu.cqbys.com/campus/view/id/738873",
+    "https://www.fenbi.com/page/exam-information-detail/470043672996864"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-062/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-062/photo1.svg",
+        "caption": "厦门国资运 · 产业投资业务示意",
+        "alt": "产业投资和资本运作非实景视觉",
+        "note": "HHBA原创业务示意，不是国资公司真实办公楼。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-062/photo2.svg",
+        "caption": "厦门国资运 · 资产盘活与片区开发示意",
+        "alt": "产业片区与资产管理的非实景信息图",
+        "note": "非企业实景、非项目现场照片。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://cqu.cqbys.com/campus/view/id/738873",
+    "label": "高校转载的2027届管培公告（非官方网申）",
+    "status": "unconfirmed",
+    "subject": "厦门国有资本运营有限责任公司",
+    "note": "仅提供高校公告页面供阅读，无法从公开资料核准其二维码投递接口；不是官方网投入口。转载学历出现硕士及以上与本科及以上冲突，请以公司原始公告为准。"
+  },
+  "majorIntro": "已核对公开转载列出综合管理和专业技术两个管培方向；相关专业是基于业务的探索建议，不能理解为正式公告明确要求。研究生学历口径存在转载差异，先提示核实。",
+  "preferredMajors": [
+    "金融学",
+    "经济学",
+    "会计学",
+    "财务管理",
+    "法学",
+    "工商管理",
+    "人力资源管理",
+    "公共事业管理",
+    "城市规划",
+    "城乡规划",
+    "土木工程",
+    "计算机科学与技术",
+    "投资学"
+  ],
+  "photoNote": "本地暂为3张独立SVG示意素材，企业文字标识明确写“非官方”，业务视觉明确注明“非企业实景”。不得以此替代正式Logo及总部照片；待可追溯可使用的真实图片再更新。",
+  "business": [
+    {
+      "title": "产业投资与股权管理",
+      "description": "面向厦门重点产业领域开展股权投资、产业项目培育及资金与产业资源匹配。",
+      "tags": "产业 · 股权",
+      "details": [
+        "重点产业投资布局",
+        "投资项目尽职调查",
+        "产业资源与资本协同"
+      ]
+    },
+    {
+      "title": "国有资本运作与改革",
+      "description": "通过资本运营、股权整合及投融资协同参与市属国资国企市场化改革。",
+      "tags": "资本 · 改革",
+      "details": [
+        "国有资本保值增值",
+        "资本与产业协同",
+        "国企改革项目"
+      ]
+    },
+    {
+      "title": "存量资产盘活与管理",
+      "description": "通过资产管理、租赁经营和盘活机制提升存量资产的使用和经营效率。",
+      "tags": "存量资产 · 经营",
+      "details": [
+        "存量资产管理",
+        "租赁与物业经营支持",
+        "资产经营管理"
+      ]
+    },
+    {
+      "title": "城市片区开发与运营",
+      "description": "参与重点片区开发、城市空间及产业载体运营，服务城市发展战略。",
+      "tags": "城市 · 片区",
+      "details": [
+        "片区与产业载体建设",
+        "城市公共资源优化",
+        "相关项目经营协调"
+      ]
+    },
+    {
+      "title": "文旅与公共文化产业",
+      "description": "旗下厦门文旅投资集团等企业涉及文旅资源整合、文化设施与市场运营。",
+      "tags": "文旅 · 城市服务",
+      "details": [
+        "文化旅游投资",
+        "文旅项目经营",
+        "城市文化资源整合"
+      ]
+    },
+    {
+      "title": "产业基金与城市规划设计",
+      "description": "通过旗下基金管理公司和城市规划设计院开展基金、投资研究及规划设计等专业能力。",
+      "tags": "基金 · 规划",
+      "details": [
+        "基金设立与管理支持",
+        "产业研究与项目评估",
+        "城市规划设计服务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "management-2027",
+      "title": "综合管理方向管培生（2027届）",
+      "category": "综合管理",
+      "summary": "2027届管培项目公开转载的综合管理方向，属于管理及运营培养通道，可能涉及跨部门轮岗。",
+      "requirements": "高校公告转载注明2027届及择业期应届生、硕士研究生及以上；其他平台曾写本科及以上，存在冲突。具体职能分配、专业限制及网申条件须核验公司官方原附件，不作统一肯定。",
+      "majorNames": [
+        "工商管理",
+        "人力资源管理",
+        "财务管理",
+        "会计学",
+        "法学",
+        "公共事业管理"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 转载称硕士及以上（有冲突，须核实）",
+      "city": "福建省厦门市",
+      "url": "https://cqu.cqbys.com/campus/view/id/738873",
+      "evidenceUrl": "https://www.eoffcn.com/kszx/detail/2226487.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "厦门国有资本运营有限责任公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "professional-2027",
+      "title": "专业技术方向管培生（2027届）",
+      "category": "投资 / 专业技术",
+      "summary": "2027管培公告转载确认专业技术方向，但没有公开可核实的各独立专业技术岗位名称和分配安排。",
+      "requirements": "转载公告对学历的表述为硕士及以上，同一届其他聚合页写本科及以上，须以原件为准。金融、经济、规划、工程及信息技术等为业务关联的探索建议，并非经官方确认的逐岗专业要求。两个来源的学历要求存在冲突，禁止直接据此判断报考资格。",
+      "majorNames": [
+        "金融学",
+        "投资学",
+        "经济学",
+        "城乡规划",
+        "土木工程",
+        "计算机科学与技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 转载称硕士及以上（有冲突，须核实）",
+      "city": "福建省厦门市",
+      "url": "https://cqu.cqbys.com/campus/view/id/738873",
+      "evidenceUrl": "https://www.eoffcn.com/kszx/detail/2226487.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "厦门国有资本运营有限责任公司",
+      "currentOpenVerified": false
+    }
+  ]
+}

@@ -3,7 +3,7 @@ import {existsSync,readFileSync} from 'node:fs';
 const root='src/data/employerProfiles/';
 const expected=[['057','line plus',4],['058','招商金科',1],['059','中盈优创',3]];
 const page=readFileSync('src/pages/UnifiedV2CompanyPage.tsx','utf8');
-assert(page.includes("05[0-9])$/.test(id)"),'batch range not connected to V2 template');
+assert(page.includes("06[0-2])$/.test(id)"),"V2 includes 057-059 and 060-062");
 assert(page.includes("if(batch3756)return job.category===major"),'category job filtering missing');
 for(const [num,name,count] of expected){
  const id='cn-autumn-'+num,p=JSON.parse(readFileSync(root+id+'.json','utf8'));

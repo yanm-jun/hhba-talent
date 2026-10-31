@@ -4,7 +4,7 @@ import {createHash} from 'node:crypto';
 const read=p=>readFileSync(p,'utf8');
 const ids=['054','055','056'],names=['海程邦达','长隆科技','维音'],jobCount=[1,5,2];
 const page=read('src/pages/UnifiedV2CompanyPage.tsx');
-assert(page.includes("const batch3756=/^cn-autumn-(?:03[7-9]|04[0-9]|05[0-6])$/.test(id)"),'V2 original template reused');
+assert(page.includes("const batch3756=/^cn-autumn-")&&page.includes("06[0-2])$/.test(id)"),"V2 template covers all existing batches");
 assert(page.includes('if(batch3756)return job.category===major'),'Exact role category filters');
 assert(page.includes('j.category===g.label'),'Job group counts');
 assert(page.includes('hhba-kpmg-photo-grid')&&page.includes('hhba-kpmg-service-grid'),'2-photo panel and business panels');
