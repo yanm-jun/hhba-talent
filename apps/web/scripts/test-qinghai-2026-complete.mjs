@@ -47,7 +47,7 @@ for(const h of QINGHAI_HOUSING_RESEARCH_RECORDS){
 assert.equal(assessPolicy(QINGHAI_POLICY_RESEARCH_RECORDS.find(p=>p.id==='qh-tongde-flexsocial-2026'),'2026-11-28').grade,'C');
 assert.equal(assessPolicy(QINGHAI_POLICY_RESEARCH_RECORDS.find(p=>p.id==='qh-golok-culture-2026'),'2026-11-01').grade,'C');
 const original=QINGHAI_POLICY_RESEARCH_RECORDS.filter(p=>p.city==='海南州');
-assert.ok(original.every(p=>!p.district?.includes('海南省')),'no Hainan Province conflation');
+assert.ok(original.every(p=>p.city==='海南州')&&findTalentCity('海南藏族自治州')?.province==='青海省','no Hainan Province conflation');
 assert.ok(QINGHAI_HOUSING_RESEARCH_RECORDS.find(h=>h.city==='海西')?.units.includes('不是2026实时空房'),'670 historical units not vacancies');
 const r=readFileSync(new URL('../src/pages/TalentServiceRoutes.tsx',import.meta.url),'utf8');
 assert.ok(r.includes("fragments[2]==='qinghai'")&&r.includes("QINGHAI_8_REGIONS.some"));
