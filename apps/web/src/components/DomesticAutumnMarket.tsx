@@ -19,10 +19,12 @@ const jobs=[...jobsJSON.jobs,...pfizerJobsJSON.jobs] as DomesticRecord[];
 const additionalEvidence=officialEvidence.entries as Record<string,{officialRecruitment:string|null;source:string|null}>;
 const reviewed=(e:Employer)=>employerProfileById.get(e.id);
 const displayCompany=(e:Employer)=>reviewed(e)?.name||e.name;
-const recruitmentLink=(e:Employer)=>e.officialUrl||additionalEvidence[e.name]?.officialRecruitment||(reviewed(e)?.recruitment.status==='official_portal'?reviewed(e)!.recruitment.url:null);
+const recruitmentLink=(e:Employer)=>reviewed(e)?(reviewed(e)!.recruitment.status==='official_portal'?reviewed(e)!.recruitment.url:null):(e.officialUrl||additionalEvidence[e.name]?.officialRecruitment||null);
+const archiveLink=(e:Employer)=>reviewed(e)?.recruitment.status==='archived_source'?reviewed(e)!.recruitment.url:null;
 function evidenceLabel(e:Employer){
  if(recruitmentLink(e))return '招聘官网入口已定位';
- if(reviewed(e)?.jobs.length)return reviewed(e)?.recruitment.status==='unconfirmed'?'岗位方向已收录·投递入口待核':'企业岗位资料已收录';
+ if(archiveLink(e))return '招聘公开资料已收录（非官方网申）';
+ if(reviewed(e)?.jobs.length)return '岗位资料已收录·投递状态待核';
   if(e.evidenceUrl)return '招聘公告已有来源';
  if(additionalEvidence[e.name]?.source)return '企业资料已有来源';
  return '招聘信息待核验';
@@ -119,7 +121,7 @@ export function DomesticAutumnMarket({compact=false,standalone=false,query='',ma
    if(![item.name,displayCompany(item),...(reviewed(item)?.aliases||[])].some(x=>normalize(x).includes(normalize(directoryText.trim()))))return false;
    if(directoryStatus==='with_jobs')return jobs.some(j=>j.company===item.name)||(reviewed(item)?.jobs.length||0)>0;
    if(directoryStatus==='with_entry')return !!recruitmentLink(item);
-   if(directoryStatus==='not_checked')return !recruitmentLink(item)&&!item.evidenceUrl&&!additionalEvidence[item.name]?.source;
+   if(directoryStatus==='not_checked')return !recruitmentLink(item)&&!archiveLink(item)&&!item.evidenceUrl&&!additionalEvidence[item.name]?.source;
    return true;
  }),[directoryText,directoryStatus]);
  if(foreignOnly&&!standalone)return null;
@@ -154,8 +156,9 @@ export function DomesticAutumnMarket({compact=false,standalone=false,query='',ma
       <AutumnCompanyCover name={displayCompany(e)} id={e.id} kind="directory"/>
       <div><Link className="hhba-autumn-company-index-link" to={'/companies/autumn/'+e.id} title={'查看'+displayCompany(e)+'企业档案'}><AutumnCompanyBrand name={displayCompany(e)}/><strong>{displayCompany(e)}</strong></Link><small>{e.screenshotGroup.replace('截图组A：','').replace('截图组B：','')} · {evidenceLabel(e)}</small></div>
       <div className="hhba-autumn-row-actions"><Link to={'/companies/autumn/'+e.id} className="hhba-autumn-row-detail">企业详情 <ArrowRight size={13}/></Link>
-      {safeUrl(recruitmentLink(e))?<a href={safeUrl(recruitmentLink(e))!} data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">招聘官网 <ExternalLink size={14}/></a>:
-        <span className="hhba-domestic-pending">{e.evidenceUrl?'官网待核验':'待核验'}</span>}</div>
+      {safeUrl(recruitmentLink(e))?<a href={safeUrl(recruitmentLink(e))!} data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">企业招聘栏目 <ExternalLink size={14}/></a>:
+       safeUrl(archiveLink(e))?<a href={safeUrl(archiveLink(e))!} data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">公开招聘公告（非官方网申） <ExternalLink size={14}/></a>:
+        <span className="hhba-domestic-pending">{e.evidenceUrl?'招聘入口待核验':'待核验'}</span>}</div>
     </article>)}</div>
   </section>}
   {!standalone&&<Link className="hhba-domestic-autumn-bottom" to="/candidate/domestic-autumn">完整查看截图 156 家企业的招聘核验状态与岗位档案 <ArrowRight size={15}/></Link>}
