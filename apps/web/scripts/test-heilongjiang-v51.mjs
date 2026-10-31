@@ -54,5 +54,5 @@ assert.ok(![...policies,...housing].some(x=>JSON.stringify(x).includes('${')),'U
 const read=p=>readFileSync(new URL('../src/'+p,import.meta.url),'utf8');
 assert.ok(read('components/talent/UnifiedPolicyList.tsx').includes("'hlj-'"));
 assert.ok(read('pages/TalentServiceRoutes.tsx').includes('buildHeilongjiangGuide('));
-assert.ok(read('pages/TalentCityDirectory.tsx').includes('totals.regions'));
+assert.ok(read('pages/TalentCityDirectory.tsx').includes('totals.otherPrefectures'));
 console.log('PASS Heilongjiang V5.1: 13 regions, 52 policy entries, 32 housing references, 52 shared guides, 306 national entries.');
