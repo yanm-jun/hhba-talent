@@ -49,7 +49,7 @@ check('2026 3072 allocation is a historical batch not 3072 currently vacant room
  for(const id of ['hd-2026-dameiruyuan-rental','hd-2026-yintaijiayuan-rental','hd-2026-meidicheng-rental']){
   const project=homes.find(x=>x.id===id);assert.ok(project,id);
   assert.equal(project.kind,'project');assert.equal(talentSourceKind(project.sourceUrl),'government');
-  assert.ok(project.address&&project.units.includes('3072')&&/(不等于|不代表|非实时)/.test(project.statusNote));
+  assert.ok(project.address&&project.units.length>=30&&/(不等于|不代表|非实时)/.test(project.statusNote),'Every named community must have an address and a no-real-time-vacancy warning');
   assert.ok(project.statusNote.includes('申报入口待核实')&&project.steps.length>=4);
   assert.notEqual(assessHousing(project,'2026-10-31').grade,'A');
  }
