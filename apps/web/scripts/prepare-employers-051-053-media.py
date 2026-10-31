@@ -28,7 +28,7 @@ CFG={
    "find":[],"note":"Headquarters image from university company listing; second picture from Hongchuan Group official Nangtong port operations news."},
  "053":{"name":"兰石集团","logoFallback":True,"logo":[],
    "logoFind":["https://www.lsjt.com.cn/","https://www.lansland.com/","https://www.lsjt.com.cn/lsgroup/lsgroup/guanyulanshijt/fazhanlicheng/index.html"],
-   "photo1":["https://www.lsjt.com.cn/upload/1/cms/content/20251228/2005153501508898816.jpg"],
+   "photo1":["https://www.lansland.com/upload/1/cms/content/20251228/2005153501508898816.jpg"],
    "photo2":["https://www.lzxq.gov.cn/pic/003/020/730/00302073073_379c00e6.jpg"],
    "find":[],"note":"Official group industrial park and government reported 125MN press of Lanshi subsidiary."}
 }
@@ -109,6 +109,14 @@ for number,cfg in CFG.items():
     try:
      options.extend([u for u,sc in article_images(page,True)[:7]])
     except Exception as e:print('LOGO_FIND_FAIL',number,str(e)[:90],flush=True)
+  if filename=='photo1.jpg' and number=='053':
+   for page in ['https://www.lansland.com/lsgroup/lsgroup/guanyulanshijt/index.html',
+                'https://www.lansland.com/lsgroup/lsgroup/xinwenxuanchuan1995796606296453121/jituanyaowen/2028343080758349825.html']:
+    try:
+     listed=article_images(page)
+     print('OFFICIAL_LANSHI_PHOTO_CANDIDATES',page,listed[:8],flush=True)
+     options.extend(u for u,sc in listed if sc>=1 and not re.search('logo|banner|nav|icon',u,re.I))
+    except Exception as e:print('LANSHI_PAGE_WARN',page,str(e)[:130],flush=True)
   if filename=='photo2.jpg' and number=='052':
    for page in ['https://www.grgroup.cc/newsview/17571.html','https://www.grgroup.cc/newsview/18029.html']:
     try:
