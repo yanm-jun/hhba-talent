@@ -377,7 +377,10 @@ export function findTalentCity(input:string){
  const q=normalize(input);
  if(!q)return null;
  const matches=TALENT_CITY_INDEX.filter(c=>c.aliases.some(a=>normalize(a)===q));
- return matches.length===1?matches[0]:null; // Avoid silently selecting a wrong city for ambiguous pinyin initials.
+ // The seed index and nationwide index may both contain the same city. Collapse
+ // only same-name duplicates; keep different cities with shared initials ambiguous.
+ const unique=[...new Map(matches.map(c=>[c.name,c])).values()];
+ return unique.length===1?unique[0]:null; // Never guess between distinct cities sharing abbreviations.
 }
 const matchingAliases=TALENT_CITY_INDEX.flatMap(city=>city.aliases
  .filter(a=>!(/^[a-z]{2}$/i.test(a)))
