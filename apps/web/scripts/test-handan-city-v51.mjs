@@ -33,7 +33,7 @@ check('Different cohorts, degrees, eligibility and recipients cannot be collapse
  assert.equal(policies.find(x=>x.id==='hd-2026-young-talent-apartments').payoutTo,'住房折扣');
 });
 check('2026 3072 allocation is a historical batch not 3072 currently vacant rooms',()=>{
- assert.equal(homes.length,2);
+ assert.equal(homes.length,5);
  for(const id of homeIds){const h=homes.find(x=>x.id===id);assert.ok(h,id);
   assert.equal(h.kind,'program');assert.equal(talentSourceKind(h.sourceUrl),'government');
   assert.ok(h.steps.length>=4&&h.statusNote.includes('不等于')&&h.statusNote.includes('申报'),id);
@@ -45,7 +45,14 @@ check('2026 3072 allocation is a historical batch not 3072 currently vacant room
  assert.ok(rental.rent.includes('11.31')&&rental.rent.includes('6.43'));
  const talent=homes.find(x=>x.id==='hd-2026-youth-talent-apartment-program');
  assert.ok(talent.rent.includes('免租')&&talent.units.includes('80'));
- assert.equal(homes.filter(x=>x.kind==='project').length,0,'No false independently verifiable building');
+ assert.equal(homes.filter(x=>x.kind==='project').length,3,'Only government-named historical housing communities count as projects');
+ for(const id of ['hd-2026-dameiruyuan-rental','hd-2026-yintaijiayuan-rental','hd-2026-meidicheng-rental']){
+  const project=homes.find(x=>x.id===id);assert.ok(project,id);
+  assert.equal(project.kind,'project');assert.equal(talentSourceKind(project.sourceUrl),'government');
+  assert.ok(project.address&&project.units.includes('3072')&&project.statusNote.includes('不等于'));
+  assert.ok(project.statusNote.includes('申报入口待核实')&&project.steps.length>=4);
+  assert.notEqual(assessHousing(project,'2026-10-31').grade,'A');
+ }
 });
 check('Handan routes use shared V5.1 listing, search and relevant housing policies',()=>{
  const routes=readFileSync(new URL('../src/pages/TalentServiceRoutes.tsx',import.meta.url),'utf8');
@@ -54,4 +61,4 @@ check('Handan routes use shared V5.1 listing, search and relevant housing polici
  assert.ok(routes.includes('housingPrograms=resultHomes.filter'));
  assert.equal(assessTalentCity('邯郸','2026-10-31').accepted,false);
 });
-console.log(JSON.stringify({passed,city:'邯郸',policies:policies.length,housingPrograms:homes.length,certifiedProjects:0},null,2));
+console.log(JSON.stringify({passed,city:'邯郸',policies:policies.length,housingRecords:homes.length,verifiedNamedHistoricalProjects:3},null,2));
