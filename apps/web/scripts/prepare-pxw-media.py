@@ -19,8 +19,8 @@ items=[
   ('https://static2.xunxiang.site/uploads/sites/210/2024/11/170a39b4d788220443511538ad54d3eb.png','https://www.pxwsemi.com/')
  ]),
  ('photo1.jpg',[
-  ('https://static.mianbaoban-assets.eet-china.com/xinyu-images/MBXY-CR-7dc7fd7c6b7bece7394ec21ff72420c7.png','https://www.eet-china.com/mp/a466733.html'),
-  ('https://i5.szhomeimg.com/o/2024/01/19/011919244918191.JPG','https://bbs.szhome.com/30-30430-detail-178644741.html')
+  ('https://i5.szhomeimg.com/o/2024/01/19/011919244918191.JPG','https://bbs.szhome.com/30-30430-detail-178644741.html'),
+  ('https://static.mianbaoban-assets.eet-china.com/xinyu-images/MBXY-CR-7dc7fd7c6b7bece7394ec21ff72420c7.png','https://www.eet-china.com/mp/a466733.html')
  ]),
  ('photo2.jpg',[
   ('https://static2.xunxiang.site/uploads/sites/210/2025/03/8681d2fd0faebdc026de88d40dd0e2a9.jpg','https://www.pxwsemi.com/%E7%94%9F%E6%B4%BB%E4%B8%8E%E7%A6%8F%E5%88%A9'),
