@@ -23,19 +23,19 @@
     "https://www.wondercv.com/xiaozhao/zhongying-youchuang-2027-campus-recruitment-19952-a26262/"
   ],
   "media": {
-    "logo": "images/employer-profiles/cn-autumn-059/logo.png",
+    "logo": "images/employer-profiles/cn-autumn-059/logo.svg",
     "photos": [
       {
-        "path": "images/employer-profiles/cn-autumn-059/photo1.jpg",
-        "caption": "中盈优创 · 官方业务产品视觉",
-        "alt": "中盈优创官网智慧云网产品相关业务图",
-        "note": "官网产品或方案页面配图，不表示某个生产基地或总部实景。"
+        "path": "images/employer-profiles/cn-autumn-059/photo1.svg",
+        "caption": "中盈优创 · 业务主题示意图1",
+        "alt": "中盈优创业务板块信息可视化插画",
+        "note": "HHBA原创说明性视觉，非企业真实办公现场或官方产品摄影。"
       },
       {
-        "path": "images/employer-profiles/cn-autumn-059/photo2.jpg",
-        "caption": "中盈优创 · AI运维与行业数字化视觉",
-        "alt": "中盈优创公司官网展示的业务技术场景图片",
-        "note": "优先选择同公司官网第二张不同的产品或新闻业务配图；若失效则采用明确标识的示意图。"
+        "path": "images/employer-profiles/cn-autumn-059/photo2.svg",
+        "caption": "中盈优创 · 业务主题示意图2",
+        "alt": "中盈优创业务板块信息可视化插画",
+        "note": "HHBA原创说明性视觉，非企业真实办公现场或官方产品摄影。"
       }
     ]
   },
@@ -60,7 +60,7 @@
     "工商管理",
     "数学与应用数学"
   ],
-  "photoNote": "Logo及业务图像仅采用可确认中盈优创主体的官网资源；不得将网络拓扑示意或产品视觉称作真实办公室照片。素材本地化并保留SHA-256与网页来源；缺图采用标记的非实景编辑图。",
+  "photoNote": "当前提供3张相互独立的本地SVG视觉（1张非官方字标、2张原创业务示意图）。均非官方Logo或真实企业照片，不能冒充实景；待取得可核验、可使用的官方图片后再替换。",
   "business": [
     {
       "title": "UniOS数字基础设施操作系统",
