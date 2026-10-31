@@ -222,7 +222,7 @@ jobs:
       - name: Package 072-074 true-source corporate/government imagery with audited fallback
         working-directory: apps/web
         run: python scripts/prepare-employers-072-074-sourced-media.py
-      - name: Package source-audited 078-080 photos and verified brand references after approval
+      - name: Package 078-080 audited documentary media
         working-directory: apps/web
         run: python scripts/prepare-employers-078-080-source-media.py
       - name: Install dependencies
@@ -249,15 +249,26 @@ jobs:
       - name: Test 072-074 shared four-panel, truthful job sources, media and application status
         working-directory: apps/web
         run: node scripts/employers-072-074-v2.contract.test.mjs
-      - name: Validate 075-077 inherited full profiles and role sourcing
+      - name: Verify 075-077 previous employer cohort
         working-directory: apps/web
         run: node scripts/employers-075-077-v2.contract.test.mjs
-      - name: Validate 078-080 sourced images, professional filters and recruitment links
+      - name: Verify 078-080 enterprise job and image records
         working-directory: apps/web
         run: node scripts/employers-078-080-v2.contract.test.mjs
       - name: Validate MINIEYE 035 source-backed positions, six major tabs and real media
         working-directory: apps/web
         run: node scripts/minieye-v2.contract.test.mjs
+      - name: Guard all 337 city policy/housing counters against stale empty cards
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/audit-talent-city-ui.mjs
+      - name: Audit screenshot provinces and recovered Guizhou policy before release
+        working-directory: apps/web
+        run: |
+          node --experimental-strip-types scripts/test-screenshot-province-coverage.mjs
+          node --experimental-strip-types scripts/test-guizhou-city-v51.mjs
+      - name: Verify Guiyang 2026 complete policy and housing catalog before publication
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-guiyang-2026-complete.mjs
       - name: Validate source-backed talent policies and housing records
         working-directory: apps/web
         run: node scripts/audit-talent-service.mjs
@@ -900,6 +911,9 @@ jobs:
         uses: actions/configure-pages@v5
         with:
           enablement: true
+      - name: Record deployed commit and 337 official data counts in Pages manifest
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/write-talent-city-manifest.mjs
       - name: Upload exactly the public built site
         uses: actions/upload-pages-artifact@v3
         with:

@@ -1,3 +1,6 @@
+import {GUIZHOU_9_REGIONS,guizhouGuideUrl,buildGuizhouGuide} from '../data/guizhouGuides';
+import {getTalentCitySnapshot} from '../data/talentCitySnapshot';
+import {SICHUAN_21_REGIONS,sichuanGuideUrl,buildSichuanGuide} from '../data/sichuanGuides';
 import {buildHainanGuide,hainanGuideUrl,HAINAN_TALENT_CITIES} from '../data/hainanGuides';
 import {buildHunanGuide} from '../data/hunanGuides';
 import {getHubeiGuide} from '../data/hubeiGuides';
@@ -138,9 +141,10 @@ function Empty({city,kind}:{city:string;kind:string}){
 function CityHub({city}:{city:string}){
  const match=findTalentCity(city);
  if(!match)return <><Bread current="城市尚未收录"/><section className="ts-sub-header"><h1>该城市尚未加入本次城市名录</h1><p>当前目标范围是4个直辖市和293个地级市，云南8个自治州已接入，其他未收录县级市、自治州、地区和盟请先到全国城市目录核对名称。</p><Link to="/talent-service/cities">返回全国城市目录 <ArrowRight size={16}/></Link></section></>;
- const policies=TALENT_POLICY_RECORDS.filter(p=>p.city===match.name).sort(recentPolicies);
+ const {policies,homes}=getTalentCitySnapshot(match.name);
+ policies.sort(recentPolicies);
  const researchPolicyCount=match.name==='邢台'?XINGTAI_POLICY_RESEARCH_RECORDS.length:0;
- const homes=TALENT_HOUSING_RECORDS.filter(h=>h.city===match.name);
+
  const housingPolicies=policies.filter(isHousingPolicy);
  const housingLeads=housingResearchLeads(match.name);
  const housingHistory=housingPolicyResearch(match.name).length;
@@ -174,7 +178,46 @@ function CityHub({city}:{city:string}){
      </Link>)}
    </div>
   </section>
-  {HAINAN_TALENT_CITIES.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="海南省四城人才政策及住房V5.1指南">
+  
+ {match.name==='贵阳'&&<section className="ts-sub-section" aria-label="贵阳市2026人才引进政策专项完整目录">
+  <div className="ts-sub-section-heading"><h2>贵阳贵安 · 2026人才引进政策专项</h2><Link to={talentListUrl('policies','贵阳')}>查看全部政策 <ArrowRight size={15}/></Link></div>
+  <p>根据2026年2月25日政府政策清单、2026年8月5日青年办事指南及秋季引才公告重新整理。<strong>安家费是个人分期待遇；企业引才薪酬补助发给企业；事业单位引才是岗位招聘</strong>，三个项目不能混淆。住房项目无实时空房证据。</p>
+  {(['落户引进','生活补贴','购房补贴','租房安居','就业创业'] as const).map(group=>
+    <div key={group} className="ts-sub-section">
+     <div className="ts-sub-section-heading"><h3>{group} · {policies.filter(p=>p.category===group).length}项</h3></div>
+     <div className="ts-sub-grid">{policies.filter(p=>p.category===group).map(p=>
+      <Link key={p.id} className="ts-sub-tile" to={guizhouGuideUrl('policy',p.id)}>
+       <strong>{p.title}</strong>
+       <span>{p.headlineAmount||p.category} · {p.temporal==='policy'?(p.deadline?'截止 '+p.deadline:'资格及当期受理待核验'):'历史已截止'}</span>
+       <small>{p.targetGroup}</small>
+       <ArrowRight size={15}/>
+      </Link>)}</div>
+    </div>)}
+  <div className="ts-sub-section-heading"><h3>住房与短期住宿 · {homes.length}条独立记录</h3></div>
+  <p>保租房、住房租金补贴、项目式公寓和来筑求职短住分开列出；历史项目总套数不代表当前有房。</p>
+  <div className="ts-sub-grid">{homes.map(h=>
+    <Link key={h.id} className="ts-sub-tile" to={guizhouGuideUrl('housing',h.id)}>
+     <strong>{h.title}</strong><span>{h.kind==='program'?'住房制度／保障服务':'已有具体住房项目'} · 当前余房待核验</span>
+     <ArrowRight size={15}/>
+    </Link>)}</div>
+ </section>}
+ {match.name!=='贵阳'&&GUIZHOU_9_REGIONS.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="贵州省九市州人才政策与安居办理指南">
+ <div className="ts-sub-section-heading"><h2>{match.name} · 人才政策与住房办理指南</h2></div>
+ <p>仅展示可追溯的市州政策；历史招聘批次、已结束申报和住房项目旧规模不代表现在可申请、可入住。</p>
+ {policies.length+homes.length>0?<div className="ts-sub-grid">
+ {policies.map(p=><Link key={p.id} className="ts-sub-tile" to={guizhouGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>{p.category} · {policyStatus(p)} · 查看分步指南</span><ArrowRight size={15}/></Link>)}
+ {homes.map(h=><Link key={h.id} className="ts-sub-tile" to={guizhouGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>{h.kind==='program'?'住房制度':'住房项目'} · {housingStatus(h)} · 非实时空房</span><ArrowRight size={15}/></Link>)}
+ </div>:<div className="ts-sub-empty"><p>尚无可核实的正式政府资料，不能因此推断当地没有人才政策。</p></div>}
+ </section>}
+ {SICHUAN_21_REGIONS.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="四川省人才服务V5.1分步办理">
+ <div className="ts-sub-section-heading"><h2>{match.name} · 政策与人才安居分步核验</h2></div>
+ <p>{policies.length?'本市（州）已核实的政策提供资格分支、材料清单、办理步骤和政府原文。当前事项是否开放及人才公寓剩余房源仍需官方确认。':'已进入四川省21个地级行政区服务目录。本地政府政策和独立住房一手资料尚未核实，暂不编造补贴、申请入口或房源。'}</p>
+ {policies.length+homes.length>0&&<div className="ts-sub-grid">
+  {policies.map(p=><Link key={p.id} className="ts-sub-tile" to={sichuanGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>{p.category} · 政策资料按B/C分级 · {policyStatus(p)}</span><ArrowRight size={15}/></Link>)}
+  {homes.map(h=><Link key={h.id} className="ts-sub-tile" to={sichuanGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>住房{h.kind==='program'?'管理制度':'具体项目'} · {housingStatus(h)}</span><ArrowRight size={15}/></Link>)}
+ </div>}
+ </section>}
+ {HAINAN_TALENT_CITIES.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="海南省四城人才政策及住房V5.1指南">
  <div className="ts-sub-section-heading"><h2>{match.name} · 人才政策与住房分步办理指南</h2></div>
  <p>{match.name==='三沙'?'三沙适用海南2026安居房管理办法第44条跨市县统筹规则；联合实施细则、受理入口和可选房源尚待核验。':'正式来源及分步核查均为B级资料，当前政策受理及空房需以政府最新公告为准。'}</p>
  <div className="ts-sub-grid">
@@ -354,6 +397,16 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
    province==='jiangxi'?buildJiangxiGuide(decode(fragments[3]||'')):
    buildHunanGuide(decode(fragments[3]||''));
   body=guide?<UnifiedPolicyGuide data={guide}/>:<><Bread current="指南尚未收录"/><section className="ts-sub-header"><h1>该指南暂未核验</h1><Link to="/talent-service/cities">返回城市目录</Link></section></>;
+ }
+ else if(kind==='policy-guide-preview'&&fragments[2]==='guizhou'){
+ const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
+ const guide=t?buildGuizhouGuide(t,decode(fragments[4]||'')):null;
+ body=guide?<UnifiedPolicyGuide data={guide}/>:<section className="ts-sub-header"><h1>贵州市州指南暂未核实</h1><Link to="/talent-service/cities">返回全国城市目录</Link></section>;
+}
+ else if(kind==='policy-guide-preview'&&fragments[2]==='sichuan'){
+  const t=fragments[3]==='housing'?'housing':fragments[3]==='policy'?'policy':null;
+  const guide=t?buildSichuanGuide(t,decode(fragments[4]||'')):null;
+  body=guide?<UnifiedPolicyGuide data={guide}/>:<section className="ts-sub-header"><h1>该四川地区政策或住房指南尚待核验</h1><Link to="/talent-service/cities">返回城市目录</Link></section>;
  }
  else if(kind==='policy-guide-preview'&&fragments[2]==='hainan'){
   const t=fragments[3]==='housing'?'housing':fragments[3]==='policy'?'policy':null;
