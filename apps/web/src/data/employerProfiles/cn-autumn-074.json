@@ -28,16 +28,16 @@
     "logo": "images/employer-profiles/cn-autumn-074/logo.svg",
     "photos": [
       {
-        "path": "images/employer-profiles/cn-autumn-074/photo1.jpg",
-        "caption": "大众汽车中国官方或机构原始页面的实际现场图片 1（来源见审计）",
-        "alt": "大众汽车中国与业务实体关联的真实场景照片 1",
-        "note": "照片仅限能由官网/权威机构原始新闻明确归属的场景；不得将外单位照片或产品渲染图标注为实景；来源、SHA-256及版权状态见media-sources.json。"
+        "path": "images/employer-profiles/cn-autumn-074/photo1.svg",
+        "caption": "大众汽车集团（中国） · HHBA独立业务示意（等待真实图片校验）",
+        "alt": "大众汽车相关业务示意图，明确不是真实企业照片",
+        "note": "当前源码使用非官方独立SVG占位。预览构建将首先尝试按原始机构新闻/官方网站取得真实照片并保存原图SHA-256，获取成功后构建脚本会自动换为独立jpg，获取失败则仍明确标注为非实景。"
       },
       {
-        "path": "images/employer-profiles/cn-autumn-074/photo2.jpg",
-        "caption": "大众汽车中国官方或机构原始页面的实际现场图片 2（来源见审计）",
-        "alt": "大众汽车中国与业务实体关联的真实场景照片 2",
-        "note": "照片仅限能由官网/权威机构原始新闻明确归属的场景；不得将外单位照片或产品渲染图标注为实景；来源、SHA-256及版权状态见media-sources.json。"
+        "path": "images/employer-profiles/cn-autumn-074/photo2.svg",
+        "caption": "大众汽车集团（中国） · HHBA独立业务示意（等待真实图片校验）",
+        "alt": "大众汽车相关业务示意图，明确不是真实企业照片",
+        "note": "当前源码使用非官方独立SVG占位。预览构建将首先尝试按原始机构新闻/官方网站取得真实照片并保存原图SHA-256，获取成功后构建脚本会自动换为独立jpg，获取失败则仍明确标注为非实景。"
       }
     ]
   },
@@ -63,7 +63,7 @@
     "工商管理",
     "人力资源管理"
   ],
-  "photoNote": "优先使用大众汽车官方图片中心2026年已发布的安徽生产线及整车质量检测实拍，图片详情具有明确Volkswagen AG署名和“editorial purposes free of charge”的编辑用途说明。HHBA网站用途是否符合授权须谨慎核对，绝不使用AI伪造汽车工厂。",
+  "photoNote": "优先使用大众汽车官方图片中心2026年已发布的安徽生产线及整车质量检测实拍，图片详情具有明确Volkswagen AG署名和“editorial purposes free of charge”的编辑用途说明。HHBA网站用途是否符合授权须谨慎核对，绝不使用AI伪造汽车工厂。 构建程序按实名公司来源验证真实照片，取得并完成图片校验后将自动替换占位图；无法取得时保留明显非实景标注，不捏造。",
   "business": [
     {
       "title": "整车研发与平台工程",
