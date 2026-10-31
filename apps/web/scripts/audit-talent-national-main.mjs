@@ -50,6 +50,10 @@ assert.ok(missingHousing.length<=26,'housing coverage regressed from the 2026-10
 const pca=JSON.parse(readFileSync(new URL('../src/data/china_pca_2026.json',import.meta.url),'utf8'));
 const pcaSecondLevel=pca.flatMap(p=>(p.ch||[]).map(c=>({province:p.n,name:c.n,code:String(c.c)})));
 const unmatchedPca=pcaSecondLevel.filter(c=>!official.has(c.name));
+const missingPrefecture=unmatchedPca.filter(c=>c.code.length===4&&c.name!=='县');
+const directAdminOrCounty=unmatchedPca.filter(c=>c.code.length===6);
+const syntheticPcaNode=unmatchedPca.filter(c=>c.name==='县');
+assert.equal(missingPrefecture.length+directAdminOrCounty.length+syntheticPcaNode.length,unmatchedPca.length,'PCA nodes require an explicit administrative-level classification');
 const policyQuality=TALENT_POLICY_RECORDS.reduce((a,p)=>(a[assessPolicy(p,asOf).grade]++,a),{A:0,B:0,C:0,D:0});
 const housingQuality=TALENT_HOUSING_RECORDS.reduce((a,h)=>(a[assessHousing(h,asOf).grade]++,a),{A:0,B:0,C:0,D:0});
 const detail=readFileSync(new URL('../src/components/talent/UnifiedTalentRecordDetail.tsx',import.meta.url),'utf8');
@@ -67,6 +71,9 @@ const report={
  policyCitiesMissingHousing:missingHousing.length,missingHousingList:missingHousing,
  pcaSecondLevelCount:pcaSecondLevel.length,unmatchedPcaCount:unmatchedPca.length,
  pcaUnmatchedNodes:unmatchedPca,
+ pcaMissingPrefectureCount:missingPrefecture.length,pcaMissingPrefectureList:missingPrefecture,
+ pcaDirectAdminOrCountyCount:directAdminOrCounty.length,
+ pcaSyntheticNodeCount:syntheticPcaNode.length,
  constraints:'PCA unmatched county-level or provincial-direct units are not automatically classified as prefecture cities'
 };
 console.log('HHBA_NATIONAL_TALENT_AUDIT_BEGIN');
