@@ -162,7 +162,7 @@ export const QINGHAI_HOUSING_RESEARCH_RECORDS:TalentHousingRecord[]=[
     "housingCategory": "人才公寓",
     "reviewedAt": "2026-11-01"
   }
-].map(r=>({...r,statusNote:r.statusNote+' 当前空房待核实，申报入口待核实。'}));
+].map(r=>({...r,statusNote:r.statusNote+' 当前空房待核实，申报入口待核实。',kind:r.kind as TalentHousingRecord['kind'],housingCategory:r.housingCategory as TalentHousingRecord['housingCategory']}));
 
 /** Formal V5.1 index requires first-party government policy source, not recruitment/media reprints. */
 export const QINGHAI_HOUSING_RECORDS:TalentHousingRecord[]=QINGHAI_HOUSING_RESEARCH_RECORDS.filter(r=>{try{return new URL(r.sourceUrl).hostname.endsWith('.gov.cn')}catch{return false}}).map(r=>({...r,statusNote:r.statusNote+' 不提供实时空房或可租房源，申报入口待核实。'}));
