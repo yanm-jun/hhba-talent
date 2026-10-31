@@ -1,0 +1,416 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-039",
+  "name": "安世中国",
+  "displayName": "安世中国",
+  "englishName": "Nexperia China",
+  "aliases": [
+    "安世半导体（中国）有限公司",
+    "安世半导体",
+    "安世",
+    "Nexperia",
+    "Nexperia China",
+    "安世2027校园招聘"
+  ],
+  "industry": "半导体 · MOSFET · SiC/GaN · 封装测试 · 汽车电子",
+  "subtitle": "安世半导体（中国）有限公司 · 东莞封装测试基地 · 与全球Nexperia集团业务相关",
+  "overview": "安世半导体（Nexperia）聚焦分立器件、MOSFET、ESD保护、模拟和逻辑IC及功率器件，覆盖汽车、工业和消费电子等应用。安世中国重要的组装及测试基地位于广东东莞黄江，拥有自动化制造、产品质量与供应链相关团队。各岗位地点与招聘实体仍以官方单岗为准。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.nexperia.cn/about",
+    "https://www.nexperia.cn/about/worldwide-locations/manufacturing",
+    "https://www.nexperia.com/careers/",
+    "https://www.deizao.net/index/index/gonggaoxq/nwid/30591",
+    "https://www.nexperia.com/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-039/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-039/photo1.jpg",
+        "caption": "安世半导体 · 东莞制造基地",
+        "alt": "Nexperia官方制造页面展示的东莞半导体生产园区外景",
+        "note": "来自Nexperia官方制造地点页面的工厂实景，非AI图。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-039/photo2.jpg",
+        "caption": "安世半导体 · 企业生产园区",
+        "alt": "安世半导体园区建筑与Nexperia标识外景",
+        "note": "来自安世中国相关公开报道的实拍工厂外景，保持独立来源；非办公内景。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.nexperia.com/careers/",
+    "label": "Nexperia官方招聘入口",
+    "status": "official_portal",
+    "subject": "安世半导体（中国）有限公司",
+    "note": "2027届岗位名称来自2026年10月27日招聘平台汇总，共保留12个明确职位名称。未证实各岗位的官网单岗链接、学历和精确城市，不填造；开放状态以Nexperia招聘系统为准。"
+  },
+  "majorIntro": "按真实岗位标题划分质量、IT、应用验证、制造设备及供应链五组。校招汇总仅提供整体招聘城市，本页不把整体城市当单岗城市。",
+  "preferredMajors": [
+    "微电子科学与工程",
+    "集成电路设计与集成系统",
+    "机械工程",
+    "自动化",
+    "电气工程及其自动化",
+    "电子信息工程",
+    "计算机科学与技术",
+    "软件工程",
+    "材料科学与工程",
+    "供应链管理"
+  ],
+  "photoNote": "品牌Logo来自Nexperia官方站点，工厂图片使用可核实的Nexperia真实外景；图片只在站内静态展示，不转跳第三方。商标与图片权属原权利方，HHBA不是官方招聘代理。",
+  "business": [
+    {
+      "title": "分立半导体与双极晶体管",
+      "description": "提供双极晶体管、二极管及集成电阻器件，覆盖汽车电子、移动和工业控制。",
+      "tags": "二极管 · BJT · 工业",
+      "details": [
+        "高可靠小信号分立元件",
+        "低功耗与小型封装",
+        "电路保护和信号调节"
+      ]
+    },
+    {
+      "title": "MOSFET与功率半导体",
+      "description": "研发制造低中压功率MOSFET以及部分高压器件方案，应用于电动汽车和能源系统。",
+      "tags": "MOSFET · 功率管理",
+      "details": [
+        "汽车功率开关和电源转换",
+        "驱动系统中的损耗管理",
+        "功率器件的封装与热性能"
+      ]
+    },
+    {
+      "title": "SiC与GaN产品组合",
+      "description": "围绕碳化硅和氮化镓功率器件打造高效率高功率密度的电能转换方案。",
+      "tags": "SiC · GaN · 能源",
+      "details": [
+        "电动汽车充电系统",
+        "光伏和工业能源转换",
+        "开关器件的性能验证"
+      ]
+    },
+    {
+      "title": "模拟逻辑与接口IC",
+      "description": "覆盖模拟开关、逻辑、接口和电源管理IC，支持客户应用与系统设计。",
+      "tags": "逻辑IC · ESD · 接口",
+      "details": [
+        "车规级保护及接口器件",
+        "高可靠信号链与逻辑控制",
+        "系统应用与产品验证"
+      ]
+    },
+    {
+      "title": "东莞半导体封测制造",
+      "description": "在中国东莞开展规模化组装、封装与测试，协同工艺、自动化设备及产品工程团队。",
+      "tags": "东莞 · 封测 · 设备",
+      "details": [
+        "先进封装和生产工艺",
+        "设备维护与自动化工程",
+        "NPI验证和量产质量保障"
+      ]
+    },
+    {
+      "title": "质量体系与全球供应链",
+      "description": "在产品、工厂、供应链和客户交付环节推进质量管理及协同运营。",
+      "tags": "质量 · 供应链 · IT",
+      "details": [
+        "质量数据追踪和工艺改善",
+        "物流和供应商协同",
+        "ERP及制造数字化系统"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "qa-system",
+      "title": "QA系统开发工程师",
+      "city": "上海 / 东莞 / 深圳 / 无锡（校招总体城市，单岗需核实）",
+      "category": "质量与产品工程",
+      "url": "https://www.nexperia.com/careers/",
+      "evidenceUrl": "https://www.deizao.net/index/index/gonggaoxq/nwid/30591",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安世半导体（中国）有限公司",
+      "summary": "参与质量系统的数据管理与开发，支持质量追踪、数据分析和业务流程数字化。",
+      "requirements": "职位名称来自2026年10月27日安世中国2027届校园招聘汇总。未获得逐岗位原始完整JD，本段为按岗位名称解释的工作方向，不代表官方逐项职责；学历、经验、具体工作城市及开放状态均需以安世官方招聘站实际岗位页面为准。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "editorialRelatedMajors": [
+        "质量管理工程",
+        "信息管理与信息系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官方单岗为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sap-engineer",
+      "title": "IT SAP工程师",
+      "city": "上海 / 东莞 / 深圳 / 无锡（校招总体城市，单岗需核实）",
+      "category": "IT与业务系统",
+      "url": "https://www.nexperia.com/careers/",
+      "evidenceUrl": "https://www.deizao.net/index/index/gonggaoxq/nwid/30591",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安世半导体（中国）有限公司",
+      "summary": "协同ERP业务系统需求、配置和运维，支持生产、供应链及业务数据的系统流转。",
+      "requirements": "职位名称来自2026年10月27日安世中国2027届校园招聘汇总。未获得逐岗位原始完整JD，本段为按岗位名称解释的工作方向，不代表官方逐项职责；学历、经验、具体工作城市及开放状态均需以安世官方招聘站实际岗位页面为准。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "editorialRelatedMajors": [
+        "信息管理与信息系统",
+        "供应链管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官方单岗为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "workplace-support",
+      "title": "IT Workplace支持工程师",
+      "city": "上海 / 东莞 / 深圳 / 无锡（校招总体城市，单岗需核实）",
+      "category": "IT与业务系统",
+      "url": "https://www.nexperia.com/careers/",
+      "evidenceUrl": "https://www.deizao.net/index/index/gonggaoxq/nwid/30591",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安世半导体（中国）有限公司",
+      "summary": "围绕办公终端、企业网络与应用支持开展IT服务和故障跟踪，支撑员工日常数字工作环境。",
+      "requirements": "职位名称来自2026年10月27日安世中国2027届校园招聘汇总。未获得逐岗位原始完整JD，本段为按岗位名称解释的工作方向，不代表官方逐项职责；学历、经验、具体工作城市及开放状态均需以安世官方招聘站实际岗位页面为准。",
+      "majorNames": [
+        "计算机科学与技术",
+        "网络工程"
+      ],
+      "editorialRelatedMajors": [
+        "信息安全",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官方单岗为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "product-application",
+      "title": "产品应用工程师（BG ICS）",
+      "city": "上海 / 东莞 / 深圳 / 无锡（校招总体城市，单岗需核实）",
+      "category": "应用与验证",
+      "url": "https://www.nexperia.com/careers/",
+      "evidenceUrl": "https://www.deizao.net/index/index/gonggaoxq/nwid/30591",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安世半导体（中国）有限公司",
+      "summary": "协同集成电路产品的客户应用、电路评估与技术问题定位，为产品导入提供支持。",
+      "requirements": "职位名称来自2026年10月27日安世中国2027届校园招聘汇总。未获得逐岗位原始完整JD，本段为按岗位名称解释的工作方向，不代表官方逐项职责；学历、经验、具体工作城市及开放状态均需以安世官方招聘站实际岗位页面为准。",
+      "majorNames": [
+        "电子信息工程",
+        "微电子科学与工程"
+      ],
+      "editorialRelatedMajors": [
+        "通信工程",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官方单岗为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "system-application",
+      "title": "系统应用工程师（BG ICS）",
+      "city": "上海 / 东莞 / 深圳 / 无锡（校招总体城市，单岗需核实）",
+      "category": "应用与验证",
+      "url": "https://www.nexperia.com/careers/",
+      "evidenceUrl": "https://www.deizao.net/index/index/gonggaoxq/nwid/30591",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安世半导体（中国）有限公司",
+      "summary": "基于半导体产品设计系统级应用验证方案，协同实验室测试及客户设计支持。",
+      "requirements": "职位名称来自2026年10月27日安世中国2027届校园招聘汇总。未获得逐岗位原始完整JD，本段为按岗位名称解释的工作方向，不代表官方逐项职责；学历、经验、具体工作城市及开放状态均需以安世官方招聘站实际岗位页面为准。",
+      "majorNames": [
+        "电子信息工程",
+        "电气工程及其自动化"
+      ],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官方单岗为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ic-validation",
+      "title": "芯片验证工程师（BG ICS）",
+      "city": "上海 / 东莞 / 深圳 / 无锡（校招总体城市，单岗需核实）",
+      "category": "应用与验证",
+      "url": "https://www.nexperia.com/careers/",
+      "evidenceUrl": "https://www.deizao.net/index/index/gonggaoxq/nwid/30591",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安世半导体（中国）有限公司",
+      "summary": "参与芯片功能与性能测试、验证环境搭建、数据记录及异常分析，协同设计和工程团队。",
+      "requirements": "职位名称来自2026年10月27日安世中国2027届校园招聘汇总。未获得逐岗位原始完整JD，本段为按岗位名称解释的工作方向，不代表官方逐项职责；学历、经验、具体工作城市及开放状态均需以安世官方招聘站实际岗位页面为准。",
+      "majorNames": [
+        "微电子科学与工程",
+        "集成电路设计与集成系统"
+      ],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官方单岗为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "process-fol",
+      "title": "工艺工程师（FOL）",
+      "city": "上海 / 东莞 / 深圳 / 无锡（校招总体城市，单岗需核实）",
+      "category": "制造工艺与设备",
+      "url": "https://www.nexperia.com/careers/",
+      "evidenceUrl": "https://www.deizao.net/index/index/gonggaoxq/nwid/30591",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安世半导体（中国）有限公司",
+      "summary": "围绕半导体封测前段制造进行工艺监控、参数分析与制造异常改善。",
+      "requirements": "职位名称来自2026年10月27日安世中国2027届校园招聘汇总。未获得逐岗位原始完整JD，本段为按岗位名称解释的工作方向，不代表官方逐项职责；学历、经验、具体工作城市及开放状态均需以安世官方招聘站实际岗位页面为准。",
+      "majorNames": [
+        "微电子科学与工程",
+        "材料科学与工程"
+      ],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官方单岗为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "equipment-maintenance",
+      "title": "设备维修保养工程师",
+      "city": "上海 / 东莞 / 深圳 / 无锡（校招总体城市，单岗需核实）",
+      "category": "制造工艺与设备",
+      "url": "https://www.nexperia.com/careers/",
+      "evidenceUrl": "https://www.deizao.net/index/index/gonggaoxq/nwid/30591",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安世半导体（中国）有限公司",
+      "summary": "开展封测产线设备点检、预防性维护和故障排除，促进稳定生产。",
+      "requirements": "职位名称来自2026年10月27日安世中国2027届校园招聘汇总。未获得逐岗位原始完整JD，本段为按岗位名称解释的工作方向，不代表官方逐项职责；学历、经验、具体工作城市及开放状态均需以安世官方招聘站实际岗位页面为准。",
+      "majorNames": [
+        "机械工程",
+        "机械设计制造及其自动化"
+      ],
+      "editorialRelatedMajors": [
+        "自动化",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官方单岗为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "electrical-design",
+      "title": "电气设计工程师",
+      "city": "上海 / 东莞 / 深圳 / 无锡（校招总体城市，单岗需核实）",
+      "category": "制造工艺与设备",
+      "url": "https://www.nexperia.com/careers/",
+      "evidenceUrl": "https://www.deizao.net/index/index/gonggaoxq/nwid/30591",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安世半导体（中国）有限公司",
+      "summary": "参与自动化设备电气控制、硬件选型、系统调试与工程设计支持。",
+      "requirements": "职位名称来自2026年10月27日安世中国2027届校园招聘汇总。未获得逐岗位原始完整JD，本段为按岗位名称解释的工作方向，不代表官方逐项职责；学历、经验、具体工作城市及开放状态均需以安世官方招聘站实际岗位页面为准。",
+      "majorNames": [
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "editorialRelatedMajors": [
+        "机械电子工程",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官方单岗为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "npi-test",
+      "title": "NPI测试工程师",
+      "city": "上海 / 东莞 / 深圳 / 无锡（校招总体城市，单岗需核实）",
+      "category": "质量与产品工程",
+      "url": "https://www.nexperia.com/careers/",
+      "evidenceUrl": "https://www.deizao.net/index/index/gonggaoxq/nwid/30591",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安世半导体（中国）有限公司",
+      "summary": "支持新产品导入期间的测试流程、试产问题分析与量产验证，衔接产品和制造团队。",
+      "requirements": "职位名称来自2026年10月27日安世中国2027届校园招聘汇总。未获得逐岗位原始完整JD，本段为按岗位名称解释的工作方向，不代表官方逐项职责；学历、经验、具体工作城市及开放状态均需以安世官方招聘站实际岗位页面为准。",
+      "majorNames": [
+        "电子信息工程",
+        "微电子科学与工程"
+      ],
+      "editorialRelatedMajors": [
+        "测控技术与仪器",
+        "质量管理工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官方单岗为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "supply-chain",
+      "title": "供应链管理专员",
+      "city": "上海 / 东莞 / 深圳 / 无锡（校招总体城市，单岗需核实）",
+      "category": "供应链与管理",
+      "url": "https://www.nexperia.com/careers/",
+      "evidenceUrl": "https://www.deizao.net/index/index/gonggaoxq/nwid/30591",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安世半导体（中国）有限公司",
+      "summary": "参与物料计划、交付协调、库存与供应商协同等生产运营工作。",
+      "requirements": "职位名称来自2026年10月27日安世中国2027届校园招聘汇总。未获得逐岗位原始完整JD，本段为按岗位名称解释的工作方向，不代表官方逐项职责；学历、经验、具体工作城市及开放状态均需以安世官方招聘站实际岗位页面为准。",
+      "majorNames": [
+        "供应链管理",
+        "物流管理"
+      ],
+      "editorialRelatedMajors": [
+        "工业工程",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官方单岗为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "mechanical-assistant",
+      "title": "见习/助理机械设计工程师",
+      "city": "上海 / 东莞 / 深圳 / 无锡（校招总体城市，单岗需核实）",
+      "category": "制造工艺与设备",
+      "url": "https://www.nexperia.com/careers/",
+      "evidenceUrl": "https://www.deizao.net/index/index/gonggaoxq/nwid/30591",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "安世半导体（中国）有限公司",
+      "summary": "参与半导体生产设备的机械结构开发、图纸修改和测试装配支持。",
+      "requirements": "职位名称来自2026年10月27日安世中国2027届校园招聘汇总。未获得逐岗位原始完整JD，本段为按岗位名称解释的工作方向，不代表官方逐项职责；学历、经验、具体工作城市及开放状态均需以安世官方招聘站实际岗位页面为准。",
+      "majorNames": [
+        "机械设计制造及其自动化",
+        "机械工程"
+      ],
+      "editorialRelatedMajors": [
+        "机械电子工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官方单岗为准",
+      "currentOpenVerified": false
+    }
+  ]
+}
