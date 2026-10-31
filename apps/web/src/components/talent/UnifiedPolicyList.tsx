@@ -48,6 +48,7 @@ export function UnifiedPolicyList({config}:{config:CityPolicyConfig}){
  const [category,setCategory]=useState('all');
  const entries=useMemo(()=>config.tiles.map(tile=>({tile,record:V51_POLICY_DISPLAY_RECORDS.find(p=>p.id===tile.id)})).filter((x):x is {tile:PolicyTile;record:TalentPolicyRecord}=>Boolean(x.record&&x.record.city===config.city)),[config]);
  const archives=entries.filter(x=>historical(x.record));
+ const guangxi=GUANGXI_RENT_RESEARCH_RECORDS.some(p=>p.city===config.city);
  const groups=['all',...new Set(entries.map(x=>x.tile.category)),'history'];
  const filtered=entries.filter(x=>category==='all'||(category==='history'?historical(x.record):x.tile.category===category));
  const fresh=filtered.filter(x=>!historical(x.record));
