@@ -1,0 +1,81 @@
+name: HHBA employers 066-068 real-photo independent preview
+on:
+  push:
+    branches: [feature/employers-066-068-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-employers-066-068-photo-review
+  cancel-in-progress: true
+jobs:
+  build-source-photo-static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install image validation dependency
+        run: python -m pip install --quiet Pillow
+      - name: Retrieve actual company-owned images and retain exact-source manifest
+        working-directory: apps/web
+        run: python scripts/prepare-employers-066-068-real-media.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked frontend dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Validate companies and all earlier four-block batches
+        working-directory: apps/web
+        run: |
+          node scripts/employer-factory-check.mjs
+          node scripts/employers-054-056-v2.contract.test.mjs
+          node scripts/employers-057-059-v2.contract.test.mjs
+          node scripts/employers-060-062-v2.contract.test.mjs
+          node scripts/employers-063-065-v2.contract.test.mjs
+          node scripts/employers-066-068-v2.contract.test.mjs
+          node scripts/recruitment-market-source-invalid.regression.test.mjs
+      - name: Full isolated Vite static build preserving main Pages
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: |
+          npm run build
+          node scripts/materialize-company-route-entries.mjs
+      - name: Check actual static files and direct company routes
+        run: |
+          test -s apps/web/dist/index.html
+          for i in 066 067 068; do
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$i/logo.svg"
+            test -s "apps/web/dist/companies/autumn/cn-autumn-$i/index.html"
+          done
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-066/photo1.jpg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-066/photo2.jpg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-067/photo1.png
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-067/photo2.svg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-068/photo1.jpg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-068/photo2.jpg
+      - name: Upload photo source evidence and copyright disclosure
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-066-068-real-photo-source-audit
+          path: |
+            apps/web/public/images/employer-profiles/cn-autumn-066/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-067/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-068/media-sources.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload independent full static review (never deploy over main Pages)
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-employers-066-068-real-media-static-review
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
