@@ -41,10 +41,10 @@ export const birminghamPrograms={
   intro:'该课程面向希望系统转换为软件开发和计算机科学方向的非计算机本科生。学校将软件开发工作坊、系统原理、数据结构、算法、数据库、人工智能与 60 学分独立项目结合，让学生在一年内从基础逐步过渡到大型软件系统设计与评估。',
   modules:[
    {name:'Software Workshop 1 / 2',credit:40,content:'两门软件工作坊，每门 20 学分，围绕编程基础、开发工作流和构建可运行的软件系统展开。它们是转换课程的重要实践起点，但具体语言、考核方式与开课次序以最新课程手册为准。'},
-   {name:'Computer Systems',credit:20,content:'理解计算机系统的结构及运行方式，形成分析软件与底层系统关系的基础。原本没有计算机专业背景的申请者尤其需要为这部分的技术概念投入时间。'},
-   {name:'Data Structures, Algorithms, and Databases',credit:20,content:'学习数据结构、常见算法与数据管理，把基础代码转化为可处理真实数据、具备适当复杂度与性能考虑的软件解决方案。'},
+   {name:'Computer Systems',credit:20,content:'理解计算机系统的结构及运行方式，形成分析软件与底层系统关系的基础。原本没有计算机专业背景的申请者尤其需要为这部分的技术概念投入时间，也应配合课程安排逐步练习基础计算原理与系统调试，具体实验和考核以本年度模块手册为准。'},
+   {name:'Data Structures, Algorithms, and Databases',credit:20,content:'学习数据结构、常见算法与数据管理，把基础代码转化为可处理真实数据、具备适当复杂度与性能考虑的软件解决方案。对于非计算机本科生，建议提前复习基础编程和算法概念，以适应这门将多个核心主题整合到一学期的课程。'},
    {name:'Building Useable Software',credit:20,content:'从用户需求和人机交互角度理解软件设计，关注可用性、需求验证与系统原型。对于设计、艺术、人文背景申请者，这部分与已有的用户研究经验存在可迁移联系。'},
-   {name:'Artificial Intelligence and Machine Learning',credit:20,content:'在程序和数据基础上认识人工智能及机器学习。它是转换课程里的一个 20 学分核心模块，不应误写为整项学位都是 AI 专项研究。'},
+   {name:'Artificial Intelligence and Machine Learning',credit:20,content:'在程序和数据基础上认识人工智能及机器学习。它是转换课程里的一个 20 学分核心模块，不应误写为整项学位都是 AI 专项研究。申请者需要理解模型、数据与软件项目之间的联系，并核查学校当年具体的项目评估方式。'},
    {name:'Project – Conversion MSc',credit:60,content:'通常在课程后期由导师指导，完成大型软件系统的设计、实现和评估。选题可来自教师或行业伙伴，申请人也可能提出自己的想法，最终可选题目需学校批准。'}
   ],
   intlTuition:[
@@ -61,11 +61,11 @@ export const birminghamPrograms={
   admission:'英国 2:1 Honours degree，适用于本科非 computing 的申请者。国际学历、英语和材料仍要经过招生导师核实。它与需要数理或计算机学科背景的 AI MSc 进阶课程不同，不应混淆录取条件。',
   intro:'这门转换型硕士将人工智能、编程、数据与计算机系统基础放在同一个一年全日制的学习路径中。学校列出编程、人工智能与机器学习、数据库管理、网络开发、AI 新兴主题和团队/个人项目相关学习，适合希望从其他专业转换到 AI 软件应用方向的学生。',
   modules:[
-   {name:'Programming for Artificial Intelligence and Data Science',credit:20,content:'从计算机编程开始，建立可以处理数据、实现基础 AI 方法的程序能力。适合跨专业学生入门，但需要自主练习和完成编程评估。'},
-   {name:'Storing and Managing Data',credit:20,content:'学习数据存储和管理的核心概念，为后续 AI 模型训练、数据处理及应用实现提供基础；其具体数据库平台与工具按学校当前课程说明核实。'},
-   {name:'Artificial Intelligence and Machine Learning',credit:20,content:'构建 AI/机器学习核心概念，理解基本模型和方法，以及如何把算法与数据、程序代码联结起来。'},
-   {name:'Current Topics in Artificial Intelligence and Data Science',credit:20,content:'认识 AI 与数据科学的新方向和相关问题，重视技术迭代与实际问题，而非保证教授某个固定的热门产品或商业软件。'},
-   {name:'Web Development',credit:20,content:'通过 Web 技术理解智能系统的软件交付，帮助将 AI 想法转化为可使用的数字服务或展示界面。'},
+   {name:'Programming for Artificial Intelligence and Data Science',credit:20,content:'从计算机编程开始，建立可以处理数据、实现基础 AI 方法的程序能力。适合跨专业学生入门，但需要自主练习和完成编程评估。对于原先学习艺术、人文或社科专业的人，建议先通过简单代码项目体验变量、函数、数据结构和调试工作。'},
+   {name:'Storing and Managing Data',credit:20,content:'学习数据存储和管理的核心概念，为后续 AI 模型训练、数据处理及应用实现提供基础；其具体数据库平台与工具按学校当前课程说明核实。课程主题强调处理、保存、检索与组织数据，相关数据库技术与考核按最新课程手册为准。'},
+   {name:'Artificial Intelligence and Machine Learning',credit:20,content:'构建 AI/机器学习核心概念，理解基本模型和方法，以及如何把算法与数据、程序代码联结起来。非计算机背景学习者需结合基础编程课循序练习；本模块的具体算法与数学要求应按当前招生和教学说明进行确认。'},
+   {name:'Current Topics in Artificial Intelligence and Data Science',credit:20,content:'认识 AI 与数据科学的新方向和相关问题，重视技术迭代与实际问题，而非保证教授某个固定的热门产品或商业软件。这门模块更适合用来建立持续查阅研究资料、分析技术限制、评价新兴技术影响的能力，主题会随教学年度变化。'},
+   {name:'Web Development',credit:20,content:'通过 Web 技术理解智能系统的软件交付，帮助将 AI 想法转化为可使用的数字服务或展示界面。在课程项目中，尤其需要关注数据输入、页面交互与系统可用性的联系；具体前后端技术栈仍以校方最新模块资料为准。'},
    {name:'选修与独立 AI 项目',credit:80,content:'学生在 Data Analytics with AI 或 Computer Systems, Data Structures and Algorithms 等方向中选一门 20 学分选修，另有 60 学分个人项目，需设计、实现、评估并提交成果。'}
   ],
   intlTuition:[],
