@@ -57,9 +57,13 @@ def convert(raw,name):
  with Image.open(BytesIO(raw)) as im:im.verify()
  with Image.open(BytesIO(raw)) as im:
   im=ImageOps.exif_transpose(im)
-  if im.width<180 or im.height<40:raise ValueError('resolution too small')
   if name=='logo.png':
+   if im.width<70 or im.height<18:raise ValueError('official branding icon unreadably small')
    im=im.convert('RGBA')
+   # Preserve official pixels and aspect ratio; resize only for display legibility.
+   if im.width<600:
+    scale=600/im.width
+    im=im.resize((600,round(im.height*scale)),Image.Resampling.LANCZOS)
    im.thumbnail((1250,850))
    # preserve logo aspect ratio, never crop
   else:
