@@ -3,7 +3,6 @@ import type {TalentHousingRecord} from './talentHousingRecords.ts';
 export const GANSU_EXPANDED_HOUSING_RECORDS:TalentHousingRecord[]=[
   {
     "city": "兰州",
-    "tag": "lanzhou-newzone-online2026",
     "title": "兰州新区2026公租房申请、续租、报修、退租线上一类事",
     "district": "兰州新区",
     "address": "兰州新区政务服务平台与房产服务系统（线上事项，不是公租房具体地址）",
@@ -27,7 +26,6 @@ export const GANSU_EXPANDED_HOUSING_RECORDS:TalentHousingRecord[]=[
   },
   {
     "city": "兰州",
-    "tag": "xigu-2026-cashrent",
     "title": "兰州西固区公租房租赁补贴资格确认办事入口",
     "district": "兰州市西固区",
     "address": "兰州市西固区公园路3号政务服务中心二楼214窗口",
@@ -51,7 +49,6 @@ export const GANSU_EXPANDED_HOUSING_RECORDS:TalentHousingRecord[]=[
   },
   {
     "city": "嘉峪关",
-    "tag": "talent-free-apartment2026",
     "title": "嘉峪关2026引进人才公寓按档免租4—8年",
     "district": "嘉峪关市属用人单位人才住房保障范围",
     "address": "嘉峪关市人才公寓（具体小区、门牌由市房产服务中心按批次公布）",
@@ -75,7 +72,6 @@ export const GANSU_EXPANDED_HOUSING_RECORDS:TalentHousingRecord[]=[
   },
   {
     "city": "白银",
-    "tag": "2026-sale-protected",
     "title": "白银2026配售型保障性住房管理办法（人才及新毕业生）",
     "district": "白银市及所辖县区正式配售项目范围",
     "address": "具体配售小区、项目房号由白银市住建和项目运营机构当批公布",
@@ -99,7 +95,6 @@ export const GANSU_EXPANDED_HOUSING_RECORDS:TalentHousingRecord[]=[
   },
   {
     "city": "白银",
-    "tag": "2026-huining-rent",
     "title": "会宁县2026年度城镇住房保障家庭租赁补贴实施方案",
     "district": "白银市会宁县会师镇等文件规定的保障范围",
     "address": "申请地社区和会宁县住房保障中心业务窗口（货币租补，无指定实物房号）",
@@ -123,7 +118,6 @@ export const GANSU_EXPANDED_HOUSING_RECORDS:TalentHousingRecord[]=[
   },
   {
     "city": "天水",
-    "tag": "2026-talent-transitional",
     "title": "天水2026高层次引进人才周转公寓保障资格",
     "district": "天水市市直及各区县依实际引才岗位",
     "address": "人才周转公寓实际楼栋和门牌以天水市委人才办及运营机构配住公告为准",
@@ -147,7 +141,6 @@ export const GANSU_EXPANDED_HOUSING_RECORDS:TalentHousingRecord[]=[
   },
   {
     "city": "张掖",
-    "tag": "talent-2025-5-year",
     "title": "张掖市直引进人才公寓五年免租或分档租房补贴",
     "district": "张掖市市直事业单位人才住房服务范围",
     "address": "张掖市人才公寓实际位置及房号需市人社局人才管理部门核实",
@@ -171,7 +164,6 @@ export const GANSU_EXPANDED_HOUSING_RECORDS:TalentHousingRecord[]=[
   },
   {
     "city": "平凉",
-    "tag": "2026-graduate-buy-20k",
     "title": "平凉2026本科毕业生新房2万元购房补贴及公积金政策",
     "district": "平凉市境内符合当期网签条件的新建商品住房",
     "address": "平凉市住建局与住房公积金管理中心受理（购房优惠不提供实物公租房地址）",
@@ -195,7 +187,6 @@ export const GANSU_EXPANDED_HOUSING_RECORDS:TalentHousingRecord[]=[
   },
   {
     "city": "临夏",
-    "tag": "2026-provident-rent",
     "title": "临夏州2026人才及青年公积金租房提取上浮保障",
     "district": "临夏回族自治州各县市缴存单位（与具体公租房无直接关系）",
     "address": "临夏州住房公积金管理中心及指定业务窗口（不是实物房源）",
