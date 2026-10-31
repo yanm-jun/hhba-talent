@@ -3,7 +3,7 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 const root=process.cwd(), read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const manifest=JSON.parse(read('src/data/domesticAutumnScreenshot20261028.json'));
-const files=fs.readdirSync('src/data/employerProfiles').filter(x=>/^cn-autumn-\\d{3}\\.json$/.test(x)).sort();
+const files=fs.readdirSync('src/data/employerProfiles').filter(x=>/^cn-autumn-\d{3}\.json$/.test(x)).sort();
 const profiles=files.map(f=>JSON.parse(read('src/data/employerProfiles/'+f)));
 const byId=new Map(profiles.map(p=>[p.id,p]));
 const main=read('src/main.tsx');
@@ -78,7 +78,7 @@ const lines=[
  '公司名、招聘主体、二级来源、官网及图片权属必须分开核验。缺失企业仍可能走原有通用秋招页面，不应误报为404。老版专属页面可以访问，但并非与现有V2四板块完全一致。示意图只能计入本地素材槽位，不能算真实企业实景。'
 ];
 fs.mkdirSync('audit-output',{recursive:true});
-fs.writeFileSync('audit-output/employer-completeness-20261031.md',lines.join('\\n')+'\\n');
+fs.writeFileSync('audit-output/employer-completeness-20261031.md',lines.join('\n')+'\n');
 fs.writeFileSync('audit-output/employer-completeness-20261031.json',JSON.stringify({summary:{roster:manifest.entries.length,profiles:profiles.length,missingV2:allMissing,legacy:custom,generic,slots,missingMedia,unconfirmed,backlog:backlog.length,issueCounts:{P1:groups.P1.length,P2:groups.P2.length}},issues:notes},null,2));
 console.log('HHBA_ENTERPRISE_AUDIT_SUMMARY',JSON.stringify({roster:manifest.entries.length,profiles:profiles.length,missingV2:allMissing,legacy:custom,generic,slots,missingMedia,unconfirmed,backlog:backlog.length,issueCounts:{P1:groups.P1.length,P2:groups.P2.length}}));
 for(const x of notes)if(x.level==='P1')console.log('HHBA_AUDIT_P1',x.id,x.name,x.code,x.details);
