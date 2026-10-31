@@ -39,8 +39,8 @@ for(const city of cities){
    assert.ok(guide&&guide.steps?.length>=5&&guide.faq?.length>=5&&guide.qualityLevel!=='A',p.id+' guide path');
  }
  for(const h of housing.filter(x=>x.city===city)){
-   if(h.id.includes('xuefu56'))assert.equal(talentSourceKind(h.sourceUrl),'secondary','university notice is NOT a government source');
-   else assert.equal(talentSourceKind(h.sourceUrl),'government',h.id+' government-only housing');
+   assert.equal(talentSourceKind(h.sourceUrl),'government',h.id+' government primary location evidence');
+   if(h.id.includes('xuefu56'))assert.ok(h.statusNote.includes('高校而非政府来源')&&h.statusNote.includes('jgj')===false,'Separation of government location and university internal eligibility');
    assert.ok(['program','project'].includes(h.kind),h.id+' invalid housing kind');
    if(h.kind==='project')assert.equal(h.city,'哈尔滨');
    assert.ok(h.statusNote.includes('非实时')&&h.statusNote.includes('申报入口未公布'),h.id+' availability disclosure');
