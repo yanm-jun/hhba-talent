@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-078",
+  "name": "中国邮政",
+  "displayName": "中国邮政集团有限公司",
+  "englishName": "China Post Group Corporation",
+  "aliases": [
+    "中国邮政集团",
+    "China Post",
+    "邮政集团",
+    "中国邮政2027校招",
+    "中国邮政2027年度联合校园招聘"
+  ],
+  "industry": "邮政普遍服务 · 快递物流 · 邮政金融 · 邮政电商 · 信息科技",
+  "subtitle": "中国邮政集团及各直属、省级招聘单位 · 全国招聘",
+  "overview": "中国邮政集团依法承担邮政普遍服务和特殊服务，以邮政、快递物流、金融、电子商务为主业，设有分支机构和不同招聘主体。集团2027年度联合校园招聘公告面向2027届与符合条件的择业期毕业生，招聘专业涵盖邮政物流、金融经济、电商、计算机、法律等。公告不提供全集团统一逐岗职位表，本页依照公告划分业务方向而非假造岗位。",
+  "lastReviewed": "2026-11-01",
+  "sources": [
+    "https://www.chinapost.com.cn/cn/report/2609/1176-1.htm",
+    "https://www.chinapost.com.cn/",
+    "https://www.chinapost.com.cn/cn/report/2608/1294-1.htm"
+  ],
+  "media": {
+    "logo": "images/autumn-real-logos/cn-autumn-078.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-078/photo1.svg",
+        "caption": "中国邮政 · HHBA原创建模业务示意（非企业实景）",
+        "alt": "中国邮政业务编辑示意图，非真实企业场景照片",
+        "note": "源码采用显著标注的独立非实景SVG，独立审查构建尝试以媒体来源证据替换为实际新闻照片，图像转载许可尚待核查。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-078/photo2.svg",
+        "caption": "中国邮政 · HHBA原创建模业务示意（非企业实景）",
+        "alt": "中国邮政业务编辑示意图，非真实企业场景照片",
+        "note": "源码采用显著标注的独立非实景SVG，独立审查构建尝试以媒体来源证据替换为实际新闻照片，图像转载许可尚待核查。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://chinapost2027.zhaopin.com/",
+    "label": "中国邮政集团2027年度联合校招指定网申入口",
+    "status": "official_portal",
+    "subject": "中国邮政集团有限公司",
+    "note": "集团简历接收截止2026-10-31；邮储银行原截止10月7日、中邮保险10月17日。每人最多报2个单位、每单位1岗；金融子公司不能套用同一截止日。当前不得标注正在招募。"
+  },
+  "majorIntro": "邮政官方公告只列招聘相关学科，具体岗位专业、招聘主体和城市由招聘系统内的岗位详情确定；下列为公告专业类别对应的“招聘方向参考”，不代表各方向均正在招录。",
+  "preferredMajors": [
+    "物流管理",
+    "物流工程",
+    "交通运输",
+    "电子商务",
+    "计算机科学与技术",
+    "软件工程",
+    "经济学",
+    "金融学",
+    "会计学",
+    "财务管理",
+    "法学",
+    "汉语言文学",
+    "工商管理",
+    "工业工程",
+    "自动化"
+  ],
+  "photoNote": "媒体审计优先核查该企业名称明确匹配的实际场景新闻图片，逐张记录原图地址、图片所在新闻文章、尺寸和SHA-256。未取得可验证的原图则保留显著非实景示意，真实来源图片的再次商业转载许可尚未确认。",
+  "business": [
+    {
+      "title": "邮政普遍服务与寄递",
+      "description": "承担基础邮政普遍服务、邮政特殊服务以及各类寄递业务并统筹网络运营。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "邮政 · 公共服务",
+      "details": [
+        "普遍服务网络",
+        "包裹快递寄递",
+        "投递及服务质量"
+      ]
+    },
+    {
+      "title": "快递物流与供应链",
+      "description": "提供邮件处理、快递物流、仓配运营和多式联运网络服务。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "物流 · 运输",
+      "details": [
+        "智能分拣与处理中心",
+        "干支线运输及仓配",
+        "供应链物流服务"
+      ]
+    },
+    {
+      "title": "邮政金融业务",
+      "description": "集团体系涉及邮政储蓄、保险及相关金融服务，但各法人招聘需独立核对。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "金融 · 合规",
+      "details": [
+        "邮政储蓄业务",
+        "保险与金融服务",
+        "金融科技及风控"
+      ]
+    },
+    {
+      "title": "邮政电子商务",
+      "description": "围绕电商平台、寄递客户、农村流通与邮政零售开展线上线下服务。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "电商 · 商贸",
+      "details": [
+        "电商平台运营",
+        "农村电商和供应链",
+        "商贸与渠道服务"
+      ]
+    },
+    {
+      "title": "信息科技与数字化",
+      "description": "推进物流管理系统、寄递信息平台、业务数据分析及数字化服务。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "IT · 数字化",
+      "details": [
+        "网络信息系统",
+        "数据分析和IT支持",
+        "寄递科技应用"
+      ]
+    },
+    {
+      "title": "运营管理与综合职能",
+      "description": "覆盖合规、财务、人力、市场、客户服务与网点经营管理。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "管理 · 服务",
+      "details": [
+        "集团及省分公司运营",
+        "财务审计与法务",
+        "客户与网点服务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "postal-logistics-2027",
+      "title": "邮政物流及交通运输方向（公告专业类别，非具体JD）",
+      "category": "物流 / 运输",
+      "city": "全国分支单位，具体地点逐岗核实",
+      "summary": "中国邮政官方2027校招列明邮政类、交通运输及物流类为相关专业，适合关注寄递网络、运输及处理中心职位，但该条并非正式职位名称。",
+      "requirements": "公告要求符合2027届或择业期毕业生资格，具体专业、学历、单位、城市及职位职责仅以官方智联系统岗位清单为准；不能认为此类专业可申请所有物流职位。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "物流管理",
+        "物流工程",
+        "交通运输"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届及择业期毕业生，按集团公告",
+      "url": "https://chinapost2027.zhaopin.com/",
+      "evidenceUrl": "https://www.chinapost.com.cn/cn/report/2609/1176-1.htm",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国邮政集团所属招聘单位（每单位具体JD待核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "finance-2027",
+      "title": "金融经济及财会方向（公告专业类别，非具体JD）",
+      "category": "金融 / 财务",
+      "city": "集团与各招聘法人，地点以岗位为准",
+      "summary": "集团公告提及金融经济、财务会计专业类别，但邮储银行与中邮保险的校园招聘存在单独时限及规则，应按其各自官网核实。",
+      "requirements": "不能把邮储银行、中邮保险的岗位合并成集团普通网申条目；金融专业及财会岗位必须参考对应招聘法人报名通道、资质和截止时间。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "金融学",
+        "经济学",
+        "会计学",
+        "财务管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届及择业期毕业生，按集团公告",
+      "url": "https://chinapost2027.zhaopin.com/",
+      "evidenceUrl": "https://www.chinapost.com.cn/cn/report/2609/1176-1.htm",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国邮政集团所属招聘单位（每单位具体JD待核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ecommerce-2027",
+      "title": "电子商务与市场运营方向（公告专业类别，非具体JD）",
+      "category": "电商 / 运营",
+      "city": "各招聘单位，地点待核",
+      "summary": "官方公告将电子商务与工商管理列入招聘专业范围，相关毕业生可在官方系统中寻找对应的市场、电商或网点运营岗位。",
+      "requirements": "这只是招聘专业归类不是已经核查的实名岗位；市场、电商运营等方向的实际招录人数、学历及工作城市须以集团招聘系统分单位记录为准。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子商务",
+        "工商管理",
+        "市场营销"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届及择业期毕业生，按集团公告",
+      "url": "https://chinapost2027.zhaopin.com/",
+      "evidenceUrl": "https://www.chinapost.com.cn/cn/report/2609/1176-1.htm",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国邮政集团所属招聘单位（每单位具体JD待核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "software-2027",
+      "title": "计算机与信息技术方向（公告专业类别，非具体JD）",
+      "category": "计算机 / 软件",
+      "city": "招聘单位及城市逐岗核实",
+      "summary": "官方公告列有计算机类专业，提示集团存在面向IT及数字化人才的招聘领域；本页不将未列明的软件工程师、算法岗位编造为正在招聘。",
+      "requirements": "计算机科学、软件工程与信息技术是公告对应学科及编辑匹配，职位技术栈、学历、报名阶段和法人主体必须核对智联职位详细要求。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息安全"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届及择业期毕业生，按集团公告",
+      "url": "https://chinapost2027.zhaopin.com/",
+      "evidenceUrl": "https://www.chinapost.com.cn/cn/report/2609/1176-1.htm",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国邮政集团所属招聘单位（每单位具体JD待核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "legal-writing-2027",
+      "title": "法律与中文综合职能方向（公告专业类别，非具体JD）",
+      "category": "法务 / 综合",
+      "city": "全国各省级和直属招聘单位，逐岗确认",
+      "summary": "官方2027届公告明确法律、中文专业类别，可关注集团合规法务及行政综合方向，但没有公开统一同名JD。",
+      "requirements": "法学、汉语言文学等专业范围可作为检索入口，不代表某地区已设置相应岗位；对应单位资格、数量及是否公开招聘必须逐项核验。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "法学",
+        "汉语言文学",
+        "行政管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届及择业期毕业生，按集团公告",
+      "url": "https://chinapost2027.zhaopin.com/",
+      "evidenceUrl": "https://www.chinapost.com.cn/cn/report/2609/1176-1.htm",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国邮政集团所属招聘单位（每单位具体JD待核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "operations-engineering-2027",
+      "title": "业务管理与物流技术方向（公告类别导览，非具体JD）",
+      "category": "综合 / 工程",
+      "city": "中国邮政集团各单位，具体地点待核",
+      "summary": "基于集团物流、信息科技和运营业务提供工业工程及管理方向检索导航；官方公告没有直接确认同名技术职位存在。",
+      "requirements": "工业工程、自动化等为业务相关度建议，并非集团明确逐岗位专业许可。应回到2027年智联网申系统确认专业资格、工作岗位和报名期限。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工业工程",
+        "自动化",
+        "物流工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届及择业期毕业生，按集团公告",
+      "url": "https://chinapost2027.zhaopin.com/",
+      "evidenceUrl": "https://www.chinapost.com.cn/cn/report/2609/1176-1.htm",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国邮政集团所属招聘单位（每单位具体JD待核）",
+      "currentOpenVerified": false
+    }
+  ]
+}

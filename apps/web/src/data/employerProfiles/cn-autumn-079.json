@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-079",
+  "name": "中通快递",
+  "displayName": "中通快递",
+  "englishName": "ZTO Express",
+  "aliases": [
+    "ZTO",
+    "中通",
+    "中通快递集团",
+    "中通快递2027校招",
+    "中通招聘",
+    "青鸟计划"
+  ],
+  "industry": "快递物流 · 智能分拣 · 网络运营 · 供应链 · 物流科技",
+  "subtitle": "中通快递及集团招聘项目 · 上海及各区域网点",
+  "overview": "中通快递提供全国快递寄递网络、转运分拣、干线运输、网点服务及智慧物流技术。官方中通招聘网站在2026年9月发布多条有具体职责的上海管理培训生岗位；校方披露其2027届青鸟项目覆盖物流运营、物流网络、市场营销、安全、人力等方向。中通快运是其他法人主体，其岗位不能自动归入本条快递招聘。",
+  "lastReviewed": "2026-11-01",
+  "sources": [
+    "https://hr.zto.com/campus-position?object=1&projectId=17",
+    "https://hr.zto.com/campus",
+    "https://hlju.bysjy.com.cn/detail/career?id=708635",
+    "https://www.zto.com/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-079/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-079/photo1.svg",
+        "caption": "中通快递 · HHBA原创建模业务示意（非企业实景）",
+        "alt": "中通快递业务编辑示意图，非真实企业场景照片",
+        "note": "源码采用显著标注的独立非实景SVG，独立审查构建尝试以媒体来源证据替换为实际新闻照片，图像转载许可尚待核查。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-079/photo2.svg",
+        "caption": "中通快递 · HHBA原创建模业务示意（非企业实景）",
+        "alt": "中通快递业务编辑示意图，非真实企业场景照片",
+        "note": "源码采用显著标注的独立非实景SVG，独立审查构建尝试以媒体来源证据替换为实际新闻照片，图像转载许可尚待核查。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://hr.zto.com/campus-position?object=1&projectId=17",
+    "label": "中通招聘官方网站校招职位入口",
+    "status": "official_portal",
+    "subject": "中通快递",
+    "note": "公司官网显示2026年9月的六个管理培训生职位；高校确认2027届青鸟项目及目标毕业时间2026-10-01至2027-09-30，但不能保证这六个上海职位全部属于青鸟项目或仍可申请。中通快运为不同招聘主体。"
+  },
+  "majorIntro": "本页选用中通官网2026年9月列出的六条具名管理培训生岗位；招聘年份与是否当前开放由官网核对，不将中通快运2027校招职位混入中通快递。专业筛选为非官方推荐，官方原岗位未一一披露学校及学历限制。",
+  "preferredMajors": [
+    "物流管理",
+    "物流工程",
+    "交通运输",
+    "供应链管理",
+    "工商管理",
+    "市场营销",
+    "财务管理",
+    "会计学",
+    "人力资源管理",
+    "安全工程",
+    "工业工程",
+    "计算机科学与技术",
+    "电子商务",
+    "数据科学与大数据技术"
+  ],
+  "photoNote": "媒体审计优先核查该企业名称明确匹配的实际场景新闻图片，逐张记录原图地址、图片所在新闻文章、尺寸和SHA-256。未取得可验证的原图则保留显著非实景示意，真实来源图片的再次商业转载许可尚未确认。",
+  "business": [
+    {
+      "title": "快递网络与加盟网点",
+      "description": "协同全国加盟伙伴开展网点服务、业务规则、品质与终端网络管理。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "快递 · 网络",
+      "details": [
+        "网络政策与经营管理",
+        "加盟网点质量治理",
+        "业务发展与客户服务"
+      ]
+    },
+    {
+      "title": "智能转运与分拣",
+      "description": "建设并运营转运中心、自动化分拣装备及高效物流作业体系。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "分拣 · 自动化",
+      "details": [
+        "智能分拣设备",
+        "处理中心运营",
+        "分拣效率与品质"
+      ]
+    },
+    {
+      "title": "干线运输与调度",
+      "description": "围绕路由规划、干线车辆与中转协调保障网络时效和运输成本。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "运输 · 调度",
+      "details": [
+        "车辆调度与路由",
+        "运输时效监测",
+        "成本效率与安全"
+      ]
+    },
+    {
+      "title": "供应链及仓储服务",
+      "description": "面向多行业客户提供仓配一体、供应链服务与数字化物流解决方案。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "仓配 · 供应链",
+      "details": [
+        "仓储配送协同",
+        "行业供应链方案",
+        "电子商务物流"
+      ]
+    },
+    {
+      "title": "物流科技与信息系统",
+      "description": "使用物流IT系统与数据能力优化分拣、网点管理、运营分析及服务体验。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "IT · 数据",
+      "details": [
+        "物流业务系统",
+        "数据分析与智能应用",
+        "客户数字化服务"
+      ]
+    },
+    {
+      "title": "人才、安全与财务管理",
+      "description": "对快递网络安全、经营财务、人力资源及企业管理实施运营支持。 具体业务范围及实施细节以企业主体官方公开信息为准。",
+      "tags": "职能 · 风险",
+      "details": [
+        "HRBP与人才发展",
+        "运营财务与结算",
+        "物流场地与运输安全"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "network-mt-2026",
+      "title": "管理培训生—物流网络（上海）",
+      "category": "网络管理",
+      "city": "上海市",
+      "summary": "中通2026年9月23日官网正式招聘记录，涉及网络政策落地、加盟网点资源与服务质量、业务指标与省区政策管理等。",
+      "requirements": "官方列示职责涉及网点经营与网络政策，相关专业可参考物流管理、工业工程、工商管理等；需以中通官网点击详细岗位后公布的学历、毕业届别及当前是否在招为准。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "物流管理",
+        "工业工程",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026年9月官网招聘记录，届别与资格需确认",
+      "url": "https://hr.zto.com/campus-position?object=1&projectId=17",
+      "evidenceUrl": "https://hr.zto.com/campus-position?object=1&projectId=17",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中通快递官网管理培训生（不同于中通快运）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "human-resources-mt-2026",
+      "title": "管理培训生—人力资源（上海）",
+      "category": "人力资源",
+      "city": "上海市",
+      "summary": "中通官网2026年9月18日HRBP岗位，职责包括业务部门人力方案、招聘、组织改善、员工发展及文化建设项目。",
+      "requirements": "官网已披露具体工作职责，但此摘要不将管理、人力与心理等背景视为官方无限制专业，学历、招聘届别及关闭状态均应以当前HR职位详情为准。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人力资源管理",
+        "工商管理",
+        "心理学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026年9月官网招聘记录，届别与资格需确认",
+      "url": "https://hr.zto.com/campus-position?object=1&projectId=17",
+      "evidenceUrl": "https://hr.zto.com/campus-position?object=1&projectId=17",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中通快递官网管理培训生（不同于中通快运）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "product-mt-2026",
+      "title": "管理培训生—产品推广（上海）",
+      "category": "产品运营",
+      "city": "上海市",
+      "summary": "中通官网2026年9月14日具名产品事业职位，参与用户研究、推广方案、业务数据分析、系统推广及需求反馈。",
+      "requirements": "用户需求研究、产品推广和数据运营是官网明确职责；电子商务、市场、计算机等相关度仅为辅助参考，不作官方专业门槛证明。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子商务",
+        "市场营销",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026年9月官网招聘记录，届别与资格需确认",
+      "url": "https://hr.zto.com/campus-position?object=1&projectId=17",
+      "evidenceUrl": "https://hr.zto.com/campus-position?object=1&projectId=17",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中通快递官网管理培训生（不同于中通快运）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "safety-mt-2026",
+      "title": "管理培训生—安全管理（上海）",
+      "category": "安全管理",
+      "city": "上海市",
+      "summary": "中通2026年9月14日安全管理管培生岗位，涉及快递作业、场地、运输线路安全检查及安全管理制度和数据报告。",
+      "requirements": "安全工程及物流相关专业是业务关联建议；官网列有安全制度、现场检查、风险排查等职责，具体学历及应届资格与现时开放情况均须官方复查。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "安全工程",
+        "物流管理",
+        "交通运输"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026年9月官网招聘记录，届别与资格需确认",
+      "url": "https://hr.zto.com/campus-position?object=1&projectId=17",
+      "evidenceUrl": "https://hr.zto.com/campus-position?object=1&projectId=17",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中通快递官网管理培训生（不同于中通快运）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "finance-mt-2026",
+      "title": "管理培训生—财务管理（上海）",
+      "category": "财务",
+      "city": "上海市",
+      "summary": "中通2026年9月14日财务管理管培生岗位，涉及网点费用结算申诉、收入成本分析、业务财务及财务制度培训。",
+      "requirements": "官网披露具体费用审核、收入成本分析与结算职责，会计学、财务管理与审计等为专业关联建议；逐岗具体学历与证书条件仍以官网为准。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "会计学",
+        "财务管理",
+        "审计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026年9月官网招聘记录，届别与资格需确认",
+      "url": "https://hr.zto.com/campus-position?object=1&projectId=17",
+      "evidenceUrl": "https://hr.zto.com/campus-position?object=1&projectId=17",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中通快递官网管理培训生（不同于中通快运）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "operations-mt-2026",
+      "title": "管理培训生—物流运营（上海）",
+      "category": "运营管理",
+      "city": "上海市",
+      "summary": "中通2026年9月14日物流运营职位，涉及包裹转运效率、站点作业、数据分析、运输调度、路由规划、成本及质量改善。",
+      "requirements": "官网明确岗位实操及管理训练内容，物流、交通运输与工业工程相关度仅供参考；招聘是否仍进行、准确资格及其他城市相同职位情况需独立核验。 岗位是否实时开放及资格认定必须以当期官方单职位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "物流管理",
+        "交通运输",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026年9月官网招聘记录，届别与资格需确认",
+      "url": "https://hr.zto.com/campus-position?object=1&projectId=17",
+      "evidenceUrl": "https://hr.zto.com/campus-position?object=1&projectId=17",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中通快递官网管理培训生（不同于中通快运）",
+      "currentOpenVerified": false
+    }
+  ]
+}

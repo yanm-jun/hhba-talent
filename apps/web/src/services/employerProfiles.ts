@@ -42,7 +42,7 @@ export function allowedEmployerProfileJobLink(id:string,url:string):boolean{
   const u=new URL(url),e=new URL(record.job.evidenceUrl);
   // Permit only Moka's fixed '#/' client-router suffix. The URL must still match
   // the exact reviewed profile job URL, use HTTPS and the approved ATS host.
-  const trustedMokaHome=u.hostname==='app.mokahr.com'&&u.hash==='#/'&&
+  const trustedMokaHome=u.hostname==='app.mokahr.com'&&(u.hash==='#/' || (record.profile.id==='cn-autumn-080'&&u.hash==='#/jobs'))&&
    u.href===record.profile.recruitment.url;
   return u.protocol==='https:'&&e.protocol==='https:'&&!u.username&&!u.password&&!u.port&&
    (!u.hash||trustedMokaHome)&&

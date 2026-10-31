@@ -222,6 +222,9 @@ jobs:
       - name: Package 072-074 true-source corporate/government imagery with audited fallback
         working-directory: apps/web
         run: python scripts/prepare-employers-072-074-sourced-media.py
+      - name: Package 078-080 audited documentary media
+        working-directory: apps/web
+        run: python scripts/prepare-employers-078-080-source-media.py
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
@@ -246,6 +249,12 @@ jobs:
       - name: Test 072-074 shared four-panel, truthful job sources, media and application status
         working-directory: apps/web
         run: node scripts/employers-072-074-v2.contract.test.mjs
+      - name: Verify 075-077 previous employer cohort
+        working-directory: apps/web
+        run: node scripts/employers-075-077-v2.contract.test.mjs
+      - name: Verify 078-080 enterprise job and image records
+        working-directory: apps/web
+        run: node scripts/employers-078-080-v2.contract.test.mjs
       - name: Validate MINIEYE 035 source-backed positions, six major tabs and real media
         working-directory: apps/web
         run: node scripts/minieye-v2.contract.test.mjs

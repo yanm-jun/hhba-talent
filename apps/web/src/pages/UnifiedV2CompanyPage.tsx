@@ -208,7 +208,7 @@ export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
  const minieye=id==='cn-autumn-035';
  const keyence=id==='cn-autumn-157';
  // Shared four-block V2 layout for all approved enterprise records.
- const batch3756=/^cn-autumn-(?:03[6-9]|04[0-9]|05[0-9]|06[0-9]|07[0-7])$/.test(id);
+ const batch3756=/^cn-autumn-(?:03[6-9]|04[0-9]|05[0-9]|06[0-9]|07[0-9]|080)$/.test(id);
  const showcase=qizheng||weipu||bodor||pxw||minieye||keyence||batch3756;
  const detailedCards=weipu||bodor||pxw||minieye||keyence||batch3756;
  const batchGroups=useMemo(()=>p?[...new Set(p.jobs.map(job=>job.category).filter((value):value is string=>!!value))].map(label=>({label,majors:[]})):[],[p]);

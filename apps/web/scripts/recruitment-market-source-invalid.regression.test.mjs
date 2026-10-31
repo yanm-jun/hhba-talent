@@ -15,8 +15,9 @@ for(const file of files){
   assert.equal(u.protocol,'https:');assert.equal(e.protocol,'https:');
   assert.equal(u.hostname,portal.hostname,'Job link cannot redirect to unreviewed host: '+id);
   assert(!u.username&&!u.password&&!u.port,'Credentials and nonstandard ports blocked: '+id);
-  assert(!u.hash||(u.hostname==='app.mokahr.com'&&u.hash==='#/'&&u.href===p.recruitment.url),
-    'Only exact pinned Moka #/ SPA landing routes can contain fragments: '+id);
+  assert(!u.hash||(u.hostname==='app.mokahr.com'&&u.href===p.recruitment.url&&
+     (u.hash==='#/'||(p.id==='cn-autumn-080'&&u.hash==='#/jobs'))),
+    'Only exact reviewed Moka landing hashes (#/ or Danone #/jobs) are permitted: '+id);
   if(u.hash)hashRoutes++;
   assert(job.title&&job.summary&&job.requirements&&job.recruitmentSubject);
   assert(job.currentOpenVerified===false,'Unverified posts cannot be claimed open');
