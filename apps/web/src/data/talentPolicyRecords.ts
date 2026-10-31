@@ -15,6 +15,8 @@ import {GUANGDONG_POLICY_RECORDS} from './guangdongPolicyRecords.ts';
 import {GUANGDONG_EXPANDED_POLICY_RECORDS} from './guangdongExpandedPolicyRecords.ts';
 import {GUANGDONG_FINAL_CITIES_POLICY_RECORDS} from './guangdongFinalCitiesPolicyRecords.ts';
 import {GUANGDONG_PROVINCIAL_POLICY_RECORDS} from './guangdongProvincialPolicyRecords.ts';
+import {LIAONING_PROVINCIAL_POLICY_RECORDS} from './liaoningProvincialPolicyRecords.ts';
+import {LIAONING_MUNICIPAL_POLICY_RECORDS} from './liaoningMunicipalPolicyRecords.ts';
 import {GUANGXI_POLICY_RECORDS} from './guangxiPolicyRecords.ts';
 import {GUANGXI_MUNICIPAL_POLICY_RECORDS} from './guangxiMunicipalPolicyRecords.ts';
 import {BEIJING_POLICY_RECORDS} from './beijingPolicyRecords.ts';
@@ -49,6 +51,8 @@ export type TalentPolicyRecord={
 };
 export const TALENT_POLICY_REVIEW_DATE='2026-10-30';
 export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
+...LIAONING_PROVINCIAL_POLICY_RECORDS,
+...LIAONING_MUNICIPAL_POLICY_RECORDS,
 ...YUNNAN_POLICY_RECORDS,
 ...HANGZHOU_POLICY_RECORDS,
 ...NINGBO_POLICY_RECORDS,
