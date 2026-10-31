@@ -58,13 +58,14 @@ assert.ok(GUANGXI_MUNICIPAL_RESEARCH_RECORDS.some(p=>p.city==='百色'));
 assert.ok(GUANGXI_MUNICIPAL_RESEARCH_RECORDS.some(p=>p.city==='玉林'));
 assert.ok(GUANGXI_MUNICIPAL_RESEARCH_RECORDS.some(p=>p.city==='钦州'));
 assert.ok(GUANGXI_MUNICIPAL_RESEARCH_RECORDS.some(p=>p.city==='来宾'));
-assert.equal(GUANGXI_HOUSING_RECORDS.length,1,'Only independently sourced 2026 Guilin housing program is formal');
-const h=GUANGXI_HOUSING_RECORDS[0];
-assert.equal(h.city,'桂林');
-assert.equal(h.kind,'program','Guilin is a city qualification/program, not a specific rent apartment');
-assert.equal(talentSourceKind(h.sourceUrl),'government');
-assert.equal(assessHousing(h,'2026-10-31').grade,'B');
-assert.ok(TALENT_HOUSING_RECORDS.some(x=>x.id===h.id));
+assert.equal(GUANGXI_HOUSING_RECORDS.length,2,'Only verified Guilin and Fangchenggang housing programs are formal');
+for(const h of GUANGXI_HOUSING_RECORDS){
+ assert.ok(['桂林','防城港'].includes(h.city));
+ assert.equal(h.kind,'program','These are city purchase qualification programs, not currently available rental apartments');
+ assert.equal(talentSourceKind(h.sourceUrl),'government');
+ assert.equal(assessHousing(h,'2026-10-31').grade,'B');
+ assert.ok(TALENT_HOUSING_RECORDS.some(x=>x.id===h.id));
+}
 assert.equal(GUANGXI_HOUSING_RESEARCH_LEADS.length,3,'Separate unverified Nanning Guilin Guigang housing lead');
 for(const lead of GUANGXI_HOUSING_RESEARCH_LEADS){
  assert.ok(TALENT_HOUSING_RESEARCH_LEADS.some(x=>x.id===lead.id));
@@ -81,6 +82,6 @@ assert.ok(listing.includes("GUANGXI_MUNICIPAL_RESEARCH_RECORDS"));
 assert.ok(listing.includes("p.id.endsWith('-graduate-housing-rent')"),'Municipal research does not link to unrelated regional guides');
 assert.equal((routes.match(/<UnifiedPolicyGuide/g)||[]).length>=1,true,'Use existing V5.1 shared guide template');
 console.log('✓ Guangxi 14 city registry, 42 provincial city views, 42 real shared-guide routes');
-console.log('✓ 1 original local-policy record, 4 research local-policy leads, 1 verified city housing program, 3 clearly separate housing research leads');
+console.log('✓ 1 original local-policy record, 4 research local-policy leads, 2 verified city housing programs, 3 clearly separate housing research leads');
 console.log('✓ National search/list/housing integrations, source grades, expiry, NO false city acceptance');
 console.log('GUANGXI:',JSON.stringify({cities:expected.length,provinceViews:GUANGXI_POLICY_RECORDS.length+GUANGXI_RENT_RESEARCH_RECORDS.length,municipalGovernment:GUANGXI_MUNICIPAL_POLICY_RECORDS.length,municipalResearch:GUANGXI_MUNICIPAL_RESEARCH_RECORDS.length,housingGov:GUANGXI_HOUSING_RECORDS.length,housingResearch:GUANGXI_HOUSING_RESEARCH_LEADS.length,qualityA:0}));
