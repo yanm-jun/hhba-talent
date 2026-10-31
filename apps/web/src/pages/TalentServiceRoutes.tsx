@@ -1,3 +1,4 @@
+import {SHAANXI_10_CITIES,shaanxiGuideUrl,buildShaanxiGuide} from '../data/shaanxiGuides';
 import {GUIZHOU_9_REGIONS,guizhouGuideUrl,buildGuizhouGuide} from '../data/guizhouGuides';
 import {getTalentCitySnapshot} from '../data/talentCitySnapshot';
 import {SICHUAN_21_REGIONS,sichuanGuideUrl,buildSichuanGuide} from '../data/sichuanGuides';
@@ -179,6 +180,13 @@ function CityHub({city}:{city:string}){
    </div>
   </section>
   
+ {SHAANXI_10_CITIES.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="陕西省十地市贵阳V6标准人才政策与住房目录">
+  <div className="ts-sub-section-heading"><h2>{match.name} · 陕西省 V6 人才政策与安居</h2><Link to={talentListUrl('policies',match.name)}>查看全部政策 <ArrowRight size={15}/></Link></div>
+  <p>每条按政府政策、真实项目、历史批次、管理制度或建设采购分别展示。省级统一事项不是各地额外现金；住房套数不是实时空房；未核实项目不宣称可立即入住。</p>
+  {(['生活补贴','落户引进','就业创业','购房补贴','租房安居'] as const).map(group=>policies.some(p=>p.category===group)&&<div key={group}><h3>{group}</h3><div className="ts-sub-grid">{policies.filter(p=>p.category===group).map(p=><Link key={p.id} className="ts-sub-tile" to={shaanxiGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>{p.headlineAmount||'以官方核定为准'} · {p.payoutTo||'身份须核验'} · {policyStatus(p)}</span><ArrowRight size={15}/></Link>)}</div></div>)}
+  <h3>人才公寓、公租房、保租房及政策住房</h3>
+  {homes.length?<div className="ts-sub-grid">{homes.map(h=><Link key={h.id} className="ts-sub-tile" to={shaanxiGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>{h.kind==='project'?'具体项目':'管理制度或研究线索'} · {housingStatus(h)}</span><ArrowRight size={15}/></Link>)}</div>:<p>暂无有官方出处的独立安居资料，不意味着当地没有住房政策。需继续核验而不能虚构公寓。</p>}
+ </section>}
  {match.name==='贵阳'&&<section className="ts-sub-section" aria-label="贵阳市2026人才引进政策专项完整目录">
   <div className="ts-sub-section-heading"><h2>贵阳贵安 · 2026人才引进政策专项</h2><Link to={talentListUrl('policies','贵阳')}>查看全部政策 <ArrowRight size={15}/></Link></div>
   <p>根据2026年2月25日政府政策清单、2026年8月5日青年办事指南及秋季引才公告重新整理。<strong>安家费是个人分期待遇；企业引才薪酬补助发给企业；事业单位引才是岗位招聘</strong>，三个项目不能混淆。住房项目无实时空房证据。</p>
@@ -397,6 +405,11 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
    province==='jiangxi'?buildJiangxiGuide(decode(fragments[3]||'')):
    buildHunanGuide(decode(fragments[3]||''));
   body=guide?<UnifiedPolicyGuide data={guide}/>:<><Bread current="指南尚未收录"/><section className="ts-sub-header"><h1>该指南暂未核验</h1><Link to="/talent-service/cities">返回城市目录</Link></section></>;
+ }
+ else if(kind==='policy-guide-preview'&&fragments[2]==='shaanxi'){
+  const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
+  const guide=t?buildShaanxiGuide(t,decode(fragments[4]||'')):null;
+  body=guide?<UnifiedPolicyGuide data={guide}/>:<section className="ts-sub-header"><h1>该陕西政策/住房指南暂未核验</h1><Link to="/talent-service/cities">返回全国城市目录</Link></section>;
  }
  else if(kind==='policy-guide-preview'&&fragments[2]==='guizhou'){
  const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
