@@ -10,7 +10,7 @@ import {findTalentCity,queryTalentCities} from '../src/data/talentCityRegistry.t
 assert.equal(XIZANG_7_REGIONS.length,7);
 assert.equal(new Set(XIZANG_7_REGIONS).size,7);
 assert.equal(XIZANG_POLICY_RECORDS.length,29);
-assert.equal(new Set(XIZANG_POLICY_RECORDS.map(p=>p.id)).size,28);
+assert.equal(new Set(XIZANG_POLICY_RECORDS.map(p=>p.id)).size,29);
 assert.equal(XIZANG_HOUSING_RECORDS.length,22);
 assert.equal(queryTalentCities('','西藏自治区').length,7);
 for(const city of XIZANG_7_REGIONS){
