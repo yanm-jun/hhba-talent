@@ -3,6 +3,7 @@ import {ArrowLeft,ArrowRight,ArrowUpRight,BookOpen,CheckCircle2,ExternalLink,Gra
 import type {User} from '../services/api';
 import {Link} from '../router';
 import {Shell} from './Shell';
+import {MinotStateUniversityPage,MinotStateProgramPage} from './MinotStateUniversityPage';
 import {studyCountries,studyCountry,type StudyCountryCode} from '../data/studyAbroad';
 import {findProgram,findUniversity,programsForUniversity,searchUniversityPrograms,studyDegreeLabels,studyFieldLabels,studyLanguageLabels,studyModeLabels,universities,universityPrograms,type DirectoryFilters,type StudyDegree,type StudyField} from '../data/studyUniversities';
 import '../styles/study-universities.css';
@@ -72,6 +73,7 @@ function DetailShell({user,children}:{user:User|null;children:React.ReactNode}){
  return <Shell user={user}><main className="hhba-study hhba-uni-detail-page"><div className="hhba-study-wrap"><Link className="hhba-study-back" to="/study-abroad"><ArrowLeft size={16}/> 返回留学机会 · 大学与专业数据库</Link>{children}</div></main></Shell>;
 }
 export function StudyUniversityDetail({user,id}:{user:User|null;id:string}){
+ if(id==='minot-state')return <MinotStateUniversityPage user={user}/>;
  const u=findUniversity(id);
  if(!u)return <DetailShell user={user}><div className="hhba-uni-not-found"><h1>未找到这所大学</h1><p>请返回已收录的学校目录重新选择。</p><Link className="hhba-study-btn" to="/study-abroad">返回目录 <ArrowRight size={15}/></Link></div></DetailShell>;
  const ps=programsForUniversity(u.id);
@@ -94,6 +96,7 @@ export function StudyUniversityDetail({user,id}:{user:User|null;id:string}){
  </DetailShell>;
 }
 export function StudyProgramDetail({user,id}:{user:User|null;id:string}){
+ if(id==='minot-management-ms'||id==='minot-cyber-ms')return <MinotStateProgramPage user={user} id={id}/>;
  const p=findProgram(id),u=p?findUniversity(p.universityId):undefined;
  if(!p||!u)return <DetailShell user={user}><div className="hhba-uni-not-found"><h1>未找到该专业</h1><Link className="hhba-study-btn" to="/study-abroad">返回目录</Link></div></DetailShell>;
  const c=studyCountry(u.country);

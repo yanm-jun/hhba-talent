@@ -310,9 +310,44 @@ jobs:
       - name: Verify study abroad V1 nav, 6 official national gateways and static routes
         working-directory: apps/web
         run: node --test scripts/study-abroad.contract.test.mjs
+      - name: Verify first deep Minot State profile content, image rights and visa disclosures
+        working-directory: apps/web
+        run: node --experimental-strip-types --test scripts/minot-state.contract.test.mjs
       - name: Verify real university and program database links, precise search and integrated study route
         working-directory: apps/web
         run: node --experimental-strip-types --test scripts/study-universities.contract.test.mjs
+      - name: Package licensed, source-attributed real Minot State campus photographs
+        run: |
+          python - <<'PY'
+          import pathlib, urllib.request, hashlib, time
+          target=pathlib.Path('apps/web/public/images/study/minot-state')
+          target.mkdir(parents=True,exist_ok=True)
+          sources=[
+            ('old-main-highsmith.jpg','https://tile.loc.gov/storage-services/service/pnp/highsm/69000/69075v.jpg',140000),
+            ('old-main-goldenpaw2000.jpg','https://upload.wikimedia.org/wikipedia/commons/6/67/Oldmainmsu.jpg',70000),
+            ('old-main-alexwcovington.jpg','https://upload.wikimedia.org/wikipedia/commons/1/1e/Minotstate.jpg',90000),
+          ]
+          for filename,url,minimum in sources:
+            last=None
+            for attempt in range(3):
+              try:
+                request=urllib.request.Request(url,headers={'User-Agent':'HHBA-Archive-Attribution/1.0 (public-domain and CC BY-SA photo publication; contact via GitHub repo)'})
+                with urllib.request.urlopen(request,timeout=45) as response:
+                  data=response.read(2_000_000)
+                  if response.status!=200: raise ValueError('HTTP not 200')
+                if len(data)<minimum or not data.startswith(bytes((0xff,0xd8,0xff))):
+                  raise ValueError('Unexpected media or size')
+                dest=target/filename
+                dest.write_bytes(data)
+                print('HHBA_MINOT_LICENSED_REAL_PHOTO',filename,len(data),hashlib.sha256(data).hexdigest())
+                break
+              except Exception as exc:
+                last=exc
+                if attempt<2:time.sleep(3)
+            else:
+              raise RuntimeError('Fail to retrieve source-attributed photo '+filename+': '+str(last))
+          assert len(list(target.glob('*.jpg')))==3
+          PY
       - name: "Build unified HHBA - 200 companies, applicant center, employer governance previews and brand pages"
         working-directory: apps/web
         env:
@@ -676,6 +711,7 @@ jobs:
           curl -fsS "$HHBA_TEST_BASE" >/dev/null
           node scripts/mainline-v2-browser.mjs
           node scripts/study-universities.browser.mjs
+          node scripts/minot-state.browser.mjs
       - name: Save screenshots and the real search/browser verification results
         if: always()
         uses: actions/upload-artifact@v4
