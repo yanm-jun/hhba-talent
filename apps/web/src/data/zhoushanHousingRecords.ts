@@ -11,7 +11,7 @@ export const ZHOUSHAN_HOUSING_RECORDS:TalentHousingRecord[]=[
     "rent": "租金按实际公租房项目和家庭保障类别核定，本报道没有住房单价、住房补贴额和具体项目。",
     "eligibility": "符合当地住建部门公租房资格审核的岱山、嵊泗等住房困难家庭；不能仅凭就业地直接取得舟山本岛房源。",
     "sourceUrl": "https://zsstb.zhoushan.gov.cn/col/col1228973558/art/2026/art_7eb924b414c84712a341c641c4ce9bfa.html",
-    "published": "2026-09-01",
+    "published": "2026",
     "kind": "program",
     "housingCategory": "其他住房",
     "reviewedAt": "2026-10-31",
