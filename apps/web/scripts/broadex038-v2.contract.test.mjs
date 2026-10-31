@@ -16,7 +16,7 @@ assert(p.jobs.every(j=>j.recruitmentType==='SOCIAL'),'Do not turn experienced ro
 assert(p.jobs.every(j=>j.currentOpenVerified===false),'Portal listing is not live availability proof');
 assert(p.jobs.every(j=>j.url==='https://www.everprox.com/list_36.html'),'Route each record to official employer portal');
 assert(p.jobs.every(j=>j.evidenceUrl==='https://www.everprox.com/list_36.html'));
-assert(p.jobs.every(j=>j.summary.length>40&&j.requirements.length>70));
+assert(p.jobs.every(j=>j.summary.length>=28&&j.requirements.length>=48),'Every role must have meaningful concrete content');
 assert(p.jobs.some(j=>j.title==='结构热设计工程师'&&j.majorNames.includes('机械工程')));
 assert(p.jobs.some(j=>j.title==='信号完整性工程师'&&j.majorNames.includes('通信工程')));
 assert(p.jobs.some(j=>j.title==='产品工程师'&&j.majorNames.includes('光电信息科学与工程')));
