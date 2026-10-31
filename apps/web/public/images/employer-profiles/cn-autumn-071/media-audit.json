@@ -1,0 +1,26 @@
+{
+  "company": "桃溪集团",
+  "verifiedCorporateLogo": false,
+  "commercialPublicationRightsVerified": false,
+  "created": "2026-10-31",
+  "visuals": [
+    {
+      "file": "logo.svg",
+      "type": "HHBA editorial wordmark",
+      "realPhoto": false
+    },
+    {
+      "file": "photo1.svg",
+      "type": "HHBA original illustrated brand concept",
+      "realPhoto": false,
+      "republicationLicenseVerified": false
+    },
+    {
+      "file": "photo2.svg",
+      "type": "HHBA original illustrated brand concept",
+      "realPhoto": false,
+      "republicationLicenseVerified": false
+    }
+  ],
+  "notes": "Logo is NOT official. 069/070 real images must be found on grounded company or affiliated institutional news pages; 071 editorial illustrations are not actual product or office photographs."
+}
