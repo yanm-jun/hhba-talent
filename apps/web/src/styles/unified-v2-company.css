@@ -144,3 +144,14 @@
 .hhba-v2-pxw .hhba-v2-company-role details summary{color:#2d8056}
 .hhba-v2-pxw .hhba-v2-company-role>small.hhba-v2-weipu-location{color:#73817d}
 @media(max-width:760px){.hhba-v2-pxw .hhba-kpmg-logo img{max-width:65px}}
+
+/* KEYENCE 157: the exact V2 screenshot-approved four-section template. */
+.hhba-v2-keyence .hhba-kpmg-logo img{max-width:100%;max-height:82px;object-fit:contain}
+.hhba-v2-keyence .hhba-kpmg-hero{border-top:3px solid #db1025}
+.hhba-v2-keyence .hhba-kpmg-photo-grid img{object-fit:cover;object-position:center}
+.hhba-v2-keyence .hhba-v2-company-role-grid{grid-template-columns:minmax(0,1fr)}
+.hhba-v2-keyence .hhba-v2-company-role{min-height:225px}
+.hhba-v2-keyence .hhba-v2-company-role h3{font-size:18px}
+.hhba-v2-keyence .hhba-v2-company-role details summary{color:#2d8056}
+.hhba-v2-keyence .hhba-v2-qizheng-majors .hhba-v2-company-chips{gap:9px}
+@media(min-width:850px){.hhba-v2-keyence .hhba-v2-company-role-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
