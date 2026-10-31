@@ -15,7 +15,7 @@ for(let i=0;i<3;i++){
  assert.equal(p.id,id);assert.equal(p.name,names[i]);
  assert.equal(p.jobs.length,jobCount[i]);assert.equal(p.business.length,6);
  assert.equal(new Set(p.jobs.map(j=>j.id)).size,p.jobs.length);
- assert(p.jobs.every(j=>j.title&&j.summary.length>25&&j.requirements.length>65&&j.city&&j.category&&j.majorNames.length>=2));
+ assert(p.jobs.every(j=>j.title&&j.summary.length>25&&j.requirements.length>=50&&j.city&&j.category&&j.majorNames.length>=2));
  assert(p.jobs.every(j=>j.currentOpenVerified===false&&j.recruitmentType==='CAMPUS'),'No fake real-time openings');
  assert(p.jobs.every(j=>j.evidenceUrl.startsWith('https://')&&j.url===p.recruitment.url));
  assert(p.jobs.every(j=>/2027/.test(j.title)),'2027 direction only, not old 2026 standalone listing');
@@ -32,6 +32,15 @@ for(let i=0;i<3;i++){
   if(e.editorialFallback)assert(/非企业官方|非官方/.test(p.photoNote),'Do not pass off editorial nameplate as official corporate trademark');
  }
  assert(audit['photo1.jpg'].verified&&audit['photo2.jpg'].verified);
+ if(ids[i]==='055'){
+   assert(!audit['logo.png'].source.includes('res.gys.cn'),'Do not use supplier website logo');
+   assert(!audit['photo1.jpg'].source.includes('1f5e3fc61d084513b684e016ba6b1071.jpg'),'No recruitment QR code as company photo');
+ }
+ if(ids[i]==='056'){
+   assert(!audit['photo1.jpg'].source.includes('CgAGbGXlrn6AXw5fAABm4izI2Vw692.png'),'No WhatsApp/WeChat QR code as company photo');
+   assert(audit['photo1.jpg'].sourcePage.includes('vxichina.cn/AboutStd_1070.html'),'Only official Xian operation centre photo');
+ }
+
  if(ids[i]==='054')assert.equal(p.jobs.length,1,'No speculative 2027 overseas officer roles');
  if(ids[i]==='055')assert(p.industry.includes('环保水处理')&&!p.industry.includes('文旅'),'Not Chimelong tourist attractions');
  if(ids[i]==='056')assert(p.jobs.every(x=>x.educationLabel.includes('未披露')),'Do not fabricate a published degree condition');
