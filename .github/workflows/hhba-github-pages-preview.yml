@@ -244,6 +244,9 @@ jobs:
       - name: Verify Handan V5.1 official 2026 youth policy and historical rental inventory
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-handan-city-v51.mjs
+      - name: Verify Hebei Shijiazhuang V5.1 government policies and honest housing batches
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-shijiazhuang-city-v51.mjs
       - name: Lock future city template, certify full policy guides and protect 95 historical record IDs
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
