@@ -55,7 +55,7 @@ const r=readFileSync(new URL('../src/pages/TalentServiceRoutes.tsx',import.meta.
 assert.ok(r.includes("fragments[2]==='qinghai'")&&r.includes("QINGHAI_8_REGIONS.some"));
 
 // Province-wide policies are each single canonical entries, not duplicated 8 times.
-assert.ok(QINGHAI_SHARED_POLICY_RECORDS.length>=9);
+assert.ok(QINGHAI_SHARED_POLICY_RECORDS.length>=11);
 assert.ok(QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS.length>=9);
 assert.equal(new Set(QINGHAI_SHARED_POLICY_RECORDS.map(p=>p.id)).size,QINGHAI_SHARED_POLICY_RECORDS.length);
 assert.equal(new Set(QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS.map(h=>h.id)).size,QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS.length);
@@ -83,5 +83,5 @@ assert.equal(assessHousing(QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS.find(h=>h.id==='
 const ui=readFileSync(new URL('../src/pages/TalentServiceRoutes.tsx',import.meta.url),'utf8');
 assert.ok(ui.includes('qinghaiSharedPolicies.map')&&ui.includes('qinghaiSharedHousing.map'),'shared cards on each Qinghai region');
 assert.ok(ui.includes("recordCity==='青海省'")&&ui.includes('qhPolicyMatch')&&ui.includes('qhHousingMatch'),'national search reaches province shared programs');
-console.log('QINGHAI_2026_EXPANSION_OK: 9 provincial policies, 9 new housing records (2 shared), official sources and no expired Guide record');
+console.log('QINGHAI_2026_EXPANSION_OK: 11 provincial policies, 9 new housing records (2 shared), official sources and no expired Guide record');
 console.log('QINGHAI_2026_POLICY_INTEGRATION_OK: '+QINGHAI_POLICY_RESEARCH_RECORDS.length+' policy leads, '+QINGHAI_HOUSING_RESEARCH_RECORDS.length+' housing leads, 8 prefectures, dates, guides, search integration');
