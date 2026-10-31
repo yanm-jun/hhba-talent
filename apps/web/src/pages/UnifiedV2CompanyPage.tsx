@@ -93,6 +93,56 @@ const bodorGroups=[
   ]
  }
 ] as const;
+const pxwGroups=[
+ {
+  "label": "工艺研发",
+  "majors": [
+   "微电子科学与工程",
+   "集成电路科学与工程",
+   "材料科学与工程"
+  ]
+ },
+ {
+  "label": "制程 / 良率",
+  "majors": [
+   "集成电路设计与集成系统",
+   "微电子科学与工程",
+   "材料科学与工程"
+  ]
+ },
+ {
+  "label": "材料 / 分析",
+  "majors": [
+   "材料科学与工程",
+   "化学",
+   "物理学"
+  ]
+ },
+ {
+  "label": "设备 / 自动化",
+  "majors": [
+   "机械工程",
+   "电气工程及其自动化",
+   "自动化"
+  ]
+ },
+ {
+  "label": "软件 / 系统",
+  "majors": [
+   "计算机科学与技术",
+   "软件工程",
+   "自动化"
+  ]
+ },
+ {
+  "label": "生产 / 管理",
+  "majors": [
+   "工业工程",
+   "工程管理",
+   "机械工程"
+  ]
+ }
+] as const;
 function roleMatches(role:Role,major:string){
  if(!major||role.majorUnrestricted)return true;
  return [...role.majorNames,...role.editorialRelatedMajors].some(x=>majorNamesRelated(x,major));
@@ -103,9 +153,10 @@ export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
  const qizheng=id==='cn-autumn-031';
  const weipu=id==='cn-autumn-032';
  const bodor=id==='cn-autumn-033';
- const showcase=qizheng||weipu||bodor;
- const detailedCards=weipu||bodor;
- const majorGroups=bodor?bodorGroups:(weipu?weipuGroups:qizhengGroups);
+ const pxw=id==='cn-autumn-034';
+ const showcase=qizheng||weipu||bodor||pxw;
+ const detailedCards=weipu||bodor||pxw;
+ const majorGroups=pxw?pxwGroups:(bodor?bodorGroups:(weipu?weipuGroups:qizhengGroups));
  const [expanded,setExpanded]=useState(false);
  const [focusedRole]=useState(()=>new URLSearchParams(location.search).get('role')||'');
  const back=getCompanyReturnTarget();
@@ -116,12 +167,13 @@ export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
  const matches=useMemo(()=>p?.jobs.filter(job=>{
   if(!major)return true;
   if(bodor)return job.category===major;
+  if(pxw)return job.category===major;
   if(showcase){const g=majorGroups.find(g=>g.label===major);return !!g&&g.majors.some(name=>roleMatches(job,name));}
   return roleMatches(job,major);
- })||[],[p,major,bodor,showcase,majorGroups]);
+ })||[],[p,major,bodor,pxw,showcase,majorGroups]);
  if(!p)return <Shell user={user}><section className="hhba-v2-company-status" role="alert">企业档案未加入主站数据目录。<p><Link to="/candidate/jobs">返回招聘市场</Link></p></section></Shell>;
  return <Shell user={user}>
-  <article className={"company-profile hhba-kpmg-compact"+(showcase?" hhba-v2-showcase":"")+(weipu?" hhba-v2-weipu":"")+(bodor?" hhba-v2-bodor":"")+(qizheng?" hhba-v2-qizheng":"")} data-company-template="unified-v2" data-domestic-rebuild="v2" data-employer-id={p.id}>
+  <article className={"company-profile hhba-kpmg-compact"+(showcase?" hhba-v2-showcase":"")+(weipu?" hhba-v2-weipu":"")+(bodor||pxw?" hhba-v2-bodor":"")+(pxw?" hhba-v2-pxw":"")+(qizheng?" hhba-v2-qizheng":"")} data-company-template="unified-v2" data-domestic-rebuild="v2" data-employer-id={p.id}>
    <nav className="company-profile-top" aria-label="企业详情导航">
     <Link to={back.to} restoreScrollY={back.scrollY} restoreMarketState={back.marketState}><ArrowLeft size={15}/> 返回上一页</Link>
     <Link to="/candidate/jobs">招聘市场 <ArrowRight size={15}/></Link>
@@ -147,11 +199,11 @@ export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
      <div className="hhba-v2-company-chips">
       <button type="button" className={!major?'selected':''} onClick={()=>setMajor('')}>全部专业 ({p.jobs.length})</button>
       {majorGroups.map(g=><button type="button" key={g.label} className={major===g.label?'selected':''} onClick={()=>setMajor(g.label)}>
-       {g.label} ({p.jobs.filter(j=>bodor?j.category===g.label:g.majors.some(name=>roleMatches(j,name))).length})</button>)}
+       {g.label} ({p.jobs.filter(j=>bodor||pxw?j.category===g.label:g.majors.some(name=>roleMatches(j,name))).length})</button>)}
      </div>
     </section>}
    <section className="hhba-kpmg-section hhba-v2-company-jobs" aria-label="招聘岗位">
-    {showcase?<div className="hhba-kpmg-section-heading"><div><h2>招聘岗位</h2><p>{major||'全部专业'} · {matches.length} 条岗位资料。当前申请状态请以{bodor?'邦德激光招聘系统':(weipu?'微谱招聘系统':'奇正集团官网')}为准。</p></div></div>:null}
+    {showcase?<div className="hhba-kpmg-section-heading"><div><h2>招聘岗位</h2><p>{major||'全部专业'} · {matches.length} 条岗位资料。当前申请状态请以{pxw?'鹏芯微校园招聘系统':(bodor?'邦德激光招聘系统':(weipu?'微谱招聘系统':'奇正集团官网'))}为准。</p></div></div>:null}
     {!showcase&&<>
     <div className="hhba-kpmg-section-heading"><div><h2>岗位与所学专业</h2>
      <p>{p.majorIntro}</p></div></div>
