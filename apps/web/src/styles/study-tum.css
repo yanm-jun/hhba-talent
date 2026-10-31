@@ -1,0 +1,15 @@
+/* Sixth university: clicked-in TUM details inherit HHBA's tested deep school design. No homepage CSS changes. */
+.hhba-tum .hhba-minot-hero{background:radial-gradient(ellipse at 86% 3%,#d7e8df,transparent 48%),linear-gradient(118deg,#eaf5ed,#fff)}
+.hhba-tum .hhba-minot-photo-trigger img{object-fit:cover}
+.hhba-tum .hhba-minot-narrative{min-width:0}
+.hhba-tum .hhba-minot-narrative h3{overflow-wrap:anywhere}
+.hhba-tum .hhba-minot-deadlines{gap:14px}
+.hhba-tum-degree{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:23px;border:1px solid #d6e7dc;border-radius:12px;background:linear-gradient(115deg,#f0f8f1,#fff);margin-bottom:22px}
+.hhba-tum-degree>div{flex:1;min-width:0}
+.hhba-tum-degree h3{margin:8px 0 4px;color:#2b694a;font-size:20px}
+.hhba-tum-degree p{margin:6px 0;color:#638272;font-size:13px;line-height:1.8}
+.hhba-tum-degree>a{white-space:nowrap;flex-shrink:0}
+.hhba-tum .hhba-minot-jump>a:focus-visible,.hhba-tum .hhba-minot-thumb:focus-visible,.hhba-tum .hhba-minot-photo-trigger:focus-visible{outline:2px solid #267e4e;outline-offset:2px}
+.hhba-tum .hhba-minot-budget-note{align-items:flex-start}
+.hhba-tum .hhba-minot-lightbox p{color:#e2f3e8}
+@media(max-width:720px){.hhba-tum-degree{flex-direction:column;align-items:stretch}.hhba-tum-degree>a{justify-content:center}.hhba-tum .hhba-minot-hero-actions>a{max-width:100%}.hhba-tum .hhba-minot-fee-wrap{overflow-x:auto}}

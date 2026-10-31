@@ -419,6 +419,11 @@ jobs:
         run: node --experimental-strip-types --test scripts/monash.contract.test.mjs
       - name: Package three authentically licensed Clayton campus photos
         run: python apps/web/scripts/package-monash-campus-photos.py
+      - name: Validate TUM advanced Informatics MSc admissions, real campus imagery and authentic fees
+        working-directory: apps/web
+        run: node --experimental-strip-types --test scripts/tum.contract.test.mjs
+      - name: Package 3 licensed actual Garching campus photos
+        run: python apps/web/scripts/package-tum-campus-photos.py
       - name: "Build unified HHBA - 200 companies, applicant center, employer governance previews and brand pages"
         working-directory: apps/web
         env:
@@ -801,6 +806,7 @@ jobs:
           node scripts/tamiu.browser.mjs
           node scripts/birmingham.browser.mjs
           node scripts/monash.browser.mjs
+          node scripts/tum.browser.mjs
       - name: Save screenshots and the real search/browser verification results
         if: always()
         uses: actions/upload-artifact@v4

@@ -7,6 +7,7 @@ import {MinotStateUniversityPage,MinotStateProgramPage} from './MinotStateUniver
 import {TamiuUniversityPage,TamiuMbaPage} from './TamiuUniversityPage';
 import {SouthDakotaUniversityPage,SouthDakotaProgramPage} from './SouthDakotaUniversityPage';
 import {BirminghamUniversityPage,BirminghamProgramPage} from './BirminghamUniversityPage';
+import {TumUniversityPage,TumInformaticsPage} from './TumUniversityPage';
 import {MonashUniversityPage,MonashProgramPage} from './MonashUniversityPage';
 import {studyCountries,studyCountry,type StudyCountryCode} from '../data/studyAbroad';
 import {findProgram,findUniversity,programsForUniversity,searchUniversityPrograms,studyDegreeLabels,studyFieldLabels,studyLanguageLabels,studyModeLabels,universities,universityPrograms,type DirectoryFilters,type StudyDegree,type StudyField} from '../data/studyUniversities';
@@ -82,6 +83,7 @@ export function StudyUniversityDetail({user,id}:{user:User|null;id:string}){
  if(id==='tamiu')return <TamiuUniversityPage user={user}/>;
  if(id==='birmingham')return <BirminghamUniversityPage user={user}/>;
  if(id==='monash')return <MonashUniversityPage user={user}/>;
+ if(id==='tum')return <TumUniversityPage user={user}/>;
  const u=findUniversity(id);
  if(!u)return <DetailShell user={user}><div className="hhba-uni-not-found"><h1>未找到这所大学</h1><p>请返回已收录的学校目录重新选择。</p><Link className="hhba-study-btn" to="/study-abroad">返回目录 <ArrowRight size={15}/></Link></div></DetailShell>;
  const ps=programsForUniversity(u.id);
@@ -109,6 +111,7 @@ export function StudyProgramDetail({user,id}:{user:User|null;id:string}){
  if(id==='tamiu-mba')return <TamiuMbaPage user={user}/>;
  if(id==='birmingham-cs-conversion'||id==='birmingham-ai-conversion')return <BirminghamProgramPage user={user} id={id}/>;
  if(id==='monash-it-master'||id==='monash-bis-master')return <MonashProgramPage user={user} id={id}/>;
+ if(id==='tum-informatics-ms')return <TumInformaticsPage user={user}/>;
  const p=findProgram(id),u=p?findUniversity(p.universityId):undefined;
  if(!p||!u)return <DetailShell user={user}><div className="hhba-uni-not-found"><h1>未找到该专业</h1><Link className="hhba-study-btn" to="/study-abroad">返回目录</Link></div></DetailShell>;
  const c=studyCountry(u.country);
