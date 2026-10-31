@@ -21,7 +21,8 @@
     "https://www.suncentgroup.com/contact/",
     "https://www.suncentgroup.com/join_us/job-list.html",
     "https://www.wondercv.com/xiaozhao/suncent-auto-parts-2027-campus-autumn-19808-5aa6c9/",
-    "https://www.wondercv.com/xiaozhao/sangchen-auto-parts-2027-global-campus-19826-c0186f/"
+    "https://www.wondercv.com/xiaozhao/sangchen-auto-parts-2027-global-campus-19826-c0186f/",
+    "https://suncentgroup.com/join_us/job-list.html"
   ],
   "media": {
     "logo": "images/employer-profiles/cn-autumn-063/logo.svg",
@@ -41,11 +42,11 @@
     ]
   },
   "recruitment": {
-    "url": "https://www.suncentgroup.com/join_us/job-list.html",
-    "label": "桑椹汽配官网招聘栏目（2027岗位需复核）",
-    "status": "unconfirmed",
+    "url": "https://suncentgroup.com/join_us/job-list.html",
+    "label": "桑椹汽配官网招聘岗位列表",
+    "status": "official_portal",
     "subject": "深圳桑椹汽配科技有限公司",
-    "note": "2027届方向来自二级汇总；公司官网招聘栏目可核实企业主体，但当前页面未显示完整2027职位，不能当成已经开放申请的2027专用网申链接。招聘邮箱由公司官方联系方式提供。"
+    "note": "官网岗位目录公开了2026年10月19日发布的亚马逊运营、Python、IT产品经理等真实社会招聘职位。当前6个2027校招方向仍来自独立摘要，不把这批社招直接当成2027届校招。官方招聘邮箱 zhaopin@suncent.net 在官方联系页面可查。"
   },
   "majorIntro": "按2027届二级校招来源中已披露的方向分组，专业标签是探索推荐。部分专业、技能细则来自公开摘要，而非每个职位的官方终版JD。",
   "preferredMajors": [
@@ -143,7 +144,7 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
-      "url": "https://www.suncentgroup.com/join_us/job-list.html",
+      "url": "https://suncentgroup.com/join_us/job-list.html",
       "evidenceUrl": "https://www.wondercv.com/xiaozhao/suncent-auto-parts-2027-campus-autumn-19808-5aa6c9/",
       "observedOn": "2026-10-31",
       "recruitmentType": "CAMPUS",
@@ -166,7 +167,7 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
-      "url": "https://www.suncentgroup.com/join_us/job-list.html",
+      "url": "https://suncentgroup.com/join_us/job-list.html",
       "evidenceUrl": "https://www.wondercv.com/xiaozhao/suncent-auto-parts-2027-campus-autumn-19808-5aa6c9/",
       "observedOn": "2026-10-31",
       "recruitmentType": "CAMPUS",
@@ -189,7 +190,7 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
-      "url": "https://www.suncentgroup.com/join_us/job-list.html",
+      "url": "https://suncentgroup.com/join_us/job-list.html",
       "evidenceUrl": "https://www.wondercv.com/xiaozhao/suncent-auto-parts-2027-campus-autumn-19808-5aa6c9/",
       "observedOn": "2026-10-31",
       "recruitmentType": "CAMPUS",
@@ -213,7 +214,7 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
-      "url": "https://www.suncentgroup.com/join_us/job-list.html",
+      "url": "https://suncentgroup.com/join_us/job-list.html",
       "evidenceUrl": "https://www.wondercv.com/xiaozhao/suncent-auto-parts-2027-campus-autumn-19808-5aa6c9/",
       "observedOn": "2026-10-31",
       "recruitmentType": "CAMPUS",
@@ -237,7 +238,7 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
-      "url": "https://www.suncentgroup.com/join_us/job-list.html",
+      "url": "https://suncentgroup.com/join_us/job-list.html",
       "evidenceUrl": "https://www.wondercv.com/xiaozhao/suncent-auto-parts-2027-campus-autumn-19808-5aa6c9/",
       "observedOn": "2026-10-31",
       "recruitmentType": "CAMPUS",
@@ -261,7 +262,7 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "2027届 · 本科及以上（据二级校招资料，最终以企业公告为准）",
-      "url": "https://www.suncentgroup.com/join_us/job-list.html",
+      "url": "https://suncentgroup.com/join_us/job-list.html",
       "evidenceUrl": "https://www.wondercv.com/xiaozhao/suncent-auto-parts-2027-campus-autumn-19808-5aa6c9/",
       "observedOn": "2026-10-31",
       "recruitmentType": "CAMPUS",
