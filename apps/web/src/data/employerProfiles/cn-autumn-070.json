@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-070",
+  "name": "青岛成达",
+  "displayName": "青岛成达集团",
+  "englishName": "Qingdao Chengda Auto Group",
+  "aliases": [
+    "青岛成达汽车销售集团有限公司",
+    "成达集团",
+    "青岛成达汽车集团",
+    "成唯达",
+    "成势达"
+  ],
+  "industry": "汽车销售与4S服务 · 新能源汽车 · 汽车数字营销 · 售后维修",
+  "subtitle": "青岛成达汽车销售集团有限公司 · 山东青岛 · 1999年成立",
+  "overview": "青岛成达集团1999年成立，总部位于青岛李沧区，是多品牌汽车销售、服务及新能源汽车渠道运营集团。青岛新闻网2025年刊载成达与青岛大学实习基地合作实景报道；2027届校招聚合页仅披露招聘项目标题，缺少原始职位明细，不能把子公司2026年社招当成2027校招职位。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.wondercv.com/xiaozhao/chengda-group-qingdao-2027-campus-19705-b5e26c/",
+    "https://auto.qingdaonews.com/content/2025-12/03/content_23704648.htm",
+    "https://auto.qingdaonews.com/content/2022-09/21/content_23360080.htm",
+    "https://www.zhaopin.com/jobdetail/CC610645080J40888378105.htm",
+    "https://www.zhaopin.com/jobdetail/CC610645080J40889603605.htm"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-070/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-070/photo1.jpg",
+        "caption": "青岛成达 · 来源明确的实际活动照片1",
+        "alt": "青岛成达公开报道活动现场照片1",
+        "note": "源自实际公司相关机构公开新闻，不意味着总部/工作地点或拥有转载授权；确切照片来源经构建清单追溯。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-070/photo2.jpg",
+        "caption": "青岛成达 · 来源明确的实际活动照片2",
+        "alt": "青岛成达公开报道活动现场照片2",
+        "note": "源自实际公司相关机构公开新闻，不意味着总部/工作地点或拥有转载授权；确切照片来源经构建清单追溯。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.wondercv.com/xiaozhao/chengda-group-qingdao-2027-campus-19705-b5e26c/",
+    "label": "成达集团2027届校招资料（未找到官方网申）",
+    "status": "archived_source",
+    "subject": "青岛成达汽车销售集团有限公司",
+    "note": "聚合站只能核实2027校招存在，没有原始逐岗职位表。以下2条来源于关联销售服务公司公开社招，职位名称和要求不可与2027校招混为一谈。"
+  },
+  "majorIntro": "目前有2条带企业用人主体可追溯的汽车新媒体社招职位；2027校招的具体专业、职位与学历尚未核实，不能展示为本届可投递岗位。",
+  "preferredMajors": [
+    "车辆工程",
+    "汽车服务工程",
+    "市场营销",
+    "电子商务",
+    "网络与新媒体",
+    "数字媒体艺术",
+    "工商管理",
+    "新能源汽车工程"
+  ],
+  "photoNote": "预览照片采用青岛新闻网对成达集团与青岛大学交流及签约活动的真实现场图片，标注媒体来源；不是4S店虚构实景，也不能据此确认拍摄地点为具体工作门店，转载许可需后续审核。",
+  "business": [
+    {
+      "title": "多品牌汽车销售网络",
+      "description": "运营青岛及周边区域多个授权汽车品牌的整车销售与客户接待体系，涵盖燃油与新能源产品。",
+      "tags": "4S · 销售",
+      "details": [
+        "授权品牌新车销售",
+        "汽车配置与试乘试驾",
+        "零售与客户关系管理"
+      ]
+    },
+    {
+      "title": "新能源汽车体验中心",
+      "description": "运营腾势、极氪、方程豹等新能源品牌终端，提供线下体验、试驾及数字化销售协同。",
+      "tags": "新能源 · 体验",
+      "details": [
+        "商超及体验店运营",
+        "新能源汽车产品咨询",
+        "试驾与售前服务"
+      ]
+    },
+    {
+      "title": "汽车售后与维保服务",
+      "description": "依托授权门店提供维修养护、故障检测、配件销售及客户售后服务。",
+      "tags": "售后 · 维修",
+      "details": [
+        "机电与钣喷服务",
+        "原厂配件保障",
+        "售后客户服务"
+      ]
+    },
+    {
+      "title": "数字营销与直播电商",
+      "description": "通过抖音等平台开展汽车产品介绍、直播互动及线上线索转化，链接线下门店销售。",
+      "tags": "数字营销 · 直播",
+      "details": [
+        "短视频创意制作",
+        "汽车直播带货及到店引流",
+        "线索转化与运营"
+      ]
+    },
+    {
+      "title": "汽车综合出行服务",
+      "description": "部分集团关联公司开展汽车租赁、网络服务等相关经营，扩展车辆交易和使用环节服务。",
+      "tags": "租赁 · 出行",
+      "details": [
+        "汽车租赁支持",
+        "车辆生活服务",
+        "交易与交付协同"
+      ]
+    },
+    {
+      "title": "校企合作及人才培养",
+      "description": "通过与青岛大学共建实习基地、门店实训及人才交流等方式支持汽车零售行业人才发展。",
+      "tags": "校企合作 · 人才",
+      "details": [
+        "实习基地与门店实践",
+        "职业技能培训",
+        "服务管理人才培养"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "car-streamer-social",
+      "title": "即墨腾势汽车主播（关联企业社招）",
+      "category": "直播 / 营销",
+      "city": "山东青岛·即墨区",
+      "summary": "在授权新能源汽车门店直播间介绍车型、回答客户咨询并引导到店看车或下单，承担直播内容互动与运营复盘。",
+      "requirements": "智联招聘由集团关联公司青岛成唯达汽车销售服务有限公司发布，注明1—3年经验、中专/中技及以上，并明确要求汽车主播相关经验。不是2027届校招岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "电子商务",
+        "网络与新媒体"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "中专/中技及以上 · 1—3年经验",
+      "url": "https://www.zhaopin.com/jobdetail/CC610645080J40888378105.htm",
+      "evidenceUrl": "https://www.zhaopin.com/jobdetail/CC610645080J40888378105.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "青岛成唯达汽车销售服务有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "new-media-social",
+      "title": "汽车新媒体运营（关联企业社招）",
+      "category": "新媒体 / 运营",
+      "city": "山东青岛",
+      "summary": "在汽车经销门店的数字营销业务中参与短视频内容、平台账号维护和车型营销内容运营。",
+      "requirements": "来源为智联招聘青岛成唯达汽车销售服务有限公司的汽车新媒体运营职位，属于集团关联用人单位；无法据此认定青岛成达2027届校园招聘要求。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "网络与新媒体",
+        "数字媒体艺术",
+        "市场营销"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历/经验以原社招页面为准",
+      "url": "https://www.zhaopin.com/jobdetail/CC610645080J40889603605.htm",
+      "evidenceUrl": "https://www.zhaopin.com/jobdetail/CC610645080J40889603605.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "青岛成唯达汽车销售服务有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}
