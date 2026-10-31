@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-054",
+  "name": "海程邦达",
+  "displayName": "海程邦达",
+  "englishName": "Bondex",
+  "aliases": [
+    "海程邦达供应链管理股份有限公司",
+    "海程邦达集团",
+    "Bondex Supply Chain",
+    "603836",
+    "海程邦达2027"
+  ],
+  "industry": "国际货运代理 · 精益合同物流 · 跨境供应链 · 数字化物流",
+  "subtitle": "海程邦达供应链管理股份有限公司 · 山东青岛 · 上交所603836",
+  "overview": "海程邦达创立于1996年，面向进出口客户提供海运、空运、铁路、公路运输与报关仓储，以及半导体、汽车、医疗和跨境电商行业物流服务。上市公司总部位于青岛，2027届招聘公开信息涉及青岛、上海、成都、合肥、宁波、深圳、潍坊、西安及郑州等城市。已披露资料仅能明确一条管培生招聘方向，不把海外销售等行业相关职位臆造为确定的2027校招岗位。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.bondex.com.cn/",
+    "https://www.bondex.com.cn/about",
+    "https://www.bondex.com.cn/joinus",
+    "https://www.wondercv.com/xiaozhao/hchbond-2027-campus-management-trainee-19787-29a5e4/",
+    "https://www.wondercv.com/xiaozhao/bondex-supply-chain-2027-campus-19721-4ba612/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-054/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-054/photo1.jpg",
+        "caption": "海程邦达 · 官方网站企业建筑形象图",
+        "alt": "海程邦达官网企业介绍栏目展示的现代建筑形象视觉",
+        "note": "官网关于公司板块的建筑形象图，具体楼宇归属未核实，不能冒充海程邦达总部实拍。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-054/photo2.jpg",
+        "caption": "海程邦达 · 国际海运服务视觉",
+        "alt": "海程邦达官网海运业务栏目展示的货轮集装箱船视觉",
+        "note": "公司官网海运服务业务配图，不能推断为公司自有船舶。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.bondex.com.cn/joinus",
+    "label": "海程邦达官方人才发展栏目（2027岗位需核对）",
+    "status": "unconfirmed",
+    "subject": "海程邦达供应链管理股份有限公司",
+    "note": "2027校招相关资料明确校招批次、若干城市，以及管培生方向；尚无核实的企业官网逐岗2027JD、具体专属链接或实时岗位状态。岗位页面保留校招来源，并提供公司官网人才发展入口。"
+  },
+  "majorIntro": "现有2027校招来源仅确认一个跨专业管培生方向，其优先背景包括物流、国际贸易、工商管理、信息技术、金融财会和外语法学等；不把可能的轮岗部门虚构为独立岗位。",
+  "preferredMajors": [
+    "物流管理",
+    "供应链管理",
+    "交通运输",
+    "国际经济与贸易",
+    "工商管理",
+    "信息管理与信息系统",
+    "计算机科学与技术",
+    "财务管理",
+    "金融学",
+    "英语",
+    "法学"
+  ],
+  "photoNote": "企业Logo及两张图片优先从海程邦达自有官网取得；均采用本地静态文件并保留来源与SHA-256。图片仅为可核实的企业业务视觉，不冒充员工办公实拍。",
+  "business": [
+    {
+      "title": "国际海运与空运代理",
+      "description": "提供国际海空运订舱、运力协调、运输方案与货物全链路跟踪。",
+      "tags": "海运 · 空运",
+      "details": [
+        "全球200余个港口服务网络",
+        "国际空运及综合运力组织",
+        "跨境物流可视化跟踪"
+      ]
+    },
+    {
+      "title": "铁路、公路与多式联运",
+      "description": "结合陆运、铁运、关务和仓储资源，组织跨境多式联运方案。",
+      "tags": "陆运 · 铁路",
+      "details": [
+        "多式联运及末端配送",
+        "国际关务与单证协同",
+        "仓储与集拼配送服务"
+      ]
+    },
+    {
+      "title": "电子半导体与汽车物流",
+      "description": "为高端制造客户提供精益合同物流、工厂物流和高价值货物供应链支持。",
+      "tags": "半导体 · 汽车",
+      "details": [
+        "半导体及电子元器件物流",
+        "汽车供应链协同",
+        "精密仪器与安全运输"
+      ]
+    },
+    {
+      "title": "生鲜、医疗及大件项目物流",
+      "description": "聚焦温控、展会、工程项目及大件运输，提供定制化交付。",
+      "tags": "生鲜 · 医疗 · 工程",
+      "details": [
+        "温控物流及行业方案",
+        "项目大件运输",
+        "展会与特殊货物服务"
+      ]
+    },
+    {
+      "title": "跨境电商物流",
+      "description": "提供跨境电商头程、通关、海外仓与配送协作等综合服务。",
+      "tags": "跨境电商 · 海外仓",
+      "details": [
+        "电商货物出口服务",
+        "海外仓和订单履约",
+        "跨境卖家全链条支持"
+      ]
+    },
+    {
+      "title": "数字化供应链与贸易服务",
+      "description": "运用数字系统提高国际物流可见性，并延伸供应链贸易服务。",
+      "tags": "数字化 · 供应链",
+      "details": [
+        "物流系统与数字化管理",
+        "供需与货运流程协同",
+        "供应链贸易支持"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "management-trainee-2027",
+      "title": "管理培训生方向（2027届）",
+      "category": "综合管培生",
+      "city": "青岛、上海、成都、合肥、宁波、深圳、潍坊、西安、郑州等（实际城市待核）",
+      "summary": "2027届秋招公开资料提及管培生方向，拟面向物流供应链及集团业务开展培养，具体轮岗部门和培养计划仍需企业官方核实。",
+      "requirements": "二级招聘资料提示本科、专业不限，物流管理、国际贸易、交通运输、工商管理、计算机、信息管理、财务金融、外语与法学等相关背景优先。尚无该方向经官方逐项确认的JD、薪资、工作地点分配规则与当前名额；以上专业为二级来源的概括。",
+      "majorNames": [
+        "物流管理",
+        "供应链管理",
+        "交通运输",
+        "国际经济与贸易",
+        "工商管理",
+        "计算机科学与技术",
+        "信息管理与信息系统",
+        "财务管理",
+        "金融学",
+        "英语",
+        "法学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科（第三方校招汇总；以官方为准）",
+      "url": "https://www.bondex.com.cn/joinus",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hchbond-2027-campus-management-trainee-19787-29a5e4/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "海程邦达供应链管理股份有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}

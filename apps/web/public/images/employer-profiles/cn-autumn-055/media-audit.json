@@ -1,0 +1,41 @@
+{
+  "logo.png": {
+    "company": "长隆科技",
+    "verified": true,
+    "editorialFallback": false,
+    "source": "https://job.hdu.edu.cn/attachment/hdu/company/202605/11/sZTQabjwE848.png",
+    "sourcePage": "https://job.hdu.edu.cn/company/view?id=895204",
+    "sha256": "6a9702d676709812986015933bfce1784163638b15f420feb1e52f528b2dda99",
+    "sourceSha256": "e050503d27e5b72f229d821f0da6fc0f9bac3d887c69be87d899c646afe82811",
+    "width": 700,
+    "height": 700,
+    "sourceNote": "Corporate site or identifiable same-company recruitment page, no claim of office photos",
+    "copyright": "Original rights holders retain copyright"
+  },
+  "photo1.jpg": {
+    "company": "长隆科技",
+    "verified": true,
+    "editorialFallback": false,
+    "source": "https://img1.goepe.com/2022082/0_1660012531_1611.jpg_360x360.jpg",
+    "sourcePage": "https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822",
+    "sha256": "caca7b32912144c23b02e1b96088e54d6627093e872860bb58bfbd7924a9100d",
+    "sourceSha256": "e26516a0a3f6a9564ec6166f16dad894419d165bd44bf83975c74c02336cb15f",
+    "width": 700,
+    "height": 700,
+    "sourceNote": "Corporate site or identifiable same-company recruitment page, no claim of office photos",
+    "copyright": "Original rights holders retain copyright"
+  },
+  "photo2.jpg": {
+    "company": "长隆科技",
+    "verified": true,
+    "editorialFallback": false,
+    "source": "https://img1.goepe.com/2021016/0_1611546256_3332.jpg_360x360.jpg",
+    "sourcePage": "https://a617645265.cn.goepe.com/",
+    "sha256": "eed34fd946a271f7c1cf50752196a6a2adb9a99e6531783d8777a8937a7c8291",
+    "sourceSha256": "4210c1cdb4048c9c89507a5de7de4f971ea7c819683ffb57ec0e6529cce29891",
+    "width": 700,
+    "height": 700,
+    "sourceNote": "Corporate site or identifiable same-company recruitment page, no claim of office photos",
+    "copyright": "Original rights holders retain copyright"
+  }
+}

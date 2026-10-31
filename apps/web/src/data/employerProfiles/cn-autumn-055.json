@@ -1,0 +1,257 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-055",
+  "name": "长隆科技",
+  "displayName": "长隆科技",
+  "englishName": "Changlong Technology",
+  "aliases": [
+    "深圳市长隆科技有限公司",
+    "深圳长隆",
+    "深圳长隆科技",
+    "Changlong Environmental Technology",
+    "长隆科技2027校园招聘"
+  ],
+  "industry": "环保水处理 · 水处理药剂 · 工业废水 · 绿色技术与资源化",
+  "subtitle": "深圳市长隆科技有限公司 · 广东深圳 · 2003年创立 · 国家专精特新小巨人",
+  "overview": "长隆科技为工业水处理、绿色资源化与环境工程企业，研发水处理药剂、新材料、膜系统及工业污水运营解决方案，并布局环保设备和数字化技术。2027届校招公开五类招聘方向，历史高校招聘公告可辅助了解企业技术能力，但不能直接将2026届历史职位误当2027实时在招岗位。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.changlongkeji.cn/",
+    "https://www.wondercv.com/xiaozhao/changlong-tech-shenzhen-2027-campus-19958-517b71/",
+    "https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822",
+    "https://career.hebut.edu.cn/home/correcruit/content/id/78681.html",
+    "https://www.lg.gov.cn/lgfgj/gkmlpt/content/12/12731/post_12731901.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-055/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-055/photo1.jpg",
+        "caption": "长隆科技 · 工业水处理产品展示（一）",
+        "alt": "深圳长隆科技对应供应商企业资料中展示的一项工业水处理化学品产品",
+        "note": "来自注明深圳长隆科技的环保产品供应商资料，属于产品展示而不是企业办公室照片；具体产品品牌以包装标签为准。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-055/photo2.jpg",
+        "caption": "长隆科技 · 工业水处理药剂展示（二）",
+        "alt": "供应商展示的桶装工业水处理药剂产品图片",
+        "note": "深圳长隆科技关联供应商企业资料中另一款水处理药剂产品图，不能假装真实厂区或办公室照片。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822",
+    "label": "高校长隆科技招聘公告（2027方向另见校招汇总）",
+    "status": "unconfirmed",
+    "subject": "深圳市长隆科技有限公司",
+    "note": "2027届公开招聘汇总确认技术研发、工程技术、职能、营销和操作五大类方向及学历范围；高校官网列有2026届历史岗位和具体业务背景，不应标记为2027届逐岗完整JD。企业官网当前访问不稳定，保留高校招聘资料供核实。"
+  },
+  "majorIntro": "按2027校招五大方向分组；环保化工、环境微生物适合研发，机械自动化适合工程，财务法务适合职能，操作岗可涉及大专。相关专业按公开方向列表整理。",
+  "preferredMajors": [
+    "环境工程",
+    "环境科学",
+    "化学工程与工艺",
+    "给排水科学与工程",
+    "应用化学",
+    "生物工程",
+    "高分子材料与工程",
+    "机械工程",
+    "自动化",
+    "安全工程",
+    "计算机科学与技术",
+    "软件工程",
+    "会计学",
+    "法学",
+    "市场营销"
+  ],
+  "photoNote": "企业蓝色CLT家园守望标识取自高校企业档案（明确对应深圳市长隆科技有限公司）；两张业务产品图来自标明该主体的环保产品供应资料而非办公或工厂现场。图片本地保存并有独立SHA-256来源记录，禁止混用广州长隆文旅商标。",
+  "business": [
+    {
+      "title": "工业废水治理与运营",
+      "description": "为印染、电镀、制药及制造业提供污水处理工艺、工程设计和运营支持。",
+      "tags": "工业废水 · 工程",
+      "details": [
+        "工业废水方案设计",
+        "运营管理与监测",
+        "污染物达标处理"
+      ]
+    },
+    {
+      "title": "水处理药剂和新材料",
+      "description": "研发生产絮凝剂、工业水处理药剂及新型环境功能材料。",
+      "tags": "药剂 · 材料",
+      "details": [
+        "药剂研究与应用",
+        "化学材料性能评价",
+        "量产工艺和质量检测"
+      ]
+    },
+    {
+      "title": "膜材料及设备",
+      "description": "围绕MBR、RO等膜技术、环保设备和水处理系统开展研究制造。",
+      "tags": "MBR · RO",
+      "details": [
+        "膜组件与工艺配置",
+        "膜材料性能研究",
+        "现场系统调试"
+      ]
+    },
+    {
+      "title": "微生物与资源化技术",
+      "description": "研究工业废水微生物处理、工业副产物资源化及低碳循环工艺。",
+      "tags": "微生物 · 循环",
+      "details": [
+        "微生物反应技术",
+        "工业副产物回用",
+        "循环经济与环境工程"
+      ]
+    },
+    {
+      "title": "环保设备自动化和数字化",
+      "description": "开展环保仪器、过程控制、检测和工业环保信息系统建设。",
+      "tags": "自动化 · IT",
+      "details": [
+        "设备运行监测",
+        "自动控制与传感器应用",
+        "软件数据平台"
+      ]
+    },
+    {
+      "title": "检验检测与工程服务",
+      "description": "提供环境检测、技术验证、环保工程项目管理和现场技术支持。",
+      "tags": "检测 · 质量",
+      "details": [
+        "环境检验检测",
+        "现场工程维护",
+        "施工与安全质量协同"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "technology-research",
+      "title": "技术研发岗方向（2027届）",
+      "category": "技术研发",
+      "city": "广东深圳（具体研发基地待官方确认）",
+      "summary": "面向环境工程、化学、水处理膜、微生物和工业数字化等技术研发方向开展校招培养。",
+      "requirements": "2027校招汇总列出环境工程、化学、给排水、微生物、高分子材料、光学、电磁学、数学及软件计算机相关专业；单岗位学历和职责未逐项公开，应以官方完整JD为准。",
+      "majorNames": [
+        "环境工程",
+        "化学",
+        "化学工程与工艺",
+        "给排水科学与工程",
+        "生物工程",
+        "高分子材料与工程",
+        "计算机科学与技术",
+        "软件工程",
+        "数学与应用数学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本硕博 · 具体单岗以官方为准",
+      "url": "https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/changlong-tech-shenzhen-2027-campus-19958-517b71/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳市长隆科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "engineering-technology",
+      "title": "工程技术岗方向（2027届）",
+      "category": "工程与装备",
+      "city": "广东深圳（项目地点待核实）",
+      "summary": "面向环保项目的机械设备、自动化、安全和质量工程开展招聘与工程轮岗。",
+      "requirements": "公开2027方向包括机械工程、自动化、机械设计、安全工程和质量相关背景；是否有出差、现场驻场要求需查看实际岗位，不能套用2026单个运营工程师历史条件。",
+      "majorNames": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "自动化",
+        "安全工程",
+        "质量管理工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本硕博 · 单岗需核实",
+      "url": "https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/changlong-tech-shenzhen-2027-campus-19958-517b71/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳市长隆科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "functional",
+      "title": "综合职能岗方向（2027届）",
+      "category": "综合职能",
+      "city": "广东深圳",
+      "summary": "支持环保企业的财务、法务、人力、审计和物流综合管理方向。",
+      "requirements": "2027招聘汇总列明会计、法学、人力资源、审计与物流等专业；具体部门、学历门槛、薪酬和应聘资格尚未有官方单岗位公告。",
+      "majorNames": [
+        "会计学",
+        "财务管理",
+        "法学",
+        "人力资源管理",
+        "审计学",
+        "物流管理"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本硕博 · 单岗需核实",
+      "url": "https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/changlong-tech-shenzhen-2027-campus-19958-517b71/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳市长隆科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sales",
+      "title": "营销岗方向（2027届）",
+      "category": "市场营销",
+      "city": "广东深圳／全国业务项目",
+      "summary": "面向工业水处理客户和环保材料市场开展技术型营销、行业客户需求沟通。",
+      "requirements": "公开2027汇总列明环境、化学、生物、材料和市场营销相关专业；这是招聘方向，并非已核实的某个客户顾问单岗位JD。",
+      "majorNames": [
+        "市场营销",
+        "环境工程",
+        "化学",
+        "应用化学",
+        "生物工程",
+        "材料科学与工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本硕博 · 单岗需核实",
+      "url": "https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/changlong-tech-shenzhen-2027-campus-19958-517b71/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳市长隆科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "operations",
+      "title": "现场操作岗方向（2027届）",
+      "category": "现场运维",
+      "city": "广东深圳／工厂与水站（分配待核）",
+      "summary": "参与生产基地或污水处理站的日常现场操作、基础工艺记录、设备巡检。",
+      "requirements": "2027招聘摘要说明该方向可接受专科和本科背景，化工、环境工程优先；实际岗位名称、轮班和劳动条件须由企业官方确认。",
+      "majorNames": [
+        "环境工程",
+        "化学工程与工艺",
+        "环境监测技术",
+        "机电一体化技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届大专／本科（汇总口径）",
+      "url": "https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/changlong-tech-shenzhen-2027-campus-19958-517b71/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳市长隆科技有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}

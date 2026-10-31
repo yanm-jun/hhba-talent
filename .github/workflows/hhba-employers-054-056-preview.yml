@@ -1,0 +1,85 @@
+name: HHBA employers 054-056 independent 4-block static preview
+on:
+  push:
+    branches: [feature/employers-054-056-v2]
+    paths:
+      - 'apps/web/src/data/employerProfiles/cn-autumn-054.json'
+      - 'apps/web/src/data/employerProfiles/cn-autumn-055.json'
+      - 'apps/web/src/data/employerProfiles/cn-autumn-056.json'
+      - 'apps/web/src/pages/UnifiedV2CompanyPage.tsx'
+      - 'apps/web/scripts/prepare-employers-054-056-media.py'
+      - 'apps/web/scripts/employers-054-056-v2.contract.test.mjs'
+      - '.github/workflows/hhba-employers-054-056-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: hhba-employers-054-056-isolated
+  cancel-in-progress: true
+jobs:
+  validate-static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/employers-054-056-v2
+          persist-credentials: true
+      - name: Install media tools and Chinese identification font
+        run: |
+          python -m pip install pillow beautifulsoup4 cairosvg
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Collect three company business visuals with SHA and source evidence
+        run: python apps/web/scripts/prepare-employers-054-056-media.py
+      - name: Store independent local media ONLY on feature branch, not main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/public/images/employer-profiles/cn-autumn-054 \
+                  apps/web/public/images/employer-profiles/cn-autumn-055 \
+                  apps/web/public/images/employer-profiles/cn-autumn-056
+          if ! git diff --cached --quiet; then
+            git commit -m "assets(054-056): source-audited local business pictures and brand identities"
+            git push origin HEAD:feature/employers-054-056-v2
+          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked front-end deps
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify four V2 blocks, source records, images and full-job source validation
+        working-directory: apps/web
+        run: |
+          node scripts/employers-054-056-v2.contract.test.mjs
+          node scripts/recruitment-market-source-invalid.regression.test.mjs
+      - name: Diagnose historic assets independently of this batch
+        working-directory: apps/web
+        continue-on-error: true
+        run: node scripts/employer-factory-check.mjs
+      - name: Compile unchanged full HHBA site for GitHub Pages
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: |
+          npm run build
+          node scripts/materialize-company-route-entries.mjs
+      - name: Verify all 9 local media are included in static build
+        run: |
+          test -s apps/web/dist/index.html
+          for id in 054 055 056; do
+            test -s apps/web/dist/images/employer-profiles/cn-autumn-$id/logo.png
+            test -s apps/web/dist/images/employer-profiles/cn-autumn-$id/photo1.jpg
+            test -s apps/web/dist/images/employer-profiles/cn-autumn-$id/photo2.jpg
+          done
+      - name: Upload separate static preview artifact; DO NOT deploy production main
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-employers-054-056-four-panel-full-static-preview
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
