@@ -289,6 +289,9 @@ jobs:
       - name: Verify Zhangjiakou V5.1 2026 closed recruitment, High Innovation Park support and truthful housing
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-zhangjiakou-city-v51.mjs
+      - name: Verify Hengshui V5.1 sourced policies, housing caveats and four shared guides
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-hengshui-city-v51.mjs
       - name: Lock future city template, certify full policy guides and protect 95 historical record IDs
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
