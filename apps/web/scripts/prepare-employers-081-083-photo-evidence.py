@@ -28,12 +28,12 @@ SOURCES={
    '太古地产太古坊标识办公楼实景；太古地产子公司业务')
  ],
  '083':[
-  ('https://media.ford.com/content/fordmedia/fap/cn/zh_cn/news/2022/01/17/china-design-center/jcr%3Acontent/image.img.881.495.jpg/1731083991833.jpg',
-   'https://media.ford.com/content/fordmedia/fap/cn/zh_cn/news/2022/01/17/china-design-center.html',
-   '福特官方媒体：上海中国设计中心建筑外观'),
-  ('https://media.ford.com/content/dam/fordmedia/Asia%20Pacific/cn/2017/04/Ford-NJ-REC-MakerSpace_02.jpg',
-   'https://media.ford.com/content/fordmedia/fap/cn/en/news/2017/04/08/ford-china-invests-more-than-rmb-1-3-billion-to-further-innovati.html',
-   '福特官方媒体：南京研发工程中心MakerSpace内部')
+  ('https://p4.itc.cn/images01/20220211/50ea293ef335495ab00e36d937c1ca9c.jpeg',
+   'https://www.sohu.com/a/522042738_120048229',
+   '搜狐汽车实拍报道：福特中国上海设计中心内部办公及展示空间'),
+  ('https://p7.itc.cn/images01/20220211/529a8a306e94458f88210d7199fc468c.jpeg',
+   'https://www.sohu.com/a/522042738_120048229',
+   '搜狐汽车实拍报道：福特中国上海设计中心公共休息与协作空间')
  ]
 }
 def download(url,referer):
