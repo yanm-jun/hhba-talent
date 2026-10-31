@@ -1,0 +1,297 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-047",
+  "name": "瀚通通讯",
+  "displayName": "瀛通通讯（名录原标：瀚通通讯）",
+  "englishName": "YingTong Communications",
+  "aliases": [
+    "瀛通通讯",
+    "瀛通通讯股份有限公司",
+    "Ying Tong",
+    "YingTong",
+    "Ying Tong Communications",
+    "瀚通通讯2027校园招聘"
+  ],
+  "industry": "消费电子 · 声学电子 · 精密连接线材 · 智能制造",
+  "subtitle": "名称核验提示：名录原文“瀚通通讯”；核查到的2027招聘主体为瀛通通讯股份有限公司 · 002861",
+  "overview": "当前名录所写“瀚通通讯”未查到与2027秋招相符的独立官方企业资料；公开高校招聘、公示股份公司官网及股票代码002861对应的主体为“瀛通通讯股份有限公司”。本页暂以名称核验提示展示该企业真实资料，避免无证据认定“瀚通通讯”为法定名称。瀛通通讯主营智能耳机、声学电子、通信线材、数据线、无线充电及智能电子设备，拥有多地生产研发基地。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.yingtong-wire.com/",
+    "https://www.yingtong-wire.com/recruit",
+    "https://hubu.91wllm.cn/teachin/view/id/253284",
+    "https://www.jdjianli.com/campus/904"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-047/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-047/photo1.jpg",
+        "caption": "瀛通通讯 · 无线业务官网视觉",
+        "alt": "瀛通通讯官方网站无线相关业务展示图",
+        "note": "官方网站公开的无线业务视觉，不能未经核实当作特定耳机型号或企业办公室实拍；公司正确名称为瀛通通讯。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-047/photo2.jpg",
+        "caption": "瀛通通讯 · 线材业务官网视觉",
+        "alt": "瀛通通讯官方网站线材相关业务形象图",
+        "note": "官方网站公开的线材业务视觉，与无线业务图片不同，不代表名录原标瀚通通讯的独立公司资产。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.yingtong-wire.com/recruit",
+    "label": "瀛通通讯官方招聘入口（名称待核）",
+    "status": "official_portal",
+    "subject": "瀛通通讯股份有限公司",
+    "note": "7条2027届校招岗位及其专业学历来自湖北大学就业官网近期宣讲信息；当前名录“瀚通”与企业法定名“瀛通”存在字形差异，未单独核实源名录含义。不能将瀛通当成未经证实的“瀚通”子公司。职位实时状态以官方为准。"
+  },
+  "majorIntro": "按高校正式列出的岗位专业做5类职位筛选：机械自动化、电子研发、供应链、国际业务、人力管理。具体每条与高校岗位一一对应。企业名录名称仍需核对。",
+  "preferredMajors": [
+    "机械工程",
+    "机械电子工程",
+    "自动化",
+    "电子信息工程",
+    "工业工程",
+    "国际经济与贸易",
+    "英语",
+    "日语",
+    "人力资源管理",
+    "工商管理",
+    "行政管理",
+    "经济学",
+    "统计学"
+  ],
+  "photoNote": "特别说明：名录原名称“瀚通通讯”未独立核实，照片与Logo来自可核验的“瀛通通讯股份有限公司”官方媒体，不能证明二者为同一法定主体。两张独立产品图片本地保存，商标版权仍归权利人。",
+  "business": [
+    {
+      "title": "智能耳机与个人音频",
+      "description": "研发生产有线、真无线耳机及ANC主动降噪声学电子产品。",
+      "tags": "TWS · 耳机 · ANC",
+      "details": [
+        "声学单元及电子设计",
+        "耳机整机制造和测试",
+        "客户产品交付"
+      ]
+    },
+    {
+      "title": "精密数据线及通信连接",
+      "description": "面向手机、计算机和消费电子开发数据线、连接线及精密线材组件。",
+      "tags": "数据线 · 线材",
+      "details": [
+        "高速连接和成品线材",
+        "精密焊接、连接器与检测",
+        "全球制造与供货"
+      ]
+    },
+    {
+      "title": "智能音箱及声学电子",
+      "description": "提供消费类智能音箱、声学电子模组和设备的研发制造支持。",
+      "tags": "智能音箱 · 声学",
+      "details": [
+        "声学效果与音频调校",
+        "结构及PCB协同设计",
+        "电子产品试产和量产"
+      ]
+    },
+    {
+      "title": "无线充电和电子配件",
+      "description": "围绕智能设备配套的无线充电器和供电附件提供产品设计与制造服务。",
+      "tags": "无线充电 · 电子配件",
+      "details": [
+        "无线充线圈和电路",
+        "产品可靠性验证",
+        "量产供应链管理"
+      ]
+    },
+    {
+      "title": "工艺工程与设备自动化",
+      "description": "通过IE工业工程、工装夹具、设备开发和现场改善提升电子制造效率。",
+      "tags": "IE · ME · 自动化",
+      "details": [
+        "生产流程与产线设计",
+        "机械结构及工装工具",
+        "制造良率和数据追踪"
+      ]
+    },
+    {
+      "title": "多地供应链及业务支持",
+      "description": "在湖北、广东及海外基地开展制造交付、采购运营、国际业务和人力资源协同。",
+      "tags": "供应链 · HRBP",
+      "details": [
+        "采购与物料交付",
+        "客户项目跟踪",
+        "人力资源与组织支持"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "rd",
+      "title": "研发工程师",
+      "category": "研发与电子",
+      "city": "广东东莞",
+      "summary": "参与电子声学或通信连接产品研发验证、技术文档与研发试验协作。",
+      "requirements": "湖北大学2027校园招聘宣讲公示：本科；机械类、电子信息类、自动化类专业。实际职责范围仍以公司招聘系统完整JD为准。",
+      "majorNames": [
+        "机械工程",
+        "电子信息工程"
+      ],
+      "editorialRelatedMajors": [
+        "自动化",
+        "机械电子工程"
+      ],
+      "educationLabel": "本科 · 2027届",
+      "url": "https://www.yingtong-wire.com/recruit",
+      "evidenceUrl": "https://hubu.91wllm.cn/teachin/view/id/253284",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "瀛通通讯股份有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    },
+    {
+      "id": "biz",
+      "title": "业务储备岗",
+      "category": "销售与语言",
+      "city": "广东东莞",
+      "summary": "参与客户需求跟踪、业务培训、销售运营和团队岗位轮岗，协同订单执行。",
+      "requirements": "湖北大学公开岗位列明本科，外国语言文学类与工商管理类专业。工作内容属于据职位名称的方向解释，不代表企业发布完整JD。",
+      "majorNames": [
+        "英语",
+        "工商管理"
+      ],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "国际经济与贸易"
+      ],
+      "educationLabel": "本科 · 2027届",
+      "url": "https://www.yingtong-wire.com/recruit",
+      "evidenceUrl": "https://hubu.91wllm.cn/teachin/view/id/253284",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "瀛通通讯股份有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    },
+    {
+      "id": "procurement",
+      "title": "采购工程师",
+      "category": "采购与供应链",
+      "city": "广东东莞",
+      "summary": "围绕供应商沟通、采购成本与订单执行、生产物料保障等方向参与采购协同。",
+      "requirements": "湖北大学2027校招岗位公告要求本科，经济与贸易类、经济学类、统计学类专业；不是所有机械类自动符合资格。",
+      "majorNames": [
+        "国际经济与贸易",
+        "经济学"
+      ],
+      "editorialRelatedMajors": [
+        "统计学",
+        "供应链管理"
+      ],
+      "educationLabel": "本科 · 2027届",
+      "url": "https://www.yingtong-wire.com/recruit",
+      "evidenceUrl": "https://hubu.91wllm.cn/teachin/view/id/253284",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "瀛通通讯股份有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    },
+    {
+      "id": "industrial",
+      "title": "IE工程师/自动化工程师",
+      "category": "机械与自动化",
+      "city": "广东东莞",
+      "summary": "围绕工厂工业工程改善、工装夹具或自动化产线方案分析、工艺流程与效率优化开展工作。",
+      "requirements": "湖北大学2027校招公告列明本科，机械类、电子信息类、自动化类专业。IE和自动化同列为岗位名称，本站不编造其内部各自独立JD。",
+      "majorNames": [
+        "机械工程",
+        "自动化",
+        "工业工程"
+      ],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "机械电子工程"
+      ],
+      "educationLabel": "本科 · 2027届",
+      "url": "https://www.yingtong-wire.com/recruit",
+      "evidenceUrl": "https://hubu.91wllm.cn/teachin/view/id/253284",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "瀛通通讯股份有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hrbp",
+      "title": "HRBP",
+      "category": "人力资源与管理",
+      "city": "广东东莞",
+      "summary": "协助开展人力资源业务伙伴工作，包括招聘、员工沟通、组织数据和部门支持。",
+      "requirements": "湖北大学2027职位表列明本科，工商管理类专业。该岗位职责概括为行业通用方向，不代表官方逐项JD。",
+      "majorNames": [
+        "人力资源管理",
+        "工商管理"
+      ],
+      "editorialRelatedMajors": [
+        "劳动与社会保障"
+      ],
+      "educationLabel": "本科 · 2027届",
+      "url": "https://www.yingtong-wire.com/recruit",
+      "evidenceUrl": "https://hubu.91wllm.cn/teachin/view/id/253284",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "瀛通通讯股份有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    },
+    {
+      "id": "exec",
+      "title": "董事长助理",
+      "category": "人力资源与管理",
+      "city": "广东东莞",
+      "summary": "支持高管日程、会议事务、资料组织与跨部门沟通协调，参与运营过程的行政辅助。",
+      "requirements": "湖北大学2027职位表列明本科，工商管理类专业。具体办公安排、实习资格与岗位职责以官网另行发布的完整岗位说明为准。",
+      "majorNames": [
+        "工商管理",
+        "行政管理"
+      ],
+      "editorialRelatedMajors": [
+        "人力资源管理"
+      ],
+      "educationLabel": "本科 · 2027届",
+      "url": "https://www.yingtong-wire.com/recruit",
+      "evidenceUrl": "https://hubu.91wllm.cn/teachin/view/id/253284",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "瀛通通讯股份有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    },
+    {
+      "id": "business-project",
+      "title": "业务/项目",
+      "category": "销售与语言",
+      "city": "工作地点以公司岗位原文为准",
+      "summary": "参与业务或项目沟通、进度记录、客户需求整理和相关文档协同。",
+      "requirements": "湖北大学招聘职位表列明本科、外国语言文学类专业，单岗地点栏为不限；不能将其他岗位的东莞工作地点直接套用。",
+      "majorNames": [
+        "英语",
+        "日语"
+      ],
+      "editorialRelatedMajors": [
+        "国际经济与贸易",
+        "商务英语"
+      ],
+      "educationLabel": "本科 · 2027届",
+      "url": "https://www.yingtong-wire.com/recruit",
+      "evidenceUrl": "https://hubu.91wllm.cn/teachin/view/id/253284",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "瀛通通讯股份有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    }
+  ]
+}

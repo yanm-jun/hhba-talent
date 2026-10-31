@@ -1,0 +1,274 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-050",
+  "name": "汇蓉国科",
+  "displayName": "汇蓉国科",
+  "englishName": "Chengdu Huirong Guoke Microsystems",
+  "aliases": [
+    "成都汇蓉国科微系统技术有限公司",
+    "汇蓉",
+    "汇蓉公司2027届",
+    "Huirong Guoke"
+  ],
+  "industry": "低空安全感知 · 雷达微系统 · 低空探测 · 雷达信号处理",
+  "subtitle": "成都汇蓉国科微系统技术有限公司 · 四川天府新区 · 2017年成立",
+  "overview": "汇蓉国科面向低空经济与智能感知场景开展雷达微系统、低慢小目标探测、目标指示与低空交通安全服务系统研究及产品开发。现有2027届招聘公告由西安电子科技大学就业网站发布，六条岗位、地点、学历和专业要求均可逐项核对。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://job.xidian.edu.cn/campus/view/id/758119",
+    "https://www.cc-airshow.com/czqy-105.html",
+    "https://www.cwrep.cn/news/zhxw/380.html",
+    "https://tfxqsh.com/4/31325/1981832",
+    "https://www.kczg.org.cn/annualmeeting/rankdetail?id=547"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-050/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-050/photo1.jpg",
+        "caption": "汇蓉国科 · 雷达装备公开报道图片",
+        "alt": "雷达行业协会/展会资料报道的汇蓉国科雷达产品展陈画面",
+        "note": "本图需来自明确标注汇蓉国科的协会或行业活动文章，自动验收会拒绝天府新区商会通用页眉；具体现场内容以最终图片审阅为准。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-050/photo2.jpg",
+        "caption": "汇蓉国科 · 研发实验室现场",
+        "alt": "汇蓉国科相关公开资料展示的工程师在研发实验室调试测试仪器的现场照片",
+        "note": "图片来自科创中国企业案例，实景显示研发人员进行设备测量与调试，非AI生成；不推断具体年月、人员身份。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://job.xidian.edu.cn/campus/view/id/758119",
+    "label": "西安电子科技大学2027校招公告（含投递方式）",
+    "status": "unconfirmed",
+    "subject": "成都汇蓉国科微系统技术有限公司",
+    "note": "高校2027届招聘表提供6个明确岗位，申请时间2026-09-01至2026-12-15，电子简历邮箱cdhrgk@163.com（高校公告）。此页面并非公司自建ATS，岗位实时是否开放仍以招聘方回复为准。 该来源为高校正式招聘公告，非企业官方ATS；因此站内招聘通道状态标记为“未核实实时投递”。"
+  },
+  "majorIntro": "按公告逐项标注硕士／本科门槛，雷达、FPGA、软件、测试等岗位逐组匹配，机械类专业不被默认映射成雷达设计岗位。",
+  "preferredMajors": [
+    "电子信息工程",
+    "通信工程",
+    "自动化",
+    "计算机科学与技术",
+    "软件工程",
+    "微电子科学与工程",
+    "测控技术与仪器",
+    "电子科学与技术",
+    "数学与应用数学"
+  ],
+  "photoNote": "尚未取得汇蓉国科可独立核验的官方Logo源文件，页面识别图明确标记“非企业官方Logo”；两张图片来自明确标注汇蓉国科的行业协会或公司活动报道，不能以无关雷达厂家商标代替。",
+  "business": [
+    {
+      "title": "低空目标探测雷达",
+      "description": "研发低慢小目标探测雷达与系统集成，为低空安全监管提供感知能力。",
+      "tags": "雷达 · 低空安全",
+      "details": [
+        "低空目标搜索与跟踪",
+        "多场景雷达部署和测试",
+        "全天候感知数据接口"
+      ]
+    },
+    {
+      "title": "目标指示与成像雷达",
+      "description": "围绕目标指示、二维多面阵和成像雷达开展设备研发和系统验证。",
+      "tags": "成像 · 目标指示",
+      "details": [
+        "目标数据处理",
+        "雷达分系统设计",
+        "环境适应性与试验"
+      ]
+    },
+    {
+      "title": "信号处理与目标识别",
+      "description": "研发杂波抑制、目标检测识别及多目标跟踪的信号和算法方案。",
+      "tags": "信号处理 · 算法",
+      "details": [
+        "数字信号处理链路",
+        "复杂环境雷达感知",
+        "算法效果验证"
+      ]
+    },
+    {
+      "title": "FPGA与嵌入式系统",
+      "description": "围绕高吞吐信号数据和微系统控制需求开展软硬件协同设计。",
+      "tags": "FPGA · 嵌入式",
+      "details": [
+        "数字逻辑开发和仿真",
+        "设备通信与控制软件",
+        "嵌入式系统工程验证"
+      ]
+    },
+    {
+      "title": "低空安全平台与数据服务",
+      "description": "开展低空交通安全服务系统及态势感知数据平台应用，服务城市低空监管需求。",
+      "tags": "低空交通 · 平台",
+      "details": [
+        "雷达感知数据接入",
+        "监管场景可视化",
+        "安全事件监测支持"
+      ]
+    },
+    {
+      "title": "系统测试与工程交付",
+      "description": "从雷达系统研发、生产装配、测试验证到现场维护提供全生命周期支持。",
+      "tags": "测试 · 系统集成",
+      "details": [
+        "功能与环境测试",
+        "系统可靠性验证",
+        "客户现场实施与技术支持"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "radar-system",
+      "title": "雷达总体工程师",
+      "category": "雷达系统与算法",
+      "city": "四川成都·天府新区",
+      "summary": "开展雷达产品系统方案、模块接口、总体设计和综合联调相关研发方向。",
+      "requirements": "高校2027届原公告明确硕士及以上、优秀者可放宽；电子信息相关专业。岗位职责为依据名称和企业业务编写的方向介绍，最终以招聘方的独立岗位要求为准。",
+      "majorNames": [
+        "电子信息工程",
+        "通信工程",
+        "信息工程"
+      ],
+      "editorialRelatedMajors": [
+        "电子科学与技术",
+        "微电子科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上（优秀者可放宽） · 2027届",
+      "url": "https://job.xidian.edu.cn/campus/view/id/758119",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/758119",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "成都汇蓉国科微系统技术有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "radar-algorithm",
+      "title": "雷达算法工程师",
+      "category": "雷达系统与算法",
+      "city": "四川成都·天府新区",
+      "summary": "围绕目标检测、雷达信号处理与跟踪算法开展研究、数据处理和效果评估。",
+      "requirements": "高校2027届原公告明确硕士及以上、优秀者可放宽；电子信息类相关专业。具体MATLAB或C++等技能栈未见逐岗位公开披露，需以公司最终JD为准。",
+      "majorNames": [
+        "电子信息工程",
+        "通信工程",
+        "信息与计算科学"
+      ],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上（优秀者可放宽） · 2027届",
+      "url": "https://job.xidian.edu.cn/campus/view/id/758119",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/758119",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "成都汇蓉国科微系统技术有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "fpga",
+      "title": "FPGA开发工程师",
+      "category": "FPGA与嵌入式",
+      "city": "四川成都·天府新区",
+      "summary": "围绕雷达信号处理链路开展FPGA逻辑功能实现、验证和模块联调方向的工程工作。",
+      "requirements": "高校2027届招聘表明确硕士及以上、优秀者可放宽，雷达、自动化、电子信息相关专业。具体器件与工具选型需要和公司招聘方确认。",
+      "majorNames": [
+        "电子信息工程",
+        "自动化",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "集成电路设计与集成系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上（优秀者可放宽） · 2027届",
+      "url": "https://job.xidian.edu.cn/campus/view/id/758119",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/758119",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "成都汇蓉国科微系统技术有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "embedded",
+      "title": "嵌入式软件工程师",
+      "category": "FPGA与嵌入式",
+      "city": "四川成都·天府新区",
+      "summary": "配合雷达系统开展嵌入式控制程序、设备通信、数据处理和现场调试。",
+      "requirements": "高校2027届公告写明硕士及以上、优秀者可放宽；雷达、自动化及电子信息相关专业；具体系统平台与工具链尚需官方独立JD说明。",
+      "majorNames": [
+        "自动化",
+        "电子信息工程",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上（优秀者可放宽） · 2027届",
+      "url": "https://job.xidian.edu.cn/campus/view/id/758119",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/758119",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "成都汇蓉国科微系统技术有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "software",
+      "title": "软件工程师",
+      "category": "软件与系统",
+      "city": "四川成都·天府新区",
+      "summary": "围绕雷达监控平台、数据分析或产品管理界面开展软件研发、测试和系统联调。",
+      "requirements": "高校2027届公告明确本科及以上、计算机、软件、电子信息相关专业。是否开展Web、桌面或后台具体开发由企业安排，本站不假定。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027届",
+      "url": "https://job.xidian.edu.cn/campus/view/id/758119",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/758119",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "成都汇蓉国科微系统技术有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "radar-test",
+      "title": "雷达测试工程师",
+      "category": "测试与验证",
+      "city": "四川成都·天府新区",
+      "summary": "参与雷达设备功能、环境适应性和系统性能测试，记录试验结果并推进问题定位。",
+      "requirements": "高校2027届公告明确本科及以上、雷达、自动化及电子信息相关专业；具体现场测试要求和测试仪表由企业实际岗位确认。",
+      "majorNames": [
+        "电子信息工程",
+        "自动化",
+        "测控技术与仪器"
+      ],
+      "editorialRelatedMajors": [
+        "通信工程",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027届",
+      "url": "https://job.xidian.edu.cn/campus/view/id/758119",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/758119",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "成都汇蓉国科微系统技术有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}

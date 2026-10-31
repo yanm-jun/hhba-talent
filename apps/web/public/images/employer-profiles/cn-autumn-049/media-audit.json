@@ -1,0 +1,39 @@
+{
+  "logo.png": {
+    "company": "红谱科技",
+    "source": "editorial-text-only",
+    "sourcePage": "https://www.hongpu-tech.com/",
+    "sha256": "5f7abebca01c86029f28d7ca10d5f3144ab3fd38dc0c1995bc4bcc84592c1917",
+    "sourceSha256": "editorial-049",
+    "width": 1000,
+    "height": 280,
+    "verified": false,
+    "editorialFallback": true,
+    "companyIdentityFrom": "user-registered company list",
+    "note": "Distinct text identification graphic; NOT the company's official trademark"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "editorialFallback": false,
+    "company": "红谱科技",
+    "source": "https://img.antpedia.com/instrument-library/attachments/product/3491/1729699424-943.png!w400x300.jpg",
+    "sourcePage": "https://www.antpedia.com/ibook3491/",
+    "sourceSha256": "942499a23a84dfd025c20d7f916fdc8a1c2d5ac2832a210c1cb3c8a086e3f6bc",
+    "sha256": "7044d92cb0ac35bd4d7362c35dc186d6671931ccd2a70ebc020beed49272a123",
+    "width": 680,
+    "height": 510,
+    "note": "Genuine source company-associated graphic; does not alone prove office photo"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "editorialFallback": false,
+    "company": "红谱科技",
+    "source": "https://img.antpedia.com/instrument-library/attachments/product/3491/1729699118-64.png!w400x300.jpg",
+    "sourcePage": "https://www.antpedia.com/ibook3491/",
+    "sourceSha256": "0fd12093786943c1c2d0bdb0dc1b6a67daadd0dc1ccd979f0a5ca6ebf2512632",
+    "sha256": "fcf2d75831e8bb7bc5115b63bdd13c4dccbaed8104947c063661f9570ecd08b7",
+    "width": 680,
+    "height": 510,
+    "note": "Genuine source company-associated graphic; does not alone prove office photo"
+  }
+}

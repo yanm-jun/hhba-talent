@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-046",
+  "name": "芯德科技",
+  "displayName": "芯德科技（V-SOL）",
+  "englishName": "V-SOL",
+  "aliases": [
+    "广州芯德通信科技有限公司",
+    "芯德科技V-SOL",
+    "V-SOL",
+    "VSOL",
+    "广州芯德通信科技",
+    "芯德光通信",
+    "芯德科技2027校园招聘"
+  ],
+  "industry": "光网络接入设备 · PON/FTTH · 无线路由与CPE · 网络通信",
+  "subtitle": "广州芯德通信科技有限公司（V-SOL）· 广州 · 星网锐捷控股子公司",
+  "overview": "芯德科技（V-SOL）研发与销售PON光接入、GPON/XGS-PON光线路终端、ONU/ONT光猫、无线接入路由器及4G/5G CPE设备。其现行官网设有2027届校招专页，直接公开嵌入式软件、硬件开发和外贸销售三个岗位。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.vsol.com.cn/",
+    "https://www.vsol.com.cn/about-us/company-profile",
+    "https://www.vsol.com.cn/join-us/campus-recruitment",
+    "https://www.vsol.com.cn/join-us/campus-recruitment/embedded-software-engineer-1",
+    "https://www.vsol.com.cn/join-us/campus-recruitment/hardware-development-engineer-1",
+    "https://www.vsol.com.cn/join-us/campus-recruitment/9328-2",
+    "https://www.vsol.com.cn/about",
+    "https://www.crunchbase.com/organization/v-solution-telecommunication-technology-co-ltd"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-046/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-046/photo1.jpg",
+        "caption": "芯德科技 · PON光网络设备",
+        "alt": "V-SOL芯德科技官网光网络设备产品图片",
+        "note": "公司官网光接入产品图片，本地静态存储；非公司办公环境实拍。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-046/photo2.jpg",
+        "caption": "芯德科技 · 无线CPE与通信产品",
+        "alt": "V-SOL官网无线路由器或CPE设备产品图片",
+        "note": "公司官网第二张独立产品或业务图片；非其他公司素材。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.vsol.com.cn/join-us/campus-recruitment",
+    "label": "V-SOL官方2027校园招聘",
+    "status": "official_portal",
+    "subject": "广州芯德通信科技有限公司",
+    "note": "公司2027校招页公布的三条职位有独立官网JD。官网提示2027届投递区间为2026-09-01到2027-06-01，但具体剩余名额及某一职位是否可投递仍以官方最新页面为准。"
+  },
+  "majorIntro": "依据官网单岗专业条件进行匹配：通信/计算机可查看嵌入式岗位，电子/通信可查看硬件岗位，语言和国际贸易方向可查看外贸岗位。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "软件工程",
+    "电子信息工程",
+    "电子科学与技术",
+    "通信工程",
+    "电气工程及其自动化",
+    "英语",
+    "西班牙语",
+    "法语",
+    "阿拉伯语",
+    "国际经济与贸易",
+    "市场营销"
+  ],
+  "photoNote": "V-SOL品牌识别图使用与广州芯德光网络设备业务明确对应的第三方公司介绍或设备经销商图片；非芯德官网独立下载的原始Logo文件。两张业务/产品图来自芯德官网。均保留原图与SHA来源，不把其他同名公司标志当作本公司Logo；素材版权归原权利人。",
+  "business": [
+    {
+      "title": "PON光接入OLT设备",
+      "description": "提供GPON、EPON、XGS-PON等光线路终端，适配运营商及企业光接入网络。",
+      "tags": "OLT · XGS-PON",
+      "details": [
+        "运营商FTTH/FTTx接入",
+        "光线路终端软硬件开发",
+        "端到端管理和组网适配"
+      ]
+    },
+    {
+      "title": "ONU/ONT智能光终端",
+      "description": "研发用于家庭和办公网络的光网络单元、网关和光猫终端，支持多协议接入。",
+      "tags": "ONU · ONT",
+      "details": [
+        "光纤接入与用户侧终端",
+        "Wi-Fi网关和网络配置",
+        "固件升级与远程管理"
+      ]
+    },
+    {
+      "title": "4G/5G无线CPE",
+      "description": "提供面向室内、室外和行业场景的蜂窝网络CPE及连接解决方案。",
+      "tags": "5G · 4G · CPE",
+      "details": [
+        "宽带无线接入终端",
+        "无线覆盖和工业场景连接",
+        "射频与嵌入式整机测试"
+      ]
+    },
+    {
+      "title": "无线路由和Mesh网络",
+      "description": "设计Wi-Fi路由器、Mesh组网设备，实现家庭、校园和企业网络的覆盖优化。",
+      "tags": "Wi-Fi · Mesh",
+      "details": [
+        "无线路由器软硬件平台",
+        "Mesh组网及信号覆盖",
+        "网络安全和设备管理"
+      ]
+    },
+    {
+      "title": "工业园区全光网络方案",
+      "description": "面向园区、SMB和运营场景提供光网络部署、运维与客户应用支持。",
+      "tags": "园区 · FTTX",
+      "details": [
+        "全光园区网络设计",
+        "接入终端与运营支撑",
+        "客户现场部署及技术支持"
+      ]
+    },
+    {
+      "title": "通信硬件、固件及质量服务",
+      "description": "覆盖PCB硬件开发、Linux嵌入式系统、网络协议调试及制造测试。",
+      "tags": "PCB · Linux · 制造",
+      "details": [
+        "通信接口及电源设计",
+        "设备固件与协议适配",
+        "测试、质控及批量交付"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "embedded",
+      "title": "嵌入式软件开发工程师（2027届）",
+      "category": "嵌入式软件",
+      "city": "广东广州",
+      "summary": "围绕光网络及接入设备进行嵌入式Linux系统开发，参与需求分析、模块设计、C/C++程序编写及调试。",
+      "requirements": "官方2027职位明确本科及以上、硕士优先，计算机、电子、计算数学或通信类专业；熟悉嵌入式Linux、C/C++和TCP/IP或Wi-Fi协议，要求英语四级及以上。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "数学与应用数学"
+      ],
+      "educationLabel": "本科及以上 · 硕士优先",
+      "url": "https://www.vsol.com.cn/join-us/campus-recruitment",
+      "evidenceUrl": "https://www.vsol.com.cn/join-us/campus-recruitment/embedded-software-engineer-1",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州芯德通信科技有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hardware",
+      "title": "硬件开发工程师（2027届）",
+      "category": "硬件与电子",
+      "city": "广东广州",
+      "summary": "参与OLT/ONU等通信设备的器件选型、原理图与PCB设计、板级调试、测试和量产阶段问题跟踪。",
+      "requirements": "官方2027职位要求本科或硕士，通信、电子相关专业，掌握模拟及数字电路，理解计算机网络和通信接口，英语四级及以上；具体细节以公司岗位页面为准。",
+      "majorNames": [
+        "电子信息工程",
+        "通信工程",
+        "电子科学与技术"
+      ],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "微电子科学与工程"
+      ],
+      "educationLabel": "本科或硕士",
+      "url": "https://www.vsol.com.cn/join-us/campus-recruitment",
+      "evidenceUrl": "https://www.vsol.com.cn/join-us/campus-recruitment/hardware-development-engineer-1",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州芯德通信科技有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    },
+    {
+      "id": "overseas-sales",
+      "title": "外贸销售代表（2027届）",
+      "category": "国际销售",
+      "city": "广东广州",
+      "summary": "负责海外通信接入客户开发、展会与线上平台获客、询盘回复、销售推进和交付协同。",
+      "requirements": "官网明确本科及以上，英语、西班牙语、法语、阿拉伯语等专业，要求相应语言听说读写能力；海外留学背景优先。",
+      "majorNames": [
+        "英语",
+        "西班牙语",
+        "法语"
+      ],
+      "editorialRelatedMajors": [
+        "阿拉伯语",
+        "国际经济与贸易",
+        "市场营销"
+      ],
+      "educationLabel": "本科及以上",
+      "url": "https://www.vsol.com.cn/join-us/campus-recruitment",
+      "evidenceUrl": "https://www.vsol.com.cn/join-us/campus-recruitment/9328-2",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州芯德通信科技有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    }
+  ]
+}

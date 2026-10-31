@@ -1,0 +1,430 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-040",
+  "name": "黑格科技",
+  "displayName": "黑格科技",
+  "englishName": "HeyGears",
+  "aliases": [
+    "广州黑格智造信息科技有限公司",
+    "黑格",
+    "HeyGears",
+    "HEYGEARS",
+    "黑格智造",
+    "黑格3D打印"
+  ],
+  "industry": "增材制造 · 高精度光固化3D打印 · 齿科数字化 · 精密智造",
+  "subtitle": "广州黑格智造信息科技有限公司 · 创立于2015年 · 广州总部",
+  "overview": "黑格科技（HeyGears）围绕光固化3D打印开展精密制造技术及产业化服务，以材料、光学、硬件、软件、运动控制和云平台融合自研为基础，服务齿科、消费电子、创客以及行业精密智造场景，并向分布式数字化生产解决方案拓展。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.heygears.com/cn/aboutUs",
+    "https://www.heygears.com/news/478",
+    "https://heygears.jobs.feishu.cn/campus",
+    "https://myjob.dlmu.edu.cn/campus/view/id/868184",
+    "https://www.heygears.com/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-040/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-040/photo1.jpg",
+        "caption": "黑格科技 · 办公接待区",
+        "alt": "黑格科技官网展示的带HeyGears标识的办公室前台场景",
+        "note": "来自黑格官网关于我们页面中的办公接待区实景。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-040/photo2.jpg",
+        "caption": "黑格科技 · 深圳会议室（历史影像）",
+        "alt": "黑格科技官网发布的深圳办公室会议室及城市外景",
+        "note": "来自黑格官网深圳办公室启用新闻照片，属于较早的真实工作环境资料。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://heygears.jobs.feishu.cn/campus",
+    "label": "黑格科技官方飞书校招",
+    "status": "official_portal",
+    "subject": "广州黑格智造信息科技有限公司",
+    "note": "2026届历史职位13条来自大连海事大学就业官网，已标过期。官网飞书有新的招聘入口，但此处不冒用历史岗位宣称2027届，实时岗位请以官网为准。"
+  },
+  "majorIntro": "将2026届真实历史岗位按机械工艺、系统控制、光电硬件、软件算法、材料、商业六组筛选，学历采用高校公开记录，岗位现已过期。",
+  "preferredMajors": [
+    "机械工程",
+    "自动化",
+    "光电信息科学与工程",
+    "材料科学与工程",
+    "高分子材料与工程",
+    "电子信息工程",
+    "计算机科学与技术",
+    "软件工程",
+    "人工智能",
+    "市场营销"
+  ],
+  "photoNote": "企业真实品牌Logo及两张独立办公实景从黑格官网相关页面提取为本地静态素材，不链接第三方图片来源；照片有明确历史属性，版权属原权利人。",
+  "business": [
+    {
+      "title": "光固化3D打印装备",
+      "description": "研发高精度光固化成型设备及光机控制模块，服务专业和行业级制造。",
+      "tags": "DLP · 光固化 · 设备",
+      "details": [
+        "打印设备软硬件系统研发",
+        "精密光学投影和成型控制",
+        "整机精度及可靠性验证"
+      ]
+    },
+    {
+      "title": "工业级高分子材料",
+      "description": "研发适配光固化成型的树脂和功能材料，形成材料-工艺配套解决方案。",
+      "tags": "树脂 · 高分子 · 工艺",
+      "details": [
+        "医用及工业级材料性能研究",
+        "光敏材料配方与量产控制",
+        "材料打印质量检测"
+      ]
+    },
+    {
+      "title": "齿科数字化制造",
+      "description": "围绕牙科数字扫描、设计、3D打印和后处理流程提供数字化生产工具。",
+      "tags": "齿科 · 口腔 · 打印",
+      "details": [
+        "齿科模型与高精密打印",
+        "后处理和工艺质量管理",
+        "数字生产流程优化"
+      ]
+    },
+    {
+      "title": "AI与几何算法",
+      "description": "研究3D模型计算、自动排版、切片软件及视觉和AI优化算法。",
+      "tags": "几何处理 · 软件 · AI",
+      "details": [
+        "3D几何内核与切片算法",
+        "多材料打印与色彩管理",
+        "生产智能化数据平台"
+      ]
+    },
+    {
+      "title": "运动控制与精密光学",
+      "description": "整合精密机构、电控、运动算法和光学系统，实现工业级打印稳定性。",
+      "tags": "机械 · 电控 · 光学",
+      "details": [
+        "运动轨迹及设备控制算法",
+        "光学成像和曝光均匀性",
+        "硬件调试与系统验证"
+      ]
+    },
+    {
+      "title": "全球应用与分布式智造",
+      "description": "向国内外专业工作室、生产服务商及工业客户提供设备部署、应用支持和解决方案。",
+      "tags": "全球市场 · 应用工程",
+      "details": [
+        "行业数字化工作流导入",
+        "全球客户与渠道协作",
+        "高精度生产设备培训服务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "application",
+      "title": "应用工程师（2026届公告）",
+      "city": "广东广州（高校历史岗位记录）",
+      "category": "机械与工艺",
+      "url": "https://heygears.jobs.feishu.cn/campus",
+      "evidenceUrl": "https://myjob.dlmu.edu.cn/campus/view/id/868184",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州黑格智造信息科技有限公司",
+      "summary": "参与3D打印方案应用分析、工艺验证与客户应用测试。",
+      "requirements": "大连海事大学公开的2026届职位表明确该岗位学历为硕士，有具体关联专业；本页工作内容属于按岗位名称归纳，并非逐项抄录企业JD。该批高校招聘信息标为2026年7月31日到期，不能当作2027届或仍在招的招聘信息。请以黑格官方飞书招聘系统最新结果为准。",
+      "majorNames": [
+        "机械工程",
+        "材料科学与工程"
+      ],
+      "editorialRelatedMajors": [
+        "材料与化工"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 · 2026届历史校招",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "system",
+      "title": "系统工程师（2026届公告）",
+      "city": "广东广州（高校历史岗位记录）",
+      "category": "系统与控制",
+      "url": "https://heygears.jobs.feishu.cn/campus",
+      "evidenceUrl": "https://myjob.dlmu.edu.cn/campus/view/id/868184",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州黑格智造信息科技有限公司",
+      "summary": "负责跨光学、机械、电子与软件系统研发协同和系统验证。",
+      "requirements": "大连海事大学公开的2026届职位表明确该岗位学历为博士，有具体关联专业；本页工作内容属于按岗位名称归纳，并非逐项抄录企业JD。该批高校招聘信息标为2026年7月31日到期，不能当作2027届或仍在招的招聘信息。请以黑格官方飞书招聘系统最新结果为准。",
+      "majorNames": [
+        "人工智能",
+        "控制科学与工程"
+      ],
+      "editorialRelatedMajors": [
+        "自动化",
+        "机械工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "博士 · 2026届历史校招",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "process-rd",
+      "title": "研发工艺工程师（2026届公告）",
+      "city": "广东广州（高校历史岗位记录）",
+      "category": "机械与工艺",
+      "url": "https://heygears.jobs.feishu.cn/campus",
+      "evidenceUrl": "https://myjob.dlmu.edu.cn/campus/view/id/868184",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州黑格智造信息科技有限公司",
+      "summary": "围绕高精度3D打印材料、成型工艺与参数稳定性开展研发和实验改进。",
+      "requirements": "大连海事大学公开的2026届职位表明确该岗位学历为硕士，有具体关联专业；本页工作内容属于按岗位名称归纳，并非逐项抄录企业JD。该批高校招聘信息标为2026年7月31日到期，不能当作2027届或仍在招的招聘信息。请以黑格官方飞书招聘系统最新结果为准。",
+      "majorNames": [
+        "机械工程",
+        "电气工程及其自动化"
+      ],
+      "editorialRelatedMajors": [
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 · 2026届历史校招",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "mechanical",
+      "title": "机械工程师（2026届公告）",
+      "city": "广东广州（高校历史岗位记录）",
+      "category": "机械与工艺",
+      "url": "https://heygears.jobs.feishu.cn/campus",
+      "evidenceUrl": "https://myjob.dlmu.edu.cn/campus/view/id/868184",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州黑格智造信息科技有限公司",
+      "summary": "参与精密3D打印设备的机构、装配和运动系统设计验证。",
+      "requirements": "大连海事大学公开的2026届职位表明确该岗位学历为硕士，有具体关联专业；本页工作内容属于按岗位名称归纳，并非逐项抄录企业JD。该批高校招聘信息标为2026年7月31日到期，不能当作2027届或仍在招的招聘信息。请以黑格官方飞书招聘系统最新结果为准。",
+      "majorNames": [
+        "机械工程",
+        "机械设计制造及其自动化"
+      ],
+      "editorialRelatedMajors": [
+        "机械电子工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 · 2026届历史校招",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hardware",
+      "title": "硬件工程师（2026届公告）",
+      "city": "广东广州（高校历史岗位记录）",
+      "category": "光电与硬件",
+      "url": "https://heygears.jobs.feishu.cn/campus",
+      "evidenceUrl": "https://myjob.dlmu.edu.cn/campus/view/id/868184",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州黑格智造信息科技有限公司",
+      "summary": "负责设备控制板及周边电子硬件开发、测试及跨学科联调。",
+      "requirements": "大连海事大学公开的2026届职位表明确该岗位学历为硕士，有具体关联专业；本页工作内容属于按岗位名称归纳，并非逐项抄录企业JD。该批高校招聘信息标为2026年7月31日到期，不能当作2027届或仍在招的招聘信息。请以黑格官方飞书招聘系统最新结果为准。",
+      "majorNames": [
+        "电子信息工程",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 · 2026届历史校招",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "geometry",
+      "title": "几何算法工程师（2026届公告）",
+      "city": "广东广州（高校历史岗位记录）",
+      "category": "软件与算法",
+      "url": "https://heygears.jobs.feishu.cn/campus",
+      "evidenceUrl": "https://myjob.dlmu.edu.cn/campus/view/id/868184",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州黑格智造信息科技有限公司",
+      "summary": "研究复杂几何处理、切片及建模运算在3D打印软件中的应用。",
+      "requirements": "大连海事大学公开的2026届职位表明确该岗位学历为硕士，有具体关联专业；本页工作内容属于按岗位名称归纳，并非逐项抄录企业JD。该批高校招聘信息标为2026年7月31日到期，不能当作2027届或仍在招的招聘信息。请以黑格官方飞书招聘系统最新结果为准。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "editorialRelatedMajors": [
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 · 2026届历史校招",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "motion-control",
+      "title": "运控算法工程师（2026届公告）",
+      "city": "广东广州（高校历史岗位记录）",
+      "category": "系统与控制",
+      "url": "https://heygears.jobs.feishu.cn/campus",
+      "evidenceUrl": "https://myjob.dlmu.edu.cn/campus/view/id/868184",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州黑格智造信息科技有限公司",
+      "summary": "研发3D打印机运动轨迹与控制算法，实现打印过程稳定控制。",
+      "requirements": "大连海事大学公开的2026届职位表明确该岗位学历为硕士，有具体关联专业；本页工作内容属于按岗位名称归纳，并非逐项抄录企业JD。该批高校招聘信息标为2026年7月31日到期，不能当作2027届或仍在招的招聘信息。请以黑格官方飞书招聘系统最新结果为准。",
+      "majorNames": [
+        "机械工程",
+        "计算机科学与技术"
+      ],
+      "editorialRelatedMajors": [
+        "自动化",
+        "控制科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 · 2026届历史校招",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "materials",
+      "title": "材料研发工程师（2026届公告）",
+      "city": "广东广州（高校历史岗位记录）",
+      "category": "材料与光固化",
+      "url": "https://heygears.jobs.feishu.cn/campus",
+      "evidenceUrl": "https://myjob.dlmu.edu.cn/campus/view/id/868184",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州黑格智造信息科技有限公司",
+      "summary": "参与光固化树脂、高分子材料配方和打印材料性能评估。",
+      "requirements": "大连海事大学公开的2026届职位表明确该岗位学历为硕士，有具体关联专业；本页工作内容属于按岗位名称归纳，并非逐项抄录企业JD。该批高校招聘信息标为2026年7月31日到期，不能当作2027届或仍在招的招聘信息。请以黑格官方飞书招聘系统最新结果为准。",
+      "majorNames": [
+        "材料科学与工程",
+        "高分子材料与工程"
+      ],
+      "editorialRelatedMajors": [
+        "化学工程与工艺"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 · 2026届历史校招",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "marketing",
+      "title": "市场管培生（2026届公告）",
+      "city": "广东广州（高校历史岗位记录）",
+      "category": "商业与市场",
+      "url": "https://heygears.jobs.feishu.cn/campus",
+      "evidenceUrl": "https://myjob.dlmu.edu.cn/campus/view/id/868184",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州黑格智造信息科技有限公司",
+      "summary": "参与全球化市场调研、营销与品牌推广项目运营。",
+      "requirements": "大连海事大学公开的2026届职位表明确该岗位学历为本科，有具体关联专业；本页工作内容属于按岗位名称归纳，并非逐项抄录企业JD。该批高校招聘信息标为2026年7月31日到期，不能当作2027届或仍在招的招聘信息。请以黑格官方飞书招聘系统最新结果为准。",
+      "majorNames": [
+        "市场营销",
+        "国际经济与贸易"
+      ],
+      "editorialRelatedMajors": [
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 · 2026届历史校招",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "optical",
+      "title": "光学工程师（2026届公告）",
+      "city": "广东广州（高校历史岗位记录）",
+      "category": "光电与硬件",
+      "url": "https://heygears.jobs.feishu.cn/campus",
+      "evidenceUrl": "https://myjob.dlmu.edu.cn/campus/view/id/868184",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州黑格智造信息科技有限公司",
+      "summary": "设计和验证光固化3D打印光学模组、光路和光学系统性能。",
+      "requirements": "大连海事大学公开的2026届职位表明确该岗位学历为硕士，有具体关联专业；本页工作内容属于按岗位名称归纳，并非逐项抄录企业JD。该批高校招聘信息标为2026年7月31日到期，不能当作2027届或仍在招的招聘信息。请以黑格官方飞书招聘系统最新结果为准。",
+      "majorNames": [
+        "光电信息科学与工程",
+        "光学工程"
+      ],
+      "editorialRelatedMajors": [
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 · 2026届历史校招",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "cpp",
+      "title": "C++开发工程师（2026届公告）",
+      "city": "广东广州（高校历史岗位记录）",
+      "category": "软件与算法",
+      "url": "https://heygears.jobs.feishu.cn/campus",
+      "evidenceUrl": "https://myjob.dlmu.edu.cn/campus/view/id/868184",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州黑格智造信息科技有限公司",
+      "summary": "参与3D打印控制软件、算法组件与跨平台应用开发。",
+      "requirements": "大连海事大学公开的2026届职位表明确该岗位学历为硕士，有具体关联专业；本页工作内容属于按岗位名称归纳，并非逐项抄录企业JD。该批高校招聘信息标为2026年7月31日到期，不能当作2027届或仍在招的招聘信息。请以黑格官方飞书招聘系统最新结果为准。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "editorialRelatedMajors": [
+        "计算机技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 · 2026届历史校招",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "color",
+      "title": "色彩管理工程师（2026届公告）",
+      "city": "广东广州（高校历史岗位记录）",
+      "category": "软件与算法",
+      "url": "https://heygears.jobs.feishu.cn/campus",
+      "evidenceUrl": "https://myjob.dlmu.edu.cn/campus/view/id/868184",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州黑格智造信息科技有限公司",
+      "summary": "开展色彩管理与图像处理，配合打印材料、光学模块和软件算法验证。",
+      "requirements": "大连海事大学公开的2026届职位表明确该岗位学历为硕士，有具体关联专业；本页工作内容属于按岗位名称归纳，并非逐项抄录企业JD。该批高校招聘信息标为2026年7月31日到期，不能当作2027届或仍在招的招聘信息。请以黑格官方飞书招聘系统最新结果为准。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "editorialRelatedMajors": [
+        "机械工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 · 2026届历史校招",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sales",
+      "title": "销售管培生（2026届公告）",
+      "city": "广东广州（高校历史岗位记录）",
+      "category": "商业与市场",
+      "url": "https://heygears.jobs.feishu.cn/campus",
+      "evidenceUrl": "https://myjob.dlmu.edu.cn/campus/view/id/868184",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州黑格智造信息科技有限公司",
+      "summary": "参与客户开发、区域市场运营及业务流程轮岗培养。",
+      "requirements": "大连海事大学公开的2026届职位表明确该岗位学历为本科，有具体关联专业；本页工作内容属于按岗位名称归纳，并非逐项抄录企业JD。该批高校招聘信息标为2026年7月31日到期，不能当作2027届或仍在招的招聘信息。请以黑格官方飞书招聘系统最新结果为准。",
+      "majorNames": [
+        "市场营销",
+        "国际经济与贸易"
+      ],
+      "editorialRelatedMajors": [
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 · 2026届历史校招",
+      "currentOpenVerified": false
+    }
+  ]
+}

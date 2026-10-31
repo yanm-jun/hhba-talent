@@ -1,0 +1,41 @@
+{
+  "logo.png": {
+    "verified": true,
+    "company": "迦智科技",
+    "source": "https://www.iplusmobot.cn/static/images/common/iplusmobot_5826.webp",
+    "sourcePage": "https://www.iplusmobot.cn/",
+    "retrievedFrom": "https://www.iplusmobot.cn/static/images/common/iplusmobot_5826.webp",
+    "sourceSha256": "d50c9d0d8c4eb97a9d67b34599be20f83d173b29c903bad46146d1db0cb53a02",
+    "sha256": "f463dcda306e0219f666801136a50416518bb1d52b0a1a46628f6be190c2a84f",
+    "width": 600,
+    "height": 88,
+    "type": "official corporate brand",
+    "ownership": "Original rights holders retain copyright"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "company": "迦智科技",
+    "source": "https://www.iplusmobot.cn/static/images/home/EMMA%201000K.png",
+    "sourcePage": "https://www.iplusmobot.cn/",
+    "retrievedFrom": "https://www.iplusmobot.cn/static/images/home/EMMA%201000K.png",
+    "sourceSha256": "7e5712fcd3ba28888f9d3ca041b8b77ccb3e44fe2899e29fae6340b988da1e4a",
+    "sha256": "304479e0548fe8fa9b63c814c910a8b54f7185682000a55a7aa1b94b1cc7bf3e",
+    "width": 1500,
+    "height": 844,
+    "type": "official product or business illustration",
+    "ownership": "Original rights holders retain copyright"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "company": "迦智科技",
+    "source": "https://www.iplusmobot.cn/static/images/home/FOLA%20DN1416.png",
+    "sourcePage": "https://www.iplusmobot.cn/",
+    "retrievedFrom": "https://www.iplusmobot.cn/static/images/home/FOLA%20DN1416.png",
+    "sourceSha256": "ced2899ae1da97c143599539c282296ff1666f854af373fcef13b39b4f3a6a68",
+    "sha256": "b3a566894deaebc0c5274ba3a4f50bc7252a0f62dc176e15ff71ca45da9656f9",
+    "width": 905,
+    "height": 1050,
+    "type": "official product or business illustration",
+    "ownership": "Original rights holders retain copyright"
+  }
+}

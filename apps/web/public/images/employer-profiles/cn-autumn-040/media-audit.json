@@ -1,0 +1,41 @@
+{
+  "logo.png": {
+    "verified": true,
+    "company": "黑格科技",
+    "source": "https://www.heygears.com/en-logo.jpg",
+    "sourcePage": "https://www.heygears.com/",
+    "retrievedFrom": "https://www.heygears.com/en-logo.jpg",
+    "sourceSha256": "94944e5c40a0da67cad5de9c192799f1e4a8e076455011fb6785fb811e22fede",
+    "sha256": "6c5077528e7658245f51f3e511262caf24fdfcb110ecde9319001d4e828cad24",
+    "width": 842,
+    "height": 596,
+    "note": "Real logo",
+    "copyright": "Original rights holders retain rights"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "company": "黑格科技",
+    "source": "https://static3-uswest1.heygears.com/production_static/images/about/index/head-office6.webp",
+    "sourcePage": "https://www.heygears.com/cn/aboutUs",
+    "retrievedFrom": "https://static3-uswest1.heygears.com/production_static/images/about/index/head-office6.webp",
+    "sourceSha256": "c1434b4318fad8ef507d59701c3f1d6a9387bd487f51928d1b68be01586e0d4e",
+    "sha256": "93dd89fed2aeeadef9b80619681d4dad6cd23f5630068c7b7af79355f166b54d",
+    "width": 1200,
+    "height": 900,
+    "note": "Real corporate or event photograph",
+    "copyright": "Original rights holders retain rights"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "company": "黑格科技",
+    "source": "https://hg-website.oss-cn-shenzhen.aliyuncs.com/upload/resume/EUpn1565599600399.jpg",
+    "sourcePage": "https://www.heygears.com/cn/news/14",
+    "retrievedFrom": "https://hg-website.oss-cn-shenzhen.aliyuncs.com/upload/resume/EUpn1565599600399.jpg",
+    "sourceSha256": "fe56d19a4bbc830b1dbbe44b3cf059b33552deedd1e1ef11354a19bc40ef4d3e",
+    "sha256": "d435c939f66e43734b4f7d724b4629659465e4a83e298e4e3f3d21aecd29ff44",
+    "width": 1080,
+    "height": 720,
+    "note": "Real corporate or event photograph",
+    "copyright": "Original rights holders retain rights"
+  }
+}

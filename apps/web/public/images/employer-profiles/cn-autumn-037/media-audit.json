@@ -1,0 +1,41 @@
+{
+  "logo.png": {
+    "verified": true,
+    "company": "炬芯科技股份有限公司",
+    "source": "https://www.gmitec.com/wp-content/uploads/2022/05/%E7%82%AC%E8%8A%AF.png",
+    "downloadUrl": "https://www.gmitec.com/wp-content/uploads/2022/05/%E7%82%AC%E8%8A%AF.png",
+    "sourcePage": "https://www.gmitec.com/agent-products/actions/",
+    "sourceSha256": "48fc7ef25a182eec17fedb29b616f1f371c12087a167d2be0e2521f5c6f716c3",
+    "sha256": "91638984aa5e6d1974c31ee174715ebb0a2a581eacd8b68b86877b0c11659075",
+    "width": 1000,
+    "height": 546,
+    "description": "Genuine company brand mark",
+    "ownership": "All rights remain with original owner / publisher"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "company": "炬芯科技股份有限公司",
+    "source": "https://www.actionstech.com/res/202011/04/e7f8a23aeb0484f0.jpg",
+    "downloadUrl": "https://www.actionstech.com/res/202011/04/e7f8a23aeb0484f0.jpg",
+    "sourcePage": "https://www.actionstech.com/index.php?id=join",
+    "sourceSha256": "941e731561cf4471ad5a2a7f43ceedb266424d965a7580b9ca2177940549f121",
+    "sha256": "f5a46670f7b0631946da7bb7951a931ee47fbe452f61e6692d5f7b9e1c20f1aa",
+    "width": 887,
+    "height": 1030,
+    "description": "Company workplace photograph published on official recruitment page",
+    "ownership": "All rights remain with original owner / publisher"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "company": "炬芯科技股份有限公司",
+    "source": "https://www.actionstech.com/res/202011/04/a6360907bdeedd8e.jpg",
+    "downloadUrl": "https://www.actionstech.com/res/202011/04/a6360907bdeedd8e.jpg",
+    "sourcePage": "https://www.actionstech.com/index.php?id=join",
+    "sourceSha256": "9a65e0ddafbee92664ecc991e3bb3376f7539ad87256e497fcd0157af3127b2f",
+    "sha256": "313cef283da58aea7bdba53951f78e4e377f67ffe607105e8d169231160d8e17",
+    "width": 887,
+    "height": 1030,
+    "description": "Company workplace photograph published on official recruitment page",
+    "ownership": "All rights remain with original owner / publisher"
+  }
+}

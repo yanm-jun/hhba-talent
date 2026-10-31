@@ -1,0 +1,464 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-041",
+  "name": "晶云",
+  "displayName": "晶云药物",
+  "englishName": "Crystal Pharmatech",
+  "aliases": [
+    "苏州晶云药物科技股份有限公司",
+    "晶云药物",
+    "Crystal Pharmatech",
+    "晶云星空",
+    "晶云制药",
+    "Crystal Pharmatech Co Ltd"
+  ],
+  "industry": "生物医药 · CRO/CDMO · 药物晶型 · 制剂研发与生产",
+  "subtitle": "苏州晶云药物科技股份有限公司 · 2010年创立 · 苏州工业园区总部",
+  "overview": "晶云药物成立于2010年，是专注小分子药物晶型与固态研发、制剂开发与生产、临床供应和生物分析等领域的CRO/CDMO平台。集团在苏州及北美设有研发与生产布局；2025年苏州晶云大厦总部研发大楼启用。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.crystalpharmatech.com.cn/",
+    "https://www.crystalpharmatech.com.cn/join.aspx?pid=4&t=27",
+    "https://job.hust.edu.cn/zpinfo1/2461533.htm",
+    "https://job.ustc.edu.cn/Recruitment/info.aspx?itemid=11913",
+    "https://www.crystalpharmatech.com.cn/news_view.aspx?ContentID=163&page=1&t=15"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-041/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-041/photo1.jpg",
+        "caption": "晶云药物 · 总部研发楼",
+        "alt": "苏州晶云药物总部建筑和蓝色企业标识的官方实拍",
+        "note": "来自晶云药物官网新华日报访谈资料中的总部建筑实景。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-041/photo2.jpg",
+        "caption": "晶云药物 · 研发开放日",
+        "alt": "晶云药物Open Day活动现场，讲者分享晶型研究技术",
+        "note": "来自晶云药物官网活动新闻的现场照片，非AI生成或拼图。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://mh.hire66.com/position?secret_key=IXp360vyhc",
+    "label": "晶云2027校园招聘入口",
+    "status": "official_portal",
+    "subject": "苏州晶云药物科技股份有限公司",
+    "note": "14条岗位方向按2026年10月23日高校公布的2027校招岗位列表整理，部分含本科、硕士、博士条件。高校发布不等于所有岗位实时仍开放；最终以晶云官方招聘系统为准。"
+  },
+  "majorIntro": "按晶型与药物分析、结晶制剂研发、质量与微生物、项目和生产工程四类职位关联专业；机械类只展示设备工程，不混入全部药学岗位。",
+  "preferredMajors": [
+    "化学",
+    "应用化学",
+    "化学工程与工艺",
+    "材料化学",
+    "药学",
+    "药物化学",
+    "生物制药",
+    "机械工程",
+    "机械设计制造及其自动化",
+    "自动化",
+    "质量管理工程",
+    "制药工程"
+  ],
+  "photoNote": "真实公司品牌与总部、企业活动照片保存在本地。两张照片分别为官方发布的建筑和活动现场，标注性质与来源，图片不跳转到原网站。版权归各原权利人。",
+  "business": [
+    {
+      "title": "药物晶型与固态研究",
+      "description": "提供药物多晶型、盐型、共晶和无定形形态研究及固态表征服务。",
+      "tags": "晶型 · XRPD · DSC",
+      "details": [
+        "晶型筛选和理化性质研究",
+        "药物固态稳定性和相容性",
+        "固态结构与物理分析平台"
+      ]
+    },
+    {
+      "title": "结晶工艺及处方前研究",
+      "description": "开展原料药结晶工艺开发、粒径控制及处方前药物理化性质研究。",
+      "tags": "结晶 · 工艺 · 处方前",
+      "details": [
+        "结晶筛选与工艺放大",
+        "原料药固态物性研究",
+        "制剂前期实验与技术评估"
+      ]
+    },
+    {
+      "title": "口服固体制剂CDMO",
+      "description": "从制剂研发和工艺放大到GMP试制及商业化生产，提供小分子药品开发支持。",
+      "tags": "CDMO · GMP · 制剂",
+      "details": [
+        "小试处方研发及制剂技术",
+        "GMP生产及生产工艺验证",
+        "药品分析及合规注册支持"
+      ]
+    },
+    {
+      "title": "生物分析与大分子CMC",
+      "description": "提供生物分析和生物药理化质量分析服务，与小分子CRO/CDMO技术平台协同。",
+      "tags": "生物分析 · CMC",
+      "details": [
+        "分析方法研发与质量研究",
+        "生物药物和大分子理化表征",
+        "多业务协同研发项目"
+      ]
+    },
+    {
+      "title": "药物质量分析与微生物检测",
+      "description": "围绕HPLC、GC和理化检测、微生物质量控制和实验室合规建立科学分析平台。",
+      "tags": "QA · QC · 分析",
+      "details": [
+        "实验室分析与方法验证",
+        "微生物检测和环境监测",
+        "GMP质量体系及审核"
+      ]
+    },
+    {
+      "title": "临床供应与研发制造支撑",
+      "description": "提供临床药品供应、设备及工程管理、项目协同与国际服务支持。",
+      "tags": "临床供应 · 工程",
+      "details": [
+        "制剂临床供应保障",
+        "实验室仪器设备管理",
+        "跨区域研发项目协同"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "analysis-cro",
+      "title": "分析研究（CRO事业部）",
+      "city": "江苏苏州（2027校招公告）",
+      "category": "药物晶型与分析",
+      "url": "https://mh.hire66.com/position?secret_key=IXp360vyhc",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2461533.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "苏州晶云药物科技股份有限公司",
+      "summary": "开展药物晶型及固态研发相关分析方法开发、理化评价和分析检测，为研发项目提供测试支撑。",
+      "requirements": "2026年10月23日华中科技大学2027校园招聘公告列有此职位及学历（学历以单岗为准）、专业信息；上方摘要为按岗位职能归纳，并非官方逐字职责。若高校公告仅列职位分类，具体工作内容及现在是否仍可投递应以晶云官方职位链接和独立JD为准。",
+      "majorNames": [
+        "应用化学",
+        "化学"
+      ],
+      "editorialRelatedMajors": [
+        "药学",
+        "材料化学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以单岗为准 · 2027届公告",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "solid-cro",
+      "title": "固态研发（CRO事业部）",
+      "city": "江苏苏州（2027校招公告）",
+      "category": "药物晶型与分析",
+      "url": "https://mh.hire66.com/position?secret_key=IXp360vyhc",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2461533.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "苏州晶云药物科技股份有限公司",
+      "summary": "围绕原料药晶型筛选、多晶型、盐型和共晶体研究开展实验与稳定性评价。",
+      "requirements": "2026年10月23日华中科技大学2027校园招聘公告列有此职位及学历（学历以单岗为准）、专业信息；上方摘要为按岗位职能归纳，并非官方逐字职责。若高校公告仅列职位分类，具体工作内容及现在是否仍可投递应以晶云官方职位链接和独立JD为准。",
+      "majorNames": [
+        "应用化学",
+        "化学"
+      ],
+      "editorialRelatedMajors": [
+        "药学",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以单岗为准 · 2027届公告",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "crystallization",
+      "title": "结晶工艺开发（CRO事业部）",
+      "city": "江苏苏州（2027校招公告）",
+      "category": "结晶与制剂研发",
+      "url": "https://mh.hire66.com/position?secret_key=IXp360vyhc",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2461533.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "苏州晶云药物科技股份有限公司",
+      "summary": "开展小分子药物结晶条件筛选、工艺优化和晶型控制，参与研发与生产技术衔接。",
+      "requirements": "2026年10月23日华中科技大学2027校园招聘公告列有此职位及学历（学历以单岗为准）、专业信息；上方摘要为按岗位职能归纳，并非官方逐字职责。若高校公告仅列职位分类，具体工作内容及现在是否仍可投递应以晶云官方职位链接和独立JD为准。",
+      "majorNames": [
+        "化学工程与工艺",
+        "应用化学"
+      ],
+      "editorialRelatedMajors": [
+        "药学",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以单岗为准 · 2027届公告",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "formulation-assistant",
+      "title": "制剂助理研究员（CDMO）",
+      "city": "江苏苏州（2027校招公告）",
+      "category": "结晶与制剂研发",
+      "url": "https://mh.hire66.com/position?secret_key=IXp360vyhc",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2461533.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "苏州晶云药物科技股份有限公司",
+      "summary": "参与制剂处方筛选、工艺研究及实验记录，配合研发项目开展小试与工艺验证。",
+      "requirements": "2026年10月23日华中科技大学2027校园招聘公告列有此职位及学历（本科）、专业信息；上方摘要为按岗位职能归纳，并非官方逐字职责。若高校公告仅列职位分类，具体工作内容及现在是否仍可投递应以晶云官方职位链接和独立JD为准。",
+      "majorNames": [
+        "药学",
+        "生物制药"
+      ],
+      "editorialRelatedMajors": [
+        "制药工程",
+        "应用化学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 · 2027届公告",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "analysis-cdmo",
+      "title": "分析助理研究员（CDMO）",
+      "city": "江苏苏州（2027校招公告）",
+      "category": "药物晶型与分析",
+      "url": "https://mh.hire66.com/position?secret_key=IXp360vyhc",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2461533.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "苏州晶云药物科技股份有限公司",
+      "summary": "从事制剂分析方法开发、验证和质量研究，协助仪器维护与技术报告编写。",
+      "requirements": "2026年10月23日华中科技大学2027校园招聘公告列有此职位及学历（本科）、专业信息；上方摘要为按岗位职能归纳，并非官方逐字职责。若高校公告仅列职位分类，具体工作内容及现在是否仍可投递应以晶云官方职位链接和独立JD为准。",
+      "majorNames": [
+        "化学工程与工艺",
+        "应用化学",
+        "化学"
+      ],
+      "editorialRelatedMajors": [
+        "药学",
+        "材料化学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 · 2027届公告",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "preformulation-senior",
+      "title": "处方前高级研究员（CDMO）",
+      "city": "江苏苏州（2027校招公告）",
+      "category": "结晶与制剂研发",
+      "url": "https://mh.hire66.com/position?secret_key=IXp360vyhc",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2461533.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "苏州晶云药物科技股份有限公司",
+      "summary": "研究制剂研发前期的原料性质、处方前评价及配方工艺相关关键问题。",
+      "requirements": "2026年10月23日华中科技大学2027校园招聘公告列有此职位及学历（博士）、专业信息；上方摘要为按岗位职能归纳，并非官方逐字职责。若高校公告仅列职位分类，具体工作内容及现在是否仍可投递应以晶云官方职位链接和独立JD为准。",
+      "majorNames": [
+        "化学工程与工艺",
+        "化学"
+      ],
+      "editorialRelatedMajors": [
+        "应用化学",
+        "药学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "博士 · 2027届公告",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "preformulation-assistant",
+      "title": "处方前助理研究员（CDMO）",
+      "city": "江苏苏州（2027校招公告）",
+      "category": "结晶与制剂研发",
+      "url": "https://mh.hire66.com/position?secret_key=IXp360vyhc",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2461533.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "苏州晶云药物科技股份有限公司",
+      "summary": "开展原料药和辅料理化性质分析、处方前实验、数据处理与研发报告归档。",
+      "requirements": "2026年10月23日华中科技大学2027校园招聘公告列有此职位及学历（本科）、专业信息；上方摘要为按岗位职能归纳，并非官方逐字职责。若高校公告仅列职位分类，具体工作内容及现在是否仍可投递应以晶云官方职位链接和独立JD为准。",
+      "majorNames": [
+        "化学工程与工艺",
+        "应用化学"
+      ],
+      "editorialRelatedMajors": [
+        "化学",
+        "药学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 · 2027届公告",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "qa-assistant",
+      "title": "QA助理（CDMO）",
+      "city": "江苏苏州（2027校招公告）",
+      "category": "质量与微生物",
+      "url": "https://mh.hire66.com/position?secret_key=IXp360vyhc",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2461533.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "苏州晶云药物科技股份有限公司",
+      "summary": "参与GMP质量流程、药品生产过程审核、偏差调查和质量体系文件维护。",
+      "requirements": "2026年10月23日华中科技大学2027校园招聘公告列有此职位及学历（本科）、专业信息；上方摘要为按岗位职能归纳，并非官方逐字职责。若高校公告仅列职位分类，具体工作内容及现在是否仍可投递应以晶云官方职位链接和独立JD为准。",
+      "majorNames": [
+        "药学",
+        "生物制药"
+      ],
+      "editorialRelatedMajors": [
+        "应用化学",
+        "化学工程与工艺"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 · 2027届公告",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "physical-analysis",
+      "title": "理化助理／分析师（CDMO）",
+      "city": "江苏苏州（2027校招公告）",
+      "category": "药物晶型与分析",
+      "url": "https://mh.hire66.com/position?secret_key=IXp360vyhc",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2461533.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "苏州晶云药物科技股份有限公司",
+      "summary": "开展药品理化检测、分析方法验证与偏差调查，协助质量记录和仪器日常维护。",
+      "requirements": "2026年10月23日华中科技大学2027校园招聘公告列有此职位及学历（硕士）、专业信息；上方摘要为按岗位职能归纳，并非官方逐字职责。若高校公告仅列职位分类，具体工作内容及现在是否仍可投递应以晶云官方职位链接和独立JD为准。",
+      "majorNames": [
+        "化学工程与工艺",
+        "材料化学"
+      ],
+      "editorialRelatedMajors": [
+        "化学",
+        "药物化学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 · 2027届公告",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "formulation-senior",
+      "title": "制剂高级研究员（CDMO）",
+      "city": "江苏苏州（2027校招公告）",
+      "category": "结晶与制剂研发",
+      "url": "https://mh.hire66.com/position?secret_key=IXp360vyhc",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2461533.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "苏州晶云药物科技股份有限公司",
+      "summary": "负责制剂项目方案设计、小试工艺优化及研发团队协同，为客户交付提供支持。",
+      "requirements": "2026年10月23日华中科技大学2027校园招聘公告列有此职位及学历（博士）、专业信息；上方摘要为按岗位职能归纳，并非官方逐字职责。若高校公告仅列职位分类，具体工作内容及现在是否仍可投递应以晶云官方职位链接和独立JD为准。",
+      "majorNames": [
+        "药学",
+        "药物化学"
+      ],
+      "editorialRelatedMajors": [
+        "制药工程",
+        "化学工程与工艺"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "博士 · 2027届公告",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "pm-specialist",
+      "title": "项目管理专员（CDMO）",
+      "city": "江苏苏州（2027校招公告）",
+      "category": "项目与生产工程",
+      "url": "https://mh.hire66.com/position?secret_key=IXp360vyhc",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2461533.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "苏州晶云药物科技股份有限公司",
+      "summary": "协调制剂研发项目计划、关键节点、研发文件与跨团队沟通，支持项目执行。",
+      "requirements": "2026年10月23日华中科技大学2027校园招聘公告列有此职位及学历（本科）、专业信息；上方摘要为按岗位职能归纳，并非官方逐字职责。若高校公告仅列职位分类，具体工作内容及现在是否仍可投递应以晶云官方职位链接和独立JD为准。",
+      "majorNames": [
+        "化学工程与工艺",
+        "药学"
+      ],
+      "editorialRelatedMajors": [
+        "工商管理",
+        "生物制药"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 · 2027届公告",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "microbiology",
+      "title": "微生物助理分析师（CDMO）",
+      "city": "江苏苏州（2027校招公告）",
+      "category": "质量与微生物",
+      "url": "https://mh.hire66.com/position?secret_key=IXp360vyhc",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2461533.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "苏州晶云药物科技股份有限公司",
+      "summary": "进行微生物检测、环境监控和样品管理，依据实验室SOP记录及汇报数据。",
+      "requirements": "2026年10月23日华中科技大学2027校园招聘公告列有此职位及学历（本科）、专业信息；上方摘要为按岗位职能归纳，并非官方逐字职责。若高校公告仅列职位分类，具体工作内容及现在是否仍可投递应以晶云官方职位链接和独立JD为准。",
+      "majorNames": [
+        "生物制药"
+      ],
+      "editorialRelatedMajors": [
+        "生物技术",
+        "药学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 · 2027届公告",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "equipment-assistant",
+      "title": "设备助理工程师（CDMO）",
+      "city": "江苏苏州（2027校招公告）",
+      "category": "项目与生产工程",
+      "url": "https://mh.hire66.com/position?secret_key=IXp360vyhc",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2461533.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "苏州晶云药物科技股份有限公司",
+      "summary": "开展制药设备点检、维护、运行记录和异常排查，支持GMP生产工程管理。",
+      "requirements": "2026年10月23日华中科技大学2027校园招聘公告列有此职位及学历（本科）、专业信息；上方摘要为按岗位职能归纳，并非官方逐字职责。若高校公告仅列职位分类，具体工作内容及现在是否仍可投递应以晶云官方职位链接和独立JD为准。",
+      "majorNames": [
+        "机械设计制造及其自动化"
+      ],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 · 2027届公告",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "process-assistant",
+      "title": "工艺助理工程师（CDMO）",
+      "city": "江苏苏州（2027校招公告）",
+      "category": "项目与生产工程",
+      "url": "https://mh.hire66.com/position?secret_key=IXp360vyhc",
+      "evidenceUrl": "https://job.hust.edu.cn/zpinfo1/2461533.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "苏州晶云药物科技股份有限公司",
+      "summary": "参与制剂生产工艺实施、记录及现场问题跟踪，配合工艺优化与质量要求。",
+      "requirements": "2026年10月23日华中科技大学2027校园招聘公告列有此职位及学历（本科）、专业信息；上方摘要为按岗位职能归纳，并非官方逐字职责。若高校公告仅列职位分类，具体工作内容及现在是否仍可投递应以晶云官方职位链接和独立JD为准。",
+      "majorNames": [
+        "药学"
+      ],
+      "editorialRelatedMajors": [
+        "制药工程",
+        "生物制药"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 · 2027届公告",
+      "currentOpenVerified": false
+    }
+  ]
+}
