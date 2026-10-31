@@ -1,6 +1,6 @@
 import type {TalentHousingRecord} from './talentHousingRecords.ts';
 /** 住房政策和建设线索严格区分：本数组不构成当前可申请空房承诺。 */
-export const QINGHAI_HOUSING_RECORDS:TalentHousingRecord[]=[
+export const QINGHAI_HOUSING_RESEARCH_RECORDS:TalentHousingRecord[]=[
   {
     "id": "qh-xining-youth-2025-housing-2026",
     "city": "西宁",
@@ -163,3 +163,6 @@ export const QINGHAI_HOUSING_RECORDS:TalentHousingRecord[]=[
     "reviewedAt": "2026-11-01"
   }
 ];
+
+/** Formal V5.1 index requires first-party government policy source, not recruitment/media reprints. */
+export const QINGHAI_HOUSING_RECORDS:TalentHousingRecord[]=QINGHAI_HOUSING_RESEARCH_RECORDS.filter(r=>{try{return new URL(r.sourceUrl).hostname.endsWith('.gov.cn')}catch{return false}});
