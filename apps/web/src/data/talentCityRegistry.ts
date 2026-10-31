@@ -356,9 +356,9 @@ export const TALENT_PREFECTURE_CITIES:TalentCity[]=prefectureRaw.trim().split('\
  const sh=shortProvince(province);
  const aliases=[name,official,py,initials,pinyin,province+name,province+official,sh+name,sh+official,...(old?.aliases||[])];
  return {...old,name,official,province,code,pinyin,initials,level:'prefecture' as const,
-  photo:old?.photo||(name==='石家庄'?'https://commons.wikimedia.org/wiki/Special:Redirect/file/Skyline_of_Shijiazhuang_2012.jpg?width=1280':undefined),
-  credit:old?.credit||(name==='石家庄'?'ping lin · CC0 · Wikimedia Commons':undefined),
-  photoPage:old?.photoPage||(name==='石家庄'?'https://commons.wikimedia.org/wiki/File:Skyline_of_Shijiazhuang_2012.jpg':undefined),
+  photo:old?.photo||(name==='邢台'?'https://commons.wikimedia.org/wiki/Special:Redirect/file/Xingtai_Taihang_International_Convention_and_Exhibition_Center.jpg?width=1280':name==='石家庄'?'https://commons.wikimedia.org/wiki/Special:Redirect/file/Skyline_of_Shijiazhuang_2012.jpg?width=1280':undefined),
+  credit:old?.credit||(name==='邢台'?'Wcr1993 · Wikimedia Commons':name==='石家庄'?'ping lin · CC0 · Wikimedia Commons':undefined),
+  photoPage:old?.photoPage||(name==='邢台'?'https://commons.wikimedia.org/wiki/File:Xingtai_Taihang_International_Convention_and_Exhibition_Center.jpg':name==='石家庄'?'https://commons.wikimedia.org/wiki/File:Skyline_of_Shijiazhuang_2012.jpg':undefined),
   aliases:[...new Set(aliases)],intro:old?.intro||(name==='邢台'?'已收录2026回邢来邢人才三年分期购房补贴、36个月租房补贴、就业支持及真实住房待核验线索':name==='石家庄'?'河北首站：市级B卡租购房补贴、毕业生一次性安家补贴、2026人才公寓与公租房历史项目':name==='日照'?'已收录青年人才补贴、先租后购住房优惠，并整理市级及高新区人才公寓历史资料':name==='枣庄'?'已收录2026青年就业创业补贴、首批高层次人才家园试点，另有薛城保租房和高新区公寓待核验线索':name==='聊城'?'已收录2026青年人才生活及社保补贴；人才住房三年免租和购房支持为2022历史政策，另有3处公寓或工程待核验线索':name==='承德'?'已收录2026年主导产业租房与一次性生活补助、燕赵英才卡、配售型保障住房以及京津科技人才公寓历史制度；具体空房和申报直达入口待核验':name==='秦皇岛'?'已收录秦皇岛经开区官方人才公寓政策及配租流程；锦绣佳成与科技大厦项目依据2025年报道列为待核验房源线索':name==='保定'?'已收录2026国控高新区四小区保租房与公积金租房提取制度，2022毕业生租购房补贴作为历史政策参考；284套为四小区批次总量，不是实时空房':'人才政策与住房资料正在逐步核验')};
 });
 const municipalityCode:Record<string,string>={北京:'110000',天津:'120000',上海:'310000',重庆:'500000'};
