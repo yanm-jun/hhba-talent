@@ -85,13 +85,14 @@ function Bread({city,current,parent}:{city?:string;current:string;parent?:{title
 }
 function QuickCount({count,label}:{count:number;label:string}){return <span className="ts-sub-count"><strong>{count}</strong><small>{label}</small></span>}
 function PolicyTile({data}:{data:TalentPolicyRecord}){
+ const fromSecondary= XINGTAI_POLICY_RESEARCH_RECORDS.some(r=>r.id===data.id);
  return <Link to={talentPolicyUrl(data.id)} className="ts-sub-tile">
-  <div className="ts-sub-tile-top"><span>{data.category}{data.scope?' · '+data.scope:''}</span><small>{policyStatus(data)}</small></div>
+  <div className="ts-sub-tile-top"><span>{data.category}{data.scope?' · '+data.scope:''}</span><small>{fromSecondary?'公开资料转载 · 政府原文待核验':policyStatus(data)}</small></div>
   <h3>{data.title}</h3><p>{data.summary}</p>
   {data.targetGroup&&<p className="ts-policy-audience"><b>适用人群：</b>{data.targetGroup}</p>}
   <div className="ts-sub-tile-benefit">{data.benefit}</div>
   {data.payoutTo&&data.payoutTo!=='个人'&&<p className="ts-sub-payout-hint">扶持性质：{data.payoutTo==='用人单位'?'单位补助':data.payoutTo==='非现金贷款'?'需偿还贷款':data.payoutTo==='住房折扣'?'房款折扣':data.payoutTo}</p>}
-  <footer><small>{data.department} · {data.published}</small><ArrowUpRight size={18}/></footer>
+  <footer><small>{fromSecondary?'二手公开资料（非政府一手文件）':data.department} · {data.published}</small><ArrowUpRight size={18}/></footer>
  </Link>;
 }
 function HousingTile({data}:{data:TalentHousingRecord}){
@@ -199,7 +200,7 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
  const housingMode=kind==='housing';
  const guideMode=kind==='guide';
  const title=searchMode?'搜索结果':housingMode?'人才安居':kind==='benefits'?'补贴与福利':guideMode?'申请指南':'人才政策';
- const resultPolicies=TALENT_POLICY_RECORDS.filter(p=>p.city===city&&(!query||matchesPolicy(p,query,city))&&(!housingMode||isHousingPolicy(p))&&(kind!=='benefits'||benefit(p))).sort(recentPolicies);
+ const resultPolicies=(searchMode?[...TALENT_POLICY_RECORDS,...XINGTAI_POLICY_RESEARCH_RECORDS]:TALENT_POLICY_RECORDS).filter(p=>p.city===city&&(!query||matchesPolicy(p,query,city))&&(!housingMode||isHousingPolicy(p))&&(kind!=='benefits'||benefit(p))).sort(recentPolicies);
  const resultHomes=TALENT_HOUSING_RECORDS.filter(p=>p.city===city&&(housingMode||searchMode)&&(!query||matchesHousing(p,query,city))).sort(housingFirst);
  const pendingHousingCount=(housingMode||searchMode)?housingResearchLeads(city,query||'').length:0;
  const housingHistoricalCount=(housingMode||searchMode)?housingPolicyResearch(city,query||'').length:0;
