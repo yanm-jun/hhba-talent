@@ -1,0 +1,238 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-082",
+  "name": "太古集团",
+  "displayName": "太古集团 / Swire Group",
+  "englishName": "Swire Group",
+  "aliases": [
+    "Swire",
+    "太古",
+    "John Swire & Sons",
+    "太古股份有限公司",
+    "太古地产",
+    "太古可口可乐",
+    "Swire Management Programme"
+  ],
+  "industry": "多元企业集团 · 地产 · 饮料 · 航空 · 船务 · 管理培养",
+  "subtitle": "太古集团香港及中国内地总部 · 下属企业独立发布职位",
+  "overview": "太古集团为历史悠久的全球多元企业集团，核心业务覆盖商业地产、饮料、航空工程和船务等。集团2027年全球领导力计划SMP于2026年10月31日23:59（香港时间）截止；财务SFP和人力SHRLP计划主要面向有工作经验者且官网表示目前不接受申请。太古地产的中国内地商业地产与工程培养项目属于下属公司招聘，不与集团SMP混成一套职位。",
+  "lastReviewed": "2026-11-01",
+  "sources": [
+    "https://careers.swire.com/zh-cn",
+    "https://careers.swire.com/zh-cn/careers/swire-management-programme",
+    "https://careers.swire.com/zh-cn/careers/swire-finance-programme",
+    "https://careers.swire.com/zh-cn/careers/swire-hr-leadership-programme",
+    "https://careers.swireproperties.com/zh-cn/early-careers/",
+    "https://www.swire.com/sc/about/overview.php"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-082/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-082/photo1.svg",
+        "caption": "太古集团 · 非实景编辑图片",
+        "alt": "太古集团相关业务的非实景示意",
+        "note": "HHBA独立非实景SVG；实际图片必须核对是否为太古集团或明确署名的下属企业业务项目，并保留图片来源、SHA256及版权说明。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-082/photo2.svg",
+        "caption": "太古集团 · 非实景编辑图片",
+        "alt": "太古集团相关业务的非实景示意",
+        "note": "HHBA独立非实景SVG；实际图片必须核对是否为太古集团或明确署名的下属企业业务项目，并保留图片来源、SHA256及版权说明。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://careers.swire.com/zh-cn",
+    "label": "太古集团官方Careers入口（下属企业独立申请）",
+    "status": "official_portal",
+    "subject": "香港太古集团的集团计划，及明确标示的太古地产子公司项目",
+    "note": "SMP 2027届申请截止2026-10-31香港时间23:59；SFP及SHRLP官网写明目前不接受申请、需工作经验。太古地产为独立申请主体，集团Career首页不是其直接申请链接。"
+  },
+  "majorIntro": "集团毕业生SMP、经验人才SFP／SHRLP及太古地产培训生分开列示。点击专业只过滤相应项目，标签不等于满足全部学历、经验及工作许可条件。",
+  "preferredMajors": [
+    "工商管理",
+    "经济学",
+    "会计学",
+    "财务管理",
+    "人力资源管理",
+    "工程管理",
+    "建筑学",
+    "电气工程及其自动化",
+    "机械工程"
+  ],
+  "photoNote": "优先使用太古集团官网或旗下太古地产真实楼宇和业务项目图片（明确区别集团与子公司），标注媒体版权及具体项目，任何非真实图不得冒充公司场景。",
+  "business": [
+    {
+      "title": "商业地产与资产运营",
+      "description": "太古地产在香港及中国内地从事商业综合体、办公楼和物业管理服务。 具体业务及招聘主体应按集团组织和子公司公告核对。",
+      "tags": "地产 · 资产",
+      "details": [
+        "商业地产建设",
+        "租赁及资产管理",
+        "社区营造和物业运营"
+      ]
+    },
+    {
+      "title": "饮料与消费业务",
+      "description": "集团相关企业在大中华及亚太区域开展饮料生产、物流和市场经营。 具体业务及招聘主体应按集团组织和子公司公告核对。",
+      "tags": "饮料 · 生产",
+      "details": [
+        "饮料制造",
+        "市场渠道",
+        "供应链管理"
+      ]
+    },
+    {
+      "title": "航空与飞机工程",
+      "description": "集团业务涉及航空服务、飞机维修与工程技术以及航空物流。 具体业务及招聘主体应按集团组织和子公司公告核对。",
+      "tags": "航空 · 工程",
+      "details": [
+        "航空运输服务",
+        "飞机维修工程",
+        "航空相关物流"
+      ]
+    },
+    {
+      "title": "船务与物流运输",
+      "description": "有关集团公司开展航运、物流、船舶服务及冷链等活动。 具体业务及招聘主体应按集团组织和子公司公告核对。",
+      "tags": "船务 · 物流",
+      "details": [
+        "航运服务",
+        "冷链及运输",
+        "国际物流"
+      ]
+    },
+    {
+      "title": "集团财务与风险管理",
+      "description": "香港等集团总部支持投资、财务、内部审计、风险和治理。 具体业务及招聘主体应按集团组织和子公司公告核对。",
+      "tags": "财务 · 风险",
+      "details": [
+        "资金及投资管理",
+        "审计和合规",
+        "集团风险控制"
+      ]
+    },
+    {
+      "title": "领导力培养与可持续发展",
+      "description": "面向集团和下属企业开展管理培养、组织发展及可持续经营工作。 具体业务及招聘主体应按集团组织和子公司公告核对。",
+      "tags": "人才 · ESG",
+      "details": [
+        "全球领导力计划",
+        "人力资源管理",
+        "企业社会责任"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "smp-2027",
+      "title": "太古全球领导力发展计划（SMP 2027）",
+      "category": "综合 / 全球管理",
+      "city": "香港、中国内地及海外可能轮岗",
+      "summary": "太古集团官网2027年SMP培养项目，岗位轮换跨行业与多个工作地区；该项目已列明特定招聘窗口。",
+      "requirements": "2027年SMP官网申请时间为2026年9月11日至10月31日23:59（香港时间UTC+8），该批已截止。实际语言、学历、工作地点与申请资格须参考官方SMP详情。 报名须进入对应公司官网核对当前状态与职位资格，任何第三方摘录不代表实时开放。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工商管理",
+        "经济学",
+        "工程管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027计划，2026-10-31截止",
+      "url": "https://careers.swire.com/zh-cn",
+      "evidenceUrl": "https://careers.swire.com/zh-cn/careers/swire-management-programme",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "香港太古集团有限公司，集团领导力项目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sfp-experienced",
+      "title": "太古财务领导力发展计划（SFP）",
+      "category": "财务 / 经验人才",
+      "city": "香港、中国内地及海外轮岗",
+      "summary": "集团官方财务领导力发展计划为拥有经验的专业财务人才设计，官网并非将其作为2027届毕业生校招。",
+      "requirements": "官方要求具备会计师资质（如HKICPA、CICPA、ACCA等）与财务工作经验，以主管或业务负责人层级参加。官网标注当前不接受申请。 报名须进入对应公司官网核对当前状态与职位资格，任何第三方摘录不代表实时开放。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "会计学",
+        "财务管理",
+        "金融学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "非应届项目，需要会计师资格和财务经验",
+      "url": "https://careers.swire.com/zh-cn",
+      "evidenceUrl": "https://careers.swire.com/zh-cn/careers/swire-finance-programme",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "香港太古集团有限公司，集团领导力项目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "shrlp-experienced",
+      "title": "太古人力资源领导力发展计划（SHRLP）",
+      "category": "人力 / 经验人才",
+      "city": "香港、中国内地及其他地区",
+      "summary": "太古集团官网介绍的人力资源领导力轮岗和高管培养体系，主要面向有专业工作经历的人才。",
+      "requirements": "官方强调相关学历、HR团队管理经验及中英文交流能力，并明确当前不接受申请。不可作为2027届应届毕业生无经验岗位展示。 报名须进入对应公司官网核对当前状态与职位资格，任何第三方摘录不代表实时开放。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人力资源管理",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "具有团队管理经验的社招培养项目",
+      "url": "https://careers.swire.com/zh-cn",
+      "evidenceUrl": "https://careers.swire.com/zh-cn/careers/swire-hr-leadership-programme",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "香港太古集团有限公司，集团领导力项目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "property-mainland-2027",
+      "title": "太古地产中国内地商业地产人才计划（2027项目）",
+      "category": "地产 / 运营",
+      "city": "中国内地，具体项目城市以太古地产为准",
+      "summary": "太古地产自身早期事业发展页面介绍中国内地三年制商业地产人才计划，2027年度项目属于集团下属独立雇主。",
+      "requirements": "太古地产并非集团SMP项目的同一招聘主体，必须进入太古地产岗位系统核对当年接受申请时间、学历及项目地点；不得从集团官网推断已录用。 报名须进入对应公司官网核对当前状态与职位资格，任何第三方摘录不代表实时开放。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工程管理",
+        "建筑学",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "太古地产独立招聘主体，2027年度计划",
+      "url": "https://careers.swire.com/zh-cn",
+      "evidenceUrl": "https://careers.swireproperties.com/zh-cn/early-careers/",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "太古地产（独立于集团SMP的招聘主体）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "property-engineering-2027",
+      "title": "太古地产技术培训生（工程方向）",
+      "category": "地产 / 工程",
+      "city": "香港，实际项目地点需核实",
+      "summary": "太古地产技术培训生官方页面介绍香港为期两年的见习工程师培养、轮岗与专业资格辅导。",
+      "requirements": "官网注明相关工程学士学位、良好中英文沟通能力；来源版本中2026年度招聘信息与2027最新摘要可能不同，不能把历史截止日当作最新申请状态。 报名须进入对应公司官网核对当前状态与职位资格，任何第三方摘录不代表实时开放。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "机械工程",
+        "建筑环境与能源应用工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "工程相关学士，招录年份与开放状态需核",
+      "url": "https://careers.swire.com/zh-cn",
+      "evidenceUrl": "https://careers.swireproperties.com/zh-cn/trainee-detail-page/",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "太古地产（独立于集团SMP的招聘主体）",
+      "currentOpenVerified": false
+    }
+  ]
+}
