@@ -1,0 +1,467 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-035",
+  "name": "佑驾创新",
+  "displayName": "佑驾创新",
+  "englishName": "MINIEYE",
+  "aliases": [
+    "深圳佑驾创新科技股份有限公司",
+    "MINIEYE",
+    "Minieye Technology",
+    "佑驾创新MINIEYE",
+    "佑驾创新2027校园招聘",
+    "佑驾创新招聘",
+    "小竹无人车"
+  ],
+  "industry": "智能驾驶 · 智能座舱 · 自动驾驶 · 无人物流 · 车载AI",
+  "subtitle": "深圳佑驾创新科技股份有限公司 · 成立于2014年 · 港股2431.HK · 深圳总部",
+  "overview": "佑驾创新（MINIEYE）成立于2014年，是上市的中国智能驾驶、智能座舱及无人车科技企业，总部位于深圳。公司围绕辅助驾驶、座舱感知、域控制器、无人车感知与规划等开展研发、量产与商业化，渐进覆盖L1到L4的技术及应用场景，并在智慧出行和无人物流领域拓展。2027届校园招聘面向2026年9月至2027年8月毕业的海内外应届毕业生。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.minieye.cc/about",
+    "https://www.minieye.cc/news_detail/118",
+    "https://www.minieye.cc/news_detail/105",
+    "https://www.minieye.cc/investor",
+    "https://scdc.jnu.edu.cn/campus/view/id/1036477",
+    "https://myjob.dlmu.edu.cn/campus/view/id/868603",
+    "https://www.wondercv.com/xiaozhao/youjia-innovation-2027-campus-autumn-20060-211e73/",
+    "https://www.career.zju.edu.cn/jyxt/sczp/zpztgl/ckZpgwList.zf?dwxxid=JG1210839",
+    "https://catarc.tech/news/11156.cshtml",
+    "https://www.21jingji.com/article/20250918/herald/2f8e3f77d2d994bd295c7fab80153ba2.html",
+    "https://www.tidesight.com/news/1364150.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-035/logo.webp",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-035/photo1.jpg",
+        "caption": "佑驾创新 · 2025年汽车技术展台实景",
+        "alt": "2025年佑驾创新MINIEYE智能汽车技术展台与产品展示实拍",
+        "note": "图片来自21世纪经济报道2025年9月18日关于佑驾创新的实地报道，为展台实景；不冒称公司总部或工厂。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-035/photo2.jpg",
+        "caption": "佑驾创新 · 智能汽车展示实景",
+        "alt": "MINIEYE展会现场的透明智能汽车展示模型和企业展台",
+        "note": "图片来自行业媒体对佑驾创新的企业活动报道，记录早期展会真实活动；并非实时门店或研发办公室。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://app.mokahr.com/campus-recruitment/minieye/118571#/",
+    "label": "佑驾创新2027校园招聘官网",
+    "status": "official_portal",
+    "subject": "深圳佑驾创新科技股份有限公司",
+    "note": "高校2027秋招公告及官方Moka招聘专题支持该校招渠道。本站13条第三方岗位编号汇总与1条高校招聘岗位共14条方向；不声称实时在招或已逐岗核实官方JD。请以Moka岗位状态、学历、专业与城市为准。"
+  },
+  "majorIntro": "按岗位名称、专业相关性及真实城市拆分展示。机械、车辆、自动化、电子、人工智能等专业只展示具体相关岗位；2027届招聘公告及Moka单岗要求是最终报名依据。",
+  "preferredMajors": [
+    "人工智能",
+    "计算机科学与技术",
+    "软件工程",
+    "控制科学与工程",
+    "自动化",
+    "电子信息工程",
+    "电气工程及其自动化",
+    "机械工程",
+    "车辆工程",
+    "通信工程",
+    "工业工程",
+    "供应链管理",
+    "工程管理",
+    "日语",
+    "数据科学与大数据技术"
+  ],
+  "photoNote": "Logo为公开媒体展示的佑驾创新MINIEYE品牌标识；两张独立图片为媒体实拍的不同年份展会场景，不使用AI模拟公司办公环境，也不把产品展台冒称总部。原图版权归各原权利人，本地静态副本仅供企业介绍，图片点击不外跳。",
+  "business": [
+    {
+      "title": "辅助驾驶与主动安全",
+      "description": "面向乘用车提供iSafety系列前视感知、主动安全和多场景辅助驾驶方案。",
+      "tags": "ADAS · iSafety",
+      "details": [
+        "前向感知与主动安全预警",
+        "iSafety 4高性能前视一体机",
+        "面向车企的量产集成和测试"
+      ]
+    },
+    {
+      "title": "智能驾驶域控与行泊一体",
+      "description": "围绕iPilot域控制器、领航辅助、行车泊车协同与高速/城区辅助驾驶开展量产研发。",
+      "tags": "域控制器 · iPilot",
+      "details": [
+        "全场景辅助驾驶域控平台",
+        "记忆行车、记忆泊车及领航辅助",
+        "车规硬件、平台软件与量产适配"
+      ]
+    },
+    {
+      "title": "智能座舱感知",
+      "description": "提供驾驶员监测、乘员感知及人车交互技术，为车内安全和智能化体验赋能。",
+      "tags": "DMS · OMS · iCabin",
+      "details": [
+        "驾驶员疲劳及注意力监测",
+        "乘员识别与座舱感知",
+        "座舱大模型智能管家BamBam"
+      ]
+    },
+    {
+      "title": "L4级无人物流车",
+      "description": "围绕“小竹”系列无人物流车研发、生产交付及物流场景运营，支持园区与开放道路配送。",
+      "tags": "L4 · 小竹无人车",
+      "details": [
+        "小竹T5 Pro真无图无人物流车",
+        "小竹A6 Pro冷链无人车",
+        "无人配送场景落地与运营协同"
+      ]
+    },
+    {
+      "title": "感知与规划算法",
+      "description": "通过AI视觉、端到端模型、规划控制、数据闭环与仿真验证迭代自动驾驶系统。",
+      "tags": "AI算法 · 端到端",
+      "details": [
+        "端到端感知与规划研究",
+        "数据闭环与自动驾驶仿真",
+        "算法训练、评价和工程部署"
+      ]
+    },
+    {
+      "title": "车载软硬件与量产服务",
+      "description": "覆盖嵌入式底层软件、硬件平台、系统测试及车企项目量产交付相关能力。",
+      "tags": "BSP · 软硬件",
+      "details": [
+        "控制器嵌入式与BSP平台",
+        "车载硬件和测试验证",
+        "研发到量产的系统工程与项目支持"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "MJ000950",
+      "title": "27届-研发运营（管培生）",
+      "city": "深圳",
+      "category": "项目 / 管培",
+      "url": "https://app.mokahr.com/campus-recruitment/minieye/118571#/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/youjia-innovation-2027-campus-autumn-20060-211e73/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳佑驾创新科技股份有限公司",
+      "summary": "协助研发团队梳理阶段任务、跨团队研发信息及项目过程数据，参与需求和问题跟踪、流程优化与运营分析。该方向偏技术团队的组织协同和项目运营，不应被误写为独立算法开发岗位。",
+      "requirements": "学历及具体职责以Moka的MJ000950职位页面为准。 校招公告招聘毕业时间为2026年9月至2027年8月（本岗位若属实习，则以其单岗届别条件为准），公告涉及深圳、北京、苏州、上海、武汉，但不能据此推断每个职位所有城市均可投递。专业仅作岗位内容的相关性提示，不等于已审核通过的专业资格；官方岗位页面为最终依据。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工业工程",
+        "工程管理",
+        "计算机科学与技术",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "MJ000947",
+      "title": "27届-底软测试实习生",
+      "city": "深圳",
+      "category": "测试 / 验证",
+      "url": "https://app.mokahr.com/campus-recruitment/minieye/118571#/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/youjia-innovation-2027-campus-autumn-20060-211e73/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "INTERNSHIP",
+      "recruitmentSubject": "深圳佑驾创新科技股份有限公司",
+      "summary": "围绕智能驾驶底层软件参与测试用例整理、版本回归、缺陷记录和验证工作，学习与嵌入式开发和系统联调团队协作定位问题。为实习岗位，具体可实习周期和转正政策请查看官方单岗信息。",
+      "requirements": "为2027届实习方向，实习周期及专业条件须以Moka职位详情确认。 校招公告招聘毕业时间为2026年9月至2027年8月（本岗位若属实习，则以其单岗届别条件为准），公告涉及深圳、北京、苏州、上海、武汉，但不能据此推断每个职位所有城市均可投递。专业仅作岗位内容的相关性提示，不等于已审核通过的专业资格；官方岗位页面为最终依据。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "自动化",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届实习 · 学历以官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "MJ000945",
+      "title": "27届-规划模型算法工程师（上海）",
+      "city": "上海",
+      "category": "算法 / AI",
+      "url": "https://app.mokahr.com/campus-recruitment/minieye/118571#/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/youjia-innovation-2027-campus-autumn-20060-211e73/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳佑驾创新科技股份有限公司",
+      "summary": "面向智能驾驶端到端规划模型，参与神经网络架构、数据构建、训练策略与规划表现的分析；结合仿真和实车验证寻找模型对复杂工况响应不足的原因，利用对比实验优化规划效果。",
+      "requirements": "职位编号MJ000945，第三方岗位目录显示上海办公地，学历和具体任职条件以Moka单岗页面为准。 校招公告招聘毕业时间为2026年9月至2027年8月（本岗位若属实习，则以其单岗届别条件为准），公告涉及深圳、北京、苏州、上海、武汉，但不能据此推断每个职位所有城市均可投递。专业仅作岗位内容的相关性提示，不等于已审核通过的专业资格；官方岗位页面为最终依据。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "软件工程",
+        "控制科学与工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "MJ000944",
+      "title": "27届-规划模型算法工程师（深圳）",
+      "city": "深圳",
+      "category": "算法 / AI",
+      "url": "https://app.mokahr.com/campus-recruitment/minieye/118571#/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/youjia-innovation-2027-campus-autumn-20060-211e73/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳佑驾创新科技股份有限公司",
+      "summary": "围绕城市道路、结构化道路及泊车场景的预测规划模型开发，协助模型训练、推理评价和数据闭环，基于实验验证预测轨迹与规划效果的优化方向。该条与上海岗位分别对应不同招聘编号。",
+      "requirements": "职位编号MJ000944，深圳岗位；不与上海MJ000945合并为同一开放城市。 校招公告招聘毕业时间为2026年9月至2027年8月（本岗位若属实习，则以其单岗届别条件为准），公告涉及深圳、北京、苏州、上海、武汉，但不能据此推断每个职位所有城市均可投递。专业仅作岗位内容的相关性提示，不等于已审核通过的专业资格；官方岗位页面为最终依据。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "软件工程",
+        "自动化",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "MJ000929",
+      "title": "27届-嵌入式开发工程师（BSP）",
+      "city": "深圳",
+      "category": "嵌入式 / 硬件",
+      "url": "https://app.mokahr.com/campus-recruitment/minieye/118571#/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/youjia-innovation-2027-campus-autumn-20060-211e73/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳佑驾创新科技股份有限公司",
+      "summary": "面向智能驾驶硬件平台开展嵌入式底层软件及板级支持包（BSP）相关开发工作，协助驱动接口、系统启动与外设联调，并配合验证设备运行稳定性。使用芯片和工具链以官方岗位介绍为准。",
+      "requirements": "BSP为岗位原始名称，不推断必须熟练某一特定芯片型号或操作系统。 校招公告招聘毕业时间为2026年9月至2027年8月（本岗位若属实习，则以其单岗届别条件为准），公告涉及深圳、北京、苏州、上海、武汉，但不能据此推断每个职位所有城市均可投递。专业仅作岗位内容的相关性提示，不等于已审核通过的专业资格；官方岗位页面为最终依据。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "电子信息工程",
+        "自动化",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "MJ000920",
+      "title": "27届-C++开发工程师",
+      "city": "深圳",
+      "category": "软件 / 数据",
+      "url": "https://app.mokahr.com/campus-recruitment/minieye/118571#/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/youjia-innovation-2027-campus-autumn-20060-211e73/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳佑驾创新科技股份有限公司",
+      "summary": "使用C++参与智驾软件模块开发、维护及问题排查，可能涉及平台基础组件、算法工程化、模块接口或性能优化。具体职责以企业Moka职位页面为准，避免把岗位名称相同的两个招聘编号当作两类职业。",
+      "requirements": "岗位目录还出现另一个同名职位MJ000895；本站按同一岗位方向保留MJ000920，不重复计数。 校招公告招聘毕业时间为2026年9月至2027年8月（本岗位若属实习，则以其单岗届别条件为准），公告涉及深圳、北京、苏州、上海、武汉，但不能据此推断每个职位所有城市均可投递。专业仅作岗位内容的相关性提示，不等于已审核通过的专业资格；官方岗位页面为最终依据。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息与计算科学",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "MJ000919",
+      "title": "27届-仿真开发工程师（工程开发）",
+      "city": "北京 / 深圳",
+      "category": "软件 / 数据",
+      "url": "https://app.mokahr.com/campus-recruitment/minieye/118571#/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/youjia-innovation-2027-campus-autumn-20060-211e73/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳佑驾创新科技股份有限公司",
+      "summary": "协助构建智能驾驶仿真场景和工程工具，围绕仿真任务执行、数据接口、评测结果及功能复现开展研发支持，为算法回归测试和工程验证提供可复用的仿真能力。",
+      "requirements": "第三方目录注明北京和深圳两个办公地址，实际是否可选城市以官方职位页面为准。 校招公告招聘毕业时间为2026年9月至2027年8月（本岗位若属实习，则以其单岗届别条件为准），公告涉及深圳、北京、苏州、上海、武汉，但不能据此推断每个职位所有城市均可投递。专业仅作岗位内容的相关性提示，不等于已审核通过的专业资格；官方岗位页面为最终依据。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "自动化",
+        "车辆工程",
+        "交通运输工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "MJ000918",
+      "title": "27届-运维开发工程师",
+      "city": "深圳",
+      "category": "软件 / 数据",
+      "url": "https://app.mokahr.com/campus-recruitment/minieye/118571#/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/youjia-innovation-2027-campus-autumn-20060-211e73/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳佑驾创新科技股份有限公司",
+      "summary": "支持研发和业务平台的日常部署、运行监控及异常问题排查，参与自动化运维工具和流程改善，并与软件开发、算法和数据工程团队协作提高系统稳定性。",
+      "requirements": "工作地点深圳；职责和技术栈为岗位名称对应的辅助理解，不能替代官方任职资格。 校招公告招聘毕业时间为2026年9月至2027年8月（本岗位若属实习，则以其单岗届别条件为准），公告涉及深圳、北京、苏州、上海、武汉，但不能据此推断每个职位所有城市均可投递。专业仅作岗位内容的相关性提示，不等于已审核通过的专业资格；官方岗位页面为最终依据。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "网络工程",
+        "信息安全"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "MJ000917",
+      "title": "27届-数据闭环软件开发工程师",
+      "city": "深圳 / 上海",
+      "category": "软件 / 数据",
+      "url": "https://app.mokahr.com/campus-recruitment/minieye/118571#/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/youjia-innovation-2027-campus-autumn-20060-211e73/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳佑驾创新科技股份有限公司",
+      "summary": "参与智能驾驶数据采集、处理、回传与评测流程的软件工程建设，支撑模型迭代和问题复现，协同算法团队跟进数据质量及工具链能力。不同办公室对具体职责有差异。",
+      "requirements": "第三方岗位目录列示深圳或上海，请以MJ000917官方岗位详情确认为准。 校招公告招聘毕业时间为2026年9月至2027年8月（本岗位若属实习，则以其单岗届别条件为准），公告涉及深圳、北京、苏州、上海、武汉，但不能据此推断每个职位所有城市均可投递。专业仅作岗位内容的相关性提示，不等于已审核通过的专业资格；官方岗位页面为最终依据。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "数据科学与大数据技术",
+        "人工智能"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "MJ000910",
+      "title": "27届-硬件工程师",
+      "city": "深圳",
+      "category": "嵌入式 / 硬件",
+      "url": "https://app.mokahr.com/campus-recruitment/minieye/118571#/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/youjia-innovation-2027-campus-autumn-20060-211e73/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳佑驾创新科技股份有限公司",
+      "summary": "围绕智能驾驶控制器、感知设备等硬件研发，协助电路与硬件系统的测试、联调、故障分析及工程资料维护，与嵌入式、系统和测试岗位共同推进产品验证。",
+      "requirements": "岗位编号MJ000910，具体硬件电路及电子专业要求以企业官方说明为准。 校招公告招聘毕业时间为2026年9月至2027年8月（本岗位若属实习，则以其单岗届别条件为准），公告涉及深圳、北京、苏州、上海、武汉，但不能据此推断每个职位所有城市均可投递。专业仅作岗位内容的相关性提示，不等于已审核通过的专业资格；官方岗位页面为最终依据。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "电气工程及其自动化",
+        "电子科学与技术",
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "MJ000889",
+      "title": "27届-大模型算法工程师",
+      "city": "深圳",
+      "category": "算法 / AI",
+      "url": "https://app.mokahr.com/campus-recruitment/minieye/118571#/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/youjia-innovation-2027-campus-autumn-20060-211e73/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳佑驾创新科技股份有限公司",
+      "summary": "参与智能驾驶或座舱相关模型的研究、训练与推理评测，开展算法实验、数据分析、模型结果复盘及迭代优化；实际应用场景、模型类型和平台以官方岗位要求为准。",
+      "requirements": "只据公开2027校招岗位名称确认职位方向，细分模型栈及学历以Moka原文为准。 校招公告招聘毕业时间为2026年9月至2027年8月（本岗位若属实习，则以其单岗届别条件为准），公告涉及深圳、北京、苏州、上海、武汉，但不能据此推断每个职位所有城市均可投递。专业仅作岗位内容的相关性提示，不等于已审核通过的专业资格；官方岗位页面为最终依据。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "软件工程",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "MJ000914",
+      "title": "27届-供应链管培生",
+      "city": "深圳",
+      "category": "供应链",
+      "url": "https://app.mokahr.com/campus-recruitment/minieye/118571#/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/youjia-innovation-2027-campus-autumn-20060-211e73/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳佑驾创新科技股份有限公司",
+      "summary": "参与硬件产品或智能驾驶系统供应链运营学习，熟悉采购交付、供应商协调、物料及库存数据、生产供应保障等流程，逐步承担跨职能协同任务。",
+      "requirements": "岗位编号MJ000914，实际轮岗计划、职级及专业要求由企业官方招聘页面说明。 校招公告招聘毕业时间为2026年9月至2027年8月（本岗位若属实习，则以其单岗届别条件为准），公告涉及深圳、北京、苏州、上海、武汉，但不能据此推断每个职位所有城市均可投递。专业仅作岗位内容的相关性提示，不等于已审核通过的专业资格；官方岗位页面为最终依据。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "物流管理",
+        "工业工程",
+        "机械工程",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "MJ000894",
+      "title": "27届-项目经理（日语）",
+      "city": "深圳",
+      "category": "项目 / 管培",
+      "url": "https://app.mokahr.com/campus-recruitment/minieye/118571#/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/youjia-innovation-2027-campus-autumn-20060-211e73/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳佑驾创新科技股份有限公司",
+      "summary": "面向与日语业务沟通相关的项目协同，辅助整理客户需求、研发进度与交付节点，衔接技术、项目和商务团队，日语交流能力的具体水平以招聘原文为准。",
+      "requirements": "项目经理（日语）编号MJ000894，需核验官方语言资质要求。 校招公告招聘毕业时间为2026年9月至2027年8月（本岗位若属实习，则以其单岗届别条件为准），公告涉及深圳、北京、苏州、上海、武汉，但不能据此推断每个职位所有城市均可投递。专业仅作岗位内容的相关性提示，不等于已审核通过的专业资格；官方岗位页面为最终依据。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "日语",
+        "国际经济与贸易",
+        "车辆工程",
+        "工程管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以官网为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "l4-perception-2027",
+      "title": "L4-感知算法工程师（2027届）",
+      "city": "深圳",
+      "category": "算法 / AI",
+      "url": "https://app.mokahr.com/campus-recruitment/minieye/118571#/",
+      "evidenceUrl": "https://www.career.zju.edu.cn/jyxt/sczp/zpztgl/ckZpgwList.zf?dwxxid=JG1210839",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳佑驾创新科技股份有限公司",
+      "summary": "围绕L4级自动驾驶感知算法开展算法研究、数据分析、感知模型验证与研发协作，涉及车辆与环境目标感知的基础能力。高校就业平台有单独招聘岗位记录，岗位原文注明硕士及相关人工智能、计算机、软件和电子信息专业。",
+      "requirements": "高校发布的2027秋招岗位要求硕士，具体人数、薪酬和实时招聘状态以企业Moka平台为准。 校招公告招聘毕业时间为2026年9月至2027年8月（本岗位若属实习，则以其单岗届别条件为准），公告涉及深圳、北京、苏州、上海、武汉，但不能据此推断每个职位所有城市均可投递。专业仅作岗位内容的相关性提示，不等于已审核通过的专业资格；官方岗位页面为最终依据。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "软件工程",
+        "电子信息"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士（高校招聘资料）",
+      "currentOpenVerified": false
+    }
+  ]
+}
