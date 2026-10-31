@@ -1,0 +1,53 @@
+name: Hubei 13-city V5.1 isolated static review
+on:
+  push:
+    branches:
+      - feature/talent-hubei
+  pull_request:
+    paths:
+      - 'apps/web/src/data/hubei*.ts'
+      - 'apps/web/src/data/talentPolicyRecords.ts'
+      - 'apps/web/src/data/talentHousingRecords.ts'
+      - 'apps/web/src/data/talentCityRegistry.ts'
+      - 'apps/web/src/pages/TalentServiceRoutes.tsx'
+      - 'apps/web/src/components/talent/UnifiedTalentRecordDetail.tsx'
+      - 'apps/web/scripts/test-hubei-city-v51.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-hubei:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify Hubei 13 prefectures
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-hubei-city-v51.mjs
+      - name: National V5.1 contract
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - name: National city search
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-cities.mjs
+      - name: Build full static site without deploying production
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+        run: npm run build
+      - name: Upload static review build
+        uses: actions/upload-artifact@v4
+        with:
+          name: hubei-13cities-static-v51-review
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error

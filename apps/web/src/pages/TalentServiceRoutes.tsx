@@ -15,6 +15,7 @@ import {TalentQingdaoPolicyPreview} from './TalentQingdaoPolicyPreview';
 import {TalentQingdaoGuidePreview} from './TalentQingdaoGuidePreview';
 import {TalentLaoshanGuide} from './TalentLaoshanGuide';
 import {getJiangsuGuide,jiangsuGuideUrl,JIANGSU_CITY_SLUGS} from '../data/jiangsuGuides';
+import {getHubeiGuide} from '../data/hubeiGuides';
 import {UnifiedPolicyGuide} from '../components/talent/UnifiedPolicyGuide';
 import {GUANGXI_RENT_RESEARCH_RECORDS} from '../data/guangxiRentPolicyResearch';
 import {GUANGXI_MUNICIPAL_RESEARCH_RECORDS} from '../data/guangxiMunicipalResearch';
@@ -328,6 +329,10 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
  else if(kind==='list'&&fragments[2]==='policies')body=city==='济南'?<TalentJinanPolicyPreview/>:city==='青岛'?<TalentQingdaoPolicyPreview/>:<UnifiedPolicyList config={buildCityPolicyConfig(city)}/>;
  else if(kind==='list'&&['policies','benefits','housing','guide'].includes(fragments[2]))body=<ListPage city={city} kind={fragments[2] as TalentListKind}/>;
  else if(kind==='search')body=<ListPage key={route} city={decode(fragments[2]||'杭州')||'杭州'} kind="search" query={decode(fragments.slice(3).join('/'))}/>;
+ else if(kind==='policy-guide-preview'&&fragments[2]==='hubei'){
+  const guide=getHubeiGuide(fragments[3]||'',decode(fragments[4]||''));
+  body=guide?<UnifiedPolicyGuide data={guide}/>:<><Bread current="湖北省办事指南暂未收录"/><section className="ts-sub-header"><h1>暂未收录对应湖北办事指南</h1><Link to="/talent-service/cities">返回全国城市目录 <ArrowRight size={16}/></Link></section></>;
+ }
  else if(kind==='policy-guide-preview'&&fragments[2]==='jiangsu'){
   const guide=getJiangsuGuide(fragments[3]||'',decode(fragments[4]||''));
   body=guide?<UnifiedPolicyGuide data={guide}/>:<><Bread current="未找到江苏省指南"/><section className="ts-sub-header"><h1>该指南尚未收录</h1><Link to="/talent-service/cities">返回城市列表 <ArrowRight size={16}/></Link></section></>;
