@@ -9,6 +9,11 @@ function Panel({title,children}:{title:string;children:React.ReactNode}){
  return <section className="jgd-panel"><div className="jgd-section-heading"><span className="jgd-section-icon"><FileText size={18}/></span><div><h2>{title}</h2></div></div>{children}</section>;
 }
 const fullGuide=(id:string)=>({
+ 'hs-2024-graduate-settlement':'/talent-service/policy-guide-preview/hengshui/graduate',
+ 'hs-2024-card-rent':'/talent-service/policy-guide-preview/hengshui/rent-buy',
+ 'hs-2024-card-home':'/talent-service/policy-guide-preview/hengshui/rent-buy',
+ 'hs-2024-apartment-support':'/talent-service/policy-guide-preview/hengshui/apartment',
+ 'hs-2024-skill-awards':'/talent-service/policy-guide-preview/hengshui/skill',
  'zjk-2026-shuobo-doctor':'/talent-service/policy-guide-preview/zhangjiakou/shuobo',
  'zjk-2026-shuobo-hospital':'/talent-service/policy-guide-preview/zhangjiakou/shuobo',
  'zjk-2024-highpark-apartment':'/talent-service/policy-guide-preview/zhangjiakou/park',
@@ -48,7 +53,7 @@ export function UnifiedTalentRecordDetail({policy,housing}:{policy?:TalentPolicy
  const quality=policy?assessPolicy(policy):assessHousing(housing!);
  const application=policy?.applicationUrl||housing?.applyUrl;
  const route=policy?'/talent-service/list/policies/':'/talent-service/list/housing/';
- const housingGuide=housing&&['sjz-2026-talent-574','sjz-2026-affordable-rental','sjz-2026-public-rental-yishui','sjz-2026-public-rental-tanan','sjz-2026-public-rental-shenghe'].includes(housing.id)?'/talent-service/policy-guide-preview/shijiazhuang/housing':housing&&['ta-2026-city-affordable-rental','ta-2026-new-worker-public-rent'].includes(housing.id)?'/talent-service/policy-guide-preview/taian/housing':housing&&['zb-zichuan-shuian-202606','zb-zichuan-yuting-202606'].includes(housing.id)?'/talent-service/policy-guide-preview/zibo/housing':undefined;
+ const housingGuide=housing&&['hs-2024-talents-apartment-program','hs-2022-affordable-housing-policy'].includes(housing.id)?'/talent-service/policy-guide-preview/hengshui/apartment':housing&&['sjz-2026-talent-574','sjz-2026-affordable-rental','sjz-2026-public-rental-yishui','sjz-2026-public-rental-tanan','sjz-2026-public-rental-shenghe'].includes(housing.id)?'/talent-service/policy-guide-preview/shijiazhuang/housing':housing&&['ta-2026-city-affordable-rental','ta-2026-new-worker-public-rent'].includes(housing.id)?'/talent-service/policy-guide-preview/taian/housing':housing&&['zb-zichuan-shuian-202606','zb-zichuan-yuting-202606'].includes(housing.id)?'/talent-service/policy-guide-preview/zibo/housing':undefined;
  const link=policy?fullGuide(policy.id):housingGuide;
  return <main className="jgd-page">
   <nav className="jgd-breadcrumb"><Link to="/talent-service">人才服务</Link><span>›</span><Link to={'/talent-service/city/'+encodeURIComponent(item.city)}>{item.city}</Link><span>›</span>{policy?'人才政策':housing?.housingCategory||'人才住房'}</nav>
