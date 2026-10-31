@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-052",
+  "name": "宏川集团",
+  "displayName": "宏川集团",
+  "englishName": "Hongchuan Group",
+  "aliases": [
+    "广东宏川集团有限公司",
+    "宏川智慧",
+    "宏川集团2027"
+  ],
+  "industry": "石化仓储物流 · 化工品供应链 · 产业服务 · 连锁油站",
+  "subtitle": "广东宏川集团有限公司 · 广东东莞 · 综合化工产业服务集团",
+  "overview": "广东宏川集团创立于1993年，围绕石化仓储物流、化工品服务型贸易、供应链及连锁油站等业务提供综合产业服务；宏川智慧是其上市业务体系之一。2027校园招聘二级资料列出运营、营销及管培生类别，但部分2025/2026届历史法务职位混在同一聚合页面；未把旧届别职位冒充2027岗位，也未把某一子公司岗位等同整个集团招聘。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.grgroup.cc/",
+    "https://www.wondercv.com/xiaozhao/hongchuan-group-2027-campus-recruitment-19831-46bb8d/",
+    "https://www.wondercv.com/xiaozhao/hongchuan-group-2027-autumn-campus-mt-19933-382c70/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-052/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-052/photo1.svg",
+        "caption": "宏川集团 · HHBA编辑业务视觉1",
+        "alt": "宏川集团业务领域编辑插画，不是真实企业照片",
+        "note": "由HHBA独立制作的非官方业务示意图；不表示企业真实办公地点、员工或产品照片。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-052/photo2.svg",
+        "caption": "宏川集团 · HHBA编辑业务视觉2",
+        "alt": "宏川集团业务领域编辑插画，不是真实企业照片",
+        "note": "由HHBA独立制作的非官方业务示意图；不表示企业真实办公地点、员工或产品照片。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.wondercv.com/xiaozhao/hongchuan-group-2027-campus-recruitment-19831-46bb8d/",
+    "label": "2027届校招公开信息（非官方投递入口）",
+    "status": "archived_source",
+    "subject": "广东宏川集团有限公司",
+    "note": "2027批次依据二级摘要，具体官网官方网申需要企业核实。聚合页出现法务管培对应2025/2026届，不收录为2027确定岗位。官方集团站有校园招聘板块但未核到本批直达JD。"
+  },
+  "majorIntro": "只确认公开2027批次中运营与营销及管培方向；学科建议用于岗位探索，不是正式公告逐岗专业限制。",
+  "preferredMajors": [
+    "物流管理",
+    "供应链管理",
+    "国际经济与贸易",
+    "市场营销",
+    "化学工程与工艺",
+    "安全工程",
+    "工商管理",
+    "财务管理"
+  ],
+  "photoNote": "1张HHBA非官方编辑字标和2张非企业实景SVG业务图，均为明确标示的临时视觉资产；待官方可使用照片与商标核验后替换。",
+  "business": [
+    {
+      "title": "石化仓储和罐区物流",
+      "description": "围绕石化液体与相关化工品提供码头储罐、仓储及物流协同等服务。",
+      "tags": "石化 · 仓储",
+      "details": [
+        "专业仓储运营",
+        "储罐与装卸服务",
+        "化学品物流"
+      ]
+    },
+    {
+      "title": "集成供应链服务",
+      "description": "整合化工品仓配、物流、上下游产业资源，为客户提供综合供应链解决方案。",
+      "tags": "供应链 · 物流",
+      "details": [
+        "供应链网络",
+        "采购与物流协调",
+        "交付和质量保障"
+      ]
+    },
+    {
+      "title": "化工品服务型贸易",
+      "description": "围绕工业及能源客户开展化工品贸易、销售和供应商协同。",
+      "tags": "贸易 · 化工",
+      "details": [
+        "化工品市场服务",
+        "贸易执行",
+        "客户协作"
+      ]
+    },
+    {
+      "title": "供应链金融与资本协同",
+      "description": "集团公开业务领域包括供应链金融，为相关产业链客户提供金融相关服务。",
+      "tags": "金融 · 产业",
+      "details": [
+        "行业资金协同",
+        "供应链融资支持",
+        "产业商业服务"
+      ]
+    },
+    {
+      "title": "连锁油站经营",
+      "description": "集团公开业务领域包括连锁油站管理，涉及站点运营和服务体系。",
+      "tags": "能源 · 零售",
+      "details": [
+        "油站运营管理",
+        "安全与服务管理",
+        "终端客户经营"
+      ]
+    },
+    {
+      "title": "数字平台与科技创新",
+      "description": "围绕化工供应链的信息服务、业务系统与数字化工具开展发展。",
+      "tags": "数字化 · 科技",
+      "details": [
+        "数字交易服务",
+        "产业信息系统",
+        "经营数据支撑"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "operations-2027",
+      "title": "运营管培方向（2027届摘要）",
+      "category": "运营 / 管培",
+      "city": "上海、广东、江苏（招聘项目城市范围）",
+      "summary": "第三方2027校招摘要列运营管培方向，服务仓储物流与化工供应链体系，具体岗位需按集团和子公司区分。",
+      "requirements": "已公开2027方向及跨区域意向，但正式职责、最终专业限制与职位所属招聘法人未核到官方单岗JD；不把其他届别法务岗转写为本届岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "物流管理",
+        "供应链管理",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以原公告为准",
+      "currentOpenVerified": false,
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东宏川集团有限公司",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hongchuan-group-2027-campus-recruitment-19831-46bb8d/",
+      "url": "https://www.wondercv.com/xiaozhao/hongchuan-group-2027-campus-recruitment-19831-46bb8d/"
+    },
+    {
+      "id": "marketing-2027",
+      "title": "营销管培方向（2027届摘要）",
+      "category": "市场 / 管培",
+      "city": "上海／东莞，可能涉及全国业务",
+      "summary": "第三方2027校招摘要列出营销管培方向，集团经营业务覆盖化工物流与能源行业客户服务。",
+      "requirements": "工作地点与出差倾向来自二级摘要；岗位学历、应届范围、出差比例及营销职责未能取得企业官网逐项核实，请以正式公告为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "国际经济与贸易",
+        "物流管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以原公告为准",
+      "currentOpenVerified": false,
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东宏川集团有限公司",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hongchuan-group-2027-campus-recruitment-19831-46bb8d/",
+      "url": "https://www.wondercv.com/xiaozhao/hongchuan-group-2027-campus-recruitment-19831-46bb8d/"
+    }
+  ]
+}

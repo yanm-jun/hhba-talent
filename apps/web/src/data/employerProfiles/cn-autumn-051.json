@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-051",
+  "name": "金中新材",
+  "displayName": "金中新材",
+  "englishName": "Liaoning Jinzhong New Materials",
+  "aliases": [
+    "辽宁金中新材料产业集团有限公司",
+    "辽宁金中新材料",
+    "金中新材2027"
+  ],
+  "industry": "水泥与建筑材料 · 新材料技术 · 绿色制造 · 产业运营",
+  "subtitle": "辽宁金中新材料产业集团有限公司 · 辽宁沈阳 · 辽宁区域建材运营",
+  "overview": "辽宁金中新材料产业集团有限公司由金隅冀东水泥和天山材料相关上市公司合作设立，企业注册经营涉及新材料技术研发及推广、水泥和建材销售、非金属矿物制品等。2027校园招聘汇总列出沈阳、辽阳、本溪等地的采矿、地质测量、安全与机械维修等岗位方向；暂未发现本批集团官方招聘门户，所有具体条件保留第三方校招出处并不称为已核实官方岗位。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+    "https://static.cninfo.com.cn/finalpage/2026-05-25/1225328172.PDF"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-051/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-051/photo1.svg",
+        "caption": "金中新材 · HHBA编辑业务视觉1",
+        "alt": "金中新材业务领域编辑插画，不是真实企业照片",
+        "note": "由HHBA独立制作的非官方业务示意图；不表示企业真实办公地点、员工或产品照片。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-051/photo2.svg",
+        "caption": "金中新材 · HHBA编辑业务视觉2",
+        "alt": "金中新材业务领域编辑插画，不是真实企业照片",
+        "note": "由HHBA独立制作的非官方业务示意图；不表示企业真实办公地点、员工或产品照片。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+    "label": "2027招聘公开转载（非官方投递网站）",
+    "status": "archived_source",
+    "subject": "辽宁金中新材料产业集团有限公司",
+    "note": "招聘批次与岗位来自招聘信息聚合站，工商经营范围以上市公司披露文件作为背景；逐岗资格、报名入口需由招聘单位重新确认。另一同名汇总存在不同城市与材料研发职系口径，不直接合并。"
+  },
+  "majorIntro": "采矿、地质测量、安全、机械、电气及质量方向来自该公司2027届校招转载；具体专业与学历以原公告为准，未把其他口径的金属材料研发招聘误并。",
+  "preferredMajors": [
+    "采矿工程",
+    "地质工程",
+    "测绘工程",
+    "安全工程",
+    "机械工程",
+    "电气工程及其自动化",
+    "材料科学与工程",
+    "市场营销"
+  ],
+  "photoNote": "此批提供3张明确非官方、非实景的独立SVG作为页面视觉占位；不代表实际厂区、人员、集团Logo或现场产品。",
+  "business": [
+    {
+      "title": "区域建材与产业运营",
+      "description": "参与辽宁区域建材领域投资、生产经营协同以及相关产业资源整合。",
+      "tags": "建材 · 运营",
+      "details": [
+        "建材产业运营",
+        "区域生产协调",
+        "经营管理"
+      ]
+    },
+    {
+      "title": "水泥与建筑材料",
+      "description": "公司注册业务包含水泥制品和建筑材料销售与供应链经营。",
+      "tags": "水泥 · 建材",
+      "details": [
+        "水泥制品销售",
+        "建筑材料服务",
+        "产品质量协同"
+      ]
+    },
+    {
+      "title": "新材料技术研究",
+      "description": "围绕非金属材料、新型建材技术研发、应用推广与工程服务开展探索。",
+      "tags": "材料 · 研发",
+      "details": [
+        "新材料技术应用",
+        "工艺创新推广",
+        "技术服务"
+      ]
+    },
+    {
+      "title": "矿山和原料保障",
+      "description": "依托相关建材生产链对矿产原料供应、安全与环境合规开展专业协同。",
+      "tags": "矿山 · 原料",
+      "details": [
+        "原料采购与供应",
+        "矿区安全",
+        "矿山技术支持"
+      ]
+    },
+    {
+      "title": "设备维保和安全质量",
+      "description": "相关区域生产活动涉及机械电气设备维护、安全环保及质量控制。",
+      "tags": "设备 · 安全",
+      "details": [
+        "机械设备维护",
+        "电气设备维修",
+        "品质安全管理"
+      ]
+    },
+    {
+      "title": "物流与建材交付",
+      "description": "公司经营范围包含一般货物道路运输等相关项目，有利于建材供应和物流协同。",
+      "tags": "物流 · 交付",
+      "details": [
+        "区域建材物流",
+        "原料及成品运输",
+        "供应计划协调"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "mining-2027",
+      "title": "采矿工程师岗（2027届转载）",
+      "category": "采矿 / 地质",
+      "city": "辽宁辽阳",
+      "summary": "二级招聘汇总列出采矿工程师，工作地点辽宁辽阳，涉及矿山及矿产原料相关工程技术。",
+      "requirements": "第三方2027招聘摘要显示本科及以上、采矿专业方向；正式岗位职责、劳动条件、用人法人和官方报名入口尚未核实，不将转载内容描述为当前确定在招。",
+      "majorNames": [
+        "采矿工程"
+      ],
+      "editorialRelatedMajors": [
+        "安全工程",
+        "地质工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（转载）",
+      "currentOpenVerified": false,
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "辽宁金中新材料产业集团有限公司",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "url": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/"
+    },
+    {
+      "id": "safety-2027",
+      "title": "安全管理岗（2027届转载）",
+      "category": "安全 / 管理",
+      "city": "辽宁辽阳",
+      "summary": "公开2027校招摘要包含安全管理岗，专业涉及安全工程及采矿相关背景。",
+      "requirements": "转载表格列明本科及以上、辽阳，优先关注安全工程与采矿工程方向；未得到完整官方岗位说明，安全岗位现场资格和法定证书要求须另外向企业核实。",
+      "majorNames": [
+        "安全工程",
+        "采矿工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（转载）",
+      "currentOpenVerified": false,
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "辽宁金中新材料产业集团有限公司",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "url": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/"
+    },
+    {
+      "id": "mechanical-maintenance-2027",
+      "title": "机械维修岗（2027届转载）",
+      "category": "机械 / 运维",
+      "city": "辽宁本溪",
+      "summary": "二级校招摘要列出机械维修岗位，属于建材与区域设备运维相关技术方向。",
+      "requirements": "招聘摘要列大专及以上学历、机械类专业、辽宁本溪；是否需要轮班、驻矿和特殊证书尚无原公告可核，不能替企业增加必备要求。",
+      "majorNames": [
+        "机械工程",
+        "机械设计制造及其自动化"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "大专及以上（转载）",
+      "currentOpenVerified": false,
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "辽宁金中新材料产业集团有限公司",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/",
+      "url": "https://www.wondercv.com/xiaozhao/jinzhong-xincai-2027-campus-liaoning-19825-940681/"
+    }
+  ]
+}

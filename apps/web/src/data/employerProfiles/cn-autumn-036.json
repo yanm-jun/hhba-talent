@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-036",
+  "name": "南芯科技",
+  "displayName": "南芯科技",
+  "englishName": "Southchip Semiconductor",
+  "aliases": [
+    "上海南芯半导体科技股份有限公司",
+    "南芯半导体",
+    "SOUTHCHIP",
+    "Southchip",
+    "南芯科技2027"
+  ],
+  "industry": "电源管理芯片 · 数模混合芯片 · 汽车电子 · 工业供电",
+  "subtitle": "上海南芯半导体科技股份有限公司 · 上海 · 集成电路与高效供电",
+  "overview": "南芯科技专注电源管理与相关信号链芯片，提供DC-DC/AC-DC转换、USB供电协议、PMIC、电池管理、汽车电子、MCU、马达驱动和传感器等产品及解决方案。官网2027校园招聘系统提供具体职位。2027硬件算法和现场应用岗位均有可核对的独立官方招聘页面；具体城市应按单岗页面显示，不将所有公司地区合并视为职位地点。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.southchip.com/",
+    "https://nanxin.zhiye.com/campus/",
+    "https://nanxin.zhiye.com/campus/detail?jobAdId=f2f69375-3fbc-4daa-9fc1-29d2276e7c29",
+    "https://nanxin.zhiye.com/campus/detail?jobAdId=293e405a-bd27-44ff-b8ac-2f95a0bd8cb9"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-036/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-036/photo1.svg",
+        "caption": "南芯科技 · HHBA编辑业务视觉1",
+        "alt": "南芯科技业务领域编辑插画，不是真实企业照片",
+        "note": "由HHBA独立制作的非官方业务示意图；不表示企业真实办公地点、员工或产品照片。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-036/photo2.svg",
+        "caption": "南芯科技 · HHBA编辑业务视觉2",
+        "alt": "南芯科技业务领域编辑插画，不是真实企业照片",
+        "note": "由HHBA独立制作的非官方业务示意图；不表示企业真实办公地点、员工或产品照片。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://nanxin.zhiye.com/campus/",
+    "label": "南芯官方校园招聘网站",
+    "status": "official_portal",
+    "subject": "上海南芯半导体科技股份有限公司",
+    "note": "具体职位以官方jobAdId独立岗位页面为证，2026年已发布，是否当前仍在招需以官网为准；旧清单#36此前未形成独立V2页面。"
+  },
+  "majorIntro": "仅将南芯官网可核实的2027岗位及明确条件放入岗位资料；专业背景按原始资格与编辑相关性区分，不把产品业务直接当成在招职位。",
+  "preferredMajors": [
+    "电气工程及其自动化",
+    "自动化",
+    "机械工程",
+    "电子信息工程",
+    "微电子科学与工程",
+    "计算机科学与技术",
+    "集成电路设计与集成系统",
+    "通信工程"
+  ],
+  "photoNote": "当前为1张非官方字标与2张原创业务示意SVG，不是南芯科技真实企业Logo或办公照片。官网原始产品影像的使用权与来源须进一步审查后再换。",
+  "business": [
+    {
+      "title": "车规电源和汽车电子",
+      "description": "面向车载充电、智能座舱、辅助驾驶等场景提供电源与汽车电子芯片。",
+      "tags": "汽车 · 电源",
+      "details": [
+        "车规电源管理",
+        "座舱与控制供电",
+        "车载电源方案"
+      ]
+    },
+    {
+      "title": "DC-DC电源管理",
+      "description": "包括降压、升压和升降压电源转换控制器，覆盖工业与消费电子。",
+      "tags": "降压 · 升压",
+      "details": [
+        "宽输入电压转换",
+        "负载开关",
+        "大功率供电"
+      ]
+    },
+    {
+      "title": "AC-DC与高效充电",
+      "description": "研发高效AC-DC、氮化镓集成与适配器相关芯片与电源方案。",
+      "tags": "AC-DC · GaN",
+      "details": [
+        "同步整流控制",
+        "快充供电设计",
+        "节能电源"
+      ]
+    },
+    {
+      "title": "电池管理与USB协议",
+      "description": "产品涉及电池充电、保护与电量管理，以及USB Type-C和PD协议控制。",
+      "tags": "USB PD · BMS",
+      "details": [
+        "协议芯片",
+        "电池管理",
+        "便携产品供电"
+      ]
+    },
+    {
+      "title": "MCU与马达驱动",
+      "description": "通过处理器、控制算法和驱动器支持工业自动化、执行机构和智能设备。",
+      "tags": "MCU · 马达",
+      "details": [
+        "嵌入式控制",
+        "马达驱动",
+        "智能控制"
+      ]
+    },
+    {
+      "title": "无线充电与传感",
+      "description": "提供无线充电、位置与电流传感等芯片，面向多种消费与工业应用。",
+      "tags": "无线充电 · 传感",
+      "details": [
+        "无线充电控制",
+        "电流与磁传感",
+        "高可靠接口"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "hardware-algorithm-2027",
+      "title": "硬件算法工程师（2027届）",
+      "category": "算法 / 电力电子",
+      "city": "上海、南京、成都、西安（官网所列）",
+      "summary": "官网明确硬件算法设计与模拟仿真岗位，方向涉及电源控制、马达驱动、姿态控制、音频和传感信号处理。",
+      "requirements": "官方职位写硕士及以上或优秀本科毕业生；电气、自动化、机械工程及自动化、电子信息、微电子等相关专业。要求MATLAB或C/Python仿真能力、控制理论和信号处理基础，具体递交状态以官方岗位页为准。",
+      "majorNames": [
+        "电气工程及其自动化",
+        "自动化",
+        "机械工程",
+        "电子信息工程",
+        "微电子科学与工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上／优秀本科（官网岗位）",
+      "currentOpenVerified": false,
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海南芯半导体科技股份有限公司",
+      "evidenceUrl": "https://nanxin.zhiye.com/campus/detail?jobAdId=f2f69375-3fbc-4daa-9fc1-29d2276e7c29",
+      "url": "https://nanxin.zhiye.com/campus/"
+    },
+    {
+      "id": "field-applications-2027",
+      "title": "现场应用工程师（2027届）",
+      "category": "技术支持 / FAE",
+      "city": "上海、深圳、北京（官网所列）",
+      "summary": "官网明确客户技术应用支持、问题定位、电路调试与参考设计，协同产品研发和销售推动应用导入。",
+      "requirements": "官方职位注明本科及以上，电子类相关专业，要求扎实电路知识、PCB绘图与动手调试能力，并重视沟通协作。职位属于2027届校招，招聘状态请进入官网核对。",
+      "majorNames": [
+        "电子信息工程",
+        "电子科学与技术",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（官网岗位）",
+      "currentOpenVerified": false,
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海南芯半导体科技股份有限公司",
+      "evidenceUrl": "https://nanxin.zhiye.com/campus/detail?jobAdId=293e405a-bd27-44ff-b8ac-2f95a0bd8cb9",
+      "url": "https://nanxin.zhiye.com/campus/"
+    }
+  ]
+}
