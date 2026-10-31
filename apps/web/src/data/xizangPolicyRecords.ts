@@ -41,7 +41,6 @@ function p(region:typeof REGIONS[number],key:string,values:Omit<TalentPolicyReco
    '按实际申报主体准备身份证、学历证明、合同社保及公告要求的其他材料',
    '联系'+region.office+'，通过'+region.phone+'核实当前申报渠道及办理时间',
    '通过主管部门正式入口办理、参加资格审核并依据公示结果确认，不以资料介绍代替批准']
-  ]
  };
 }
 const shared:TalentPolicyRecord[]=REGIONS.flatMap(region=>[
