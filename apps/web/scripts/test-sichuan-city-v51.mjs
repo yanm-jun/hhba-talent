@@ -14,9 +14,9 @@ for(const c of SICHUAN_21_REGIONS){
  assert.equal(findTalentCity(c)?.name,c,'missing Sichuan city/prefecture index');
 }
 assert.equal(SICHUAN_POLICY_RECORDS.length,9);
-assert.equal(SICHUAN_HOUSING_RECORDS.length,7);
+assert.equal(SICHUAN_HOUSING_RECORDS.length,9);
 assert.equal(SICHUAN_VERIFIED_POLICIES.length,11,'must keep two Leshan policies');
-assert.equal(SICHUAN_VERIFIED_HOUSING.length,8,'must keep separate Leshan housing');
+assert.equal(SICHUAN_VERIFIED_HOUSING.length,10,'must keep separate Leshan housing');
 for(const p of SICHUAN_VERIFIED_POLICIES){
  assert.equal(talentSourceKind(p.sourceUrl),'government','not government source: '+p.id);
  assert.equal(assessPolicy(p,'2026-10-31').grade,'B','not A-city certified: '+p.city);
@@ -33,6 +33,7 @@ for(const h of SICHUAN_VERIFIED_HOUSING){
  assert.equal(assessHousing(h,'2026-10-31').grade,'B');
  assert.equal(TALENT_HOUSING_RECORDS.filter(x=>x.id===h.id).length,1);
  assert.equal(h.kind,'program','no fake apartment projects');
+ assert.ok(/申报(入口|渠道).*?(未公开|待核|未公布)/.test(h.statusNote),h.id+' missing portal caveat');
  assert.ok(h.statusNote.match(/空房|房源|可租|项目/));
  const g=buildSichuanGuide('housing',h.id);
  assert.ok(g?.steps.length>=4&&g.branches.verify&&g.faq.length>=6);
