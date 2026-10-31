@@ -15,6 +15,7 @@ import {YUNNAN_HOUSING_RECORDS} from './yunnanHousingRecords.ts';
 import {JIANGSU_HOUSING_RECORDS} from './jiangsuHousingRecords.ts';
 import {GUANGDONG_HOUSING_RECORDS} from './guangdongHousingRecords.ts';
 import {GUANGDONG_EXPANDED_HOUSING_RECORDS} from './guangdongExpandedHousingRecords.ts';
+import {LIAONING_HOUSING_RECORDS} from './liaoningHousingRecords.ts';
 import {GUANGXI_HOUSING_RECORDS} from './guangxiHousingRecords.ts';
 import {BEIJING_HOUSING_RECORDS} from './beijingHousingRecords.ts';
 import {CHONGQING_HOUSING_RECORDS} from './chongqingHousingRecords.ts';
@@ -41,6 +42,7 @@ export type TalentHousingRecord={id:string;city:string;district:string;title:str
 export const HOUSING_REVIEW_DATE='2026-10-30';
 export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
 ...HENAN_HOUSING_RECORDS,
+...LIAONING_HOUSING_RECORDS,
 ...YUNNAN_HOUSING_RECORDS,
 ...HANGZHOU_HOUSING_RECORDS,
 ...NINGBO_HOUSING_RECORDS,
