@@ -626,7 +626,11 @@ export const TALENT_CITY_INDEX:TalentCity[]=[
  ...TALENT_MUNICIPALITIES.map(c=>({...c,code:municipalityCode[c.name]})),
  ...TALENT_PREFECTURE_CITIES,
  ...TALENT_YUNNAN_PREFECTURES,
- ...TALENT_INNER_MONGOLIA_LEAGUES
+ ...TALENT_INNER_MONGOLIA_LEAGUES,
+ ...TALENT_JILIN_PREFECTURES,
+ ...TALENT_HEILONGJIANG_DISTRICTS,
+ TALENT_HUBEI_PREFECTURE,
+ ...TALENT_HUNAN_AUTONOMOUS_PREFECTURES
 ];
 const normalize=(text:string)=>text.trim().toLowerCase().replace(/[\s，。,.、·•\-]/g,'');
 export function findTalentProvince(input:string){
