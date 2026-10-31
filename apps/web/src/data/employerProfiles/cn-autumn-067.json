@@ -25,16 +25,16 @@
     "logo": "images/employer-profiles/cn-autumn-067/logo.svg",
     "photos": [
       {
-        "path": "images/employer-profiles/cn-autumn-067/photo1.png",
-        "caption": "弘象科技官方网站真实页面截图（非办公室照片）",
-        "alt": "用浏览器真实截取的弘象科技官方网站展示页面",
-        "note": "由独立Chromium访问https://www.cnpresky.com/后直接截屏，能核对企业身份；这不是办公楼、员工或企业实体设施照片，转载许可未核。"
+        "path": "images/employer-profiles/cn-autumn-067/photo1.svg",
+        "caption": "弘象科技SkyNexus产品架构（HHBA非官方示意）",
+        "alt": "数据采集、气象预测模型和行业应用的非官方结构示意图",
+        "note": "根据公司官网业务体系制作的HHBA独立示意图。并非弘象办公或员工真实照片，未用于伪装企业现场。"
       },
       {
         "path": "images/employer-profiles/cn-autumn-067/photo2.svg",
         "caption": "SkyNexus数据—模型—行业应用结构示意（HHBA原创）",
         "alt": "HHBA独立制作的弘象科技业务结构示意图，非企业实景",
-        "note": "未找到能充分核对公司身份的第二张公开实景照片；此处采用明确标注的非官方编辑示意图，不能作为真实办公照。"
+        "note": "根据弘象官网公开的产品技术链制作的非官方编辑示意图，非公司真实实景。缺少可核实的第二张照片，不使用无关企业素材。"
       }
     ]
   },
@@ -59,7 +59,7 @@
     "遥感科学与技术",
     "信息管理与信息系统"
   ],
-  "photoNote": "弘象科技第一张为可复核的官网实时截图，属于真实页面而非真实企业实景照片；第二张为独立HHBA原创业务示意。未找到两张可可靠确认的真实企业办公或团队照片，不以其他公司的图片替代。",
+  "photoNote": "当前弘象官方站公开了业务和产品体系，但未获得能够独立核实并成功下载的办公楼或团队实景照片。本批使用两张分别制作的业务示意SVG，页面明确标注“非官方、非实景”，后续须替换为真实且有使用许可的企业图片。",
   "business": [
     {
       "title": "SkyNexus数值天气预报",
