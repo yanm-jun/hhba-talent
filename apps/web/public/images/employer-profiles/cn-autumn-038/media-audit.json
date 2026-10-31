@@ -1,0 +1,38 @@
+{
+  "logo.png": {
+    "verified": true,
+    "source": "https://www.everprox.com/theme/default/images/logo@2x.png",
+    "sourcePage": "https://www.everprox.com/",
+    "retrievedFrom": "https://www.everprox.com/theme/default/images/logo@2x.png",
+    "sourceSha256": "ce6d47cb14c6a99f1139dc86494c4fa17ef29a09ba8e3c25701077ffc57fb8ad",
+    "sha256": "82da7813eef1d48cfa4462090341cf74a5b6872572f097adc55ce7fe7ab5c3e7",
+    "width": 365,
+    "height": 96,
+    "label": "Official EverProX identity asset",
+    "copyright": "Rights remain with respective owners"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "source": "https://en.broadex-tech.com/sites/default/files/Broadex%20Shanghai%201_2.jpg",
+    "sourcePage": "https://en.broadex-tech.com/about/news",
+    "retrievedFrom": "https://en.broadex-tech.com/sites/default/files/Broadex%20Shanghai%201_2.jpg",
+    "sourceSha256": "7ee5a963fc4d4c61219c736a68287c4c1df685b78067eda7bee958d8e240c9a5",
+    "sha256": "30b421f65186fff78bd4b7a3a673bfc2b0d39085a5c08b67dc7090d42e682213",
+    "width": 999,
+    "height": 550,
+    "label": "Original real photo credited to company / original publisher",
+    "copyright": "Rights remain with respective owners"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "source": "https://www.everprotech.com.cn/upload/20240131/65b9d8c309ed4.jpg",
+    "sourcePage": "https://www.everprotech.com.cn/view/473.html",
+    "retrievedFrom": "https://www.everprotech.com.cn/upload/20240131/65b9d8c309ed4.jpg",
+    "sourceSha256": "ea610ef94650cebbca3cb9caa795fd4f2269660a3accc713dcbf737a27f030cd",
+    "sha256": "d9b0b3307c4dac86a35f97e92a5a25e175fd4a672f8b1b969264c30113ebf9db",
+    "width": 1450,
+    "height": 967,
+    "label": "Original real photo credited to company / original publisher",
+    "copyright": "Rights remain with respective owners"
+  }
+}
