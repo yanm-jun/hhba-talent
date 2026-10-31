@@ -35,18 +35,22 @@ try{
   assert.equal(await page.locator('.hhba-uni-program-link').count(),2,'UK must list 2 evidence-backed conversion programs');
   proof.countryFilter=true;
   await cards.getByRole('link',{name:'伯明翰大学'}).click();
-  await page.locator('.hhba-uni-detail-hero').waitFor({state:'visible',timeout:12000});
-  assert((await page.locator('.hhba-uni-detail-hero').innerText()).includes('University of Birmingham'));
-  assert.equal(await page.locator('.hhba-uni-degree-row').count(),2);
+  // Birmingham is a full-length University 04 profile now. Verify that the
+  // actual country-filter result opens its new rich page, not the former short template.
+  await page.locator('[data-bham-detail="verified-longform"]').waitFor({state:'visible',timeout:12000});
+  assert((await page.locator('.hhba-minot-hero').innerText()).includes('University of Birmingham'));
+  assert.equal(await page.locator('#bham-programs .hhba-minot-program-card').count(),2);
+  assert.equal(await page.locator('#bham-photos .hhba-minot-thumb').count(),3);
   proof.universityDetails=true;
-  await page.getByRole('link',{name:/专业详情/}).first().click();
-  await page.locator('.hhba-uni-program-source').waitFor({state:'visible',timeout:12000});
-  const actualSource=page.locator('.hhba-uni-program-head a[href^="https://"]');
+  await page.locator('#bham-programs .hhba-minot-program-card a[href*="/program/"]').first().click();
+  await page.locator('#bham-curriculum .hhba-minot-narrative').first().waitFor({state:'visible',timeout:12000});
+  assert.equal(await page.locator('#bham-curriculum .hhba-minot-narrative').count(),6);
+  const actualSource=page.locator('.hhba-minot-degree-hero .hhba-study-btn[href^="https://"]');
   assert.equal(await actualSource.count(),1);
   assert((await actualSource.getAttribute('href')).includes('birmingham.ac.uk'));
   assert.equal(await actualSource.getAttribute('target'),'_blank');
   assert.equal(await actualSource.getAttribute('rel'),'noopener noreferrer');
-  assert((await page.locator('.hhba-uni-program-source').innerText()).includes('2026-10-31'));
+  assert((await page.locator('#bham-fees').innerText()).includes('£36,000'));
   proof.programDetails=true;
   proof.sourceLinks=true;
   await page.goto(base+'study-abroad',{waitUntil:'domcontentloaded'});
