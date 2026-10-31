@@ -1,13 +1,15 @@
 import type {CompleteGuide,GuideStep} from '../components/talent/UnifiedPolicyGuide';
 import type {TalentPolicyRecord} from './talentPolicyRecords';
 import {JILIN_POLICY_RECORDS} from './jilinPolicyRecords';
+import {JILIN_SUPPLEMENT_POLICY_RECORDS} from './jilinSupplementPolicyRecords';
 
 /** Jilin V5.1: policy-specific B/C six-section guide using shared renderer.
  * These are NOT certified A guides. Every benefit, eligibility and material originates
  * in the named record; only explanation and self-check UX are shared.
  */
 export const JILIN_GUIDE_RECORDS:readonly TalentPolicyRecord[]=[
- ...JILIN_POLICY_RECORDS
+ ...JILIN_POLICY_RECORDS,
+ ...JILIN_SUPPLEMENT_POLICY_RECORDS
 ];
 const dateToday=()=>new Date().toISOString().slice(0,10);
 const limited=(p:TalentPolicyRecord)=>p.temporal!=='policy'||Boolean(p.deadline&&p.deadline<dateToday());
