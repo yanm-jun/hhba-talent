@@ -45,5 +45,5 @@ assert.ok(![...policies,...houses].some(x=>JSON.stringify(x).includes('${')),'Un
 const read=path=>readFileSync(new URL('../src/'+path,import.meta.url),'utf8');
 assert.ok(read('pages/TalentServiceRoutes.tsx').includes("fragments[2]==='inner-mongolia'"));
 assert.ok(read('components/talent/UnifiedPolicyList.tsx').includes("'nm-'"));
-assert.ok(read('pages/TalentCityDirectory.tsx').includes('totals.leagues'));
+assert.ok(read('pages/TalentCityDirectory.tsx').includes('totals.otherPrefectures'));
 console.log('PASS Inner Mongolia V5.1 12 regions, 37 policies (24 province shared), 33 housing reference programs, 37 B/C guides and 308 national entries.');
