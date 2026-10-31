@@ -187,7 +187,7 @@ const raw:Raw[]=[
 ];
 const mapMunicipal=(p:Raw):TalentPolicyRecord=>{
  const limited=p.city==='阜新'||p.city==='辽阳'||p.city==='鞍山'||p.city==='本溪';
- const historic=false; // 鞍山房交会截至2026-11-06尚未过期；不要提前归档
+ const historic=['本溪','丹东'].includes(p.city); // 9月25日遴选预通知与9月17日第72批公示已结束，鞍山11月6日仍在有效期
  const withoutOriginal=['沈阳','锦州','铁岭','鞍山'].includes(p.city);
  const faq=p.city==='辽阳'?'本条仅是官方购房政策信息索引，既非确定的个人现金补贴，也非申报系统。':p.city==='丹东'?'第72批为历史核准公示，申请人仍须通过当前有效批次审核，不能用该批平均数推算自己待遇。':'具体资金、资料及所需期限以政策文件和当期官方审核为准，不得自动享有。';
  return {
@@ -199,8 +199,8 @@ const mapMunicipal=(p:Raw):TalentPolicyRecord=>{
  targetGroup:p.elig,
  payoutTo:p.city==='本溪'||p.city==='辽阳'?'非现金服务':'个人',
  headlineAmount:p.amount,headlineUnit:'市级政策依据 · 以实际资格审核和现行受理为准',
- reviewedAt:'2026-10-31',deadline:p.city==='鞍山'?'2026-11-06':undefined,
- reviewNote:(withoutOriginal?'政策摘要/新闻报道未取得市级原始全套办理细则，B级基础资料。':'可查政府/官方政务公开来源，但当前经办平台或申请是否开放仍需核实；B级。')+' '+faq+' 办理入口待核实：仅对政府已明确公布的真实经办模块提供文字指引，不将报道或门户首页当作在线申请成功。'+(p.city==='葫芦岛'?' 葫芦岛政务服务问答未给出原发文日，本条published仅为2026-10-31索引核查日，不可作为正式政策发布日期。':''),
+ reviewedAt:'2026-10-31',deadline:p.city==='鞍山'?'2026-11-06':p.city==='本溪'?'2026-09-25':p.city==='丹东'?'2026-09-17':undefined,
+ reviewNote:(withoutOriginal?'政策摘要/新闻报道未取得市级原始全套办理细则，B级基础资料。':'可查政府/官方政务公开来源，但当前经办平台或申请是否开放仍需核实；B级。')+' '+faq+' 办理入口待核实：仅对政府已明确公布的真实经办模块提供文字指引，不将报道或门户首页当作在线申请成功。'+(historic?' 本溪遴选材料报送及丹东第72批公示已截止，此记录仅为历史批次；若同类政策现行仍有效须查新的申报批次。':'')+''+(p.city==='葫芦岛'?' 葫芦岛政务服务问答未给出原发文日，本条published仅为2026-10-31索引核查日，不可作为正式政策发布日期。':''),
  keywords:[p.city,'辽宁','2026','人才','大学生','高校毕业生',...p.title.match(/购房|租房|生活|补贴|就业|住房/g)||[]],
  materials:[
  '申请人身份证、毕业证及学历学位验证材料（按具体项目）',
