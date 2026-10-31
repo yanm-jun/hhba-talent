@@ -1,3 +1,4 @@
+import {QINGHAI_8_REGIONS,qinghaiGuideUrl,buildQinghaiGuide} from '../data/qinghaiGuides';
 import {GUIZHOU_9_REGIONS,guizhouGuideUrl,buildGuizhouGuide} from '../data/guizhouGuides';
 import {getTalentCitySnapshot} from '../data/talentCitySnapshot';
 import {SICHUAN_21_REGIONS,sichuanGuideUrl,buildSichuanGuide} from '../data/sichuanGuides';
@@ -209,6 +210,14 @@ function CityHub({city}:{city:string}){
  {homes.map(h=><Link key={h.id} className="ts-sub-tile" to={guizhouGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>{h.kind==='program'?'住房制度':'住房项目'} · {housingStatus(h)} · 非实时空房</span><ArrowRight size={15}/></Link>)}
  </div>:<div className="ts-sub-empty"><p>尚无可核实的正式政府资料，不能因此推断当地没有人才政策。</p></div>}
  </section>}
+ {QINGHAI_8_REGIONS.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="青海省2026人才政策和安居指南">
+  <div className="ts-sub-section-heading"><h2>{match.name} · 2026人才政策与人才安居详细指南</h2></div>
+  <p>青海海南州不是海南省；具体市州及县区政策各有资格条件，已建公寓套数和招标计划均非当前剩余房源。</p>
+  <div className="ts-sub-grid">
+  {policies.map(p=><Link key={p.id} className="ts-sub-tile" to={qinghaiGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>{p.category} · {policyStatus(p)} · 查看政策详解</span><ArrowRight size={15}/></Link>)}
+  {homes.map(h=><Link key={h.id} className="ts-sub-tile" to={qinghaiGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>{h.kind==='program'?'住房制度/建设线索':'住房项目'} · {housingStatus(h)} · 空房待核实</span><ArrowRight size={15}/></Link>)}
+  </div>
+ </section>}
  {SICHUAN_21_REGIONS.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="四川省人才服务V5.1分步办理">
  <div className="ts-sub-section-heading"><h2>{match.name} · 政策与人才安居分步核验</h2></div>
  <p>{policies.length?'本市（州）已核实的政策提供资格分支、材料清单、办理步骤和政府原文。当前事项是否开放及人才公寓剩余房源仍需官方确认。':'已进入四川省21个地级行政区服务目录。本地政府政策和独立住房一手资料尚未核实，暂不编造补贴、申请入口或房源。'}</p>
@@ -397,6 +406,11 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
    province==='jiangxi'?buildJiangxiGuide(decode(fragments[3]||'')):
    buildHunanGuide(decode(fragments[3]||''));
   body=guide?<UnifiedPolicyGuide data={guide}/>:<><Bread current="指南尚未收录"/><section className="ts-sub-header"><h1>该指南暂未核验</h1><Link to="/talent-service/cities">返回城市目录</Link></section></>;
+ }
+ else if(kind==='policy-guide-preview'&&fragments[2]==='qinghai'){
+  const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
+  const guide=t?buildQinghaiGuide(t,decode(fragments[4]||'')):null;
+  body=guide?<UnifiedPolicyGuide data={guide}/>:<section className="ts-sub-header"><h1>该青海事项尚未核实</h1><Link to="/talent-service/cities">返回城市目录</Link></section>;
  }
  else if(kind==='policy-guide-preview'&&fragments[2]==='guizhou'){
  const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
