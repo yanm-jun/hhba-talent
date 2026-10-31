@@ -29,7 +29,7 @@ class Images(HTMLParser):
   if text.strip():self.pageText.append(text.strip())
 def get(url,ref=None):
  req=Request(url,headers={'User-Agent':UA,'Referer':ref or url,'Accept':'image/avif,image/webp,image/png,image/jpeg,text/html,*/*;q=0.8'})
- with urlopen(req,timeout=24,context=CTX) as res:
+ with urlopen(req,timeout=11,context=CTX) as res:
   if res.status!=200:raise RuntimeError('Bad HTTP response: '+str(res.status))
   return res.read(11_000_000)
 def source_candidates(page,domain,textcheck):
@@ -81,7 +81,7 @@ def collect(id,sources,needle,domain,limit=2,ban=None):
    # only source captions/content from named entity official page
    candidates.sort(key=lambda o:(0 if any(w in (o[1] or '').lower() for w in ('office','beijing','shanghai','plant','厂','办公','工厂','厂区','项目','施工','建筑')) else 1,0 if 'og:image' in (o[1] or '') else 1))
    print('HHBA_MEDIA_CANDIDATES',id,page,len(candidates),json.dumps(candidates[:8],ensure_ascii=False))
-   for url,alt,ref in candidates[:45]:
+   for url,alt,ref in candidates[:10]:
     if len(result)>=limit:break
     if url in seen:continue
     seen.add(url)
