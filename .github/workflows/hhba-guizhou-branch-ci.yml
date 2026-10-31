@@ -1,0 +1,50 @@
+name: HHBA Guizhou 9-region V5.1 isolated validation
+on:
+  push:
+    branches:
+      - feature/talent-guizhou
+  pull_request:
+    paths:
+      - 'apps/web/src/data/guizhou*.ts'
+      - 'apps/web/src/data/talentPolicyRecords.ts'
+      - 'apps/web/src/data/talentHousingRecords.ts'
+      - 'apps/web/src/pages/TalentServiceRoutes.tsx'
+      - 'apps/web/scripts/test-guizhou-city-v51.mjs'
+      - '.github/workflows/hhba-guizhou-branch-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Guizhou source and routing contract
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-guizhou-city-v51.mjs
+      - name: V5.1 national city contract
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - name: Nationwide city directory
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-cities.mjs
+      - name: Build isolated preview
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hhba-guizhou-v51-isolated-static
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
