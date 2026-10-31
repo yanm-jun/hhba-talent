@@ -17,6 +17,9 @@ on:
       - 'apps/web/scripts/prepare-pxw-media.py'
       - 'apps/web/scripts/pxw-v2.contract.test.mjs'
       - 'apps/web/scripts/pxw-v2.browser.mjs'
+      - 'apps/web/scripts/minieye-v2.browser.mjs'
+      - 'apps/web/scripts/minieye-v2.contract.test.mjs'
+      - 'apps/web/scripts/prepare-minieye-media.py'
       - 'apps/web/scripts/keyence-v2.browser.mjs'
       - 'apps/web/scripts/keyence-v2.contract.test.mjs'
       - 'apps/web/scripts/prepare-keyence-media.py'
@@ -58,6 +61,8 @@ jobs:
         run: python apps/web/scripts/prepare-pxw-media.py
       - name: Verify KEYENCE #157 official logo and two independent corporate photos
         run: python apps/web/scripts/prepare-keyence-media.py
+      - name: Verify MINIEYE #035 real MINIEYE trademark and two independent show photos
+        run: python apps/web/scripts/prepare-minieye-media.py
       - name: Inspect actual media provenance and access
         run: |
           python - <<'PY'
@@ -92,6 +97,7 @@ jobs:
           node scripts/weipu-v2.contract.test.mjs
           node scripts/bodor-v2.contract.test.mjs
           node scripts/pxw-v2.contract.test.mjs
+          node scripts/minieye-v2.contract.test.mjs
           node scripts/keyence-v2.contract.test.mjs
           node scripts/employer-job-level-search.contract.test.mjs
           node scripts/major-eligibility.contract.test.mjs
@@ -124,6 +130,7 @@ jobs:
           curl -fsS "$HHBA_TEST_BASE"
           node scripts/mainline-v2-browser.mjs
           node scripts/pxw-v2.browser.mjs
+          node scripts/minieye-v2.browser.mjs
           node scripts/keyence-v2.browser.mjs
       - uses: actions/upload-artifact@v4
         if: always()
@@ -136,6 +143,7 @@ jobs:
             apps/web/public/images/employer-profiles/cn-autumn-032/media-audit.json
             apps/web/public/images/employer-profiles/cn-autumn-033/media-audit.json
             apps/web/public/images/employer-profiles/cn-autumn-034/media-audit.json
+            apps/web/public/images/employer-profiles/cn-autumn-035/media-audit.json
             apps/web/public/images/employer-profiles/cn-autumn-157/media-audit.json
           retention-days: 14
           if-no-files-found: ignore
