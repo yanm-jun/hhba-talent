@@ -1,0 +1,38 @@
+name: HHBA talent housing gap audit
+on:
+  push:
+    branches: [fix/talent-housing-coverage-20261031]
+  pull_request:
+    paths:
+      - 'apps/web/src/data/talentHousingCoverageFix20261031.ts'
+      - 'apps/web/src/data/talentHousingRecords.ts'
+      - 'apps/web/scripts/test-talent-housing-coverage-20261031.mjs'
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci
+      - name: Check nationwide housing coverage and government evidence
+        working-directory: apps/web
+        run: |
+          node scripts/test-talent-housing-coverage-20261031.mjs
+          node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+          node scripts/test-guangdong-city-v51.mjs
+      - name: Build full website with Guangdong and Jiangsu intact
+        working-directory: apps/web
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: housing-gap-fix-independent-static-preview
+          path: apps/web/dist/
+          if-no-files-found: error
