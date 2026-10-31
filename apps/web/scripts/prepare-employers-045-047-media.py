@@ -26,7 +26,8 @@ def image_links(page):
  doc=BeautifulSoup(data,'html.parser')
  images={}
  def add(src,alt='',context=''):
-  if not src or src.startswith(('data:','blob:')):return
+  alt=str(alt);context=str(context)
+  if not isinstance(src,str) or not src or src.startswith(('data:','blob:')):return
   u=urljoin(page,html.unescape(src.strip()))
   if not u.startswith('https://'):return
   if re.search(r'\.(pdf|woff2?|js|mp4)(\?|$)',u,re.I):return
