@@ -19,7 +19,7 @@ for (const [i,p] of profiles.entries()){
  assert.equal(p.business.length,6);
  assert.equal(new Set(p.jobs.map(j=>j.id)).size,expected[i][1]);
  assert(p.jobs.every(j=>j.currentOpenVerified===false));
- assert(p.jobs.every(j=>j.title&&j.city&&j.summary.length>40&&j.requirements.length>65));
+ assert(p.jobs.every(j=>j.title&&j.city&&j.summary.length>=28&&j.requirements.length>=55),'Meaningful evidenced role text without padding unpublished job requirements');
  assert(p.jobs.every(j=>j.evidenceUrl.startsWith('https://')&&j.url===p.recruitment.url));
  assert(p.jobs.every(j=>j.majorNames.length>0&&j.educationLabel));
  const paths=[p.media.logo,...p.media.photos.map(x=>x.path)];
@@ -40,6 +40,9 @@ for (const [i,p] of profiles.entries()){
 }
 assert(profiles[0].jobs.length===1,'Yuanli has exactly one evidenced 2027 reserve specialist position');
 assert(profiles[1].jobs.length===4,'Hongpu source only describes 4 categories, no fabricated detailed JDs');
+const huiMedia=JSON.parse(read('public/images/employer-profiles/cn-autumn-050/media-audit.json'));
+assert(huiMedia['photo1.jpg'].width/huiMedia['photo1.jpg'].height<3.6,'No Tianfu chamber website header pretending to be Huirong company photo');
+assert(!huiMedia['photo1.jpg'].source.includes('20230726/c0624d61'),'Visually rejected chamber logo must not be reused');
 assert(profiles[2].jobs.length===6&&profiles[2].jobs.every(j=>j.evidenceUrl.includes('job.xidian.edu.cn')),'6 university verified radar roles');
 assert(profiles[2].jobs.filter(j=>j.educationLabel.includes('本科')).length===2,'Two undergraduate positions must be accurate');
 console.log('HHBA_048_049_050_11_ROLES_18_BUSINESS_SECTIONS_9_MEDIA_PASS');
