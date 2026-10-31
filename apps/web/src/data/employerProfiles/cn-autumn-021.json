@@ -154,7 +154,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "第三方社会招聘记录 · 具体学历以原职位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "packaging",
@@ -175,7 +176,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "第三方社会招聘记录 · 具体学历以原职位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "设计 / 创意"
     },
     {
       "id": "product-planning",
@@ -196,7 +198,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "第三方社会招聘记录 · 具体学历以原职位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "管理 / 运营"
     },
     {
       "id": "product-management",
@@ -218,7 +221,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "第三方社会招聘记录 · 具体学历以原职位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "管理 / 运营"
     },
     {
       "id": "process-engineer",
@@ -238,7 +242,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "第三方社会招聘记录 · 具体学历以原职位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "electrical-engineer",
@@ -258,7 +263,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "第三方社会招聘记录 · 具体学历以原职位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "lab-manager",
@@ -281,7 +287,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "第三方社会招聘记录 · 具体学历以原职位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "quality",
@@ -301,7 +308,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "第三方社会招聘记录 · 具体学历以原职位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "procurement",
@@ -321,7 +329,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "第三方社会招聘记录 · 具体学历以原职位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "供应链 / 物流"
     },
     {
       "id": "warehouse",
@@ -341,7 +350,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "第三方社会招聘记录 · 具体学历以原职位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "recruitment",
@@ -361,7 +371,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "第三方社会招聘记录 · 具体学历以原职位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "finance",
@@ -381,7 +392,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "第三方社会招聘记录 · 具体学历以原职位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     }
   ],
   "mediaSources": {

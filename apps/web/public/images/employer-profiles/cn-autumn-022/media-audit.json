@@ -1,0 +1,26 @@
+{
+  "company": "万兴科技",
+  "reviewedOn": "2026-10-31",
+  "sourceVerification": "pending",
+  "scope": "Asset metadata only, independent license and original photo provenance not verified",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-022/logo.png",
+      "sourceNote": "1张Wondershare万兴科技品牌Logo来自第三方公开品牌图；两张实景图片来自万兴科技官方网页，均分别保存为本站本地文件，不设置图片外链。商标及图像版权归原权利人所有，站内品牌展示不表示与万兴科技存在合作或授权。商业再使用许可仍应核验。",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-022/photo1.webp",
+      "sourceNote": "万兴科技官方2024年社招专题的企业建筑实景图；照片用于公司识别，具体楼宇应以官网介绍为准。",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-022/photo2.webp",
+      "sourceNote": "万兴科技官方加入我们页面收录的办公环境摄影，展示Wondershare万兴科技标志和室内接待区域；拍摄日期未明。",
+      "verifiedOfficial": false
+    }
+  ]
+}

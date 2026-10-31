@@ -141,7 +141,8 @@
         "电气工程及其自动化",
         "工业工程"
       ],
-      "majorUnrestricted": false
+      "majorUnrestricted": false,
+      "category": "软件 / 数字技术"
     },
     {
       "recruitmentType": "CAMPUS",
@@ -164,7 +165,8 @@
       "editorialRelatedMajors": [
         "工程力学"
       ],
-      "majorUnrestricted": false
+      "majorUnrestricted": false,
+      "category": "设计 / 创意"
     },
     {
       "recruitmentType": "CAMPUS",
@@ -186,7 +188,8 @@
         "自动化",
         "机械设计制造及其自动化"
       ],
-      "majorUnrestricted": false
+      "majorUnrestricted": false,
+      "category": "工程 / 制造"
     },
     {
       "recruitmentType": "CAMPUS",
@@ -209,7 +212,8 @@
         "机械设计制造及其自动化",
         "电子信息工程"
       ],
-      "majorUnrestricted": false
+      "majorUnrestricted": false,
+      "category": "工程 / 制造"
     },
     {
       "recruitmentType": "CAMPUS",
@@ -231,7 +235,8 @@
         "机械设计制造及其自动化",
         "自动化"
       ],
-      "majorUnrestricted": false
+      "majorUnrestricted": false,
+      "category": "工程 / 制造"
     },
     {
       "recruitmentType": "CAMPUS",
@@ -254,7 +259,8 @@
         "自动化",
         "能源与动力工程"
       ],
-      "majorUnrestricted": false
+      "majorUnrestricted": false,
+      "category": "工程 / 制造"
     }
   ],
   "mediaSources": {

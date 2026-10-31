@@ -162,7 +162,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届本科／硕士／博士（单岗条件请核对）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "人工智能 / 算法"
     },
     {
       "id": "ai-app-development",
@@ -185,7 +186,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届本科／硕士／博士（单岗条件请核对）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "人工智能 / 算法"
     },
     {
       "id": "full-stack-development",
@@ -207,7 +209,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届本科／硕士／博士（单岗条件请核对）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "软件 / 数字技术"
     },
     {
       "id": "ai-creative-design",
@@ -231,7 +234,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届本科／硕士／博士（单岗条件请核对）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "人工智能 / 算法"
     },
     {
       "id": "ai-social-media",
@@ -255,7 +259,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届本科／硕士／博士（单岗条件请核对）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "人工智能 / 算法"
     }
   ],
   "mediaSources": {

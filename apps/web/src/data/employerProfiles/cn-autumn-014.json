@@ -144,7 +144,8 @@
       "recruitmentSubject": "中能建国际建设集团有限公司",
       "majorUnrestricted": false,
       "educationLabel": "2027届硕士毕业生",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "管理 / 运营"
     },
     {
       "id": "commercial-contract-2027",
@@ -169,7 +170,8 @@
       "recruitmentSubject": "中能建国际建设集团有限公司",
       "majorUnrestricted": false,
       "educationLabel": "2027届硕士毕业生",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "市场 / 商务"
     },
     {
       "id": "legal-affairs-2027",
@@ -193,7 +195,8 @@
       "recruitmentSubject": "中能建国际建设集团有限公司",
       "majorUnrestricted": false,
       "educationLabel": "2027届硕士毕业生",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "法务 / 合规"
     },
     {
       "id": "qhsse-safety-2027",
@@ -216,7 +219,8 @@
       "recruitmentSubject": "中能建国际建设集团有限公司",
       "majorUnrestricted": false,
       "educationLabel": "2027届硕士毕业生",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "管理 / 运营"
     },
     {
       "id": "overseas-logistics-2027",
@@ -240,7 +244,8 @@
       "recruitmentSubject": "中能建国际建设集团有限公司",
       "majorUnrestricted": false,
       "educationLabel": "2027届硕士毕业生",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "供应链 / 物流"
     }
   ],
   "mediaSources": {

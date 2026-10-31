@@ -150,7 +150,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "软件 / 数字技术"
     },
     {
       "id": "infomanagement-math",
@@ -173,7 +174,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "管理 / 运营"
     },
     {
       "id": "electronics-automation",
@@ -196,7 +198,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "energy-power-electrical",
@@ -219,7 +222,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "construction-municipal",
@@ -242,7 +246,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "petroleum-safety",
@@ -264,7 +269,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "mechanical-shipbuilding",
@@ -288,7 +294,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "materials-physics",
@@ -312,7 +319,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "corporate-management",
@@ -334,7 +342,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "管理 / 运营"
     },
     {
       "id": "law-humanities",
@@ -357,7 +366,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "法务 / 合规"
     },
     {
       "id": "tourism-arts",
@@ -381,7 +391,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "marketing-trade",
@@ -403,7 +414,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "市场 / 商务"
     },
     {
       "id": "brand-media-design",
@@ -426,7 +438,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "设计 / 创意"
     },
     {
       "id": "accounting-audit",
@@ -447,7 +460,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "财务 / 金融"
     },
     {
       "id": "finance-economics",
@@ -470,7 +484,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "本科 / 硕士 / 博士 · 具体条件以岗位为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "财务 / 金融"
     }
   ],
   "mediaSources": {

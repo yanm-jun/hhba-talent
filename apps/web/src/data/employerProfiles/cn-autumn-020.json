@@ -161,7 +161,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "2027届全球校园招聘 · 本科/硕士/博士（依岗位而异）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "electrical-automation",
@@ -186,7 +187,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "2027届全球校园招聘 · 本科/硕士/博士（依岗位而异）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "digital-and-ai",
@@ -209,7 +211,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "2027届全球校园招聘 · 本科/硕士/博士（依岗位而异）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "软件 / 数字技术"
     },
     {
       "id": "chemical-materials",
@@ -233,7 +236,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "2027届全球校园招聘 · 本科/硕士/博士（依岗位而异）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "corporate-services",
@@ -263,7 +267,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "2027届全球校园招聘 · 本科/硕士/博士（依岗位而异）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "法务 / 合规"
     },
     {
       "id": "foreign-languages",
@@ -287,7 +292,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "2027届全球校园招聘 · 本科/硕士/博士（依岗位而异）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     }
   ],
   "mediaSources": {

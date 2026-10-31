@@ -141,7 +141,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "以企业官方岗位要求为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "electrical-engineer",
@@ -164,7 +165,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "以企业官方岗位要求为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "hydraulic-engineer",
@@ -187,7 +189,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "以企业官方岗位要求为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "intelligent-control-rd",
@@ -211,7 +214,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "以企业官方岗位要求为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "软件 / 数字技术"
     },
     {
       "id": "software-engineer",
@@ -234,7 +238,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "以企业官方岗位要求为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "软件 / 数字技术"
     },
     {
       "id": "inverter-rd",
@@ -257,7 +262,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "以企业官方岗位要求为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "软件 / 数字技术"
     },
     {
       "id": "test-engineer",
@@ -281,7 +287,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "以企业官方岗位要求为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "测试 / 质量"
     },
     {
       "id": "embedded-hardware-rd",
@@ -305,7 +312,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "以企业官方岗位要求为准",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     }
   ],
   "mediaSources": {

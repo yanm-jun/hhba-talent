@@ -1,0 +1,26 @@
+{
+  "company": "太极股份",
+  "reviewedOn": "2026-10-31",
+  "sourceVerification": "pending",
+  "scope": "Asset metadata only, independent license and original photo provenance not verified",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-017/logo.png",
+      "sourceNote": "真实太极股份Logo依据国聘企业档案保存；建筑照片及数字解决方案中心内部照片来自不同年份的企业相关媒体材料，均独立保存于本站，图片不含外链；2020年接待区图片并非2026年办公环境。企业Logo仅用于识别企业，不表示企业与HHBA存在合作。",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-017/photo1.webp",
+      "sourceNote": "2024年媒体报道所配太极总部建筑图 · 原始发布见素材来源清单",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-017/photo2.webp",
+      "sourceNote": "2020年太极校招宣传图所示数字解决方案中心接待区 · 非近期实拍",
+      "verifiedOfficial": false
+    }
+  ]
+}

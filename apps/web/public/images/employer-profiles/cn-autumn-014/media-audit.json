@@ -1,0 +1,26 @@
+{
+  "company": "中国能建国际集团",
+  "reviewedOn": "2026-10-31",
+  "sourceVerification": "pending",
+  "scope": "Asset metadata only, independent license and original photo provenance not verified",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-014/logo.png",
+      "sourceNote": "集团 Logo 已按用户提供的蓝红色标识替换（2026-10-30）；两张照片来自中国能建国际集团官方网站（ceecgroup.com）沙特哈登光伏项目资料，分别展示组件安装和升压站送电节点。均为本站独立静态副本，点击图片不跳第三方网站。2027届岗位类别依据高校公开招聘简章，不表示当前实时开放。",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-014/photo1.webp",
+      "sourceNote": "中国能建国际集团官方网站（ceecgroup.com）沙特哈登光伏项目施工人员合影 · 实际项目图片",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-014/photo2.webp",
+      "sourceNote": "中国能建国际集团官方网站（ceecgroup.com）沙特哈登光伏项目升压站送电纪念照片",
+      "verifiedOfficial": false
+    }
+  ]
+}
