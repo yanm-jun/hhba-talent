@@ -412,8 +412,8 @@ export const GANSU_POLICY_RECORDS:TalentPolicyRecord[]=[
     "application": "向武威市住房公积金管理中心通过正式网上办事大厅、微信公众号或服务窗口核验灵活就业自愿缴存、租房提取及购房贷款的现行办理事项和材料清单；申请贷款后仍须依约还款。",
     "department": "武威市住房公积金管理中心",
     "published": "2026-10-22",
-    "sourceUrl": "https://www.mohurd.gov.cn/xinwen/dfxx/art/2026/art_5ab271438e5149ed8db29fe7a57c3965.html",
-    "sourceName": "住房和城乡建设部转《中国建设报》2026-10-22武威住房公积金制度报道（部门政策执行内容）",
+    "sourceUrl": "https://www.gswuwei.gov.cn/art/2026/9/20/art_177_1680006.html",
+    "sourceName": "武威市人民政府2026年9月20日第二批高层次和急需紧缺人才引进公告（政府原网址；目前网页直连可用性待复核）",
     "temporal": "policy",
     "scope": "全市",
     "keywords": [
@@ -427,7 +427,7 @@ export const GANSU_POLICY_RECORDS:TalentPolicyRecord[]=[
       "贷款"
     ],
     "targetGroup": "符合武威住房公积金自愿缴存及相关实际住房消费资格的灵活就业劳动者",
-    "reviewNote": "这是住建部政府官网转载的《中国建设报》报道，涉及武威住房公积金管理中心政策执行，但不是某个免费公寓的分配文件；具体缴存基数、贷款上限、租房提取范围和现实办事入口需向武威中心核实。办理入口待核实。",
+    "reviewNote": "2026年9月20日武威市政府原文网址由多个转载页面明确提供；自动抓取政府官网目前返回服务错误，条款由高校转载对照确认，待人工再次核验。2026年10月20日招聘已截止；岗位与人才公寓现实住房状态不得按旧公告推断。办理入口待核实。",
     "reviewedAt": "2026-11-01",
     "payoutTo": "非现金服务",
     "headlineAmount": "好房子贷款上浮最高20%",
