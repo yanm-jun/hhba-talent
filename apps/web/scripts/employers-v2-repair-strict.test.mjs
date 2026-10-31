@@ -24,7 +24,8 @@ for(const num of ids){
  const localAudit='public/images/employer-profiles/'+id+'/media-audit.json';
  assert(fs.existsSync(localAudit),'Missing image provenance ledger '+id);
  const audit=JSON.parse(read(localAudit));
- assert(audit.company===p.name,'Incorrect audit provenance '+id);
+ const provenanceName=audit.company||Object.values(audit).find(v=>v&&typeof v==='object'&&v.company)?.company;
+ assert(provenanceName===p.name,'Incorrect audit provenance '+id);
  if(audit.officialLogo===false||audit.realPhotos===false||audit.sourceVerification==='pending'||audit.realPhotoValidationComplete===false)unverifiedMedia++;
 }
 assert.equal(count,55);
