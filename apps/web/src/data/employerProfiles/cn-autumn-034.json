@@ -1,0 +1,398 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-034",
+  "name": "鹏芯微",
+  "displayName": "鹏芯微",
+  "englishName": "PENGXINWEI · PXW",
+  "aliases": [
+    "深圳市鹏芯微集成电路制造有限公司",
+    "鹏芯微集成电路",
+    "PENGXINWEI",
+    "PXW",
+    "Pengxinwei Semiconductor",
+    "鹏芯微2027校园招聘"
+  ],
+  "industry": "集成电路 · 晶圆代工 · 半导体制造 · 智能工厂",
+  "subtitle": "深圳市鹏芯微集成电路制造有限公司 · 2021年6月成立 · 深圳市龙岗区",
+  "overview": "鹏芯微于2021年6月在深圳注册成立，具有深圳国资背景，服务粤港澳大湾区汽车电子、新能源、图像传感器、智慧家居及可穿戴设备等半导体产能需求。公司官网介绍的技术平台覆盖逻辑电路、电源和模拟、混合信号与射频、图像传感等方向，以晶圆代工及产品开发支持为核心。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.pxwsemi.com/",
+    "https://www.pxwsemi.com/%E5%85%AC%E5%8F%B8%E7%AE%80%E4%BB%8B",
+    "https://www.pxwsemi.com/%E8%B4%A8%E9%87%8F%E5%8F%AF%E9%9D%A0%E6%80%A7",
+    "https://career.pxwsemi.com/campus/jobs",
+    "https://jdjyw.jlu.edu.cn/portal/recruit/details?id=638f4d148c0843e88d6566c529504ac6",
+    "https://career.hebut.edu.cn/home/correcruit/content/id/79153.html",
+    "https://career.nankai.edu.cn/correcruit/content/id/117925.html",
+    "https://www.sz.gov.cn/cn/xxgk/zfxxgj/bmdt/content/mpost_10525622.html",
+    "https://www.eet-china.com/mp/a466733.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-034/logo.webp",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-034/photo1.jpg",
+        "caption": "鹏芯微 · 企业园区入口（媒体实拍）",
+        "alt": "鹏芯微企业园区入口标志及办公建筑外景",
+        "note": "图片来自电子工程专辑对深圳半导体工厂的专题报道。该照片展示公司入口，并非洁净室内部。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-034/photo2.jpg",
+        "caption": "鹏芯微 · 2023年项目建设现场",
+        "alt": "深圳市政府2023年调研鹏芯微项目建设现场的纪实照片",
+        "note": "图片来自深圳市政府门户网站2023年企业项目调研报道，是历史建设阶段实景，不代表当前厂区建设状态。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://career.pxwsemi.com/campus/jobs",
+    "label": "官方校园招聘入口",
+    "status": "official_portal",
+    "subject": "深圳市鹏芯微集成电路制造有限公司",
+    "note": "2027届校招公告于2026年8—9月由多所高校公开发布，共有11个明确招聘方向；本页标注的是官网公告岗位方向，不等于逐岗实时空缺确认。具体要求及开放状态以官网职位详情为准。"
+  },
+  "majorIntro": "根据公开2027届校招的11个方向，逐岗位关联专业和业务类别。选择标签只显示该方向职位；没有官方单岗学历专业明细的，不擅自生成任职门槛。",
+  "preferredMajors": [
+    "微电子科学与工程",
+    "集成电路科学与工程",
+    "集成电路设计与集成系统",
+    "材料科学与工程",
+    "化学",
+    "应用化学",
+    "应用物理学",
+    "物理学",
+    "机械工程",
+    "机械电子工程",
+    "电气工程及其自动化",
+    "自动化",
+    "计算机科学与技术",
+    "软件工程",
+    "工业工程",
+    "工程管理"
+  ],
+  "photoNote": "公司Logo使用官方校园招聘平台发布的PXW品牌图。两张不同的企业场景照片来自电子工程专辑和深圳市政府公开报道，并由静态构建脚本校验、保存为本地副本。图片无点击外跳，照片及商标权属各原权利人；HHBA非鹏芯微官方招聘代理。",
+  "business": [
+    {
+      "title": "晶圆代工与客户技术支持",
+      "description": "面向汽车电子、新能源与智能终端等应用，提供晶圆制造和客户产品开发配套支持。",
+      "tags": "晶圆代工 · 客户服务",
+      "details": [
+        "面向晶圆客户提供代工与技术衔接",
+        "制造过程协同与交付质量",
+        "产品开发、生产安排与客户服务"
+      ]
+    },
+    {
+      "title": "逻辑电路工艺平台",
+      "description": "围绕数字及逻辑电路工艺能力，服务多元电子产品对芯片制程的需求。",
+      "tags": "逻辑芯片 · 工艺",
+      "details": [
+        "逻辑电路技术平台",
+        "制造工艺验证及改进",
+        "与研发及生产环节协同"
+      ]
+    },
+    {
+      "title": "电源与模拟电路制造",
+      "description": "建设电源管理与模拟电路相关技术能力，支撑电源、能源和电子系统应用。",
+      "tags": "电源芯片 · 模拟",
+      "details": [
+        "电源与模拟制程方向",
+        "晶圆加工及产品制造配合",
+        "制造品质和交付保障"
+      ]
+    },
+    {
+      "title": "混合信号与射频制造",
+      "description": "拓展混合信号与射频相关制程平台，满足终端连接及信号处理领域需求。",
+      "tags": "射频 · 混合信号",
+      "details": [
+        "混合信号工艺技术方向",
+        "射频相关晶圆代工能力",
+        "量产制造与客户需求支持"
+      ]
+    },
+    {
+      "title": "图像传感器工艺平台",
+      "description": "支持图像传感器应用相关晶圆制造，服务智能家居、车载和消费终端市场。",
+      "tags": "CIS · 影像",
+      "details": [
+        "图像传感器技术平台",
+        "产品应用与晶圆制造协同",
+        "检测、验证及制造品质"
+      ]
+    },
+    {
+      "title": "智能制造与可靠性管理",
+      "description": "通过自动化物料搬运、生产系统和质量流程建设，促进晶圆制造的运营稳定与可追溯。",
+      "tags": "AMHS · 智造 · 质量",
+      "details": [
+        "AMHS自动物料搬运",
+        "制造信息系统与现场管理",
+        "从供应链到客户交付的质量管理"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "process-rd",
+      "title": "工艺研发工程师（2027届）",
+      "city": "广东省深圳市",
+      "category": "工艺研发",
+      "url": "https://career.pxwsemi.com/campus/jobs",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/portal/recruit/details?id=638f4d148c0843e88d6566c529504ac6",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳市鹏芯微集成电路制造有限公司",
+      "summary": "围绕晶圆制造工艺的研发与优化方向，参与实验条件研究、流程测试以及工艺数据整理和分析；在研发、制造与质量团队协作中学习制程验证方法，形成问题记录与改进建议。",
+      "requirements": "该职位方向见于鹏芯微2027届官方校园招聘公告及高校转载。公告明确招聘国内硕士（2027年1月1日至7月31日毕业）、国内博士（2026年9月1日至2027年7月31日毕业）及符合时间条件的海外硕博；这里的专业关联是按工作内容与校招公布专业方向辅助整理，并非独立JD核定的录用门槛。具体职责、研究方向、语言与经历条件，以及是否仍可投递，应以官方招聘系统单岗位说明为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "集成电路科学与工程",
+        "材料科学与工程",
+        "应用物理学",
+        "化学工程与工艺"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 / 博士（2027届公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "process-integration-rd",
+      "title": "工艺整合研发工程师（2027届）",
+      "city": "广东省深圳市",
+      "category": "工艺研发",
+      "url": "https://career.pxwsemi.com/campus/jobs",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/portal/recruit/details?id=638f4d148c0843e88d6566c529504ac6",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳市鹏芯微集成电路制造有限公司",
+      "summary": "研究晶圆工艺各制造环节之间的匹配与整合，协助开展流程验证、不同工艺模块协同以及测试数据复盘，针对关键参数和质量指标提出优化思路。",
+      "requirements": "该职位方向见于鹏芯微2027届官方校园招聘公告及高校转载。公告明确招聘国内硕士（2027年1月1日至7月31日毕业）、国内博士（2026年9月1日至2027年7月31日毕业）及符合时间条件的海外硕博；这里的专业关联是按工作内容与校招公布专业方向辅助整理，并非独立JD核定的录用门槛。具体职责、研究方向、语言与经历条件，以及是否仍可投递，应以官方招聘系统单岗位说明为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "集成电路科学与工程",
+        "材料科学与工程",
+        "物理学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 / 博士（2027届公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "analysis-technology",
+      "title": "分析技术工程师（2027届）",
+      "city": "广东省深圳市",
+      "category": "材料 / 分析",
+      "url": "https://career.pxwsemi.com/campus/jobs",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/portal/recruit/details?id=638f4d148c0843e88d6566c529504ac6",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳市鹏芯微集成电路制造有限公司",
+      "summary": "面向半导体材料与制程问题开展分析技术支持，协助样品测试、数据整理、原因追踪及分析报告撰写，通过与工艺和质量团队配合支持问题定位。",
+      "requirements": "该职位方向见于鹏芯微2027届官方校园招聘公告及高校转载。公告明确招聘国内硕士（2027年1月1日至7月31日毕业）、国内博士（2026年9月1日至2027年7月31日毕业）及符合时间条件的海外硕博；这里的专业关联是按工作内容与校招公布专业方向辅助整理，并非独立JD核定的录用门槛。具体职责、研究方向、语言与经历条件，以及是否仍可投递，应以官方招聘系统单岗位说明为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "材料科学与工程",
+        "化学",
+        "应用化学",
+        "物理学",
+        "微电子科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 / 博士（2027届公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hardware-system-integration",
+      "title": "硬件系统整合工程师（2027届）",
+      "city": "广东省深圳市",
+      "category": "设备 / 自动化",
+      "url": "https://career.pxwsemi.com/campus/jobs",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/portal/recruit/details?id=638f4d148c0843e88d6566c529504ac6",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳市鹏芯微集成电路制造有限公司",
+      "summary": "参与晶圆制造相关硬件系统及设备接口的整合与联调，了解设备运行参数、故障记录和系统兼容性验证流程，与自动化、工艺和设备团队协作开展技术支持。",
+      "requirements": "该职位方向见于鹏芯微2027届官方校园招聘公告及高校转载。公告明确招聘国内硕士（2027年1月1日至7月31日毕业）、国内博士（2026年9月1日至2027年7月31日毕业）及符合时间条件的海外硕博；这里的专业关联是按工作内容与校招公布专业方向辅助整理，并非独立JD核定的录用门槛。具体职责、研究方向、语言与经历条件，以及是否仍可投递，应以官方招聘系统单岗位说明为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "电气工程及其自动化",
+        "自动化",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 / 博士（2027届公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "semiconductor-process",
+      "title": "半导体工艺工程师（2027届）",
+      "city": "广东省深圳市",
+      "category": "制程 / 良率",
+      "url": "https://career.pxwsemi.com/campus/jobs",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/portal/recruit/details?id=638f4d148c0843e88d6566c529504ac6",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳市鹏芯微集成电路制造有限公司",
+      "summary": "面向半导体晶圆量产工艺开展工艺流程学习、过程数据分析、制程异常协助处理与质量指标跟踪，逐步了解工艺稳定性及制造运营的协同机制。",
+      "requirements": "该职位方向见于鹏芯微2027届官方校园招聘公告及高校转载。公告明确招聘国内硕士（2027年1月1日至7月31日毕业）、国内博士（2026年9月1日至2027年7月31日毕业）及符合时间条件的海外硕博；这里的专业关联是按工作内容与校招公布专业方向辅助整理，并非独立JD核定的录用门槛。具体职责、研究方向、语言与经历条件，以及是否仍可投递，应以官方招聘系统单岗位说明为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "集成电路设计与集成系统",
+        "物理学",
+        "化学工程与工艺",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 / 博士（2027届公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "process-integration",
+      "title": "工艺整合工程师（2027届）",
+      "city": "广东省深圳市",
+      "category": "制程 / 良率",
+      "url": "https://career.pxwsemi.com/campus/jobs",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/portal/recruit/details?id=638f4d148c0843e88d6566c529504ac6",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳市鹏芯微集成电路制造有限公司",
+      "summary": "关注晶圆生产中跨工序整合与流程稳定性，参与工艺参数协调、异常定位、生产数据复盘和良率改进工作，推动研发、生产及分析环节的信息衔接。",
+      "requirements": "该职位方向见于鹏芯微2027届官方校园招聘公告及高校转载。公告明确招聘国内硕士（2027年1月1日至7月31日毕业）、国内博士（2026年9月1日至2027年7月31日毕业）及符合时间条件的海外硕博；这里的专业关联是按工作内容与校招公布专业方向辅助整理，并非独立JD核定的录用门槛。具体职责、研究方向、语言与经历条件，以及是否仍可投递，应以官方招聘系统单岗位说明为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "集成电路科学与工程",
+        "材料科学与工程",
+        "物理学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 / 博士（2027届公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "yield-engineer",
+      "title": "良率工程师（2027届）",
+      "city": "广东省深圳市",
+      "category": "制程 / 良率",
+      "url": "https://career.pxwsemi.com/campus/jobs",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/portal/recruit/details?id=638f4d148c0843e88d6566c529504ac6",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳市鹏芯微集成电路制造有限公司",
+      "summary": "围绕晶圆制造良率指标开展数据整理与趋势分析，配合工艺、测试及生产团队识别异常批次并跟踪改进措施，学习制造数据及质量问题闭环管理。",
+      "requirements": "该职位方向见于鹏芯微2027届官方校园招聘公告及高校转载。公告明确招聘国内硕士（2027年1月1日至7月31日毕业）、国内博士（2026年9月1日至2027年7月31日毕业）及符合时间条件的海外硕博；这里的专业关联是按工作内容与校招公布专业方向辅助整理，并非独立JD核定的录用门槛。具体职责、研究方向、语言与经历条件，以及是否仍可投递，应以官方招聘系统单岗位说明为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "统计学",
+        "数学与应用数学",
+        "材料科学与工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 / 博士（2027届公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "production-management",
+      "title": "生产管理工程师（2027届）",
+      "city": "广东省深圳市",
+      "category": "生产 / 管理",
+      "url": "https://career.pxwsemi.com/campus/jobs",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/portal/recruit/details?id=638f4d148c0843e88d6566c529504ac6",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳市鹏芯微集成电路制造有限公司",
+      "summary": "参与晶圆制造生产排程、制造流程协同和现场资源协调的学习，跟踪计划与产线执行情况，整理运营指标并与工艺、设备和物流团队进行跨职能沟通。",
+      "requirements": "该职位方向见于鹏芯微2027届官方校园招聘公告及高校转载。公告明确招聘国内硕士（2027年1月1日至7月31日毕业）、国内博士（2026年9月1日至2027年7月31日毕业）及符合时间条件的海外硕博；这里的专业关联是按工作内容与校招公布专业方向辅助整理，并非独立JD核定的录用门槛。具体职责、研究方向、语言与经历条件，以及是否仍可投递，应以官方招聘系统单岗位说明为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工业工程",
+        "管理科学与工程",
+        "工程管理",
+        "机械工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 / 博士（2027届公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "production-software",
+      "title": "生产系统开发工程师（2027届）",
+      "city": "广东省深圳市",
+      "category": "软件 / 系统",
+      "url": "https://career.pxwsemi.com/campus/jobs",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/portal/recruit/details?id=638f4d148c0843e88d6566c529504ac6",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳市鹏芯微集成电路制造有限公司",
+      "summary": "面向半导体制造信息系统参与业务需求梳理、系统模块开发、测试验证与运行维护支持，理解生产流程的数据流转、工厂信息化以及软件与业务协同关系。",
+      "requirements": "该职位方向见于鹏芯微2027届官方校园招聘公告及高校转载。公告明确招聘国内硕士（2027年1月1日至7月31日毕业）、国内博士（2026年9月1日至2027年7月31日毕业）及符合时间条件的海外硕博；这里的专业关联是按工作内容与校招公布专业方向辅助整理，并非独立JD核定的录用门槛。具体职责、研究方向、语言与经历条件，以及是否仍可投递，应以官方招聘系统单岗位说明为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息管理与信息系统",
+        "数据科学与大数据技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 / 博士（2027届公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "amhs-system",
+      "title": "AMHS系统工程师（2027届）",
+      "city": "广东省深圳市",
+      "category": "软件 / 系统",
+      "url": "https://career.pxwsemi.com/campus/jobs",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/portal/recruit/details?id=638f4d148c0843e88d6566c529504ac6",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳市鹏芯微集成电路制造有限公司",
+      "summary": "围绕自动物料搬运系统（AMHS）的系统侧联调与运行支持，参与设备与生产系统之间的信息交互、运行状态分析和异常问题跟踪，了解晶圆厂自动化物流运作。",
+      "requirements": "该职位方向见于鹏芯微2027届官方校园招聘公告及高校转载。公告明确招聘国内硕士（2027年1月1日至7月31日毕业）、国内博士（2026年9月1日至2027年7月31日毕业）及符合时间条件的海外硕博；这里的专业关联是按工作内容与校招公布专业方向辅助整理，并非独立JD核定的录用门槛。具体职责、研究方向、语言与经历条件，以及是否仍可投递，应以官方招聘系统单岗位说明为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "自动化",
+        "软件工程",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 / 博士（2027届公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "amhs-equipment",
+      "title": "AMHS设备工程师（2027届）",
+      "city": "广东省深圳市",
+      "category": "设备 / 自动化",
+      "url": "https://career.pxwsemi.com/campus/jobs",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/portal/recruit/details?id=638f4d148c0843e88d6566c529504ac6",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳市鹏芯微集成电路制造有限公司",
+      "summary": "面向晶圆厂自动物料搬运设备开展运行维护、设备状态监控及异常分析支持，配合产线保障设备稳定运行，了解机械传动、电气控制与厂内物流协作。",
+      "requirements": "该职位方向见于鹏芯微2027届官方校园招聘公告及高校转载。公告明确招聘国内硕士（2027年1月1日至7月31日毕业）、国内博士（2026年9月1日至2027年7月31日毕业）及符合时间条件的海外硕博；这里的专业关联是按工作内容与校招公布专业方向辅助整理，并非独立JD核定的录用门槛。具体职责、研究方向、语言与经历条件，以及是否仍可投递，应以官方招聘系统单岗位说明为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械电子工程",
+        "机械设计制造及其自动化",
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士 / 博士（2027届公告）",
+      "currentOpenVerified": false
+    }
+  ]
+}
