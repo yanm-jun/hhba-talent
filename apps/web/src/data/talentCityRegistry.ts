@@ -549,11 +549,84 @@ export const TALENT_YUNNAN_PREFECTURES:TalentCity[]=[
     "initials": "dq"
   }
 ] as TalentCity[];
+export const TALENT_INNER_MONGOLIA_LEAGUES:TalentCity[]=[
+  {
+    "name": "兴安盟",
+    "official": "兴安盟",
+    "province": "内蒙古自治区",
+    "level": "prefecture",
+    "intro": "内蒙古2026就业创业、人才引进与保障安居基础索引，实际本盟政策及实时公寓房源仍须专项核验。",
+    "code": "152200",
+    "pinyin": "xing an meng",
+    "initials": "xam",
+    "aliases": [
+      "兴安盟",
+      "兴安",
+      "xing an meng",
+      "xinganmeng",
+      "xam",
+      "内蒙古兴安盟",
+      "内蒙古自治区兴安盟"
+    ]
+  },
+  {
+    "name": "锡林郭勒盟",
+    "official": "锡林郭勒盟",
+    "province": "内蒙古自治区",
+    "level": "prefecture",
+    "intro": "内蒙古2026就业创业、人才引进与保障安居基础索引，实际本盟政策及实时公寓房源仍须专项核验。",
+    "code": "152500",
+    "pinyin": "xi lin guo le meng",
+    "initials": "xlglm",
+    "aliases": [
+      "锡林郭勒盟",
+      "锡林郭勒",
+      "xi lin guo le meng",
+      "xilinguolemeng",
+      "xlglm",
+      "内蒙古锡林郭勒盟",
+      "内蒙古自治区锡林郭勒盟"
+    ]
+  },
+  {
+    "name": "阿拉善盟",
+    "official": "阿拉善盟",
+    "province": "内蒙古自治区",
+    "level": "prefecture",
+    "intro": "内蒙古2026就业创业、人才引进与保障安居基础索引，实际本盟政策及实时公寓房源仍须专项核验。",
+    "code": "152900",
+    "pinyin": "a la shan meng",
+    "initials": "alsm",
+    "aliases": [
+      "阿拉善盟",
+      "阿拉善",
+      "a la shan meng",
+      "alashanmeng",
+      "alsm",
+      "内蒙古阿拉善盟",
+      "内蒙古自治区阿拉善盟"
+    ]
+  }
+] as TalentCity[];
+export const TALENT_JILIN_PREFECTURES:TalentCity[]=[{
+ name:'延边',official:'延边朝鲜族自治州',province:'吉林省',level:'prefecture',code:'222400',
+ pinyin:'yan bian',initials:'yb',
+ intro:'延边州适用吉林省高校毕业生就业、租房、购房政策；延吉市2026人才公寓和青年驿站只适用于延吉对应人群，不等于全州统一待遇。',
+ aliases:['延边','延边州','延边朝鲜族自治州','吉林延边','吉林省延边','延边人才政策','yan bian','yanbian','yb','延吉','延吉市']
+}];
+export const TALENT_HEILONGJIANG_DISTRICTS:TalentCity[]=[{
+ name:'大兴安岭',official:'大兴安岭地区',province:'黑龙江省',level:'prefecture',
+ intro:'2026人才周大兴安岭地区引才计划及省级就业创业、住房保障制度；2026年9月招聘批次已截止，具体住房待核验',
+ code:'232700',pinyin:'da xing an ling',initials:'dxal',aliases:['大兴安岭','大兴安岭地区','黑龙江大兴安岭','黑龙江省大兴安岭地区','da xing an ling','daxinganling','dxal']
+}];
+export const TALENT_HUBEI_PREFECTURE:TalentCity={name:'恩施',official:'恩施土家族苗族自治州',province:'湖北省',level:'prefecture',intro:'湖北省恩施州人才政策基础资料，具体市州待遇和申报批次待核验',aliases:['恩施','恩施州','恩施土家族苗族自治州','enshi','en shi','湖北恩施','湖北省恩施'],code:'422800',pinyin:'en shi',initials:'es'};
+export const TALENT_HUNAN_AUTONOMOUS_PREFECTURES:TalentCity[]=[{name:'湘西',official:'湘西土家族苗族自治州',province:'湖南省',level:'prefecture',intro:'2026湖南省创业求职扶持、青年安居“一间房”制度和支持湘西自治州高质量发展政策；实物房源及地方专项需逐项核实',code:'433100',pinyin:'xiang xi',initials:'xx',aliases:['湘西','湘西州','湘西自治州','湘西土家族苗族自治州','湖南湘西','湖南省湘西土家族苗族自治州','xiang xi','xiangxi','xxz']}];
 const municipalityCode:Record<string,string>={北京:'110000',天津:'120000',上海:'310000',重庆:'500000'};
 export const TALENT_CITY_INDEX:TalentCity[]=[
  ...TALENT_MUNICIPALITIES.map(c=>({...c,code:municipalityCode[c.name]})),
  ...TALENT_PREFECTURE_CITIES,
- ...TALENT_YUNNAN_PREFECTURES
+ ...TALENT_YUNNAN_PREFECTURES,
+ ...TALENT_INNER_MONGOLIA_LEAGUES
 ];
 const normalize=(text:string)=>text.trim().toLowerCase().replace(/[\s，。,.、·•\-]/g,'');
 export function findTalentProvince(input:string){
