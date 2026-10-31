@@ -1,0 +1,52 @@
+name: HHBA Hangzhou V5.1 isolated branch acceptance
+on:
+  push:
+    branches:
+      - feature/talent-hangzhou
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-hangzhou:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify Hangzhou source and national V5.1 contract
+        working-directory: apps/web
+        run: |
+          node scripts/test-hangzhou-city-v51.mjs
+          node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+          node --experimental-strip-types scripts/test-talent-cities.mjs
+          node scripts/global-talent-nav.contract.test.mjs
+      - name: Build static front-end in isolation
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '0'
+          HHBA_PAGES_BASE: '/'
+        run: npm run build
+      - name: Inspect built content
+        working-directory: apps/web
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const bundle=fs.readdirSync('dist/assets').filter(x=>x.endsWith('.js')).map(x=>fs.readFileSync('dist/assets/'+x,'utf8')).join('');
+          for(const keyword of ['hz-2026-graduate-rent','hz-2026-talent-rental-program','杭州市','hz-2026-high-purchase'])if(!bundle.includes(keyword))throw Error('Missing built record '+keyword);
+          if(!fs.existsSync('dist/index.html'))throw Error('No static build');
+          console.log('HANGZHOU_STATIC_BUNDLE_OK');
+          JS
+      - name: Upload preview artifact, never touch main Pages
+        uses: actions/upload-artifact@v4
+        with:
+          name: hangzhou-isolated-static-preview
+          path: apps/web/dist/
+          if-no-files-found: error
+          retention-days: 14
