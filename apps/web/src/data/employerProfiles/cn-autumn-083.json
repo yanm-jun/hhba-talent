@@ -1,0 +1,327 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-083",
+  "name": "福特中国",
+  "displayName": "福特中国 / 福特汽车工程研究（南京）",
+  "englishName": "Ford Motor Company China",
+  "aliases": [
+    "Ford",
+    "Ford China",
+    "福特汽车",
+    "福特中国2027校招",
+    "福特汽车工程研究南京",
+    "福特汽车中国"
+  ],
+  "industry": "车辆工程 · 汽车研发 · 智能座舱 · 动力总成 · 供应链",
+  "subtitle": "福特中国上海总部／福特南京工程研究体系 · 2027届校园招聘",
+  "overview": "福特中国经营汽车研发、产品工程与品牌业务。吉林大学就业网于2026年8月27日发布以福特汽车工程研究（南京）有限公司名义参与的2027届校招资料，列出9个具名岗位并提供指定Moka系统。公告网申窗口为2026年9月1日至10月30日，已截止；不能把南京宣讲会地点或高校发布的招聘总人数当成各具体岗位的当前空缺。长安福特与江铃汽车为不同招聘主体。",
+  "lastReviewed": "2026-11-01",
+  "sources": [
+    "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=9843021b020a476da5c4ee41463a01d4",
+    "https://app.mokahr.com/campus-recruitment/ford/43706#/",
+    "https://www.ford.com.cn/careers",
+    "https://media.ford.com/content/fordmedia/fap/cn/zh_cn/news/2022/01/17/china-design-center.html",
+    "https://media.ford.com/content/fordmedia/fap/cn/en/news/2017/04/08/ford-china-invests-more-than-rmb-1-3-billion-to-further-innovati.html"
+  ],
+  "media": {
+    "logo": "images/autumn-real-logos/cn-autumn-083.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-083/photo1.svg",
+        "caption": "福特中国 · 非实景业务编辑示意",
+        "alt": "福特中国相关业务示意，非公司真实照片",
+        "note": "独立原始SVG仅作编辑性业务示意；构建可从福特官方媒体中心核验工程研究设施实际照片后替换，版权许可需另审。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-083/photo2.svg",
+        "caption": "福特中国 · 非实景业务编辑示意",
+        "alt": "福特中国相关业务示意，非公司真实照片",
+        "note": "独立原始SVG仅作编辑性业务示意；构建可从福特官方媒体中心核验工程研究设施实际照片后替换，版权许可需另审。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://app.mokahr.com/campus-recruitment/ford/43706#/",
+    "label": "福特中国2027校园招聘Moka指定网申入口",
+    "status": "official_portal",
+    "subject": "福特汽车工程研究（南京）有限公司等已明确的福特中国招聘法人",
+    "note": "吉林大学2027校招公告：2026-09-01至2026-10-30网申；9项具名招聘方向。工作城市、岗位资格、是否另有补招须以Moka单职位为准；不混入长安福特和江铃汽车招聘。"
+  },
+  "majorIntro": "本页9个岗位名称来自高校公布的真实2027招聘名单；专业标签属编辑关联，岗位具体资格、单岗工作地及语言要求仍以官方职位内容为准。",
+  "preferredMajors": [
+    "车辆工程",
+    "机械工程",
+    "电气工程及其自动化",
+    "自动化",
+    "电子信息工程",
+    "计算机科学与技术",
+    "人工智能",
+    "工业设计",
+    "工程管理",
+    "会计学",
+    "人力资源管理",
+    "供应链管理"
+  ],
+  "photoNote": "福特官方媒体中心已发布上海设计中心、南京工程研究中心的真实建筑及创新工坊照片，可用经来源核验的JPEG替换业务示意；不等于已获得商业转载授权。",
+  "business": [
+    {
+      "title": "整车研发与结构工程",
+      "description": "开展车辆车身、座椅、底盘等工程研发、设计及验证。 当前是否具有相应职位需以福特招聘项目及招聘实体为准。",
+      "tags": "整车 · 工程",
+      "details": [
+        "车身座椅系统",
+        "底盘研发测试",
+        "整车工程协作"
+      ]
+    },
+    {
+      "title": "动力总成与电驱技术",
+      "description": "研发动力传动、动力系统工程及汽车电控相关技术。 当前是否具有相应职位需以福特招聘项目及招聘实体为准。",
+      "tags": "动力 · 电控",
+      "details": [
+        "动力系统开发",
+        "工程模拟验证",
+        "电动化控制"
+      ]
+    },
+    {
+      "title": "数字与汽车人工智能",
+      "description": "在汽车研发体系内开展数据处理、AI应用及数字研发。 当前是否具有相应职位需以福特招聘项目及招聘实体为准。",
+      "tags": "数据 · AI",
+      "details": [
+        "数据工程",
+        "AI研发应用",
+        "技术数字化"
+      ]
+    },
+    {
+      "title": "智能座舱体验",
+      "description": "围绕座舱电子、产品体验和人机交互开展评估分析。 当前是否具有相应职位需以福特招聘项目及招聘实体为准。",
+      "tags": "座舱 · UX",
+      "details": [
+        "座舱体验分析",
+        "人机交互",
+        "智能网联系统"
+      ]
+    },
+    {
+      "title": "售后配件采购与项目管理",
+      "description": "支持汽车配件采购、供应商协同和复杂产品工程项目。 当前是否具有相应职位需以福特招聘项目及招聘实体为准。",
+      "tags": "采购 · 项目",
+      "details": [
+        "售后件采购",
+        "项目工程协调",
+        "研发成本评估"
+      ]
+    },
+    {
+      "title": "财务及人力资源",
+      "description": "为福特中国相关技术企业开展会计管理、人才发展等职能。 当前是否具有相应职位需以福特招聘项目及招聘实体为准。",
+      "tags": "财务 · 人力",
+      "details": [
+        "会计管培生",
+        "HR GT",
+        "运营管理服务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "data-ai",
+      "title": "数据 & AI工程师",
+      "category": "数据 / AI",
+      "city": "南京／上海等（逐岗位核实）",
+      "summary": "吉林大学就业网2026年8月27日发布的福特中国2027校园招聘资料明确列名“数据 & AI工程师”，该名称来自招聘名单而非从企业业务范围推断。",
+      "requirements": "公开高校公告说明整体面向本科、硕士、博士毕业生，但没有给出该职位独立的专业限制、学历细则、具体工作城市和技能清单。适合专业是HHBA编辑关联参考。官方指定Moka网申原计划2026年10月30日截止，当前申请状态未核实。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招本科、硕士、博士范围（逐岗确定）",
+      "url": "https://app.mokahr.com/campus-recruitment/ford/43706#/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=9843021b020a476da5c4ee41463a01d4",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "福特汽车工程研究（南京）有限公司2027校招项目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "finance-graduate",
+      "title": "财务毕业培训生（会计）",
+      "category": "财务 / 管培",
+      "city": "南京／上海等（逐岗位核实）",
+      "summary": "吉林大学就业网2026年8月27日发布的福特中国2027校园招聘资料明确列名“财务毕业培训生（会计）”，该名称来自招聘名单而非从企业业务范围推断。",
+      "requirements": "公开高校公告说明整体面向本科、硕士、博士毕业生，但没有给出该职位独立的专业限制、学历细则、具体工作城市和技能清单。适合专业是HHBA编辑关联参考。官方指定Moka网申原计划2026年10月30日截止，当前申请状态未核实。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "会计学",
+        "财务管理",
+        "金融学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招本科、硕士、博士范围（逐岗确定）",
+      "url": "https://app.mokahr.com/campus-recruitment/ford/43706#/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=9843021b020a476da5c4ee41463a01d4",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "福特汽车工程研究（南京）有限公司2027校招项目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hr-gt",
+      "title": "HR GT",
+      "category": "人力 / 管培",
+      "city": "南京／上海等（逐岗位核实）",
+      "summary": "吉林大学就业网2026年8月27日发布的福特中国2027校园招聘资料明确列名“HR GT”，该名称来自招聘名单而非从企业业务范围推断。",
+      "requirements": "公开高校公告说明整体面向本科、硕士、博士毕业生，但没有给出该职位独立的专业限制、学历细则、具体工作城市和技能清单。适合专业是HHBA编辑关联参考。官方指定Moka网申原计划2026年10月30日截止，当前申请状态未核实。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人力资源管理",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招本科、硕士、博士范围（逐岗确定）",
+      "url": "https://app.mokahr.com/campus-recruitment/ford/43706#/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=9843021b020a476da5c4ee41463a01d4",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "福特汽车工程研究（南京）有限公司2027校招项目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "service-parts",
+      "title": "福特售后件采购",
+      "category": "采购 / 供应链",
+      "city": "南京／上海等（逐岗位核实）",
+      "summary": "吉林大学就业网2026年8月27日发布的福特中国2027校园招聘资料明确列名“福特售后件采购”，该名称来自招聘名单而非从企业业务范围推断。",
+      "requirements": "公开高校公告说明整体面向本科、硕士、博士毕业生，但没有给出该职位独立的专业限制、学历细则、具体工作城市和技能清单。适合专业是HHBA编辑关联参考。官方指定Moka网申原计划2026年10月30日截止，当前申请状态未核实。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "采购管理",
+        "工业工程",
+        "供应链管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招本科、硕士、博士范围（逐岗确定）",
+      "url": "https://app.mokahr.com/campus-recruitment/ford/43706#/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=9843021b020a476da5c4ee41463a01d4",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "福特汽车工程研究（南京）有限公司2027校招项目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "powertrain",
+      "title": "动力系统工程师",
+      "category": "动力 / 车辆",
+      "city": "南京／上海等（逐岗位核实）",
+      "summary": "吉林大学就业网2026年8月27日发布的福特中国2027校园招聘资料明确列名“动力系统工程师”，该名称来自招聘名单而非从企业业务范围推断。",
+      "requirements": "公开高校公告说明整体面向本科、硕士、博士毕业生，但没有给出该职位独立的专业限制、学历细则、具体工作城市和技能清单。适合专业是HHBA编辑关联参考。官方指定Moka网申原计划2026年10月30日截止，当前申请状态未核实。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "车辆工程",
+        "机械工程",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招本科、硕士、博士范围（逐岗确定）",
+      "url": "https://app.mokahr.com/campus-recruitment/ford/43706#/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=9843021b020a476da5c4ee41463a01d4",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "福特汽车工程研究（南京）有限公司2027校招项目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "body-seats",
+      "title": "产品研发工程师（车身、座椅系统方向）",
+      "category": "整车 / 研发",
+      "city": "南京／上海等（逐岗位核实）",
+      "summary": "吉林大学就业网2026年8月27日发布的福特中国2027校园招聘资料明确列名“产品研发工程师（车身、座椅系统方向）”，该名称来自招聘名单而非从企业业务范围推断。",
+      "requirements": "公开高校公告说明整体面向本科、硕士、博士毕业生，但没有给出该职位独立的专业限制、学历细则、具体工作城市和技能清单。适合专业是HHBA编辑关联参考。官方指定Moka网申原计划2026年10月30日截止，当前申请状态未核实。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "车辆工程",
+        "机械工程",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招本科、硕士、博士范围（逐岗确定）",
+      "url": "https://app.mokahr.com/campus-recruitment/ford/43706#/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=9843021b020a476da5c4ee41463a01d4",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "福特汽车工程研究（南京）有限公司2027校招项目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "project-management",
+      "title": "项目管理工程师",
+      "category": "项目 / 工程",
+      "city": "南京／上海等（逐岗位核实）",
+      "summary": "吉林大学就业网2026年8月27日发布的福特中国2027校园招聘资料明确列名“项目管理工程师”，该名称来自招聘名单而非从企业业务范围推断。",
+      "requirements": "公开高校公告说明整体面向本科、硕士、博士毕业生，但没有给出该职位独立的专业限制、学历细则、具体工作城市和技能清单。适合专业是HHBA编辑关联参考。官方指定Moka网申原计划2026年10月30日截止，当前申请状态未核实。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工程管理",
+        "车辆工程",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招本科、硕士、博士范围（逐岗确定）",
+      "url": "https://app.mokahr.com/campus-recruitment/ford/43706#/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=9843021b020a476da5c4ee41463a01d4",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "福特汽车工程研究（南京）有限公司2027校招项目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "cabin-experience",
+      "title": "产品体验分析师（座舱）",
+      "category": "座舱 / UX",
+      "city": "南京／上海等（逐岗位核实）",
+      "summary": "吉林大学就业网2026年8月27日发布的福特中国2027校园招聘资料明确列名“产品体验分析师（座舱）”，该名称来自招聘名单而非从企业业务范围推断。",
+      "requirements": "公开高校公告说明整体面向本科、硕士、博士毕业生，但没有给出该职位独立的专业限制、学历细则、具体工作城市和技能清单。适合专业是HHBA编辑关联参考。官方指定Moka网申原计划2026年10月30日截止，当前申请状态未核实。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工业设计",
+        "人机交互",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招本科、硕士、博士范围（逐岗确定）",
+      "url": "https://app.mokahr.com/campus-recruitment/ford/43706#/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=9843021b020a476da5c4ee41463a01d4",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "福特汽车工程研究（南京）有限公司2027校招项目",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "chassis-electronics",
+      "title": "底盘电子工程师",
+      "category": "汽车 / 电子",
+      "city": "南京／上海等（逐岗位核实）",
+      "summary": "吉林大学就业网2026年8月27日发布的福特中国2027校园招聘资料明确列名“底盘电子工程师”，该名称来自招聘名单而非从企业业务范围推断。",
+      "requirements": "公开高校公告说明整体面向本科、硕士、博士毕业生，但没有给出该职位独立的专业限制、学历细则、具体工作城市和技能清单。适合专业是HHBA编辑关联参考。官方指定Moka网申原计划2026年10月30日截止，当前申请状态未核实。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "自动化",
+        "车辆工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招本科、硕士、博士范围（逐岗确定）",
+      "url": "https://app.mokahr.com/campus-recruitment/ford/43706#/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=9843021b020a476da5c4ee41463a01d4",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "福特汽车工程研究（南京）有限公司2027校招项目",
+      "currentOpenVerified": false
+    }
+  ]
+}
