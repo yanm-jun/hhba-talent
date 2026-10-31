@@ -1,0 +1,45 @@
+name: Tianjin V5.1 isolated verification
+on:
+  push:
+    branches: [feature/talent-tianjin]
+  pull_request:
+    paths:
+      - 'apps/web/src/data/tianjin*.ts'
+      - 'apps/web/scripts/test-tianjin-city-v51.mjs'
+      - 'apps/web/src/pages/TalentServiceRoutes.tsx'
+      - '.github/workflows/hhba-tianjin-branch-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-tianjin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Test Tianjin V5.1
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-tianjin-city-v51.mjs
+      - name: National city V5.1 contract
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - name: Build full static website without deploying production
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tianjin-v51-static
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
