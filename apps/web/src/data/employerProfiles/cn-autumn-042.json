@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-042",
+  "name": "艾普工华",
+  "displayName": "艾普工华",
+  "englishName": "EpicHust",
+  "aliases": [
+    "艾普工华科技（武汉）有限公司",
+    "EpicHust",
+    "EPICHUST",
+    "艾普工华工业软件",
+    "天璇工业平台",
+    "UniMax MES",
+    "MOM工业软件"
+  ],
+  "industry": "工业软件 · 智能制造 · MOM/MES · AI工业平台 · 数字孪生",
+  "subtitle": "艾普工华科技（武汉）有限公司 · 武汉总部 · 工业软件与智能工厂",
+  "overview": "艾普工华成立于2012年，聚焦制造运营管理（MOM）、制造执行系统（MES）、工业物联网（AIoT）与工业人工智能。其天璇工业软件平台、UniMax及艾问工业大模型面向汽车、轨道交通、工程机械、电子和装备制造等行业提供工厂数字化解决方案。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.epichust.com/",
+    "https://epichust.com/p/company_profile",
+    "https://www.epichust.com/campus_recruitment.html",
+    "https://www.91wllm.cn/campusUnion/view/id/1004848/mark/0",
+    "https://www.epichust.com/Digital_intelligence_platform/6.html",
+    "https://www.epichust.com/Intelligent_manufacturing_operation/9.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-042/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-042/photo1.jpg",
+        "caption": "艾普工华 · PCT工业软件产品界面",
+        "alt": "艾普工华官网PCT制造指挥平台电脑端产品展示图",
+        "note": "公司官网产品页面公开展示的PCT平台视觉，非企业办公实拍。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-042/photo2.jpg",
+        "caption": "艾普工华 · 智能制造行业解决方案",
+        "alt": "艾普工华企业官网发布的汽车发动机智能制造合作案例视觉",
+        "note": "来自艾普工华官网行业方案原图，属于真实品牌业务示意，非员工实景。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.epichust.com/campus_recruitment.html",
+    "label": "艾普工华官方校园招聘",
+    "status": "official_portal",
+    "subject": "艾普工华科技（武汉）有限公司",
+    "note": "7条2027届校招岗位名称与地点来自湖北高校就业联合平台公告，官网同步公开对应职位方向。官网岗位开放状态不是实时核验，最终以公司校招原页为准。"
+  },
+  "majorIntro": "7个具体岗位分别归为AI/CAE、电气自动化、智能制造实施、软件开发测试、市场销售；点击标签只展示该组岗位，不把不相关岗位混在机械搜索中。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "软件工程",
+    "人工智能",
+    "数学与应用数学",
+    "机械工程",
+    "工程力学",
+    "材料科学与工程",
+    "电气工程及其自动化",
+    "自动化",
+    "工业工程",
+    "智能制造工程",
+    "市场营销"
+  ],
+  "photoNote": "Logo使用官网明确的EpicHust标识，另两张是公司官网发布的独立工业软件产品界面与行业案例视觉；不把软件截图当公司办公实景，全部本地保存且不链接第三方。版权归各原权利人。",
+  "business": [
+    {
+      "title": "天璇工业软件平台",
+      "description": "基于天璇Merak工业底座整合数据、模型和工业应用，支持工厂多个系统间的协作。",
+      "tags": "Merak · 工业底座",
+      "details": [
+        "工业数字化统一底座",
+        "低代码平台与可配置业务应用",
+        "工业大数据与系统扩展能力"
+      ]
+    },
+    {
+      "title": "MOM制造运营管理",
+      "description": "UniMax系列面向生产制造运营，整合计划排程、仓储、设备、质量与物流管理。",
+      "tags": "MOM · MES · QMS",
+      "details": [
+        "生产全过程追踪与监控",
+        "仓储物流和物料调度",
+        "制造执行与质量管理"
+      ]
+    },
+    {
+      "title": "智能制造大模型",
+      "description": "通过艾问工业大模型增强生产知识查询、管理决策和工业场景问答。",
+      "tags": "AIwen · 工业大模型",
+      "details": [
+        "制造业专业知识库与问答",
+        "生产异常分析和预测预警",
+        "业务工作流智能辅助"
+      ]
+    },
+    {
+      "title": "数字孪生与生产指挥",
+      "description": "PCT与数字孪生技术提供工厂数据驾驶舱、现场可视化及调度辅助。",
+      "tags": "PCT · Digital Twin",
+      "details": [
+        "制造过程多维指标分析",
+        "工厂/车间运营可视化",
+        "生产资源调度优化"
+      ]
+    },
+    {
+      "title": "工业物联网与现场防错",
+      "description": "工业AIoT平台连接设备、工位和产线，实现现场数据采集、质量防错及状态管理。",
+      "tags": "AIoT · WSI · SCADA",
+      "details": [
+        "工业设备信息采集",
+        "机器视觉与操作防错",
+        "多源工业数据集成"
+      ]
+    },
+    {
+      "title": "制造业行业交付与服务",
+      "description": "面向汽车、轨交、工程机械、电子等离散制造客户开展行业咨询和项目实施。",
+      "tags": "汽车 · 轨交 · 工业工程",
+      "details": [
+        "制造业务需求调研和实施",
+        "工厂建模与生产系统测试",
+        "运维优化与员工培训"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "ai-algorithm",
+      "title": "人工智能算法工程师",
+      "city": "武汉",
+      "category": "人工智能 / CAE",
+      "url": "https://www.epichust.com/campus_recruitment.html",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1004848/mark/0",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "艾普工华科技（武汉）有限公司",
+      "summary": "参与工业大模型的知识库、检索与智能应用研发，协助生产场景中的算法设计、数据整理和模型评测。",
+      "requirements": "校招公告说明硕士及以上、专业不限；但仍需要相关AI实践能力。2027届/2028届可申请实习，实习时长有相应要求。",
+      "majorNames": [
+        "人工智能",
+        "计算机科学与技术"
+      ],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上 · 2027届/2028届",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "topology",
+      "title": "拓扑优化研发工程师",
+      "city": "武汉",
+      "category": "人工智能 / CAE",
+      "url": "https://www.epichust.com/campus_recruitment.html",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1004848/mark/0",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "艾普工华科技（武汉）有限公司",
+      "summary": "开展计算力学与拓扑优化算法研发，参与CAE工程求解流程及算法应用效率的持续改进。",
+      "requirements": "高校2027届公告明确计算机、机械、材料、力学相关专业，硕士及以上；算法、力学或编程技能按公司单岗原文核验。",
+      "majorNames": [
+        "机械工程",
+        "工程力学",
+        "材料科学与工程"
+      ],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上 · 2027届",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "plc-trainee",
+      "title": "PLC管培生",
+      "city": "武汉",
+      "category": "电气与自动化",
+      "url": "https://www.epichust.com/campus_recruitment.html",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1004848/mark/0",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "艾普工华科技（武汉）有限公司",
+      "summary": "参与PLC控制软件、工业现场应用及相关产品研发培训，逐步熟悉设备控制与系统联调。",
+      "requirements": "公告明确电气、自动化、机电、控制工程等相关专业，本科及以上。具体PLC品牌工具、轮岗计划以官方JD为准。",
+      "majorNames": [
+        "电气工程及其自动化",
+        "自动化",
+        "机械电子工程"
+      ],
+      "editorialRelatedMajors": [
+        "控制科学与工程",
+        "智能制造工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027届",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "mom-consultant",
+      "title": "智能制造实施顾问",
+      "city": "武汉、深圳、无锡、长沙、郑州、长春、成都、济南（可选）",
+      "category": "智能制造与交付",
+      "url": "https://www.epichust.com/campus_recruitment.html",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1004848/mark/0",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "艾普工华科技（武汉）有限公司",
+      "summary": "开展MES/MOM项目需求调研、工厂基础数据收集、系统测试及客户培训，参与生产运营数字化项目实施。",
+      "requirements": "公司官网列有智能制造实施顾问：智能制造、工业工程、物流、信息管理、机械及自动化相关专业，本科及以上，能适应项目调研与现场应用。",
+      "majorNames": [
+        "工业工程",
+        "机械工程",
+        "自动化",
+        "智能制造工程"
+      ],
+      "editorialRelatedMajors": [
+        "物流管理",
+        "信息管理与信息系统",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027届",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sales-trainee",
+      "title": "销售管培生",
+      "city": "武汉、无锡、长沙、郑州、济南、成都（可选）",
+      "category": "市场与销售",
+      "url": "https://www.epichust.com/campus_recruitment.html",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1004848/mark/0",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "艾普工华科技（武汉）有限公司",
+      "summary": "围绕制造业数字化客户开展市场调研、销售学习、方案介绍与客户沟通，积累工业软件销售与应用知识。",
+      "requirements": "高校2027届公告本科及以上、专业不限；此处以商业岗位类别进行检索，不表示仅允许市场专业报名。其他条件以公司官方招聘页面为准。",
+      "majorNames": [
+        "市场营销",
+        "工商管理"
+      ],
+      "editorialRelatedMajors": [
+        "工业工程",
+        "国际经济与贸易"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 专业不限 · 2027届",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "java-developer",
+      "title": "Java开发工程师",
+      "city": "武汉",
+      "category": "软件开发与测试",
+      "url": "https://www.epichust.com/campus_recruitment.html",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1004848/mark/0",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "艾普工华科技（武汉）有限公司",
+      "summary": "参与工业软件产品的Java服务端模块研发、数据库操作和项目联调，编写相关文档与功能测试代码。",
+      "requirements": "官网说明硕士及以上（岗位卡片）并在详细条件提及本科以上相关专业；以官方单岗位最新学历为准。要求掌握Java、Spring相关框架及SQL基础。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "editorialRelatedMajors": [
+        "信息管理与信息系统",
+        "网络工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以官网完整JD为准 · 2027届",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "software-test",
+      "title": "软件测试工程师",
+      "city": "武汉",
+      "category": "软件开发与测试",
+      "url": "https://www.epichust.com/campus_recruitment.html",
+      "evidenceUrl": "https://www.91wllm.cn/campusUnion/view/id/1004848/mark/0",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "艾普工华科技（武汉）有限公司",
+      "summary": "对工业软件开展功能、集成、回归及性能测试，设计测试用例、定位异常并形成质量报告。",
+      "requirements": "高校公告和公司招聘说明本科及以上，计算机、软件或通信相关专业，需了解软件测试流程、缺陷跟踪和测试工具。",
+      "majorNames": [
+        "软件工程",
+        "计算机科学与技术",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [
+        "信息安全",
+        "数据科学与大数据技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027届",
+      "currentOpenVerified": false
+    }
+  ]
+}
