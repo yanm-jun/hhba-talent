@@ -753,4 +753,4 @@ export const QINGHAI_POLICY_RESEARCH_RECORDS:TalentPolicyRecord[]=[
 ];
 
 /** Formal V5.1 index requires first-party government policy source, not recruitment/media reprints. */
-export const QINGHAI_POLICY_RECORDS:TalentPolicyRecord[]=QINGHAI_POLICY_RESEARCH_RECORDS.filter(r=>{try{return new URL(r.sourceUrl).hostname.endsWith('.gov.cn')}catch{return false}});
+export const QINGHAI_POLICY_RECORDS:TalentPolicyRecord[]=QINGHAI_POLICY_RESEARCH_RECORDS.filter(r=>{try{return new URL(r.sourceUrl).hostname.endsWith('.gov.cn')}catch{return false}}).map(r=>({...r,reviewNote:r.reviewNote+' 办理入口待核实。'}));
