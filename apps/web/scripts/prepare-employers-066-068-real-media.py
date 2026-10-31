@@ -21,8 +21,6 @@ import time
 ROOT=Path("public/images/employer-profiles")
 USER_AGENT="Mozilla/5.0 (compatible; HHBA-Enterprise-Evidence-Audit/1.0; sourced image attribution)"
 SOURCES={
- "067":[("photo1.png","https://www.cnpresky.com/img/jingzhun.52bb8582.png",
-          "Company website product-visual artwork, not a photograph")],
  "068":[("photo1.jpg","https://liuhuahuagong.com/hdupf/gimg/202506/20250610112656_333342.jpg",
           "Official LiuHua Chemical Group subsidiary site, real plant construction"),
         ("photo2.jpg","https://www.liuhuahuagong.com/hdupf/img/202509/202509301759224056485957.jpg",
@@ -122,4 +120,4 @@ for i,(url,data,page,alt) in enumerate(collected[:2],1):
              "Corporate event/workplace photograph extracted from Dao Fortune first-party page "+page+
              (" (alt: "+alt[:80]+")" if alt else ""),True))
 (ROOT/"cn-autumn-066"/"media-sources.json").write_text(json.dumps(out,ensure_ascii=False,indent=2)+"\n",encoding="utf8")
-print("HHBA_066_068_CORPORATE_MEDIA_PACKAGING_OK",json.dumps({k:len(list((ROOT/("cn-autumn-"+k)).glob("photo*"))) for k in ("066","067","068")}))
+print("HHBA_066_068_CORPORATE_MEDIA_PACKAGING_PENDING_WEBSITE_CAPTURE",json.dumps({k:len(list((ROOT/("cn-autumn-"+k)).glob("photo*"))) for k in ("066","067","068")}))
