@@ -1,0 +1,94 @@
+name: HHBA Study Minot State isolated verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-study-minot-validation.yml'
+      - 'apps/web/src/components/MinotStateUniversityPage.tsx'
+      - 'apps/web/src/components/StudyUniversityDirectory.tsx'
+      - 'apps/web/src/data/studyMinotState.ts'
+      - 'apps/web/src/styles/study-minot-state.css'
+      - 'apps/web/scripts/minot-state.contract.test.mjs'
+      - 'apps/web/scripts/minot-state.browser.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-minot-validation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    name: Compile, licensed photographs & desktop/mobile Minot acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Restore web dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Validate school evidence, visa cautions, photo rights and navigation
+        working-directory: apps/web
+        run: node --experimental-strip-types --test scripts/minot-state.contract.test.mjs scripts/study-universities.contract.test.mjs scripts/study-abroad.contract.test.mjs
+      - name: Build the exact main HHBA site, never a separate preview
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+        run: npm run build
+      - name: Download three credited public-domain / CC BY-SA campus photographs into built site
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request, hashlib, time
+          dest=Path('apps/web/dist/images/study/minot-state')
+          dest.mkdir(parents=True,exist_ok=True)
+          photos=[
+            ('old-main-highsmith.jpg','https://tile.loc.gov/storage-services/service/pnp/highsm/69000/69075v.jpg',140000),
+            ('old-main-goldenpaw2000.jpg','https://upload.wikimedia.org/wikipedia/commons/6/67/Oldmainmsu.jpg',70000),
+            ('old-main-alexwcovington.jpg','https://upload.wikimedia.org/wikipedia/commons/1/1e/Minotstate.jpg',90000)
+          ]
+          for name,url,minimum in photos:
+            for attempt in range(3):
+              try:
+                req=urllib.request.Request(url,headers={'User-Agent':'HHBA-Archive-Attribution/1.0 (photo credit on page)'})
+                with urllib.request.urlopen(req,timeout=45) as r:data=r.read(2000000)
+                assert len(data)>=minimum and data.startswith(bytes((255,216,255)))
+                (dest/name).write_bytes(data)
+                print(name,hashlib.sha256(data).hexdigest(),len(data))
+                break
+              except Exception as exc:
+                print('PHOTO_RETRY',name,attempt,str(exc)[:130])
+                if attempt==2:raise
+                time.sleep(3)
+          assert len(list(dest.glob('*.jpg')))==3
+          PY
+      - name: Install Chromium to test the real compiled main app
+        working-directory: apps/web
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Verify real Minot images, gallery, two programs, source links and F-1 warnings
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          HHBA_TEST_BASE: 'http://127.0.0.1:4173/hhba-talent/'
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/hhba-minot-preview.log 2>&1 &
+          for i in $(seq 1 40); do
+            if curl -fsS "$HHBA_TEST_BASE" >/dev/null 2>&1; then break; fi
+            sleep 1
+          done
+          curl -fsS "$HHBA_TEST_BASE" >/dev/null
+          node scripts/minot-state.browser.mjs
+      - name: Save independent Minot acceptance screenshots and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-minot-campus-browser-proof
+          path: apps/web/mainline-v2-browser-proof/
+          if-no-files-found: ignore
+          retention-days: 14
