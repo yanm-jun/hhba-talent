@@ -161,28 +161,5 @@ export const QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS:TalentHousingRecord[]=[
     "kind": "program",
     "housingCategory": "其他住房",
     "reviewedAt": "2026-11-01"
-  },
-  {
-    "id": "qh-hainanzhou-guide-rent-2026",
-    "city": "海南州",
-    "district": "贵德县",
-    "title": "贵德县住房保障家庭租赁补贴实施细则（2026核查历史制度）",
-    "address": "青海省海南州贵德县乡镇、社区及住房保障部门（非具体住房地址）",
-    "units": "贵德县较早发布的住房租赁货币补贴制度，2026年仍应以现行住房保障经办核实",
-    "rent": "针对贵德县低收入无房或人均住房面积较小的城镇困难家庭设置按资格审核的住房租赁补贴；具体当年标准以县住建部门为准，非人才专享。",
-    "eligibility": "旧细则规定城镇户籍住房困难家庭等条件、人均住房面积小于16平方米、未享其他住房保障等；2026是否修订执行须向县住建核验。",
-    "sourceUrl": "https://www.guide.gov.cn/lnb/zc1__zwgk/zc/agwzlfl/zf/content_13566195",
-    "published": "2019-01-01",
-    "statusNote": "该文件为历史县级实施细则原文，未查实2026有无修订或个人实际受理窗口，仅作政策历史基础资料。申报入口待核实，空房待核实。",
-    "steps": [
-      "核对贵德县旧实施细则与2026现行制度是否仍有效",
-      "按县住建要求确认家庭人均收入和住房面积限制",
-      "准备身份户籍关系、收入、无房和租赁证明",
-      "向社区或乡镇提出申请由主管部门审核",
-      "以县住建最新认定结果和拨款公告为准"
-    ],
-    "kind": "program",
-    "housingCategory": "保障性租赁住房",
-    "reviewedAt": "2026-11-01"
   }
 ];
