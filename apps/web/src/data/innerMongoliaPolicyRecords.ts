@@ -1043,7 +1043,7 @@ export const INNER_MONGOLIA_POLICY_RECORDS:TalentPolicyRecord[]=[
     "city": "乌海",
     "title": "乌海2026急需紧缺研究生人才免费住房支持",
     "category": "租房安居",
-    "published": "2026-06-01",
+    "published": "2026-05-18",
     "sourceUrl": "https://fgw.wuhai.gov.cn/xywh/zzqzc/7883667.jhtml",
     "sourceName": "所列政府原文、官方部门公告或人社部官网信息",
     "summary": "乌海市2026年营商环境政策要求为企业引进的研究生及以上学历急需紧缺人才提供3年免费人才公寓，属市级人才住房保障方向。",

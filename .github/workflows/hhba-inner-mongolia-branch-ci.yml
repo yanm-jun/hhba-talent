@@ -1,0 +1,43 @@
+name: HHBA Inner Mongolia V5.1 standalone QA
+on:
+  push:
+    branches: ['feature/talent-inner-mongolia']
+  pull_request:
+    paths:
+      - 'apps/web/src/data/innerMongolia*'
+      - 'apps/web/src/data/talentCityRegistry.ts'
+      - 'apps/web/src/pages/TalentServiceRoutes.tsx'
+      - 'apps/web/scripts/test-inner-mongolia-v51.mjs'
+      - '.github/workflows/hhba-inner-mongolia-branch-ci.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: npm ci
+        working-directory: apps/web
+        run: npm ci
+      - name: V5.1 coverage, city and core contract tests
+        working-directory: apps/web
+        run: |
+          node --experimental-strip-types scripts/test-inner-mongolia-v51.mjs
+          node --experimental-strip-types scripts/test-talent-cities.mjs
+          node --experimental-strip-types scripts/test-yunnan-city-v51.mjs
+          node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - name: Build static site without publishing
+        working-directory: apps/web
+        run: npm run build
+      - name: Save isolated static preview as GitHub Actions artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-inner-mongolia-v51-static-preview
+          path: apps/web/dist/
+          if-no-files-found: error
