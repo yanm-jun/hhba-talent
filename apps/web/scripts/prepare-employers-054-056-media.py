@@ -20,10 +20,10 @@ CFG={
   "photoPages":["https://www.bondex.com.cn/news/detail?pid=5648","https://www.bondex.com.cn/wuliu/haiyun","https://www.bondex.com.cn/about"],
   "logoPages":["https://www.bondex.com.cn/","https://www.bondex.com.cn/about/wenhua"],
   "hint":["bondex","邦达","物流"],"editorialLogo":True},
- "055":{"name":"长隆科技","photoPages":["https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822","https://jy.cdutcm.edu.cn/detail/online?id=3510265","https://www.andexpo.com/index.php/photos_list-2676-152216.html","https://www.changlongkeji.cn/","https://www.cl39.com/"],
-  "logoPages":["https://www.cl39.com/","https://www.changlongkeji.cn/","https://job.ncss.cn/student/jobs/f63e0e5752f3492c805d7d08772a8882/corp.html"],
+ "055":{"name":"长隆科技","photoPages":["https://a617645265.cn.goepe.com/","https://clkj888888.gys.cn/","https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822"],
+  "logoPages":["https://a617645265.cn.goepe.com/","https://clkj888888.gys.cn/"],
   "hint":["长隆科技","changlong","cl39","深圳长隆"],"editorialLogo":True},
- "056":{"name":"维音","photoPages":["https://www.vxichina.cn/AboutStd_806.html","https://www.vxichina.cn/AboutStd_807.html","https://www.vxichina.cn/"],
+ "056":{"name":"维音","photoPages":["https://www.vxichina.cn/","https://www.vxichina.cn/AboutStd_806.html"],
   "logoPages":["https://www.vxichina.cn/","https://www.vxichina.cn/AboutStd_806.html"],
   "hint":["维音","VXI","联络中心"],"editorialLogo":True}
 }
@@ -31,7 +31,7 @@ ROOT=Path(__file__).resolve().parents[1]/'public/images/employer-profiles'
 def download(url,referer=None):
  req=Request(url,headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/133 Safari/537.36',
   'Referer':referer or url,'Accept':'image/avif,image/webp,image/png,image/jpeg,image/svg+xml,image/*,text/html;q=0.8,*/*;q=0.5'})
- with urlopen(req,timeout=10) as f: content=f.read(5_800_000)
+ with urlopen(req,timeout=5) as f: content=f.read(5_800_000)
  if len(content)<260 or len(content)>5_700_000:raise ValueError('Invalid media size')
  return content
 def candidates(page,logo):
@@ -113,7 +113,7 @@ for no,cfg in CFG.items():
   options.sort(key=lambda a:-a[0])
   seen=set();options=[(score,url,page) for score,url,page in options if not(url in seen or seen.add(url))]
   done=False
-  for score,url,page in options[:26]:
+  for score,url,page in options[:14]:
    try:
     raw=download(url,page)
     h=sha256(raw).hexdigest()
