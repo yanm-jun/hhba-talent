@@ -1,0 +1,20 @@
+{
+  "company": "卡夫亨氏",
+  "reviewedAt": "2026-11-01",
+  "logoStatus": "HHBA independent brand-identification fallback (nonofficial)",
+  "commercialReusePermissionConfirmed": false,
+  "mediaSlots": [
+    {
+      "slot": 1,
+      "fallback": "images/employer-profiles/cn-autumn-084/photo1.svg",
+      "fallbackType": "non-real editorial SVG",
+      "sourceAudit": "media-sources.json generated in CI"
+    },
+    {
+      "slot": 2,
+      "fallback": "images/employer-profiles/cn-autumn-084/photo2.svg",
+      "fallbackType": "non-real editorial SVG",
+      "sourceAudit": "media-sources.json generated in CI"
+    }
+  ]
+}
