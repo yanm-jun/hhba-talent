@@ -35,5 +35,7 @@ jobs:
           node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
       - name: Validate Hainan government-backed records and housing separation
         run: node --experimental-strip-types scripts/test-hainan-sourced-v51.mjs
+      - name: Check sourced Shenyang 2026 housing record
+        run: node --experimental-strip-types scripts/test-shenyang-housing-gap-v51.mjs
       - name: Confirm static build
         run: npm run build
