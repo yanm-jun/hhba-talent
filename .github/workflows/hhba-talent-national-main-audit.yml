@@ -47,5 +47,9 @@ jobs:
         run: node --experimental-strip-types scripts/test-sichuan-city-v51.mjs
       - name: Audit all 337 city UI counters and known Sichuan/Hainan records
         run: node --experimental-strip-types scripts/audit-talent-city-ui.mjs
+      - name: Verify screenshot's 15 provinces against merged main city records
+        run: node --experimental-strip-types scripts/test-screenshot-province-coverage.mjs
+      - name: Restore Guizhou 9 regional policies and independent housing source
+        run: node --experimental-strip-types scripts/test-guizhou-city-v51.mjs
       - name: Confirm static build
         run: npm run build
