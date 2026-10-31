@@ -2,12 +2,12 @@
   "logo.png": {
     "verified": true,
     "company": "芯德科技",
-    "source": "https://commons.wikimedia.org/wiki/Special:FilePath/VSOL_LOGO.jpg",
-    "sourcePage": "https://commons.wikimedia.org/wiki/File:VSOL_LOGO.jpg",
-    "sourceSha256": "a5e4aa38ed499a281858c34370f31ebaa763e2cd161266848e803540e0fbd573",
-    "sha256": "14180d4d5df122b5601cb238fdbb084c8dc14311ced6b82263aad86853222a92",
-    "width": 700,
-    "height": 225,
+    "source": "https://www.vsol.com.cn/wp-content/uploads/2024/12/VSOL-AboutUs_OurStory.jpg",
+    "sourcePage": "https://www.vsol.com.cn/",
+    "sourceSha256": "f7191e223e52bd0dab4f83f5a315c87bb74769990553c7a3f292a6237eeaa93e",
+    "sha256": "36befd8556773b3c65140bf10c4b90ff42d89121cb10634e5ef33642fc91c4a7",
+    "width": 1250,
+    "height": 521,
     "type": "company logo",
     "copyright": "Rights remain with the original owner"
   },
