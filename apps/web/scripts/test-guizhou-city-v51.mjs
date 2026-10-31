@@ -10,8 +10,8 @@ import {assessPolicy,assessHousing,ACCEPTED_TALENT_CITIES} from '../src/data/tal
 assert.equal(GUIZHOU_9_REGIONS.length,9);
 assert.equal(new Set(GUIZHOU_9_REGIONS).size,9);
 assert.equal(queryTalentCities('','贵州省').length,9);
-assert.equal(GUIZHOU_POLICY_RECORDS.length,9);
-assert.equal(GUIZHOU_HOUSING_RECORDS.length,3);
+assert.equal(GUIZHOU_POLICY_RECORDS.length,17);
+assert.equal(GUIZHOU_HOUSING_RECORDS.length,5);
 for(const city of GUIZHOU_9_REGIONS){
  assert.equal(findTalentCity(city)?.name,city);
  assert.ok(GUIZHOU_POLICY_RECORDS.some(p=>p.city===city),'city missing distinct policy: '+city);
@@ -43,4 +43,5 @@ assert.equal(buildGuizhouGuide('policy','fake-id'),null);
 assert.equal(buildGuizhouGuide('housing','fake-id'),null);
 const route=readFileSync(new URL('../src/pages/TalentServiceRoutes.tsx',import.meta.url),'utf8');
 assert.ok(route.includes("fragments[2]==='guizhou'")&&route.includes("GUIZHOU_9_REGIONS.some"));
+assert.ok(route.includes("match.name==='贵阳'")&&route.includes("policies.filter(p=>p.category===group)"),'Guiyang city page must render categorized 2026 policy cards');
 console.log('HHBA_GUIZHOU_9_REGIONS_V51_CHECKS_OK');

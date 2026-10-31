@@ -229,6 +229,9 @@ jobs:
         run: |
           node --experimental-strip-types scripts/test-screenshot-province-coverage.mjs
           node --experimental-strip-types scripts/test-guizhou-city-v51.mjs
+      - name: Verify Guiyang 2026 complete policy and housing catalog before publication
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-guiyang-2026-complete.mjs
       - name: Validate source-backed talent policies and housing records
         working-directory: apps/web
         run: node scripts/audit-talent-service.mjs
