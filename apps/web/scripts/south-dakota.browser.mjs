@@ -12,6 +12,8 @@ try{
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(base+'study-abroad/university/south-dakota',{waitUntil:'domcontentloaded',timeout:50000});
   const consent=page.getByRole('button',{name:'暂不同意'});if(await consent.isVisible().catch(()=>false))await consent.click();
+  await page.waitForTimeout(1200);
+  console.log('HHBA_USD_BROWSER_DIAGNOSTIC',JSON.stringify({url:page.url(),body:(await page.locator('body').innerText()).slice(0,850),errors}));
   await page.locator('[data-usd="longform"]').waitFor({state:'visible'});
   assert(await page.getByRole('heading',{name:'南达科他大学',exact:true}).isVisible());
   assert.equal(await page.locator('.hhba-minot-facts>div').count(),6);
