@@ -24,7 +24,9 @@ items=[
  ]),
  ('photo2.jpg',[
   ('https://static2.xunxiang.site/uploads/sites/210/2025/03/8681d2fd0faebdc026de88d40dd0e2a9.jpg','https://www.pxwsemi.com/%E7%94%9F%E6%B4%BB%E4%B8%8E%E7%A6%8F%E5%88%A9'),
-  ('https://static2.xunxiang.site/uploads/sites/210/2025/03/20141639e41fdc4204c74239d287e422.jpg','https://www.pxwsemi.com/%E7%94%9F%E6%B4%BB%E4%B8%8E%E7%A6%8F%E5%88%A9')
+  ('https://static2.xunxiang.site/uploads/sites/210/2025/03/20141639e41fdc4204c74239d287e422.jpg','https://www.pxwsemi.com/%E7%94%9F%E6%B4%BB%E4%B8%8E%E7%A6%8F%E5%88%A9'),
+  ('https://wsrv.nl/?url=static2.xunxiang.site%2Fuploads%2Fsites%2F210%2F2025%2F03%2F8681d2fd0faebdc026de88d40dd0e2a9.jpg','https://www.pxwsemi.com/%E7%94%9F%E6%B4%BB%E4%B8%8E%E7%A6%8F%E5%88%A9'),
+  ('https://wsrv.nl/?url=static2.xunxiang.site%2Fuploads%2Fsites%2F210%2F2025%2F03%2F20141639e41fdc4204c74239d287e422.jpg','https://www.pxwsemi.com/%E7%94%9F%E6%B4%BB%E4%B8%8E%E7%A6%8F%E5%88%A9')
  ])
 ]
 def fetch_https_verified(url,page):
@@ -65,7 +67,7 @@ for filename,alternatives in items:
      photo.thumbnail((1600,1150))
      photo.save(out/filename,'JPEG',quality=87,optimize=True)
     if (out/filename).stat().st_size<1800:raise ValueError('converted image too small')
-    audit[filename]={'verified':True,'source':url,'sourcePage':page,'sha256':hash,'width':photo.width,'height':photo.height}
+    audit[filename]={'verified':True,'source':url,'sourcePage':page,'deliveryProxy':url.startswith('https://wsrv.nl/'),'sha256':hash,'width':photo.width,'height':photo.height}
     used.add(hash)
     print('PXW_034_SOURCE_VERIFIED',filename,url,photo.size)
     break
