@@ -21,22 +21,23 @@
     "https://www.vxichina.cn/ContactSt_zgdo.html",
     "https://www.vxichina.cn/qsxx_xa_0014_015.html",
     "https://www.wondercv.com/xiaozhao/weiyin-xian-2027-autumn-campus-19930-72bad6/",
-    "https://www.wondercv.com/xiaozhao/vxi-xian-2027-campus-19838-7dea54/"
+    "https://www.wondercv.com/xiaozhao/vxi-xian-2027-campus-19838-7dea54/",
+    "https://www.vxichina.cn/AboutStd_1070.html"
   ],
   "media": {
     "logo": "images/employer-profiles/cn-autumn-056/logo.png",
     "photos": [
       {
         "path": "images/employer-profiles/cn-autumn-056/photo1.jpg",
-        "caption": "维音 · 客户体验与联络中心",
-        "alt": "维音官网展示的客服和客户联络中心业务图",
-        "note": "维音企业官网公开的客户服务运营场景/业务视觉，不将行业素材误标为确定的办公室实拍。"
+        "caption": "维音 · 西安联络中心启动现场",
+        "alt": "维音官网2022年西安联络中心正式启用新闻中的实际运营中心现场照片",
+        "note": "维音官网2022年7月29日西安联络中心启用报道原始现场照片，不代表2026年办公区状态。"
       },
       {
         "path": "images/employer-profiles/cn-autumn-056/photo2.jpg",
-        "caption": "维音 · 智能客服技术平台",
-        "alt": "维音官方网站发布的智能客服或联络中心产品视觉",
-        "note": "官网另一个独立产品服务视觉，本地保存并标注真实业务内容。"
+        "caption": "维音 · 西安联络中心内部环境",
+        "alt": "维音官网2022年西安联络中心启用报道中的办公区走廊环境",
+        "note": "源于维音官网同一新闻中的另一张实景图，保留拍摄时期的说明，非AI生成图。"
       }
     ]
   },
@@ -58,7 +59,7 @@
     "国际经济与贸易",
     "电子商务"
   ],
-  "photoNote": "维音官网品牌标识与两张独立客户服务/AI客服业务图片本地入库，媒体审计保留原始地址；图片按实际业务内容标注，不冒称为西安办公室照片。",
+  "photoNote": "VXI官方Logo及两张不同的2022年西安联络中心启用实景均取自维音官网；仅说明2022年当时场地情况，不将历史照片误称2026年的办公现状。媒体来源、SHA-256均保存，本地静态展示。",
   "business": [
     {
       "title": "智能联络中心外包",
