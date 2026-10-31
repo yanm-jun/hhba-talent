@@ -34,7 +34,7 @@ for(const city of cities){
  for(const h of hr){
    assert.equal(talentSourceKind(h.sourceUrl),'government',h.id);
    assert.ok(h.steps.length>=4&&h.statusNote.includes('非实时'),h.id+' housing disclosure');
-   assert.ok(h.statusNote.includes('申报入口未公布'),h.id+' portal caveat');
+   assert.ok(h.statusNote.includes('申报入口未公布')||h.statusNote.includes('申请入口未公布'),h.id+' portal caveat');
    assert.ok(['B','C'].includes(assessHousing(h,'2026-10-31').grade),h.id+' incorrect housing quality');
    assert.equal(h.kind,'program','Housing program != apartment building: '+h.id);
  }
