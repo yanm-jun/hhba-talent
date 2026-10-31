@@ -16,9 +16,9 @@
       "republicationLicenseVerified": false
     },
     {
-      "file": "photo2.jpg",
-      "type": "photo from actual corporate-affiliated news activity, exact original URL logged during CI",
-      "realPhoto": true,
+      "file": "photo2.svg",
+      "type": "HHBA original non-real illustrative diagram",
+      "realPhoto": false,
       "republicationLicenseVerified": false
     }
   ],
