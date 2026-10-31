@@ -2,13 +2,13 @@ import type {TalentPolicyRecord} from './talentPolicyRecords.ts';
 /** 衢州 V5.1: version and source are explicit. */
 export const QUZHOU_POLICY_RECORDS:TalentPolicyRecord[]=[
   {
-    "id": "qz-2025-talent-service-strategy",
+    "id": "qz-2021-talent-service-strategy",
     "city": "衢州",
     "title": "衢州高层次人才津贴及住房补助制度与线上兑现规划",
     "category": "落户引进",
     "scope": "全市",
     "temporal": "historical",
-    "published": "2025-07-01",
+    "published": "2021",
     "sourceUrl": "https://zjjcmspublic.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/jcms_files/jcms1/web2771/site/attach/0/08924256c2b040d583a51c5aa87f5598.pdf",
     "sourceName": "衢州市发展改革系统公开人才政策服务行动规划",
     "summary": "官方规划列举高层次人才购房及租房补助、人才津贴、一次性奖励、博士后和新115人才工程，并推进津贴线上申报；未给出一刀切的统一金额或2026受理期。",
@@ -46,17 +46,17 @@ export const QUZHOU_POLICY_RECORDS:TalentPolicyRecord[]=[
     ]
   },
   {
-    "id": "qz-2025-housing-strategy",
+    "id": "qz-2021-housing-strategy",
     "city": "衢州",
     "title": "衢州市高层次人才购房与租房补助政策框架",
     "category": "租房安居",
     "scope": "全市",
     "temporal": "historical",
-    "published": "2025-07-01",
+    "published": "2021",
     "sourceUrl": "https://zjjcmspublic.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/jcms_files/jcms1/web2771/site/attach/0/08924256c2b040d583a51c5aa87f5598.pdf",
     "sourceName": "衢州市发展改革规划关于人才服务保障",
-    "summary": "政府规划确认衢州开展引进高层次人才购房及租房补助工作，但具体适用分类、金额、补贴年限和新受理公告不能由该规划推断。",
-    "benefit": "政府规划确认衢州开展引进高层次人才购房及租房补助工作，但具体适用分类、金额、补贴年限和新受理公告不能由该规划推断。",
+    "summary": "政府“十四五”规划确认衢州开展引进高层次人才购房及租房补助工作，但具体适用分类、金额、补贴年限和新受理公告不能由该规划推断。",
+    "benefit": "政府“十四五”规划确认衢州开展引进高层次人才购房及租房补助工作，但具体适用分类、金额、补贴年限和新受理公告不能由该规划推断。",
     "eligibility": "应先获得衢州对应人才身份认定，逐项核对本市或区县工作地、住房及就业社保条件和补贴互斥规则。",
     "application": "通过衢州人才服务及属地住房、人社部门查现行2026购租房补贴实施细则和申请系统事项；申报入口待核实。",
     "department": "衢州市发展改革规划关于人才服务保障",
