@@ -250,6 +250,9 @@ jobs:
       - name: Verify Tangshan V5.1 government policies, 2026 version guard and truthful housing
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-tangshan-city-v51.mjs
+      - name: Verify Chengde V5.1 official talent aid, 2025 housing, historical policies and no live vacancy claims
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-chengde-city-v51.mjs
       - name: Lock future city template, certify full policy guides and protect 95 historical record IDs
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
