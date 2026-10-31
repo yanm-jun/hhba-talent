@@ -318,3 +318,10 @@ check('Zhejiang 11 cities have actual policy and housing rows on the deployment 
   for(const x of [...p,...h])assert.ok(x.sourceUrl,city+' unsourced row');
  }
 });
+
+check('Anhui 16 cities must not deploy with empty policy or housing cards',()=>{
+ for(const city of ["合肥","芜湖","蚌埠","淮南","马鞍山","淮北","铜陵","安庆","黄山","滁州","阜阳","宿州","六安","亳州","池州","宣城"]){
+  assert.ok(TALENT_POLICY_RECORDS.some(p=>p.city===city&&p.id.startsWith('ah-')),city+' missing imported Anhui policies');
+  assert.ok(TALENT_HOUSING_RECORDS.some(h=>h.city===city&&h.id.startsWith('ah-')),city+' missing imported Anhui housing');
+ }
+});
