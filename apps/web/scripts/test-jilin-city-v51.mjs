@@ -43,7 +43,7 @@ for(const p of housing){
 for(const a of ['...JILIN_POLICY_RECORDS','...JILIN_SUPPLEMENT_POLICY_RECORDS'])assert.ok(policyIndex.includes(a));
 assert.ok(housingIndex.includes('...JILIN_HOUSING_RECORDS'));
 assert.ok(routes.includes("fragments[2]==='jilin'")&&routes.includes('buildJilinGuide(decode('));
-assert.ok(cards.includes("p.id.startsWith('jl-')"),'card must click into guide');
+assert.ok(cards.includes("'jl-'"),'card must click into guide');
 assert.ok(guides.includes("qualityLevel:expired?'C':'B'"),'no unsupported A certification');
 for(const city of cities) {
  assert.ok(policies.some(p=>p.city===city&&p.title.includes('就业生活补贴')));

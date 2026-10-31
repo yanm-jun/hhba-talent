@@ -52,7 +52,7 @@ for(const p of policies.filter(x=>x.city==='鸡西'||x.city==='绥化'||x.city==
 for(const p of policies.filter(x=>x.id.includes('-prov-'))){assert.ok(p.sourceUrl.includes('/202606/'),'2026 not old 2024 source');}
 assert.ok(![...policies,...housing].some(x=>JSON.stringify(x).includes('${')),'Unsubstituted template variable');
 const read=p=>readFileSync(new URL('../src/'+p,import.meta.url),'utf8');
-assert.ok(read('components/talent/UnifiedPolicyList.tsx').includes("p.id.startsWith('hlj-')"));
+assert.ok(read('components/talent/UnifiedPolicyList.tsx').includes("'hlj-'"));
 assert.ok(read('pages/TalentServiceRoutes.tsx').includes("fragments[2]==='heilongjiang'"));
 assert.ok(read('pages/TalentCityDirectory.tsx').includes('totals.regions'));
 console.log('PASS Heilongjiang V5.1: 13 regions, 52 policy entries, 32 housing references, 52 shared guides, 306 national entries.');

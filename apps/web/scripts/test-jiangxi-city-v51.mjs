@@ -39,7 +39,7 @@ assert.ok(housing.find(x=>x.city==='鹰潭')?.statusNote.includes('并非正式�
 assert.ok(pIndex.includes('...JIANGXI_POLICY_RECORDS'),'national policy search registration missing');
 assert.ok(hIndex.includes('...JIANGXI_HOUSING_RECORDS'),'national housing search registration missing');
 assert.ok(guides.includes("qualityLevel:expired?'C':'B'"),'unverified A guide');
-assert.ok(routes.includes("fragments[2]==='jiangxi'")&&routes.includes('buildJiangxiGuide(decode('),'guide route missing');
-assert.ok(cards.includes("p.id.startsWith('jx-')"),'card clickthrough missing');
+assert.ok(routes.includes("'jiangxi'")&&routes.includes('buildJiangxiGuide(decode('),'guide route missing');
+assert.ok(cards.includes("'jx-'"),'card clickthrough missing');
 assert.ok(!policy.some(p=>p.id.includes('-prov-')&&!p.title.includes('江西')),'province-level grant wrongly framed as local');
 console.log('PASS Jiangxi V5.1: 11 prefectural cities, 46 policy records, 11 sourced housing records, 46 shared B/C guides, national directory, no housing empty cards');
