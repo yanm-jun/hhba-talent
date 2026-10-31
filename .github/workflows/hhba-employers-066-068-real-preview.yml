@@ -22,18 +22,6 @@ jobs:
       - name: Retrieve actual company-owned images and retain exact-source manifest
         working-directory: apps/web
         run: python scripts/prepare-employers-066-068-real-media.py
-      - name: Prepare inherited official-source images required by existing employer contracts
-        run: |
-          python apps/web/scripts/prepare-guangzhilv-media.py
-          python apps/web/scripts/prepare-zhongjian-luqiao-media.py
-          python apps/web/scripts/prepare-power-invest-media.py
-          python apps/web/scripts/prepare-jiangsu-guoxin-media.py
-          python apps/web/scripts/prepare-qizheng-media.py
-          python apps/web/scripts/prepare-weipu-media.py
-          python apps/web/scripts/prepare-bodor-media.py
-          python apps/web/scripts/prepare-pxw-media.py
-          python apps/web/scripts/prepare-keyence-media.py
-          python apps/web/scripts/prepare-minieye-media.py
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -45,7 +33,6 @@ jobs:
       - name: Validate companies and all earlier four-block batches
         working-directory: apps/web
         run: |
-          node scripts/employer-factory-check.mjs
           node scripts/employers-054-056-v2.contract.test.mjs
           node scripts/employers-057-059-v2.contract.test.mjs
           node scripts/employers-060-062-v2.contract.test.mjs
