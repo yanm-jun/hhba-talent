@@ -28,5 +28,5 @@ assert.ok(routes.includes("const resultHomes=TALENT_HOUSING_RECORDS.filter(p=>p.
 // Other four were already research-only: do not silently promote secondary-source leads as A/B government verified housing projects.
 const research=src('talentHousingResearch.ts');
 assert.ok(research.includes('HEZE_HOUSING_RESEARCH_LEADS')&&research.includes('XINGTAI_HOUSING_RESEARCH_LEADS'),'retain research-only leads');
-assert.ok(research.includes('"city": "日照"')&&research.includes('"city": "聊城"'),'retain housing leads for the other two cities');
+assert.ok(/city\s*:\s*["']日照["']/.test(research)&&/city\s*:\s*["']聊城["']/.test(research),'retain housing leads for the other two cities');
 console.log('PASS housing-gap audit: 11 Guangdong empty entrances filled with government-source programs, four other cities continue to display openly labeled research leads, no fabricated vacancy claims');
