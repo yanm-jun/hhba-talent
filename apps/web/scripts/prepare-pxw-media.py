@@ -10,7 +10,7 @@ from urllib.request import urlopen,Request
 from io import BytesIO
 from PIL import Image,ImageOps
 from hashlib import sha256
-import json,time
+import json,time,subprocess
 out=Path(__file__).resolve().parents[1]/'public/images/employer-profiles/cn-autumn-034'
 out.mkdir(parents=True,exist_ok=True)
 items=[
@@ -27,6 +27,19 @@ items=[
   ('https://static2.xunxiang.site/uploads/sites/210/2025/03/20141639e41fdc4204c74239d287e422.jpg','https://www.pxwsemi.com/%E7%94%9F%E6%B4%BB%E4%B8%8E%E7%A6%8F%E5%88%A9')
  ])
 ]
+def fetch_https_verified(url,page):
+ """Try Python HTTPS first, then independent curl TLS for server-specific ECC errors.
+ Both methods verify certificates. Original source and independent PIL/SHA checks remain mandatory.
+ """
+ req=Request(url,headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36','Accept':'image/webp,image/png,image/jpeg,image/*','Referer':page})
+ try:
+  with urlopen(req,timeout=22) as response:return response.read(8_500_001)
+ except Exception as py_exc:
+  cmd=['curl','--fail','--silent','--show-error','--location','--http1.1','--max-time','28','--connect-timeout','10','--user-agent','Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36','--referer',page,'--header','Accept: image/webp,image/png,image/jpeg,image/*','--url',url]
+  result=subprocess.run(cmd,capture_output=True,timeout=34)
+  if result.returncode!=0:raise RuntimeError('Python HTTPS: '+str(py_exc)[:110]+'; curl TLS: '+result.stderr.decode('utf-8',errors='replace')[:200])
+  return result.stdout
+
 audit={}
 used=set()
 for filename,alternatives in items:
@@ -35,8 +48,7 @@ for filename,alternatives in items:
   if filename in audit:break
   for attempt in range(2):
    try:
-    req=Request(url,headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36','Accept':'image/webp,image/png,image/jpeg,image/*','Referer':page})
-    with urlopen(req,timeout=22) as response:raw=response.read(8_500_001)
+    raw=fetch_https_verified(url,page)
     if not 1800<len(raw)<8_500_000:raise ValueError('unexpected image bytes')
     hash=sha256(raw).hexdigest()
     if hash in used:raise ValueError('same image content reused')
