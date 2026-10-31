@@ -25,7 +25,9 @@
     "https://career.hebut.edu.cn/home/correcruit/content/id/79153.html",
     "https://career.nankai.edu.cn/correcruit/content/id/117925.html",
     "https://www.sz.gov.cn/cn/xxgk/zfxxgj/bmdt/content/mpost_10525622.html",
-    "https://www.eet-china.com/mp/a466733.html"
+    "https://www.eet-china.com/mp/a466733.html",
+    "https://www.pxwsemi.com/%E7%94%9F%E6%B4%BB%E4%B8%8E%E7%A6%8F%E5%88%A9",
+    "https://bbs.szhome.com/30-30430-detail-178644741.html"
   ],
   "media": {
     "logo": "images/employer-profiles/cn-autumn-034/logo.webp",
@@ -38,9 +40,9 @@
       },
       {
         "path": "images/employer-profiles/cn-autumn-034/photo2.jpg",
-        "caption": "鹏芯微 · 2023年项目建设现场",
-        "alt": "深圳市政府2023年调研鹏芯微项目建设现场的纪实照片",
-        "note": "图片来自深圳市政府门户网站2023年企业项目调研报道，是历史建设阶段实景，不代表当前厂区建设状态。"
+        "caption": "鹏芯微 · 员工活动实景（官网图片）",
+        "alt": "鹏芯微官网展示的员工活动和团队合影实拍照片",
+        "note": "图片来自鹏芯微官网《生活与福利》2025年企业活动相册；仅裁切原图中的单场活动，非AI生成或其他企业照片。"
       }
     ]
   },
@@ -70,7 +72,7 @@
     "工业工程",
     "工程管理"
   ],
-  "photoNote": "公司Logo使用官方校园招聘平台发布的PXW品牌图。两张不同的企业场景照片来自电子工程专辑和深圳市政府公开报道，并由静态构建脚本校验、保存为本地副本。图片无点击外跳，照片及商标权属各原权利人；HHBA非鹏芯微官方招聘代理。",
+  "photoNote": "Logo采用鹏芯微官方校园招聘入口发布的品牌图。两张照片分别为鹏芯微企业园区入口媒体实拍及公司官网员工活动实拍，均在GitHub Pages构建中保存独立本地文件和来源记录。照片不设置第三方点击跳转，版权归原权利人所有；HHBA不是官方招聘代理。",
   "business": [
     {
       "title": "晶圆代工与客户技术支持",
