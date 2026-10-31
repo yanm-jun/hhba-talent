@@ -181,6 +181,13 @@ jobs:
           test -s apps/web/public/images/employer-profiles/cn-autumn-033/photo2.jpg
           test -s apps/web/public/images/employer-profiles/cn-autumn-033/media-audit.json
           echo HHBA_BODOR_033_3_SOURCED_IMAGES_READY
+      - name: Prepare PXW 034 original logo and two independent company photos
+        run: |
+          python apps/web/scripts/prepare-pxw-media.py
+          test -s apps/web/public/images/employer-profiles/cn-autumn-034/logo.webp
+          test -s apps/web/public/images/employer-profiles/cn-autumn-034/photo1.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-034/photo2.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-034/media-audit.json
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
@@ -190,6 +197,9 @@ jobs:
       - name: Guard Bodor 033 factual jobs, screenshot style and logo/2 image provenance
         working-directory: apps/web
         run: node scripts/bodor-v2.contract.test.mjs
+      - name: Verify PXW 034 official job directions and photo provenance
+        working-directory: apps/web
+        run: node scripts/pxw-v2.contract.test.mjs
       - name: Validate source-backed talent policies and housing records
         working-directory: apps/web
         run: node scripts/audit-talent-service.mjs
@@ -733,6 +743,7 @@ jobs:
           done
           curl -fsS "$HHBA_TEST_BASE" >/dev/null
           node scripts/mainline-v2-browser.mjs
+          node scripts/pxw-v2.browser.mjs
           node scripts/study-universities.browser.mjs
           node scripts/minot-state.browser.mjs
           node scripts/south-dakota.browser.mjs
