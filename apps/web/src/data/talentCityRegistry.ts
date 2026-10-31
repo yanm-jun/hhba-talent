@@ -369,6 +369,7 @@ const GUANGDONG_CITY_INTROS:Readonly<Record<string,string>>={
  "河源": "河源2026阶段性新房购房补贴、粤东北地区毕业生就业支持与省级创业资助",
  "梅州": "梅州来梅创业人才最长6个月免费住宿制度、粤东北高校毕业生就业补贴；两类免费住宿资格不同"
 };
+const HUBEI_CITY_INTROS:Readonly<Record<string,string>>={"武汉":"武汉2026湖北省级就业创业、求职与青年安居政策入口；本市独立人才专项和住房房源逐条核验","黄石":"黄石2026毕业生住房储备金、公积金缴存奖励、钢友大厦青年社区交付和省级就业支持；实际余房待核","十堰":"十堰2026工匠人才培育与武当人才卡，湖北高校毕业生创业就业与住房制度","宜昌":"宜昌2026青年租房补贴、人才购房券分档及人才驿站制度；规划数量与在租空房分开","襄阳":"襄阳2026湖北省级青年创业求职社保补贴和住房制度，市级细则待继续核实","鄂州":"鄂州2026人才强企生活补贴、2026已停止发放的旧人才购房补贴与住房制度","荆门":"荆门2026湖北省级创业、困难求职、重点县域就业及安居保障，市级项目待核","孝感":"孝感2026湖北省级就业创业支持与住房制度，具体独立公寓及补贴受理窗口需核实","荆州":"荆州2025七小区1090套保租房历史公告、湖北2026省级就业创业支持；不可假定实时空房","黄冈":"黄冈2026湖北省级创业补贴及指定重点帮扶县就业补贴，县区政策适用边界要核实","咸宁":"咸宁2026武汉大学站引才招聘历史已截止，省级政策仍按属地规则办理","随州":"随州2026湖北省级创业就业、企业社保补贴及青年人才安居制度，实际市级专项待核","恩施":"湖北恩施土家族苗族自治州2026毕业生创业、困难求职、重点县域就业及青年安居政策；当地项目待核"};
 const prefectureLegacy=new Map(TALENT_LEGACY_CITIES.map(c=>[c.name,c]));
 function shortProvince(s:string){return s.replace(/维吾尔自治区|壮族自治区|回族自治区|自治区|省$/,'')}
 export const TALENT_PROVINCES=provinceRaw.trim().split('\n').map(v=>{const [code,official]=v.split('|');return {code,official,name:shortProvince(official)}});
@@ -384,7 +385,7 @@ export const TALENT_PREFECTURE_CITIES:TalentCity[]=prefectureRaw.trim().split('\
   photo:old?.photo||(name==='邢台'?'https://commons.wikimedia.org/wiki/Special:Redirect/file/Xingtai_Taihang_International_Convention_and_Exhibition_Center.jpg?width=1280':name==='石家庄'?'https://commons.wikimedia.org/wiki/Special:Redirect/file/Skyline_of_Shijiazhuang_2012.jpg?width=1280':undefined),
   credit:old?.credit||(name==='邢台'?'Wcr1993 · Wikimedia Commons':name==='石家庄'?'ping lin · CC0 · Wikimedia Commons':undefined),
   photoPage:old?.photoPage||(name==='邢台'?'https://commons.wikimedia.org/wiki/File:Xingtai_Taihang_International_Convention_and_Exhibition_Center.jpg':name==='石家庄'?'https://commons.wikimedia.org/wiki/File:Skyline_of_Shijiazhuang_2012.jpg':undefined),
-  aliases:[...new Set(aliases)],intro:province==='广东省'?(GUANGDONG_CITY_INTROS[name]||'广东省人才政策及住房基础资料正在持续核验'):old?.intro||(name==='沧州'?'已收录2025人才新政生活与购房补贴、人才公寓免租及岭贤府和经开区历史住房资料；2026办理入口与实时房源待核验':name==='邢台'?'已收录2026回邢来邢人才三年分期购房补贴、36个月租房补贴、就业支持及真实住房待核验线索':name==='石家庄'?'河北首站：市级B卡租购房补贴、毕业生一次性安家补贴、2026人才公寓与公租房历史项目':name==='日照'?'已收录青年人才补贴、先租后购住房优惠，并整理市级及高新区人才公寓历史资料':name==='枣庄'?'已收录2026青年就业创业补贴、首批高层次人才家园试点，另有薛城保租房和高新区公寓待核验线索':name==='聊城'?'已收录2026青年人才生活及社保补贴；人才住房三年免租和购房支持为2022历史政策，另有3处公寓或工程待核验线索':name==='承德'?'已收录2026年主导产业租房与一次性生活补助、燕赵英才卡、配售型保障住房以及京津科技人才公寓历史制度；具体空房和申报直达入口待核验':name==='秦皇岛'?'已收录秦皇岛经开区官方人才公寓政策及配租流程；锦绣佳成与科技大厦项目依据2025年报道列为待核验房源线索':name==='保定'?'已收录2026国控高新区四小区保租房与公积金租房提取制度，2022毕业生租购房补贴作为历史政策参考；284套为四小区批次总量，不是实时空房':'人才政策与住房资料正在逐步核验')};
+  aliases:[...new Set(aliases)],intro:province==='湖北省'?(HUBEI_CITY_INTROS[name]||'湖北青年人才政策及住房资料需核验'):province==='广东省'?(GUANGDONG_CITY_INTROS[name]||'广东省人才政策及住房基础资料正在持续核验'):old?.intro||(name==='沧州'?'已收录2025人才新政生活与购房补贴、人才公寓免租及岭贤府和经开区历史住房资料；2026办理入口与实时房源待核验':name==='邢台'?'已收录2026回邢来邢人才三年分期购房补贴、36个月租房补贴、就业支持及真实住房待核验线索':name==='石家庄'?'河北首站：市级B卡租购房补贴、毕业生一次性安家补贴、2026人才公寓与公租房历史项目':name==='日照'?'已收录青年人才补贴、先租后购住房优惠，并整理市级及高新区人才公寓历史资料':name==='枣庄'?'已收录2026青年就业创业补贴、首批高层次人才家园试点，另有薛城保租房和高新区公寓待核验线索':name==='聊城'?'已收录2026青年人才生活及社保补贴；人才住房三年免租和购房支持为2022历史政策，另有3处公寓或工程待核验线索':name==='承德'?'已收录2026年主导产业租房与一次性生活补助、燕赵英才卡、配售型保障住房以及京津科技人才公寓历史制度；具体空房和申报直达入口待核验':name==='秦皇岛'?'已收录秦皇岛经开区官方人才公寓政策及配租流程；锦绣佳成与科技大厦项目依据2025年报道列为待核验房源线索':name==='保定'?'已收录2026国控高新区四小区保租房与公积金租房提取制度，2022毕业生租购房补贴作为历史政策参考；284套为四小区批次总量，不是实时空房':'人才政策与住房资料正在逐步核验')};
 });
 /** 云南8个自治州：加入目录而不改变原293地级市基准，避免全局统计与既有测试失效。 */
 export const TALENT_YUNNAN_PREFECTURES:TalentCity[]=[
@@ -549,11 +550,13 @@ export const TALENT_YUNNAN_PREFECTURES:TalentCity[]=[
     "initials": "dq"
   }
 ] as TalentCity[];
+export const TALENT_HUBEI_PREFECTURE:TalentCity={name:'恩施',official:'恩施土家族苗族自治州',province:'湖北省',level:'prefecture',intro:HUBEI_CITY_INTROS['恩施'],aliases:['恩施','恩施州','恩施土家族苗族自治州','enshi','en shi','湖北恩施','湖北省恩施'],code:'422800',pinyin:'en shi',initials:'es'};
 const municipalityCode:Record<string,string>={北京:'110000',天津:'120000',上海:'310000',重庆:'500000'};
 export const TALENT_CITY_INDEX:TalentCity[]=[
  ...TALENT_MUNICIPALITIES.map(c=>({...c,code:municipalityCode[c.name]})),
  ...TALENT_PREFECTURE_CITIES,
- ...TALENT_YUNNAN_PREFECTURES
+ ...TALENT_YUNNAN_PREFECTURES,
+ TALENT_HUBEI_PREFECTURE
 ];
 const normalize=(text:string)=>text.trim().toLowerCase().replace(/[\s，。,.、·•\-]/g,'');
 export function findTalentProvince(input:string){

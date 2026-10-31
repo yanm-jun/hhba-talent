@@ -11,6 +11,7 @@ import {TAIZHOU_POLICY_RECORDS} from './taizhouPolicyRecords.ts';
 import {LISHUI_POLICY_RECORDS} from './lishuiPolicyRecords.ts';
 import {YUNNAN_POLICY_RECORDS} from './yunnanPolicyRecords.ts';
 import {JIANGSU_POLICY_RECORDS} from './jiangsuPolicyRecords.ts';
+import {HUBEI_POLICY_RECORDS} from './hubeiPolicyRecords.ts';
 import {GUANGDONG_POLICY_RECORDS} from './guangdongPolicyRecords.ts';
 import {GUANGDONG_EXPANDED_POLICY_RECORDS} from './guangdongExpandedPolicyRecords.ts';
 import {GUANGDONG_FINAL_CITIES_POLICY_RECORDS} from './guangdongFinalCitiesPolicyRecords.ts';
@@ -49,6 +50,7 @@ export type TalentPolicyRecord={
 };
 export const TALENT_POLICY_REVIEW_DATE='2026-10-30';
 export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
+ ...HUBEI_POLICY_RECORDS,
 ...YUNNAN_POLICY_RECORDS,
 ...HANGZHOU_POLICY_RECORDS,
 ...NINGBO_POLICY_RECORDS,
