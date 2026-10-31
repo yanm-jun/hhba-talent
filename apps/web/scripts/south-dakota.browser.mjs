@@ -9,11 +9,14 @@ const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 try{
  for(const width of [1440,390]){
   const page=await browser.newPage({viewport:{width,height:900},locale:'zh-CN'});
-  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  const errors=[];const requests=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push('console '+m.text())});page.on('response',r=>{if(r.status()>=400)requests.push(r.status()+' '+r.url())});
+  await page.goto(base,{waitUntil:'domcontentloaded',timeout:50000});
+  await page.waitForTimeout(500);
+  console.log('HHBA_USD_HOME_CHECK',JSON.stringify({url:page.url(),body:(await page.locator('body').innerText()).slice(0,260),scripts:await page.locator('script[src]').evaluateAll(xs=>xs.map(x=>x.src)),errors,requests}));
   await page.goto(base+'study-abroad/university/south-dakota',{waitUntil:'domcontentloaded',timeout:50000});
   const consent=page.getByRole('button',{name:'暂不同意'});if(await consent.isVisible().catch(()=>false))await consent.click();
   await page.waitForTimeout(1200);
-  console.log('HHBA_USD_BROWSER_DIAGNOSTIC',JSON.stringify({url:page.url(),body:(await page.locator('body').innerText()).slice(0,850),errors}));
+  console.log('HHBA_USD_BROWSER_DIAGNOSTIC',JSON.stringify({url:page.url(),body:(await page.locator('body').innerText()).slice(0,850),root:(await page.locator('#root').innerHTML().catch(()=>'' )).slice(0,550),title:await page.title(),scripts:await page.locator('script[src]').evaluateAll(xs=>xs.map(x=>x.src)),errors,requests}));
   await page.locator('[data-usd="longform"]').waitFor({state:'visible'});
   assert(await page.getByRole('heading',{name:'南达科他大学',exact:true}).isVisible());
   assert.equal(await page.locator('.hhba-minot-facts>div').count(),6);
