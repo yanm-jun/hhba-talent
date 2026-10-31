@@ -1,0 +1,323 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-036",
+  "name": "南芯科技",
+  "displayName": "南芯科技",
+  "englishName": "SOUTHCHIP",
+  "aliases": [
+    "上海南芯半导体科技股份有限公司",
+    "Southchip Semiconductor Technology (Shanghai) Co., Ltd.",
+    "Southchip",
+    "SOUTHCHIP",
+    "南芯半导体",
+    "南芯2027校园招聘",
+    "南芯科技688484"
+  ],
+  "industry": "半导体 · 模拟与嵌入式芯片 · 电源管理 · 汽车电子",
+  "subtitle": "上海南芯半导体科技股份有限公司 · 上交所科创板 688484 · 上海总部",
+  "overview": "南芯科技专注于模拟与嵌入式芯片的研发、设计和销售，覆盖高效电源转换、USB充电协议、电池管理、汽车电子、无线充电、微控制器、电机驱动及传感器等产品。公司总部位于上海，并在多个国内城市开展研发、市场与客户支持业务。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.southchip.com/",
+    "https://www.southchip.com/recruitment",
+    "https://www.southchip.com/contact-us",
+    "https://www.southchip.com/quality-reliability",
+    "https://www.southchip.com/case/case6",
+    "https://nanxin.zhiye.com/campus",
+    "https://nanxin.zhiye.com/campus/detail?jobAdId=115e468b-f27d-4926-931b-acce146f5748",
+    "https://nanxin.zhiye.com/campus/detail?jobAdId=5fc7f9db-60d4-412c-95fb-85502dcb4484",
+    "https://nanxin.zhiye.com/campus/detail?jobAdId=f12e622a-e10a-4e0e-bb24-6bd806ee1382",
+    "https://nanxin.zhiye.com/campus/detail?jobAdId=e5522075-dd45-4e8b-b192-dd7406a6e81d",
+    "https://nanxin.zhiye.com/campus/detail?jobAdId=f2f69375-3fbc-4daa-9fc1-29d2276e7c29",
+    "https://nanxin.zhiye.com/campus/detail?jobAdId=0f7ba85c-cae5-4699-8c3b-06a1f08b41db",
+    "https://nanxin.zhiye.com/campus/detail?jobAdId=293e405a-bd27-44ff-b8ac-2f95a0bd8cb9"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-036/logo.webp",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-036/photo1.jpg",
+        "caption": "南芯科技 · 官网芯片应用图",
+        "alt": "南芯科技官方发布的SOUTHCHIP芯片产品应用形象图",
+        "note": "来自南芯科技官网客户案例的企业产品宣传图；属于品牌视觉/产品示意，不是办公实拍。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-036/photo2.jpg",
+        "caption": "南芯科技 · 2026年行业展会实景",
+        "alt": "南芯科技在2026年行业展会的展台及观展人群实拍",
+        "note": "来自半导体行业媒体对2026年南芯科技展会的报道；为活动现场实拍，不能视为公司总部照片。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://nanxin.zhiye.com/campus",
+    "label": "南芯科技2027届校园招聘官网",
+    "status": "official_portal",
+    "subject": "上海南芯半导体科技股份有限公司",
+    "note": "依据南芯科技官方2027校招岗位详情整理7条可追溯职位记录；岗位曾在2026年公开发布，站内不保证实时剩余名额，具体投递状态以官方平台为准。"
+  },
+  "majorIntro": "7条职位逐条关联官方公布的专业和岗位能力，选择专业方向后仅显示相关职位。跨学科专业映射仅作检索参考，不代表满足官方报名条件。",
+  "preferredMajors": [
+    "微电子科学与工程",
+    "集成电路科学与工程",
+    "集成电路设计与集成系统",
+    "电子科学与技术",
+    "电子信息工程",
+    "电气工程及其自动化",
+    "自动化",
+    "通信工程",
+    "计算机科学与技术",
+    "机械工程",
+    "材料科学与工程",
+    "物理学"
+  ],
+  "photoNote": "企业Logo选用可核验的南芯科技SOUTHCHIP品牌图；配图为南芯官网发布的产品应用视觉及媒体拍摄的南芯企业展台实景，分别标明性质和来源，不冒充办公楼照片。图片无第三方跳转；商标与图片权属原权利人，HHBA并非企业官方招聘代理。",
+  "business": [
+    {
+      "title": "DC-DC与高效电源转换",
+      "description": "覆盖升降压及多种电源变换产品，为消费电子、工业系统及汽车电子提供高效率供电设计支持。",
+      "tags": "DC-DC · 电源转换",
+      "details": [
+        "Buck、Boost与升降压电源产品系列",
+        "高效率和低待机功耗方案",
+        "便携设备和工业电源适配"
+      ]
+    },
+    {
+      "title": "AC-DC与智能算力供电",
+      "description": "通过AC-DC电源平台和多相供电产品为服务器周边、算力终端与工业设备提供电源转换方案。",
+      "tags": "AC-DC · DrMOS · AI算力",
+      "details": [
+        "PFC与LLC组合电源架构",
+        "面向算力芯片的多相供电",
+        "高功率密度和系统效率设计"
+      ]
+    },
+    {
+      "title": "电池管理与充电协议",
+      "description": "覆盖电池充电、保护、USB电源与协议管理，服务手机、笔记本电脑与储能类产品。",
+      "tags": "充电管理 · 电池管理 · USB",
+      "details": [
+        "快充及电池充电管理芯片",
+        "USB供电与接口协议方案",
+        "可靠性和系统安全设计"
+      ]
+    },
+    {
+      "title": "汽车电子与车规电源",
+      "description": "提供车规级电源转换与电源驱动解决方案，适配车载电子架构及48V等电气系统。",
+      "tags": "车规级 · 48V · 座舱",
+      "details": [
+        "车用高压转低压电源设计",
+        "车规产品测试与可靠性要求",
+        "智能座舱配套供电与驱动"
+      ]
+    },
+    {
+      "title": "MCU、马达驱动和传感器",
+      "description": "在微控制器、电机驱动及磁传感方向布局产品，服务机器人、工业控制和消费类电子设备。",
+      "tags": "MCU · 电机驱动 · Sensor",
+      "details": [
+        "高集成电机控制及驱动方案",
+        "霍尔及电流等传感器产品",
+        "多设备场景嵌入式系统"
+      ]
+    },
+    {
+      "title": "芯片设计、验证与量产支持",
+      "description": "贯穿模拟/数字IC研发、器件工艺、封装设计、质量验证及现场应用工程，为芯片产品交付提供协作支撑。",
+      "tags": "模拟IC · 数字IC · 工程服务",
+      "details": [
+        "IC设计、验证与EDA工具应用",
+        "半导体器件、封装和工艺验证",
+        "FAE客户技术支持与产品导入"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "j11276",
+      "title": "2027校招模拟IC设计工程师",
+      "city": "上海、成都、北京、深圳、南京、西安、杭州",
+      "category": "芯片设计",
+      "url": "https://nanxin.zhiye.com/campus/detail?jobAdId=115e468b-f27d-4926-931b-acce146f5748",
+      "evidenceUrl": "https://nanxin.zhiye.com/campus/detail?jobAdId=115e468b-f27d-4926-931b-acce146f5748",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海南芯半导体科技股份有限公司",
+      "summary": "参与模拟及混合信号芯片电路的设计与验证，与版图、测试及系统团队协同完成芯片开发工作。",
+      "requirements": "官方岗位要求具备模拟电路及半导体器件基础，了解Simplis、Cadence等EDA工具，能够分析电路问题并配合跨团队验证；学历和具体专业限制请以该职位原文及投递页面为准。",
+      "majorNames": [
+        "微电子科学与工程",
+        "集成电路设计与集成系统",
+        "电子科学与技术"
+      ],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以官网单岗为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11278",
+      "title": "2027校招数字IC设计工程师",
+      "city": "北京、上海、南京、深圳、珠海、成都、西安",
+      "category": "芯片设计",
+      "url": "https://nanxin.zhiye.com/campus/detail?jobAdId=5fc7f9db-60d4-412c-95fb-85502dcb4484",
+      "evidenceUrl": "https://nanxin.zhiye.com/campus/detail?jobAdId=5fc7f9db-60d4-412c-95fb-85502dcb4484",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海南芯半导体科技股份有限公司",
+      "summary": "参与数字电路逻辑设计、功能验证、综合时序分析与后端实现，配合测试及FPGA验证，提高芯片研发交付质量。",
+      "requirements": "官方页面写明本科以上、硕士优先，涉及通信、微电子、电子信息、计算机、电气、自动化相关专业。岗位涉及综合、功耗、P&R及DFT/ATPG流程；是否开放以官方系统为准。",
+      "majorNames": [
+        "微电子科学与工程",
+        "集成电路设计与集成系统",
+        "电子信息工程",
+        "计算机科学与技术"
+      ],
+      "editorialRelatedMajors": [
+        "通信工程",
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科以上 · 硕士优先（官方JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11486",
+      "title": "2027校招数字验证工程师",
+      "city": "西安、成都、上海、珠海、深圳、北京",
+      "category": "芯片设计",
+      "url": "https://nanxin.zhiye.com/campus/detail?jobAdId=f12e622a-e10a-4e0e-bb24-6bd806ee1382",
+      "evidenceUrl": "https://nanxin.zhiye.com/campus/detail?jobAdId=f12e622a-e10a-4e0e-bb24-6bd806ee1382",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海南芯半导体科技股份有限公司",
+      "summary": "围绕数字电路功能、时序及测试覆盖进行验证，配合芯片设计与后端团队开展综合、FPGA验证及测试流程。",
+      "requirements": "官方职位强调数字电路验证、后端时序和测试流程，本科以上、硕士优先；关联通信、微电子、电子信息及计算机等专业。本站仅按公开岗位描述建立专业映射，不以此替代企业资格审核。",
+      "majorNames": [
+        "微电子科学与工程",
+        "集成电路设计与集成系统",
+        "电子信息工程"
+      ],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "通信工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科以上 · 硕士优先（官方JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11477",
+      "title": "2027校招器件开发工程师",
+      "city": "上海",
+      "category": "器件与工艺",
+      "url": "https://nanxin.zhiye.com/campus/detail?jobAdId=e5522075-dd45-4e8b-b192-dd7406a6e81d",
+      "evidenceUrl": "https://nanxin.zhiye.com/campus/detail?jobAdId=e5522075-dd45-4e8b-b192-dd7406a6e81d",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海南芯半导体科技股份有限公司",
+      "summary": "参与BCD相关工艺器件的版图设计、TCAD仿真、工艺选型与技术问题分析，支持研发项目及量产良率改进。",
+      "requirements": "官方职位明确微电子相关专业、硕士及以上学历，期望能够使用Virtuoso或Laker版图工具及Sentaurus仿真工具，并理解MOS、BJT、LDMOS等器件。具体投递资格以原职位最新展示为准。",
+      "majorNames": [
+        "微电子科学与工程",
+        "集成电路科学与工程"
+      ],
+      "editorialRelatedMajors": [
+        "电子科学与技术",
+        "物理学",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上（官方JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11465",
+      "title": "2027校招硬件算法工程师",
+      "city": "上海、南京、成都、西安",
+      "category": "算法与控制",
+      "url": "https://nanxin.zhiye.com/campus/detail?jobAdId=f2f69375-3fbc-4daa-9fc1-29d2276e7c29",
+      "evidenceUrl": "https://nanxin.zhiye.com/campus/detail?jobAdId=f2f69375-3fbc-4daa-9fc1-29d2276e7c29",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海南芯半导体科技股份有限公司",
+      "summary": "研究电源控制、电机驱动、姿态控制、音频信号及传感器相关硬件算法，开展系统建模、仿真并支持芯片化验证。",
+      "requirements": "官方职位写明硕士及以上或优秀本科，专业涉及电气工程、自动化、机械工程及自动化、电子信息、微电子。需要控制理论或信号处理基础，熟悉MATLAB或C/Python仿真环境；学校专业匹配不等于录用保证。",
+      "majorNames": [
+        "电气工程及其自动化",
+        "自动化",
+        "电子信息工程"
+      ],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "控制科学与工程",
+        "微电子科学与工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上或优秀本科（官方JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11369",
+      "title": "2027校招封装工程师",
+      "city": "上海",
+      "category": "封装与产品",
+      "url": "https://nanxin.zhiye.com/campus/detail?jobAdId=0f7ba85c-cae5-4699-8c3b-06a1f08b41db",
+      "evidenceUrl": "https://nanxin.zhiye.com/campus/detail?jobAdId=0f7ba85c-cae5-4699-8c3b-06a1f08b41db",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海南芯半导体科技股份有限公司",
+      "summary": "与封装供应商和研发团队合作，对新产品封装方案、物料选择、工艺验证和可靠性风险进行评估，并参与量产导入及异常改善。",
+      "requirements": "官方职位要求本科或以上，电子、微电子相关背景，了解集成电路生产制造与测试过程，并具备跨部门协作能力；岗位还对英语能力提出要求。具体以官方JD及投递系统为准。",
+      "majorNames": [
+        "微电子科学与工程",
+        "电子科学与技术",
+        "集成电路设计与集成系统"
+      ],
+      "editorialRelatedMajors": [
+        "材料科学与工程",
+        "电子信息工程",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（官方JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11375",
+      "title": "2027校招现场应用工程师",
+      "city": "上海、深圳、北京",
+      "category": "系统应用与技术支持",
+      "url": "https://nanxin.zhiye.com/campus/detail?jobAdId=293e405a-bd27-44ff-b8ac-2f95a0bd8cb9",
+      "evidenceUrl": "https://nanxin.zhiye.com/campus/detail?jobAdId=293e405a-bd27-44ff-b8ac-2f95a0bd8cb9",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海南芯半导体科技股份有限公司",
+      "summary": "面向客户开展电源芯片方案调试和应用支持，分析实际电路问题、审查参考设计，并协同销售与研发推进产品导入。",
+      "requirements": "官方职位明确本科及以上、电子相关专业，要求电路知识、实操调试能力、PCB绘图软件经验和良好的技术沟通能力。岗位涉及客户现场支持，但具体出差安排及投递状态仍应以官方页面为准。",
+      "majorNames": [
+        "电子信息工程",
+        "电气工程及其自动化",
+        "电子科学与技术"
+      ],
+      "editorialRelatedMajors": [
+        "自动化",
+        "通信工程",
+        "微电子科学与工程",
+        "市场营销"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（官方JD）",
+      "currentOpenVerified": false
+    }
+  ]
+}
