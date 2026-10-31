@@ -1,0 +1,242 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-052",
+  "name": "宏川集团",
+  "displayName": "宏川集团",
+  "englishName": "Hongchuan Group",
+  "aliases": [
+    "广东宏川集团有限公司",
+    "宏川智慧",
+    "广东宏川智慧物流股份有限公司",
+    "GR Group",
+    "Hongchuan Smart"
+  ],
+  "industry": "石化仓储物流 · 码头罐区 · 化工供应链 · 贸易与新能源",
+  "subtitle": "广东宏川集团有限公司 · 广东东莞 · 成立于1993年",
+  "overview": "宏川集团总部位于东莞松山湖，围绕石化品罐区储运、供应链服务、服务型贸易、供应链金融、电子交易平台和能源终端管理发展，旗下有上市公司宏川智慧（002930.SZ）。2027年‘川承人’校招公开营销、运营、职能、算力、海外业务五类培养方向，并未公开每条具体JD，本站按方向展示不虚构逐岗要求。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://grgroup.cc/",
+    "https://grgroup.cc/about.html",
+    "https://www.grgroup.cc/human/005002.html",
+    "https://www.wondercv.com/xiaozhao/hongchuan-group-2027-campus-recruitment-19831-46bb8d/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-052/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-052/photo1.jpg",
+        "caption": "宏川集团 · 化工品码头储运业务",
+        "alt": "宏川集团官方发布的石化储罐码头或集团实景图",
+        "note": "来自宏川集团自身官方网站的业务现场或服务展示图。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-052/photo2.jpg",
+        "caption": "宏川集团 · 供应链及港口储罐",
+        "alt": "宏川集团另一张独立官网仓储罐区或企业业务图片",
+        "note": "使用不同于第一张的集团官方业务图，图片本地保存不跳转。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.grgroup.cc/human/005002.html",
+    "label": "宏川集团官方招聘页（2027校招公众号入口）",
+    "status": "official_portal",
+    "subject": "广东宏川集团有限公司",
+    "note": "公司2027校招5个方向来自2026-10-28公开汇总，投递入口主要是‘宏川招聘’官方公众号；此官网网页有历史社会招聘信息，不能将2025年历史社会岗位当作2027届职位。"
+  },
+  "majorIntro": "专业关联按五个正式校招大方向筛选；专业适配仅为参考，不代表所有方向已发布逐岗任职条件。",
+  "preferredMajors": [
+    "物流管理",
+    "供应链管理",
+    "化学工程与工艺",
+    "安全工程",
+    "市场营销",
+    "国际经济与贸易",
+    "财务管理",
+    "会计学",
+    "法学",
+    "计算机科学与技术",
+    "软件工程",
+    "英语"
+  ],
+  "photoNote": "集团官方标识及两张不同的业务现场图应从广东宏川集团网站取得；不可把上市子公司‘宏川智慧’的商标直接冒充‘宏川集团’Logo。",
+  "business": [
+    {
+      "title": "石化仓储物流",
+      "description": "依托专业储罐、码头和仓储基础设施向化工、能源客户提供液体仓储和转运服务。",
+      "tags": "码头 · 储罐",
+      "details": [
+        "液体化学品储罐服务",
+        "港口卸货与装运",
+        "库区安全和计量管理"
+      ]
+    },
+    {
+      "title": "集成供应链服务",
+      "description": "通过仓储网络和多式联运协作，提供客户仓储、配送及供应链综合管理能力。",
+      "tags": "供应链 · 物流",
+      "details": [
+        "多地点仓储网络协同",
+        "化工产品运输衔接",
+        "客户库存与配送计划"
+      ]
+    },
+    {
+      "title": "服务型化工贸易",
+      "description": "为化工品及能源客户提供产品采购、销售协同与一体化服务型贸易。",
+      "tags": "贸易 · 石化品",
+      "details": [
+        "供应商采购与客户经营",
+        "贸易履约和风险管理",
+        "仓储交易一体化服务"
+      ]
+    },
+    {
+      "title": "供应链金融",
+      "description": "结合真实商品交付与仓储资产提供供应链金融及商业保理服务。",
+      "tags": "金融 · 保理",
+      "details": [
+        "应收账款与保理协作",
+        "贸易融资场景支持",
+        "客户信用风险管理"
+      ]
+    },
+    {
+      "title": "油站与新能源终端",
+      "description": "围绕连锁油站、汽车能源终端以及光伏新能源方向进行产业投资与运营。",
+      "tags": "能源 · 终端",
+      "details": [
+        "连锁油站服务",
+        "新能源场景探索",
+        "运营与数字化协作"
+      ]
+    },
+    {
+      "title": "科技与数字供应链",
+      "description": "通过业务数据、信息系统和供应链服务创新提升仓储与贸易协同能力。",
+      "tags": "技术 · 信息化",
+      "details": [
+        "业务系统与数据平台",
+        "智能仓储及安全管理",
+        "电子交易与客户服务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "marketing",
+      "title": "营销方向（川承人计划）",
+      "category": "市场与销售",
+      "city": "北京／沧州／上海／南京／常州／苏州／南通／东莞／中山（具体方向地点待核对）",
+      "summary": "围绕化工供应链和仓储客户开发、营销项目支持、商务协作与合同流程参与培养。",
+      "requirements": "公开的2027届‘川承人’公告确认此项招聘方向、面向本科或硕士应届毕业生，但没有为该方向提供独立完整JD或逐岗专业限制。所列专业是HHBA按业务进行的相关性建议，并非公司逐项录用门槛。网申时间为2026年11月1日至12月30日，以‘宏川招聘’官方公众号为准。",
+      "majorNames": [
+        "市场营销",
+        "国际经济与贸易",
+        "化学工程与工艺"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科／硕士 · 单岗要求待核实",
+      "url": "https://www.grgroup.cc/human/005002.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hongchuan-group-2027-campus-recruitment-19831-46bb8d/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东宏川集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "operation",
+      "title": "运营方向（川承人计划）",
+      "category": "仓储运营与供应链",
+      "city": "北京／沧州／上海／南京／常州／苏州／南通／东莞／中山（具体方向地点待核对）",
+      "summary": "参与液体化学品罐区、码头、仓储或供应链运营管理的轮岗与现场安全协作。",
+      "requirements": "公开的2027届‘川承人’公告确认此项招聘方向、面向本科或硕士应届毕业生，但没有为该方向提供独立完整JD或逐岗专业限制。所列专业是HHBA按业务进行的相关性建议，并非公司逐项录用门槛。网申时间为2026年11月1日至12月30日，以‘宏川招聘’官方公众号为准。",
+      "majorNames": [
+        "物流管理",
+        "供应链管理",
+        "化学工程与工艺",
+        "安全工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科／硕士 · 单岗要求待核实",
+      "url": "https://www.grgroup.cc/human/005002.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hongchuan-group-2027-campus-recruitment-19831-46bb8d/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东宏川集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "functions",
+      "title": "职能方向（川承人计划）",
+      "category": "综合职能",
+      "city": "北京／沧州／上海／南京／常州／苏州／南通／东莞／中山（具体方向地点待核对）",
+      "summary": "围绕财务、法务、人力和集团行政职能接受管理培训，具体职能按正式岗位安排。",
+      "requirements": "公开的2027届‘川承人’公告确认此项招聘方向、面向本科或硕士应届毕业生，但没有为该方向提供独立完整JD或逐岗专业限制。所列专业是HHBA按业务进行的相关性建议，并非公司逐项录用门槛。网申时间为2026年11月1日至12月30日，以‘宏川招聘’官方公众号为准。",
+      "majorNames": [
+        "财务管理",
+        "会计学",
+        "人力资源管理",
+        "法学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科／硕士 · 单岗要求待核实",
+      "url": "https://www.grgroup.cc/human/005002.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hongchuan-group-2027-campus-recruitment-19831-46bb8d/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东宏川集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "computing",
+      "title": "算力方向（川承人计划）",
+      "category": "计算技术与数据",
+      "city": "北京／沧州／上海／南京／常州／苏州／南通／东莞／中山（具体方向地点待核对）",
+      "summary": "聚焦信息技术、算力基础设施或业务数据平台方向，公开资料未披露具体职位名称及技能要求。",
+      "requirements": "公开的2027届‘川承人’公告确认此项招聘方向、面向本科或硕士应届毕业生，但没有为该方向提供独立完整JD或逐岗专业限制。所列专业是HHBA按业务进行的相关性建议，并非公司逐项录用门槛。网申时间为2026年11月1日至12月30日，以‘宏川招聘’官方公众号为准。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "数据科学与大数据技术",
+        "人工智能"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科／硕士 · 单岗要求待核实",
+      "url": "https://www.grgroup.cc/human/005002.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hongchuan-group-2027-campus-recruitment-19831-46bb8d/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东宏川集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "overseas",
+      "title": "海外业务方向（川承人计划）",
+      "category": "国际业务",
+      "city": "北京／沧州／上海／南京／常州／苏州／南通／东莞／中山（具体方向地点待核对）",
+      "summary": "支持跨境化工仓储、国际客户协调及海外业务拓展方向的培养，具体工作地点须官方核对。",
+      "requirements": "公开的2027届‘川承人’公告确认此项招聘方向、面向本科或硕士应届毕业生，但没有为该方向提供独立完整JD或逐岗专业限制。所列专业是HHBA按业务进行的相关性建议，并非公司逐项录用门槛。网申时间为2026年11月1日至12月30日，以‘宏川招聘’官方公众号为准。",
+      "majorNames": [
+        "国际经济与贸易",
+        "英语",
+        "商务英语",
+        "物流管理"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科／硕士 · 单岗要求待核实",
+      "url": "https://www.grgroup.cc/human/005002.html",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hongchuan-group-2027-campus-recruitment-19831-46bb8d/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广东宏川集团有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}
