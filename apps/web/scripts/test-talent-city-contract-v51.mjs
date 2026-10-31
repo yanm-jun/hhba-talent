@@ -308,3 +308,13 @@ check('Baoding V5.1: official 2026 four-community rental allocation and historic
  assert.equal(ACCEPTED_TALENT_CITIES.includes(city),false);
 });
 console.log(JSON.stringify({passed,baseline:base.policyIds.length+base.housingIds.length,certified:Object.keys(CERTIFIED_TALENT_GUIDES).length,acceptedCities:ACCEPTED_TALENT_CITIES.length},null,2));
+
+check('Zhejiang 11 cities have actual policy and housing rows on the deployment branch',()=>{
+ const cities=['杭州','宁波','温州','嘉兴','湖州','绍兴','金华','衢州','舟山','台州','丽水'];
+ for(const city of cities){
+  const p=TALENT_POLICY_RECORDS.filter(x=>x.city===city),h=TALENT_HOUSING_RECORDS.filter(x=>x.city===city);
+  assert.ok(p.length>0,city+' zero policy rows; missing branch merge?');
+  assert.ok(h.length>0,city+' zero housing rows; missing branch merge?');
+  for(const x of [...p,...h])assert.ok(x.sourceUrl,city+' unsourced row');
+ }
+});

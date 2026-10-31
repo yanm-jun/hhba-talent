@@ -1,3 +1,14 @@
+import {HANGZHOU_POLICY_RECORDS} from './hangzhouPolicyRecords.ts';
+import {NINGBO_POLICY_RECORDS} from './ningboPolicyRecords.ts';
+import {WENZHOU_POLICY_RECORDS} from './wenzhouPolicyRecords.ts';
+import {JIAXING_POLICY_RECORDS} from './jiaxingPolicyRecords.ts';
+import {HUZHOU_POLICY_RECORDS} from './huzhouPolicyRecords.ts';
+import {SHAOXING_POLICY_RECORDS} from './shaoxingPolicyRecords.ts';
+import {JINHUA_POLICY_RECORDS} from './jinhuaPolicyRecords.ts';
+import {QUZHOU_POLICY_RECORDS} from './quzhouPolicyRecords.ts';
+import {ZHOUSHAN_POLICY_RECORDS} from './zhoushanPolicyRecords.ts';
+import {TAIZHOU_POLICY_RECORDS} from './taizhouPolicyRecords.ts';
+import {LISHUI_POLICY_RECORDS} from './lishuiPolicyRecords.ts';
 import {JIANGSU_POLICY_RECORDS} from './jiangsuPolicyRecords.ts';
 import {GUANGDONG_POLICY_RECORDS} from './guangdongPolicyRecords.ts';
 import {GUANGDONG_EXPANDED_POLICY_RECORDS} from './guangdongExpandedPolicyRecords.ts';
@@ -37,6 +48,17 @@ export type TalentPolicyRecord={
 };
 export const TALENT_POLICY_REVIEW_DATE='2026-10-30';
 export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
+...HANGZHOU_POLICY_RECORDS,
+...NINGBO_POLICY_RECORDS,
+...WENZHOU_POLICY_RECORDS,
+...JIAXING_POLICY_RECORDS,
+...HUZHOU_POLICY_RECORDS,
+...SHAOXING_POLICY_RECORDS,
+...JINHUA_POLICY_RECORDS,
+...QUZHOU_POLICY_RECORDS,
+...ZHOUSHAN_POLICY_RECORDS,
+...TAIZHOU_POLICY_RECORDS,
+...LISHUI_POLICY_RECORDS,
 ...GUANGXI_POLICY_RECORDS,
 ...GUANGXI_MUNICIPAL_POLICY_RECORDS,
 ...JIANGSU_POLICY_RECORDS,
