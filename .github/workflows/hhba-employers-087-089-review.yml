@@ -1,0 +1,106 @@
+name: HHBA employers 087-089 independent source-backed review
+on:
+  push:
+    branches: [feature/employers-087-089-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-employers-087-089-review
+  cancel-in-progress: true
+jobs:
+  static-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install media content inspection library
+        run: python -m pip install --quiet Pillow
+      - name: Source original company photos and verify identity, dimensions, SHA256
+        working-directory: apps/web
+        run: python scripts/prepare-employers-087-089-photo-evidence.py
+      - name: Package verified 087-089 corporate identification wordmarks with trademark audit
+        working-directory: apps/web
+        run: python scripts/prepare-employers-087-089-logo-references.py
+      - name: Repackage inherited 084-086 photos and logo-source evidence
+        working-directory: apps/web
+        run: |
+          python scripts/prepare-employers-084-086-photo-evidence.py
+          python scripts/prepare-employers-084-086-logos.py
+      - name: Repackage inherited 081-083 imagery
+        working-directory: apps/web
+        run: |
+          python scripts/prepare-employers-081-083-photo-evidence.py
+          python scripts/prepare-employers-081-083-logos.py
+      - name: Repackage inherited 078-080 imagery
+        working-directory: apps/web
+        run: python scripts/prepare-employers-078-080-source-media.py
+      - name: Repackage inherited 072-074 imagery
+        working-directory: apps/web
+        run: python scripts/prepare-employers-072-074-sourced-media.py
+      - name: Repackage inherited 069-071 imagery
+        working-directory: apps/web
+        run: python scripts/prepare-employers-069-071-source-media.py
+      - name: Repackage inherited 066-068 imagery
+        working-directory: apps/web
+        run: python scripts/prepare-employers-066-068-real-media.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install pinned dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: All ten prior company batches plus 087-089, search and outbound security
+        working-directory: apps/web
+        run: |
+          for id in 054-056 057-059 060-062 063-065 066-068 069-071 072-074 075-077 078-080 081-083 084-086 087-089; do
+            node "scripts/employers-$id-v2.contract.test.mjs"
+          done
+          node scripts/employer-job-level-search.contract.test.mjs
+          node scripts/recruitment-market-source-invalid.regression.test.mjs
+      - name: Compile approved V2 layout and create direct routes without deploying Pages
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: |
+          npm run build
+          node scripts/materialize-company-route-entries.mjs
+      - name: Check every new company direct link and independent source evidence assets
+        run: |
+          test -s apps/web/dist/index.html
+          for id in 087 088 089; do
+            test -s "apps/web/dist/companies/autumn/cn-autumn-$id/index.html"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/photo1.svg"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/photo2.svg"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/media-sources.json"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/logo.svg"
+          done
+      - name: Preserve three-company photo provenance and copyright warnings
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-087-089-media-source-rights-audit
+          path: |
+            apps/web/public/images/employer-profiles/cn-autumn-087/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-088/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-089/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-087/logo-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-088/logo-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-089/logo-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-084/logo-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-085/logo-sources.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Upload complete independently reviewable static site (never deploy to main Pages)
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-employers-087-089-independent-static-review
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error

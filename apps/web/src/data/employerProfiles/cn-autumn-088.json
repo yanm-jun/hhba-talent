@@ -1,0 +1,569 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-088",
+  "name": "森马",
+  "displayName": "浙江森马服饰股份有限公司",
+  "englishName": "Semir Apparel",
+  "aliases": [
+    "森马服饰",
+    "浙江森马服饰",
+    "Semir",
+    "Semir Group",
+    "巴拉巴拉",
+    "Balabala",
+    "森马2027",
+    "森马良驹行动"
+  ],
+  "industry": "服饰零售 · 童装设计 · 电商直播 · 商品企划 · 跨境运营",
+  "subtitle": "森马服饰 · 上海、杭州、温州三个招聘区域",
+  "overview": "森马服饰是中国多品牌服饰经营企业，主要自主品牌包括森马与巴拉巴拉。2026年10月温州大学、汉口学院对2027校园招聘有公开记录，具体岗位覆盖温州跨境电商、商品计划、物流、设计及上海杭州服饰、商品和线上零售相关岗位。温州校招包含温州本地多项跨境/家具业务岗位，不能把它们与上海品牌服装设计岗混为一个招聘主体或工作城市。",
+  "lastReviewed": "2026-11-01",
+  "sources": [
+    "https://job.wzu.edu.cn/teachin/view?id=78034",
+    "https://hkxy.91wllm.cn/teachin/view/id/250801",
+    "https://xiaozhaobao.com.cn/company/sen-ma-fu-shi",
+    "https://www.semir.com/join-us.html",
+    "https://app.mokahr.com/su/zdhegf"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-088/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-088/photo1.svg",
+        "caption": "森马服饰业务示意（非企业实景）",
+        "alt": "森马业务场景编辑示意，不是实际企业照片",
+        "note": "非实景：原始SVG用于未取得照片的占位。CI仅在确认森马所属项目真实设施、原图尺寸与SHA256后使用实拍；原作者版权和商业授权另行核查。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-088/photo2.svg",
+        "caption": "森马服饰业务示意（非企业实景）",
+        "alt": "森马业务场景编辑示意，不是实际企业照片",
+        "note": "非实景：原始SVG用于未取得照片的占位。CI仅在确认森马所属项目真实设施、原图尺寸与SHA256后使用实拍；原作者版权和商业授权另行核查。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://app.mokahr.com/su/zdhegf",
+    "label": "森马2027校招官方指定Moka申请入口",
+    "status": "official_portal",
+    "subject": "浙江森马服饰股份有限公司2027届及相关事业部（逐岗位核对）",
+    "note": "汉口学院高校宣讲页确认官方Moka入口。温州大学2026-10-29宣讲已经举行；第三方部分校招聚合信息标10月31日截止，不能认定全部20条均同一截至日期或仍可申请。"
+  },
+  "majorIntro": "按不同工作城市与公开来源分开收录温州高校直接公示的10条、上海杭州2027校招聚合索引10条。专业建议不等于官方招录许可；温州公示有本科及具体学科/专业不限信息，上海杭州资质须逐岗核实。",
+  "preferredMajors": [
+    "服装与服饰设计",
+    "服装设计与工程",
+    "视觉传达设计",
+    "环境设计",
+    "数字媒体艺术",
+    "电子商务",
+    "市场营销",
+    "工商管理",
+    "供应链管理",
+    "物流管理",
+    "国际经济与贸易",
+    "工业设计"
+  ],
+  "photoNote": "优先从森马在建国际运营中心实际项目报道提取企业实名的建筑与办公设施；项目建筑效果图和摄影实拍需区分，不能把效果图冒充真实实景。第三方图片商业转载权仍需核实。",
+  "business": [
+    {
+      "title": "休闲服装与品牌设计",
+      "description": "围绕森马品牌休闲服装设计、企划、商品开发与年轻消费者品牌传播。 岗位实际用人部门须核对森马服饰及相关事业部最新公告。",
+      "tags": "服装 · 设计",
+      "details": [
+        "服装产品企划",
+        "设计和商品研发",
+        "品牌视觉与传播"
+      ]
+    },
+    {
+      "title": "儿童服饰与巴拉巴拉",
+      "description": "开展巴拉巴拉品牌童装设计、鞋品开发、商品经营与市场推广。 岗位实际用人部门须核对森马服饰及相关事业部最新公告。",
+      "tags": "童装 · 产品",
+      "details": [
+        "童装及鞋品设计",
+        "儿童商品企划",
+        "童装电商运营"
+      ]
+    },
+    {
+      "title": "商品计划与柔性供应链",
+      "description": "在商品计划、货品管理、供应商、采购、质量与物流等流程协调运营。 岗位实际用人部门须核对森马服饰及相关事业部最新公告。",
+      "tags": "商品 · 供应链",
+      "details": [
+        "商品计划及排期",
+        "货品运营与库存",
+        "质量及仓储物流"
+      ]
+    },
+    {
+      "title": "线上店铺与直播电商",
+      "description": "通过线上店铺、直播账号和数字营销推广商品与消费者服务。 岗位实际用人部门须核对森马服饰及相关事业部最新公告。",
+      "tags": "电商 · 直播",
+      "details": [
+        "店铺运营和增长",
+        "直播账号运营",
+        "消费者数字体验"
+      ]
+    },
+    {
+      "title": "跨境渠道与独立站",
+      "description": "部分业务部门经营亚马逊、沃尔玛、Wayfair与独立站等国际零售渠道。 岗位实际用人部门须核对森马服饰及相关事业部最新公告。",
+      "tags": "跨境 · 运营",
+      "details": [
+        "海外电商平台",
+        "国际营销与订单",
+        "跨境供应物流"
+      ]
+    },
+    {
+      "title": "视觉创意与职能管理",
+      "description": "通过电商设计、摄影剪辑、陈列展示、财务等综合职能支持品牌运营。 岗位实际用人部门须核对森马服饰及相关事业部最新公告。",
+      "tags": "视觉 · 职能",
+      "details": [
+        "陈列与摄影内容",
+        "数字视觉设计",
+        "财务及人力资源"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "wz-merch",
+      "title": "商品计划（温州校招）",
+      "category": "商品 / 计划",
+      "city": "温州市瓯海区",
+      "summary": "https://job.wzu.edu.cn/teachin/view?id=78034 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "工商管理",
+        "物流管理"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "2027届温州大学校招明确的商品计划岗位，涉及货柜排期、发货单据、业务数据及订单进度等管理支持。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "wz-logistics",
+      "title": "物流运营（温州校招）",
+      "category": "物流 / 运营",
+      "city": "温州市瓯海区",
+      "summary": "https://job.wzu.edu.cn/job/view/id/786770 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "物流管理",
+        "物流工程",
+        "供应链管理"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "温州大学2027届职位列表列名物流运营，涉及物流单据处理、部门数据与物流业务运营支持。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "wz-supply",
+      "title": "供应计划（温州校招）",
+      "category": "供应链 / 计划",
+      "city": "温州市瓯海区",
+      "summary": "https://job.wzu.edu.cn/teachin/view?id=78034 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "物流管理",
+        "工业工程"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "温州大学2027招聘简章在供应链管理部列名供应计划岗位，属于商品及供应节奏管理。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "wz-product",
+      "title": "产品开发（温州校招）",
+      "category": "产品 / 开发",
+      "city": "温州市瓯海区",
+      "summary": "https://job.wzu.edu.cn/job/view/id/786768 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工业设计",
+        "服装与服饰设计",
+        "工商管理"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "学校公开初级产品开发工作：产品资料整理、项目开发跟进与流程协调，不能误称为独立服装主设计师。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "wz-amazon",
+      "title": "亚马逊运营（温州校招）",
+      "category": "跨境 / 亚马逊",
+      "city": "温州市瓯海区",
+      "summary": "https://job.wzu.edu.cn/teachin/view?id=78034 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子商务",
+        "国际经济与贸易",
+        "市场营销"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "温州大学2027招聘部门清单明确亚马逊运营，为温州跨境平台方向的具体岗位。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "wz-walmart",
+      "title": "沃尔玛运营（温州校招）",
+      "category": "跨境 / 沃尔玛",
+      "city": "温州市瓯海区",
+      "summary": "https://job.wzu.edu.cn/teachin/view?id=78034 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子商务",
+        "工商管理",
+        "国际经济与贸易"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "温州大学2027招聘简章在家具运营等业务列名沃尔玛平台运营，和亚马逊运营分开管理。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "wz-site",
+      "title": "独立站运营（温州校招）",
+      "category": "跨境 / 独立站",
+      "city": "温州市瓯海区",
+      "summary": "https://job.wzu.edu.cn/teachin/view?id=78034 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子商务",
+        "市场营销",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "温州大学2027招聘公告单列独立站运营，工作地点为温州而非上海商品管理团队。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "wz-wayfair",
+      "title": "Wayfair运营（温州校招）",
+      "category": "跨境 / Wayfair",
+      "city": "温州市瓯海区",
+      "summary": "https://job.wzu.edu.cn/teachin/view?id=78034 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子商务",
+        "国际经济与贸易",
+        "工商管理"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "学校列示Wayfair平台运营作为温州2027届独立职位，归于跨境电商业务范畴。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "wz-photo",
+      "title": "摄影剪辑师（温州校招）",
+      "category": "视觉 / 内容",
+      "city": "温州市瓯海区",
+      "summary": "https://job.wzu.edu.cn/teachin/view?id=78034 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "视觉传达设计",
+        "环境设计",
+        "数字媒体艺术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "2027温州大学招聘公布摄影剪辑师，涉及品牌/商品拍摄、视频剪辑及视觉内容；是独立视觉技术岗位。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "wz-visual",
+      "title": "电商设计师（温州校招）",
+      "category": "视觉 / 电商设计",
+      "city": "温州市瓯海区",
+      "summary": "https://job.wzu.edu.cn/teachin/view?id=78034 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "视觉传达设计",
+        "环境设计",
+        "服装与服饰设计"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "温州大学列出视觉设计科电商设计师职位，工作地温州，和杭州视觉设计师不是同一条。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sh-child",
+      "title": "童装设计师（27届）",
+      "category": "服装 / 童装设计",
+      "city": "上海",
+      "summary": "https://xiaozhaobao.com.cn/company/sen-ma-fu-shi 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "服装与服饰设计",
+        "服装设计与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "2026年10月的森马2027校招岗位索引列示童装设计师（上海），专业及服装作品集要求须回官方JD核查。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sh-shoe",
+      "title": "鞋品设计师（27届）",
+      "category": "鞋品 / 设计",
+      "city": "上海",
+      "summary": "https://xiaozhaobao.com.cn/company/sen-ma-fu-shi 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "服装与服饰设计",
+        "工业设计"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "森马2027岗位汇总独立公布上海鞋品设计师，不能与其他设计岗合并计数。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sh-pattern",
+      "title": "技术版师（27届）",
+      "category": "服装 / 版型",
+      "city": "上海",
+      "summary": "https://xiaozhaobao.com.cn/company/sen-ma-fu-shi 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "服装设计与工程",
+        "服装与服饰设计"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "森马2027校招聚合索引单列上海技术版师，工作侧重服装版型技术，完整工艺技能要求待核。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sh-commodity",
+      "title": "商品运营校招生—巴拉巴拉（27届）",
+      "category": "商品 / 运营",
+      "city": "上海",
+      "summary": "https://xiaozhaobao.com.cn/company/sen-ma-fu-shi 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工商管理",
+        "市场营销",
+        "供应链管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "森马2027岗位索引列出巴拉巴拉商品运营校招生，地点上海，不借用温州商品计划的资格条件。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sh-category",
+      "title": "品类企划（27届）",
+      "category": "商品 / 企划",
+      "city": "上海",
+      "summary": "https://xiaozhaobao.com.cn/company/sen-ma-fu-shi 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工商管理",
+        "市场营销",
+        "统计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "2027森马岗位清单独立列名品类企划（上海），关注零售商品品类与品牌企划方向。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sh-brand",
+      "title": "品牌传播（27届）",
+      "category": "品牌 / 传播",
+      "city": "上海",
+      "summary": "https://xiaozhaobao.com.cn/company/sen-ma-fu-shi 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "广告学",
+        "视觉传达设计"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "森马2027岗位库列名品牌传播职位，地点上海；发布方未提供该岗完整校招JD要求。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sh-display",
+      "title": "陈列设计（27届）",
+      "category": "视觉 / 陈列",
+      "city": "上海",
+      "summary": "https://xiaozhaobao.com.cn/company/sen-ma-fu-shi 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "视觉传达设计",
+        "环境设计",
+        "服装与服饰设计"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "2027森马校招聚合记录列名上海陈列设计，和温州电商视觉、杭州线上视觉独立存在。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sh-merch",
+      "title": "商品计划校招生（27届）",
+      "category": "商品 / 上海计划",
+      "city": "上海",
+      "summary": "https://xiaozhaobao.com.cn/company/sen-ma-fu-shi 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "统计学",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "2027森马岗位清单另有上海商品计划校招生，不把温州本地同名职位及条件套用到上海。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hz-visual",
+      "title": "视觉设计师（27届）",
+      "category": "视觉 / 杭州设计",
+      "city": "杭州",
+      "summary": "https://xiaozhaobao.com.cn/company/sen-ma-fu-shi 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "视觉传达设计",
+        "数字媒体艺术",
+        "环境设计"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "2027森马校招列表列名杭州视觉设计师，属于不同于上海陈列设计的独立职位。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hz-store",
+      "title": "线上店铺运营校招生—巴拉巴拉（27届）",
+      "category": "电商 / 店铺",
+      "city": "杭州",
+      "summary": "https://xiaozhaobao.com.cn/company/sen-ma-fu-shi 所属2027届招聘记录；该索引仅说明岗位出现过，无法由此认定今天尚有空缺。",
+      "requirements": "高校2027届校园招聘列表披露该温州岗位本科全职；部分岗位注明专业不限，视觉及设计岗位有具体专业列表。尚未核实所有学历限制、实际技能、作品集、申请截至时间与当前开放状态。请查看温州大学原职位及森马Moka详情。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子商务",
+        "工商管理",
+        "市场营销"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科（温州大学公示）",
+      "url": "https://app.mokahr.com/su/zdhegf",
+      "evidenceUrl": "2027森马聚合职位列表公开巴拉巴拉线上店铺运营校招生（杭州），实际用人部门与条件须见官方招聘系统。",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江森马服饰股份有限公司及其业务部门（温州及上海杭州实际用人主体须逐岗确认）",
+      "currentOpenVerified": false
+    }
+  ]
+}

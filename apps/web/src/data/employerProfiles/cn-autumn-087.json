@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-087",
+  "name": "嘉士伯",
+  "displayName": "嘉士伯中国",
+  "englishName": "Carlsberg China",
+  "aliases": [
+    "嘉士伯中国",
+    "Carlsberg",
+    "Carlsberg China",
+    "重庆啤酒",
+    "Carlsberg China Campus",
+    "嘉士伯2027校园招聘"
+  ],
+  "industry": "酿造制造 · 工程设备 · 供应链 · 品牌营销 · 管理培养",
+  "subtitle": "嘉士伯中国 · 广东、重庆、云南、四川及全国业务网络",
+  "overview": "嘉士伯集团起源于丹麦，在华拥有酿造、包装、供应链与品牌市场销售等业务，并通过重庆啤酒等公司经营部分在华业务。2026年高校就业渠道确认2027届校招有商务、供应链、职能三类管理培训项目；供应链中明确列有工程设备、酿造、仓配等子方向。本次2027届公告原网申截至2026年10月31日，均不显示为已经确认仍可申请。",
+  "lastReviewed": "2026-11-01",
+  "sources": [
+    "https://career.cuhk.edu.cn/job/view/id/469083",
+    "https://jobs.ynu.edu.cn/detail/career?id=694346",
+    "https://carlsbergchina.com.cn/zh/%E5%8A%A0%E5%85%A5%E6%88%91%E4%BB%AC/%E5%98%89%E6%9C%89%E6%9C%BA%E4%BC%9A/",
+    "https://campus-china.carlsberg.cn/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-087/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-087/photo1.svg",
+        "caption": "嘉士伯中国相关业务非实景示意",
+        "alt": "嘉士伯业务示意图，并非企业真实照片",
+        "note": "非实景：本文件是明确标识的编辑SVG；CI尝试从企业及高校官方真实生产设施报道取得本地照片，须保留来源、尺寸和SHA256，转载授权仍未确认。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-087/photo2.svg",
+        "caption": "嘉士伯中国相关业务非实景示意",
+        "alt": "嘉士伯业务示意图，并非企业真实照片",
+        "note": "非实景：本文件是明确标识的编辑SVG；CI尝试从企业及高校官方真实生产设施报道取得本地照片，须保留来源、尺寸和SHA256，转载授权仍未确认。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://campus-china.carlsberg.cn/",
+    "label": "嘉士伯中国官方校园招聘网站",
+    "status": "official_portal",
+    "subject": "嘉士伯中国与重庆啤酒相关招聘单位",
+    "note": "学校公告列明2027届秋招2026-08-26开始、2026-10-31截止。工作城市、专业、公开职位余量须逐岗核验，历史项目不视为今天依然开放。"
+  },
+  "majorIntro": "三个已确认培训计划与其内部方向严格区分。仅按具体岗位方向推荐专业，不把酿造、包装、工程等子方向虚构为独立可投递JD。",
+  "preferredMajors": [
+    "机械工程",
+    "自动化",
+    "工业工程",
+    "食品科学与工程",
+    "生物工程",
+    "物流管理",
+    "供应链管理",
+    "市场营销",
+    "人力资源管理",
+    "工商管理",
+    "计算机科学与技术"
+  ],
+  "photoNote": "优先使用嘉士伯集团官网佛山三水酒厂实拍、中国农业大学大理酒厂访企照片；准确记录所拍工厂名称、新闻来源和图片哈希，商用转载授权另行核实。",
+  "business": [
+    {
+      "title": "酿造与饮料生产",
+      "description": "在嘉士伯中国的各地酒厂开展原料处理、发酵、产品灌装和生产作业管理。 具体业务法人及职责以嘉士伯最新官方公开信息为准。",
+      "tags": "制造 · 酿造",
+      "details": [
+        "酿造工艺与生产运营",
+        "佛山等生产设施",
+        "包装和灌装工艺"
+      ]
+    },
+    {
+      "title": "工程设备与自动化",
+      "description": "在啤酒生产及包装工程场景中支持工厂设备运维、控制系统与持续改善。 具体业务法人及职责以嘉士伯最新官方公开信息为准。",
+      "tags": "机械 · 自动化",
+      "details": [
+        "机械与设备维护",
+        "生产自动化管理",
+        "精益生产与能效"
+      ]
+    },
+    {
+      "title": "质量、食品安全及研发",
+      "description": "围绕产品品质、微生物及食品安全开展实验、质量控制与技术开发。 具体业务法人及职责以嘉士伯最新官方公开信息为准。",
+      "tags": "食品安全",
+      "details": [
+        "酒类产品质量检测",
+        "食品微生物与研发",
+        "供应链质量标准"
+      ]
+    },
+    {
+      "title": "仓配物流与采购供应",
+      "description": "统筹生产物料、仓储、运输、需求预测及运营卓越化项目。 具体业务法人及职责以嘉士伯最新官方公开信息为准。",
+      "tags": "物流 · 供应链",
+      "details": [
+        "原辅料物流和采购",
+        "仓储及运输",
+        "供应链数字化"
+      ]
+    },
+    {
+      "title": "品牌管理与市场推广",
+      "description": "经营嘉士伯及本土品牌相关的市场传播、消费者需求分析与推广项目。 具体业务法人及职责以嘉士伯最新官方公开信息为准。",
+      "tags": "品牌 · 市场",
+      "details": [
+        "品牌产品和渠道运营",
+        "数字化营销",
+        "消费市场分析"
+      ]
+    },
+    {
+      "title": "商业销售与集团职能",
+      "description": "承担区域业务管理、销售网络支持、IT和人力资源职能培养。 具体业务法人及职责以嘉士伯最新官方公开信息为准。",
+      "tags": "商业 · 管理",
+      "details": [
+        "区域销售与客户服务",
+        "P&C人力资源",
+        "IT和职能培训"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "business-2027",
+      "title": "2027商务管理培训生",
+      "category": "商务 / 销售",
+      "city": "广州、成都、重庆等全国业务城市（按具体申请方向）",
+      "summary": "2027招聘公告中的商务管理培训生独立项目，为期约两年，培养渠道销售、业务管理和数字化营销能力，包含部门轮岗与辅导。 它归属于嘉士伯中国2027届校招已公开的项目，招录部门、城市与名额由企业按申请方向公布；不能将岗位简介中的轮岗子方向理解为独立新增职位。",
+      "requirements": "高校和公开项目说明为本科及以上、毕业时间2025年7月至2027年7月或两年内相关经验，专业未设统一硬性门槛，异地调动能力优先；原2027报名2026年10月31日截止。 此记录表示历史已公开校招项目，今日是否可再次申请尚未确认。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理",
+        "国际经济与贸易"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "2025—2027届相关毕业窗口，学历本科及以上",
+      "url": "https://campus-china.carlsberg.cn/",
+      "evidenceUrl": "https://xiaozhaobao.com.cn/job/1654701",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "嘉士伯中国（重庆啤酒业务体系），具体招聘单位逐项以网申核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "supply-2027",
+      "title": "2027供应链管理培训生",
+      "category": "工程 / 供应链",
+      "city": "佛山、重庆、滁州、常州等生产城市（不同方向城市有差异）",
+      "summary": "独立供应链培养项目约一年半，轮岗方向含工程设备、包装、酿造、仓储物流、质量和研发；这些方向不是六个未经核实的独立实名岗位。 它归属于嘉士伯中国2027届校招已公开的项目，招录部门、城市与名额由企业按申请方向公布；不能将岗位简介中的轮岗子方向理解为独立新增职位。",
+      "requirements": "本科及以上，适合机械、自动化、食品、发酵、生物、物流、工业工程等业务相关学科；专业门槛、定岗城市和跨厂轮岗以最终原职位核实。原2027秋招10月31日截止。 此记录表示历史已公开校招项目，今日是否可再次申请尚未确认。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械电子工程",
+        "自动化",
+        "工业工程",
+        "食品科学与工程",
+        "物流管理",
+        "供应链管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2025—2027届相关毕业窗口，学历本科及以上",
+      "url": "https://campus-china.carlsberg.cn/",
+      "evidenceUrl": "https://xiaozhaobao.com.cn/job/17747849",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "嘉士伯中国（重庆啤酒业务体系），具体招聘单位逐项以网申核对",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "function-2027",
+      "title": "2027职能管理培训生（市场／HR／IT）",
+      "category": "职能 / IT",
+      "city": "中国业务总部及各职能团队（地点以岗位页为准）",
+      "summary": "大学就业官网列示的两年制职能管理培训项目，涉及市场、人力资源P&C、信息技术等职能轮岗及跨部门项目。 它归属于嘉士伯中国2027届校招已公开的项目，招录部门、城市与名额由企业按申请方向公布；不能将岗位简介中的轮岗子方向理解为独立新增职位。",
+      "requirements": "职位页注明本科及以上、毕业时间2025年7月至2027年7月、专业不限，但要求英语听说读写流利并能以英语工作。对应岗位和城市以官方网站逐一核实，原截止2026年10月31日。 此记录表示历史已公开校招项目，今日是否可再次申请尚未确认。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工商管理",
+        "人力资源管理",
+        "计算机科学与技术",
+        "市场营销"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "2025—2027届相关毕业窗口，学历本科及以上",
+      "url": "https://campus-china.carlsberg.cn/",
+      "evidenceUrl": "https://jobs.ynu.edu.cn/detail/job?career_id=694346&id=3226455",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "嘉士伯中国（重庆啤酒业务体系），具体招聘单位逐项以网申核对",
+      "currentOpenVerified": false
+    }
+  ]
+}
