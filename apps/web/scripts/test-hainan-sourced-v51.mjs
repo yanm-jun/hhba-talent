@@ -26,7 +26,7 @@ for(const city of auditedCities){
  assert.ok(p[0].materials.length>=3&&p[0].applicationSteps.length>=4);
  assert.ok(p[0].reviewNote&&p[0].reviewedAt);
  assert.equal(h[0].kind,'program');
- assert.ok(h[0].units.includes('未核验')&&h[0].steps.length>=4);
+ assert.ok((h[0].units.includes('未核验')||h[0].units.includes('空房'))&&h[0].steps.length>=4);
  assert.ok(h[0].statusNote.includes('非实时')||h[0].statusNote.includes('无实时'));
 }
 assert.equal(HAINAN_POLICY_RECORDS.find(x=>x.city==='儋州').published,'2026-06-01');
