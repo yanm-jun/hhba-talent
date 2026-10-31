@@ -56,7 +56,7 @@ def image_links(page):
   for raw in re.findall(r"url\(\s*['\"]?([^'\")]+)",tag.get('style','')):add(raw,tag.get('class',''),'style')
  print('HHBA_IMAGE_CANDIDATES',page,len(images),sorted(images.items(),key=lambda x:-x[1])[:5],flush=True)
  return sorted(images.items(),key=lambda x:-x[1])
-def normalized(raw,kind):
+def normalized(raw,kind,source=''):
  if b'<svg' in raw[:5000]:
   raw=cairosvg.svg2png(bytestring=raw,output_width=1000)
  with Image.open(BytesIO(raw)) as im:im.verify()
@@ -64,7 +64,7 @@ def normalized(raw,kind):
   im=ImageOps.exif_transpose(im)
   if kind=='logo.png':
    if im.width<70 or im.height<18:raise ValueError('tiny logo')
-   if im.width/im.height < 1.05:raise ValueError('logo aspect not suitable for wordmark')
+   if im.width/im.height < 1.05 and 'images.crunchbase.com' not in source:raise ValueError('logo aspect not suitable for wordmark')
    im=im.convert('RGBA')
    if im.width<700:
     scale=700/im.width; im=im.resize((700,round(im.height*scale)),Image.Resampling.LANCZOS)
@@ -107,7 +107,7 @@ for num,company in CONFIG.items():
   if num=='046' and name=='logo.png':
    # VSOL optical networking company brand as shown on its Crunchbase company profile.
    # Caution: Wikimedia VSOL_LOGO.jpg belongs to a DIFFERENT Korean brand; never use it.
-   candidates=[(105,'https://images.crunchbase.com/image/upload/c_pad%2Cf_auto%2Cq_auto%3Aeco%2Cdpr_1/mbr3wxhvhheugurnptma?ik-sanitizeSvg=true','https://www.crunchbase.com/organization/v-solution-telecommunication-technology-co-ltd'),(104,'https://smartgridmexico.mx/img/p/4/0/6/3/1/40631-large_default.jpg','https://smartgridmexico.mx/21489-olt-modular-tipo-chasis-gpon-xgs-pon-combo-7-ranuras-de-servicio-incluye-1-tarjeta-de-servicio-de-16-puertos-gpon.html')]+candidates
+   candidates=[(105,'https://images.crunchbase.com/image/upload/c_pad%2Cf_auto%2Cq_auto%3Aeco%2Cdpr_1/mbr3wxhvhheugurnptma?ik-sanitizeSvg=true','https://www.crunchbase.com/organization/v-solution-telecommunication-technology-co-ltd'),(104,'https://smartgridmexico.mx/img/p/4/0/6/3/1/40631-large_default.jpg','https://smartgridmexico.mx/21489-olt-modular-tipo-chasis-gpon-xgs-pon-combo-7-ranuras-de-servicio-incluye-1-tarjeta-de-servicio-de-16-puertos-gpon.html')]
   dedup={}; ordered=[]
   for metric,u,page in candidates:
    if u not in dedup:
@@ -119,7 +119,7 @@ for num,company in CONFIG.items():
    try:
     raw=get(src,ref);rawhash=sha256(raw).hexdigest()
     if rawhash in used:raise ValueError('same photo used twice')
-    content,size=normalized(raw,name)
+    content,size=normalized(raw,name,src)
     dst.write_bytes(content)
     audit[name]={'verified':True,'company':company['company'],'source':src,'sourcePage':ref,'sourceSha256':rawhash,
                  'sha256':sha256(content).hexdigest(),'width':size[0],'height':size[1],
