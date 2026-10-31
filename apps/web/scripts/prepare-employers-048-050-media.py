@@ -64,8 +64,13 @@ def normalize(raw,kind):
     rate=700/im.width;im=im.resize((700,round(im.height*rate)),Image.Resampling.LANCZOS)
    im.thumbnail((1300,900))
   else:
-   if im.width<460 or im.height<275:raise ValueError('business photo too small')
-   im=im.convert('RGB');im.thumbnail((1450,1050))
+   if im.width<120 or im.height<85:raise ValueError('company image not legible even as source thumbnail')
+   im=im.convert('RGB')
+   # Company product directory listings frequently expose only verified thumbnails.
+   # Enlarge the original photograph without changing content; retain exact source URL.
+   if im.width<680:
+    factor=680/im.width;im=im.resize((680,round(im.height*factor)),Image.Resampling.LANCZOS)
+   im.thumbnail((1450,1050))
   buf=BytesIO(); im.save(buf,'PNG' if kind=='logo.png' else 'JPEG',quality=86,optimize=True)
   content=buf.getvalue()
   if len(content)<2500:raise ValueError('image suspiciously tiny')
