@@ -1,0 +1,20 @@
+{
+  "companyId": "cn-autumn-089",
+  "reviewedOn": "2026-11-01",
+  "brandStatus": "HHBA editorial/non-official identity placeholder; trademark rights not licensed",
+  "commercialReuseRightsVerified": false,
+  "photoSlots": [
+    {
+      "slot": 1,
+      "fallback": "images/employer-profiles/cn-autumn-089/photo1.svg",
+      "fallbackKind": "nonreal",
+      "sourceArtifact": "media-sources.json produced during independent build"
+    },
+    {
+      "slot": 2,
+      "fallback": "images/employer-profiles/cn-autumn-089/photo2.svg",
+      "fallbackKind": "nonreal",
+      "sourceArtifact": "media-sources.json produced during independent build"
+    }
+  ]
+}
