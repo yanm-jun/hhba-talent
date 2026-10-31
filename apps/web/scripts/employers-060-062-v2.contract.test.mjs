@@ -5,7 +5,7 @@ const ids=['060','061','062'];
 const names=['云尖信息','美迈科技','厦门国资运'];
 const counts=[10,8,2];
 const page=read('src/pages/UnifiedV2CompanyPage.tsx');
-assert(page.includes('06[0-2])$/.test(id)'), 'New employer IDs must use existing four-panel renderer');
+assert(page.includes('06[0-5])$/.test(id)'), 'New employer IDs must use existing four-panel renderer');
 assert(page.includes('hhba-kpmg-photo-grid')&&page.includes('hhba-kpmg-service-grid'),'Original four-panel layout changed');
 assert(page.includes('if(batch3756)return job.category===major'),'Category filtering missing');
 assert(page.includes('站内岗位详情')&&page.includes('data-hhba-recruitment-outbound="true"'),'Job details and existing link gating missing');
