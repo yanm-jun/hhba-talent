@@ -15,7 +15,9 @@ import json,re,html,time
 import cairosvg
 
 CFG={
- "054":{"name":"海程邦达","photoPages":["https://www.bondex.com.cn/news/detail?pid=5648","https://www.bondex.com.cn/wuliu/haiyun","https://www.bondex.com.cn/about"],
+ "054":{"name":"海程邦达",
+  "directPhotos":["https://www.bondex.com.cn/file/image/20260624/20260624162433_3786.jpg","https://www.bondex.com.cn/file/image/20260624/20260624162547_4689.jpg"],
+  "photoPages":["https://www.bondex.com.cn/news/detail?pid=5648","https://www.bondex.com.cn/wuliu/haiyun","https://www.bondex.com.cn/about"],
   "logoPages":["https://www.bondex.com.cn/","https://www.bondex.com.cn/about/wenhua"],
   "hint":["bondex","邦达","物流"],"editorialLogo":True},
  "055":{"name":"长隆科技","photoPages":["https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822","https://jy.cdutcm.edu.cn/detail/online?id=3510265","https://www.andexpo.com/index.php/photos_list-2676-152216.html","https://www.changlongkeji.cn/","https://www.cl39.com/"],
@@ -96,12 +98,15 @@ for no,cfg in CFG.items():
    print('MEDIA_PINNED',no,name,flush=True);used.add(prior['sourceSha256']);continue
   logo=name=='logo.png'
   options=[]
+  if no=='054' and not logo:
+   preferred=cfg['directPhotos'][0 if name=='photo1.jpg' else 1]
+   options.append((90,preferred,'https://www.bondex.com.cn/news/detail?pid=5648'))
   for page in cfg['logoPages' if logo else 'photoPages']:
    try:
     a=candidates(page,logo)
     print('MEDIA_DISCOVER',no,name,page,a[:8],flush=True)
     for url,score in a:
-     if score<(-2 if logo else 1):continue
+     if score<(-2 if logo else 0):continue
      if not logo and re.search('logo|header|banner|favicon|footer|icon',url,re.I):continue
      options.append((score,url,page))
    except Exception as e:print('MEDIA_PAGE_WARN',no,name,page,str(e)[:110],flush=True)
