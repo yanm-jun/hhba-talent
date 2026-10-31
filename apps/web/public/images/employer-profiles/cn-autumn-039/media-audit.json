@@ -1,0 +1,41 @@
+{
+  "logo.png": {
+    "verified": true,
+    "company": "安世中国",
+    "source": "https://commons.wikimedia.org/wiki/Special:FilePath/Nexperia-logo.svg",
+    "sourcePage": "https://commons.wikimedia.org/wiki/File:Nexperia-logo.svg",
+    "retrievedFrom": "https://commons.wikimedia.org/wiki/Special:FilePath/Nexperia-logo.svg",
+    "sourceSha256": "57462610388aa2d39f48ca2ab39332d50d22ab21dd3e93ea065612038ba30f7d",
+    "sha256": "13acb2f921d9d9b070b9051e7e87c0b909ee4e1cf2c5d57e242d3875dd33b92e",
+    "width": 1100,
+    "height": 270,
+    "note": "Real logo",
+    "copyright": "Original rights holders retain rights"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "company": "安世中国",
+    "source": "https://i.guancha.cn/news/mainland/2025/10/19/20251019202551494.jpg",
+    "sourcePage": "https://www.guancha.cn/economy/2025_10_19_793872_1.shtml",
+    "retrievedFrom": "https://i.guancha.cn/news/mainland/2025/10/19/20251019202551494.jpg",
+    "sourceSha256": "22db2c16a1d509775cf3198430d9e90902dd4fb134f4c11bf8985b00d83b0b1f",
+    "sha256": "248bc0a4bb34210456ac2aab6c76a0bcf5672440ec4adf726e4bbea12d6b0c3b",
+    "width": 1373,
+    "height": 1030,
+    "note": "Real corporate or event photograph",
+    "copyright": "Original rights holders retain rights"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "company": "安世中国",
+    "source": "https://cms-image.pandaily.com/nexperia_7943a61342.png",
+    "sourcePage": "https://pandaily.com/nexperia-china-issues-statement-on-wafer-supply-disruption",
+    "retrievedFrom": "https://cms-image.pandaily.com/nexperia_7943a61342.png",
+    "sourceSha256": "5807317e01a657e337854b0c511673b9c08aea84077ad6ce391c031482e75f51",
+    "sha256": "c7cacbc540734e898f20e86ada069ccd1fd9b0ff1d8faad0a65422c85765934a",
+    "width": 831,
+    "height": 534,
+    "note": "Real corporate or event photograph",
+    "copyright": "Original rights holders retain rights"
+  }
+}

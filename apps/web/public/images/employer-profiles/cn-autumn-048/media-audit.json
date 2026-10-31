@@ -1,0 +1,38 @@
+{
+  "logo.png": {
+    "company": "元力股份",
+    "verified": true,
+    "editorialFallback": false,
+    "source": "https://static.cninfo.com.cn/finalpage/2026-04-16/1225105339.PDF",
+    "sourcePage": "https://static.cninfo.com.cn/finalpage/2026-04-16/1225105339.PDF#page=1",
+    "sourceSha256": "31beb33f41c7519458f7353d5825a1b11af59a2082e802df634ad6bbc3469f7e",
+    "sha256": "c39fde1412b01fb2ab8d22f35def37dd50c8010ff81da4f86510957b1e89f8ef",
+    "width": 590,
+    "height": 658,
+    "note": "Official company mark and Yuanli wordmark cropped from 2025 annual report cover, issued 2026-04-16"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "editorialFallback": false,
+    "company": "元力股份",
+    "source": "https://cdn.wemorefun.com/upload/document6/64522/image/thumbs/20211120165326258_800.jpg",
+    "sourcePage": "https://www.yuanlicarbon.com/",
+    "sourceSha256": "f944d9057a3737124641418fc59882f60e7c4583b5fba9ed192178e5e211f54e",
+    "sha256": "79ed421037e403e60761cbcf86084be6b30917a107ff88cce9db8043c4e6a72f",
+    "width": 680,
+    "height": 907,
+    "note": "Genuine source company-associated graphic; does not alone prove office photo"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "editorialFallback": false,
+    "company": "元力股份",
+    "source": "https://cdn.wemorefun.com/upload/document6/64522/image/20210127163143506.png",
+    "sourcePage": "https://www.yuanlicarbon.com/",
+    "sourceSha256": "9429a08001081c5a94b8d9336d5792108fb6edcc9043e5d7e05624da77c1f994",
+    "sha256": "5dfaafbcf6ba27f6cc3307d1a7bdb01b79c6570a21b4bc3747c95011ff253a45",
+    "width": 1450,
+    "height": 514,
+    "note": "Genuine source company-associated graphic; does not alone prove office photo"
+  }
+}

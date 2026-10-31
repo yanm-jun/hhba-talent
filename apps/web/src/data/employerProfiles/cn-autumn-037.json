@@ -1,0 +1,391 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-037",
+  "name": "炬芯科技",
+  "displayName": "炬芯科技",
+  "englishName": "Actions Technology",
+  "aliases": [
+    "炬芯科技股份有限公司",
+    "Actions Technology Co., Ltd.",
+    "Actions Technology",
+    "炬芯",
+    "Actions",
+    "炬芯2027校园招聘",
+    "炬芯智能",
+    "炬芯科技688049"
+  ],
+  "industry": "半导体 · 端侧AI · 低功耗AIoT · 智能音频SoC",
+  "subtitle": "炬芯科技股份有限公司 · 珠海总部 · 科创板688049 · 2014年成立",
+  "overview": "炬芯科技2014年成立、2021年在上交所科创板上市，总部位于珠海，聚焦低功耗端侧AI SoC与处理器芯片的研发、设计和销售。技术方向涉及高音质音频全信号链、低延迟无线连接、AI NPU与模数混合SRAM存内计算等，产品服务蓝牙音箱、麦克风、智能穿戴、AI办公及智能交互终端。分支机构覆盖深圳、合肥、成都、杭州、上海及香港等地。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.actionstech.com/index.php?id=about",
+    "https://www.actionstech.com/index.php?id=join",
+    "https://www.actionstech.com/index.php?id=stock-info",
+    "https://www.actionstech.com/",
+    "https://gdjy.hfut.edu.cn/detail/online?id=3574650",
+    "https://www.career.zju.edu.cn/jyxt/sczp/zpztgl/ckZpgwXq.zf?zpxxbh=594AA0787498E8CEE0653A68DD0E9B18",
+    "https://www.gaoxiaojob.com/announcement/detail/424621.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-037/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-037/photo1.jpg",
+        "caption": "炬芯科技 · 官网展示的公司一角",
+        "alt": "炬芯科技官网《加入我们》展示的公司环境真实照片",
+        "note": "来自炬芯科技官网《加入我们》栏目中“公司一角”原始照片；非AI生成。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-037/photo2.jpg",
+        "caption": "炬芯科技 · 官网展示的办公环境",
+        "alt": "炬芯科技官网《加入我们》展示的办公环境真实照片",
+        "note": "来自炬芯科技官网《加入我们》栏目中“办公环境”原始照片；非其他企业图片。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://actionstech.zhiye.com/",
+    "label": "官方校园招聘入口",
+    "status": "official_portal",
+    "subject": "炬芯科技股份有限公司",
+    "note": "2027届校园招聘公告由高校就业平台于2026年9月公开，整理出10个具体岗位方向。部分第三方公告标注2026年10月18日截止，因此不声称目前仍开放投递，实时状态以官方招聘系统为准。"
+  },
+  "majorIntro": "依据2027届校招的10条具体岗位，按数字IC、模拟射频、算法软件、电源系统、测试版图五组精确筛选；点击专业方向只显示对应岗位，不展示公司全部职位。关联专业不等于取得官方录用资格。",
+  "preferredMajors": [
+    "集成电路设计与集成系统",
+    "微电子科学与工程",
+    "电子科学与技术",
+    "电子信息工程",
+    "通信工程",
+    "计算机科学与技术",
+    "软件工程",
+    "自动化",
+    "电气工程及其自动化",
+    "人工智能",
+    "数学与应用数学",
+    "材料科学与工程",
+    "测控技术与仪器"
+  ],
+  "photoNote": "企业标识源于炬芯科技官方生态合作伙伴的品牌素材；两张图片直接来自炬芯科技官网《加入我们》栏目对应环境照片，并保留本地独立副本。照片不设置外链，版权归原权利人；HHBA不是官方招聘代理。",
+  "business": [
+    {
+      "title": "端侧AI处理器与存内计算",
+      "description": "围绕模数混合SRAM存内计算及高能效AI NPU，面向低功耗端侧设备提供本地推理能力。",
+      "tags": "端侧AI · NPU · MMSCIM",
+      "details": [
+        "自研端侧AI处理器和SoC平台",
+        "AI推理与嵌入式软件工具链",
+        "低功耗、高能效本地智能应用"
+      ]
+    },
+    {
+      "title": "无线音频SoC与蓝牙连接",
+      "description": "研发低功耗蓝牙音频SoC及低延迟无线音频方案，支撑蓝牙音箱、无线麦克风和耳机等产品。",
+      "tags": "Bluetooth · SoC · 无线音频",
+      "details": [
+        "蓝牙射频和音频数据链路",
+        "低延迟无线私有协议方案",
+        "音箱、麦克风及耳机芯片设计"
+      ]
+    },
+    {
+      "title": "高音质全信号链",
+      "description": "从ADC/DAC、数字信号处理到音频编码和音效算法，提供高质量音频系统芯片与应用支持。",
+      "tags": "音频ADC/DAC · DSP · Codec",
+      "details": [
+        "模拟前端与音频编解码",
+        "DSP和音频增强算法",
+        "软硬件音质调优与验证"
+      ]
+    },
+    {
+      "title": "智能穿戴与AI眼镜",
+      "description": "提供面向智能手表、AI眼镜及轻量智能终端的高集成低功耗芯片方案。",
+      "tags": "可穿戴 · AI眼镜 · 低功耗",
+      "details": [
+        "穿戴端侧AI算力与功耗优化",
+        "低延迟音频及无线连接",
+        "传感交互与系统解决方案"
+      ]
+    },
+    {
+      "title": "智能办公与交互终端",
+      "description": "覆盖AI Note、录音设备、智能办公音频及家庭智能交互产品所需的SoC与软件平台。",
+      "tags": "AI办公 · AI Note · 交互",
+      "details": [
+        "会议记录与音频采集",
+        "端云协同智能产品能力",
+        "软硬件二次开发平台"
+      ]
+    },
+    {
+      "title": "芯片研发、测试和客户支持",
+      "description": "围绕数字/模拟IC、射频、电源、封装测试和嵌入式算法进行全流程设计验证及量产支持。",
+      "tags": "EDA · IC验证 · 量产测试",
+      "details": [
+        "IC设计与仿真验证平台",
+        "芯片测试及产品可靠性",
+        "嵌入式系统开发与客户技术服务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "digital-design",
+      "title": "数字电路设计工程师（2027届）",
+      "city": "广东珠海 / 四川成都",
+      "category": "数字IC设计与验证",
+      "url": "https://actionstech.zhiye.com/",
+      "evidenceUrl": "https://gdjy.hfut.edu.cn/detail/online?id=3574650",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "炬芯科技股份有限公司",
+      "summary": "参与数字电路架构实施、RTL设计、功能仿真验证，配合SoC产品设计开发及前端EDA工作流程。",
+      "requirements": "硕士及以上；公告涉及集成电路、微电子、通信等专业，要求掌握C/C++、汇编或Verilog等设计验证语言，具备数字电路或前端EDA项目经验者优先。 来自2026年9月的炬芯科技2027届校园招聘简章，属于有出处的招聘岗位记录，不能据此断言截至今天仍有空缺。以官方校园招聘平台的单岗位申请状态、专业、学历和地点为准。",
+      "majorNames": [
+        "集成电路设计与集成系统",
+        "微电子科学与工程",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上（2027校招公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "digital-verification",
+      "title": "数字电路验证工程师（2027届）",
+      "city": "广东珠海",
+      "category": "数字IC设计与验证",
+      "url": "https://actionstech.zhiye.com/",
+      "evidenceUrl": "https://gdjy.hfut.edu.cn/detail/online?id=3574650",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "炬芯科技股份有限公司",
+      "summary": "建设数字电路及系统级验证平台，通过仿真、调试与覆盖验证协作提升芯片功能正确性。",
+      "requirements": "硕士及以上；集成电路、微电子、通信相关专业，熟悉C/C++/Verilog、数字逻辑仿真及波形调试，有验证方法学或验证平台经验者优先。 来自2026年9月的炬芯科技2027届校园招聘简章，属于有出处的招聘岗位记录，不能据此断言截至今天仍有空缺。以官方校园招聘平台的单岗位申请状态、专业、学历和地点为准。",
+      "majorNames": [
+        "集成电路设计与集成系统",
+        "微电子科学与工程",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上（2027校招公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "analog-ic-design",
+      "title": "模拟IC电路设计工程师（2027届）",
+      "city": "广东珠海",
+      "category": "模拟与射频IC",
+      "url": "https://actionstech.zhiye.com/",
+      "evidenceUrl": "https://gdjy.hfut.edu.cn/detail/online?id=3574650",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "炬芯科技股份有限公司",
+      "summary": "承担模拟电路与系统规格设计、芯片电路仿真和验证，并与版图、系统团队开展联调和测试。",
+      "requirements": "硕士及以上；微电子、电路设计相关专业，熟悉CMOS工艺、Analog EDA设计及基本器件物理，对混合信号、数据转换器或PLL设计有经验者优先。 来自2026年9月的炬芯科技2027届校园招聘简章，属于有出处的招聘岗位记录，不能据此断言截至今天仍有空缺。以官方校园招聘平台的单岗位申请状态、专业、学历和地点为准。",
+      "majorNames": [
+        "微电子科学与工程",
+        "集成电路设计与集成系统",
+        "电子科学与技术"
+      ],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "物理学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上（2027校招公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "rf-analog-design",
+      "title": "射频模拟IC电路设计工程师（2027届）",
+      "city": "广东珠海",
+      "category": "模拟与射频IC",
+      "url": "https://actionstech.zhiye.com/",
+      "evidenceUrl": "https://gdjy.hfut.edu.cn/detail/online?id=3574650",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "炬芯科技股份有限公司",
+      "summary": "参与射频收发机链路、RF电路设计和电磁仿真，协调版图规划及硅后性能测试。",
+      "requirements": "硕士及以上；集成电路、电子科学与技术相关专业，需射频电路和电磁场基础；了解PA、LNA、MIXER、PLL/VCO等模块及RF类EDA仿真工具优先。 来自2026年9月的炬芯科技2027届校园招聘简章，属于有出处的招聘岗位记录，不能据此断言截至今天仍有空缺。以官方校园招聘平台的单岗位申请状态、专业、学历和地点为准。",
+      "majorNames": [
+        "电子科学与技术",
+        "微电子科学与工程",
+        "集成电路设计与集成系统"
+      ],
+      "editorialRelatedMajors": [
+        "通信工程",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上（2027校招公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "power-analog-ic",
+      "title": "电源模拟IC电路设计工程师（2027届）",
+      "city": "广东珠海",
+      "category": "电源与系统",
+      "url": "https://actionstech.zhiye.com/",
+      "evidenceUrl": "https://gdjy.hfut.edu.cn/detail/online?id=3574650",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "炬芯科技股份有限公司",
+      "summary": "负责电源模拟芯片的拓扑和电路设计、模拟验证、版图协同及量产阶段的工程技术支持。",
+      "requirements": "硕士及以上；微电子、电路与系统等相关专业，了解Bandgap、LDO、Buck/Boost等电源拓扑与CMOS/BiCMOS器件，熟悉Analog EDA工具者优先。 来自2026年9月的炬芯科技2027届校园招聘简章，属于有出处的招聘岗位记录，不能据此断言截至今天仍有空缺。以官方校园招聘平台的单岗位申请状态、专业、学历和地点为准。",
+      "majorNames": [
+        "微电子科学与工程",
+        "集成电路设计与集成系统",
+        "电子科学与技术"
+      ],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上（2027校招公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "audio-algorithm",
+      "title": "算法工程师（2027届）",
+      "city": "广东珠海",
+      "category": "算法与软件",
+      "url": "https://actionstech.zhiye.com/",
+      "evidenceUrl": "https://gdjy.hfut.edu.cn/detail/online?id=3574650",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "炬芯科技股份有限公司",
+      "summary": "研究音频语音、图像视频信号处理、音视频编解码与识别算法，配合硬件实现和产品调试。",
+      "requirements": "硕士及以上；信号处理、电子信息、通信、计算机、自动化或数学相关专业，需熟悉至少一种信号处理或编解码算法，具编程基础，项目经验优先。 来自2026年9月的炬芯科技2027届校园招聘简章，属于有出处的招聘岗位记录，不能据此断言截至今天仍有空缺。以官方校园招聘平台的单岗位申请状态、专业、学历和地点为准。",
+      "majorNames": [
+        "电子信息工程",
+        "通信工程",
+        "计算机科学与技术",
+        "自动化"
+      ],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "数学与应用数学",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上（2027校招公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "embedded-software",
+      "title": "嵌入式软件工程师（2027届）",
+      "city": "广东珠海 / 四川成都 / 安徽合肥",
+      "category": "算法与软件",
+      "url": "https://actionstech.zhiye.com/",
+      "evidenceUrl": "https://gdjy.hfut.edu.cn/detail/online?id=3574650",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "炬芯科技股份有限公司",
+      "summary": "开发与优化Linux/RTOS内核、驱动、应用框架和嵌入式软件，支持端侧AI SoC产品的软件集成。",
+      "requirements": "硕士及以上；通信、计算机、自动化和电子相关专业，熟悉操作系统、驱动、工具链及C语言，掌握C++、Python或Java之一，有系统开发项目经验者优先。 来自2026年9月的炬芯科技2027届校园招聘简章，属于有出处的招聘岗位记录，不能据此断言截至今天仍有空缺。以官方校园招聘平台的单岗位申请状态、专业、学历和地点为准。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "自动化",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上（2027校招公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "power-systems",
+      "title": "电源系统设计工程师（2027届）",
+      "city": "广东珠海",
+      "category": "电源与系统",
+      "url": "https://actionstech.zhiye.com/",
+      "evidenceUrl": "https://gdjy.hfut.edu.cn/detail/online?id=3574650",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "炬芯科技股份有限公司",
+      "summary": "参与SoC电源系统架构规划、开发和测试验证，协助电源相关软硬件方案优化。",
+      "requirements": "本科及以上；通信、计算机、自动化和电子相关专业，要求具备数字/模拟电路基础、高频电路知识及C语言或汇编编程能力，并具英文技术阅读能力。 来自2026年9月的炬芯科技2027届校园招聘简章，属于有出处的招聘岗位记录，不能据此断言截至今天仍有空缺。以官方校园招聘平台的单岗位申请状态、专业、学历和地点为准。",
+      "majorNames": [
+        "电子信息工程",
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "通信工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（2027校招公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ic-test",
+      "title": "IC测试开发工程师（2027届）",
+      "city": "广东珠海",
+      "category": "测试与版图",
+      "url": "https://actionstech.zhiye.com/",
+      "evidenceUrl": "https://gdjy.hfut.edu.cn/detail/online?id=3574650",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "炬芯科技股份有限公司",
+      "summary": "负责IC量产测试系统开发、测试程序优化和量产导入，协同研发解决测试与电路问题。",
+      "requirements": "硕士；电子信息、电子科学、自动化、微电子或电子测量与仪器等专业，要求具PCB硬件设计和C语言程序开发能力，电子竞赛经验优先。 来自2026年9月的炬芯科技2027届校园招聘简章，属于有出处的招聘岗位记录，不能据此断言截至今天仍有空缺。以官方校园招聘平台的单岗位申请状态、专业、学历和地点为准。",
+      "majorNames": [
+        "电子信息工程",
+        "电子科学与技术",
+        "微电子科学与工程",
+        "自动化"
+      ],
+      "editorialRelatedMajors": [
+        "测控技术与仪器",
+        "集成电路设计与集成系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士（2027校招公告）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "layout",
+      "title": "版图设计工程师（2027届）",
+      "city": "广东珠海",
+      "category": "测试与版图",
+      "url": "https://actionstech.zhiye.com/",
+      "evidenceUrl": "https://gdjy.hfut.edu.cn/detail/online?id=3574650",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "炬芯科技股份有限公司",
+      "summary": "负责模拟、数模混合及射频芯片版图实现、DRC/LVS检查和全芯片物理验证，协同电路设计团队完成交付。",
+      "requirements": "本科及以上；电子科学、微电子或信息工程相关专业，熟悉半导体器件物理和CMOS工艺，并理解DRC/LVS/ERC及物理验证流程。 来自2026年9月的炬芯科技2027届校园招聘简章，属于有出处的招聘岗位记录，不能据此断言截至今天仍有空缺。以官方校园招聘平台的单岗位申请状态、专业、学历和地点为准。",
+      "majorNames": [
+        "微电子科学与工程",
+        "电子科学与技术",
+        "集成电路设计与集成系统"
+      ],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（2027校招公告）",
+      "currentOpenVerified": false
+    }
+  ]
+}

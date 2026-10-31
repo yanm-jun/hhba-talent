@@ -1,0 +1,305 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-045",
+  "name": "元夫半导体",
+  "displayName": "元夫半导体",
+  "englishName": "LEADLAP",
+  "aliases": [
+    "江苏元夫半导体科技有限公司",
+    "元夫科技",
+    "LEADLAP",
+    "Leadlap Semiconductor",
+    "元夫半导体2027校招"
+  ],
+  "industry": "半导体先进封装装备 · 精密减薄 · 激光微加工 · 工业装备",
+  "subtitle": "江苏元夫半导体科技有限公司 · 江苏无锡 · 无锡先导控股投资企业",
+  "overview": "元夫半导体2020年成立，专注半导体减薄、研磨抛光设备、先进封装激光微加工与相应耗材，向晶圆、芯片和先进封装客户提供设备、工艺与工程服务。公司官网对机械研发、生产装调、现场售后及软件控制等方向公开2027届招聘岗位。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.leadlap.com/",
+    "https://www.leadlap.com/about",
+    "https://www.leadlap.com/recruit",
+    "https://www.leadlap.com/products",
+    "https://m.yingjiesheng.com/result.php?Page=2&city=0&jobtype=&keyword=%E5%85%88%E5%AF%BC%E9%9B%86%E5%9B%A2&word=%E5%85%88%E5%AF%BC%E9%9B%86%E5%9B%A2"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-045/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-045/photo1.jpg",
+        "caption": "元夫半导体 · 精密加工装备",
+        "alt": "元夫半导体官网发布的半导体精密设备官方产品展示",
+        "note": "来自元夫半导体官网真实产品图片，非办公环境实拍。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-045/photo2.jpg",
+        "caption": "元夫半导体 · 先进封装解决方案",
+        "alt": "元夫半导体官网另一张激光微加工/晶圆减薄业务图",
+        "note": "来自元夫半导体官网不同业务区域的官方产品或技术视觉，非公司员工照片。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.leadlap.com/recruit",
+    "label": "元夫半导体官方2027招聘",
+    "status": "official_portal",
+    "subject": "江苏元夫半导体科技有限公司",
+    "note": "基于官方招贤纳士栏目6条完整2027届职位与聚合站1条同届机械岗位整理；所有职位均不承诺实时剩余名额。学校、学历及详细要求按各项证据分别标注。"
+  },
+  "majorIntro": "按机械设计、电气装配、质量、供应链和软件方向逐岗匹配。点击方向只显示对应岗位，机械类不会误包含全部软件岗位；专业匹配不等于满足官方全部资格。",
+  "preferredMajors": [
+    "机械工程",
+    "机械设计制造及其自动化",
+    "机械电子工程",
+    "自动化",
+    "电气工程及其自动化",
+    "电子信息工程",
+    "微电子科学与工程",
+    "计算机科学与技术",
+    "软件工程",
+    "工业工程",
+    "供应链管理"
+  ],
+  "photoNote": "1个元夫品牌标识和2张真实公司产品技术图片均以官网来源审计、本地独立保存；产品视觉不冒称办公实拍，图片不外跳。权利归原持有人。",
+  "business": [
+    {
+      "title": "晶圆精密减薄与研磨",
+      "description": "研发全自动晶圆背面减薄与研磨装备，服务薄晶圆和先进封装制程。",
+      "tags": "晶圆减薄 · 研磨",
+      "details": [
+        "减薄设备平台及工艺应用",
+        "薄晶圆机械损伤控制",
+        "自动化上下片和设备联动"
+      ]
+    },
+    {
+      "title": "减薄砂轮和精密耗材",
+      "description": "围绕晶圆研磨与减薄提供配套砂轮与工艺耗材，提升加工效率与一致性。",
+      "tags": "砂轮 · 耗材",
+      "details": [
+        "精密加工砂轮选型",
+        "耗材性能与过程稳定性",
+        "制造参数与加工品质优化"
+      ]
+    },
+    {
+      "title": "激光微加工与精密切割",
+      "description": "提供皮秒激光开槽、隐切和先进封装激光工艺设备，支持复杂芯片加工。",
+      "tags": "皮秒激光 · 隐切",
+      "details": [
+        "激光开槽与精细图案加工",
+        "工艺参数调优与视觉AOI",
+        "激光设备项目交付"
+      ]
+    },
+    {
+      "title": "先进封装工艺设备",
+      "description": "面向晶圆级封装、薄晶圆和异构集成需求开展封装制程解决方案开发。",
+      "tags": "WLP · 先进封装",
+      "details": [
+        "封装前处理和精密减薄",
+        "激光工艺及加工测试",
+        "工艺平台设备协同"
+      ]
+    },
+    {
+      "title": "设备机械电控与软件",
+      "description": "整合机械结构、电气装调、上位机C#控制及工艺模块，支撑量产设备开发。",
+      "tags": "机械 · C# · 自动化",
+      "details": [
+        "结构设计、BOM和标准化",
+        "设备软件和现场通信",
+        "整机装调与可靠性验证"
+      ]
+    },
+    {
+      "title": "质量供应链和客户服务",
+      "description": "面向精密加工装备提供供应链计划、质量工程、售后驻场与工艺支持。",
+      "tags": "质量 · 供应链 · 售后",
+      "details": [
+        "质量追踪与供应商协同",
+        "售后设备问题定位",
+        "客户现场装机和运维优化"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "production-trainee",
+      "title": "2027校招-生产管培生",
+      "category": "生产与装调",
+      "city": "江苏无锡",
+      "summary": "协助半导体设备机械、电气装配及光路调试，跟踪安装问题并参与生产质量改善。",
+      "requirements": "官方官网招聘页明确机械装配、电气装配和设备调试等方向；大专及以上，调试方向要求本科以上。机械、机械电子、电气等相关专业，具体申请资格以企业官方岗位卡为准。",
+      "majorNames": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "机械电子工程"
+      ],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "educationLabel": "大专及以上，调试岗位本科及以上",
+      "url": "https://www.leadlap.com/recruit",
+      "evidenceUrl": "https://www.leadlap.com/recruit",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏元夫半导体科技有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    },
+    {
+      "id": "after-sales",
+      "title": "2027校招-售后工程师",
+      "category": "设备交付与售后",
+      "city": "江苏无锡",
+      "summary": "负责设备现场安装、调试及运维期间机械、电气、激光工艺与AOI视觉等常见问题的定位及改善跟踪。",
+      "requirements": "官网要求本科及以上，电子、机械、微电子、电控相关专业；重视设备动手调试和客户沟通能力，并说明需适应频繁出差及长期驻场安排。",
+      "majorNames": [
+        "机械工程",
+        "电气工程及其自动化",
+        "电子信息工程"
+      ],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "自动化",
+        "机械电子工程"
+      ],
+      "educationLabel": "本科及以上",
+      "url": "https://www.leadlap.com/recruit",
+      "evidenceUrl": "https://www.leadlap.com/recruit",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏元夫半导体科技有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    },
+    {
+      "id": "procurement-planning",
+      "title": "2027校招-采购、计划",
+      "category": "供应链与计划",
+      "city": "江苏无锡",
+      "summary": "承担外协采购、采购订单跟踪、生产计划衔接及仓储物料流转等方向的轮岗工作。",
+      "requirements": "官网列明本科及以上，仓库岗位可放宽大专；机械、机电一体化、工业工程等专业。具体轮岗取决于实际岗位安排，不能把所有职责当成单个职位的固定工作。",
+      "majorNames": [
+        "工业工程",
+        "机械工程",
+        "机械电子工程"
+      ],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "物流管理",
+        "机械设计制造及其自动化"
+      ],
+      "educationLabel": "本科及以上，仓储方向可放宽至大专",
+      "url": "https://www.leadlap.com/recruit",
+      "evidenceUrl": "https://www.leadlap.com/recruit",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏元夫半导体科技有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    },
+    {
+      "id": "quality",
+      "title": "2027校招-质量工程师",
+      "category": "质量与产品工程",
+      "city": "江苏无锡",
+      "summary": "参与研发、供应链、制程与客诉环节的质量异常分析，制定或维护检验标准并跟进改善措施。",
+      "requirements": "官方明确本科及以上，机械、自动化、机电等相关专业，具机械结构知识和图纸识读基础，注重协作、质量问题闭环与学习能力。",
+      "majorNames": [
+        "机械工程",
+        "自动化",
+        "机械电子工程"
+      ],
+      "editorialRelatedMajors": [
+        "质量管理工程",
+        "工业工程",
+        "机械设计制造及其自动化"
+      ],
+      "educationLabel": "本科及以上",
+      "url": "https://www.leadlap.com/recruit",
+      "evidenceUrl": "https://www.leadlap.com/recruit",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏元夫半导体科技有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    },
+    {
+      "id": "project-management",
+      "title": "2027校招-项目管理工程师",
+      "category": "质量与产品工程",
+      "city": "江苏无锡",
+      "summary": "参与量产设备BOM维护、标准化文件管理、项目流程支持及研发文档整理与归档。",
+      "requirements": "官方要求本科及以上，机械、自动化及其他理工类背景，具备逻辑思维、沟通协作与主动学习能力；具体项目分工以官网岗位要求为准。",
+      "majorNames": [
+        "机械工程",
+        "自动化",
+        "工程管理"
+      ],
+      "editorialRelatedMajors": [
+        "工业工程",
+        "电气工程及其自动化"
+      ],
+      "educationLabel": "本科及以上",
+      "url": "https://www.leadlap.com/recruit",
+      "evidenceUrl": "https://www.leadlap.com/recruit",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏元夫半导体科技有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    },
+    {
+      "id": "software",
+      "title": "2027校招-软件工程师",
+      "category": "软件与运动控制",
+      "city": "江苏无锡",
+      "summary": "负责半导体设备上位机UI现场联调、设备通信与界面流程问题排查，编写调试记录和测试用例。",
+      "requirements": "企业官网明确本科及以上，计算机、自动化、通信等专业。要求使用.NET 8、C#并理解WinForms界面；表现优异可转入设备UI软件开发，不能直接标成初始即独立研发岗位。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "自动化"
+      ],
+      "editorialRelatedMajors": [
+        "通信工程",
+        "电子信息工程"
+      ],
+      "educationLabel": "本科及以上",
+      "url": "https://www.leadlap.com/recruit",
+      "evidenceUrl": "https://www.leadlap.com/recruit",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏元夫半导体科技有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    },
+    {
+      "id": "mechanical",
+      "title": "2027校招-机械工程师",
+      "category": "机械设计与研发",
+      "city": "江苏无锡",
+      "summary": "面向减薄与精密加工装备开展机械设计、结构件选型和设计验证，配合研发与装配团队处理结构问题。",
+      "requirements": "机械工程师2027岗位名称见2026年10月27日招聘聚合信息；目前未拿到该岗位官方逐项JD，不能杜撰精确学历、工具栈和任职年限。申请条件请在元夫官网招聘页核对。",
+      "majorNames": [
+        "机械工程",
+        "机械设计制造及其自动化"
+      ],
+      "editorialRelatedMajors": [
+        "机械电子工程",
+        "材料成型及控制工程"
+      ],
+      "educationLabel": "2027届 · 单岗学历以官方为准",
+      "url": "https://www.leadlap.com/recruit",
+      "evidenceUrl": "https://m.yingjiesheng.com/result.php?Page=2&city=0&jobtype=&keyword=%E5%85%88%E5%AF%BC%E9%9B%86%E5%9B%A2&word=%E5%85%88%E5%AF%BC%E9%9B%86%E5%9B%A2",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏元夫半导体科技有限公司",
+      "majorUnrestricted": false,
+      "currentOpenVerified": false
+    }
+  ]
+}

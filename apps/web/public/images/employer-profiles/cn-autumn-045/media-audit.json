@@ -1,0 +1,38 @@
+{
+  "logo.png": {
+    "verified": true,
+    "company": "元夫半导体",
+    "source": "https://www.leadlap.com/static/img/logo.svg",
+    "sourcePage": "https://www.leadlap.com/about",
+    "sourceSha256": "131ffe182f1dd86ede6faa73193f3433b5bc1a097b50b4b3ab7695030e2af427",
+    "sha256": "7edeb14d3d804fa1f66c4331bb5c97ef47f4edd4f2b4ffd8a25f0a705163c411",
+    "width": 1000,
+    "height": 180,
+    "type": "company logo",
+    "copyright": "Rights remain with the original owner"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "company": "元夫半导体",
+    "source": "https://www.leadlap.com/uploads/images/202406/037e84dcd631da16710b4a60823c2036.svg",
+    "sourcePage": "https://www.leadlap.com/products",
+    "sourceSha256": "a69c472fa146849199ceba011bf22a3b06dab97197ad10612992cdbaf31aca22",
+    "sha256": "e27a95730ae223d5eee075d7275258e0030c549fa1a4f4fc841796b4687b332a",
+    "width": 1000,
+    "height": 431,
+    "type": "company website business imagery; not necessarily workplace photo",
+    "copyright": "Rights remain with the original owner"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "company": "元夫半导体",
+    "source": "https://www.leadlap.com/uploads/images/202405/6616939275762d46e4b588f370cf97d8.jpg",
+    "sourcePage": "https://www.leadlap.com/products",
+    "sourceSha256": "c9a917a89c3c0166736806c35a9f440ce58d6efd0b371b822a727e3cce52d0da",
+    "sha256": "9099c7a41b6bb2dc59fe792d83e516e55abf1348c9bfba562f73594029026a06",
+    "width": 1550,
+    "height": 630,
+    "type": "company website business imagery; not necessarily workplace photo",
+    "copyright": "Rights remain with the original owner"
+  }
+}
