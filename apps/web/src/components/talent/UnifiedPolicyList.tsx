@@ -8,6 +8,7 @@ import {LIAONING_MUNICIPAL_RESEARCH_RECORDS} from '../../data/liaoningMunicipalP
 import {GUANGXI_RENT_RESEARCH_RECORDS} from '../../data/guangxiRentPolicyResearch';
 import {GUANGXI_MUNICIPAL_RESEARCH_RECORDS} from '../../data/guangxiMunicipalResearch';
 function newProvincePolicyRoute(id:string,city:string):string|undefined{
+ if(id.startsWith('sc-')&&['成都','自贡','攀枝花','泸州','德阳','绵阳','广元','遂宁','内江','乐山','南充','眉山','宜宾','广安','达州','雅安','巴中','资阳','阿坝','甘孜','凉山'].includes(city))return '/talent-service/policy-guide-preview/sichuan/policy/'+encodeURIComponent(id);
  if(id.startsWith('hi-')&&['海口','三亚','三沙','儋州'].includes(city))return '/talent-service/policy-guide-preview/hainan/policy/'+encodeURIComponent(id);
  const guideBases:Record<string,string>={'nm-':'inner-mongolia','jl-':'jilin','hlj-':'heilongjiang','jx-':'jiangxi','hn-':'hunan'};
  if(id.startsWith('hb-'))return '/talent-service/policy-guide-preview/hubei/policy/'+encodeURIComponent(id);

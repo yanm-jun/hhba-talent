@@ -43,5 +43,7 @@ jobs:
         run: node --experimental-strip-types scripts/test-leshan-policy-v51.mjs
       - name: Check all four Hainan regions and complete B-grade guides
         run: node --experimental-strip-types scripts/test-hainan-full-v51.mjs
+      - name: Sichuan source-backed regional policy and housing V5.1 regression
+        run: node --experimental-strip-types scripts/test-sichuan-city-v51.mjs
       - name: Confirm static build
         run: npm run build
