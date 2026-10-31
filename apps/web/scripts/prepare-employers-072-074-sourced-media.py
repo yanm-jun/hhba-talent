@@ -108,7 +108,10 @@ try:ms.append(store('073',1,'https://www.microsoft.com/en-us/research/wp-content
  'https://www.microsoft.com/en-us/research/labs-locations/','微软亚洲研究院北京园区建筑真实外观'))
 except Exception as e:print('HHBA_MS_BEIJING_FAIL',str(e))
 if ms:
- for u,alt,page in source_candidates('https://careers.microsoft.com/v2/global/en/locations/shanghai.html','*','Shanghai'):
+ try: msCandidates=source_candidates('https://careers.microsoft.com/v2/global/en/locations/shanghai.html','*','Shanghai')
+ except Exception as exc:
+  print('HHBA_MS_SHANGHAI_SOURCE_UNAVAILABLE',str(exc)[:140]);msCandidates=[]
+ for u,alt,page in msCandidates:
   if 'office' not in (alt or '').lower() or 'shanghai' not in (alt or '').lower():continue
   try:
    e=store('073',2,u,page,'Microsoft Careers标注的上海办公区照片')
@@ -121,7 +124,10 @@ try:vw.append(store('074',1,'https://m.volkswagengroupchina.com.cn/MediaFile/Syn
  'https://volkswagengroupchina.com.cn/en/news/Detail?ArticleID=EBF2FEE3F8104A5D84731F1FE1D2ABBB','大众安徽高压电池生产实际现场'))
 except Exception as e:print('HHBA_VW_FIRST_FAIL',str(e))
 if vw:
- for u,alt,page in source_candidates('https://www.volkswagen-newsroom.com/en/images/detail/volkswagen-group-china-88096','*','Volkswagen'):
+ try: vwCandidates=source_candidates('https://www.volkswagen-newsroom.com/en/images/detail/volkswagen-group-china-88096','*','Volkswagen')
+ except Exception as exc:
+  print('HHBA_VW_NEWSROOM_UNAVAILABLE',str(exc)[:140]);vwCandidates=[]
+ for u,alt,page in vwCandidates:
   if any(z in u.lower() for z in ('logo','sprite','icon')):continue
   try:
    e=store('074',2,u,page,'Volkswagen官方新闻图片库·大众安徽整车总装车间')
