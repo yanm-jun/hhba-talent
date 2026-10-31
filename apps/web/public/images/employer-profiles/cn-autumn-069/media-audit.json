@@ -1,0 +1,26 @@
+{
+  "company": "广东省农村信用社联合社",
+  "verifiedCorporateLogo": false,
+  "commercialPublicationRightsVerified": false,
+  "created": "2026-10-31",
+  "visuals": [
+    {
+      "file": "logo.svg",
+      "type": "HHBA editorial wordmark",
+      "realPhoto": false
+    },
+    {
+      "file": "photo1.jpg",
+      "type": "photo from actual corporate-affiliated news activity, exact original URL logged during CI",
+      "realPhoto": true,
+      "republicationLicenseVerified": false
+    },
+    {
+      "file": "photo2.svg",
+      "type": "HHBA original non-real illustrative diagram",
+      "realPhoto": false,
+      "republicationLicenseVerified": false
+    }
+  ],
+  "notes": "Logo is NOT official. 069/070 real images must be found on grounded company or affiliated institutional news pages; 071 editorial illustrations are not actual product or office photographs."
+}

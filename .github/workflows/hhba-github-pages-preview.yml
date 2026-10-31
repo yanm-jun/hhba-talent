@@ -212,6 +212,13 @@ jobs:
             test -s "public/images/employer-profiles/cn-autumn-$id/photo2.jpg"
             test -s "public/images/employer-profiles/cn-autumn-$id/media-sources.json"
           done
+      - name: Package 069/070 evidence-backed real architecture and event photographs
+        working-directory: apps/web
+        run: |
+          python scripts/prepare-employers-069-071-source-media.py
+          for id in 069 070; do
+            test -s "public/images/employer-profiles/cn-autumn-$id/media-sources.json"
+          done
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
@@ -230,6 +237,9 @@ jobs:
       - name: Guard 066-068 real-photo provenance and full 19-role four-block profiles
         working-directory: apps/web
         run: node scripts/employers-066-068-v2.contract.test.mjs
+      - name: Validate 069-071 role evidence, category matching, actual media and 2027 scope
+        working-directory: apps/web
+        run: node scripts/employers-069-071-v2.contract.test.mjs
       - name: Validate MINIEYE 035 source-backed positions, six major tabs and real media
         working-directory: apps/web
         run: node scripts/minieye-v2.contract.test.mjs
@@ -501,6 +511,15 @@ jobs:
           done
           test -s apps/web/dist/images/employer-profiles/cn-autumn-067/photo1.svg
           test -s apps/web/dist/images/employer-profiles/cn-autumn-067/photo2.svg
+      - name: Verify 069-071 media are present in official main build
+        run: |
+          for id in 069 070 071; do
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/logo.svg"
+          done
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-069/photo1.jpg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-069/photo2.svg
+          for image in photo1.jpg photo2.jpg; do test -s "apps/web/dist/images/employer-profiles/cn-autumn-070/$image"; done
+          for image in photo1.svg photo2.svg; do test -s "apps/web/dist/images/employer-profiles/cn-autumn-071/$image"; done
       - name: Verify Southern, Guangzhilv and shared static images in built site
         run: |
           test -s apps/web/dist/index.html

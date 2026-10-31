@@ -1,0 +1,84 @@
+name: HHBA employers 069-071 isolated real-media preview
+on:
+  push:
+    branches: [feature/employers-069-071-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-employers-069-071-review
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Pillow for authentic news image validation
+        run: python -m pip install --quiet Pillow
+      - name: Acquire 069/070 source-specific real event photos
+        working-directory: apps/web
+        run: python scripts/prepare-employers-069-071-source-media.py
+      - name: Package inherited 066/068 documented real company photographs
+        working-directory: apps/web
+        run: python scripts/prepare-employers-066-068-real-media.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked dependency tree
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Validate current and inherited company/major/category jobs
+        working-directory: apps/web
+        run: |
+          node scripts/employers-054-056-v2.contract.test.mjs
+          node scripts/employers-057-059-v2.contract.test.mjs
+          node scripts/employers-060-062-v2.contract.test.mjs
+          node scripts/employers-063-065-v2.contract.test.mjs
+          node scripts/employers-066-068-v2.contract.test.mjs
+          node scripts/employers-069-071-v2.contract.test.mjs
+          node scripts/recruitment-market-source-invalid.regression.test.mjs
+      - name: Build full isolated Vite GitHub Pages version, NOT official main
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: |
+          npm run build
+          node scripts/materialize-company-route-entries.mjs
+      - name: Verify all new direct enterprise routes and independent images
+        run: |
+          test -s apps/web/dist/index.html
+          for id in 069 070 071; do
+            test -s "apps/web/dist/companies/autumn/cn-autumn-$id/index.html"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/logo.svg"
+          done
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-069/photo1.jpg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-069/photo2.svg
+          for image in photo1.jpg photo2.jpg; do
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-070/$image"
+          done
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-071/photo1.svg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-071/photo2.svg
+      - name: Upload machine-readable genuine-photo source and rights evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-069-071-original-photo-provenance
+          path: |
+            apps/web/public/images/employer-profiles/cn-autumn-069/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-070/media-sources.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Upload full static preview for user acceptance (never deploy Pages)
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-069-071-complete-review-site
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
