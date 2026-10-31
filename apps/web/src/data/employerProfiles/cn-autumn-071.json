@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-071",
+  "name": "桃溪集团",
+  "displayName": "桃溪集团",
+  "englishName": "Taoxi Group",
+  "aliases": [
+    "湖南桃溪品牌管理有限公司",
+    "桃溪",
+    "喜纯",
+    "每桃",
+    "桃溪品牌管理",
+    "桃溪集团2027"
+  ],
+  "industry": "药食同源 · 新中式滋补 · 消费健康品牌 · 直播电商",
+  "subtitle": "湖南桃溪品牌管理有限公司 · 湖南长沙湘江新区 · 喜纯与每桃品牌运营",
+  "overview": "桃溪集团的可核验运营主体为湖南桃溪品牌管理有限公司，长沙民政职业技术学院就业系统发布其单位介绍，明确集团集产品研发、品牌营销与电商运营于一体，旗下喜纯、每桃等品牌。校方招聘会资料列带货主播和电商客服专员等职位，但未核实为2027届专属校招。本页将真实校企招聘和相关岗位标注为公开历史职位。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://job.csmzxy.edu.cn/company/view/id/1166749",
+    "https://job.csmzxy.edu.cn/largefairs/view/id/7419/domain/csmzxy",
+    "https://cy.chanmama.com/open/authorRank/UriqxPWNoJYNqXbiKChqdZGWvoFFixKL.html",
+    "https://www.liepin.com/city-changsha/zptbdydskf8f8l/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-071/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-071/photo1.svg",
+        "caption": "桃溪集团 · 业务主题编辑示意1",
+        "alt": "桃溪集团品牌业务说明插画1，不是企业实拍",
+        "note": "HHBA独立制作的SVG编辑示意，并非企业实体照片或官方产品拍摄；取得可追溯授权照片后替换。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-071/photo2.svg",
+        "caption": "桃溪集团 · 业务主题编辑示意2",
+        "alt": "桃溪集团品牌业务说明插画2，不是企业实拍",
+        "note": "HHBA独立制作的SVG编辑示意，并非企业实体照片或官方产品拍摄；取得可追溯授权照片后替换。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://job.csmzxy.edu.cn/company/view/id/1166749",
+    "label": "高校就业平台登记的桃溪企业资料（非官方网申）",
+    "status": "archived_source",
+    "subject": "湖南桃溪品牌管理有限公司",
+    "note": "高校认证单位主体和历史招聘会职位可核，当前未找到2027届官方单岗清单或桃溪集团独立网投；不能把其它品牌的同名电商职位移入本公司。"
+  },
+  "majorIntro": "目前可核实高校招聘会中的带货主播和电商客服岗位，非2027届明确专项招聘；岗位专业按照学校公布的专业范围整理。",
+  "preferredMajors": [
+    "电子商务",
+    "市场营销",
+    "网络与新媒体",
+    "广告学",
+    "食品科学与工程",
+    "食品质量与安全",
+    "产品设计",
+    "数字媒体艺术",
+    "工商管理"
+  ],
+  "photoNote": "本批暂未获取可直接核对、授权使用的桃溪集团办公/员工实景图，采用两张明确标注非实景的品牌业务编辑SVG；不把喜纯旗舰店头像、其他药食同源产品或竞争对手照片伪称集团实景。",
+  "business": [
+    {
+      "title": "喜纯新中式滋补品牌",
+      "description": "围绕东方食养文化开发古法膏方、阿胶、食养古粉和茶饮等产品，开展品牌经营和用户教育。",
+      "tags": "喜纯 · 食养",
+      "details": [
+        "膏方与阿胶产品企划",
+        "滋补饮品与食养品类",
+        "新中式品牌定位"
+      ]
+    },
+    {
+      "title": "每桃品牌与女性滋补",
+      "description": "甄选食养原料开发燕窝粥及食养代餐粉等日常食品，服务女性消费与生活方式场景。",
+      "tags": "每桃 · 产品",
+      "details": [
+        "燕窝粥与食养食品",
+        "代餐及轻养品类",
+        "品牌视觉与内容"
+      ]
+    },
+    {
+      "title": "健康食品研发及品控",
+      "description": "面向药食同源食品的配方、供应协同和品质管控，强调标准化及可视化质量流程。",
+      "tags": "研发 · 品控",
+      "details": [
+        "食品原料研究",
+        "标准化配方开发",
+        "质量控制与供应链协同"
+      ]
+    },
+    {
+      "title": "直播带货与内容电商",
+      "description": "通过直播间、达人合作和内容营销推广健康食品品牌，支持电商转化及用户体验。",
+      "tags": "直播 · 电商",
+      "details": [
+        "直播讲品与运营复盘",
+        "达人合作与短视频",
+        "数字销售漏斗"
+      ]
+    },
+    {
+      "title": "电商平台与客户服务",
+      "description": "在电商渠道开展商品信息管理、订单履约、客服响应及用户关系维护。",
+      "tags": "电商 · 服务",
+      "details": [
+        "电商订单与客服",
+        "用户运营与留存",
+        "平台活动协同"
+      ]
+    },
+    {
+      "title": "品牌传播及消费洞察",
+      "description": "围绕新中式滋补市场研究消费者需求、品牌调性、渠道反馈和复购行为。",
+      "tags": "市场 · 品牌",
+      "details": [
+        "消费数据洞察",
+        "品牌活动与传播",
+        "市场渠道研究"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "livestream-campus-fair",
+      "title": "带货主播（高校招聘会公开岗位）",
+      "category": "直播 / 电商",
+      "city": "湖南长沙",
+      "summary": "长沙民政职业技术学院专场招聘会登记湖南桃溪品牌管理有限公司带货主播职位，计划2人，参与滋补品类直播讲解与用户互动。",
+      "requirements": "校方招聘会列表列出旅游管理、电子商务、空中乘务等专科专业；没有明确2027届校招专属资格、招聘截止日或具体薪酬条件，不能声称本岗位当前仍在招。",
+      "majorNames": [
+        "旅游管理",
+        "电子商务",
+        "空中乘务"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "历史高校招聘会 · 专科方向（非2027届确认岗位）",
+      "url": "https://job.csmzxy.edu.cn/largefairs/view/id/7419/domain/csmzxy",
+      "evidenceUrl": "https://job.csmzxy.edu.cn/largefairs/view/id/7419/domain/csmzxy",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "湖南桃溪品牌管理有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "customer-service-fair",
+      "title": "电商客服专员（高校招聘会公开岗位）",
+      "category": "电商客服",
+      "city": "湖南长沙",
+      "summary": "高校就业平台专场招聘会登记湖南桃溪品牌管理有限公司电商客服专员5人，支持电商消费者咨询和订单服务。",
+      "requirements": "校方列市场营销、电子商务、计算机网络技术（网络互动媒体开发方向）专科专业；由于并非2027单岗JD，不自行增写2027毕业年份、英语证书或工资。",
+      "majorNames": [
+        "市场营销",
+        "电子商务",
+        "计算机网络技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "历史高校招聘会 · 专科方向（非2027届确认岗位）",
+      "url": "https://job.csmzxy.edu.cn/largefairs/view/id/7419/domain/csmzxy",
+      "evidenceUrl": "https://job.csmzxy.edu.cn/largefairs/view/id/7419/domain/csmzxy",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "湖南桃溪品牌管理有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}
