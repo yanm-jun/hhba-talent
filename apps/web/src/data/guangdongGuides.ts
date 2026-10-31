@@ -3,6 +3,7 @@ import type {TalentPolicyRecord} from './talentPolicyRecords';
 import {GUANGDONG_POLICY_RECORDS} from './guangdongPolicyRecords';
 import {GUANGDONG_EXPANDED_POLICY_RECORDS} from './guangdongExpandedPolicyRecords';
 import {GUANGDONG_FINAL_CITIES_POLICY_RECORDS} from './guangdongFinalCitiesPolicyRecords';
+import {GUANGDONG_PROVINCIAL_POLICY_RECORDS} from './guangdongProvincialPolicyRecords';
 
 /** Guangdong V5.1: policy-specific B/C six-section guide using shared renderer.
  * These are NOT certified A guides. Every benefit, eligibility and material originates
@@ -11,7 +12,8 @@ import {GUANGDONG_FINAL_CITIES_POLICY_RECORDS} from './guangdongFinalCitiesPolic
 export const GUANGDONG_GUIDE_RECORDS:readonly TalentPolicyRecord[]=[
  ...GUANGDONG_POLICY_RECORDS,
  ...GUANGDONG_EXPANDED_POLICY_RECORDS,
- ...GUANGDONG_FINAL_CITIES_POLICY_RECORDS
+ ...GUANGDONG_FINAL_CITIES_POLICY_RECORDS,
+ ...GUANGDONG_PROVINCIAL_POLICY_RECORDS
 ];
 const dateToday=()=>new Date().toISOString().slice(0,10);
 const limited=(p:TalentPolicyRecord)=>p.temporal!=='policy'||Boolean(p.deadline&&p.deadline<dateToday());
