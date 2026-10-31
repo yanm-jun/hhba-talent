@@ -1,6 +1,6 @@
 import type {CompleteGuide,GuideStep} from '../components/talent/UnifiedPolicyGuide';
-import {SHANXI_POLICY_RECORDS} from './shanxiPolicyRecords';
-import {SHANXI_HOUSING_RECORDS} from './shanxiHousingRecords';
+import {SHANXI_POLICY_RECORDS} from './shanxiPolicyRecords.ts';
+import {SHANXI_HOUSING_RECORDS} from './shanxiHousingRecords.ts';
 export const SHANXI_CITIES=['太原','大同','阳泉','长治','晋城','朔州','晋中','运城','忻州','临汾','吕梁'] as const;
 export const shanxiGuideUrl=(kind:'policy'|'housing',id:string)=>'/talent-service/policy-guide-preview/shanxi/'+kind+'/'+encodeURIComponent(id);
 export function getShanxiGuide(kind:string,id:string):CompleteGuide|undefined{
