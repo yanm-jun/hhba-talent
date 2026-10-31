@@ -173,12 +173,23 @@ jobs:
           test -s apps/web/public/images/employer-profiles/cn-autumn-032/photo1.jpg
           test -s apps/web/public/images/employer-profiles/cn-autumn-032/photo2.jpg
           test -s apps/web/public/images/employer-profiles/cn-autumn-032/media-audit.json
+      - name: Verify Bodor Laser company logo and two separate official project photos
+        run: |
+          python apps/web/scripts/prepare-bodor-media.py
+          test -s apps/web/public/images/employer-profiles/cn-autumn-033/logo.webp
+          test -s apps/web/public/images/employer-profiles/cn-autumn-033/photo1.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-033/photo2.jpg
+          test -s apps/web/public/images/employer-profiles/cn-autumn-033/media-audit.json
+          echo HHBA_BODOR_033_3_SOURCED_IMAGES_READY
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
       - name: Verify WEIPU screenshot layout, major matching and source provenance
         working-directory: apps/web
         run: node scripts/weipu-v2.contract.test.mjs
+      - name: Guard Bodor 033 factual jobs, screenshot style and logo/2 image provenance
+        working-directory: apps/web
+        run: node scripts/bodor-v2.contract.test.mjs
       - name: Validate source-backed talent policies and housing records
         working-directory: apps/web
         run: node scripts/audit-talent-service.mjs

@@ -1,0 +1,511 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-033",
+  "name": "邦德激光",
+  "displayName": "邦德激光",
+  "englishName": "Bodor Laser",
+  "aliases": [
+    "济南邦德激光股份有限公司",
+    "Bodor",
+    "BODOR",
+    "Bodor Laser",
+    "邦德激光招聘",
+    "邦德激光2027校园招聘",
+    "济南邦德",
+    "Bodor CNC"
+  ],
+  "industry": "激光设备 · 智能制造 · 工业自动化 · 高端装备",
+  "subtitle": "济南邦德激光股份有限公司 · 创立于2008年 · 总部山东济南",
+  "overview": "邦德激光创立于2008年，是以激光加工高端装备为核心的制造企业，主要从事激光切割设备、激光焊接设备及相关自动化系统的研发、生产、销售和售后服务。全球总部基地Dream Park位于山东济南历城区春晖路3999号，涵盖超级工厂、研发试制和创新中心等配套，服务面向汽车制造、工程机械、船舶、钢结构及新能源等工业领域。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.bodor.cn/brand/",
+    "https://www.bodor.cn/recruit/",
+    "https://bodor.zhiye.com/Campus",
+    "https://jgxy.sdut.edu.cn/2026/1009/c5450a573387/page.htm",
+    "https://school.gxjy.sdei.edu.cn/career/school/TblCareerFairReviewRecord/detail/20260909204815478da384",
+    "https://www.upcv.tech/xiaozhao/cmto4x4qu00l6m9thpmg999mp.html",
+    "https://www.zhaopin.com/jobdetail/CC323684010J41033399404.htm",
+    "https://51uns.bysjy.com.cn/Position/Details/3241634?schoolCode=10720",
+    "https://www.goldmantis.com/en/projects/337",
+    "https://www.iteschina.com/zh-cn/exhibitor-list/details/13472/jinan-bodor-cnc-machine"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-033/logo.webp",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-033/photo1.jpg",
+        "caption": "邦德激光 · Dream Park全球总部基地",
+        "alt": "济南邦德激光Dream Park全球总部基地建筑与厂区航拍",
+        "note": "图片来自邦德激光官方网站“关于邦德”，为全球总部基地实景；本地静态副本。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-033/photo2.jpg",
+        "caption": "邦德激光 · Dream Park总部建筑",
+        "alt": "邦德激光全球总部基地的环形总部楼宇黄昏外景",
+        "note": "图片来自Dream Park项目承建方金螳螂项目介绍，显示已建成的总部建筑；本地静态副本。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://bodor.zhiye.com/Campus",
+    "label": "邦德激光官方校园招聘",
+    "status": "official_portal",
+    "subject": "济南邦德激光股份有限公司",
+    "note": "由邦德官网“人才招聘-校园招聘”确认的链接。2027届招聘信息由高校就业公告及公开职位整理，除有明确职位编号的职位外，按招聘方向展示；开放状态及投递期限以官网为准。"
+  },
+  "majorIntro": "按单条岗位实际工作内容或校招公告披露的专业要求归类。机械、车辆、电气等关键词仅显示与岗位相关的条目，不会把邦德所有岗位全列出来；非官方资格认定。",
+  "preferredMajors": [
+    "机械工程",
+    "机械设计制造及其自动化",
+    "电气工程及其自动化",
+    "自动化",
+    "光学工程",
+    "光电信息科学与工程",
+    "电子信息工程",
+    "通信工程",
+    "计算机科学与技术",
+    "软件工程",
+    "材料科学与工程",
+    "焊接技术与工程",
+    "质量管理工程",
+    "采购管理",
+    "工业工程",
+    "国际经济与贸易",
+    "市场营销",
+    "英语",
+    "车辆工程",
+    "信息与计算科学",
+    "材料成型及控制工程",
+    "供应链管理"
+  ],
+  "photoNote": "Bodor品牌logo取自中国工业展官方参展商信息；两张独立公司照片取自邦德官网与其总部项目承建方公开资料，构建时下载、核验并保存为本站静态图片。图片不可点击外跳；权利归各自原权利人，HHBA不代表企业官方。",
+  "business": [
+    {
+      "title": "激光切板设备",
+      "description": "面向金属板材加工的高功率、高精度激光切割装备研发与制造。",
+      "tags": "板材 · 精密切割",
+      "details": [
+        "Dream等不同定位产品系列",
+        "高精密金属加工",
+        "制造业设备应用"
+      ]
+    },
+    {
+      "title": "激光切管与型材",
+      "description": "研发管材、型材及板管一体切割装备，面向复杂工业零部件加工。",
+      "tags": "管材 · 型材",
+      "details": [
+        "多卡盘激光切管",
+        "型材与异形结构加工",
+        "设备工艺优化"
+      ]
+    },
+    {
+      "title": "激光焊接技术",
+      "description": "提供手持激光焊接等设备及面向制造场景的工艺服务。",
+      "tags": "激光焊 · 工艺",
+      "details": [
+        "Pro和Air激光焊接系列",
+        "焊接工艺验证",
+        "应用培训支持"
+      ]
+    },
+    {
+      "title": "自研核心组件",
+      "description": "研发激光器、激光加工头及工业控制相关核心部件。",
+      "tags": "激光器 · 光电",
+      "details": [
+        "BodorPower激光器",
+        "BodorGenius激光头",
+        "BodorThinker工业控制系统"
+      ]
+    },
+    {
+      "title": "智能工厂与自动化",
+      "description": "围绕设备装配、自动化产线及工厂信息化开展制造与品质提升。",
+      "tags": "工业自动化 · 智能制造",
+      "details": [
+        "Dream Space超级工厂",
+        "精益制造与自动化",
+        "高功率设备装配"
+      ]
+    },
+    {
+      "title": "全球销售及技术服务",
+      "description": "面向国内外制造业客户提供技术咨询、安装调试及售后服务。",
+      "tags": "国际业务 · 服务",
+      "details": [
+        "海外子公司及渠道支持",
+        "全球技术服务体系",
+        "客户培训与设备维护"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "mechanical-rd",
+      "title": "机械研发工程师（2027届）",
+      "city": "济南（岗位城市以官网为准）",
+      "url": "https://bodor.zhiye.com/Campus",
+      "evidenceUrl": "https://jgxy.sdut.edu.cn/2026/1009/c5450a573387/page.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "济南邦德激光股份有限公司",
+      "summary": "参与激光切割装备机械系统方案、零部件结构和传动机构的设计工作，结合生产制造与产品试验数据改进结构可靠性。负责方案图纸、样机测试及跨部门技术问题协同，具体任务以企业职位详情为准。",
+      "requirements": "机械研发为2027届已公开招聘方向，非单独岗位实时在招确认。 本站作招聘资料归档，并不代表实时确认在招；投递城市、学历及任职条件以招聘官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "车辆工程",
+        "机械电子工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 以官网为准",
+      "currentOpenVerified": false,
+      "category": "机械 / 自动化"
+    },
+    {
+      "id": "electric-rd",
+      "title": "电气设计工程师（2027届）",
+      "city": "济南（岗位城市以官网为准）",
+      "url": "https://bodor.zhiye.com/Campus",
+      "evidenceUrl": "https://jgxy.sdut.edu.cn/2026/1009/c5450a573387/page.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "济南邦德激光股份有限公司",
+      "summary": "参与激光装备电气控制系统和元器件选型、原理图设计及电控系统联调，配合设备试验并整理调试记录。自动化与控制方向有相关性，具体任职专业和学历以官网为准。",
+      "requirements": "电气工程师为2027届公开招聘方向。 本站作招聘资料归档，并不代表实时确认在招；投递城市、学历及任职条件以招聘官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "自动化",
+        "机器人工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 以官网为准",
+      "currentOpenVerified": false,
+      "category": "机械 / 自动化"
+    },
+    {
+      "id": "software-rd",
+      "title": "软件工程师（2027届）",
+      "city": "济南（岗位城市以官网为准）",
+      "url": "https://bodor.zhiye.com/Campus",
+      "evidenceUrl": "https://jgxy.sdut.edu.cn/2026/1009/c5450a573387/page.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "济南邦德激光股份有限公司",
+      "summary": "面向激光加工设备的软件系统开展功能开发、程序维护和联合测试，可能涉及设备控制、上位机或工业软件模块。使用语言、岗位职责与学历条件以官方岗位说明为准，本站不据概述推断已开放独立职位。",
+      "requirements": "2027届公告列有软件工程师方向。 本站作招聘资料归档，并不代表实时确认在招；投递城市、学历及任职条件以招聘官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "自动化",
+        "信息与计算科学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 以官网为准",
+      "currentOpenVerified": false,
+      "category": "软件 / 人工智能"
+    },
+    {
+      "id": "optical-rd",
+      "title": "光学工程师（2027届）",
+      "city": "济南（岗位城市以官网为准）",
+      "url": "https://bodor.zhiye.com/Campus",
+      "evidenceUrl": "https://jgxy.sdut.edu.cn/2026/1009/c5450a573387/page.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "济南邦德激光股份有限公司",
+      "summary": "围绕激光器、激光头及光学加工系统开展光学器件选型、实验验证和光路性能分析，协助完成性能测试与技术记录。光学技术要求和岗位细分以企业正式职位页面为准。",
+      "requirements": "2027届公告列有光学工程师方向。 本站作招聘资料归档，并不代表实时确认在招；投递城市、学历及任职条件以招聘官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "光学工程",
+        "光电信息科学与工程",
+        "应用物理学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 以官网为准",
+      "currentOpenVerified": false,
+      "category": "光学 / 电子"
+    },
+    {
+      "id": "hardware-rd",
+      "title": "硬件工程师（2027届）",
+      "city": "济南（岗位城市以官网为准）",
+      "url": "https://bodor.zhiye.com/Campus",
+      "evidenceUrl": "https://jgxy.sdut.edu.cn/2026/1009/c5450a573387/page.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "济南邦德激光股份有限公司",
+      "summary": "参与激光设备控制板卡、硬件电路或相关电子系统的设计、验证与问题排查，配合软件和整机团队开展联调。具体电路设计平台、任职资格及工作城市须查看官方岗位原文。",
+      "requirements": "2027届公告列有硬件工程师方向。 本站作招聘资料归档，并不代表实时确认在招；投递城市、学历及任职条件以招聘官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "电子科学与技术",
+        "微电子科学与工程",
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 以官网为准",
+      "currentOpenVerified": false,
+      "category": "光学 / 电子"
+    },
+    {
+      "id": "welding-process",
+      "title": "焊接工艺工程师（2027届）",
+      "city": "济南（岗位城市以官网为准）",
+      "url": "https://bodor.zhiye.com/Campus",
+      "evidenceUrl": "https://jgxy.sdut.edu.cn/2026/1009/c5450a573387/page.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "济南邦德激光股份有限公司",
+      "summary": "围绕焊接应用场景参与工艺参数研究、设备试验和质量问题分析，协助形成可复用的工艺文件并支持产线改进。岗位方向来源于企业2027届校园招聘介绍，具体专业门槛需复核官网。",
+      "requirements": "2027届公告列有焊接工艺工程师方向。 本站作招聘资料归档，并不代表实时确认在招；投递城市、学历及任职条件以招聘官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "焊接技术与工程",
+        "材料成型及控制工程",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 以官网为准",
+      "currentOpenVerified": false,
+      "category": "材料 / 工艺"
+    },
+    {
+      "id": "structure-rd",
+      "title": "结构设计工程师（2027届）",
+      "city": "济南（岗位城市以官网为准）",
+      "url": "https://bodor.zhiye.com/Campus",
+      "evidenceUrl": "https://jgxy.sdut.edu.cn/2026/1009/c5450a573387/page.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "济南邦德激光股份有限公司",
+      "summary": "协助激光装备机身、装配结构与功能组件的结构设计，参与三维建模、工程图纸整理及样机结构验证。具体建模软件、项目分工和学历要求以邦德招聘系统发布的信息为准。",
+      "requirements": "2027届公告列有结构设计师方向。 本站作招聘资料归档，并不代表实时确认在招；投递城市、学历及任职条件以招聘官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "工业设计"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 以官网为准",
+      "currentOpenVerified": false,
+      "category": "机械 / 自动化"
+    },
+    {
+      "id": "cpp-rd",
+      "title": "C++开发工程师（2027届）",
+      "city": "济南（岗位城市以官网为准）",
+      "url": "https://bodor.zhiye.com/Campus",
+      "evidenceUrl": "https://jgxy.sdut.edu.cn/2026/1009/c5450a573387/page.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "济南邦德激光股份有限公司",
+      "summary": "参与激光装备控制软件与工业应用的功能开发、模块联调和问题定位，依据产品需求完善代码与测试记录。招聘方向确认包含C++开发，实际开发框架和专业要求以公司官方JD为准。",
+      "requirements": "2027届公告列有C++开发工程师方向。 本站作招聘资料归档，并不代表实时确认在招；投递城市、学历及任职条件以招聘官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 以官网为准",
+      "currentOpenVerified": false,
+      "category": "软件 / 人工智能"
+    },
+    {
+      "id": "testing-rd",
+      "title": "测试工程师（2027届）",
+      "city": "济南",
+      "url": "https://bodor.zhiye.com/Campus",
+      "evidenceUrl": "https://51uns.bysjy.com.cn/Position/Details/3241634?schoolCode=10720",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "济南邦德激光股份有限公司",
+      "summary": "围绕装备操作系统及整机功能制定测试方案与大纲，搭建测试平台、记录试验结果，配合研发复现和跟踪问题。高校公开的2027届招聘资料对岗位职责和技能有具体说明。",
+      "requirements": "2027届高校招聘资料列有济南测试工程师，学历以具体JD核实。 本站作招聘资料归档，并不代表实时确认在招；投递城市、学历及任职条件以招聘官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "自动化",
+        "机械电子工程",
+        "电气工程及其自动化",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科（高校公开资料）",
+      "currentOpenVerified": false,
+      "category": "机械 / 自动化"
+    },
+    {
+      "id": "procure-sheet",
+      "title": "采购工程师（钣金）（2027届）",
+      "city": "济南 · 历城区",
+      "url": "https://bodor.zhiye.com/Campus",
+      "evidenceUrl": "https://www.zhaopin.com/jobdetail/CC323684010J41033399404.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "济南邦德激光股份有限公司",
+      "summary": "负责钣金等零部件采购相关数据的收集与分析，协助供应商调研、管理与质量改进，优化采购体系和成本控制。需要熟练使用办公软件，并具备沟通与逻辑分析能力。",
+      "requirements": "公开职位J14308，本科及以上，2027届应届毕业生，机械及采购类相关专业优先。 本站作招聘资料归档，并不代表实时确认在招；投递城市、学历及任职条件以招聘官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "采购管理",
+        "供应链管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上",
+      "currentOpenVerified": false,
+      "category": "供应链 / 质量"
+    },
+    {
+      "id": "procure-optical",
+      "title": "采购工程师（光学）（公开岗位方向）",
+      "city": "济南 · 历城区",
+      "url": "https://bodor.zhiye.com/Campus",
+      "evidenceUrl": "https://jgxy.sdut.edu.cn/2026/1009/c5450a573387/page.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "济南邦德激光股份有限公司",
+      "summary": "围绕光学相关物料或器件的采购需求参与供应商沟通、物料信息分析及采购流程协同，推进采购质量、交付与成本管理。该方向有公开招聘线索，正式岗位资格请核对官方招聘入口。",
+      "requirements": "公开的光学采购方向职位编号J14310已见于招聘信息；是否面向2027届须按企业招聘公告复核。本平台不将第三方岗位线索直接认定为已开放校招职位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "光学工程",
+        "光电信息科学与工程",
+        "采购管理",
+        "供应链管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 以官网为准",
+      "currentOpenVerified": false,
+      "category": "供应链 / 质量"
+    },
+    {
+      "id": "quality-eng",
+      "title": "质量工程师（2027届招聘方向）",
+      "city": "济南（岗位城市以官网为准）",
+      "url": "https://bodor.zhiye.com/Campus",
+      "evidenceUrl": "https://jgxy.sdut.edu.cn/2026/1009/c5450a573387/page.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "济南邦德激光股份有限公司",
+      "summary": "协助质量体系执行、产品测试数据整理、制造缺陷分析与改进措施跟踪，与研发、采购和生产团队协同处理设备质量问题。2027秋招公告列有质量工程师方向，学历专业需按具体职位核验。",
+      "requirements": "2027届招聘方向包含质量工程师，具体职位状态未实时确认。 本站作招聘资料归档，并不代表实时确认在招；投递城市、学历及任职条件以招聘官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "质量管理工程",
+        "机械工程",
+        "材料科学与工程",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 以官网为准",
+      "currentOpenVerified": false,
+      "category": "供应链 / 质量"
+    },
+    {
+      "id": "domestic-sales",
+      "title": "国内销售工程师（2027届）",
+      "city": "全国（实际城市以官网为准）",
+      "url": "https://bodor.zhiye.com/Campus",
+      "evidenceUrl": "https://jgxy.sdut.edu.cn/2026/1009/c5450a573387/page.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "济南邦德激光股份有限公司",
+      "summary": "了解激光切割及焊接装备的产品参数和应用行业，与潜在制造业客户沟通需求，协助技术方案演示、客户管理及销售流程推进。2027届公告将国内销售列为营销服务招聘方向。",
+      "requirements": "招聘方向已见于2027届公告，全国/驻地由企业最终确认。 本站作招聘资料归档，并不代表实时确认在招；投递城市、学历及任职条件以招聘官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "机械工程",
+        "电气工程及其自动化",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 以官网为准",
+      "currentOpenVerified": false,
+      "category": "营销 / 服务"
+    },
+    {
+      "id": "overseas-sales",
+      "title": "海外销售工程师（2027届）",
+      "city": "海外 / 济南（以官网为准）",
+      "url": "https://bodor.zhiye.com/Campus",
+      "evidenceUrl": "https://jgxy.sdut.edu.cn/2026/1009/c5450a573387/page.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "济南邦德激光股份有限公司",
+      "summary": "面向境外渠道和制造业客户开展商务开发与产品沟通，协助跟进售前技术方案、跨文化交流和订单执行。语言能力与出差派驻要求因岗位而异，需在官方职位页核对。",
+      "requirements": "海外销售为2027届公开方向，具体语言和城市要求以官网为准。 本站作招聘资料归档，并不代表实时确认在招；投递城市、学历及任职条件以招聘官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "国际经济与贸易",
+        "英语",
+        "俄语",
+        "西班牙语",
+        "机械工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 以官网为准",
+      "currentOpenVerified": false,
+      "category": "营销 / 服务"
+    },
+    {
+      "id": "overseas-service",
+      "title": "海外服务工程师（2027届）",
+      "city": "济南及海外（以官网为准）",
+      "url": "https://bodor.zhiye.com/Campus",
+      "evidenceUrl": "https://51uns.bysjy.com.cn/Position/Details/3241634?schoolCode=10720",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "济南邦德激光股份有限公司",
+      "summary": "参与激光装备售前方案说明、海外安装调试、客户培训及售后维护，通过现场与远程服务解决设备使用问题，并收集质量反馈支持产品迭代。公开的高校2027届岗位信息提供了具体职责依据。",
+      "requirements": "高校2027届岗位说明明确本科及以上，机械、电气、车辆等相关专业优先，具备外语沟通基础。 本站作招聘资料归档，并不代表实时确认在招；投递城市、学历及任职条件以招聘官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "电气工程及其自动化",
+        "自动化",
+        "车辆工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上",
+      "currentOpenVerified": false,
+      "category": "营销 / 服务"
+    },
+    {
+      "id": "technical-support",
+      "title": "技术支持工程师（2027届）",
+      "city": "济南 / 全国（以官网为准）",
+      "url": "https://bodor.zhiye.com/Campus",
+      "evidenceUrl": "https://jgxy.sdut.edu.cn/2026/1009/c5450a573387/page.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "济南邦德激光股份有限公司",
+      "summary": "支持激光设备的售前选型、客户技术交流、安装培训与故障问题跟进，协调研发和售后团队完善客户服务。2027届公开招聘方向已列出技术支持工程师，岗位地点和资格待官网复核。",
+      "requirements": "2027届公告列有技术支持工程师方向。 本站作招聘资料归档，并不代表实时确认在招；投递城市、学历及任职条件以招聘官网为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "电气工程及其自动化",
+        "自动化",
+        "光电信息科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科 / 硕士 / 博士 · 以官网为准",
+      "currentOpenVerified": false,
+      "category": "营销 / 服务"
+    }
+  ]
+}
