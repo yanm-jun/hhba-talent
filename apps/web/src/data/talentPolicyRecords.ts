@@ -1,4 +1,5 @@
 import {BEIJING_POLICY_RECORDS} from './beijingPolicyRecords.ts';
+import {SHANGHAI_POLICY_RECORDS} from './shanghaiPolicyRecords.ts';
 import {LANGFANG_POLICY_RECORDS} from './langfangPolicyRecords.ts';
 import {CANGZHOU_POLICY_RECORDS} from './cangzhouPolicyRecords.ts';
 import {HENGSHUI_POLICY_RECORDS} from './hengshuiPolicyRecords.ts';
@@ -27,6 +28,7 @@ export type TalentPolicyRecord={
 };
 export const TALENT_POLICY_REVIEW_DATE='2026-10-30';
 export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
+...SHANGHAI_POLICY_RECORDS,
 ...BEIJING_POLICY_RECORDS,
 ...HENGSHUI_POLICY_RECORDS,
 ...LANGFANG_POLICY_RECORDS,
