@@ -5,7 +5,7 @@ import {LIAONING_MUNICIPAL_POLICY_RECORDS,LIAONING_MUNICIPAL_RESEARCH_RECORDS} f
 
 /** 14市统一详情组件：省级同款属地视图和城市独立项目不能混为一谈。 */
 export const LIAONING_GUIDE_RECORDS:readonly TalentPolicyRecord[]=[...LIAONING_PROVINCIAL_POLICY_RECORDS,...LIAONING_MUNICIPAL_POLICY_RECORDS,...LIAONING_MUNICIPAL_RESEARCH_RECORDS];
-export const LIAONING_14_CITIES=LIAONING_CITY_CONTACTS.map(c=>c.city);
+export const LIAONING_14_CITIES:string[]=LIAONING_CITY_CONTACTS.map(c=>c.city);
 export const liaoningGuideRoute=(id:string)=>'/talent-service/policy-guide-preview/liaoning/'+encodeURIComponent(id);
 const st=(title:string,action:string,i:number):GuideStep=>({
  title,action,
