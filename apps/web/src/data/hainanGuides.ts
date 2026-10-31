@@ -1,6 +1,6 @@
 import type {CompleteGuide,GuideStep,GuideBranch} from '../components/talent/UnifiedPolicyGuide';
-import {HAINAN_POLICY_RECORDS} from './hainanPolicyRecords';
-import {HAINAN_HOUSING_RECORDS} from './hainanHousingRecords';
+import {HAINAN_POLICY_RECORDS} from './hainanPolicyRecords.ts';
+import {HAINAN_HOUSING_RECORDS} from './hainanHousingRecords.ts';
 import type {TalentPolicyRecord} from './talentPolicyRecords';
 import type {TalentHousingRecord} from './talentHousingRecords';
 export const HAINAN_TALENT_CITIES=['海口','三亚','三沙','儋州'] as const;
