@@ -20,7 +20,7 @@ CFG={
   "photoPages":["https://www.bondex.com.cn/news/detail?pid=5648","https://www.bondex.com.cn/wuliu/haiyun","https://www.bondex.com.cn/about"],
   "logoPages":["https://www.bondex.com.cn/","https://www.bondex.com.cn/about/wenhua"],
   "hint":["bondex","邦达","物流"],"editorialLogo":True},
- "055":{"name":"长隆科技","photoPages":["https://a617645265.cn.goepe.com/","https://clkj888888.gys.cn/","https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822"],
+ "055":{"name":"长隆科技","photoPages":["https://a617645265.cn.goepe.com/","https://clkj888888.gys.cn/","https://changlong6.gys.cn/","https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822"],
   "logoPages":["https://a617645265.cn.goepe.com/","https://clkj888888.gys.cn/"],
   "hint":["长隆科技","changlong","cl39","深圳长隆"],"editorialLogo":True},
  "056":{"name":"维音","photoPages":["https://www.vxichina.cn/","https://www.vxichina.cn/AboutStd_806.html"],
@@ -51,7 +51,7 @@ def candidates(page,logo):
    u=urljoin(page,html.unescape(value).strip())
    if not u.startswith('https://'):continue
    label=(u+' '+context).lower()
-   if re.search('qrcode|weixin|wechat|公众号|二维码|shareicon|favicon|sprite|loading|transparent',label,re.I):continue
+   if re.search('qrcode|weixin|wechat|公众号|二维码|shareicon|favicon|sprite|loading|transparent|/void[.]|/public/images/detail/|/images/image-fixed/',label,re.I):continue
    score=0
    if re.search('logo|brand|标志|商标',label,re.I):score+=16 if logo else -18
    if re.search('about|company|photo|product|business|业务|仓库|海运|客户|环保|车间|项目|运营|展会|contact|news|article|内容|图片',label,re.I):score+=5
@@ -61,7 +61,7 @@ def candidates(page,logo):
    found[u]=max(found.get(u,-99),score)
  print('MEDIA_PAGE_CANDIDATES',page,'logo' if logo else 'photo',len(found),flush=True)
  return sorted(found.items(),key=lambda x:-x[1])
-def normalize(raw,name):
+def normalize(raw,name,no):
  if b'<svg' in raw[:6000]:raw=cairosvg.svg2png(bytestring=raw,output_width=1000)
  with Image.open(BytesIO(raw)) as c:c.verify()
  with Image.open(BytesIO(raw)) as im:
@@ -70,7 +70,10 @@ def normalize(raw,name):
    if im.width<50 or im.height<18:raise ValueError('Tiny logo')
    im=im.convert('RGBA')
   else:
-   if im.width<380 or im.height<220:raise ValueError('Not enough detail to be a company photograph')
+   # VXI serves truthful small graphics for its branded SaaS products; allow these
+   # as PRODUCT ILLUSTRATIONS only, never describe them as office photographs.
+   minimum=(140,90) if no=='056' else (300,160)
+   if im.width<minimum[0] or im.height<minimum[1]:raise ValueError('Not enough detail to be a company photograph/illustration: '+str(im.size))
    if im.width/im.height>3.5 or im.height/im.width>3:raise ValueError('Decorative banner/header')
    im=im.convert('RGB')
   if im.width<700:
@@ -118,7 +121,7 @@ for no,cfg in CFG.items():
     raw=download(url,page)
     h=sha256(raw).hexdigest()
     if h in used:raise ValueError('Duplicate source reused')
-    out,size=normalize(raw,name)
+    out,size=normalize(raw,name,no)
     if len(out)<2000:raise ValueError('Blank media file')
     f.write_bytes(out)
     audit[name]={'company':cfg['name'],'verified':True,'editorialFallback':False,'source':url,'sourcePage':page,
