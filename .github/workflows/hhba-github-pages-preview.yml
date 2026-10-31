@@ -225,6 +225,9 @@ jobs:
       - name: Package source-audited 078-080 photos and verified brand references after approval
         working-directory: apps/web
         run: python scripts/prepare-employers-078-080-source-media.py
+      - name: Package source-audited 081-083 company documentary photographs after approval
+        working-directory: apps/web
+        run: python scripts/prepare-employers-081-083-photo-evidence.py
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
@@ -255,6 +258,9 @@ jobs:
       - name: Validate 078-080 sourced images, professional filters and recruitment links
         working-directory: apps/web
         run: node scripts/employers-078-080-v2.contract.test.mjs
+      - name: Validate 081-083 company role sources, professional chips and photos
+        working-directory: apps/web
+        run: node scripts/employers-081-083-v2.contract.test.mjs
       - name: Validate MINIEYE 035 source-backed positions, six major tabs and real media
         working-directory: apps/web
         run: node scripts/minieye-v2.contract.test.mjs
