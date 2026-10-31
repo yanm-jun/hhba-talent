@@ -1,0 +1,70 @@
+name: HHBA Monash University Deep Profile Validation
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hhba-study-monash-validation.yml'
+      - 'apps/web/src/data/studyMonash.ts'
+      - 'apps/web/src/components/MonashUniversityPage.tsx'
+      - 'apps/web/src/components/StudyUniversityDirectory.tsx'
+      - 'apps/web/src/styles/study-monash.css'
+      - 'apps/web/scripts/package-monash-campus-photos.py'
+      - 'apps/web/scripts/monash.contract.test.mjs'
+      - 'apps/web/scripts/monash.browser.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-monash-verify-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    name: Real campus photos, 2 official MSc, international tuition, actual Chromium
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Validate actual official programmes, tuition, cross-major, image credits and existing homepage
+        working-directory: apps/web
+        run: node --experimental-strip-types --test scripts/monash.contract.test.mjs scripts/study-universities.contract.test.mjs scripts/study-abroad.contract.test.mjs
+      - name: Package three licensed real Clayton campus JPEGs
+        run: python apps/web/scripts/package-monash-campus-photos.py
+      - name: Compile main HHBA React application (not a separate website)
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+        run: npm run build
+      - name: Install Chromium
+        working-directory: apps/web
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Verify deep site links, images, photo licensing, graduate requirements and fees in Chrome
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          HHBA_TEST_BASE: 'http://127.0.0.1:4173/hhba-talent/'
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/hhba-monash.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -fsS "$HHBA_TEST_BASE" >/dev/null 2>&1; then break; fi
+            sleep 1
+          done
+          curl -fsS "$HHBA_TEST_BASE" >/dev/null
+          node scripts/monash.browser.mjs
+      - name: Save desktop and mobile acceptance screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-monash-university-browser-proof
+          path: apps/web/mainline-v2-browser-proof/
+          retention-days: 14
+          if-no-files-found: ignore

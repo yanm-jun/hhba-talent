@@ -1,0 +1,13 @@
+/* HHBA Monash deep profile: inherits established Minot University component aesthetic; no homepage edits. */
+.hhba-monash .hhba-minot-hero{background:radial-gradient(ellipse at 86% 4%,#d4e9e0,transparent 48%),linear-gradient(118deg,#edf7f1,#fff)}
+.hhba-monash .hhba-minot-program-card{min-width:0}
+.hhba-monash .hhba-minot-photo-trigger img{object-fit:cover}
+.hhba-monash .hhba-minot-program-card h3{font-size:19px}
+.hhba-monash .hhba-minot-program-card .hhba-minot-program-summary{line-height:1.95}
+.hhba-monash .hhba-minot-narrative{min-width:0}
+.hhba-monash .hhba-minot-narrative h3{overflow-wrap:anywhere}
+.hhba-monash .hhba-minot-fee-wrap th,.hhba-monash .hhba-minot-fee-wrap td{min-width:110px}
+.hhba-monash .hhba-minot-lightbox>p{color:#dcece0}
+.hhba-monash .hhba-minot-jump>a:focus-visible,.hhba-monash .hhba-minot-thumb:focus-visible,.hhba-monash .hhba-minot-photo-trigger:focus-visible{outline:2px solid #2d8251;outline-offset:2px}
+.hhba-monash-description{font-size:13px;line-height:1.95;color:#607b6b;margin:0 0 20px}
+@media(max-width:690px){.hhba-monash .hhba-minot-program-grid{grid-template-columns:1fr}.hhba-monash .hhba-minot-hero-actions>a{max-width:100%}.hhba-monash .hhba-minot-fee-wrap{overflow-x:auto}}
