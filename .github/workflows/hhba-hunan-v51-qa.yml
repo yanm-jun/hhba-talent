@@ -1,0 +1,43 @@
+name: HHBA Hunan V5.1 branch QA
+on:
+  push:
+    branches: ['feature/talent-hunan']
+  pull_request:
+    paths:
+      - 'apps/web/src/data/hunan*'
+      - 'apps/web/src/data/talentCityRegistry.ts'
+      - 'apps/web/src/pages/TalentServiceRoutes.tsx'
+      - 'apps/web/scripts/test-hunan-city-v51.mjs'
+      - '.github/workflows/hhba-hunan-v51-qa.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci
+      - name: Hunan 14 regions and nationwide V5.1 regressions
+        working-directory: apps/web
+        run: |
+          node --experimental-strip-types scripts/test-hunan-city-v51.mjs
+          node --experimental-strip-types scripts/test-talent-cities.mjs
+          node --experimental-strip-types scripts/test-yunnan-city-v51.mjs
+          node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - name: Build isolated static preview
+        working-directory: apps/web
+        run: npm run build
+      - name: Upload isolated static bundle without publishing
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-hunan-v51-static-build
+          path: apps/web/dist/
+          if-no-files-found: error
