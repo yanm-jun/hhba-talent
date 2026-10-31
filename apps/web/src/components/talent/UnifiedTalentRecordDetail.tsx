@@ -9,6 +9,7 @@ import {jiangsuGuideUrl} from '../../data/jiangsuGuides';
 import '../../styles/talent-jinan-guide-preview.css';
 
 function nationalRecordGuideUrl(kind:'policy'|'housing',id:string,city:string):string|undefined{
+ if(id.startsWith('hi-')&&['海口','三亚','三沙','儋州'].includes(city))return '/talent-service/policy-guide-preview/hainan/'+kind+'/'+encodeURIComponent(id);
  if(id.startsWith('hb-'))return hubeiGuideUrl(kind,id);
  if(id.startsWith('fj-'))return fujianGuideUrl(kind,id);
  if(kind==='housing')return undefined;

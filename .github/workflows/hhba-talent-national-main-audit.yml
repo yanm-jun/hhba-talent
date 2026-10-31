@@ -41,5 +41,7 @@ jobs:
         run: node --experimental-strip-types scripts/test-talent-prefecture-25-v51.mjs
       - name: Verify Leshan High-Tech Zone official 2024 policy and housing scope
         run: node --experimental-strip-types scripts/test-leshan-policy-v51.mjs
+      - name: Check all four Hainan regions and complete B-grade guides
+        run: node --experimental-strip-types scripts/test-hainan-full-v51.mjs
       - name: Confirm static build
         run: npm run build
