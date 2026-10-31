@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/hhba-chengde-static-deploy.yml'
+      - 'apps/web/scripts/test-talent-city-contract-v51.mjs'
   workflow_dispatch:
 permissions:
   contents: read
