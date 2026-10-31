@@ -268,4 +268,43 @@ check('Qinhuangdao V5.1 government EDZ apartment policy and separately sourced n
  assert.ok(page.includes('housingResearchLeads(match.name)')&&page.includes('<UnifiedTalentHousingResearch city={city} query={query}/>'));
  assert.equal(ACCEPTED_TALENT_CITIES.includes(city),false);
 });
+check('Baoding V5.1: official 2026 four-community rental allocation and historical incentives stay distinct',()=>{
+ const city='保定';
+ const pol=TALENT_POLICY_RECORDS.filter(p=>p.city===city);
+ const homes=TALENT_HOUSING_RECORDS.filter(h=>h.city===city);
+ const ids=['bd-2026-guokong-rental','bd-2025-provident-rent','bd-2022-graduate-rent-history','bd-2022-graduate-purchase-history','bd-2022-graduate-settle-history'];
+ assert.equal(pol.length,5);
+ assert.equal(new Set(pol.map(p=>p.id)).size,5);
+ for(const id of ids){
+  const p=pol.find(x=>x.id===id);
+  assert.ok(p,id);
+  assert.equal(talentSourceKind(p.sourceUrl),'government',id);
+  assert.ok(p.materials?.length>=3&&p.applicationSteps?.length>=4,id+' must include detailed conditions');
+  assert.ok(p.reviewNote.includes('办理入口待核实'),id+' must disclose online access limits');
+  assert.notEqual(assessPolicy(p,'2026-10-31').grade,'A');
+ }
+ for(const id of ids.slice(2))assert.equal(assessPolicy(pol.find(p=>p.id===id),'2026-10-31').grade,'C','2022 is historical only');
+ assert.ok(pol.find(p=>p.id==='bd-2025-provident-rent').benefit.includes('不是政府额外发款'));
+ assert.ok(pol.find(p=>p.id==='bd-2022-graduate-purchase-history').benefit.includes('分两次'));
+ assert.equal(homes.length,5);
+ assert.equal(homes.filter(h=>h.kind==='project').length,4);
+ assert.equal(homes.filter(h=>h.kind==='program').length,1);
+ const named=['曹庄小区','新秀园','周正家园','中贤佳苑'];
+ for(const name of named){
+  const h=homes.find(x=>x.kind==='project'&&x.title.includes(name));
+  assert.ok(h,'Missing named official housing site '+name);
+  assert.equal(talentSourceKind(h.sourceUrl),'government');
+  assert.ok(h.units.includes('284')&&h.units.includes('合计')&&h.units.includes('不能把284套全部算作本小区'));
+  assert.ok(h.statusNote.includes('不代表现在仍有空房'));
+  assert.ok(h.steps.length>=4&&h.contactPhone.includes('0312-6789109'));
+  assert.notEqual(assessHousing(h,'2026-10-31').grade,'A');
+ }
+ const program=homes.find(h=>h.kind==='program');
+ assert.ok(program.units.includes('不得与四个具体项目重复加总'));
+ assert.ok(program.steps.length>=4&&program.statusNote.includes('不等于2026年10月实时空房'));
+ const cityCode=code('TalentServiceRoutes.tsx');
+ assert.ok(cityCode.includes("const housingPolicies=policies.filter(isHousingPolicy)"));
+ assert.ok(cityCode.includes("k.id==='policies'?policies.length+' 条已收录'"));
+ assert.equal(ACCEPTED_TALENT_CITIES.includes(city),false);
+});
 console.log(JSON.stringify({passed,baseline:base.policyIds.length+base.housingIds.length,certified:Object.keys(CERTIFIED_TALENT_GUIDES).length,acceptedCities:ACCEPTED_TALENT_CITIES.length},null,2));
