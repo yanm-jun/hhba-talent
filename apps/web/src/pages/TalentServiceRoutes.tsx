@@ -254,7 +254,7 @@ function GuideContent({city}:{city:string}){
  </>;
 }
 function DetailPage({kind,id}:{kind:'policy'|'housing';id:string}){
- const p=kind==='policy'?TALENT_POLICY_RECORDS.find(x=>x.id===id):undefined;
+ const p=kind==='policy'?(TALENT_POLICY_RECORDS.find(x=>x.id===id)||XINGTAI_POLICY_RESEARCH_RECORDS.find(x=>x.id===id)):undefined;
  const h=kind==='housing'?TALENT_HOUSING_RECORDS.find(x=>x.id===id):undefined;
  if(!p&&!h)return <><Bread current="未找到该条资料"/><Empty city="所选城市" kind="详情"/></>;
  return <UnifiedTalentRecordDetail policy={p} housing={h}/>;
