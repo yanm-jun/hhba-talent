@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const read=p=>fs.readFileSync(p,'utf8');
+const profiles=['039','040','041'].map(n=>JSON.parse(read('src/data/employerProfiles/cn-autumn-'+n+'.json')));
+const expected=[['039','安世中国',12],['040','黑格科技',13],['041','晶云',14]];
+const sourceDomains=['nexperia.com','heygears.jobs.feishu.cn','mh.hire66.com'];
+const page=read('src/pages/UnifiedV2CompanyPage.tsx');
+assert(page.includes("const batch3941=['cn-autumn-039','cn-autumn-040','cn-autumn-041'].includes(id)"),'Use existing standard V2 design');
+assert(page.includes('if(minieye||batch3941)return job.category===major'),'Category chips filter actual corresponding roles');
+assert(page.includes('j.category===g.label'),'Only matched roles count in chips');
+assert(page.includes('batchGroups'),'Data-driven labels based on real categories');
+assert(page.includes('站内岗位详情')&&page.includes('data-hhba-recruitment-outbound="true"'),'Detail and auth route preserved');
+assert(page.includes('hhba-kpmg-photo-grid'),'Company photo grid preserved');
+for(const t of ['适合哪些专业背景？','招聘岗位','主要业务与专业服务'])assert(page.includes(t));
+for(const [i,p] of profiles.entries()){
+ const [num,name,count]=expected[i];
+ assert.equal(p.id,'cn-autumn-'+num);assert.equal(p.name,name);
+ assert.equal(p.business.length,6,'Six distinct business cards for '+name);
+ assert.equal(p.jobs.length,count,'Actual sourced job count for '+name);
+ assert.equal(new Set(p.jobs.map(j=>j.id)).size,count);
+ assert(p.jobs.every(j=>j.currentOpenVerified===false),'Unverified live status '+name);
+ assert(p.jobs.every(j=>j.url.startsWith('https://')&&j.evidenceUrl.startsWith('https://')));
+ assert(p.jobs.every(j=>j.summary.length>=22&&j.requirements.length>=65),'Actual meaningful details and verification caveat');
+ assert(p.jobs.every(j=>j.educationLabel&&j.majorNames.length>=1),'Each role has education and relevant majors');
+ assert(new Set(p.jobs.map(j=>j.category)).size>=4);
+ assert(p.recruitment.url.includes(sourceDomains[i]));
+ const files=[p.media.logo,...p.media.photos.map(x=>x.path)];
+ assert.equal(new Set(files).size,3);
+ for(const file of files){assert(fs.existsSync('public/'+file),'Missing LOCAL actual image '+file);assert(fs.statSync('public/'+file).size>2500);}
+ const audit=JSON.parse(read('public/images/employer-profiles/cn-autumn-'+num+'/media-audit.json'));
+ assert.deepEqual(Object.keys(audit).sort(),['logo.png','photo1.jpg','photo2.jpg']);
+ assert(Object.values(audit).every(x=>x.verified&&x.source.startsWith('https://')&&x.sourceSha256));
+ assert.equal(new Set(Object.values(audit).map(x=>x.sourceSha256)).size,3);
+ assert(p.media.photos.every(x=>x.alt&&x.caption&&x.note));
+ console.log('HHBA_COMPANY_0'+num+'_PANELS_IMAGES_JOBS_PASS',JSON.stringify({name,jobs:count,business:6,assets:3}));
+}
+assert(profiles[1].jobs.every(x=>x.title.includes('2026届')&&x.requirements.includes('到期')),'Never show old HeyGears campus jobs as 2027');
+assert(profiles[2].jobs.some(x=>x.title.includes('设备助理')&&x.majorNames.includes('机械设计制造及其自动化')));
+assert(profiles[0].jobs.some(x=>x.title.includes('电气设计')&&x.majorNames.includes('自动化')));
+console.log('HHBA_BATCH_039_040_041_FOUR_PANEL_COMPLETE',profiles.reduce((n,p)=>n+p.jobs.length,0),'jobs / 9 separate images');
