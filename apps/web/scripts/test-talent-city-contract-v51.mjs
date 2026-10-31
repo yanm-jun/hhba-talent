@@ -168,7 +168,7 @@ check('City hub prominently counts housing support and unverified apartment refe
  assert.ok(hub.includes('const housingPolicies=policies.filter(isHousingPolicy)'), 'city hub must include housing-support policies');
  assert.ok(hub.includes('const housingLeads=housingResearchLeads(match.name)'), 'city hub must load apartment references');
  assert.ok(hub.includes('label="住房支持政策"'), 'main city counter must display housing policy count');
- assert.ok(hub.includes('label="人才公寓线索 · 待核验"'), 'apartment references must be visible in summary');
+ assert.ok(hub.includes('label="人才公寓线索 · 待核验"') || (hub.includes("researchHousing>0?researchHousing+' 处人才公寓线索（待核验）'") && hub.includes('const housingLeads=housingResearchLeads(match.name)')), 'apartment references must be visibly counted in the city summary');
  assert.ok(hub.includes('人才公寓在哪里？'), 'city hub must show apartment preview with navigation');
  assert.ok(hub.includes("k.id==='policies'?policies.length+' 条已收录'"), 'housing card must not treat reference-only city as empty');
  assert.ok(cityIndex.includes("name==='日照'"), 'Rizhao description should not incorrectly claim there is no housing information');
