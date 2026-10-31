@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-157",
+  "name": "基恩士",
+  "displayName": "基恩士",
+  "englishName": "KEYENCE CHINA",
+  "aliases": [
+    "基恩士（中国）有限公司",
+    "基恩士(中国)有限公司",
+    "基恩士中国",
+    "KEYENCE",
+    "KEYENCE CHINA",
+    "KEYENCE (CHINA) CO. LTD.",
+    "基恩士2027校园招聘",
+    "基恩士招聘"
+  ],
+  "industry": "工业自动化 · 传感器 · 机器视觉 · 测量仪器 · 激光刻印",
+  "subtitle": "基恩士（中国）有限公司 · 2001年进入中国 · 中国总部位于上海浦东",
+  "overview": "基恩士（KEYENCE）创立于1974年，总部在日本大阪，中国业务自2001年起开展。基恩士（中国）有限公司负责中国市场的销售、技术支持和运营，为汽车、电子、半导体、医疗、包装与食品等领域提供工业自动化产品和解决方案，涵盖传感器、机器视觉、测量仪器、激光刻印、数码显微系统、PLC及自动识别等。中国总部位于上海市浦东新区世纪大道100号上海环球金融中心7楼。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.keyence.com.cn/about-us/",
+    "https://www.keyence.com.cn/ss/careers/",
+    "https://www.keyence.com.cn/ss/careers/company.jsp",
+    "https://www.keyence.com.cn/ss/careers/recruitment.jsp",
+    "https://www.keyence.com.cn/products/",
+    "https://career.nankai.edu.cn/correcruit/content/id/117020.html",
+    "https://www.keyence-jobs.jp/work/business/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-157/logo.webp",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-157/photo1.jpg",
+        "caption": "KEYENCE · 企业办公建筑（日本公司官网）",
+        "alt": "基恩士公司官网展示的日本企业办公建筑外景",
+        "note": "图片来自基恩士中国官方网站公司概述，展现全球品牌企业形象；不冒充上海中国总部办公楼。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-157/photo2.jpg",
+        "caption": "KEYENCE · 现场产品演示（日本招聘官网）",
+        "alt": "KEYENCE员工在办公室演示工业自动化传感器及产品的真实照片",
+        "note": "取自日本基恩士官方招聘网站的业务岗位工作场景，说明顾问式产品演示方式；非中国办公室实拍。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.keyence.com.cn/ss/careers/recruitment.jsp",
+    "label": "基恩士2027官方招聘入口",
+    "status": "official_portal",
+    "subject": "基恩士（中国）有限公司",
+    "note": "官方2027届秋季校园招聘明示销售工程师/销售岗位，学历本科及以上、专业不限，毕业时间2026年9月1日至2027年8月31日。录用城市由公司分配，薪酬为公司公布的区间，实时开放与投递状态以官方招聘页面为准。"
+  },
+  "majorIntro": "基恩士2027届校园招聘专业不限，不应只因机械、电气、计算机等专业关键词筛除其他专业。只有一条经官方确认的岗位方向，其他业务类别不是独立招聘职位。",
+  "preferredMajors": [],
+  "photoNote": "本页使用基恩士品牌公开Logo及两张独立的企业真实资料图片（官网企业建筑、官网员工产品演示）。图片保存为静态站本地副本，单纯展示不外跳；场景地点在图片说明中如实标注，HHBA非基恩士官方招聘代理，图像权利归原权利人。",
+  "business": [
+    {
+      "title": "智能传感器与检测",
+      "description": "面向制造现场的有无检测、工件定位与过程监测，覆盖光电、光纤、激光及接近传感器等。",
+      "tags": "智能传感 · 工业检测",
+      "details": [
+        "光电、激光、光纤与接近传感",
+        "生产设备状态识别和位置检测",
+        "自动化设备的数据采集与异常识别"
+      ]
+    },
+    {
+      "title": "机器视觉与自动识别",
+      "description": "以视觉系统、图像识别传感器及条码读取设备支持工件识别、缺陷检测与追溯。",
+      "tags": "机器视觉 · 读码追溯",
+      "details": [
+        "视觉检测与尺寸识别",
+        "工业条形码/二维码读取",
+        "电子、包装、汽车等行业的追溯应用"
+      ]
+    },
+    {
+      "title": "高精密测量与3D扫描",
+      "description": "提供激光位移、图像尺寸测量、三维轮廓及扫描测量产品，支持精密品质管理。",
+      "tags": "尺寸测量 · 3D检测",
+      "details": [
+        "激光位移与非接触测量",
+        "全自动影像测量仪",
+        "三维轮廓、3D扫描和工业测量方案"
+      ]
+    },
+    {
+      "title": "激光刻印与标识",
+      "description": "通过光纤、UV等激光刻印设备，对产品进行高对比度标识、序列号和可追溯信息加工。",
+      "tags": "激光打标 · 工业标识",
+      "details": [
+        "光纤、UV和CO₂激光刻印",
+        "零部件和包装材料标识",
+        "制造履历、序列号与追溯应用"
+      ]
+    },
+    {
+      "title": "数码显微与质量分析",
+      "description": "服务研发实验、微观形貌观察和产品质量分析，提供超景深、激光显微及高分辨观察方案。",
+      "tags": "显微分析 · 研发质量",
+      "details": [
+        "数码显微系统及超景深观察",
+        "激光显微与表面粗糙度测量",
+        "研发实验、质量复核及失效分析"
+      ]
+    },
+    {
+      "title": "PLC控制与技术服务",
+      "description": "结合PLC/HMI及现场技术支持，为客户提供设备控制、方案演示和投产后的应用培训。",
+      "tags": "PLC · 顾问式服务",
+      "details": [
+        "工业PLC及HMI控制产品",
+        "售前现场演示与应用测试",
+        "安装协助、技术咨询和操作培训"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "sales-engineer-2027",
+      "title": "销售工程师 / 销售（2027届秋季校园招聘）",
+      "city": "全国23个城市Office（地点由公司分配，非指定城市独立岗位）",
+      "category": "专业不限",
+      "url": "https://www.keyence.com.cn/ss/careers/recruitment.jsp",
+      "evidenceUrl": "https://www.keyence.com.cn/ss/careers/recruitment.jsp",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "基恩士（中国）有限公司",
+      "summary": "采用顾问式B2B销售方式，面向各行业制造企业直接开展客户沟通：了解客户的生产、检测与测量难点，结合传感器、机器视觉、工业测量或激光标识等产品进行介绍和演示，分析所在区域的行业动态、持续跟进客户需求，协助企业推进工业自动化改善方案。",
+      "requirements": "招聘对象：2027届本科及以上应届毕业生，专业不限；毕业时间为2026年9月1日至2027年8月31日。工作地点：根据公司业务统一分配，目前在23个城市设有Office，并非可任意选择全国所有城市。公司公布的本科月薪为12,000—15,000元，研究生为14,000—17,000元，视工作地点而定；参考年收入和奖金会随业绩变化，不能视为保证收入。企业披露的福利包括双休、五险一金、补充商业保险、带薪培训及相应补贴。具体岗位、薪酬、流程与当前是否可投递请以官方招聘页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": true,
+      "educationLabel": "本科及以上 · 2027届 · 专业不限",
+      "currentOpenVerified": false
+    }
+  ]
+}
