@@ -346,7 +346,7 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
  const qhPolicyMatch=(p:TalentPolicyRecord)=>!query||matchesPolicy(p.city==='青海省'?{...p,city}:p,query,city);
  const qhHousingMatch=(h:TalentHousingRecord)=>!query||matchesHousing(h.city==='青海省'?{...h,city}:h,query,city);
  const resultPolicies=(searchMode?[...TALENT_POLICY_RECORDS,...XINGTAI_POLICY_RESEARCH_RECORDS,...GUANGXI_RENT_RESEARCH_RECORDS,...GUANGXI_MUNICIPAL_RESEARCH_RECORDS,...LIAONING_MUNICIPAL_RESEARCH_RECORDS]:[...TALENT_POLICY_RECORDS,...GUANGXI_RENT_RESEARCH_RECORDS,...GUANGXI_MUNICIPAL_RESEARCH_RECORDS,...LIAONING_MUNICIPAL_RESEARCH_RECORDS]).filter(p=>eligibleRegion(p.city)&&qhPolicyMatch(p)&&(!housingMode||isHousingPolicy(p))&&(kind!=='benefits'||benefit(p))).sort(recentPolicies);
- const resultHomes=TALENT_HOUSING_RECORDS.filter(p=>eligibleRegion(p.city)&&(housingMode||searchMode)&&qhHousingMatch(p)).sort(housingFirst);
+ const resultHomes=TALENT_HOUSING_RECORDS.filter(p=>p.city===city||(qhCity&&p.city==='青海省')).filter(p=>(housingMode||searchMode)&&qhHousingMatch(p)).sort(housingFirst);
  const pendingHousingCount=(housingMode||searchMode)?housingResearchLeads(city,query||'').length:0;
  const housingHistoricalCount=(housingMode||searchMode)?housingPolicyResearch(city,query||'').length:0;
  const housingPrograms=resultHomes.filter(p=>p.kind==='program');
