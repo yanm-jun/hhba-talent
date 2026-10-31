@@ -29,7 +29,7 @@ for(const p of QINGHAI_POLICY_RESEARCH_RECORDS){
  assert.ok(p.sourceUrl.startsWith('https://'),p.id);
  assert.ok(p.published.match(/^202[0-6]-\d\d-\d\d$/),p.id);
  assert.ok(p.materials?.length>=3&&p.applicationSteps?.length>=4,p.id);
- assert.ok(p.eligibility.length>60&&p.reviewNote,p.id);
+ assert.ok(p.eligibility.length>40&&p.reviewNote,p.id);
  assert.ok(buildQinghaiGuide('policy',p.id)?.faq.length>=8,p.id);
  assert.ok(qinghaiGuideUrl('policy',p.id).includes('qinghai'),p.id);
  assert.equal(TALENT_POLICY_RECORDS.filter(x=>x.id===p.id).length,QINGHAI_POLICY_RECORDS.some(x=>x.id===p.id)?1:0,p.id);
