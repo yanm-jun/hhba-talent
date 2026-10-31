@@ -16,8 +16,8 @@ import cairosvg
 
 CFG={
  "054":{"name":"海程邦达",
-  "directPhotos":["https://www.bondex.com.cn/file/image/20260624/20260624162433_3786.jpg","https://www.bondex.com.cn/file/image/20260624/20260624162547_4689.jpg"],
-  "photoPages":["https://www.bondex.com.cn/news/detail?pid=5648","https://www.bondex.com.cn/wuliu/haiyun","https://www.bondex.com.cn/about"],
+  "directPhotos":["https://www.bondex.com.cn/Upload/20200707/F630EB46F9C8A2909F576DF900B508FC.jpg","https://www.bondex.com.cn/Upload/20240726/66BCC687F10738374B6B467ED32D35E9.jpg"],
+  "photoPages":["https://www.bondex.com.cn/about","https://www.bondex.com.cn/wuliu/haiyun"],
   "logoPages":["https://www.bondex.com.cn/","https://www.bondex.com.cn/about/wenhua"],
   "hint":["bondex","邦达","物流"],"editorialLogo":True},
  "055":{"name":"长隆科技","photoPages":["https://a617645265.cn.goepe.com/","https://clkj888888.gys.cn/","https://changlong6.gys.cn/","https://job.henu.edu.cn/module/position_brief_detail/id-112340/nid-10822"],
@@ -103,7 +103,7 @@ for no,cfg in CFG.items():
   options=[]
   if no=='054' and not logo:
    preferred=cfg['directPhotos'][0 if name=='photo1.jpg' else 1]
-   options.append((90,preferred,'https://www.bondex.com.cn/news/detail?pid=5648'))
+   options.append((90,preferred,'https://www.bondex.com.cn/about' if name=='photo1.jpg' else 'https://www.bondex.com.cn/wuliu/haiyun'))
   for page in cfg['logoPages' if logo else 'photoPages']:
    try:
     a=candidates(page,logo)
