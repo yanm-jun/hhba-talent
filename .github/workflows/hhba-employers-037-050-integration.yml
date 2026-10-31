@@ -1,0 +1,52 @@
+name: HHBA V2 companies 037-050 mainline integration gate
+on:
+  push:
+    branches:
+      - feature/employers-037-050-main-integration-20261031
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full-v2-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out integration branch (no production publication)
+        uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install exact web dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Check 14 profiles, 106 jobs, 42 image files and V2 four-block layout
+        working-directory: apps/web
+        run: node scripts/employers-037-050-main-integration.contract.test.mjs
+      - name: Diagnose inherited global factory data inconsistencies
+        working-directory: apps/web
+        continue-on-error: true
+        run: node scripts/employer-factory-check.mjs
+      - name: Compile full existing mainline web shell
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: npm run build
+      - name: Verify compiled site contains all 14 companies and their assets
+        run: |
+          test -s apps/web/dist/index.html
+          for id in $(seq -w 37 50); do
+            test -s apps/web/dist/images/employer-profiles/cn-autumn-0$id/logo.png
+            test -s apps/web/dist/images/employer-profiles/cn-autumn-0$id/photo1.jpg
+            test -s apps/web/dist/images/employer-profiles/cn-autumn-0$id/photo2.jpg
+          done
+      - name: Upload integrated static preview of 14 companies without publishing main
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-037-050-integration-full-static-review
+          path: apps/web/dist/
+          if-no-files-found: error
+          retention-days: 14
