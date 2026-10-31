@@ -13,7 +13,7 @@ export const LIAONING_HOUSING_RECORDS:TalentHousingRecord[]=[
     "sourceUrl": "https://www.dlhitech.gov.cn/news/view_78621.html",
     "published": "2026-03-25",
     "reviewedAt": "2026-10-31",
-    "statusNote": "2026-10-31已核对公开住房政策依据，但属于制度/补贴，不是即时出租、可选房源或承诺通过；具体办理入口、空房、审核结果与是否仍开放以住房或人社经办机关当期公示为准。",
+    "statusNote": "2026-10-31已核对公开住房政策依据，但属于制度/补贴，不是即时出租、可选房源或承诺通过；申报入口待核实：具体办事渠道、空房、审核结果与是否仍开放以住房或人社经办机关当期公示为准。",
     "kind": "program",
     "housingCategory": "其他住房",
     "steps": [
@@ -36,7 +36,7 @@ export const LIAONING_HOUSING_RECORDS:TalentHousingRecord[]=[
     "sourceUrl": "https://rsj.yingkou.gov.cn/004/20250610/6c97dd01-d89a-4f86-ad29-f71a02e57989.html",
     "published": "2025-06-10",
     "reviewedAt": "2026-10-31",
-    "statusNote": "2026-10-31已核对公开住房政策依据，但属于制度/补贴，不是即时出租、可选房源或承诺通过；具体办理入口、空房、审核结果与是否仍开放以住房或人社经办机关当期公示为准。",
+    "statusNote": "2026-10-31已核对公开住房政策依据，但属于制度/补贴，不是即时出租、可选房源或承诺通过；申报入口待核实：具体办事渠道、空房、审核结果与是否仍开放以住房或人社经办机关当期公示为准。",
     "kind": "program",
     "housingCategory": "其他住房",
     "steps": [
@@ -59,7 +59,7 @@ export const LIAONING_HOUSING_RECORDS:TalentHousingRecord[]=[
     "sourceUrl": "https://www.panjin.gov.cn/html/3217/2026-05-15/content-151084.html",
     "published": "2026-05-15",
     "reviewedAt": "2026-10-31",
-    "statusNote": "2026-10-31已核对公开住房政策依据，但属于制度/补贴，不是即时出租、可选房源或承诺通过；具体办理入口、空房、审核结果与是否仍开放以住房或人社经办机关当期公示为准。",
+    "statusNote": "2026-10-31已核对公开住房政策依据，但属于制度/补贴，不是即时出租、可选房源或承诺通过；申报入口待核实：具体办事渠道、空房、审核结果与是否仍开放以住房或人社经办机关当期公示为准。",
     "kind": "program",
     "housingCategory": "人才公寓",
     "steps": [
@@ -82,7 +82,7 @@ export const LIAONING_HOUSING_RECORDS:TalentHousingRecord[]=[
     "sourceUrl": "https://zjj.chaoyang.gov.cn/html/CYZJJ/202605/0177908681649596.html",
     "published": "2026-05-18",
     "reviewedAt": "2026-10-31",
-    "statusNote": "2026-10-31已核对公开住房政策依据，但属于制度/补贴，不是即时出租、可选房源或承诺通过；具体办理入口、空房、审核结果与是否仍开放以住房或人社经办机关当期公示为准。",
+    "statusNote": "2026-10-31已核对公开住房政策依据，但属于制度/补贴，不是即时出租、可选房源或承诺通过；申报入口待核实：具体办事渠道、空房、审核结果与是否仍开放以住房或人社经办机关当期公示为准。",
     "kind": "program",
     "housingCategory": "其他住房",
     "steps": [
