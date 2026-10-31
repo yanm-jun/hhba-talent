@@ -1,0 +1,38 @@
+{
+  "logo.png": {
+    "verified": true,
+    "company": "瀚通通讯",
+    "source": "https://yingtong-wire.com/images/logo_but.png",
+    "sourcePage": "https://yingtong-wire.com/",
+    "sourceSha256": "6d77bcc227b429ac001445a78f35e2b8e100f3d35efcf7db74f596a2caf9204f",
+    "sha256": "5153a1cefdf2e7a3639fa5ba2671b656c9fe19d25e6afc61c683d4bfe1ab096a",
+    "width": 700,
+    "height": 123,
+    "type": "company logo",
+    "copyright": "Rights remain with the original owner"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "company": "瀚通通讯",
+    "source": "https://yingtong-wire.com/uploadFiles/image/wireless.jpg",
+    "sourcePage": "https://yingtong-wire.com/",
+    "sourceSha256": "e2b1c80491965ad7fb82bc2580a322527d3a4c06f5f68f19426ed1a46fe3b58c",
+    "sha256": "9fc4cef6f444cf367f70a2262979298f355e615304be26a44594887ca95f6674",
+    "width": 960,
+    "height": 600,
+    "type": "company website business imagery; not necessarily workplace photo",
+    "copyright": "Rights remain with the original owner"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "company": "瀚通通讯",
+    "source": "https://yingtong-wire.com/uploadFiles/image/xianbg.jpg",
+    "sourcePage": "https://yingtong-wire.com/products/11",
+    "sourceSha256": "7bbcf4b6bb1e75e7e6b318789784c7e4f58d14d0c83b30a6f3ad1fb245a80417",
+    "sha256": "59f783f8128393cde3af6aa69cd0e497f25a46cb35c13de2930d4d53ad373269",
+    "width": 1550,
+    "height": 775,
+    "type": "company website business imagery; not necessarily workplace photo",
+    "copyright": "Rights remain with the original owner"
+  }
+}

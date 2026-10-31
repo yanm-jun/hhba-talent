@@ -1,0 +1,38 @@
+{
+  "logo.png": {
+    "verified": true,
+    "company": "芯德科技",
+    "source": "https://www.vsol.com.cn/wp-content/uploads/2024/12/VSOL-AboutUs_OurStory.jpg",
+    "sourcePage": "https://www.vsol.com.cn/",
+    "sourceSha256": "f7191e223e52bd0dab4f83f5a315c87bb74769990553c7a3f292a6237eeaa93e",
+    "sha256": "36befd8556773b3c65140bf10c4b90ff42d89121cb10634e5ef33642fc91c4a7",
+    "width": 1250,
+    "height": 521,
+    "type": "company logo",
+    "copyright": "Rights remain with the original owner"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "company": "芯德科技",
+    "source": "https://www.vsol.com.cn/wp-content/uploads/2026/02/lQDPKG0OEQSbUy3NCQDNEACwsW9zaU3HmasJWLFy0vr_AA_4096_2304.jpg",
+    "sourcePage": "https://www.vsol.com.cn/about",
+    "sourceSha256": "671f7f2338ff9a7b0c4c6a68cc18f3953102d5e40321b9bf8dff85022b27cbaf",
+    "sha256": "ed6311560125e4d852be866f572c4b8af2e69d347db5861672991e4422790426",
+    "width": 1550,
+    "height": 888,
+    "type": "company website business imagery; not necessarily workplace photo",
+    "copyright": "Rights remain with the original owner"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "company": "芯德科技",
+    "source": "https://www.vsol.com.cn/wp-content/uploads/2026/10/100ge-olt-bn-desktop-cn.webp",
+    "sourcePage": "https://www.vsol.com.cn/",
+    "sourceSha256": "049a2d34103fe9466be34659ced3f23ac7212c7db21bfe46874eb95126ebb40b",
+    "sha256": "38f545660501ebe4055216a49e52cef2e3711de2f07a34fb90c7f7b466df6b25",
+    "width": 1550,
+    "height": 807,
+    "type": "company website business imagery; not necessarily workplace photo",
+    "copyright": "Rights remain with the original owner"
+  }
+}
