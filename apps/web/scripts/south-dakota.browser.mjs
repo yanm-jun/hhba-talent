@@ -22,7 +22,9 @@ try{
   out.admissions=true;out.tuition=true;
   const gallery=page.locator('[data-usd-gallery]');
   assert.equal(await gallery.locator('.hhba-minot-thumb').count(),3);
+  await gallery.scrollIntoViewIfNeeded();
   for(const img of await gallery.locator('img').all()){
+   await img.scrollIntoViewIfNeeded();
    await img.evaluate(async el=>{if(!el.complete)await new Promise((resolve,reject)=>{el.addEventListener('load',resolve,{once:true});el.addEventListener('error',reject,{once:true})});if(!el.naturalWidth||!el.naturalHeight)throw Error('real school photo 404: '+el.src);});
   }
   out.realPhotos=true;
