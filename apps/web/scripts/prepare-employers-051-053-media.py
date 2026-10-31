@@ -160,6 +160,22 @@ for number,cfg in CFG.items():
   if not ok:
    raise RuntimeError('REQUIRED_COMPANY_PHOTO_NOT_VERIFIED '+number+' '+filename)
   time.sleep(.1)
+ # Genuine group wordmarks use WHITE typography on transparency.
+ # A navy backing, not a redrawn/fabricated logo, keeps the official text legible
+ # against HHBA's light company profile cards. Preserve source hash and identity.
+ if number in ('052','053') and not audit['logo.png'].get('presentation'):
+  with Image.open(folder/'logo.png') as im:
+   mark=im.convert('RGBA')
+   backing=Image.new('RGBA',(mark.width+64,mark.height+52),(23,42,66,255))
+   backing.alpha_composite(mark,(32,26))
+   buffer=BytesIO();backing.save(buffer,format='PNG',optimize=True)
+   updated=buffer.getvalue()
+   (folder/'logo.png').write_bytes(updated)
+   audit['logo.png']['sha256']=sha256(updated).hexdigest()
+   audit['logo.png']['width']=backing.width
+   audit['logo.png']['height']=backing.height
+   audit['logo.png']['presentation']='Official white wordmark preserved on dark-navy readability background'
+   print('MEDIA_WORDMARK_READABLE_ON_LIGHT_UI',number,flush=True)
  if len(audit)!=3 or len({v['sourceSha256'] for v in audit.values()})!=3:
   raise ValueError('Missing or duplicate media for '+number)
  auditfile.write_text(json.dumps(audit,ensure_ascii=False,indent=2)+'\n')
