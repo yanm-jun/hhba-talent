@@ -1,0 +1,41 @@
+{
+  "logo.png": {
+    "verified": true,
+    "company": "博顿光电",
+    "source": "https://www.ibdtec.cn/static/modules/cms/images/logo.svg",
+    "sourcePage": "https://www.ibdtec.cn/",
+    "retrievedFrom": "https://www.ibdtec.cn/static/modules/cms/images/logo.svg",
+    "sourceSha256": "066ea8c95dcf730aea95bf4a160502406377045a490dfb23241d739393bc6bce",
+    "sha256": "738ff21250cd6c641edc2c2ca9b249547b5c5a2ce6e0ebdc813ee40b6eeac392",
+    "width": 1000,
+    "height": 342,
+    "type": "official corporate brand",
+    "ownership": "Original rights holders retain copyright"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "company": "博顿光电",
+    "source": "https://www.ibdtec.cn/uploads/images/20240223/fb949fa27266c15deb61c767eaeccf60.jpg",
+    "sourcePage": "https://www.ibdtec.cn/",
+    "retrievedFrom": "https://www.ibdtec.cn/uploads/images/20240223/fb949fa27266c15deb61c767eaeccf60.jpg",
+    "sourceSha256": "a84c18729fac536ad9af266be54c879e0227fc175ff940c6f59c8bee731de430",
+    "sha256": "7a8518cfdebad51cd0c6e596d94a91fb67347f7a9b8a47785d1dbaf711817798",
+    "width": 1500,
+    "height": 750,
+    "type": "official product or business illustration",
+    "ownership": "Original rights holders retain copyright"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "company": "博顿光电",
+    "source": "https://www.ibdtec.cn/uploads/images/20230815/231870d49c8ddafd89b41559e0558d94.jpg",
+    "sourcePage": "https://www.ibdtec.cn/product/solutions/RIBER/22",
+    "retrievedFrom": "https://www.ibdtec.cn/uploads/images/20230815/231870d49c8ddafd89b41559e0558d94.jpg",
+    "sourceSha256": "81ae03c9bd3c681189b515a8f92ec8e2cbe4a88b4e98264e9fd7601ac1c38e62",
+    "sha256": "3d84ef34d7b764beae0e468b7dd6355305e5f8f23056916b3dee8edc2b52b11d",
+    "width": 1500,
+    "height": 886,
+    "type": "official product or business illustration",
+    "ownership": "Original rights holders retain copyright"
+  }
+}

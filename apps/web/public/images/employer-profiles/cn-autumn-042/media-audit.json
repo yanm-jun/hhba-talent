@@ -1,0 +1,41 @@
+{
+  "logo.png": {
+    "verified": true,
+    "company": "艾普工华",
+    "source": "https://www.epichust.com/assets/addons/cms/images/logo.png",
+    "sourcePage": "https://www.epichust.com/",
+    "retrievedFrom": "https://www.epichust.com/assets/addons/cms/images/logo.png",
+    "sourceSha256": "11c3054e44b184488bb33d1f9d580438de36ba31b1ba194fe6450c84beeabff1",
+    "sha256": "3fd661ac2375df85e1f7c8f0c7a69a87a2fd43f95cefb43f1e13345642a3a146",
+    "width": 600,
+    "height": 192,
+    "type": "official corporate brand",
+    "ownership": "Original rights holders retain copyright"
+  },
+  "photo1.jpg": {
+    "verified": true,
+    "company": "艾普工华",
+    "source": "https://www.epichust.com/uploads/20240402/008b6d72b17c0fe4f76b8874afb07920.png",
+    "sourcePage": "https://www.epichust.com/Intelligent_decision/12.html",
+    "retrievedFrom": "https://www.epichust.com/uploads/20240402/008b6d72b17c0fe4f76b8874afb07920.png",
+    "sourceSha256": "4030457ac8b9f2662675d891bee69555d4f18c6c6a921d752eda17aee0adb45b",
+    "sha256": "846ab4a1931080b83e8d622b6da7c19e2fb449a673bc0d42aec911a1c843cf94",
+    "width": 960,
+    "height": 610,
+    "type": "official product or business illustration",
+    "ownership": "Original rights holders retain copyright"
+  },
+  "photo2.jpg": {
+    "verified": true,
+    "company": "艾普工华",
+    "source": "https://www.epichust.com/uploads/20240228/ecbe367c55914cab674a74185a6d0ea5.png",
+    "sourcePage": "https://www.epichust.com/Complete_vehicle/172.html",
+    "retrievedFrom": "https://www.epichust.com/uploads/20240228/ecbe367c55914cab674a74185a6d0ea5.png",
+    "sourceSha256": "11e2f1a144800b4ae1992b96f313a96efaba340604a3b4be251c327de2833f2e",
+    "sha256": "98c0e2eaf9699a9b1c31e42d2efb39526dcb248ccd0d613b3f590f4a75740c14",
+    "width": 1500,
+    "height": 844,
+    "type": "official product or business illustration",
+    "ownership": "Original rights holders retain copyright"
+  }
+}
