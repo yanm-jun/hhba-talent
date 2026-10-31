@@ -1,3 +1,4 @@
+import {SHIJIAZHUANG_POLICY_RECORDS} from './shijiazhuangPolicyRecords.ts';
 import {HANDAN_POLICY_RECORDS} from './handanPolicyRecords.ts';
 import {QINHUANGDAO_POLICY_RECORDS} from './qinhuangdaoPolicyRecords.ts';
 import {BINZHOU_POLICY_RECORDS} from './binzhouPolicyRecords.ts';
@@ -436,6 +437,7 @@ export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
 ...WEIFANG_POLICY_RECORDS,
 ...ZIBO_POLICY_RECORDS,
 ...TAIAN_POLICY_RECORDS,
+...SHIJIAZHUANG_POLICY_RECORDS,
 ...DEZHOU_POLICY_RECORDS,
 ...QINHUANGDAO_POLICY_RECORDS,
 ...HANDAN_POLICY_RECORDS,
