@@ -1,0 +1,368 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-060",
+  "name": "云尖信息",
+  "displayName": "云尖信息",
+  "englishName": "Cloudnine Information",
+  "aliases": [
+    "云尖信息技术股份有限公司",
+    "云尖信息技术有限公司",
+    "Cloudnine Information",
+    "CloudNine Info",
+    "云尖信息2027校招"
+  ],
+  "industry": "AI智算 · ICT基础设施 · 服务器与网络设备 · 研发制造",
+  "subtitle": "云尖信息技术股份有限公司 · 浙江杭州 · 杭州、北京研发能力",
+  "overview": "云尖信息成立于2020年8月，总部位于杭州，业务包括AI智算解决方案、计算与存储产品、网络产品、智能硬件及电子制造和研发技术服务。公司官网在2026年10月30日发布2027届校园招聘启动消息；西安电子科技大学招聘页面列有10条2027届具体职位。学历、城市和专业字段依据高校登记公开资料，具体岗位要求以实际招聘系统为准。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.cloudnineinfo.com/",
+    "https://www.cloudnineinfo.com/About/",
+    "https://job.xidian.edu.cn/teachin/view/id/127489",
+    "https://career.nankai.edu.cn/correcruit/content/id/120224.html",
+    "https://wecruit.hotjob.cn/SU6298e4f10dcad45229985fd0/pb/index.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-060/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-060/photo1.svg",
+        "caption": "云尖信息 · 智算服务器业务示意",
+        "alt": "云尖信息智算基础设施主题的非实景信息图",
+        "note": "HHBA原创业务主题视觉，不是官方产品摄影。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-060/photo2.svg",
+        "caption": "云尖信息 · 研发制造业务示意",
+        "alt": "研发制造与网络设备主题非实景信息图",
+        "note": "HHBA原创示意视觉，不表示真实企业厂区。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://wecruit.hotjob.cn/SU6298e4f10dcad45229985fd0/pb/index.html",
+    "label": "云尖信息官方招聘系统",
+    "status": "official_portal",
+    "subject": "云尖信息技术股份有限公司",
+    "note": "官网人才招聘链接指向该系统；以下2027校招职位来自西安电子科技大学公开目录，职位是否仍可投递应进入系统再次检查。"
+  },
+  "majorIntro": "从高校发布的2027届职位表提取岗位名称、学历与对应专业；专业筛选依据各岗位所列专业，省略的信息不作猜测。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "人工智能",
+    "软件工程",
+    "电子信息工程",
+    "通信工程",
+    "自动化",
+    "机械设计制造及其自动化",
+    "测控技术与仪器",
+    "光电信息科学与工程",
+    "数据科学与大数据技术",
+    "供应链管理",
+    "英语"
+  ],
+  "photoNote": "目前暂用三张本地独立SVG：非官方企业文字识别图、智算服务器示意图、研发制造示意图。所有示意图明确标注非官方、非企业实景，等待获取并核实允许使用的官方产品和厂区照片后替换。",
+  "business": [
+    {
+      "title": "AI智算中心与一体化方案",
+      "description": "提供智算中心、AI一体机及数据中心硬件与系统集成，面向大模型训练推理及企业智能化场景。",
+      "tags": "AI · 算力",
+      "details": [
+        "智算中心整机系统",
+        "AI一体机配置",
+        "训练推理算力方案"
+      ]
+    },
+    {
+      "title": "机架与AI算力服务器",
+      "description": "覆盖通用机架、GPU计算、存储、高密和边缘服务器以及相关计算部件。",
+      "tags": "服务器 · 硬件",
+      "details": [
+        "通用机架服务器",
+        "AI GPU服务器",
+        "高密与边缘计算产品"
+      ]
+    },
+    {
+      "title": "AI算力部件与网络交换",
+      "description": "提供PCIe算力卡、OAM组件、DPU及数据中心、工业交换设备。",
+      "tags": "DPU · 网络",
+      "details": [
+        "AI加速卡及处理部件",
+        "数据中心交换机",
+        "园区与工业网络"
+      ]
+    },
+    {
+      "title": "高性能分布式存储",
+      "description": "围绕全闪、混闪和高速网络构建分布式并行存储基础设施。",
+      "tags": "存储 · 数据中心",
+      "details": [
+        "分布式存储产品",
+        "多层级存储系统",
+        "云与智算数据平台支撑"
+      ]
+    },
+    {
+      "title": "新能源与汽车电子产品",
+      "description": "提供BMS、EMS、工业网关、工控机及边缘AI硬件，覆盖智能能源和工业场景。",
+      "tags": "能源 · 工控",
+      "details": [
+        "电池管理BMS",
+        "工业物联网网关",
+        "汽车电子及边缘计算"
+      ]
+    },
+    {
+      "title": "硬件研发与电子制造服务",
+      "description": "面向客户定制化研发、可靠性验证、电子制造和平台软件提供技术服务。",
+      "tags": "研发 · 制造",
+      "details": [
+        "电子设计与验证",
+        "制造与质量管理",
+        "CloudBMC和CloudManager平台软件"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "hw-dev",
+      "title": "硬件开发工程师（2027届）",
+      "category": "硬件研发",
+      "summary": "校招职位目录明确2027届硬件开发工程师，工作地杭州，面向服务器、ICT产品电子硬件研发方向。",
+      "requirements": "西安电子科技大学2027校招职位表确认本科、杭州；列示信息工程、电子信息工程、自动化、通信工程、机械设计制造及其自动化、测控技术与仪器等专业。具体电路职责、实验技能、软件工具以企业原始JD为准。",
+      "majorNames": [
+        "电子信息工程",
+        "通信工程",
+        "自动化",
+        "机械设计制造及其自动化",
+        "测控技术与仪器"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科",
+      "city": "浙江省杭州市",
+      "url": "https://wecruit.hotjob.cn/SU6298e4f10dcad45229985fd0/pb/index.html",
+      "evidenceUrl": "https://job.xidian.edu.cn/teachin/view/id/127489",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云尖信息技术股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ai-llm",
+      "title": "AI大模型工程师（2027届）",
+      "category": "AI / 软件",
+      "summary": "校招高校页确认2027届AI大模型工程师岗位，工作地杭州，属人工智能方向技术研发。",
+      "requirements": "西安电子科技大学职位表列为硕士，涵盖人工智能、计算机技术、统计学、控制科学与工程、电子信息及软件工程等。模型框架及具体研发任务未逐项查证，不扩写成企业承诺。",
+      "majorNames": [
+        "人工智能",
+        "计算机科学与技术",
+        "软件工程",
+        "统计学",
+        "数学与应用数学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士",
+      "city": "浙江省杭州市",
+      "url": "https://wecruit.hotjob.cn/SU6298e4f10dcad45229985fd0/pb/index.html",
+      "evidenceUrl": "https://job.xidian.edu.cn/teachin/view/id/127489",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云尖信息技术股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "c-dev",
+      "title": "C开发工程师（2027届）",
+      "category": "软件开发",
+      "summary": "2027届C开发工程师为大学就业网页独立列出的全职职位，工作地点杭州。",
+      "requirements": "招聘职位列表显示本科，涉及计算机科学与技术、软件工程、通信工程、电子信息工程、数据科学与大数据技术、物联网工程等；不额外假定C语言版本或操作系统要求。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程",
+        "通信工程",
+        "物联网工程",
+        "数据科学与大数据技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科",
+      "city": "浙江省杭州市",
+      "url": "https://wecruit.hotjob.cn/SU6298e4f10dcad45229985fd0/pb/index.html",
+      "evidenceUrl": "https://job.xidian.edu.cn/teachin/view/id/127489",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云尖信息技术股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hw-test",
+      "title": "硬件测试工程师（2027届）",
+      "category": "硬件测试",
+      "summary": "2027届硬件测试工程师主要对应ICT硬件产品测试验证岗位，已在高校招聘页面独立列出。",
+      "requirements": "高校职位表列本科、杭州；专业涉及电子信息工程、通信工程、自动化、测控技术与仪器、机械设计制造及其自动化等。测试协议、可靠性标准和具体仪器使用需核对官方JD。",
+      "majorNames": [
+        "电子信息工程",
+        "通信工程",
+        "自动化",
+        "测控技术与仪器"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科",
+      "city": "浙江省杭州市",
+      "url": "https://wecruit.hotjob.cn/SU6298e4f10dcad45229985fd0/pb/index.html",
+      "evidenceUrl": "https://job.xidian.edu.cn/teachin/view/id/127489",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云尖信息技术股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sw-test",
+      "title": "软件测试工程师（2027届）",
+      "category": "软件测试",
+      "summary": "2027届软件测试工程师岗位在高校校招职位目录中出现，工作地杭州。",
+      "requirements": "高校列表注明本科，专业覆盖软件工程、计算机科学与技术、人工智能、物联网工程、电子信息工程、通信工程、数据科学与大数据技术等。岗位具体自动化测试栈未核实。",
+      "majorNames": [
+        "软件工程",
+        "计算机科学与技术",
+        "人工智能",
+        "物联网工程",
+        "电子信息工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科",
+      "city": "浙江省杭州市",
+      "url": "https://wecruit.hotjob.cn/SU6298e4f10dcad45229985fd0/pb/index.html",
+      "evidenceUrl": "https://job.xidian.edu.cn/teachin/view/id/127489",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云尖信息技术股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "presales",
+      "title": "售前工程师（2027届）",
+      "category": "技术支持 / 售前",
+      "summary": "面向ICT产品及方案需求协作的2027届售前工程师，高校职位表确认该名称和杭州工作地。",
+      "requirements": "高校登记为本科，专业包含计算机、电子信息、通信、自动化、机械与数据等；具体客户拜访、解决方案、英语和出差门槛不能从行业常识推定。",
+      "majorNames": [
+        "计算机科学与技术",
+        "通信工程",
+        "电子信息工程",
+        "自动化",
+        "数据科学与大数据技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科",
+      "city": "浙江省杭州市",
+      "url": "https://wecruit.hotjob.cn/SU6298e4f10dcad45229985fd0/pb/index.html",
+      "evidenceUrl": "https://job.xidian.edu.cn/teachin/view/id/127489",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云尖信息技术股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "marketing",
+      "title": "市场拓展（2027届）",
+      "category": "市场 / 商务",
+      "summary": "高校招聘页面列出2027届市场拓展岗位，属于市场商务方向，工作地点为杭州。",
+      "requirements": "发布的专业名单以电子信息、电子科学与技术、光电信息科学与工程及电磁场与无线技术等为主，学历本科。是否需要销售经验、差旅和绩效要求尚须核对职位详情。",
+      "majorNames": [
+        "电子信息工程",
+        "电子科学与技术",
+        "光电信息科学与工程",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科",
+      "city": "浙江省杭州市",
+      "url": "https://wecruit.hotjob.cn/SU6298e4f10dcad45229985fd0/pb/index.html",
+      "evidenceUrl": "https://job.xidian.edu.cn/teachin/view/id/127489",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云尖信息技术股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "intl-presales",
+      "title": "海外售前工程师（2027届）",
+      "category": "国际业务 / 售前",
+      "summary": "2027届海外售前工程师已见高校职位表，地点杭州；涉及海外客户技术方案方向。",
+      "requirements": "职位表列本科与杭州，专业覆盖电子信息、通信、计算机、软件、英语、翻译、自动化等；英语水平及出差目的地并未在可核实列表中逐项列出。",
+      "majorNames": [
+        "电子信息工程",
+        "计算机科学与技术",
+        "软件工程",
+        "通信工程",
+        "英语",
+        "翻译"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科",
+      "city": "浙江省杭州市",
+      "url": "https://wecruit.hotjob.cn/SU6298e4f10dcad45229985fd0/pb/index.html",
+      "evidenceUrl": "https://job.xidian.edu.cn/teachin/view/id/127489",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云尖信息技术股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "order",
+      "title": "订单管理专员（2027届）",
+      "category": "运营 / 供应链",
+      "summary": "高校公布2027届订单管理专员，地点杭州；南开就业页面另载交付协同、物料预测及问题改进职责。",
+      "requirements": "高校目录标注本科；南开大学职位详情描述跨部门订单交付、预测分析和备料流程，参考专业包括供应链管理、工业工程、物流管理及电子信息。两所高校记录细节不完全一致，以实际报名JD为准。",
+      "majorNames": [
+        "供应链管理",
+        "物流管理",
+        "工业工程",
+        "电子信息工程",
+        "电子商务"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科（高校职位目录）",
+      "city": "浙江省杭州市",
+      "url": "https://wecruit.hotjob.cn/SU6298e4f10dcad45229985fd0/pb/index.html",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/120224.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云尖信息技术股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "test-general",
+      "title": "测试工程师（2027届）",
+      "category": "系统测试",
+      "summary": "2027届测试工程师在高校职位表中单独列出，不与硬件测试或软件测试工程师重复合并。",
+      "requirements": "高校职位表列杭州、本科，专业覆盖光电、电子信息、通信、自动化、机械、测控技术与仪器等；具体测试产品线应由招聘企业进一步确认。",
+      "majorNames": [
+        "光电信息科学与工程",
+        "电子信息工程",
+        "自动化",
+        "测控技术与仪器",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科",
+      "city": "浙江省杭州市",
+      "url": "https://wecruit.hotjob.cn/SU6298e4f10dcad45229985fd0/pb/index.html",
+      "evidenceUrl": "https://job.xidian.edu.cn/teachin/view/id/127489",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云尖信息技术股份有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}
