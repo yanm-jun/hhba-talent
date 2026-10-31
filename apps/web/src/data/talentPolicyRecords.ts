@@ -1,4 +1,5 @@
 import {BEIJING_POLICY_RECORDS} from './beijingPolicyRecords.ts';
+import {SHANGHAI_POLICY_RECORDS} from './shanghaiPolicyRecords.ts';
 import {LANGFANG_POLICY_RECORDS} from './langfangPolicyRecords.ts';
 import {CANGZHOU_POLICY_RECORDS} from './cangzhouPolicyRecords.ts';
 import {HENGSHUI_POLICY_RECORDS} from './hengshuiPolicyRecords.ts';
@@ -27,6 +28,7 @@ export type TalentPolicyRecord={
 };
 export const TALENT_POLICY_REVIEW_DATE='2026-10-30';
 export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
+...SHANGHAI_POLICY_RECORDS,
 ...BEIJING_POLICY_RECORDS,
 ...HENGSHUI_POLICY_RECORDS,
 ...LANGFANG_POLICY_RECORDS,
@@ -368,22 +370,20 @@ export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
  keywords:['本科','硕士','博士','应届','毕业','落户','户籍','人才引进','72分']},
  {id:'sh-xuhui-rent',city:'上海',district:'徐汇区',title:'徐汇区新就业青年保租房优惠',category:'租房安居',
  summary:'徐汇区针对符合条件的新就业青年推出保障性租赁住房优惠。',
- benefit:'按公示的房源及补贴优惠价格申请，具体金额和房源须核验。',
- eligibility:'就业单位在徐汇区；35 周岁以下，在沪无房，2026 年后新就业缴保，符合学历、社保基数等条件。',
- application:'通过徐汇区政策公告所列线上入口申请，核实房源与当期申请时间。',
+ benefit:"按2026徐汇区政策，外环内最高备案价40%每套2500元/月、外郊环间最高50%每套2000元/月、郊环外最高60%每套1500元/月。第二年退坡50%，最长2年；需先通过资格核验并实际租住保租房。",
+ eligibility:"就业单位在徐汇区；申请当年1月1日35周岁以下；本人配偶未成年子女在沪无自有住房；2026年1月1日以后在沪新就业缴保且社保缴费基数不超过上年度上海社平工资两倍；高水平大学本科以上毕业未满3年；此前未享上海及区级租补。",
+ application:"通过随申办‘我要租房—新就业青年安居服务’按当期政府事项申请；徐汇漕河泾街道冠生园路211号可线下帮办。项目真实房源另通过随申办‘我要找房’查询。",
  department:'上海市徐汇区人民政府',published:'2026-08-07',
- sourceUrl:'https://www.shanghai.gov.cn/nw17239/20260807/298edd6be1494e7d91cb27a7490dc44d.html',sourceName:'上海市政府转发徐汇区住房优惠说明',
- applicationUrl:'https://www.shanghai.gov.cn/nw17239/20260807/298edd6be1494e7d91cb27a7490dc44d.html',temporal:'policy',
- keywords:['上海','徐汇','青年','租房','住房','保租房','本科','研究生','补贴']},
+ sourceUrl:'https://www.shanghai.gov.cn/nw17239/20260807/298edd6be1494e7d91cb27a7490dc44d.html',sourceName:'上海市政府转发徐汇区住房优惠说明',temporal:'policy',
+ keywords:['上海','徐汇','青年','租房','住房','保租房','本科','研究生','补贴'],reviewNote:"办理入口待核实：原纪录把政府2026年8月政策新闻当申报URL，现已删除；实际资格系统为随申办事项名。不能按最高2500元/月断定每人获批，补贴与备案价、环线、家庭资格和入住时点相关。",materials:["高水平大学学历学位与毕业未满3年证明","徐汇区用人单位就业合同与2026年后实际新就业缴保记录及社保基数","本人配偶未成年子女在沪无住房及未享市区租补信息","真实保租房项目网签备案租金、实际入住房屋的记录"],applicationSteps:["确认徐汇就业单位以及申请当年35岁以下、2026后新就业缴保要求","核对高水平大学本科及以上毕业三年内与社保缴费基数不高于两倍平均工资","确认本人及家庭无房、未领取其他上海市区租房补贴","进入随申办相应新就业青年安居事项申请资格，按需要到街道帮办","核查实际项目所在外环内或环线外区位和真实租赁备案价格，确认当期有空房","根据首年40/50/60%限额及第二年50%退坡、实际租期核对政府发放和运营方减租"]},
  {id:'sh-pudong-housing',city:'上海',district:'浦东新区',title:'浦东新区青年低租金公寓支持',category:'租房安居',
  summary:'浦东针对符合条件的青年人才推出低租金公寓和租房补贴措施，具体房源以运营方公告为准。',
  benefit:'重点产业符合条件人才租金一般不超过 2000 元/月，或按条件享受阶段性租房补贴。',
  eligibility:'研究生、高水平大学本科或重点产业区域就业等政策规定的青年人才；存在区域与就业等限制。',
  application:'参阅浦东住保部门及官方项目公示，按实际房源批次申请。',
  department:'上海市浦东新区相关住房保障部门',published:'2026-05-19',
- sourceUrl:'https://www.shanghai.gov.cn/nw15343/20260519/3718830b7e7b4a1e937b4e07dbe2fdb8.html',sourceName:'上海市政府浦东青年住房专题信息',
- applicationUrl:'https://www.shanghai.gov.cn/nw15343/20260519/3718830b7e7b4a1e937b4e07dbe2fdb8.html',temporal:'policy',
- keywords:['浦东','张江','金桥','住房','公寓','租房','硕士','本科','人才']},
+ sourceUrl:'https://www.shanghai.gov.cn/nw15343/20260519/3718830b7e7b4a1e937b4e07dbe2fdb8.html',sourceName:'上海市政府浦东青年住房专题信息',temporal:'policy',
+ keywords:['浦东','张江','金桥','住房','公寓','租房','硕士','本科','人才'],reviewNote:"办理入口待核实：原记录将2026年浦东青年住房新闻页误设为办事系统，已清除。重点产业公寓、城投宽庭等真实项目的当期入住资格及租金、余房须分别核查，不得把2000元作为浦东任何青年可申请租金。",materials:["浦东具体项目与人才分类认定证明","在沪真实就业、社保和学历资料","个人及家庭住房状况与既有租补资料","实际保租房项目房源价目与运营方申报材料"],applicationSteps:["区分全市保障性租赁住房准入与浦东重点产业青年人才专项资格","查本人学历毕业年限、浦东用人单位及具体产业岗位规定","查询官方具体项目真实房源、房型及2026当期租金与运营方","向浦东新区住保部门和项目运营方索取当前有效项目申请清单","按运营方实际指定合法渠道提交资料、接受住房资格审核与选房签约"]},
  {id:'bj-youth-rental-2026',city:'北京',title:'2026 年毕业生及青年人才专项保障房配租',category:'租房安居',
  summary:"北京保障房中心2026年7月推出覆盖14区69个公租房及保租房项目3300套面向近五届毕业生与青年人才的配租计划；这是历史配租批次，不能认为2026年10月仍有3300套空房。",
  benefit:'当批次共推出 3300 套房源；此为当期公布规模，非当前可租数量。',
