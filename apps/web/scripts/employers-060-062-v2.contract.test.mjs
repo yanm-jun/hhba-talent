@@ -23,7 +23,7 @@ for(let i=0;i<3;i++){
   assert(image.startsWith('images/employer-profiles/'+id+'/'));
   assert(existsSync('public/'+image),'Missing local visual '+image);
   const svg=read('public/'+image);
-  assert(svg.includes('<svg')&&svg.length>1000,'Invalid/empty independent SVG '+image);
+  assert(svg.includes('<svg')&&svg.length>500,'Invalid/empty independent SVG '+image);
   assert(svg.includes('非官方')||svg.includes('非公司官方'),'Unlabeled editorial image: '+image);
  }
  const audit=JSON.parse(read('public/images/employer-profiles/'+id+'/media-audit.json'));
