@@ -21,19 +21,19 @@
     "https://wap.sasac.gov.cn/n2588035/n2588325/n2588350/c33553382/content.html"
   ],
   "media": {
-    "logo": "images/employer-profiles/cn-autumn-058/logo.png",
+    "logo": "images/employer-profiles/cn-autumn-058/logo.svg",
     "photos": [
       {
-        "path": "images/employer-profiles/cn-autumn-058/photo1.jpg",
-        "caption": "招商金科 · 历史办公室接待区",
-        "alt": "招商金融科技办公接待区的历史照片",
-        "note": "2020年行业联盟采访中招商金融科技现场照片，非2026年办公现状。"
+        "path": "images/employer-profiles/cn-autumn-058/photo1.svg",
+        "caption": "招商金科 · 业务主题示意图1",
+        "alt": "招商金科业务板块信息可视化插画",
+        "note": "HHBA原创说明性视觉，非企业真实办公现场或官方产品摄影。"
       },
       {
-        "path": "images/employer-profiles/cn-autumn-058/photo2.jpg",
-        "caption": "招商金科 · 数智平台业务视觉",
-        "alt": "招商金科公司官网相关数智业务的视觉资料",
-        "note": "来源为招商金科官网技术产品或新闻配图；若无法复核使用明确标记的非实景示意图。"
+        "path": "images/employer-profiles/cn-autumn-058/photo2.svg",
+        "caption": "招商金科 · 业务主题示意图2",
+        "alt": "招商金科业务板块信息可视化插画",
+        "note": "HHBA原创说明性视觉，非企业真实办公现场或官方产品摄影。"
       }
     ]
   },
@@ -57,7 +57,7 @@
     "电子信息工程",
     "工商管理"
   ],
-  "photoNote": "Logo需来自企业或权威可辨识的同名主体，否则显示明确的HHBA非官方识别图。两张业务图片优先使用同名企业公开采访和官网配图；不得冒充当期办公室现场。图片留存来源记录。",
+  "photoNote": "当前提供3张相互独立的本地SVG视觉（1张非官方字标、2张原创业务示意图）。均非官方Logo或真实企业照片，不能冒充实景；待取得可核验、可使用的官方图片后再替换。",
   "business": [
     {
       "title": "招商云与混合云平台",
