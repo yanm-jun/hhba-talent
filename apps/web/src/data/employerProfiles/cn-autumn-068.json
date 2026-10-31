@@ -1,0 +1,363 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-068",
+  "name": "甘肃能化集团",
+  "displayName": "甘肃能化集团",
+  "englishName": "Gansu Energy Chemical Investment Group",
+  "aliases": [
+    "甘肃能源化工投资集团有限公司",
+    "甘肃能化",
+    "甘肃能化集团2027",
+    "甘肃能化股份",
+    "靖煤",
+    "窑煤"
+  ],
+  "industry": "煤炭采选 · 电力 · 煤化工 · 新能源 · 矿山工程",
+  "subtitle": "甘肃能源化工投资集团有限公司 · 甘肃兰州 · 省属国有大型综合能源集团",
+  "overview": "甘肃能化集团为甘肃省属综合能源化工企业，业务覆盖煤炭、煤电、化工、新能源、工程建设、勘探设计和贸易服务。2027年校园招聘简章经高校就业平台披露，集团下属生产企业计划合计340人，分10类专业方向，面向2027届统招本科及以上毕业生。招聘单位含靖煤、窑煤、能化发电、金昌及刘化化工等；340人属于集团总计划，不能误认为每一家子公司均招340人。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://qxnzy.bysjy.com.cn/detail/career?id=729194",
+    "https://fenbi.com/page/exam-information-detail/470055243507712",
+    "https://www.gnhtjt.com/info/1049/43432.htm",
+    "https://liuhuahuagong.com/col_gsjj/index/",
+    "https://www.liuhuahuagong.com/col_xwzx1/202509/27352E666DC3E4FDCBC8D1F091EEB43B.htm",
+    "https://www.cwcec.com/content/newdetails_383_1045.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-068/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-068/photo1.jpg",
+        "caption": "甘肃能化集团下属刘化化工项目厂区实景",
+        "alt": "甘肃能化集团刘化化工真实化工项目厂区设备与工业装置",
+        "note": "来源甘肃能化集团下属刘化化工公司官网，展示在甘肃白银的真实化工项目；不是集团兰州总部照片，转载许可待核。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-068/photo2.jpg",
+        "caption": "甘肃能化集团下属刘化化工空分装置实景",
+        "alt": "甘肃能化集团下属刘化化工项目空分设备塔和厂区实际照片",
+        "note": "来源刘化化工公司官网2025年9月空分装置考核报道；同集团下属项目的真实工业实景，不是虚构的建筑或其他企业工厂。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://qxnzy.bysjy.com.cn/detail/career?id=729194",
+    "label": "高校发布的2027届340人招聘简章（非官方网申）",
+    "status": "archived_source",
+    "subject": "甘肃能源化工投资集团有限公司",
+    "note": "高校发布的集团2027届招聘专业计划共340人10类；本链接为公开简章不是官方网投系统。人数与专业来自企业简章转载，实际子公司、职位名称和报到地点需查看集团原始报名表及后续公告。"
+  },
+  "majorIntro": "10条对应官方公开的10个招聘专业大类，计划人数分别为52、36、103、27、29、7、5、13、25、43，合计340。分类是专业招聘方向，不是逐岗单独招聘岗位，也不保证每个专业在每家子公司都有名额。",
+  "preferredMajors": [
+    "采矿工程",
+    "智能采矿工程",
+    "安全工程",
+    "电气工程及其自动化",
+    "机械设计制造及其自动化",
+    "地质工程",
+    "测绘工程",
+    "土木工程",
+    "能源与动力工程",
+    "计算机科学与技术",
+    "会计学",
+    "汉语言文学",
+    "化学工程与工艺"
+  ],
+  "photoNote": "本批实景选自甘肃能化集团直管刘化化工公司官方网站：2张为真实不同工业装置图片。官网公开并不意味着HHBA已取得图片商业授权；企业Logo在缺少原权利核验前使用明确标记的非官方文字标识。",
+  "business": [
+    {
+      "title": "煤炭资源开发与智能矿山",
+      "description": "依托靖煤及窑煤生产单位开展煤炭开采、原煤加工、矿井安全管理及智能矿山建设。",
+      "tags": "采矿 · 安全",
+      "details": [
+        "煤矿生产与采掘",
+        "矿山智能化管理",
+        "安全监测与应急救援"
+      ]
+    },
+    {
+      "title": "煤电与热电联产",
+      "description": "运营煤电和热电项目，覆盖设备维护、运行控制和发电安全管理等生产环节。",
+      "tags": "电力 · 热电",
+      "details": [
+        "发电厂运行与检修",
+        "电气系统和热力工程",
+        "能源效率提升"
+      ]
+    },
+    {
+      "title": "煤制化学品与精细化工",
+      "description": "通过刘化化工、金昌等项目开展煤气化、合成氨、尿素及配套精细化工业务。",
+      "tags": "化工 · 煤气化",
+      "details": [
+        "合成氨与尿素生产",
+        "煤气化工艺研发",
+        "化工设备与安全工艺"
+      ]
+    },
+    {
+      "title": "新能源与能源系统转型",
+      "description": "围绕风光能源、综合能源及重点新能源投资项目拓展能源结构。",
+      "tags": "新能源 · 转型",
+      "details": [
+        "新能源项目建设",
+        "新能源运行维护",
+        "能源系统与节能环保"
+      ]
+    },
+    {
+      "title": "能源工程建设与勘察设计",
+      "description": "面向矿井建设、能源化工工程、土建结构、测绘地勘提供工程实施与技术支持。",
+      "tags": "工程 · 设计",
+      "details": [
+        "地质测绘及勘探",
+        "土建施工与造价",
+        "大型项目工程管理"
+      ]
+    },
+    {
+      "title": "能源供应链及经营管理",
+      "description": "整合煤炭及化工产品贸易、物流、企业数字化、财务、人力与法律服务。",
+      "tags": "贸易 · 管理",
+      "details": [
+        "煤炭化工物流运输",
+        "信息化与网络支持",
+        "财务人力与合规运营"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "mining",
+      "title": "矿业采掘类专业招聘方向（2027届，计划52人）",
+      "category": "采矿 / 矿业",
+      "city": "甘肃省相关下属经营单位（单岗位城市以企业分配为准）",
+      "summary": "2027届面向采矿工程、智能采矿工程等专业公开的专业类别，集团计划52人，分配至下属矿山相关单位。",
+      "requirements": "集团招聘简章列统招本科及以上，矿业专业对口，符合体检和安全岗位的基本条件；具体矿井、岗位安全资质及现场工作安排未按单岗披露。",
+      "majorNames": [
+        "采矿工程",
+        "智能采矿工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届统招本科及以上（高校发布集团简章）",
+      "url": "https://qxnzy.bysjy.com.cn/detail/career?id=729194",
+      "evidenceUrl": "https://fenbi.com/page/exam-information-detail/470055243507712",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "甘肃能源化工投资集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "safety",
+      "title": "安全科学与工程类专业招聘方向（2027届，计划36人）",
+      "category": "安全 / 应急",
+      "city": "甘肃省相关下属经营单位（单岗位城市以企业分配为准）",
+      "summary": "涵盖矿山安全管理、生产安全和应急救援相关专业方向，集团计划36人，职位分布按下属单位安排。",
+      "requirements": "简章规定本科及以上，所学专业对口；安全工程、应急救援等专业为公告所列范围，具体安全证照及岗位实际要求需以企业单岗通知为准。",
+      "majorNames": [
+        "安全工程",
+        "安全生产监管",
+        "应急救援技术"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届统招本科及以上（高校发布集团简章）",
+      "url": "https://qxnzy.bysjy.com.cn/detail/career?id=729194",
+      "evidenceUrl": "https://fenbi.com/page/exam-information-detail/470055243507712",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "甘肃能源化工投资集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "electromechanical",
+      "title": "电气与机械工程类专业招聘方向（2027届，计划103人）",
+      "category": "电气 / 机械",
+      "city": "甘肃省相关下属经营单位（单岗位城市以企业分配为准）",
+      "summary": "电气及机械工程方向是本批合并计划最大类别，面向电力、煤化工及矿山生产相关装备，集团计划103人。",
+      "requirements": "高校公开集团专业表把电气与机械工程类合并成一条103人计划，未细分各专业配额；本科及以上，最终岗位地点和任务以用人单位公布为准。",
+      "majorNames": [
+        "电气工程及其自动化",
+        "电气工程与智能控制",
+        "电机电器智能化",
+        "智慧能源工程",
+        "机械设计制造及其自动化",
+        "过程装备与控制工程",
+        "智能制造工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届统招本科及以上（高校发布集团简章）",
+      "url": "https://qxnzy.bysjy.com.cn/detail/career?id=729194",
+      "evidenceUrl": "https://fenbi.com/page/exam-information-detail/470055243507712",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "甘肃能源化工投资集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "geology",
+      "title": "地质测绘类专业招聘方向（2027届，计划27人）",
+      "category": "地质 / 测绘",
+      "city": "甘肃省相关下属经营单位（单岗位城市以企业分配为准）",
+      "summary": "面向地质勘查、矿山资源勘探和测量等工作领域的公开专业大类，集团计划27人。",
+      "requirements": "简章列出地质工程、勘查技术与工程、资源勘查工程及测绘等对口专业，本科及以上；没有明确逐专业具体人数或下属矿点。",
+      "majorNames": [
+        "地质工程",
+        "勘查技术与工程",
+        "资源勘查工程",
+        "测绘工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届统招本科及以上（高校发布集团简章）",
+      "url": "https://qxnzy.bysjy.com.cn/detail/career?id=729194",
+      "evidenceUrl": "https://fenbi.com/page/exam-information-detail/470055243507712",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "甘肃能源化工投资集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "civil",
+      "title": "矿建土木与工程管理专业招聘方向（2027届，计划29人）",
+      "category": "矿建 / 土木",
+      "city": "甘肃省相关下属经营单位（单岗位城市以企业分配为准）",
+      "summary": "服务矿井建设、能源基础设施与工程管理，集团计划29人，专业范围覆盖土木建设和工程造价。",
+      "requirements": "高校简章明确土木类及工程造价相关专业，本科及以上；矿井建设涉及的专项条件和真实岗位所在地需由招聘单位进一步说明。",
+      "majorNames": [
+        "土木工程",
+        "建筑环境与能源应用工程",
+        "智能建造",
+        "工程造价"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届统招本科及以上（高校发布集团简章）",
+      "url": "https://qxnzy.bysjy.com.cn/detail/career?id=729194",
+      "evidenceUrl": "https://fenbi.com/page/exam-information-detail/470055243507712",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "甘肃能源化工投资集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "power",
+      "title": "能源动力专业招聘方向（2027届，计划7人）",
+      "category": "能源动力",
+      "city": "甘肃省相关下属经营单位（单岗位城市以企业分配为准）",
+      "summary": "面向热能工程、电力生产及新能源业务相关专业，集团计划7人，不等于7个独立职位。",
+      "requirements": "专业限能源与动力工程、新能源科学与工程等方向，本科及以上；招聘简章未将其拆分为各下属发电厂的具体岗位。",
+      "majorNames": [
+        "能源与动力工程",
+        "新能源科学与工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届统招本科及以上（高校发布集团简章）",
+      "url": "https://qxnzy.bysjy.com.cn/detail/career?id=729194",
+      "evidenceUrl": "https://fenbi.com/page/exam-information-detail/470055243507712",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "甘肃能源化工投资集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "information",
+      "title": "计算机与电子信息专业招聘方向（2027届，计划5人）",
+      "category": "IT / 信息化",
+      "city": "甘肃省相关下属经营单位（单岗位城市以企业分配为准）",
+      "summary": "围绕集团生产系统数字化、网络工程及电子信息技术支持的招聘专业类别，集团计划5人。",
+      "requirements": "高校专业表明确计算机、网络、电子信息、通信和测控相关专业，本科及以上；具体软件或系统岗位名称和IT技术栈未单独披露。",
+      "majorNames": [
+        "计算机科学与技术",
+        "网络工程",
+        "电子信息工程",
+        "通信工程",
+        "智能测控工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届统招本科及以上（高校发布集团简章）",
+      "url": "https://qxnzy.bysjy.com.cn/detail/career?id=729194",
+      "evidenceUrl": "https://fenbi.com/page/exam-information-detail/470055243507712",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "甘肃能源化工投资集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "business",
+      "title": "工商经营管理专业招聘方向（2027届，计划13人）",
+      "category": "经营 / 财务",
+      "city": "甘肃省相关下属经营单位（单岗位城市以企业分配为准）",
+      "summary": "适配集团下属经营企业的营销、财务、人力及相关职能岗位方向，集团计划13人。",
+      "requirements": "简章列市场营销、会计学、财务管理、人力资源管理、劳动关系等相关专业，本科及以上；不等于每个小类都有独立名额。",
+      "majorNames": [
+        "市场营销",
+        "会计学",
+        "财务管理",
+        "人力资源管理",
+        "劳动关系"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届统招本科及以上（高校发布集团简章）",
+      "url": "https://qxnzy.bysjy.com.cn/detail/career?id=729194",
+      "evidenceUrl": "https://fenbi.com/page/exam-information-detail/470055243507712",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "甘肃能源化工投资集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "administration",
+      "title": "文字法务与综合管理专业招聘方向（2027届，计划25人）",
+      "category": "综合职能 / 法务",
+      "city": "甘肃省相关下属经营单位（单岗位城市以企业分配为准）",
+      "summary": "集团综合管理大类涉及文字、法务、行政、统计和教育类专业，2027专业类别计划25人。",
+      "requirements": "高校专业表列汉语言文学、秘书学、法学、新闻、行政、统计、教育等方向，本科及以上；不能据此推断各子公司都招法务或职能岗。",
+      "majorNames": [
+        "汉语言文学",
+        "秘书学",
+        "法学",
+        "新闻学",
+        "行政管理",
+        "统计学",
+        "教育学"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届统招本科及以上（高校发布集团简章）",
+      "url": "https://qxnzy.bysjy.com.cn/detail/career?id=729194",
+      "evidenceUrl": "https://fenbi.com/page/exam-information-detail/470055243507712",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "甘肃能源化工投资集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "chemical",
+      "title": "化工技术专业招聘方向（2027届，计划43人）",
+      "category": "煤化工 / 技术",
+      "city": "甘肃省相关下属经营单位（单岗位城市以企业分配为准）",
+      "summary": "面向煤化工、煤气化及配套化学品生产技术领域，集团计划43人，覆盖化工类对口专业。",
+      "requirements": "简章明确化学工程与工艺和能源化学工程，本科及以上；具体化工园区、工艺装置、岗位学历细分及工作班制尚需用人单位确认。",
+      "majorNames": [
+        "化学工程与工艺",
+        "能源化学工程"
+      ],
+      "editorialRelatedMajors": [],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届统招本科及以上（高校发布集团简章）",
+      "url": "https://qxnzy.bysjy.com.cn/detail/career?id=729194",
+      "evidenceUrl": "https://fenbi.com/page/exam-information-detail/470055243507712",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "甘肃能源化工投资集团有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}
