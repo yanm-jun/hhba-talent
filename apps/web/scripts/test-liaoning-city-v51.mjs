@@ -50,7 +50,7 @@ for(const city of expected){
 }
 assert.ok(LIAONING_MUNICIPAL_POLICY_RECORDS.find(p=>p.city==='鞍山').deadline==='2026-11-06','Anshan property fair not expired on Oct 31');
 assert.equal(LIAONING_MUNICIPAL_POLICY_RECORDS.find(p=>p.city==='鞍山').temporal,'policy');
-assert.ok(LIAONING_MUNICIPAL_POLICY_RECORDS.find(p=>p.city==='辽阳').reviewNote.includes('信息查询'),'Liaoyang is only a housing info index');
+assert.ok(LIAONING_MUNICIPAL_POLICY_RECORDS.find(p=>p.city==='辽阳').benefit.includes('查询入口'),'Liaoyang is only a housing info index');
 for(const h of LIAONING_HOUSING_RECORDS){
  assert.ok(TALENT_HOUSING_RECORDS.some(x=>x.id===h.id),h.city+' housing missing shared list');
  assert.equal(h.kind,'program','No confirmed 2026 live apartments have been demonstrated');
