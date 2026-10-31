@@ -1,3 +1,4 @@
+import {CHENGDE_POLICY_RECORDS} from './chengdePolicyRecords.ts';
 import {TANGSHAN_POLICY_RECORDS} from './tangshanPolicyRecords.ts';
 import {SHIJIAZHUANG_POLICY_RECORDS} from './shijiazhuangPolicyRecords.ts';
 import {HANDAN_POLICY_RECORDS} from './handanPolicyRecords.ts';
@@ -443,4 +444,5 @@ export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
 ...DEZHOU_POLICY_RECORDS,
 ...QINHUANGDAO_POLICY_RECORDS,
 ...HANDAN_POLICY_RECORDS,
+...CHENGDE_POLICY_RECORDS,
 ];
