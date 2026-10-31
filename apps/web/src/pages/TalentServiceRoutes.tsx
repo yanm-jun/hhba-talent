@@ -272,7 +272,7 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
   <section className="ts-sub-header">
    <span className="ts-section-kicker">{searchMode?'SEARCH RESULTS':'CITY SERVICES'} / {city}</span><h1>{city} · {title}</h1>
    <p>{searchMode?'搜索已收录政策、住房和明确标注的待核验项目；仅政府核实的资料可作为正式申报依据。':'按城市分类查看已收录政策和住房；政府原文、媒体转载、待核验项目会分别标明，不能据此认定正在受理或有空房。'}</p>
-   <div className="ts-sub-counts">{housingMode?<><QuickCount count={housingPolicyCount} label="住房政策与保障通道"/><QuickCount count={shownProjects.length} label="已核实独立项目"/></>:<><QuickCount count={shownPolicies.length} label="政策结果"/>{searchMode&&<QuickCount count={shownHomes.length} label="住房资料"/>}</>}{pendingHousingCount>0&&<QuickCount count={pendingHousingCount} label="待核验公寓线索"/>}{housingHistoricalCount>0&&<QuickCount count={housingHistoricalCount} label="历史住房政策参考"/>}</div>
+   <div className="ts-sub-counts">{housingMode?<><QuickCount count={housingPolicyCount} label="住房政策与保障通道"/><QuickCount count={shownProjects.length} label="已核实独立项目"/>{LIAONING_14_CITIES.includes(city)&&<QuickCount count={1} label="省住建厅购房政策查询入口"/>}</>:<><QuickCount count={shownPolicies.length} label="政策结果"/>{searchMode&&<QuickCount count={shownHomes.length} label="住房资料"/>}</>}{pendingHousingCount>0&&<QuickCount count={pendingHousingCount} label="待核验公寓线索"/>}{housingHistoricalCount>0&&<QuickCount count={housingHistoricalCount} label="历史住房政策参考"/>}</div>
   </section>
   <form className="ts-sub-search" onSubmit={e=>{e.preventDefault();doSearch()}}><Search size={18}/><input value={draft} onChange={e=>setDraft(e.target.value)} placeholder={'搜索'+city+'硕士补贴、住房项目…'} aria-label="搜索人才服务"/><button type="submit">搜索 <ArrowRight size={15}/></button></form>
   {searchMode&&query&&<p className="ts-sub-found">关键词：<strong>{query}</strong> · 实际匹配 {shownPolicies.length+shownHomes.length+pendingHousingCount+housingHistoricalCount} 条（含待核验项目与历史参考）</p>}
@@ -286,9 +286,14 @@ function ListPage({city,kind,query}:{city:string;kind:TalentListKind|'search';qu
    {housingMode&&housingDistricts.length>2&&<div className="ts-housing-districts" aria-label="按区域筛选住房项目">{housingDistricts.map(d=><button type="button" key={d} aria-pressed={activeDistrict===d} className={activeDistrict===d?'active':''} onClick={()=>setHousingDistrict(d)}>{d}</button>)}</div>}
    {shownProjects.length?<div className="ts-sub-grid">{shownProjects.map(h=><HousingTile data={h} key={h.id}/>)}</div>:<p className="ts-housing-filter-empty">该区域没有匹配的已核验项目，试试“全部区域”。</p>}
   </section>}
+  {housingMode&&LIAONING_14_CITIES.includes(city)&&<section className="ts-sub-section" aria-label="辽宁2026住房政策官方查询入口">
+    <div className="ts-sub-section-heading"><h2>{city} · 市级住房支持政策查询</h2></div>
+    <p>辽宁省住房和城乡建设厅2026年2月6日整理各市购房支持政策，包含人才、购房补贴、契税、住房公积金和贷款等不同事项。该汇总**仅提供真实政府政策检索线索**，不代表{city}存在可立即入住的人才公寓、固定金额购房补贴或实时可选房源。住房政策适用范围须以{city}的本市住建部门最新公告核对。</p>
+    <p><a href="https://zjt.ln.gov.cn/zjt/gsgg/2026020611093590717/index.shtml" target="_blank" rel="noopener noreferrer">打开辽宁省住建厅2026各市商品房购房支持政策汇总（官方网站）</a>。本页不是房屋预定平台；若当期没有合法公寓名单，将明确标注未核实，不展示虚构房号。</p>
+  </section>}
   {housingMode&&!housingProjects.length&&<section className="ts-sub-section"><div className="ts-sub-section-heading"><h2>独立人才公寓项目核验进度</h2></div><p className="ts-housing-inventory-note">目前尚未核实可按具体地址与批次申报的独立人才公寓项目。下方线索仍待官方配租公告确认，不能据此宣称有实时空房。</p></section>}
   {(housingMode||searchMode)&&<UnifiedTalentHousingResearch city={city} query={query}/>}
-  {!shownPolicies.length&&!resultHomes.length&&!pendingHousingCount&&<Empty city={city} kind={searchMode?'匹配结果':title}/>}
+  {!shownPolicies.length&&!resultHomes.length&&!pendingHousingCount&&!(housingMode&&LIAONING_14_CITIES.includes(city))&&<Empty city={city} kind={searchMode?'匹配结果':title}/>}
   <section className="ts-sub-cross"><ShieldCheck size={17}/><span>静态官方资料索引，非政府实时申报系统。补贴金额、资格、截止时间和剩余房源以最新官方公告为准。政策整理日期：{TALENT_POLICY_REVIEW_DATE}；项目整理日期：{HOUSING_REVIEW_DATE}。</span></section>
   </>}
  </>;
