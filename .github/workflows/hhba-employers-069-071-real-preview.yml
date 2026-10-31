@@ -59,10 +59,10 @@ jobs:
             test -s "apps/web/dist/companies/autumn/cn-autumn-$id/index.html"
             test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/logo.svg"
           done
-          for id in 069 070; do
-            for image in photo1.jpg photo2.jpg; do
-              test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/$image"
-            done
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-069/photo1.jpg
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-069/photo2.svg
+          for image in photo1.jpg photo2.jpg; do
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-070/$image"
           done
           test -s apps/web/dist/images/employer-profiles/cn-autumn-071/photo1.svg
           test -s apps/web/dist/images/employer-profiles/cn-autumn-071/photo2.svg
