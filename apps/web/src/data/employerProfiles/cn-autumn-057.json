@@ -24,19 +24,19 @@
     "https://www.linepluscorp.com/en"
   ],
   "media": {
-    "logo": "images/employer-profiles/cn-autumn-057/logo.png",
+    "logo": "images/employer-profiles/cn-autumn-057/logo.svg",
     "photos": [
       {
-        "path": "images/employer-profiles/cn-autumn-057/photo1.jpg",
-        "caption": "LINE · 官方报道办公环境",
-        "alt": "LINE官方报道展示的办公空间与接待区域",
-        "note": "LINE集团2022年混合办公官方报道配图；不代表LINE Plus韩国办公室现状。"
+        "path": "images/employer-profiles/cn-autumn-057/photo1.svg",
+        "caption": "LINE Plus · 业务主题示意图1",
+        "alt": "LINE Plus业务板块信息可视化插画",
+        "note": "HHBA原创说明性视觉，非企业真实办公现场或官方产品摄影。"
       },
       {
-        "path": "images/employer-profiles/cn-autumn-057/photo2.jpg",
-        "caption": "LINE · 官方工程团队办公视觉",
-        "alt": "LINE官方职业文化页面中的研发办公空间",
-        "note": "LINE Careers所载办公空间为集团相关办公室，并非LINE Plus韩国总部实拍。"
+        "path": "images/employer-profiles/cn-autumn-057/photo2.svg",
+        "caption": "LINE Plus · 业务主题示意图2",
+        "alt": "LINE Plus业务板块信息可视化插画",
+        "note": "HHBA原创说明性视觉，非企业真实办公现场或官方产品摄影。"
       }
     ]
   },
@@ -60,7 +60,7 @@
     "信息管理与信息系统",
     "工商管理"
   ],
-  "photoNote": "媒体展示的是LINE集团官方传播或招聘资料中的历史办公场景，不冒充LINE Plus韩国总部实拍；资产需附原始来源和SHA-256。若官方图片失效则改用明确标记的HHBA业务示意图，不伪称企业实拍。",
+  "photoNote": "当前提供3张相互独立的本地SVG视觉（1张非官方字标、2张原创业务示意图）。均非官方Logo或真实企业照片，不能冒充实景；待取得可核验、可使用的官方图片后再替换。",
   "business": [
     {
       "title": "LINE通讯产品与全球运营",
