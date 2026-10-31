@@ -5,6 +5,7 @@
   "displayName": "芯德科技（V-SOL）",
   "englishName": "V-SOL",
   "aliases": [
+    "广州芯德通信科技有限公司",
     "芯德科技V-SOL",
     "V-SOL",
     "VSOL",
@@ -13,7 +14,7 @@
     "芯德科技2027校园招聘"
   ],
   "industry": "光网络接入设备 · PON/FTTH · 无线路由与CPE · 网络通信",
-  "subtitle": "芯德科技（V-SOL） · 广州 · 光纤接入和通信终端研发制造",
+  "subtitle": "广州芯德通信科技有限公司（V-SOL）· 广州 · 星网锐捷控股子公司",
   "overview": "芯德科技（V-SOL）研发与销售PON光接入、GPON/XGS-PON光线路终端、ONU/ONT光猫、无线接入路由器及4G/5G CPE设备。其现行官网设有2027届校招专页，直接公开嵌入式软件、硬件开发和外贸销售三个岗位。",
   "lastReviewed": "2026-10-31",
   "sources": [
@@ -22,7 +23,8 @@
     "https://www.vsol.com.cn/join-us/campus-recruitment",
     "https://www.vsol.com.cn/join-us/campus-recruitment/embedded-software-engineer-1",
     "https://www.vsol.com.cn/join-us/campus-recruitment/hardware-development-engineer-1",
-    "https://www.vsol.com.cn/join-us/campus-recruitment/9328-2"
+    "https://www.vsol.com.cn/join-us/campus-recruitment/9328-2",
+    "https://www.vsol.com.cn/about"
   ],
   "media": {
     "logo": "images/employer-profiles/cn-autumn-046/logo.png",
@@ -45,7 +47,7 @@
     "url": "https://www.vsol.com.cn/join-us/campus-recruitment",
     "label": "V-SOL官方2027校园招聘",
     "status": "official_portal",
-    "subject": "芯德科技（V-SOL，广州）",
+    "subject": "广州芯德通信科技有限公司",
     "note": "公司2027校招页公布的三条职位有独立官网JD。官网提示2027届投递区间为2026-09-01到2027-06-01，但具体剩余名额及某一职位是否可投递仍以官方最新页面为准。"
   },
   "majorIntro": "依据官网单岗专业条件进行匹配：通信/计算机可查看嵌入式岗位，电子/通信可查看硬件岗位，语言和国际贸易方向可查看外贸岗位。",
@@ -148,7 +150,7 @@
       "evidenceUrl": "https://www.vsol.com.cn/join-us/campus-recruitment/embedded-software-engineer-1",
       "observedOn": "2026-10-31",
       "recruitmentType": "CAMPUS",
-      "recruitmentSubject": "芯德科技（V-SOL，广州）",
+      "recruitmentSubject": "广州芯德通信科技有限公司",
       "majorUnrestricted": false,
       "currentOpenVerified": false
     },
@@ -173,7 +175,7 @@
       "evidenceUrl": "https://www.vsol.com.cn/join-us/campus-recruitment/hardware-development-engineer-1",
       "observedOn": "2026-10-31",
       "recruitmentType": "CAMPUS",
-      "recruitmentSubject": "芯德科技（V-SOL，广州）",
+      "recruitmentSubject": "广州芯德通信科技有限公司",
       "majorUnrestricted": false,
       "currentOpenVerified": false
     },
@@ -199,7 +201,7 @@
       "evidenceUrl": "https://www.vsol.com.cn/join-us/campus-recruitment/9328-2",
       "observedOn": "2026-10-31",
       "recruitmentType": "CAMPUS",
-      "recruitmentSubject": "芯德科技（V-SOL，广州）",
+      "recruitmentSubject": "广州芯德通信科技有限公司",
       "majorUnrestricted": false,
       "currentOpenVerified": false
     }
