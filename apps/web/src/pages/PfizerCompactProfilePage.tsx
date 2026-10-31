@@ -34,7 +34,7 @@ export function PfizerCompactProfilePage({user}:{user:User|null}){
   return job.majors.includes(major);
  });
  return <Shell user={user}>
-  <article className="company-profile hhba-kpmg-compact hhba-pfizer-compact" data-company-template="openai" data-employer-id="cn-autumn-003" data-domestic-rebuild="v2">
+  <article className="company-profile hhba-kpmg-compact hhba-pfizer-compact" data-company-template="unified-v2" data-four-block-contract="hero,majors,jobs,business" data-employer-id="cn-autumn-003" data-domestic-rebuild="v2">
    <nav className="company-profile-top" aria-label="企业详情导航">
     <Link to={back.to} restoreScrollY={back.scrollY} restoreMarketState={back.marketState}><ArrowLeft size={15}/> 返回上一页</Link>
     <Link to="/candidate/jobs">招聘市场 <ArrowRight size={15}/></Link>
