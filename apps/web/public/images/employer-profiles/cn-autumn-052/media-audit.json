@@ -5,11 +5,12 @@
     "company": "宏川集团",
     "source": "https://grgroup.cc/phone/images/new/logo.png",
     "sourceSha256": "2afc0785fc7c4cc6621d213ebb9fac29f953f66865096f3d3718563f663c449f",
-    "sha256": "5c9804bb81105542ab80b5e55bf97ce4e1d6e8f9de5c7f10beb8b31b04c94d12",
-    "width": 680,
-    "height": 260,
+    "sha256": "d76fe7ad2fdb5e59a3816dac705700bc41aa882b39d5505119404a2a00b06b27",
+    "width": 744,
+    "height": 312,
     "sourceNote": "Headquarters image from university company listing; second picture from Hongchuan Group official Nangtong port operations news.",
-    "copyright": "Image rights retained by original publisher"
+    "copyright": "Image rights retained by original publisher",
+    "presentation": "Official white wordmark preserved on dark-navy readability background"
   },
   "photo1.jpg": {
     "verified": true,
