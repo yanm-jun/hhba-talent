@@ -118,7 +118,7 @@ export function buildGuangxiGuide(city:string,kind:Kind):CompleteGuide{
  qualityLevel:old?'C':'B',
  amounts,branches,defaultBranch:Object.keys(branches)[0],steps,
  checks:common,faq,
- sources:[[p.sourceName,p.sourceUrl],...(rent?[['广西住建厅安居补贴新闻转载','https://www.gxnews.com.cn/staticpages/20261001/newgx6abda183-22000092.shtml']]:[])],
+ sources:[[p.sourceName,p.sourceUrl] as [string,string],...(rent?[['广西住建厅安居补贴新闻转载','https://www.gxnews.com.cn/staticpages/20261001/newgx6abda183-22000092.shtml'] as [string,string]]:[])],
  officialUrl:old?p.sourceUrl:undefined,
  officialLabel:old?'查看人社部原始历史招募公告':'申报入口请打开云闪付App广西消费券专区确认',
  officialNote:rent?'云闪付是政策公布的申请平台，但该页面并非官方原文地址；暂未核实可直接跳转的有效深链。':buy?'政府报道与办理系统不能混同；须在云闪付App核对当前购房事项、合同备案期限与资金余额。':'历史招募公告不是2027报名入口，当前不开放2026新报名。',
