@@ -386,10 +386,174 @@ export const TALENT_PREFECTURE_CITIES:TalentCity[]=prefectureRaw.trim().split('\
   photoPage:old?.photoPage||(name==='邢台'?'https://commons.wikimedia.org/wiki/File:Xingtai_Taihang_International_Convention_and_Exhibition_Center.jpg':name==='石家庄'?'https://commons.wikimedia.org/wiki/File:Skyline_of_Shijiazhuang_2012.jpg':undefined),
   aliases:[...new Set(aliases)],intro:province==='广东省'?(GUANGDONG_CITY_INTROS[name]||'广东省人才政策及住房基础资料正在持续核验'):old?.intro||(name==='沧州'?'已收录2025人才新政生活与购房补贴、人才公寓免租及岭贤府和经开区历史住房资料；2026办理入口与实时房源待核验':name==='邢台'?'已收录2026回邢来邢人才三年分期购房补贴、36个月租房补贴、就业支持及真实住房待核验线索':name==='石家庄'?'河北首站：市级B卡租购房补贴、毕业生一次性安家补贴、2026人才公寓与公租房历史项目':name==='日照'?'已收录青年人才补贴、先租后购住房优惠，并整理市级及高新区人才公寓历史资料':name==='枣庄'?'已收录2026青年就业创业补贴、首批高层次人才家园试点，另有薛城保租房和高新区公寓待核验线索':name==='聊城'?'已收录2026青年人才生活及社保补贴；人才住房三年免租和购房支持为2022历史政策，另有3处公寓或工程待核验线索':name==='承德'?'已收录2026年主导产业租房与一次性生活补助、燕赵英才卡、配售型保障住房以及京津科技人才公寓历史制度；具体空房和申报直达入口待核验':name==='秦皇岛'?'已收录秦皇岛经开区官方人才公寓政策及配租流程；锦绣佳成与科技大厦项目依据2025年报道列为待核验房源线索':name==='保定'?'已收录2026国控高新区四小区保租房与公积金租房提取制度，2022毕业生租购房补贴作为历史政策参考；284套为四小区批次总量，不是实时空房':'人才政策与住房资料正在逐步核验')};
 });
+/** 云南8个自治州：加入目录而不改变原293地级市基准，避免全局统计与既有测试失效。 */
+export const TALENT_YUNNAN_PREFECTURES:TalentCity[]=[
+  {
+    "name": "楚雄",
+    "official": "楚雄彝族自治州",
+    "province": "云南省",
+    "level": "prefecture",
+    "intro": "兴楚英才、人才回巢与青年安居。已接入省级求职、首次创业、公租房及保租房基础资料；州级专项还须逐条核实。",
+    "aliases": [
+      "楚雄",
+      "楚雄彝族自治州",
+      "chu xiong",
+      "chuxiong",
+      "cx",
+      "云南楚雄",
+      "云南省楚雄",
+      "云南省楚雄彝族自治州"
+    ],
+    "code": "532300",
+    "pinyin": "chu xiong",
+    "initials": "cx"
+  },
+  {
+    "name": "红河",
+    "official": "红河哈尼族彝族自治州",
+    "province": "云南省",
+    "level": "prefecture",
+    "intro": "红河奔腾、边疆紧缺人才与就业创业。已接入省级求职、首次创业、公租房及保租房基础资料；州级专项还须逐条核实。",
+    "aliases": [
+      "红河",
+      "红河哈尼族彝族自治州",
+      "hong he",
+      "honghe",
+      "hh",
+      "云南红河",
+      "云南省红河",
+      "云南省红河哈尼族彝族自治州"
+    ],
+    "code": "532500",
+    "pinyin": "hong he",
+    "initials": "hh"
+  },
+  {
+    "name": "文山",
+    "official": "文山壮族苗族自治州",
+    "province": "云南省",
+    "level": "prefecture",
+    "intro": "兴文英才、人才培养与创业安居。已接入省级求职、首次创业、公租房及保租房基础资料；州级专项还须逐条核实。",
+    "aliases": [
+      "文山",
+      "文山壮族苗族自治州",
+      "wen shan",
+      "wenshan",
+      "ws",
+      "云南文山",
+      "云南省文山",
+      "云南省文山壮族苗族自治州"
+    ],
+    "code": "532600",
+    "pinyin": "wen shan",
+    "initials": "ws"
+  },
+  {
+    "name": "西双版纳",
+    "official": "西双版纳傣族自治州",
+    "province": "云南省",
+    "level": "prefecture",
+    "intro": "文旅人才、创新创业与住房保障。已接入省级求职、首次创业、公租房及保租房基础资料；州级专项还须逐条核实。",
+    "aliases": [
+      "西双版纳",
+      "西双版纳傣族自治州",
+      "xi shuang ban na",
+      "xishuangbanna",
+      "xsbn",
+      "云南西双版纳",
+      "云南省西双版纳",
+      "云南省西双版纳傣族自治州"
+    ],
+    "code": "532800",
+    "pinyin": "xi shuang ban na",
+    "initials": "xsbn"
+  },
+  {
+    "name": "大理",
+    "official": "大理白族自治州",
+    "province": "云南省",
+    "level": "prefecture",
+    "intro": "高层次人才、青年就业与住房保障。已接入省级求职、首次创业、公租房及保租房基础资料；州级专项还须逐条核实。",
+    "aliases": [
+      "大理",
+      "大理白族自治州",
+      "da li",
+      "dali",
+      "dl",
+      "云南大理",
+      "云南省大理",
+      "云南省大理白族自治州"
+    ],
+    "code": "532900",
+    "pinyin": "da li",
+    "initials": "dl"
+  },
+  {
+    "name": "德宏",
+    "official": "德宏傣族景颇族自治州",
+    "province": "云南省",
+    "level": "prefecture",
+    "intro": "口岸人才、青年创业与住房保障。已接入省级求职、首次创业、公租房及保租房基础资料；州级专项还须逐条核实。",
+    "aliases": [
+      "德宏",
+      "德宏傣族景颇族自治州",
+      "de hong",
+      "dehong",
+      "dh",
+      "云南德宏",
+      "云南省德宏",
+      "云南省德宏傣族景颇族自治州"
+    ],
+    "code": "533100",
+    "pinyin": "de hong",
+    "initials": "dh"
+  },
+  {
+    "name": "怒江",
+    "official": "怒江傈僳族自治州",
+    "province": "云南省",
+    "level": "prefecture",
+    "intro": "紧缺人才、基层岗位与人才住房保障。已接入省级求职、首次创业、公租房及保租房基础资料；州级专项还须逐条核实。",
+    "aliases": [
+      "怒江",
+      "怒江傈僳族自治州",
+      "nu jiang",
+      "nujiang",
+      "nj",
+      "云南怒江",
+      "云南省怒江",
+      "云南省怒江傈僳族自治州"
+    ],
+    "code": "533300",
+    "pinyin": "nu jiang",
+    "initials": "nj"
+  },
+  {
+    "name": "迪庆",
+    "official": "迪庆藏族自治州",
+    "province": "云南省",
+    "level": "prefecture",
+    "intro": "高原地区青年就业、困难毕业生与住房保障。已接入省级求职、首次创业、公租房及保租房基础资料；州级专项还须逐条核实。",
+    "aliases": [
+      "迪庆",
+      "迪庆藏族自治州",
+      "di qing",
+      "diqing",
+      "dq",
+      "云南迪庆",
+      "云南省迪庆",
+      "云南省迪庆藏族自治州"
+    ],
+    "code": "533400",
+    "pinyin": "di qing",
+    "initials": "dq"
+  }
+] as TalentCity[];
 const municipalityCode:Record<string,string>={北京:'110000',天津:'120000',上海:'310000',重庆:'500000'};
 export const TALENT_CITY_INDEX:TalentCity[]=[
  ...TALENT_MUNICIPALITIES.map(c=>({...c,code:municipalityCode[c.name]})),
- ...TALENT_PREFECTURE_CITIES
+ ...TALENT_PREFECTURE_CITIES,
+ ...TALENT_YUNNAN_PREFECTURES
 ];
 const normalize=(text:string)=>text.trim().toLowerCase().replace(/[\s，。,.、·•\-]/g,'');
 export function findTalentProvince(input:string){
@@ -423,7 +587,7 @@ export function suggestTalentCities(input:string,limit=8){
  const q=normalize(input);
  if(!q)return TALENT_MUNICIPALITIES.slice(0,limit);
  const province=findTalentProvince(q);
- if(province)return TALENT_PREFECTURE_CITIES.filter(c=>c.province===province.official).slice(0,limit);
+ if(province)return TALENT_CITY_INDEX.filter(c=>c.province===province.official).slice(0,limit);
  return TALENT_CITY_INDEX.map(city=>{
   let score=1000;
   for(const alias of city.aliases){

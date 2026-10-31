@@ -1,0 +1,44 @@
+name: HHBA Yunnan V5.1 independent branch validation
+on:
+  push:
+    branches:
+      - feature/talent-yunnan
+  pull_request:
+    paths:
+      - 'apps/web/src/data/yunnan*'
+      - 'apps/web/src/data/talentCityRegistry.ts'
+      - 'apps/web/src/data/talentPolicyRecords.ts'
+      - 'apps/web/src/data/talentHousingRecords.ts'
+      - 'apps/web/src/pages/TalentServiceRoutes.tsx'
+      - 'apps/web/src/components/talent/UnifiedPolicyList.tsx'
+      - 'apps/web/scripts/test-yunnan-city-v51.mjs'
+      - '.github/workflows/hhba-yunnan-branch-ci.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci
+      - name: Yunnan V5.1 province scope and coverage tests
+        working-directory: apps/web
+        run: |
+          node --experimental-strip-types scripts/test-yunnan-city-v51.mjs
+          node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - name: Static production build without deployment
+        working-directory: apps/web
+        run: npm run build
+      - name: Upload isolated static build artifact (does not affect main)
+        uses: actions/upload-artifact@v4
+        with:
+          name: yunnan-v51-static-build
+          path: apps/web/dist/
+          if-no-files-found: error
