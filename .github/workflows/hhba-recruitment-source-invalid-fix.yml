@@ -44,6 +44,8 @@ jobs:
         working-directory: apps/web
         env:
           HHBA_TEST_BASE: 'http://127.0.0.1:4173/hhba-talent/'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          HHBA_GITHUB_PAGES: '1'
         run: |
           npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/hhba-recruitment-source-verify.log 2>&1 &
           for n in $(seq 1 40); do
