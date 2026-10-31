@@ -18,14 +18,20 @@ export function buildGuizhouGuide(kind:'policy'|'housing',id:string):CompleteGui
  if(!p&&!h)return null;
  const item=p||h!;
  const housing=!!h;
- const outdated=!!p&&(p.temporal!=='policy'||Boolean(p.deadline&&p.deadline<'2026-10-31'));
+ const today=new Date().toISOString().slice(0,10);
+ const outdated=!!p&&(p.temporal!=='policy'||Boolean(p.deadline&&p.deadline<today));
  const material=p?.materials?.length?p.materials:[
  '本人身份、学历学位及工作单位证明（按适用事项）',
  '本人及家庭住房信息、既有住房保障记录（按当期项目要求）',
  '项目主管部门要求的实名申请表和人才资格证据（当期核实）'];
  const limitation=p?.reviewNote||h?.statusNote||'受理情况需以最新政府公告为准';
+ const guiyang=item.city==='贵阳';
+ const enterprise=p?.payoutTo==='用人单位';
+ const currentDeadline=p?.deadline&&p.deadline>=today?'本公告截止'+p.deadline+'；仅以主管部门最新变更为准。':'';
+ const usefulOfficialUrl=p?.applicationUrl||h?.applyUrl;
+
  const branches:Record<string,GuideBranch>={
-  eligible:{label:'可能符合该事项条件',desc:p?.targetGroup||h?.eligibility||item.city,
+  eligible:{label:enterprise?'符合条件的申报企业':'可能符合该事项条件',desc:p?.targetGroup||h?.eligibility||item.city,
    conditions:[p?.eligibility||h?.eligibility||'', '申请人工作及人才资格应符合本条限定市州、单位和政策批次','住房资格、已享政策互斥及身份资历需依当期正式清单核验'],materials:material,warning:limitation},
   other:{label:'不符合该批次或不在对应市州',desc:'应查询真实工作或居住市州的其他独立项目，不得跨市州套用最高待遇。',
    conditions:['核对本人聘用或企业注册地点是否在政策所指区域','核对毕业时间、专业学历、人才认定和工作服务期','不得以其他市州制度替代申请本地岗位或租房'],
@@ -37,7 +43,7 @@ export function buildGuizhouGuide(kind:'policy'|'housing',id:string):CompleteGui
  return {city:item.city,title:item.title,kicker:'贵州省 · '+item.city+' · '+(housing?'人才安居':'人才政策')+' · 资料分级',
  desc:p?.summary||h?.statusNote||'',support:p?.headlineAmount||'住房项目或制度·按真实项目核定',
  unit:p?.headlineUnit||'历史规模不等于实时房源',
- limit:outdated?'历史批次/已截止，不得作为当前开放申请':'是否开放申报和实际补助以当期主管部门核验为准',
+ limit:outdated?'历史批次/已截止，不得作为当前开放申请':currentDeadline||'是否开放申报和实际补助以当期主管部门核验为准',
  review:limitation,qualityLevel:outdated?'C':'B',
  amounts:[[p?.category||h?.housingCategory||'住房',p?.benefit||h?.rent||'',housing?'真实项目以运营方通知为准':'并非人人享受'],['资格与适用区域',p?.district||h?.district||item.city,'不可跨州县套用']],
  branches,defaultBranch:'eligible',steps:steps(p?.applicationSteps||h?.steps||[]),
@@ -49,10 +55,17 @@ export function buildGuizhouGuide(kind:'policy'|'housing',id:string):CompleteGui
  ['人才公寓建设套数等于现在有空房吗？','不等于。项目总规模及历史首批释放套数不能推导今天可申请的空房数。'],
  ['政府新闻网页就是报名网站吗？','不是。当前详情只收录原始政策依据，未核实真实事项直达受理入口的须向主管部门确认。'],
  ['条件不符合时还能跨市州申请吗？','不能直接跨市州适用。请重新检索本人实际就业和住房属地的独立政策。'],
- ['HHBA负责办理或保障审核成功吗？','不负责。本站提供政策公开资料索引，最终依主管部门规定与实际审批。']],
+ ['HHBA负责办理或保障审核成功吗？','不负责。本站提供政策公开资料索引，最终依主管部门规定与实际审批。'],
+ ...(guiyang?[
+  ['贵阳人才安家费与企业引才薪酬补贴能否算作个人两份收入？','不能。安家费是满足市外引进、落户、合同、目录和社保要求的人才分期获得；企业引才薪酬补贴是给企业的支持，不是每个月转给申请人的额外工资。'],
+  ['硕士在贵阳工作就一定拿2.4万元安家费吗？','不是。还需要首次从市外引进、落户贵阳贵安、与符合条件的重点产业企业签约2年以上、参保满6个月、岗位列入有效需求目录等，最终由主管部门审核。'],
+  ['2026年9月人才引进公告能报名到什么时候？','目前公告指向2026年11月30日17:00截止；请到贵阳市人社部门核对最新更正和岗位表，公告报名与个人现金补助申领不同。'],
+  ['免费筑梦驿站能当作长期免费公寓吗？','不能。筑梦驿站提供符合条件来筑求职青年的短住服务，不是长期人才公寓；必须核实站点现时开放床位。']
+ ] as [string,string][]:[])],
  sources:[[p?.sourceName||'政府住房及人才项目公告',item.sourceUrl]],
- officialLabel:'政府事项直达办理入口待核实',officialNote:limitation,
- contacts:[],listPath:'/talent-service/list/'+(housing?'housing':'policies')+'/'+encodeURIComponent(item.city),
+ officialUrl:usefulOfficialUrl,officialLabel:usefulOfficialUrl?'已核验平台入口（具体事项仍需自行核对）':'政府事项直达办理入口待核实',officialNote:limitation,
+ contacts:guiyang?[{name:'贵阳贵安人才服务热线',phone:'0851-96567'},{name:'重点产业引才政策咨询',phone:'0851-84846647'}]:[],
+ listPath:'/talent-service/list/'+(housing?'housing':'policies')+'/'+encodeURIComponent(item.city),
  detailPath:'/talent-service/'+(housing?'housing':'policy')+'/'+encodeURIComponent(item.id)
  };
 }
