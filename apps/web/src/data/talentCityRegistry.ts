@@ -549,11 +549,18 @@ export const TALENT_YUNNAN_PREFECTURES:TalentCity[]=[
     "initials": "dq"
   }
 ] as TalentCity[];
+/** 黑龙江省大兴安岭地区与12个既有地级市同属13个地级行政区，但非地级市。 */
+export const TALENT_HEILONGJIANG_DISTRICTS:TalentCity[]=[{
+ name:'大兴安岭',official:'大兴安岭地区',province:'黑龙江省',level:'prefecture',
+ intro:'2026人才周大兴安岭地区引才计划及省级就业创业、住房保障制度；2026年9月招聘批次已截止，具体住房待核验',
+ code:'232700',pinyin:'da xing an ling',initials:'dxal',aliases:['大兴安岭','大兴安岭地区','黑龙江大兴安岭','黑龙江省大兴安岭地区','da xing an ling','daxinganling','dxal']
+}];
 const municipalityCode:Record<string,string>={北京:'110000',天津:'120000',上海:'310000',重庆:'500000'};
 export const TALENT_CITY_INDEX:TalentCity[]=[
  ...TALENT_MUNICIPALITIES.map(c=>({...c,code:municipalityCode[c.name]})),
  ...TALENT_PREFECTURE_CITIES,
- ...TALENT_YUNNAN_PREFECTURES
+ ...TALENT_YUNNAN_PREFECTURES,
+ ...TALENT_HEILONGJIANG_DISTRICTS
 ];
 const normalize=(text:string)=>text.trim().toLowerCase().replace(/[\s，。,.、·•\-]/g,'');
 export function findTalentProvince(input:string){
