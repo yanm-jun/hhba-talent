@@ -1,0 +1,57 @@
+name: Fujian 9-city V5.1 isolated static acceptance
+on:
+  push:
+    branches:
+      - feature/talent-fujian
+  pull_request:
+    paths:
+      - 'apps/web/src/data/fujian*.ts'
+      - 'apps/web/src/data/talentPolicyRecords.ts'
+      - 'apps/web/src/data/talentHousingRecords.ts'
+      - 'apps/web/src/data/talentCityRegistry.ts'
+      - 'apps/web/src/pages/TalentServiceRoutes.tsx'
+      - 'apps/web/src/components/talent/UnifiedTalentRecordDetail.tsx'
+      - 'apps/web/scripts/test-fujian-city-v51.mjs'
+      - '.github/workflows/hhba-fujian-branch-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-fujian-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify-fujian:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify 福建省 nine cities
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-fujian-city-v51.mjs
+      - name: Existing national city contract
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-cities.mjs
+      - name: National V5.1 core contract
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-talent-city-contract-v51.mjs
+      - name: Full site build, no production deploy
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+        run: npm run build
+      - name: Preserve static build for independent acceptance
+        uses: actions/upload-artifact@v4
+        with:
+          name: fujian-9city-v51-isolated-static
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error

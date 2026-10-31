@@ -1,3 +1,14 @@
+import {HUNAN_POLICY_RECORDS} from './hunanPolicyRecords.ts';
+import {HENAN_POLICY_RECORDS} from './henanPolicyRecords.ts';
+import {HUBEI_POLICY_RECORDS} from './hubeiPolicyRecords.ts';
+import {JIANGXI_POLICY_RECORDS} from './jiangxiPolicyRecords.ts';
+import {HEILONGJIANG_POLICY_RECORDS} from './heilongjiangPolicyRecords.ts';
+import {FUJIAN_POLICY_RECORDS} from './fujianPolicyRecords.ts';
+import {ANHUI_POLICY_RECORDS} from './anhuiPolicyRecords.ts';
+import {JILIN_POLICY_RECORDS} from './jilinPolicyRecords.ts';
+import {JILIN_SUPPLEMENT_POLICY_RECORDS} from './jilinSupplementPolicyRecords.ts';
+import {INNER_MONGOLIA_POLICY_RECORDS} from './innerMongoliaPolicyRecords.ts';
+import {SHANXI_POLICY_RECORDS} from './shanxiPolicyRecords.ts';
 import {HANGZHOU_POLICY_RECORDS} from './hangzhouPolicyRecords.ts';
 import {NINGBO_POLICY_RECORDS} from './ningboPolicyRecords.ts';
 import {WENZHOU_POLICY_RECORDS} from './wenzhouPolicyRecords.ts';
@@ -52,6 +63,17 @@ export type TalentPolicyRecord={
 };
 export const TALENT_POLICY_REVIEW_DATE='2026-10-30';
 export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
+ ...HUNAN_POLICY_RECORDS,
+ ...HENAN_POLICY_RECORDS,
+ ...HUBEI_POLICY_RECORDS,
+ ...JIANGXI_POLICY_RECORDS,
+ ...HEILONGJIANG_POLICY_RECORDS,
+ ...FUJIAN_POLICY_RECORDS,
+ ...ANHUI_POLICY_RECORDS,
+ ...JILIN_POLICY_RECORDS,
+ ...JILIN_SUPPLEMENT_POLICY_RECORDS,
+ ...INNER_MONGOLIA_POLICY_RECORDS,
+ ...SHANXI_POLICY_RECORDS,
 ...LIAONING_PROVINCIAL_POLICY_RECORDS,
 ...LIAONING_EXPANDED_PROVINCIAL_POLICY_RECORDS,
 ...LIAONING_MUNICIPAL_POLICY_RECORDS,

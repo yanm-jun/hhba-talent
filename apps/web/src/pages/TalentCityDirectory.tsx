@@ -7,7 +7,7 @@ import {TALENT_HOUSING_RECORDS} from '../data/talentHousingRecords';
 import '../styles/talent-city-directory.css';
 
 const PAGE_SIZE=24;
-const totals={city:TALENT_CITY_INDEX.length,prefecture:293,municipality:4,autonomous:8};
+const totals={city:TALENT_CITY_INDEX.length,prefecture:293,municipality:4,autonomous:8,otherPrefectures:7};
 const policyCounts=new Map<string,number>();
 const housingCounts=new Map<string,number>();
 for(const p of TALENT_POLICY_RECORDS)policyCounts.set(p.city,(policyCounts.get(p.city)||0)+1);
@@ -30,7 +30,7 @@ export function TalentCityDirectory({initialProvince='',initialQuery=''}:{initia
   <nav aria-label="当前位置" className="tcd-breadcrumb"><Link to="/talent-service">人才服务首页</Link><span>›</span><span>全部城市</span></nav>
   <header className="tcd-hero"><span className="tcd-kicker">HHBA / NATIONAL CITY DIRECTORY</span><h1>选择城市，查询当地人才服务</h1>
    <p>全国目标城市的搜索入口已建立。是否已有政策、公寓资料以各城市实际收录情况为准。</p>
-   <div className="tcd-numbers"><span><b>{totals.city}</b> 城市入口</span><span><b>{totals.municipality}</b> 直辖市</span><span><b>{totals.prefecture}</b> 地级市</span><span><b>{totals.autonomous}</b> 云南自治州</span></div></header>
+   <div className="tcd-numbers"><span><b>{totals.city}</b> 城市入口</span><span><b>{totals.municipality}</b> 直辖市</span><span><b>{totals.prefecture}</b> 地级市</span><span><b>{totals.autonomous}</b> 云南自治州</span><span><b>{totals.otherPrefectures}</b> 其他盟州地区</span></div></header>
   <section className="tcd-controls" aria-label="城市筛选">
    <label className="tcd-search"><Search size={17}/><input aria-label="搜索城市名称、拼音或省份" autoComplete="off" value={query} onChange={e=>editQuery(e.target.value)} placeholder="搜索：临沂、linyi、聊城、山东省…"/></label>
    <label className="tcd-select"><span>省份 / 自治区</span><select aria-label="选择省份或自治区" value={province} onChange={e=>pickProvince(e.target.value)}>

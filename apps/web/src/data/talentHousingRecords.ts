@@ -1,3 +1,13 @@
+import {HUNAN_HOUSING_RECORDS} from './hunanHousingRecords.ts';
+import {HENAN_HOUSING_RECORDS} from './henanHousingRecords.ts';
+import {HUBEI_HOUSING_RECORDS} from './hubeiHousingRecords.ts';
+import {JIANGXI_HOUSING_RECORDS} from './jiangxiHousingRecords.ts';
+import {HEILONGJIANG_HOUSING_RECORDS} from './heilongjiangHousingRecords.ts';
+import {FUJIAN_HOUSING_RECORDS} from './fujianHousingRecords.ts';
+import {ANHUI_HOUSING_RECORDS} from './anhuiHousingRecords.ts';
+import {JILIN_HOUSING_RECORDS} from './jilinHousingRecords.ts';
+import {INNER_MONGOLIA_HOUSING_RECORDS} from './innerMongoliaHousingRecords.ts';
+import {SHANXI_HOUSING_RECORDS} from './shanxiHousingRecords.ts';
 import {HANGZHOU_HOUSING_RECORDS} from './hangzhouHousingRecords.ts';
 import {NINGBO_HOUSING_RECORDS} from './ningboHousingRecords.ts';
 import {WENZHOU_HOUSING_RECORDS} from './wenzhouHousingRecords.ts';
@@ -40,6 +50,16 @@ import {WEIFANG_HOUSING_RECORDS} from './weifangHousingRecords.ts';
 export type TalentHousingRecord={id:string;city:string;district:string;title:string;address:string;units:string;rent:string;eligibility:string;sourceUrl:string;published:string;applicationEnd?:string;statusNote:string;steps:string[];applyUrl?:string;kind:'project'|'program';reviewedAt:string;contactPhone?:string;contactSourceUrl?:string;photoEvidence?:'source';housingCategory?:'人才公寓'|'公共租赁住房'|'保障性租赁住房'|'其他住房';};
 export const HOUSING_REVIEW_DATE='2026-10-30';
 export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
+ ...HUNAN_HOUSING_RECORDS,
+ ...HENAN_HOUSING_RECORDS,
+ ...HUBEI_HOUSING_RECORDS,
+ ...JIANGXI_HOUSING_RECORDS,
+ ...HEILONGJIANG_HOUSING_RECORDS,
+ ...FUJIAN_HOUSING_RECORDS,
+ ...ANHUI_HOUSING_RECORDS,
+ ...JILIN_HOUSING_RECORDS,
+ ...INNER_MONGOLIA_HOUSING_RECORDS,
+ ...SHANXI_HOUSING_RECORDS,
 ...LIAONING_HOUSING_RECORDS,
 ...YUNNAN_HOUSING_RECORDS,
 ...HANGZHOU_HOUSING_RECORDS,
