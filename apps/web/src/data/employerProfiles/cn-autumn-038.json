@@ -1,0 +1,364 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-038",
+  "name": "博创科技",
+  "displayName": "博创科技（现长芯博创）",
+  "englishName": "EverProX · formerly Broadex",
+  "aliases": [
+    "博创科技股份有限公司",
+    "长芯博创",
+    "长芯博创科技股份有限公司",
+    "EverProX",
+    "EverProX Technologies",
+    "Broadex Technologies",
+    "Broadex",
+    "光电互联",
+    "300548"
+  ],
+  "industry": "光通信器件 · 光子集成 · 高速光模块 · 数据中心互联",
+  "subtitle": "长芯博创科技股份有限公司（原博创科技股份有限公司）· 深圳创业板300548 · 浙江嘉兴",
+  "overview": "原博创科技已于2025年更名为长芯博创（EverProX）。公司深耕光电互联，业务覆盖光通信无源器件、PLC光分路器、光模块、光纤阵列、无源及有源线缆、数据中心高速互联和光电芯片。官网介绍了嘉兴、成都、汉川和海外等制造研发布局。为避免同一法律实体重复展示，本页保留原名单名称“博创科技”，同时明确现用企业名称。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.everprox.com/Overview.html",
+    "https://www.everprox.com/",
+    "https://www.everprox.com/list_36.html",
+    "https://www.everprox.com/list_37.html",
+    "https://en.everprox.com/view_26.html",
+    "https://en.broadex-tech.com/about/news",
+    "https://www.broadex-tech.com/jobs.aspx?cateid=29"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-038/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-038/photo1.jpg",
+        "caption": "博创科技 · 上海研发中心建筑实景（历史照片）",
+        "alt": "博创科技上海研发中心外景，建筑物上显示Broadex Technologies品牌",
+        "note": "来自博创科技英文官网历史新闻栏目中的上海研发中心建筑实拍，非AI生成；摄于企业更名前，不能冒称最新总部。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-038/photo2.jpg",
+        "caption": "博创科技与长芯盛整合活动 · 官方资料实拍",
+        "alt": "博创科技与长芯盛整合活动现场，活动背景显示企业品牌标志",
+        "note": "来自长芯盛官方新闻文章2024年整合活动实拍；不同于上海研发中心建筑照片，非AI图片。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.everprox.com/list_36.html",
+    "label": "长芯博创官方社会招聘",
+    "status": "official_portal",
+    "subject": "长芯博创科技股份有限公司",
+    "note": "岗位依据现用名称下的官方社会招聘目录整理。官网并未给出这些岗位的统一发布时间与实时剩余名额，本站一律不宣称当前可投递，社招与校园招聘严格区分；2027届毕业生另可查看官方校园招聘栏目。"
+  },
+  "majorIntro": "按照官网具体社会招聘职位整理专业关联。点击专业方向只显示相关岗位，不把全公司岗位混入单一专业。实际申请条件包括工作年限、学历与经验，应以最新官方JD为准；此处并非2027届校招岗位。",
+  "preferredMajors": [
+    "光电信息科学与工程",
+    "光学工程",
+    "电子信息工程",
+    "通信工程",
+    "电子科学与技术",
+    "微电子科学与工程",
+    "机械工程",
+    "机械设计制造及其自动化",
+    "能源与动力工程",
+    "电气工程及其自动化",
+    "工业工程",
+    "质量管理工程",
+    "材料科学与工程",
+    "工程管理"
+  ],
+  "photoNote": "品牌标识采用长芯博创现用 EverProX 官方/可靠媒体展示图，而非将历史 Broadex 标识误当现用品牌；两张照片分别为博创上海研发中心旧照与长芯盛整合活动旧照，明确标注历史性质，图片只本地展示不跳外部网址。版权归原权利人，HHBA非官方招聘代理。",
+  "business": [
+    {
+      "title": "无源集成光学与PLC",
+      "description": "设计制造平面光波导（PLC）分路器、AWG、阵列器件及相关光路组件，面向电信网络与数据中心高密度光连接。",
+      "tags": "PLC · AWG · FA",
+      "details": [
+        "光子集成器件与光波导设计",
+        "WDM/光分路与光纤阵列",
+        "器件封装与光学可靠性验证"
+      ]
+    },
+    {
+      "title": "高速数据中心光互联",
+      "description": "围绕400G/800G和更高速率的光收发、AOC、AEC与高速无源连接产品，服务云计算和AI算力网络。",
+      "tags": "800G · AOC · AEC",
+      "details": [
+        "高速光模块与互联传输",
+        "高密度光电连接组件",
+        "面向AI算力基础设施的应用"
+      ]
+    },
+    {
+      "title": "PON与电信光通信模块",
+      "description": "提供10G PON、XGS-PON等光网络接入方案，以及面向电信领域的有源与无源光器件。",
+      "tags": "PON · GPON · XGS-PON",
+      "details": [
+        "光接入网络收发模块",
+        "光分路、复用与波长管理",
+        "电信网络部署及相关器件"
+      ]
+    },
+    {
+      "title": "消费与工业高速有源线缆",
+      "description": "围绕USB、HDMI、DP及工业图像传输等场景提供有源光缆、连接器和线缆解决方案。",
+      "tags": "USB · HDMI · 工业互联",
+      "details": [
+        "长距离高带宽光电传输",
+        "机器视觉及影音设备连接",
+        "线缆电路、光学和系统工程"
+      ]
+    },
+    {
+      "title": "光电芯片与光子集成技术",
+      "description": "布局低功耗光电SerDes、光子芯片和集成光电器件技术，支撑数据互联和轻量化智能终端。",
+      "tags": "PIC · SerDes · 芯片",
+      "details": [
+        "光电芯片及接收发送技术",
+        "硅光与光子集成方案",
+        "高速信号及光器件封装"
+      ]
+    },
+    {
+      "title": "生产制造、测试与工程服务",
+      "description": "覆盖无源/有源器件的NPI新产品导入、生产工艺、质量验证、可靠性与供应链协同服务。",
+      "tags": "NPI · DQA · 工艺测试",
+      "details": [
+        "结构与热仿真及高速链路测试",
+        "工艺转产、制造良率优化",
+        "研发质量与产品全生命周期管理"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "thermal-structure",
+      "title": "结构热设计工程师",
+      "city": "湖北武汉",
+      "category": "机械与热设计",
+      "url": "https://www.everprox.com/list_36.html",
+      "evidenceUrl": "https://www.everprox.com/list_36.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "长芯博创科技股份有限公司（原博创科技股份有限公司）",
+      "summary": "负责光模块的结构方案、热仿真、散热优化及样机阶段的机械测试，配合完成工程图纸和设计验证。",
+      "requirements": "官方社会招聘页面要求具有3年以上光模块结构设计经验，熟悉MSA协议及AutoCAD等设计工具；有热设计相关经验者优先。页面未对该岗位逐项明确学历门槛，不擅自补写。",
+      "majorNames": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "能源与动力工程"
+      ],
+      "editorialRelatedMajors": [
+        "材料科学与工程",
+        "光电信息科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以官网为准 · 社会招聘",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "signal-integrity",
+      "title": "信号完整性工程师",
+      "city": "湖北武汉",
+      "category": "电子与硬件",
+      "url": "https://www.everprox.com/list_36.html",
+      "evidenceUrl": "https://www.everprox.com/list_36.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "长芯博创科技股份有限公司（原博创科技股份有限公司）",
+      "summary": "从事高速光模块链路的信号完整性与电源完整性仿真、测试及设计规范建设，持续推进高速互联性能优化。",
+      "requirements": "官方岗位要求5年以上高速光模块信号完整性设计经验，理解微带线、带状线等结构及IEEE 802.3、OIF相关协议，能够使用HFSS、ADS仿真并分析测试结果。",
+      "majorNames": [
+        "电子信息工程",
+        "通信工程",
+        "电子科学与技术"
+      ],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历以官网为准 · 5年以上相关经验",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "advanced-hardware",
+      "title": "高级硬件工程师",
+      "city": "湖北武汉",
+      "category": "电子与硬件",
+      "url": "https://www.everprox.com/list_36.html",
+      "evidenceUrl": "https://www.everprox.com/list_36.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "长芯博创科技股份有限公司（原博创科技股份有限公司）",
+      "summary": "参与AOC光电产品的研发方案、原理图设计、PCB布局指导、板级调试、性能优化及量产导入。",
+      "requirements": "官方要求本科及以上学历，通信、电子信息、计算机、机电、物理或光电工程等相关背景；5年以上产品开发经历；理解USB、HDMI、DP、PCIe等接口，熟悉模拟、数字电路及EMC。",
+      "majorNames": [
+        "电子信息工程",
+        "通信工程",
+        "电气工程及其自动化"
+      ],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "机械电子工程",
+        "光电信息科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 5年以上经验",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "pre-research",
+      "title": "预研工程师",
+      "city": "湖北武汉",
+      "category": "光学与研发",
+      "url": "https://www.everprox.com/list_36.html",
+      "evidenceUrl": "https://www.everprox.com/list_36.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "长芯博创科技股份有限公司（原博创科技股份有限公司）",
+      "summary": "面向无源光通信器件及光纤跳线开展新技术、新工艺与新产品预研，完成原型样品验证、方案评审与量产导入优化。",
+      "requirements": "官方招聘页面要求硕士以上学历且有1年以上无源器件或光跳线行业经验；或相关专业本科学历、3年以上同行经验。涉及光学、电子、通信领域。",
+      "majorNames": [
+        "光电信息科学与工程",
+        "光学工程",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "微电子科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士及以上1年 / 本科3年同业经验",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "fundamental-rd-tpm",
+      "title": "基础研发TPM",
+      "city": "湖北武汉",
+      "category": "光学与研发",
+      "url": "https://www.everprox.com/list_36.html",
+      "evidenceUrl": "https://www.everprox.com/list_36.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "长芯博创科技股份有限公司（原博创科技股份有限公司）",
+      "summary": "承担无源光器件及跳线新品预研项目的技术规划、客户对接、方案论证与团队协同，跟踪开发节点和技术攻关。",
+      "requirements": "官网显示硕士以上学历、光学或电子通信等专业，且具3年以上相关行业经验；或本科学历、5年以上同行经验，要求能带领技术团队并推动项目交付。",
+      "majorNames": [
+        "光学工程",
+        "光电信息科学与工程",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "工程管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士3年 / 本科5年同业经验",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "product-engineer",
+      "title": "产品工程师",
+      "city": "湖北武汉",
+      "category": "工艺与产品",
+      "url": "https://www.everprox.com/list_36.html",
+      "evidenceUrl": "https://www.everprox.com/list_36.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "长芯博创科技股份有限公司（原博创科技股份有限公司）",
+      "summary": "面向无源光器件、跳线和机架产品完成客户规格澄清、工艺路线制订、样品验证及NPI量产导入工作。",
+      "requirements": "官方要求本科及以上学历，光学、电子、通信相关专业；3年以上MPO/LC/FC/SC/WDM/PLC等相关器件或光跳线制造经验；具英语技术沟通与跨团队协同能力。",
+      "majorNames": [
+        "光电信息科学与工程",
+        "电子信息工程",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [
+        "材料科学与工程",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 3年以上相关经验",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "product-manager",
+      "title": "产品经理",
+      "city": "湖北武汉",
+      "category": "工艺与产品",
+      "url": "https://www.everprox.com/list_36.html",
+      "evidenceUrl": "https://www.everprox.com/list_36.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "长芯博创科技股份有限公司（原博创科技股份有限公司）",
+      "summary": "推进光通信新产品立项、EVT/DVT设计验证、试样、备料和量产工艺转换，并协调研发、物控、质量与生产进度。",
+      "requirements": "官方招聘页面说明参与新产品开发里程碑、功能与结构规格确认、设计验证和量产导入；关联本科及以上、电子通信光电材料机械等专业的具体条件，应以原站最新职位完整描述为准。",
+      "majorNames": [
+        "工程管理",
+        "电子信息工程",
+        "通信工程"
+      ],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "材料科学与工程",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "学历与经历以官网岗位原文为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "rd-quality",
+      "title": "研发质量工程师",
+      "city": "湖北武汉 / 湖北汉川",
+      "category": "质量与可靠性",
+      "url": "https://www.everprox.com/list_36.html",
+      "evidenceUrl": "https://www.everprox.com/list_36.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "长芯博创科技股份有限公司（原博创科技股份有限公司）",
+      "summary": "参与光通信研发方案评审、设计验证测试计划（DVP）制定、光电性能及环境可靠性测试，推动研发阶段质量问题闭环。",
+      "requirements": "官方要求本科及以上，光电、通信、物理电子等相关专业；5年以上光模块或光器件研发测试/硬件质量经验，熟悉FMEA、APQP、8D等质量方法及研发质量控制流程。",
+      "majorNames": [
+        "光电信息科学与工程",
+        "通信工程",
+        "电子信息工程"
+      ],
+      "editorialRelatedMajors": [
+        "质量管理工程",
+        "物理学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 5年以上相关经验",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "product-quality",
+      "title": "产品品质工程师",
+      "city": "湖北汉川",
+      "category": "质量与可靠性",
+      "url": "https://www.everprox.com/list_36.html",
+      "evidenceUrl": "https://www.everprox.com/list_36.html",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "长芯博创科技股份有限公司（原博创科技股份有限公司）",
+      "summary": "负责有源光通信产品的制程质量异常分析、检验规范维护、IPQC/FQC/OQC流程指导及量产质量改善。",
+      "requirements": "官方要求本科及以上学历，光电信息或电子工程相关专业，3年以上生产现场品质管理经验；熟悉ISO及APQP、FMEA、MSA、SPC、PPAP等质量管理工具。",
+      "majorNames": [
+        "光电信息科学与工程",
+        "电子信息工程",
+        "质量管理工程"
+      ],
+      "editorialRelatedMajors": [
+        "工业工程",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 3年以上相关经验",
+      "currentOpenVerified": false
+    }
+  ]
+}
