@@ -1,5 +1,7 @@
 import type {CompleteGuide,GuideBranch,GuideStep} from '../components/talent/UnifiedPolicyGuide';
 import {GANSU_POLICY_RECORDS} from './gansuPolicyRecords.ts';
+import {GANSU_EXPANDED_POLICY_RECORDS} from './gansuExpandedPolicyRecords.ts';
+import {GANSU_EXPANDED_HOUSING_RECORDS} from './gansuExpandedHousingRecords.ts';
 import {GANSU_HOUSING_RECORDS} from './gansuHousingRecords.ts';
 export {GANSU_14_REGIONS} from './gansuPolicyRecords.ts';
 export function gansuGuideUrl(kind:'policy'|'housing',id:string):string{
@@ -20,8 +22,8 @@ const FAQs:[string,string][]=[
  ['资格通过后是否立刻可以选房或拿到补贴？','不是。住房需轮候、抽号、合同，补贴需审核、公示、资金拨付；HHBA不代政府审批。']
 ];
 export function buildGansuGuide(kind:'policy'|'housing',id:string):CompleteGuide|null{
- const p=kind==='policy'?GANSU_POLICY_RECORDS.find(x=>x.id===id):undefined;
- const h=kind==='housing'?GANSU_HOUSING_RECORDS.find(x=>x.id===id):undefined;
+ const p=kind==='policy'?[...GANSU_POLICY_RECORDS,...GANSU_EXPANDED_POLICY_RECORDS].find(x=>x.id===id):undefined;
+ const h=kind==='housing'?[...GANSU_HOUSING_RECORDS,...GANSU_EXPANDED_HOUSING_RECORDS].find(x=>x.id===id):undefined;
  if(!p&&!h)return null;
  const item=p||h!;
  const today=new Date().toISOString().slice(0,10);
