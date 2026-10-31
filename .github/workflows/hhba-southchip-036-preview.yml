@@ -1,0 +1,61 @@
+name: HHBA SOUTHCHIP 036 isolated preview verification
+on:
+  push:
+    branches: [feature/employer-southchip-036]
+    paths:
+      - 'apps/web/src/data/employerProfiles/cn-autumn-036.json'
+      - 'apps/web/src/pages/UnifiedV2CompanyPage.tsx'
+      - 'apps/web/scripts/southchip-v2.contract.test.mjs'
+      - 'apps/web/public/images/employer-profiles/cn-autumn-036/**'
+      - '.github/workflows/hhba-southchip-036-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  isolated-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        run: npm ci --no-audit --no-fund
+        working-directory: apps/web
+      - name: Verify 036 V2 profile and professional job filtering
+        run: node scripts/southchip-v2.contract.test.mjs
+        working-directory: apps/web
+      - name: Verify three local genuine visual assets (no placeholders)
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          p=json.loads(pathlib.Path('apps/web/src/data/employerProfiles/cn-autumn-036.json').read_text())
+          paths=[p['media']['logo'],*[photo['path'] for photo in p['media']['photos']]]
+          for name in paths:
+              f=pathlib.Path('apps/web/public')/name
+              assert f.exists() and f.stat().st_size>2600, 'UNVERIFIED_SOUTHCHIP_MEDIA: '+name
+          print('SOUTHCHIP_036_MEDIA_COMPLETE')
+          PY
+      - name: Validate all employer profile contracts
+        working-directory: apps/web
+        run: node scripts/employer-factory-check.mjs
+      - name: Build full unmodified HHBA shell on isolated branch
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: npm run build
+      - name: Ensure profile and image paths are bundled
+        run: |
+          test -s apps/web/dist/index.html
+          test -d apps/web/dist/images/employer-profiles/cn-autumn-036
+      - name: Upload independent preview artifact (does not publish Pages or modify main)
+        uses: actions/upload-artifact@v4
+        with:
+          name: southchip-036-static-preview
+          path: apps/web/dist/
+          if-no-files-found: error
