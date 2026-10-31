@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {SHENYANG_HOUSING_GAP_RECORDS} from '../src/data/shenyangHousingGapRecords.ts';
+import {TALENT_HOUSING_RECORDS} from '../src/data/talentHousingRecords.ts';
+import {assessHousing,talentSourceKind} from '../src/data/talentQuality.ts';
+const p=SHENYANG_HOUSING_GAP_RECORDS[0];
+assert.equal(SHENYANG_HOUSING_GAP_RECORDS.length,1);
+assert.equal(p.city,'沈阳');
+assert.equal(p.kind,'program');
+assert.equal(p.housingCategory,'保障性租赁住房');
+assert.equal(p.published,'2026-07-28');
+assert.equal(talentSourceKind(p.sourceUrl),'government');
+assert.ok(p.statusNote.includes('非实时空房'));
+assert.ok(p.statusNote.includes('申报入口待核实'));
+assert.ok(p.units.includes('不含可核验'));
+assert.equal(assessHousing(p,'2026-10-31').grade,'B');
+assert.equal(TALENT_HOUSING_RECORDS.filter(x=>x.id===p.id).length,1);
+assert.ok(TALENT_HOUSING_RECORDS.some(x=>x.city==='沈阳'));
+console.log('PASS Shenyang 2026 official housing-program record without fake vacancy');
