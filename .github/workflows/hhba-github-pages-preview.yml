@@ -224,9 +224,12 @@ jobs:
       - name: Validate source-backed talent policies and housing records
         working-directory: apps/web
         run: node scripts/audit-talent-service.mjs
-      - name: Validate nationwide 297 city codes, province filters and city-search aliases
+      - name: Validate 305 city/prefecture entries including Yunnan autonomous prefectures
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-cities.mjs
+      - name: Validate Yunnan 16-prefecture policies, housing records and guide routes
+        working-directory: apps/web
+        run: node --experimental-strip-types scripts/test-yunnan-city-v51.mjs
       - name: Validate source-backed Shandong 16-city talent policies and applicability
         working-directory: apps/web
         run: node --experimental-strip-types scripts/test-talent-shandong.mjs
