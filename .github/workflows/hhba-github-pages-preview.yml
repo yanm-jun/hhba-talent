@@ -224,6 +224,11 @@ jobs:
       - name: Guard all 337 city policy/housing counters against stale empty cards
         working-directory: apps/web
         run: node --experimental-strip-types scripts/audit-talent-city-ui.mjs
+      - name: Audit screenshot provinces and recovered Guizhou policy before release
+        working-directory: apps/web
+        run: |
+          node --experimental-strip-types scripts/test-screenshot-province-coverage.mjs
+          node --experimental-strip-types scripts/test-guizhou-city-v51.mjs
       - name: Validate source-backed talent policies and housing records
         working-directory: apps/web
         run: node scripts/audit-talent-service.mjs
