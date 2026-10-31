@@ -1,3 +1,4 @@
+import {GUANGXI_HOUSING_RESEARCH_LEADS} from './guangxiHousingLeads.ts';
 import {LANGFANG_HOUSING_LEADS} from './langfangHousingLeads.ts';
 import {CANGZHOU_HOUSING_LEADS} from './cangzhouHousingLeads.ts';
 import {XINGTAI_HOUSING_RESEARCH_LEADS} from './xingtaiHousingLeads.ts';
@@ -14,6 +15,7 @@ export type TalentHousingResearchLead={
  sourceUrl:string;sourceName:string;statusNote:string;steps:string[];reviewedAt:string;
 };
 export const TALENT_HOUSING_RESEARCH_LEADS:TalentHousingResearchLead[]=[
+...GUANGXI_HOUSING_RESEARCH_LEADS,
 ...LANGFANG_HOUSING_LEADS,
 ...CANGZHOU_HOUSING_LEADS,
 ...QINHUANGDAO_HOUSING_LEADS,
