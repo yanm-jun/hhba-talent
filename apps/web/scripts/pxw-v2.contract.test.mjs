@@ -26,7 +26,7 @@ assert(p.jobs.some(j=>j.id==='production-software'&&j.editorialRelatedMajors.inc
 const page=read('src/pages/UnifiedV2CompanyPage.tsx'),css=read('src/styles/unified-v2-company.css');
 assert(page.includes("pxw=id==='cn-autumn-034'"));
 assert(page.includes('pxwGroups')&&page.includes('if(pxw)return job.category===major'),'Precise per-job category filter');
-assert(page.includes('detailedCards=weipu||bodor||pxw'),'Use complete second screenshot cards');
+assert(['weipu','bodor','pxw'].every(name=>(page.match(/const detailedCards=([^;]+)/)?.[1]||'').split('||').includes(name)),'Use complete second screenshot cards');
 assert(page.includes('适合哪些专业背景？')&&page.includes('招聘岗位'));
 assert(page.includes('detailedCards&&<div className="hhba-v2-weipu-detail-links"'));
 assert(page.includes('data-hhba-recruitment-outbound="true"'),'Do not bypass HHBA gate');
