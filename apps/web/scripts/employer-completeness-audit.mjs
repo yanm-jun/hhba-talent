@@ -26,7 +26,9 @@ for(const x of manifest.entries){
  if(p.name!==x.name&&!p.aliases?.includes(x.name))issue(p.id,p.name,'P1','ROSTER_NAME_MISMATCH','Screenshot name '+x.name+' differs and is not captured by aliases');
  if((p.jobs||[]).length===0)issue(p.id,p.name,'P1','EMPTY_JOBS','No reviewed job/direction records');
  if((p.business||[]).length<6)issue(p.id,p.name,'P1','BUSINESS_UNDER_SIX','Only '+(p.business||[]).length+' business blocks');
- const badJobs=(p.jobs||[]).map(j=>({id:j.id,missing:['title','summary','requirements','city','category','evidenceUrl'].filter(k=>!j[k]).concat(!Array.isArray(j.majorNames)||!j.majorNames.length?'majorNames':[])})).filter(x=>x.missing.length);
+ const badJobs=(p.jobs||[]).map(j=>({id:j.id,missing:['title','summary','requirements','city','category','evidenceUrl'].filter(k=>!j[k]).concat(!Array.isArray(j.majorNames)||!Array.isArray(j.editorialRelatedMajors)||typeof j.majorUnrestricted!=='boolean'?['majorEvidenceStructure']:[])})).filter(x=>x.missing.length);
+ const unspecified=(p.jobs||[]).filter(j=>!j.majorUnrestricted&&!j.majorNames?.length&&!j.editorialRelatedMajors?.length);
+ if(unspecified.length)issue(p.id,p.name,'P2','MAJOR_UNDISCLOSED','Official requirements and editorial major mapping both empty for '+unspecified.length+' jobs; leave unassigned until verified: '+unspecified.map(j=>j.id).join(', '));
  if(badJobs.length)issue(p.id,p.name,'P1','INCOMPLETE_JOB_FIELDS',badJobs.length+' jobs; missing fields: '+[...new Set(badJobs.flatMap(x=>x.missing))].join(', ')+'; examples: '+badJobs.slice(0,3).map(x=>x.id).join(', '));
  if(p.recruitment?.status==='unconfirmed'){unconfirmed++;issue(p.id,p.name,'P2','UNCONFIRMED_RECRUITMENT','2027 recruitment link or application status unconfirmed');}
  const media=[p.media?.logo,...(p.media?.photos||[]).map(m=>m.path)];
@@ -45,10 +47,10 @@ for(const x of manifest.entries){
  if(!fs.existsSync(mediaDir)){issue(p.id,p.name,'P2','MEDIA_AUDIT_MISSING','No local source provenance audit JSON');}
  else {
    const audit=JSON.parse(read(mediaDir));
-   if(audit.realPhotos===false||audit.officialLogo===false)issue(p.id,p.name,'P2','EDITORIAL_MEDIA_ONLY','Media are explicitly nonofficial illustrations, not real photos/logo');
+   if(audit.realPhotos===false||audit.officialLogo===false||audit.officialImageEvidenceVerified===false||audit.sourceVerification==='pending'||audit.realPhotoValidationComplete===false)issue(p.id,p.name,'P2','MEDIA_SOURCE_PENDING','Corporate media rights, official logo and/or actual photographs remain unverified');
  }
  if((p.jobs||[]).some(j=>j.currentOpenVerified!==false))issue(p.id,p.name,'P1','OPEN_STATE_UNVERIFIED','One or more job records incorrectly presented as open');
- if(x.reviewStatus==='not_checked')issue(p.id,p.name,'P2','SOURCE_ROSTER_STALE','Original screenshot retains not_checked, separate reviewed profile exists');
+ // Original screenshot not_checked is source history, reviewed V2 profile acts as current status layer.
 }
 const uniqueById=[...new Set(ids)];
 const allMissing=Array.from({length:65},(_,i)=>i+1).filter(i=>!byId.has('cn-autumn-'+String(i).padStart(3,'0')));

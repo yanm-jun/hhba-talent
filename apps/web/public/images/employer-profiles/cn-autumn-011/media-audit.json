@@ -1,0 +1,26 @@
+{
+  "company": "万科泊寓",
+  "reviewedOn": "2026-10-31",
+  "sourceVerification": "pending",
+  "scope": "Asset metadata only, independent license and original photo provenance not verified",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/boyu-user/boyu-logo.webp",
+      "sourceNote": "照片来自用户提供的独立文件，图片不设外链。2027届全国万寓生项目与天津地区两个具体岗位不能混同。",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/boyu-user/boyu-exterior.webp",
+      "sourceNote": "用户上传照片 · 具体门店位置未核验",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/boyu-user/boyu-lobby.webp",
+      "sourceNote": "用户上传照片 · 拍摄时间未核验",
+      "verifiedOfficial": false
+    }
+  ]
+}

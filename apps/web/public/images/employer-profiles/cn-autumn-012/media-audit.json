@@ -1,0 +1,26 @@
+{
+  "company": "远景科技集团",
+  "reviewedOn": "2026-10-31",
+  "sourceVerification": "pending",
+  "scope": "Asset metadata only, independent license and original photo provenance not verified",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-012/logo.png",
+      "sourceNote": "Logo 来源：Wikimedia Commons《Logo envision.png》，作者 Hahaheditor12667，CC BY-SA 4.0（历史版标识）；产业设施与风机照片来自远景集团官方展示材料。所有图片均保存在本站、互相独立，点击照片不会外跳。职位依据第三方留存记录，申请状态待官网复核。",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-012/photo1.webp",
+      "sourceNote": "远景集团官方产品设施图片，非办公总部",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-012/photo2.webp",
+      "sourceNote": "远景集团官方风机产品宣传图",
+      "verifiedOfficial": false
+    }
+  ]
+}

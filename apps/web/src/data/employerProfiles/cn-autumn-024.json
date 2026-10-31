@@ -170,7 +170,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届应届 · 本科及以上（企业官网）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "marketing-trainee-2027",
@@ -198,7 +199,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届应届 · 本科及以上（企业官网）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "市场 / 商务"
     }
   ],
   "mediaSources": {

@@ -1,0 +1,26 @@
+{
+  "company": "中国煤炭科工",
+  "reviewedOn": "2026-10-31",
+  "sourceVerification": "pending",
+  "scope": "Asset metadata only, independent license and original photo provenance not verified",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-015/logo.png",
+      "sourceNote": "品牌 Logo 根据国聘公开企业档案（中国煤科/CCTEG）保存；两张图片来自媒体报道的天玛智控装备展示，天玛智控属于中国煤科体系，图片均为本站独立副本，点击不外跳。8类职位来源为中煤科工集团上海有限公司2027届校招简章，不代表集团总部或其他下属企业在招。",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-015/photo1.webp",
+      "sourceNote": "新浪财经 2023 年现场报道 · 中国煤科所属天玛智控顺义创新基地",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-015/photo2.webp",
+      "sourceNote": "新浪财经 2024 年产品报道 · 中国煤科所属天玛智控研发装备",
+      "verifiedOfficial": false
+    }
+  ]
+}

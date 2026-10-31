@@ -31,19 +31,19 @@
     "https://www.tidesight.com/news/1364150.html"
   ],
   "media": {
-    "logo": "images/employer-profiles/cn-autumn-035/logo.webp",
+    "logo": "images/employer-profiles/cn-autumn-035/repair-logo.svg",
     "photos": [
       {
-        "path": "images/employer-profiles/cn-autumn-035/photo1.jpg",
-        "caption": "佑驾创新 · 2025年汽车技术展台实景",
-        "alt": "2025年佑驾创新MINIEYE智能汽车技术展台与产品展示实拍",
-        "note": "图片来自21世纪经济报道2025年9月18日关于佑驾创新的实地报道，为展台实景；不冒称公司总部或工厂。"
+        "path": "images/employer-profiles/cn-autumn-035/repair-photo1.svg",
+        "caption": "佑驾创新 · HHBA非实景业务示意（修复缺图）",
+        "alt": "佑驾创新原创业务主题矢量示意图",
+        "note": "原图文件在仓库中缺失；临时采用独立HHBA原创SVG避免断图。不是企业实景或官方素材，尚需授权真实照片替换。"
       },
       {
-        "path": "images/employer-profiles/cn-autumn-035/photo2.jpg",
-        "caption": "佑驾创新 · 智能汽车展示实景",
-        "alt": "MINIEYE展会现场的透明智能汽车展示模型和企业展台",
-        "note": "图片来自行业媒体对佑驾创新的企业活动报道，记录早期展会真实活动；并非实时门店或研发办公室。"
+        "path": "images/employer-profiles/cn-autumn-035/repair-photo2.svg",
+        "caption": "佑驾创新 · HHBA非实景业务示意（修复缺图）",
+        "alt": "佑驾创新原创业务主题矢量示意图",
+        "note": "原图文件在仓库中缺失；临时采用独立HHBA原创SVG避免断图。不是企业实景或官方素材，尚需授权真实照片替换。"
       }
     ]
   },
@@ -72,7 +72,7 @@
     "日语",
     "数据科学与大数据技术"
   ],
-  "photoNote": "Logo为公开媒体展示的佑驾创新MINIEYE品牌标识；两张独立图片为媒体实拍的不同年份展会场景，不使用AI模拟公司办公环境，也不把产品展台冒称总部。原图版权归各原权利人，本地静态副本仅供企业介绍，图片点击不外跳。",
+  "photoNote": "Logo为公开媒体展示的佑驾创新MINIEYE品牌标识；两张独立图片为媒体实拍的不同年份展会场景，不使用AI模拟公司办公环境，也不把产品展台冒称总部。原图版权归各原权利人，本地静态副本仅供企业介绍，图片点击不外跳。 部分旧图片已失效，现显示明显标注的HHBA编辑性占位图片；不视为企业真实照片。",
   "business": [
     {
       "title": "辅助驾驶与主动安全",

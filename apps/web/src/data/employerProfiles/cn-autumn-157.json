@@ -28,19 +28,19 @@
     "https://www.keyence-jobs.jp/work/business/"
   ],
   "media": {
-    "logo": "images/employer-profiles/cn-autumn-157/logo.webp",
+    "logo": "images/employer-profiles/cn-autumn-157/logo.svg",
     "photos": [
       {
-        "path": "images/employer-profiles/cn-autumn-157/photo1.jpg",
-        "caption": "KEYENCE · 企业办公建筑（日本公司官网）",
-        "alt": "基恩士公司官网展示的日本企业办公建筑外景",
-        "note": "图片来自基恩士中国官方网站公司概述，展现全球品牌企业形象；不冒充上海中国总部办公楼。"
+        "path": "images/employer-profiles/cn-autumn-157/photo1.svg",
+        "caption": "基恩士 · HHBA工业自动化示意图1",
+        "alt": "基恩士工业传感和自动化产品编辑示意图1",
+        "note": "原资料引用的本地图片文件不存在，现使用HHBA原创编辑性业务示意图修复断图；不是基恩士真实企业照片或官方产品照片。"
       },
       {
-        "path": "images/employer-profiles/cn-autumn-157/photo2.jpg",
-        "caption": "KEYENCE · 现场产品演示（日本招聘官网）",
-        "alt": "KEYENCE员工在办公室演示工业自动化传感器及产品的真实照片",
-        "note": "取自日本基恩士官方招聘网站的业务岗位工作场景，说明顾问式产品演示方式；非中国办公室实拍。"
+        "path": "images/employer-profiles/cn-autumn-157/photo2.svg",
+        "caption": "基恩士 · HHBA工业自动化示意图2",
+        "alt": "基恩士工业传感和自动化产品编辑示意图2",
+        "note": "原资料引用的本地图片文件不存在，现使用HHBA原创编辑性业务示意图修复断图；不是基恩士真实企业照片或官方产品照片。"
       }
     ]
   },
@@ -53,7 +53,7 @@
   },
   "majorIntro": "基恩士2027届校园招聘专业不限，不应只因机械、电气、计算机等专业关键词筛除其他专业。只有一条经官方确认的岗位方向，其他业务类别不是独立招聘职位。",
   "preferredMajors": [],
-  "photoNote": "本页使用基恩士品牌公开Logo及两张独立的企业真实资料图片（官网企业建筑、官网员工产品演示）。图片保存为静态站本地副本，单纯展示不外跳；场景地点在图片说明中如实标注，HHBA非基恩士官方招聘代理，图像权利归原权利人。",
+  "photoNote": "三张本地视觉均为HHBA原创非官方SVG：1张非官方公司识别字标、2张非实景工业自动化业务示意图。原资料曾标注的官网实拍图片未能在本仓库核实存在，现已取消相关实景声称，真实企业素材待审查和补充。",
   "business": [
     {
       "title": "智能传感器与检测",

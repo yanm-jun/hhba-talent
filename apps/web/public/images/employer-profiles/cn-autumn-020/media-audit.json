@@ -1,0 +1,26 @@
+{
+  "company": "紫金集团",
+  "reviewedOn": "2026-10-31",
+  "sourceVerification": "pending",
+  "scope": "Asset metadata only, independent license and original photo provenance not verified",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-020/logo.png",
+      "sourceNote": "三张独立素材分别为由世界铂金投资协会合作伙伴页面展示的紫金矿业商标图、紫金矿业官方发布的紫金山矿山图、官方铜业务页面的巨龙铜矿图。素材用于企业识别和信息说明，不代表紫金矿业与HHBA有合作或授权关系，商业使用需遵守权利人许可。",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-020/photo1.webp",
+      "sourceNote": "紫金矿业英文官网2024年12月发布的矿山实景摄影；为旗下紫金山矿区，不是集团总部办公楼。原始图像版权归相应权利人，页面仅标注来源。",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-020/photo2.webp",
+      "sourceNote": "紫金矿业英文官网铜业务页面的巨龙铜矿实景图，为旗下矿业项目，不是总公司大楼；保留来源说明。",
+      "verifiedOfficial": false
+    }
+  ]
+}

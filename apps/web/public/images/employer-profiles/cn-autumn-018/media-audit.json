@@ -1,0 +1,26 @@
+{
+  "company": "新奥集团",
+  "reviewedOn": "2026-10-31",
+  "sourceVerification": "pending",
+  "scope": "Asset metadata only, independent license and original photo provenance not verified",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-018/logo.png",
+      "sourceNote": "品牌图为智联招聘平台标注的新奥集团Logo素材；两张真实企业照片分别来自新奥科技与新奥动力官方网站，均属于新奥集团旗下企业，不应误标为同一集团总部大楼。素材已存为网站本地三份独立文件，点击图片不外链。商标展示不表示新奥集团与HHBA合作。",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-018/photo1.webp",
+      "sourceNote": "来自新奥科技发展有限公司官网（ennresearch.com）的集团介绍页面 · 属旗下企业场景，并非集团总部唯一办公楼",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-018/photo2.webp",
+      "sourceNote": "来自新奥动力官网（ennpower.com）2026年公开图片 · 为集团旗下能源装备企业建筑，不代表全集团所有办公场景",
+      "verifiedOfficial": false
+    }
+  ]
+}

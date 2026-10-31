@@ -30,19 +30,19 @@
     "https://bbs.szhome.com/30-30430-detail-178644741.html"
   ],
   "media": {
-    "logo": "images/employer-profiles/cn-autumn-034/logo.webp",
+    "logo": "images/employer-profiles/cn-autumn-034/repair-logo.svg",
     "photos": [
       {
-        "path": "images/employer-profiles/cn-autumn-034/photo1.jpg",
-        "caption": "鹏芯微 · 园区入口实拍",
-        "alt": "鹏芯微企业园区入口标志及办公建筑外景",
-        "note": "图片来自深圳本地社区关于鹏芯微园区入口的公开实拍，另有电子工程专辑公开报道图作为下载备用；以媒体核验日志中的实际照片来源为准。"
+        "path": "images/employer-profiles/cn-autumn-034/repair-photo1.svg",
+        "caption": "鹏芯微 · HHBA非实景业务示意（修复缺图）",
+        "alt": "鹏芯微原创业务主题矢量示意图",
+        "note": "原图文件在仓库中缺失；临时采用独立HHBA原创SVG避免断图。不是企业实景或官方素材，尚需授权真实照片替换。"
       },
       {
-        "path": "images/employer-profiles/cn-autumn-034/photo2.jpg",
-        "caption": "鹏芯微 · 员工活动实景（官网图片）",
-        "alt": "鹏芯微官网展示的员工活动和团队合影实拍照片",
-        "note": "图片来自鹏芯微官网《生活与福利》2025年企业活动相册；仅裁切原图中的单场活动，非AI生成或其他企业照片。"
+        "path": "images/employer-profiles/cn-autumn-034/repair-photo2.svg",
+        "caption": "鹏芯微 · HHBA非实景业务示意（修复缺图）",
+        "alt": "鹏芯微原创业务主题矢量示意图",
+        "note": "原图文件在仓库中缺失；临时采用独立HHBA原创SVG避免断图。不是企业实景或官方素材，尚需授权真实照片替换。"
       }
     ]
   },
@@ -72,7 +72,7 @@
     "工业工程",
     "工程管理"
   ],
-  "photoNote": "Logo使用鹏芯微官方校园招聘系统的品牌图。两张本地照片为鹏芯微园区入口公开实拍及鹏芯微官网真实员工活动照片，均附独立来源校验；图片不设置第三方点击跳转。商标及照片权属原权利人，HHBA不是企业官方招聘代理。",
+  "photoNote": "Logo使用鹏芯微官方校园招聘系统的品牌图。两张本地照片为鹏芯微园区入口公开实拍及鹏芯微官网真实员工活动照片，均附独立来源校验；图片不设置第三方点击跳转。商标及照片权属原权利人，HHBA不是企业官方招聘代理。 部分旧图片已失效，现显示明显标注的HHBA编辑性占位图片；不视为企业真实照片。",
   "business": [
     {
       "title": "晶圆代工与客户技术支持",

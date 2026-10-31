@@ -31,16 +31,16 @@
     "logo": "images/employer-profiles/cn-autumn-029/logo.png",
     "photos": [
       {
-        "path": "images/employer-profiles/cn-autumn-029/photo1.jpg",
-        "caption": "中国电建盘南发电项目实景 · 2026年",
-        "alt": "中国电建官方报道的贵州盘南发电项目电厂冷却塔与发电设施实景",
-        "note": "中国电建集团官网2026年盘南项目1号机组商业运营报道配图；该项目由中电建电力投资集团投资建设，非公司总部办公楼。"
+        "path": "images/employer-profiles/cn-autumn-029/repair-photo1.svg",
+        "caption": "中电建电力投资集团 · HHBA非实景业务示意（修复缺图）",
+        "alt": "中电建电力投资集团原创业务主题矢量示意图",
+        "note": "原图文件在仓库中缺失；临时采用独立HHBA原创SVG避免断图。不是企业实景或官方素材，尚需授权真实照片替换。"
       },
       {
-        "path": "images/employer-profiles/cn-autumn-029/photo2.jpg",
-        "caption": "盘南发电项目建设阶段实景 · 2025年",
-        "alt": "中国电建所属贵州工程公司发布的盘南2×660兆瓦项目工地建设实景",
-        "note": "中国电建所属贵州工程公司公开的2025年盘南电厂项目建设阶段照片；该项目属于中电建电投投资的盘南项目，照片不代表当前建设状态。"
+        "path": "images/employer-profiles/cn-autumn-029/repair-photo2.svg",
+        "caption": "中电建电力投资集团 · HHBA非实景业务示意（修复缺图）",
+        "alt": "中电建电力投资集团原创业务主题矢量示意图",
+        "note": "原图文件在仓库中缺失；临时采用独立HHBA原创SVG避免断图。不是企业实景或官方素材，尚需授权真实照片替换。"
       }
     ]
   },
@@ -71,7 +71,7 @@
     "法学",
     "机械设计制造及其自动化"
   ],
-  "photoNote": "企业 Logo 采用中国电建官方品牌图；两张独立照片分别来自中国电建集团官网和所属贵州工程公司对中电建电投投资的盘南2×660MW发电项目的报道，构建时保存本地静态副本并留媒体来源记录。图片与商标权属原权利人，HHBA独立整理公开资料，不代表官方合作授权。",
+  "photoNote": "企业 Logo 采用中国电建官方品牌图；两张独立照片分别来自中国电建集团官网和所属贵州工程公司对中电建电投投资的盘南2×660MW发电项目的报道，构建时保存本地静态副本并留媒体来源记录。图片与商标权属原权利人，HHBA独立整理公开资料，不代表官方合作授权。 部分旧图片已失效，现显示明显标注的HHBA编辑性占位图片；不视为企业真实照片。",
   "business": [
     {
       "title": "火力发电及电源项目投资",
@@ -154,7 +154,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "本科及以上（2027届公开招聘信息）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "thermal-energy",
@@ -175,7 +176,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "本科及以上（2027届公开招聘信息）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "thermal-chemistry",
@@ -196,7 +198,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "本科及以上（2027届公开招聘信息）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "thermal-control",
@@ -217,7 +220,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "本科及以上（2027届公开招聘信息）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "general-management",
@@ -241,7 +245,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "本科及以上（2027届公开招聘信息）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "管理 / 运营"
     },
     {
       "id": "it-engineer",
@@ -262,7 +267,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "本科及以上（2027届公开招聘信息）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "软件 / 数字技术"
     },
     {
       "id": "hydraulic-engineer",
@@ -283,7 +289,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "本科及以上（2027届公开招聘信息）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "legal-risk",
@@ -303,7 +310,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "本科及以上（2027届公开招聘信息）",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "法务 / 合规"
     }
   ]
 }

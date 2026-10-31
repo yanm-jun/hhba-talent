@@ -155,7 +155,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "2026届历史校招 · 公告含本科需求",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "2026-qingmang-editorial-media-historical",
@@ -178,7 +179,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "2026届历史校招 · 公告含本科需求",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "市场 / 商务"
     },
     {
       "id": "2026-qingmang-computing-historical",
@@ -198,7 +200,8 @@
       "editorialRelatedMajors": [],
       "majorUnrestricted": false,
       "educationLabel": "2026届历史校招 · 公告含本科需求",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "软件 / 数字技术"
     }
   ],
   "mediaSources": {

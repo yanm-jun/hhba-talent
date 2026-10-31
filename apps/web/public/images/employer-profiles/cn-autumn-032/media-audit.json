@@ -1,0 +1,29 @@
+{
+  "company": "微谱",
+  "reviewedOn": "2026-10-31",
+  "realPhotoValidationComplete": false,
+  "licenseReviewed": false,
+  "reason": "Historic imagery audit; replaced only missing files with explicit nonofficial editorial assets.",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-032/logo.webp",
+      "verifiedOriginalSource": false,
+      "editorialReplacement": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-032/repair-photo1.svg",
+      "sourceNote": "原图文件在仓库中缺失；临时采用独立HHBA原创SVG避免断图。不是企业实景或官方素材，尚需授权真实照片替换。",
+      "verifiedOriginalSource": false,
+      "editorialReplacement": true
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-032/repair-photo2.svg",
+      "sourceNote": "原图文件在仓库中缺失；临时采用独立HHBA原创SVG避免断图。不是企业实景或官方素材，尚需授权真实照片替换。",
+      "verifiedOriginalSource": false,
+      "editorialReplacement": true
+    }
+  ]
+}

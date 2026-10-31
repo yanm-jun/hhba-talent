@@ -1,0 +1,29 @@
+{
+  "company": "青岛银行",
+  "reviewedOn": "2026-10-31",
+  "realPhotoValidationComplete": false,
+  "licenseReviewed": false,
+  "reason": "Historic imagery audit; replaced only missing files with explicit nonofficial editorial assets.",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-025/logo.png",
+      "verifiedOriginalSource": false,
+      "editorialReplacement": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-025/photo1.webp",
+      "sourceNote": "青岛新闻网金融频道2025年7月报道中的青岛银行建筑实景照片；拍摄时间未单独核实。属于媒体公开报道图片，不是企业官方授权摄影。",
+      "verifiedOriginalSource": false,
+      "editorialReplacement": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-025/photo2.webp",
+      "sourceNote": "青岛新闻网2022年11月专题报道中的青岛银行与相邻金融机构楼群，拍摄视角与第一张不同。不是2026年实时照片。",
+      "verifiedOriginalSource": false,
+      "editorialReplacement": false
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "company": "青蛙王子",
+  "reviewedOn": "2026-10-31",
+  "sourceVerification": "pending",
+  "scope": "Asset metadata only, independent license and original photo provenance not verified",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-021/logo.png",
+      "sourceNote": "品牌 Logo 来源于三文品牌设计解读资料，两张真实企业照片来源于青蛙王子旗下英文企业网站。所有图片分别本地保存且不外链；Logo用于企业识别，并不表示与HHBA存在商业合作。再使用授权须另行核实。 原始媒体图像版权归相应权利人，正式商业使用前需落实授权。",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-021/photo1.webp",
+      "sourceNote": "青蛙王子旗下英文企业网站2025年10月新闻配图：福建漳州集团建筑及门前青蛙雕塑；拍摄日期不详。",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-021/photo2.webp",
+      "sourceNote": "青蛙王子旗下英文企业网站2024年公开工厂照片：另一角度的厂区设施；非近期实拍。",
+      "verifiedOfficial": false
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "company": "蜂巢能源",
+  "reviewedOn": "2026-10-31",
+  "sourceVerification": "pending",
+  "scope": "Asset metadata only, independent license and original photo provenance not verified",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-013/logo.png",
+      "sourceNote": "三张图片是独立的本站静态文件。Logo 图片来自第三方品牌资料页（待企业官方品牌资源二次核准），园区照片来自财新新闻报道，生产线照片来自蜂巢能源官网。图片无第三方点击跳转。招聘资料来自中国科学技术大学2027届公开校招简章，实时可投递状态尚未核实。",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-013/photo1.webp",
+      "sourceNote": "财新网 2024 年新闻报道图片 · 展示蜂巢能源园区",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-013/photo2.webp",
+      "sourceNote": "蜂巢能源官网新闻图片 · 盐城生产线投产现场",
+      "verifiedOfficial": false
+    }
+  ]
+}

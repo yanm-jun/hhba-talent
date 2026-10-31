@@ -158,7 +158,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "管理 / 运营"
     },
     {
       "id": "combat-ai-native",
@@ -180,7 +181,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "人工智能 / 算法"
     },
     {
       "id": "narrative",
@@ -202,7 +204,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "管理 / 运营"
     },
     {
       "id": "ai-art",
@@ -224,7 +227,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "人工智能 / 算法"
     },
     {
       "id": "ui-motion",
@@ -246,7 +250,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "设计 / 创意"
     },
     {
       "id": "ui-design",
@@ -268,7 +273,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "设计 / 创意"
     },
     {
       "id": "spine-animation",
@@ -289,7 +295,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "综合业务 / 待核对"
     },
     {
       "id": "character-original-art",
@@ -311,7 +318,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "设计 / 创意"
     },
     {
       "id": "client-development",
@@ -332,7 +340,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "软件 / 数字技术"
     },
     {
       "id": "server-development",
@@ -353,7 +362,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "软件 / 数字技术"
     },
     {
       "id": "qa-engineer",
@@ -375,7 +385,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "测试 / 质量"
     },
     {
       "id": "ui-intern",
@@ -397,7 +408,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "2027届校招 · 岗位学历与经验需逐条核对",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "设计 / 创意"
     }
   ],
   "mediaSources": {

@@ -143,7 +143,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "本科及以上",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "research-support-2027",
@@ -166,7 +167,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "本科及以上",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "intelligent-manufacturing-2027",
@@ -190,7 +192,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "本科及以上",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "production-technical-2027",
@@ -216,7 +219,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "本科及以上",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "工程 / 制造"
     },
     {
       "id": "operations-management-2027",
@@ -244,7 +248,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "本科及以上",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "管理 / 运营"
     },
     {
       "id": "marketing-planning-2027",
@@ -267,7 +272,8 @@
       ],
       "majorUnrestricted": false,
       "educationLabel": "本科及以上",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "市场 / 商务"
     },
     {
       "id": "management-trainee-2027",
@@ -288,7 +294,8 @@
       ],
       "majorUnrestricted": true,
       "educationLabel": "专科及以上",
-      "currentOpenVerified": false
+      "currentOpenVerified": false,
+      "category": "管理 / 运营"
     }
   ],
   "mediaSources": {

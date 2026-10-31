@@ -1,0 +1,28 @@
+{
+  "company": "line plus",
+  "reviewedOn": "2026-10-31",
+  "sourceVerification": "pending",
+  "realPhotoValidationComplete": false,
+  "officialLogo": false,
+  "realPhotos": false,
+  "reason": "Three original local SVG illustrations, not authentic official photographic assets; legal usage and corporate brand identity still pending",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-057/logo.svg",
+      "verifiedAsCorporateLogo": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-057/photo1.svg",
+      "sourceNote": "HHBA原创说明性视觉，非企业真实办公现场或官方产品摄影。",
+      "verifiedAsReal": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-057/photo2.svg",
+      "sourceNote": "HHBA原创说明性视觉，非企业真实办公现场或官方产品摄影。",
+      "verifiedAsReal": false
+    }
+  ]
+}

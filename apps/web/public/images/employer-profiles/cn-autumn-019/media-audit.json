@@ -1,0 +1,26 @@
+{
+  "company": "湖南省广播影视集团（湖南广电）",
+  "reviewedOn": "2026-10-31",
+  "sourceVerification": "pending",
+  "scope": "Asset metadata only, independent license and original photo provenance not verified",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-019/logo.png",
+      "sourceNote": "品牌图采用公开GBS标识实景照片，非官方授权矢量Logo；两张图片是2021年传媒报道总部及2022年建筑项目图，不是近期办公环境。均保留媒体来源且不外链，图片再使用授权待核验。公开展示不表示湖南广电与HHBA建立合作。 后续如取得官方授权标识，将替换当前GBS历史标识实景来源。",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-019/photo1.webp",
+      "sourceNote": "2021年媒体报道所附湖南广电大楼实景，来源：搜狐号图文；非2026年新拍摄。仅用于企业场景说明，使用权待进一步核验。",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-019/photo2.webp",
+      "sourceNote": "2022年HPP Architects项目图，来源：谷德设计网；为制作基地建筑实景，图片使用权待进一步核验。",
+      "verifiedOfficial": false
+    }
+  ]
+}

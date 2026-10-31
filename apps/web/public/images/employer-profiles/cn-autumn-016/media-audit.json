@@ -1,0 +1,26 @@
+{
+  "company": "中国通服广西公司",
+  "reviewedOn": "2026-10-31",
+  "sourceVerification": "pending",
+  "scope": "Asset metadata only, independent license and original photo provenance not verified",
+  "assets": [
+    {
+      "slot": "logo",
+      "path": "images/employer-profiles/cn-autumn-016/logo.png",
+      "sourceNote": "Logo 使用中国通信服务股份有限公司官方品牌标志；两张照片由母公司官方媒体图库提供，并非广西公司办公楼或员工实拍。本页是广西省级子公司，不能与中国电信广西公司、中国移动广西公司混同。三张素材均为本站独立文件且不设置第三方图片跳转。",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo1",
+      "path": "images/employer-profiles/cn-autumn-016/photo1.webp",
+      "sourceNote": "中国通信服务集团官方网站图库 · 非广西公司单独项目",
+      "verifiedOfficial": false
+    },
+    {
+      "slot": "photo2",
+      "path": "images/employer-profiles/cn-autumn-016/photo2.webp",
+      "sourceNote": "中国通信服务集团官方网站图库 · 非广西公司办公环境",
+      "verifiedOfficial": false
+    }
+  ]
+}
