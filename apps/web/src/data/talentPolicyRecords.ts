@@ -1,3 +1,4 @@
+import {LESHAN_POLICY_RECORDS} from './leshanPolicyRecords.ts';
 import {HAINAN_POLICY_RECORDS} from './hainanPolicyRecords.ts';
 import {HUNAN_POLICY_RECORDS} from './hunanPolicyRecords.ts';
 import {HENAN_POLICY_RECORDS} from './henanPolicyRecords.ts';
@@ -64,6 +65,7 @@ export type TalentPolicyRecord={
 };
 export const TALENT_POLICY_REVIEW_DATE='2026-10-30';
 export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
+ ...LESHAN_POLICY_RECORDS,
  ...HAINAN_POLICY_RECORDS,
  ...HUNAN_POLICY_RECORDS,
  ...HENAN_POLICY_RECORDS,
