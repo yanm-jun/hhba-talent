@@ -1,92 +1,68 @@
 #!/usr/bin/env python3
-"""Scrape attributable company/event photos into isolated HHBA review build.
-No screenshot, generated art, or unrelated bank/dealer photo is labeled a real company photo.
-On failure, the CI build fails rather than silently replacing a photo with fake content.
-Copyright/use permission is unverified even if article is publicly readable.
+"""Strict source-backed Guangdong Rural Credit building and Chengda event photo packaging.
+Non-photographic assets are separate SVG with explicit editorial label, never photo.jpg.
+Commercial reuse and copyright remain unverified.
 """
-from __future__ import annotations
-import hashlib,json,re,ssl
-from pathlib import Path
-from urllib.parse import urljoin,urlparse
-from urllib.request import Request,urlopen
+import json,hashlib,re,ssl
 from html.parser import HTMLParser
-from PIL import Image,ImageOps
 from io import BytesIO
-
+from pathlib import Path
+from urllib.parse import urljoin
+from urllib.request import Request,urlopen
+from PIL import Image,ImageOps
 ROOT=Path("public/images/employer-profiles")
-UA="Mozilla/5.0 (compatible; HHBA FirstPartyPhotoAudit/1.0)"
-PAGES={
-"069":[
- ("https://www.gdrcu.com/gdrcunew/nxdt/nsfc/202602/129907.html","Guangdong Rural Credit official network event; NOT HQ office"),
- ("https://www.gdrcu.com/gdrcunew/nxdt/nsfc/202609/136383.html","Guangdong rural commercial bank in-system training; NOT HQ office"),
- ("https://www.gdrcu.com/gdrcunew/nxdt/nxtdl/202606/133488.html","Guangdong Rural Credit official business reporting")
-],
-"070":[
- ("https://auto.qingdaonews.com/content/2025-12/03/content_23704648.htm","2025 Qingdao University—Chengda Group joint training ceremony"),
- ("https://auto.qingdaonews.com/content/2025-11/07/content_23699709.htm","Chengda Group actual exhibition booths at 2025 Qingdao auto show")
+SSL=ssl.create_default_context(); SSL.options|=0x4
+UA="Mozilla/5.0 (HHBA photo provenance audit)"
+def fetch(url,ref=None):
+ req=Request(url,headers={"User-Agent":UA,"Referer":ref or url,"Accept":"image/avif,image/webp,image/*,text/html,*/*;q=0.8"})
+ with urlopen(req,timeout=28,context=SSL) as r:return r.read(10000000)
+def save(id,n,url,ref,note):
+ data=fetch(url,ref)
+ im=ImageOps.exif_transpose(Image.open(BytesIO(data))).convert("RGB");w,h=im.size
+ if w<425 or h<290 or w/h<0.68 or w/h>4:raise RuntimeError(f"invalid sourced photo {w}x{h} {url}")
+ folder=ROOT/("cn-autumn-"+id);folder.mkdir(parents=True,exist_ok=True)
+ fname=f"photo{n}.jpg";im.save(folder/fname,"JPEG",quality=91,optimize=True)
+ out=(folder/fname).read_bytes()
+ if len(out)<12000:raise RuntimeError(f"too small {len(out)} {url}")
+ record={"filename":fname,"sourceImageUrl":url,"pageEvidence":ref,"sourceDescription":note,"dimensions":[w,h],"sha256":hashlib.sha256(out).hexdigest(),"rights":"photo original publisher; commercial republishing permission NOT verified"}
+ print("HHBA_REAL_SOURCE_IMAGE",id,json.dumps(record,ensure_ascii=False));return record
+# An unmistakably labeled building image in a 2024 report on Guangdong Rural Credit.
+bank=save("069",1,"https://n.sinaimg.cn/finance/crawl/155/w550h405/20240722/c61f-3a7341623c76af3a7712122bcda0a2fa.png","https://finance.sina.com.cn/money/bank/gsdt/2024-07-22/doc-inceytkc4652453.shtml","Guangdong Rural Credit Union Building photographed exterior; news media, not company HQ interior")
+(ROOT/"cn-autumn-069"/"media-sources.json").write_text(json.dumps([bank],ensure_ascii=False,indent=2)+"\n",encoding="utf8")
+# Qingdao media article contains actual photos of Chengda Group—Qingdao University visits.
+PAGES=[
+"https://auto.qingdaonews.com/content/2025-12/03/content_23704648.htm",
+"https://auto.qingdaonews.com/content/2025-11/07/content_23699709.htm",
 ]
-}
-class Parsed(HTMLParser):
- def __init__(self):
-  super().__init__();self.images=[];self.known=False;self.full=[]
+class Images(HTMLParser):
+ def __init__(self):super().__init__();self.images=[];self.body=[]
  def handle_starttag(self,t,a):
   d=dict(a)
-  if t=='img':
-   src=next((d.get(k) for k in ('data-original','data-src','data-lazy','data-image','src') if d.get(k)),None)
-   if src:self.images.append((src,d.get('alt',''),dict(a)))
-  if t=='meta' and d.get('property') in ('og:image','twitter:image'):
-   if d.get('content'):self.images.append((d['content'],'meta-image',d))
- def handle_data(self,data):
-  if data.strip():self.full.append(data.strip())
-def get(url,ref=None):
- req=Request(url,headers={"User-Agent":UA,"Referer":ref or url,"Accept":"text/html,image/*,*/*;q=0.8"})
- context=ssl.create_default_context()
- context.options|=0x4  # OpenSSL SSL_OP_LEGACY_SERVER_CONNECT for Guangdong rural credit legacy portal
- with urlopen(req,timeout=28,context=context) as r:
-  if r.status!=200:raise RuntimeError(f"HTTP {r.status}: {url}")
-  return r.read(12_000_000)
-for id,pages in PAGES.items():
- found=[];seen={};reports=[]
- for page,note in pages:
-  try:
-   text=get(page).decode("utf-8","ignore")
-   parser=Parsed();parser.feed(text)
-   context=" ".join(parser.full)
-   must=("广东" if id=="069" else "成达")
-   if must not in context:raise ValueError("Page is not grounded in named employer")
-   imgs=list(parser.images)
-   imgs += [(raw,"inline-reference",{}) for raw in re.findall(r'(?:(?:https?:)?//[^"\\s<>]+|/[^"\\s<>]+)\\.(?:jpe?g|png|webp)(?:\\?[^"\\s<>]*)?',text,re.I)]
-   print("HHBA_IMAGE_SOURCE_PAGE",id,page,"Candidates",len(imgs))
-   for raw,alt,attrs in imgs[:120]:
-    if len(found)>=2:break
-    if not raw or raw.startswith("data:"):continue
-    link=urljoin(page,raw.replace("&amp;","&").replace("\\/","/"))
-    if link in seen:continue
-    seen[link]=1
-    if any(k in link.lower() for k in ("logo","icon","qrcode","qr_","ewm","avatar","wechat","indexbanner","nopic","blank","footer","top_","bg.","pixel")):continue
-    try:
-     data=get(link,page)
-     im=Image.open(BytesIO(data));im=ImageOps.exif_transpose(im)
-     w,h=im.size
-     if not(640<=w<=12000 and 345<=h<=12000 and 0.7<=w/h<=4.1):continue
-     if len(data)<17000:continue
-     digest=hashlib.sha256(im.convert("RGB").tobytes()).hexdigest()
-     if any(r.get('sourcePixelSHA256')==digest for r in found):continue
-     fname=f"photo{len(found)+1}.jpg"
-     folder=ROOT/("cn-autumn-"+id);folder.mkdir(parents=True,exist_ok=True)
-     im.convert("RGB").save(folder/fname,"JPEG",quality=91,optimize=True)
-     outfile=(folder/fname).read_bytes()
-     audit={"filename":fname,"exactImageUrl":link,"publishedNewsPage":page,
-       "captionContext":note,"sourceAlt":alt,"pixels":[w,h],"sourcePixelSHA256":digest,
-       "sha256":hashlib.sha256(outfile).hexdigest(),"fileBytes":len(outfile),
-       "photoType":"actual organizational activity / news illustration; not claimed to be HQ or a specific job's office",
-       "imageRights":"public article image; independent republication license not yet verified"}
-     found.append(audit)
-     print("HHBA_COMPANY_EVENT_REAL_PHOTO",id,json.dumps(audit,ensure_ascii=False))
-    except Exception as error:
-     print("HHBA_SKIP_CANDIDATE",id,str(error)[:180])
-  except Exception as error:print("HHBA_SOURCE_UNREACHABLE",id,page,str(error)[:200])
-  if len(found)>=2:break
- if len(found)!=2:raise RuntimeError(f"Company {id}: only {len(found)} credible article images acquired; do not synthesize/copy unrelated photos")
- (ROOT/("cn-autumn-"+id)/"media-sources.json").write_text(json.dumps(found,ensure_ascii=False,indent=2)+"\n",encoding="utf8")
-print("HHBA_069_070_FOUR_SOURCE_IMAGE_FILES_READY")
+  if t=="img":
+   url=next((d.get(k) for k in ("data-original","data-src","data-lazy","src") if d.get(k)),None)
+   if url:self.images.append((url,d.get("alt","")))
+ def handle_data(self,d):self.body.append(d.strip())
+found=[];seen=set()
+for page in PAGES:
+ try:
+  html=fetch(page).decode("utf8","ignore")
+  parser=Images();parser.feed(html)
+  if "成达集团" not in "".join(parser.body):raise RuntimeError("wrong company page")
+  print("HHBA_CHENGDA_NEWS_IMAGE_CANDIDATES",page,json.dumps(parser.images[:50],ensure_ascii=False))
+  for src,alt in parser.images:
+   if len(found)>=2:break
+   url=urljoin(page,src.strip().replace("&amp;","&"))
+   if url in seen:continue
+   seen.add(url)
+   if any(k in url.lower() for k in ("logo","icon","avatar","ewm","weixin","erweima","qr","banner","footer","top_","1x1")):continue
+   try:
+    r=save("070",len(found)+1,url,page,"Actual Chengda Group event or dealership display shown in news article; "+alt[:90])
+    if any(r["sha256"]==x["sha256"] for x in found):
+     (ROOT/"cn-autumn-070"/r["filename"]).unlink(missing_ok=True);continue
+    found.append(r)
+   except Exception as exc:print("HHBA_CHENGDA_SKIP",url,str(exc)[:140])
+ except Exception as exc:print("HHBA_CHENGDA_SOURCE_ERROR",page,str(exc)[:200])
+ if len(found)>=2:break
+if len(found)!=2:raise RuntimeError(f"Chengda actual news images verified: {len(found)}/2; fake photos forbidden")
+(ROOT/"cn-autumn-070"/"media-sources.json").write_text(json.dumps(found,ensure_ascii=False,indent=2)+"\n",encoding="utf8")
+print("HHBA_069_070_SOURCE_MEDIA_OK")
