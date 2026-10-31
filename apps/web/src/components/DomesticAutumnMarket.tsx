@@ -8,6 +8,7 @@ import jobsJSON from '../data/domesticAutumnVerifiedJobs20261028.json';
 import pfizerJobsJSON from '../data/domesticPfizerOfficialJobs20261029.json';
 import officialEvidence from '../data/domesticAutumnOfficialEvidence20261028.json';
 import brandMedia from '../data/domesticAutumnBrandMediaRegistry.json';
+import {employerProfileById} from '../services/employerProfiles';
 import '../styles/domestic-autumn-market.css';
 
 type Employer={id:string;name:string;screenshotGroup:string;reviewStatus:string;officialUrl:string|null;evidenceUrl:string|null;notes:string|null};
@@ -16,10 +17,13 @@ const employers=employersJSON.entries as Employer[];
 const tracedLogos=Object.keys(brandMedia.entries).length;
 const jobs=[...jobsJSON.jobs,...pfizerJobsJSON.jobs] as DomesticRecord[];
 const additionalEvidence=officialEvidence.entries as Record<string,{officialRecruitment:string|null;source:string|null}>;
-const recruitmentLink=(e:Employer)=>e.officialUrl||additionalEvidence[e.name]?.officialRecruitment||null;
+const reviewed=(e:Employer)=>employerProfileById.get(e.id);
+const displayCompany=(e:Employer)=>reviewed(e)?.name||e.name;
+const recruitmentLink=(e:Employer)=>e.officialUrl||additionalEvidence[e.name]?.officialRecruitment||(reviewed(e)?.recruitment.status==='official_portal'?reviewed(e)!.recruitment.url:null);
 function evidenceLabel(e:Employer){
  if(recruitmentLink(e))return '招聘官网入口已定位';
- if(e.evidenceUrl)return '招聘公告已有来源';
+ if(reviewed(e)?.jobs.length)return reviewed(e)?.recruitment.status==='unconfirmed'?'岗位方向已收录·投递入口待核':'企业岗位资料已收录';
+  if(e.evidenceUrl)return '招聘公告已有来源';
  if(additionalEvidence[e.name]?.source)return '企业资料已有来源';
  return '招聘信息待核验';
 }
@@ -112,8 +116,8 @@ export function DomesticAutumnMarket({compact=false,standalone=false,query='',ma
    return picked.slice(0,compact?6:10);
  },[matched,compact,standalone]);
  const listed=useMemo(()=>employers.filter(item=>{
-   if(!normalize(item.name).includes(normalize(directoryText.trim())))return false;
-   if(directoryStatus==='with_jobs')return jobs.some(j=>j.company===item.name);
+   if(![item.name,displayCompany(item),...(reviewed(item)?.aliases||[])].some(x=>normalize(x).includes(normalize(directoryText.trim()))))return false;
+   if(directoryStatus==='with_jobs')return jobs.some(j=>j.company===item.name)||(reviewed(item)?.jobs.length||0)>0;
    if(directoryStatus==='with_entry')return !!recruitmentLink(item);
    if(directoryStatus==='not_checked')return !recruitmentLink(item)&&!item.evidenceUrl&&!additionalEvidence[item.name]?.source;
    return true;
@@ -147,8 +151,8 @@ export function DomesticAutumnMarket({compact=false,standalone=false,query='',ma
      <small>当前显示 {listed.length} / {employers.length} 家</small>
     </nav>
     <div className="hhba-autumn-company-grid">{listed.map(e=><article key={e.id} className="hhba-autumn-company-row">
-      <AutumnCompanyCover name={e.name} id={e.id} kind="directory"/>
-      <div><Link className="hhba-autumn-company-index-link" to={'/companies/autumn/'+e.id} title={'查看'+e.name+'企业档案'}><AutumnCompanyBrand name={e.name}/><strong>{e.name}</strong></Link><small>{e.screenshotGroup.replace('截图组A：','').replace('截图组B：','')} · {evidenceLabel(e)}</small></div>
+      <AutumnCompanyCover name={displayCompany(e)} id={e.id} kind="directory"/>
+      <div><Link className="hhba-autumn-company-index-link" to={'/companies/autumn/'+e.id} title={'查看'+displayCompany(e)+'企业档案'}><AutumnCompanyBrand name={displayCompany(e)}/><strong>{displayCompany(e)}</strong></Link><small>{e.screenshotGroup.replace('截图组A：','').replace('截图组B：','')} · {evidenceLabel(e)}</small></div>
       <div className="hhba-autumn-row-actions"><Link to={'/companies/autumn/'+e.id} className="hhba-autumn-row-detail">企业详情 <ArrowRight size={13}/></Link>
       {safeUrl(recruitmentLink(e))?<a href={safeUrl(recruitmentLink(e))!} data-hhba-recruitment-outbound="true" target="_blank" rel="noopener noreferrer">招聘官网 <ExternalLink size={14}/></a>:
         <span className="hhba-domestic-pending">{e.evidenceUrl?'官网待核验':'待核验'}</span>}</div>
