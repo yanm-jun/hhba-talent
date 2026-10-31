@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-043",
+  "name": "迦智科技",
+  "displayName": "迦智科技",
+  "englishName": "IPLUSMOBOT",
+  "aliases": [
+    "杭州迦智科技有限公司",
+    "浙江迦智科技股份有限公司",
+    "IPLUSMOBOT",
+    "IPLUS MOBOT",
+    "iPlusMobot",
+    "迦智机器人",
+    "杭州迦智"
+  ],
+  "industry": "智能移动机器人 · AMR/AGV · 工厂物流自动化 · 具身移动操作",
+  "subtitle": "迦智科技 · 2016年成立 · 杭州运营中心及衢州制造基地",
+  "overview": "迦智科技成立于2016年，专注工业智能移动机器人和工厂物流自动化，产品包括EMMA标准AMR、FOLA叉取机器人、NERA具身移动操作机器人、LUNA室外移动机器人及OMNI全向移动机器人，向电子、半导体、汽车、锂电与消费品等工业客户提供机器人及软件系统方案。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.iplusmobot.cn/about.html",
+    "https://www.iplusmobot.cn/",
+    "https://www.iplusmobot.cn/product/178/id/280",
+    "https://www.iplusmobot.com/career/",
+    "https://www.iplusmobot.com/campus-recruitment/",
+    "https://www.wondercv.com/xiaozhao/gazhi-tech-2027-campus-recruitment-19947-0b83bb/",
+    "https://www.iplusmobot.com/contact/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-043/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-043/photo1.jpg",
+        "caption": "迦智科技 · AMR机器人产品家族",
+        "alt": "迦智科技官网官方机器人产品家族陈列图",
+        "note": "来自迦智科技官网关于我们产品家族图片；真实官方产品摄影，不是办公场景。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-043/photo2.jpg",
+        "caption": "迦智科技 · OMNI工业移动机器人",
+        "alt": "迦智科技官网OMNI重载全向移动机器人产品图",
+        "note": "来自迦智科技官网OMNI 5T产品图片；与产品家族图不同的独立原图。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.iplusmobot.com/career/",
+    "label": "迦智科技官方招聘与联系渠道",
+    "status": "official_portal",
+    "subject": "杭州迦智科技有限公司",
+    "note": "2027届公开校招概况只确认海外实施、海外技术支持和产品测试三个方向，尚无官方逐岗完整JD。官方英文Campus Recruitment页面仍显示面向2025届毕业生，故不能据此推断2027岗位已开放投递；公司明确提示任何招聘流程不收取费用。"
+  },
+  "majorIntro": "按2027届已见于第三方招聘汇总的三条岗位名称划分现场实施、技术支持、产品测试三类；详细学历、语言与城市均需官方岗位核验，未编造额外职位。",
+  "preferredMajors": [
+    "自动化",
+    "电气工程及其自动化",
+    "机械工程",
+    "机械电子工程",
+    "电子信息工程",
+    "计算机科学与技术",
+    "软件工程",
+    "测控技术与仪器"
+  ],
+  "photoNote": "官方品牌标识与两张不同的机器人产品摄影均从迦智科技官方网站独立采集，本地展示，不跳出第三方网页。产品图不是办公室实拍，版权归原公司。",
+  "business": [
+    {
+      "title": "标准AMR与仓内搬运",
+      "description": "以EMMA标准AMR为基础提供车间物料周转和厂内物流柔性自动化产品。",
+      "tags": "EMMA · AMR",
+      "details": [
+        "自然导航及柔性路径规划",
+        "工厂物料自动搬运",
+        "多车协同与调度"
+      ]
+    },
+    {
+      "title": "叉取机器人与托盘物流",
+      "description": "FOLA叉取机器人面向产线、仓库及物流节点提供托盘、料箱等搬运能力。",
+      "tags": "FOLA · 叉取式",
+      "details": [
+        "托盘和货架物流衔接",
+        "自动叉取与精准停靠",
+        "制造仓储系统集成"
+      ]
+    },
+    {
+      "title": "重载全向移动平台",
+      "description": "OMNI全向移动机器人提供大载重与高精度移动，面向重型物料和特殊厂内物流。",
+      "tags": "OMNI · 5吨",
+      "details": [
+        "全向行驶与重载运输",
+        "高精度定位与避障",
+        "工业安全与工况适配"
+      ]
+    },
+    {
+      "title": "具身移动操作机器人",
+      "description": "NERA系列结合机器人移动和操作能力，探索柔性制造、多任务作业及机器人协同。",
+      "tags": "NERA · 具身智能",
+      "details": [
+        "移动与操作的一体化",
+        "复杂制造场景柔性部署",
+        "机器人感知及任务规划"
+      ]
+    },
+    {
+      "title": "户外机器人与行业定制",
+      "description": "LUNA及行业专用AMR覆盖户外转运、制造物流及特殊行业需求。",
+      "tags": "LUNA · AMR+",
+      "details": [
+        "园区与户外移动作业",
+        "半导体与电子行业适配",
+        "汽车与新能源物流部署"
+      ]
+    },
+    {
+      "title": "智能物流软件与海外交付",
+      "description": "集成导航、群体调度、任务管理和客户现场实施，覆盖国内外智能工厂项目。",
+      "tags": "调度系统 · 交付",
+      "details": [
+        "工业机器人车队管理",
+        "厂内物流流程优化",
+        "系统测试、部署和客户支持"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "overseas-deployment",
+      "title": "海外实施工程师",
+      "city": "衢州（第三方校招汇总）",
+      "category": "现场实施与交付",
+      "url": "https://www.iplusmobot.com/career/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/gazhi-tech-2027-campus-recruitment-19947-0b83bb/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "杭州迦智科技有限公司",
+      "summary": "机器人海外项目部署、调试与现场交付相关工作方向，可能涉及移动机器人调试、系统集成及客户现场问题定位。",
+      "requirements": "2027届校招二级来源只提供岗位名称及衢州招聘概况，未提供官方逐岗职责、学历及是否需出差的信息。上述方向是根据岗位名称与公司业务作出的职业解释，不应作为官方岗位JD。",
+      "majorNames": [
+        "自动化",
+        "电气工程及其自动化",
+        "机械电子工程"
+      ],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "机械工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以企业官方JD为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "overseas-support",
+      "title": "海外技术支持工程师",
+      "city": "衢州（第三方校招汇总）",
+      "category": "客户支持与应用",
+      "url": "https://www.iplusmobot.com/career/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/gazhi-tech-2027-campus-recruitment-19947-0b83bb/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "杭州迦智科技有限公司",
+      "summary": "面向海外工业机器人客户的设备问题分析、技术沟通、交付后支持和现场服务工作方向，强调应用知识与客户协同。",
+      "requirements": "公开2027届校招概况确认该岗位名称，但未披露学历、英语等级、工作城市在单岗位层面的精确要求。当前工作内容仅为相关业务解释，准确资格条件以企业官方招聘渠道为准。",
+      "majorNames": [
+        "自动化",
+        "机械工程",
+        "电子信息工程"
+      ],
+      "editorialRelatedMajors": [
+        "英语",
+        "电气工程及其自动化",
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以企业官方JD为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "product-testing",
+      "title": "产品测试工程师",
+      "city": "衢州（第三方校招汇总）",
+      "category": "产品测试与质量",
+      "url": "https://www.iplusmobot.com/career/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/gazhi-tech-2027-campus-recruitment-19947-0b83bb/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "杭州迦智科技有限公司",
+      "summary": "围绕移动机器人整机与相关模块进行功能验证、异常记录和测试数据整理的岗位方向，具体测试范围以官方招聘信息为准。",
+      "requirements": "二级来源确认2027校招名单含产品测试工程师，但没有独立公开岗位JD；专业关联基于机器人测试能力，不代表公司披露的录用资格、学历和实时招聘状态。",
+      "majorNames": [
+        "自动化",
+        "机械工程",
+        "计算机科学与技术"
+      ],
+      "editorialRelatedMajors": [
+        "测控技术与仪器",
+        "电子信息工程",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 学历以企业官方JD为准",
+      "currentOpenVerified": false
+    }
+  ]
+}
