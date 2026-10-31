@@ -1,0 +1,12 @@
+{
+  "company": "基恩士",
+  "officialLogo": false,
+  "realPhotos": false,
+  "reviewedOn": "2026-10-31",
+  "reason": "Historic image paths were broken; editorial vectors used only for safe static fallback",
+  "assets": [
+    "logo.svg",
+    "photo1.svg",
+    "photo2.svg"
+  ]
+}
