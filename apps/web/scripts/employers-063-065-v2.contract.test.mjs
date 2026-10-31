@@ -6,6 +6,10 @@ assert(page.includes('06[0-5])$/.test(id)'),'Four-block V2 template must route a
 assert(page.includes('if(batch3756)return job.category===major'),'Role category selector must filter company roles');
 assert(page.includes('hhba-kpmg-photo-grid')&&page.includes('hhba-kpmg-service-grid'),'Four fixed sections must remain');
 assert(page.includes('站内岗位详情'),'Each role must have internal detail route');
+const directory=read('src/components/DomesticAutumnMarket.tsx');
+assert(directory.includes('employerProfileById.get(e.id)'),'Directory must reuse current V2 profiles');
+assert(directory.includes('displayCompany(item)')&&directory.includes("reviewed(item)?.jobs.length||0"),'Directory search and has-jobs filter must include new profiles');
+
 const roster=JSON.parse(read('src/data/domesticAutumnScreenshot20261028.json'));
 const cases=[['063','桑椹汽配',6],['064','新海威',5],['065','双视科技',5]];
 for(const [num,name,expectedJobs] of cases){
