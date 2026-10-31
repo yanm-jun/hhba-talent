@@ -30,6 +30,14 @@ jobs:
       - name: Install locked frontend dependencies
         working-directory: apps/web
         run: npm ci --no-audit --no-fund
+      - name: Install browser capture tool for genuine official site screenshot
+        working-directory: apps/web
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Capture Hongxiang actual first-party corporate webpage (not a workplace photo)
+        working-directory: apps/web
+        run: node scripts/capture-employer-067-official-website.mjs
       - name: Validate companies and all earlier four-block batches
         working-directory: apps/web
         run: |
