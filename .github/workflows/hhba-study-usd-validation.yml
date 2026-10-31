@@ -49,6 +49,8 @@ jobs:
       - name: Test real compiled site on desktop/mobile, images, links, degree pages
         working-directory: apps/web
         env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
           HHBA_TEST_BASE: 'http://127.0.0.1:4173/hhba-talent/'
         run: |
           npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/hhba-usd-preview.log 2>&1 &
