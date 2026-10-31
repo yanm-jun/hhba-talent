@@ -31,7 +31,7 @@ const css=read('src/styles/unified-v2-company.css');
 assert(page.includes("bodor=id==='cn-autumn-033'"));
 assert(page.includes('bodorGroups')&&page.includes('if(bodor)return job.category===major'),'Exact per-job group filtering');
 assert(page.includes('showcase?6:')&&page.includes('适合哪些专业背景？')&&page.includes('招聘岗位'));
-assert(page.includes('detailedCards=weipu||bodor')&&page.includes('detailedCards&&<p className="hhba-v2-weipu-education"'));
+assert(['weipu','bodor'].every(name=>(page.match(/const detailedCards=([^;]+)/)?.[1]||'').split('||').includes(name))&&page.includes('detailedCards&&<p className="hhba-v2-weipu-education"'));
 assert(page.includes('{showcase&&!detailedCards&&'),'External links must not sit under Bodor cards');
 assert(page.includes('{detailedCards&&<div className="hhba-v2-weipu-detail-links"'));
 assert(page.includes('data-hhba-recruitment-outbound="true"'),'Recruitment login gate required');
