@@ -1,3 +1,4 @@
+import {XINJIANG_14_PREFECTURES,xinjiangGuideUrl,buildXinjiangGuide} from '../data/xinjiangGuides';
 import {GUIZHOU_9_REGIONS,guizhouGuideUrl,buildGuizhouGuide} from '../data/guizhouGuides';
 import {getTalentCitySnapshot} from '../data/talentCitySnapshot';
 import {SICHUAN_21_REGIONS,sichuanGuideUrl,buildSichuanGuide} from '../data/sichuanGuides';
@@ -179,6 +180,13 @@ function CityHub({city}:{city:string}){
    </div>
   </section>
   
+ {XINJIANG_14_PREFECTURES.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="新疆维吾尔自治区14地州V6人才政策与住房保障分类目录">
+ <div className="ts-sub-section-heading"><h2>{match.name} · 新疆2026人才与住房政策</h2><Link to={talentListUrl('policies',match.name)}>全部政策与服务 <ArrowRight size={15}/></Link></div>
+ <p>地方14地州与新疆生产建设兵团师市政策单独管理。政府发布的招录、人才公寓、2026住房供应计划和工程招标不代表当前可报名或有实时空房；每条均附政府依据与资格办理指南。</p>
+ {(['落户引进','生活补贴','就业创业','购房补贴','租房安居'] as const).map(group=>policies.some(p=>p.category===group)&&<div key={group}><h3>{group}</h3><div className="ts-sub-grid">{policies.filter(p=>p.category===group).map(p=><Link key={p.id} className="ts-sub-tile" to={xinjiangGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>{p.headlineAmount||'依项目核算'} · {p.payoutTo||'对象待核'} · {policyStatus(p)}</span><ArrowRight size={15}/></Link>)}</div></div>)}
+ <h3>人才公寓、公租房、保障性租赁住房及租赁补贴</h3>
+ {homes.length?<div className="ts-sub-grid">{homes.map(h=><Link key={h.id} className="ts-sub-tile" to={xinjiangGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>{h.kind==='project'?'具体项目证据':'保障制度、规划或历史服务'} · {housingStatus(h)}</span><ArrowRight size={15}/></Link>)}</div>:<p>尚无可核实的住房资料，请等待真实主管部门来源，不得推断本地没有住房或虚构公寓。</p>}
+ </section>}
  {match.name==='贵阳'&&<section className="ts-sub-section" aria-label="贵阳市2026人才引进政策专项完整目录">
   <div className="ts-sub-section-heading"><h2>贵阳贵安 · 2026人才引进政策专项</h2><Link to={talentListUrl('policies','贵阳')}>查看全部政策 <ArrowRight size={15}/></Link></div>
   <p>根据2026年2月25日政府政策清单、2026年8月5日青年办事指南及秋季引才公告重新整理。<strong>安家费是个人分期待遇；企业引才薪酬补助发给企业；事业单位引才是岗位招聘</strong>，三个项目不能混淆。住房项目无实时空房证据。</p>
@@ -397,6 +405,11 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
    province==='jiangxi'?buildJiangxiGuide(decode(fragments[3]||'')):
    buildHunanGuide(decode(fragments[3]||''));
   body=guide?<UnifiedPolicyGuide data={guide}/>:<><Bread current="指南尚未收录"/><section className="ts-sub-header"><h1>该指南暂未核验</h1><Link to="/talent-service/cities">返回城市目录</Link></section></>;
+ }
+ else if(kind==='policy-guide-preview'&&fragments[2]==='xinjiang'){
+  const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
+  const guide=t?buildXinjiangGuide(t,decode(fragments[4]||'')):null;
+  body=guide?<UnifiedPolicyGuide data={guide}/>:<section className="ts-sub-header"><h1>该新疆政策或住房资料尚待核实</h1><Link to="/talent-service/cities">返回全国城市目录</Link></section>;
  }
  else if(kind==='policy-guide-preview'&&fragments[2]==='guizhou'){
  const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
