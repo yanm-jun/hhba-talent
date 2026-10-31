@@ -35,7 +35,7 @@ for(const h of housing){
  assert.ok(h.steps?.length>=4,'housing procedure missing '+h.city);
  assert.ok(h.sourceUrl.startsWith('https://'),'missing source '+h.city);
 }
-assert.ok(housing.find(x=>x.city==='鹰潭')?.statusNote.includes('未核实公寓已交付'),'procurement must not become verified vacant apartment');
+assert.ok(housing.find(x=>x.city==='鹰潭')?.statusNote.includes('并非正式住建配租或实际交付证明'),'procurement must not become verified vacant apartment');
 assert.ok(pIndex.includes('...JIANGXI_POLICY_RECORDS'),'national policy search registration missing');
 assert.ok(hIndex.includes('...JIANGXI_HOUSING_RECORDS'),'national housing search registration missing');
 assert.ok(guides.includes("qualityLevel:expired?'C':'B'"),'unverified A guide');
