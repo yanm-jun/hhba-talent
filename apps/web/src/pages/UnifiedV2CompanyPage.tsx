@@ -292,7 +292,7 @@ export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
       </details>
       {showcase&&!detailedCards&&<div className="hhba-v2-qizheng-role-actions">
        <Link to={'/candidate/jobs/'+encodeURIComponent('cn-v2-profile-'+p.id+'-'+job.id)}>查看详情 <ArrowRight size={13}/></Link>
-       <a href={p.recruitment.url} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">查看官网 <ExternalLink size={13}/></a>
+       <a href={p.recruitment.url} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">{p.recruitment.status==='official_portal'?'查看企业招聘栏目':p.recruitment.status==='archived_source'?'查看招聘公告（非网申）':'核对企业资料（入口待核）'} <ExternalLink size={13}/></a>
       </div>}
      </article>)}</div>
     {!matches.length&&<p className="hhba-v2-company-no-roles">该专业暂无已收录的对应岗位方向。请切换专业或选择全部岗位。</p>}

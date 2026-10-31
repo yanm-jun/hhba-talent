@@ -1,0 +1,64 @@
+name: HHBA enterprise remaining P2 corrections and audit
+on:
+  push:
+    branches:
+      - fix/employer-p2-final-20261031
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-employer-p2-final-20261031
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install exact dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Test historic employer records and shared page contracts
+        working-directory: apps/web
+        run: |
+          node scripts/employer-factory-check.mjs
+          node scripts/employers-v2-repair-strict.test.mjs
+          node scripts/employers-legacy-four-block-final.test.mjs
+          node scripts/employers-054-056-v2.contract.test.mjs
+          node scripts/employers-057-059-v2.contract.test.mjs
+          node scripts/employers-060-062-v2.contract.test.mjs
+          node scripts/employers-063-065-v2.contract.test.mjs
+          node scripts/recruitment-market-source-invalid.regression.test.mjs
+      - name: Run honest quality audit
+        working-directory: apps/web
+        run: |
+          node scripts/employer-completeness-audit.mjs
+          node --input-type=module -e 'import fs from "node:fs";const a=JSON.parse(fs.readFileSync("audit-output/employer-completeness-20261031.json"));if(a.summary.issueCounts.P1!==0||a.summary.legacy.length!==0)process.exit(1);console.log("FOUR_PANEL_AND_P1_OK",a.summary)'
+      - name: Build complete non-production static pages
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: |
+          npm run build
+          node scripts/materialize-company-route-entries.mjs
+      - name: Upload quality audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-enterprise-final-remaining-audit
+          path: apps/web/audit-output/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Upload review-only site (not deploy to Pages)
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-enterprise-final-review-static
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
