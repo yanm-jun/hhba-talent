@@ -1,0 +1,370 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-044",
+  "name": "博顿光电",
+  "displayName": "博顿光电",
+  "englishName": "IBDTEC",
+  "aliases": [
+    "博顿光电科技有限公司",
+    "中山市博顿光电科技有限公司",
+    "佛山市博顿光电科技有限公司",
+    "IBDTEC",
+    "博顿",
+    "博顿离子源",
+    "IBD Technology"
+  ],
+  "industry": "离子束装备 · 光学镀膜 · 精密制造 · 半导体设备 · 微纳加工",
+  "subtitle": "博顿光电 · 广东中山／佛山 · 离子源与离子束精密工艺装备",
+  "overview": "博顿光电专注新型离子源及离子束设备的自主研发、设计和制造，提供离子束溅射镀膜、辅助蒸发镀膜、离子刻蚀、抛光等纳米与原子级工艺技术及装备，应用于精密光学、航天、半导体、光通信、新能源等领域。公司公开的中山、佛山联系方式与产品信息可核验。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://www.ibdtec.cn/",
+    "https://www.ibdtec.cn/about/company",
+    "https://www.ibdtec.cn/contact",
+    "https://www.wondercv.com/xiaozhao/bodon-optoelectronics-foshan-zhongshan-2027-campus-19761-f26651/",
+    "https://www.wondercv.com/xiaozhao/bodon-photonics-2027-campus-recruitment-19775-82b56c/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-044/logo.png",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-044/photo1.jpg",
+        "caption": "博顿光电 · XPUTTER镀膜设备产品",
+        "alt": "博顿光电官网XPUTTER离子束溅射镀膜装备产品官方视觉",
+        "note": "来自博顿光电官网产品页面的真实产品宣传视觉，非公司办公实拍。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-044/photo2.jpg",
+        "caption": "博顿光电 · 离子束设备技术展示",
+        "alt": "博顿光电官网技术页面的离子束工艺设备或产品展示图",
+        "note": "来自博顿光电官网产品/应用图片，为品牌技术视觉而非办公室或工厂实拍。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.ibdtec.cn/contact",
+    "label": "博顿光电官方招聘联系入口",
+    "status": "official_portal",
+    "subject": "博顿光电科技有限公司",
+    "note": "整理出10条2027届校园招聘岗位方向，职位来自2026年10月收录的公开招聘汇总，不把二级来源当作官方单岗JD；官方联系页提供公司联系渠道，招聘简历邮箱需以最新正式校招公告为准。"
+  },
+  "majorIntro": "按机械、电气、软件、工艺测试、设备交付和项目市场6类对10条岗位进行精确匹配，工作要求以有据可核实的职责方向为主，不虚构单岗学历与工资。",
+  "preferredMajors": [
+    "机械工程",
+    "机械设计制造及其自动化",
+    "自动化",
+    "电气工程及其自动化",
+    "机械电子工程",
+    "材料科学与工程",
+    "光电信息科学与工程",
+    "应用物理学",
+    "计算机科学与技术",
+    "软件工程",
+    "工程管理"
+  ],
+  "photoNote": "Logo与两张不同的博顿官网产品技术图片分别本地保存、独立展示，清晰标注产品视觉性质，严禁将效果图当办公实拍。所有版权归原权利人。",
+  "business": [
+    {
+      "title": "离子束溅射镀膜",
+      "description": "IBS XPUTTER等离子束溅射设备面向高致密、多层高精度光学膜系制备。",
+      "tags": "IBS · XPUTTER",
+      "details": [
+        "精密膜层沉积与工艺验证",
+        "低散射高牢固度膜层",
+        "高功率激光与光学器件制造"
+      ]
+    },
+    {
+      "title": "离子束辅助蒸发",
+      "description": "以IAD设备提升蒸发镀膜的致密度、均匀性与附着性能。",
+      "tags": "IAD · 光学镀膜",
+      "details": [
+        "离子辅助沉积工艺",
+        "多种材料膜系研发",
+        "量产自动化与稳定性"
+      ]
+    },
+    {
+      "title": "高性能离子源研发",
+      "description": "研发霍尔、射频等离子源和相关电源控制、真空系统关键部件。",
+      "tags": "HIT · RISE · 离子源",
+      "details": [
+        "离子发生与束流控制",
+        "真空系统和高压电源",
+        "关键耗材及国产化模块"
+      ]
+    },
+    {
+      "title": "离子束刻蚀技术",
+      "description": "支持微纳结构刻蚀和复杂材料微加工，服务半导体与光学制造。",
+      "tags": "刻蚀 · 微纳加工",
+      "details": [
+        "高准直离子束刻蚀",
+        "纳米与亚微米加工",
+        "工艺试验及表面微结构调控"
+      ]
+    },
+    {
+      "title": "离子束抛光与清洗",
+      "description": "通过离子束对特殊材料和曲面进行高精度非接触修形、抛光和清洗。",
+      "tags": "抛光 · 清洗",
+      "details": [
+        "大口径精密光学修形",
+        "超精密表面去除",
+        "清洁化工艺及表面改性"
+      ]
+    },
+    {
+      "title": "整机研发与客户交付",
+      "description": "从机械设计、电控软件、工艺验证到项目装机、调试和售后服务提供装备系统支持。",
+      "tags": "真空装备 · 交付",
+      "details": [
+        "结构、电气、软件集成",
+        "离子源及系统现场测试",
+        "精密制造客户方案设计"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "mechanical",
+      "title": "机械工程师",
+      "city": "广东中山／佛山（校招主要基地，单岗以官网为准）",
+      "category": "机械与结构",
+      "url": "https://www.ibdtec.cn/contact",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/bodon-optoelectronics-foshan-zhongshan-2027-campus-19761-f26651/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "博顿光电科技有限公司",
+      "summary": "负责离子源/离子束装备结构设计、产品迭代和工装夹具、模具的开发与验证。",
+      "requirements": "2027届校园招聘二级汇总明确此岗位名称及工作方向，但尚未确认该岗位独立的官方JD、具体学历门槛、每一岗位的工作地与实时投递状态。此处专业归类仅用于方向检索；岗位任职条件最终应联系企业招聘官方渠道核实。",
+      "majorNames": [
+        "机械工程",
+        "机械设计制造及其自动化"
+      ],
+      "editorialRelatedMajors": [
+        "机械电子工程",
+        "材料成型及控制工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 详细学历以公司官方招聘为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "electrical",
+      "title": "电气工程师",
+      "city": "广东中山／佛山（校招主要基地，单岗以官网为准）",
+      "category": "电气与控制",
+      "url": "https://www.ibdtec.cn/contact",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/bodon-optoelectronics-foshan-zhongshan-2027-campus-19761-f26651/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "博顿光电科技有限公司",
+      "summary": "参与微纳加工装备的电气系统、工控系统、温控与安全系统设计、测试和调试。",
+      "requirements": "2027届校园招聘二级汇总明确此岗位名称及工作方向，但尚未确认该岗位独立的官方JD、具体学历门槛、每一岗位的工作地与实时投递状态。此处专业归类仅用于方向检索；岗位任职条件最终应联系企业招聘官方渠道核实。",
+      "majorNames": [
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "editorialRelatedMajors": [
+        "机械电子工程",
+        "测控技术与仪器"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 详细学历以公司官方招聘为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "software",
+      "title": "软件开发工程师",
+      "city": "广东中山／佛山（校招主要基地，单岗以官网为准）",
+      "category": "软件与嵌入式",
+      "url": "https://www.ibdtec.cn/contact",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/bodon-optoelectronics-foshan-zhongshan-2027-campus-19761-f26651/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "博顿光电科技有限公司",
+      "summary": "参与设备控制软件的C/C++或Python模块开发，支持Linux及串行总线外设调试。",
+      "requirements": "2027届校园招聘二级汇总明确此岗位名称及工作方向，但尚未确认该岗位独立的官方JD、具体学历门槛、每一岗位的工作地与实时投递状态。此处专业归类仅用于方向检索；岗位任职条件最终应联系企业招聘官方渠道核实。",
+      "majorNames": [
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 详细学历以公司官方招聘为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "process",
+      "title": "工艺开发工程师",
+      "city": "广东中山／佛山（校招主要基地，单岗以官网为准）",
+      "category": "工艺与测试",
+      "url": "https://www.ibdtec.cn/contact",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/bodon-optoelectronics-foshan-zhongshan-2027-campus-19761-f26651/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "博顿光电科技有限公司",
+      "summary": "研究离子束镀膜、微纳加工工艺，制定DOE试验方案，完成性能测试和工艺报告。",
+      "requirements": "2027届校园招聘二级汇总明确此岗位名称及工作方向，但尚未确认该岗位独立的官方JD、具体学历门槛、每一岗位的工作地与实时投递状态。此处专业归类仅用于方向检索；岗位任职条件最终应联系企业招聘官方渠道核实。",
+      "majorNames": [
+        "材料科学与工程",
+        "应用物理学"
+      ],
+      "editorialRelatedMajors": [
+        "光电信息科学与工程",
+        "物理学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 详细学历以公司官方招聘为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "assistant",
+      "title": "助理工程师",
+      "city": "广东中山／佛山（校招主要基地，单岗以官网为准）",
+      "category": "设备与交付",
+      "url": "https://www.ibdtec.cn/contact",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/bodon-optoelectronics-foshan-zhongshan-2027-campus-19761-f26651/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "博顿光电科技有限公司",
+      "summary": "进行离子源在真空平台的安装、调试和部件维护，配合客户现场设备交付。",
+      "requirements": "2027届校园招聘二级汇总明确此岗位名称及工作方向，但尚未确认该岗位独立的官方JD、具体学历门槛、每一岗位的工作地与实时投递状态。此处专业归类仅用于方向检索；岗位任职条件最终应联系企业招聘官方渠道核实。",
+      "majorNames": [
+        "机械工程",
+        "机械电子工程"
+      ],
+      "editorialRelatedMajors": [
+        "自动化",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 详细学历以公司官方招聘为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "product-support",
+      "title": "产品支持技术员",
+      "city": "广东中山／佛山（校招主要基地，单岗以官网为准）",
+      "category": "设备与交付",
+      "url": "https://www.ibdtec.cn/contact",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/bodon-optoelectronics-foshan-zhongshan-2027-campus-19761-f26651/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "博顿光电科技有限公司",
+      "summary": "配合设备软硬件安装调试、功能测试、故障处理与系统维护。",
+      "requirements": "2027届校园招聘二级汇总明确此岗位名称及工作方向，但尚未确认该岗位独立的官方JD、具体学历门槛、每一岗位的工作地与实时投递状态。此处专业归类仅用于方向检索；岗位任职条件最终应联系企业招聘官方渠道核实。",
+      "majorNames": [
+        "自动化",
+        "机械设计制造及其自动化"
+      ],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 详细学历以公司官方招聘为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "project",
+      "title": "项目工程师",
+      "city": "广东中山／佛山（校招主要基地，单岗以官网为准）",
+      "category": "项目与市场",
+      "url": "https://www.ibdtec.cn/contact",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/bodon-optoelectronics-foshan-zhongshan-2027-campus-19761-f26651/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "博顿光电科技有限公司",
+      "summary": "开展装备类项目需求分析、计划、技术资源协调及项目全生命周期管理。",
+      "requirements": "2027届校园招聘二级汇总明确此岗位名称及工作方向，但尚未确认该岗位独立的官方JD、具体学历门槛、每一岗位的工作地与实时投递状态。此处专业归类仅用于方向检索；岗位任职条件最终应联系企业招聘官方渠道核实。",
+      "majorNames": [
+        "工程管理",
+        "机械工程"
+      ],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 详细学历以公司官方招聘为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sales",
+      "title": "区域销售",
+      "city": "广东中山／佛山（校招主要基地，单岗以官网为准）",
+      "category": "项目与市场",
+      "url": "https://www.ibdtec.cn/contact",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/bodon-optoelectronics-foshan-zhongshan-2027-campus-19761-f26651/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "博顿光电科技有限公司",
+      "summary": "负责工业设备产品介绍、行业客户开发、合同及订单节点协同与客户关系维护。",
+      "requirements": "2027届校园招聘二级汇总明确此岗位名称及工作方向，但尚未确认该岗位独立的官方JD、具体学历门槛、每一岗位的工作地与实时投递状态。此处专业归类仅用于方向检索；岗位任职条件最终应联系企业招聘官方渠道核实。",
+      "majorNames": [
+        "市场营销",
+        "机械工程"
+      ],
+      "editorialRelatedMajors": [
+        "国际经济与贸易",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 详细学历以公司官方招聘为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "electrical-tech",
+      "title": "电气技术员",
+      "city": "广东中山／佛山（校招主要基地，单岗以官网为准）",
+      "category": "电气与控制",
+      "url": "https://www.ibdtec.cn/contact",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/bodon-optoelectronics-foshan-zhongshan-2027-campus-19761-f26651/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "博顿光电科技有限公司",
+      "summary": "按照电气原理图进行电柜、泵组、模块安装接线与调试，支持设备问题排查和维护。",
+      "requirements": "2027届校园招聘二级汇总明确此岗位名称及工作方向，但尚未确认该岗位独立的官方JD、具体学历门槛、每一岗位的工作地与实时投递状态。此处专业归类仅用于方向检索；岗位任职条件最终应联系企业招聘官方渠道核实。",
+      "majorNames": [
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "editorialRelatedMajors": [
+        "机械电子工程",
+        "机电一体化技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 详细学历以公司官方招聘为准",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ion-beam-tech",
+      "title": "离子束设备技术员",
+      "city": "广东中山／佛山（校招主要基地，单岗以官网为准）",
+      "category": "工艺与测试",
+      "url": "https://www.ibdtec.cn/contact",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/bodon-optoelectronics-foshan-zhongshan-2027-campus-19761-f26651/",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "博顿光电科技有限公司",
+      "summary": "操作离子束微纳加工设备开展工艺运行、记录和膜系试验辅助，完成工艺参数分析。",
+      "requirements": "2027届校园招聘二级汇总明确此岗位名称及工作方向，但尚未确认该岗位独立的官方JD、具体学历门槛、每一岗位的工作地与实时投递状态。此处专业归类仅用于方向检索；岗位任职条件最终应联系企业招聘官方渠道核实。",
+      "majorNames": [
+        "材料科学与工程",
+        "光电信息科学与工程"
+      ],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "物理学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 详细学历以公司官方招聘为准",
+      "currentOpenVerified": false
+    }
+  ]
+}
