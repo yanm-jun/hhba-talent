@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-075",
+  "name": "强生",
+  "displayName": "强生（中国）",
+  "englishName": "Johnson & Johnson",
+  "aliases": [
+    "J&J",
+    "Johnson and Johnson",
+    "强生中国",
+    "强生医疗科技",
+    "强生创新制药",
+    "强生2027届校招"
+  ],
+  "industry": "医疗科技 · 创新制药 · 全球供应链 · 临床研究",
+  "subtitle": "强生中国 · 上海／苏州等中国业务机构",
+  "overview": "强生中国围绕医疗科技、创新制药、全球供应链及商业职能开展业务；强生在2023年完成消费者健康业务分拆，不将现已分拆业务计入当前强生集团。西北农林科技大学2026年10月转载2027校招公告，确认四个项目名称，目标毕业窗口2026年9月至2027年8月；项目实际开放以强生官方招聘系统为准。",
+  "lastReviewed": "2026-10-31",
+  "sources": [
+    "https://food.nwsuaf.edu.cn/zhdt/jyxx/7d28c62af2714ee4a3730b1363ded5c0.htm",
+    "https://careers.jnj.com.cn/jnj/home/index/",
+    "https://www.careers.jnj.com/en/locations/asia-pacific/china/",
+    "https://www.jnj.com/innovation/how-johnson-johnsons-innovative-supply-chain-technology-is-helping-transform-how-we-work-and-live"
+  ],
+  "media": {
+    "logo": "images/autumn-real-logos/cn-autumn-075.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-075/photo1.svg",
+        "caption": "强生（中国） · HHBA独立业务示意（非真实公司照片）",
+        "alt": "强生相关主题示意，明确非公司实景照片",
+        "note": "非官方非实景SVG占位；独立预览构建将尝试取得同名企业官方或政府来源的真实照片，验真失败不能冒充实景。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-075/photo2.svg",
+        "caption": "强生（中国） · HHBA独立业务示意（非真实公司照片）",
+        "alt": "强生相关主题示意，明确非公司实景照片",
+        "note": "非官方非实景SVG占位；独立预览构建将尝试取得同名企业官方或政府来源的真实照片，验真失败不能冒充实景。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://careers.jnj.com.cn/jnj/home/index/",
+    "label": "强生中国官方校招系统",
+    "status": "official_portal",
+    "subject": "强生（中国）",
+    "note": "2027届校园招聘9月10日启动，涵盖4个已公开项目；原公告未披露逐岗实时空缺，不标注实时在招。"
+  },
+  "majorIntro": "2027校招公告确实列出四个项目，但未公布各项目的细化专业条件。下方适合专业是HHBA编辑相关度推荐，不能当作官方录用要求。",
+  "preferredMajors": [
+    "药学",
+    "生物医学工程",
+    "制药工程",
+    "生物技术",
+    "机械工程",
+    "自动化",
+    "供应链管理",
+    "工业工程",
+    "安全工程",
+    "环境工程",
+    "工商管理",
+    "化学工程与工艺"
+  ],
+  "photoNote": "优先采用 强生 已实名确认的官方或政府网页中的真实设施及业务场景，逐张验证原始图片、像素与SHA-256。图片再次商业发布的授权尚未核实；任何下载失败均保留显著标注的非实景SVG。",
+  "business": [
+    {
+      "title": "医疗科技与器械",
+      "description": "医疗器械研发、制造与临床场景服务。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "医疗科技",
+      "details": [
+        "外科与骨科系统",
+        "心血管介入相关技术",
+        "医械生产质量"
+      ]
+    },
+    {
+      "title": "创新药物研发",
+      "description": "面向疾病治疗开展创新药物、临床开发和相关合作。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "药学研发",
+      "details": [
+        "创新药物研发",
+        "临床试验协同",
+        "药物研究服务"
+      ]
+    },
+    {
+      "title": "生产运营管理",
+      "description": "开展制造工艺、产线运营、效率与现场质量管理。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "生产管理",
+      "details": [
+        "生产流程优化",
+        "工艺运营",
+        "现场设备管理"
+      ]
+    },
+    {
+      "title": "质量、法规与注册",
+      "description": "围绕产品生命周期开展质量、注册法规及合规支持。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "法规质量",
+      "details": [
+        "产品注册事务",
+        "法规体系管理",
+        "质量及安全风险"
+      ]
+    },
+    {
+      "title": "供应链与物流",
+      "description": "支撑制造物料、全球采购、物流与库存周转。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "供应链",
+      "details": [
+        "物流计划",
+        "供应商协作",
+        "采购及运营"
+      ]
+    },
+    {
+      "title": "全球服务与职能",
+      "description": "苏州等中国团队提供全球服务与职能支持。 业务范围及开展城市以该企业最新官方信息为准。",
+      "tags": "综合服务",
+      "details": [
+        "财务共享",
+        "信息技术",
+        "人力资源支持"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "gold-2027",
+      "title": "全球运营领导力项目 GOLD",
+      "category": "运营 / 管理",
+      "city": "中国各招聘主体，地点待核",
+      "summary": "学校转载的2027届招聘简章明确列出GOLD项目。全球运营领导力项目与普通职能岗位不同，具体轮岗及工作地点未在该简章逐项披露。",
+      "requirements": "高校简章列明本科及以上、2026年9月至2027年8月毕业。工业工程、供应链、工商管理相关度仅供参考；官方没有提供项目逐项专业门槛、薪资或实时开放证明。 具体投递资格及项目状态以招聘官网当前公开的职位为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工业工程",
+        "供应链管理",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.09—2027.08毕业，本科及以上",
+      "url": "https://careers.jnj.com.cn/jnj/home/index/",
+      "evidenceUrl": "https://food.nwsuaf.edu.cn/zhdt/jyxx/7d28c62af2714ee4a3730b1363ded5c0.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "强生（中国）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "supply-chain-2027",
+      "title": "供应链生产运营管理培训生",
+      "category": "机械 / 供应链",
+      "city": "中国制造基地及团队，逐岗确认",
+      "summary": "强生2027届秋招公告中的正式项目名称，面向供应链和生产运营相关工作，尚不能确认统一工作城市或生产基地。",
+      "requirements": "学校公告未给出该项目的细化岗位要求，机械、自动化、工业工程、供应链背景是编辑专业建议；本科及以上、目标2027届毕业窗口需结合官方JD复核。 具体投递资格及项目状态以招聘官网当前公开的职位为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "自动化",
+        "供应链管理",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.09—2027.08毕业，本科及以上",
+      "url": "https://careers.jnj.com.cn/jnj/home/index/",
+      "evidenceUrl": "https://food.nwsuaf.edu.cn/zhdt/jyxx/7d28c62af2714ee4a3730b1363ded5c0.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "强生（中国）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ehs-2027",
+      "title": "环境健康安全管理培训生",
+      "category": "安全 / 环境",
+      "city": "中国业务机构，逐岗确认",
+      "summary": "2027届秋招公开列名EHS环境健康安全管理培训生项目，涉及企业日常安全、健康与环境相关业务。",
+      "requirements": "高校招聘简章没有列出这一项目的精确专业及地点要求；安全工程、环境工程与相关理工专业是编辑性匹配，不代表企业已公布专业清单。 具体投递资格及项目状态以招聘官网当前公开的职位为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "安全工程",
+        "环境工程",
+        "化学工程与工艺"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.09—2027.08毕业，本科及以上",
+      "url": "https://careers.jnj.com.cn/jnj/home/index/",
+      "evidenceUrl": "https://food.nwsuaf.edu.cn/zhdt/jyxx/7d28c62af2714ee4a3730b1363ded5c0.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "强生（中国）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "regulatory-2027",
+      "title": "注册事务管理培训生",
+      "category": "医药 / 注册",
+      "city": "中国业务机构，逐岗确认",
+      "summary": "2027届校招公告确认注册事务培训生项目，相关工作可能涉及医疗科技法规与产品注册，但没有明确公开对应细分产品团队。",
+      "requirements": "学校提供的是项目名称和毕业窗口，药学、制药、生物医学工程为非官方的专业匹配建议；职位所属法人、工作地和项目资格以强生官方招聘信息为准。 具体投递资格及项目状态以招聘官网当前公开的职位为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "药学",
+        "制药工程",
+        "生物医学工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.09—2027.08毕业，本科及以上",
+      "url": "https://careers.jnj.com.cn/jnj/home/index/",
+      "evidenceUrl": "https://food.nwsuaf.edu.cn/zhdt/jyxx/7d28c62af2714ee4a3730b1363ded5c0.htm",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "强生（中国）",
+      "currentOpenVerified": false
+    }
+  ]
+}
