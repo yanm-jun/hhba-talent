@@ -334,7 +334,7 @@ export const LIAONING_EXPANDED_PROVINCIAL_POLICY_RECORDS:TalentPolicyRecord[]=LI
  published:'2026-04-14',
  deadline:topic.deadline||undefined,
  sourceUrl:SOURCE,
- sourceName:'辽宁省人民政府公开《辽人社〔2026〕6号》附件“辽宁省高校毕业生等青年就业创业支持政策清单”第'+(TOPICS.indexOf(topic)+1)+'项的省级政策属地视图；条目编号参照原文名称，非本市独立财政奖励',
+ sourceName:'辽宁省人民政府公开《辽人社〔2026〕6号》附件“辽宁省高校毕业生等青年就业创业支持政策清单”中“'+topic.title+'”对应省级政策属地视图；非本市独立财政奖励',
  summary:'辽宁省2026年公开的就业创业政策，'+city.city+'仅为属地检索入口。'+topic.title+'；主要适用对象：'+topic.who+'。最终受理范围及资金以当地公共就业、财政、税务、科研主管部门当期正式事项为准。',
  benefit:topic.benefit,
  eligibility:topic.eligibility,
