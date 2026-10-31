@@ -8,7 +8,7 @@ export const ZHOUSHAN_POLICY_RECORDS:TalentPolicyRecord[]=[
     "category": "租房安居",
     "scope": "全市",
     "temporal": "policy",
-    "published": "2026-09-01",
+    "published": "2026",
     "sourceUrl": "https://zsstb.zhoushan.gov.cn/col/col1228973558/art/2026/art_7eb924b414c84712a341c641c4ce9bfa.html",
     "sourceName": "舟山市政府网站转载公共服务一体化改革报道",
     "summary": "2026舟山推进住房保障跨区域协同，符合条件的岱山、嵊泗中等偏低收入家庭，可按规定申领舟山本岛城区公共租赁住房资格。属于公租房制度便利，不是所有海岛人才住房补贴。",
