@@ -1,3 +1,4 @@
+import {XINGTAI_POLICY_RECORDS} from './xingtaiPolicyRecords.ts';
 import {BAODING_POLICY_RECORDS} from './baodingPolicyRecords.ts';
 import {CHENGDE_POLICY_RECORDS} from './chengdePolicyRecords.ts';
 import {TANGSHAN_POLICY_RECORDS} from './tangshanPolicyRecords.ts';
@@ -443,6 +444,7 @@ export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
 ...ZIBO_POLICY_RECORDS,
 ...TAIAN_POLICY_RECORDS,
 ...SHIJIAZHUANG_POLICY_RECORDS,
+...XINGTAI_POLICY_RECORDS,
 ...DEZHOU_POLICY_RECORDS,
 ...QINHUANGDAO_POLICY_RECORDS,
 ...HANDAN_POLICY_RECORDS,
