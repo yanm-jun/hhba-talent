@@ -6,6 +6,7 @@ import {TALENT_HOUSING_RECORDS} from '../src/data/talentHousingRecords.ts';
 import {TALENT_HOUSING_RESEARCH_LEADS} from '../src/data/talentHousingResearch.ts';
 import {GUANGXI_RENT_RESEARCH_RECORDS} from '../src/data/guangxiRentPolicyResearch.ts';
 import {talentSourceKind} from '../src/data/talentQuality.ts';
+import {getTalentCitySnapshot} from '../src/data/talentCitySnapshot.ts';
 
 const files=new URL('../src/',import.meta.url);
 const routes=readFileSync(new URL('pages/TalentServiceRoutes.tsx',files),'utf8');
@@ -47,7 +48,11 @@ assert.ok(routes.includes('GUANGXI_RENT_RESEARCH_RECORDS.filter(p=>p.city===matc
 assert.ok(routes.includes("guangxiRentalResearch>0?guangxiRentalResearch+"));
 assert.ok(routes.includes("尚未收录已核实住房 · 查看核验进展"),'No empty-looking city housing card');
 assert.ok(routes.includes("homes.length>0?homes.length+"),'Housing count must derive from runtime records');
-assert.ok(routes.includes("TALENT_HOUSING_RECORDS.filter(h=>h.city===match.name)"));
+assert.ok(routes.includes('getTalentCitySnapshot(match.name)'), 'city housing counter must use audited shared data');
+for(const city of audited){
+ assert.equal(getTalentCitySnapshot(city).housingCount,TALENT_HOUSING_RECORDS.filter(h=>h.city===city).length,
+  'verified city UI housing count drift: '+city);
+}
 assert.ok(routes.includes("TALENT_HOUSING_RECORDS.filter(p=>p.city===city"),'City housing list must use same source as city card');
 assert.ok(routes.includes("<UnifiedTalentRecordDetail policy={p} housing={h}/>"),'Housing detail must route to common renderer');
 assert.ok(housingSource.includes('...TALENT_HOUSING_COVERAGE_FIX_20261031'),'Guangzhou+10 housing fixes must be included in live aggregate');
