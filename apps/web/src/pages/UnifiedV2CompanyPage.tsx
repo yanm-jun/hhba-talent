@@ -208,7 +208,7 @@ export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
  const minieye=id==='cn-autumn-035';
  const keyence=id==='cn-autumn-157';
  // Shared four-block V2 layout for all approved enterprise records.
- const batch3756=/^cn-autumn-(?:03[7-9]|04[0-9]|05[0-9]|06[0-5])$/.test(id);
+ const batch3756=/^cn-autumn-(?:03[6-9]|04[0-9]|05[0-9]|06[0-5])$/.test(id);
  const showcase=qizheng||weipu||bodor||pxw||minieye||keyence||batch3756;
  const detailedCards=weipu||bodor||pxw||minieye||keyence||batch3756;
  const batchGroups=useMemo(()=>p?[...new Set(p.jobs.map(job=>job.category).filter((value):value is string=>!!value))].map(label=>({label,majors:[]})):[],[p]);
@@ -287,7 +287,7 @@ export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
        <p>{job.requirements}</p>
        {detailedCards&&<div className="hhba-v2-weipu-detail-links">
         <Link to={'/candidate/jobs/'+encodeURIComponent('cn-v2-profile-'+p.id+'-'+job.id)}>站内岗位详情 <ArrowRight size={13}/></Link>
-        <a href={p.recruitment.url} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">{p.recruitment.status==='unconfirmed'?'招聘公告／企业资料（入口待核）':'官方招聘入口'} <ExternalLink size={13}/></a>
+        <a href={p.recruitment.url} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">{p.recruitment.status==='official_portal'?'官方招聘入口':(p.recruitment.status==='archived_source'?'公开招聘公告（非官方网申）':'招聘公告／企业资料（入口待核）')} <ExternalLink size={13}/></a>
        </div>}
       </details>
       {showcase&&!detailedCards&&<div className="hhba-v2-qizheng-role-actions">

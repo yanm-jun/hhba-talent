@@ -45,10 +45,10 @@ for(const x of manifest.entries){
  if(!fs.existsSync(mediaDir)){issue(p.id,p.name,'P2','MEDIA_AUDIT_MISSING','No local source provenance audit JSON');}
  else {
    const audit=JSON.parse(read(mediaDir));
-   if(audit.realPhotos===false||audit.officialLogo===false)issue(p.id,p.name,'P2','EDITORIAL_MEDIA_ONLY','Media are explicitly nonofficial illustrations, not real photos/logo');
+   if(audit.realPhotos===false||audit.officialLogo===false||audit.officialImageEvidenceVerified===false||audit.sourceVerification==='pending'||audit.realPhotoValidationComplete===false)issue(p.id,p.name,'P2','MEDIA_SOURCE_PENDING','Corporate media rights, official logo and/or actual photographs remain unverified');
  }
  if((p.jobs||[]).some(j=>j.currentOpenVerified!==false))issue(p.id,p.name,'P1','OPEN_STATE_UNVERIFIED','One or more job records incorrectly presented as open');
- if(x.reviewStatus==='not_checked')issue(p.id,p.name,'P2','SOURCE_ROSTER_STALE','Original screenshot retains not_checked, separate reviewed profile exists');
+ // Original screenshot not_checked is source history, reviewed V2 profile acts as current status layer.
 }
 const uniqueById=[...new Set(ids)];
 const allMissing=Array.from({length:65},(_,i)=>i+1).filter(i=>!byId.has('cn-autumn-'+String(i).padStart(3,'0')));

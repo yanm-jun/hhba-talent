@@ -14,7 +14,9 @@
   "lastReviewed": "2026-10-30",
   "sources": [
     "https://www.inboyu.com/",
-    "https://career.tjcu.edu.cn/company/index/id/5132.html"
+    "https://career.tjcu.edu.cn/company/index/id/5132.html",
+    "https://xauat.bibibi.net/detail/career?id=729621",
+    "https://www.vanke.com/join/talent"
   ],
   "media": {
     "logo": "images/boyu-user/boyu-logo.webp",
@@ -34,13 +36,13 @@
     ]
   },
   "recruitment": {
-    "url": "https://career.tjcu.edu.cn/company/index/id/5132.html",
-    "label": "核实的招聘来源",
+    "url": "https://xauat.bibibi.net/detail/career?id=729621",
+    "label": "高校发布的泊寓2027万寓生校园招聘公告（非官方网申）",
     "status": "archived_source",
-    "subject": "天津市万泊商业运营管理有限公司",
-    "note": "不代表集团全国招聘入口或当前可投递"
+    "subject": "万科泊寓企业发展有限公司",
+    "note": "西安建筑科技大学公开2027万寓生招聘公告，划分经营、职能、科技三类，列本科及以上；该链接是校园招聘公开公告，非泊寓官方网申系统，实际岗位开启情况由企业核验。"
   },
-  "majorIntro": "已收录天津市万泊商业运营管理有限公司于2026年9月11日公开的2条具体岗位；万寓生标注专业不限，泊寓运营官注明部分专业优先。当前开放状态未核实。",
+  "majorIntro": "2027万寓生公开公告按经营、职能和科技三类介绍招生方向；专业关联由HHBA按方向给出编辑建议，不能当作公告明确的专业限制。",
   "preferredMajors": [
     "酒店管理",
     "市场营销",
@@ -108,5 +110,74 @@
       ]
     }
   ],
-  "jobs": []
+  "jobs": [
+    {
+      "id": "operations-2027",
+      "title": "经营岗万寓生（2027届）",
+      "category": "经营 / 运营",
+      "summary": "负责泊寓门店经营、租赁服务、企业及个人客户开发与客户关系管理，属于官网公开的经营方向培养通道。",
+      "requirements": "2027届本科及以上，校园公告明确该方向从一线门店经营开始并形成门店管理能力；未逐项列专业限制、所在城市及固定轮岗时长，应以招聘企业实际岗位确认。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "物业管理",
+        "工商管理",
+        "市场营销",
+        "酒店管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科及以上（高校公告）",
+      "city": "全国招聘项目范围；单岗工作地须核对",
+      "url": "https://xauat.bibibi.net/detail/career?id=729621",
+      "evidenceUrl": "https://xauat.bibibi.net/detail/career?id=729621",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "万科泊寓企业发展有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "functions-2027",
+      "title": "职能岗万寓生（2027届）",
+      "category": "职能 / 管培",
+      "summary": "2027万寓生职能方向覆盖投资拓展、产品设计、品牌策划、人力资源，需分别按业务团队理解。",
+      "requirements": "公开公告未核实每一职能具体招聘名额及统一专业范围；保留职能培养方向的归类，实际所需学历仍以2027本科及以上公告为主，专业及属地需官方单岗位JD确认。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人力资源管理",
+        "环境设计",
+        "金融学",
+        "广告学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科及以上（高校公告）",
+      "city": "全国招聘项目范围；单岗工作地须核对",
+      "url": "https://xauat.bibibi.net/detail/career?id=729621",
+      "evidenceUrl": "https://xauat.bibibi.net/detail/career?id=729621",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "万科泊寓企业发展有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "tech-2027",
+      "title": "科技岗万寓生（2027届）",
+      "category": "数字化 / 产品",
+      "summary": "2027万寓生科技方向覆盖产品经理与后端研发，面向租赁业务数字化效率和用户体验提升。",
+      "requirements": "高校2027校园招聘说明科技岗位为产品经理、后端研发培养，整体招聘对象本科及以上；未逐条披露语言与技术栈，计算机相关学科仅为编辑探索建议。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息管理与信息系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届本科及以上（高校公告）",
+      "city": "全国招聘项目范围；单岗工作地须核对",
+      "url": "https://xauat.bibibi.net/detail/career?id=729621",
+      "evidenceUrl": "https://xauat.bibibi.net/detail/career?id=729621",
+      "observedOn": "2026-10-31",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "万科泊寓企业发展有限公司",
+      "currentOpenVerified": false
+    }
+  ]
 }
