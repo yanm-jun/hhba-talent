@@ -1,3 +1,5 @@
+import {QINGHAI_POLICY_RESEARCH_RECORDS} from '../data/qinghaiPolicyRecords';
+import {QINGHAI_HOUSING_RESEARCH_RECORDS} from '../data/qinghaiHousingRecords';
 import {QINGHAI_8_REGIONS,qinghaiGuideUrl,buildQinghaiGuide} from '../data/qinghaiGuides';
 import {GUIZHOU_9_REGIONS,guizhouGuideUrl,buildGuizhouGuide} from '../data/guizhouGuides';
 import {getTalentCitySnapshot} from '../data/talentCitySnapshot';
@@ -217,6 +219,13 @@ function CityHub({city}:{city:string}){
   {policies.map(p=><Link key={p.id} className="ts-sub-tile" to={qinghaiGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>{p.category} · {policyStatus(p)} · 查看政策详解</span><ArrowRight size={15}/></Link>)}
   {homes.map(h=><Link key={h.id} className="ts-sub-tile" to={qinghaiGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>{h.kind==='program'?'住房制度/建设线索':'住房项目'} · {housingStatus(h)} · 空房待核实</span><ArrowRight size={15}/></Link>)}
   </div>
+  <div className="ts-sub-section-heading"><h3>2026引才宣讲与待核线索（不计入政府原文认证政策）</h3></div>
+  <p>以下项目存在2026宣传材料或新闻证据，但缺当地主办部门正式实施细则或直接政府原文；仅供进一步核查，不能作为已开放申报的承诺。</p>
+  <div className="ts-sub-grid">
+   {QINGHAI_POLICY_RESEARCH_RECORDS.filter(p=>p.city===match.name&&!policies.some(x=>x.id===p.id)).map(p=><Link key={p.id} className="ts-sub-tile" to={qinghaiGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>待核原始实施细则 · {policyStatus(p)}</span><ArrowRight size={15}/></Link>)}
+   {QINGHAI_HOUSING_RESEARCH_RECORDS.filter(h=>h.city===match.name&&!homes.some(x=>x.id===h.id)).map(h=><Link key={h.id} className="ts-sub-tile" to={qinghaiGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>住房新闻线索 · 不代表现时有房</span><ArrowRight size={15}/></Link>)}
+  </div>
+
  </section>}
  {SICHUAN_21_REGIONS.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="四川省人才服务V5.1分步办理">
  <div className="ts-sub-section-heading"><h2>{match.name} · 政策与人才安居分步核验</h2></div>
