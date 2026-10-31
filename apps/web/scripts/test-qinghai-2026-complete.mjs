@@ -22,7 +22,7 @@ for(const city of QINGHAI_8_REGIONS){
  assert.ok(QINGHAI_POLICY_RESEARCH_RECORDS.some(p=>p.city===city),'city should not disappear from the policy search: '+city);
  const snapshot=getTalentCitySnapshot(city);
  assert.equal(snapshot.policyCount,QINGHAI_POLICY_RECORDS.filter(p=>p.city===city).length);
- assert.equal(snapshot.housingCount,QINGHAI_HOUSING_RECORDS.filter(p=>p.city===city).length);
+ assert.equal(snapshot.housingCount,QINGHAI_HOUSING_RECORDS.filter(p=>p.city===city).length+QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS.filter(p=>p.city===city).length);
  assert.ok(!ACCEPTED_TALENT_CITIES.includes(city),'B-grade cities are not city certified');
 }
 assert.equal(findTalentProvince('青海')?.official,'青海省');
