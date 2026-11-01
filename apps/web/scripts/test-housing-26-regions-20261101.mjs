@@ -24,7 +24,7 @@ for(const r of matrix.records){
  assert.equal(r.projectAddressVerified,false,'no real project-level site addresses verified from this research');
 }
 assert.ok(seen.has('甘孜'));
-assert.equal(SICHUAN_HOUSING_GAP_2026_COUNTY_OFFICIAL.length,1);
+assert.ok(SICHUAN_HOUSING_GAP_2026_COUNTY_OFFICIAL.length>=1,'must retain verified 2026 Luding County record; may additionally index older scoped government regulations');
 const luding=SICHUAN_HOUSING_GAP_2026_COUNTY_OFFICIAL[0];
 assert.equal(luding.city,'甘孜');
 assert.match(luding.district,/泸定县/);
