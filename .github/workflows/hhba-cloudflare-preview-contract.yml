@@ -1,0 +1,29 @@
+name: HHBA Cloudflare media and routing contract
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/web/scripts/cloudflare-pages-build.py"
+      - "apps/web/scripts/materialize-company-route-entries.mjs"
+      - "apps/web/scripts/cloudflare-routing.contract.test.mjs"
+      - ".github/workflows/hhba-cloudflare-preview-contract.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  routing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify source module syntax
+        working-directory: apps/web
+        run: node --check scripts/materialize-company-route-entries.mjs
+      - name: Verify both hosting path conventions
+        working-directory: apps/web
+        run: node --test scripts/cloudflare-routing.contract.test.mjs
+      - name: Syntax-check Cloudflare media build
+        run: python3 -m py_compile apps/web/scripts/cloudflare-pages-build.py
