@@ -24,7 +24,7 @@ export async function sendMail(env, {to,subject,text,replyTo}) {
  }
  const result=await fetch('https://api.resend.com/emails',{method:'POST',
    headers:{'content-type':'application/json','authorization':`Bearer ${env.RESEND_API_KEY}`},
-   body:JSON.stringify({...payload,to:[payload.to],...(replyTo?{reply_to:replyTo}:{})})});
+   body:JSON.stringify({from:payload.from,to:[payload.to],subject:payload.subject,text:payload.text,...(replyTo&&validEmail(replyTo)?{reply_to:replyTo}:{})})});
  if(!result.ok)throw new Error('mail_provider_rejected_'+result.status);
  const data=await result.json();
  if(!data?.id)throw new Error('mail_no_provider_message_id');
