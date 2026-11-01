@@ -172,7 +172,9 @@ check('City hub prominently counts housing support and unverified apartment refe
  assert.ok(hub.includes('人才公寓在哪里？'), 'city hub must show apartment preview with navigation');
  assert.ok(hub.includes("k.id==='policies'?(policies.length+researchPolicyCount)+' 条已收录（含分级资料）'") && hub.includes("researchHousing>0?researchHousing+' 处人才公寓线索（待核验）'"), 'housing card must count both verified and research-only city data');
  assert.ok(cityIndex.includes("name==='日照'"), 'Rizhao description should not incorrectly claim there is no housing information');
- assert.equal(TALENT_HOUSING_RESEARCH_LEADS.filter(x=>x.city==='日照').length,3);
+ const rizhaoLeads=TALENT_HOUSING_RESEARCH_LEADS.filter(x=>x.city==='日照');
+ assert.ok(rizhaoLeads.length>=3,'original three Rizhao housing leads must remain');
+ assert.ok(rizhaoLeads.some(x=>x.id==='hhba-rizhao-2026-six-complex-public-rent-research'),'new 2026 six-community evidence must remain research-only');
 });
 check('Zaozhuang V5.1: two detailed policies, truthful pilot program, three housing leads and shared routes',()=>{
  const city='枣庄';
