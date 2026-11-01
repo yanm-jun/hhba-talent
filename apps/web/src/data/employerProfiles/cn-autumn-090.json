@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-090",
+  "name": "阅文集团",
+  "displayName": "阅文集团 / China Literature",
+  "englishName": "China Literature",
+  "aliases": [
+    "阅文",
+    "China Literature",
+    "起点读书",
+    "QQ阅读",
+    "新丽传媒",
+    "阅文2027校招"
+  ],
+  "industry": "网络文学 · 影视动漫IP · AIGC · 版权与内容商业化",
+  "subtitle": "上海陆家嘴滨江总部 · 上海、北京校招",
+  "overview": "阅文集团以网络文学内容和IP开发为核心，旗下包括起点读书、QQ阅读、新丽传媒等。2027届校招面向2026年11月至2027年7月毕业生，官方披露技术、产品运营、内容、版权、市场、设计六类方向，集团批次原网申2026年9月14日至10月31日；牛客有部分具名2027岗位信息，单岗位截止日可能不同，不应把11月13日推广为集团全面延期。",
+  "lastReviewed": "2026-11-01",
+  "sources": [
+    "https://join.yuewen.com/school",
+    "https://join.yuewen.com/",
+    "https://www.yuewen.com/contact",
+    "https://www.nowcoder.com/jobs/detail/470179",
+    "https://www.nowcoder.com/jobs/detail/470184"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-090/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-090/photo1.svg",
+        "caption": "阅文集团编辑示意（非实景）",
+        "alt": "阅文集团业务编辑示意，并非真实办公场景",
+        "note": "非实景：仅当构建核实来源、照片真实性及尺寸哈希后替换，版权许可尚未确认。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-090/photo2.svg",
+        "caption": "阅文集团编辑示意（非实景）",
+        "alt": "阅文集团业务编辑示意，并非真实办公场景",
+        "note": "非实景：仅当构建核实来源、照片真实性及尺寸哈希后替换，版权许可尚未确认。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://join.yuewen.com/school",
+    "label": "阅文集团2027届官方校园招聘",
+    "status": "official_portal",
+    "subject": "阅文集团与上海阅文信息技术有限公司等",
+    "note": "2027官方校招报名2026-09-14至10-31；部分牛客独立职位标示11月13日截止，不能据此认定集团全面延期；当前岗位实时开放状态未验证。"
+  },
+  "majorIntro": "每个专业按钮只显示相应岗位。7条具名2027岗位＋1条明确标示非具体JD的官方职能方向；不得把集团34条网站总数当成本站已逐条核验的职位。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "人工智能",
+    "软件工程",
+    "戏剧影视文学",
+    "动画",
+    "广播电视编导",
+    "法学",
+    "汉语言文学",
+    "英语",
+    "市场营销",
+    "视觉传达设计"
+  ],
+  "photoNote": "拟使用阅文集团官方网站总部实景及报道中2023年上海前台实景，各图注明来源与商业转载未授权情况。",
+  "business": [
+    {
+      "title": "数字阅读与内容生态",
+      "description": "以起点读书、QQ阅读等服务原创小说作者、编辑和阅读用户，覆盖作品孵化、内容运营与平台分发。 不把公司整体业务能力冒充正在开放的具体岗位。",
+      "tags": "文学 · 阅读",
+      "details": [
+        "作者与作品孵化",
+        "小说内容编辑",
+        "阅读内容推荐"
+      ]
+    },
+    {
+      "title": "互联网产品及AIGC",
+      "description": "围绕智能阅读、AI生成文本与产品商业化建设用户产品、智能内容工作流、数据分析系统。 不把公司整体业务能力冒充正在开放的具体岗位。",
+      "tags": "AI · 产品",
+      "details": [
+        "AIGC生成辅助",
+        "产品和数据分析",
+        "内容智能运营"
+      ]
+    },
+    {
+      "title": "影视动漫游戏IP开发",
+      "description": "通过新丽传媒、动漫与游戏合作伙伴推动网文IP改编、投资合作、内容制作及产品发行。 不把公司整体业务能力冒充正在开放的具体岗位。",
+      "tags": "影视 · 动漫",
+      "details": [
+        "影视改编",
+        "动画与游戏IP",
+        "漫剧制作"
+      ]
+    },
+    {
+      "title": "IP授权与衍生商品",
+      "description": "管理文学IP版权和国内外许可合作、手办潮玩等消费衍生商品企划与制作。 不把公司整体业务能力冒充正在开放的具体岗位。",
+      "tags": "版权 · 商品",
+      "details": [
+        "版权授权商务",
+        "IP消费品企划",
+        "国际IP合作"
+      ]
+    },
+    {
+      "title": "海外内容与发行",
+      "description": "在海外网文、IP衍生、漫剧及多语种内容传播方面开展国际编辑和品牌市场运营。 不把公司整体业务能力冒充正在开放的具体岗位。",
+      "tags": "海外 · 内容",
+      "details": [
+        "海外编辑与内容",
+        "国际品牌商务",
+        "海外版权合作"
+      ]
+    },
+    {
+      "title": "AI文创产业协作",
+      "description": "与上海浦东相关产业主体合作开发AI+文创应用场景、内容工作流及IP产业生态。 不把公司整体业务能力冒充正在开放的具体岗位。",
+      "tags": "AI · 产业",
+      "details": [
+        "浦东人工智能文创基地",
+        "生成内容评估",
+        "IP技术生态"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "ai-product",
+      "title": "产品经理（AI方向）",
+      "category": "AI / 产品",
+      "city": "上海",
+      "summary": "阅文集团2027具名岗位，负责AI产品需求、PRD、原型设计、数据埋点和模型效果监测，推动算法与研发团队交付。 本条属于2027公开招聘记录；当前是否可申请须以企业官网核实。",
+      "requirements": "牛客原岗位要求本科及以上，SQL、Excel或BI数据分析、产品定义与跨部门项目推进能力；岗位显示2026年11月13日为该平台投递截止，不能等同于整个集团招聘延期。 岗位资格以原企业JD为准，相关专业为HHBA辅助匹配，不等同于符合所有录用条件。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "产品设计"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届，本科及以上需逐岗确认",
+      "url": "https://join.yuewen.com/school",
+      "evidenceUrl": "https://www.nowcoder.com/jobs/detail/470179",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海阅文信息技术有限公司等阅文集团用人法人（按职位核对）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ip-merch",
+      "title": "衍生品产品企划",
+      "category": "版权 / 衍生品",
+      "city": "上海",
+      "summary": "阅文集团2027具名岗位，开发小说、动漫与游戏IP周边，研究粉丝需求并统筹设计师、供应链和销售渠道项目。 本条属于2027公开招聘记录；当前是否可申请须以企业官网核实。",
+      "requirements": "来源强调熟悉二次元消费品、制作工艺、产品企划和项目协调，牛客岗位已显示结束。具体学历专业门槛及当前空缺以企业原岗位页为准。 岗位资格以原企业JD为准，相关专业为HHBA辅助匹配，不等同于符合所有录用条件。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工业设计",
+        "视觉传达设计",
+        "市场营销"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届，本科及以上需逐岗确认",
+      "url": "https://join.yuewen.com/school",
+      "evidenceUrl": "https://www.nowcoder.com/jobs/detail/470189",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海阅文信息技术有限公司等阅文集团用人法人（按职位核对）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ai-content",
+      "title": "AI内容架构",
+      "category": "AIGC / 内容",
+      "city": "上海",
+      "summary": "阅文2027职位，设计生成式AI辅助IP改编剧本的Prompt流程、编辑标准和知识库，对人物、叙事节奏及语言风格做审校。 本条属于2027公开招聘记录；当前是否可申请须以企业官网核实。",
+      "requirements": "岗位要求对剧本改编、人工智能辅助内容生产、质量评价体系与跨部门协作具有实际认识；职位发布在牛客2027校招，显示已结束。 岗位资格以原企业JD为准，相关专业为HHBA辅助匹配，不等同于符合所有录用条件。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "广播电视编导",
+        "戏剧影视文学",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届，本科及以上需逐岗确认",
+      "url": "https://join.yuewen.com/school",
+      "evidenceUrl": "https://www.nowcoder.com/jobs/detail/470184",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海阅文信息技术有限公司等阅文集团用人法人（按职位核对）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "overseas-brand",
+      "title": "海外平台品牌商务专员",
+      "category": "海外 / 品牌",
+      "city": "上海",
+      "summary": "2027届上海岗位，处理海外社媒平台内容、品牌传播、线下展会、营销素材与IP商务合作。 本条属于2027公开招聘记录；当前是否可申请须以企业官网核实。 项目包括海外品牌形象维护、海外IP营销合作及活动物料筹备与复盘，具体受众覆盖海外网文与泛娱乐内容用户。",
+      "requirements": "原职位明确英语可作为工作语言，熟悉海外主流社媒和内容传播，具有审美、策划和跨团队执行能力；原投递2026年10月31日结束。 岗位资格以原企业JD为准，相关专业为HHBA辅助匹配，不等同于符合所有录用条件。 职位没有公开所有留学国家或驻外城市要求，不能从“海外商务”一词擅自推断需要长期驻外。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "英语",
+        "市场营销",
+        "广告学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届，本科及以上需逐岗确认",
+      "url": "https://join.yuewen.com/school",
+      "evidenceUrl": "https://www.nowcoder.com/jobs/detail/470182",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海阅文信息技术有限公司等阅文集团用人法人（按职位核对）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "overseas-licensing",
+      "title": "海外IP授权商务",
+      "category": "版权 / 国际商务",
+      "city": "上海",
+      "summary": "2027上海职位，评估海外原创网文IP改编价值，参与动漫、影视及游戏授权沟通和后续项目管理。 本条属于2027公开招聘记录；当前是否可申请须以企业官网核实。 具体合作涉及原创网文IP在动漫、影视、游戏和衍生商业场景中的授权资源梳理、市场调研和项目落地跟踪。",
+      "requirements": "原岗位要求英语商务沟通、熟悉内容行业及版权商业合作，有海外市场实习经历加分；原2026年10月31日结束。 岗位资格以原企业JD为准，相关专业为HHBA辅助匹配，不等同于符合所有录用条件。 海外版权商务与版权法务是不同职能，专业推荐不构成拥有商标/著作权合规执业资格的保证。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "法学",
+        "英语",
+        "国际经济与贸易"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届，本科及以上需逐岗确认",
+      "url": "https://join.yuewen.com/school",
+      "evidenceUrl": "https://www.nowcoder.com/jobs/detail/470181",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海阅文信息技术有限公司等阅文集团用人法人（按职位核对）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "overseas-short",
+      "title": "海外短篇编辑",
+      "category": "内容 / 海外编辑",
+      "city": "上海",
+      "summary": "阅文2027届上海岗位，研究海外短篇平台趋势、审核英文稿件、策划选题并基于数据反馈调整故事内容。 本条属于2027公开招聘记录；当前是否可申请须以企业官网核实。 包括选题、文字结构、英文稿件编辑、跨文化读者偏好分析和与内容投放团队配合开展复盘，明确属于内容岗位。",
+      "requirements": "原职位要求本科及以上，英语可作工作语言，英语或编辑类背景优先；原公开截止2026年10月31日。 岗位资格以原企业JD为准，相关专业为HHBA辅助匹配，不等同于符合所有录用条件。 根据原2027职位描述，英语需能直接用于审稿，海外短篇创作和编辑经历为优先条件。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "英语",
+        "汉语言文学",
+        "编辑出版学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届，本科及以上需逐岗确认",
+      "url": "https://join.yuewen.com/school",
+      "evidenceUrl": "https://www.nowcoder.com/jobs/detail/470188",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海阅文信息技术有限公司等阅文集团用人法人（按职位核对）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ai-manga",
+      "title": "海外AI漫剧编辑（英语）",
+      "category": "动画 / 海外内容",
+      "city": "上海",
+      "summary": "阅文2027届上海岗位，开展小说改编短动漫、剧本和美术审核、内容生产进度控制及海外市场受众分析。 本条属于2027公开招聘记录；当前是否可申请须以企业官网核实。 项目关注小说改编短动漫的选品、剧本及美术方案审核、剧集节奏、生产进度与质量跟踪，服务海外受众。",
+      "requirements": "岗位偏好懂动漫制作和短剧、导演或动画等艺术背景，英语可用于工作；不能将它描述成算法研发岗，原招聘已结束。 岗位资格以原企业JD为准，相关专业为HHBA辅助匹配，不等同于符合所有录用条件。 公司原岗位偏好动画或导演艺术背景并重视英语能力，不意味着必须具有算法模型研发经验。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "动画",
+        "数字媒体艺术",
+        "广播电视编导",
+        "英语"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届，本科及以上需逐岗确认",
+      "url": "https://join.yuewen.com/school",
+      "evidenceUrl": "https://www.nowcoder.com/jobs/detail/470187",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海阅文信息技术有限公司等阅文集团用人法人（按职位核对）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "six-dirs",
+      "title": "2027集团版权、市场及设计方向（非具体JD）",
+      "category": "品牌 / 官方方向",
+      "city": "上海、北京（项目方向，不代表每城都有岗位）",
+      "summary": "阅文集团官方校招页公开六类职能：技术、产品策划及运营、内容、版权、市场、设计；本条是官网分类说明，并非实名岗位。 本条属于2027公开招聘记录；当前是否可申请须以企业官网核实。",
+      "requirements": "2027校招毕业范围2026年11月至2027年7月，集团原网申为2026年9月14日至10月31日。不同职能具体工作内容、专业和学历限制不允许从官网分类推断。 岗位资格以原企业JD为准，相关专业为HHBA辅助匹配，不等同于符合所有录用条件。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "视觉传达设计",
+        "广告学",
+        "市场营销"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届，本科及以上需逐岗确认",
+      "url": "https://join.yuewen.com/school",
+      "evidenceUrl": "https://join.yuewen.com/school",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海阅文信息技术有限公司等阅文集团用人法人（按职位核对）",
+      "currentOpenVerified": false
+    }
+  ]
+}

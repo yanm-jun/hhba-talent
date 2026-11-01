@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-092",
+  "name": "爱奇艺重庆",
+  "displayName": "爱奇艺重庆（重庆奇艺天下科技有限公司）",
+  "englishName": "iQIYI Chongqing",
+  "aliases": [
+    "爱奇艺",
+    "爱奇艺重庆招聘",
+    "重庆奇艺天下",
+    "重庆奇艺天下科技有限公司",
+    "iQIYI Chongqing",
+    "爱奇艺2027重庆"
+  ],
+  "industry": "影视平台服务 · 内容审核 · 用户客服 · 内容运营",
+  "subtitle": "重庆市两江新区洪湖西路24号 · 2027重庆校招",
+  "overview": "爱奇艺重庆2027校招公开稿面向2026年9月至2027年8月毕业生，明确客服类、审核类、运营类三条方向，工作地点重庆两江新区洪湖西路24号。投递在2026年9至10月，2027年1至6月安排实习体验，考核通过才可取得后续正式Offer。没有证据证实集团北京或上海技术岗位也在重庆招聘，不允许合并两套数据。",
+  "lastReviewed": "2026-11-01",
+  "sources": [
+    "https://mp.weixin.qq.com/s/8nezl5qTVaHAtr69IjfMQw",
+    "https://templates.upcv.tech/xiaozhao/cmu0ibdlz0005m9sedxs85mw8.html",
+    "https://www.deizao.net/m/index/gonggaoxq/nwid/24932",
+    "https://campus.iqiyi.com/about-us.html",
+    "https://careers.iqiyi.com/index.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-092/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-092/photo1.svg",
+        "caption": "爱奇艺重庆业务场景（非实景示意）",
+        "alt": "爱奇艺重庆编辑示意图，不是公司真实照片",
+        "note": "非实景：在取得爱奇艺校园招聘官网注明重庆办公区的图片后可替换，需要注明图片发布日期较早；版权重用许可另审。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-092/photo2.svg",
+        "caption": "爱奇艺重庆业务场景（非实景示意）",
+        "alt": "爱奇艺重庆编辑示意图，不是公司真实照片",
+        "note": "非实景：在取得爱奇艺校园招聘官网注明重庆办公区的图片后可替换，需要注明图片发布日期较早；版权重用许可另审。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://careers.iqiyi.com/index.html",
+    "label": "爱奇艺集团官方招聘网站（重庆需单独确认）",
+    "status": "official_portal",
+    "subject": "重庆奇艺天下科技有限公司2027校园招聘方向",
+    "note": "公开海报明确重庆三个招聘方向，没有可独立核对的直达具体职位ID、薪资和逐岗学历；官网入口是集团站，不等同于重庆直达投递链接。多个转载站记载2026-10-31截止，原2027秋招窗口已结束。"
+  },
+  "majorIntro": "只展示重庆实际公布的客服、审核、运营三个方向，均标注非具体JD；其专业相关性不构成符合所有录用条件的证明。",
+  "preferredMajors": [
+    "工商管理",
+    "电子商务",
+    "传播学",
+    "新闻学",
+    "广播电视编导",
+    "市场营销",
+    "数字媒体艺术"
+  ],
+  "photoNote": "优先从爱奇艺校园招聘官方重庆办公照片里独立获取真实现场，图片可能拍摄于早年且不能声称代表当前2026办公条件。",
+  "business": [
+    {
+      "title": "在线影视与数字内容服务",
+      "description": "重庆相关业务属于爱奇艺影视内容平台生态，围绕视频播放和用户观看体验提供运营及支持。 该内容仅说明业务活动，不能推断有其他已公开的实名招聘职位。",
+      "tags": "影视 · 内容",
+      "details": [
+        "影视会员服务",
+        "播放及内容支持",
+        "平台体验运营"
+      ]
+    },
+    {
+      "title": "重庆客户服务与反馈",
+      "description": "在重庆办公区提供用户咨询答疑、反馈受理以及平台服务质量改善相关工作。 该内容仅说明业务活动，不能推断有其他已公开的实名招聘职位。",
+      "tags": "客服 · 体验",
+      "details": [
+        "用户咨询处理",
+        "服务投诉反馈",
+        "服务体验提升"
+      ]
+    },
+    {
+      "title": "内容审核与安全品质",
+      "description": "执行内容安全及质量规则、审核流程和质量反馈，与平台内容部门协作。 该内容仅说明业务活动，不能推断有其他已公开的实名招聘职位。",
+      "tags": "审核 · 安全",
+      "details": [
+        "内容规则检查",
+        "质量反馈机制",
+        "审核流程协同"
+      ]
+    },
+    {
+      "title": "短视频与社媒内容运营",
+      "description": "配合视频内容传播和用户参与活动，协助短视频素材与社媒内容管理。 该内容仅说明业务活动，不能推断有其他已公开的实名招聘职位。",
+      "tags": "内容 · 运营",
+      "details": [
+        "内容推广",
+        "短视频创意执行",
+        "用户运营"
+      ]
+    },
+    {
+      "title": "AI业务工具辅助",
+      "description": "在客服、内容审核、运营等职能中使用AI工具协助信息整合与流程效率优化。 该内容仅说明业务活动，不能推断有其他已公开的实名招聘职位。",
+      "tags": "AI · 工具",
+      "details": [
+        "AI辅助客服",
+        "审核工具",
+        "运营流程协同"
+      ]
+    },
+    {
+      "title": "校招实习与组织培训",
+      "description": "重庆2027校招包含2027年初实习体验及根据评估安排的后续入职流程。 该内容仅说明业务活动，不能推断有其他已公开的实名招聘职位。",
+      "tags": "培养 · 服务",
+      "details": [
+        "重庆校招生实践",
+        "业务岗位培训",
+        "组织职能支持"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "customer",
+      "title": "客服类（2027届公开方向，非具体JD）",
+      "category": "用户 / 客服",
+      "city": "重庆市两江新区洪湖西路24号",
+      "summary": "爱奇艺重庆2027校园招聘宣传明确列出客服类方向，负责用户咨询、问题解决、服务反馈和AI辅助沟通，工作地点为重庆两江新区。 仅确认这一方向在2027年校招中出现，绝不擅自增加具体岗位编号和人数。",
+      "requirements": "2027届报名对象毕业时间2026年9月至2027年8月；公告没有逐条给出具体职位编号、学历和专业要求，不可直接照搬集团北京客服岗位JD。 专业匹配属于HHBA编辑推荐而非公司认证录用门槛，实际岗位要求和当前空缺需以官方说明为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工商管理",
+        "电子商务",
+        "传播学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.09—2027.08毕业；逐岗学历条件未核",
+      "url": "https://careers.iqiyi.com/index.html",
+      "evidenceUrl": "https://mp.weixin.qq.com/s/8nezl5qTVaHAtr69IjfMQw",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "重庆奇艺天下科技有限公司（校招转载主体，单岗位用人单位待官网核对）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "audit",
+      "title": "审核类（2027届公开方向，非具体JD）",
+      "category": "内容 / 审核",
+      "city": "重庆市两江新区洪湖西路24号",
+      "summary": "爱奇艺重庆2027年公布审核方向，围绕平台内容质量、安全规则与AI辅助判断提供内容审核工作，未发布可核验的单条JD。 仅确认这一方向在2027年校招中出现，绝不擅自增加具体岗位编号和人数。",
+      "requirements": "公司公开招聘海报只有审核类别，未列实操工具、排班模式、审核内容范围和逐岗学历资格；职位条件须向重庆招聘团队或官方渠道核实。 专业匹配属于HHBA编辑推荐而非公司认证录用门槛，实际岗位要求和当前空缺需以官方说明为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "新闻学",
+        "传播学",
+        "广播电视编导"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.09—2027.08毕业；逐岗学历条件未核",
+      "url": "https://careers.iqiyi.com/index.html",
+      "evidenceUrl": "https://mp.weixin.qq.com/s/8nezl5qTVaHAtr69IjfMQw",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "重庆奇艺天下科技有限公司（校招转载主体，单岗位用人单位待官网核对）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "operation",
+      "title": "运营类（2027届公开方向，非具体JD）",
+      "category": "运营 / 内容",
+      "city": "重庆市两江新区洪湖西路24号",
+      "summary": "重庆校招宣传材料列出运营类方向，重点是内容传播、短视频/社媒营销及业务运营协同，非具体独立编码的职位。 仅确认这一方向在2027年校招中出现，绝不擅自增加具体岗位编号和人数。",
+      "requirements": "公开材料注明2027届校招投递2026年9月至10月、线下面试2026年10月至11月、实习2027年1月至6月；不等于确定任何运营类岗位目前还开放。 专业匹配属于HHBA编辑推荐而非公司认证录用门槛，实际岗位要求和当前空缺需以官方说明为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "电子商务",
+        "数字媒体艺术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026.09—2027.08毕业；逐岗学历条件未核",
+      "url": "https://careers.iqiyi.com/index.html",
+      "evidenceUrl": "https://mp.weixin.qq.com/s/8nezl5qTVaHAtr69IjfMQw",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "重庆奇艺天下科技有限公司（校招转载主体，单岗位用人单位待官网核对）",
+      "currentOpenVerified": false
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "company": "虎牙",
+  "id": "cn-autumn-091",
+  "originalAssets": "two distinct business SVGs and an openly nonofficial HHBA logo",
+  "commercialReuseRightsVerified": false,
+  "photoSlots": [
+    {
+      "slot": 1,
+      "initial": "photo1.svg",
+      "sourceStatus": "nonreal until verified",
+      "sourceReport": "media-sources.json generated in CI"
+    },
+    {
+      "slot": 2,
+      "initial": "photo2.svg",
+      "sourceStatus": "nonreal until verified",
+      "sourceReport": "media-sources.json generated in CI"
+    }
+  ]
+}
