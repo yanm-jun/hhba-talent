@@ -320,10 +320,11 @@
       "广安",
       "巴中",
       "宜宾",
-      "资阳"
+      "资阳",
+      "甘孜"
     ],
-    "newlyAddedOfficialRecordCount": 4,
-    "remainMissingHousingCities": 36,
+    "newlyAddedOfficialRecordCount": 5,
+    "remainMissingHousingCities": 35,
     "remainingByProvince": {
       "河北省": [
         "邢台"
@@ -360,7 +361,6 @@
         "绵阳",
         "遂宁",
         "内江",
-        "甘孜",
         "凉山"
       ],
       "贵州省": [
@@ -384,7 +384,17 @@
       "资阳"
     ],
     "sourceLimit": "Government domain / exact whitelisted official original source classification and integration passing CI does not prove original page accessible, project availability, current applicants, actual rent, or full A-grade guidance.",
-    "ci": "https://github.com/yanm-jun/hhba-talent/actions/runs/41306163777",
-    "detail": "docs/TALENT_SICHUAN_HOUSING_BATCH2_20261101.md"
+    "ci": "https://github.com/yanm-jun/hhba-talent/actions/runs/41307505853",
+    "detail": "docs/TALENT_SICHUAN_HOUSING_BATCH2_20261101.md",
+    "newlyAddedOfficialHousingNote": "Ganzi 2026 county-level independent original is Luding ONLY; other Ganzi prefecture counties and live apartments not comprehensively verified.",
+    "focus26": {
+      "targetCities": 26,
+      "independentOriginalsNewlyVerifiedThisBatch": 1,
+      "remainingMissingIndependentOriginals": 25,
+      "sichuanNewRemaining": 6,
+      "guangxiRemaining": 12,
+      "guizhouRemaining": 7,
+      "detail": "docs/TALENT_HOUSING_26REGIONS_EVIDENCE_MATRIX_20261101.json"
+    }
   }
 }
