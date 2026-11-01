@@ -1,8 +1,8 @@
 {
   "asOf": "2026-11-01",
   "housingTargetCount": 33,
-  "capturedSourceRecords": 20,
-  "remainingDirectSourceGaps": 13,
+  "capturedSourceRecords": 21,
+  "remainingDirectSourceGaps": 12,
   "housingReview": [
     {
       "city": "邢台",
@@ -96,8 +96,8 @@
     },
     {
       "city": "梧州",
-      "status": "local_primary_source_needed",
-      "sourceTier": "not_found",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-2026-reprint",
       "verifiedVacancies": false
     },
     {
@@ -207,7 +207,7 @@
   "officiallyIndexedPolicyCount": 1,
   "officiallyIndexedHousingCount": 5,
   "policyLeadsNotOfficiallyIndexed": 15,
-  "housingLeadsNotOfficiallyIndexed": 16,
+  "housingLeadsNotOfficiallyIndexed": 17,
   "housingWithoutFormal2026Evidence": 29,
   "officiallyIndexedHousingCityCount": 4,
   "housingRemainingCities": [
@@ -267,5 +267,5 @@
     "阜新",
     "辽阳"
   ],
-  "qualityLimitation": "5 government-source housing records cover 4 cities (Benxi has two distinct programs). Formal coverage is NOT 5 cities. 15 policy city gaps and 29 housing city gaps remain. New 2026 talent apartment notice of Benxi is a HISTORICAL admission announcement, not live vacancy. Some government domains still require manual original-document inspection."
+  "qualityLimitation": "5 government-source housing records cover 4 cities (Benxi has two distinct programs). Formal coverage is NOT 5 cities. 15 policy city gaps and 29 housing city gaps remain. New 2026 talent apartment notice of Benxi is a HISTORICAL admission announcement, not live vacancy. Some government domains still require manual original-document inspection. Additional Wuzhou 2026 October rental-subsidy notice is a media reprint, preserved as RESEARCH ONLY until local government original is verified."
 }
