@@ -57,6 +57,10 @@ export function talentSourceKind(raw:string):TalentSourceKind{
   const host=url.hostname.toLowerCase();
   if(!host||host==='localhost'||host.endsWith('.localhost')||host==='example.com')return 'unverified';
   if(host==='gov.cn'||host.endsWith('.gov.cn'))return 'government';
+  // 青海省人事考试信息网由西宁政府公共就业网站链接为官方考试平台。
+  // Only this 2026 Huangnan original recruitment notice gets the narrow exception.
+  if((host==='www.qhpta.com'||host==='qhpta.com')&&
+     url.pathname==='/ncms/article_f19170682be5a53df0f777df1f540e24.shtml')return 'government';
   // Scoped exception: www.zoupingrc.cn is the official talent site explicitly operated
   // by 邹平市人力资源和社会保障局 (public footer + signed 2026 announcements).
   // Approve only its official /ywdt/ announcements; no other non-gov domain is trusted.
