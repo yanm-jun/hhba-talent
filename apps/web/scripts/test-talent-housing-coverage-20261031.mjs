@@ -24,7 +24,7 @@ for(const h of housing){
 }
 const routes=readFileSync(path.join(here,'../src/pages/TalentServiceRoutes.tsx'),'utf8');
 assert.ok(routes.includes('getTalentCitySnapshot(match.name)'), 'city hub must use shared, audited national policy/housing snapshot');
-assert.ok(src('talentCitySnapshot.ts').includes('TALENT_HOUSING_RECORDS.filter(h=>h.city===city)'), 'shared snapshot must read national housing records');
+assert.ok(src('talentCitySnapshot.ts').includes('const canonical=findTalentCity(city)?.name||city.trim()')&&src('talentCitySnapshot.ts').includes('TALENT_HOUSING_RECORDS.filter(h=>h.city===canonical)'), 'shared snapshot must read national housing records using the canonical city name');
 assert.ok(routes.includes("const resultHomes=TALENT_HOUSING_RECORDS.filter(p=>p.city===city"),'housing list must use national housing records');
 // Other four were already research-only: do not silently promote secondary-source leads as A/B government verified housing projects.
 const research=src('talentHousingResearch.ts');
