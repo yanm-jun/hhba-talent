@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync,existsSync,statSync} from 'node:fs';
-import {searchEmployersByIndividualRoles} from '../src/services/employerJobSearch.mjs';
+import {searchEmployersByIndividualRoles,matchesJobMajor} from '../src/services/employerJobSearch.mjs';
 const read=p=>readFileSync(p,'utf8');
 const page=read('src/pages/UnifiedV2CompanyPage.tsx');
 const pattern=page.split('const batch3756=/')[1]?.split('/.test(id)')[0];
@@ -63,10 +63,10 @@ for(const [num,name,count] of [['090','阅文集团',8],['091','虎牙',31],['09
 }
 const ai=searchEmployersByIndividualRoles(companies,'人工智能',{knownMajors:['人工智能']});
 assert(ai.some(x=>x.profile.id==='cn-autumn-091'&&x.jobs.some(j=>j.title.includes('大模型算法'))),'HUYA AI individual roles must be searchable');
-assert(ai.every(x=>x.jobs.every(j=>j.editorialRelatedMajors.includes('人工智能'))),'Return job-specific major matches, not all company roles');
+assert(ai.every(x=>x.jobs.every(j=>matchesJobMajor(j,'人工智能'))),'Return only major-family related individual roles, not all company roles');
 const news=searchEmployersByIndividualRoles(companies,'新闻学',{knownMajors:['新闻学']});
 assert(news.some(x=>x.profile.id==='cn-autumn-092'&&x.jobs.some(j=>j.id==='audit')),'Chongqing content auditing must show for journalism');
-assert(news.every(x=>x.jobs.every(j=>j.editorialRelatedMajors.includes('新闻学'))));
+assert(news.every(x=>x.jobs.every(j=>matchesJobMajor(j,'新闻学'))));
 assert(read('src/services/domesticRebuildJobs.ts').includes('employerProfiles.flatMap'),'Profile JSON must be included in recruitment job records');
 assert(read('src/components/UnifiedJobMarket.tsx').includes('<V2EmployerSearchResults'),'Recruitment market must render company results');
 console.log('HHBA_090_092_BATCH_PASS',JSON.stringify({companies:3,jobOrDirectionRecords:records,business:18,sourcedImages:sourcePictures,companyNameSearch:true,majorExactFilter:true}));
