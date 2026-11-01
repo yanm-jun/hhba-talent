@@ -6,7 +6,7 @@ class Db {
  prepare(sql){const db=this;let a=[];
   return {bind(...values){a=values;return this},async run(){
    if(sql.startsWith('INSERT INTO auth_rate_limits')){const [key,ts,cutoff]=a;const old=db.limits.get(key);db.limits.set(key,{hits:old&&old.window_start>=cutoff?old.hits+1:1,window_start:old&&old.window_start>=cutoff?old.window_start:ts});return {};}
-   if(sql.startsWith('INSERT INTO auth_users')){const [id,email,salt,hash,iterations,name,ts]=a;if(db.users.has(email))throw Error('unique');db.users.set(email,{id,email,password_salt:salt,password_hash:hash,password_iterations:iterations,display_name:name,created_at:ts});return {};}
+   if(sql.startsWith('INSERT INTO auth_users')){const [id,email,salt,hash,iterations,name,verifiedAt,ts]=a;if(db.users.has(email))throw Error('unique');db.users.set(email,{id,email,password_salt:salt,password_hash:hash,password_iterations:iterations,display_name:name,email_verified_at:verifiedAt,created_at:ts});return {};}
    if(sql.startsWith('INSERT INTO auth_roles')){const [id,account_type]=a;db.roles.push({user_id:id,account_type});return {};}
    if(sql.startsWith('INSERT INTO auth_sessions')){const [hash,id,csrf,created,expires]=a;db.sessions.set(hash,{token_hash:hash,user_id:id,csrf_token:csrf,created_at:created,expires_at:expires});return {};}
    if(sql.startsWith('DELETE FROM auth_sessions')){db.sessions.delete(a[0]);return {};}
