@@ -2,7 +2,7 @@ import { type FormEvent, useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Building2, Info, LockKeyhole, UserRound } from 'lucide-react';
 import { Shell } from '../components/Shell';
 import { Link, navigate } from '../router';
-import { api, ApiError, employerApiReady, phoneAuthReady, type AccountType, type User } from '../services/api';
+import { api, ApiError, accountAuthReady, phoneAuthReady, type AccountType, type User } from '../services/api';
 import {
   clearRealAuthToken,
   getRealAuthToken,
@@ -21,7 +21,7 @@ type Props = { user: User | null; onUser: (value: User) => void; accountType: Ac
 /**
  * 手机号登录/注册页。正式流程仍走 /api/v1 正式网关并受 phoneAuthReady 门控。
  * 求职者在 VITE_HHBA_REAL_AUTH_ENABLED='1' 时走测试站真实认证分支（/api/real-auth/*），
- * 该分支不走 employerApiReady 门控；测试后端只签发 candidate 角色，因此招聘方仍走正式流程。
+ * 该分支不走旧版企业 API 门控；测试后端只签发 candidate 角色，因此招聘方仍走正式流程。
  */
 export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props) {
   const [mode, setMode] = useState<Mode>(initialMode);
@@ -236,8 +236,8 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
             <button className="hhba-phone-submit" type="submit" disabled={!canSubmit || busy}>{busy ? '验证中…' : mode === 'login' ? '登录' : '注册并继续'}<ArrowRight size={17} /></button>
           </form>
           <div className="hhba-phone-account-change">{mode === 'login' ? '还没有账户？' : '已经有账户？'} <Link to={modeRoute}>{mode === 'login' ? '立即注册' : '返回登录'}</Link></div>
-          {employerApiReady && <Link className="hhba-phone-legacy" to={stem + '/email-' + mode + suffix}>已有邮箱密码账户？使用原登录方式</Link>}
-          {!phoneAuthReady && !useRealAuth && <div className="hhba-phone-preview-note" role="status"><Info size={15} /><span>当前为页面预览，短信服务暂未接入，无法真实注册或登录。</span></div>}
+          {accountAuthReady && <Link className="hhba-phone-legacy" to={stem + '/email-' + mode + suffix}>短信尚未开放 · 使用邮箱密码{mode === 'login' ? '登录' : '注册'}（测试）</Link>}
+          {!phoneAuthReady && !useRealAuth && <div className="hhba-phone-preview-note" role="status"><Info size={15} /><span>{accountAuthReady ? '短信尚未接入。当前仅可通过上方邮箱密码入口体验真实测试账号，不要使用真实个人信息。' : '当前为页面预览，短信服务暂未接入，无法真实注册或登录。'}</span></div>}
         </div>
         <div className="hhba-phone-below">
           <Link to="/auth"><ArrowLeft size={14} /> 返回身份选择</Link>
