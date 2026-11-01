@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-089",
+  "name": "无限极",
+  "displayName": "无限极（中国）有限公司",
+  "englishName": "Infinitus China",
+  "aliases": [
+    "无限极中国",
+    "Infinitus",
+    "Infinitus China",
+    "极优生",
+    "养固健",
+    "无限极2027校园招聘"
+  ],
+  "industry": "中草药健康 · 生物科研 · 食品营养 · 生产质量 · 数字商业",
+  "subtitle": "无限极中国 · 广东新会／辽宁营口生产基地 · 广州及全国业务团队",
+  "overview": "无限极（中国）有限公司是李锦记集团体系下的中草药健康产品企业，业务涵盖中草药原料、健康食品、护肤和个人护理产品、制造以及业务销售。2026年9月高校2027届校招公告明确“极优生”两条路线：大业务与科研，并公开2026年1月至2027年7月毕业窗口；中山大学10月招聘信息明确原申请截止10月31日，不能把大学页面中30人计划误作今天剩余名额。",
+  "lastReviewed": "2026-11-01",
+  "sources": [
+    "https://yjsjob.91wllm.cn/teachin/view/id/252299",
+    "https://career.sustech.edu.cn/detail/online?id=3612819",
+    "https://career.gdufs.edu.cn/web/Index/jobs-brief-detail?id=VHUXSNB",
+    "https://ce.sysu.edu.cn/zh-hans/article/9235",
+    "https://www.infinitus.com.cn/c/2024-08-13/425961.shtml",
+    "https://app.mokahr.com/m/campus-recruitment/infinitushr/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-089/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-089/photo1.svg",
+        "caption": "无限极业务编辑示意（非企业实景）",
+        "alt": "无限极业务示意，不是该企业的真实照片",
+        "note": "非实景：默认SVG有显著非实景说明；CI可在确认无限极实际生产基地文章及原图后使用可溯源JPEG，不等于获得商业转载授权。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-089/photo2.svg",
+        "caption": "无限极业务编辑示意（非企业实景）",
+        "alt": "无限极业务示意，不是该企业的真实照片",
+        "note": "非实景：默认SVG有显著非实景说明；CI可在确认无限极实际生产基地文章及原图后使用可溯源JPEG，不等于获得商业转载授权。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://app.mokahr.com/m/campus-recruitment/infinitushr/",
+    "label": "无限极2027极优生指定Moka网申入口",
+    "status": "official_portal",
+    "subject": "无限极（中国）有限公司2027届极优生招聘项目",
+    "note": "南科大、广东外语外贸等高校校招确认毕业窗口2026-01至2027-07；中山大学化学学院2026年10月公告原网申截止10月31日。大业务与科研为两条实际项目，不将企业其他研究领域虚构为岗位。"
+  },
+  "majorIntro": "区分实际披露的大业务、科研两类项目，专业推荐及录用资格以招聘项目细则为准。高校鼓励多专业申请，不代表所有专业可直接胜任科研岗位。",
+  "preferredMajors": [
+    "中药学",
+    "药学",
+    "临床医学",
+    "生物科学",
+    "生物工程",
+    "食品科学与工程",
+    "化学",
+    "应用化学",
+    "工商管理",
+    "市场营销",
+    "电子商务",
+    "计算机科学与技术"
+  ],
+  "photoNote": "优先采用无限极官网、实名媒体报道的广东新会及辽宁营口真实生产基地照片。逐张审核出处与版权许可，无法验证时保留明显标识的非实景SVG。",
+  "business": [
+    {
+      "title": "中草药原料与健康研究",
+      "description": "研究中草药原料、天然植物及营养健康应用相关的科研创新项目。 实际业务部门与岗位编制须以无限极公司官方记录为准。",
+      "tags": "中草药 · 科研",
+      "details": [
+        "草本原料与应用研究",
+        "药食同源科学",
+        "营养健康研究"
+      ]
+    },
+    {
+      "title": "健康食品与营养制品",
+      "description": "经营以中草药健康为特色的营养产品，涵盖产品开发和质量验证。 实际业务部门与岗位编制须以无限极公司官方记录为准。",
+      "tags": "营养 · 食品",
+      "details": [
+        "健康食品研发",
+        "膳食营养产品",
+        "产品品质管理"
+      ]
+    },
+    {
+      "title": "美妆和个人护理",
+      "description": "旗下品牌面向护肤、个人护理等消费领域，开展研发与商业服务。 实际业务部门与岗位编制须以无限极公司官方记录为准。",
+      "tags": "美妆 · 消费品",
+      "details": [
+        "护肤研发与品质",
+        "个人护理产品",
+        "消费者体验服务"
+      ]
+    },
+    {
+      "title": "新会和营口制造运营",
+      "description": "依托广东江门新会及辽宁营口生产基地推进健康产品生产、工艺、设备与质量控制。 实际业务部门与岗位编制须以无限极公司官方记录为准。",
+      "tags": "制造 · 工艺",
+      "details": [
+        "新会制造基地",
+        "营口生产基地",
+        "制造工艺及质检"
+      ]
+    },
+    {
+      "title": "数字商业与市场推广",
+      "description": "通过市场营销、数字业务和客户运营部门推动业务协同与营销管理。 实际业务部门与岗位编制须以无限极公司官方记录为准。",
+      "tags": "数字 · 商业",
+      "details": [
+        "数字营销项目",
+        "市场渠道运营",
+        "业务数据分析"
+      ]
+    },
+    {
+      "title": "综合职能与人才培养",
+      "description": "组织人才发展、研发培养、跨业务项目与员工职能支持。 实际业务部门与岗位编制须以无限极公司官方记录为准。",
+      "tags": "人力 · 管理",
+      "details": [
+        "极优生培养项目",
+        "跨部门轮岗",
+        "组织与运营协同"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "business-excellence",
+      "title": "大业务极优生（2027届培养项目）",
+      "category": "商业 / 管培",
+      "city": "广州及中国区业务单位（具体岗位需官网核验）",
+      "summary": "无限极2027校招明确的大业务极优生项目，安排业务部门、市场营销及数字化等核心职能的跨部门轮岗，发展管理综合能力。 该培养方向来自2026年高校公布的无限极2027届极优生项目，强调按项目参加测评、轮岗和管理或科研培养；具体部门、地点与选拔资格需在官方网申页面核实。",
+      "requirements": "高校公布2027届毕业时间2026年1月至2027年7月，鼓励AI Native思维和业务创新，专业背景保持开放。具体学历、工作城市、能力考核以官方Moka项目为准；中山大学10月公告截止2026-10-31。 项目确实公开，不代表原招聘窗口后今天仍可申请；完整资格按官方岗位系统核验。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工商管理",
+        "市场营销",
+        "电子商务",
+        "数据科学与大数据技术",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "2027届，2026.01—2027.07毕业（学历逐项目核实）",
+      "url": "https://app.mokahr.com/m/campus-recruitment/infinitushr/",
+      "evidenceUrl": "https://career.sustech.edu.cn/detail/online?id=3612819",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "无限极（中国）有限公司2027届极优生",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "research-excellence",
+      "title": "科研极优生（2027届培养项目）",
+      "category": "科研 / 健康",
+      "city": "无限极科研中心（城市按官方项目）",
+      "summary": "2027届官方校招资料明确的科研极优生培养路线，轮岗科研中心和核心业务，配合科研导师培养并参与中草药、健康营养领域研发项目。 该培养方向来自2026年高校公布的无限极2027届极优生项目，强调按项目参加测评、轮岗和管理或科研培养；具体部门、地点与选拔资格需在官方网申页面核实。",
+      "requirements": "2027届毕业窗口2026年1月至2027年7月。高校公开材料明确生物类、化学类、医学类、药学类、中医药、食品及营养类专业优先，其他专业可咨询但不等于符合特定科研岗位。原公开截止2026-10-31。 项目确实公开，不代表原招聘窗口后今天仍可申请；完整资格按官方岗位系统核验。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "中药学",
+        "药学",
+        "临床医学",
+        "生物科学",
+        "化学",
+        "应用化学",
+        "食品科学与工程",
+        "生物工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届，2026.01—2027.07毕业（学历逐项目核实）",
+      "url": "https://app.mokahr.com/m/campus-recruitment/infinitushr/",
+      "evidenceUrl": "https://yjsjob.91wllm.cn/teachin/view/id/252299",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "无限极（中国）有限公司2027届极优生",
+      "currentOpenVerified": false
+    }
+  ]
+}
