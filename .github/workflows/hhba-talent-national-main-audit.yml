@@ -73,5 +73,7 @@ jobs:
         run: node --experimental-strip-types scripts/test-sichuan-housing-gap-2026.mjs
       - name: Validate 26 Sichuan Guangxi Guizhou housing evidence and 2026 Luding local program
         run: node --experimental-strip-types scripts/test-housing-26-regions-20261101.mjs
+      - name: Audit six Sichuan housing gaps against formal and clearly marked research data
+        run: node --experimental-strip-types scripts/test-sichuan-six-housing-20261101.mjs
       - name: Confirm static build
         run: npm run build
