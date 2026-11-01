@@ -198,8 +198,13 @@ async function readJSON<T>(path: string, signal: AbortSignal): Promise<T> {
     method: 'GET', cache: 'no-store', credentials: 'omit',
     headers: { Accept: 'application/json' }, signal,
   });
-  if (!response.ok) throw new Error('职位数据暂时无法读取，请稍后重试');
-  return response.json() as Promise<T>;
+  if (!response.ok) throw new Error('招聘数据接口暂不可用（HTTP '+response.status+'），请稍后重试。');
+  // Cloudflare Pages serves index.html for missing SPA paths. Never try to
+  // parse that HTML as JSON or misreport an unavailable feed as zero jobs.
+  if (!(response.headers.get('content-type') || '').toLowerCase().includes('json'))
+    throw new Error('招聘数据接口未接通：服务器返回网页而非岗位 JSON，请检查 Cloudflare 静态岗位构建。');
+  try { return await response.json() as T; }
+  catch { throw new Error('招聘数据返回格式错误，请检查已发布的岗位索引。'); }
 }
 // White HHBA on Railway uses the same source-validated snapshot and search facets
 // as GitHub Pages, proxied by our own read-only /data/ route during migration.
@@ -237,7 +242,13 @@ async function previewSnapshot(signal:AbortSignal):Promise<LivePage> {
   if(!cachedSnapshot) {
     const url=import.meta.env.BASE_URL+'data/jobs.json';
     cachedSnapshot=fetch(url,{method:'GET',headers:{Accept:'application/json'},cache:'no-store',credentials:'omit'})
-      .then(async response=>{if(!response.ok)throw new Error('岗位数据快照尚未更新');return response.json() as Promise<LivePage>})
+      .then(async response=>{
+        if(!response.ok)throw new Error('岗位数据快照未发布（HTTP '+response.status+'）');
+        if(!(response.headers.get('content-type')||'').toLowerCase().includes('json'))
+          throw new Error('岗位数据快照未发布：服务器返回 HTML 而不是 JSON');
+        try{return await response.json() as LivePage;}
+        catch{throw new Error('岗位数据快照 JSON 格式错误');}
+      })
       .then(data=>{
         if(!Array.isArray(data.jobs) || !Number.isInteger(data.total) ||
           !Number.isFinite(Date.parse(data.updated)) || data.failures!==0)
