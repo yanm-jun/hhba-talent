@@ -1,0 +1,796 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-091",
+  "name": "虎牙",
+  "displayName": "广州虎牙科技有限公司 / HUYA",
+  "englishName": "HUYA",
+  "aliases": [
+    "虎牙直播",
+    "HUYA",
+    "虎牙集团",
+    "虎牙2027秋招",
+    "虎牙佛山总部"
+  ],
+  "industry": "游戏直播 · 电竞赛事 · 游戏发行 · 多模态AI · 互联网研发",
+  "subtitle": "2027校招：佛山、广州、深圳、上海、武汉",
+  "overview": "虎牙在2027届校招中将自己定位为综合游戏生态服务商，覆盖游戏直播、赛事版权、游戏发行和AI研发。南开大学就业平台2026年10月9日转载的简章列出31个具体职位，毕业时间2026年9月至2027年8月，简历投递原截至2026年10月31日。个别高校系统记录不同截止日期，不能推断官方统一延期。",
+  "lastReviewed": "2026-11-01",
+  "sources": [
+    "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+    "https://hr.huya.com/home",
+    "https://hr.huya.com/campusRecruit/index",
+    "https://www.career.zju.edu.cn/jyxt/sczp/zpztgl/ckZpgwXq.zf?zpxxbh=5D60C34485444E1EE0653A68DD0E9B18",
+    "https://www.gzasc.edu.cn/jsj/info/1685/19719.htm"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-091/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-091/photo1.svg",
+        "caption": "虎牙真实场景待核；原图为非实景示意",
+        "alt": "虎牙业务示意，不是实际公司照片",
+        "note": "非实景：本次预览从来源确切的佛山总部及HUYA办公建筑照片尝试替换，需独立尺寸与SHA256核验；商业转载许可未核。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-091/photo2.svg",
+        "caption": "虎牙真实场景待核；原图为非实景示意",
+        "alt": "虎牙业务示意，不是实际公司照片",
+        "note": "非实景：本次预览从来源确切的佛山总部及HUYA办公建筑照片尝试替换，需独立尺寸与SHA256核验；商业转载许可未核。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://hr.huya.com/campusRecruit/index",
+    "label": "虎牙2027届官方校园招聘",
+    "status": "official_portal",
+    "subject": "广州虎牙科技有限公司及各业务用人单位",
+    "note": "公司2027官方简章公布31个岗位名称，投递期至2026-10-31；其他高校招聘平台标注的更晚日期不能直接证明开放，当前岗位是否仍可投递需回官网确认。"
+  },
+  "majorIntro": "本页31条职位均出自高校转载的虎牙2027届正式招聘清单。学历专业为关联建议，筛选只能出现相关单条职位，不返回企业其他职位，也不把具体城市从总招聘城市列表误赋给单职位。",
+  "preferredMajors": [
+    "人工智能",
+    "计算机科学与技术",
+    "软件工程",
+    "数据科学与大数据技术",
+    "统计学",
+    "视觉传达设计",
+    "数字媒体艺术",
+    "广播电视编导",
+    "新闻学",
+    "传播学",
+    "市场营销",
+    "会计学",
+    "审计学",
+    "人力资源管理"
+  ],
+  "photoNote": "优先选择佛山官方媒体的虎牙佛山HUYA SPACE总部外景和建筑设计公司Gensler的HUYA办公实景；跨年份/地点需要分别注明。",
+  "business": [
+    {
+      "title": "游戏直播与玩家社区",
+      "description": "运营虎牙游戏直播服务、主播创作者及观众互动社区，为核心玩家提供内容和交流环境。 企业业务涉及多个公司与团队，具体招聘岗位及城市以正式用人部门为准。",
+      "tags": "直播 · 社区",
+      "details": [
+        "游戏直播及分发",
+        "主播生态",
+        "玩家社区互动"
+      ]
+    },
+    {
+      "title": "电竞赛事与版权",
+      "description": "围绕电竞赛事的转播、版权合作、赛事运营、市场传播及商业化开展活动。 企业业务涉及多个公司与团队，具体招聘岗位及城市以正式用人部门为准。",
+      "tags": "电竞 · 赛事",
+      "details": [
+        "电竞赛事运营",
+        "赛事商务赞助",
+        "赛事内容制作"
+      ]
+    },
+    {
+      "title": "游戏发行和联运",
+      "description": "通过合作发行、游戏运营、用户增长及自主研发等方式拓展游戏生态。 企业业务涉及多个公司与团队，具体招聘岗位及城市以正式用人部门为准。",
+      "tags": "游戏 · 运营",
+      "details": [
+        "合作游戏联运",
+        "发行及玩家服务",
+        "游戏内容策划"
+      ]
+    },
+    {
+      "title": "多模态AI产品研发",
+      "description": "探索视频生成、语音大模型、推荐搜索和数字人等AI相关产品及推理基础设施。 企业业务涉及多个公司与团队，具体招聘岗位及城市以正式用人部门为准。",
+      "tags": "AI · 多模态",
+      "details": [
+        "视频和语音模型",
+        "游戏AI交互",
+        "数字人技术"
+      ]
+    },
+    {
+      "title": "研发与数据平台",
+      "description": "建设Web、移动、Java后台、机器学习数据平台及服务可靠性和软件测试体系。 企业业务涉及多个公司与团队，具体招聘岗位及城市以正式用人部门为准。",
+      "tags": "研发 · 数据",
+      "details": [
+        "互联网应用研发",
+        "数据工程",
+        "SRE与测试"
+      ]
+    },
+    {
+      "title": "产品体验及企业管理",
+      "description": "开展产品经理、AI设计、直播运营、人力培养、财务应用和内部控制等职能。 企业业务涉及多个公司与团队，具体招聘岗位及城市以正式用人部门为准。",
+      "tags": "产品 · 职能",
+      "details": [
+        "AI产品与用户体验",
+        "人力学习发展",
+        "财务及内部审计"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "huya-2027-01",
+      "title": "2027届｜大模型算法工程师",
+      "category": "AI / 大模型",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“大模型算法工程师”这一具体职位。该岗位归属招聘简章的算法技术序列。其专业工作可能涉及AI或多模态技术，但简章未逐岗列明模型框架、代码语言或绩效指标，不应臆造要求。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-02",
+      "title": "2027届｜多模态视频生成算法工程师",
+      "category": "AI / 视频算法",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“多模态视频生成算法工程师”这一具体职位。该岗位归属招聘简章的算法技术序列。其专业工作可能涉及AI或多模态技术，但简章未逐岗列明模型框架、代码语言或绩效指标，不应臆造要求。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "数字媒体技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-03",
+      "title": "2027届｜AIGC语音大模型算法工程师",
+      "category": "AI / 语音算法",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“AIGC语音大模型算法工程师”这一具体职位。该岗位归属招聘简章的算法技术序列。其专业工作可能涉及AI或多模态技术，但简章未逐岗列明模型框架、代码语言或绩效指标，不应臆造要求。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-04",
+      "title": "2027届｜图像算法工程师",
+      "category": "AI / 图像算法",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“图像算法工程师”这一具体职位。该岗位归属招聘简章的算法技术序列。其专业工作可能涉及AI或多模态技术，但简章未逐岗列明模型框架、代码语言或绩效指标，不应臆造要求。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "人工智能",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-05",
+      "title": "2027届｜语音大模型算法工程师",
+      "category": "AI / 语音模型",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“语音大模型算法工程师”这一具体职位。该岗位归属招聘简章的算法技术序列。其专业工作可能涉及AI或多模态技术，但简章未逐岗列明模型框架、代码语言或绩效指标，不应臆造要求。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "通信工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-06",
+      "title": "2027届｜算法工程师-搜推广方向",
+      "category": "AI / 搜推广",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“算法工程师-搜推广方向”这一具体职位。该岗位归属招聘简章的算法技术序列。其专业工作可能涉及AI或多模态技术，但简章未逐岗列明模型框架、代码语言或绩效指标，不应臆造要求。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "数据科学与大数据技术",
+        "统计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-07",
+      "title": "2027届｜全栈开发工程师",
+      "category": "技术 / 全栈",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“全栈开发工程师”这一具体职位。属于招聘简章技术类职位，岗位涉及互联网研发、测试、平台服务与系统交付中的相应方向；具体编程语言、技术栈及任职门槛需要单岗位JD确认。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-08",
+      "title": "2027届｜应用开发工程师",
+      "category": "技术 / 应用",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“应用开发工程师”这一具体职位。属于招聘简章技术类职位，岗位涉及互联网研发、测试、平台服务与系统交付中的相应方向；具体编程语言、技术栈及任职门槛需要单岗位JD确认。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-09",
+      "title": "2027届｜后台开发工程师",
+      "category": "技术 / 后台",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“后台开发工程师”这一具体职位。属于招聘简章技术类职位，岗位涉及互联网研发、测试、平台服务与系统交付中的相应方向；具体编程语言、技术栈及任职门槛需要单岗位JD确认。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-10",
+      "title": "2027届｜AI推理后台开发工程师",
+      "category": "技术 / AI推理",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“AI推理后台开发工程师”这一具体职位。属于招聘简章技术类职位，岗位涉及互联网研发、测试、平台服务与系统交付中的相应方向；具体编程语言、技术栈及任职门槛需要单岗位JD确认。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-11",
+      "title": "2027届｜移动端开发工程师",
+      "category": "技术 / 移动端",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“移动端开发工程师”这一具体职位。属于招聘简章技术类职位，岗位涉及互联网研发、测试、平台服务与系统交付中的相应方向；具体编程语言、技术栈及任职门槛需要单岗位JD确认。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-12",
+      "title": "2027届｜Java后台开发工程师",
+      "category": "技术 / Java",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“Java后台开发工程师”这一具体职位。属于招聘简章技术类职位，岗位涉及互联网研发、测试、平台服务与系统交付中的相应方向；具体编程语言、技术栈及任职门槛需要单岗位JD确认。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-13",
+      "title": "2027届｜Web开发工程师",
+      "category": "技术 / Web",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“Web开发工程师”这一具体职位。属于招聘简章技术类职位，岗位涉及互联网研发、测试、平台服务与系统交付中的相应方向；具体编程语言、技术栈及任职门槛需要单岗位JD确认。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-14",
+      "title": "2027届｜机器学习平台研发工程师",
+      "category": "技术 / 机器学习",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“机器学习平台研发工程师”这一具体职位。属于招聘简章技术类职位，岗位涉及互联网研发、测试、平台服务与系统交付中的相应方向；具体编程语言、技术栈及任职门槛需要单岗位JD确认。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-15",
+      "title": "2027届｜数据开发工程师",
+      "category": "数据 / 开发",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“数据开发工程师”这一具体职位。属于招聘简章技术或数据序列，方向与数据工程、分析业务相关，具体业务线、城市和工具技能必须以官方职位页核对。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "数据科学与大数据技术",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-16",
+      "title": "2027届｜SRE开发工程师",
+      "category": "技术 / SRE",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“SRE开发工程师”这一具体职位。属于招聘简章技术类职位，岗位涉及互联网研发、测试、平台服务与系统交付中的相应方向；具体编程语言、技术栈及任职门槛需要单岗位JD确认。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "网络工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-17",
+      "title": "2027届｜测试开发工程师",
+      "category": "技术 / 测试",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“测试开发工程师”这一具体职位。属于招聘简章技术类职位，岗位涉及互联网研发、测试、平台服务与系统交付中的相应方向；具体编程语言、技术栈及任职门槛需要单岗位JD确认。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-18",
+      "title": "2027届｜数据分析师",
+      "category": "数据 / 分析",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“数据分析师”这一具体职位。属于招聘简章技术或数据序列，方向与数据工程、分析业务相关，具体业务线、城市和工具技能必须以官方职位页核对。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "统计学",
+        "数据科学与大数据技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-19",
+      "title": "2027届｜产品经理",
+      "category": "产品 / 互联网",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“产品经理”这一具体职位。该岗位为虎牙2027正式简章列明的产品、运营、电竞或企业职能职位，不能把相关业务方向或岗位名称误称为已公开详尽JD。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-20",
+      "title": "2027届｜产品运营",
+      "category": "产品 / 运营",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“产品运营”这一具体职位。该岗位为虎牙2027正式简章列明的产品、运营、电竞或企业职能职位，不能把相关业务方向或岗位名称误称为已公开详尽JD。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子商务",
+        "市场营销"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-21",
+      "title": "2027届｜游戏策划",
+      "category": "游戏 / 策划",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“游戏策划”这一具体职位。该岗位为虎牙2027正式简章列明的产品、运营、电竞或企业职能职位，不能把相关业务方向或岗位名称误称为已公开详尽JD。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "数字媒体技术",
+        "游戏设计",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-22",
+      "title": "2027届｜内容运营",
+      "category": "内容 / 运营",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“内容运营”这一具体职位。该岗位为虎牙2027正式简章列明的产品、运营、电竞或企业职能职位，不能把相关业务方向或岗位名称误称为已公开详尽JD。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "新闻学",
+        "传播学",
+        "市场营销"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-23",
+      "title": "2027届｜赛事运营",
+      "category": "电竞 / 运营",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“赛事运营”这一具体职位。该岗位为虎牙2027正式简章列明的产品、运营、电竞或企业职能职位，不能把相关业务方向或岗位名称误称为已公开详尽JD。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "体育产业管理",
+        "传播学",
+        "市场营销"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-24",
+      "title": "2027届｜赛事商务",
+      "category": "电竞 / 商务",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“赛事商务”这一具体职位。该岗位为虎牙2027正式简章列明的产品、运营、电竞或企业职能职位，不能把相关业务方向或岗位名称误称为已公开详尽JD。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工商管理",
+        "市场营销"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-25",
+      "title": "2027届｜AI短视频编导",
+      "category": "视频 / AI编导",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“AI短视频编导”这一具体职位。该岗位为虎牙2027正式简章列明的产品、运营、电竞或企业职能职位，不能把相关业务方向或岗位名称误称为已公开详尽JD。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "广播电视编导",
+        "数字媒体艺术",
+        "传播学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-26",
+      "title": "2027届｜AI视觉设计师",
+      "category": "设计 / AI视觉",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“AI视觉设计师”这一具体职位。该岗位为虎牙校招明示的AI设计职位，设计工具、AI创作工作流及作品集要求尚未逐岗公布，不能推定所有艺术专业具备录用资格。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "视觉传达设计",
+        "数字媒体艺术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-27",
+      "title": "2027届｜AI体验设计师",
+      "category": "设计 / AI交互",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“AI体验设计师”这一具体职位。该岗位为虎牙校招明示的AI设计职位，设计工具、AI创作工作流及作品集要求尚未逐岗公布，不能推定所有艺术专业具备录用资格。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "交互设计",
+        "工业设计",
+        "数字媒体艺术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-28",
+      "title": "2027届｜学习发展专员",
+      "category": "职能 / 人力",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“学习发展专员”这一具体职位。该岗位为虎牙2027正式简章列明的产品、运营、电竞或企业职能职位，不能把相关业务方向或岗位名称误称为已公开详尽JD。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人力资源管理",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-29",
+      "title": "2027届｜AI财务应用专员",
+      "category": "职能 / 财务AI",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“AI财务应用专员”这一具体职位。该岗位为虎牙2027正式简章列明的产品、运营、电竞或企业职能职位，不能把相关业务方向或岗位名称误称为已公开详尽JD。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "财务管理",
+        "会计学",
+        "人工智能"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-30",
+      "title": "2027届｜内审内控专员",
+      "category": "职能 / 内审",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“内审内控专员”这一具体职位。该岗位为虎牙2027正式简章列明的产品、运营、电竞或企业职能职位，不能把相关业务方向或岗位名称误称为已公开详尽JD。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "审计学",
+        "会计学",
+        "法学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "huya-2027-31",
+      "title": "2027届｜活动策划及宣传专员",
+      "category": "职能 / 宣传",
+      "city": "佛山、广州、深圳、上海或武汉（单岗具体工作城市待官网确认）",
+      "summary": "南开大学转载虎牙2027届秋季校园招聘简章，确实列明“活动策划及宣传专员”这一具体职位。该岗位为虎牙2027正式简章列明的产品、运营、电竞或企业职能职位，不能把相关业务方向或岗位名称误称为已公开详尽JD。 本条不是根据公司业务范围推断出来的虚构职位。",
+      "requirements": "招聘正式简章面向2026年9月至2027年8月毕业的应届生，明确可同时申请两岗。该公开简章未逐岗提供学历、专业门槛、薪资、岗位编号和具体工作城市，因此仅将相关专业列作关联建议；官方公布简历投递至2026年10月31日，其他高校记录有11月30日/12月31日不同字段，不能确认原官方批次延期。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "新闻学",
+        "市场营销",
+        "广告学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届毕业窗口；单岗位学历资格须查看官网",
+      "url": "https://hr.huya.com/campusRecruit/index",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119582.html",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州虎牙科技有限公司2027秋季校招（具体法人和城市按JD）",
+      "currentOpenVerified": false
+    }
+  ]
+}
