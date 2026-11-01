@@ -204,7 +204,7 @@
     }
   ],
   "critical": "Only direct government 2026 source records are in nationwide formal data. Qinghai five SZYF entries are province-wide past-window research locators, not independent local cash policies. Secondary and obsolete rules must not claim official housing or live vacancies.",
-  "officiallyIndexedPolicyCount": 6,
+  "officiallyIndexedPolicyCount": 7,
   "officiallyIndexedHousingCount": 5,
   "policyLeadsNotOfficiallyIndexed": 15,
   "housingLeadsNotOfficiallyIndexed": 17,
@@ -242,7 +242,6 @@
     "海北"
   ],
   "policyRemainingCities": [
-    "泸州",
     "宜宾",
     "巴中",
     "资阳",
@@ -259,7 +258,8 @@
     "绵阳",
     "遂宁",
     "内江",
-    "甘孜"
+    "甘孜",
+    "泸州"
   ],
   "housingOfficialCities": [
     "抚顺",
@@ -270,7 +270,7 @@
   "qualityLimitation": "5 government-source housing records cover 4 cities (Benxi has two distinct programs). Formal coverage is NOT 5 cities. 15 policy city gaps and 29 housing city gaps remain. New 2026 talent apartment notice of Benxi is a HISTORICAL admission announcement, not live vacancy. Some government domains still require manual original-document inspection. Additional Wuzhou 2026 October rental-subsidy notice is a media reprint, preserved as RESEARCH ONLY until local government original is verified.",
   "sichuanPolicyStatus": {
     "baseCityCoverage": 11,
-    "direct2026GovernmentSourceCityCount": 6,
+    "direct2026GovernmentSourceCityCount": 7,
     "addedCityDetails": [
       {
         "city": "攀枝花",
@@ -303,6 +303,7 @@
         "regionalLimit": "特定区域"
       }
     ],
-    "warnings": "2026 historical recruitment and a narrow industry-specific coupon cannot be represented as a universal talent cash subsidy. External pages have intermittent direct-open errors; retain B/C grade and source audit warnings. Other Sichuan city original notices remain to verify."
+    "warnings": "2026 historical recruitment and a narrow industry-specific coupon cannot be represented as a universal talent cash subsidy. External pages have intermittent direct-open errors; retain B/C grade and source audit warnings. Other Sichuan city original notices remain to verify.",
+    "officialSourceOperatorException": "Luzhou official exam organization portal exact one signed 2026 announcement. Narrowly registered in quality source classification; excludes third-party reprints."
   }
 }

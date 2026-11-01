@@ -57,6 +57,11 @@ export function talentSourceKind(raw:string):TalentSourceKind{
   const host=url.hostname.toLowerCase();
   if(!host||host==='localhost'||host.endsWith('.localhost')||host==='example.com')return 'unverified';
   if(host==='gov.cn'||host.endsWith('.gov.cn'))return 'government';
+  // Narrow exact-page official operator exception: 泸州市人事考试网 is organized by
+  // 泸州市人力资源综合服务中心 (footer identifies its legal organizer). Only the
+  // original signed 2026 spring talent announcement is evaluated as official.
+  if((host==='www.lzsrsks.cn'||host==='lzsrsks.cn')&&
+     url.pathname==='/web/info/detail/8ac981829d235619019d76702e4f02c7')return 'government';
   // Scoped exception: www.zoupingrc.cn is the official talent site explicitly operated
   // by 邹平市人力资源和社会保障局 (public footer + signed 2026 announcements).
   // Approve only its official /ywdt/ announcements; no other non-gov domain is trusted.
