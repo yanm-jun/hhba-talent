@@ -39,7 +39,15 @@ check('Media-sourced purchase installments, monthly rental and six districts sta
  for(const p of [purchase,rent]){assert.ok(p.eligibility.includes('2023年1月1日')&&p.eligibility.includes('半年'));assert.ok(p.eligibility.includes('南和区'));assert.ok(p.applicationSteps.length>=6);assert.equal(assessPolicy(p,'2026-10-31').grade,'B');}
 });
 check('Four 2026 public-rental and talent-housing research leads are not verified vacancies',()=>{
- assert.equal(leads.length,4);
+ // Retain the four previously verified research entries; allow additional
+ // 2026 source-labelled leads without treating them as vacant housing.
+ assert.equal(leads.filter(x=>lids.includes(x.id)).length,4,'Original four Xingtai leads must remain');
+ assert.equal(new Set(leads.map(x=>x.id)).size,leads.length,'Duplicate Xingtai research lead IDs');
+ for(const extra of leads.filter(x=>!lids.includes(x.id))){
+  assert.notEqual(talentSourceKind(extra.sourceUrl),'government','Research is not a city government original');
+  assert.ok(extra.steps.length>=4&&extra.statusNote.length>=35,'Additional evidence must explain limits and applicant steps');
+  assert.ok(!homes.some(h=>h.id===extra.id),'Unverified extra evidence must remain outside official housing records');
+ }
  assert.equal(homes.length,0,'No original municipal verified apartment project source was located');
  for(const id of lids){const r=leads.find(x=>x.id===id);assert.ok(r,id);assert.ok(r.steps.length>=4);assert.ok(r.statusNote.includes('待核验')||r.statusNote.includes('未核验'));assert.notEqual(talentSourceKind(r.sourceUrl),'government');assert.ok(!homes.some(h=>h.id===id));}
  assert.ok(leads.find(x=>x.id===lids[0]).units.includes('488套')&&leads.find(x=>x.id===lids[0]).statusNote.includes('非实时'));
