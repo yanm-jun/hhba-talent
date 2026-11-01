@@ -1,3 +1,4 @@
+import {HOUSING_TEN_CITY_OFFICIAL_RECORDS_20261101} from './housingTenCityOfficialRecords20261101.ts';
 import {SICHUAN_HOUSING_GAP_2026_COUNTY_OFFICIAL} from './sichuanHousingGap2026CountyOfficial.ts';
 import {SICHUAN_HOUSING_GAP_2026_OFFICIAL} from './sichuanHousingGapOfficial2026.ts';
 import {TALENT_2026_HOUSING_GAP_RECORDS} from './talent2026HousingGapRecords.ts';
@@ -67,6 +68,7 @@ import {WEIFANG_HOUSING_RECORDS} from './weifangHousingRecords.ts';
 export type TalentHousingRecord={id:string;city:string;district:string;title:string;address:string;units:string;rent:string;eligibility:string;sourceUrl:string;published:string;applicationEnd?:string;statusNote:string;steps:string[];applyUrl?:string;kind:'project'|'program';reviewedAt:string;contactPhone?:string;contactSourceUrl?:string;photoEvidence?:'source';housingCategory?:'人才公寓'|'公共租赁住房'|'保障性租赁住房'|'其他住房';};
 export const HOUSING_REVIEW_DATE='2026-10-30';
 export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
+ ...HOUSING_TEN_CITY_OFFICIAL_RECORDS_20261101,
  ...TALENT_2026_HOUSING_GAP_RECORDS,
  ...XINJIANG_HOUSING_RECORDS,
  ...GANSU_HOUSING_BATCH_RECORDS,

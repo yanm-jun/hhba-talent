@@ -75,5 +75,7 @@ jobs:
         run: node --experimental-strip-types scripts/test-housing-26-regions-20261101.mjs
       - name: Audit six Sichuan housing gaps against formal and clearly marked research data
         run: node --experimental-strip-types scripts/test-sichuan-six-housing-20261101.mjs
+      - name: Ten missing-city housing evidence quality and false-live-availability regression
+        run: node --experimental-strip-types scripts/test-ten-housing-gaps-2026.mjs
       - name: Confirm static build
         run: npm run build
