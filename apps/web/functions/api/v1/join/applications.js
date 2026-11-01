@@ -1,4 +1,4 @@
-import {JOIN_INBOX,mailReady,sendMail,validEmail} from '../_lib/mail.js';
+import {JOIN_INBOX,mailReady,sendMail,validEmail} from '../../../_lib/mail.js';
 const enc=new TextEncoder();
 const response=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'private, no-store','x-content-type-options':'nosniff'}});
 const err=(s,detail)=>response({detail},s);
@@ -57,4 +57,5 @@ export async function onRequestPost({request,env}) {
    }
  }catch(error){console.error('HHBA_JOIN_DB_ERROR',String(error).slice(0,200));return err(503,'申请系统暂不可用，未确认提交成功。');}
 }
+export const onRequestGet=({env})=>response({ready:env.HHBA_JOIN_INTAKE_ENABLED==='1'&&!!env.HHBA_JOIN_DB&&mailReady(env),recipient_configured:true});
 export const onRequestOptions=()=>new Response(null,{status:405});
