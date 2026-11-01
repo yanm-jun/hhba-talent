@@ -38,7 +38,22 @@ check('Separately retain the actual talent-apartment management operator but do 
  assert.ok(h.statusNote.includes('待核验')&&h.steps.length>=4);
  assert.notEqual(talentSourceKind(h.sourceUrl),'government');
  assert.ok(!homes.some(x=>x.id===h.id));
- assert.equal(leads.length,6);
+ // Six legacy leads must remain, while source-qualified newer research may be added.
+ const known=new Set([
+  'hz-mudan-20260930-longtian-lead',
+  'hz-mudan-20260930-yiwu-lead',
+  'hz-mudan-20260930-zhongfu-lead',
+  'hz-mudan-20260930-shuangjing-lead',
+  'hz-mudan-20260930-shidai-lead',
+  'hz-talent-apartment-operator-lead'
+ ]);
+ assert.equal(leads.filter(x=>known.has(x.id)).length,6,'the six historical leads must remain');
+ assert.equal(new Set(leads.map(x=>x.id)).size,leads.length,'duplicate research lead IDs');
+ for(const extra of leads.filter(x=>!known.has(x.id))){
+  assert.notEqual(talentSourceKind(extra.sourceUrl),'government','secondary lead must not be misrepresented as government');
+  assert.ok(extra.statusNote&&extra.steps.length>=4,'new leads require complete warning and applicant verification steps');
+  assert.ok(!homes.some(h=>h.id===extra.id),'pending research must not become a verified housing project');
+ }
 });
 check('Four shared B/C guides include distinct beneficiaries, real procedures and source quality caveats',()=>{
  for(const g of [hezeLivingGuide,hezePurchaseGuide,hezeStartupGuide,hezeHousingGuide]){
