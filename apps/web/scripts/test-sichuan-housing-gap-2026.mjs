@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {SICHUAN_HOUSING_GAP_2026_OFFICIAL} from '../src/data/sichuanHousingGapOfficial2026.ts';
 import {TALENT_HOUSING_RECORDS} from '../src/data/talentHousingRecords.ts';
 
-const required = ['广安','巴中','泸州','宜宾','资阳'];
+const required = ['广安','巴中','宜宾','资阳'];
 assert.equal(SICHUAN_HOUSING_GAP_2026_OFFICIAL.length,required.length);
 const ids = new Set();
 for (const city of required) {
@@ -23,10 +23,9 @@ for (const city of ['广安','巴中']) {
   assert.equal(item.housingCategory,'公共租赁住房');
   assert.ok(item.sourceUrl.includes('.gov.cn'),'district public rental rules must cite official government originals');
 }
-const luzhou=SICHUAN_HOUSING_GAP_2026_OFFICIAL.find(x=>x.city==='泸州');
-assert.match(luzhou.statusNote,/市委组织部/,'must disclose that it is government-authored media text, not government original implementation rules');
+assert.ok(!SICHUAN_HOUSING_GAP_2026_OFFICIAL.some(x=>x.city==='泸州'),'news platform must remain research, not formal records');
 const yibin=SICHUAN_HOUSING_GAP_2026_OFFICIAL.find(x=>x.city==='宜宾');
 assert.match(yibin.statusNote,/超时/,'must preserve official SPA verification blocker');
 const ziyang=SICHUAN_HOUSING_GAP_2026_OFFICIAL.find(x=>x.city==='资阳');
 assert.match(ziyang.statusNote,/超时/,'must preserve inaccessible original document blocker');
-console.log('Sichuan housing gap source and scope data tests passed: 5 added records, all marked non-vacancy. Public portal original-source verification is separately pending.');
+console.log('Sichuan housing gap source and scope data tests passed: 4 added records, all marked non-vacancy. Public portal original-source verification is separately pending.');
