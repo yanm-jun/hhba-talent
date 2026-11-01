@@ -1,3 +1,5 @@
+import {QINGHAI_POLICY_RECORDS} from './qinghaiPolicyRecords.ts';
+import {QINGHAI_SHARED_POLICY_RECORDS} from './qinghaiSharedPolicies.ts';
 import {NINGXIA_POLICY_RECORDS} from './ningxiaPolicyRecords.ts';
 import {GUIZHOU_POLICY_RECORDS} from './guizhouPolicyRecords.ts';
 import {SICHUAN_POLICY_RECORDS} from './sichuanPolicyRecords.ts';
@@ -68,6 +70,8 @@ export type TalentPolicyRecord={
 };
 export const TALENT_POLICY_REVIEW_DATE='2026-10-30';
 export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
+ ...QINGHAI_POLICY_RECORDS,
+ ...QINGHAI_SHARED_POLICY_RECORDS,
  ...NINGXIA_POLICY_RECORDS,
  ...GUIZHOU_POLICY_RECORDS,
  ...SICHUAN_POLICY_RECORDS,
