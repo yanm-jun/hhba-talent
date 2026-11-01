@@ -321,10 +321,11 @@
       "巴中",
       "宜宾",
       "资阳",
-      "甘孜"
+      "甘孜",
+      "泸州"
     ],
-    "newlyAddedOfficialRecordCount": 5,
-    "remainMissingHousingCities": 35,
+    "newlyAddedOfficialRecordCount": 6,
+    "remainMissingHousingCities": 34,
     "remainingByProvince": {
       "河北省": [
         "邢台"
@@ -357,7 +358,6 @@
       ],
       "四川省": [
         "攀枝花",
-        "泸州",
         "绵阳",
         "遂宁",
         "内江",
@@ -384,7 +384,7 @@
       "资阳"
     ],
     "sourceLimit": "Government domain / exact whitelisted official original source classification and integration passing CI does not prove original page accessible, project availability, current applicants, actual rent, or full A-grade guidance.",
-    "ci": "https://github.com/yanm-jun/hhba-talent/actions/runs/41307505853",
+    "ci": "待最新分支CI复核，不沿用此前成功结果",
     "detail": "docs/TALENT_SICHUAN_HOUSING_BATCH2_20261101.md",
     "newlyAddedOfficialHousingNote": "Ganzi 2026 county-level independent original is Luding ONLY; other Ganzi prefecture counties and live apartments not comprehensively verified.",
     "focus26": {
@@ -395,6 +395,26 @@
       "guangxiRemaining": 12,
       "guizhouRemaining": 7,
       "detail": "docs/TALENT_HOUSING_26REGIONS_EVIDENCE_MATRIX_20261101.json"
+    },
+    "sichuan20261101": {
+      "reductionOnlyCodeRecord": "泸州政府2023跨省公开公租房文件",
+      "historicalRuleNotVerified2026": true,
+      "remainingNoFormalHousingRecord": [
+        "攀枝花",
+        "绵阳",
+        "遂宁",
+        "内江",
+        "凉山"
+      ],
+      "researchCardsAdded": [
+        "攀枝花",
+        "绵阳",
+        "遂宁",
+        "内江",
+        "凉山"
+      ],
+      "notice": "代码层面的非零不等于住房政策已完整补齐，2026原件、项目、空房仍需核实",
+      "details": "docs/TALENT_SICHUAN_SIX_HOUSING_20261101.md"
     }
   }
 }
