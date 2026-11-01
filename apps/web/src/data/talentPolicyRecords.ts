@@ -1,3 +1,8 @@
+import {XINJIANG_POLICY_RECORDS} from './xinjiangPolicyRecords.ts';
+import {GANSU_EXPANDED_POLICY_RECORDS} from './gansuExpandedPolicyRecords.ts';
+import {GANSU_POLICY_RECORDS} from './gansuPolicyRecords.ts';
+import {SHAANXI_POLICY_RECORDS} from './shaanxiPolicyRecords.ts';
+import {XIZANG_POLICY_RECORDS} from './xizangPolicyRecords.ts';
 import {QINGHAI_POLICY_RECORDS} from './qinghaiPolicyRecords.ts';
 import {QINGHAI_SHARED_POLICY_RECORDS} from './qinghaiSharedPolicies.ts';
 import {NINGXIA_POLICY_RECORDS} from './ningxiaPolicyRecords.ts';
@@ -70,6 +75,11 @@ export type TalentPolicyRecord={
 };
 export const TALENT_POLICY_REVIEW_DATE='2026-10-30';
 export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
+ ...XINJIANG_POLICY_RECORDS,
+ ...GANSU_EXPANDED_POLICY_RECORDS,
+ ...GANSU_POLICY_RECORDS,
+ ...SHAANXI_POLICY_RECORDS,
+ ...XIZANG_POLICY_RECORDS,
  ...QINGHAI_POLICY_RECORDS,
  ...QINGHAI_SHARED_POLICY_RECORDS,
  ...NINGXIA_POLICY_RECORDS,
