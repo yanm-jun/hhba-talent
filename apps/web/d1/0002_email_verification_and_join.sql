@@ -30,3 +30,10 @@ CREATE TABLE IF NOT EXISTS join_applications (
  consent_version TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_join_applications_created ON join_applications(created_at);
+
+-- Server-enforced submission throttling. Applicant addresses never form the D1 rate key.
+CREATE TABLE IF NOT EXISTS join_rate_limits (
+ rate_key TEXT PRIMARY KEY NOT NULL,
+ window_start INTEGER NOT NULL,
+ hits INTEGER NOT NULL
+);
