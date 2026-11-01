@@ -1,3 +1,4 @@
+import {mailReady,sendMail,testAddress,validEmail} from './mail.js';
 const enc = new TextEncoder();
 const MAX_BODY_BYTES = 8192;
 const SESSION_SECONDS = 604800;
@@ -21,7 +22,7 @@ async function passwordHash(password,salt,iterations=HASH_ITERATIONS){
  const key=await crypto.subtle.importKey('raw',enc.encode(password),'PBKDF2',false,['deriveBits']);
  return hex(new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:fromHex(salt),iterations},key,256)));
 }
-const emailValid=v=>typeof v==='string'&&v.length>=5&&v.length<=254&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+const emailValid=validEmail;
 const passwordValid=v=>typeof v==='string'&&v.length>=12&&v.length<=128&&enc.encode(v).length<=512;
 function enabled(context){
  const host=new URL(context.request.url).hostname;
@@ -63,22 +64,105 @@ async function newSession(db,userId){
  await db.prepare('INSERT INTO auth_sessions(token_hash,user_id,csrf_token,created_at,expires_at) VALUES(?,?,?,?,?)').bind(await sha256(token),userId,csrf,ts,ts+SESSION_SECONDS).run();
  return reply({csrf_token:csrf},200,{'set-cookie':COOKIE_NAME+'='+token+'; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age='+SESSION_SECONDS});
 }
-async function register(db,req){
+// One-time email challenges: send only through verified server-side mail service.
+const CHALLENGE_TTL = 600;
+const challengeHash=async (env,email,purpose,code) => {
+ const key=await crypto.subtle.importKey('raw',enc.encode(env.HHBA_AUTH_CODE_PEPPER),'HMAC',false,['sign']);
+ return hex(new Uint8Array(await crypto.subtle.sign('HMAC',key,enc.encode(email+'|'+purpose+'|'+code))));
+};
+const sixDigit=()=>String(crypto.getRandomValues(new Uint32Array(1))[0] % 1000000).padStart(6,'0');
+const canSendCode=env=>mailReady(env)&&typeof env.HHBA_AUTH_CODE_PEPPER==='string'&&env.HHBA_AUTH_CODE_PEPPER.length>=32;
+async function sendChallenge(env,db,email,purpose) {
+ if(!canSendCode(env))throw Error('mail_not_configured');
+ const code=sixDigit(),ts=now(),id=crypto.randomUUID(),hash=await challengeHash(env,email,purpose,code);
+ await db.prepare('INSERT INTO auth_email_challenges(id,email,purpose,code_hash,expires_at,created_at) VALUES(?,?,?,?,?,?)')
+   .bind(id,email,purpose,hash,ts+CHALLENGE_TTL,ts).run();
+ try {
+  await sendMail(env,{to:email,subject:purpose==='verify'?'HHBA 邮箱验证代码':'HHBA 密码重置代码',
+   text:'你的 HHBA '+(purpose==='verify'?'注册验证':'密码重置')+'验证码为：'+code+'。有效期 10 分钟。如果不是你本人操作，请忽略此邮件。'});
+ } catch(e) {
+  await db.prepare('DELETE FROM auth_email_challenges WHERE id=?').bind(id).run();
+  throw e;
+ }
+}
+async function checkChallenge(env,db,email,purpose,code) {
+ const item=await db.prepare('SELECT * FROM auth_email_challenges WHERE email=? AND purpose=? AND used_at IS NULL ORDER BY created_at DESC LIMIT 1').bind(email,purpose).first();
+ if(!item||item.expires_at<=now()||item.attempts>=5)return false;
+ await db.prepare('UPDATE auth_email_challenges SET attempts=attempts+1 WHERE id=?').bind(item.id).run();
+ if(!safeEqual(item.code_hash,await challengeHash(env,email,purpose,code)))return false;
+ const result=await db.prepare('UPDATE auth_email_challenges SET used_at=? WHERE id=? AND used_at IS NULL AND attempts<=5').bind(now(),item.id).run();
+ return (result?.meta?.changes??1)>0;
+}
+const emailReply=()=>reply({ok:true,message:'如果账户存在且邮件服务已接通，验证邮件将发送到该地址。'});
+async function verifyEmail(env,db,req) {
+ const parsed=await mutation(req);if(parsed.error)return parsed.error;
+ const {email,code}=parsed.data,normalized=typeof email==='string'?email.trim().toLowerCase():'';
+ if(!emailValid(normalized)||!/^\\d{6}$/.test(code||''))return fail(400,'请填写邮箱和六位验证码。');
+ const limited=await throttle(db,req,normalized,'verify');if(limited)return limited;
+ if(!canSendCode(env))return fail(503,'邮件验证服务尚未接通。');
+ if(!await checkChallenge(env,db,normalized,'verify',code))return fail(400,'验证码不正确、已过期或超过尝试次数。');
+ await db.prepare('UPDATE auth_users SET email_verified_at=? WHERE email=?').bind(now(),normalized).run();
+ return reply({verified:true});
+}
+async function resendEmail(env,db,req) {
+ const parsed=await mutation(req);if(parsed.error)return parsed.error;
+ const email=typeof parsed.data.email==='string'?parsed.data.email.trim().toLowerCase():'';
+ if(!emailValid(email))return fail(400,'邮箱格式不正确。');
+ if(!canSendCode(env))return fail(503,'邮件发送服务尚未接通。');
+ const limited=await throttle(db,req,email,'mail');if(limited)return limited;
+ const u=await db.prepare('SELECT id,email_verified_at FROM auth_users WHERE email=?').bind(email).first();
+ if(u&&!u.email_verified_at)await sendChallenge(env,db,email,'verify');
+ return emailReply();
+}
+async function passwordResetRequest(env,db,req){
+ const parsed=await mutation(req);if(parsed.error)return parsed.error;
+ const email=typeof parsed.data.email==='string'?parsed.data.email.trim().toLowerCase():'';
+ if(!emailValid(email))return fail(400,'邮箱格式不正确。');
+ if(!canSendCode(env))return fail(503,'邮件发送服务尚未接通。');
+ const limited=await throttle(db,req,email,'reset');if(limited)return limited;
+ const u=await db.prepare('SELECT id,email_verified_at FROM auth_users WHERE email=?').bind(email).first();
+ if(u?.email_verified_at)await sendChallenge(env,db,email,'reset');
+ return emailReply();
+}
+async function resetPassword(env,db,req) {
+ const parsed=await mutation(req);if(parsed.error)return parsed.error;
+ const {email,code,password}=parsed.data,normalized=typeof email==='string'?email.trim().toLowerCase():'';
+ if(!emailValid(normalized)||!/^\\d{6}$/.test(code||'')||!passwordValid(password))return fail(400,'请检查邮箱、验证码和不少于 12 位的新密码。');
+ if(!canSendCode(env))return fail(503,'邮件发送服务尚未接通。');
+ const limited=await throttle(db,req,normalized,'verify');if(limited)return limited;
+ if(!await checkChallenge(env,db,normalized,'reset',code))return fail(400,'验证码不正确、已过期或超过尝试次数。');
+ const user=await db.prepare('SELECT id FROM auth_users WHERE email=? AND email_verified_at IS NOT NULL').bind(normalized).first();
+ if(!user)return fail(400,'验证码无效。');
+ const salt=randomHex(16),hash=await passwordHash(password,salt);
+ await db.batch([
+  db.prepare('UPDATE auth_users SET password_salt=?,password_hash=?,password_iterations=? WHERE id=?').bind(salt,hash,HASH_ITERATIONS,user.id),
+  db.prepare('DELETE FROM auth_sessions WHERE user_id=?').bind(user.id)
+ ]);
+ return reply({updated:true});
+}
+async function register(env,db,req){
  const input=await mutation(req);if(input.error)return input.error;
  const {email,password,display_name,account_type}=input.data;
  const normalized=typeof email==='string'?email.trim().toLowerCase():'';
  if(!emailValid(normalized)||!passwordValid(password)||typeof display_name!=='string'||display_name.trim().length<2||display_name.trim().length>60||!ROLES.has(account_type))return fail(400,'请检查邮箱、展示名称（2—60 字）和至少 12 位的密码。');
- if(!(normalized.endsWith('@example.test')||normalized.endsWith('@example.invalid')))return fail(403,'测试阶段仅接受 @example.test 或 @example.invalid 测试邮箱；请勿输入真实账号。');
+ const synthetic=testAddress(normalized);
+ if(!synthetic && !canSendCode(env))return fail(503,'真实邮箱验证暂未开通，请勿提交个人资料。');
  const limit=await throttle(db,req,normalized,'register');if(limit)return limit;
  if(await db.prepare('SELECT id FROM auth_users WHERE email=?').bind(normalized).first())return fail(409,'该测试邮箱已注册，请直接登录。');
  const id=crypto.randomUUID(),salt=randomHex(16),hash=await passwordHash(password,salt),ts=now();
  try{
   await db.batch([
-   db.prepare('INSERT INTO auth_users(id,email,password_salt,password_hash,password_iterations,display_name,created_at) VALUES(?,?,?,?,?,?,?)').bind(id,normalized,salt,hash,HASH_ITERATIONS,display_name.trim(),ts),
+   db.prepare('INSERT INTO auth_users(id,email,password_salt,password_hash,password_iterations,display_name,email_verified_at,created_at) VALUES(?,?,?,?,?,?,?,?)').bind(id,normalized,salt,hash,HASH_ITERATIONS,display_name.trim(),synthetic?ts:null,ts),
    db.prepare('INSERT INTO auth_roles(user_id,account_type,created_at) VALUES(?,?,?)').bind(id,account_type,ts)
   ]);
  }catch{return fail(409,'注册未完成，该邮箱可能已经存在。');}
- return reply({id,account_type,email_verified:false},201);
+ if(!synthetic) {
+   try { await sendChallenge(env,db,normalized,'verify'); }
+   catch { await db.prepare('DELETE FROM auth_roles WHERE user_id=?').bind(id).run();
+           await db.prepare('DELETE FROM auth_users WHERE id=?').bind(id).run();
+           return fail(503,'验证码邮件未被发送服务接受，注册未完成。'); }
+ }
+ return reply({id,account_type,email_verified:synthetic,verification_required:!synthetic},201);
 }
 async function login(db,req){
  const input=await mutation(req);if(input.error)return input.error;
@@ -88,6 +172,7 @@ async function login(db,req){
  const u=await db.prepare('SELECT * FROM auth_users WHERE email=?').bind(normalized).first();
  const hash=await passwordHash(password,u?.password_salt||'00000000000000000000000000000000',u?.password_iterations||HASH_ITERATIONS);
  if(!u||!safeEqual(u.password_hash,hash)||u.disabled_at)return fail(401,'邮箱或密码不正确。');
+ if(!u.email_verified_at)return fail(403,'请先验证注册邮箱。');
  const roles=await db.prepare('SELECT account_type FROM auth_roles WHERE user_id=?').bind(u.id).all();
  if(account_type&&!(roles.results||[]).some(x=>x.account_type===account_type))return fail(403,'当前账户没有该身份权限。');
  return newSession(db,u.id);
@@ -108,7 +193,11 @@ export async function route(context){
  const req=context.request,p=new URL(req.url).pathname.replace(/^\/api\/v1\/?/,'');
  try{
   const db=context.env.HHBA_AUTH_DB;
-  if(p==='auth/register'&&req.method==='POST')return await register(db,req);
+  if(p==='auth/register'&&req.method==='POST')return await register(context.env,db,req);
+  if(p==='auth/email/verify'&&req.method==='POST')return await verifyEmail(context.env,db,req);
+  if(p==='auth/email/resend'&&req.method==='POST')return await resendEmail(context.env,db,req);
+  if(p==='auth/password/request'&&req.method==='POST')return await passwordResetRequest(context.env,db,req);
+  if(p==='auth/password/reset'&&req.method==='POST')return await resetPassword(context.env,db,req);
   if(p==='auth/session'&&req.method==='POST')return await login(db,req);
   if(p==='auth/session'&&req.method==='DELETE')return await logout(db,req);
   if(p==='auth/me'&&req.method==='GET')return await me(db,req);
