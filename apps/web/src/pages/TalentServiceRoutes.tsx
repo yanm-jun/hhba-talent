@@ -1,3 +1,7 @@
+import {XINJIANG_14_PREFECTURES,xinjiangGuideUrl,buildXinjiangGuide} from '../data/xinjiangGuides';
+import {GANSU_14_REGIONS,gansuGuideUrl,buildGansuGuide} from '../data/gansuGuides';
+import {SHAANXI_10_CITIES,shaanxiGuideUrl,buildShaanxiGuide} from '../data/shaanxiGuides';
+import {XIZANG_7_REGIONS,xizangGuideUrl,buildXizangGuide} from '../data/xizangGuides';
 import {QINGHAI_SHARED_POLICY_RECORDS} from '../data/qinghaiSharedPolicies';
 import {QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS} from '../data/qinghaiVerifiedHousing';
 import {QINGHAI_POLICY_RESEARCH_RECORDS} from '../data/qinghaiPolicyRecords';
@@ -194,6 +198,34 @@ function CityHub({city}:{city:string}){
   {(['生活补贴','落户引进','就业创业','购房补贴','租房安居'] as const).map(group=>policies.some(p=>p.category===group)&&<div key={group}><h3>{group}</h3><div className="ts-sub-grid">{policies.filter(p=>p.category===group).map(p=><Link key={p.id} className="ts-sub-tile" to={ningxiaGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>{p.headlineAmount||'依主管机关核定'} · {p.payoutTo||'资格待核'} · {policyStatus(p)}</span><ArrowRight size={15}/></Link>)}</div></div>)}
   <h3>人才公寓、保租房、公租房、配售房及货币租赁补贴</h3>
   {homes.length?<div className="ts-sub-grid">{homes.map(h=><Link key={h.id} className="ts-sub-tile" to={ningxiaGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>{h.kind==='project'?'已分配小区项目证据':'制度／历史批次／住房服务'} · {housingStatus(h)}</span><ArrowRight size={15}/></Link>)}</div>:<p>暂无已核验独立住房证据，需要补证，不能推断该地无房。</p>}
+ </section>}
+ {XIZANG_7_REGIONS.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="西藏自治区七地市V6政策与安居完整目录">
+  <div className="ts-sub-section-heading"><h2>{match.name} · 西藏2026人才政策与办理指南</h2><Link to={talentListUrl('policies',match.name)}>全部政策 <ArrowRight size={15}/></Link></div>
+  <p>自治区统一制度按属地展示，不是每市单独现金补助；过期招聘归历史资料，公租房项目规模不是实时空房。每条可查看资格、材料、流程、FAQ和原始依据。</p>
+  {(['落户引进','购房补贴','租房安居','生活补贴','就业创业'] as const).map(group=>policies.some(p=>p.category===group)&&<div key={group}><h3>{group}</h3><div className="ts-sub-grid">{policies.filter(p=>p.category===group).map(p=><Link key={p.id} className="ts-sub-tile" to={xizangGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>{p.headlineAmount||'按规定核定'} · {p.payoutTo||'按资格核验'} · {policyStatus(p)}</span><ArrowRight size={15}/></Link>)}</div></div>)}
+  <h3>人才安居项目与住房保障</h3>
+  {homes.length>0?<div className="ts-sub-grid">{homes.map(h=><Link className="ts-sub-tile" key={h.id} to={xizangGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>{h.kind==='program'?'住房制度':'住房项目'} · 房源与当期受理待核实</span><ArrowRight size={15}/></Link>)}</div>:<p>暂无已核实的独立住房记录，不表示当地没有公寓；不虚构项目、租金、房源。</p>}
+ </section>}
+ {SHAANXI_10_CITIES.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="陕西省十地市贵阳V6标准人才政策与住房目录">
+  <div className="ts-sub-section-heading"><h2>{match.name} · 陕西省 V6 人才政策与安居</h2><Link to={talentListUrl('policies',match.name)}>查看全部政策 <ArrowRight size={15}/></Link></div>
+  <p>每条按政府政策、真实项目、历史批次、管理制度或建设采购分别展示。省级统一事项不是各地额外现金；住房套数不是实时空房；未核实项目不宣称可立即入住。</p>
+  {(['生活补贴','落户引进','就业创业','购房补贴','租房安居'] as const).map(group=>policies.some(p=>p.category===group)&&<div key={group}><h3>{group}</h3><div className="ts-sub-grid">{policies.filter(p=>p.category===group).map(p=><Link key={p.id} className="ts-sub-tile" to={shaanxiGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>{p.headlineAmount||'以官方核定为准'} · {p.payoutTo||'身份须核验'} · {policyStatus(p)}</span><ArrowRight size={15}/></Link>)}</div></div>)}
+  <h3>人才公寓、公租房、保租房及政策住房</h3>
+  {homes.length?<div className="ts-sub-grid">{homes.map(h=><Link key={h.id} className="ts-sub-tile" to={shaanxiGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>{h.kind==='project'?'具体项目':'管理制度或研究线索'} · {housingStatus(h)}</span><ArrowRight size={15}/></Link>)}</div>:<p>暂无有官方出处的独立安居资料，不意味着当地没有住房政策。需继续核验而不能虚构公寓。</p>}
+ </section>}
+ {GANSU_14_REGIONS.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="甘肃省14市州贵阳V6政策住房完整分类目录">
+  <div className="ts-sub-section-heading"><h2>{match.name} · 甘肃省 V6 人才服务与住房保障</h2><Link to={talentListUrl('policies',match.name)}>政策列表 <ArrowRight size={15}/></Link></div>
+  <p>按原政府来源逐条展示人才政策、住房项目、管理制度与建设线索。历史项目规模和招录名额不是当前余额；缺少可申报入口的项目会如实提示。</p>
+  {(['生活补贴','落户引进','就业创业','购房补贴','租房安居'] as const).map(group=>policies.some(p=>p.category===group)&&<div key={group}><h3>{group}</h3><div className="ts-sub-grid">{policies.filter(p=>p.category===group).map(p=><Link key={p.id} className="ts-sub-tile" to={gansuGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>{p.headlineAmount||'以主管部门核定为准'} · {p.payoutTo||'资格待核'} · {policyStatus(p)}</span><ArrowRight size={15}/></Link>)}</div></div>)}
+  <h3>人才公寓、公租房、保障性租赁住房与货币租补</h3>
+  {homes.length?<div className="ts-sub-grid">{homes.map(h=><Link key={h.id} className="ts-sub-tile" to={gansuGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>{h.kind==='project'?'已有独立项目资料':'管理办法／规划建设／历史服务资料'} · {housingStatus(h)}</span><ArrowRight size={15}/></Link>)}</div>:<p>没有找到可靠的独立住房来源，需继续核验，不能虚构公寓或空房。</p>}
+ </section>}
+ {XINJIANG_14_PREFECTURES.some(c=>c===match.name)&&<section className="ts-sub-section" aria-label="新疆维吾尔自治区14地州V6人才政策与住房保障分类目录">
+ <div className="ts-sub-section-heading"><h2>{match.name} · 新疆2026人才与住房政策</h2><Link to={talentListUrl('policies',match.name)}>全部政策与服务 <ArrowRight size={15}/></Link></div>
+ <p>地方14地州与新疆生产建设兵团师市政策单独管理。政府发布的招录、人才公寓、2026住房供应计划和工程招标不代表当前可报名或有实时空房；每条均附政府依据与资格办理指南。</p>
+ {(['落户引进','生活补贴','就业创业','购房补贴','租房安居'] as const).map(group=>policies.some(p=>p.category===group)&&<div key={group}><h3>{group}</h3><div className="ts-sub-grid">{policies.filter(p=>p.category===group).map(p=><Link key={p.id} className="ts-sub-tile" to={xinjiangGuideUrl('policy',p.id)}><strong>{p.title}</strong><span>{p.headlineAmount||'依项目核算'} · {p.payoutTo||'对象待核'} · {policyStatus(p)}</span><ArrowRight size={15}/></Link>)}</div></div>)}
+ <h3>人才公寓、公租房、保障性租赁住房及租赁补贴</h3>
+ {homes.length?<div className="ts-sub-grid">{homes.map(h=><Link key={h.id} className="ts-sub-tile" to={xinjiangGuideUrl('housing',h.id)}><strong>{h.title}</strong><span>{h.kind==='project'?'具体项目证据':'保障制度、规划或历史服务'} · {housingStatus(h)}</span><ArrowRight size={15}/></Link>)}</div>:<p>尚无可核实的住房资料，请等待真实主管部门来源，不得推断本地没有住房或虚构公寓。</p>}
  </section>}
  {match.name==='贵阳'&&<section className="ts-sub-section" aria-label="贵阳市2026人才引进政策专项完整目录">
   <div className="ts-sub-section-heading"><h2>贵阳贵安 · 2026人才引进政策专项</h2><Link to={talentListUrl('policies','贵阳')}>查看全部政策 <ArrowRight size={15}/></Link></div>
@@ -450,6 +482,26 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
   const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
   const guide=t?buildQinghaiGuide(t,decode(fragments[4]||'')):null;
   body=guide?<UnifiedPolicyGuide data={guide}/>:<section className="ts-sub-header"><h1>该青海事项尚未核实</h1><Link to="/talent-service/cities">返回城市目录</Link></section>;
+ }
+ else if(kind==='policy-guide-preview'&&fragments[2]==='xizang'){
+  const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
+  const guide=t?buildXizangGuide(t,decode(fragments[4]||'')):null;
+  body=guide?<UnifiedPolicyGuide data={guide}/>:<section className="ts-sub-header"><h1>西藏该政策办理资料尚待核验</h1><Link to="/talent-service/cities">返回全国城市目录</Link></section>;
+ }
+ else if(kind==='policy-guide-preview'&&fragments[2]==='shaanxi'){
+  const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
+  const guide=t?buildShaanxiGuide(t,decode(fragments[4]||'')):null;
+  body=guide?<UnifiedPolicyGuide data={guide}/>:<section className="ts-sub-header"><h1>该陕西政策/住房指南暂未核验</h1><Link to="/talent-service/cities">返回全国城市目录</Link></section>;
+ }
+ else if(kind==='policy-guide-preview'&&fragments[2]==='gansu'){
+  const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
+  const guide=t?buildGansuGuide(t,decode(fragments[4]||'')):null;
+  body=guide?<UnifiedPolicyGuide data={guide}/>:<section className="ts-sub-header"><h1>该甘肃市州办理指南尚未核验</h1><Link to="/talent-service/cities">返回全国城市目录</Link></section>;
+ }
+ else if(kind==='policy-guide-preview'&&fragments[2]==='xinjiang'){
+  const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
+  const guide=t?buildXinjiangGuide(t,decode(fragments[4]||'')):null;
+  body=guide?<UnifiedPolicyGuide data={guide}/>:<section className="ts-sub-header"><h1>该新疆政策或住房资料尚待核实</h1><Link to="/talent-service/cities">返回全国城市目录</Link></section>;
  }
  else if(kind==='policy-guide-preview'&&fragments[2]==='guizhou'){
  const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
