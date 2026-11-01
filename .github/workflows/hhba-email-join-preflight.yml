@@ -1,0 +1,55 @@
+name: HHBA verified email and join intake preflight
+on:
+  pull_request:
+    branches:
+      - main
+      - feature/cloudflare-d1-dual-role-auth-20261101
+    paths:
+      - "apps/web/functions/**"
+      - "apps/web/d1/**"
+      - "apps/web/src/pages/AuthPage.tsx"
+      - "apps/web/src/pages/JoinUsPage.tsx"
+      - "apps/web/src/services/api.ts"
+      - "apps/web/scripts/email-join.contract.test.mjs"
+      - "apps/web/scripts/real-email-auth.contract.test.mjs"
+      - ".github/workflows/hhba-email-join-preflight.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate email and join D1 migrations
+        run: |
+          python - <<'PY'
+          import sqlite3
+          from pathlib import Path
+          db=sqlite3.connect(':memory:')
+          db.execute('PRAGMA foreign_keys=ON')
+          for file in ['apps/web/d1/0001_dual_role_auth.sql','apps/web/d1/0002_email_verification_and_join.sql']:
+              db.executescript(Path(file).read_text())
+          t={x[0] for x in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+          assert {'auth_users','auth_roles','auth_sessions','auth_email_challenges','join_applications','join_rate_limits'} <= t
+          print('D1 migrations valid')
+          PY
+      - name: Validate JS syntax and mail contracts
+        working-directory: apps/web
+        run: |
+          node --check functions/_lib/auth.js
+          node --check functions/_lib/mail.js
+          node --check functions/api/v1/join/applications.js
+          node --test scripts/auth-api.contract.test.mjs scripts/email-join.contract.test.mjs scripts/real-email-auth.contract.test.mjs
+      - name: Build React+Vite frontend
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build

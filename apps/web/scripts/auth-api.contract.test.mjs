@@ -6,7 +6,7 @@ class Db {
  prepare(sql){const db=this;let a=[];
   return {bind(...values){a=values;return this},async run(){
    if(sql.startsWith('INSERT INTO auth_rate_limits')){const [key,ts,cutoff]=a;const old=db.limits.get(key);db.limits.set(key,{hits:old&&old.window_start>=cutoff?old.hits+1:1,window_start:old&&old.window_start>=cutoff?old.window_start:ts});return {};}
-   if(sql.startsWith('INSERT INTO auth_users')){const [id,email,salt,hash,iterations,name,ts]=a;if(db.users.has(email))throw Error('unique');db.users.set(email,{id,email,password_salt:salt,password_hash:hash,password_iterations:iterations,display_name:name,created_at:ts});return {};}
+   if(sql.startsWith('INSERT INTO auth_users')){const [id,email,salt,hash,iterations,name,verifiedAt,ts]=a;if(db.users.has(email))throw Error('unique');db.users.set(email,{id,email,password_salt:salt,password_hash:hash,password_iterations:iterations,display_name:name,email_verified_at:verifiedAt,created_at:ts});return {};}
    if(sql.startsWith('INSERT INTO auth_roles')){const [id,account_type]=a;db.roles.push({user_id:id,account_type});return {};}
    if(sql.startsWith('INSERT INTO auth_sessions')){const [hash,id,csrf,created,expires]=a;db.sessions.set(hash,{token_hash:hash,user_id:id,csrf_token:csrf,created_at:created,expires_at:expires});return {};}
    if(sql.startsWith('DELETE FROM auth_sessions')){db.sessions.delete(a[0]);return {};}
@@ -47,7 +47,7 @@ test('isolated recruiter account and unverified email guardrails',async()=>{
  const r=await route(ctx('/api/v1/auth/register','POST',{email:'company@example.test',display_name:'Recruiter',password:'other-long-password-2026',account_type:'recruiter'}));
  assert.equal(r.status,201);
  assert.equal((await route(ctx('/api/v1/auth/session','POST',{email:'company@example.test',password:'other-long-password-2026',account_type:'candidate'}))).status,403);
- assert.equal((await route(ctx('/api/v1/auth/register','POST',{email:'user@real.com',display_name:'Real',password:'not-for-testing',account_type:'candidate'}))).status,403);
+ assert.equal((await route(ctx('/api/v1/auth/register','POST',{email:'user@real.com',display_name:'Real',password:'not-for-testing',account_type:'candidate'}))).status,503); // Real mail domains valid, but preview has no verified sender.
  assert.equal((await route(ctx('/api/v1/auth/register','POST',{email:'attacker@example.test',display_name:'Other',password:'long-example-password-2026',account_type:'candidate'},{origin:'https://attacker.invalid'}))).status,403);
  const prod={env:{HHBA_AUTH_DB:db,HHBA_AUTH_ROLLOUT:'preview'},request:new Request('https://hhba-talent.pages.dev/api/v1/auth/me')};
  assert.equal((await route(prod)).status,503);

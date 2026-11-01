@@ -29,6 +29,9 @@ export function AuthPage({ user, onUser, accountType = 'candidate', initialMode 
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [flow, setFlow] = useState<'form'|'verify'|'reset-request'|'reset-confirm'>('form');
+  const [code, setCode] = useState('');
+  const [notice, setNotice] = useState('');
   const isCandidate = accountType === 'candidate';
   const stem = isCandidate ? '/candidate' : '/recruiter';
   const accountLabel = isCandidate ? '求职者' : '招聘方';
@@ -55,6 +58,9 @@ export function AuthPage({ user, onUser, accountType = 'candidate', initialMode 
     setError('');
     setPassword('');
     setPasswordConfirm('');
+    setFlow('form');
+    setNotice('');
+    setCode('');
   }, [accountType, initialMode]);
 
   useEffect(() => {
@@ -74,7 +80,14 @@ export function AuthPage({ user, onUser, accountType = 'candidate', initialMode 
     setBusy(true);
     try {
       const normalizedEmail = email.trim().toLowerCase();
-      if (mode === 'register') await api.register(normalizedEmail, password, displayName.trim(), accountType);
+      if (mode === 'register') {
+        const result = await api.register(normalizedEmail, password, displayName.trim(), accountType);
+        if (result.verification_required) {
+          setFlow('verify'); setCode('');
+          setNotice('验证码已交给邮件服务发送，请检查收件箱及垃圾邮件。');
+          return;
+        }
+      }
       await api.login(normalizedEmail, password, accountType);
       const current = await api.me();
       if (!current.account_types?.includes(accountType)) {
@@ -90,6 +103,27 @@ export function AuthPage({ user, onUser, accountType = 'candidate', initialMode 
     }
   }
 
+  async function submitCode(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setError(''); setBusy(true);
+    try {
+      if (flow==='verify') {
+        await api.verifyEmail(email.trim().toLowerCase(),code);
+        await api.login(email.trim().toLowerCase(),password,accountType);
+        const current=await api.me();
+        if(!current.account_types?.includes(accountType))throw new ApiError(403,'当前账户没有该身份权限。');
+        onUser(current); navigate(safeNext);
+      } else if (flow==='reset-request') {
+        await api.requestPasswordReset(email.trim().toLowerCase());
+        setFlow('reset-confirm');setNotice('如该邮箱已经注册并验证，密码重置验证码将发送到该邮箱。');
+      } else if (flow==='reset-confirm') {
+        await api.resetPassword(email.trim().toLowerCase(),code,password);
+        setFlow('form');setMode('login');setCode('');setPassword('');
+        setNotice('密码已重置，请使用新密码登录。');
+      }
+    } catch(e) {setError(e instanceof ApiError ? e.message : '请求失败，请稍后再试。');}
+    finally {setBusy(false);}
+  }
+
   if (accountHasRole) return null;
 
   return <Shell user={user}>
@@ -98,7 +132,7 @@ export function AuthPage({ user, onUser, accountType = 'candidate', initialMode 
         <div className="hhba-auth-page-logo"><BrandMark variant="icon" size="hero"/></div>
         <div className="hhba-phone-heading">
           <span className="hhba-phone-kicker">{accountLabel}账户</span>
-          <h1 id="hhba-email-auth-title">{mode === 'login' ? '欢迎回来' : '创建你的账户'}</h1>
+          <h1 id="hhba-email-auth-title">{flow==='verify'?'验证邮箱':flow.startsWith('reset')?'找回密码':mode === 'login' ? '欢迎回来' : '创建你的账户'}</h1>
           <p>{mode === 'login' ? '使用邮箱登录，继续你在 HHBA 的旅程。' : '使用邮箱创建账户，开启你在 HHBA 的旅程。'}</p>
         </div>
         <div className="hhba-phone-identity">
@@ -108,7 +142,8 @@ export function AuthPage({ user, onUser, accountType = 'candidate', initialMode 
           <span>以{accountLabel}身份继续</span>
           <Link className="hhba-phone-switch-identity" to="/auth">切换身份 <ArrowRight size={13}/></Link>
         </div>
-        <form className="hhba-phone-form" onSubmit={submit}>
+        {notice && <p className="hhba-phone-notice" role="status">{notice}</p>}
+        {flow==='form' ? <form className="hhba-phone-form" onSubmit={submit}>
           {mode === 'register' && <label htmlFor="hhba-email-auth-name">
             称呼
             <input id="hhba-email-auth-name" required minLength={2} maxLength={60}
@@ -145,16 +180,38 @@ export function AuthPage({ user, onUser, accountType = 'candidate', initialMode 
             {busy ? '处理中…' : mode === 'login' ? '登录' : '注册并继续'}
             <ArrowRight size={17} aria-hidden="true"/>
           </button>
-        </form>
-        <div className="hhba-phone-account-change">
+        </form> : <form className="hhba-phone-form" onSubmit={submitCode}>
+          <label htmlFor="hhba-email-account">邮箱
+            <input id="hhba-email-account" type="email" required maxLength={254} autoComplete="email"
+              value={email} onChange={e=>setEmail(e.target.value)} placeholder="QQ、163、Gmail 等常用邮箱"/>
+          </label>
+          {flow!=='reset-request' && <label htmlFor="hhba-email-code">邮箱验证码
+            <input id="hhba-email-code" required inputMode="numeric" maxLength={6} pattern="[0-9]{6}"
+              value={code} onChange={e=>setCode(e.target.value.replace(/[^0-9]/g,''))}
+              placeholder="请输入 6 位邮件验证码"/>
+          </label>}
+          {flow==='reset-confirm' && <label htmlFor="hhba-new-password">新密码
+            <input id="hhba-new-password" required type="password" minLength={12} maxLength={128}
+              value={password} onChange={e=>setPassword(e.target.value)}
+              autoComplete="new-password" placeholder="至少 12 位新密码"/>
+          </label>}
+          {error && <p className="hhba-phone-error" role="alert">{error}</p>}
+          <button className="hhba-phone-submit" type="submit" disabled={busy || !emailValid || (flow!=='reset-request' && code.length!==6) || (flow==='reset-confirm' && password.length<12)}>
+            {busy?'处理中…':flow==='verify'?'验证并登录':flow==='reset-request'?'发送找回邮件':'设置新密码'} <ArrowRight size={17}/>
+          </button>
+          {flow==='verify' && <button className="text-button" type="button" onClick={async()=>{setError('');try{await api.resendVerification(email.trim().toLowerCase());setNotice('验证码发送请求已被接受。');}catch(e){setError(e instanceof ApiError?e.message:'暂时无法重新发送。')}}}>重新发送验证码</button>}
+          <button className="text-button" type="button" onClick={()=>{setFlow('form');setError('');setNotice('');setCode('');}}>返回邮箱登录</button>
+        </form>}
+        {flow==='form' && <div className="hhba-phone-account-change">
           {mode === 'login' ? '还没有账户？' : '已经有账户？'}{' '}
           <Link to={stem + (mode === 'login' ? '/register' : '/login') + nextSuffix}>
             {mode === 'login' ? '立即注册' : '返回登录'}
           </Link>
-        </div>
+        </div>}
+        {flow==='form' && mode==='login' && <button type="button" className="hhba-phone-legacy" onClick={()=>{setFlow('reset-request');setError('');setNotice('');setCode('');setPassword('');}}>忘记密码？通过邮箱找回</button>}
         <div className="hhba-phone-preview-note" role="note">
           <Info size={15} aria-hidden="true"/>
-          <span>当前为隔离测试版，仅使用 @example.test 或 @example.invalid 测试邮箱和专用测试密码。邮箱验证、找回密码及手机短信将在后续接入。</span>
+          <span>支持 QQ、163、126、Gmail、Outlook 和企业邮箱。真实邮箱必须先完成验证码验证；发信服务开通前，真实邮箱注册会明确提示不可用。请勿使用真实密码测试。</span>
         </div>
       </div>
       <div className="hhba-phone-below">
