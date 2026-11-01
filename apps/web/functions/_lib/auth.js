@@ -158,7 +158,7 @@ async function register(env,db,req){
  }catch{return fail(409,'注册未完成，该邮箱可能已经存在。');}
  if(!synthetic) {
    try { await sendChallenge(env,db,normalized,'verify'); }
-   catch { await db.prepare('DELETE FROM auth_roles WHERE user_id=?').bind(id).run();
+   catch (e) { console.error('HHBA_AUTH_MAIL_SEND_FAILED',String(e).slice(0,150)); await db.prepare('DELETE FROM auth_roles WHERE user_id=?').bind(id).run();
            await db.prepare('DELETE FROM auth_users WHERE id=?').bind(id).run();
            return fail(503,'验证码邮件未被发送服务接受，注册未完成。'); }
  }
