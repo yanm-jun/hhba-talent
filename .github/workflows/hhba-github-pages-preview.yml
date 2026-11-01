@@ -923,6 +923,21 @@ jobs:
       - name: Record deployed commit and 337 official data counts in Pages manifest
         working-directory: apps/web
         run: node --experimental-strip-types scripts/write-talent-city-manifest.mjs
+      - name: Verify release artifact embeds five Ningxia city policy and housing inventories
+        working-directory: apps/web
+        run: |
+          node --experimental-strip-types scripts/test-ningxia-pages-sync.mjs
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {readFileSync} from 'node:fs';
+          const x=JSON.parse(readFileSync('dist/talent-city-release.json','utf8'));
+          assert.equal(x.commit,process.env.GITHUB_SHA,'Pages manifest must be from triggering main sha');
+          for(const [city,p,h] of [['银川',11,5],['石嘴山',7,7],['吴忠',7,4],['固原',8,5],['中卫',7,5]]){
+            assert.equal(x.cities[city]?.policies,p,city+' missing published policy count');
+            assert.equal(x.cities[city]?.housing,h,city+' missing published housing count');
+          }
+          console.log('HHBA_PAGES_ARTIFACT_NINGXIA_5_CITY_READY',x.commit);
+          NODE
       - name: Upload exactly the public built site
         uses: actions/upload-pages-artifact@v3
         with:
@@ -971,4 +986,35 @@ jobs:
                   print('PAGES_PROPAGATING',attempt,str(exc)[:140])
                   if attempt==11:raise
                   time.sleep(10)
+          PY
+      - name: Verify deployed GitHub Pages manifest is the triggering main commit and Ningxia is populated
+        env:
+          EXPECTED_MAIN_SHA: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          import json,os,time,urllib.request
+          target='https://yanm-jun.github.io/hhba-talent/talent-city-release.json'
+          expected=os.environ['EXPECTED_MAIN_SHA']
+          required={'银川':(11,5),'石嘴山':(7,7),'吴忠':(7,4),'固原':(8,5),'中卫':(7,5)}
+          last=''
+          for attempt in range(15):
+              try:
+                  req=urllib.request.Request(target+'?release='+expected+'&attempt='+str(attempt),headers={'Cache-Control':'no-cache','User-Agent':'HHBA-Pages-Release-Verification/1.0'})
+                  with urllib.request.urlopen(req,timeout=16) as response:
+                      assert response.status==200
+                      doc=json.load(response)
+                  actual=doc.get('commit')
+                  actualcities=doc.get('cities',{})
+                  ok=actual==expected and all(
+                      (actualcities.get(name) or {}).get('policies')==p and (actualcities.get(name) or {}).get('housing')==h
+                      for name,(p,h) in required.items())
+                  if ok:
+                      print('HHBA_PAGES_LIVE_NINGXIA_OK',expected,[(name,actualcities[name]['policies'],actualcities[name]['housing']) for name in required])
+                      break
+                  last='stale commit '+str(actual)+' (want '+expected+'), city counts '+str({n:actualcities.get(n) for n in required})
+              except Exception as exc:
+                  last=type(exc).__name__+': '+str(exc)[:240]
+              print('HHBA_PAGES_RELEASE_NOT_VERIFIED',attempt,last)
+              if attempt==14:raise AssertionError('Published HHBA Pages did not update to triggering main commit with Ningxia five-city data: '+last)
+              time.sleep(10)
           PY
