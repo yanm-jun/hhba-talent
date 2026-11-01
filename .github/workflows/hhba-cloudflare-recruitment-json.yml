@@ -1,0 +1,48 @@
+name: HHBA Cloudflare recruitment JSON compatibility
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/web/scripts/cloudflare-pages-build.py"
+      - "apps/web/scripts/verify-cloudflare-recruitment.mjs"
+      - "apps/web/src/services/liveRecruitment.ts"
+      - ".github/workflows/hhba-cloudflare-recruitment-json.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Guard Cloudflare build against a dev-only recruitment proxy
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('apps/web/scripts/cloudflare-pages-build.py').read_text()
+          assert '"VITE_HHBA_VERIFIED_SNAPSHOT": "1"' in s, 'Cloudflare must use same-origin verified JSON'
+          assert 'verify-cloudflare-recruitment.mjs' in s
+          source=Path('apps/web/src/services/liveRecruitment.ts').read_text()
+          assert '服务器返回网页而非岗位 JSON' in source
+          assert '岗位数据快照未发布：服务器返回 HTML 而不是 JSON' in source
+          print('HHBA_CLOUDFLARE_STATIC_RECRUITMENT_MODE_OK')
+          PY
+      - name: Compile cloud-based market and check local curated jobs
+        working-directory: apps/web
+        env:
+          VITE_HHBA_VERIFIED_SNAPSHOT: "1"
+          VITE_HHBA_DOMESTIC_REBUILD_V2: "1"
+          VITE_HHBA_OVERSEAS_CURATED_100: "1"
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+          test -s dist/curated/v1/jobs.json
+          node --check scripts/verify-cloudflare-recruitment.mjs
+          test ! -f dist/404.html
