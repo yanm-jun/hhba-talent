@@ -8,6 +8,7 @@ import {LIAONING_MUNICIPAL_RESEARCH_RECORDS} from '../../data/liaoningMunicipalP
 import {GUANGXI_RENT_RESEARCH_RECORDS} from '../../data/guangxiRentPolicyResearch';
 import {GUANGXI_MUNICIPAL_RESEARCH_RECORDS} from '../../data/guangxiMunicipalResearch';
 function newProvincePolicyRoute(id:string,city:string):string|undefined{
+ if(id.startsWith('nx-')&&['银川','石嘴山','吴忠','固原','中卫'].includes(city))return '/talent-service/policy-guide-preview/ningxia/policy/'+encodeURIComponent(id);
  if(id.startsWith('gz-')&&['贵阳','六盘水','遵义','安顺','毕节','铜仁','黔西南','黔东南','黔南'].includes(city))return '/talent-service/policy-guide-preview/guizhou/policy/'+encodeURIComponent(id);
  if(id.startsWith('sc-')&&['成都','自贡','攀枝花','泸州','德阳','绵阳','广元','遂宁','内江','乐山','南充','眉山','宜宾','广安','达州','雅安','巴中','资阳','阿坝','甘孜','凉山'].includes(city))return '/talent-service/policy-guide-preview/sichuan/policy/'+encodeURIComponent(id);
  if(id.startsWith('hi-')&&['海口','三亚','三沙','儋州'].includes(city))return '/talent-service/policy-guide-preview/hainan/policy/'+encodeURIComponent(id);
