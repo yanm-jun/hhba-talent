@@ -47,7 +47,7 @@ test('isolated recruiter account and unverified email guardrails',async()=>{
  const r=await route(ctx('/api/v1/auth/register','POST',{email:'company@example.test',display_name:'Recruiter',password:'other-long-password-2026',account_type:'recruiter'}));
  assert.equal(r.status,201);
  assert.equal((await route(ctx('/api/v1/auth/session','POST',{email:'company@example.test',password:'other-long-password-2026',account_type:'candidate'}))).status,403);
- assert.equal((await route(ctx('/api/v1/auth/register','POST',{email:'user@real.com',display_name:'Real',password:'not-for-testing',account_type:'candidate'}))).status,403);
+ assert.equal((await route(ctx('/api/v1/auth/register','POST',{email:'user@real.com',display_name:'Real',password:'not-for-testing',account_type:'candidate'}))).status,503); // Real mail domains valid, but preview has no verified sender.
  assert.equal((await route(ctx('/api/v1/auth/register','POST',{email:'attacker@example.test',display_name:'Other',password:'long-example-password-2026',account_type:'candidate'},{origin:'https://attacker.invalid'}))).status,403);
  const prod={env:{HHBA_AUTH_DB:db,HHBA_AUTH_ROLLOUT:'preview'},request:new Request('https://hhba-talent.pages.dev/api/v1/auth/me')};
  assert.equal((await route(prod)).status,503);
