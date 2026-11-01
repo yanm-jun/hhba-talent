@@ -67,6 +67,14 @@ jobs:
         run: node --experimental-strip-types scripts/test-gansu-expansion-20261101.mjs
       - name: Xinjiang fourteen-prefecture V6 housing and Corps boundary
         run: node --experimental-strip-types scripts/test-xinjiang-v6.mjs
+      - name: Verify 2026 Sichuan eleven-region sourced policy data without false certification
+        run: node --experimental-strip-types scripts/test-sichuan-2026-policy-gap.mjs
+      - name: Guard two source-backed Sichuan housing programs and nationwide integration
+        run: node --experimental-strip-types scripts/test-sichuan-housing-gap-2026.mjs
+      - name: Validate 26 Sichuan Guangxi Guizhou housing evidence and 2026 Luding local program
+        run: node --experimental-strip-types scripts/test-housing-26-regions-20261101.mjs
+      - name: Audit six Sichuan housing gaps against formal and clearly marked research data
+        run: node --experimental-strip-types scripts/test-sichuan-six-housing-20261101.mjs
       - name: Ten missing-city housing evidence quality and false-live-availability regression
         run: node --experimental-strip-types scripts/test-ten-housing-gaps-2026.mjs
       - name: Confirm static build

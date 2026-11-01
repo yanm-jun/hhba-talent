@@ -1,0 +1,420 @@
+{
+  "asOf": "2026-11-01",
+  "housingTargetCount": 33,
+  "capturedSourceRecords": 21,
+  "remainingDirectSourceGaps": 12,
+  "housingReview": [
+    {
+      "city": "邢台",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "鞍山",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "government-site",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "抚顺",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "government-site",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "本溪",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "government-site",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "丹东",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "government-site",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "锦州",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "government-site",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "阜新",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "government-site",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "辽阳",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "government-site",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "铁岭",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "government-evidence-reprint",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "葫芦岛",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "日照",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "聊城",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "菏泽",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "南宁",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "柳州",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "梧州",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-2026-reprint",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "北海",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "钦州",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "贵港",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "玉林",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "百色",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "贺州",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "河池",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "来宾",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "崇左",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "六盘水",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "遵义",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "安顺",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "毕节",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "黔西南",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "黔东南",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "黔南",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "海北",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    }
+  ],
+  "critical": "Only direct government 2026 source records are in nationwide formal data. Qinghai five SZYF entries are province-wide past-window research locators, not independent local cash policies. Secondary and obsolete rules must not claim official housing or live vacancies.",
+  "officiallyIndexedPolicyCount": 11,
+  "officiallyIndexedHousingCount": 5,
+  "policyLeadsNotOfficiallyIndexed": 15,
+  "housingLeadsNotOfficiallyIndexed": 17,
+  "housingWithoutFormal2026Evidence": 29,
+  "officiallyIndexedHousingCityCount": 4,
+  "housingRemainingCities": [
+    "邢台",
+    "鞍山",
+    "丹东",
+    "锦州",
+    "铁岭",
+    "葫芦岛",
+    "日照",
+    "聊城",
+    "菏泽",
+    "南宁",
+    "柳州",
+    "梧州",
+    "北海",
+    "钦州",
+    "贵港",
+    "玉林",
+    "百色",
+    "贺州",
+    "河池",
+    "来宾",
+    "崇左",
+    "六盘水",
+    "遵义",
+    "安顺",
+    "毕节",
+    "黔西南",
+    "黔东南",
+    "黔南",
+    "海北"
+  ],
+  "policyRemainingCities": [
+    "西宁",
+    "黄南",
+    "果洛",
+    "玉树",
+    "海西"
+  ],
+  "policyOfficialCities": [
+    "广安",
+    "攀枝花",
+    "绵阳",
+    "遂宁",
+    "内江",
+    "甘孜",
+    "泸州",
+    "资阳",
+    "宜宾",
+    "巴中",
+    "凉山"
+  ],
+  "housingOfficialCities": [
+    "抚顺",
+    "本溪",
+    "阜新",
+    "辽阳"
+  ],
+  "qualityLimitation": "5 government-source housing records cover 4 cities (Benxi has two distinct programs). Formal coverage is NOT 5 cities. 15 policy city gaps and 29 housing city gaps remain. New 2026 talent apartment notice of Benxi is a HISTORICAL admission announcement, not live vacancy. Some government domains still require manual original-document inspection. Additional Wuzhou 2026 October rental-subsidy notice is a media reprint, preserved as RESEARCH ONLY until local government original is verified.",
+  "sichuanPolicyStatus": {
+    "baseCityCoverage": 11,
+    "direct2026GovernmentSourceCityCount": 11,
+    "addedCityDetails": [
+      {
+        "city": "攀枝花",
+        "sourceUrl": "https://jxj.panzhihua.gov.cn/zfxxgk/tzgg/10297031.shtml",
+        "status": "past-window",
+        "regionalLimit": "特定区域"
+      },
+      {
+        "city": "绵阳",
+        "sourceUrl": "https://sc.spb.gov.cn/scsyzglj/c105609/c105613/202609/76bb61f2e18440919ce0468d4a7c7462.shtml",
+        "status": "policy",
+        "regionalLimit": "特定区域"
+      },
+      {
+        "city": "遂宁",
+        "sourceUrl": "https://chinajob.mohrss.gov.cn/c/2026-07-16/574114.shtml",
+        "status": "policy",
+        "regionalLimit": "全市"
+      },
+      {
+        "city": "内江",
+        "sourceUrl": "https://chinajob.mohrss.gov.cn/c/2026-10-13/619337.shtml",
+        "status": "policy",
+        "regionalLimit": "全市"
+      },
+      {
+        "city": "甘孜",
+        "sourceUrl": "https://www.xcx.gov.cn/gsgg/article/736938",
+        "status": "past-window",
+        "regionalLimit": "特定区域"
+      }
+    ],
+    "warnings": "2026 historical recruitment and a narrow industry-specific coupon cannot be represented as a universal talent cash subsidy. External pages have intermittent direct-open errors; retain B/C grade and source audit warnings. Other Sichuan city original notices remain to verify.",
+    "officialSourceOperatorException": "Luzhou official exam organization portal exact one signed 2026 announcement. Narrowly registered in quality source classification; excludes third-party reprints.",
+    "ziyangNote": "An Yue county 2026 government-signed announcement on cqdx.gov.cn; NOT a Ziyang municipal subsidy.",
+    "notes": "11/11 official or original-source signed 2026 prefectural region records indexed, but some are historical recruitment (C) or narrow county/occupational programs; NO city A certification and full 2026 official policy inventory still incomplete.",
+    "rawOfficialSitesStillRequireManualCheck": [
+      "宜宾人事考试网 SPA",
+      "巴中党建网 timed out"
+    ]
+  },
+  "currentCodeHousingGapAudit": {
+    "auditDate": "2026-11-01",
+    "scope": "Nationwide CI derived formal aggregate: only cities with policy records and zero formal housing records",
+    "baselineMissingHousingCities": 40,
+    "newlyConnectedFormalCities": [
+      "广安",
+      "巴中",
+      "宜宾",
+      "资阳",
+      "甘孜",
+      "泸州"
+    ],
+    "newlyAddedOfficialRecordCount": 6,
+    "remainMissingHousingCities": 34,
+    "remainingByProvince": {
+      "河北省": [
+        "邢台"
+      ],
+      "辽宁省": [
+        "鞍山",
+        "丹东",
+        "锦州",
+        "铁岭",
+        "葫芦岛"
+      ],
+      "山东省": [
+        "日照",
+        "聊城",
+        "菏泽"
+      ],
+      "广西壮族自治区": [
+        "南宁",
+        "柳州",
+        "梧州",
+        "北海",
+        "钦州",
+        "贵港",
+        "玉林",
+        "百色",
+        "贺州",
+        "河池",
+        "来宾",
+        "崇左"
+      ],
+      "四川省": [
+        "攀枝花",
+        "绵阳",
+        "遂宁",
+        "内江",
+        "凉山"
+      ],
+      "贵州省": [
+        "六盘水",
+        "遵义",
+        "安顺",
+        "毕节",
+        "黔西南",
+        "黔东南",
+        "黔南"
+      ],
+      "青海省": [
+        "海北"
+      ]
+    },
+    "institutionAuthoredMediaNotFormal": [
+      "泸州"
+    ],
+    "originalSourceAccessNeedsManualRecheck": [
+      "宜宾",
+      "资阳"
+    ],
+    "sourceLimit": "Government domain / exact whitelisted official original source classification and integration passing CI does not prove original page accessible, project availability, current applicants, actual rent, or full A-grade guidance.",
+    "ci": "待最新分支CI复核，不沿用此前成功结果",
+    "detail": "docs/TALENT_SICHUAN_HOUSING_BATCH2_20261101.md",
+    "newlyAddedOfficialHousingNote": "Ganzi 2026 county-level independent original is Luding ONLY; other Ganzi prefecture counties and live apartments not comprehensively verified.",
+    "focus26": {
+      "targetCities": 26,
+      "independentOriginalsNewlyVerifiedThisBatch": 1,
+      "remainingMissingIndependentOriginals": 25,
+      "sichuanNewRemaining": 6,
+      "guangxiRemaining": 12,
+      "guizhouRemaining": 7,
+      "detail": "docs/TALENT_HOUSING_26REGIONS_EVIDENCE_MATRIX_20261101.json"
+    },
+    "sichuan20261101": {
+      "reductionOnlyCodeRecord": "泸州政府2023跨省公开公租房文件",
+      "historicalRuleNotVerified2026": true,
+      "remainingNoFormalHousingRecord": [
+        "攀枝花",
+        "绵阳",
+        "遂宁",
+        "内江",
+        "凉山"
+      ],
+      "researchCardsAdded": [
+        "攀枝花",
+        "绵阳",
+        "遂宁",
+        "内江",
+        "凉山"
+      ],
+      "notice": "代码层面的非零不等于住房政策已完整补齐，2026原件、项目、空房仍需核实",
+      "details": "docs/TALENT_SICHUAN_SIX_HOUSING_20261101.md"
+    }
+  }
+}

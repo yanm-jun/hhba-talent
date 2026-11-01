@@ -58,7 +58,14 @@ assert.ok(originalMissingPolicy.length<=64,'original 312-region policy coverage 
 // Restoring Guizhou makes seven additional policy-only cities visible, rather than
 // changing any previously recorded housing. Preserve the old-city regression guard
 // and report newly exposed Guizhou gaps separately.
-const legacyMissingHousing=missingHousing.filter(x=>x.province!=='贵州省');
+// A municipality with newly verified 2026 policy evidence but no official housing file
+// becomes a NEW policy-only gap. It is not a regression in any previously recorded city.
+// Preserve the <=26 legacy guard and report newly exposed Sichuan gaps explicitly.
+const sichuanNewlyExposedPolicyHousingGaps=missingHousing.filter(x=>x.province==='四川省'&&[
+ '攀枝花','泸州','绵阳','遂宁','内江','宜宾','广安','巴中','资阳','甘孜','凉山'
+].includes(x.city));
+const legacyMissingHousing=missingHousing.filter(x=>x.province!=='贵州省'&&
+ !sichuanNewlyExposedPolicyHousingGaps.some(sc=>sc.city===x.city));
 const newGuizhouHousingGaps=missingHousing.filter(x=>x.province==='贵州省');
 assert.ok(legacyMissingHousing.length<=26,'pre-existing housing coverage regressed');
 assert.ok(newGuizhouHousingGaps.length<=9,'Guizhou housing gap count inconsistent');
@@ -88,6 +95,7 @@ const report={
  original312MissingPolicy:originalMissingPolicy.length,pendingNewPrefectures:missingPolicy.filter(x=>addedRegionNames.has(x.city)).length,
  policyCitiesMissingHousing:missingHousing.length,missingHousingList:missingHousing,
  legacyMissingHousingCount:legacyMissingHousing.length,guizhouMissingHousingCount:newGuizhouHousingGaps.length,
+ newlyExposedSichuanHousingCount:sichuanNewlyExposedPolicyHousingGaps.length,newlyExposedSichuanHousingCities:sichuanNewlyExposedPolicyHousingGaps.map(x=>x.city),
  pcaSecondLevelCount:pcaSecondLevel.length,unmatchedPcaCount:unmatchedPca.length,
  pcaUnmatchedNodes:unmatchedPca,
  pcaMissingPrefectureCount:missingPrefecture.length,pcaMissingPrefectureList:missingPrefecture,

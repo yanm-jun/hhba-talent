@@ -1,4 +1,5 @@
 import {HOUSING_TEN_CITY_RESEARCH_LEADS_20261101} from './housingTenCityResearchLeads20261101.ts';
+import {SICHUAN_HOUSING_GAP_2026_RESEARCH_LEADS} from './sichuanHousingGap2026ResearchLeads.ts';
 import {GUANGXI_HOUSING_RESEARCH_LEADS} from './guangxiHousingLeads.ts';
 import {LANGFANG_HOUSING_LEADS} from './langfangHousingLeads.ts';
 import {CANGZHOU_HOUSING_LEADS} from './cangzhouHousingLeads.ts';
@@ -17,6 +18,7 @@ export type TalentHousingResearchLead={
 };
 export const TALENT_HOUSING_RESEARCH_LEADS:TalentHousingResearchLead[]=[
 ...HOUSING_TEN_CITY_RESEARCH_LEADS_20261101,
+...SICHUAN_HOUSING_GAP_2026_RESEARCH_LEADS,
 ...GUANGXI_HOUSING_RESEARCH_LEADS,
 ...LANGFANG_HOUSING_LEADS,
 ...CANGZHOU_HOUSING_LEADS,

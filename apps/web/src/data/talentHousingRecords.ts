@@ -1,4 +1,7 @@
 import {HOUSING_TEN_CITY_OFFICIAL_RECORDS_20261101} from './housingTenCityOfficialRecords20261101.ts';
+import {SICHUAN_HOUSING_GAP_2026_COUNTY_OFFICIAL} from './sichuanHousingGap2026CountyOfficial.ts';
+import {SICHUAN_HOUSING_GAP_2026_OFFICIAL} from './sichuanHousingGapOfficial2026.ts';
+import {TALENT_2026_HOUSING_GAP_RECORDS} from './talent2026HousingGapRecords.ts';
 import {XINJIANG_HOUSING_RECORDS} from './xinjiangHousingRecords.ts';
 import {GANSU_HOUSING_BATCH_RECORDS} from './gansuHousingBatchRecords.ts';
 import {GANSU_EXPANDED_HOUSING_RECORDS} from './gansuExpandedHousingRecords.ts';
@@ -66,6 +69,7 @@ export type TalentHousingRecord={id:string;city:string;district:string;title:str
 export const HOUSING_REVIEW_DATE='2026-10-30';
 export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
  ...HOUSING_TEN_CITY_OFFICIAL_RECORDS_20261101,
+ ...TALENT_2026_HOUSING_GAP_RECORDS,
  ...XINJIANG_HOUSING_RECORDS,
  ...GANSU_HOUSING_BATCH_RECORDS,
  ...GANSU_EXPANDED_HOUSING_RECORDS,
@@ -76,6 +80,8 @@ export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
  ...QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS,
  ...NINGXIA_HOUSING_RECORDS,
  ...GUIZHOU_HOUSING_RECORDS,
+ ...SICHUAN_HOUSING_GAP_2026_COUNTY_OFFICIAL,
+ ...SICHUAN_HOUSING_GAP_2026_OFFICIAL,
  ...SICHUAN_HOUSING_RECORDS,
  ...LESHAN_HOUSING_RECORDS,
  ...SHENYANG_HOUSING_GAP_RECORDS,

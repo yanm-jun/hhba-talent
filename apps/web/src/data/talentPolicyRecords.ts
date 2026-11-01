@@ -1,3 +1,4 @@
+import {TALENT_2026_POLICY_GAP_RECORDS} from './talent2026PolicyGapRecords.ts';
 import {XINJIANG_POLICY_RECORDS} from './xinjiangPolicyRecords.ts';
 import {GANSU_EXPANDED_POLICY_RECORDS} from './gansuExpandedPolicyRecords.ts';
 import {GANSU_POLICY_RECORDS} from './gansuPolicyRecords.ts';
@@ -75,6 +76,7 @@ export type TalentPolicyRecord={
 };
 export const TALENT_POLICY_REVIEW_DATE='2026-10-30';
 export const TALENT_POLICY_RECORDS:TalentPolicyRecord[]=[
+ ...TALENT_2026_POLICY_GAP_RECORDS,
  ...XINJIANG_POLICY_RECORDS,
  ...GANSU_EXPANDED_POLICY_RECORDS,
  ...GANSU_POLICY_RECORDS,
