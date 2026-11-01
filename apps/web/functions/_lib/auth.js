@@ -97,7 +97,7 @@ const emailReply=()=>reply({ok:true,message:'如果账户存在且邮件服务�
 async function verifyEmail(env,db,req) {
  const parsed=await mutation(req);if(parsed.error)return parsed.error;
  const {email,code}=parsed.data,normalized=typeof email==='string'?email.trim().toLowerCase():'';
- if(!emailValid(normalized)||!/^\\d{6}$/.test(code||''))return fail(400,'请填写邮箱和六位验证码。');
+ if(!emailValid(normalized)||!/^\d{6}$/.test(code||''))return fail(400,'请填写邮箱和六位验证码。');
  const limited=await throttle(db,req,normalized,'verify');if(limited)return limited;
  if(!canSendCode(env))return fail(503,'邮件验证服务尚未接通。');
  if(!await checkChallenge(env,db,normalized,'verify',code))return fail(400,'验证码不正确、已过期或超过尝试次数。');
@@ -127,7 +127,7 @@ async function passwordResetRequest(env,db,req){
 async function resetPassword(env,db,req) {
  const parsed=await mutation(req);if(parsed.error)return parsed.error;
  const {email,code,password}=parsed.data,normalized=typeof email==='string'?email.trim().toLowerCase():'';
- if(!emailValid(normalized)||!/^\\d{6}$/.test(code||'')||!passwordValid(password))return fail(400,'请检查邮箱、验证码和不少于 12 位的新密码。');
+ if(!emailValid(normalized)||!/^\d{6}$/.test(code||'')||!passwordValid(password))return fail(400,'请检查邮箱、验证码和不少于 12 位的新密码。');
  if(!canSendCode(env))return fail(503,'邮件发送服务尚未接通。');
  const limited=await throttle(db,req,normalized,'verify');if(limited)return limited;
  if(!await checkChallenge(env,db,normalized,'reset',code))return fail(400,'验证码不正确、已过期或超过尝试次数。');
