@@ -11,6 +11,7 @@ on:
       - "apps/web/src/pages/JoinUsPage.tsx"
       - "apps/web/src/services/api.ts"
       - "apps/web/scripts/email-join.contract.test.mjs"
+      - "apps/web/scripts/real-email-auth.contract.test.mjs"
       - ".github/workflows/hhba-email-join-preflight.yml"
   workflow_dispatch:
 permissions:
@@ -46,7 +47,7 @@ jobs:
           node --check functions/_lib/auth.js
           node --check functions/_lib/mail.js
           node --check functions/api/v1/join/applications.js
-          node --test scripts/auth-api.contract.test.mjs scripts/email-join.contract.test.mjs
+          node --test scripts/auth-api.contract.test.mjs scripts/email-join.contract.test.mjs scripts/real-email-auth.contract.test.mjs
       - name: Build React+Vite frontend
         working-directory: apps/web
         run: |
