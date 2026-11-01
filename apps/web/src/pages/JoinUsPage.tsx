@@ -439,25 +439,34 @@ export function JoinUsPage({ user }: { user: User | null }) {
           <div className="join-form-progress" aria-label="合作意向步骤">
             {['基本信息','专业能力','合作意向'].map((label,i) => <span className={i===step ? 'is-current' : i<step ? 'is-complete' : ''} key={label}><b>{i<step ? '✓' : String(i+1).padStart(2,'0')}</b>{label}</span>)}
           </div>
-          {preview ? <div className="join-form-body join-form-preview">
+          {submittedId ? <div className="join-form-body join-form-preview" role="status">
+            <span className="join-icon"><CheckCircle2 size={23}/></span><h3>申请已提交</h3>
+            <p>申请记录已保存，通知邮件已被发送服务接受。最终邮件送达仍取决于收件服务。</p>
+            <p>申请编号：<strong>{submittedId}</strong>，建议保存编号便于后续查询。</p>
+            <button type="button" className="join-btn join-btn-light" onClick={()=>{setSubmittedId(null);setStep(0);setForm(blank)}}>返回申请表 <ArrowLeft size={16}/></button>
+          </div> : preview ? <div className="join-form-body join-form-preview">
             <span className="join-icon"><CheckCircle2 size={23}/></span>
             <h3>合作意向预览</h3>
-            <p className="join-preview-warning">这是你在浏览器内填写的摘要，<strong>未提交、未发送、未存入 HHBA 数据库</strong>。正式申请通道尚待接入。</p>
+            <p className="join-preview-warning">{mailReady ? '请核对申请信息。点击“确认并提交”后才会保存资料并发出负责人邮件通知。' : '邮件接收通道尚未连接，当前只是浏览器内的填写摘要，未发送、未存入数据库。'}</p>
             <dl>
               <div><dt>称呼</dt><dd>{form.name.trim()}</dd></div>
               <div><dt>合作方向</dt><dd>{selectedRole?.title || '—'}</dd></div>
               <div><dt>每周投入</dt><dd>{form.weeklyTime}</dd></div>
               <div><dt>合作偏好</dt><dd>{form.mode}</dd></div>
             </dl>
-            <div className="join-form-actions"><button type="button" className="join-btn join-btn-light" onClick={() => {setPreview(false);setStep(0)}}>返回修改 <ArrowLeft size={16}/></button><span className="join-preview-disabled">正式在线申请：尚未开放</span></div>
+            <div className="join-form-actions"><button type="button" className="join-btn join-btn-light" onClick={() => {setPreview(false);setStep(0)}}>返回修改 <ArrowLeft size={16}/></button>
+              <button className="join-btn join-btn-primary" type="button" disabled={!mailReady || sending} onClick={submitApplication}>{sending?'正在安全提交…':'确认并提交'} <ArrowRight size={16}/></button>
+            </div>
+            {error && <p className="join-form-error" role="alert">{error}</p>}
+            {!mailReady && <p className="join-form-security">{mailChecking?'正在确认投递服务状态…':'邮件投递服务尚未配置，暂不能接收真实申请。'}</p>}
           </div> : <form className="join-form-body" onSubmit={e => {e.preventDefault(); if(step<2)next();else showPreview()}} noValidate>
             {step === 0 && <>
-              <h3>先认识一下你</h3><p className="join-form-description">你可以先使用常用称呼，不必在静态预览中填写真实隐私信息。</p>
+              <h3>先认识一下你</h3><p className="join-form-description">建议填写可供联系的称呼；只有投递服务开放后才可正式提交。</p>
               <label htmlFor="join-name">怎么称呼你？ <em>*</em></label>
               <input id="join-name" value={form.name} maxLength={80} autoComplete="off" onChange={e=>update('name',e.target.value)} placeholder="姓名或常用称呼" />
               <div className="join-field-row">
                 <div><label htmlFor="join-contact-type">联系方式类别 <em>*</em></label><select id="join-contact-type" value={form.contactType} onChange={e=>update('contactType',e.target.value)}><option>邮箱</option><option>微信</option><option>手机号</option><option>其他</option></select></div>
-                <div><label htmlFor="join-contact">联系方式 <em>*</em></label><input id="join-contact" autoComplete="off" maxLength={180} value={form.contact} onChange={e=>update('contact',e.target.value)} placeholder="仅用于体验，不会发送" /></div>
+                <div><label htmlFor="join-contact">联系方式 <em>*</em></label><input id="join-contact" autoComplete="off" maxLength={180} value={form.contact} onChange={e=>update('contact',e.target.value)} placeholder="用于回复申请，不对外公开" /></div>
               </div>
               <label htmlFor="join-direction">你希望参与哪个方向？ <em>*</em></label>
               <select id="join-direction" value={form.direction} onChange={e=>update('direction',e.target.value as Direction | '')}>
@@ -482,13 +491,14 @@ export function JoinUsPage({ user }: { user: User | null }) {
               <label htmlFor="join-note">还想告诉我们什么？</label>
               <textarea id="join-note" value={form.note} onChange={e=>update('note',e.target.value)} maxLength={600} rows={3} placeholder="例如协作时间、对项目的想法或想先交流的问题" />
               <label className="join-agreement"><input type="checkbox" checked={form.acknowledged} onChange={e=>update('acknowledged',e.target.checked)}/><span>我已阅读并理解：HHBA 仍处于公司筹备及融资前阶段；福利与股权仅为未来目标，具体合作报酬及权益需另行书面约定。<em> *</em></span></label>
+              <label className="join-agreement"><input type="checkbox" checked={form.privacyAgreed} onChange={e=>update('privacyAgreed',e.target.checked)}/><span>我同意 HHBA 为联系和评估此次申请，将我主动填写的称呼、联系方式、经历及合作意向保存在受控数据库，并通过邮件通知负责人。可通过官方联系渠道提出删除请求。<em> *</em></span></label>
             </>}
             {error && <p className="join-form-error" role="alert">{error}</p>}
             <div className="join-form-actions">
               {step > 0 && <button type="button" className="join-btn join-btn-light" onClick={() => {setStep(s=>s-1);setError('')}}><ArrowLeft size={16} /> 上一步</button>}
               <button type="submit" className="join-btn join-btn-primary">{step === 2 ? '查看填写摘要' : '下一步'} <ArrowRight size={16}/></button>
             </div>
-            <p className="join-form-security"><Info size={14}/> 静态体验版本：不发送网络请求、不保存申请资料、不会产生已提交记录。</p>
+            <p className="join-form-security"><Info size={14}/> 申请数据仅在你核对摘要并确认提交后发送；邮件服务未接通时无法正式提交。</p>
           </form>}
         </div>
       </section>
