@@ -35,7 +35,7 @@ export const HOUSING_TEN_CITY_OFFICIAL_RECORDS_20261101:TalentHousingRecord[]=[
     "rent": "租赁补贴执行《丹东市公共租赁住房租赁补贴的实施意见》（丹政办发〔2017〕3号）及各地当期资格和补助标准；不是统一免费租房。",
     "eligibility": "符合丹东市区住房困难、家庭收入或稳定就业及居住要求的新就业职工和稳定就业外来务工家庭等；需经实际所属社区、街道及住房保障部门核查收入、住房、社保和其他保障享受情况。2026答复未重述所有资格细节，不能套用2011年旧标准。",
     "sourceUrl": "https://rsj.dandong.gov.cn/html/DDRSJ/202606/0178108029052561.html",
-    "published": "2026-06-09",
+    "published": "2026-06-10",
     "kind": "program",
     "housingCategory": "公共租赁住房",
     "reviewedAt": "2026-11-01",
