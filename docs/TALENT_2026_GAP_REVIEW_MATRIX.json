@@ -203,5 +203,10 @@
       "verifiedVacancies": false
     }
   ],
-  "critical": "A research or 2012 rule is not current availability. Never count source-collected as government 2026 verified. Qinghai regional SZYF belongs to a shared provincial program, not new cash policy."
+  "critical": "Only direct government 2026 source records are in nationwide formal data. Qinghai five SZYF entries are province-wide past-window research locators, not independent local cash policies. Secondary and obsolete rules must not claim official housing or live vacancies.",
+  "officiallyIndexedPolicyCount": 1,
+  "officiallyIndexedHousingCount": 4,
+  "policyLeadsNotOfficiallyIndexed": 15,
+  "housingLeadsNotOfficiallyIndexed": 16,
+  "housingWithoutFormal2026Evidence": 29
 }
