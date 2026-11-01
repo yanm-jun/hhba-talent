@@ -8,6 +8,7 @@ Only execute audited media-generation steps, not CI release/deploy steps.
 from __future__ import annotations
 
 import os
+import json
 from pathlib import Path
 import re
 import subprocess
@@ -110,6 +111,30 @@ def main() -> None:
     if missing:
         raise SystemExit("Missing required Cloudflare artifacts: " + ", ".join(missing))
     print(f"HHBA_CLOUDFLARE_BUILD_VERIFIED={len(checks)}", flush=True)
+
+    # Every employer's image path must exist in the released static files.
+    # Check actual profile JSON after the sourced-media scripts have updated it.
+    validated = 0
+    missing_profile_media = []
+    for profile_path in sorted((WEB / "src/data/employerProfiles").glob("cn-autumn-*.json")):
+        profile = json.loads(profile_path.read_text(encoding="utf8"))
+        media = profile.get("media") or {}
+        items = [media.get("logo")] + [p.get("path") for p in media.get("photos", [])]
+        for candidate in items:
+            if not isinstance(candidate, str) or not candidate:
+                missing_profile_media.append(f"{profile_path.name}: empty media path")
+                continue
+            if not candidate.startswith("images/") or ".." in Path(candidate).parts:
+                missing_profile_media.append(f"{profile_path.name}: unsafe/nonlocal media {candidate}")
+                continue
+            dest = WEB / "dist" / candidate
+            if not dest.is_file() or dest.stat().st_size <= 0:
+                missing_profile_media.append(f"{profile_path.name}: {candidate}")
+            else:
+                validated += 1
+    if missing_profile_media:
+        raise SystemExit("Unresolved employer media:\\n" + "\\n".join(missing_profile_media[:100]))
+    print(f"HHBA_CLOUDFLARE_EMPLOYER_MEDIA_VERIFIED={validated}", flush=True)
 
 
 if __name__ == "__main__":
