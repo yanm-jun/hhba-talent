@@ -1,3 +1,4 @@
+import {HOUSING_TEN_CITY_RESEARCH_LEADS_20261101} from './housingTenCityResearchLeads20261101.ts';
 import {GUANGXI_HOUSING_RESEARCH_LEADS} from './guangxiHousingLeads.ts';
 import {LANGFANG_HOUSING_LEADS} from './langfangHousingLeads.ts';
 import {CANGZHOU_HOUSING_LEADS} from './cangzhouHousingLeads.ts';
@@ -15,6 +16,7 @@ export type TalentHousingResearchLead={
  sourceUrl:string;sourceName:string;statusNote:string;steps:string[];reviewedAt:string;
 };
 export const TALENT_HOUSING_RESEARCH_LEADS:TalentHousingResearchLead[]=[
+...HOUSING_TEN_CITY_RESEARCH_LEADS_20261101,
 ...GUANGXI_HOUSING_RESEARCH_LEADS,
 ...LANGFANG_HOUSING_LEADS,
 ...CANGZHOU_HOUSING_LEADS,
