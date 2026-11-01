@@ -168,12 +168,12 @@ type Direction = typeof roles[number]['id'];
 type FormData = {
   name: string; contactType: string; contact: string; direction: Direction | '';
   experience: string; portfolio: string; strength: string;
-  weeklyTime: string; mode: string; note: string; acknowledged: boolean;
+  weeklyTime: string; mode: string; note: string; acknowledged: boolean; privacyAgreed: boolean;
 };
 const blank: FormData = {
   name: '', contactType: '邮箱', contact: '', direction: '',
   experience: '', portfolio: '', strength: '',
-  weeklyTime: '', mode: '', note: '', acknowledged: false,
+  weeklyTime: '', mode: '', note: '', acknowledged: false, privacyAgreed: false,
 };
 
 function JumpButton({ onClick, secondary = false, children }: {
@@ -246,6 +246,20 @@ export function JoinUsPage({ user }: { user: User | null }) {
   const [form, setForm] = useState<FormData>(blank);
   const [error, setError] = useState('');
   const [preview, setPreview] = useState(false);
+  const [mailReady, setMailReady] = useState(false);
+  const [mailChecking, setMailChecking] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [submittedId, setSubmittedId] = useState<string | null>(null);
+  useEffect(() => {
+    if (import.meta.env.VITE_HHBA_JOIN_API_ENABLED !== '1') {setMailChecking(false);return;}
+    let alive = true;
+    fetch('/api/v1/join/applications', {credentials:'same-origin'})
+      .then(r=>r.ok?r.json():null)
+      .then(r=>{if(alive)setMailReady(r?.ready===true)})
+      .catch(()=>{if(alive)setMailReady(false)})
+      .finally(()=>{if(alive)setMailChecking(false)});
+    return ()=>{alive=false};
+  }, []);
   useEffect(() => { window.scrollTo(0, 0); }, []);
   const update = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     setForm(old => ({ ...old, [key]: value }));
@@ -276,13 +290,33 @@ export function JoinUsPage({ user }: { user: User | null }) {
     jump(formRef);
   };
   const showPreview = () => {
-    if (!form.weeklyTime || !form.mode || !form.acknowledged) {
-      setError('请填写合作安排，并确认已知悉当前创业阶段说明。'); return;
+    if (!form.weeklyTime || !form.mode || !form.acknowledged || !form.privacyAgreed) {
+      setError('请填写合作安排，并确认已阅读创业阶段说明和个人信息处理说明。'); return;
     }
     setError('');
     setPreview(true);
     jump(formRef);
   };
+  async function submitApplication() {
+    setError('');
+    if(!mailReady) { setError('申请邮件发送服务尚未配置完成，当前表单不会收集或保存真实申请。'); return; }
+    if(!form.acknowledged || !form.privacyAgreed) {setError('请确认资料处理说明。');return;}
+    setSending(true);
+    try {
+      const res = await fetch('/api/v1/join/applications', {
+        method:'POST', credentials:'same-origin',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({...form,website:''})
+      });
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok)throw new Error(data?.detail||'提交失败，请稍后再试。');
+      if(data.ok!==true || data.mail_status!=='accepted')throw new Error('邮件尚未获发送服务接受，未确认投递。');
+      setSubmittedId(data.application_id);
+      setForm(blank);
+      setPreview(false);
+    }catch(e) {setError(e instanceof Error?e.message:'提交失败。');}
+    finally {setSending(false);}
+  }
   const selectedRole = roles.find(role => role.id === form.direction);
   return <Shell user={user}>
     <div className="join-page">
@@ -399,7 +433,7 @@ export function JoinUsPage({ user }: { user: User | null }) {
         <div className="join-section-head">
           <p className="join-kicker">SAY HELLO</p>
           <h2 id="join-apply-title">告诉我们，你想一起做什么。</h2>
-          <p>先体验这套三步合作意向流程。当前是 GitHub Pages 静态预览，尚无安全申请接收接口，因此不会发送或保存你填写的任何资料。</p>
+          <p>三步填写加入或合作意向；邮件服务接通后，申请将安全存入 HHBA 数据库，并向负责人指定邮箱发送申请通知。</p>
         </div>
         <div className="join-form-shell">
           <div className="join-form-progress" aria-label="合作意向步骤">
