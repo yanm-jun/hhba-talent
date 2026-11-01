@@ -97,10 +97,26 @@ def collect(id,sources,needle,domain,limit=2,ban=None):
  return result
 # 072: municipal government construction department text explicitly credits 福州建工集团.
 # Image selection is restricted to this specific government article; if no photo, keep SVG.
-fj=collect('072',[
- ('https://zjj.fuzhou.gov.cn/zwgk/zlaqjg/202503/t20250324_4993333.htm','2025福州市住建局福州建工集团特级资质及工程案例报道配图'),
- ('https://gzw.fuzhou.gov.cn/zwgk/zpxx/202605/t20260527_5327138.htm','2026福州市国资委福州建工招聘报道配图')],
- '福州建工','fuzhou.gov.cn')
+fj=[]
+# Two direct, publisher-hosted images with specific company/project attribution.
+# Avoid re-scraping generic CMS meta content and unrelated project photos.
+for slot, url, article, context in [
+ (1,
+  'https://zjj.fuzhou.gov.cn/zwgk/zlaqjg/202503/W020250324354696475507.png',
+  'https://zjj.fuzhou.gov.cn/zwgk/zlaqjg/202503/t20250324_4993333.htm',
+  '福州市住建局报道：福州建工集团总部建筑实景（2025）'),
+ (2,
+  'https://zjj.fuzhou.gov.cn/zwgk/tzgg/202506/W020250626627265383527.jpg',
+  'https://zjj.fuzhou.gov.cn/zwgk/tzgg/202506/t20250626_5039211.htm',
+  '福州市住建局发布：福州建工建筑生产基地绿色建筑项目实景（2025）'),
+]:
+ try:
+  media=store('072',slot,url,article,context)
+  if media['sha256'] not in {x['sha256'] for x in fj}: fj.append(media)
+ except Exception as exc:
+  print('HHBA_FUZHOU_GOVERNMENT_PHOTO_UNAVAILABLE',slot,str(exc)[:150])
+# If both exact URLs are unavailable, retain the clearly labelled editorial
+# SVG rather than present unrelated construction-site imagery as this firm.
 commit('072',fj)
 # 073: exact Microsoft-owned published research centre building, not generic skyline.
 ms=[]
