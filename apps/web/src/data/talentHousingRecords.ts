@@ -1,3 +1,5 @@
+import {QINGHAI_HOUSING_RECORDS} from './qinghaiHousingRecords.ts';
+import {QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS} from './qinghaiVerifiedHousing.ts';
 import {NINGXIA_HOUSING_RECORDS} from './ningxiaHousingRecords.ts';
 import {GUIZHOU_HOUSING_RECORDS} from './guizhouHousingRecords.ts';
 import {SICHUAN_HOUSING_RECORDS} from './sichuanHousingRecords.ts';
@@ -56,6 +58,8 @@ import {WEIFANG_HOUSING_RECORDS} from './weifangHousingRecords.ts';
 export type TalentHousingRecord={id:string;city:string;district:string;title:string;address:string;units:string;rent:string;eligibility:string;sourceUrl:string;published:string;applicationEnd?:string;statusNote:string;steps:string[];applyUrl?:string;kind:'project'|'program';reviewedAt:string;contactPhone?:string;contactSourceUrl?:string;photoEvidence?:'source';housingCategory?:'人才公寓'|'公共租赁住房'|'保障性租赁住房'|'其他住房';};
 export const HOUSING_REVIEW_DATE='2026-10-30';
 export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
+ ...QINGHAI_HOUSING_RECORDS,
+ ...QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS,
  ...NINGXIA_HOUSING_RECORDS,
  ...GUIZHOU_HOUSING_RECORDS,
  ...SICHUAN_HOUSING_RECORDS,
