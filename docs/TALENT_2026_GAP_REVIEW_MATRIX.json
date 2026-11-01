@@ -311,5 +311,80 @@
       "宜宾人事考试网 SPA",
       "巴中党建网 timed out"
     ]
+  },
+  "currentCodeHousingGapAudit": {
+    "auditDate": "2026-11-01",
+    "scope": "Nationwide CI derived formal aggregate: only cities with policy records and zero formal housing records",
+    "baselineMissingHousingCities": 40,
+    "newlyConnectedFormalCities": [
+      "广安",
+      "巴中",
+      "宜宾",
+      "资阳"
+    ],
+    "newlyAddedOfficialRecordCount": 4,
+    "remainMissingHousingCities": 36,
+    "remainingByProvince": {
+      "河北省": [
+        "邢台"
+      ],
+      "辽宁省": [
+        "鞍山",
+        "丹东",
+        "锦州",
+        "铁岭",
+        "葫芦岛"
+      ],
+      "山东省": [
+        "日照",
+        "聊城",
+        "菏泽"
+      ],
+      "广西壮族自治区": [
+        "南宁",
+        "柳州",
+        "梧州",
+        "北海",
+        "钦州",
+        "贵港",
+        "玉林",
+        "百色",
+        "贺州",
+        "河池",
+        "来宾",
+        "崇左"
+      ],
+      "四川省": [
+        "攀枝花",
+        "泸州",
+        "绵阳",
+        "遂宁",
+        "内江",
+        "甘孜",
+        "凉山"
+      ],
+      "贵州省": [
+        "六盘水",
+        "遵义",
+        "安顺",
+        "毕节",
+        "黔西南",
+        "黔东南",
+        "黔南"
+      ],
+      "青海省": [
+        "海北"
+      ]
+    },
+    "institutionAuthoredMediaNotFormal": [
+      "泸州"
+    ],
+    "originalSourceAccessNeedsManualRecheck": [
+      "宜宾",
+      "资阳"
+    ],
+    "sourceLimit": "Government domain / exact whitelisted official original source classification and integration passing CI does not prove original page accessible, project availability, current applicants, actual rent, or full A-grade guidance.",
+    "ci": "https://github.com/yanm-jun/hhba-talent/actions/runs/41306163777",
+    "detail": "docs/TALENT_SICHUAN_HOUSING_BATCH2_20261101.md"
   }
 }
