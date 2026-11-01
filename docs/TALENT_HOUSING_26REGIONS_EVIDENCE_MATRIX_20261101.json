@@ -86,16 +86,16 @@
     {
       "province": "四川省",
       "city": "甘孜",
-      "leadType": "government_host_reprint",
-      "lead": "泸定县政府网站2025转载州住建等8部门住房措施，涉及青年驿站与定向保障；仍需联合发文原件、2026受理批次",
+      "leadType": "government_original_2026_county_program",
+      "lead": "泸定县人民政府办公室泸府办发〔2026〕4号，2026年3月31日起施行5年；县城镇户籍、年龄、住房、车辆、租金、线上线下审核和配租流程均有原文。严格限泸定县，非全州公租房。",
       "leadUrl": "https://www.luding.gov.cn/ldtwjd/article/670035",
-      "hasVerifiedLocalDirectOriginal": false,
-      "localGovernmentOriginalUrl": null,
+      "hasVerifiedLocalDirectOriginal": true,
+      "localGovernmentOriginalUrl": "https://www.luding.gov.cn/gfxwj/article/707174",
       "official2026ApplicationPage": null,
       "projectAddressVerified": false,
       "liveVacancyVerified": false,
       "deadlineVerified": false,
-      "task": "取得本地区住建/政府官方原始文件与2026受理公告；确认属地、资格、项目、申请材料、办理入口及房源状态"
+      "task": "泸定县本地县级原始政策已建档；仍需取得2026实际房源分配公告、具体门牌、真实可选套数、项目租金及四川政务服务网事项深链，并核实其他州县制度。"
     },
     {
       "province": "四川省",
@@ -377,5 +377,11 @@
       "deadlineVerified": false,
       "task": "取得本地区住建/政府官方原始文件与2026受理公告；确认属地、资格、项目、申请材料、办理入口及房源状态"
     }
-  ]
+  ],
+  "officiallyIndexedHousingTargetCities": [
+    "甘孜"
+  ],
+  "region2026OriginalVerifiedCount": 1,
+  "remainingIndependentLocalOriginalsCount": 25,
+  "lastReconciliationNote": "Policy-only housing gap audited by code may drop 36 to 35 after Ganzi county-level housing index. This does not mean Ganzi as a whole is fully covered."
 }
