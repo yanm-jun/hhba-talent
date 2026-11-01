@@ -9,7 +9,7 @@
 - 当前测试只允许 `@example.test`、`@example.invalid` 邮箱（明确非真实邮箱，不做邮件所有权认证）；**禁止真实用户输入个人信息或复用真实密码**。
 
 ## 已有能力
-1. 求职者与招聘方使用现有两个入口及邮箱密码页面，各自在数据库中持有 `candidate`、`recruiter` 角色。
+1. 求职者与招聘方默认在 `/candidate/login` 和 `/recruiter/login` 显示截图统一样式的邮箱密码页面，各自在数据库中持有 `candidate`、`recruiter` 角色。
 2. 身份数据库核验和隔离；求职者账号不能作为招聘方登录，反之亦然。
 3. PBKDF2-SHA256（每用户随机盐，310000 次）、D1 凭证持久化。
 4. 密码不会放在前端存储；Cookie 为 HttpOnly、Secure、SameSite=Lax，服务端只存令牌 SHA-256，期限 7 天；敏感改动需 Origin、CSRF。
@@ -25,7 +25,7 @@
 
 ## 测试步骤
 1. Cloudflare Pages 分支预览构建成功，确认 Functions 打包成功，`HHBA_AUTH_DB` 绑定至预览 D1。
-2. 从 `/auth` 进入求职者或招聘方登录页，选“邮箱密码（测试）”。
+2. 从 `/auth` 进入求职者或招聘方的 `/candidate/login` 或 `/recruiter/login`，直接呈现邮箱密码输入框；切换身份、Logo、绿色按钮及卡片尺寸与原手机登录页一致。
 3. 使用 `candidate01@example.test` 或 `recruiter01@example.test` 等测试邮箱，设置 **仅用于测试** 的随机密码。
 4. 注册并登录，刷新页面应恢复同一会话，退出后 `/api/v1/auth/me` 应变为 401。
 5. 将求职者账号切换招聘方登录，必须返回 403；相反方向同样检查。
