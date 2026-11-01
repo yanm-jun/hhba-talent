@@ -7,7 +7,11 @@ const configuredApiBase = String(import.meta.env.VITE_API_BASE || '').trim();
 // Railway's ATS reader is NOT the authenticated HHBA candidate/employer API.
 // Enable account operations only after deploying and verifying that separate API.
 const accountApiEnabled = import.meta.env.VITE_HHBA_ACCOUNT_API_ENABLED==='1';
-export const employerApiReady = accountApiEnabled && (configuredApiBase==='/api/v1' || /^https:\/\/[^\s/?#]+\/api\/v1\/?$/.test(configuredApiBase));
+// Limited Cloudflare D1 authentication preview. Other APIs remain disabled.
+const authApiEnabled = import.meta.env.VITE_HHBA_ACCOUNT_AUTH_ENABLED==='1';
+const apiAddressValid = configuredApiBase==='/api/v1' || /^https:\/\/[^\s/?#]+\/api\/v1\/?$/.test(configuredApiBase);
+export const accountAuthReady = authApiEnabled && apiAddressValid;
+export const employerApiReady = accountApiEnabled && apiAddressValid;
 // Do not send SMS from a public static site. Enable only after dedicated phone auth backend is verified.
 export const phoneAuthReady = employerApiReady && import.meta.env.VITE_HHBA_PHONE_AUTH_ENABLED==='1';
 // Evidence is an additional, independently activated capability. Existing employer API readiness is insufficient.
@@ -36,7 +40,8 @@ export function setCsrfToken(value: string | null) { csrfToken = value; }
 export function getCsrfToken() { return csrfToken; }
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
-  if (!employerApiReady) throw new ApiError(503, 'HHBA 企业与个人账户后台尚未完成接入。岗位搜索正常使用，但账户注册、企业认证、职位发布暂不可操作。');
+  const authPath = /^\/auth\/(register|session|me)$/.test(path);
+  if (!employerApiReady && !(authPath && accountAuthReady)) throw new ApiError(503, '此功能尚未正式开放。测试环境仅支持账号注册、登录、退出和会话查询。');
   const controller = new AbortController();
   const timer = window.setTimeout(() => controller.abort(), 20_000);
   const headers = new Headers(init.headers);
