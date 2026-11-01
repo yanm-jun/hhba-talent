@@ -1,3 +1,4 @@
+import {SICHUAN_HOUSING_GAP_2026_OFFICIAL} from './sichuanHousingGapOfficial2026.ts';
 import {TALENT_2026_HOUSING_GAP_RECORDS} from './talent2026HousingGapRecords.ts';
 import {XINJIANG_HOUSING_RECORDS} from './xinjiangHousingRecords.ts';
 import {GANSU_HOUSING_BATCH_RECORDS} from './gansuHousingBatchRecords.ts';
@@ -76,6 +77,7 @@ export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
  ...QINGHAI_VERIFIED_HOUSING_SUPPLEMENTS,
  ...NINGXIA_HOUSING_RECORDS,
  ...GUIZHOU_HOUSING_RECORDS,
+ ...SICHUAN_HOUSING_GAP_2026_OFFICIAL,
  ...SICHUAN_HOUSING_RECORDS,
  ...LESHAN_HOUSING_RECORDS,
  ...SHENYANG_HOUSING_GAP_RECORDS,
