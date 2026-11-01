@@ -109,7 +109,7 @@ export function assessHousing(h:TalentHousingRecord,asOf:string=dateToday()):Tal
  if(!h.applyUrl)missing.push('已核对的申报渠道');
  if(!h.contactPhone)missing.push('真实公开咨询方式（如官方公布）');
  if(!certified)missing.push('逐项核实的完整项目办理指南');
- const outdated=pastDeadline(h.applicationEnd,asOf);
+ const outdated=pastDeadline(h.applicationEnd,asOf)||h.id.endsWith('-history');
  const grade:TalentQualityGrade=sourceKind==='unverified'?'D':outdated?'C':
   certified&&certified.city===h.city&&sourceKind==='government'?'A':'B';
  return {id:h.id,city:h.city,title:h.title,kind:'housing',grade,label:label(grade,'housing'),missing,
