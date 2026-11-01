@@ -128,16 +128,16 @@
     {
       "province": "广西壮族自治区",
       "city": "柳州",
-      "leadType": "government_document_expired",
-      "lead": "2025官方企业政策手册含2022-2025到期人才购房补贴，不能延长为2026现行待遇",
-      "leadUrl": "https://www.liuzhou.gov.cn/bsfw/myqyzczc/202504/P020250424328894956107.pdf",
+      "leadType": "official_procurement_not_housing_application",
+      "lead": "中央政府采购网2025-12-02发布柳州市住建局2026-2027公租房运营管理招标；只能证明当地有公租房管理活动，采购预算不是居民补贴，不具备申请人条件/本期房源。",
+      "leadUrl": "https://www.ccgp.gov.cn/cggg/dfgg/gkzb/202512/t20251202_25833691.htm",
       "hasVerifiedLocalDirectOriginal": false,
       "localGovernmentOriginalUrl": null,
       "official2026ApplicationPage": null,
       "projectAddressVerified": false,
       "liveVacancyVerified": false,
       "deadlineVerified": false,
-      "task": "取得本地区住建/政府官方原始文件与2026受理公告；确认属地、资格、项目、申请材料、办理入口及房源状态"
+      "task": "取得本地区住建/政府官方原始文件与2026受理公告；确认属地、资格、项目、申请材料、办理入口及房源状态；已检出来源但不具本市政府官网可核验原件，不能计作已完成。"
     },
     {
       "province": "广西壮族自治区",
@@ -184,44 +184,44 @@
     {
       "province": "广西壮族自治区",
       "city": "贵港",
-      "leadType": "secondary_regulation_2024",
-      "lead": "贵住建通〔2024〕27号保租房办法第三方全文，需政府一手版本及现行状态",
-      "leadUrl": "https://gcs66.com/document_detail/151689.html",
+      "leadType": "2025_official_regulation_press_conference",
+      "lead": "2025-06-06贵港市政府部门解读《贵港市公共租赁住房管理办法》，本地官方报纸记载新增外来务工、灵活就业等保障类型，但没取得规章政府原件与2026独立受理公告。",
+      "leadUrl": "https://www.ggnews.com.cn/news/ggxwfb/2025-06-07/104976.html",
       "hasVerifiedLocalDirectOriginal": false,
       "localGovernmentOriginalUrl": null,
       "official2026ApplicationPage": null,
       "projectAddressVerified": false,
       "liveVacancyVerified": false,
       "deadlineVerified": false,
-      "task": "取得本地区住建/政府官方原始文件与2026受理公告；确认属地、资格、项目、申请材料、办理入口及房源状态"
+      "task": "取得本地区住建/政府官方原始文件与2026受理公告；确认属地、资格、项目、申请材料、办理入口及房源状态；已检出来源但不具本市政府官网可核验原件，不能计作已完成。"
     },
     {
       "province": "广西壮族自治区",
       "city": "玉林",
-      "leadType": "local_original_missing",
-      "lead": "现有2026人才工作报道并非住房申报细则，须县区与市级住建原件",
-      "leadUrl": null,
+      "leadType": "2025_selltype_official_authored_reprint",
+      "lead": "玉住建字〔2025〕5号配售型保障住房准入细则修改（主申请人在玉州/福绵/玉东无房或人均不足22㎡；单位就业/社保/创业等分支）和2025-08-21常态受理通告均仅见第三方全文，需政府部门原件、2026本期是否受理和房源项目。",
+      "leadUrl": "https://zc.51shebao.com/detail/838100",
       "hasVerifiedLocalDirectOriginal": false,
       "localGovernmentOriginalUrl": null,
       "official2026ApplicationPage": null,
       "projectAddressVerified": false,
       "liveVacancyVerified": false,
       "deadlineVerified": false,
-      "task": "取得本地区住建/政府官方原始文件与2026受理公告；确认属地、资格、项目、申请材料、办理入口及房源状态"
+      "task": "取得本地区住建/政府官方原始文件与2026受理公告；确认属地、资格、项目、申请材料、办理入口及房源状态；已检出来源但不具本市政府官网可核验原件，不能计作已完成。"
     },
     {
       "province": "广西壮族自治区",
       "city": "百色",
-      "leadType": "local_original_missing",
-      "lead": "仅有自治区住房保障规则；百色本地项目/租补原文未检出",
-      "leadUrl": null,
+      "leadType": "municipal_2026_notice_reprint",
+      "lead": "2026-05-14百色市住建局签署2026第一批市本级公租房轮候家庭分配意向调查：登记期限2026-05-15至20，已截止；对象限已进入轮候库，不是公租房新申请批次；原文为媒体转载。",
+      "leadUrl": "https://m.sohu.com/a/1022646963_121106875",
       "hasVerifiedLocalDirectOriginal": false,
       "localGovernmentOriginalUrl": null,
       "official2026ApplicationPage": null,
       "projectAddressVerified": false,
       "liveVacancyVerified": false,
       "deadlineVerified": false,
-      "task": "取得本地区住建/政府官方原始文件与2026受理公告；确认属地、资格、项目、申请材料、办理入口及房源状态"
+      "task": "取得本地区住建/政府官方原始文件与2026受理公告；确认属地、资格、项目、申请材料、办理入口及房源状态；已检出来源但不具本市政府官网可核验原件，不能计作已完成。"
     },
     {
       "province": "广西壮族自治区",
