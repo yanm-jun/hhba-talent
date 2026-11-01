@@ -68,7 +68,12 @@ def main() -> None:
         run(step["run"], cwd=REPO / step.get("working-directory", "."))
     print("HHBA_CLOUDFLARE_CAMPUS_MEDIA_OK=5", flush=True)
 
-    run(["npm", "run", "build"], cwd=WEB)
+    # Cloudflare Pages runs at '/', not Github Pages '/hhba-talent/'.
+    # Enable the audited same-origin public catalogue BEFORE Vite embeds its
+    # feature flags. Without this it fetches /live-recruitment/api/jobs/page,
+    # a dev-only proxy which becomes HTML SPA fallback on Cloudflare.
+    run(["npm", "run", "build"], cwd=WEB,
+        env={**os.environ, "VITE_HHBA_VERIFIED_SNAPSHOT": "1"})
 
     # Same-site company deep links; do not add 404.html, so Cloudflare Pages
     # retains its native SPA fallback for other client-side routes.
@@ -82,6 +87,7 @@ def main() -> None:
     # Fail the build if a source is stale rather than shipping fake or old jobs.
     run(["node", "scripts/prepare-pages-jobs.mjs"], cwd=WEB)
     run(["node", "scripts/audit-all-official-jds.mjs"], cwd=WEB)
+    run(["node", "scripts/verify-cloudflare-recruitment.mjs"], cwd=WEB)
 
     # Publish manifest tied to the actual Cloudflare Git commit (no fabricated SHA).
     env = dict(os.environ)
