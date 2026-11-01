@@ -16,36 +16,41 @@
     {
       "province": "四川省",
       "city": "攀枝花",
-      "leadType": "secondary_policy_index",
-      "lead": "2024年公租房租赁补贴实施意见政策解读有间接索引，未取得2026仍有效的原文",
-      "leadUrl": null,
+      "leadType": "2026-09_third_party_housing_project_notice",
+      "lead": "2026年9月国家钒钛高新区保租房受理公告的第三方索引，地址仁和区科创路69号、项目规模约671套；未取得园区官网原始公告，套数不等于11月余房",
+      "leadUrl": "https://www.bidcenter.com.cn/zhaobiao/zbkeyw-35489-510400-1.html",
       "hasVerifiedLocalDirectOriginal": false,
       "localGovernmentOriginalUrl": null,
       "official2026ApplicationPage": null,
       "projectAddressVerified": false,
       "liveVacancyVerified": false,
       "deadlineVerified": false,
-      "task": "取得本地区住建/政府官方原始文件与2026受理公告；确认属地、资格、项目、申请材料、办理入口及房源状态"
+      "task": "已将2026项目/保障线索接入城市人才安居待核验卡片，仍需当地住房保障部门原始文件、申报资格、真实项目与房源、租金和受理入口；不能算正式住房政策已补齐。",
+      "formalOldPolicyIndexed": false,
+      "researchLeadInCityPage": true
     },
     {
       "province": "四川省",
       "city": "泸州",
-      "leadType": "institution_authored_media",
-      "lead": "2026“凤栖泸桐”人才公寓、购房支持和青年驿站，市委组织部署名于省级媒体，非政府官网原文",
-      "leadUrl": "https://cbgc.scol.com.cn/news/7322053",
+      "leadType": "government_crossprovince_fulltext_2023_validity_2026_unverified",
+      "lead": "重庆市江津区政府跨省住房保障合作栏目完整刊载《泸州市公租房管理办法》2023版公布文本，资格、申报、分级租补及三级审核明晰；尚无泸州市2026新版或确认现行效力的政府原文。已接正式基础政策但不得宣称2026制度全量认证",
+      "leadUrl": "https://www.jiangjin.gov.cn/bm/qzfcxjw_69012/zwgk_81474/zfxxgkml/jczwgk/bzxzflyxxgk/lyjzfbzzcxc/202312/t20231222_12737188.html",
       "hasVerifiedLocalDirectOriginal": false,
       "localGovernmentOriginalUrl": null,
       "official2026ApplicationPage": null,
       "projectAddressVerified": false,
       "liveVacancyVerified": false,
       "deadlineVerified": false,
-      "task": "取得本地区住建/政府官方原始文件与2026受理公告；确认属地、资格、项目、申请材料、办理入口及房源状态"
+      "task": "已新增跨省政府网站完整历史公租房制度正式基础卡片；仍需泸州市住建原始现行文本、各区县2026项目/金额、开放批次、真实申报入口及当前房源，不能算全面补齐。",
+      "governmentCrossProvinceFullTextUrl": "https://www.jiangjin.gov.cn/bm/qzfcxjw_69012/zwgk_81474/zfxxgkml/jczwgk/bzxzflyxxgk/lyjzfbzzcxc/202312/t20231222_12737188.html",
+      "formalOldPolicyIndexed": true,
+      "originalIssuingAuthority2026Valid": false
     },
     {
       "province": "四川省",
       "city": "绵阳",
-      "leadType": "secondary_2026_housing_notice",
-      "lead": "2026年市本级人才公寓选房排号公示已有媒体索引；需住建委原始直链、申请条件及项目名单",
+      "leadType": "2026_talent_apartment_secondary_notices",
+      "lead": "2026绵阳市本级人才公寓排号（7月、9月）及涪城区经开区多批次公示，缺政府官网公告原文、当期适用申请条件及可出租项目详情",
       "leadUrl": "https://news.myersh.cn/?category=%E4%BA%BA%E6%89%8D%E6%94%BF%E7%AD%96",
       "hasVerifiedLocalDirectOriginal": false,
       "localGovernmentOriginalUrl": null,
@@ -53,35 +58,41 @@
       "projectAddressVerified": false,
       "liveVacancyVerified": false,
       "deadlineVerified": false,
-      "task": "取得本地区住建/政府官方原始文件与2026受理公告；确认属地、资格、项目、申请材料、办理入口及房源状态"
+      "task": "已将2026项目/保障线索接入城市人才安居待核验卡片，仍需当地住房保障部门原始文件、申报资格、真实项目与房源、租金和受理入口；不能算正式住房政策已补齐。",
+      "formalOldPolicyIndexed": false,
+      "researchLeadInCityPage": true
     },
     {
       "province": "四川省",
       "city": "遂宁",
-      "leadType": "media_2026_allocation",
-      "lead": "2026年104户公租房分配为历史配租报道，需住建部门当期申请原件",
-      "leadUrl": "https://cbgc.scol.com.cn/news/7649398",
+      "leadType": "2026_occupied_talent_apartment_media_reporting",
+      "lead": "四川日报2026-07-29现场报道遂宁河东新区暖新公寓165套基本配完、另预留28套作调剂；政府受理原件与实时房源状态待查",
+      "leadUrl": "https://cbgc.scol.com.cn/news/7803049",
       "hasVerifiedLocalDirectOriginal": false,
       "localGovernmentOriginalUrl": null,
       "official2026ApplicationPage": null,
       "projectAddressVerified": false,
       "liveVacancyVerified": false,
       "deadlineVerified": false,
-      "task": "取得本地区住建/政府官方原始文件与2026受理公告；确认属地、资格、项目、申请材料、办理入口及房源状态"
+      "task": "已将2026项目/保障线索接入城市人才安居待核验卡片，仍需当地住房保障部门原始文件、申报资格、真实项目与房源、租金和受理入口；不能算正式住房政策已补齐。",
+      "formalOldPolicyIndexed": false,
+      "researchLeadInCityPage": true
     },
     {
       "province": "四川省",
       "city": "内江",
-      "leadType": "local_media",
-      "lead": "市中区人才公寓媒体报道线索，2026效力与原始主管部门项目清单待补",
-      "leadUrl": "https://www.scnj.tv/wap/showplay.php?id=1982574",
+      "leadType": "2025_local_regulation_2026_application_secondary",
+      "lead": "内市区府规〔2025〕1号市中区公租房办法有第三方全文、2026住建局多批住房保障资格公示转载，尚需区政府正式文号原文及2026申领窗口",
+      "leadUrl": "https://zc.51shebao.com/detail/835470",
       "hasVerifiedLocalDirectOriginal": false,
       "localGovernmentOriginalUrl": null,
       "official2026ApplicationPage": null,
       "projectAddressVerified": false,
       "liveVacancyVerified": false,
       "deadlineVerified": false,
-      "task": "取得本地区住建/政府官方原始文件与2026受理公告；确认属地、资格、项目、申请材料、办理入口及房源状态"
+      "task": "已将2026项目/保障线索接入城市人才安居待核验卡片，仍需当地住房保障部门原始文件、申报资格、真实项目与房源、租金和受理入口；不能算正式住房政策已补齐。",
+      "formalOldPolicyIndexed": false,
+      "researchLeadInCityPage": true
     },
     {
       "province": "四川省",
@@ -100,16 +111,18 @@
     {
       "province": "四川省",
       "city": "凉山",
-      "leadType": "institution_historical_notice",
-      "lead": "西昌学院2025人才公寓教职工内部公示，不代表凉山州居民普惠或2026开放",
-      "leadUrl": "https://www.xcc.edu.cn/gyzcgc/tzjgg11/gztz84/831727/index.html",
+      "leadType": "2026_ended_local_public_rental_allocation",
+      "lead": "西昌市住建局2026年4月27日209套公租房历史配租公告（第三方全文转载），5月11—15日报名已结束，需西昌市政府原文及后续批次",
+      "leadUrl": "https://m.cd.bendibao.com/fangchan/207947.shtm",
       "hasVerifiedLocalDirectOriginal": false,
       "localGovernmentOriginalUrl": null,
       "official2026ApplicationPage": null,
       "projectAddressVerified": false,
       "liveVacancyVerified": false,
       "deadlineVerified": false,
-      "task": "取得本地区住建/政府官方原始文件与2026受理公告；确认属地、资格、项目、申请材料、办理入口及房源状态"
+      "task": "已将2026项目/保障线索接入城市人才安居待核验卡片，仍需当地住房保障部门原始文件、申报资格、真实项目与房源、租金和受理入口；不能算正式住房政策已补齐。",
+      "formalOldPolicyIndexed": false,
+      "researchLeadInCityPage": true
     },
     {
       "province": "广西壮族自治区",
@@ -383,5 +396,20 @@
   ],
   "region2026OriginalVerifiedCount": 1,
   "remainingIndependentLocalOriginalsCount": 25,
-  "lastReconciliationNote": "Policy-only housing gap audited by code may drop 36 to 35 after Ganzi county-level housing index. This does not mean Ganzi as a whole is fully covered."
+  "lastReconciliationNote": "Policy-only housing gap audited by code may drop 36 to 35 after Ganzi county-level housing index. This does not mean Ganzi as a whole is fully covered.",
+  "sichuanSix20261101": {
+    "date": "2026-11-01",
+    "formalGovernmentHostOldRegulationIndexed": [
+      "泸州"
+    ],
+    "researchCardsVisible": [
+      "攀枝花",
+      "绵阳",
+      "遂宁",
+      "内江",
+      "凉山"
+    ],
+    "independentlyVerified2026ApplicationAndRealVacancy": [],
+    "sourceAuditLimit": "2026 original issuer local public housing information missing; cross-government full text is older. Do not assert six places fully covered or vacant properties."
+  }
 }
