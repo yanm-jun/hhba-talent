@@ -1,3 +1,4 @@
+import {TALENT_2026_HOUSING_GAP_RECORDS} from './talent2026HousingGapRecords.ts';
 import {XINJIANG_HOUSING_RECORDS} from './xinjiangHousingRecords.ts';
 import {GANSU_HOUSING_BATCH_RECORDS} from './gansuHousingBatchRecords.ts';
 import {GANSU_EXPANDED_HOUSING_RECORDS} from './gansuExpandedHousingRecords.ts';
@@ -64,6 +65,7 @@ import {WEIFANG_HOUSING_RECORDS} from './weifangHousingRecords.ts';
 export type TalentHousingRecord={id:string;city:string;district:string;title:string;address:string;units:string;rent:string;eligibility:string;sourceUrl:string;published:string;applicationEnd?:string;statusNote:string;steps:string[];applyUrl?:string;kind:'project'|'program';reviewedAt:string;contactPhone?:string;contactSourceUrl?:string;photoEvidence?:'source';housingCategory?:'人才公寓'|'公共租赁住房'|'保障性租赁住房'|'其他住房';};
 export const HOUSING_REVIEW_DATE='2026-10-30';
 export const TALENT_HOUSING_RECORDS:TalentHousingRecord[]=[
+ ...TALENT_2026_HOUSING_GAP_RECORDS,
  ...XINJIANG_HOUSING_RECORDS,
  ...GANSU_HOUSING_BATCH_RECORDS,
  ...GANSU_EXPANDED_HOUSING_RECORDS,

@@ -1,0 +1,207 @@
+{
+  "asOf": "2026-11-01",
+  "housingTargetCount": 33,
+  "capturedSourceRecords": 20,
+  "remainingDirectSourceGaps": 13,
+  "housingReview": [
+    {
+      "city": "邢台",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "鞍山",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "government-site",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "抚顺",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "government-site",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "本溪",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "government-site",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "丹东",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "government-site",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "锦州",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "government-site",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "阜新",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "government-site",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "辽阳",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "government-site",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "铁岭",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "government-evidence-reprint",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "葫芦岛",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "日照",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "聊城",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "菏泽",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "南宁",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "柳州",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "梧州",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "北海",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "钦州",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "贵港",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "玉林",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "百色",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "贺州",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "河池",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "来宾",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "崇左",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "六盘水",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "遵义",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "安顺",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "毕节",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "黔西南",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "黔东南",
+      "status": "source_captured_requires_verification",
+      "sourceTier": "secondary-or-old",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "黔南",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    },
+    {
+      "city": "海北",
+      "status": "local_primary_source_needed",
+      "sourceTier": "not_found",
+      "verifiedVacancies": false
+    }
+  ],
+  "critical": "A research or 2012 rule is not current availability. Never count source-collected as government 2026 verified. Qinghai regional SZYF belongs to a shared provincial program, not new cash policy."
+}
