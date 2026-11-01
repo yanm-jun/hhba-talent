@@ -10,9 +10,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 import re
-import shutil
 import subprocess
-import sys
 
 import yaml
 
@@ -73,7 +71,8 @@ def main() -> None:
 
     # Same-site company deep links; do not add 404.html, so Cloudflare Pages
     # retains its native SPA fallback for other client-side routes.
-    run(["node", "scripts/materialize-company-route-entries.mjs"], cwd=WEB)
+    run(["node", "scripts/materialize-company-route-entries.mjs"], cwd=WEB,
+        env={**os.environ, "HHBA_CLOUDFLARE_PAGES": "1"})
 
     # Locally host the licensed font used by the brand slogan.
     run(["python3", "scripts/prepare-home-xingshu-font.py"], cwd=WEB)
