@@ -48,7 +48,7 @@ test('real Gmail registration is verification-gated and password recovery revoke
   EMAIL:{send:async m=>{sent.push(m);return {messageId:'mock-'+sent.length}}}};
  const email='some-person@gmail.com',password='preview-only-long-password-2026';
  let r=await call(env,'auth/register',{email,password,display_name:'Test Individual',account_type:'candidate'});
- assert.equal(r.status,201);assert.equal((await r.json()).verification_required,true);
+ assert.equal(r.status,201,JSON.stringify(await r.clone().json()));assert.equal((await r.json()).verification_required,true);
  r=await call(env,'auth/session',{email,password,account_type:'candidate'});assert.equal(r.status,403);
  assert.equal(sent[0].to,email);
  const code=sent[0].text.match(/\d{6}/)?.[0];assert.ok(code);
