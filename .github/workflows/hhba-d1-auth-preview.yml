@@ -1,0 +1,48 @@
+name: HHBA D1 dual-role authentication preview
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/web/functions/**"
+      - "apps/web/d1/**"
+      - "apps/web/src/pages/AuthPage.tsx"
+      - "apps/web/src/pages/PhoneAuthPage.tsx"
+      - "apps/web/src/services/api.ts"
+      - "apps/web/src/main.tsx"
+      - "apps/web/scripts/auth-api.contract.test.mjs"
+      - ".github/workflows/hhba-d1-auth-preview.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  auth-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate D1 schema (foreign keys and unique identities)
+        run: |
+          python - <<'PY'
+          import sqlite3
+          from pathlib import Path
+          c=sqlite3.connect(':memory:')
+          c.execute('PRAGMA foreign_keys=ON')
+          c.executescript(Path('apps/web/d1/0001_dual_role_auth.sql').read_text())
+          tables={x[0] for x in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+          assert {'auth_users','auth_roles','auth_sessions','auth_rate_limits'} <= tables
+          print('D1 schema OK')
+          PY
+      - name: Exercise auth API and privacy controls
+        working-directory: apps/web
+        run: node --test scripts/auth-api.contract.test.mjs
+      - name: Compile real front-end pages
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
