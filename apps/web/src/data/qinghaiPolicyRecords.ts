@@ -1,3 +1,4 @@
+import {QINGHAI_2026_LOCAL_POLICY_RECORDS} from './qinghai2026LocalPolicyRecords.ts';
 import type {TalentPolicyRecord} from './talentPolicyRecords.ts';
 /** 青海8市州：2026官方原文与官方招聘活动材料分层登记；无市州正式细则不升级A级。 */
 export const QINGHAI_POLICY_RESEARCH_RECORDS:TalentPolicyRecord[]=[
@@ -753,4 +754,4 @@ export const QINGHAI_POLICY_RESEARCH_RECORDS:TalentPolicyRecord[]=[
 ];
 
 /** Formal V5.1 index requires first-party government policy source, not recruitment/media reprints. */
-export const QINGHAI_POLICY_RECORDS:TalentPolicyRecord[]=QINGHAI_POLICY_RESEARCH_RECORDS.filter(r=>{try{return new URL(r.sourceUrl).hostname.endsWith('.gov.cn')}catch{return false}}).map(r=>({...r,reviewNote:r.reviewNote+' 办理入口待核实。'}));
+export const QINGHAI_POLICY_RECORDS:TalentPolicyRecord[]=QINGHAI_POLICY_RESEARCH_RECORDS.filter(r=>{try{return new URL(r.sourceUrl).hostname.endsWith('.gov.cn')}catch{return false}}).map(r=>({...r,reviewNote:r.reviewNote+' 办理入口待核实。'})).concat(QINGHAI_2026_LOCAL_POLICY_RECORDS);
