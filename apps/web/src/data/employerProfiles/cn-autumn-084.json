@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-084",
+  "name": "卡夫亨氏",
+  "displayName": "卡夫亨氏（中国）",
+  "englishName": "The Kraft Heinz Company",
+  "aliases": [
+    "卡夫亨氏中国",
+    "Kraft Heinz",
+    "KraftHeinz",
+    "Heinz",
+    "亨氏",
+    "味事达",
+    "卡夫亨氏2027校招"
+  ],
+  "industry": "食品制造 · 调味品 · 食品安全 · 工厂运营 · 品牌销售",
+  "subtitle": "中国区业务 · 上海、广州、青岛、阳江及全国销售业务",
+  "overview": "卡夫亨氏是全球食品企业，在中国经营亨氏、味事达等品牌及食品研发、生产、供应、营销业务，涉及青岛、阳江等制造基地。香港中文大学（深圳）2026年9月30日发布2027校园招聘公告，列出综合培训生、国际生产制造管培生、销售培训生三大项目；公告网申截止2026年10月31日，现已过去，不得将项目直接标成仍有空缺。",
+  "lastReviewed": "2026-11-01",
+  "sources": [
+    "https://career.cuhk.edu.cn/job/view/id/469755",
+    "https://sfi.cuhk.edu.cn/zh-hans/node/12199",
+    "https://www.wondercv.com/xiaozhao/kraft-heinz-2027-campus-recruitment-17302-e13e3a/",
+    "https://www.krones.com/zh/company/press/magazine/reference/a-new-era-for-bottling-tomato-ketchup.php",
+    "https://www.foodtalks.cn/news/46923",
+    "https://wecruit.hotjob.cn/SU6295c39a0dcad4522994d9a2/mc/position/campus"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-084/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-084/photo1.svg",
+        "caption": "卡夫亨氏 · 业务编辑示意（非实景）",
+        "alt": "卡夫亨氏企业业务主题示意，非真实企业照片",
+        "note": "非实景：初始SVG为HHBA编辑性示意图，非任何企业实拍。CI仅在验证同名公司的新闻/官网原始图片后替换为JPEG并写入SHA256；尚未获得图像商业转载许可。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-084/photo2.svg",
+        "caption": "卡夫亨氏 · 业务编辑示意（非实景）",
+        "alt": "卡夫亨氏企业业务主题示意，非真实企业照片",
+        "note": "非实景：初始SVG为HHBA编辑性示意图，非任何企业实拍。CI仅在验证同名公司的新闻/官网原始图片后替换为JPEG并写入SHA256；尚未获得图像商业转载许可。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://wecruit.hotjob.cn/SU6295c39a0dcad4522994d9a2/mc/position/campus",
+    "label": "卡夫亨氏2027校园招聘指定网申入口（以官网为准）",
+    "status": "official_portal",
+    "subject": "卡夫亨氏中国相关招聘法人（正式岗位用人主体须逐项核验）",
+    "note": "香港中文大学（深圳）公告标注网申截止2026-10-31。第三方整理的2026-12-07时限与原2027校招公告不一致，不能据此确认延期；原三项培养项目均按已结束批次展示。"
+  },
+  "majorIntro": "三条仅为公告列名的完整培训项目，不拆成虚构职位。专业推荐属于HHBA编辑分类；官方未提供每个项目逐岗专业门槛，最终需在卡夫亨氏指定招聘系统核实。",
+  "preferredMajors": [
+    "食品科学与工程",
+    "食品质量与安全",
+    "生物工程",
+    "化学工程与工艺",
+    "机械工程",
+    "自动化",
+    "工业工程",
+    "供应链管理",
+    "物流管理",
+    "工商管理",
+    "市场营销",
+    "金融学",
+    "会计学",
+    "国际经济与贸易"
+  ],
+  "photoNote": "优先使用可信企业官方网站、大学、政府/行业公开报道中能确认公司或生产项目的真实照片，两张分别独立存档并记录原始文章、原图、尺寸、哈希。素材的再次商业使用许可尚未核实，验证失败则保留明确标注的非实景SVG，不冒充真实图片。",
+  "business": [
+    {
+      "title": "食品生产与制造",
+      "description": "在中国生产调味料、酱料和其他食品，运营工厂与食品工艺项目。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "食品 · 生产",
+      "details": [
+        "青岛等食品生产设施",
+        "阳江食品及调味料生产",
+        "生产线与工艺工程"
+      ]
+    },
+    {
+      "title": "食品安全与质量管理",
+      "description": "实施食品安全、产品质量、原料检验及制造过程质量控制。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "食品安全",
+      "details": [
+        "食品安全及质量体系",
+        "实验检测与质量保证",
+        "法规和追溯管理"
+      ]
+    },
+    {
+      "title": "工艺工程与设备自动化",
+      "description": "围绕灌装、包装、设备运维、自动化和制造效率开展技术工程。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "机械 · 自动化",
+      "details": [
+        "食品灌装和包装设备",
+        "工艺持续改善",
+        "维护与智能制造"
+      ]
+    },
+    {
+      "title": "供应链及采购物流",
+      "description": "统筹原辅料采购、供应商管理、库存、仓配与销售需求计划。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "供应链",
+      "details": [
+        "原材料计划",
+        "仓储物流与交付",
+        "供应商及采购协作"
+      ]
+    },
+    {
+      "title": "品牌与消费者市场",
+      "description": "开展亨氏、味事达等品牌市场、产品推广、渠道管理与消费者沟通。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "市场 · 品牌",
+      "details": [
+        "品牌运营",
+        "消费者洞察",
+        "数字化营销"
+      ]
+    },
+    {
+      "title": "商业销售与综合管理",
+      "description": "支持区域客户、商超和餐饮渠道、跨部门项目及集团财务等职能。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "销售 · 管理",
+      "details": [
+        "大客户与渠道业务",
+        "区域销售运营",
+        "财务及商业管理"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "general-management",
+      "title": "卡夫亨氏培训生（综合管培项目）",
+      "category": "综合 / 管理",
+      "city": "上海及中国业务单位（逐岗核对）",
+      "summary": "2027校园招聘公告列名的综合培训生项目。公开材料描述约12个月跨部门轮岗、业务项目及多职能培养，不等同于已列明具体财务、法务或市场岗位。",
+      "requirements": "2026届及2027届本科及以上毕业生、全职工作经验一般不超过1年。完整专业与具体工作城市并未在高校发布的项目概览逐岗细化；最多可报两个项目。原网申2026年10月31日截止。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工商管理",
+        "金融学",
+        "会计学",
+        "市场营销",
+        "国际经济与贸易"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026/2027届本科及以上，单项目条件待核",
+      "url": "https://wecruit.hotjob.cn/SU6295c39a0dcad4522994d9a2/mc/position/campus",
+      "evidenceUrl": "https://career.cuhk.edu.cn/job/view/id/469755",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "卡夫亨氏中国相关招聘法人（正式岗位用人主体须逐项核验）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "manufacturing-global",
+      "title": "国际生产制造管培生（Global Manufacturing）",
+      "category": "生产 / 工程",
+      "city": "青岛／阳江等中国制造基地（实际岗位待核）",
+      "summary": "2027届公开项目之一，围绕生产制造、设备、食品工艺及工厂管理开展约12个月制造运营培养；“未来厂长”是项目宣传描述而非承诺的岗位。",
+      "requirements": "培养项目面向2026/2027届本科及以上毕业生、全职经验不超过一年。食品工程、机械、自动化等为业务相关度建议，实际专业资格、是否需要接受制造基地轮岗及最终城市按项目官网核实；截止10月31日。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "食品科学与工程",
+        "食品质量与安全",
+        "机械工程",
+        "自动化",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026/2027届本科及以上，单项目条件待核",
+      "url": "https://wecruit.hotjob.cn/SU6295c39a0dcad4522994d9a2/mc/position/campus",
+      "evidenceUrl": "https://career.cuhk.edu.cn/job/view/id/469755",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "卡夫亨氏中国相关招聘法人（正式岗位用人主体须逐项核验）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sales-trainee",
+      "title": "销售培训生（2027届校招）",
+      "category": "销售 / 商务",
+      "city": "中国各区域，公开范围包含广州等（逐岗确认）",
+      "summary": "官方校园宣传列名销售培训生，公开介绍约18个月销售渠道、区域业务与客户运营轮岗。实际销售区域不等同于全部项目城市同时有空缺。",
+      "requirements": "2026/2027届本科及以上，申请人全职工作经验一般不超过一年；市场营销、工商管理、贸易等为编辑专业建议，并非公开官方专业清单。每人最多申请两个项目，10月31日原网申已截止。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理",
+        "国际经济与贸易",
+        "物流管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2026/2027届本科及以上，单项目条件待核",
+      "url": "https://wecruit.hotjob.cn/SU6295c39a0dcad4522994d9a2/mc/position/campus",
+      "evidenceUrl": "https://career.cuhk.edu.cn/job/view/id/469755",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "卡夫亨氏中国相关招聘法人（正式岗位用人主体须逐项核验）",
+      "currentOpenVerified": false
+    }
+  ]
+}

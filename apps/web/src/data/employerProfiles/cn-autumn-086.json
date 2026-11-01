@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-086",
+  "name": "利洁时",
+  "displayName": "利洁时（中国）",
+  "englishName": "Reckitt",
+  "aliases": [
+    "Reckitt",
+    "Reckitt China",
+    "利洁时中国",
+    "利洁时苏州",
+    "Reckitt Benckiser",
+    "NextGen",
+    "滴露",
+    "杜蕾斯",
+    "利洁时2027校招"
+  ],
+  "industry": "卫生健康消费品 · 日化生产 · 研发科技 · 供应链 · 消费品牌",
+  "subtitle": "利洁时中国 · 太仓、青岛、上海（不同项目地点独立核验）",
+  "overview": "利洁时是英国消费品集团，旗下业务包括卫生健康品牌以及研发、制造、供应链和消费者业务。2027届校园招聘公开两个不同来源项目：利洁时（苏州）有限公司供应链NextGen（太仓/青岛及部分轮岗）和利洁时中国2027研发培养及助理岗位。二者用人单位、专业和学历条件不同，不能把研发硕士要求套用给供应链本科项目。NextGen网申测评截止2026年10月31日。",
+  "lastReviewed": "2026-11-01",
+  "sources": [
+    "https://jdjyw.jlu.edu.cn/portal/jyzp/recruit/details?id=d51d1e255942476fb78eaad3436f89e3",
+    "https://gdjy.hfut.edu.cn/detail/online?id=3615086&menu_id=40264",
+    "https://reckitt.zhaopin.com/",
+    "https://www.reckitt.com/news/introducing-our-new-world-class-facility-in-taicang/",
+    "https://www.sthu.cn/2c/9b/c2438a76955/page.htm"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-086/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-086/photo1.svg",
+        "caption": "利洁时 · 业务编辑示意（非实景）",
+        "alt": "利洁时企业业务主题示意，非真实企业照片",
+        "note": "非实景：初始SVG为HHBA编辑性示意图，非任何企业实拍。CI仅在验证同名公司的新闻/官网原始图片后替换为JPEG并写入SHA256；尚未获得图像商业转载许可。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-086/photo2.svg",
+        "caption": "利洁时 · 业务编辑示意（非实景）",
+        "alt": "利洁时企业业务主题示意，非真实企业照片",
+        "note": "非实景：初始SVG为HHBA编辑性示意图，非任何企业实拍。CI仅在验证同名公司的新闻/官网原始图片后替换为JPEG并写入SHA256；尚未获得图像商业转载许可。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://reckitt.zhaopin.com/",
+    "label": "利洁时中国2027校园招聘官方指定智联专题（以职位状态为准）",
+    "status": "official_portal",
+    "subject": "利洁时（中国）投资有限公司与利洁时（苏州）有限公司等不同招聘法人",
+    "note": "太仓/青岛NextGen的2027届校招2026-10-31前完成网申测评，现已过期。智联研发专题公布R&D培养与三类研发助理岗位，但该页是否继续开放未逐岗确认。供应链项目有独立前程无忧网申短链，避免误认集团智联页面可直接提交供应链岗位。"
+  },
+  "majorIntro": "本页收录2027供应链NextGen以及智联官方专题列名的1项研发培养与3类研发助理，均为真实公布的项目/职位标题。供应链本科资格与研发培养硕士资格区分；具体岗位是否开放须回原平台核实。",
+  "preferredMajors": [
+    "供应链管理",
+    "工业工程",
+    "机械工程",
+    "电气工程及其自动化",
+    "自动化",
+    "化学工程与工艺",
+    "食品科学与工程",
+    "生物工程",
+    "人工智能",
+    "数据科学与大数据技术",
+    "物流管理",
+    "微生物学",
+    "药学",
+    "应用化学",
+    "化学"
+  ],
+  "photoNote": "优先使用可信企业官方网站、大学、政府/行业公开报道中能确认公司或生产项目的真实照片，两张分别独立存档并记录原始文章、原图、尺寸、哈希。素材的再次商业使用许可尚未核实，验证失败则保留明确标注的非实景SVG，不冒充真实图片。",
+  "business": [
+    {
+      "title": "健康与卫生消费品牌",
+      "description": "围绕消费者健康和家庭卫生领域经营多个品牌和产品。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "健康 · 消费品",
+      "details": [
+        "滴露等卫生产品",
+        "健康护理品牌",
+        "消费者需求研究"
+      ]
+    },
+    {
+      "title": "太仓及青岛供应制造",
+      "description": "在中国组织日化及健康产品生产、工艺、设备和供应链管理。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "制造 · 供应链",
+      "details": [
+        "太仓工厂运营",
+        "青岛供应链",
+        "生产与产线改善"
+      ]
+    },
+    {
+      "title": "研发科学与全球创新",
+      "description": "开展产品研发、配方及性能分析、生物微生物实验和项目创新。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "研发 · 科学",
+      "details": [
+        "配方与实验室研究",
+        "微生物和防护研究",
+        "全球市场研发协同"
+      ]
+    },
+    {
+      "title": "质量法规与产品安全",
+      "description": "开展日化及健康产品质量测试、标准合规、制造质量和产品安全管理。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "质量 · 法规",
+      "details": [
+        "研发分析检测",
+        "生产质量保证",
+        "合规和产品验证"
+      ]
+    },
+    {
+      "title": "供应计划和物流协作",
+      "description": "连接供应商、工厂、仓配、客户与消费者，推动端到端供应链效能。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "物流 · 供应链",
+      "details": [
+        "采购及计划",
+        "仓储配送管理",
+        "跨职能运营改善"
+      ]
+    },
+    {
+      "title": "品牌商业及数字化运营",
+      "description": "围绕品牌市场、消费者沟通、渠道发展和供应链数字技术开展经营。 招聘主体及职能分工须以具体业务单位公布的信息为准。",
+      "tags": "品牌 · 数字化",
+      "details": [
+        "消费者品牌管理",
+        "商业渠道运营",
+        "数据与AI赋能"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "supply-nextgen",
+      "title": "供应链管理培训生 NextGen（2027校招）",
+      "category": "供应链 / 工程",
+      "city": "太仓／青岛（可涉及上海及海外轮岗）",
+      "summary": "2027届利洁时供应链NextGen项目，为期2年，通过制造、供应、物流及跨部门项目轮岗培养端到端供应链管理人才。吉林大学及合肥工业大学官方就业页面转载真实项目与指定网申说明。",
+      "requirements": "本科及以上，毕业时间2026年1月至2027年6月，供应链、工业工程、机械电气、自动化、化工、食品、生物技术、AI、数据分析、物联网等相关专业优先；要求良好的英语及分析能力。2026年10月31日前网申测评，已过原截止；校方披露岗位15人，但不可推断剩余名额。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "工业工程",
+        "机械工程",
+        "电气工程及其自动化",
+        "自动化",
+        "人工智能",
+        "物流管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "供应链2026.01—2027.06本科及以上；研发培养硕士以上；助理待核",
+      "url": "https://reckitt.zhaopin.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/portal/jyzp/recruit/details?id=d51d1e255942476fb78eaad3436f89e3",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "利洁时（中国）投资有限公司与利洁时（苏州）有限公司等不同招聘法人",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "rd-leadership",
+      "title": "R&D Future Leadership Scheme 研发领导力培养计划",
+      "category": "研发 / 理工",
+      "city": "中国研发团队（具体城市按智联岗位）",
+      "summary": "利洁时中国2027官方智联校园招聘专题明确列名R&D Future Leadership Scheme，参与不同研发职能及面向全球内部市场的创新项目。",
+      "requirements": "官方专题明确硕士及以上，毕业于2026年6月至2027年6月，化学化工、生物食品、医药等相关专业；良好英语读写和口语，以及跨部门合作能力。原招聘是否仍有空缺必须通过智联单岗核实。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "化学",
+        "化学工程与工艺",
+        "生物工程",
+        "食品科学与工程",
+        "药学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "供应链2026.01—2027.06本科及以上；研发培养硕士以上；助理待核",
+      "url": "https://reckitt.zhaopin.com/",
+      "evidenceUrl": "https://reckitt.zhaopin.com/",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "利洁时（中国）投资有限公司与利洁时（苏州）有限公司等不同招聘法人",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "rd-microbiology",
+      "title": "Microbiology—R&D Assistant 微生物研发助理",
+      "category": "研发 / 微生物",
+      "city": "中国研发业务（具体地点按智联职位）",
+      "summary": "利洁时中国2027官方招聘页面在非培训生项目中列出的Microbiology-R&D Assistant具名职位，与研发领导力培训生不同。",
+      "requirements": "官方索引确认职位名称与研发职能，未逐岗公开学历、具体专业与工作地点。本页微生物、生物工程相关度为编辑建议，不能将领导力项目的硕士门槛自动套用。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微生物学",
+        "生物工程",
+        "生物科学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "供应链2026.01—2027.06本科及以上；研发培养硕士以上；助理待核",
+      "url": "https://reckitt.zhaopin.com/",
+      "evidenceUrl": "https://reckitt.zhaopin.com/",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "利洁时（中国）投资有限公司与利洁时（苏州）有限公司等不同招聘法人",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "rd-analytical",
+      "title": "Analytical—R&D Assistant 分析研发助理",
+      "category": "研发 / 分析",
+      "city": "中国研发业务（具体地点按智联职位）",
+      "summary": "利洁时2027智联专题列出的Analytical-R&D Assistant，涉及研发分析实验方向；详细工作内容以该职位原始JD为准。",
+      "requirements": "该助理职位与R&D领导力项目分列，不能凭标题断定具体化学分析技术、学历或证书要求；化学、应用化学、药学等为HHBA相关度推荐。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "化学",
+        "应用化学",
+        "药学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "供应链2026.01—2027.06本科及以上；研发培养硕士以上；助理待核",
+      "url": "https://reckitt.zhaopin.com/",
+      "evidenceUrl": "https://reckitt.zhaopin.com/",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "利洁时（中国）投资有限公司与利洁时（苏州）有限公司等不同招聘法人",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "rd-germ-protection",
+      "title": "Germ Protection—R&D Assistant 防护研发助理",
+      "category": "研发 / 防护",
+      "city": "中国研发业务（具体地点按智联职位）",
+      "summary": "利洁时官方2027招聘页面明确列名Germ Protection - R&D Assistant，是卫生防护研究方向的独立助理项目。",
+      "requirements": "职位具体实验职责、工作地和本科学历是否接受仍需核实单职位JD；微生物、化学、生物技术为编辑关联，不假定已确认满足资格。 上述岗位为来源已公开的2027招聘记录，不代表当前仍在开放；以企业官方申请系统逐项确认为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微生物学",
+        "生物工程",
+        "化学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "供应链2026.01—2027.06本科及以上；研发培养硕士以上；助理待核",
+      "url": "https://reckitt.zhaopin.com/",
+      "evidenceUrl": "https://reckitt.zhaopin.com/",
+      "observedOn": "2026-11-01",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "利洁时（中国）投资有限公司与利洁时（苏州）有限公司等不同招聘法人",
+      "currentOpenVerified": false
+    }
+  ]
+}

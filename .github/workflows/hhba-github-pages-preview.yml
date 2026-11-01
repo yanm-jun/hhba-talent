@@ -231,6 +231,12 @@ jobs:
       - name: Package verified 081-082 brand reference wordmarks (not licensed for commercial advertising)
         working-directory: apps/web
         run: python scripts/prepare-employers-081-083-logos.py
+      - name: Package 084-086 source-backed business images (after approved main merge)
+        working-directory: apps/web
+        run: python scripts/prepare-employers-084-086-photo-evidence.py
+      - name: Package attributed 084-085 reference logos with safety checks
+        working-directory: apps/web
+        run: python scripts/prepare-employers-084-086-logos.py
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
@@ -264,6 +270,9 @@ jobs:
       - name: Validate 081-083 company role sources, professional chips and photos
         working-directory: apps/web
         run: node scripts/employers-081-083-v2.contract.test.mjs
+      - name: Verify 084-086 company routing, 19 role records and job-level marketplace search
+        working-directory: apps/web
+        run: node scripts/employers-084-086-v2.contract.test.mjs
       - name: Validate MINIEYE 035 source-backed positions, six major tabs and real media
         working-directory: apps/web
         run: node scripts/minieye-v2.contract.test.mjs
