@@ -67,7 +67,7 @@ async function newSession(db,userId){
 // One-time email challenges: send only through verified server-side mail service.
 const CHALLENGE_TTL = 600;
 const challengeHash=async (env,email,purpose,code) => {
- const key=await crypto.subtle.importKey('raw',enc.encode(env.HHBA_AUTH_CODE_PEPPER),'HMAC',false,['sign']);
+ const key=await crypto.subtle.importKey('raw',enc.encode(env.HHBA_AUTH_CODE_PEPPER),{name:'HMAC',hash:'SHA-256'},false,['sign']);
  return hex(new Uint8Array(await crypto.subtle.sign('HMAC',key,enc.encode(email+'|'+purpose+'|'+code))));
 };
 const sixDigit=()=>String(crypto.getRandomValues(new Uint32Array(1))[0] % 1000000).padStart(6,'0');
