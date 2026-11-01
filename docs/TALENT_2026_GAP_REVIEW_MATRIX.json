@@ -204,7 +204,7 @@
     }
   ],
   "critical": "Only direct government 2026 source records are in nationwide formal data. Qinghai five SZYF entries are province-wide past-window research locators, not independent local cash policies. Secondary and obsolete rules must not claim official housing or live vacancies.",
-  "officiallyIndexedPolicyCount": 1,
+  "officiallyIndexedPolicyCount": 6,
   "officiallyIndexedHousingCount": 5,
   "policyLeadsNotOfficiallyIndexed": 15,
   "housingLeadsNotOfficiallyIndexed": 17,
@@ -242,15 +242,10 @@
     "海北"
   ],
   "policyRemainingCities": [
-    "攀枝花",
     "泸州",
-    "绵阳",
-    "遂宁",
-    "内江",
     "宜宾",
     "巴中",
     "资阳",
-    "甘孜",
     "凉山",
     "西宁",
     "黄南",
@@ -259,7 +254,12 @@
     "海西"
   ],
   "policyOfficialCities": [
-    "广安"
+    "广安",
+    "攀枝花",
+    "绵阳",
+    "遂宁",
+    "内江",
+    "甘孜"
   ],
   "housingOfficialCities": [
     "抚顺",
@@ -267,5 +267,42 @@
     "阜新",
     "辽阳"
   ],
-  "qualityLimitation": "5 government-source housing records cover 4 cities (Benxi has two distinct programs). Formal coverage is NOT 5 cities. 15 policy city gaps and 29 housing city gaps remain. New 2026 talent apartment notice of Benxi is a HISTORICAL admission announcement, not live vacancy. Some government domains still require manual original-document inspection. Additional Wuzhou 2026 October rental-subsidy notice is a media reprint, preserved as RESEARCH ONLY until local government original is verified."
+  "qualityLimitation": "5 government-source housing records cover 4 cities (Benxi has two distinct programs). Formal coverage is NOT 5 cities. 15 policy city gaps and 29 housing city gaps remain. New 2026 talent apartment notice of Benxi is a HISTORICAL admission announcement, not live vacancy. Some government domains still require manual original-document inspection. Additional Wuzhou 2026 October rental-subsidy notice is a media reprint, preserved as RESEARCH ONLY until local government original is verified.",
+  "sichuanPolicyStatus": {
+    "baseCityCoverage": 11,
+    "direct2026GovernmentSourceCityCount": 6,
+    "addedCityDetails": [
+      {
+        "city": "攀枝花",
+        "sourceUrl": "https://jxj.panzhihua.gov.cn/zfxxgk/tzgg/10297031.shtml",
+        "status": "past-window",
+        "regionalLimit": "特定区域"
+      },
+      {
+        "city": "绵阳",
+        "sourceUrl": "https://sc.spb.gov.cn/scsyzglj/c105609/c105613/202609/76bb61f2e18440919ce0468d4a7c7462.shtml",
+        "status": "policy",
+        "regionalLimit": "特定区域"
+      },
+      {
+        "city": "遂宁",
+        "sourceUrl": "https://chinajob.mohrss.gov.cn/c/2026-07-16/574114.shtml",
+        "status": "policy",
+        "regionalLimit": "全市"
+      },
+      {
+        "city": "内江",
+        "sourceUrl": "https://chinajob.mohrss.gov.cn/c/2026-10-13/619337.shtml",
+        "status": "policy",
+        "regionalLimit": "全市"
+      },
+      {
+        "city": "甘孜",
+        "sourceUrl": "https://www.xcx.gov.cn/gsgg/article/736938",
+        "status": "past-window",
+        "regionalLimit": "特定区域"
+      }
+    ],
+    "warnings": "2026 historical recruitment and a narrow industry-specific coupon cannot be represented as a universal talent cash subsidy. External pages have intermittent direct-open errors; retain B/C grade and source audit warnings. Other Sichuan city original notices remain to verify."
+  }
 }
