@@ -22,10 +22,10 @@ export async function onRequestPost({request,env}) {
  try{data=JSON.parse(raw);}catch{return err(400,'申请格式错误。');}
  if(!data||typeof data!=='object'||Array.isArray(data))return err(400,'申请格式错误。');
  if(data.website)return response({ok:true},202); // honeypot, do not persist
- const {name,contactType,contact,direction,experience,portfolio,strength,weeklyTime,mode,note,acknowledged}=data;
+ const {name,contactType,contact,direction,experience,portfolio,strength,weeklyTime,mode,note,acknowledged,privacyAgreed}=data;
  if(!str(name,80,2)||!contacts.has(contactType)||!str(contact,180,3)||!directions.has(direction)||
     !str(experience,1200,10)||!str(portfolio||'',400)||!str(strength||'',600)||
-    !weeks.has(weeklyTime)||!modes.has(mode)||!str(note||'',600)||acknowledged!==true)
+    !weeks.has(weeklyTime)||!modes.has(mode)||!str(note||'',600)||acknowledged!==true||privacyAgreed!==true)
     return err(400,'请检查表单必填信息与长度。');
  if(contactType==='邮箱'&&!validEmail(clean(contact)))return err(400,'联系邮箱格式错误。');
  if(portfolio){try{const u=new URL(portfolio);if(u.protocol!=='https:'||u.username||u.password)return err(400,'作品链接必须使用安全 HTTPS 地址。');}catch{return err(400,'作品链接不正确。');}}
