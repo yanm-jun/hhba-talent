@@ -1,0 +1,38 @@
+name: WEIPU verified-photo recovery smoke test
+on:
+  push:
+    branches:
+      - fix/pages-weipu-source-fallback-20261101
+  pull_request:
+    paths:
+      - 'apps/web/scripts/prepare-weipu-media.py'
+      - 'apps/web/scripts/weipu-v2.contract.test.mjs'
+      - '.github/workflows/weipu-verified-media-recovery.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-real-photos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install image verifier
+        run: python -m pip install --quiet Pillow
+      - name: Prepare real WEIPU photographs with pinned Pages backup
+        run: python apps/web/scripts/prepare-weipu-media.py
+      - name: Fail if either source photo or the user's approved logo is not verified
+        working-directory: apps/web
+        run: |
+          node scripts/weipu-v2.contract.test.mjs
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('public/images/employer-profiles/cn-autumn-032/media-audit.json').read_text())
+          assert all(a[x].get('verified') for x in ['logo.webp','photo1.jpg','photo2.jpg'])
+          assert a['photo1.jpg']['sha256']!=a['photo2.jpg']['sha256']
+          print('WEIPU_FALLBACK_PROVENANCE_OK',[(x,a[x].get('verifiedSourceMirror',a[x]['source'])) for x in ['photo1.jpg','photo2.jpg']])
+          PY
