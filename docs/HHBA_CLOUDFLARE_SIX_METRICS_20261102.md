@@ -10,9 +10,9 @@
 ## Implementation
 - Pages Functions in apps/web/functions, with HHBA_METRICS_DB D1 and secret HHBA_METRICS_SECRET (at least 32 chars) independently bound in **preview**.
 - D1 migration apps/web/d1/0003_cloudflare_metrics.sql.
-- /admin-metrics/ is a front-end six-card report. Public metrics can render without credentials; *private* metrics require a signed Cloudflare Access JWT validated by RS256/JWKS + issuer + audience + allowlisted email.
+- **Only original** `/preview-admin/` navigation/cards/workbench is used: existing dashboard.js reads GET /api/metrics/public and GET /api/admin/metrics via a shape adapter. Do NOT create another dashboard. Custom 1–90-day interval and D1 bookmark add/remove event counts preserve the old UI. Public metrics can render without credentials; *private* metrics require a signed Cloudflare Access JWT validated by RS256/JWKS + issuer + audience + allowlisted email.
 - To enable private metrics later, set only server-side HHBA_ACCESS_TEAM_DOMAIN (e.g. team.cloudflareaccess.com), HHBA_ACCESS_AUD, HHBA_METRICS_ADMIN_EMAIL, add Cloudflare Access policy protecting the /admin-metrics/* and /api/admin/metrics endpoints. **No shared admin password or public aggregate backdoor.**
-- A browser showing — for missing/unauthorized metrics is intentional, not a zero.
+- A browser showing — for missing/unauthorized metrics is intentional, not a zero. The separate /admin-metrics/ page from the first draft was removed. GitHub Pages stays a public read-only static preview.
 - First deploy to an isolated preview D1. To deploy production, create a new, separate production D1; do not reuse the preview database or auth preview database. Configure Access first. Explicit approval required before merging main.
 
 ## Safety and limitations

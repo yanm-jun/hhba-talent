@@ -32,9 +32,13 @@ export async function onRequest({request,env}){
    const count=await db.prepare('SELECT COUNT(*) AS n FROM hhba_device_saved WHERE device_hash=?').bind(o.hash).first();
    const found=await db.prepare('SELECT job_id FROM hhba_device_saved WHERE device_hash=? AND job_id=?').bind(o.hash,id).first();
    if(!found&&Number(count?.n)>=300)return bad('SAVED_LIMIT_REACHED',409);
-   await db.prepare('INSERT OR IGNORE INTO hhba_device_saved(device_hash,job_id,saved_at) VALUES(?,?,?)').bind(o.hash,id,new Date().toISOString()).run();
+   const change=await db.prepare('INSERT OR IGNORE INTO hhba_device_saved(device_hash,job_id,saved_at) VALUES(?,?,?)').bind(o.hash,id,new Date().toISOString()).run();
+   if(change.meta?.changes>0)await db.prepare('INSERT INTO hhba_device_save_events(day,event_type,created_at) VALUES(?,?,?)')
+    .bind(new Date().toISOString().slice(0,10),'added',new Date().toISOString()).run();
   }else if(o.hash){
-   await db.prepare('DELETE FROM hhba_device_saved WHERE device_hash=? AND job_id=?').bind(o.hash,id).run();
+   const change=await db.prepare('DELETE FROM hhba_device_saved WHERE device_hash=? AND job_id=?').bind(o.hash,id).run();
+   if(change.meta?.changes>0)await db.prepare('INSERT INTO hhba_device_save_events(day,event_type,created_at) VALUES(?,?,?)')
+    .bind(new Date().toISOString().slice(0,10),'removed',new Date().toISOString()).run();
   }
   const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'};
   if(o.setCookie)headers['Set-Cookie']=o.setCookie;

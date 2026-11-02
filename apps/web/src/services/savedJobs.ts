@@ -3,9 +3,9 @@ export type SavedJob={jobId:string;savedAt:string};
 const STORE='/api/saved';
 let requestCache:Promise<SavedJob[]>|null=null;
 export async function listSavedJobs():Promise<SavedJob[]>{
- if(!savedAvailable)throw Error('收藏目前仅在 Railway 站点开放');
+ if(!savedAvailable)throw Error('设备收藏需要 Cloudflare 后台服务；GitHub Pages 静态预览不提供收藏同步。');
  if(!requestCache)requestCache=fetch(STORE,{credentials:'same-origin',cache:'no-store'})
-  .then(async res=>{if(!res.ok)throw Error('收藏服务暂不可用');return res.json()})
+  .then(async res=>{if(!res.ok)throw Error('Cloudflare 设备收藏服务尚未启用');return res.json()})
   .then(payload=>{if(payload.kind!=='HHBA_DEVICE_SAVED_JOBS_V1'||!Array.isArray(payload.items))
     throw Error('收藏数据异常');return payload.items as SavedJob[]})
   .catch(error=>{requestCache=null;throw error});

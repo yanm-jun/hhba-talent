@@ -12,6 +12,8 @@ on:
       - "apps/web/d1/0003_cloudflare_metrics.sql"
       - "apps/web/src/services/engagement.ts"
       - "apps/web/scripts/metrics-contract.test.mjs"
+      - "apps/web/scripts/admin-original-dashboard.contract.test.mjs"
+      - "apps/web/public/preview-admin/**"
       - ".github/workflows/hhba-six-metrics.yml"
   workflow_dispatch:
 permissions: {contents: read}
@@ -34,7 +36,7 @@ jobs:
           db=sqlite3.connect(':memory:')
           db.executescript(Path('apps/web/d1/0003_cloudflare_metrics.sql').read_text())
           tables={x[0] for x in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
-          assert {'hhba_metrics_metadata','hhba_traffic_events','hhba_device_saved'}<=tables
+          assert {'hhba_metrics_metadata','hhba_traffic_events','hhba_device_saved','hhba_device_save_events'}<=tables
           assert 'hhba_auth_users' not in tables
           print('HHBA_CLOUDFLARE_METRICS_SCHEMA_OK')
           PY
@@ -47,11 +49,13 @@ jobs:
           node --check functions/api/admin/metrics.js
           node --check functions/api/engagement/event.js
           node --check 'functions/api/saved/[[path]].js'
-          node --test scripts/metrics-contract.test.mjs
+          node --test scripts/metrics-contract.test.mjs scripts/admin-original-dashboard.contract.test.mjs
       - name: Build existing Vite frontend without new feature flags
         working-directory: apps/web
         run: |
           npm ci --no-audit --no-fund
           npm run build
-          test -f dist/admin-metrics/index.html
+          test -f dist/preview-admin/index.html
+          test -f dist/preview-admin/cloudflare-metrics-adapter.mjs
+          test ! -d dist/admin-metrics
           test -f dist/curated/v1/jobs.json
