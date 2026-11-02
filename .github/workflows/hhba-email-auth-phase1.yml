@@ -1,0 +1,66 @@
+name: HHBA email authentication phase 1
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/web/functions/_lib/auth.js"
+      - "apps/web/functions/_lib/mail.js"
+      - "apps/web/functions/api/v1/**"
+      - "apps/web/d1/**"
+      - "apps/web/src/pages/AuthPage.tsx"
+      - "apps/web/src/pages/PhoneAuthPage.tsx"
+      - "apps/web/src/styles/role-auth.css"
+      - "apps/web/src/services/api.ts"
+      - "apps/web/src/main.tsx"
+      - "apps/web/scripts/auth-*.test.mjs"
+      - "apps/web/scripts/real-email-auth.contract.test.mjs"
+      - ".github/workflows/hhba-email-auth-phase1.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  email-auth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify D1 identity schema and email challenge migration
+        run: |
+          python - <<'PY'
+          import sqlite3
+          from pathlib import Path
+          db=sqlite3.connect(':memory:')
+          db.execute('PRAGMA foreign_keys=ON')
+          db.executescript(Path('apps/web/d1/0001_dual_role_auth.sql').read_text())
+          db.executescript(Path('apps/web/d1/0002_email_verification.sql').read_text())
+          names={v[0] for v in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+          assert {'auth_users','auth_roles','auth_sessions','auth_rate_limits','auth_email_challenges'}<=names
+          assert 'join_applications' not in names
+          print('HHBA_EMAIL_AUTH_SCHEMA_OK')
+          PY
+      - name: Test email provider failure guard, ownership proof, role separation, reset and sessions
+        working-directory: apps/web
+        run: |
+          node --check functions/_lib/auth.js
+          node --check functions/_lib/mail.js
+          node --check 'functions/api/v1/[[path]].js'
+          node --test scripts/auth-api.contract.test.mjs scripts/real-email-auth.contract.test.mjs scripts/auth-phase1-safety.contract.test.mjs
+      - name: Verify Vite production compilation, independently of applicant intake
+        working-directory: apps/web
+        env:
+          VITE_API_BASE: "/api/v1"
+          VITE_HHBA_ACCOUNT_AUTH_ENABLED: "1"
+          VITE_HHBA_ACCOUNT_API_ENABLED: "0"
+          VITE_HHBA_VERIFIED_SNAPSHOT: "1"
+          VITE_HHBA_DOMESTIC_REBUILD_V2: "1"
+          VITE_HHBA_OVERSEAS_CURATED_100: "1"
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+          test -f dist/curated/v1/jobs.json
