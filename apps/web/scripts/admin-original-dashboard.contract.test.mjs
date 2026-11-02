@@ -11,7 +11,7 @@ test('exact GitHub Pages /admin-preview/ source and seven original navigation gr
   assert(html.includes('id="'+x+'"'),'missing connected original admin slot: '+x);
  assert(js.includes("fetch('/api/overview'"),'GitHub Pages canonical transform anchor lost');
  assert(js.includes("fetch('/api/metrics/public'"),'Cloudflare public API unconnected');
- assert(js.includes("fetch('/api/admin/metrics?'"),'Cloudflare protected D1 metrics unconnected');
+ assert(js.includes("fetch('/admin-preview/api/metrics?'"),'Cloudflare protected D1 metrics unconnected');
  assert(js.includes("setView(node.dataset.view)"),'original navigation broken');
  assert(css.includes('.kpi-grid')&&css.includes('.sidebar'),'original stylesheet lost');
  assert(!html.includes('admin-metrics/'),'duplicate dashboard prohibited');
