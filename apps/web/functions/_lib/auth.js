@@ -20,9 +20,13 @@ function safeEqual(a,b){
  for(let i=0;i<Math.max(x.length,y.length);i++)diff|=(x[i]||0)^(y[i]||0);
  return diff===0;
 }
-async function passwordHash(password,salt,iterations=HASH_ITERATIONS){
+async function passwordHash(password,salt,iterations=HASH_ITERATIONS,pepper=''){
  const key=await crypto.subtle.importKey('raw',enc.encode(password),'PBKDF2',false,['deriveBits']);
- return hex(new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:fromHex(salt),iterations},key,256)));
+ const bits=new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:fromHex(salt),iterations},key,256));
+ // Server-side HMAC pepper protects against offline cracking from a D1-only leak.
+ if(!pepper)return hex(bits); // preview-only: production requires HHBA_AUTH_PASSWORD_PEPPER
+ const hmac=await crypto.subtle.importKey('raw',enc.encode(pepper),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+ return hex(new Uint8Array(await crypto.subtle.sign('HMAC',hmac,bits)));
 }
 const emailValid=validEmail;
 const passwordValid=v=>typeof v==='string'&&v.length>=12&&v.length<=128&&enc.encode(v).length<=512;
@@ -30,7 +34,7 @@ function enabled(context){
  const host=new URL(context.request.url).hostname;
  if(!context.env.HHBA_AUTH_DB)return false;
  if(context.env.HHBA_AUTH_ROLLOUT==='preview')return host.endsWith('.hhba-talent.pages.dev')&&host!=='hhba-talent.pages.dev';
- return context.env.HHBA_AUTH_ROLLOUT==='production'&&host==='hhba-talent.pages.dev';
+ return context.env.HHBA_AUTH_ROLLOUT==='production'&&host==='hhba-talent.pages.dev'&&typeof context.env.HHBA_AUTH_PASSWORD_PEPPER==='string'&&context.env.HHBA_AUTH_PASSWORD_PEPPER.length>=32;
 }
 async function mutation(req){
  if(req.headers.get('origin')!==new URL(req.url).origin)return {error:fail(403,'请求来源无效。')};
@@ -135,7 +139,7 @@ async function resetPassword(env,db,req) {
  if(!await checkChallenge(env,db,normalized,'reset',code))return fail(400,'验证码不正确、已过期或超过尝试次数。');
  const user=await db.prepare('SELECT id FROM auth_users WHERE email=? AND email_verified_at IS NOT NULL').bind(normalized).first();
  if(!user)return fail(400,'验证码无效。');
- const salt=randomHex(16),hash=await passwordHash(password,salt);
+ const salt=randomHex(16),hash=await passwordHash(password,salt,HASH_ITERATIONS,env.HHBA_AUTH_PASSWORD_PEPPER||'');
  await db.batch([
   db.prepare('UPDATE auth_users SET password_salt=?,password_hash=?,password_iterations=? WHERE id=?').bind(salt,hash,HASH_ITERATIONS,user.id),
   db.prepare('DELETE FROM auth_sessions WHERE user_id=?').bind(user.id)
@@ -154,7 +158,7 @@ async function register(env,db,req){
  if(await db.prepare('SELECT id FROM auth_users WHERE email=?').bind(normalized).first())return fail(409,'该邮箱已注册，请直接登录或找回密码。');
  const id=crypto.randomUUID(),salt=randomHex(16),ts=now();
  let hash;
- try {hash=await passwordHash(password,salt);}
+ try {hash=await passwordHash(password,salt,HASH_ITERATIONS,env.HHBA_AUTH_PASSWORD_PEPPER||'');}
  catch(e) {
    console.error('HHBA_PASSWORD_DERIVATION_ERROR',e?.name||'UnknownError');
    return fail(503,'密码安全处理暂不可用'+(env.HHBA_AUTH_ROLLOUT==='preview'&&env.HHBA_AUTH_DEBUG_ENABLED==='1'?' ['+String(e?.name||'unknown').slice(0,45)+']':'')+'。');
@@ -173,13 +177,13 @@ async function register(env,db,req){
  }
  return reply({id,account_type,email_verified:synthetic,verification_required:!synthetic},201);
 }
-async function login(db,req){
+async function login(env,db,req){
  const input=await mutation(req);if(input.error)return input.error;
  const {email,password,account_type}=input.data,normalized=typeof email==='string'?email.trim().toLowerCase():'';
  if(!emailValid(normalized)||typeof password!=='string'||password.length>128||(account_type!==undefined&&!ROLES.has(account_type)))return fail(400,'登录信息无效。');
  const limit=await throttle(db,req,normalized,'login');if(limit)return limit;
  const u=await db.prepare('SELECT * FROM auth_users WHERE email=?').bind(normalized).first();
- const hash=await passwordHash(password,u?.password_salt||'00000000000000000000000000000000',u?.password_iterations||HASH_ITERATIONS);
+ const hash=await passwordHash(password,u?.password_salt||'00000000000000000000000000000000',u?.password_iterations||HASH_ITERATIONS,env.HHBA_AUTH_PASSWORD_PEPPER||'');
  if(!u||!safeEqual(u.password_hash,hash)||u.disabled_at)return fail(401,'邮箱或密码不正确。');
  if(!u.email_verified_at)return fail(403,'请先验证注册邮箱。');
  const roles=await db.prepare('SELECT account_type FROM auth_roles WHERE user_id=?').bind(u.id).all();
@@ -213,7 +217,7 @@ export async function route(context){
   if(p==='auth/email/resend'&&req.method==='POST')return await resendEmail(context.env,db,req);
   if(p==='auth/password/request'&&req.method==='POST')return await passwordResetRequest(context.env,db,req);
   if(p==='auth/password/reset'&&req.method==='POST')return await resetPassword(context.env,db,req);
-  if(p==='auth/session'&&req.method==='POST')return await login(db,req);
+  if(p==='auth/session'&&req.method==='POST')return await login(context.env,db,req);
   if(p==='auth/session'&&req.method==='DELETE')return await logout(db,req);
   if(p==='auth/me'&&req.method==='GET')return await me(db,req);
   return fail(404,'该接口尚未开放。');
