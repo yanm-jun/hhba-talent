@@ -1,4 +1,4 @@
-// HHBA Admin Console — Phase 1, read-only local preview.
+// HHBA ORIGINAL admin-preview console — existing GitHub Pages dashboard, Cloudflare data adapter.
 // All remote content is restricted to the server's validated aggregate metrics.
 const byId=id=>document.getElementById(id);
 const fmt=new Intl.NumberFormat('zh-CN');
@@ -8,7 +8,75 @@ const formatTime=value=>{
    hour:'2-digit',minute:'2-digit',hour12:false
  })+'（北京时间）'}catch{return '—'}
 };
-let snapshot=null,selectedPeriod='30d',customRange=null,activeView='overview';
+const cloudflareMode=location.hostname==='hhba-talent.pages.dev'||location.hostname.endsWith('.hhba-talent.pages.dev')||location.hostname==='hhba.work';
+let snapshot=null,growth=null,selectedPeriod='30d',customRange=null,activeView='overview';
+function normalizeCloudflarePublic(raw){
+ if(raw?.kind!=='HHBA_CLOUDFLARE_PUBLIC_METRICS_V1'||!raw.counts)throw Error('INVALID_CLOUDFLARE_JOB_DATA');
+ return {kind:'HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2',quality:raw.quality,asOf:raw.sourceTime,
+  auditCheckedAt:raw.auditCheckedAt,counts:raw.counts,
+  definitions:{
+   indexedJobs:'公开 ATS 索引总记录数，不等于有效在招',
+   displayableJobs:raw.definitions?.displayableJobs||'已剔除撤下和失效后的展示记录',
+   auditedJobRequirements:raw.definitions?.auditedJobRequirements||'官网完整岗位要求经核验',
+   distinctIndexedCompanies:'去重后的索引企业数，非签约企业',
+   checkedAtsSources:'官方来源审计数，非签约企业',
+   failedAtsSources:'本次审计不成功的官方招聘来源数量'
+  }};
+}
+function integer(x){return Number.isSafeInteger(x)&&x>=0?x:null}
+function setMetric(id,n){const e=byId(id);if(e)e.textContent=integer(n)===null?'—':fmt.format(n)}
+function renderTraffic(target,items){
+ const root=byId(target);if(!root)return;
+ if(!Array.isArray(items)){root.textContent='私有统计未授权或尚未采集';return}
+ root.replaceChildren();
+ const chart=document.createElement('div');chart.className='hhba-real-bars';const max=Math.max(1,...items.map(x=>x.pv||0));
+ for(const item of items){
+  const bar=document.createElement('span');
+  bar.style.height=(item.pv?Math.max(5,Math.round(item.pv/max*100)):2)+'%';
+  bar.title=item.day+'：'+item.pv+' 次';
+  bar.setAttribute('aria-label',bar.title);chart.append(bar);
+ }
+ root.append(chart);
+}
+function updateGrowth(){
+ const t=growth?.traffic,b=growth?.devices,a=growth?.account;
+ setMetric('ov-pv',t?.quality==='collected'?t.pv:null);
+ setMetric('growth-pv',t?.quality==='collected'?t.pv:null);
+ setMetric('ov-saves',b?.quality==='collected'?b.savedJobs:null);
+ setMetric('growth-uv',t?.quality==='collected'?t.dailyUvSum:null);
+ setMetric('growth-saves',b?.quality==='collected'?b.savedJobs:null);
+ setMetric('growth-devices',b?.quality==='collected'?b.devicesWithSavedJobs:null);
+ setMetric('growth-views',t?.quality==='collected'?t.jobViews:null);
+ setMetric('growth-search',t?.quality==='collected'?t.searches:null);
+ setMetric('growth-click',t?.quality==='collected'?t.outboundClicks:null);
+ const changes=byId('growth-changes');
+ if(changes)changes.textContent=b?.quality==='collected'&&integer(b.added)!==null&&integer(b.removed)!==null?fmt.format(b.added)+' / '+fmt.format(b.removed):'—';
+ setMetric('registered-users',a?.quality==='collected'?a.registeredUsers:null);
+ byId('active-users').textContent=a?.quality==='collected'&&integer(a.dau)!==null&&integer(a.mau)!==null?fmt.format(a.dau)+' / '+fmt.format(a.mau):'— / —';
+ byId('users-interval').textContent=growth?.period?growth.period.start+' 至 '+growth.period.end+' · UTC':'私有数据需要 Cloudflare Access 管理员授权';
+ byId('users-data-quality').textContent=growth?'数据来源：Cloudflare D1。设备收藏不等于注册用户；DAU/MAU 待真实账户体系。':'私有指标需要 Cloudflare Access 管理员授权；未接入不等于零。';
+ renderTraffic('users-chart',t?.quality==='collected'?t.series:null);
+ if(t?.quality==='collected'){
+  const trend=byId('trend-chart');if(trend){trend.className='chart-empty hhba-live-trend';renderTraffic('trend-chart',t.series)}
+ }
+}
+async function refreshGrowth(){
+ if(!cloudflareMode){growth=null;updateGrowth();return}
+ const params=new URLSearchParams();
+ if(selectedPeriod==='custom'){
+  if(!customRange)return;
+  params.set('from',customRange.from);params.set('to',customRange.to);
+ }else params.set('days',selectedPeriod==='today'?'1':selectedPeriod.slice(0,-1));
+ try{
+  const r=await fetch('/api/admin/metrics?'+params,{cache:'no-store',credentials:'same-origin'});
+  if(!r.ok)throw Error('PRIVATE_METRICS_REQUIRE_AUTH');
+  const v=await r.json();
+  if(v.kind!=='HHBA_CLOUDFLARE_PRIVATE_METRICS_V1'||!v.traffic||!v.devices||!v.account)throw Error('INVALID_PRIVATE_METRICS');
+  growth=v;
+ }catch{growth=null}
+ updateGrowth();
+}
+
 const titles={overview:'数据总览',users:'用户分析',market:'岗位与企业',operations:'运营监控',
  finance:'财务成本',investor:'融资展示',settings:'系统设置'};
 const details={
@@ -22,7 +90,7 @@ function setView(view){
  if(!Object.hasOwn(titles,view))view='overview';
  activeView=view;
  for(const node of document.querySelectorAll('.page-view'))node.hidden=true;
- byId('view-'+(view==='investor'?'investor':view==='overview'?'overview':'placeholder')).hidden=false;
+ byId('view-'+(['investor','overview','users'].includes(view)?view:'placeholder')).hidden=false;
  byId('breadcrumb').textContent=titles[view];
  document.title=titles[view]+' · HHBA 管理中心';
  document.body.classList.toggle('investor-mode',view==='investor');
@@ -57,7 +125,8 @@ function choosePeriod(value){
  byId('trend-range-label').textContent=value==='custom'&&customRange
   ?customRange.from+' 至 '+customRange.to:text[value];
  byId('period-notice').querySelector('span').textContent='当前岗位指标为最新索引快照，与所选'+text[value]+
-  '范围无关；按日注册、活跃与趋势尚未接入。';
+  '范围无关；Cloudflare 同意采集的访问与设备收藏操作按选定日期查询。';
+ if(value!=='custom'||customRange)void refreshGrowth();
 }
 function qualityText(data){
  if(!data)return '暂不可用';
@@ -99,10 +168,11 @@ async function refresh(){
  btn.setAttribute('aria-busy','true');
  btn.lastChild.textContent=' 正在核对…';
  try{
-  const response=await fetch('/api/overview',{method:'GET',cache:'no-store',credentials:'omit',
-   headers:{Accept:'application/json'}});
+  const response=cloudflareMode
+   ?await fetch('/api/metrics/public',{method:'GET',cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}})
+   :await fetch('/api/overview',{method:'GET',cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}});
   if(!response.ok)throw Error('index_not_available');
-  const body=await response.json();
+  const raw=await response.json();const body=cloudflareMode?normalizeCloudflarePublic(raw):raw;
   if(body.kind!=='HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2'||
      !['current','partial','stale','unavailable'].includes(body.quality)||
      !body.counts||!(body.counts.displayableJobs===null||Number.isSafeInteger(body.counts.displayableJobs)))
@@ -128,10 +198,12 @@ function exportCSV(){
   ['去重收录企业',String(data.counts.distinctIndexedCompanies),data.definitions.distinctIndexedCompanies,data.asOf],
   ['已审计 ATS 来源',String(data.counts.checkedAtsSources),data.definitions.checkedAtsSources,data.auditCheckedAt],
   ['失败 ATS 来源',String(data.counts.failedAtsSources),data.definitions.failedAtsSources,data.auditCheckedAt],
-  ['累计注册用户','未接入','没有可核验用户计数',''],
-  ['近 30 日活跃用户','未接入','没有完整用户事件数据',''],
+  ['累计注册用户','未接入','生产邮箱用户尚未启用',''],
+  ['真正 DAU/MAU','未接入','生产账号活跃数据未接通',''],
   ['真实收入','未接入','未接入财务台账','']
  ];
+ if(growth?.traffic?.quality==='collected')rows.push(['同意访问 PV',String(growth.traffic.pv),'Cloudflare D1 同意采集，按分钟去重',growth.asOf]);
+ if(growth?.devices?.quality==='collected')rows.push(['设备有效收藏',String(growth.devices.savedJobs),'Cloudflare D1 设备维度，非用户账户收藏',growth.asOf]);
  const csv='\uFEFF'+rows.map(row=>row.map(cell=>'"'+String(cell).replaceAll('"','""')+'"').join(',')).join('\r\n');
  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
  const a=document.createElement('a');a.href=url;a.download='HHBA-verified-overview.csv';
@@ -148,10 +220,12 @@ byId('apply-custom').addEventListener('click',()=>{
  const alert=byId('date-error');
  if(!from||!to||from>to){alert.textContent='请选择有效的起止日期';return}
  if(to>new Date().toISOString().slice(0,10)){alert.textContent='结束日期不能晚于今天';return}
+ const diff=(Date.parse(to+'T00:00:00Z')-Date.parse(from+'T00:00:00Z'))/86400000;
+ if(!Number.isInteger(diff)||diff>89){alert.textContent='自定义范围最多 90 天';return}
  alert.textContent='';
  customRange={from,to};choosePeriod('custom');
 });
-byId('refresh').addEventListener('click',refresh);
+byId('refresh').addEventListener('click',()=>{void refresh();void refreshGrowth()});
 byId('top-investor').addEventListener('click',()=>setView('investor'));
 byId('show-investor').addEventListener('click',()=>setView('investor'));
 byId('leave-investor').addEventListener('click',()=>setView('overview'));
@@ -165,4 +239,4 @@ byId('mobile-menu').addEventListener('click',()=>{
 });
 byId('mobile-dim').addEventListener('click',closeMenu);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
-choosePeriod('30d');updateOverview();void refresh();
+choosePeriod('30d');updateOverview();updateGrowth();void refresh();

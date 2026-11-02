@@ -1,0 +1,65 @@
+name: HHBA Cloudflare six real metrics
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/web/functions/_lib/**"
+      - "apps/web/functions/api/admin/metrics.js"
+      - "apps/web/functions/api/metrics/public.js"
+      - "apps/web/functions/api/engagement/event.js"
+      - "apps/web/functions/api/saved/**"
+      - "apps/web/public/admin-metrics/**"
+      - "apps/web/d1/0003_cloudflare_metrics.sql"
+      - "apps/web/src/services/engagement.ts"
+      - "apps/web/scripts/metrics-contract.test.mjs"
+      - "apps/web/scripts/admin-original-dashboard.contract.test.mjs"
+      - "apps/admin-preview/**"
+      - "apps/web/scripts/cloudflare-pages-build.py"
+      - ".github/workflows/hhba-six-metrics.yml"
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  metrics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate privacy-preserving D1 schema and data access
+        run: |
+          python - <<'PY'
+          import sqlite3
+          from pathlib import Path
+          db=sqlite3.connect(':memory:')
+          db.executescript(Path('apps/web/d1/0003_cloudflare_metrics.sql').read_text())
+          tables={x[0] for x in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+          assert {'hhba_metrics_metadata','hhba_traffic_events','hhba_device_saved','hhba_device_save_events'}<=tables
+          assert 'hhba_auth_users' not in tables
+          print('HHBA_CLOUDFLARE_METRICS_SCHEMA_OK')
+          PY
+      - name: Test server privacy, audit snapshot and device identity
+        working-directory: apps/web
+        run: |
+          node --check functions/_lib/admin-access.js
+          node --check functions/_lib/metric-utils.js
+          node --check functions/api/metrics/public.js
+          node --check functions/api/admin/metrics.js
+          node --check functions/api/engagement/event.js
+          node --check 'functions/api/saved/[[path]].js'
+          node --check ../../apps/admin-preview/dashboard.js
+          node --test scripts/metrics-contract.test.mjs scripts/admin-original-dashboard.contract.test.mjs
+          node --test ../../apps/admin-preview/tests/*.test.mjs
+      - name: Build existing Vite frontend without new feature flags
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+          test -f dist/preview-admin/index.html
+          test -f ../../apps/admin-preview/index.html
+          test -f ../../apps/admin-preview/dashboard.js
+          test ! -d dist/admin-metrics
+          test -f dist/curated/v1/jobs.json
