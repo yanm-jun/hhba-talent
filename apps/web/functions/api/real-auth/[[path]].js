@@ -27,8 +27,8 @@ import {
   revokeBearer,
   hashPassword,
   verifyPassword,
-} from '../../../_lib/real-auth.js';
-import { PNVS_SIGN_NAME, PNVS_TEMPLATE_CODE, createSmsProvider } from '../../../_lib/sms-provider.js';
+} from '../../_lib/real-auth.js';
+import { PNVS_SIGN_NAME, PNVS_TEMPLATE_CODE, createSmsProvider } from '../../_lib/sms-provider.js';
 
 const json = (data, status = 200) =>
   new Response(JSON.stringify(data), {
