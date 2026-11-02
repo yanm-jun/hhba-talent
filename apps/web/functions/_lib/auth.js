@@ -146,6 +146,7 @@ async function register(env,db,req){
  const normalized=typeof email==='string'?email.trim().toLowerCase():'';
  if(!emailValid(normalized)||!passwordValid(password)||typeof display_name!=='string'||display_name.trim().length<2||display_name.trim().length>60||!ROLES.has(account_type))return fail(400,'请检查邮箱、展示名称（2—60 字）和至少 12 位的密码。');
  const synthetic=env.HHBA_AUTH_ROLLOUT==='preview' && env.HHBA_AUTH_ALLOW_TEST_EMAIL==='1' && testAddress(normalized);
+ if(testAddress(normalized) && !synthetic)return fail(400,'正式注册请使用可接收验证码的有效邮箱。');
  if(!synthetic && !canSendCode(env))return fail(503,'真实邮箱验证暂未开通，请勿提交个人资料。');
  const limit=await throttle(db,req,normalized,'register');if(limit)return limit;
  if(await db.prepare('SELECT id FROM auth_users WHERE email=?').bind(normalized).first())return fail(409,'该邮箱已注册，请直接登录或找回密码。');
