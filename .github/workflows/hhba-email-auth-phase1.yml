@@ -55,7 +55,7 @@ jobs:
       - name: End-to-end preview test against real Cloudflare D1
         working-directory: apps/web
         env:
-          HHBA_PREVIEW_URL: "https://e0931b16.hhba-talent.pages.dev"
+          HHBA_PREVIEW_URL: "https://2e2e7f6b.hhba-talent.pages.dev"
         run: |
           node scripts/auth-preview-live.e2e.mjs "$HHBA_PREVIEW_URL"
       - name: Verify Vite production compilation, independently of applicant intake
