@@ -54,7 +54,7 @@ function cookie(req){const raw=req.headers.get('cookie')||'';const item=raw.spli
 async function sessionFor(db,req){
  const token=cookie(req);if(!/^[0-9a-f]{64}$/.test(token))return null;
  const hash=await sha256(token);
- const s=await db.prepare('SELECT s.token_hash,s.user_id,s.csrf_token,s.expires_at,u.email,u.display_name,u.disabled_at FROM auth_sessions s JOIN auth_users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?').bind(hash,now()).first();
+ const s=await db.prepare('SELECT s.token_hash,s.user_id,s.csrf_token,s.expires_at,u.email,u.display_name,u.email_verified_at,u.disabled_at FROM auth_sessions s JOIN auth_users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?').bind(hash,now()).first();
  if(!s||s.disabled_at)return null;
  const r=await db.prepare('SELECT account_type FROM auth_roles WHERE user_id=? ORDER BY account_type').bind(s.user_id).all();
  return {...s,account_types:(r.results||[]).map(x=>x.account_type)};
@@ -145,10 +145,10 @@ async function register(env,db,req){
  const {email,password,display_name,account_type}=input.data;
  const normalized=typeof email==='string'?email.trim().toLowerCase():'';
  if(!emailValid(normalized)||!passwordValid(password)||typeof display_name!=='string'||display_name.trim().length<2||display_name.trim().length>60||!ROLES.has(account_type))return fail(400,'请检查邮箱、展示名称（2—60 字）和至少 12 位的密码。');
- const synthetic=testAddress(normalized);
+ const synthetic=env.HHBA_AUTH_ROLLOUT==='preview' && env.HHBA_AUTH_ALLOW_TEST_EMAIL==='1' && testAddress(normalized);
  if(!synthetic && !canSendCode(env))return fail(503,'真实邮箱验证暂未开通，请勿提交个人资料。');
  const limit=await throttle(db,req,normalized,'register');if(limit)return limit;
- if(await db.prepare('SELECT id FROM auth_users WHERE email=?').bind(normalized).first())return fail(409,'该测试邮箱已注册，请直接登录。');
+ if(await db.prepare('SELECT id FROM auth_users WHERE email=?').bind(normalized).first())return fail(409,'该邮箱已注册，请直接登录或找回密码。');
  const id=crypto.randomUUID(),salt=randomHex(16),hash=await passwordHash(password,salt),ts=now();
  try{
   await db.batch([
@@ -179,7 +179,7 @@ async function login(db,req){
 }
 async function me(db,req){
  const s=await sessionFor(db,req);if(!s)return fail(401,'请先登录。');
- return reply({id:s.user_id,email:s.email,display_name:s.display_name,role:s.account_types[0],account_types:s.account_types,csrf_token:s.csrf_token,email_verified:false});
+ return reply({id:s.user_id,email:s.email,display_name:s.display_name,role:s.account_types[0],account_types:s.account_types,csrf_token:s.csrf_token,email_verified:!!s.email_verified_at});
 }
 async function logout(db,req){
  if(req.headers.get('origin')!==new URL(req.url).origin)return fail(403,'请求来源无效。');
