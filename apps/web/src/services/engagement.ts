@@ -10,7 +10,7 @@ export function chooseAnalytics(enabled:boolean){
  dispatchEvent(new Event('hhba:analytics-consent'));
 }
 export function trackEvent(type:EngagementEvent,path=location.pathname){
- if(!metricsSupported || analyticsChoice()!==true ||navigator.doNotTrack==='1'||navigator.globalPrivacyControl===true)return;
+ if(!metricsSupported || analyticsChoice()!==true ||navigator.doNotTrack==='1'||(navigator as Navigator & {globalPrivacyControl?: boolean}).globalPrivacyControl===true)return;
  // No URL query, job title, resume text, user ID, email, or search keywords sent.
  try{
   const body=JSON.stringify({type,path:path.split(/[?#]/,1)[0]});
