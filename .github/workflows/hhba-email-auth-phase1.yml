@@ -14,6 +14,7 @@ on:
       - "apps/web/src/main.tsx"
       - "apps/web/scripts/auth-*.test.mjs"
       - "apps/web/scripts/real-email-auth.contract.test.mjs"
+      - "apps/web/scripts/auth-preview-live.e2e.mjs"
       - ".github/workflows/hhba-email-auth-phase1.yml"
   workflow_dispatch:
 permissions:
@@ -51,6 +52,12 @@ jobs:
           node --check functions/_lib/mail.js
           node --check 'functions/api/v1/[[path]].js'
           node --test scripts/auth-api.contract.test.mjs scripts/real-email-auth.contract.test.mjs scripts/auth-phase1-safety.contract.test.mjs
+      - name: End-to-end preview test against real Cloudflare D1
+        working-directory: apps/web
+        env:
+          HHBA_PREVIEW_URL: "https://e0931b16.hhba-talent.pages.dev"
+        run: |
+          node scripts/auth-preview-live.e2e.mjs "$HHBA_PREVIEW_URL"
       - name: Verify Vite production compilation, independently of applicant intake
         working-directory: apps/web
         env:
