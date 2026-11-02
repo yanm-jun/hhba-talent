@@ -38,6 +38,11 @@ test('original admin and legacy API require route-specific, signed Cloudflare Ac
    const parts=token(aud).split('.');
    parts[1]=b64({...JSON.parse(Buffer.from(parts[1],'base64url').toString()),email:'attacker@example.com'});
    assert.equal((await verifyAdmin(request(path,parts.join('.')),env)).ok,false);
+   const broken=token(aud).split('.');
+   const bytes=Buffer.from(broken[2],'base64url');bytes[0]^=1;
+   broken[2]=bytes.toString('base64url');
+   assert.equal((await verifyAdmin(request(path,broken.join('.')),env)).status,403);
+   assert.equal((await verifyAdmin(request(path,token(aud,email,{exp:Math.floor(Date.now()/1000)-1})),env)).status,403);
   }
   assert.equal((await verifyAdmin(request(admin,token(apiAud)),env)).status,403);
   assert.equal((await verifyAdmin(request(legacy,token(consoleAud)),env)).status,403);
