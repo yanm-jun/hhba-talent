@@ -9,8 +9,9 @@
 //
 // PNVS 参数与 10 月 ECS 测试后端 apps/real-backend/pnvs.mjs 一致：
 // 端点 dypnsapi.aliyuncs.com，版本 2017-05-25，RPC 签名 HMAC-SHA1，
-// SendSmsVerifyCode（签名与模板见下，TemplateParam 固定为 {"code":"##code##"}，
-// 表示“请短信商生成验证码”），CheckSmsVerifyCode 验码。
+// SendSmsVerifyCode（签名与模板见下，TemplateParam 为 {"code":"##code##","min":"5"}，
+// 表示“请短信商生成验证码”，模板 100001 内容含 ${code} 与 ${min} 两个变量，缺 min 会报
+// isv.INVALID_PARAMETERS；CodeType=1（纯数字）为占位符发码时的必填项），CheckSmsVerifyCode 验码。
 // 凭证只从 Pages Secret 环境变量读取，本文件与仓库中绝不出现真实密钥值。
 
 export const PNVS_SIGN_NAME = '恒创联众';
@@ -95,7 +96,8 @@ export class PnvsSmsProvider {
         PhoneNumber: phone,
         SignName: PNVS_SIGN_NAME,
         TemplateCode: PNVS_TEMPLATE_CODE,
-        TemplateParam: JSON.stringify({ code: '##code##' }),
+        TemplateParam: JSON.stringify({ code: '##code##', min: '5' }),
+        CodeType: 1,
       },
       'PNVS_SEND_FAILED',
     );
