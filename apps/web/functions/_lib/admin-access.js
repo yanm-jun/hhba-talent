@@ -6,7 +6,13 @@ function decode(part){
 }
 export async function verifyAdmin(request,env){
  const team=(env.HHBA_ACCESS_TEAM_DOMAIN||'').trim().toLowerCase();
- const aud=(env.HHBA_ACCESS_AUD||'').trim();
+ // The original dashboard and legacy metrics API have distinct Cloudflare Access applications.
+ // Enforce one explicit JWT audience for each route; never accept both audiences everywhere.
+ const path=new URL(request.url).pathname;
+ const fromOriginalAdmin=path==='/admin-preview/api/metrics';
+ const fromLegacyApi=path==='/api/admin/metrics';
+ if(!fromOriginalAdmin&&!fromLegacyApi)return {ok:false,code:'ADMIN_ACCESS_DENIED',status:403};
+ const aud=((fromOriginalAdmin?env.HHBA_ACCESS_CONSOLE_AUD:env.HHBA_ACCESS_AUD)||'').trim();
  const email=(env.HHBA_METRICS_ADMIN_EMAIL||'').trim().toLowerCase();
  if(!/^[a-z0-9.-]+\.cloudflareaccess\.com$/.test(team)||!aud||!email)return {ok:false,code:'ADMIN_ACCESS_NOT_CONFIGURED',status:503};
  const jwt=request.headers.get('cf-access-jwt-assertion')||'';
