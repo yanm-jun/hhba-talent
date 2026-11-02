@@ -10,7 +10,7 @@ export async function onRequestGet({request,env}){
  let since=isoDay(new Date(Date.now()-(days-1)*86400000)),until=today;
  const from=url.searchParams.get('from'),to=url.searchParams.get('to');
  if(from!==null||to!==null){
-  const valid=d=>typeof d==='string'&&/^\\d{4}-\\d{2}-\\d{2}$/.test(d)
+  const valid=d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)
     &&Number.isFinite(Date.parse(d+'T00:00:00Z'))
     &&new Date(d+'T00:00:00Z').toISOString().slice(0,10)===d;
   if(!valid(from)||!valid(to)||from>to||to>today)return bad('INVALID_CUSTOM_PERIOD',400);
