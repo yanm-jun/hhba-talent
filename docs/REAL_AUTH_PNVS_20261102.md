@@ -50,7 +50,9 @@
 
 ## 4. D1 与绑定取舍：新增认证库，不复用指标库
 
-**决定：新建 D1 数据库，Pages 绑定名 `HHBA_AUTH_DB`，把 `0004` 迁移应用到该库。**
+**决定：新建 D1 数据库，Pages 绑定名优先 `HHBA_PNVS_AUTH_DB`、回退 `HHBA_AUTH_DB`，把 `0004` 迁移应用到该库。**
+
+跟进说明（2026-11-03）：预览环境的 `HHBA_AUTH_DB` 已绑定 email-auth-phase1 库，不能覆盖，故本分支 handler 改为优先读 `HHBA_PNVS_AUTH_DB`、回退读 `HHBA_AUTH_DB`；新库 `hhba-pnvs-auth-20261103` 以 `HHBA_PNVS_AUTH_DB` 绑定到预览配置，原有三个预览绑定未动。
 
 取舍理由：现有 `HHBA_METRICS_DB` 存的是设备级收藏与流量聚合数据，且其存取函数以 `HHBA_METRICS_SECRET` 门控；把手机号、密码哈希、会话哈希这些认证数据混进同一库，会扩大指标库泄露时的 blast radius，也让“指标数据”与“身份数据”的权限边界不清。单独认证库则：认证 Functions 只绑认证库，指标 Functions 不变；出问题时可单独轮换、单独审计。
 代价：部署时需多建一个 D1 并多做一次迁移应用（见第 5 节）；handler 在 `HHBA_AUTH_DB` 缺失时明确报 `AUTH_DB_NOT_CONFIGURED`（503），不静默回退到指标库——静默回退正是会把两类数据混在一起的隐患，故不做。
