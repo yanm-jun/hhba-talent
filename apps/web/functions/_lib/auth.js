@@ -193,6 +193,12 @@ export async function route(context){
  const req=context.request,p=new URL(req.url).pathname.replace(/^\/api\/v1\/?/,'');
  try{
   const db=context.env.HHBA_AUTH_DB;
+  if(p==='auth/status'&&req.method==='GET')return reply({
+    email_delivery_configured:canSendCode(context.env),
+    preview_test_email_enabled:context.env.HHBA_AUTH_ROLLOUT==='preview'&&context.env.HHBA_AUTH_ALLOW_TEST_EMAIL==='1',
+    password_recovery_available:canSendCode(context.env),
+    phone_login_available:false
+  });
   if(p==='auth/register'&&req.method==='POST')return await register(context.env,db,req);
   if(p==='auth/email/verify'&&req.method==='POST')return await verifyEmail(context.env,db,req);
   if(p==='auth/email/resend'&&req.method==='POST')return await resendEmail(context.env,db,req);
