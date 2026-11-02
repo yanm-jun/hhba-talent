@@ -150,7 +150,13 @@ async function register(env,db,req){
  if(!synthetic && !canSendCode(env))return fail(503,'真实邮箱验证暂未开通，请勿提交个人资料。');
  const limit=await throttle(db,req,normalized,'register');if(limit)return limit;
  if(await db.prepare('SELECT id FROM auth_users WHERE email=?').bind(normalized).first())return fail(409,'该邮箱已注册，请直接登录或找回密码。');
- const id=crypto.randomUUID(),salt=randomHex(16),hash=await passwordHash(password,salt),ts=now();
+ const id=crypto.randomUUID(),salt=randomHex(16),ts=now();
+ let hash;
+ try {hash=await passwordHash(password,salt);}
+ catch(e) {
+   console.error('HHBA_PASSWORD_DERIVATION_ERROR',e?.name||'UnknownError');
+   return fail(503,'密码安全处理暂不可用'+(env.HHBA_AUTH_ROLLOUT==='preview'&&env.HHBA_AUTH_DEBUG_ENABLED==='1'?' ['+String(e?.name||'unknown').slice(0,45)+']':'')+'。');
+ }
  try{
   await db.batch([
    db.prepare('INSERT INTO auth_users(id,email,password_salt,password_hash,password_iterations,display_name,email_verified_at,created_at) VALUES(?,?,?,?,?,?,?,?)').bind(id,normalized,salt,hash,HASH_ITERATIONS,display_name.trim(),synthetic?ts:null,ts),
