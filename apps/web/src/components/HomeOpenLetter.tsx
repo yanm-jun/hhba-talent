@@ -76,13 +76,11 @@ export function HomeOpenLetter() {
   };
   const share = async () => {
     const link = shareUrl();
+    // 只分享一个链接：不传 text、不传 files。传 text 会让不少 App（尤其微信）
+    // 把分享当成一段话发出去、链接不再是可点开的卡片，这正是用户要改掉的。
     if (typeof navigator.share === 'function') {
       try {
-        await navigator.share({
-          title: '致每一个认真生活的人｜HHBA',
-          text: '让劳动更有尊严，让商业更有温度。我们想认真地和你谈谈，为什么创立 HHBA。',
-          url: link,
-        });
+        await navigator.share({ url: link });
         setFeedback('感谢你把这封信分享出去。');
         return;
       } catch (error) {
