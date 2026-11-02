@@ -79,7 +79,8 @@ export async function onRequest({ request, env }) {
     });
   }
 
-  const db = env.HHBA_AUTH_DB;
+  // PNVS 专用库优先，避免覆盖预览共享的 HHBA_AUTH_DB（email-auth-phase1 库）。
+  const db = env.HHBA_PNVS_AUTH_DB ?? env.HHBA_AUTH_DB;
   if (!db) return bad('AUTH_DB_NOT_CONFIGURED', 503);
 
   try {
