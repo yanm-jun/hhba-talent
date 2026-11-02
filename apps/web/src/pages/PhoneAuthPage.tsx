@@ -60,6 +60,21 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
         ? realAuthUsernameValid(name) && password.length > 0
         : mobileValid && codeValid
     : phoneAuthReady && mobileValid && codeValid;
+  // 登录按钮置灰时也要给一句原因，不能静默点不动：用户填了手机号但码没填满时，
+  // 以及密码登录时称呼/密码没填对时，页面上直接显示原因，而不是只靠按钮颜色。
+  const loginHint = useRealAuth && mode === 'login' && !error
+    ? realPasswordLogin
+      ? name && !realAuthUsernameValid(name)
+        ? '请先填写正确的称呼（2-20 位，首字符为字母或中文）。'
+        : name && !password
+          ? '请先输入密码。'
+          : ''
+      : phone && !mobileValid
+        ? '请先填写正确的中国大陆 11 位手机号。'
+        : mobileValid && !codeValid
+          ? '请先输入 6 位短信验证码，填满后登录按钮才可用。'
+          : ''
+    : '';
   const restoredRef = useRef(false);
 
   useEffect(() => {
@@ -232,6 +247,8 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
             )}
             {user && !accountHasRole && <p className="hhba-phone-warning" role="status">当前账户尚未开通{title}身份，请先完成对应身份认证。</p>}
             {error && <p className="hhba-phone-error" role="alert">{error}</p>}
+            {error === '该手机号尚未注册，请先注册。' && <p className="hhba-phone-notice" role="status">还没有账户？ <Link to={modeRoute}>立即注册</Link></p>}
+            {loginHint && <p className="hhba-phone-notice" role="status">{loginHint}</p>}
             {notice && <p className="hhba-phone-notice" role="status">{notice}</p>}
             <button className="hhba-phone-submit" type="submit" disabled={!canSubmit || busy}>{busy ? '验证中…' : mode === 'login' ? '登录' : '注册并继续'}<ArrowRight size={17} /></button>
           </form>
