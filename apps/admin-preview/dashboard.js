@@ -68,7 +68,7 @@ async function refreshGrowth(){
   params.set('from',customRange.from);params.set('to',customRange.to);
  }else params.set('days',selectedPeriod==='today'?'1':selectedPeriod.slice(0,-1));
  try{
-  const r=await fetch('/api/admin/metrics?'+params,{cache:'no-store',credentials:'same-origin'});
+  const r=await fetch('/admin-preview/api/metrics?'+params,{cache:'no-store',credentials:'same-origin'});
   if(!r.ok)throw Error('PRIVATE_METRICS_REQUIRE_AUTH');
   const v=await r.json();
   if(v.kind!=='HHBA_CLOUDFLARE_PRIVATE_METRICS_V1'||!v.traffic||!v.devices||!v.account)throw Error('INVALID_PRIVATE_METRICS');
