@@ -48,6 +48,7 @@ jobs:
           node --check functions/_lib/metric-utils.js
           node --check functions/api/metrics/public.js
           node --check functions/api/admin/metrics.js
+          node --check functions/admin-preview/api/metrics.js
           node --check functions/api/engagement/event.js
           node --check 'functions/api/saved/[[path]].js'
           node --check ../../apps/admin-preview/dashboard.js
