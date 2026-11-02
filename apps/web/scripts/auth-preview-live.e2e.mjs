@@ -18,7 +18,7 @@ assert.equal((await call('/api/v1/auth/me')).status,401);
 for(const role of ['candidate','recruiter']){
  const email='ci-'+stamp+'-'+role+'@example.test';
  const register=await call('/api/v1/auth/register','POST',{email,password:pass,display_name:'SyntheticCI',account_type:role});
- assert.equal(register.status,201,role+' registration failed '+register.status);
+ assert.equal(register.status,201,role+' registration failed '+register.status+' '+String(register.body?.detail||'').slice(0,180));
  assert.equal(register.body.email_verified,true);
  const other=role==='candidate'?'recruiter':'candidate';
  assert.equal((await call('/api/v1/auth/session','POST',{email,password:pass,account_type:other})).status,403,'cross-role denial');
