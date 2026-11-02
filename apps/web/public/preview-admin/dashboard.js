@@ -1,6 +1,5 @@
 import {mountUnifiedWorkbench,workspaceViews,refreshUnifiedWorkbench} from './unified-workbench.js';
-import {normalizePublicMetrics,normalizePrivateMetrics} from './cloudflare-metrics-adapter.mjs';
-// HHBA's ORIGINAL admin UI: same navigation and cards, Cloudflare API adapter (GitHub static fallback stays read-only).
+// HHBA Admin Console — private Railway Phase 3.1; all queries require an admin session.
 const byId=id=>document.getElementById(id);
 const fmt=new Intl.NumberFormat('zh-CN');
 const formatTime=value=>{
@@ -10,9 +9,7 @@ const formatTime=value=>{
    hour:'2-digit',minute:'2-digit',hour12:false
  })+'（北京时间）'}catch{return '—'}
 };
-const cloudflareMetrics=location.hostname==='hhba-talent.pages.dev'||location.hostname.endsWith('.hhba-talent.pages.dev')||location.hostname==='hhba.work';
 let snapshot=null,growth=null,selectedPeriod='30d',customRange=null,activeView='overview';
-let privateMetricsError=null;
 const titles={overview:'数据总览',users:'访问与收藏',market:'岗位与企业',operations:'运营监控',
  finance:'财务成本',investor:'融资展示',settings:'系统设置',...workspaceViews};
 const details={
@@ -102,12 +99,11 @@ async function refresh(){
  btn.setAttribute('aria-busy','true');
  btn.lastChild.textContent=' 正在核对…';
  try{
-  const response=await fetch(cloudflareMetrics?'/api/metrics/public':'./data/jobs.json',{method:'GET',cache:'no-store',credentials:'same-origin',
+  const response=await fetch('./data/jobs.json',{method:'GET',cache:'no-store',credentials:'same-origin',
    headers:{Accept:'application/json'}});
   if(response.status===401){void 0;return;}
   if(!response.ok)throw Error('index_not_available');
-  const raw=await response.json();
-  const body=cloudflareMetrics?normalizePublicMetrics(raw):raw;
+  const body=await response.json();
   if(body.kind!=='HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2'||
      !['current','partial','stale','unavailable'].includes(body.quality)||
      !body.counts||!(body.counts.displayableJobs===null||Number.isSafeInteger(body.counts.displayableJobs)))
@@ -190,11 +186,8 @@ function updateGrowth(){
  byId('export-csv').disabled=!(readyT||readyB||(['current','partial'].includes(snapshot?.quality)&&snapshot?.kind==='HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2'));
  const quality=readyT&&readyB?'访问与收藏数据已连接':readyT?'访问数据正常，收藏数据暂不可用':
   readyB?'收藏数据正常，访问数据暂不可用':'聚合数据暂不可用';
- byId('growth-quality').textContent=(cloudflareMetrics&&privateMetricsError?'Cloudflare 私有指标需要管理员授权，未泄露数据':quality)+' · '+(growth?.asOf?formatTime(growth.asOf):'数据未获取');
- byId('users-data-quality').textContent='数据质量：'+quality+(cloudflareMetrics&&privateMetricsError?' · 私有指标未授权 / 尚未完成管理员配置':'');
- displayMetric('registered-users',growth?.account?.registeredUsers,Number.isSafeInteger(growth?.account?.registeredUsers));
- const dau=growth?.account?.dau,mau=growth?.account?.mau;
- byId('active-users').textContent=Number.isSafeInteger(dau)&&Number.isSafeInteger(mau)?fmt.format(dau)+' / '+fmt.format(mau):'— / —';
+ byId('growth-quality').textContent=quality+' · '+(growth?.asOf?formatTime(growth.asOf):'数据未获取');
+ byId('users-data-quality').textContent='数据质量：'+quality;
  byId('users-interval').textContent=growth?.period?growth.period.from+' 至 '+growth.period.today+' · UTC':'暂未取得统计区间';
  renderDailyPV('trend-chart',t?.series,readyT);
  renderDailyPV('users-chart',t?.series,readyT);
@@ -206,14 +199,13 @@ async function refreshGrowth(){
   params.set('from',customRange.from);params.set('to',customRange.to);
  }else params.set('days',selectedPeriod==='today'?'1':selectedPeriod.replace('d',''));
  try{
-  const res=await fetch((cloudflareMetrics?'/api/admin/metrics':'./data/growth.json')+'?'+params,{credentials:'same-origin',cache:'no-store'});
+  const res=await fetch('./data/growth.json?'+params,{credentials:'same-origin',cache:'no-store'});
   if(res.status===401){void 0;return;}
   if(!res.ok)throw Error('PRIVATE_GROWTH_UNAVAILABLE');
-  const raw=await res.json();
-  const data=cloudflareMetrics?normalizePrivateMetrics(raw):raw;
+  const data=await res.json();
   if(data.kind!=='HHBA_PRIVATE_GROWTH_V1'||!data.traffic||!data.bookmarks)throw Error('INVALID_GROWTH_PAYLOAD');
-  growth=data;privateMetricsError=null;
- }catch(error){growth=null;privateMetricsError=String(error?.message||'PRIVATE_METRICS_UNAVAILABLE');}
+  growth=data;
+ }catch{growth=null;}
  updateGrowth();
 }
 
@@ -248,20 +240,5 @@ byId('mobile-menu').addEventListener('click',()=>{
  byId('mobile-menu').setAttribute('aria-expanded',String(open));
 });
 byId('mobile-dim').addEventListener('click',closeMenu);
-if(cloudflareMetrics){
- const change=(selector,value)=>{const node=document.querySelector(selector);if(node)node.textContent=value};
- change('.workspace-identity small','Cloudflare 数据预览');
- change('.sidebar-bottom > p','私有统计需 Cloudflare Access 管理员授权');
- change('.sidebar-bottom .safety-note span:last-child','Cloudflare 后台 · 独立预览');
- change('.top-env','Cloudflare 数据源');
- change('.preview-top-marker','私有指标受保护');
- change('.preview-notice strong','HHBA 原版统一管理后台 · Cloudflare 数据接入');
- change('.preview-notice span','保留原有布局和全部业务菜单。岗位和 ATS 从同源真实审计读取；访问与收藏需管理员授权；注册及 DAU/MAU 等待正式账号体系。');
- change('#period-notice span','岗位源数据来自 Cloudflare 官方快照，私有访问与收藏按 UTC 日期查询 Cloudflare D1；未授权则不展示。');
- const userP=document.querySelector('#view-users .admin-detail-panel p:not([id])');
- if(userP)userP.textContent='PV 与日 UV 仅覆盖主动同意的用户。设备收藏从 Cloudflare D1 查询，不代表真实登录账户；未授权指标显示 —，不推算历史数据。';
- const source=document.querySelector('.provenance tbody tr:first-child td:nth-child(2)');
- if(source)source.textContent='Cloudflare 同源岗位快照和官网 JD 审计';
-}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
-choosePeriod('30d');updateOverview();void refresh();void refreshGrowth();
+choosePeriod('30d');updateOverview();void refresh();

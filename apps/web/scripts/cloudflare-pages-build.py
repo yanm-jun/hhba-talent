@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import re
 import subprocess
+import shutil
 
 import yaml
 
@@ -75,6 +76,26 @@ def main() -> None:
     run(["npm", "run", "build"], cwd=WEB,
         env={**os.environ, "VITE_HHBA_VERIFIED_SNAPSHOT": "1"})
 
+    # Cloudflare serves the VERY SAME original admin-preview source as GitHub Pages.
+    # Only asset paths differ between the standalone app and the /admin-preview/ subpath.
+    # No new admin UI, no new route prefix, no synthetic user or business records.
+    original_admin = REPO / "apps" / "admin-preview"
+    cloudflare_admin = WEB / "dist" / "admin-preview"
+    cloudflare_admin.mkdir(parents=True, exist_ok=True)
+    for filename in ("index.html", "dashboard.js", "styles.css", "favicon.svg"):
+        shutil.copy2(original_admin / filename, cloudflare_admin / filename)
+    admin_html = (cloudflare_admin / "index.html").read_text(encoding="utf-8")
+    for old, new in (
+        ('href="/styles.css"', 'href="./styles.css"'),
+        ('src="/dashboard.js"', 'src="./dashboard.js"'),
+        ('href="/favicon.svg"', 'href="./favicon.svg"'),
+    ):
+        if old not in admin_html:
+            raise SystemExit("Original admin asset reference changed: " + old)
+        admin_html = admin_html.replace(old, new)
+    (cloudflare_admin / "index.html").write_text(admin_html, encoding="utf-8")
+    print("HHBA_CLOUDFLARE_ORIGINAL_ADMIN_READY=/admin-preview/", flush=True)
+
     # Same-site company deep links; do not add 404.html, so Cloudflare Pages
     # retains its native SPA fallback for other client-side routes.
     run(["node", "scripts/materialize-company-route-entries.mjs"], cwd=WEB,
@@ -110,6 +131,8 @@ def main() -> None:
         "images/employer-profiles/cn-autumn-157/logo.webp",
         "fonts/hhba-people-xingshu.woff2",
         "data/jobs.json",
+        "admin-preview/index.html",
+        "admin-preview/dashboard.js",
         "companies/autumn/cn-autumn-034/index.html",
     ]
     missing = [p for p in checks if not (WEB / "dist" / p).is_file()
