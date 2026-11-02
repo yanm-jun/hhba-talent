@@ -12,6 +12,13 @@ test('production auth defaults to disabled even with D1 binding',async()=>{
  const ctx=context('https://hhba-talent.pages.dev',{HHBA_AUTH_DB:{},HHBA_AUTH_ROLLOUT:'preview'});
  const r=await route(ctx);assert.equal(r.status,503);
 });
+test('production auth refuses to start without server-side password pepper',async()=>{
+ const url='https://hhba-talent.pages.dev';
+ let r=await route(context(url,{HHBA_AUTH_DB:{},HHBA_AUTH_ROLLOUT:'production'}));
+ assert.equal(r.status,503);
+ r=await route(context(url,{HHBA_AUTH_DB:{},HHBA_AUTH_ROLLOUT:'production',HHBA_AUTH_PASSWORD_PEPPER:'preview-contract-pepper-required-value-1234'}));
+ assert.equal(r.status,200);
+});
 test('preview explicitly reports email provider unconfigured; no secrets are returned',async()=>{
  const r=await route(context(preview,{HHBA_AUTH_DB:{},HHBA_AUTH_ROLLOUT:'preview',HHBA_AUTH_ALLOW_TEST_EMAIL:'1'}));
  assert.equal(r.status,200); const v=await r.json();
