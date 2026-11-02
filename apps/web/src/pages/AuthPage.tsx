@@ -32,6 +32,7 @@ export function AuthPage({ user, onUser, accountType = 'candidate', initialMode 
   const [flow, setFlow] = useState<'form'|'verify'|'reset-request'|'reset-confirm'>('form');
   const [code, setCode] = useState('');
   const [notice, setNotice] = useState('');
+  const [mailStatus, setMailStatus] = useState<{email_delivery_configured:boolean;preview_test_email_enabled:boolean;password_recovery_available:boolean}|null>(null);
   const isCandidate = accountType === 'candidate';
   const stem = isCandidate ? '/candidate' : '/recruiter';
   const accountLabel = isCandidate ? '求职者' : '招聘方';
@@ -50,8 +51,11 @@ export function AuthPage({ user, onUser, accountType = 'candidate', initialMode 
       : '';
   const accountHasRole = Boolean(user?.account_types?.includes(accountType));
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const isSyntheticTestAddress = /@example\\.(test|invalid)$/i.test(email.trim());
+  const emailRegistrationAvailable = Boolean(mailStatus?.email_delivery_configured ||
+    (mailStatus?.preview_test_email_enabled && isSyntheticTestAddress));
   const formReady = accountAuthReady && emailValid && password.length >= 12
-    && (mode === 'login' || (displayName.trim().length >= 2 && passwordConfirm === password));
+    && (mode === 'login' || (emailRegistrationAvailable && displayName.trim().length >= 2 && passwordConfirm === password));
 
   useEffect(() => {
     setMode(initialMode);
@@ -64,6 +68,14 @@ export function AuthPage({ user, onUser, accountType = 'candidate', initialMode 
   }, [accountType, initialMode]);
 
   useEffect(() => {
+    if (!accountAuthReady) return;
+    let active=true;
+    api.authStatus().then(status => {if(active)setMailStatus(status)})
+      .catch(() => {if(active)setMailStatus(null)});
+    return () => {active=false};
+  }, [accountType]);
+
+  useEffect(() => {
     if (accountHasRole) navigate(safeNext);
   }, [accountHasRole, safeNext]);
 
@@ -74,6 +86,7 @@ export function AuthPage({ user, onUser, accountType = 'candidate', initialMode 
     if (!emailValid) return setError('请填写有效邮箱地址。');
     if (password.length < 12) return setError('密码至少需要 12 位。');
     if (mode === 'register') {
+      if (!emailRegistrationAvailable) return setError('真实邮箱验证码服务尚未开通，本阶段暂不接收真实邮箱注册资料。');
       if (displayName.trim().length < 2 || displayName.trim().length > 60) return setError('称呼请填写 2—60 个字符。');
       if (password !== passwordConfirm) return setError('两次输入的密码不一致。');
     }
@@ -143,6 +156,10 @@ export function AuthPage({ user, onUser, accountType = 'candidate', initialMode 
           <Link className="hhba-phone-switch-identity" to="/auth">切换身份 <ArrowRight size={13}/></Link>
         </div>
         {notice && <p className="hhba-phone-notice" role="status">{notice}</p>}
+        {mode === 'register' && flow === 'form' && mailStatus && !mailStatus.email_delivery_configured &&
+          <p className="hhba-phone-warning" role="status">真实邮箱发信服务尚未配置：QQ、163、Gmail 等注册暂不能提交。{mailStatus.preview_test_email_enabled ? '当前仅可使用 @example.test 测试账户。' : ''}</p>}
+        {mode === 'register' && flow === 'form' && !mailStatus &&
+          <p className="hhba-phone-warning" role="status">正在检查邮箱验证服务，暂不开放真实邮箱注册。</p>}
         {flow==='form' ? <form className="hhba-phone-form" onSubmit={submit}>
           {mode === 'register' && <label htmlFor="hhba-email-auth-name">
             称呼
@@ -211,7 +228,7 @@ export function AuthPage({ user, onUser, accountType = 'candidate', initialMode 
         {flow==='form' && mode==='login' && <button type="button" className="hhba-phone-legacy" onClick={()=>{setFlow('reset-request');setError('');setNotice('');setCode('');setPassword('');}}>忘记密码？通过邮箱找回</button>}
         <div className="hhba-phone-preview-note" role="note">
           <Info size={15} aria-hidden="true"/>
-          <span>支持 QQ、163、126、Gmail、Outlook 和企业邮箱。真实邮箱必须先完成验证码验证；发信服务开通前，真实邮箱注册会明确提示不可用。请勿使用真实密码测试。</span>
+          <span>支持 QQ、163、126、Gmail、Outlook 等常用邮箱。邮箱所有权验证后方可登录。当前预览仅供验收，请勿输入真实个人资料或常用密码。</span>
         </div>
       </div>
       <div className="hhba-phone-below">
