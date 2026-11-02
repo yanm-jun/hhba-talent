@@ -2,7 +2,9 @@ import {mailReady,sendMail,testAddress,validEmail} from './mail.js';
 const enc = new TextEncoder();
 const MAX_BODY_BYTES = 8192;
 const SESSION_SECONDS = 604800;
-const HASH_ITERATIONS = 310000;
+// Cloudflare workerd limits an individual WebCrypto PBKDF2 call to 100000 iterations.
+// Pair with server-managed HMAC pepper for production and enforce MFA/rate-limiting.
+const HASH_ITERATIONS = 100000;
 const COOKIE_NAME = '__Host-hhba_session';
 const ROLES = new Set(['candidate', 'recruiter']);
 const headers = {'content-type':'application/json; charset=utf-8','cache-control':'no-store, private','x-content-type-options':'nosniff','referrer-policy':'no-referrer'};
