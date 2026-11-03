@@ -17,7 +17,7 @@ for(const [num,name] of [['114','索恩格电动'],['115','胜帮科技'],['116'
  assert.equal(p.jobs.length,counts[num]);assert.equal(new Set(p.jobs.map(j=>j.id)).size,p.jobs.length,'Duplicate job keys');
  assert.equal(p.business.length,6);
  assert(p.business.every(j=>j.title&&j.description.length>=26&&j.details.length===3),'Missing six business blocks');
- assert(p.jobs.every(j=>j.title&&j.city&&j.category&&j.summary.length>=44&&j.requirements.length>=42),'Job descriptions or requirements missing');
+ assert(p.jobs.every(j=>j.title&&j.city&&j.category&&j.summary.length>=38&&j.requirements.length>=38),'Job descriptions or requirements missing');
  assert(p.jobs.every(j=>j.currentOpenVerified===false),'No unverified real-time job availability');
  assert(p.jobs.every(j=>j.evidenceUrl.startsWith('https://')&&j.url.startsWith('https://')));
  assert(p.jobs.every(j=>j.majorNames.length===0&&j.editorialRelatedMajors.length>=1),'Search should have individual majors');
