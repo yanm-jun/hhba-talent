@@ -1,0 +1,246 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-096",
+  "name": "宁波银行",
+  "displayName": "宁波银行股份有限公司",
+  "englishName": "Bank of Ningbo",
+  "aliases": [
+    "宁波银行股份有限公司",
+    "Bank of Ningbo",
+    "NBCB",
+    "宁波银行2027校招"
+  ],
+  "industry": "城市商业银行 · 金融科技 · 公司与个人银行 · 风控与运营",
+  "subtitle": "2027届校园招聘 · 全国分支机构；2026年秋季网申已截止",
+  "overview": "宁波银行2027届秋季校园招聘由总行、分行、支行与子公司分主体组织。官方秋招流程中，2026年9月7日至10月31日为简历投递期，后续面试、体检及实习安排不代表仍能报名。本页按高校转载的2027正式招聘简章保留总行与分支机构五类公开岗位名称，未得到各城市独立岗位链接时不推断具体城市都有剩余名额。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://zhaopin.nbcb.com.cn/",
+    "https://eie.scu.edu.cn/info/1057/15660.htm",
+    "https://job.zzu.edu.cn/campus/view/id/1018779",
+    "https://www.yinhangzhaopin.com/ningboyh/2026-09-02/224567.htm",
+    "https://www.nbcb.com.cn/"
+  ],
+  "media": {
+    "logo": "images/autumn-real-logos/cn-autumn-096.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-096/photo1.svg",
+        "caption": "宁波银行业务场景：照片待授权，当前为非实景编辑图",
+        "alt": "宁波银行的非实景信息图，占位图不是实际办公场所",
+        "note": "非实景：仅作独立PR审查占位，真实公司照片尚未取得商用许可。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-096/photo2.svg",
+        "caption": "宁波银行业务场景：照片待授权，当前为非实景编辑图",
+        "alt": "宁波银行的非实景信息图，占位图不是实际办公场所",
+        "note": "非实景：仅作独立PR审查占位，真实公司照片尚未取得商用许可。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://zhaopin.nbcb.com.cn/",
+    "label": "宁波银行官方招聘系统（秋招已截止）",
+    "status": "official_portal",
+    "subject": "宁波银行股份有限公司总行与所属分支机构；各子公司另核主体",
+    "note": "2027秋季校园招聘简历投递2026-09-07至2026-10-31；本文岗位为具名招聘类别，并非可独立确认的当前空缺。后续复面和实习阶段不等于报名延期。"
+  },
+  "majorIntro": "来自2027届校园招聘官方简章及高校就业平台的五类具名岗位。岗位名称可核，分行确切城市、职位ID及单岗专业要求未逐一公开。本页专业仅为关联推荐，不是录取资格认证。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "软件工程",
+    "人工智能",
+    "信息安全",
+    "统计学",
+    "数学与应用数学",
+    "金融学",
+    "经济学",
+    "会计学",
+    "工商管理",
+    "市场营销",
+    "法学"
+  ],
+  "photoNote": "此独立审查版本的两幅配图均为显著标注的非实景编辑占位，不代表企业真实办公场景。正式展示必须取得真实素材许可并核验来源。",
+  "business": [
+    {
+      "title": "公司银行与普惠金融",
+      "description": "面向公司及小微企业提供存贷款、结算和综合金融服务，具体产品权限与地区服务范围依监管披露。",
+      "tags": "对公 · 融资",
+      "details": [
+        "公司客户经营",
+        "支付结算",
+        "普惠金融"
+      ]
+    },
+    {
+      "title": "零售银行与财富管理",
+      "description": "依托分支机构和手机银行为个人客户提供账户、消费、存贷款及投资理财相关服务。",
+      "tags": "零售 · 财富",
+      "details": [
+        "个人银行",
+        "财富服务",
+        "客户运营"
+      ]
+    },
+    {
+      "title": "金融科技与软件研发",
+      "description": "总行金融科技方向覆盖应用研发、数据研发、算法、运维、系统测试和信息安全，具体专业要求随职位变化。",
+      "tags": "科技 · 系统",
+      "details": [
+        "应用软件研发",
+        "数据与算法",
+        "系统运行安全"
+      ]
+    },
+    {
+      "title": "风险管理与合规",
+      "description": "围绕银行授信风险、内部控制、反欺诈及法律合规建立管理和技术保障机制。",
+      "tags": "风控 · 合规",
+      "details": [
+        "信用风险控制",
+        "数据风控",
+        "法律与审计"
+      ]
+    },
+    {
+      "title": "运营与金融服务",
+      "description": "分支机构运营培训生及柜面服务团队承担服务流程、运营质量和数字化渠道协作。",
+      "tags": "运营 · 服务",
+      "details": [
+        "网点运营",
+        "客户服务",
+        "流程改进"
+      ]
+    },
+    {
+      "title": "金融市场与专业经营",
+      "description": "资金营运与金融市场领域覆盖交易、投研及流动性管理，校招实际专业方向以相关单位岗位公告为准。",
+      "tags": "市场 · 交易",
+      "details": [
+        "资金营运",
+        "市场研究",
+        "风险评估"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "hq-training",
+      "title": "总行培训生",
+      "category": "管理 / 银行业务",
+      "city": "宁波（总行，职位具体部门以官网为准）",
+      "summary": "2027届宁波银行招聘材料明确列出总行培训生，面向总行不同业务条线的综合培养方向。本条为官网公布的岗位名称，不拆分成未经证实的部门级职位。",
+      "requirements": "面向2026年9月至2027年8月取得毕业资格的应届毕业生；公告注明科技、量化风控方向偏好数学与计算机，其他岗位多数专业不限。原2026年10月31日秋招报名已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "金融学",
+        "经济学",
+        "工商管理",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 秋季网申已截止",
+      "url": "https://zhaopin.nbcb.com.cn/",
+      "evidenceUrl": "https://eie.scu.edu.cn/info/1057/15660.htm",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "宁波银行股份有限公司总行或分支机构（逐岗法人另核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hq-fintech",
+      "title": "总行金融科技定向生",
+      "category": "金融科技 / 软件",
+      "city": "宁波（总行金融科技相关部门）",
+      "summary": "学校就业平台公开的宁波银行2027届岗位明确列出总行金融科技定向生，内部涉及应用研发、数据研发、算法、运维SRE、系统测试、安全技术与产品等岗位方向。",
+      "requirements": "公开文本要求本科及以上，偏好计算机、软件工程、人工智能、电子通信、信息安全、自动化、数学及统计专业；细分岗位JD与具体部门要通过银行官网进一步逐项核验。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能",
+        "网络空间安全",
+        "统计学",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 秋季网申已截止",
+      "url": "https://zhaopin.nbcb.com.cn/",
+      "evidenceUrl": "https://job.zzu.edu.cn/campus/view/id/1018779",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "宁波银行股份有限公司总行或分支机构（逐岗法人另核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "branch-training",
+      "title": "分（支）行培训生",
+      "category": "银行 / 业务",
+      "city": "全国分支行城市（逐岗城市以官方招聘系统为准）",
+      "summary": "四川大学就业发布的2027秋招说明列出分行和支行培训生，是全国分支机构的综合培养岗位，不意味着所列所有城市目前均有独立空缺。",
+      "requirements": "目标为2027届毕业生，原秋季简历投递至2026年10月31日；各招聘机构对学历、专业、志愿选择和工作地区的条件须以对应岗位详情为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "金融学",
+        "经济学",
+        "工商管理",
+        "市场营销"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 秋季网申已截止",
+      "url": "https://zhaopin.nbcb.com.cn/",
+      "evidenceUrl": "https://eie.scu.edu.cn/info/1057/15660.htm",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "宁波银行股份有限公司总行或分支机构（逐岗法人另核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "branch-fintech",
+      "title": "分行金融科技定向生",
+      "category": "金融科技 / 软件",
+      "city": "各招聘分行（具体城市需逐岗核对）",
+      "summary": "宁波银行2027届校园招聘材料将分行金融科技定向生独立列为岗位类别，工作地点依相应分行需要而非统一宁波总部。",
+      "requirements": "科技类岗位对数学、计算机、软件工程和统计等背景具有相关偏好；学历及实际技能要求需由分行逐条确认，2026年秋季统一报名已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息安全",
+        "网络工程",
+        "统计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 秋季网申已截止",
+      "url": "https://zhaopin.nbcb.com.cn/",
+      "evidenceUrl": "https://eie.scu.edu.cn/info/1057/15660.htm",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "宁波银行股份有限公司总行或分支机构（逐岗法人另核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "branch-operations",
+      "title": "分（支）行运营培训生",
+      "category": "银行 / 运营",
+      "city": "各招聘分支机构（单岗城市未核实）",
+      "summary": "公开2027校招简介将分支行运营培训生与普通培训生分开，属于分支机构运营及客户服务人才培养方向，不冒充具体柜员JD。",
+      "requirements": "官方公告总体岗位以2027届应届毕业生为对象，运营条线的每个地区录用资格需参考银行招聘平台；原秋招报名期为9月7日至10月31日。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工商管理",
+        "会计学",
+        "金融学",
+        "市场营销"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 秋季网申已截止",
+      "url": "https://zhaopin.nbcb.com.cn/",
+      "evidenceUrl": "https://eie.scu.edu.cn/info/1057/15660.htm",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "宁波银行股份有限公司总行或分支机构（逐岗法人另核）",
+      "currentOpenVerified": false
+    }
+  ]
+}
