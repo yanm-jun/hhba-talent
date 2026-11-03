@@ -32,6 +32,14 @@ test('selected or typed major is ranked across the entire filtered list before p
   'Known relevant subjects must rank ahead of unrestricted claims');
  assert.match(match,/majorExactEvidence/);
 });
+test('company role rows and account bookmarks share the same global rules',()=>{
+ const company=read('src/components/CompanyMajorJobs.tsx');
+ const center=read('src/pages/PersonalCenterPage.tsx');
+ assert.match(company,/<SaveJobButton jobId=\{job\.id\} compact\/>/);
+ assert.match(company,/majorExactEvidence\(b,slug\)-majorExactEvidence\(a,slug\)/);
+ assert.match(center,/setVisibleSaved\(n=>Math\.min\(300,n\+40\)\)/);
+ assert.doesNotMatch(center,/当前仅显示最近 40 条收藏/);
+});
 test('real account API verifies source-built domestic and archived source indexes',()=>{
  const api=read('functions/api/account/[[path]].js');
  const generator=read('scripts/prepare-saveable-job-index.mjs');
