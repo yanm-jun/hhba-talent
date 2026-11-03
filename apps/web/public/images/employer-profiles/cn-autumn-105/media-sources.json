@@ -1,0 +1,35 @@
+{
+  "companyId": "105",
+  "checkedAt": "2026-11-03",
+  "brand": {
+    "status": "editorial_label_not_official_logo",
+    "copyrightStatus": "unverified",
+    "approvedToPublishAsCorporateLogo": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": {
+        "sourcePage": "https://hwzs.cscec.com/jpgc/xzlgc/202311/3735242.html",
+        "mediaUrl": "https://hwzs.cscec.com/jpgc/xzlgc/202311/W020231130358969312007.JPG",
+        "description": "中建海峡展示的中国融通集团办公大楼外景，属于施工方的官方工程案例照片，尚无授权用于HHBA"
+      },
+      "actualCompanyPhotoDisplayed": false,
+      "commercialUsageApproved": false
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": {
+        "sourcePage": "https://www.crtamg.com.cn/rlzy/",
+        "mediaUrl": null,
+        "description": "融通集团官方人才页面（无可确认授权转载的第二张实景图）"
+      },
+      "actualCompanyPhotoDisplayed": false,
+      "commercialUsageApproved": false
+    }
+  ],
+  "commercialUsageApproved": false,
+  "notes": "候选图片仅供审计归属，不将网上可见等同可转载；页面两张图片均显著注明非实景。"
+}
