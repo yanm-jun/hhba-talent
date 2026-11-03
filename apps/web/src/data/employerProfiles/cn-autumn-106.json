@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-106",
+  "name": "中国信达",
+  "displayName": "中国信达资产管理股份有限公司",
+  "englishName": "China Cinda Asset Management",
+  "aliases": [
+    "中国信达资产管理",
+    "Cinda",
+    "China Cinda",
+    "信达资产管理2027校招"
+  ],
+  "industry": "金融资产管理 · 不良资产经营 · 风险化解 · 金融科技",
+  "subtitle": "2027届总部及22家分公司校招：四大官方岗位类别，报名已截止",
+  "overview": "中国信达资产管理股份有限公司2026年10月9日官方公告发布2027年度校园招聘，招聘范围覆盖总部与22家分公司，明确公布业务拓展、业务支持、信息科技及综合管理四个职位类别。大类下的实际岗位详见公告附件；本版不将四类名称包装成四个可独立申请的JD或猜测每家分公司招聘城市。2027校招报名2026年10月31日24时截止。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://www.cinda.com.cn/home/pc/cn/xdjt/xdjtpd/rczp/20261009/265731.shtml",
+    "https://cinda.zhiye.com/",
+    "https://career.nankai.edu.cn/correcruit/content/id/119773.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-106/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-106/photo1.svg",
+        "caption": "中国信达企业图片待官方核验（非实景）",
+        "alt": "中国信达非实景编辑展示图，非企业真实厂区或办公环境",
+        "note": "非实景：仅供分支独立验收，不是企业真实照片；真实图片及商业使用授权待审核。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-106/photo2.svg",
+        "caption": "中国信达企业图片待官方核验（非实景）",
+        "alt": "中国信达非实景编辑展示图，非企业真实厂区或办公环境",
+        "note": "非实景：仅供分支独立验收，不是企业真实照片；真实图片及商业使用授权待审核。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://cinda.zhiye.com/",
+    "label": "中国信达2027校招官方网申（原批次已截止）",
+    "status": "official_portal",
+    "subject": "中国信达资产管理股份有限公司总部和22家参加2027校招的分公司，具体职位待官方附件核实",
+    "note": "2027年度校园招聘官方报名截止2026-10-31 24:00；最多投递2个岗位；官方公告四类岗位是方向类别，不等于四条独立在招职位。"
+  },
+  "majorIntro": "四大方向全部来自中国信达官方2027校园招聘公告。公开正文没有逐个职位编号、独立所在地与细化JD，本站明确标记为方向汇总，不计为4个实时职位。普遍硕士及以上、英语CET6 425或等效成绩要求。",
+  "preferredMajors": [
+    "金融学",
+    "经济学",
+    "法学",
+    "会计学",
+    "审计学",
+    "财务管理",
+    "计算机科学与技术",
+    "软件工程",
+    "数据科学与大数据技术",
+    "人力资源管理"
+  ],
+  "photoNote": "两张图片为已明确标注的非实景占位，品牌标识为非官方编辑字标。未经版权所有人许可不得将其包装为企业真实办公实景或正式商标。",
+  "business": [
+    {
+      "title": "不良资产收购与处置",
+      "description": "以金融不良资产经营为主责主业，参与债权收购、资产管理和市场化处置与重组。",
+      "tags": "资产 · 风控",
+      "details": [
+        "不良收购",
+        "资产重组",
+        "债权处置"
+      ]
+    },
+    {
+      "title": "金融机构与企业纾困",
+      "description": "服务金融风险化解和实体企业经营，提供困境资产管理及企业风险处置相关方案。",
+      "tags": "金融 · 企业",
+      "details": [
+        "风险化解",
+        "企业重组",
+        "债务管理"
+      ]
+    },
+    {
+      "title": "股权及资产投资",
+      "description": "通过多种法律允许的投资方式参与企业价值恢复与资产经营，业务范围以监管核准为准。",
+      "tags": "投资 · 管理",
+      "details": [
+        "股权投资",
+        "资产经营",
+        "价值提升"
+      ]
+    },
+    {
+      "title": "金融科技和数据系统",
+      "description": "开发信息系统、业务数据管理和数字化风险监测技术，为不良资产管理和金融业务提供支持。",
+      "tags": "数字 · IT",
+      "details": [
+        "软件开发",
+        "数据治理",
+        "金融信息化"
+      ]
+    },
+    {
+      "title": "法律合规与审计",
+      "description": "处理资产经营涉及的法律事项、风险管理、业务审核及财务审计要求，承担监督与内控。",
+      "tags": "合规 · 审计",
+      "details": [
+        "法律支持",
+        "财务审计",
+        "内控风险"
+      ]
+    },
+    {
+      "title": "集团及分公司管理",
+      "description": "总部与多地分公司通过综合管理、人才培养与财务运营等职能支持业务和风险治理。",
+      "tags": "管理 · 组织",
+      "details": [
+        "人力资源",
+        "经营管理",
+        "组织治理"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "business-expansion",
+      "title": "业务拓展类（2027公告岗位类别，非独立职位ID）",
+      "city": "总部及22家参与招聘分公司（逐岗位城市未单独核实）",
+      "category": "金融 / 不良资产",
+      "summary": "中国信达2026年10月9日官方2027校园招聘公告直接列出业务拓展类，涵盖不良资产收购、资产经营管理与处置全链条。该条为公告的岗位类别，非总部或某分公司独立职位。",
+      "requirements": "官方校招要求境内2027届硕士研究生及以上，符合国籍及英语六级425或等效语言成绩；涉及全国总部与分公司，实际岗位城市、人数和细化职责均须以原公告附件与网申系统为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "金融学",
+        "经济学",
+        "工商管理",
+        "法学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上 · 2026-10-31已截止",
+      "url": "https://cinda.zhiye.com/",
+      "evidenceUrl": "https://www.cinda.com.cn/home/pc/cn/xdjt/xdjtpd/rczp/20261009/265731.shtml",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国信达资产管理股份有限公司总部或各分公司（按独立JD确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "business-support",
+      "title": "业务支持类（2027公告岗位类别，非独立职位ID）",
+      "city": "总部及22家参与招聘分公司（逐岗位城市未单独核实）",
+      "category": "财务 / 风控",
+      "summary": "中国信达2027届官方公告列示业务支持类，主要覆盖业务审核、法律合规、财务审计和金融风险管理等支持职能。这是招聘大类，不是可独立投递的职位链接。",
+      "requirements": "一般要求境内2027届硕士研究生及以上；符合官方CET6或TOEFL、IELTS等对应英语标准，具体法律、会计等岗位的执业资格和地区条件须以招聘附件为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "法学",
+        "会计学",
+        "审计学",
+        "财务管理",
+        "金融学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上 · 2026-10-31已截止",
+      "url": "https://cinda.zhiye.com/",
+      "evidenceUrl": "https://www.cinda.com.cn/home/pc/cn/xdjt/xdjtpd/rczp/20261009/265731.shtml",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国信达资产管理股份有限公司总部或各分公司（按独立JD确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "information-technology",
+      "title": "信息科技类（2027公告岗位类别，非独立职位ID）",
+      "city": "总部及22家参与招聘分公司（逐岗位城市未单独核实）",
+      "category": "软件 / 数据",
+      "summary": "中国信达官方2027年校园招聘公告明确列出信息科技类，涉及信息技术、软件开发与数据管理等方向；没有官方单岗编号时不擅自拆成多个程序员岗位。",
+      "requirements": "中国信达2027校招要求硕士研究生及以上，IT相关专业符合公告专业范围；具体编程语言、数据库、金融系统经验和工作地点未在大类公告逐项公布，不自造门槛。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息安全",
+        "数据科学与大数据技术",
+        "人工智能"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上 · 2026-10-31已截止",
+      "url": "https://cinda.zhiye.com/",
+      "evidenceUrl": "https://www.cinda.com.cn/home/pc/cn/xdjt/xdjtpd/rczp/20261009/265731.shtml",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国信达资产管理股份有限公司总部或各分公司（按独立JD确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "general-management",
+      "title": "综合管理类（2027公告岗位类别，非独立职位ID）",
+      "city": "总部及22家参与招聘分公司（逐岗位城市未单独核实）",
+      "category": "行政 / 人事",
+      "summary": "中国信达官方招聘公告列示综合管理类，覆盖党建纪检、人力资源、文秘宣传等职能。不同城市与机构的具体岗位没有在公告正文中逐一确定。",
+      "requirements": "境内2027届硕士及以上，境外初次就业者按毕业取得学位与留服认证时间规则执行；英语CET6达到425或官方等效分数，并满足各机构具体审核要求。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人力资源管理",
+        "汉语言文学",
+        "新闻学",
+        "公共管理",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上 · 2026-10-31已截止",
+      "url": "https://cinda.zhiye.com/",
+      "evidenceUrl": "https://www.cinda.com.cn/home/pc/cn/xdjt/xdjtpd/rczp/20261009/265731.shtml",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国信达资产管理股份有限公司总部或各分公司（按独立JD确认）",
+      "currentOpenVerified": false
+    }
+  ]
+}

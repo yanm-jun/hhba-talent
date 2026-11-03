@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-105",
+  "name": "中国融通集团",
+  "displayName": "中国融通资产管理集团有限公司",
+  "englishName": "China Rongtong Asset Management Group",
+  "aliases": [
+    "融通集团",
+    "中国融通资产管理集团",
+    "CRTC",
+    "中国融通2027秋招"
+  ],
+  "industry": "综合资产管理 · 农业 · 不动产 · 旅业 · 医疗保障 · 科技",
+  "subtitle": "2027秋招：原报名2026年10月30日已截止；第三方披露5条待原职位复核",
+  "overview": "中国融通集团为中央管理的国有独资企业，2027年秋季校园招聘涉及多个业务子公司，工作地区广泛。集团官方网站确认2026年9月发布2027届秋招，原网申10月30日17时截止。本页面录入5条第三方校招网站披露的带城市职位名称，但岗位所对应的原始招聘法人和独立职位编号尚未与集团网申端交叉验证；应视为历史待核对记录，不能据此推定当前空缺或总部直接录用。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://www.crtamg.com.cn/rlzy/rczp/",
+    "https://www.wondercv.com/xiaozhao/china-rongtong-2027-autumn-campus-recruitment-15341-c4859a/",
+    "https://www.upcv.tech/xiaozhao/cmu11nbyq000em9e39vvn0gov.html",
+    "https://www.gaoxiaojob.com/announcement/detail/430798.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-105/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-105/photo1.svg",
+        "caption": "中国融通集团企业图片待官方核验（非实景）",
+        "alt": "中国融通集团非实景编辑展示图，非企业真实厂区或办公环境",
+        "note": "非实景：仅供分支独立验收，不是企业真实照片；真实图片及商业使用授权待审核。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-105/photo2.svg",
+        "caption": "中国融通集团企业图片待官方核验（非实景）",
+        "alt": "中国融通集团非实景编辑展示图，非企业真实厂区或办公环境",
+        "note": "非实景：仅供分支独立验收，不是企业真实照片；真实图片及商业使用授权待审核。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.crtamg.com.cn/rlzy/rczp/",
+    "label": "中国融通集团官方网站人才招聘栏目（不是已验证的网申地址）",
+    "status": "unconfirmed",
+    "subject": "集团及旗下各业务子公司；具体岗位实际招聘主体未完成原单岗核验",
+    "note": "本次2027届秋季网申已于2026-10-30 17:00截止；本站5条城市岗位来自第三方转载，暂未取得集团官方单岗ID与原始JD，严禁标为实时可投递。"
+  },
+  "majorIntro": "以下是校招信息聚合平台出现的5条城市岗位记录，存在招聘主体与单岗URL未确认的证据缺口。专业仅用于相关性过滤，不承诺通过集团招聘资格审核。",
+  "preferredMajors": [
+    "人力资源管理",
+    "工商管理",
+    "电子科学与技术",
+    "计算机科学与技术",
+    "市场营销",
+    "材料科学与工程",
+    "化学工程与工艺",
+    "通信工程"
+  ],
+  "photoNote": "两张图片为已明确标注的非实景占位，品牌标识为非官方编辑字标。未经版权所有人许可不得将其包装为企业真实办公实景或正式商标。",
+  "business": [
+    {
+      "title": "不动产及商业资产运营",
+      "description": "围绕存量商业不动产和集团持有资产开展管理运营、租赁服务及项目改造。",
+      "tags": "资产 · 运营",
+      "details": [
+        "资产管理",
+        "园区服务",
+        "物业经营"
+      ]
+    },
+    {
+      "title": "农业发展与土地管理",
+      "description": "依托农业发展业务主体开展农业资产经营、农业生产、现代农业项目与土地资源管理。",
+      "tags": "农业 · 土地",
+      "details": [
+        "现代农业",
+        "资源经营",
+        "农业供应链"
+      ]
+    },
+    {
+      "title": "旅业酒店与文教服务",
+      "description": "管理旅游酒店、军队保障相关服务及文化教育资产，招聘由不同子公司独立开展。",
+      "tags": "酒店 · 文教",
+      "details": [
+        "酒店运营",
+        "文体旅游",
+        "文化教育"
+      ]
+    },
+    {
+      "title": "医疗健康与保障服务",
+      "description": "通过医疗健康业务单位承担相关医疗机构运营与健康服务项目，具体职能按法人划分。",
+      "tags": "医疗 · 健康",
+      "details": [
+        "医疗运营",
+        "健康服务",
+        "保障项目"
+      ]
+    },
+    {
+      "title": "科技服务与信息化",
+      "description": "信息技术、科研机构等集团业务主体负责信息系统、软件工程、研发创新和数字化服务。",
+      "tags": "科技 · 软件",
+      "details": [
+        "信息系统",
+        "研发工程",
+        "企业数字化"
+      ]
+    },
+    {
+      "title": "金融服务与风险管理",
+      "description": "通过财务公司、财产保险等相关主体开展金融保障服务与资产风险管理，按监管许可经营。",
+      "tags": "金融 · 风控",
+      "details": [
+        "集团财务",
+        "资产风控",
+        "保险服务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "hr-xiangyang",
+      "title": "人事服务岗（襄阳）",
+      "city": "湖北襄阳市（第三方转载，待原岗位核对）",
+      "category": "人事 / 行政",
+      "summary": "第三方2027中国融通秋招岗位汇总列有襄阳人事服务岗位，工作内容涉及招聘支持、劳动关系、入离职手续、档案及薪酬福利基础事务。职位归属具体分公司仍待原报名系统核对。",
+      "requirements": "岗位汇总给出的基础条件为本科及以上，人力资源管理、工商管理等相关专业，中共党员为优先条件。集团统一2027秋招原截止2026年10月30日17时，切勿据此判断当前可申请。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人力资源管理",
+        "工商管理",
+        "劳动与社会保障"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上 · 2026-10-30已截止",
+      "url": "https://www.crtamg.com.cn/rlzy/rczp/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/china-rongtong-2027-autumn-campus-recruitment-15341-c4859a/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国融通集团校招第三方聚合：单独招录法人尚未核实",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "auditor-material",
+      "title": "专职审核员（三）（北京）",
+      "city": "北京市（需核实实际法人）",
+      "category": "材料 / 质量",
+      "summary": "第三方2027融通校招整理资料列有北京审核评价部专职审核员（三），工作主要围绕材料、化工、轻工、纺织等领域的认证审核。该岗位不能证明属于集团总部直聘。",
+      "requirements": "转载名单给出本科及以上、材料科学与工程、材料与化工、化学、轻工技术与工程和纺织科学与工程等相关专业，具体资质证书及用人实体尚待官方岗位详情核验。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "材料科学与工程",
+        "材料与化工",
+        "化学工程与工艺",
+        "纺织工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上 · 2026-10-30已截止",
+      "url": "https://www.crtamg.com.cn/rlzy/rczp/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/china-rongtong-2027-autumn-campus-recruitment-15341-c4859a/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国融通集团校招第三方聚合：单独招录法人尚未核实",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "auditor-electro",
+      "title": "专职审核员（二）（北京）",
+      "city": "北京市（需核实实际法人）",
+      "category": "通信 / 电子",
+      "summary": "第三方2027校招关联岗位中列明北京审核评价部专职审核员（二），专业方向集中在电子、信息通信和计算机。关联岗位身份尚未与融通集团原始职位ID交叉确认。",
+      "requirements": "转载资料给出本科及以上，电子科学与技术、电子信息、信息与通信工程、计算机科学与技术等相关专业；实际审核能力与公司具体用人单位要求请以招聘方原文为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子科学与技术",
+        "电子信息工程",
+        "通信工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上 · 2026-10-30已截止",
+      "url": "https://www.crtamg.com.cn/rlzy/rczp/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmu11nbyq000em9e39vvn0gov.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国融通集团校招第三方聚合：单独招录法人尚未核实",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "market-kunming",
+      "title": "云贵市场拓展岗（昆明）",
+      "city": "云南昆明市（实际主体待核）",
+      "category": "营销 / 市场",
+      "summary": "中国融通2027秋招第三方整理出现云贵市场拓展岗，工作地昆明，涉及区域市场开发、营销策划与客户拓展协作。不能仅凭转载确认该岗位由融通集团何家子公司直接招聘。",
+      "requirements": "第三方职位摘要列本科及以上，市场营销、经济管理、工商管理、市场策划等方向。集团秋招报名已于2026年10月30日截止，当前不视为有效空缺。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理",
+        "经济学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上 · 2026-10-30已截止",
+      "url": "https://www.crtamg.com.cn/rlzy/rczp/",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/china-rongtong-2027-autumn-campus-recruitment-15341-c4859a/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国融通集团校招第三方聚合：单独招录法人尚未核实",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hr-chaozhou",
+      "title": "人事服务岗（潮州）",
+      "city": "广东潮州市（需核实实际法人）",
+      "category": "人事 / 行政",
+      "summary": "独立校招资讯页面列出潮州人事服务岗位，与襄阳人事岗属于不同城市记录；原始职位ID及具体聘用法人尚未公开可独立核验。",
+      "requirements": "第三方岗位表仅核到职位名称和潮州地点，招聘对象为2027届本科及以上应届毕业生；具体岗位要求和专业限制不能用襄阳岗位条件直接替代。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人力资源管理",
+        "工商管理",
+        "公共事业管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上 · 2026-10-30已截止",
+      "url": "https://www.crtamg.com.cn/rlzy/rczp/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmu11nbyq000em9e39vvn0gov.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国融通集团校招第三方聚合：单独招录法人尚未核实",
+      "currentOpenVerified": false
+    }
+  ]
+}

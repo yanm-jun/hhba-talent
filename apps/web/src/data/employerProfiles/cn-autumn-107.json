@@ -1,0 +1,527 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-107",
+  "name": "晶晨半导体",
+  "displayName": "晶晨半导体（上海）股份有限公司",
+  "englishName": "Amlogic",
+  "aliases": [
+    "晶晨",
+    "晶晨股份",
+    "Amlogic Inc.",
+    "晶晨半导体2027校招"
+  ],
+  "industry": "集成电路 · 多媒体SoC · AI芯片 · 嵌入式软件 · IC设计",
+  "subtitle": "官方2027届岗位：18条有职位编号，分布上海、深圳、南京、合肥、成都、西安、北京",
+  "overview": "晶晨半导体官方北森校园招聘站公开列有面向2027届的数字设计、系统验证、AI芯片软件、嵌入式及数字后端等岗位，每条标有独立职位编号J11xxx和工作地点。本版选择18条官网有具体职责、任职资格及不同编号的岗位，保留同城不同岗位编号以便审查；官方网页展示岗位不等于已实时成功投递，需以职位详情的申请按钮核实。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://amlogicsh.zhiye.com/campus/jobs",
+    "https://amlogicsh.zhiye.com/Campus",
+    "https://www.amlogic.cn/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-107/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-107/photo1.svg",
+        "caption": "晶晨半导体企业图片待官方核验（非实景）",
+        "alt": "晶晨半导体非实景编辑展示图，非企业真实厂区或办公环境",
+        "note": "非实景：仅供分支独立验收，不是企业真实照片；真实图片及商业使用授权待审核。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-107/photo2.svg",
+        "caption": "晶晨半导体企业图片待官方核验（非实景）",
+        "alt": "晶晨半导体非实景编辑展示图，非企业真实厂区或办公环境",
+        "note": "非实景：仅供分支独立验收，不是企业真实照片；真实图片及商业使用授权待审核。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://amlogicsh.zhiye.com/campus/jobs",
+    "label": "晶晨半导体官方2027校园岗位列表（按职位编号查询）",
+    "status": "official_portal",
+    "subject": "晶晨半导体（上海）股份有限公司及用人单位，以各单岗官方职位信息为准",
+    "note": "官网公布2027岗位编号和职责，校园流程显示9—10月网申、9—11月面试、10—12月Offer；2026-11-03尚未验证每条独立职位的申请按钮，因此不认定18条均可投递。"
+  },
+  "majorIntro": "18条来自晶晨官方北森校园招聘列表的独立J编号及具体城市，均附职责与技术要求摘要。专业筛选仅返回相关单岗，不能将集成电路/软件所有职位一并展示。",
+  "preferredMajors": [
+    "微电子科学与工程",
+    "集成电路设计与集成系统",
+    "电子科学与技术",
+    "计算机科学与技术",
+    "软件工程",
+    "通信工程",
+    "电子信息工程",
+    "自动化",
+    "人工智能",
+    "数学与应用数学"
+  ],
+  "photoNote": "两张图片为已明确标注的非实景占位，品牌标识为非官方编辑字标。未经版权所有人许可不得将其包装为企业真实办公实景或正式商标。",
+  "business": [
+    {
+      "title": "多媒体及智能电视SoC",
+      "description": "设计面向智能电视、机顶盒、投影等终端的高集成度多媒体系统芯片及软硬件平台。",
+      "tags": "多媒体 · SoC",
+      "details": [
+        "视频处理",
+        "智能电视",
+        "机顶盒"
+      ]
+    },
+    {
+      "title": "智能家居与物联网芯片",
+      "description": "提供智能家居、IoT联网计算、连接和控制相关SoC芯片技术及解决方案。",
+      "tags": "智能家居 · IoT",
+      "details": [
+        "IoT平台",
+        "系统芯片",
+        "通信连接"
+      ]
+    },
+    {
+      "title": "端侧AI与算法优化",
+      "description": "围绕边缘AI推理、深度学习算子和AI芯片性能模型开展芯片及软件协同研发。",
+      "tags": "AI · 算法",
+      "details": [
+        "AI推理",
+        "性能建模",
+        "硬件加速"
+      ]
+    },
+    {
+      "title": "数字前端和芯片验证",
+      "description": "开展RTL数字逻辑、IP集成、验证方法学及芯片流片前后的功能与性能验证。",
+      "tags": "设计 · 验证",
+      "details": [
+        "RTL设计",
+        "系统验证",
+        "硬件描述语言"
+      ]
+    },
+    {
+      "title": "数字后端与射频设计",
+      "description": "提供综合布局布线、物理验证、射频电路设计以及产品量产适配等工程研发活动。",
+      "tags": "后端 · RF",
+      "details": [
+        "P&R物理设计",
+        "射频IC",
+        "时序收敛"
+      ]
+    },
+    {
+      "title": "嵌入式软件与BSP",
+      "description": "研发Android、Linux及RTOS设备驱动、系统软件和芯片平台工具，支撑客户终端产品。",
+      "tags": "系统 · 软件",
+      "details": [
+        "Linux驱动",
+        "BSP",
+        "软件调优"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "j11733",
+      "title": "DDR软件工程师",
+      "city": "上海浦东新区",
+      "category": "软件 / 芯片",
+      "summary": "负责AI-SoC存储控制器Linux驱动开发、DDR性能和稳定性验证，并与芯片设计和硬件团队共同排查系统故障。",
+      "requirements": "硕士以上，要求C语言、Linux内核或U-Boot/BSP开发基础，能阅读芯片原理图并理解信号完整性。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "通信工程",
+        "自动化",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上（以原文为准）",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11733",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11689",
+      "title": "AI芯片软件工程师-上海-2027",
+      "city": "上海市",
+      "category": "软件 / AI",
+      "summary": "面向AI芯片建立CModel功能与性能模型，参与高性能算子库、框架适配、芯片算法功能及RTL和驱动交叉验证。",
+      "requirements": "硕士以上，计算机、电子工程或数学相关专业；熟悉C/C++和Linux，了解PyTorch或TensorFlow及深度学习推理为优先项。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上（以原文为准）",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11689",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11709",
+      "title": "嵌入式软件工程师-上海-2027",
+      "city": "上海市",
+      "category": "软件 / 嵌入式",
+      "summary": "参与Android、Linux、RTOS等嵌入式系统软件及设备驱动开发，开展功能实现、性能调优、功耗优化与稳定性工作。",
+      "requirements": "本科及以上，计算机、软件、电子或通信专业；要求扎实的C/C++编程基础，具有实际项目经验，AI、多媒体或网络软件经验优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "电子信息工程",
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 专业及学历见原JD",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11709",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11706",
+      "title": "嵌入式软件工程师-深圳-2027",
+      "city": "广东深圳市",
+      "category": "软件 / 嵌入式",
+      "summary": "深圳2027届嵌入式软件岗位独立编号，负责Android、Linux与RTOS相关子系统、设备驱动开发以及性能、功耗与可靠性优化。",
+      "requirements": "硕士及以上，计算机软件、通信或电子相关专业，要求C/C++编码能力，Python与AI相关研发经历为优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "通信工程",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上（以原文为准）",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11706",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11698",
+      "title": "数字后端工程师-上海-2027",
+      "city": "上海市",
+      "category": "芯片 / 物理设计",
+      "summary": "面向芯片或模块承担综合、布局布线、时钟树、时序收敛、DFT规划与DRC/LVS物理验证工作。",
+      "requirements": "微电子、电子工程等相关专业硕士及以上，了解后端设计工具链以及Verilog、TCL、Python等为加分。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "电子科学与技术",
+        "集成电路设计与集成系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上（以原文为准）",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11698",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11700",
+      "title": "验证工程师-深圳-2027",
+      "city": "广东深圳市",
+      "category": "芯片 / 验证",
+      "summary": "参与电视、AI、物联网、Wi-Fi、智能家居与车载等场景SoC芯片系统和模块验证，设计验证计划、平台与用例。",
+      "requirements": "计算机或微电子专业硕士以上，具备数字电路、Verilog和RTL实现基础，了解计算机组成及C/C++。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "计算机科学与技术",
+        "电子科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上（以原文为准）",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11700",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11680",
+      "title": "验证工程师-上海-2027",
+      "city": "上海市",
+      "category": "芯片 / 验证",
+      "summary": "负责SoC模块及系统验证、测试平台搭建、验证用例覆盖，协同芯片前后端、DFT和性能验证流程。",
+      "requirements": "计算机或微电子专业硕士以上，了解数电模电、Verilog、RTL综合、C/C++，具备芯片设计基础。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "计算机科学与技术",
+        "电子科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上（以原文为准）",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11680",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11697",
+      "title": "数字设计工程师-上海-2027",
+      "city": "上海市",
+      "category": "芯片 / RTL",
+      "summary": "使用RTL设计数字电路并验证模块，完成低功耗分析、IP集成、SoC系统仿真和可测性逻辑支持。",
+      "requirements": "电子、微电子专业硕士及以上，熟悉Verilog HDL与数字芯片设计流程；FPGA、SystemVerilog经验优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "电子科学与技术",
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上（以原文为准）",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11697",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11701",
+      "title": "数字设计工程师-上海-2027（独立编号J11701）",
+      "city": "上海市",
+      "category": "芯片 / RTL",
+      "summary": "晶晨官方同城另列独立岗位编号J11701，工作内容为RTL电路设计、SoC IP集成、低功耗验证和系统级仿真。",
+      "requirements": "电子或微电子专业硕士及以上，要求数字电路设计基础及Verilog编码能力；与J11697并列公开但不推断为额外不同团队。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "电子科学与技术",
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上（以原文为准）",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11701",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11699",
+      "title": "数字后端工程师-成都-2027",
+      "city": "四川成都市",
+      "category": "芯片 / 物理设计",
+      "summary": "成都物理设计岗位单独编号，承担芯片或模块综合、布局布线、时钟树、时序优化与DRC/LVS物理验证。",
+      "requirements": "微电子、电子工程等硕士及以上，熟悉Design Compiler、Innovus、PrimeTime等EDA流程优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "电子科学与技术",
+        "集成电路设计与集成系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上（以原文为准）",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11699",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11710",
+      "title": "数字设计工程师-西安-2027",
+      "city": "陕西西安市高新区",
+      "category": "芯片 / RTL",
+      "summary": "参与5G芯片modem二级模块开发与4G量产芯片相关技术维护工作，岗位在官方校园招聘列表单独列出西安高新区。",
+      "requirements": "通信、电子、微电子等相关专业；了解无线信号处理与Verilog或VHDL硬件描述语言，具体学历以官方单岗页为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "通信工程",
+        "电子信息工程",
+        "微电子科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 专业及学历见原JD",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11710",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11703",
+      "title": "射频IC工程师-上海-2027",
+      "city": "上海市",
+      "category": "芯片 / 射频",
+      "summary": "负责RedCap射频电路子模块开发与仿真验证，支持4G量产芯片测试，属于晶晨2027届正式列出的上海射频IC岗位。",
+      "requirements": "微电子相关专业，学习过射频集成电路设计课程，有模拟/RF校内研究项目者优先；不可臆造硕士硬门槛。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "电子科学与技术",
+        "集成电路设计与集成系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上（以原文为准）",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11703",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11695",
+      "title": "嵌入式软件工程师-南京-2027",
+      "city": "江苏南京市",
+      "category": "软件 / 嵌入式",
+      "summary": "在南京开展Linux、Android、RTOS嵌入式系统与设备驱动研发，参与软硬件功能、功耗及可靠性问题定位。",
+      "requirements": "本科及以上计算机、软件、电子、通信相关专业；要求C/C++基础与实际编码经验，懂多媒体、AI、网络经验优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "电子信息工程",
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 专业及学历见原JD",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11695",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11684",
+      "title": "验证工程师-南京-2027",
+      "city": "江苏南京市",
+      "category": "芯片 / 验证",
+      "summary": "南京2027验证岗负责AI、IoT和车载相关SoC芯片的系统模块验证，设计覆盖测试平台、验证用例与芯片综合验证策略。",
+      "requirements": "计算机或微电子专业硕士以上，了解Verilog、RTL实现流程、数电模电和软件基础，验证方法学实践优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "计算机科学与技术",
+        "电子科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上（以原文为准）",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11684",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11682",
+      "title": "验证工程师-合肥-2027",
+      "city": "安徽合肥市",
+      "category": "芯片 / 验证",
+      "summary": "合肥芯片验证岗位独立编号，参与SoC逻辑验证与流片阶段验证流程，包括DFT、性能和模块验证策略。",
+      "requirements": "硕士以上，计算机或微电子背景，掌握数字电路及Verilog、计算机体系结构和基本C/C++。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "计算机科学与技术",
+        "电子科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上（以原文为准）",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11682",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11692",
+      "title": "嵌入式软件工程师-合肥-2027",
+      "city": "安徽合肥市",
+      "category": "软件 / 嵌入式",
+      "summary": "合肥2027嵌入式软件工程师参与Linux、Android、RTOS系统、驱动和软件子系统开发，开展性能与功耗优化。",
+      "requirements": "硕士及以上，软件计算机、电子通信专业；掌握C/C++并熟悉嵌入式软件研发，Python和神经网络框架优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "通信工程",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上（以原文为准）",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11692",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11685",
+      "title": "数字设计工程师-北京-2027",
+      "city": "北京市",
+      "category": "芯片 / RTL",
+      "summary": "北京2027数字设计岗承担RTL逻辑、IP集成、芯片可测性设计及SoC系统级仿真，与上海同名岗位有独立编号和城市。",
+      "requirements": "电子或微电子专业硕士及以上，熟悉Verilog和数字设计流程，有FPGA或SystemVerilog经验优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "电子科学与技术",
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上（以原文为准）",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11685",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "j11704",
+      "title": "嵌入式软件工程师-上海-2027（独立编号J11704）",
+      "city": "上海市",
+      "category": "软件 / 嵌入式",
+      "summary": "晶晨上海另一个具有独立编号的2027嵌入式软件岗位，涉及Linux、Android、RTOS设备驱动开发和AI相关应用优化。",
+      "requirements": "计算机、软件、电子或通信相关专业本科及以上，要求C/C++研发能力、软件工程基础，多媒体和网络相关开发优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "通信工程",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 专业及学历见原JD",
+      "url": "https://amlogicsh.zhiye.com/campus/jobs",
+      "evidenceUrl": "https://amlogicsh.zhiye.com/campus/jobs",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "晶晨半导体（上海）股份有限公司 · 官方北森职位编号J11704",
+      "currentOpenVerified": false
+    }
+  ]
+}
