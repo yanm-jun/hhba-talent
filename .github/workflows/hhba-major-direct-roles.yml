@@ -4,6 +4,8 @@ on:
     branches: [main]
     paths:
       - 'apps/web/src/components/UnifiedJobMarket.tsx'
+      - 'apps/web/src/components/CompanyMajorJobs.tsx'
+      - 'apps/web/src/services/majorJobMatching.ts'
       - 'apps/web/src/services/liveRecruitment.ts'
       - 'apps/web/src/components/MajorEmployerRecommendations.tsx'
       - 'apps/web/src/styles/unified-jobs.css'
