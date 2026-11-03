@@ -1,0 +1,44 @@
+name: HHBA distinct-employer compact market and city-group safety
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/services/marketRolePresentation.mjs'
+      - 'apps/web/src/services/marketRolePresentation.d.mts'
+      - 'apps/web/src/services/liveRecruitment.ts'
+      - 'apps/web/src/components/UnifiedJobMarket.tsx'
+      - 'apps/web/src/styles/unified-jobs.css'
+      - 'apps/web/scripts/market-role-diversity.contract.test.mjs'
+      - 'apps/web/scripts/market-role-real-index.test.mjs'
+      - 'apps/web/scripts/major-direct-role-results.contract.test.mjs'
+      - 'apps/web/scripts/major-company-job-flow.contract.test.mjs'
+      - '.github/workflows/hhba-role-group-diversity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  market-groups-and-diversity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked frontend dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify full-result grouping, exact company rank, bookmarks, and 10-card pagination
+        working-directory: apps/web
+        run: |
+          node --check src/services/marketRolePresentation.mjs
+          node --test scripts/market-role-diversity.contract.test.mjs scripts/job-paging-ten.contract.test.mjs
+          node scripts/market-role-real-index.test.mjs
+          node scripts/major-direct-role-results.contract.test.mjs
+          node scripts/major-company-job-flow.contract.test.mjs
+          node scripts/major-eligibility.contract.test.mjs
+      - name: Compile and build with real source assets
+        working-directory: apps/web
+        run: npm run build

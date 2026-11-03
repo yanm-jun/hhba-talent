@@ -4,7 +4,7 @@
  * All "related" labels describe recorded/curated relevance, NOT official admission.
  */
 import type {LiveJob} from './liveRecruitment';
-import {majorById} from './domesticMajors';
+import {majorById,MAJOR_OPTIONS} from './domesticMajors';
 import {majorNamesRelated} from './majorEligibility.mjs';
 export type MajorMatch='all'|'related'|'unrestricted'|'unknown'|'other';
 export const MAJOR_STORAGE_KEY='hhba.company.major';
@@ -64,13 +64,37 @@ export function storeSelectedMajor(slug:string){
  if(typeof window!=='undefined')window.dispatchEvent(new CustomEvent('hhba-major-changed',{detail:verified}));
 }
 export function majorName(slug:string){return majorById(slug)?.name||'';}
+// Only an exact major name or a small, explicit alias can turn keyword search
+// into professional intent. A company name or broad substring must not do so.
+export function majorSlugForQuery(query:string):string{
+ const key=normalize(query);
+ if(!key||key.length>70)return '';
+ const aliases:Record<string,string>={
+  '机械':'mechanical-engineering','机械专业':'mechanical-engineering',
+  '电气':'electrical-engineering','电气专业':'electrical-engineering',
+  '计算机':'computer-science','计算机专业':'computer-science',
+  '软件':'software-engineering','软件专业':'software-engineering',
+  '电子信息':'electronic-information','自动化专业':'automation',
+  '机电':'mechatronics','车辆':'vehicle-engineering'
+ };
+ if(aliases[key])return aliases[key];
+ return MAJOR_OPTIONS.find(major=>normalize(major.name)===key)?.slug||'';
+}
+// Used only as a tie-breaker *within* recorded related matches.
+export function majorExactEvidence(job:Pick<LiveJob,'majorNames'|'editorialRelatedMajors'>,slug:string):number{
+ const name=majorName(slug);if(!name)return 0;
+ return (job.majorNames||[]).some(label=>normalize(label)===normalize(name))?2:
+  (job.editorialRelatedMajors||[]).some(label=>normalize(label)===normalize(name))?1:0;
+}
 export function matchRoleToMajor(job:Pick<LiveJob,'majorNames'|'editorialRelatedMajors'|'majorUnrestricted'>,slug:string):MajorMatch{
  if(!slug)return 'all';
  const chosen=majorById(slug);if(!chosen)return 'unknown';
- if(job.majorUnrestricted===true)return 'unrestricted';
  const fields=[...(job.majorNames||[]),...(job.editorialRelatedMajors||[])];
- if(fields.some(x=>/^(?:不限专业|专业不限|不限制专业|不限学科|any major)$/i.test(x.trim())))return 'unrestricted';
+ // Explicitly relevant subject evidence takes precedence over a general
+ // "all majors" flag. Never place a matching specialist role in the fallback.
  if(fields.some(x=>equivalent(x,chosen.name)))return 'related';
+ if(job.majorUnrestricted===true||
+    fields.some(x=>/^(?:不限专业|专业不限|不限制专业|不限学科|any major)$/i.test(x.trim())))return 'unrestricted';
  // Distinguish an absent major field from a documented but different subject.
  // A known-other requirement must not be described as 'unreported'.
  return fields.length?'other':'unknown';

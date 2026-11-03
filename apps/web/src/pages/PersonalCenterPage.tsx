@@ -30,6 +30,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
  const [account,setAccount]=useState<CandidateWorkspaceProfile|null>(null),[profileLoading,setProfileLoading]=useState(true);
  const displayName=account?.display_name||user?.display_name||'求职者';
  const [rows,setRows]=useState<RecordRow[]>([]),[savedCount,setSavedCount]=useState(0);
+ const [visibleSaved,setVisibleSaved]=useState(40);
  const [resumeCount,setResumeCount]=useState<number|null>(null);
  const [loading,setLoading]=useState(false),[error,setError]=useState('');
  const [busy,setBusy]=useState('');
@@ -62,17 +63,22 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
    setSavedCount(records.length);
    if(current==='overview'){setRows([]);return;}
    const results:RecordRow[]=[];
-   for(const record of records.slice(0,40)){
+   const visible=records.slice(0,visibleSaved);
+   // Resolve only the visible page of bookmarks in small, bounded batches.
+   for(let offset=0;offset<visible.length;offset+=10){
     if(!active)return;
-    try{const detail=await getJob(record.jobId,new AbortController().signal);
-      results.push({record,job:detail.job});}
-    catch{results.push({record,job:null});}
+    const chunk=await Promise.all(visible.slice(offset,offset+10).map(async record=>{
+     try{const detail=await getJob(record.jobId,new AbortController().signal);
+       return {record,job:detail.job} as RecordRow;}
+     catch{return {record,job:null} as RecordRow;}
+    }));
+    results.push(...chunk);
    }
    if(active)setRows(results);
   }).catch(e=>{if(active)setError(e instanceof Error?e.message:'收藏服务暂不可用')})
   .finally(()=>{if(active)setLoading(false)});
   return()=>{active=false};
- },[current,user?.id]);
+ },[current,user?.id,visibleSaved]);
  useEffect(()=>{
   if(!user?.account_types?.includes('candidate')||!privateResumeAvailable)return;
   let active=true;
@@ -151,7 +157,9 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
        <div><strong>{job?localizedTitle(job,'zh'):'此岗位当前无法获取'}</strong><small>{job?localizedCompany(job,'zh')+' · '+localizedLocation(job,'zh'):'收藏记录已保留，但岗位可能已失效'}</small><small>收藏于 {record.savedAt.slice(0,10)}</small></div>
        <div className="hhba-personal-actions">{job&&<Link to={'/candidate/jobs/'+encodeURIComponent(record.jobId)}>查看岗位</Link>}<button type="button" disabled={busy===record.jobId} onClick={()=>cancel(record.jobId)}>取消收藏</button></div>
       </article>)}</div>}
-      {savedCount>40&&<p className="hhba-account-muted">当前仅显示最近 40 条收藏。</p>}
+      {!loading&&savedCount>rows.length&&<div className="hhba-personal-actions">
+        <button type="button" onClick={()=>setVisibleSaved(n=>Math.min(300,n+40))}>加载更多收藏（已显示 {rows.length} / {savedCount}）</button>
+       </div>}
       <p className="hhba-account-muted">当前收藏只属于你的真实登录账户。</p>
     </section>}
     {current==='profile'&&<section className="hhba-account-panel">
