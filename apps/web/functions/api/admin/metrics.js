@@ -36,7 +36,7 @@ export async function onRequestGet({request,env}){
   const sum=k=>series.reduce((a,x)=>a+x[k],0);
   const counts=Object.fromEntries((changes.results||[]).map(x=>[x.event_type,Number(x.n)]));
   const {accounts,activity}=await queryAccountGrowth({metricsDb:db,authDb:env.HHBA_PNVS_AUTH_DB,
-   since,until,today,series});
+   since,until,today,series,accountAnalyticsEnabled:env.HHBA_ACCOUNT_ANALYTICS_ENABLED==='1'});
   const result={kind:'HHBA_CLOUDFLARE_PRIVATE_METRICS_V1',asOf:new Date().toISOString(),period:{start:since,end:until,days,timezone:'UTC'},collectorStartedAt:installed?.value||null,
    traffic:{quality:'collected',pv:sum('pv'),dailyUvSum:sum('dailyUv'),jobViews:sum('jobViews'),searches:sum('searches'),outboundClicks:sum('outboundClicks'),series,scope:'OPT_IN_CONSENT_ONLY_AND_PER_MINUTE_DEDUP'},
    devices:{quality:'collected',savedJobs:Number(saved?.n||0),devicesWithSavedJobs:Number(saved?.devices||0),added:counts.added||0,removed:counts.removed||0,scope:'CLOUDFLARE_DEVICE_COOKIE_ONLY_NOT_ACCOUNT_SAVES'},

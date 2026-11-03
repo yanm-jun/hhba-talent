@@ -2,7 +2,7 @@
 const n=v=>Number(v||0);
 export const rate=(returned,eligible)=>eligible>0?Math.round(returned/eligible*10000)/100:null;
 const dateDays=(utcDay,offset)=>new Date(Date.parse(utcDay+'T00:00:00Z')+offset*86400000).toISOString().slice(0,10);
-export async function queryAccountGrowth({metricsDb,authDb,since,until,today,series}){
+export async function queryAccountGrowth({metricsDb,authDb,since,until,today,series,accountAnalyticsEnabled=false}){
  let accounts={quality:'not_connected',registeredUsers:null,newRegistered:null,signupSeries:null,
   savedJobs:null,accountsWithSavedJobs:null,dau:null,wau:null,mau:null,
   scope:'VERIFIED_PNVS_CANDIDATES_ONLY',reason:'真实账号库尚未连接'};
@@ -31,6 +31,7 @@ export async function queryAccountGrowth({metricsDb,authDb,since,until,today,ser
   areaUsers:null,series:null,firstSeenRetention:null,collectedFrom:null,
   scope:'CONSENTED_VERIFIED_ACCOUNTS_ONLY',reason:'账号行为 D1 迁移尚未应用或数据连接不可用'};
  try{
+  if(!accountAnalyticsEnabled)throw Error('ACCOUNT_ANALYTICS_DISABLED');
   const [daily,areas,summary,started,retained]=await Promise.all([
    metricsDb.prepare('SELECT day,COUNT(DISTINCT account_hash) AS n FROM hhba_account_activity WHERE day>=? AND day<=? GROUP BY day ORDER BY day').bind(since,until).all(),
    metricsDb.prepare('SELECT area,COUNT(DISTINCT account_hash) AS n FROM hhba_account_activity WHERE day>=? AND day<=? GROUP BY area').bind(since,until).all(),

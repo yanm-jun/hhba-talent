@@ -39,7 +39,7 @@ test('report uses real account totals, distinct usage areas and mature cohorts',
   if(sql.includes('WITH first_seen'))return {d1_eligible:4,d1_returned:2,d7_eligible:0,d7_returned:0};
   throw Error('unexpected metric SQL: '+sql);
  });
- const v=await queryAccountGrowth({metricsDb:metrics,authDb:auth,since:'2026-11-01',until:'2026-11-03',today:'2026-11-03',series});
+ const v=await queryAccountGrowth({metricsDb:metrics,authDb:auth,since:'2026-11-01',until:'2026-11-03',today:'2026-11-03',series,accountAnalyticsEnabled:true});
  assert.equal(v.accounts.registeredUsers,8);
  assert.equal(v.accounts.newRegistered,2);
  assert.equal(v.accounts.savedJobs,11);
