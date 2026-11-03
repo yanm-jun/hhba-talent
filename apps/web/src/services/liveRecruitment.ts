@@ -180,7 +180,7 @@ export function localizedTitle(job: LiveJob, lang: Language) {
   const translated=cleanLocaleText(job.titleZh);
   if(lang==='zh') {
     if(translated && han.test(translated) && job.titleStatus!=='pending') return translated;
-    return original && han.test(original) ? original : '职位名称待翻译';
+    return original || '职位名称待核验';
   }
   return original && !han.test(original) ? original : 'Title translation pending';
 }
@@ -191,7 +191,7 @@ export function localizedCompany(job: LiveJob, lang: Language) {
 }
 export function localizedLocation(job: LiveJob, lang: Language) {
   const original=cleanLocaleText(job.location), zh=cleanLocaleText(job.locationZh);
-  if(lang==='zh')return zh&&han.test(zh)?zh:original&&han.test(original)?original:'地点待翻译';
+  if(lang==='zh')return zh&&han.test(zh)?zh:original||'地点待核验';
   return original&&!han.test(original)?original:'Location translation pending';
 }
 async function readJSON<T>(path: string, signal: AbortSignal): Promise<T> {
