@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-104",
+  "name": "湖南钢铁集团",
+  "displayName": "湖南钢铁集团有限公司 / 湘钢、衡钢2027校招",
+  "englishName": "Hunan Steel Group",
+  "aliases": [
+    "湖南钢铁",
+    "华菱钢铁",
+    "湘钢",
+    "衡钢",
+    "Hunan Steel",
+    "湖南华菱湘潭钢铁",
+    "衡阳华菱钢管"
+  ],
+  "industry": "钢铁冶炼 · 特种钢 · 无缝钢管 · 智能制造",
+  "subtitle": "2027届湘钢与衡钢校招 · 湘潭、衡阳；各法人招录条件不同",
+  "overview": "湖南钢铁集团下属湘潭钢铁集团与衡阳华菱钢管在2026年发布2027届独立校园招聘材料。湘钢招聘材料列出生产管理技术岗并规定严格的学历与英语门槛，原操作类网申10月31日已截止。衡钢在贵州大学2026年11月2日宣讲信息中单列机械工程师、财务专员、电气工程师、材料工程师四条职位，各有具体人数与专业，另有2027招聘简章原报名期至11月20日。实际投递仍要按湘钢/衡钢原主体单独办理。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://www.chinavalin.com/",
+    "https://job.xidian.edu.cn/teachin/view/id/127308",
+    "https://gzzy.bysjy.com.cn/detail/career?id=730132",
+    "https://fenbi.com/page/fenxiaozhaokaodetail/28/1777/469907054291968",
+    "https://xyzp.hnxg.com.cn"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-104/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-104/photo1.svg",
+        "caption": "湖南钢铁集团图像素材待核验（非真实办公照片）",
+        "alt": "湖南钢铁集团的编辑信息示意，并非企业现场实拍",
+        "note": "非实景：来源、商用许可和真实场景待审，暂以显著标注的编辑占位图展示。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-104/photo2.svg",
+        "caption": "湖南钢铁集团图像素材待核验（非真实办公照片）",
+        "alt": "湖南钢铁集团的编辑信息示意，并非企业现场实拍",
+        "note": "非实景：来源、商用许可和真实场景待审，暂以显著标注的编辑占位图展示。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.chinavalin.com/",
+    "label": "湖南钢铁集团信息官网（湘钢和衡钢招聘需分别核实）",
+    "status": "official_portal",
+    "subject": "湘潭钢铁集团有限公司与衡阳华菱钢管有限公司（各自独立招录）",
+    "note": "湘钢2027操作类校招2026-10-31已截止；衡钢2027校园招聘综合公告标明2026-11-20为报名截止，是否仍接受申请请向衡钢招聘方核实。此集团网址仅作企业概览，不是统一应聘系统。"
+  },
+  "majorIntro": "仅收录有高校就业平台独立职位证据的湘钢1条、衡钢4条，均为2027校招原始岗位名称，工作城市和招聘人数可逐条核实；不将集团通用专业方向拆成虚假的实名职位。",
+  "preferredMajors": [
+    "冶金工程",
+    "材料科学与工程",
+    "材料成型及控制工程",
+    "机械工程",
+    "机械设计制造及其自动化",
+    "电气工程及其自动化",
+    "自动化",
+    "人工智能",
+    "会计学",
+    "财务管理",
+    "金融学"
+  ],
+  "photoNote": "本独立审核版的两幅企业图片区暂为带明显声明的非实景示意；正式上线前需要可核验、获得使用许可的企业真实照片与品牌Logo。",
+  "business": [
+    {
+      "title": "钢铁冶炼与品种升级",
+      "description": "旗下钢铁主体生产板材、线棒材与特种钢材，持续进行冶炼工艺与关键材料技术升级。",
+      "tags": "钢铁 · 冶金",
+      "details": [
+        "炼钢工艺",
+        "产品质量",
+        "特种钢材"
+      ]
+    },
+    {
+      "title": "无缝钢管与重大装备材料",
+      "description": "衡钢从事无缝钢管及相关高端钢管产品制造，服务能源、工程与关键装备应用。",
+      "tags": "钢管 · 装备",
+      "details": [
+        "无缝钢管",
+        "能源管材",
+        "材料技术"
+      ]
+    },
+    {
+      "title": "智能工厂与自动化",
+      "description": "湘钢等企业推进5G智能工厂、自动生产线与设备控制系统，相关岗位以对应单位招聘页为准。",
+      "tags": "智能 · 设备",
+      "details": [
+        "5G智慧工厂",
+        "设备自动化",
+        "数字生产"
+      ]
+    },
+    {
+      "title": "机械电气与设备维护",
+      "description": "钢铁生产涉及机械液压、电气自动控制、过程设备检修和能源保障等工程工作。",
+      "tags": "机械 · 电气",
+      "details": [
+        "设备检修",
+        "电气控制",
+        "能源保障"
+      ]
+    },
+    {
+      "title": "质量与材料研究",
+      "description": "生产、检测和研发部门关注金属材料、热处理、材料成型、品质分析和性能提升。",
+      "tags": "材料 · 质量",
+      "details": [
+        "金属材料",
+        "热处理",
+        "质量分析"
+      ]
+    },
+    {
+      "title": "集团产业链及物流",
+      "description": "集团相关单位开展金属深加工、钢材商贸、物流及工程技术服务，岗位不跨子公司自动合并。",
+      "tags": "商贸 · 物流",
+      "details": [
+        "钢材贸易",
+        "供应链",
+        "工程技术"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "xiangsteel-production",
+      "title": "生产管理技术岗（湘潭钢铁集团）",
+      "category": "冶金 / 生产",
+      "city": "湖南湘潭岳塘区",
+      "summary": "西安电子科技大学2026年10月22日湘钢2027校园宣讲页单列生产管理技术岗，工作地明确为湘潭岳塘区，专业涉及机械、材料、AI、机器人工程、电气及自动化。",
+      "requirements": "该岗位招聘简章规定国内2027全日制公办本科及以上，通常需英语四级425分以上；海外毕业生另有院校与语言要求。具体工程专业及学历对应须按湘钢岗位原文核对，湘钢部分网申2026-10-31已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "材料科学与工程",
+        "人工智能",
+        "机器人工程",
+        "机械设计制造及其自动化",
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 本科及以上（以岗位原文为准）",
+      "url": "https://www.chinavalin.com/",
+      "evidenceUrl": "https://job.xidian.edu.cn/teachin/view/id/127308",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "湘潭钢铁集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hengsteel-mech",
+      "title": "机械工程师（衡阳华菱钢管）",
+      "category": "机械 / 工程",
+      "city": "湖南衡阳",
+      "summary": "贵州大学2026年11月2日衡钢2027招聘宣讲公布机械工程师岗位，计划10人，工作地点湖南衡阳市，服务无缝钢管生产装备与机械技术职能。",
+      "requirements": "官方高校发布条目给出本科及以上、机械设计制造及其自动化专业；薪酬区间7千至1.3万元/月为校方公布区间，不视为录用承诺。衡钢报名截止按其独立招聘简章核对。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械设计制造及其自动化",
+        "机械工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 本科及以上（以岗位原文为准）",
+      "url": "https://www.chinavalin.com/",
+      "evidenceUrl": "https://gzzy.bysjy.com.cn/detail/career?id=730132",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "衡阳华菱钢管有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hengsteel-finance",
+      "title": "财务专员（衡阳华菱钢管）",
+      "category": "财务 / 管理",
+      "city": "湖南衡阳",
+      "summary": "衡钢2027贵州大学宣讲职位表明确财务专员4人，工作地衡阳，专业范围金融学、会计学与财务管理，属于衡钢自有岗位而非集团财务共享中心空缺。",
+      "requirements": "高校条目注明本科及以上，薪酬区间6千至9千元/月；具体资格与企业最终招聘文件为准，岗位实际在招状态仍需核实。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "金融学",
+        "会计学",
+        "财务管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 本科及以上（以岗位原文为准）",
+      "url": "https://www.chinavalin.com/",
+      "evidenceUrl": "https://gzzy.bysjy.com.cn/detail/career?id=730132",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "衡阳华菱钢管有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hengsteel-electro",
+      "title": "电气工程师（衡阳华菱钢管）",
+      "category": "电气 / 自动化",
+      "city": "湖南衡阳",
+      "summary": "衡钢2027校园宣讲招聘电气工程师10人，工作地衡阳市，对应电气工程、自动化控制及设备技术岗位方向。",
+      "requirements": "职位表公布本科及以上，需求专业电气工程、电气工程及其自动化与控制科学与工程；福利及薪酬以企业实际合同为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "电气工程",
+        "控制科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 本科及以上（以岗位原文为准）",
+      "url": "https://www.chinavalin.com/",
+      "evidenceUrl": "https://gzzy.bysjy.com.cn/detail/career?id=730132",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "衡阳华菱钢管有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hengsteel-material",
+      "title": "材料工程师（衡阳华菱钢管）",
+      "category": "材料 / 研发",
+      "city": "湖南衡阳",
+      "summary": "贵州大学衡钢2027校园招聘表单列材料工程师10人，工作地湖南衡阳，需求材料加工、材料学、材料物理等领域人才，服务无缝钢管材料技术。",
+      "requirements": "职位表注明本科及以上，材料加工工程、材料学、材料物理等相关专业；薪酬约7千至1.3万元/月为发布信息而非录用保证。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "材料科学与工程",
+        "材料加工工程",
+        "材料物理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 本科及以上（以岗位原文为准）",
+      "url": "https://www.chinavalin.com/",
+      "evidenceUrl": "https://gzzy.bysjy.com.cn/detail/career?id=730132",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "衡阳华菱钢管有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}
