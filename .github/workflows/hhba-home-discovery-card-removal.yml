@@ -1,0 +1,31 @@
+name: HHBA homepage discovery banner removal
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/pages/HomePage.tsx'
+      - 'apps/web/scripts/home-promo-alignment.contract.test.mjs'
+      - '.github/workflows/hhba-home-discovery-card-removal.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  home-layout-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Confirm removed card and preserved home sections
+        working-directory: apps/web
+        run: node --test scripts/home-promo-alignment.contract.test.mjs scripts/home-company-marquee.contract.test.mjs scripts/home-hero-layout.contract.test.mjs
+      - name: Verify production frontend build
+        working-directory: apps/web
+        run: npm run build
