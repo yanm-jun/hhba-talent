@@ -1,0 +1,29 @@
+name: HHBA Pages updated real join application contract
+on:
+  push:
+    branches: [fix/pages-join-live-contract-20261103]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Verify current public site, real join submit failure semantics and source search
+        working-directory: apps/web
+        run: |
+          node --test scripts/hhba-unified-static.contract.test.mjs
+          node --test scripts/home-open-letter.contract.test.mjs
+          node scripts/employer-job-level-search.contract.test.mjs
+      - name: Compile static GitHub Pages without affecting public homepage
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          HHBA_GITHUB_PAGES=1 HHBA_PAGES_BASE=/hhba-talent/ npm run build

@@ -89,10 +89,17 @@ test('founder manifesto untouched and includes two authentic original image file
  }
  assert.ok(!vision.includes('每一份简历背后，都是一个认真生活的人。'));
 });
-test('static job application discloses demo boundary and honors reduced motion',()=>{
- for(const banned of [/\bfetch\s*\(/,/localStorage/,/sessionStorage/,/sendBeacon/,/XMLHttpRequest/,/\bapi\./])
-   assert.doesNotMatch(join,banned);
- assert.ok(join.includes('正式在线申请：尚未开放'));
- assert.ok(join.includes('未提交、未发送、未存入 HHBA 数据库'));
+test('early partner application never fakes success, handles API errors and discloses venture stage',()=>{
+ const start=join.indexOf('const submitApplication = async () =>');
+ const end=join.indexOf('const selectedRole',start);
+ assert.ok(start>=0 && end>start,'Real application submit function missing');
+ const submit=join.slice(start,end);
+ assert.ok(submit.includes("fetch('/api/join-apply', { method: 'POST', body })"),'Submission must use the supported API, not a demo-only success');
+ assert.ok(submit.includes('if (!res.ok || !data?.ok)'),'HTTP or JSON error must block success');
+ assert.ok(submit.indexOf('if (!res.ok || !data?.ok)')<submit.indexOf('setSubmitted(true)'),'Success must only occur after server confirms');
+ assert.ok(submit.includes('提交失败，请检查网络后重试。'),'Offline or missing API must display failure');
+ assert.ok(submit.includes('form.acknowledged'),'Applicant must explicitly acknowledge stage disclosure');
+ assert.ok(join.includes('尚未完成公司设立和融资'),'Business phase disclosure must be visible');
+ assert.ok(join.includes('现阶段合作应先协商工作范围'),'No implied guaranteed employment terms');
  assert.match(css,/prefers-reduced-motion/);
 });
