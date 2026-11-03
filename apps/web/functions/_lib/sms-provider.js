@@ -6,6 +6,7 @@
 // 失败抛错（err.code 为上游错误码）；然后只改本文件底部的 createSmsProvider，
 // 不动任何路由 handler。绝不允许“本地生成验证码并比对”的实现混进来：
 // 验证码必须由短信商生成与核验，后端永远不生成、不存储验证码原文。
+// 本站遵循 PNVS 默认 4 位纯数字码；Code=OK/Success=true 只表示请求成功，必须额外核验 Model.VerifyResult=PASS。
 //
 // PNVS 参数与 10 月 ECS 测试后端 apps/real-backend/pnvs.mjs 一致：
 // 端点 dypnsapi.aliyuncs.com，版本 2017-05-25，RPC 签名 HMAC-SHA1，
@@ -104,12 +105,18 @@ export class PnvsSmsProvider {
     return { bizId: data.BizId || null };
   }
   async verifyCode(phone, code) {
-    await this.rpc(
+    // PNVS Code=OK only means the API request succeeded, NOT that the SMS
+    // code matched. Only Model.VerifyResult=PASS may authorize registration,
+    // login or password reset (Alibaba PNVS API contract).
+    if (typeof code !== 'string' || !/^[0-9]{4}$/.test(code)) return false;
+    const response = await this.rpc(
       'CheckSmsVerifyCode',
       { PhoneNumber: phone, VerifyCode: code },
       'PNVS_CHECK_FAILED',
     );
-    return true;
+    return response?.Code === 'OK' &&
+      response?.Success === true &&
+      response?.Model?.VerifyResult === 'PASS';
   }
 }
 
