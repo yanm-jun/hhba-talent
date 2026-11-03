@@ -2,13 +2,13 @@
 // Every original ID survives in its own city variant; never fabricate a role
 // or replace the reviewed source records. This runs on the FULL filtered list,
 // before the existing 30-result fetch window and 10-card UI pagination.
-const norm=value=>String(value||'').normalize('NFKC').toLocaleLowerCase().replace(/[\s·．.（）()、/\\—–-]/g,'').trim();
+const norm=value=>String(value||'').normalize('NFKC').toLocaleLowerCase().replace(/[\s·．.（）()、\\—–-]/g,'').replace(/\//g,'').trim();
 const cityName=job=>String(job.locationZh||job.location||'').trim();
 const employerKey=job=>norm(job.companyZh||job.company)||norm(job.company)||job.id;
 function citiesIn(job){
  const raw=cityName(job);
  if(!raw||/^(?:未知|待定|不限|全国|远程|remote|多城市|地点待核实)$/i.test(raw))return [];
- return raw.replace(/（可选）|\(可选\)/g,'').split(/[、，,;；/｜|]/)
+ return raw.replace(/（可选）|\(可选\)/g,'').split(/[、，,;；\/｜|]/)
   .map(x=>x.trim()).filter(Boolean)
   .map(label=>({label,key:norm(label).replace(/(?:省|市)$/,'')}))
   .filter(x=>x.key.length>=2);
