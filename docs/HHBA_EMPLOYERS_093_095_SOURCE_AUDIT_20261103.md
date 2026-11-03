@@ -8,13 +8,17 @@
   - https://zhaopin.chng.com.cn/CampusRecruit?aId=2000093
   - https://zhaopin.chng.com.cn/CampusRecruit?aId=2000056
   - https://zhaopin.chng.com.cn/CampusRecruit?aId=2000137
-- 94 中国大唐：9条**公开集团招聘类别 / 专项方向**，均明显标为“非具体JD”，不能当成9个拥有独立JD和岗位ID的实时空缺。2027第一批2026-09-22至10-31，已截止。官方公告：
+- 94 中国大唐：10条大唐集团数字科技有限公司2027年公布的具名职位，包含软件、云计算、数据分析、交互设计、网络安全、HRBP、法律事务等，来源为南开大学转载的公司官方招聘岗位表。2027第一批2026-09-22至10-31，已截止。官方公告：
   - https://gs.china-cdt.com/cdtgs/xwzx/jtxw/2026/9/I1552059660066881536.html
   - https://zhaopin.china-cdt.com/zpgg_xyzp.html
-- 95 广发银行：14条按2027届公开校园招聘公告分总行/分行/信用卡中心/广银理财的分类方向，**非具体JD**。总行2026-10-15截止，分支机构2026-11-15截止；后者是否仍开放需以官网具体岗位为准。
+  - https://career.nankai.edu.cn/correcruit/content/id/119636.html
+- 95 广发银行：3条国家大学生就业服务平台2027届独立职位条目，名称仍为金融科技类、法律与风险管理类和营销英才，不能据此推断具体分行每个独立空缺。总行2026-10-15截止，分支机构2026-11-15截止；后者是否仍开放需以官网具体岗位为准。
   - https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html
   - https://career.nankai.edu.cn/correcruit/content/id/118874.html
   - https://www.cgbchina.com.cn/career/job_notice2.jsp
+  - https://www.ncss.cn/student/jobs/2QNzCztmZsnxQLKKrA9nA3/detail.html
+  - https://job.ncss.cn/student/jobs/ASp5FrMFHYnvd4K4P5X7ut/detail.html
+  - https://sysu.ncss.cn/student/m/jobs/PqwxFWu18dvtkJVRrNgVXK/detail.html
 
 ## 风险与禁用
 
