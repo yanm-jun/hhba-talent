@@ -34,6 +34,35 @@ async function postedJson(request){
 }
 const profileDefaults={display_name:'',headline:'',city:'',intro:'',skills:'',
  preferred_role:'',preferred_city:'',work_mode:'不限'};
+// Validate against published, source-audited IDs rather than the browser's
+// displayed job object. The old snapshot alone omits curated + V2 positions.
+async function inPublishedJobIndex(env,request,id){
+ let checked=false;
+ const sources=[
+  ['/data/jobs.json','snapshot'],
+  ['/data/saveable-domestic-job-ids.json','domestic'],
+  ['/curated/v1/jobs.json','curated']
+ ];
+ for(const [path,type] of sources){
+  let data;
+  try{data=await assetJson(env,request,path);}catch{continue}
+  if(type==='snapshot'&&Array.isArray(data?.jobs)){
+   checked=true;
+   if(data.jobs.some(job=>job?.id===id))return true;
+  }
+  if(type==='domestic'&&data?.kind==='HHBA_SAVEABLE_DOMESTIC_JOBS_V1'&&
+     Array.isArray(data.ids)&&data.ids.length===data.count&&data.ids.length>0){
+   checked=true;
+   if(data.ids.includes(id))return true;
+  }
+  if(type==='curated'&&data?.kind==='HHBA_CURATED_JOBS_V1'&&Array.isArray(data.jobs)){
+   checked=true;
+   if(data.jobs.some(job=>job?.id==='curated-'+id))return true;
+  }
+ }
+ if(!checked)throw Error('BOOKMARK_INDEX_NOT_DEPLOYED');
+ return false;
+}
 export async function onRequest({request,env}){
  const db=env.HHBA_PNVS_AUTH_DB;
  if(!db)return fail('WORKSPACE_DB_NOT_CONFIGURED',503);
@@ -80,9 +109,8 @@ export async function onRequest({request,env}){
    const id=match[1];
    if(!jobPattern.test(id))return fail('INVALID_JOB_ID',400);
    if(method==='PUT'){
-    const snapshot=await assetJson(env,request,'/data/jobs.json');
-    if(!Array.isArray(snapshot.jobs)||!snapshot.jobs.some(j=>j.id===id))
-      return fail('JOB_NOT_IN_VERIFIED_SNAPSHOT',404);
+    if(!await inPublishedJobIndex(env,request,id))
+      return fail('JOB_NOT_IN_VERIFIED_INDEX',404);
     const total=await db.prepare('SELECT COUNT(*) AS n FROM hhba_candidate_saved_jobs WHERE phone=?').bind(phone).first();
     const previous=await db.prepare('SELECT job_id FROM hhba_candidate_saved_jobs WHERE phone=? AND job_id=?').bind(phone,id).first();
     if(!previous&&Number(total?.n)>=300)return fail('SAVED_LIMIT_REACHED',409);
