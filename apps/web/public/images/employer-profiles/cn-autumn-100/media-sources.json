@@ -1,0 +1,31 @@
+{
+  "companyId": "100",
+  "reviewDate": "2026-11-03",
+  "commercialReuseRightsVerified": false,
+  "brand": {
+    "status": "editorial_wordmark_fallback_not_official",
+    "verifiedOfficialSource": false,
+    "licenceVerified": false,
+    "notes": "不把编辑字标当成真正的企业Logo；正式发布前需要核对官方商标及使用许可。"
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "imageUrl": "https://www.neusoft.com/cn/wp-content/uploads/2024/08/1709516957489.jpg",
+      "articleUrl": "https://www.neusoft.com/cn/contact/",
+      "sourceContext": "东软集团官网联系页：东软沈阳软件园官方配图（历史实景）",
+      "status": "nonreal_svg_fallback",
+      "licenceVerified": false
+    },
+    {
+      "slot": 2,
+      "imageUrl": "https://newscast.jp/attachments/xGZ7ghuufpuFWHAK78Cy.jpg",
+      "articleUrl": "https://newscast.jp/news/7991415",
+      "sourceContext": "Newscast 2024新闻：东软集团软件园建筑历史实景；新闻刊载方，非官网图片",
+      "status": "nonreal_svg_fallback",
+      "licenceVerified": false
+    }
+  ],
+  "sourcedImages": 0,
+  "notes": "Build attempts two independent historical site-associated photos for PRIVATE independent preview. Rights not confirmed; not approved for official commercial publication."
+}
