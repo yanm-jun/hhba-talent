@@ -1,10 +1,12 @@
 import {useEffect,useState} from 'react';
 import {Bookmark,BookmarkCheck} from 'lucide-react';
 import {listSavedJobs,savedAvailable,setSavedJob} from '../services/savedJobs';
+import {getRealAuthToken} from '../services/realAuth';
+import {navigate} from '../router';
 export function SaveJobButton({jobId,compact=false}:{jobId:string,compact?:boolean}){
  const [saved,setSaved]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState('');
  useEffect(()=>{
-  if(!savedAvailable)return;
+  if(!savedAvailable||!getRealAuthToken())return;
   let mounted=true;
   listSavedJobs().then(items=>{if(mounted)setSaved(items.some(j=>j.jobId===jobId))})
    .catch(()=>{if(mounted)setError('收藏暂不可用')});
@@ -13,7 +15,7 @@ export function SaveJobButton({jobId,compact=false}:{jobId:string,compact?:boole
   return()=>{mounted=false;removeEventListener('hhba:saved-changed',refresh)};
  },[jobId]);
  if(!savedAvailable)return null;
- const click=async()=>{if(busy)return;setBusy(true);setError('');
+ const click=async()=>{if(busy)return;if(!getRealAuthToken()){navigate('/candidate/login');return;}setBusy(true);setError('');
   try{await setSavedJob(jobId,!saved);setSaved(!saved);}catch(e){setError(e instanceof Error?e.message:'操作失败')}
   finally{setBusy(false)}
  };

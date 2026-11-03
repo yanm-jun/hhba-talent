@@ -54,7 +54,7 @@ function updateGrowth(){
  setMetric('registered-users',a?.quality==='collected'?a.registeredUsers:null);
  byId('active-users').textContent=a?.quality==='collected'&&integer(a.dau)!==null&&integer(a.mau)!==null?fmt.format(a.dau)+' / '+fmt.format(a.mau):'— / —';
  byId('users-interval').textContent=growth?.period?growth.period.start+' 至 '+growth.period.end+' · UTC':'私有数据需要 Cloudflare Access 管理员授权';
- byId('users-data-quality').textContent=growth?'数据来源：Cloudflare D1。设备收藏不等于注册用户；DAU/MAU 待真实账户体系。':'私有指标需要 Cloudflare Access 管理员授权；未接入不等于零。';
+ byId('users-data-quality').textContent=a?.quality==='collected'?'真实注册人数来自 PNVS 认证 D1；DAU/MAU 仍待账号级活跃数据接通，不能以匿名 UV 代替。':growth?'Cloudflare D1 已接入访问统计；注册人数尚未连接。':'私有指标需要 Cloudflare Access 管理员授权；未接入不等于零。';
  renderTraffic('users-chart',t?.quality==='collected'?t.series:null);
  if(t?.quality==='collected'){
   const trend=byId('trend-chart');if(trend){trend.className='chart-empty hhba-live-trend';renderTraffic('trend-chart',t.series)}

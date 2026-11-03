@@ -6,7 +6,6 @@ import {employerApiReady,type User} from '../services/api';
 import {realAuthReady} from '../services/realAuth';
 import { CandidateAccountDropdown } from './CandidateAccountDropdown';
 import { BrandMark } from './BrandMark';
-import {demoModeEnabled,useDemoAccount,exitDemoAccount} from '../services/demoAccount';
 import '../styles/demo-nav.css';
 import '../styles/experience-navigation.css';
 
@@ -31,10 +30,9 @@ export function Shell({ user, children }: { user: User | null; children: React.R
  const navigate=useNavigate();
  const route=useRoute();
  const experience=experienceForRoute(route);
- const demo=useDemoAccount();
  const hasCandidate=!!user?.account_types?.includes('candidate');
  const hasRecruiter=!!user?.account_types?.includes('recruiter');
- const candidateSignedIn=hasCandidate||(demoModeEnabled&&!!demo);
+ const candidateSignedIn=hasCandidate;
  // Only a verified HHBA account session may unlock official recruiting outlinks.
  // A local demo account must never satisfy this requirement.
  const verifiedCandidate=hasCandidate&&(employerApiReady||realAuthReady);
@@ -92,8 +90,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
      <Link className="auth" to="/candidate/saved">我的收藏</Link>
      <Link className="hhba-nav-switch" to="/employer/start">我要招人 <ArrowUpRight size={13}/></Link>
      {candidateSignedIn?<><CandidateAccountDropdown/>
-       {demoModeEnabled&&demo&&<button type="button" className="text-button" onClick={()=>{exitDemoAccount();navigate('/candidate/login')}}>退出演示</button>}
-       {hasCandidate&&<Link className="hhba-nav-account" to="/candidate/account">{user?.display_name||'个人中心'}</Link>}
+       <Link className="hhba-nav-account" to="/candidate/account">{user?.display_name||'个人中心'}</Link>
       </>:<Link className="hhba-nav-account" to="/auth">登录 / 注册</Link>}
    </nav>:<nav aria-label="企业招聘与治理导航">
      <StudyAbroadNavLink active={route.startsWith('/study-abroad')}/>

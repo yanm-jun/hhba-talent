@@ -1,45 +1,50 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,existsSync} from 'node:fs';
+
 const base=new URL('../src/',import.meta.url);
 const source=path=>readFileSync(new URL(path,base),'utf8');
-test('candidate auth routes expose trusted phone UI instead of mock login',()=>{
+test('candidate routes only expose genuine PNVS sign-in and authenticated workbench',()=>{
  const main=source('main.tsx');
- assert.ok(main.includes("route===\u0027/auth\u0027)return <AuthChoicePage/>") || main.includes("route==\u0027/auth\u0027)return <AuthChoicePage/>"));
- assert.ok(main.includes("PhoneAuthPage"));
- assert.ok(!main.includes("demoModeEnabled?<DemoAuthPage"));
- assert.match(main,/if\(!employerApiReady\)\{setReady\(true\);return;\}/);
- assert.match(main,/candidate\/account/);
+ const login=source('pages/PhoneAuthPage.tsx');
+ assert.ok(main.includes("route==='/auth')return <AuthChoicePage/>"));
+ assert.ok(main.includes('PhoneAuthPage'));
+ assert.match(main,/realAuth\.me\(\)/);
+ assert.match(main,/realAuthToUser\(me\)/);
+ assert.match(main,/route==='\/candidate'\)return user\?\.account_types\?\.includes\('candidate'\)/);
+ assert.match(login,/candidate \? '\/candidate\/account'/);
+ assert.doesNotMatch(main,/DemoAuthPage|CandidateDashboardPage/);
 });
-test('demo account cannot unlock real candidate or employer authenticated endpoints',()=>{
- const demo=source('services/demoAccount.ts');
- const auth=source('pages/DemoAuthPage.tsx');
- assert.ok(demo.includes('localStorage.setItem(KEY'));
- assert.ok(demo.includes("dispatchEvent(new Event('hhba:demo-account-change'))"));
- assert.ok(!demo.includes('api.login('));
- assert.ok(!demo.includes('api.register('));
- assert.ok(!auth.includes('type="password"'));
- assert.ok(auth.includes('不是真正注册或登录'));
- assert.ok(auth.includes('不需要密码'));
+test('retired mock user system can no longer write fake accounts to local storage',()=>{
+ const main=source('main.tsx');
+ assert.equal(existsSync(new URL('services/demoAccount.ts',base)),false);
+ assert.equal(existsSync(new URL('pages/DemoAuthPage.tsx',base)),false);
+ assert.equal(existsSync(new URL('pages/CandidateDashboardPage.tsx',base)),false);
+ assert.match(main,/localStorage\.removeItem\('hhba\.demo\.candidate\.v1'\)/);
+ const shell=source('components/Shell.tsx');
+ const account=source('pages/PersonalCenterPage.tsx');
+ assert.doesNotMatch(shell,/useDemoAccount|demoModeEnabled|exitDemoAccount/);
+ assert.doesNotMatch(account,/useDemoAccount|updateDemoAccount|createDemoAccount|模拟账户|模拟登录|模拟注册/);
 });
-test('prototype has editable preferences and genuine device favorites but no fabricated activity',()=>{
+test('original workbench has real account profile, isolated favorites and transparent unavailable services',()=>{
+ const account=source('pages/PersonalCenterPage.tsx');
+ const saved=source('services/savedJobs.ts');
+ assert.match(account,/getCandidateWorkspaceProfile\(\)/);
+ assert.match(account,/saveCandidateWorkspaceProfile\(/);
+ assert.match(account,/saveCandidateWorkspacePreferences\(/);
+ assert.match(saved,/HHBA_ACCOUNT_SAVED_JOBS_V1/);
+ assert.match(account,/真实投递接口尚未接通/);
+ assert.match(account,/私有简历服务尚未接通|真实简历功能尚未开放/);
+ assert.match(account,/className="hhba-account-tool-card"/);
+ assert.match(account,/className="hhba-account-tool-copy"/);
+});
+test('workbench layout remains consistent across desktop and mobile',()=>{
+ const sourceCss=source('styles/demo-account.css');
+ assert.match(sourceCss,/\.hhba-account-tool-copy\{[^}]*display:flex;flex-direction:column;[^}]*min-width:0;/);
+ assert.match(sourceCss,/\.hhba-account-tool-grid>a\.hhba-account-tool-card\{[^}]*grid-template-columns:20px minmax\(0,1fr\) 15px;/);
+ assert.ok(sourceCss.includes('min-height:88px'));
+ assert.ok(sourceCss.includes('.hhba-account-tool-grid{grid-template-columns:1fr}'));
+ assert.ok(!sourceCss.includes('grid-template-rows:auto auto'));
  const page=source('pages/PersonalCenterPage.tsx');
- assert.ok(page.includes('updateDemoAccount({nickname,headline,city,intro,skills})'));
- assert.ok(page.includes('updateDemoAccount({preferredRole:role,preferredCity:targetCity,workMode:mode})'));
- assert.ok(page.includes('listSavedJobs()'));
- assert.ok(page.includes('暂无真实求职记录'));
- assert.ok(page.includes('不会获得企业权限'));
- assert.ok(page.includes('deleteDemoAccount()'));
-});
-
-test('personal center feature cards keep horizontal readable text and compact mobile layout',()=>{
- const page=source('pages/PersonalCenterPage.tsx');
- const styles=source('styles/demo-account.css');
- assert.ok(page.includes('className="hhba-account-tool-card"'));
- assert.ok(page.includes('className="hhba-account-tool-copy"'));
- assert.match(styles,/\.hhba-account-tool-copy\{[^}]*display:flex;flex-direction:column;[^}]*min-width:0;/);
- assert.match(styles,/\.hhba-account-tool-grid>a\.hhba-account-tool-card\{[^}]*grid-template-columns:20px minmax\(0,1fr\) 15px;/);
- assert.ok(styles.includes('min-height:88px'));
- assert.ok(styles.includes('.hhba-account-tool-grid{grid-template-columns:1fr}'));
- assert.ok(!styles.includes('grid-template-rows:auto auto'));
+ assert.ok(page.includes("import '../styles/demo-account.css';"),'preserve original workbench layout styles');
 });
