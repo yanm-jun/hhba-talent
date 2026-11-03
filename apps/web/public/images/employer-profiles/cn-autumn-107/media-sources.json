@@ -1,0 +1,35 @@
+{
+  "companyId": "107",
+  "checkedAt": "2026-11-03",
+  "brand": {
+    "status": "editorial_label_not_official_logo",
+    "copyrightStatus": "unverified",
+    "approvedToPublishAsCorporateLogo": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": {
+        "sourcePage": "https://www.amlogic.cn/",
+        "mediaUrl": null,
+        "description": "晶晨半导体公司官网，尚未确认可商用总部照片"
+      },
+      "actualCompanyPhotoDisplayed": false,
+      "commercialUsageApproved": false
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": {
+        "sourcePage": "https://amlogicsh.zhiye.com/Campus",
+        "mediaUrl": null,
+        "description": "晶晨半导体官方招聘网站，暂无可确认授权的企业现场实景"
+      },
+      "actualCompanyPhotoDisplayed": false,
+      "commercialUsageApproved": false
+    }
+  ],
+  "commercialUsageApproved": false,
+  "notes": "候选图片仅供审计归属，不将网上可见等同可转载；页面两张图片均显著注明非实景。"
+}

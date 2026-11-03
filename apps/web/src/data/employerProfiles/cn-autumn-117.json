@@ -1,0 +1,328 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-117",
+  "name": "邦盛科技",
+  "displayName": "浙江邦盛科技股份有限公司",
+  "englishName": "BANGSUN Technology",
+  "aliases": [
+    "浙江邦盛科技",
+    "邦盛科技股份",
+    "Bangsun",
+    "邦盛科技2027校招"
+  ],
+  "industry": "实时智能 · 流计算 · 图计算 · 智能风控 · 企业级大数据",
+  "subtitle": "2027校招：9项具名方向（第三方汇总）；原报名已于10月31日截止",
+  "overview": "浙江邦盛科技股份有限公司成立于2010年，总部位于杭州，提供实时智能决策平台及解决方案。2027校园招聘转录资料列有建模、算法、Java研发与交付、销售、产品、售前和AI博士后等9项具名方向。但没有逐一核验原始单岗编号、具体学历与城市，历史公告整体列杭州、北京、上海、沈阳等地区，不把公司地区列表套给每个方向。2027秋招原报名截止2026年10月31日。另有杭州电子科技大学2026届（上一届）校招公告，可用于核对公司以往招聘官网，但不能充当2027届招聘证据。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://www.jdjianli.com/campus/51134",
+    "https://www.jdjianli.com/campus/48223",
+    "https://www.wondercv.com/xiaozhao/bangsun-tech-2027-campus-14452-635ab4/",
+    "https://www.bsfit.com.cn/about",
+    "https://job.hdu.edu.cn/campus/view?id=7918"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-117/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-117/photo1.svg",
+        "caption": "邦盛科技：图片审核占位（非实景）",
+        "alt": "邦盛科技非实景图片占位，不代表公司真实厂区或办公室",
+        "note": "非实景编辑图；真实照片、来源和转载授权均需单独审核。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-117/photo2.svg",
+        "caption": "邦盛科技：图片审核占位（非实景）",
+        "alt": "邦盛科技非实景图片占位，不代表公司真实厂区或办公室",
+        "note": "非实景编辑图；真实照片、来源和转载授权均需单独审核。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.bsfit.com.cn/about",
+    "label": "邦盛科技公司官网（本批2027校招单岗链接未核实）",
+    "status": "unconfirmed",
+    "subject": "浙江邦盛科技股份有限公司，实际岗位用人主体以原报名系统为准",
+    "note": "2027届秋招原投递截至2026-10-31。本次9个名称来自2027校招公开汇总而非9条官方单岗ID；2026届Moka校园项目不是2027年新的网申入口。"
+  },
+  "photoNote": "本批图片暂为显著标注的非实景占位，Logo为编辑字标，非企业授权商标。未经授权真实照片不进入正式站。",
+  "majorIntro": "本版九条均为2027秋招资料所披露的岗位方向，不视为已经确认仍开放的独立岗位。公司整体招聘地杭州、北京、上海、沈阳等，不代表每个岗位分别在上述地区有职位。",
+  "preferredMajors": [
+    "软件工程",
+    "计算机科学与技术",
+    "人工智能",
+    "数学与应用数学",
+    "信息管理与信息系统",
+    "工商管理",
+    "市场营销"
+  ],
+  "business": [
+    {
+      "title": "实时智能计算平台",
+      "description": "提供流式大数据与实时决策基础软件，处理高并发、低时延的业务事件计算与分析。",
+      "tags": "实时 · 计算",
+      "details": [
+        "流立方",
+        "时序数据",
+        "高并发处理"
+      ]
+    },
+    {
+      "title": "图与关联数据分析",
+      "description": "运用图计算与多源关联分析技术处理业务关系网络和风险事件序列。",
+      "tags": "图 · 关联",
+      "details": [
+        "图计算",
+        "关系分析",
+        "风险关联"
+      ]
+    },
+    {
+      "title": "智能风险管理",
+      "description": "支持金融机构、支付与互联网业务的实时交易风险监测及智能风控决策。",
+      "tags": "风控 · 金融",
+      "details": [
+        "交易风控",
+        "风险预测",
+        "实时识别"
+      ]
+    },
+    {
+      "title": "智能模型及算法",
+      "description": "通过建模、数据挖掘与机器学习提升复杂决策场景中的算法能力。",
+      "tags": "算法 · 模型",
+      "details": [
+        "数据挖掘",
+        "算法工程",
+        "风险模型"
+      ]
+    },
+    {
+      "title": "企业软件工程交付",
+      "description": "开展Java平台软件研发、实时智能系统部署和面向客户的工程交付。",
+      "tags": "软件 · 交付",
+      "details": [
+        "Java开发",
+        "系统部署",
+        "售前方案"
+      ]
+    },
+    {
+      "title": "多行业实时数据应用",
+      "description": "为通信、交通及其他实时场景提供数据处理与智能业务分析方案。",
+      "tags": "行业 · 应用",
+      "details": [
+        "通信场景",
+        "交通分析",
+        "数据决策"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "model",
+      "title": "建模工程师（2027公布方向，非独立职位ID）",
+      "city": "杭州、上海、北京、沈阳等（整体校招地区；此方向未逐岗核定）",
+      "category": "算法 / 建模",
+      "summary": "邦盛科技2027秋季校招公开名单列出“建模工程师”方向，涉及实时智能软件、算法、产品或业务技术相关职能；来源为校招资料转载，尚无该方向独立官方职位编号、实际部门及单岗城市。",
+      "requirements": "公开2027招聘资料未对这个具体方向独立列出学历门槛、人数和技能清单；专业关联仅用于HHBA求职相关性筛选，不构成邦盛科技录用要求。本批原网申2026年10月31日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "数学与应用数学",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 具体学历待官方单岗核验",
+      "url": "https://www.bsfit.com.cn/about",
+      "evidenceUrl": "https://www.jdjianli.com/campus/51134",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江邦盛科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "algo",
+      "title": "算法工程师（2027公布方向，非独立职位ID）",
+      "city": "杭州、上海、北京、沈阳等（整体校招地区；此方向未逐岗核定）",
+      "category": "算法 / 研发",
+      "summary": "邦盛科技2027秋季校招公开名单列出“算法工程师”方向，涉及实时智能软件、算法、产品或业务技术相关职能；来源为校招资料转载，尚无该方向独立官方职位编号、实际部门及单岗城市。",
+      "requirements": "公开2027招聘资料未对这个具体方向独立列出学历门槛、人数和技能清单；专业关联仅用于HHBA求职相关性筛选，不构成邦盛科技录用要求。本批原网申2026年10月31日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "人工智能",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 具体学历待官方单岗核验",
+      "url": "https://www.bsfit.com.cn/about",
+      "evidenceUrl": "https://www.jdjianli.com/campus/51134",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江邦盛科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "sales",
+      "title": "销售工程师（2027公布方向，非独立职位ID）",
+      "city": "杭州、上海、北京、沈阳等（整体校招地区；此方向未逐岗核定）",
+      "category": "营销 / 软件",
+      "summary": "邦盛科技2027秋季校招公开名单列出“销售工程师”方向，涉及实时智能软件、算法、产品或业务技术相关职能；来源为校招资料转载，尚无该方向独立官方职位编号、实际部门及单岗城市。",
+      "requirements": "公开2027招聘资料未对这个具体方向独立列出学历门槛、人数和技能清单；专业关联仅用于HHBA求职相关性筛选，不构成邦盛科技录用要求。本批原网申2026年10月31日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 具体学历待官方单岗核验",
+      "url": "https://www.bsfit.com.cn/about",
+      "evidenceUrl": "https://www.jdjianli.com/campus/51134",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江邦盛科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "delivery",
+      "title": "Java交付工程师（2027公布方向，非独立职位ID）",
+      "city": "杭州、上海、北京、沈阳等（整体校招地区；此方向未逐岗核定）",
+      "category": "软件 / 交付",
+      "summary": "邦盛科技2027秋季校招公开名单列出“Java交付工程师”方向，涉及实时智能软件、算法、产品或业务技术相关职能；来源为校招资料转载，尚无该方向独立官方职位编号、实际部门及单岗城市。",
+      "requirements": "公开2027招聘资料未对这个具体方向独立列出学历门槛、人数和技能清单；专业关联仅用于HHBA求职相关性筛选，不构成邦盛科技录用要求。本批原网申2026年10月31日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 具体学历待官方单岗核验",
+      "url": "https://www.bsfit.com.cn/about",
+      "evidenceUrl": "https://www.jdjianli.com/campus/51134",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江邦盛科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "java",
+      "title": "Java开发工程师（2027公布方向，非独立职位ID）",
+      "city": "杭州、上海、北京、沈阳等（整体校招地区；此方向未逐岗核定）",
+      "category": "软件 / 开发",
+      "summary": "邦盛科技2027秋季校招公开名单列出“Java开发工程师”方向，涉及实时智能软件、算法、产品或业务技术相关职能；来源为校招资料转载，尚无该方向独立官方职位编号、实际部门及单岗城市。",
+      "requirements": "公开2027招聘资料未对这个具体方向独立列出学历门槛、人数和技能清单；专业关联仅用于HHBA求职相关性筛选，不构成邦盛科技录用要求。本批原网申2026年10月31日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 具体学历待官方单岗核验",
+      "url": "https://www.bsfit.com.cn/about",
+      "evidenceUrl": "https://www.jdjianli.com/campus/51134",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江邦盛科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "postdoc",
+      "title": "AI方向博士后（算法）（2027公布方向，非独立职位ID）",
+      "city": "杭州、上海、北京、沈阳等（整体校招地区；此方向未逐岗核定）",
+      "category": "算法 / 博士后",
+      "summary": "邦盛科技2027秋季校招公开名单列出“AI方向博士后（算法）”方向，涉及实时智能软件、算法、产品或业务技术相关职能；来源为校招资料转载，尚无该方向独立官方职位编号、实际部门及单岗城市。",
+      "requirements": "公开2027招聘资料未对这个具体方向独立列出学历门槛、人数和技能清单；专业关联仅用于HHBA求职相关性筛选，不构成邦盛科技录用要求。本批原网申2026年10月31日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "人工智能",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 具体学历待官方单岗核验",
+      "url": "https://www.bsfit.com.cn/about",
+      "evidenceUrl": "https://www.jdjianli.com/campus/51134",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江邦盛科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "product",
+      "title": "产品经理（2027公布方向，非独立职位ID）",
+      "city": "杭州、上海、北京、沈阳等（整体校招地区；此方向未逐岗核定）",
+      "category": "产品 / 管理",
+      "summary": "邦盛科技2027秋季校招公开名单列出“产品经理”方向，涉及实时智能软件、算法、产品或业务技术相关职能；来源为校招资料转载，尚无该方向独立官方职位编号、实际部门及单岗城市。",
+      "requirements": "公开2027招聘资料未对这个具体方向独立列出学历门槛、人数和技能清单；专业关联仅用于HHBA求职相关性筛选，不构成邦盛科技录用要求。本批原网申2026年10月31日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "信息管理与信息系统",
+        "计算机科学与技术",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 具体学历待官方单岗核验",
+      "url": "https://www.bsfit.com.cn/about",
+      "evidenceUrl": "https://www.jdjianli.com/campus/51134",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江邦盛科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "solution",
+      "title": "解决方案产品经理（2027公布方向，非独立职位ID）",
+      "city": "杭州、上海、北京、沈阳等（整体校招地区；此方向未逐岗核定）",
+      "category": "产品 / 方案",
+      "summary": "邦盛科技2027秋季校招公开名单列出“解决方案产品经理”方向，涉及实时智能软件、算法、产品或业务技术相关职能；来源为校招资料转载，尚无该方向独立官方职位编号、实际部门及单岗城市。",
+      "requirements": "公开2027招聘资料未对这个具体方向独立列出学历门槛、人数和技能清单；专业关联仅用于HHBA求职相关性筛选，不构成邦盛科技录用要求。本批原网申2026年10月31日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "信息管理与信息系统",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 具体学历待官方单岗核验",
+      "url": "https://www.bsfit.com.cn/about",
+      "evidenceUrl": "https://www.jdjianli.com/campus/51134",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江邦盛科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "presale",
+      "title": "售前工程师（2027公布方向，非独立职位ID）",
+      "city": "杭州、上海、北京、沈阳等（整体校招地区；此方向未逐岗核定）",
+      "category": "售前 / 技术",
+      "summary": "邦盛科技2027秋季校招公开名单列出“售前工程师”方向，涉及实时智能软件、算法、产品或业务技术相关职能；来源为校招资料转载，尚无该方向独立官方职位编号、实际部门及单岗城市。",
+      "requirements": "公开2027招聘资料未对这个具体方向独立列出学历门槛、人数和技能清单；专业关联仅用于HHBA求职相关性筛选，不构成邦盛科技录用要求。本批原网申2026年10月31日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "信息管理与信息系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 具体学历待官方单岗核验",
+      "url": "https://www.bsfit.com.cn/about",
+      "evidenceUrl": "https://www.jdjianli.com/campus/51134",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江邦盛科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    }
+  ]
+}

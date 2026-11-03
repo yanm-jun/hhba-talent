@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-097",
+  "name": "汇丰中国",
+  "displayName": "汇丰银行（中国）有限公司 / 汇丰科技中国招聘",
+  "englishName": "HSBC Mainland China",
+  "aliases": [
+    "汇丰银行",
+    "HSBC",
+    "HSBC China",
+    "汇丰银行（中国）有限公司",
+    "汇丰科技中国",
+    "汇丰2027校招"
+  ],
+  "industry": "国际银行 · 金融科技 · 网络安全 · 商业及机构银行",
+  "subtitle": "汇丰官网2027毕业生项目 · 广州和西安技术岗原定2026-12-31截止",
+  "overview": "汇丰集团官方毕业生项目索引列出中国内地广州与西安 Technology Graduate Programme 项目，分别涵盖软件工程与网络安全。相关职位显示2026年9月1日开放、12月31日截止，项目2027年3月1日启动；另一组中国内地企业与机构银行管培项目10月31日已截止，不能与技术项目混淆。职位网页归属HSBC Global Services Limited或集团招聘主体，不能把所有岗位说成汇丰银行（中国）有限公司直接雇用。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://www.hsbc.com/careers/students-and-graduates/find-a-programme?location=mainland-china&page=1&programme-type=graduate-programme&take=40",
+    "https://apply.careers.hsbc.com/emergingtalent/job/Guangzhou-Engineering-Graduate-GD-510170/1371118457/",
+    "https://apply.careers.hsbc.com/emergingtalent/job/Guangzhou-Cyber-Graduate-GD-510170/1371120557/",
+    "https://apply.careers.hsbc.com/emergingtalent/job/Xi%27an-Engineering-Graduate-SN-710077/1371118957/",
+    "https://www.hsbc.com/careers/students-and-graduates"
+  ],
+  "media": {
+    "logo": "images/autumn-real-logos/cn-autumn-097.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-097/photo1.svg",
+        "caption": "汇丰中国业务场景：照片待授权，当前为非实景编辑图",
+        "alt": "汇丰中国的非实景信息图，占位图不是实际办公场所",
+        "note": "非实景：仅作独立PR审查占位，真实公司照片尚未取得商用许可。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-097/photo2.svg",
+        "caption": "汇丰中国业务场景：照片待授权，当前为非实景编辑图",
+        "alt": "汇丰中国的非实景信息图，占位图不是实际办公场所",
+        "note": "非实景：仅作独立PR审查占位，真实公司照片尚未取得商用许可。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://apply.careers.hsbc.com/emergingtalent/",
+    "label": "汇丰集团毕业生招聘系统（按职位查申请状态）",
+    "status": "official_portal",
+    "subject": "汇丰集团技术人才项目，部分招录法人为HSBC Global Services Limited；不自动等同汇丰银行（中国）有限公司",
+    "note": "汇丰集团官网列出的广州 Engineering/Cyber 及西安 Engineering 项目原定截止2026-12-31；2026-10-31截止的其他企业银行类项目不计入本批开放技术岗位。当前申请按钮状态需以职位原网页实时核对。"
+  },
+  "majorIntro": "本批只收录汇丰官网有独立岗位编号及职位页面的三个中国内地技术培训生职位。专业标签为能力关联，不代表官网规定了必须属于该专业；官网项目仍须逐项核实工作授权及入职条件。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "软件工程",
+    "网络空间安全",
+    "信息安全",
+    "人工智能",
+    "电子信息工程",
+    "通信工程",
+    "数据科学与大数据技术",
+    "金融科技"
+  ],
+  "photoNote": "此独立审查版本的两幅配图均为显著标注的非实景编辑占位，不代表企业真实办公场景。正式展示必须取得真实素材许可并核验来源。",
+  "business": [
+    {
+      "title": "国际商业及机构金融",
+      "description": "汇丰集团通过国际企业及机构银行提供跨境金融、现金管理和交易服务，不表示本批技术招聘涵盖全部金融业务。",
+      "tags": "国际 · 企业",
+      "details": [
+        "企业银行服务",
+        "机构客户",
+        "跨境业务"
+      ]
+    },
+    {
+      "title": "零售与财富管理",
+      "description": "国际财富管理及卓越理财业务涉及跨境客户、财富服务与数字渠道，集团不同法人分别开展服务。",
+      "tags": "零售 · 财富",
+      "details": [
+        "财富管理",
+        "数字渠道",
+        "客户服务"
+      ]
+    },
+    {
+      "title": "银行科技工程",
+      "description": "集团技术团队设计、建设和运维金融服务系统及其软件平台，为多业务线提供可扩展的技术解决方案。",
+      "tags": "研发 · 工程",
+      "details": [
+        "平台工程",
+        "系统开发",
+        "云与API"
+      ]
+    },
+    {
+      "title": "网络与信息安全",
+      "description": "科技部门承担集团网络、应用、基础设施安全标准、监控及安全事件响应等。",
+      "tags": "网络 · 安全",
+      "details": [
+        "网络防护",
+        "安全运营",
+        "安全响应"
+      ]
+    },
+    {
+      "title": "全球支付及贸易服务",
+      "description": "汇丰在环球支付与贸易融资方向提供资金流转和贸易金融方案，岗位主体、业务要求独立审核。",
+      "tags": "支付 · 贸易",
+      "details": [
+        "环球支付",
+        "贸易融资",
+        "风险控制"
+      ]
+    },
+    {
+      "title": "数据与数字化",
+      "description": "通过数据技术和业务数字化提升客户服务、员工系统和后台处理效率，不把集团技术方向冒充具体岗位。",
+      "tags": "数据 · 数字",
+      "details": [
+        "数据平台",
+        "智能应用",
+        "数字客户体验"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "gza-eng",
+      "title": "Engineering - Graduate（广州）",
+      "category": "软件 / 工程",
+      "city": "广东广州",
+      "summary": "汇丰集团官方Graduate Programme单岗：广州工程技术培训生，参与银行平台、应用与系统建设，学习企业级开发、交付质量和技术协作，为金融技术团队提供系统工程支持。",
+      "requirements": "官网职位编号1371118457；开放日期2026年9月1日，公布截止2026年12月31日，2027年3月1日开始两年培养。官网强调解决真实技术问题与协作能力，具体学历及工作签证资格以原JD为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息工程",
+        "人工智能"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "Graduate 2027 · 官网页面列12月31日截止",
+      "url": "https://apply.careers.hsbc.com/emergingtalent/job/Guangzhou-Engineering-Graduate-GD-510170/1371118457/",
+      "evidenceUrl": "https://apply.careers.hsbc.com/emergingtalent/job/Guangzhou-Engineering-Graduate-GD-510170/1371118457/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "HSBC Group Technology（招录主体见官方岗位页）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "gza-cyber",
+      "title": "Cyber - Graduate（广州）",
+      "category": "安全 / 网络",
+      "city": "广东广州",
+      "summary": "汇丰集团官方Cyber Graduate广州职位，围绕数字系统与数据资产安全、网络/应用/基础设施防护、监控、风险控制及安全事件响应开展职业培养。",
+      "requirements": "官网职位编号1371120557；开放2026年9月1日，截止2026年12月31日，2027年3月1日开始两年计划；不要求入职时已经是安全专家，侧重分析思维与学习潜力。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "网络空间安全",
+        "信息安全",
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "Graduate 2027 · 官网页面列12月31日截止",
+      "url": "https://apply.careers.hsbc.com/emergingtalent/job/Guangzhou-Cyber-Graduate-GD-510170/1371120557/",
+      "evidenceUrl": "https://apply.careers.hsbc.com/emergingtalent/job/Guangzhou-Cyber-Graduate-GD-510170/1371120557/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "HSBC Group Technology（招录主体见官方岗位页）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "xian-eng",
+      "title": "Engineering - Graduate（西安）",
+      "category": "软件 / 工程",
+      "city": "陕西西安",
+      "summary": "汇丰集团2027西安Engineering Graduate官网单岗，与广州同名项目属于不同工作城市，岗位原网页单独列明Xi'an作为办公所在地。",
+      "requirements": "官方招聘职位编号1371118957；项目页面列2026年9月1日开放、12月31日截止及2027年3月1日入职计划，具体工程技能、学历和中国工作资格按原岗位信息执行。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "电子信息工程",
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "Graduate 2027 · 官网页面列12月31日截止",
+      "url": "https://apply.careers.hsbc.com/emergingtalent/job/Xi%27an-Engineering-Graduate-SN-710077/1371118957/",
+      "evidenceUrl": "https://apply.careers.hsbc.com/emergingtalent/job/Xi%27an-Engineering-Graduate-SN-710077/1371118957/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "HSBC Group Technology（招录主体见官方岗位页）",
+      "currentOpenVerified": false
+    }
+  ]
+}

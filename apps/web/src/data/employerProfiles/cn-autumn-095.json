@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-095",
+  "name": "广发银行",
+  "displayName": "广发银行股份有限公司",
+  "englishName": "China Guangfa Bank",
+  "aliases": [
+    "中国广发银行",
+    "CGB",
+    "China Guangfa Bank",
+    "广发银行2027校园招聘"
+  ],
+  "industry": "商业银行 · 信用卡 · 金融科技 · 风险管理 · 财富管理",
+  "subtitle": "2027年度校园招聘 · 总行10月15日截止；分支机构公告至11月15日",
+  "overview": "广发银行2027届校园招聘分总行、直属分行、信用卡中心及广银理财等机构。本页收录由国家大学生就业服务平台发布、有独立链接的三种招聘条目：金融科技类、法律与风险管理类和营销英才。职位仍需进入银行系统选城市与机构，公开截止日分别为总行10月15日和分支机构11月15日；不可理解为所有职位今天均在招。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html",
+    "https://career.nankai.edu.cn/correcruit/content/id/118874.html",
+    "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+    "https://www.cgbchina.com.cn/",
+    "https://www.chinalife.com.cn/chinalife/zhaopin",
+    "https://www.ncss.cn/student/jobs/2QNzCztmZsnxQLKKrA9nA3/detail.html",
+    "https://job.ncss.cn/student/jobs/ASp5FrMFHYnvd4K4P5X7ut/detail.html",
+    "https://sysu.ncss.cn/student/m/jobs/PqwxFWu18dvtkJVRrNgVXK/detail.html"
+  ],
+  "media": {
+    "logo": "images/autumn-real-logos/cn-autumn-095.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-095/photo1.svg",
+        "caption": "广发银行业务图片待核（当前为非实景编辑示意）",
+        "alt": "广发银行业务场景非实景示意，不是企业真实办公照片",
+        "note": "非实景：如审查构建能取得来源可核的真实照片，才以该来源图片替换；商业使用权未取得。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-095/photo2.svg",
+        "caption": "广发银行业务图片待核（当前为非实景编辑示意）",
+        "alt": "广发银行业务场景非实景示意，不是企业真实办公照片",
+        "note": "非实景：如审查构建能取得来源可核的真实照片，才以该来源图片替换；商业使用权未取得。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+    "label": "广发银行人才招聘官网（2027校招）",
+    "status": "official_portal",
+    "subject": "广发银行股份有限公司总行、直属分行及信用卡中心；广银理财另属独立法人",
+    "note": "高校刊载的2027校招公告：总行2026-10-15截止，分支机构2026-11-15截止；具体招聘机构、岗位ID和实时网申状态仍需在广发银行/中国人寿官方招聘系统确认。"
+  },
+  "majorIntro": "只收录国家大学生就业服务平台有独立职位页面的2027届招聘记录；其职能名称有时仍为“金融科技类”等宽类别，并非逐部门岗位JD。分支机构报名公告截至11月15日，实时开放状态仍需官方核对，未验证不标称在招。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "软件工程",
+    "数据科学与大数据技术",
+    "人工智能",
+    "金融学",
+    "经济学",
+    "统计学",
+    "法学",
+    "会计学",
+    "财务管理",
+    "市场营销",
+    "工商管理",
+    "人力资源管理"
+  ],
+  "photoNote": "历史招聘来源与真实招聘机会分开标识。来源照片的拍摄日期可能早于2026年，不代表今日办公现状。发布前还需取得素材使用权。",
+  "business": [
+    {
+      "title": "公司金融与普惠服务",
+      "description": "开展对公结算、融资、客户管理及企业金融综合服务，具体业务资格与产品以银行监管披露为准。",
+      "tags": "公司金融",
+      "details": [
+        "企业金融",
+        "融资支持",
+        "结算服务"
+      ]
+    },
+    {
+      "title": "零售银行与财富管理",
+      "description": "为个人客户提供账户、消费与财富相关的银行服务，金融产品与风险承受能力须依法匹配。",
+      "tags": "零售 · 财富",
+      "details": [
+        "个人金融",
+        "理财服务",
+        "客户运营"
+      ]
+    },
+    {
+      "title": "信用卡与消费金融",
+      "description": "通过信用卡中心开展产品、客户服务、风险管理和营销数据分析，招聘主体按专项公告。",
+      "tags": "信用卡 · 风控",
+      "details": [
+        "信用卡运营",
+        "策略分析",
+        "客户服务"
+      ]
+    },
+    {
+      "title": "金融科技与智能风控",
+      "description": "银行和信用卡中心招聘公告披露金融科技、算法模型及风险策略方向，实际技术栈须以单岗JD为准。",
+      "tags": "金融科技 · AI",
+      "details": [
+        "数据工程",
+        "模型策略",
+        "信息安全"
+      ]
+    },
+    {
+      "title": "投资交易与资产管理",
+      "description": "总行投资交易及广银理财的投资研究、交易和产品管理在不同主体与职能下开展。",
+      "tags": "投资 · 交易",
+      "details": [
+        "投资研究",
+        "交易业务",
+        "产品管理"
+      ]
+    },
+    {
+      "title": "合规运营与职能管理",
+      "description": "法律与风险、财务、运营、人力资源及综合行政等支撑银行业务合规、治理与客户服务。",
+      "tags": "运营 · 合规",
+      "details": [
+        "法律合规",
+        "财务管理",
+        "人才与运营"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "fintech-2027",
+      "title": "金融科技类（2027届国家就业平台招聘条目）",
+      "category": "金融科技 / 数据",
+      "city": "全国（具体分行或总行地点需在官方招聘系统确认）",
+      "summary": "国家大学生就业服务平台2026年9月发布广发银行2027届“金融科技类”独立招聘条目，注明本科及以上、全国招聘；属公开职位条目，但尚未分解为具体分行与部门独立JD。",
+      "requirements": "另一个学校就业平台对同名岗位描述要求计算机、数据建模、信息安全相关知识，具有开发、模型或网络安全项目经验者优先；不能将这些技能视为所有分行的硬门槛。分支机构公告截止11月15日，申请仍否开放以银行系统为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能",
+        "网络空间安全",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上 · 官网实时投递状态待确认",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://www.ncss.cn/student/jobs/2QNzCztmZsnxQLKKrA9nA3/detail.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广发银行股份有限公司（具体总行/分行招聘机构按官网岗位确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "risk-2027",
+      "title": "法律与风险管理类（2027届国家就业平台招聘条目）",
+      "category": "法律 / 风控",
+      "city": "广州市（就业平台列示；细分法人以官网核）",
+      "summary": "国家大学生就业服务平台发布广发银行2027届“法律与风险管理类”独立招聘条目，公开工作地点为广东省广州市，条目有独立职位链接。",
+      "requirements": "就业平台要求本科及以上，专业标签为法学、法律；此岗位是银行公开职位类别，具体合同主体、部门、资格及截止状态必须看招聘系统。总行公告原10月15日截止，分支机构原11月15日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "法学",
+        "法律"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上 · 官网实时投递状态待确认",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://job.ncss.cn/student/jobs/ASp5FrMFHYnvd4K4P5X7ut/detail.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广发银行股份有限公司（具体总行/分行招聘机构按官网岗位确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sales-2027",
+      "title": "营销英才（2027届国家就业平台招聘条目）",
+      "category": "营销 / 服务",
+      "city": "全国（各直属分行独立确认）",
+      "summary": "国家大学生就业服务平台2027校招发布广发银行“营销英才”职位条目，标明全国、本科及以上、专业不限；对应直属分行人才储备方向，真实地区需由分行具体招聘页确认。",
+      "requirements": "此岗位在招聘平台标为专业不限；金融学、市场营销、工商管理等仅为HHBA相关性建议而非申请强制条件，分支机构公开报名截止2026年11月15日。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "金融学",
+        "市场营销",
+        "工商管理",
+        "经济学"
+      ],
+      "majorUnrestricted": true,
+      "educationLabel": "2027届 · 本科及以上 · 官网实时投递状态待确认",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://sysu.ncss.cn/student/m/jobs/PqwxFWu18dvtkJVRrNgVXK/detail.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广发银行股份有限公司（具体总行/分行招聘机构按官网岗位确认）",
+      "currentOpenVerified": false
+    }
+  ]
+}

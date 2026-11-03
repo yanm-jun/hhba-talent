@@ -1,0 +1,27 @@
+{
+  "companyId": "109",
+  "reviewedOn": "2026-11-03",
+  "businessIdentityVerifiedThroughOfficialWebsite": true,
+  "brand": {
+    "status": "explicit_editorial_wordmark_not_licensed_corporate_logo",
+    "permissionVerified": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_review_placeholder",
+      "sourceForFutureReview": "https://www.kingfa.com.cn/aboutus.html",
+      "imageCopyrightVerified": false,
+      "realPremisesPhotoDisplayed": false
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_review_placeholder",
+      "sourceForFutureReview": "https://kjj.gz.gov.cn/xxgk/zwdt/gzdt/content/post_9457694.html",
+      "imageCopyrightVerified": false,
+      "realPremisesPhotoDisplayed": false
+    }
+  ],
+  "commercialReuseRightsVerified": false,
+  "notes": "All images have explicit NON-REAL visual labels; official-site links are only provenance candidates, no unlicensed images represented as office photography."
+}

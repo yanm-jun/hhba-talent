@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-102",
+  "name": "陕煤集团",
+  "displayName": "陕西煤业化工集团有限责任公司",
+  "englishName": "Shaanxi Coal and Chemical Industry Group",
+  "aliases": [
+    "陕西煤业化工集团",
+    "陕煤",
+    "Shccig",
+    "陕煤2027管理培训生"
+  ],
+  "industry": "煤炭 · 煤化工 · 电力 · 钢铁 · 科技与新材料",
+  "subtitle": "2027校园招聘：普通岗已截止；集团管培生公告至11月30日",
+  "overview": "陕煤集团2027年度高校毕业生公开招聘覆盖多家二级企业，其中普通毕业生秋招于2026年10月31日截止。集团另于2026年9月16日发布独立的2027管理培训生公告，明确职能管理岗和技术管理岗两类具名方向、人数、专业及很高的院校与学历门槛，原报名至11月30日。本页只把有完整官方公告的两项管培生岗位当作具名岗位，不用集团产业板块臆造普通校招的独立职位。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://www.shccig.com/index/Article/index.html?cid=85&id=1429902",
+    "https://www.shccig.com/index/Article/index.html?cid=97&id=1429903",
+    "https://webhr.shccig.com/webhrN2-zp"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-102/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-102/photo1.svg",
+        "caption": "陕煤集团图像素材待核验（非真实办公照片）",
+        "alt": "陕煤集团的编辑信息示意，并非企业现场实拍",
+        "note": "非实景：来源、商用许可和真实场景待审，暂以显著标注的编辑占位图展示。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-102/photo2.svg",
+        "caption": "陕煤集团图像素材待核验（非真实办公照片）",
+        "alt": "陕煤集团的编辑信息示意，并非企业现场实拍",
+        "note": "非实景：来源、商用许可和真实场景待审，暂以显著标注的编辑占位图展示。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://webhr.shccig.com/webhrN2-zp",
+    "label": "陕煤集团官方人才招聘网（管培生公告至11月30日）",
+    "status": "official_portal",
+    "subject": "陕西煤业化工集团有限责任公司总部统一招录、统一培养2027管理培训生",
+    "note": "普通2027高校毕业生报名2026-10-31已截止；2027管培生职能管理与技术管理两岗，集团2026-09-16公告明确截止2026-11-30。实际是否仍接受网申须到官网核实。"
+  },
+  "majorIntro": "仅2条官方独立公布的2027管培生岗位，两岗均由集团总部统一招录；选择专业只显示实际相关岗位。官方对大学名单、硕博学历、年龄、本科院校有严格条件，勿仅凭专业标签判断可报名。",
+  "preferredMajors": [
+    "法学",
+    "会计学",
+    "审计学",
+    "经济学",
+    "金融学",
+    "工商管理",
+    "汉语言文学",
+    "新闻学",
+    "采矿工程",
+    "化学工程与工艺",
+    "安全工程",
+    "机械工程",
+    "电气工程及其自动化",
+    "人工智能"
+  ],
+  "photoNote": "本独立审核版的两幅企业图片区暂为带明显声明的非实景示意；正式上线前需要可核验、获得使用许可的企业真实照片与品牌Logo。",
+  "business": [
+    {
+      "title": "煤炭开采与安全生产",
+      "description": "旗下煤矿企业开展煤炭安全开采、智能矿山建设及资源综合利用，生产岗位由具体矿区单位决定。",
+      "tags": "矿业 · 安全",
+      "details": [
+        "煤炭开采",
+        "煤矿安全",
+        "智能矿山"
+      ]
+    },
+    {
+      "title": "化工与新材料",
+      "description": "在煤化工、基础化学品、新能源材料和化工工艺技术等领域开展生产、研发与设备管理。",
+      "tags": "化工 · 材料",
+      "details": [
+        "煤基化工",
+        "新材料",
+        "工艺研发"
+      ]
+    },
+    {
+      "title": "电力与综合能源",
+      "description": "旗下电力企业经营发电、能源供应与设备维护，相关技术岗位需依电力子公司实际公开职位。",
+      "tags": "电力 · 能源",
+      "details": [
+        "发电运营",
+        "能源管理",
+        "电站技术"
+      ]
+    },
+    {
+      "title": "装备制造与工程",
+      "description": "围绕矿山机械、装备制造、机电工程和建筑建材，为能源化工产业提供技术与施工服务。",
+      "tags": "装备 · 工程",
+      "details": [
+        "矿山机械",
+        "电气设备",
+        "工程服务"
+      ]
+    },
+    {
+      "title": "钢铁与铁路物流",
+      "description": "集团参控股钢铁及铁路物流业务，覆盖钢材生产、物流运输与供应链运营。",
+      "tags": "钢铁 · 物流",
+      "details": [
+        "钢铁制造",
+        "铁路运输",
+        "物流协同"
+      ]
+    },
+    {
+      "title": "科技创新与集团职能",
+      "description": "集团总部和科技业务单位开展经营管理、财务审计、人工智能、数据应用和相关人才培养。",
+      "tags": "创新 · 管理",
+      "details": [
+        "技术管理",
+        "财务与法务",
+        "数字化研发"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "mt-function",
+      "title": "职能管理岗（2027集团管培生）",
+      "category": "财务 / 法务 / 综合",
+      "city": "集团统一分配（并未公布固定城市）",
+      "summary": "陕煤集团2027年度管理培训生官方公告明确列出的职能管理岗，计划招聘5—10人，由集团总部统一招录、培养及调配，围绕集团经营、审计、法务与综合管理领域培养人才。",
+      "requirements": "全日制硕士研究生及以上，并同时符合公告的特定院校与本科学校范围；硕士不超过28周岁、博士不超过33周岁，报名最多一岗。此专项原截止日2026-11-30，与普通高校毕业生10月31日截止不是同一批。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "法学",
+        "会计学",
+        "财务管理",
+        "审计学",
+        "经济学",
+        "金融学",
+        "工商管理",
+        "公共管理",
+        "汉语言文学",
+        "新闻学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027管培生 · 硕士及以上 / 严格院校条件",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.shccig.com/index/Article/index.html?cid=97&id=1429903",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "陕西煤业化工集团有限责任公司总部",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "mt-technology",
+      "title": "技术管理岗（2027集团管培生）",
+      "category": "技术 / 工程 / AI",
+      "city": "集团统一分配（地点依岗位调配）",
+      "summary": "陕煤集团2027管培生计划明确单列技术管理岗，5—10人，侧重矿业、化工、安全环保、电气、机械、能源动力、自动化、计算机与人工智能等关键技术和管理方向。",
+      "requirements": "官方要求全日制硕士以上及特定高校范围，硕博年龄、院校与专业对应条件详见集团公告，未列明确具体工厂或城市，不把整个集团矿区当作工作地址；2026-11-30原定截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "采矿工程",
+        "化学工程与工艺",
+        "安全工程",
+        "环境工程",
+        "材料科学与工程",
+        "机械工程",
+        "电气工程及其自动化",
+        "能源与动力工程",
+        "自动化",
+        "土木工程",
+        "计算机科学与技术",
+        "人工智能"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027管培生 · 硕士及以上 / 严格院校条件",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.shccig.com/index/Article/index.html?cid=97&id=1429903",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "陕西煤业化工集团有限责任公司总部",
+      "currentOpenVerified": false
+    }
+  ]
+}

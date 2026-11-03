@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-113",
+  "name": "AIA Digital+",
+  "displayName": "AIA Digital+／友邦资讯科技",
+  "englishName": "AIA Digital+",
+  "aliases": [
+    "友邦资讯科技",
+    "AIA TSS",
+    "AIA Digital Plus",
+    "AIA数字科技"
+  ],
+  "industry": "保险数字技术 · AI全栈开发 · 数据分析 · 算法工程",
+  "subtitle": "2027届两项AI培训生公开方向，原10月31日截止；独立官网申请ID待核",
+  "overview": "AIA Digital+是AIA友邦保险集团科技、数字和分析创新业务的组成部分。友邦资讯科技相关2027校园招聘资料列明两个培训生方向：AI Full Stack和Algorithm Engineer，地点广州。第三方转载给出毕业时间及方向要求，但尚未确认其在友邦官方Workday对应的具体校园职位申请ID；不能将集团普通社招工程师岗位冒充2027校园招聘。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://www.upcv.tech/xiaozhao/cmughxa4i000tm93ot55ffymf.html",
+    "https://www.jdjianli.com/campus/44572",
+    "https://aia.wd3.myworkdayjobs.com/en-US/External",
+    "https://aia.wd3.myworkdayjobs.com/en-US/External/job/Engineer_JR-65783-2"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-113/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-113/photo1.svg",
+        "caption": "AIA Digital+非实景占位图",
+        "alt": "AIA Digital+仅供审核的非实景编辑示意图",
+        "note": "非实景：真实企业现场图片与版权待核，独立PR审核占位。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-113/photo2.svg",
+        "caption": "AIA Digital+非实景占位图",
+        "alt": "AIA Digital+仅供审核的非实景编辑示意图",
+        "note": "非实景：真实企业现场图片与版权待核，独立PR审核占位。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://aia.wd3.myworkdayjobs.com/en-US/External",
+    "label": "AIA官方Workday职位门户（不是已核实的2027校园直达）",
+    "status": "unconfirmed",
+    "subject": "友邦资讯科技AIA TSS相关招聘实体，具体法人和职位编号仍待官网核验",
+    "note": "2027校园资料原网申2026-09-20至2026-10-31，披露广州两项AI培训生方向。未找到官方独立校园单岗ID，当前只能查看友邦集团官方招聘入口并核对其他岗位。"
+  },
+  "majorIntro": "两项均为2027校园公告具名培训方向，而不是有官方独立岗位编号的职位。本科、硕士和博士毕业时间要求及AI能力来自公开校招转录，相关专业仅作岗位筛选参考。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "软件工程",
+    "人工智能",
+    "数学与应用数学",
+    "数据科学与大数据技术",
+    "电子信息工程"
+  ],
+  "photoNote": "两张图片区为显著标明非实景的编辑SVG；Logo为非企业官方字标。正式商用前需图片归属及版权授权。",
+  "business": [
+    {
+      "title": "保险数字技术服务",
+      "description": "AIA Digital+为友邦保险集团的数字系统与服务提供工程技术支持。",
+      "tags": "数字 · 平台",
+      "details": [
+        "数字平台",
+        "技术服务",
+        "保险应用"
+      ]
+    },
+    {
+      "title": "AI应用与创新",
+      "description": "围绕集团数字化服务进行AI软件技术应用、效率优化与创新实践。",
+      "tags": "AI · 创新",
+      "details": [
+        "人工智能",
+        "业务智能化",
+        "AI工具"
+      ]
+    },
+    {
+      "title": "全栈与智能体工程",
+      "description": "采用软件工程方法研发前端、后端与Agent相关应用技术。",
+      "tags": "全栈 · Agent",
+      "details": [
+        "前端研发",
+        "后端研发",
+        "智能体技术"
+      ]
+    },
+    {
+      "title": "机器学习和多模态",
+      "description": "关注机器学习、深度学习、大模型及多模态技术的业务场景。",
+      "tags": "算法 · AI",
+      "details": [
+        "机器学习",
+        "LLM",
+        "多模态应用"
+      ]
+    },
+    {
+      "title": "数据分析与决策支持",
+      "description": "借助数字分析工具支持集团数据处理、智能决策与业务运营。",
+      "tags": "数据 · 分析",
+      "details": [
+        "数据治理",
+        "数据应用",
+        "经营分析"
+      ]
+    },
+    {
+      "title": "跨地域协作与人才培养",
+      "description": "提供面向科技人才的导师协作、专业成长和跨区域项目经验。",
+      "tags": "组织 · 培养",
+      "details": [
+        "导师机制",
+        "技能培训",
+        "团队协作"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "fullstack",
+      "title": "培训生（AI Full Stack方向）（公告方向，官方职位ID待核）",
+      "city": "广东广州市（2027项目公告列示）",
+      "category": "AI / 全栈",
+      "summary": "友邦资讯科技AIA Digital+2027届秋招资料列出的AI全栈培训生方向，关注前端、后端、客户端及Agent应用开发和AI工具结合。",
+      "requirements": "第三方转载的2027项目公告面向2026年7月1日至2027年7月30日期间毕业的本硕博，要求有编程基础和AI学习兴趣；原网申2026年10月31日截止。未找到这条方向独立的AIA官方Workday申请编号。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招方向 · 本硕博 · 原10月31日截止",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmughxa4i000tm93ot55ffymf.html",
+      "url": "https://aia.wd3.myworkdayjobs.com/en-US/External",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "AIA Digital+／友邦资讯科技",
+      "evidenceClass": "thirdparty_announcement_direction"
+    },
+    {
+      "id": "algorithm",
+      "title": "培训生（Algorithm Engineer方向）（公告方向，官方职位ID待核）",
+      "city": "广东广州市（2027项目公告列示）",
+      "category": "AI / 算法",
+      "summary": "友邦资讯科技2027校招资料列出的算法工程培训生方向，关注机器学习、深度学习、大语言模型和多模态算法应用。",
+      "requirements": "第三方转载的2027项目公告面向2026年7月1日至2027年7月30日期间毕业的本硕博，要求有编程基础和AI学习兴趣；原网申2026年10月31日截止。未找到这条方向独立的AIA官方Workday申请编号。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "数学与应用数学",
+        "数据科学与大数据技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招方向 · 本硕博 · 原10月31日截止",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmughxa4i000tm93ot55ffymf.html",
+      "url": "https://aia.wd3.myworkdayjobs.com/en-US/External",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "AIA Digital+／友邦资讯科技",
+      "evidenceClass": "thirdparty_announcement_direction"
+    }
+  ]
+}

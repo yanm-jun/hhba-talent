@@ -1,0 +1,473 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-100",
+  "name": "东软",
+  "displayName": "东软集团股份有限公司",
+  "englishName": "Neusoft Corporation",
+  "aliases": [
+    "东软集团",
+    "Neusoft",
+    "东软集团股份有限公司",
+    "东软2027届校招"
+  ],
+  "industry": "软件工程 · AI · 数字医疗 · 智能汽车软件 · 智慧城市",
+  "subtitle": "2027届校招 · 沈阳、大连、上海及全国软件项目所在地",
+  "overview": "东软集团2027届校园招聘简章由吉林大学就业平台2026年9月4日正式发布，明确列有研发类、开发测试类及其他/实习类共16个具体岗位名称。研发类通常硕士及以上，开发测试及支持类多为本科及以上；工作城市属于类别层面的集合，不代表每个城市均招聘每一岗位。原网申9月1日启动、面试持续至11月30日，但当前职位可否再投递需以官方平台核实。东软集团与东软医疗等独立公司不可混同。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+    "https://www.neusoft.com/cn/about/job/",
+    "https://www.neusoft.com/cn/about/about-neusoft/",
+    "https://neusoft-campus.zhiye.com/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-100/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-100/photo1.svg",
+        "caption": "东软的实景图片待来源与授权审核（目前非实景示意）",
+        "alt": "东软图片审核中的编辑占位图，并非企业真实照片",
+        "note": "非实景：独立验收图片待真实来源、尺寸哈希、版权许可审核。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-100/photo2.svg",
+        "caption": "东软的实景图片待来源与授权审核（目前非实景示意）",
+        "alt": "东软图片审核中的编辑占位图，并非企业真实照片",
+        "note": "非实景：独立验收图片待真实来源、尺寸哈希、版权许可审核。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://neusoft-campus.zhiye.com/",
+    "label": "东软集团官方2027校园招聘系统",
+    "status": "official_portal",
+    "subject": "东软集团股份有限公司及其实际招聘关联单位，按原项目具体职位核实",
+    "note": "2027届校招网申2026年9月1日启动，宣讲9月15日至10月31日，测评面试9月1日至11月30日。11月面试不等于证明职位可继续投递；岗位开放状态未验证。"
+  },
+  "photoNote": "本页不使用无来源的企业环境图片。预览CI从可追溯出版者尝试获取两幅历史现场照片，经尺寸/哈希核验后展示，并明确其历史日期及转载许可状态；正式商用前需获得授权。",
+  "majorIntro": "16个岗位名称来自吉林大学发布的东软集团2027校招简章。由于未逐岗位分配城市与独立岗位ID，城市仅列对应岗位类别的官方招聘地点范围，不伪造某市具体空缺。专业只按岗位职能与公告所示计算机相关要求辅助匹配。",
+  "preferredMajors": [
+    "软件工程",
+    "计算机科学与技术",
+    "人工智能",
+    "数据科学与大数据技术",
+    "电子信息工程",
+    "网络空间安全",
+    "通信工程",
+    "自动化",
+    "日语",
+    "翻译"
+  ],
+  "business": [
+    {
+      "title": "医疗健康软件与数据",
+      "description": "面向医疗机构和卫生主管部门提供电子病历、医疗数据和智能化解决方案，服务智慧医疗建设。",
+      "tags": "医疗 · 软件",
+      "details": [
+        "智慧医院",
+        "医疗数据",
+        "AI医疗"
+      ]
+    },
+    {
+      "title": "智能汽车软件",
+      "description": "提供智能座舱、车载信息娱乐、软件定义汽车和车控平台产品及工程服务。",
+      "tags": "汽车 · 车载",
+      "details": [
+        "智能座舱",
+        "车控系统",
+        "软件工程"
+      ]
+    },
+    {
+      "title": "智慧城市与政务服务",
+      "description": "通过城市公共服务、社保与政务数字化应用提供行业软件及信息系统。",
+      "tags": "智慧城市",
+      "details": [
+        "政务系统",
+        "社保信息化",
+        "城市治理"
+      ]
+    },
+    {
+      "title": "人工智能与数据价值化",
+      "description": "建设AI、大模型和数据分析应用，推动行业数据治理、算法优化和智能化业务落地。",
+      "tags": "AI · 数据",
+      "details": [
+        "行业大模型",
+        "数据平台",
+        "智能分析"
+      ]
+    },
+    {
+      "title": "全球软件工程交付",
+      "description": "服务日本、欧美和全球客户的软件研发、测试及工程技术项目，并建立国际化交付能力。",
+      "tags": "国际 · 交付",
+      "details": [
+        "对日软件服务",
+        "全球研发",
+        "项目实施"
+      ]
+    },
+    {
+      "title": "企业数字化与云平台",
+      "description": "提供云原生、物联网、企业应用及数字运营技术与行业解决方案，支持大型组织的系统集成、业务流程升级和平台服务。",
+      "tags": "云 · 企业",
+      "details": [
+        "企业级平台",
+        "智能运维",
+        "数字化转型"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "algo",
+      "title": "算法工程师",
+      "category": "算法 / AI",
+      "city": "沈阳、大连、上海（研发类城市集合，非逐岗位确定）",
+      "summary": "东软集团2027届招聘简章正式列出“算法工程师”岗位，归属研发类。实际具体职责和部门在官方校招平台查看；页面不把类别发布的全部城市误记为该岗位每处都有缺额。",
+      "requirements": "吉林大学2026年9月4日发布的2027校招简章要求本岗位所属类别硕士研究生及以上（研发类简章），面向2027届毕业生；专业以计算机相关方向为主。具体技能及城市以企业官方单岗JD为准，未核实11月3日仍可网申。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "软件工程",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士研究生及以上（研发类简章）",
+      "url": "https://neusoft-campus.zhiye.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "东软集团股份有限公司（实际岗位主体需在官网确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ai",
+      "title": "人工智能工程师",
+      "category": "算法 / AI",
+      "city": "沈阳、大连、上海（研发类城市集合，非逐岗位确定）",
+      "summary": "东软集团2027届招聘简章正式列出“人工智能工程师”岗位，归属研发类。实际具体职责和部门在官方校招平台查看；页面不把类别发布的全部城市误记为该岗位每处都有缺额。",
+      "requirements": "吉林大学2026年9月4日发布的2027校招简章要求本岗位所属类别硕士研究生及以上（研发类简章），面向2027届毕业生；专业以计算机相关方向为主。具体技能及城市以企业官方单岗JD为准，未核实11月3日仍可网申。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "数据科学与大数据技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士研究生及以上（研发类简章）",
+      "url": "https://neusoft-campus.zhiye.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "东软集团股份有限公司（实际岗位主体需在官网确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "netsec",
+      "title": "网络安全工程师",
+      "category": "安全 / 通信",
+      "city": "沈阳、大连、上海（研发类城市集合，非逐岗位确定）",
+      "summary": "东软集团2027届招聘简章正式列出“网络安全工程师”岗位，归属研发类。实际具体职责和部门在官方校招平台查看；页面不把类别发布的全部城市误记为该岗位每处都有缺额。",
+      "requirements": "吉林大学2026年9月4日发布的2027校招简章要求本岗位所属类别硕士研究生及以上（研发类简章），面向2027届毕业生；专业以计算机相关方向为主。具体技能及城市以企业官方单岗JD为准，未核实11月3日仍可网申。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "网络空间安全",
+        "信息安全",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士研究生及以上（研发类简章）",
+      "url": "https://neusoft-campus.zhiye.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "东软集团股份有限公司（实际岗位主体需在官网确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "comsec",
+      "title": "通信安全工程师",
+      "category": "安全 / 通信",
+      "city": "沈阳、大连、上海（研发类城市集合，非逐岗位确定）",
+      "summary": "东软集团2027届招聘简章正式列出“通信安全工程师”岗位，归属研发类。实际具体职责和部门在官方校招平台查看；页面不把类别发布的全部城市误记为该岗位每处都有缺额。",
+      "requirements": "吉林大学2026年9月4日发布的2027校招简章要求本岗位所属类别硕士研究生及以上（研发类简章），面向2027届毕业生；专业以计算机相关方向为主。具体技能及城市以企业官方单岗JD为准，未核实11月3日仍可网申。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "通信工程",
+        "信息安全",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士研究生及以上（研发类简章）",
+      "url": "https://neusoft-campus.zhiye.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "东软集团股份有限公司（实际岗位主体需在官网确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "tech-mt",
+      "title": "技术管培生（灵犀人才计划）",
+      "category": "算法 / AI",
+      "city": "沈阳、大连、上海（研发类城市集合，非逐岗位确定）",
+      "summary": "东软集团2027届招聘简章正式列出“技术管培生（灵犀人才计划）”岗位，归属研发类。实际具体职责和部门在官方校招平台查看；页面不把类别发布的全部城市误记为该岗位每处都有缺额。",
+      "requirements": "吉林大学2026年9月4日发布的2027校招简章要求本岗位所属类别硕士研究生及以上（研发类简章），面向2027届毕业生；专业以计算机相关方向为主。具体技能及城市以企业官方单岗JD为准，未核实11月3日仍可网申。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "人工智能",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士研究生及以上（研发类简章）",
+      "url": "https://neusoft-campus.zhiye.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "东软集团股份有限公司（实际岗位主体需在官网确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "java",
+      "title": "Java开发工程师",
+      "category": "软件 / 开发",
+      "city": "全国二十余个校招城市（开发测试类整体范围）",
+      "summary": "东软集团2027届招聘简章正式列出“Java开发工程师”岗位，归属开发测试类。实际具体职责和部门在官方校招平台查看；页面不把类别发布的全部城市误记为该岗位每处都有缺额。",
+      "requirements": "吉林大学2026年9月4日发布的2027校招简章要求本岗位所属类别本科及以上（该类招聘简章），面向2027届毕业生；专业以计算机相关方向为主。具体技能及城市以企业官方单岗JD为准，未核实11月3日仍可网申。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（该类招聘简章）",
+      "url": "https://neusoft-campus.zhiye.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "东软集团股份有限公司（实际岗位主体需在官网确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "embedded",
+      "title": "C/嵌入式开发工程师",
+      "category": "嵌入式 / 车载",
+      "city": "全国二十余个校招城市（开发测试类整体范围）",
+      "summary": "东软集团2027届招聘简章正式列出“C/嵌入式开发工程师”岗位，归属开发测试类。实际具体职责和部门在官方校招平台查看；页面不把类别发布的全部城市误记为该岗位每处都有缺额。",
+      "requirements": "吉林大学2026年9月4日发布的2027校招简章要求本岗位所属类别本科及以上（该类招聘简章），面向2027届毕业生；专业以计算机相关方向为主。具体技能及城市以企业官方单岗JD为准，未核实11月3日仍可网申。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "自动化",
+        "电子信息工程",
+        "车辆工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（该类招聘简章）",
+      "url": "https://neusoft-campus.zhiye.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "东软集团股份有限公司（实际岗位主体需在官网确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "cpp",
+      "title": "C/C++开发工程师",
+      "category": "软件 / 开发",
+      "city": "全国二十余个校招城市（开发测试类整体范围）",
+      "summary": "东软集团2027届招聘简章正式列出“C/C++开发工程师”岗位，归属开发测试类。实际具体职责和部门在官方校招平台查看；页面不把类别发布的全部城市误记为该岗位每处都有缺额。",
+      "requirements": "吉林大学2026年9月4日发布的2027校招简章要求本岗位所属类别本科及以上（该类招聘简章），面向2027届毕业生；专业以计算机相关方向为主。具体技能及城市以企业官方单岗JD为准，未核实11月3日仍可网申。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（该类招聘简章）",
+      "url": "https://neusoft-campus.zhiye.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "东软集团股份有限公司（实际岗位主体需在官网确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "dotnet",
+      "title": "C#/.NET开发工程师",
+      "category": "软件 / 开发",
+      "city": "全国二十余个校招城市（开发测试类整体范围）",
+      "summary": "东软集团2027届招聘简章正式列出“C#/.NET开发工程师”岗位，归属开发测试类。实际具体职责和部门在官方校招平台查看；页面不把类别发布的全部城市误记为该岗位每处都有缺额。",
+      "requirements": "吉林大学2026年9月4日发布的2027校招简章要求本岗位所属类别本科及以上（该类招聘简章），面向2027届毕业生；专业以计算机相关方向为主。具体技能及城市以企业官方单岗JD为准，未核实11月3日仍可网申。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（该类招聘简章）",
+      "url": "https://neusoft-campus.zhiye.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "东软集团股份有限公司（实际岗位主体需在官网确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "android",
+      "title": "Android开发工程师",
+      "category": "软件 / 开发",
+      "city": "全国二十余个校招城市（开发测试类整体范围）",
+      "summary": "东软集团2027届招聘简章正式列出“Android开发工程师”岗位，归属开发测试类。实际具体职责和部门在官方校招平台查看；页面不把类别发布的全部城市误记为该岗位每处都有缺额。",
+      "requirements": "吉林大学2026年9月4日发布的2027校招简章要求本岗位所属类别本科及以上（该类招聘简章），面向2027届毕业生；专业以计算机相关方向为主。具体技能及城市以企业官方单岗JD为准，未核实11月3日仍可网申。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（该类招聘简章）",
+      "url": "https://neusoft-campus.zhiye.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "东软集团股份有限公司（实际岗位主体需在官网确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "qa",
+      "title": "测试工程师",
+      "category": "软件 / 测试",
+      "city": "全国二十余个校招城市（开发测试类整体范围）",
+      "summary": "东软集团2027届招聘简章正式列出“测试工程师”岗位，归属开发测试类。实际具体职责和部门在官方校招平台查看；页面不把类别发布的全部城市误记为该岗位每处都有缺额。",
+      "requirements": "吉林大学2026年9月4日发布的2027校招简章要求本岗位所属类别本科及以上（该类招聘简章），面向2027届毕业生；专业以计算机相关方向为主。具体技能及城市以企业官方单岗JD为准，未核实11月3日仍可网申。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（该类招聘简章）",
+      "url": "https://neusoft-campus.zhiye.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "东软集团股份有限公司（实际岗位主体需在官网确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "consulting",
+      "title": "咨询顾问",
+      "category": "咨询 / 交付",
+      "city": "全国（其他及实习类城市集合）",
+      "summary": "东软集团2027届招聘简章正式列出“咨询顾问”岗位，归属其他与实习类。实际具体职责和部门在官方校招平台查看；页面不把类别发布的全部城市误记为该岗位每处都有缺额。",
+      "requirements": "吉林大学2026年9月4日发布的2027校招简章要求本岗位所属类别本科及以上（该类招聘简章），面向2027届毕业生；专业以计算机相关方向为主。具体技能及城市以企业官方单岗JD为准，未核实11月3日仍可网申。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "信息管理与信息系统",
+        "计算机科学与技术",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（该类招聘简章）",
+      "url": "https://neusoft-campus.zhiye.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "东软集团股份有限公司（实际岗位主体需在官网确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "japanese",
+      "title": "日语翻译",
+      "category": "语言 / 翻译",
+      "city": "全国（其他及实习类城市集合）",
+      "summary": "东软集团2027届招聘简章正式列出“日语翻译”岗位，归属其他与实习类。实际具体职责和部门在官方校招平台查看；页面不把类别发布的全部城市误记为该岗位每处都有缺额。",
+      "requirements": "吉林大学2026年9月4日发布的2027校招简章要求本岗位所属类别本科及以上（该类招聘简章），面向2027届毕业生；专业以计算机相关方向为主。具体技能及城市以企业官方单岗JD为准，未核实11月3日仍可网申。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "日语",
+        "翻译",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（该类招聘简章）",
+      "url": "https://neusoft-campus.zhiye.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "东软集团股份有限公司（实际岗位主体需在官网确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "implementation",
+      "title": "实施/技术支持工程师",
+      "category": "咨询 / 交付",
+      "city": "全国（其他及实习类城市集合）",
+      "summary": "东软集团2027届招聘简章正式列出“实施/技术支持工程师”岗位，归属其他与实习类。实际具体职责和部门在官方校招平台查看；页面不把类别发布的全部城市误记为该岗位每处都有缺额。",
+      "requirements": "吉林大学2026年9月4日发布的2027校招简章要求本岗位所属类别本科及以上（该类招聘简章），面向2027届毕业生；专业以计算机相关方向为主。具体技能及城市以企业官方单岗JD为准，未核实11月3日仍可网申。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息管理与信息系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（该类招聘简章）",
+      "url": "https://neusoft-campus.zhiye.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "东软集团股份有限公司（实际岗位主体需在官网确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "intern-dev",
+      "title": "实习软件开发工程师",
+      "category": "软件 / 开发",
+      "city": "全国（其他及实习类城市集合）",
+      "summary": "东软集团2027届招聘简章正式列出“实习软件开发工程师”岗位，归属其他与实习类。实际具体职责和部门在官方校招平台查看；页面不把类别发布的全部城市误记为该岗位每处都有缺额。",
+      "requirements": "吉林大学2026年9月4日发布的2027校招简章要求本岗位所属类别本科及以上（该类招聘简章），面向2027届毕业生；专业以计算机相关方向为主。具体技能及城市以企业官方单岗JD为准，未核实11月3日仍可网申。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（该类招聘简章）",
+      "url": "https://neusoft-campus.zhiye.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "INTERNSHIP",
+      "recruitmentSubject": "东软集团股份有限公司（实际岗位主体需在官网确认）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "intern-test",
+      "title": "实习软件测试工程师",
+      "category": "软件 / 测试",
+      "city": "全国（其他及实习类城市集合）",
+      "summary": "东软集团2027届招聘简章正式列出“实习软件测试工程师”岗位，归属其他与实习类。实际具体职责和部门在官方校招平台查看；页面不把类别发布的全部城市误记为该岗位每处都有缺额。",
+      "requirements": "吉林大学2026年9月4日发布的2027校招简章要求本岗位所属类别本科及以上（该类招聘简章），面向2027届毕业生；专业以计算机相关方向为主。具体技能及城市以企业官方单岗JD为准，未核实11月3日仍可网申。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上（该类招聘简章）",
+      "url": "https://neusoft-campus.zhiye.com/",
+      "evidenceUrl": "https://jdjyw.jlu.edu.cn/mportal/recruit/details?id=5140aa6678554a09952f75fb06c50fdb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "INTERNSHIP",
+      "recruitmentSubject": "东软集团股份有限公司（实际岗位主体需在官网确认）",
+      "currentOpenVerified": false
+    }
+  ]
+}

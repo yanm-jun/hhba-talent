@@ -1,0 +1,27 @@
+{
+  "companyId": "115",
+  "company": "胜帮科技",
+  "auditedOn": "2026-11-03",
+  "commercialReuseRightsVerified": false,
+  "brand": {
+    "status": "editorial_wordmark_not_official_logo",
+    "officialTrademarkPermissionVerified": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": "https://jy.cumtb.edu.cn/Zhaopin/zuijin.html?hold_date=2026-10-31&id=004cfe7e-70a3-d067-5aca-352620ce75ba",
+      "authenticCorporatePremisesPhotoDisplayed": false,
+      "permissionVerified": false
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": "https://www.spangchem.com/",
+      "authenticCorporatePremisesPhotoDisplayed": false,
+      "permissionVerified": false
+    }
+  ],
+  "notes": "No identifiable photo copied without rights verification. Two explicitly non-real editorial vectors are not real office/factory photography; source URLs are for future audits only."
+}

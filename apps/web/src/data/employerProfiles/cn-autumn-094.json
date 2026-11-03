@@ -1,0 +1,347 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-094",
+  "name": "中国大唐集团",
+  "displayName": "中国大唐集团有限公司",
+  "englishName": "China Datang Corporation",
+  "aliases": [
+    "中国大唐",
+    "大唐集团",
+    "China Datang",
+    "大唐2027校招"
+  ],
+  "industry": "发电 · 煤炭煤化工 · 环保 · 科技创新 · 综合能源",
+  "subtitle": "2027届 · 中国大唐数科雄安、长沙、重庆岗位（第一批已截止）",
+  "overview": "中国大唐是中央能源企业，业务涉及电力、煤炭煤化工、金融、环保及商贸物流。本页精选其二级企业中国大唐集团数字科技有限公司2027年公开职位表中的10条有名称、专业和城市的岗位。2026年9月22日至10月31日第一批已截止；不能说这10条目前开放投递。集团其他单位仍可从官方招聘总入口查阅。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://gs.china-cdt.com/cdtgs/xwzx/jtxw/2026/9/I1552059660066881536.html",
+    "https://zhaopin.china-cdt.com/zpgg_xyzp.html",
+    "https://www.china-cdt.com/dtwz/gydt/gsjj/A024001001Gone1.html",
+    "https://career.nankai.edu.cn/correcruit/content/id/119636.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-094/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-094/photo1.svg",
+        "caption": "中国大唐集团业务图片待核（当前为非实景编辑示意）",
+        "alt": "中国大唐集团业务场景非实景示意，不是企业真实办公照片",
+        "note": "非实景：如审查构建能取得来源可核的真实照片，才以该来源图片替换；商业使用权未取得。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-094/photo2.svg",
+        "caption": "中国大唐集团业务图片待核（当前为非实景编辑示意）",
+        "alt": "中国大唐集团业务场景非实景示意，不是企业真实办公照片",
+        "note": "非实景：如审查构建能取得来源可核的真实照片，才以该来源图片替换；商业使用权未取得。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://zhaopin.china-cdt.com/",
+    "label": "中国大唐官方人力资源市场平台（第一批已截止）",
+    "status": "official_portal",
+    "subject": "中国大唐集团有限公司及所属区域、专业、科研等二级单位",
+    "note": "官方2027第一批网申2026-09-22至2026-10-31，现已结束；以下未有单岗JD编号的条目均标明“非具体JD”，仅作为已公开招聘类别存档，不得视为实时岗位。"
+  },
+  "majorIntro": "以下十条均为中国大唐集团数字科技有限公司2027年明确列出的具名岗位，不再用集团笼统招聘方向冒充职位。城市、专业和学历依据公开岗位表；职位仍否开放以大唐人力资源市场系统为准，原第一批已截止。",
+  "preferredMajors": [
+    "电气工程及其自动化",
+    "能源与动力工程",
+    "新能源科学与工程",
+    "机械工程",
+    "自动化",
+    "计算机科学与技术",
+    "人工智能",
+    "软件工程",
+    "金融学",
+    "会计学",
+    "审计学",
+    "物流管理"
+  ],
+  "photoNote": "历史招聘来源与真实招聘机会分开标识。来源照片的拍摄日期可能早于2026年，不代表今日办公现状。发布前还需取得素材使用权。",
+  "business": [
+    {
+      "title": "火电及供热",
+      "description": "集团所属发电企业开展火电、热电联产及供热保障，包含运行调度、设备检修与生产技术。",
+      "tags": "电力 · 保供",
+      "details": [
+        "火力发电",
+        "热电联产",
+        "设备检修"
+      ]
+    },
+    {
+      "title": "风电光伏与新型电力",
+      "description": "推进风电、光伏及储能等新能源业务，面向新能源场站生产技术与智慧运维。",
+      "tags": "新能源 · 储能",
+      "details": [
+        "风光运营",
+        "储能技术",
+        "电力交易"
+      ]
+    },
+    {
+      "title": "煤炭与煤化工",
+      "description": "在煤炭煤化工领域进行相关产业经营，并通过专业公司招聘能源化工和环保人才。",
+      "tags": "资源 · 化工",
+      "details": [
+        "煤炭业务",
+        "煤化工",
+        "安全与环保"
+      ]
+    },
+    {
+      "title": "数字科技与创新",
+      "description": "依托数字科技和科研机构开展电气、能源、人工智能、网络工程及软件研发方向研究。",
+      "tags": "数字 · 科研",
+      "details": [
+        "数字化研发",
+        "智能控制",
+        "科研服务"
+      ]
+    },
+    {
+      "title": "物资商贸和供应链",
+      "description": "所属物资与专业公司从事能源物资采购、物流、贸易和供应链协作业务。",
+      "tags": "供应链 · 物流",
+      "details": [
+        "采购管理",
+        "商贸物流",
+        "供应链风控"
+      ]
+    },
+    {
+      "title": "财务经营与国际业务",
+      "description": "经营财务、审计、市场交易及海外能源合作支持由不同业务单位承担，资格依具体公告。",
+      "tags": "财务 · 国际",
+      "details": [
+        "财务管培",
+        "电力交易",
+        "境外业务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "software",
+      "title": "软件工程师",
+      "category": "信息 / 软件",
+      "city": "雄安新区、长沙",
+      "summary": "中国大唐集团数字科技有限公司2027届官方招聘岗位表明确列出软件工程师，岗位安排在雄安新区或长沙，属于大唐数科及所管理基层科技单位招聘需求。",
+      "requirements": "公告要求硕士研究生及以上，面向计算机、电子信息、自动化、数学等相关专业；2026年10月31日首批报名已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "电子信息工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士研究生及以上（部分岗位仅硕士）· 已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119636.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团数字科技有限公司（具体基层用人单位以官方岗位投递系统为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "cloud-dev",
+      "title": "云计算工程师",
+      "category": "云计算 / 技术",
+      "city": "雄安新区",
+      "summary": "大唐数科2027招聘岗位表单独列出云计算工程师，属其能源数字化技术开发岗位；原公开岗位地点为雄安新区。",
+      "requirements": "招聘公告要求硕士研究生及以上，专业限计算机、电子信息和自动化相关领域；公开首批网申2026年10月31日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士研究生及以上（部分岗位仅硕士）· 已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119636.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团数字科技有限公司（具体基层用人单位以官方岗位投递系统为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "cloud-ops",
+      "title": "云平台运营工程师",
+      "category": "云计算 / 技术",
+      "city": "雄安新区",
+      "summary": "大唐数科2027届岗位表将云平台运营工程师和云计算工程师分开列示，前者原公告工作地点仅雄安新区。",
+      "requirements": "岗位表要求硕士研究生，专业覆盖计算机、电子信息类，实际运营方向工作内容以具体岗位详细要求为准；本批截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "网络工程",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士研究生及以上（部分岗位仅硕士）· 已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119636.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团数字科技有限公司（具体基层用人单位以官方岗位投递系统为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "biz-analyst",
+      "title": "业务分析师",
+      "category": "电力 / 数据",
+      "city": "雄安新区、长沙",
+      "summary": "大唐数科公开招聘岗位表列有业务分析师，专业侧重电气和能源动力，地点为雄安新区及长沙。",
+      "requirements": "官方高校转载岗位表要求硕士研究生及以上，报考专业为电气、能源动力类；不把业务分析师等同于银行金融分析师；10月31日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "能源与动力工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士研究生及以上（部分岗位仅硕士）· 已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119636.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团数字科技有限公司（具体基层用人单位以官方岗位投递系统为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "data-analyst",
+      "title": "数据分析师",
+      "category": "电力 / 数据",
+      "city": "雄安新区、长沙",
+      "summary": "2027大唐数科明确发布数据分析师岗位，地点雄安新区、长沙；与业务分析师同属数字能源数据能力，但专业范围各异。",
+      "requirements": "岗位明确硕士及以上，数学、数据科学与大数据技术、统计、应用统计和财务管理等专业；原第一批报名已结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "统计学",
+        "数学与应用数学",
+        "数据科学与大数据技术",
+        "财务管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士研究生及以上（部分岗位仅硕士）· 已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119636.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团数字科技有限公司（具体基层用人单位以官方岗位投递系统为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "interaction",
+      "title": "交互设计师",
+      "category": "设计 / 交互",
+      "city": "雄安新区",
+      "summary": "大唐数科2027职位表列交互设计师岗位，地点雄安新区，与软件研发岗位分列；原公开专业为数字媒体技术及相关专业。",
+      "requirements": "硕士研究生学历要求，原公告没有完整的原型工具、UI体系或项目作品细则，不得自行添加强制工具条件；10月31日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "数字媒体技术",
+        "交互设计",
+        "数字媒体艺术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士研究生及以上（部分岗位仅硕士）· 已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119636.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团数字科技有限公司（具体基层用人单位以官方岗位投递系统为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "security",
+      "title": "网络安全工程师",
+      "category": "网络 / 安全",
+      "city": "雄安新区",
+      "summary": "中国大唐集团数字科技有限公司2027公告具体列有网络安全工程师，工作地点雄安新区，属于数字能源网络安全方向。",
+      "requirements": "硕士研究生及以上，计算机和电子信息类专业；不能根据岗位名称擅自宣称具备高级安全认证的硬条件；第一批网申截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "网络空间安全",
+        "信息安全",
+        "计算机科学与技术",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士研究生及以上（部分岗位仅硕士）· 已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119636.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团数字科技有限公司（具体基层用人单位以官方岗位投递系统为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "network",
+      "title": "网络工程师",
+      "category": "网络 / 安全",
+      "city": "雄安新区、重庆",
+      "summary": "大唐数科2027岗位表列出网络工程师，在雄安新区及重庆工作，和网络安全工程师是两项不同的具名岗位。",
+      "requirements": "硕士研究生学历，要求计算机类、电子信息类专业；所在单位分配以官方岗位详情为准，首批2026年10月31日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "网络工程",
+        "计算机科学与技术",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士研究生及以上（部分岗位仅硕士）· 已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119636.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团数字科技有限公司（具体基层用人单位以官方岗位投递系统为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hrbp",
+      "title": "人力资源业务合作伙伴（HRBP）",
+      "category": "管理 / 人事",
+      "city": "雄安新区",
+      "summary": "大唐数科2027招聘公告岗位表明确列出HRBP，工作地点雄安新区，主要面向人力资源相关专业的毕业生。",
+      "requirements": "硕士研究生学历要求，专业为人力资源管理、劳动关系、劳动与社会保障；不可把全集团所有人事部门视为该职位招录主体。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人力资源管理",
+        "劳动关系",
+        "劳动与社会保障"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士研究生及以上（部分岗位仅硕士）· 已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119636.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团数字科技有限公司（具体基层用人单位以官方岗位投递系统为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "legal",
+      "title": "法律事务管理",
+      "category": "法律 / 合规",
+      "city": "重庆",
+      "summary": "大唐数科2027年校招公告明确法律事务管理职位，工作地点重庆，属于数科所辖企业招聘的真实岗位名称。",
+      "requirements": "公告列出法学硕士研究生专业要求，准确用人单位按照岗位投递页核对；2026年10月31日首批网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "法学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士研究生及以上（部分岗位仅硕士）· 已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://career.nankai.edu.cn/correcruit/content/id/119636.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团数字科技有限公司（具体基层用人单位以官方岗位投递系统为准）",
+      "currentOpenVerified": false
+    }
+  ]
+}

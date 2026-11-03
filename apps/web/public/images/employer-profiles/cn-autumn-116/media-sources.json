@@ -1,0 +1,27 @@
+{
+  "companyId": "116",
+  "company": "恒神股份",
+  "auditedOn": "2026-11-03",
+  "commercialReuseRightsVerified": false,
+  "brand": {
+    "status": "editorial_wordmark_not_official_logo",
+    "officialTrademarkPermissionVerified": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": "https://hscarbonfibre.com/default/talent/656",
+      "authenticCorporatePremisesPhotoDisplayed": false,
+      "permissionVerified": false
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": "https://hera-webapp.fenbi.com/api/article/detail?app=web&id=469137564389376",
+      "authenticCorporatePremisesPhotoDisplayed": false,
+      "permissionVerified": false
+    }
+  ],
+  "notes": "No identifiable photo copied without rights verification. Two explicitly non-real editorial vectors are not real office/factory photography; source URLs are for future audits only."
+}

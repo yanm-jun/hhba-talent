@@ -1,0 +1,27 @@
+{
+  "companyId": "098",
+  "observedOn": "2026-11-03",
+  "brand": {
+    "status": "editorial_wordmark_not_company_logo",
+    "source": "https://www.casetify.cn/zh_CN/careers",
+    "trademarkUseApproved": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_placeholder",
+      "asset": "images/employer-profiles/cn-autumn-098/photo1.svg",
+      "companyRealImage": false,
+      "commercialRightsVerified": false
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_placeholder",
+      "asset": "images/employer-profiles/cn-autumn-098/photo2.svg",
+      "companyRealImage": false,
+      "commercialRightsVerified": false
+    }
+  ],
+  "commercialRightsVerified": false,
+  "notes": "No photo represented as real workplace. Replace with verified licensed source before final publication."
+}

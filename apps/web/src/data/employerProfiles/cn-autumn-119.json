@@ -1,0 +1,469 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-119",
+  "name": "飞骧科技",
+  "displayName": "深圳飞骧科技股份有限公司",
+  "englishName": "Lansus Technologies",
+  "aliases": [
+    "飞骧科技股份",
+    "LANSUS",
+    "Lansus Technologies",
+    "飞骧科技2027校招"
+  ],
+  "industry": "射频前端芯片 · 5G通信 · Wi-Fi 6/7 · 功率放大器 · 芯片设计",
+  "subtitle": "2027秋招15项具名方向，深圳等7城；原网申10月30日已截止",
+  "overview": "飞骧科技成立于2015年，专注射频前端芯片及模块设计研发与销售，产品面向智能终端、Wi-Fi、IoT及通信场景。2027届校招在2026年8月24日发布资料中列明15项岗位方向，涵盖射频和模拟芯片设计、产品保障、量产测试、市场支持、IT运维与财务。第三方完整公告可核实名称和整个招聘城市列表，但缺乏每个方向的官方独立申请ID及确定城市，故一方向记一条，不将七个城市自动拆成七个空缺。原网申10月30日截止，官网仍设校招入口，但不据此推定旧批次仍开放。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://www.upjianli.com/xiaozhao/cmt80y132002cm9ikm75atw97.html",
+    "https://www.jdjianli.com/campus/3488",
+    "https://www.lansus.com/about/careers",
+    "https://www.lansus.com/en/about/careers"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-119/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-119/photo1.svg",
+        "caption": "飞骧科技：图片审核占位（非实景）",
+        "alt": "飞骧科技非实景图片占位，不代表公司真实厂区或办公室",
+        "note": "非实景编辑图；真实照片、来源和转载授权均需单独审核。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-119/photo2.svg",
+        "caption": "飞骧科技：图片审核占位（非实景）",
+        "alt": "飞骧科技非实景图片占位，不代表公司真实厂区或办公室",
+        "note": "非实景编辑图；真实照片、来源和转载授权均需单独审核。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.lansus.com/about/careers",
+    "label": "飞骧科技官方加入我们/校园招聘入口（原批次职位待核）",
+    "status": "official_portal",
+    "subject": "深圳飞骧科技股份有限公司及其实际招聘业务主体（以具体职位为准）",
+    "note": "2027秋招原网申2026-08-24至2026-10-30。官方招聘网站有校园招聘入口，但没有逐一核实15项方向的独立官方JD及当前可投状态。公开岗位方向不能当15条实时在招。"
+  },
+  "photoNote": "本批图片暂为显著标注的非实景占位，Logo为编辑字标，非企业授权商标。未经授权真实照片不进入正式站。",
+  "majorIntro": "15项来自飞骧2027招聘公告转录的正式方向，整体城市为深圳、上海、北京、西安、无锡、重庆、成都。没有可公开逐岗核定的地区/学历/人数，专业关联只帮助搜索，不能推导为企业已核资格。",
+  "preferredMajors": [
+    "微电子科学与工程",
+    "集成电路设计与集成系统",
+    "电子信息工程",
+    "通信工程",
+    "材料科学与工程",
+    "软件工程",
+    "计算机科学与技术",
+    "市场营销",
+    "会计学"
+  ],
+  "business": [
+    {
+      "title": "射频功率放大器",
+      "description": "设计功率放大器及集成模组，服务手机等通信终端和多频段无线连接。",
+      "tags": "射频 · PA",
+      "details": [
+        "功率放大器",
+        "PA模组",
+        "射频前端"
+      ]
+    },
+    {
+      "title": "5G与多模射频产品",
+      "description": "围绕多制式移动通信进行集成射频前端研发与产品设计。",
+      "tags": "5G · 通信",
+      "details": [
+        "5G前端",
+        "多频段设计",
+        "手机终端"
+      ]
+    },
+    {
+      "title": "Wi-Fi与物联网通信",
+      "description": "面向Wi-Fi 6/7、IoT和智能家居提供射频连接及相关芯片方案。",
+      "tags": "Wi-Fi · IoT",
+      "details": [
+        "Wi-Fi芯片",
+        "智能家居",
+        "物联网"
+      ]
+    },
+    {
+      "title": "射频滤波器及材料研发",
+      "description": "开展滤波器、模拟IC、材料技术和产品方案研发，支撑射频芯片性能提升。",
+      "tags": "滤波 · 材料",
+      "details": [
+        "滤波器",
+        "模拟芯片",
+        "材料工程"
+      ]
+    },
+    {
+      "title": "芯片测试与制造保障",
+      "description": "涉及新品导入、量产测试、质量保证及生产计划等生产保障职能。",
+      "tags": "测试 · NPI",
+      "details": [
+        "量产验证",
+        "新品导入",
+        "质量控制"
+      ]
+    },
+    {
+      "title": "技术销售及企业支持",
+      "description": "提供客户技术支持、销售项目、IT系统和财务管理等业务服务。",
+      "tags": "销售 · 运营",
+      "details": [
+        "技术支持",
+        "销售培养",
+        "数字运维"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "rf-ic",
+      "title": "射频集成电路设计工程师（2027公告具名方向，非独立职位ID）",
+      "city": "深圳、上海、北京、西安、无锡、重庆、成都（全批招聘地区，未逐岗位核实）",
+      "category": "射频 / IC",
+      "summary": "飞骧科技2027秋季校招汇总公告明确列出“射频集成电路设计工程师”这一岗位方向，归属于产品研发、产品保障、市场销售、网络运维或综合职能板块。此项没有公开可核对的官方独立申请编号或确定城市，不应额外拆分名额。",
+      "requirements": "公开的2027招聘资料面向本科、硕士和博士应届生，但没有逐项公布本方向的具体学历门槛、招聘人数与详细技术条件；所关联专业仅用于平台推荐。原2027秋招网申2026年10月30日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "电子科学与技术",
+        "集成电路设计与集成系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕博总体范围，单岗未核",
+      "url": "https://www.lansus.com/about/careers",
+      "evidenceUrl": "https://www.upjianli.com/xiaozhao/cmt80y132002cm9ikm75atw97.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳飞骧科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "analog-ic",
+      "title": "模拟集成电路设计工程师（2027公告具名方向，非独立职位ID）",
+      "city": "深圳、上海、北京、西安、无锡、重庆、成都（全批招聘地区，未逐岗位核实）",
+      "category": "模拟 / IC",
+      "summary": "飞骧科技2027秋季校招汇总公告明确列出“模拟集成电路设计工程师”这一岗位方向，归属于产品研发、产品保障、市场销售、网络运维或综合职能板块。此项没有公开可核对的官方独立申请编号或确定城市，不应额外拆分名额。",
+      "requirements": "公开的2027招聘资料面向本科、硕士和博士应届生，但没有逐项公布本方向的具体学历门槛、招聘人数与详细技术条件；所关联专业仅用于平台推荐。原2027秋招网申2026年10月30日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "电子科学与技术",
+        "集成电路设计与集成系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕博总体范围，单岗未核",
+      "url": "https://www.lansus.com/about/careers",
+      "evidenceUrl": "https://www.upjianli.com/xiaozhao/cmt80y132002cm9ikm75atw97.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳飞骧科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "ai-rf",
+      "title": "AI射频应用开发工程师（2027公告具名方向，非独立职位ID）",
+      "city": "深圳、上海、北京、西安、无锡、重庆、成都（全批招聘地区，未逐岗位核实）",
+      "category": "AI / 射频",
+      "summary": "飞骧科技2027秋季校招汇总公告明确列出“AI射频应用开发工程师”这一岗位方向，归属于产品研发、产品保障、市场销售、网络运维或综合职能板块。此项没有公开可核对的官方独立申请编号或确定城市，不应额外拆分名额。",
+      "requirements": "公开的2027招聘资料面向本科、硕士和博士应届生，但没有逐项公布本方向的具体学历门槛、招聘人数与详细技术条件；所关联专业仅用于平台推荐。原2027秋招网申2026年10月30日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "微电子科学与工程",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕博总体范围，单岗未核",
+      "url": "https://www.lansus.com/about/careers",
+      "evidenceUrl": "https://www.upjianli.com/xiaozhao/cmt80y132002cm9ikm75atw97.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳飞骧科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "filter",
+      "title": "滤波器设计工程师（2027公告具名方向，非独立职位ID）",
+      "city": "深圳、上海、北京、西安、无锡、重庆、成都（全批招聘地区，未逐岗位核实）",
+      "category": "射频 / 滤波器",
+      "summary": "飞骧科技2027秋季校招汇总公告明确列出“滤波器设计工程师”这一岗位方向，归属于产品研发、产品保障、市场销售、网络运维或综合职能板块。此项没有公开可核对的官方独立申请编号或确定城市，不应额外拆分名额。",
+      "requirements": "公开的2027招聘资料面向本科、硕士和博士应届生，但没有逐项公布本方向的具体学历门槛、招聘人数与详细技术条件；所关联专业仅用于平台推荐。原2027秋招网申2026年10月30日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子科学与技术",
+        "微电子科学与工程",
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕博总体范围，单岗未核",
+      "url": "https://www.lansus.com/about/careers",
+      "evidenceUrl": "https://www.upjianli.com/xiaozhao/cmt80y132002cm9ikm75atw97.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳飞骧科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "material",
+      "title": "材料工程师（2027公告具名方向，非独立职位ID）",
+      "city": "深圳、上海、北京、西安、无锡、重庆、成都（全批招聘地区，未逐岗位核实）",
+      "category": "材料 / 射频",
+      "summary": "飞骧科技2027秋季校招汇总公告明确列出“材料工程师”这一岗位方向，归属于产品研发、产品保障、市场销售、网络运维或综合职能板块。此项没有公开可核对的官方独立申请编号或确定城市，不应额外拆分名额。",
+      "requirements": "公开的2027招聘资料面向本科、硕士和博士应届生，但没有逐项公布本方向的具体学历门槛、招聘人数与详细技术条件；所关联专业仅用于平台推荐。原2027秋招网申2026年10月30日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "材料科学与工程",
+        "高分子材料与工程",
+        "微电子科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕博总体范围，单岗未核",
+      "url": "https://www.lansus.com/about/careers",
+      "evidenceUrl": "https://www.upjianli.com/xiaozhao/cmt80y132002cm9ikm75atw97.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳飞骧科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "npi",
+      "title": "新品导入工程师（2027公告具名方向，非独立职位ID）",
+      "city": "深圳、上海、北京、西安、无锡、重庆、成都（全批招聘地区，未逐岗位核实）",
+      "category": "制造 / NPI",
+      "summary": "飞骧科技2027秋季校招汇总公告明确列出“新品导入工程师”这一岗位方向，归属于产品研发、产品保障、市场销售、网络运维或综合职能板块。此项没有公开可核对的官方独立申请编号或确定城市，不应额外拆分名额。",
+      "requirements": "公开的2027招聘资料面向本科、硕士和博士应届生，但没有逐项公布本方向的具体学历门槛、招聘人数与详细技术条件；所关联专业仅用于平台推荐。原2027秋招网申2026年10月30日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工业工程",
+        "电子信息工程",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕博总体范围，单岗未核",
+      "url": "https://www.lansus.com/about/careers",
+      "evidenceUrl": "https://www.upjianli.com/xiaozhao/cmt80y132002cm9ikm75atw97.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳飞骧科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "mass-test",
+      "title": "量产测试工程师（2027公告具名方向，非独立职位ID）",
+      "city": "深圳、上海、北京、西安、无锡、重庆、成都（全批招聘地区，未逐岗位核实）",
+      "category": "质量 / 测试",
+      "summary": "飞骧科技2027秋季校招汇总公告明确列出“量产测试工程师”这一岗位方向，归属于产品研发、产品保障、市场销售、网络运维或综合职能板块。此项没有公开可核对的官方独立申请编号或确定城市，不应额外拆分名额。",
+      "requirements": "公开的2027招聘资料面向本科、硕士和博士应届生，但没有逐项公布本方向的具体学历门槛、招聘人数与详细技术条件；所关联专业仅用于平台推荐。原2027秋招网申2026年10月30日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "测控技术与仪器",
+        "微电子科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕博总体范围，单岗未核",
+      "url": "https://www.lansus.com/about/careers",
+      "evidenceUrl": "https://www.upjianli.com/xiaozhao/cmt80y132002cm9ikm75atw97.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳飞骧科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "plan",
+      "title": "生产计划工程师（2027公告具名方向，非独立职位ID）",
+      "city": "深圳、上海、北京、西安、无锡、重庆、成都（全批招聘地区，未逐岗位核实）",
+      "category": "生产 / 计划",
+      "summary": "飞骧科技2027秋季校招汇总公告明确列出“生产计划工程师”这一岗位方向，归属于产品研发、产品保障、市场销售、网络运维或综合职能板块。此项没有公开可核对的官方独立申请编号或确定城市，不应额外拆分名额。",
+      "requirements": "公开的2027招聘资料面向本科、硕士和博士应届生，但没有逐项公布本方向的具体学历门槛、招聘人数与详细技术条件；所关联专业仅用于平台推荐。原2027秋招网申2026年10月30日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工业工程",
+        "物流管理",
+        "供应链管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕博总体范围，单岗未核",
+      "url": "https://www.lansus.com/about/careers",
+      "evidenceUrl": "https://www.upjianli.com/xiaozhao/cmt80y132002cm9ikm75atw97.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳飞骧科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "purchase",
+      "title": "采购工程师（2027公告具名方向，非独立职位ID）",
+      "city": "深圳、上海、北京、西安、无锡、重庆、成都（全批招聘地区，未逐岗位核实）",
+      "category": "供应链 / 采购",
+      "summary": "飞骧科技2027秋季校招汇总公告明确列出“采购工程师”这一岗位方向，归属于产品研发、产品保障、市场销售、网络运维或综合职能板块。此项没有公开可核对的官方独立申请编号或确定城市，不应额外拆分名额。",
+      "requirements": "公开的2027招聘资料面向本科、硕士和博士应届生，但没有逐项公布本方向的具体学历门槛、招聘人数与详细技术条件；所关联专业仅用于平台推荐。原2027秋招网申2026年10月30日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "物流管理",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕博总体范围，单岗未核",
+      "url": "https://www.lansus.com/about/careers",
+      "evidenceUrl": "https://www.upjianli.com/xiaozhao/cmt80y132002cm9ikm75atw97.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳飞骧科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "qa",
+      "title": "质量工程师（2027公告具名方向，非独立职位ID）",
+      "city": "深圳、上海、北京、西安、无锡、重庆、成都（全批招聘地区，未逐岗位核实）",
+      "category": "质量 / 工程",
+      "summary": "飞骧科技2027秋季校招汇总公告明确列出“质量工程师”这一岗位方向，归属于产品研发、产品保障、市场销售、网络运维或综合职能板块。此项没有公开可核对的官方独立申请编号或确定城市，不应额外拆分名额。",
+      "requirements": "公开的2027招聘资料面向本科、硕士和博士应届生，但没有逐项公布本方向的具体学历门槛、招聘人数与详细技术条件；所关联专业仅用于平台推荐。原2027秋招网申2026年10月30日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "质量管理工程",
+        "电子信息工程",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕博总体范围，单岗未核",
+      "url": "https://www.lansus.com/about/careers",
+      "evidenceUrl": "https://www.upjianli.com/xiaozhao/cmt80y132002cm9ikm75atw97.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳飞骧科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "sales",
+      "title": "销售管培生（2027公告具名方向，非独立职位ID）",
+      "city": "深圳、上海、北京、西安、无锡、重庆、成都（全批招聘地区，未逐岗位核实）",
+      "category": "营销 / 管培",
+      "summary": "飞骧科技2027秋季校招汇总公告明确列出“销售管培生”这一岗位方向，归属于产品研发、产品保障、市场销售、网络运维或综合职能板块。此项没有公开可核对的官方独立申请编号或确定城市，不应额外拆分名额。",
+      "requirements": "公开的2027招聘资料面向本科、硕士和博士应届生，但没有逐项公布本方向的具体学历门槛、招聘人数与详细技术条件；所关联专业仅用于平台推荐。原2027秋招网申2026年10月30日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕博总体范围，单岗未核",
+      "url": "https://www.lansus.com/about/careers",
+      "evidenceUrl": "https://www.upjianli.com/xiaozhao/cmt80y132002cm9ikm75atw97.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳飞骧科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "support",
+      "title": "技术支持工程师（2027公告具名方向，非独立职位ID）",
+      "city": "深圳、上海、北京、西安、无锡、重庆、成都（全批招聘地区，未逐岗位核实）",
+      "category": "技术 / 客户",
+      "summary": "飞骧科技2027秋季校招汇总公告明确列出“技术支持工程师”这一岗位方向，归属于产品研发、产品保障、市场销售、网络运维或综合职能板块。此项没有公开可核对的官方独立申请编号或确定城市，不应额外拆分名额。",
+      "requirements": "公开的2027招聘资料面向本科、硕士和博士应届生，但没有逐项公布本方向的具体学历门槛、招聘人数与详细技术条件；所关联专业仅用于平台推荐。原2027秋招网申2026年10月30日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "通信工程",
+        "电子信息工程",
+        "微电子科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕博总体范围，单岗未核",
+      "url": "https://www.lansus.com/about/careers",
+      "evidenceUrl": "https://www.upjianli.com/xiaozhao/cmt80y132002cm9ikm75atw97.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳飞骧科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "it",
+      "title": "IT工程师（2027公告具名方向，非独立职位ID）",
+      "city": "深圳、上海、北京、西安、无锡、重庆、成都（全批招聘地区，未逐岗位核实）",
+      "category": "IT / 系统",
+      "summary": "飞骧科技2027秋季校招汇总公告明确列出“IT工程师”这一岗位方向，归属于产品研发、产品保障、市场销售、网络运维或综合职能板块。此项没有公开可核对的官方独立申请编号或确定城市，不应额外拆分名额。",
+      "requirements": "公开的2027招聘资料面向本科、硕士和博士应届生，但没有逐项公布本方向的具体学历门槛、招聘人数与详细技术条件；所关联专业仅用于平台推荐。原2027秋招网申2026年10月30日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "网络工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕博总体范围，单岗未核",
+      "url": "https://www.lansus.com/about/careers",
+      "evidenceUrl": "https://www.upjianli.com/xiaozhao/cmt80y132002cm9ikm75atw97.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳飞骧科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "devops",
+      "title": "运维开发工程师（2027公告具名方向，非独立职位ID）",
+      "city": "深圳、上海、北京、西安、无锡、重庆、成都（全批招聘地区，未逐岗位核实）",
+      "category": "软件 / 运维",
+      "summary": "飞骧科技2027秋季校招汇总公告明确列出“运维开发工程师”这一岗位方向，归属于产品研发、产品保障、市场销售、网络运维或综合职能板块。此项没有公开可核对的官方独立申请编号或确定城市，不应额外拆分名额。",
+      "requirements": "公开的2027招聘资料面向本科、硕士和博士应届生，但没有逐项公布本方向的具体学历门槛、招聘人数与详细技术条件；所关联专业仅用于平台推荐。原2027秋招网申2026年10月30日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "信息安全"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕博总体范围，单岗未核",
+      "url": "https://www.lansus.com/about/careers",
+      "evidenceUrl": "https://www.upjianli.com/xiaozhao/cmt80y132002cm9ikm75atw97.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳飞骧科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "finance",
+      "title": "财务管培生（2027公告具名方向，非独立职位ID）",
+      "city": "深圳、上海、北京、西安、无锡、重庆、成都（全批招聘地区，未逐岗位核实）",
+      "category": "财务 / 管培",
+      "summary": "飞骧科技2027秋季校招汇总公告明确列出“财务管培生”这一岗位方向，归属于产品研发、产品保障、市场销售、网络运维或综合职能板块。此项没有公开可核对的官方独立申请编号或确定城市，不应额外拆分名额。",
+      "requirements": "公开的2027招聘资料面向本科、硕士和博士应届生，但没有逐项公布本方向的具体学历门槛、招聘人数与详细技术条件；所关联专业仅用于平台推荐。原2027秋招网申2026年10月30日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "会计学",
+        "财务管理",
+        "金融学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕博总体范围，单岗未核",
+      "url": "https://www.lansus.com/about/careers",
+      "evidenceUrl": "https://www.upjianli.com/xiaozhao/cmt80y132002cm9ikm75atw97.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "深圳飞骧科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    }
+  ]
+}

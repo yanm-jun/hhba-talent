@@ -1,0 +1,238 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-115",
+  "name": "胜帮科技",
+  "displayName": "胜帮科技股份有限公司",
+  "englishName": "Shanghai Spang Chemical Technology",
+  "aliases": [
+    "胜帮科技股份有限公司",
+    "Spangchem",
+    "上海胜帮",
+    "胜帮科技2027校招"
+  ],
+  "industry": "煤化工 · 石油化工 · 工程设计 · EPC · 化工装备",
+  "subtitle": "2027校招：5条真实具名岗位、合计12人；原报名10月31日截止",
+  "overview": "胜帮科技隶属于陕煤集团，主营煤化工、石油化工、精细化工技术研发、工程设计、项目管理与产业技术服务。2027届校园招聘在中国矿业大学（北京）高校就业网列有上海3条工程岗位；专业招聘平台另有湖州2条工厂操作职位，共5条具名职位、12个原计划名额。所有职位原招聘截止2026年10月31日，不应宣传为11月仍能网申。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://jy.cumtb.edu.cn/Zhaopin/zuijin.html?hold_date=2026-10-31&id=004cfe7e-70a3-d067-5aca-352620ce75ba",
+    "https://m.gaoxiaojob.com/company/detail/140550.html",
+    "https://m.gaoxiaojob.com/announcement/detail/432664.html",
+    "https://webhr.shccig.com/webhrn2-zp/xzsy"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-115/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-115/photo1.svg",
+        "caption": "胜帮科技：非实景编辑示意，真实照片授权待核",
+        "alt": "胜帮科技的非实景图片审核占位图",
+        "note": "非实景：真实企业图片来源及转载授权未核实，不能视为企业环境照片。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-115/photo2.svg",
+        "caption": "胜帮科技：非实景编辑示意，真实照片授权待核",
+        "alt": "胜帮科技的非实景图片审核占位图",
+        "note": "非实景：真实企业图片来源及转载授权未核实，不能视为企业环境照片。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://webhr.shccig.com/webhrn2-zp/xzsy",
+    "label": "陕煤集团人才招聘网—胜帮科技原2027校招（已截止）",
+    "status": "official_portal",
+    "subject": "胜帮科技股份有限公司；湖州两条操作员职位具体分子公司需原网申确认",
+    "note": "2027校园招聘公开5个职位、原计划12人。报名2026-10-31截止，官网统一选择胜帮科技股份有限公司后申请；11月3日未核实重新开放。上海3条由高校公告核证，湖州2条来自招聘平台岗位详情。"
+  },
+  "majorIntro": "5条为有独立职位详情或高校原始招聘表核实的具名2027岗位，上海工艺3人、热工1人、配管5人；浙江湖州机电操作2人、工艺操作1人。学历、专业和原截止日期分别列明，选择专业只展示符合相关专业的行。",
+  "preferredMajors": [
+    "化学工程与工艺",
+    "应用化学",
+    "材料科学与工程",
+    "能源与动力工程",
+    "电气工程及其自动化",
+    "机电一体化技术",
+    "过程装备与控制工程"
+  ],
+  "photoNote": "两张图片为标明非实景的审查占位，不是办公/厂区实拍；标识为非官方编辑字标。正式上站前须核实照片真实归属与商用权。",
+  "business": [
+    {
+      "title": "煤化工工艺技术研发",
+      "description": "从事煤焦油加氢、粉煤热解、化工过程综合利用与产业化工艺技术开发。",
+      "tags": "煤化工 · 工艺",
+      "details": [
+        "粉煤热解",
+        "煤焦油技术",
+        "化学工艺"
+      ]
+    },
+    {
+      "title": "石化与精细化工工程",
+      "description": "提供石油化工及精细化工装置的工艺设计、技术研发和项目咨询服务。",
+      "tags": "石化 · 技术",
+      "details": [
+        "精细化工",
+        "化工设计",
+        "技术咨询"
+      ]
+    },
+    {
+      "title": "化工工程设计与配管",
+      "description": "开展化工装置的PFD/P&ID、设备布置、工艺管道、压力容器及系统工程设计。",
+      "tags": "设计 · 配管",
+      "details": [
+        "P&ID",
+        "工艺管道",
+        "设备布置"
+      ]
+    },
+    {
+      "title": "工程采购与建设管理",
+      "description": "参与化工工程项目的采购施工、工程实施、项目管理及开车指导。",
+      "tags": "EPC · 工程",
+      "details": [
+        "采购施工",
+        "项目管理",
+        "工程开车"
+      ]
+    },
+    {
+      "title": "工厂运营维护",
+      "description": "在相关工业基地开展机电设备巡检、工艺运行、维护检修和质量改进。",
+      "tags": "运营 · 维护",
+      "details": [
+        "电仪巡检",
+        "工艺跟踪",
+        "设备保养"
+      ]
+    },
+    {
+      "title": "数字化与科技服务",
+      "description": "通过信息科技、设备数据和技术管理服务支撑化工装置运营与技术开发。",
+      "tags": "数字 · 工业",
+      "details": [
+        "技术系统",
+        "工业数据",
+        "数字服务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "process",
+      "title": "工艺岗（2027校园招聘，原计划3人）",
+      "category": "工艺 / 化工",
+      "city": "上海",
+      "summary": "负责化工装置工艺流程设计，开展物料和热量衡算、工艺设备计算、PFD及P&ID绘制、编制工艺说明和技术表。",
+      "requirements": "2027届应届硕士，需化工相关专业，研究生CET-6至少425分，细化要求以原始招聘职位核实。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "化学工程与工艺",
+        "化学工程",
+        "应用化学",
+        "材料与化工"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士研究生 · 原计划3人",
+      "url": "https://webhr.shccig.com/webhrn2-zp/xzsy",
+      "evidenceUrl": "https://www.gaoxiaojob.com/job/detail/2340491.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "胜帮科技股份有限公司（具体合同主体及工作项目以企业JD为准）",
+      "currentOpenVerified": false,
+      "evidenceClass": "job_level_school_or_recruiter"
+    },
+    {
+      "id": "thermal",
+      "title": "热工岗（2027校园招聘，原计划1人）",
+      "category": "热能 / 化工",
+      "city": "上海",
+      "summary": "开展化工热工和热能工程相关专业技术工作；公告明确热工岗为上海硕士职位，计划1人。",
+      "requirements": "2027届应届硕士，化学工艺、化学工程、热能与动力工程相关专业，研究生CET-6至少425分。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "能源与动力工程",
+        "化学工程与工艺",
+        "动力工程及工程热物理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士研究生 · 原计划1人",
+      "url": "https://webhr.shccig.com/webhrn2-zp/xzsy",
+      "evidenceUrl": "https://www.gaoxiaojob.com/job/detail/2340493.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "胜帮科技股份有限公司（具体合同主体及工作项目以企业JD为准）",
+      "currentOpenVerified": false,
+      "evidenceClass": "job_level_school_or_recruiter"
+    },
+    {
+      "id": "piping",
+      "title": "配管岗（2027校园招聘，原计划5人）",
+      "category": "化工 / 配管",
+      "city": "上海",
+      "summary": "根据工艺设计条件和流程图绘制设备布置及工艺管道方案，建立三维模型、编制管道材料表和采购技术资料。",
+      "requirements": "2027届本科或以上，化工及相关专业；本科CET-4或研究生CET-6至少425分，有设计院实习经历者优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "化学工程与工艺",
+        "过程装备与控制工程",
+        "材料化学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上 · 原计划5人",
+      "url": "https://webhr.shccig.com/webhrn2-zp/xzsy",
+      "evidenceUrl": "https://www.gaoxiaojob.com/job/detail/2340490.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "胜帮科技股份有限公司（具体合同主体及工作项目以企业JD为准）",
+      "currentOpenVerified": false,
+      "evidenceClass": "job_level_school_or_recruiter"
+    },
+    {
+      "id": "electro-operator",
+      "title": "机电操作员（2027校园招聘，原计划2人）",
+      "category": "机电 / 操作",
+      "city": "浙江湖州",
+      "summary": "协助工程师巡检公司电气仪表设备，进行保养与检修计划、设备维护及电仪台账记录，地点湖州。",
+      "requirements": "2027届应届毕业生，大专及以上，机电一体化技术、电气相关专业，有实习经历者优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机电一体化技术",
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 大专及以上 · 原计划2人",
+      "url": "https://webhr.shccig.com/webhrn2-zp/xzsy",
+      "evidenceUrl": "https://www.gaoxiaojob.com/job/detail/2340492.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "胜帮科技股份有限公司（具体合同主体及工作项目以企业JD为准）",
+      "currentOpenVerified": false,
+      "evidenceClass": "job_level_school_or_recruiter"
+    },
+    {
+      "id": "process-operator",
+      "title": "工艺操作员（2027校园招聘，原计划1人）",
+      "category": "化工 / 生产",
+      "city": "浙江湖州",
+      "summary": "协助工程师跟踪生产工艺、分析不良品问题并实施纠正预防措施，支持工艺改进及生产异常排查。",
+      "requirements": "2027届应届毕业生，本科及以上，相关化工材料专业；技能细则以岗位原文和实际聘用主体为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "化学工程与工艺",
+        "应用化学",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上 · 原计划1人",
+      "url": "https://webhr.shccig.com/webhrn2-zp/xzsy",
+      "evidenceUrl": "https://www.gaoxiaojob.com/job/detail/2340489.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "胜帮科技股份有限公司（具体合同主体及工作项目以企业JD为准）",
+      "currentOpenVerified": false,
+      "evidenceClass": "job_level_school_or_recruiter"
+    }
+  ]
+}

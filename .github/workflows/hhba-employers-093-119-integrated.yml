@@ -1,0 +1,67 @@
+name: HHBA Employers 093-119 Integrated 27 Company Audit
+on:
+  push:
+    branches: [feature/employers-093-119-main-integration-20261103]
+  pull_request:
+    paths:
+      - 'apps/web/src/data/employerProfiles/cn-autumn-0*.json'
+      - 'apps/web/src/data/employerProfiles/cn-autumn-1*.json'
+      - 'apps/web/src/pages/UnifiedV2CompanyPage.tsx'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-093-119-integrated-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install exact dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Run all nine batch contracts and role search regression
+        working-directory: apps/web
+        run: |
+          for batch in 093-095 096-098 099-101 102-104 105-107 108-110 111-113 114-116 117-119; do
+            node "scripts/employers-$batch-v2.contract.test.mjs"
+          done
+          node scripts/employer-job-level-search.contract.test.mjs
+          node scripts/major-direct-role-results.contract.test.mjs
+          node scripts/recruitment-market-source-invalid.regression.test.mjs
+      - name: Build unified static site with all 27 routes
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: |
+          npm run build
+          node scripts/materialize-company-route-entries.mjs
+      - name: Check every employer page and associated media
+        run: |
+          for id in $(seq -w 93 119); do
+            test -s "apps/web/dist/companies/autumn/cn-autumn-$id/index.html"
+            # 095–097 reuse licensed earlier brand asset paths from company profiles.
+            case "$id" in
+              095|096|097) test -s "apps/web/dist/images/autumn-real-logos/cn-autumn-$id.svg" ;;
+              *) test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/logo.svg" ;;
+            esac
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/photo1.svg"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/photo2.svg"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/media-sources.json"
+          done
+      - name: Upload combined 27-employer static preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-employers-093-119-integrated-static
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error

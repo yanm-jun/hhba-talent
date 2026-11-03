@@ -1,0 +1,32 @@
+{
+  "companyId": "103",
+  "checkedOn": "2026-11-03",
+  "brand": {
+    "sourceUrl": "",
+    "status": "nonofficial_editorial_wordmark",
+    "trademarkPermissionVerified": false
+  },
+  "commercialReuseRightsVerified": false,
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": {
+        "imageUrl": "https://www.archina.com/uploadWX/20250510/681e9f26a2208174683728699925.jpeg",
+        "articleUrl": "https://www.archina.com/index.php?a=show&g=works&id=158516&m=index",
+        "note": "建筑设计报道明确标注浙江交通集团总部建筑，历史照片，商业使用许可未取得"
+      },
+      "companyRealPhoto": false,
+      "licenceVerified": false,
+      "note": "正式商用前取得来源授权；当前为非实景SVG示意"
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": null,
+      "companyRealPhoto": false,
+      "licenceVerified": false,
+      "note": "正式商用前取得来源授权；当前为非实景SVG示意"
+    }
+  ]
+}
