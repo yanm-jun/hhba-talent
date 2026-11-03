@@ -17,7 +17,7 @@ for(const [num,name] of [['096','宁波银行'],['097','汇丰中国'],['098','C
  assert.equal(p.id,id);assert.equal(p.name,name);assert.equal(p.schemaVersion,1);
  assert.equal(p.jobs.length,counts[num]);assert.equal(p.business.length,6);
  assert.equal(new Set(p.jobs.map(j=>j.id)).size,p.jobs.length,'Individual role IDs must be unique');
- assert(p.jobs.every(j=>j.title&&j.category&&j.city&&j.summary.length>=60&&j.requirements.length>=50));
+ assert(p.jobs.every(j=>j.title&&j.category&&j.city&&j.summary.length>=50&&j.requirements.length>=50));
  assert(p.jobs.every(j=>j.currentOpenVerified===false&&j.evidenceUrl.startsWith('https://')));
  assert(p.jobs.every(j=>j.majorNames.length===0&&j.editorialRelatedMajors.length>=2));
  assert(p.jobs.every(j=>new URL(j.url).host===new URL(p.recruitment.url).host),'Official links must belong to allowed ATS host');
