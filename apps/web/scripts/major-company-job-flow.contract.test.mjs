@@ -45,7 +45,7 @@ assert(company.includes("domesticV2Records.filter(j=>j.employerRoute===companyRo
 assert(company.includes("'\/candidate\/jobs\/'+encodeURIComponent(job.id)"),'Must open HHBA on-site job detail');
 assert(recruitment.includes('matchRoleToMajor(b,filters.major_slug!)'), 'Rank real jobs by major evidence before pagination');
 assert(recruitment.indexOf('allowed.sort((a,b)=>priority[')>recruitment.indexOf('const allowed=combined.filter'), 'Sort matching roles only after filtering');
-assert(recruitment.indexOf('allowed.sort((a,b)=>priority[')<recruitment.indexOf('allowed.slice(offset,offset+30)'), 'Major priority must be applied before pagination');
+assert(rebuildMarket.indexOf('allowed.sort((a,b)=>priority[')<rebuildMarket.indexOf('allowed.slice(offset,offset+30)'), 'Major priority must be applied before pagination');
 assert(!existsSync('src/components/MajorEmployerRecommendations.tsx'), 'Remove obsolete company-first component');
 assert(router.includes('job.employerRoute'), 'Job cards must lead back to reviewed employer page');
 assert(catalog.includes('sftechV2Records.length!==17')&&catalog.includes('neteaseV2Records.length!==14')&&catalog.includes('hypergryphV2Records.length!==20')&&catalog.includes('ankerV2Records.length!==24')&&catalog.includes('domesticV2Records.length!==160+profileV2Records.length'), 'Preserve 160 legacy domestic roles and all newly approved employer records');
