@@ -247,7 +247,7 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
             )}
             {user && !accountHasRole && <p className="hhba-phone-warning" role="status">当前账户尚未开通{title}身份，请先完成对应身份认证。</p>}
             {error && <p className="hhba-phone-error" role="alert">{error}</p>}
-            {error === '该手机号尚未注册，请先注册。' && <p className="hhba-phone-notice" role="status">还没有账户？ <Link to={modeRoute}>立即注册</Link></p>}
+            {error === '该手机号尚未注册，请先注册。' && <button type="button" className="hhba-phone-submit" onClick={() => navigate(modeRoute)}>立即注册<ArrowRight size={17} /></button>}
             {loginHint && <p className="hhba-phone-notice" role="status">{loginHint}</p>}
             {notice && <p className="hhba-phone-notice" role="status">{notice}</p>}
             <button className="hhba-phone-submit" type="submit" disabled={!canSubmit || busy}>{busy ? '验证中…' : mode === 'login' ? '登录' : '注册并继续'}<ArrowRight size={17} /></button>
