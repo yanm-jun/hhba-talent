@@ -43,7 +43,7 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
     ? '/candidate/official-outbound'
     : !candidate && requested === '/recruiter/onboarding'
       ? '/recruiter/onboarding'
-      : candidate ? '/candidate' : '/employer/hub';
+      : candidate ? '/candidate/account' : '/employer/hub';
   const suffix = safeNext === '/candidate/official-outbound' ? '?next=%2Fcandidate%2Fofficial-outbound'
     : safeNext === '/recruiter/onboarding' ? '?next=%2Frecruiter%2Fonboarding' : '';
   const title = candidate ? '求职者' : '招聘方';
