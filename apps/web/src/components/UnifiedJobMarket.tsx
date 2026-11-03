@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRight, ExternalLink, MapPin, RefreshCcw, Search, ShieldCheck } from 'lucide-react';
 import { Link, getJobReturnTarget, navigate } from '../router';
 import { Shell } from './Shell';
@@ -128,8 +128,14 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       company:typeof saved==='string'&&saved.length<=100?saved:initialCompanyQuery()};
   });
   const {slug:selectedMajor,choose:selectMajor}=useSharedMajorSelection();
+  const previousMajor=useRef(selectedMajor);
   useEffect(()=>{
-    setPage(0);
+    // Changing the major resets results; mounting after opening a job detail
+    // must NOT discard the user's saved page and existing filters.
+    if(previousMajor.current!==selectedMajor){
+      previousMajor.current=selectedMajor;
+      setPage(0);
+    }
     setFilters(f=>f.major_slug===selectedMajor?f:{...f,major_slug:selectedMajor});
   },[selectedMajor]);
   const [draft,setDraft]=useState(()=>readMarketState(compact)?.draft??initialJobQuery());
