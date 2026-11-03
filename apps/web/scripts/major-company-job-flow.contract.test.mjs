@@ -40,12 +40,12 @@ assert(market.includes('major_slug:selectedMajor'), 'Market must apply major fil
 assert(market.includes('include_unknown_majors:e.target.checked'), 'User can inspect unverified records');
 assert(recruitment.includes('visibleRoleForMajor(job,f.major_slug'), 'Filters must run before pagination');
 const rebuildMarket=recruitment.slice(recruitment.indexOf('export async function listDomesticRebuildMarket'));
-assert(rebuildMarket.indexOf('rebuildListFilter(job,filters)')>=0&&rebuildMarket.indexOf('rebuildListFilter(job,filters)')<rebuildMarket.indexOf('allowed.slice(offset,offset+30)'), 'Filter before pagination in domestic V2');
+assert(rebuildMarket.indexOf('rebuildListFilter(job,filters)')>=0&&rebuildMarket.indexOf('rebuildListFilter(job,filters)')<rebuildMarket.indexOf('marketPage(allowed,filters,offset)'), 'Filter before pagination in domestic V2');
 assert(company.includes("domesticV2Records.filter(j=>j.employerRoute===companyRoute"), 'Use the same V2 source');
 assert(company.includes("'\/candidate\/jobs\/'+encodeURIComponent(job.id)"),'Must open HHBA on-site job detail');
 assert(recruitment.includes('matchRoleToMajor(b,filters.major_slug!)'), 'Rank real jobs by major evidence before pagination');
 assert(recruitment.indexOf('allowed.sort((a,b)=>priority[')>recruitment.indexOf('const allowed=combined.filter'), 'Sort matching roles only after filtering');
-assert(rebuildMarket.indexOf('allowed.sort((a,b)=>priority[')<rebuildMarket.indexOf('allowed.slice(offset,offset+30)'), 'Major priority must be applied before pagination');
+assert(rebuildMarket.indexOf('allowed.sort((a,b)=>priority[')<rebuildMarket.indexOf('marketPage(allowed,filters,offset)'), 'Major priority must be applied before pagination');
 assert(!existsSync('src/components/MajorEmployerRecommendations.tsx'), 'Remove obsolete company-first component');
 assert(router.includes('job.employerRoute'), 'Job cards must lead back to reviewed employer page');
 assert(catalog.includes('sftechV2Records.length!==17')&&catalog.includes('neteaseV2Records.length!==14')&&catalog.includes('hypergryphV2Records.length!==20')&&catalog.includes('ankerV2Records.length!==24')&&catalog.includes('domesticV2Records.length!==160+profileV2Records.length'), 'Preserve 160 legacy domestic roles and all newly approved employer records');
