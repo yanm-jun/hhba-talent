@@ -27,3 +27,18 @@ test('original HHBA home CTA, main dual-entry and shared job marketplace stay un
  assert.ok(home.includes('title="我要招人"'));
  assert.ok(home.includes('<UnifiedJobMarket compact/>'));
 });
+
+test('remove only the redundant home company discovery banner, without deleting destination or later blocks',()=>{
+ assert.doesNotMatch(home,/home-company-discover-link/);
+ assert.doesNotMatch(home,/企业发现 · 200 家国内企业|探索 200 家企业/);
+ const market=home.indexOf('<UnifiedJobMarket compact/>');
+ const talent=home.indexOf('className="home-talent-service-link"');
+ const marquee=home.indexOf('<HomeCompanyMarquee/>');
+ const banner=home.indexOf('<HomePeopleBanner/>');
+ assert(market>=0&&talent>market&&marquee>talent&&banner>marquee,
+  'After banner removal, the market must flow directly into talent service, followed by the domestic company marquee');
+ assert.match(home,/to="\/talent-service"/);
+ assert.match(home,/className="home-match-promo"/);
+ assert.match(home,/title="我要应聘"/);
+ assert.match(home,/title="我要招人"/);
+});
