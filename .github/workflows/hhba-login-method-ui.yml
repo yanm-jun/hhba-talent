@@ -6,6 +6,8 @@ on:
       - "apps/web/src/pages/PhoneAuthPage.tsx"
       - "apps/web/src/styles/role-auth.css"
       - "apps/web/scripts/phone-auth-method-switch.contract.test.mjs"
+      - "apps/web/scripts/password-guidance.contract.test.mjs"
+      - "apps/web/src/services/realAuth.ts"
       - ".github/workflows/hhba-login-method-ui.yml"
   workflow_dispatch:
 permissions:
@@ -26,7 +28,7 @@ jobs:
         run: npm ci --no-audit --no-fund
       - name: Verify login switch, preserved auth contracts and candidate route
         working-directory: apps/web
-        run: node --test scripts/phone-auth-method-switch.contract.test.mjs scripts/demo-account.contract.test.mjs
+        run: node --test scripts/phone-auth-method-switch.contract.test.mjs scripts/password-guidance.contract.test.mjs scripts/demo-account.contract.test.mjs scripts/real-auth-pnvs.test.mjs
       - name: Typecheck and build existing HHBA frontend
         working-directory: apps/web
         run: npm run build
