@@ -88,7 +88,9 @@ export async function onRequest({request,env}){
     'SELECT COUNT(*) AS n FROM hhba_candidate_resume_upload_events WHERE phone=? AND created_at>=?'
    ).bind(phone,dayAgo).first();
    if(Number(uploads?.n)>=15)return err('UPLOAD_RATE_LIMITED',429);
-   const hash=await sha256Hex(bytes),existing=await db.prepare(
+   const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',bytes));
+   const hash=Array.from(digest,x=>x.toString(16).padStart(2,'0')).join('');
+   const existing=await db.prepare(
     'SELECT id FROM hhba_candidate_resumes WHERE phone=? AND sha256=?'
    ).bind(phone,hash).first();
    if(existing)return err('RESUME_ALREADY_EXISTS',409);
