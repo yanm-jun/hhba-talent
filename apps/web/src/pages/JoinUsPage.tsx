@@ -166,15 +166,22 @@ const roles = [
 
 type Direction = typeof roles[number]['id'];
 type FormData = {
-  name: string; contactType: string; contact: string; direction: Direction | '';
+  name: string; contact: string; direction: Direction | '';
   experience: string; portfolio: string; strength: string;
   weeklyTime: string; mode: string; note: string; acknowledged: boolean;
 };
 const blank: FormData = {
-  name: '', contactType: '邮箱', contact: '', direction: '',
+  name: '', contact: '', direction: '',
   experience: '', portfolio: '', strength: '',
   weeklyTime: '', mode: '', note: '', acknowledged: false,
 };
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const RESUME_MAX_BYTES = 10 * 1024 * 1024;
+const RESUME_EXTS = ['pdf', 'doc', 'docx'];
+function resumeExt(name: string) {
+  const parts = name.toLowerCase().split('.');
+  return parts.length > 1 ? parts[parts.length - 1] : '';
+}
 
 function JumpButton({ onClick, secondary = false, children }: {
   onClick: () => void; secondary?: boolean; children: React.ReactNode
@@ -244,8 +251,11 @@ export function JoinUsPage({ user }: { user: User | null }) {
   const formRef = useRef<HTMLElement | null>(null);
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormData>(blank);
+  const [resume, setResume] = useState<File | null>(null);
   const [error, setError] = useState('');
   const [preview, setPreview] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   useEffect(() => { window.scrollTo(0, 0); }, []);
   const update = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     setForm(old => ({ ...old, [key]: value }));
@@ -262,10 +272,13 @@ export function JoinUsPage({ user }: { user: User | null }) {
   const next = () => {
     if (step === 0) {
       if (!form.name.trim() || !form.contact.trim() || !form.direction) {
-        setError('请先填写称呼、联系方式并选择合作方向。'); return;
+        setError('请先填写称呼、邮箱并选择合作方向。'); return;
+      }
+      if (!EMAIL_RE.test(form.contact.trim())) {
+        setError('请填写正确的邮箱地址。'); return;
       }
       if (form.name.trim().length > 80 || form.contact.trim().length > 180) {
-        setError('请检查输入长度：称呼最多 80 字，联系方式最多 180 字。'); return;
+        setError('请检查输入长度：称呼最多 80 字，邮箱最多 180 字。'); return;
       }
     }
     if (step === 1 && form.experience.trim().length < 10) {
@@ -282,6 +295,46 @@ export function JoinUsPage({ user }: { user: User | null }) {
     setError('');
     setPreview(true);
     jump(formRef);
+  };
+  const submitApplication = async () => {
+    setError('');
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      const body = new FormData();
+      body.append('name', form.name.trim());
+      body.append('email', form.contact.trim());
+      body.append('direction', form.direction);
+      body.append('experience', form.experience.trim());
+      body.append('strength', form.strength.trim());
+      body.append('portfolio', form.portfolio.trim());
+      body.append('weeklyTime', form.weeklyTime);
+      body.append('mode', form.mode);
+      body.append('note', form.note.trim());
+      body.append('acknowledged', form.acknowledged ? 'true' : 'false');
+      if (resume) body.append('resume', resume);
+      const res = await fetch('/api/join-apply', { method: 'POST', body });
+      const data = await res.json().catch(() => null) as { ok?: boolean; error?: string } | null;
+      if (!res.ok || !data?.ok) {
+        const code = data?.error || '';
+        const messages: Record<string, string> = {
+          INVALID_EMAIL: '请填写正确的邮箱地址。',
+          INVALID_INPUT: '请检查填写内容，必填项不能为空或超出长度。',
+          INVALID_DIRECTION: '请选择正确的合作方向。',
+          INVALID_RESUME: '简历仅支持 PDF 或 Word（.doc/.docx），且不超过 10MB。',
+          RATE_LIMITED: '操作太频繁，请稍后再试。',
+          EMAIL_NOT_CONFIGURED: '申请通道尚未完成邮箱配置，请稍后再试。',
+          EMAIL_SEND_FAILED: '申请已保存，但邮件发送失败，请稍后再试或换个时间提交。',
+        };
+        setError(messages[code] || '提交失败，请稍后再试。');
+        return;
+      }
+      setSubmitted(true);
+    } catch {
+      setError('提交失败，请检查网络后重试。');
+    } finally {
+      setSubmitting(false);
+    }
   };
   const selectedRole = roles.find(role => role.id === form.direction);
   return <Shell user={user}>
@@ -399,32 +452,37 @@ export function JoinUsPage({ user }: { user: User | null }) {
         <div className="join-section-head">
           <p className="join-kicker">SAY HELLO</p>
           <h2 id="join-apply-title">告诉我们，你想一起做什么。</h2>
-          <p>先体验这套三步合作意向流程。当前是 GitHub Pages 静态预览，尚无安全申请接收接口，因此不会发送或保存你填写的任何资料。</p>
+          <p>填写并提交后，申请会发送到 HHBA 邮箱，我们会通过你填写的邮箱与你联系。</p>
         </div>
         <div className="join-form-shell">
           <div className="join-form-progress" aria-label="合作意向步骤">
             {['基本信息','专业能力','合作意向'].map((label,i) => <span className={i===step ? 'is-current' : i<step ? 'is-complete' : ''} key={label}><b>{i<step ? '✓' : String(i+1).padStart(2,'0')}</b>{label}</span>)}
           </div>
-          {preview ? <div className="join-form-body join-form-preview">
+          {submitted ? <div className="join-form-body join-form-preview">
+            <span className="join-icon"><CheckCircle2 size={23}/></span>
+            <h3>已收到你的合作意向</h3>
+            <p className="join-preview-warning">申请已发送到 HHBA 邮箱，我们会通过你填写的邮箱与你联系，请留意收件箱。</p>
+            <div className="join-form-actions"><button type="button" className="join-btn join-btn-light" onClick={() => {setSubmitted(false);setPreview(false);setStep(0);setForm(blank);setResume(null)}}>再填一份 <ArrowLeft size={16}/></button></div>
+          </div> : preview ? <div className="join-form-body join-form-preview">
             <span className="join-icon"><CheckCircle2 size={23}/></span>
             <h3>合作意向预览</h3>
-            <p className="join-preview-warning">这是你在浏览器内填写的摘要，<strong>未提交、未发送、未存入 HHBA 数据库</strong>。正式申请通道尚待接入。</p>
+            <p className="join-preview-warning">请核对以下信息，确认无误后点提交，申请会发送到 HHBA 邮箱。</p>
             <dl>
               <div><dt>称呼</dt><dd>{form.name.trim()}</dd></div>
+              <div><dt>邮箱</dt><dd>{form.contact.trim()}</dd></div>
               <div><dt>合作方向</dt><dd>{selectedRole?.title || '—'}</dd></div>
               <div><dt>每周投入</dt><dd>{form.weeklyTime}</dd></div>
               <div><dt>合作偏好</dt><dd>{form.mode}</dd></div>
+              {resume && <div><dt>简历</dt><dd>{resume.name}</dd></div>}
             </dl>
-            <div className="join-form-actions"><button type="button" className="join-btn join-btn-light" onClick={() => {setPreview(false);setStep(0)}}>返回修改 <ArrowLeft size={16}/></button><span className="join-preview-disabled">正式在线申请：尚未开放</span></div>
+            {error && <p className="join-form-error" role="alert">{error}</p>}
+            <div className="join-form-actions"><button type="button" className="join-btn join-btn-light" onClick={() => {setPreview(false);setStep(0)}}>返回修改 <ArrowLeft size={16}/></button><button type="button" className="join-btn join-btn-primary" disabled={submitting} onClick={() => void submitApplication()}>{submitting ? '提交中…' : '提交合作意向'} <ArrowRight size={16}/></button></div>
           </div> : <form className="join-form-body" onSubmit={e => {e.preventDefault(); if(step<2)next();else showPreview()}} noValidate>
             {step === 0 && <>
-              <h3>先认识一下你</h3><p className="join-form-description">你可以先使用常用称呼，不必在静态预览中填写真实隐私信息。</p>
+              <h3>先认识一下你</h3><p className="join-form-description">请填写真实联系邮箱，提交后我们会通过该邮箱与你联系。</p>
               <label htmlFor="join-name">怎么称呼你？ <em>*</em></label>
               <input id="join-name" value={form.name} maxLength={80} autoComplete="off" onChange={e=>update('name',e.target.value)} placeholder="姓名或常用称呼" />
-              <div className="join-field-row">
-                <div><label htmlFor="join-contact-type">联系方式类别 <em>*</em></label><select id="join-contact-type" value={form.contactType} onChange={e=>update('contactType',e.target.value)}><option>邮箱</option><option>微信</option><option>手机号</option><option>其他</option></select></div>
-                <div><label htmlFor="join-contact">联系方式 <em>*</em></label><input id="join-contact" autoComplete="off" maxLength={180} value={form.contact} onChange={e=>update('contact',e.target.value)} placeholder="仅用于体验，不会发送" /></div>
-              </div>
+              <label htmlFor="join-contact">邮箱 <em>*</em></label><input id="join-contact" type="email" autoComplete="email" maxLength={180} value={form.contact} onChange={e=>update('contact',e.target.value)} placeholder="你的邮箱地址，例如 name@example.com" />
               <label htmlFor="join-direction">你希望参与哪个方向？ <em>*</em></label>
               <select id="join-direction" value={form.direction} onChange={e=>update('direction',e.target.value as Direction | '')}>
                 <option value="">请选择合作方向</option>{roles.map(r=><option key={r.id} value={r.id}>{r.title}</option>)}
@@ -438,6 +496,9 @@ export function JoinUsPage({ user }: { user: User | null }) {
               <textarea id="join-strength" value={form.strength} onChange={e=>update('strength',e.target.value)} maxLength={600} rows={3} placeholder="比如：让企业入驻流程更简单，或让岗位搜索更准确" />
               <label htmlFor="join-portfolio">作品 / GitHub / 作品集链接（选填）</label>
               <input id="join-portfolio" type="url" value={form.portfolio} onChange={e=>update('portfolio',e.target.value)} maxLength={400} placeholder="https://（不要填写私人文档的访问密钥）" />
+              <label htmlFor="join-resume">简历（选填，PDF 或 Word，不超过 10MB）</label>
+              <input id="join-resume" type="file" accept=".pdf,.doc,.docx" onChange={e=>{const f=e.target.files?.[0]||null; if(!f){setResume(null);return;} if(!RESUME_EXTS.includes(resumeExt(f.name))){setError('简历仅支持 PDF 或 Word（.doc/.docx）。');setResume(null);return;} if(f.size>RESUME_MAX_BYTES){setError('简历不超过 10MB。');setResume(null);return;} setError('');setResume(f);}} />
+              {resume && <p className="join-form-description">已选择：{resume.name}（{Math.ceil(resume.size/1024)} KB）</p>}
             </>}
             {step === 2 && <>
               <h3>聊聊你想如何一起参与</h3><p className="join-form-description">合作方式及实际权益必须在正式沟通时另行确认。</p>
@@ -454,7 +515,7 @@ export function JoinUsPage({ user }: { user: User | null }) {
               {step > 0 && <button type="button" className="join-btn join-btn-light" onClick={() => {setStep(s=>s-1);setError('')}}><ArrowLeft size={16} /> 上一步</button>}
               <button type="submit" className="join-btn join-btn-primary">{step === 2 ? '查看填写摘要' : '下一步'} <ArrowRight size={16}/></button>
             </div>
-            <p className="join-form-security"><Info size={14}/> 静态体验版本：不发送网络请求、不保存申请资料、不会产生已提交记录。</p>
+            <p className="join-form-security"><Info size={14}/> 提交后，申请资料会发送到 HHBA 邮箱并保存为申请记录，仅用于合作沟通。</p>
           </form>}
         </div>
       </section>
