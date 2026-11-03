@@ -25,6 +25,12 @@ test('saved jobs reject cross-site writes and arbitrary job IDs',async()=>{
  const r=await saved({request:new Request(origin+'/api/saved/greenhouse-abc-123',{method:'PUT',headers:{Origin:'https://attacker.invalid'}}),env});
  assert.equal(r.status,403);
 });
+test('legacy device bookmarks are read-only and cannot create new anonymous account data',async()=>{
+ const r=await saved({request:new Request(origin+'/api/saved/greenhouse-abc-123',{
+  method:'PUT',headers:{Origin:origin}}),env});
+ assert.equal(r.status,410);
+ assert.equal((await r.json()).error,'ACCOUNT_LOGIN_REQUIRED');
+});
 test('saved job reads without device cookie return no persisted records',async()=>{
  const r=await saved({request:new Request(origin+'/api/saved'),env});const a=await r.json();
  assert.equal(r.status,200);assert.equal(a.kind,'HHBA_DEVICE_SAVED_JOBS_V1');assert.deepEqual(a.items,[]);
