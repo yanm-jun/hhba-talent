@@ -103,7 +103,7 @@ export function PrivateResumeVault(){
      {file&&<p>已选择：{file.name} · {(file.size/1024/1024).toFixed(2)} MB</p>}
      <label className="hhba-private-resume-consent">
       <input type="checkbox" checked={consent} disabled={busy} onChange={e=>setConsent(e.target.checked)}/>
-      <span>我同意将本次选择的简历保存在 HHBA 的私有存储中，供本人登录后管理。上传不会自动发送给 DeepSeek 或招聘企业；使用 AI 匹配或对外分享需要另外授权。</span>
+      <span>我已知悉：简历将由 HHBA 使用 Cloudflare R2 亚太区（APAC）的私有对象存储保存，存储位置可能在中国大陆境外。我单独同意保存本次文件以便本人登录后管理；上传不等于授权 DeepSeek 分析或向招聘企业分享。涉及身份证号、住址等非必要敏感信息，请在上传前自行移除。</span>
      </label>
      <button type="button" className="hhba-private-resume-submit" disabled={!file||!consent||busy}
       onClick={()=>void upload()}><ShieldCheck size={17}/>{operation==='upload'?'正在安全保存…':'确认授权并保存简历'}</button>
