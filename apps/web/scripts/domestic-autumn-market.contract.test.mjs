@@ -30,7 +30,7 @@ for(const j of found.jobs){
 assert(ui.includes('招聘项目城市范围（非逐岗）')&&ui.includes('不参与严格的专业＋城市岗位匹配'));
 assert(ui.includes('data-hhba-recruitment-outbound="true"'),'Existing login gating remains in effect');
 assert(market.includes('<DomesticAutumnMarket compact={compact}'),'Domestic roles must be in existing market');
-assert(market.includes('官方原始岗位未提供可确认的专业字段'),'Do not infer unverified overseas majors');
+assert(read('src/services/majorJobMatching.ts').includes("return 'unknown'"),'Unreported major requirements must remain unknown, not invented as eligible');
 assert(app.includes("if(route==='/candidate/domestic-autumn')return <DomesticAutumnPage"));
 assert(router.includes("path==='/candidate/domestic-autumn'"));
 console.log('DOMESTIC_AUTUMN_EVIDENCE_CONTRACT_OK',list.entries.length,found.jobs.length);

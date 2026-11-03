@@ -10,7 +10,8 @@ assert(!market.includes('MajorEmployerRecommendations'),'No company-first profes
 assert(market.includes('与「{majorName(selectedMajor)}」匹配的招聘岗位'),'Selecting a major shows role results');
 assert(market.includes('hhba-major-role-summary'),'Visible role heading should replace employer heading');
 assert(market.includes('majorSlug={selectedMajor}'),'Each actual job card includes professional match status');
-assert(market.includes("to={'/candidate/jobs/'+encodeURIComponent(job.id)}"),'Primary action leads directly to on-site job detail');
+assert(market.includes("const detail='/candidate/jobs/'+encodeURIComponent(job.id)")&&
+  market.includes('<Link to={detail}'),'Primary action leads directly to on-site job detail');
 
 for(const term of [
  '!selectedMajor&&<V2EmployerSearchResults',

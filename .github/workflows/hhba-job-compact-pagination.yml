@@ -1,0 +1,43 @@
+name: HHBA compact role list and 10-item pagination
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/components/UnifiedJobMarket.tsx'
+      - 'apps/web/src/components/JobResultPagination.tsx'
+      - 'apps/web/src/services/jobPaging.mjs'
+      - 'apps/web/src/services/jobPaging.d.mts'
+      - 'apps/web/src/styles/unified-jobs.css'
+      - 'apps/web/scripts/job-paging-ten.contract.test.mjs'
+      - 'apps/web/scripts/featured-brand-jobs.contract.test.mjs'
+      - '.github/workflows/hhba-job-compact-pagination.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compact-job-results:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked frontend dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Check ten-item pagination, major matching, sources and highlighted homepage
+        working-directory: apps/web
+        run: |
+          node --test scripts/job-paging-ten.contract.test.mjs scripts/job-search-facets.test.mjs
+          node --test scripts/featured-brand-jobs.contract.test.mjs
+          node scripts/major-direct-role-results.contract.test.mjs
+          node scripts/major-company-job-flow.contract.test.mjs
+          node scripts/major-eligibility.contract.test.mjs
+          node scripts/v2-market-search.contract.test.mjs
+          node scripts/domestic-autumn-market.contract.test.mjs
+      - name: Build production TypeScript and Vite
+        working-directory: apps/web
+        run: npm run build

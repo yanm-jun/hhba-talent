@@ -165,3 +165,64 @@ a.unified-company-brand:focus-visible,.unified-detail-company-link:focus-visible
 .hhba-role-major-status-unrestricted{background:#f3f6f3;color:#657b69}
 .hhba-role-major-status-unknown{background:#fff6e7;color:#946d2c}
 @media(max-width:720px){.hhba-major-role-summary{padding:16px;flex-direction:column;gap:10px}.hhba-major-role-summary h2{font-size:17px}}
+
+/* HHBA job-first search: one compact row per position across all major/keyword filters. */
+.unified-job-results-anchor{scroll-margin-top:24px}
+.unified-job-grid.unified-role-list{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;margin-top:14px}
+.unified-role-list .unified-job-card{
+  display:grid;grid-template-columns:46px minmax(0,1fr) auto;align-items:center;gap:15px;
+  position:relative;padding:15px 18px;border-radius:12px;min-height:91px;
+  background:#fff;transition:border-color .16s ease,box-shadow .16s ease
+}
+.unified-role-list .unified-job-card:hover{border-color:#b9d5c3;box-shadow:0 4px 14px rgba(31,70,45,.045)}
+.unified-job-list-logo{display:flex;align-items:center;justify-content:center;min-width:0}
+.unified-role-list .unified-brand-logo{width:44px;height:44px;flex-basis:44px;border-radius:10px}
+.unified-role-list .unified-brand-logo img{max-width:35px;max-height:35px;object-fit:contain}
+.unified-role-list .unified-brand-logo-wide{width:44px;flex-basis:44px}
+.unified-role-list .unified-brand-logo-wide img{width:38px;height:auto;max-height:34px}
+.unified-job-list-main{display:flex;flex-direction:column;gap:8px;min-width:0}
+.unified-job-list-title{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap}
+.unified-role-list .unified-job-card h3{font-size:15px;line-height:1.45;font-weight:750;margin:0;min-height:0;letter-spacing:-.15px;overflow-wrap:anywhere}
+.unified-role-list .unified-job-card h3 a{color:#183c2b;text-decoration:none}
+.unified-role-list .unified-job-card h3 a::after{content:"";position:absolute;inset:0;z-index:1;border-radius:12px}
+.unified-role-list .unified-job-card h3 a:focus-visible::after{outline:3px solid #73ac8b;outline-offset:2px}
+.unified-role-list .hhba-role-major-status{margin:0;padding:4px 8px;font-size:10px;white-space:nowrap}
+.unified-job-list-meta{display:flex;align-items:center;gap:5px 13px;min-width:0;flex-wrap:wrap;color:#718077;font-size:11px;line-height:1.5}
+.unified-job-list-meta>span,.unified-job-list-meta>a{display:inline-flex;align-items:center;gap:4px;min-width:0}
+.unified-job-list-meta .unified-company-brand{font-size:12px;font-weight:650;color:#3c6a51;text-decoration:none}
+.unified-job-list-meta .unified-company-brand:hover{text-decoration:underline}
+.unified-job-list-company{font-weight:650;color:#3c6a51}
+.unified-job-list-status{color:#839088}
+.unified-job-list-action{display:flex;align-items:center;gap:11px;justify-content:flex-end;white-space:nowrap}
+.unified-job-list-action>a{display:inline-flex;align-items:center;gap:5px;font-size:12px;text-decoration:none;font-weight:700;color:#287147}
+.unified-job-list-action>a:hover{text-decoration:underline}
+.unified-role-list a.unified-company-brand,
+.unified-role-list .unified-job-list-action>a,
+.unified-role-list .unified-job-list-action button,
+.unified-role-list .unified-job-list-action [role=button]{position:relative;z-index:2}
+.unified-role-list .unified-job-card:focus-within{border-color:#b4d2c0}
+.unified-job-footer{align-items:center;flex-wrap:wrap;gap:16px}
+.unified-job-paging{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:12px 15px}
+.unified-job-pages{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.unified-job-pages button{min-width:34px;min-height:33px;padding:6px 9px;justify-content:center;cursor:pointer}
+.unified-job-pages button[aria-current=page]{background:#eaf5ed;border-color:#9fc7ac;color:#285d3f;font-weight:750}
+.unified-job-pages button:disabled{cursor:default}
+.unified-job-pages button[aria-current=page]:disabled{opacity:1}
+.unified-page-ellipsis{color:#819189;padding:0 3px}
+.unified-job-page-jump{display:flex;align-items:center;gap:7px;color:#66786a;font-size:12px}
+.unified-job-page-jump label{white-space:nowrap}
+.unified-job-page-jump input{width:58px;min-height:33px;border:1px solid #d6e1d9;border-radius:7px;padding:5px 7px;font:inherit;color:#244b35;text-align:center}
+.unified-job-page-jump input:focus-visible,.unified-job-page-jump button:focus-visible,.unified-job-pages button:focus-visible{outline:2px solid #488b64;outline-offset:2px}
+.unified-job-page-jump button{min-height:33px;cursor:pointer}
+@media(max-width:760px){
+ .unified-role-list .unified-job-card{grid-template-columns:40px minmax(0,1fr);gap:10px;padding:12px;min-height:0}
+ .unified-role-list .unified-brand-logo{width:38px;height:38px;flex-basis:38px}
+ .unified-role-list .unified-brand-logo img{max-width:30px;max-height:30px}
+ .unified-job-list-title{gap:6px}
+ .unified-role-list .unified-job-card h3{font-size:14px}
+ .unified-job-list-action{grid-column:2;justify-content:flex-start;gap:15px}
+ .unified-job-list-meta{gap:5px 10px}
+ .unified-job-footer{flex-direction:column;align-items:flex-start}
+ .unified-job-paging{justify-content:flex-start;width:100%}
+}
+@media(prefers-reduced-motion:reduce){.unified-role-list .unified-job-card{transition:none}}
