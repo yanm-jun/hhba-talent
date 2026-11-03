@@ -70,7 +70,7 @@ async function invoke(fixture,route,who,method='GET',body=null,origin=null){
  const request=new Request('https://hhba.work/api/account'+route,{
   method,headers,...(body?{body:JSON.stringify(body)}:{})
  });
- const response=await onRequest({request,env:{HHBA_PNVS_AUTH_DB:fixture.db,ASSETS:assets}});
+ const response=await onRequest({request,env:{HHBA_PNVS_AUTH_DB:fixture.db,ASSETS:fixture.assets||assets}});
  return {status:response.status,headers:response.headers,body:await response.json()};
 }
 test('every private endpoint rejects anonymous and forged tokens without reading a profile',async()=>{
@@ -142,4 +142,28 @@ test('additive D1 migration only adds account-owned tables and never drops real 
  assert.match(sql,/CREATE TABLE IF NOT EXISTS hhba_candidate_saved_jobs/);
  assert.match(sql,/REFERENCES hhba_auth_users\(phone\)/);
  assert.doesNotMatch(sql,/\bDROP\b|DELETE FROM hhba_auth_users|TRUNCATE/i);
+});
+
+test('verified V2 and curated role IDs can be saved by their own accounts',async()=>{
+ const f=dbFixture(),a='13800138000',b='13900139000';
+ const ids={
+  domestic:'cn-v2-schneider-123456',
+  curated:'greenhouse-sample-9876'
+ };
+ f.assets={fetch:async(request)=>{
+  const path=new URL(request.url).pathname;
+  const payload=path==='/data/jobs.json'?{jobs:[]}:
+   path==='/data/saveable-domestic-job-ids.json'?
+    {kind:'HHBA_SAVEABLE_DOMESTIC_JOBS_V1',count:1,ids:[ids.domestic]}:
+   path==='/curated/v1/jobs.json'?
+    {kind:'HHBA_CURATED_JOBS_V1',jobs:[{id:'curated-'+ids.curated}]}:{};
+  return new Response(JSON.stringify(payload),{headers:{'Content-Type':'application/json'}});
+ }};
+ assert.equal((await invoke(f,'/saved/'+ids.domestic,a,'PUT')).status,200);
+ assert.equal((await invoke(f,'/saved/'+ids.curated,a,'PUT')).status,200);
+ assert.equal((await invoke(f,'/saved',a)).body.items.length,2);
+ assert.equal((await invoke(f,'/saved',b)).body.items.length,0);
+ assert.equal((await invoke(f,'/saved/cn-v2-fake-1234',a,'PUT')).status,404);
+ assert.equal((await invoke(f,'/saved/'+ids.domestic,a,'DELETE')).status,200);
+ assert.deepEqual((await invoke(f,'/saved',a)).body.items.map(row=>row.jobId),[ids.curated]);
 });
