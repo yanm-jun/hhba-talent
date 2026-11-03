@@ -99,6 +99,11 @@ export async function onRequest({ request, env }) {
       if (purpose === 'register' && (await getUserByPhone(db, body.phone))) {
         return bad('USER_EXISTS', 409);
       }
+      // 登录发码先查账号：未注册不发短信、不耗限流，直接报未注册，
+      // 让前端在点“获取验证码”时就醒目提示去注册，而不是等码填对提交后才知道。
+      if (purpose === 'login' && !(await getUserByPhone(db, body.phone))) {
+        return bad('USER_NOT_REGISTERED', 403);
+      }
       const hash = await ipHash(request);
       const decision = decideSend(
         {
