@@ -38,8 +38,10 @@ function renderTraffic(target,items){
  }
  root.append(chart);
 }
+function percent(value){return typeof value==='number'&&Number.isFinite(value)?value.toFixed(1)+'%':'—'}
+function accountValue(n){return integer(n)===null?'—':fmt.format(n)}
 function updateGrowth(){
- const t=growth?.traffic,b=growth?.devices,a=growth?.account;
+ const t=growth?.traffic,b=growth?.devices,a=growth?.account,q=growth?.activity;
  setMetric('ov-pv',t?.quality==='collected'?t.pv:null);
  setMetric('growth-pv',t?.quality==='collected'?t.pv:null);
  setMetric('ov-saves',b?.quality==='collected'?b.savedJobs:null);
@@ -54,7 +56,24 @@ function updateGrowth(){
  setMetric('registered-users',a?.quality==='collected'?a.registeredUsers:null);
  byId('active-users').textContent=a?.quality==='collected'&&integer(a.dau)!==null&&integer(a.mau)!==null?fmt.format(a.dau)+' / '+fmt.format(a.mau):'— / —';
  byId('users-interval').textContent=growth?.period?growth.period.start+' 至 '+growth.period.end+' · UTC':'私有数据需要 Cloudflare Access 管理员授权';
- byId('users-data-quality').textContent=a?.quality==='collected'?'真实注册人数来自 PNVS 认证 D1；DAU/MAU 仍待账号级活跃数据接通，不能以匿名 UV 代替。':growth?'Cloudflare D1 已接入访问统计；注册人数尚未连接。':'私有指标需要 Cloudflare Access 管理员授权；未接入不等于零。';
+ byId('users-data-quality').textContent=a?.quality==='collected'?'注册用户来自 PNVS 身份库；匿名访客和历史设备收藏单独统计，不混同账号人数。':growth?'Cloudflare D1 已接入匿名访问；真实注册库未连接。':'私有指标需要 Cloudflare Access 管理员授权；未接入不等于零。';
+  setMetric('users-new-registrations',a?.quality==='collected'?a.newRegistered:null);
+  byId('users-dau-wau').textContent=q?.quality==='collected'?accountValue(q.dau)+' / '+accountValue(q.wau):'— / —';
+  setMetric('users-mau',q?.quality==='collected'?q.mau:null);
+  const r=q?.quality==='collected'?q.firstSeenRetention:null;
+  byId('users-d1').textContent=percent(r?.d1?.rate)+(r?.d1?.eligible?'（'+r.d1.returned+'/'+r.d1.eligible+'）':'');
+  byId('users-d7').textContent=percent(r?.d7?.rate);
+  for(const name of ['jobs','companies','policies','tools','job_save']){
+   setMetric('users-area-'+name.replace('_','-'),q?.quality==='collected'?(q.areaUsers?.[name]||0):null);
+  }
+  setMetric('users-account-saves',a?.quality==='collected'?a.savedJobs:null);
+  byId('users-account-start').textContent=q?.collectedFrom?formatTime(q.collectedFrom):'未应用账号统计迁移';
+  byId('users-account-quality').textContent=q?.quality==='collected'
+   ?'账号 DAU/WAU/MAU 与首次活跃回访仅覆盖已同意统计的登录账号，不等于所有注册用户；留存以首次记录活跃日为起点。'
+   :'尚未采集真实账号活跃，请先部署 D1 迁移和受保护的账号采集接口；这里不显示模拟数据。';
+  if(q?.quality==='collected')renderTraffic('users-account-chart',q.series.map(x=>({day:x.day,pv:x.active})));
+  else byId('users-account-chart').textContent='账号统计未接通，暂无真实曲线';
+  setMetric('investor-users',a?.quality==='collected'?a.registeredUsers:null);
  renderTraffic('users-chart',t?.quality==='collected'?t.series:null);
  if(t?.quality==='collected'){
   const trend=byId('trend-chart');if(trend){trend.className='chart-empty hhba-live-trend';renderTraffic('trend-chart',t.series)}
@@ -80,7 +99,7 @@ async function refreshGrowth(){
 const titles={overview:'数据总览',users:'用户分析',market:'岗位与企业',operations:'运营监控',
  finance:'财务成本',investor:'融资展示',settings:'系统设置'};
 const details={
- users:['注册与活跃用户','未来接入真实身份系统、用户事件与留存数据；不从访问量反推注册用户。'],
+ users:['真实用户增长、回访与使用','账号级行为仅在登录和用户同意后采集，分清注册账户、匿名访客和设备收藏。'],
  market:['企业和岗位质量分析','未来接入岗位状态、ATS 来源及招聘质量报表；当前公开索引汇总在数据总览。'],
  operations:['系统运行与数据同步','未来接入有权限的同步队列和异常日志；当前预览不读取服务器私有日志。'],
  finance:['成本、收入与经营效率','未来接入经核对的收支台账和 API 成本；无记录时不生成模拟营收。'],
@@ -125,7 +144,7 @@ function choosePeriod(value){
  byId('trend-range-label').textContent=value==='custom'&&customRange
   ?customRange.from+' 至 '+customRange.to:text[value];
  byId('period-notice').querySelector('span').textContent='当前岗位指标为最新索引快照，与所选'+text[value]+
-  '范围无关；Cloudflare 同意采集的访问与设备收藏操作按选定日期查询。';
+  '范围无关；匿名访问、账号功能分类和新注册按所选区间查询，DAU/WAU/MAU 始终按今日滚动窗口。';
  if(value!=='custom'||customRange)void refreshGrowth();
 }
 function qualityText(data){
