@@ -1,0 +1,40 @@
+name: HHBA major-to-direct-job results
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/components/UnifiedJobMarket.tsx'
+      - 'apps/web/src/services/liveRecruitment.ts'
+      - 'apps/web/src/components/MajorEmployerRecommendations.tsx'
+      - 'apps/web/src/styles/unified-jobs.css'
+      - 'apps/web/scripts/major-company-job-flow.contract.test.mjs'
+      - 'apps/web/scripts/major-direct-role-results.contract.test.mjs'
+      - '.github/workflows/hhba-major-direct-roles.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  direct-major-job-results:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Test real position matching, academic family and market regression
+        working-directory: apps/web
+        run: |
+          node --test scripts/major-direct-role-results.contract.test.mjs
+          node scripts/major-company-job-flow.contract.test.mjs
+          node scripts/major-eligibility.contract.test.mjs
+          node scripts/v2-market-search.contract.test.mjs
+          node scripts/job-search-facets.test.mjs
+      - name: Build production React and TypeScript
+        working-directory: apps/web
+        run: npm run build
