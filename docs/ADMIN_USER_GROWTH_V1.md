@@ -36,3 +36,9 @@
 ## 本分支交付边界
 增加数据结构、页面级功能类别事件、账号收藏事件、私有聚合 API 和原管理后台视图。
 不自动合并 `main`，不部署到正式生产、不擅自执行 D1 迁移、不宣称当前已获得 DAU/MAU 历史。
+
+## 正式后台域名鉴权
+- 正式入口 `https://hhba.work/admin-preview/` 的 Access 应用独立保护整个 `/admin-preview` 路径，包括私有 `/admin-preview/api/metrics`。
+- 生产环境设置 `HHBA_ACCESS_WORK_ADMIN_AUD` 为对应 Cloudflare Access 应用 Audience；`HHBA_ACCESS_CONSOLE_AUD` 继续保护 pages.dev 管理入口；不可交叉信任。
+- 后台只读聚合；用户账号、简历、手机号不应由管理 API 返回。前端若未获授权明确显示原因而非虚构的 0。
+- 新账号分析采用新的 `hhba.analytics.consent.v2` 授权键；此前只同意匿名统计的用户必须重新选择，才能纳入账号级分析。
