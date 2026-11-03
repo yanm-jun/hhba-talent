@@ -7,8 +7,7 @@ import { V2EmployerSearchResults } from './V2EmployerSearchResults';
 import { DomesticAutumnMarket } from './DomesticAutumnMarket';
 import { MajorFilter } from './MajorFilter';
 import {useSharedMajorSelection} from './CompanyMajorJobs';
-import {MajorEmployerRecommendations} from './MajorEmployerRecommendations';
-import {getSavedMajor,majorName} from '../services/majorJobMatching';
+import {getSavedMajor,majorName,majorMatchLabel,matchRoleToMajor} from '../services/majorJobMatching';
 import { majorById } from '../services/domesticMajors';
 import { SaveJobButton } from './SaveJobButton';
 import { trackEvent } from '../services/engagement';
@@ -68,7 +67,7 @@ function useLanguage() {
   function change(value:Language) {setLang(value);try{sessionStorage.setItem('hhba.jobs.language',value);}catch{}}
   return {lang,change};
 }
-function JobCard({job,lang,asOf}:{job:LiveJob,lang:Language,asOf:string}){
+function JobCard({job,lang,asOf,majorSlug=''}:{job:LiveJob,lang:Language,asOf:string,majorSlug?:string}){
   const source=safeOfficialJobUrl(job);
   const profile=companyProfileForJob(job);
   const companyRoute=companyPageRouteForJob(job);
@@ -86,6 +85,7 @@ function JobCard({job,lang,asOf}:{job:LiveJob,lang:Language,asOf:string}){
       <small>{job.recordKind==='CURATED_HISTORICAL'?(lang==='zh'?'历史公开岗位 · 当前状态未核实':'Archived · Status unverified'):job.recordKind==='DOMESTIC_REBUILT'?(lang==='zh'?'国内岗位资料 · 申请状态待核实':'China role · Availability unverified'):job.recordKind==='DOMESTIC_ARCHIVE_SNAPSHOT'?(lang==='zh'?'历史收录 · 状态待核实':'Archived · Availability unverified'):(lang==='zh'?'官方招聘':'Official opening')}</small>
     </div>
     <h3><Link to={'/candidate/jobs/'+encodeURIComponent(job.id)}>{featuredTitle(job,lang)}</Link></h3>
+    {majorSlug&&<p className={'hhba-role-major-status hhba-role-major-status-'+matchRoleToMajor(job,majorSlug)}>{majorMatchLabel(matchRoleToMajor(job,majorSlug))}</p>}
     <div className="hhba-domestic-major-row"><strong>{lang==='zh'?'专业：':'Major: '}</strong><span>{job.recordKind==='DOMESTIC_REBUILT'&&job.majorNames?.length?job.majorNames.slice(0,4).join('、'):(lang==='zh'?'官方原始岗位未提供可确认的专业字段，请到职位详情核实':'Major requirements not explicitly captured; verify original JD')}</span></div>
     <div className="unified-job-meta"><span><MapPin size={14}/>{featuredLocation(job,lang)||localizedLocation(job,lang)}</span>
       <span>{job.recruitmentType?typeLabel[job.recruitmentType]?.[lang]||job.recruitmentType:(lang==='zh'?'招聘类型待确认':'Type unverified')}</span>
@@ -282,15 +282,21 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       <p>{rebuilding?(lang==='zh'?'海外精选岗位与逐家审核通过的国内岗位 · 使用同一套卡片和站内详情':'Overseas curated jobs and individually reviewed China roles in one layout'):curatedHundred?(lang==='zh'?'精选 10 家知名海外企业 · 100 条已存档岗位（状态待核实）':'100 archived roles from 10 companies; current availability unverified.'):officialThree?(lang==='zh'?'OpenAI、Anthropic、SpaceX 官方公开招聘 · 只展示本次从招聘系统核验到的职位，随时可能变化':'OpenAI, Anthropic and SpaceX public ATS listings · Verified at latest sync'):domesticOnly?(lang==='zh'?'国内历史招聘岗位静态测试 · 岗位状态以企业官网为准':'Historical China listings preview · Check employer for availability'):lang==='zh'?'国内外岗位统一搜索，与应聘页面共享同一套职位数据。':'One job index shared by the homepage and candidate pages.'}</p></div>
       <LanguageSwitcher lang={lang} change={change}/></div>
     {controls}
-    {rebuilding&&selectedMajor&&<MajorEmployerRecommendations filters={filters.major_slug===selectedMajor?filters:{...filters,major_slug:selectedMajor}}/>}
-    {!curatedHundred&&aiAvailable&&<div className="unified-ai-discovery">
+    {selectedMajor&&<section className="hhba-major-role-summary" aria-label="按专业筛选的具体招聘岗位">
+      <div><small>HHBA / PROFESSIONAL MATCHING</small>
+        <h2>与「{majorName(selectedMajor)}」匹配的招聘岗位</h2>
+        <p>直接按已收录的具体岗位专业要求筛选，点击职位查看详情。专业相关不代表已符合全部应聘条件，岗位是否仍开放请以招聘官网为准。</p>
+      </div>
+      <strong>{loading?'匹配中':error?'暂不可用':`${snapshot?.total||0} 条岗位`}</strong>
+    </section>}
+    {!selectedMajor&&!curatedHundred&&aiAvailable&&<div className="unified-ai-discovery">
       <label><input type="checkbox" checked={aiConsent} onChange={e=>setAiConsent(e.target.checked)}/>
         同意将本次搜索描述发送给 DeepSeek 联网查找国内招聘官网；请勿输入身份证等敏感资料。</label>
       <button type="button" disabled={aiBusy} onClick={aiFindOfficialJobs}>
         {aiBusy?'正在查找官网…':'AI 联网找国内岗位'} <Search size={14}/></button>
     </div>}
     {aiError&&<p className="unified-job-state" role="alert">{aiError}</p>}
-    {aiEvidence&&<section className="unified-ai-results" aria-label="DeepSeek 官网招聘线索">
+    {!selectedMajor&&aiEvidence&&<section className="unified-ai-results" aria-label="DeepSeek 官网招聘线索">
       <div className="unified-market-heading"><div><h2>国内官方招聘线索</h2>
         <p>以下仅为 DeepSeek 在企业招聘官网发现的具体岗位页面，<strong>当前是否仍可投递需要进入官网核实</strong>。</p></div></div>
       <div className="unified-job-grid">
@@ -304,15 +310,15 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       </div>
       {aiEvidence.jobs.length===0&&<p className="unified-job-state">暂未检索到具备可核对原文证据的岗位；不会提供虚构的职位。</p>}
     </section>}
-    {!showInlineDiscoveryEntry&&<div className="unified-company-discovery-navigation" style={{margin:'18px auto 8px',maxWidth:1120,display:'flex',justifyContent:'flex-end'}}><Link to="/companies/discover" style={{fontSize:13,color:'#265e45',fontWeight:700,textDecoration:'none'}}>浏览全部 200 家企业档案 →</Link></div>}
-    <V2EmployerSearchResults query={draft} scope={filters.country}
+    {!selectedMajor&&!showInlineDiscoveryEntry&&<div className="unified-company-discovery-navigation" style={{margin:'18px auto 8px',maxWidth:1120,display:'flex',justifyContent:'flex-end'}}><Link to="/companies/discover" style={{fontSize:13,color:'#265e45',fontWeight:700,textDecoration:'none'}}>浏览全部 200 家企业档案 →</Link></div>}
+    {!selectedMajor&&<V2EmployerSearchResults query={draft} scope={filters.country}
       country={filters.location_country||''} major={majorById(selectedMajor)?.name||''}
-      onMatchChange={setV2SearchMatched}/>
-    {!rebuilding&&!curatedHundred&&<DomesticAutumnMarket compact={compact} query={draft}
+      onMatchChange={setV2SearchMatched}/>}
+    {!selectedMajor&&!rebuilding&&!curatedHundred&&<DomesticAutumnMarket compact={compact} query={draft}
       major={majorById(selectedMajor)?.name||''}
       scope={filters.country} country={filters.location_country||''}
       city={cityOptions.find(c=>c.value===filters.city)?.zh||''}/>}
-    {!rebuilding&&!curatedHundred&&<DomesticCompanyResults query={draft} majorSlug={selectedMajor}
+    {!selectedMajor&&!rebuilding&&!curatedHundred&&<DomesticCompanyResults query={draft} majorSlug={selectedMajor}
       scope={filters.country} country={filters.location_country||''}
       city={cityOptions.find(c=>c.value===filters.city)?.zh||''}/>}
     {intentLabels.length>0&&<div className="unified-search-interpreted">
@@ -340,8 +346,8 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       ?(featuredPending?'正在核验六个精选企业岗位…':'正在读取真实岗位…')
       :(featuredPending?'Verifying six highlighted official jobs…':'Loading jobs…')}</p>:
       error?<div className="unified-job-state" role="alert">{lang==='zh'?error:'Jobs temporarily unavailable. Please retry.'}<button type="button" onClick={()=>setRetry(x=>x+1)}><RefreshCcw size={15}/> {lang==='zh'?'重试':'Retry'}</button></div>:
-      shown.length?<div className="unified-job-grid">{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated}/>)}</div>:
-        <div className="unified-job-state">{domesticOnly?(lang==='zh'?'当前没有符合条件的历史岗位。':'No matching archived jobs.'):v2SearchMatched?(lang==='zh'?'以上已找到匹配的 V2 企业及其岗位方向；当前正式岗位列表未有其他近期核验结果。':'The V2 employer and its archived role directions are shown above; no additional recently verified jobs match.'):lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
+      shown.length?<div className="unified-job-grid" aria-label={selectedMajor?'专业相关的真实岗位':'招聘岗位'}>{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated} majorSlug={selectedMajor}/>)}</div>:
+        <div className="unified-job-state">{selectedMajor?(lang==='zh'?'当前没有符合该专业及其他筛选条件的已收录岗位。可尝试调整城市、招聘类型，或主动勾选“专业要求未披露的岗位”进行核验。':'No recorded roles meet this major and your other filters. Try adjusting your criteria.'):domesticOnly?(lang==='zh'?'当前没有符合条件的历史岗位。':'No matching archived jobs.'):v2SearchMatched?(lang==='zh'?'以上已找到匹配的 V2 企业及其岗位方向；当前正式岗位列表未有其他近期核验结果。':'The V2 employer and its archived role directions are shown above; no additional recently verified jobs match.'):lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
     {!curatedHundred&&!domesticOnly&&!loading&&defaultView&&featuredError&&
       <div className="unified-featured-fallback" role="status">
         <span>{lang==='zh'?'六个精选岗位未能及时完成最新核验，当前显示其他近期核验的真实职位。':

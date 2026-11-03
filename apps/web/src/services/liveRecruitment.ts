@@ -4,7 +4,7 @@ import {searchJobs, type SearchFacet} from './jobSearchFacets.mjs';
 import {loadOfficialSearchFacets} from './officialSearchIndex';
 import {domesticV2Records, domesticV2ById, assertDomesticRebuildIntegrity} from './domesticRebuildJobs';
 import {allowedEmployerProfileJobLink,profileAliasesForJob} from './employerProfiles';
-import {visibleRoleForMajor} from './majorJobMatching';
+import {matchRoleToMajor,visibleRoleForMajor} from './majorJobMatching';
 import {educationMatchesApplicant} from './majorEligibility.mjs';
 export type Language = 'zh' | 'en';
 export type LiveJob = {
@@ -449,10 +449,18 @@ export async function listDomesticRebuildMarket(filters:LiveFilters,offset:numbe
   ...domesticV2Records.slice(49,54),...overseas.slice(55,60),
   ...domesticV2Records.slice(54),...overseas.slice(60)];
  const allowed=combined.filter(job=>!!safeOfficialJobUrl(job)&&rebuildListFilter(job,filters));
+ // Rank concrete roles by explicit professional relevance before pagination.
+ // Roles with undisclosed requirements only appear after explicit opt-in.
+ if(filters.major_slug){
+  const priority={related:3,unrestricted:2,unknown:1,other:0,all:0};
+  allowed.sort((a,b)=>priority[matchRoleToMajor(b,filters.major_slug!)]-priority[matchRoleToMajor(a,filters.major_slug!)]);
+ }
  // Name matches must not be hidden behind 30 unrelated job-summary hits.
  // Apply relevance ordering AFTER all filters and BEFORE pagination.
  const term=filters.q.normalize('NFKC').toLowerCase().trim();
- if(term){
+ // With a selected major, retain evidence-based role priority instead of
+ // moving enterprise-name matches back to the front.
+ if(term&&!filters.major_slug){
   const nameScore=(job:LiveJob)=>{
    const aliases=job.platform==='shkp-official-detail'?' SHKP Sun Hung Kai Properties 新鴻基地產':
     job.platform==='anker-2027-campus-official'?' Anker Innovations':
