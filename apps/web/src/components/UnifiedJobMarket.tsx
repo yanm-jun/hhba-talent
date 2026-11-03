@@ -75,7 +75,10 @@ function JobCard({job,lang,asOf,majorSlug=''}:{job:LiveJob,lang:Language,asOf:st
   const companyRoute=companyPageRouteForJob(job);
   if(!source || (!['CURATED_HISTORICAL','DOMESTIC_REBUILT'].includes(job.recordKind||'') && officialStatus(job,asOf)!=='recent'))return null;
   const detail='/candidate/jobs/'+encodeURIComponent(job.id);
-  const company=localizedCompany(job,lang),title=featuredTitle(job,lang);
+  const company=localizedCompany(job,lang);
+  const grouped=!!job.marketGroup&&job.marketGroup.variants.length>1;
+  const title=grouped&&lang==='zh'?job.marketGroup!.title:featuredTitle(job,lang);
+  const cityLabel=grouped?job.marketGroup!.cities.join('、'):featuredLocation(job,lang)||localizedLocation(job,lang);
   const status=job.recordKind==='CURATED_HISTORICAL'
     ?(lang==='zh'?'历史公开岗位 · 状态待核实':'Archived · Status unverified')
     :job.recordKind==='DOMESTIC_REBUILT'
@@ -94,7 +97,8 @@ function JobCard({job,lang,asOf,majorSlug=''}:{job:LiveJob,lang:Language,asOf:st
         {profile?<Link className="unified-company-brand" to={'/companies/'+profile.slug} title={lang==='zh'?'查看企业档案':'View employer profile'}>{company}</Link>:
          companyRoute?<Link className="unified-company-brand" to={companyRoute} title={lang==='zh'?'查看企业档案':'View employer profile'}>{company}</Link>:
          <span className="unified-job-list-company">{company}</span>}
-        <span className="unified-job-list-location"><MapPin size={13}/>{featuredLocation(job,lang)||localizedLocation(job,lang)}</span>
+        <span className="unified-job-list-location"><MapPin size={13}/>{cityLabel}</span>
+        {grouped&&<span className="unified-job-city-count">{lang==='zh'?job.marketGroup!.variants.length+' 条城市岗位':job.marketGroup!.variants.length+' location-specific roles'}</span>}
         <span>{job.recruitmentType?typeLabel[job.recruitmentType]?.[lang]||job.recruitmentType:(lang==='zh'?'招聘类型待核实':'Type unverified')}</span>
         {job.remote===true&&<span>{lang==='zh'?'远程':'Remote'}</span>}
         <span className="unified-job-list-status">{status}</span>
@@ -103,9 +107,25 @@ function JobCard({job,lang,asOf,majorSlug=''}:{job:LiveJob,lang:Language,asOf:st
     <div className="unified-job-list-action">
       <SaveJobButton jobId={job.id}/>
       <Link to={detail} aria-label={(lang==='zh'?'查看岗位：':'View role: ')+title}>
-        {lang==='zh'?'查看岗位':'View role'} <ArrowRight size={15}/>
+        {grouped?(lang==='zh'?'查看首个城市':'View first city'):(lang==='zh'?'查看岗位':'View role')} <ArrowRight size={15}/>
       </Link>
     </div>
+    {grouped&&<details className="unified-job-variants">
+      <summary>{lang==='zh'?'展开 '+job.marketGroup!.variants.length+' 条具体岗位（各城市可分别收藏）':
+        'Show '+job.marketGroup!.variants.length+' original postings and bookmarks'}</summary>
+      <div className="unified-job-variant-list">
+        {job.marketGroup!.variants.map(variant=><div key={variant.id} className="unified-job-variant-row">
+          <span className="unified-job-variant-city"><MapPin size={13}/>{variant.locationZh||variant.location||'地点待核实'}</span>
+          <span className="unified-job-variant-title">{lang==='zh'?variant.titleZh||variant.title:variant.title}</span>
+          <SaveJobButton jobId={variant.id} compact/>
+          <Link to={'/candidate/jobs/'+encodeURIComponent(variant.id)}>
+            {lang==='zh'?'查看岗位':'View details'} <ArrowRight size={13}/>
+          </Link>
+        </div>)}
+      </div>
+      <p>{lang==='zh'?'各城市岗位保留独立编号与资格要求，申请状态以企业官网为准。':
+        'Each posting retains its own ID and employer requirements; verify current availability.'}</p>
+    </details>}
   </article>;
 }
 function LanguageSwitcher({lang,change}:{lang:Language,change:(value:Language)=>void}){
@@ -286,7 +306,8 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
         <h2>与「{majorName(selectedMajor)}」匹配的招聘岗位</h2>
         <p>直接按已收录的具体岗位专业要求筛选，点击职位查看详情。专业相关不代表已符合全部应聘条件，岗位是否仍开放请以招聘官网为准。</p>
       </div>
-      <strong>{loading?'匹配中':error?'暂不可用':`${snapshot?.total||0} 条岗位`}</strong>
+      <strong>{loading?'匹配中':error?'暂不可用':snapshot?.sourceTotal!==undefined&&snapshot.sourceTotal!==snapshot.total?
+        `${snapshot.sourceTotal} 条岗位 · ${snapshot.total} 组展示`:`${snapshot?.total||0} 条岗位`}</strong>
     </section>}
     {!selectedMajor&&!curatedHundred&&aiAvailable&&<div className="unified-ai-discovery">
       <label><input type="checkbox" checked={aiConsent} onChange={e=>setAiConsent(e.target.checked)}/>
@@ -346,8 +367,11 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       shown.length?<div className="unified-job-grid unified-role-list" aria-label={selectedMajor?'专业相关的真实岗位':'招聘岗位'}>{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated} majorSlug={selectedMajor}/>)}</div>:
         <div className="unified-job-state">{selectedMajor?(lang==='zh'?'当前没有符合该专业及其他筛选条件的已收录岗位。可尝试调整城市、招聘类型，或主动勾选“专业要求未披露的岗位”进行核验。':'No recorded roles meet this major and your other filters. Try adjusting your criteria.'):domesticOnly?(lang==='zh'?'当前没有符合条件的历史岗位。':'No matching archived jobs.'):v2SearchMatched?(lang==='zh'?'以上已找到匹配的 V2 企业及其岗位方向；当前正式岗位列表未有其他近期核验结果。':'The V2 employer and its archived role directions are shown above; no additional recently verified jobs match.'):lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
     <div className="unified-job-footer">
-      <span>{lang==='zh'? `共匹配 ${snapshot?.total.toLocaleString()||0} 条 · 本页 ${!loading&&!error?shown.length:0} 条 · 来源更新时间：${formatDate(snapshot?.updated)}`
-        : `${snapshot?.total.toLocaleString()||0} matching jobs · ${!loading&&!error?shown.length:0} on this page · Updated ${formatDate(snapshot?.updated)}`}</span>
+      <span>{snapshot?.sourceTotal!==undefined&&snapshot.sourceTotal!==snapshot.total?
+        (lang==='zh'?`共 ${snapshot.sourceTotal.toLocaleString()} 条原始岗位 · 合并展示 ${snapshot.total.toLocaleString()} 组 · 本页 ${!loading&&!error?shown.length:0} 组 · 来源更新时间：${formatDate(snapshot.updated)}`:
+         `${snapshot.sourceTotal.toLocaleString()} original roles · ${snapshot.total.toLocaleString()} display groups · ${!loading&&!error?shown.length:0} on this page · Updated ${formatDate(snapshot.updated)}`):
+        (lang==='zh'?`共匹配 ${snapshot?.total.toLocaleString()||0} 条 · 本页 ${!loading&&!error?shown.length:0} 条 · 来源更新时间：${formatDate(snapshot?.updated)}`:
+         `${snapshot?.total.toLocaleString()||0} matching jobs · ${!loading&&!error?shown.length:0} on this page · Updated ${formatDate(snapshot?.updated)}`)}</span>
       {!error&&!loading&&snapshot&&<JobResultPagination page={page} total={snapshot.total} pageSize={JOBS_PER_PAGE}
         loading={loading} lang={lang} onChange={next=>{
           if(next<0||next===page||next>=pageCount(snapshot.total))return;
