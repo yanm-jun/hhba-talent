@@ -9,6 +9,7 @@ on:
       - 'apps/web/src/components/UnifiedJobMarket.tsx'
       - 'apps/web/src/styles/unified-jobs.css'
       - 'apps/web/scripts/market-role-diversity.contract.test.mjs'
+      - 'apps/web/scripts/market-role-real-index.test.mjs'
       - 'apps/web/scripts/major-direct-role-results.contract.test.mjs'
       - 'apps/web/scripts/major-company-job-flow.contract.test.mjs'
       - '.github/workflows/hhba-role-group-diversity.yml'
@@ -34,6 +35,7 @@ jobs:
         run: |
           node --check src/services/marketRolePresentation.mjs
           node --test scripts/market-role-diversity.contract.test.mjs scripts/job-paging-ten.contract.test.mjs
+          node scripts/market-role-real-index.test.mjs
           node scripts/major-direct-role-results.contract.test.mjs
           node scripts/major-company-job-flow.contract.test.mjs
           node scripts/major-eligibility.contract.test.mjs
