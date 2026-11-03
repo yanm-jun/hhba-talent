@@ -12,7 +12,7 @@ type Business={title:string;description:string;tags:string;details:string[]};
 type Role={
  id:string;title:string;city:string;summary:string;requirements:string;category?:string;
  majorNames:string[];editorialRelatedMajors:string[];majorUnrestricted:boolean;
- educationLabel:string;currentOpenVerified:false;observedOn:string;evidenceUrl:string;
+ educationLabel:string;currentOpenVerified:false;observedOn:string;evidenceUrl:string;url:string;
 };
 type Photo={path:string;caption:string;note:string;alt:string};
 type Company={
@@ -208,7 +208,7 @@ export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
  const minieye=id==='cn-autumn-035';
  const keyence=id==='cn-autumn-157';
  // Shared four-block V2 layout for all approved enterprise records.
- const batch3756=/^cn-autumn-(?:03[6-9]|04[0-9]|05[0-9]|06[0-9]|07[0-9]|08[0-9]|09[0-2])$/.test(id);
+ const batch3756=/^cn-autumn-(?:03[6-9]|04[0-9]|05[0-9]|06[0-9]|07[0-9]|08[0-9]|09[0-9]|10[01])$/.test(id);
  const showcase=qizheng||weipu||bodor||pxw||minieye||keyence||batch3756;
  const detailedCards=weipu||bodor||pxw||minieye||keyence||batch3756;
  const batchGroups=useMemo(()=>p?[...new Set(p.jobs.map(job=>job.category).filter((value):value is string=>!!value))].map(label=>({label,majors:[]})):[],[p]);
@@ -287,12 +287,12 @@ export function UnifiedV2CompanyPage({user,id}:{user:User|null;id:string}){
        <p>{job.requirements}</p>
        {detailedCards&&<div className="hhba-v2-weipu-detail-links">
         <Link to={'/candidate/jobs/'+encodeURIComponent('cn-v2-profile-'+p.id+'-'+job.id)}>站内岗位详情 <ArrowRight size={13}/></Link>
-        <a href={p.recruitment.url} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">{p.recruitment.status==='official_portal'?'官方招聘入口':(p.recruitment.status==='archived_source'?'公开招聘公告（非官方网申）':'招聘公告／企业资料（入口待核）')} <ExternalLink size={13}/></a>
+        <a href={job.url||p.recruitment.url} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">{p.recruitment.status==='official_portal'?'官方招聘入口':(p.recruitment.status==='archived_source'?'公开招聘公告（非官方网申）':'招聘公告／企业资料（入口待核）')} <ExternalLink size={13}/></a>
        </div>}
       </details>
       {showcase&&!detailedCards&&<div className="hhba-v2-qizheng-role-actions">
        <Link to={'/candidate/jobs/'+encodeURIComponent('cn-v2-profile-'+p.id+'-'+job.id)}>查看详情 <ArrowRight size={13}/></Link>
-       <a href={p.recruitment.url} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">{p.recruitment.status==='official_portal'?'查看企业招聘栏目':p.recruitment.status==='archived_source'?'查看招聘公告（非网申）':'核对企业资料（入口待核）'} <ExternalLink size={13}/></a>
+       <a href={job.url||p.recruitment.url} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">{p.recruitment.status==='official_portal'?'查看企业招聘栏目':p.recruitment.status==='archived_source'?'查看招聘公告（非网申）':'核对企业资料（入口待核）'} <ExternalLink size={13}/></a>
       </div>}
      </article>)}</div>
     {!matches.length&&<p className="hhba-v2-company-no-roles">该专业暂无已收录的对应岗位方向。请切换专业或选择全部岗位。</p>}
