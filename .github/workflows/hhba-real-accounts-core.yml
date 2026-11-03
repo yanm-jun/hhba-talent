@@ -13,6 +13,9 @@ on:
       - 'apps/web/functions/api/account/**'
       - 'apps/web/d1/0006_real_candidate_workspace.sql'
       - 'apps/web/scripts/real-accounts-core.contract.test.mjs'
+      - 'apps/web/scripts/real-account-admin-metrics.test.mjs'
+      - 'apps/web/functions/api/admin/metrics.js'
+      - 'apps/admin-preview/dashboard.js'
       - '.github/workflows/hhba-real-accounts-core.yml'
   workflow_dispatch:
 permissions:
@@ -35,7 +38,7 @@ jobs:
         working-directory: apps/web
         run: |
           node --check 'functions/api/account/[[path]].js'
-          node --test scripts/real-accounts-core.contract.test.mjs scripts/real-auth-pnvs.test.mjs scripts/pnvs-four-digit-pass.security.test.mjs scripts/phone-auth-method-switch.contract.test.mjs
+          node --test scripts/real-accounts-core.contract.test.mjs scripts/real-account-admin-metrics.test.mjs scripts/real-auth-pnvs.test.mjs scripts/pnvs-four-digit-pass.security.test.mjs scripts/phone-auth-method-switch.contract.test.mjs
       - name: Compile current frontend
         working-directory: apps/web
         run: npm run build
