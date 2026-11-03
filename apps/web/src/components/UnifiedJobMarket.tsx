@@ -391,7 +391,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
             if(next<0||next===page||next>=pageCount(snapshot.total))return;
             setPage(next);
             requestAnimationFrame(()=>document.getElementById('hhba-job-results')?.scrollIntoView({behavior:'smooth',block:'start'}));
-          }}/>
+          }}/>}
     </div>
     {!compact && <p className="unified-job-history">{lang==='zh'?'了解企业或查阅历史岗位资料：':'Explore companies and historical records: '}
       <Link to="/companies">{lang==='zh'?'企业资料库':'Company directory'}</Link>{' · '}
