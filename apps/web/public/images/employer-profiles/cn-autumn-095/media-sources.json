@@ -1,0 +1,31 @@
+{
+  "companyId": "095",
+  "observedOn": "2026-11-03",
+  "brand": {
+    "sourceImageUrl": "https://github.com/icongo/bank-logos/blob/main/logos/cgbchina-rect.svg",
+    "sourcePageUrl": "https://github.com/icongo/bank-logos",
+    "sourceContext": "历史资料库已保存与广发银行名称匹配的矢量图，不代表官方商标许可",
+    "status": "inherited_brand_vector_identity_pending",
+    "trademarkUsagePermissionVerified": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "imageUrl": "https://n.sinaimg.cn/sinakd20230109s/213/w1080h733/20230109/bab4-bd560894b5f9ea040bef4ed824ba4429.png",
+      "articleUrl": "https://finance.sina.com.cn/wm/2023-01-09/doc-imxzqvxe8778819.shtml",
+      "sourceContext": "新浪财经2023年广发银行历史办公建筑",
+      "status": "nonreal_svg_fallback",
+      "republicationRightsVerified": false
+    },
+    {
+      "slot": 2,
+      "imageUrl": "https://www.nuogo.net/uploads/image/20230626/1687781736.jpg",
+      "articleUrl": "https://www.nuogo.net/news/news-926.html",
+      "sourceContext": "尼高设计2023年广发银行历史建筑图片",
+      "status": "nonreal_svg_fallback",
+      "republicationRightsVerified": false
+    }
+  ],
+  "commercialRightsVerified": false,
+  "sourcedImages": 0
+}

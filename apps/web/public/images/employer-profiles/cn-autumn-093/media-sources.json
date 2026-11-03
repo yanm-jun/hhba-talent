@@ -1,0 +1,31 @@
+{
+  "companyId": "093",
+  "observedOn": "2026-11-03",
+  "brand": {
+    "sourceImageUrl": "https://iguopin-company.oss-cn-beijing.aliyuncs.com/10685310584588550/logo/20230612/237dc0f1e8332505b4c7eaeeeeacd608.jpg",
+    "sourcePageUrl": "https://job.ihnhr.com/company?id=10685310584588550",
+    "sourceContext": "国聘企业资料图，尚非官方品牌授权",
+    "status": "nonofficial_editorial_wordmark_fallback",
+    "trademarkUsagePermissionVerified": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "imageUrl": "https://img.yicaiglobal.com/src/image/2023/05/24066809771717.jpg",
+      "articleUrl": "https://www.yicaiglobal.com/news/20230531-06-chinas-huaneng-lancang-to-build-large-hydropower-station-for-usd82-billion",
+      "sourceContext": "第一财经国际2023年中国华能历史总部建筑",
+      "status": "nonreal_svg_fallback",
+      "republicationRightsVerified": false
+    },
+    {
+      "slot": 2,
+      "imageUrl": "https://img.caixin.com/2022-07-27/165889117455375.jpg",
+      "articleUrl": "https://companies.caixin.com/2022-07-27/101918348.html",
+      "sourceContext": "财新2022年中国华能历史总部外景",
+      "status": "nonreal_svg_fallback",
+      "republicationRightsVerified": false
+    }
+  ],
+  "commercialRightsVerified": false,
+  "sourcedImages": 0
+}
