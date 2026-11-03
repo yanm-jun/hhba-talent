@@ -154,3 +154,14 @@ a.unified-company-brand:focus-visible,.unified-detail-company-link:focus-visible
 .unified-major-options .unified-major-custom{border-top:1px solid #e5ece6;border-radius:0;color:#276146}
 .unified-major-options [role="option"]{min-height:45px}
 @media(max-width:740px){.unified-major-options{width:min(420px,calc(100vw - 32px));max-width:calc(100vw - 32px)}}
+
+/* Selecting a major goes straight to concrete role cards, not employer groups. */
+.hhba-major-role-summary{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin:18px 0 0;padding:21px 24px;background:#fff;border:1px solid #e5ece7;border-radius:15px}
+.hhba-major-role-summary small{font-size:10px;color:#537968;font-weight:750;letter-spacing:.085em}
+.hhba-major-role-summary h2{font-size:20px;line-height:1.4;margin:7px 0 7px;color:#182f28}
+.hhba-major-role-summary p{font-size:12px;line-height:1.8;color:#698179;margin:0;max-width:850px}
+.hhba-major-role-summary>strong{flex:none;padding:7px 11px;border-radius:9px;background:#f3f8f5;color:#2a7356;font-size:12px;font-weight:700;white-space:nowrap}
+.hhba-role-major-status{display:inline-flex;align-items:center;margin:0 0 13px;padding:5px 9px;border-radius:7px;font-size:11px;font-weight:650;color:#3b7255;background:#eef7f1}
+.hhba-role-major-status-unrestricted{background:#f3f6f3;color:#657b69}
+.hhba-role-major-status-unknown{background:#fff6e7;color:#946d2c}
+@media(max-width:720px){.hhba-major-role-summary{padding:16px;flex-direction:column;gap:10px}.hhba-major-role-summary h2{font-size:17px}}
