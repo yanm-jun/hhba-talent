@@ -8,6 +8,8 @@ import {analyticsChoice,chooseAnalytics} from '../services/engagement';
 import {getCandidateWorkspaceProfile,saveCandidateWorkspaceProfile,saveCandidateWorkspacePreferences,realWorkspaceAvailable,type CandidateWorkspaceProfile} from '../services/candidateWorkspace';
 import {type User} from '../services/api';
 import '../styles/personal-center.css';
+// Preserve the existing workbench layout styles while deleting the obsolete demo identity logic.
+import '../styles/demo-account.css';
 
 type Section='overview'|'profile'|'preferences'|'resume'|'applications'|'privacy'|'saved';
 type RecordRow={record:SavedJob;job:LiveJob|null};
