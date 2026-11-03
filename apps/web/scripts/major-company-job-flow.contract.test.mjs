@@ -35,7 +35,7 @@ assert(market.includes('selectedMajor&&<section className="hhba-major-role-summa
 assert(market.includes('!selectedMajor&&<V2EmployerSearchResults'), 'Do not show company-first V2 search during professional selection');
 assert(market.includes('!selectedMajor&&!rebuilding&&!curatedHundred&&<DomesticCompanyResults'), 'No separate employer list when major is selected');
 assert(market.includes('majorSlug={selectedMajor}'), 'Job cards should explain each major match');
-assert(market.includes('暂无符合该专业及其他筛选条件的已收录岗位'), 'Empty major result must disclose zero roles, not invent companies');
+assert(market.includes('当前没有符合该专业及其他筛选条件的已收录岗位'), 'Empty major result must disclose zero roles, not invent companies');
 assert(market.includes('major_slug:selectedMajor'), 'Market must apply major filter to listJobs');
 assert(market.includes('include_unknown_majors:e.target.checked'), 'User can inspect unverified records');
 assert(recruitment.includes('visibleRoleForMajor(job,f.major_slug'), 'Filters must run before pagination');
