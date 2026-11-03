@@ -1,0 +1,37 @@
+name: HHBA public letter GitHub Pages canonical hotfix
+on:
+  push:
+    branches: [fix/pages-letter-canonical-main-20261103]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-letter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate published letter shareability and existing homepage
+        working-directory: apps/web
+        run: node --test scripts/home-open-letter.contract.test.mjs
+      - name: Check social preview path and prevent unpublished domain misdirection
+        run: |
+          test -s apps/web/public/images/hhba-people-group.webp
+          test -s apps/web/public/letter/index.html
+          grep -Fq 'https://yanm-jun.github.io/hhba-talent/letter/' apps/web/public/letter/index.html
+          grep -Fq 'https://yanm-jun.github.io/hhba-talent/images/hhba-people-group.webp' apps/web/public/letter/index.html
+          ! grep -q 'hhba.work/letter' apps/web/public/letter/index.html
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Verify application production build unaffected
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          HHBA_GITHUB_PAGES=1 HHBA_PAGES_BASE=/hhba-talent/ npm run build
+          test -s dist/letter/index.html
