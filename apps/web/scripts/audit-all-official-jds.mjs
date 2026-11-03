@@ -86,7 +86,10 @@ async function getJson(url,{fetchFn=fetch,retries=1}={}){
 export async function auditSnapshot(snapshot,{fetchFn=fetch,concurrency=5,now=Date.now()}={}){
  if(!snapshot||!Array.isArray(snapshot.jobs)||snapshot.jobs.length===0||
     snapshot.jobs.length>LIMIT||snapshot.total!==snapshot.jobs.length ||
-    snapshot.failures!==0 || !Number.isFinite(Date.parse(snapshot.updated)))
+    !Number.isInteger(snapshot.failures)||snapshot.failures<0||
+    (snapshot.failures>0&&(!Array.isArray(snapshot.source_failures)||
+      snapshot.source_failures.length!==snapshot.failures))||
+    !Number.isFinite(Date.parse(snapshot.updated)))
     throw Error('INVALID_OR_INCOMPLETE_SOURCE_SNAPSHOT');
  const sourceTime=Date.parse(snapshot.updated);
  if(sourceTime>now+5*60_000||now-sourceTime>24*3600_000)
@@ -180,6 +183,8 @@ export async function auditSnapshot(snapshot,{fetchFn=fetch,concurrency=5,now=Da
   verified_complete_chinese_jd:0,coverage_ratio:Number((eligible/results.length).toFixed(5)),
   official_ats_boards_checked:boards.length,
   official_ats_board_failures:failures.length,
+  index_successful_boards:snapshot.boards??null,
+  index_source_failures:snapshot.failures,
   statuses:statusCounts,platforms:platformCounts,
   distinct_companies:Object.keys(companyCounts).length,
   blocked_and_incomplete:results.length-eligible,
