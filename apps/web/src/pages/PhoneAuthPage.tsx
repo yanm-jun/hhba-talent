@@ -56,6 +56,22 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
   const codeLength = useRealAuth ? 4 : 6;
   const codeValid = useRealAuth ? /^[0-9]{4}$/.test(code) : /^[0-9]{6}$/.test(code);
   const realPasswordLogin = useRealAuth && mode === 'login' && authMethod === 'password';
+  // Show the exact conditions that block registration rather than silently
+  // disabling the submit button. Symbols including @ are valid in passwords,
+  // but the separate username field has a stricter character set.
+  const passwordIssues = [
+    password.length < 8 || password.length > 64 ? '长度需为 8–64 位' : '',
+    !/[A-Za-z]/.test(password) ? '至少包含一个字母' : '',
+    !/[0-9]/.test(password) ? '至少包含一个数字' : '',
+  ].filter(Boolean);
+  const passwordFeedback = password.length > 0
+    ? passwordIssues.length > 0
+      ? `还需满足：${passwordIssues.join('、')}。`
+      : '密码符合要求。'
+    : '';
+  const passwordConfirmFeedback = passwordConfirm.length > 0
+    ? passwordConfirm === password ? '两次密码一致。' : '两次密码不一致，请重新输入。'
+    : '';
   const canSubmit = useRealAuth
     ? mode === 'register'
       ? mobileValid && codeValid && realAuthUsernameValid(name) && realAuthPasswordValid(password) && password === passwordConfirm
@@ -157,7 +173,7 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
       if (mode === 'register') {
         if (!mobileValid || !codeValid) return setError(`请核对手机号，并输入 ${codeLength} 位短信验证码。`);
         if (!realAuthUsernameValid(username)) return setError('称呼需为 2-20 位，首字符为字母或中文，其余为字母、数字、下划线或中文。');
-        if (!realAuthPasswordValid(password)) return setError('密码需为 8-64 位，且同时包含字母和数字。');
+        if (!realAuthPasswordValid(password)) return setError('密码须为 8–64 位，同时包含字母和数字；支持 @、!、# 等常见符号。');
         if (password !== passwordConfirm) return setError('两次输入的密码不一致。');
       } else if (realPasswordLogin) {
         if (!realAuthUsernameValid(username)) return setError('称呼需为 2-20 位，首字符为字母或中文，其余为字母、数字、下划线或中文。');
@@ -239,9 +255,16 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
               </div>
             )}
             {mode === 'register' && (
-              <label htmlFor="hhba-auth-name">称呼
-                <input id="hhba-auth-name" maxLength={useRealAuth ? 20 : 60} required minLength={2} autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder={candidate ? '你的姓名或昵称' : '招聘联系人姓名'} />
-              </label>
+              <div className="hhba-phone-field-group">
+                <label htmlFor="hhba-auth-name">称呼
+                  <input id="hhba-auth-name" maxLength={useRealAuth ? 20 : 60} required minLength={2} autoComplete="name" value={name} aria-invalid={useRealAuth && name.length > 0 && !realAuthUsernameValid(name)} aria-describedby={useRealAuth && name.length > 0 && !realAuthUsernameValid(name) ? 'hhba-auth-username-feedback' : undefined} onChange={(e) => { setName(e.target.value); setError(''); }} placeholder={candidate ? '你的姓名或昵称' : '招聘联系人姓名'} />
+                </label>
+                {useRealAuth && name.length > 0 && !realAuthUsernameValid(name) && (
+                  <p id="hhba-auth-username-feedback" className="hhba-phone-inline-feedback is-invalid" role="status">
+                    称呼须为 2–20 位，以字母或中文开头；只能使用字母、数字、中文或下划线，不支持 @。
+                  </p>
+                )}
+              </div>
             )}
             {realPasswordLogin && (
               <>
@@ -265,12 +288,23 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
             )}
             {useRealAuth && mode === 'register' && (
               <>
-                <label htmlFor="hhba-auth-password">密码
-                  <input id="hhba-auth-password" type="password" required autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="8-64 位，含字母和数字" />
-                </label>
-                <label htmlFor="hhba-auth-password-confirm">确认密码
-                  <input id="hhba-auth-password-confirm" type="password" required autoComplete="new-password" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} placeholder="请再次输入密码" />
-                </label>
+                <div className="hhba-phone-field-group">
+                  <label htmlFor="hhba-auth-password">密码
+                    <input id="hhba-auth-password" type="password" required autoComplete="new-password" value={password} aria-invalid={password.length > 0 && !realAuthPasswordValid(password)} aria-describedby={password.length > 0 ? 'hhba-auth-password-rules hhba-auth-password-feedback' : 'hhba-auth-password-rules'} onChange={(e) => { setPassword(e.target.value); setError(''); }} placeholder="请输入登录密码" />
+                  </label>
+                  <p id="hhba-auth-password-rules" className="hhba-phone-password-rules">密码须为 8–64 位，同时包含字母和数字；支持 @、!、# 等常见符号。</p>
+                  {password.length > 0 && (
+                    <p id="hhba-auth-password-feedback" role="status" aria-live="polite" className={`hhba-phone-inline-feedback ${realAuthPasswordValid(password) ? 'is-valid' : 'is-invalid'}`}>{passwordFeedback}</p>
+                  )}
+                </div>
+                <div className="hhba-phone-field-group">
+                  <label htmlFor="hhba-auth-password-confirm">确认密码
+                    <input id="hhba-auth-password-confirm" type="password" required autoComplete="new-password" value={passwordConfirm} aria-invalid={passwordConfirm.length > 0 && passwordConfirm !== password} aria-describedby={passwordConfirm.length > 0 ? 'hhba-auth-password-confirm-feedback' : undefined} onChange={(e) => { setPasswordConfirm(e.target.value); setError(''); }} placeholder="请再次输入密码" />
+                  </label>
+                  {passwordConfirm.length > 0 && (
+                    <p id="hhba-auth-password-confirm-feedback" role="status" aria-live="polite" className={`hhba-phone-inline-feedback ${passwordConfirm === password ? 'is-valid' : 'is-invalid'}`}>{passwordConfirmFeedback}</p>
+                  )}
+                </div>
               </>
             )}
             {user && !accountHasRole && <p className="hhba-phone-warning" role="status">当前账户尚未开通{title}身份，请先完成对应身份认证。</p>}
