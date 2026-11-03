@@ -1,0 +1,42 @@
+name: HHBA provenance-pinned PXW media build smoke
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/scripts/prepare-pxw-media.py'
+      - '.github/workflows/hhba-pxw-verified-media-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-verified-media:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install image validation dependency
+        run: python -m pip install --quiet Pillow
+      - name: Build PXW assets from previously verified and source-pinned images
+        run: |
+          python -m py_compile apps/web/scripts/prepare-pxw-media.py
+          python apps/web/scripts/prepare-pxw-media.py
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          from PIL import Image
+          root=Path('apps/web/public/images/employer-profiles/cn-autumn-034')
+          audit=json.loads((root/'media-audit.json').read_text())
+          expected={'logo.webp':(1000,414),'photo1.jpg':(1200,675),'photo2.jpg':(1440,374)}
+          assert set(audit)==set(expected)
+          assert all(row['verified'] is True and row['sha256'] and row['source'] and row['sourcePage'] for row in audit.values())
+          for name, dims in expected.items():
+           path=root/name
+           assert path.stat().st_size>1800
+           with Image.open(path) as im:
+            assert im.size==dims, (name, im.size, dims)
+            im.verify()
+          print('PXW_034_VERIFIED_MEDIA_PREVIEW_READY',sum(1 for a in audit.values() if a.get('reusedVerifiedPublishedCopy')))
+          PY
