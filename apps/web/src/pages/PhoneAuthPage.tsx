@@ -48,10 +48,13 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
     : safeNext === '/recruiter/onboarding' ? '?next=%2Frecruiter%2Fonboarding' : '';
   const title = candidate ? '求职者' : '招聘方';
   const mobileValid = /^1[3-9]\d{9}$/.test(phone);
-  const codeValid = /^\d{6}$/.test(code);
   const accountHasRole = !!user?.account_types?.includes(accountType);
   // 真实认证分支只用于求职者：测试后端注册时角色固定为 candidate。
   const useRealAuth = realAuthReady && candidate;
+  // Alibaba PNVS currently issues four-digit codes. Preserve the independent
+  // legacy /api/v1 form contract for recruiter accounts until it is migrated.
+  const codeLength = useRealAuth ? 4 : 6;
+  const codeValid = useRealAuth ? /^[0-9]{4}$/.test(code) : /^[0-9]{6}$/.test(code);
   const realPasswordLogin = useRealAuth && mode === 'login' && authMethod === 'password';
   const canSubmit = useRealAuth
     ? mode === 'register'
@@ -72,7 +75,7 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
       : phone && !mobileValid
         ? '请先填写正确的中国大陆 11 位手机号。'
         : mobileValid && !codeValid
-          ? '请先输入 6 位短信验证码，填满后登录按钮才可用。'
+          ? `请先输入 ${codeLength} 位短信验证码，填满后登录按钮才可用。`
           : ''
     : '';
   const restoredRef = useRef(false);
@@ -152,7 +155,7 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
     if (useRealAuth) {
       const username = name.trim();
       if (mode === 'register') {
-        if (!mobileValid || !codeValid) return setError('请核对手机号，并输入 6 位短信验证码。');
+        if (!mobileValid || !codeValid) return setError(`请核对手机号，并输入 ${codeLength} 位短信验证码。`);
         if (!realAuthUsernameValid(username)) return setError('称呼需为 2-20 位，首字符为字母或中文，其余为字母、数字、下划线或中文。');
         if (!realAuthPasswordValid(password)) return setError('密码需为 8-64 位，且同时包含字母和数字。');
         if (password !== passwordConfirm) return setError('两次输入的密码不一致。');
@@ -160,7 +163,7 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
         if (!realAuthUsernameValid(username)) return setError('称呼需为 2-20 位，首字符为字母或中文，其余为字母、数字、下划线或中文。');
         if (!password) return setError('请输入密码。');
       } else if (!mobileValid || !codeValid) {
-        return setError('请核对手机号，并输入 6 位短信验证码。');
+        return setError(`请核对手机号，并输入 ${codeLength} 位短信验证码。`);
       }
       setBusy(true);
       try {
@@ -182,7 +185,7 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
       return;
     }
     if (!phoneAuthReady) return setError('真实账户服务尚未接入，不能进行注册或登录。');
-    if (!mobileValid || !codeValid) return setError('请核对手机号，并输入 6 位短信验证码。');
+    if (!mobileValid || !codeValid) return setError(`请核对手机号，并输入 ${codeLength} 位短信验证码。`);
     if (mode === 'register' && name.trim().length < 2) return setError('请填写至少两个字符的展示名称。');
     setBusy(true);
     try {
@@ -257,7 +260,7 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
             )}
             {!realPasswordLogin && (
               <label htmlFor="hhba-auth-code">验证码
-                <div className="hhba-phone-code"><input id="hhba-auth-code" type="text" inputMode="numeric" maxLength={6} required autoComplete="one-time-code" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} placeholder="6 位短信验证码" /><button type="button" disabled={useRealAuth ? !mobileValid || sending || seconds > 0 : !phoneAuthReady || !mobileValid || sending || seconds > 0} onClick={() => void sendCode()}>{sending ? '发送中…' : seconds > 0 ? seconds + ' 秒后重试' : '获取验证码'}</button></div>
+                <div className="hhba-phone-code"><input id="hhba-auth-code" type="text" inputMode="numeric" maxLength={codeLength} required autoComplete="one-time-code" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, codeLength))} placeholder={`${codeLength} 位短信验证码`} /><button type="button" disabled={useRealAuth ? !mobileValid || sending || seconds > 0 : !phoneAuthReady || !mobileValid || sending || seconds > 0} onClick={() => void sendCode()}>{sending ? '发送中…' : seconds > 0 ? seconds + ' 秒后重试' : '获取验证码'}</button></div>
               </label>
             )}
             {useRealAuth && mode === 'register' && (
@@ -273,6 +276,9 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
             {user && !accountHasRole && <p className="hhba-phone-warning" role="status">当前账户尚未开通{title}身份，请先完成对应身份认证。</p>}
             {error && <p className="hhba-phone-error" role="alert">{error}</p>}
             {error === '该手机号尚未注册，请先注册。' && <button type="button" className="hhba-phone-submit" onClick={() => navigate(modeRoute)}>立即注册<ArrowRight size={17} /></button>}
+            {mode === 'register' && useRealAuth && code.length > 0 && !codeValid && !error && (
+              <p className="hhba-phone-notice" role="status">请输入完整的 4 位短信验证码。</p>
+            )}
             {loginHint && <p className="hhba-phone-notice" role="status">{loginHint}</p>}
             {notice && <p className="hhba-phone-notice" role="status">{notice}</p>}
             <button className="hhba-phone-submit" type="submit" disabled={!canSubmit || busy}>{busy ? '验证中…' : mode === 'login' ? '登录' : '注册并继续'}<ArrowRight size={17} /></button>

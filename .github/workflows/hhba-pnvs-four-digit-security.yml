@@ -1,0 +1,38 @@
+name: HHBA PNVS four-digit authentication and security regression
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/pages/PhoneAuthPage.tsx'
+      - 'apps/web/functions/_lib/sms-provider.js'
+      - 'apps/web/functions/_lib/real-auth.js'
+      - 'apps/web/functions/api/real-auth/**'
+      - 'apps/web/scripts/pnvs-four-digit-pass.security.test.mjs'
+      - '.github/workflows/hhba-pnvs-four-digit-security.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pnvs-auth-security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked frontend dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Check backend syntax and run PNVS security regressions without sending SMS
+        working-directory: apps/web
+        run: |
+          node --check functions/_lib/sms-provider.js
+          node --check functions/_lib/real-auth.js
+          node --check 'functions/api/real-auth/[[path]].js'
+          node --test scripts/real-auth-pnvs.test.mjs scripts/pnvs-four-digit-pass.security.test.mjs scripts/phone-auth-method-switch.contract.test.mjs
+      - name: Typecheck and compile the HHBA site
+        working-directory: apps/web
+        run: npm run build
