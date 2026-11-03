@@ -23,6 +23,12 @@
 .hhba-phone-login-method.is-active,.hhba-phone-login-method.is-active:hover{background:#fff;border-color:#dce7de;color:#295c42;font-weight:730;box-shadow:0 1px 4px rgba(28,48,36,.055)}
 .hhba-phone-login-method:focus-visible{outline:3px solid #9ac7ad;outline-offset:2px}
 .hhba-phone-form label{display:flex;flex-direction:column;gap:9px;font-size:12px;font-weight:680;letter-spacing:.01em;color:#303f34}
+.hhba-phone-field-group{display:flex;flex-direction:column;gap:6px;min-width:0}
+.hhba-phone-password-rules{margin:0;font-size:11.5px;font-weight:450;line-height:1.7;color:#75877b;overflow-wrap:anywhere}
+.hhba-phone-inline-feedback{margin:0;font-size:11.5px;font-weight:500;line-height:1.65;overflow-wrap:anywhere}
+.hhba-phone-inline-feedback.is-valid{color:#32734d}
+.hhba-phone-inline-feedback.is-invalid{color:#a15c34}
+.hhba-phone-form input[aria-invalid="true"]{border-color:#d2a18d}
 .hhba-phone-form input{font:inherit;color:#202e25;font-weight:450;font-size:13px;letter-spacing:0;width:100%;height:48px;border:1px solid #e0e7e1;background:#fff;border-radius:10px;outline:none;padding:0 13px;transition:border-color .17s,box-shadow .17s}
 .hhba-phone-form input::placeholder{color:#a2aba4}
 .hhba-phone-form input:focus{border-color:#65947b;box-shadow:0 0 0 3px rgba(57,113,77,.095)}
