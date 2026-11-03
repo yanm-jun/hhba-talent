@@ -644,7 +644,7 @@ jobs:
           grep -q 'og:title' apps/web/dist/letter/index.html
           grep -q 'og:image' apps/web/dist/letter/index.html
           grep -q '../?letter=1' apps/web/dist/letter/index.html
-          node -e "const fs=require('fs');const html=fs.readFileSync('apps/web/dist/letter/index.html','utf8');if(!html.includes('致每一个认真生活的人')||!html.includes('yanm-jun.github.io/hhba-talent/letter/'))process.exit(1);console.log('HHBA_SHAREABLE_PUBLIC_LETTER_READY')"
+          node -e "const fs=require('fs');const html=fs.readFileSync('apps/web/dist/letter/index.html','utf8');if(!html.includes('致每一个认真生活的人')||!html.includes('hhba.work/letter/'))process.exit(1);console.log('HHBA_SHAREABLE_PUBLIC_LETTER_READY')"
       - name: Verify old 100 overseas curated jobs were published without changing domestic source
         working-directory: apps/web
         run: |

@@ -39,8 +39,8 @@ test('published founder-letter copy covers the vision, business model and welcom
   assert.ok((letter.match(/text:'/g)||[]).length >= 35, 'Full letter must not be replaced by a teaser');
 });
 test('independent /letter/ sharing entry has static social preview and opens the real envelope', () => {
-  assert.match(modal, /new URL\('letter\/', base\)/);
+  assert.ok(modal.includes("return 'https://hhba.work/letter/'"), 'Shares must link to the official production domain');
   for (const phrase of ['og:title','og:description','og:image','og:url','twitter:card','rel="canonical"',
-    'https://yanm-jun.github.io/hhba-talent/letter/','../?letter=1']) assert.ok(html.includes(phrase), 'Missing '+phrase);
+    'https://hhba.work/letter/','../?letter=1']) assert.ok(html.includes(phrase), 'Missing '+phrase);
   assert.ok(!html.includes('noindex'), 'Public letter must be shareable and indexable');
 });
