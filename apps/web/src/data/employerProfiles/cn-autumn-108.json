@@ -1,0 +1,458 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-108",
+  "name": "复旦微电子",
+  "displayName": "上海复旦微电子集团股份有限公司",
+  "englishName": "Fudan Microelectronics Group",
+  "aliases": [
+    "上海复旦微电子",
+    "复旦微电",
+    "Fudan Microelectronics",
+    "复微集团"
+  ],
+  "industry": "集成电路 · FPGA · 非挥发存储器 · 安全识别芯片 · IC测试",
+  "subtitle": "2027届校招 · 15项逐条JD，2026年10月31日原网申结束",
+  "overview": "复旦微电子1998年创建，业务涵盖安全识别芯片、非挥发存储、智能电表、FPGA与芯片测试。西安电子科技大学2027校园招聘公告完整列出15个有职责和学历技术要求的具体岗位，网申仅指定Moka官方渠道。原网申为2026年9月10日至10月31日，已结束；本页提供独立岗位方向及核验链接，但不视为仍有实时可投递空缺。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://job.xidian.edu.cn/campus/view/id/757619",
+    "https://app.mokahr.com/campus-recruitment/fmsh",
+    "https://www.fmsh.com/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-108/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-108/photo1.svg",
+        "caption": "复旦微电子企业实景授权待审核：非实景编辑示意",
+        "alt": "复旦微电子非实景编辑占位图（非真实企业照片）",
+        "note": "非实景：真实企业照片来源和商用授权尚未完成核实；独立PR审查使用占位。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-108/photo2.svg",
+        "caption": "复旦微电子企业实景授权待审核：非实景编辑示意",
+        "alt": "复旦微电子非实景编辑占位图（非真实企业照片）",
+        "note": "非实景：真实企业照片来源和商用授权尚未完成核实；独立PR审查使用占位。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://app.mokahr.com/campus-recruitment/fmsh",
+    "label": "复旦微电子官方Moka 2027校招入口（原批次已结束）",
+    "status": "official_portal",
+    "subject": "上海复旦微电子集团股份有限公司及其公开招聘所属单位，以原JD合同主体为准",
+    "note": "2027校园招聘官网指定唯一网申：https://app.mokahr.com/campus-recruitment/fmsh；开放2026-09-10至2026-10-31，11月3日已过期。15项来自高校发布的实际JD，未独立核验目前可投递。"
+  },
+  "majorIntro": "高校招聘公告以正式表格列出15项岗位、职责和任职要求；不为各岗位虚构独立职位ID。以下岗位工作地按公司公告主体上海填写，确切部门以官方招聘系统为准。",
+  "preferredMajors": [
+    "微电子科学与工程",
+    "电子科学与技术",
+    "集成电路设计与集成系统",
+    "计算机科学与技术",
+    "软件工程",
+    "电子信息工程",
+    "自动化",
+    "数学与应用数学"
+  ],
+  "photoNote": "这两幅照片均为标明“非实景”的编辑图；Logo也是明确标注的非官方品牌字标。历史企业照片需要先审实景归属与版权许可才可上线。",
+  "business": [
+    {
+      "title": "安全与身份识别芯片",
+      "description": "开发用于金融支付、身份识别、电子证照与安全认证应用的安全芯片解决方案。",
+      "tags": "安全 · 芯片",
+      "details": [
+        "安全芯片",
+        "身份识别",
+        "金融应用"
+      ]
+    },
+    {
+      "title": "非挥发存储器",
+      "description": "面向不同工业和消费场景开发非挥发性存储产品与配套技术。",
+      "tags": "存储 · 产品",
+      "details": [
+        "非挥发存储",
+        "存储设计",
+        "设备应用"
+      ]
+    },
+    {
+      "title": "FPGA及可编程逻辑",
+      "description": "研发FPGA等可编程逻辑芯片及相关工具与应用生态，为工业和计算等系统提供逻辑平台。",
+      "tags": "FPGA · 逻辑",
+      "details": [
+        "可编程器件",
+        "FPGA应用",
+        "IP开发"
+      ]
+    },
+    {
+      "title": "智能电表芯片",
+      "description": "开发智能计量、电表通信和物联网能源终端的专用芯片方案。",
+      "tags": "电表 · IoT",
+      "details": [
+        "智能计量",
+        "电表芯片",
+        "传感与连接"
+      ]
+    },
+    {
+      "title": "芯片测试与质量技术",
+      "description": "提供集成电路生产测试、自动化测试软件、芯片应用验证及相关技术服务。",
+      "tags": "测试 · ATE",
+      "details": [
+        "芯片测试",
+        "测试系统",
+        "质量验证"
+      ]
+    },
+    {
+      "title": "AI与嵌入式技术",
+      "description": "围绕AI软件工具、编译器与嵌入式系统开展软硬件技术研发及产品应用。",
+      "tags": "AI · 软件",
+      "details": [
+        "AI编译",
+        "嵌入式软件",
+        "技术平台"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "digital",
+      "title": "数字前端工程师",
+      "category": "芯片 / 数字逻辑",
+      "city": "上海（集团校招工作地；逐岗位部门待确认）",
+      "summary": "负责芯片数字电路模块设计、RTL与UVM验证，编写设计及验证文档，并参与芯片功能性能目标实现。",
+      "requirements": "微电子或电子相关硕士及以上，掌握数字电路及Verilog、SystemVerilog和前端EDA基础。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "电子科学与技术",
+        "集成电路设计与集成系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位原表学历要求见JD",
+      "url": "https://app.mokahr.com/campus-recruitment/fmsh",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海复旦微电子集团股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "analog",
+      "title": "模拟前端工程师",
+      "category": "芯片 / 模拟电路",
+      "city": "上海（集团校招工作地；逐岗位部门待确认）",
+      "summary": "参与模拟芯片线路方案、模拟前端电路设计与验证，实现产品规格要求并编写项目文档。",
+      "requirements": "微电子或电子相关硕士及以上，熟悉模拟电路和半导体器件，接触Hspice、Spectre等仿真工具优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "电子科学与技术",
+        "集成电路设计与集成系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位原表学历要求见JD",
+      "url": "https://app.mokahr.com/campus-recruitment/fmsh",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海复旦微电子集团股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "layout",
+      "title": "后端/版图工程师",
+      "category": "芯片 / 后端",
+      "city": "上海（集团校招工作地；逐岗位部门待确认）",
+      "summary": "负责数字芯片自动布局布线和模拟版图设计、物理验证与寄生参数抽取，同前端团队协作完成性能要求。",
+      "requirements": "微电子相关本科及以上，具备集成电路工艺与版图基础，了解Virtuoso、ICC、Calibre、StarRC等工具者优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "集成电路设计与集成系统",
+        "电子科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位原表学历要求见JD",
+      "url": "https://app.mokahr.com/campus-recruitment/fmsh",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海复旦微电子集团股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hardware",
+      "title": "硬件研发/开发工程师",
+      "category": "硬件 / 测试",
+      "city": "上海（集团校招工作地；逐岗位部门待确认）",
+      "summary": "开发芯片测试系统硬件电路，负责测试平台设计调试及芯片样片与生产测试的硬件支持。",
+      "requirements": "电子、微电子、自动化或仪器相关本科及以上，熟悉常用仪器、板级电路、FPGA或嵌入式基础。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "自动化",
+        "测控技术与仪器",
+        "微电子科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位原表学历要求见JD",
+      "url": "https://app.mokahr.com/campus-recruitment/fmsh",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海复旦微电子集团股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ai-test",
+      "title": "AI测试工程师",
+      "category": "AI / 测试",
+      "city": "上海（集团校招工作地；逐岗位部门待确认）",
+      "summary": "开展AI软件及产品系统测试、自动化测试脚本与工具开发，并协助AI开发工程师排查缺陷。",
+      "requirements": "计算机、通信、软件或自动化专业本科及以上，熟悉C++、Python，编译器测试经历优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "通信工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位原表学历要求见JD",
+      "url": "https://app.mokahr.com/campus-recruitment/fmsh",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海复旦微电子集团股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ai-compiler",
+      "title": "AI编译器工程师",
+      "category": "AI / 编译器",
+      "city": "上海（集团校招工作地；逐岗位部门待确认）",
+      "summary": "研发AI编译器与相关优化算法，支持推理部署、AI软件测试及相关芯片应用技术服务。",
+      "requirements": "计算机、微电子、电子信息或数学硕士及以上，掌握C/C++、编译原理与计算机体系结构，深度学习框架经验优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "微电子科学与工程",
+        "数学与应用数学",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位原表学历要求见JD",
+      "url": "https://app.mokahr.com/campus-recruitment/fmsh",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海复旦微电子集团股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "fpga",
+      "title": "FPGA开发工程师",
+      "category": "FPGA / 嵌入式",
+      "city": "上海（集团校招工作地；逐岗位部门待确认）",
+      "summary": "研发芯片测试系统FPGA逻辑与片上系统，参与IP开发、硬件调试及芯片软硬件功能验证。",
+      "requirements": "微电子、电子或计算机本科及以上，熟悉Verilog/VHDL、C语言及FPGA开发流程，具备仪器调试能力。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "电子信息工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位原表学历要求见JD",
+      "url": "https://app.mokahr.com/campus-recruitment/fmsh",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海复旦微电子集团股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ic-test",
+      "title": "IC测试工程师",
+      "category": "芯片 / 测试",
+      "city": "上海（集团校招工作地；逐岗位部门待确认）",
+      "summary": "制定芯片量产测试方案与测试规范，参与ATE程序开发和自动化测试平台建设，分析芯片缺陷。",
+      "requirements": "电子工程或微电子硕士及以上，掌握IC测试基础、C/C++，具备ATE或FPGA测试背景优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "电子信息工程",
+        "电子科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位原表学历要求见JD",
+      "url": "https://app.mokahr.com/campus-recruitment/fmsh",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海复旦微电子集团股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "application",
+      "title": "应用开发工程师",
+      "category": "FPGA / 应用",
+      "city": "上海（集团校招工作地；逐岗位部门待确认）",
+      "summary": "开发FPGA应用解决方案，为客户提供技术支持并分析失效案例，反馈芯片产品测试数据与改进建议。",
+      "requirements": "电子相关本科及以上，熟悉模拟数字电路、Verilog/VHDL、C和EDA工具，有FPGA/PSOC项目经历优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "微电子科学与工程",
+        "通信工程",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位原表学历要求见JD",
+      "url": "https://app.mokahr.com/campus-recruitment/fmsh",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海复旦微电子集团股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "system-test",
+      "title": "系统测试工程师",
+      "category": "软件 / 测试",
+      "city": "上海（集团校招工作地；逐岗位部门待确认）",
+      "summary": "对嵌入式产品实施功能和性能测试，撰写测试报告并协助定位客户发现的软硬件问题。",
+      "requirements": "计算机、电子或通信相关本科及以上，了解软件测试方法与工具，汽车电子行业经验为加分项。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "电子信息工程",
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位原表学历要求见JD",
+      "url": "https://app.mokahr.com/campus-recruitment/fmsh",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海复旦微电子集团股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "system-app",
+      "title": "系统应用工程师",
+      "category": "硬件 / 应用",
+      "city": "上海（集团校招工作地；逐岗位部门待确认）",
+      "summary": "承担集成电路生产测试相关整机系统的应用验证和技术支持，协同产品和硬件工程团队完成系统调试。",
+      "requirements": "电子工程、自动化或仪表相关本科及以上，具备板级电路、可编程逻辑及嵌入式软件基础。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "自动化",
+        "测控技术与仪器"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位原表学历要求见JD",
+      "url": "https://app.mokahr.com/campus-recruitment/fmsh",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海复旦微电子集团股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "embedded",
+      "title": "嵌入式软件工程师",
+      "category": "软件 / 嵌入式",
+      "city": "上海（集团校招工作地；逐岗位部门待确认）",
+      "summary": "从事芯片测试装备嵌入式程序开发，与软硬件团队完成整机系统联调、故障分析与方案设计。",
+      "requirements": "电子或计算机相关本科及以上，熟悉ARM MCU、Zynq及C/C++编程，有硬件原理图阅读能力。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位原表学历要求见JD",
+      "url": "https://app.mokahr.com/campus-recruitment/fmsh",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海复旦微电子集团股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "testing-software",
+      "title": "测试软件开发工程师",
+      "category": "软件 / 开发",
+      "city": "上海（集团校招工作地；逐岗位部门待确认）",
+      "summary": "承担测试软件系统设计开发与问题修复，制定研发技术方案并向软件使用方提供技术支持。",
+      "requirements": "计算机、电子、数学或物理本科及以上，掌握数据结构、网络、数据库和一门C/C++/C#/Python开发语言。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "电子信息工程",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位原表学历要求见JD",
+      "url": "https://app.mokahr.com/campus-recruitment/fmsh",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海复旦微电子集团股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "tech-market",
+      "title": "技术市场工程师",
+      "category": "市场 / 技术",
+      "city": "上海（集团校招工作地；逐岗位部门待确认）",
+      "summary": "承担芯片产品市场推广、销售协作、产品调研和技术支持，并开展渠道服务与客户技术沟通。",
+      "requirements": "电子、微电子或自动化相关本科及以上，要求沟通协调能力；具备嵌入式项目开发经验为加分项。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "微电子科学与工程",
+        "自动化",
+        "市场营销"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位原表学历要求见JD",
+      "url": "https://app.mokahr.com/campus-recruitment/fmsh",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海复旦微电子集团股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "web",
+      "title": "WEB工程师",
+      "category": "软件 / Web",
+      "city": "上海（集团校招工作地；逐岗位部门待确认）",
+      "summary": "根据项目计划开发Web产品，完成技术文档与交付物，并排查软件设计、开发和运行过程的问题。",
+      "requirements": "计算机、软件或通信相关本科及以上，熟悉Vue或React，了解TypeScript及Node.js/Java/Python优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 岗位原表学历要求见JD",
+      "url": "https://app.mokahr.com/campus-recruitment/fmsh",
+      "evidenceUrl": "https://job.xidian.edu.cn/campus/view/id/757619",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "上海复旦微电子集团股份有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}

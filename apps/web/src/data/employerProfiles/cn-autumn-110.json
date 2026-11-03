@@ -1,0 +1,476 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-110",
+  "name": "远光软件",
+  "displayName": "远光软件股份有限公司",
+  "englishName": "YGSoft",
+  "aliases": [
+    "远光软件股份有限公司",
+    "YGSoft",
+    "国网数科远光",
+    "远光软件2027校招"
+  ],
+  "industry": "企业管理软件 · 智慧能源 · ERP · AI研发 · 电力数字化",
+  "subtitle": "2027届校招 · 1条高校独立职位+15项招聘公告技术方向",
+  "overview": "远光软件是国家电网体系国网数科控股的上市公司，2027提前批招聘公告明确列出研发和产品等多类岗位方向。与大范围“职位方向”不同，湘潭大学2026年10月发布的实施顾问FDE职位有独立职位页和招聘人数。本批保留该1条独立职位及15个公告中有名称的研发产品招聘方向。原2027提前批报名至2026年10月30日，不能因为之后的宣讲或研究员专项招聘而将提前批标为当前可投递。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://yjsjob.91wllm.cn/campus/view/id/1005888",
+    "https://jobs.tiangong.edu.cn/recruitment/content/type/2/id/2777.html",
+    "https://jiuye.xtu.edu.cn/detail/job?id=2609704&online_id=3617164",
+    "https://sgdt.iguopin.com"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-110/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-110/photo1.svg",
+        "caption": "远光软件企业实景授权待审核：非实景编辑示意",
+        "alt": "远光软件非实景编辑占位图（非真实企业照片）",
+        "note": "非实景：真实企业照片来源和商用授权尚未完成核实；独立PR审查使用占位。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-110/photo2.svg",
+        "caption": "远光软件企业实景授权待审核：非实景编辑示意",
+        "alt": "远光软件非实景编辑占位图（非真实企业照片）",
+        "note": "非实景：真实企业照片来源和商用授权尚未完成核实；独立PR审查使用占位。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://sgdt.iguopin.com",
+    "label": "远光软件2027提前批官方网申平台（原10月30日截止）",
+    "status": "official_portal",
+    "subject": "远光软件股份有限公司，工作地区与用人实体以单岗正式公告为准",
+    "note": "远光软件2027提前批公告原网申截止2026-10-30；其中1项实施顾问FDE由湘潭大学提供独立JD，其余15项仅为2027校招具名方向，不能当作15个独立招聘编号。另有研究员博士专项其他截止日期，不与本批混用。"
+  },
+  "majorIntro": "公开公告确认2027招聘方向和学历专业要求，岗位城市列为公告整体范围；FDE独立职位提供自己的需求人数、条件和工作地点。高校公告列北京、上海岗位通常硕士及以上，其余依单岗。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "软件工程",
+    "人工智能",
+    "信息安全",
+    "数据科学与大数据技术",
+    "信息管理与信息系统",
+    "会计学",
+    "电气工程及其自动化"
+  ],
+  "photoNote": "这两幅照片均为标明“非实景”的编辑图；Logo也是明确标注的非官方品牌字标。历史企业照片需要先审实景归属与版权许可才可上线。",
+  "business": [
+    {
+      "title": "企业管理与财务软件",
+      "description": "为大型企业提供财务管理、ERP、集团管控和企业数字化经营系统。",
+      "tags": "企业 · ERP",
+      "details": [
+        "企业财务",
+        "ERP实施",
+        "数字运营"
+      ]
+    },
+    {
+      "title": "智慧能源与电力数字化",
+      "description": "面向电力能源企业提供信息系统、经营分析及能源业务数字化解决方案。",
+      "tags": "能源 · 数字",
+      "details": [
+        "电网信息化",
+        "智慧能源",
+        "系统应用"
+      ]
+    },
+    {
+      "title": "AI与大模型应用",
+      "description": "推动AI应用、垂直领域大模型、智能交付与企业数据智能研究。",
+      "tags": "AI · 产品",
+      "details": [
+        "企业大模型",
+        "智能交付",
+        "算法研发"
+      ]
+    },
+    {
+      "title": "数据治理与分析",
+      "description": "围绕企业经营与能源数据平台开展数据治理、分析及数据资产应用。",
+      "tags": "数据 · 治理",
+      "details": [
+        "数据工程",
+        "业务分析",
+        "数据治理"
+      ]
+    },
+    {
+      "title": "软件实施与行业咨询",
+      "description": "通过业务顾问、实施工程师与交付团队完成需求调研、系统上线及培训。",
+      "tags": "实施 · 咨询",
+      "details": [
+        "FDE部署",
+        "需求调研",
+        "运维交付"
+      ]
+    },
+    {
+      "title": "信创与信息安全",
+      "description": "在企业数字化技术中开展国产化软硬件适配、产品测试及数据和系统安全保障。",
+      "tags": "信创 · 安全",
+      "details": [
+        "信创适配",
+        "安全测试",
+        "企业IT"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "fde",
+      "title": "实施顾问（FDE前沿部署岗）（2027届校招）",
+      "category": "实施 / FDE",
+      "city": "全国（湘潭大学独立岗位，具体城市以分配为准）",
+      "summary": "开展ERP项目上线前需求调研和实施，负责系统上线后运维、需求管理及用户培训。",
+      "requirements": "本科及以上；湘潭大学发布单岗30人、全国工作地；招聘方偏好财会、计算机、经济与管理专业，需良好逻辑与文档沟通能力。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息管理与信息系统",
+        "会计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上 · 独立高校职位",
+      "url": "https://sgdt.iguopin.com",
+      "evidenceUrl": "https://jiuye.xtu.edu.cn/detail/job?id=2609704&online_id=3617164",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "远光软件股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ai",
+      "title": "AI工程师（2027公告方向）",
+      "category": "算法 / AI",
+      "city": "全国招聘城市集合：珠海、北京、武汉、广州、上海、雄安、杭州、长沙、成都等（非逐岗位城市）",
+      "summary": "远光软件2027高校校招公告明确列出的AI工程师方向，归入研发类，具体团队工作职责需以官方独立职位详情为准。",
+      "requirements": "公告面向2027届本科及以上，尤其AI与软件相关专业；北京上海通常要求硕士及以上，不能由方向名称推定各城市均有空缺。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上；北京上海一般硕士及以上",
+      "url": "https://sgdt.iguopin.com",
+      "evidenceUrl": "https://yjsjob.91wllm.cn/campus/view/id/1005888",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "远光软件股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ai-app",
+      "title": "AI产品应用师（2027公告方向）",
+      "category": "产品 / AI",
+      "city": "全国招聘城市集合：珠海、北京、武汉、广州、上海、雄安、杭州、长沙、成都等（非逐岗位城市）",
+      "summary": "远光软件2027高校就业公告列出的AI产品应用研发方向，服务企业及智慧能源信息化场景。",
+      "requirements": "本科及以上校招方向，实际编程工具、应用部署与产品要求须依官网职位详情；北京上海招聘岗位一般要求硕士及以上。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "软件工程",
+        "信息管理与信息系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上；北京上海一般硕士及以上",
+      "url": "https://sgdt.iguopin.com",
+      "evidenceUrl": "https://yjsjob.91wllm.cn/campus/view/id/1005888",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "远光软件股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "security",
+      "title": "信息安全工程师（2027公告方向）",
+      "category": "安全 / 软件",
+      "city": "全国招聘城市集合：珠海、北京、武汉、广州、上海、雄安、杭州、长沙、成都等（非逐岗位城市）",
+      "summary": "公开招聘清单中的信息安全工程师方向，面向企业应用与智慧能源平台的信息安全工作。",
+      "requirements": "2027届本科及以上，网络安全相关专业背景；个人工作地与岗位编号须回官方招聘页确认。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "信息安全",
+        "网络空间安全",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上；北京上海一般硕士及以上",
+      "url": "https://sgdt.iguopin.com",
+      "evidenceUrl": "https://yjsjob.91wllm.cn/campus/view/id/1005888",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "远光软件股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "data-gov",
+      "title": "数据治理工程师（2027公告方向）",
+      "category": "数据 / 治理",
+      "city": "全国招聘城市集合：珠海、北京、武汉、广州、上海、雄安、杭州、长沙、成都等（非逐岗位城市）",
+      "summary": "高校公布的2027校招研发方向之一，围绕企业业务数据治理与数字化数据平台建设。",
+      "requirements": "2027届本科及以上，数据与计算机相关专业；具体软件工具和工作城市依企业独立职位公布信息。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "数据科学与大数据技术",
+        "信息管理与信息系统",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上；北京上海一般硕士及以上",
+      "url": "https://sgdt.iguopin.com",
+      "evidenceUrl": "https://yjsjob.91wllm.cn/campus/view/id/1005888",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "远光软件股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "llm",
+      "title": "大模型工程师（2027公告方向）",
+      "category": "算法 / 大模型",
+      "city": "全国招聘城市集合：珠海、北京、武汉、广州、上海、雄安、杭州、长沙、成都等（非逐岗位城市）",
+      "summary": "远光软件2027校招列明的大模型工程师方向，重点涉及企业业务与电力能源场景的大模型技术应用。",
+      "requirements": "2027届计算机及人工智能等相关专业本科及以上，资历和具体研发要求按原职位，不把研究员博士门槛误套到此岗。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上；北京上海一般硕士及以上",
+      "url": "https://sgdt.iguopin.com",
+      "evidenceUrl": "https://yjsjob.91wllm.cn/campus/view/id/1005888",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "远光软件股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "algorithm",
+      "title": "算法工程师（2027公告方向）",
+      "category": "算法 / AI",
+      "city": "全国招聘城市集合：珠海、北京、武汉、广州、上海、雄安、杭州、长沙、成都等（非逐岗位城市）",
+      "summary": "招聘公告列出的算法工程师方向，用于企业级AI和数据智能项目，缺少独立职位编号。",
+      "requirements": "2027届本科及以上，数学、人工智能与计算机方向；每岗位城市、语言和技术要求未在公告中单列。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "数学与应用数学",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上；北京上海一般硕士及以上",
+      "url": "https://sgdt.iguopin.com",
+      "evidenceUrl": "https://yjsjob.91wllm.cn/campus/view/id/1005888",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "远光软件股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "data-eng",
+      "title": "数据工程师（2027公告方向）",
+      "category": "数据 / 开发",
+      "city": "全国招聘城市集合：珠海、北京、武汉、广州、上海、雄安、杭州、长沙、成都等（非逐岗位城市）",
+      "summary": "远光软件2027校园公告列有数据工程师职位方向，服务能源企业业务数据平台和软件系统。",
+      "requirements": "2027届计算机与大数据相关本科及以上，具体数据工程技能、学历和工作城市须核实企业单岗。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "数据科学与大数据技术",
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上；北京上海一般硕士及以上",
+      "url": "https://sgdt.iguopin.com",
+      "evidenceUrl": "https://yjsjob.91wllm.cn/campus/view/id/1005888",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "远光软件股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hardware",
+      "title": "硬件设计（2027公告方向）",
+      "category": "硬件 / 研发",
+      "city": "全国招聘城市集合：珠海、北京、武汉、广州、上海、雄安、杭州、长沙、成都等（非逐岗位城市）",
+      "summary": "招聘材料将硬件设计单列为技术招聘方向，可能涉及业务设备及技术产品的硬件工程工作。",
+      "requirements": "2027届本科及以上，电子或工科背景相关；原公告未列具体硬件设计工程项目及职位编号。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "自动化",
+        "机械工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上；北京上海一般硕士及以上",
+      "url": "https://sgdt.iguopin.com",
+      "evidenceUrl": "https://yjsjob.91wllm.cn/campus/view/id/1005888",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "远光软件股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "software",
+      "title": "软件开发（2027公告方向）",
+      "category": "软件 / 开发",
+      "city": "全国招聘城市集合：珠海、北京、武汉、广州、上海、雄安、杭州、长沙、成都等（非逐岗位城市）",
+      "summary": "远光软件2027高校公告将软件开发列为研发岗位方向，服务企业管理平台及智慧能源软件。",
+      "requirements": "2027届计算机与软件专业本科及以上，北京上海通常硕士及以上；具体技术栈按官网职位要求。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "人工智能"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上；北京上海一般硕士及以上",
+      "url": "https://sgdt.iguopin.com",
+      "evidenceUrl": "https://yjsjob.91wllm.cn/campus/view/id/1005888",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "远光软件股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ai-ops",
+      "title": "AI智能交付运营（2027公告方向）",
+      "category": "AI / 运营",
+      "city": "全国招聘城市集合：珠海、北京、武汉、广州、上海、雄安、杭州、长沙、成都等（非逐岗位城市）",
+      "summary": "2027公开校招产品类方向，涉及智能应用交付和运行运营，与传统实施顾问不同，不虚构独立职位号码。",
+      "requirements": "2027届本科及以上，相关AI应用和信息管理专业可参考；具体职责要求与所在城市待官网核实。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "信息管理与信息系统",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上；北京上海一般硕士及以上",
+      "url": "https://sgdt.iguopin.com",
+      "evidenceUrl": "https://yjsjob.91wllm.cn/campus/view/id/1005888",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "远光软件股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "qa",
+      "title": "安全测试工程师（2027公告方向）",
+      "category": "软件 / 测试",
+      "city": "全国招聘城市集合：珠海、北京、武汉、广州、上海、雄安、杭州、长沙、成都等（非逐岗位城市）",
+      "summary": "远光软件高校校招清单中的安全测试工程师方向，归属于测试和产品交付相关技术序列。",
+      "requirements": "2027届本科及以上，安全和软件测试相关背景；具体测试工具及资格由单岗JD决定。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "信息安全",
+        "网络空间安全",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上；北京上海一般硕士及以上",
+      "url": "https://sgdt.iguopin.com",
+      "evidenceUrl": "https://yjsjob.91wllm.cn/campus/view/id/1005888",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "远光软件股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "analyst",
+      "title": "需求分析师（2027公告方向）",
+      "category": "产品 / 分析",
+      "city": "全国招聘城市集合：珠海、北京、武汉、广州、上海、雄安、杭州、长沙、成都等（非逐岗位城市）",
+      "summary": "2027招聘公告单列需求分析师，面向业务调研、需求整理与信息系统交付环节。",
+      "requirements": "2027届本科及以上，计算机、信息管理等背景相关；具体业务领域与岗位城市未被逐岗公开。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "信息管理与信息系统",
+        "计算机科学与技术",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上；北京上海一般硕士及以上",
+      "url": "https://sgdt.iguopin.com",
+      "evidenceUrl": "https://yjsjob.91wllm.cn/campus/view/id/1005888",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "远光软件股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "consult",
+      "title": "咨询顾问（2027公告方向）",
+      "category": "实施 / 咨询",
+      "city": "全国招聘城市集合：珠海、北京、武汉、广州、上海、雄安、杭州、长沙、成都等（非逐岗位城市）",
+      "summary": "远光软件2027校招产品类方向中的咨询顾问，聚焦企业管理与数字化解决方案相关工作。",
+      "requirements": "本科及以上，面向应届毕业生；需核实专业偏好和职位地区，不能挪用FDE单岗30人的招聘人数。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "信息管理与信息系统",
+        "工商管理",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上；北京上海一般硕士及以上",
+      "url": "https://sgdt.iguopin.com",
+      "evidenceUrl": "https://yjsjob.91wllm.cn/campus/view/id/1005888",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "远光软件股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "test",
+      "title": "测试工程师（2027公告方向）",
+      "category": "软件 / 测试",
+      "city": "全国招聘城市集合：珠海、北京、武汉、广州、上海、雄安、杭州、长沙、成都等（非逐岗位城市）",
+      "summary": "远光软件2027高校招聘列出的软件测试工程师方向，实际职责、工具和业务线在独立岗位JD中确认。",
+      "requirements": "2027届本科及以上，软件测试相关专业；北京上海可能有更高学历要求，以具体岗位为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上；北京上海一般硕士及以上",
+      "url": "https://sgdt.iguopin.com",
+      "evidenceUrl": "https://yjsjob.91wllm.cn/campus/view/id/1005888",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "远光软件股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "new-energy",
+      "title": "新能源检测工程师（2027公告方向）",
+      "category": "能源 / 检测",
+      "city": "全国招聘城市集合：珠海、北京、武汉、广州、上海、雄安、杭州、长沙、成都等（非逐岗位城市）",
+      "summary": "招聘资料中的新能源检测工程师方向，与企业智慧能源、检测及技术服务业务相关。",
+      "requirements": "2027届本科及以上，电气能源及自动化专业关联；原公告缺少独立工作城市及细化检测设备门槛。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "能源与动力工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上；北京上海一般硕士及以上",
+      "url": "https://sgdt.iguopin.com",
+      "evidenceUrl": "https://yjsjob.91wllm.cn/campus/view/id/1005888",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "远光软件股份有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}
