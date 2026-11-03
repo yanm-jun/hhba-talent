@@ -1,0 +1,32 @@
+{
+  "companyId": "104",
+  "checkedOn": "2026-11-03",
+  "brand": {
+    "sourceUrl": "",
+    "status": "nonofficial_editorial_wordmark",
+    "trademarkPermissionVerified": false
+  },
+  "commercialReuseRightsVerified": false,
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": {
+        "imageUrl": "https://img2.voc.com.cn/remote/2022/03/08/606_d10c2980c635c98c27e1b6baad0e8d35e2e36b9e.jpg",
+        "articleUrl": "https://www.hunantoday.cn/news/xhn/202203/14104316.html",
+        "note": "新湖南2022年湖南钢铁报道中的钢铁生产线历史照片，版权待许可"
+      },
+      "companyRealPhoto": false,
+      "licenceVerified": false,
+      "note": "正式商用前取得来源授权；当前为非实景SVG示意"
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": null,
+      "companyRealPhoto": false,
+      "licenceVerified": false,
+      "note": "正式商用前取得来源授权；当前为非实景SVG示意"
+    }
+  ]
+}

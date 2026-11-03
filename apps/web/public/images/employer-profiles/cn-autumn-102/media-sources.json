@@ -1,0 +1,36 @@
+{
+  "companyId": "102",
+  "checkedOn": "2026-11-03",
+  "brand": {
+    "sourceUrl": "",
+    "status": "nonofficial_editorial_wordmark",
+    "trademarkPermissionVerified": false
+  },
+  "commercialReuseRightsVerified": false,
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": {
+        "imageUrl": "https://blobppplus.blob.core.windows.net/e2b1a2ce-3e23-428e-84a1-e29c33cf4ad9/SHCCIG.jpeg",
+        "articleUrl": "https://portfolio-pplus.azurewebsites.net/Communicator/Details/4761",
+        "note": "陕煤集团总部历史建筑，图片来自第三方化工企业资料，作者与转载许可尚未取得"
+      },
+      "companyRealPhoto": false,
+      "licenceVerified": false,
+      "note": "正式商用前取得来源授权；当前为非实景SVG示意"
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": {
+        "imageUrl": "https://p3-sdbk2-media.byteimg.com/tos-cn-i-xv4ileqgde/63a08dd545ca4a88b4cfe7bb1290ea0a~tplv-xv4ileqgde-resize-w%3A750.image",
+        "articleUrl": "https://m.baike.com/wikiid/5655017156833273169",
+        "note": "陕煤集团总部历史入口照片，不代表2026办公情况，作者与许可未取得"
+      },
+      "companyRealPhoto": false,
+      "licenceVerified": false,
+      "note": "正式商用前取得来源授权；当前为非实景SVG示意"
+    }
+  ]
+}
