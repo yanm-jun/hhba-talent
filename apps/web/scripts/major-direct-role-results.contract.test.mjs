@@ -29,7 +29,7 @@ assert(recruitment.includes('priority={related:3,unknown:2,unrestricted:1,other:
 const domesticMarket=recruitment.slice(recruitment.indexOf('export async function listDomesticRebuildMarket'));
 const filterPos=domesticMarket.indexOf('const allowed=combined.filter(');
 const sortPos=domesticMarket.indexOf('allowed.sort((a,b)=>priority[');
-const paginationPos=domesticMarket.indexOf('return {jobs:allowed.slice(offset,offset+30)');
+const paginationPos=domesticMarket.indexOf('marketPage(allowed,filters,offset)');
 assert(filterPos>=0&&sortPos>filterPos&&paginationPos>sortPos,'Rank before pagination after filtering');
 assert(market.includes('当前没有符合该专业及其他筛选条件的已收录岗位'),'Zero verified roles must show a truthful empty state');
 assert(css.includes('.hhba-major-role-summary'),'Retain existing HHBA color and card styling');
