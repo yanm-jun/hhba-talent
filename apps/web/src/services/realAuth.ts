@@ -84,7 +84,7 @@ function realAuthErrorMessage(body: unknown): string {
     case 'INVALID_USERNAME':
       return '称呼需为 2-20 位，首字符为字母或中文，其余为字母、数字、下划线或中文。';
     case 'WEAK_PASSWORD':
-      return '密码需为 8-64 位，且同时包含字母和数字。';
+      return '密码须为 8–64 位，同时包含字母和数字；支持 @、!、# 等常见符号。';
     case 'PASSWORD_MISMATCH':
       return '两次输入的密码不一致。';
     case 'CODE_INVALID_OR_EXPIRED':
