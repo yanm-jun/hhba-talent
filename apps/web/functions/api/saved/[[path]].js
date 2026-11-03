@@ -23,6 +23,11 @@ export async function onRequest({request,env}){
  }
  if(!id||!pattern.test(id)||!['PUT','DELETE'].includes(request.method))return bad('METHOD_NOT_ALLOWED',405);
  if(!sameOrigin(request))return bad('ORIGIN_REQUIRED',403);
+ // Legacy device-only saves are read-only for historical data recovery.
+ // New bookmark writes MUST go through /api/account/saved with a PNVS bearer
+ // session. This does not delete existing anonymous device history.
+ return bad('ACCOUNT_LOGIN_REQUIRED',410);
+ /* Retired device mutation implementation, kept out of production execution. */
  try{
   const o=await owner(request,env,request.method==='PUT');
   if(request.method==='PUT'){
