@@ -46,17 +46,19 @@ test('six curated positions are exact source verified job IDs, no invented card 
  assert.ok(selections.includes("job.title===entry.title"));
  assert.ok(selections.includes('!!safeOfficialJobUrl(job)'));
 });
-test('default market showcases six, filtered search and pagination keep the full job index',()=>{
- assert.ok(market.includes('loadVerifiedFeaturedJobs(controller.signal)'));
- assert.ok(market.includes('const defaultView=isDefaultMarketFilters(filters,page)'));
- assert.ok(market.includes('const shown=!compact?pagedEligible:'),'full job market must remain paginated with no pinned duplicates');
- assert.ok(market.includes('defaultView?(featured||featuredError?featured||eligible.slice(0,8):[]):eligible.slice(0,8)'),'home page preserves verified featured employers');
+test('home and full recruitment market both paginate ten actual filtered roles',()=>{
+ assert.ok(market.includes('const pagedEligible=sliceJobsForPage(eligible,page)'));
+ assert.ok(market.includes('const shown=pagedEligible;'),'homepage and full market must share the exact same results');
+ assert.ok(!market.includes('loadVerifiedFeaturedJobs(controller.signal)'),'featured six must not override paged results');
+ assert.ok(market.includes('!error&&!loading&&snapshot&&<JobResultPagination'),'pagination must be present in the homepage as well');
+ assert.ok(market.includes('查看完整招聘市场'),'retain the full recruitment market entry');
+ assert.ok(!market.includes('浏览企业资料库'),'remove only the extra homepage link');
  assert.ok(market.includes("onChange={e=>setDraft(e.target.value)}"));
- assert.ok(market.includes('listJobs(filters,batchOffsetForPage(page),controller.signal)'),'job paging must keep existing source-validated 30-record feed');
+ assert.ok(market.includes('listJobs(filters,batchOffsetForPage(page),controller.signal)'),'keep existing source-validated 30-record feed');
  assert.ok(market.includes("const detail='/candidate/jobs/'+encodeURIComponent(job.id)"));
  assert.ok(market.includes("to={detail}"));
  assert.ok(market.includes('<EmployerBrandLogo job={job}/>'));
- assert.ok(market.includes('featuredTitle(job,lang)'));
+ assert.ok(market.includes('featuredTitle(job,lang)'),'curated source titles remain available for known job IDs');
 });
 test('real selected official details and application stay independent of logo source',()=>{
  assert.ok(market.includes('fetchOfficialJd(job,controller.signal)'));

@@ -52,7 +52,11 @@ test('compact cards, direct role access, persistent filters, mobile layout and r
  const pager=read('src/components/JobResultPagination.tsx');
  const css=read('src/styles/unified-jobs.css');
  assert.match(market,/className="unified-job-grid unified-role-list"/);
- assert.match(market,/const shown=!compact\?pagedEligible:/);
+ assert.match(market,/const shown=pagedEligible;/);
+ assert.doesNotMatch(market,/eligible\.slice\(0,6\)/,'homepage must not silently truncate to six');
+ assert.doesNotMatch(market,/浏览企业资料库/,'the red-box company link must be removed');
+ assert.match(market,/\{compact&&<div className="unified-job-browse-links">/);
+ assert.match(market,/查看完整招聘市场/);
  assert.match(market,/sliceJobsForPage\(eligible,page\)/);
  assert.match(market,/listJobs\(filters,batchOffsetForPage\(page\),controller.signal\)/);
  assert.match(market,/const state=\{scope:compact\?'home'/);
@@ -63,6 +67,9 @@ test('compact cards, direct role access, persistent filters, mobile layout and r
  assert.match(market,/majorSlug=\{selectedMajor\}/);
  assert.match(market,/<SaveJobButton jobId=\{job.id\}/);
  assert.match(market,/<JobResultPagination page=\{page\} total=\{snapshot.total\} pageSize=\{JOBS_PER_PAGE\}/);
+ assert.match(market,/!error&&!loading&&snapshot&&<JobResultPagination/,'homepage and full market use the same paginator');
+ assert.doesNotMatch(market,/\{compact\?<div className="unified-job-browse-links">/,'homepage link must not replace pagination');
+
  assert.match(pager,/type="number" inputMode="numeric"/);
  assert.match(pager,/onSubmit=\{submit\}/);
  assert.match(pager,/validJumpPage\(typed,total\)/);
