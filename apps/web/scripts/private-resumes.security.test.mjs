@@ -191,7 +191,9 @@ test('UI never publishes resume objects or automatically invokes DeepSeek',()=>{
  assert.match(api,/private-resume-storage-v1/);
  assert.match(vault,/checked=\{consent\}/);
  assert.match(vault,/!file\|\|!consent\|\|busy/);
- assert.match(vault,/不会自动发送给 DeepSeek/);
+ assert.match(vault,/上传不等于授权 DeepSeek 分析/);
+ assert.match(vault,/Cloudflare R2 亚太区（APAC）/);
+ assert.match(vault,/中国大陆境外/);
  assert.match(page,/current==='resume'&&<PrivateResumeVault\/>/);
  assert.doesNotMatch(api,/DeepSeek|matchResume|externalApi/);
  const schema=readFileSync(new URL('../d1/0007_private_resumes.sql',import.meta.url),'utf8');
