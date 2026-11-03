@@ -91,6 +91,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
   finally{setBusy('')}
  }
  const sectionTitle=pages.find(page=>page.id===current)?.label||'个人中心';
+ if(!user?.account_types?.includes('candidate'))return <Shell user={user}><section className="hhba-personal"><p role="status">请先使用真实求职者账号登录。</p><Link to="/candidate/login">前往登录</Link></section></Shell>;
  return <Shell user={user}>
  <section className="hhba-personal hhba-account-page">
   <nav className="hhba-personal-trail"><Link to="/">首页</Link><span>/</span><Link to="/candidate">求职中心</Link><span>/</span><strong>{sectionTitle}</strong></nav>
