@@ -25,9 +25,10 @@ assert(major.includes("return fields.length?'other':'unknown'"),
  'Missing/other declared requirements must not be treated as verified');
 assert(recruitment.includes('priority={related:3,unrestricted:2,unknown:1,other:0,all:0}'),
  'Rank related, explicitly unrestricted and optional unknown in that order');
-const filterPos=recruitment.indexOf('const allowed=combined.filter(');
-const sortPos=recruitment.indexOf('allowed.sort((a,b)=>priority[');
-const paginationPos=recruitment.indexOf('allowed.slice(offset,offset+30)');
+const domesticMarket=recruitment.slice(recruitment.indexOf('export async function listDomesticRebuildMarket'));
+const filterPos=domesticMarket.indexOf('const allowed=combined.filter(');
+const sortPos=domesticMarket.indexOf('allowed.sort((a,b)=>priority[');
+const paginationPos=domesticMarket.indexOf('return {jobs:allowed.slice(offset,offset+30)');
 assert(filterPos>=0&&sortPos>filterPos&&paginationPos>sortPos,'Rank before pagination after filtering');
 assert(market.includes('当前没有符合该专业及其他筛选条件的已收录岗位'),'Zero verified roles must show a truthful empty state');
 assert(css.includes('.hhba-major-role-summary'),'Retain existing HHBA color and card styling');
