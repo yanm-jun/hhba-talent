@@ -37,3 +37,27 @@ jobs:
         run: |
           npm ci --no-audit --no-fund
           VITE_HHBA_VERIFIED_SNAPSHOT=1 npm run build
+
+  live-ats-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify current official job feeds without Railway or fixture data
+        working-directory: apps/web
+        run: |
+          mkdir -p dist/data
+          node scripts/prepare-pages-jobs.mjs
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const data=JSON.parse(readFileSync('dist/data/jobs.json','utf8'));
+          if(data.total<40||data.boards<8||data.boards+data.failures!==data.configured_boards)
+            throw Error('LIVE_OFFICIAL_COVERAGE_INSUFFICIENT');
+          console.log('HHBA_OFFICIAL_ATS_LIVE_SMOKE_OK',JSON.stringify({
+            jobs:data.total,successfulBoards:data.boards,failedBoards:data.failures,
+            totalBoards:data.configured_boards,updated:data.updated
+          }));
+          NODE
