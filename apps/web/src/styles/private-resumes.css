@@ -1,24 +1,64 @@
-.hhba-private-resumes{display:flex;flex-direction:column;gap:13px}
+/* Keep the original HHBA personal-workbench layout: scoped visual refinement only. */
+.hhba-private-resumes{display:flex;flex-direction:column;gap:17px}
 .hhba-private-resumes .hhba-account-section-heading{margin-bottom:0}
-.hhba-resume-private-note{display:flex;gap:10px;align-items:flex-start;padding:13px 15px;background:#f3f8f4;border:1px solid #deeadf;border-radius:12px;color:#405f4c;font-size:12px;line-height:1.7}
-.hhba-resume-private-note svg{flex:none;margin-top:1px}
-.hhba-private-resume-summary{display:flex;gap:12px;align-items:center;color:#597266;font-size:12px}
-.hhba-private-resume-summary strong{font-size:20px;color:#245c3a}
-.hhba-private-resume-empty{font-size:13px;color:#667c6b}
+.hhba-resume-private-note{display:flex;gap:10px;align-items:center;padding:12px 15px;background:#f3f8f4;border:1px solid #e2ebe3;border-radius:11px;color:#4c6e58;font-size:12px;line-height:1.7}
+.hhba-resume-private-note svg{flex:none;color:#3b7555}
+.hhba-private-resume-summary{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#526e5b;font-size:13px;font-weight:650}
+.hhba-private-resume-count{display:inline-flex;align-items:baseline;gap:3px;border:1px solid #dce9df;padding:5px 11px;border-radius:999px;background:#f4f9f5;color:#6c8073;font-size:12px;white-space:nowrap}
+.hhba-private-resume-count strong{font-size:18px;line-height:1;color:#2c6646;font-variant-numeric:tabular-nums}
+.hhba-private-resume-empty{display:flex;align-items:center;gap:11px;padding:13px 15px;border:1px solid #ecf0ec;border-radius:11px;background:#fafcfb;color:#7b8e80;font-size:12px;line-height:1.6}
+.hhba-private-resume-empty svg{color:#789d85;flex:none}
 .hhba-private-resume-list{display:grid;gap:9px}
-.hhba-private-resume-list article{display:flex;align-items:center;gap:12px;padding:15px;border:1px solid #e1eae2;border-radius:12px;background:#fff;min-width:0}
+.hhba-private-resume-list article{display:flex;align-items:center;gap:12px;padding:15px;border:1px solid #e2ebe3;border-radius:12px;background:#fff;min-width:0}
 .hhba-private-resume-list article>svg{color:#2b7050;flex:none}
-.hhba-private-resume-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
-.hhba-private-resume-info strong{font-size:13px;font-weight:680;overflow-wrap:anywhere}
-.hhba-private-resume-info small{color:#718378;font-size:11px}
+.hhba-private-resume-info{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+.hhba-private-resume-info strong{font-size:13px;font-weight:650;overflow-wrap:anywhere}
+.hhba-private-resume-info small{color:#77877c;font-size:11px}
 .hhba-private-resume-actions{display:flex;gap:8px;flex-wrap:wrap}
-.hhba-private-resume-actions button,.hhba-private-resume-submit{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid #cfe2d2;border-radius:9px;background:white;color:#2d6544;padding:10px 12px;font-size:12px;cursor:pointer}
-.hhba-private-resume-actions button:disabled,.hhba-private-resume-submit:disabled{opacity:.5;cursor:not-allowed}
-.hhba-private-resume-upload{display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid #e0eae0;border-radius:12px;background:#fbfdfb}
-.hhba-private-resume-upload>label:first-child{font-size:13px;font-weight:650;color:#2b4936}
-.hhba-private-resume-upload input[type=file]{max-width:100%;font-size:12px;color:#405a47}
-.hhba-private-resume-upload>p,.hhba-private-resume-upload>small{font-size:12px;line-height:1.75;color:#657568;margin:0}
-.hhba-private-resume-consent{display:flex;gap:10px;align-items:flex-start;font-size:12px;color:#4c5f51;line-height:1.75;cursor:pointer}
-.hhba-private-resume-consent input{flex:none;margin-top:5px}
-.hhba-private-resume-submit{background:#285e43;color:#fff;border-color:#285e43;align-self:flex-start;font-weight:650}
-@media(max-width:640px){.hhba-private-resume-list article{flex-wrap:wrap}.hhba-private-resume-actions{width:100%;padding-left:32px}.hhba-private-resume-submit{align-self:stretch}}
+.hhba-private-resume-actions button,.hhba-private-resume-pick,.hhba-private-resume-clear,.hhba-private-resume-submit{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid #d2e3d5;border-radius:9px;background:white;color:#2f6545;padding:9px 14px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease}
+.hhba-private-resume-actions button:hover:not(:disabled),.hhba-private-resume-pick:hover:not(:disabled),.hhba-private-resume-clear:hover:not(:disabled){background:#eef7f0;border-color:#abcbb6}
+.hhba-private-resume-actions button:disabled,.hhba-private-resume-pick:disabled,.hhba-private-resume-clear:disabled,.hhba-private-resume-submit:disabled{opacity:.55;cursor:not-allowed}
+.hhba-private-resumes button:focus-visible,.hhba-private-resume-details summary:focus-visible{outline:3px solid #9bd2b2;outline-offset:3px}
+.hhba-private-resume-upload{display:flex;flex-direction:column;gap:15px;padding:20px;border:1px solid #e4ece5;border-radius:14px;background:#fbfdfb;min-width:0}
+.hhba-private-resume-upload-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hhba-private-resume-upload-heading h3{margin:0 0 5px;font-size:15px;font-weight:680;color:#244a34;line-height:1.35}
+.hhba-private-resume-upload-heading p{margin:0;color:#819085;font-size:12px}
+.hhba-private-resume-upload-heading>span{border:1px solid #e0ebe3;background:white;border-radius:7px;padding:6px 9px;color:#728d79;font-size:10px;font-weight:650;letter-spacing:.015em;white-space:nowrap}
+.hhba-private-resume-dropzone{display:flex;flex-direction:column;align-items:center;text-align:center;justify-content:center;gap:7px;padding:27px 20px;min-height:200px;border:1.5px dashed #bcd6c3;border-radius:13px;background:#fff;color:#355c43;transition:background-color .16s ease,border-color .16s ease;min-width:0}
+.hhba-private-resume-dropzone.is-dragging{background:#ecf7ee;border-color:#488f65}
+.hhba-private-resume-dropzone.has-file{background:#f8fcf9;border-style:solid;border-color:#c4dec9}
+.hhba-private-resume-drop-icon{width:51px;height:51px;display:grid;place-items:center;background:#e8f3eb;color:#3c8058;border-radius:14px;margin-bottom:2px}
+.hhba-private-resume-dropzone strong{font-size:14px;font-weight:650;line-height:1.4;color:#2b513a}
+.hhba-private-resume-dropzone>small{color:#87998b;font-size:11px;line-height:1.6}
+.hhba-private-resume-file-name{font-size:12px;color:#52705c;max-width:100%;overflow-wrap:anywhere;line-height:1.5}
+.hhba-private-resume-file-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:8px}
+.hhba-private-resume-pick{background:#fff;border-color:#a9cbb5;padding:10px 23px;color:#2a6444}
+.hhba-private-resume-clear{border-color:#e3e9e4;color:#67796d}
+.hhba-private-resume-consent-panel{border:1px solid #e5ebe5;border-radius:11px;background:#fff;overflow:hidden}
+.hhba-private-resume-consent{display:flex;gap:11px;align-items:flex-start;padding:14px 15px 12px;cursor:pointer;color:#52675a;font-size:12px;line-height:1.75}
+.hhba-private-resume-consent input{flex:none;width:15px;height:15px;accent-color:#2e7151;margin:4px 0 0;cursor:pointer}
+.hhba-private-resume-consent strong{color:#385d43;font-weight:650}
+.hhba-private-resume-details{border-top:1px solid #edf1ed;color:#697d70}
+.hhba-private-resume-details summary{display:flex;align-items:center;gap:8px;padding:12px 15px;list-style:none;cursor:pointer;font-size:12px;font-weight:600;user-select:none}
+.hhba-private-resume-details summary::-webkit-details-marker{display:none}
+.hhba-private-resume-details summary svg:first-child{color:#518b65;flex:none}
+.hhba-private-resume-details summary:hover{background:#f7faf8}
+.hhba-private-resume-chevron{margin-left:auto;transition:transform .18s ease;flex:none}
+.hhba-private-resume-details[open] .hhba-private-resume-chevron{transform:rotate(180deg)}
+.hhba-private-resume-details p{margin:0;padding:0 15px 14px 39px;font-size:12px;line-height:1.85;color:#647669}
+.hhba-private-resume-upload-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:11px}
+.hhba-private-resume-submit{background:#2d6849;border-color:#2d6849;color:#fff;padding:12px 19px;min-height:42px}
+.hhba-private-resume-submit:hover:not(:disabled){background:#21573a;border-color:#21573a}
+.hhba-private-resume-upload-actions>small{display:inline-flex;align-items:center;gap:6px;font-size:11px;line-height:1.6;color:#89988d}
+.hhba-private-resume-upload-actions>small svg{color:#80a88c;flex:none}
+@media(max-width:740px){
+ .hhba-private-resume-upload{padding:15px;gap:13px}
+ .hhba-private-resume-dropzone{padding:23px 12px;min-height:190px}
+ .hhba-private-resume-upload-actions{flex-direction:column;align-items:stretch}
+ .hhba-private-resume-submit{width:100%}
+ .hhba-private-resume-upload-actions>small{justify-content:center;text-align:center}
+ .hhba-private-resume-list article{flex-wrap:wrap}
+ .hhba-private-resume-actions{width:100%;padding-left:32px}
+ .hhba-private-resume-details p{padding-left:15px}
+}
+@media(prefers-reduced-motion:reduce){.hhba-private-resumes *{transition:none!important}}
