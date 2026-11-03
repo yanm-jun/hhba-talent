@@ -20,3 +20,13 @@ CREATE TABLE IF NOT EXISTS hhba_candidate_resumes (
 );
 CREATE INDEX IF NOT EXISTS idx_hhba_candidate_resumes_owner_time
   ON hhba_candidate_resumes(phone,created_at DESC);
+
+-- Separate upload-rate ledger prevents repeatedly delete/re-uploading files
+-- to bypass the 3-file limit; stores only owner and time, never resume text.
+CREATE TABLE IF NOT EXISTS hhba_candidate_resume_upload_events (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  phone TEXT NOT NULL REFERENCES hhba_auth_users(phone) ON DELETE CASCADE,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_hhba_candidate_resume_upload_events_owner_time
+  ON hhba_candidate_resume_upload_events(phone,created_at DESC);
