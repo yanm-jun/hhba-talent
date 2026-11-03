@@ -46,7 +46,10 @@ def fetch_https_verified(url,page):
 # temporarily unreachable from the Cloudflare build network. Provenance is
 # pinned to a previous successful HHBA deployment, not an unaudited substitute.
 # Never accept editorial SVG placeholders or an arbitrary remote image.
-PUBLISHED_ROOT='https://hhba.work/images/employer-profiles/cn-autumn-034/'
+PUBLISHED_ROOTS=(
+ 'https://hhba-talent.pages.dev/images/employer-profiles/cn-autumn-034/',
+ 'https://hhba.work/images/employer-profiles/cn-autumn-034/',
+)
 PINNED_SOURCES={
  'logo.webp':('https://portal-oss.zhiye.com/608369/image/904d8154-0f08-427a-8e98-4149aac0ee91.png',
    '8a5bd9ad0b3cc15d919d164f600f4fc2b753e9c409c211df9289d77f5816a299',1000,414),
@@ -57,25 +60,34 @@ PINNED_SOURCES={
 }
 def reuse_published_verified(filename,alternatives):
  expected=PINNED_SOURCES[filename]
- with urlopen(Request(PUBLISHED_ROOT+'media-audit.json',headers={'Accept':'application/json'}),timeout=15) as res:
-  published=json.load(res)
- row=published.get(filename)
- if not isinstance(row,dict) or row.get('verified') is not True:
-  raise ValueError('published media provenance missing')
- if row.get('source')!=expected[0] or row.get('sha256')!=expected[1] or (
-    row.get('width'),row.get('height'))!=expected[2:]:
-  raise ValueError('published media provenance hash/source/dimensions mismatch')
- if (row.get('source'),row.get('sourcePage')) not in alternatives:
-  raise ValueError('published media has unapproved source attribution')
- raw=fetch_https_verified(PUBLISHED_ROOT+filename,'https://hhba.work/')
- if not 1800<len(raw)<8_500_000:raise ValueError('published media size invalid')
- expected_format='WEBP' if filename.endswith('.webp') else 'JPEG'
- with Image.open(BytesIO(raw)) as im:
-  if im.format!=expected_format or im.size!=expected[2:]:
-   raise ValueError('published media pixels or format mismatch')
-  im.verify()
- (out/filename).write_bytes(raw)
- return {**row,'reusedVerifiedPublishedCopy':True,'publishedCopySha256':sha256(raw).hexdigest()}
+ errors=[]
+ for root in PUBLISHED_ROOTS:
+  try:
+   # Reuse the same browser-like HTTPS transport as the original images.
+   # Python's default urllib user agent can be blocked by Cloudflare WAF (403).
+   audit_bytes=fetch_https_verified(root+'media-audit.json',root)
+   if not 200<len(audit_bytes)<25000:raise ValueError('invalid published provenance length')
+   published=json.loads(audit_bytes.decode('utf8'))
+   row=published.get(filename)
+   if not isinstance(row,dict) or row.get('verified') is not True:
+    raise ValueError('published media provenance missing')
+   if row.get('source')!=expected[0] or row.get('sha256')!=expected[1] or (
+      row.get('width'),row.get('height'))!=expected[2:]:
+    raise ValueError('published media provenance hash/source/dimensions mismatch')
+   if (row.get('source'),row.get('sourcePage')) not in alternatives:
+    raise ValueError('published media has unapproved source attribution')
+   raw=fetch_https_verified(root+filename,root)
+   if not 1800<len(raw)<8_500_000:raise ValueError('published media size invalid')
+   expected_format='WEBP' if filename.endswith('.webp') else 'JPEG'
+   with Image.open(BytesIO(raw)) as im:
+    if im.format!=expected_format or im.size!=expected[2:]:
+     raise ValueError('published media pixels or format mismatch')
+    im.verify()
+   (out/filename).write_bytes(raw)
+   return {**row,'reusedVerifiedPublishedCopy':True,'publishedCopySha256':sha256(raw).hexdigest()}
+  except Exception as exc:
+   errors.append(root.split('/')[2]+': '+str(exc)[:90])
+ raise RuntimeError('No valid published original: '+'; '.join(errors))
 
 audit={}
 used=set()
