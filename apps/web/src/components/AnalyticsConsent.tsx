@@ -19,8 +19,8 @@ export function AnalyticsConsent(){
  },[]);
  if(import.meta.env.BASE_URL==='/hhba-talent/'||choice!==null)return null;
  return <aside className="hhba-consent" aria-label="访问统计隐私选择">
-  <div><strong>匿名访问与账号使用统计</strong><p>同意后会统计登录账号在不同功能类别的按日使用情况，用于计算活跃与回访；账号标识经不可逆哈希映射，不收集访问路径、搜索词或简历内容。帮助 HHBA 了解页面访问和岗位使用情况；不采集搜索词、邮箱、简历或完整职位链接。可随时在个人中心修改。</p></div>
+  <div><strong>匿名访问与账号使用统计</strong><p>同意后会统计登录账号在不同功能类别的按日使用情况，用于计算活跃与回访；账号仅以受保护的统计标识关联到按日功能类别，用于计算活跃和回访。统计库不保存搜索词、简历正文、手机号或具体页面路径；可在个人中心随时关闭并申请清除相关记录。</p></div>
   <div><button type="button" onClick={()=>{chooseAnalytics(false);setChoice(false)}}>暂不同意</button>
-  <button type="button" onClick={()=>{chooseAnalytics(true);setChoice(true)}}>同意匿名统计</button></div>
+  <button type="button" onClick={()=>{chooseAnalytics(true);setChoice(true)}}>同意使用情况统计</button></div>
  </aside>;
 }
