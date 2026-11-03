@@ -1,0 +1,640 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-101",
+  "name": "云天化集团",
+  "displayName": "云天化集团有限责任公司及控股企业招聘",
+  "englishName": "Yuntianhua Group",
+  "aliases": [
+    "云天化",
+    "云天化股份",
+    "云南云天化",
+    "Yuntianhua",
+    "云天化集团2027秋招"
+  ],
+  "industry": "磷矿 · 磷复肥 · 化工新材料 · 化学品生产 · 商贸物流",
+  "subtitle": "2027年云天化控股上市公司所属单位招聘记录（秋招已截止）",
+  "overview": "云天化集团旗下上市公司云南云天化股份有限公司及下属单位公开2027年秋季招聘计划。高校与招聘资讯转载的清单按24家用人单位列出多项具体职位、人数、学历和工作地。这里记录其中24条与集团相关的具名岗位，保留所属法人与真实地域，不把母公司直接写成招聘主体。主要2027年秋季网申至2026年10月31日已截止，且部分项目另有专项时间，必须逐项区分。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://f.15386.cn/a/475349.html",
+    "https://career.csu.edu.cn/campus/view/id/591041",
+    "https://yth.cn/gywm/wh.html",
+    "https://hera-webapp.fenbi.com/api/article/detail?app=web&id=469644765582336",
+    "https://yythzb3.zhiye.com/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-101/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-101/photo1.svg",
+        "caption": "云天化集团的实景图片待来源与授权审核（目前非实景示意）",
+        "alt": "云天化集团图片审核中的编辑占位图，并非企业真实照片",
+        "note": "非实景：独立验收图片待真实来源、尺寸哈希、版权许可审核。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-101/photo2.svg",
+        "caption": "云天化集团的实景图片待来源与授权审核（目前非实景示意）",
+        "alt": "云天化集团图片审核中的编辑占位图，并非企业真实照片",
+        "note": "非实景：独立验收图片待真实来源、尺寸哈希、版权许可审核。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://yythzb3.zhiye.com/",
+    "label": "云天化股份2027校园招聘系统（首批已截止）",
+    "status": "official_portal",
+    "subject": "云南云天化股份有限公司及各下属子公司，不代表云天化集团有限责任公司直接招录",
+    "note": "云天化股份2027秋招一般报名截至2026-10-31 24:00，公开汇总材料含24家所属单位。个别单独专项可能另有截止日，不能将所有记录说成11月可投。当前开放状态未验证。"
+  },
+  "photoNote": "本页不使用无来源的企业环境图片。预览CI从可追溯出版者尝试获取两幅历史现场照片，经尺寸/哈希核验后展示，并明确其历史日期及转载许可状态；正式商用前需获得授权。",
+  "majorIntro": "24条为2027招聘计划表中按企业、岗位、教育和地区给出的具名岗位。专业关联由HHBA编辑辅助匹配；原汇总不一定公开每岗具体学科限制，不把专业推荐写成企业硬门槛。",
+  "preferredMajors": [
+    "化学工程与工艺",
+    "机械工程",
+    "电气工程及其自动化",
+    "自动化",
+    "材料科学与工程",
+    "采矿工程",
+    "矿物加工工程",
+    "地质工程",
+    "环境工程",
+    "计算机科学与技术",
+    "会计学",
+    "供应链管理"
+  ],
+  "business": [
+    {
+      "title": "磷矿采选与资源开发",
+      "description": "开发磷矿资源，围绕采矿、选矿、地质和测量等专业环节开展矿产资源保障业务。",
+      "tags": "矿业 · 资源",
+      "details": [
+        "磷矿开采",
+        "选矿工程",
+        "地质勘查"
+      ]
+    },
+    {
+      "title": "磷复肥与农业化工",
+      "description": "生产化肥、磷复肥、合成氨及农业生产相关化学品，在多个省份运行生产基地。",
+      "tags": "化肥 · 生产",
+      "details": [
+        "化肥制造",
+        "合成氨",
+        "农业化学品"
+      ]
+    },
+    {
+      "title": "精细化工与工程塑料",
+      "description": "开展聚甲醛及高分子材料等新材料生产研发，包含聚合、工艺优化与质量检验。",
+      "tags": "材料 · 化工",
+      "details": [
+        "聚甲醛",
+        "工程塑料",
+        "质量检验"
+      ]
+    },
+    {
+      "title": "装备、电仪与自动化",
+      "description": "工业装备、检修、仪表与自动控制服务于化工园区生产、数字化改造与安全稳定运行。",
+      "tags": "装备 · 自动化",
+      "details": [
+        "工艺设备",
+        "电气仪表",
+        "工业自控"
+      ]
+    },
+    {
+      "title": "化工研发与绿色技术",
+      "description": "围绕化学品、产品研发、资源综合利用与环保技术展开应用研究及产业化。",
+      "tags": "研发 · 环保",
+      "details": [
+        "化工材料",
+        "资源循环",
+        "绿色低碳"
+      ]
+    },
+    {
+      "title": "商贸物流与供应链",
+      "description": "通过贸易、物流与海外业务开展化工品采购销售、仓储运输和国际运营。",
+      "tags": "物流 · 商贸",
+      "details": [
+        "产品采购",
+        "国际物流",
+        "供应链管理"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "tianan-ops",
+      "title": "生产操作（云南天安化工有限公司）",
+      "category": "化工 / 生产",
+      "city": "昆明安宁市",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南天安化工有限公司的“生产操作”岗位，地点为昆明安宁市。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为大专及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "化学工程与工艺",
+        "应用化学",
+        "化工安全工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "大专及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南天安化工有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "tianan-process",
+      "title": "工艺技术（云南天安化工有限公司）",
+      "category": "化工 / 工艺",
+      "city": "昆明安宁市",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南天安化工有限公司的“工艺技术”岗位，地点为昆明安宁市。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为本科及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "化学工程与工艺",
+        "过程装备与控制工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南天安化工有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "tianan-test",
+      "title": "分析检验（云南天安化工有限公司）",
+      "category": "质量 / 检验",
+      "city": "昆明安宁市",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南天安化工有限公司的“分析检验”岗位，地点为昆明安宁市。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为大专及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "应用化学",
+        "化学工程与工艺",
+        "材料化学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "大专及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南天安化工有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "tianan-equipment",
+      "title": "设备技术（云南天安化工有限公司）",
+      "category": "机械 / 设备",
+      "city": "昆明安宁市",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南天安化工有限公司的“设备技术”岗位，地点为昆明安宁市。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为本科及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "过程装备与控制工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南天安化工有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "cq-plastics",
+      "title": "工程塑料研发（重庆天聚新材料有限公司）",
+      "category": "材料 / 研发",
+      "city": "重庆长寿区",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出重庆天聚新材料有限公司的“工程塑料研发”岗位，地点为重庆长寿区。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为硕士研究生及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "高分子材料与工程",
+        "材料科学与工程",
+        "化学工程与工艺"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士研究生及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "重庆天聚新材料有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "cq-risk",
+      "title": "风控管理（重庆天聚新材料有限公司）",
+      "category": "经营 / 风控",
+      "city": "重庆长寿区",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出重庆天聚新材料有限公司的“风控管理”岗位，地点为重庆长寿区。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为本科及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "财务管理",
+        "金融学",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "重庆天聚新材料有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "cq-auto",
+      "title": "自控技术（重庆天聚新材料有限公司）",
+      "category": "自动化 / 电气",
+      "city": "重庆长寿区",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出重庆天聚新材料有限公司的“自控技术”岗位，地点为重庆长寿区。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为本科及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "自动化",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "重庆天聚新材料有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "poly-mining",
+      "title": "采矿技术（云南云天化聚磷新材料有限公司）",
+      "category": "矿业 / 工程",
+      "city": "昭通镇雄县",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南云天化聚磷新材料有限公司的“采矿技术”岗位，地点为昭通镇雄县。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为本科及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "采矿工程",
+        "矿物资源工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南云天化聚磷新材料有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "poly-safety",
+      "title": "安全环保（云南云天化聚磷新材料有限公司）",
+      "category": "安全 / 环保",
+      "city": "昭通镇雄县",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南云天化聚磷新材料有限公司的“安全环保”岗位，地点为昭通镇雄县。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为本科及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "安全工程",
+        "环境工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南云天化聚磷新材料有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "honghe-process",
+      "title": "工艺技术（云南云天化红磷化工有限公司）",
+      "category": "化工 / 工艺",
+      "city": "红河开远市",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南云天化红磷化工有限公司的“工艺技术”岗位，地点为红河开远市。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为本科及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "化学工程与工艺",
+        "应用化学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南云天化红磷化工有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "honghe-electro",
+      "title": "电气维护（云南云天化红磷化工有限公司）",
+      "category": "自动化 / 电气",
+      "city": "红河开远市",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南云天化红磷化工有限公司的“电气维护”岗位，地点为红河开远市。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为大专及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "大专及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南云天化红磷化工有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "tianning-mining",
+      "title": "采矿技术（云南天宁矿业有限公司）",
+      "category": "矿业 / 工程",
+      "city": "昆明安宁市",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南天宁矿业有限公司的“采矿技术”岗位，地点为昆明安宁市。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为本科及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "采矿工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南天宁矿业有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "tianning-geology",
+      "title": "地质技术（云南天宁矿业有限公司）",
+      "category": "矿业 / 工程",
+      "city": "昆明安宁市",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南天宁矿业有限公司的“地质技术”岗位，地点为昆明安宁市。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为本科及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "地质工程",
+        "资源勘查工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南天宁矿业有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "kaishi-processing",
+      "title": "选矿技术（云南云天化凯石科技有限公司）",
+      "category": "矿业 / 工程",
+      "city": "昆明晋宁区",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南云天化凯石科技有限公司的“选矿技术”岗位，地点为昆明晋宁区。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为本科及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "矿物加工工程",
+        "采矿工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南云天化凯石科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "phosphate-it",
+      "title": "信息化技术（云南磷化集团有限公司）",
+      "category": "软件 / 信息化",
+      "city": "昆明晋宁区",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南磷化集团有限公司的“信息化技术”岗位，地点为昆明晋宁区。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为硕士研究生及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息管理与信息系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士研究生及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南磷化集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "phosphate-geology",
+      "title": "地质技术（云南磷化集团有限公司）",
+      "category": "矿业 / 工程",
+      "city": "昆明晋宁区",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南磷化集团有限公司的“地质技术”岗位，地点为昆明晋宁区。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为本科及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "地质工程",
+        "资源勘查工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南磷化集团有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "research-fertilizer",
+      "title": "化肥产品开发（云南云天化股份有限公司研究院）",
+      "category": "材料 / 研发",
+      "city": "昆明晋宁区",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南云天化股份有限公司研究院的“化肥产品开发”岗位，地点为昆明晋宁区。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为博士研究生；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "化学工程与工艺",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "博士研究生 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南云天化股份有限公司研究院",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "qinghai-electro",
+      "title": "电气技术（青海云天化国际化肥有限公司）",
+      "category": "自动化 / 电气",
+      "city": "西宁湟中区",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出青海云天化国际化肥有限公司的“电气技术”岗位，地点为西宁湟中区。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为本科及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "青海云天化国际化肥有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ammonia-it",
+      "title": "信息化技术（云南云天化大为制氨有限公司）",
+      "category": "软件 / 信息化",
+      "city": "曲靖沾益区",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南云天化大为制氨有限公司的“信息化技术”岗位，地点为曲靖沾益区。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为本科及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南云天化大为制氨有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "yth-finance",
+      "title": "财务管理（云南云天化股份有限公司）",
+      "category": "财务 / 管理",
+      "city": "云天化股份下属单位注册地（未单列具体城市）",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南云天化股份有限公司的“财务管理”岗位，地点为云天化股份下属单位注册地（未单列具体城市）。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为本科及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "会计学",
+        "财务管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南云天化股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "fushi-digital",
+      "title": "数智化技术岗（云南云天化福石科技有限公司）",
+      "category": "软件 / 信息化",
+      "city": "昆明西山区、晋宁区",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南云天化福石科技有限公司的“数智化技术岗”岗位，地点为昆明西山区、晋宁区。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为本科及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南云天化福石科技有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "tianchi-international",
+      "title": "市场管理（国际业务）（天驰物流有限责任公司）",
+      "category": "营销 / 国际业务",
+      "city": "广西钦州市",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出天驰物流有限责任公司的“市场管理（国际业务）”岗位，地点为广西钦州市。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为本科及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "国际经济与贸易",
+        "物流管理",
+        "市场营销"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "本科及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "天驰物流有限责任公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sales-masters",
+      "title": "产品销售（云南云天化联合商务有限公司）",
+      "category": "营销 / 国际业务",
+      "city": "昆明西山区",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南云天化联合商务有限公司的“产品销售”岗位，地点为昆明西山区。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为硕士研究生及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "化学工程与工艺",
+        "国际经济与贸易"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士研究生及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南云天化联合商务有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "purchase-masters",
+      "title": "产品采购（云南云天化联合商务有限公司）",
+      "category": "供应链 / 采购",
+      "city": "昆明西山区",
+      "summary": "2027年云天化股份及下属单位公开招聘计划明确列出云南云天化联合商务有限公司的“产品采购”岗位，地点为昆明西山区。此条岗位归属该单位而非直接归属集团母公司；职位类别和项目地点来自公开招聘计划表。",
+      "requirements": "公开招聘计划对该条岗位给出的学历门槛为硕士研究生及以上；具体专业细分、职位职责、名额变化和流程须以云天化股份的官方报名系统为准。主要2027年秋季报名2026年10月31日已截止，此条不作为当前可投递岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "物流管理",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "硕士研究生及以上 · 2027秋招已截止",
+      "url": "https://yythzb3.zhiye.com/",
+      "evidenceUrl": "https://f.15386.cn/a/475349.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "云南云天化联合商务有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}
