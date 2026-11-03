@@ -1,5 +1,6 @@
 import {useEffect,useState,type FormEvent} from 'react';
 import type {Language} from '../services/liveRecruitment';
+import {pageCount,validJumpPage,visiblePageTokens} from '../services/jobPaging.mjs';
 
 type Props={
  page:number;total:number;pageSize:number;loading:boolean;
@@ -7,24 +8,16 @@ type Props={
 };
 export function JobResultPagination({page,total,pageSize,loading,onChange,lang}:Props){
  const [typed,setTyped]=useState('');
- const pages=Math.max(1,Math.ceil(Math.max(0,total)/pageSize));
+ const pages=Math.max(1,pageCount(total));
  const current=Math.min(page+1,pages);
  useEffect(()=>setTyped(''),[page,total,pageSize]);
  if(total<=0)return null;
- const candidate=Number(typed.trim());
- const valid=typed.trim().length>0&&/^\d+$/.test(typed.trim())&&
-   Number.isSafeInteger(candidate)&&candidate>=1&&candidate<=pages;
- const selected=new Set([1,pages,current-2,current-1,current,current+1,current+2]
-   .filter(n=>n>=1&&n<=pages));
- const displayed=[...selected].sort((a,b)=>a-b);
- const numbers:(number|'dots')[]=[];
- for(let i=0;i<displayed.length;i++){
-  if(i>0&&displayed[i]-displayed[i-1]>1)numbers.push('dots');
-  numbers.push(displayed[i]);
- }
+ const jump=validJumpPage(typed,total);
+ const valid=jump!==null;
+ const numbers=visiblePageTokens(page,total);
  function submit(event:FormEvent<HTMLFormElement>){
   event.preventDefault();
-  if(!loading&&valid)onChange(candidate-1);
+  if(!loading&&jump!==null)onChange(jump);
  }
  const zh=lang==='zh';
  return <nav className="unified-job-paging" aria-label={zh?'岗位结果分页':'Job result pagination'}>
