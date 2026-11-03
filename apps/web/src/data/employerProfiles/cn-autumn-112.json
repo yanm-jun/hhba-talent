@@ -1,0 +1,264 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-112",
+  "name": "舒客电商",
+  "displayName": "广州薇美姿电商（舒客电商）",
+  "englishName": "Saky / Weimeizi E-commerce",
+  "aliases": [
+    "舒客",
+    "薇美姿电商",
+    "Saky",
+    "舒客电商2027校园招聘"
+  ],
+  "industry": "口腔护理消费品 · 电商运营 · 品牌内容 · 直播营销",
+  "subtitle": "2027校招：官方飞书明确列出6条广州独立岗位；历史网申截止10月31日",
+  "overview": "广州薇美姿电商是舒客品牌相关电商业务团队，华中科技大学2026年9月校招简章列有9个管培方向。舒客官方飞书2027校园招聘页明确展示6个独立职位：财务管理、短视频编导、平面设计、市场推广、产品经理、互联网运营。互联网运营下含平台、直播、内容、渠道及海外五种方向，不宜拆成五条独立空缺。原本批网申2026年9月1日至10月31日。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://job.hust.edu.cn/zpinfo1/2436698.htm",
+    "https://tianzhulingshan.jobs.feishu.cn/267335/m/position/",
+    "https://www.jdjianli.com/campus/2646",
+    "https://www.weimeizi.com/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-112/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-112/photo1.svg",
+        "caption": "舒客电商非实景占位图",
+        "alt": "舒客电商仅供审核的非实景编辑示意图",
+        "note": "非实景：真实企业现场图片与版权待核，独立PR审核占位。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-112/photo2.svg",
+        "caption": "舒客电商非实景占位图",
+        "alt": "舒客电商仅供审核的非实景编辑示意图",
+        "note": "非实景：真实企业现场图片与版权待核，独立PR审核占位。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://tianzhulingshan.jobs.feishu.cn/267335/m/position/",
+    "label": "舒客电商2027官方飞书校园招聘职位列表",
+    "status": "official_portal",
+    "subject": "广州薇美姿电商（职位详情具体用工法人以招聘方为准）",
+    "note": "华中科技大学及企业飞书发布2027校园招聘，官方网申原2026-09-01至2026-10-31。官网可查六条职位名称，但申请按钮是否仍有效未做实时投递核验。"
+  },
+  "majorIntro": "六个官方飞书单列招聘条目，细分的电商运营、直播、渠道、海外运营均归属互联网运营大岗；不能把学校简章九个方向与官方六岗简单相加。全部主要在广州。",
+  "preferredMajors": [
+    "电子商务",
+    "市场营销",
+    "会计学",
+    "财务管理",
+    "视觉传达设计",
+    "广播电视编导",
+    "工业设计",
+    "广告学"
+  ],
+  "photoNote": "两张图片区为显著标明非实景的编辑SVG；Logo为非企业官方字标。正式商用前需图片归属及版权授权。",
+  "business": [
+    {
+      "title": "口腔护理电商经营",
+      "description": "围绕舒客牙膏、牙刷及口腔护理消费电子产品开展品牌电商经营。",
+      "tags": "产品 · 电商",
+      "details": [
+        "口腔护理",
+        "电商销售",
+        "用户洞察"
+      ]
+    },
+    {
+      "title": "平台与渠道运营",
+      "description": "运营天猫、京东等消费平台及渠道业务，推进营销活动与经营优化。",
+      "tags": "平台 · 运营",
+      "details": [
+        "平台电商",
+        "渠道发展",
+        "增长分析"
+      ]
+    },
+    {
+      "title": "直播与短视频内容",
+      "description": "通过直播、短视频脚本、影像制作与数据反馈推动品牌传播。",
+      "tags": "直播 · 内容",
+      "details": [
+        "短视频编导",
+        "直播策划",
+        "内容营销"
+      ]
+    },
+    {
+      "title": "产品开发与管理",
+      "description": "从用户需求洞察、产品概念、供应链沟通到上市开展产品管理。",
+      "tags": "产品 · 设计",
+      "details": [
+        "日化产品",
+        "消费电子",
+        "产品生命周期"
+      ]
+    },
+    {
+      "title": "品牌视觉与营销推广",
+      "description": "维护海内外渠道视觉规范，开展小红书、抖音等平台推广及营销。",
+      "tags": "品牌 · 传播",
+      "details": [
+        "品牌设计",
+        "KOL推广",
+        "市场活动"
+      ]
+    },
+    {
+      "title": "财务与经营分析",
+      "description": "开展预算管理、业务财务分析和财务内控流程改进。",
+      "tags": "财务 · 风控",
+      "details": [
+        "经营报告",
+        "预算管理",
+        "业务内控"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "finance",
+      "title": "【2027届校招】财务管理",
+      "city": "广东广州市（舒客官方飞书2027招聘列表）",
+      "category": "财务 / 会计",
+      "summary": "围绕企业经营开展业务财务分析、预算管理、经营报告与内控流程优化，属于舒客电商官方飞书发布的2027届广州独立校招职位。",
+      "requirements": "面向2027届国内外本科或硕士毕业生。岗位职责和特定能力要求以舒客官方飞书原始职位页为准；华中科技大学2026年9月的简章另有专业推荐，不能以此替代真实审核条件。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "会计学",
+        "财务管理",
+        "金融学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕 · 具体资格以官方JD为准",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://tianzhulingshan.jobs.feishu.cn/267335/m/position/",
+      "url": "https://tianzhulingshan.jobs.feishu.cn/267335/m/position/",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州薇美姿电商（舒客电商）",
+      "evidenceClass": "official_individual_listing"
+    },
+    {
+      "id": "video",
+      "title": "【2027届校招】短视频编导",
+      "city": "广东广州市（舒客官方飞书2027招聘列表）",
+      "category": "短视频 / 内容",
+      "summary": "负责短视频内容选题、脚本写作、拍摄统筹、剪辑把关及效果复盘，是舒客电商官方飞书2027届广州独立招聘条目。",
+      "requirements": "面向2027届国内外本科或硕士毕业生。岗位职责和特定能力要求以舒客官方飞书原始职位页为准；华中科技大学2026年9月的简章另有专业推荐，不能以此替代真实审核条件。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "广播电视编导",
+        "广播电视学",
+        "数字媒体艺术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕 · 具体资格以官方JD为准",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://tianzhulingshan.jobs.feishu.cn/267335/m/position/",
+      "url": "https://tianzhulingshan.jobs.feishu.cn/267335/m/position/",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州薇美姿电商（舒客电商）",
+      "evidenceClass": "official_individual_listing"
+    },
+    {
+      "id": "graphic",
+      "title": "【2027届校招】平面设计",
+      "city": "广东广州市（舒客官方飞书2027招聘列表）",
+      "category": "视觉 / 设计",
+      "summary": "面向品牌海内外线上线下渠道承担视觉设计、品牌视觉规范维护与营销活动创意落地，是飞书官方独立招聘职位。",
+      "requirements": "面向2027届国内外本科或硕士毕业生。岗位职责和特定能力要求以舒客官方飞书原始职位页为准；华中科技大学2026年9月的简章另有专业推荐，不能以此替代真实审核条件。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "视觉传达设计",
+        "数字媒体艺术",
+        "艺术设计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕 · 具体资格以官方JD为准",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://tianzhulingshan.jobs.feishu.cn/267335/m/position/",
+      "url": "https://tianzhulingshan.jobs.feishu.cn/267335/m/position/",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州薇美姿电商（舒客电商）",
+      "evidenceClass": "official_individual_listing"
+    },
+    {
+      "id": "market",
+      "title": "【2027届校招】市场推广",
+      "city": "广东广州市（舒客官方飞书2027招聘列表）",
+      "category": "市场 / 营销",
+      "summary": "负责品牌推广、小红书和抖音KOL内容营销、消费者洞察及数据分析，官方飞书以单独市场推广岗位发布。",
+      "requirements": "面向2027届国内外本科或硕士毕业生。岗位职责和特定能力要求以舒客官方飞书原始职位页为准；华中科技大学2026年9月的简章另有专业推荐，不能以此替代真实审核条件。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "广告学",
+        "传播学",
+        "电子商务"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕 · 具体资格以官方JD为准",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://tianzhulingshan.jobs.feishu.cn/267335/m/position/",
+      "url": "https://tianzhulingshan.jobs.feishu.cn/267335/m/position/",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州薇美姿电商（舒客电商）",
+      "evidenceClass": "official_individual_listing"
+    },
+    {
+      "id": "product",
+      "title": "【2027届校招】产品经理",
+      "city": "广东广州市（舒客官方飞书2027招聘列表）",
+      "category": "产品 / 研发",
+      "summary": "参与口腔护理日化及电子产品需求调研、产品概念、跨部门研发上市和生命周期管理，属于飞书2027校招单独岗位。",
+      "requirements": "面向2027届国内外本科或硕士毕业生。岗位职责和特定能力要求以舒客官方飞书原始职位页为准；华中科技大学2026年9月的简章另有专业推荐，不能以此替代真实审核条件。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工业设计",
+        "产品设计",
+        "市场营销",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕 · 具体资格以官方JD为准",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://tianzhulingshan.jobs.feishu.cn/267335/m/position/",
+      "url": "https://tianzhulingshan.jobs.feishu.cn/267335/m/position/",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州薇美姿电商（舒客电商）",
+      "evidenceClass": "official_individual_listing"
+    },
+    {
+      "id": "ecomm",
+      "title": "【2027届校招】互联网运营",
+      "city": "广东广州市（舒客官方飞书2027招聘列表）",
+      "category": "电商 / 运营",
+      "summary": "官方飞书独立的2027互联网运营职位，岗位内部覆盖平台电商、直播、内容、渠道与海外五个方向；这些子方向并非五条另外招聘的职位。",
+      "requirements": "面向2027届国内外本科或硕士毕业生。岗位职责和特定能力要求以舒客官方飞书原始职位页为准；华中科技大学2026年9月的简章另有专业推荐，不能以此替代真实审核条件。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子商务",
+        "市场营销",
+        "工商管理",
+        "数据科学与大数据技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招 · 本硕 · 具体资格以官方JD为准",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://tianzhulingshan.jobs.feishu.cn/267335/m/position/",
+      "url": "https://tianzhulingshan.jobs.feishu.cn/267335/m/position/",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广州薇美姿电商（舒客电商）",
+      "evidenceClass": "official_individual_listing"
+    }
+  ]
+}
