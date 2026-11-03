@@ -202,6 +202,9 @@ a.unified-company-brand:focus-visible,.unified-detail-company-link:focus-visible
 .unified-role-list .unified-job-list-action [role=button]{position:relative;z-index:2}
 .unified-role-list .unified-job-card:focus-within{border-color:#b4d2c0}
 .unified-job-footer{align-items:center;flex-wrap:wrap;gap:16px}
+/* Keep 10-result navigation central while the existing full-market link stays on the right. */
+.unified-job-footer .unified-job-paging{flex:1 1 410px;justify-content:center}
+.unified-job-footer .unified-job-browse-links{margin-left:auto}
 .unified-job-paging{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:12px 15px}
 .unified-job-pages{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .unified-job-pages button{min-width:34px;min-height:33px;padding:6px 9px;justify-content:center;cursor:pointer}
@@ -224,5 +227,6 @@ a.unified-company-brand:focus-visible,.unified-detail-company-link:focus-visible
  .unified-job-list-meta{gap:5px 10px}
  .unified-job-footer{flex-direction:column;align-items:flex-start}
  .unified-job-paging{justify-content:flex-start;width:100%}
+ .unified-job-footer .unified-job-browse-links{margin-left:0}
 }
 @media(prefers-reduced-motion:reduce){.unified-role-list .unified-job-card{transition:none}}
