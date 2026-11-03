@@ -47,7 +47,7 @@ for(const [num,name] of [['096','宁波银行'],['097','汇丰中国'],['098','C
   assert(p.jobs.every(j=>j.url===j.evidenceUrl));
   assert(p.jobs.every(j=>/greenhouse.io\/casetify\/jobs\/\d+/.test(j.url)));
   assert(p.jobs.some(j=>j.id==='mt-2027'&&j.requirements.includes('31 October 2026')));
-  assert(p.jobs.some(j=>j.id==='tiktok')&&j.city==='深圳');
+  assert(p.jobs.some(j=>j.id==='tiktok'&&j.city==='深圳'));
  }
  companies.push(p);
  console.log('HHBA_COMPANY_096_098_SEARCH_PASS',num,name,p.jobs.length);
