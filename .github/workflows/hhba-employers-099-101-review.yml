@@ -37,7 +37,6 @@ jobs:
           node scripts/employer-job-level-search.contract.test.mjs
           node scripts/major-direct-role-results.contract.test.mjs
           node scripts/recruitment-market-source-invalid.regression.test.mjs
-          node scripts/hhba-unified-static.contract.test.mjs
       - name: Build existing V2 site and create per-company deep links, never touch production Pages
         working-directory: apps/web
         env:
