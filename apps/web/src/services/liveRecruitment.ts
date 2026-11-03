@@ -4,7 +4,7 @@ import {searchJobs, type SearchFacet} from './jobSearchFacets.mjs';
 import {loadOfficialSearchFacets} from './officialSearchIndex';
 import {domesticV2Records, domesticV2ById, assertDomesticRebuildIntegrity} from './domesticRebuildJobs';
 import {allowedEmployerProfileJobLink,profileAliasesForJob} from './employerProfiles';
-import {matchRoleToMajor,visibleRoleForMajor} from './majorJobMatching';
+import {matchRoleToMajor,visibleRoleForMajor,majorExactEvidence,majorSlugForQuery} from './majorJobMatching';
 import {educationMatchesApplicant} from './majorEligibility.mjs';
 export type Language = 'zh' | 'en';
 export type LiveJob = {
@@ -275,8 +275,17 @@ export function loadOfficialPublicSnapshot(signal:AbortSignal):Promise<LivePage>
  return previewSnapshot(signal);
 }
 function searchPreview(data:LivePage,filters:LiveFilters,offset:number,facets:Map<string,SearchFacet>):LivePage{
-  const matches=searchJobs(data.jobs,filters,facets);
-  return {...data,jobs:matches.rows.slice(offset,offset+30),total:matches.counted,offset,limit:30};
+  const major=filters.major_slug||majorSlugForQuery(filters.q);
+  // A pure major query should match recorded job subjects, not just title text.
+  const searchFilters=major&&!filters.major_slug?{...filters,q:''}:filters;
+  const matches=searchJobs(data.jobs,searchFilters,facets);
+  const relevant=major?matches.rows.filter(job=>visibleRoleForMajor(job,major,filters.include_unknown_majors===true)):matches.rows;
+  if(major){
+   const priority={related:3,unrestricted:2,unknown:1,other:0,all:0};
+   relevant.sort((a,b)=>priority[matchRoleToMajor(b,major)]-priority[matchRoleToMajor(a,major)]||
+     majorExactEvidence(b,major)-majorExactEvidence(a,major));
+  }
+  return {...data,jobs:relevant.slice(offset,offset+30),total:relevant.length,offset,limit:30};
 }
 
 type CuratedEditorial={
@@ -357,7 +366,7 @@ export async function loadCuratedOverseasJobs(signal:AbortSignal):Promise<LiveJo
 
 async function listArchivedJobs(filters:LiveFilters,offset:number,signal:AbortSignal):Promise<LivePage>{
   const rows=await loadArchivedHundred(signal);
-  const parts=filters.q.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  const parts=(majorSlugForQuery(filters.q)&&!filters.major_slug?'':filters.q).toLowerCase().trim().split(/\s+/).filter(Boolean);
   const allowed=rows.filter(j=>{
     if(filters.country==='cn'||(filters.company&&j.company!==filters.company))return false;
     if(filters.location_country&&j.countryCode?.toLowerCase()!==filters.location_country.toLowerCase())return false;
@@ -375,8 +384,16 @@ async function listArchivedJobs(filters:LiveFilters,offset:number,signal:AbortSi
     return parts.every(term=>searchable.includes(term));
   });
   const updated=rows[0]?.snapshotObservedAt||'2026-10-24';
-  return {jobs:allowed.slice(offset,offset+30).map(archivedJob),
-    total:allowed.length,limit:30,offset,updated,boards:10,failures:0};
+  const major=filters.major_slug||majorSlugForQuery(filters.q);
+  const candidates=allowed.map(archivedJob);
+  const ranked=major?candidates.filter(job=>visibleRoleForMajor(job,major,filters.include_unknown_majors===true)):candidates;
+  if(major){
+   const priority={related:3,unrestricted:2,unknown:1,other:0,all:0};
+   ranked.sort((a,b)=>priority[matchRoleToMajor(b,major)]-priority[matchRoleToMajor(a,major)]||
+     majorExactEvidence(b,major)-majorExactEvidence(a,major));
+  }
+  return {jobs:ranked.slice(offset,offset+30),
+    total:ranked.length,limit:30,offset,updated,boards:10,failures:0};
 }
 
 export function rebuildListFilter(job:LiveJob,f:LiveFilters){
@@ -434,6 +451,8 @@ function jobCountryCode(job:LiveJob){
  return job.countryCode||'';
 }
 export async function listDomesticRebuildMarket(filters:LiveFilters,offset:number,signal:AbortSignal):Promise<LivePage>{
+ const queriedMajor=majorSlugForQuery(filters.q);
+ if(!filters.major_slug&&queriedMajor)filters={...filters,major_slug:queriedMajor,q:''};
  assertDomesticRebuildIntegrity();
  const overseas=await loadCuratedOverseasJobs(signal);
  // Keep original 100 records unchanged; interleave the first reviewed China employer.
@@ -453,7 +472,8 @@ export async function listDomesticRebuildMarket(filters:LiveFilters,offset:numbe
  // Roles with undisclosed requirements only appear after explicit opt-in.
  if(filters.major_slug){
   const priority={related:3,unrestricted:2,unknown:1,other:0,all:0};
-  allowed.sort((a,b)=>priority[matchRoleToMajor(b,filters.major_slug!)]-priority[matchRoleToMajor(a,filters.major_slug!)]);
+  allowed.sort((a,b)=>priority[matchRoleToMajor(b,filters.major_slug!)]-priority[matchRoleToMajor(a,filters.major_slug!)]||
+    majorExactEvidence(b,filters.major_slug!)-majorExactEvidence(a,filters.major_slug!));
  }
  // Name matches must not be hidden behind 30 unrelated job-summary hits.
  // Apply relevance ordering AFTER all filters and BEFORE pagination.
@@ -493,7 +513,7 @@ export async function listJobs(filters: LiveFilters, offset: number, signal: Abo
     // and/or user-selected filters actually need them.
     const unfiltered=!filters.q.trim()&&!filters.company.trim()&&!filters.country&&
       !filters.remote&&!filters.recruitment_type&&!filters.location_country&&
-      !filters.city&&!filters.education&&!filters.experience;
+      !filters.city&&!filters.education&&!filters.experience&&!filters.major_slug&&!majorSlugForQuery(filters.q);
     const [audit,index,campus]=await Promise.all([
       loadPublicJobAudit(),
       unfiltered?Promise.resolve(null):loadOfficialSearchFacets(),
