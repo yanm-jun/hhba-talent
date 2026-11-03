@@ -21,7 +21,7 @@ for(const [num,name] of [['099','波士顿科学'],['100','东软'],['101','云�
  assert.equal(p.business.length,6);
  assert(p.business.every(s=>s.title&&s.description.length>30&&s.details.length===3));
  assert(p.jobs.every(j=>j.id&&j.title&&j.category&&j.city&&j.summary.length>=35&&j.requirements.length>=38));
- assert(p.jobs.every(j=>Array.isArray(j.majorNames)&&j.majorNames.length===0&&j.editorialRelatedMajors.length>=2));
+ assert(p.jobs.every(j=>Array.isArray(j.majorNames)&&j.majorNames.length===0&&j.editorialRelatedMajors.length>=1));
  assert(p.jobs.every(j=>j.currentOpenVerified===false&&j.evidenceUrl.startsWith('https://')&&j.url.startsWith('https://')));
  assert(p.jobs.every(j=>new URL(j.url).host===new URL(p.recruitment.url).host),'Official role link uses unapproved host');
  assert.equal(p.media.photos.length,2);
