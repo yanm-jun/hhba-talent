@@ -15,6 +15,13 @@
 .hhba-phone-switch-identity{display:inline-flex;align-items:center;gap:3px;color:#3f7455;margin-left:auto;font-size:11px;text-decoration:none;white-space:nowrap}
 .hhba-phone-switch-identity:hover{color:#235d40;text-decoration:underline}
 .hhba-phone-form{display:flex;flex-direction:column;gap:20px}
+/* One consistent, keyboard-accessible switch for SMS and password sign-in. */
+.hhba-phone-login-methods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;padding:4px;margin:0 0 1px;border:1px solid #e1eae3;border-radius:12px;background:#f5f8f6}
+.hhba-phone-login-method{appearance:none;-webkit-appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;min-width:0;min-height:42px;padding:0 8px;border:1px solid transparent;border-radius:9px;background:transparent;color:#687b6c;font:inherit;font-size:12px;font-weight:650;line-height:1.3;white-space:nowrap;cursor:pointer;transition:background .16s,border-color .16s,color .16s,box-shadow .16s}
+.hhba-phone-login-method svg{flex:none}
+.hhba-phone-login-method:hover{background:#edf4ef;color:#2f694b}
+.hhba-phone-login-method.is-active,.hhba-phone-login-method.is-active:hover{background:#fff;border-color:#dce7de;color:#295c42;font-weight:730;box-shadow:0 1px 4px rgba(28,48,36,.055)}
+.hhba-phone-login-method:focus-visible{outline:3px solid #9ac7ad;outline-offset:2px}
 .hhba-phone-form label{display:flex;flex-direction:column;gap:9px;font-size:12px;font-weight:680;letter-spacing:.01em;color:#303f34}
 .hhba-phone-form input{font:inherit;color:#202e25;font-weight:450;font-size:13px;letter-spacing:0;width:100%;height:48px;border:1px solid #e0e7e1;background:#fff;border-radius:10px;outline:none;padding:0 13px;transition:border-color .17s,box-shadow .17s}
 .hhba-phone-form input::placeholder{color:#a2aba4}
@@ -75,8 +82,8 @@
  .hhba-phone-code{gap:7px}
  .hhba-phone-code button{padding:0 11px;font-size:11px}
 }
-@media(max-width:350px){.hhba-phone-code button{padding:0 8px}.hhba-phone-identity{padding:9px}}
-@media(prefers-reduced-motion:reduce){.hhba-phone-form input,.hhba-phone-submit,.hhba-role-option{transition:none}}
+@media(max-width:350px){.hhba-phone-code button{padding:0 8px}.hhba-phone-identity{padding:9px}.hhba-phone-login-method{gap:5px;padding:0 4px;font-size:11px}}
+@media(prefers-reduced-motion:reduce){.hhba-phone-form input,.hhba-phone-login-method,.hhba-phone-submit,.hhba-role-option{transition:none}}
 
 /* Original HHBA SVG graphic anchors the centered, light account screens. */
 .hhba-auth-page-logo{display:flex;justify-content:center;align-items:center;margin:0 auto}
