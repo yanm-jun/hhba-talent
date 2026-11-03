@@ -14,8 +14,7 @@ export function SaveJobButton({jobId,compact=false}:{jobId:string,compact?:boole
   addEventListener('hhba:saved-changed',refresh);
   return()=>{mounted=false;removeEventListener('hhba:saved-changed',refresh)};
  },[jobId]);
- if(!savedAvailable)return null;
- const click=async()=>{if(busy)return;if(!getRealAuthToken()){navigate('/candidate/login');return;}setBusy(true);setError('');
+ const click=async()=>{if(busy)return;if(!savedAvailable||!getRealAuthToken()){navigate('/candidate/login');return;}setBusy(true);setError('');
   try{await setSavedJob(jobId,!saved);setSaved(!saved);}catch(e){setError(e instanceof Error?e.message:'操作失败')}
   finally{setBusy(false)}
  };
