@@ -1,6 +1,7 @@
 import {getRealAuthToken} from './realAuth';
 export type EngagementEvent='page_view'|'job_view'|'job_search'|'official_apply_click';
-const KEY='hhba.analytics.consent.v1';
+// V2 requires explicit re-consent: a previous anonymous-only opt-in must not authorize account-level tracking.
+const KEY='hhba.analytics.consent.v2';
 const API='/api/engagement/event';
 const ACCOUNT_API='/api/engagement/account';
 const metricsSupported=import.meta.env.BASE_URL!=='/hhba-talent/';
