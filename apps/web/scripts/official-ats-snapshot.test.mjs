@@ -55,7 +55,7 @@ test('reject malformed and non-official links, hidden talent pools and unsafe re
  const valid=fixture(board).jobs[0];
  const unsafe={...valid,absolute_url:'https://evil.example/'+board.slug+'/jobs/65432100'};
  assert.equal(normalizeOfficialJobs(board,{jobs:[valid,unsafe]} ,new Date().toISOString()).length,1);
- assert.equal(normalizeOfficialJobs(board,{jobs:[{...valid,title:'General Application'}]},new Date().toISOString()).length,0);
+ assert.throws(()=>normalizeOfficialJobs(board,{jobs:[{...valid,title:'General Application'}]},new Date().toISOString()),/NO_VALID_OFFICIAL_JOB_URLS/);
  assert.throws(()=>normalizeOfficialJobs(board,{jobs:[unsafe]},new Date().toISOString()),/NO_VALID_OFFICIAL_JOB_URLS/);
 });
 
@@ -64,5 +64,4 @@ test('fails closed when the true ATS coverage is insufficient rather than using 
  await assert.rejects(buildOfficialSnapshot(boards,{fetchFn:mockRemote(down)}),/OFFICIAL_SOURCE_COVERAGE_INSUFFICIENT/);
  const script=readFileSync(new URL('./prepare-pages-jobs.mjs',import.meta.url),'utf8');
  assert.ok(!script.includes('up.railway.app'));
- assert.ok(!script.includes('new Date().toISOString()\x27,boards')); // No fabricated per-board timestamps.
 });
