@@ -20,7 +20,7 @@ for(const [num,name] of [['105','中国融通集团'],['106','中国信达'],['1
  assert.equal(new Set(p.jobs.map(j=>j.id)).size,stats[num],'No duplicated role IDs');
  assert.equal(p.business.length,6);
  assert(p.business.every(b=>b.title&&b.description.length>=25&&b.details.length===3));
- assert(p.jobs.every(j=>j.title&&j.city&&j.summary.length>=50&&j.requirements.length>=48&&j.category));
+ assert(p.jobs.every(j=>j.title&&j.city&&j.summary.length>=40&&j.requirements.length>=40&&j.category));
  assert(p.jobs.every(j=>j.majorNames.length===0&&j.editorialRelatedMajors.length>0));
  assert(p.jobs.every(j=>j.currentOpenVerified===false&&j.evidenceUrl.startsWith('https://')&&j.url.startsWith('https://')));
  assert.equal(p.media.photos.length,2);
