@@ -1,0 +1,39 @@
+name: HHBA Cloudflare official ATS build safety
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/scripts/prepare-pages-jobs.mjs'
+      - 'apps/web/scripts/official-ats-snapshot.test.mjs'
+      - 'apps/web/scripts/audit-all-official-jds.mjs'
+      - 'apps/web/scripts/verify-cloudflare-recruitment.mjs'
+      - 'apps/web/src/services/liveRecruitment.ts'
+      - 'apps/web/scripts/cloudflare-pages-build.py'
+      - '.github/workflows/hhba-official-ats-build.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verified-ats-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Verify native source ingestion and audit without external dependencies
+        working-directory: apps/web
+        run: |
+          node --check scripts/prepare-pages-jobs.mjs
+          node --check scripts/audit-all-official-jds.mjs
+          node --check scripts/verify-cloudflare-recruitment.mjs
+          node --test scripts/official-ats-snapshot.test.mjs
+          node --test ../../ops/jobs-indexer/test/catalog.test.mjs
+      - name: Typecheck and build frontend with honest failed-source metadata
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          VITE_HHBA_VERIFIED_SNAPSHOT=1 npm run build
