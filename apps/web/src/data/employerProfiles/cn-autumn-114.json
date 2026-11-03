@@ -1,0 +1,494 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-114",
+  "name": "索恩格电动",
+  "displayName": "索恩格汽车电驱动系统有限公司（SEG FASTEL）",
+  "englishName": "SEG FASTEL",
+  "aliases": [
+    "SEG FASTEL",
+    "索恩格汽车电驱动系统",
+    "索恩格电驱",
+    "索恩格电动27校招"
+  ],
+  "industry": "汽车电驱 · 智能底盘 · 新能源电机 · 制造自动化",
+  "subtitle": "2027秋招：16个具名岗位方向，长沙与常州；原报名10月31日截止",
+  "overview": "索恩格电动的2027届校园招聘资料列出16个具有岗位名称和工作地的方向，包括电机性能、软件控制、硬件、机械、底盘、AI、工艺、采购和财务等。岗位清单来自校招汇总对原宣传信息的转录，尚未取得16条独立官方职位JD和招聘编号，因此不将其等同16条已核实的实时可投岗位。需区别索恩格汽车部件（中国）有限公司另一份2027机器人关节招聘：两份公告发布主体及岗位可能不同，不能混为本企业岗位。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+    "https://www.jdjianli.com/campus/44391",
+    "https://www.wondercv.com/xiaozhao/segfastel-2027-campus-changsha-changzhou-16752-20f170/",
+    "https://www.seg-automotive.com/zh/career/career-application-platform/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-114/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-114/photo1.svg",
+        "caption": "索恩格电动：非实景编辑示意，真实照片授权待核",
+        "alt": "索恩格电动的非实景图片审核占位图",
+        "note": "非实景：真实企业图片来源及转载授权未核实，不能视为企业环境照片。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-114/photo2.svg",
+        "caption": "索恩格电动：非实景编辑示意，真实照片授权待核",
+        "alt": "索恩格电动的非实景图片审核占位图",
+        "note": "非实景：真实企业图片来源及转载授权未核实，不能视为企业环境照片。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+    "label": "SEG Automotive集团职业机会网页（非本批2027校招直达）",
+    "status": "unconfirmed",
+    "subject": "索恩格汽车电驱动系统有限公司（SEG FASTEL），具体合同主体待正式单岗核实",
+    "note": "索恩格电动2027届秋招原报名截至2026-10-31，11月起安排面试不代表可继续投简历。16项为公示具名招聘方向，无独立官方单岗编号；集团SEG Automotive全球职位页不等同FASTEL秋招网申。"
+  },
+  "majorIntro": "16项来自2027秋招岗位名称与长沙/常州地点清单，岗位细化技能、学历门槛和实际申请入口未逐一验证。专业匹配仅为编辑辅助，长沙常州合并行不拆分虚增岗位。",
+  "preferredMajors": [
+    "机械工程",
+    "电气工程及其自动化",
+    "自动化",
+    "计算机科学与技术",
+    "软件工程",
+    "人工智能",
+    "车辆工程",
+    "工业工程",
+    "供应链管理",
+    "会计学"
+  ],
+  "photoNote": "两张图片为标明非实景的审查占位，不是办公/厂区实拍；标识为非官方编辑字标。正式上站前须核实照片真实归属与商用权。",
+  "business": [
+    {
+      "title": "新能源电驱动系统",
+      "description": "围绕汽车电驱动产品开展电机、电驱系统及其控制相关研发和工程应用。",
+      "tags": "电驱 · 新能源",
+      "details": [
+        "电机设计",
+        "电机控制",
+        "系统验证"
+      ]
+    },
+    {
+      "title": "智能底盘与机械传动",
+      "description": "开展底盘结构设计、动力学仿真、机械零件与传动技术等工程研发。",
+      "tags": "底盘 · 机械",
+      "details": [
+        "传动设计",
+        "底盘仿真",
+        "结构工程"
+      ]
+    },
+    {
+      "title": "软硬件协同开发",
+      "description": "通过软件控制、电子硬件与系统测试支撑电驱动产品的工程实现。",
+      "tags": "软件 · 电子",
+      "details": [
+        "控制软件",
+        "电子硬件",
+        "软件测试"
+      ]
+    },
+    {
+      "title": "制造工艺与质量",
+      "description": "在长沙与常州基地涉及电驱制造工艺、开发工艺与工厂产品质量改善。",
+      "tags": "制造 · 工艺",
+      "details": [
+        "工艺开发",
+        "产线技术",
+        "品质改进"
+      ]
+    },
+    {
+      "title": "AI与工业数字技术",
+      "description": "拓展AI应用相关工程人才与数字技术在生产和研发流程中的运用。",
+      "tags": "AI · 技术",
+      "details": [
+        "AI应用",
+        "研发效率",
+        "制造数据"
+      ]
+    },
+    {
+      "title": "供应链与经营管理",
+      "description": "通过采购、物流、客户关系与业务财务协作保障电驱项目及业务运营。",
+      "tags": "供应链 · 运营",
+      "details": [
+        "采购工程",
+        "物流计划",
+        "业财BP"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "motor",
+      "title": "电机性能设计工程师（2027校招具名方向，非独立职位ID）",
+      "category": "电机 / 设计",
+      "city": "长沙",
+      "summary": "从事新能源汽车电驱系统的电机性能设计方向；校招公示给出了该职位名称及长沙工作地，具体电磁计算任务需要进一步核验企业单岗JD。",
+      "requirements": "原2027校招汇总仅确定此岗位名称及工作地，未发布可核验的逐岗学历、具体工作年限或招聘人数。相关专业仅供HHBA岗位检索，实际录用资格请以公司原始招聘公告为准；2026年10月31日原网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "电机与电器",
+        "机械工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科/硕士整体范围；单岗学历未核验",
+      "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "索恩格汽车电驱动系统有限公司（岗位单独用人主体待官网核对）",
+      "currentOpenVerified": false,
+      "evidenceClass": "third_party_named_direction"
+    },
+    {
+      "id": "software",
+      "title": "软件工程师（电机控制方向）（2027校招具名方向，非独立职位ID）",
+      "category": "软件 / 控制",
+      "city": "长沙",
+      "summary": "索恩格电动2027秋招公开列明的电机控制软件方向，工作地长沙；C语言和控制算法等细化技术要求未由原职位独立确认。",
+      "requirements": "原2027校招汇总仅确定此岗位名称及工作地，未发布可核验的逐岗学历、具体工作年限或招聘人数。相关专业仅供HHBA岗位检索，实际录用资格请以公司原始招聘公告为准；2026年10月31日原网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "自动化",
+        "控制工程",
+        "软件工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科/硕士整体范围；单岗学历未核验",
+      "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "索恩格汽车电驱动系统有限公司（岗位单独用人主体待官网核对）",
+      "currentOpenVerified": false,
+      "evidenceClass": "third_party_named_direction"
+    },
+    {
+      "id": "software-test",
+      "title": "软件测试工程师（2027校招具名方向，非独立职位ID）",
+      "category": "软件 / 测试",
+      "city": "长沙",
+      "summary": "从事电驱软件测试相关方向，招聘公示确认岗位名称、长沙工作地；测试工具和任职学历需以原始企业职位说明为准。",
+      "requirements": "原2027校招汇总仅确定此岗位名称及工作地，未发布可核验的逐岗学历、具体工作年限或招聘人数。相关专业仅供HHBA岗位检索，实际录用资格请以公司原始招聘公告为准；2026年10月31日原网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "计算机科学与技术",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科/硕士整体范围；单岗学历未核验",
+      "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "索恩格汽车电驱动系统有限公司（岗位单独用人主体待官网核对）",
+      "currentOpenVerified": false,
+      "evidenceClass": "third_party_named_direction"
+    },
+    {
+      "id": "hardware",
+      "title": "硬件工程师（2027校招具名方向，非独立职位ID）",
+      "category": "电子 / 硬件",
+      "city": "长沙",
+      "summary": "从事电驱相关硬件工程研发方向，校招公示岗位名为硬件工程师，地点长沙；不等同于另一家索恩格汽车部件的机器人关节硬件职位。",
+      "requirements": "原2027校招汇总仅确定此岗位名称及工作地，未发布可核验的逐岗学历、具体工作年限或招聘人数。相关专业仅供HHBA岗位检索，实际录用资格请以公司原始招聘公告为准；2026年10月31日原网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子信息工程",
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科/硕士整体范围；单岗学历未核验",
+      "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "索恩格汽车电驱动系统有限公司（岗位单独用人主体待官网核对）",
+      "currentOpenVerified": false,
+      "evidenceClass": "third_party_named_direction"
+    },
+    {
+      "id": "mechanical",
+      "title": "机械设计工程师（2027校招具名方向，非独立职位ID）",
+      "category": "机械 / 设计",
+      "city": "长沙、常州（同一招聘方向两地，非两条独立职位）",
+      "summary": "索恩格电动2027招聘清单在同一行标记长沙、常州两地的机械设计方向，不以工作城市将此方向拆为两个职位。",
+      "requirements": "原2027校招汇总仅确定此岗位名称及工作地，未发布可核验的逐岗学历、具体工作年限或招聘人数。相关专业仅供HHBA岗位检索，实际录用资格请以公司原始招聘公告为准；2026年10月31日原网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "车辆工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科/硕士整体范围；单岗学历未核验",
+      "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "索恩格汽车电驱动系统有限公司（岗位单独用人主体待官网核对）",
+      "currentOpenVerified": false,
+      "evidenceClass": "third_party_named_direction"
+    },
+    {
+      "id": "transmission",
+      "title": "传动设计工程师（2027校招具名方向，非独立职位ID）",
+      "category": "传动 / 机械",
+      "city": "长沙、常州（同一招聘方向两地，非两条独立职位）",
+      "summary": "从事传动系统设计方向，校招招聘名单明确该岗位及长沙、常州两个地点，具体专业和经验门槛需回公司核实。",
+      "requirements": "原2027校招汇总仅确定此岗位名称及工作地，未发布可核验的逐岗学历、具体工作年限或招聘人数。相关专业仅供HHBA岗位检索，实际录用资格请以公司原始招聘公告为准；2026年10月31日原网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "车辆工程",
+        "机械设计制造及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科/硕士整体范围；单岗学历未核验",
+      "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "索恩格汽车电驱动系统有限公司（岗位单独用人主体待官网核对）",
+      "currentOpenVerified": false,
+      "evidenceClass": "third_party_named_direction"
+    },
+    {
+      "id": "chassis-sim",
+      "title": "底盘动力学仿真工程师（2027校招具名方向，非独立职位ID）",
+      "category": "底盘 / 仿真",
+      "city": "长沙",
+      "summary": "2027校招中明确列出的底盘动力学仿真工程方向，工作地点长沙；仿真软件与项目能力要求未逐项获得官方JD。",
+      "requirements": "原2027校招汇总仅确定此岗位名称及工作地，未发布可核验的逐岗学历、具体工作年限或招聘人数。相关专业仅供HHBA岗位检索，实际录用资格请以公司原始招聘公告为准；2026年10月31日原网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "车辆工程",
+        "机械工程",
+        "工程力学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科/硕士整体范围；单岗学历未核验",
+      "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "索恩格汽车电驱动系统有限公司（岗位单独用人主体待官网核对）",
+      "currentOpenVerified": false,
+      "evidenceClass": "third_party_named_direction"
+    },
+    {
+      "id": "chassis-design",
+      "title": "结构设计工程师（底盘）（2027校招具名方向，非独立职位ID）",
+      "category": "底盘 / 结构",
+      "city": "长沙",
+      "summary": "底盘结构设计工程师方向来自2027招聘岗位名单，工作地点长沙；不将其与机械设计工程师合并或臆造实际人数。",
+      "requirements": "原2027校招汇总仅确定此岗位名称及工作地，未发布可核验的逐岗学历、具体工作年限或招聘人数。相关专业仅供HHBA岗位检索，实际录用资格请以公司原始招聘公告为准；2026年10月31日原网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "车辆工程",
+        "机械工程",
+        "机械设计制造及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科/硕士整体范围；单岗学历未核验",
+      "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "索恩格汽车电驱动系统有限公司（岗位单独用人主体待官网核对）",
+      "currentOpenVerified": false,
+      "evidenceClass": "third_party_named_direction"
+    },
+    {
+      "id": "ai",
+      "title": "AI应用工程师（2027校招具名方向，非独立职位ID）",
+      "category": "软件 / AI",
+      "city": "常州",
+      "summary": "2027秋招公开单列AI应用工程师，地点明确为常州；缺乏独立官方招聘JD，具体算法栈与学历未公开核实。",
+      "requirements": "原2027校招汇总仅确定此岗位名称及工作地，未发布可核验的逐岗学历、具体工作年限或招聘人数。相关专业仅供HHBA岗位检索，实际录用资格请以公司原始招聘公告为准；2026年10月31日原网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科/硕士整体范围；单岗学历未核验",
+      "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "索恩格汽车电驱动系统有限公司（岗位单独用人主体待官网核对）",
+      "currentOpenVerified": false,
+      "evidenceClass": "third_party_named_direction"
+    },
+    {
+      "id": "customer",
+      "title": "客户经理（2027校招具名方向，非独立职位ID）",
+      "category": "商务 / 客户",
+      "city": "长沙",
+      "summary": "索恩格电动2027招聘公示列出的长沙客户经理岗位名称；具体客户行业与销售考核要求未从招聘方独立核实。",
+      "requirements": "原2027校招汇总仅确定此岗位名称及工作地，未发布可核验的逐岗学历、具体工作年限或招聘人数。相关专业仅供HHBA岗位检索，实际录用资格请以公司原始招聘公告为准；2026年10月31日原网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理",
+        "车辆工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科/硕士整体范围；单岗学历未核验",
+      "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "索恩格汽车电驱动系统有限公司（岗位单独用人主体待官网核对）",
+      "currentOpenVerified": false,
+      "evidenceClass": "third_party_named_direction"
+    },
+    {
+      "id": "process",
+      "title": "工艺工程师（2027校招具名方向，非独立职位ID）",
+      "category": "制造 / 工艺",
+      "city": "长沙",
+      "summary": "校招名单列明长沙工艺工程师方向，面向电驱生产工艺技术；无法据岗位名称进一步确认设备类别或技能资格。",
+      "requirements": "原2027校招汇总仅确定此岗位名称及工作地，未发布可核验的逐岗学历、具体工作年限或招聘人数。相关专业仅供HHBA岗位检索，实际录用资格请以公司原始招聘公告为准；2026年10月31日原网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "工业工程",
+        "材料成型及控制工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科/硕士整体范围；单岗学历未核验",
+      "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "索恩格汽车电驱动系统有限公司（岗位单独用人主体待官网核对）",
+      "currentOpenVerified": false,
+      "evidenceClass": "third_party_named_direction"
+    },
+    {
+      "id": "process-dev",
+      "title": "工艺开发工程师（2027校招具名方向，非独立职位ID）",
+      "category": "研发 / 工艺",
+      "city": "长沙",
+      "summary": "2027招聘名单独立列出工艺开发工程师与工艺工程师两种名称，均在长沙；具体业务边界依官方单岗说明。",
+      "requirements": "原2027校招汇总仅确定此岗位名称及工作地，未发布可核验的逐岗学历、具体工作年限或招聘人数。相关专业仅供HHBA岗位检索，实际录用资格请以公司原始招聘公告为准；2026年10月31日原网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "材料成型及控制工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科/硕士整体范围；单岗学历未核验",
+      "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "索恩格汽车电驱动系统有限公司（岗位单独用人主体待官网核对）",
+      "currentOpenVerified": false,
+      "evidenceClass": "third_party_named_direction"
+    },
+    {
+      "id": "purchase",
+      "title": "采购工程师（2027校招具名方向，非独立职位ID）",
+      "category": "采购 / 供应链",
+      "city": "长沙",
+      "summary": "索恩格电动2027招聘名单列出长沙采购工程师方向，项目采购工作细化职责须按企业具体岗位核验。",
+      "requirements": "原2027校招汇总仅确定此岗位名称及工作地，未发布可核验的逐岗学历、具体工作年限或招聘人数。相关专业仅供HHBA岗位检索，实际录用资格请以公司原始招聘公告为准；2026年10月31日原网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "物流管理",
+        "机械工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科/硕士整体范围；单岗学历未核验",
+      "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "索恩格汽车电驱动系统有限公司（岗位单独用人主体待官网核对）",
+      "currentOpenVerified": false,
+      "evidenceClass": "third_party_named_direction"
+    },
+    {
+      "id": "logistics-eng",
+      "title": "物流工程师（2027校招具名方向，非独立职位ID）",
+      "category": "物流 / 工程",
+      "city": "长沙",
+      "summary": "2027校园招聘名单列出物流工程师，长沙地点；其项目实施、仓储规划等具体任务尚无独立职位JD。",
+      "requirements": "原2027校招汇总仅确定此岗位名称及工作地，未发布可核验的逐岗学历、具体工作年限或招聘人数。相关专业仅供HHBA岗位检索，实际录用资格请以公司原始招聘公告为准；2026年10月31日原网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "物流工程",
+        "物流管理",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科/硕士整体范围；单岗学历未核验",
+      "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "索恩格汽车电驱动系统有限公司（岗位单独用人主体待官网核对）",
+      "currentOpenVerified": false,
+      "evidenceClass": "third_party_named_direction"
+    },
+    {
+      "id": "logistics-plan",
+      "title": "物流计划员（2027校招具名方向，非独立职位ID）",
+      "category": "物流 / 计划",
+      "city": "长沙",
+      "summary": "2027校园招聘名单列出长沙物流计划员，与物流工程师岗位方向单列，职位人数和细化技能条件未核验。",
+      "requirements": "原2027校招汇总仅确定此岗位名称及工作地，未发布可核验的逐岗学历、具体工作年限或招聘人数。相关专业仅供HHBA岗位检索，实际录用资格请以公司原始招聘公告为准；2026年10月31日原网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "物流管理",
+        "供应链管理",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科/硕士整体范围；单岗学历未核验",
+      "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "索恩格汽车电驱动系统有限公司（岗位单独用人主体待官网核对）",
+      "currentOpenVerified": false,
+      "evidenceClass": "third_party_named_direction"
+    },
+    {
+      "id": "bp",
+      "title": "业财BP（商业战略控制方向）（2027校招具名方向，非独立职位ID）",
+      "category": "财务 / 经营",
+      "city": "长沙",
+      "summary": "索恩格电动2027秋招公示列出业财BP（商业战略控制方向），工作地长沙；财务分析与业务合作职责以企业原岗位为准。",
+      "requirements": "原2027校招汇总仅确定此岗位名称及工作地，未发布可核验的逐岗学历、具体工作年限或招聘人数。相关专业仅供HHBA岗位检索，实际录用资格请以公司原始招聘公告为准；2026年10月31日原网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "会计学",
+        "财务管理",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科/硕士整体范围；单岗学历未核验",
+      "url": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "evidenceUrl": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "索恩格汽车电驱动系统有限公司（岗位单独用人主体待官网核对）",
+      "currentOpenVerified": false,
+      "evidenceClass": "third_party_named_direction"
+    }
+  ]
+}

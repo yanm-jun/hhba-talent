@@ -1,0 +1,516 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-116",
+  "name": "恒神股份",
+  "displayName": "江苏恒神股份有限公司",
+  "englishName": "Jiangsu Hengshen Carbon Fiber",
+  "aliases": [
+    "江苏恒神",
+    "恒神",
+    "Hengshen",
+    "碳纤维恒神"
+  ],
+  "industry": "碳纤维 · 预浸料 · 复合材料 · 航空航天 · 高端制造",
+  "subtitle": "2027校园招聘17项历史方向；另有2026社会招聘17岗、65人（报名原截止12月31日）",
+  "overview": "江苏恒神股份隶属陕西煤业化工集团，生产碳纤维、原丝、预浸料、树脂及复合材料制件。2027秋招宣传列12个专业技术方向与5个技能操作方向，原校招截止2026年10月31日。天津工业大学就业网独立发布材料开发工程师岗位（硕士、江苏、原计划5人），可独立核证；其余16项仅是招聘方向，不虚构独立工作地点与学历。特别需要分开另一轮恒神2026年社会招聘：2026年9月公告明确17岗位65人，计划到2026年12月31日接受报名，是另一批次、非2027应届秋招。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+    "https://www.upjianli.com/xiaozhao/cmuc8o0am000ym9hjwp1ow9tz.html",
+    "https://job.tiangong.edu.cn/correcruit/content/id/56313.html",
+    "https://hera-webapp.fenbi.com/api/article/detail?app=web&id=469137564389376",
+    "https://hscarbonfibre.com/default/talent/656"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-116/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-116/photo1.svg",
+        "caption": "恒神股份：非实景编辑示意，真实照片授权待核",
+        "alt": "恒神股份的非实景图片审核占位图",
+        "note": "非实景：真实企业图片来源及转载授权未核实，不能视为企业环境照片。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-116/photo2.svg",
+        "caption": "恒神股份：非实景编辑示意，真实照片授权待核",
+        "alt": "恒神股份的非实景图片审核占位图",
+        "note": "非实景：真实企业图片来源及转载授权未核实，不能视为企业环境照片。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://webhr.shccig.com/webhrN2-zp",
+    "label": "陕煤集团人才招聘网（分别查询恒神2026社招和2027校招）",
+    "status": "official_portal",
+    "subject": "江苏恒神股份有限公司，子公司实际用工主体按招聘公告与单岗确认",
+    "note": "2027校园秋招原2026-10-31截止；另有2026社会招聘17岗65人，公告原报名截止2026-12-31，不能与校招混算。2026社招涉及已有工作经历/年龄条件，是否仍受理须在陕煤集团招聘系统核实。"
+  },
+  "majorIntro": "17项2027校招方向中只有材料开发工程师找到具有单独高校JD的硕士/江苏5人记录；其他16项是公告具名方向，地点与学历并未逐岗核实。2026社招原计划17岗65人另在公告链接查询，避免重复作为2027校园空缺。",
+  "preferredMajors": [
+    "高分子材料与工程",
+    "复合材料与工程",
+    "材料科学与工程",
+    "化学工程与工艺",
+    "工程力学",
+    "机械工程",
+    "电气工程及其自动化",
+    "自动化",
+    "质量管理工程"
+  ],
+  "photoNote": "两张图片为标明非实景的审查占位，不是办公/厂区实拍；标识为非官方编辑字标。正式上站前须核实照片真实归属与商用权。",
+  "business": [
+    {
+      "title": "碳纤维原丝与碳纤维制造",
+      "description": "围绕碳纤维原丝、纺丝、碳化和后加工技术开展高性能纤维生产。",
+      "tags": "碳纤维 · 制造",
+      "details": [
+        "碳纤维原丝",
+        "碳化工艺",
+        "纤维产品"
+      ]
+    },
+    {
+      "title": "织物与预浸料",
+      "description": "开发碳纤维织物、预浸料与树脂体系，为复材结构件成型提供中间材料。",
+      "tags": "预浸料 · 织物",
+      "details": [
+        "预浸料",
+        "树脂体系",
+        "复材织物"
+      ]
+    },
+    {
+      "title": "复合材料制品与结构件",
+      "description": "开展复合材料结构设计、工艺成型与零部件制造，服务航空及高端装备领域。",
+      "tags": "复材 · 结构",
+      "details": [
+        "结构设计",
+        "成型工艺",
+        "产品应用"
+      ]
+    },
+    {
+      "title": "材料研发与工程验证",
+      "description": "研究树脂配方、材料性能和新材料技术，开展材料开发与性能测试验证。",
+      "tags": "研发 · 测试",
+      "details": [
+        "材料配方",
+        "材料测试",
+        "工艺研究"
+      ]
+    },
+    {
+      "title": "先进制造设备与智能化",
+      "description": "通过机械电气设备、产线自动化与智能制造技术支持碳纤维全产业链。",
+      "tags": "装备 · 自动化",
+      "details": [
+        "机械设备",
+        "电仪技术",
+        "产线管理"
+      ]
+    },
+    {
+      "title": "跨行业应用与技术服务",
+      "description": "面向航空航天、新能源、轨道交通等产业提供材料方案、技术服务及产品支持。",
+      "tags": "行业 · 技术",
+      "details": [
+        "航空航天",
+        "新能源装备",
+        "技术支持"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "materials",
+      "title": "材料开发工程师（2027高校独立岗位，原计划5人）",
+      "category": "材料 / 研发",
+      "city": "江苏省（高校独立职位显示；未确认具体厂区）",
+      "summary": "天津工业大学2026年9月20日校招平台公布江苏恒神材料开发工程师，原计划5人，面向碳纤维树脂配方、材料开发和生产工艺优化，为独立可核验的职位说明。",
+      "requirements": "高校原岗位要求硕士在读或同等2027应届条件，专业涉及高分子材料、复合材料等相关方向；原计划5人。2027校园报名原于2026年10月31日截止，是否重开需官方核实。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "高分子材料与工程",
+        "复合材料与工程",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士 · 高校职位原计划5人",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://job.tiangong.edu.cn/correcruit/content/id/56313.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "school_individual_job"
+    },
+    {
+      "id": "process",
+      "title": "工艺工程师（2027校招公告方向，非独立编号）",
+      "category": "材料 / 工艺",
+      "city": "丹阳、榆林等公司招聘整体地区（未逐岗位确认）",
+      "summary": "恒神股份2027校园招聘公开名单列有“工艺工程师”方向，属于集团公告列出的专业技术或技能操作类别；逐岗位厂区、人数和独立申请编号未取得核验。",
+      "requirements": "2027校招公告只公布方向名称及材料、力学、机械、化工、电气相关专业总体范围，未确认这一方向的独立学历、人数或地点；2026-10-31原校招截止。下方另有2026社会招聘，不属于此岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "高分子材料与工程",
+        "化学工程与工艺",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 具体学历以企业正式单岗为准",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "research",
+      "title": "研发工程师（2027校招公告方向，非独立编号）",
+      "category": "材料 / 研发",
+      "city": "丹阳、榆林等公司招聘整体地区（未逐岗位确认）",
+      "summary": "恒神股份2027校园招聘公开名单列有“研发工程师”方向，属于集团公告列出的专业技术或技能操作类别；逐岗位厂区、人数和独立申请编号未取得核验。",
+      "requirements": "2027校招公告只公布方向名称及材料、力学、机械、化工、电气相关专业总体范围，未确认这一方向的独立学历、人数或地点；2026-10-31原校招截止。下方另有2026社会招聘，不属于此岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "高分子材料与工程",
+        "复合材料与工程",
+        "应用化学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 具体学历以企业正式单岗为准",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "strength",
+      "title": "强度仿真工程师（2027校招公告方向，非独立编号）",
+      "category": "力学 / 仿真",
+      "city": "丹阳、榆林等公司招聘整体地区（未逐岗位确认）",
+      "summary": "恒神股份2027校园招聘公开名单列有“强度仿真工程师”方向，属于集团公告列出的专业技术或技能操作类别；逐岗位厂区、人数和独立申请编号未取得核验。",
+      "requirements": "2027校招公告只公布方向名称及材料、力学、机械、化工、电气相关专业总体范围，未确认这一方向的独立学历、人数或地点；2026-10-31原校招截止。下方另有2026社会招聘，不属于此岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工程力学",
+        "力学",
+        "复合材料与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 具体学历以企业正式单岗为准",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "structure",
+      "title": "结构设计工程师（2027校招公告方向，非独立编号）",
+      "category": "结构 / 设计",
+      "city": "丹阳、榆林等公司招聘整体地区（未逐岗位确认）",
+      "summary": "恒神股份2027校园招聘公开名单列有“结构设计工程师”方向，属于集团公告列出的专业技术或技能操作类别；逐岗位厂区、人数和独立申请编号未取得核验。",
+      "requirements": "2027校招公告只公布方向名称及材料、力学、机械、化工、电气相关专业总体范围，未确认这一方向的独立学历、人数或地点；2026-10-31原校招截止。下方另有2026社会招聘，不属于此岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "工程力学",
+        "复合材料与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 具体学历以企业正式单岗为准",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "mech",
+      "title": "机械工程师（2027校招公告方向，非独立编号）",
+      "category": "机械 / 制造",
+      "city": "丹阳、榆林等公司招聘整体地区（未逐岗位确认）",
+      "summary": "恒神股份2027校园招聘公开名单列有“机械工程师”方向，属于集团公告列出的专业技术或技能操作类别；逐岗位厂区、人数和独立申请编号未取得核验。",
+      "requirements": "2027校招公告只公布方向名称及材料、力学、机械、化工、电气相关专业总体范围，未确认这一方向的独立学历、人数或地点；2026-10-31原校招截止。下方另有2026社会招聘，不属于此岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 具体学历以企业正式单岗为准",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "electrical",
+      "title": "电仪工程师（2027校招公告方向，非独立编号）",
+      "category": "电气 / 仪表",
+      "city": "丹阳、榆林等公司招聘整体地区（未逐岗位确认）",
+      "summary": "恒神股份2027校园招聘公开名单列有“电仪工程师”方向，属于集团公告列出的专业技术或技能操作类别；逐岗位厂区、人数和独立申请编号未取得核验。",
+      "requirements": "2027校招公告只公布方向名称及材料、力学、机械、化工、电气相关专业总体范围，未确认这一方向的独立学历、人数或地点；2026-10-31原校招截止。下方另有2026社会招聘，不属于此岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "自动化",
+        "测控技术与仪器"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 具体学历以企业正式单岗为准",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "test",
+      "title": "测试工程师（2027校招公告方向，非独立编号）",
+      "category": "质量 / 测试",
+      "city": "丹阳、榆林等公司招聘整体地区（未逐岗位确认）",
+      "summary": "恒神股份2027校园招聘公开名单列有“测试工程师”方向，属于集团公告列出的专业技术或技能操作类别；逐岗位厂区、人数和独立申请编号未取得核验。",
+      "requirements": "2027校招公告只公布方向名称及材料、力学、机械、化工、电气相关专业总体范围，未确认这一方向的独立学历、人数或地点；2026-10-31原校招截止。下方另有2026社会招聘，不属于此岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "材料科学与工程",
+        "复合材料与工程",
+        "测控技术与仪器"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 具体学历以企业正式单岗为准",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "technical",
+      "title": "技术服务工程师（2027校招公告方向，非独立编号）",
+      "category": "工程 / 服务",
+      "city": "丹阳、榆林等公司招聘整体地区（未逐岗位确认）",
+      "summary": "恒神股份2027校园招聘公开名单列有“技术服务工程师”方向，属于集团公告列出的专业技术或技能操作类别；逐岗位厂区、人数和独立申请编号未取得核验。",
+      "requirements": "2027校招公告只公布方向名称及材料、力学、机械、化工、电气相关专业总体范围，未确认这一方向的独立学历、人数或地点；2026-10-31原校招截止。下方另有2026社会招聘，不属于此岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "材料科学与工程",
+        "复合材料与工程",
+        "机械工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 具体学历以企业正式单岗为准",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "product",
+      "title": "产品研发工程师（2027校招公告方向，非独立编号）",
+      "category": "材料 / 产品",
+      "city": "丹阳、榆林等公司招聘整体地区（未逐岗位确认）",
+      "summary": "恒神股份2027校园招聘公开名单列有“产品研发工程师”方向，属于集团公告列出的专业技术或技能操作类别；逐岗位厂区、人数和独立申请编号未取得核验。",
+      "requirements": "2027校招公告只公布方向名称及材料、力学、机械、化工、电气相关专业总体范围，未确认这一方向的独立学历、人数或地点；2026-10-31原校招截止。下方另有2026社会招聘，不属于此岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "高分子材料与工程",
+        "复合材料与工程",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 具体学历以企业正式单岗为准",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "quality",
+      "title": "质量工程师（2027校招公告方向，非独立编号）",
+      "category": "质量 / 材料",
+      "city": "丹阳、榆林等公司招聘整体地区（未逐岗位确认）",
+      "summary": "恒神股份2027校园招聘公开名单列有“质量工程师”方向，属于集团公告列出的专业技术或技能操作类别；逐岗位厂区、人数和独立申请编号未取得核验。",
+      "requirements": "2027校招公告只公布方向名称及材料、力学、机械、化工、电气相关专业总体范围，未确认这一方向的独立学历、人数或地点；2026-10-31原校招截止。下方另有2026社会招聘，不属于此岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "质量管理工程",
+        "材料科学与工程",
+        "复合材料与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 具体学历以企业正式单岗为准",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "sales",
+      "title": "销售经理（2027校招公告方向，非独立编号）",
+      "category": "市场 / 销售",
+      "city": "丹阳、榆林等公司招聘整体地区（未逐岗位确认）",
+      "summary": "恒神股份2027校园招聘公开名单列有“销售经理”方向，属于集团公告列出的专业技术或技能操作类别；逐岗位厂区、人数和独立申请编号未取得核验。",
+      "requirements": "2027校招公告只公布方向名称及材料、力学、机械、化工、电气相关专业总体范围，未确认这一方向的独立学历、人数或地点；2026-10-31原校招截止。下方另有2026社会招聘，不属于此岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 具体学历以企业正式单岗为准",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "production",
+      "title": "生产技术员（2027校招公告方向，非独立编号）",
+      "category": "生产 / 技术",
+      "city": "丹阳、榆林等公司招聘整体地区（未逐岗位确认）",
+      "summary": "恒神股份2027校园招聘公开名单列有“生产技术员”方向，属于集团公告列出的专业技术或技能操作类别；逐岗位厂区、人数和独立申请编号未取得核验。",
+      "requirements": "2027校招公告只公布方向名称及材料、力学、机械、化工、电气相关专业总体范围，未确认这一方向的独立学历、人数或地点；2026-10-31原校招截止。下方另有2026社会招聘，不属于此岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "材料科学与工程",
+        "化学工程与工艺",
+        "机械工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 具体学历以企业正式单岗为准",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "composite",
+      "title": "复材操作技工（2027校招公告方向，非独立编号）",
+      "category": "制造 / 技能",
+      "city": "丹阳、榆林等公司招聘整体地区（未逐岗位确认）",
+      "summary": "恒神股份2027校园招聘公开名单列有“复材操作技工”方向，属于集团公告列出的专业技术或技能操作类别；逐岗位厂区、人数和独立申请编号未取得核验。",
+      "requirements": "2027校招公告只公布方向名称及材料、力学、机械、化工、电气相关专业总体范围，未确认这一方向的独立学历、人数或地点；2026-10-31原校招截止。下方另有2026社会招聘，不属于此岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "复合材料与工程",
+        "高分子材料与工程",
+        "材料成型及控制工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 具体学历以企业正式单岗为准",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "machine-repair",
+      "title": "机械维修技工（2027校招公告方向，非独立编号）",
+      "category": "设备 / 维修",
+      "city": "丹阳、榆林等公司招聘整体地区（未逐岗位确认）",
+      "summary": "恒神股份2027校园招聘公开名单列有“机械维修技工”方向，属于集团公告列出的专业技术或技能操作类别；逐岗位厂区、人数和独立申请编号未取得核验。",
+      "requirements": "2027校招公告只公布方向名称及材料、力学、机械、化工、电气相关专业总体范围，未确认这一方向的独立学历、人数或地点；2026-10-31原校招截止。下方另有2026社会招聘，不属于此岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "机电一体化技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 具体学历以企业正式单岗为准",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "prepreg",
+      "title": "预浸操作技工（2027校招公告方向，非独立编号）",
+      "category": "制造 / 技能",
+      "city": "丹阳、榆林等公司招聘整体地区（未逐岗位确认）",
+      "summary": "恒神股份2027校园招聘公开名单列有“预浸操作技工”方向，属于集团公告列出的专业技术或技能操作类别；逐岗位厂区、人数和独立申请编号未取得核验。",
+      "requirements": "2027校招公告只公布方向名称及材料、力学、机械、化工、电气相关专业总体范围，未确认这一方向的独立学历、人数或地点；2026-10-31原校招截止。下方另有2026社会招聘，不属于此岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "高分子材料与工程",
+        "复合材料与工程",
+        "化学工程与工艺"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 具体学历以企业正式单岗为准",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    },
+    {
+      "id": "carbon",
+      "title": "碳纤维操作技工（2027校招公告方向，非独立编号）",
+      "category": "制造 / 技能",
+      "city": "丹阳、榆林等公司招聘整体地区（未逐岗位确认）",
+      "summary": "恒神股份2027校园招聘公开名单列有“碳纤维操作技工”方向，属于集团公告列出的专业技术或技能操作类别；逐岗位厂区、人数和独立申请编号未取得核验。",
+      "requirements": "2027校招公告只公布方向名称及材料、力学、机械、化工、电气相关专业总体范围，未确认这一方向的独立学历、人数或地点；2026-10-31原校招截止。下方另有2026社会招聘，不属于此岗位。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "高分子材料与工程",
+        "化学工程与工艺",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 具体学历以企业正式单岗为准",
+      "url": "https://webhr.shccig.com/webhrN2-zp",
+      "evidenceUrl": "https://www.wondercv.com/xiaozhao/hengshen-2027-campus-recruitment-16445-fbcb31/",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "江苏恒神股份有限公司或实际招聘子公司（需按正式职位确认）",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    }
+  ]
+}
