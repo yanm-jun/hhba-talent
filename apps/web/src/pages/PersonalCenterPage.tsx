@@ -1,31 +1,30 @@
 import {type FormEvent,useEffect,useState} from 'react';
-import {ArrowRight,Bookmark,BriefcaseBusiness,CheckCircle2,Compass,FileUser,LockKeyhole,LogOut,Scale,ShieldCheck,SlidersHorizontal,Trash2,UserRound,ChartNoAxesCombined} from 'lucide-react';
+import {ArrowRight,Bookmark,BriefcaseBusiness,CheckCircle2,Compass,FileUser,LockKeyhole,LogOut,Scale,ShieldCheck,SlidersHorizontal,UserRound,ChartNoAxesCombined} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
 import {getJob,localizedCompany,localizedLocation,localizedTitle,type LiveJob} from '../services/liveRecruitment';
 import {listSavedJobs,setSavedJob,savedAvailable,type SavedJob} from '../services/savedJobs';
 import {analyticsChoice,chooseAnalytics} from '../services/engagement';
-import {demoModeEnabled,useDemoAccount,exitDemoAccount,deleteDemoAccount,updateDemoAccount} from '../services/demoAccount';
-import {employerApiReady,type User} from '../services/api';
+import {getCandidateWorkspaceProfile,saveCandidateWorkspaceProfile,saveCandidateWorkspacePreferences,realWorkspaceAvailable,type CandidateWorkspaceProfile} from '../services/candidateWorkspace';
+import {type User} from '../services/api';
 import '../styles/personal-center.css';
-import '../styles/demo-account.css';
 
 type Section='overview'|'profile'|'preferences'|'resume'|'applications'|'privacy'|'saved';
 type RecordRow={record:SavedJob;job:LiveJob|null};
 const pages:{id:Section;label:string;icon:typeof UserRound;description:string}[]=[
  {id:'overview',label:'工作台',icon:Compass,description:'了解你的职业探索进度'},
  {id:'saved',label:'我的收藏',icon:Bookmark,description:'查看保存的真实岗位'},
- {id:'profile',label:'个人资料',icon:UserRound,description:'自定义演示头像和个人介绍'},
+ {id:'profile',label:'个人资料',icon:UserRound,description:'填写真实个人资料'},
  {id:'preferences',label:'求职偏好',icon:SlidersHorizontal,description:'地点、职位和工作方式'},
- {id:'resume',label:'我的简历',icon:FileUser,description:'体验简历管理界面'},
- {id:'applications',label:'求职记录',icon:BriefcaseBusiness,description:'查看申请流程占位'},
- {id:'privacy',label:'账户与隐私',icon:ShieldCheck,description:'管理匿名统计和演示数据'},
+ {id:'resume',label:'我的简历',icon:FileUser,description:'私有简历功能待接入'},
+ {id:'applications',label:'求职记录',icon:BriefcaseBusiness,description:'真实投递记录待接入'},
+ {id:'privacy',label:'账户与隐私',icon:ShieldCheck,description:'管理真实账户与匿名统计'},
 ];
 function routeFor(id:Section){return id==='overview'?'/candidate/account':id==='saved'?'/candidate/saved':'/candidate/account/'+id;}
-export function PersonalCenterPage({user,onlySaved=false,section='overview'}:{user:User|null;onlySaved?:boolean;section?:Section}){
+export function PersonalCenterPage({user,onlySaved=false,section='overview',onLogout}:{user:User|null;onlySaved?:boolean;section?:Section;onLogout:()=>Promise<void>}){
  const current:Section=onlySaved?'saved':section;
- const demo=useDemoAccount();
- const displayName=user?.display_name||demo?.nickname||'访客';
+ const [account,setAccount]=useState<CandidateWorkspaceProfile|null>(null),[profileLoading,setProfileLoading]=useState(true);
+ const displayName=account?.display_name||user?.display_name||'求职者';
  const [rows,setRows]=useState<RecordRow[]>([]),[savedCount,setSavedCount]=useState(0);
  const [loading,setLoading]=useState(false),[error,setError]=useState('');
  const [busy,setBusy]=useState('');
@@ -33,14 +32,24 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview'}:{us
  const [nickname,setNickname]=useState(''),[headline,setHeadline]=useState(''),[city,setCity]=useState(''),[intro,setIntro]=useState(''),[skills,setSkills]=useState('');
  const [role,setRole]=useState(''),[targetCity,setTargetCity]=useState(''),[mode,setMode]=useState<'不限'|'远程'|'现场'|'混合办公'>('不限');
  const [notice,setNotice]=useState('');
- const [selectedFile,setSelectedFile]=useState('');
  useEffect(()=>{
-  setNickname(demo?.nickname||'');setHeadline(demo?.headline||'');setCity(demo?.city||'');
-  setIntro(demo?.intro||'');setSkills(demo?.skills||'');
-  setRole(demo?.preferredRole||'');setTargetCity(demo?.preferredCity||'');setMode(demo?.workMode||'不限');
- },[demo?.updatedAt]);
+  if(!user?.account_types?.includes('candidate'))navigate('/candidate/login');
+ },[user?.id]);
  useEffect(()=>{
-  if(!savedAvailable||!['overview','saved'].includes(current))return;
+  if(!user?.account_types?.includes('candidate')||!realWorkspaceAvailable){setProfileLoading(false);return;}
+  let active=true;setProfileLoading(true);setAccount(null);
+  getCandidateWorkspaceProfile().then(data=>{
+   if(!active)return;
+   setAccount(data);
+   setNickname(data.display_name||'');setHeadline(data.headline||'');setCity(data.city||'');
+   setIntro(data.intro||'');setSkills(data.skills||'');
+   setRole(data.preferred_role||'');setTargetCity(data.preferred_city||'');setMode(data.work_mode||'不限');
+  }).catch(e=>{if(active)setNotice(e instanceof Error?e.message:'真实账户资料读取失败')})
+   .finally(()=>{if(active)setProfileLoading(false)});
+  return()=>{active=false};
+ },[user?.id]);
+ useEffect(()=>{
+  if(!user||!savedAvailable||!['overview','saved'].includes(current))return;
   let active=true;
   setLoading(true);setError('');
   listSavedJobs().then(async records=>{
@@ -58,21 +67,28 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview'}:{us
   }).catch(e=>{if(active)setError(e instanceof Error?e.message:'收藏服务暂不可用')})
   .finally(()=>{if(active)setLoading(false)});
   return()=>{active=false};
- },[current]);
+ },[current,user?.id]);
  const cancel=async(id:string)=>{
   setBusy(id);setError('');
   try{await setSavedJob(id,false);setRows(all=>all.filter(item=>item.record.jobId!==id));setSavedCount(n=>Math.max(0,n-1))}
   catch(e){setError(e instanceof Error?e.message:'操作失败')}
   finally{setBusy('')}
  };
- function update(event:FormEvent<HTMLFormElement>,which:'profile'|'preferences'){
+ async function update(event:FormEvent<HTMLFormElement>,which:'profile'|'preferences'){
   event.preventDefault();setNotice('');
-  if(!demoModeEnabled||!demo){setNotice('请先进入模拟账户');return;}
+  if(!user||!account||!realWorkspaceAvailable){setNotice('真实账户服务未接通或登录状态失效');return;}
+  setBusy(which);
   try{
-   if(which==='profile')updateDemoAccount({nickname,headline,city,intro,skills});
-   else updateDemoAccount({preferredRole:role,preferredCity:targetCity,workMode:mode});
-   setNotice('演示资料已保存在本浏览器；并未创建真实账号。');
-  }catch(e){setNotice(e instanceof Error?e.message:'暂无法保存')}
+   if(which==='profile'){
+    await saveCandidateWorkspaceProfile({display_name:nickname,headline,city,intro,skills});
+    setAccount(prev=>prev?{...prev,display_name:nickname.trim(),headline:headline.trim(),city:city.trim(),intro:intro.trim(),skills:skills.trim()}:null);
+   }else{
+    await saveCandidateWorkspacePreferences({preferred_role:role,preferred_city:targetCity,work_mode:mode});
+    setAccount(prev=>prev?{...prev,preferred_role:role.trim(),preferred_city:targetCity.trim(),work_mode:mode}:null);
+   }
+   setNotice('已保存到当前真实账户。');
+  }catch(e){setNotice(e instanceof Error?e.message:'保存失败，请重试')}
+  finally{setBusy('')}
  }
  const sectionTitle=pages.find(page=>page.id===current)?.label||'个人中心';
  return <Shell user={user}>
@@ -81,19 +97,11 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview'}:{us
   <header className="hhba-account-header">
    <div className="hhba-account-avatar"><UserRound size={28}/></div>
    <div className="hhba-account-identity"><span className="hhba-account-eyebrow">MY CAREER SPACE</span>
-    <h1>{displayName}，欢迎回来</h1>
-    <p>{demo?.headline||'把每一份职业机会都整理好，找到更适合自己的方向。'}</p>
-    <span className="hhba-account-chip">{user?'真实账户':demo?'已进入演示账户':'未进入演示'} · {user?'账户资料': '前端体验模式'}</span>
+    <h1>{displayName}，欢迎回来</h1><p>{account?.headline||'把每一份职业机会都整理好，找到更适合自己的方向。'}</p>
+    <span className="hhba-account-chip">真实求职者账户 · {account?'资料已连接':profileLoading?'读取中':'资料连接待确认'}</span>
    </div>
-   {demoModeEnabled&&demo&&<button className="hhba-account-exit" type="button" onClick={()=>{exitDemoAccount();navigate('/candidate/login')}}><LogOut size={15}/>退出演示</button>}
+   {user&&<button className="hhba-account-exit" type="button" onClick={()=>void onLogout()}><LogOut size={15}/>退出登录</button>}
   </header>
-  {demoModeEnabled&&<div className="hhba-account-warning"><ShieldCheck size={17}/>
-   <span><strong>模拟账户演示：</strong>这里的昵称、简历界面和求职偏好不代表真实注册，数据仅留在当前浏览器；不会获得企业权限，也不计入平台注册及活跃用户。</span>
-  </div>}
-  {!demo&&!user&&<section className="hhba-account-entry">
-   <div><strong>先体验完整个人中心</strong><p>无需真实邮箱或密码。选择模拟登录，也可以注册一个自定义的演示昵称。</p></div>
-   <div className="hhba-account-actions"><Link to="/candidate/login">模拟登录</Link><Link to="/candidate/register">模拟注册</Link></div>
-  </section>}
   <div className="hhba-account-grid">
    <aside className="hhba-account-sidebar" aria-label="个人中心导航">
     <p>我的空间</p>
