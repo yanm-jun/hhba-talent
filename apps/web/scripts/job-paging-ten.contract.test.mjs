@@ -56,6 +56,8 @@ test('compact cards, direct role access, persistent filters, mobile layout and r
  assert.match(market,/sliceJobsForPage\(eligible,page\)/);
  assert.match(market,/listJobs\(filters,batchOffsetForPage\(page\),controller.signal\)/);
  assert.match(market,/const state=\{scope:compact\?'home'/);
+ assert.match(market,/const previousMajor=useRef\(selectedMajor\)/);
+ assert.match(market,/if\(previousMajor.current!==selectedMajor\)/);
  assert.match(market,/setPage\(0\);setFilters/);
  assert.match(market,/const detail='\/candidate\/jobs\/'\+encodeURIComponent\(job.id\)/);
  assert.match(market,/majorSlug=\{selectedMajor\}/);
