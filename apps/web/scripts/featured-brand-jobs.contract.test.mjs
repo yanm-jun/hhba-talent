@@ -49,11 +49,12 @@ test('six curated positions are exact source verified job IDs, no invented card 
 test('default market showcases six, filtered search and pagination keep the full job index',()=>{
  assert.ok(market.includes('loadVerifiedFeaturedJobs(controller.signal)'));
  assert.ok(market.includes('const defaultView=isDefaultMarketFilters(filters,page)'));
- assert.ok(market.includes('compact?featured:'));
- assert.ok(market.includes("compact?eligible.slice(0,8):eligible"));
+ assert.ok(market.includes('const shown=!compact?pagedEligible:'),'full job market must remain paginated with no pinned duplicates');
+ assert.ok(market.includes('defaultView?(featured||featuredError?featured||eligible.slice(0,8):[]):eligible.slice(0,8)'),'home page preserves verified featured employers');
  assert.ok(market.includes("onChange={e=>setDraft(e.target.value)}"));
- assert.ok(market.includes('listJobs(filters,page*30,controller.signal)'));
- assert.ok(market.includes("to={'/candidate/jobs/'+encodeURIComponent(job.id)}"));
+ assert.ok(market.includes('listJobs(filters,batchOffsetForPage(page),controller.signal)'),'job paging must keep existing source-validated 30-record feed');
+ assert.ok(market.includes("const detail='/candidate/jobs/'+encodeURIComponent(job.id)"));
+ assert.ok(market.includes("to={detail}"));
  assert.ok(market.includes('<EmployerBrandLogo job={job}/>'));
  assert.ok(market.includes('featuredTitle(job,lang)'));
 });
