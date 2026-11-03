@@ -101,7 +101,7 @@ async function refreshGrowth(){
   const r=await fetch('/admin-preview/api/metrics?'+params,{cache:'no-store',credentials:'same-origin'});
   if(!r.ok||!(r.headers.get('content-type')||'').includes('application/json')){
    growthError=[401,403].includes(r.status)?'AUTH_REQUIRED':'SERVICE_ERROR';
-   throw Error('PRIVATE_METRICS_NOT_AVAILABLE');
+   throw Error('PRIVATE_METRICS_REQUIRE_AUTH');
   }
   const v=await r.json();
   if(v.kind!=='HHBA_CLOUDFLARE_PRIVATE_METRICS_V1'||!v.traffic||!v.devices||!v.account){growthError='SERVICE_ERROR';throw Error('INVALID_PRIVATE_METRICS')}
