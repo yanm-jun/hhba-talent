@@ -49,7 +49,11 @@ jobs:
         run: |
           for id in $(seq -w 93 119); do
             test -s "apps/web/dist/companies/autumn/cn-autumn-$id/index.html"
-            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/logo.svg"
+            # 095–097 reuse licensed earlier brand asset paths from company profiles.
+            case "$id" in
+              095|096|097) test -s "apps/web/dist/images/autumn-real-logos/cn-autumn-$id.svg" ;;
+              *) test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/logo.svg" ;;
+            esac
             test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/photo1.svg"
             test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/photo2.svg"
             test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/media-sources.json"
