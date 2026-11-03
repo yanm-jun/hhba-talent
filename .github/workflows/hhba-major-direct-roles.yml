@@ -9,6 +9,7 @@ on:
       - 'apps/web/src/styles/unified-jobs.css'
       - 'apps/web/scripts/major-company-job-flow.contract.test.mjs'
       - 'apps/web/scripts/major-direct-role-results.contract.test.mjs'
+      - 'apps/web/scripts/job-bookmark-major-priority.contract.test.mjs'
       - '.github/workflows/hhba-major-direct-roles.yml'
   workflow_dispatch:
 permissions:
@@ -30,7 +31,7 @@ jobs:
       - name: Test real position matching, academic family and market regression
         working-directory: apps/web
         run: |
-          node --test scripts/major-direct-role-results.contract.test.mjs
+          node --test scripts/major-direct-role-results.contract.test.mjs scripts/job-bookmark-major-priority.contract.test.mjs
           node scripts/major-company-job-flow.contract.test.mjs
           node scripts/major-eligibility.contract.test.mjs
           node scripts/v2-market-search.contract.test.mjs
