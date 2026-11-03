@@ -24,8 +24,8 @@ assert(recruitment.includes('visibleRoleForMajor(job,f.major_slug,f.include_unkn
  'Match actual roles and never auto-include major-undisclosed jobs');
 assert(major.includes("return fields.length?'other':'unknown'"),
  'Missing/other declared requirements must not be treated as verified');
-assert(recruitment.includes('priority={related:3,unrestricted:2,unknown:1,other:0,all:0}'),
- 'Rank related, explicitly unrestricted and optional unknown in that order');
+assert(recruitment.includes('priority={related:3,unknown:2,unrestricted:1,other:0,all:0}'),
+ 'Rank related first, optional unknown next, and explicitly unrestricted last');
 const domesticMarket=recruitment.slice(recruitment.indexOf('export async function listDomesticRebuildMarket'));
 const filterPos=domesticMarket.indexOf('const allowed=combined.filter(');
 const sortPos=domesticMarket.indexOf('allowed.sort((a,b)=>priority[');
