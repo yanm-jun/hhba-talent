@@ -1,0 +1,35 @@
+{
+  "companyId": "112",
+  "reviewedOn": "2026-11-03",
+  "companyName": "舒客电商",
+  "brand": {
+    "status": "editorial_wordmark_not_official_logo",
+    "trademarkUsePermissionVerified": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_fallback",
+      "candidate": {
+        "page": "https://www.weimeizi.com/",
+        "image": null,
+        "note": "薇美姿品牌官网，不宜将广告或图库形象当办公室实景"
+      },
+      "realImageDisplayed": false,
+      "copyrightPermissionVerified": false
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_fallback",
+      "candidate": {
+        "page": "https://job.hust.edu.cn/zpinfo1/2436698.htm",
+        "image": null,
+        "note": "高校校招发布文字，非真实办公环境照片"
+      },
+      "realImageDisplayed": false,
+      "copyrightPermissionVerified": false
+    }
+  ],
+  "commercialReuseRightsVerified": false,
+  "notes": "Official/industry URLs are candidate provenance only. No public web photo is asserted to be licensed for HHBA publication. The two SVGs visibly state they are not real premises."
+}

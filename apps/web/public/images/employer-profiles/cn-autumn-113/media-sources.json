@@ -1,0 +1,35 @@
+{
+  "companyId": "113",
+  "reviewedOn": "2026-11-03",
+  "companyName": "AIA Digital+",
+  "brand": {
+    "status": "editorial_wordmark_not_official_logo",
+    "trademarkUsePermissionVerified": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_fallback",
+      "candidate": {
+        "page": "https://aia.wd3.myworkdayjobs.com/en-US/External/job/Engineer_JR-65783-2",
+        "image": null,
+        "note": "AIA官方广州招聘JD，不包含可授权的办公室真实照片"
+      },
+      "realImageDisplayed": false,
+      "copyrightPermissionVerified": false
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_fallback",
+      "candidate": {
+        "page": "https://www.aia.com.cn/zh-cn/join-us/zhaopin",
+        "image": null,
+        "note": "AIA集团官方人才官网图片非单独广州TSS实景，版权需核"
+      },
+      "realImageDisplayed": false,
+      "copyrightPermissionVerified": false
+    }
+  ],
+  "commercialReuseRightsVerified": false,
+  "notes": "Official/industry URLs are candidate provenance only. No public web photo is asserted to be licensed for HHBA publication. The two SVGs visibly state they are not real premises."
+}

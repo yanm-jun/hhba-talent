@@ -1,0 +1,35 @@
+{
+  "companyId": "111",
+  "reviewedOn": "2026-11-03",
+  "companyName": "钱江摩托",
+  "brand": {
+    "status": "editorial_wordmark_not_official_logo",
+    "trademarkUsePermissionVerified": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_fallback",
+      "candidate": {
+        "page": "https://qjmotor.ch/de/qjmotor/about",
+        "image": "https://qjmotor.ch/storage/app/media/apropos/apropos-entete.jpg",
+        "note": "QJMOTOR欧洲经销商官网2025以前历史钱江工厂外观，真实但未确认版权授权"
+      },
+      "realImageDisplayed": false,
+      "copyrightPermissionVerified": false
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_fallback",
+      "candidate": {
+        "page": "https://www.sohu.com/a/844381433_170287",
+        "image": "https://q2.itc.cn/images01/20250102/2438266fdf8740348bc76527669a6feb.jpeg",
+        "note": "搜狐汽车2025钱江生产线，媒体著作权未授权"
+      },
+      "realImageDisplayed": false,
+      "copyrightPermissionVerified": false
+    }
+  ],
+  "commercialReuseRightsVerified": false,
+  "notes": "Official/industry URLs are candidate provenance only. No public web photo is asserted to be licensed for HHBA publication. The two SVGs visibly state they are not real premises."
+}
