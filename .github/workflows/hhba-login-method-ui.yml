@@ -1,0 +1,32 @@
+name: HHBA login method switch UI regression
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/web/src/pages/PhoneAuthPage.tsx"
+      - "apps/web/src/styles/role-auth.css"
+      - "apps/web/scripts/phone-auth-method-switch.contract.test.mjs"
+      - ".github/workflows/hhba-login-method-ui.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify login switch, preserved auth contracts and candidate route
+        working-directory: apps/web
+        run: node --test scripts/phone-auth-method-switch.contract.test.mjs scripts/demo-account.contract.test.mjs
+      - name: Typecheck and build existing HHBA frontend
+        working-directory: apps/web
+        run: npm run build
