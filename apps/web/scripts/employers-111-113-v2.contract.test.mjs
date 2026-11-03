@@ -43,7 +43,7 @@ for(const [num,name] of [['111','钱江摩托'],['112','舒客电商'],['113','A
  }
  if(num==='112'){
   assert(p.jobs.every(j=>j.evidenceClass==='official_individual_listing'&&j.evidenceUrl.includes('tianzhulingshan.jobs.feishu.cn')));
-  assert(p.jobs.some(j=>j.id==='ecomm'&&j.summary.includes('一个条目')));
+  assert(p.jobs.some(j=>j.id==='ecomm'&&j.summary.includes('并非五条另外招聘的职位')));
   assert(p.jobs.some(j=>j.id==='graphic'));
   assert(p.recruitment.url.includes('jobs.feishu.cn'));
  }
