@@ -8,15 +8,18 @@ export async function queryAccountGrowth({metricsDb,authDb,since,until,today,ser
   scope:'VERIFIED_PNVS_CANDIDATES_ONLY',reason:'真实账号库尚未连接'};
  if(authDb){
   try{
-   const [total,signups]=await Promise.all([
-    authDb.prepare("SELECT COUNT(*) AS n FROM hhba_auth_users WHERE role='candidate'").first(),
-    authDb.prepare("SELECT substr(created_at,1,10) AS day,COUNT(*) AS n FROM hhba_auth_users WHERE role='candidate' AND substr(created_at,1,10)>=? AND substr(created_at,1,10)<=? GROUP BY day ORDER BY day").bind(since,until).all()
-   ]);
-   const map=new Map((signups.results||[]).map(row=>[row.day,n(row.n)]));
-   const signupSeries=series.map(row=>({day:row.day,count:map.get(row.day)||0}));
-   accounts={quality:'collected',registeredUsers:n(total?.n),newRegistered:signupSeries.reduce((sum,row)=>sum+row.count,0),
-    signupSeries,savedJobs:null,accountsWithSavedJobs:null,dau:null,wau:null,mau:null,
-    scope:'VERIFIED_PNVS_CANDIDATES_ONLY',reason:'仅实际注册候选人，排除匿名设备和模拟账号'};
+   // A missing optional signup/saved table must never hide the verified user total.
+   const total=await authDb.prepare("SELECT COUNT(*) AS n FROM hhba_auth_users WHERE role='candidate'").first();
+   accounts={quality:'collected',registeredUsers:n(total?.n),newRegistered:null,signupSeries:null,
+    savedJobs:null,accountsWithSavedJobs:null,dau:null,wau:null,mau:null,
+    scope:'VERIFIED_PNVS_CANDIDATE_USERS_ONLY',
+    reason:'注册总数来自真实候选人数据库；DAU/MAU 仅在同意账号采集后计算，不能用匿名 UV 替代。'};
+   try{
+    const signups=await authDb.prepare("SELECT substr(created_at,1,10) AS day,COUNT(*) AS n FROM hhba_auth_users WHERE role='candidate' AND substr(created_at,1,10)>=? AND substr(created_at,1,10)<=? GROUP BY day ORDER BY day").bind(since,until).all();
+    const map=new Map((signups.results||[]).map(row=>[row.day,n(row.n)]));
+    accounts.signupSeries=series.map(row=>({day:row.day,count:map.get(row.day)||0}));
+    accounts.newRegistered=accounts.signupSeries.reduce((sum,row)=>sum+row.count,0);
+   }catch(e){console.warn('HHBA_SIGNUP_SERIES_NOT_READY',e?.name||'error')}
    try{
     const saves=await authDb.prepare('SELECT COUNT(*) AS n,COUNT(DISTINCT phone) AS users FROM hhba_candidate_saved_jobs').first();
     accounts.savedJobs=n(saves?.n);
