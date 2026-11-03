@@ -458,7 +458,9 @@ export async function listDomesticRebuildMarket(filters:LiveFilters,offset:numbe
  // Name matches must not be hidden behind 30 unrelated job-summary hits.
  // Apply relevance ordering AFTER all filters and BEFORE pagination.
  const term=filters.q.normalize('NFKC').toLowerCase().trim();
- if(term){
+ // With a selected major, retain evidence-based role priority instead of
+ // moving enterprise-name matches back to the front.
+ if(term&&!filters.major_slug){
   const nameScore=(job:LiveJob)=>{
    const aliases=job.platform==='shkp-official-detail'?' SHKP Sun Hung Kai Properties 新鴻基地產':
     job.platform==='anker-2027-campus-official'?' Anker Innovations':
