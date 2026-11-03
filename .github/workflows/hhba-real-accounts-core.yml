@@ -1,0 +1,41 @@
+name: HHBA real account core security and frontend
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/src/pages/PhoneAuthPage.tsx'
+      - 'apps/web/src/pages/PersonalCenterPage.tsx'
+      - 'apps/web/src/components/Shell.tsx'
+      - 'apps/web/src/components/SaveJobButton.tsx'
+      - 'apps/web/src/services/candidateWorkspace.ts'
+      - 'apps/web/src/services/savedJobs.ts'
+      - 'apps/web/functions/api/account/**'
+      - 'apps/web/d1/0006_real_candidate_workspace.sql'
+      - 'apps/web/scripts/real-accounts-core.contract.test.mjs'
+      - '.github/workflows/hhba-real-accounts-core.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-account-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install project dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify identity isolation, profile writes and login redirects
+        working-directory: apps/web
+        run: |
+          node --check 'functions/api/account/[[path]].js'
+          node --test scripts/real-accounts-core.contract.test.mjs scripts/real-auth-pnvs.test.mjs scripts/pnvs-four-digit-pass.security.test.mjs scripts/phone-auth-method-switch.contract.test.mjs
+      - name: Compile current frontend
+        working-directory: apps/web
+        run: npm run build
