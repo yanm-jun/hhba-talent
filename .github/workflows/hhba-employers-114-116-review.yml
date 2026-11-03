@@ -1,0 +1,68 @@
+name: HHBA employers 114-116 independent source-backed static review
+on:
+  push:
+    branches: [feature/employers-114-116-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-employers-114-116-independent-static-review
+  cancel-in-progress: true
+jobs:
+  static-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install reproducible locked dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify employer 114-116 source classes, individual roles, search and outbound link gate
+        working-directory: apps/web
+        run: |
+          node scripts/employers-114-116-v2.contract.test.mjs
+          node scripts/employer-job-level-search.contract.test.mjs
+          node scripts/major-direct-role-results.contract.test.mjs
+          node scripts/recruitment-market-source-invalid.regression.test.mjs
+      - name: Build original V2 site and materialize independent static company routes
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: |
+          npm run build
+          node scripts/materialize-company-route-entries.mjs
+      - name: Validate company direct URLs and 2 audited non-real photos each
+        run: |
+          test -s apps/web/dist/index.html
+          for id in 114 115 116; do
+            test -s "apps/web/dist/companies/autumn/cn-autumn-$id/index.html"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/logo.svg"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/photo1.svg"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/photo2.svg"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/media-sources.json"
+          done
+      - name: Upload independent complete static build artifact - never deploy main GitHub Pages
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-employers-114-116-independent-static-review
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
+      - name: Upload source and license audit for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-employers-114-116-job-and-media-source-audit
+          path: |
+            apps/web/public/images/employer-profiles/cn-autumn-114/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-115/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-116/media-sources.json
+            docs/HHBA_EMPLOYERS_114_116_SOURCE_AUDIT_20261103.md
+          retention-days: 30
+          if-no-files-found: error
