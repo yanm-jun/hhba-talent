@@ -193,6 +193,33 @@ a.unified-company-brand:focus-visible,.unified-detail-company-link:focus-visible
 .unified-job-list-meta .unified-company-brand:hover{text-decoration:underline}
 .unified-job-list-company{font-weight:650;color:#3c6a51}
 .unified-job-list-status{color:#839088}
+/* City variants are a compact expansion of one reviewed job direction.
+   Keep the primary card height unchanged until the user expands details. */
+.unified-job-city-count{color:#347e54;font-size:10px;font-weight:700;white-space:nowrap}
+.unified-role-list .unified-job-variants{grid-column:2 / -1;position:relative;z-index:3;
+  min-width:0;border-top:1px solid #e9efe9;margin-top:1px;padding-top:8px}
+.unified-role-list .unified-job-variants>summary{width:max-content;max-width:100%;
+  cursor:pointer;font-size:12px;color:#2e7551;font-weight:700;line-height:1.65}
+.unified-role-list .unified-job-variants>summary:hover{text-decoration:underline}
+.unified-role-list .unified-job-variants>summary:focus-visible{outline:2px solid #488b64;outline-offset:3px}
+.unified-job-variant-list{display:grid;gap:6px;margin:10px 0}
+.unified-job-variant-row{display:grid;grid-template-columns:minmax(95px,.8fr) minmax(130px,2fr) auto auto;
+  align-items:center;gap:8px 12px;background:#f9fcfa;border:1px solid #e7eee8;
+  padding:7px 10px;border-radius:8px;min-width:0}
+.unified-job-variant-city{display:flex;align-items:center;gap:4px;color:#426c52;
+  font-size:12px;min-width:0;overflow-wrap:anywhere}
+.unified-job-variant-title{font-size:11px;color:#67796e;min-width:0;overflow-wrap:anywhere}
+.unified-job-variant-row>a{display:inline-flex;align-items:center;gap:4px;text-decoration:none;
+  color:#247348;font-weight:700;font-size:11px;white-space:nowrap}
+.unified-job-variant-row>a:hover{text-decoration:underline}
+.unified-role-list .unified-job-variants>p{margin:5px 0 0;color:#879489;font-size:11px;line-height:1.5}
+@media(max-width:760px){
+ .unified-role-list .unified-job-variants{grid-column:1 / -1}
+ .unified-job-variant-row{grid-template-columns:minmax(0,1fr) auto;gap:8px}
+ .unified-job-variant-title{grid-column:1 / -1;grid-row:2}
+ .unified-job-variant-row .hhba-save-wrap{grid-column:2;grid-row:1}
+ .unified-job-variant-row>a{grid-column:2;grid-row:2}
+}
 .unified-job-list-action{display:flex;align-items:center;gap:11px;justify-content:flex-end;white-space:nowrap}
 .unified-job-list-action>a{display:inline-flex;align-items:center;gap:5px;font-size:12px;text-decoration:none;font-weight:700;color:#287147}
 .unified-job-list-action>a:hover{text-decoration:underline}

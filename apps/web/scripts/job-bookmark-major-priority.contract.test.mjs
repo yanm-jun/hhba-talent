@@ -20,7 +20,7 @@ test('selected or typed major is ranked across the entire filtered list before p
  const section=list.slice(start,next);
  const filter=section.indexOf('const allowed=combined.filter');
  const ranking=section.indexOf('allowed.sort(');
- const pagination=section.indexOf('jobs:allowed.slice(offset,offset+30)');
+ const pagination=section.indexOf('marketPage(allowed,filters,offset)');
  assert(filter>=0&&ranking>filter&&pagination>ranking,
   'Ranking must precede batching, or unrestricted roles win page one');
  assert.match(section,/majorSlugForQuery\(filters\.q\)/);
