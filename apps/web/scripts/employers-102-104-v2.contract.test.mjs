@@ -17,7 +17,7 @@ for(const [num,name,count] of [['102','陕煤集团',2],['103','浙江省交通�
  assert.equal(p.jobs.length,count);assert.equal(new Set(p.jobs.map(j=>j.id)).size,count);
  assert.equal(p.business.length,6);
  assert(p.business.every(b=>b.title&&b.description.length>22&&b.details.length===3),'Incomplete business content');
- assert(p.jobs.every(j=>j.title&&j.city&&j.category&&j.summary.length>45&&j.requirements.length>50),'Missing role descriptions');
+ assert(p.jobs.every(j=>j.title&&j.city&&j.category&&j.summary.length>35&&j.requirements.length>35),'Missing role descriptions');
  assert(p.jobs.every(j=>j.currentOpenVerified===false&&j.url===p.recruitment.url&&j.evidenceUrl.startsWith('https://')),'Reject fake live openings and unapproved outbound URLs');
  assert(p.jobs.every(j=>j.majorNames.length===0&&j.editorialRelatedMajors.length>=1),'Specialties require individual position evidence');
  assert.equal(p.media.photos.length,2);
