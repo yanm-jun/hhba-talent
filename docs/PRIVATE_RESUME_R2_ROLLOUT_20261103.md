@@ -1,6 +1,10 @@
 # HHBA 私有简历库部署与隐私门槛（2026-11-03）
 
 分支：`feature/private-resume-r2-phase2-20261103`，PR #202。此时**尚未合并 main**。
+
+> **最新执行状态（2026-11-03）**：此前的 R2 403/10042 已由账户所有者完成激活。已创建独立的 `hhba-private-resumes-prod` 与 `hhba-private-resumes-preview`（均为 Standard、APAC、无公共域名、无公开 r2.dev）；均已绑定 Pages `HHBA_PRIVATE_RESUMES` 到正确环境。R2 测试桶的非用户数据写入/删除已成功。预览 D1 与正式 D1 的 `0007` 增量迁移均已执行，生产认证用户、会话和短信原始记录数量保持不变，Cloudflare 恢复检查点可用。**以下“尚未开通/尚未迁移”记录属于开通前的历史审计状态，不代表当前状态。** 正式上线仍以最新 GitHub CI、独立预览发布和真实账号端到端验证为准。简历仅用于本人管理，单独授权文案包含 R2 APAC 及可能跨境存储说明；完整法定隐私政策及主体信息仍需补齐。
+
+
 原个人工作台位置：`/candidate/account/resume`。
 
 ## 本轮已完成代码
