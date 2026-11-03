@@ -42,7 +42,6 @@ import { PhoneAuthPage } from './pages/PhoneAuthPage';
 import { OfficialRecruitmentContinuePage } from './pages/OfficialRecruitmentContinuePage';
 import { employerApiReady } from './services/api';
 import { ResumeUploadPage, ProfilePage, PublicProfilePage, ResumePage, ReviewPage } from './pages/CandidatePages';
-import { CandidateDashboardPage } from './pages/CandidateDashboardPage';
 import { PersonalCenterPage } from './pages/PersonalCenterPage';
 import { LegalAidLandingPage } from './pages/LegalAidLandingPage';
 import { LegalAidInterventionPage } from './pages/LegalAidInterventionPage';
@@ -72,6 +71,9 @@ useEffect(()=>{
  let mounted=true;
  async function restore(){
   try{
+   // Remove only obsolete local prototype identity. Never touch PNVS tokens,
+   // account-backed bookmarks or any real user data.
+   try{window.localStorage.removeItem('hhba.demo.candidate.v1');}catch{}
    if(realAuthReady&&getRealAuthToken()){
     try{const me=await realAuth.me();if(mounted){setUser(realAuthToUser(me));return;}}
     catch(e){if(e instanceof ApiError&&e.status===401)clearRealAuthToken();
