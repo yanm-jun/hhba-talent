@@ -7,6 +7,8 @@ import {listSavedJobs,setSavedJob,savedAvailable,type SavedJob} from '../service
 import {analyticsChoice,chooseAnalytics} from '../services/engagement';
 import {getCandidateWorkspaceProfile,saveCandidateWorkspaceProfile,saveCandidateWorkspacePreferences,realWorkspaceAvailable,type CandidateWorkspaceProfile} from '../services/candidateWorkspace';
 import {type User} from '../services/api';
+import {PrivateResumeVault} from '../components/PrivateResumeVault';
+import {listPrivateResumes,privateResumeAvailable} from '../services/privateResumes';
 import '../styles/personal-center.css';
 // Preserve the existing workbench layout styles while deleting the obsolete demo identity logic.
 import '../styles/demo-account.css';
@@ -18,7 +20,7 @@ const pages:{id:Section;label:string;icon:typeof UserRound;description:string}[]
  {id:'saved',label:'我的收藏',icon:Bookmark,description:'查看保存的真实岗位'},
  {id:'profile',label:'个人资料',icon:UserRound,description:'填写真实个人资料'},
  {id:'preferences',label:'求职偏好',icon:SlidersHorizontal,description:'地点、职位和工作方式'},
- {id:'resume',label:'我的简历',icon:FileUser,description:'私有简历功能待接入'},
+ {id:'resume',label:'我的简历',icon:FileUser,description:'账户私有简历管理'},
  {id:'applications',label:'求职记录',icon:BriefcaseBusiness,description:'真实投递记录待接入'},
  {id:'privacy',label:'账户与隐私',icon:ShieldCheck,description:'管理真实账户与匿名统计'},
 ];
@@ -28,6 +30,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
  const [account,setAccount]=useState<CandidateWorkspaceProfile|null>(null),[profileLoading,setProfileLoading]=useState(true);
  const displayName=account?.display_name||user?.display_name||'求职者';
  const [rows,setRows]=useState<RecordRow[]>([]),[savedCount,setSavedCount]=useState(0);
+ const [resumeCount,setResumeCount]=useState<number|null>(null);
  const [loading,setLoading]=useState(false),[error,setError]=useState('');
  const [busy,setBusy]=useState('');
  const [consent,setConsent]=useState<boolean|null>(()=>analyticsChoice());
@@ -70,6 +73,16 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
   .finally(()=>{if(active)setLoading(false)});
   return()=>{active=false};
  },[current,user?.id]);
+ useEffect(()=>{
+  if(!user?.account_types?.includes('candidate')||!privateResumeAvailable)return;
+  let active=true;
+  const refresh=()=>{void listPrivateResumes().then(items=>{
+   if(active)setResumeCount(items.length);
+  }).catch(()=>{if(active)setResumeCount(null);});};
+  refresh();
+  window.addEventListener('hhba:private-resumes-changed',refresh);
+  return()=>{active=false;window.removeEventListener('hhba:private-resumes-changed',refresh);};
+ },[user?.id]);
  const cancel=async(id:string)=>{
   setBusy(id);setError('');
   try{await setSavedJob(id,false);setRows(all=>all.filter(item=>item.record.jobId!==id));setSavedCount(n=>Math.max(0,n-1))}
@@ -119,7 +132,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
       <div className="hhba-account-stat-grid">
        <Link to="/candidate/saved"><Bookmark size={21}/><span>已收藏岗位</span><strong>{!savedAvailable?'—':loading?'…':error?'—':savedCount}</strong><small>真实账户专属收藏</small></Link>
        <Link to="/candidate/account/applications"><BriefcaseBusiness size={21}/><span>求职申请</span><strong>—</strong><small>真实投递服务尚未接通</small></Link>
-       <Link to="/candidate/account/resume"><FileUser size={21}/><span>我的简历</span><strong>—</strong><small>私有简历服务尚未接通</small></Link>
+       <Link to="/candidate/account/resume"><FileUser size={21}/><span>我的简历</span><strong>{resumeCount===null?'—':resumeCount}</strong><small>{resumeCount===null?'私有存储尚未开通':'仅本人可访问'}</small></Link>
       </div>
       <section className="hhba-account-panel"><div className="hhba-account-section-heading"><div><h3>完善我的职业档案</h3><p>真实账户资料与求职偏好可跨设备读取。</p></div></div>
        <div className="hhba-account-tool-grid">
@@ -161,10 +174,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
       <div className="hhba-account-form-actions"><button type="submit" disabled={!account||busy==='preferences'}>{busy==='preferences'?'保存中…':'保存求职偏好'}</button><small>重新登录后仍可读取</small></div>
      </form>}{notice&&<p className="hhba-account-notice" role="status">{notice}</p>}
     </section>}
-    {current==='resume'&&<section className="hhba-account-panel">
-     <div className="hhba-account-section-heading"><div><h2>我的简历</h2><p>上传简历需要专属私有文件存储和明确授权。</p></div></div>
-     <div className="hhba-account-upload"><FileUser size={31}/><h3>真实简历功能尚未开放</h3><p>尚未接通此账户的私有简历存储，因此暂不收取文件，也不显示虚构的简历数。</p></div>
-    </section>}
+    {current==='resume'&&<PrivateResumeVault/>}
     {current==='applications'&&<section className="hhba-account-panel">
      <div className="hhba-account-section-heading"><div><h2>求职记录</h2><p>实际申请状态必须由真实投递接口提供。</p></div></div>
      <div className="hhba-account-empty"><BriefcaseBusiness size={27}/><strong>真实投递接口尚未接通</strong><p>仅浏览外部岗位不会被记成“已投递”。</p><Link to="/candidate/jobs">浏览招聘岗位</Link></div>
