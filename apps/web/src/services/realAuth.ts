@@ -89,6 +89,8 @@ function realAuthErrorMessage(body: unknown): string {
       return '两次输入的密码不一致。';
     case 'CODE_INVALID_OR_EXPIRED':
       return '验证码无效或已过期，请重新获取。';
+    case 'RATE_LIMITED':
+      return '操作太频繁，请稍后再试。';
     case 'USER_NOT_REGISTERED':
       return '该手机号尚未注册，请先注册。';
     case 'BAD_CREDENTIALS':
