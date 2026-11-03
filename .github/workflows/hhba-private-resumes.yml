@@ -1,0 +1,41 @@
+name: HHBA private resume vault security
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/functions/api/resumes/**'
+      - 'apps/web/functions/_lib/private-resume-validation.js'
+      - 'apps/web/d1/0007_private_resumes.sql'
+      - 'apps/web/src/components/PrivateResumeVault.tsx'
+      - 'apps/web/src/services/privateResumes.ts'
+      - 'apps/web/src/styles/private-resumes.css'
+      - 'apps/web/src/pages/PersonalCenterPage.tsx'
+      - 'apps/web/scripts/private-resumes.security.test.mjs'
+      - 'apps/web/scripts/demo-account.contract.test.mjs'
+      - '.github/workflows/hhba-private-resumes.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  private-resume-security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install frozen dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify backend syntax, owner isolation and security
+        working-directory: apps/web
+        run: |
+          node --check 'functions/api/resumes/[[path]].js'
+          node --check functions/_lib/private-resume-validation.js
+          node --test scripts/private-resumes.security.test.mjs scripts/demo-account.contract.test.mjs scripts/real-accounts-core.contract.test.mjs scripts/real-auth-pnvs.test.mjs scripts/pnvs-four-digit-pass.security.test.mjs
+      - name: Compile existing HHBA web frontend
+        working-directory: apps/web
+        run: npm run build
