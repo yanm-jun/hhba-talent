@@ -17,7 +17,7 @@ import '../styles/saved-jobs.css';
 import { EmployerBrandLogo } from './EmployerBrandLogo';
 import { companyProfileForJob } from '../services/companyProfiles';
 import { companyPageRouteForJob } from '../services/companyDirectory';
-import { featuredTitle, featuredLocation, isDefaultMarketFilters, loadVerifiedFeaturedJobs } from '../services/featuredOfficialJobs';
+import { featuredTitle, featuredLocation } from '../services/featuredOfficialJobs';
 import type { User } from '../services/api';
 import { getJob, listJobs, localizedCompany, localizedLocation, localizedTitle, officialStatus, safeOfficialJobUrl,
   type Language, type LiveFilters, type LiveJob, type LivePage } from '../services/liveRecruitment';
@@ -176,8 +176,6 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
     }catch(error){setAiError(error instanceof Error?error.message:'联网检索失败');}
     finally{setAiBusy(false)}
   }
-  const [featured,setFeatured]=useState<LiveJob[]|null>(null);
-  const [featuredError,setFeaturedError]=useState('');
   useEffect(()=>{const id=setTimeout(()=>{setPage(0);setFilters(f=>({...f,q:draft,education:f.education==='UNRESTRICTED_OR_UNREPORTED'?'':f.education}));},280);return()=>clearTimeout(id)},[draft]);
   useEffect(()=>{
     const controller=new AbortController();setLoading(true);setError('');setSnapshot(null);
@@ -196,40 +194,12 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
     const previous=history.state&&typeof history.state==='object'?history.state:{};
     history.replaceState({...previous,hhbaMarketState:state},'');
   },[compact,filters,draft,page]);
-  const defaultView=isDefaultMarketFilters(filters,page);
-  useEffect(()=>{
-    if(!compact||officialThree||domesticOnly||curatedHundred||rebuilding){setFeatured([]);setFeaturedError('');return;}
-    if(!defaultView){setFeatured(null);setFeaturedError('');return;}
-    const controller=new AbortController();
-    setFeatured(null);setFeaturedError('');
-    // Verification must never leave the job market stuck on a spinner.
-    // The normal audited market remains available if the curated set is slow.
-    const guard=setTimeout(()=>{
-      if(!controller.signal.aborted){
-        controller.abort();
-        setFeaturedError('精选岗位核验超时，已切换至其他近期核验职位');
-      }
-    },6500);
-    loadVerifiedFeaturedJobs(controller.signal)
-      .then(verified=>{if(!controller.signal.aborted)setFeatured(verified)})
-      .catch(e=>{if(!controller.signal.aborted)setFeaturedError(
-        e instanceof Error?e.message:'精选企业岗位暂时不可用')})
-      .finally(()=>clearTimeout(guard));
-    return ()=>{clearTimeout(guard);controller.abort()};
-  },[compact,defaultView,retry]);
   const eligible=useMemo(()=>snapshot?.jobs.filter(j=>j.recordKind==='CURATED_HISTORICAL'||j.recordKind==='DOMESTIC_REBUILT'||officialStatus(j,snapshot.updated)==='recent')||[],[snapshot]);
-  // Only the UNFILTERED first page gets six highlighted jobs. Search,
-  // company/city filtering and all other pages retain their normal results.
-  // The feed stays in audited 30-job batches, but the complete market shows
-  // exactly ten consecutive positions per UI page (0-9, 10-19, 20-29).
-  // No artificial pinned jobs in the paginated market: avoids duplicates and
-  // inconsistent result counts when jumping directly to another page.
+  // Keep the homepage job list and full recruitment market on one real, filtered
+  // 10-role-per-page source. The server still supplies 30 verified roles per batch.
+  // Never pin six separate featured records here: they break counts and page jumps.
   const pagedEligible=sliceJobsForPage(eligible,page);
-  const shown=!compact?pagedEligible:
-    rebuilding||curatedHundred||officialThree?eligible.slice(0,6):
-    domesticOnly?eligible.slice(0,8):
-    defaultView?(featured||featuredError?featured||eligible.slice(0,8):[]):eligible.slice(0,8);
-  const featuredPending=compact&&defaultView && !rebuilding && !curatedHundred && !officialThree && !domesticOnly && !featured && !featuredError;
+  const shown=pagedEligible;
   const interpreted=useMemo(()=>parseNaturalQuery(filters.q),[filters.q]);
   const roleNames:Record<string,string>={software:'软件工程师',sales:'销售',engineer:'工程师',product:'产品经理',intern:'实习',design:'设计',finance:'财务',marketing:'市场营销',operations:'运营'};
   const intentLabels=[
@@ -371,33 +341,22 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
         {lang==='zh'?'当前包含官网没有明确识别到学历条件的岗位。这些职位可能仍有学历要求，请务必查阅官方任职资格。':
           'Some listed jobs have unknown education requirements. This does not mean that a degree is unnecessary; check the employer’s official qualifications.'}
       </p>}
-    {(loading||featuredPending)?<p className="unified-job-state" role="status">{lang==='zh'
-      ?(featuredPending?'正在核验六个精选企业岗位…':'正在读取真实岗位…')
-      :(featuredPending?'Verifying six highlighted official jobs…':'Loading jobs…')}</p>:
+    {loading?<p className="unified-job-state" role="status">{lang==='zh'?'正在读取真实岗位…':'Loading jobs…'}</p>:
       error?<div className="unified-job-state" role="alert">{lang==='zh'?error:'Jobs temporarily unavailable. Please retry.'}<button type="button" onClick={()=>setRetry(x=>x+1)}><RefreshCcw size={15}/> {lang==='zh'?'重试':'Retry'}</button></div>:
       shown.length?<div className="unified-job-grid unified-role-list" aria-label={selectedMajor?'专业相关的真实岗位':'招聘岗位'}>{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated} majorSlug={selectedMajor}/>)}</div>:
         <div className="unified-job-state">{selectedMajor?(lang==='zh'?'当前没有符合该专业及其他筛选条件的已收录岗位。可尝试调整城市、招聘类型，或主动勾选“专业要求未披露的岗位”进行核验。':'No recorded roles meet this major and your other filters. Try adjusting your criteria.'):domesticOnly?(lang==='zh'?'当前没有符合条件的历史岗位。':'No matching archived jobs.'):v2SearchMatched?(lang==='zh'?'以上已找到匹配的 V2 企业及其岗位方向；当前正式岗位列表未有其他近期核验结果。':'The V2 employer and its archived role directions are shown above; no additional recently verified jobs match.'):lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
-    {!curatedHundred&&!domesticOnly&&!loading&&defaultView&&featuredError&&
-      <div className="unified-featured-fallback" role="status">
-        <span>{lang==='zh'?'六个精选岗位未能及时完成最新核验，当前显示其他近期核验的真实职位。':
-          'Featured verification is delayed; showing other recently audited jobs.'}</span>
-        <button type="button" onClick={()=>setRetry(x=>x+1)}>
-          <RefreshCcw size={14}/>{lang==='zh'?'重试精选':'Retry featured'}
-        </button>
-      </div>}
     <div className="unified-job-footer">
       <span>{lang==='zh'? `共匹配 ${snapshot?.total.toLocaleString()||0} 条 · 本页 ${!loading&&!error?shown.length:0} 条 · 来源更新时间：${formatDate(snapshot?.updated)}`
         : `${snapshot?.total.toLocaleString()||0} matching jobs · ${!loading&&!error?shown.length:0} on this page · Updated ${formatDate(snapshot?.updated)}`}</span>
-      {compact?<div className="unified-job-browse-links">
-         <Link to="/companies">{lang==='zh'?'浏览企业资料库':'Browse companies'} <ArrowRight size={15}/></Link>
+      {!error&&!loading&&snapshot&&<JobResultPagination page={page} total={snapshot.total} pageSize={JOBS_PER_PAGE}
+        loading={loading} lang={lang} onChange={next=>{
+          if(next<0||next===page||next>=pageCount(snapshot.total))return;
+          setPage(next);
+          requestAnimationFrame(()=>document.getElementById('hhba-job-results')?.scrollIntoView({behavior:'smooth',block:'start'}));
+        }}/>}
+      {compact&&<div className="unified-job-browse-links">
          <Link to="/candidate/jobs">{lang==='zh'?'查看完整招聘市场':'Browse all jobs'} <ArrowRight size={15}/></Link>
-       </div>:
-        !error&&!loading&&snapshot&&<JobResultPagination page={page} total={snapshot.total} pageSize={JOBS_PER_PAGE}
-          loading={loading} lang={lang} onChange={next=>{
-            if(next<0||next===page||next>=pageCount(snapshot.total))return;
-            setPage(next);
-            requestAnimationFrame(()=>document.getElementById('hhba-job-results')?.scrollIntoView({behavior:'smooth',block:'start'}));
-          }}/>}
+       </div>}
     </div>
     {!compact && <p className="unified-job-history">{lang==='zh'?'了解企业或查阅历史岗位资料：':'Explore companies and historical records: '}
       <Link to="/companies">{lang==='zh'?'企业资料库':'Company directory'}</Link>{' · '}
