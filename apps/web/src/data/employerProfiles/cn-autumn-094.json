@@ -1,0 +1,332 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-094",
+  "name": "中国大唐集团",
+  "displayName": "中国大唐集团有限公司",
+  "englishName": "China Datang Corporation",
+  "aliases": [
+    "中国大唐",
+    "大唐集团",
+    "China Datang",
+    "大唐2027校招"
+  ],
+  "industry": "发电 · 煤炭煤化工 · 环保 · 科技创新 · 综合能源",
+  "subtitle": "2027届第一批校园招聘（2026年10月31日截止） · 全国各项目与专项计划",
+  "overview": "中国大唐集团有限公司2027年第一批校招分为区域公司、专业公司、科技创新企业常规招聘及财务管理、电力交易、在京二级单位本部管培生三类专项。集团公告披露的是招聘通道和专业方向，并非每个岗位都有独立JD及职位ID。第一批网申为2026年9月22日至10月31日，现已截止。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://gs.china-cdt.com/cdtgs/xwzx/jtxw/2026/9/I1552059660066881536.html",
+    "https://zhaopin.china-cdt.com/zpgg_xyzp.html",
+    "https://www.china-cdt.com/dtwz/gydt/gsjj/A024001001Gone1.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-094/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-094/photo1.svg",
+        "caption": "中国大唐集团业务图片待核（当前为非实景编辑示意）",
+        "alt": "中国大唐集团业务场景非实景示意，不是企业真实办公照片",
+        "note": "非实景：如审查构建能取得来源可核的真实照片，才以该来源图片替换；商业使用权未取得。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-094/photo2.svg",
+        "caption": "中国大唐集团业务图片待核（当前为非实景编辑示意）",
+        "alt": "中国大唐集团业务场景非实景示意，不是企业真实办公照片",
+        "note": "非实景：如审查构建能取得来源可核的真实照片，才以该来源图片替换；商业使用权未取得。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://zhaopin.china-cdt.com/",
+    "label": "中国大唐官方人力资源市场平台（第一批已截止）",
+    "status": "official_portal",
+    "subject": "中国大唐集团有限公司及所属区域、专业、科研等二级单位",
+    "note": "官方2027第一批网申2026-09-22至2026-10-31，现已结束；以下未有单岗JD编号的条目均标明“非具体JD”，仅作为已公开招聘类别存档，不得视为实时岗位。"
+  },
+  "majorIntro": "本次官方集团第一批公告明确披露的招聘类别与专项通道，尚不能替代所属单位独立岗位JD；对招聘地点一律使用集团通道范围，不推断某一具体城市仍有缺额。",
+  "preferredMajors": [
+    "电气工程及其自动化",
+    "能源与动力工程",
+    "新能源科学与工程",
+    "机械工程",
+    "自动化",
+    "计算机科学与技术",
+    "人工智能",
+    "软件工程",
+    "金融学",
+    "会计学",
+    "审计学",
+    "物流管理"
+  ],
+  "photoNote": "历史招聘来源与真实招聘机会分开标识。来源照片的拍摄日期可能早于2026年，不代表今日办公现状。发布前还需取得素材使用权。",
+  "business": [
+    {
+      "title": "火电及供热",
+      "description": "集团所属发电企业开展火电、热电联产及供热保障，包含运行调度、设备检修与生产技术。",
+      "tags": "电力 · 保供",
+      "details": [
+        "火力发电",
+        "热电联产",
+        "设备检修"
+      ]
+    },
+    {
+      "title": "风电光伏与新型电力",
+      "description": "推进风电、光伏及储能等新能源业务，面向新能源场站生产技术与智慧运维。",
+      "tags": "新能源 · 储能",
+      "details": [
+        "风光运营",
+        "储能技术",
+        "电力交易"
+      ]
+    },
+    {
+      "title": "煤炭与煤化工",
+      "description": "在煤炭煤化工领域进行相关产业经营，并通过专业公司招聘能源化工和环保人才。",
+      "tags": "资源 · 化工",
+      "details": [
+        "煤炭业务",
+        "煤化工",
+        "安全与环保"
+      ]
+    },
+    {
+      "title": "数字科技与创新",
+      "description": "依托数字科技和科研机构开展电气、能源、人工智能、网络工程及软件研发方向研究。",
+      "tags": "数字 · 科研",
+      "details": [
+        "数字化研发",
+        "智能控制",
+        "科研服务"
+      ]
+    },
+    {
+      "title": "物资商贸和供应链",
+      "description": "所属物资与专业公司从事能源物资采购、物流、贸易和供应链协作业务。",
+      "tags": "供应链 · 物流",
+      "details": [
+        "采购管理",
+        "商贸物流",
+        "供应链风控"
+      ]
+    },
+    {
+      "title": "财务经营与国际业务",
+      "description": "经营财务、审计、市场交易及海外能源合作支持由不同业务单位承担，资格依具体公告。",
+      "tags": "财务 · 国际",
+      "details": [
+        "财务管培",
+        "电力交易",
+        "境外业务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "regional-production",
+      "title": "区域公司生产技术类（2027招聘方向，非具体JD）",
+      "category": "电力 / 生产",
+      "city": "全国31个省级区域项目地（非单岗地址）",
+      "summary": "中国大唐2027第一批集团公告明确区域公司常规招聘涵盖生产一线技术人才，能源、电气、热动、机械、自动化等属于已公布专业范围。此为集团招聘类别，非独立岗位编号。",
+      "requirements": "区域基层企业主要面向本科及以上应届毕业生，部分区域生产主专业优秀专科生可报；真实岗位需求、专业及项目地点应查二级单位列表；2026-10-31已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "能源与动力工程",
+        "电气工程及其自动化",
+        "自动化",
+        "机械工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 第一批已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://gs.china-cdt.com/cdtgs/xwzx/jtxw/2026/9/I1552059660066881536.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团有限公司及所属企业（招聘通道，非单岗位用人单位）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "regional-management",
+      "title": "区域公司通用管理类（2027招聘方向，非具体JD）",
+      "category": "财务 / 管理",
+      "city": "全国项目所在地（具体单位未核）",
+      "summary": "集团2027首批公告列出区域公司通用管理需求，涉及财务审计、技术经济、电力营销和法律事务等专业类别；未披露各地独立职位编号。",
+      "requirements": "根据官方通道公告，以本科及以上且专业对口为主，具体单位招聘要求可能不同，不应把所有31省自动标注为有职缺；原第一批报名已结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "会计学",
+        "审计学",
+        "经济学",
+        "法学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 第一批已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://gs.china-cdt.com/cdtgs/xwzx/jtxw/2026/9/I1552059660066881536.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团有限公司及所属企业（招聘通道，非单岗位用人单位）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "professional-environment",
+      "title": "专业公司环保与能源类（2027招聘方向，非具体JD）",
+      "category": "环境 / 化工",
+      "city": "各专业公司项目地（具体单岗未披露）",
+      "summary": "中国大唐专业公司常规招聘覆盖电力、煤炭、煤化工和环保板块，属于公司分类发布的岗位大类，并非一个固定法人下的单条JD。",
+      "requirements": "集团公告列出专业公司以本科及以上为主，含专业对口的电力、煤炭煤化工、环保等专业；若涉及海外项目须另核报考单位和驻地，首批网申已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "环境工程",
+        "化学工程与工艺",
+        "能源与动力工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 第一批已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://gs.china-cdt.com/cdtgs/xwzx/jtxw/2026/9/I1552059660066881536.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团有限公司及所属企业（招聘通道，非单岗位用人单位）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "professional-supply",
+      "title": "专业公司供应链与物流类（2027招聘方向，非具体JD）",
+      "category": "供应链 / 物流",
+      "city": "国内外项目分布区域（非确定派驻）",
+      "summary": "大唐集团2027官方第一批公告把供应链、物流、经济贸易列为专业公司招聘需求方向，未逐条发布本列表可核对的独立JD链接。",
+      "requirements": "公告涵盖各专业公司，具体工作地点与招聘专业必须通过官方相应二级单位招聘公告确认；不将集团总体海外分布当作必然派驻国家。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "物流管理",
+        "供应链管理",
+        "国际经济与贸易"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 第一批已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://gs.china-cdt.com/cdtgs/xwzx/jtxw/2026/9/I1552059660066881536.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团有限公司及所属企业（招聘通道，非单岗位用人单位）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "innovation-research",
+      "title": "科技创新类科研岗位（2027招聘方向，非具体JD）",
+      "category": "科研 / AI",
+      "city": "北京、雄安及部分省会城市（非单岗）",
+      "summary": "集团2027第一批针对科研创新企业开设科研岗位类别，研究方向包括电气、热动力、新能源、储能、人工智能及相关技术，类别不是具名职位JD。",
+      "requirements": "京内科研岗位一般为符合官方院校层次的硕士及以上；京外科研岗位亦有院校要求，具体适用条件按集团2027公告，不可推断普通本科均能报考。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "人工智能",
+        "计算机科学与技术",
+        "能源与动力工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 第一批已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://gs.china-cdt.com/cdtgs/xwzx/jtxw/2026/9/I1552059660066881536.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团有限公司及所属企业（招聘通道，非单岗位用人单位）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "innovation-service",
+      "title": "科技创新技术服务（2027招聘方向，非具体JD）",
+      "category": "信息 / 软件",
+      "city": "北京、雄安、成都、西安等列举城市（非单岗）",
+      "summary": "中国大唐集团2027科研创新招聘把科研与技术服务岗位分开，涉及数字系统及能源技术服务；没有本类别通用的独立招聘岗位编号。",
+      "requirements": "技术服务类别按公告通常要求符合院校要求的硕士及以上，确切招聘方向、研究内容及办公地点必须以企业单独公布的岗位为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "网络工程",
+        "人工智能",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 第一批已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://gs.china-cdt.com/cdtgs/xwzx/jtxw/2026/9/I1552059660066881536.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团有限公司及所属企业（招聘通道，非单岗位用人单位）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "finance-mt",
+      "title": "财务管理管培生专项（2027公告项目，非具体JD）",
+      "category": "财务 / 管理",
+      "city": "北京、上海、重庆、雄安及省会城市（未拆单岗）",
+      "summary": "集团2027专项公告明确财务管理管培生招聘方向，公示总计划为45个以上岗位数量，但本站并没有逐条确认这些岗位的具体企业及ID。",
+      "requirements": "要求硕士及以上且满足集团指定院校、学科背景条件；重点财务、会计、税务与金融类专业，具体职位数量和名额按官方报名系统；10月31日首批截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "会计学",
+        "财务管理",
+        "金融学",
+        "税收学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 第一批已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://gs.china-cdt.com/cdtgs/xwzx/jtxw/2026/9/I1552059660066881536.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团有限公司及所属企业（招聘通道，非单岗位用人单位）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "trading-mt",
+      "title": "电力交易管培生专项（2027公告项目，非具体JD）",
+      "category": "电力 / 数据",
+      "city": "北京、重庆和省会城市（非单岗分布）",
+      "summary": "集团2027年电力交易管培生专项明确招收应用数学、数据科学、金融、AI和计算机背景，集团计划数量30余个，但具体用人单位需求须进一步核对。",
+      "requirements": "官方明确硕士及以上及特殊院校门槛，本条仅保留项目方向而非虚构实时独立JD，2026-10-31报名已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "应用数学",
+        "数据科学与大数据技术",
+        "金融学",
+        "人工智能",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 第一批已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://gs.china-cdt.com/cdtgs/xwzx/jtxw/2026/9/I1552059660066881536.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团有限公司及所属企业（招聘通道，非单岗位用人单位）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "beijing-mt",
+      "title": "在京二级单位本部管培生（2027公告项目，非具体JD）",
+      "category": "管理 / 技术",
+      "city": "北京市（二级单位具体位置未核）",
+      "summary": "2027第一批集团官方公布在京二级单位本部管培生专项，涉及电力生产、交易、技术经济、能源研究及财务、法务、国际业务等复合方向。",
+      "requirements": "硕士及以上，面向公告规定的院校范围，计划30余个岗位但这里没有逐个实际JD，不得宣称具体北京部门仍有空缺。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "计算机科学与技术",
+        "财务管理",
+        "法学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 第一批已截止",
+      "url": "https://zhaopin.china-cdt.com/",
+      "evidenceUrl": "https://gs.china-cdt.com/cdtgs/xwzx/jtxw/2026/9/I1552059660066881536.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国大唐集团有限公司及所属企业（招聘通道，非单岗位用人单位）",
+      "currentOpenVerified": false
+    }
+  ]
+}

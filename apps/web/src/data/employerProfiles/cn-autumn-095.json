@@ -1,0 +1,439 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-095",
+  "name": "广发银行",
+  "displayName": "广发银行股份有限公司",
+  "englishName": "China Guangfa Bank",
+  "aliases": [
+    "中国广发银行",
+    "CGB",
+    "China Guangfa Bank",
+    "广发银行2027校园招聘"
+  ],
+  "industry": "商业银行 · 信用卡 · 金融科技 · 风险管理 · 财富管理",
+  "subtitle": "2027年度校园招聘 · 总行10月15日截止；分支机构公告至11月15日",
+  "overview": "广发银行2027届校招公告覆盖总行、49家直属分行、信用卡中心与广银理财四类招聘机构。公开公告列出各机构职能分类而非全部具体职位ID。总行申请截止2026年10月15日，分支机构公告截止2026年11月15日；银行官网或集团招聘系统的岗位是否仍接受申请，需登录官网逐岗确认。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html",
+    "https://career.nankai.edu.cn/correcruit/content/id/118874.html",
+    "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+    "https://www.cgbchina.com.cn/",
+    "https://www.chinalife.com.cn/chinalife/zhaopin"
+  ],
+  "media": {
+    "logo": "images/autumn-real-logos/cn-autumn-095.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-095/photo1.svg",
+        "caption": "广发银行业务图片待核（当前为非实景编辑示意）",
+        "alt": "广发银行业务场景非实景示意，不是企业真实办公照片",
+        "note": "非实景：如审查构建能取得来源可核的真实照片，才以该来源图片替换；商业使用权未取得。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-095/photo2.svg",
+        "caption": "广发银行业务图片待核（当前为非实景编辑示意）",
+        "alt": "广发银行业务场景非实景示意，不是企业真实办公照片",
+        "note": "非实景：如审查构建能取得来源可核的真实照片，才以该来源图片替换；商业使用权未取得。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+    "label": "广发银行人才招聘官网（2027校招）",
+    "status": "official_portal",
+    "subject": "广发银行股份有限公司总行、直属分行及信用卡中心；广银理财另属独立法人",
+    "note": "高校刊载的2027校招公告：总行2026-10-15截止，分支机构2026-11-15截止；具体招聘机构、岗位ID和实时网申状态仍需在广发银行/中国人寿官方招聘系统确认。"
+  },
+  "majorIntro": "以下是2027校园招聘公告分别披露的总行、分行、信用卡和广银理财职能类别，非具名独立JD。点击分类只呈现相关条目。银行多数职位不限制专业，但重点招聘理工、经济、法律与管理背景；最终资格必须看原职位。",
+  "preferredMajors": [
+    "计算机科学与技术",
+    "软件工程",
+    "数据科学与大数据技术",
+    "人工智能",
+    "金融学",
+    "经济学",
+    "统计学",
+    "法学",
+    "会计学",
+    "财务管理",
+    "市场营销",
+    "工商管理",
+    "人力资源管理"
+  ],
+  "photoNote": "历史招聘来源与真实招聘机会分开标识。来源照片的拍摄日期可能早于2026年，不代表今日办公现状。发布前还需取得素材使用权。",
+  "business": [
+    {
+      "title": "公司金融与普惠服务",
+      "description": "开展对公结算、融资、客户管理及企业金融综合服务，具体业务资格与产品以银行监管披露为准。",
+      "tags": "公司金融",
+      "details": [
+        "企业金融",
+        "融资支持",
+        "结算服务"
+      ]
+    },
+    {
+      "title": "零售银行与财富管理",
+      "description": "为个人客户提供账户、消费与财富相关的银行服务，金融产品与风险承受能力须依法匹配。",
+      "tags": "零售 · 财富",
+      "details": [
+        "个人金融",
+        "理财服务",
+        "客户运营"
+      ]
+    },
+    {
+      "title": "信用卡与消费金融",
+      "description": "通过信用卡中心开展产品、客户服务、风险管理和营销数据分析，招聘主体按专项公告。",
+      "tags": "信用卡 · 风控",
+      "details": [
+        "信用卡运营",
+        "策略分析",
+        "客户服务"
+      ]
+    },
+    {
+      "title": "金融科技与智能风控",
+      "description": "银行和信用卡中心招聘公告披露金融科技、算法模型及风险策略方向，实际技术栈须以单岗JD为准。",
+      "tags": "金融科技 · AI",
+      "details": [
+        "数据工程",
+        "模型策略",
+        "信息安全"
+      ]
+    },
+    {
+      "title": "投资交易与资产管理",
+      "description": "总行投资交易及广银理财的投资研究、交易和产品管理在不同主体与职能下开展。",
+      "tags": "投资 · 交易",
+      "details": [
+        "投资研究",
+        "交易业务",
+        "产品管理"
+      ]
+    },
+    {
+      "title": "合规运营与职能管理",
+      "description": "法律与风险、财务、运营、人力资源及综合行政等支撑银行业务合规、治理与客户服务。",
+      "tags": "运营 · 合规",
+      "details": [
+        "法律合规",
+        "财务管理",
+        "人才与运营"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "hq-fintech",
+      "title": "总行金融科技类（2027校招方向，非具体JD）",
+      "category": "金融科技 / 数据",
+      "city": "广州、北京、上海、佛山（总行城市集合，非单岗）",
+      "summary": "广发银行2027年度校招公告明确总行设金融科技类招聘方向，公告只列总行整体工作地点集合，没有针对该类别提供具体岗位编号和城市分布。",
+      "requirements": "2027届本科及以上为主，部分职位硕士及以上；官方总行截止2026年10月15日，已结束；所列专业为HHBA辅助关联，非银行逐岗强制条件。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息安全",
+        "人工智能"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 总行10月15日已截止",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广发银行股份有限公司总行",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hq-business",
+      "title": "总行业务管理类（2027校招方向，非具体JD）",
+      "category": "银行 / 业务",
+      "city": "广州、北京、上海、佛山（非逐岗地址）",
+      "summary": "银行2027官方校招公开稿列总行业务管理类为招聘职能之一，具体职责与人员需求没有在综合公告按职位拆分。",
+      "requirements": "主要招聘2027届本科及以上毕业生；岗位专业要求以银行人才招聘系统为准，总行2026年10月15日截止，不能当成今日可申请。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "金融学",
+        "经济学",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 总行10月15日已截止",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广发银行股份有限公司总行",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hq-trading",
+      "title": "总行投资交易类（2027校招方向，非具体JD）",
+      "category": "投资 / 交易",
+      "city": "总行广州、北京、上海、佛山（城市集合）",
+      "summary": "广发银行2027校招综合公告列示总行投资交易类方向，但没有确认独立的交易员JD或固定办公城市。",
+      "requirements": "涉及投资交易相关专业的关联为HHBA编辑建议；部分高级职位学历要求可能高于本科，具体需查银行独立岗位；总行报名已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "金融学",
+        "经济学",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 总行10月15日已截止",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广发银行股份有限公司总行",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hq-legal",
+      "title": "总行法律与风险管理类（2027校招方向，非具体JD）",
+      "category": "法律 / 风控",
+      "city": "总行所在城市集合（具体岗位未披露）",
+      "summary": "银行2027年度校招总行职能中明确包括法律与风险管理类别，不应推断同时招聘合规、诉讼、授信模型所有独立职位。",
+      "requirements": "具体法学、金融与数据背景资格应查逐岗招聘内容；总行2026年10月15日截止，本条为公开招聘方向档案。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "法学",
+        "金融学",
+        "统计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 总行10月15日已截止",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广发银行股份有限公司总行",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "branch-sales",
+      "title": "直属分行营销英才（2027校招方向，非具体JD）",
+      "category": "营销 / 服务",
+      "city": "49家直属分行所在101个城市（非每城均在招）",
+      "summary": "广发银行2027校招公开公告明确分行营销英才方向，公告举例北京、上海、广州、深圳、南京、杭州、郑州、东莞等城市，未逐岗核实各行仍有名额。",
+      "requirements": "分支机构综合公告2026年11月15日截止，申请状态还须在官方招聘系统核对；公告称多数岗位专业不限，专业标签不应当作官方硬条件。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "金融学",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 公告至11月15日，需官网核实",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广发银行股份有限公司直属分行",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "branch-fintech",
+      "title": "直属分行金融科技类（2027校招方向，非具体JD）",
+      "category": "金融科技 / 数据",
+      "city": "49家直属分行所覆盖城市（单岗未公布）",
+      "summary": "广发银行2027校招公告将金融科技列为49家直属分行招聘方向，但没有在集团汇总稿中逐一披露技术岗位的工作城市和岗位编号。",
+      "requirements": "2027届本科及以上为主，具体编程语言、安全证书和职业资格均不能从综合公告推定；分支机构原公告11月15日截止，实时状态未核。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "网络工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 公告至11月15日，需官网核实",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广发银行股份有限公司直属分行",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "branch-legal",
+      "title": "直属分行法律与风险管理类（2027方向，非具体JD）",
+      "category": "法律 / 风控",
+      "city": "分行所在城市（需按机构逐条核实）",
+      "summary": "2027校招总公告明确各直属分行设法律与风险管理类招聘方向；并未公布具体城市下每个司法及风控岗位的JD。",
+      "requirements": "专业限制和资格由广发银行相关分行招聘岗位决定，分支机构公告截止2026年11月15日，不能在本站承诺任何岗位依然开放。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "法学",
+        "金融学",
+        "统计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 公告至11月15日，需官网核实",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广发银行股份有限公司直属分行",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "branch-finance",
+      "title": "直属分行财务管理类（2027方向，非具体JD）",
+      "category": "财务 / 管理",
+      "city": "分行机构所在城市（具体单岗未披露）",
+      "summary": "银行2027年度校园招聘公开资料把财务管理列为直属分行职能类别之一，但没有逐岗薪酬、学历或直达申请ID。",
+      "requirements": "专业标签是编辑辅助关联；实际报名需通过银行人才招聘渠道按城市与机构查看，公开分支机构窗口至2026年11月15日。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "会计学",
+        "财务管理",
+        "审计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 公告至11月15日，需官网核实",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广发银行股份有限公司直属分行",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "card-data",
+      "title": "信用卡中心市场数据分析类（2027方向，非具体JD）",
+      "category": "数据 / 分析",
+      "city": "广州、佛山（信用卡中心整体范围）",
+      "summary": "广发银行2027校招公告明确信用卡中心在广州及佛山招聘市场数据分析类人才，但未逐岗分配这两个城市或披露职位编号。",
+      "requirements": "统计、数学与数据科学背景是建议，具体是否接受非相关专业应看岗位；公开分支机构报名期至2026年11月15日，实时申请状态尚未核。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "数据科学与大数据技术",
+        "统计学",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 公告至11月15日，需官网核实",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广发银行信用卡中心",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "card-model",
+      "title": "信用卡中心算法模型类（2027方向，非具体JD）",
+      "category": "算法 / 风控",
+      "city": "广州、佛山（具体单岗未披露）",
+      "summary": "广发银行2027届信用卡中心公告职能列表明确写有算法模型类，不能将其包装成有独立岗位编号的机器学习工程师招聘。",
+      "requirements": "招聘公告整体2027届本科及以上，部分硕士及以上；真实模型方向、语言和经验要求要查看官方职位，分支机构公告至11月15日。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人工智能",
+        "数学与应用数学",
+        "统计学",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 公告至11月15日，需官网核实",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广发银行信用卡中心",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "card-strategy",
+      "title": "信用卡中心风险模型及策略算法类（2027方向，非具体JD）",
+      "category": "算法 / 风控",
+      "city": "广州、佛山（具体位置需核官网）",
+      "summary": "2027校招公告将信用卡中心风险模型及策略算法类与市场数据分析类分别列示，表明是不同招聘职能类别，不代表已核实两份具体JD。",
+      "requirements": "风险策略需要的数据技能与业务要求须按广发银行招聘系统实时岗位确认；公开分支机构报名截止11月15日。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "统计学",
+        "人工智能",
+        "金融工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 公告至11月15日，需官网核实",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广发银行信用卡中心",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "wm-research",
+      "title": "广银理财投资研究类（2027方向，非具体JD）",
+      "category": "投资 / 交易",
+      "city": "上海（广银理财公告总体地点）",
+      "summary": "广发银行2027年度招聘公告单独列出广银理财有限责任公司在上海的投资研究类方向，属于关联公司，不与广发银行总行同一招聘法人混写。",
+      "requirements": "具体岗位条件及2026年11月15日是否适用于广银理财独立岗位须由该主体官方招聘页确认；不把集团综合截止自动视作全部职位截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "金融学",
+        "经济学",
+        "统计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 公告至11月15日，需官网核实",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广银理财有限责任公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "wm-trading",
+      "title": "广银理财集中交易类（2027方向，非具体JD）",
+      "category": "投资 / 交易",
+      "city": "上海（广银理财公告城市）",
+      "summary": "广银理财2027校招公告综合列有集中交易类方向，面向理财业务相关专业培养，未核实每个岗位名称、招聘编号和独立截止日。",
+      "requirements": "该主体与银行各分行区分管理，招聘资格应通过广银理财或广发银行官方招聘系统逐项核对；当前申请状态未验证。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "金融学",
+        "经济学",
+        "会计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 公告至11月15日，需官网核实",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广银理财有限责任公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "wm-products",
+      "title": "广银理财产品管理类（2027方向，非具体JD）",
+      "category": "产品 / 运营",
+      "city": "上海（具体办公室与部门未公开）",
+      "summary": "广银理财2027校园招聘分类说明列出产品管理类，招聘信息未公开独立岗位JD和每个产品线数量，不能因此认定本职位仍开放。",
+      "requirements": "本条属于银行综合公告中的关联理财子公司招聘方向；适用学历、证书及考核流程须以最终具体岗位发布的信息为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "金融学",
+        "工商管理",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 公告至11月15日，需官网核实",
+      "url": "https://www.cgbchina.com.cn/career/job_notice2.jsp",
+      "evidenceUrl": "https://jobs.tiangong.edu.cn/correcruit/content/id/56228.html",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "广银理财有限责任公司",
+      "currentOpenVerified": false
+    }
+  ]
+}
