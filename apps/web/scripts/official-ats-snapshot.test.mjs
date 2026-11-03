@@ -41,6 +41,7 @@ test('official sources produce fresh per-job identifiers and a transparent incom
  assert.ok(feed.total>=MIN_VERIFIED_JOBS&&feed.boards>=MIN_SUCCESSFUL_BOARDS);
  assert.equal(feed.jobs.every(j=>j.id.startsWith(j.platform+'-'+j.source+'-')),true);
  assert.equal(feed.jobs.every(j=>j.url.startsWith('https://')&&j.currentApplicationVerified===false),true);
+ assert.equal(feed.jobs.every(j=>!('titleZh' in j)&&!('locationZh' in j)),true,'do not invent Chinese translations');
  const audit=await auditSnapshot(feed,{fetchFn:async url=>{
   const b=boards.find(b=>url.includes('/'+b.slug));
   return {ok:true,headers:{get:()=>null},json:async()=>fixture(b)};
@@ -64,4 +65,10 @@ test('fails closed when the true ATS coverage is insufficient rather than using 
  await assert.rejects(buildOfficialSnapshot(boards,{fetchFn:mockRemote(down)}),/OFFICIAL_SOURCE_COVERAGE_INSUFFICIENT/);
  const script=readFileSync(new URL('./prepare-pages-jobs.mjs',import.meta.url),'utf8');
  assert.ok(!script.includes('up.railway.app'));
+});
+
+test('frontend displays official English title/location when translation is absent',()=>{
+ const source=readFileSync(new URL('../src/services/liveRecruitment.ts',import.meta.url),'utf8');
+ assert.ok(source.includes("return original || '职位名称待核验';"));
+ assert.ok(source.includes("if(lang==='zh')return zh&&han.test(zh)?zh:original||'地点待核验';"));
 });
