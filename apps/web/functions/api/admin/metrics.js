@@ -34,11 +34,25 @@ export async function onRequestGet({request,env}){
   const series=Array.from({length:days},(_,i)=>{const d=isoDay(new Date(Date.parse(since+'T00:00:00.000Z')+i*86400000));const row=(daily.results||[]).find(r=>r.day===d);return {day:d,pv:Number(row?.pv||0),dailyUv:Number(row?.daily_uv||0),jobViews:Number(row?.job_views||0),searches:Number(row?.searches||0),outboundClicks:Number(row?.outbound_clicks||0)}})
   const sum=k=>series.reduce((a,x)=>a+x[k],0);
   const counts=Object.fromEntries((changes.results||[]).map(x=>[x.event_type,Number(x.n)]));
+  // Real registration count is sourced only from the verified PNVS auth D1.
+  // Session timestamps are not a complete site-wide DAU/MAU signal; keep
+  // those fields null until actual account-scoped activity telemetry exists.
+  let accounts={quality:'not_connected',registeredUsers:null,dau:null,mau:null,
+   scope:'VERIFIED_PNVS_D1_ACCOUNT_ONLY',reason:'未连接真实 PNVS 用户数据库。'};
+  if(env.HHBA_PNVS_AUTH_DB){
+   try{
+    const authDb=env.HHBA_PNVS_AUTH_DB;
+    const result=await authDb.prepare("SELECT COUNT(*) AS n FROM hhba_auth_users WHERE role='candidate'").first();
+    accounts={quality:'collected',registeredUsers:Number(result?.n||0),dau:null,mau:null,
+     scope:'VERIFIED_PNVS_CANDIDATE_USERS_ONLY',
+     reason:'真实注册人数已连接。完整 DAU/MAU 需要独立的账号级活跃事件，不能用设备 UV 或会话数替代。'};
+   }catch(e){console.error('HHBA_AUTH_AGGREGATE_UNAVAILABLE',e?.name||'error');}
+  }
+
   const result={kind:'HHBA_CLOUDFLARE_PRIVATE_METRICS_V1',asOf:new Date().toISOString(),period:{start:since,end:until,days,timezone:'UTC'},collectorStartedAt:installed?.value||null,
    traffic:{quality:'collected',pv:sum('pv'),dailyUvSum:sum('dailyUv'),jobViews:sum('jobViews'),searches:sum('searches'),outboundClicks:sum('outboundClicks'),series,scope:'OPT_IN_CONSENT_ONLY_AND_PER_MINUTE_DEDUP'},
    devices:{quality:'collected',savedJobs:Number(saved?.n||0),devicesWithSavedJobs:Number(saved?.devices||0),added:counts.added||0,removed:counts.removed||0,scope:'CLOUDFLARE_DEVICE_COOKIE_ONLY_NOT_ACCOUNT_SAVES'},
-   account:{quality:'not_connected',registeredUsers:null,dau:null,mau:null,scope:'VERIFIED_PRODUCTION_ACCOUNT_ONLY',
-     reason:'正式邮箱认证与真实登录活动尚未接入生产账户数据库，不能用设备 UV 或测试用户推算 DAU/MAU。'}
+   account:accounts
   };
   return json(result);
  }catch(e){console.error('HHBA_METRICS_PRIVATE_QUERY_FAILED',e?.name||'error');return bad('PRIVATE_METRICS_QUERY_FAILED')}
