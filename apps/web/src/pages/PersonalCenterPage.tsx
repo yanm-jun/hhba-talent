@@ -114,75 +114,70 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
     {current==='overview'&&<>
       <div className="hhba-account-section-heading"><div><h2>个人工作台</h2><p>你的职业探索，从这里开始。</p></div><Link to="/candidate/jobs">探索职位 <ArrowRight size={15}/></Link></div>
       <div className="hhba-account-stat-grid">
-       <Link to="/candidate/saved"><Bookmark size={21}/><span>已收藏岗位</span><strong>{!savedAvailable?'—':loading?'…':error?'—':savedCount}</strong><small>本浏览器真实收藏记录</small></Link>
-       <Link to="/candidate/account/applications"><BriefcaseBusiness size={21}/><span>求职申请</span><strong>—</strong><small>正式账号接入后开放</small></Link>
-       <Link to="/candidate/account/resume"><FileUser size={21}/><span>我的简历</span><strong>—</strong><small>仅演示页面，不保存文件</small></Link>
+       <Link to="/candidate/saved"><Bookmark size={21}/><span>已收藏岗位</span><strong>{!savedAvailable?'—':loading?'…':error?'—':savedCount}</strong><small>真实账户专属收藏</small></Link>
+       <Link to="/candidate/account/applications"><BriefcaseBusiness size={21}/><span>求职申请</span><strong>—</strong><small>真实投递服务尚未接通</small></Link>
+       <Link to="/candidate/account/resume"><FileUser size={21}/><span>我的简历</span><strong>—</strong><small>私有简历服务尚未接通</small></Link>
       </div>
-      <section className="hhba-account-panel"><div className="hhba-account-section-heading"><div><h3>完善我的职业档案</h3><p>体验个人资料、求职偏好与账户隐私设置。</p></div></div>
+      <section className="hhba-account-panel"><div className="hhba-account-section-heading"><div><h3>完善我的职业档案</h3><p>真实账户资料与求职偏好可跨设备读取。</p></div></div>
        <div className="hhba-account-tool-grid">
         {pages.filter(x=>['profile','preferences','resume','privacy'].includes(x.id)).map(x=><Link to={routeFor(x.id)} key={x.id} className="hhba-account-tool-card"><x.icon size={20} className="hhba-account-tool-icon"/><span className="hhba-account-tool-copy"><strong>{x.label}</strong><small>{x.description}</small></span><ArrowRight size={15} className="hhba-account-tool-arrow"/></Link>)}
        </div>
       </section>
       <section className="hhba-account-panel"><div className="hhba-account-section-heading"><div><h3>真实招聘市场</h3><p>收藏后返回这里查看，企业岗位是否仍在招以官网为准。</p></div><Link to="/candidate/jobs">查看全部岗位 <ArrowRight size={15}/></Link></div>
-        {error?<p role="alert">{error}</p>:<p>当前收藏数据按本浏览器隔离，正式账号级跨设备同步仍在规划中。</p>}
+        {error?<p role="alert">{error}</p>:<p>收藏按当前已登录账户隔离，匿名设备记录不会自动合并。</p>}
       </section>
     </>}
     {current==='saved'&&<section className="hhba-account-panel">
       <div className="hhba-account-section-heading"><div><h2>我的收藏</h2><p>只展示来自真实职位索引的收藏记录。下架职位不会被伪装成仍在招聘。</p></div><Link to="/candidate/jobs">搜索更多 <ArrowRight size={15}/></Link></div>
       {error&&<p className="hhba-personal-error" role="alert">{error}</p>}
-      {loading?<p role="status">正在读取本浏览器收藏…</p>:rows.length===0?<div className="hhba-account-empty"><Bookmark size={27}/><strong>还没有保存职位</strong><p>在职位列表或详情页点击「收藏」，就可以回到这里查看。</p><Link to="/candidate/jobs">去逛逛招聘市场</Link></div>:
+      {loading?<p role="status">正在读取当前账户收藏…</p>:rows.length===0?<div className="hhba-account-empty"><Bookmark size={27}/><strong>还没有保存职位</strong><p>在职位列表或详情页点击「收藏」，就可以回到这里查看。</p><Link to="/candidate/jobs">去逛逛招聘市场</Link></div>:
       <div className="hhba-personal-saved-list">{rows.map(({record,job})=><article key={record.jobId}>
        <div><strong>{job?localizedTitle(job,'zh'):'此岗位当前无法获取'}</strong><small>{job?localizedCompany(job,'zh')+' · '+localizedLocation(job,'zh'):'收藏记录已保留，但岗位可能已失效'}</small><small>收藏于 {record.savedAt.slice(0,10)}</small></div>
        <div className="hhba-personal-actions">{job&&<Link to={'/candidate/jobs/'+encodeURIComponent(record.jobId)}>查看岗位</Link>}<button type="button" disabled={busy===record.jobId} onClick={()=>cancel(record.jobId)}>取消收藏</button></div>
       </article>)}</div>}
       {savedCount>40&&<p className="hhba-account-muted">当前仅显示最近 40 条收藏。</p>}
-      <p className="hhba-account-muted">当前是本设备收藏，并非模拟账户创造的虚假数据。</p>
+      <p className="hhba-account-muted">当前收藏只属于你的真实登录账户。</p>
     </section>}
     {current==='profile'&&<section className="hhba-account-panel">
-     <div className="hhba-account-section-heading"><div><h2>个人资料</h2><p>填写用于界面体验的非敏感示例内容。</p></div></div>
-     {!demo&&demoModeEnabled?<p>进入演示账户后可修改并保存资料。</p>:
-     <form className="hhba-account-form" onSubmit={e=>update(e,'profile')}>
-      <div className="hhba-account-form-row"><label>展示昵称<input value={nickname} maxLength={32} onChange={e=>setNickname(e.target.value)} placeholder="职业探索者"/></label><label>所在城市<input value={city} maxLength={70} onChange={e=>setCity(e.target.value)} placeholder="例如：济南"/></label></div>
+     <div className="hhba-account-section-heading"><div><h2>个人资料</h2><p>资料保存在当前已验证的真实账户中，不会公开给企业。</p></div></div>
+     {profileLoading?<p role="status">正在读取账户资料…</p>:<form className="hhba-account-form" onSubmit={e=>void update(e,'profile')}>
+      <div className="hhba-account-form-row"><label>展示昵称<input value={nickname} maxLength={32} onChange={e=>setNickname(e.target.value)} placeholder="如何称呼你"/></label><label>所在城市<input value={city} maxLength={70} onChange={e=>setCity(e.target.value)} placeholder="例如：济南"/></label></div>
       <label>职业介绍<input value={headline} maxLength={110} onChange={e=>setHeadline(e.target.value)} placeholder="用一句话介绍自己"/></label>
-      <label>擅长的能力 / 技能<input value={skills} maxLength={150} onChange={e=>setSkills(e.target.value)} placeholder="例如：市场策划、数据整理、项目沟通"/></label>
-      <label>个人简介<textarea value={intro} maxLength={380} rows={4} onChange={e=>setIntro(e.target.value)} placeholder="写一段简单的职业自我介绍"/></label>
-      <div className="hhba-account-form-actions"><button type="submit" disabled={!demo}>保存演示资料</button><small>仅保存于本机浏览器，不上传服务器</small></div>
+      <label>擅长能力 / 技能<input value={skills} maxLength={150} onChange={e=>setSkills(e.target.value)} placeholder="例如：项目沟通、数据分析"/></label>
+      <label>个人简介<textarea value={intro} maxLength={380} rows={4} onChange={e=>setIntro(e.target.value)} placeholder="写一段真实的职业介绍"/></label>
+      <div className="hhba-account-form-actions"><button type="submit" disabled={!account||busy==='profile'}>{busy==='profile'?'保存中…':'保存账户资料'}</button><small>仅写入当前真实账户</small></div>
      </form>}
      {notice&&<p className="hhba-account-notice" role="status">{notice}</p>}
     </section>}
     {current==='preferences'&&<section className="hhba-account-panel">
-      <div className="hhba-account-section-heading"><div><h2>求职偏好</h2><p>让个人中心先具备真实交互，不触发 AI 匹配或岗位申请。</p></div></div>
-      <form className="hhba-account-form" onSubmit={e=>update(e,'preferences')}>
-       <label>期望岗位<input value={role} onChange={e=>setRole(e.target.value)} maxLength={70} placeholder="例如：产品运营、销售管理"/></label>
-       <label>期望工作城市<input value={targetCity} onChange={e=>setTargetCity(e.target.value)} maxLength={70} placeholder="例如：上海、杭州或远程"/></label>
-       <label>期望工作方式<select value={mode} onChange={e=>setMode(e.target.value as typeof mode)}><option>不限</option><option>远程</option><option>现场</option><option>混合办公</option></select></label>
-       <div className="hhba-account-form-actions"><button type="submit" disabled={!demo}>保存求职偏好</button><small>这是界面预览，尚未作为自动匹配条件</small></div>
-      </form>{notice&&<p className="hhba-account-notice" role="status">{notice}</p>}
+     <div className="hhba-account-section-heading"><div><h2>求职偏好</h2><p>信息保存到当前账户，不会自动产生职位申请。</p></div></div>
+     {profileLoading?<p role="status">正在读取偏好…</p>:<form className="hhba-account-form" onSubmit={e=>void update(e,'preferences')}>
+      <label>期望岗位<input value={role} onChange={e=>setRole(e.target.value)} maxLength={70} placeholder="例如：产品运营、销售管理"/></label>
+      <label>期望工作城市<input value={targetCity} onChange={e=>setTargetCity(e.target.value)} maxLength={70} placeholder="例如：上海、杭州或远程"/></label>
+      <label>期望工作方式<select value={mode} onChange={e=>setMode(e.target.value as typeof mode)}><option>不限</option><option>远程</option><option>现场</option><option>混合办公</option></select></label>
+      <div className="hhba-account-form-actions"><button type="submit" disabled={!account||busy==='preferences'}>{busy==='preferences'?'保存中…':'保存求职偏好'}</button><small>重新登录后仍可读取</small></div>
+     </form>}{notice&&<p className="hhba-account-notice" role="status">{notice}</p>}
     </section>}
     {current==='resume'&&<section className="hhba-account-panel">
-     <div className="hhba-account-section-heading"><div><h2>我的简历</h2><p>预览未来简历管理的页面与交互。</p></div></div>
-     <div className="hhba-account-upload"><FileUser size={31}/><h3>添加你的简历</h3>
-      <p>选择文件仅在浏览器中展示文件名，本演示不读取、保存或上传文件。</p>
-      <label className="hhba-account-upload-button">选择演示文件<input type="file" accept=".pdf,.docx" onChange={e=>setSelectedFile(e.target.files?.[0]?.name||'')}/></label>
-      {selectedFile&&<p className="hhba-account-notice" role="status">已选择：{selectedFile}（未上传）</p>}
-     </div><p className="hhba-account-muted">正式账户上线后才会开放私有文件存储、简历解析与真实状态展示。</p>
+     <div className="hhba-account-section-heading"><div><h2>我的简历</h2><p>上传简历需要专属私有文件存储和明确授权。</p></div></div>
+     <div className="hhba-account-upload"><FileUser size={31}/><h3>真实简历功能尚未开放</h3><p>尚未接通此账户的私有简历存储，因此暂不收取文件，也不显示虚构的简历数。</p></div>
     </section>}
     {current==='applications'&&<section className="hhba-account-panel">
-     <div className="hhba-account-section-heading"><div><h2>求职记录</h2><p>未来集中查看真实投递记录与进度。</p></div></div>
-     <div className="hhba-account-empty"><BriefcaseBusiness size={27}/><strong>暂无真实求职记录</strong><p>当前模拟身份不会向招聘企业发送申请，也不会生成虚假的「已投递」记录。</p><Link to="/candidate/jobs">浏览招聘岗位</Link></div>
+     <div className="hhba-account-section-heading"><div><h2>求职记录</h2><p>实际申请状态必须由真实投递接口提供。</p></div></div>
+     <div className="hhba-account-empty"><BriefcaseBusiness size={27}/><strong>真实投递接口尚未接通</strong><p>仅浏览外部岗位不会被记成“已投递”。</p><Link to="/candidate/jobs">浏览招聘岗位</Link></div>
     </section>}
     {current==='privacy'&&<section className="hhba-account-panel">
-     <div className="hhba-account-section-heading"><div><h2>账户与隐私</h2><p>在这里决定是否允许匿名行为统计，并管理演示资料。</p></div></div>
-     <div className="hhba-account-privacy-row"><div><strong><ChartNoAxesCombined size={18}/>匿名网站使用统计</strong><p>仅在同意后记录访问和职位操作，不采集简历、邮箱或搜索词。</p></div>
+     <div className="hhba-account-section-heading"><div><h2>账户与隐私</h2><p>管理当前真实账户和匿名统计授权。</p></div></div>
+     <div className="hhba-account-privacy-row"><div><strong><ChartNoAxesCombined size={18}/>匿名网站使用统计</strong><p>仅在同意后记录匿名访问和职位操作，不采集简历正文或密码。</p></div>
       <div className="hhba-personal-consent"><button type="button" aria-pressed={consent===true} onClick={()=>{chooseAnalytics(true);setConsent(true)}}>同意</button><button type="button" aria-pressed={consent===false} onClick={()=>{chooseAnalytics(false);setConsent(false)}}>拒绝</button></div>
      </div>
-     <div className="hhba-account-privacy-row"><div><strong><LockKeyhole size={18}/>账户安全</strong><p>尚未建立真实登录凭据；演示模式不会要求密码或验证邮箱。</p></div><span className="hhba-account-chip">未连接</span></div>
-     <div className="hhba-account-privacy-row"><div><strong><Trash2 size={18}/>清除本地演示资料</strong><p>仅删除昵称和偏好，不会删除服务器中本设备已有的岗位收藏。</p></div>
-      <button type="button" className="hhba-account-danger" disabled={!demo} onClick={()=>{if(confirm('确定清除本浏览器的演示账户资料吗？本设备岗位收藏不会删除。')){deleteDemoAccount();navigate('/candidate/login')}}}>清除演示资料</button></div>
+     <div className="hhba-account-privacy-row"><div><strong><LockKeyhole size={18}/>账户安全</strong><p>只有当前登录用户可读取其个人资料与收藏。</p></div><span className="hhba-account-chip">真实账户</span></div>
+     <div className="hhba-account-privacy-row"><div><strong><LogOut size={18}/>安全退出</strong><p>仅撤销当前会话，不删除账户资料。</p></div><button type="button" className="hhba-account-danger" onClick={()=>void onLogout()}>退出登录</button></div>
     </section>}
+
    </div>
   </div>
-  <footer className="hhba-account-footer"><CheckCircle2 size={15}/> 你看到的是 HHBA 前端体验版。展示数据不会被计入管理后台融资指标。</footer>
+  <footer className="hhba-account-footer"><CheckCircle2 size={15}/> 当前账户资料与收藏按真实用户归属；未接通功能不显示虚构数据。</footer>
  </section>
  </Shell>;
 }
