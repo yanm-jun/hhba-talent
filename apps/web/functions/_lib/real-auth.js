@@ -18,6 +18,8 @@
 //   避免用耗时差别泄露账号是否存在。
 
 export const PHONE_RE = /^1[3-9][0-9]{9}$/;
+export const PNVS_CODE_RE = /^[0-9]{4}$/;
+export const okSmsCode = (code) => typeof code === 'string' && PNVS_CODE_RE.test(code);
 export const USERNAME_RE = /^[A-Za-z\u4e00-\u9fa5][A-Za-z0-9_\u4e00-\u9fa5]{1,19}$/;
 export const SEND_COOLDOWN_MS = 60 * 1000;
 export const SEND_WINDOW_MS = 60 * 60 * 1000;
@@ -168,7 +170,12 @@ export async function latestUnconsumedSend(db, phone, purpose, nowMs) {
     .first();
 }
 export async function consumeSend(db, id, nowMs) {
-  await db.prepare('UPDATE hhba_sms_events SET consumed=1, consumed_at=? WHERE id=?').bind(iso(nowMs), id).run();
+  // Atomic compare-and-set: concurrent requests cannot successfully consume
+  // the same verified SMS send twice.
+  const result = await db.prepare(
+    'UPDATE hhba_sms_events SET consumed=1, consumed_at=? WHERE id=? AND consumed=0',
+  ).bind(iso(nowMs), id).run();
+  return result?.success === true && result?.meta?.changes === 1;
 }
 export async function recordVerifyAttempt(db, phone, purpose, success, nowMs) {
   await db
@@ -189,19 +196,20 @@ export async function verifySmsCode(db, provider, phone, purpose, code, nowMs) {
   );
   if (attempts >= VERIFY_MAX_PER_HOUR) throw new AuthError('RATE_LIMITED', 429);
   const sendRow = await latestUnconsumedSend(db, phone, purpose, nowMs);
-  if (!sendRow) {
+  if (!sendRow || !okSmsCode(code)) {
     await recordVerifyAttempt(db, phone, purpose, false, nowMs);
     return false;
   }
   let ok = false;
   try {
-    ok = await provider.verifyCode(phone, code);
+    // Only a literal boolean true from the trusted provider is accepted.
+    ok = (await provider.verifyCode(phone, code)) === true;
   } catch {
     ok = false;
   }
   await recordVerifyAttempt(db, phone, purpose, ok, nowMs);
-  if (ok) await consumeSend(db, sendRow.id, nowMs);
-  return ok;
+  if (!ok) return false;
+  return consumeSend(db, sendRow.id, nowMs);
 }
 
 export async function createSession(db, phone, nowMs) {
