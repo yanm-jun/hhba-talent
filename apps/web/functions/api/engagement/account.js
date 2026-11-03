@@ -4,8 +4,8 @@ import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 const areas=new Set(['general','jobs','companies','policies','tools','job_save']);
 export async function onRequest({request,env}){
  if(!['POST','DELETE'].includes(request.method))return bad('METHOD_NOT_ALLOWED',405);
- if(request.method==='POST'&&env.HHBA_ACCOUNT_ANALYTICS_ENABLED!=='1')return bad('ACCOUNT_ANALYTICS_DISABLED');
  if(!sameOrigin(request))return bad('ORIGIN_REQUIRED',403);
+ if(request.method==='POST'&&env.HHBA_ACCOUNT_ANALYTICS_ENABLED!=='1')return bad('ACCOUNT_ANALYTICS_DISABLED');
  const metrics=metricDb(env),auth=env.HHBA_PNVS_AUTH_DB;
  if(!metrics||!auth)return bad('ACCOUNT_ANALYTICS_NOT_CONFIGURED');
  try{
