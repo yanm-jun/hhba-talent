@@ -201,3 +201,25 @@ test('UI never publishes resume objects or automatically invokes DeepSeek',()=>{
  assert.match(schema,/UNIQUE\(phone,sha256\)/);
  assert.doesNotMatch(schema,/\bDROP\b|\bDELETE FROM hhba_auth_users/i);
 });
+
+test('polished file picker remains functional, keyboard accessible and explicitly consent gated',()=>{
+ const vault=readFileSync(new URL('../src/components/PrivateResumeVault.tsx',import.meta.url),'utf8');
+ const css=readFileSync(new URL('../src/styles/private-resumes.css',import.meta.url),'utf8');
+ assert.match(vault,/type="file" id="hhba-private-resume-file"/);
+ assert.match(vault,/<input ref=\{input\} hidden type="file"/);
+ assert.match(vault,/onClick=\{\(\)=>input\.current\?\.click\(\)\}/);
+ assert.match(vault,/onChange=\{choose\}/);
+ assert.match(vault,/onDrop=\{handleDrop\}/);
+ assert.match(vault,/onDragOver=\{handleDragOver\}/);
+ assert.match(vault,/event\.dataTransfer\.files\?\.\[0\]/);
+ assert.match(vault,/onClick=\{clearSelection\}/);
+ assert.match(vault,/onClick=\{\(\)=>void upload\(\)\}/);
+ assert.match(vault,/disabled=\{!file\|\|!consent\|\|busy\}/);
+ assert.match(vault,/<details className="hhba-private-resume-details">/);
+ assert.match(vault,/aria-label="选择简历文件"/);
+ assert.match(css,/\.hhba-private-resume-dropzone\{/);
+ assert.match(css,/\.hhba-private-resume-upload-actions\{/);
+ assert.match(css,/\.hhba-private-resumes button:focus-visible/);
+ assert.match(css,/@media\(max-width:740px\)/);
+ assert.doesNotMatch(css,/input\[type=file\]\{max-width/,'native browser file control must not be styled as a visible button');
+});
