@@ -11,6 +11,7 @@ import {getSavedMajor,majorName,majorMatchLabel,matchRoleToMajor} from '../servi
 import { majorById } from '../services/domesticMajors';
 import { SaveJobButton } from './SaveJobButton';
 import { JobResultPagination } from './JobResultPagination';
+import {JOBS_PER_PAGE,batchOffsetForPage,sliceJobsForPage,pageCount} from '../services/jobPaging.mjs';
 import { trackEvent } from '../services/engagement';
 import '../styles/saved-jobs.css';
 import { EmployerBrandLogo } from './EmployerBrandLogo';
@@ -26,8 +27,6 @@ import { loadPublicJobAudit, auditForJob, describeAudit, type JobAuditEntry } fr
 import {countryOptions,cityOptions,parseNaturalQuery} from '../services/jobSearchFacets.mjs';
 import '../styles/unified-jobs.css';
 
-const JOBS_PER_PAGE=10;
-const FETCH_BATCH_SIZE=30; // Keep the validated read-only job feed contract unchanged.
 type PersistedMarketState={scope:'home'|'jobs';filters:Record<string,unknown>;draft:string;page:number};
 function readMarketState(compact:boolean):PersistedMarketState|null{
  const state=history.state?.hhbaMarketState as PersistedMarketState|undefined;
@@ -176,9 +175,9 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   useEffect(()=>{const id=setTimeout(()=>{setPage(0);setFilters(f=>({...f,q:draft,education:f.education==='UNRESTRICTED_OR_UNREPORTED'?'':f.education}));},280);return()=>clearTimeout(id)},[draft]);
   useEffect(()=>{
     const controller=new AbortController();setLoading(true);setError('');setSnapshot(null);
-    listJobs(filters,Math.floor(page*JOBS_PER_PAGE/FETCH_BATCH_SIZE)*FETCH_BATCH_SIZE,controller.signal)
+    listJobs(filters,batchOffsetForPage(page),controller.signal)
       .then(data=>{if(!controller.signal.aborted){
-        const lastPage=Math.max(0,Math.ceil(data.total/JOBS_PER_PAGE)-1);
+        const lastPage=Math.max(0,pageCount(data.total)-1);
         if(page>lastPage){setPage(lastPage);return;}
         setSnapshot(data);
       }})
@@ -219,8 +218,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   // exactly ten consecutive positions per UI page (0-9, 10-19, 20-29).
   // No artificial pinned jobs in the paginated market: avoids duplicates and
   // inconsistent result counts when jumping directly to another page.
-  const batchStart=(page%3)*JOBS_PER_PAGE;
-  const pagedEligible=eligible.slice(batchStart,batchStart+JOBS_PER_PAGE);
+  const pagedEligible=sliceJobsForPage(eligible,page);
   const shown=!compact?pagedEligible:
     rebuilding||curatedHundred||officialThree?eligible.slice(0,6):
     domesticOnly?eligible.slice(0,8):
@@ -390,7 +388,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
        </div>:
         !error&&!loading&&snapshot&&<JobResultPagination page={page} total={snapshot.total} pageSize={JOBS_PER_PAGE}
           loading={loading} lang={lang} onChange={next=>{
-            if(next<0||next===page||next>=Math.ceil(snapshot.total/JOBS_PER_PAGE))return;
+            if(next<0||next===page||next>=pageCount(snapshot.total))return;
             setPage(next);
             requestAnimationFrame(()=>document.getElementById('hhba-job-results')?.scrollIntoView({behavior:'smooth',block:'start'}));
           }}/>
