@@ -9,7 +9,7 @@ const formatTime=value=>{
  })+'（北京时间）'}catch{return '—'}
 };
 const cloudflareMode=location.hostname==='hhba-talent.pages.dev'||location.hostname.endsWith('.hhba-talent.pages.dev')||location.hostname==='hhba.work';
-let snapshot=null,growth=null,selectedPeriod='30d',customRange=null,activeView='overview';
+let snapshot=null,growth=null,growthError=null,selectedPeriod='30d',customRange=null,activeView='overview';
 function normalizeCloudflarePublic(raw){
  if(raw?.kind!=='HHBA_CLOUDFLARE_PUBLIC_METRICS_V1'||!raw.counts)throw Error('INVALID_CLOUDFLARE_JOB_DATA');
  return {kind:'HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2',quality:raw.quality,asOf:raw.sourceTime,
@@ -40,7 +40,18 @@ function renderTraffic(target,items){
 }
 function percent(value){return typeof value==='number'&&Number.isFinite(value)?value.toFixed(1)+'%':'—'}
 function accountValue(n){return integer(n)===null?'—':fmt.format(n)}
+function showRealDataStatus(){
+ const liveHost=location.hostname==='hhba.work'||location.hostname==='hhba-talent.pages.dev';
+ const source=liveHost?'正式网站数据':'独立预览数据库';
+ byId('workspace-mode').textContent=liveHost?'正式管理后台':'开发预览';
+ byId('sidebar-environment').textContent=source;
+ const state=growth?.account?.quality==='collected'?'管理员已验证 · 真实账号已接通':growth?'管理员已验证 · 部分指标待接入':growthError==='AUTH_REQUIRED'?'管理员尚未授权':growthError==='SERVICE_ERROR'?'私有统计服务不可用':'等待私有数据连接';
+ byId('sidebar-account-state').textContent=state;
+ byId('sidebar-data-state').textContent=state+'；仅展示汇总数据，不读取个人浏览记录';
+ byId('top-access-state').textContent=state;
+}
 function updateGrowth(){
+ showRealDataStatus();
  const t=growth?.traffic,b=growth?.devices,a=growth?.account,q=growth?.activity;
  setMetric('ov-pv',t?.quality==='collected'?t.pv:null);
  setMetric('growth-pv',t?.quality==='collected'?t.pv:null);
@@ -56,7 +67,7 @@ function updateGrowth(){
  setMetric('registered-users',a?.quality==='collected'?a.registeredUsers:null);
  byId('active-users').textContent=a?.quality==='collected'&&integer(a.dau)!==null&&integer(a.mau)!==null?fmt.format(a.dau)+' / '+fmt.format(a.mau):'— / —';
  byId('users-interval').textContent=growth?.period?growth.period.start+' 至 '+growth.period.end+' · UTC':'私有数据需要 Cloudflare Access 管理员授权';
- byId('users-data-quality').textContent=a?.quality==='collected'?'注册用户来自 PNVS 身份库；匿名访客和历史设备收藏单独统计，不混同账号人数。':growth?'Cloudflare D1 已接入匿名访问；真实注册库未连接。':'私有指标需要 Cloudflare Access 管理员授权；未接入不等于零。';
+ byId('users-data-quality').textContent=a?.quality==='collected'?'注册用户来自 PNVS 身份库；匿名访客和历史设备收藏单独统计，不混同账号人数。':growth?'Cloudflare D1 已接入匿名访问；真实注册库未连接。':growthError==='AUTH_REQUIRED'?'管理员验证未通过；请在受保护的 HHBA 管理域名完成 Cloudflare Access 登录。':growthError==='SERVICE_ERROR'?'统计服务暂不可用，请检查受保护 API、D1 绑定和管理员权限。':'私有数据等待连接；未接入不等于零。';
   setMetric('users-new-registrations',a?.quality==='collected'?a.newRegistered:null);
   byId('users-dau-wau').textContent=q?.quality==='collected'?accountValue(q.dau)+' / '+accountValue(q.wau):'— / —';
   setMetric('users-mau',q?.quality==='collected'?q.mau:null);
@@ -80,7 +91,7 @@ function updateGrowth(){
  }
 }
 async function refreshGrowth(){
- if(!cloudflareMode){growth=null;updateGrowth();return}
+ if(!cloudflareMode){growth=null;growthError='UNAVAILABLE';updateGrowth();return}
  const params=new URLSearchParams();
  if(selectedPeriod==='custom'){
   if(!customRange)return;
@@ -88,11 +99,14 @@ async function refreshGrowth(){
  }else params.set('days',selectedPeriod==='today'?'1':selectedPeriod.slice(0,-1));
  try{
   const r=await fetch('/admin-preview/api/metrics?'+params,{cache:'no-store',credentials:'same-origin'});
-  if(!r.ok)throw Error('PRIVATE_METRICS_REQUIRE_AUTH');
+  if(!r.ok||!(r.headers.get('content-type')||'').includes('application/json')){
+   growthError=[401,403].includes(r.status)?'AUTH_REQUIRED':'SERVICE_ERROR';
+   throw Error('PRIVATE_METRICS_NOT_AVAILABLE');
+  }
   const v=await r.json();
-  if(v.kind!=='HHBA_CLOUDFLARE_PRIVATE_METRICS_V1'||!v.traffic||!v.devices||!v.account)throw Error('INVALID_PRIVATE_METRICS');
-  growth=v;
- }catch{growth=null}
+  if(v.kind!=='HHBA_CLOUDFLARE_PRIVATE_METRICS_V1'||!v.traffic||!v.devices||!v.account){growthError='SERVICE_ERROR';throw Error('INVALID_PRIVATE_METRICS')}
+  growth=v;growthError=null;
+ }catch{growth=null;if(!growthError)growthError='SERVICE_ERROR'}
  updateGrowth();
 }
 
