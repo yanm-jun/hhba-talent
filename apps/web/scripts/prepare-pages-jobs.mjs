@@ -1,99 +1,145 @@
-import {mkdir,writeFile} from 'node:fs/promises';
-import {join} from 'node:path';
+// Build the public recruitment snapshot directly from employer-owned ATS feeds.
+// Never make Cloudflare Pages deployment contingent on a retired Railway endpoint.
+// Only publish source-validated, current official URLs; failed boards remain visible in health metadata.
+import {mkdir,readFile,writeFile} from 'node:fs/promises';
+import {resolve,join} from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {endpoint,officialLink,isTalentPool,validateBoards} from '../../../ops/jobs-indexer/catalog.mjs';
 
-// A GitHub Pages preview can only publish public job-board metadata.
-// Never upload resumes, cookies, JD, ATS raw responses or translation credentials.
-const SOURCES=[
- 'https://hhba-web-production-024c.up.railway.app/api/jobs',
- 'https://hhba-live-jobs-preview-production.up.railway.app/api/jobs'
-];
-const BOARD_HOSTS={
- greenhouse:new Set(['job-boards.greenhouse.io','boards.greenhouse.io','boards.eu.greenhouse.io']),
- ashby:new Set(['jobs.ashbyhq.com']),
- lever:new Set(['jobs.lever.co','jobs.eu.lever.co'])
-};
-const BRANDED_GREENHOUSE={
- stripe:{host:'stripe.com',path:'/jobs/search'},
- coinbase:{host:'www.coinbase.com',path:'/careers/positions/'},
- airbnb:{host:'careers.airbnb.com',path:'/positions/'},
- databricks:{host:'databricks.com',path:'/company/careers/open-positions/job'}
-};
-const CHINA_HOSTS={
- 'xiaomi-official':'xiaomi.jobs.f.mioffice.cn',
- 'meituan-official':'zhaopin.meituan.com',
- 'tencent-official':'careers.tencent.com',
- 'baidu-official':'talent.baidu.com'
-};
-const mojibake=/\uFFFD|(?:Ã.|Â.|â[€Œœ„™])|(?:ä¸|å[\x80-\xBF]|æ[\x80-\xBF])|[\u0000-\u001F\u007F]/u;
-const han=/[\u3400-\u9fff]/u;
-function clean(value,max=240){
+const MAX_RESPONSE_BYTES=20_000_000;
+const MAX_BOARD_ROWS=5000;
+const MAX_JOBS=20000;
+export const MIN_SUCCESSFUL_BOARDS=8;
+export const MIN_VERIFIED_JOBS=40;
+const concurrency=6;
+const registryUrl=new URL('../../../ops/jobs-indexer/boards.json',import.meta.url);
+
+function clean(value,max){
  if(typeof value!=='string')return null;
- const v=value.replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim();
- return !v||v.length>max||mojibake.test(v)?null:v;
+ const text=value.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+ return text&&text.length<=max&&!/[\u0000-\u001f\u007f\ufffd]/.test(text)?text:null;
 }
-function safeUrl(job){
- try{
-  const u=new URL(job.url),platform=job.platform,source=job.source;
-  if(u.protocol!=='https:'||u.port||u.username||u.password)return false;
-  if(job.domestic===true)return u.hostname===CHINA_HOSTS[platform];
-  if(BOARD_HOSTS[platform]?.has(u.hostname)&&u.pathname.split('/').includes(source))return true;
-  const branded=platform==='greenhouse'?BRANDED_GREENHOUSE[source]:null;
-  if(!branded)return false;
-  const prefix='greenhouse-'+source+'-';
-  const native=String(job.id||'').startsWith(prefix)?String(job.id).slice(prefix.length):'';
-  return /^[0-9]{5,20}$/.test(native)&&u.hostname===branded.host &&
-    (branded.path.endsWith('/')?u.pathname.startsWith(branded.path):u.pathname===branded.path) &&
-    u.searchParams.get('gh_jid')===native;
- }catch{return false;}
+function recordsFor(board,payload){
+ const rows=board.platform==='lever'?payload:payload?.jobs;
+ if(!Array.isArray(rows)||rows.length>MAX_BOARD_ROWS)throw Error('INVALID_OFFICIAL_JOB_ARRAY');
+ return rows;
 }
-function onlyPublic(job){
- if(!job||typeof job!=='object'||!/^[A-Za-z0-9_-]{1,180}$/.test(String(job.id||'')))return null;
- if(!safeUrl(job))return null;
- const title=clean(job.title,220),company=clean(job.company,180);
- if(!title||!company)return null;
- const titleZh=clean(job.titleZh,220),companyZh=clean(job.companyZh,180);
- const locationZh=clean(job.locationZh,170);
- return {
-  id:job.id,company,companyZh:companyZh||null,
-  title,titleZh:titleZh&&han.test(titleZh)?titleZh:null,
-  titleStatus:clean(job.titleStatus,32)||'pending',
-  location:clean(job.location,170)||null,
-  locationZh:locationZh&&han.test(locationZh)?locationZh:null,
-  url:job.url,platform:job.platform,source:job.source,
-  domestic:job.domestic===true,remote:typeof job.remote==='boolean'?job.remote:null,
-  recruitmentType:['SOCIAL','CAMPUS','INTERNSHIP','SPECIAL'].includes(job.recruitmentType)?job.recruitmentType:null,
-  observedAt:clean(job.observedAt,50)||null,
-  recordKind:clean(job.recordKind,60)||null,
-  currentApplicationVerified:false
- };
-}
-async function fetchBoard(url){
- const reply=await fetch(url,{method:'GET',headers:{Accept:'application/json'},redirect:'error',
-   signal:AbortSignal.timeout(45000)});
- if(!reply.ok)throw new Error('HTTP '+reply.status);
- if(!reply.headers.get('content-type')?.includes('application/json'))throw new Error('not_json');
- const body=await reply.json();
- if(!Array.isArray(body.jobs)||!Number.isInteger(body.total)||body.total!==body.jobs.length||
-    body.jobs.length===0||body.jobs.length>20000||!Number.isInteger(body.boards)||
-    body.boards<1||body.failures!==0)throw new Error('incomplete_snapshot');
- const when=Date.parse(body.updated);
- if(!Number.isFinite(when)||when>Date.now()+5*60000||Date.now()-when>24*3600*1000)
-   throw new Error('stale_snapshot');
- const seen=new Set(),data=[];
- for(const row of body.jobs){
-  const publicJob=onlyPublic(row);
-  if(!publicJob||seen.has(publicJob.id))continue;
-  seen.add(publicJob.id);data.push(publicJob);
+export function normalizeOfficialJobs(board,payload,observedAt){
+ const records=recordsFor(board,payload),jobs=[],ids=new Set(),urls=new Set();
+ for(const raw of records){
+  if(!raw||typeof raw!=='object'||raw.isListed===false)continue;
+  const native=String(raw.id??'');
+  if(!/^[A-Za-z0-9_-]{1,110}$/.test(native))continue;
+  const title=clean(board.platform==='lever'?raw.text:raw.title,220);
+  if(!title||isTalentPool(title))continue;
+  const href=board.platform==='greenhouse'?raw.absolute_url:board.platform==='ashby'?raw.jobUrl:raw.hostedUrl;
+  const official=officialLink(href,board);
+  if(!official)continue;
+  let url;
+  try{
+   const parsed=new URL(official);
+   if(parsed.port||parsed.username||parsed.password)continue;
+   parsed.hash='';
+   url=parsed.href;
+  }catch{continue;}
+  const id=board.platform+'-'+board.slug+'-'+native;
+  if(id.length>180||ids.has(id)||urls.has(url))continue;
+  const location=clean(board.platform==='lever'?raw.categories?.location:
+    board.platform==='greenhouse'?raw.location?.name:raw.location,170);
+  const kind=typeof raw.workplaceType==='string'?raw.workplaceType.toLowerCase():null;
+  const remote=typeof raw.isRemote==='boolean'?raw.isRemote:
+    kind==='remote'?true:kind==='onsite'?false:null;
+  ids.add(id);urls.add(url);
+  jobs.push({id,company:board.company,title,location,url,platform:board.platform,
+    source:board.slug,domestic:false,remote,observedAt,
+    recordKind:'OFFICIAL_ATS_PUBLIC_METADATA',currentApplicationVerified:false});
  }
- if(!data.length)throw new Error('no_verified_public_listings');
- return {jobs:data,total:data.length,limit:data.length,offset:0,updated:body.updated,boards:body.boards,failures:0,
-  informationalNotice:'Job listings were observed on public employer sources. Current application availability is unconfirmed.'};
+ // A board that returned positions without a single valid official position is not verified.
+ if(records.length>0&&jobs.length===0)throw Error('NO_VALID_OFFICIAL_JOB_URLS');
+ return jobs;
 }
-let snapshot=null,lastError=null;
-for(const url of SOURCES) {
- try{snapshot=await fetchBoard(url);break;}catch(e){lastError=e;console.warn('SOURCE_READ_FAILED',new URL(url).hostname,e.message);}
+
+export async function fetchOfficialBoard(board,{fetchFn=fetch}={}){
+ const target=endpoint(board);
+ let lastError=null;
+ for(let attempt=0;attempt<2;attempt++){
+  try{
+   const response=await fetchFn(target,{
+    method:'GET',headers:{Accept:'application/json'},
+    redirect:'error',signal:AbortSignal.timeout(board.slug==='andurilindustries'?35000:20000)
+   });
+   if(!response.ok){
+    const status=response.status;
+    lastError=new Error('ATS_HTTP_'+status);
+    if(attempt===0&&(status===429||status>=500))continue;
+    throw lastError;
+   }
+   const size=Number(response.headers?.get?.('content-length')||0);
+   if(size>MAX_RESPONSE_BYTES)throw Error('ATS_RESPONSE_TOO_LARGE');
+   const body=await response.text();
+   if(body.length>MAX_RESPONSE_BYTES)throw Error('ATS_RESPONSE_TOO_LARGE');
+   let payload;
+   try{payload=JSON.parse(body);}catch{throw Error('ATS_INVALID_JSON');}
+   return normalizeOfficialJobs(board,payload,new Date().toISOString());
+  }catch(error){
+   lastError=error;
+   if(attempt===1||/^ATS_HTTP_4(?!29)/.test(String(error?.message||'')))break;
+  }
+ }
+ throw lastError||new Error('ATS_UNAVAILABLE');
 }
-if(!snapshot)throw new Error('No complete, recent official source snapshot: '+lastError?.message);
-await mkdir(join('dist','data'),{recursive:true});
-await writeFile(join('dist','data','jobs.json'),JSON.stringify(snapshot),'utf8');
-console.log('HHBA_PAGES_SNAPSHOT',JSON.stringify({count:snapshot.total,boards:snapshot.boards,updated:snapshot.updated}));
+
+export async function buildOfficialSnapshot(boards,{fetchFn=fetch,workerCount=concurrency,now=()=>Date.now()}={}){
+ validateBoards(boards);
+ if(boards.length<MIN_SUCCESSFUL_BOARDS)throw Error('INSUFFICIENT_CONFIGURED_BOARDS');
+ const results=new Array(boards.length);
+ let next=0;
+ async function worker(){
+  while(next<boards.length){
+   const i=next++,board=boards[i];
+   try{
+    const jobs=await fetchOfficialBoard(board,{fetchFn});
+    results[i]={board,jobs,ok:true};
+   }catch(error){
+    const reason=String(error instanceof Error?error.message:'ATS_UNAVAILABLE').slice(0,90);
+    results[i]={board,jobs:[],ok:false,reason};
+   }
+  }
+ }
+ await Promise.all(Array.from({length:Math.min(Math.max(workerCount,1),8)},()=>worker()));
+ const successes=results.filter(row=>row.ok);
+ const failures=results.filter(row=>!row.ok).map(row=>({
+  platform:row.board.platform,source:row.board.slug,reason:row.reason
+ }));
+ const seen=new Set(),jobs=[];
+ for(const {jobs:rows} of successes)for(const job of rows){
+  if(seen.has(job.id))continue;
+  seen.add(job.id);
+  jobs.push(job);
+ }
+ if(successes.length<MIN_SUCCESSFUL_BOARDS||jobs.length<MIN_VERIFIED_JOBS||jobs.length>MAX_JOBS)
+  throw Error('OFFICIAL_SOURCE_COVERAGE_INSUFFICIENT boards='+successes.length+
+   ' jobs='+jobs.length+' failed='+failures.length);
+ const updated=new Date(now()).toISOString();
+ return {jobs,total:jobs.length,limit:jobs.length,offset:0,updated,
+  boards:successes.length,failures:failures.length,configured_boards:boards.length,
+  source_failures:failures,
+  informationalNotice:'Only current employer-owned ATS listings were indexed. Not every configured source was available. See source_failures; current application availability is unconfirmed.'};
+}
+
+async function main(){
+ const registry=JSON.parse(await readFile(registryUrl,'utf8'));
+ const boards=validateBoards(registry.boards);
+ const snapshot=await buildOfficialSnapshot(boards);
+ const dir=resolve('dist','data');
+ await mkdir(dir,{recursive:true});
+ await writeFile(join(dir,'jobs.json'),JSON.stringify(snapshot),'utf8');
+ console.log('HHBA_OFFICIAL_ATS_SNAPSHOT',JSON.stringify({
+  jobs:snapshot.total,successful_boards:snapshot.boards,
+  failed_boards:snapshot.failures,configured_boards:snapshot.configured_boards,
+  updated:snapshot.updated
+ }));
+}
+if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
+ main().catch(error=>{console.error('HHBA_OFFICIAL_ATS_SNAPSHOT_FAILED',error.message);process.exitCode=1;});
+}

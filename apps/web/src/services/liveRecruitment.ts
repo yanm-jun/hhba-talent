@@ -29,6 +29,7 @@ export type LiveFilters = {
 export type LivePage = {
   jobs: LiveJob[]; total: number; limit: number; offset: number;
   updated: string; boards: number; failures: number;
+  configured_boards?:number; source_failures?:Array<{platform:string;source:string;reason:string}>;
 };
 export type LiveDetail = {
   job: LiveJob; description?: string | null; richHtml?: string | null;
@@ -179,7 +180,7 @@ export function localizedTitle(job: LiveJob, lang: Language) {
   const translated=cleanLocaleText(job.titleZh);
   if(lang==='zh') {
     if(translated && han.test(translated) && job.titleStatus!=='pending') return translated;
-    return original && han.test(original) ? original : '职位名称待翻译';
+    return original || '职位名称待核验';
   }
   return original && !han.test(original) ? original : 'Title translation pending';
 }
@@ -190,7 +191,7 @@ export function localizedCompany(job: LiveJob, lang: Language) {
 }
 export function localizedLocation(job: LiveJob, lang: Language) {
   const original=cleanLocaleText(job.location), zh=cleanLocaleText(job.locationZh);
-  if(lang==='zh')return zh&&han.test(zh)?zh:original&&han.test(original)?original:'地点待翻译';
+  if(lang==='zh')return zh&&han.test(zh)?zh:original||'地点待核验';
   return original&&!han.test(original)?original:'Location translation pending';
 }
 async function readJSON<T>(path: string, signal: AbortSignal): Promise<T> {
@@ -250,8 +251,13 @@ async function previewSnapshot(signal:AbortSignal):Promise<LivePage> {
         catch{throw new Error('岗位数据快照 JSON 格式错误');}
       })
       .then(data=>{
-        if(!Array.isArray(data.jobs) || !Number.isInteger(data.total) ||
-          !Number.isFinite(Date.parse(data.updated)) || data.failures!==0)
+        const reportedFailures=Number.isInteger(data.failures)&&data.failures>=0&&
+          (data.failures===0||
+            (Array.isArray(data.source_failures)&&data.source_failures.length===data.failures&&
+              Number.isInteger(data.configured_boards)&&data.configured_boards===data.boards+data.failures));
+        if(!Array.isArray(data.jobs)||data.jobs.length===0||!Number.isInteger(data.total)||
+          data.total!==data.jobs.length||!Number.isInteger(data.boards)||data.boards<1||
+          !Number.isFinite(Date.parse(data.updated))||!reportedFailures)
           throw new Error('招聘数据快照无效');
         if(Date.now()-Date.parse(data.updated)>24*60*60_000 ||
            Date.now()<Date.parse(data.updated)-5*60_000)
