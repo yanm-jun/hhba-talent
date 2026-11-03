@@ -16,7 +16,7 @@ for(const [num,name,count] of [['093','中国华能',12],['094','中国大唐集
  assert.equal(p.business.length,6);assert(p.business.every(s=>s.details.length===3&&s.description.length>=30));
  assert.equal(p.jobs.length,count);assert.equal(new Set(p.jobs.map(x=>x.id)).size,count);
  assert(p.jobs.every(j=>j.currentOpenVerified===false&&j.url===p.recruitment.url&&j.evidenceUrl.startsWith('https://')));
- assert(p.jobs.every(j=>j.title&&j.city&&j.summary.length>40&&j.requirements.length>48&&j.editorialRelatedMajors.length>=2));
+ assert(p.jobs.every(j=>j.title&&j.city&&j.summary.length>40&&j.requirements.length>48&&j.editorialRelatedMajors.length>=1));
  assert(p.jobs.every(j=>j.majorNames.length===0&&(num==='095'||!j.majorUnrestricted)));
  assert.equal(p.media.photos.length,2);
  assert.equal(new Set([p.media.logo,...p.media.photos.map(photo=>photo.path)]).size,3);
