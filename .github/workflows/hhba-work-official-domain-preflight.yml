@@ -1,0 +1,59 @@
+name: HHBA Work Official Domain Preflight
+on:
+  push:
+    branches: [fix/hhba-work-official-domain-20261103]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  official-domain-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install exact dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Validate share URL, open letter, and prior recruitment regressions
+        working-directory: apps/web
+        run: |
+          node --test scripts/home-open-letter.contract.test.mjs
+          node scripts/employer-job-level-search.contract.test.mjs
+          node scripts/major-direct-role-results.contract.test.mjs
+      - name: Compile static production root including employers 093 and 119
+        working-directory: apps/web
+        env:
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+          HHBA_CLOUDFLARE_PAGES: '1'
+        run: |
+          npm run build
+          node scripts/materialize-company-route-entries.mjs
+      - name: Check production origin share metadata and all three direct routes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path('apps/web/dist')
+          html=(root/'letter/index.html').read_text(encoding='utf8')
+          assert '<link rel="canonical" href="https://hhba.work/letter/">' in html
+          assert '<meta property="og:url" content="https://hhba.work/letter/">' in html
+          assert '<meta property="og:image" content="https://hhba.work/images/hhba-people-group.webp">' in html
+          assert 'yanm-jun.github.io' not in html
+          assert '../?letter=1' in html
+          for id in ('093','119'):
+              assert (root/f'companies/autumn/cn-autumn-{id}/index.html').is_file(),id
+              assert (root/f'images/employer-profiles/cn-autumn-{id}/media-sources.json').is_file(),id
+          assert (root/'index.html').is_file()
+          print('HHBA_WORK_OFFICIAL_DOMAIN_PREFLIGHT_PASS')
+          PY
+      - name: Upload tested official-domain production-style static artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-work-official-domain-preflight
+          path: apps/web/dist/
+          retention-days: 7
+          if-no-files-found: error

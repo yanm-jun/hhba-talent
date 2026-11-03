@@ -135,6 +135,9 @@ def main() -> None:
         "admin-preview/index.html",
         "admin-preview/dashboard.js",
         "companies/autumn/cn-autumn-034/index.html",
+        "companies/autumn/cn-autumn-093/index.html",
+        "companies/autumn/cn-autumn-119/index.html",
+        "letter/index.html",
     ]
     missing = [p for p in checks if not (WEB / "dist" / p).is_file()
                or (WEB / "dist" / p).stat().st_size == 0]

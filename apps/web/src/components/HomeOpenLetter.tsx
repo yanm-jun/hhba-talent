@@ -16,8 +16,8 @@ function firstStage(): Stage {
   catch { return 'envelope'; }
 }
 function shareUrl() {
-  const base = new URL(import.meta.env.BASE_URL, window.location.origin);
-  return new URL('letter/', base).toString();
+  // Always share the production origin, never a review branch or GitHub Pages preview.
+  return 'https://hhba.work/letter/';
 }
 function removeExplicitFlag() {
   const url = new URL(window.location.href);
