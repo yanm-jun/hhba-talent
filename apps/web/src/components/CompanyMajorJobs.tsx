@@ -3,7 +3,9 @@ import {ArrowRight,BriefcaseBusiness,GraduationCap} from 'lucide-react';
 import {Link,getCompanyReturnTarget} from '../router';
 import {CompanyMajorChips} from './CompanyMajorChips';
 import {domesticV2Records} from '../services/domesticRebuildJobs';
-import {majorName,matchRoleToMajor,majorMatchLabel,getSavedMajor,storeSelectedMajor} from '../services/majorJobMatching';
+import {majorName,matchRoleToMajor,majorMatchLabel,getSavedMajor,storeSelectedMajor,majorExactEvidence} from '../services/majorJobMatching';
+import {SaveJobButton} from './SaveJobButton';
+import '../styles/saved-jobs.css';
 import {safeOfficialJobUrl,rebuildListFilter} from '../services/liveRecruitment';
 import type {LiveJob,LiveFilters} from '../services/liveRecruitment';
 import '../styles/major-company-flow.css';
@@ -29,7 +31,8 @@ export function CompanyMajorJobs({companyRoute,majorIntro,quickMajorNames}:{comp
  const related=jobs.filter(j=>{
   const result=matchRoleToMajor(j,slug);
   return result==='related'||result==='unrestricted';
- });
+ }).sort((a,b)=>Number(matchRoleToMajor(b,slug)==='related')-Number(matchRoleToMajor(a,slug)==='related')||
+  majorExactEvidence(b,slug)-majorExactEvidence(a,slug));
  const unknown=slug?jobs.filter(j=>matchRoleToMajor(j,slug)==='unknown'):[];
  const current=!slug?allJobs:related;
  const label=majorName(slug);
@@ -54,6 +57,7 @@ export function CompanyMajorJobs({companyRoute,majorIntro,quickMajorNames}:{comp
       <p>{job.locationZh||job.location||'工作地点待核实'} · {job.responsibilitiesSummary||'岗位职责请查看站内资料'}</p>
       <small>{slug?majorMatchLabel(matchRoleToMajor(job,slug))+' · ':''}申请状态待官网核对；{job.majorNames?.length?'已整理专业信息：'+job.majorNames.slice(0,4).join('、'):'逐岗官方专业要求尚未核实'}</small>
      </div>
+     <SaveJobButton jobId={job.id} compact/>
      <Link to={'/candidate/jobs/'+encodeURIComponent(job.id)} aria-label={'查看'+job.title+'站内岗位详情'}>查看详情 <ArrowRight size={14}/></Link>
     </article>)}
     {current.length===0&&<p className="hhba-kpmg-role-disclaimer">
