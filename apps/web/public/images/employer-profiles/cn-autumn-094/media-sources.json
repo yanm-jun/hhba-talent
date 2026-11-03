@@ -1,0 +1,31 @@
+{
+  "companyId": "094",
+  "observedOn": "2026-11-03",
+  "brand": {
+    "sourceImageUrl": "https://logo9.net/userfiles/images/datanjt.jpg",
+    "sourcePageUrl": "https://www.logo9.net/works/5494.html",
+    "sourceContext": "历史品牌标志第三方目录，官方识别与授权待核",
+    "status": "nonofficial_editorial_wordmark_fallback",
+    "trademarkUsagePermissionVerified": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "imageUrl": "https://www.china-cdt.com/dtwz/lib/second/images/gsjj-lou.png",
+      "articleUrl": "https://www.china-cdt.com/dtwz/gydt/gsjj/A024001001Gone1.html",
+      "sourceContext": "中国大唐官网企业介绍所用历史总部图片",
+      "status": "nonreal_svg_fallback",
+      "republicationRightsVerified": false
+    },
+    {
+      "slot": 2,
+      "imageUrl": "https://img3.jiemian.com/101/original/20201207/160732408697586700.jpg",
+      "articleUrl": "https://www.jiemian.com/article/5368732.html",
+      "sourceContext": "界面新闻2020年历史总部照片",
+      "status": "nonreal_svg_fallback",
+      "republicationRightsVerified": false
+    }
+  ],
+  "commercialRightsVerified": false,
+  "sourcedImages": 0
+}

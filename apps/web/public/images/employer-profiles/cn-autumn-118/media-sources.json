@@ -1,0 +1,28 @@
+{
+  "companyId": "118",
+  "name": "屹唐半导体",
+  "reviewDate": "2026-11-03",
+  "officialLogoPermissionVerified": false,
+  "commercialImageUsageVerified": false,
+  "brand": {
+    "status": "nonofficial_editorial_wordmark",
+    "officialLogo": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_placeholder",
+      "candidateSource": "https://www.bestsemi.com/",
+      "actualWorkplacePhoto": false,
+      "commercialRightsVerified": false
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_placeholder",
+      "candidateSource": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "actualWorkplacePhoto": false,
+      "commercialRightsVerified": false
+    }
+  ],
+  "notes": "Pictures are deliberately non-real editorial illustrations clearly marked as such; corporate sites may display authentic visual material but reuse permissions are not established. Do not present as official workplace photos or official logos."
+}

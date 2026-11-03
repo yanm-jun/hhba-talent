@@ -1,0 +1,659 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-109",
+  "name": "金发科技",
+  "displayName": "金发科技股份有限公司",
+  "englishName": "Kingfa Sci. & Tech.",
+  "aliases": [
+    "金发科技股份有限公司",
+    "KINGFA",
+    "Kingfa",
+    "金发科技2027校招"
+  ],
+  "industry": "高分子材料 · 改性塑料 · 化工新材料 · 绿色石化 · 医疗材料",
+  "subtitle": "2027届全球校招 · 24项高校招聘表具名岗位，涉及多城市与板块",
+  "overview": "金发科技2027年全球校招由多所高校转发企业完整招聘表，分集团、改性塑料、绿色石化和医疗健康等板块，列有10类80余岗位方向。当前精确录入其中24个具名岗位；工作地字段严格照招聘表中的可选城市集合，不将多个城市拆成独立空缺，也不把集团1000余名需求当成本站24条职位人数。官网招聘系统需自行核对是否仍受理。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+    "https://job.ustc.edu.cn/Specialrecruitment/info.aspx?itemid=10094",
+    "https://kingfa.zhiye.com/",
+    "https://career.kingfa.com/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-109/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-109/photo1.svg",
+        "caption": "金发科技企业实景授权待审核：非实景编辑示意",
+        "alt": "金发科技非实景编辑占位图（非真实企业照片）",
+        "note": "非实景：真实企业照片来源和商用授权尚未完成核实；独立PR审查使用占位。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-109/photo2.svg",
+        "caption": "金发科技企业实景授权待审核：非实景编辑示意",
+        "alt": "金发科技非实景编辑占位图（非真实企业照片）",
+        "note": "非实景：真实企业照片来源和商用授权尚未完成核实；独立PR审查使用占位。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://kingfa.zhiye.com/",
+    "label": "金发科技官方校园招聘入口（请复核投递状态）",
+    "status": "official_portal",
+    "subject": "金发科技股份有限公司及各板块所属招聘实体，实际法人由招聘系统确认",
+    "note": "2027届全球校招有80余岗位方向，本批24条来自吉林大学及中科大就业网同一招聘表。部分第三方记录称10月31日截止，但大学公告没有一律截止日，故不擅自认定24项同日关闭；实际网申按钮实时验证缺失。"
+  },
+  "majorIntro": "依据2027公司校园招聘表逐条匹配岗位、学历、专业和城市集合。城市集合不代表每个岗位在其中所有城市均有有效空缺；专业筛选只返回有关岗位。",
+  "preferredMajors": [
+    "材料科学与工程",
+    "高分子材料与工程",
+    "化学工程与工艺",
+    "机械工程",
+    "机械设计制造及其自动化",
+    "自动化",
+    "电气工程及其自动化",
+    "计算机科学与技术",
+    "软件工程",
+    "供应链管理",
+    "会计学"
+  ],
+  "photoNote": "这两幅照片均为标明“非实景”的编辑图；Logo也是明确标注的非官方品牌字标。历史企业照片需要先审实景归属与版权许可才可上线。",
+  "business": [
+    {
+      "title": "改性塑料与功能材料",
+      "description": "设计开发汽车、家电、电气电子等领域的改性塑料与高性能工程材料方案。",
+      "tags": "改性 · 塑料",
+      "details": [
+        "高分子配方",
+        "材料测试",
+        "工程应用"
+      ]
+    },
+    {
+      "title": "先进化工与聚合",
+      "description": "通过绿色石化与新材料业务开展高分子聚合、化工工艺和功能化学品研发制造。",
+      "tags": "聚合 · 石化",
+      "details": [
+        "聚合工程",
+        "化工工艺",
+        "材料制造"
+      ]
+    },
+    {
+      "title": "合成生物与新材料研发",
+      "description": "探索合成生物、精细化工和高分子材料相关研究及产业化应用。",
+      "tags": "研发 · 生物",
+      "details": [
+        "合成生物",
+        "功能化学品",
+        "材料创新"
+      ]
+    },
+    {
+      "title": "医疗健康材料",
+      "description": "为医疗卫生和健康消费场景提供高分子材料、品质检验及产品开发相关业务。",
+      "tags": "医疗 · 材料",
+      "details": [
+        "医疗材料",
+        "应用研发",
+        "质量控制"
+      ]
+    },
+    {
+      "title": "设备制造与智能生产",
+      "description": "多个生产基地开展机械电气设备、自动化生产及制造过程优化。",
+      "tags": "装备 · 制造",
+      "details": [
+        "机械设计",
+        "智能制造",
+        "设备工程"
+      ]
+    },
+    {
+      "title": "供应链及全球销售",
+      "description": "连接全球多地客户和制造基地，进行材料销售、供应链规划、贸易与物流运营。",
+      "tags": "全球 · 运营",
+      "details": [
+        "材料销售",
+        "全球供应链",
+        "仓储物流"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "sales-mat",
+      "title": "销售工程师-改性与新材料方向",
+      "category": "营销 / 材料",
+      "city": "广州、上海、昆山、宁波、武汉、成都、天津、盘锦及海外项目候选地区",
+      "summary": "服务改性塑料和新材料客户，结合材料技术与市场需求开展业务开发、技术沟通及产品销售。",
+      "requirements": "企业2027校园招聘表该项要求本科、硕士或博士，专业方向包含材料科学与工程、高分子材料与工程、机械工程、化学工程与工艺等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "材料科学与工程",
+        "高分子材料与工程",
+        "机械工程",
+        "化学工程与工艺"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科、硕士或博士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "sales-trade",
+      "title": "销售工程师-贸易方向",
+      "category": "营销 / 贸易",
+      "city": "广州、上海、天津、珠海及海外业务项目候选地区",
+      "summary": "面向新材料贸易业务开展客户对接、材料产品推广及供应链销售协作，具体派驻地区按岗位确定。",
+      "requirements": "企业2027校园招聘表该项要求本科或硕士，专业方向包含材料科学与工程、化学工程与工艺、国际经济与贸易等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "材料科学与工程",
+        "化学工程与工艺",
+        "国际经济与贸易"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科或硕士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "rd-material",
+      "title": "研发工程师-改性与新材料方向",
+      "category": "材料 / 研发",
+      "city": "广州、上海、成都、天津、武汉、清远、珠海等候选城市",
+      "summary": "开展改性高分子及功能材料配方、测试、优化与应用研究，属于集团公布的2027研发岗位方向。",
+      "requirements": "企业2027校园招聘表该项要求硕士或博士，专业方向包含高分子材料与工程、材料科学与工程、高分子化学与物理等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "高分子材料与工程",
+        "材料科学与工程",
+        "高分子化学与物理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士或博士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "rd-polymer",
+      "title": "研发工程师-聚合方向",
+      "category": "化工 / 研发",
+      "city": "广州、盘锦、珠海（集团招聘表城市集合）",
+      "summary": "研究高分子聚合相关反应、工艺技术及材料性能，参与材料聚合研发与产品优化工作。",
+      "requirements": "企业2027校园招聘表该项要求硕士或博士，专业方向包含高分子化学与物理、化学工程与工艺、应用化学等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "高分子化学与物理",
+        "化学工程与工艺",
+        "应用化学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士或博士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "rd-process",
+      "title": "研发工程师-化工工艺研究方向",
+      "category": "化工 / 工艺",
+      "city": "广州、宁波、盘锦、珠海（集团招聘表城市集合）",
+      "summary": "研究化工生产工艺及反应过程，提升生产技术方案与精细化工过程的效率和安全性。",
+      "requirements": "企业2027校园招聘表该项要求硕士或博士，专业方向包含化学工程与工艺、应用化学、化学工程等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "化学工程与工艺",
+        "应用化学",
+        "化学工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士或博士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "rd-bio",
+      "title": "研发工程师-合成生物方向",
+      "category": "生物 / 研发",
+      "city": "广州（招聘表列明）",
+      "summary": "参与合成生物与生物化工研发，涉及发酵工程、微生物技术和生物材料开发。",
+      "requirements": "企业2027校园招聘表该项要求硕士或博士，专业方向包含生物工程、生物技术、合成生物学等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "生物工程",
+        "生物技术",
+        "合成生物学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士或博士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "rd-fine",
+      "title": "研发工程师-精细化工方向",
+      "category": "化工 / 研发",
+      "city": "广州、盘锦（招聘表城市集合）",
+      "summary": "研究精细化工产品及功能化学品的工艺、反应与材料应用，协助开展工业化技术研究。",
+      "requirements": "企业2027校园招聘表该项要求硕士或博士，专业方向包含化学工程与工艺、应用化学、有机化学等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "化学工程与工艺",
+        "应用化学",
+        "有机化学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士或博士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "rd-aesthetic",
+      "title": "研发工程师-美学方向",
+      "category": "材料 / 设计",
+      "city": "广州、上海、成都、天津、武汉等候选城市",
+      "summary": "面向材料外观、色彩与用户应用效果开展跨材料与美学方向的产品技术研究。",
+      "requirements": "企业2027校园招聘表该项要求硕士或博士，专业方向包含工业设计、光学、材料科学与工程等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工业设计",
+        "光学",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士或博士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "rd-equipment",
+      "title": "研发工程师-装备研究方向",
+      "category": "机械 / 研发",
+      "city": "广州、清远（招聘表城市集合）",
+      "summary": "从事材料制造装备、机械结构与自动化工艺研究，开展设备技术方案和性能优化。",
+      "requirements": "企业2027校园招聘表该项要求硕士或博士，专业方向包含机械工程、过程装备与控制工程、自动化等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "过程装备与控制工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士或博士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "energy",
+      "title": "能源管理工程师",
+      "category": "能源 / 工程",
+      "city": "广州（招聘表列明）",
+      "summary": "参与化工生产系统能源管理、工艺节能与设备能源效率改善，需求专业包含动力、电气与化工。",
+      "requirements": "企业2027校园招聘表该项要求硕士或博士，专业方向包含能源与动力工程、电气工程及其自动化、化学工程与工艺等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "能源与动力工程",
+        "电气工程及其自动化",
+        "化学工程与工艺"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士或博士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ip",
+      "title": "知识产权管理工程师",
+      "category": "法务 / 知识产权",
+      "city": "广州（招聘表列明）",
+      "summary": "负责与高分子材料及研发技术相关的知识产权管理、技术成果保护与专利资料支持。",
+      "requirements": "企业2027校园招聘表该项要求硕士，专业方向包含法学、材料科学与工程、高分子材料与工程等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "法学",
+        "材料科学与工程",
+        "高分子材料与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "mech-design",
+      "title": "机械设计工程师",
+      "category": "机械 / 设计",
+      "city": "广州、上海、昆山、徐州、清远（招聘表城市集合）",
+      "summary": "面向材料生产和工艺设备开展机械设计、技术支持及制造设备工程设计协作。",
+      "requirements": "企业2027校园招聘表该项要求本科或硕士，专业方向包含机械工程、机械设计制造及其自动化、过程装备与控制工程等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "过程装备与控制工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科或硕士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "manufacture",
+      "title": "制造工程师",
+      "category": "制造 / 工艺",
+      "city": "广州、上海、昆山、徐州、天津、盘锦、武汉、清远、珠海等候选城市",
+      "summary": "围绕高分子材料生产线进行制造工艺、流程改善、质量及生产设备协同管理。",
+      "requirements": "企业2027校园招聘表该项要求本科或硕士，专业方向包含机械工程、自动化、化学工程与工艺、材料科学与工程等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "自动化",
+        "化学工程与工艺",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科或硕士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "test-meter",
+      "title": "检测/计量工程师",
+      "category": "质量 / 检测",
+      "city": "广州、上海、昆山、天津、盘锦、珠海（招聘表城市集合）",
+      "summary": "进行材料试验检测及计量测试相关技术工作，支持品质验证与生产工艺过程数据记录。",
+      "requirements": "企业2027校园招聘表该项要求本科或硕士，专业方向包含材料科学与工程、应用化学、测控技术与仪器、机械工程等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "材料科学与工程",
+        "应用化学",
+        "测控技术与仪器",
+        "机械工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科或硕士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "equip",
+      "title": "设备工程师",
+      "category": "机械 / 设备",
+      "city": "广州、盘锦、清远、珠海（招聘表城市集合）",
+      "summary": "参与材料生产设备维护改进、工艺装备运行与设备管理等工程工作。",
+      "requirements": "企业2027校园招聘表该项要求本科或硕士，专业方向包含机械设计制造及其自动化、自动化、电气工程及其自动化等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械设计制造及其自动化",
+        "自动化",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科或硕士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "supply",
+      "title": "供应链管理储干",
+      "category": "供应链 / 管培",
+      "city": "广州、上海、昆山、徐州、天津、盘锦、清远、珠海（招聘表城市集合）",
+      "summary": "在供应链项目和采购、物流、生产协同环节进行轮岗培养，支持集团多基地业务运营。",
+      "requirements": "企业2027校园招聘表该项要求本科或硕士，专业方向包含供应链管理、物流管理、工业工程、自动化等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "物流管理",
+        "工业工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科或硕士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "planner",
+      "title": "计划/物控师",
+      "category": "供应链 / 计划",
+      "city": "上海、昆山、徐州、天津、盘锦、清远、珠海（招聘表城市集合）",
+      "summary": "负责制造计划协调、物料需求及生产供应链物控，基于产销计划开展库存与供货协同。",
+      "requirements": "企业2027校园招聘表该项要求本科或硕士，专业方向包含供应链管理、物流管理、工业工程、统计学等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "物流管理",
+        "工业工程",
+        "统计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科或硕士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "it",
+      "title": "IT系统工程师",
+      "category": "软件 / IT",
+      "city": "广州、珠海（招聘表列明）",
+      "summary": "面向集团业务信息化提供IT系统建设、应用维护与业务数字化支持，职位名称来自2027官方校招表。",
+      "requirements": "企业2027校园招聘表该项要求本科或硕士，专业方向包含计算机科学与技术、软件工程、通信工程、信息安全等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "通信工程",
+        "信息安全"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科或硕士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "data",
+      "title": "数据分析师",
+      "category": "数据 / 软件",
+      "city": "广州、珠海（招聘表列明）",
+      "summary": "支持集团业务数据采集、质量整理和经营分析，服务制造、研发及供应链的数字化决策。",
+      "requirements": "企业2027校园招聘表该项要求本科或硕士，专业方向包含数据科学与大数据技术、统计学、计算机科学与技术、数学与应用数学等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "数据科学与大数据技术",
+        "统计学",
+        "计算机科学与技术",
+        "数学与应用数学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科或硕士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "account",
+      "title": "财务会计师",
+      "category": "财务 / 会计",
+      "city": "广州、上海、昆山、徐州、天津、盘锦、清远、珠海（招聘表城市集合）",
+      "summary": "承担经营核算、财务报表与成本分析相关工作，属于集团2027校园招聘的财务会计方向。",
+      "requirements": "企业2027校园招聘表该项要求本科或硕士，专业方向包含会计学、财务管理、审计学等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "会计学",
+        "财务管理",
+        "审计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科或硕士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "legal",
+      "title": "法务工程师",
+      "category": "法务 / 合规",
+      "city": "广州（招聘表列明）",
+      "summary": "承担公司经营合同、法律风险及合规问题的支持工作，2027校园招聘表对该岗位单列法学硕士。",
+      "requirements": "企业2027校园招聘表该项要求硕士，专业方向包含法学等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "法学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hr",
+      "title": "人力资源管理师",
+      "category": "人力资源 / 行政",
+      "city": "上海、昆山、清远、珠海（招聘表城市集合）",
+      "summary": "参与人才招聘、员工发展及人事管理工作，具体岗位地点由金发招聘系统逐岗公布。",
+      "requirements": "企业2027校园招聘表该项要求本科或硕士，专业方向包含人力资源管理、工商管理、心理学等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人力资源管理",
+        "工商管理",
+        "心理学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科或硕士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "env",
+      "title": "安全/环保工程师",
+      "category": "安全 / 环保",
+      "city": "广州、上海、昆山、天津、盘锦、清远（招聘表城市集合）",
+      "summary": "开展高分子与化工生产基地的安全环保技术支持、风险排查及环境合规工作。",
+      "requirements": "企业2027校园招聘表该项要求本科或硕士，专业方向包含安全工程、环境工程、化学工程与工艺等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "安全工程",
+        "环境工程",
+        "化学工程与工艺"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科或硕士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "automation",
+      "title": "自动化工程师（绿色石化板块）",
+      "category": "自动化 / 仪表",
+      "city": "宁波、盘锦（绿色石化板块招聘表城市集合）",
+      "summary": "负责绿色石化生产过程自动化与仪表控制相关技术支持，明确属绿色石化板块2027岗位方向。",
+      "requirements": "企业2027校园招聘表该项要求硕士，专业方向包含自动化、测控技术与仪器、控制工程等；工作城市为公告列明的相关候选区域，不等于所有地点仍有空缺，实际技能、招聘实体和申请限制以官方单岗页面为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "自动化",
+        "测控技术与仪器",
+        "控制工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士（高校企业招聘表）",
+      "url": "https://kingfa.zhiye.com/",
+      "evidenceUrl": "https://jdjywpt.jlu.edu.cn/mportal/recruit/details?id=80f1320ef0ff4f56b45c90786637d8eb",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "金发科技股份有限公司",
+      "currentOpenVerified": false
+    }
+  ]
+}

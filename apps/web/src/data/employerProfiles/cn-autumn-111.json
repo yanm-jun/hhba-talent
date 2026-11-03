@@ -1,0 +1,584 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-111",
+  "name": "钱江摩托",
+  "displayName": "浙江钱江摩托股份有限公司",
+  "englishName": "QJMOTOR / Qianjiang Motorcycle",
+  "aliases": [
+    "浙江钱江摩托",
+    "QJMOTOR",
+    "钱江摩托2027届校园招聘",
+    "Benelli钱江"
+  ],
+  "industry": "摩托车制造 · 新能源三电 · 智能网联 · 品牌出行",
+  "subtitle": "2027届校招：2条高校独立职位，另18项公司公开方向；本批网申已截止",
+  "overview": "浙江钱江摩托股份有限公司成立于1985年，属吉利科技集团摩托车业务体系，旗下有QJMOTOR、Benelli和钱江品牌。2027届校招简章披露20项具名招聘方向，其中温州大学公开过研发设计和三电开发两条有明确工作地、硕士学历的独立职位。学校历史页面现在显示已过期；其他18项无独立职位编号，不是18个在招名额。整体秋招网申原截止2026-10-31。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://job.wzu.edu.cn/teachin/view/id/78035",
+    "https://www.jdjianli.com/campus/47718",
+    "https://campus.geely.com/campus-recruitment/geely/98148",
+    "https://www.jdjianli.com/campus/1617"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-111/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-111/photo1.svg",
+        "caption": "钱江摩托非实景占位图",
+        "alt": "钱江摩托仅供审核的非实景编辑示意图",
+        "note": "非实景：真实企业现场图片与版权待核，独立PR审核占位。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-111/photo2.svg",
+        "caption": "钱江摩托非实景占位图",
+        "alt": "钱江摩托仅供审核的非实景编辑示意图",
+        "note": "非实景：真实企业现场图片与版权待核，独立PR审核占位。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+    "label": "吉利科技集团官方校园招聘（钱江摩托所属业务）",
+    "status": "official_portal",
+    "subject": "浙江钱江摩托股份有限公司，实际聘用主体以各招聘岗位为准",
+    "note": "2027秋招原网申2026-08-13至2026-10-31。温州大学曾列2条具体职位但网页目前已显示过期；剩余18项仅为招聘方向，不冒充独立可投职位。"
+  },
+  "majorIntro": "20条公开名称中，仅研发设计工程师与三电开发工程师2条有高校明确岗位、硕士学历和台州温岭工作地。其余岗位名称来自2027校招整体简章，城市是全批招聘范围，专业筛选为HHBA编辑匹配。",
+  "preferredMajors": [
+    "机械工程",
+    "车辆工程",
+    "电气工程及其自动化",
+    "电子信息工程",
+    "工业设计",
+    "质量管理工程",
+    "软件工程",
+    "市场营销",
+    "物流管理"
+  ],
+  "photoNote": "两张图片区为显著标明非实景的编辑SVG；Logo为非企业官方字标。正式商用前需图片归属及版权授权。",
+  "business": [
+    {
+      "title": "整车与动力研发",
+      "description": "开展摩托车整车设计、动力系统研究及中大排量车型开发。",
+      "tags": "整车 · 研发",
+      "details": [
+        "摩托车设计",
+        "动力开发",
+        "机械研发"
+      ]
+    },
+    {
+      "title": "新能源电驱与智能网联",
+      "description": "面向电动摩托车开展电池、电驱、电控与车联网技术拓展。",
+      "tags": "新能源 · 网联",
+      "details": [
+        "三电技术",
+        "车载系统",
+        "智能互联"
+      ]
+    },
+    {
+      "title": "品牌及赛车技术",
+      "description": "经营QJMOTOR、Benelli和钱江品牌，并以摩托车赛事促进技术迭代。",
+      "tags": "品牌 · 全球",
+      "details": [
+        "QJMOTOR",
+        "Benelli",
+        "赛事技术"
+      ]
+    },
+    {
+      "title": "制造工艺与质量",
+      "description": "开展零部件与整车制造生产工艺、质量管理和持续改进。",
+      "tags": "制造 · 品控",
+      "details": [
+        "整车制造",
+        "工艺优化",
+        "供应商质量"
+      ]
+    },
+    {
+      "title": "采购及物流供应链",
+      "description": "为生产基地开展零部件采购、物料计划及物流配送协同。",
+      "tags": "采购 · 物流",
+      "details": [
+        "零件供应",
+        "物料管理",
+        "物流规划"
+      ]
+    },
+    {
+      "title": "数字化与企业职能",
+      "description": "开展信息系统开发、财务管理、人力资源与企业经营支撑工作。",
+      "tags": "数字 · 职能",
+      "details": [
+        "数字化开发",
+        "财务管理",
+        "人才服务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "style",
+      "title": "造型设计师（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "工业 / 设计",
+      "summary": "钱江摩托2027校园招聘简章明确列出“造型设计师”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工业设计",
+        "产品设计",
+        "交通工具设计"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "research",
+      "title": "研发设计工程师（高校独立职位）",
+      "city": "浙江台州温岭市（温州大学2027校招职位表）",
+      "category": "机械 / 研发",
+      "summary": "温州大学钱江摩托2027校园招聘职位表单列“研发设计工程师”岗位，工作地点浙江台州温岭市，属于企业整车和新能源研发职能；原学校页面现已提示资料过期。",
+      "requirements": "高校岗位表注明硕士学历，需求专业为机械、机械工程。具体职位要求和当前空缺请进入钱江摩托招聘系统核对。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "车辆工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招 · 硕士 · 历史高校职位",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://job.wzu.edu.cn/teachin/view/id/78035",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "school_individual_historic"
+    },
+    {
+      "id": "ev",
+      "title": "三电开发工程师（高校独立职位）",
+      "city": "浙江台州温岭市（温州大学2027校招职位表）",
+      "category": "新能源 / 三电",
+      "summary": "温州大学钱江摩托2027校园招聘职位表单列“三电开发工程师”岗位，工作地点浙江台州温岭市，属于企业整车和新能源研发职能；原学校页面现已提示资料过期。",
+      "requirements": "高校岗位表注明硕士学历，需求专业包含机械、机械工程、电子信息、电气工程。具体名额和申请状态以钱江摩托招聘系统为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "机械工程",
+        "电子信息工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招 · 硕士 · 历史高校职位",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://job.wzu.edu.cn/teachin/view/id/78035",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "school_individual_historic"
+    },
+    {
+      "id": "connected",
+      "title": "智能网联工程师（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "电子 / 智能网联",
+      "summary": "钱江摩托2027校园招聘简章明确列出“智能网联工程师”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "车辆工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "marketing",
+      "title": "市场营销岗（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "市场 / 营销",
+      "summary": "钱江摩托2027校园招聘简章明确列出“市场营销岗”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理",
+        "国际经济与贸易"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "brand",
+      "title": "品牌传播岗（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "品牌 / 传媒",
+      "summary": "钱江摩托2027校园招聘简章明确列出“品牌传播岗”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "传播学",
+        "广告学",
+        "市场营销"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "user",
+      "title": "用户运营岗（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "用户 / 运营",
+      "summary": "钱江摩托2027校园招聘简章明确列出“用户运营岗”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "电子商务",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "quality",
+      "title": "质量管理岗（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "质量 / 制造",
+      "summary": "钱江摩托2027校园招聘简章明确列出“质量管理岗”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "质量管理工程",
+        "机械工程",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "production",
+      "title": "生产管理岗（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "生产 / 管理",
+      "summary": "钱江摩托2027校园招聘简章明确列出“生产管理岗”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "工业工程",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "equipment",
+      "title": "设备工程师（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "机械 / 设备",
+      "summary": "钱江摩托2027校园招聘简章明确列出“设备工程师”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "process",
+      "title": "工艺工程师（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "工艺 / 机械",
+      "summary": "钱江摩托2027校园招聘简章明确列出“工艺工程师”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "材料成型及控制工程",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "logistics",
+      "title": "物流规划岗（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "物流 / 规划",
+      "summary": "钱江摩托2027校园招聘简章明确列出“物流规划岗”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "物流管理",
+        "供应链管理",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "sup-quality",
+      "title": "供应商质量岗（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "质量 / 供应链",
+      "summary": "钱江摩托2027校园招聘简章明确列出“供应商质量岗”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "质量管理工程",
+        "机械工程",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "purchase",
+      "title": "采购工程师（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "供应链 / 采购",
+      "summary": "钱江摩托2027校园招聘简章明确列出“采购工程师”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "机械工程",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "it",
+      "title": "数字化开发岗（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "IT / 软件",
+      "summary": "钱江摩托2027校园招聘简章明确列出“数字化开发岗”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "数据科学与大数据技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "digital-prod",
+      "title": "数字化产品岗（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "IT / 产品",
+      "summary": "钱江摩托2027校园招聘简章明确列出“数字化产品岗”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "信息管理与信息系统",
+        "计算机科学与技术",
+        "软件工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "energy",
+      "title": "能源基建岗（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "能源 / 工程",
+      "summary": "钱江摩托2027校园招聘简章明确列出“能源基建岗”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "能源与动力工程",
+        "土木工程",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "hr",
+      "title": "人力资源岗（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "职能 / 人事",
+      "summary": "钱江摩托2027校园招聘简章明确列出“人力资源岗”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "人力资源管理",
+        "工商管理",
+        "劳动与社会保障"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "finance",
+      "title": "财务管理岗（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "财务 / 会计",
+      "summary": "钱江摩托2027校园招聘简章明确列出“财务管理岗”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "会计学",
+        "财务管理",
+        "审计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    },
+    {
+      "id": "management",
+      "title": "经营管理岗（2027公告方向，非独立职位）",
+      "city": "杭州、台州、重庆（整批招聘地区，未逐岗核实）",
+      "category": "经营 / 综合",
+      "summary": "钱江摩托2027校园招聘简章明确列出“经营管理岗”这一岗位方向，但没有可核验的单独职位编号、部门和城市对应关系；不能把它当作已经确认的实时开放职位。",
+      "requirements": "公司公开2027届秋招仅列岗位名称，未给本岗位特定学历门槛与专业硬条件。专业仅为HHBA编辑匹配，不代表公司录用要求；原网申已于2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工商管理",
+        "经济学",
+        "财务管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校招公告方向 · 单岗学历待核",
+      "observedOn": "2026-11-03",
+      "evidenceUrl": "https://www.jdjianli.com/campus/47718",
+      "url": "https://campus.geely.com/campus-recruitment/geely/98148",
+      "currentOpenVerified": false,
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江钱江摩托股份有限公司",
+      "evidenceClass": "public_direction"
+    }
+  ]
+}

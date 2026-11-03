@@ -1,0 +1,27 @@
+{
+  "companyId": "097",
+  "observedOn": "2026-11-03",
+  "brand": {
+    "status": "inherited_brand_catalog_vector_not_rights_cleared",
+    "source": "https://github.com/glincker/thesvg/blob/main/public/icons/hsbc/default.svg",
+    "trademarkUseApproved": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_placeholder",
+      "asset": "images/employer-profiles/cn-autumn-097/photo1.svg",
+      "companyRealImage": false,
+      "commercialRightsVerified": false
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_placeholder",
+      "asset": "images/employer-profiles/cn-autumn-097/photo2.svg",
+      "companyRealImage": false,
+      "commercialRightsVerified": false
+    }
+  ],
+  "commercialRightsVerified": false,
+  "notes": "No photo represented as real workplace. Replace with verified licensed source before final publication."
+}

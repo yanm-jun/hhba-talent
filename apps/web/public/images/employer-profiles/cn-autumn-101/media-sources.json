@@ -1,0 +1,31 @@
+{
+  "companyId": "101",
+  "reviewDate": "2026-11-03",
+  "commercialReuseRightsVerified": false,
+  "brand": {
+    "status": "editorial_wordmark_fallback_not_official",
+    "verifiedOfficialSource": false,
+    "licenceVerified": false,
+    "notes": "不把编辑字标当成真正的企业Logo；正式发布前需要核对官方商标及使用许可。"
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "imageUrl": "https://yth.cn/file/ythjt/cn/image/20240322/1711102041099019815.jpg",
+      "articleUrl": "https://yth.cn/gywm/wh.html",
+      "sourceContext": "云天化集团官网企业文化页：云天化集团总部园区历史实景",
+      "status": "nonreal_svg_fallback",
+      "licenceVerified": false
+    },
+    {
+      "slot": 2,
+      "imageUrl": "https://www.ieisystem.com/global/upload/2025-04-23/17454042700022c975afc96440b021290196623395b23eda.png",
+      "articleUrl": "https://www.ieisystem.com/keyarchos/news/18217.html",
+      "sourceContext": "浪潮信息2025年报道：云天化石化智能化工厂历史实景，属云天化相关业务单位",
+      "status": "nonreal_svg_fallback",
+      "licenceVerified": false
+    }
+  ],
+  "sourcedImages": 0,
+  "notes": "Build attempts two independent historical site-associated photos for PRIVATE independent preview. Rights not confirmed; not approved for official commercial publication."
+}

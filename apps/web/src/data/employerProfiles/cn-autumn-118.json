@@ -1,0 +1,639 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-118",
+  "name": "屹唐半导体",
+  "displayName": "北京屹唐半导体科技股份有限公司",
+  "englishName": "Beijing E-Town Semiconductor Technology",
+  "aliases": [
+    "屹唐股份",
+    "北京屹唐半导体",
+    "BEST Semiconductor",
+    "E-Town Semiconductor"
+  ],
+  "industry": "半导体设备 · 干法去胶 · 干法刻蚀 · 快速热处理 · 晶圆加工",
+  "subtitle": "2027校招：21项高校详细职位＋1项仅次级名单方向；10月30日原投递截止",
+  "overview": "屹唐股份主要提供晶圆加工的干法去胶、干法刻蚀、快速热处理与毫秒级退火等设备。华中科技大学2026年10月22日发布的2027秋招宣讲资料逐项披露21种岗位名称、学历专业和工作地点；其中整机测试、制造电气还能找到公司官方北森独立岗位页。另有材料工程师出现在第三方校招方向清单，却未在这份大学详细职位表中发现，故单独标记为次级方向。招聘简历筛选安排在2026年9月15日至10月30日；11月仍有面试和Offer不等于持续接收网申。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://job.hust.edu.cn/extxjh/421789354924432.do",
+    "https://jobs.tiangong.edu.cn/correcruit/content/id/56162.html",
+    "https://bestsemi.zhiye.com/",
+    "https://bestsemi.zhiye.com/campus/detail?jobAdId=ce112770-c64b-4aac-8f34-e283733c4766",
+    "https://bestsemi.zhiye.com/campus/detail?jobAdId=588eb45f-96eb-4254-ace9-6d010a46d670",
+    "https://www.jdjianli.com/campus/49219",
+    "https://www.bestsemi.com/"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-118/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-118/photo1.svg",
+        "caption": "屹唐半导体：图片审核占位（非实景）",
+        "alt": "屹唐半导体非实景图片占位，不代表公司真实厂区或办公室",
+        "note": "非实景编辑图；真实照片、来源和转载授权均需单独审核。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-118/photo2.svg",
+        "caption": "屹唐半导体：图片审核占位（非实景）",
+        "alt": "屹唐半导体非实景图片占位，不代表公司真实厂区或办公室",
+        "note": "非实景编辑图；真实照片、来源和转载授权均需单独审核。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://bestsemi.zhiye.com/",
+    "label": "屹唐半导体官方北森招聘网站（原2027秋招已结束）",
+    "status": "official_portal",
+    "subject": "北京屹唐半导体科技股份有限公司，具体员工合同主体由原职位确认",
+    "note": "2027届秋招原简历筛选2026-09-15至2026-10-30；面试截至11月6日、发放Offer至11月20日。高校21项逐行公布，另1条材料工程师仅见次级汇总；全部当前开放状态未核验。"
+  },
+  "photoNote": "本批图片暂为显著标注的非实景占位，Logo为编辑字标，非企业授权商标。未经授权真实照片不进入正式站。",
+  "majorIntro": "华中科技大学公开21项具名岗位及学历、专业、城市，明确保留跨城职位的一条记录；材料工程师只见二手名单，暂不伪造专业和城市硬门槛。仿真工程师的工作地两校信息不一致，已清楚注明待企业核对。",
+  "preferredMajors": [
+    "机械工程",
+    "微电子科学与工程",
+    "电气工程及其自动化",
+    "自动化",
+    "软件工程",
+    "电子信息工程",
+    "材料科学与工程",
+    "化学工程与工艺",
+    "安全工程",
+    "物流管理"
+  ],
+  "business": [
+    {
+      "title": "干法去胶与表面处理",
+      "description": "研发和生产面向半导体晶圆加工的干法去胶及先进表面材料去除设备。",
+      "tags": "去胶 · 工艺",
+      "details": [
+        "干法去胶",
+        "表面处理",
+        "工艺应用"
+      ]
+    },
+    {
+      "title": "干法刻蚀设备",
+      "description": "开展等离子体刻蚀和高选择比刻蚀相关设备与工艺技术开发。",
+      "tags": "刻蚀 · 等离子",
+      "details": [
+        "干法刻蚀",
+        "等离子工艺",
+        "晶圆技术"
+      ]
+    },
+    {
+      "title": "热处理与退火",
+      "description": "提供快速热处理和毫秒级退火装备，满足集成电路制造中的热工艺要求。",
+      "tags": "热处理 · 设备",
+      "details": [
+        "RTP",
+        "毫秒级退火",
+        "热控制"
+      ]
+    },
+    {
+      "title": "机械电气设备研发",
+      "description": "围绕半导体设备结构、精密机械、电气自动化与系统集成开展工程研发。",
+      "tags": "机械 · 电气",
+      "details": [
+        "系统集成",
+        "机械研发",
+        "自动化控制"
+      ]
+    },
+    {
+      "title": "设备测试与制造",
+      "description": "开展半导体设备整机测试、装配、质量管理、采购和工厂物料计划。",
+      "tags": "制造 · 测试",
+      "details": [
+        "整机验证",
+        "质量管理",
+        "产线计划"
+      ]
+    },
+    {
+      "title": "全球技术支持服务",
+      "description": "向集成电路制造客户提供产品支持、现场工艺与设备调试及工程服务。",
+      "tags": "全球 · 服务",
+      "details": [
+        "现场设备",
+        "工艺支持",
+        "客户服务"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "product-support",
+      "title": "产品支持工程师（2027高校职位表）",
+      "city": "北京",
+      "category": "机械 / 技术支持",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“产品支持工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求硕士及以上，专业方向包括机械工程、机械设计制造及其自动化、机电一体化技术。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "机电一体化技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "system",
+      "title": "系统工程师（2027高校职位表）",
+      "city": "北京",
+      "category": "机械 / 系统",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“系统工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求硕士及以上，专业方向包括机械工程、机械设计制造及其自动化、自动化。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "process-rd",
+      "title": "研发工艺工程师（2027高校职位表）",
+      "city": "北京",
+      "category": "半导体 / 工艺",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“研发工艺工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求硕士及以上，博士优先，专业方向包括微电子科学与工程、应用化学、化学工程与工艺、材料科学与工程、物理学。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "应用化学",
+        "化学工程与工艺",
+        "材料科学与工程",
+        "物理学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上，博士优先",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "temperature",
+      "title": "温度测量控制工程师（2027高校职位表）",
+      "city": "北京",
+      "category": "热学 / 光学",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“温度测量控制工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求硕士及以上，专业方向包括能源与动力工程、光电信息科学与工程、应用物理学。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "能源与动力工程",
+        "光电信息科学与工程",
+        "应用物理学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "system-integration",
+      "title": "系统集成工程师（2027高校职位表）",
+      "city": "北京",
+      "category": "机械 / 系统",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“系统集成工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求硕士及以上，专业方向包括机械工程、电子信息工程、电气工程及其自动化、自动化。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "电子信息工程",
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "software",
+      "title": "软件工程师（2027高校职位表）",
+      "city": "北京",
+      "category": "软件 / 开发",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“软件工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求本科及以上，专业方向包括软件工程、电子信息工程、计算机科学与技术。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "软件工程",
+        "电子信息工程",
+        "计算机科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "simulation",
+      "title": "仿真工程师（2027高校职位表）",
+      "city": "北京或上海（两所高校公告不一致，待公司复核）",
+      "category": "半导体 / 仿真",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“仿真工程师”岗位、专业、学历与工作地点。仿真工程师地区在另一所高校公告写成上海，与该校北京信息冲突，需要向企业复核。",
+      "requirements": "公开高校2027招聘资料要求硕士及以上，专业方向包括物理学、机械工程、电子信息工程、材料科学与工程、化学工程与工艺。城市为高校列示的岗位候选范围，实际空缺需在招聘系统确认。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "物理学",
+        "机械工程",
+        "电子信息工程",
+        "材料科学与工程",
+        "化学工程与工艺"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "rf",
+      "title": "研发射频工程师（2027高校职位表）",
+      "city": "北京",
+      "category": "半导体 / 射频",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“研发射频工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求硕士及以上，专业方向包括应用物理学、微电子科学与工程、电子科学与技术。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "应用物理学",
+        "微电子科学与工程",
+        "电子科学与技术"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "mechanical",
+      "title": "机械工程师（2027高校职位表）",
+      "city": "北京",
+      "category": "机械 / 研发",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“机械工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求硕士及以上，专业方向包括机械工程、机械设计制造及其自动化。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "electrical",
+      "title": "电气工程师（2027高校职位表）",
+      "city": "北京",
+      "category": "电气 / 研发",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“电气工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求硕士及以上，专业方向包括电气工程及其自动化、电子信息工程、自动化。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "电子信息工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "field-equipment",
+      "title": "现场设备工程师（2027高校职位表）",
+      "city": "重庆、北京、上海、无锡、武汉、合肥（高校列出候选城市，非每地均有名额）",
+      "category": "设备 / 现场",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“现场设备工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求本科及以上，专业方向包括机械工程、电气工程及其自动化、自动化。城市为高校列示的岗位候选范围，实际空缺需在招聘系统确认。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "field-process",
+      "title": "现场工艺工程师（2027高校职位表）",
+      "city": "北京、青岛、合肥、上海、武汉、广州、成都、无锡、深圳（岗位候选地区）",
+      "category": "工艺 / 现场",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“现场工艺工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求硕士及以上，专业方向包括应用化学、材料科学与工程、物理学、微电子科学与工程。城市为高校列示的岗位候选范围，实际空缺需在招聘系统确认。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "应用化学",
+        "材料科学与工程",
+        "物理学",
+        "微电子科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 硕士及以上",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "sales-ops",
+      "title": "销售运营专员（2027高校职位表）",
+      "city": "北京、上海（高校列出候选城市）",
+      "category": "销售 / 运营",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“销售运营专员”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求本科及以上，专业方向包括工商管理、市场营销、机械工程。城市为高校列示的岗位候选范围，实际空缺需在招聘系统确认。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工商管理",
+        "市场营销",
+        "机械工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "logistics",
+      "title": "物流管理员（2027高校职位表）",
+      "city": "上海",
+      "category": "供应链 / 物流",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“物流管理员”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求本科及以上，专业方向包括物流管理、物流工程、工业工程。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "物流管理",
+        "物流工程",
+        "工业工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "mfg-mech",
+      "title": "制造机械工程师（2027高校职位表）",
+      "city": "北京",
+      "category": "机械 / 制造",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“制造机械工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求本科及以上，专业方向包括机械工程、机械设计制造及其自动化、自动化。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "机械设计制造及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "mfg-elec",
+      "title": "制造电气工程师（2027高校职位表）",
+      "city": "北京",
+      "category": "电气 / 制造",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“制造电气工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求本科及以上，专业方向包括电气工程及其自动化、自动化。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上",
+      "url": "https://bestsemi.zhiye.com/campus/detail?jobAdId=588eb45f-96eb-4254-ace9-6d010a46d670",
+      "evidenceUrl": "https://bestsemi.zhiye.com/campus/detail?jobAdId=588eb45f-96eb-4254-ace9-6d010a46d670",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "official_job_page"
+    },
+    {
+      "id": "machine-test",
+      "title": "整机测试工程师（2027高校职位表）",
+      "city": "北京",
+      "category": "测试 / 设备",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“整机测试工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求本科及以上，专业方向包括机械工程、电气工程及其自动化、测控技术与仪器。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "电气工程及其自动化",
+        "测控技术与仪器"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科及以上",
+      "url": "https://bestsemi.zhiye.com/campus/detail?jobAdId=ce112770-c64b-4aac-8f34-e283733c4766",
+      "evidenceUrl": "https://bestsemi.zhiye.com/campus/detail?jobAdId=ce112770-c64b-4aac-8f34-e283733c4766",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "official_job_page"
+    },
+    {
+      "id": "quality",
+      "title": "质量工程师（2027高校职位表）",
+      "city": "北京",
+      "category": "质量 / 芯片设备",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“质量工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求本科，专业方向包括微电子科学与工程、电气工程及其自动化。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "微电子科学与工程",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "procurement",
+      "title": "采购工程师（2027高校职位表）",
+      "city": "北京",
+      "category": "采购 / 供应链",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“采购工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求本科，专业方向包括机械工程、电子信息工程、工业工程、自动化、国际经济与贸易、供应链管理。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "电子信息工程",
+        "工业工程",
+        "自动化",
+        "国际经济与贸易",
+        "供应链管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "ehs",
+      "title": "EHS工程师（2027高校职位表）",
+      "city": "北京",
+      "category": "安全 / 环境",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“EHS工程师”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求本科，专业方向包括安全工程、环境工程。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "安全工程",
+        "环境工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "materials-plan",
+      "title": "生产与物料计划（2027高校职位表）",
+      "city": "北京",
+      "category": "制造 / 计划",
+      "summary": "屹唐半导体2027届招聘在华中科技大学校招宣讲中逐条列明“生产与物料计划”岗位、专业、学历与工作地点。由于高校公告多为岗位名称和资格表，具体逐日工作任务请以企业单岗职位详情为准。",
+      "requirements": "公开高校2027招聘资料要求本科，专业方向包括工业工程、物流管理、物流工程、自动化。工作地见高校公告，实际录用条件以屹唐企业官方岗位页为准。原2027秋招简历筛选10月30日结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "工业工程",
+        "物流管理",
+        "物流工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 本科",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://job.hust.edu.cn/extxjh/421789354924432.do",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "university_named_job_table"
+    },
+    {
+      "id": "material-extra",
+      "title": "材料工程师（仅见次级招聘方向，非高校单岗）",
+      "city": "北京、上海等（企业全批校招城市，未单独确认）",
+      "category": "半导体 / 材料",
+      "summary": "材料工程师出现在屹唐2027次级校园招聘岗位方向汇总中，但未出现在已核阅的华中科技大学21条具名岗位及学历、城市明细里；因此仅归档为额外方向，不冒充独立职位。",
+      "requirements": "原次级招聘汇总未单独提供材料工程师具体学历、真实职位编号、职位地区或招聘人数。专业关联为HHBA编辑推荐，不代表该公司确有实时开放该岗；10月30日该轮投递结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "材料科学与工程",
+        "微电子科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届校招方向 · 学历及工作地待核",
+      "url": "https://bestsemi.zhiye.com/",
+      "evidenceUrl": "https://www.jdjianli.com/campus/49219",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "北京屹唐半导体科技股份有限公司",
+      "currentOpenVerified": false,
+      "evidenceClass": "thirdparty_named_direction"
+    }
+  ]
+}

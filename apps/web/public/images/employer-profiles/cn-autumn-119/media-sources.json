@@ -1,0 +1,28 @@
+{
+  "companyId": "119",
+  "name": "飞骧科技",
+  "reviewDate": "2026-11-03",
+  "officialLogoPermissionVerified": false,
+  "commercialImageUsageVerified": false,
+  "brand": {
+    "status": "nonofficial_editorial_wordmark",
+    "officialLogo": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_placeholder",
+      "candidateSource": "https://www.lansus.com/about/careers",
+      "actualWorkplacePhoto": false,
+      "commercialRightsVerified": false
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_placeholder",
+      "candidateSource": "https://www.lansus.com/en/about/careers",
+      "actualWorkplacePhoto": false,
+      "commercialRightsVerified": false
+    }
+  ],
+  "notes": "Pictures are deliberately non-real editorial illustrations clearly marked as such; corporate sites may display authentic visual material but reuse permissions are not established. Do not present as official workplace photos or official logos."
+}

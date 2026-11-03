@@ -1,0 +1,396 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-093",
+  "name": "中国华能",
+  "displayName": "中国华能集团有限公司",
+  "englishName": "China Huaneng Group",
+  "aliases": [
+    "华能",
+    "华能集团",
+    "China Huaneng",
+    "华能2027校园招聘"
+  ],
+  "industry": "综合能源 · 火电、水电、风电、光伏 · 发电技术与运营",
+  "subtitle": "2027届秋招 · 太仓 / 宁夏 / 云南 / 河北等属地单位（原报名已截止）",
+  "overview": "中国华能是以电力为核心的综合能源企业。2027届校招由不同子公司、发电厂及区域单位分别发布岗位。2026年9月15日至10月31日的秋季网申窗口已经结束；华能招聘系统明确提示本轮秋招报名已截止。以下只收录有独立官方公告可核的岗位名称及专业，具体单位、场站和专业录用条件按原公告执行。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://zhaopin.chng.com.cn/Home/",
+    "https://zhaopin.chng.com.cn/know",
+    "https://zhaopin.chng.com.cn/CampusRecruit?positionId=2000957",
+    "https://zhaopin.chng.com.cn/CampusRecruit?aId=2000093",
+    "https://zhaopin.chng.com.cn/CampusRecruit?aId=2000056",
+    "https://zhaopin.chng.com.cn/CampusRecruit?aId=2000137"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-093/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-093/photo1.svg",
+        "caption": "中国华能业务图片待核（当前为非实景编辑示意）",
+        "alt": "中国华能业务场景非实景示意，不是企业真实办公照片",
+        "note": "非实景：如审查构建能取得来源可核的真实照片，才以该来源图片替换；商业使用权未取得。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-093/photo2.svg",
+        "caption": "中国华能业务图片待核（当前为非实景编辑示意）",
+        "alt": "中国华能业务场景非实景示意，不是企业真实办公照片",
+        "note": "非实景：如审查构建能取得来源可核的真实照片，才以该来源图片替换；商业使用权未取得。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://zhaopin.chng.com.cn/Home/",
+    "label": "中国华能官方招聘系统（秋招已截止）",
+    "status": "official_portal",
+    "subject": "中国华能所属子公司及区域单位，各岗位属地主体按原招聘公告确认",
+    "note": "官方官网显示2027秋招报名已截止；常规秋招为2026-09-15至10-31。当前所有收录条目为招聘历史记录，不应显示“正在招”。春招时间以另行公告为准。"
+  },
+  "majorIntro": "本页是逐家华能所属单位2027年秋招官方公告中的具名岗位。专业关系来源于对应公告；具体地理位置、学历学位与网申期须按原文件审核。已截止的秋招岗位不计作实时可投递机会。",
+  "preferredMajors": [
+    "电气工程及其自动化",
+    "机械工程",
+    "自动化",
+    "能源与动力工程",
+    "新能源科学与工程",
+    "计算机科学与技术",
+    "网络工程",
+    "会计学",
+    "财务管理",
+    "审计学",
+    "储能科学与工程"
+  ],
+  "photoNote": "历史招聘来源与真实招聘机会分开标识。来源照片的拍摄日期可能早于2026年，不代表今日办公现状。发布前还需取得素材使用权。",
+  "business": [
+    {
+      "title": "火电与综合能源",
+      "description": "旗下燃煤及燃气发电企业承担发电、供热及综合能源服务，建设数字化集控和节能减排体系。",
+      "tags": "发电 · 供热",
+      "details": [
+        "集控与检修",
+        "智慧电厂",
+        "综合能源服务"
+      ]
+    },
+    {
+      "title": "风电与光伏",
+      "description": "通过区域新能源公司建设、运营风电与光伏场站，推进配套储能及新能源设备检修。",
+      "tags": "新能源 · 运维",
+      "details": [
+        "陆上与海上风电",
+        "集中式与分布式光伏",
+        "场站运营"
+      ]
+    },
+    {
+      "title": "水电与调度",
+      "description": "旗下水电业务涉及水电站运行、调度及流域开发，岗位随具体项目和单位计划发布。",
+      "tags": "水电 · 调度",
+      "details": [
+        "机组运行",
+        "工程技术",
+        "调度保障"
+      ]
+    },
+    {
+      "title": "能源技术与研发",
+      "description": "下属科研机构开展热工、电气、数字控制及清洁能源技术研发，相关岗位资格依官方公告。",
+      "tags": "科研 · 技术",
+      "details": [
+        "能源技术研发",
+        "智能控制",
+        "技术服务"
+      ]
+    },
+    {
+      "title": "核电与安全保障",
+      "description": "在核能相关产业开展项目开发与技术支持，不能将集团核电业务等同于本批已核实招聘职位。",
+      "tags": "核能 · 安全",
+      "details": [
+        "核电工程",
+        "运行支持",
+        "安全管理"
+      ]
+    },
+    {
+      "title": "经营与职能支持",
+      "description": "财务、审计、人力资源及信息网络部门支撑所属单位经营、工程项目和运行维护。",
+      "tags": "管理 · 信息化",
+      "details": [
+        "财务与审计",
+        "信息网络",
+        "组织管理"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "tc-control",
+      "title": "集控运行岗（华能太仓电厂）",
+      "category": "集控 / 电气",
+      "city": "苏州太仓（太仓电厂）",
+      "summary": "官方太仓电厂2027年毕业生招聘公告将集控运行岗列为明确招聘岗位，面向发电机组集控生产。工作地点以太仓电厂具体部门安排为准。",
+      "requirements": "公告将热能发电、能源动力、电气、自动化和控制等相关专业列入招聘范围，但未逐岗拆分全部专业门槛；统一报名期至2026年10月31日18时。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "能源与动力工程",
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 原2026秋招已截止",
+      "url": "https://zhaopin.chng.com.cn/Home/",
+      "evidenceUrl": "https://zhaopin.chng.com.cn/CampusRecruit?positionId=2000957",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国华能集团有限公司所属单位（准确用人单位以对应公告为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "tc-maintenance",
+      "title": "检修岗（华能太仓电厂）",
+      "category": "设备 / 检修",
+      "city": "苏州太仓（太仓电厂）",
+      "summary": "华能太仓电厂2027届正式公告明确检修岗，涉及发电设备检修和维护方向；岗位职责仅为官网公布职能的简明解释，不充当逐岗JD。",
+      "requirements": "招聘公告为专业组口径，涵盖能源动力、电气、机械或控制相关学科，实际岗位要求以招聘系统为准；2026年10月31日截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械工程",
+        "电气工程及其自动化",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 原2026秋招已截止",
+      "url": "https://zhaopin.chng.com.cn/Home/",
+      "evidenceUrl": "https://zhaopin.chng.com.cn/CampusRecruit?positionId=2000957",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国华能集团有限公司所属单位（准确用人单位以对应公告为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "tc-management",
+      "title": "综合管理岗（华能太仓电厂）",
+      "category": "综合 / 管理",
+      "city": "苏州太仓（太仓电厂）",
+      "summary": "太仓电厂2027届官方招聘公告列有综合管理岗，涉及发电企业经营支持与行政专业职能。不能由此认定所有管理类专业均可报考。",
+      "requirements": "公告整体专业范围包括财务管理、企业管理等，缺少独立职位资格细则，专业关联为辅助理解；原2026年10月31日已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "财务管理",
+        "会计学",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 原2026秋招已截止",
+      "url": "https://zhaopin.chng.com.cn/Home/",
+      "evidenceUrl": "https://zhaopin.chng.com.cn/CampusRecruit?positionId=2000957",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国华能集团有限公司所属单位（准确用人单位以对应公告为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "nx-wind",
+      "title": "风电运维岗（宁夏基地中心）",
+      "category": "风电 / 运维",
+      "city": "宁夏东、西部基地中心所属电站",
+      "summary": "华能宁夏能源有限公司东部、西部基地中心2027公告明确风电运维岗位，实际办公场所为所属风电场站，而不是统一银川市区。",
+      "requirements": "官方岗位列出机械设计制造及其自动化、能源与动力工程、储能科学与工程、电气工程及其自动化等专业，要求2027年本科及以上应届毕业生；秋招窗口至10月31日。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "机械设计制造及其自动化",
+        "能源与动力工程",
+        "储能科学与工程",
+        "电气工程及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 原2026秋招已截止",
+      "url": "https://zhaopin.chng.com.cn/Home/",
+      "evidenceUrl": "https://zhaopin.chng.com.cn/CampusRecruit?aId=2000093",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国华能集团有限公司所属单位（准确用人单位以对应公告为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "nx-solar",
+      "title": "光伏运维岗（宁夏基地中心）",
+      "category": "光伏 / 运维",
+      "city": "宁夏东、西部基地中心所属电站",
+      "summary": "宁夏东、西部基地中心正式2027招聘公告明确光伏运维方向，现场从事光伏发电相关运行及设备维护，具体站点按原公告。",
+      "requirements": "官方列出电力系统及其自动化、自动化、新能源科学与工程、光伏发电相关技术、机械工程等专业，本科及以上；不把所有项目所在地推断为银川。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "自动化",
+        "新能源科学与工程",
+        "机械工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 原2026秋招已截止",
+      "url": "https://zhaopin.chng.com.cn/Home/",
+      "evidenceUrl": "https://zhaopin.chng.com.cn/CampusRecruit?aId=2000093",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国华能集团有限公司所属单位（准确用人单位以对应公告为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "nx-network",
+      "title": "信息网络岗（华能宁夏东部基地）",
+      "category": "网络 / 信息化",
+      "city": "宁夏东部基地中心（具体站点以公告为准）",
+      "summary": "华能宁夏能源东部基地中心2027届公开岗位中列有信息网络岗，面向场站信息网络与基础设施支持方向，未提供可独立确认的办公室地址。",
+      "requirements": "专业范围包含计算机信息管理、计算机应用、大数据技术应用、网络工程和网络安全等；原公告为本科及以上，未证明当前重新开放。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "网络工程",
+        "计算机科学与技术",
+        "网络空间安全"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 原2026秋招已截止",
+      "url": "https://zhaopin.chng.com.cn/Home/",
+      "evidenceUrl": "https://zhaopin.chng.com.cn/CampusRecruit?aId=2000093",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国华能集团有限公司所属单位（准确用人单位以对应公告为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "yn-repair",
+      "title": "检修员岗（华能云南新能源）",
+      "category": "设备 / 检修",
+      "city": "云南省内外新能源场站及项目现场",
+      "summary": "华能新能源云南分公司2027年校招公告列明检修员岗，直接注明工作地点是云南省内外新能源场站和项目现场，不能统一写成昆明。",
+      "requirements": "公告明确电气工程及其自动化、电力系统及其自动化、电子信息工程等相关专业；本科及以上，要求2027年取得学历学位；原秋招已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "电子信息工程",
+        "自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 原2026秋招已截止",
+      "url": "https://zhaopin.chng.com.cn/Home/",
+      "evidenceUrl": "https://zhaopin.chng.com.cn/CampusRecruit?aId=2000056",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国华能集团有限公司所属单位（准确用人单位以对应公告为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "yn-finance",
+      "title": "财务管理岗（华能云南新能源）",
+      "category": "财务 / 审计",
+      "city": "云南昆明",
+      "summary": "华能新能源云南分公司2027官方校园招聘将财务管理岗与检修员岗分别列示，明确财务岗位在云南省昆明市。",
+      "requirements": "公告具体涉及财务管理、会计学、税收学、财政学及金融工程等专业，并附学历学位及报名材料要求；已结束的秋招不表示仍可投递。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "财务管理",
+        "会计学",
+        "财政学",
+        "经济学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 原2026秋招已截止",
+      "url": "https://zhaopin.chng.com.cn/Home/",
+      "evidenceUrl": "https://zhaopin.chng.com.cn/CampusRecruit?aId=2000056",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国华能集团有限公司所属单位（准确用人单位以对应公告为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hb-audit",
+      "title": "审计管理岗（河北区域华能所属单位）",
+      "category": "财务 / 审计",
+      "city": "河北省（具体单位及岗位地点核官网）",
+      "summary": "河北区域华能所属单位2027届公开招聘公告明确审计管理岗，与财务管理岗及生产技术岗位分列，不将区域联系电话当成精确办公地址。",
+      "requirements": "专业明确涵盖审计学、统计学、税收学、会计学、财政学等，招聘主体和详细岗位驻地以原公告核验；2027校招历史记录。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "审计学",
+        "会计学",
+        "统计学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 原2026秋招已截止",
+      "url": "https://zhaopin.chng.com.cn/Home/",
+      "evidenceUrl": "https://zhaopin.chng.com.cn/CampusRecruit?aId=2000137",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国华能集团有限公司所属单位（准确用人单位以对应公告为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hb-finance",
+      "title": "财务管理岗（河北区域华能所属单位）",
+      "category": "财务 / 审计",
+      "city": "河北省（单岗工作地点未披露）",
+      "summary": "2027官方招聘公告在河北区域分别列明财务管理岗和审计管理岗，此条只归属该公告发布的华能所属招聘单位。",
+      "requirements": "招聘专业注明财务管理、会计、税收、财政及经济等相关学科，未公开的具体薪酬和每岗人数不在HHBA编造；秋招已结束。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "财务管理",
+        "会计学",
+        "经济学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 原2026秋招已截止",
+      "url": "https://zhaopin.chng.com.cn/Home/",
+      "evidenceUrl": "https://zhaopin.chng.com.cn/CampusRecruit?aId=2000137",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国华能集团有限公司所属单位（准确用人单位以对应公告为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hb-control",
+      "title": "集控运行岗（河北区域华能所属单位）",
+      "category": "集控 / 电气",
+      "city": "河北省（单岗地点以原公告为准）",
+      "summary": "河北区域华能招聘公告列有集控运行岗，面向电力系统控制、测控、自动化与计算机等专业方向，不将其与太仓电厂同名岗位合并。",
+      "requirements": "官方招生专业包括电力系统及其自动化、通信工程、测控技术与仪器、自动化、电气工程类、计算机类；招聘状态未显示新的报名窗口。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "自动化",
+        "通信工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 原2026秋招已截止",
+      "url": "https://zhaopin.chng.com.cn/Home/",
+      "evidenceUrl": "https://zhaopin.chng.com.cn/CampusRecruit?aId=2000137",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国华能集团有限公司所属单位（准确用人单位以对应公告为准）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "hb-repair",
+      "title": "场站检修岗（河北区域华能所属单位）",
+      "category": "设备 / 检修",
+      "city": "河北省（具体场站以原公告为准）",
+      "summary": "河北区域华能所属单位2027年校园公告明确场站检修岗，属于新能源设备与场站运维方向。未确认具体项目名称，因此只展示河北区域。",
+      "requirements": "官方列出电气、新能源、能源动力、材料成型、机械设计制造等专业，最终专业及资格以岗位页面为准；2026年秋招已截止。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电气工程及其自动化",
+        "新能源科学与工程",
+        "能源与动力工程",
+        "机械设计制造及其自动化"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027届 · 原2026秋招已截止",
+      "url": "https://zhaopin.chng.com.cn/Home/",
+      "evidenceUrl": "https://zhaopin.chng.com.cn/CampusRecruit?aId=2000137",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "中国华能集团有限公司所属单位（准确用人单位以对应公告为准）",
+      "currentOpenVerified": false
+    }
+  ]
+}

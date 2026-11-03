@@ -1,0 +1,35 @@
+{
+  "companyId": "106",
+  "checkedAt": "2026-11-03",
+  "brand": {
+    "status": "editorial_label_not_official_logo",
+    "copyrightStatus": "unverified",
+    "approvedToPublishAsCorporateLogo": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": {
+        "sourcePage": "https://www.sohu.com/a/591893879_121284943",
+        "mediaUrl": "https://p5.itc.cn/q_70/images03/20221011/64667b4b88cc4abb9afda84920a93911.jpeg",
+        "description": "媒体报道展示的中国信达标识建筑历史实景，非企业官方授权素材"
+      },
+      "actualCompanyPhotoDisplayed": false,
+      "commercialUsageApproved": false
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": {
+        "sourcePage": "https://www.cinda.com.cn/",
+        "mediaUrl": null,
+        "description": "中国信达官网（无可确认商用授权的第二张实景图）"
+      },
+      "actualCompanyPhotoDisplayed": false,
+      "commercialUsageApproved": false
+    }
+  ],
+  "commercialUsageApproved": false,
+  "notes": "候选图片仅供审计归属，不将网上可见等同可转载；页面两张图片均显著注明非实景。"
+}

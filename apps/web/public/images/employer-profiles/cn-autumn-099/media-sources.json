@@ -1,0 +1,31 @@
+{
+  "companyId": "099",
+  "reviewDate": "2026-11-03",
+  "commercialReuseRightsVerified": false,
+  "brand": {
+    "status": "editorial_wordmark_fallback_not_official",
+    "verifiedOfficialSource": false,
+    "licenceVerified": false,
+    "notes": "不把编辑字标当成真正的企业Logo；正式发布前需要核对官方商标及使用许可。"
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "imageUrl": "https://img.21jingji.com/uploadfile/cover/20241024/1729736405538542.jpg",
+      "articleUrl": "https://m.21jingji.com/article/20241024/herald/baaf1ace9df8fe016dda70e9a2014308_zaker.html",
+      "sourceContext": "21世纪经济报道：波士顿科学2024年上海临港工厂外景（历史实景）",
+      "status": "nonreal_svg_fallback",
+      "licenceVerified": false
+    },
+    {
+      "slot": 2,
+      "imageUrl": "https://en.lingang.gov.cn/upload/1/cms/content/editor/1729071346463.png",
+      "articleUrl": "https://en.lingang.gov.cn/html/website/lg/English/News1630758253379031042/Updates/c1846485591469936641.html",
+      "sourceContext": "上海临港管委会英文网：2024年波士顿科学中国工厂启用仪式（历史活动）",
+      "status": "nonreal_svg_fallback",
+      "licenceVerified": false
+    }
+  ],
+  "sourcedImages": 0,
+  "notes": "Build attempts two independent historical site-associated photos for PRIVATE independent preview. Rights not confirmed; not approved for official commercial publication."
+}

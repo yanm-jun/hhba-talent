@@ -1,0 +1,423 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-103",
+  "name": "浙江省交通集团",
+  "displayName": "浙江省交通投资集团有限公司",
+  "englishName": "Zhejiang Communications Investment Group",
+  "aliases": [
+    "浙江交投",
+    "浙江交通集团",
+    "ZCIG",
+    "浙江省交通投资集团",
+    "浙江交工"
+  ],
+  "industry": "交通基建 · 高速公路 · 铁路 · 工程施工 · 交通数字科技",
+  "subtitle": "2027届校园招聘 · 浙江交工旗下真实岗位，杭州富阳、临安等",
+  "overview": "浙江交通集团2027届集团招聘覆盖23家参与单位。集团综合公告仅明确各下属企业招聘人数而不是逐岗位JD。本页从集团成员浙江交工集团股份有限公司2027年公开校招计划逐行录入岗位名称、部门、地点、学历和专业；这不是将集团全部岗位误写成已核实。具体职位如有截止及实时状态变化，以各成员单位官网查询为准。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://www.cncico.com/content/82659",
+    "https://www.djdzp.cn/a/236",
+    "https://www.cncico.com/content/82696",
+    "https://job.tiangong.edu.cn/correcruit/content/id/56355.html"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-103/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-103/photo1.svg",
+        "caption": "浙江省交通集团图像素材待核验（非真实办公照片）",
+        "alt": "浙江省交通集团的编辑信息示意，并非企业现场实拍",
+        "note": "非实景：来源、商用许可和真实场景待审，暂以显著标注的编辑占位图展示。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-103/photo2.svg",
+        "caption": "浙江省交通集团图像素材待核验（非真实办公照片）",
+        "alt": "浙江省交通集团的编辑信息示意，并非企业现场实拍",
+        "note": "非实景：来源、商用许可和真实场景待审，暂以显著标注的编辑占位图展示。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://www.cncico.com/content/82659",
+    "label": "浙江交通集团2027届官方校园招聘公告",
+    "status": "official_portal",
+    "subject": "浙江交工集团股份有限公司及直属/关联单位（按岗位原始招聘单位核对）",
+    "note": "集团2027年公开23家成员企业招聘计划；本页岗位来源于浙江交工具体2027招聘表。公告原文与实际招聘系统的实时投递情况不同；不承诺截至11月3日仍有空缺。"
+  },
+  "majorIntro": "以下13条均为浙江交工2027公开招聘表中的具名校园岗位，避免将其他22家集团成员的招聘人数伪装成本站具体岗位。每条保留单位、实际工作地和原始学历专业限制。",
+  "preferredMajors": [
+    "土木工程",
+    "道路桥梁与渡河工程",
+    "材料科学与工程",
+    "化学工程与工艺",
+    "法学",
+    "计算机科学与技术",
+    "软件工程",
+    "人工智能",
+    "交通运输工程",
+    "工程管理",
+    "会计学",
+    "机械工程",
+    "物流管理"
+  ],
+  "photoNote": "本独立审核版的两幅企业图片区暂为带明显声明的非实景示意；正式上线前需要可核验、获得使用许可的企业真实照片与品牌Logo。",
+  "business": [
+    {
+      "title": "高速公路与交通基础设施",
+      "description": "作为浙江省综合交通投融资主平台，参与高速公路等大型基础设施投资建设及管理。",
+      "tags": "公路 · 建设",
+      "details": [
+        "路网投资",
+        "项目建设",
+        "设施管理"
+      ]
+    },
+    {
+      "title": "轨道交通及铁路运营",
+      "description": "通过轨道交通与铁路相关成员企业开展运营、维护和综合交通枢纽建设等业务。",
+      "tags": "铁路 · 轨道",
+      "details": [
+        "交通运营",
+        "铁路建设",
+        "枢纽服务"
+      ]
+    },
+    {
+      "title": "交通工程施工与检测",
+      "description": "旗下浙江交工承担道路、桥梁、隧道工程建设与检测，兼顾工程质量和施工安全管理。",
+      "tags": "施工 · 检测",
+      "details": [
+        "桥梁隧道",
+        "工程检测",
+        "施工管理"
+      ]
+    },
+    {
+      "title": "交通数字化及科技",
+      "description": "信息中心和数字科技成员推进交通数据、智能监测、工程软件及行业信息化技术。",
+      "tags": "数字 · AI",
+      "details": [
+        "全栈研发",
+        "工程数字化",
+        "智能检测"
+      ]
+    },
+    {
+      "title": "金融服务与产业运营",
+      "description": "通过证券、保险、产融等成员企业提供相关资本市场、保险及产业配套业务，具体业务需看各主体。",
+      "tags": "金融 · 产业",
+      "details": [
+        "资本运作",
+        "保险服务",
+        "产业投资"
+      ]
+    },
+    {
+      "title": "供应链与多元业务",
+      "description": "成员单位涉及采购、商贸、海运物流与化工材料等，不把集团业务一概当成有空缺。",
+      "tags": "物流 · 供应链",
+      "details": [
+        "采购管理",
+        "国际物流",
+        "材料生产"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "test-material",
+      "title": "检测员（原材料，交工科技）",
+      "category": "材料 / 检测",
+      "city": "浙江杭州富阳区",
+      "summary": "浙江交工2027招聘表列示交工科技材料工程部原材料检测员，计划1人，在杭州富阳开展建筑或工程原材料检测，需具备实践操作能力。",
+      "requirements": "本科及以上，优先无机非金属、化学工程及材料检测相关专业；有原材料检测试验经验者优先，可能长期出差，准确要求见逐岗招聘表。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "无机非金属材料工程",
+        "化学工程与工艺",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 具体学历见原岗位JD",
+      "url": "https://www.cncico.com/content/82659",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江交工集团股份有限公司及下属招聘单位",
+      "currentOpenVerified": false,
+      "evidenceUrl": "https://www.djdzp.cn/a/236"
+    },
+    {
+      "id": "test-road",
+      "title": "检测员（无机结合料、土工、交安，交工科技）",
+      "category": "土木 / 检测",
+      "city": "浙江杭州富阳区",
+      "summary": "浙江交工交工科技2027道路工程部明确招聘检测员，方向为无机结合料、土工及交安工程材料检测，公开计划1人，地点杭州富阳。",
+      "requirements": "本科及以上，相关道路桥梁、工程材料检测专业优先；具备检测实践与团队配合能力，能够根据项目安排出差。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "道路桥梁与渡河工程",
+        "材料科学与工程",
+        "土木工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 具体学历见原岗位JD",
+      "url": "https://www.cncico.com/content/82659",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江交工集团股份有限公司及下属招聘单位",
+      "currentOpenVerified": false,
+      "evidenceUrl": "https://www.djdzp.cn/a/236"
+    },
+    {
+      "id": "test-bridge",
+      "title": "检测员（桥梁，交工科技）",
+      "category": "土木 / 检测",
+      "city": "浙江杭州富阳区",
+      "summary": "浙江交工交工科技在建项目部2027校园招聘桥梁检测员1人，工作地杭州富阳区，工程需要时需服从项目流动安排。",
+      "requirements": "本科及以上，桥梁隧道工程、结构工程、地质工程等相关专业优先；桥梁检测实习与现场经验为加分项。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "桥梁与隧道工程",
+        "土木工程",
+        "地质工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 具体学历见原岗位JD",
+      "url": "https://www.cncico.com/content/82659",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江交工集团股份有限公司及下属招聘单位",
+      "currentOpenVerified": false,
+      "evidenceUrl": "https://www.djdzp.cn/a/236"
+    },
+    {
+      "id": "test-tunnel",
+      "title": "检测员（隧道，交工科技）",
+      "category": "土木 / 检测",
+      "city": "浙江杭州富阳区",
+      "summary": "浙江交工交工科技2027在建项目部隧道检测员岗位，公告计划2人，地点杭州富阳；与桥梁检测员为同一部门不同职位。",
+      "requirements": "本科及以上，桥隧、结构与地质工程等专业优先；有桥隧检测或相关工程实习经历者优先，须能适应项目流动。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "桥梁与隧道工程",
+        "结构工程",
+        "地质工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 具体学历见原岗位JD",
+      "url": "https://www.cncico.com/content/82659",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江交工集团股份有限公司及下属招聘单位",
+      "currentOpenVerified": false,
+      "evidenceUrl": "https://www.djdzp.cn/a/236"
+    },
+    {
+      "id": "general-admin",
+      "title": "综合管理（衍界运营）",
+      "category": "综合 / 行政",
+      "city": "浙江杭州临安区",
+      "summary": "浙江交工成员单位衍界运营2027综合管理部综合管理岗，计划1人，工作地杭州临安，承担综合管理与文字沟通职能。",
+      "requirements": "硕士研究生及以上，汉语言、人力资源、行政管理、新闻传媒等相关专业优先；熟悉办公软件、有行政宣传实习或组织经验者优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "汉语言文学",
+        "人力资源管理",
+        "公共事业管理",
+        "工商管理",
+        "新闻学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 具体学历见原岗位JD",
+      "url": "https://www.cncico.com/content/82659",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江交工集团股份有限公司及下属招聘单位",
+      "currentOpenVerified": false,
+      "evidenceUrl": "https://www.djdzp.cn/a/236"
+    },
+    {
+      "id": "design-maintenance",
+      "title": "设计员（养护设计部）",
+      "category": "土木 / 设计",
+      "city": "浙江杭州临安区",
+      "summary": "浙江交工设计院分公司2027养护设计部设计员，工作地点临安区，计划1人，属于路桥养护工程设计工作。",
+      "requirements": "硕士及以上，土木、岩土、道路铁道、交通运输工程等专业优先；看重专业基础与团队协作，具体设计软件条件不作擅自推断。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "土木工程",
+        "岩土工程",
+        "交通运输工程",
+        "道路与铁道工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 具体学历见原岗位JD",
+      "url": "https://www.cncico.com/content/82659",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江交工集团股份有限公司及下属招聘单位",
+      "currentOpenVerified": false,
+      "evidenceUrl": "https://www.djdzp.cn/a/236"
+    },
+    {
+      "id": "design-bridge",
+      "title": "桥梁结构工程设计（综合设计部）",
+      "category": "土木 / 设计",
+      "city": "浙江杭州临安区",
+      "summary": "浙江交工设计院2027综合设计部明确公开桥梁结构工程设计岗1人，地点杭州临安，岗位名称和需求均来自成员企业招聘表。",
+      "requirements": "硕士及以上，结构、桥梁、港口与航道、土木水利等专业优先；科研及社会实践经历为加分项。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "结构工程",
+        "桥梁与隧道工程",
+        "土木水利",
+        "港口航道与海岸工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 具体学历见原岗位JD",
+      "url": "https://www.cncico.com/content/82659",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江交工集团股份有限公司及下属招聘单位",
+      "currentOpenVerified": false,
+      "evidenceUrl": "https://www.djdzp.cn/a/236"
+    },
+    {
+      "id": "consult",
+      "title": "工程咨询（安全环保技术研究中心）",
+      "category": "土木 / 咨询",
+      "city": "浙江杭州临安区",
+      "summary": "浙江交工2027设计院安全环保技术研究中心工程咨询岗1人，负责工程技术咨询与安全环保相关项目支持，地点杭州临安。",
+      "requirements": "硕士研究生及以上，土木、岩土、交通工程、安全工程等专业优先；有研究、实习或相关项目经验者优先。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "土木工程",
+        "安全工程",
+        "交通工程",
+        "桥梁与隧道工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 具体学历见原岗位JD",
+      "url": "https://www.cncico.com/content/82659",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江交工集团股份有限公司及下属招聘单位",
+      "currentOpenVerified": false,
+      "evidenceUrl": "https://www.djdzp.cn/a/236"
+    },
+    {
+      "id": "fullstack",
+      "title": "全栈工程师（数智研究中心）",
+      "category": "软件 / AI",
+      "city": "浙江杭州临安区",
+      "summary": "浙江交工2027设计院数智研究中心招聘全栈工程师1人，要求前后端与数据库技术，并具有AI应用研发、智能体和AI辅助编程实践理解。",
+      "requirements": "硕士及以上，计算机、软件工程等专业优先；公告具体要求至少掌握一门后端语言、前端技术栈及常见数据库中间件。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 具体学历见原岗位JD",
+      "url": "https://www.cncico.com/content/82659",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江交工集团股份有限公司及下属招聘单位",
+      "currentOpenVerified": false,
+      "evidenceUrl": "https://www.djdzp.cn/a/236"
+    },
+    {
+      "id": "legal",
+      "title": "法务风控管理（供应链公司）",
+      "category": "法务 / 风控",
+      "city": "浙江杭州临安区",
+      "summary": "浙江交工2027供应链公司纪检审计风控部招聘法务风控管理1人，地点杭州临安，负责法律合规与风险控制相关业务支持。",
+      "requirements": "硕士及以上，法律专业优先；具有财会双学历或通过法律职业资格考试者优先，需文字与协调能力。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "法学",
+        "会计学",
+        "财务管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 具体学历见原岗位JD",
+      "url": "https://www.cncico.com/content/82659",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江交工集团股份有限公司及下属招聘单位",
+      "currentOpenVerified": false,
+      "evidenceUrl": "https://www.djdzp.cn/a/236"
+    },
+    {
+      "id": "purchase",
+      "title": "采购管理员（供应链公司）",
+      "category": "供应链 / 采购",
+      "city": "浙江杭州临安区",
+      "summary": "浙江交工供应链公司市场采购中心2027公开采购管理员1人，需理解工程采购流程、业务沟通和采购执行。",
+      "requirements": "硕士研究生及以上，土木、机械、材料、计算机、物流相关专业优先，岗位位于杭州临安，具体资格以单位公告为准。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "物流管理",
+        "机械工程",
+        "材料科学与工程"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 具体学历见原岗位JD",
+      "url": "https://www.cncico.com/content/82659",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江交工集团股份有限公司及下属招聘单位",
+      "currentOpenVerified": false,
+      "evidenceUrl": "https://www.djdzp.cn/a/236"
+    },
+    {
+      "id": "soft-engineer",
+      "title": "软件工程师（数字化事业部）",
+      "category": "软件 / AI",
+      "city": "浙江杭州临安区",
+      "summary": "浙江交工2027数字化事业部公开软件工程师4人，工作地杭州临安区，涉及Java应用开发、SQL数据处理及数字化产品建设。",
+      "requirements": "硕士研究生及以上，计算机、物联网、数据科学、信息管理及人工智能相关专业；公告明确要求熟练使用Java及SQL。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "物联网工程",
+        "数据科学与大数据技术",
+        "人工智能"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 具体学历见原岗位JD",
+      "url": "https://www.cncico.com/content/82659",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江交工集团股份有限公司及下属招聘单位",
+      "currentOpenVerified": false,
+      "evidenceUrl": "https://www.djdzp.cn/a/236"
+    },
+    {
+      "id": "financial",
+      "title": "财务管理（富润成本部）",
+      "category": "财务 / 经营",
+      "city": "北京丰台区",
+      "summary": "浙江交工富润成本部2027财务管理岗计划1人，具体地点北京丰台区；不得简单将浙江集团旗下所有岗位写成浙江省工作地。",
+      "requirements": "本科及以上，会计、财务管理、审计、税务相关专业优先，需持有初级会计专业技术资格证，熟悉Excel与常用财务软件。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "会计学",
+        "财务管理",
+        "审计学",
+        "税收学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027校园招聘 · 具体学历见原岗位JD",
+      "url": "https://www.cncico.com/content/82659",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "浙江交工集团股份有限公司及下属招聘单位",
+      "currentOpenVerified": false,
+      "evidenceUrl": "https://www.djdzp.cn/a/236"
+    }
+  ]
+}

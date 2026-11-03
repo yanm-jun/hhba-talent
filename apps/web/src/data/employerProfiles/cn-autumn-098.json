@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 1,
+  "id": "cn-autumn-098",
+  "name": "CASETiFY",
+  "displayName": "CASETiFY / 国际科技配件与个性化生活方式品牌",
+  "englishName": "CASETiFY",
+  "aliases": [
+    "casetify",
+    "CASETiFY中国",
+    "CASETiFY Careers",
+    "CASETiFY招聘",
+    "CASETiFY2027管培生"
+  ],
+  "industry": "科技配件 · 个性化产品 · 跨境电商 · 品牌及海外营销",
+  "subtitle": "官方 Greenhouse 招聘系统 · 上海、深圳岗位（含已截止2027管培生）",
+  "overview": "CASETiFY为以个性化手机壳及科技配件为核心的全球生活方式品牌。其官网人才页与Greenhouse招聘平台公布上海、深圳等办公地的品牌运营、海外达人营销、数字技术支持、增长营销及商业规划职位。每条记录均有CASETiFY自身职位申请页。特别注意：2027品牌管培生页面虽保留申请表，但明确截止2026年10月31日，不可标注为仍在招。",
+  "lastReviewed": "2026-11-03",
+  "sources": [
+    "https://www.casetify.cn/zh_CN/careers",
+    "https://job-boards.greenhouse.io/casetify",
+    "https://job-boards.greenhouse.io/casetify/jobs/6207279004",
+    "https://job-boards.greenhouse.io/casetify/jobs/6101356004",
+    "https://job-boards.greenhouse.io/casetify/jobs/6141822004",
+    "https://job-boards.greenhouse.io/casetify/jobs/6233106004",
+    "https://job-boards.greenhouse.io/casetify/jobs/6202013004",
+    "https://job-boards.greenhouse.io/casetify/jobs/6123072004",
+    "https://job-boards.greenhouse.io/casetify/jobs/6107356004",
+    "https://job-boards.greenhouse.io/casetify/jobs/6166484004"
+  ],
+  "media": {
+    "logo": "images/employer-profiles/cn-autumn-098/logo.svg",
+    "photos": [
+      {
+        "path": "images/employer-profiles/cn-autumn-098/photo1.svg",
+        "caption": "CASETiFY业务场景：照片待授权，当前为非实景编辑图",
+        "alt": "CASETiFY的非实景信息图，占位图不是实际办公场所",
+        "note": "非实景：仅作独立PR审查占位，真实公司照片尚未取得商用许可。"
+      },
+      {
+        "path": "images/employer-profiles/cn-autumn-098/photo2.svg",
+        "caption": "CASETiFY业务场景：照片待授权，当前为非实景编辑图",
+        "alt": "CASETiFY的非实景信息图，占位图不是实际办公场所",
+        "note": "非实景：仅作独立PR审查占位，真实公司照片尚未取得商用许可。"
+      }
+    ]
+  },
+  "recruitment": {
+    "url": "https://job-boards.greenhouse.io/casetify",
+    "label": "CASETiFY官方 Greenhouse 职位列表",
+    "status": "official_portal",
+    "subject": "CASETiFY集团相关中国/香港业务单位（具体用人法人以各岗位及合同为准）",
+    "note": "2026年11月3日官方Greenhouse列表包含上海和深圳多条岗位；每条需按原链接核实是否仍显示申请按钮。2027品牌管培生截止2026-10-31，虽仍有申请表不可作为有效期证明。"
+  },
+  "majorIntro": "本页均为官方Greenhouse发布的8个独立职位页面，含工作地与职位ID。专业是HHBA编辑关联，官网岗位的专业限制、经验和工作许可条件以原JD为准；2027管培生明确已过截止。",
+  "preferredMajors": [
+    "市场营销",
+    "广告学",
+    "传播学",
+    "工商管理",
+    "电子商务",
+    "计算机科学与技术",
+    "数据科学与大数据技术",
+    "英语",
+    "供应链管理",
+    "统计学",
+    "工业工程"
+  ],
+  "photoNote": "此独立审查版本的两幅配图均为显著标注的非实景编辑占位，不代表企业真实办公场景。正式展示必须取得真实素材许可并核验来源。",
+  "business": [
+    {
+      "title": "个性化消费科技配件",
+      "description": "以手机壳、表带和其他电子设备配件为产品基础，结合个性化表达、设计与保护功能开展产品开发。",
+      "tags": "配件 · 设计",
+      "details": [
+        "产品定制",
+        "配件研发",
+        "商品保护"
+      ]
+    },
+    {
+      "title": "品牌联名与知识产权",
+      "description": "与不同IP、设计师和品牌开展授权联名合作，涉及权益管理、策划和全球新品发布。",
+      "tags": "联名 · IP",
+      "details": [
+        "品牌合作",
+        "授权运营",
+        "主题设计"
+      ]
+    },
+    {
+      "title": "全球达人营销与社媒",
+      "description": "围绕TikTok、YouTube和Instagram等社媒建立营销策略、达人合作、内容投放和转化归因。",
+      "tags": "达人 · 营销",
+      "details": [
+        "TikTok投放",
+        "YouTube达人",
+        "海外传播"
+      ]
+    },
+    {
+      "title": "跨境电商与增长运营",
+      "description": "管理全球数字渠道、增长实验、商品推广与数据分析，结合投放数据优化商业转化。",
+      "tags": "电商 · 增长",
+      "details": [
+        "电商运营",
+        "付费增长",
+        "数据归因"
+      ]
+    },
+    {
+      "title": "数字产品和系统支持",
+      "description": "数字团队支持办公软件、企业信息系统与技术解决方案，为不同地区业务协作提供工具。",
+      "tags": "数字 · 技术",
+      "details": [
+        "企业IT",
+        "系统协同",
+        "运营技术"
+      ]
+    },
+    {
+      "title": "商品企划及供应链",
+      "description": "围绕生产、设计、商品生命周期、采购和销售预测开展商业规划及跨区域供应链管理。",
+      "tags": "商品 · 供应链",
+      "details": [
+        "商品计划",
+        "库存预测",
+        "采购协作"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "mt-2027",
+      "title": "2027品牌发展管理培训生（已截止）",
+      "category": "品牌 / 管培",
+      "city": "上海",
+      "summary": "CASETiFY官方2027管理培训生项目，安排24个月轮岗学习品牌与商业运营，涉及跨团队策略、市场研究、营销活动及新品发布等，面向2025年7月至2027年6月毕业人员。",
+      "requirements": "官方Greenhouse职位6207279004明确 APPLICATION DEADLINE 31 October 2026；虽申请表仍在页面，不能据此宣称可继续投递；提交材料还需一分钟英文视频。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "工商管理",
+        "广告学",
+        "英语"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "2027管培生 · 10月31日已截止",
+      "url": "https://job-boards.greenhouse.io/casetify/jobs/6207279004",
+      "evidenceUrl": "https://job-boards.greenhouse.io/casetify/jobs/6207279004",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "CAMPUS",
+      "recruitmentSubject": "CASETiFY中国业务相关用人单位（逐岗法人未核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "tiktok",
+      "title": "Influencer Marketing Associate (TikTok)",
+      "category": "营销 / 达人",
+      "city": "深圳",
+      "summary": "CASETiFY深圳TikTok达人营销专员，负责海外付费达人寻找、商务议价、创意内容审核、Spark Ads启用、投放效果跟踪与ROI优化，原官网有独立职位页面。",
+      "requirements": "官方岗位6101356004要求相关社媒、达人或数字营销经验两年以上，市场/传媒相关本科学历优先，熟悉TikTok及Instagram，具有优秀英语书面和口头沟通能力。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "广告学",
+        "传播学",
+        "英语"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官网具体JD · 实时状态以原网页为准",
+      "url": "https://job-boards.greenhouse.io/casetify/jobs/6101356004",
+      "evidenceUrl": "https://job-boards.greenhouse.io/casetify/jobs/6101356004",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "CASETiFY中国业务相关用人单位（逐岗法人未核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "youtube",
+      "title": "Influencer Marketing Associate (Youtube)",
+      "category": "营销 / 达人",
+      "city": "深圳",
+      "summary": "CASETiFY深圳YouTube付费达人营销专员，聚焦美国市场YouTube达人合作，从筛选议价、内容制作和上线到视频效果统计、频道增长及跨团队预算管理。",
+      "requirements": "Greenhouse职位6141822004要求约两年社媒或增长营销经验、熟悉YouTube Shorts与长视频生态、擅长英语交流，并对美国创作者群体及数据分析有认知。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "广告学",
+        "传播学",
+        "英语"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官网具体JD · 实时状态以原网页为准",
+      "url": "https://job-boards.greenhouse.io/casetify/jobs/6141822004",
+      "evidenceUrl": "https://job-boards.greenhouse.io/casetify/jobs/6141822004",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "CASETiFY中国业务相关用人单位（逐岗法人未核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "influencer-manager",
+      "title": "Assistant Influencer Marketing Manager",
+      "category": "营销 / 达人",
+      "city": "上海",
+      "summary": "CASETiFY上海助理达人营销经理，为官方China职位分类下的独立岗位，面向品牌营销协作、达人合作与推广项目推进。具体绩效指标及任职经历要求以原职位正文为准。",
+      "requirements": "官方Greenhouse职位6233106004页面列Shanghai, China，可直接定位该岗位；不能仅凭助理经理称谓推定具体管理人数或硬性学历资格，现有招聘状态按官网实时页面确认。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "广告学",
+        "传播学",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官网具体JD · 实时状态以原网页为准",
+      "url": "https://job-boards.greenhouse.io/casetify/jobs/6233106004",
+      "evidenceUrl": "https://job-boards.greenhouse.io/casetify/jobs/6233106004",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "CASETiFY中国业务相关用人单位（逐岗法人未核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "tech-solutions",
+      "title": "Technology Solutions Assistant - Shenzhen",
+      "category": "数字 / 技术",
+      "city": "深圳",
+      "summary": "CASETiFY官方Digital Products部门在深圳发布Technology Solutions Assistant岗位，支持业务团队使用和维护数字系统、技术解决方案及跨部门流程。",
+      "requirements": "Greenhouse职位6202013004确认深圳工作地点；实际软硬件平台、工作经验和专业要求以企业原文为准，本条专业字段仅用于HHBA相关性推荐，不构成专业限制。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "计算机科学与技术",
+        "软件工程",
+        "信息管理与信息系统"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官网具体JD · 实时状态以原网页为准",
+      "url": "https://job-boards.greenhouse.io/casetify/jobs/6202013004",
+      "evidenceUrl": "https://job-boards.greenhouse.io/casetify/jobs/6202013004",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "CASETiFY中国业务相关用人单位（逐岗法人未核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "ecom-manager",
+      "title": "E-commerce Operations Manager",
+      "category": "电商 / 运营",
+      "city": "深圳",
+      "summary": "CASETiFY在深圳公开E-commerce Operations Manager独立职位，服务品牌线上业务运营与商品电商活动，属于官网Ecommerce业务线。",
+      "requirements": "官方Greenhouse职位6123072004有独立招聘详情，具体平台、电商市场、管理经验要求与合同用人主体以企业实际JD为准，不能由职位名称擅自添加资格。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "电子商务",
+        "市场营销",
+        "工商管理"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官网具体JD · 实时状态以原网页为准",
+      "url": "https://job-boards.greenhouse.io/casetify/jobs/6123072004",
+      "evidenceUrl": "https://job-boards.greenhouse.io/casetify/jobs/6123072004",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "CASETiFY中国业务相关用人单位（逐岗法人未核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "growth-attribution",
+      "title": "Assistant Growth Marketing Manager (Data & Attribution)",
+      "category": "增长 / 数据",
+      "city": "深圳",
+      "summary": "CASETiFY深圳增长营销团队发布数据与归因方向助理增长营销经理职位，侧重付费渠道增长分析、数据归因及商业绩效评估。",
+      "requirements": "Greenhouse职位6107356004公开职位名称与深圳工作地点；应遵从原文技能与经验要求，此处不虚构具体营销工具门槛、最低学历或薪酬数据。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "市场营销",
+        "统计学",
+        "数据科学与大数据技术",
+        "广告学"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官网具体JD · 实时状态以原网页为准",
+      "url": "https://job-boards.greenhouse.io/casetify/jobs/6107356004",
+      "evidenceUrl": "https://job-boards.greenhouse.io/casetify/jobs/6107356004",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "CASETiFY中国业务相关用人单位（逐岗法人未核）",
+      "currentOpenVerified": false
+    },
+    {
+      "id": "planner",
+      "title": "Senior Merchandise Planner",
+      "category": "商品 / 供应链",
+      "city": "深圳",
+      "summary": "CASETiFY官网Product Lifecycle Management板块公开深圳高级商品企划职位，涉及商业需求、品类经营与商品计划相关工作，职位详情可独立核对。",
+      "requirements": "Greenhouse职位6166484004标明深圳工作地点；对于预测、库存、供应链技能和任职年限等具体条件按实际岗位全文，而非将建议专业视作硬性要求。",
+      "majorNames": [],
+      "editorialRelatedMajors": [
+        "供应链管理",
+        "工商管理",
+        "统计学",
+        "电子商务"
+      ],
+      "majorUnrestricted": false,
+      "educationLabel": "官网具体JD · 实时状态以原网页为准",
+      "url": "https://job-boards.greenhouse.io/casetify/jobs/6166484004",
+      "evidenceUrl": "https://job-boards.greenhouse.io/casetify/jobs/6166484004",
+      "observedOn": "2026-11-03",
+      "recruitmentType": "SOCIAL",
+      "recruitmentSubject": "CASETiFY中国业务相关用人单位（逐岗法人未核）",
+      "currentOpenVerified": false
+    }
+  ]
+}

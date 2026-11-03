@@ -1,0 +1,27 @@
+{
+  "companyId": "114",
+  "company": "索恩格电动",
+  "auditedOn": "2026-11-03",
+  "commercialReuseRightsVerified": false,
+  "brand": {
+    "status": "editorial_wordmark_not_official_logo",
+    "officialTrademarkPermissionVerified": false
+  },
+  "photos": [
+    {
+      "slot": 1,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": "https://www.upcv.tech/xiaozhao/cmugbrelz002jm998pulx39k3.html",
+      "authenticCorporatePremisesPhotoDisplayed": false,
+      "permissionVerified": false
+    },
+    {
+      "slot": 2,
+      "status": "nonreal_svg_placeholder",
+      "sourceCandidate": "https://www.seg-automotive.com/zh/career/career-application-platform/",
+      "authenticCorporatePremisesPhotoDisplayed": false,
+      "permissionVerified": false
+    }
+  ],
+  "notes": "No identifiable photo copied without rights verification. Two explicitly non-real editorial vectors are not real office/factory photography; source URLs are for future audits only."
+}

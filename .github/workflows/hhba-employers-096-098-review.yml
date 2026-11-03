@@ -1,0 +1,70 @@
+name: HHBA employers 096-098 V2 independent static review
+on:
+  push:
+    branches: [feature/employers-096-098-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-employers-096-098-independent-static-review
+  cancel-in-progress: true
+jobs:
+  static-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify 096-098 company roles, professional filtering, evidence and non-real image labels
+        working-directory: apps/web
+        run: |
+          node scripts/employers-096-098-v2.contract.test.mjs
+          node scripts/employer-job-level-search.contract.test.mjs
+          node scripts/major-direct-role-results.contract.test.mjs
+          node scripts/recruitment-market-source-invalid.regression.test.mjs
+      - name: Build the approved four-block V2 static website for branch review ONLY
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+          VITE_HHBA_DOMESTIC_REBUILD_V2: '1'
+        run: |
+          npm run build
+          node scripts/materialize-company-route-entries.mjs
+      - name: Verify 3 real route entrypoint files and audited image placeholders
+        run: |
+          test -s apps/web/dist/index.html
+          for id in 096 097 098; do
+            test -s "apps/web/dist/companies/autumn/cn-autumn-$id/index.html"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/photo1.svg"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/photo2.svg"
+            test -s "apps/web/dist/images/employer-profiles/cn-autumn-$id/media-sources.json"
+          done
+          test -s apps/web/dist/images/employer-profiles/cn-autumn-098/logo.svg
+          test -s apps/web/dist/images/autumn-real-logos/cn-autumn-096.svg
+          test -s apps/web/dist/images/autumn-real-logos/cn-autumn-097.svg
+      - name: Upload independent audit preview only (does not deploy main GitHub Pages)
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-employers-096-098-independent-static-review
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
+      - name: Preserve 3 employer media review manifests
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-employers-096-098-source-and-image-audit
+          path: |
+            apps/web/public/images/employer-profiles/cn-autumn-096/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-097/media-sources.json
+            apps/web/public/images/employer-profiles/cn-autumn-098/media-sources.json
+            docs/HHBA_EMPLOYERS_096_098_SOURCE_AUDIT_20261103.md
+          retention-days: 30
+          if-no-files-found: error
