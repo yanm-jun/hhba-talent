@@ -281,7 +281,7 @@ function searchPreview(data:LivePage,filters:LiveFilters,offset:number,facets:Ma
   const matches=searchJobs(data.jobs,searchFilters,facets);
   const relevant=major?matches.rows.filter(job=>visibleRoleForMajor(job,major,filters.include_unknown_majors===true)):matches.rows;
   if(major){
-   const priority={related:3,unrestricted:2,unknown:1,other:0,all:0};
+   const priority={related:3,unknown:2,unrestricted:1,other:0,all:0};
    relevant.sort((a,b)=>priority[matchRoleToMajor(b,major)]-priority[matchRoleToMajor(a,major)]||
      majorExactEvidence(b,major)-majorExactEvidence(a,major));
   }
@@ -388,7 +388,7 @@ async function listArchivedJobs(filters:LiveFilters,offset:number,signal:AbortSi
   const candidates=allowed.map(archivedJob);
   const ranked=major?candidates.filter(job=>visibleRoleForMajor(job,major,filters.include_unknown_majors===true)):candidates;
   if(major){
-   const priority={related:3,unrestricted:2,unknown:1,other:0,all:0};
+   const priority={related:3,unknown:2,unrestricted:1,other:0,all:0};
    ranked.sort((a,b)=>priority[matchRoleToMajor(b,major)]-priority[matchRoleToMajor(a,major)]||
      majorExactEvidence(b,major)-majorExactEvidence(a,major));
   }
@@ -471,7 +471,7 @@ export async function listDomesticRebuildMarket(filters:LiveFilters,offset:numbe
  // Rank concrete roles by explicit professional relevance before pagination.
  // Roles with undisclosed requirements only appear after explicit opt-in.
  if(filters.major_slug){
-  const priority={related:3,unrestricted:2,unknown:1,other:0,all:0};
+  const priority={related:3,unknown:2,unrestricted:1,other:0,all:0};
   allowed.sort((a,b)=>priority[matchRoleToMajor(b,filters.major_slug!)]-priority[matchRoleToMajor(a,filters.major_slug!)]||
     majorExactEvidence(b,filters.major_slug!)-majorExactEvidence(a,filters.major_slug!));
  }
