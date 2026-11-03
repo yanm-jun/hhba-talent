@@ -1,5 +1,5 @@
 import { type FormEvent, useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, Building2, Info, LockKeyhole, UserRound } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Building2, Info, KeyRound, LockKeyhole, MessageSquareText, UserRound } from 'lucide-react';
 import { Shell } from '../components/Shell';
 import { Link, navigate } from '../router';
 import { api, ApiError, employerApiReady, phoneAuthReady, type AccountType, type User } from '../services/api';
@@ -102,6 +102,16 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
       .catch((e) => { if (e instanceof ApiError && e.status === 401) clearRealAuthToken(); });
   }, [useRealAuth, user, onUser]);
 
+  function changeAuthMethod(nextMethod: 'code' | 'password') {
+    if (nextMethod === authMethod) return;
+    setAuthMethod(nextMethod);
+    setError('');
+    setNotice('');
+    // Clear the previous method's one-time credential without touching the phone or username.
+    if (nextMethod === 'password') setCode('');
+    else setPassword('');
+  }
+
   async function sendCode() {
     setError('');
     setNotice('');
@@ -197,7 +207,7 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
           <div className="hhba-phone-heading">
             <span className="hhba-phone-kicker">{candidate ? '求职者账户' : '招聘方账户'}</span>
             <h1 id="hhba-phone-title">{mode === 'login' ? '欢迎回来' : '创建你的账户'}</h1>
-            <p>{mode === 'login' ? '使用手机号登录，继续你在 HHBA 的旅程。' : '只需几步，即可开启你的 HHBA 账户。'}</p>
+            <p>{mode === 'login' ? realPasswordLogin ? '使用注册称呼和密码登录，继续你在 HHBA 的旅程。' : '使用手机号登录，继续你在 HHBA 的旅程。' : '只需几步，即可开启你的 HHBA 账户。'}</p>
           </div>
           <div className="hhba-phone-identity">
             <span className="hhba-phone-identity-icon" aria-hidden="true">{candidate ? <UserRound size={17} /> : <Building2 size={17} />}</span>
@@ -205,6 +215,26 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
             <Link to="/auth" className="hhba-phone-switch-identity">切换身份 <ArrowRight size={13} /></Link>
           </div>
           <form className="hhba-phone-form" onSubmit={submit}>
+            {useRealAuth && mode === 'login' && (
+              <div className="hhba-phone-login-methods" role="group" aria-label="选择登录方式">
+                <button
+                  type="button"
+                  className={`hhba-phone-login-method${authMethod === 'code' ? ' is-active' : ''}`}
+                  aria-pressed={authMethod === 'code'}
+                  onClick={() => changeAuthMethod('code')}
+                >
+                  <MessageSquareText size={15} aria-hidden="true" /> 验证码登录
+                </button>
+                <button
+                  type="button"
+                  className={`hhba-phone-login-method${authMethod === 'password' ? ' is-active' : ''}`}
+                  aria-pressed={authMethod === 'password'}
+                  onClick={() => changeAuthMethod('password')}
+                >
+                  <KeyRound size={15} aria-hidden="true" /> 密码登录
+                </button>
+              </div>
+            )}
             {mode === 'register' && (
               <label htmlFor="hhba-auth-name">称呼
                 <input id="hhba-auth-name" maxLength={useRealAuth ? 20 : 60} required minLength={2} autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder={candidate ? '你的姓名或昵称' : '招聘联系人姓名'} />
@@ -239,11 +269,6 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
                   <input id="hhba-auth-password-confirm" type="password" required autoComplete="new-password" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} placeholder="请再次输入密码" />
                 </label>
               </>
-            )}
-            {useRealAuth && mode === 'login' && (
-              <div className="hhba-phone-account-change">
-                <button type="button" id="hhba-phone-switch-identity" onClick={() => { setAuthMethod(authMethod === 'password' ? 'code' : 'password'); setError(''); setNotice(''); }}>{authMethod === 'password' ? '用验证码登录' : '用密码登录'}</button>
-              </div>
             )}
             {user && !accountHasRole && <p className="hhba-phone-warning" role="status">当前账户尚未开通{title}身份，请先完成对应身份认证。</p>}
             {error && <p className="hhba-phone-error" role="alert">{error}</p>}
