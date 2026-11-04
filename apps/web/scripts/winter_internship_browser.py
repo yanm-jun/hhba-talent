@@ -236,7 +236,7 @@ with sync_playwright() as p:
     assert page.get_by_text('雇主官方确认已招满',exact=False).count()>=3
     page.locator('[data-winter-job="bnp-hk-2027-securities-services-ref118477"]').get_by_role('link',name='岗位详情').click()
     assert page.get_by_role('link',name='查看雇主已招满岗位公告').get_attribute('href').startswith('https://group.bnpparibas/')
-    assert page.get_by_text('已经',exact=False).count()>=0
+    assert page.get_by_text('已招满',exact=False).count()>0
     page.get_by_role('link',name='返回寒假实习岗位列表').click()
     page.get_by_role('button',name='重置').click()
     page.get_by_role('searchbox',name='搜索寒假实习具体岗位').fill('SSCPC02515')
