@@ -19,7 +19,7 @@ test('landing route and permanent programme-detail routes are public',()=>{
  for(const part of ["route==='/winter-internship'",'/^\\/winter-internship\\/[a-z0-9-]{3,100}$/.test(route)',"<WinterInternshipPage user={user}"])assert.ok(main.includes(part),part+' missing');
  assert.ok(page.includes('data-winter-page="directory"'));
  assert.ok(page.includes('data-winter-page="detail"'));
- assert.ok(page.includes('to={\\'/winter-internship/\\'+program.id}'));
+ assert.ok(page.includes("to={'/winter-internship/'+program.id}"));
  assert.ok(page.includes('href={p.sourceUrl}'));
  assert.ok(page.includes('target="_blank" rel="noopener noreferrer"'));
 });
