@@ -25,6 +25,10 @@ with sync_playwright() as p:
     page.goto(BASE, wait_until="domcontentloaded", timeout=60000)
     header = page.get_by_role("searchbox", name="搜索 HHBA 站内所有公开内容")
     header.wait_for(timeout=60000)
+    # The existing first-visit welcome letter is intentionally modal; dismiss it as a user would.
+    welcome=page.get_by_role("button", name="关闭公开信，进入首页")
+    if welcome.is_visible():
+        welcome.click()
     assert header.is_visible(), "universal header search should be visible"
     page.screenshot(path="/tmp/hhba-global-search-header.png")
 
