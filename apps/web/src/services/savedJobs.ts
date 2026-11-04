@@ -1,5 +1,4 @@
 import {getRealAuthToken,realAuthReady} from './realAuth';
-import {trackAccountActivity} from './engagement';
 
 export const savedAvailable=realAuthReady && import.meta.env.BASE_URL!=='/hhba-talent/';
 export type SavedJob={jobId:string;savedAt:string};
@@ -38,6 +37,5 @@ export async function setSavedJob(jobId:string,save:boolean){
  if(!res.ok)throw Error(res.status===401?'请重新登录真实账户':res.status===404?
   '该岗位已不在官方职位索引中':'账号收藏操作失败，请重试');
  cacheToken=token;requestCache=null;
- if(save)trackAccountActivity('job_save');
  dispatchEvent(new CustomEvent('hhba:saved-changed',{detail:{jobId,saved:save}}));
 }

@@ -17,9 +17,27 @@ test('private metrics reject unauthenticated header even with a D1 binding',asyn
  const r=await privateMetric({request:new Request(origin+'/api/admin/metrics'),env});
  assert.equal(r.status,503);assert.equal((await r.json()).error,'ADMIN_ACCESS_NOT_CONFIGURED');
 });
-test('visitor event requires opt-in and same origin; never writes without consent',async()=>{
- const r=await event({request:new Request(origin+'/api/engagement/event',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({type:'page_view'})}),env});
- assert.equal(r.status,403);
+test('unlinked event count accepts same-origin calls without per-page consent and does not set a visitor cookie',async()=>{
+ const writes=[];
+ const db={prepare(){return {bind(...args){this.args=args;return this},async run(){writes.push(this.args);return {success:true}}}}};
+ const metricsEnv={...env,HHBA_METRICS_DB:db};
+ const request=(url,headers,body)=>new Request(url,{method:'POST',headers,body:JSON.stringify(body)});
+ const good=await event({request:request(origin+'/api/engagement/event',{
+  Origin:origin,'Content-Type':'application/json'
+ },{type:'page_view'}),env:metricsEnv});
+ assert.equal(good.status,202);
+ assert.equal(good.headers.get('set-cookie'),null);
+ assert.equal(writes.length,1);
+ assert.equal(writes[0][1],'page_view');
+ const offOrigin=await event({request:request(origin+'/api/engagement/event',{
+  Origin:'https://attacker.invalid','Content-Type':'application/json'
+ },{type:'page_view'}),env:metricsEnv});
+ assert.equal(offOrigin.status,403);
+ const sensitive=await event({request:request(origin+'/api/engagement/event',{
+  Origin:origin,'Content-Type':'application/json'
+ },{type:'page_view',path:'/candidate/account/private'}),env:metricsEnv});
+ assert.equal(sensitive.status,400);
+ assert.equal(writes.length,1);
 });
 test('saved jobs reject cross-site writes and arbitrary job IDs',async()=>{
  const r=await saved({request:new Request(origin+'/api/saved/greenhouse-abc-123',{method:'PUT',headers:{Origin:'https://attacker.invalid'}}),env});

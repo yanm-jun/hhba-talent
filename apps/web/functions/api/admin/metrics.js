@@ -23,7 +23,6 @@ export async function onRequestGet({request,env}){
   const [daily,saved,installed,changes]=await Promise.all([
    db.prepare(`SELECT day,
     SUM(CASE WHEN event_type='page_view' THEN 1 ELSE 0 END) AS pv,
-    COUNT(DISTINCT CASE WHEN event_type='page_view' THEN visitor_day_hash END) AS daily_uv,
     SUM(CASE WHEN event_type='job_view' THEN 1 ELSE 0 END) AS job_views,
     SUM(CASE WHEN event_type='job_search' THEN 1 ELSE 0 END) AS searches,
     SUM(CASE WHEN event_type='official_apply_click' THEN 1 ELSE 0 END) AS outbound_clicks
@@ -32,13 +31,13 @@ export async function onRequestGet({request,env}){
    db.prepare("SELECT value FROM hhba_metrics_metadata WHERE key='installed_at'").first(),
    db.prepare("SELECT event_type, COUNT(*) AS n FROM hhba_device_save_events WHERE day>=? AND day<=? GROUP BY event_type").bind(since,until).all()
   ]);
-  const series=Array.from({length:days},(_,i)=>{const d=isoDay(new Date(Date.parse(since+'T00:00:00.000Z')+i*86400000));const row=(daily.results||[]).find(r=>r.day===d);return {day:d,pv:Number(row?.pv||0),dailyUv:Number(row?.daily_uv||0),jobViews:Number(row?.job_views||0),searches:Number(row?.searches||0),outboundClicks:Number(row?.outbound_clicks||0)}})
+  const series=Array.from({length:days},(_,i)=>{const d=isoDay(new Date(Date.parse(since+'T00:00:00.000Z')+i*86400000));const row=(daily.results||[]).find(r=>r.day===d);return {day:d,pv:Number(row?.pv||0),dailyUv:null,jobViews:Number(row?.job_views||0),searches:Number(row?.searches||0),outboundClicks:Number(row?.outbound_clicks||0)}})
   const sum=k=>series.reduce((a,x)=>a+x[k],0);
   const counts=Object.fromEntries((changes.results||[]).map(x=>[x.event_type,Number(x.n)]));
   const {accounts,activity}=await queryAccountGrowth({metricsDb:db,authDb:env.HHBA_PNVS_AUTH_DB,
-   since,until,today,series,accountAnalyticsEnabled:env.HHBA_ACCOUNT_ANALYTICS_ENABLED==='1'});
+   since,until,today,series,accountAnalyticsEnabled:false});
   const result={kind:'HHBA_CLOUDFLARE_PRIVATE_METRICS_V1',asOf:new Date().toISOString(),period:{start:since,end:until,days,timezone:'UTC'},collectorStartedAt:installed?.value||null,
-   traffic:{quality:'collected',pv:sum('pv'),dailyUvSum:sum('dailyUv'),jobViews:sum('jobViews'),searches:sum('searches'),outboundClicks:sum('outboundClicks'),series,scope:'OPT_IN_CONSENT_ONLY_AND_PER_MINUTE_DEDUP'},
+   traffic:{quality:'collected',pv:sum('pv'),dailyUvSum:null,jobViews:sum('jobViews'),searches:sum('searches'),outboundClicks:sum('outboundClicks'),series,scope:'UNLINKED_AGGREGATE_EVENT_COUNTS_NO_UV'},
    devices:{quality:'collected',savedJobs:Number(saved?.n||0),devicesWithSavedJobs:Number(saved?.devices||0),added:counts.added||0,removed:counts.removed||0,scope:'CLOUDFLARE_DEVICE_COOKIE_ONLY_NOT_ACCOUNT_SAVES'},
    account:accounts,activity
   };

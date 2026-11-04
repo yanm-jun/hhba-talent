@@ -4,7 +4,7 @@ import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
 import {getJob,localizedCompany,localizedLocation,localizedTitle,type LiveJob} from '../services/liveRecruitment';
 import {listSavedJobs,setSavedJob,savedAvailable,type SavedJob} from '../services/savedJobs';
-import {analyticsChoice,chooseAnalytics,getMyActivityCheck,type MyActivityCheck,type AccountArea} from '../services/engagement';
+import {eraseAccountAnalytics,getMyActivityCheck,type MyActivityCheck,type AccountArea} from '../services/engagement';
 import {getCandidateWorkspaceProfile,saveCandidateWorkspaceProfile,saveCandidateWorkspacePreferences,realWorkspaceAvailable,type CandidateWorkspaceProfile} from '../services/candidateWorkspace';
 import {type User} from '../services/api';
 import {PrivateResumeVault} from '../components/PrivateResumeVault';
@@ -22,7 +22,7 @@ const pages:{id:Section;label:string;icon:typeof UserRound;description:string}[]
  {id:'preferences',label:'求职偏好',icon:SlidersHorizontal,description:'地点、职位和工作方式'},
  {id:'resume',label:'我的简历',icon:FileUser,description:'账户私有简历管理'},
  {id:'applications',label:'求职记录',icon:BriefcaseBusiness,description:'真实投递记录待接入'},
- {id:'privacy',label:'账户与隐私',icon:ShieldCheck,description:'管理真实账户与匿名统计'},
+ {id:'privacy',label:'账户与隐私',icon:ShieldCheck,description:'账户安全与历史数据管理'},
 ];
 function routeFor(id:Section){return id==='overview'?'/candidate/account':id==='saved'?'/candidate/saved':'/candidate/account/'+id;}
 export function PersonalCenterPage({user,onlySaved=false,section='overview',onLogout}:{user:User|null;onlySaved?:boolean;section?:Section;onLogout:()=>Promise<void>}){
@@ -34,10 +34,10 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
  const [resumeCount,setResumeCount]=useState<number|null>(null);
  const [loading,setLoading]=useState(false),[error,setError]=useState('');
  const [busy,setBusy]=useState('');
- const [consent,setConsent]=useState<boolean|null>(()=>analyticsChoice());
  const [myActivity,setMyActivity]=useState<MyActivityCheck|null>(null);
  const [activityChecking,setActivityChecking]=useState(false);
  const [activityCheckError,setActivityCheckError]=useState('');
+ const [erasureState,setErasureState]=useState<'idle'|'pending'|'cleared'|'failed'>('idle');
  const [nickname,setNickname]=useState(''),[headline,setHeadline]=useState(''),[city,setCity]=useState(''),[intro,setIntro]=useState(''),[skills,setSkills]=useState('');
  const [role,setRole]=useState(''),[targetCity,setTargetCity]=useState(''),[mode,setMode]=useState<'不限'|'远程'|'现场'|'混合办公'>('不限');
  const [notice,setNotice]=useState('');
@@ -114,9 +114,14 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
   }catch(e){setNotice(e instanceof Error?e.message:'保存失败，请重试')}
   finally{setBusy('')}
  }
- useEffect(()=>{setMyActivity(null);setActivityCheckError('')},[consent,user?.id]);
+ useEffect(()=>{setMyActivity(null);setActivityCheckError('')},[user?.id]);
+ useEffect(()=>{setErasureState('idle')},[user?.id]);
+ async function retryErasure(){
+  setErasureState('pending');
+  const result=await eraseAccountAnalytics();
+  setErasureState(result==='cleared'?'cleared':'failed');
+ }
  async function checkMyActivity(){
-  if(consent!==true)return;
   setActivityChecking(true);setActivityCheckError('');setMyActivity(null);
   try{setMyActivity(await getMyActivityCheck())}
   catch(e){setActivityCheckError(e instanceof Error?e.message:'暂时无法验证统计结果，请重试。')}
@@ -201,23 +206,31 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
      <div className="hhba-account-empty"><BriefcaseBusiness size={27}/><strong>真实投递接口尚未接通</strong><p>仅浏览外部岗位不会被记成“已投递”。</p><Link to="/candidate/jobs">浏览招聘岗位</Link></div>
     </section>}
     {current==='privacy'&&<section className="hhba-account-panel">
-     <div className="hhba-account-section-heading"><div><h2>账户与隐私</h2><p>管理当前真实账户和匿名统计授权。</p></div></div>
-     <div className="hhba-account-privacy-row"><div><strong><ChartNoAxesCombined size={18}/>网站及账号使用统计</strong><p>仅在同意后采集匿名访问与已登录账号的按日功能使用类别，用于活跃与回访分析；不记录具体搜索词、简历正文或密码。</p></div>
-      <div className="hhba-personal-consent"><button type="button" aria-pressed={consent===true} onClick={()=>{chooseAnalytics(true);setConsent(true)}}>同意</button><button type="button" aria-pressed={consent===false} onClick={()=>{chooseAnalytics(false);setConsent(false)}}>拒绝</button></div>
-     </div>
+     <div className="hhba-account-section-heading"><div><h2>账户与隐私</h2><p>查看账户安全、数据使用说明和历史记录清理。</p></div></div>
+     <div className="hhba-account-privacy-row"><div><strong><ChartNoAxesCombined size={18}/>运营数据的使用范围</strong>
+      <p>网站只汇总不关联个人的页面访问、岗位浏览、岗位搜索及官网跳转次数。不设置访问统计 Cookie，不保存访客标识、搜索词、详细页面地址、简历正文或个人联系方式。注册人数和岗位收藏数量来自真实业务记录，不据此推断个人浏览轨迹。</p>
+      <p>不再新增可按账号识别的日活行为记录，因此账号 DAU、WAU、MAU 和用户留存暂不统计，也不会用浏览量冒充。</p>
+     </div></div>
      <div className="hhba-account-privacy-row hhba-activity-verification">
-      <div><strong><CheckCircle2 size={18}/>核验账号活动是否真正入库</strong>
-       <p>只读查询当前登录账号今天（UTC）的功能类别，不创建测试数据，也不显示手机号、搜索词或简历。</p>
-       {consent!==true&&<p role="status">当前未授权账号使用统计；可先自愿同意，再浏览岗位或人才政策。</p>}
-       {trackingPrevented&&<p role="status">浏览器已启用 DNT/GPC 隐私保护；HHBA 会尊重这一设置，不会新增行为统计记录。</p>}
-       {myActivity&&<p className="hhba-account-activity-result" role="status">{myActivity.day} UTC：{myActivity.recorded
-         ?'已查询到真实活动：'+myActivity.areas.map(a=>areaLabels[a]).join('、')
-         :'数据库尚无该账号今日活动记录；请在同意统计后浏览岗位，再重新核验。'}</p>}
+      <div><strong><CheckCircle2 size={18}/>清理旧版账号统计记录</strong>
+       <p>下方只读查询和历史删除专用于旧版账号活动记录。新版本不再写入这些记录，也不需要为使用网站单独选择统计授权。</p>
+       {erasureState==='pending'&&<p role="status">正在向服务器申请删除旧版账号活动记录…</p>}
+       {erasureState==='cleared'&&<p className="hhba-account-activity-result" role="status">服务器已确认旧版账号活动记录清理完成；可重新只读查询核实。</p>}
+       {erasureState==='failed'&&<p className="hhba-account-activity-error" role="alert">尚未获得服务器删除成功确认；原记录可能仍在，请重试。</p>}
+       {trackingPrevented&&<p role="status">已检测到浏览器 DNT/GPC 隐私偏好，网站会停止普通页面事件统计。</p>}
+       {myActivity&&<p className="hhba-account-activity-result" role="status">{myActivity.day} UTC：
+        {myActivity.recorded?'旧版今日记录：'+myActivity.areas.map(a=>areaLabels[a]).join('、')+'。':'没有旧版今日账号活动记录。'}
+        {myActivity.historicalRecorded?'旧版历史账号活动记录仍存在。':'旧版账号活动记录已不存在。'}</p>}
        {activityCheckError&&<p className="hhba-account-activity-error" role="alert">{activityCheckError}</p>}
       </div>
-      <button type="button" className="hhba-account-activity-button" disabled={consent!==true||activityChecking} onClick={()=>void checkMyActivity()}>
-       {activityChecking?'正在核验…':'查询今日真实记录'}
-      </button>
+      <div className="hhba-account-actions">
+       <button type="button" className="hhba-account-activity-button" disabled={activityChecking||erasureState==='pending'} onClick={()=>void checkMyActivity()}>
+        {activityChecking?'正在查询…':'只读查询旧记录'}
+       </button>
+       <button type="button" className="hhba-account-activity-button" disabled={erasureState==='pending'} onClick={()=>void retryErasure()}>
+        {erasureState==='pending'?'正在清理…':'清除旧版活动记录'}
+       </button>
+      </div>
      </div>
      <div className="hhba-account-privacy-row"><div><strong><LockKeyhole size={18}/>账户安全</strong><p>只有当前登录用户可读取其个人资料与收藏。</p></div><span className="hhba-account-chip">真实账户</span></div>
      <div className="hhba-account-privacy-row"><div><strong><LogOut size={18}/>安全退出</strong><p>仅撤销当前会话，不删除账户资料。</p></div><button type="button" className="hhba-account-danger" onClick={()=>void onLogout()}>退出登录</button></div>

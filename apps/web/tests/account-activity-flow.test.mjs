@@ -47,6 +47,11 @@ function fixture(){
    let args=[];
    return {
     bind(...items){args=items;return this},
+    async first(){
+     if(sql.startsWith('SELECT 1 AS present FROM hhba_account_activity WHERE account_hash=? LIMIT 1'))
+      return [...activities.values()].some(a=>a.account_hash===args[0])?{present:1}:null;
+     throw Error('Unexpected metrics .first SQL: '+sql);
+    },
     async all(){
      if(sql.startsWith('SELECT area FROM hhba_account_activity WHERE account_hash=? AND day=? ORDER BY area')){
       return {results:[...activities.values()].filter(a=>a.account_hash===args[0]&&a.day===args[1])
@@ -88,7 +93,7 @@ const putSaved=(env,token,jobId='JOB-TEST-001')=>accountRequest({env,request:new
 })});
 const wipe=(env,token)=>activityRequest({env,request:new Request(origin+'/api/engagement/account',{method:'DELETE',headers:headers(token)})});
 
-test('registration, real saved-job writes, consented events, isolation, and erasure form one consistent flow',async()=>{
+test('real registration/saves persist, retired account writes are denied, historic records remain erasable',async()=>{
  const state=fixture(),now=Date.now();
  for(const [phone,username] of [['13900000001','testA'],['13900000002','testB']])
   await createUser(state.auth,{phone,username,passwordHash:'test-only-placeholder',nowMs:now});
@@ -97,87 +102,72 @@ test('registration, real saved-job writes, consented events, isolation, and eras
  const env={HHBA_PNVS_AUTH_DB:state.auth,HHBA_METRICS_DB:state.metrics,
   HHBA_METRICS_SECRET:'only-for-isolated-flow-tests-not-production-123456789',
   HHBA_ACCOUNT_ANALYTICS_ENABLED:'1',ASSETS:state.ASSETS};
- assert.equal(state.users.size,2,'created registered candidates');
-
- // Real saved-jobs endpoint must update account storage, not a device visitor table.
+ assert.equal(state.users.size,2);
  assert.equal((await putSaved(env,tokenA)).status,200);
- assert.equal((await putSaved(env,tokenA)).status,200,'duplicate save is idempotent');
+ assert.equal((await putSaved(env,tokenA)).status,200);
  assert.equal(state.saves.size,1);
- assert.equal((await (await getSaved(env,tokenB)).json()).items.length,0,'accounts cannot read each other\'s saves');
+ assert.equal((await (await getSaved(env,tokenB)).json()).items.length,0);
  assert.equal((await (await getSaved(env,tokenA)).json()).items[0].jobId,'JOB-TEST-001');
- assert.equal((await putSaved(env,tokenB,'NOT-IN-SOURCE')).status,404,'invalid source job cannot be saved');
+ assert.equal((await putSaved(env,tokenB,'NOT-IN-SOURCE')).status,404);
 
- // Neither unauthenticated traffic nor opt-outs are allowed into account activity.
- assert.equal((await post(env,null,'jobs')).status,401);
+ // New account-linked event writes must be forbidden EVEN with a legacy consent header.
+ for(const [token,extra] of [[tokenA,{}],[tokenB,{}],[null,{}],[tokenA,{'dnt':'1'}],[tokenA,{'sec-gpc':'1'}]])
+  assert.equal((await post(env,token,'jobs',extra)).status,410);
+ assert.equal(state.activities.size,0,'no new user-level tracks or DAU from ordinary behavior');
  assert.equal((await activityRequest({env,request:new Request(origin+'/api/engagement/account',{
-  method:'POST',headers:headers(tokenA),body:JSON.stringify({area:'jobs'})
- })})).status,403,'explicit consent required');
- assert.equal((await post(env,tokenA,'jobs',{'dnt':'1'})).status,403,'DNT honored');
- assert.equal((await post(env,tokenA,'jobs',{'sec-gpc':'1'})).status,403,'GPC honored');
- assert.equal((await post(env,tokenA,'unknown')).status,400,'no arbitrary event labels');
+  method:'POST',headers:{...headers(tokenA),origin:'https://evil.example'},body:JSON.stringify({area:'jobs'})
+ })})).status,403,'cross-origin calls rejected');
 
- // Per-day account dedup prevents inflated DAU and user counts.
- for(const area of ['jobs','jobs','policies','companies','job_save'])
-  assert.equal((await post(env,tokenA,area)).status,202);
- assert.equal(state.activities.size,4,'one row per account/day/function area');
- assert.equal(new Set([...state.activities.values()].map(x=>x.account_hash)).size,1);
- assert.ok([...state.activities.values()].every(x=>x.day===today()));
- assert.equal((await post(env,tokenB,'jobs')).status,202);
- assert.equal(new Set([...state.activities.values()].map(x=>x.account_hash)).size,2);
- assert.equal(state.activities.size,5);
- assert.ok([...state.activities.values()].every(x=>!JSON.stringify(x).includes('1390000000')),'metrics storage has no raw phone');
- // The self-check must return only this authenticated account's daily categories.
+ // Older accounts may still have previously consented history; deletion remains scoped and verifiable.
+ const {hmac}=await import('../functions/_lib/metric-utils.js');
+ const hashA=await hmac(env.HHBA_METRICS_SECRET,'account-activity-v1:13900000001');
+ const hashB=await hmac(env.HHBA_METRICS_SECRET,'account-activity-v1:13900000002');
+ state.activities.set(hashA+'|2026-01-01|jobs',{account_hash:hashA,day:'2026-01-01',area:'jobs'});
+ state.activities.set(hashB+'|2026-01-01|tools',{account_hash:hashB,day:'2026-01-01',area:'tools'});
  const selfRequest=(token)=>new Request(origin+'/api/engagement/self-check',{headers:headers(token)});
- const proofA=await selfCheck({env,request:selfRequest(tokenA)}),proofB=await selfCheck({env,request:selfRequest(tokenB)});
- assert.equal(proofA.status,200);assert.equal(proofB.status,200);
- const bodyA=await proofA.json(),bodyB=await proofB.json();
- assert.equal(bodyA.recorded,true);assert.deepEqual(bodyA.areas,['companies','job_save','jobs','policies']);
- assert.deepEqual(bodyB.areas,['jobs']);
- assert.equal(bodyA.day,today());assert.equal('account_hash' in bodyA,false);
- assert.ok(!JSON.stringify(bodyA).includes('13900000001'));
- assert.equal(state.activities.size,5,'self-check cannot create activity records');
+ const oldA=await (await selfCheck({env,request:selfRequest(tokenA)})).json();
+ assert.equal(oldA.recorded,false);
+ assert.equal(oldA.historicalRecorded,true);
  assert.equal((await selfCheck({env,request:selfRequest(null)})).status,401);
-
-
- // Origin and session security are mandatory even for a valid token.
- assert.equal((await activityRequest({env,request:new Request(origin+'/api/engagement/account',{
-  method:'POST',headers:{...headers(tokenA,{'x-hhba-consent':'yes'}),origin:'https://evil.example'},body:JSON.stringify({area:'jobs'})
- })})).status,403);
- assert.equal((await wipe(env,tokenA)).status,200,'consent revocation deletes this account');
- assert.equal(state.activities.size,1,'another account remains untouched');
- const afterErase=await (await selfCheck({env,request:new Request(origin+'/api/engagement/self-check',{
-  headers:headers(tokenA)})})).json();
- assert.equal(afterErase.recorded,false,'read-only check reflects actual erasure');
- assert.deepEqual(afterErase.areas,[]);
-
- assert.equal(state.saves.size,1,'withdrawal does not erase real job bookmarks');
- assert.equal((await wipe(env,tokenA)).status,200,'erasure is idempotent');
- assert.equal((await putSaved(env,tokenA)).status,200,'real saved jobs unaffected by analytics opt-out');
-
- // Deactivated/expired session must never write private metrics.
- for(const s of state.sessions.values())if(s.phone==='13900000002')s.revoked=1;
- assert.equal((await post(env,tokenB,'jobs')).status,401);
+ assert.equal((await wipe(env,tokenA)).status,200);
+ assert.equal((await wipe(env,tokenA)).status,200,'history deletion remains idempotent');
+ const after=await (await selfCheck({env,request:selfRequest(tokenA)})).json();
+ assert.equal(after.recorded,false);assert.equal(after.historicalRecorded,false);
+ assert.equal(state.activities.size,1,'second user history unaffected');
+ assert.equal((await (await selfCheck({env,request:selfRequest(tokenB)})).json()).historicalRecorded,true);
+ assert.equal(state.saves.size,1,'saved jobs not deleted along with historical activity');
+ for(const session of state.sessions.values())if(session.phone==='13900000002')session.revoked=1;
+ assert.equal((await wipe(env,tokenB)).status,401);
  assert.equal(state.activities.size,1);
 });
-test('disabled production feature is unknown, not faked user activity',async()=>{
+test('retired POST remains disabled even when database and feature flag are unavailable',async()=>{
  const state=fixture(),env={HHBA_PNVS_AUTH_DB:state.auth,HHBA_METRICS_DB:state.metrics,HHBA_METRICS_SECRET:'test-secret-of-sufficient-length-123456'};
- const r=await post(env,'not-a-real-session','jobs');
- assert.equal(r.status,503);
+ assert.equal((await post(env,'invalid','jobs')).status,410);
  assert.equal((await selfCheck({env,request:new Request(origin+'/api/engagement/self-check')})).status,503);
-
  assert.equal(state.activities.size,0);
 });
-test('frontend session changes and other-tab consent rechecks remain wired',()=>{
+test('frontend never mounts analytics prompt or sends account bearer events',()=>{
  const market=readFileSync(new URL('../src/components/UnifiedJobMarket.tsx',import.meta.url),'utf8');
  assert.match(market,/trackEvent\('job_search','\/candidate\/jobs'\)/);
  assert.match(market,/hasEditedSearch\.current&&draft\.trim\(\)\.length>=2/);
- const auth=readFileSync(new URL('../src/services/realAuth.ts',import.meta.url),'utf8');
- const consent=readFileSync(new URL('../src/components/AnalyticsConsent.tsx',import.meta.url),'utf8');
- assert.match(auth,/announceRealAuthChange\(\);/);
- assert.match(consent,/hhba:real-auth-changed/);
- assert.match(consent,/REAL_AUTH_TOKEN_KEY/);
- assert.match(consent,/hhba\.analytics\.consent\.v2/);
- assert.match(consent,/\[route,choice,authRevision\]/);
- assert.match(consent,/\[route,choice\]/);
- assert.match(consent,/not fabricate/);
+ const root=readFileSync(new URL('../src/main.tsx',import.meta.url),'utf8');
+ const tracker=readFileSync(new URL('../src/components/AnalyticsConsent.tsx',import.meta.url),'utf8');
+ const metrics=readFileSync(new URL('../src/services/engagement.ts',import.meta.url),'utf8');
+ const saved=readFileSync(new URL('../src/services/savedJobs.ts',import.meta.url),'utf8');
+ const privacy=readFileSync(new URL('../src/pages/PersonalCenterPage.tsx',import.meta.url),'utf8');
+ const resume=readFileSync(new URL('../src/components/PrivateResumeVault.tsx',import.meta.url),'utf8');
+ const match=readFileSync(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
+ assert.match(root,/<AnonymousTrafficTracker\/>/);
+ assert.match(tracker,/return null/);
+ assert.doesNotMatch(tracker,/hhba-consent|同意使用情况统计|暂不同意|trackAccountActivity/);
+ assert.doesNotMatch(metrics,/X-HHBA-Consent|Bearer '\+token.*POST/);
+ assert.match(metrics,/credentials:'omit'/);
+ assert.match(metrics,/referrerPolicy:'no-referrer'/);
+ assert.doesNotMatch(saved,/trackAccountActivity/);
+ assert.doesNotMatch(privacy,/hhba-personal-consent|setAnalyticsPreference|chooseAnalytics/);
+ assert.match(privacy,/eraseAccountAnalytics/);
+ assert.match(privacy,/historicalRecorded/);
+ assert.match(privacy,/清除旧版活动记录/);
+ assert.match(resume,/我已知悉并单独同意/);
+ assert.match(match,/我同意 HHBA 提取简历文本/);
 });

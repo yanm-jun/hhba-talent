@@ -120,5 +120,6 @@ export function Shell({ user, children }: { user: User | null; children: React.R
    </nav>}
   </header>
   {children}
+  <footer className="hhba-site-disclosure"><Link to="/data-use">运营数据说明</Link></footer>
  </main>;
 }
