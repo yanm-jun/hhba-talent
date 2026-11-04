@@ -1,0 +1,57 @@
+name: HHBA Overseas New Zealand V1 isolated static review
+on:
+  push:
+    branches: [feature/overseas-new-zealand-v1]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/data/overseasNewZealand.ts'
+      - 'apps/web/src/pages/OverseasDevelopmentPage.tsx'
+      - 'apps/web/src/styles/overseas-development.css'
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/src/components/Shell.tsx'
+      - 'apps/web/scripts/overseas-new-zealand.contract.test.mjs'
+      - '.github/workflows/hhba-overseas-nz-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-overseas-nz-review
+  cancel-in-progress: true
+jobs:
+  verify-isolated-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Test new overseas pathways and preserve original study contracts
+        working-directory: apps/web
+        run: |
+          node --experimental-strip-types --test scripts/overseas-new-zealand.contract.test.mjs
+          node --experimental-strip-types --test scripts/overseas-nz-v2-detail.contract.test.mjs
+          node --experimental-strip-types --test scripts/overseas-occupation.contract.test.mjs
+          node --experimental-strip-types --test scripts/study-abroad.contract.test.mjs
+          node --experimental-strip-types --test scripts/study-universities.contract.test.mjs
+      - name: Typecheck and build independently reviewable static website
+        working-directory: apps/web
+        env:
+          HHBA_PAGES_BASE: /
+          HHBA_GITHUB_PAGES: '1'
+        run: npm run build
+      - name: Include GitHub Pages deep-link fallback
+        run: cp apps/web/dist/index.html apps/web/dist/404.html
+      - name: Upload isolated full static build, do not deploy official Pages
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-overseas-new-zealand-v1-static-review
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error

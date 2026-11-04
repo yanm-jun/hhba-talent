@@ -1,0 +1,26 @@
+/* HHBA 日本海外发展 · 在既有橙蓝语言上延续白底长文阅读。
+   实景摄影：Tokyo - Sunset Skyline.jpg，Fred Cherrygarden，CC BY-SA 4.0。
+   https://commons.wikimedia.org/wiki/File:Tokyo_-_Sunset_Skyline.jpg */
+.hhba-overseas-jp .hhba-overseas-jp-hero{position:relative;min-height:310px;border-radius:19px;
+ background:linear-gradient(95deg,#17344bea 0%,#194967d9 53%,#173e5965 100%),
+ url("https://commons.wikimedia.org/wiki/Special:FilePath/Tokyo_-_Sunset_Skyline.jpg?width=1440") right center/cover no-repeat,#224c67}
+.hhba-overseas-jp-hero .hhba-overseas-kiwi{opacity:.12}
+.hhba-overseas-jp-credit{display:inline-flex!important;align-items:center;gap:6px;color:#eaf2f7!important;background:#12375199;padding:6px 10px;border-radius:7px;text-decoration:none;font-size:10px;line-height:1.6;margin-top:16px;font-weight:600}
+.hhba-overseas-jp-credit:hover{text-decoration:underline}
+.hhba-overseas-jp .hhba-overseas-path-icon{background:#edf4fa;color:#236c99}
+.hhba-overseas-jp .hhba-overseas-path-main{color:#bc6333!important}
+.hhba-overseas-jp .hhba-overseas-path-card:hover{border-color:#bed3e4;box-shadow:0 10px 28px #194d6a13}
+.hhba-overseas-jp .hhba-overseas-compare-card{min-height:360px}
+.hhba-japan-closed-text{color:#ae4b32;font-size:12px}
+.hhba-japan-pending-text{color:#8f7849;font-size:12px}
+.hhba-japan-status-warning,.hhba-japan-pathway-warning{border-left:3px solid #d7864f;padding:10px 16px;background:#fff8f0;color:#8a5938;font-size:13px;line-height:1.85;border-radius:0 5px 5px 0;margin:15px 0}
+.hhba-japan-occupation-browser .hhba-occupation-result-main span{overflow-wrap:anywhere}
+.hhba-japan-occupation-page .hhba-occupation-important{margin-top:20px}
+.hhba-japan-occupation-page .hhba-occupation-detail-verified{font-size:11.5px}
+.hhba-overseas-jp .hhba-overseas-reader-related{margin-top:32px}
+@media(max-width:760px){
+ .hhba-overseas-jp .hhba-overseas-jp-hero{min-height:350px;padding:25px;
+ background:linear-gradient(105deg,#17344bf7 0%,#19445ee4 100%),url("https://commons.wikimedia.org/wiki/Special:FilePath/Tokyo_-_Sunset_Skyline.jpg?width=1440") center/cover no-repeat}
+ .hhba-overseas-jp-credit{font-size:9px}
+ .hhba-japan-occupation-browser .hhba-occupation-result{align-items:start}
+}

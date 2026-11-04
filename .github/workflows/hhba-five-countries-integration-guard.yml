@@ -1,0 +1,46 @@
+name: HHBA Five Countries Integration Review
+on:
+  push:
+    branches: [feature/merge-overseas-five-countries-20261104]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-overseas-merge-validation
+  cancel-in-progress: false
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Test five countries and preserve winter internships, site search and university pages
+        working-directory: apps/web
+        run: |
+          node --experimental-strip-types --test scripts/overseas-canada.contract.test.mjs
+          node --experimental-strip-types --test scripts/overseas-germany.contract.test.mjs
+          node --experimental-strip-types --test scripts/overseas-japan.contract.test.mjs
+          node --experimental-strip-types --test scripts/overseas-australia.contract.test.mjs
+          node --experimental-strip-types --test scripts/overseas-new-zealand.contract.test.mjs
+          node --experimental-strip-types --test scripts/overseas-real-country-photos.contract.test.mjs
+          node --experimental-strip-types --test scripts/overseas-nz-v2-detail.contract.test.mjs
+          node --experimental-strip-types --test scripts/overseas-v2-16-paths.contract.test.mjs
+          node --experimental-strip-types --test scripts/overseas-occupation.contract.test.mjs
+          node --experimental-strip-types --test scripts/study-abroad.contract.test.mjs
+          node --experimental-strip-types --test scripts/study-universities.contract.test.mjs
+          node --experimental-strip-types --test scripts/site-search.contract.test.mjs
+          node --experimental-strip-types --test scripts/winter-internship.contract.test.mjs
+      - name: Full integrated TypeScript build
+        working-directory: apps/web
+        env:
+          HHBA_PAGES_BASE: /
+          HHBA_GITHUB_PAGES: '1'
+        run: npm run build

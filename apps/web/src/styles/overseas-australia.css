@@ -1,0 +1,26 @@
+/* Australia country hub shares the already accepted HHBA NZ component rhythm.
+ * Landscape: Sydney Harbour Bridge and Sydney Opera House panorama.jpg, author Kgbo,
+ * https://commons.wikimedia.org/wiki/File:Sydney_Harbour_Bridge_and_Sydney_Opera_House_panorama.jpg
+ * CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/
+ * Display uses responsive cover cropping; source remains unchanged, attribution remains visible.
+ */
+.hhba-overseas-au .hhba-overseas-au-hero{
+  position:relative;min-height:290px;
+  background:linear-gradient(93deg,#123759f9 0%,#17517bcf 52%,#113d6870 100%),
+    url("https://commons.wikimedia.org/wiki/Special:FilePath/Sydney_Harbour_Bridge_and_Sydney_Opera_House_panorama.jpg?width=1280") right center/cover no-repeat,#1c5680;
+  border-radius:19px;
+}
+.hhba-overseas-au-hero .hhba-overseas-kiwi{opacity:.12}
+.hhba-overseas-au-credit{display:inline-flex;align-items:center;gap:6px;color:#e6edf5!important;background:#1539528c;padding:6px 10px;border-radius:7px;font-size:10px;margin-top:15px;font-weight:600}
+.hhba-overseas-au .hhba-overseas-path-icon{background:#edf2fa;color:#205f99}
+.hhba-overseas-au .hhba-overseas-path-main{color:#d36d30!important}
+.hhba-overseas-au .hhba-overseas-closed{background:#fff0e9;color:#a8472c}
+.hhba-overseas-au .hhba-overseas-utility a:hover,.hhba-overseas-au .hhba-overseas-path-card:hover{border-color:#bdcfe1}
+.hhba-overseas-au .hhba-overseas-path-card:hover{box-shadow:0 10px 25px #184d8115}
+.hhba-overseas-au .hhba-overseas-detail-intro{border-left:4px solid #3272a2}
+.hhba-overseas-au .hhba-overseas-compare-card{min-height:360px}
+@media(max-width:760px){
+ .hhba-overseas-au .hhba-overseas-au-hero{min-height:340px;padding:25px;background:linear-gradient(93deg,#123759f7 0%,#164c75e7 100%),url("https://commons.wikimedia.org/wiki/Special:FilePath/Sydney_Harbour_Bridge_and_Sydney_Opera_House_panorama.jpg?width=1280") center center/cover no-repeat,#1c5680}
+ .hhba-overseas-au-credit{font-size:9px;line-height:1.5}
+ .hhba-overseas-au .hhba-overseas-detail-layout{grid-template-columns:1fr}
+}

@@ -1,0 +1,61 @@
+name: HHBA - import licensed real country photos to feature branch
+on:
+  push:
+    branches:
+      - feature/overseas-country-real-photos-20261104
+    paths:
+      - '.github/workflows/hhba-import-real-country-photos.yml'
+      - 'apps/web/scripts/fetch_real_country_photos.py'
+      - 'apps/web/src/data/overseasCountryPhotos.ts'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: hhba-real-country-photos-import
+  cancel-in-progress: false
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout feature branch (not main)
+        uses: actions/checkout@v4
+        with:
+          ref: feature/overseas-country-real-photos-20261104
+          persist-credentials: true
+      - name: Python and Pillow
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install photo processing tools
+        run: python -m pip install --disable-pip-version-check requests 'Pillow>=10.3,<13'
+      - name: Fetch eight actual Wikimedia Commons photographs, resize, and store locally
+        run: python apps/web/scripts/fetch_real_country_photos.py
+      - name: Check every binary is a true nonempty WebP image
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          directory=Path("apps/web/public/overseas/countries")
+          for country in ['nz','au','jp','de','ca','uk','sg','us']:
+              photo=directory/(country+'.webp')
+              assert photo.is_file() and photo.stat().st_size>12000,(country,"missing actual photo")
+              with Image.open(photo) as picture:
+                  assert picture.format=="WEBP" and picture.size==(960,384),(country,picture.format,picture.size)
+              print(country,photo.stat().st_size)
+          PY
+      - name: Commit only 8 real photo binaries to feature branch (never main)
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/web/public/overseas/countries/*.webp
+          if git diff --cached --quiet; then
+            echo 'Eight local photos already committed'
+          else
+            git commit -m 'assets(overseas): add eight genuine CC-licensed country photo banners [skip ci]'
+            git push origin HEAD:feature/overseas-country-real-photos-20261104
+          fi
+      - name: Confirm official photos contract
+        working-directory: apps/web
+        run: node --experimental-strip-types --test scripts/overseas-real-country-photos.contract.test.mjs

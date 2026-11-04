@@ -1,0 +1,14 @@
+/* HHBA Germany — white editorial overseas pages with real self-hosted Berlin image */
+.hhba-overseas-germany .hhba-germany-hero{min-height:300px;position:relative;background-position:center;background-size:cover}
+.hhba-overseas-germany .hhba-germany-hero h1{color:#fff}
+.hhba-overseas-germany .hhba-germany-hero .hhba-overseas-kiwi{opacity:.14}
+.hhba-germany-photo-credit{display:inline-flex!important;align-items:center;gap:5px;color:#f4f8fb!important;background:#0d2c498f;border-radius:6px;padding:6px 9px;font-size:10px;line-height:1.5;text-decoration:none;margin-top:15px}
+.hhba-germany-photo-credit:hover{text-decoration:underline}
+.hhba-overseas-germany .hhba-overseas-path-icon{background:#ecf4fb;color:#336f97}
+.hhba-overseas-germany .hhba-overseas-path-main{color:#b86934!important}
+.hhba-overseas-germany .hhba-overseas-path-card:hover{border-color:#c9dbe8}
+.hhba-germany-occupation-directory .hhba-occupation-result-main span{overflow-wrap:anywhere}
+.hhba-germany-occupation-detail .hhba-occupation-detail-section{scroll-margin-top:95px}
+.hhba-germany-disclaimer{font-size:12px!important;color:#758a9b!important}
+.hhba-germany-occupation-detail .hhba-occupation-important{margin-top:20px}
+@media(max-width:760px){.hhba-overseas-germany .hhba-germany-hero{min-height:340px;background-position:55% center;padding:26px}.hhba-overseas-germany .hhba-overseas-country-summary{gap:7px}.hhba-germany-photo-credit{font-size:9px}}
