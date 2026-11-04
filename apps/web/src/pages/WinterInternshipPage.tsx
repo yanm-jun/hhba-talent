@@ -137,12 +137,14 @@ export function WinterInternshipPage({user,slug}:{user:User|null;slug?:string}){
  const industries=['全部行业',...new Set(WINTER_2027_JOBS.map(j=>j.industry))];
  const majors=['全部专业',...new Set(WINTER_2027_JOBS.flatMap(j=>j.majorTags).filter(v=>v!=='不限专业'))];
  const filtered=useMemo(()=>{
-  const q=keyword.trim().normalize('NFKC').toLocaleLowerCase();
-  return WINTER_2027_JOBS.filter(j=>
-   (region==='全部地区'||j.region===region)&&
-   (industry==='全部行业'||j.industry===industry)&&
-   (major==='全部专业'||j.majorTags.includes(major)||j.majorTags.includes('不限专业'))&&
-   (!q||[j.title,j.company,j.english,j.region,j.city,j.industry,j.description,...j.majorTags,...j.tags].join(' ').normalize('NFKC').toLocaleLowerCase().includes(q)));
+  const terms=keyword.trim().normalize('NFKC').toLocaleLowerCase().split(/\s+/).filter(Boolean);
+  return WINTER_2027_JOBS.filter(j=>{
+   const haystack=[j.title,j.company,j.english,j.region,j.city,j.industry,j.description,...j.majorTags,...j.tags].join(' ').normalize('NFKC').toLocaleLowerCase();
+   return (region==='全部地区'||j.region===region)&&
+    (industry==='全部行业'||j.industry===industry)&&
+    (major==='全部专业'||j.majorTags.includes(major)||j.majorTags.includes('不限专业'))&&
+    terms.every(term=>haystack.includes(term));
+  }).sort((a,b)=>major==='全部专业'?0:Number(b.majorTags.includes(major))-Number(a.majorTags.includes(major)));
  },[keyword,region,industry,major]);
  const totalPages=Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));
  const visible=filtered.slice(page*PAGE_SIZE,(page+1)*PAGE_SIZE);
