@@ -19,8 +19,10 @@ with sync_playwright() as p:
     page.goto(BASE,wait_until='domcontentloaded',timeout=60000)
     dialog=page.locator('[data-hhba-winter-modal] [role=dialog]')
     dialog.wait_for(timeout=60000)
-    assert page.get_by_role('button',name='关闭公开信，进入首页').count()==0
-    assert page.get_by_text('读一封来自 HHBA 的信').count()==0
+    # The old public letter is retained in the middle of the homepage, but
+    # must not open automatically while the winter advert is visible.
+    assert page.locator('.hhba-letter-overlay').count()==0
+    assert page.get_by_role('button',name='读一封来自 HHBA 的信').is_visible()
     page.screenshot(path='/tmp/hhba-winter-modal-desktop.png',full_page=False)
     dialog.get_by_role('link',name='立即参加').click()
     page.get_by_role('heading',name='探索寒假实习机会').wait_for(timeout=60000)
@@ -34,7 +36,29 @@ with sync_playwright() as p:
     assert source.get_attribute('href').startswith('https://')
     page.goto(BASE,wait_until='domcontentloaded')
     assert page.locator('[data-hhba-winter-modal]').count()==0,'should not reopen within same session'
+    assert page.locator('.hhba-letter-overlay').count()==0,'letter must not auto-open'
+    page.get_by_role('button',name='读一封来自 HHBA 的信').click()
+    envelope=page.locator('.hhba-letter-overlay[data-stage=envelope]')
+    envelope.wait_for(timeout=15000)
+    page.locator('button[data-letter-open]').click()
+    page.locator('.hhba-letter-paper').wait_for(timeout=15000)
+    assert page.get_by_role('button',name='分享这封信').is_visible()
+    assert page.get_by_role('button',name='复制链接').is_visible()
+    page.screenshot(path='/tmp/hhba-winter-letter-manual-desktop.png',full_page=False)
+    page.get_by_role('button',name='关闭公开信，进入首页').click()
+    assert page.locator('.hhba-letter-overlay').count()==0
+    page.reload()
+    assert page.locator('.hhba-letter-overlay').count()==0,'manual letter should not reappear on reload'
     desktop.close()
+
+    # Explicit public-letter share URLs still open the envelope directly;
+    # the winter campaign must not overlay it, even for a new visitor.
+    shared=browser.new_context(viewport={"width":1280,"height":800})
+    shared_page=shared.new_page()
+    shared_page.goto(BASE+'?letter=1',wait_until='domcontentloaded')
+    shared_page.locator('.hhba-letter-overlay[data-stage=envelope]').wait_for(timeout=15000)
+    assert shared_page.locator('[data-hhba-winter-modal]').count()==0
+    shared.close()
 
     mobile=browser.new_context(viewport={"width":390,"height":844},device_scale_factor=1,is_mobile=True,has_touch=True)
     page=mobile.new_page()
@@ -45,8 +69,13 @@ with sync_playwright() as p:
     page.screenshot(path='/tmp/hhba-winter-modal-mobile.png',full_page=False)
     popup.get_by_role('button',name='关闭寒假实习广告').click()
     assert page.locator('[data-hhba-winter-modal]').count()==0
+    assert page.locator('.hhba-letter-overlay').count()==0
+    page.get_by_role('button',name='读一封来自 HHBA 的信').click()
+    page.locator('.hhba-letter-overlay[data-stage=envelope]').wait_for(timeout=15000)
+    page.locator('.hhba-letter-close').first.click()
     page.reload()
     assert page.locator('[data-hhba-winter-modal]').count()==0
+    assert page.locator('.hhba-letter-overlay').count()==0
     mobile.close()
     assert not errors,errors
     print('HHBA_WINTER_CAMPAIGN_BROWSER_ACCEPTANCE_OK')
