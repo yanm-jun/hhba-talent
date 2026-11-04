@@ -1,0 +1,23 @@
+name: HHBA Company200 Current Market Gate
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/scripts/company200-integration.contract.test.mjs'
+      - 'apps/web/src/components/UnifiedJobMarket.tsx'
+      - '.github/workflows/hhba-company200-market-gate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-company-and-jobs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Ensure 200-company and recruitment routes coexist
+        working-directory: apps/web
+        run: node scripts/company200-integration.contract.test.mjs
