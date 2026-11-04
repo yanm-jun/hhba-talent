@@ -13,8 +13,9 @@
 - 第三批新增核验：**3 家企业、4 条独立职位资料**（历峰 1、天职国际 2、Crowe 香港 1），其中 Crowe 官网年份有证据版本冲突，不能认定2027在招。
 - 第四批新增资料：**3 家候选、4 条独立职位/招聘批次记录**（安永台湾统一批次1、信永中和香港独立招聘记录2、洛书投资量化实习1）。前两项有明确2027实习周期；洛书没有同编号的冬季时段证据。
 - 第五批新增核验：**3 家候选**（ReCube 7 条高校公开冬季岗位标题；招商银行广州分行只有2026寒假旧项目、2027寒假职位未确认；叠纸游戏 2 条真实日常实习招聘但寒假到岗未证实），独立分支 `feature/winter-internships-batch05-recube-cmb-papergames-20261104`，不视作全员已开放。
-- 后续待逐项核验：**36** 条候选（54中原专区3+五批各3已处理；处理≠正在招聘）。
-- **岗位统计与企业统计分开**：前一批已收录具体岗位 3 个（APCO、HSBC、QIMA），第二批后为 8 条具体岗位；第三批后为 12 条职位资料，第五批后为 **25 条岗位或招聘批次资料（16 + ReCube 7 + 叠纸 2）**，其中第三方来源及日期未匹配的记录仍标为待核实；QIMA 不在原 54 企业候选里，因此不计入54完成数。
+- 第六批新增核验：**3 家企业，9条不同职位记录**（永明金融3条：财务战略、财务报告、精算；宏利5条：私募股权、数据财务、信息风险、营销战略、科技；Informa Markets 1条：会展/数字营销实习）。永明2条及宏利5条官网截止日期已过；永明精算的当前申请状态待核实；Informa招聘平台列2026-11-07截止。
+- 后续待逐项核验：**33** 条候选（54中原专区3+六批各3已处理；处理≠正在招聘）。
+- **岗位统计与企业统计分开**：前一批已收录具体岗位 3 个（APCO、HSBC、QIMA），第二批后为 8 条具体岗位；第三批后为 12 条职位资料，第六批后为 **34 条岗位或招聘批次资料（前五批25 + 永明3 + 宏利5 + Informa1）**，其中第三方来源及日期未匹配的记录仍标为待核实；QIMA 不在原 54 企业候选里，因此不计入54完成数。
 - **摩根大通**旧站内另有一条 *2027 China Seasonal Internship*，不属于本次54条候选。已有证据提示它的部分岗位是夏秋入职，单独列入纠错队列，不应自动算作寒假已核实岗位。
 
 ## 开发规则
@@ -45,9 +46,9 @@
 | 14 | 法国巴黎银行 BNP Paribas | 中国香港 | 待官方核验 | 核对2027年1—6月证券服务实习 |
 | 15 | LVMH 香水及美妆 | 中国香港 | 待官方核验 | 核对2027年1月营销实习 |
 | 16 | RSM 罗申美 | 中国香港 | 第2批已开发 | 2027春季审计及科技咨询两个官网职位，确切入职日期按官网核验 |
-| 17 | 永明金融 Sun Life | 中国香港 | 待官方核验 | 原记录截止日已过，查新批次 |
-| 18 | 宏利 Manulife | 中国香港 | 待官方核验 | 原记录截止日已过，查新批次 |
-| 19 | Informa Markets 英富曼 | 中国香港 | 待官方核验 | 核对2027年1—6月实习 |
+| 17 | 永明金融 Sun Life | 中国香港 | 第6批已开发·3条独立官网职位 | JR00128213及JR00128231分别为战略财务和财务报告，10/30已截止；精算JR00120885含2027上半年及下半年，截止日不明 |
+| 18 | 宏利 Manulife | 中国香港 | 第6批已开发·5条独立官网职位 | JR26091338、JR26091703、JR26100089、JR26100142、JR26100136，2027年1—6月，官方截止2026-11-01 |
+| 19 | Informa Markets 英富曼 | 中国香港 | 第6批已开发·1条第三方招聘记录 | Recruit独立记录L059656859，2026-11-02刊登，2027年1—6月，全职6个月，公告截止2026-11-07；未证实公司官网可直投 |
 | 20 | Kering Saint Laurent | 中国香港 | 待官方核验 | 核实是否覆盖2027寒假 |
 | 21 | Crédit Agricole 法国农业信贷 | 中国香港 | 待官方核验 | 核对冬季/春季审计实习 |
 | 22 | 洛书投资 | 中国内地·上海 | 第4批已开发·寒假时段待核实 | 雇主官网可投简历且高校有具体校招量化实习，寒假批次及工作城市需企业确认 |
@@ -131,3 +132,22 @@
 3. **叠纸游戏（2条独立日常实习，冬季到岗未确认）**：[实习僧：招聘实习生－游戏研发向](https://www.shixiseng.com/intern/inn_rupynll1lq54)；[得早学就创：大世界玩法策划实习生－无限暖暖](https://www.deizao.cn/m/index/shixixq/jobid/280350)，分别有职责与要求，平台列2027-01-06截止，但**并未证实是2027寒假批次**，也没有对应企业官方岗位编号。雇主 [职业首页](https://career.papegames.com/) 仅供核实。2026上半年NOVA训练营、2027届秋招与2027寒假不能混同。
 
 > 第五批不增加自称“官网确认正在开放”的记录：7条高校校内职位受访问限制，2条叠纸日常实习缺2027冬季入职证据，招商广州没有新寒假岗位；25 条是累计资料数，**不是实时可申请名额**。用户验收前不合并 main、不更新 hhba.work。
+
+
+## 第六批原始岗位证据与时效核对（2026-11-04）
+
+本批在未合并的第5批分支之上继续扩展，单独提交PR，第5批通过验收后才能依赖合并。只记录独立招聘编号，不把多部门/入职期拆成虚构职位。**既往公开招聘不等于现在仍可申请。**
+
+1. **永明金融 Sun Life（3条雇主官方独立职位）**：
+   - [JR00128213 战略财务 Finance Intern](https://sunlife.wd3.myworkdayjobs.com/en-US/Experienced-Jobs/job/Finance-Intern--Jan---Jun-2027-_JR00128213)：香港红磡2027年1—6月，战略财务团队，研究、项目管理、财务指标看板；官方页面列截止**2026-10-30**，标已截止。
+   - [JR00128231 财务报告 Finance Intern](https://sunlife.wd3.myworkdayjobs.com/Experienced/job/Hunghom-Kowloon-Hong-Kong/Finance-Intern--Jan---Jun-2027-_JR00128231-1)：同名但不同编号与部门，负责财务报告和数据分析；官方截止**2026-10-30**，标已截止，不能与JR00128213合并。
+   - [JR00120885 Actuarial Internship 2027](https://sunlife.wd3.myworkdayjobs.com/en-US/Experienced-Jobs/job/Actuarial-Internship-2027_JR00120885)：单一官网职位同时包含**2027年1—6月、7—12月**两批，只有1个编号，仅把1月开始的上半年作为寒假线索；公开网页未能读取确切截止日和当前申请状态，不拆分部门/7月入职。
+2. **宏利 Manulife（5条独立雇主官方招聘编号）**：全为香港2027上半年Co-op全职实习，官网明确**2026-11-01**为报名截止日，2026-11-04已过，全部标「已过申请截止日」，但保留具体要求与原文。
+   - [JR26091338 Private Equity Asia Analyst Intern](https://manulife.wd3.myworkdayjobs.com/en-US/MFCJH_Jobs/job/Manulife---Analyst-Intern--6-months---Private-Equity-Asia--January-2027-Intake_JR26091338)：私募股权分析；岗位正文出现1—7月、项目通用条款1—6月两种结束月份，明确提示。
+   - [JR26091703 Data and Finance](https://manulife.wd3.myworkdayjobs.com/en-US/MFCJH_Jobs/job/Co-op-2027---Data-and-Finance--6-months-_JR26091703)：财务与数据。
+   - [JR26100089 Global Information Risk Management](https://manulife.wd3.myworkdayjobs.com/en-US/MFCJH_Jobs/job/Co-op-Internship-2027---Global-Information-Risk-Management--6-months-_JR26100089)：信息风险控制评估与测试。
+   - [JR26100142 Asia Regional Marketing Strategy & Business Planning](https://manulife.wd3.myworkdayjobs.com/en-US/MFCJH_Jobs/job/Hong-Kong-Manulife-Tower/Co-op-Internship-2027---Asia-Regional-Marketing-Strategy---Business-Planning--6-months-_JR26100142)：营销战略及业务规划。
+   - [JR26100136 Tech Placement Program](https://manulife.wd3.myworkdayjobs.com/en-US/MFCJH_Jobs/job/Co-op-Internship-2027--Tech-Placement-Program--6-months-_JR26100136)：技术实习，技术方向虽多但仅1个招聘编号。
+3. **Informa Markets（1条第三方独立招聘记录）**：[Recruit招聘原文 L059656859](https://openuniversity.recruit.com.hk/jobseeker/JobDetail.aspx?jobOrder=L059656859)2026-11-02发布，2027年1—6月香港全职会展运营与数字营销实习，要求市场、传播、新闻或商科相关在读背景、英/粤/普通话，**要求2026-11-07前报名**，并填写可到岗日期及预期薪金。已核实[企业官方招聘总入口](https://www.informa.com/divisions/informa-markets/join-the-team/)，未获取这条职位在企业官网的一对一独立编号，故展示第三方招聘记录并提示企业主页不是直投地址。截止日尚未到不等于实时开放。
+
+> 合计**34条独立职位或招聘批次资料**，其中部分已过期或需官网复核，不可称34条在招。原54条企业/地区候选累计处理**21条**，未处理**33条**；其他招聘机会QIMA不纳入54候选数。独立PR验收前不合并main、不部署hhba.work。
