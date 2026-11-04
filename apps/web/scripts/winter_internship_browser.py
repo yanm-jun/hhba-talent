@@ -56,10 +56,10 @@ with sync_playwright() as p:
     page.get_by_role('button',name='搜索岗位').click()
     # Major matching: exact discipline first; unrestricted roles remain after relevant results.
     page.get_by_label('按专业筛选寒假岗位').select_option('传播学')
-    assert page.locator('[data-winter-job]').count()==2
+    assert page.locator('[data-winter-job]').count()==3,'ReCube digital marketing adds another communication-related role'
     assert page.locator('[data-winter-job]').first.get_attribute('data-winter-job')=='apco-shanghai-winter-start-1787'
     page.get_by_label('按地区筛选寒假岗位').select_option('中国香港')
-    assert page.locator('[data-winter-job]').count()==1
+    assert page.locator('[data-winter-job]').count()==2,'new ReCube marketing posting joins old Hong Kong role'
     page.get_by_role('button',name='重置').click()
     assert page.locator('[data-winter-job]').count()==10
     assert '25 条公开岗位及招聘批次结果' in page.locator('.hhba-winter-list-summary').inner_text()
