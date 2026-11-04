@@ -32,7 +32,7 @@ function HeaderSiteSearch(){
  return <form className="hhba-header-site-search" role="search" aria-label="HHBA 全站搜索"
    onSubmit={event=>{event.preventDefault();navigate('/search'+(value.trim()?'?q='+encodeURIComponent(value.trim().slice(0,100)):''));}}>
    <Search aria-hidden="true" size={16}/>
-   <input name="q" value={value} maxLength={100} onChange={event=>setValue(event.target.value)}
+   <input type="search" name="q" value={value} maxLength={100} onChange={event=>setValue(event.target.value)}
      aria-label="搜索 HHBA 站内所有公开内容" placeholder="搜索 HHBA 全站…" />
    <button type="submit" aria-label="提交全站搜索"><ArrowRight size={15}/></button>
  </form>;
