@@ -74,7 +74,7 @@ test('German country link, independent occupation routes and photo stay part of 
  const page=read('../src/pages/GermanyDevelopmentPage.tsx');
  const comp=read('../src/components/GermanyOccupationDirectory.tsx');
  const article=read('../src/components/OverseasDetailedGuide.tsx');
- assert.deepEqual(overseasCountryOptions.filter(x=>x.ready).map(x=>x.code),['nz','au','jp','de']);
+ assert.deepEqual(overseasCountryOptions.filter(x=>x.ready).map(x=>x.code),['nz','au','jp','de','ca']);
  assert.match(home,/c\.code==='de'\?root\+'\/country\/germany'/);
  assert.match(main,/\/study-abroad\/country\/germany/);
  assert.match(main,/\/study-abroad\/germany\/occupation\//);
