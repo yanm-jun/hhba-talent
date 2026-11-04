@@ -46,6 +46,8 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Smoke-test header search and in-site detail routing
         working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
         run: |
           npm run preview -- --host 127.0.0.1 --port 4173 &
           python scripts/site_search_browser.py
