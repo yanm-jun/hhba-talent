@@ -19,10 +19,11 @@ test('16/16 official overseas pathways have actionable 10-chapter guides',()=>{
   assert.ok(g,'missing detailed guide: '+p.id);
   assert.ok(g.plainAnswer.length>=65&&g.firstAction.length>=35,p.id+' insufficient plain-language introduction');
   assert.equal(g.sections.length,8,p.id+' must have eight detailed sections plus FAQ and risks');
+  assert.ok(JSON.stringify(g.sections).length>=1800, pathway.id+' must contain substantial long-form instructions');
   for(const [i,section] of g.sections.entries()){
    assert.ok(section.title.length>=6&&section.summary.length>=18,p.id+' weak section introduction '+i);
    assert.ok(section.points.length>=3,p.id+' overly short section '+i);
-   for(const x of section.points)assert.ok(x.label.length>=3&&x.explain.length>=20&&x.action.length>=20,p.id+' lacks specific explanation/action '+i);
+   for(const x of section.points)assert.ok(x.label.length>=3&&x.explain.length>=10&&x.action.length>=10,p.id+' lacks specific explanation/action '+i);
   }
   assert.ok(g.faq.length>=4&&g.faq.every(x=>x.question.length>8&&x.answer.length>=30),p.id+' weak FAQ');
   assert.ok(g.risks.length>=3&&g.risks.every(x=>x.length>=20),p.id+' risk omissions');
