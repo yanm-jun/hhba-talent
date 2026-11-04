@@ -39,7 +39,7 @@ test('export reflects real PNVS registration and account saves while retaining t
  assert.equal(row(rows,'账号 WAU')[1],'0');
  assert.equal(row(rows,'账号 MAU')[1],'0');
  assert.equal(row(rows,'区间授权活跃账号')[1],'0');
- assert.equal(row(rows,'同意访问 PV')[1],'0');
+ assert.equal(row(rows,'页面访问事件 PV')[1],'0');
  assert.equal(row(rows,'设备有效收藏')[1],'0');
  assert.equal(row(rows,'首次活跃次日回访率')[1],'样本不足');
  assert.equal(row(rows,'累计真实求职者账号')[3],privateData.asOf);
@@ -54,7 +54,7 @@ test('missing/unauthorized private aggregates never become zero, even if public 
  assert.equal(row(rows,'累计真实求职者账号')[1],'未采集或未授权');
  assert.equal(row(rows,'账号当前收藏岗位数')[1],'未采集或未授权');
  assert.equal(row(rows,'账号 MAU')[1],'未采集或未授权');
- assert.equal(row(rows,'同意访问 PV')[1],'未采集或未授权');
+ assert.equal(row(rows,'页面访问事件 PV')[1],'未采集或未授权');
  assert.equal(row(rows,'已审计 ATS 来源')[1],'4');
  assert.equal(row(rows,'失败 ATS 来源')[1],'0');
  assert.equal(row(rows,'真实收入')[1],'未接入');
@@ -68,7 +68,7 @@ test('partial private results and invalid numbers are explicitly unavailable',()
  });
  assert.equal(row(rows,'累计真实求职者账号')[1],'未采集或未授权');
  assert.equal(row(rows,'账号 MAU')[1],'未采集或未授权');
- assert.equal(row(rows,'同意访问 PV')[1],'未采集或未授权');
+ assert.equal(row(rows,'页面访问事件 PV')[1],'未采集或未授权');
  assert.equal(row(rows,'设备有效收藏')[1],'未采集或未授权');
 });
 test('retention uses mature first-active cohort, not registration retention',()=>{
