@@ -82,7 +82,7 @@ function WinterRoleRow({job}:{job:WinterJob}){
   <div className="hhba-winter-role-body">
    <div className="hhba-winter-role-flags">
     <span>{job.region}</span>
-    <span className={job.status==='deadline-conflict'?'hhba-winter-status-caution':'hhba-winter-status-neutral'}>{winterJobStatusLabel(job)}</span>
+    <span className={(job.status==='deadline-conflict'||job.status==='year-conflict')?'hhba-winter-status-caution':'hhba-winter-status-neutral'}>{winterJobStatusLabel(job)}</span>
    </div>
    <h3><Link to={'/winter-internship/'+job.id}>{job.title}</Link></h3>
    <p className="hhba-winter-role-company"><Building2 size={14}/><strong>{job.company}</strong><span>{job.city}</span><span>{job.industry}</span></p>
@@ -119,7 +119,9 @@ function WinterJobDetail({user,job}:{user:User|null;job:WinterJob}){
    <ul>{job.requirements.map((r,i)=><li key={i}>{r}</li>)}</ul>
    <h2>匹配专业背景</h2><p>{job.majorTags.join('、')}。具体是否满足条件以官方职位描述为准。</p>
    {job.salaryNote&&<><h2>薪酬备注</h2><p>{job.salaryNote}</p></>}
-   {job.status==='deadline-conflict'&&<p className="hhba-winter-warning" role="note">官方截止日期出现不一致的公开页面版本，HHBA 无法确认当前可申请。请以雇主申请系统最新页面为准。</p>}
+   {(job.status==='deadline-conflict'||job.status==='year-conflict')&&<p className="hhba-winter-warning" role="note">{job.reviewWarning||'官方截止日期出现不一致的公开页面版本，HHBA 无法确认当前可申请。请以雇主申请系统最新页面为准。'}</p>}
+   {job.reviewWarning&&job.status==='verify-apply'&&<p className="hhba-winter-warning" role="note">{job.reviewWarning}</p>}
+   {job.evidenceUrl&&<a href={job.evidenceUrl} target="_blank" rel="noopener noreferrer" className="hhba-winter-source-link">查看补充招聘时间证据 <ExternalLink size={15}/></a>}
    <h2>官方职位与申请</h2><p>本站仅提供已核验的企业岗位信息，不在 HHBA 代替企业收集申请材料、不承诺名额或录取结果。申请之前请确认官方投递按钮仍然有效。</p>
    {url&&<a href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-official">前往企业官方岗位核实及申请 <ExternalLink size={16}/></a>}
    <p className="hhba-winter-verified">资料核对日期：{job.checkedOn}。{job.statusNote}。</p>
