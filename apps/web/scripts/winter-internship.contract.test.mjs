@@ -11,12 +11,12 @@ test('winter campaign replaces ONLY original homepage letter auto-popup',()=>{
  assert.ok(home.includes('读一封来自 HHBA 的信')&&home.includes('hhba:open-letter'),'public letter button must remain clickable');
  const letter=read('src/components/HomeOpenLetter.tsx');
  assert.ok(letter.includes('if (!autoOpen) return null;'),'letter must never auto-open during a regular visit');
- assert.ok(popup.includes("get('letter')==='1'"),'explicit letter shares must not be covered by winter popup');
+ assert.ok(popup.includes("get('letter')!=='1'"),'explicit letter shares must not be covered by winter popup');
  assert.ok(existsSync(new URL('../src/components/HomeOpenLetter.tsx',import.meta.url)),'public letter source must stay present');
  for(const stable of ['<UnifiedJobMarket compact/>','<HomeCompanyMarquee/>','<HomePeopleBanner/>','我要应聘','我要招人'])assert.ok(home.includes(stable),stable+' must remain');
 });
-test('first visit modal uses accessible close/escape/backdrop and real internal CTA',()=>{
- for(const part of ['aria-modal="true"','role="dialog"','aria-label="关闭寒假实习广告"',"event.key==='Escape'",'e.target===e.currentTarget','sessionStorage.setItem','to="/winter-internship"'])assert.ok(popup.includes(part),part+' missing');
+test('every homepage visit modal uses accessible close/escape/backdrop and real internal CTA',()=>{
+ for(const part of ['aria-modal="true"','role="dialog"','aria-label="关闭寒假实习广告"',"event.key==='Escape'",'e.target===e.currentTarget','showOnHomeVisit','to="/winter-internship"'])assert.ok(popup.includes(part),part+' missing');
  assert.ok(popup.includes('images/hhba-join-team.webp'),'existing locally-hosted campaign photo missing');
  assert.ok(css.includes('hhba-winter-modal-overlay')&&css.includes('@media(max-width:600px)'),'responsive centered modal CSS missing');
  assert.ok(css.includes('width:min(780px,100%)')&&css.includes('height:min(450px,88dvh)'),'campaign should use compact 780 x 450 popup');
@@ -99,11 +99,12 @@ test('concrete job first: only individual employer-issued postings appear in the
 
 test('site search and personal data flows are unchanged',()=>{
  assert.ok(!home.includes('siteSearchIndex'));
- assert.ok(popup.includes("window.localStorage.getItem(HIDE_KEY)")&&popup.includes("window.localStorage.setItem(HIDE_KEY,'1')"),'explicit opt-out must persist in browser local storage');
- assert.ok(popup.includes('if(dontShowAgain)'),'closing without a checked box must not persist a preference');
- assert.ok(popup.includes('checked={dontShowAgain}')&&popup.includes('setDontShowAgain(e.target.checked)'),'checkbox must be controllable');
- assert.ok(popup.includes('aria-label="不再显示寒假实习广告"'),'user must be able to locate opt-out choice');
+ assert.ok(popup.includes('useState(showOnHomeVisit)'),'each homepage mount must open campaign');
+ assert.ok(popup.includes('const close=useCallback(()=>setOpen(false),[])'),'close must only affect current view');
+ assert.ok(!popup.includes('localStorage')&&!popup.includes('sessionStorage'),'legacy suppress keys must never be read or written');
+ assert.ok(!popup.includes('HIDE_KEY')&&!popup.includes('SESSION_KEY'),'old suppression keys must not gate campaign');
+ assert.ok(!popup.includes('dontShowAgain')&&!popup.includes('type="checkbox"')&&!popup.includes('不再显示'),'nonfunctional opt-out checkbox must be removed');
+ assert.ok(!css.includes('.hhba-winter-hide-choice')&&!css.includes('.hhba-winter-modal-actions'),'obsolete checkbox styles must be removed');
  assert.ok(!popup.includes('getRealAuthToken')&&!popup.includes('/api/resumes'),'never read private account or resume information');
- assert.ok(css.includes('.hhba-winter-hide-choice')&&css.includes('.hhba-winter-modal-actions'),'opt-out must have responsive inline CTA layout');
  assert.ok(page.includes('过滤')||page.includes('筛选'),'filter UI should exist');
 });

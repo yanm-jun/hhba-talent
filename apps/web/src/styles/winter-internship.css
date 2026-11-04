@@ -16,10 +16,6 @@
 .hhba-winter-modal-description{font-size:11px!important;line-height:1.6!important;color:#61748c;margin:1px 0 12px!important}
 .hhba-winter-modal-highlights{display:flex;flex-wrap:wrap;gap:6px 9px;align-items:center;color:#3d6390;font-size:10px;font-weight:750;margin-bottom:13px}
 .hhba-winter-modal-highlights span{display:inline-flex;align-items:center;gap:5px}
-.hhba-winter-modal-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;max-width:355px;flex-wrap:wrap}
-.hhba-winter-hide-choice{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;font-size:11px;font-weight:650;line-height:1.45;color:#59718b;cursor:pointer;user-select:none}
-.hhba-winter-hide-choice input[type="checkbox"]{appearance:auto;-webkit-appearance:checkbox;accent-color:#1c6ca6;width:15px;height:15px;flex:none;margin:0;cursor:pointer}
-.hhba-winter-hide-choice input[type="checkbox"]:focus-visible{outline:2px solid #ff8a36;outline-offset:3px}
 .hhba-winter-join{display:inline-flex;align-items:center;justify-content:center;gap:17px;border-radius:100px;padding:10px 23px;color:#fff!important;text-decoration:none!important;font-size:16px;font-weight:850;letter-spacing:.045em;background:linear-gradient(105deg,#ff9b1d,#ff6b00);box-shadow:0 11px 23px #fe7c0060;transition:transform .2s,box-shadow .2s}
 .hhba-winter-join:hover{transform:translateY(-3px);box-shadow:0 15px 27px #ff7f005e}
 .hhba-winter-modal-footnote{font-size:9px!important;color:#7e93a7!important;line-height:1.4!important;margin:10px 0 0!important}
@@ -121,8 +117,6 @@
  .hhba-winter-modal-subtitle{font-size:17px!important;margin:12px 0 4px!important}
  .hhba-winter-modal-description{font-size:12px!important;margin:0 0 12px!important}
  .hhba-winter-modal-highlights{font-size:10px;gap:6px 10px;margin-bottom:14px}
- .hhba-winter-modal-actions{max-width:100%;gap:11px}
- .hhba-winter-hide-choice{font-size:11px}
  .hhba-winter-join{font-size:16px;padding:11px 23px;gap:17px}
  .hhba-winter-modal-footnote{margin-top:11px!important;font-size:9px!important}
  .hhba-winter-modal-close{top:12px;right:12px;width:36px;height:36px}
