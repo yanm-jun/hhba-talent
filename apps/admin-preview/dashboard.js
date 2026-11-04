@@ -258,7 +258,7 @@ function buildVerifiedInvestorRows(data,report){
   ['区间授权活跃账号',value(activity?.periodActive),'经同意的账号功能使用去重，'+range,activity?privateTime:''],
   ['首次活跃次日回访率',retention(activity?.firstSeenRetention?.d1),'以首次记录的同意活跃日为基准，不是注册次日留存；括号为回访/成熟样本',activity?privateTime:''],
   ['首次活跃第七日回访率',retention(activity?.firstSeenRetention?.d7),'以首次记录的同意活跃日为基准，不是注册七日留存；括号为回访/成熟样本',activity?privateTime:''],
-  ['同意访问 PV',value(traffic?.pv),'Cloudflare D1 匿名同意页面浏览，按分钟去重，'+range,traffic?privateTime:''],
+  ['页面访问事件 PV',value(traffic?.pv),'Cloudflare D1 不关联账号或访客标识的事件次数，不等于 UV，'+range,traffic?privateTime:''],
   ['设备有效收藏',value(devices?.savedJobs),'Cloudflare D1 设备级收藏；不是登录账号收藏，不应相加',devices?privateTime:''],
   ['真实收入','未接入','未接入可核验财务台账，不以岗位、访问或收藏估算收入','']
  ];
