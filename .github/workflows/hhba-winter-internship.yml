@@ -3,9 +3,10 @@ on:
   # Stacked PR base branches do not always carry the next batch's workflow filter.
   # Validate this source branch directly, without retargeting the PR to main.
   push:
-    branches: ['feature/winter-internships-batch04-eytw-shinewing-luoshu-20261104']
+    branches: ['feature/winter-internships-batch05-recube-cmb-papergames-20261104']
     paths:
       - 'apps/web/src/data/winter2027Jobs.ts'
+      - 'apps/web/src/data/winter2027Programs.ts'
       - 'apps/web/src/pages/WinterInternshipPage.tsx'
       - 'apps/web/scripts/winter-internship.contract.test.mjs'
       - 'apps/web/scripts/winter_internship_browser.py'
