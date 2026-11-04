@@ -149,8 +149,8 @@ test('batch06 adds three independently sourced employers, nine unique 2027 H1 re
  assert.ok(page.includes('企业招聘首页（非直投）')&&page.includes('查看招聘平台原始记录'),'third-party direct-job distinction missing');
  assert.ok(!jobs.includes('status:"open"'),'never invent live openings');
  const ledger=read('../../docs/WINTER_2027_54_EMPLOYER_PIPELINE.md');
- assert.ok(ledger.includes('后续待逐项核验：**33**'));
- assert.ok(ledger.includes('**21条**')&&ledger.includes('**33条**'),'21 handled candidates, 33 outstanding');
+ assert.ok(ledger.includes('后续待逐项核验：**30**'),'latest outstanding candidates must reflect batch07');
+ assert.ok(ledger.includes('**24条已处理、30条仍待核验**'),'batch07 cumulative candidate counts must be current');
 });
 
 
