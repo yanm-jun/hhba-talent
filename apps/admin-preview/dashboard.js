@@ -50,6 +50,46 @@ function showRealDataStatus(){
  byId('sidebar-data-state').textContent=state+'；仅展示汇总数据，不读取个人浏览记录';
  byId('top-access-state').textContent=state;
 }
+// Source-backed daily rows. A day before installation is unknown, not zero.
+function buildDailyOperationsRows(report){
+ const series=report?.traffic?.quality==='collected'&&Array.isArray(report.traffic.series)?report.traffic.series:null;
+ const account=report?.account?.quality==='collected'?report.account:null;
+ const signup=Array.isArray(account?.signupSeries)?account.signupSeries:null;
+ if(!series||!report?.period)return null;
+ const validDay=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v);
+ const installed=report.collectorStartedAt;
+ const earliest=typeof installed==='string'&&Number.isFinite(Date.parse(installed))?installed.slice(0,10):null;
+ const signupMap=signup?new Map(signup.filter(x=>validDay(x.day)).map(x=>[x.day,integer(x.count)])):null;
+ return series.filter(x=>validDay(x.day)).map(x=>{
+  const collected=earliest!==null&&x.day>=earliest;
+  const count=k=>collected?integer(x[k]):null;
+  return {day:x.day,signup:signupMap?.has(x.day)?signupMap.get(x.day):null,
+   pv:count('pv'),jobViews:count('jobViews'),searches:count('searches'),
+   outboundClicks:count('outboundClicks'),collected};
+ });
+}
+function renderDailyOperations(report){
+ const root=byId('users-daily-rows'),status=byId('users-daily-status');
+ if(!root||!status)return;
+ const rows=buildDailyOperationsRows(report);
+ root.replaceChildren();
+ if(!rows){
+  const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=6;
+  td.textContent='私有汇总数据不可用或未授权，不能显示真实明细';
+  tr.append(td);root.append(tr);status.textContent='数据不可用';return;
+ }
+ const display=n=>integer(n)===null?'—':fmt.format(n);
+ for(const item of [...rows].reverse()){
+  const tr=document.createElement('tr');
+  for(const value of [item.day,display(item.signup),item.collected?display(item.pv):'未采集',
+   item.collected?display(item.jobViews):'未采集',item.collected?display(item.searches):'未采集',
+   item.collected?display(item.outboundClicks):'未采集']){
+   const td=document.createElement('td');td.textContent=value;tr.append(td);
+  }
+  root.append(tr);
+ }
+ status.textContent=rows.length+' 天 · '+(report.collectorStartedAt?'运营事件起始于 '+report.collectorStartedAt.slice(0,10):'运营事件采集时间尚未核实');
+}
 function updateGrowth(){
  showRealDataStatus();
  const t=growth?.traffic,b=growth?.devices,a=growth?.account,q=growth?.activity;
@@ -78,12 +118,17 @@ function updateGrowth(){
    setMetric('users-area-'+name.replace('_','-'),q?.quality==='collected'?(q.areaUsers?.[name]||0):null);
   }
   setMetric('users-account-saves',a?.quality==='collected'?a.savedJobs:null);
+ setMetric('users-total-accounts',a?.quality==='collected'?a.registeredUsers:null);
+ setMetric('users-total-saves',a?.quality==='collected'?a.savedJobs:null);
+ setMetric('users-accounts-with-saves',a?.quality==='collected'?a.accountsWithSavedJobs:null);
+ const sourceStatus=byId('accounts-source-status');if(sourceStatus){sourceStatus.textContent=a?.quality==='collected'?'已核验':'未接通';sourceStatus.className='table-status '+(a?.quality==='collected'?'good':'waiting')}
+ renderDailyOperations(growth);
   byId('users-account-start').textContent=q?.collectedFrom?formatTime(q.collectedFrom):'账号活动统计已停用或尚未配置';
   byId('users-account-quality').textContent=q?.quality==='collected'
    ?'账号 DAU/WAU/MAU 与首次活跃回访仅覆盖已同意统计的登录账号，不等于所有注册用户；留存以首次记录活跃日为起点。'
    :q?.quality==='not_collected'?'账号级活动采集已停用；不计算 DAU/WAU/MAU 或回访率，匿名访问量不能代替账号活跃。':'账号级活跃尚无可信记录，不显示模拟数据。';
-  if(q?.quality==='collected')renderTraffic('users-account-chart',q.series.map(x=>({day:x.day,pv:x.active})));
-  else byId('users-account-chart').textContent='未采集账号级活跃，不显示虚假曲线';
+  if(a?.quality==='collected'&&Array.isArray(a.signupSeries))renderTraffic('users-account-chart',a.signupSeries.map(x=>({day:x.day,pv:integer(x.count)||0})));
+  else byId('users-account-chart').textContent='注册时间序列尚未连接，不显示虚假趋势';
   setMetric('investor-users',a?.quality==='collected'?a.registeredUsers:null);
  renderTraffic('users-chart',t?.quality==='collected'?t.series:null);
  if(t?.quality==='collected'){
