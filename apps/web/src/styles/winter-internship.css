@@ -161,8 +161,8 @@
 .hhba-winter-job-filters .hhba-winter-query{min-width:0;flex:1;background:#fff}
 .hhba-winter-job-search-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:#1b629c;border:0;border-radius:9px;color:#fff;font-size:12px;font-weight:800;padding:0 18px;white-space:nowrap}
 .hhba-winter-job-facets{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 13px;background:#fff;border:1px solid #dfe9f0;border-radius:10px}
-.hhba-winter-job-facets>span{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;color:#5e7488}
-.hhba-winter-job-facets label{display:inline-flex;align-items:center;gap:6px;color:#6a8295;font-size:11px}
+.hhba-winter-job-facets>span{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;color:#5e7488;white-space:nowrap;flex-shrink:0}
+.hhba-winter-job-facets label{display:inline-flex;align-items:center;gap:6px;color:#6a8295;font-size:11px;white-space:nowrap;flex-shrink:0}
 .hhba-winter-job-facets select{max-width:185px;border:1px solid #dce6ed;border-radius:7px;background:#fff;color:#2d4d66;padding:9px 10px;font-size:12px}
 .hhba-winter-filters-reset{border:0;padding:8px;background:transparent;color:#307aab;font-size:11px;cursor:pointer}
 .hhba-winter-list-summary{color:#698399;font-size:12px;padding:14px 0 7px}
