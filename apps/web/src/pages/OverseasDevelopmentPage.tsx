@@ -27,7 +27,7 @@ export function OverseasDevelopmentPage({user,view='home',pathwayId}:{user:User|
  const [category,setCategory]=useState<'all'|OverseasCategory>('all');
  const [bookmarks,setBookmarks]=useState<string[]>(()=>readIds(storedBookmarks));
  const [comparison,setComparison]=useState<string[]>(()=>readIds(storedCompare));
- const [matchGoal,setMatchGoal]=useState<'work'|'study'|'residence'|'experience'>('work');
+ const [matchGoal,setMatchGoal]=useState<'work'|'study'|'residence'|'experience'>(()=>{const goal=new URLSearchParams(location.search).get('goal');return goal==='study'||goal==='residence'||goal==='experience'?goal:'work';});
  const [matchOffer,setMatchOffer]=useState<'yes'|'no'|'unsure'>('unsure');
  useEffect(()=>{try{localStorage.setItem(storedBookmarks,JSON.stringify(bookmarks));}catch{}},[bookmarks]);
  useEffect(()=>{try{localStorage.setItem(storedCompare,JSON.stringify(comparison));}catch{}},[comparison]);
@@ -55,7 +55,7 @@ export function OverseasDevelopmentPage({user,view='home',pathwayId}:{user:User|
      <p>不止留学。探索各国合法的海外工作、职业发展、学习与居留路径，从自己的目标出发，找到可核实的行动方案。</p>
      <div className="hhba-overseas-hero-actions"><Link to={countryLink} className="hhba-overseas-primary">从新西兰开始探索 <ArrowRight size={17}/></Link><Link to={root+'/match'} className="hhba-overseas-outline">按目标初步筛选 <Compass size={17}/></Link></div>
      <div className="hhba-overseas-hero-meta"><span><CheckCircle2 size={15}/> 官方政策来源</span><span><CheckCircle2 size={15}/> 申请门槛透明</span><span><CheckCircle2 size={15}/> 不保证获签</span></div>
-    </div><div className="hhba-overseas-hero-globe" aria-hidden="true"><div className="hhba-overseas-orbit">✦</div><span>NZ</span></div></header>
+    </div><div className="hhba-overseas-hero-credit"><a className="hhba-overseas-photo-credit" target="_blank" rel="noopener noreferrer" href="https://commons.wikimedia.org/wiki/File:The_Remarkables_from_Queenstown,_New_Zealand_04.jpg">实景摄影：Σ64 · CC BY 4.0 · Wikimedia Commons <ExternalLink size={12}/></a></div><div className="hhba-overseas-hero-globe" aria-hidden="true"><div className="hhba-overseas-orbit">✦</div><span>NZ</span></div></header>
     <main className="hhba-overseas-container hhba-overseas-home-main">
      <section className="hhba-overseas-section" aria-labelledby="hhba-overseas-countries">
       <div className="hhba-overseas-section-head"><div><span className="hhba-overseas-kicker">EXPLORE DESTINATIONS</span><h2 id="hhba-overseas-countries">探索国家与地区</h2><p>逐国开发、逐条核实。资料未完成的国家不会伪装成可申请方案。</p></div></div>
@@ -65,7 +65,7 @@ export function OverseasDevelopmentPage({user,view='home',pathwayId}:{user:User|
       </article>)}</div>
      </section>
      <section className="hhba-overseas-section"><div className="hhba-overseas-section-head"><div><span className="hhba-overseas-kicker">CHOOSE YOUR PATH</span><h2>不确定去哪里？先从目标出发</h2><p>先看有哪些可研究的合法方案，再核对个人具体资格。</p></div></div>
-      <div className="hhba-overseas-goal-grid">{[{name:'海外工作',desc:'找到适用的雇主支持和就业路径',icon:<BriefcaseBusiness/>,goal:'work'},{name:'留学深造',desc:'比较课程与学生签证要求',icon:<GraduationCap/>,goal:'study'},{name:'长期居留',desc:'梳理技能和居留资格门槛',icon:<House/>,goal:'residence'},{name:'工作与旅行',desc:'了解短期工作及打工度假项目',icon:<Plane/>,goal:'experience'}].map(item=><Link to={root+'/match'} key={item.goal} onClick={()=>setMatchGoal(item.goal as OverseasCategory)} className="hhba-overseas-goal-card"><span>{item.icon}</span><strong>{item.name}</strong><small>{item.desc}</small><ArrowUpRight size={17}/></Link>)}</div>
+      <div className="hhba-overseas-goal-grid">{[{name:'海外工作',desc:'找到适用的雇主支持和就业路径',icon:<BriefcaseBusiness/>,goal:'work'},{name:'留学深造',desc:'比较课程与学生签证要求',icon:<GraduationCap/>,goal:'study'},{name:'长期居留',desc:'梳理技能和居留资格门槛',icon:<House/>,goal:'residence'},{name:'工作与旅行',desc:'了解短期工作及打工度假项目',icon:<Plane/>,goal:'experience'}].map(item=><Link to={root+'/match?goal='+item.goal} key={item.goal} className="hhba-overseas-goal-card"><span>{item.icon}</span><strong>{item.name}</strong><small>{item.desc}</small><ArrowUpRight size={17}/></Link>)}</div>
      </section>
      <section className="hhba-overseas-extras"><div><span className="hhba-overseas-kicker">EXISTING STUDY RESOURCES</span><h2>原有大学与专业资料继续保留</h2><p>已开发的大学、专业及课程资源将保留在留学资料库中，作为海外发展模块的教育资源。</p></div><Link to={root+'/legacy'} className="hhba-overseas-outline">查看原留学资料 <ArrowRight size={16}/></Link></section>
      <Disclaimer/>
@@ -73,7 +73,7 @@ export function OverseasDevelopmentPage({user,view='home',pathwayId}:{user:User|
    </>}
    {view==='country'&&<main className="hhba-overseas-container hhba-overseas-content">
     <Breadcrumb items={[{title:'新西兰'}]}/>
-    <div className="hhba-overseas-country-hero"><div><span className="hhba-overseas-kicker">NEW ZEALAND · OFFICIAL PATHWAYS</span><h1>🇳🇿 新西兰发展规划</h1><p>从就业、绿名单相关居留、留学到短期打工度假，选择符合自己条件的合法路径。绿名单是职业分类，不是单独的签证。</p><div className="hhba-overseas-country-summary"><span>{nzPathways.length} 条已整理方案</span><span>2026-11-04 官方资料核验</span></div></div><div className="hhba-overseas-kiwi" aria-hidden="true">NZ<span>新西兰</span></div></div>
+    <div className="hhba-overseas-country-hero"><div><span className="hhba-overseas-kicker">NEW ZEALAND · OFFICIAL PATHWAYS</span><h1>🇳🇿 新西兰发展规划</h1><p>从就业、绿名单相关居留、留学到短期打工度假，选择符合自己条件的合法路径。绿名单是职业分类，不是单独的签证。</p><div className="hhba-overseas-country-summary"><span>{nzPathways.length} 条已整理方案</span><span>2026-11-04 官方资料核验</span></div><a className="hhba-overseas-photo-credit" target="_blank" rel="noopener noreferrer" href="https://commons.wikimedia.org/wiki/File:The_Remarkables_from_Queenstown,_New_Zealand_04.jpg">实景摄影：Σ64 · CC BY 4.0 · Wikimedia Commons <ExternalLink size={12}/></a></div><div className="hhba-overseas-kiwi" aria-hidden="true">NZ<span>新西兰</span></div></div>
     <div className="hhba-overseas-utility"><Link to={root+'/match'}><SlidersHorizontal size={17}/> 目标筛选</Link><Link to={root+'/saved'}><Bookmark size={17}/> 我的收藏（{bookmarks.length}）</Link><Link to={root+'/compare'}><GitCompareArrows size={17}/> 方案对比（{comparison.length}/3）</Link><Link to={root+'/legacy'}><BookOpen size={17}/> 留学资料库</Link></div>
     <section className="hhba-overseas-section"><div className="hhba-overseas-section-head"><div><h2>选择赴新西兰方案</h2><p>按出国目标分类，所有方案均有申请条件、材料、流程、限制和官方来源。</p></div></div>
      <div className="hhba-overseas-filter-bar"><div className="hhba-overseas-search"><Search size={18}/><input value={search} onChange={e=>setSearch(e.target.value)} aria-label="搜索新西兰方案" placeholder="搜索签证、职业、条件或关键词"/></div><div className="hhba-overseas-filter-chips">{([{id:'all',name:'全部'},...Object.entries(overseasCategoryLabels).map(([id,name])=>({id,name}))] as {id:'all'|OverseasCategory;name:string}[]).map(item=><button type="button" key={item.id} className={category===item.id?'is-active':''} aria-pressed={category===item.id} onClick={()=>setCategory(item.id)}>{item.name}</button>)}</div></div>
