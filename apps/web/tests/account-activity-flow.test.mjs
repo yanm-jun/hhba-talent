@@ -141,6 +141,13 @@ test('registration, real saved-job writes, consented events, isolation, and eras
  assert.equal(bodyA.day,today());assert.equal('account_hash' in bodyA,false);
  assert.equal(bodyA.historicalRecorded,true);
  assert.equal(bodyB.historicalRecorded,true);
+ // Records from an earlier day must still be visible as history even when today is empty.
+ const hashA=[...state.activities.values()].find(row=>row.area==='companies').account_hash;
+ for(const row of state.activities.values())if(row.account_hash===hashA)row.day='2026-01-01';
+ const historicalOnly=await (await selfCheck({env,request:selfRequest(tokenA)})).json();
+ assert.equal(historicalOnly.recorded,false,'no activity for current UTC day');
+ assert.equal(historicalOnly.historicalRecorded,true,'historical activity is not mistaken for zero');
+ for(const row of state.activities.values())if(row.account_hash===hashA)row.day=today();
  assert.ok(!JSON.stringify(bodyA).includes('13900000001'));
  assert.equal(state.activities.size,5,'self-check cannot create activity records');
  assert.equal((await selfCheck({env,request:selfRequest(null)})).status,401);
