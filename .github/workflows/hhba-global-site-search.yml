@@ -9,6 +9,7 @@ on:
       - 'apps/web/src/main.tsx'
       - 'apps/web/src/styles/site-search.css'
       - 'apps/web/scripts/site-search.contract.test.mjs'
+      - 'apps/web/scripts/site_search_browser.py'
       - '.github/workflows/hhba-global-site-search.yml'
   workflow_dispatch:
 permissions:
@@ -39,6 +40,23 @@ jobs:
         run: |
           cp apps/web/dist/index.html apps/web/dist/404.html
           touch apps/web/dist/.nojekyll
+      - name: Install Chromium for actual browser acceptance
+        run: |
+          python -m pip install 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Smoke-test header search and in-site detail routing
+        working-directory: apps/web
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 &
+          python scripts/site_search_browser.py
+      - name: Upload search browser screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-global-site-search-screenshots
+          path: /tmp/hhba-global-search-*.png
+          retention-days: 14
+          if-no-files-found: ignore
       - name: Upload isolated branch build for acceptance
         uses: actions/upload-artifact@v4
         with:
