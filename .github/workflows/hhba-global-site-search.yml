@@ -1,0 +1,47 @@
+name: HHBA Global Site Search PR Preview and Regression
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/services/siteSearchIndex.ts'
+      - 'apps/web/src/pages/SiteSearchPage.tsx'
+      - 'apps/web/src/components/Shell.tsx'
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/src/styles/site-search.css'
+      - 'apps/web/scripts/site-search.contract.test.mjs'
+      - '.github/workflows/hhba-global-site-search.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build-and-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked web dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Global search routing, source, scope and privacy regression
+        working-directory: apps/web
+        run: node --test scripts/site-search.contract.test.mjs
+      - name: Verify TypeScript and build static HHBA branch
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+        run: npm run build
+      - name: Add GitHub Pages deep-link fallback
+        run: |
+          cp apps/web/dist/index.html apps/web/dist/404.html
+          touch apps/web/dist/.nojekyll
+      - name: Upload isolated branch build for acceptance
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-global-site-search-branch-build
+          path: apps/web/dist
+          retention-days: 14
