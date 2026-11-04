@@ -93,7 +93,7 @@ function WinterRoleRow({job}:{job:WinterJob}){
   </div>
   <div className="hhba-winter-role-actions">
    <Link to={'/winter-internship/'+job.id} className="hhba-winter-role-detail">岗位详情 <ArrowRight size={15}/></Link>
-   {url&&<a href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-role-apply">{job.status==='closed'?'查看已截止公告':job.status==='campus-limited'?'企业官网（非直投）':job.status==='source-verify'?'企业招聘首页（非直投）':'官网核实'} <ExternalLink size={14}/></a>}
+   {url&&<a href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-role-apply">{job.status==='filled'?'查看已招满公告':job.status==='closed'?'查看已截止公告':job.status==='campus-limited'?'企业官网（非直投）':job.status==='source-verify'?'企业招聘首页（非直投）':'官网核实'} <ExternalLink size={14}/></a>}
    <small>核对：{job.checkedOn}</small>
   </div>
  </article>;
@@ -123,8 +123,8 @@ function WinterJobDetail({user,job}:{user:User|null;job:WinterJob}){
    {(job.status==='deadline-conflict'||job.status==='year-conflict')&&<p className="hhba-winter-warning" role="note">{job.reviewWarning||'官方截止日期出现不一致的公开页面版本，HHBA 无法确认当前可申请。请以雇主申请系统最新页面为准。'}</p>}
    {job.reviewWarning&&job.status!=='deadline-conflict'&&job.status!=='year-conflict'&&<p className="hhba-winter-warning" role="note">{job.reviewWarning}</p>}
    {job.evidenceUrl&&<a href={job.evidenceUrl} target="_blank" rel="noopener noreferrer" className="hhba-winter-source-link">{job.status==='campus-limited'?'查看高校公开职位与截止日':job.status==='source-verify'?'查看招聘平台原始记录':'查看补充招聘时间证据'} <ExternalLink size={15}/></a>}
-   <h2>职位来源与申请核实</h2><p>本站整理有出处的公开职位和招聘批次信息；部分仅见于高校或第三方招聘平台。已过截止日的岗位只保留历史资料与官方公告链接，不代表可投递；企业招聘首页不等于具体岗位直投入口。HHBA 不代收申请材料，也不承诺名额或录取结果。</p>
-   {url&&<a href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-official">{job.status==='closed'?'查看雇主已截止岗位公告':job.status==='campus-limited'?'企业官网（非岗位直投）':job.status==='source-verify'?'企业招聘首页（非岗位直投）':'前往企业官方岗位核实及申请'} <ExternalLink size={16}/></a>}
+   <h2>职位来源与申请核实</h2><p>本站整理有出处的公开职位和招聘批次信息；部分仅见于高校或第三方招聘平台。已过截止日或已被雇主宣布招满的岗位仅保留历史资料与官方公告链接，不代表可投递；企业招聘首页不等于具体岗位直投入口。HHBA 不代收申请材料，也不承诺名额或录取结果。</p>
+   {url&&<a href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-official">{job.status==='filled'?'查看雇主已招满岗位公告':job.status==='closed'?'查看雇主已截止岗位公告':job.status==='campus-limited'?'企业官网（非岗位直投）':job.status==='source-verify'?'企业招聘首页（非岗位直投）':'前往企业官方岗位核实及申请'} <ExternalLink size={16}/></a>}
    <p className="hhba-winter-verified">资料核对日期：{job.checkedOn}。{job.statusNote}。</p>
   </section>
  </main></Shell>;
@@ -202,6 +202,6 @@ export function WinterInternshipPage({user,slug}:{user:User|null;slug?:string}){
   <section className="hhba-winter-help"><BriefcaseBusiness size={26}/><div><h2>想继续寻找更多专业实习机会？</h2>
    <p>优先展示覆盖冬季的具体岗位；尚未核实寒假入职的相关实习会明显标注。更多职位可到 HHBA 招聘市场查看。</p></div>
    <Link to="/candidate/jobs">查看完整招聘市场 <ArrowUpRight size={16}/></Link></section>
-  <p className="hhba-winter-page-note"><ShieldCheck size={16}/> 岗位发布不代表仍在招；信息核验日期请查看每条详情。香港职位可能要求有效工作资格；若某岗位官网已关闭申请，须以企业官网为准。</p>
+  <p className="hhba-winter-page-note"><ShieldCheck size={16}/> 岗位发布不代表仍在招，部分已招满或已截止；信息核验日期请查看每条详情。香港职位可能要求有效工作资格；若某岗位官网已关闭申请，须以企业官网为准。</p>
  </main></Shell>;
 }
