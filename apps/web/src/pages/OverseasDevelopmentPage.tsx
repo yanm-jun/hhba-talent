@@ -4,6 +4,7 @@ import {Link} from '../router';
 import {Shell} from '../components/Shell';
 import type {User} from '../services/api';
 import {nzPathways,nzVerifiedOn,overseasCategoryLabels,overseasCountryOptions,type OverseasCategory,type OverseasPathway} from '../data/overseasNewZealand';
+import {overseasCountryPhotos} from '../data/overseasCountryPhotos';
 import {OverseasDetailedGuide} from '../components/OverseasDetailedGuide';
 import {nzCompleteGuidesV2} from '../data/overseasNzGuidesV2';
 import '../styles/overseas-development.css';
@@ -62,7 +63,20 @@ export function OverseasDevelopmentPage({user,view='home',pathwayId}:{user:User|
      <section className="hhba-overseas-section" aria-labelledby="hhba-overseas-countries">
       <div className="hhba-overseas-section-head"><div><span className="hhba-overseas-kicker">EXPLORE DESTINATIONS</span><h2 id="hhba-overseas-countries">探索国家与地区</h2><p>逐国开发、逐条核实。资料未完成的国家不会伪装成可申请方案。</p></div></div>
       <div className="hhba-overseas-country-grid">{overseasCountryOptions.map(c=><article className={'hhba-overseas-country-card hhba-overseas-country-'+c.code} key={c.code}>
-       <div className="hhba-overseas-country-banner"><span className="hhba-overseas-banner-flag">{c.flag}</span><span className="hhba-overseas-country-status">{c.ready?'国家方案已收录':'规划中'}</span></div>
+       <div className="hhba-overseas-country-banner">
+        <img className="hhba-overseas-country-photo"
+          src={import.meta.env.BASE_URL+'overseas/countries/'+overseasCountryPhotos[c.code].file}
+          alt={overseasCountryPhotos[c.code].alt}
+          width={960} height={384} loading="lazy" decoding="async"
+          style={{objectPosition:overseasCountryPhotos[c.code].position}}/>
+        <a className="hhba-overseas-photo-attribution" href={overseasCountryPhotos[c.code].sourceUrl}
+          target="_blank" rel="noopener noreferrer"
+          title={overseasCountryPhotos[c.code].credit+' · '+overseasCountryPhotos[c.code].license+' · 照片已为网页裁切'}
+          aria-label={c.name+'照片来源：'+overseasCountryPhotos[c.code].credit+'，'+overseasCountryPhotos[c.code].license}>
+          <span aria-hidden="true">©</span> {overseasCountryPhotos[c.code].credit} · {overseasCountryPhotos[c.code].license}
+        </a>
+        <span className="hhba-overseas-country-status">{c.ready?'国家方案已收录':'规划中'}</span>
+       </div>
        <div className="hhba-overseas-country-copy"><small>{c.region} · {c.english}</small><h3>{c.name}</h3><p>{c.description}</p>{c.ready?<Link to={c.code==='nz'?countryLink:c.code==='au'?root+'/country/australia':c.code==='jp'?root+'/country/japan':root}>探索全部方案 <ArrowRight size={16}/></Link>:<span className="hhba-overseas-country-pending">资料开发中 · 暂不开放</span>}</div>
       </article>)}</div>
      </section>
