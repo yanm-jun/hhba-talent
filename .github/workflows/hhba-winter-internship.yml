@@ -1,0 +1,68 @@
+name: HHBA Winter Internship Popup and Directory Acceptance
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/pages/HomePage.tsx'
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/src/pages/WinterInternshipPage.tsx'
+      - 'apps/web/src/components/WinterInternshipPopup.tsx'
+      - 'apps/web/src/data/winter2027Programs.ts'
+      - 'apps/web/src/styles/winter-internship.css'
+      - 'apps/web/scripts/winter-internship.contract.test.mjs'
+      - 'apps/web/scripts/winter_internship_browser.py'
+      - '.github/workflows/hhba-winter-internship.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  winter-review-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify modal, real programmes, route and privacy contracts
+        working-directory: apps/web
+        run: node --test scripts/winter-internship.contract.test.mjs
+      - name: Build HHBA static review version with exact Pages base
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+        run: npm run build
+      - name: Prepare deep-link review package
+        run: |
+          cp apps/web/dist/index.html apps/web/dist/404.html
+          touch apps/web/dist/.nojekyll
+      - name: Install Playwright Chromium
+        run: |
+          python -m pip install 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Actual desktop and mobile entry and CTA acceptance
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 &
+          python scripts/winter_internship_browser.py
+      - name: Upload desktop/mobile evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-winter-2027-review-screenshots
+          path: /tmp/hhba-winter-*.png
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Upload isolated review build
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-winter-2027-review-dist
+          path: apps/web/dist
+          retention-days: 14
