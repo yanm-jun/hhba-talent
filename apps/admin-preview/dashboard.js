@@ -9,7 +9,7 @@ const formatTime=value=>{
  })+'（北京时间）'}catch{return '—'}
 };
 const cloudflareMode=location.hostname==='hhba-talent.pages.dev'||location.hostname.endsWith('.hhba-talent.pages.dev')||location.hostname==='hhba.work';
-let snapshot=null,growth=null,growthError=null,selectedPeriod='30d',customRange=null,activeView='overview';
+let snapshot=null,growth=null,growthError=null,selectedPeriod='30d',customRange=null,activeView='overview',growthRequestId=0;
 function normalizeCloudflarePublic(raw){
  if(raw?.kind!=='HHBA_CLOUDFLARE_PUBLIC_METRICS_V1'||!raw.counts)throw Error('INVALID_CLOUDFLARE_JOB_DATA');
  return {kind:'HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2',quality:raw.quality,asOf:raw.sourceTime,
@@ -142,17 +142,20 @@ async function refreshGrowth(){
   if(!customRange)return;
   params.set('from',customRange.from);params.set('to',customRange.to);
  }else params.set('days',selectedPeriod==='today'?'1':selectedPeriod.slice(0,-1));
+ const requestId=++growthRequestId;
  try{
   const r=await fetch('/admin-preview/api/metrics?'+params,{cache:'no-store',credentials:'same-origin'});
+  if(requestId!==growthRequestId)return;
   if(!r.ok||!(r.headers.get('content-type')||'').includes('application/json')){
    growthError=[401,403].includes(r.status)?'AUTH_REQUIRED':'SERVICE_ERROR';
    throw Error('PRIVATE_METRICS_REQUIRE_AUTH');
   }
   const v=await r.json();
+  if(requestId!==growthRequestId)return;
   if(v.kind!=='HHBA_CLOUDFLARE_PRIVATE_METRICS_V1'||!v.traffic||!v.devices||!v.account){growthError='SERVICE_ERROR';throw Error('INVALID_PRIVATE_METRICS')}
   growth=v;growthError=null;
- }catch{growth=null;if(!growthError)growthError='SERVICE_ERROR'}
- updateGrowth();
+ }catch{if(requestId!==growthRequestId)return;growth=null;if(!growthError)growthError='SERVICE_ERROR'}
+ if(requestId===growthRequestId)updateGrowth();
 }
 
 const titles={overview:'数据总览',users:'用户分析',market:'岗位与企业',operations:'运营监控',
@@ -199,11 +202,13 @@ function choosePeriod(value){
   node.setAttribute('aria-pressed',String(chosen));
  }
  byId('custom-range').hidden=value!=='custom';
+ byId('users-custom-range').hidden=value!=='custom';
  const text={today:'今日', '7d':'近 7 天','30d':'近 30 天',custom:customRange?'自定义时间':'自定义时间'};
- byId('trend-range-label').textContent=value==='custom'&&customRange
-  ?customRange.from+' 至 '+customRange.to:text[value];
+ const periodText=value==='custom'&&customRange?customRange.from+' 至 '+customRange.to:text[value];
+ byId('trend-range-label').textContent=periodText;
+ byId('users-period-label').textContent=periodText+'（UTC）';
  byId('period-notice').querySelector('span').textContent='当前岗位指标为最新索引快照，与所选'+text[value]+
-  '范围无关；匿名访问、账号功能分类和新注册按所选区间查询，DAU/WAU/MAU 始终按今日滚动窗口。';
+  '范围无关；注册新增和无身份运营事件按所选日期查询，账号 DAU/WAU/MAU 已停采。';
  if(value!=='custom'||customRange)void refreshGrowth();
 }
 function qualityText(data){
@@ -328,16 +333,23 @@ for(const node of document.querySelectorAll('.nav-link'))node.addEventListener('
 for(const node of document.querySelectorAll('[data-period]'))node.addEventListener('click',()=>{
  choosePeriod(node.dataset.period);
 });
-byId('apply-custom').addEventListener('click',()=>{
- const from=byId('date-from').value,to=byId('date-to').value;
- const alert=byId('date-error');
- if(!from||!to||from>to){alert.textContent='请选择有效的起止日期';return}
- if(to>new Date().toISOString().slice(0,10)){alert.textContent='结束日期不能晚于今天';return}
+function applyCustomDateRange(prefix){
+ const from=byId(prefix+'date-from').value,to=byId(prefix+'date-to').value;
+ const alert=byId(prefix+'date-error');
+ const valid=d=>/^\d{4}-\d{2}-\d{2}$/.test(d||'')&&Number.isFinite(Date.parse(d+'T00:00:00Z'))&&
+  new Date(d+'T00:00:00Z').toISOString().slice(0,10)===d;
+ if(!valid(from)||!valid(to)||from>to){alert.textContent='请选择有效的起止日期';return}
+ if(to>new Date().toISOString().slice(0,10)){alert.textContent='结束日期不能晚于今天（UTC）';return}
  const diff=(Date.parse(to+'T00:00:00Z')-Date.parse(from+'T00:00:00Z'))/86400000;
  if(!Number.isInteger(diff)||diff>89){alert.textContent='自定义范围最多 90 天';return}
  alert.textContent='';
- customRange={from,to};choosePeriod('custom');
-});
+ customRange={from,to};
+ byId('date-from').value=from;byId('date-to').value=to;
+ byId('users-date-from').value=from;byId('users-date-to').value=to;
+ choosePeriod('custom');
+}
+byId('apply-custom').addEventListener('click',()=>applyCustomDateRange(''));
+byId('users-apply-custom').addEventListener('click',()=>applyCustomDateRange('users-'));
 byId('refresh').addEventListener('click',()=>{void refresh();void refreshGrowth()});
 byId('top-investor').addEventListener('click',()=>setView('investor'));
 byId('show-investor').addEventListener('click',()=>setView('investor'));
