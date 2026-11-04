@@ -4,6 +4,8 @@ import {Link} from '../router';
 import {Shell} from '../components/Shell';
 import type {User} from '../services/api';
 import {nzPathways,nzVerifiedOn,overseasCategoryLabels,overseasCountryOptions,type OverseasCategory,type OverseasPathway} from '../data/overseasNewZealand';
+import {OverseasDetailedGuide} from '../components/OverseasDetailedGuide';
+import {nzCompleteGuidesV2} from '../data/overseasNzGuidesV2';
 import '../styles/overseas-development.css';
 
 type View='home'|'country'|'pathway'|'saved'|'compare'|'match';
@@ -85,14 +87,8 @@ export function OverseasDevelopmentPage({user,view='home',pathwayId}:{user:User|
     {chosen?<><Breadcrumb items={[{title:'新西兰',to:countryLink},{title:chosen.name}]}/>
      <header className="hhba-overseas-pathway-head"><div className="hhba-overseas-eyebrow"><CategoryIcon category={chosen.category}/>{overseasCategoryLabels[chosen.category]} · 官方资料核验：{nzVerifiedOn}</div><h1>{chosen.name}</h1><p className="hhba-overseas-eng">{chosen.english}</p><p>{chosen.summary}</p><div className="hhba-overseas-detail-tags">{chosen.highlights.map(x=><span key={x}>{x}</span>)}{chosen.availability==='closed'&&<span className="is-closed">目前官方关闭</span>}</div></header>
      <div className="hhba-overseas-detail-layout"><div className="hhba-overseas-detail-main">
-      <section className="hhba-overseas-detail-intro"><h2>这条路线适合谁？</h2><p>{chosen.audience}</p></section>
-      <Block title="01 · 申请资格与门槛" items={chosen.requirement}/>
-      <Block title="02 · 需要准备的材料" items={chosen.documents}/>
-      <Block title="03 · 从准备到申请的步骤" items={chosen.steps}/>
-      <Block title="04 · 费用与预算" items={chosen.fees}/>
-      <Block title="05 · 获签后的工作或居留权利" items={chosen.rights}/>
-      <section className="hhba-overseas-detail-block hhba-overseas-warning"><h2><AlertTriangle size={20}/> 风险和重要限制</h2><ul>{chosen.risks.map((x,i)=><li key={i}>{x}</li>)}</ul></section>
-      <div className="hhba-overseas-study-follow"><h2>还想了解新西兰的学校和课程？</h2><p>旧版留学资料及大学项目仍然保留，不把“读书”包装为自动获得工作或居留权。</p><Link to={root+'/legacy'}>打开留学资料库 <ArrowRight size={16}/></Link></div>
+      <OverseasDetailedGuide key={chosen.id} pathway={chosen} guide={nzCompleteGuidesV2[chosen.id]}/>
+     <div className="hhba-overseas-study-follow"><h2>还想了解新西兰的学校和课程？</h2><p>旧版留学资料及大学项目仍然保留，不把“读书”包装为自动获得工作或居留权。</p><Link to={root+'/legacy'}>打开留学资料库 <ArrowRight size={16}/></Link></div>
      </div><aside className="hhba-overseas-detail-aside"><div className="hhba-overseas-aside-card"><span className="hhba-overseas-kicker">OFFICIAL APPLICATION</span><h2>以官方条件为准</h2><p>核验日期：{nzVerifiedOn}</p><p>申请资格及收费可能变化。直接访问新西兰移民局的原始政策页。</p>
       <a href={chosen.officialUrl} target="_blank" rel="noopener noreferrer" className="hhba-overseas-primary">{chosen.availability==='closed'?'查看官方开放状态':'查看官方申请资料'} <ExternalLink size={16}/></a>
       {chosen.secondaryUrl&&<a className="hhba-overseas-aside-link" href={chosen.secondaryUrl} target="_blank" rel="noopener noreferrer">查看补充官方依据 <ExternalLink size={15}/></a>}
