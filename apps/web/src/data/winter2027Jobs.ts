@@ -5,7 +5,7 @@
  * The programme-only catalogue lives in winter2027Programs.ts.
  * Posted ≠ currently accepting applications. Review before every production release.
  */
-export type WinterJobStatus='verify-apply'|'deadline-conflict'|'closed';
+export type WinterJobStatus='verify-apply'|'deadline-conflict'|'year-conflict'|'closed';
 export type WinterJob={
  id:string;company:string;english:string;title:string;
  region:string;city:string;industry:string;location:string;
@@ -13,6 +13,7 @@ export type WinterJob={
  description:string;requirements:string[];majorTags:string[];tags:string[];
  sourceUrl:string;applyUrl:string;checkedOn:string;status:WinterJobStatus;
  statusNote:string;workRightsNote?:string;salaryNote?:string;
+ evidenceUrl?:string;reviewWarning?:string;
  originalProgramId?:string;
 };
 export const WINTER_2027_JOBS:ReadonlyArray<WinterJob>=[
@@ -146,6 +147,73 @@ export const WINTER_2027_JOBS:ReadonlyArray<WinterJob>=[
   checkedOn:'2026-11-04',status:'verify-apply',
   statusNote:'雇主官网有独立科技与管理咨询岗位；月份尚未证实，申请前确认是否涵盖寒假',
   workRightsNote:'香港工作地点，具体工作许可和签证担保政策应向雇主核实。'
+ },
+ {
+  id:'richemont-hk-talent-acquisition-jr134347',company:'历峰集团 Richemont',english:'Richemont',
+  title:'Talent Acquisition Intern 人才招聘实习生（2026.12—2027.05）',
+  region:'中国香港',city:'香港',industry:'人力资源',location:'中国香港·全职实习',
+  startDate:'2026 年 12 月',period:'2026 年 12 月至 2027 年 5 月（约六个月）',
+  deadline:'官网有 Apply Now 入口，未列公开统一申请截止日；名额与按钮状态以雇主官网实时显示为准',
+  description:'历峰集团官方招聘职位 JR134347，协助校园招聘活动、面试安排、零售精品店招聘支持以及集团实习计划协调。属于单一人力资源职位，不按品牌或门店拆成多个岗位。',
+  requirements:['人力资源管理、酒店管理、心理学或相关领域本科背景。','具备 Word、Excel、PowerPoint、Outlook 办公应用能力。','英语、中文书面和口语沟通良好，有团队协作和组织协调能力。','能从 2026 年 12 月至 2027 年 5 月全职到岗；奢侈品零售、酒店业相关实习经历优先。'],
+  majorTags:['人力资源管理','心理学','酒店管理','工商管理','英语','市场营销'],
+  tags:['历峰','Richemont','人力','招聘','Luxury','零售','香港','冬季','实习','2027'],
+  sourceUrl:'https://careers.richemont.com/en/jobs/jr134347/talent-acquisition-intern-6-months-dec-2026-may-2027/',
+  applyUrl:'https://careers.richemont.com/en/jobs/jr134347/talent-acquisition-intern-6-months-dec-2026-may-2027/',
+  checkedOn:'2026-11-04',status:'verify-apply',
+  statusNote:'历峰集团雇主官网存在独立编号 JR134347 的具体实习岗位，当前是否仍可申请以官网为准',
+  workRightsNote:'工作地点为香港，雇主页面没有明确此岗位签证担保安排，申请前需核实合法工作资格。'
+ },
+ {
+  id:'tianzh-international-haikou-audit-j10722',company:'天职国际',english:'Baker Tilly China · Tianzhi',
+  title:'财务审计实习生 · 海口（J10722）',
+  region:'中国内地',city:'海口',industry:'审计咨询',location:'海南省海口市',
+  startDate:'2026 年 12 月初（根据 2026-10-30 官网招聘公告推定；请向雇主确认）',
+  period:'雇主职位说明为 12 月初至次年 3 月 31 日，每周至少 4 天、尽量完整参与一项审计项目',
+  deadline:'企业官方招聘列表 2026-10-30 发布，未公布统一截止日期；按岗位编号 J10722 查找',
+  description:'天职国际官方实习生招聘板块独立岗位 J10722。协助项目经理及组长完成年报审计、经济责任审计、清产核资及相关底稿工作。原公告写“12月初—3月31日”，未逐项注明两端年份，HHBA 不假定年限已最终确认。',
+  requirements:['在校本科大三或以上学生；会计、审计、财务、金融等相关专业可核对申请条件。','具备责任心、沟通协调能力、团队协作能力及基本办公软件使用技能。','每周至少可到岗 4 天、可参与一个完整审计项目者优先。'],
+  majorTags:['会计学','审计学','财务管理','金融学','税收学'],
+  tags:['天职国际','海口','海南','审计','财务','J10722','实习','寒假','2027'],
+  sourceUrl:'https://tzcpa.zhiye.com/intern/jobs',applyUrl:'https://tzcpa.zhiye.com/intern/jobs',
+  checkedOn:'2026-11-04',status:'verify-apply',
+  statusNote:'雇主官方列表中的独立职位编号 J10722；请在企业官网按编号查找后确认 2026—2027 年实习期与可投递状态',
+  reviewWarning:'官方岗位写明“12月初—3月31日”但未标注起止年份。根据2026年10月发布日推测覆盖2027年寒假，申请前务必向雇主确认。'
+ },
+ {
+  id:'tianzh-international-xian-workcenter-j11175',company:'天职国际',english:'Baker Tilly China · Tianzhi',
+  title:'作业中心审计实习生 · 西安（J11175）',
+  region:'中国内地',city:'西安',industry:'审计咨询',location:'陕西省西安市·数字化审计作业中心',
+  startDate:'第三方雇主招聘记录标示 2027 年 1 月；企业官网未明示入职月份',
+  period:'第三方招聘记录显示 2027 年 1—4 月；官网岗位 J11175 要求至少 50 个工作日',
+  deadline:'雇主官网 2026-10-30 发布独立职位 J11175，未见统一截止日',
+  description:'天职国际官方职位 J11175“作业中心实习生-西安”，协助审计底稿与报告编制、企业财务报表及现金流量表处理、数字化审计工具操作。第三方平台另一条同类企业职位显示 1—4 月入职批次，具体是否对应 J11175 由雇主确认。',
+  requirements:['本科大二及以上在校学生。','具有较强的敬业精神、团队协作、沟通协调及分析能力。','熟练使用计算机、Excel等常用办公软件。','可保证至少 50 个工作日实习，具体时段和录用要求请按职位编号 J11175 向雇主核实。'],
+  majorTags:['会计学','审计学','财务管理','信息管理与信息系统','数据科学','计算机科学'],
+  tags:['天职国际','西安','AI审计','函证','数字化','J11175','实习','寒假','2027'],
+  sourceUrl:'https://tzcpa.zhiye.com/intern/jobs',applyUrl:'https://tzcpa.zhiye.com/intern/jobs',
+  evidenceUrl:'https://www.shixiseng.com/intern/inn_vlr3ihsifqkc?pcm=pc_SearchList',
+  checkedOn:'2026-11-04',status:'verify-apply',
+  statusNote:'雇主官方岗位 J11175 确有该职位；第三方招聘时间未与官网职位 ID 严格绑定，具体冬季批次待企业确认',
+  reviewWarning:'第三方平台发布的“2027年1—4月”岗位与官网 J11175 业务内容相似，但未证明为同一招聘编号。此岗位不保证属于该批次或仍可申请。'
+ },
+ {
+  id:'crowe-hk-spring-audit-2027-review',company:'国富浩华香港 Crowe',english:'Crowe (HK) CPA Limited',
+  title:'Spring Audit Intern 春季审计实习生（年度版本待核验）',
+  region:'中国香港',city:'香港',industry:'审计咨询',location:'中国香港·审计部门',
+  startDate:'官网近期检索显示 2027 年 1 月；旧版页面缓存仍显示 2026 年 1 月',
+  period:'近期官网检索记录显示 2027 年 1—3 月；与旧版缓存年份不一致',
+  deadline:'雇主官网未公开统一截止日，招聘年度与在招状态须直接联系雇主确认',
+  description:'国富浩华香港雇主官网 Spring Internship 页面提供单一审计部门实习职位及邮件投递指引。2026年11月的近期搜索索引显示 Spring Internship 2027，但旧的网页提取缓存仍记录 Spring Internship 2026；因此 HHBA 将该职位标注年度待核验，不作为确定 2027 年度可投递机会。',
+  requirements:['会计或商科相关专业全日制在读大学生。','英语和中文（广东话及普通话）沟通良好。','愿意参与不同类型企业及机构的审计与鉴证工作。','投递前必须在雇主官网或通过其人力资源联系方式核实2027年度批次是否实际开放。'],
+  majorTags:['会计学','审计学','财务管理','金融学','工商管理'],
+  tags:['Crowe','国富浩华','香港','审计','Spring Internship','2027','版本待核实'],
+  sourceUrl:'https://www.crowe.com/hk/careers/internship',
+  applyUrl:'https://www.crowe.com/hk/careers/internship',
+  checkedOn:'2026-11-04',status:'year-conflict',
+  statusNote:'同一官网网址存在“2027近期检索”与“2026旧缓存”两版年份信息；不保证2027实习已开放',
+  reviewWarning:'官方网页存在年度版本冲突：近期检索结果显示2027年1—3月，另有旧缓存显示2026年1—3月。请先核对企业官网当前正文并联系招聘方，不要直接把此条视为已开放的2027岗位。',
+  workRightsNote:'中国香港实习岗位；如需在港工作许可，请提前与雇主确认资格及安排。'
  }
 ];
 const safe=(url:string)=>{try{const u=new URL(url);return u.protocol==='https:'&&!u.username&&!u.password;}catch{return false}};
@@ -153,6 +221,7 @@ export function winterJobById(id:string){return WINTER_2027_JOBS.find(job=>job.i
 export function winterJobSafeUrl(job:WinterJob){return safe(job.sourceUrl)&&safe(job.applyUrl)?job.applyUrl:null;}
 export function winterJobStatusLabel(job:WinterJob){
  if(job.status==='closed')return '已过申请截止日';
+ if(job.status==='year-conflict')return '招聘年度存在冲突 · 待复核';
  if(job.status==='deadline-conflict')return '申请日期冲突 · 需核实';
  return '官方具体岗位 · 申请状态待核实';
 }
