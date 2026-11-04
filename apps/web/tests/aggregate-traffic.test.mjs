@@ -71,3 +71,17 @@ test('admin does not manufacture UV or DAU from count-only events',()=>{
  assert.match(index,/访客 UV（未采集）/);
  assert.match(index,/账号行为采集已停止/);
 });
+
+test('public disclosure is a quiet page link, not a new consent or identity-tracking step',()=>{
+ const shell=readFileSync(new URL('../src/components/Shell.tsx',import.meta.url),'utf8');
+ const main=readFileSync(new URL('../src/main.tsx',import.meta.url),'utf8');
+ const page=readFileSync(new URL('../src/pages/DataUsePage.tsx',import.meta.url),'utf8');
+ assert.match(shell,/<footer className="hhba-site-disclosure"><Link to="\/data-use">运营数据说明<\/Link><\/footer>/);
+ assert.match(main,/if\(route==='\/data-use'\)return <DataUsePage user=\{user\}\/>/);
+ assert.match(page,/事件次数/);
+ assert.match(page,/不为访问统计设置访客 Cookie/);
+ assert.match(page,/运营计数以最少字段收集/);
+ assert.match(page,/简历智能匹配/);
+ assert.match(page,/留期限和自动清理机制尚待平台完成专项治理验收/);
+ assert.doesNotMatch(page,/<input|<button|同意使用情况统计|暂不同意/);
+});
