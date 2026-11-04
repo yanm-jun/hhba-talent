@@ -123,6 +123,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
   finally{setActivityChecking(false)}
  }
  const areaLabels:Record<AccountArea,string>={general:'一般访问',jobs:'岗位浏览',companies:'企业资料',policies:'人才政策',tools:'求职工具',job_save:'岗位收藏操作'};
+ const trackingPrevented=typeof navigator!=='undefined'&&(navigator.doNotTrack==='1'||(navigator as Navigator & {globalPrivacyControl?:boolean}).globalPrivacyControl===true);
  const sectionTitle=pages.find(page=>page.id===current)?.label||'个人中心';
  if(!user?.account_types?.includes('candidate'))return <Shell user={user}><section className="hhba-personal"><p role="status">请先使用真实求职者账号登录。</p><Link to="/candidate/login">前往登录</Link></section></Shell>;
  return <Shell user={user}>
@@ -208,6 +209,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
       <div><strong><CheckCircle2 size={18}/>核验账号活动是否真正入库</strong>
        <p>只读查询当前登录账号今天（UTC）的功能类别，不创建测试数据，也不显示手机号、搜索词或简历。</p>
        {consent!==true&&<p role="status">当前未授权账号使用统计；可先自愿同意，再浏览岗位或人才政策。</p>}
+       {trackingPrevented&&<p role="status">浏览器已启用 DNT/GPC 隐私保护；HHBA 会尊重这一设置，不会新增行为统计记录。</p>}
        {myActivity&&<p className="hhba-account-activity-result" role="status">{myActivity.day} UTC：{myActivity.recorded
          ?'已查询到真实活动：'+myActivity.areas.map(a=>areaLabels[a]).join('、')
          :'数据库尚无该账号今日活动记录；请在同意统计后浏览岗位，再重新核验。'}</p>}
