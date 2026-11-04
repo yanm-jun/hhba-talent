@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import {BookOpenText,CheckCircle2,ClipboardCheck,ExternalLink,HelpCircle,Info,ShieldAlert} from 'lucide-react';
 import type {OverseasPathway} from '../data/overseasNewZealand';
+import {overseasTerms} from '../data/overseasGlossary';
 import '../styles/overseas-guide-v2.css';
 
 /** Every country guide follows the same 10 chapters, but ALL factual wording is pathway-specific. */
@@ -13,51 +14,7 @@ export type DetailedGuide={
   sections:GuideSection[];faq:GuideFAQ[];risks:string[];terms:string[];
   sources:GuideSource[];
 };
-export const overseasTerms:Record<string,string>={
- 'Green List':'新西兰官方列出的部分紧缺职业清单，按 Tier 1、Tier 2 区分。清单内职业也必须满足该岗位专有资格、注册、工资等要求。',
- 'Tier 1':'新西兰绿名单第一层级。符合规定的 Tier 1 职业、认证雇主就业及居民签证条件时，可能走 Straight to Residence（直接申请居民签证），不是自动获批。',
- 'Tier 2':'新西兰绿名单第二层级。通常需累积至少24个月符合条件的新西兰就业经历，再检查 Work to Residence 的居民签证条件。',
- 'Accredited employer':'新西兰移民局认可的雇主。申请人应在官方认证雇主名单核实雇主，而不是仅凭招聘广告写着“认证”。',
- 'AEWV':'Accredited Employer Work Visa，新西兰认证雇主工作签证。须有满足规定的真实岗位与雇主程序；不等于居民签证。',
- 'Job Check':'新西兰认证雇主在聘用某些海外员工前，针对具体职位履行的官方岗位审核程序；与雇主获得认证是两回事。',
- 'NZQCF':'New Zealand Qualifications and Credentials Framework，新西兰学历与资格等级框架；“4级”不等于中国学历的“四级考试”。',
- 'NZQA':'New Zealand Qualifications Authority，新西兰学历资格评估机构，负责符合规定的海外学历评估（IQA）等业务。',
- 'IQA':'International Qualification Assessment，即海外学历资格评估。是否需要由签证和职业要求决定，需要时通过 NZQA 官方渠道办理；不是每位申请人都必须做。',
- '职业注册':'某些国家的护士、教师、医生、工程师等受监管职业，须取得当地行业主管机构认可的专业执业资格；学历证书不等同执业牌照。',
- 'EOI':'Expression of Interest，意向登记或意向申请。提交 EOI 不等于已经递交签证、获得邀请或可以凭此合法居留。',
- 'ITA':'Invitation to Apply，官方申请邀请。不同国家和路径可能需要先收到邀请才进入签证正式申请阶段。',
- 'SMC':'Skilled Migrant Category，新西兰技术移民类别；须结合职业、薪酬、资格、工作经验、积分体系及官方当期规则判断。',
- '居民签证':'允许在相应签证条件下长期居留、工作或学习的身份；不是所有工作签证都属于居民签证，也不等同已获得公民身份。',
- '永久居民签证':'新西兰 Permanent Resident Visa 等独立签证类别；与此前获得的居民签证不是同一手续，需另行满足资格。',
- 'Offer of Place':'新西兰合规教育机构提供的正式课程录取文件；是否无条件录取、学费和课程信息须逐项核对。',
- 'PSWV':'Post Study Work Visa，新西兰部分合格课程毕业生可申请的毕业后工作签证；不是任何学校毕业都自动有资格。',
- 'Ballot':'抽签登记程序。登记与被抽中只是官方程序中的阶段，并非已获得签证；没有人可以保证中签。',
- 'Skills in Demand':'澳大利亚482类别雇主担保临时技能工作签证的名称；不同技能通道可能有不同薪资和职业要求。',
- 'Core Skills':'澳大利亚482核心技能通道之一，需检查职业名单、工资门槛、雇主提名等具体规定。',
- 'Specialist Skills':'澳大利亚482专业技能通道；高薪等特定要求与 Core Skills 不同，不能仅凭职业名称判断资格。',
- 'Subclass':'澳大利亚签证类别代码，例如482为雇主担保工作，189为独立技术移民；数字不代表等级优劣。',
- 'Nomination':'提名。澳洲雇主提名、州/领地政府提名的提交机构和资格不同；获得提名也不等于签证获批。',
- 'SkillSelect':'澳大利亚用于部分技术移民路径提交 EOI、统计积分并发出邀请的官方系统，不是直接付款获签平台。',
- 'Skills assessment':'职业技能评估。澳大利亚相关职业评估机构核查你的教育及工作经验，是否合格由具体职业的指定机构判断。',
- 'ANZSCO':'澳大利亚和新西兰常用的职业分类编码体系。需按真实工作职责匹配，不能只看中文岗位名称近似。',
- 'Points test':'技术移民积分评估；澳洲某些路径最低分通常65分，但达到最低分不保证获得州提名或联邦邀请。',
- 'ImmiAccount':'澳大利亚内政部官方网上签证申请账户，用于提交资料、缴费、上传附件、查询申请消息。',
- 'CoE':'Confirmation of Enrolment，澳大利亚合规教育机构签发的入学确认文件。一般是在学校录取及确认入学等环节后得到的文件。',
- 'CRICOS':'澳大利亚对可向国际学生提供教育服务的学校和课程的官方注册系统；申请学生签证前应核对学校及课程。',
- 'GS':'Genuine Student，澳大利亚学生签证的真实学习目的要求。申请人需用个人背景、课程选择和证据解释为什么赴澳学习。',
- 'OSHC':'Overseas Student Health Cover，澳大利亚国际学生通常须持有的海外学生医疗保险，不等同于签证申请费。',
- 'AFP':'Australian Federal Police，澳大利亚联邦警察。部分签证需其出具的澳洲无犯罪证明，不能以普通国内派出所证明代替。',
- 'Bridging visa':'澳大利亚部分在境内合法提交申请后的过桥签证，用于处理身份衔接；并不是任意递交 EOI 都能取得。',
- 'Designated regional area':'澳大利亚官方定义的指定区域，不等于中文习惯中的“农村”或“偏僻地方”；须按地区代码和签证规则核查。',
- 'Regional':'澳大利亚某些区域性签证的范围，需核对官方指定区域名单，不能依据城市大小自行推定。',
- 'Subclass 191':'澳大利亚满足特定区域签证及其他规定后可能申请的永久居留类别；持491/494并不自动变成191。',
- 'TRT':'Temporary Residence Transition，澳大利亚部分雇主提名永居签证的临时居留转永居通道，要求视当期规则而定。',
- 'Direct Entry':'澳大利亚186雇主提名永居的一种直接申请通道，通常对技能评估和工作经验等有独立要求。',
- '英语能力':'不同签证对语言要求并不一致，有些要求具体等级和成绩，有些只对部分职业或签证类别要求；须核查被认可考试、有效期和豁免。',
- '体检与无犯罪':'移民目的国可能要求指定体检方式、胸透或由符合规则的机构出具无犯罪记录；不要提前做错误类型的材料。',
- 'Visa Pricing Estimator':'澳大利亚内政部签证费官方估算器，仅估算签证收费，通常不包括学费、体检、英语考试、翻译、职业认证及安家费。',
- '职业名单':'政府为特定签证设定的可申请职业范围；一种职业可在某签证名单上、却不在另一种签证名单上。'
-};
+
 
 export function OverseasDetailedGuide({pathway,guide}:{pathway:OverseasPathway;guide:DetailedGuide}){
  const [completed,setCompleted]=useState<string[]>([]);
