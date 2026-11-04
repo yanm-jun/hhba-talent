@@ -130,7 +130,7 @@ test('batch05 has seven distinct university-only ReCube winter records and two s
 
 
 test('batch06 adds three independently sourced employers, nine unique 2027 H1 records with truthful deadlines',()=>{
- const ids=[...jobs.matchAll(/\\bid:['"]([a-z0-9-]+)['"]/g)].map(x=>x[1]);
+ const ids=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(x=>x[1]);
  const sun=['sunlife-hk-strategic-finance-jr00128213','sunlife-hk-financial-reporting-jr00128231','sunlife-hk-actuarial-internship-jr00120885'];
  const man=['manulife-hk-2027-private-equity-jr26091338','manulife-hk-2027-data-finance-jr26091703','manulife-hk-2027-global-info-risk-jr26100089','manulife-hk-2027-marketing-strategy-jr26100142','manulife-hk-2027-tech-placement-jr26100136'];
  const informa='informa-markets-hk-2027-jan-jun-intern-l059656859';
