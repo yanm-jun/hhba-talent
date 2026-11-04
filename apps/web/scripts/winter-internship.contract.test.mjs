@@ -50,12 +50,18 @@ test('directory contains source-backed programmes without invented job numbers',
 });
 test('concrete job first: only individual employer-issued postings appear in the primary list',()=>{
  const jobIds=[...jobs.matchAll(/\bid:'([a-z0-9-]+)'/g)].map(x=>x[1]);
- assert.equal(jobIds.length,3,'three independent official job requisitions in first MVP');
+ assert.equal(jobIds.length,8,'8 independently sourced winter/spring recruitment positions after batch 02');
  assert.equal(new Set(jobIds).size,jobIds.length,'no duplicate role identity');
  for(const id of ['apco-shanghai-winter-start-1787','hsbc-hk-student-placement-1367003857','qima-hk-sales-intern-744000154586189']){
   assert.ok(jobIds.includes(id),id+' missing');
  }
- for(const domain of ['oraclecloud.com','careers.hsbc.com','jobs.smartrecruiters.com'])assert.ok(jobs.includes(domain));
+ for(const id of ['bdo-hk-spring-assurance-2027','bdo-hk-spring-it-audit-2027','atkinsrealis-hk-winter-2027-r164310','rsm-hk-spring-audit-assurance-2027','rsm-hk-spring-tech-consulting-2027'])assert.ok(jobIds.includes(id),id+' missing from batch 02');
+ for(const name of ['BDO 香港','AtkinsRéalis','RSM 罗申美香港'])assert.ok(jobs.includes(name),'batch02 employer '+name+' missing');
+ for(const domain of ['oraclecloud.com','careers.hsbc.com','jobs.smartrecruiters.com','recruitment.bdo.com.hk','careers.atkinsrealis.com','www.rsm.global'])assert.ok(jobs.includes(domain));
+ assert.ok(jobs.includes("2026 年 11 月 20 日")&&jobs.includes("2026 年 11 月 30 日"),'two different real BDO application deadlines must be preserved');
+ assert.ok(jobs.includes('R-164310')&&jobs.includes('不是 13 个单独招聘岗位'),'engineering business lines must not be inflated into fake jobs');
+ assert.ok(jobs.includes('确切起始月份尚未公布'),'RSM spring schedule is not a verified January start');
+ assert.ok(!jobs.includes("status:'open'"),'real-time availability must not be fabricated');
  assert.ok(!jobs.includes('jpm-2027-seasonal'),'JPM summer/fall seasonal programme is not a winter role');
  for(const part of ['data-winter-job={job.id}','winterJobById(slug)','data-winter-page="job-detail"','hhba-winter-role-list','PROGRAM_ONLY','data-winter-program-archive']){
   assert.ok(page.includes(part),part+' missing from job-first page');
