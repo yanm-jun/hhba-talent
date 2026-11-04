@@ -1,5 +1,5 @@
 import type {DetailedGuide} from '../components/OverseasDetailedGuide';
-import {pack} from './overseasNzGuidesV2a';
+import {pack} from './overseasNzGuidesV2a.ts';
 const au={
  fee:'https://immi.homeaffairs.gov.au/visas/getting-a-visa/fees-and-charges',
  student:'https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500',
