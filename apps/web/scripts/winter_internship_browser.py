@@ -17,7 +17,7 @@ with sync_playwright() as p:
     errors=[]
     page.on('pageerror',lambda e: errors.append(str(e)))
     page.goto(BASE,wait_until='domcontentloaded',timeout=60000)
-    dialog=page.get_by_role('dialog',name='寒假实习季抢先一步')
+    dialog=page.locator('[data-hhba-winter-modal] [role=dialog]')
     dialog.wait_for(timeout=60000)
     assert page.get_by_role('button',name='关闭公开信，进入首页').count()==0
     assert page.get_by_text('读一封来自 HHBA 的信').count()==0
