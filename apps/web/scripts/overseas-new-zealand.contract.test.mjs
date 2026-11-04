@@ -48,7 +48,7 @@ test('原有大学资料路由保留，新首页/国家/详情/收藏/对比接�
 });
 test('8国展示，只有新西兰已收录，不虚构其他国家方案',()=>{
  assert.equal(overseasCountryOptions.length,8);
- assert.deepEqual(overseasCountryOptions.filter(c=>c.ready).map(c=>c.code),['nz']);
+ assert.deepEqual(overseasCountryOptions.filter(c=>c.ready).map(c=>c.code),['nz','au']);
  assert.ok(css.includes('@media(max-width:760px)'));
  assert.ok(css.includes('.hhba-overseas-path-grid'));
 });
