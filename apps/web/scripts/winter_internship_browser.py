@@ -130,7 +130,8 @@ with sync_playwright() as p:
     assert page.get_by_role('link',name='查看补充招聘时间证据').get_attribute('href').startswith('https://www.shixiseng.com/')
     assert page.get_by_text('未证明为同一招聘编号',exact=False).count()>0
     page.get_by_role('link',name='返回寒假实习岗位列表').click()
-    page.get_by_role('button',name='下一页').click()
+    # Job detail and list are the same React route component; it preserves page 2 on return.
+    assert page.locator('[data-winter-job]').count()==2
     page.locator('[data-winter-job="crowe-hk-spring-audit-2027-review"]').get_by_role('link',name='岗位详情').click()
     assert page.get_by_text('官方网页存在年度版本冲突',exact=False).count()>0
     assert page.get_by_role('link',name='前往企业官方岗位核实及申请').get_attribute('href').startswith('https://www.crowe.com/')
