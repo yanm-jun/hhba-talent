@@ -1,0 +1,135 @@
+/* HHBA 2027 winter internship: scoped, standalone styles. No changes to existing site layout. */
+.hhba-winter-modal-overlay{position:fixed;inset:0;z-index:11000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(7,21,46,.68);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hhba-winter-modal{position:relative;display:grid;grid-template-columns:53% 47%;width:min(1050px,100%);height:min(600px,88dvh);min-height:420px;border-radius:27px;overflow:hidden;background:#fff;box-shadow:0 30px 100px #07172f60;border:1px solid #ffffffad;isolation:isolate}
+.hhba-winter-modal-close{position:absolute;right:18px;top:18px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#fffffff0;border:1px solid #e0e8f1;box-shadow:0 2px 14px #00000014;color:#1b365a;z-index:5;cursor:pointer}
+.hhba-winter-modal-close:hover{background:#eff6ff}
+.hhba-winter-modal-close:focus-visible,.hhba-winter-join:focus-visible,.hhba-winter-card-detail:focus-visible{outline:3px solid #ff8a36;outline-offset:3px}
+.hhba-winter-modal-copy{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:50px 42px 40px 52px;background:radial-gradient(ellipse at 100% 10%,#cee8ff 0,transparent 60%),linear-gradient(158deg,#fcffff 0%,#f1f8ff 64%,#ebf6ff 100%);z-index:1}
+.hhba-winter-modal-copy:before{content:"";position:absolute;width:210px;height:210px;border:1px solid #1666bd1c;border-radius:50%;top:-110px;left:-85px;pointer-events:none}
+.hhba-winter-brand{display:flex;align-items:center;flex-wrap:wrap;gap:12px;color:#416b97;font-size:11px;font-weight:800;letter-spacing:.11em}
+.hhba-winter-brand-dot{color:#0e559a;font-size:23px;font-weight:950;letter-spacing:-.05em}
+.hhba-winter-brand-dot:after{content:"";display:inline-block;border-radius:50%;height:5px;width:5px;background:#ff8a1f;margin-left:2px}
+.hhba-winter-year{display:inline-flex;align-items:center;gap:7px;margin:48px 0 13px;background:#ff8b1f;color:white;padding:9px 16px;transform:rotate(-2deg);border-radius:5px 18px 5px 14px;font-weight:900;letter-spacing:.025em;box-shadow:0 5px 0 #ffcf7d44}
+.hhba-winter-modal h2{font-size:clamp(36px,4vw,60px);line-height:1.16;letter-spacing:-.06em;color:#13549e;font-weight:950;margin:0}
+.hhba-winter-modal h2 span{display:block;color:#f17e0b;font-size:.83em;margin-top:13px;letter-spacing:.04em}
+.hhba-winter-modal-subtitle{font-size:23px!important;line-height:1.4!important;font-weight:850;color:#173f75;margin:23px 0 6px!important}
+.hhba-winter-modal-description{font-size:14px!important;line-height:1.75!important;color:#61748c;margin:2px 0 19px!important}
+.hhba-winter-modal-highlights{display:flex;flex-wrap:wrap;gap:9px 13px;align-items:center;color:#3d6390;font-size:12px;font-weight:750;margin-bottom:21px}
+.hhba-winter-modal-highlights span{display:inline-flex;align-items:center;gap:5px}
+.hhba-winter-join{display:inline-flex;align-items:center;justify-content:center;gap:28px;border-radius:100px;padding:15px 35px;color:#fff!important;text-decoration:none!important;font-size:21px;font-weight:850;letter-spacing:.045em;background:linear-gradient(105deg,#ff9b1d,#ff6b00);box-shadow:0 11px 23px #fe7c0060;transition:transform .2s,box-shadow .2s}
+.hhba-winter-join:hover{transform:translateY(-3px);box-shadow:0 15px 27px #ff7f005e}
+.hhba-winter-modal-footnote{font-size:10px!important;color:#7e93a7!important;line-height:1.5!important;margin:17px 0 0!important}
+.hhba-winter-modal-visual{position:relative;background:linear-gradient(150deg,#d9efff,#8fb8e7);min-width:0;overflow:hidden}
+.hhba-winter-modal-visual img{width:100%;height:100%;display:block;object-fit:cover;object-position:52% center;filter:saturate(1.17) contrast(1.03)}
+.hhba-winter-modal-visual:before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,#c6e6ff7a 0%,transparent 34%),linear-gradient(0deg,#1953a1a8 0%,transparent 35%);pointer-events:none}
+.hhba-winter-sun{position:absolute;top:-90px;right:-100px;width:330px;height:330px;background:radial-gradient(circle,#ffe2998e 0,#fff0bd30 45%,transparent 70%);border-radius:50%;z-index:2;pointer-events:none}
+.hhba-winter-visual-note{position:absolute;left:25px;bottom:46px;z-index:3;display:flex;align-items:center;gap:7px;color:#fff;text-shadow:0 1px 8px #0007}
+.hhba-winter-visual-note strong{font-size:24px}.hhba-winter-visual-note span{font-size:10px;letter-spacing:.1em;margin-left:4px}
+.hhba-winter-visual-credit{position:absolute;bottom:13px;left:27px;z-index:3;color:#ffffffbf;font-size:10px}
+.hhba-winter-modal-secondary{position:absolute;right:24px;bottom:16px;z-index:4;display:inline-flex;align-items:center;gap:5px;font-size:12px;color:white;text-decoration:underline;text-underline-offset:3px}
+/* Standalone section and canonical detail routes. */
+.hhba-winter-page{max-width:1170px;margin:0 auto;padding:35px 24px 70px;color:#17324d}
+.hhba-winter-page a{text-decoration:none}
+.hhba-winter-landing-hero{display:grid;grid-template-columns:1.12fr .88fr;min-height:365px;background:linear-gradient(115deg,#e4f2ff 0%,#fafcff 52%,#eaf5ff 100%);border:1px solid #dfeaf5;border-radius:25px;overflow:hidden}
+.hhba-winter-landing-copy{padding:48px 30px 45px 50px;position:relative;z-index:1}
+.hhba-winter-eyebrow{display:flex;align-items:center;gap:7px;color:#3472a5;letter-spacing:.1em;font-weight:800;font-size:11px;margin:0 0 12px}
+.hhba-winter-landing-hero h1{font-size:clamp(31px,3.6vw,47px);font-weight:900;color:#0c4c95;margin:0 0 16px;line-height:1.29;letter-spacing:-.04em}
+.hhba-winter-landing-hero h1 em{font-size:.64em;font-style:normal;color:#f08319;white-space:normal}
+.hhba-winter-landing-copy>p:not(.hhba-winter-eyebrow){color:#5a7594;font-size:13px;line-height:1.9;max-width:530px}
+.hhba-winter-landing-cta{display:inline-flex;align-items:center;gap:12px;border-radius:24px;background:#f28616;color:white!important;padding:13px 21px;font-weight:800;font-size:13px;margin-top:13px}
+.hhba-winter-landing-hero>img{width:100%;height:100%;min-height:365px;object-fit:cover;object-position:center}
+.hhba-winter-page-trust{display:flex;justify-content:space-around;gap:15px;flex-wrap:wrap;background:#fff;padding:20px;margin:17px 0 40px;border:1px solid #e0e9f0;border-radius:14px}
+.hhba-winter-page-trust span{display:flex;align-items:center;gap:7px;color:#496783;font-size:12px;font-weight:700}
+.hhba-winter-page-trust svg{color:#258b65}
+.hhba-winter-section-title h2{font-size:26px;color:#153755;margin:4px 0 8px}
+.hhba-winter-section-title p{color:#eb7e0d;font-weight:700;font-size:11px;margin:0}
+.hhba-winter-section-title span{font-size:13px;color:#7b8c9f}
+.hhba-winter-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:24px;background:#fff;border:1px solid #e1e8ed;padding:12px;border-radius:12px}
+.hhba-winter-query{display:flex;align-items:center;gap:9px;min-width:230px;flex:1;border:1px solid #e0e7ee;border-radius:9px;padding:0 13px;color:#6e8298}
+.hhba-winter-query input{padding:12px 0;min-width:0;width:100%;border:0;background:transparent;outline:none;font-size:13px}
+.hhba-winter-select{display:flex;align-items:center;gap:7px;font-size:12px;color:#61748a;border:1px solid #e0e7ee;border-radius:9px;padding:9px 11px}
+.hhba-winter-select select{border:0;background:#fff;min-width:80px;font-size:12px;color:#30475e}
+.hhba-winter-filters>button{display:inline-flex;align-items:center;gap:7px;padding:12px 18px;border:0;border-radius:9px;background:#195992;color:#fff;font-weight:750;font-size:12px}
+.hhba-winter-result-count{color:#7b8ea0;font-size:12px;margin:16px 2px}
+.hhba-winter-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
+.hhba-winter-card{display:flex;flex-direction:column;min-width:0;background:#fff;border:1px solid #e0e8ef;border-radius:16px;padding:22px;box-shadow:0 4px 16px #23426607}
+.hhba-winter-card-label{display:flex;gap:9px;color:#4382a8;font-size:10px;font-weight:750}
+.hhba-winter-card-label span:first-child{background:#eaf5ff;border-radius:5px;padding:5px 9px}.hhba-winter-card-label span:last-child{padding:5px}
+.hhba-winter-card h3{font-size:18px;color:#1f3e5b;line-height:1.4;margin:12px 0 7px}
+.hhba-winter-card-company{margin:0 0 12px;color:#236ea8;font-weight:800;font-size:13px}
+.hhba-winter-card-company small{font-size:11px;color:#879aab;margin-left:4px;font-weight:500}
+.hhba-winter-card-description{color:#586e81;font-size:12px;line-height:1.85;margin:0 0 15px;flex:1}
+.hhba-winter-card-meta{display:grid;gap:8px;font-size:11px;color:#637c93}
+.hhba-winter-card-meta span{display:flex;align-items:flex-start;gap:6px}
+.hhba-winter-card-meta svg{flex:none;margin-top:1px}
+.hhba-winter-card-status{display:flex;align-items:flex-start;gap:6px;border-radius:7px;background:#f6f9fb;color:#687e8d;padding:9px;margin:14px 0;font-size:11px}
+.hhba-winter-card-status svg{flex:none}
+.hhba-winter-card-detail{display:flex;align-items:center;justify-content:space-between;gap:7px;background:#ebf4fb;color:#185c91!important;font-size:12px;font-weight:800;padding:12px;border-radius:8px}
+.hhba-winter-card-detail:hover{background:#dcecf9}
+.hhba-winter-help{display:flex;align-items:center;gap:15px;flex-wrap:wrap;padding:24px;margin-top:36px;background:#f3f8fd;border:1px solid #dde7f0;border-radius:16px}
+.hhba-winter-help>svg{color:#276b9f}.hhba-winter-help>div{flex:1;min-width:240px}
+.hhba-winter-help h2{font-size:16px;margin:0 0 6px}.hhba-winter-help p{font-size:12px;color:#73899c;margin:0}
+.hhba-winter-help>a{display:inline-flex;align-items:center;gap:6px;color:#1d6a9c;font-size:12px;font-weight:800}
+.hhba-winter-page-note{font-size:12px;color:#788b9b;display:flex;align-items:flex-start;gap:8px;line-height:1.8;margin-top:22px}
+.hhba-winter-page-note svg{flex:none;margin-top:3px}
+.hhba-winter-none{display:grid;justify-items:center;text-align:center;padding:45px 20px;background:#fff;border:1px dashed #c8d8e5;border-radius:14px;color:#8092a3}
+.hhba-winter-none h3{font-size:16px;color:#344e67;margin-bottom:0}.hhba-winter-none p{font-size:12px}
+.hhba-winter-none button{padding:9px 16px;color:#24659e;border-radius:8px;border:1px solid #b1ccdf;background:#f2f9ff}
+.hhba-winter-back{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#266d9e!important;margin:6px 0 24px}
+.hhba-winter-detail>h1{font-size:30px}.hhba-winter-detail-panel{display:grid;grid-template-columns:1.3fr .7fr;gap:24px;border-radius:19px;background:linear-gradient(120deg,#eaf4ff,#fff);border:1px solid #dce9f3;padding:32px}
+.hhba-winter-detail-panel h1{font-size:30px;line-height:1.4;color:#19548d;margin:13px 0}
+.hhba-winter-detail-panel>div>p{font-size:13px;line-height:1.85;color:#667e93}
+.hhba-winter-detail-company{font-size:14px!important;font-weight:800;color:#3b75a4!important}
+.hhba-winter-source-tag{display:inline-flex;align-items:center;gap:5px;background:#e2f3eb;padding:7px 11px;color:#277755;font-size:11px;border-radius:6px;font-weight:750}
+.hhba-winter-detail-facts{display:grid;gap:8px}.hhba-winter-detail-facts div{display:grid;gap:6px;border-radius:10px;padding:11px 15px;background:#ffffffcb}
+.hhba-winter-detail-facts small{font-size:11px;color:#718396}.hhba-winter-detail-facts strong{font-size:12px;line-height:1.6;color:#30516e}
+.hhba-winter-detail-info{background:#fff;border:1px solid #e0eaf0;border-radius:15px;padding:30px;margin-top:18px;line-height:1.9;color:#587189;font-size:13px}
+.hhba-winter-detail-info h2{font-size:18px;color:#204e75;margin:22px 0 6px}.hhba-winter-detail-info h2:first-child{margin-top:0}
+.hhba-winter-detail-info li{margin:6px 0;padding-left:2px}.hhba-winter-detail-info ul{padding-left:22px}
+.hhba-winter-source-link,.hhba-winter-official{display:inline-flex;align-items:center;gap:6px;padding:11px 15px;border-radius:8px;margin:6px 8px 8px 0;background:#e8f3fb;color:#20699b!important;font-weight:800}
+.hhba-winter-official{background:#f58b1b;color:#fff!important}
+.hhba-winter-verified{font-size:11px!important;color:#8b9bad}
+.hhba-winter-missing{max-width:720px;margin:80px auto;text-align:center}
+@media(max-width:850px){
+ .hhba-winter-modal{grid-template-columns:55% 45%}
+ .hhba-winter-modal-copy{padding:38px 28px}
+ .hhba-winter-modal h2{font-size:40px}
+ .hhba-winter-year{margin-top:24px}
+ .hhba-winter-modal-subtitle{font-size:19px!important}
+ .hhba-winter-card-grid{grid-template-columns:1fr}
+ .hhba-winter-detail-panel{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+ .hhba-winter-modal-overlay{padding:10px}
+ .hhba-winter-modal{width:min(440px,100%);height:auto;min-height:0;max-height:92dvh;display:flex;flex-direction:column;overflow:auto;border-radius:20px}
+ .hhba-winter-modal-visual{order:-1;height:177px;min-height:177px}
+ .hhba-winter-modal-copy{padding:18px 24px 23px}
+ .hhba-winter-brand{font-size:9px}.hhba-winter-brand-dot{font-size:18px}
+ .hhba-winter-year{margin:15px 0 11px;padding:5px 12px;font-size:12px}
+ .hhba-winter-modal h2{font-size:31px;line-height:1.13}
+ .hhba-winter-modal h2 span{margin-top:6px}
+ .hhba-winter-modal-subtitle{font-size:17px!important;margin:12px 0 4px!important}
+ .hhba-winter-modal-description{font-size:12px!important;margin:0 0 12px!important}
+ .hhba-winter-modal-highlights{font-size:10px;gap:6px 10px;margin-bottom:14px}
+ .hhba-winter-join{font-size:16px;padding:11px 23px;gap:17px}
+ .hhba-winter-modal-footnote{margin-top:11px!important;font-size:9px!important}
+ .hhba-winter-modal-close{top:12px;right:12px;width:36px;height:36px}
+ .hhba-winter-visual-note{bottom:25px;left:19px}
+ .hhba-winter-visual-note strong{font-size:18px}
+ .hhba-winter-visual-note span{font-size:8px}
+ .hhba-winter-visual-credit{bottom:6px;left:17px;font-size:8px}
+ .hhba-winter-modal-secondary{position:static;display:none}
+ .hhba-winter-page{padding:20px 14px 50px}
+ .hhba-winter-landing-hero{display:flex;flex-direction:column-reverse}
+ .hhba-winter-landing-hero>img{height:180px;min-height:180px}
+ .hhba-winter-landing-copy{padding:24px}
+ .hhba-winter-landing-hero h1{font-size:29px}
+ .hhba-winter-filters{display:grid;grid-template-columns:1fr 1fr}
+ .hhba-winter-query{grid-column:1/-1;min-width:0}
+ .hhba-winter-filters>button{grid-column:1/-1;justify-content:center}
+ .hhba-winter-select{min-width:0}.hhba-winter-select select{width:100%;min-width:0}
+ .hhba-winter-page-trust{margin-bottom:27px}
+ .hhba-winter-detail-panel{padding:20px}.hhba-winter-detail-panel h1{font-size:22px}
+ .hhba-winter-detail-info{padding:20px}
+}
+@media(prefers-reduced-motion:reduce){.hhba-winter-join{transition:none}}
