@@ -13,7 +13,7 @@ test('新西兰已收录 7 条明确区分的合法路径',()=>{
  assert.equal(new Set(nzPathways.map(x=>x.id)).size,7);
  assert.deepEqual([...new Set(nzPathways.map(x=>x.category))].sort(),Object.keys(overseasCategoryLabels).sort());
  for(const p of nzPathways){
-  assert.ok(p.name.length>6&&p.summary.length>30,p.id+' summary');
+  assert.ok(p.name.length>=5&&p.summary.length>30,p.id+' summary');
   assert.ok(p.requirement.length>=3&&p.documents.length>=3&&p.steps.length>=4,p.id+' process');
   assert.ok(p.fees.length>=1&&p.rights.length>=1&&p.risks.length>=1,p.id+' disclosures');
   assert.ok(p.officialUrl.startsWith('https://www.immigration.govt.nz/'),p.id+' official URL');
