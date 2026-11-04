@@ -141,14 +141,14 @@ test('batch06 adds three independently sourced employers, nine unique 2027 H1 re
  assert.ok(jobs.includes('2026年10月30日')&&jobs.includes('2026年11月1日'));
  assert.ok(jobs.includes('2026年11月7日'),'Informa third-party upcoming deadline');
  assert.ok(jobs.includes('JR00128213')&&jobs.includes('JR00128231'),'same-named finance jobs need distinct employer requisitions');
- assert.ok(jobs.includes('JR00120885')&&jobs.includes('1月开始的上半年批次'),'one actuarial program must not split Jul-Dec');
- assert.ok(jobs.includes('2027年1月至7月')&&jobs.includes('1—6月'),'Manulife PE month discrepancy should be documented');
+ assert.ok(jobs.includes('JR00120885')&&jobs.includes('包含1月入职的一条招聘记录'),'one actuarial program must not split Jul-Dec');
+ assert.ok(jobs.includes('1—7月')&&jobs.includes('1—6月'),'Manulife PE month discrepancy should be documented');
  assert.ok(jobs.includes('L059656859')&&jobs.includes('openuniversity.recruit.com.hk'),'Informa job board evidence required');
  for(const hostname of ['sunlife.wd3.myworkdayjobs.com','manulife.wd3.myworkdayjobs.com','www.informa.com'])assert.ok(jobs.includes(hostname),hostname+' employer primary URL missing');
  assert.ok(page.includes('查看已截止公告')&&page.includes('查看雇主已截止岗位公告'),'closed jobs must not present generic apply CTA');
  assert.ok(page.includes('企业招聘首页（非直投）')&&page.includes('查看招聘平台原始记录'),'third-party direct-job distinction missing');
  assert.ok(!jobs.includes('status:"open"'),'never invent live openings');
- const ledger=read('../docs/WINTER_2027_54_EMPLOYER_PIPELINE.md');
- assert.ok(ledger.includes('剩余')||ledger.includes('未处理'));
+ const ledger=read('../../docs/WINTER_2027_54_EMPLOYER_PIPELINE.md');
+ assert.ok(ledger.includes('后续待逐项核验：**33**'));
  assert.ok(ledger.includes('**21条**')&&ledger.includes('**33条**'),'21 handled candidates, 33 outstanding');
 });
