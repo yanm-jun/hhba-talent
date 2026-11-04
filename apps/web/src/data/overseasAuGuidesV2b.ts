@@ -1,5 +1,5 @@
 import type {DetailedGuide} from '../components/OverseasDetailedGuide';
-import {pack} from './overseasNzGuidesV2a';
+import {pack} from './overseasNzGuidesV2a.ts';
 const official={
  eoi:'https://immi.homeaffairs.gov.au/visas/working-in-australia/skillselect/expression-of-interest',
  rounds:'https://immi.homeaffairs.gov.au/visas/working-in-australia/skillselect/invitation-rounds',
