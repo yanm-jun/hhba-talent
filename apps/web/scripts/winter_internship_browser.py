@@ -39,7 +39,7 @@ with sync_playwright() as p:
     mobile=browser.new_context(viewport={"width":390,"height":844},device_scale_factor=1,is_mobile=True,has_touch=True)
     page=mobile.new_page()
     page.goto(BASE,wait_until='domcontentloaded',timeout=60000)
-    popup=page.get_by_role('dialog',name='寒假实习季抢先一步')
+    popup=page.locator('[data-hhba-winter-modal] [role=dialog]')
     popup.wait_for(timeout=60000)
     assert popup.get_by_role('link',name='立即参加').is_visible()
     page.screenshot(path='/tmp/hhba-winter-modal-mobile.png',full_page=False)
