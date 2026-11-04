@@ -38,6 +38,7 @@ jobs:
           node --experimental-strip-types --test scripts/overseas-australia.contract.test.mjs
           node --experimental-strip-types --test scripts/overseas-nz-v2-detail.contract.test.mjs
           node --experimental-strip-types --test scripts/overseas-v2-16-paths.contract.test.mjs
+          node --experimental-strip-types --test scripts/overseas-occupation.contract.test.mjs
           node --experimental-strip-types --test scripts/overseas-new-zealand.contract.test.mjs
           node --experimental-strip-types --test scripts/study-abroad.contract.test.mjs
           node --experimental-strip-types --test scripts/study-universities.contract.test.mjs
