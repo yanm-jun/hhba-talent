@@ -40,6 +40,11 @@ test('directory contains source-backed programmes without invented job numbers',
 });
 test('site search and personal data flows are unchanged',()=>{
  assert.ok(!home.includes('siteSearchIndex'));
- assert.ok(!popup.includes('localStorage'),'no private auth tokens read');
+ assert.ok(popup.includes("window.localStorage.getItem(HIDE_KEY)")&&popup.includes("window.localStorage.setItem(HIDE_KEY,'1')"),'explicit opt-out must persist in browser local storage');
+ assert.ok(popup.includes('if(dontShowAgain)'),'closing without a checked box must not persist a preference');
+ assert.ok(popup.includes('checked={dontShowAgain}')&&popup.includes('setDontShowAgain(e.target.checked)'),'checkbox must be controllable');
+ assert.ok(popup.includes('aria-label="不再显示寒假实习广告"'),'user must be able to locate opt-out choice');
+ assert.ok(!popup.includes('getRealAuthToken')&&!popup.includes('/api/resumes'),'never read private account or resume information');
+ assert.ok(css.includes('.hhba-winter-hide-choice')&&css.includes('.hhba-winter-modal-actions'),'opt-out must have responsive inline CTA layout');
  assert.ok(page.includes('过滤')||page.includes('筛选'),'filter UI should exist');
 });
