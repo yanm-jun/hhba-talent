@@ -83,7 +83,7 @@ export const overseasCountryOptions=[
  {code:'nz',name:'新西兰',english:'New Zealand',flag:'🇳🇿',region:'大洋洲',ready:true,description:'工作签证、绿名单职业、留学与居留路径'},
  {code:'au',name:'澳大利亚',english:'Australia',flag:'🇦🇺',region:'大洋洲',ready:true,description:'雇主担保、技术移民与留学'},
  {code:'jp',name:'日本',english:'Japan',flag:'🇯🇵',region:'亚洲',ready:true,description:'特定技能19行业、技人国、高度人才、留学与求职'},
- {code:'de',name:'德国',english:'Germany',flag:'🇩🇪',region:'欧洲',ready:false,description:'机会卡、职业培训与留学'},
+ {code:'de',name:'德国',english:'Germany',flag:'🇩🇪',region:'欧洲',ready:true,description:'机会卡、欧盟蓝卡、学历认可、职业培训、留学及毕业求职'},
  {code:'ca',name:'加拿大',english:'Canada',flag:'🇨🇦',region:'北美洲',ready:false,description:'技术移民、省提名与留学'},
  {code:'uk',name:'英国',english:'United Kingdom',flag:'🇬🇧',region:'欧洲',ready:false,description:'工作签证与留学'},
  {code:'sg',name:'新加坡',english:'Singapore',flag:'🇸🇬',region:'亚洲',ready:false,description:'就业准证、专业就业与留学'},
