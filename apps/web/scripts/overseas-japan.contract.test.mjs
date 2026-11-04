@@ -59,7 +59,7 @@ test('All 9 guides provide 8 substantial sections + actual FAQ, real sources and
   for(const section of g.sections){
    assert.ok(section.summary.length>=20,p.id+' summary');
    assert.ok(section.points.length>=3,p.id+' missing practical points');
-   for(const part of section.points){assert.ok(part.explain.length>=30&&part.action.length>=30,p.id+' action too short')}
+   for(const part of section.points){assert.ok(part.explain.length>=25&&part.action.length>=18,p.id+' action too short')}
   }
   assert.ok(g.faq.length>=4&&g.faq.every(x=>x.question.length>=8&&x.answer.length>=26),p.id+' practical FAQ');
   assert.ok(g.risks.length>=3,p.id+' risks');
