@@ -1,5 +1,5 @@
 import type {DetailedGuide} from '../components/OverseasDetailedGuide';
-import {pack} from './overseasNzGuidesV2a';
+import {pack} from './overseasNzGuidesV2a.ts';
 const auSrc={
  fees:'https://immi.homeaffairs.gov.au/visas/getting-a-visa/fees-and-charges',
  sid:'https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/skills-in-demand-visa-subclass-482',
