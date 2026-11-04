@@ -84,7 +84,7 @@
           <article class="kpi-card"><div class="kpi-head"><span>已审计 ATS 来源</span><span class="metric-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span></div><div class="metric-number" id="boards-count">—</div><p id="boards-sub" class="kpi-foot">ATS 招聘来源，非合作企业数</p></article>
           <article class="kpi-card"><div class="kpi-head"><span>累计注册用户</span><span class="metric-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 19v-2c0-3 2.3-4 6-4s6 1 6 4v2"/></svg></span></div><div class="metric-number pending" id="registered-users">—</div><p class="kpi-foot muted">真实 PNVS 候选人注册账户；未连接则留空</p></article>
           <article class="kpi-card"><div class="kpi-head"><span>账户 DAU / MAU</span><span class="metric-icon"><svg viewBox="0 0 24 24"><path d="M3 13h4l3-7 4 12 3-5h4"/></svg></span></div><div class="metric-number pending" id="active-users">— / —</div><p class="kpi-foot muted">需要正式账户事件，不等于访客 UV</p></article>
-          <article class="kpi-card"><div class="kpi-head"><span>用户同意访问 PV</span></div><div class="metric-number pending" id="ov-pv">—</div><p class="kpi-foot muted">Cloudflare D1 · 仅用户自愿同意的采集</p></article>
+          <article class="kpi-card"><div class="kpi-head"><span>无身份访问事件 PV</span></div><div class="metric-number pending" id="ov-pv">—</div><p class="kpi-foot muted">Cloudflare D1 · 仅用户自愿同意的采集</p></article>
           <article class="kpi-card"><div class="kpi-head"><span>设备级有效收藏</span></div><div class="metric-number pending" id="ov-saves">—</div><p class="kpi-foot muted">Cloudflare D1 · 不代表登录用户收藏</p></article>
         </div>
         <div class="kpi-grid phase2-metrics"><article class="kpi-card"><div class="kpi-head"><span>全部索引记录</span></div><div class="metric-number" id="indexed-count">—</div><p class="kpi-foot">原始索引规模，非全部有效在招</p></article><article class="kpi-card"><div class="kpi-head"><span>官网任职要求已核验</span></div><div class="metric-number" id="requirements-count">—</div><p class="kpi-foot">原文证据已核验，非完整翻译数量</p></article><article class="kpi-card"><div class="kpi-head"><span>去重收录企业</span></div><div class="metric-number" id="companies-count">—</div><p class="kpi-foot">按公司名称去重，非签约企业数</p></article></div>
@@ -123,13 +123,13 @@
         <div class="page-heading"><div><p class="eyebrow">CLOUDFLARE · PRIVATE METRICS</p><h1 id="users-heading">用户增长、回访与功能使用</h1>
         <p class="page-subtitle">原有「用户分析」模块升级：区分真实注册账户、经同意的账号活跃、匿名访问与历史设备收藏；不展示任何个人浏览轨迹。</p></div></div>
         <div class="kpi-grid">
-          <article class="kpi-card"><div class="kpi-head"><span>访问 PV</span></div><div class="metric-number pending" id="growth-pv">—</div><p class="kpi-foot muted">同意采集后的 PV，事件每分钟去重</p></article>
-          <article class="kpi-card"><div class="kpi-head"><span>日 UV 合计</span></div><div class="metric-number pending" id="growth-uv">—</div><p class="kpi-foot muted">跨天访客可能重复，不等于注册用户</p></article>
+          <article class="kpi-card"><div class="kpi-head"><span>访问 PV</span></div><div class="metric-number pending" id="growth-pv">—</div><p class="kpi-foot muted">不使用访客识别 Cookie，按实际事件条数汇总</p></article>
+          <article class="kpi-card"><div class="kpi-head"><span>访客 UV（未采集）</span></div><div class="metric-number pending" id="growth-uv">—</div><p class="kpi-foot muted">不记录访客唯一标识，无法计算 UV</p></article>
           <article class="kpi-card"><div class="kpi-head"><span>设备有效收藏</span></div><div class="metric-number pending" id="growth-saves">—</div><p class="kpi-foot muted">按设备 Cookie 的真实收藏关系</p></article>
           <article class="kpi-card"><div class="kpi-head"><span>新增 / 取消收藏</span></div><div class="metric-number pending" id="growth-changes">—</div><p class="kpi-foot muted">按当前日期范围统计实际操作</p></article>
         </div>
         <section class="hhba-growth-section" aria-label="真实账号增长">
-          <div class="panel-heading"><div><h2>真实账号增长与回访</h2><p>账号级聚合仅统计已登录且同意使用分析的求职者；DAU/WAU/MAU 为自然日滚动窗口，与匿名 UV 不同。</p></div></div>
+          <div class="panel-heading"><div><h2>真实账号增长与回访</h2><p>注册及收藏来自真实账户业务库；账号行为采集已停止，DAU/WAU/MAU 和回访率不再采集，不能以匿名访问次数替代。</p></div></div>
           <div class="kpi-grid">
             <article class="kpi-card"><div class="kpi-head"><span>新增注册（所选期间）</span></div><div class="metric-number pending" id="users-new-registrations">—</div><p class="kpi-foot muted">PNVS 真实候选人，不含匿名访问</p></article>
             <article class="kpi-card"><div class="kpi-head"><span>账号 DAU / WAU</span></div><div class="metric-number pending" id="users-dau-wau">— / —</div><p class="kpi-foot muted">今日 / 过去7日，不受自定义时间范围影响</p></article>
