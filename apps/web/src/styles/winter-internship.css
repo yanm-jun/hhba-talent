@@ -58,7 +58,13 @@
 .hhba-winter-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
 .hhba-winter-card{display:flex;flex-direction:column;min-width:0;background:#fff;border:1px solid #e0e8ef;border-radius:16px;padding:22px;box-shadow:0 4px 16px #23426607}
 .hhba-winter-card-label{display:flex;gap:9px;color:#4382a8;font-size:10px;font-weight:750}
-.hhba-winter-card-label span:first-child{background:#eaf5ff;border-radius:5px;padding:5px 9px}.hhba-winter-card-label span:last-child{padding:5px}
+.hhba-winter-card-label span:first-child{background:#eaf5ff;border-radius:5px;padding:5px 9px}/* Audited project labels are compact and do not crowd existing cards. */
+.hhba-winter-card-label{flex-wrap:wrap;align-items:center}
+.hhba-winter-card-label .hhba-winter-status-neutral{padding:5px 8px;background:#f1f5f9;border-radius:5px;color:#61758b}
+.hhba-winter-card-label .hhba-winter-status-caution{padding:5px 8px;background:#fff0de;border-radius:5px;color:#a15b15}
+.hhba-winter-warning{border:1px solid #f0cf9b;border-radius:9px;padding:11px 13px;background:#fff9ee;color:#80551f!important;font-size:12px!important;line-height:1.8}
+.hhba-winter-work-rights{background:#fff6e8!important}
+.hhba-winter-card-label span:last-child{padding:5px}
 .hhba-winter-card h3{font-size:18px;color:#1f3e5b;line-height:1.4;margin:12px 0 7px}
 .hhba-winter-card-company{margin:0 0 12px;color:#236ea8;font-weight:800;font-size:13px}
 .hhba-winter-card-company small{font-size:11px;color:#879aab;margin-left:4px;font-weight:500}
