@@ -5,21 +5,27 @@ import {Link} from '../router';
 import '../styles/winter-internship.css';
 
 const SESSION_KEY='hhba:winter-internship-2027:seen:v1';
+const HIDE_KEY='hhba:winter-internship-2027:hide:v1';
 
 /** The campaign replaces first-visit envelope; reopening is never forced on navigation. */
 function showFirstVisit(){
  // Keep directly shared /letter/?letter=1 links usable without two modal layers.
  if(new URLSearchParams(window.location.search).get('letter')==='1')return false;
+ // A deliberate opt-out persists across visits on this browser only.
+ try{if(window.localStorage.getItem(HIDE_KEY)==='1')return false;}catch{/* storage denied */}
  try{return window.sessionStorage.getItem(SESSION_KEY)!=='1';}
  catch{return true;}
 }
 export function WinterInternshipPopup(){
  const [open,setOpen]=useState(showFirstVisit);
+ const [dontShowAgain,setDontShowAgain]=useState(false);
  const dialogRef=useRef<HTMLDivElement>(null);
  const close=useCallback(()=>{
+  // Only an explicit opt-out is written persistently; ordinary close is session-only.
+  if(dontShowAgain){try{window.localStorage.setItem(HIDE_KEY,'1');}catch{/* storage denied */}}
   try{window.sessionStorage.setItem(SESSION_KEY,'1');}catch{/* private mode */}
   setOpen(false);
- },[]);
+ },[dontShowAgain]);
  useEffect(()=>{
   if(!open)return;
   const previouslyFocused=document.activeElement instanceof HTMLElement?document.activeElement:null;
@@ -52,7 +58,13 @@ export function WinterInternshipPopup(){
      <p className="hhba-winter-modal-subtitle">这个寒假，提前遇见未来。</p>
      <p className="hhba-winter-modal-description">从第一份真实实习开始，走进职场，探索自己的可能。</p>
      <div className="hhba-winter-modal-highlights"><span><BriefcaseBusiness size={15}/> 官方项目</span><span>多元行业</span><span>成长从此刻开始</span></div>
-     <Link to="/winter-internship" className="hhba-winter-join" onClick={close}>立即参加 <ArrowRight size={22}/></Link>
+     <div className="hhba-winter-modal-actions">
+      <Link to="/winter-internship" className="hhba-winter-join" onClick={close}>立即参加 <ArrowRight size={22}/></Link>
+      <label className="hhba-winter-hide-choice">
+       <input type="checkbox" checked={dontShowAgain} onChange={e=>setDontShowAgain(e.target.checked)} aria-label="不再显示寒假实习广告"/>
+       <span>不再显示</span>
+      </label>
+     </div>
      <p className="hhba-winter-modal-footnote">企业项目与申请入口来自官方公开资料 · 实际名额请以官网为准</p>
     </div>
     <div className="hhba-winter-modal-visual" aria-hidden="true">
