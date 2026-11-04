@@ -7,7 +7,7 @@ const headings=['先弄明白这是什么方案','申请资格：每个门槛怎
 type Chapter=[string,P[]];
 type FAQ=[string,string];
 type S=[string,string,string];
-function pack(id:string,plainAnswer:string,firstAction:string,
+export function pack(id:string,plainAnswer:string,firstAction:string,
  chapters:Chapter[],faq:FAQ[],risks:string[],terms:string[],sources:S[]):DetailedGuide{
  if(chapters.length!==8)throw Error('Missing 8 in-depth chapters: '+id);
  return {id,plainAnswer,firstAction,checkedAt:'2026-11-04',
@@ -15,7 +15,7 @@ function pack(id:string,plainAnswer:string,firstAction:string,
  faq:faq.map(([question,answer]):GuideFAQ=>({question,answer})),risks,terms,
  sources:sources.map(([label,url,purpose]):GuideSource=>({label,url,purpose}))};
 }
-const src={
+export const src={
  green:'https://www.immigration.govt.nz/work/requirements-for-work-visas/green-list-occupations-qualifications-and-skills/green-list-roles-jobs-we-need-people-for-in-new-zealand/',
  iqa:'https://www.immigration.govt.nz/work/requirements-for-work-visas/green-list-occupations-qualifications-and-skills/check-if-you-need-an-international-qualification-assessment/',
  aewv:'https://www.immigration.govt.nz/visas/accredited-employer-work-visa/',
@@ -36,7 +36,7 @@ export const nzDetailedGuides:Record<string,DetailedGuide>={
   ['“直接居留”是不是不用找工作','不是。政府通常要求你已经在认证雇主工作，或者持有认证雇主提供的合格全职工作邀请。','将雇佣合同、岗位工作地点和薪资条件与移民局要求逐项对照。'],
   ['能否携带配偶和孩子','官方允许符合条件的伴侣及24岁或以下受抚养子女随申请；每位家属仍需递交关系、身份及可能的健康品行证据。','提前准备婚姻、同居、出生等关系材料，别默认口头声称“是家人”就够了。']]],
  ['核心门槛需要逐项核对，职业是否紧缺只完成了第一关。',[
-  ['年龄：55岁或以下','申请 Straight to Residence 时须年满? 并非“任意年龄都可以”，官网明确要求申请时55岁或以下。注意以正式提交日期和护照生日核对。','查看护照出生日期和预计递交日期；超过门槛先查询其他适用途径，而不是期待自动豁免。'],
+  ['年龄：55岁或以下','申请 Straight to Residence 时不是“任意年龄都可以”，官网明确要求申请时55岁或以下。注意以正式提交日期和护照生日核对。','查看护照出生日期和预计递交日期；超过门槛先查询其他适用途径，而不是期待自动豁免。'],
   ['职业与薪资必须同时合格','有些职业要求特定专业学位、当地职业注册、一定工资，有的还有其他技能条件；同名工作可能实际职责不同。','把职位对应的官方 Green List 一条职业要求完整截图/保存，再逐一向雇主核对工资和职责。'],
   ['雇主必须真实认证','一家企业的招聘广告写“保证绿名单”不代表它有新西兰移民局认可的认证资格。','通过移民局认可的雇主核验工具核查企业正式法定名称，保留核验时间与职位信息。'],
   ['英语与健康品行','居民签证通常有英语、体检/胸透及无犯罪要求；英语证明是否接受取决于移民局规则与考试/学历情况。','先查官网可接受的英语证明类型和家属规则；体检按官方指定操作，不要随便找医院。']]],
