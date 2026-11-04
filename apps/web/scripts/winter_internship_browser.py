@@ -62,7 +62,7 @@ with sync_playwright() as p:
     assert page.locator('[data-winter-job]').count()==1
     page.get_by_role('button',name='重置').click()
     assert page.locator('[data-winter-job]').count()==10
-    assert '12 条具体岗位结果' in page.locator('.hhba-winter-list-summary').inner_text()
+    assert '16 条具体岗位结果' in page.locator('.hhba-winter-list-summary').inner_text()
     # Each real job opens a distinct internal role detail and first-party application URL.
     page.locator('[data-winter-job="hsbc-hk-student-placement-1367003857"]').get_by_role('link',name='岗位详情').click()
     assert 'hsbc-hk-student-placement-1367003857' in page.url
@@ -125,16 +125,45 @@ with sync_playwright() as p:
     assert page.get_by_role('link',name='前往企业官方岗位核实及申请').get_attribute('href')=='https://tzcpa.zhiye.com/intern/jobs'
     page.get_by_role('link',name='返回寒假实习岗位列表').click()
     page.get_by_role('button',name='下一页').click()
-    assert page.locator('[data-winter-job]').count()==2
+    assert page.locator('[data-winter-job]').count()==6
     page.locator('[data-winter-job="tianzh-international-xian-workcenter-j11175"]').get_by_role('link',name='岗位详情').click()
     assert page.get_by_role('link',name='查看补充招聘时间证据').get_attribute('href').startswith('https://www.shixiseng.com/')
     assert page.get_by_text('未证明为同一招聘编号',exact=False).count()>0
     page.get_by_role('link',name='返回寒假实习岗位列表').click()
     # Job detail and list are the same React route component; it preserves page 2 on return.
-    assert page.locator('[data-winter-job]').count()==2
+    assert page.locator('[data-winter-job]').count()==6
     page.locator('[data-winter-job="crowe-hk-spring-audit-2027-review"]').get_by_role('link',name='岗位详情').click()
     assert page.get_by_text('官方网页存在年度版本冲突',exact=False).count()>0
     assert page.get_by_role('link',name='前往企业官方岗位核实及申请').get_attribute('href').startswith('https://www.crowe.com/')
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.get_by_role('button',name='上一页').click()
+    assert page.locator('[data-winter-job]').count()==10
+    # Batch 04: three companies and four additional records, on page two.
+    page.get_by_role('button',name='下一页').click()
+    assert page.locator('[data-winter-job]').count()==6
+    for identifier in [
+        'ey-tw-2027-peak-season-intake',
+        'shinewing-hk-2027-winter-audit-tax-advisory',
+        'shinewing-hk-2027-tax-business-advisory-l0607873647',
+        'luoshu-final-year-quant-intern-2027'
+    ]:
+        assert page.locator(f'[data-winter-job="{identifier}"]').count()==1,identifier
+    page.locator('[data-winter-job="ey-tw-2027-peak-season-intake"]').get_by_role('link',name='岗位详情').click()
+    assert page.get_by_text('2026 年 11 月 8 日',exact=False).count()>0
+    assert page.get_by_text('不拆分为四个虚拟岗位',exact=False).count()>0
+    assert page.get_by_role('link',name='前往企业官方岗位核实及申请').get_attribute('href').startswith('https://www.ey.com/')
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.locator('[data-winter-job="shinewing-hk-2027-winter-audit-tax-advisory"]').get_by_role('link',name='岗位详情').click()
+    assert page.get_by_text('Jobsdb 招聘记录',exact=False).count()>0
+    assert page.get_by_role('link',name='查看补充招聘时间证据').get_attribute('href').startswith('https://hk.jobsdb.com/')
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.locator('[data-winter-job="shinewing-hk-2027-tax-business-advisory-l0607873647"]').get_by_role('link',name='岗位详情').click()
+    assert page.get_by_text('L0607873647',exact=False).count()>0
+    assert page.get_by_role('link',name='查看补充招聘时间证据').get_attribute('href').startswith('https://www.recruit.com.hk/')
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.locator('[data-winter-job="luoshu-final-year-quant-intern-2027"]').get_by_role('link',name='岗位详情').click()
+    assert page.get_by_text('寒假时间',exact=False).count()>0 or page.get_by_text('寒假批次',exact=False).count()>0
+    assert page.get_by_role('link',name='前往企业官方岗位核实及申请').get_attribute('href')=='https://www.luoshu.com/join-us'
     page.get_by_role('link',name='返回寒假实习岗位列表').click()
     page.get_by_role('button',name='上一页').click()
     assert page.locator('[data-winter-job]').count()==10
