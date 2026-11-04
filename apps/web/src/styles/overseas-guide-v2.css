@@ -1,0 +1,56 @@
+/* Long-form overseas guide, independent of other HHBA pages. */
+.hhba-guide-v2{--g-border:#dfe8f1;--g-blue:#1b5a8a;color:#253f56}
+.hhba-guide-v2 *{box-sizing:border-box}
+.hhba-guide-v2-intro{background:linear-gradient(120deg,#eff7ff,#f8fbff);padding:28px;border:1px solid #d8e8f5;border-radius:16px;margin-bottom:22px}
+.hhba-guide-v2-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.7px;color:#3375a7}
+.hhba-guide-v2-intro h2{font-size:24px;margin:17px 0 10px}
+.hhba-guide-v2-intro>p{font-size:15px;line-height:1.95;color:#3d5b74;margin:0 0 15px;white-space:pre-line}
+.hhba-guide-v2-start{display:flex;gap:10px;background:#fff;border:1px solid #d4e7f0;border-left:4px solid #ef873e;border-radius:11px;padding:16px;margin:17px 0;color:#1e567e}
+.hhba-guide-v2-start svg{flex:0 0 auto;color:#ea8034}
+.hhba-guide-v2-start strong{font-size:14px}.hhba-guide-v2-start p{color:#3e607b;font-size:14px;line-height:1.8;margin:6px 0 0}
+.hhba-guide-v2-intro small{font-size:11px;line-height:1.7;color:#71879b}
+.hhba-guide-v2-index{padding:20px 22px;border:1px solid #e0e9f0;border-radius:13px;margin-bottom:20px;background:#fff}
+.hhba-guide-v2-index strong{font-size:14px}.hhba-guide-v2-index>div{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.hhba-guide-v2-index a{font-size:12px;color:#285e8c;border-radius:30px;padding:8px 12px;background:#f1f6fb;border:1px solid #e0eaf2;text-decoration:none}
+.hhba-guide-v2-index a:hover,.hhba-guide-v2-index a:focus-visible{background:#e1f0ff}
+.hhba-guide-v2-terms{border:1px solid #e1e8ee;border-radius:13px;padding:22px;margin-bottom:22px}
+.hhba-guide-v2-terms h2{display:flex;align-items:center;gap:10px;font-size:19px;margin:0 0 7px}
+.hhba-guide-v2-terms>p{font-size:13px;color:#667c90;line-height:1.8;margin:0 0 14px}
+.hhba-guide-v2-termgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.hhba-guide-v2-termgrid details{background:#f7f9fb;border:1px solid #e4ebf1;border-radius:10px;padding:12px 13px}
+.hhba-guide-v2-termgrid summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:10px;font-weight:700;font-size:13px}
+.hhba-guide-v2-termgrid summary span{color:#d47b3b}
+.hhba-guide-v2-termgrid summary::-webkit-details-marker{display:none}
+.hhba-guide-v2-termgrid details p{font-size:12px;line-height:1.85;color:#567087;margin:12px 0 0}
+.hhba-guide-v2-check-status{display:flex;align-items:center;gap:8px;border:1px solid #dce8ed;border-radius:12px;padding:14px 16px;background:#f8fcff;font-size:13px;margin-bottom:18px;flex-wrap:wrap}
+.hhba-guide-v2-check-status svg{color:#2674a7}.hhba-guide-v2-fine{font-size:11px;color:#7890a2;width:100%;padding-left:28px}
+.hhba-guide-v2-section{border:1px solid var(--g-border);border-radius:15px;padding:24px;margin-bottom:20px;scroll-margin-top:105px}
+.hhba-guide-v2-section>header{display:flex;gap:13px;align-items:flex-start;margin-bottom:22px}
+.hhba-guide-v2-section>header>span{display:grid;place-items:center;color:#fff;font-size:13px;font-weight:800;background:#245f91;border-radius:9px;width:40px;height:40px;flex:0 0 40px}
+.hhba-guide-v2-section h2{font-size:22px;line-height:1.4;margin:0 0 8px;color:#21425f}
+.hhba-guide-v2-section header p{font-size:13px;line-height:1.8;color:#677e92;margin:0}
+.hhba-guide-v2-pointlist{display:grid;gap:12px}
+.hhba-guide-v2-point{background:#fbfcfe;border:1px solid #e7edf3;border-radius:12px;padding:18px}
+.hhba-guide-v2-point h3{font-size:16px;margin:0 0 8px;line-height:1.6}
+.hhba-guide-v2-point>p{margin:0 0 13px;color:#475f74;font-size:14px;line-height:1.9}
+.hhba-guide-v2-action{display:flex;gap:9px;align-items:flex-start;background:#edf5fa;border-radius:9px;padding:13px}
+.hhba-guide-v2-action>span{flex:0 0 auto;font-size:11px;font-weight:800;color:#b85e26;background:#fff;padding:3px 7px;border-radius:5px}
+.hhba-guide-v2-action p{font-size:13px;line-height:1.85;margin:0;color:#2a526e}
+.hhba-guide-v2-check{display:inline-flex;align-items:center;gap:8px;color:#6b8195;font-size:11px;margin-top:13px;cursor:pointer}
+.hhba-guide-v2-check input{accent-color:#266b9c;width:16px;height:16px}
+.hhba-guide-v2-faq{display:grid;gap:10px}
+.hhba-guide-v2-faq details{border:1px solid #dfe8f0;border-radius:11px;padding:17px;background:#fff}
+.hhba-guide-v2-faq summary{display:flex;gap:11px;align-items:center;list-style:none;font-size:14px;font-weight:700;cursor:pointer}
+.hhba-guide-v2-faq summary svg{flex:0 0 auto;color:#2b6a9c}
+.hhba-guide-v2-faq p{font-size:14px;line-height:1.95;color:#4b667c;padding:10px 0 0 29px;margin:0}
+.hhba-guide-v2-risks{list-style:none;margin:0 0 23px;padding:0;display:grid;gap:11px}
+.hhba-guide-v2-risks li{display:flex;gap:10px;line-height:1.85;background:#fff7ef;color:#81582b;border-radius:9px;padding:12px 15px;font-size:13px}
+.hhba-guide-v2-risks svg{flex:0 0 auto;color:#ce7a34;margin-top:4px}
+.hhba-guide-v2-sources{padding:17px;border:1px solid #e0e9f1;border-radius:11px;display:grid;gap:9px}
+.hhba-guide-v2-sources>strong{margin-bottom:5px;font-size:14px}
+.hhba-guide-v2-sources a{display:flex;align-items:flex-start;gap:11px;padding:12px;border-radius:9px;background:#f5f9fc;color:#24608d!important;text-decoration:none}
+.hhba-guide-v2-sources a svg{flex:0 0 auto;margin-top:4px}
+.hhba-guide-v2-sources a span{display:grid;gap:5px}.hhba-guide-v2-sources a b{font-size:13px}.hhba-guide-v2-sources a small{color:#607b90;font-size:11px;line-height:1.7}
+.hhba-guide-v2-final{display:flex;gap:8px;color:#70859a;font-size:12px;line-height:1.85;margin:15px 0 0}
+.hhba-guide-v2-final svg{flex:0 0 auto;margin-top:3px}
+@media(max-width:760px){.hhba-guide-v2-section{padding:18px}.hhba-guide-v2-intro{padding:19px}.hhba-guide-v2-intro h2{font-size:22px}.hhba-guide-v2-termgrid{grid-template-columns:1fr}.hhba-guide-v2-index{padding:17px}.hhba-guide-v2-section h2{font-size:20px}.hhba-guide-v2-point{padding:15px}.hhba-guide-v2-section header{gap:10px}}
