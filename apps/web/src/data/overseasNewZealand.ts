@@ -81,7 +81,7 @@ export const nzPathways:OverseasPathway[]=[
 ];
 export const overseasCountryOptions=[
  {code:'nz',name:'新西兰',english:'New Zealand',flag:'🇳🇿',region:'大洋洲',ready:true,description:'工作签证、绿名单职业、留学与居留路径'},
- {code:'au',name:'澳大利亚',english:'Australia',flag:'🇦🇺',region:'大洋洲',ready:false,description:'雇主担保、技术移民与留学'},
+ {code:'au',name:'澳大利亚',english:'Australia',flag:'🇦🇺',region:'大洋洲',ready:true,description:'雇主担保、技术移民与留学'},
  {code:'jp',name:'日本',english:'Japan',flag:'🇯🇵',region:'亚洲',ready:false,description:'特定技能、技术就业与留学'},
  {code:'de',name:'德国',english:'Germany',flag:'🇩🇪',region:'欧洲',ready:false,description:'机会卡、职业培训与留学'},
  {code:'ca',name:'加拿大',english:'Canada',flag:'🇨🇦',region:'北美洲',ready:false,description:'技术移民、省提名与留学'},
