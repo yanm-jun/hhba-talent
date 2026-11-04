@@ -6,6 +6,12 @@ import {WINTER_2027_PROGRAMS,winterProgramById,type WinterProgram} from '../data
 import type {User} from '../services/api';
 import '../styles/winter-internship.css';
 
+function verificationLabel(p:WinterProgram){
+ if(p.verificationLevel==='date-conflict')return '申请截止时间待核实';
+ if(p.verificationLevel==='official-posting')return '企业官网具体岗位';
+ if(p.verificationLevel==='official-program')return '官方项目 · 需核对在招';
+ return '已收录项目资料';
+}
 function safeOfficialHref(p:WinterProgram){
  try{
   const url=new URL(p.applicationUrl),source=new URL(p.sourceUrl);
@@ -19,7 +25,7 @@ function SourceButton({program}:{program:WinterProgram}){
 }
 function WinterCard({program}:{program:WinterProgram}){
  return <article className="hhba-winter-card" data-winter-program={program.id}>
-  <div className="hhba-winter-card-label"><span>{program.kind}</span><span>{program.region}</span></div>
+  <div className="hhba-winter-card-label"><span>{program.kind}</span><span>{program.region}</span><span className={program.verificationLevel==='date-conflict'?'hhba-winter-status-caution':'hhba-winter-status-neutral'}>{verificationLabel(program)}</span></div>
   <h3>{program.title}</h3><p className="hhba-winter-card-company">{program.company} <small>{program.english}</small></p>
   <p className="hhba-winter-card-description">{program.intro}</p>
   <div className="hhba-winter-card-meta"><span><MapPin size={14}/> {program.location}</span><span><CalendarDays size={14}/> {program.period}</span></div>
@@ -35,7 +41,7 @@ function WinterDetail({user,id}:{user:User|null;id:string}){
    <Link className="hhba-winter-back" to="/winter-internship"><ArrowLeft size={16}/> 返回寒假实习专区</Link>
    <p className="hhba-winter-eyebrow">HHBA · 2027 WINTER INTERNSHIP</p>
    <div className="hhba-winter-detail-panel"><div>
-    <span className="hhba-winter-source-tag"><ShieldCheck size={14}/> 企业官方资料</span>
+    <span className="hhba-winter-source-tag"><ShieldCheck size={14}/> {verificationLabel(p)}</span>
     <h1>{p.title}</h1><p className="hhba-winter-detail-company">{p.company} · {p.english}</p>
     <p>{p.intro}</p>
    </div>
@@ -44,12 +50,15 @@ function WinterDetail({user,id}:{user:User|null;id:string}){
     <div><small>工作地点</small><strong>{p.location}</strong></div>
     <div><small>实习周期</small><strong>{p.period}</strong></div>
     <div><small>申请时间</small><strong>{p.deadline}</strong></div>
+    {p.workRightsNote&&<div className="hhba-winter-work-rights"><small>工作资格提醒</small><strong>{p.workRightsNote}</strong></div>}
    </div></div>
    <section className="hhba-winter-detail-info"><h2>谁适合申请？</h2>
     <ul>{p.requirements.map((x,i)=><li key={i}>{x}</li>)}</ul>
     <h2>官方来源与报名</h2><p>HHBA 仅整理公开招聘信息，不收取报名费、不承诺录取。请在企业官网核对最新职位、地点、年龄/年级要求和截止时间。</p>
     <a href={p.sourceUrl} target="_blank" rel="noopener noreferrer" className="hhba-winter-source-link">查看企业官方项目说明 <ExternalLink size={15}/></a>
+    {p.evidenceUrl&&<a href={p.evidenceUrl} target="_blank" rel="noopener noreferrer" className="hhba-winter-source-link">查看补充招聘证据 <ExternalLink size={15}/></a>}
     <SourceButton program={p}/>
+    {p.verificationLevel==='date-conflict'&&<p className="hhba-winter-warning" role="note">这条项目的官方截止日期出现不一致的公开页面版本，HHBA 不将其标为已确认可申请。请直接在企业招聘系统验证申请按钮及日期。</p>}
     <p className="hhba-winter-verified">资料核对日期：{p.checkedOn}。{p.statusNote}。</p>
    </section>
   </main>
@@ -81,7 +90,7 @@ export function WinterInternshipPage({user,slug}:{user:User|null;slug?:string}){
    </section>
    <div className="hhba-winter-page-trust"><span><CheckCircle2 size={17}/> 企业官方来源</span><span><CheckCircle2 size={17}/> 不虚构招聘名额</span><span><CheckCircle2 size={17}/> 免费查看申请入口</span></div>
    <section className="hhba-winter-directory" id="winter-opportunities" aria-labelledby="winter-opportunities-title">
-    <div className="hhba-winter-section-title"><div><p>2026—2027 冬季项目资料库</p><h2 id="winter-opportunities-title">探索寒假实习机会</h2><span>首批收录 {WINTER_2027_PROGRAMS.length} 条官方项目或岗位记录，后续将继续逐批扩充。</span></div></div>
+    <div className="hhba-winter-section-title"><div><p>2026—2027 冬季项目资料库</p><h2 id="winter-opportunities-title">探索寒假实习机会</h2><span>现收录 {WINTER_2027_PROGRAMS.length} 条官方项目或岗位资料；与已核实的实际开放名额不同，后续每批增加 3 家企业。</span></div></div>
     <form className="hhba-winter-filters" role="search" onSubmit={e=>{e.preventDefault();setKeyword(draft.trim());}}>
      <label className="hhba-winter-query"><Search size={18}/><input type="search" value={draft} onChange={e=>setDraft(e.target.value)} maxLength={80}
       aria-label="搜索寒假实习企业、职位或专业" placeholder="搜索企业、岗位、专业方向或城市…"/></label>
