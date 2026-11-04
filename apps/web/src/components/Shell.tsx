@@ -1,7 +1,7 @@
 import {ArrowRight,ArrowUpRight,Building2,BriefcaseBusiness,Search} from 'lucide-react';
 import {useState,type MouseEvent} from 'react';
 import {recruitmentTarget,rememberRecruitment} from '../services/recruitmentOutbound';
-import { Link, useNavigate, useRoute } from '../router';
+import { Link, navigate, useNavigate, useRoute } from '../router';
 import {employerApiReady,type User} from '../services/api';
 import {realAuthReady} from '../services/realAuth';
 import { CandidateAccountDropdown } from './CandidateAccountDropdown';
