@@ -26,6 +26,9 @@ with sync_playwright() as p:
     assert abs(box['x']-(1440-box['width'])/2)<3
     assert abs(box['y']-(900-box['height'])/2)<3
     assert dialog.get_by_role('link',name='立即参加').is_visible()
+    checkbox=dialog.get_by_role('checkbox',name='不再显示寒假实习广告')
+    assert checkbox.is_visible()
+    assert not checkbox.is_checked(), 'do not opt out without explicit consent'
     # The old public letter is retained in the middle of the homepage, but
     # must not open automatically while the winter advert is visible.
     assert page.locator('.hhba-letter-overlay').count()==0
@@ -34,6 +37,7 @@ with sync_playwright() as p:
     dialog.get_by_role('link',name='立即参加').click()
     page.get_by_role('heading',name='探索寒假实习机会').wait_for(timeout=60000)
     assert '/winter-internship' in page.url
+    assert page.evaluate("localStorage.getItem('hhba:winter-internship-2027:hide:v1')") is None
     assert page.locator('[data-winter-program]').count()==4
     page.screenshot(path='/tmp/hhba-winter-directory-desktop.png',full_page=False)
     page.get_by_role('link',name='查看项目详情与申请方法').first.click()
@@ -67,6 +71,55 @@ with sync_playwright() as p:
     assert shared_page.locator('[data-hhba-winter-modal]').count()==0
     shared.close()
 
+    # An ordinary close suppresses the current tab only; it must not create a
+    # persistent preference, and a new browser visit can see the campaign.
+    ordinary=browser.new_context(viewport={"width":1280,"height":800})
+    ordinary_page=ordinary.new_page()
+    ordinary_page.goto(BASE,wait_until='domcontentloaded',timeout=60000)
+    ordinary_popup=ordinary_page.locator('[data-hhba-winter-modal] [role=dialog]')
+    ordinary_popup.wait_for(timeout=15000)
+    assert not ordinary_popup.get_by_role('checkbox',name='不再显示寒假实习广告').is_checked()
+    ordinary_popup.get_by_role('button',name='关闭寒假实习广告').click()
+    assert ordinary_page.evaluate("localStorage.getItem('hhba:winter-internship-2027:hide:v1')") is None
+    ordinary_new=ordinary.new_page()
+    ordinary_new.goto(BASE,wait_until='domcontentloaded',timeout=60000)
+    ordinary_new.locator('[data-hhba-winter-modal] [role=dialog]').wait_for(timeout=15000)
+    ordinary.close()
+
+    # Explicitly ticking "don't show again" before closing persists across
+    # navigations and even in a fresh browser context that carries site storage.
+    preference=browser.new_context(viewport={"width":1280,"height":800})
+    preference_page=preference.new_page()
+    preference_page.goto(BASE,wait_until='domcontentloaded',timeout=60000)
+    preference_popup=preference_page.locator('[data-hhba-winter-modal] [role=dialog]')
+    preference_popup.wait_for(timeout=15000)
+    dont_show=preference_popup.get_by_role('checkbox',name='不再显示寒假实习广告')
+    dont_show.check()
+    assert dont_show.is_checked()
+    preference_page.screenshot(path='/tmp/hhba-winter-optout-desktop.png',full_page=False)
+    preference_popup.get_by_role('button',name='关闭寒假实习广告').click()
+    assert preference_page.evaluate("localStorage.getItem('hhba:winter-internship-2027:hide:v1')")=='1'
+    stored=preference.storage_state()
+    persisted=browser.new_context(storage_state=stored,viewport={"width":1280,"height":800})
+    persisted_page=persisted.new_page()
+    persisted_page.goto(BASE,wait_until='domcontentloaded',timeout=60000)
+    assert persisted_page.locator('[data-hhba-winter-modal]').count()==0
+    assert persisted_page.get_by_role('button',name='读一封来自 HHBA 的信').is_visible()
+    persisted.close()
+    preference.close()
+
+    # Checking opt-out and selecting "Join" must save the preference as well.
+    participate=browser.new_context(viewport={"width":1280,"height":800})
+    participate_page=participate.new_page()
+    participate_page.goto(BASE,wait_until='domcontentloaded',timeout=60000)
+    participate_popup=participate_page.locator('[data-hhba-winter-modal] [role=dialog]')
+    participate_popup.wait_for(timeout=15000)
+    participate_popup.get_by_role('checkbox',name='不再显示寒假实习广告').check()
+    participate_popup.get_by_role('link',name='立即参加').click()
+    participate_page.get_by_role('heading',name='探索寒假实习机会').wait_for(timeout=15000)
+    assert participate_page.evaluate("localStorage.getItem('hhba:winter-internship-2027:hide:v1')")=='1'
+    participate.close()
+
     mobile=browser.new_context(viewport={"width":390,"height":844},device_scale_factor=1,is_mobile=True,has_touch=True)
     page=mobile.new_page()
     page.goto(BASE,wait_until='domcontentloaded',timeout=60000)
@@ -76,6 +129,7 @@ with sync_playwright() as p:
     assert mobile_box is not None and mobile_box['width'] <= 390, f"popup overflows mobile viewport: {mobile_box}"
     assert mobile_box['height'] <= 844, f"popup is taller than mobile viewport: {mobile_box}"
     assert popup.get_by_role('link',name='立即参加').is_visible()
+    assert popup.get_by_role('checkbox',name='不再显示寒假实习广告').is_visible()
     page.screenshot(path='/tmp/hhba-winter-modal-mobile.png',full_page=False)
     popup.get_by_role('button',name='关闭寒假实习广告').click()
     assert page.locator('[data-hhba-winter-modal]').count()==0
