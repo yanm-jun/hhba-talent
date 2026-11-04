@@ -7,6 +7,8 @@ on:
       - 'apps/web/src/main.tsx'
       - 'apps/web/src/pages/WinterInternshipPage.tsx'
       - 'apps/web/src/components/WinterInternshipPopup.tsx'
+      - 'apps/web/src/components/HomeOpenLetter.tsx'
+      - 'apps/web/scripts/home-open-letter.contract.test.mjs'
       - 'apps/web/src/data/winter2027Programs.ts'
       - 'apps/web/src/styles/winter-internship.css'
       - 'apps/web/scripts/winter-internship.contract.test.mjs'
@@ -31,7 +33,7 @@ jobs:
         run: npm ci --no-audit --no-fund
       - name: Verify modal, real programmes, route and privacy contracts
         working-directory: apps/web
-        run: node --test scripts/winter-internship.contract.test.mjs
+        run: node --test scripts/winter-internship.contract.test.mjs scripts/home-open-letter.contract.test.mjs
       - name: Build HHBA static review version with exact Pages base
         working-directory: apps/web
         env:
