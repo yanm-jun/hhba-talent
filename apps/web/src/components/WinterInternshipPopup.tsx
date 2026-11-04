@@ -36,7 +36,7 @@ export function WinterInternshipPopup(){
   const onKey=(event:KeyboardEvent)=>{
    if(event.key==='Escape'){event.preventDefault();close();return;}
    if(event.key!=='Tab')return;
-   const elements=[...(dialog?.querySelectorAll<HTMLElement>('a[href],button:not([disabled])')||[])];
+   const elements=[...(dialog?.querySelectorAll<HTMLElement>('a[href],button:not([disabled]),input:not([disabled])')||[])];
    if(!elements.length)return;
    const first=elements[0],last=elements[elements.length-1];
    if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
