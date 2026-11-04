@@ -1,53 +1,24 @@
 import {getRealAuthToken} from './realAuth';
 export type EngagementEvent='page_view'|'job_view'|'job_search'|'official_apply_click';
-// V2 requires explicit re-consent: a previous anonymous-only opt-in must not authorize account-level tracking.
-const KEY='hhba.analytics.consent.v2';
-const API='/api/engagement/event';
+const METRICS_API='/api/engagement/event';
 const ACCOUNT_API='/api/engagement/account';
+const LEGACY_OPTOUT='hhba.analytics.consent.v2';
 const metricsSupported=import.meta.env.BASE_URL!=='/hhba-talent/';
-export function analyticsChoice():boolean|null{
- try{const v=localStorage.getItem(KEY);return v==='yes'?true:v==='no'?false:null}catch{return null}
-}
-export type AnalyticsErasureResult='cleared'|'no-session'|'unavailable'|'not-requested';
-export function chooseAnalytics(enabled:boolean):Promise<AnalyticsErasureResult>{
- // Stop all client-side collection before requesting remote erasure.
- try{localStorage.setItem(KEY,enabled?'yes':'no')}catch{}
- dispatchEvent(new Event('hhba:analytics-consent'));
- return enabled?Promise.resolve('not-requested'):eraseAccountAnalytics();
-}
-export function trackEvent(type:EngagementEvent,path=location.pathname){
- if(!metricsSupported || analyticsChoice()!==true ||navigator.doNotTrack==='1'||(navigator as Navigator & {globalPrivacyControl?: boolean}).globalPrivacyControl===true)return;
- // No URL query, job title, resume text, user ID, email, or search keywords sent.
+// No cookies, tokens, client identifiers, page paths, referrers or search text are sent.
+// Honor prior explicit refusals and browser-level Do Not Track / GPC preferences.
+export function trackEvent(type:EngagementEvent,_legacyRoute?:string):void{
+ if(!metricsSupported||typeof navigator==='undefined'||navigator.doNotTrack==='1'||
+    (navigator as Navigator & {globalPrivacyControl?:boolean}).globalPrivacyControl===true)return;
+ try{if(localStorage.getItem(LEGACY_OPTOUT)==='no')return;}catch{return;}
  try{
-  const body=JSON.stringify({type,path:path.split(/[?#]/,1)[0]});
-  void fetch(API,{method:'POST',headers:{'Content-Type':'application/json','X-HHBA-Consent':'yes'},
-   body,credentials:'same-origin',keepalive:true}).catch(()=>undefined);
+  void fetch(METRICS_API,{method:'POST',credentials:'omit',referrerPolicy:'no-referrer',keepalive:true,
+    headers:{'Content-Type':'application/json'},body:JSON.stringify({type})}).catch(()=>undefined);
  }catch{}
 }
-
-// A small, explicit category vocabulary: no paths, query terms, job IDs or resume data.
+// Legacy opt-in account analytics has been retired, not silently changed to opt-out.
+// Keep authenticated self-check and verifiable deletion only for historic rows.
 export type AccountArea='general'|'jobs'|'companies'|'policies'|'tools'|'job_save';
-export function activityAreaForRoute(route:string):AccountArea{
- if(route.startsWith('/talent-service')||route.startsWith('/talent/'))return 'policies';
- if(route.startsWith('/companies')||route.startsWith('/employer/public'))return 'companies';
- if(route.startsWith('/candidate/jobs')||route.startsWith('/candidate/employer-jobs')||route.startsWith('/candidate/domestic-autumn'))return 'jobs';
- if(route.startsWith('/candidate/match')||route.startsWith('/candidate/account/resume')||route.startsWith('/study-abroad'))return 'tools';
- return 'general';
-}
-function canCollectAccount():boolean{
- return metricsSupported && analyticsChoice()===true &&
- navigator.doNotTrack!=='1' &&
- (navigator as Navigator & {globalPrivacyControl?:boolean}).globalPrivacyControl!==true;
-}
-export function trackAccountActivity(area:AccountArea):void{
- if(!canCollectAccount())return;
- const token=getRealAuthToken();
- if(!token)return;
- void fetch(ACCOUNT_API,{method:'POST',credentials:'same-origin',keepalive:true,
-  headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'X-HHBA-Consent':'yes'},
-  body:JSON.stringify({area})}).catch(()=>undefined);
-}
-// The signed-in user can confirm or retry erasure without enabling tracking.
+export type AnalyticsErasureResult='cleared'|'no-session'|'unavailable';
 export async function eraseAccountAnalytics():Promise<AnalyticsErasureResult>{
  if(!metricsSupported)return 'unavailable';
  const token=getRealAuthToken();
