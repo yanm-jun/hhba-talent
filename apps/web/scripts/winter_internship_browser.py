@@ -38,8 +38,22 @@ with sync_playwright() as p:
     page.get_by_role('heading',name='探索寒假实习机会').wait_for(timeout=60000)
     assert '/winter-internship' in page.url
     assert page.evaluate("localStorage.getItem('hhba:winter-internship-2027:hide:v1')") is None
-    assert page.locator('[data-winter-program]').count()==4
+    assert page.locator('[data-winter-program]').count()==7
     page.screenshot(path='/tmp/hhba-winter-directory-desktop.png',full_page=False)
+    # New 3-company batch: real details and source-specific caution text.
+    for identifier in ['ey-china-winter-2027-review','pwc-hk-2027-winter','hsbc-hk-2027-work-placement']:
+        assert page.locator(f'[data-winter-program="{identifier}"]').count()==1,identifier
+    page.locator('[data-winter-program="hsbc-hk-2027-work-placement"]').get_by_role('link',name='查看项目详情与申请方法').click()
+    assert 'hsbc-hk-2027-work-placement' in page.url
+    assert page.get_by_text('需要现有合法香港工作资格',exact=False).count()>0
+    assert page.get_by_text('截止日期出现不一致',exact=False).count()>0
+    page.get_by_role('link',name='返回寒假实习专区').click()
+    page.locator('[data-winter-program="pwc-hk-2027-winter"]').get_by_role('link',name='查看项目详情与申请方法').click()
+    assert page.get_by_role('link',name='查看补充招聘证据').get_attribute('href').startswith('https://pip.erg.cuhk.edu.hk/')
+    page.get_by_role('link',name='返回寒假实习专区').click()
+    page.locator('[data-winter-program="ey-china-winter-2027-review"]').get_by_role('link',name='查看项目详情与申请方法').click()
+    assert page.get_by_text('2026—2027 具体实习日期尚待官方岗位确认',exact=False).count()>0
+    page.get_by_role('link',name='返回寒假实习专区').click()
     page.get_by_role('link',name='查看项目详情与申请方法').first.click()
     page.get_by_text('前往企业官方招聘页面').wait_for(timeout=60000)
     assert '/winter-internship/' in page.url
