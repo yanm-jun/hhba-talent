@@ -9,7 +9,7 @@ const formatTime=value=>{
  })+'（北京时间）'}catch{return '—'}
 };
 const cloudflareMode=location.hostname==='hhba-talent.pages.dev'||location.hostname.endsWith('.hhba-talent.pages.dev')||location.hostname==='hhba.work';
-let snapshot=null,growth=null,growthError=null,selectedPeriod='30d',customRange=null,activeView='overview';
+let snapshot=null,growth=null,growthError=null,selectedPeriod='30d',customRange=null,activeView='overview',growthRequestId=0;
 function normalizeCloudflarePublic(raw){
  if(raw?.kind!=='HHBA_CLOUDFLARE_PUBLIC_METRICS_V1'||!raw.counts)throw Error('INVALID_CLOUDFLARE_JOB_DATA');
  return {kind:'HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2',quality:raw.quality,asOf:raw.sourceTime,
@@ -50,6 +50,46 @@ function showRealDataStatus(){
  byId('sidebar-data-state').textContent=state+'；仅展示汇总数据，不读取个人浏览记录';
  byId('top-access-state').textContent=state;
 }
+// Source-backed daily rows. A day before installation is unknown, not zero.
+function buildDailyOperationsRows(report){
+ const series=report?.traffic?.quality==='collected'&&Array.isArray(report.traffic.series)?report.traffic.series:null;
+ const account=report?.account?.quality==='collected'?report.account:null;
+ const signup=Array.isArray(account?.signupSeries)?account.signupSeries:null;
+ if(!series||!report?.period)return null;
+ const validDay=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v);
+ const installed=report.collectorStartedAt;
+ const earliest=typeof installed==='string'&&Number.isFinite(Date.parse(installed))?installed.slice(0,10):null;
+ const signupMap=signup?new Map(signup.filter(x=>validDay(x.day)).map(x=>[x.day,integer(x.count)])):null;
+ return series.filter(x=>validDay(x.day)).map(x=>{
+  const collected=earliest!==null&&x.day>=earliest;
+  const count=k=>collected?integer(x[k]):null;
+  return {day:x.day,signup:signupMap?.has(x.day)?signupMap.get(x.day):null,
+   pv:count('pv'),jobViews:count('jobViews'),searches:count('searches'),
+   outboundClicks:count('outboundClicks'),collected};
+ });
+}
+function renderDailyOperations(report){
+ const root=byId('users-daily-rows'),status=byId('users-daily-status');
+ if(!root||!status)return;
+ const rows=buildDailyOperationsRows(report);
+ root.replaceChildren();
+ if(!rows){
+  const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=6;
+  td.textContent='私有汇总数据不可用或未授权，不能显示真实明细';
+  tr.append(td);root.append(tr);status.textContent='数据不可用';return;
+ }
+ const display=n=>integer(n)===null?'—':fmt.format(n);
+ for(const item of [...rows].reverse()){
+  const tr=document.createElement('tr');
+  for(const value of [item.day,display(item.signup),item.collected?display(item.pv):'未采集',
+   item.collected?display(item.jobViews):'未采集',item.collected?display(item.searches):'未采集',
+   item.collected?display(item.outboundClicks):'未采集']){
+   const td=document.createElement('td');td.textContent=value;tr.append(td);
+  }
+  root.append(tr);
+ }
+ status.textContent=rows.length+' 天 · '+(report.collectorStartedAt?'运营事件起始于 '+report.collectorStartedAt.slice(0,10):'运营事件采集时间尚未核实');
+}
 function updateGrowth(){
  showRealDataStatus();
  const t=growth?.traffic,b=growth?.devices,a=growth?.account,q=growth?.activity;
@@ -78,16 +118,23 @@ function updateGrowth(){
    setMetric('users-area-'+name.replace('_','-'),q?.quality==='collected'?(q.areaUsers?.[name]||0):null);
   }
   setMetric('users-account-saves',a?.quality==='collected'?a.savedJobs:null);
+ setMetric('users-total-accounts',a?.quality==='collected'?a.registeredUsers:null);
+ setMetric('users-total-saves',a?.quality==='collected'?a.savedJobs:null);
+ setMetric('users-accounts-with-saves',a?.quality==='collected'?a.accountsWithSavedJobs:null);
+ const sourceStatus=byId('accounts-source-status');if(sourceStatus){sourceStatus.textContent=a?.quality==='collected'?'已核验':'未接通';sourceStatus.className='table-status '+(a?.quality==='collected'?'good':'waiting')}
+ renderDailyOperations(growth);
   byId('users-account-start').textContent=q?.collectedFrom?formatTime(q.collectedFrom):'账号活动统计已停用或尚未配置';
   byId('users-account-quality').textContent=q?.quality==='collected'
    ?'账号 DAU/WAU/MAU 与首次活跃回访仅覆盖已同意统计的登录账号，不等于所有注册用户；留存以首次记录活跃日为起点。'
    :q?.quality==='not_collected'?'账号级活动采集已停用；不计算 DAU/WAU/MAU 或回访率，匿名访问量不能代替账号活跃。':'账号级活跃尚无可信记录，不显示模拟数据。';
-  if(q?.quality==='collected')renderTraffic('users-account-chart',q.series.map(x=>({day:x.day,pv:x.active})));
-  else byId('users-account-chart').textContent='未采集账号级活跃，不显示虚假曲线';
+  if(a?.quality==='collected'&&Array.isArray(a.signupSeries))renderTraffic('users-account-chart',a.signupSeries.map(x=>({day:x.day,pv:integer(x.count)||0})));
+  else byId('users-account-chart').textContent='注册时间序列尚未连接，不显示虚假趋势';
   setMetric('investor-users',a?.quality==='collected'?a.registeredUsers:null);
- renderTraffic('users-chart',t?.quality==='collected'?t.series:null);
+ const actualDays=buildDailyOperationsRows(growth);
+ const actualSeries=Array.isArray(actualDays)?actualDays.filter(x=>x.collected).map(x=>({day:x.day,pv:x.pv||0})):null;
+ renderTraffic('users-chart',actualSeries);
  if(t?.quality==='collected'){
-  const trend=byId('trend-chart');if(trend){trend.className='chart-empty hhba-live-trend';renderTraffic('trend-chart',t.series)}
+  const trend=byId('trend-chart');if(trend){trend.className='chart-empty hhba-live-trend';renderTraffic('trend-chart',actualSeries)}
  }
 }
 async function refreshGrowth(){
@@ -97,17 +144,20 @@ async function refreshGrowth(){
   if(!customRange)return;
   params.set('from',customRange.from);params.set('to',customRange.to);
  }else params.set('days',selectedPeriod==='today'?'1':selectedPeriod.slice(0,-1));
+ const requestId=++growthRequestId;
  try{
   const r=await fetch('/admin-preview/api/metrics?'+params,{cache:'no-store',credentials:'same-origin'});
+  if(requestId!==growthRequestId)return;
   if(!r.ok||!(r.headers.get('content-type')||'').includes('application/json')){
    growthError=[401,403].includes(r.status)?'AUTH_REQUIRED':'SERVICE_ERROR';
    throw Error('PRIVATE_METRICS_REQUIRE_AUTH');
   }
   const v=await r.json();
+  if(requestId!==growthRequestId)return;
   if(v.kind!=='HHBA_CLOUDFLARE_PRIVATE_METRICS_V1'||!v.traffic||!v.devices||!v.account){growthError='SERVICE_ERROR';throw Error('INVALID_PRIVATE_METRICS')}
   growth=v;growthError=null;
- }catch{growth=null;if(!growthError)growthError='SERVICE_ERROR'}
- updateGrowth();
+ }catch{if(requestId!==growthRequestId)return;growth=null;if(!growthError)growthError='SERVICE_ERROR'}
+ if(requestId===growthRequestId)updateGrowth();
 }
 
 const titles={overview:'数据总览',users:'用户分析',market:'岗位与企业',operations:'运营监控',
@@ -154,11 +204,13 @@ function choosePeriod(value){
   node.setAttribute('aria-pressed',String(chosen));
  }
  byId('custom-range').hidden=value!=='custom';
+ byId('users-custom-range').hidden=value!=='custom';
  const text={today:'今日', '7d':'近 7 天','30d':'近 30 天',custom:customRange?'自定义时间':'自定义时间'};
- byId('trend-range-label').textContent=value==='custom'&&customRange
-  ?customRange.from+' 至 '+customRange.to:text[value];
+ const periodText=value==='custom'&&customRange?customRange.from+' 至 '+customRange.to:text[value];
+ byId('trend-range-label').textContent=periodText;
+ byId('users-period-label').textContent=periodText+'（UTC）';
  byId('period-notice').querySelector('span').textContent='当前岗位指标为最新索引快照，与所选'+text[value]+
-  '范围无关；匿名访问、账号功能分类和新注册按所选区间查询，DAU/WAU/MAU 始终按今日滚动窗口。';
+  '范围无关；注册新增和无身份运营事件按所选日期查询，账号 DAU/WAU/MAU 已停采。';
  if(value!=='custom'||customRange)void refreshGrowth();
 }
 function qualityText(data){
@@ -259,6 +311,9 @@ function buildVerifiedInvestorRows(data,report){
   ['首次活跃次日回访率',retention(activity?.firstSeenRetention?.d1),'以首次记录的同意活跃日为基准，不是注册次日留存；括号为回访/成熟样本',activity?privateTime:''],
   ['首次活跃第七日回访率',retention(activity?.firstSeenRetention?.d7),'以首次记录的同意活跃日为基准，不是注册七日留存；括号为回访/成熟样本',activity?privateTime:''],
   ['页面访问事件 PV',value(traffic?.pv),'Cloudflare D1 不关联账号或访客标识的事件次数，不等于 UV，'+range,traffic?privateTime:''],
+  ['岗位详情浏览事件',value(traffic?.jobViews),'Cloudflare D1 无身份岗位详情事件次数，'+range,traffic?privateTime:''],
+  ['岗位搜索事件',value(traffic?.searches),'Cloudflare D1 无身份岗位搜索操作次数，不含搜索词，'+range,traffic?privateTime:''],
+  ['官网招聘链接点击事件',value(traffic?.outboundClicks),'Cloudflare D1 无身份官网跳转点击次数，不代表已投递，'+range,traffic?privateTime:''],
   ['设备有效收藏',value(devices?.savedJobs),'Cloudflare D1 设备级收藏；不是登录账号收藏，不应相加',devices?privateTime:''],
   ['真实收入','未接入','未接入可核验财务台账，不以岗位、访问或收藏估算收入','']
  ];
@@ -283,16 +338,23 @@ for(const node of document.querySelectorAll('.nav-link'))node.addEventListener('
 for(const node of document.querySelectorAll('[data-period]'))node.addEventListener('click',()=>{
  choosePeriod(node.dataset.period);
 });
-byId('apply-custom').addEventListener('click',()=>{
- const from=byId('date-from').value,to=byId('date-to').value;
- const alert=byId('date-error');
- if(!from||!to||from>to){alert.textContent='请选择有效的起止日期';return}
- if(to>new Date().toISOString().slice(0,10)){alert.textContent='结束日期不能晚于今天';return}
+function applyCustomDateRange(prefix){
+ const from=byId(prefix+'date-from').value,to=byId(prefix+'date-to').value;
+ const alert=byId(prefix+'date-error');
+ const valid=d=>/^\d{4}-\d{2}-\d{2}$/.test(d||'')&&Number.isFinite(Date.parse(d+'T00:00:00Z'))&&
+  new Date(d+'T00:00:00Z').toISOString().slice(0,10)===d;
+ if(!valid(from)||!valid(to)||from>to){alert.textContent='请选择有效的起止日期';return}
+ if(to>new Date().toISOString().slice(0,10)){alert.textContent='结束日期不能晚于今天（UTC）';return}
  const diff=(Date.parse(to+'T00:00:00Z')-Date.parse(from+'T00:00:00Z'))/86400000;
  if(!Number.isInteger(diff)||diff>89){alert.textContent='自定义范围最多 90 天';return}
  alert.textContent='';
- customRange={from,to};choosePeriod('custom');
-});
+ customRange={from,to};
+ byId('date-from').value=from;byId('date-to').value=to;
+ byId('users-date-from').value=from;byId('users-date-to').value=to;
+ choosePeriod('custom');
+}
+byId('apply-custom').addEventListener('click',()=>applyCustomDateRange(''));
+byId('users-apply-custom').addEventListener('click',()=>applyCustomDateRange('users-'));
 byId('refresh').addEventListener('click',()=>{void refresh();void refreshGrowth()});
 byId('top-investor').addEventListener('click',()=>setView('investor'));
 byId('show-investor').addEventListener('click',()=>setView('investor'));

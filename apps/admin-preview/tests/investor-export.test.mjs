@@ -26,7 +26,7 @@ const privateData={
  account:{quality:'collected',registeredUsers:1,newRegistered:1,savedJobs:1,accountsWithSavedJobs:1},
  activity:{quality:'collected',dau:0,wau:0,mau:0,periodActive:0,
   firstSeenRetention:{d1:{eligible:0,returned:0,rate:null},d7:{eligible:0,returned:0,rate:null}}},
- traffic:{quality:'collected',pv:0},
+ traffic:{quality:'collected',pv:0,jobViews:2,searches:3,outboundClicks:1},
  devices:{quality:'collected',savedJobs:0}
 };
 const row=(rows,name)=>rows.find(x=>x[0]===name);
@@ -40,6 +40,10 @@ test('export reflects real PNVS registration and account saves while retaining t
  assert.equal(row(rows,'账号 MAU')[1],'0');
  assert.equal(row(rows,'区间授权活跃账号')[1],'0');
  assert.equal(row(rows,'页面访问事件 PV')[1],'0');
+ assert.equal(row(rows,'岗位详情浏览事件')[1],'2');
+ assert.equal(row(rows,'岗位搜索事件')[1],'3');
+ assert.equal(row(rows,'官网招聘链接点击事件')[1],'1');
+ assert.match(row(rows,'官网招聘链接点击事件')[2],/不代表已投递/);
  assert.equal(row(rows,'设备有效收藏')[1],'0');
  assert.equal(row(rows,'首次活跃次日回访率')[1],'样本不足');
  assert.equal(row(rows,'累计真实求职者账号')[3],privateData.asOf);
@@ -55,6 +59,7 @@ test('missing/unauthorized private aggregates never become zero, even if public 
  assert.equal(row(rows,'账号当前收藏岗位数')[1],'未采集或未授权');
  assert.equal(row(rows,'账号 MAU')[1],'未采集或未授权');
  assert.equal(row(rows,'页面访问事件 PV')[1],'未采集或未授权');
+ assert.equal(row(rows,'岗位搜索事件')[1],'未采集或未授权');
  assert.equal(row(rows,'已审计 ATS 来源')[1],'4');
  assert.equal(row(rows,'失败 ATS 来源')[1],'0');
  assert.equal(row(rows,'真实收入')[1],'未接入');

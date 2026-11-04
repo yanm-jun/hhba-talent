@@ -223,3 +223,17 @@ body.investor-mode .top-env{display:none}
 .hhba-growth-section .metric-number{font-size:26px;white-space:nowrap}
 .hhba-growth-section .panel-trend,.hhba-growth-section .panel-quality{min-height:300px}
 .hhba-growth-section .hhba-private-quality{margin:0 0 18px;line-height:1.6}
+
+
+/* Real daily accounting: compact, date-scoped additions to the original admin. */
+.hhba-user-range-toolbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin:0 0 14px}
+.hhba-user-range-toolbar .small-label{font-size:12px;color:#607d70}
+.hhba-daily-operations{margin:18px 0 22px;padding:20px 22px}
+.hhba-daily-operations .panel-heading{display:flex;justify-content:space-between;align-items:start;gap:12px}
+.hhba-daily-operations .data-table-wrap{overflow-x:auto;max-height:370px;overflow-y:auto}
+.hhba-daily-table{width:100%;min-width:660px;font-variant-numeric:tabular-nums}
+.hhba-daily-table th{position:sticky;top:0;background:#f8faf8;z-index:1}
+.hhba-daily-table th:not(:first-child),.hhba-daily-table td:not(:first-child){text-align:right}
+.hhba-daily-table td{white-space:nowrap}
+.hhba-daily-operations .hhba-private-quality{margin:12px 0 0}
+@media(max-width:680px){.hhba-user-range-toolbar{align-items:flex-start}.hhba-daily-operations{padding:16px 13px}.hhba-daily-operations .panel-heading{flex-wrap:wrap}}
