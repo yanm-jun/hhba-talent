@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {nzPathways} from '../src/data/overseasNewZealand.ts';
 import {nzCompleteGuidesV2} from '../src/data/overseasNzGuidesV2.ts';
-import {overseasTerms} from '../src/components/OverseasDetailedGuide.tsx';
+import {overseasTerms} from '../src/data/overseasGlossary.ts';
 const page=readFileSync(new URL('../src/pages/OverseasDevelopmentPage.tsx',import.meta.url),'utf8');
 const css=readFileSync(new URL('../src/styles/overseas-guide-v2.css',import.meta.url),'utf8');
 test('7/7 New Zealand paths have complete 10-chapter instructions, not tiny summary cards',()=>{
