@@ -84,7 +84,7 @@
           <article class="kpi-card"><div class="kpi-head"><span>已审计 ATS 来源</span><span class="metric-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span></div><div class="metric-number" id="boards-count">—</div><p id="boards-sub" class="kpi-foot">ATS 招聘来源，非合作企业数</p></article>
           <article class="kpi-card"><div class="kpi-head"><span>累计注册用户</span><span class="metric-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 19v-2c0-3 2.3-4 6-4s6 1 6 4v2"/></svg></span></div><div class="metric-number pending" id="registered-users">—</div><p class="kpi-foot muted">真实 PNVS 候选人注册账户；未连接则留空</p></article>
           <article class="kpi-card"><div class="kpi-head"><span>账户 DAU / MAU</span><span class="metric-icon"><svg viewBox="0 0 24 24"><path d="M3 13h4l3-7 4 12 3-5h4"/></svg></span></div><div class="metric-number pending" id="active-users">— / —</div><p class="kpi-foot muted">账号级行为数据已停采，不以 UV 代替</p></article>
-          <article class="kpi-card"><div class="kpi-head"><span>无身份访问事件 PV</span></div><div class="metric-number pending" id="ov-pv">—</div><p class="kpi-foot muted">Cloudflare D1 · 仅用户自愿同意的采集</p></article>
+          <article class="kpi-card"><div class="kpi-head"><span>无身份访问事件 PV</span></div><div class="metric-number pending" id="ov-pv">—</div><p class="kpi-foot muted">Cloudflare D1 · 无访客标识的真实页面事件次数</p></article>
           <article class="kpi-card"><div class="kpi-head"><span>设备级有效收藏</span></div><div class="metric-number pending" id="ov-saves">—</div><p class="kpi-foot muted">Cloudflare D1 · 不代表登录用户收藏</p></article>
         </div>
         <div class="kpi-grid phase2-metrics"><article class="kpi-card"><div class="kpi-head"><span>全部索引记录</span></div><div class="metric-number" id="indexed-count">—</div><p class="kpi-foot">原始索引规模，非全部有效在招</p></article><article class="kpi-card"><div class="kpi-head"><span>官网任职要求已核验</span></div><div class="metric-number" id="requirements-count">—</div><p class="kpi-foot">原文证据已核验，非完整翻译数量</p></article><article class="kpi-card"><div class="kpi-head"><span>去重收录企业</span></div><div class="metric-number" id="companies-count">—</div><p class="kpi-foot">按公司名称去重，非签约企业数</p></article></div>
@@ -113,42 +113,60 @@
           <div class="panel-heading"><div><h2>数据来源与统计口径</h2><p>优先展示已采集、可复核的指标，不以预测代替事实。</p></div><button class="link-button" type="button" id="show-investor">融资展示视图 →</button></div>
           <div class="data-table-wrap"><table class="data-table"><thead><tr><th scope="col">统计项目</th><th scope="col">数据来源</th><th scope="col">状态</th></tr></thead><tbody>
             <tr><td><strong>岗位索引与 ATS 来源</strong><small>本次公开索引同步快照</small></td><td>Cloudflare 同源公开岗位与官网 JD 审计</td><td><span class="table-status waiting" id="jobs-status">核对中</span></td></tr>
-            <tr><td><strong>注册、活跃及用户留存</strong><small>需要鉴权后的聚合统计</small></td><td>用户系统 / 行为事件（未接入）</td><td><span class="table-status waiting">待接入</span></td></tr>
-            <tr><td><strong>申请外链点击 / 商业收入</strong><small>不能使用浏览量估算转化</small></td><td>行为埋点 / 财务账目（未接入）</td><td><span class="table-status waiting">待接入</span></td></tr>
+            <tr><td><strong>真实注册和账号收藏</strong><small>来自受保护身份库的聚合；不追踪个人访问轨迹</small></td><td>Cloudflare PNVS 身份库 · 真实注册与收藏</td><td><span class="table-status waiting" id="accounts-source-status">核验中</span></td></tr>
+            <tr><td><strong>官网跳转事件 / 商业收入</strong><small>跳转次数来自真实事件，收入需要财务凭据</small></td><td>Cloudflare 匿名事件 D1 / 财务台账（未接入）</td><td><span class="table-status waiting">待接入</span></td></tr>
           </tbody></table></div>
         </article>
         <footer class="page-footer">HHBA Management Console · Phase 2 公开数据看板 · 所有统计数据均须标明来源、口径与时间</footer>
       </section>
       <section class="page-view" id="view-users" hidden aria-labelledby="users-heading">
         <div class="page-heading"><div><p class="eyebrow">CLOUDFLARE · PRIVATE METRICS</p><h1 id="users-heading">用户增长、回访与功能使用</h1>
-        <p class="page-subtitle">原有「用户分析」模块升级：区分真实注册账户、经同意的账号活跃、匿名访问与历史设备收藏；不展示任何个人浏览轨迹。</p></div></div>
+        <p class="page-subtitle">原有「用户分析」模块显示真实注册、收藏与无身份运营事件。不会把页面访问次数当作活跃用户；无需新增同意弹窗。</p></div></div>
+        <div class="hhba-user-range-toolbar" role="group" aria-label="用户分析日期筛选">
+          <div class="range-group" aria-label="用户分析时间范围">
+            <button type="button" data-period="today">今日</button>
+            <button type="button" data-period="7d">近 7 天</button>
+            <button type="button" data-period="30d" class="selected" aria-pressed="true">近 30 天</button>
+            <button type="button" data-period="custom">自定义</button>
+          </div>
+          <span class="small-label" id="users-period-label">近 30 天（UTC）</span>
+        </div>
+        <div id="users-custom-range" class="custom-range" hidden>
+          <label>开始日期 <input type="date" id="users-date-from"/></label>
+          <label>结束日期 <input type="date" id="users-date-to"/></label>
+          <button type="button" class="button-outline" id="users-apply-custom">应用日期</button>
+          <span role="alert" class="validation-note" id="users-date-error"></span>
+        </div>
         <div class="kpi-grid">
+          <article class="kpi-card"><div class="kpi-head"><span>累计注册求职者（当前快照）</span></div><div class="metric-number pending" id="users-total-accounts">—</div><p class="kpi-foot muted">PNVS 身份库真实 candidate 账户总量</p></article>
+          <article class="kpi-card"><div class="kpi-head"><span>当前真实账号收藏数</span></div><div class="metric-number pending" id="users-total-saves">—</div><p class="kpi-foot muted">当前快照，不能当作历史区间累计收藏</p></article>
+          <article class="kpi-card"><div class="kpi-head"><span>有收藏的账号数</span></div><div class="metric-number pending" id="users-accounts-with-saves">—</div><p class="kpi-foot muted">当前去重账号数，非点击次数</p></article>
           <article class="kpi-card"><div class="kpi-head"><span>访问 PV</span></div><div class="metric-number pending" id="growth-pv">—</div><p class="kpi-foot muted">不使用访客识别 Cookie，按实际事件条数汇总</p></article>
           <article class="kpi-card"><div class="kpi-head"><span>访客 UV（未采集）</span></div><div class="metric-number pending" id="growth-uv">—</div><p class="kpi-foot muted">不记录访客唯一标识，无法计算 UV</p></article>
-          <article class="kpi-card"><div class="kpi-head"><span>设备有效收藏</span></div><div class="metric-number pending" id="growth-saves">—</div><p class="kpi-foot muted">按设备 Cookie 的真实收藏关系</p></article>
-          <article class="kpi-card"><div class="kpi-head"><span>新增 / 取消收藏</span></div><div class="metric-number pending" id="growth-changes">—</div><p class="kpi-foot muted">按当前日期范围统计实际操作</p></article>
+          <article class="kpi-card"><div class="kpi-head"><span>历史设备收藏（单列）</span></div><div class="metric-number pending" id="growth-saves">—</div><p class="kpi-foot muted">旧设备收藏表当前快照，不是账号收藏</article>
+          <article class="kpi-card"><div class="kpi-head"><span>旧设备新增 / 取消</span></div><div class="metric-number pending" id="growth-changes">—</div><p class="kpi-foot muted">历史设备收藏操作，不是账号收藏</article>
         </div>
         <section class="hhba-growth-section" aria-label="真实账号增长">
-          <div class="panel-heading"><div><h2>真实账号增长与回访</h2><p>注册及收藏来自真实账户业务库；账号行为采集已停止，DAU/WAU/MAU 和回访率不再采集，不能以匿名访问次数替代。</p></div></div>
+          <div class="panel-heading"><div><h2>真实注册与账号收藏</h2><p>注册及收藏来自真实账户业务库；账号行为采集已停止，DAU/WAU/MAU 和回访率不再采集，不能以匿名访问次数替代。</p></div></div>
           <div class="kpi-grid">
             <article class="kpi-card"><div class="kpi-head"><span>新增注册（所选期间）</span></div><div class="metric-number pending" id="users-new-registrations">—</div><p class="kpi-foot muted">PNVS 真实候选人，不含匿名访问</p></article>
-            <article class="kpi-card"><div class="kpi-head"><span>账号 DAU / WAU</span></div><div class="metric-number pending" id="users-dau-wau">— / —</div><p class="kpi-foot muted">今日 / 过去7日，不受自定义时间范围影响</p></article>
-            <article class="kpi-card"><div class="kpi-head"><span>账号 MAU（30日）</span></div><div class="metric-number pending" id="users-mau">—</div><p class="kpi-foot muted">账号行为采集已停止，不能以页面 PV 替代</p></article>
-            <article class="kpi-card"><div class="kpi-head"><span>7日首次活跃回访</span></div><div class="metric-number pending" id="users-d7">—</div><p class="kpi-foot muted">首次记录活跃后第7日；非注册留存</p></article>
+            <article class="kpi-card"><div class="kpi-head"><span>账号 DAU / WAU（未采集）</span></div><div class="metric-number pending" id="users-dau-wau">— / —</div><p class="kpi-foot muted">今日 / 过去7日，不受自定义时间范围影响</p></article>
+            <article class="kpi-card"><div class="kpi-head"><span>账号 MAU（未采集）</span></div><div class="metric-number pending" id="users-mau">—</div><p class="kpi-foot muted">账号行为采集已停止，不能以页面 PV 替代</p></article>
+            <article class="kpi-card"><div class="kpi-head"><span>7日账号回访（未采集）</span></div><div class="metric-number pending" id="users-d7">—</div><p class="kpi-foot muted">首次记录活跃后第7日；非注册留存</p></article>
           </div>
           <div class="insights-grid">
-            <article class="panel panel-trend"><div class="panel-heading"><div><h2>每日真实账号活跃</h2><p>账号级活动已停止新增；无历史授权数据则不显示</p></div></div>
-              <div class="chart-empty" id="users-account-chart">尚未接入账号行为统计</div>
-              <div class="panel-footnote">账号行为采集起点：<span id="users-account-start">待接入</span></div>
+            <article class="panel panel-trend"><div class="panel-heading"><div><h2>真实每日注册趋势</h2><p>按 UTC 注册日期汇总，仅显示 PNVS 真实账号，不生成模拟增长</p></div></div>
+              <div class="chart-empty" id="users-account-chart">等待真实注册日期汇总</div>
+              <div class="panel-footnote">注册来源：PNVS 候选人账户 · 不包含匿名访问次数</div>
             </article>
-            <article class="panel panel-quality"><div class="panel-heading"><div><h2>用户使用的功能</h2><p>所选区间内各类功能的去重账号数；同一个人可同时出现在多项中</p></div></div>
+            <article class="panel panel-quality"><div class="panel-heading"><div><h2>实际业务与事件口径</h2><p>账号收藏按当前业务库；岗位浏览、搜索与跳转仅统计事件次数</p></div></div>
               <div class="quality-lines">
-                <div><span>查看岗位</span><strong id="users-area-jobs">—</strong></div>
-                <div><span>查看企业档案</span><strong id="users-area-companies">—</strong></div>
-                <div><span>查看人才政策</span><strong id="users-area-policies">—</strong></div>
-                <div><span>使用求职工具</span><strong id="users-area-tools">—</strong></div>
-                <div><span>当日有岗位收藏操作的账号</span><strong id="users-area-job-save">—</strong></div>
-                <div><span>当前账号级岗位收藏数</span><strong id="users-account-saves">—</strong></div>
+                <div><span>账号级岗位浏览（停采）</span><strong id="users-area-jobs">—</strong></div>
+                <div><span>账号级企业浏览（停采）</span><strong id="users-area-companies">—</strong></div>
+                <div><span>账号级政策浏览（停采）</span><strong id="users-area-policies">—</strong></div>
+                <div><span>账号级工具使用（停采）</span><strong id="users-area-tools">—</strong></div>
+                <div><span>账号级活动中的收藏操作（停采）</span><strong id="users-area-job-save">—</strong></div>
+                <div><span>当前真实账号岗位收藏数</span><strong id="users-account-saves">—</strong></div>
                 <div><span>企业收藏</span><strong>尚未接入</strong></div>
                 <div><span>首次活跃第1日回访</span><strong id="users-d1">—</strong></div>
               </div>
@@ -156,18 +174,30 @@
           </div>
           <p class="hhba-private-quality" id="users-account-quality">账号活跃指标须有真实后端和用户授权，不得从访问量反推。</p>
         </section>
+
+        <article class="panel hhba-daily-operations">
+          <div class="panel-heading"><div><h2>每日真实数据明细</h2><p>UTC 日期；注册来自 PNVS，运营事件来自 Cloudflare D1。未开始采集的日期显示「未采集」而不是 0。</p></div>
+          <span class="small-label" id="users-daily-status">等待管理员数据</span></div>
+          <div class="data-table-wrap">
+            <table class="data-table hhba-daily-table">
+              <thead><tr><th scope="col">日期（UTC）</th><th scope="col">新增注册</th><th scope="col">页面访问 PV</th><th scope="col">岗位浏览</th><th scope="col">岗位搜索</th><th scope="col">官网跳转</th></tr></thead>
+              <tbody id="users-daily-rows"><tr><td colspan="6">管理员验证后显示真实记录</td></tr></tbody>
+            </table>
+          </div>
+          <p class="hhba-private-quality">区间累计数据随日期变化；注册总量、当前账号收藏及有收藏的账号数是最新快照，不随历史区间回溯。UV、账号 DAU/WAU/MAU 和留存未采集。</p>
+        </article>
         <div class="insights-grid">
-          <article class="panel panel-trend"><div class="panel-heading"><div><h2>匿名访问趋势</h2><p>按日记录不关联访客身份的页面事件次数</p></div></div>
+          <article class="panel panel-trend"><div class="panel-heading"><div><h2>无身份页面访问趋势</h2><p>按日记录不关联访客身份的页面事件次数</p></div></div>
             <div class="chart-empty" id="users-chart">管理员未授权或尚无采集数据</div>
             <div class="panel-footnote">统计区间：<span id="users-interval">UTC · 等待管理员授权</span></div>
           </article>
           <article class="panel panel-quality"><div class="panel-heading"><div><h2>来源与隐私状态</h2><p>未经授权不返回私有聚合数据</p></div></div>
             <p id="users-data-quality" class="hhba-private-quality">Cloudflare Access 管理员验证尚未完成，私有指标保持 —。</p>
             <div class="quality-lines">
-              <div><span>设备收藏的设备数</span><strong id="growth-devices">—</strong></div>
-              <div><span>岗位详情浏览</span><strong id="growth-views">—</strong></div>
-              <div><span>搜索事件</span><strong id="growth-search">—</strong></div>
-              <div><span>申请外链点击</span><strong id="growth-click">—</strong></div>
+              <div><span>旧版设备收藏设备数</span><strong id="growth-devices">—</strong></div>
+              <div><span>岗位详情浏览事件</span><strong id="growth-views">—</strong></div>
+              <div><span>岗位搜索事件</span><strong id="growth-search">—</strong></div>
+              <div><span>官方招聘链接点击事件</span><strong id="growth-click">—</strong></div>
             </div>
           </article>
         </div>
@@ -176,7 +206,7 @@
         <div class="page-heading investor-heading"><div><p class="eyebrow">INVESTOR DATA ROOM · PREVIEW</p><h1 id="investor-heading">HHBA · 融资数据展示</h1><p class="page-subtitle">可核验的平台基础建设进度，尚未接入的经营指标明确留空。</p></div><div class="heading-actions"><button type="button" class="button-outline" id="export-csv">导出已核验 CSV</button><button type="button" class="button-primary" id="leave-investor">返回管理后台</button></div></div>
         <div class="investor-statement"><div class="statement-symbol">H</div><div><strong>Human Capability Network</strong><p>全球职位与人才能力连接平台 · HHBA 独立整理公开职位来源，不代表与雇主建立招聘合作。</p></div></div>
         <div class="investor-kpis"><article><span>可展示职位记录</span><strong id="investor-jobs">—</strong><small id="investor-jobs-label">待核验数据</small></article><article><span>去重收录企业</span><strong id="investor-boards">—</strong><small>索引公司名称去重，非合作伙伴数</small></article><article><span>真实注册用户</span><strong id="investor-users">—</strong><small>仅从 PNVS 用户数据库查询</small></article></div>
-        <article class="panel investor-disclosure"><h2>给投资人的数据披露说明</h2><p>此页面展示由主站同批次公开职位列表和官网 JD 审计计算的聚合信息，GitHub Pages 更新时生成快照而非实时查询。有核验依据的真实注册数、经同意的账号活跃与首次活跃回访可按实际接入情况展示；未经核验的转化、收入和成本均不展示数字；不得将岗位索引规模解释为真实用户规模或公司营收。</p><dl><div><dt>当前索引快照</dt><dd id="investor-asof">—</dd></div><div><dt>索引状态</dt><dd id="investor-quality">等待数据</dd></div><div><dt>增长历史</dt><dd>尚未接入按日数据</dd></div><div><dt>数据采集方式</dt><dd>Pages 构建时读取同源公开岗位快照与官网 JD 审计</dd></div></dl></article>
+        <article class="panel investor-disclosure"><h2>给投资人的数据披露说明</h2><p>此页面展示由主站同批次公开职位列表和官网 JD 审计计算的聚合信息，GitHub Pages 更新时生成快照而非实时查询。有核验依据的真实注册、收藏和无身份事件次数可按实际接入情况展示；账号 DAU/留存已停采；未经核验的转化、收入和成本均不展示数字；不得将岗位索引规模解释为真实用户规模或公司营收。</p><dl><div><dt>当前索引快照</dt><dd id="investor-asof">—</dd></div><div><dt>索引状态</dt><dd id="investor-quality">等待数据</dd></div><div><dt>增长历史</dt><dd>尚未接入按日数据</dd></div><div><dt>数据采集方式</dt><dd>Pages 构建时读取同源公开岗位快照与官网 JD 审计</dd></div></dl></article>
         <footer class="page-footer">仅供内部融资材料编排与指标核对；正式对外分享须完成身份认证、数据审查与访问控制。</footer>
       </section>
       <section class="page-view" id="view-placeholder" hidden aria-labelledby="placeholder-heading">
