@@ -62,7 +62,7 @@ with sync_playwright() as p:
     assert page.locator('[data-winter-job]').count()>=2,'ReCube marketing joins old Hong Kong records'
     page.get_by_role('button',name='重置').click()
     assert page.locator('[data-winter-job]').count()==10
-    assert '25 条公开岗位及招聘批次结果' in page.locator('.hhba-winter-list-summary').inner_text()
+    assert '34 条公开岗位及招聘批次结果' in page.locator('.hhba-winter-list-summary').inner_text()
     # Each real job opens a distinct internal role detail and first-party application URL.
     page.locator('[data-winter-job="hsbc-hk-student-placement-1367003857"]').get_by_role('link',name='岗位详情').click()
     assert 'hsbc-hk-student-placement-1367003857' in page.url
@@ -155,11 +155,11 @@ with sync_playwright() as p:
     page.get_by_role('link',name='返回寒假实习岗位列表').click()
     page.locator('[data-winter-job="shinewing-hk-2027-winter-audit-tax-advisory"]').get_by_role('link',name='岗位详情').click()
     assert page.get_by_text('Jobsdb 招聘记录',exact=False).count()>0
-    assert page.get_by_role('link',name='查看补充招聘时间证据').get_attribute('href').startswith('https://hk.jobsdb.com/')
+    assert page.get_by_role('link',name='查看招聘平台原始记录').get_attribute('href').startswith('https://hk.jobsdb.com/')
     page.get_by_role('link',name='返回寒假实习岗位列表').click()
     page.locator('[data-winter-job="shinewing-hk-2027-tax-business-advisory-l0607873647"]').get_by_role('link',name='岗位详情').click()
     assert page.get_by_text('L0607873647',exact=False).count()>0
-    assert page.get_by_role('link',name='查看补充招聘时间证据').get_attribute('href').startswith('https://www.recruit.com.hk/')
+    assert page.get_by_role('link',name='查看招聘平台原始记录').get_attribute('href').startswith('https://www.recruit.com.hk/')
     page.get_by_role('link',name='返回寒假实习岗位列表').click()
     page.locator('[data-winter-job="luoshu-final-year-quant-intern-2027"]').get_by_role('link',name='岗位详情').click()
     assert page.get_by_text('寒假时间',exact=False).count()>0 or page.get_by_text('寒假批次',exact=False).count()>0
@@ -180,7 +180,7 @@ with sync_playwright() as p:
     page.get_by_role('button',name='重置').click()
     page.get_by_role('button',name='下一页').click()
     page.get_by_role('button',name='下一页').click()
-    assert page.locator('[data-winter-job]').count()==5,'25 records = 10+10+5'
+    assert page.locator('[data-winter-job]').count()==10,'34 records = 10+10+10+4'
     for jobid in ['recube-hk-winter-hardware-260900322','recube-hk-winter-website-designer-260900317','recube-hk-winter-data-ai-260900320','papergames-shanghai-recruiting-game-rd-intern-2027-review','papergames-shanghai-nikki-world-ecology-planning-280350']:
         assert page.locator(f'[data-winter-job="{jobid}"]').count()==1,jobid
     page.locator('[data-winter-job="papergames-shanghai-nikki-world-ecology-planning-280350"]').get_by_role('link',name='岗位详情').click()
@@ -194,6 +194,41 @@ with sync_playwright() as p:
     page.locator('[data-winter-program="cmb-guangzhou-2027-winter-internship-review"]').get_by_role('link',name='项目资料与官网').click()
     assert page.get_by_text('2026寒假',exact=False).count()>0
     page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    # Batch 06: three employers, nine distinct records, genuine expiry notices and a third-party original.
+    page.get_by_role('searchbox',name='搜索寒假实习具体岗位').fill('Sun Life')
+    page.get_by_role('button',name='搜索岗位').click()
+    assert page.locator('[data-winter-job]').count()==3
+    page.locator('[data-winter-job="sunlife-hk-strategic-finance-jr00128213"]').get_by_role('link',name='岗位详情').click()
+    assert page.get_by_role('link',name='查看雇主已截止岗位公告').get_attribute('href').startswith('https://sunlife.wd3.myworkdayjobs.com/')
+    assert page.get_by_text('2026年10月30日',exact=False).count()>0
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.get_by_role('button',name='重置').click()
+    page.get_by_role('searchbox',name='搜索寒假实习具体岗位').fill('Manulife')
+    page.get_by_role('button',name='搜索岗位').click()
+    assert page.locator('[data-winter-job]').count()==5
+    page.locator('[data-winter-job="manulife-hk-2027-global-info-risk-jr26100089"]').get_by_role('link',name='岗位详情').click()
+    assert page.get_by_role('link',name='查看雇主已截止岗位公告').get_attribute('href').startswith('https://manulife.wd3.myworkdayjobs.com/')
+    assert page.get_by_text('2026年11月1日',exact=False).count()>0
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.get_by_role('button',name='重置').click()
+    page.get_by_role('searchbox',name='搜索寒假实习具体岗位').fill('Informa')
+    page.get_by_role('button',name='搜索岗位').click()
+    assert page.locator('[data-winter-job]').count()==1
+    page.locator('[data-winter-job="informa-markets-hk-2027-jan-jun-intern-l059656859"]').get_by_role('link',name='岗位详情').click()
+    assert page.get_by_role('link',name='企业招聘首页（非岗位直投）').get_attribute('href').startswith('https://www.informa.com/')
+    assert page.get_by_role('link',name='查看招聘平台原始记录').get_attribute('href').startswith('https://openuniversity.recruit.com.hk/')
+    assert page.get_by_text('2026年11月7日',exact=False).count()>0
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.get_by_role('button',name='重置').click()
+    page.get_by_role('button',name='下一页').click()
+    page.get_by_role('button',name='下一页').click()
+    page.get_by_role('button',name='下一页').click()
+    assert page.locator('[data-winter-job]').count()==4,'new batch06 makes four compact pages of 10+10+10+4'
+    for jobid in ['manulife-hk-2027-global-info-risk-jr26100089','manulife-hk-2027-marketing-strategy-jr26100142','manulife-hk-2027-tech-placement-jr26100136','informa-markets-hk-2027-jan-jun-intern-l059656859']:
+        assert page.locator(f'[data-winter-job="{jobid}"]').count()==1,jobid
+    page.get_by_role('button',name='上一页').click()
+    page.get_by_role('button',name='上一页').click()
+    page.get_by_role('button',name='上一页').click()
     # Old employer programmes still have working detail pages, but are not jobs.
     page.locator('[data-winter-program-archive] summary').click()
     assert page.locator('[data-winter-program-archive]').get_attribute('open') is not None
