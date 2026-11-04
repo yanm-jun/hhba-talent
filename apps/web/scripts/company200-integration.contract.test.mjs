@@ -46,7 +46,15 @@ assert(app.includes("if(route==='/companies/discover')return <Company200PreviewP
 assert(!app.includes("if(route==='/'&&import.meta.env.VITE_COMPANY200_STATIC_PREVIEW"),'Do not replace market homepage with company-only preview');
 assert(home.includes('<UnifiedJobMarket compact/>')&&home.includes('<HomeCompanyMarquee/>'),'Restore official market and original verified brand carousel');
 assert(nav.includes('to="/candidate/jobs"')&&nav.includes('to="/companies/discover"'),'Job and company discovery must both be navigable');
-assert(market.includes('loadVerifiedFeaturedJobs')&&market.includes('DomesticCompanyResults'),'Official recruitment cards and matched company discovery must coexist');
+// The market now loads verified job snapshots through the shared listJobs API.
+ // Retain a direct check of live job loading, official job rendering, and company cards.
+assert(
+ market.includes('listJobs(filters,batchOffsetForPage(page),controller.signal)') &&
+ market.includes('safeOfficialJobUrl(job)') &&
+ market.includes('featuredTitle(job,lang)') &&
+ market.includes('<DomesticCompanyResults'),
+ 'Official live recruitment cards and matched company discovery must coexist'
+);
 assert(source.includes("company:'OpenAI'")&&source.includes("company:'Anthropic'")&&source.includes("company:'SpaceX'"),'Keep original three priority employers');
 assert(router.includes('domesticDiscoveryRoute'),'New company page must preserve SPA safe return navigation');
 assert(discovery.includes('browseDefault'),'200-company page must show all 200 on direct visit');
