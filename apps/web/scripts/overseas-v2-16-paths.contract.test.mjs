@@ -40,7 +40,7 @@ test('two country page detail routes use shared guide, not original 5-point shal
  assert.match(nz,/OverseasDetailedGuide key=\{chosen.id\}/);
  assert.match(au,/OverseasDetailedGuide key=\{detail.id\}/);
  assert.ok(component.includes('09')&&component.includes('10'));
- assert.ok(component.includes('details')&&component.includes('复核'));
+ assert.ok(component.includes('details')&&component.includes('核对'));
  assert.ok(component.includes('type="checkbox"'));
  assert.ok(css.includes('@media(max-width:760px)'));
 });
