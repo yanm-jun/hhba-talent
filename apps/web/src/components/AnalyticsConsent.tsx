@@ -7,13 +7,17 @@ export function AnalyticsConsent(){
  const route=useRoute();
  const [choice,setChoice]=useState<boolean|null>(()=>analyticsChoice());
  const [authRevision,setAuthRevision]=useState(0);
+ // Account session transitions need a new identity-scoped observation, but must
+ // not fabricate a second anonymous page view for the same route.
  useEffect(()=>{
-  if(choice===true){trackAccountActivity(activityAreaForRoute(route));}
-   if(choice===true && !(/^\/candidate\/(?:account(?:\/.*)?|saved|login|register)$/.test(route)||route==='/auth')){
+  if(choice===true)trackAccountActivity(activityAreaForRoute(route));
+ },[route,choice,authRevision]);
+ useEffect(()=>{
+  if(choice===true && !(/^\/candidate\/(?:account(?:\/.*)?|saved|login|register)$/.test(route)||route==='/auth')){
    trackEvent('page_view',route);
    if(/^\/candidate\/jobs\/[A-Za-z0-9_-]{1,180}$/.test(route))trackEvent('job_view',route);
   }
- },[route,choice,authRevision]);
+ },[route,choice]);
  useEffect(()=>{
   const update=()=>setChoice(analyticsChoice());
   const authChanged=()=>setAuthRevision(n=>n+1);
