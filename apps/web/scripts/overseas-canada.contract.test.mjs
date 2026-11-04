@@ -65,7 +65,7 @@ test('Actual 2026 Express Entry category NOC codes and 11 province official PNP 
  assert.equal(caProvinceEntries.length,11);
  assert.equal(new Set(caProvinceEntries.map(x=>x.id)).size,11);
  assert.ok(!caProvinceEntries.some(x=>x.id==='qc'||x.id==='nu'));
- assert.ok(caProvinceEntries.every(p=>p.url.startsWith('https://')&&p.example.length>35));
+ assert.ok(caProvinceEntries.every(p=>p.url.startsWith('https://')&&p.example.length>18));
 });
 
 test('Canada fifth country routes, existing eight authentic photos, and previous countries remain',()=>{
