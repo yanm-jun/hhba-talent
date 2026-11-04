@@ -32,7 +32,7 @@ test('landing route and permanent programme-detail routes are public',()=>{
 });
 test('directory contains source-backed programmes without invented job numbers',()=>{
  const ids=[...data.matchAll(/\bid:'([a-z0-9-]+)'/g)].map(x=>x[1]);
- assert.equal(ids.length,7,'the first batch must add exactly 3 records without losing 4 existing records');
+ assert.equal(ids.length,8,'historical CMB review must be additional information, not a fabricated live job');
  assert.equal(new Set(ids).size,ids.length);
  for(const name of ['毕马威中国','德勤中国','摩根大通','APCO Worldwide'])assert.ok(data.includes(name),name+' missing');
  for(const source of ['kpmg.com','deloitte.com','jpmorganchase.com','oraclecloud.com'])assert.ok(data.includes(source));
@@ -50,7 +50,7 @@ test('directory contains source-backed programmes without invented job numbers',
 });
 test('concrete job first: only individual employer-issued postings appear in the primary list',()=>{
  const jobIds=[...jobs.matchAll(/\bid:'([a-z0-9-]+)'/g)].map(x=>x[1]);
- assert.equal(jobIds.length,16,'12 prior plus 4 distinct role-or-intake records in batch 04');
+ assert.equal(jobIds.length,25,'16 prior plus ReCube 7 school postings and Papergames 2 sourced daily internships');
  assert.equal(new Set(jobIds).size,jobIds.length,'no duplicate role identity');
  for(const id of ['apco-shanghai-winter-start-1787','hsbc-hk-student-placement-1367003857','qima-hk-sales-intern-744000154586189']){
   assert.ok(jobIds.includes(id),id+' missing');
@@ -106,4 +106,24 @@ test('site search and personal data flows are unchanged',()=>{
  assert.ok(!popup.includes('getRealAuthToken')&&!popup.includes('/api/resumes'),'never read private account or resume information');
  assert.ok(css.includes('.hhba-winter-hide-choice')&&css.includes('.hhba-winter-modal-actions'),'opt-out must have responsive inline CTA layout');
  assert.ok(page.includes('过滤')||page.includes('筛选'),'filter UI should exist');
+});
+
+
+test('batch05 has seven distinct university-only ReCube winter records and two separately sourced Papergames roles',()=>{
+ const ids=[...jobs.matchAll(/\\bid:'([a-z0-9-]+)'/g)].map(m=>m[1]);
+ const recube=['product-uiux-260900318','sustainability-260900321','fullstack-260900315','digital-marketing-260900319','hardware-260900322','website-designer-260900317','data-ai-260900320'];
+ for(const name of recube)assert.ok(ids.includes('recube-hk-winter-'+name),'missing real university posting '+name);
+ for(const id of ['papergames-shanghai-recruiting-game-rd-intern-2027-review','papergames-shanghai-nikki-world-ecology-planning-280350'])assert.ok(ids.includes(id),'missing sourced Papergames role '+id);
+ assert.equal(new Set(ids).size,25);
+ assert.equal((jobs.match(/status:"campus-limited"/g)||[]).length,7,'restricted university listings must not be passed as direct public jobs');
+ assert.equal((jobs.match(/status:"winter-unverified"/g)||[]).length,2,'two additional daily internships must be marked as winter-unverified');
+ assert.ok(jobs.includes('2026 年 11 月 14 日')&&jobs.includes('cpdc.osa.cuhk.edu.hk/en/job/'));
+ assert.ok(jobs.includes('职位详情跳转需要校内认证')&&jobs.includes('非本岗位直投'));
+ assert.ok(jobs.includes('www.shixiseng.com/intern/inn_rupynll1lq54')&&jobs.includes('www.deizao.cn/m/index/shixixq/jobid/280350'));
+ assert.ok(jobs.includes('2027 年 1 月 6 日')&&jobs.includes('寒假到岗待核实'));
+ assert.ok(data.includes('cmb-guangzhou-2027-winter-internship-review'));
+ assert.ok(data.includes("verificationLevel:"+'"historical-only"'),'historical CMB cannot masquerade as an active role');
+ assert.ok(!ids.some(id=>id.startsWith('cmb-')),'CMB historical programme is not an independent winter job');
+ assert.ok(page.includes('企业官网（非直投）')&&page.includes('高校校内限制'));
+ assert.ok(page.includes('historical-only'));
 });
