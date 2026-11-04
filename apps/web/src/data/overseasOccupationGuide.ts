@@ -90,7 +90,7 @@ export const nzTier1Occupations:OccupationRecord[]=[
  healthcare('nz-physiotherapist','物理治疗师','Physiotherapist','252511','职业资格列明 Bachelor of Physiotherapy 或 Bachelor of Health Science (Physiotherapy) 等途径。','Physiotherapy Board of New Zealand','https://physioboard.org.nz/'),
  {...base,id:'nz-external-auditor',group:'商业与审计',name:'外部审计师',english:'External Auditor',code:'221213',
  intro:'外部审计师（ANZSCO 221213）在绿名单 Tier 1，要求实际从事符合职业定义的审计工作，不等于所有会计岗位都可用。',
- qualification:['此职业的 Green List 专项门槛为明确工资标准；学历、英语及职位职责仍需分别符合居民签证的一般要求。'],
+ qualification:['此职业在 Green List 中以明确工资标准作为职业专项门槛；并非有会计学位就自动符合 External Auditor。申请人还须证明真实工作内容与 ANZSCO 221213 一致，并独立满足居民签证的英语、健康及品行要求。','如果目标职位涉及审计报告签署或当地受监管业务，还应另向相应新西兰专业或监管机构核查执业资格。'],
  registration:'需对照实际审计职责与当地行业执业规则；不宜把会计学位直接视为取得审计执业资格。',
  wage:'2026-03-09 起适用的绿名单工资要求至少 NZD 45.50/小时，40小时工作周的税前年薪示意为 NZD 94,640；实际按每小时工资和合同核算。',
  experience:'不应把“曾做过会计”与“外部审计师真实职业经历”直接等同。',
