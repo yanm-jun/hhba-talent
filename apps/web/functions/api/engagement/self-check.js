@@ -14,10 +14,14 @@ export async function onRequestGet({request,env}){
   if(!user||user.role!=='candidate')return bad('FORBIDDEN',403);
   const hash=await hmac(env.HHBA_METRICS_SECRET,'account-activity-v1:'+session.phone);
   const day=isoDay();
-  const result=await metrics.prepare('SELECT area FROM hhba_account_activity WHERE account_hash=? AND day=? ORDER BY area')
-   .bind(hash,day).all();
+  const [result,history]=await Promise.all([
+   metrics.prepare('SELECT area FROM hhba_account_activity WHERE account_hash=? AND day=? ORDER BY area').bind(hash,day).all(),
+   metrics.prepare('SELECT 1 AS present FROM hhba_account_activity WHERE account_hash=? LIMIT 1').bind(hash).first()
+  ]);
   const areas=(result.results||[]).map(x=>x.area).filter(x=>allowedAreas.has(x));
-  return json({kind:'HHBA_ACCOUNT_ACTIVITY_SELF_CHECK_V1',ok:true,day,recorded:areas.length>0,areas});
+  // Historical presence is scoped to the same authenticated account, never another user.
+  return json({kind:'HHBA_ACCOUNT_ACTIVITY_SELF_CHECK_V1',ok:true,day,recorded:areas.length>0,
+   historicalRecorded:!!history,areas});
  }catch(e){
   console.error('HHBA_ACCOUNT_ACTIVITY_SELF_CHECK_FAILED',e?.name||'error');
   return bad('ACCOUNT_ACTIVITY_CHECK_UNAVAILABLE',503);

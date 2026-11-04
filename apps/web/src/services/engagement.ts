@@ -8,10 +8,12 @@ const metricsSupported=import.meta.env.BASE_URL!=='/hhba-talent/';
 export function analyticsChoice():boolean|null{
  try{const v=localStorage.getItem(KEY);return v==='yes'?true:v==='no'?false:null}catch{return null}
 }
-export function chooseAnalytics(enabled:boolean){
- if(!enabled && metricsSupported)deleteAccountAnalytics();
+export type AnalyticsErasureResult='cleared'|'no-session'|'unavailable'|'not-requested';
+export function chooseAnalytics(enabled:boolean):Promise<AnalyticsErasureResult>{
+ // Stop all client-side collection before requesting remote erasure.
  try{localStorage.setItem(KEY,enabled?'yes':'no')}catch{}
  dispatchEvent(new Event('hhba:analytics-consent'));
+ return enabled?Promise.resolve('not-requested'):eraseAccountAnalytics();
 }
 export function trackEvent(type:EngagementEvent,path=location.pathname){
  if(!metricsSupported || analyticsChoice()!==true ||navigator.doNotTrack==='1'||(navigator as Navigator & {globalPrivacyControl?: boolean}).globalPrivacyControl===true)return;
@@ -45,17 +47,24 @@ export function trackAccountActivity(area:AccountArea):void{
   headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'X-HHBA-Consent':'yes'},
   body:JSON.stringify({area})}).catch(()=>undefined);
 }
-// Best-effort deletion of consented account activity when analytics is switched off.
-function deleteAccountAnalytics():void{
+// The signed-in user can confirm or retry erasure without enabling tracking.
+export async function eraseAccountAnalytics():Promise<AnalyticsErasureResult>{
+ if(!metricsSupported)return 'unavailable';
  const token=getRealAuthToken();
- if(!token)return;
- void fetch(ACCOUNT_API,{method:'DELETE',credentials:'same-origin',keepalive:true,
-  headers:{'Authorization':'Bearer '+token}}).catch(()=>undefined);
+ if(!token)return 'no-session';
+ try{
+  const response=await fetch(ACCOUNT_API,{method:'DELETE',credentials:'same-origin',cache:'no-store',
+   headers:{'Authorization':'Bearer '+token}});
+  if(response.status===401)return 'no-session';
+  if(!response.ok)return 'unavailable';
+  const body=await response.json().catch(()=>null) as {ok?:boolean;deleted?:boolean}|null;
+  return body?.ok===true&&body.deleted===true?'cleared':'unavailable';
+ }catch{return 'unavailable'}
 }
 
 // A read-only check of this signed-in candidate's actual D1 activity rows.
 // Never returns a user identity, job ID, search term, or resume content.
-export type MyActivityCheck={kind:'HHBA_ACCOUNT_ACTIVITY_SELF_CHECK_V1';ok:true;day:string;recorded:boolean;areas:AccountArea[]};
+export type MyActivityCheck={kind:'HHBA_ACCOUNT_ACTIVITY_SELF_CHECK_V1';ok:true;day:string;recorded:boolean;historicalRecorded:boolean;areas:AccountArea[]};
 export async function getMyActivityCheck():Promise<MyActivityCheck>{
  if(!metricsSupported)throw Error('该预览环境未启用账号统计。');
  const token=getRealAuthToken();
@@ -70,7 +79,7 @@ export async function getMyActivityCheck():Promise<MyActivityCheck>{
  if(!response.ok)throw Error('统计数据库暂时不可用，不能将此错误算作零记录。');
  const value=await response.json().catch(()=>null) as Partial<MyActivityCheck>|null;
  if(value?.kind!=='HHBA_ACCOUNT_ACTIVITY_SELF_CHECK_V1'||value.ok!==true||
-    typeof value.day!=='string'||typeof value.recorded!=='boolean'||!Array.isArray(value.areas))
+    typeof value.day!=='string'||typeof value.recorded!=='boolean'||typeof value.historicalRecorded!=='boolean'||!Array.isArray(value.areas))
   throw Error('统计服务响应异常，请重试。');
  return value as MyActivityCheck;
 }

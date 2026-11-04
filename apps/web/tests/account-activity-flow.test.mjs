@@ -47,6 +47,11 @@ function fixture(){
    let args=[];
    return {
     bind(...items){args=items;return this},
+    async first(){
+     if(sql.startsWith('SELECT 1 AS present FROM hhba_account_activity WHERE account_hash=? LIMIT 1'))
+      return [...activities.values()].some(a=>a.account_hash===args[0])?{present:1}:null;
+     throw Error('Unexpected metrics .first SQL: '+sql);
+    },
     async all(){
      if(sql.startsWith('SELECT area FROM hhba_account_activity WHERE account_hash=? AND day=? ORDER BY area')){
       return {results:[...activities.values()].filter(a=>a.account_hash===args[0]&&a.day===args[1])
@@ -134,6 +139,15 @@ test('registration, real saved-job writes, consented events, isolation, and eras
  assert.equal(bodyA.recorded,true);assert.deepEqual(bodyA.areas,['companies','job_save','jobs','policies']);
  assert.deepEqual(bodyB.areas,['jobs']);
  assert.equal(bodyA.day,today());assert.equal('account_hash' in bodyA,false);
+ assert.equal(bodyA.historicalRecorded,true);
+ assert.equal(bodyB.historicalRecorded,true);
+ // Records from an earlier day must still be visible as history even when today is empty.
+ const hashA=[...state.activities.values()].find(row=>row.area==='companies').account_hash;
+ for(const row of state.activities.values())if(row.account_hash===hashA)row.day='2026-01-01';
+ const historicalOnly=await (await selfCheck({env,request:selfRequest(tokenA)})).json();
+ assert.equal(historicalOnly.recorded,false,'no activity for current UTC day');
+ assert.equal(historicalOnly.historicalRecorded,true,'historical activity is not mistaken for zero');
+ for(const row of state.activities.values())if(row.account_hash===hashA)row.day=today();
  assert.ok(!JSON.stringify(bodyA).includes('13900000001'));
  assert.equal(state.activities.size,5,'self-check cannot create activity records');
  assert.equal((await selfCheck({env,request:selfRequest(null)})).status,401);
@@ -149,6 +163,9 @@ test('registration, real saved-job writes, consented events, isolation, and eras
   headers:headers(tokenA)})})).json();
  assert.equal(afterErase.recorded,false,'read-only check reflects actual erasure');
  assert.deepEqual(afterErase.areas,[]);
+ assert.equal(afterErase.historicalRecorded,false,'all past and present activity deleted for account A');
+ const stillOther=await (await selfCheck({env,request:selfRequest(tokenB)})).json();
+ assert.equal(stillOther.historicalRecorded,true,'account B activity must remain');
 
  assert.equal(state.saves.size,1,'withdrawal does not erase real job bookmarks');
  assert.equal((await wipe(env,tokenA)).status,200,'erasure is idempotent');
@@ -180,4 +197,11 @@ test('frontend session changes and other-tab consent rechecks remain wired',()=>
  assert.match(consent,/\[route,choice,authRevision\]/);
  assert.match(consent,/\[route,choice\]/);
  assert.match(consent,/not fabricate/);
+ const privacy=readFileSync(new URL('../src/pages/PersonalCenterPage.tsx',import.meta.url),'utf8');
+ const svc=readFileSync(new URL('../src/services/engagement.ts',import.meta.url),'utf8');
+ assert.match(privacy,/retryErasure/);
+ assert.match(privacy,/historicalRecorded/);
+ assert.match(privacy,/erasureState==='failed'/);
+ assert.match(svc,/return body\?\.ok===true&&body\.deleted===true/);
+ assert.match(svc,/return enabled\?Promise\.resolve\('not-requested'\):eraseAccountAnalytics\(\)/);
 });
