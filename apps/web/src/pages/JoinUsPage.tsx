@@ -239,7 +239,7 @@ function BrandManifesto() {
         <p className="join-manifesto-founder-label">创办者 · 闫明骏</p>
         <img className="join-manifesto-signature"
              src={import.meta.env.BASE_URL + 'images/hhba-founder-signature-2026.svg'}
-             alt="闫明骏的手写姓名签名" width={1185} height={503}
+             alt="创办者闫明骏的真实手写签名" width={1185} height={503}
              decoding="async" loading="lazy" />
       </footer>
     </div>
