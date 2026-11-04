@@ -12,6 +12,7 @@ import {TALENT_MUNICIPALITIES,TALENT_LEGACY_CITIES} from '../data/talentCityRegi
 import {studyCountries,studyDirections,studyCountry} from '../data/studyAbroad';
 import {universities,universityPrograms} from '../data/studyUniversities';
 import {WINTER_2027_PROGRAMS} from '../data/winter2027Programs';
+import {WINTER_2027_JOBS} from '../data/winter2027Jobs';
 
 export type SiteSearchKind='page'|'job'|'company'|'policy'|'housing'|'study';
 export type SiteSearchRecord={
@@ -102,14 +103,26 @@ export function buildSiteSearchIndex():SiteSearchRecord[]{
    description:u.chinese+' · '+p.description,tags:[p.english,u.english,u.chinese,studyCountry(u.country).name,...p.keywords],
    path:'/study-abroad/program/'+encodeURIComponent(p.id),status:'院校课程 · 招生状态需核实'});
  }
- // Every officially reviewed winter internship entry is navigable inside HHBA.
- for(const p of WINTER_2027_PROGRAMS)add({
-  id:'winter:'+p.id,kind:'job',title:p.company+' · '+p.title,
-  description:[p.intro,p.location,p.period].join(' · ').slice(0,430),
-  tags:[p.english,p.company,p.category,p.region,p.location,'寒假','实习','冬季实习',...p.tags],
-  path:'/winter-internship/'+encodeURIComponent(p.id),
-  status:p.statusNote
+ // Only genuine employer-published job requisitions appear as JOB results.
+ for(const job of WINTER_2027_JOBS)add({
+  id:'winter-job:'+job.id,kind:'job',title:job.company+' · '+job.title,
+  description:[job.description,job.location,job.period].join(' · ').slice(0,430),
+  tags:[job.company,job.english,job.industry,job.city,job.region,'寒假','实习','冬季实习',...job.majorTags,...job.tags],
+  path:'/winter-internship/'+encodeURIComponent(job.id),
+  status:job.statusNote
  });
+ // Unverified programme descriptions are informational pages, not job posts.
+ // Exclude the JPM 2027 seasonal listing: its indexed 2027 opportunities can start in summer.
+ for(const p of WINTER_2027_PROGRAMS){
+  if(p.kind!=='专项计划'||p.id==='jpm-2027-seasonal'||WINTER_2027_JOBS.some(j=>j.originalProgramId===p.id))continue;
+  add({
+   id:'winter-program:'+p.id,kind:'page',title:p.company+' · '+p.title,
+   description:[p.intro,p.location,p.period].join(' · ').slice(0,430),
+   tags:[p.english,p.company,p.category,p.region,p.location,'冬季实习项目','实习资讯',...p.tags],
+   path:'/winter-internship/'+encodeURIComponent(p.id),
+   status:'项目资料 · 尚无核实具体岗位'
+  });
+ }
  const unique=new Map<string,SiteSearchRecord>();
  for(const r of records)unique.set(r.kind+':'+r.path,r);
  cached=[...unique.values()];

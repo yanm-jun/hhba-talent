@@ -8,6 +8,9 @@ export type WinterProgram={
  intro:string;requirements:string[];period:string;deadline:string;
  sourceUrl:string;applicationUrl:string;checkedOn:string;statusNote:string;
  tags:string[];featured?:boolean;
+ evidenceUrl?:string; /** Secondary public evidence when official portal omits dates. */
+ workRightsNote?:string; /** Eligibility notes especially for cross-border postings. */
+ verificationLevel?:'official-program'|'official-posting'|'date-conflict';
 };
 export const WINTER_2027_PROGRAMS:ReadonlyArray<WinterProgram>=[
  {
@@ -57,6 +60,48 @@ export const WINTER_2027_PROGRAMS:ReadonlyArray<WinterProgram>=[
   applicationUrl:'https://fa-evxv-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_2001/job/1787',
   checkedOn:'2026-11-04',statusNote:'曾标为有薪岗位；金额和当前可投递状态以官网为准',
   tags:['上海','传播','媒体','公共事务','品牌','研究','写作','公关']
+ },
+ {
+  id:'ey-china-winter-2027-review',company:'安永中国',english:'EY China',
+  title:'安永中国 Winter Internship Program 冬季实习',kind:'专项计划',region:'中国内地',location:'具体办公室及职位须从安永中国校招官网选择',category:'审计咨询',
+  intro:'安永中国官方校园招聘页面明确设有冬季实习项目，为在读学生提供真实客户项目、业务实践及专业培训机会。官网尚未公布统一的 2026—2027 冬季实习起止日期，不能将该项目视为已经确认开放的 2027 岗位。',
+  requirements:['官网对冬季实习列明：全日制大学三年级在读生或符合条件的第一年毕业生。','愿意在专业服务领域发展，具备解决问题、团队合作与组织能力。','具体城市、岗位、申请资格以及签约要求以安永官方招聘系统为准。'],
+  period:'冬季项目；2026—2027 具体实习日期尚待官方岗位确认',
+  deadline:'未查得 2026—2027 批次官方统一申请截止日期',
+  sourceUrl:'https://www.ey.com/en_cn/careers/student-programs-in-chinese-mainland',
+  applicationUrl:'https://www.ey.com/en_cn/careers/student-programs-in-chinese-mainland',
+  checkedOn:'2026-11-04',statusNote:'官方长期设有冬季实习项目，但本批次是否在招尚未确认',
+  verificationLevel:'official-program',
+  tags:['安永','EY','审计','鉴证','税务','咨询','财务','商科','大三','冬季']
+ },
+ {
+  id:'pwc-hk-2027-winter',company:'普华永道香港',english:'PwC Hong Kong',
+  title:'2027 香港冬季实习｜咨询、数字鉴证与交易服务',kind:'专项计划',region:'中国香港',location:'香港特别行政区（部分方向为全职到岗）',category:'审计咨询',
+  intro:'普华永道官方校园招聘页确认每年有冬季实习批次；香港中文大学招聘平台发布了面向 2027 年 1—6 月的咨询、数据与人工智能、数字鉴证及交易服务等冬季实习职位。不同业务线条件各异，项目期与具体投递状态需要再核对。',
+  requirements:['相关岗位为香港办公室冬季实习，不应与中国内地岗位混同。','大学平台对多项职位标记为 2027 年 1—6 月、约六个月全职；以申请页面实际要求为准。','官网校园实习计划提及欢迎 2028 届及之后的本科及以上申请者，但不同职位可能有额外条件。','申请香港职位前核对在港工作资格、实习时长、专业和岗位对应条件。'],
+  period:'部分具体岗位：2027 年 1 月至 6 月（约六个月）',
+  deadline:'大学招聘平台显示的部分截止日期晚于项目起始月；请以企业招聘入口实时状态为准',
+  sourceUrl:'https://www.pwccn.com/en/careers/students.html',
+  evidenceUrl:'https://pip.erg.cuhk.edu.hk/app.php/guest/jobs/posted',
+  applicationUrl:'https://www.pwccn.com/en/careers/students.html',
+  checkedOn:'2026-11-04',statusNote:'官方存在冬季批次；2027 年香港岗位有高校发布记录，逐岗位申请状态待核实',
+  verificationLevel:'official-program',
+  tags:['普华永道','PwC','香港','咨询','数据','人工智能','AI','科技风险','审计','数字鉴证','交易咨询','2027','金融']
+ },
+ {
+  id:'hsbc-hk-2027-work-placement',company:'汇丰银行',english:'HSBC',
+  title:'2027 香港 Student Work Placement 学生工作实习',kind:'具体岗位',region:'中国香港',location:'香港岛中环，香港',category:'金融',
+  intro:'汇丰官方招聘系统公布的香港全职学生工作实习项目，业务涉及商业银行、数据分析、数字银行、客户服务、风险合规、市场研究等，计划自 2027 年 1 月 5 日持续至 6 月 30 日。注意：同一岗位官方访问入口显示两种不同截止日期，需以实际申请按钮的最新状态为准。',
+  requirements:['面向大学在读本科生，官网表示允许多专业背景申请。','需在 2027 年 1 月 5 日至 6 月 30 日全职到岗。','必须具备覆盖整个实习期间及项目结束后的香港合法工作资格；该项目不提供签证担保。','企业说明每轮仅接受一次申请，且职位可能因申请量提前截止。'],
+  period:'2027 年 1 月 5 日—6 月 30 日，六个月全职',
+  deadline:'官方同一职位在不同访问入口出现 2026-10-30 与 2026-11-20 两种截止日期；不保证仍可投递',
+  sourceUrl:'https://apply.careers.hsbc.com/emergingtalent/job/Central-HSBC-Student-Work-Placement-Hong/1367003857/',
+  evidenceUrl:'https://apply.careers.hsbc.com/emergingtalent/job/Central-HSBC-Student-Work-Placement-Hong/1367003857/?feedId=434057',
+  applicationUrl:'https://apply.careers.hsbc.com/emergingtalent/job/Central-HSBC-Student-Work-Placement-Hong/1367003857/',
+  checkedOn:'2026-11-04',statusNote:'官方岗位已发布；截止日期存在版本冲突，投递前须重新核实',
+  workRightsNote:'需要现有合法香港工作资格，汇丰明确不提供此岗位签证担保。',
+  verificationLevel:'date-conflict',
+  tags:['汇丰','HSBC','香港','银行','数字银行','金融','数据','商业分析','风险合规','法律','市场营销','2027']
  }
 ];
 export function winterProgramById(id:string){return WINTER_2027_PROGRAMS.find(p=>p.id===id);}

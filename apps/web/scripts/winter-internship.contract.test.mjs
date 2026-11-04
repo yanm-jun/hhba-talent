@@ -4,6 +4,7 @@ import {readFileSync,existsSync} from 'node:fs';
 
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const home=read('src/pages/HomePage.tsx'),main=read('src/main.tsx'),popup=read('src/components/WinterInternshipPopup.tsx'),page=read('src/pages/WinterInternshipPage.tsx'),data=read('src/data/winter2027Programs.ts'),css=read('src/styles/winter-internship.css');
+const jobs=read('src/data/winter2027Jobs.ts'),siteIndex=read('src/services/siteSearchIndex.ts');
 test('winter campaign replaces ONLY original homepage letter auto-popup',()=>{
  assert.ok(home.includes('<WinterInternshipPopup/>'));
  assert.ok(home.includes('<HomeOpenLetter autoOpen={false}/>'),'manual-only public letter component must be mounted');
@@ -31,13 +32,47 @@ test('landing route and permanent programme-detail routes are public',()=>{
 });
 test('directory contains source-backed programmes without invented job numbers',()=>{
  const ids=[...data.matchAll(/\bid:'([a-z0-9-]+)'/g)].map(x=>x[1]);
- assert.equal(ids.length,4);
+ assert.equal(ids.length,7,'the first batch must add exactly 3 records without losing 4 existing records');
  assert.equal(new Set(ids).size,ids.length);
  for(const name of ['毕马威中国','德勤中国','摩根大通','APCO Worldwide'])assert.ok(data.includes(name),name+' missing');
  for(const source of ['kpmg.com','deloitte.com','jpmorganchase.com','oraclecloud.com'])assert.ok(data.includes(source));
+ for(const id of ['ey-china-winter-2027-review','pwc-hk-2027-winter','hsbc-hk-2027-work-placement'])assert.ok(ids.includes(id),id+' missing');
+ for(const company of ['安永中国','普华永道香港','汇丰银行'])assert.ok(data.includes(company),company+' missing');
+ assert.ok(data.includes("workRightsNote:"),'Hong Kong eligibility risk must be shown');
+ assert.ok(data.includes("verificationLevel:'date-conflict'"),'HSBC application cutoff discrepancy must be disclosed');
+ assert.ok(data.includes("verificationLevel:'official-program'"),'EY and PwC should not be marked as currently verified open');
+ assert.ok(data.includes('pip.erg.cuhk.edu.hk'),'PwC 2027 seasonal source must be disclosed');
+ assert.ok(page.includes('查看补充招聘证据')&&page.includes('p.workRightsNote'),'full evidence and visa restriction must be shown');
+ assert.ok(page.includes('verificationLabel(program)'),'cards must disclose evidence levels');
+ assert.ok(!data.includes('currentOpenVerified:true'),'never invent open statuses');
  assert.ok(data.includes("checkedOn:'2026-11-04'"));
  assert.ok(!data.includes('currentOpenVerified:true'),'no false live availability');
 });
+test('concrete job first: only individual employer-issued postings appear in the primary list',()=>{
+ const jobIds=[...jobs.matchAll(/\bid:'([a-z0-9-]+)'/g)].map(x=>x[1]);
+ assert.equal(jobIds.length,3,'three independent official job requisitions in first MVP');
+ assert.equal(new Set(jobIds).size,jobIds.length,'no duplicate role identity');
+ for(const id of ['apco-shanghai-winter-start-1787','hsbc-hk-student-placement-1367003857','qima-hk-sales-intern-744000154586189']){
+  assert.ok(jobIds.includes(id),id+' missing');
+ }
+ for(const domain of ['oraclecloud.com','careers.hsbc.com','jobs.smartrecruiters.com'])assert.ok(jobs.includes(domain));
+ assert.ok(!jobs.includes('jpm-2027-seasonal'),'JPM summer/fall seasonal programme is not a winter role');
+ for(const part of ['data-winter-job={job.id}','winterJobById(slug)','data-winter-page="job-detail"','hhba-winter-role-list','PROGRAM_ONLY','data-winter-program-archive']){
+  assert.ok(page.includes(part),part+' missing from job-first page');
+ }
+ assert.ok(page.includes("p.id!=='jpm-2027-seasonal'"),'not-yet-confirmed winter programme must stay out of archive');
+ assert.ok(page.includes("p.kind==='专项计划'"),'program-only section must not duplicate concrete jobs');
+ assert.ok(page.includes('PAGE_SIZE=10')&&page.includes('totalPages>1'),'job list must paginate');
+ assert.ok(page.includes('按专业筛选寒假岗位')&&page.includes('按地区筛选寒假岗位')&&page.includes('按行业筛选寒假岗位'));
+ assert.ok(page.includes('terms.every(term=>haystack.includes(term))'),'natural multi-term job search expected');
+ assert.ok(page.includes("Number(b.majorTags.includes(major))-Number(a.majorTags.includes(major))"),'major-specific roles must rank above unrestricted');
+ assert.ok(jobs.includes("status:'deadline-conflict'"),'HSBC conflicting deadline must be displayed');
+ assert.ok(page.includes('job.workRightsNote'),'cross-border employment eligibility must be shown');
+ assert.ok(siteIndex.includes('for(const job of WINTER_2027_JOBS)')&&siteIndex.includes("kind:'job'"),'global search must index concrete jobs');
+ assert.ok(siteIndex.includes("kind:'page',title:p.company"),'unconfirmed programmes must be informational results, not job posts');
+ assert.ok(!page.includes("data-winter-page=\"directory\"\n   <section className=\"hhba-winter-landing-hero\""),'large introduction cannot precede jobs');
+});
+
 test('site search and personal data flows are unchanged',()=>{
  assert.ok(!home.includes('siteSearchIndex'));
  assert.ok(popup.includes("window.localStorage.getItem(HIDE_KEY)")&&popup.includes("window.localStorage.setItem(HIDE_KEY,'1')"),'explicit opt-out must persist in browser local storage');
