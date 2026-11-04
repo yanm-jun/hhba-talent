@@ -38,7 +38,7 @@ with sync_playwright() as p:
     page.get_by_role('heading',name='探索寒假实习机会').wait_for(timeout=60000)
     assert '/winter-internship' in page.url
     assert page.evaluate("localStorage.getItem('hhba:winter-internship-2027:hide:v1')") is None
-    assert page.locator('[data-winter-job]').count()==3, 'job-first list must contain exactly 3 source-backed vacancies'
+    assert page.locator('[data-winter-job]').count()==8, 'batch 02 must include 8 distinct source-backed vacancies'
     assert page.locator('[data-winter-program]').count()==4, 'unverified programme references must be secondary'
     assert page.locator('[data-winter-program-archive]').get_attribute('open') is None
     page.screenshot(path='/tmp/hhba-winter-directory-desktop.png',full_page=False)
@@ -46,7 +46,7 @@ with sync_playwright() as p:
     for jobid in ['apco-shanghai-winter-start-1787','hsbc-hk-student-placement-1367003857','qima-hk-sales-intern-744000154586189']:
         assert page.locator(f'[data-winter-job="{jobid}"]').count()==1, jobid
     assert page.get_by_role('heading',name='政府事务与战略传播实习生（2027 冬季入职）').is_visible()
-    assert page.get_by_role('link',name='官网核实').count()==3
+    assert page.get_by_role('link',name='官网核实').count()==8
     # Multi-word search must match title, location and major, with no invented programme results.
     page.get_by_role('searchbox',name='搜索寒假实习具体岗位').fill('上海 传播')
     page.get_by_role('button',name='搜索岗位').click()
@@ -61,7 +61,7 @@ with sync_playwright() as p:
     page.get_by_label('按地区筛选寒假岗位').select_option('中国香港')
     assert page.locator('[data-winter-job]').count()==1
     page.get_by_role('button',name='重置').click()
-    assert page.locator('[data-winter-job]').count()==3
+    assert page.locator('[data-winter-job]').count()==8
     # Each real job opens a distinct internal role detail and first-party application URL.
     page.locator('[data-winter-job="hsbc-hk-student-placement-1367003857"]').get_by_role('link',name='岗位详情').click()
     assert 'hsbc-hk-student-placement-1367003857' in page.url
@@ -76,6 +76,42 @@ with sync_playwright() as p:
     page.locator('[data-winter-job="apco-shanghai-winter-start-1787"]').get_by_role('link',name='岗位详情').click()
     assert 'apco-shanghai-winter-start-1787' in page.url
     assert page.get_by_role('link',name='前往企业官方岗位核实及申请').get_attribute('href').endswith('/1787')
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    # Batch 02: three companies and five independent official job descriptions.
+    new_ids=[
+        'bdo-hk-spring-assurance-2027',
+        'bdo-hk-spring-it-audit-2027',
+        'atkinsrealis-hk-winter-2027-r164310',
+        'rsm-hk-spring-audit-assurance-2027',
+        'rsm-hk-spring-tech-consulting-2027'
+    ]
+    for identifier in new_ids:
+        assert page.locator(f'[data-winter-job="{identifier}"]').count()==1,identifier
+    # One company may have multiple real posting URLs, not repeated company marketing cards.
+    page.get_by_role('searchbox',name='搜索寒假实习具体岗位').fill('BDO IT')
+    page.get_by_role('button',name='搜索岗位').click()
+    assert page.locator('[data-winter-job]').count()==1
+    assert page.locator('[data-winter-job="bdo-hk-spring-it-audit-2027"]').count()==1
+    page.get_by_role('button',name='重置').click()
+    page.locator('[data-winter-job="bdo-hk-spring-assurance-2027"]').get_by_role('link',name='岗位详情').click()
+    assert 'bdo-hk-spring-assurance-2027' in page.url
+    assert page.get_by_text('11 月 20 日',exact=False).count()>0
+    assert page.get_by_role('link',name='前往企业官方岗位核实及申请').get_attribute('href').startswith('https://recruitment.bdo.com.hk/')
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.locator('[data-winter-job="bdo-hk-spring-it-audit-2027"]').get_by_role('link',name='岗位详情').click()
+    assert page.get_by_text('11 月 30 日',exact=False).count()>0
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.locator('[data-winter-job="atkinsrealis-hk-winter-2027-r164310"]').get_by_role('link',name='岗位详情').click()
+    assert 'atkinsrealis-hk-winter-2027-r164310' in page.url
+    assert page.get_by_text('13 个单独招聘岗位',exact=False).count()>0
+    assert 'r-164310' in page.get_by_role('link',name='前往企业官方岗位核实及申请').get_attribute('href')
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.locator('[data-winter-job="rsm-hk-spring-tech-consulting-2027"]').get_by_role('link',name='岗位详情').click()
+    assert page.get_by_text('确切起始月份尚未公布',exact=False).count()>0
+    assert page.get_by_role('link',name='前往企业官方岗位核实及申请').get_attribute('href').startswith('https://www.rsm.global/')
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.locator('[data-winter-job="rsm-hk-spring-audit-assurance-2027"]').get_by_role('link',name='岗位详情').click()
+    assert page.get_by_text('3 个月春季实习',exact=False).count()>0
     page.get_by_role('link',name='返回寒假实习岗位列表').click()
     # Old employer programmes still have working detail pages, but are not jobs.
     page.locator('[data-winter-program-archive] summary').click()
