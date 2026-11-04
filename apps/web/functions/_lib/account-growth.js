@@ -13,7 +13,7 @@ export async function queryAccountGrowth({metricsDb,authDb,since,until,today,ser
    accounts={quality:'collected',registeredUsers:n(total?.n),newRegistered:null,signupSeries:null,
     savedJobs:null,accountsWithSavedJobs:null,dau:null,wau:null,mau:null,
     scope:'VERIFIED_PNVS_CANDIDATE_USERS_ONLY',
-    reason:'注册总数来自真实候选人数据库；DAU/MAU 仅在同意账号采集后计算，不能用匿名 UV 替代。'};
+    reason:'注册、收藏来自真实候选人数据库；账号级行为统计已停止，DAU/MAU 不可用，不能用访问次数冒充。'};
    try{
     const signups=await authDb.prepare("SELECT substr(created_at,1,10) AS day,COUNT(*) AS n FROM hhba_auth_users WHERE role='candidate' AND substr(created_at,1,10)>=? AND substr(created_at,1,10)<=? GROUP BY day ORDER BY day").bind(since,until).all();
     const map=new Map((signups.results||[]).map(row=>[row.day,n(row.n)]));
@@ -27,11 +27,10 @@ export async function queryAccountGrowth({metricsDb,authDb,since,until,today,ser
    }catch(e){console.warn('HHBA_REAL_ACCOUNT_SAVES_NOT_READY',e?.name||'error')}
   }catch(e){console.warn('HHBA_REAL_USER_REGISTRATION_NOT_READY',e?.name||'error')}
  }
- let activity={quality:'not_connected',dau:null,wau:null,mau:null,periodActive:null,
+ let activity={quality:accountAnalyticsEnabled?'not_connected':'not_collected',dau:null,wau:null,mau:null,periodActive:null,
   areaUsers:null,series:null,firstSeenRetention:null,collectedFrom:null,
-  scope:'CONSENTED_VERIFIED_ACCOUNTS_ONLY',reason:'账号行为 D1 迁移尚未应用或数据连接不可用'};
- try{
-  if(!accountAnalyticsEnabled)throw Error('ACCOUNT_ANALYTICS_DISABLED');
+  scope:'CONSENTED_VERIFIED_ACCOUNTS_ONLY',reason:accountAnalyticsEnabled?'账号行为 D1 迁移尚未应用或数据连接不可用':'已停止新增账号行为分析；日活与留存不以匿名页面事件推算'};
+ if(accountAnalyticsEnabled)try{
   const [daily,areas,summary,started,retained]=await Promise.all([
    metricsDb.prepare('SELECT day,COUNT(DISTINCT account_hash) AS n FROM hhba_account_activity WHERE day>=? AND day<=? GROUP BY day ORDER BY day').bind(since,until).all(),
    metricsDb.prepare('SELECT area,COUNT(DISTINCT account_hash) AS n FROM hhba_account_activity WHERE day>=? AND day<=? GROUP BY area').bind(since,until).all(),
