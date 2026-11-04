@@ -74,7 +74,7 @@ test('concrete job first: only individual employer-issued postings appear in the
  assert.ok(jobs.includes('2027 年 1 月 18 日')&&jobs.includes('2026 年 11 月 8 日'),'EY 2027 deadline and start must be preserved');
  assert.ok(jobs.includes("status:'program-intake'")&&jobs.includes('不拆分为四个虚拟岗位'),'EY business departments must not inflate separate job counts');
  assert.ok(jobs.includes("status:'source-verify'")&&jobs.includes('L0607873647'),'SHINEWING 2027 job-board records must show source limitations');
- assert.ok(jobs.includes("status:'winter-unverified'")&&jobs.includes('未与校招职位对应'),'Luoshu winter timing must be explicit as unverified');
+ assert.ok(jobs.includes("status:'winter-unverified'")&&jobs.includes('尚未证明与校招职位是同一批次'),'Luoshu winter timing must be explicit as unverified');
  assert.ok(jobs.includes('www.ey.com')&&jobs.includes('www.shinewing.hk')&&jobs.includes('www.luoshu.com'),'company career links required');
  assert.ok(page.includes("job.status==='verify-apply'?'hhba-winter-status-neutral'"),'source-unverified roles need caution badge in list');
  assert.ok(page.includes("job.status!=='deadline-conflict'&&job.status!=='year-conflict'"),'batch04 status caution must render in job detail');
