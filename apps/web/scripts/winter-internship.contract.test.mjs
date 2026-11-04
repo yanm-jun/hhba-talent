@@ -31,10 +31,19 @@ test('landing route and permanent programme-detail routes are public',()=>{
 });
 test('directory contains source-backed programmes without invented job numbers',()=>{
  const ids=[...data.matchAll(/\bid:'([a-z0-9-]+)'/g)].map(x=>x[1]);
- assert.equal(ids.length,4);
+ assert.equal(ids.length,7,'the first batch must add exactly 3 records without losing 4 existing records');
  assert.equal(new Set(ids).size,ids.length);
  for(const name of ['毕马威中国','德勤中国','摩根大通','APCO Worldwide'])assert.ok(data.includes(name),name+' missing');
  for(const source of ['kpmg.com','deloitte.com','jpmorganchase.com','oraclecloud.com'])assert.ok(data.includes(source));
+ for(const id of ['ey-china-winter-2027-review','pwc-hk-2027-winter','hsbc-hk-2027-work-placement'])assert.ok(ids.includes(id),id+' missing');
+ for(const company of ['安永中国','普华永道香港','汇丰银行'])assert.ok(data.includes(company),company+' missing');
+ assert.ok(data.includes("workRightsNote:"),'Hong Kong eligibility risk must be shown');
+ assert.ok(data.includes("verificationLevel:'date-conflict'"),'HSBC application cutoff discrepancy must be disclosed');
+ assert.ok(data.includes("verificationLevel:'official-program'"),'EY and PwC should not be marked as currently verified open');
+ assert.ok(data.includes('pip.erg.cuhk.edu.hk'),'PwC 2027 seasonal source must be disclosed');
+ assert.ok(page.includes('查看补充招聘证据')&&page.includes('p.workRightsNote'),'full evidence and visa restriction must be shown');
+ assert.ok(page.includes('verificationLabel(program)'),'cards must disclose evidence levels');
+ assert.ok(!data.includes('currentOpenVerified:true'),'never invent open statuses');
  assert.ok(data.includes("checkedOn:'2026-11-04'"));
  assert.ok(!data.includes('currentOpenVerified:true'),'no false live availability');
 });
