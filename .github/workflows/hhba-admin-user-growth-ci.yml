@@ -1,0 +1,44 @@
+name: HHBA admin user growth checks
+on:
+  pull_request:
+    paths:
+      - "apps/web/functions/**"
+      - "apps/web/src/services/engagement.ts"
+      - "apps/web/src/services/savedJobs.ts"
+      - "apps/web/src/components/AnalyticsConsent.tsx"
+      - "apps/web/d1/0008_account_growth_metrics.sql"
+      - "apps/web/tests/account-growth.test.mjs"
+      - "apps/web/tests/admin-work-audience.test.mjs"
+      - "apps/admin-preview/**"
+      - ".github/workflows/hhba-admin-user-growth-ci.yml"
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Check scripts and unit tests
+        run: |
+          node --check apps/admin-preview/dashboard.js
+          node --check apps/web/functions/api/engagement/account.js
+          node --check apps/web/functions/_lib/account-growth.js
+          node --test apps/web/tests/account-growth.test.mjs apps/web/tests/admin-work-audience.test.mjs
+      - name: Check D1 migration
+        run: |
+          python3 - <<'PY'
+          import sqlite3, pathlib
+          db=sqlite3.connect(':memory:')
+          db.execute('CREATE TABLE hhba_metrics_metadata(key TEXT PRIMARY KEY,value TEXT NOT NULL)')
+          db.executescript(pathlib.Path('apps/web/d1/0008_account_growth_metrics.sql').read_text())
+          db.execute("INSERT INTO hhba_account_activity VALUES('anon','2026-11-04','jobs','2026-11-04T00:00:00Z')")
+          assert db.execute('SELECT COUNT(*) FROM hhba_account_activity').fetchone()[0]==1
+          PY
+      - name: Compile existing HHBA web app
+        working-directory: apps/web
+        run: |
+          npm ci
+          npm run build

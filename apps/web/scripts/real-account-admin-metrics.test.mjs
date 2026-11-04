@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {generateKeyPairSync,sign} from 'node:crypto';
 import {onRequestGet as realMetrics} from '../functions/api/admin/metrics.js';
 
-const team='hhba-unit.cloudflareaccess.com',aud='admin-console-test-audience';
+const team='hhba-unit.cloudflareaccess.com',aud='hhba-work-admin-test-audience';
 const email='admin@example.test';
 const {privateKey,publicKey}=generateKeyPairSync('rsa',{modulusLength:2048});
 const jwk={...publicKey.export({format:'jwk'}),kid:'hhba-metrics-unit-key',alg:'RS256'};
@@ -30,7 +30,8 @@ function authDb(n,throwError=false){
 function env(n=17){
  return {
   HHBA_ACCESS_TEAM_DOMAIN:team,
-  HHBA_ACCESS_CONSOLE_AUD:aud,
+  HHBA_ACCESS_CONSOLE_AUD:'pages-dev-admin-test-audience',
+  HHBA_ACCESS_WORK_ADMIN_AUD:aud,
   HHBA_ACCESS_AUD:'legacy-api-audience',
   HHBA_METRICS_ADMIN_EMAIL:email,
   HHBA_METRICS_SECRET:'long-metrics-secret-at-least-32-characters-1234',

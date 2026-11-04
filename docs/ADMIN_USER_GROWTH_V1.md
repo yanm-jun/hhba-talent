@@ -1,0 +1,44 @@
+# HHBA 管理中心真实用户增长 V1（开发分支）
+
+## 目标与原则
+沿用 `apps/admin-preview` 原后台与 Cloudflare Access 审核鉴权，不创建第二个后台。
+区分四类来源：公开岗位快照、匿名同意访问、真实 PNVS 注册账户、同意统计的已登录账号。
+正式界面无演示数字；缺少后端、D1 迁移或授权时显示「—」，不将未知视为零。
+
+## 埋点与隐私
+- 已登录求职者且选择同意统计后，`/api/engagement/account` 才接受事件。
+- 服务器验证 PNVS Bearer 会话，不接受前端传来的用户 ID。
+- 将手机号在服务器内以秘密 HMAC 映射为稳定、不可直接还原的账号统计标识。
+- D1 仅保存账号哈希、UTC 日期、受限类别（general/jobs/companies/policies/tools/job_save）。
+- 不记录 URL 路径、搜索词、详细岗位 ID、企业 ID、简历、手机号、工资或申请材料。
+- 账号统计不包含拒绝统计、DNT 或 GPC 的用户；因此 DAU/MAU 不是整个注册用户群的实际全量活跃。
+- 个人中心撤回同意会尽力触发经过身份验证的 DELETE 删除该账号统计事件，因网络中断可能需要重试；需要补齐留存期限、删除重试和合规留痕策略后才可规模化推广。
+- GitHub Pages 静态预览不向 Cloudflare 写入统计事件。
+
+## 指标口径
+- 注册账户数与区间新增：真实 `hhba_auth_users` candidate，按创建时间计入，不等于匿名 UV。
+- 账号收藏数：`hhba_candidate_saved_jobs`；区分历史设备收藏。
+- DAU / WAU / MAU：**自愿同意采集的登录账号**，当前 UTC 日、滚动 7/30 UTC 日去重。
+- 功能参与人数：所选日期范围内每类功能的去重账号数，跨类别有重叠，不应相加。
+- D1/D7 **首次被观察活跃回访率**：以首次被同意采集的日期为 cohort 起点，在第 1/7 天同样发生经同意的使用事件；仅纳入已成熟 cohort。**不是注册留存率**，不能作为全体注册用户留存对外宣传。
+- 企业收藏未接入正式功能，不展示伪造数值。
+- 外链点击不能等同于成功投递；职位索引不等于合作企业。
+
+## 数据部署前置条件
+1. 不更改现有正式 Cloudflare Pages 绑定，先在受保护预览环境验证。
+2. 确认绑定 `HHBA_METRICS_DB`、`HHBA_METRICS_SECRET`、`HHBA_PNVS_AUTH_DB`；后者必须是用户实际使用的认证库。
+3. 在既有 `0003_cloudflare_metrics.sql` 应用完成的指标 D1 中执行 `apps/web/d1/0008_account_growth_metrics.sql`。
+5. 检查原 `/admin-preview/api/metrics` 依然受到 Cloudflare Access JWT 验证和管理员邮箱允许名单保护。
+6. 使用用户自愿授权的测试账号在岗位、公司、政策页面进行浏览，再在私有管理后台核验匿名 / 账号指标彼此独立。
+7. 检验撤回同意删除、单日去重、跨日回访、新用户、收藏数据库未迁移、D1 尚未接通等场景。
+8. 采集须从真实上线当天开始累积；历史未采集数据不能回填或伪造。
+
+## 本分支交付边界
+增加数据结构、页面级功能类别事件、账号收藏事件、私有聚合 API 和原管理后台视图。
+不自动合并 `main`，不部署到正式生产、不擅自执行 D1 迁移、不宣称当前已获得 DAU/MAU 历史。
+
+## 正式后台域名鉴权
+- 正式入口 `https://hhba.work/admin-preview/` 的 Access 应用独立保护整个 `/admin-preview` 路径，包括私有 `/admin-preview/api/metrics`。
+- 生产环境设置 `HHBA_ACCESS_WORK_ADMIN_AUD` 为对应 Cloudflare Access 应用 Audience；`HHBA_ACCESS_CONSOLE_AUD` 继续保护 pages.dev 管理入口；不可交叉信任。
+- 后台只读聚合；用户账号、简历、手机号不应由管理 API 返回。前端若未获授权明确显示原因而非虚构的 0。
+- 新账号分析采用新的 `hhba.analytics.consent.v2` 授权键；此前只同意匿名统计的用户必须重新选择，才能纳入账号级分析。

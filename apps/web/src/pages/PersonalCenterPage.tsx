@@ -189,7 +189,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
     </section>}
     {current==='privacy'&&<section className="hhba-account-panel">
      <div className="hhba-account-section-heading"><div><h2>账户与隐私</h2><p>管理当前真实账户和匿名统计授权。</p></div></div>
-     <div className="hhba-account-privacy-row"><div><strong><ChartNoAxesCombined size={18}/>匿名网站使用统计</strong><p>仅在同意后记录匿名访问和职位操作，不采集简历正文或密码。</p></div>
+     <div className="hhba-account-privacy-row"><div><strong><ChartNoAxesCombined size={18}/>网站及账号使用统计</strong><p>仅在同意后采集匿名访问与已登录账号的按日功能使用类别，用于活跃与回访分析；不记录具体搜索词、简历正文或密码。</p></div>
       <div className="hhba-personal-consent"><button type="button" aria-pressed={consent===true} onClick={()=>{chooseAnalytics(true);setConsent(true)}}>同意</button><button type="button" aria-pressed={consent===false} onClick={()=>{chooseAnalytics(false);setConsent(false)}}>拒绝</button></div>
      </div>
      <div className="hhba-account-privacy-row"><div><strong><LockKeyhole size={18}/>账户安全</strong><p>只有当前登录用户可读取其个人资料与收藏。</p></div><span className="hhba-account-chip">真实账户</span></div>
