@@ -22,7 +22,7 @@ function experienceForRoute(route:string):Experience {
 }
 // The talent-service entry must be identical in all three navigation contexts.
 function StudyAbroadNavLink({active}:{active:boolean}){
- return <Link className="auth hhba-study-nav-link" to="/study-abroad" aria-current={active?'page':undefined}>留学机会</Link>;
+ return <Link className="auth hhba-study-nav-link" to="/study-abroad" aria-current={active?'page':undefined}>海外发展</Link>;
 }
 function TalentPolicyNavLink({active}:{active:boolean}){
  return <Link className="auth hhba-talent-policy-nav" to="/talent-service" aria-current={active?'page':undefined}>人才政策</Link>;

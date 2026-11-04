@@ -1,0 +1,86 @@
+/* HHBA 海外发展 · 清爽长文阅读版
+   保留原始完整内容，去掉 V2 卡片矩阵、重复色块和逐条勾选。 */
+.hhba-guide-v2-editorial{display:grid;grid-template-columns:208px minmax(0,770px);gap:clamp(28px,4vw,60px);align-items:start;justify-content:center;color:#243d53}
+.hhba-guide-v2-editorial *{box-sizing:border-box}
+.hhba-guide-v2-toc{position:sticky;top:94px;align-self:start}
+.hhba-guide-v2-desktop-toc{display:flex;flex-direction:column;padding:8px 0 8px 16px;border-left:1px solid #e1e8ef}
+.hhba-guide-v2-desktop-toc>strong{font-size:12px;font-weight:800;letter-spacing:.6px;color:#7b8997;margin:0 0 15px}
+.hhba-guide-v2-desktop-toc a{display:flex;align-items:baseline;gap:10px;padding:7px 10px 7px 0;color:#5a6d7f!important;text-decoration:none;font-size:12.5px;line-height:1.5;transition:color .15s}
+.hhba-guide-v2-desktop-toc a span{font-variant-numeric:tabular-nums;color:#a4b0bc;font-size:11px;flex:0 0 17px}
+.hhba-guide-v2-desktop-toc a:hover,.hhba-guide-v2-desktop-toc a:focus-visible{color:#1c6396!important}
+.hhba-guide-v2-mobile-toc{display:none}
+.hhba-guide-v2-article{max-width:770px;min-width:0}
+.hhba-guide-v2-opening{margin:0 0 40px;padding-bottom:27px;border-bottom:1px solid #e8edf2}
+.hhba-guide-v2-article-eyebrow{color:#b06c38;font-weight:800;font-size:12px;letter-spacing:.6px;margin:0 0 13px}
+.hhba-guide-v2-lede{font-size:17px;line-height:1.95;letter-spacing:.1px;color:#274259;font-weight:500;margin:0 0 24px}
+.hhba-guide-v2-first{border-left:3px solid #e08d4e;padding:3px 0 3px 17px;margin:0 0 18px;color:#476176;font-size:14.5px;line-height:1.9}
+.hhba-guide-v2-first strong{color:#2d536e;margin-right:5px}
+.hhba-guide-v2-verified{font-size:11.5px;color:#83909d;margin:0;line-height:1.75}
+.hhba-guide-v2-section{scroll-margin-top:106px;padding:0 0 27px;margin:0 0 35px;border-bottom:1px solid #e8edf2}
+.hhba-guide-v2-section:last-child{border:0;margin-bottom:0;padding-bottom:0}
+.hhba-guide-v2-section h2{display:flex;gap:11px;align-items:baseline;font-size:23px;font-weight:800;line-height:1.42;letter-spacing:-.4px;margin:0 0 13px;color:#243e56}
+.hhba-guide-v2-section h2>span{font-size:12px;font-weight:800;font-variant-numeric:tabular-nums;color:#d07e45;flex-shrink:0;letter-spacing:0}
+.hhba-guide-v2-section-intro{font-size:14.5px;line-height:1.9;color:#596f83;margin:0 0 23px}
+.hhba-guide-v2-point{padding:0 0 18px;margin:0 0 23px;border-bottom:1px solid #f0f3f6;background:transparent}
+.hhba-guide-v2-point:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+.hhba-guide-v2-point h3{font-size:16px;line-height:1.6;color:#2d465c;font-weight:750;margin:0 0 8px}
+.hhba-guide-v2-point>p{margin:0 0 10px;color:#455e72;font-size:14.5px;line-height:1.95}
+.hhba-guide-v2-point>p:last-child{margin-bottom:0}
+.hhba-guide-v2-howto{font-size:14px!important;line-height:1.9!important;color:#556f85!important}
+.hhba-guide-v2-howto strong{color:#23688e;margin-right:4px;font-weight:750}
+.hhba-guide-inline-term-wrap{position:relative;display:inline}
+.hhba-guide-inline-term{background:none;border:0;padding:0;display:inline;color:inherit;border-bottom:1px dotted #9d8a75;cursor:help;font-size:inherit;font-family:inherit;line-height:inherit}
+.hhba-guide-inline-term:hover,.hhba-guide-inline-term[aria-expanded="true"]{color:#1a6e9e;border-bottom-color:#1a6e9e}
+.hhba-guide-inline-term:focus-visible{outline:2px solid #d88a49;outline-offset:3px}
+.hhba-guide-inline-term-note{position:absolute;top:calc(100% + 8px);left:0;width:290px;max-width:calc(100vw - 36px);z-index:25;display:flex;flex-direction:column;gap:5px;background:#fff;border:1px solid #dce5ed;box-shadow:0 9px 25px #133c6125;border-radius:9px;color:#405c71;font-size:12px;line-height:1.75;padding:12px 14px;text-align:left;white-space:normal}
+.hhba-guide-inline-term-note strong{color:#245879;font-size:12.5px}
+.hhba-guide-v2-faq{margin:0}
+.hhba-guide-v2-faq>div{padding:15px 0 19px;border-bottom:1px solid #e8edf2}
+.hhba-guide-v2-faq>div:last-child{border-bottom:none;padding-bottom:0}
+.hhba-guide-v2-faq dt{font-size:15px;line-height:1.75;font-weight:750;color:#2b465c;margin-bottom:7px}
+.hhba-guide-v2-faq dd{margin:0;color:#516b80;font-size:14.5px;line-height:1.95}
+.hhba-guide-v2-risks{padding-left:21px;margin:2px 0 25px;list-style:disc;display:grid;gap:10px;color:#5d5b58}
+.hhba-guide-v2-risks li{padding-left:3px;font-size:14px;line-height:1.9}
+.hhba-guide-v2-risks li::marker{color:#d48952}
+.hhba-guide-v2-references-title{font-size:15.5px;color:#324e63;font-weight:750;margin:20px 0 9px}
+.hhba-guide-v2-sources{padding:0;margin:0;list-style:none}
+.hhba-guide-v2-sources li{display:flex;align-items:baseline;gap:11px;border-bottom:1px solid #edf1f5;padding:10px 0;font-size:13px;flex-wrap:wrap}
+.hhba-guide-v2-sources li a{display:inline-flex;gap:5px;align-items:center;color:#266e9e!important;font-weight:750;text-decoration:none}
+.hhba-guide-v2-sources li a:hover{text-decoration:underline}
+.hhba-guide-v2-sources li span{color:#7a8b9a;font-size:12px;line-height:1.5}
+.hhba-guide-v2-footer-note{font-size:12px;line-height:1.8;color:#80909b;margin:25px 0 0}
+.hhba-overseas-reader-actions{display:flex;gap:10px 18px;align-items:center;flex-wrap:wrap;max-width:1020px;margin:-9px auto 36px;padding-bottom:16px;border-bottom:1px solid #e9eef2}
+.hhba-overseas-reader-actions .hhba-overseas-reader-official{display:inline-flex;gap:6px;align-items:center;background:#e77e39;border-radius:8px;color:#fff!important;text-decoration:none;font-size:13px;font-weight:800;padding:11px 16px}
+.hhba-overseas-reader-actions button{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:#476985;cursor:pointer;font-size:12.5px;padding:7px 2px}
+.hhba-overseas-reader-actions button:hover{color:#cb6a2e}
+.hhba-overseas-reader-actions .hhba-overseas-reader-note{margin-left:auto;color:#8a98a3;font-size:11px}
+.hhba-overseas-reader-related{border-top:1px solid #edf1f5;max-width:770px;margin:36px 0 0 auto;padding:19px 0 0;font-size:13px;color:#687f91;line-height:1.8}
+.hhba-overseas-reader-related a{margin-left:7px;color:#286b98!important;font-weight:750}
+.hhba-overseas-reader-related a:hover{text-decoration:underline}
+.hhba-overseas-pathway-head{max-width:1020px;margin-left:auto;margin-right:auto;padding-bottom:22px;margin-bottom:30px}
+.hhba-overseas-pathway-head h1{font-size:clamp(28px,3.2vw,39px)}
+.hhba-overseas-pathway-head>p:not(.hhba-overseas-eng){max-width:770px;font-size:14px;line-height:1.85}
+.hhba-overseas-reader-page>.hhba-overseas-crumb{max-width:1020px;margin-left:auto;margin-right:auto}
+@media(max-width:840px){
+ .hhba-guide-v2-editorial{grid-template-columns:1fr;gap:0;max-width:740px;margin:0 auto}
+ .hhba-guide-v2-toc{position:static;margin-bottom:25px}
+ .hhba-guide-v2-desktop-toc{display:none}
+ .hhba-guide-v2-mobile-toc{display:block;border-top:1px solid #e3e9ef;border-bottom:1px solid #e3e9ef;padding:11px 0}
+ .hhba-guide-v2-mobile-toc summary{display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-weight:700;font-size:13px;color:#3e617d;list-style:none}
+ .hhba-guide-v2-mobile-toc summary::-webkit-details-marker{display:none}
+ .hhba-guide-v2-mobile-toc details>div,.hhba-guide-v2-mobile-toc>div{display:grid;gap:0;padding:10px 0 0}
+ .hhba-guide-v2-mobile-toc a{color:#426682!important;text-decoration:none;padding:9px 0;font-size:12.5px;border-top:1px solid #f0f3f6}
+ .hhba-overseas-reader-actions .hhba-overseas-reader-note{margin-left:0;width:100%}
+ .hhba-overseas-reader-related{max-width:740px;margin-left:auto;margin-right:auto}
+}
+@media(max-width:500px){
+ .hhba-guide-v2-section h2{font-size:20px}
+ .hhba-guide-v2-lede{font-size:16px}
+ .hhba-guide-v2-point>p,.hhba-guide-v2-faq dd,.hhba-guide-v2-section-intro{font-size:14px}
+ .hhba-guide-v2-opening{margin-bottom:30px}
+ .hhba-guide-v2-section{margin-bottom:29px}
+ .hhba-guide-inline-term-note{position:relative;left:auto;top:auto;display:block;margin:9px 0;padding:11px;max-width:100%;width:auto}
+ .hhba-guide-inline-term-note strong{display:block;margin-bottom:5px}
+ .hhba-overseas-reader-actions{gap:8px 16px;margin-top:-6px}
+ .hhba-overseas-reader-actions .hhba-overseas-reader-official{width:100%}
+}
