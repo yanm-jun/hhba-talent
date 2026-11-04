@@ -108,3 +108,33 @@ export const nzTier1Occupations:OccupationRecord[]=[
  sources:[...greenSources,{label:'新西兰教师理事会',url:'https://teachingcouncil.nz/'}],
  warning:'不要把 Early Childhood Teacher（幼儿教师）与 Secondary School Teacher（中学教师）混为一谈，它们的 Tier 及申请条件可能不同。'}
 ];
+
+export const auOccupationList='https://immi.homeaffairs.gov.au/visas/working-in-australia/skill-occupation-list';
+export const auSkillsAssessment='https://immi.homeaffairs.gov.au/visas/working-in-australia/skills-assessment';
+export const auEoi='https://immi.homeaffairs.gov.au/visas/working-in-australia/skillselect/expression-of-interest';
+export const auLegislation='https://www.legislation.gov.au/F2019L00278/latest/details';
+const auCommon={
+ country:'au' as const,pathwayId:'au-189',tier:'189 技术移民',verifiedOn:'2026-11-04',
+ wageAsOf:'189 积分制无适用于所有职业的统一最低雇主工资门槛；不能把482工资标准直接用在189。',
+ wage:'189 积分制没有一项适用于所有此类职业的固定薪资申请线。重点核对合格职业、职业评估、英语、积分及邀请。',
+ experience:'189没有适用于全部职业的统一法定“至少N年经验”门槛；工作经验可以影响职业评估和积分，可计入的年数必须按评估机构及政府积分标准核查。',
+ proof:['有效的职业技能评估结果（由该职业指定评估机构出具）','被认可的英语考试成绩以及有效日期','学历证书、成绩单及必要的英文翻译','用于积分的可核实雇佣合同、工资、税务、社保和工作职责证据'],
+ sources:[{label:'澳大利亚内政部技术职业清单',url:auOccupationList},{label:'2026年现行LIN 19/051职业法规',url:auLegislation},{label:'内政部职业技能评估',url:auSkillsAssessment},{label:'SkillSelect意向登记与邀请',url:auEoi}]
+};
+function australian(id:string,name:string,english:string,code:string,group:string,authority:string,qualification:string,registration:string,source:string):OccupationRecord{
+ return {...auCommon,id,name,english,code,group,
+ intro:'澳大利亚 189 积分制适用职业示例，ANZSCO '+code+'（用于189的职业编码按相应 ANZSCO 2013 口径核查）；看到职业名称不代表自动符合。',
+ qualification:[qualification,'职业评估机构 '+authority+' 会按照自己的要求审查学历、课程内容和技能。中国学历不会因中文专业名称一致自动通过。'],
+ registration,
+ actions:['在内政部 Skilled occupation list 按 '+code+' 搜索 '+english+'，确认189积分制是否列入。','进入 '+authority+' 官方网站核对学历及工作评估类别、证据、费用和时效。','取得有效评估与英语成绩后使用积分表计算实际分数，再在 SkillSelect 提交 EOI；65分只是资格底线，不保证邀请。'],
+ sources:[...auCommon.sources,{label:authority+' 职业评估机构',url:source}],
+ warning:'澳大利亚189与190、491、482、186的职业名单和评估规则可能不同。职业列表上有这项不等于本人一定符合职业评估、邀请或签证资格。'};
+}
+export const au189Occupations:OccupationRecord[]=[
+ australian('au-civil-engineer','土木工程师','Civil Engineer','233211','工程技术','Engineers Australia','通常按工程课程、工程技术项目和个人工程能力申请 Engineers Australia 的移民职业评估；具体材料与途径由评估机构判断。','是否需要各州专业工程师执业注册，取决于实际工作地点、职责和地方职业规定；移民职业评估不是自动颁发执业执照。','https://www.engineersaustralia.org.au/'),
+ australian('au-mechanical-engineer','机械工程师','Mechanical Engineer','233512','工程技术','Engineers Australia','重点审查机械工程教育背景、工程工作任务、技术能力及所用评估通道。','如承担当地受监管的专业工程服务，须核实目标州职业执照；不能混同技能评估与当地职业注册。','https://www.engineersaustralia.org.au/'),
+ australian('au-electrical-engineer','电气工程师','Electrical Engineer','233311','工程技术','Engineers Australia','需要符合相应电气工程职业评估途径；学历课程、专业课程与工程项目证明应一致。','电气工程师与电工（Electrician）是不同职业，不应把电工执照自动视为工程师职业评估。','https://www.engineersaustralia.org.au/'),
+ australian('au-software-engineer','软件工程师','Software Engineer','261313','信息技术','Australian Computer Society (ACS)','由 ACS 按申请人计算机课程、学历相关性和工作经历审查；不同教育背景可能适用不同移民技能评估路线。','软件工程师的移民职业技能评估和职业从业证书不是同一事项；仍须满足职位实际职责。','https://www.acs.org.au/'),
+ australian('au-registered-nurse-medical','注册护士（内科）','Registered Nurse (Medical)','254418','医疗健康','Australian Nursing & Midwifery Accreditation Council (ANMAC)','护理学历、临床学习及专业身份应符合 ANMAC 针对技术移民的评估条件；个人资料可能需要不同类别的评估。','澳洲 AHPRA/Nursing and Midwifery Board 的职业登记与 ANMAC 移民技能评估属于不同环节，可能均需满足，不能彼此代替。','https://anmac.org.au/'),
+ australian('au-secondary-teacher','中学教师','Secondary School Teacher','241411','教育行业','Australian Institute for Teaching and School Leadership (AITSL)','按 AITSL 的移民教师职业评估标准审查教育学位、教学实践及英语。不能仅凭持有国内教师资格证推断评估通过。','在澳大利亚当地学校执教通常还需按目标州或领地取得相应教师登记资格。','https://www.aitsl.edu.au/')
+];
