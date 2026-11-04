@@ -4,7 +4,7 @@ import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
 import {getJob,localizedCompany,localizedLocation,localizedTitle,type LiveJob} from '../services/liveRecruitment';
 import {listSavedJobs,setSavedJob,savedAvailable,type SavedJob} from '../services/savedJobs';
-import {analyticsChoice,chooseAnalytics,getMyActivityCheck,type MyActivityCheck,type AccountArea} from '../services/engagement';
+import {analyticsChoice,chooseAnalytics,eraseAccountAnalytics,getMyActivityCheck,type MyActivityCheck,type AccountArea} from '../services/engagement';
 import {getCandidateWorkspaceProfile,saveCandidateWorkspaceProfile,saveCandidateWorkspacePreferences,realWorkspaceAvailable,type CandidateWorkspaceProfile} from '../services/candidateWorkspace';
 import {type User} from '../services/api';
 import {PrivateResumeVault} from '../components/PrivateResumeVault';
@@ -38,6 +38,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
  const [myActivity,setMyActivity]=useState<MyActivityCheck|null>(null);
  const [activityChecking,setActivityChecking]=useState(false);
  const [activityCheckError,setActivityCheckError]=useState('');
+ const [erasureState,setErasureState]=useState<'idle'|'pending'|'cleared'|'failed'>('idle');
  const [nickname,setNickname]=useState(''),[headline,setHeadline]=useState(''),[city,setCity]=useState(''),[intro,setIntro]=useState(''),[skills,setSkills]=useState('');
  const [role,setRole]=useState(''),[targetCity,setTargetCity]=useState(''),[mode,setMode]=useState<'不限'|'远程'|'现场'|'混合办公'>('不限');
  const [notice,setNotice]=useState('');
@@ -115,8 +116,19 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
   finally{setBusy('')}
  }
  useEffect(()=>{setMyActivity(null);setActivityCheckError('')},[consent,user?.id]);
+ useEffect(()=>{setErasureState('idle')},[user?.id]);
+ async function setAnalyticsPreference(enabled:boolean){
+  if(enabled){setErasureState('idle');setConsent(true);void chooseAnalytics(true);return}
+  setConsent(false);setErasureState('pending');
+  const result=await chooseAnalytics(false);
+  setErasureState(result==='cleared'?'cleared':'failed');
+ }
+ async function retryErasure(){
+  setErasureState('pending');
+  const result=await eraseAccountAnalytics();
+  setErasureState(result==='cleared'?'cleared':'failed');
+ }
  async function checkMyActivity(){
-  if(consent!==true)return;
   setActivityChecking(true);setActivityCheckError('');setMyActivity(null);
   try{setMyActivity(await getMyActivityCheck())}
   catch(e){setActivityCheckError(e instanceof Error?e.message:'暂时无法验证统计结果，请重试。')}
@@ -203,19 +215,24 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
     {current==='privacy'&&<section className="hhba-account-panel">
      <div className="hhba-account-section-heading"><div><h2>账户与隐私</h2><p>管理当前真实账户和匿名统计授权。</p></div></div>
      <div className="hhba-account-privacy-row"><div><strong><ChartNoAxesCombined size={18}/>网站及账号使用统计</strong><p>仅在同意后采集匿名访问与已登录账号的按日功能使用类别，用于活跃与回访分析；不记录具体搜索词、简历正文或密码。</p></div>
-      <div className="hhba-personal-consent"><button type="button" aria-pressed={consent===true} onClick={()=>{chooseAnalytics(true);setConsent(true)}}>同意</button><button type="button" aria-pressed={consent===false} onClick={()=>{chooseAnalytics(false);setConsent(false)}}>拒绝</button></div>
+      <div className="hhba-personal-consent"><button type="button" disabled={erasureState==='pending'} aria-pressed={consent===true} onClick={()=>void setAnalyticsPreference(true)}>同意</button><button type="button" disabled={erasureState==='pending'} aria-pressed={consent===false} onClick={()=>void setAnalyticsPreference(false)}>拒绝</button></div>
      </div>
      <div className="hhba-account-privacy-row hhba-activity-verification">
       <div><strong><CheckCircle2 size={18}/>核验账号活动是否真正入库</strong>
-       <p>只读查询当前登录账号今天（UTC）的功能类别，不创建测试数据，也不显示手机号、搜索词或简历。</p>
-       {consent!==true&&<p role="status">当前未授权账号使用统计；可先自愿同意，再浏览岗位或人才政策。</p>}
+       <p>只读核验当前账号今天（UTC）的功能类别及是否仍存在历史记录；即使拒绝统计也可查询，不会增加活跃人数。</p>
+       {consent!==true&&<p role="status">当前未授权使用统计，不会新增行为记录；你仍可检查此前记录是否清除。</p>}
+       {erasureState==='pending'&&<p role="status">已关闭本机统计，正在向服务器申请删除账号活动记录…</p>}
+       {erasureState==='cleared'&&<p className="hhba-account-activity-result" role="status">服务器已确认当前账号的历史活动记录删除请求执行成功，可点击只读查询复核。</p>}
+       {erasureState==='failed'&&<p className="hhba-account-activity-error" role="alert">本机统计已关闭，但服务器未确认删除成功。请保持登录并重试；不能把失败当成已清除。</p>}
        {trackingPrevented&&<p role="status">浏览器已启用 DNT/GPC 隐私保护；HHBA 会尊重这一设置，不会新增行为统计记录。</p>}
-       {myActivity&&<p className="hhba-account-activity-result" role="status">{myActivity.day} UTC：{myActivity.recorded
-         ?'已查询到真实活动：'+myActivity.areas.map(a=>areaLabels[a]).join('、')
-         :'数据库尚无该账号今日活动记录；请在同意统计后浏览岗位，再重新核验。'}</p>}
+       {myActivity&&<p className="hhba-account-activity-result" role="status">{myActivity.day} UTC：
+        {myActivity.recorded?'今日已记录：'+myActivity.areas.map(a=>areaLabels[a]).join('、')+'。':'今日没有账号活动记录。'}
+        {myActivity.historicalRecorded?'当前账号仍存在历史活动记录。':'当前账号在统计库中没有任何历史活动记录。'}</p>}
+       {consent===false&&(erasureState==='failed'||myActivity?.historicalRecorded===true)&&
+        <button type="button" className="hhba-account-activity-button" disabled={erasureState==='pending'} onClick={()=>void retryErasure()}>重试删除历史记录</button>}
        {activityCheckError&&<p className="hhba-account-activity-error" role="alert">{activityCheckError}</p>}
       </div>
-      <button type="button" className="hhba-account-activity-button" disabled={consent!==true||activityChecking} onClick={()=>void checkMyActivity()}>
+      <button type="button" className="hhba-account-activity-button" disabled={activityChecking} onClick={()=>void checkMyActivity()}>
        {activityChecking?'正在核验…':'查询今日真实记录'}
       </button>
      </div>
