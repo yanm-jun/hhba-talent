@@ -62,7 +62,7 @@ with sync_playwright() as p:
     assert page.locator('[data-winter-job]').count()>=2,'ReCube marketing joins old Hong Kong records'
     page.get_by_role('button',name='重置').click()
     assert page.locator('[data-winter-job]').count()==10
-    assert '34 条公开岗位及招聘批次结果' in page.locator('.hhba-winter-list-summary').inner_text()
+    assert '41 条公开岗位及招聘批次结果' in page.locator('.hhba-winter-list-summary').inner_text()
     # Each real job opens a distinct internal role detail and first-party application URL.
     page.locator('[data-winter-job="hsbc-hk-student-placement-1367003857"]').get_by_role('link',name='岗位详情').click()
     assert 'hsbc-hk-student-placement-1367003857' in page.url
@@ -180,7 +180,7 @@ with sync_playwright() as p:
     page.get_by_role('button',name='重置').click()
     page.get_by_role('button',name='下一页').click()
     page.get_by_role('button',name='下一页').click()
-    assert page.locator('[data-winter-job]').count()==10,'34 records = 10+10+10+4'
+    assert page.locator('[data-winter-job]').count()==10,'first 30 records remain on three stable pages'
     for jobid in ['recube-hk-winter-hardware-260900322','recube-hk-winter-website-designer-260900317','recube-hk-winter-data-ai-260900320','papergames-shanghai-recruiting-game-rd-intern-2027-review','papergames-shanghai-nikki-world-ecology-planning-280350']:
         assert page.locator(f'[data-winter-job="{jobid}"]').count()==1,jobid
     page.locator('[data-winter-job="papergames-shanghai-nikki-world-ecology-planning-280350"]').get_by_role('link',name='岗位详情').click()
@@ -223,12 +223,52 @@ with sync_playwright() as p:
     page.get_by_role('button',name='下一页').click()
     page.get_by_role('button',name='下一页').click()
     page.get_by_role('button',name='下一页').click()
-    assert page.locator('[data-winter-job]').count()==4,'new batch06 makes four compact pages of 10+10+10+4'
+    assert page.locator('[data-winter-job]').count()==10,'batch07 makes 41 records; fourth page holds 10 roles'
     for jobid in ['manulife-hk-2027-global-info-risk-jr26100089','manulife-hk-2027-marketing-strategy-jr26100142','manulife-hk-2027-tech-placement-jr26100136','informa-markets-hk-2027-jan-jun-intern-l059656859']:
         assert page.locator(f'[data-winter-job="{jobid}"]').count()==1,jobid
     page.get_by_role('button',name='上一页').click()
     page.get_by_role('button',name='上一页').click()
     page.get_by_role('button',name='上一页').click()
+    # Batch 07: three distinct BNP programmes are filled, LVMH past deadline, CA separate numbered roles.
+    page.get_by_role('searchbox',name='搜索寒假实习具体岗位').fill('BNP Paribas')
+    page.get_by_role('button',name='搜索岗位').click()
+    assert page.locator('[data-winter-job]').count()==3
+    assert page.get_by_text('雇主官方确认已招满',exact=False).count()>=3
+    page.locator('[data-winter-job="bnp-hk-2027-securities-services-ref118477"]').get_by_role('link',name='岗位详情').click()
+    assert page.get_by_role('link',name='查看雇主已招满岗位公告').get_attribute('href').startswith('https://group.bnpparibas/')
+    assert page.get_by_text('已经',exact=False).count()>=0
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.get_by_role('button',name='重置').click()
+    page.get_by_role('searchbox',name='搜索寒假实习具体岗位').fill('SSCPC02515')
+    page.get_by_role('button',name='搜索岗位').click()
+    assert page.locator('[data-winter-job]').count()==1
+    page.locator('[data-winter-job="lvmh-hk-beauty-2027-jan-sscpc02515"]').get_by_role('link',name='岗位详情').click()
+    assert page.get_by_role('link',name='查看雇主已截止岗位公告').get_attribute('href').startswith('https://www.lvmh.com/')
+    assert page.get_by_text('2026年10月16日',exact=False).count()>0
+    assert page.get_by_text('签证担保',exact=False).count()>0
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.get_by_role('button',name='重置').click()
+    page.get_by_role('searchbox',name='搜索寒假实习具体岗位').fill('2026-115202')
+    page.get_by_role('button',name='搜索岗位').click()
+    assert page.locator('[data-winter-job]').count()==1
+    page.locator('[data-winter-job="creditagricole-hk-2027-finance-intern-115202"]').get_by_role('link',name='岗位详情').click()
+    assert page.get_by_role('link',name='前往企业官方岗位核实及申请').get_attribute('href').startswith('https://jobs.ca-cib.com/')
+    assert page.get_by_text('额外表格',exact=False).count()>0
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.get_by_role('button',name='重置').click()
+    page.get_by_role('button',name='下一页').click()
+    page.get_by_role('button',name='下一页').click()
+    page.get_by_role('button',name='下一页').click()
+    assert page.locator('[data-winter-job]').count()==10
+    for jobid in ['bnp-hk-2027-securities-services-ref118477','bnp-hk-2027-wealth-management-ref117528','bnp-hk-2027-global-markets-ref117487','lvmh-hk-beauty-2027-jan-sscpc02515','creditagricole-hk-2027-audit-intern-115888','creditagricole-hk-2027-finance-intern-115202']:
+        assert page.locator(f'[data-winter-job="{jobid}"]').count()==1,jobid
+    page.get_by_role('button',name='下一页').click()
+    assert page.locator('[data-winter-job]').count()==1,'41 roles means final fifth page has exactly one entry'
+    page.locator('[data-winter-job="creditagricole-hk-2027-global-markets-115201"]').get_by_role('link',name='岗位详情').click()
+    assert page.get_by_text('四个月兼职',exact=False).count()>0
+    assert page.get_by_role('link',name='查看雇主已截止岗位公告').get_attribute('href').startswith('https://jobs.ca-cib.com/')
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.get_by_role('button',name='重置').click()
     # Old employer programmes still have working detail pages, but are not jobs.
     page.locator('[data-winter-program-archive] summary').click()
     assert page.locator('[data-winter-program-archive]').get_attribute('open') is not None
