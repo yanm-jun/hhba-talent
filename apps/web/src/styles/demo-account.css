@@ -78,3 +78,9 @@
 .hhba-account-footer{display:flex;align-items:center;gap:8px;color:#88978d;font-size:11px;margin:20px 0 0}
 @media(max-width:900px){.hhba-account-grid{grid-template-columns:1fr;gap:12px}.hhba-account-sidebar{display:flex;flex-direction:row;flex-wrap:wrap;padding:10px;gap:4px}.hhba-account-sidebar>p{display:none}.hhba-account-sidebar a{padding:9px 11px;min-height:38px}.hhba-account-chevron{display:none}}
 @media(max-width:620px){.hhba-account-header{padding:19px;gap:12px;flex-wrap:wrap}.hhba-account-avatar{width:48px;height:48px;border-radius:12px}.hhba-account-exit{margin-left:auto}.hhba-account-sidebar a{font-size:12px}.hhba-account-stat-grid{gap:7px}.hhba-account-stat-grid>a{padding:13px 10px}.hhba-account-stat-grid strong{font-size:22px}.hhba-account-panel{padding:18px 15px}.hhba-account-form-row{grid-template-columns:1fr}.hhba-account-tool-grid{grid-template-columns:1fr}.hhba-account-tool-grid>a.hhba-account-tool-card{min-height:76px;padding:12px 14px;column-gap:11px}.hhba-account-entry{flex-direction:column;align-items:flex-start}.hhba-account-privacy-row{flex-direction:column;align-items:flex-start}.hhba-account-section-heading h2{font-size:19px}}
+
+/* Read-only account-activity proof in the original privacy panel. */
+.hhba-account-activity-button{border:1px solid #cadbcc;background:#f5faf6;color:#2e6244;border-radius:8px;padding:9px 12px;font-size:12px;cursor:pointer;flex-shrink:0}
+.hhba-account-activity-button:disabled{opacity:.55;cursor:not-allowed}
+.hhba-account-privacy-row .hhba-account-activity-result{color:#2b6a43;font-weight:600;max-width:560px}
+.hhba-account-privacy-row .hhba-account-activity-error{color:#a44646;max-width:560px}

@@ -39,12 +39,18 @@ export function getRealAuthToken(): string | null {
     return null;
   }
 }
+// No token is ever included in the event payload. Analytics uses this only to
+// re-check whether an explicitly consenting user has an authenticated session.
+function announceRealAuthChange(): void {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('hhba:real-auth-changed'));
+}
 export function setRealAuthToken(token: string): void {
   try {
     window.localStorage.setItem(REAL_AUTH_TOKEN_KEY, token);
   } catch {
     // 存储不可用时仍可继续本次会话，刷新后需重新登录。
   }
+  announceRealAuthChange();
 }
 export function clearRealAuthToken(): void {
   try {
@@ -52,6 +58,7 @@ export function clearRealAuthToken(): void {
   } catch {
     // 忽略清理失败。
   }
+  announceRealAuthChange();
 }
 export function realAuthPhoneValid(phone: string): boolean {
   return /^1[3-9][0-9]{9}$/.test(phone);

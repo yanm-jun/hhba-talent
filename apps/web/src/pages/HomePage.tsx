@@ -4,6 +4,7 @@ import { Shell } from '../components/Shell';
 import { UnifiedJobMarket } from '../components/UnifiedJobMarket';
 import { HomeCompanyMarquee } from '../components/HomeCompanyMarquee';
 import { HomePeopleBanner } from '../components/HomePeopleBanner';
+import { WinterInternshipPopup } from '../components/WinterInternshipPopup';
 import { HomeOpenLetter } from '../components/HomeOpenLetter';
 import { BrandMark } from '../components/BrandMark';
 import type { User } from '../services/api';
@@ -26,7 +27,7 @@ export function HomePage({user}:{user:User|null}){
    <p className="hhba-public-eyebrow">HHBA · HUMAN CAPABILITY NETWORK</p>
    <h1>让机会与人才，找到彼此。</h1>
    <p>你来到这里，是为了什么？</p>
-   <button type="button" className="hhba-letter-revisit" onClick={()=>window.dispatchEvent(new Event("hhba:open-letter"))}> <span aria-hidden="true">✉</span> 读一封来自 HHBA 的信</button>
+   <button type="button" className="hhba-letter-revisit" onClick={()=>window.dispatchEvent(new Event('hhba:open-letter'))}><span aria-hidden="true">✉</span> 读一封来自 HHBA 的信</button>
   </section>
   <section className="entry-grid hhba-public-entry-grid" aria-label="选择使用入口">
    <EntryCard kind="candidate" title="我要应聘"
@@ -53,6 +54,7 @@ export function HomePage({user}:{user:User|null}){
   <HomeCompanyMarquee/>
   <HomePeopleBanner/>
   <footer className="hhba-brand-home-footer"><BrandMark variant="signature" size="small"/><p>Human Capability Network · HHBA</p></footer>
-  <HomeOpenLetter/>
+  <HomeOpenLetter autoOpen={false}/>
+  <WinterInternshipPopup/>
  </Shell>;
 }

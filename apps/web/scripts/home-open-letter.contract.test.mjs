@@ -11,13 +11,14 @@ test('the existing HHBA homepage and people banner are preserved', () => {
   assert.match(home, /<HomePeopleBanner\/>/);
   assert.match(home, /<HomeCompanyMarquee\/>/);
   assert.match(home, /<UnifiedJobMarket compact\/>/);
-  assert.match(home, /<HomeOpenLetter\/>/);
+  assert.match(home, /<HomeOpenLetter autoOpen=\{false\}\/>/);
   assert.match(home, /我要应聘/);
   assert.match(home, /我要招人/);
   assert.match(home, /hhba:open-letter/);
   assert.match(banner, /hhba-people-group-hd\.avif/);
 });
-test('letter displays only once per browser session unless manually reopened or explicitly shared', () => {
+test('letter is manually opened on homepage, or explicitly opened from a shared link', () => {
+  assert.match(modal, /if \(!autoOpen\) return null/);
   assert.match(modal, /sessionStorage\.getItem\(SESSION_KEY\)/);
   assert.match(modal, /sessionStorage\.setItem\(SESSION_KEY/);
   assert.match(modal, /new URLSearchParams\(window\.location\.search\)\.get\('letter'\) === '1'/);

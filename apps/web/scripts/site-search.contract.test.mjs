@@ -23,7 +23,7 @@ test('search route is lazy and isolated from the current homepage layout',()=>{
  assert.doesNotMatch(read('src/pages/HomePage.tsx'),/siteSearchIndex|SiteSearchPage/);
 });
 test('search indexes real HHBA public data and canonical internal routes',()=>{
- for(const term of ['getDomesticCompanies()','employerProfiles','TALENT_POLICY_RECORDS','TALENT_HOUSING_RECORDS','studyDirections','universities','universityPrograms']){
+ for(const term of ['getDomesticCompanies()','employerProfiles','TALENT_POLICY_RECORDS','TALENT_HOUSING_RECORDS','studyDirections','universities','universityPrograms','WINTER_2027_PROGRAMS']){
    assert.ok(index.includes(term),term+' must be indexed');
  }
  for(const path of ['/talent-service/policy/','/talent-service/housing/','/companies/autumn/','/study-abroad/university/','/study-abroad/program/']){
@@ -31,6 +31,8 @@ test('search indexes real HHBA public data and canonical internal routes',()=>{
  }
  assert.match(index,/startsWith\('\/'\)/);
  assert.match(index,/new Map<string,SiteSearchRecord>\(\)/);
+ assert.match(index,/\/winter-internship\//);
+ assert.match(main,/route==='\/winter-internship'/);
 });
 test('search results always link inside HHBA and preserve the existing job API',()=>{
  assert.match(page,/listJobs\(/);

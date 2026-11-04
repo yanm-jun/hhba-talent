@@ -11,6 +11,7 @@ import {TALENT_HOUSING_RECORDS} from '../data/talentHousingRecords';
 import {TALENT_MUNICIPALITIES,TALENT_LEGACY_CITIES} from '../data/talentCityRegistry';
 import {studyCountries,studyDirections,studyCountry} from '../data/studyAbroad';
 import {universities,universityPrograms} from '../data/studyUniversities';
+import {WINTER_2027_PROGRAMS} from '../data/winter2027Programs';
 
 export type SiteSearchKind='page'|'job'|'company'|'policy'|'housing'|'study';
 export type SiteSearchRecord={
@@ -24,6 +25,7 @@ export const SITE_SEARCH_TABS:ReadonlyArray<{kind:'all'|SiteSearchKind;label:str
 ];
 const staticPages:SiteSearchRecord[]=[
  {id:'home',kind:'page',title:'HHBA 首页',description:'了解 HHBA 的使命、服务与求职入口',path:'/',tags:['首页','平台','HHBA']},
+ {id:'winter-season',kind:'page',title:'2027 寒假实习季',description:'HHBA 寒假实习官方项目、企业和实习申请入口',path:'/winter-internship',tags:['寒假','实习','冬季实习','冬季','2027','企业','招聘']},
  {id:'job-market',kind:'page',title:'招聘市场',description:'搜索岗位、筛选专业、城市与招聘类别',path:'/candidate/jobs',tags:['工作','职位','岗位','校招','社招','实习','招聘']},
  {id:'employers',kind:'page',title:'企业发现',description:'查找 HHBA 已收录的企业档案及招聘渠道',path:'/companies/discover',tags:['公司','企业','行业','招聘']},
  {id:'talent',kind:'page',title:'人才政策与人才服务',description:'全国城市人才政策、人才公寓、住房补贴和申请指南',path:'/talent-service',tags:['政策','人才','落户','住房','申请','指南']},
@@ -100,6 +102,14 @@ export function buildSiteSearchIndex():SiteSearchRecord[]{
    description:u.chinese+' · '+p.description,tags:[p.english,u.english,u.chinese,studyCountry(u.country).name,...p.keywords],
    path:'/study-abroad/program/'+encodeURIComponent(p.id),status:'院校课程 · 招生状态需核实'});
  }
+ // Every officially reviewed winter internship entry is navigable inside HHBA.
+ for(const p of WINTER_2027_PROGRAMS)add({
+  id:'winter:'+p.id,kind:'job',title:p.company+' · '+p.title,
+  description:[p.intro,p.location,p.period].join(' · ').slice(0,430),
+  tags:[p.english,p.company,p.category,p.region,p.location,'寒假','实习','冬季实习',...p.tags],
+  path:'/winter-internship/'+encodeURIComponent(p.id),
+  status:p.statusNote
+ });
  const unique=new Map<string,SiteSearchRecord>();
  for(const r of records)unique.set(r.kind+':'+r.path,r);
  cached=[...unique.values()];
