@@ -78,12 +78,12 @@ function updateGrowth(){
    setMetric('users-area-'+name.replace('_','-'),q?.quality==='collected'?(q.areaUsers?.[name]||0):null);
   }
   setMetric('users-account-saves',a?.quality==='collected'?a.savedJobs:null);
-  byId('users-account-start').textContent=q?.collectedFrom?formatTime(q.collectedFrom):'未应用账号统计迁移';
+  byId('users-account-start').textContent=q?.collectedFrom?formatTime(q.collectedFrom):'账号活动统计已停用或尚未配置';
   byId('users-account-quality').textContent=q?.quality==='collected'
    ?'账号 DAU/WAU/MAU 与首次活跃回访仅覆盖已同意统计的登录账号，不等于所有注册用户；留存以首次记录活跃日为起点。'
-   :'尚未采集真实账号活跃，请先部署 D1 迁移和受保护的账号采集接口；这里不显示模拟数据。';
+   :q?.quality==='not_collected'?'账号级活动采集已停用；不计算 DAU/WAU/MAU 或回访率，匿名访问量不能代替账号活跃。':'账号级活跃尚无可信记录，不显示模拟数据。';
   if(q?.quality==='collected')renderTraffic('users-account-chart',q.series.map(x=>({day:x.day,pv:x.active})));
-  else byId('users-account-chart').textContent='账号统计未接通，暂无真实曲线';
+  else byId('users-account-chart').textContent='未采集账号级活跃，不显示虚假曲线';
   setMetric('investor-users',a?.quality==='collected'?a.registeredUsers:null);
  renderTraffic('users-chart',t?.quality==='collected'?t.series:null);
  if(t?.quality==='collected'){
@@ -113,7 +113,7 @@ async function refreshGrowth(){
 const titles={overview:'数据总览',users:'用户分析',market:'岗位与企业',operations:'运营监控',
  finance:'财务成本',investor:'融资展示',settings:'系统设置'};
 const details={
- users:['真实用户增长、回访与使用','账号级行为仅在登录和用户同意后采集，分清注册账户、匿名访客和设备收藏。'],
+ users:['真实用户注册与业务操作','账号级行为追踪已停止；注册和收藏来自真实数据库，页面事件仅计次数。'],
  market:['企业和岗位质量分析','未来接入岗位状态、ATS 来源及招聘质量报表；当前公开索引汇总在数据总览。'],
  operations:['系统运行与数据同步','未来接入有权限的同步队列和异常日志；当前预览不读取服务器私有日志。'],
  finance:['成本、收入与经营效率','未来接入经核对的收支台账和 API 成本；无记录时不生成模拟营收。'],
@@ -252,10 +252,10 @@ function buildVerifiedInvestorRows(data,report){
   ['区间新增求职者',value(account?.newRegistered),'PNVS 真实注册时间，'+range,account?privateTime:''],
   ['账号当前收藏岗位数',value(account?.savedJobs),'Cloudflare PNVS 真实账号收藏关系总数；当前快照，与日期筛选无关',account?privateTime:''],
   ['有账号收藏的求职者',value(account?.accountsWithSavedJobs),'具有至少一条真实账号收藏关系的去重求职者数',account?privateTime:''],
-  ['账号 DAU',value(activity?.dau),'UTC 今日去重活跃；仅已登录且同意账号统计用户',activity?privateTime:''],
-  ['账号 WAU',value(activity?.wau),'截至 UTC 今日，最近 7 天去重活跃；仅已同意统计账号',activity?privateTime:''],
+  ['账号 DAU',value(activity?.dau),'UTC 今日去重活跃；旧版经同意的账号活动；已停采新记录',activity?privateTime:''],
+  ['账号 WAU',value(activity?.wau),'截至 UTC 今日，最近 7 天去重活跃；旧版经同意的账号活动；已停采新记录',activity?privateTime:''],
   ['账号 MAU',value(activity?.mau),'截至 UTC 今日，最近 30 天去重活跃；仅已同意统计账号',activity?privateTime:''],
-  ['区间授权活跃账号',value(activity?.periodActive),'经同意的账号功能使用去重，'+range,activity?privateTime:''],
+  ['区间授权活跃账号',value(activity?.periodActive),'旧版经同意的账号功能使用去重（已停采），'+range,activity?privateTime:''],
   ['首次活跃次日回访率',retention(activity?.firstSeenRetention?.d1),'以首次记录的同意活跃日为基准，不是注册次日留存；括号为回访/成熟样本',activity?privateTime:''],
   ['首次活跃第七日回访率',retention(activity?.firstSeenRetention?.d7),'以首次记录的同意活跃日为基准，不是注册七日留存；括号为回访/成熟样本',activity?privateTime:''],
   ['页面访问事件 PV',value(traffic?.pv),'Cloudflare D1 不关联账号或访客标识的事件次数，不等于 UV，'+range,traffic?privateTime:''],
