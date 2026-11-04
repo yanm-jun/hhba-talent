@@ -32,7 +32,6 @@ with sync_playwright() as p:
     page.get_by_role("heading", name="搜索 HHBA").wait_for(timeout=60000)
     page.get_by_role("heading", name="新西兰留学机会").first.wait_for(timeout=60000)
     assert "q=" in page.url and "/search" in page.url, page.url
-    assert page.get_by_role("link", name="新西兰留学机会").count() == 0 or True
     page.screenshot(path="/tmp/hhba-global-search-results.png")
 
     # Prove canonical in-app detail navigation, not an external search engine.
