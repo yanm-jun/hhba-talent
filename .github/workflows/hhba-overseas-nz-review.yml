@@ -36,6 +36,7 @@ jobs:
         working-directory: apps/web
         run: |
           node --experimental-strip-types --test scripts/overseas-new-zealand.contract.test.mjs
+          node --experimental-strip-types --test scripts/overseas-nz-v2-detail.contract.test.mjs
           node --experimental-strip-types --test scripts/study-abroad.contract.test.mjs
           node --experimental-strip-types --test scripts/study-universities.contract.test.mjs
       - name: Typecheck and build independently reviewable static website
