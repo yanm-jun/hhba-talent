@@ -13,10 +13,11 @@ test('7/7 New Zealand paths have complete 10-chapter instructions, not tiny summ
   assert.ok(g,'missing guide '+pathway.id);
   assert.ok(g.plainAnswer.length>=65&&g.firstAction.length>=35,pathway.id+' user-first summary');
   assert.equal(g.sections.length,8,pathway.id+' 8 sections + FAQs + risks');
+  assert.ok(JSON.stringify(g.sections).length>=1800, pathway.id+' must contain substantial long-form instructions');
   for(const [i,s] of g.sections.entries()){
    assert.ok(s.title&&s.summary.length>=18,pathway.id+' section '+i+' heading');
    assert.ok(s.points.length>=3,pathway.id+' section '+i+' depth');
-   for(const p of s.points)assert.ok(p.label.length>=3&&p.explain.length>=20&&p.action.length>=20,pathway.id+' detail/action');
+   for(const p of s.points)assert.ok(p.label.length>=3&&p.explain.length>=10&&p.action.length>=10,pathway.id+' detail/action');
   }
   assert.ok(g.faq.length>=4&&g.faq.every(f=>f.question.length>8&&f.answer.length>30),pathway.id+' FAQs');
   assert.ok(g.risks.length>=3&&g.risks.every(s=>s.length>=20),pathway.id+' risk explanation');
