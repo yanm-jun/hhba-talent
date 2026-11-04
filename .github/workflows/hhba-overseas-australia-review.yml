@@ -1,0 +1,55 @@
+name: HHBA Overseas Australia V1 independent static review
+on:
+  push:
+    branches: [feature/overseas-australia-v1]
+  pull_request:
+    branches: [feature/overseas-new-zealand-v1]
+    paths:
+      - 'apps/web/src/data/overseasAustralia.ts'
+      - 'apps/web/src/data/overseasNewZealand.ts'
+      - 'apps/web/src/pages/AustraliaDevelopmentPage.tsx'
+      - 'apps/web/src/pages/OverseasDevelopmentPage.tsx'
+      - 'apps/web/src/styles/overseas-australia.css'
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/scripts/overseas-*.contract.test.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hhba-overseas-au-static
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: AU, NZ, previous study routes and university contracts
+        working-directory: apps/web
+        run: |
+          node --experimental-strip-types --test scripts/overseas-australia.contract.test.mjs
+          node --experimental-strip-types --test scripts/overseas-new-zealand.contract.test.mjs
+          node --experimental-strip-types --test scripts/study-abroad.contract.test.mjs
+          node --experimental-strip-types --test scripts/study-universities.contract.test.mjs
+      - name: Build independently reviewable full React site
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: /
+        run: npm run build
+      - name: Add fallback for direct links
+        run: cp apps/web/dist/index.html apps/web/dist/404.html
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hhba-overseas-australia-v1-static-review
+          path: apps/web/dist/
+          retention-days: 14
+          if-no-files-found: error
