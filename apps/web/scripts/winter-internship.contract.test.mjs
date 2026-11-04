@@ -50,7 +50,7 @@ test('directory contains source-backed programmes without invented job numbers',
 });
 test('concrete job first: only individual employer-issued postings appear in the primary list',()=>{
  const jobIds=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(x=>x[1]);
- assert.equal(jobIds.length,25,'16 prior plus ReCube 7 school postings and Papergames 2 sourced daily internships');
+ assert.equal(jobIds.length,34,'25 prior plus batch06 3 Sun Life, 5 Manulife, 1 Informa');
  assert.equal(new Set(jobIds).size,jobIds.length,'no duplicate role identity');
  for(const id of ['apco-shanghai-winter-start-1787','hsbc-hk-student-placement-1367003857','qima-hk-sales-intern-744000154586189']){
   assert.ok(jobIds.includes(id),id+' missing');
@@ -114,7 +114,7 @@ test('batch05 has seven distinct university-only ReCube winter records and two s
  const recube=['product-uiux-260900318','sustainability-260900321','fullstack-260900315','digital-marketing-260900319','hardware-260900322','website-designer-260900317','data-ai-260900320'];
  for(const name of recube)assert.ok(ids.includes('recube-hk-winter-'+name),'missing real university posting '+name);
  for(const id of ['papergames-shanghai-recruiting-game-rd-intern-2027-review','papergames-shanghai-nikki-world-ecology-planning-280350'])assert.ok(ids.includes(id),'missing sourced Papergames role '+id);
- assert.equal(new Set(ids).size,25);
+ assert.equal(new Set(ids).size,34);
  assert.equal((jobs.match(/status:"campus-limited"/g)||[]).length,7,'restricted university listings must not be passed as direct public jobs');
  assert.equal((jobs.match(/status:"winter-unverified"/g)||[]).length,2,'two additional daily internships must be marked as winter-unverified');
  assert.ok(jobs.includes('2026 年 11 月 14 日')&&jobs.includes('cpdc.osa.cuhk.edu.hk/en/job/'));
@@ -126,4 +126,29 @@ test('batch05 has seven distinct university-only ReCube winter records and two s
  assert.ok(!ids.some(id=>id.startsWith('cmb-')),'CMB historical programme is not an independent winter job');
  assert.ok(page.includes('企业官网（非直投）')&&page.includes('高校校内限制'));
  assert.ok(page.includes('historical-only'));
+});
+
+
+test('batch06 adds three independently sourced employers, nine unique 2027 H1 records with truthful deadlines',()=>{
+ const ids=[...jobs.matchAll(/\\bid:['"]([a-z0-9-]+)['"]/g)].map(x=>x[1]);
+ const sun=['sunlife-hk-strategic-finance-jr00128213','sunlife-hk-financial-reporting-jr00128231','sunlife-hk-actuarial-internship-jr00120885'];
+ const man=['manulife-hk-2027-private-equity-jr26091338','manulife-hk-2027-data-finance-jr26091703','manulife-hk-2027-global-info-risk-jr26100089','manulife-hk-2027-marketing-strategy-jr26100142','manulife-hk-2027-tech-placement-jr26100136'];
+ const informa='informa-markets-hk-2027-jan-jun-intern-l059656859';
+ for(const id of [...sun,...man,informa])assert.ok(ids.includes(id),'batch06 missing distinct job '+id);
+ assert.equal(ids.length,34,'batch05 25 plus batch06 9 independent job IDs');
+ assert.equal(new Set(ids).size,34,'no duplicate record identifiers');
+ assert.equal((jobs.match(/status:"closed"/g)||[]).length,7,'two Sun Life Finance plus five Manulife official expired records');
+ assert.ok(jobs.includes('2026年10月30日')&&jobs.includes('2026年11月1日'));
+ assert.ok(jobs.includes('2026年11月7日'),'Informa third-party upcoming deadline');
+ assert.ok(jobs.includes('JR00128213')&&jobs.includes('JR00128231'),'same-named finance jobs need distinct employer requisitions');
+ assert.ok(jobs.includes('JR00120885')&&jobs.includes('1月开始的上半年批次'),'one actuarial program must not split Jul-Dec');
+ assert.ok(jobs.includes('2027年1月至7月')&&jobs.includes('1—6月'),'Manulife PE month discrepancy should be documented');
+ assert.ok(jobs.includes('L059656859')&&jobs.includes('openuniversity.recruit.com.hk'),'Informa job board evidence required');
+ for(const hostname of ['sunlife.wd3.myworkdayjobs.com','manulife.wd3.myworkdayjobs.com','www.informa.com'])assert.ok(jobs.includes(hostname),hostname+' employer primary URL missing');
+ assert.ok(page.includes('查看已截止公告')&&page.includes('查看雇主已截止岗位公告'),'closed jobs must not present generic apply CTA');
+ assert.ok(page.includes('企业招聘首页（非直投）')&&page.includes('查看招聘平台原始记录'),'third-party direct-job distinction missing');
+ assert.ok(!jobs.includes('status:"open"'),'never invent live openings');
+ const ledger=read('../docs/WINTER_2027_54_EMPLOYER_PIPELINE.md');
+ assert.ok(ledger.includes('剩余')||ledger.includes('未处理'));
+ assert.ok(ledger.includes('**21条**')&&ledger.includes('**33条**'),'21 handled candidates, 33 outstanding');
 });
