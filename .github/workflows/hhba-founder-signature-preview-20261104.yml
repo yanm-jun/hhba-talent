@@ -1,0 +1,50 @@
+name: HHBA Founder Signature - Isolated Preview
+on:
+  push:
+    branches: [feature/join-real-founder-signature-20261104]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/public/images/hhba-founder-signature-2026.svg'
+      - 'apps/web/src/pages/JoinUsPage.tsx'
+      - 'apps/web/src/styles/join-vision.css'
+      - 'apps/web/scripts/founder-signature-20261104.contract.test.mjs'
+      - 'previews/join-founder-signature-20261104/**'
+      - '.github/workflows/hhba-founder-signature-preview-20261104.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Validate handwritten asset and join signoff
+        working-directory: apps/web
+        run: node --test scripts/founder-signature-20261104.contract.test.mjs
+      - name: Install front-end dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Build the whole static public site on this branch
+        working-directory: apps/web
+        env:
+          HHBA_GITHUB_PAGES: '1'
+          HHBA_PAGES_BASE: '/hhba-talent/'
+        run: npm run build
+      - name: Confirm signature is packaged in the built site
+        run: |
+          test -s apps/web/dist/images/hhba-founder-signature-2026.svg
+          cmp apps/web/public/images/hhba-founder-signature-2026.svg apps/web/dist/images/hhba-founder-signature-2026.svg
+      - name: Upload non-production review build
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-join-real-signature-branch-static-build
+          path: |
+            apps/web/dist/
+            previews/join-founder-signature-20261104/index.html
+          retention-days: 14
