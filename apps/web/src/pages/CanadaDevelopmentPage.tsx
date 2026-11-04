@@ -42,7 +42,7 @@ export function CanadaDevelopmentPage({user,view='country',pathwayId}:{user:User
    <button type="button" onClick={()=>compare(p.id)} aria-pressed={compared.includes(p.id)} aria-label={(compared.includes(p.id)?'移出对比 ':'加入对比 ')+p.name}><GitCompareArrows size={17}/></button>
   </div>
  </article>;
- return <Shell user={user}><div className="hhba-overseas hhba-overseas-canada" data-hhba-overseas-de={view}>
+ return <Shell user={user}><div className="hhba-overseas hhba-overseas-canada" data-hhba-overseas-ca={view}>
   {view==='country'&&<main className="hhba-overseas-container hhba-overseas-content">
    {breadcrumbs('')}
    <header className="hhba-overseas-country-hero hhba-canada-hero" style={{backgroundImage:"linear-gradient(90deg,#132f49f5 0%,#1c4168d9 57%,#1c416846 100%),url('"+import.meta.env.BASE_URL+"overseas/countries/ca.webp')"}}>
