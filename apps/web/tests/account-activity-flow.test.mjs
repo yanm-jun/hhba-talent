@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import {createUser,createSession} from '../functions/_lib/real-auth.js';
 import {onRequest as accountRequest} from '../functions/api/account/[[path]].js';
 import {onRequest as activityRequest} from '../functions/api/engagement/account.js';
+import {onRequestGet as selfCheck} from '../functions/api/engagement/self-check.js';
 
 const origin='https://hhba.work';
 const today=()=>new Date().toISOString().slice(0,10);
@@ -46,6 +47,13 @@ function fixture(){
    let args=[];
    return {
     bind(...items){args=items;return this},
+    async all(){
+     if(sql.startsWith('SELECT area FROM hhba_account_activity WHERE account_hash=? AND day=? ORDER BY area')){
+      return {results:[...activities.values()].filter(a=>a.account_hash===args[0]&&a.day===args[1])
+       .map(a=>({area:a.area})).sort((a,b)=>a.area.localeCompare(b.area))};
+     }
+     throw Error('Unexpected self-check SQL: '+sql);
+    },
     async run(){
      if(sql.startsWith('INSERT OR IGNORE INTO hhba_account_activity')){
       const [account_hash,day,area,created_at]=args;
@@ -118,6 +126,18 @@ test('registration, real saved-job writes, consented events, isolation, and eras
  assert.equal(new Set([...state.activities.values()].map(x=>x.account_hash)).size,2);
  assert.equal(state.activities.size,5);
  assert.ok([...state.activities.values()].every(x=>!JSON.stringify(x).includes('1390000000')),'metrics storage has no raw phone');
+ // The self-check must return only this authenticated account's daily categories.
+ const selfRequest=(token)=>new Request(origin+'/api/engagement/self-check',{headers:headers(token)});
+ const proofA=await selfCheck({env,request:selfRequest(tokenA)}),proofB=await selfCheck({env,request:selfRequest(tokenB)});
+ assert.equal(proofA.status,200);assert.equal(proofB.status,200);
+ const bodyA=await proofA.json(),bodyB=await proofB.json();
+ assert.equal(bodyA.recorded,true);assert.deepEqual(bodyA.areas,['companies','job_save','jobs','policies']);
+ assert.deepEqual(bodyB.areas,['jobs']);
+ assert.equal(bodyA.day,today());assert.equal('account_hash' in bodyA,false);
+ assert.ok(!JSON.stringify(bodyA).includes('13900000001'));
+ assert.equal(state.activities.size,5,'self-check cannot create activity records');
+ assert.equal((await selfCheck({env,request:selfRequest(null)})).status,401);
+
 
  // Origin and session security are mandatory even for a valid token.
  assert.equal((await activityRequest({env,request:new Request(origin+'/api/engagement/account',{
@@ -125,6 +145,11 @@ test('registration, real saved-job writes, consented events, isolation, and eras
  })})).status,403);
  assert.equal((await wipe(env,tokenA)).status,200,'consent revocation deletes this account');
  assert.equal(state.activities.size,1,'another account remains untouched');
+ const afterErase=await (await selfCheck({env,request:new Request(origin+'/api/engagement/self-check',{
+  headers:headers(tokenA)})})).json();
+ assert.equal(afterErase.recorded,false,'read-only check reflects actual erasure');
+ assert.deepEqual(afterErase.areas,[]);
+
  assert.equal(state.saves.size,1,'withdrawal does not erase real job bookmarks');
  assert.equal((await wipe(env,tokenA)).status,200,'erasure is idempotent');
  assert.equal((await putSaved(env,tokenA)).status,200,'real saved jobs unaffected by analytics opt-out');
@@ -138,6 +163,8 @@ test('disabled production feature is unknown, not faked user activity',async()=>
  const state=fixture(),env={HHBA_PNVS_AUTH_DB:state.auth,HHBA_METRICS_DB:state.metrics,HHBA_METRICS_SECRET:'test-secret-of-sufficient-length-123456'};
  const r=await post(env,'not-a-real-session','jobs');
  assert.equal(r.status,503);
+ assert.equal((await selfCheck({env,request:new Request(origin+'/api/engagement/self-check')})).status,503);
+
  assert.equal(state.activities.size,0);
 });
 test('frontend session changes and other-tab consent rechecks remain wired',()=>{
