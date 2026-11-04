@@ -214,7 +214,10 @@ assert(ui.includes("!rebuilding&&!curatedHundred&&<DomesticAutumnMarket"));
 assert(ui.includes("!rebuilding&&!curatedHundred&&<DomesticCompanyResults"));
 assert(ui.includes("job.recordKind==='DOMESTIC_REBUILT'?<div className=\"unified-jd-content\""));
 assert(ui.includes("j.recordKind==='DOMESTIC_REBUILT'"));
-assert(ui.includes("job.recordKind!=='DOMESTIC_REBUILT'&&<SaveJobButton jobId={job.id}/>"));
+// Every real job, including DOMESTIC_REBUILT, should now offer SaveJobButton.
+assert(ui.includes('<SaveJobButton jobId={job.id}/>'),'All jobs must retain a save action in the market and detail views');
+assert(ui.includes('<SaveJobButton jobId={variant.id} compact/>'),'Multi-location role variants must remain individually saveable');
+assert(!ui.includes("job.recordKind!=='DOMESTIC_REBUILT'&&<SaveJobButton"),'Rebuilt domestic jobs must not be excluded from bookmark actions');
 assert(branded.includes("autumn-real-logos/cn-autumn-002.svg"));
 assert(branded.includes("autumn-real-logos/cn-autumn-001.svg"));
 assert(branded.includes('domestic-media/user-f9727f3062cf91da52b3285c.png'));
