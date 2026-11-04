@@ -59,7 +59,7 @@ test('concrete job first: only individual employer-issued postings appear in the
  for(const name of ['BDO 香港','AtkinsRéalis','RSM 罗申美香港'])assert.ok(jobs.includes(name),'batch02 employer '+name+' missing');
  for(const domain of ['oraclecloud.com','careers.hsbc.com','jobs.smartrecruiters.com','recruitment.bdo.com.hk','careers.atkinsrealis.com','www.rsm.global'])assert.ok(jobs.includes(domain));
  assert.ok(jobs.includes("2026 年 11 月 20 日")&&jobs.includes("2026 年 11 月 30 日"),'two different real BDO application deadlines must be preserved');
- assert.ok(jobs.includes('R-164310')&&jobs.includes('不是 13 个单独招聘岗位'),'engineering business lines must not be inflated into fake jobs');
+ assert.ok(jobs.includes('R-164310')&&jobs.includes('并非 13 个单独招聘岗位'),'engineering business lines must not be inflated into fake jobs');
  assert.ok(jobs.includes('确切起始月份尚未公布'),'RSM spring schedule is not a verified January start');
  assert.ok(!jobs.includes("status:'open'"),'real-time availability must not be fabricated');
  assert.ok(!jobs.includes('jpm-2027-seasonal'),'JPM summer/fall seasonal programme is not a winter role');
