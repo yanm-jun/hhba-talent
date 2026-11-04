@@ -198,8 +198,8 @@
   color:#8b8985;
 }
 .join-manifesto-signature{
-  display:block;width:237px;max-width:66%;height:auto;
-  object-fit:contain;mix-blend-mode:multiply;opacity:.89;
+  display:block;width:265px;max-width:76%;height:auto;
+  object-fit:contain;opacity:.94;
 }
 .join-manifesto-animate [data-manifesto-reveal]{
   opacity:0;transform:translate3d(0,17px,0);
@@ -219,7 +219,7 @@
   .join-manifesto-rule{margin-bottom:22px}
   .join-manifesto-identity{font-size:12px}
   .join-manifesto-tagline{font-size:12px;margin-bottom:24px}
-  .join-manifesto-signature{width:205px}
+  .join-manifesto-signature{width:225px}
 }
 @media(prefers-reduced-motion:reduce){
   .join-manifesto-animate [data-manifesto-reveal]{
