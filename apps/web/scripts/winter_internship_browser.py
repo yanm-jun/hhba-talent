@@ -19,6 +19,13 @@ with sync_playwright() as p:
     page.goto(BASE,wait_until='domcontentloaded',timeout=60000)
     dialog=page.locator('[data-hhba-winter-modal] [role=dialog]')
     dialog.wait_for(timeout=60000)
+    box=dialog.bounding_box()
+    assert box is not None
+    assert 770 <= box['width'] <= 790, f"desktop popup too large: {box}"
+    assert 440 <= box['height'] <= 460, f"desktop popup too tall: {box}"
+    assert abs(box['x']-(1440-box['width'])/2)<3
+    assert abs(box['y']-(900-box['height'])/2)<3
+    assert dialog.get_by_role('link',name='立即参加').is_visible()
     # The old public letter is retained in the middle of the homepage, but
     # must not open automatically while the winter advert is visible.
     assert page.locator('.hhba-letter-overlay').count()==0
@@ -65,6 +72,9 @@ with sync_playwright() as p:
     page.goto(BASE,wait_until='domcontentloaded',timeout=60000)
     popup=page.locator('[data-hhba-winter-modal] [role=dialog]')
     popup.wait_for(timeout=60000)
+    mobile_box=popup.bounding_box()
+    assert mobile_box is not None and mobile_box['width'] <= 390, f"popup overflows mobile viewport: {mobile_box}"
+    assert mobile_box['height'] <= 844, f"popup is taller than mobile viewport: {mobile_box}"
     assert popup.get_by_role('link',name='立即参加').is_visible()
     page.screenshot(path='/tmp/hhba-winter-modal-mobile.png',full_page=False)
     popup.get_by_role('button',name='关闭寒假实习广告').click()
