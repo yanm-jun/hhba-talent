@@ -18,6 +18,8 @@ test('first visit modal uses accessible close/escape/backdrop and real internal 
  for(const part of ['aria-modal="true"','role="dialog"','aria-label="关闭寒假实习广告"',"event.key==='Escape'",'e.target===e.currentTarget','sessionStorage.setItem','to="/winter-internship"'])assert.ok(popup.includes(part),part+' missing');
  assert.ok(popup.includes('images/hhba-join-team.webp'),'existing locally-hosted campaign photo missing');
  assert.ok(css.includes('hhba-winter-modal-overlay')&&css.includes('@media(max-width:600px)'),'responsive centered modal CSS missing');
+ assert.ok(css.includes('width:min(780px,100%)')&&css.includes('height:min(450px,88dvh)'),'campaign should use compact 780 x 450 popup');
+ assert.ok(!css.includes('width:min(1050px,100%)'),'former oversized popup width must be removed');
 });
 test('landing route and permanent programme-detail routes are public',()=>{
  for(const part of ["route==='/winter-internship'",'/^\\/winter-internship\\/[a-z0-9-]{3,100}$/.test(route)',"<WinterInternshipPage user={user}"])assert.ok(main.includes(part),part+' missing');
