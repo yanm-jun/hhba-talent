@@ -1,4 +1,4 @@
-import {allGermanyRoutes,deOfficial,deVerifiedOn} from './overseasGermany';
+import {allGermanyRoutes,deOfficial,deVerifiedOn} from './overseasGermany.ts';
 import {pack} from './overseasNzGuidesV2a.ts';
 import type {DetailedGuide} from '../components/OverseasDetailedGuide';
 const section=(items:{title:string;explain:string;how:string}[])=>items.map(x=>[x.title,x.explain,x.how] as [string,string,string]);
