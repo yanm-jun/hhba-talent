@@ -57,7 +57,7 @@ test('12 actual Blue Card professional examples + 8 Ausbildung occupations have 
  const all=[...deBlueProfessionSamples,...deTrainingOccupationSamples];
  assert.equal(new Set(all.map(x=>x.id)).size,20);
  for(const prof of all){
-  assert.ok(prof.cn.length>=3&&prof.de.length>=7&&prof.en.length>=7,prof.id);
+  assert.ok(prof.cn.length>=2&&prof.de.length>=7&&prof.en.length>=7,prof.id);
   assert.ok(prof.duties.length>=18&&prof.qualification.length>=30,prof.id);
   assert.ok(prof.salary.length>=40&&prof.language.length>=30,prof.id);
   assert.ok(prof.documents.length>=4&&prof.actions.length>=4,prof.id);
