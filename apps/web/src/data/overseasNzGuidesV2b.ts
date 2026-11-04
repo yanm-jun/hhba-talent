@@ -1,5 +1,5 @@
 import type {DetailedGuide} from '../components/OverseasDetailedGuide';
-import {pack,src} from './overseasNzGuidesV2a';
+import {pack,src} from './overseasNzGuidesV2a.ts';
 export const nzDetailedGuidesPart2:Record<string,DetailedGuide>={
  'nz-smc':pack('nz-smc',
  '一句话：SMC（技术移民类别）是通过被认可的专业资格、职业注册、收入或新西兰合格工作经历等因素来判断居民签证资格的制度。它不是“国内学历加几年经验自动换永居”。不同规则对如何累计达到 6 分、是否需要新西兰工作以及认证雇主都有具体定义。',
