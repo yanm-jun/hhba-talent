@@ -53,7 +53,7 @@ export function OverseasDevelopmentPage({user,view='home',pathwayId}:{user:User|
      <div className="hhba-overseas-eyebrow"><Globe2 size={15}/> HHBA · GLOBAL OPPORTUNITIES</div>
      <h1>你的下一站，<br/><em>可以是更广阔的世界。</em></h1>
      <p>不止留学。探索各国合法的海外工作、职业发展、学习与居留路径，从自己的目标出发，找到可核实的行动方案。</p>
-     <div className="hhba-overseas-hero-actions"><Link to={countryLink} className="hhba-overseas-primary">从新西兰开始探索 <ArrowRight size={17}/></Link><Link to={root+'/match'} className="hhba-overseas-outline">按目标初步筛选 <Compass size={17}/></Link></div>
+     <div className="hhba-overseas-hero-actions"><Link to={countryLink} className="hhba-overseas-primary">探索新西兰 <ArrowRight size={17}/></Link><Link to={root+'/country/australia'} className="hhba-overseas-outline">探索澳大利亚 <ArrowRight size={17}/></Link><Link to={root+'/match'} className="hhba-overseas-outline">按目标初步筛选 <Compass size={17}/></Link></div>
      <div className="hhba-overseas-hero-meta"><span><CheckCircle2 size={15}/> 官方政策来源</span><span><CheckCircle2 size={15}/> 申请门槛透明</span><span><CheckCircle2 size={15}/> 不保证获签</span></div>
     </div><div className="hhba-overseas-hero-credit"><a className="hhba-overseas-photo-credit" target="_blank" rel="noopener noreferrer" href="https://commons.wikimedia.org/wiki/File:The_Remarkables_from_Queenstown,_New_Zealand_04.jpg">实景摄影：Σ64 · CC BY 4.0 · Wikimedia Commons <ExternalLink size={12}/></a></div><div className="hhba-overseas-hero-globe" aria-hidden="true"><div className="hhba-overseas-orbit">✦</div><span>NZ</span></div></header>
     <main className="hhba-overseas-container hhba-overseas-home-main">
