@@ -6,8 +6,12 @@ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const home=read('src/pages/HomePage.tsx'),main=read('src/main.tsx'),popup=read('src/components/WinterInternshipPopup.tsx'),page=read('src/pages/WinterInternshipPage.tsx'),data=read('src/data/winter2027Programs.ts'),css=read('src/styles/winter-internship.css');
 test('winter campaign replaces ONLY original homepage letter auto-popup',()=>{
  assert.ok(home.includes('<WinterInternshipPopup/>'));
- assert.ok(!home.includes('HomeOpenLetter')&&!home.includes('读一封来自 HHBA 的信'));
- assert.ok(existsSync(new URL('../src/components/HomeOpenLetter.tsx',import.meta.url)),'legacy letter source should remain archived');
+ assert.ok(home.includes('<HomeOpenLetter autoOpen={false}/>'),'manual-only public letter component must be mounted');
+ assert.ok(home.includes('读一封来自 HHBA 的信')&&home.includes('hhba:open-letter'),'public letter button must remain clickable');
+ const letter=read('src/components/HomeOpenLetter.tsx');
+ assert.ok(letter.includes('if (!autoOpen) return null;'),'letter must never auto-open during a regular visit');
+ assert.ok(popup.includes("get('letter')==='1'"),'explicit letter shares must not be covered by winter popup');
+ assert.ok(existsSync(new URL('../src/components/HomeOpenLetter.tsx',import.meta.url)),'public letter source must stay present');
  for(const stable of ['<UnifiedJobMarket compact/>','<HomeCompanyMarquee/>','<HomePeopleBanner/>','我要应聘','我要招人'])assert.ok(home.includes(stable),stable+' must remain');
 });
 test('first visit modal uses accessible close/escape/backdrop and real internal CTA',()=>{
