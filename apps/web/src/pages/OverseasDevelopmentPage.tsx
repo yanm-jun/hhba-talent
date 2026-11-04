@@ -83,19 +83,32 @@ export function OverseasDevelopmentPage({user,view='home',pathwayId}:{user:User|
     </section>
     <div className="hhba-overseas-inline-alert"><Info size={19}/><p>中国公民打工度假签证在核验时处于关闭状态，开放时间须以新西兰移民局为准。本站不提供所谓“抢名额”收费服务。</p></div><Disclaimer/>
    </main>}
-   {view==='pathway'&&<main className="hhba-overseas-container hhba-overseas-content">
+   {view==='pathway'&&<main className="hhba-overseas-container hhba-overseas-content hhba-overseas-reader-page">
     {chosen?<><Breadcrumb items={[{title:'新西兰',to:countryLink},{title:chosen.name}]}/>
-     <header className="hhba-overseas-pathway-head"><div className="hhba-overseas-eyebrow"><CategoryIcon category={chosen.category}/>{overseasCategoryLabels[chosen.category]} · 官方资料核验：{nzVerifiedOn}</div><h1>{chosen.name}</h1><p className="hhba-overseas-eng">{chosen.english}</p><p>{chosen.summary}</p><div className="hhba-overseas-detail-tags">{chosen.highlights.map(x=><span key={x}>{x}</span>)}{chosen.availability==='closed'&&<span className="is-closed">目前官方关闭</span>}</div></header>
-     <div className="hhba-overseas-detail-layout"><div className="hhba-overseas-detail-main">
-      <OverseasDetailedGuide key={chosen.id} pathway={chosen} guide={nzCompleteGuidesV2[chosen.id]}/>
-      <div className="hhba-overseas-study-follow"><h2>还想了解新西兰的学校和课程？</h2><p>旧版留学资料及大学项目仍然保留，不把“读书”包装为自动获得工作或居留权。</p><Link to={root+'/legacy'}>打开留学资料库 <ArrowRight size={16}/></Link></div>
-     </div><aside className="hhba-overseas-detail-aside"><div className="hhba-overseas-aside-card"><span className="hhba-overseas-kicker">OFFICIAL APPLICATION</span><h2>以官方条件为准</h2><p>核验日期：{nzVerifiedOn}</p><p>申请资格及收费可能变化。直接访问新西兰移民局的原始政策页。</p>
-      <a href={chosen.officialUrl} target="_blank" rel="noopener noreferrer" className="hhba-overseas-primary">{chosen.availability==='closed'?'查看官方开放状态':'查看官方申请资料'} <ExternalLink size={16}/></a>
-      {chosen.secondaryUrl&&<a className="hhba-overseas-aside-link" href={chosen.secondaryUrl} target="_blank" rel="noopener noreferrer">查看补充官方依据 <ExternalLink size={15}/></a>}
-      <button type="button" onClick={()=>toggleBookmark(chosen.id)}>{bookmarks.includes(chosen.id)?<BookmarkCheck size={17}/>:<Bookmark size={17}/>} {bookmarks.includes(chosen.id)?'已收藏（点击取消）':'收藏此方案'}</button>
-      <button type="button" onClick={()=>toggleComparison(chosen.id)}><GitCompareArrows size={17}/>{comparison.includes(chosen.id)?'已加入对比（点击移除）':'加入方案对比'}</button>
-      <small>收藏与对比暂保存在当前浏览器；尚未接入 HHBA 账号云同步。</small></div></aside></div>
-     <Disclaimer/>
+     <header className="hhba-overseas-pathway-head">
+      <div className="hhba-overseas-eyebrow">{overseasCategoryLabels[chosen.category]} · 新西兰 · {nzVerifiedOn} 核验</div>
+      <h1>{chosen.name}</h1>
+      <p className="hhba-overseas-eng">{chosen.english}</p>
+      <p>{chosen.summary}</p>
+      {chosen.availability==='closed'&&<p className="hhba-overseas-reader-closed">当前官方关闭申请；请核实最新开放状态。</p>}
+     </header>
+     <div className="hhba-overseas-reader-actions">
+      <a href={chosen.officialUrl} target="_blank" rel="noopener noreferrer" className="hhba-overseas-reader-official">
+       {chosen.availability==='closed'?'查看官方开放状态':'查看移民局官方说明'} <ExternalLink size={15}/>
+      </a>
+      <button type="button" onClick={()=>toggleBookmark(chosen.id)} aria-label={bookmarks.includes(chosen.id)?'取消收藏此方案':'收藏此方案'}>
+       {bookmarks.includes(chosen.id)?<BookmarkCheck size={17}/>:<Bookmark size={17}/>}
+       {bookmarks.includes(chosen.id)?'已收藏':'收藏'}
+      </button>
+      <button type="button" onClick={()=>toggleComparison(chosen.id)} aria-pressed={comparison.includes(chosen.id)}>
+       <GitCompareArrows size={17}/>{comparison.includes(chosen.id)?'已加入对比':'加入对比'}
+      </button>
+      <span className="hhba-overseas-reader-note">收藏与对比仅保存在当前浏览器</span>
+     </div>
+     <OverseasDetailedGuide key={chosen.id} pathway={chosen} guide={nzCompleteGuidesV2[chosen.id]}/>
+     <p className="hhba-overseas-reader-related">还想了解新西兰的大学和课程？
+      <Link to={root+'/legacy'}>打开原留学资料库 <ArrowRight size={14}/></Link>
+     </p>
     </>:<><Breadcrumb items={[{title:'新西兰',to:countryLink},{title:'方案不存在'}]}/><div className="hhba-overseas-empty"><h1>未找到此方案</h1><Link to={countryLink}>返回新西兰全部方案 <ArrowRight size={16}/></Link></div></>}
    </main>}
    {view==='saved'&&<main className="hhba-overseas-container hhba-overseas-content"><Breadcrumb items={[{title:'我的海外收藏'}]}/><div className="hhba-overseas-section-head"><div><h1>我的海外收藏</h1><p>这里仅展示当前浏览器收藏的新西兰方案；账户跨设备同步尚未接入。</p></div></div><div className="hhba-overseas-path-grid">{nzPathways.filter(p=>bookmarks.includes(p.id)).map(featured)}</div>{!bookmarks.length&&<div className="hhba-overseas-empty"><Bookmark size={26}/><h2>还没有收藏方案</h2><Link to={countryLink}>浏览新西兰路径 <ArrowRight size={16}/></Link></div>}</main>}
