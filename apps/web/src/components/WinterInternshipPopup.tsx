@@ -8,6 +8,8 @@ const SESSION_KEY='hhba:winter-internship-2027:seen:v1';
 
 /** The campaign replaces first-visit envelope; reopening is never forced on navigation. */
 function showFirstVisit(){
+ // Keep directly shared /letter/?letter=1 links usable without two modal layers.
+ if(new URLSearchParams(window.location.search).get('letter')==='1')return false;
  try{return window.sessionStorage.getItem(SESSION_KEY)!=='1';}
  catch{return true;}
 }
