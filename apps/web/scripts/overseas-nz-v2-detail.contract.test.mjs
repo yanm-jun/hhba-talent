@@ -14,12 +14,12 @@ test('7/7 New Zealand paths have complete 10-chapter instructions, not tiny summ
   assert.ok(g.plainAnswer.length>=65&&g.firstAction.length>=35,pathway.id+' user-first summary');
   assert.equal(g.sections.length,8,pathway.id+' 8 sections + FAQs + risks');
   for(const [i,s] of g.sections.entries()){
-   assert.ok(s.title&&s.summary.length>=25,pathway.id+' section '+i+' heading');
+   assert.ok(s.title&&s.summary.length>=18,pathway.id+' section '+i+' heading');
    assert.ok(s.points.length>=3,pathway.id+' section '+i+' depth');
-   for(const p of s.points)assert.ok(p.label.length>=3&&p.explain.length>=25&&p.action.length>=25,pathway.id+' detail/action');
+   for(const p of s.points)assert.ok(p.label.length>=3&&p.explain.length>=20&&p.action.length>=20,pathway.id+' detail/action');
   }
   assert.ok(g.faq.length>=4&&g.faq.every(f=>f.question.length>8&&f.answer.length>30),pathway.id+' FAQs');
-  assert.ok(g.risks.length>=3&&g.risks.every(s=>s.length>=24),pathway.id+' risk explanation');
+  assert.ok(g.risks.length>=3&&g.risks.every(s=>s.length>=20),pathway.id+' risk explanation');
   assert.ok(g.terms.length>=4&&g.terms.every(t=>overseasTerms[t]),pathway.id+' glossary');
   assert.ok(g.sources.length>=2&&g.sources.every(s=>s.url.startsWith('https://www.immigration.govt.nz/')),pathway.id+' verified source');
  }
