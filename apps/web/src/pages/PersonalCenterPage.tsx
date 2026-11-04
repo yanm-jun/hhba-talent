@@ -4,7 +4,7 @@ import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
 import {getJob,localizedCompany,localizedLocation,localizedTitle,type LiveJob} from '../services/liveRecruitment';
 import {listSavedJobs,setSavedJob,savedAvailable,type SavedJob} from '../services/savedJobs';
-import {analyticsChoice,chooseAnalytics} from '../services/engagement';
+import {analyticsChoice,chooseAnalytics,getMyActivityCheck,type MyActivityCheck,type AccountArea} from '../services/engagement';
 import {getCandidateWorkspaceProfile,saveCandidateWorkspaceProfile,saveCandidateWorkspacePreferences,realWorkspaceAvailable,type CandidateWorkspaceProfile} from '../services/candidateWorkspace';
 import {type User} from '../services/api';
 import {PrivateResumeVault} from '../components/PrivateResumeVault';
@@ -35,6 +35,9 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
  const [loading,setLoading]=useState(false),[error,setError]=useState('');
  const [busy,setBusy]=useState('');
  const [consent,setConsent]=useState<boolean|null>(()=>analyticsChoice());
+ const [myActivity,setMyActivity]=useState<MyActivityCheck|null>(null);
+ const [activityChecking,setActivityChecking]=useState(false);
+ const [activityCheckError,setActivityCheckError]=useState('');
  const [nickname,setNickname]=useState(''),[headline,setHeadline]=useState(''),[city,setCity]=useState(''),[intro,setIntro]=useState(''),[skills,setSkills]=useState('');
  const [role,setRole]=useState(''),[targetCity,setTargetCity]=useState(''),[mode,setMode]=useState<'不限'|'远程'|'现场'|'混合办公'>('不限');
  const [notice,setNotice]=useState('');
@@ -111,6 +114,15 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
   }catch(e){setNotice(e instanceof Error?e.message:'保存失败，请重试')}
   finally{setBusy('')}
  }
+ useEffect(()=>{setMyActivity(null);setActivityCheckError('')},[consent,user?.id]);
+ async function checkMyActivity(){
+  if(consent!==true)return;
+  setActivityChecking(true);setActivityCheckError('');setMyActivity(null);
+  try{setMyActivity(await getMyActivityCheck())}
+  catch(e){setActivityCheckError(e instanceof Error?e.message:'暂时无法验证统计结果，请重试。')}
+  finally{setActivityChecking(false)}
+ }
+ const areaLabels:Record<AccountArea,string>={general:'一般访问',jobs:'岗位浏览',companies:'企业资料',policies:'人才政策',tools:'求职工具',job_save:'岗位收藏操作'};
  const sectionTitle=pages.find(page=>page.id===current)?.label||'个人中心';
  if(!user?.account_types?.includes('candidate'))return <Shell user={user}><section className="hhba-personal"><p role="status">请先使用真实求职者账号登录。</p><Link to="/candidate/login">前往登录</Link></section></Shell>;
  return <Shell user={user}>
@@ -191,6 +203,19 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
      <div className="hhba-account-section-heading"><div><h2>账户与隐私</h2><p>管理当前真实账户和匿名统计授权。</p></div></div>
      <div className="hhba-account-privacy-row"><div><strong><ChartNoAxesCombined size={18}/>网站及账号使用统计</strong><p>仅在同意后采集匿名访问与已登录账号的按日功能使用类别，用于活跃与回访分析；不记录具体搜索词、简历正文或密码。</p></div>
       <div className="hhba-personal-consent"><button type="button" aria-pressed={consent===true} onClick={()=>{chooseAnalytics(true);setConsent(true)}}>同意</button><button type="button" aria-pressed={consent===false} onClick={()=>{chooseAnalytics(false);setConsent(false)}}>拒绝</button></div>
+     </div>
+     <div className="hhba-account-privacy-row hhba-activity-verification">
+      <div><strong><CheckCircle2 size={18}/>核验账号活动是否真正入库</strong>
+       <p>只读查询当前登录账号今天（UTC）的功能类别，不创建测试数据，也不显示手机号、搜索词或简历。</p>
+       {consent!==true&&<p role="status">当前未授权账号使用统计；可先自愿同意，再浏览岗位或人才政策。</p>}
+       {myActivity&&<p className="hhba-account-activity-result" role="status">{myActivity.day} UTC：{myActivity.recorded
+         ?'已查询到真实活动：'+myActivity.areas.map(a=>areaLabels[a]).join('、')
+         :'数据库尚无该账号今日活动记录；请在同意统计后浏览岗位，再重新核验。'}</p>}
+       {activityCheckError&&<p className="hhba-account-activity-error" role="alert">{activityCheckError}</p>}
+      </div>
+      <button type="button" className="hhba-account-activity-button" disabled={consent!==true||activityChecking} onClick={()=>void checkMyActivity()}>
+       {activityChecking?'正在核验…':'查询今日真实记录'}
+      </button>
      </div>
      <div className="hhba-account-privacy-row"><div><strong><LockKeyhole size={18}/>账户安全</strong><p>只有当前登录用户可读取其个人资料与收藏。</p></div><span className="hhba-account-chip">真实账户</span></div>
      <div className="hhba-account-privacy-row"><div><strong><LogOut size={18}/>安全退出</strong><p>仅撤销当前会话，不删除账户资料。</p></div><button type="button" className="hhba-account-danger" onClick={()=>void onLogout()}>退出登录</button></div>
