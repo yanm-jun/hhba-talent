@@ -3,6 +3,7 @@ import {ExternalLink} from 'lucide-react';
 import type {OverseasPathway} from '../data/overseasNewZealand';
 import {overseasTerms} from '../data/overseasGlossary';
 import {OverseasOccupationDirectory} from './OverseasOccupationDirectory';
+import {JapanOccupationDirectory,type JapanOccupationTrack} from './JapanOccupationDirectory';
 import '../styles/overseas-guide-v2.css';
 
 /** Shared editorial reader: keep the practical content without card and checklist clutter. */
@@ -37,7 +38,8 @@ export function OverseasDetailedGuide({pathway,guide}:{pathway:OverseasPathway;g
  const [tocOpen,setTocOpen]=useState(false);
  const toggle=(term:string)=>setOpenTerm(t=>t===term?null:term);
  const sectionId=(index:number)=>'overseas-guide-'+pathway.id+'-'+(index+1);
- const showOccupationDirectory=pathway.id==='nz-green-tier1'||pathway.id==='au-189';
+ const japanTrack=(['jp-ssw1','jp-ssw2','jp-engineer'].includes(pathway.id)?pathway.id:null) as JapanOccupationTrack|null;
+ const showOccupationDirectory=pathway.id==='nz-green-tier1'||pathway.id==='au-189'||!!japanTrack;
  const occupationCountry=pathway.id==='au-189'?'au':'nz';
  const chapters=[...guide.sections.map((s,i)=>({label:s.title,id:sectionId(i)})),
   {label:'常见问题',id:sectionId(8)},{label:'风险与官方来源',id:sectionId(9)}];
@@ -68,7 +70,7 @@ export function OverseasDetailedGuide({pathway,guide}:{pathway:OverseasPathway;g
      <p>{glossary(point.explain)}</p>
      <p className="hhba-guide-v2-howto"><strong>具体怎么做：</strong>{glossary(point.action)}</p>
     </div>)}
-   </section>{i===0&&showOccupationDirectory&&<OverseasOccupationDirectory country={occupationCountry}/>}</div>)}
+   </section>{i===0&&japanTrack&&<JapanOccupationDirectory track={japanTrack}/>}{i===0&&showOccupationDirectory&&!japanTrack&&<OverseasOccupationDirectory country={occupationCountry}/>}</div>)}
    <section className="hhba-guide-v2-section" id={sectionId(8)}>
     <h2><span>09</span>常见问题</h2>
     <p className="hhba-guide-v2-section-intro">遇到不符合条件、准备材料或判断签证资格的问题，可以先查看这里。</p>
