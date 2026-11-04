@@ -79,7 +79,7 @@ export function SiteSearchPage({user}:{user:User|null}){
    <p className="hhba-site-search-intro">一个入口找到站内岗位、企业档案、人才政策、人才安居和留学资料。</p>
    <form role="search" className="hhba-site-search-main" onSubmit={submit}>
     <Search aria-hidden="true" size={22}/>
-    <input aria-label="搜索 HHBA 全站内容" value={draft} onChange={e=>setDraft(e.target.value)}
+    <input type="search" aria-label="搜索 HHBA 全站内容" value={draft} onChange={e=>setDraft(e.target.value)}
        maxLength={100} autoFocus placeholder="搜索岗位、企业、城市政策、大学或留学方向"/>
     <button type="submit">搜索 <ArrowRight size={16}/></button>
    </form>
