@@ -130,9 +130,11 @@ function updateGrowth(){
   if(a?.quality==='collected'&&Array.isArray(a.signupSeries))renderTraffic('users-account-chart',a.signupSeries.map(x=>({day:x.day,pv:integer(x.count)||0})));
   else byId('users-account-chart').textContent='注册时间序列尚未连接，不显示虚假趋势';
   setMetric('investor-users',a?.quality==='collected'?a.registeredUsers:null);
- renderTraffic('users-chart',t?.quality==='collected'?t.series:null);
+ const actualDays=buildDailyOperationsRows(growth);
+ const actualSeries=Array.isArray(actualDays)?actualDays.filter(x=>x.collected).map(x=>({day:x.day,pv:x.pv||0})):null;
+ renderTraffic('users-chart',actualSeries);
  if(t?.quality==='collected'){
-  const trend=byId('trend-chart');if(trend){trend.className='chart-empty hhba-live-trend';renderTraffic('trend-chart',t.series)}
+  const trend=byId('trend-chart');if(trend){trend.className='chart-empty hhba-live-trend';renderTraffic('trend-chart',actualSeries)}
  }
 }
 async function refreshGrowth(){
@@ -309,6 +311,9 @@ function buildVerifiedInvestorRows(data,report){
   ['首次活跃次日回访率',retention(activity?.firstSeenRetention?.d1),'以首次记录的同意活跃日为基准，不是注册次日留存；括号为回访/成熟样本',activity?privateTime:''],
   ['首次活跃第七日回访率',retention(activity?.firstSeenRetention?.d7),'以首次记录的同意活跃日为基准，不是注册七日留存；括号为回访/成熟样本',activity?privateTime:''],
   ['页面访问事件 PV',value(traffic?.pv),'Cloudflare D1 不关联账号或访客标识的事件次数，不等于 UV，'+range,traffic?privateTime:''],
+  ['岗位详情浏览事件',value(traffic?.jobViews),'Cloudflare D1 无身份岗位详情事件次数，'+range,traffic?privateTime:''],
+  ['岗位搜索事件',value(traffic?.searches),'Cloudflare D1 无身份岗位搜索操作次数，不含搜索词，'+range,traffic?privateTime:''],
+  ['官网招聘链接点击事件',value(traffic?.outboundClicks),'Cloudflare D1 无身份官网跳转点击次数，不代表已投递，'+range,traffic?privateTime:''],
   ['设备有效收藏',value(devices?.savedJobs),'Cloudflare D1 设备级收藏；不是登录账号收藏，不应相加',devices?privateTime:''],
   ['真实收入','未接入','未接入可核验财务台账，不以岗位、访问或收藏估算收入','']
  ];
