@@ -13,6 +13,7 @@ on:
       - "apps/web/d1/0008_account_growth_metrics.sql"
       - "apps/web/tests/account-growth.test.mjs"
       - "apps/web/tests/account-activity-flow.test.mjs"
+      - "apps/web/tests/aggregate-traffic.test.mjs"
       - "apps/web/tests/admin-work-audience.test.mjs"
       - "apps/admin-preview/**"
       - ".github/workflows/hhba-admin-user-growth-ci.yml"
@@ -30,8 +31,10 @@ jobs:
         run: |
           node --check apps/admin-preview/dashboard.js
           node --check apps/web/functions/api/engagement/account.js
+          node --check apps/web/functions/api/engagement/event.js
+          node --check apps/web/functions/api/admin/metrics.js
           node --check apps/web/functions/_lib/account-growth.js
-          node --test apps/web/tests/account-growth.test.mjs apps/web/tests/admin-work-audience.test.mjs apps/web/tests/account-activity-flow.test.mjs
+          node --test apps/web/tests/account-growth.test.mjs apps/web/tests/admin-work-audience.test.mjs apps/web/tests/account-activity-flow.test.mjs apps/web/tests/aggregate-traffic.test.mjs
           node --test apps/admin-preview/tests/*.test.mjs
       - name: Check D1 migration
         run: |
