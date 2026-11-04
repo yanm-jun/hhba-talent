@@ -4,6 +4,8 @@ import {Link} from '../router';
 import {Shell} from '../components/Shell';
 import type {User} from '../services/api';
 import {auPathways,auVerifiedOn} from '../data/overseasAustralia';
+import {OverseasDetailedGuide} from '../components/OverseasDetailedGuide';
+import {auCompleteGuidesV2} from '../data/overseasAuGuidesV2';
 import {overseasCategoryLabels,type OverseasCategory,type OverseasPathway} from '../data/overseasNewZealand';
 import '../styles/overseas-development.css';
 import '../styles/overseas-australia.css';
@@ -63,13 +65,7 @@ export function AustraliaDevelopmentPage({user,view='country',pathwayId}:{user:U
    {detail?<>{crumb(detail.name)}
     <header className="hhba-overseas-pathway-head"><div className="hhba-overseas-eyebrow"><CategoryIcon type={detail.category}/>{overseasCategoryLabels[detail.category]} · AUSTRALIA {auVerifiedOn}</div><h1>{detail.name}</h1><p className="hhba-overseas-eng">{detail.english}</p><p>{detail.summary}</p><div className="hhba-overseas-detail-tags">{detail.highlights.map(x=><span key={x}>{x}</span>)}{detail.availability==='closed'&&<span className="is-closed">登记已关闭</span>}</div></header>
     <div className="hhba-overseas-detail-layout"><div className="hhba-overseas-detail-main">
-     <section className="hhba-overseas-detail-intro"><h2>什么人可能适合这条路线？</h2><p>{detail.audience}</p></section>
-     <DocSection heading="申请资格和门槛" number="01" points={detail.requirement}/>
-     <DocSection heading="证据与申请材料" number="02" points={detail.documents}/>
-     <DocSection heading="从准备到递交" number="03" points={detail.steps}/>
-     <DocSection heading="真实费用与预算" number="04" points={detail.fees}/>
-     <DocSection heading="获签后有哪些权利" number="05" points={detail.rights}/>
-     <section className="hhba-overseas-detail-block hhba-overseas-warning"><h2><AlertTriangle size={20}/> 需要格外注意</h2><ul>{detail.risks.map((x,i)=><li key={i}>{x}</li>)}</ul></section>
+     <OverseasDetailedGuide key={detail.id} pathway={detail} guide={auCompleteGuidesV2[detail.id]}/>
      <div className="hhba-overseas-study-follow"><h2>准备通过大学留学赴澳？</h2><p>我们保留了原来开发的澳大利亚真实大学与课程信息，但大学录取不代表毕业工签或永居资格。</p><Link to={root+'/legacy'}>进入原大学资料库 <ArrowRight size={16}/></Link></div>
     </div><aside className="hhba-overseas-detail-aside"><div className="hhba-overseas-aside-card"><span className="hhba-overseas-kicker">OFFICIAL SOURCE</span><h2>澳大利亚内政部</h2><p>最后核验：{auVerifiedOn}</p><p>官方是最终申请入口。签证类别、受邀时间和费用请在正式递交前再次核对。</p>
      <a className="hhba-overseas-primary" href={detail.availability==='closed'?(detail.secondaryUrl||detail.officialUrl):detail.officialUrl} target="_blank" rel="noopener noreferrer">{detail.availability==='closed'?'查看抽签登记状态':'查看官方签证说明'} <ExternalLink size={16}/></a>
