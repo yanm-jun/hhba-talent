@@ -50,7 +50,7 @@ test('directory contains source-backed programmes without invented job numbers',
 });
 test('concrete job first: only individual employer-issued postings appear in the primary list',()=>{
  const jobIds=[...jobs.matchAll(/\bid:'([a-z0-9-]+)'/g)].map(x=>x[1]);
- assert.equal(jobIds.length,8,'8 independently sourced winter/spring recruitment positions after batch 02');
+ assert.equal(jobIds.length,12,'8 prior plus 4 distinct employer-issued roles reviewed in batch 03');
  assert.equal(new Set(jobIds).size,jobIds.length,'no duplicate role identity');
  for(const id of ['apco-shanghai-winter-start-1787','hsbc-hk-student-placement-1367003857','qima-hk-sales-intern-744000154586189']){
   assert.ok(jobIds.includes(id),id+' missing');
@@ -61,6 +61,15 @@ test('concrete job first: only individual employer-issued postings appear in the
  assert.ok(jobs.includes("2026 年 11 月 20 日")&&jobs.includes("2026 年 11 月 30 日"),'two different real BDO application deadlines must be preserved');
  assert.ok(jobs.includes('R-164310')&&jobs.includes('并非 13 个单独招聘岗位'),'engineering business lines must not be inflated into fake jobs');
  assert.ok(jobs.includes('确切起始月份尚未公布'),'RSM spring schedule is not a verified January start');
+ for(const id of ['richemont-hk-talent-acquisition-jr134347','tianzh-international-haikou-audit-j10722','tianzh-international-xian-workcenter-j11175','crowe-hk-spring-audit-2027-review'])assert.ok(jobIds.includes(id),'missing batch03 job '+id);
+ for(const employer of ['历峰集团 Richemont','天职国际','国富浩华香港 Crowe'])assert.ok(jobs.includes(employer),'batch03 employer missing '+employer);
+ assert.ok(jobs.includes('JR134347')&&jobs.includes('2026 年 12 月至 2027 年 5 月'),'Richemont must have verifiable winter period');
+ assert.ok(jobs.includes('J10722')&&jobs.includes('J11175'),'Tianzhi posting codes are real and must be preserved');
+ assert.ok(jobs.includes("status:'year-conflict'")&&jobs.includes('2026年11月的近期搜索索引显示'),'Crowe conflicting employer page years must be shown');
+ assert.ok(jobs.includes('未证明为同一招聘编号'),'third-party corroboration must not imply exact requisition identity');
+ assert.ok(page.includes('job.reviewWarning')&&page.includes('job.evidenceUrl'),'source limitations and secondary citations must appear in details');
+ assert.ok(jobs.includes('careers.richemont.com')&&jobs.includes('tzcpa.zhiye.com')&&jobs.includes('www.crowe.com'),'all three employers have official destinations');
+ assert.ok(!jobs.includes("status:'open'"),'no unproven current availability');
  assert.ok(!jobs.includes("status:'open'"),'real-time availability must not be fabricated');
  assert.ok(!jobs.includes('jpm-2027-seasonal'),'JPM summer/fall seasonal programme is not a winter role');
  for(const part of ['data-winter-job={job.id}','winterJobById(slug)','data-winter-page="job-detail"','hhba-winter-role-list','PROGRAM_ONLY','data-winter-program-archive']){
