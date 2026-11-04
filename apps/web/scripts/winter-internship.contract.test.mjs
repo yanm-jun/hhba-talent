@@ -50,7 +50,7 @@ test('directory contains source-backed programmes without invented job numbers',
 });
 test('concrete job first: only individual employer-issued postings appear in the primary list',()=>{
  const jobIds=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(x=>x[1]);
- assert.equal(jobIds.length,34,'25 prior plus batch06 3 Sun Life, 5 Manulife, 1 Informa');
+ assert.equal(jobIds.length,41,'34 prior plus batch07 BNP 3 LVMH 1 Crédit Agricole 3');
  assert.equal(new Set(jobIds).size,jobIds.length,'no duplicate role identity');
  for(const id of ['apco-shanghai-winter-start-1787','hsbc-hk-student-placement-1367003857','qima-hk-sales-intern-744000154586189']){
   assert.ok(jobIds.includes(id),id+' missing');
@@ -114,7 +114,7 @@ test('batch05 has seven distinct university-only ReCube winter records and two s
  const recube=['product-uiux-260900318','sustainability-260900321','fullstack-260900315','digital-marketing-260900319','hardware-260900322','website-designer-260900317','data-ai-260900320'];
  for(const name of recube)assert.ok(ids.includes('recube-hk-winter-'+name),'missing real university posting '+name);
  for(const id of ['papergames-shanghai-recruiting-game-rd-intern-2027-review','papergames-shanghai-nikki-world-ecology-planning-280350'])assert.ok(ids.includes(id),'missing sourced Papergames role '+id);
- assert.equal(new Set(ids).size,34);
+ assert.equal(new Set(ids).size,41);
  assert.equal((jobs.match(/status:"campus-limited"/g)||[]).length,7,'restricted university listings must not be passed as direct public jobs');
  assert.equal((jobs.match(/status:"winter-unverified"/g)||[]).length,2,'two additional daily internships must be marked as winter-unverified');
  assert.ok(jobs.includes('2026 年 11 月 14 日')&&jobs.includes('cpdc.osa.cuhk.edu.hk/en/job/'));
@@ -135,9 +135,9 @@ test('batch06 adds three independently sourced employers, nine unique 2027 H1 re
  const man=['manulife-hk-2027-private-equity-jr26091338','manulife-hk-2027-data-finance-jr26091703','manulife-hk-2027-global-info-risk-jr26100089','manulife-hk-2027-marketing-strategy-jr26100142','manulife-hk-2027-tech-placement-jr26100136'];
  const informa='informa-markets-hk-2027-jan-jun-intern-l059656859';
  for(const id of [...sun,...man,informa])assert.ok(ids.includes(id),'batch06 missing distinct job '+id);
- assert.equal(ids.length,34,'batch05 25 plus batch06 9 independent job IDs');
- assert.equal(new Set(ids).size,34,'no duplicate record identifiers');
- assert.equal((jobs.match(/status:"closed"/g)||[]).length,7,'two Sun Life Finance plus five Manulife official expired records');
+ assert.equal(ids.length,41,'34 cumulative batch06 plus batch07 7 independent job IDs');
+ assert.equal(new Set(ids).size,41,'no duplicate record identifiers');
+ assert.equal((jobs.match(/status:"closed"/g)||[]).length,9,'existing seven plus LVMH and CA Global Markets expired records');
  assert.ok(jobs.includes('2026年10月30日')&&jobs.includes('2026年11月1日'));
  assert.ok(jobs.includes('2026年11月7日'),'Informa third-party upcoming deadline');
  assert.ok(jobs.includes('JR00128213')&&jobs.includes('JR00128231'),'same-named finance jobs need distinct employer requisitions');
@@ -151,4 +151,30 @@ test('batch06 adds three independently sourced employers, nine unique 2027 H1 re
  const ledger=read('../../docs/WINTER_2027_54_EMPLOYER_PIPELINE.md');
  assert.ok(ledger.includes('后续待逐项核验：**33**'));
  assert.ok(ledger.includes('**21条**')&&ledger.includes('**33条**'),'21 handled candidates, 33 outstanding');
+});
+
+
+test('batch07 keeps independently sourced January-2027 BNP, LVMH and Credit Agricole records with exact filled/expired labels',()=>{
+ const ids=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(m=>m[1]);
+ const bnp=['bnp-hk-2027-securities-services-ref118477','bnp-hk-2027-wealth-management-ref117528','bnp-hk-2027-global-markets-ref117487'];
+ const lvmh='lvmh-hk-beauty-2027-jan-sscpc02515';
+ const ca=['creditagricole-hk-2027-audit-intern-115888','creditagricole-hk-2027-finance-intern-115202','creditagricole-hk-2027-global-markets-115201'];
+ for(const id of [...bnp,lvmh,...ca])assert.ok(ids.includes(id),id+' not indexed');
+ assert.equal(ids.length,41,'34 previous records plus seven new postings');
+ assert.equal(new Set(ids).size,41,'no duplicated employer vacancy IDs');
+ assert.equal((jobs.match(/status:"filled"/g)||[]).length,3,'three BNP posts all employer-confirmed filled');
+ assert.equal((jobs.match(/status:"closed"/g)||[]).length,9,'two additional expired beyond prior seven');
+ for(const ref of ['1234567890100118477','1234567890100117528','1234567890100117487','SSCPC02515','2026-115888','2026-115202','2026-115201'])assert.ok(jobs.includes(ref),'missing grounded employer number '+ref);
+ for(const domain of ['group.bnpparibas/en/careers/job-offer/','lvmh.com/fr/nous-rejoindre/nos-offres/SSCPC02515','jobs.ca-cib.com'])assert.ok(jobs.includes(domain),domain+' missing');
+ assert.ok(jobs.includes('2026年10月16日')&&jobs.includes('2026年10月31日'),'LVMH and CA Global Markets past deadlines must appear');
+ assert.ok(jobs.includes('四个月兼职')&&jobs.includes('2027年1月6日'),'CA Global Markets four months vs LVMH intake date must be precise');
+ assert.ok(jobs.includes('不提供工作签证担保'),'LVMH work rights warning must remain');
+ assert.ok(jobs.includes('额外表格'),'CA finance two-part application requirement must be shown');
+ assert.ok(jobs.includes("if(job.status==='filled')return"),'filled must not be labeled as expired applications');
+ assert.ok(page.includes("job.status==='filled'?'查看已招满公告'"),'filled roles should have source-only list action');
+ assert.ok(page.includes('查看雇主已招满岗位公告'),'filled detail must not promote application');
+ assert.ok(!jobs.includes('status:"open"'),'no invented currently available slots');
+ const ledger=read('../../docs/WINTER_2027_54_EMPLOYER_PIPELINE.md');
+ assert.ok(ledger.includes('后续待逐项核验：**30**'),'remaining 30 companies');
+ assert.ok(ledger.includes('**24条已处理、30条仍待核验**')&&ledger.includes('**41条岗位或招聘批次资料**'),'batch07 cumulative counts');
 });
