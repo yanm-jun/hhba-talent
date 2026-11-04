@@ -7,6 +7,8 @@ import { HomePage } from './pages/HomePage';
 import { StudyAbroadPage } from './pages/StudyAbroadPage';
 import { OverseasDevelopmentPage } from './pages/OverseasDevelopmentPage';
 import { JapanDevelopmentPage } from './pages/JapanDevelopmentPage';
+import { GermanyDevelopmentPage } from './pages/GermanyDevelopmentPage';
+import { GermanyOccupationDetailPage } from './components/GermanyOccupationDirectory';
 import { JapanOccupationDetailPage } from './components/JapanOccupationDirectory';
 import { OverseasOccupationDetailPage } from './components/OverseasOccupationDirectory';
 import { AustraliaDevelopmentPage } from './pages/AustraliaDevelopmentPage';
@@ -98,7 +100,13 @@ const logout=async()=>{
   if(realAuthReady&&getRealAuthToken())await realAuth.logout();
   else if(employerApiReady)await api.logout();
  }finally{clearRealAuthToken();setUser(null);navigate('/candidate/login');}
-};if(!ready)return <main className="app-shell" aria-busy="true"/>;if(route==='/')return <HomePage user={user}/>;if(route==='/study-abroad')return <OverseasDevelopmentPage user={user}/>;if(route==='/study-abroad/legacy')return <StudyAbroadPage user={user}/>;if(route==='/study-abroad/country/new-zealand')return <OverseasDevelopmentPage user={user} view="country"/>;if(route.startsWith('/study-abroad/nz/occupation/'))return <OverseasOccupationDetailPage user={user} country="nz" id={route.slice('/study-abroad/nz/occupation/'.length)}/>;if(route==='/study-abroad/saved')return <OverseasDevelopmentPage user={user} view="saved"/>;if(route==='/study-abroad/compare')return <OverseasDevelopmentPage user={user} view="compare"/>;if(route==='/study-abroad/match')return <OverseasDevelopmentPage user={user} view="match"/>;if(route.startsWith('/study-abroad/pathway/'))return <OverseasDevelopmentPage user={user} view="pathway" pathwayId={route.slice('/study-abroad/pathway/'.length)}/>;if(route==='/study-abroad/country/japan')return <JapanDevelopmentPage user={user}/>;
+};if(!ready)return <main className="app-shell" aria-busy="true"/>;if(route==='/')return <HomePage user={user}/>;if(route==='/study-abroad')return <OverseasDevelopmentPage user={user}/>;if(route==='/study-abroad/legacy')return <StudyAbroadPage user={user}/>;if(route==='/study-abroad/country/new-zealand')return <OverseasDevelopmentPage user={user} view="country"/>;if(route.startsWith('/study-abroad/nz/occupation/'))return <OverseasOccupationDetailPage user={user} country="nz" id={route.slice('/study-abroad/nz/occupation/'.length)}/>;if(route==='/study-abroad/saved')return <OverseasDevelopmentPage user={user} view="saved"/>;if(route==='/study-abroad/compare')return <OverseasDevelopmentPage user={user} view="compare"/>;if(route==='/study-abroad/match')return <OverseasDevelopmentPage user={user} view="match"/>;if(route.startsWith('/study-abroad/pathway/'))return <OverseasDevelopmentPage user={user} view="pathway" pathwayId={route.slice('/study-abroad/pathway/'.length)}/>;if(route==='/study-abroad/country/germany')return <GermanyDevelopmentPage user={user}/>;
+ if(route==='/study-abroad/germany/saved')return <GermanyDevelopmentPage user={user} view="saved"/>;
+ if(route==='/study-abroad/germany/compare')return <GermanyDevelopmentPage user={user} view="compare"/>;
+ if(route==='/study-abroad/germany/match')return <GermanyDevelopmentPage user={user} view="match"/>;
+ if(route.startsWith('/study-abroad/germany/pathway/'))return <GermanyDevelopmentPage user={user} view="pathway" pathwayId={route.slice('/study-abroad/germany/pathway/'.length)}/>;
+ if(route.startsWith('/study-abroad/germany/occupation/')){const parts=route.slice('/study-abroad/germany/occupation/'.length).split('/');if((parts[0]==='blue'||parts[0]==='training')&&parts.length===2)return <GermanyOccupationDetailPage user={user} track={parts[0]} id={parts[1]}/>;}
+ if(route==='/study-abroad/country/japan')return <JapanDevelopmentPage user={user}/>;
  if(route==='/study-abroad/japan/saved')return <JapanDevelopmentPage user={user} view="saved"/>;
  if(route==='/study-abroad/japan/compare')return <JapanDevelopmentPage user={user} view="compare"/>;
  if(route==='/study-abroad/japan/match')return <JapanDevelopmentPage user={user} view="match"/>;
