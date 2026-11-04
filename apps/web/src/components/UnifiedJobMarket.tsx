@@ -244,7 +244,7 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
     (!filters.location_country||/^(cn|chn|china|中国|中国大陆)$/i.test(filters.location_country));
   const controls=<div className="unified-job-controls">
     <label className="unified-job-search"><Search size={17}/>
-      <input value={draft} onChange={e=>{hasEditedSearch.current=true;setDraft(e.target.value)}} maxLength={100}
+      <input value={draft} onChange={e=>setDraft(e.target.value)} onInput={()=>{hasEditedSearch.current=true}} maxLength={100}
         placeholder={lang==='zh'?'例如：新加坡软件工程师、美国销售、不限学历的远程工作':'Try Singapore software engineer or remote sales'}
         aria-label={lang==='zh'?'自然语言搜索岗位':'Search jobs in natural language'}/></label>
     <select value={filters.country} onChange={e=>{setPage(0);setFilters(f=>({...f,country:e.target.value as LiveFilters['country']}))}} aria-label={lang==='zh'?'国内外范围':'Domestic or international'}>
