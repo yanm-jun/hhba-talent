@@ -48,7 +48,8 @@ test('路由保留新西兰全部功能、旧大学及新增澳大利亚独立�
  assert.equal(nzPathways.length,7);
  for(const path of ['/study-abroad/country/australia','/study-abroad/australia/pathway/','/study-abroad/australia/saved','/study-abroad/australia/compare','/study-abroad/australia/match','/study-abroad/legacy'])assert.ok(main.includes(path),path);
  assert.deepEqual(overseasCountryOptions.filter(x=>x.ready).map(x=>x.code),['nz','au','jp']);
- assert.match(home,/c\.code==='nz'\?countryLink:root\+'\/country\/'\+c\.code/);
+ assert.match(home,/c\.code==='au'\?root\+'\/country\/australia'/);
+ assert.match(home,/c\.code==='jp'\?root\+'\/country\/japan'/);
  assert.match(data,/ready:true,description:'雇主担保/);
  assert.ok(css.includes('@media(max-width:760px)'));
  assert.ok(css.includes('commons.wikimedia.org/wiki/Special:FilePath/'));
