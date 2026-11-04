@@ -28,8 +28,12 @@ test('7/7 New Zealand paths have complete 10-chapter instructions, not tiny summ
 test('deep NZ route actually renders guide and responsive glossary, rather than old five tiny lists',()=>{
  assert.match(page,/OverseasDetailedGuide key=\{chosen\.id\}/);
  assert.ok(!page.includes('<Block title="01 · 申请资格与门槛"'));
- assert.ok(css.includes('.hhba-guide-v2-termgrid'));
- assert.ok(css.includes('@media(max-width:760px)'));
+ assert.ok(css.includes('.hhba-guide-v2-toc'));
+ assert.ok(css.includes('.hhba-guide-inline-term'));
+ assert.ok(css.includes('@media(max-width:840px)'));
+ assert.ok(!css.includes('.hhba-guide-v2-check-status'));
+ assert.ok(page.includes('hhba-overseas-reader-actions'));
+ assert.ok(!page.includes('hhba-overseas-aside-card') || page.includes('hhba-overseas-reader-page'));
 });
 test('Tier 1 and student meaningful details are present',()=>{
  const a=nzCompleteGuidesV2['nz-green-tier1'],s=nzCompleteGuidesV2['nz-student'];
