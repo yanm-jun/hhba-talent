@@ -47,7 +47,7 @@ import { PersonalCenterPage } from './pages/PersonalCenterPage';
 import { LegalAidLandingPage } from './pages/LegalAidLandingPage';
 import { LegalAidInterventionPage } from './pages/LegalAidInterventionPage';
 import { LegalAidTopicPage } from './pages/LegalAidTopicPage';
-import { AnalyticsConsent } from './components/AnalyticsConsent';
+import { AnonymousTrafficTracker } from './components/AnalyticsConsent';
 import { EmployerStartPage, EmployerOnboardingPreviewPage, EmployerGrowthHubPage } from './pages/EmployerGrowthHubPage';
 import { EmployerEvidencePage, AdminEmployerEvidencePage } from './pages/EmployerEvidencePage';
 import { EmployeeFeedbackPage } from './pages/EmployeeFeedbackPage';
@@ -114,4 +114,4 @@ if(route==='/admin/employer-appeals'||route==='/admin/employer-appeals/')return 
 if(route==='/employer/scoring'||route==='/employer/scoring/')return <EmployerScoringPage user={user}/>;
 if(route==='/admin/employer-scoring'||route==='/admin/employer-scoring/')return <AdminEmployerScoringPage user={user}/>;
 if(route==='/employee/feedback'||route==='/employee/feedback/')return <EmployeeFeedbackPage user={user}/>;if(route==='/employer/evidence'||route==='/employer/evidence/')return <EmployerEvidencePage user={user}/>;if(route==='/admin/employer-evidence'||route==='/admin/employer-evidence/')return <AdminEmployerEvidencePage user={user}/>;if(route==='/employer/hub'||route==='/employer/hub/')return <EmployerGrowthHubPage user={user} view="dashboard"/>;if(route==='/employer/growth'||route==='/employer/growth/')return <EmployerGrowthHubPage user={user} view="growth"/>;if(route==='/employer/aid'||route==='/employer/aid/')return <EmployerGrowthHubPage user={user} view="aid"/>;if(route==='/employer/public'||route==='/employer/public/')return <EmployerGrowthHubPage user={user} view="public"/>;if(route==='/employer/workspace'||route==='/employer/workspace/')return <EmployerWorkspacePage user={user}/>;if(route==='/employer')return <EmployerPage user={user}/>;if(route==='/workspace'&&user)return <WorkspacePage user={user} onLogout={logout}/>;navigate('/');return null;}
-createRoot(document.getElementById('root')!).render(<><App/><AnalyticsConsent/></>);
+createRoot(document.getElementById('root')!).render(<><App/><AnonymousTrafficTracker/></>);
