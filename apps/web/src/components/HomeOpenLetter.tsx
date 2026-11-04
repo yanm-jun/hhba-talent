@@ -9,9 +9,12 @@ type Stage = 'envelope' | 'letter' | null;
 const SESSION_KEY = 'hhba:public-letter:seen:v1';
 const OPEN_EVENT = 'hhba:open-letter';
 
-function firstStage(): Stage {
-  // Links shared publicly must open the letter even after earlier visits.
+function firstStage(autoOpen: boolean): Stage {
+  // An explicitly shared letter link is a user-requested open, not an automatic popup.
   if (new URLSearchParams(window.location.search).get('letter') === '1') return 'envelope';
+  // On the public homepage, this is disabled: the centered winter campaign owns
+  // the first-visit popup, while the letter remains available via its original button.
+  if (!autoOpen) return null;
   try { return window.sessionStorage.getItem(SESSION_KEY) === '1' ? null : 'envelope'; }
   catch { return 'envelope'; }
 }
@@ -26,8 +29,8 @@ function removeExplicitFlag() {
   window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
 }
 
-export function HomeOpenLetter() {
-  const [stage, setStage] = useState<Stage>(firstStage);
+export function HomeOpenLetter({autoOpen = true}:{autoOpen?:boolean} = {}) {
+  const [stage, setStage] = useState<Stage>(()=>firstStage(autoOpen));
   const [feedback, setFeedback] = useState('');
   const layer = useRef<HTMLDivElement>(null);
   const dismiss = useCallback(() => {
