@@ -31,7 +31,7 @@ test('landing route and permanent programme-detail routes are public',()=>{
  assert.ok(page.includes('target="_blank" rel="noopener noreferrer"'));
 });
 test('directory contains source-backed programmes without invented job numbers',()=>{
- const ids=[...data.matchAll(/\bid:'([a-z0-9-]+)'/g)].map(x=>x[1]);
+ const ids=[...data.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(x=>x[1]);
  assert.equal(ids.length,8,'historical CMB review must be additional information, not a fabricated live job');
  assert.equal(new Set(ids).size,ids.length);
  for(const name of ['毕马威中国','德勤中国','摩根大通','APCO Worldwide'])assert.ok(data.includes(name),name+' missing');
@@ -49,7 +49,7 @@ test('directory contains source-backed programmes without invented job numbers',
  assert.ok(!data.includes('currentOpenVerified:true'),'no false live availability');
 });
 test('concrete job first: only individual employer-issued postings appear in the primary list',()=>{
- const jobIds=[...jobs.matchAll(/\bid:'([a-z0-9-]+)'/g)].map(x=>x[1]);
+ const jobIds=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(x=>x[1]);
  assert.equal(jobIds.length,25,'16 prior plus ReCube 7 school postings and Papergames 2 sourced daily internships');
  assert.equal(new Set(jobIds).size,jobIds.length,'no duplicate role identity');
  for(const id of ['apco-shanghai-winter-start-1787','hsbc-hk-student-placement-1367003857','qima-hk-sales-intern-744000154586189']){
@@ -110,7 +110,7 @@ test('site search and personal data flows are unchanged',()=>{
 
 
 test('batch05 has seven distinct university-only ReCube winter records and two separately sourced Papergames roles',()=>{
- const ids=[...jobs.matchAll(/\\bid:'([a-z0-9-]+)'/g)].map(m=>m[1]);
+ const ids=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(m=>m[1]);
  const recube=['product-uiux-260900318','sustainability-260900321','fullstack-260900315','digital-marketing-260900319','hardware-260900322','website-designer-260900317','data-ai-260900320'];
  for(const name of recube)assert.ok(ids.includes('recube-hk-winter-'+name),'missing real university posting '+name);
  for(const id of ['papergames-shanghai-recruiting-game-rd-intern-2027-review','papergames-shanghai-nikki-world-ecology-planning-280350'])assert.ok(ids.includes(id),'missing sourced Papergames role '+id);
