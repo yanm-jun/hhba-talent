@@ -38,7 +38,7 @@ test('中国462打工度假官方2026—27抽签已关闭，拒绝伪造名额',
  assert.ok(whv.fees.join(' ').includes('AUD 25'));
  const page=read('../src/pages/AustraliaDevelopmentPage.tsx');
  assert.match(page,/本年度登记已关闭/);
- assert.match(page,/查看抽签登记状态/);
+ assert.match(page,/查看官方抽签状态/);
 });
 test('路由保留新西兰全部功能、旧大学及新增澳大利亚独立详情',()=>{
  const main=read('../src/main.tsx');
