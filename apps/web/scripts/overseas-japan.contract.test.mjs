@@ -83,7 +83,8 @@ test('Three-level routes and filtered search retain existing overseas, NZ and AU
  assert.match(occupation,/closed-new-coe/);
  assert.match(article,/JapanOccupationDirectory/);
  assert.match(article,/jp-ssw1/);
- assert.match(index,/c\.code==='nz'\?countryLink:root\+'\/country\/'\+c\.code/);
+ assert.match(index,/c\.code==='au'\?root\+'\/country\/australia'/);
+ assert.match(index,/c\.code==='jp'\?root\+'\/country\/japan'/);
  const styles=read('../src/styles/overseas-japan.css');
  assert.ok(styles.includes('Tokyo_-_Sunset_Skyline.jpg'));
  assert.ok(styles.includes('@media(max-width:760px)'));
