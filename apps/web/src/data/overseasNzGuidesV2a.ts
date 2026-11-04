@@ -1,5 +1,5 @@
 import type {DetailedGuide,GuideSection,GuidePoint,GuideFAQ,GuideSource} from '../components/OverseasDetailedGuide';
-import {nzPathways} from './overseasNewZealand';
+import {nzPathways} from './overseasNewZealand.ts';
 /* 2026-11-04 government sources. 8 substantive chapters x specific action points,
    plus glossary, real FAQ, scam checks and traceable official sources. */
 type P=[string,string,string];
