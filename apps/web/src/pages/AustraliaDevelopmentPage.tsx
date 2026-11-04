@@ -61,19 +61,32 @@ export function AustraliaDevelopmentPage({user,view='country',pathwayId}:{user:U
    <section className="hhba-overseas-extras"><div><h2>想比较新西兰和澳大利亚？</h2><p>两个国家具有不同的雇主、技术移民及留学制度。先分别查清真实资格，再选择适合的国家。</p></div><Link to={root+'/country/new-zealand'} className="hhba-overseas-outline">查看新西兰方案 <ArrowRight size={16}/></Link></section>
    <Alert/>
   </main>}
-  {view==='pathway'&&<main className="hhba-overseas-container hhba-overseas-content">
+  {view==='pathway'&&<main className="hhba-overseas-container hhba-overseas-content hhba-overseas-reader-page">
    {detail?<>{crumb(detail.name)}
-    <header className="hhba-overseas-pathway-head"><div className="hhba-overseas-eyebrow"><CategoryIcon type={detail.category}/>{overseasCategoryLabels[detail.category]} · AUSTRALIA {auVerifiedOn}</div><h1>{detail.name}</h1><p className="hhba-overseas-eng">{detail.english}</p><p>{detail.summary}</p><div className="hhba-overseas-detail-tags">{detail.highlights.map(x=><span key={x}>{x}</span>)}{detail.availability==='closed'&&<span className="is-closed">登记已关闭</span>}</div></header>
-    <div className="hhba-overseas-detail-layout"><div className="hhba-overseas-detail-main">
-     <OverseasDetailedGuide key={detail.id} pathway={detail} guide={auCompleteGuidesV2[detail.id]}/>
-     <div className="hhba-overseas-study-follow"><h2>准备通过大学留学赴澳？</h2><p>我们保留了原来开发的澳大利亚真实大学与课程信息，但大学录取不代表毕业工签或永居资格。</p><Link to={root+'/legacy'}>进入原大学资料库 <ArrowRight size={16}/></Link></div>
-    </div><aside className="hhba-overseas-detail-aside"><div className="hhba-overseas-aside-card"><span className="hhba-overseas-kicker">OFFICIAL SOURCE</span><h2>澳大利亚内政部</h2><p>最后核验：{auVerifiedOn}</p><p>官方是最终申请入口。签证类别、受邀时间和费用请在正式递交前再次核对。</p>
-     <a className="hhba-overseas-primary" href={detail.availability==='closed'?(detail.secondaryUrl||detail.officialUrl):detail.officialUrl} target="_blank" rel="noopener noreferrer">{detail.availability==='closed'?'查看抽签登记状态':'查看官方签证说明'} <ExternalLink size={16}/></a>
-     {detail.secondaryUrl&&<a className="hhba-overseas-aside-link" href={detail.secondaryUrl} target="_blank" rel="noopener noreferrer">相关官方政策与补充规则 <ExternalLink size={15}/></a>}
-     <button type="button" onClick={()=>toggleSaved(detail.id)}>{saved.includes(detail.id)?<BookmarkCheck size={17}/>:<Bookmark size={17}/>} {saved.includes(detail.id)?'已收藏 · 点击取消':'收藏此签证路径'}</button>
-     <button type="button" onClick={()=>toggleCompared(detail.id)}><GitCompareArrows size={17}/>{compared.includes(detail.id)?'已加入对比 · 点击移除':'加入对比（最多3项）'}</button>
-     <small>当前收藏和对比仅在本机浏览器保存，不代表已经接入 HHBA 账号系统。</small></div></aside>
-    </div><Alert/>
+    <header className="hhba-overseas-pathway-head">
+     <div className="hhba-overseas-eyebrow">{overseasCategoryLabels[detail.category]} · 澳大利亚 · {auVerifiedOn} 核验</div>
+     <h1>{detail.name}</h1>
+     <p className="hhba-overseas-eng">{detail.english}</p>
+     <p>{detail.summary}</p>
+     {detail.availability==='closed'&&<p className="hhba-overseas-reader-closed">当前登记关闭；已登记者请查看官方抽选进度。</p>}
+    </header>
+    <div className="hhba-overseas-reader-actions">
+     <a href={detail.availability==='closed'?(detail.secondaryUrl||detail.officialUrl):detail.officialUrl} target="_blank" rel="noopener noreferrer" className="hhba-overseas-reader-official">
+      {detail.availability==='closed'?'查看官方抽签状态':'查看内政部官方说明'} <ExternalLink size={15}/>
+     </a>
+     <button type="button" onClick={()=>toggleSaved(detail.id)} aria-label={saved.includes(detail.id)?'取消收藏此签证路径':'收藏此签证路径'}>
+      {saved.includes(detail.id)?<BookmarkCheck size={17}/>:<Bookmark size={17}/>}
+      {saved.includes(detail.id)?'已收藏':'收藏'}
+     </button>
+     <button type="button" onClick={()=>toggleCompared(detail.id)} aria-pressed={compared.includes(detail.id)}>
+      <GitCompareArrows size={17}/>{compared.includes(detail.id)?'已加入对比':'加入对比'}
+     </button>
+     <span className="hhba-overseas-reader-note">收藏与对比仅保存在当前浏览器</span>
+    </div>
+    <OverseasDetailedGuide key={detail.id} pathway={detail} guide={auCompleteGuidesV2[detail.id]}/>
+    <p className="hhba-overseas-reader-related">还想了解澳大利亚的大学和课程？
+     <Link to={root+'/legacy'}>打开原留学资料库 <ArrowRight size={14}/></Link>
+    </p>
    </>:<>{crumb('未找到方案')}<div className="hhba-overseas-empty"><h1>未找到此签证方案</h1><Link to={country}>返回澳大利亚全部方案 <ArrowRight size={16}/></Link></div></>}
   </main>}
   {view==='saved'&&<main className="hhba-overseas-container hhba-overseas-content">{crumb('我的收藏')}<div className="hhba-overseas-section-head"><div><h1>已收藏的澳大利亚方案</h1><p>存储在当前浏览器。跨设备同步尚未实现。</p></div></div><div className="hhba-overseas-path-grid">{auPathways.filter(x=>saved.includes(x.id)).map(cards)}</div>{!saved.length&&<div className="hhba-overseas-empty"><Bookmark size={24}/><h2>你还没有收藏澳大利亚方案</h2><Link to={country}>探索全部方案 <ArrowRight size={16}/></Link></div>}</main>}
