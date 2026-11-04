@@ -1,0 +1,28 @@
+name: HHBA Domestic Bookmark Guard Regression
+on:
+  push:
+    branches: [fix/pages-domestic-rebuild-savejob-gate-20261104]
+    paths:
+      - 'apps/web/scripts/domestic-rebuild-v2.contract.test.mjs'
+      - '.github/workflows/hhba-domestic-bookmark-guard.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/scripts/domestic-rebuild-v2.contract.test.mjs'
+      - 'apps/web/src/components/UnifiedJobMarket.tsx'
+      - '.github/workflows/hhba-domestic-bookmark-guard.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  domestic-rebuild-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify all domestic rebuild guard contracts and save actions
+        working-directory: apps/web
+        run: node scripts/domestic-rebuild-v2.contract.test.mjs
