@@ -1,4 +1,4 @@
-import {caOfficial,type CaGuideRoute,CaGuideLine} from './overseasCanadaA.ts';
+import {caOfficial,type CaGuideRoute,type CaGuideLine} from './overseasCanadaA.ts';
 const P=(a:string,b:string,c:string):CaGuideLine=>[a,b,c];
 export const caRoutesB:CaGuideRoute[]=[
 {id:'ca-pnp-base',name:'省提名 PNP · 非Express Entry基础通道',english:'Base Provincial Nominee Program (Non-Express Entry)',category:'residence',
