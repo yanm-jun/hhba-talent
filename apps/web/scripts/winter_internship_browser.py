@@ -39,7 +39,7 @@ with sync_playwright() as p:
     assert '/winter-internship' in page.url
     assert page.evaluate("localStorage.getItem('hhba:winter-internship-2027:hide:v1')") is None
     assert page.locator('[data-winter-job]').count()==10, '10 entries fit the first page, 12 verified-record rows total'
-    assert page.locator('[data-winter-program]').count()==4, 'unverified programme references must be secondary'
+    assert page.locator('[data-winter-program]').count()==5, 'unverified programme references must be secondary'
     assert page.locator('[data-winter-program-archive]').get_attribute('open') is None
     page.screenshot(path='/tmp/hhba-winter-directory-desktop.png',full_page=False)
     # Verify compact job rows and the three distinct original employer job links.
@@ -62,7 +62,7 @@ with sync_playwright() as p:
     assert page.locator('[data-winter-job]').count()==1
     page.get_by_role('button',name='重置').click()
     assert page.locator('[data-winter-job]').count()==10
-    assert '16 条具体岗位结果' in page.locator('.hhba-winter-list-summary').inner_text()
+    assert '25 条公开岗位及招聘批次结果' in page.locator('.hhba-winter-list-summary').inner_text()
     # Each real job opens a distinct internal role detail and first-party application URL.
     page.locator('[data-winter-job="hsbc-hk-student-placement-1367003857"]').get_by_role('link',name='岗位详情').click()
     assert 'hsbc-hk-student-placement-1367003857' in page.url
@@ -125,13 +125,13 @@ with sync_playwright() as p:
     assert page.get_by_role('link',name='前往企业官方岗位核实及申请').get_attribute('href')=='https://tzcpa.zhiye.com/intern/jobs'
     page.get_by_role('link',name='返回寒假实习岗位列表').click()
     page.get_by_role('button',name='下一页').click()
-    assert page.locator('[data-winter-job]').count()==6
+    assert page.locator('[data-winter-job]').count()==10
     page.locator('[data-winter-job="tianzh-international-xian-workcenter-j11175"]').get_by_role('link',name='岗位详情').click()
     assert page.get_by_role('link',name='查看补充招聘时间证据').get_attribute('href').startswith('https://www.shixiseng.com/')
     assert page.get_by_text('未证明为同一招聘编号',exact=False).count()>0
     page.get_by_role('link',name='返回寒假实习岗位列表').click()
     # Job detail and list are the same React route component; it preserves page 2 on return.
-    assert page.locator('[data-winter-job]').count()==6
+    assert page.locator('[data-winter-job]').count()==10
     page.locator('[data-winter-job="crowe-hk-spring-audit-2027-review"]').get_by_role('link',name='岗位详情').click()
     assert page.get_by_text('官方网页存在年度版本冲突',exact=False).count()>0
     assert page.get_by_role('link',name='前往企业官方岗位核实及申请').get_attribute('href').startswith('https://www.crowe.com/')
@@ -140,7 +140,7 @@ with sync_playwright() as p:
     assert page.locator('[data-winter-job]').count()==10
     # Batch 04: three companies and four additional records, on page two.
     page.get_by_role('button',name='下一页').click()
-    assert page.locator('[data-winter-job]').count()==6
+    assert page.locator('[data-winter-job]').count()==10
     for identifier in [
         'ey-tw-2027-peak-season-intake',
         'shinewing-hk-2027-winter-audit-tax-advisory',
@@ -167,6 +167,33 @@ with sync_playwright() as p:
     page.get_by_role('link',name='返回寒假实习岗位列表').click()
     page.get_by_role('button',name='上一页').click()
     assert page.locator('[data-winter-job]').count()==10
+    # Batch 05: page two carries four ReCube roles, page three the other three and two Papergames posts.
+    page.get_by_role('searchbox',name='搜索寒假实习具体岗位').fill('ReCube')
+    page.get_by_role('button',name='搜索岗位').click()
+    assert page.locator('[data-winter-job]').count()==7
+    assert page.get_by_text('高校公开冬季职位',exact=False).count()>=7
+    page.locator('[data-winter-job="recube-hk-winter-product-uiux-260900318"]').get_by_role('link',name='岗位详情').click()
+    assert page.get_by_text('2026 年 11 月 14 日',exact=False).count()>0
+    assert page.get_by_role('link',name='企业官网（非岗位直投）').get_attribute('href')=='https://www.recube.hk/'
+    assert page.get_by_role('link',name='查看高校公开职位与截止日').get_attribute('href').startswith('https://cpdc.osa.cuhk.edu.hk/')
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.get_by_role('button',name='重置').click()
+    page.get_by_role('button',name='下一页').click()
+    page.get_by_role('button',name='下一页').click()
+    assert page.locator('[data-winter-job]').count()==5,'25 records = 10+10+5'
+    for jobid in ['recube-hk-winter-hardware-260900322','recube-hk-winter-website-designer-260900317','recube-hk-winter-data-ai-260900320','papergames-shanghai-recruiting-game-rd-intern-2027-review','papergames-shanghai-nikki-world-ecology-planning-280350']:
+        assert page.locator(f'[data-winter-job="{jobid}"]').count()==1,jobid
+    page.locator('[data-winter-job="papergames-shanghai-nikki-world-ecology-planning-280350"]').get_by_role('link',name='岗位详情').click()
+    assert page.get_by_text('每周5天',exact=False).count()>0
+    assert page.get_by_role('link',name='查看补充招聘时间证据').get_attribute('href').startswith('https://www.deizao.cn/')
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    page.get_by_role('button',name='上一页').click()
+    page.get_by_role('button',name='上一页').click()
+    assert page.locator('[data-winter-job]').count()==10
+    page.locator('[data-winter-program-archive] summary').click()
+    page.locator('[data-winter-program="cmb-guangzhou-2027-winter-internship-review"]').get_by_role('link',name='项目资料与官网').click()
+    assert page.get_by_text('2026寒假',exact=False).count()>0
+    page.get_by_role('link',name='返回寒假实习岗位列表').click()
     # Old employer programmes still have working detail pages, but are not jobs.
     page.locator('[data-winter-program-archive] summary').click()
     assert page.locator('[data-winter-program-archive]').get_attribute('open') is not None
