@@ -213,10 +213,10 @@ with sync_playwright() as p:
     # the campaign, even after a new page, reload, or internal navigation.
     legacy=browser.new_context(viewport={"width":1280,"height":800})
     legacy_page=legacy.new_page()
-    legacy_page.add_init_script("""() => {
+    legacy_page.add_init_script("""(() => {
         localStorage.setItem('hhba:winter-internship-2027:hide:v1','1');
         sessionStorage.setItem('hhba:winter-internship-2027:seen:v1','1');
-    }""")
+    })();""")
     legacy_page.goto(BASE,wait_until='domcontentloaded',timeout=60000)
     legacy_dialog=legacy_page.locator('[data-hhba-winter-modal] [role=dialog]')
     legacy_dialog.wait_for(timeout=15000)
