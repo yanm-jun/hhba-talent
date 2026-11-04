@@ -41,9 +41,14 @@ test('two country page detail routes use shared guide, not original 5-point shal
  assert.match(nz,/OverseasDetailedGuide key=\{chosen.id\}/);
  assert.match(au,/OverseasDetailedGuide key=\{detail.id\}/);
  assert.ok(component.includes('09')&&component.includes('10'));
- assert.ok(component.includes('details')&&component.includes('核对'));
- assert.ok(component.includes('type="checkbox"'));
- assert.ok(css.includes('@media(max-width:760px)'));
+ assert.ok(component.includes('hhba-guide-v2-toc')&&component.includes('hhba-guide-inline-term'));
+ assert.ok(component.includes('hhba-guide-v2-howto')&&component.includes('hhba-guide-v2-faq'));
+ assert.ok(!component.includes('type="checkbox"'));
+ assert.ok(!component.includes('hhba-guide-v2-termgrid'));
+ assert.ok(css.includes('@media(max-width:840px)'));
+ assert.ok(nz.includes('hhba-overseas-reader-page')&&au.includes('hhba-overseas-reader-page'));
+ assert.ok(!nz.includes('hhba-overseas-detail-layout')&& !au.includes('hhba-overseas-detail-layout'));
+ assert.ok(!nz.includes('hhba-overseas-detail-aside')&& !au.includes('hhba-overseas-detail-aside'));
 });
 test('gov source interpretation is explicit: NZ Tier1 age and IQA, 189 65 not auto invitation, China 462 ballot ongoing',()=>{
  const nz=JSON.stringify(nzCompleteGuidesV2['nz-green-tier1']);
