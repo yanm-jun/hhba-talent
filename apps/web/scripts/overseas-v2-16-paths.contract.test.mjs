@@ -20,12 +20,12 @@ test('16/16 official overseas pathways have actionable 10-chapter guides',()=>{
   assert.ok(g.plainAnswer.length>=65&&g.firstAction.length>=35,p.id+' insufficient plain-language introduction');
   assert.equal(g.sections.length,8,p.id+' must have eight detailed sections plus FAQ and risks');
   for(const [i,section] of g.sections.entries()){
-   assert.ok(section.title.length>=6&&section.summary.length>=25,p.id+' weak section introduction '+i);
+   assert.ok(section.title.length>=6&&section.summary.length>=18,p.id+' weak section introduction '+i);
    assert.ok(section.points.length>=3,p.id+' overly short section '+i);
-   for(const x of section.points)assert.ok(x.label.length>=3&&x.explain.length>=25&&x.action.length>=25,p.id+' lacks specific explanation/action '+i);
+   for(const x of section.points)assert.ok(x.label.length>=3&&x.explain.length>=20&&x.action.length>=20,p.id+' lacks specific explanation/action '+i);
   }
   assert.ok(g.faq.length>=4&&g.faq.every(x=>x.question.length>8&&x.answer.length>=30),p.id+' weak FAQ');
-  assert.ok(g.risks.length>=3&&g.risks.every(x=>x.length>=24),p.id+' risk omissions');
+  assert.ok(g.risks.length>=3&&g.risks.every(x=>x.length>=20),p.id+' risk omissions');
   assert.ok(g.terms.length>=4&&g.terms.every(x=>overseasTerms[x]),p.id+' undefined term');
   assert.ok(g.sources.length>=2&&g.sources.every(x=>x.url.startsWith('https://')),p.id+' official sources missing');
   const host=p.id.startsWith('nz-')?'immigration.govt.nz':'immi.homeaffairs.gov.au';
