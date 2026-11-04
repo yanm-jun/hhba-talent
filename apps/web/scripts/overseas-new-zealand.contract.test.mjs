@@ -46,9 +46,9 @@ test('原有大学资料路由保留，新首页/国家/详情/收藏/对比接�
  assert.ok(page.includes('官方当前关闭'));
  assert.ok(page.includes("to={root+'/legacy'}"));
 });
-test('8国展示，新西兰、澳大利亚和日本已收录，其余国家仍为规划中',()=>{
+test('8国展示，新西兰、澳大利亚、日本与德国已收录，其余国家仍为规划中',()=>{
  assert.equal(overseasCountryOptions.length,8);
- assert.deepEqual(overseasCountryOptions.filter(c=>c.ready).map(c=>c.code),['nz','au','jp']);
+ assert.deepEqual(overseasCountryOptions.filter(c=>c.ready).map(c=>c.code),['nz','au','jp','de']);
  assert.ok(css.includes('@media(max-width:760px)'));
  assert.ok(css.includes('.hhba-overseas-path-grid'));
 });
