@@ -9,7 +9,9 @@
 - 总候选记录：**54**。
 - 原来已在寒假专区：**3**（毕马威、德勤、APCO）。
 - 第一批本分支新增：**3**（安永中国、普华永道香港、汇丰香港）。
-- 后续待官网逐项核验：**48**。
+- 第二批新增具体岗位：**3 家企业、5 个独立官方招聘职位**（BDO 香港 2、AtkinsRéalis 香港 1、RSM 香港 2），开发分支 `feature/winter-internships-batch02-bdo-atkins-rsm-20261104`。
+- 后续待官网逐项核验：**45** 条候选（54 候选记录中已有原专区3 + 第一批3 + 第二批3）。
+- **岗位统计与企业统计分开**：前一批已收录具体岗位 3 个（APCO、HSBC、QIMA），第二批后为 8 条具体岗位；QIMA 不在原 54 企业候选里，因此不计入54完成数。
 - **摩根大通**旧站内另有一条 *2027 China Seasonal Internship*，不属于本次54条候选。已有证据提示它的部分岗位是夏秋入职，单独列入纠错队列，不应自动算作寒假已核实岗位。
 
 ## 开发规则
@@ -30,8 +32,8 @@
 | 4 | Crowe 国富浩华 | 中国香港 | 待官方核验 | 核对2027春季审计实习 |
 | 5 | 信永中和 SHINEWING | 中国香港 | 待官方核验 | 核对2027年1—4月实习 |
 | 6 | 历峰集团 Richemont | 中国香港 | 待官方核验 | 核对Winter Internship招聘计划 |
-| 7 | AtkinsRéalis | 中国香港 | 待官方核验 | 核对冬季招聘入口及日期 |
-| 8 | BDO | 中国香港 | 待官方核验 | 核对2027年春季鉴证 |
+| 7 | AtkinsRéalis | 中国香港 | 第2批已开发 | 官网有冬季工程实习 R-164310，具体入职日期待确认 |
+| 8 | BDO | 中国香港 | 第2批已开发 | 官方两项独立岗位：鉴证截止11/20、IT审计截止11/30 |
 | 9 | ReCube | 中国香港 | 待官方核验 | 核对人工智能及软硬件实习 |
 | 10 | 德勤中国 Deloitte | 中国内地 | 已在原专区 | 已有冬季项目记录 |
 | 11 | 安永中国 EY | 中国内地 | 第1批已开发 | 官方有冬季计划，2027具体在招未核实 |
@@ -39,7 +41,7 @@
 | 13 | 汇丰 HSBC | 中国香港 | 第1批已开发 | 2027具体岗位；官方截止日期存在矛盾 |
 | 14 | 法国巴黎银行 BNP Paribas | 中国香港 | 待官方核验 | 核对2027年1—6月证券服务实习 |
 | 15 | LVMH 香水及美妆 | 中国香港 | 待官方核验 | 核对2027年1月营销实习 |
-| 16 | RSM 罗申美 | 中国香港 | 待官方核验 | 核对2027年春季审计实习 |
+| 16 | RSM 罗申美 | 中国香港 | 第2批已开发 | 2027春季审计及科技咨询两个官网职位，确切入职日期按官网核验 |
 | 17 | 永明金融 Sun Life | 中国香港 | 待官方核验 | 原记录截止日已过，查新批次 |
 | 18 | 宏利 Manulife | 中国香港 | 待官方核验 | 原记录截止日已过，查新批次 |
 | 19 | Informa Markets 英富曼 | 中国香港 | 待官方核验 | 核对2027年1—6月实习 |
@@ -84,3 +86,17 @@
 - **安永中国**：https://www.ey.com/en_cn/careers/student-programs-in-chinese-mainland — 官网显示 Winter Internship Program，2027具体批次日期未证实。
 - **普华永道香港**：https://www.pwccn.com/en/careers/students.html — 官方确认 Winter intake；https://pip.erg.cuhk.edu.hk/app.php/guest/jobs/posted — 高校招聘记录列出2027年1—6月具体方向。高校平台归档截止日可能晚于实习开始，不当成即时在招承诺。
 - **汇丰香港**：https://apply.careers.hsbc.com/emergingtalent/job/Central-HSBC-Student-Work-Placement-Hong/1367003857/ — 官方岗位确认2027年1月5日至6月30日；不同入口出现10月30与11月20两种截止日期，需以实际可提交状态为准。
+
+## 第二批证据入口（岗位优先）
+
+- **BDO 香港 · Spring Internship 2027 Assurance**：官网独立岗位 [鉴证招聘](https://recruitment.bdo.com.hk/Apply/JobDetail.aspx?qs=oPaEsT8Oae0cgQ5ubvSQIQ%3D%3D)，1月至4月，公告截止2026-11-20。
+- **BDO 香港 · Spring Internship 2027 IT Audit**：官网独立岗位 [信息技术审计招聘](https://recruitment.bdo.com.hk/Apply/JobDetail.aspx?qs=Y8N698+gXg1C1B5645zuhg%3D%3D)，1月至4月，公告截止2026-11-30。两者不同职位不可合并，也不能复制城市拆岗位。
+- **AtkinsRéalis 香港**：官网单一 [Winter Internship R-164310](https://careers.atkinsrealis.com/fr-fr/jobs/winter-internship-r-164310)，涵盖土木、电气、机械、环境等多业务线，**13个业务方向不是13个独立职位**，实习具体入职时间未公开。
+- **RSM 香港审计鉴证**：官网独立 [2027 Spring Interns Audit & Assurance](https://www.rsm.global/hongkong/assurance/en/2027-spring-interns-audit-assurance-services)，官网说明为春季约三个月；第三方招聘页面标注1月至4月初，实际开始日按雇主核对。
+- **RSM 香港科技与管理咨询**：官网独立 [2027 Spring Interns Technology & Management Consulting](https://www.rsm.global/hongkong/assurance/en/2027-spring-interns-technology-management-consulting-services)，官网未列统一起止日；第三方职位显示1月至4月期间可工作，HHBA 标明日期仍待雇主确认。
+
+### 候选质量纠偏
+
+- **Crowe 香港（国富浩华）**：搜索索引曾出现 2027，但官网实时页面 [英文版](https://www.crowe.com/hk/careers/internship) 仍标为 Spring Internship **2026**。暂不计入2027已核实岗位。
+- **法国巴黎银行**：官方 [Securities Services 2027](https://group.bnpparibas/en/careers/job-offer/2027-apac-long-internship-january-june-securities-services-hong-kong) 已标为岗位招满，不能宣传仍可申请。
+- **LVMH 香港**：官方 [2027年1月入职的香水美妆实习](https://www.lvmh.com/fr/nous-rejoindre/nos-offres/SSCPC02515) 公布申请截止 2026-10-16，需标为过期线索，不在可申请岗位中凑数。
