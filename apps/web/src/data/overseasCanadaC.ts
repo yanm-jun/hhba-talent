@@ -1,4 +1,4 @@
-import {caOfficial,type CaGuideRoute,CaGuideLine} from './overseasCanadaA.ts';
+import {caOfficial,type CaGuideRoute,type CaGuideLine} from './overseasCanadaA.ts';
 const P=(a:string,b:string,c:string):CaGuideLine=>[a,b,c];
 export const caRoutesC:CaGuideRoute[]=[
 {id:'ca-francophone-mobility',name:'法语流动工签 C16 · 魁省以外雇主',english:'Francophone Mobility Work Permit (LMIA-exempt C16)',category:'work',
