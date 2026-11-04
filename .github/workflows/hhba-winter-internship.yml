@@ -1,7 +1,7 @@
 name: HHBA Winter Internship Popup and Directory Acceptance
 on:
   pull_request:
-    branches: [main]
+    branches: [main, 'feature/winter-internships-batch01-ey-pwc-hsbc-20261104']
     paths:
       - 'apps/web/src/pages/HomePage.tsx'
       - 'apps/web/src/main.tsx'
@@ -10,6 +10,7 @@ on:
       - 'apps/web/src/components/HomeOpenLetter.tsx'
       - 'apps/web/scripts/home-open-letter.contract.test.mjs'
       - 'apps/web/src/data/winter2027Programs.ts'
+      - 'apps/web/src/data/winter2027Jobs.ts'
       - 'apps/web/src/styles/winter-internship.css'
       - 'apps/web/scripts/winter-internship.contract.test.mjs'
       - 'apps/web/scripts/winter_internship_browser.py'
