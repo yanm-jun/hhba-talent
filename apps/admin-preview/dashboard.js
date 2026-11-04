@@ -220,24 +220,59 @@ async function refresh(){
   btn.lastChild.textContent=' 刷新数据';
  }
 }
+// Investor exports must reconcile with the protected aggregation API, not stale placeholders.
+// Every row is aggregate-only; absent authorization or missing fields remain unavailable.
+function buildVerifiedInvestorRows(data,report){
+ const whole=n=>Number.isSafeInteger(n)&&n>=0;
+ const value=n=>whole(n)?String(n):'未采集或未授权';
+ const sourceTime=t=>typeof t==='string'&&Number.isFinite(Date.parse(t))?t:'';
+ const account=report?.account?.quality==='collected'?report.account:null;
+ const activity=report?.activity?.quality==='collected'?report.activity:null;
+ const traffic=report?.traffic?.quality==='collected'?report.traffic:null;
+ const devices=report?.devices?.quality==='collected'?report.devices:null;
+ const privateTime=sourceTime(report?.asOf);
+ const range=report?.period&&/^\d{4}-\d{2}-\d{2}$/.test(report.period.start||'')&&
+   /^\d{4}-\d{2}-\d{2}$/.test(report.period.end||'')
+   ?report.period.start+' 至 '+report.period.end+'（UTC）':'所选时间范围';
+ const retention=entry=>{
+  if(!activity||!entry||!whole(entry.eligible)||!whole(entry.returned))return '未采集或未授权';
+  if(entry.eligible===0)return '样本不足';
+  if(typeof entry.rate!=='number'||!Number.isFinite(entry.rate)||entry.returned>entry.eligible)return '未采集或未授权';
+  return entry.rate.toFixed(2)+'%（'+entry.returned+'/'+entry.eligible+'）';
+ };
+ return [
+  ['HHBA 融资只读数据快照','指标值','统计口径','来源时间（ISO 8601）'],
+  ['公开索引记录',value(data.counts.indexedJobs),data.definitions.indexedJobs,sourceTime(data.asOf)],
+  ['可展示记录',value(data.counts.displayableJobs),data.definitions.displayableJobs,sourceTime(data.asOf)],
+  ['已核验官网任职要求',value(data.counts.auditedJobRequirements),data.definitions.auditedJobRequirements,sourceTime(data.auditCheckedAt)],
+  ['去重收录企业',value(data.counts.distinctIndexedCompanies),data.definitions.distinctIndexedCompanies,sourceTime(data.asOf)],
+  ['已审计 ATS 来源',value(data.counts.checkedAtsSources),data.definitions.checkedAtsSources,sourceTime(data.auditCheckedAt)],
+  ['失败 ATS 来源',value(data.counts.failedAtsSources),data.definitions.failedAtsSources,sourceTime(data.auditCheckedAt)],
+  ['累计真实求职者账号',value(account?.registeredUsers),'Cloudflare PNVS 真实 candidate 账户总数；不等于活跃人数',account?privateTime:''],
+  ['区间新增求职者',value(account?.newRegistered),'PNVS 真实注册时间，'+range,account?privateTime:''],
+  ['账号当前收藏岗位数',value(account?.savedJobs),'Cloudflare PNVS 真实账号收藏关系总数；当前快照，与日期筛选无关',account?privateTime:''],
+  ['有账号收藏的求职者',value(account?.accountsWithSavedJobs),'具有至少一条真实账号收藏关系的去重求职者数',account?privateTime:''],
+  ['账号 DAU',value(activity?.dau),'UTC 今日去重活跃；仅已登录且同意账号统计用户',activity?privateTime:''],
+  ['账号 WAU',value(activity?.wau),'截至 UTC 今日，最近 7 天去重活跃；仅已同意统计账号',activity?privateTime:''],
+  ['账号 MAU',value(activity?.mau),'截至 UTC 今日，最近 30 天去重活跃；仅已同意统计账号',activity?privateTime:''],
+  ['区间授权活跃账号',value(activity?.periodActive),'经同意的账号功能使用去重，'+range,activity?privateTime:''],
+  ['首次活跃次日回访率',retention(activity?.firstSeenRetention?.d1),'以首次记录的同意活跃日为基准，不是注册次日留存；括号为回访/成熟样本',activity?privateTime:''],
+  ['首次活跃第七日回访率',retention(activity?.firstSeenRetention?.d7),'以首次记录的同意活跃日为基准，不是注册七日留存；括号为回访/成熟样本',activity?privateTime:''],
+  ['同意访问 PV',value(traffic?.pv),'Cloudflare D1 匿名同意页面浏览，按分钟去重，'+range,traffic?privateTime:''],
+  ['设备有效收藏',value(devices?.savedJobs),'Cloudflare D1 设备级收藏；不是登录账号收藏，不应相加',devices?privateTime:''],
+  ['真实收入','未接入','未接入可核验财务台账，不以岗位、访问或收藏估算收入','']
+ ];
+}
 function exportCSV(){
  const data=snapshot;
  if(!data||!['current','partial'].includes(data.quality)||data.kind!=='HHBA_PUBLIC_RECRUITMENT_OVERVIEW_V2')return;
- const rows=[
-  ['HHBA 融资只读数据快照','指标值','统计口径','来源时间（ISO 8601）'],
-  ['公开索引记录',String(data.counts.indexedJobs),data.definitions.indexedJobs,data.asOf],
-  ['可展示记录',String(data.counts.displayableJobs),data.definitions.displayableJobs,data.asOf],
-  ['已核验官网任职要求',String(data.counts.auditedJobRequirements),data.definitions.auditedJobRequirements,data.auditCheckedAt],
-  ['去重收录企业',String(data.counts.distinctIndexedCompanies),data.definitions.distinctIndexedCompanies,data.asOf],
-  ['已审计 ATS 来源',String(data.counts.checkedAtsSources),data.definitions.checkedAtsSources,data.auditCheckedAt],
-  ['失败 ATS 来源',String(data.counts.failedAtsSources),data.definitions.failedAtsSources,data.auditCheckedAt],
-  ['累计注册用户','未接入','生产邮箱用户尚未启用',''],
-  ['真正 DAU/MAU','未接入','生产账号活跃数据未接通',''],
-  ['真实收入','未接入','未接入财务台账','']
- ];
- if(growth?.traffic?.quality==='collected')rows.push(['同意访问 PV',String(growth.traffic.pv),'Cloudflare D1 同意采集，按分钟去重',growth.asOf]);
- if(growth?.devices?.quality==='collected')rows.push(['设备有效收藏',String(growth.devices.savedJobs),'Cloudflare D1 设备维度，非用户账户收藏',growth.asOf]);
- const csv='\uFEFF'+rows.map(row=>row.map(cell=>'"'+String(cell).replaceAll('"','""')+'"').join(',')).join('\r\n');
+ const rows=buildVerifiedInvestorRows(data,growth);
+ // Prevent spreadsheet formula injection from a compromised upstream description.
+ const csv='\uFEFF'+rows.map(row=>row.map(cell=>{
+  const raw=String(cell??'');
+  const safe=/^\s*[=+\-@]/.test(raw)?"'"+raw:raw;
+  return '"'+safe.replaceAll('"','""')+'"';
+ }).join(',')).join('\r\n');
  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
  const a=document.createElement('a');a.href=url;a.download='HHBA-verified-overview.csv';
  document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
