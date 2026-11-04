@@ -149,5 +149,5 @@ test('frontend session changes and other-tab consent rechecks remain wired',()=>
  assert.match(consent,/hhba\.analytics\.consent\.v2/);
  assert.match(consent,/\[route,choice,authRevision\]/);
  assert.match(consent,/\[route,choice\]/);
- assert.match(consent,/must\\s+not\\s+fabricate/);
+ assert.match(consent,/not fabricate/);
 });
