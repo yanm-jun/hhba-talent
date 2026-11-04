@@ -211,7 +211,7 @@ with sync_playwright() as p:
     assert page.get_by_text('2026年11月1日',exact=False).count()>0
     page.get_by_role('link',name='返回寒假实习岗位列表').click()
     page.get_by_role('button',name='重置').click()
-    page.get_by_role('searchbox',name='搜索寒假实习具体岗位').fill('Informa')
+    page.get_by_role('searchbox',name='搜索寒假实习具体岗位').fill('L059656859')
     page.get_by_role('button',name='搜索岗位').click()
     assert page.locator('[data-winter-job]').count()==1
     page.locator('[data-winter-job="informa-markets-hk-2027-jan-jun-intern-l059656859"]').get_by_role('link',name='岗位详情').click()
