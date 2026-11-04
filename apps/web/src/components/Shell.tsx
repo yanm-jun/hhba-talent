@@ -1,13 +1,14 @@
-import {ArrowUpRight,Building2,BriefcaseBusiness} from 'lucide-react';
-import type {MouseEvent} from 'react';
+import {ArrowRight,ArrowUpRight,Building2,BriefcaseBusiness,Search} from 'lucide-react';
+import {useState,type MouseEvent} from 'react';
 import {recruitmentTarget,rememberRecruitment} from '../services/recruitmentOutbound';
-import { Link, useNavigate, useRoute } from '../router';
+import { Link, navigate, useNavigate, useRoute } from '../router';
 import {employerApiReady,type User} from '../services/api';
 import {realAuthReady} from '../services/realAuth';
 import { CandidateAccountDropdown } from './CandidateAccountDropdown';
 import { BrandMark } from './BrandMark';
 import '../styles/demo-nav.css';
 import '../styles/experience-navigation.css';
+import '../styles/site-search.css';
 
 // Navigation is contextual: a public landing page is not a candidate account
 // and a recruiter is NEVER granted the internal HHBA reviewer/admin role.
@@ -25,6 +26,16 @@ function StudyAbroadNavLink({active}:{active:boolean}){
 }
 function TalentPolicyNavLink({active}:{active:boolean}){
  return <Link className="auth hhba-talent-policy-nav" to="/talent-service" aria-current={active?'page':undefined}>人才政策</Link>;
+}
+function HeaderSiteSearch(){
+ const [value,setValue]=useState('');
+ return <form className="hhba-header-site-search" role="search" aria-label="HHBA 全站搜索"
+   onSubmit={event=>{event.preventDefault();navigate('/search'+(value.trim()?'?q='+encodeURIComponent(value.trim().slice(0,100)):''));}}>
+   <Search aria-hidden="true" size={16}/>
+   <input type="search" name="q" value={value} maxLength={100} onChange={event=>setValue(event.target.value)}
+     aria-label="搜索 HHBA 站内所有公开内容" placeholder="搜索 HHBA 全站…" />
+   <button type="submit" aria-label="提交全站搜索"><ArrowRight size={15}/></button>
+ </form>;
 }
 export function Shell({ user, children }: { user: User | null; children: React.ReactNode }) {
  const navigate=useNavigate();
@@ -74,6 +85,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
     {experience==='employer'&&<span className="hhba-experience-label">企业端</span>}
    </div>
    {experience==='public'?<nav aria-label="公共网站导航">
+     <HeaderSiteSearch/>
      <StudyAbroadNavLink active={route.startsWith('/study-abroad')}/>
      <TalentPolicyNavLink active={route.startsWith('/talent-service')}/>
      <Link className="auth" to="/candidate/jobs">招聘市场</Link>
@@ -83,6 +95,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
        recruiterSignedIn?<Link className="hhba-nav-account" to="/employer/hub">企业账户</Link>:
        <Link className="hhba-nav-account" to="/auth">登录 / 注册</Link>}
    </nav>:experience==='candidate'?<nav aria-label="求职者服务导航">
+     <HeaderSiteSearch/>
      <StudyAbroadNavLink active={route.startsWith('/study-abroad')}/>
      <TalentPolicyNavLink active={route.startsWith('/talent-service')}/>
      <Link className="auth" to="/candidate/jobs">招聘市场</Link>
@@ -93,6 +106,7 @@ export function Shell({ user, children }: { user: User | null; children: React.R
        <Link className="hhba-nav-account" to="/candidate/account">{user?.display_name||'个人中心'}</Link>
       </>:<Link className="hhba-nav-account" to="/auth">登录 / 注册</Link>}
    </nav>:<nav aria-label="企业招聘与治理导航">
+     <HeaderSiteSearch/>
      <StudyAbroadNavLink active={route.startsWith('/study-abroad')}/>
      <TalentPolicyNavLink active={route.startsWith('/talent-service')}/>
      <Link className="auth" to="/employer/start">企业服务</Link>

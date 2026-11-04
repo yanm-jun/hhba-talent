@@ -1,0 +1,44 @@
+/* HHBA unified public-content search, intentionally scoped away from legacy search components. */
+.hhba-header-site-search{display:flex;align-items:center;gap:6px;width:clamp(160px,18vw,230px);min-width:142px;height:36px;border:1px solid #d9e3eb;border-radius:9px;background:#fff;padding:0 6px 0 10px;color:#6a7a8b;transition:border-color .18s,box-shadow .18s}
+.hhba-header-site-search:focus-within{border-color:#4783bc;box-shadow:0 0 0 3px #287bc417}
+.hhba-header-site-search input{min-width:0;width:100%;flex:1;border:0;background:transparent;outline:0;font-size:12px;color:#253b54;padding:7px 0}
+.hhba-header-site-search input::placeholder{color:#8190a0}
+.hhba-header-site-search button{display:inline-flex;align-items:center;justify-content:center;border:0;background:#f3f7fa;color:#34566e;width:25px;height:25px;border-radius:6px;padding:0;flex:none}
+.hhba-header-site-search button:hover{background:#e6eff8}
+.hhba-site-search-page{max-width:1100px;margin:48px auto 70px;color:#20354b}
+.hhba-site-search-eyebrow{font-size:11px;font-weight:750;letter-spacing:.12em;color:#448061}
+.hhba-site-search-page h1{font-size:clamp(27px,4vw,40px);margin:8px 0 12px}
+.hhba-site-search-intro{font-size:14px;color:#60748a;margin:0 0 23px}
+.hhba-site-search-main{display:flex;align-items:center;gap:12px;padding:9px 10px 9px 17px;border-radius:13px;border:1px solid #d9e2eb;background:#fff;box-shadow:0 7px 25px #14283b0b}
+.hhba-site-search-main>svg{color:#5885a7;flex:none}
+.hhba-site-search-main input{width:100%;min-width:0;flex:1;padding:10px 1px;border:0;outline:0;background:transparent;font-size:15px;color:#22364e}
+.hhba-site-search-main button{display:flex;align-items:center;gap:7px;justify-content:center;white-space:nowrap;background:#28674d;border:0;color:white;border-radius:9px;padding:11px 17px;font-weight:700;font-size:13px}
+.hhba-site-search-tabs{display:flex;gap:9px;flex-wrap:wrap;margin:22px 0 18px}
+.hhba-site-search-tabs button,.hhba-site-search-chips button{border:1px solid #dce3e9;border-radius:25px;background:#fff;padding:9px 14px;color:#52667a;font-size:12px}
+.hhba-site-search-tabs button.active{background:#eaf3ee;color:#276348;border-color:#a8cbb6;font-weight:700}
+.hhba-site-search-count{font-size:13px;color:#697b8c;line-height:1.7;margin:0 0 14px}
+.hhba-site-search-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.hhba-site-search-result{display:flex;flex-direction:column;gap:10px;text-decoration:none;background:#fff;border:1px solid #e2e8ee;border-radius:13px;padding:18px;min-width:0;transition:border-color .2s,box-shadow .2s}
+.hhba-site-search-result:hover{border-color:#8eb79f;box-shadow:0 9px 24px #1c32250d}
+.hhba-site-search-result>div{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.hhba-site-search-kind{font-size:11px;font-weight:750;color:#2b7554;background:#eef7f0;border-radius:5px;padding:5px 8px}
+.hhba-site-search-result small{font-size:11px;color:#8694a1}
+.hhba-site-search-result h2{font-size:16px;line-height:1.45;color:#213b53;margin:0}
+.hhba-site-search-result p{font-size:12px;color:#65798e;line-height:1.75;margin:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;word-break:break-word}
+.hhba-site-search-result-arrow{display:inline-flex;align-items:center;gap:6px;color:#2d7455;font-weight:700;font-size:12px;margin-top:auto}
+.hhba-site-search-paging{display:flex;align-items:center;justify-content:center;gap:15px;margin:25px 0}
+.hhba-site-search-paging button{background:#fff;border:1px solid #d8e0e7;border-radius:8px;padding:9px 16px;color:#355068}
+.hhba-site-search-paging button:disabled{opacity:.4;cursor:not-allowed}
+.hhba-site-search-guide,.hhba-site-search-empty{background:#fff;border:1px solid #e2e8ee;border-radius:13px;padding:26px;margin-top:24px}
+.hhba-site-search-guide h2{font-size:16px;margin:0 0 18px}
+.hhba-site-search-chips{display:flex;flex-wrap:wrap;gap:10px}
+.hhba-site-search-empty{display:grid;justify-items:center;text-align:center;gap:8px;color:#718295}
+.hhba-site-search-empty strong{color:#2b3b4b}
+.hhba-site-search-empty p{font-size:13px}
+.hhba-site-search-warning{border:1px solid #ead7bd;border-radius:9px;padding:12px;background:#fffaf2;color:#79572c;font-size:12px}
+.hhba-site-search-more{display:flex;align-items:center;gap:10px;background:#eef5f0;border-radius:10px;padding:14px;margin-top:22px;font-size:12px;color:#4d6d5a;flex-wrap:wrap}
+.hhba-site-search-more a{display:inline-flex;gap:6px;align-items:center;color:#275f44;font-weight:700;text-decoration:none}
+.hhba-site-search-disclaimer{margin:30px 0;display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.7;color:#80909e}
+.hhba-site-search-disclaimer svg{flex:none;margin-top:2px}
+@media(max-width:960px){.hhba-header-site-search{width:180px}.hhba-experience-header>nav{gap:7px}}
+@media(max-width:680px){.hhba-header-site-search{width:100%;min-width:100%;order:-1}.hhba-site-search-results{grid-template-columns:1fr}.hhba-site-search-page{margin:24px auto}.hhba-site-search-main{gap:7px;padding-left:12px}.hhba-site-search-main button{padding:11px 12px}.hhba-site-search-tabs{gap:6px}}
