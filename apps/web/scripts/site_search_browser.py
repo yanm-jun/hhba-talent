@@ -3,6 +3,7 @@ import os
 import time
 from pathlib import Path
 from urllib.request import urlopen
+from urllib.parse import quote
 from playwright.sync_api import sync_playwright
 
 BASE = os.environ.get("HHBA_SEARCH_PREVIEW_BASE", "http://127.0.0.1:4173/hhba-talent/")
@@ -34,13 +35,16 @@ with sync_playwright() as p:
     assert "q=" in page.url and "/search" in page.url, page.url
     page.screenshot(path="/tmp/hhba-global-search-results.png")
 
+    # Query the country name to include its actual published directional pages.
+    page.goto(BASE+"search?q="+quote("新西兰"), wait_until="domcontentloaded")
+    page.get_by_role("heading", name="新西兰硕士升学方向").wait_for(timeout=60000)
     # Prove canonical in-app detail navigation, not an external search engine.
     page.get_by_role("link").filter(has=page.get_by_role("heading", name="新西兰硕士升学方向")).first.click()
     page.get_by_role("heading", name="新西兰硕士升学方向").wait_for(timeout=60000)
     assert "/study-abroad/nz-masters" in page.url, page.url
 
     # A source-backed public policy must also be discoverable.
-    page.goto(BASE+"search?q="+__import__("urllib.parse", fromlist=["quote"]).quote("济南"), wait_until="domcontentloaded")
+    page.goto(BASE+"search?q="+quote("济南"), wait_until="domcontentloaded")
     page.get_by_role("heading", name="搜索 HHBA").wait_for(timeout=60000)
     page.get_by_role("button", name="人才政策", exact=True).click()
     assert page.locator(".hhba-site-search-result").count() > 0, "city policy search returned no records"
