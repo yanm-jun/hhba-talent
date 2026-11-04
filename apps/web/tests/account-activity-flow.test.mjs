@@ -141,6 +141,9 @@ test('disabled production feature is unknown, not faked user activity',async()=>
  assert.equal(state.activities.size,0);
 });
 test('frontend session changes and other-tab consent rechecks remain wired',()=>{
+ const market=readFileSync(new URL('../src/components/UnifiedJobMarket.tsx',import.meta.url),'utf8');
+ assert.match(market,/trackEvent\('job_search','\/candidate\/jobs'\)/);
+ assert.match(market,/hasEditedSearch\.current&&draft\.trim\(\)\.length>=2/);
  const auth=readFileSync(new URL('../src/services/realAuth.ts',import.meta.url),'utf8');
  const consent=readFileSync(new URL('../src/components/AnalyticsConsent.tsx',import.meta.url),'utf8');
  assert.match(auth,/announceRealAuthChange\(\);/);

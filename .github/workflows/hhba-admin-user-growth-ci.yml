@@ -7,6 +7,7 @@ on:
       - "apps/web/src/services/realAuth.ts"
       - "apps/web/src/services/savedJobs.ts"
       - "apps/web/src/components/AnalyticsConsent.tsx"
+      - "apps/web/src/components/UnifiedJobMarket.tsx"
       - "apps/web/d1/0008_account_growth_metrics.sql"
       - "apps/web/tests/account-growth.test.mjs"
       - "apps/web/tests/account-activity-flow.test.mjs"
