@@ -5,7 +5,7 @@
  * The programme-only catalogue lives in winter2027Programs.ts.
  * Posted ≠ currently accepting applications. Review before every production release.
  */
-export type WinterJobStatus='verify-apply'|'deadline-conflict'|'year-conflict'|'closed';
+export type WinterJobStatus='verify-apply'|'deadline-conflict'|'year-conflict'|'source-verify'|'winter-unverified'|'program-intake'|'closed';
 export type WinterJob={
  id:string;company:string;english:string;title:string;
  region:string;city:string;industry:string;location:string;
@@ -214,6 +214,79 @@ export const WINTER_2027_JOBS:ReadonlyArray<WinterJob>=[
   statusNote:'同一官网网址存在“2027近期检索”与“2026旧缓存”两版年份信息；不保证2027实习已开放',
   reviewWarning:'官方网页存在年度版本冲突：近期检索结果显示2027年1—3月，另有旧缓存显示2026年1—3月。请先核对企业官网当前正文并联系招聘方，不要直接把此条视为已开放的2027岗位。',
   workRightsNote:'中国香港实习岗位；如需在港工作许可，请提前与雇主确认资格及安排。'
+ },
+ {
+  id:'ey-tw-2027-peak-season-intake',company:'安永台湾 EY',english:'EY Taiwan',
+  title:'2027 旺季实习｜审计、税务、咨询与策略交易（统一申请批次）',
+  region:'中国台湾',city:'台北及其他办公城市',industry:'审计咨询',location:'台北、桃园、新竹、台中、台南、高雄（依业务部门开放地区）',
+  startDate:'2027 年 1 月 18 日',period:'2027 年 1 月 18 日—5 月 31 日；寒假周一至周五到岗，开学后至少每周 3 个整天',
+  deadline:'企业官方 2027 批次截止 2026 年 11 月 8 日 23:59（台湾当地时间）；投递前核实当前系统状态',
+  description:'安永台湾官方 2027 旺季实习招募项目，涉及审计服务、税务服务、咨询服务、策略与交易咨询服务四个业务方向。官方网站引导申请者到校园招聘系统选择具体职缺；本条只代表同一批次统一入口，未取得四个可核验的独立岗位编号，不拆分为四个虚拟岗位。',
+  requirements:['日间部大学四年级或硕士二年级在读学生。','2027 年 1 月 18 日起可到岗，寒假期间周一至周五完整工作天；开学后每周至少 3 个完整工作天。','需在安永校园招聘系统提交履历，并依官方公告完成基本信息表单等步骤。','具体业务方向、办公地、实习职位名称与可投递状态以官方系统为准。'],
+  majorTags:['会计学','审计学','金融学','财务管理','税收学','工商管理','经济学','咨询'],
+  tags:['安永','EY','台湾','2027','旺季实习','审计','税务','策略','交易咨询','冬季'],
+  sourceUrl:'https://www.ey.com/zh_tw/careers/ey-peak-season-internship-program',
+  applyUrl:'https://www.ey.com/zh_tw/careers/ey-peak-season-internship-program',
+  evidenceUrl:'https://www.nycu.edu.tw/osa/ch/app/data/view?id=5115&module=nycu0106&serno=ed73e51c-e789-4f56-a694-6e254f13cc1a',
+  checkedOn:'2026-11-04',status:'program-intake',
+  statusNote:'官网公示 2027 旺季实习计划及统一申请入口，业务部门按一条招聘计划记录；官网旧缓存曾显示2026年版，2026-11-03高校招聘公告交叉确认2027批次。',
+  reviewWarning:'此记录为安永统一招聘批次，不是四个带独立招聘编号的岗位。不同搜索缓存出现2026旧版，请在官网及校园招募系统核对当前2027批次与实际可申请职位。',
+  salaryNote:'高校 2026-11-03 招聘公告写时薪新台币 230 元，雇主实际支付与合同条款以官方规定为准。'
+ },
+ {
+  id:'shinewing-hk-2027-winter-audit-tax-advisory',company:'信永中和香港 SHINEWING',english:'SHINEWING (HK) CPA Limited',
+  title:'2027 Winter Internship – Audit / Tax / Advisory Team',
+  region:'中国香港',city:'香港',industry:'审计咨询',location:'香港·铜锣湾',
+  startDate:'2027 年 1 月',period:'2027 年 1—4 月，约 4 个月全职',
+  deadline:'招聘平台标记临近截止，具体截止日期及可申请状态以原职位页核实',
+  description:'信永中和香港在香港招聘平台公开刊登的 2027 冬季实习：参与 IPO、年度审计、税务合规及风险咨询等工作。这是一个跨审计、税务和咨询团队的综合实习职位，不按方向拆成多个独立岗位。',
+  requirements:['在读本科生或硕士生，会计、财务或其他商科相关背景优先，大一也可申请。','具有良好的英语、普通话和广东话沟通能力。','能在 2027 年 1 至 4 月连续全职实习，部分工作可能涉及出差。','招聘状态及官网报名方式需向雇主核对。'],
+  majorTags:['会计学','审计学','财务管理','金融学','工商管理','经济学'],
+  tags:['信永中和','SHINEWING','香港','审计','税务','咨询','2027','Winter'],
+  sourceUrl:'https://www.shinewing.hk/en/Career/',
+  applyUrl:'https://www.shinewing.hk/en/Career/',
+  evidenceUrl:'https://hk.jobsdb.com/ShineWing-jobs/in-Hong-Kong-SAR',
+  checkedOn:'2026-11-04',status:'source-verify',
+  statusNote:'第三方招聘平台近期刊登雇主名称及2027年1—4月岗位，企业官网职业页确认有实习计划，但未提供同一招聘记录的独立直投链接。',
+  reviewWarning:'具体2027职位由 Jobsdb 招聘记录核实，企业官网职业页仅展示招聘/实习计划，不能认定官网当前可直接投递该岗位。请查看补充招聘证据并联系雇主核对。', 
+  workRightsNote:'香港职位；香港以外求职者应先核对实习工作资格及签证安排。'
+ },
+ {
+  id:'shinewing-hk-2027-tax-business-advisory-l0607873647',company:'信永中和香港 SHINEWING',english:'SHINEWING (HK) CPA Limited',
+  title:'Internship – Tax & Business Advisory Services 税务与商业咨询实习',
+  region:'中国香港',city:'香港',industry:'审计咨询',location:'中国香港',
+  startDate:'2027 年 1 月',period:'2027 年 1—3 月，约 3 个月全职',
+  deadline:'2026-09-11 已刊登，招聘平台未列确切截止日；当前是否在招需核实',
+  description:'信永中和香港以独立招聘记录 L0607873647 刊登的税务与商业咨询实习；协助税务研究、资料整理、数据分析、香港及内地税务申报与咨询。该职位和集团综合审计/税务/咨询冬季项目名称不同，不合并为同一招聘编号。',
+  requirements:['在读本科生或硕士生，会计、金融、商科背景优先，大一学生亦可申请。','2027 年 1—3 月可连续全职实习三个月。','具备英语、普通话及广东话书面与口头沟通能力。','可能涉及出差，工作形式及申请资格以招聘页为准。'],
+  majorTags:['会计学','税收学','金融学','审计学','财务管理','工商管理','经济学'],
+  tags:['信永中和','SHINEWING','香港','Tax','Advisory','咨询','税务','2027'],
+  sourceUrl:'https://www.shinewing.hk/en/Career/',
+  applyUrl:'https://www.shinewing.hk/en/Career/',
+  evidenceUrl:'https://www.recruit.com.hk/job-detail/shinewing-hk-cpa-limited/internship-tax-business-advisory-services/L0607873647',
+  checkedOn:'2026-11-04',status:'source-verify',
+  statusNote:'第三方招聘平台记录 L0607873647 提供明确岗位标题、工作内容及2027年1—3月实习周期；雇主官网未取得同一职位的直投详情页。',
+  reviewWarning:'该具体岗位的招聘记录来自 Recruit.com.hk，不是独立企业官网职位页。「官网核实」仅到达企业招聘入口，请在补充证据页确认职位状态，不保证岗位仍然开放。', 
+  workRightsNote:'在香港实习需具备合法工作资格，招聘公告未明确签证担保情况。'
+ },
+ {
+  id:'luoshu-final-year-quant-intern-2027',company:'洛书投资',english:'Luoshu Investment',
+  title:'量化实习生（Final Year 校招）｜寒假到岗待核实',
+  region:'中国内地',city:'上海/成都待核实',industry:'量化金融',location:'雇主招聘公告列有上海方向，四川大学职位页另列成都；具体工作城市以实际录用职位为准',
+  startDate:'寒假入职日未由企业官方明确；第三方项目归档提及 2027 年 1 月中旬—3 月初',
+  period:'雇主2026年校招提出毕业前可连续线下实习数月；具体冬季批次需招聘方确认',
+  deadline:'2026-08-28 高校企业发布岗位；页面有效期写至 2027-06-29，不能等同本次寒假报名截止日',
+  description:'洛书投资企业官方招聘中心公开提供招聘入口，四川大学就业中心 2026-08-28 收录其“量化实习生（final year校招）”职位；数学、统计、物理、计算机和金融工程背景适用。另有第三方寒假项目归档，但尚未证明与校招职位是同一批次，因此不宣称已确认2027寒假招募。',
+  requirements:['在读本科及以上，数学、统计、物理、计算机、金融工程等专业优先。','具备概率统计、量化模型、数据分析或 Python/MATLAB 编程基础。','愿意在实习期间参与量化策略、风险模型与交易系统相关研究。','对2027寒假入职月份、工作城市、具体薪酬和投递资格向企业招聘人员核对。'],
+  majorTags:['数学','统计学','物理学','计算机科学','金融工程','人工智能','数据科学'],
+  tags:['洛书投资','量化','量化交易','量化研究','Python','机器学习','上海','成都','冬季待核实'],
+  sourceUrl:'https://www.luoshu.com/join-us',
+  applyUrl:'https://www.luoshu.com/join-us',
+  evidenceUrl:'https://jy.scu.edu.cn/index/index/employjobdetail.html?data=MDAwMDAwMDAwMJG6n3_Ed6imi4qQtLh4Y92Kzra-smHddricp9CWi5qikaeWacSdqLqGfaK2w4iil5C4zNbGiL-E',
+  checkedOn:'2026-11-04',status:'winter-unverified',
+  statusNote:'公司官网有真实投递入口，2026年四川大学就业中心有独立量化实习岗位，但企业官网未证实该编号属于2027寒假批次，地区资料也不一致。',
+  reviewWarning:'第三方寒假项目页称1月中旬至3月初，但未与高校发布的“final year校招”逐条绑定；高校岗位地点信息与上海总部也有差异。本条仅作可进一步咨询的量化实习线索，不能当成已确认的寒假在招职位。',
+  salaryNote:'高校职位曾公开薪资区间，但不同来源的工作地区和薪酬口径存在差异，HHBA 不把任何数额视为已核实寒假工资。'
  }
 ];
 const safe=(url:string)=>{try{const u=new URL(url);return u.protocol==='https:'&&!u.username&&!u.password;}catch{return false}};
@@ -222,6 +295,9 @@ export function winterJobSafeUrl(job:WinterJob){return safe(job.sourceUrl)&&safe
 export function winterJobStatusLabel(job:WinterJob){
  if(job.status==='closed')return '已过申请截止日';
  if(job.status==='year-conflict')return '招聘年度存在冲突 · 待复核';
+ if(job.status==='program-intake')return '官方招聘批次 · 按部门选择';
+ if(job.status==='source-verify')return '雇主招聘平台记录 · 待官网复核';
+ if(job.status==='winter-unverified')return '实习岗位有据 · 寒假时间待核实';
  if(job.status==='deadline-conflict')return '申请日期冲突 · 需核实';
  return '官方具体岗位 · 申请状态待核实';
 }

@@ -50,7 +50,7 @@ test('directory contains source-backed programmes without invented job numbers',
 });
 test('concrete job first: only individual employer-issued postings appear in the primary list',()=>{
  const jobIds=[...jobs.matchAll(/\bid:'([a-z0-9-]+)'/g)].map(x=>x[1]);
- assert.equal(jobIds.length,12,'8 prior plus 4 distinct employer-issued roles reviewed in batch 03');
+ assert.equal(jobIds.length,16,'12 prior plus 4 distinct role-or-intake records in batch 04');
  assert.equal(new Set(jobIds).size,jobIds.length,'no duplicate role identity');
  for(const id of ['apco-shanghai-winter-start-1787','hsbc-hk-student-placement-1367003857','qima-hk-sales-intern-744000154586189']){
   assert.ok(jobIds.includes(id),id+' missing');
@@ -69,6 +69,15 @@ test('concrete job first: only individual employer-issued postings appear in the
  assert.ok(jobs.includes('未证明为同一招聘编号'),'third-party corroboration must not imply exact requisition identity');
  assert.ok(page.includes('job.reviewWarning')&&page.includes('job.evidenceUrl'),'source limitations and secondary citations must appear in details');
  assert.ok(jobs.includes('careers.richemont.com')&&jobs.includes('tzcpa.zhiye.com')&&jobs.includes('www.crowe.com'),'all three employers have official destinations');
+ for(const id of ['ey-tw-2027-peak-season-intake','shinewing-hk-2027-winter-audit-tax-advisory','shinewing-hk-2027-tax-business-advisory-l0607873647','luoshu-final-year-quant-intern-2027'])assert.ok(jobIds.includes(id),'missing batch04 record '+id);
+ for(const employer of ['安永台湾 EY','信永中和香港 SHINEWING','洛书投资'])assert.ok(jobs.includes(employer),employer+' missing');
+ assert.ok(jobs.includes('2027 年 1 月 18 日')&&jobs.includes('2026 年 11 月 8 日'),'EY 2027 deadline and start must be preserved');
+ assert.ok(jobs.includes("status:'program-intake'")&&jobs.includes('不拆分为四个虚拟岗位'),'EY business departments must not inflate separate job counts');
+ assert.ok(jobs.includes("status:'source-verify'")&&jobs.includes('L0607873647'),'SHINEWING 2027 job-board records must show source limitations');
+ assert.ok(jobs.includes("status:'winter-unverified'")&&jobs.includes('尚未证明与校招职位是同一批次'),'Luoshu winter timing must be explicit as unverified');
+ assert.ok(jobs.includes('www.ey.com')&&jobs.includes('www.shinewing.hk')&&jobs.includes('www.luoshu.com'),'company career links required');
+ assert.ok(page.includes("job.status==='verify-apply'?'hhba-winter-status-neutral'"),'source-unverified roles need caution badge in list');
+ assert.ok(page.includes("job.status!=='deadline-conflict'&&job.status!=='year-conflict'"),'batch04 status caution must render in job detail');
  assert.ok(!jobs.includes("status:'open'"),'no unproven current availability');
  assert.ok(!jobs.includes("status:'open'"),'real-time availability must not be fabricated');
  assert.ok(!jobs.includes('jpm-2027-seasonal'),'JPM summer/fall seasonal programme is not a winter role');
