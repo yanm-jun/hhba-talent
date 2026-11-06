@@ -47,3 +47,12 @@
 - 编译：`npm ci && npm run build`（`apps/web`）。
 
 本文件的添加用于触发此独立开发分支的 Cloudflare Pages Preview，不修改主线或正式站。
+
+## 本轮 Preview 迁移核验（2026-11-07）
+- 已逐项读取 Cloudflare Pages Preview/Production D1 绑定，并确认是两个不同数据库。
+- 已对 Preview D1 取得 Time Travel 当前恢复书签；未将书签、密钥或测试用户个人资料提交至公开仓库。
+- 仅对 Preview D1 执行 0014 加法迁移，新建 `hhba_apply_profile_transfers` 与 `idx_hhba_apply_profile_transfers_expiry`，事后通过 `sqlite_master` 验证表和索引存在。**Production D1 未发生改动**。
+- 加入机会性过期密文清理：用户准备或领取同步时，服务端清除已过期或已领取的旧密文。**仍需正式定时清理机制**，才可把物理保留期限作为上线承诺。
+- Cloudflare Preview 自定义白名单只新增本开发分支，已有的 36 条分支保留，生产分支仍为 `main`。
+- Preview 的独立同步加密 Secret 仍未配置，直到能够证明不会覆盖 Preview 已有机密配置才允许安全写入。实际同步端到端功能因此默认禁用；单元与浏览器模拟测试可运行。
+
