@@ -18,24 +18,24 @@ export type WinterJob={
 };
 export const WINTER_2027_JOBS:ReadonlyArray<WinterJob>=[
 {
-  "id": "haier-qd-vision-algorithm-intern-20261104",
-  "company": "海尔集团",
-  "english": "Haier Group",
-  "title": "视觉算法实习生（工业智能柔性技术方向）",
-  "region": "中国内地",
-  "city": "青岛",
-  "industry": "工业人工智能",
-  "location": "山东省青岛市（以海尔招聘系统岗位详情为准）",
-  "startDate": "2027寒假到岗时间待核实",
-  "period": "招聘官网尚未披露统一实习周期；到岗日期与每周出勤需联系招聘方",
-  "deadline": "官网列表未显示岗位统一截止日；是否仍可申请需实际进入招聘平台核对",
-  "description": "海尔官方「日常实习机会」于2026年11月4日发布视觉算法实习生（工业智能柔性技术方向），归属于卡奥斯平台产品研发中心，硕士及以上；本项目属于有官网依据的日常实习，不等于已确认2027年寒假可到岗。",
-  "requirements": [
+  id: "haier-qd-vision-algorithm-intern-20261104",
+  company: "海尔集团",
+  english: "Haier Group",
+  title: "视觉算法实习生（工业智能柔性技术方向）",
+  region: "中国内地",
+  city: "青岛",
+  industry: "工业人工智能",
+  location: "山东省青岛市（以海尔招聘系统岗位详情为准）",
+  startDate: "2027寒假到岗时间待核实",
+  period: "招聘官网尚未披露统一实习周期；到岗日期与每周出勤需联系招聘方",
+  deadline: "官网列表未显示岗位统一截止日；是否仍可申请需实际进入招聘平台核对",
+  description: "海尔官方「日常实习机会」于2026年11月4日发布视觉算法实习生（工业智能柔性技术方向），归属于卡奥斯平台产品研发中心，硕士及以上；本项目属于有官网依据的日常实习，不等于已确认2027年寒假可到岗。",
+  requirements: [
     "官方招聘列表标注硕士及以上学历。",
     "岗位为工业智能/视觉算法方向；具体技术栈、专业限制与招聘人数以海尔职位详情为准。",
     "确认企业能否接受2027年1—2月入职及实际在岗周期后再申请。"
   ],
-  "majorTags": [
+  majorTags: [
     "人工智能",
     "计算机科学与技术",
     "软件工程",
@@ -44,7 +44,7 @@ export const WINTER_2027_JOBS:ReadonlyArray<WinterJob>=[
     "电子信息工程",
     "数据科学"
   ],
-  "tags": [
+  tags: [
     "海尔",
     "Haier",
     "卡奥斯",
@@ -54,32 +54,32 @@ export const WINTER_2027_JOBS:ReadonlyArray<WinterJob>=[
     "2026-11-04",
     "寒假待核实"
   ],
-  "sourceUrl": "https://maker.haier.net/client/practicemobile/jobs.html",
-  "applyUrl": "https://maker.haier.net/client/practicemobile/jobs.html",
-  "checkedOn": "2026-11-06",
-  "status": "winter-unverified",
-  "statusNote": "企业官网2026-11-04实习职位列表可核对，但链接为岗位列表而非独立直投页。搜索「视觉算法实习生（工业智能柔性技术方向）」；寒假到岗和当前名额未确认。",
-  "reviewWarning": "这是企业官网发布的日常实习岗位；2027年寒假是否接受到岗尚未得到雇主确认。不要据此宣传「已开放2027寒假招聘」。"
+  sourceUrl: "https://maker.haier.net/client/practicemobile/jobs.html",
+  applyUrl: "https://maker.haier.net/client/practicemobile/jobs.html",
+  checkedOn: "2026-11-06",
+  status: "winter-unverified",
+  statusNote: "企业官网2026-11-04实习职位列表可核对，但链接为岗位列表而非独立直投页。搜索「视觉算法实习生（工业智能柔性技术方向）」；寒假到岗和当前名额未确认。",
+  reviewWarning: "这是企业官网发布的日常实习岗位；2027年寒假是否接受到岗尚未得到雇主确认。不要据此宣传「已开放2027寒假招聘」。"
 },
 {
-  "id": "hisense-qd-hr-intern-j44475",
-  "company": "海信集团",
-  "english": "Hisense Group",
-  "title": "人力资源管理实习生（J44475）",
-  "region": "中国内地",
-  "city": "青岛",
-  "industry": "人力资源与制造业",
-  "location": "山东省青岛市·海信空气事业部",
-  "startDate": "2027寒假到岗时间待核实",
-  "period": "招聘官网未公布本职位统一实习开始日与持续月数",
-  "deadline": "官方岗位列表未公布截止日；当前申请按钮需回官网核对",
-  "description": "海信官方「实习生招聘项目」列有编号J44475的人力资源管理实习生，2026年10月29日发布，面向2027或2028届毕业生，负责空气事业部的人力资源模块建设、协调与日常改善。寒假实习排期未披露。",
-  "requirements": [
+  id: "hisense-qd-hr-intern-j44475",
+  company: "海信集团",
+  english: "Hisense Group",
+  title: "人力资源管理实习生（J44475）",
+  region: "中国内地",
+  city: "青岛",
+  industry: "人力资源与制造业",
+  location: "山东省青岛市·海信空气事业部",
+  startDate: "2027寒假到岗时间待核实",
+  period: "招聘官网未公布本职位统一实习开始日与持续月数",
+  deadline: "官方岗位列表未公布截止日；当前申请按钮需回官网核对",
+  description: "海信官方「实习生招聘项目」列有编号J44475的人力资源管理实习生，2026年10月29日发布，面向2027或2028届毕业生，负责空气事业部的人力资源模块建设、协调与日常改善。寒假实习排期未披露。",
+  requirements: [
     "2027或2028年毕业的国内高校或学历获认可的海外院校学生。",
     "本科及以上学历，专业不限，人力资源管理、工商管理等管理类专业优先。",
     "熟练Office办公软件，沟通协作能力良好，英语CET-4及以上。"
   ],
-  "majorTags": [
+  majorTags: [
     "人力资源管理",
     "工商管理",
     "行政管理",
@@ -87,7 +87,7 @@ export const WINTER_2027_JOBS:ReadonlyArray<WinterJob>=[
     "心理学",
     "不限专业"
   ],
-  "tags": [
+  tags: [
     "海信",
     "Hisense",
     "J44475",
@@ -98,33 +98,33 @@ export const WINTER_2027_JOBS:ReadonlyArray<WinterJob>=[
     "2026-10-29",
     "寒假待核实"
   ],
-  "sourceUrl": "https://jobs.hisense.com/intern/jobs?queryId=bd1139aa-79e3-47c4-97bd-4f10d07cf78e",
-  "applyUrl": "https://jobs.hisense.com/intern/jobs?queryId=bd1139aa-79e3-47c4-97bd-4f10d07cf78e",
-  "checkedOn": "2026-11-06",
-  "status": "winter-unverified",
-  "statusNote": "雇主官网实习生项目岗位号J44475可核对，需在官方列表查找对应编号；尚未获得2027寒假到岗日期及实时投递名额。",
-  "reviewWarning": "这是一条独立实习岗位，不是寒假专项招聘公告。若2027寒假无法满足企业到岗要求，不应认定为可投递的寒假机会。"
+  sourceUrl: "https://jobs.hisense.com/intern/jobs?queryId=bd1139aa-79e3-47c4-97bd-4f10d07cf78e",
+  applyUrl: "https://jobs.hisense.com/intern/jobs?queryId=bd1139aa-79e3-47c4-97bd-4f10d07cf78e",
+  checkedOn: "2026-11-06",
+  status: "winter-unverified",
+  statusNote: "雇主官网实习生项目岗位号J44475可核对，需在官方列表查找对应编号；尚未获得2027寒假到岗日期及实时投递名额。",
+  reviewWarning: "这是一条独立实习岗位，不是寒假专项招聘公告。若2027寒假无法满足企业到岗要求，不应认定为可投递的寒假机会。"
 },
 {
-  "id": "boe-bj-2027-software-intern-j54754",
-  "company": "京东方",
-  "english": "BOE Technology Group",
-  "title": "2027实习生·软件开发实习生（J54754）",
-  "region": "中国内地",
-  "city": "北京",
-  "industry": "工业软件与先进制造",
-  "location": "北京市通州区经济技术开发区（以雇主招聘详情为准）",
-  "startDate": "2027寒假开始日待企业确认",
-  "period": "岗位要求每周至少4天、连续实习6个月以上，单纯寒假短期可能不符合",
-  "deadline": "2026年11月5日公开招聘记录；官网截止日与当前是否仍可投递需核对",
-  "description": "京东方官方招聘系统独立编号J54754的2027实习生软件开发职位，面向APS排程系统后端开发、算法优化与数据库查询优化；岗位由企业招聘链接对应，第三方岗位汇总提供了2026年11月5日的发布日期，寒假起始日未公开。",
-  "requirements": [
+  id: "boe-bj-2027-software-intern-j54754",
+  company: "京东方",
+  english: "BOE Technology Group",
+  title: "2027实习生·软件开发实习生（J54754）",
+  region: "中国内地",
+  city: "北京",
+  industry: "工业软件与先进制造",
+  location: "北京市通州区经济技术开发区（以雇主招聘详情为准）",
+  startDate: "2027寒假开始日待企业确认",
+  period: "岗位要求每周至少4天、连续实习6个月以上，单纯寒假短期可能不符合",
+  deadline: "2026年11月5日公开招聘记录；官网截止日与当前是否仍可投递需核对",
+  description: "京东方官方招聘系统独立编号J54754的2027实习生软件开发职位，面向APS排程系统后端开发、算法优化与数据库查询优化；岗位由企业招聘链接对应，第三方岗位汇总提供了2026年11月5日的发布日期，寒假起始日未公开。",
+  requirements: [
     "计算机、软件工程、自动化等相关专业本科及以上在读。",
     "掌握Java、Python或C++至少一种，熟悉数据结构、算法与SQL。",
     "每周至少4天，连续实习6个月以上；需要自备电脑。",
     "希望仅寒假1—2个月的申请者应特别核对出勤限制。"
   ],
-  "majorTags": [
+  majorTags: [
     "计算机科学与技术",
     "软件工程",
     "自动化",
@@ -132,7 +132,7 @@ export const WINTER_2027_JOBS:ReadonlyArray<WinterJob>=[
     "数学",
     "人工智能"
   ],
-  "tags": [
+  tags: [
     "京东方",
     "BOE",
     "J54754",
@@ -143,13 +143,13 @@ export const WINTER_2027_JOBS:ReadonlyArray<WinterJob>=[
     "2027届",
     "寒假待核实"
   ],
-  "sourceUrl": "https://boe.zhiye.com/campus/detail?jobAdId=ed53b5f2-9e08-4188-82d1-99c3260b94f8",
-  "applyUrl": "https://boe.zhiye.com/campus/detail?jobAdId=ed53b5f2-9e08-4188-82d1-99c3260b94f8",
-  "evidenceUrl": "https://jinliqiuzhi.com/jobs/990325",
-  "checkedOn": "2026-11-06",
-  "status": "winter-unverified",
-  "statusNote": "官方招聘页面URL对应独立岗位J54754，辅助招聘索引显示2026-11-05发布。企业要求至少6个月实习，尚不能认定为只覆盖寒假的机会。",
-  "reviewWarning": "连续6个月、每周至少4天是公开职位的重要资格要求；不满足者不应把它视为短期寒假实习。职位开放状态仍需雇主官网核对。"
+  sourceUrl: "https://boe.zhiye.com/campus/detail?jobAdId=ed53b5f2-9e08-4188-82d1-99c3260b94f8",
+  applyUrl: "https://boe.zhiye.com/campus/detail?jobAdId=ed53b5f2-9e08-4188-82d1-99c3260b94f8",
+  evidenceUrl: "https://jinliqiuzhi.com/jobs/990325",
+  checkedOn: "2026-11-06",
+  status: "winter-unverified",
+  statusNote: "官方招聘页面URL对应独立岗位J54754，辅助招聘索引显示2026-11-05发布。企业要求至少6个月实习，尚不能认定为只覆盖寒假的机会。",
+  reviewWarning: "连续6个月、每周至少4天是公开职位的重要资格要求；不满足者不应把它视为短期寒假实习。职位开放状态仍需雇主官网核对。"
 },
  {
   id:'apco-shanghai-winter-start-1787',company:'APCO Worldwide',english:'APCO Worldwide',
