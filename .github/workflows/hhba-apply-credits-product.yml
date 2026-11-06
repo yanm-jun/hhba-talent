@@ -91,7 +91,7 @@ jobs:
           node --check popup.js
           node --check account.mjs
           node --check core.mjs
-          node --test tests/core.test.mjs tests/quickfill.contract.test.mjs tests/account.contract.test.mjs tests/ai-map.contract.test.mjs
+          node --test tests/core.test.mjs tests/quickfill.contract.test.mjs tests/account.contract.test.mjs tests/ai-map.contract.test.mjs tests/edge-preview-stage.test.mjs
       - name: Audit Microsoft Edge manifest, icons and permission scope
         working-directory: apps/browser-extension
         run: node scripts/edge-package-audit.mjs
