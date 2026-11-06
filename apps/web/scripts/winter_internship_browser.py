@@ -42,7 +42,7 @@ with sync_playwright() as p:
     page.screenshot(path='/tmp/hhba-winter-directory-desktop.png',full_page=False)
     # Dataset and grouping checks are independent of source order; new batches
     # must not break test navigation due to pagination reordering.
-    assert '58 条公开岗位及招聘批次结果' in page.locator('.hhba-winter-list-summary').inner_text()
+    assert '62 条公开岗位及招聘批次结果' in page.locator('.hhba-winter-list-summary').inner_text()
     assert page.locator('.hhba-winter-role-group-title').count()>=1
     assert page.get_by_label('按行业分组筛选寒假岗位').count()==1
 
@@ -192,6 +192,44 @@ with sync_playwright() as p:
     assert page.locator('[data-winter-job]').count()==3
     reset()
 
+    # Batch12: three new mainland employers and four distinct winter-tagged postings.
+    for term,ident,expected_url in [
+        ('陆芯科技','luxin-sh-power-semiconductor-winter-tag-20261023','inn_lrlnlhezssyb'),
+        ('空地互联','airlink-sh-wifi-data-analyst-winter-tag-20261104','inn_jhwbqfhkwtoa'),
+        ('同道猎聘','liepin-bj-rpo-intern-winter-tag-20261020','inn_tpt19ipuu8np'),
+        ('同道猎聘','liepin-hz-sales-consultant-winter-tag-20260910','inn_22u67vker7bb')
+    ]:
+        search(term)
+        assert page.locator(f'[data-winter-job="{ident}"]').count()==1,ident
+        page.locator(f'[data-winter-job="{ident}"]').get_by_role('link',name='岗位详情').click()
+        assert ident in page.url
+        source=page.get_by_role('link',name='查看第三方招聘平台的独立岗位').get_attribute('href')
+        assert expected_url in source
+        assert page.locator('.hhba-winter-warning').count()>0,'job limitations must be visible'
+        page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    reset()
+    search('同道猎聘')
+    assert page.locator('[data-winter-job]').count()==2,'show RPO and sales, do not multiply same-name jobs by city'
+    page.get_by_label('按地区筛选寒假岗位').select_option('中国内地')
+    page.get_by_label('按行业分组筛选寒假岗位').select_option('企业职能')
+    assert page.locator('[data-winter-job="liepin-bj-rpo-intern-winter-tag-20261020"]').count()==1
+    assert page.locator('[data-winter-job="liepin-hz-sales-consultant-winter-tag-20260910"]').count()==0
+    page.get_by_label('按行业分组筛选寒假岗位').select_option('市场传播')
+    assert page.locator('[data-winter-job="liepin-bj-rpo-intern-winter-tag-20261020"]').count()==0
+    assert page.locator('[data-winter-job="liepin-hz-sales-consultant-winter-tag-20260910"]').count()==1
+    reset()
+    search('陆芯科技')
+    page.get_by_label('按行业分组筛选寒假岗位').select_option('先进制造')
+    assert page.locator('[data-winter-job="luxin-sh-power-semiconductor-winter-tag-20261023"]').count()==1
+    reset()
+    search('空地互联')
+    page.get_by_label('按行业分组筛选寒假岗位').select_option('科技研发')
+    assert page.locator('[data-winter-job="airlink-sh-wifi-data-analyst-winter-tag-20261104"]').count()==1
+    reset()
+    search('航空 Wi-Fi')
+    assert page.locator('[data-winter-job="airlink-sh-wifi-data-analyst-winter-tag-20261104"]').count()==1
+    reset()
+
     # Key legacy official jobs continue to have source-backed detail routes.
     for term,jobid in [
         ('HSBC','hsbc-hk-student-placement-1367003857'),
@@ -210,9 +248,9 @@ with sync_playwright() as p:
 
     # Stable ten-per-page browsing, including the new final partial page.
     assert page.locator('[data-winter-job]').count()==10
-    for number in range(5):
+    for number in range(6):
         page.get_by_role('button',name='下一页').click()
-    assert page.locator('[data-winter-job]').count()==8, '58 independent records = five full pages and eight final records'
+    assert page.locator('[data-winter-job]').count()==2, '62 independent records = six full pages and two final records'
     page.get_by_role('button',name='上一页').click()
     assert page.locator('[data-winter-job]').count()==10
     reset()
