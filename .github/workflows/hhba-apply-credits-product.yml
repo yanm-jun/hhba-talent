@@ -82,7 +82,7 @@ jobs:
 
   verify-browser-extension:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -123,6 +123,9 @@ jobs:
       - name: Verify real Chromium and Vite local PDF worker
         working-directory: apps/web
         run: timeout 95s python3 -u scripts/pdf-browser-e2e.py
+      - name: Verify real Chromium MV3 Edge Preview account pairing and one-time local import
+        working-directory: apps/browser-extension
+        run: timeout 95s python3 -u scripts/edge-browser-preview-e2e.py
       - name: Verify synthetic recruitment page fill, events, sensitive-field skips, undo
         working-directory: apps/browser-extension
         run: timeout 90s python3 -u tests/browser_e2e.py
