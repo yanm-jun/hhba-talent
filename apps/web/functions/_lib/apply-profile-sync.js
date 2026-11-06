@@ -43,10 +43,18 @@ async function aesKey(env){
  return crypto.subtle.importKey('raw',fromHex(env.HHBA_APPLY_PROFILE_TRANSFER_KEY),
   {name:'AES-GCM'},false,['encrypt','decrypt']);
 }
+export async function purgeExpiredProfileTransfers(db,now=Date.now()){
+ // Opportunistic expiry cleanup on every prepare/claim. Add scheduled cleanup
+ // before production to bound physical retention even without any traffic.
+ const cutoff=new Date(now).toISOString();
+ return db.prepare('DELETE FROM hhba_apply_profile_transfers WHERE expires_at<=? OR claimed_at IS NOT NULL')
+  .bind(cutoff).run();
+}
 export async function prepareProfileTransfer(db,env,phone,body,now=Date.now()){
  const profile=validateSyncRequest(body);
  if(!profile)return {ok:false,error:'INVALID_PROFILE_SYNC_REQUEST',status:400};
  if(!syncKeyConfigured(env))return {ok:false,error:'PROFILE_TRANSFER_NOT_CONFIGURED',status:503};
+ await purgeExpiredProfileTransfers(db,now);
  const resume=await db.prepare('SELECT id FROM hhba_candidate_resumes WHERE id=? AND phone=?')
   .bind(body.resumeId,phone).first();
  if(!resume)return {ok:false,error:'RESUME_NOT_FOUND',status:404};
@@ -73,6 +81,7 @@ export async function prepareProfileTransfer(db,env,phone,body,now=Date.now()){
 export async function claimProfileTransfer(db,env,phone,now=Date.now()){
  if(!syncKeyConfigured(env))return {ok:false,error:'PROFILE_TRANSFER_NOT_CONFIGURED',status:503};
  const stamp=new Date(now).toISOString();
+ await purgeExpiredProfileTransfers(db,now);
  // D1 supports UPDATE ... RETURNING. Two simultaneous extension claims cannot
  // both receive the same profile; only the winning claim returns ciphertext.
  const row=await db.prepare(
