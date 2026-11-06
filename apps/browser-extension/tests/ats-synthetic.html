@@ -1,0 +1,38 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<title>招聘 ATS 组件合成样本，不代表任何企业官网</title>
+<style>
+body{font-family:Arial,"Microsoft YaHei",sans-serif;max-width:680px;margin:30px auto}
+.ant-form-item,.el-form-item,.arco-form-item,.semi-form-field{margin:16px 0;padding:14px;border:1px solid #ddd}
+label{display:block;margin:0 0 7px}
+input,textarea{padding:8px;border:1px solid #bbb;display:block;width:90%}
+.ant-select{padding:8px;border:1px solid #aaa;min-height:38px}
+.ant-select-selector{min-height:30px}
+</style></head><body>
+<h1>HHBA 仅供测试的合成招聘 ATS 表单</h1>
+<form>
+ <div class="ant-form-item"><label for="candidate-name">姓名</label>
+  <div class="ant-form-item-control"><input id="candidate-name" name="candidateName" autocomplete="name"></div></div>
+ <div class="el-form-item"><label for="candidate-mobile" class="el-form-item__label">手机号</label>
+  <div class="el-form-item__content"><input id="candidate-mobile" type="tel" name="mobile"></div></div>
+ <div class="arco-form-item"><label for="candidate-school" class="arco-form-item-label">毕业院校</label>
+  <div class="arco-form-item-wrapper"><input id="candidate-school" name="school"></div></div>
+ <div class="semi-form-field"><label for="candidate-email">电子邮箱</label>
+  <input id="candidate-email" type="email"></div>
+ <div class="ant-form-item">
+  <label>最高学历（动态下拉）</label>
+  <div class="ant-select"><div class="ant-select-selector" role="combobox" aria-label="最高学历（动态下拉）" aria-expanded="false">
+   <input id="dynamic-education" role="combobox" name="education-selector" aria-label="最高学历（动态下拉）" autocomplete="off">
+  </div></div>
+ </div>
+ <div class="el-form-item"><label for="private-document">身份证号码</label><input id="private-document" name="identity_document"></div>
+ <input type="hidden" id="hidden-field" name="hidden_value" value="">
+ <button type="button">仅用于功能测试，绝不提交</button>
+</form>
+<script>
+window.formEvents=[];
+for(const el of document.querySelectorAll('input,textarea,select')){
+ el.addEventListener('input',e=>window.formEvents.push('input:'+e.target.id));
+ el.addEventListener('change',e=>window.formEvents.push('change:'+e.target.id));
+}
+</script>
+</body></html>

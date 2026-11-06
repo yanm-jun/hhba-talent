@@ -1,5 +1,5 @@
 import {type FormEvent,useEffect,useState} from 'react';
-import {ArrowRight,Bookmark,BriefcaseBusiness,CheckCircle2,Compass,FileUser,LockKeyhole,LogOut,Scale,ShieldCheck,SlidersHorizontal,UserRound,ChartNoAxesCombined} from 'lucide-react';
+import {ArrowRight,Bookmark,BriefcaseBusiness,CheckCircle2,Compass,FileUser,LockKeyhole,LogOut,MousePointerClick,Scale,ShieldCheck,SlidersHorizontal,UserRound,ChartNoAxesCombined} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
 import {getJob,localizedCompany,localizedLocation,localizedTitle,type LiveJob} from '../services/liveRecruitment';
@@ -8,12 +8,13 @@ import {eraseAccountAnalytics,getMyActivityCheck,type MyActivityCheck,type Accou
 import {getCandidateWorkspaceProfile,saveCandidateWorkspaceProfile,saveCandidateWorkspacePreferences,realWorkspaceAvailable,type CandidateWorkspaceProfile} from '../services/candidateWorkspace';
 import {type User} from '../services/api';
 import {PrivateResumeVault} from '../components/PrivateResumeVault';
+import {ApplyAssistantProduct} from '../components/ApplyAssistantProduct';
 import {listPrivateResumes,privateResumeAvailable} from '../services/privateResumes';
 import '../styles/personal-center.css';
 // Preserve the existing workbench layout styles while deleting the obsolete demo identity logic.
 import '../styles/demo-account.css';
 
-type Section='overview'|'profile'|'preferences'|'resume'|'applications'|'privacy'|'saved';
+type Section='overview'|'profile'|'preferences'|'resume'|'applications'|'privacy'|'saved'|'apply-assistant';
 type RecordRow={record:SavedJob;job:LiveJob|null};
 const pages:{id:Section;label:string;icon:typeof UserRound;description:string}[]=[
  {id:'overview',label:'工作台',icon:Compass,description:'了解你的职业探索进度'},
@@ -129,7 +130,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
  }
  const areaLabels:Record<AccountArea,string>={general:'一般访问',jobs:'岗位浏览',companies:'企业资料',policies:'人才政策',tools:'求职工具',job_save:'岗位收藏操作'};
  const trackingPrevented=typeof navigator!=='undefined'&&(navigator.doNotTrack==='1'||(navigator as Navigator & {globalPrivacyControl?:boolean}).globalPrivacyControl===true);
- const sectionTitle=pages.find(page=>page.id===current)?.label||'个人中心';
+ const sectionTitle=current==='apply-assistant'?'一键网申':pages.find(page=>page.id===current)?.label||'个人中心';
  if(!user?.account_types?.includes('candidate'))return <Shell user={user}><section className="hhba-personal"><p role="status">请先使用真实求职者账号登录。</p><Link to="/candidate/login">前往登录</Link></section></Shell>;
  return <Shell user={user}>
  <section className="hhba-personal hhba-account-page">
@@ -157,6 +158,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
        <Link to="/candidate/saved"><Bookmark size={21}/><span>已收藏岗位</span><strong>{!savedAvailable?'—':loading?'…':error?'—':savedCount}</strong><small>真实账户专属收藏</small></Link>
        <Link to="/candidate/account/applications"><BriefcaseBusiness size={21}/><span>求职申请</span><strong>—</strong><small>真实投递服务尚未接通</small></Link>
        <Link to="/candidate/account/resume"><FileUser size={21}/><span>我的简历</span><strong>{resumeCount===null?'—':resumeCount}</strong><small>{resumeCount===null?'私有存储尚未开通':'仅本人可访问'}</small></Link>
+       <Link to="/candidate/account/apply-assistant"><MousePointerClick size={21}/><span>一键网申</span><strong className="hhba-account-stat-plugin-version">¥0.30</strong><small>AI 辅助填写 · 次数套餐</small></Link>
       </div>
       <section className="hhba-account-panel"><div className="hhba-account-section-heading"><div><h3>完善我的职业档案</h3><p>真实账户资料与求职偏好可跨设备读取。</p></div></div>
        <div className="hhba-account-tool-grid">
@@ -167,6 +169,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
         {error?<p role="alert">{error}</p>:<p>收藏按当前已登录账户隔离，匿名设备记录不会自动合并。</p>}
       </section>
     </>}
+    {current==='apply-assistant'&&<ApplyAssistantProduct userId={user?.id}/>}
     {current==='saved'&&<section className="hhba-account-panel">
       <div className="hhba-account-section-heading"><div><h2>我的收藏</h2><p>只展示来自真实职位索引的收藏记录。下架职位不会被伪装成仍在招聘。</p></div><Link to="/candidate/jobs">搜索更多 <ArrowRight size={15}/></Link></div>
       {error&&<p className="hhba-personal-error" role="alert">{error}</p>}

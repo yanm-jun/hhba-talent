@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>测试表单（合成样本，非企业官网）</title>
+<style>body{font-family:Arial,"Microsoft Yahei",sans-serif;padding:24px;max-width:580px;margin:auto}label{display:block;margin:20px 0}input,select,textarea{display:block;padding:8px;width:100%;box-sizing:border-box}</style></head>
+<body><h1>HHBA 内测用招聘申请表</h1><p>仅用于合成表单的浏览器自动化测试，不代表任何真实企业招聘页面。</p>
+<form>
+<label for="candidate-name">姓名 <input id="candidate-name" name="candidate_name" placeholder="姓名"></label>
+<label for="mobile">手机号 <input id="mobile" type="tel" name="mobile" placeholder="手机号"></label>
+<label for="education">最高学历 <select id="education" name="education"><option value="">请选择</option><option value="high">高中</option><option value="undergraduate">本科</option><option value="nonfull">非全日制本科</option><option value="master">硕士</option></select></label>
+<label for="major">所学专业 <input id="major" name="major"></label>
+<label for="email">联系邮箱 <input id="email" type="email" name="email" value="already@example.com"></label>
+<label for="documentid">身份证号码 <input id="documentid" name="identity_card_number"></label>
+<label for="statement">诚信承诺 <input id="statement" name="consent_statement"></label>
+<label for="misc">其他信息 <input id="misc" name="unrecognized_text"></label>
+<button type="button" id="non-submit">仅演示</button>
+</form>
+<script>
+  window.formEvents=[];
+  for(const input of document.querySelectorAll("input,select")){
+    input.addEventListener("input",e=>window.formEvents.push("input:"+e.target.id));
+    input.addEventListener("change",e=>window.formEvents.push("change:"+e.target.id));
+  }
+</script>
+</body></html>

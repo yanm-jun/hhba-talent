@@ -30,7 +30,7 @@
 .hhba-account-section-heading h3{margin:0;font-size:17px;color:#273c30}
 .hhba-account-section-heading p{font-size:12px;line-height:1.7;color:#859185;margin:5px 0 0}
 .hhba-account-section-heading a{display:flex;align-items:center;gap:6px;font-size:12px;color:#336747;text-decoration:none;flex-shrink:0}
-.hhba-account-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:19px}
+.hhba-account-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:19px}
 .hhba-account-stat-grid>a{padding:20px 19px;display:flex;flex-direction:column;gap:9px;background:#fff;border:1px solid #e3e9e5;border-radius:13px;text-decoration:none;color:#273c2d}
 .hhba-account-stat-grid>a svg{color:#528565}
 .hhba-account-stat-grid span{font-size:12px;font-weight:600;color:#728574}
@@ -84,3 +84,10 @@
 .hhba-account-activity-button:disabled{opacity:.55;cursor:not-allowed}
 .hhba-account-privacy-row .hhba-account-activity-result{color:#2b6a43;font-weight:600;max-width:560px}
 .hhba-account-privacy-row .hhba-account-activity-error{color:#a44646;max-width:560px}
+
+/* Four-card workbench and the isolated V0.2 browser helper entry. */
+.hhba-account-stat-grid>a{min-width:0;transition:background-color .15s,border-color .15s}
+.hhba-account-stat-grid>a:hover{background:#fcfefd;border-color:#b9d5c1}
+.hhba-account-stat-grid>a:focus-visible{outline:2px solid #4b8760;outline-offset:2px}
+.hhba-account-stat-grid strong.hhba-account-stat-plugin-version{font-size:23px;letter-spacing:-.02em}
+@media(max-width:620px){.hhba-account-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hhba-account-stat-grid>a{min-height:138px}}
