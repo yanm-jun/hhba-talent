@@ -63,7 +63,7 @@ export type UkRoute={
 const lines=(data:string):UkLine[]=>data.trim().split('\n').map((row)=>{const a=row.split('¦');if(a.length!==3||a.some(x=>!x.trim()))throw new Error('Invalid UK guide point: '+row);return a as UkLine;});
 export const ukRoutes:UkRoute[]=[
 {
-id:'uk-skilled-worker',name:'技术工作签证：Skilled Worker',english:'Skilled Worker visa',category:'work',
+id:'uk-skilled',name:'技术工作签证：Skilled Worker',english:'Skilled Worker visa',category:'work',
 summary:'已获得英国持牌雇主真实职位与CoS的专业人才路径。2026年新申请通常须同时达到年薪£41,700及该SOC职业going rate中较高者；部分法定例外和职业表单独适用。',
 audience:'有可验证的英国雇主、达到岗位技能和薪资标准、能提交有效B2英语证明的境外专业求职者。',
 highlights:['通常£41,700与职业标准取高','新申请英语B2','需有效CoS'],
@@ -95,7 +95,7 @@ faq:[['只有offer，没有CoS能直接办吗？','通常不能。需要有效�
 sourceKeys:['skilled','salary','english','occupation','rates','sponsors','skilledFees','ihs','tb']
 },
 {
-id:'uk-health-care',name:'卫生与医疗专业工作签证',english:'Health and Care Worker visa',category:'work',
+id:'uk-health',name:'卫生与医疗专业工作签证',english:'Health and Care Worker visa',category:'work',
 summary:'面向有资格的医生、护士、医疗及适用社会照护专业人员，需有合规NHS/医疗领域持牌雇主的真实工作邀请。2025年7月22日起护理工与高级护理工不再接受新的海外直接招募申请。',
 audience:'持有符合监管机构要求的资格、准备与NHS或合规机构签约的医学及健康专业人才；不适用于从国外直接买护理员担保岗位。',
 highlights:['医生护士等合格职业','特定岗位有NHS薪资表','海外护理工新申请关闭'],
@@ -255,7 +255,7 @@ faq:[['英国大学毕业能申请HPI吗？','HPI适用于名单中的境外大�
 sourceKeys:['hpi','hpiList','hpiEligibility','hpiFees','ihs']
 },
 {
-id:'uk-scale-up',name:'高成长企业工作签证：Scale-up',english:'Scale-up Worker visa',category:'work',
+id:'uk-scale',name:'高成长企业工作签证：Scale-up',english:'Scale-up Worker visa',category:'work',
 summary:'需英国获准的Scale-up高成长企业提供至少6个月真实工作并签发CoS，2026新申请薪酬通常为£39,100与该岗位going rate取高。',
 audience:'已获英国Scale-up许可雇主职位，具备专业技能、英语和合格薪资条件的人。',
 highlights:['企业需Scale-up许可','工资通常≥£39,100与going rate取高','前6个月需履约'],
