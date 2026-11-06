@@ -13,6 +13,22 @@ import '../styles/winter-internship.css';
  * in a clearly separate supplementary section. Legacy project detail URLs work.
  */
 const PAGE_SIZE=10;
+const WINTER_GROUPS=['科技研发','先进制造','金融银行','审计咨询','市场传播','教育文旅','企业职能','其他方向'] as const;
+function winterIndustryGroup(job:WinterJob):string{
+ const value=job.industry.toLowerCase();
+ if(/审计|咨询|会计|税务/.test(value))return '审计咨询';
+ if(/金融科技|软件研发/.test(value))return '科技研发';
+ if(/金融|银行|证券|财富|精算|私募|投资|财务|风险/.test(value))return '金融银行';
+ if(/人力资源|人事|行政|法务|职能/.test(value))return '企业职能';
+ if(/工业软件|制造|机械|家电|芯片|半导体|硬件/.test(value))return '先进制造';
+ if(/人工智能|ai|算法|数据|软件|研发|科技|技术|智能/.test(value))return '科技研发';
+ if(/营销|传播|公关|市场|零售|电商|媒体|游戏|美妆|奢侈/.test(value))return '市场传播';
+ if(/酒店|文旅|旅游|教育|教学|餐饮|培训/.test(value))return '教育文旅';
+ return '其他方向';
+}
+function winterProgrammeGroup(category:WinterProgram['category']):string{
+ return category==='审计咨询'?'审计咨询':category==='金融'?'金融银行':'市场传播';
+}
 const PROGRAM_ONLY=WINTER_2027_PROGRAMS.filter(p=>
  p.kind==='专项计划'&&p.id!=='jpm-2027-seasonal' &&
  !WINTER_2027_JOBS.some(job=>job.originalProgramId===p.id));
@@ -135,6 +151,7 @@ export function WinterInternshipPage({user,slug}:{user:User|null;slug?:string}){
  const [region,setRegion]=useState('全部地区');
  const [industry,setIndustry]=useState('全部行业');
  const [major,setMajor]=useState('全部专业');
+ const [group,setGroup]=useState('全部分组');
  const [page,setPage]=useState(0);
  const regions=['全部地区',...new Set(WINTER_2027_JOBS.map(j=>j.region))];
  const industries=['全部行业',...new Set(WINTER_2027_JOBS.map(j=>j.industry))];
@@ -144,14 +161,33 @@ export function WinterInternshipPage({user,slug}:{user:User|null;slug?:string}){
   return WINTER_2027_JOBS.filter(j=>{
    const haystack=[j.title,j.company,j.english,j.region,j.city,j.industry,j.description,...j.majorTags,...j.tags].join(' ').normalize('NFKC').toLocaleLowerCase();
    return (region==='全部地区'||j.region===region)&&
+    (group==='全部分组'||winterIndustryGroup(j)===group)&&
     (industry==='全部行业'||j.industry===industry)&&
     (major==='全部专业'||j.majorTags.includes(major)||j.majorTags.includes('不限专业'))&&
     terms.every(term=>haystack.includes(term));
-  }).sort((a,b)=>major==='全部专业'?0:Number(b.majorTags.includes(major))-Number(a.majorTags.includes(major)));
- },[keyword,region,industry,major]);
+  }).sort((a,b)=>{
+   const majorPriority=major==='全部专业'?0:Number(b.majorTags.includes(major))-Number(a.majorTags.includes(major));
+   const mainlandPriority=Number(b.region==='中国内地')-Number(a.region==='中国内地');
+   return majorPriority||mainlandPriority||
+    WINTER_GROUPS.indexOf(winterIndustryGroup(a) as typeof WINTER_GROUPS[number])-
+    WINTER_GROUPS.indexOf(winterIndustryGroup(b) as typeof WINTER_GROUPS[number]);
+  });
+ },[keyword,region,industry,major,group]);
  const totalPages=Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));
  const visible=filtered.slice(page*PAGE_SIZE,(page+1)*PAGE_SIZE);
- const clear=()=>{setDraft('');setKeyword('');setRegion('全部地区');setIndustry('全部行业');setMajor('全部专业');setPage(0)};
+ const visibleGroups=WINTER_GROUPS.map(name=>({name,jobs:visible.filter(j=>winterIndustryGroup(j)===name)})).filter(entry=>entry.jobs.length>0);
+ const matchedPrograms=useMemo(()=>{
+  const terms=keyword.trim().normalize('NFKC').toLocaleLowerCase().split(/\s+/).filter(Boolean);
+  return PROGRAM_ONLY.filter(p=>{
+   const haystack=[p.title,p.company,p.english,p.region,p.location,p.intro,p.category,...p.requirements,...p.tags].join(' ').normalize('NFKC').toLocaleLowerCase();
+   return (region==='全部地区'||p.region===region)&&
+    (group==='全部分组'||winterProgrammeGroup(p.category)===group)&&
+    (industry==='全部行业'||p.category===industry)&&
+    (major==='全部专业'||haystack.includes(major.toLocaleLowerCase()))&&
+    terms.every(term=>haystack.includes(term));
+  });
+ },[keyword,region,industry,major,group]);
+ const clear=()=>{setDraft('');setKeyword('');setRegion('全部地区');setIndustry('全部行业');setMajor('全部专业');setGroup('全部分组');setPage(0)};
  if(slug){
   const job=winterJobById(slug);
   return job?<WinterJobDetail user={user} job={job}/>:<WinterDetail user={user} id={slug}/>;
@@ -169,23 +205,29 @@ export function WinterInternshipPage({user,slug}:{user:User|null;slug?:string}){
    <div className="hhba-winter-section-title"><div>
     <p>公开职位证据 · 每条独立记录保留来源与核验状态</p>
     <h2 id="winter-opportunities-title">探索寒假实习机会</h2>
-    <span>直接按岗位搜索，按专业、地区和行业筛选。高校校内限制、第三方公开记录、单一招聘批次及未确认寒假时段均会明确标注，不把业务方向拆成虚构职位。</span>
+    <span>输入时即时检索企业、岗位、城市和专业，支持按地区、行业分组、专业及细分行业筛选；企业项目资料与具体岗位分开展示；高校校内限制、未证实寒假时段仍有明确提示。</span>
    </div></div>
    <form className="hhba-winter-job-filters" role="search" onSubmit={e=>{e.preventDefault();setKeyword(draft);setPage(0)}}>
-    <label className="hhba-winter-query"><Search size={18}/><input type="search" value={draft} onChange={e=>setDraft(e.target.value)} maxLength={80}
+    <label className="hhba-winter-query"><Search size={18}/><input type="search" value={draft} onChange={e=>{setDraft(e.target.value);setKeyword(e.target.value);setPage(0)}} maxLength={80}
       aria-label="搜索寒假实习具体岗位" placeholder="输入企业、职位、城市或专业，例如：上海 传播"/></label>
     <button className="hhba-winter-job-search-btn" type="submit">搜索岗位 <ArrowRight size={15}/></button>
    </form>
    <div className="hhba-winter-job-facets"><span><Filter size={15}/>筛选</span>
     <label>专业<select aria-label="按专业筛选寒假岗位" value={major} onChange={e=>{setMajor(e.target.value);setPage(0)}}>{majors.map(m=><option key={m}>{m}</option>)}</select></label>
     <label>地区<select aria-label="按地区筛选寒假岗位" value={region} onChange={e=>{setRegion(e.target.value);setPage(0)}}>{regions.map(r=><option key={r}>{r}</option>)}</select></label>
+    <label>分组<select aria-label="按行业分组筛选寒假岗位" value={group} onChange={e=>{setGroup(e.target.value);setPage(0)}}><option value="全部分组">全部分组</option>{WINTER_GROUPS.map(name=><option key={name} value={name}>{name}</option>)}</select></label>
     <label>行业<select aria-label="按行业筛选寒假岗位" value={industry} onChange={e=>{setIndustry(e.target.value);setPage(0)}}>{industries.map(x=><option key={x}>{x}</option>)}</select></label>
     <button type="button" onClick={clear} className="hhba-winter-filters-reset">重置</button>
    </div>
    <div className="hhba-winter-list-summary" aria-live="polite"><strong>{filtered.length}</strong> 条公开岗位及招聘批次结果
     <span> · 包含雇主官方及招聘平台公开记录，部分寒假时间待核实</span></div>
-   {visible.length?<div className="hhba-winter-role-list" aria-label="寒假实习具体岗位列表">{visible.map(j=><WinterRoleRow job={j} key={j.id}/>)}</div>:
-    <div className="hhba-winter-none" role="status"><Search size={24}/><h3>没有找到相符的具体寒假岗位</h3>
+   {visible.length?<div className="hhba-winter-role-groups" aria-label="寒假实习具体岗位列表">
+     {visibleGroups.map(entry=><section className="hhba-winter-role-group" key={entry.name}>
+      <h3 className="hhba-winter-role-group-title">{entry.name}<small>本页 {entry.jobs.length} 条</small></h3>
+      <div className="hhba-winter-role-list">{entry.jobs.map(j=><WinterRoleRow job={j} key={j.id}/>)}</div>
+     </section>)}
+    </div>:
+    <div className="hhba-winter-none" role="status"><Search size={24}/><h3>{keyword.trim()&&matchedPrograms.length?'暂无匹配的具体岗位，下方有相关企业项目资料':'没有找到相符的具体寒假岗位'}</h3>
       <p>可缩短关键词或修改专业、地区和行业条件；不使用未经核实的项目名称凑岗位数量。</p><button type="button" onClick={clear}>重置筛选</button></div>}
    {totalPages>1&&<nav className="hhba-winter-job-paging" aria-label="寒假实习岗位分页">
     <button type="button" disabled={page===0} onClick={()=>setPage(p=>Math.max(0,p-1))}>上一页</button>
@@ -193,10 +235,10 @@ export function WinterInternshipPage({user,slug}:{user:User|null;slug?:string}){
     <button type="button" disabled={page+1>=totalPages} onClick={()=>setPage(p=>Math.min(totalPages-1,p+1))}>下一页</button>
    </nav>}
   </section>
-  <details className="hhba-winter-program-archive" data-winter-program-archive>
-   <summary><span><ChevronDown size={18}/> 其他冬季项目与历年招聘资料（尚缺具体岗位）</span><strong>{PROGRAM_ONLY.length} 家</strong></summary>
+  <details className="hhba-winter-program-archive" data-winter-program-archive open={Boolean(keyword.trim()&&matchedPrograms.length)}>
+   <summary><span><ChevronDown size={18}/> 其他冬季项目与历年招聘资料（尚缺具体岗位）</span><strong>{matchedPrograms.length} 家</strong></summary>
    <p>以下是雇主冬季项目介绍或历年招聘线索；未找到可核实的本年度独立职位时，不计入上面的岗位数量。历史资料不代表当前开放申请。</p>
-   <div className="hhba-winter-program-archive-grid">{PROGRAM_ONLY.map(p=><WinterCard key={p.id} program={p}/>)}</div>
+   <div className="hhba-winter-program-archive-grid">{matchedPrograms.map(p=><WinterCard key={p.id} program={p}/>)}</div>
   </details>
   <div className="hhba-winter-page-trust"><span><CheckCircle2 size={17}/> 每条独立岗位或申请批次均披露核验等级</span><span><CheckCircle2 size={17}/> 不把业务方向拆成虚假岗位</span><span><CheckCircle2 size={17}/> 明确提示申请状态</span></div>
   <section className="hhba-winter-help"><BriefcaseBusiness size={26}/><div><h2>想继续寻找更多专业实习机会？</h2>
