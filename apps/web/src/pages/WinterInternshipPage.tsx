@@ -13,15 +13,17 @@ import '../styles/winter-internship.css';
  * in a clearly separate supplementary section. Legacy project detail URLs work.
  */
 const PAGE_SIZE=10;
-const WINTER_GROUPS=['科技研发','先进制造','金融银行','审计咨询','市场传播','企业职能','其他方向'] as const;
+const WINTER_GROUPS=['科技研发','先进制造','金融银行','审计咨询','市场传播','教育文旅','企业职能','其他方向'] as const;
 function winterIndustryGroup(job:WinterJob):string{
  const value=job.industry.toLowerCase();
  if(/审计|咨询|会计|税务/.test(value))return '审计咨询';
+ if(/金融科技|软件研发/.test(value))return '科技研发';
  if(/金融|银行|证券|财富|精算|私募|投资|财务|风险/.test(value))return '金融银行';
  if(/人力资源|人事|行政|法务|职能/.test(value))return '企业职能';
  if(/工业软件|制造|机械|家电|芯片|半导体|硬件/.test(value))return '先进制造';
  if(/人工智能|ai|算法|数据|软件|研发|科技|技术|智能/.test(value))return '科技研发';
  if(/营销|传播|公关|市场|零售|电商|媒体|游戏|美妆|奢侈/.test(value))return '市场传播';
+ if(/酒店|文旅|旅游|教育|教学|餐饮|培训/.test(value))return '教育文旅';
  return '其他方向';
 }
 function winterProgrammeGroup(category:WinterProgram['category']):string{
