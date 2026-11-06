@@ -8,7 +8,7 @@ export const reserveSql=
  "SELECT ?,?,'reserved',? WHERE "+
  "(SELECT COALESCE(SUM(package_uses),0) FROM hhba_apply_orders WHERE phone=? AND status='paid')>"+
  "(SELECT COUNT(*) FROM hhba_apply_tasks WHERE phone=? AND status IN ('reserved','completed'))";
-const settleSql=
+export const settleSql=
  "UPDATE hhba_apply_tasks SET status=?,finished_at=? WHERE id=? AND phone=? AND status='reserved'";
 export async function reserveCredit(db,phone,taskId,now=new Date().toISOString()){
  if(!taskPattern.test(taskId)||typeof phone!=='string'||!/^1[3-9]\d{9}$/.test(phone))
