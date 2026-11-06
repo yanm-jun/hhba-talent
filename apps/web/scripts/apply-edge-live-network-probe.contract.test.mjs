@@ -30,6 +30,11 @@ test('site and extension tokens are ephemeral; Owner/consent/revoke flows are re
  assert.ok(worker.includes("await fetch(LAB+'/api/apply'+path"));
  assert.ok(!worker.includes('console.log'));
  assert.ok(!worker.includes('console.error'));
+ assert.ok(worker.includes("redirect:'manual'"),'Cloudflare Workers support manual redirects');
+ assert.ok(worker.includes("response.status>=300&&response.status<400"),'3xx must be rejected before parsing response');
+ assert.ok(!worker.includes("redirect:'error'"),'Cloudflare Workers reject redirect:error');
+ assert.ok(worker.includes("error:safe(e?.message)"),'only static allowlisted codes may be persisted');
+ assert.ok(!worker.includes("safe(e?.message)?e.message"),'never persist unsanitized runtime exceptions');
 });
 test('test identities and resume metadata are removed in finally, and audit stores no bearer or pair code',()=>{
  assert.ok(worker.includes('}finally{'));
