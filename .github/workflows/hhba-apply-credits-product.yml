@@ -80,7 +80,7 @@ jobs:
           node --check popup.js
           node --check account.mjs
           node --check core.mjs
-          node --test tests/core.test.mjs tests/quickfill.contract.test.mjs tests/account.contract.test.mjs tests/ai-map.contract.test.mjs
+          node --test tests/core.test.mjs tests/quickfill.contract.test.mjs tests/account.contract.test.mjs tests/ai-map.contract.test.mjs tests/resume-gr-synthetic.contract.test.mjs
       - name: Install Chromium and Playwright for actual DOM acceptance
         run: |
           python3 -m pip install --quiet --disable-pip-version-check 'playwright>=1.55,<2'

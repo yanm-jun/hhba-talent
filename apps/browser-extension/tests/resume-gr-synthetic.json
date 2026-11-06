@@ -1,0 +1,19 @@
+{
+  "schema": "hhba-apply-profile-v1",
+  "profile": {
+    "fullName": "测试求职者",
+    "phone": "13800000000",
+    "email": "candidate@example.invalid",
+    "school": "某本科院校",
+    "major": "舞蹈学（师范类）",
+    "education": "本科",
+    "degree": "",
+    "enrollment": "",
+    "graduation": "",
+    "city": "",
+    "skills": "政策研究；行政审批；跨部门协同；项目申报；办公软件",
+    "experience": "2025—至今｜甲公司｜政府事务协同：参与政府项目资料整理及跨部门协作。\n2024—2025｜乙公司｜项目专员：参与审批材料准备。",
+    "projects": "项目甲：参与政策材料组织与事项跟踪。项目乙：参与跨地区项目执行协同。",
+    "summary": "具备公共事务与项目执行相关经历，重视材料真实性与团队合作。"
+  }
+}
