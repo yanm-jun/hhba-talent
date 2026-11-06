@@ -203,7 +203,7 @@ export function WinterInternshipPage({user,slug}:{user:User|null;slug?:string}){
    <div className="hhba-winter-section-title"><div>
     <p>公开职位证据 · 每条独立记录保留来源与核验状态</p>
     <h2 id="winter-opportunities-title">探索寒假实习机会</h2>
-    <span>输入时即时检索企业、岗位、城市和专业，支持按地区、行业分组、专业及细分行业筛选；企业项目资料与具体岗位分开展示。</span>
+    <span>输入时即时检索企业、岗位、城市和专业，支持按地区、行业分组、专业及细分行业筛选；企业项目资料与具体岗位分开展示；高校校内限制、未证实寒假时段仍有明确提示。</span>
    </div></div>
    <form className="hhba-winter-job-filters" role="search" onSubmit={e=>{e.preventDefault();setKeyword(draft);setPage(0)}}>
     <label className="hhba-winter-query"><Search size={18}/><input type="search" value={draft} onChange={e=>{setDraft(e.target.value);setKeyword(e.target.value);setPage(0)}} maxLength={80}
