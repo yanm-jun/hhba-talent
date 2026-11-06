@@ -10,7 +10,7 @@ export type WinterProgram={
  tags:string[];featured?:boolean;
  evidenceUrl?:string; /** Secondary public evidence when official portal omits dates. */
  workRightsNote?:string; /** Eligibility notes especially for cross-border postings. */
- verificationLevel?:'official-program'|'official-posting'|'date-conflict';
+ verificationLevel?:'official-program'|'official-posting'|'date-conflict'|'historical-only';
 };
 export const WINTER_2027_PROGRAMS:ReadonlyArray<WinterProgram>=[
  {
@@ -102,6 +102,27 @@ export const WINTER_2027_PROGRAMS:ReadonlyArray<WinterProgram>=[
   workRightsNote:'需要现有合法香港工作资格，汇丰明确不提供此岗位签证担保。',
   verificationLevel:'date-conflict',
   tags:['汇丰','HSBC','香港','银行','数字银行','金融','数据','商业分析','风险合规','法律','市场营销','2027']
+ },
+ {
+  id:"cmb-guangzhou-2027-winter-internship-review",
+  company:"招商银行广州分行",
+  english:"China Merchants Bank Guangzhou Branch",
+  title:"2027 寒假实习核验资料（目前仅查到往期项目）",
+  kind:"专项计划",
+  region:"中国内地",
+  location:"广州及分行覆盖地区，若有新批次以正式公告为准",
+  category:"金融",
+  intro:"截至2026年11月4日，已找到招商银行广州分行2026寒假「梦工场」实习历史公告（2025年12月发布），岗位方向包括职能、数字金融和市场营销；还找到了2026年暑期面向2027届的实习公告。近期2027届「冬季校园招聘」是毕业生校招，不能等同于2027寒假实习。没有取得2027寒假实习独立岗位或官方现行报名批次。",
+  requirements:["目前没有经过核实的2027寒假实习申请资格或开始时间；不得引用往期学历限制当作新批次要求。","2026年冬季历史项目存在职能、数字金融、营销三个业务方向，但不构成2027年三个已发布岗位。","如有新项目，须进入招商银行官方招聘平台的校园招聘→实习生招聘筛选广州分行，并再次核对时间和职位。","不要把2026年五月的2027届暑期实习和2026年十一月的2027届冬季毕业生招聘混入寒假岗位列表。"],
+  period:"2027 年寒假尚无可信确认；往期2026寒假信息仅作历史参考",
+  deadline:"2027寒假未公布；旧版2026暑期实习截止2026年5月31日，已不适用",
+  sourceUrl:"https://career.cmbchina.com/",
+  applicationUrl:"https://career.cmbchina.com/",
+  evidenceUrl:"https://offers.51mee.com/offer-detail/NI8TU9E1.html",
+  checkedOn:"2026-11-04",
+  statusNote:"已处理候选企业，但没有核实2027寒假实习具体岗位；先置于项目资料区，不计入具体岗位、不承诺仍在招聘",
+  verificationLevel:"historical-only",
+  tags:["招商银行","广州分行","2026寒假旧项目","2027待核验","银行","数字金融","市场营销","历史项目"]
  }
 ];
 export function winterProgramById(id:string){return WINTER_2027_PROGRAMS.find(p=>p.id===id);}

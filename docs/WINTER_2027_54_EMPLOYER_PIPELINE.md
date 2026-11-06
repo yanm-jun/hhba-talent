@@ -12,8 +12,11 @@
 - 第二批新增具体岗位：**3 家企业、5 个独立官方招聘职位**（BDO 香港 2、AtkinsRéalis 香港 1、RSM 香港 2），开发分支 `feature/winter-internships-batch02-bdo-atkins-rsm-20261104`。
 - 第三批新增核验：**3 家企业、4 条独立职位资料**（历峰 1、天职国际 2、Crowe 香港 1），其中 Crowe 官网年份有证据版本冲突，不能认定2027在招。
 - 第四批新增资料：**3 家候选、4 条独立职位/招聘批次记录**（安永台湾统一批次1、信永中和香港独立招聘记录2、洛书投资量化实习1）。前两项有明确2027实习周期；洛书没有同编号的冬季时段证据。
-- 后续待官网逐项核验：**39** 条候选（54中原专区3+第一批3+第二批3+第三批3+第四批3已处理；处理≠正在招聘）。
-- **岗位统计与企业统计分开**：前一批已收录具体岗位 3 个（APCO、HSBC、QIMA），第二批后为 8 条具体岗位；第三批后为 12 条职位资料，第四批后为 **16 条岗位或招聘批次资料**，其中第三方来源及日期未匹配的记录仍标为待核实；QIMA 不在原 54 企业候选里，因此不计入54完成数。
+- 第五批新增核验：**3 家候选**（ReCube 7 条高校公开冬季岗位标题；招商银行广州分行只有2026寒假旧项目、2027寒假职位未确认；叠纸游戏 2 条真实日常实习招聘但寒假到岗未证实），独立分支 `feature/winter-internships-batch05-recube-cmb-papergames-20261104`，不视作全员已开放。
+- 第六批新增核验：**3 家企业，9条不同职位记录**（永明金融3条：财务战略、财务报告、精算；宏利5条：私募股权、数据财务、信息风险、营销战略、科技；Informa Markets 1条：会展/数字营销实习）。永明2条及宏利5条官网截止日期已过；永明精算的当前申请状态待核实；Informa招聘平台列2026-11-07截止。
+- 第七批新增核验：**3 家候选、7条真实官网岗位记录**（法国巴黎银行3条、LVMH美妆统一招募1条、法国农业信贷CIB3条）。巴黎银行3条官网确认已招满；LVMH和CA全球市场2条官网公告截止；CA审计/财务2条有独立编号和2027-01-01入职但没有确认当前申请状态。专用分支 `feature/winter-internships-batch07-bnp-lvmh-creditagricole-20261104`。
+- 后续待逐项核验：**30** 条候选（54中原专区3+七批各3已处理；处理≠正在招聘）。
+- **岗位统计与企业统计分开**：前一批已收录具体岗位 3 个（APCO、HSBC、QIMA），第二批后为 8 条具体岗位；第三批后为 12 条职位资料，第七批后为 **41 条岗位或招聘批次资料（前六批34 + 巴黎银行3 + LVMH1 + 法国农业信贷3）**，其中第三方来源及日期未匹配的记录仍标为待核实；QIMA 不在原 54 企业候选里，因此不计入54完成数。
 - **摩根大通**旧站内另有一条 *2027 China Seasonal Internship*，不属于本次54条候选。已有证据提示它的部分岗位是夏秋入职，单独列入纠错队列，不应自动算作寒假已核实岗位。
 
 ## 开发规则
@@ -36,24 +39,24 @@
 | 6 | 历峰集团 Richemont | 中国香港 | 第3批已开发 | 官网 JR134347 人力招聘实习，2026年12月至2027年5月 |
 | 7 | AtkinsRéalis | 中国香港 | 第2批已开发 | 官网有冬季工程实习 R-164310，具体入职日期待确认 |
 | 8 | BDO | 中国香港 | 第2批已开发 | 官方两项独立岗位：鉴证截止11/20、IT审计截止11/30 |
-| 9 | ReCube | 中国香港 | 待官方核验 | 核对人工智能及软硬件实习 |
+| 9 | ReCube | 中国香港 | 第5批已开发·7条高校公开冬季岗位 | 香港中文大学公开索引列 7 个不同 Winter Intern 职位、2026-11-14截止；校内详情和校外申请资格未核实 |
 | 10 | 德勤中国 Deloitte | 中国内地 | 已在原专区 | 已有冬季项目记录 |
 | 11 | 安永中国 EY | 中国内地 | 第1批已开发 | 官方有冬季计划，2027具体在招未核实 |
 | 12 | 普华永道 PwC | 中国香港 | 第1批已开发 | 2027年1—6月岗位有高校发布证据 |
 | 13 | 汇丰 HSBC | 中国香港 | 第1批已开发 | 2027具体岗位；官方截止日期存在矛盾 |
-| 14 | 法国巴黎银行 BNP Paribas | 中国香港 | 待官方核验 | 核对2027年1—6月证券服务实习 |
-| 15 | LVMH 香水及美妆 | 中国香港 | 待官方核验 | 核对2027年1月营销实习 |
+| 14 | 法国巴黎银行 BNP Paribas | 中国香港 | 第7批已开发·3条独立官方项目招聘 | Securities Services 118477、Wealth Management 117528、Global Markets 117487，均2027年1—6月且官网显示已招满 |
+| 15 | LVMH 香水及美妆 | 中国香港 | 第7批已开发·官方统一招募1条 | 官网SSCPC02515，2027-01-06入职、2026-10-16截止；8个业务部门不拆成8条虚假岗位 |
 | 16 | RSM 罗申美 | 中国香港 | 第2批已开发 | 2027春季审计及科技咨询两个官网职位，确切入职日期按官网核验 |
-| 17 | 永明金融 Sun Life | 中国香港 | 待官方核验 | 原记录截止日已过，查新批次 |
-| 18 | 宏利 Manulife | 中国香港 | 待官方核验 | 原记录截止日已过，查新批次 |
-| 19 | Informa Markets 英富曼 | 中国香港 | 待官方核验 | 核对2027年1—6月实习 |
+| 17 | 永明金融 Sun Life | 中国香港 | 第6批已开发·3条独立官网职位 | JR00128213及JR00128231分别为战略财务和财务报告，10/30已截止；精算JR00120885含2027上半年及下半年，截止日不明 |
+| 18 | 宏利 Manulife | 中国香港 | 第6批已开发·5条独立官网职位 | JR26091338、JR26091703、JR26100089、JR26100142、JR26100136，2027年1—6月，官方截止2026-11-01 |
+| 19 | Informa Markets 英富曼 | 中国香港 | 第6批已开发·1条第三方招聘记录 | Recruit独立记录L059656859，2026-11-02刊登，2027年1—6月，全职6个月，公告截止2026-11-07；未证实公司官网可直投 |
 | 20 | Kering Saint Laurent | 中国香港 | 待官方核验 | 核实是否覆盖2027寒假 |
-| 21 | Crédit Agricole 法国农业信贷 | 中国香港 | 待官方核验 | 核对冬季/春季审计实习 |
+| 21 | Crédit Agricole 法国农业信贷 | 中国香港 | 第7批已开发·3条独立官网职位 | 审计2026-115888、财务2026-115202：2027年1月入职，当前申请状态待核验；全球市场2026-115201：1—4月兼职且10/31已截止 |
 | 22 | 洛书投资 | 中国内地·上海 | 第4批已开发·寒假时段待核实 | 雇主官网可投简历且高校有具体校招量化实习，寒假批次及工作城市需企业确认 |
 | 23 | 邦戴数科 | 中国内地·上海 | 待官方核验 | 第三方线索：量化研究算法 |
 | 24 | 平方和投资 | 中国内地·上海 | 待官方核验 | 第三方线索：量化策略 |
 | 25 | 九鞅投资 | 中国内地·上海 | 待官方核验 | 第三方线索：宏观研究 |
-| 26 | 招商银行广州分行 | 中国内地·广州 | 待官方核验 | 第三方线索：数字金融 |
+| 26 | 招商银行广州分行 | 中国内地·广州 | 第5批已处理·仅历史项目资料 | 查到2026寒假旧项目、2026暑期2027届实习与2027冬季毕业生校招，均不可冒充2027寒假具体实习 |
 | 27 | 赫章富民村镇银行 | 中国内地·毕节 | 待官方核验 | 第三方寒假实习线索 |
 | 28 | 东阳农商银行 | 中国内地·金华 | 待官方核验 | 第三方寒假实习线索 |
 | 29 | 西安雁塔恒通村镇银行 | 中国内地·西安 | 待官方核验 | 第三方寒假实习线索 |
@@ -61,7 +64,7 @@
 | 31 | 邮储银行南通市分行 | 中国内地·南通 | 待官方核验 | 第三方寒假实习线索 |
 | 32 | 无锡农村商业银行 | 中国内地·无锡 | 待官方核验 | 第三方寒假实习线索 |
 | 33 | 泉州农商银行 | 中国内地·泉州 | 待官方核验 | 第三方寒假实习线索 |
-| 34 | 叠纸游戏 | 中国内地·上海 | 待官方核验 | 第三方线索：游戏策划 |
+| 34 | 叠纸游戏 | 中国内地·上海 | 第5批已开发·2条日常实习待核验 | 招聘实习生－游戏研发向、大世界玩法策划实习；平台到期2027-01-06并不代表2027寒假到岗 |
 | 35 | 沐曦 | 中国内地·上海 | 待官方核验 | 第三方实习线索 |
 | 36 | 质子梯度 | 中国内地·北京 | 待官方核验 | 第三方实习线索 |
 | 37 | 洞墟科技 | 中国内地·深圳 | 待官方核验 | 第三方线索：算法开发 |
@@ -121,3 +124,47 @@
 3. **洛书投资**：[企业官网加入我们](https://www.luoshu.com/join-us)（指向官方招聘系统）；[四川大学2026-08-28职位](https://jy.scu.edu.cn/index/index/employjobdetail.html?data=MDAwMDAwMDAwMJG6n3_Ed6imi4qQtLh4Y92Kzra-smHddricp9CWi5qikaeWacSdqLqGfaK2w4iil5C4zNbGiL-E)“量化实习生（final year校招）”；[第三方寒假项目](https://www.wondercv.com/xiaozhao/luoshu-investment-2027-autumn-quant-intern-shanghai-19461-dae3b0/)写1月中旬至3月初。**未证明高校具体职位与第三方寒假批次相同**，企业地点也有出入，不得写成已确认2027寒假在招。
 
 > 统计注意：上一批的12 + 本批4 = **16条职位及申请批次记录**，不是16个已核实实时开放的岗位。分批验收后才进入main；未授权不覆盖 hhba.work。
+
+
+## 第五批岗位与历史项目核验（2026-11-04）
+
+1. **ReCube Limited（香港，7条独立职位）**：香港中文大学职业发展中心 [Job Highlights 公共列表](https://cpdc.osa.cuhk.edu.hk/en/find-a-job/highlight-job-postings) 逐项列示截至2026-11-14的七条 Winter Intern：Product & UI/UX Analyst（校内260900318）、Sustainability Research（260900321）、Full Stack App Developer（260900315）、Digital Marketing（260900319）、Hardware Engineer（260900322）、Website Designer（260900317）、Data and AI Engineer（260900320）。点击独立条目需学校统一身份认证，**无法核实实际2027开始日期、待遇、是否接受校外申请或职位完整要求**。每条链接至独立校内岗位路径、公共目录及 [ReCube 企业主页](https://www.recube.hk/)（**不是岗位直投**）；不把2026暑期招聘表格或2024冬季计划当成本轮申请入口。
+2. **招商银行广州分行（项目线索，不计具体岗位）**：[官方招聘入口](https://career.cmbchina.com/)；[2026寒假梦工场旧项目归档](https://offers.51mee.com/offer-detail/NI8TU9E1.html) 记载职能、数字金融和市场营销方向；2026年5月2027届**暑期**实习项目虽有三个岗位，已经截止，不能计入2027寒假；2026年11月的**2027届冬季校园招聘是毕业生招聘**。未找到可确认的2027寒假实习岗位，故只进入「历史项目」折叠区。
+3. **叠纸游戏（2条独立日常实习，冬季到岗未确认）**：[实习僧：招聘实习生－游戏研发向](https://www.shixiseng.com/intern/inn_rupynll1lq54)；[得早学就创：大世界玩法策划实习生－无限暖暖](https://www.deizao.cn/m/index/shixixq/jobid/280350)，分别有职责与要求，平台列2027-01-06截止，但**并未证实是2027寒假批次**，也没有对应企业官方岗位编号。雇主 [职业首页](https://career.papegames.com/) 仅供核实。2026上半年NOVA训练营、2027届秋招与2027寒假不能混同。
+
+> 第五批不增加自称“官网确认正在开放”的记录：7条高校校内职位受访问限制，2条叠纸日常实习缺2027冬季入职证据，招商广州没有新寒假岗位；25 条是累计资料数，**不是实时可申请名额**。用户验收前不合并 main、不更新 hhba.work。
+
+
+## 第六批原始岗位证据与时效核对（2026-11-04）
+
+本批在未合并的第5批分支之上继续扩展，单独提交PR，第5批通过验收后才能依赖合并。只记录独立招聘编号，不把多部门/入职期拆成虚构职位。**既往公开招聘不等于现在仍可申请。**
+
+1. **永明金融 Sun Life（3条雇主官方独立职位）**：
+   - [JR00128213 战略财务 Finance Intern](https://sunlife.wd3.myworkdayjobs.com/en-US/Experienced-Jobs/job/Finance-Intern--Jan---Jun-2027-_JR00128213)：香港红磡2027年1—6月，战略财务团队，研究、项目管理、财务指标看板；官方页面列截止**2026-10-30**，标已截止。
+   - [JR00128231 财务报告 Finance Intern](https://sunlife.wd3.myworkdayjobs.com/Experienced/job/Hunghom-Kowloon-Hong-Kong/Finance-Intern--Jan---Jun-2027-_JR00128231-1)：同名但不同编号与部门，负责财务报告和数据分析；官方截止**2026-10-30**，标已截止，不能与JR00128213合并。
+   - [JR00120885 Actuarial Internship 2027](https://sunlife.wd3.myworkdayjobs.com/en-US/Experienced-Jobs/job/Actuarial-Internship-2027_JR00120885)：单一官网职位同时包含**2027年1—6月、7—12月**两批，只有1个编号，仅把1月开始的上半年作为寒假线索；公开网页未能读取确切截止日和当前申请状态，不拆分部门/7月入职。
+2. **宏利 Manulife（5条独立雇主官方招聘编号）**：全为香港2027上半年Co-op全职实习，官网明确**2026-11-01**为报名截止日，2026-11-04已过，全部标「已过申请截止日」，但保留具体要求与原文。
+   - [JR26091338 Private Equity Asia Analyst Intern](https://manulife.wd3.myworkdayjobs.com/en-US/MFCJH_Jobs/job/Manulife---Analyst-Intern--6-months---Private-Equity-Asia--January-2027-Intake_JR26091338)：私募股权分析；岗位正文出现1—7月、项目通用条款1—6月两种结束月份，明确提示。
+   - [JR26091703 Data and Finance](https://manulife.wd3.myworkdayjobs.com/en-US/MFCJH_Jobs/job/Co-op-2027---Data-and-Finance--6-months-_JR26091703)：财务与数据。
+   - [JR26100089 Global Information Risk Management](https://manulife.wd3.myworkdayjobs.com/en-US/MFCJH_Jobs/job/Co-op-Internship-2027---Global-Information-Risk-Management--6-months-_JR26100089)：信息风险控制评估与测试。
+   - [JR26100142 Asia Regional Marketing Strategy & Business Planning](https://manulife.wd3.myworkdayjobs.com/en-US/MFCJH_Jobs/job/Hong-Kong-Manulife-Tower/Co-op-Internship-2027---Asia-Regional-Marketing-Strategy---Business-Planning--6-months-_JR26100142)：营销战略及业务规划。
+   - [JR26100136 Tech Placement Program](https://manulife.wd3.myworkdayjobs.com/en-US/MFCJH_Jobs/job/Co-op-Internship-2027--Tech-Placement-Program--6-months-_JR26100136)：技术实习，技术方向虽多但仅1个招聘编号。
+3. **Informa Markets（1条第三方独立招聘记录）**：[Recruit招聘原文 L059656859](https://openuniversity.recruit.com.hk/jobseeker/JobDetail.aspx?jobOrder=L059656859)2026-11-02发布，2027年1—6月香港全职会展运营与数字营销实习，要求市场、传播、新闻或商科相关在读背景、英/粤/普通话，**要求2026-11-07前报名**，并填写可到岗日期及预期薪金。已核实[企业官方招聘总入口](https://www.informa.com/divisions/informa-markets/join-the-team/)，未获取这条职位在企业官网的一对一独立编号，故展示第三方招聘记录并提示企业主页不是直投地址。截止日尚未到不等于实时开放。
+
+> 合计**34条独立职位或招聘批次资料**，其中部分已过期或需官网复核，不可称34条在招。原54条企业/地区候选累计处理**21条**，未处理**33条**；其他招聘机会QIMA不纳入54候选数。独立PR验收前不合并main、不部署hhba.work。
+
+## 第七批独立岗位与申请状态证据（2026-11-04）
+
+第七批以尚待合并的PR #252第6批分支为父分支进行叠加式开发，不覆盖先前批次。**全部岗位明确2027年1月入职，但并不意味着可在2026年11月继续投递。**
+
+1. **法国巴黎银行 BNP Paribas（3个官网独立招聘编号，全部已招满）**：
+   - [Securities Services（完整编号1234567890100118477）](https://group.bnpparibas/en/careers/job-offer/2027-apac-long-internship-january-june-securities-services-hong-kong)：2027年1—6月香港证券服务实习，官网更新31.10.2026明确写「Sorry, this position is already filled」。包含CAO、客户交付、投资人服务等多个业务方向，不拆多个职位。
+   - [Wealth Management（完整编号1234567890100117528）](https://group.bnpparibas/en/careers/job-offer/2027-apac-long-internship-jan-jun-wealth-management-hong-kong)：2027年1—6月香港财富管理，官方同样显示已招满；COO、投资服务、营销等是同一编号的业务线。
+   - [Global Markets（完整编号1234567890100117487）](https://group.bnpparibas/en/careers/job-offer/2027-apac-long-internship-jan-jun-global-markets-hong-kong)：2027年1—6月香港全球市场，官网明确已招满。正文包含「2026 APAC」旧文案，与2027标题/时间有版本混用，页面明确备注；销售、交易、量化不是独立招聘编号。
+2. **LVMH香水与美妆（1个统一招募编号，已截止）**：[SSCPC02515 2027香港1月实习](https://www.lvmh.com/fr/nous-rejoindre/nos-offres/SSCPC02515)，官方写明**2027年1月6日开始**、**2026年10月16日报名截止**，现已过期。欢迎在读本科与应届毕业生，每周至少4天，申请人须自行具备在港工作资格、不提供工作签证担保。涵盖营销、销售、视觉陈列、HR、零售培训、财务、采购、供应链，**一个招聘编号不拆成8条岗位**。
+3. **法国农业信贷 Crédit Agricole CIB（3个官网独立招聘编号）**：
+   - [Audit Intern 2026-115888](https://jobs.ca-cib.com/stelle/stelle-audit-intern-6-month-contract-_115888.aspx?LCID=1031)：2027年1月1日开始，六个月，亚太/中东内审枢纽，内部控制评估、证据核验、审计报告；官网可读摘要未见明确投递截止，标记**申请状态待核实**。
+   - [Finance Intern 2026-115202](https://jobs.ca-cib.com/Pages/Offre/detailoffre.aspx?LCID=1031&idOffre=115202&idOrigine=1533&offerReference=2026-115202)：2027年1月1日开始，六个月，亚太财务/ALM、资金定价、损益分析及Power BI；申请状态待核实。**官网文字要求同时完成职位申请和额外表格**，按实际岗位操作。
+   - [Global Markets 2026-115201](https://jobs.ca-cib.com/job/job-global-markets-off-cycle-intern-jan-to-apr-2027-_115201.aspx)：2027年1—4月四个月**兼职**实习，官网截止2026年10月31日（已过期）；不可误写为全职六个月岗位。官网说明面向2027届毕业、可于8月加入Graduate Analyst的申请者。
+
+> 统计：前六批34 + 第七批7 = **41条岗位或招聘批次资料**；54条企业/地区候选累计**24条已处理、30条仍待核验**。已招满3条、已截止2条、本批待核实申请状态2条。这里的「已处理」不代表仍有申请资格、开放名额；未经用户验收本PR不可合并main或部署hhba.work。
