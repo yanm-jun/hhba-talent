@@ -77,7 +77,7 @@ export function OverseasDevelopmentPage({user,view='home',pathwayId}:{user:User|
         </a>
         <span className="hhba-overseas-country-status">{c.ready?'国家方案已收录':'规划中'}</span>
        </div>
-       <div className="hhba-overseas-country-copy"><small>{c.region} · {c.english}</small><h3>{c.name}</h3><p>{c.description}</p>{c.ready?<Link to={c.code==='nz'?countryLink:c.code==='au'?root+'/country/australia':c.code==='jp'?root+'/country/japan':c.code==='de'?root+'/country/germany':c.code==='ca'?root+'/country/canada':c.code==='uk'?root+'/country/united-kingdom':root}>探索全部方案 <ArrowRight size={16}/></Link>:<span className="hhba-overseas-country-pending">资料开发中 · 暂不开放</span>}</div>
+       <div className="hhba-overseas-country-copy"><small>{c.region} · {c.english}</small><h3>{c.name}</h3><p>{c.description}</p>{c.ready?<Link to={c.code==='nz'?countryLink:c.code==='au'?root+'/country/australia':c.code==='jp'?root+'/country/japan':c.code==='de'?root+'/country/germany':c.code==='ca'?root+'/country/canada':c.code==='uk'?root+'/country/united-kingdom':c.code==='sg'?root+'/country/singapore':c.code==='us'?root+'/country/united-states':root}>探索全部方案 <ArrowRight size={16}/></Link>:<span className="hhba-overseas-country-pending">资料开发中 · 暂不开放</span>}</div>
       </article>)}</div>
      </section>
      <section className="hhba-overseas-section"><div className="hhba-overseas-section-head"><div><span className="hhba-overseas-kicker">CHOOSE YOUR PATH</span><h2>不确定去哪里？先从目标出发</h2><p>先看有哪些可研究的合法方案，再核对个人具体资格。</p></div></div>
