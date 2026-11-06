@@ -17,6 +17,7 @@ const PROGRAM_ONLY=WINTER_2027_PROGRAMS.filter(p=>
  p.kind==='专项计划'&&p.id!=='jpm-2027-seasonal' &&
  !WINTER_2027_JOBS.some(job=>job.originalProgramId===p.id));
 function verificationLabel(p:WinterProgram){
+ if(p.verificationLevel==='historical-only')return '往期冬季实习资料 · 2027待核实';
  if(p.verificationLevel==='date-conflict')return '申请截止时间待核实';
  if(p.verificationLevel==='official-posting')return '企业官网具体岗位';
  if(p.verificationLevel==='official-program')return '官方项目 · 需核对在招';
@@ -87,12 +88,12 @@ function WinterRoleRow({job}:{job:WinterJob}){
    <h3><Link to={'/winter-internship/'+job.id}>{job.title}</Link></h3>
    <p className="hhba-winter-role-company"><Building2 size={14}/><strong>{job.company}</strong><span>{job.city}</span><span>{job.industry}</span></p>
    <p className="hhba-winter-role-intro">{job.description}</p>
-   <div className="hhba-winter-role-labels"><span><CalendarDays size={13}/>{job.startDate}开始</span>
+   <div className="hhba-winter-role-labels"><span><CalendarDays size={13}/>{job.startDate}{job.status==='campus-limited'||job.status==='winter-unverified'?'':'开始'}</span>
     {job.majorTags.slice(0,3).map(x=><span key={x}>{x}</span>)}</div>
   </div>
   <div className="hhba-winter-role-actions">
    <Link to={'/winter-internship/'+job.id} className="hhba-winter-role-detail">岗位详情 <ArrowRight size={15}/></Link>
-   {url&&<a href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-role-apply">官网核实 <ExternalLink size={14}/></a>}
+   {url&&<a href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-role-apply">{job.status==='filled'?'查看已招满公告':job.status==='closed'?'查看已截止公告':job.status==='campus-limited'?'企业官网（非直投）':job.status==='source-verify'?'企业招聘首页（非直投）':'官网核实'} <ExternalLink size={14}/></a>}
    <small>核对：{job.checkedOn}</small>
   </div>
  </article>;
@@ -121,9 +122,9 @@ function WinterJobDetail({user,job}:{user:User|null;job:WinterJob}){
    {job.salaryNote&&<><h2>薪酬备注</h2><p>{job.salaryNote}</p></>}
    {(job.status==='deadline-conflict'||job.status==='year-conflict')&&<p className="hhba-winter-warning" role="note">{job.reviewWarning||'官方截止日期出现不一致的公开页面版本，HHBA 无法确认当前可申请。请以雇主申请系统最新页面为准。'}</p>}
    {job.reviewWarning&&job.status!=='deadline-conflict'&&job.status!=='year-conflict'&&<p className="hhba-winter-warning" role="note">{job.reviewWarning}</p>}
-   {job.evidenceUrl&&<a href={job.evidenceUrl} target="_blank" rel="noopener noreferrer" className="hhba-winter-source-link">查看补充招聘时间证据 <ExternalLink size={15}/></a>}
-   <h2>官方职位与申请</h2><p>本站仅提供已核验的企业岗位信息，不在 HHBA 代替企业收集申请材料、不承诺名额或录取结果。申请之前请确认官方投递按钮仍然有效。</p>
-   {url&&<a href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-official">前往企业官方岗位核实及申请 <ExternalLink size={16}/></a>}
+   {job.evidenceUrl&&<a href={job.evidenceUrl} target="_blank" rel="noopener noreferrer" className="hhba-winter-source-link">{job.status==='campus-limited'?'查看高校公开职位与截止日':job.status==='source-verify'?'查看招聘平台原始记录':'查看补充招聘时间证据'} <ExternalLink size={15}/></a>}
+   <h2>职位来源与申请核实</h2><p>本站整理有出处的公开职位和招聘批次信息；部分仅见于高校或第三方招聘平台。已过截止日或已被雇主宣布招满的岗位仅保留历史资料与官方公告链接，不代表可投递；企业招聘首页不等于具体岗位直投入口。HHBA 不代收申请材料，也不承诺名额或录取结果。</p>
+   {url&&<a href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-official">{job.status==='filled'?'查看雇主已招满岗位公告':job.status==='closed'?'查看雇主已截止岗位公告':job.status==='campus-limited'?'企业官网（非岗位直投）':job.status==='source-verify'?'企业招聘首页（非岗位直投）':'前往企业官方岗位核实及申请'} <ExternalLink size={16}/></a>}
    <p className="hhba-winter-verified">资料核对日期：{job.checkedOn}。{job.statusNote}。</p>
   </section>
  </main></Shell>;
@@ -161,14 +162,14 @@ export function WinterInternshipPage({user,slug}:{user:User|null;slug?:string}){
     <h1>寒假实习 · 直接找岗位</h1>
     <p>先看真实企业发布的具体岗位，再了解职位要求、时间和申请入口。</p>
    </div>
-   <div className="hhba-winter-job-hero-stat"><strong>{WINTER_2027_JOBS.length}</strong><span>条官方具体岗位资料</span>
+   <div className="hhba-winter-job-hero-stat"><strong>{WINTER_2027_JOBS.length}</strong><span>条公开岗位及招聘批次记录</span>
     <small>不等于实时可申请名额</small></div>
   </section>
   <section className="hhba-winter-job-market" id="winter-opportunities" aria-labelledby="winter-opportunities-title">
    <div className="hhba-winter-section-title"><div>
     <p>公开职位证据 · 每条独立记录保留来源与核验状态</p>
     <h2 id="winter-opportunities-title">探索寒假实习机会</h2>
-    <span>直接按岗位搜索，按专业、地区和行业筛选。单一批次及未确认寒假时段的岗位会明确标注，不把业务方向拆成虚构职位。</span>
+    <span>直接按岗位搜索，按专业、地区和行业筛选。高校校内限制、第三方公开记录、单一招聘批次及未确认寒假时段均会明确标注，不把业务方向拆成虚构职位。</span>
    </div></div>
    <form className="hhba-winter-job-filters" role="search" onSubmit={e=>{e.preventDefault();setKeyword(draft);setPage(0)}}>
     <label className="hhba-winter-query"><Search size={18}/><input type="search" value={draft} onChange={e=>setDraft(e.target.value)} maxLength={80}
@@ -181,7 +182,7 @@ export function WinterInternshipPage({user,slug}:{user:User|null;slug?:string}){
     <label>行业<select aria-label="按行业筛选寒假岗位" value={industry} onChange={e=>{setIndustry(e.target.value);setPage(0)}}>{industries.map(x=><option key={x}>{x}</option>)}</select></label>
     <button type="button" onClick={clear} className="hhba-winter-filters-reset">重置</button>
    </div>
-   <div className="hhba-winter-list-summary" aria-live="polite"><strong>{filtered.length}</strong> 条具体岗位结果
+   <div className="hhba-winter-list-summary" aria-live="polite"><strong>{filtered.length}</strong> 条公开岗位及招聘批次结果
     <span> · 包含雇主官方及招聘平台公开记录，部分寒假时间待核实</span></div>
    {visible.length?<div className="hhba-winter-role-list" aria-label="寒假实习具体岗位列表">{visible.map(j=><WinterRoleRow job={j} key={j.id}/>)}</div>:
     <div className="hhba-winter-none" role="status"><Search size={24}/><h3>没有找到相符的具体寒假岗位</h3>
@@ -193,14 +194,14 @@ export function WinterInternshipPage({user,slug}:{user:User|null;slug?:string}){
    </nav>}
   </section>
   <details className="hhba-winter-program-archive" data-winter-program-archive>
-   <summary><span><ChevronDown size={18}/> 其他已核实冬季项目资料（尚缺具体岗位）</span><strong>{PROGRAM_ONLY.length} 家</strong></summary>
-   <p>以下企业官网介绍了冬季实习项目，但还未核验到可逐条引用的本年度具体岗位，因此不计入上面的岗位数量。</p>
+   <summary><span><ChevronDown size={18}/> 其他冬季项目与历年招聘资料（尚缺具体岗位）</span><strong>{PROGRAM_ONLY.length} 家</strong></summary>
+   <p>以下是雇主冬季项目介绍或历年招聘线索；未找到可核实的本年度独立职位时，不计入上面的岗位数量。历史资料不代表当前开放申请。</p>
    <div className="hhba-winter-program-archive-grid">{PROGRAM_ONLY.map(p=><WinterCard key={p.id} program={p}/>)}</div>
   </details>
   <div className="hhba-winter-page-trust"><span><CheckCircle2 size={17}/> 每条独立岗位或申请批次均披露核验等级</span><span><CheckCircle2 size={17}/> 不把业务方向拆成虚假岗位</span><span><CheckCircle2 size={17}/> 明确提示申请状态</span></div>
   <section className="hhba-winter-help"><BriefcaseBusiness size={26}/><div><h2>想继续寻找更多专业实习机会？</h2>
    <p>优先展示覆盖冬季的具体岗位；尚未核实寒假入职的相关实习会明显标注。更多职位可到 HHBA 招聘市场查看。</p></div>
    <Link to="/candidate/jobs">查看完整招聘市场 <ArrowUpRight size={16}/></Link></section>
-  <p className="hhba-winter-page-note"><ShieldCheck size={16}/> 岗位发布不代表仍在招；信息核验日期请查看每条详情。香港职位可能要求有效工作资格；若某岗位官网已关闭申请，须以企业官网为准。</p>
+  <p className="hhba-winter-page-note"><ShieldCheck size={16}/> 岗位发布不代表仍在招，部分已招满或已截止；信息核验日期请查看每条详情。香港职位可能要求有效工作资格；若某岗位官网已关闭申请，须以企业官网为准。</p>
  </main></Shell>;
 }
