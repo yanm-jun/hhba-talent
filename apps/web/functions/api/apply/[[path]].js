@@ -6,6 +6,7 @@ import {APPLY_PACKAGES,packagePriceFen,alipayConfigured,alipayCredentialsConfigu
 import {reconcileOrder,closeUnpaidOrder} from '../../_lib/apply-payment-reconciliation.js';
 import {aiConfigured,validateAISuggestionRequest,suggestSafeFields,validateAIKeyMapRequest,suggestAIFieldKeys} from '../../_lib/apply-ai-suggest.js';
 import {pairingConfigured,validExtensionOrigin,extensionCors,createPairCode,claimPairCode,extensionSession,revokeExtensions} from '../../_lib/apply-extension-pairing.js';
+import {syncKeyConfigured,prepareProfileTransfer,claimProfileTransfer,revokeProfileTransfer} from '../../_lib/apply-profile-sync.js';
 
 const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
  'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'
@@ -100,6 +101,16 @@ export async function onRequest({request,env}){
   try{ext=await extensionSession(db,env,request)}
   catch{return wrap(err('EXTENSION_SESSION_UNAVAILABLE',503))}
   if(!ext)return wrap(err('EXTENSION_SESSION_INVALID',401));
+  if(method==='POST'&&path==='/extension/profile/claim'){
+   // Separate extension session, same verified account and fixed extension origin.
+   if(!syncKeyConfigured(env))return wrap(err('PROFILE_TRANSFER_NOT_CONFIGURED',503));
+   try{
+    const user=await getUserByPhone(db,ext.phone);
+    if(user?.role!=='candidate')return wrap(err('CANDIDATE_REQUIRED',403));
+    const claim=await claimProfileTransfer(db,env,ext.phone);
+    return wrap(claim.ok?json(claim):err(claim.error,claim.status));
+   }catch{return wrap(err('PROFILE_TRANSFER_UNAVAILABLE',503))}
+  }
   if(method==='GET'&&path==='/extension/wallet'){
    try{
     const user=await getUserByPhone(db,ext.phone);
@@ -157,6 +168,23 @@ export async function onRequest({request,env}){
     .bind(phone,now).first();
    return json({ok:true,connectedDevices:Number(total?.n||0)});
   }
+  if(method==='POST'&&path==='/profile-transfer/prepare'){
+   if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
+   if(!pairingConfigured(env))return err('PAIRING_NOT_ENABLED',503);
+   const body=await jsonBody(request,22000);
+   if(!body)return err('INVALID_PROFILE_SYNC_REQUEST',400);
+   try{
+    const result=await prepareProfileTransfer(db,env,phone,body);
+    return result.ok?json(result):err(result.error,result.status);
+   }catch{return err('PROFILE_TRANSFER_UNAVAILABLE',503)}
+  }
+  if(method==='POST'&&path==='/profile-transfer/revoke'){
+   if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
+   try{
+    const result=await revokeProfileTransfer(db,phone);
+    return result.ok?json(result):err('PROFILE_TRANSFER_UNAVAILABLE',503);
+   }catch{return err('PROFILE_TRANSFER_UNAVAILABLE',503)}
+  }
   if(method==='POST'&&path==='/pair/start'){
    if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
    if(!pairingConfigured(env))return err('PAIRING_NOT_ENABLED',503);
@@ -167,6 +195,7 @@ export async function onRequest({request,env}){
    if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
    if(!pairingConfigured(env))return err('PAIRING_NOT_ENABLED',503);
    await revokeExtensions(db,phone);
+   await revokeProfileTransfer(db,phone);
    return json({ok:true,connectedDevices:0});
   }
   if(method==='POST'&&path==='/ai/suggest'){
