@@ -59,7 +59,9 @@ test('P0 install entry never presents an unreviewed ZIP as an approved store ins
  assert.ok(product.includes('VITE_HHBA_EDGE_ADDONS_URL'));
  assert.ok(product.includes('microsoftedge.microsoft.com'));
  assert.ok(product.includes('url.protocol'));
- assert.ok(product.includes('!path.test(url.pathname)'));
+ assert.ok(product.includes('url.pathname'));
+ assert.ok(product.includes('/addons'));
+ assert.ok(product.includes('url.hostname'));
  assert.ok(product.includes('Edge 商店尚未发布'));
  assert.ok(!product.includes('Google Chrome'));
  assert.ok(!product.includes('chromeInstallUrl'));
