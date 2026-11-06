@@ -7,7 +7,7 @@ import {ukCompleteGuides} from '../src/data/overseasUKGuides.ts';
 import {overseasCountryOptions} from '../src/data/overseasNewZealand.ts';
 import {overseasTerms} from '../src/data/overseasGlossary.ts';
 const read=p=>readFileSync(new URL(p,import.meta.url),'utf8');
-const ids=['uk-skilled-worker','uk-health-care','uk-student','uk-graduate','uk-global-talent','uk-hpi','uk-scale-up','uk-innovator','uk-seasonal','uk-creative-worker','uk-gov-exchange','uk-senior-specialist','uk-family-partner','uk-youth-mobility','uk-global-business-graduate-trainee'];
+const ids=['uk-skilled','uk-health','uk-student','uk-graduate','uk-global-talent','uk-hpi','uk-scale','uk-innovator','uk-seasonal','uk-creative-worker','uk-gov-exchange','uk-senior-specialist','uk-family-partner','uk-youth-mobility','uk-global-business-graduate-trainee'];
 
 test('UK 2026 has 15 independent official pathways, stable IDs and no invented availability',()=>{
  assert.equal(ukVerifiedOn,'2026-11-06');
@@ -55,8 +55,8 @@ test('All UK guides have complete eight-subject chapters, 3+ useful points, FAQs
 });
 
 test('Critical 2026 UK safeguards must not revert to inaccurate immigration claims',()=>{
- const skilled=JSON.stringify(ukCompleteGuides['uk-skilled-worker']);
- const healthcare=JSON.stringify(ukCompleteGuides['uk-health-care']);
+ const skilled=JSON.stringify(ukCompleteGuides['uk-skilled']);
+ const healthcare=JSON.stringify(ukCompleteGuides['uk-health']);
  const student=JSON.stringify(ukCompleteGuides['uk-student']);
  const graduate=JSON.stringify(ukCompleteGuides['uk-graduate']);
  const hpi=JSON.stringify(ukCompleteGuides['uk-hpi']);
@@ -86,7 +86,7 @@ test('Existing UK photo/country card, clickable frontend route and legacy five c
  const main=read('../src/main.tsx'),homepage=read('../src/pages/OverseasDevelopmentPage.tsx');
  const page=read('../src/pages/UKDevelopmentPage.tsx'),css=read('../src/styles/overseas-uk.css');
  assert.ok(main.includes("import { UKDevelopmentPage } from './pages/UKDevelopmentPage'"));
- for(const url of ['/study-abroad/country/united-kingdom','/study-abroad/uk/saved','/study-abroad/uk/compare','/study-abroad/uk/match','/study-abroad/uk/pathway/'])assert.ok(main.includes(url),url);
+ for(const url of ['/study-abroad/country/united-kingdom','/study-abroad/united-kingdom/saved','/study-abroad/united-kingdom/compare','/study-abroad/united-kingdom/match','/study-abroad/united-kingdom/pathway/'])assert.ok(main.includes(url),url);
  assert.ok(homepage.includes("c.code==='uk'?root+'/country/united-kingdom'"),'UK card must not fall back to generic old study-abroad page');
  assert.ok(overseasCountryOptions.find(c=>c.code==='uk'&&c.ready));
  for(const code of ['nz','au','jp','de','ca'])assert.ok(overseasCountryOptions.some(c=>c.code===code&&c.ready),code);
@@ -95,7 +95,7 @@ test('Existing UK photo/country card, clickable frontend route and legacy five c
  assert.ok(page.includes('https://commons.wikimedia.org/wiki/File:Westminster_Palace_and_Big_Ben.jpg'));
  assert.ok(page.includes('ukOfficial.sponsors')&&page.includes('ukOfficial.rates'));
  assert.ok(page.includes('data-hhba-overseas-uk'));
- assert.ok(page.includes('hhba.overseas.uk.favourites.v1'));
+ assert.ok(page.includes('hhba.overseas.uk.saved.v1'));
  assert.ok(page.includes('hhba.overseas.uk.compare.v1'));
  assert.ok(css.includes('@media(max-width:760px)'));
  const photo=fileURLToPath(new URL('../public/overseas/countries/uk.webp',import.meta.url));
