@@ -49,7 +49,7 @@ HHBA 智能网申助手是一款面向 Microsoft Edge 的求职表单辅助填�
 - Partner Center 实际开发者账号与正式展示图/截图、支持渠道、隐私法务审查。
 - 审查并配置专属 Edge Extension ID 及 Cloudflare Preview 的配对开关、pepper 与 AES-256-GCM Secret；不向源代码或用户端暴露秘密。
 - 使用隔离测试账户在真实 Edge Windows/macOS 测试**完整的一次性资料同步链**；生产配置、收费和合并 main 均在验收后单独审批。
-- 过期密文后台定时删除代码已实现于 `apps/web/workers/apply-profile-transfer-janitor.js`，但**仍未在 Cloudflare 创建/启用 Cron Trigger**。当前只有访问时机会性删除与过期后不可领取；启用并验证调度及 D1 隔离之后才能承诺物理保留上限。
+- 过期密文后台定时删除代码已实现于 `apps/web/workers/apply-profile-transfer-janitor.js`；**独立测试实验室**已配置 Preview D1 清理 Worker 和 15 分钟 Cron，但正式 hhba.work 仍未启用该计划，实际定时运行与承诺的物理留存上限还需单独核验。
 
 **必须区分：** Chromium 扩展平台会在 Edge 使用 `chrome.*` API 和 `chrome-extension://<id>`，这不表示上传 Chrome Web Store。
 
@@ -78,4 +78,4 @@ node apps/browser-extension/scripts/stage-preview.mjs https://<真实Cloudflare-
 2. 将 `HHBA_APPLY_CLEANUP_ENABLED=1` 仅写入该 Worker 的受控环境，配置必要的周期性 Cron Trigger（例如每 15 分钟）。
 3. 用隔离合成数据验收「未过期行保留、过期行删除、已经领取行删除」，确认不清理任意其他表、不会写入个人字段日志。
 4. 根据实际调度间隔、时钟偏差、失败重试和用户权利请求，准确修订隐私政策及物理删除时间。不能只凭代码存在就声称服务已按时删除。
-5. **本分支不自动部署 Worker、不创建计划任务、不修改生产 D1。**
+5. **本分支对正式 HHBA 站点不部署 Worker、不创建生产定时任务、不修改生产 D1；测试实验室的独立 Worker/Cron 已作为隔离验收环境创建。**
