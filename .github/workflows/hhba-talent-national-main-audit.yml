@@ -59,6 +59,8 @@ jobs:
         run: node --experimental-strip-types scripts/test-ningxia-pages-sync.mjs
       - name: Tibet V6 seven-region complete catalog and guides
         run: node --experimental-strip-types scripts/test-xizang-v6.mjs
+      - name: Shanxi V5.1 current main policy and housing guide regression
+        run: node --experimental-strip-types scripts/test-shanxi-current-guide-20261106.mjs
       - name: Shaanxi V6 full ten-city policy housing and guide regression
         run: node --experimental-strip-types scripts/test-shaanxi-v6.mjs
       - name: Audit Gansu 14 regions V6 policy, housing, city UI and guides

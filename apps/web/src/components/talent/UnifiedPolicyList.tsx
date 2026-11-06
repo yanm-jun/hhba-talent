@@ -12,6 +12,7 @@ function newProvincePolicyRoute(id:string,city:string):string|undefined{
  if(id.startsWith('xj-')&&['乌鲁木齐','克拉玛依','吐鲁番','哈密','昌吉','博尔塔拉','巴音郭楞','阿克苏','克孜勒苏','喀什','和田','伊犁','塔城','阿勒泰'].includes(city))return '/talent-service/policy-guide-preview/xinjiang/policy/'+encodeURIComponent(id);
  if(id.startsWith('gs-')&&['兰州','嘉峪关','金昌','白银','天水','武威','张掖','平凉','酒泉','庆阳','定西','陇南','临夏','甘南'].includes(city))return '/talent-service/policy-guide-preview/gansu/policy/'+encodeURIComponent(id);
  if(id.startsWith('sn-')&&['西安','铜川','宝鸡','咸阳','渭南','延安','榆林','汉中','安康','商洛'].includes(city))return '/talent-service/policy-guide-preview/shaanxi/policy/'+encodeURIComponent(id);
+ if(id.startsWith('sx-')&&['太原','大同','阳泉','长治','晋城','朔州','晋中','运城','忻州','临汾','吕梁'].includes(city))return '/talent-service/policy-guide-preview/shanxi/policy/'+encodeURIComponent(id);
  if(id.startsWith('xz-')&&['拉萨','日喀则','山南','林芝','昌都','那曲','阿里'].includes(city))return '/talent-service/policy-guide-preview/xizang/policy/'+encodeURIComponent(id);
  if(id.startsWith('nx-')&&['银川','石嘴山','吴忠','固原','中卫'].includes(city))return '/talent-service/policy-guide-preview/ningxia/policy/'+encodeURIComponent(id);
  if(id.startsWith('gz-')&&['贵阳','六盘水','遵义','安顺','毕节','铜仁','黔西南','黔东南','黔南'].includes(city))return '/talent-service/policy-guide-preview/guizhou/policy/'+encodeURIComponent(id);

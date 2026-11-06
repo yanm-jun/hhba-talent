@@ -1,0 +1,3 @@
+# Shanxi PR #126 recovery (2026-11-06)
+
+The historical branch contains 25 policies and 15 housing records. Current main has a newer source-backed set of 22 policy and 12 housing records; the old data MUST NOT overwrite current sources. This change restores only the shared-guide builder using the **existing main** records and IDs, with 11-city routing and B/C-only qualification. All 34 records get applicant steps, conditional branches, FAQ and original record sources; still not an assertion of currently open applications or rentable vacancy. Added a source/route/build regression to the existing national audit. The original PR #126 and branch remain intact for evidence review.
