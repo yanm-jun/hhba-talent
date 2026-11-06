@@ -60,5 +60,5 @@ test('V0.5 UI requires per-call opt-in and does NOT silently AI-fill or charge',
  assert.ok(popup.includes("planAIFieldSuggestions(scan.fields,profile,response.matches)"));
  assert.ok(popup.includes('accountApi(fetch,"/ai/map",session'));
  assert.ok(!popup.includes('AI_DEDUCT_CREDIT'));
- assert.ok(!/\\.submit\\s*\\(/.test(popup));
+ assert.ok(!popup.includes(".submit("));
 });

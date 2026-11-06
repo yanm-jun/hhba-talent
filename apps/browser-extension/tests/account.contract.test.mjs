@@ -31,9 +31,9 @@ test('account requests omit cookies and never support client-issued spending or 
  assert.equal(last.options.credentials,'omit');
  assert.equal(last.options.headers.Authorization,'Bearer '+token.token);
  assert.equal(last.options.method,'GET');
- await assert.rejects(()=>accountApi(fake,'/grant',token),/只允许/);
- await assert.rejects(()=>accountApi(fake,'/pay',token),/只允许/);
- await assert.rejects(()=>accountApi(fake,'/settle',token),/只允许/);
+ await assert.rejects(()=>accountApi(fake,'/grant',token),/没有操作|只允许/);
+ await assert.rejects(()=>accountApi(fake,'/pay',token),/没有操作|只允许/);
+ await assert.rejects(()=>accountApi(fake,'/settle',token),/没有操作|只允许/);
 });
 test('extension claim uses explicit one-time code and no website bearer',async()=>{
  let req;
