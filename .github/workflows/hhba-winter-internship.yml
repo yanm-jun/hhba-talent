@@ -3,7 +3,7 @@ on:
   # Stacked PR base branches do not always carry the next batch's workflow filter.
   # Validate this source branch directly, without retargeting the PR to main.
   push:
-    branches: ['feature/winter-internships-batch07-bnp-lvmh-creditagricole-20261104', 'feature/winter-cn-batch09-cmbc-bondi-changchun-wanda-20261106', 'feature/winter-cn-batch10-zuoyebang-alpha2-gtht-20261106', 'feature/winter-cn-batch12-luxin-airlink-liepin-20261106']
+    branches: ['feature/winter-internships-batch07-bnp-lvmh-creditagricole-20261104', 'feature/winter-cn-batch09-cmbc-bondi-changchun-wanda-20261106', 'feature/winter-cn-batch10-zuoyebang-alpha2-gtht-20261106', 'feature/winter-cn-batch12-luxin-airlink-liepin-20261106', 'feature/winter-cn-batch13-bdo-pccpa-dahua-20261106']
     paths:
       - 'apps/web/src/data/winter2027Jobs.ts'
       - 'apps/web/src/data/winter2027Programs.ts'
@@ -12,7 +12,7 @@ on:
       - 'apps/web/scripts/winter_internship_browser.py'
       - '.github/workflows/hhba-winter-internship.yml'
   pull_request:
-    branches: [main, 'feature/winter-internships-batch06-sunlife-manulife-informa-20261104', 'feature/winter-cn-batch08-haier-hisense-boe-20261106', 'feature/winter-cn-batch09-cmbc-bondi-changchun-wanda-20261106', 'feature/winter-cn-batch11-hfbank-tabs-roys-20261106']
+    branches: [main, 'feature/winter-internships-batch06-sunlife-manulife-informa-20261104', 'feature/winter-cn-batch08-haier-hisense-boe-20261106', 'feature/winter-cn-batch09-cmbc-bondi-changchun-wanda-20261106', 'feature/winter-cn-batch11-hfbank-tabs-roys-20261106', 'feature/winter-cn-batch12-luxin-airlink-liepin-20261106']
     paths:
       - 'apps/web/src/pages/HomePage.tsx'
       - 'apps/web/src/main.tsx'
