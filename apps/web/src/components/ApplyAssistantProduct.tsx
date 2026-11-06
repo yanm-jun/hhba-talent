@@ -2,6 +2,7 @@ import {useEffect,useMemo,useState} from 'react';
 import {ArrowRight,BadgeCheck,CheckCircle2,ChevronRight,Clock3,FileCheck2,LockKeyhole,MousePointerClick,PlayCircle,RefreshCcw,ReceiptText,ShieldCheck,Sparkles,Wallet} from 'lucide-react';
 import {Link} from '../router';
 import {qrcodegen} from '../vendor/qrcodegen';
+import {ApplyResumeSync} from './ApplyResumeSync';
 import {applyAccountAvailable,createApplyOrder,closeApplyOrder,getApplyConfig,queryApplyOrderStatus,getApplyOrders,getApplyTasks,getApplyWallet,listApplyRefundRequests,requestApplyRefund,getApplyPairStatus,startApplyPair,revokeApplyPairs,type ApplyConfig,type ApplyOrder,type ApplyTask,type ApplyWallet,type ApplyRefundRequest,type ApplyPairCode} from '../services/applyCredits';
 import '../styles/apply-assistant-product.css';
 
@@ -251,6 +252,7 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
    {pairNotice&&<p className="hhba-apply-safety-note" role="status"><ShieldCheck size={15}/>{pairNotice}</p>}
    <p className="hhba-apply-safety-note"><ShieldCheck size={15}/>只读连接，不会付款、扣次、上传简历或自动投递。待完成扩展安全验收后开放。</p>
   </section>
+  <ApplyResumeSync/>
   <section className="hhba-apply-history">
    <div className="hhba-apply-headline"><div><h3>使用与购买记录</h3><p>同一账号独立归属；不使用演示数据冒充真实记录。</p></div></div>
    <div className="hhba-apply-tabs">
