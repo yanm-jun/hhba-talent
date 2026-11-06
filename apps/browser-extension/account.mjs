@@ -13,7 +13,7 @@ export function validDeviceSession(v,now=Date.now()){
  typeof v.expiresAt==='string'&&Date.parse(v.expiresAt)>now;
 }
 export async function accountApi(fetchFn,path,token,body){
- if(!['/claim','/wallet','/disconnect','/ai/map'].includes(path))throw Error('此插件没有操作该接口的权限');
+ if(!['/claim','/wallet','/disconnect','/ai/map','/profile/claim'].includes(path))throw Error('此插件没有操作该接口的权限');
  if(path!=='/claim'&&!validDeviceSession(token))throw Error('连接已失效，请重新连接');
  let payload=path==='/claim'?{code:cleanPairCode(body?.code)}:undefined;
  if(path==='/claim'&&!payload.code)throw Error('请输入正确的12位连接码');

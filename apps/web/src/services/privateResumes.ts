@@ -77,3 +77,17 @@ export async function downloadPrivateResume(resume:PrivateResume):Promise<void>{
   document.body.appendChild(a);a.click();a.remove();
  }finally{window.setTimeout(()=>URL.revokeObjectURL(temp),10000);}
 }
+
+/**
+ * The user's existing private resume is fetched from first-party HHBA R2
+ * under the regular web login. The document bytes remain in browser memory.
+ * This does not upload the PDF/DOCX to an AI or to the browser extension.
+ */
+export async function fetchPrivateResumeForLocalReview(resume:PrivateResume):Promise<ArrayBuffer>{
+ if(!/^[0-9a-f-]{36}$/.test(resume.id))throw Error('简历标识无效。');
+ if(resume.size<30||resume.size>PRIVATE_RESUME_LIMIT)throw Error('简历大小超过本地解析上限。');
+ const response=await request('/'+resume.id+'/download','GET');
+ const raw=await response.arrayBuffer();
+ if(raw.byteLength!==resume.size||raw.byteLength>PRIVATE_RESUME_LIMIT)throw Error('简历大小校验失败。');
+ return raw;
+}

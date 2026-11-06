@@ -16,6 +16,12 @@
 <div class="actions"><label class="filepick">导入 HHBA 档案<input id="import" type="file" accept=".json,application/json"></label><button class="secondary" id="export">导出档案</button></div><p class="help">支持 HHBA JSON 档案文件。PDF/DOCX 请先通过可用的简历解析服务转换并确认，当前插件不假装已经解析。</p></section>
 <section id="view-account" class="view hidden">
  <p class="help">在 HHBA 个人工作台「一键网申」页面生成一次性连接码。插件连接后可查询网申次数，并在你单独同意时请求 AI 字段分析；不能消费次数、申请付款或读取网站登录凭据。</p>
+ <div class="actions"><button type="button" class="secondary" id="open-hhba-account">去 HHBA 网站连接账号</button><button type="button" class="secondary" id="open-hhba-resume">上传 / 管理我的简历</button></div>
+ <p class="help">网站可在本机从已保存的文字版 PDF/DOCX 提取建议字段，经你核对并单独授权后，插件才能一次性领取。扫描版 PDF 暂不支持 OCR；未经同意不会同步或发送原始文件。</p>
+ <div class="account-readonly"><strong>领取已确认的求职资料</strong><small>先在网站「一键网申」中选简历、核对并授权，再回插件领取。</small>
+ <label class="ai-consent"><input id="profile-sync-consent" type="checkbox">我同意本次领取 HHBA 网站上由我确认的结构化资料，保存到本浏览器扩展的本地档案中，替换旧资料（若有）。</label>
+ <button type="button" class="secondary" id="profile-sync-claim">领取一次性同步资料</button></div>
+ <p class="help">使用前可阅读 <a href="https://hhba.work/apply-extension-privacy.html" target="_blank" rel="noopener noreferrer">HHBA 插件专用隐私说明</a>，了解本地档案、一次性连接码和可选 AI 字段分析。</p>
  <div class="account-readonly"><strong>只读次数账户</strong><span id="account-state">未连接</span><small id="account-balance">剩余次数：—</small></div>
  <label class="field">12 位连接码<input id="pair-code" type="text" maxlength="16" placeholder="例如 ABCDEF-GHJKLM" autocomplete="off" spellcheck="false"></label>
  <div class="actions"><button id="pair-connect" class="primary" type="button">授权并连接 HHBA</button><button id="pair-refresh" class="secondary" type="button">刷新次数</button><button id="pair-disconnect" class="secondary" type="button">断开连接</button></div>

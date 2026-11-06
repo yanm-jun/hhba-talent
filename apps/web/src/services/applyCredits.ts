@@ -1,7 +1,7 @@
 import {getRealAuthToken,realAuthReady} from './realAuth';
 
 export type ApplyPackage={uses:number;amountFen:number};
-export type ApplyConfig={ok:boolean;packages:ApplyPackage[];paymentEnabled:boolean;tasksEnabled:boolean;pairingEnabled:boolean};
+export type ApplyConfig={ok:boolean;packages:ApplyPackage[];paymentEnabled:boolean;tasksEnabled:boolean;pairingEnabled:boolean;profileSyncEnabled?:boolean};
 export type ApplyWallet={purchased:number;consumed:number;reserved:number;available:number};
 export type ApplyOrder={id:string;uses:number;amountFen:number;status:'pending'|'paid'|'closed'|'refunded';createdAt:string;paidAt:string|null;qrCode?:string};
 export type ApplyTask={id:string;status:'reserved'|'completed'|'released';createdAt:string;finishedAt:string|null};
@@ -29,6 +29,13 @@ const errors:Record<string,string>={
  PAIRING_NOT_ENABLED:'浏览器插件连接功能尚未开放。',
  PAIR_RATE_LIMITED:'连接码生成过于频繁，请稍后重试。',
  PAIR_SERVICE_UNAVAILABLE:'插件连接服务暂不可用。',
+ PAIRING_REQUIRED:'请先在本页面完成浏览器插件连接，再生成同步任务。',
+ PROFILE_TRANSFER_NOT_CONFIGURED:'安全同步服务尚未启用，未传输任何简历内容。',
+ PROFILE_TRANSFER_NOT_READY:'尚未准备同步任务，或任务已被领取、取消或过期。',
+ PROFILE_TRANSFER_UNAVAILABLE:'简历同步服务暂时不可用，请稍后再试。',
+ PROFILE_TRANSFER_CORRUPT:'简历同步安全校验未通过，未导入任何信息。',
+ INVALID_PROFILE_SYNC_REQUEST:'请检查并确认简历资料内容和本次同步授权。',
+ RESUME_NOT_FOUND:'该简历不属于当前账号或已被删除。',
 
  APPLY_SERVICE_UNAVAILABLE:'次数服务暂不可用，请稍后再试。',
 };
@@ -62,3 +69,13 @@ export type ApplyPairCode={ok:true;code:string;expiresAt:string};
 export const getApplyPairStatus=()=>request<ApplyPairStatus>('/pair/status');
 export const startApplyPair=()=>request<ApplyPairCode>('/pair/start','POST');
 export const revokeApplyPairs=()=>request<ApplyPairStatus>('/pair/revoke','POST');
+
+export const PROFILE_SYNC_CONSENT='extension-structured-profile-sync-v1';
+export type ApplyProfileSyncResult={ok:true;expiresAt:string;fieldsWithValue:number};
+export const prepareApplyProfileSync=(resumeId:string,profile:Record<string,string>,consent:boolean)=>{
+ if(!consent)throw Error('请先主动勾选本次将所确认资料交给已连接插件的授权。');
+ return request<ApplyProfileSyncResult>('/profile-transfer/prepare','POST',{
+  resumeId,profile,consent:true,consentVersion:PROFILE_SYNC_CONSENT
+ });
+};
+export const revokeApplyProfileSync=()=>request<{ok:true}>('/profile-transfer/revoke','POST');

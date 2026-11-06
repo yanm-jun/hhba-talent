@@ -2,6 +2,7 @@ import {useEffect,useMemo,useState} from 'react';
 import {ArrowRight,BadgeCheck,CheckCircle2,ChevronRight,Clock3,FileCheck2,LockKeyhole,MousePointerClick,PlayCircle,RefreshCcw,ReceiptText,ShieldCheck,Sparkles,Wallet} from 'lucide-react';
 import {Link} from '../router';
 import {qrcodegen} from '../vendor/qrcodegen';
+import {ApplyResumeSync} from './ApplyResumeSync';
 import {applyAccountAvailable,createApplyOrder,closeApplyOrder,getApplyConfig,queryApplyOrderStatus,getApplyOrders,getApplyTasks,getApplyWallet,listApplyRefundRequests,requestApplyRefund,getApplyPairStatus,startApplyPair,revokeApplyPairs,type ApplyConfig,type ApplyOrder,type ApplyTask,type ApplyWallet,type ApplyRefundRequest,type ApplyPairCode} from '../services/applyCredits';
 import '../styles/apply-assistant-product.css';
 
@@ -10,6 +11,26 @@ const money=(fen:number)=>'¥'+(fen/100).toFixed(2);
 const stateText:Record<ApplyOrder['status'],string>={pending:'等待支付',paid:'已到账',closed:'已关闭',refunded:'已退款'};
 const taskText:Record<ApplyTask['status'],string>={reserved:'处理中（预占1次）',completed:'已使用1次',released:'未扣次'};
 const archiveUrl=import.meta.env.BASE_URL+'downloads/hhba-apply-assistant-v0.5.zip';
+/**
+ * Never render an unapproved download or arbitrary third-party link as an
+ * official one-click extension install. Only accept exact store hosts and
+ * extension-detail URLs with an actual 32-character Chromium extension ID.
+ */
+function officialStoreUrl(raw:unknown,store:'chrome'|'edge'):string|null{
+ if(typeof raw!=='string'||raw.length>350)return null;
+ try{
+  const url=new URL(raw);
+  const expected=store==='chrome'?'chromewebstore.google.com':'microsoftedge.microsoft.com';
+  const path=store==='chrome'
+   ? /^\/detail\/(?:[a-z0-9-]+\/)?[a-p]{32}\/?$/
+   : /^\/addons\/detail\/(?:[a-z0-9-]+\/)?[a-p]{32}\/?$/;
+  if(url.protocol!=='https:'||url.hostname!==expected||url.port||url.username||url.password||url.search||url.hash||!path.test(url.pathname))return null;
+  return url.href;
+ }catch{return null}
+}
+const chromeInstallUrl=officialStoreUrl(import.meta.env.VITE_HHBA_CHROME_WEB_STORE_URL,'chrome');
+const edgeInstallUrl=officialStoreUrl(import.meta.env.VITE_HHBA_EDGE_ADDONS_URL,'edge');
+
 
 function AlipayPaymentQR({value}:{value:string}){
  const qr=useMemo(()=>{try{return qrcodegen.QrCode.encodeText(value,qrcodegen.QrCode.Ecc.MEDIUM)}catch{return null}},[value]);
@@ -140,6 +161,26 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
    <article><FileCheck2 size={21}/><strong>以真实简历为准</strong><p>不编造学历或经历；未知信息需要你自行确认。</p></article>
    <article><ShieldCheck size={21}/><strong>保护求职资料</strong><p>明确授权后才处理数据，验证码和最终提交保留人工操作。</p></article>
   </div>
+  <section className="hhba-apply-install" id="hhba-apply-install" aria-label="安装 HHBA 浏览器插件">
+   <div className="hhba-apply-headline"><div><h3>安装 HHBA 网申助手</h3>
+    <p>从浏览器官方扩展商店安装，无需解压 ZIP 或开启开发者模式。商店版本经审核并发布后才会显示可用的安装链接。</p>
+   </div></div>
+   <div className="hhba-apply-store-grid">
+    <div className="hhba-apply-store-option"><strong>Google Chrome</strong><span>Chrome 网上应用店</span>
+     {chromeInstallUrl?<a href={chromeInstallUrl} target="_blank" rel="noopener noreferrer">前往 Chrome 官方商店安装 <ArrowRight size={14}/></a>:
+      <button type="button" disabled>商店尚未发布</button>}</div>
+    <div className="hhba-apply-store-option"><strong>Microsoft Edge</strong><span>Microsoft Edge 加载项</span>
+     {edgeInstallUrl?<a href={edgeInstallUrl} target="_blank" rel="noopener noreferrer">前往 Edge 官方商店安装 <ArrowRight size={14}/></a>:
+      <button type="button" disabled>商店尚未发布</button>}</div>
+   </div>
+   <div className="hhba-apply-onboarding-steps">
+    <div><b>01</b><span><strong>先安装插件</strong><small>等待官方商店审核发布后开放真实安装按钮</small></span></div>
+    <div><b>02</b><span><strong>使用 HHBA 现有账号</strong><small>无需再次注册；已登录用户可生成一次性连接码</small></span><a href="#hhba-apply-connect">连接账户</a></div>
+    <div><b>03</b><span><strong>上传或管理简历</strong><small>前往私有简历库，选择 PDF/DOCX 并主动同意存储条款</small></span><Link to="/candidate/account/resume">我的简历 <ArrowRight size={13}/></Link></div>
+   </div>
+   <p className="hhba-apply-safety-note"><ShieldCheck size={15}/>当前插件账号连接仅支持查询次数及逐次授权的 AI 字段分析；私有简历文件不会自动同步给插件或第三方 AI，PDF/DOCX 的文字提取和用户授权同步已进入独立开发验收；扫描版 PDF 仍需手动核对，正式版尚未开放。</p>
+   <p className="hhba-apply-safety-note"><LockKeyhole size={15}/>阅读 <a href={import.meta.env.BASE_URL+'apply-extension-privacy.html'} target="_blank" rel="noopener noreferrer">网申插件专用隐私与数据处理说明</a>；正式公开上线前仍需完成法律及商店审核。</p>
+  </section>
   <section className="hhba-apply-wallet" aria-label="我的网申次数">
    <div className="hhba-apply-headline"><div><h3>我的网申次数</h3><p>按当前真实账户统计，不会因为刷新或重复点击而重复扣减。</p></div><button type="button" onClick={()=>void refresh()} disabled={busy||!applyAccountAvailable}><RefreshCcw size={14}/>刷新记录</button></div>
    <div className="hhba-apply-wallet-stats">
@@ -211,6 +252,7 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
    {pairNotice&&<p className="hhba-apply-safety-note" role="status"><ShieldCheck size={15}/>{pairNotice}</p>}
    <p className="hhba-apply-safety-note"><ShieldCheck size={15}/>只读连接，不会付款、扣次、上传简历或自动投递。待完成扩展安全验收后开放。</p>
   </section>
+  <ApplyResumeSync enabled={Boolean(config?.profileSyncEnabled)}/>
   <section className="hhba-apply-history">
    <div className="hhba-apply-headline"><div><h3>使用与购买记录</h3><p>同一账号独立归属；不使用演示数据冒充真实记录。</p></div></div>
    <div className="hhba-apply-tabs">
@@ -221,7 +263,8 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
   </section>
   <details className="hhba-apply-faq"><summary>关于浏览器插件内测版和当前服务状态</summary>
    <p>V0.5 可在当前网页一键预填高置信度字段，也保留预览、手动确认和撤销。不支持复杂招聘系统全程自动填写，已添加需单独同意、默认关闭的 AI 字段识别入口；尚未使用真实模型密钥，未接入购买次数扣费，正式收费功能没有开放。</p>
-   <a href={archiveUrl} download="HHBA-智能网申助手-V0.5.zip">下载 V0.5 浏览器内测插件 <ArrowRight size={14}/></a>
+   <p>下方 ZIP 仅供开发者在隔离测试环境中手动安装，不是面向普通用户的一键安装，也不是商店审核通过的版本。</p>
+   <a href={archiveUrl} download="HHBA-智能网申助手-V0.5.zip">开发者内部测试：下载 V0.5 ZIP <ArrowRight size={14}/></a>
   </details>
   <p className="hhba-apply-footer"><BadgeCheck size={15}/>不代替企业决定录用，也不保证投递成功。收费、有效任务认定、失败退回、使用期限及退款规则将在正式开通前公开明确；必要的个人信息处理和 AI 服务告知将独立完成。</p>
  </section>;
