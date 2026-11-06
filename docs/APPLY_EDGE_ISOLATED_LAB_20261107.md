@@ -49,3 +49,16 @@ Cloudflare 账号中新增 **`hhba-edge-p0-lab-expiry-janitor`**，只用于实�
 - 配置前核对 D1 Time Travel 恢复书签可获取、转移暂存表为零条；Worker 绑定和 Cron 再读取后均匹配。
 
 **验收边界：** 以上证明代码、部署、资源绑定和 Cron 配置生效；Cloudflare 的计划变更可能延迟传播，尚未在 Cron Events 中观察到第一次实际运行，不得宣称已经核验过真实定时触发的删除结果。上线正式网站前，仍必须为正式环境单独评估绑定、数据保留期限和权限；不能沿用实验室的 Preview D1 与测试密钥。
+
+## Windows/macOS Microsoft Edge 内部手工验收包
+
+GitHub Actions `HHBA Edge P0 Isolated Cloudflare Lab Live Smoke` 在通过 HTTPS 安全烟测后，生成**仅开发者/内部测试使用**的 Artifact `hhba-edge-p0-lab-qa-only`。2026-11-07 验收 run：`https://github.com/yanm-jun/hhba-talent/actions/runs/42285938934`（已确实生成、非空，内含 `hhba-edge-p0-lab-qa-only.zip`）。
+
+在 Windows 或 macOS 的 Edge **手工内部测试**时：
+1. 登录项目 GitHub，在上述 Actions run 的 Artifacts 区域领取 `hhba-edge-p0-lab-qa-only`，解压外层 Artifact，再解压里面的 `hhba-edge-p0-lab-qa-only.zip`，得到含 `manifest.json`、`popup.html`、`account.mjs`、`icons` 的目录。
+2. 打开 Edge 的 `edge://extensions`，开发者模式仅供验收人员使用，点击「加载解压缩的扩展」，选择含 `manifest.json` 的目录；**不要向普通求职者宣传此开发者操作，也不要将该 ZIP 上传 Microsoft Edge Add-ons 商店。**
+3. 应显示“HHBA 智能网申助手（隔离预览测试）”，内测 Extension ID 必须与 `fjkcpgikachmfhajlghgekeicgbdagej` 完全一致。站点访问权限只能是 `https://hhba-edge-p0-lab.pages.dev/*`，并且默认仍需用户主动授权。
+4. 测试弹窗、字段 UI、账户页、隐私政策链接、本地档案清除、异常网络提示和权限拒绝。**实验室页面仅有 API 与警告首页，不提供真实注册/登录 UI；没有单独准备的虚构测试账号和一次性连接码时，不能声称完整真实账户配对成功。**
+5. 测试结束从 Edge 移除内测扩展并删除解压目录与本地测试档案。正式上架仍只走 Microsoft Edge Add-ons 经过审核的安装入口。
+
+**安全注意：** 内部测试扩展使用固定的**公钥** `manifest.key`，并没有私钥或 Cloudflare API Key。此身份仅供独立实验室使用，不是正式上架身份。Cloudflare lab 仅用于合成账号/字段演示，严禁上传真实简历或填写真实个人信息。
