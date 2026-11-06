@@ -62,6 +62,35 @@ def placeholder(name):
  d.text((54,388),f'{name} -- company source could not be verified',font=body,fill=(93,107,113))
  d.text((54,433),'Not a corporate photograph or an approved logo',font=body,fill=(93,107,113))
  return im
+# The previous successful Pages build verified each original image and kept
+# its corresponding evidence JSON. Reuse that immutable, source-backed JPEG
+# if the official publisher is unreachable; do not substitute another plant.
+VERIFIED_RELEASES=("https://0691511a.hhba-talent.pages.dev","https://hhba.work")
+CACHED_OUTPUT={( "photo1.jpg"):(390350,(1800,1013)),("photo2.jpg"):(430181,(1800,1011))}
+def reused_verified_photo(name):
+ if name not in direct_photos:return None
+ official_url,official_article=direct_photos[name][0]
+ expected_bytes,expected_dimensions=CACHED_OUTPUT[name]
+ for release in VERIFIED_RELEASES:
+  prefix=release+"/images/employer-profiles/cn-autumn-029/"
+  try:
+   audit_data=json.loads(read(prefix+"media-audit.json",limit=100000,timeout=16).decode("utf8"))
+   record=audit_data.get(name,{})
+   if (record.get("verified") is not True or record.get("source")!=official_url or
+       record.get("article")!=official_article or
+       not re.fullmatch("[0-9a-f]{64}",str(record.get("sha256","")))):
+    raise ValueError("cached provenance audit mismatch")
+   raw=read(prefix+name,timeout=20)
+   if len(raw)!=expected_bytes:raise ValueError("cached image byte length differs from audited release")
+   chk=Image.open(BytesIO(raw));chk.verify()
+   img=ImageOps.exif_transpose(Image.open(BytesIO(raw))).convert("RGB")
+   if img.size!=expected_dimensions:raise ValueError("cached dimensions differ from audited release")
+   print("POWER_INVEST_SOURCE_VERIFIED_CACHED_PHOTO",name,release,record["source"],flush=True)
+   return (img,official_url,official_article,record["sha256"])
+  except Exception as err:
+   print("POWER_INVEST_OFFICIAL_CACHE_UNAVAILABLE",name,release,str(err)[:120],flush=True)
+ return None
+
 audit={};hashes=set()
 for name,sources in pages.items():
  if name=='logo.png':
@@ -83,8 +112,8 @@ for name,sources in pages.items():
   print('POWER_INVEST_APPROVED_LOGO_LOCKED',name,im.size,h)
   continue
  started=time.monotonic()
- chosen=None
- for url,article in direct_photos.get(name,[]):
+ chosen=reused_verified_photo(name)
+ for url,article in ([] if chosen else direct_photos.get(name,[])):
   try:
    raw=read(url,timeout=20 if name=='photo2.jpg' else 9)
    chk=Image.open(BytesIO(raw));chk.verify()
