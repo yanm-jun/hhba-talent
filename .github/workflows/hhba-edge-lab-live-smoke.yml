@@ -9,6 +9,8 @@ on:
       - 'apps/web/scripts/edge-lab-noindex.py'
       - 'apps/web/scripts/edge-lab-minimal-build.py'
       - 'apps/web/workers/apply-profile-transfer-janitor.js'
+      - 'apps/web/workers/apply-edge-lab-live-network-probe.js'
+      - 'apps/web/scripts/apply-edge-live-network-probe.contract.test.mjs'
       - 'docs/APPLY_EDGE_ISOLATED_LAB_20261107.md'
       - 'docs/HHBA_EDGE_ADDONS_FIRST_PASS_CHECKLIST_20261107.md'
       - 'apps/browser-extension/tests/fixtures/edge-lab-public-key.b64'
@@ -22,7 +24,7 @@ permissions:
 jobs:
   live-test-only:
     # Never probe a non-lab deployment or use this job to ship main.
-    if: github.event_name == 'pull_request' && github.head_ref == 'feature/apply-edge-isolated-live-lab-20261107'
+    if: github.event_name == 'pull_request' && (github.head_ref == 'feature/apply-edge-isolated-live-lab-20261107' || github.head_ref == 'feature/apply-edge-live-network-probe-20261107')
     runs-on: ubuntu-latest
     timeout-minutes: 7
     steps:
@@ -34,6 +36,11 @@ jobs:
         working-directory: apps/web
         run: node --test scripts/apply-profile-janitor.contract.test.mjs
       - name: Check scheduled one-shot live network probe before isolated deployment
+        working-directory: apps/web
+        run: |
+          node --check workers/apply-edge-lab-live-network-probe.js
+          node --test scripts/apply-edge-live-network-probe.contract.test.mjs
+      - name: Verify one-shot live network test Worker cannot be remotely triggered or leak credentials
         working-directory: apps/web
         run: |
           node --check workers/apply-edge-lab-live-network-probe.js
