@@ -142,7 +142,7 @@ export const ukPathways:UkPathway[]=[
   "english": "Global Talent visa",
   "category": "work",
   "summary": "科学、工程、数字技术、艺术与文化等领域具有杰出能力或潜力者，经指定机构背书或满足获奖例外后申请。",
-  "audience": "有可核验科研、数字科技或艺术创作成果的专业人员。",
+  "audience": "在科研、数字技术或艺术文化领域具有可核验代表性成果，并符合英国官方背书或获奖条件的申请人。",
   "officialUrl": "https://www.gov.uk/global-talent",
   "requirements": [
    "通常需相关认可机构背书endorsement；符合官方列举的特定权威奖项者可免背书。",
