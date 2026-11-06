@@ -85,7 +85,9 @@ test('Critical 2026 UK safeguards must not revert to inaccurate immigration clai
 test('Existing UK photo/country card, clickable frontend route and legacy five countries are preserved',()=>{
  const main=read('../src/main.tsx'),homepage=read('../src/pages/OverseasDevelopmentPage.tsx');
  const page=read('../src/pages/UKDevelopmentPage.tsx'),css=read('../src/styles/overseas-uk.css');
- assert.ok(main.includes("import { UKDevelopmentPage } from './pages/UKDevelopmentPage'"));
+ assert.ok(main.includes("import { UnitedKingdomDevelopmentPage } from './pages/UnitedKingdomDevelopmentPage'"));
+ const compatibility=read('../src/pages/UnitedKingdomDevelopmentPage.tsx');
+ assert.ok(compatibility.includes("UKDevelopmentPage as UnitedKingdomDevelopmentPage"));
  for(const url of ['/study-abroad/country/united-kingdom','/study-abroad/united-kingdom/saved','/study-abroad/united-kingdom/compare','/study-abroad/united-kingdom/match','/study-abroad/united-kingdom/pathway/'])assert.ok(main.includes(url),url);
  assert.ok(homepage.includes("c.code==='uk'?root+'/country/united-kingdom'"),'UK card must not fall back to generic old study-abroad page');
  assert.ok(overseasCountryOptions.find(c=>c.code==='uk'&&c.ready));
