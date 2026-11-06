@@ -22,7 +22,7 @@ function winterIndustryGroup(job:WinterJob):string{
  if(/人力资源|人事|行政|法务|职能/.test(value))return '企业职能';
  if(/工业软件|制造|机械|家电|芯片|半导体|硬件/.test(value))return '先进制造';
  if(/人工智能|ai|算法|数据|软件|研发|科技|技术|智能/.test(value))return '科技研发';
- if(/营销|传播|公关|市场|零售|电商|媒体|游戏|美妆|奢侈/.test(value))return '市场传播';
+ if(/营销|传播|公关|市场|零售|电商|媒体|游戏|美妆|奢侈|销售|商务/.test(value))return '市场传播';
  if(/酒店|文旅|旅游|教育|教学|餐饮|培训/.test(value))return '教育文旅';
  return '其他方向';
 }
