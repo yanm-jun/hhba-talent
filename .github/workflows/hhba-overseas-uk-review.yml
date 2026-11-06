@@ -1,0 +1,32 @@
+name: HHBA United Kingdom Overseas Pathways
+on:
+  pull_request:
+    paths:
+      - 'apps/web/src/data/overseasUnitedKingdom.ts'
+      - 'apps/web/src/data/overseasNewZealand.ts'
+      - 'apps/web/src/pages/UnitedKingdomDevelopmentPage.tsx'
+      - 'apps/web/src/pages/OverseasDevelopmentPage.tsx'
+      - 'apps/web/src/main.tsx'
+      - 'apps/web/scripts/overseas-united-kingdom.contract.test.mjs'
+      - '.github/workflows/hhba-overseas-uk-review.yml'
+  push:
+    branches:
+      - feature/overseas-united-kingdom-20261104
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install web dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Validate United Kingdom guide content and routing
+        working-directory: apps/web
+        run: node --test scripts/overseas-united-kingdom.contract.test.mjs
+      - name: Typecheck and production build
+        working-directory: apps/web
+        run: npm run build
