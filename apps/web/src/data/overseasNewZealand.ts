@@ -86,6 +86,6 @@ export const overseasCountryOptions=[
  {code:'de',name:'德国',english:'Germany',flag:'🇩🇪',region:'欧洲',ready:true,description:'机会卡、欧盟蓝卡、学历认可、职业培训、留学及毕业求职'},
  {code:'ca',name:'加拿大',english:'Canada',flag:'🇨🇦',region:'北美洲',ready:true,description:'2026 Express Entry、NOC职业、省提名、工作签证与留学'},
  {code:'uk',name:'英国',english:'United Kingdom',flag:'🇬🇧',region:'欧洲',ready:true,description:'英国雇主担保、全球人才、学生及毕业生、HPI与创业签证'},
- {code:'sg',name:'新加坡',english:'Singapore',flag:'🇸🇬',region:'亚洲',ready:false,description:'就业准证、专业就业与留学'},
- {code:'us',name:'美国',english:'United States',flag:'🇺🇸',region:'北美洲',ready:false,description:'留学、工作签证与职业发展'}
+ {code:'sg',name:'新加坡',english:'Singapore',flag:'🇸🇬',region:'亚洲',ready:true,description:'EP、S Pass、外籍劳工、人才准证、留学毕业求职与PR'},
+ {code:'us',name:'美国',english:'United States',flag:'🇺🇸',region:'北美洲',ready:true,description:'2026 F-1、J-1、OPT、H-1B、O-1、L-1、EB类移民与排期'}
 ] as const;
