@@ -12,7 +12,7 @@ export function checkedPreviewOrigin(urlText){
  const url=new URL(urlText);
  if(url.protocol!=='https:'||url.port||url.username||url.password||url.search||
   url.hash||url.pathname!=='/'||
-  !/^[a-z0-9][a-z0-9-]{2,62}\.hhba-talent\.pages\.dev$/.test(url.hostname))
+  !(url.hostname==='hhba-edge-p0-lab.pages.dev'||/^[a-z0-9][a-z0-9-]{2,62}\.hhba-talent\.pages\.dev$/.test(url.hostname)))
   throw Error('仅允许 HHBA Cloudflare Pages 独立 Preview 地址');
  return url.origin;
 }
@@ -39,7 +39,7 @@ async function stagingPublicKey(out){
  await writeFile(path,key+'\n',{flag:'wx'});
  return key;
 }
-export async function stagePreviewExtension(urlText,outputPath,{ciPreapprovedHost=false}={}){
+export async function stagePreviewExtension(urlText,outputPath,{ciPreapprovedHost=false,labIdentity=false}={}){
  const site=checkedPreviewOrigin(urlText),out=resolve(outputPath);
  if(out===sourceRoot||out.startsWith(sourceRoot+sep))throw Error('不能覆盖官方 Edge 插件源码');
  await mkdir(join(out,'icons'),{recursive:true});
@@ -72,7 +72,13 @@ export async function stagePreviewExtension(urlText,outputPath,{ciPreapprovedHos
   manifest.host_permissions=[site+'/*'];
   manifest.optional_host_permissions=[];
  }
- const devKey=await stagingPublicKey(out);
+ // The lab's public-only key is intentionally stable so its exact extension
+ // Origin can be configured independently of the real HHBA Pages project.
+ // Never use this public test key in the Edge store submission ZIP.
+ if(labIdentity&&site!=='https://hhba-edge-p0-lab.pages.dev')throw Error('实验室固定身份只适用于专属隔离域名');
+ const devKey=labIdentity
+  ?(await readFile(join(sourceRoot,'tests/fixtures/edge-lab-public-key.b64'),'utf8')).trim()
+  :await stagingPublicKey(out);
  manifest.key=devKey;
  const extensionId=extensionIdFromPublicKey(devKey);
  await writeFile(join(out,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
@@ -81,7 +87,7 @@ export async function stagePreviewExtension(urlText,outputPath,{ciPreapprovedHos
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  if(process.argv.length!==4){console.error('Usage: node scripts/stage-preview.mjs https://<preview>.hhba-talent.pages.dev /absolute/output-directory');process.exitCode=2;}
- else stagePreviewExtension(process.argv[2],process.argv[3],{ciPreapprovedHost:process.env.HHBA_CI_PREAPPROVE_HOST==='1'})
+ else stagePreviewExtension(process.argv[2],process.argv[3],{ciPreapprovedHost:process.env.HHBA_CI_PREAPPROVE_HOST==='1',labIdentity:process.env.HHBA_EDGE_LAB_ID==='1'})
   .then(x=>console.log('Created isolated Edge preview test extension: '+x.output))
   .catch(e=>{console.error(String(e.message));process.exitCode=1;});
 }
