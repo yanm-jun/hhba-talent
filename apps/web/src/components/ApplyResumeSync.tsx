@@ -3,6 +3,7 @@ import {ArrowRight,FileCheck2,FileText,LockKeyhole,RefreshCcw,ShieldCheck} from 
 import {Link} from '../router';
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,type PrivateResume} from '../services/privateResumes';
 import {PROFILE_FIELD_LABELS,cleanProfile,extractDocxText,inferProfileFromText} from '../services/docxProfile.mjs';
+import {extractPdfText,PDFResumeError} from '../services/pdfProfile.mjs';
 import {prepareApplyProfileSync,revokeApplyProfileSync} from '../services/applyCredits';
 import '../styles/apply-resume-sync.css';
 
@@ -36,11 +37,21 @@ export function ApplyResumeSync({enabled}:{enabled:boolean}){
   clearPrepared();setBusy(true);
   try{
    if(selectedFile.type==='application/pdf'||/\.pdf$/i.test(selectedFile.name)){
-    // PDF parsers must handle scanned images, fonts and CMaps. Refuse to
-    // pretend PDF byte strings can be safely parsed as a human CV.
-    setPreview('PDF 自动提取尚未通过安全和准确性验收。下方可以手动确认资料后直接同步到插件；不需要导出 JSON。');
-    setProfile(cleanProfile({}));
-    setMessage('已选择 PDF，可填写经你核实的资料；目前不会自动读取 PDF 文本。');
+    // Read the user's own R2 file into this browser. PDF.js and the worker
+    // are bundled first-party assets; no third-party model receives content.
+    const bytes=await fetchPrivateResumeForLocalReview(selectedFile);
+    try{
+     const result=await extractPdfText(bytes);
+     setProfile(inferProfileFromText(result.text));
+     setPreview(result.text.slice(0,1200));
+     setMessage(`已在当前浏览器本地提取 ${result.pages} 页 PDF 文字，未调用 AI。请核对并补充字段，然后再授权同步。`);
+    }catch(e){
+     if(e instanceof PDFResumeError&&e.code==='PDF_NO_TEXT'){
+      setProfile(cleanProfile({}));
+      setPreview('这份 PDF 可能是扫描图片，未检测到可靠的可复制文字。你可以在下方手动核对并填写资料；不会尝试猜测或调用 OCR。');
+      setMessage('扫描版 PDF 未自动识别任何个人资料，已保留手动核对入口。');
+     }else throw e;
+    }
    }else if(selectedFile.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'||
      /\.docx$/i.test(selectedFile.name)){
     const bytes=await fetchPrivateResumeForLocalReview(selectedFile);
@@ -115,7 +126,7 @@ export function ApplyResumeSync({enabled}:{enabled:boolean}){
    {validUntil&&<p className="hhba-apply-sync-success" role="status">待插件领取 · 有效期截至 {new Date(validUntil).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}，仅可领取一次。</p>}
    {message&&<p className="hhba-apply-sync-note" role="status">{message}</p>}
    {error&&<p className="hhba-apply-sync-error" role="alert">{error}</p>}
-   <p className="hhba-apply-sync-footnote">安全边界：需先完成 HHBA 插件账户连接；DOCX 本地提取不经 AI。PDF 自动文字解析仍待验收，目前可手动核对字段，无需手工转换 JSON。网页关闭后不保留尚未确认的本地草稿。</p>
+   <p className="hhba-apply-sync-footnote">安全边界：需先完成 HHBA 插件账户连接；PDF 与 DOCX 的可复制文字在浏览器本地提取，不经第三方 AI；扫描版 PDF 暂不支持 OCR，可手动核对字段，无需转换 JSON。网页关闭后不保留尚未确认的本地草稿。</p>
    </>}
  </section>;
 }
