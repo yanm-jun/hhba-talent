@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "HHBA 智能网申助手",
   "version": "0.5.0",
-  "description": "低风险网申字段一键预填与撤销；手动连接 HHBA 后可明确授权 AI 字段分析，不自动提交或收费。",
+  "description": "在 Microsoft Edge 中辅助识别求职表单、安全预填与撤销；需本人核对并提交，不自动投递。",
   "permissions": [
     "activeTab",
     "scripting",
@@ -11,12 +11,22 @@
   ],
   "action": {
     "default_title": "HHBA 网申助手",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
   },
   "side_panel": {
     "default_path": "popup.html"
   },
   "optional_host_permissions": [
     "https://hhba.work/*"
-  ]
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
 }
