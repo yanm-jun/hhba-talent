@@ -1,0 +1,80 @@
+name: HHBA Edge P0 Isolated Cloudflare Lab Live Smoke
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/scripts/edge-lab-live-smoke.py'
+      - 'apps/web/scripts/edge-lab-noindex.py'
+      - 'apps/web/scripts/edge-lab-minimal-build.py'
+      - 'apps/web/workers/apply-profile-transfer-janitor.js'
+      - 'docs/APPLY_EDGE_ISOLATED_LAB_20261107.md'
+      - 'docs/HHBA_EDGE_ADDONS_FIRST_PASS_CHECKLIST_20261107.md'
+      - 'apps/browser-extension/tests/fixtures/edge-lab-public-key.b64'
+      - 'apps/browser-extension/tests/edge-lab-identity.test.mjs'
+      - 'apps/browser-extension/scripts/stage-preview.mjs'
+      - 'apps/web/functions/api/apply/**'
+      - '.github/workflows/hhba-edge-lab-live-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-test-only:
+    # Never probe a non-lab deployment or use this job to ship main.
+    if: github.event_name == 'pull_request' && github.head_ref == 'feature/apply-edge-isolated-live-lab-20261107'
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert public-only stable lab identity
+        working-directory: apps/browser-extension
+        run: node --test tests/edge-lab-identity.test.mjs
+      - name: Check scheduled privacy cleanup code contract
+        working-directory: apps/web
+        run: node --test scripts/apply-profile-janitor.contract.test.mjs
+      - name: Verify lab build exposes only the intended static files and apply routes
+        working-directory: apps/web
+        run: |
+          python3 scripts/edge-lab-minimal-build.py
+          python3 scripts/edge-lab-noindex.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('dist')
+          files={p.name for p in root.iterdir()}
+          expect={'index.html','apply-extension-privacy.html','robots.txt','_headers','_routes.json'}
+          assert files==expect,(files,expect)
+          routes=json.loads((root/'_routes.json').read_text())
+          assert routes=={'version':1,'include':['/api/apply/*'],'exclude':[]},routes
+          assert 'noindex' in (root/'_headers').read_text()
+          assert 'HHBA 插件内部联调环境' in (root/'index.html').read_text()
+          print('PASS: minimal nonindexed API-only lab build')
+          PY
+      - name: Check published lab API security without any login or personal data
+        working-directory: apps/web
+        run: python3 -u scripts/edge-lab-live-smoke.py
+      - name: Package Edge Windows/macOS manual QA extension for isolated lab only
+        working-directory: apps/browser-extension
+        env:
+          HHBA_EDGE_LAB_ID: '1'
+        run: |
+          set -euo pipefail
+          node scripts/stage-preview.mjs https://hhba-edge-p0-lab.pages.dev "$RUNNER_TEMP/hhba-edge-lab-unpacked"
+          node --input-type=module -e "
+            import {readFileSync} from 'node:fs';
+            const f=process.env.RUNNER_TEMP+'/hhba-edge-lab-unpacked/manifest.json';
+            const m=JSON.parse(readFileSync(f,'utf8'));
+            if(m.name.includes('隔离预览测试')!==true)throw Error('not lab build');
+            if(m.optional_host_permissions?.join()!=='https://hhba-edge-p0-lab.pages.dev/*')throw Error('unexpected host permission');
+            if(m.host_permissions||m.key?.length<100)throw Error('unsafe lab manifest');
+          "
+          cd "$RUNNER_TEMP/hhba-edge-lab-unpacked"
+          zip -q -r "$RUNNER_TEMP/hhba-edge-p0-lab-qa-only.zip"             manifest.json popup.html popup.css popup.js core.mjs content.js account.mjs icons REVIEW_ONLY.txt
+          unzip -t "$RUNNER_TEMP/hhba-edge-p0-lab-qa-only.zip"
+      - name: Upload internal Edge lab package (NOT for public or Microsoft store)
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-edge-p0-lab-qa-only
+          path: ${{ runner.temp }}/hhba-edge-p0-lab-qa-only.zip
+          if-no-files-found: error
+          retention-days: 7
+
