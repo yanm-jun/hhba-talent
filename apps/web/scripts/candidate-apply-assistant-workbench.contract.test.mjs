@@ -21,7 +21,7 @@ test('new link routes to an installation guide and keeps privacy safety disclaim
  assert.ok(entry.includes('privacy|apply-assistant'));
  assert.ok(page.includes("current==='apply-assistant'"));
  assert.ok(page.includes('<ApplyAssistantProduct userId={user?.id}/>'));
- assert.ok(product.includes("BASE_URL+'downloads/hhba-apply-assistant-v0.5.zip'"));
+ assert.ok(!product.includes("BASE_URL+'downloads/hhba-apply-assistant-v0.5.zip'"));
  assert.ok(product.includes('正式申请由你确认'));
  assert.ok(product.includes('尚未开展正式收费网申'));
  assert.ok(product.includes('V0.5'));
@@ -56,14 +56,16 @@ test('site exposes pairing as a gated, revocable and account-scoped feature',()=
 });
 
 test('P0 install entry never presents an unreviewed ZIP as an approved store install',()=>{
- assert.ok(product.includes('VITE_HHBA_CHROME_WEB_STORE_URL'));
  assert.ok(product.includes('VITE_HHBA_EDGE_ADDONS_URL'));
- assert.ok(product.includes('chromewebstore.google.com'));
  assert.ok(product.includes('microsoftedge.microsoft.com'));
  assert.ok(product.includes('url.protocol'));
  assert.ok(product.includes('!path.test(url.pathname)'));
- assert.ok(product.includes('商店尚未发布'));
- assert.ok(product.includes('开发者内部测试'));
+ assert.ok(product.includes('Edge 商店尚未发布'));
+ assert.ok(!product.includes('Google Chrome'));
+ assert.ok(!product.includes('chromeInstallUrl'));
+ assert.ok(!product.includes('开发者内部测试：下载'));
+ assert.ok(product.includes('Windows / macOS'));
+ assert.ok(product.includes('开发者测试 ZIP 不在普通用户页面提供下载入口'));
  assert.ok(product.includes('to="/candidate/account/resume"'));
  assert.ok(product.includes('扫描版 PDF 仍需手动核对'));
 });
