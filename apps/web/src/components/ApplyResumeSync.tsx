@@ -115,7 +115,7 @@ export function ApplyResumeSync({enabled}:{enabled:boolean}){
      <label><input type="checkbox" checked={reviewed} disabled={busy} onChange={e=>{setReviewed(e.target.checked);setValidUntil('')}}/>
       <span>我已逐项核对资料，确认不包含虚构的教育、工作或其他申请信息。</span></label>
      <label><input type="checkbox" checked={consent} disabled={busy} onChange={e=>setConsent(e.target.checked)}/>
-      <span>我明确同意本次将<strong>上方已核对的结构化求职资料</strong>加密暂存最多 5 分钟，交给我本人已连接的 HHBA 插件一次性读取并保存到本机。不发送原始 PDF/DOCX，不发送给第三方 AI，也不自动投递。</span></label>
+      <span>我明确同意本次将<strong>上方已核对的结构化求职资料</strong>加密暂存，并仅在 5 分钟有效期内供我本人已连接的 HHBA 插件一次性读取并保存到本机。过期后无法领取，密文物理删除可能稍有延迟。不发送原始 PDF/DOCX，不发送给第三方 AI，也不自动投递。</span></label>
     </div>
     <div className="hhba-apply-sync-actions">
      <button type="button" disabled={!enabled||!reviewed||!consent||busy||!Object.values(profile).some(Boolean)} onClick={()=>void send()}>
