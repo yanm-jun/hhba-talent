@@ -50,7 +50,7 @@ test('directory contains source-backed programmes without invented job numbers',
 });
 test('concrete job first: only individual employer-issued postings appear in the primary list',()=>{
  const jobIds=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(x=>x[1]);
- assert.equal(jobIds.length,58,'41 prior plus three distinct mainland employer roles in batch08');
+ assert.equal(jobIds.length,62,'41 prior plus three distinct mainland employer roles in batch08');
  assert.equal(new Set(jobIds).size,jobIds.length,'no duplicate role identity');
  for(const id of ['apco-shanghai-winter-start-1787','hsbc-hk-student-placement-1367003857','qima-hk-sales-intern-744000154586189']){
   assert.ok(jobIds.includes(id),id+' missing');
@@ -115,7 +115,7 @@ test('batch05 has seven distinct university-only ReCube winter records and two s
  const recube=['product-uiux-260900318','sustainability-260900321','fullstack-260900315','digital-marketing-260900319','hardware-260900322','website-designer-260900317','data-ai-260900320'];
  for(const name of recube)assert.ok(ids.includes('recube-hk-winter-'+name),'missing real university posting '+name);
  for(const id of ['papergames-shanghai-recruiting-game-rd-intern-2027-review','papergames-shanghai-nikki-world-ecology-planning-280350'])assert.ok(ids.includes(id),'missing sourced Papergames role '+id);
- assert.equal(new Set(ids).size,58);
+ assert.equal(new Set(ids).size,62);
  assert.equal((jobs.match(/status:"campus-limited"/g)||[]).length,7,'restricted university listings must not be passed as direct public jobs');
  assert.equal((jobs.match(/status:"winter-unverified"/g)||[]).length,2,'two original daily internships must remain winter-unverified');
  assert.ok(jobs.includes('2026 年 11 月 14 日')&&jobs.includes('cpdc.osa.cuhk.edu.hk/en/job/'));
@@ -136,8 +136,8 @@ test('batch06 adds three independently sourced employers, nine unique 2027 H1 re
  const man=['manulife-hk-2027-private-equity-jr26091338','manulife-hk-2027-data-finance-jr26091703','manulife-hk-2027-global-info-risk-jr26100089','manulife-hk-2027-marketing-strategy-jr26100142','manulife-hk-2027-tech-placement-jr26100136'];
  const informa='informa-markets-hk-2027-jan-jun-intern-l059656859';
  for(const id of [...sun,...man,informa])assert.ok(ids.includes(id),'batch06 missing distinct job '+id);
- assert.equal(ids.length,58,'historical batch06/batch07 roles plus three new mainland records');
- assert.equal(new Set(ids).size,58,'no duplicate record identifiers');
+ assert.equal(ids.length,62,'historical batch06/batch07 roles plus three new mainland records');
+ assert.equal(new Set(ids).size,62,'no duplicate record identifiers');
  assert.equal((jobs.match(/status:"closed"/g)||[]).length,9,'existing seven plus LVMH and CA Global Markets expired records');
  assert.ok(jobs.includes('2026年10月30日')&&jobs.includes('2026年11月1日'));
  assert.ok(jobs.includes('2026年11月7日'),'Informa third-party upcoming deadline');
@@ -161,8 +161,8 @@ test('batch07 keeps independently sourced January-2027 BNP, LVMH and Credit Agri
  const lvmh='lvmh-hk-beauty-2027-jan-sscpc02515';
  const ca=['creditagricole-hk-2027-audit-intern-115888','creditagricole-hk-2027-finance-intern-115202','creditagricole-hk-2027-global-markets-115201'];
  for(const id of [...bnp,lvmh,...ca])assert.ok(ids.includes(id),id+' not indexed');
- assert.equal(ids.length,58,'all seven earlier batches plus the three new mainland jobs');
- assert.equal(new Set(ids).size,58,'no duplicated employer vacancy IDs');
+ assert.equal(ids.length,62,'all seven earlier batches plus the three new mainland jobs');
+ assert.equal(new Set(ids).size,62,'no duplicated employer vacancy IDs');
  assert.equal((jobs.match(/status:"filled"/g)||[]).length,3,'three BNP posts all employer-confirmed filled');
  assert.equal((jobs.match(/status:"closed"/g)||[]).length,9,'two additional expired beyond prior seven');
  for(const ref of ['1234567890100118477','1234567890100117528','1234567890100117487','SSCPC02515','2026-115888','2026-115202','2026-115201'])assert.ok(jobs.includes(ref),'missing grounded employer number '+ref);
@@ -197,8 +197,8 @@ test('batch08 adds three distinct China mainland employers and searchable indust
 
 test('batch09 adds three mainland companies with explicit winter internship recruitment references',()=>{
  const roleIds=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(m=>m[1]);
- assert.equal(roleIds.length,58);
- assert.equal(new Set(roleIds).size,58);
+ assert.equal(roleIds.length,62);
+ assert.equal(new Set(roleIds).size,62);
  const ids=[
   'cmbc-ningbo-2027-winter-intern-30',
   'bondi-sh-2027-winter-discretionary-trader',
@@ -220,8 +220,8 @@ test('batch09 adds three mainland companies with explicit winter internship recr
 
 test('batch10 adds three mainland employers with winter-origin truthfulness and unique identities',()=>{
  const ids=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(m=>m[1]);
- assert.equal(ids.length,58,'batch09 48 plus batch10 three');
- assert.equal(new Set(ids).size,58,'all job record IDs unique');
+ assert.equal(ids.length,62,'batch09 48 plus batch10 three');
+ assert.equal(new Set(ids).size,62,'all job record IDs unique');
  const entries=[
   ['zuoyebang-hz-2026-winter-teaching-assistant-archive','作业帮素养'],
   ['alpha2-sh-winter-quant-strategy-source-check-2026','平方和投资'],
@@ -249,7 +249,7 @@ test('batch10 adds three mainland employers with winter-origin truthfulness and 
 test('batch11 records 3 mainland employers, 7 separate jobs and real winter dates without inventing openings',()=>{
  const ids=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(m=>m[1]);
  assert.equal(ids.length,58);
- assert.equal(new Set(ids).size,58);
+ assert.equal(new Set(ids).size,62);
  const cases=[
   'hfbank-bj-2027winter-admin-support-20261105',
   'hfbank-bj-2027winter-corporate-assistant-20261105',
@@ -272,4 +272,34 @@ test('batch11 records 3 mainland employers, 7 separate jobs and real winter date
  assert.ok(page.includes("job.status==='platform-posting'?'查看平台岗位（申请需核实）'"),'platform CTA must distinguish direct from unofficial');
  assert.ok(page.includes("job.id==='roys-hz-2027winter-class-assistant-source-review'"),'Roys is a historical winter-related lead, not confirmed direct posting');
  assert.ok(siteIndex.includes('for(const job of WINTER_2027_JOBS)'),'global search must continue indexing new concrete role records');
+});
+
+test('batch12 adds 3 distinct mainland firms, 4 sourced winter-tagged roles, truthful eligibility and grouped search',()=>{
+ const roleIds=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(m=>m[1]);
+ assert.equal(roleIds.length,62);
+ assert.equal(new Set(roleIds).size,62);
+ const cases=[
+  ['luxin-sh-power-semiconductor-winter-tag-20261023','陆芯科技'],
+  ['airlink-sh-wifi-data-analyst-winter-tag-20261104','空地互联网络科技股份有限公司'],
+  ['liepin-bj-rpo-intern-winter-tag-20261020','同道猎聘集团'],
+  ['liepin-hz-sales-consultant-winter-tag-20260910','同道猎聘集团']
+ ];
+ for(const [id,company] of cases){
+  assert.ok(roleIds.includes(id),id+' missing');
+  assert.ok(jobs.includes(company),company+' missing');
+ }
+ const added=jobs.slice(jobs.indexOf("id:'luxin-sh-power-semiconductor-winter-tag-20261023'"),jobs.indexOf("id:'hfbank-bj-2027winter-admin-support-20261105'"));
+ assert.ok(added.length>1000,'new block must be present before previous batch');
+ assert.equal((added.match(/status: "platform-posting"/g)||[]).length,4,'all four independent platform listings need explicit source status');
+ assert.ok(!added.includes('status: "open"'),'never mark unverified applications as confirmed open');
+ for(const snippet of ['连续实习6个月','每周4天','连续实习3个月','每周5天','2027年1月24日','2027年10月31日','2026年12月31日','2027年3月31日']){
+  assert.ok(added.includes(snippet),'source detail missing '+snippet);
+ }
+ const sourceIds=['inn_lrlnlhezssyb','inn_jhwbqfhkwtoa','inn_tpt19ipuu8np','inn_22u67vker7bb'];
+ for(const id of sourceIds)assert.ok(added.includes('shixiseng.com/intern/'+id),'distinct platform source missing '+id);
+ assert.ok(page.includes("job.status==='platform-posting'?'查看第三方招聘平台的独立岗位'"),'third-party application label must not claim official direct application');
+ assert.ok(page.includes("if(/工业软件|制造|机械|家电|芯片|半导体|硬件/.test(value))return '先进制造'"),'semiconductor grouping missing');
+ assert.ok(page.includes("if(/营销|传播|公关|市场|零售|电商|媒体|游戏|美妆|奢侈|销售|商务/.test(value))return '市场传播'"),'sales grouping missing');
+ assert.ok(page.includes('setKeyword(e.target.value)'),'live search must still respond as typed');
+ assert.ok(page.includes('visibleGroups.map'),'per-page category groups must remain functional');
 });
