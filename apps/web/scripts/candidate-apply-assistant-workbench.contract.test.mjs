@@ -71,5 +71,5 @@ test('P0 install entry never presents an unreviewed ZIP as an approved store ins
 test('P0 public extension privacy page is discoverable from the website',()=>{
  const html=read('../public/apply-extension-privacy.html');
  assert.ok(product.includes("apply-extension-privacy.html"));
- for(const token of ['DeepSeek','Cloudflare R2','12 位一次性连接码','不会自动同步','隐私与数据处理说明'])assert.ok(html.includes(token));
+ for(const token of ['DeepSeek','Cloudflare R2','12 位一次性连接码','尚未提供这项自动同步','隐私与数据处理说明'])assert.ok(html.includes(token));
 });
