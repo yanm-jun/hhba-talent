@@ -25,6 +25,7 @@ test('preview extension differs from official store package and never edits orig
   const html=await readFile(join(dir,'popup.html'),'utf8');
   const note=await readFile(join(dir,'REVIEW_ONLY.txt'),'utf8');
   assert.ok(account.includes(`export const HHBA_SITE='${url}';`));
+  assert.ok(account.includes(`export const HHBA_PERMISSION='${url}/*';`));
   assert.ok(popup.includes(url+'/candidate/account/resume'));
   assert.ok(popup.includes(url+'/candidate/account/apply-assistant'));
   assert.ok(html.includes(url+'/apply-extension-privacy.html'));
