@@ -10,6 +10,7 @@ connection.executescript(schema.read_text())
 connection.executescript((schema.parent/'0010_apply_refund_requests.sql').read_text())
 connection.executescript((schema.parent/'0011_apply_ai_requests.sql').read_text())
 connection.executescript((schema.parent/'0012_apply_extension_pairing.sql').read_text())
+connection.executescript((schema.parent/'0013_apply_ai_usage_audit.sql').read_text())
 connection.execute("""INSERT INTO hhba_apply_orders
 (id,phone,package_uses,amount_fen,status,created_at)
 VALUES ('order-1','13800138000',10,300,'pending','2026-11-06T00:00:00Z')""")
@@ -106,3 +107,31 @@ connection.execute("""UPDATE hhba_apply_extension_sessions SET revoked_at=?
 assert connection.execute("""SELECT COUNT(*) FROM hhba_apply_extension_sessions
  WHERE phone=? AND revoked_at IS NULL""",('13800138000',)).fetchone()[0] == 0
 print('HHBA limited browser pairing: one-time code, device revocation PASS')
+
+
+# V0.6: typed audit, backwards-compatible legacy rows and no form input stored.
+cols={row[1] for row in connection.execute('PRAGMA table_info(hhba_apply_ai_requests)')}
+assert {'status','model','attempts','prompt_tokens','cached_tokens','completion_tokens','estimated_peak_microusd','duration_ms','error_code','completed_at'} <= cols
+assert connection.execute("SELECT status FROM hhba_apply_ai_requests WHERE id='ai-1'").fetchone()[0]=='legacy'
+created='2026-11-07T01:10:00.000Z'
+insert_stmt=(
+ "INSERT INTO hhba_apply_ai_requests(id,phone,created_at,status,model) "
+ "SELECT ?,?,?,'reserved','deepseek-flash' "
+ "WHERE (SELECT COUNT(*) FROM hhba_apply_ai_requests WHERE phone=? AND created_at>=?)<? "
+ "AND (SELECT COUNT(*) FROM hhba_apply_ai_requests WHERE created_at>=?)<?"
+)
+args=lambda taskid:(taskid,'13800138000',created,'13800138000','2026-11-07T00:10:00.000Z',3,'2026-11-07T00:00:00.000Z',100)
+assert connection.execute(insert_stmt,args('model-run-1')).rowcount==1
+assert connection.execute(insert_stmt,args('model-run-2')).rowcount==1
+assert connection.execute(insert_stmt,args('model-run-3')).rowcount==1
+assert connection.execute(insert_stmt,args('model-run-4')).rowcount==0, 'Hourly quota must be atomic'
+finish=("UPDATE hhba_apply_ai_requests SET status=?,attempts=?,prompt_tokens=?,cached_tokens=?,completion_tokens=?,"
+ "estimated_peak_microusd=?,duration_ms=?,error_code=?,completed_at=? "
+ "WHERE id=? AND phone=? AND status='reserved'")
+assert connection.execute(finish,('ok',1,200,50,40,94,1200,None,'2026-11-07T01:10:01.200Z',
+ 'model-run-1','13800138000')).rowcount==1
+assert connection.execute(finish,('ok',1,200,50,40,94,1200,None,'2026-11-07T01:10:01.200Z',
+ 'model-run-1','13800138000')).rowcount==0, 'Duplicate model settlement forbidden'
+assert connection.execute("SELECT prompt_tokens,cached_tokens,completion_tokens,estimated_peak_microusd FROM hhba_apply_ai_requests WHERE id='model-run-1'").fetchone()==(200,50,40,94)
+assert connection.execute("PRAGMA table_info(hhba_apply_ai_requests)").fetchall()
+print('HHBA AI V0.6 D1 audit migration, token costs and atomic quotas PASS')
