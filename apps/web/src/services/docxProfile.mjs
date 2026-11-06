@@ -1,7 +1,7 @@
 // Dependency-free, browser-side DOCX text extractor. Operates on bytes fetched
 // from the user's own private R2 vault after an explicit click. No external AI,
-// upload or third-party script is involved. PDF decoding needs a dedicated,
-// audited parser; never return guessed fields for an unsupported PDF.
+// upload or third-party script is involved. PDF parsing is implemented in
+// a separate bounded first-party PDF.js module; never guess unsupported fields.
 const read16=(view,offset)=>view.getUint16(offset,true);
 const read32=(view,offset)=>view.getUint32(offset,true);
 const dec=new TextDecoder();
