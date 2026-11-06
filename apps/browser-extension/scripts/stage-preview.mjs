@@ -24,7 +24,11 @@ export async function stagePreviewExtension(urlText,outputPath){
  const account=await read('account.mjs');
  const prod=`export const HHBA_SITE='https://hhba.work';`;
  if(!account.includes(prod))throw Error('官网账户配置与预期不一致，请检查源码');
- await writeFile(join(out,'account.mjs'),account.replace(prod,`export const HHBA_SITE='${site}';`));
+ const perm="export const HHBA_PERMISSION='https://hhba.work/*';";
+ if(!account.includes(perm))throw Error('官网权限配置与预期不一致，请检查源码');
+ const scoped=account.replace(prod,`export const HHBA_SITE='${site}';`)
+  .replace(perm,`export const HHBA_PERMISSION='${site}/*';`);
+ await writeFile(join(out,'account.mjs'),scoped);
  let popup=await read('popup.js');
  if(!popup.includes('https://hhba.work/candidate/account/resume'))throw Error('缺少原官网简历入口');
  popup=popup.replaceAll('https://hhba.work/',site+'/');
