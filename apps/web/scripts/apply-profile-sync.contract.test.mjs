@@ -38,6 +38,11 @@ function dbMock(){
      throw Error('Unexpected SELECT: '+sql);
     },
     async run(){
+     if(sql.includes('DELETE FROM hhba_apply_profile_transfers WHERE expires_at<=')){
+      const [cutoff]=values;
+      if(transfer&&(transfer.expires_at<=cutoff||transfer.claimed_at))transfer=null;
+      return {success:true};
+     }
      if(sql.includes('INSERT INTO hhba_apply_profile_transfers')){
       const [phone,resume_id,nonce_hex,cipher_hex,created_at,expires_at]=values;
       transfer={phone,resume_id,nonce_hex,cipher_hex,created_at,expires_at,claimed_at:null};
@@ -93,6 +98,7 @@ test('expired transfer, revoked transfer and unpaired user fail closed',async()=
  db.changeOwner(phoneA);
  await prepareProfileTransfer(db,env,phoneA,input,now);
  assert.equal((await claimProfileTransfer(db,env,phoneA,now+300001)).error,'PROFILE_TRANSFER_NOT_READY');
+ assert.equal(db.snapshot(),null,'expired ciphertext is deleted opportunistically');
  assert.equal((await revokeProfileTransfer(db,phoneA)).ok,true);
  assert.equal(db.snapshot(),null);
  assert.equal((await prepareProfileTransfer(db,{},phoneA,input,now)).error,'PROFILE_TRANSFER_NOT_CONFIGURED');
