@@ -178,6 +178,7 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
     <div><b>03</b><span><strong>上传或管理简历</strong><small>前往私有简历库，选择 PDF/DOCX 并主动同意存储条款</small></span><Link to="/candidate/account/resume">我的简历 <ArrowRight size={13}/></Link></div>
    </div>
    <p className="hhba-apply-safety-note"><ShieldCheck size={15}/>当前插件账号连接仅支持查询次数及逐次授权的 AI 字段分析；私有简历文件不会自动同步给插件或第三方 AI，简历自动解析与同步仍需单独开发和验收。</p>
+   <p className="hhba-apply-safety-note"><LockKeyhole size={15}/>阅读 <a href={import.meta.env.BASE_URL+'apply-extension-privacy.html'} target="_blank" rel="noopener noreferrer">网申插件专用隐私与数据处理说明</a>；正式公开上线前仍需完成法律及商店审核。</p>
   </section>
   <section className="hhba-apply-wallet" aria-label="我的网申次数">
    <div className="hhba-apply-headline"><div><h3>我的网申次数</h3><p>按当前真实账户统计，不会因为刷新或重复点击而重复扣减。</p></div><button type="button" onClick={()=>void refresh()} disabled={busy||!applyAccountAvailable}><RefreshCcw size={14}/>刷新记录</button></div>
