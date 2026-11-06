@@ -30,7 +30,7 @@ test('account requests omit cookies and never support client-issued spending or 
  assert.equal(last.url,HHBA_EXTENSION_API+'/wallet');
  assert.equal(last.options.credentials,'omit');
  assert.equal(last.options.headers.Authorization,'Bearer '+token.token);
- assert.equal(last.options.method,'GET');
+ assert.equal(last.options.method,'POST');
  await assert.rejects(()=>accountApi(fake,'/grant',token),/没有操作|只允许/);
  await assert.rejects(()=>accountApi(fake,'/pay',token),/没有操作|只允许/);
  await assert.rejects(()=>accountApi(fake,'/settle',token),/没有操作|只允许/);
