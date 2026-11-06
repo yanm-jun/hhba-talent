@@ -50,7 +50,7 @@ test('directory contains source-backed programmes without invented job numbers',
 });
 test('concrete job first: only individual employer-issued postings appear in the primary list',()=>{
  const jobIds=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(x=>x[1]);
- assert.equal(jobIds.length,41,'34 prior plus batch07 BNP 3 LVMH 1 Crédit Agricole 3');
+ assert.equal(jobIds.length,44,'41 prior plus three distinct mainland employer roles in batch08');
  assert.equal(new Set(jobIds).size,jobIds.length,'no duplicate role identity');
  for(const id of ['apco-shanghai-winter-start-1787','hsbc-hk-student-placement-1367003857','qima-hk-sales-intern-744000154586189']){
   assert.ok(jobIds.includes(id),id+' missing');
@@ -115,9 +115,9 @@ test('batch05 has seven distinct university-only ReCube winter records and two s
  const recube=['product-uiux-260900318','sustainability-260900321','fullstack-260900315','digital-marketing-260900319','hardware-260900322','website-designer-260900317','data-ai-260900320'];
  for(const name of recube)assert.ok(ids.includes('recube-hk-winter-'+name),'missing real university posting '+name);
  for(const id of ['papergames-shanghai-recruiting-game-rd-intern-2027-review','papergames-shanghai-nikki-world-ecology-planning-280350'])assert.ok(ids.includes(id),'missing sourced Papergames role '+id);
- assert.equal(new Set(ids).size,41);
+ assert.equal(new Set(ids).size,44);
  assert.equal((jobs.match(/status:"campus-limited"/g)||[]).length,7,'restricted university listings must not be passed as direct public jobs');
- assert.equal((jobs.match(/status:"winter-unverified"/g)||[]).length,2,'two additional daily internships must be marked as winter-unverified');
+ assert.equal((jobs.match(/status:"winter-unverified"/g)||[]).length,2,'two original daily internships must remain winter-unverified');
  assert.ok(jobs.includes('2026 年 11 月 14 日')&&jobs.includes('cpdc.osa.cuhk.edu.hk/en/job/'));
  assert.ok(jobs.includes('职位详情跳转需要校内认证')&&jobs.includes('非本岗位直投'));
  assert.ok(jobs.includes('www.shixiseng.com/intern/inn_rupynll1lq54')&&jobs.includes('www.deizao.cn/m/index/shixixq/jobid/280350'));
@@ -178,4 +178,19 @@ test('batch07 keeps independently sourced January-2027 BNP, LVMH and Credit Agri
  const ledger=read('../../docs/WINTER_2027_54_EMPLOYER_PIPELINE.md');
  assert.ok(ledger.includes('后续待逐项核验：**30**'),'remaining 30 companies');
  assert.ok(ledger.includes('**24条已处理、30条仍待核验**')&&ledger.includes('**41条岗位或招聘批次资料**'),'batch07 cumulative counts');
+});
+
+test('batch08 adds three distinct China mainland employers and searchable industry groups',()=>{
+ const ids=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(m=>m[1]);
+ for(const id of ['haier-qd-vision-algorithm-intern-20261104','hisense-qd-hr-intern-j44475','boe-bj-2027-software-intern-j54754'])assert.ok(ids.includes(id),id+' missing');
+ for(const name of ['海尔集团','海信集团','京东方'])assert.ok(jobs.includes(name),name+' missing');
+ for(const url of ['maker.haier.net/client/practicemobile/jobs.html','jobs.hisense.com/intern/jobs','boe.zhiye.com/campus/detail'])assert.ok(jobs.includes(url),url+' missing');
+ for(const phrase of ['2027寒假到岗时间待核实','2027寒假开始日待企业确认','连续实习6个月以上'])assert.ok(jobs.includes(phrase),phrase+' missing disclaimer');
+ assert.ok(page.includes('setKeyword(e.target.value)'),'typing must immediately update search');
+ assert.ok(page.includes('winterIndustryGroup(j)===group'),'group facet must affect results');
+ assert.ok(page.includes('visibleGroups.map'),'results must be grouped visually');
+ assert.ok(page.includes('Number(b.region===\'中国内地\')-Number(a.region===\'中国内地\')'),'mainland records first by default');
+ assert.ok(page.includes('matchedPrograms.map'),'keyword search must include programme-only records, without treating them as vacancies');
+ const added=jobs.slice(jobs.indexOf('haier-qd-vision-algorithm-intern-20261104'),jobs.indexOf('apco-shanghai-winter-start-1787'));
+ assert.equal((added.match(/status: "winter-unverified"/g)||[]).length,3,'new postings are real but winter timing unverified');
 });
