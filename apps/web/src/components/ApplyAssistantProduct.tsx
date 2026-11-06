@@ -1,6 +1,7 @@
-import {useEffect,useState} from 'react';
+import {useEffect,useMemo,useState} from 'react';
 import {ArrowRight,BadgeCheck,CheckCircle2,ChevronRight,Clock3,FileCheck2,LockKeyhole,MousePointerClick,PlayCircle,RefreshCcw,ReceiptText,ShieldCheck,Sparkles,Wallet} from 'lucide-react';
 import {Link} from '../router';
+import {qrcodegen} from '../vendor/qrcodegen';
 import {applyAccountAvailable,createApplyOrder,getApplyConfig,getApplyOrder,getApplyOrders,getApplyTasks,getApplyWallet,type ApplyConfig,type ApplyOrder,type ApplyTask,type ApplyWallet} from '../services/applyCredits';
 import '../styles/apply-assistant-product.css';
 
@@ -9,6 +10,18 @@ const money=(fen:number)=>'¥'+(fen/100).toFixed(2);
 const stateText:Record<ApplyOrder['status'],string>={pending:'等待支付',paid:'已到账',closed:'已关闭',refunded:'已退款'};
 const taskText:Record<ApplyTask['status'],string>={reserved:'处理中（预占1次）',completed:'已使用1次',released:'未扣次'};
 const archiveUrl=import.meta.env.BASE_URL+'downloads/hhba-apply-assistant-v0.2.zip';
+
+function AlipayPaymentQR({value}:{value:string}){
+ const qr=useMemo(()=>{try{return qrcodegen.QrCode.encodeText(value,qrcodegen.QrCode.Ecc.MEDIUM)}catch{return null}},[value]);
+ if(!qr)return <p>二维码内容超过安全长度，请联系支持人员。</p>;
+ const quiet=4,edge=qr.size+quiet*2,blocks:string[]=[];
+ for(let y=0;y<qr.size;y++)for(let x=0;x<qr.size;x++)if(qr.getModule(x,y))blocks.push('M'+(x+quiet)+' '+(y+quiet)+'h1v1h-1z');
+ return <svg xmlns="http://www.w3.org/2000/svg" width="210" height="210" viewBox={'0 0 '+edge+' '+edge}
+  role="img" aria-label="支付宝付款二维码" shapeRendering="crispEdges">
+   <rect width={edge} height={edge} fill="#fff"/>
+   <path d={blocks.join('')} fill="#173e2b"/>
+  </svg>;
+}
 
 export function ApplyAssistantProduct({userId}:{userId:string|number|undefined}){
  const [selected,setSelected]=useState(10);
@@ -110,7 +123,12 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
    {checkout&&<div className="hhba-apply-pending" role="status">
      <strong>订单 {checkout.id.slice(0,8)} · {stateText[checkout.status]}</strong>
      <p>已选择 {checkout.uses} 次，共 {money(checkout.amountFen)}。请以支付宝实际付款页面和此处状态为准。</p>
-     {checkout.qrCode&&checkout.status==='pending'&&<><a href={checkout.qrCode} target="_blank" rel="noopener noreferrer">打开支付宝支付链接 <ArrowRight size={14}/></a><small>网页版二维码展示及多设备扫码体验还需完成独立验收，当前不宣称已经支持。</small></>}
+     {checkout.qrCode&&checkout.status==='pending'&&<div className="hhba-apply-qr-panel">
+       <AlipayPaymentQR value={checkout.qrCode}/>
+       <div><strong>请使用支付宝扫码支付</strong><p>二维码在当前设备本地生成，支付链接不会发送给第三方二维码网站。</p>
+        {checkout.qrCode.startsWith('https://qr.alipay.com/')&&<a href={checkout.qrCode} target="_blank" rel="noopener noreferrer">手机端打开支付宝收银台 <ArrowRight size={14}/></a>}
+        <small>请以支付宝实际收银台金额为准；付款后点击下方按钮查询到账。</small>
+       </div></div>}
      <button type="button" disabled={busy} onClick={()=>void refresh()}>查询是否到账</button>
    </div>}
    {notice&&<p className="hhba-apply-notice" role="status">{notice}</p>}

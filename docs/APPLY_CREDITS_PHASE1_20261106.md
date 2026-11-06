@@ -41,7 +41,7 @@ Even after new orders are switched off, valid callback notifications for existin
 
 ## Required work before taking live money
 1. Confirm Alipay F2F merchant eligibility for a fully online digital service, not just limit figures.
-2. Implement onsite local QR drawing, gateway query/reconciliation, cancelled/expired orders, refund and chargeback process.
+2. Onsite local QR drawing is included (MIT-licensed Project Nayuki QR generator, license in the vendored TypeScript header). Validate real-world scan behavior, then implement gateway query/reconciliation, cancelled/expired orders, refund and chargeback process.
 3. Test authentic merchant private key, Alipay public key, callbacks, payment-retry and replay behaviors with real sandbox or controlled small transactions.
 4. Review price/usage/refund/expiry disclosure, consumer legal obligations and the AI processor privacy notice.
 5. Back up and migrate D1 in preview, run verified browser tests, then review production migration.

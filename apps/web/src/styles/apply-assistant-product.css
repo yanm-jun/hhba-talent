@@ -77,3 +77,11 @@
 .hhba-apply-footer svg{flex-shrink:0;color:#669977;margin-top:2px}
 @media(max-width:800px){.hhba-apply-hero{grid-template-columns:1fr}.hhba-apply-video{min-height:180px}.hhba-apply-benefits{grid-template-columns:1fr 1fr}.hhba-apply-wallet-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.hhba-apply-package-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hhba-apply-how-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.hhba-apply-hero{padding:19px}.hhba-apply-hero h2{font-size:28px}.hhba-apply-benefits{grid-template-columns:1fr}.hhba-apply-wallet,.hhba-apply-plans,.hhba-apply-how,.hhba-apply-history{padding:17px 14px}.hhba-apply-checkout{flex-wrap:wrap}.hhba-apply-checkout>button{width:100%}.hhba-apply-headline{align-items:flex-start}.hhba-apply-how-grid{grid-template-columns:1fr 1fr;gap:18px 11px}}
+
+.hhba-apply-qr-panel{display:flex;align-items:center;gap:16px;border:1px solid #d9e8db;border-radius:11px;padding:15px;background:#fff}
+.hhba-apply-qr-panel svg{display:block;flex-shrink:0;padding:8px;background:#fff;border:1px solid #e7ede8;border-radius:8px}
+.hhba-apply-qr-panel>div{display:flex;flex-direction:column;gap:8px;min-width:0}
+.hhba-apply-qr-panel strong{font-size:13px}
+.hhba-apply-qr-panel a{color:#2f6a46;text-decoration:underline;font-size:12px}
+.hhba-apply-qr-panel small{color:#869789;font-size:10px;line-height:1.6}
+@media(max-width:520px){.hhba-apply-qr-panel{flex-direction:column;text-align:center}.hhba-apply-qr-panel>div{align-items:center}}

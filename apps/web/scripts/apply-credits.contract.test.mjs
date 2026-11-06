@@ -9,6 +9,7 @@ const read=path=>readFileSync(new URL(path,import.meta.url),'utf8');
 const page=read('../src/components/ApplyAssistantProduct.tsx');
 const stylesheet=read('../src/styles/apply-assistant-product.css');
 const handler=read('../functions/api/apply/[[path]].js');
+const qrSource=read('../src/vendor/qrcodegen.ts');
 const doc=read('../../../docs/APPLY_CREDITS_PHASE1_20261106.md');
 const keypair=generateKeyPairSync('rsa',{modulusLength:2048,
  publicKeyEncoding:{type:'spki',format:'pem'},
@@ -63,6 +64,10 @@ test('missing or invalid bearer tokens may never view account-specific orders',a
 test('product has no public model marketing, no fake purchase, and no fake submission',()=>{
  assert.ok(page.includes('网申，不必再'));
  assert.ok(page.includes('产品演示视频'));
+ assert.ok(page.includes('<AlipayPaymentQR value={checkout.qrCode}/>'));
+ assert.ok(qrSource.includes('MIT License'));
+ assert.ok(page.includes('shapeRendering="crispEdges"'));
+ assert.ok(!page.includes('api.qrserver.com'));
  assert.ok(page.includes('支付宝支付待开通'));
  assert.ok(page.includes('aria-pressed={choice.uses===p.uses}'));
  assert.ok(page.includes('getApplyWallet()'));
