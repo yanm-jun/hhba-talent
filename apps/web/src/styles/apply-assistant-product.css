@@ -108,3 +108,21 @@
 .hhba-apply-connect-code strong{font:750 24px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:#2c6745;word-break:break-all}
 .hhba-apply-connect-code span{font-size:11px;color:#6e806f;line-height:1.6}
 @media(max-width:520px){.hhba-apply-connect{padding:17px 14px}.hhba-apply-connect-actions{width:100%}.hhba-apply-connect-actions button{flex:1}}
+
+/* P0: official-store-only install entry, without mislabeling a ZIP as one-click installation */
+.hhba-apply-install{background:#fff;border:1px solid #e2eae4;border-radius:14px;padding:22px;margin:0 0 16px}
+.hhba-apply-store-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-top:16px}
+.hhba-apply-store-option{display:flex;flex-direction:column;gap:8px;min-width:0;border:1px solid #e4ece6;border-radius:10px;background:#fbfdfb;padding:15px}
+.hhba-apply-store-option strong{font-size:14px;color:#2e4838}
+.hhba-apply-store-option span{font-size:11px;color:#7f9485}
+.hhba-apply-store-option a,.hhba-apply-store-option button{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-top:5px;min-height:36px;padding:9px;border:0;border-radius:8px;font-size:11px;font-weight:700;background:#2c6546;color:#fff;text-decoration:none;text-align:center}
+.hhba-apply-store-option button:disabled{background:#eef2ef;color:#819386;cursor:not-allowed}
+.hhba-apply-store-option a:focus-visible{outline:3px solid #6daa7d;outline-offset:2px}
+.hhba-apply-onboarding-steps{display:flex;flex-direction:column;margin-top:16px;border-top:1px solid #edf2ee}
+.hhba-apply-onboarding-steps>div{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #edf2ee}
+.hhba-apply-onboarding-steps b{color:#83ab8b;font-size:19px}
+.hhba-apply-onboarding-steps span{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.hhba-apply-onboarding-steps strong{font-size:12px;color:#36533e}
+.hhba-apply-onboarding-steps small{font-size:10px;line-height:1.7;color:#829387}
+.hhba-apply-onboarding-steps a{display:inline-flex;gap:3px;align-items:center;font-size:11px;color:#2b6c45;font-weight:700}
+@media(max-width:520px){.hhba-apply-install{padding:17px 14px}.hhba-apply-store-grid{grid-template-columns:1fr}}

@@ -1,0 +1,22 @@
+.hhba-apply-sync{margin:0 0 16px;border:1px solid #e1eae3;border-radius:14px;background:#fff;padding:22px;color:#304b37}
+.hhba-apply-sync-select{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:18px 0}
+.hhba-apply-sync-select label,.hhba-apply-sync-fields label span{font-size:11px;color:#61796a;font-weight:700}
+.hhba-apply-sync-select select{border:1px solid #d6e4d8;border-radius:8px;padding:10px 12px;font:inherit;color:#365641;min-width:0;flex:1}
+.hhba-apply-sync-select button,.hhba-apply-sync-actions button{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 14px;background:#2c6546;color:#fff;border:0;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer}
+.hhba-apply-sync-select button:disabled,.hhba-apply-sync-actions button:disabled{opacity:.45;cursor:not-allowed}
+.hhba-apply-sync-evidence{border:1px solid #e2ece4;border-radius:9px;padding:10px 13px;margin-bottom:12px}
+.hhba-apply-sync-evidence summary{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:#386c4b}
+.hhba-apply-sync-evidence pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:210px;overflow-y:auto;font:11px/1.8 inherit;color:#587061}
+.hhba-apply-sync-editor>p{display:flex;gap:7px;font-size:11px;color:#75897c;line-height:1.8}
+.hhba-apply-sync-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}
+.hhba-apply-sync-fields label{display:flex;flex-direction:column;gap:6px;min-width:0}
+.hhba-apply-sync-fields input,.hhba-apply-sync-fields textarea{font:12px/1.65 inherit;background:#fff;border:1px solid #dce8df;border-radius:8px;padding:9px;color:#375441;max-width:100%;resize:vertical}
+.hhba-apply-sync-consents{display:grid;gap:9px;margin-top:14px}
+.hhba-apply-sync-consents label{display:flex;align-items:flex-start;gap:8px;font-size:11px;line-height:1.8;color:#526e5b}
+.hhba-apply-sync-consents input{margin-top:4px;accent-color:#35744c}
+.hhba-apply-sync-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+.hhba-apply-sync-actions .secondary{background:#fff;color:#34654a;border:1px solid #bed2c4}
+.hhba-apply-sync-note,.hhba-apply-sync-footnote{font-size:11px;line-height:1.85;color:#819287;margin:13px 0 0}
+.hhba-apply-sync-error{font-size:11px;color:#b24d44}
+.hhba-apply-sync-success{font-size:11px;color:#287047;font-weight:700}
+@media(max-width:620px){.hhba-apply-sync{padding:16px 13px}.hhba-apply-sync-fields{grid-template-columns:1fr}.hhba-apply-sync-select button{width:100%}}
