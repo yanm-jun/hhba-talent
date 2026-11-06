@@ -1,5 +1,6 @@
 import type {CompleteGuide,GuideBranch,GuideStep} from '../components/talent/UnifiedPolicyGuide';
 import {SHAANXI_POLICY_RECORDS} from './shaanxiPolicyRecords.ts';
+import {XIAN_2026_ARCHIVED_YINGCAI_POLICY_RECORDS} from './xian2026ArchivedYingcai.ts';
 import {SHAANXI_HOUSING_RECORDS} from './shaanxiHousingRecords.ts';
 export {SHAANXI_10_CITIES} from './shaanxiPolicyRecords.ts';
 export function shaanxiGuideUrl(kind:'policy'|'housing',id:string){
@@ -22,7 +23,7 @@ const deadlines=(deadline?:string,archive=false)=>{
  return archive||(Boolean(deadline&&deadline<today));
 };
 export function buildShaanxiGuide(kind:'policy'|'housing',id:string):CompleteGuide|null{
- const p=kind==='policy'?SHAANXI_POLICY_RECORDS.find(r=>r.id===id):undefined;
+ const p=kind==='policy'?[...SHAANXI_POLICY_RECORDS,...XIAN_2026_ARCHIVED_YINGCAI_POLICY_RECORDS].find(r=>r.id===id):undefined;
  const h=kind==='housing'?SHAANXI_HOUSING_RECORDS.find(r=>r.id===id):undefined;
  if(!p&&!h)return null;
  const item=p||h!;

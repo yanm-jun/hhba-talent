@@ -22,7 +22,7 @@ for(const city of SHAANXI_10_CITIES){
  assert.ok(p.length>=2,city+' needs province policy + independently sourced local policy');
  assert.ok(h.length>=1,city+' cannot have zero housing without an explicitly logged evidence gap');
  const snapshot=getTalentCitySnapshot(city);
- assert.equal(snapshot.policyCount,p.length,city+' policy index not connected');
+ assert.equal(snapshot.policyCount,p.length+(city==='西安'?1:0),city+' policy index not connected');
  assert.equal(snapshot.housingCount,h.length,city+' housing index not connected');
  assert.equal(p.filter(x=>x.title.startsWith('【全省统一】')).length,1,city+' must not claim multiple provincial grants');
  for(const r of p){
@@ -48,6 +48,7 @@ for(const city of SHAANXI_10_CITIES){
   assert.ok(shaanxiGuideUrl('housing',r.id).includes(r.id));
  }
 }
+assert.equal(buildShaanxiGuide('policy','sn-xian-english-plan-2026')?.qualityLevel,'C','expired Xi’an 2026 Yingcai cohort requires a working Shaanxi guide and C grade');
 assert.equal(SHAANXI_HOUSING_RECORDS.filter(x=>x.city==='西安').length,10);
 assert.ok(SHAANXI_HOUSING_RECORDS.some(x=>x.id==='sn-baoji-taichuang-202610'&&x.rent.includes('600元/月')));
 assert.ok(SHAANXI_HOUSING_RECORDS.some(x=>x.city==='榆林'&&x.title.includes('采购')&&x.kind==='program'));
