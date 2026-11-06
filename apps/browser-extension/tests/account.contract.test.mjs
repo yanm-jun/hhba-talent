@@ -58,13 +58,38 @@ test('P0 shortcuts open HHBA first-party workspace; never read login tokens or a
  }
  assert.ok(popup.includes('https://hhba.work/candidate/account/apply-assistant'));
  assert.ok(popup.includes('https://hhba.work/candidate/account/resume'));
- assert.ok(html.includes('不会自动导入到插件'));
+ assert.ok(html.includes('未经同意不会同步或发送原始文件'));
  assert.ok(!popup.includes('chrome.cookies'));
 });
 
 test('P0 extension displays first-party privacy policy without silently consenting',()=>{
  const html=readFileSync(new URL('../popup.html',import.meta.url),'utf8');
  assert.ok(html.includes('https://hhba.work/apply-extension-privacy.html'));
- assert.ok(html.includes('自动解析与同步功能尚未开放'));
+ assert.ok(html.includes('PDF 的可靠自动解析仍待验收'));
  assert.ok(!html.includes('checked="checked"'));
+});
+
+test('P0 reviewed profile import is explicit, owner-bound and never uploads the original CV',async()=>{
+ const popup=readFileSync(new URL('../popup.js',import.meta.url),'utf8');
+ const html=readFileSync(new URL('../popup.html',import.meta.url),'utf8');
+ const code='profile-sync-consent';
+ assert.ok(html.includes('id="'+code+'"'));
+ assert.ok(html.includes('id="profile-sync-claim"'));
+ assert.ok(popup.includes('savedDeviceSession()'));
+ assert.ok(popup.includes('accountApi(fetch,"/profile/claim",device)'));
+ assert.ok(popup.includes('validateProfile(data.profile)'));
+ assert.ok(popup.includes('await storeProfile(checked)'));
+ assert.ok(popup.includes('$("profile-sync-consent").checked=false'));
+ let outgoing;
+ const fake=async(url,opts)=>{
+  outgoing={url,opts};
+  return new Response(JSON.stringify({ok:true,profile:{fullName:'模拟求职者',school:'虚构学院'}}),{status:200});
+ };
+ const response=await accountApi(fake,'/profile/claim',token);
+ assert.equal(response.profile.fullName,'模拟求职者');
+ assert.ok(outgoing.url.endsWith('/profile/claim'));
+ assert.equal(outgoing.opts.credentials,'omit');
+ assert.equal(outgoing.opts.headers.Authorization,'Bearer '+token.token);
+ assert.equal(outgoing.opts.method,'POST');
+ assert.equal(outgoing.opts.body,undefined);
 });
