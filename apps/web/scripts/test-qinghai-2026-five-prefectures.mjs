@@ -1,0 +1,34 @@
+import assert from 'node:assert/strict';
+import {QINGHAI_2026_LOCAL_POLICY_RECORDS as local} from '../src/data/qinghai2026LocalPolicyRecords.ts';
+import {QINGHAI_POLICY_RECORDS} from '../src/data/qinghaiPolicyRecords.ts';
+import {QINGHAI_SHARED_POLICY_RECORDS} from '../src/data/qinghaiSharedPolicies.ts';
+import {buildQinghaiGuide,qinghaiGuideUrl} from '../src/data/qinghaiGuides.ts';
+import {TALENT_POLICY_RECORDS} from '../src/data/talentPolicyRecords.ts';
+import {getTalentCitySnapshot} from '../src/data/talentCitySnapshot.ts';
+import {findTalentCity} from '../src/data/talentCityRegistry.ts';
+import {assessPolicy,talentSourceKind,ACCEPTED_TALENT_CITIES} from '../src/data/talentQuality.ts';
+const cities=['西宁','黄南','果洛','玉树','海西'];
+assert.equal(local.length,5);
+assert.equal(new Set(local.map(x=>x.city)).size,5);
+assert.equal(new Set(local.map(x=>x.id)).size,5);
+for(const city of cities){
+ const row=local.find(x=>x.city===city);
+ assert.ok(row,city+' missing specific 2026 local evidence');
+ assert.equal(findTalentCity(city)?.province,'青海省');
+ assert.equal(talentSourceKind(row.sourceUrl),'government',row.id+' no government or official exam source');
+ assert.ok(row.published.startsWith('2026-'));
+ assert.equal(QINGHAI_POLICY_RECORDS.filter(x=>x.id===row.id).length,1,'missing QH formal collection');
+ assert.equal(TALENT_POLICY_RECORDS.filter(x=>x.id===row.id).length,1,'missing national policy index');
+ assert.ok(getTalentCitySnapshot(city).policyCount>0,'city showing 0 policy');
+ assert.ok(row.materials?.length>=4 && row.applicationSteps?.length>=5,'guide insufficient');
+ assert.ok(row.reviewNote?.includes('办理入口待核实'),'current application cannot be invented');
+ assert.notEqual(assessPolicy(row,'2026-11-01').grade,'A');
+ assert.ok(!ACCEPTED_TALENT_CITIES.includes(city),'no full region approval');
+ assert.ok(buildQinghaiGuide('policy',row.id)?.faq.length>=8,'missing unified guide FAQ');
+ assert.ok(qinghaiGuideUrl('policy',row.id).includes('/qinghai/policy/'));
+}
+assert.equal(local.find(x=>x.city==='果洛')?.payoutTo,'非现金服务');
+assert.ok(local.find(x=>x.city==='果洛')?.benefit.includes('预算115万元'));
+assert.ok(local.find(x=>x.city==='西宁')?.district.includes('湟源县'));
+assert.equal(QINGHAI_SHARED_POLICY_RECORDS.every(x=>x.city==='青海省'),true,'provincial funding must not be duplicated to 5 cities');
+console.log('QINGHAI_2026_5_PREFECTURES_LOCAL_SOURCE_AND_GUIDES_OK',cities.join('、'));

@@ -64,8 +64,10 @@ assert.ok(originalMissingPolicy.length<=64,'original 312-region policy coverage 
 const sichuanNewlyExposedPolicyHousingGaps=missingHousing.filter(x=>x.province==='四川省'&&[
  '攀枝花','泸州','绵阳','遂宁','内江','宜宾','广安','巴中','资阳','甘孜','凉山'
 ].includes(x.city));
+const newQinghaiPolicyOnlyHousing=missingHousing.filter(x=>x.province==='青海省'&&['黄南','果洛'].includes(x.city));
 const legacyMissingHousing=missingHousing.filter(x=>x.province!=='贵州省'&&
- !sichuanNewlyExposedPolicyHousingGaps.some(sc=>sc.city===x.city));
+ !sichuanNewlyExposedPolicyHousingGaps.some(sc=>sc.city===x.city)&&
+ !newQinghaiPolicyOnlyHousing.some(qh=>qh.city===x.city));
 const newGuizhouHousingGaps=missingHousing.filter(x=>x.province==='贵州省');
 assert.ok(legacyMissingHousing.length<=26,'pre-existing housing coverage regressed');
 assert.ok(newGuizhouHousingGaps.length<=9,'Guizhou housing gap count inconsistent');
@@ -96,6 +98,7 @@ const report={
  policyCitiesMissingHousing:missingHousing.length,missingHousingList:missingHousing,
  legacyMissingHousingCount:legacyMissingHousing.length,guizhouMissingHousingCount:newGuizhouHousingGaps.length,
  newlyExposedSichuanHousingCount:sichuanNewlyExposedPolicyHousingGaps.length,newlyExposedSichuanHousingCities:sichuanNewlyExposedPolicyHousingGaps.map(x=>x.city),
+ newlyExposedQinghaiHousingCount:newQinghaiPolicyOnlyHousing.length,newlyExposedQinghaiHousingCities:newQinghaiPolicyOnlyHousing.map(x=>x.city),
  pcaSecondLevelCount:pcaSecondLevel.length,unmatchedPcaCount:unmatchedPca.length,
  pcaUnmatchedNodes:unmatchedPca,
  pcaMissingPrefectureCount:missingPrefecture.length,pcaMissingPrefectureList:missingPrefecture,
