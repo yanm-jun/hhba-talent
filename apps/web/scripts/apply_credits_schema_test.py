@@ -10,6 +10,7 @@ connection.executescript(schema.read_text())
 connection.executescript((schema.parent/'0010_apply_refund_requests.sql').read_text())
 connection.executescript((schema.parent/'0011_apply_ai_requests.sql').read_text())
 connection.executescript((schema.parent/'0012_apply_extension_pairing.sql').read_text())
+connection.executescript((schema.parent/'0014_apply_profile_sync.sql').read_text())
 connection.execute("""INSERT INTO hhba_apply_orders
 (id,phone,package_uses,amount_fen,status,created_at)
 VALUES ('order-1','13800138000',10,300,'pending','2026-11-06T00:00:00Z')""")
@@ -106,3 +107,21 @@ connection.execute("""UPDATE hhba_apply_extension_sessions SET revoked_at=?
 assert connection.execute("""SELECT COUNT(*) FROM hhba_apply_extension_sessions
  WHERE phone=? AND revoked_at IS NULL""",('13800138000',)).fetchone()[0] == 0
 print('HHBA limited browser pairing: one-time code, device revocation PASS')
+
+# AES-GCM ciphertext is the only durable profile representation. The SQLite
+# handoff is atomically claimed and cannot be replayed or claimed after expiry.
+connection.execute("""INSERT INTO hhba_apply_profile_transfers
+ (phone,resume_id,nonce_hex,cipher_hex,created_at,expires_at)
+ VALUES(?,?,?,?,?,?)""",
+ ('13800138000','00000000-0000-4000-8000-000000000001','a'*24,'b'*180,
+  '2026-11-06T04:00:00Z','2026-11-06T04:05:00Z'))
+lease=connection.execute("""UPDATE hhba_apply_profile_transfers SET claimed_at=?
+ WHERE phone=? AND claimed_at IS NULL AND expires_at>? RETURNING nonce_hex,cipher_hex""",
+ ('2026-11-06T04:01:00Z','13800138000','2026-11-06T04:01:00Z')).fetchone()
+assert lease==('a'*24,'b'*180)
+assert connection.execute("""UPDATE hhba_apply_profile_transfers SET claimed_at=?
+ WHERE phone=? AND claimed_at IS NULL AND expires_at>? RETURNING nonce_hex,cipher_hex""",
+ ('2026-11-06T04:01:01Z','13800138000','2026-11-06T04:01:01Z')).fetchone() is None
+connection.execute("DELETE FROM hhba_apply_profile_transfers WHERE phone='13800138000'")
+assert connection.execute("SELECT COUNT(*) FROM hhba_apply_profile_transfers").fetchone()[0]==0
+print('HHBA structured CV sync: encrypted-only schema + atomic one-use profile claim PASS')
