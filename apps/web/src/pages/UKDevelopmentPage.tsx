@@ -12,8 +12,8 @@ import '../styles/overseas-uk.css';
 
 type View='country'|'pathway'|'saved'|'compare'|'match';
 const root='/study-abroad',country=root+'/country/united-kingdom';
-const routeFor=(id:string)=>root+'/uk/pathway/'+id;
-const favoriteKey='hhba.overseas.uk.favourites.v1',compareKey='hhba.overseas.uk.compare.v1';
+const routeFor=(id:string)=>root+'/united-kingdom/pathway/'+id;
+const favoriteKey='hhba.overseas.uk.saved.v1',compareKey='hhba.overseas.uk.compare.v1';
 const introPhoto='https://commons.wikimedia.org/wiki/File:Westminster_Palace_and_Big_Ben.jpg';
 function savedItems(key:string):string[]{try{const ids=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(ids)?ids.filter((x:unknown):x is string=>typeof x==='string'&&ukPathways.some(p=>p.id===x)):[];}catch{return[];}}
 function CategoryIcon({cat}:{cat:OverseasCategory}){const I=cat==='work'?BriefcaseBusiness:cat==='residence'?House:cat==='study'?GraduationCap:Plane;return <I size={19}/>;}
@@ -29,7 +29,7 @@ export function UKDevelopmentPage({user,view='country',pathwayId}:{user:User|nul
  const favourite=(id:string)=>setSaved(v=>v.includes(id)?v.filter(x=>x!==id):[...v,id]);
  const compare=(id:string)=>setCompared(v=>v.includes(id)?v.filter(x=>x!==id):v.length<3?[...v,id]:v);
  const list=useMemo(()=>ukPathways.filter(p=>(filter==='all'||p.category===filter)&&[p.name,p.english,p.summary,p.audience,...p.highlights].join(' ').toLocaleLowerCase().includes(term.trim().toLocaleLowerCase())),[filter,term]);
- const suggested=useMemo(()=>ukPathways.filter(p=>p.category===goal&&p.availability!=='closed'&&(job!=='no'||!['uk-skilled-worker','uk-health-care','uk-scale-up','uk-seasonal','uk-creative-worker','uk-gov-exchange','uk-senior-specialist','uk-global-business-graduate-trainee'].includes(p.id))),[goal,job]);
+ const suggested=useMemo(()=>ukPathways.filter(p=>p.category===goal&&p.availability!=='closed'&&(job!=='no'||!['uk-skilled','uk-health','uk-scale','uk-seasonal','uk-creative-worker','uk-gov-exchange','uk-senior-specialist','uk-global-business-graduate-trainee'].includes(p.id))),[goal,job]);
  const detail=pathwayId?ukPathways.find(x=>x.id===pathwayId):undefined;
  const breadcrumbs=(label:string)=><nav className="hhba-overseas-crumb" aria-label="面包屑"><Link to={root}>海外发展</Link><span>/ <Link to={country}>英国</Link></span>{label&&<span>/ <strong>{label}</strong></span>}</nav>;
  const card=(p:OverseasPathway)=><article className="hhba-overseas-path-card" key={p.id}>
@@ -52,7 +52,7 @@ export function UKDevelopmentPage({user,view='country',pathwayId}:{user:User|nul
       <a className="hhba-uk-photo-credit" href={introPhoto} rel="noopener noreferrer" target="_blank">伦敦威斯敏斯特宫实景 · Balise42 · CC BY-SA 4.0 <ExternalLink size={12}/></a>
      </div><div className="hhba-overseas-kiwi" aria-hidden="true">UK<span>英国</span></div>
    </header>
-   <div className="hhba-overseas-utility"><Link to={root+'/uk/match'}><SlidersHorizontal size={17}/> 选择目标</Link><Link to={root+'/uk/saved'}><Bookmark size={17}/> 我的收藏（{saved.length}）</Link><Link to={root+'/uk/compare'}><GitCompareArrows size={17}/> 方案对比（{compared.length}/3）</Link><Link to={root+'/legacy'}><BookOpen size={17}/> 原大学资料库</Link></div>
+   <div className="hhba-overseas-utility"><Link to={root+'/united-kingdom/match'}><SlidersHorizontal size={17}/> 选择目标</Link><Link to={root+'/united-kingdom/saved'}><Bookmark size={17}/> 我的收藏（{saved.length}）</Link><Link to={root+'/united-kingdom/compare'}><GitCompareArrows size={17}/> 方案对比（{compared.length}/3）</Link><Link to={root+'/legacy'}><BookOpen size={17}/> 原大学资料库</Link></div>
     <section className="hhba-overseas-section"><div className="hhba-overseas-section-head"><div><span className="hhba-overseas-kicker">REAL UK IMMIGRATION ROUTES</span><h2>英国有哪些可以实际研究的合法路线？</h2><p>每条含8章中文操作指南、至少3份官方来源、资格证据、费用、风险及常见问答。符合与否以个人材料及英国政府决定为准。</p></div></div>
     <div className="hhba-overseas-filter-bar">
       <label className="hhba-overseas-search"><Search size={18}/><input value={term} onChange={e=>setTerm(e.target.value)} aria-label="搜索英国签证方案" placeholder="搜索：Skilled Worker、HPI、Graduate、£41,700、创意演出…"/></label>
