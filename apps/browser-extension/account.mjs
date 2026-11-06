@@ -26,7 +26,7 @@ export async function accountApi(fetchFn,path,token,body){
   if(JSON.stringify(payload).length>6000)throw Error('页面字段过多，请缩小分析范围');
  }
  const response=await fetchFn(HHBA_EXTENSION_API+path,{
-  method:path==='/wallet'?'GET':'POST',credentials:'omit',cache:'no-store',redirect:'error',
+  method:'POST',credentials:'omit',cache:'no-store',redirect:'error',
   headers:{...(payload?{'Content-Type':'application/json'}:{}),
    ...(token?.token&&path!=='/claim'?{Authorization:'Bearer '+token.token}:{})},
   ...(payload?{body:JSON.stringify(payload)}:{})
