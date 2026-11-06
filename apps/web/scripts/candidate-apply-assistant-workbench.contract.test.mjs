@@ -54,3 +54,16 @@ test('site exposes pairing as a gated, revocable and account-scoped feature',()=
  assert.ok(service.includes('getApplyPairStatus'));
  assert.ok(service.includes('pairingEnabled'));
 });
+
+test('P0 install entry never presents an unreviewed ZIP as an approved store install',()=>{
+ assert.ok(product.includes('VITE_HHBA_CHROME_WEB_STORE_URL'));
+ assert.ok(product.includes('VITE_HHBA_EDGE_ADDONS_URL'));
+ assert.ok(product.includes('chromewebstore.google.com'));
+ assert.ok(product.includes('microsoftedge.microsoft.com'));
+ assert.ok(product.includes('url.protocol'));
+ assert.ok(product.includes('!path.test(url.pathname)'));
+ assert.ok(product.includes('商店尚未发布'));
+ assert.ok(product.includes('开发者内部测试'));
+ assert.ok(product.includes('to="/candidate/account/resume"'));
+ assert.ok(product.includes('简历自动解析与同步仍需单独开发和验收'));
+});
