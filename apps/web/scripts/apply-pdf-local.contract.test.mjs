@@ -120,8 +120,10 @@ function realMinimalPdf(){
  return buffer.buffer.slice(buffer.byteOffset,buffer.byteOffset+buffer.byteLength);
 }
 test("real pinned PDF.js parses a full synthetic one-page text PDF without remote service",async()=>{
- const pdfjs=await import("pdfjs-dist/build/pdf.mjs");
- pdfjs.GlobalWorkerOptions.workerSrc=new URL("../node_modules/pdfjs-dist/build/pdf.worker.min.mjs",import.meta.url).href;
+ // Node 22 uses the official legacy build (Promise.try polyfilled);
+ // the actual Edge/Vite browser path continues to load the modern build.
+ const pdfjs=await import("pdfjs-dist/legacy/build/pdf.mjs");
+ pdfjs.GlobalWorkerOptions.workerSrc=new URL("../node_modules/pdfjs-dist/legacy/build/pdf.worker.min.mjs",import.meta.url).href;
  const result=await extractPdfText(realMinimalPdf(),{loadPdfJs:async()=>pdfjs});
  assert.equal(result.pages,1);
  assert.match(result.text,/Example Applicant/);
