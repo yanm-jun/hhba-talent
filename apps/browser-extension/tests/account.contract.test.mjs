@@ -61,3 +61,10 @@ test('P0 shortcuts open HHBA first-party workspace; never read login tokens or a
  assert.ok(html.includes('不会自动导入到插件'));
  assert.ok(!popup.includes('chrome.cookies'));
 });
+
+test('P0 extension displays first-party privacy policy without silently consenting',()=>{
+ const html=readFileSync(new URL('../popup.html',import.meta.url),'utf8');
+ assert.ok(html.includes('https://hhba.work/apply-extension-privacy.html'));
+ assert.ok(html.includes('自动解析与同步功能尚未开放'));
+ assert.ok(!html.includes('checked="checked"'));
+});
