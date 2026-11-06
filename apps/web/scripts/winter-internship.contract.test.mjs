@@ -136,8 +136,8 @@ test('batch06 adds three independently sourced employers, nine unique 2027 H1 re
  const man=['manulife-hk-2027-private-equity-jr26091338','manulife-hk-2027-data-finance-jr26091703','manulife-hk-2027-global-info-risk-jr26100089','manulife-hk-2027-marketing-strategy-jr26100142','manulife-hk-2027-tech-placement-jr26100136'];
  const informa='informa-markets-hk-2027-jan-jun-intern-l059656859';
  for(const id of [...sun,...man,informa])assert.ok(ids.includes(id),'batch06 missing distinct job '+id);
- assert.equal(ids.length,41,'34 cumulative batch06 plus batch07 7 independent job IDs');
- assert.equal(new Set(ids).size,41,'no duplicate record identifiers');
+ assert.equal(ids.length,44,'historical batch06/batch07 roles plus three new mainland records');
+ assert.equal(new Set(ids).size,44,'no duplicate record identifiers');
  assert.equal((jobs.match(/status:"closed"/g)||[]).length,9,'existing seven plus LVMH and CA Global Markets expired records');
  assert.ok(jobs.includes('2026年10月30日')&&jobs.includes('2026年11月1日'));
  assert.ok(jobs.includes('2026年11月7日'),'Informa third-party upcoming deadline');
@@ -161,8 +161,8 @@ test('batch07 keeps independently sourced January-2027 BNP, LVMH and Credit Agri
  const lvmh='lvmh-hk-beauty-2027-jan-sscpc02515';
  const ca=['creditagricole-hk-2027-audit-intern-115888','creditagricole-hk-2027-finance-intern-115202','creditagricole-hk-2027-global-markets-115201'];
  for(const id of [...bnp,lvmh,...ca])assert.ok(ids.includes(id),id+' not indexed');
- assert.equal(ids.length,41,'34 previous records plus seven new postings');
- assert.equal(new Set(ids).size,41,'no duplicated employer vacancy IDs');
+ assert.equal(ids.length,44,'all seven earlier batches plus the three new mainland jobs');
+ assert.equal(new Set(ids).size,44,'no duplicated employer vacancy IDs');
  assert.equal((jobs.match(/status:"filled"/g)||[]).length,3,'three BNP posts all employer-confirmed filled');
  assert.equal((jobs.match(/status:"closed"/g)||[]).length,9,'two additional expired beyond prior seven');
  for(const ref of ['1234567890100118477','1234567890100117528','1234567890100117487','SSCPC02515','2026-115888','2026-115202','2026-115201'])assert.ok(jobs.includes(ref),'missing grounded employer number '+ref);
