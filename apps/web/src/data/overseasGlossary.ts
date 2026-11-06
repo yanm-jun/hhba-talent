@@ -103,6 +103,18 @@ export const overseasTerms:Record<string,string>={
  'PSTQ':'Programme de sélection des travailleurs qualifiés，魁北克技术工人选拔项目，通常通过Arrima申报意向、接受相应邀请后申请魁省选拔，非联邦PNP。',
  'Arrima':'魁北克经济移民候选人意向与省选拔在线系统，填表并不代表被省政府邀请或获得永久居民。',
  'CSQ':'Certificat de sélection du Québec，魁省选拔证书；获得CSQ仍需通过IRCC联邦永久居民审理。',
- 'PEQ':'Programme de l’expérience québécoise，魁北克经验项目。省政府公告其2026年新申请接收期于10月31日截止，11月4日尚无新开放日期。'
+ 'PEQ':'Programme de l’expérience québécoise，魁北克经验项目。省政府公告其2026年新申请接收期于10月31日截止，11月4日尚无新开放日期。',
+
+ 'UKVI':'UK Visas and Immigration，英国签证与移民管理部门。负责适用工作、留学、家庭及其他许可的审批；拥有雇主担保许可证不等于能保证任何申请获批。',
+ 'CoS':'Certificate of Sponsorship，英国持牌工作/临时工作担保方分配的电子担保编号，不是实物工作许可证或可以购买的职位。不同签证类别需要匹配的许可证和CoS。',
+ 'CAS':'Confirmation of Acceptance for Studies，英国持牌Student sponsor向符合条件的学生签发的课程录取担保参考号码。与普通学校offer不同，申请前需核对课程和费用。',
+ 'IHS':'Immigration Health Surcharge，部分申请人取得英国签证时须缴纳的英国医疗附加费，和签证申请费分开计；合格Health and Care Worker路线可能适用豁免。',
+ 'SOC 2020':'Standard Occupational Classification 2020，英国职业分类标准；Skilled Worker等签证按实际岗位职责匹配四位SOC职业代码和对应技能/薪资表。',
+ 'going rate':'英国职业对应的官方标准工资，须按Appendix Skilled Occupations或实际签证类别规则及标准工时计算；一般Skilled Worker还须与通用工资门槛同时核算。',
+ 'SELT':'Secure English Language Test，英国移民和签证程序在适用情况下认可的安全英语语言测试；不同签证可能对CEFR等级和考察能力有不同要求。',
+ 'B2':'欧洲语言共同参考框架CEFR的中高级独立使用语言水平。英国2026年部分首次工作签证要求B2，但不能推广到所有签证、所有申请人或医疗执照标准。',
+ 'eVisa':'英国在线电子移民身份记录，显示持有人当前合法居留、工作、学习等许可与到期日期。应通过UKVI账户查看，不能只凭Offer判断权限。',
+ 'endorsement':'英国Global Talent及Innovator Founder等特定路线的认可背书审查，由政府指定的合资格机构根据该签证类型的证据标准评定；不等于签证批准。',
+ 'ILR':'Indefinite Leave to Remain，英国不受一般停留期限约束的定居许可。须按个人路线、实际居留时长、条件及申请时有效规则单独审查，不是签证到期自动转成永久居民。'
 
 };
