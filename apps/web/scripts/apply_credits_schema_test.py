@@ -7,6 +7,8 @@ connection.execute('PRAGMA foreign_keys=ON')
 connection.execute('CREATE TABLE hhba_auth_users (phone TEXT PRIMARY KEY,role TEXT)')
 connection.execute("INSERT INTO hhba_auth_users VALUES ('13800138000','candidate')")
 connection.executescript(schema.read_text())
+connection.executescript((schema.parent/'0010_apply_refund_requests.sql').read_text())
+connection.executescript((schema.parent/'0011_apply_ai_requests.sql').read_text())
 connection.execute("""INSERT INTO hhba_apply_orders
 (id,phone,package_uses,amount_fen,status,created_at)
 VALUES ('order-1','13800138000',10,300,'pending','2026-11-06T00:00:00Z')""")
@@ -71,3 +73,12 @@ assert connection.execute(reserve_sql,('guard-extra','13800138000','2026-11-06T0
 assert credits()==(10,9,1,0)
 
 print('HHBA apply credits: D1 schema, amount, paid gate, atomic reservation and release PASS')
+
+# Refund request never changes payment state or credited uses.
+connection.execute("INSERT INTO hhba_apply_refund_requests(id,order_id,phone,reason,created_at,updated_at) VALUES (?,?,?,?,?,?)",
+ ('refund-1','order-1','13800138000','申请人工核实退款','2026-11-06T03:00:00Z','2026-11-06T03:00:00Z'))
+assert connection.execute("SELECT status FROM hhba_apply_refund_requests WHERE id='refund-1'").fetchone()[0]=='requested'
+assert credits()==(10,9,1,0)
+connection.execute("INSERT INTO hhba_apply_ai_requests(id,phone,created_at) VALUES (?,?,?)",
+ ('ai-1','13800138000','2026-11-06T03:00:00Z'))
+assert connection.execute("SELECT COUNT(*) FROM hhba_apply_ai_requests WHERE phone='13800138000'").fetchone()[0]==1

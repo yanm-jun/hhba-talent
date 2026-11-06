@@ -58,3 +58,12 @@ Focused CI includes a payment signature test, fixed pricing tests, SQLite D1 con
 
 ## Task quota core (internal, not enabled)
 An atomic SQLite INSERT-SELECT reserves a paid use only when one is available. The task ID is globally unique, so retries cannot reserve twice. A conditional update transitions reserved into completed (consumed) or released (returned) at most once. The browser receives no direct settlement interface. Before deployment, implement a trusted internal producer and audited task-expiration recovery.
+
+## Phase 2: payment recovery, cancellation and refund requests
+Official Alipay transaction services support alipay.trade.query, alipay.trade.close and alipay.trade.refund.
+The product now includes a signed gateway response verifier; user-initiated query checks the order, merchant, amount, trade ID and status, then conditionally settles pending -> paid/closed. The UI can query and cancel a pending order. Closing requires provider query before and after close; a provider timeout never proves cancellation, and no pending order is closed on an unknown precreate response.
+Refund requests are persisted separately from the payment and credit ledger; no real refunds or credit removal occur until a complete reconciled admin refund workflow is reviewed. True provider refund, refund-query, accounting and customer support remain prerequisites before payment go-live.
+
+## Phase 2: AI mapping prototype (no real-user activation)
+Server prototype is explicitly gated by HHBA_APPLY_AI_ENABLED=1, HHBA_AI_DISCLOSURE_APPROVED=1 and a Cloudflare Secret HHBA_AI_API_KEY. A valid candidate bearer and same-origin request plus explicit per-request consent are required. AI sees field labels + permitted profile KEY NAMES only; it does not see their values. The server maps high-confidence model key choices back to caller-owned profile values; sensitive, consent, identity and unknown fields are rejected. Models cannot invent resume answers. Rate-limit 3 calls per real user per hour, only audit timestamps, never raw resumes.
+Service remains disabled and is not connected to the extension; a secure browser-to-site pairing mechanism and actual AI privacy disclosure/consent must be reviewed first.

@@ -5,6 +5,7 @@ export type ApplyConfig={ok:boolean;packages:ApplyPackage[];paymentEnabled:boole
 export type ApplyWallet={purchased:number;consumed:number;reserved:number;available:number};
 export type ApplyOrder={id:string;uses:number;amountFen:number;status:'pending'|'paid'|'closed'|'refunded';createdAt:string;paidAt:string|null;qrCode?:string};
 export type ApplyTask={id:string;status:'reserved'|'completed'|'released';createdAt:string;finishedAt:string|null};
+export type ApplyRefundRequest={orderId:string;reason:string;status:'requested'|'reviewing'|'rejected'|'completed';createdAt:string};
 export const applyAccountAvailable=realAuthReady&&import.meta.env.BASE_URL!=='/hhba-talent/';
 const errors:Record<string,string>={
  SESSION_INVALID:'登录已失效，请重新登录。',
@@ -14,7 +15,15 @@ const errors:Record<string,string>={
  INVALID_PACKAGE:'请选择有效的次数套餐。',
  ORDER_RATE_LIMITED:'创建订单过于频繁，请稍后再试。',
  ORIGIN_REQUIRED:'安全校验失败，请刷新后重新操作。',
- PAYMENT_GATEWAY_UNAVAILABLE:'暂时无法创建支付订单，没有扣款。',
+ PAYMENT_GATEWAY_UNAVAILABLE:'支付网关暂不可用，请稍后查看订单。',
+ PAYMENT_GATEWAY_UNCERTAIN:'支付创建请求结果不明确。请查看订单，不要重复付款。',
+ PAYMENT_QUERY_UNAVAILABLE:'支付宝查单暂时不可用，请稍后重试。',
+ PAYMENT_QUERY_MISMATCH:'支付查询数据校验未通过，请联系支持。',
+ PAYMENT_CLOSE_UNCONFIRMED:'尚未确认订单关闭，请稍后查询，不要重复付款。',
+ ORDER_NOT_PENDING:'订单已付款或关闭，不能取消。',
+ ORDER_NOT_PAID:'仅已确认付款订单可申请退款。',
+ INVALID_REFUND_REASON:'请填写2到300字的退款原因。',
+ PAYMENT_NOT_CONFIGURED:'商户接口尚未开放，请稍后重试。',
  PAYMENT_GATEWAY_INVALID_RESPONSE:'支付通道返回了异常结果，没有扣款。',
  TASK_ENGINE_NOT_ENABLED:'自动网申引擎尚未开放。',
  APPLY_SERVICE_UNAVAILABLE:'次数服务暂不可用，请稍后再试。',
@@ -39,3 +48,7 @@ export const getApplyOrders=()=>request<{ok:true;items:ApplyOrder[]}>('/orders')
 export const getApplyTasks=()=>request<{ok:true;items:ApplyTask[]}>('/tasks').then(x=>x.items);
 export const createApplyOrder=(uses:number)=>request<{ok:true;order:ApplyOrder}>('/orders','POST',{uses}).then(x=>x.order);
 export const getApplyOrder=(id:string)=>request<{ok:true;order:ApplyOrder}>('/orders/'+encodeURIComponent(id)).then(x=>x.order);
+export const queryApplyOrderStatus=(id:string)=>request<{ok:true;order:ApplyOrder}>('/orders/'+encodeURIComponent(id)+'/status').then(x=>x.order);
+export const closeApplyOrder=(id:string)=>request<{ok:true;order:ApplyOrder}>('/orders/'+encodeURIComponent(id)+'/close','POST').then(x=>x.order);
+export const listApplyRefundRequests=()=>request<{ok:true;items:ApplyRefundRequest[]}>('/refund-requests').then(x=>x.items);
+export const requestApplyRefund=(orderId:string,reason:string)=>request<{ok:true;request:ApplyRefundRequest}>('/orders/'+encodeURIComponent(orderId)+'/refund-request','POST',{reason}).then(x=>x.request);

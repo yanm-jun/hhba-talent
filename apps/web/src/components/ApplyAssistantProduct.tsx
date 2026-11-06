@@ -9,7 +9,7 @@ const fallbackPackages=[{uses:10,amountFen:300},{uses:20,amountFen:600},{uses:50
 const money=(fen:number)=>'¥'+(fen/100).toFixed(2);
 const stateText:Record<ApplyOrder['status'],string>={pending:'等待支付',paid:'已到账',closed:'已关闭',refunded:'已退款'};
 const taskText:Record<ApplyTask['status'],string>={reserved:'处理中（预占1次）',completed:'已使用1次',released:'未扣次'};
-const archiveUrl=import.meta.env.BASE_URL+'downloads/hhba-apply-assistant-v0.2.zip';
+const archiveUrl=import.meta.env.BASE_URL+'downloads/hhba-apply-assistant-v0.3.zip';
 
 function AlipayPaymentQR({value}:{value:string}){
  const qr=useMemo(()=>{try{return qrcodegen.QrCode.encodeText(value,qrcodegen.QrCode.Ecc.MEDIUM)}catch{return null}},[value]);
@@ -151,9 +151,9 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
    </div>
    {activeTab==='orders'?(orders.length?<div className="hhba-apply-records">{orders.map(o=><div key={o.id}><span><b>{o.uses} 次套餐</b><small>{o.createdAt.slice(0,10)} · {o.id.slice(0,8)}</small></span><span className="hhba-apply-record-right"><b>{money(o.amountFen)}</b><small>{stateText[o.status]}</small></span></div>)}</div>:<p className="hhba-apply-empty">暂无真实购买订单。</p>):(tasks.length?<div className="hhba-apply-records">{tasks.map(t=><div key={t.id}><span><b>网申辅助填写任务</b><small>{t.createdAt.slice(0,10)} · {t.id.slice(0,8)}</small></span><small>{taskText[t.status]}</small></div>)}</div>:<p className="hhba-apply-empty">暂无真实网申任务记录。</p>)}
   </section>
-  <details className="hhba-apply-faq"><summary>关于旧版浏览器插件和当前服务状态</summary>
-   <p>旧版 V0.2 只支持浏览器本地表单识别、手动确认填写及撤销，不能自动完成复杂招聘系统的全部流程；未接入按次付费，不等于本产品已经正式开放。</p>
-   <a href={archiveUrl} download="HHBA-智能网申助手-V0.2.zip">下载旧版 V0.2 技术预览包 <ArrowRight size={14}/></a>
+  <details className="hhba-apply-faq"><summary>关于浏览器插件内测版和当前服务状态</summary>
+   <p>V0.3 可在当前网页一键预填高置信度字段，也保留预览、手动确认和撤销。不支持复杂招聘系统全程自动填写，尚未接入云端 AI 或购买次数，正式收费功能没有开放。</p>
+   <a href={archiveUrl} download="HHBA-智能网申助手-V0.3.zip">下载 V0.3 浏览器内测插件 <ArrowRight size={14}/></a>
   </details>
   <p className="hhba-apply-footer"><BadgeCheck size={15}/>不代替企业决定录用，也不保证投递成功。收费、有效任务认定、失败退回、使用期限及退款规则将在正式开通前公开明确；必要的个人信息处理和 AI 服务告知将独立完成。</p>
  </section>;

@@ -10,6 +10,12 @@ on:
       - 'apps/web/functions/api/apply/**'
       - 'apps/web/functions/_lib/apply-billing.js'
       - 'apps/web/functions/_lib/apply-credit-ledger.js'
+      - 'apps/web/functions/_lib/apply-payment-reconciliation.js'
+      - 'apps/web/functions/_lib/apply-ai-suggest.js'
+      - 'apps/web/d1/0010_apply_refund_requests.sql'
+      - 'apps/web/d1/0011_apply_ai_requests.sql'
+      - 'apps/web/scripts/apply-payments-v2.contract.test.mjs'
+      - 'apps/browser-extension/**'
       - 'apps/web/d1/0009_apply_credits_orders.sql'
       - 'apps/web/scripts/apply-credits*'
       - 'apps/web/scripts/apply_credits_schema_test.py'
@@ -37,11 +43,28 @@ jobs:
         run: |
           node --check 'functions/_lib/apply-billing.js'
           node --check 'functions/_lib/apply-credit-ledger.js'
+          node --check 'functions/_lib/apply-payment-reconciliation.js'
+          node --check 'functions/_lib/apply-ai-suggest.js'
           node --check 'functions/api/apply/[[path]].js'
-          node --test scripts/apply-credits.contract.test.mjs scripts/candidate-apply-assistant-workbench.contract.test.mjs
+          node --test scripts/apply-credits.contract.test.mjs scripts/apply-payments-v2.contract.test.mjs scripts/candidate-apply-assistant-workbench.contract.test.mjs
       - name: Verify the additive D1 schema with SQLite
         working-directory: apps/web
         run: python3 scripts/apply_credits_schema_test.py
       - name: Compile TypeScript and build the current UI
         working-directory: apps/web
         run: npm run build
+
+  verify-browser-extension:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify extension JavaScript and low-risk autofill contracts
+        working-directory: apps/browser-extension
+        run: |
+          node --check content.js
+          node --check popup.js
+          node --test tests/core.test.mjs tests/quickfill.contract.test.mjs

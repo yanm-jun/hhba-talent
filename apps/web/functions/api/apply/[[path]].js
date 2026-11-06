@@ -3,6 +3,8 @@
 import {getUserByPhone,sessionOfBearer} from '../../_lib/real-auth.js';
 import {APPLY_PACKAGES,packagePriceFen,alipayConfigured,alipayCredentialsConfigured,tasksConfigured,
  gatewayRequest,verifyAlipayNotification,amountFen} from '../../_lib/apply-billing.js';
+import {reconcileOrder,closeUnpaidOrder} from '../../_lib/apply-payment-reconciliation.js';
+import {aiConfigured,validateAISuggestionRequest,suggestSafeFields} from '../../_lib/apply-ai-suggest.js';
 
 const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
  'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'
@@ -11,15 +13,20 @@ const err=(code,status=400)=>json({ok:false,error:code},status);
 const route='/api/apply';
 const iso=()=>new Date().toISOString();
 const uuidPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const orderPath=/^\/orders\/([0-9a-f-]{36})(?:\/(status|close|refund-request))?$/i;
 function sameOrigin(request){
  const origin=request.headers.get('Origin');
  return origin===new URL(request.url).origin&&request.headers.get('Sec-Fetch-Site')!=='cross-site';
 }
-async function jsonBody(request){
+async function jsonBody(request,maxBytes=512){
  const len=Number(request.headers.get('Content-Length')||0);
- if(len>512)return null;
- try{const value=await request.json();return value&&typeof value==='object'&&!Array.isArray(value)?value:null}
- catch{return null}
+ if(len>maxBytes)return null;
+ try{
+  const raw=await request.text();
+  if(raw.length>maxBytes)return null;
+  const value=JSON.parse(raw);
+  return value&&typeof value==='object'&&!Array.isArray(value)?value:null;
+ }catch{return null}
 }
 function walletQuery(){
  return "SELECT (SELECT COALESCE(SUM(package_uses),0) FROM hhba_apply_orders WHERE phone=? AND status='paid') AS purchased,"+
@@ -81,6 +88,21 @@ export async function onRequest({request,env}){
  }catch{return err('SESSION_CHECK_FAILED',503)}
  const phone=session.phone;
  try{
+  if(method==='POST'&&path==='/ai/suggest'){
+   if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
+   if(!aiConfigured(env))return err('AI_NOT_ENABLED',503);
+   const body=await jsonBody(request,16000);
+   if(!validateAISuggestionRequest(body))return err('INVALID_AI_REQUEST',400);
+   // Atomic hour cap prevents unlimited model calls; never store resume text
+   // or form labels in the audit.
+   const now=iso(),limit=new Date(Date.now()-3600000).toISOString();
+   const reserved=await db.prepare(
+    "INSERT INTO hhba_apply_ai_requests(id,phone,created_at) SELECT ?,?,? WHERE (SELECT COUNT(*) FROM hhba_apply_ai_requests WHERE phone=? AND created_at>=?)<3"
+   ).bind(crypto.randomUUID(),phone,now,phone,limit).run();
+   if(!reserved?.success||reserved?.meta?.changes!==1)return err('AI_RATE_LIMITED',429);
+   const advice=await suggestSafeFields(env,body);
+   return advice.ok?json(advice):err(advice.error,502);
+  }
   if(method==='GET'&&path==='/wallet')return json({ok:true,wallet:await wallet(db,phone)});
   if(method==='GET'&&path==='/orders'){
    const rows=await db.prepare("SELECT id,package_uses AS uses,amount_fen AS amountFen,status,created_at AS createdAt,paid_at AS paidAt FROM hhba_apply_orders WHERE phone=? ORDER BY created_at DESC LIMIT 30").bind(phone).all();
@@ -89,6 +111,49 @@ export async function onRequest({request,env}){
   if(method==='GET'&&path==='/tasks'){
    const rows=await db.prepare("SELECT id,status,created_at AS createdAt,finished_at AS finishedAt FROM hhba_apply_tasks WHERE phone=? ORDER BY created_at DESC LIMIT 30").bind(phone).all();
    return json({ok:true,items:rows.results||[]});
+  }
+  if(method==='GET'&&path==='/refund-requests'){
+   const rows=await db.prepare("SELECT order_id AS orderId,reason,status,created_at AS createdAt FROM hhba_apply_refund_requests WHERE phone=? ORDER BY created_at DESC LIMIT 30").bind(phone).all();
+   return json({ok:true,items:rows.results||[]});
+  }
+  const matched=path.match(orderPath);
+  if(matched&&uuidPattern.test(matched[1])){
+   const orderId=matched[1],action=matched[2]||'';
+   // Fetch the owner's order; no account IDs, prices or states accepted from client.
+   const own=await db.prepare("SELECT id,phone,package_uses AS uses,amount_fen,status,provider_trade_no,qr_code AS qrCode,created_at AS createdAt,paid_at AS paidAt,checked_at AS checkedAt FROM hhba_apply_orders WHERE id=? AND phone=?").bind(orderId,phone).first();
+   if(!own)return err('ORDER_NOT_FOUND',404);
+   if(method==='GET'&&action==='status'){
+    // Rate-limit provider reads while allowing a user-triggered refresh.
+    if(own.status==='pending'&&(!own.checkedAt||Date.now()-Date.parse(own.checkedAt)>10000)){
+     try{
+      const result=await reconcileOrder(db,env,own);
+      if(!result.ok)return err(result.error,502);
+     }catch{return err('PAYMENT_QUERY_UNAVAILABLE',502)}
+    }
+    const updated=await db.prepare("SELECT id,package_uses AS uses,amount_fen AS amountFen,status,created_at AS createdAt,paid_at AS paidAt,qr_code AS qrCode FROM hhba_apply_orders WHERE id=? AND phone=?").bind(orderId,phone).first();
+    return json({ok:true,order:updated});
+   }
+   if(method==='POST'&&action==='close'){
+    if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
+    if(own.status!=='pending')return err('ORDER_NOT_PENDING',409);
+    try{
+     const outcome=await closeUnpaidOrder(db,env,own);
+     if(!outcome.ok)return err(outcome.error,outcome.error==='ORDER_ALREADY_PAID'?409:502);
+    }catch{return err('PAYMENT_CLOSE_UNCONFIRMED',502)}
+    const updated=await db.prepare("SELECT id,package_uses AS uses,amount_fen AS amountFen,status,created_at AS createdAt,paid_at AS paidAt,qr_code AS qrCode FROM hhba_apply_orders WHERE id=? AND phone=?").bind(orderId,phone).first();
+    return json({ok:true,order:updated});
+   }
+   if(method==='POST'&&action==='refund-request'){
+    if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
+    if(own.status!=='paid')return err('ORDER_NOT_PAID',409);
+    const body=await jsonBody(request);
+    const reason=typeof body?.reason==='string'?body.reason.trim():'';
+    if(reason.length<2||reason.length>300)return err('INVALID_REFUND_REASON');
+    const id=crypto.randomUUID(),now=iso();
+    await db.prepare("INSERT OR IGNORE INTO hhba_apply_refund_requests(id,order_id,phone,reason,status,created_at,updated_at) VALUES(?,?,?,?,'requested',?,?)").bind(id,orderId,phone,reason,now,now).run();
+    const req=await db.prepare("SELECT order_id AS orderId,reason,status,created_at AS createdAt FROM hhba_apply_refund_requests WHERE order_id=? AND phone=?").bind(orderId,phone).first();
+    return json({ok:true,request:req,note:'REVIEW_ONLY_NOT_REFUNDED'},201);
+   }
   }
   if(method==='GET'&&/^\/orders\/[0-9a-f-]{36}$/i.test(path)){
    const id=path.split('/')[2];if(!uuidPattern.test(id))return err('INVALID_ORDER_ID');
@@ -113,11 +178,11 @@ export async function onRequest({request,env}){
      subject:'HHBA 一键网申 '+uses+' 次套餐',timeout_express:'30m'
     });
    }catch{
-    await db.prepare("UPDATE hhba_apply_orders SET status='closed' WHERE id=? AND phone=? AND status='pending'").bind(id,phone).run();
-    return err('PAYMENT_GATEWAY_UNAVAILABLE',502);
+    // Timeout does NOT establish that Alipay failed to create the transaction.
+    // Preserve pending and reconcile by out_trade_no before any retry or close.
+    return err('PAYMENT_GATEWAY_UNCERTAIN',502);
    }
    if(!payload.qr_code||typeof payload.qr_code!=='string'||payload.qr_code.length>2000){
-    await db.prepare("UPDATE hhba_apply_orders SET status='closed' WHERE id=? AND phone=? AND status='pending'").bind(id,phone).run();
     return err('PAYMENT_GATEWAY_INVALID_RESPONSE',502);
    }
    await db.prepare("UPDATE hhba_apply_orders SET qr_code=? WHERE id=? AND phone=? AND status='pending'").bind(payload.qr_code,id,phone).run();

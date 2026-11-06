@@ -39,6 +39,39 @@ export async function verifyAlipayNotification(rawParams,pem){
   return crypto.subtle.verify('RSASSA-PKCS1-v1_5',key,signature,new TextEncoder().encode(canonical(params)));
  }catch{return false}
 }
+// Extract the exact JSON object bytes signed by Alipay. JSON.stringify(parsed)
+// changes spacing/escaping and would invalidate a valid gateway signature.
+export function signedResponseBody(raw,key){
+ const label='"'+key+'"',at=raw.indexOf(label);
+ if(at<0)return null;
+ let i=at+label.length;
+ while(/\s/.test(raw[i]||''))i++;
+ if(raw[i++]!==':')return null;
+ while(/\s/.test(raw[i]||''))i++;
+ if(raw[i]!=='{')return null;
+ const start=i;
+ let depth=0,inString=false,escaped=false;
+ for(;i<raw.length;i++){
+  const ch=raw[i];
+  if(inString){if(escaped)escaped=false;else if(ch==='\\')escaped=true;else if(ch==='"')inString=false;continue}
+  if(ch==='"'){inString=true;continue}
+  if(ch==='{')depth++;
+  if(ch==='}'&&--depth===0)return raw.slice(start,i+1);
+ }
+ return null;
+}
+export async function verifyGatewayResponse(raw,method,pem){
+ try{
+  const parsed=JSON.parse(raw),key=method.replace(/\./g,'_')+'_response';
+  const body=signedResponseBody(raw,key);
+  if(!body||typeof parsed.sign!=='string')return null;
+  const pub=await publicKey(pem);
+  const bytes=Uint8Array.from(atob(parsed.sign.replace(/ /g,'+')),x=>x.charCodeAt(0));
+  const ok=await crypto.subtle.verify('RSASSA-PKCS1-v1_5',pub,bytes,new TextEncoder().encode(body));
+  return ok?parsed[key]:null;
+ }catch{return null}
+}
+
 function alipayTime(){
  const d=new Date(Date.now()+8*3600*1000);
  return d.toISOString().slice(0,19).replace('T',' ');
@@ -56,9 +89,9 @@ export async function gatewayRequest(env,method,bizContent){
   body:body.toString(),redirect:'error'
  });
  if(!response.ok)throw Error('PAYMENT_GATEWAY_UNAVAILABLE');
- const payload=await response.json();
- const key=method.replace(/\./g,'_')+'_response';
- const data=payload?.[key];
+ const raw=await response.text();
+ if(raw.length>65536)throw Error('PAYMENT_GATEWAY_INVALID_RESPONSE');
+ const data=await verifyGatewayResponse(raw,method,env.ALIPAY_PUBLIC_KEY);
  if(!data||data.code!=='10000')throw Error('PAYMENT_GATEWAY_REJECTED');
  return data;
 }
