@@ -42,7 +42,7 @@ with sync_playwright() as p:
     page.screenshot(path='/tmp/hhba-winter-directory-desktop.png',full_page=False)
     # Dataset and grouping checks are independent of source order; new batches
     # must not break test navigation due to pagination reordering.
-    assert '62 条公开岗位及招聘批次结果' in page.locator('.hhba-winter-list-summary').inner_text()
+    assert '70 条公开岗位及招聘批次结果' in page.locator('.hhba-winter-list-summary').inner_text()
     assert page.locator('.hhba-winter-role-group-title').count()>=1
     assert page.get_by_label('按行业分组筛选寒假岗位').count()==1
 
@@ -88,7 +88,8 @@ with sync_playwright() as p:
     # lookup must work without creating fake concrete vacancy entries.
     search('上海 传播')
     assert page.locator('[data-winter-job="apco-shanghai-winter-start-1787"]').count()==1
-    assert page.locator('[data-winter-job]').count()==1
+    assert page.locator('[data-winter-job="publicis-sh-alpha-pi-2027-jan-start"]').count()==1
+    assert page.locator('[data-winter-job]').count()==2,'APCO and Publicis both legitimately match Shanghai communications'
     search('BDO IT')
     assert page.locator('[data-winter-job="bdo-hk-spring-it-audit-2027"]').count()==1
     search('ReCube')
@@ -230,6 +231,80 @@ with sync_playwright() as p:
     assert page.locator('[data-winter-job="airlink-sh-wifi-data-analyst-winter-tag-20261104"]').count()==1
     reset()
 
+    # Batch13: three mainland firms with concrete 2027 Jan-Apr/May internship
+    # dates in their recruiting requirements, not third-party winter tags.
+    for name,jobid,domain in [
+        ('立信会计师事务所','bdo-sz-tax-intern-winter-20270104','bdochina.zhiye.com/intern/detail'),
+        ('立信会计师事务所','bdo-sz-audit-intern-winter-20270104','bdochina.zhiye.com/intern/detail'),
+        ('天健会计师事务所','pccpa-hz-workpaper-delivery-winter-202612','zhaopin.pccpa.cn/hr/recruit/internship/detail'),
+        ('大华会计师事务所','dahua-ty-data-parsing-winter-202701-j10719','zhaopin.dahua-cpa.com/campus/detail'),
+        ('大华会计师事务所','dahua-ty-confirmation-specialist-winter-202701-j10717','zhaopin.dahua-cpa.com/campus/detail')
+    ]:
+        search(name)
+        assert page.locator(f'[data-winter-job="{jobid}"]').count()==1,jobid
+        page.locator(f'[data-winter-job="{jobid}"]').get_by_role('link',name='岗位详情').click()
+        assert jobid in page.url
+        href=page.get_by_role('link',name='前往企业官方岗位核实及申请').get_attribute('href')
+        assert domain in href,jobid+' must point to official employer application site'
+        assert page.locator('.hhba-winter-warning').count()>0,'cross-semester qualification warning missing'
+        page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    reset()
+    search('立信会计师事务所')
+    assert page.locator('[data-winter-job]').count()==2,'two BDO China jobs, not a collection of project slots'
+    search('天健会计师事务所')
+    assert page.locator('[data-winter-job]').count()==1,'one winter-spanning Tianjian position'
+    search('大华会计师事务所')
+    assert page.locator('[data-winter-job]').count()==2,'two genuinely distinct Dahua requisitions'
+    reset()
+    page.get_by_label('按地区筛选寒假岗位').select_option('中国内地')
+    page.get_by_label('按行业分组筛选寒假岗位').select_option('审计咨询')
+    search('立信')
+    assert page.locator('[data-winter-job]').count()==2
+    search('天健')
+    assert page.locator('[data-winter-job]').count()==1
+    search('大华')
+    assert page.locator('[data-winter-job]').count()==2
+    reset()
+    page.get_by_label('按地区筛选寒假岗位').select_option('中国内地')
+    search('太原 函证')
+    assert page.locator('[data-winter-job="dahua-ty-confirmation-specialist-winter-202701-j10717"]').count()==1
+    reset()
+
+    # Batch14: employer-wide winter intern intakes, each one real programme
+    # with explicit 2027 winter schedule; never split one programme by office.
+    for term,ident,label,source_host in [
+        ('望华','wanghua-mcg-pta-2027winter-dec14-jan22','企业招聘首页（非岗位直投）','bmcg.com.cn/column/23.html'),
+        ('BCG','bcg-china-pta-winter-spring-2027-closed','前往BCG官方招聘首页（此批已截止）','careers.bcg.com'),
+        ('阳狮','publicis-sh-alpha-pi-2027-jan-start','查看第三方招聘平台的独立岗位（截止日冲突）','shixiseng.com/intern/inn_fq5cw5t2uuln')
+    ]:
+        search(term)
+        assert page.locator(f'[data-winter-job="{ident}"]').count()==1,ident
+        page.locator(f'[data-winter-job="{ident}"]').get_by_role('link',name='岗位详情').click()
+        assert ident in page.url
+        assert source_host in page.get_by_role('link',name=label).get_attribute('href')
+        assert page.locator('.hhba-winter-warning').count()>0,'winter eligibility and source limitations must be visible'
+        page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    reset()
+    search('望华')
+    assert page.locator('[data-winter-job]').count()==1
+    search('BCG')
+    assert page.locator('[data-winter-job]').count()==1
+    assert page.get_by_text('已过申请截止日',exact=False).count()>0
+    search('阳狮')
+    assert page.locator('[data-winter-job]').count()==1
+    assert page.get_by_text('申请日期冲突',exact=False).count()>0
+    reset()
+    page.get_by_label('按地区筛选寒假岗位').select_option('中国内地')
+    page.get_by_label('按行业分组筛选寒假岗位').select_option('审计咨询')
+    search('BCG')
+    assert page.locator('[data-winter-job="bcg-china-pta-winter-spring-2027-closed"]').count()==1
+    reset()
+    page.get_by_label('按地区筛选寒假岗位').select_option('中国内地')
+    page.get_by_label('按行业分组筛选寒假岗位').select_option('市场传播')
+    search('阳狮')
+    assert page.locator('[data-winter-job="publicis-sh-alpha-pi-2027-jan-start"]').count()==1
+    reset()
+
     # Key legacy official jobs continue to have source-backed detail routes.
     for term,jobid in [
         ('HSBC','hsbc-hk-student-placement-1367003857'),
@@ -250,7 +325,8 @@ with sync_playwright() as p:
     assert page.locator('[data-winter-job]').count()==10
     for number in range(6):
         page.get_by_role('button',name='下一页').click()
-    assert page.locator('[data-winter-job]').count()==2, '62 independent records = six full pages and two final records'
+    assert page.locator('[data-winter-job]').count()==10, '70 independent records = seven full pages'
+    assert page.get_by_role('button',name='下一页').is_disabled()
     page.get_by_role('button',name='上一页').click()
     assert page.locator('[data-winter-job]').count()==10
     reset()
