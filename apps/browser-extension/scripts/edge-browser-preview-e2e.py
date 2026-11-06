@@ -9,6 +9,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+import os
 import subprocess
 import tempfile
 from datetime import datetime, timedelta, timezone
@@ -31,10 +32,13 @@ def main() -> None:
         subprocess.run(
             ["node", str(SOURCE / "scripts" / "stage-preview.mjs"),
              PREVIEW, str(extension)], check=True, capture_output=True, text=True,
+            env={**os.environ, "HHBA_CI_PREAPPROVE_HOST":"1"},
         )
         manifest = json.loads((extension / "manifest.json").read_text())
         ext_id = extension_id(manifest)
-        assert manifest["optional_host_permissions"] == [PREVIEW+"/*"]
+        assert manifest["optional_host_permissions"] == []
+        assert manifest["host_permissions"] == [PREVIEW+"/*"]
+        assert "host_permissions" not in json.loads((SOURCE / "manifest.json").read_text()), "official Edge store build must remain optional"
         assert "隔离预览测试" in manifest["name"]
         expires = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat().replace("+00:00","Z")
         calls: list[dict] = []
