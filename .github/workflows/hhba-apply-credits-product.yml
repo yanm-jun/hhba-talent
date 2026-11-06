@@ -1,0 +1,45 @@
+name: HHBA Apply Credits Product and Payment Safety
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/pages/PersonalCenterPage.tsx'
+      - 'apps/web/src/components/ApplyAssistantProduct.tsx'
+      - 'apps/web/src/services/applyCredits.ts'
+      - 'apps/web/src/styles/apply-assistant-product.css'
+      - 'apps/web/functions/api/apply/**'
+      - 'apps/web/functions/_lib/apply-billing.js'
+      - 'apps/web/d1/0009_apply_credits_orders.sql'
+      - 'apps/web/scripts/apply-credits*'
+      - 'apps/web/scripts/apply_credits_schema_test.py'
+      - 'apps/web/scripts/candidate-apply-assistant-workbench.contract.test.mjs'
+      - '.github/workflows/hhba-apply-credits-product.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-commerce-foundations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked web packages
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Check APIs, payment signature rules and workbench links
+        working-directory: apps/web
+        run: |
+          node --check 'functions/_lib/apply-billing.js'
+          node --check 'functions/api/apply/[[path]].js'
+          node --test scripts/apply-credits.contract.test.mjs scripts/candidate-apply-assistant-workbench.contract.test.mjs
+      - name: Verify the additive D1 schema with SQLite
+        working-directory: apps/web
+        run: python3 scripts/apply_credits_schema_test.py
+      - name: Compile TypeScript and build the current UI
+        working-directory: apps/web
+        run: npm run build
