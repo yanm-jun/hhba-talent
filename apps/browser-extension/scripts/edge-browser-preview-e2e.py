@@ -119,7 +119,19 @@ def main() -> None:
 
                 page.locator("#pair-code").fill(PAIR_CODE)
                 page.locator("#pair-connect").click()
-                expect(page.locator("#account-state")).to_contain_text("已连接", timeout=15000)
+                try:
+                    expect(page.locator("#account-state")).to_contain_text("已连接", timeout=8000)
+                except AssertionError as exc:
+                    # Synthetic-only diagnostics, never print a Bearer token.
+                    granted = page.evaluate(
+                        "() => chrome.permissions.contains({origins:['"+PREVIEW+"/*']})"
+                    )
+                    raise AssertionError(
+                        "Edge MV3 connect did not complete; status="
+                        + repr(page.locator("#status").inner_text())
+                        + " permission=" + str(granted)
+                        + " requests=" + repr(calls)
+                    ) from exc
                 expect(page.locator("#account-balance")).to_contain_text("剩余次数：0")
                 assert any(c["path"]=="claim" for c in calls)
                 assert any(c["path"]=="wallet" and c["authenticated"] for c in calls)
