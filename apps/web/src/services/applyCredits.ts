@@ -1,7 +1,7 @@
 import {getRealAuthToken,realAuthReady} from './realAuth';
 
 export type ApplyPackage={uses:number;amountFen:number};
-export type ApplyConfig={ok:boolean;packages:ApplyPackage[];paymentEnabled:boolean;tasksEnabled:boolean};
+export type ApplyConfig={ok:boolean;packages:ApplyPackage[];paymentEnabled:boolean;tasksEnabled:boolean;pairingEnabled:boolean};
 export type ApplyWallet={purchased:number;consumed:number;reserved:number;available:number};
 export type ApplyOrder={id:string;uses:number;amountFen:number;status:'pending'|'paid'|'closed'|'refunded';createdAt:string;paidAt:string|null;qrCode?:string};
 export type ApplyTask={id:string;status:'reserved'|'completed'|'released';createdAt:string;finishedAt:string|null};
@@ -26,6 +26,10 @@ const errors:Record<string,string>={
  PAYMENT_NOT_CONFIGURED:'商户接口尚未开放，请稍后重试。',
  PAYMENT_GATEWAY_INVALID_RESPONSE:'支付通道返回了异常结果，没有扣款。',
  TASK_ENGINE_NOT_ENABLED:'自动网申引擎尚未开放。',
+ PAIRING_NOT_ENABLED:'浏览器插件连接功能尚未开放。',
+ PAIR_RATE_LIMITED:'连接码生成过于频繁，请稍后重试。',
+ PAIR_SERVICE_UNAVAILABLE:'插件连接服务暂不可用。',
+
  APPLY_SERVICE_UNAVAILABLE:'次数服务暂不可用，请稍后再试。',
 };
 async function request<T>(path:string,method='GET',body?:unknown,publicRoute=false):Promise<T>{
@@ -52,3 +56,9 @@ export const queryApplyOrderStatus=(id:string)=>request<{ok:true;order:ApplyOrde
 export const closeApplyOrder=(id:string)=>request<{ok:true;order:ApplyOrder}>('/orders/'+encodeURIComponent(id)+'/close','POST').then(x=>x.order);
 export const listApplyRefundRequests=()=>request<{ok:true;items:ApplyRefundRequest[]}>('/refund-requests').then(x=>x.items);
 export const requestApplyRefund=(orderId:string,reason:string)=>request<{ok:true;request:ApplyRefundRequest}>('/orders/'+encodeURIComponent(orderId)+'/refund-request','POST',{reason}).then(x=>x.request);
+
+export type ApplyPairStatus={ok:true;connectedDevices:number};
+export type ApplyPairCode={ok:true;code:string;expiresAt:string};
+export const getApplyPairStatus=()=>request<ApplyPairStatus>('/pair/status');
+export const startApplyPair=()=>request<ApplyPairCode>('/pair/start','POST');
+export const revokeApplyPairs=()=>request<ApplyPairStatus>('/pair/revoke','POST');

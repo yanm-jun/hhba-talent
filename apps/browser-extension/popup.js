@@ -1,4 +1,5 @@
 import {PROFILE_FIELDS,normalizeProfile,validateProfile,exportProfile,planFields} from "./core.mjs";
+import {HHBA_PERMISSION,EXTENSION_SESSION_KEY,accountApi,cleanPairCode,validDeviceSession} from "./account.mjs";
 const $=id=>document.getElementById(id);
 const STORAGE="hhba.apply.profile.v1";
 let profile=normalizeProfile({}),lastScan=null,lastPlan=[],tabId=null;
@@ -66,7 +67,8 @@ function renderPlans(){
  const eligible=lastPlan.filter(x=>x.eligible);
  $("counts").classList.remove("hidden");
  $("counts").replaceChildren();
- for(const [n,label] of [[lastPlan.length,"识别字段"],[eligible.length,"建议填写"],[lastPlan.length-eligible.length,"待处理"]]){
+ const manual=lastScan?.manualWidgets?.length||0;
+ for(const [n,label] of [[lastPlan.length+manual,"识别项目"],[eligible.length,"建议填写"],[lastPlan.length-eligible.length+manual,"待人工"]]){
   const box=el("span"),strong=el("strong","",String(n)),small=el("small","",label);box.append(strong,small);$("counts").append(box);
  }
  for(const p of lastPlan){
@@ -97,7 +99,7 @@ $("scan").addEventListener("click",async()=>{
   const data=await ask("HHBA_SCAN");if(!data?.ok)throw Error(data?.error||"识别失败");
   lastScan=data;lastPlan=planFields(data.fields,profile);
   $("site").textContent=(data.host||"当前页面")+" · "+(data.title||"网申表单");
-  renderPlans();status("已识别 "+data.fields.length+" 个字段；请核对后决定是否填写。");
+  renderPlans();status("已识别 "+data.fields.length+" 个标准字段，"+(data.manualWidgets?.length||0)+" 个自定义控件需手动处理。");
  }catch(err){status(err.message,true)}finally{$("scan").disabled=false}
 });
 $("quickfill").addEventListener("click",async()=>{
@@ -121,7 +123,7 @@ $("quickfill").addEventListener("click",async()=>{
    $("results").append(el("div","result "+(item.status==="filled"?"success":item.status==="failed"?"error":"warning"),
     (p?.label||item.id)+"："+(item.status==="filled"?"已填写":item.status==="failed"?"失败":"跳过")+" · "+item.reason));
   }
-  status("已回读确认 "+result.filled+" 项，失败 "+result.failures+" 项。请逐项检查官网，最终提交必须由你本人完成；可用「撤销」恢复。");
+  status("已回读确认 "+result.filled+" 项，失败 "+result.failures+" 项；另有 "+(lastScan.manualWidgets?.length||0)+" 个自定义控件需手动处理。请在官网核对并提交，可撤销。");
  }catch(e){status(e?.message||"预填失败",true)}
  finally{$("quickfill").disabled=false}
 });
@@ -154,3 +156,65 @@ $("undo").addEventListener("click",async()=>{
   if(!Object.values(profile).some(Boolean)){toggle("profile");status("先建立一份真实求职档案，再扫描企业官网。");}
  }catch(err){status(err.message,true)}
 })();
+
+
+// HHBA account pairing is opt-in and read-only. All recruitment form filling
+// above remains local and works without a linked account.
+async function savedDeviceSession(){
+ const row=await chrome.storage.session.get(EXTENSION_SESSION_KEY);
+ const token=row[EXTENSION_SESSION_KEY];
+ if(!validDeviceSession(token)){
+  await chrome.storage.session.remove(EXTENSION_SESSION_KEY);
+  return null;
+ }
+ return token;
+}
+async function refreshAccount(){
+ const token=await savedDeviceSession();
+ if(!token){$("account-state").textContent="未连接或已过期";$("account-balance").textContent="剩余次数：—";return}
+ try{
+  const result=await accountApi(fetch,"/wallet",token);
+  $("account-state").textContent="已连接 · 只读 · 临时会话";
+  $("account-balance").textContent="剩余次数："+result.wallet.available+" 次（已预占 "+result.wallet.reserved+" 次）";
+ }catch(e){
+  $("account-state").textContent="连接暂不可用";
+  $("account-balance").textContent="剩余次数：—";
+  status(e?.message||"无法读取次数账户",true);
+ }
+}
+$("pair-connect").addEventListener("click",async()=>{
+ const code=cleanPairCode($("pair-code").value);
+ if(!code)return status("请先在 HHBA 网站生成12位一次性连接码。",true);
+ // Must request the narrowly scoped optional permission directly in a click
+ // event; do not ask for permission to read every recruitment website.
+ $("pair-connect").disabled=true;
+ try{
+  const granted=await chrome.permissions.request({origins:[HHBA_PERMISSION]});
+  if(!granted)throw Error("未授予 hhba.work 访问许可，连接未建立。");
+  const res=await accountApi(fetch,"/claim",null,{code});
+  const session={token:res.token,expiresAt:res.expiresAt};
+  if(!validDeviceSession(session))throw Error("服务器返回的临时会话无效。");
+  await chrome.storage.session.set({[EXTENSION_SESSION_KEY]:session});
+  $("pair-code").value="";
+  status("HHBA 账户连接成功。当前只支持次数查询，不会扣次或发送简历。");
+  await refreshAccount();
+ }catch(e){status(e?.message||"无法连接 HHBA，请稍后再试。",true)}
+ finally{$("pair-connect").disabled=false}
+});
+$("pair-refresh").addEventListener("click",async()=>{
+ $("pair-refresh").disabled=true;
+ try{await refreshAccount()}
+ finally{$("pair-refresh").disabled=false}
+});
+$("pair-disconnect").addEventListener("click",async()=>{
+ const token=await savedDeviceSession();
+ try{if(token)await accountApi(fetch,"/disconnect",token)}
+ catch{/* Revoke via the HHBA website if the network is unavailable. */}
+ finally{
+  await chrome.storage.session.remove(EXTENSION_SESSION_KEY);
+  $("account-state").textContent="已在本机断开";
+  $("account-balance").textContent="剩余次数：—";
+  status("本地连接已清除。如网络中断，请在 HHBA 网站撤销所有连接以立即让服务器令牌失效。");
+ }
+});
+void refreshAccount();

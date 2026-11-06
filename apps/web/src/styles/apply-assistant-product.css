@@ -94,3 +94,17 @@
 .hhba-apply-refund-form>div{display:flex;gap:9px}
 .hhba-apply-refund-form button{padding:7px 12px;border:1px solid #d9e6dd;border-radius:7px;color:#326c49;background:#fff;cursor:pointer;font-size:11px}
 .hhba-apply-refund-form button:disabled{opacity:.5;cursor:default}
+
+.hhba-apply-connect{background:#fff;border:1px solid #e2eae4;border-radius:14px;padding:22px;margin:0 0 16px}
+.hhba-apply-connect-grid{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.hhba-apply-connect-status{display:flex;flex-direction:column;gap:7px;font-size:12px;color:#3a6548}
+.hhba-apply-connect-status svg{color:#4a865d}
+.hhba-apply-connect-status small{font-size:10px;color:#839386;line-height:1.6}
+.hhba-apply-connect-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.hhba-apply-connect-actions button{font-size:11px;font-weight:650;border:1px solid #c9ded0;border-radius:8px;padding:10px 12px;background:#f6faf7;color:#316449;cursor:pointer}
+.hhba-apply-connect-actions button:first-child{background:#2c6546;color:white;border-color:#2c6546}
+.hhba-apply-connect-actions button:disabled{background:#edf3ee;color:#9cad9e;border-color:#e1e9e2;cursor:not-allowed}
+.hhba-apply-connect-code{margin-top:15px;background:#f4f9f5;border:1px solid #d6e6d9;border-radius:9px;padding:15px;display:flex;flex-direction:column;gap:7px}
+.hhba-apply-connect-code strong{font:750 24px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:#2c6745;word-break:break-all}
+.hhba-apply-connect-code span{font-size:11px;color:#6e806f;line-height:1.6}
+@media(max-width:520px){.hhba-apply-connect{padding:17px 14px}.hhba-apply-connect-actions{width:100%}.hhba-apply-connect-actions button{flex:1}}

@@ -5,6 +5,7 @@ import {APPLY_PACKAGES,packagePriceFen,alipayConfigured,alipayCredentialsConfigu
  gatewayRequest,verifyAlipayNotification,amountFen} from '../../_lib/apply-billing.js';
 import {reconcileOrder,closeUnpaidOrder} from '../../_lib/apply-payment-reconciliation.js';
 import {aiConfigured,validateAISuggestionRequest,suggestSafeFields} from '../../_lib/apply-ai-suggest.js';
+import {pairingConfigured,validExtensionOrigin,extensionCors,createPairCode,claimPairCode,extensionSession,revokeExtensions} from '../../_lib/apply-extension-pairing.js';
 
 const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
  'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'
@@ -72,9 +73,49 @@ export async function onRequest({request,env}){
  const method=request.method;
  if(method==='GET'&&path==='/config')
   return json({ok:true,packages:APPLY_PACKAGES.map(uses=>({uses,amountFen:packagePriceFen(uses)})),
-   paymentEnabled:alipayConfigured(env),tasksEnabled:tasksConfigured(env)});
+   paymentEnabled:alipayConfigured(env),tasksEnabled:tasksConfigured(env),pairingEnabled:pairingConfigured(env)});
  const db=env.HHBA_PNVS_AUTH_DB;
  if(!db)return err('ACCOUNT_DATABASE_NOT_CONNECTED',503);
+ // Extension requests have a completely separate, narrow bearer credential;
+ // they are never allowed to use site session tokens or modify credits.
+ if(path.startsWith('/extension/')){
+  if(!validExtensionOrigin(request,env))return err('EXTENSION_ORIGIN_DENIED',403);
+  const cors=extensionCors(request,env);
+  const wrap=response=>{
+   const headers=new Headers(response.headers);
+   for(const [key,value] of Object.entries(cors))headers.set(key,value);
+   return new Response(response.body,{status:response.status,headers});
+  };
+  if(method==='OPTIONS')return wrap(new Response(null,{status:204}));
+  if(!pairingConfigured(env))return wrap(err('PAIRING_NOT_ENABLED',503));
+  if(method==='POST'&&path==='/extension/claim'){
+   const body=await jsonBody(request,128);
+   const ip=request.headers.get('CF-Connecting-IP')||'';
+   try{
+    const result=await claimPairCode(db,env,body?.code,ip);
+    return wrap(result.ok?json(result):err(result.error,result.error==='PAIR_RATE_LIMITED'?429:400));
+   }catch{return wrap(err('PAIR_SERVICE_UNAVAILABLE',503))}
+  }
+  let ext;
+  try{ext=await extensionSession(db,env,request)}
+  catch{return wrap(err('EXTENSION_SESSION_UNAVAILABLE',503))}
+  if(!ext)return wrap(err('EXTENSION_SESSION_INVALID',401));
+  if(method==='GET'&&path==='/extension/wallet'){
+   try{
+    const user=await getUserByPhone(db,ext.phone);
+    if(user?.role!=='candidate')return wrap(err('CANDIDATE_REQUIRED',403));
+    return wrap(json({ok:true,wallet:await wallet(db,ext.phone),expiresAt:ext.expires_at}));
+   }catch{return wrap(err('ACCOUNT_DATABASE_NOT_CONNECTED',503))}
+  }
+  if(method==='POST'&&path==='/extension/disconnect'){
+   try{
+    await db.prepare('UPDATE hhba_apply_extension_sessions SET revoked_at=? WHERE token_hash=? AND revoked_at IS NULL')
+      .bind(iso(),ext.tokenHash).run();
+    return wrap(json({ok:true}));
+   }catch{return wrap(err('PAIR_SERVICE_UNAVAILABLE',503))}
+  }
+  return wrap(err('METHOD_NOT_ALLOWED',405));
+ }
  if(path==='/alipay/notify'){
   if(method!=='POST')return err('METHOD_NOT_ALLOWED',405);
   try{return await notifyPayment(request,env,db)}catch{return new Response('failure',{status:500})}
@@ -88,6 +129,25 @@ export async function onRequest({request,env}){
  }catch{return err('SESSION_CHECK_FAILED',503)}
  const phone=session.phone;
  try{
+  if(method==='GET'&&path==='/pair/status'){
+   if(!pairingConfigured(env))return err('PAIRING_NOT_ENABLED',503);
+   const now=iso();
+   const total=await db.prepare('SELECT COUNT(*) AS n FROM hhba_apply_extension_sessions WHERE phone=? AND revoked_at IS NULL AND expires_at>?')
+    .bind(phone,now).first();
+   return json({ok:true,connectedDevices:Number(total?.n||0)});
+  }
+  if(method==='POST'&&path==='/pair/start'){
+   if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
+   if(!pairingConfigured(env))return err('PAIRING_NOT_ENABLED',503);
+   const result=await createPairCode(db,env,phone);
+   return result.ok?json(result):err(result.error,result.error==='PAIR_RATE_LIMITED'?429:503);
+  }
+  if(method==='POST'&&path==='/pair/revoke'){
+   if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
+   if(!pairingConfigured(env))return err('PAIRING_NOT_ENABLED',503);
+   await revokeExtensions(db,phone);
+   return json({ok:true,connectedDevices:0});
+  }
   if(method==='POST'&&path==='/ai/suggest'){
    if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
    if(!aiConfigured(env))return err('AI_NOT_ENABLED',503);

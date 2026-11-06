@@ -67,3 +67,19 @@ Refund requests are persisted separately from the payment and credit ledger; no 
 ## Phase 2: AI mapping prototype (no real-user activation)
 Server prototype is explicitly gated by HHBA_APPLY_AI_ENABLED=1, HHBA_AI_DISCLOSURE_APPROVED=1 and a Cloudflare Secret HHBA_AI_API_KEY. A valid candidate bearer and same-origin request plus explicit per-request consent are required. AI sees field labels + permitted profile KEY NAMES only; it does not see their values. The server maps high-confidence model key choices back to caller-owned profile values; sensitive, consent, identity and unknown fields are rejected. Models cannot invent resume answers. Rate-limit 3 calls per real user per hour, only audit timestamps, never raw resumes.
 Service remains disabled and is not connected to the extension; a secure browser-to-site pairing mechanism and actual AI privacy disclosure/consent must be reviewed first.
+
+## Phase 3: browser-to-HHBA limited account pairing
+Migration: d1/0012_apply_extension_pairing.sql (NOT applied to production).
+Feature flag and secrets (defaults OFF):
+- HHBA_APPLY_PAIRING_ENABLED=1 (only after full security QA)
+- HHBA_APPLY_EXTENSION_ID: exact 32-letter Chromium extension ID from a stable, reviewed extension install
+- HHBA_APPLY_PAIRING_PEPPER: long random secret >=32 chars
+
+Account website: authenticated same-origin POST /api/apply/pair/start creates a random 12-char (60-bit) code, hashed with pepper in D1, TTL 5 minutes and max 3 codes/hour; POST /api/apply/pair/revoke revokes outstanding codes and all sessions.
+Extension: explicit optional host permission for only hhba.work; requests use Origin matching exact configured Chrome extension ID. The claim is rate-limited using a salted IP hash, and a consumed code cannot be exchanged twice. A separate 12-hour randomly generated token is stored only hashed on the server and in chrome.storage.session locally.
+GET /api/apply/extension/wallet is READ-ONLY and account-scoped. POST /api/apply/extension/disconnect revokes only this plugin token.
+No extension endpoint grants credits, spends credits, signs in to HHBA website, uploads a resume, or runs an AI request.
+Pairing is not hardware attestation; a compromised device/session can leak a bearer token. Do not enable payment mutation or irreversible side effects using this read-only token. Third-party browser extensions are not trusted; verify exact ID and release process.
+
+## Synthetic ATS safety tests
+V0.4 reuses standard input/textarea/select matching but detects custom combobox controls (Ant Design, Element UI, Arco, Semi, ByteDance-like classes), refuses to write their underlying text input, and reports manual work. CI Chromium test uses only an authored synthetic fixture, never a live enterprise recruiting site. Real ATS adaptation requires explicit authorization and independent acceptance.

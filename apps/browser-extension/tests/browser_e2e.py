@@ -70,6 +70,37 @@ def main():
             assert page.locator("#mobile").input_value()==""
             assert page.locator("#education").input_value()==""
             print("HHBA_DOMESTIC_SYNTHETIC_BROWSER_DOM_FILL_AND_UNDO_OK")
+            # ATS-like classes/labels are a licensed synthetic test, not
+            # proof of compatibility with any real Beisen, Moka or Feishu site.
+            print("BROWSER_STEP_ATS_COMPONENTS",flush=True)
+            page.goto(f"http://127.0.0.1:{server.server_port}/ats-synthetic.html")
+            page.evaluate("""() => {
+              window.__hhbaHandler = null;
+              window.chrome = {runtime:{onMessage:{addListener(fn){window.__hhbaHandler=fn;}}}};
+            }""")
+            page.add_script_tag(content=(EXT / "content.js").read_text("utf-8"))
+            scanned=send("HHBA_SCAN")
+            assert scanned["ok"],scanned
+            names={f["label"].strip():f for f in scanned["fields"]}
+            assert "姓名" in names and "手机号" in names and "毕业院校" in names, names
+            assert "身份证号码" in names and names["身份证号码"]["excluded"],names
+            assert scanned.get("manualWidgets"), "Dynamic combobox should be reported for manual use"
+            assert all(f["idAttribute"]!="dynamic-education" for f in scanned["fields"]), "Never treat framework select text input as ordinary text"
+            steps=[
+              {"id":names["姓名"]["id"],"value":"测试姓名","optionValue":None},
+              {"id":names["手机号"]["id"],"value":"13800138000","optionValue":None},
+              {"id":names["毕业院校"]["id"],"value":"合成大学","optionValue":None},
+              {"id":names["身份证号码"]["id"],"value":"NEVER-FILL","optionValue":None},
+            ]
+            applied=send("HHBA_FILL",scanId=scanned["scanId"],steps=steps)
+            assert applied["ok"] and applied["filled"]==3,applied
+            assert page.locator("#candidate-name").input_value()=="测试姓名"
+            assert page.locator("#candidate-mobile").input_value()=="13800138000"
+            assert page.locator("#candidate-school").input_value()=="合成大学"
+            assert page.locator("#private-document").input_value()==""
+            assert page.locator("#dynamic-education").input_value()==""
+            print("HHBA_ATS_SYNTHETIC_DYNAMIC_WIDGET_SAFETY_OK",flush=True)
+
             browser.close()
     finally:
         server.shutdown()

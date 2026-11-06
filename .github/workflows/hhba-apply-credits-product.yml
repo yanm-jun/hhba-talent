@@ -12,6 +12,9 @@ on:
       - 'apps/web/functions/_lib/apply-credit-ledger.js'
       - 'apps/web/functions/_lib/apply-payment-reconciliation.js'
       - 'apps/web/functions/_lib/apply-ai-suggest.js'
+      - 'apps/web/functions/_lib/apply-extension-pairing.js'
+      - 'apps/web/d1/0012_apply_extension_pairing.sql'
+      - 'apps/web/scripts/apply-pairing.contract.test.mjs'
       - 'apps/web/d1/0010_apply_refund_requests.sql'
       - 'apps/web/d1/0011_apply_ai_requests.sql'
       - 'apps/web/scripts/apply-payments-v2.contract.test.mjs'
@@ -45,8 +48,9 @@ jobs:
           node --check 'functions/_lib/apply-credit-ledger.js'
           node --check 'functions/_lib/apply-payment-reconciliation.js'
           node --check 'functions/_lib/apply-ai-suggest.js'
+          node --check 'functions/_lib/apply-extension-pairing.js'
           node --check 'functions/api/apply/[[path]].js'
-          node --test scripts/apply-credits.contract.test.mjs scripts/apply-payments-v2.contract.test.mjs scripts/candidate-apply-assistant-workbench.contract.test.mjs
+          node --test scripts/apply-credits.contract.test.mjs scripts/apply-payments-v2.contract.test.mjs scripts/apply-pairing.contract.test.mjs scripts/candidate-apply-assistant-workbench.contract.test.mjs
       - name: Verify the additive D1 schema with SQLite
         working-directory: apps/web
         run: python3 scripts/apply_credits_schema_test.py
@@ -67,7 +71,8 @@ jobs:
         run: |
           node --check content.js
           node --check popup.js
-          node --test tests/core.test.mjs tests/quickfill.contract.test.mjs
+          node --check account.mjs
+          node --test tests/core.test.mjs tests/quickfill.contract.test.mjs tests/account.contract.test.mjs
       - name: Install Chromium and Playwright for actual DOM acceptance
         run: |
           python3 -m pip install --quiet --disable-pip-version-check 'playwright>=1.55,<2'
@@ -78,7 +83,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: hhba-apply-v03-browser-acceptance
+          name: hhba-apply-v04-browser-acceptance
           path: /tmp/hhba-domestic-apply-browser.png
           if-no-files-found: ignore
           retention-days: 7

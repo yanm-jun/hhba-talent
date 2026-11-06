@@ -9,6 +9,7 @@ connection.execute("INSERT INTO hhba_auth_users VALUES ('13800138000','candidate
 connection.executescript(schema.read_text())
 connection.executescript((schema.parent/'0010_apply_refund_requests.sql').read_text())
 connection.executescript((schema.parent/'0011_apply_ai_requests.sql').read_text())
+connection.executescript((schema.parent/'0012_apply_extension_pairing.sql').read_text())
 connection.execute("""INSERT INTO hhba_apply_orders
 (id,phone,package_uses,amount_fen,status,created_at)
 VALUES ('order-1','13800138000',10,300,'pending','2026-11-06T00:00:00Z')""")
@@ -82,3 +83,26 @@ assert credits()==(10,9,1,0)
 connection.execute("INSERT INTO hhba_apply_ai_requests(id,phone,created_at) VALUES (?,?,?)",
  ('ai-1','13800138000','2026-11-06T03:00:00Z'))
 assert connection.execute("SELECT COUNT(*) FROM hhba_apply_ai_requests WHERE phone='13800138000'").fetchone()[0]==1
+
+# Pairing token and code hashes only; no website bearer or raw codes ever stored.
+connection.execute("""INSERT INTO hhba_apply_pair_codes
+ (code_hash,phone,created_at,expires_at) VALUES (?,?,?,?)""",
+ ('SHA256_TEST_CODE_HASH','13800138000','2026-11-06T04:00:00Z','2026-11-06T04:05:00Z'))
+assert connection.execute("""UPDATE hhba_apply_pair_codes SET used_at=?
+ WHERE code_hash=? AND used_at IS NULL AND expires_at>?""",
+ ('2026-11-06T04:01:00Z','SHA256_TEST_CODE_HASH','2026-11-06T04:01:00Z')).rowcount == 1
+assert connection.execute("""UPDATE hhba_apply_pair_codes SET used_at=?
+ WHERE code_hash=? AND used_at IS NULL AND expires_at>?""",
+ ('2026-11-06T04:01:00Z','SHA256_TEST_CODE_HASH','2026-11-06T04:01:00Z')).rowcount == 0
+connection.execute("""INSERT INTO hhba_apply_extension_sessions
+ (token_hash,phone,extension_id,created_at,expires_at) VALUES (?,?,?,?,?)""",
+ ('SHA256_TEST_DEVICE_HASH','13800138000','abcdefghijklmnopabcdefghijklmnop',
+  '2026-11-06T04:01:00Z','2026-11-06T16:01:00Z'))
+assert connection.execute("""SELECT COUNT(*) FROM hhba_apply_extension_sessions
+ WHERE phone=? AND revoked_at IS NULL""",('13800138000',)).fetchone()[0] == 1
+connection.execute("""UPDATE hhba_apply_extension_sessions SET revoked_at=?
+ WHERE phone=? AND revoked_at IS NULL""",
+ ('2026-11-06T04:02:00Z','13800138000'))
+assert connection.execute("""SELECT COUNT(*) FROM hhba_apply_extension_sessions
+ WHERE phone=? AND revoked_at IS NULL""",('13800138000',)).fetchone()[0] == 0
+print('HHBA limited browser pairing: one-time code, device revocation PASS')

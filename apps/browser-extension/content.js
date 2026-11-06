@@ -43,11 +43,15 @@
  function scan(){
   current=new Map();
   const fields=[];
+  const manualWidgets=[];
   const elements=document.querySelectorAll("input,textarea,select");
   let pos=0;
   for(const el of elements){
    const type=(el.getAttribute("type")||"text").toLowerCase();
    if(forbidden.test(type)||!visible(el)||el.readOnly)continue;
+   // The visible input of a JS select is NOT a committed HTML text field.
+   // Never write directly into Ant/Element/Arco/Semi/ByteDance comboboxes.
+   if(el.getAttribute("role")==="combobox"||el.closest(".ant-select,.el-select,.arco-select,.semi-select,.byted-select"))continue;
    // Radio/checkbox/custom widgets are surfaced to the user, never modified in V0.1.
    const kind=el.matches("select")?"select":type==="checkbox"?"checkbox":type==="radio"?"radio":
      el.matches("textarea")?"textarea":"text";
@@ -65,10 +69,19 @@
     value:kind==="checkbox"||kind==="radio"?(el.checked?"已填写":""):(String(el.value||"")?"已填写":""),
     excluded:highRisk.test(context)});
   }
+  // Explain unhandled dynamic widgets instead of silently pretending that
+  // a multi-step ATS selector was filled.
+  for(const el of document.querySelectorAll('[role="combobox"],.ant-select-selector,.el-select,.arco-select,.semi-select,.byted-select')){
+   if(!visible(el)||el.closest('[hidden]'))continue;
+   if(el.matches("input,textarea,select")&&el.getAttribute("role")!=="combobox")continue;
+   const label=fieldLabel(el)||clean(el.getAttribute("aria-label")||el.getAttribute("title"))||"自定义选择器";
+   if(highRisk.test(label))continue;
+   if(manualWidgets.length<30)manualWidgets.push({label,kind:"dynamic-select",reason:"动态下拉选项需由本人手动确认"});
+  }
   scanId=String(Date.now())+"-"+Math.random().toString(36).slice(2,8);
   scanUrl=location.href;
   return {ok:true,scanId,host:location.hostname,title:document.title,
-   fields,notice:"只扫描当前网页中的可见标准控件；iframe、复杂自定义控件需人工核对。"};
+   fields,manualWidgets,notice:"只填写当前网页中的可见标准控件；iframe、复杂自定义控件需人工核对。"};
  }
  function setNative(el,value){
   const own=(el.tagName==="TEXTAREA"?HTMLTextAreaElement:el.tagName==="SELECT"?HTMLSelectElement:HTMLInputElement).prototype;
