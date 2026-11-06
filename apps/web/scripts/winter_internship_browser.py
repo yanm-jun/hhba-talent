@@ -42,7 +42,7 @@ with sync_playwright() as p:
     page.screenshot(path='/tmp/hhba-winter-directory-desktop.png',full_page=False)
     # Dataset and grouping checks are independent of source order; new batches
     # must not break test navigation due to pagination reordering.
-    assert '44 条公开岗位及招聘批次结果' in page.locator('.hhba-winter-list-summary').inner_text()
+    assert '51 条公开岗位及招聘批次结果' in page.locator('.hhba-winter-list-summary').inner_text()
     assert page.locator('.hhba-winter-role-group-title').count()>=1
     assert page.get_by_label('按行业分组筛选寒假岗位').count()==1
 
@@ -99,6 +99,65 @@ with sync_playwright() as p:
     assert page.locator('[data-winter-program-archive]').get_attribute('open') is not None
     reset()
 
+    # Batch09: all three brands must be discoverable by Chinese keywords.
+    # Bondi has two separately indexed winter postings, not duplicate cards.
+    for name,ident,homepage in [
+        ('民生银行','cmbc-ningbo-2027-winter-intern-30','career.cmbc.com.cn'),
+        ('邦戴数科','bondi-sh-2027-winter-discretionary-trader','bonditech.com.cn'),
+        ('邦戴数科','bondi-sh-2027-winter-cpp-developer','bonditech.com.cn'),
+        ('长春万富','changchun-wanda-vista-2027-short-winter-intern','ncss.cn')
+    ]:
+        search(name)
+        assert page.locator(f'[data-winter-job="{ident}"]').count()==1,ident
+        page.locator(f'[data-winter-job="{ident}"]').get_by_role('link',name='岗位详情').click()
+        assert ident in page.url
+        assert homepage in page.get_by_role('link',name='企业招聘首页（非岗位直投）').get_attribute('href')
+        assert page.get_by_text('招聘',exact=False).count()>=1
+        page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    reset()
+    search('邦戴数科')
+    assert page.locator('[data-winter-job]').count()==2
+    search('长春 2027寒假')
+    assert page.locator('[data-winter-job="changchun-wanda-vista-2027-short-winter-intern"]').count()==1
+    reset()
+    page.get_by_label('按行业分组筛选寒假岗位').select_option('教育文旅')
+    assert page.locator('[data-winter-job="changchun-wanda-vista-2027-short-winter-intern"]').count()==1
+    reset()
+    page.get_by_label('按地区筛选寒假岗位').select_option('中国内地')
+    search('宁波')
+    assert page.locator('[data-winter-job="cmbc-ningbo-2027-winter-intern-30"]').count()==1
+    reset()
+
+    # Batch10: all three China-mainland employer names should search correctly,
+    # and closed historical leads must not appear as newly opened winter posts.
+    for name,jobid,domain,link_label in [
+        ('作业帮素养','zuoyebang-hz-2026-winter-teaching-assistant-archive','app.mokahr.com','查看雇主已截止岗位公告'),
+        ('平方和投资','alpha2-sh-winter-quant-strategy-source-check-2026','alpha2fund.com','企业招聘首页（非岗位直投）'),
+        ('国泰海通证券','gtht-sh-winter-convert-bond-underwriting-20260909','hr.gtht.com','企业招聘首页（非岗位直投）')
+    ]:
+        search(name)
+        assert page.locator(f'[data-winter-job="{jobid}"]').count()==1,jobid
+        page.locator(f'[data-winter-job="{jobid}"]').get_by_role('link',name='岗位详情').click()
+        assert jobid in page.url
+        assert domain in page.get_by_role('link',name=link_label).get_attribute('href')
+        assert page.locator('.hhba-winter-warning').count()>=1,'uncertainty must be visible in job details'
+        page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    reset()
+    search('作业帮素养')
+    assert page.get_by_text('已过申请截止日',exact=False).count()>=1
+    search('国泰海通')
+    assert page.get_by_text('待官网复核',exact=False).count()>=1
+    reset()
+    page.get_by_label('按地区筛选寒假岗位').select_option('中国内地')
+    page.get_by_label('按行业分组筛选寒假岗位').select_option('教育文旅')
+    search('作业帮')
+    assert page.locator('[data-winter-job="zuoyebang-hz-2026-winter-teaching-assistant-archive"]').count()==1
+    reset()
+    page.get_by_label('按行业分组筛选寒假岗位').select_option('金融银行')
+    search('平方和')
+    assert page.locator('[data-winter-job="alpha2-sh-winter-quant-strategy-source-check-2026"]').count()==1
+    reset()
+
     # Key legacy official jobs continue to have source-backed detail routes.
     for term,jobid in [
         ('HSBC','hsbc-hk-student-placement-1367003857'),
@@ -117,9 +176,9 @@ with sync_playwright() as p:
 
     # Stable ten-per-page browsing, including the new final partial page.
     assert page.locator('[data-winter-job]').count()==10
-    for number in range(4):
+    for number in range(5):
         page.get_by_role('button',name='下一页').click()
-    assert page.locator('[data-winter-job]').count()==4, '44 independent records = four full pages and four final records'
+    assert page.locator('[data-winter-job]').count()==1, '51 independent records = five full pages and one final record'
     page.get_by_role('button',name='上一页').click()
     assert page.locator('[data-winter-job]').count()==10
     reset()
