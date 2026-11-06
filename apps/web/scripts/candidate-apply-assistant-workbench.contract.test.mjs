@@ -65,7 +65,7 @@ test('P0 install entry never presents an unreviewed ZIP as an approved store ins
  assert.ok(product.includes('商店尚未发布'));
  assert.ok(product.includes('开发者内部测试'));
  assert.ok(product.includes('to="/candidate/account/resume"'));
- assert.ok(product.includes('PDF 自动解析仍未开放'));
+ assert.ok(product.includes('扫描版 PDF 仍需手动核对'));
 });
 
 test('P0 public extension privacy page is discoverable from the website',()=>{
