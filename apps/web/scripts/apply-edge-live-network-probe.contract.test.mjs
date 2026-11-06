@@ -25,7 +25,7 @@ test('site and extension tokens are ephemeral; Owner/consent/revoke flows are re
   assert.ok(worker.includes("'"+step+"'"),'missing '+step);
  }
  assert.ok(worker.includes('const token=randomHex(32)'));
- assert.ok(worker.includes("const hash=await sha256(token)"));
+ assert.ok(worker.includes("hash=await sha256(token)"));
  assert.ok(worker.includes("consentVersion:'extension-structured-profile-sync-v1'"));
  assert.ok(worker.includes("await fetch(LAB+'/api/apply'+path"));
  assert.ok(!worker.includes('console.log'));
