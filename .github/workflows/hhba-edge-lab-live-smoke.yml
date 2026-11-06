@@ -6,6 +6,9 @@ on:
       - 'apps/web/scripts/edge-lab-live-smoke.py'
       - 'apps/web/scripts/edge-lab-noindex.py'
       - 'apps/web/scripts/edge-lab-minimal-build.py'
+      - 'apps/web/workers/apply-profile-transfer-janitor.js'
+      - 'docs/APPLY_EDGE_ISOLATED_LAB_20261107.md'
+      - 'docs/HHBA_EDGE_ADDONS_FIRST_PASS_CHECKLIST_20261107.md'
       - 'apps/browser-extension/tests/fixtures/edge-lab-public-key.b64'
       - 'apps/browser-extension/tests/edge-lab-identity.test.mjs'
       - 'apps/browser-extension/scripts/stage-preview.mjs'
@@ -25,6 +28,9 @@ jobs:
       - name: Assert public-only stable lab identity
         working-directory: apps/browser-extension
         run: node --test tests/edge-lab-identity.test.mjs
+      - name: Check scheduled privacy cleanup code contract
+        working-directory: apps/web
+        run: node --test scripts/apply-profile-janitor.contract.test.mjs
       - name: Verify lab build exposes only the intended static files and apply routes
         working-directory: apps/web
         run: |
