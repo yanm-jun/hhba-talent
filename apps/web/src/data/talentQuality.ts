@@ -57,6 +57,10 @@ export function talentSourceKind(raw:string):TalentSourceKind{
   const host=url.hostname.toLowerCase();
   if(!host||host==='localhost'||host.endsWith('.localhost')||host==='example.com')return 'unverified';
   if(host==='gov.cn'||host.endsWith('.gov.cn'))return 'government';
+  // 青海省人事考试信息网由西宁政府公共就业网站链接为官方考试平台。
+  // Only this 2026 Huangnan original recruitment notice gets the narrow exception.
+  if((host==='www.qhpta.com'||host==='qhpta.com')&&
+     url.pathname==='/ncms/article_f19170682be5a53df0f777df1f540e24.shtml')return 'government';
   // Exact 2026 original Yibin municipal personnel-exam announcement; the portal is
   // identified by the municipal personnel authorities and signed post reproduced
   // by several universities. This is not an unrestricted domain whitelist.
