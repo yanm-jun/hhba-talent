@@ -158,7 +158,7 @@ $("ai-map").addEventListener("click",async()=>{
   }catch(e){
    const message=e?.message||"AI 字段识别暂时不可用";
    status(message.includes("AI_NOT_ENABLED")?"AI 字段服务尚未正式开放。可继续使用免费的本地预填。":message,true);
-  }finally{$("ai-map").disabled=false}
+  }finally{$("ai-consent").checked=false;$("ai-map").disabled=false}
  }
 });
 $("fill").addEventListener("click",async()=>{
