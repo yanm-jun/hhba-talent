@@ -252,7 +252,7 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
    {pairNotice&&<p className="hhba-apply-safety-note" role="status"><ShieldCheck size={15}/>{pairNotice}</p>}
    <p className="hhba-apply-safety-note"><ShieldCheck size={15}/>只读连接，不会付款、扣次、上传简历或自动投递。待完成扩展安全验收后开放。</p>
   </section>
-  <ApplyResumeSync/>
+  <ApplyResumeSync enabled={Boolean(config?.profileSyncEnabled)}/>
   <section className="hhba-apply-history">
    <div className="hhba-apply-headline"><div><h3>使用与购买记录</h3><p>同一账号独立归属；不使用演示数据冒充真实记录。</p></div></div>
    <div className="hhba-apply-tabs">
