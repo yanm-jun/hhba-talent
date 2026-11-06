@@ -27,6 +27,7 @@ on:
       - 'apps/web/src/styles/apply-resume-sync.css'
       - 'apps/web/scripts/apply-profile-sync.contract.test.mjs'
       - 'apps/web/scripts/apply-edge-sync-http.contract.test.mjs'
+      - 'apps/web/scripts/apply-pairing-real-flow.contract.test.mjs'
       - 'apps/web/scripts/apply-profile-janitor.contract.test.mjs'
       - 'apps/web/workers/apply-profile-transfer-janitor.js'
       - 'apps/web/scripts/apply-docx-local.contract.test.mjs'
@@ -71,7 +72,7 @@ jobs:
           node --check 'workers/apply-profile-transfer-janitor.js'
           node --check 'src/services/pdfProfile.mjs'
           node --check 'functions/api/apply/[[path]].js'
-          node --test scripts/apply-credits.contract.test.mjs scripts/apply-payments-v2.contract.test.mjs scripts/apply-ai-v05.contract.test.mjs scripts/apply-pairing.contract.test.mjs scripts/apply-profile-sync.contract.test.mjs scripts/apply-edge-sync-http.contract.test.mjs scripts/apply-profile-janitor.contract.test.mjs scripts/apply-docx-local.contract.test.mjs scripts/apply-pdf-local.contract.test.mjs scripts/candidate-apply-assistant-workbench.contract.test.mjs
+          node --test scripts/apply-credits.contract.test.mjs scripts/apply-payments-v2.contract.test.mjs scripts/apply-ai-v05.contract.test.mjs scripts/apply-pairing.contract.test.mjs scripts/apply-profile-sync.contract.test.mjs scripts/apply-edge-sync-http.contract.test.mjs scripts/apply-pairing-real-flow.contract.test.mjs scripts/apply-profile-janitor.contract.test.mjs scripts/apply-docx-local.contract.test.mjs scripts/apply-pdf-local.contract.test.mjs scripts/candidate-apply-assistant-workbench.contract.test.mjs
       - name: Verify the additive D1 schema with SQLite
         working-directory: apps/web
         run: python3 scripts/apply_credits_schema_test.py
