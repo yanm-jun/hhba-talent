@@ -5,6 +5,7 @@ on:
     paths:
       - 'apps/web/scripts/edge-lab-live-smoke.py'
       - 'apps/web/scripts/edge-lab-noindex.py'
+      - 'apps/web/scripts/edge-lab-minimal-build.py'
       - 'apps/browser-extension/tests/fixtures/edge-lab-public-key.b64'
       - 'apps/browser-extension/tests/edge-lab-identity.test.mjs'
       - 'apps/browser-extension/scripts/stage-preview.mjs'
@@ -24,6 +25,24 @@ jobs:
       - name: Assert public-only stable lab identity
         working-directory: apps/browser-extension
         run: node --test tests/edge-lab-identity.test.mjs
+      - name: Verify lab build exposes only the intended static files and apply routes
+        working-directory: apps/web
+        run: |
+          python3 scripts/edge-lab-minimal-build.py
+          python3 scripts/edge-lab-noindex.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('dist')
+          files={p.name for p in root.iterdir()}
+          expect={'index.html','apply-extension-privacy.html','robots.txt','_headers','_routes.json'}
+          assert files==expect,(files,expect)
+          routes=json.loads((root/'_routes.json').read_text())
+          assert routes=={'version':1,'include':['/api/apply/*'],'exclude':[]},routes
+          assert 'noindex' in (root/'_headers').read_text()
+          assert 'HHBA 插件内部联调环境' in (root/'index.html').read_text()
+          print('PASS: minimal nonindexed API-only lab build')
+          PY
       - name: Check published lab API security without any login or personal data
         working-directory: apps/web
         run: python3 -u scripts/edge-lab-live-smoke.py
