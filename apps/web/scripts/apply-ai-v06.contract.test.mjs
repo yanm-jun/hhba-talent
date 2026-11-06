@@ -18,7 +18,7 @@ const env={HHBA_APPLY_AI_ENABLED:'1',HHBA_AI_DISCLOSURE_APPROVED:'1',
 function provider({matches=[{id:'f1',key:'fullName',confidence:.95},
  {id:'f2',key:'school',confidence:.98},{id:'f3',key:'fullName',confidence:1}],
  usage={prompt_tokens:200,prompt_cache_hit_tokens:50,completion_tokens:40,total_tokens:240},
- finish_reason:'stop'}={}){
+ finish_reason='stop'}={}){
  return new Response(JSON.stringify({choices:[{finish_reason,message:{content:JSON.stringify({matches})}}],usage}),
   {status:200,headers:{'Content-Type':'application/json'}});
 }
