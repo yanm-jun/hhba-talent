@@ -30,7 +30,7 @@
 .hhba-account-section-heading h3{margin:0;font-size:17px;color:#273c30}
 .hhba-account-section-heading p{font-size:12px;line-height:1.7;color:#859185;margin:5px 0 0}
 .hhba-account-section-heading a{display:flex;align-items:center;gap:6px;font-size:12px;color:#336747;text-decoration:none;flex-shrink:0}
-.hhba-account-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:19px}
+.hhba-account-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:19px}
 .hhba-account-stat-grid>a{padding:20px 19px;display:flex;flex-direction:column;gap:9px;background:#fff;border:1px solid #e3e9e5;border-radius:13px;text-decoration:none;color:#273c2d}
 .hhba-account-stat-grid>a svg{color:#528565}
 .hhba-account-stat-grid span{font-size:12px;font-weight:600;color:#728574}
@@ -84,3 +84,25 @@
 .hhba-account-activity-button:disabled{opacity:.55;cursor:not-allowed}
 .hhba-account-privacy-row .hhba-account-activity-result{color:#2b6a43;font-weight:600;max-width:560px}
 .hhba-account-privacy-row .hhba-account-activity-error{color:#a44646;max-width:560px}
+
+/* Four-card workbench and the isolated V0.2 browser helper entry. */
+.hhba-account-stat-grid>a{min-width:0;transition:background-color .15s,border-color .15s}
+.hhba-account-stat-grid>a:hover{background:#fcfefd;border-color:#b9d5c1}
+.hhba-account-stat-grid>a:focus-visible{outline:2px solid #4b8760;outline-offset:2px}
+.hhba-account-stat-grid strong.hhba-account-stat-plugin-version{font-size:23px;letter-spacing:-.02em}
+.hhba-account-apply-assistant .hhba-account-section-heading h2{font-size:19px}
+.hhba-account-apply-summary{display:flex;gap:14px;align-items:flex-start;background:#f6faf7;border:1px solid #deebdf;border-radius:12px;padding:17px;margin:15px 0}
+.hhba-account-apply-summary>svg{flex-shrink:0;color:#4b8260}
+.hhba-account-apply-summary strong{color:#304a37;font-size:14px}
+.hhba-account-apply-summary p{font-size:12px;line-height:1.7;color:#6b806f;margin:6px 0 0}
+.hhba-account-apply-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:17px 0 23px}
+.hhba-account-apply-actions>a{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-weight:650;font-size:12px;color:#386c4c;padding:11px 14px;border:1px solid #d7e6db;border-radius:9px}
+.hhba-account-apply-actions>a.hhba-account-apply-primary{background:#2c6345;border-color:#2c6345;color:#fff}
+.hhba-account-apply-actions>a:hover{opacity:.89}
+.hhba-account-apply-guide h3{font-size:15px;color:#304937;margin:0 0 10px}
+.hhba-account-apply-guide ol{padding-left:23px;margin:0;color:#536e5a;font-size:12px;line-height:1.9}
+.hhba-account-apply-guide li{padding-left:3px;margin:6px 0}
+.hhba-account-apply-disclaimer{display:flex;align-items:flex-start;gap:8px;background:#f9faf9;border:1px solid #e8ede9;border-radius:10px;padding:13px 14px;font-size:11px!important;line-height:1.75;color:#6e8174!important;margin:21px 0 16px}
+.hhba-account-apply-disclaimer>svg{flex-shrink:0;margin-top:1px;color:#4b8461}
+.hhba-account-apply-return{display:inline-flex;align-items:center;gap:5px;font-size:12px;text-decoration:none;color:#316545}
+@media(max-width:620px){.hhba-account-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hhba-account-stat-grid>a{min-height:138px}.hhba-account-apply-actions{align-items:stretch;flex-direction:column}.hhba-account-apply-actions>a{justify-content:center}}

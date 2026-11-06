@@ -1,5 +1,5 @@
 import {type FormEvent,useEffect,useState} from 'react';
-import {ArrowRight,Bookmark,BriefcaseBusiness,CheckCircle2,Compass,FileUser,LockKeyhole,LogOut,Scale,ShieldCheck,SlidersHorizontal,UserRound,ChartNoAxesCombined} from 'lucide-react';
+import {ArrowRight,Bookmark,BriefcaseBusiness,CheckCircle2,Compass,FileUser,LockKeyhole,LogOut,MousePointerClick,Scale,ShieldCheck,SlidersHorizontal,UserRound,ChartNoAxesCombined} from 'lucide-react';
 import {Shell} from '../components/Shell';
 import {Link,navigate} from '../router';
 import {getJob,localizedCompany,localizedLocation,localizedTitle,type LiveJob} from '../services/liveRecruitment';
@@ -13,8 +13,9 @@ import '../styles/personal-center.css';
 // Preserve the existing workbench layout styles while deleting the obsolete demo identity logic.
 import '../styles/demo-account.css';
 
-type Section='overview'|'profile'|'preferences'|'resume'|'applications'|'privacy'|'saved';
+type Section='overview'|'profile'|'preferences'|'resume'|'applications'|'privacy'|'saved'|'apply-assistant';
 type RecordRow={record:SavedJob;job:LiveJob|null};
+const applyAssistantDownloadUrl = import.meta.env.BASE_URL + 'downloads/hhba-apply-assistant-v0.2.zip';
 const pages:{id:Section;label:string;icon:typeof UserRound;description:string}[]=[
  {id:'overview',label:'工作台',icon:Compass,description:'了解你的职业探索进度'},
  {id:'saved',label:'我的收藏',icon:Bookmark,description:'查看保存的真实岗位'},
@@ -129,7 +130,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
  }
  const areaLabels:Record<AccountArea,string>={general:'一般访问',jobs:'岗位浏览',companies:'企业资料',policies:'人才政策',tools:'求职工具',job_save:'岗位收藏操作'};
  const trackingPrevented=typeof navigator!=='undefined'&&(navigator.doNotTrack==='1'||(navigator as Navigator & {globalPrivacyControl?:boolean}).globalPrivacyControl===true);
- const sectionTitle=pages.find(page=>page.id===current)?.label||'个人中心';
+ const sectionTitle=current==='apply-assistant'?'一键网申':pages.find(page=>page.id===current)?.label||'个人中心';
  if(!user?.account_types?.includes('candidate'))return <Shell user={user}><section className="hhba-personal"><p role="status">请先使用真实求职者账号登录。</p><Link to="/candidate/login">前往登录</Link></section></Shell>;
  return <Shell user={user}>
  <section className="hhba-personal hhba-account-page">
@@ -157,6 +158,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
        <Link to="/candidate/saved"><Bookmark size={21}/><span>已收藏岗位</span><strong>{!savedAvailable?'—':loading?'…':error?'—':savedCount}</strong><small>真实账户专属收藏</small></Link>
        <Link to="/candidate/account/applications"><BriefcaseBusiness size={21}/><span>求职申请</span><strong>—</strong><small>真实投递服务尚未接通</small></Link>
        <Link to="/candidate/account/resume"><FileUser size={21}/><span>我的简历</span><strong>{resumeCount===null?'—':resumeCount}</strong><small>{resumeCount===null?'私有存储尚未开通':'仅本人可访问'}</small></Link>
+       <Link to="/candidate/account/apply-assistant"><MousePointerClick size={21}/><span>一键网申</span><strong className="hhba-account-stat-plugin-version">V0.2</strong><small>Chrome / Edge · 内测版</small></Link>
       </div>
       <section className="hhba-account-panel"><div className="hhba-account-section-heading"><div><h3>完善我的职业档案</h3><p>真实账户资料与求职偏好可跨设备读取。</p></div></div>
        <div className="hhba-account-tool-grid">
@@ -167,6 +169,26 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
         {error?<p role="alert">{error}</p>:<p>收藏按当前已登录账户隔离，匿名设备记录不会自动合并。</p>}
       </section>
     </>}
+    {current==='apply-assistant'&&<section className="hhba-account-panel hhba-account-apply-assistant">
+     <div className="hhba-account-section-heading"><div><h2>一键网申 · HHBA 智能网申助手</h2><p>从已恢复的 Chrome / Edge V0.2 扩展安装包开始，辅助填写招聘官网的申请表。</p></div></div>
+     <div className="hhba-account-apply-summary"><MousePointerClick size={25}/><div><strong>浏览器本地填写助手 · V0.2 内测</strong><p>支持识别标准输入框、预览建议、确认后填写、回读检查及撤销；不会代替你提交网申。</p></div></div>
+     <div className="hhba-account-apply-actions">
+       <a className="hhba-account-apply-primary" href={applyAssistantDownloadUrl} download="HHBA-智能网申助手-V0.2.zip">下载 Chrome / Edge 插件 ZIP <ArrowRight size={15}/></a>
+       <a href="https://github.com/yanm-jun/hhba-talent/pull/257" target="_blank" rel="noopener noreferrer">查看插件源码与测试记录 <ArrowRight size={14}/></a>
+     </div>
+     <div className="hhba-account-apply-guide">
+       <h3>安装与使用</h3>
+       <ol>
+        <li>下载并解压 ZIP，保留 manifest.json 和其他扩展文件在同一文件夹。</li>
+        <li>在 Chrome 打开 chrome://extensions，或在 Edge 打开 edge://extensions；启用开发者模式，选择「加载已解压的扩展程序」。</li>
+        <li>打开插件，手动完善求职档案，或导入已准备好的 JSON 档案。本版本不自动读取网站中的私有简历。</li>
+        <li>进入企业官方招聘申请页面，点击「识别当前表单」，检查预览后确认填写。</li>
+        <li>核对填写内容；验证码、附件上传及最终申请提交均由你本人完成。</li>
+       </ol>
+     </div>
+     <p className="hhba-account-apply-disclaimer"><ShieldCheck size={16}/>当前是独立内测版，尚未完成北森、Moka、飞书招聘等真实招聘平台的兼容性验收；不能保证所有表单都可填写。档案默认保存在本机浏览器，不会自动同步 HHBA 账户、上传网站简历或发送给云端 AI。</p>
+     <Link className="hhba-account-apply-return" to="/candidate/account">返回个人工作台 <ArrowRight size={14}/></Link>
+    </section>}
     {current==='saved'&&<section className="hhba-account-panel">
       <div className="hhba-account-section-heading"><div><h2>我的收藏</h2><p>只展示来自真实职位索引的收藏记录。下架职位不会被伪装成仍在招聘。</p></div><Link to="/candidate/jobs">搜索更多 <ArrowRight size={15}/></Link></div>
       {error&&<p className="hhba-personal-error" role="alert">{error}</p>}

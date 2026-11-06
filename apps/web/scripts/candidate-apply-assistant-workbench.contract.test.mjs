@@ -1,0 +1,35 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const read=(path)=>readFileSync(new URL(path,import.meta.url),'utf8');
+const page=read('../src/pages/PersonalCenterPage.tsx');
+const css=read('../src/styles/demo-account.css');
+const entry=read('../src/main.tsx');
+test('personal workbench has exactly four cards, preserves original data and adds helper link',()=>{
+ const block=page.split('<div className="hhba-account-stat-grid">')[1]?.split('</div>')[0];
+ assert.ok(block);
+ assert.equal((block.match(/<Link to=/g)||[]).length,4);
+ assert.ok(block.includes('已收藏岗位')&&block.includes('求职申请')&&block.includes('我的简历'));
+ assert.ok(block.includes('to="/candidate/account/apply-assistant"'));
+ assert.ok(block.includes('一键网申'));
+ assert.ok(block.includes('savedCount')&&block.includes('resumeCount'));
+});
+test('new link routes to an installation guide and keeps privacy safety disclaimers',()=>{
+ assert.ok(entry.includes('privacy|apply-assistant'));
+ assert.ok(page.includes("current==='apply-assistant'"));
+ assert.ok(page.includes("BASE_URL + 'downloads/hhba-apply-assistant-v0.2.zip'"));
+ assert.ok(page.includes('不会代替你提交网申'));
+ assert.ok(page.includes('不会自动同步 HHBA 账户'));
+ assert.ok(page.includes('加载已解压的扩展程序'));
+});
+test('desktop is four columns; mobile is two columns',()=>{
+ assert.ok(css.includes('grid-template-columns:repeat(4,minmax(0,1fr))'));
+ assert.ok(css.includes('@media(max-width:620px){.hhba-account-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}'));
+});
+test('download archive is an actual ZIP containing extension sources',()=>{
+ const zip=readFileSync(new URL('../public/downloads/hhba-apply-assistant-v0.2.zip',import.meta.url));
+ assert.equal(zip.subarray(0,4).toString('hex'),'504b0304');
+ for(const name of ['manifest.json','popup.html','popup.css','popup.js','core.mjs','content.js','README.md']){
+  assert.ok(zip.includes(Buffer.from(name)),name);
+ }
+});
