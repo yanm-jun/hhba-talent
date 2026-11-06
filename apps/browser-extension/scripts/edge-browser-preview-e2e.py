@@ -144,9 +144,9 @@ def main() -> None:
                 page.locator("#pair-disconnect").click()
                 expect(page.locator("#account-state")).to_contain_text("已在本机断开")
                 session = page.evaluate(
-                    "() => chrome.storage.session.get('hhba.apply.device.session.v1')"
+                    "() => chrome.storage.session.get('hhba.apply.extension.session.v1')"
                 )
-                assert not session.get("hhba.apply.device.session.v1")
+                assert not session.get("hhba.apply.extension.session.v1")
                 assert any(c["path"]=="disconnect" for c in calls)
                 assert all(c["origin"]==f"chrome-extension://{ext_id}" for c in calls)
                 print("PASS: real Chromium MV3 popup pairing, explicit profile consent, local import, replay denial and disconnect")
