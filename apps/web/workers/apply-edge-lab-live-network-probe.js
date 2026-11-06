@@ -23,7 +23,7 @@ async function request(path,{method='GET',origin,token,body}={}){
  if(token)headers.set('Authorization','Bearer '+token);
  if(body!==undefined)headers.set('Content-Type','application/json');
  const response=await fetch(LAB+'/api/apply'+path,{
-  method,headers,redirect:'manual',cache:'no-store',
+  method,headers,redirect:'manual',
   ...(body!==undefined?{body:JSON.stringify(body)}:{})
  });
  if(response.status>=300&&response.status<400)throw Object.assign(new Error('UNEXPECTED_REDIRECT'),{stage:'REMOTE_HTTP'});
