@@ -1,5 +1,5 @@
 import type {DetailedGuide,GuidePoint,GuideSection,GuideFAQ,GuideSource} from '../components/OverseasDetailedGuide';
-import {ukRoutes,ukOfficial,ukVerifiedOn,type UkLine} from './overseasUK';
+import {ukRoutes,ukOfficial,ukVerifiedOn,type UkLine} from './overseasUK.ts';
 /** 15 genuine routes; 8 substantive chapters each, with separate factual checks and action tasks.
  * Every link is the public GOV.UK original, not a commercial immigration intermediary.
  */
