@@ -43,6 +43,8 @@ export const ukOfficial={
  exchange:'https://www.gov.uk/government-authorised-exchange',
  schemes:'https://www.gov.uk/guidance/immigration-rules/immigration-rules-appendix-government-authorised-exchange-schemes',
  senior:'https://www.gov.uk/senior-specialist-worker-visa',
+ graduateTrainee:'https://www.gov.uk/graduate-trainee-visa',
+ graduateTraineeEligibility:'https://www.gov.uk/graduate-trainee-visa/eligibility',
  family:'https://www.gov.uk/uk-family-visa/partner-spouse',
  familyMoney:'https://www.gov.uk/uk-family-visa/proof-income-partner',
  youth:'https://www.gov.uk/youth-mobility',
@@ -54,7 +56,7 @@ export const ukOfficial={
 export type UkLine=[string,string,string];
 export type UkRoute={
  id:string;name:string;english:string;category:OverseasCategory;summary:string;audience:string;highlights:string[];
- requirements:string[];documents:string[];steps:string[];costs:string[];time:string[];rights:string[];next:string[];
+ requirements:UkLine[];documents:UkLine[];steps:UkLine[];costs:UkLine[];time:UkLine[];rights:UkLine[];next:UkLine[];
  risks:string[];faq:[string,string][];sourceKeys:(keyof typeof ukOfficial)[];availability?:'closed'|'check-official';
 };
 /** Each point is "title¦explanation¦what the reader must actually do". */
@@ -513,8 +515,8 @@ summary:'在跨国公司正式graduate training programme中的员工赴英国�
 audience:'在跨国集团任职并参加正式国际轮岗或管理培养计划的毕业生/员工。',
 highlights:['集团内部graduate programme','需有效GBM担保','不等同Graduate Visa'],
 requirements:lines(`真实集团管理培训¦必须存在被认可的正式graduate training programme，岗位为管理或专业人才发展而临时调派。¦向集团HR核实书面培训计划与两地机构关系。
-海外雇佣记录¦一般需要在英国境外的同一集团公司工作满特定期间，适用规定另查。¦整理实际劳动合同、薪资与海外服务证明。
-英国分支CoS与工资¦英国关联机构应具有适用GBM Graduate Trainee担保资质及符合职业和工资要求的CoS。¦对照官方本路线完整salary和SOC表，不能用Senior路线薪资混算。
+海外雇佣记录¦申请前须紧接着在同集团英国境外工作至少3个月；不可从英国境内转换或延长Graduate Trainee。¦整理最近3个月真实工资单、劳动合同和境外工作证据。
+英国分支CoS与工资¦英国关联机构应持有效Graduate Trainee担保资质；一般工资至少£27,300或相应职业going rate的70%（取高），医教职位另有规则。¦对照本路线官方salary和SOC表，不用Senior Worker的£52,500门槛。
 个人资格¦护照、维持资金、适用TB和家属等要求依本路线处理。¦通过GOV.UK正式Graduate Trainee材料清单核对。`),
 documents:lines(`培训计划¦集团国际轮岗文件、岗位、导师、培训任务及期限。¦留存正式HR文件。
 雇佣和赞助¦海外劳动关系、英国集团关联、CoS及工资材料。¦让英国HR确认合法担保类别。
@@ -523,11 +525,11 @@ steps:lines(`1. 确认公司培训资格¦无真实graduate programme不能申�
 2. 确认GBM担保¦由英国关联企业按Graduate Trainee分轨签发CoS。¦比对培训工资和SOC代码。
 3. 提交政府申请¦准备真实雇佣、培训和身份材料并支付签证费用。¦使用UKVI Graduate Trainee而非毕业生Graduate Visa申请。
 4. 完成临时培训¦按许可期限参与培训并提前规划下一身份。¦保存培训记录与正式公司文件。`),
-costs:lines(`政府签证费¦Graduate Trainee申请费依GOV.UK最新规则显示，不用其他GBM类别费用代替。¦申请当日核对准确收费。
+costs:lines(`政府签证费¦2026 Graduate Trainee官方申请费£340；另需按签证期限支付适用IHS。¦申请当日核对官方收费与入境条件。
 IHS与资金¦通常需另行计算IHS及维持资金证明。¦区分公司报销和法律要求。
 企业培养开支¦差旅、住宿、交通可能由公司承担，需看正式协议。¦与公司HR书面确认。`),
 time:lines(`先满足任职时间¦入境前需要真实集团雇佣与相应时长，不能临时办假工作经历。¦核查劳动合同时间线。
-临时签证期¦此路线一般短于长期Skilled Worker，具体上限依官方规定。¦确认CoS期限与出入境。
+临时签证期¦该签证通常最长为CoS期限加14天与12个月两者较短者，不可在英国境内延长。¦确认CoS期限、总GBM停留限制与出入境。
 日后转签¦GBM属于临时跨国人才流动，长期工作需要另查可转换路径。¦在许可届满前咨询公司。`),
 rights:lines(`限定集团培训¦工作活动围绕批准的graduate training职位，不能擅自换工作。¦严格按批准条款就业。
 不直接定居¦本路线不能简单算作永久居留路径。¦规划长期工作其他制度。
@@ -537,7 +539,7 @@ next:lines(`回原集团任职¦按内部培训协议和英国许可执行。¦�
 其他学习机会¦如转入英国大学课程，须符合Student独立规则。¦不要用GBM培训许可代替CAS。`),
 risks:['GBM Graduate Trainee不是英国大学毕业后的Graduate Visa。','仅企业内部毕业生培训项目且符合集团赞助、经验、岗位要求者可申请。'],
 faq:[['中国刚毕业能单独去英国申请吗？','一般不可以。需要真实跨国集团培训项目、海外任职与英国关联机构赞助。'],['与Graduate Visa有什么区别？','Graduate Visa要求英国合格课程完成和英国Student身份；GBM Graduate Trainee是跨国公司内部调派。']],
-sourceKeys:['senior','sponsors','rates']
+sourceKeys:['graduateTrainee','graduateTraineeEligibility','sponsors','rates']
 }
 ];
 export const ukPathways:OverseasPathway[]=ukRoutes.map(r=>({
