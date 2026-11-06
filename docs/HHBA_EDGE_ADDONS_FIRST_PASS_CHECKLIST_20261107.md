@@ -54,3 +54,17 @@ HHBA 智能网申助手是一款面向 Microsoft Edge 的求职表单辅助填�
 **必须区分：** Chromium 扩展平台会在 Edge 使用 `chrome.*` API 和 `chrome-extension://<id>`，这不表示上传 Chrome Web Store。
 
 审核时采用官方条款的最新版本，以 Microsoft Partner Center 当次页面必填项和真实功能为准。
+
+## D. Cloudflare Preview 真实 Edge 联调的安全准备
+
+已提供内部脚本 `apps/browser-extension/scripts/stage-preview.mjs`。它只允许 `https://<branch-or-id>.hhba-talent.pages.dev/` 地址，复制正式扩展的**全部必要静态文件**到隔离目录，再将自有 API、隐私政策、账户与简历入口全部替换为 Preview 域名；不会改动官网发布包，不会插入 API Key，也不支持其他第三方站点。独立测试产物显著标注「隔离预览测试」，**严禁上传到 Microsoft Partner Center**。
+
+内部测试操作示例（仅开发者）：
+```sh
+node apps/browser-extension/scripts/stage-preview.mjs https://<真实Cloudflare-Preview>.hhba-talent.pages.dev /tmp/hhba-edge-preview
+```
+在 Microsoft Edge 的 `edge://extensions` 中将输出目录作为独立内测扩展加载，记下 Edge 为**该内测扩展**分配的 32 字符 ID。开发者需要先安全确认 Cloudflare Preview D1/R2 与生产隔离（已有只读核验），再把这个 Preview ID 与独立随机配对 pepper、独立 AES-256 密钥通过 Preview Secret 安全设置。整个过程不应修改生产环境，也不应为方便测试放松 origin 白名单。
+
+使用虚构候选人账号、测试 PDF/DOCX 与经过授权的测试资料，再执行：官网真实会话登录 → 创建五分钟连接码 → 内测 Edge 兑换一次性会话 → 网站提取文字并人工核对 → 用户同意结构化同步 → Edge 二次勾选同意领取 → 读取一次成功 → 二次领取/跨账号/撤销/过期均失败。记录真实网络行为与截屏（避免泄露 token/个人信息）。未完成全部链路不得报告「真实账号端到端验收通过」。
+
+**截至本次提交：未配置 Preview 配对或加密 Secret，未得到稳定扩展 ID；仅有真实 onRequest 合成账户 HTTP 协议验收，尚未完成真实浏览器与 Preview 服务端凭证联调。** 不把此步骤中的开发者加载流程展示给普通求职者。
