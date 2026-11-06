@@ -142,6 +142,16 @@ test('full real onRequest flow: website login -> pair code -> Edge redeem -> wal
  };
  const deviceWallet=await accountApi(realApiFetch,'/wallet',dev);
  assert.equal(deviceWallet.wallet.available,0);
+ // Browser GET may omit Origin: do not weaken backend origin validation.
+ // The extension must use POST for every authenticated wallet lookup.
+ const unsafeGet=new Request(DOMAIN+'/api/apply/extension/wallet',{
+  method:'GET',headers:{Authorization:'Bearer '+dev.token}
+ });
+ const unsafeResponse=await onRequest({env,request:unsafeGet});
+ assert.equal(unsafeResponse.status,403,'missing Origin must never be accepted');
+ const postWithOrigin=await dispatch(env,'/extension/wallet','POST',dev.token,null,EXT_ORIGIN);
+ assert.equal(postWithOrigin.status,200,'same Edge session with explicit Origin must succeed');
+
  const active=await dispatch(env,'/pair/status','GET',site);
  assert.equal(active.connectedDevices,1);
  const form={
