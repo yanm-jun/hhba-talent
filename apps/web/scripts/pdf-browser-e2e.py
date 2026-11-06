@@ -71,7 +71,7 @@ def main():
                     route.continue_() if route.request.url.startswith(BASE+"/")
                     else (denied.append(route.request.url),route.abort())
                 ))
-                page.goto(BASE+"/",wait_until="domcontentloaded",timeout=20000)
+                page.goto(BASE+"/apply-extension-privacy.html",wait_until="domcontentloaded",timeout=20000)
                 result=page.evaluate(
                     """async (bytes) => {
                       const {extractPdfText}=await import('/src/services/pdfProfile.mjs');
