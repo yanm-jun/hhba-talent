@@ -1,0 +1,29 @@
+name: HHBA Edge P0 Isolated Cloudflare Lab Live Smoke
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/scripts/edge-lab-live-smoke.py'
+      - 'apps/web/scripts/edge-lab-noindex.py'
+      - 'apps/browser-extension/tests/fixtures/edge-lab-public-key.b64'
+      - 'apps/browser-extension/tests/edge-lab-identity.test.mjs'
+      - 'apps/browser-extension/scripts/stage-preview.mjs'
+      - 'apps/web/functions/api/apply/**'
+      - '.github/workflows/hhba-edge-lab-live-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-test-only:
+    # Never probe a non-lab deployment or use this job to ship main.
+    if: github.event_name == 'pull_request' && github.head_ref == 'feature/apply-edge-isolated-live-lab-20261107'
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert public-only stable lab identity
+        working-directory: apps/browser-extension
+        run: node --test tests/edge-lab-identity.test.mjs
+      - name: Check published lab API security without any login or personal data
+        working-directory: apps/web
+        run: python3 -u scripts/edge-lab-live-smoke.py
