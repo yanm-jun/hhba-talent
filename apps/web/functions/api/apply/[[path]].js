@@ -74,7 +74,7 @@ export async function onRequest({request,env}){
  const method=request.method;
  if(method==='GET'&&path==='/config')
   return json({ok:true,packages:APPLY_PACKAGES.map(uses=>({uses,amountFen:packagePriceFen(uses)})),
-   paymentEnabled:alipayConfigured(env),tasksEnabled:tasksConfigured(env),pairingEnabled:pairingConfigured(env)});
+   paymentEnabled:alipayConfigured(env),tasksEnabled:tasksConfigured(env),pairingEnabled:pairingConfigured(env),profileSyncEnabled:pairingConfigured(env)&&syncKeyConfigured(env)});
  const db=env.HHBA_PNVS_AUTH_DB;
  if(!db)return err('ACCOUNT_DATABASE_NOT_CONNECTED',503);
  // Extension requests have a completely separate, narrow bearer credential;
@@ -195,7 +195,10 @@ export async function onRequest({request,env}){
    if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
    if(!pairingConfigured(env))return err('PAIRING_NOT_ENABLED',503);
    await revokeExtensions(db,phone);
-   await revokeProfileTransfer(db,phone);
+   // Old installations without migration 0014 must still be able to revoke
+   // every extension session. Without an active device the pending ciphertext
+   // is not claimable; fail-closed sync endpoints require migration 0014.
+   try{await revokeProfileTransfer(db,phone)}catch{}
    return json({ok:true,connectedDevices:0});
   }
   if(method==='POST'&&path==='/ai/suggest'){
