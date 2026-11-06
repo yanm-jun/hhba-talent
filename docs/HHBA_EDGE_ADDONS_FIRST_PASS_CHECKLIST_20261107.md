@@ -49,7 +49,7 @@ HHBA 智能网申助手是一款面向 Microsoft Edge 的求职表单辅助填�
 - Partner Center 实际开发者账号与正式展示图/截图、支持渠道、隐私法务审查。
 - 审查并配置专属 Edge Extension ID 及 Cloudflare Preview 的配对开关、pepper 与 AES-256-GCM Secret；不向源代码或用户端暴露秘密。
 - 使用隔离测试账户在真实 Edge Windows/macOS 测试**完整的一次性资料同步链**；生产配置、收费和合并 main 均在验收后单独审批。
-- 过期密文后台定时删除机制（当前只有访问时机会性删除与过期后不可领取；如要承诺最长期限，必须实现定时物理清理）。
+- 过期密文后台定时删除代码已实现于 `apps/web/workers/apply-profile-transfer-janitor.js`，但**仍未在 Cloudflare 创建/启用 Cron Trigger**。当前只有访问时机会性删除与过期后不可领取；启用并验证调度及 D1 隔离之后才能承诺物理保留上限。
 
 **必须区分：** Chromium 扩展平台会在 Edge 使用 `chrome.*` API 和 `chrome-extension://<id>`，这不表示上传 Chrome Web Store。
 
@@ -68,3 +68,14 @@ node apps/browser-extension/scripts/stage-preview.mjs https://<真实Cloudflare-
 使用虚构候选人账号、测试 PDF/DOCX 与经过授权的测试资料，再执行：官网真实会话登录 → 创建五分钟连接码 → 内测 Edge 兑换一次性会话 → 网站提取文字并人工核对 → 用户同意结构化同步 → Edge 二次勾选同意领取 → 读取一次成功 → 二次领取/跨账号/撤销/过期均失败。记录真实网络行为与截屏（避免泄露 token/个人信息）。未完成全部链路不得报告「真实账号端到端验收通过」。
 
 **截至本次提交：未配置 Preview 配对或加密 Secret，未得到稳定扩展 ID；仅有真实 onRequest 合成账户 HTTP 协议验收，尚未完成真实浏览器与 Preview 服务端凭证联调。** 不把此步骤中的开发者加载流程展示给普通求职者。
+
+## E. 定时物理清理（代码完成，部署需单独验收）
+
+独立 Worker `apps/web/workers/apply-profile-transfer-janitor.js` 使用 Cloudflare Worker 的 `scheduled` 事件，每次运行仅对配置在其 `HHBA_PNVS_AUTH_DB` 绑定的 D1 删除 `expires_at<=当前时间 OR claimed_at IS NOT NULL` 的行，不读取原始简历或解密密文。
+
+上线前：
+1. 单独创建 Preview 清理 Worker，核验其 D1 绑定严格指向 **Preview PNVS**，不得误指向生产 D1。
+2. 将 `HHBA_APPLY_CLEANUP_ENABLED=1` 仅写入该 Worker 的受控环境，配置必要的周期性 Cron Trigger（例如每 15 分钟）。
+3. 用隔离合成数据验收「未过期行保留、过期行删除、已经领取行删除」，确认不清理任意其他表、不会写入个人字段日志。
+4. 根据实际调度间隔、时钟偏差、失败重试和用户权利请求，准确修订隐私政策及物理删除时间。不能只凭代码存在就声称服务已按时删除。
+5. **本分支不自动部署 Worker、不创建计划任务、不修改生产 D1。**
