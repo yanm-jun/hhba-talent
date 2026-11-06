@@ -24,7 +24,9 @@ test('only public key is bundled in lab extension; store manifest never includes
   assert.equal(manifest.key,publicKey);
   assert.deepEqual(manifest.optional_host_permissions,[LAB+'/*']);
   assert.equal(Object.hasOwn(manifest,'host_permissions'),false);
-  assert.ok((await readFile(join(dir,'account.mjs'),'utf8')).includes(LAB+'/api/apply/extension'));
+  const account=await readFile(join(dir,'account.mjs'),'utf8');
+  assert.ok(account.includes("export const HHBA_SITE='"+LAB+"';"));
+  assert.ok(account.includes("HHBA_SITE+'/api/apply/extension'"));
   assert.ok((await readFile(join(dir,'popup.html'),'utf8')).includes(LAB+'/apply-extension-privacy.html'));
   const prod=JSON.parse(await readFile(new URL('../manifest.json',import.meta.url),'utf8'));
   assert.equal(Object.hasOwn(prod,'key'),false);
