@@ -27,14 +27,49 @@ ASSETS={
   "https://www.liuhuahuagong.com/col_xwzx1/202509/27352E666DC3E4FDCBC8D1F091EEB43B.htm",
   "Real air-separation facility in subsidiary's 2025 performance test article")
 ]}
+# A prior successful HHBA Pages release contains source-verified company photos.
+# Check both its original-source audit and the exact SHA256 of each cached JPG.
+# This is a reproducible fallback for expired certificates or unavailable source CDNs;
+# it never substitutes generic photos, redirects, or an unverified placeholder.
+VERIFIED_RELEASES=(
+ "https://0691511a.hhba-talent.pages.dev",  # successful production release, 2026-11-06
+ "https://hhba.work",
+)
+def verified_release_photo(company,filename,expected_source,expected_page):
+ for release in VERIFIED_RELEASES:
+  prefix=release+"/images/employer-profiles/cn-autumn-"+company+"/"
+  try:
+   req=Request(prefix+"media-sources.json",headers={"User-Agent":UA})
+   with urlopen(req,timeout=16) as response: records=json.loads(response.read(100000))
+   if not isinstance(records,list):raise ValueError("invalid prior audit")
+   item=next((x for x in records if x.get("filename")==filename),None)
+   if (not item or item.get("verifiedAsActualPhoto") is not True or
+       item.get("exactSourceUrl")!=expected_source or
+       item.get("firstPartyWebPage")!=expected_page):
+    raise ValueError("verified media provenance mismatch")
+   req=Request(prefix+filename,headers={"User-Agent":UA})
+   with urlopen(req,timeout=20) as response:
+    if response.status!=200:raise ValueError("cached HTTP status")
+    raw=response.read(9_000_001)
+   if not 12000<len(raw)<9_000_000:raise ValueError("cached JPEG size")
+   if sha256(raw).hexdigest()!=item.get("sha256"):raise ValueError("cached SHA256 mismatch")
+   im=Image.open(BytesIO(raw));im.verify()
+   print("HHBA_VERIFIED_PREVIOUS_RELEASE_MEDIA",company,filename,release,flush=True)
+   return raw,release
+  except Exception as exc:
+   print("HHBA_VERIFIED_RELEASE_MEDIA_UNAVAILABLE",company,filename,release,str(exc)[:100],flush=True)
+ return None,None
+
 for id,photos in ASSETS.items():
  folder=ROOT/("cn-autumn-"+id);folder.mkdir(parents=True,exist_ok=True)
  provenance=[]
  for filename,url,page,note in photos:
-  req=Request(url,headers={"User-Agent":UA,"Referer":page,"Accept":"image/avif,image/webp,image/*,*/*;q=0.8"})
-  with urlopen(req,timeout=35) as response:
-   if response.status!=200:raise RuntimeError("Source image HTTP "+str(response.status)+": "+url)
-   content=response.read(9_000_000)
+  content,cached_from=verified_release_photo(id,filename,url,page)
+  if content is None:
+   req=Request(url,headers={"User-Agent":UA,"Referer":page,"Accept":"image/avif,image/webp,image/*,*/*;q=0.8"})
+   with urlopen(req,timeout=35) as response:
+    if response.status!=200:raise RuntimeError("Source image HTTP "+str(response.status)+": "+url)
+    content=response.read(9_000_000)
   try: image=ImageOps.exif_transpose(Image.open(BytesIO(content)))
   except Exception as exc:raise RuntimeError("Source is not a photograph: "+url) from exc
   width,height=image.size
@@ -46,7 +81,8 @@ for id,photos in ASSETS.items():
   if len(actual)<12000:raise RuntimeError("Tiny photo: "+filename)
   provenance.append({"filename":filename,"exactSourceUrl":url,"firstPartyWebPage":page,
     "sourceDescription":note,"dimensions":[width,height],"sha256":sha256(actual).hexdigest(),
-    "verifiedAsActualPhoto":True,"independentPublicationPermission":"not-verified"})
+    "verifiedAsActualPhoto":True,"independentPublicationPermission":"not-verified",
+    "reusedFromVerifiedRelease":cached_from})
   print("HHBA_GENUINE_COMPANY_PHOTO",id,filename,len(actual),width,height,url)
  (folder/"media-sources.json").write_text(json.dumps(provenance,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print("HHBA_066_068_FOUR_SOURCE_PHOTOGRAPHS_READY")
