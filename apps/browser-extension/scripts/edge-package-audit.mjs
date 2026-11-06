@@ -41,6 +41,21 @@ for(const size of icons){
  const decoded=inflateSync(Buffer.concat(idat));
  assert.equal(decoded.length,size*(1+size*4),'invalid decoded PNG data '+rel);
 }
+const storeLogo=readFileSync(file('store-assets/edge-logo-300.png'));
+assert.ok(storeLogo.subarray(0,8).equals(pngHeader),'invalid Partner Center logo PNG');
+assert.equal(storeLogo.toString('ascii',12,16),'IHDR');
+assert.equal(storeLogo.readUInt32BE(16),300,'Partner Center logo width must be 300px');
+assert.equal(storeLogo.readUInt32BE(20),300,'Partner Center logo height must be 300px');
+const listing=readFileSync(resolve(root,'../../docs/HHBA_EDGE_PARTNER_CENTER_SUBMISSION_COPY_20261107.md'),'utf8');
+const paragraph=listing.match(/## 商店长描述[^\n]*\n\n([\s\S]*?)\n## /)?.[1]?.trim();
+assert.ok(paragraph,'missing Chinese Partner Center listing');
+const chars=Array.from(paragraph).length;
+assert.ok(chars>=250&&chars<=10000,'official store description must be 250–10000 characters');
+assert.ok(listing.includes('Single Purpose')&&listing.includes('Permission justification'));
+assert.ok(listing.includes('Remote code')&&listing.includes('Data usage'));
+assert.ok(listing.includes('Microsoft Edge'));
+assert.ok(listing.includes('Windows/macOS'));
+assert.ok(!Object.hasOwn(manifest,'key'),'official package must not contain test identity');
 assert.equal(manifest.action.default_icon['16'],manifest.icons['16']);
 assert.equal(manifest.action.default_icon['32'],manifest.icons['32']);
 assert.equal(manifest.action.default_popup,'popup.html');
