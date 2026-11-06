@@ -13,6 +13,7 @@ import {getTalentCitySnapshot} from '../data/talentCitySnapshot';
 import {SICHUAN_21_REGIONS,sichuanGuideUrl,buildSichuanGuide} from '../data/sichuanGuides';
 import {buildHainanGuide,hainanGuideUrl,HAINAN_TALENT_CITIES} from '../data/hainanGuides';
 import {buildHunanGuide} from '../data/hunanGuides';
+import {getShanxiGuide} from '../data/shanxiGuides';
 import {getHubeiGuide} from '../data/hubeiGuides';
 import {buildJiangxiGuide} from '../data/jiangxiGuides';
 import {buildHeilongjiangGuide} from '../data/heilongjiangGuides';
@@ -487,6 +488,11 @@ export function TalentServiceRoutes({user,route}:{user:User|null;route:string}){
   const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
   const guide=t?buildXizangGuide(t,decode(fragments[4]||'')):null;
   body=guide?<UnifiedPolicyGuide data={guide}/>:<section className="ts-sub-header"><h1>西藏该政策办理资料尚待核验</h1><Link to="/talent-service/cities">返回全国城市目录</Link></section>;
+ }
+ else if(kind==='policy-guide-preview'&&fragments[2]==='shanxi'){
+  const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
+  const guide=t?getShanxiGuide(t,decode(fragments[4]||'')):undefined;
+  body=guide?<UnifiedPolicyGuide data={guide}/>:<section className="ts-sub-header"><h1>山西该事项尚未核验</h1><Link to="/talent-service/cities">返回城市目录</Link></section>;
  }
  else if(kind==='policy-guide-preview'&&fragments[2]==='shaanxi'){
   const t=fragments[3]==='policy'?'policy':fragments[3]==='housing'?'housing':null;
