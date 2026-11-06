@@ -141,10 +141,10 @@
    if(el.tagName!=="SELECT"&&el.maxLength>0&&step.value.length>el.maxLength){
     results.push({id:key,status:"skipped",reason:"内容超出网页字数限制"});continue;
    }
-   if(el.tagName==="INPUT"&&el.type==="date"&&!/^\\d{4}-\\d{2}-\\d{2}$/.test(step.value)){
+   if(el.tagName==="INPUT"&&el.type==="date"&&!/^\d{4}-\d{2}-\d{2}$/.test(step.value)){
     results.push({id:key,status:"skipped",reason:"日期控件需要 YYYY-MM-DD"});continue;
    }
-   if(el.tagName==="INPUT"&&el.type==="month"&&!/^\\d{4}-\\d{2}$/.test(step.value)){
+   if(el.tagName==="INPUT"&&el.type==="month"&&!/^\d{4}-\d{2}$/.test(step.value)){
     results.push({id:key,status:"skipped",reason:"月份控件需要 YYYY-MM"});continue;
    }
    const old=String(el.value||"");
