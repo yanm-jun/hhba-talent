@@ -50,7 +50,7 @@ test('directory contains source-backed programmes without invented job numbers',
 });
 test('concrete job first: only individual employer-issued postings appear in the primary list',()=>{
  const jobIds=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(x=>x[1]);
- assert.equal(jobIds.length,51,'41 prior plus three distinct mainland employer roles in batch08');
+ assert.equal(jobIds.length,58,'41 prior plus three distinct mainland employer roles in batch08');
  assert.equal(new Set(jobIds).size,jobIds.length,'no duplicate role identity');
  for(const id of ['apco-shanghai-winter-start-1787','hsbc-hk-student-placement-1367003857','qima-hk-sales-intern-744000154586189']){
   assert.ok(jobIds.includes(id),id+' missing');
@@ -136,8 +136,8 @@ test('batch06 adds three independently sourced employers, nine unique 2027 H1 re
  const man=['manulife-hk-2027-private-equity-jr26091338','manulife-hk-2027-data-finance-jr26091703','manulife-hk-2027-global-info-risk-jr26100089','manulife-hk-2027-marketing-strategy-jr26100142','manulife-hk-2027-tech-placement-jr26100136'];
  const informa='informa-markets-hk-2027-jan-jun-intern-l059656859';
  for(const id of [...sun,...man,informa])assert.ok(ids.includes(id),'batch06 missing distinct job '+id);
- assert.equal(ids.length,51,'historical batch06/batch07 roles plus three new mainland records');
- assert.equal(new Set(ids).size,51,'no duplicate record identifiers');
+ assert.equal(ids.length,58,'historical batch06/batch07 roles plus three new mainland records');
+ assert.equal(new Set(ids).size,58,'no duplicate record identifiers');
  assert.equal((jobs.match(/status:"closed"/g)||[]).length,9,'existing seven plus LVMH and CA Global Markets expired records');
  assert.ok(jobs.includes('2026年10月30日')&&jobs.includes('2026年11月1日'));
  assert.ok(jobs.includes('2026年11月7日'),'Informa third-party upcoming deadline');
@@ -161,8 +161,8 @@ test('batch07 keeps independently sourced January-2027 BNP, LVMH and Credit Agri
  const lvmh='lvmh-hk-beauty-2027-jan-sscpc02515';
  const ca=['creditagricole-hk-2027-audit-intern-115888','creditagricole-hk-2027-finance-intern-115202','creditagricole-hk-2027-global-markets-115201'];
  for(const id of [...bnp,lvmh,...ca])assert.ok(ids.includes(id),id+' not indexed');
- assert.equal(ids.length,51,'all seven earlier batches plus the three new mainland jobs');
- assert.equal(new Set(ids).size,51,'no duplicated employer vacancy IDs');
+ assert.equal(ids.length,58,'all seven earlier batches plus the three new mainland jobs');
+ assert.equal(new Set(ids).size,58,'no duplicated employer vacancy IDs');
  assert.equal((jobs.match(/status:"filled"/g)||[]).length,3,'three BNP posts all employer-confirmed filled');
  assert.equal((jobs.match(/status:"closed"/g)||[]).length,9,'two additional expired beyond prior seven');
  for(const ref of ['1234567890100118477','1234567890100117528','1234567890100117487','SSCPC02515','2026-115888','2026-115202','2026-115201'])assert.ok(jobs.includes(ref),'missing grounded employer number '+ref);
@@ -197,8 +197,8 @@ test('batch08 adds three distinct China mainland employers and searchable indust
 
 test('batch09 adds three mainland companies with explicit winter internship recruitment references',()=>{
  const roleIds=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(m=>m[1]);
- assert.equal(roleIds.length,51);
- assert.equal(new Set(roleIds).size,51);
+ assert.equal(roleIds.length,58);
+ assert.equal(new Set(roleIds).size,58);
  const ids=[
   'cmbc-ningbo-2027-winter-intern-30',
   'bondi-sh-2027-winter-discretionary-trader',
@@ -220,8 +220,8 @@ test('batch09 adds three mainland companies with explicit winter internship recr
 
 test('batch10 adds three mainland employers with winter-origin truthfulness and unique identities',()=>{
  const ids=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(m=>m[1]);
- assert.equal(ids.length,51,'batch09 48 plus batch10 three');
- assert.equal(new Set(ids).size,51,'all job record IDs unique');
+ assert.equal(ids.length,58,'batch09 48 plus batch10 three');
+ assert.equal(new Set(ids).size,58,'all job record IDs unique');
  const entries=[
   ['zuoyebang-hz-2026-winter-teaching-assistant-archive','作业帮素养'],
   ['alpha2-sh-winter-quant-strategy-source-check-2026','平方和投资'],
@@ -244,4 +244,32 @@ test('batch10 adds three mainland employers with winter-origin truthfulness and 
  assert.ok(!added.includes('status: "open"'),'no unverified real-time slots');
  const page=read('src/pages/WinterInternshipPage.tsx');
  assert.ok(page.includes('setKeyword(e.target.value)')&&page.includes('WINTER_GROUPS'),'existing live search and groups must be retained');
+});
+
+test('batch11 records 3 mainland employers, 7 separate jobs and real winter dates without inventing openings',()=>{
+ const ids=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(m=>m[1]);
+ assert.equal(ids.length,58);
+ assert.equal(new Set(ids).size,58);
+ const cases=[
+  'hfbank-bj-2027winter-admin-support-20261105',
+  'hfbank-bj-2027winter-corporate-assistant-20261105',
+  'hfbank-bj-2027winter-lobby-assistant-20261105',
+  'tabs-sh-2027winter-engineering-assistant-20270125',
+  'tabs-sh-2027winter-biochemistry-assistant-20270125',
+  'tabs-sz-2027winter-biomed-assistant-20270214',
+  'roys-hz-2027winter-class-assistant-source-review'
+ ];
+ for(const id of cases)assert.ok(ids.includes(id),'missing independently sourced vacancy '+id);
+ const comp=['恒丰银行北京分行','TABS创新实验室（北京泰博斯教育科技）','Roys乐亦思'];
+ for(const name of comp)assert.ok(jobs.includes(name),name+' absent');
+ for(const exact of ['2026年11月9日12:00','2027年1月25—31日','2027年2月14—20日','100—150元/天','2027寒假批次待核实'])assert.ok(jobs.includes(exact),'missing necessary disclosed detail '+exact);
+ for(const host of ['fenbi.com/page/exam-information-detail/470270481820672','career.hfbank.com.cn','shixiseng.com/intern/inn_bpbngqctny7q','shixiseng.com/intern/inn_2nsclxzsc0qp','shixiseng.com/intern/inn_mqy9upzdcjnd','sohu.com/a/972045060_121123843','jdjianli.com/campus/51040'])assert.ok(jobs.includes(host),'source '+host+' absent');
+ const segment=jobs.slice(jobs.indexOf("id:'hfbank-bj-2027winter-admin-support-20261105'"),jobs.indexOf("id:'zuoyebang-hz-2026-winter-teaching-assistant-archive'"));
+ assert.equal((segment.match(/status: "source-verify"/g)||[]).length,4,'3 bank roles plus Roys need disclosure of source limitations');
+ assert.equal((segment.match(/status: "platform-posting"/g)||[]).length,3,'3 TABS independent platform jobs must be distinguished from official direct apply');
+ assert.ok(!segment.includes('status: "open"'),'cannot invent live applications');
+ assert.ok(jobs.includes("'platform-posting'"),'status union and rendering must recognize platform jobs');
+ assert.ok(page.includes("job.status==='platform-posting'?'查看平台岗位（申请需核实）'"),'platform CTA must distinguish direct from unofficial');
+ assert.ok(page.includes("job.id==='roys-hz-2027winter-class-assistant-source-review'"),'Roys is a historical winter-related lead, not confirmed direct posting');
+ assert.ok(siteIndex.includes('for(const job of WINTER_2027_JOBS)'),'global search must continue indexing new concrete role records');
 });
