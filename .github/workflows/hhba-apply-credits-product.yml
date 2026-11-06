@@ -9,6 +9,7 @@ on:
       - 'apps/web/src/styles/apply-assistant-product.css'
       - 'apps/web/functions/api/apply/**'
       - 'apps/web/functions/_lib/apply-billing.js'
+      - 'apps/web/functions/_lib/apply-credit-ledger.js'
       - 'apps/web/d1/0009_apply_credits_orders.sql'
       - 'apps/web/scripts/apply-credits*'
       - 'apps/web/scripts/apply_credits_schema_test.py'
@@ -35,6 +36,7 @@ jobs:
         working-directory: apps/web
         run: |
           node --check 'functions/_lib/apply-billing.js'
+          node --check 'functions/_lib/apply-credit-ledger.js'
           node --check 'functions/api/apply/[[path]].js'
           node --test scripts/apply-credits.contract.test.mjs scripts/candidate-apply-assistant-workbench.contract.test.mjs
       - name: Verify the additive D1 schema with SQLite

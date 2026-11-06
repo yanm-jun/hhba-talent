@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {generateKeyPairSync} from 'node:crypto';
 import {onRequest} from '../functions/api/apply/[[path]].js';
+import {reserveSql,settleSql,reserveCredit,settleCredit} from '../functions/_lib/apply-credit-ledger.js';
 import {alipayConfigured,alipayCredentialsConfigured,amountFen,canonical,packagePriceFen,rsaSign,verifyAlipayNotification,tasksConfigured} from '../functions/_lib/apply-billing.js';
 
 const read=path=>readFileSync(new URL(path,import.meta.url),'utf8');
@@ -60,6 +61,13 @@ test('missing or invalid bearer tokens may never view account-specific orders',a
  const db={prepare(){return {bind(){return {first:async()=>null,run:async()=>({})}}}}};
  const res=await onRequest({request:new Request('https://hhba.work/api/apply/orders'),env:{HHBA_PNVS_AUTH_DB:db}});
  assert.equal(res.status,401);
+});
+test('trusted internal task operations validate IDs and guard a single-write reservation',async()=>{
+ assert.ok(reserveSql.startsWith('INSERT OR IGNORE INTO hhba_apply_tasks'));
+ assert.ok(reserveSql.includes('status IN (\'reserved\',\'completed\')'));
+ assert.ok(settleSql.includes("status='reserved'"));
+ assert.deepEqual(await reserveCredit({},'13800138000','not-a-uuid'),{ok:false,error:'INVALID_TASK_REQUEST'});
+ assert.deepEqual(await settleCredit({},'13800138000','not-a-uuid','completed'),{ok:false,error:'INVALID_TASK_REQUEST'});
 });
 test('product has no public model marketing, no fake purchase, and no fake submission',()=>{
  assert.ok(page.includes('网申，不必再'));

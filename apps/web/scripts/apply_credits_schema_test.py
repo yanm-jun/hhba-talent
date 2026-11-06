@@ -44,4 +44,30 @@ try:
       VALUES ('dup','13800138000',10,300,'paid','trade-1','2026-11-06T00:00:00Z')""")
     raise AssertionError('Duplicated provider transaction not rejected')
 except sqlite3.IntegrityError: pass
-print('HHBA apply credits: D1 schema, amount, paid gate, settlement and release PASS')
+
+# Actual reservation INSERT...SELECT is a single SQLite write with a balance
+# predicate; no read-then-write race or client-side credit decrement.
+reserve_sql = (
+ "INSERT OR IGNORE INTO hhba_apply_tasks(id,phone,status,created_at) "
+ "SELECT ?,?,'reserved',? WHERE "
+ "(SELECT COALESCE(SUM(package_uses),0) FROM hhba_apply_orders WHERE phone=? AND status='paid')>"
+ "(SELECT COUNT(*) FROM hhba_apply_tasks WHERE phone=? AND status IN ('reserved','completed'))"
+)
+for n in range(9):
+    task_id=f'guard-{n}'
+    result=connection.execute(reserve_sql,(task_id,'13800138000','2026-11-06T02:00:00Z',
+                                          '13800138000','13800138000'))
+    assert result.rowcount==1, (n, credits())
+assert credits()==(10,9,1,0)
+assert connection.execute(reserve_sql,('guard-extra','13800138000','2026-11-06T02:00:00Z',
+                                     '13800138000','13800138000')).rowcount==0
+assert connection.execute(reserve_sql,('guard-0','13800138000','2026-11-06T02:00:00Z',
+                                     '13800138000','13800138000')).rowcount==0
+assert credits()==(10,9,1,0)
+connection.execute("UPDATE hhba_apply_tasks SET status='released' WHERE id='guard-0' AND status='reserved'")
+assert credits()==(10,8,1,1)
+assert connection.execute(reserve_sql,('guard-extra','13800138000','2026-11-06T02:00:00Z',
+                                     '13800138000','13800138000')).rowcount==1
+assert credits()==(10,9,1,0)
+
+print('HHBA apply credits: D1 schema, amount, paid gate, atomic reservation and release PASS')

@@ -55,3 +55,6 @@ User handles CAPTCHA, declarations, attachments where needed, and final submissi
 
 ## QA and rollout
 Focused CI includes a payment signature test, fixed pricing tests, SQLite D1 constraints, front-end contract and TypeScript/Vite build. This is a draft-PR change; do not silently merge into main or deploy to hhba.work before acceptance.
+
+## Task quota core (internal, not enabled)
+An atomic SQLite INSERT-SELECT reserves a paid use only when one is available. The task ID is globally unique, so retries cannot reserve twice. A conditional update transitions reserved into completed (consumed) or released (returned) at most once. The browser receives no direct settlement interface. Before deployment, implement a trusted internal producer and audited task-expiration recovery.
