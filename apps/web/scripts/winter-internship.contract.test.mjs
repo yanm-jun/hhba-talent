@@ -248,7 +248,7 @@ test('batch10 adds three mainland employers with winter-origin truthfulness and 
 
 test('batch11 records 3 mainland employers, 7 separate jobs and real winter dates without inventing openings',()=>{
  const ids=[...jobs.matchAll(/\bid:['"]([a-z0-9-]+)['"]/g)].map(m=>m[1]);
- assert.equal(ids.length,58);
+ assert.equal(ids.length,62);
  assert.equal(new Set(ids).size,62);
  const cases=[
   'hfbank-bj-2027winter-admin-support-20261105',
