@@ -19,7 +19,7 @@ export const extensionAIConfigured=env=>aiConfigured(env)&&env?.HHBA_APPLY_EXTEN
 
 export function parseAIUsage(data){
  const source=data?.usage;
- if(!source||typeof source!=='object')return {promptTokens:0,cacheHitTokens:0,completionTokens:0,totalTokens:0,estimatedPeakMicroUsd:0,hasUsage:false};
+ if(!source||typeof source!=='object'||!Number.isSafeInteger(source.prompt_tokens)||source.prompt_tokens<0||!Number.isSafeInteger(source.completion_tokens)||source.completion_tokens<0)return {promptTokens:0,cacheHitTokens:0,completionTokens:0,totalTokens:0,estimatedPeakMicroUsd:0,hasUsage:false};
  const promptTokens=safeInt(source.prompt_tokens);
  const cacheHitTokens=Math.min(promptTokens,safeInt(source.prompt_cache_hit_tokens??source.prompt_tokens_details?.cached_tokens));
  const completionTokens=safeInt(source.completion_tokens);
@@ -92,18 +92,19 @@ export async function runAIFieldMap(env,input,fetchFn=fetch,waitFn=wait){
    if(raw.length>MAX_RESPONSE_BYTES)return {ok:false,error:'AI_PROVIDER_INVALID_RESPONSE',attempts};
    let data;
    try{data=JSON.parse(raw)}catch{return {ok:false,error:'AI_PROVIDER_INVALID_RESPONSE',attempts}}
+   const usage=parseAIUsage(data);
+   if(!usage.hasUsage)return {ok:false,error:'AI_PROVIDER_USAGE_MISSING',attempts};
    if(data.choices?.[0]?.finish_reason==='length'||data.choices?.[0]?.finish_reason==='content_filter')
-    return {ok:false,error:'AI_PROVIDER_INCOMPLETE',attempts};
+    return {ok:false,error:'AI_PROVIDER_INCOMPLETE',attempts,usage};
    const content=data.choices?.[0]?.message?.content;
    if(typeof content!=='string'||!content.trim()||content.length>10000)
-    return {ok:false,error:'AI_PROVIDER_INVALID_RESPONSE',attempts};
+    return {ok:false,error:'AI_PROVIDER_INVALID_RESPONSE',attempts,usage};
    let parsed;
-   try{parsed=JSON.parse(content)}catch{return {ok:false,error:'AI_PROVIDER_INVALID_RESPONSE',attempts}}
+   try{parsed=JSON.parse(content)}catch{return {ok:false,error:'AI_PROVIDER_INVALID_RESPONSE',attempts,usage}}
    if(!Array.isArray(parsed?.matches))
-    return {ok:false,error:'AI_PROVIDER_INVALID_RESPONSE',attempts};
+    return {ok:false,error:'AI_PROVIDER_INVALID_RESPONSE',attempts,usage};
    const validated=validateAIKeyMapRequest(input);
    const matches=filterAIKeyMatches(parsed,validated.profileKeys,validated.fields);
-   const usage=parseAIUsage(data);
    return {ok:true,matches,usage,attempts,model:AI_MODEL,
     notice:'AI 仅返回字段匹配建议；原始资料值仅保留在用户插件，未经确认不填写、不扣次。'};
   }catch(e){

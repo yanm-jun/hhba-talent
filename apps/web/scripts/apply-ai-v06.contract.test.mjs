@@ -112,9 +112,15 @@ test('network ambiguity and truncation fail closed without fabricated results',a
  const truncated=await runAIFieldMap(env,input,async()=>provider({finish_reason:'length'}));
  assert.equal(truncated.error,'AI_PROVIDER_INCOMPLETE');
  const malformed=await runAIFieldMap(env,input,async()=>new Response(JSON.stringify({
-  choices:[{finish_reason:'stop',message:{content:'NOT JSON'}}]
+  choices:[{finish_reason:'stop',message:{content:'NOT JSON'}}],
+  usage:{prompt_tokens:180,completion_tokens:10,total_tokens:190}
  }),{status:200}));
  assert.equal(malformed.error,'AI_PROVIDER_INVALID_RESPONSE');
+ assert.equal(malformed.usage.hasUsage,true);
+ const missing=await runAIFieldMap(env,input,async()=>new Response(JSON.stringify({
+  choices:[{finish_reason:'stop',message:{content:JSON.stringify({matches:[]})}}]
+ }),{status:200}));
+ assert.equal(missing.error,'AI_PROVIDER_USAGE_MISSING');
 });
 test('quota uses atomic D1 insert and only sanitized cost counters are persisted',async()=>{
  const statements=[];
