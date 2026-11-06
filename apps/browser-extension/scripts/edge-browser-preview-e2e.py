@@ -81,7 +81,7 @@ def main() -> None:
                             status, response = 400, {"ok": False, "error": "PAIR_CODE_INVALID"}
                         else:
                             response = {"ok": True, "token": DEVICE, "expiresAt": expires}
-                    elif path == "wallet" and req.method == "GET":
+                    elif path == "wallet" and req.method == "POST":
                         if headers.get("authorization") != "Bearer " + DEVICE:
                             status, response = 401, {"ok":False,"error":"EXTENSION_SESSION_INVALID"}
                         else:
