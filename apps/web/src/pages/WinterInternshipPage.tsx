@@ -17,12 +17,13 @@ const WINTER_GROUPS=['科技研发','先进制造','金融银行','审计咨询'
 function winterIndustryGroup(job:WinterJob):string{
  const value=job.industry.toLowerCase();
  if(/审计|咨询|会计|税务/.test(value))return '审计咨询';
+ if(/市场传播|媒介|广告/.test(value))return '市场传播';
  if(/金融科技|软件研发/.test(value))return '科技研发';
  if(/金融|银行|证券|财富|精算|私募|投资|财务|风险/.test(value))return '金融银行';
  if(/人力资源|人事|行政|法务|职能/.test(value))return '企业职能';
  if(/工业软件|制造|机械|家电|芯片|半导体|硬件/.test(value))return '先进制造';
  if(/人工智能|ai|算法|数据|软件|研发|科技|技术|智能/.test(value))return '科技研发';
- if(/营销|传播|公关|市场|零售|电商|媒体|游戏|美妆|奢侈/.test(value))return '市场传播';
+ if(/营销|传播|公关|市场|零售|电商|媒体|游戏|美妆|奢侈|销售|商务/.test(value))return '市场传播';
  if(/酒店|文旅|旅游|教育|教学|餐饮|培训/.test(value))return '教育文旅';
  return '其他方向';
 }
@@ -109,7 +110,7 @@ function WinterRoleRow({job}:{job:WinterJob}){
   </div>
   <div className="hhba-winter-role-actions">
    <Link to={'/winter-internship/'+job.id} className="hhba-winter-role-detail">岗位详情 <ArrowRight size={15}/></Link>
-   {url&&<a href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-role-apply">{job.status==='filled'?'查看已招满公告':job.status==='closed'?'查看已截止公告':job.status==='campus-limited'?'企业官网（非直投）':job.status==='source-verify'?'企业招聘首页（非直投）':'官网核实'} <ExternalLink size={14}/></a>}
+   {url&&<a href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-role-apply">{job.status==='filled'?'查看已招满公告':job.id==='bcg-china-pta-winter-spring-2027-closed'?'查看BCG官网（本批已截止）':job.status==='closed'?'查看已截止公告':job.id==='publicis-sh-alpha-pi-2027-jan-start'?'查看平台岗位（截止日冲突）':job.status==='campus-limited'?'企业官网（非直投）':job.status==='platform-posting'?'查看平台岗位（申请需核实）':job.id==='roys-hz-2027winter-class-assistant-source-review'?'查看招聘线索（非直投）':job.status==='source-verify'?'企业招聘首页（非直投）':'官网核实'} <ExternalLink size={14}/></a>}
    <small>核对：{job.checkedOn}</small>
   </div>
  </article>;
@@ -140,7 +141,7 @@ function WinterJobDetail({user,job}:{user:User|null;job:WinterJob}){
    {job.reviewWarning&&job.status!=='deadline-conflict'&&job.status!=='year-conflict'&&<p className="hhba-winter-warning" role="note">{job.reviewWarning}</p>}
    {job.evidenceUrl&&<a href={job.evidenceUrl} target="_blank" rel="noopener noreferrer" className="hhba-winter-source-link">{job.status==='campus-limited'?'查看高校公开职位与截止日':job.status==='source-verify'?'查看招聘平台原始记录':'查看补充招聘时间证据'} <ExternalLink size={15}/></a>}
    <h2>职位来源与申请核实</h2><p>本站整理有出处的公开职位和招聘批次信息；部分仅见于高校或第三方招聘平台。已过截止日或已被雇主宣布招满的岗位仅保留历史资料与官方公告链接，不代表可投递；企业招聘首页不等于具体岗位直投入口。HHBA 不代收申请材料，也不承诺名额或录取结果。</p>
-   {url&&<a href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-official">{job.status==='filled'?'查看雇主已招满岗位公告':job.status==='closed'?'查看雇主已截止岗位公告':job.status==='campus-limited'?'企业官网（非岗位直投）':job.status==='source-verify'?'企业招聘首页（非岗位直投）':'前往企业官方岗位核实及申请'} <ExternalLink size={16}/></a>}
+   {url&&<a href={url} target="_blank" rel="noopener noreferrer" className="hhba-winter-official">{job.status==='filled'?'查看雇主已招满岗位公告':job.id==='bcg-china-pta-winter-spring-2027-closed'?'前往BCG官方招聘首页（此批已截止）':job.status==='closed'?'查看雇主已截止岗位公告':job.id==='publicis-sh-alpha-pi-2027-jan-start'?'查看第三方招聘平台的独立岗位（截止日冲突）':job.status==='campus-limited'?'企业官网（非岗位直投）':job.status==='platform-posting'?'查看第三方招聘平台的独立岗位':job.id==='roys-hz-2027winter-class-assistant-source-review'?'查看2027招聘汇总（非寒假直投）':job.status==='source-verify'?'企业招聘首页（非岗位直投）':'前往企业官方岗位核实及申请'} <ExternalLink size={16}/></a>}
    <p className="hhba-winter-verified">资料核对日期：{job.checkedOn}。{job.statusNote}。</p>
   </section>
  </main></Shell>;
