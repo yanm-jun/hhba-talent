@@ -15,7 +15,8 @@
   "dependencies": {
     "lucide-react": "^0.468.0",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "pdfjs-dist": "6.5.438"
   },
   "devDependencies": {
     "@types/react": "19.3.0",
