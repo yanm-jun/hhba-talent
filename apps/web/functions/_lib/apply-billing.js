@@ -14,7 +14,7 @@ export const tasksConfigured=()=>false;
 
 function pemBytes(value){
  const encoded=String(value||'').replace(/-----BEGIN [^-]+-----/g,'').replace(/-----END [^-]+-----/g,'').replace(/\s+/g,'');
- if(!/^[A-Za-z0-9+/=]+$/.test(encoded)||encoded.length<500)throw Error('INVALID_PAYMENT_KEY');
+ if(!/^[A-Za-z0-9+/=]+$/.test(encoded)||encoded.length<200)throw Error('INVALID_PAYMENT_KEY');
  return Uint8Array.from(atob(encoded),x=>x.charCodeAt(0));
 }
 function base64(data){return btoa(String.fromCharCode(...new Uint8Array(data)))}
