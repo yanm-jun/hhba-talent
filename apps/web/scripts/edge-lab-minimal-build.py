@@ -13,7 +13,10 @@ from pathlib import Path
 
 WEB = Path(__file__).resolve().parents[1]
 ROOT = WEB / "dist"
-ROOT.mkdir(exist_ok=True)
+# Do not allow stale Vite/catalogue/admin files to leak into a test-only build.
+if ROOT.exists():
+    shutil.rmtree(ROOT)
+ROOT.mkdir(parents=True)
 (ROOT/"index.html").write_text(
     '<!doctype html><html lang="zh-CN"><head>'
     '<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
