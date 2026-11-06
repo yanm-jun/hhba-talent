@@ -36,7 +36,7 @@ async function stagingPublicKey(out){
  const key=Buffer.from(publicKey).toString('base64');
  // Only the *public* key is persisted. The generated private key is discarded;
  // this extension is for unpacked Preview testing, not store signing.
- await writeFile(path,key+'\\n',{flag:'wx'});
+ await writeFile(path,key+'\n',{flag:'wx'});
  return key;
 }
 export async function stagePreviewExtension(urlText,outputPath){
