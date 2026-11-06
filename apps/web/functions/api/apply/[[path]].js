@@ -4,7 +4,7 @@ import {getUserByPhone,sessionOfBearer} from '../../_lib/real-auth.js';
 import {APPLY_PACKAGES,packagePriceFen,alipayConfigured,alipayCredentialsConfigured,tasksConfigured,
  gatewayRequest,verifyAlipayNotification,amountFen} from '../../_lib/apply-billing.js';
 import {reconcileOrder,closeUnpaidOrder} from '../../_lib/apply-payment-reconciliation.js';
-import {aiConfigured,validateAISuggestionRequest,suggestSafeFields} from '../../_lib/apply-ai-suggest.js';
+import {aiConfigured,validateAISuggestionRequest,suggestSafeFields,validateAIKeyMapRequest,suggestAIFieldKeys} from '../../_lib/apply-ai-suggest.js';
 import {pairingConfigured,validExtensionOrigin,extensionCors,createPairCode,claimPairCode,extensionSession,revokeExtensions} from '../../_lib/apply-extension-pairing.js';
 
 const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
@@ -106,6 +106,27 @@ export async function onRequest({request,env}){
     if(user?.role!=='candidate')return wrap(err('CANDIDATE_REQUIRED',403));
     return wrap(json({ok:true,wallet:await wallet(db,ext.phone),expiresAt:ext.expires_at}));
    }catch{return wrap(err('ACCOUNT_DATABASE_NOT_CONNECTED',503))}
+  }
+  // V0.5: scoped AI label mapping; this never opens credit writes or returns
+  // personal profile values. Call budget is bounded by a single D1 SQL write.
+  if(method==='POST'&&path==='/extension/ai/map'){
+   if(!aiConfigured(env)||env.HHBA_APPLY_EXTENSION_AI_ENABLED!=='1')
+    return wrap(err('AI_NOT_ENABLED',503));
+   let user;
+   try{user=await getUserByPhone(db,ext.phone)}
+   catch{return wrap(err('ACCOUNT_DATABASE_NOT_CONNECTED',503))}
+   if(!user||user.role!=='candidate')return wrap(err('CANDIDATE_REQUIRED',403));
+   const body=await jsonBody(request,6000);
+   if(!validateAIKeyMapRequest(body))return wrap(err('INVALID_AI_REQUEST',400));
+   try{
+    const now=iso(),cutoff=new Date(Date.now()-3600000).toISOString();
+    const used=await db.prepare(
+     'INSERT INTO hhba_apply_ai_requests(id,phone,created_at) SELECT ?,?,? WHERE (SELECT COUNT(*) FROM hhba_apply_ai_requests WHERE phone=? AND created_at>=?)<3'
+    ).bind(crypto.randomUUID(),ext.phone,now,ext.phone,cutoff).run();
+    if(!used?.success||used?.meta?.changes!==1)return wrap(err('AI_RATE_LIMITED',429));
+    const advice=await suggestAIFieldKeys(env,body);
+    return wrap(advice.ok?json(advice):err(advice.error,502));
+   }catch{return wrap(err('AI_SERVICE_UNAVAILABLE',503))}
   }
   if(method==='POST'&&path==='/extension/disconnect'){
    try{

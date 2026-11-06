@@ -104,3 +104,31 @@ export function planFields(fields,profile){
    value,optionValue:option?option.value:null,eligible,checked:eligible,reason};
  });
 }
+
+// V0.5 local AI-key rehydration. AI sees labels and key names only; never
+// accepts generated applicant values. All original field safety rules remain
+// in force, and suggestions are UNCHECKED until the user opts in.
+export function planAIFieldSuggestions(fields,profile,matches){
+ const normalized=normalizeProfile(profile);
+ const lookup=new Map((fields||[]).map(f=>[f.id,f]));
+ const used=new Set(),out=[];
+ for(const hit of (Array.isArray(matches)?matches:[]).slice(0,30)){
+  const field=lookup.get(hit?.id),key=hit?.key;
+  if(!field||used.has(field.id)||!SAFE_KEYS.has(key)||!normalized[key])continue;
+  if(!Number.isFinite(hit.confidence)||hit.confidence<0.9||hit.confidence>1)continue;
+  if(field.excluded||field.value||!['text','textarea'].includes(field.kind))continue;
+  // Never override an already confidently identified local mapping.
+  if(classifyField(field))continue;
+  const label=[field.label,field.placeholder,field.name,field.idAttribute].join(' ');
+  if(EXCLUDED.test(label)||/(身份证|护照|背景调查|性别|生日|婚姻|个人身份|免责声明|验证码|保密协议)/i.test(label))continue;
+  const type=String(field.type||'text').toLowerCase();
+  if(['password','file','hidden','checkbox','radio','tel','email','number','date','month'].includes(type))continue;
+  const display=PROFILE_FIELDS.find(([id])=>id===key)?.[1];
+  const planned=planFields([{...field,label:display,placeholder:'',name:'',idAttribute:''}],normalized)[0];
+  if(!planned?.eligible||typeof planned.value!=='string')continue;
+  used.add(field.id);
+  out.push({...planned,label:field.label||field.placeholder||'未命名字段',key,checked:false,
+   reason:'AI 建议对应「'+display+'」；未勾选，需你核对后才可填入'});
+ }
+ return out;
+}

@@ -27,3 +27,11 @@ body{width:min(415px,100%)}@media(max-width:380px){.actions>*{flex:1}}
 .account-readonly span{font-size:12px;color:#617966}
 .account-readonly small{font-size:11px;color:#819486}
 #pair-code{padding:9px;font:inherit;font-size:13px;border:1px solid #d6e2d8;border-radius:8px;width:100%;letter-spacing:.1em;text-transform:uppercase}
+
+.ai-assist-panel{padding:12px;border:1px solid #dce9de;background:#f8fbf8;border-radius:10px;margin:12px 0;display:grid;gap:8px}
+.ai-assist-panel strong{font-size:12px;color:#356c4e}
+.ai-assist-panel strong small{font-size:10px;font-weight:500;color:#839485}
+.ai-assist-panel p{margin:0;font-size:11px;line-height:1.7;color:#647a69}
+.ai-consent{display:flex;gap:8px;align-items:flex-start;font-size:11px;color:#4a6755;line-height:1.6}
+.ai-consent input{margin-top:3px;flex:none;accent-color:#286648}
+#ai-map{justify-self:start;font-size:11px}

@@ -1,4 +1,4 @@
-import {PROFILE_FIELDS,normalizeProfile,validateProfile,exportProfile,planFields} from "./core.mjs";
+import {PROFILE_FIELDS,normalizeProfile,validateProfile,exportProfile,planFields,planAIFieldSuggestions} from "./core.mjs";
 import {HHBA_PERMISSION,EXTENSION_SESSION_KEY,accountApi,cleanPairCode,validDeviceSession} from "./account.mjs";
 const $=id=>document.getElementById(id);
 const STORAGE="hhba.apply.profile.v1";
@@ -126,6 +126,40 @@ $("quickfill").addEventListener("click",async()=>{
   status("已回读确认 "+result.filled+" 项，失败 "+result.failures+" 项；另有 "+(lastScan.manualWidgets?.length||0)+" 个自定义控件需手动处理。请在官网核对并提交，可撤销。");
  }catch(e){status(e?.message||"预填失败",true)}
  finally{$("quickfill").disabled=false}
+});
+$("ai-map").addEventListener("click",async()=>{
+ if(!$("ai-consent").checked)return status("请先确认本次 AI 字段分析的内容与授权范围。",true);
+ const session=await savedDeviceSession();
+ if(!session)return status("请先在「连接账户」中使用一次性连接码连接 HHBA。",true);
+ if(!$("ai-map").disabled){
+  $("ai-map").disabled=true;status("正在请求 AI 分析当前网页的非敏感字段标签…");
+  try{
+   const scan=await ask("HHBA_SCAN");
+   if(!scan?.ok)throw Error(scan?.error||"无法识别当前网页");
+   const local=planFields(scan.fields,profile);
+   // Never send a profile value. Unknown labels are untrusted; drop labels
+   // with email, long digits, identity, password, consent or legal text.
+   const sensitive=/(?:\d{6,}|@|https?:|www\.|身份证|证件|护照|验证码|密码|隐私|承诺|同意|授权|婚姻|健康|民族|宗教|政治|家庭|工资|薪酬|性别|出生|captcha|consent|agreement|salary|password)/i;
+   const fields=scan.fields.filter((f,i)=>!local[i]?.eligible&&!f.value&&!f.excluded&&
+    ['text','textarea'].includes(f.kind)&&typeof f.label==="string"&&f.label.trim()&&
+    f.label.length<=80&&!sensitive.test(f.label))
+    .slice(0,30).map(f=>({id:f.id,label:f.label,kind:f.kind}));
+   const profileKeys=PROFILE_FIELDS.map(([key])=>key).filter(key=>Boolean(profile[key]));
+   lastScan=scan;lastPlan=local;
+   if(!fields.length||!profileKeys.length){
+    renderPlans();status("没有适合 AI 分析的非敏感陌生字段，建议继续使用本地预填。");return;
+   }
+   const response=await accountApi(fetch,"/ai/map",session,{consentToExternalAi:true,profileKeys,fields});
+   const suggestions=planAIFieldSuggestions(scan.fields,profile,response.matches);
+   const byId=new Map(suggestions.map(x=>[x.id,x]));
+   lastPlan=local.map(p=>p.eligible?p:(byId.get(p.id)||p));
+   renderPlans();
+   status("AI 建议 "+suggestions.length+" 项，默认均未勾选。请逐项核对并确认填写；不会自动提交、收费或扣次。");
+  }catch(e){
+   const message=e?.message||"AI 字段识别暂时不可用";
+   status(message.includes("AI_NOT_ENABLED")?"AI 字段服务尚未正式开放。可继续使用免费的本地预填。":message,true);
+  }finally{$("ai-map").disabled=false}
+ }
 });
 $("fill").addEventListener("click",async()=>{
  if(!lastScan)return status("请先扫描当前页面。",true);

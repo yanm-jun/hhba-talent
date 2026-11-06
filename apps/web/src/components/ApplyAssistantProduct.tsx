@@ -9,7 +9,7 @@ const fallbackPackages=[{uses:10,amountFen:300},{uses:20,amountFen:600},{uses:50
 const money=(fen:number)=>'¥'+(fen/100).toFixed(2);
 const stateText:Record<ApplyOrder['status'],string>={pending:'等待支付',paid:'已到账',closed:'已关闭',refunded:'已退款'};
 const taskText:Record<ApplyTask['status'],string>={reserved:'处理中（预占1次）',completed:'已使用1次',released:'未扣次'};
-const archiveUrl=import.meta.env.BASE_URL+'downloads/hhba-apply-assistant-v0.4.zip';
+const archiveUrl=import.meta.env.BASE_URL+'downloads/hhba-apply-assistant-v0.5.zip';
 
 function AlipayPaymentQR({value}:{value:string}){
  const qr=useMemo(()=>{try{return qrcodegen.QrCode.encodeText(value,qrcodegen.QrCode.Ecc.MEDIUM)}catch{return null}},[value]);
@@ -220,8 +220,8 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
    {activeTab==='orders'?(orders.length?<div className="hhba-apply-records">{orders.map(o=><div key={o.id} className="hhba-apply-record-entry"><span><b>{o.uses} 次套餐</b><small>{o.createdAt.slice(0,10)} · {o.id.slice(0,8)}</small></span><span className="hhba-apply-record-right"><b>{money(o.amountFen)}</b><small>{stateText[o.status]}</small>{o.status==='paid'&&!refunds.some(x=>x.orderId===o.id)&&<button type="button" disabled={busy} onClick={()=>{setRefundOrder(o.id);setRefundReason('')}}>申请退款审核</button>}{refunds.some(x=>x.orderId===o.id)&&<small>退款审核：{refunds.find(x=>x.orderId===o.id)?.status==='requested'?'待审核':'处理中'}</small>}</span>{refundOrder===o.id&&<div className="hhba-apply-refund-form"><label>退款原因<textarea maxLength={300} value={refundReason} onChange={e=>setRefundReason(e.target.value)} placeholder="提交后进入人工审核，不会立即退款。"/></label><div><button type="button" onClick={()=>setRefundOrder(null)}>取消</button><button type="button" disabled={busy||refundReason.trim().length<2} onClick={()=>void submitRefund(o.id)}>提交审核申请</button></div></div>}</div>)}</div>:<p className="hhba-apply-empty">暂无真实购买订单。</p>):(tasks.length?<div className="hhba-apply-records">{tasks.map(t=><div key={t.id}><span><b>网申辅助填写任务</b><small>{t.createdAt.slice(0,10)} · {t.id.slice(0,8)}</small></span><small>{taskText[t.status]}</small></div>)}</div>:<p className="hhba-apply-empty">暂无真实网申任务记录。</p>)}
   </section>
   <details className="hhba-apply-faq"><summary>关于浏览器插件内测版和当前服务状态</summary>
-   <p>V0.4 可在当前网页一键预填高置信度字段，也保留预览、手动确认和撤销。不支持复杂招聘系统全程自动填写，尚未接入云端 AI 或购买次数，正式收费功能没有开放。</p>
-   <a href={archiveUrl} download="HHBA-智能网申助手-V0.4.zip">下载 V0.4 浏览器内测插件 <ArrowRight size={14}/></a>
+   <p>V0.5 可在当前网页一键预填高置信度字段，也保留预览、手动确认和撤销。不支持复杂招聘系统全程自动填写，已添加需单独同意、默认关闭的 AI 字段识别入口；尚未使用真实模型密钥，未接入购买次数扣费，正式收费功能没有开放。</p>
+   <a href={archiveUrl} download="HHBA-智能网申助手-V0.5.zip">下载 V0.5 浏览器内测插件 <ArrowRight size={14}/></a>
   </details>
   <p className="hhba-apply-footer"><BadgeCheck size={15}/>不代替企业决定录用，也不保证投递成功。收费、有效任务认定、失败退回、使用期限及退款规则将在正式开通前公开明确；必要的个人信息处理和 AI 服务告知将独立完成。</p>
  </section>;

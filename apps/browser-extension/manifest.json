@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "HHBA 智能网申助手",
-  "version": "0.4.0",
-  "description": "国内网申低风险字段一键预填、短期只读账户连接（需手动授权）、回读检查及撤销，不自动提交或收费。",
+  "version": "0.5.0",
+  "description": "低风险网申字段一键预填与撤销；手动连接 HHBA 后可明确授权 AI 字段分析，不自动提交或收费。",
   "permissions": [
     "activeTab",
     "scripting",

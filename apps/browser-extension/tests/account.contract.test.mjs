@@ -15,7 +15,7 @@ test('read-only browser token is separate from website login, expires and stays 
  assert.equal(validDeviceSession({...token,expiresAt:'2020-01-01T00:00:00Z'}),false);
  assert.equal(EXTENSION_SESSION_KEY,'hhba.apply.extension.session.v1');
  const manifest=JSON.parse(readFileSync(new URL('../manifest.json',import.meta.url),'utf8'));
- assert.equal(manifest.version,'0.4.0');
+ assert.equal(manifest.version,'0.5.0');
  assert.deepEqual(manifest.optional_host_permissions,[HHBA_PERMISSION]);
  assert.ok(!manifest.host_permissions);
 });

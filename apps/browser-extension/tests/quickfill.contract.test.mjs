@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
-test('V0.4 is still a least-privilege activeTab-only browser extension',()=>{
+test('V0.5 is still a least-privilege activeTab-only browser extension',()=>{
  const manifest=JSON.parse(read('manifest.json'));
- assert.equal(manifest.version,'0.4.0');
+ assert.equal(manifest.version,'0.5.0');
  assert.equal(manifest.manifest_version,3);
  assert.ok(manifest.permissions.includes('activeTab'));
  assert.ok(!manifest.host_permissions && !manifest.content_scripts);
@@ -22,7 +22,7 @@ test('one explicit user click initiates scan, strict plan, fill, readback and un
  assert.ok(!/fetch\s*\(/.test(js));
 });
 
-test('V0.4 never treats a dynamic ATS combobox as a simple text field',()=>{
+test('V0.5 never treats a dynamic ATS combobox as a simple text field',()=>{
  const agent=read('content.js');
  assert.ok(agent.includes('manualWidgets'));
  assert.ok(agent.includes('role')&&agent.includes('combobox'));

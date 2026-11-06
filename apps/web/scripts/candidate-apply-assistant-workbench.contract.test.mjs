@@ -21,10 +21,10 @@ test('new link routes to an installation guide and keeps privacy safety disclaim
  assert.ok(entry.includes('privacy|apply-assistant'));
  assert.ok(page.includes("current==='apply-assistant'"));
  assert.ok(page.includes('<ApplyAssistantProduct userId={user?.id}/>'));
- assert.ok(product.includes("BASE_URL+'downloads/hhba-apply-assistant-v0.4.zip'"));
+ assert.ok(product.includes("BASE_URL+'downloads/hhba-apply-assistant-v0.5.zip'"));
  assert.ok(product.includes('正式申请由你确认'));
  assert.ok(product.includes('尚未开展正式收费网申'));
- assert.ok(product.includes('V0.4'));
+ assert.ok(product.includes('V0.5'));
  assert.ok(product.includes('产品演示视频'));
  assert.ok(service.includes("'/api/apply'"));
 });
@@ -40,8 +40,8 @@ test('download archive is an actual ZIP containing extension sources',()=>{
  }
 });
 
-test('browser helper V0.4 download is a real ZIP with all install files',()=>{
- const zip=readFileSync(new URL('../public/downloads/hhba-apply-assistant-v0.4.zip',import.meta.url));
+test('browser helper V0.5 download is a real ZIP with all install files',()=>{
+ const zip=readFileSync(new URL('../public/downloads/hhba-apply-assistant-v0.5.zip',import.meta.url));
  assert.equal(zip.subarray(0,4).toString('hex'),'504b0304');
  for(const name of ['manifest.json','popup.html','popup.css','popup.js','core.mjs','content.js','account.mjs','README.md'])
   assert.ok(zip.includes(Buffer.from(name)),name);

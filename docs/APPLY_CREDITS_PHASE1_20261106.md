@@ -83,3 +83,13 @@ Pairing is not hardware attestation; a compromised device/session can leak a bea
 
 ## Synthetic ATS safety tests
 V0.4 reuses standard input/textarea/select matching but detects custom combobox controls (Ant Design, Element UI, Arco, Semi, ByteDance-like classes), refuses to write their underlying text input, and reports manual work. CI Chromium test uses only an authored synthetic fixture, never a live enterprise recruiting site. Real ATS adaptation requires explicit authorization and independent acceptance.
+
+## Phase 4/V0.5: AI-assisted field matching, pre-key dry-run
+**Still OFF in production**. The extension and Cloudflare handler now have a narrow optional `/api/apply/extension/ai/map` boundary authenticated by the separate short-lived extension session; origin must match the configured extension ID.
+The browser sends only candidate profile **field keys** (no values), unfilled non-sensitive HTML field **labels/kinds** and a one-request explicit AI consent boolean. The server rejects unknown JSON properties, oversized inputs, accidental personal values, sensitive labels and low-confidence model results. Only `{id,key,confidence}` is returned; the plugin rehydrates the actual value **locally**, applies existing profile-field and DOM safety restrictions, and always leaves suggestions **unchecked** pending the user's confirmation.
+The model is instructed to treat all web labels as untrusted data. Prompt injection in a recruitment webpage never grants spending, form submission or access to secrets.
+A single scoped database INSERT limits each account to three AI field mapping requests per rolling hour. Only the time and account identifier are stored, not raw labels or resume text.
+
+**Required for real AI activation later**: candidate explicit consent, a completed accurate third-party processor/privacy notice, reviewed stable extension ID and pairing infrastructure, Cloudflare Secrets for `HHBA_AI_API_KEY`, and separate environment opt-ins `HHBA_APPLY_AI_ENABLED=1`, `HHBA_AI_DISCLOSURE_APPROVED=1`, `HHBA_APPLY_EXTENSION_AI_ENABLED=1`. Never paste the key into a chat, GitHub branch or plugin.
+Model config validated against official DeepSeek 2026 API docs: `deepseek-flash`, non-thinking mode, JSON output. In the plugin user interface only HHBA AI branding appears; processor name must be given in formal privacy disclosure before go-live. Live inference cannot run without merchant-provided credentials.
+The prior paid-credit settlement path remains deliberately unconnected. V0.5 is AI FIELD IDENTIFICATION, not end-to-end web application or billed completed task.
