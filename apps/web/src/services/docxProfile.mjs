@@ -126,10 +126,12 @@ export function inferProfileFromText(text){
  };
  // Never invent unlabeled biography, education or employment. Extract only
  // sections literally present in the uploaded document, for user review.
- const groups=[['skills',/^(?:专业技能|技能特长|个人技能)[:：]?$/],2000],
-  ['experience',/^(?:工作经历|实习经历|工作实习经历)[:：]?$/],12000],
-  ['projects',/^(?:项目经历|项目经验)[:：]?$/],12000],
-  ['summary',/^(?:自我评价|个人简介|自我介绍)[:：]?$/],4000]];
+ const groups=[
+  ['skills',/^(?:专业技能|技能特长|个人技能)[:：]?$/,2000],
+  ['experience',/^(?:工作经历|实习经历|工作实习经历)[:：]?$/,12000],
+  ['projects',/^(?:项目经历|项目经验)[:：]?$/,12000],
+  ['summary',/^(?:自我评价|个人简介|自我介绍)[:：]?$/,4000]
+ ];
  for(let i=0;i<lines.length;i++){
   for(const [key,heading,limit] of groups){
    if(!heading.test(lines[i]))continue;
