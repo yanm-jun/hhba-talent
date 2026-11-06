@@ -6,7 +6,7 @@
 // This worker is NEVER a production HHBA component. Bind ONLY Preview PNVS D1.
 const LAB='https://hhba-edge-p0-lab.pages.dev';
 const EXT='chrome-extension://fjkcpgikachmfhajlghgekeicgbdagej';
-const RUN='p0-20261107-real-network-v1';
+const RUN='p0-20261107-real-network-v2';
 const FAKE_NAME='HHBA 内部虚构联调';
 const FAKE_SCHOOL='测试样例学院';
 const FAKE_MAIL='edge-lab@example.invalid';
@@ -23,9 +23,10 @@ async function request(path,{method='GET',origin,token,body}={}){
  if(token)headers.set('Authorization','Bearer '+token);
  if(body!==undefined)headers.set('Content-Type','application/json');
  const response=await fetch(LAB+'/api/apply'+path,{
-  method,headers,redirect:'error',cache:'no-store',
+  method,headers,redirect:'manual',cache:'no-store',
   ...(body!==undefined?{body:JSON.stringify(body)}:{})
  });
+ if(response.status>=300&&response.status<400)throw Object.assign(new Error('UNEXPECTED_REDIRECT'),{stage:'REMOTE_HTTP'});
  const text=await response.text();
  if(text.length>6000)throw Object.assign(new Error('OVERSIZE_RESPONSE'),{stage:'REMOTE_PARSE'});
  let json;
@@ -147,7 +148,7 @@ async function runProbe(db){
   stage('FINISH');
   return {status:'passed',lastStep:step,checks:stageCount};
  }catch(e){
-  return {status:'failed',lastStep:step,checks:stageCount,error:safe(e?.message)?e.message:'UNEXPECTED_RESPONSE'};
+  return {status:'failed',lastStep:step,checks:stageCount,error:safe(e?.message)};
  }finally{
   if(phone){
    // The phone/resume/session/code are synthetic. Only delete the exact owner.
