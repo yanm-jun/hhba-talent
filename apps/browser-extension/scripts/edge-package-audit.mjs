@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
+import {inflateSync} from 'node:zlib';
 import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
@@ -28,6 +29,17 @@ for(const size of icons){
  assert.equal(raw.readUInt32BE(20),size,'wrong PNG height '+rel);
  assert.equal(raw[24],8,'PNG must use 8-bit per channel');
  assert.equal(raw[25],6,'PNG must be RGBA');
+ let offset=8;const idat=[];
+ while(offset+12<=raw.length){
+  const len=raw.readUInt32BE(offset),type=raw.toString('ascii',offset+4,offset+8);
+  assert.ok(len>=0&&offset+12+len<=raw.length,'truncated PNG '+rel);
+  if(type==='IDAT')idat.push(raw.subarray(offset+8,offset+8+len));
+  offset+=12+len;
+  if(type==='IEND')break;
+ }
+ assert.ok(idat.length>0,'missing PNG image bytes '+rel);
+ const decoded=inflateSync(Buffer.concat(idat));
+ assert.equal(decoded.length,size*(1+size*4),'invalid decoded PNG data '+rel);
 }
 assert.equal(manifest.action.default_icon['16'],manifest.icons['16']);
 assert.equal(manifest.action.default_icon['32'],manifest.icons['32']);
