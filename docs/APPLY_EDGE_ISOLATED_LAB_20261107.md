@@ -36,3 +36,16 @@
 - 独立 Pages 项目的生产分支只是**实验项目内部**的发布分支，并非 HHBA 正式网站生产分支。
 - 新实验项目若不用，应单独清理（删除前先确认没有其他引用）；**不能**在结束测试时误删除主项目、正式 PNVS D1 或 Preview PNVS D1。
 - 尽量维持真实 App 的来源校验：即使测试域名，也不能让 `Origin` 缺失、任意扩展 ID 或网站 Cookie 获得设备资料。
+
+## 隔离过期密文清理 Worker：已部署与计划核验
+
+Cloudflare 账号中新增 **`hhba-edge-p0-lab-expiry-janitor`**，只用于实验室；从本分支的 `apps/web/workers/apply-profile-transfer-janitor.js` 与 `apps/web/functions/_lib/apply-profile-sync.js` 上传为 ESM Worker，公开 HTTP 路由始终返回 404。
+
+**2026-11-07 完成的配置核验：**
+- Worker 已部署并有正式 deployment 记录；`HHBA_PNVS_AUTH_DB` 是 **Preview PNVS D1** `8916eebc-c730-4597-8a6b-abe16cec1e40`，明确不同于生产 PNVS D1。
+- `HHBA_APPLY_CLEANUP_ENABLED=1` 只在此独立测试 Worker 中生效。原 Pages 的 Preview 和 Production Secret 均未修改。
+- Worker Cron Trigger 已创建，Cloudflare 返回 `*/15 * * * *`。即按 UTC 每 15 分钟运行其 `scheduled()` 事件。
+- 清理 SQL 只针对 `hhba_apply_profile_transfers`：`expires_at <= 当前时间 OR claimed_at IS NOT NULL`，不删除未过期且未领取的数据，不读取明文简历或 R2 文件。
+- 配置前核对 D1 Time Travel 恢复书签可获取、转移暂存表为零条；Worker 绑定和 Cron 再读取后均匹配。
+
+**验收边界：** 以上证明代码、部署、资源绑定和 Cron 配置生效；Cloudflare 的计划变更可能延迟传播，尚未在 Cron Events 中观察到第一次实际运行，不得宣称已经核验过真实定时触发的删除结果。上线正式网站前，仍必须为正式环境单独评估绑定、数据保留期限和权限；不能沿用实验室的 Preview D1 与测试密钥。
