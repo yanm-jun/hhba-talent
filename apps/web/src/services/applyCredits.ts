@@ -1,7 +1,7 @@
 import {getRealAuthToken,realAuthReady} from './realAuth';
 
 export type ApplyPackage={uses:number;amountFen:number};
-export type ApplyConfig={ok:boolean;packages:ApplyPackage[];paymentEnabled:boolean;tasksEnabled:boolean;pairingEnabled:boolean};
+export type ApplyConfig={ok:boolean;packages:ApplyPackage[];paymentEnabled:boolean;tasksEnabled:boolean;pairingEnabled:boolean;profileSyncEnabled?:boolean};
 export type ApplyWallet={purchased:number;consumed:number;reserved:number;available:number};
 export type ApplyOrder={id:string;uses:number;amountFen:number;status:'pending'|'paid'|'closed'|'refunded';createdAt:string;paidAt:string|null;qrCode?:string};
 export type ApplyTask={id:string;status:'reserved'|'completed'|'released';createdAt:string;finishedAt:string|null};
