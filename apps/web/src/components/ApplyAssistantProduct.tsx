@@ -10,27 +10,22 @@ const fallbackPackages=[{uses:10,amountFen:300},{uses:20,amountFen:600},{uses:50
 const money=(fen:number)=>'¥'+(fen/100).toFixed(2);
 const stateText:Record<ApplyOrder['status'],string>={pending:'等待支付',paid:'已到账',closed:'已关闭',refunded:'已退款'};
 const taskText:Record<ApplyTask['status'],string>={reserved:'处理中（预占1次）',completed:'已使用1次',released:'未扣次'};
-const archiveUrl=import.meta.env.BASE_URL+'downloads/hhba-apply-assistant-v0.5.zip';
 /**
- * Never render an unapproved download or arbitrary third-party link as an
- * official one-click extension install. Only accept exact store hosts and
- * extension-detail URLs with an actual 32-character Chromium extension ID.
+ * Official Microsoft Edge Add-ons listing only. Do not redirect to ZIP,
+ * Chrome Web Store, or unofficial mirrors. A stable Edge extension ID is
+ * provisioned only after review and publication.
  */
-function officialStoreUrl(raw:unknown,store:'chrome'|'edge'):string|null{
+function edgeStoreUrl(raw:unknown):string|null{
  if(typeof raw!=='string'||raw.length>350)return null;
  try{
   const url=new URL(raw);
-  const expected=store==='chrome'?'chromewebstore.google.com':'microsoftedge.microsoft.com';
-  const path=store==='chrome'
-   ? /^\/detail\/(?:[a-z0-9-]+\/)?[a-p]{32}\/?$/
-   : /^\/addons\/detail\/(?:[a-z0-9-]+\/)?[a-p]{32}\/?$/;
-  if(url.protocol!=='https:'||url.hostname!==expected||url.port||url.username||url.password||url.search||url.hash||!path.test(url.pathname))return null;
+  if(url.protocol!=='https:'||url.hostname!=='microsoftedge.microsoft.com'||
+   url.port||url.username||url.password||url.search||url.hash||
+   !/^\/addons\/detail\/(?:[a-z0-9-]+\/)?[a-p]{32}\/?$/.test(url.pathname))return null;
   return url.href;
  }catch{return null}
 }
-const chromeInstallUrl=officialStoreUrl(import.meta.env.VITE_HHBA_CHROME_WEB_STORE_URL,'chrome');
-const edgeInstallUrl=officialStoreUrl(import.meta.env.VITE_HHBA_EDGE_ADDONS_URL,'edge');
-
+const edgeInstallUrl=edgeStoreUrl(import.meta.env.VITE_HHBA_EDGE_ADDONS_URL);
 
 function AlipayPaymentQR({value}:{value:string}){
  const qr=useMemo(()=>{try{return qrcodegen.QrCode.encodeText(value,qrcodegen.QrCode.Ecc.MEDIUM)}catch{return null}},[value]);
@@ -163,18 +158,18 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
   </div>
   <section className="hhba-apply-install" id="hhba-apply-install" aria-label="安装 HHBA 浏览器插件">
    <div className="hhba-apply-headline"><div><h3>安装 HHBA 网申助手</h3>
-    <p>从浏览器官方扩展商店安装，无需解压 ZIP 或开启开发者模式。商店版本经审核并发布后才会显示可用的安装链接。</p>
+    <p>从 Microsoft Edge 官方扩展商店安装，无需解压 ZIP 或开启开发者模式。商店版本经审核并发布后才会显示可用的安装链接。</p>
    </div></div>
    <div className="hhba-apply-store-grid">
-    <div className="hhba-apply-store-option"><strong>Google Chrome</strong><span>Chrome 网上应用店</span>
-     {chromeInstallUrl?<a href={chromeInstallUrl} target="_blank" rel="noopener noreferrer">前往 Chrome 官方商店安装 <ArrowRight size={14}/></a>:
-      <button type="button" disabled>商店尚未发布</button>}</div>
-    <div className="hhba-apply-store-option"><strong>Microsoft Edge</strong><span>Microsoft Edge 加载项</span>
+    <div className="hhba-apply-store-option">
+     <strong>Microsoft Edge · Windows / macOS</strong>
+     <span>仅通过 Microsoft Edge 加载项官方商店发布；未经商店审核，不提供普通用户一键安装按钮。</span>
      {edgeInstallUrl?<a href={edgeInstallUrl} target="_blank" rel="noopener noreferrer">前往 Edge 官方商店安装 <ArrowRight size={14}/></a>:
-      <button type="button" disabled>商店尚未发布</button>}</div>
+      <button type="button" disabled>Edge 商店尚未发布</button>}
+    </div>
    </div>
    <div className="hhba-apply-onboarding-steps">
-    <div><b>01</b><span><strong>先安装插件</strong><small>等待官方商店审核发布后开放真实安装按钮</small></span></div>
+    <div><b>01</b><span><strong>先安装插件</strong><small>等待 Edge 官方商店审核发布后开放安装</small></span></div>
     <div><b>02</b><span><strong>使用 HHBA 现有账号</strong><small>无需再次注册；已登录用户可生成一次性连接码</small></span><a href="#hhba-apply-connect">连接账户</a></div>
     <div><b>03</b><span><strong>上传或管理简历</strong><small>前往私有简历库，选择 PDF/DOCX 并主动同意存储条款</small></span><Link to="/candidate/account/resume">我的简历 <ArrowRight size={13}/></Link></div>
    </div>
@@ -233,7 +228,7 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
   </section>
   <section className="hhba-apply-connect" aria-label="连接浏览器插件">
    <div className="hhba-apply-headline"><div><h3>连接 HHBA 浏览器插件</h3>
-    <p>登录 HHBA 后生成一次性连接码，再输入 Chrome / Edge 插件。插件只获得短期的次数查询权限，不会获得网站登录密码或令牌。</p>
+    <p>登录 HHBA 后生成一次性连接码，再输入 Edge 插件。插件只获得短期的次数查询权限，不会获得网站登录密码或令牌。</p>
    </div></div>
    <div className="hhba-apply-connect-grid">
     <div className="hhba-apply-connect-status"><LockKeyhole size={20}/>
@@ -263,8 +258,7 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
   </section>
   <details className="hhba-apply-faq"><summary>关于浏览器插件内测版和当前服务状态</summary>
    <p>V0.5 可在当前网页一键预填高置信度字段，也保留预览、手动确认和撤销。不支持复杂招聘系统全程自动填写，已添加需单独同意、默认关闭的 AI 字段识别入口；尚未使用真实模型密钥，未接入购买次数扣费，正式收费功能没有开放。</p>
-   <p>下方 ZIP 仅供开发者在隔离测试环境中手动安装，不是面向普通用户的一键安装，也不是商店审核通过的版本。</p>
-   <a href={archiveUrl} download="HHBA-智能网申助手-V0.5.zip">开发者内部测试：下载 V0.5 ZIP <ArrowRight size={14}/></a>
+   <p>仅发布 Microsoft Edge 官方商店审核通过的版本。开发者测试 ZIP 不在普通用户页面提供下载入口。</p>
   </details>
   <p className="hhba-apply-footer"><BadgeCheck size={15}/>不代替企业决定录用，也不保证投递成功。收费、有效任务认定、失败退回、使用期限及退款规则将在正式开通前公开明确；必要的个人信息处理和 AI 服务告知将独立完成。</p>
  </section>;
