@@ -47,15 +47,19 @@ async function runProbe(db){
    step,'CONFIG_NOT_ISOLATED');
 
   stage('SYNTHETIC_OWNER');
+  let candidatePhone=null;
   for(let i=0;i<6;i++){
    const attempt='19999'+String(crypto.getRandomValues(new Uint32Array(1))[0]%1000000).padStart(6,'0');
    const exists=await db.prepare('SELECT phone FROM hhba_auth_users WHERE phone=?').bind(attempt).first();
-   if(!exists){phone=attempt;break;}
+   if(!exists){candidatePhone=attempt;break;}
   }
-  check(!!phone,step,'UNABLE_TO_ALLOCATE_TEST_ID');
+  check(!!candidatePhone,step,'UNABLE_TO_ALLOCATE_TEST_ID');
   const token=randomHex(32),hash=await sha256(token),resume=crypto.randomUUID(),start=iso(st),expires=iso(st+12*60*1000);
+  // Only mark this identity as our own AFTER a successful INSERT. Even a
+  // race with a real Preview account must never make cleanup delete it.
   await db.prepare('INSERT INTO hhba_auth_users(phone,username,role,created_at) VALUES(?,?,?,?)')
-   .bind(phone,'edge_probe_'+randomHex(8),'candidate',start).run();
+   .bind(candidatePhone,'ep_'+randomHex(7),'candidate',start).run();
+  phone=candidatePhone;
   await db.prepare('INSERT INTO hhba_auth_sessions(token_hash,phone,created_at,expires_at) VALUES(?,?,?,?)')
    .bind(hash,phone,start,expires).run();
   await db.prepare('INSERT INTO hhba_candidate_resumes(id,phone,storage_key,filename,media_type,size_bytes,sha256,storage_consent_version,storage_consent_at,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)')
