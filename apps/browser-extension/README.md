@@ -1,13 +1,13 @@
-# HHBA 智能网申助手 · 国内优先的独立开发预览版
+# HHBA 智能网申助手 · Microsoft Edge 开发预览版
 
-**当前阶段：可在 Chrome / Edge 开发者模式安装的本地功能版（V0.5），尚未经过真实企业招聘官网的兼容性验收，也未发布浏览器扩展商店。**
+**当前阶段：Microsoft Edge（Windows 与 macOS）开发者内测 V0.5；尚未通过 Edge 官方商店审核，也未完成真实企业 ATS 兼容性验收。用户仅应通过未来的 Edge 官方商店安装正式版。**
 
 本目录为 HHBA 独立实现，不包含其他项目的直接复制代码；参考了国内招聘表单相关开源项目的产品思路，并保留各第三方项目的独立许可证要求。
 
 ## 立即试用
 
 1. 下载本目录，保持 manifest.json、popup.html、popup.css、popup.js、core.mjs、content.js 在同一目录。
-2. Chrome 地址栏打开 chrome://extensions 或 Edge 打开 edge://extensions。
+2. 仅在 Edge 地址栏打开 edge://extensions（开发者隔离测试，不面向普通用户）。
 3. 开启开发者模式，选择「加载已解压的扩展程序」，选择本目录。
 4. 点击扩展，进入「我的求职档案」，手动录入并保存资料，或导入从 HHBA 网站导出的 JSON 档案。
 5. 打开一个具有标准 HTML input/textarea/select 的**真实**招聘申请网页，在扩展点击「识别当前表单」。
@@ -27,10 +27,10 @@
 
 暂未实现 / 未验收：
 - PDF、DOCX 的无人工核对、全自动结构化解析：目前并不支持。网站端已开发文字型 PDF/DOCX 本地文字提取建议，需用户逐项核对后以一次性授权方式同步；扫描版 PDF 暂不支持 OCR。
-- 真正安全的 HHBA 云端登录同步及受保护的 DeepSeek 代理。
+- 云端账户与结构化资料同步已完成受限接口开发，但未在稳定 Edge 扩展 ID + Preview Secrets 下进行真实账号端到端联调；受保护 DeepSeek 代理仍需独立验收。
 - 跨域 iframe、Ant Design/Element UI 复杂弹层、Shadow DOM、添加多段经历、自动跨页面续填。
 - 北森、Moka、飞书招聘、牛客等真实系统端到端兼容性（需合规测试账户和真实样本）。
-- Chrome Web Store 发布、企业大规模部署、生产级渗透/隐私审计。
+- Microsoft Edge Add-ons 官方发布、Windows/macOS Edge 实机验收、企业大规模部署、生产级渗透/隐私审计。
 
 ## 安全边界
 
@@ -54,7 +54,7 @@
 - 字段列表增加网页定位操作，方便用户处理未识别字段。
 - 不开放用户自行配置 API Key 的商业模式。后续平台 DeepSeek 密钥应当只存服务端。
 
-- 在支持 Chrome / Edge Side Panel 的浏览器上，可从弹窗主动切换到侧边栏；不支持时回退普通弹窗。字段识别仍需用户主动点击。
+- 在支持 Side Panel 的 Microsoft Edge 上，可从弹窗主动切换到侧边栏；不支持时回退普通弹窗。字段识别仍需用户主动点击。
 
 ## V0.5 一键预填（仍为本地内测）
 - 用户点击「一键预填安全字段」时才在当前标签页执行扫描、规则匹配、填写与回读。
@@ -87,3 +87,12 @@
 - 插件「连接账户」提供独立复选框与「领取一次性同步资料」按钮，若本地已有资料先明确提示覆盖，再本地保存；不会传输原始简历、不调用 DeepSeek、不扣除次数、不自动提交网申。
 - 需要 Preview D1 `0014_apply_profile_sync.sql` 与 `HHBA_APPLY_PROFILE_TRANSFER_KEY` 的独立加密密钥；未配置则拒绝操作，正式站默认仍未上线。
 - 为保护隐私，暂存密文有有效期与主动撤销渠道；过期密文的**定期物理清理**尚未实现，正式上线前必须配置清理任务与明确保留周期。
+
+## Edge 商店上架口径（P0 待验收）
+- 唯一发布平台：Microsoft Edge Add-ons；支持 Windows/macOS 的 Edge，不提交 Google Chrome 商店或 Safari。
+- Edge 基于 Chromium，内部 `chrome.*` 扩展 API 与 `chrome-extension://` 来源标识是标准技术名称，**不表示产品发布到 Chrome 商店**。
+- 面向普通用户的 ZIP 下载入口已从网站「一键网申」页面移除；仅保留开发者 CI 中的审查 ZIP，不宣传已审核或一键安装。
+- Manifest 只要求 `activeTab`、`scripting`、`storage`、`sidePanel`。对 HHBA 官网的访问为 `optional_host_permissions`，仅用户主动配对时请求。不能扩大成所有招聘网站的持久访问权限。
+- 用户已存在的 PDF/DOCX 只在网站端经过授权、本地提取及人工核对后才能同步结构化字段；无权获取原始 R2 文件，也不读取网站密码或 Cookie。
+- 证书和身份环境尚未就绪：`HHBA_APPLY_EXTENSION_ID` 必须是通过 Edge 审核或可证明来源的稳定扩展 ID，配对 pepper 与资料同步 AES 密钥须只通过 Cloudflare 受控 Secret 设置。**默认关闭**。
+- 还需提交真实商店图标、清晰的功能截图、支持渠道、开发者身份、完整隐私政策与测试说明；当前 CI ZIP 仅是技术审查件。
