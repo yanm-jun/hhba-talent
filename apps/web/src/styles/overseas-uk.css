@@ -1,0 +1,17 @@
+/* HHBA UK page, reuses existing overseas editorial components without changing other countries. */
+.hhba-overseas-uk .hhba-uk-hero{min-height:320px;position:relative;background-size:cover;background-position:center}
+.hhba-overseas-uk .hhba-uk-hero h1{color:#fff}
+.hhba-overseas-uk .hhba-uk-hero .hhba-overseas-kiwi{opacity:.17}
+.hhba-uk-photo-credit{display:inline-flex!important;align-items:center;gap:5px;color:#f7f9fa!important;background:#163247b5;border-radius:6px;padding:6px 9px;font-size:10px;line-height:1.5;text-decoration:none;margin-top:15px}
+.hhba-uk-photo-credit:hover{text-decoration:underline}
+.hhba-overseas-uk .hhba-overseas-path-icon{background:#e8eff7;color:#315779}
+.hhba-overseas-uk .hhba-overseas-path-main{color:#8f5c45!important}
+.hhba-overseas-uk .hhba-overseas-path-card:hover{border-color:#bbcadb}
+.hhba-overseas-uk .hhba-overseas-country-summary span{background:#ffffff1c}
+.hhba-overseas-uk .hhba-overseas-reader-closed{padding:11px 15px;border-left:3px solid #a84f4f;background:#fff2ed;color:#813e35;border-radius:2px}
+.hhba-overseas-uk .hhba-overseas-closed{font-size:11px;line-height:1.6;color:#923d33;background:#fff0e9;padding:4px 8px;border-radius:5px}
+@media(max-width:760px){
+ .hhba-overseas-uk .hhba-uk-hero{min-height:340px;background-position:57% center;padding:26px}
+ .hhba-uk-photo-credit{font-size:9px}
+ .hhba-overseas-uk .hhba-overseas-country-summary{gap:7px}
+}
