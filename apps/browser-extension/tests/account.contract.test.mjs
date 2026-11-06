@@ -65,7 +65,7 @@ test('P0 shortcuts open HHBA first-party workspace; never read login tokens or a
 test('P0 extension displays first-party privacy policy without silently consenting',()=>{
  const html=readFileSync(new URL('../popup.html',import.meta.url),'utf8');
  assert.ok(html.includes('https://hhba.work/apply-extension-privacy.html'));
- assert.ok(html.includes('PDF 的可靠自动解析仍待验收'));
+ assert.ok(html.includes('扫描版 PDF 暂不支持 OCR'));
  assert.ok(!html.includes('checked="checked"'));
 });
 
