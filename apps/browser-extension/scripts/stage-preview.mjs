@@ -39,7 +39,7 @@ async function stagingPublicKey(out){
  await writeFile(path,key+'\n',{flag:'wx'});
  return key;
 }
-export async function stagePreviewExtension(urlText,outputPath){
+export async function stagePreviewExtension(urlText,outputPath,{ciPreapprovedHost=false}={}){
  const site=checkedPreviewOrigin(urlText),out=resolve(outputPath);
  if(out===sourceRoot||out.startsWith(sourceRoot+sep))throw Error('不能覆盖官方 Edge 插件源码');
  await mkdir(join(out,'icons'),{recursive:true});
@@ -65,16 +65,23 @@ export async function stagePreviewExtension(urlText,outputPath){
  manifest.name='HHBA 智能网申助手（隔离预览测试）';
  manifest.description='仅用于 HHBA Preview 测试：验证已配对账户的结构化资料同步和网页预填；不得上传 Edge 商店。';
  manifest.optional_host_permissions=[site+'/*'];
+ if(ciPreapprovedHost){
+  // TEST HARNESS ONLY: Playwright's headless Chromium has no UI for the
+  // browser-level optional host permission prompt. Pre-grant the synthetic
+  // Preview host solely for CI, never in the manually staged or store build.
+  manifest.host_permissions=[site+'/*'];
+  manifest.optional_host_permissions=[];
+ }
  const devKey=await stagingPublicKey(out);
  manifest.key=devKey;
  const extensionId=extensionIdFromPublicKey(devKey);
  await writeFile(join(out,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
- await writeFile(join(out,'REVIEW_ONLY.txt'),`HHBA Preview testing ONLY. Not for Edge Add-ons submission.\nAPI: ${site}\nDevelopment Edge extension ID: ${extensionId}\nThis ID belongs only to this local, unpacked Preview test extension. Store ID will be different.\nUse only isolated Preview secrets and synthetic accounts. Never share live candidate data.\n`);
+ await writeFile(join(out,'REVIEW_ONLY.txt'),`HHBA Preview testing ONLY. Not for Edge Add-ons submission.\nAPI: ${site}\nDevelopment Edge extension ID: ${extensionId}\nThis ID belongs only to this local, unpacked Preview test extension. Store ID will be different.\nCI pre-approved host permission: ${ciPreapprovedHost ? 'YES - never distribute this test package' : 'NO'}.\nUse only isolated Preview secrets and synthetic accounts. Never share live candidate data.\n`);
  return {origin:site,output:out,extensionId};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  if(process.argv.length!==4){console.error('Usage: node scripts/stage-preview.mjs https://<preview>.hhba-talent.pages.dev /absolute/output-directory');process.exitCode=2;}
- else stagePreviewExtension(process.argv[2],process.argv[3])
+ else stagePreviewExtension(process.argv[2],process.argv[3],{ciPreapprovedHost:process.env.HHBA_CI_PREAPPROVE_HOST==='1'})
   .then(x=>console.log('Created isolated Edge preview test extension: '+x.output))
   .catch(e=>{console.error(String(e.message));process.exitCode=1;});
 }
