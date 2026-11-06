@@ -9,7 +9,7 @@ import '../styles/apply-resume-sync.css';
 const large=new Set(['skills','experience','projects','summary']);
 const limit:Record<string,number>={fullName:80,phone:40,email:160,school:180,major:150,education:50,degree:50,
  enrollment:20,graduation:20,city:100,skills:2000,experience:12000,projects:12000,summary:4000};
-export function ApplyResumeSync(){
+export function ApplyResumeSync({enabled}:{enabled:boolean}){
  const [files,setFiles]=useState<PrivateResume[]>([]);
  const [selected,setSelected]=useState('');
  const [profile,setProfile]=useState<Record<string,string>>(()=>cleanProfile({}));
@@ -58,7 +58,7 @@ export function ApplyResumeSync(){
   setReviewed(false);setConsent(false);setValidUntil('');
  }
  async function send(){
-  if(!selectedFile||!reviewed||!consent||busy)return;
+  if(!enabled||!selectedFile||!reviewed||!consent||busy)return;
   setBusy(true);setError('');setMessage('');
   try{
    const result=await prepareApplyProfileSync(selectedFile.id,profile,true);
@@ -82,6 +82,7 @@ export function ApplyResumeSync(){
   <div className="hhba-apply-headline"><div><h3>从已上传的简历同步到插件</h3>
    <p>无需下载 JSON：从你的 HHBA 私有简历库选文件，在本机提取并核对资料，主动授权一次性同步给已连接的插件。</p>
   </div><FileCheck2 size={20}/></div>
+  {!enabled&&<p className="hhba-apply-sync-note">账号资料安全同步服务尚未完成部署配置。本页可以本地预览，但暂不能生成插件领取任务，不会传输个人信息。</p>}
   {!privateResumeAvailable?<p className="hhba-apply-sync-note">当前预览环境未连接真实简历接口，不能执行同步。</p>:
    loading?<p className="hhba-apply-sync-note">正在检查你的私有简历…</p>:files.length===0?<p className="hhba-apply-sync-note">尚未保存 PDF/DOCX 简历。请先到 <Link to="/candidate/account/resume">我的简历</Link> 上传，授权私有存储后再返回本页。</p>:<>
    <div className="hhba-apply-sync-select">
@@ -106,7 +107,7 @@ export function ApplyResumeSync(){
       <span>我明确同意本次将<strong>上方已核对的结构化求职资料</strong>加密暂存最多 5 分钟，交给我本人已连接的 HHBA 插件一次性读取并保存到本机。不发送原始 PDF/DOCX，不发送给第三方 AI，也不自动投递。</span></label>
     </div>
     <div className="hhba-apply-sync-actions">
-     <button type="button" disabled={!reviewed||!consent||busy||!Object.values(profile).some(Boolean)} onClick={()=>void send()}>
+     <button type="button" disabled={!enabled||!reviewed||!consent||busy||!Object.values(profile).some(Boolean)} onClick={()=>void send()}>
       <LockKeyhole size={15}/> {busy?'正在创建…':'确认并发送给已连接插件'}</button>
      {validUntil&&<button type="button" className="secondary" disabled={busy} onClick={()=>void revoke()}>撤销待领取资料</button>}
     </div>
