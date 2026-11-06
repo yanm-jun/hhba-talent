@@ -29,3 +29,8 @@
 - Chrome Web Store: https://developer.chrome.com/docs/webstore
 - Chrome 权限/隐私申报: https://developer.chrome.com/docs/webstore/cws-dashboard-privacy
 - Edge 发布流程: https://learn.microsoft.com/en-us/microsoft-edge/extensions/publish/publish-extension
+
+## 2026-11-07 CI 验收与独立预览
+- PR #272 最新一轮 CI：`verify-commerce-foundations`、`verify-browser-extension` 均通过（含 TypeScript/Vite 构建、ZIP 完整性、Chromium 合成表单检查）。
+- 已在 Cloudflare Pages 的 custom Preview 白名单中**仅追加**本开发分支，原有 35 条允许分支全部保留，`main` 仍为生产部署分支。此变更仅允许该开发分支触发预览，不代表生产发布。
+- 以下推送用于触发本分支的 Preview 构建；预览成功与在线访问仍需按 Cloudflare 部署记录核验。
