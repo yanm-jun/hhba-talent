@@ -124,7 +124,10 @@ export function planAIFieldSuggestions(fields,profile,matches){
   const type=String(field.type||'text').toLowerCase();
   if(['password','file','hidden','checkbox','radio','tel','email','number','date','month'].includes(type))continue;
   const display=PROFILE_FIELDS.find(([id])=>id===key)?.[1];
-  const planned=planFields([{...field,label:display,placeholder:'',name:'',idAttribute:''}],normalized)[0];
+  // "工作或实习经历" is a human-friendly caption, not an exact RULES label.
+  // Canonicalize the local test label only; the UI still shows the real field.
+  const safeRuleLabel=key==='experience'?'工作经历':display;
+  const planned=planFields([{...field,label:safeRuleLabel,placeholder:'',name:'',idAttribute:''}],normalized)[0];
   if(!planned?.eligible||typeof planned.value!=='string')continue;
   used.add(field.id);
   out.push({...planned,label:field.label||field.placeholder||'未命名字段',key,checked:false,
