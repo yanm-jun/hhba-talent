@@ -51,9 +51,9 @@ test('unsupported or malicious input fails closed',async()=>{
  assert.equal(p.phone,'');
  assert.equal(p.education,'');
 });
-test('website processing cannot claim PDF support and requires explicit review',()=>{
+test('website PDF and DOCX preview preserve verified-field consent',()=>{
  const ui=readFileSync(new URL('../src/components/ApplyResumeSync.tsx',import.meta.url),'utf8');
- assert.ok(ui.includes('PDF 自动提取尚未通过安全和准确性验收'));
+ assert.ok(ui.includes('await extractPdfText(bytes)'));
  assert.ok(ui.includes('fetchPrivateResumeForLocalReview'));
  assert.ok(ui.includes('extractDocxText(bytes)'));
  assert.ok(ui.includes('checked={reviewed}')&&ui.includes('checked={consent}'));
