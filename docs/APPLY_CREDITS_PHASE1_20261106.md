@@ -93,3 +93,44 @@ A single scoped database INSERT limits each account to three AI field mapping re
 **Required for real AI activation later**: candidate explicit consent, a completed accurate third-party processor/privacy notice, reviewed stable extension ID and pairing infrastructure, Cloudflare Secrets for `HHBA_AI_API_KEY`, and separate environment opt-ins `HHBA_APPLY_AI_ENABLED=1`, `HHBA_AI_DISCLOSURE_APPROVED=1`, `HHBA_APPLY_EXTENSION_AI_ENABLED=1`. Never paste the key into a chat, GitHub branch or plugin.
 Model config validated against official DeepSeek 2026 API docs: `deepseek-flash`, non-thinking mode, JSON output. In the plugin user interface only HHBA AI branding appears; processor name must be given in formal privacy disclosure before go-live. Live inference cannot run without merchant-provided credentials.
 The prior paid-credit settlement path remains deliberately unconnected. V0.5 is AI FIELD IDENTIFICATION, not end-to-end web application or billed completed task.
+
+
+## V0.6 — authenticated DeepSeek Flash inference prelaunch
+
+Scope: refine the existing Cloudflare Pages Function /api/apply/extension/ai/map. Do not rebuild the site, replace Cloudflare, or activate billing.
+
+### Verified provider contract
+- Official DeepSeek API: POST https://api.deepseek.com/chat/completions
+- Model: deepseek-flash, thinking.type=disabled, response_format.type=json_object, max_tokens=500, no streaming.
+- Source: https://api-docs.deepseek.com/api/create-chat-completion/
+- The server accepts only an explicit per-request consent, the exact allowlisted Chrome extension origin and a separate short-lived extension token.
+- Only field labels and permitted local profile KEY NAMES travel to the model. Names, contact details, full CVs, website credentials and values stay on the user's device.
+- The response includes only vetted {id,key,confidence}. The browser rehydrates values locally and requires checkbox confirmation. No automatic submit, no billing use consumed.
+
+### Error policy
+- One short retry on HTTP 429/5xx (maximum two attempts) with a shared 10-second timeout. No retry of 400/401/402/422, network ambiguity or timeout.
+- Never surface raw model errors (which might include the user's input or secret). Keep http status and safe fixed error codes only.
+- Fail closed on invalid JSON, truncated output, untrusted model keys or unapproved fields.
+- Absent API key and flags -> return unavailable; do not attempt a live call.
+
+### D1 AI cost audit
+- Additive migration: apps/web/d1/0013_apply_ai_usage_audit.sql (not applied to production).
+- Store user account key, request ID, status, model, attempts, token usage, duration and sanitized error code; never persist prompts, response bodies or CV data.
+- Per-user hourly quota: 3; initial absolute global cap: 100 per UTC day. Enforced atomically at request reservation.
+- Estimated upper-bound *USD microdollars*, NOT actual billed expense. Based on published peak reference rates for Flash (2026-11-07): cache-miss input $0.30/1M, cache-hit input $0.006/1M, output $1.20/1M; update dynamically if DeepSeek changes pricing, and use actual provider invoices for accounting.
+- A 200-token prompt with 50 cached tokens plus 40 generated tokens: approx 94 microdollars (under the peak-rate estimator).
+- Browser gets no cost/usage metadata from provider beyond accepted matches; candidate dashboard may show own summaries.
+
+### Cloudflare deployment prerequisites
+Cloudflare Pages project hhba-talent was inspected on 2026-11-07. Neither preview nor production has the HHBA_AI_API_KEY variable name configured at this point. It must be added by the owner as a **Secret** for a restricted TEST/preview environment, not pasted into chat or committed to GitHub.
+
+Other existing guarded flags:
+- HHBA_APPLY_PAIRING_ENABLED=1
+- HHBA_APPLY_EXTENSION_ID=<stable reviewed Chrome extension id>
+- HHBA_APPLY_PAIRING_PEPPER=<long private secret>
+- HHBA_APPLY_AI_ENABLED=1
+- HHBA_AI_DISCLOSURE_APPROVED=1 only after the privacy policy accurately identifies the external processor and data categories
+- HHBA_APPLY_EXTENSION_AI_ENABLED=1
+- HHBA_AI_API_KEY=<secret only>
+
+The only live integration test will be an authorized synthetic request from the restricted browser connection. A real provider call, D1 migration or source-code deployment must not be claimed complete before verified.
