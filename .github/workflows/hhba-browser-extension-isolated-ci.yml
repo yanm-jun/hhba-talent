@@ -1,0 +1,52 @@
+name: HHBA Browser Extension Isolated Validation
+on:
+  pull_request:
+    paths:
+      - "apps/browser-extension/**"
+      - ".github/workflows/hhba-browser-extension-isolated-ci.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  extension-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate extension permissions and manifest
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const m = JSON.parse(fs.readFileSync('apps/browser-extension/manifest.json','utf8'));
+          if (m.manifest_version !== 3 || m.host_permissions?.length) throw Error('Unexpected manifest or permanent site permissions');
+          const allowed = ['activeTab','scripting','storage','sidePanel'];
+          if (!m.permissions?.every(p=>allowed.includes(p))) throw Error('Unreviewed permission');
+          if (m.background || m.content_scripts) throw Error('Unexpected background injection');
+          console.log('Extension least-privilege manifest OK');
+          NODE
+      - name: Validate source syntax and matching rules
+        run: |
+          node --check apps/browser-extension/core.mjs
+          node --check apps/browser-extension/content.js
+          node --check apps/browser-extension/popup.js
+          node --test apps/browser-extension/tests/core.test.mjs
+      - name: Package unpacked extension (review artifact only)
+        run: |
+          cd apps/browser-extension
+          zip -q /tmp/HHBA-Apply-Assistant-V0.2-Review.zip manifest.json core.mjs content.js popup.html popup.css popup.js
+          unzip -t /tmp/HHBA-Apply-Assistant-V0.2-Review.zip
+      - name: Validate synthetic browser form interactions
+        run: |
+          python3 -m pip install --quiet --disable-pip-version-check 'playwright>=1.55,<2'
+          python3 -m playwright install --with-deps chromium
+          timeout 90s python3 -u apps/browser-extension/tests/browser_e2e.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hhba-apply-assistant-v0-2-review
+          path: /tmp/HHBA-Apply-Assistant-V0.2-Review.zip
+          if-no-files-found: warn
+          retention-days: 7
