@@ -42,7 +42,7 @@ with sync_playwright() as p:
     page.screenshot(path='/tmp/hhba-winter-directory-desktop.png',full_page=False)
     # Dataset and grouping checks are independent of source order; new batches
     # must not break test navigation due to pagination reordering.
-    assert '51 条公开岗位及招聘批次结果' in page.locator('.hhba-winter-list-summary').inner_text()
+    assert '58 条公开岗位及招聘批次结果' in page.locator('.hhba-winter-list-summary').inner_text()
     assert page.locator('.hhba-winter-role-group-title').count()>=1
     assert page.get_by_label('按行业分组筛选寒假岗位').count()==1
 
@@ -158,6 +158,40 @@ with sync_playwright() as p:
     assert page.locator('[data-winter-job="alpha2-sh-winter-quant-strategy-source-check-2026"]').count()==1
     reset()
 
+    # Batch11: independent bank, research and education winter leads.
+    for term,ident,linktext,linkhost in [
+        ('恒丰银行','hfbank-bj-2027winter-admin-support-20261105','企业招聘首页（非岗位直投）','career.hfbank.com.cn'),
+        ('TABS','tabs-sh-2027winter-engineering-assistant-20270125','查看第三方招聘平台的独立岗位','shixiseng.com/intern/inn_bpbngqctny7q'),
+        ('TABS','tabs-sh-2027winter-biochemistry-assistant-20270125','查看第三方招聘平台的独立岗位','shixiseng.com/intern/inn_2nsclxzsc0qp'),
+        ('TABS','tabs-sz-2027winter-biomed-assistant-20270214','查看第三方招聘平台的独立岗位','shixiseng.com/intern/inn_mqy9upzdcjnd'),
+        ('乐亦思','roys-hz-2027winter-class-assistant-source-review','查看2027招聘汇总（非寒假直投）','jdjianli.com/campus/51040')
+    ]:
+        search(term)
+        assert page.locator(f'[data-winter-job="{ident}"]').count()==1,ident
+        page.locator(f'[data-winter-job="{ident}"]').get_by_role('link',name='岗位详情').click()
+        assert ident in page.url
+        assert linkhost in page.get_by_role('link',name=linktext).get_attribute('href')
+        assert page.locator('.hhba-winter-warning').count()>0,'winter evidence limits must appear'
+        page.get_by_role('link',name='返回寒假实习岗位列表').click()
+    reset()
+    search('恒丰银行')
+    assert page.locator('[data-winter-job]').count()==3,'3 distinct bank roles in one 6-person announcement'
+    search('TABS')
+    assert page.locator('[data-winter-job]').count()==3,'3 independently published 2027 winter project roles'
+    search('乐亦思')
+    assert page.locator('[data-winter-job]').count()==1,'one Roys winter lead, not full-time teaching jobs'
+    reset()
+    page.get_by_label('按地区筛选寒假岗位').select_option('中国内地')
+    page.get_by_label('按行业分组筛选寒假岗位').select_option('教育文旅')
+    search('TABS')
+    assert page.locator('[data-winter-job]').count()==3
+    reset()
+    page.get_by_label('按地区筛选寒假岗位').select_option('中国内地')
+    page.get_by_label('按行业分组筛选寒假岗位').select_option('金融银行')
+    search('恒丰')
+    assert page.locator('[data-winter-job]').count()==3
+    reset()
+
     # Key legacy official jobs continue to have source-backed detail routes.
     for term,jobid in [
         ('HSBC','hsbc-hk-student-placement-1367003857'),
@@ -178,7 +212,7 @@ with sync_playwright() as p:
     assert page.locator('[data-winter-job]').count()==10
     for number in range(5):
         page.get_by_role('button',name='下一页').click()
-    assert page.locator('[data-winter-job]').count()==1, '51 independent records = five full pages and one final record'
+    assert page.locator('[data-winter-job]').count()==8, '58 independent records = five full pages and eight final records'
     page.get_by_role('button',name='上一页').click()
     assert page.locator('[data-winter-job]').count()==10
     reset()
