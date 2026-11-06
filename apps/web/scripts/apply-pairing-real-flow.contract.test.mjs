@@ -137,7 +137,7 @@ test('full real onRequest flow: website login -> pair code -> Edge redeem -> wal
  const dev={token:redeemed.token,expiresAt:redeemed.expiresAt};
  const realApiFetch=async(url,opts)=>{
   assert.equal(url,'https://hhba.work/api/apply/extension/wallet');
-  const req=responseFor('/extension/wallet','GET',dev.token,null,EXT_ORIGIN);
+  const req=responseFor('/extension/wallet','POST',dev.token,null,EXT_ORIGIN);
   return onRequest({request:req,env});
  };
  const deviceWallet=await accountApi(realApiFetch,'/wallet',dev);
@@ -163,7 +163,7 @@ test('full real onRequest flow: website login -> pair code -> Edge redeem -> wal
  const revoked=await dispatch(env,'/pair/revoke','POST',site);
  assert.equal(revoked.status,200);
  assert.equal(mock.peek(),null);
- assert.equal((await dispatch(env,'/extension/wallet','GET',dev.token,null,EXT_ORIGIN)).status,401,'revoked device cannot read');
+ assert.equal((await dispatch(env,'/extension/wallet','POST',dev.token,null,EXT_ORIGIN)).status,401,'revoked device cannot read');
  assert.equal((await dispatch(env,'/profile-transfer/prepare','POST',site,form)).status,409,'no active paired devices');
  assert.equal(mock.ops.filter(x=>/INSERT INTO hhba_apply_orders|UPDATE hhba_apply_orders|INSERT INTO hhba_apply_tasks/.test(x)).length,0,'sync never charges users');
 });
