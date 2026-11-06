@@ -36,7 +36,7 @@
 ```sql
 SELECT run_id,status,last_step,checks,error_code,cleanup_verified,started_at,finished_at
 FROM hhba_apply_lab_e2e_runs
-WHERE run_id='p0-20261107-real-network-v1';
+WHERE run_id='p0-20261107-real-network-v2';
 ```
 
 只有 `status='passed'` **且** `cleanup_verified=1` 才可认为本次真实 HTTPS 协议与合成数据清理均通过。读取完成后，**必须撤销探测 Worker 的 Cron Trigger**，不要修改实验室现有独立过期密文清理 Worker 的 15 分钟计划。
@@ -44,3 +44,19 @@ WHERE run_id='p0-20261107-real-network-v1';
 ## 依赖关系
 
 代码仍由 #272 → #273 → #274 → #275 → #276 → #277 → #278 → #279 顺序待验收；本轮未修改 `main`、hhba.work 或 Microsoft Partner Center 发布状态。
+
+## 真实部署最终验收记录（2026-11-07）
+
+**首次真实执行 v1：** `status=failed`，`last_step=CONFIG`，`checks=1`，`cleanup_verified=1`；发现 Cloudflare Workers 的 `fetch()` 不支持 `redirect:'error'`。该错误发生在网络请求发出前，未创建用户/简历。修复为 `redirect:'manual'` 并主动拒绝 3xx，同时修复只允许静态枚举错误码写入审计，历史错误代码经明确核验收敛为 `UNSUPPORTED_WORKER_REDIRECT`（保持原始失败状态不变）。
+
+**第二次真实执行 v2：**
+- Run ID：`p0-20261107-real-network-v2`
+- `status='passed'`，`last_step='FINISH'`，`checks=15`
+- `error_code=NULL`，`cleanup_verified=1`
+- Cloudflare D1 的审计时间：`2026-11-06T20:28:59.976Z` 至 `2026-11-06T20:29:11.057Z`
+- 复核隔离 Preview D1：本次以 `ep_` 标识的虚构用户为 **0 条**；`synthetic-edge-probe/` 简历元数据为 **0 条**；对应登录会话为 **0 条**；通过审计为 **1 条**。
+- 通过后**立即删除一次性探测 Worker `hhba-edge-p0-lab-once-probe` 的所有 Cron 调度**：GET `/schedules` 返回 `[]`，不会持续每分钟探测或新建测试账号。原实验室专用的 15 分钟过期密文清理 Worker 是不同的服务，仍保持独立运行。
+- 实际调用的是公网部署的 HHBA 独立实验室 Pages Functions，完成真实网站登录会话验证、随机一次性配对码签发/兑换、受限设备余额、资料授权、AES 加密暂存、一次性取出、重放拒绝及撤销。
+- 没有使用真实求职者账号、短信、支付宝、DeepSeek 或 R2 原始简历。生产 D1、正式 Pages 项目、`main` 和 hhba.work 均未改动。
+
+**判定：** 本次 Edge 账户/结构化资料同步的**真实网络协议**已完成端到端验收，可以从协议排错转入实机 UX 验收；不等价于正式 Edge 商店审核通过或 Windows/macOS 实机人工测试。
