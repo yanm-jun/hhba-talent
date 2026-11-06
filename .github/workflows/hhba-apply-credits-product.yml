@@ -20,6 +20,7 @@ on:
       - 'apps/web/src/services/pdfProfile.mjs'
       - 'apps/web/src/services/pdfProfile.d.mts'
       - 'apps/web/scripts/apply-pdf-local.contract.test.mjs'
+      - 'apps/web/scripts/pdf-browser-e2e.py'
       - 'apps/web/src/services/docxProfile.mjs'
       - 'apps/web/src/services/docxProfile.d.mts'
       - 'apps/web/src/components/ApplyResumeSync.tsx'
@@ -106,6 +107,12 @@ jobs:
         run: |
           python3 -m pip install --quiet --disable-pip-version-check 'playwright>=1.55,<2'
           python3 -m playwright install --with-deps chromium
+      - name: Install locked web packages for real Chromium PDF.js worker acceptance
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Verify real Chromium and Vite local PDF worker
+        working-directory: apps/web
+        run: timeout 95s python3 -u scripts/pdf-browser-e2e.py
       - name: Verify synthetic recruitment page fill, events, sensitive-field skips, undo
         working-directory: apps/browser-extension
         run: timeout 90s python3 -u tests/browser_e2e.py
