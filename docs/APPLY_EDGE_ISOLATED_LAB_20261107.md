@@ -6,7 +6,7 @@
 
 - 项目域名：`https://hhba-edge-p0-lab.pages.dev`（仅用于联调；**非正式 HHBA 网站**）。
 - 这个独立项目使用开发分支 `feature/apply-edge-isolated-live-lab-20261107` 作为**自身**发布分支；**没有**将 `yanm-jun/hhba-talent` 的 `main` 改为别的分支，也没有修改 hhba.work。
-- 静态构建沿用已有 `cloudflare-pages-build.py`，额外运行 `edge-lab-noindex.py`，在页面明确标示「内部联调环境，请勿提交真实简历」，输出 `robots.txt` 和 `X-Robots-Tag: noindex`。
+- 实验项目最小化构建使用 `edge-lab-minimal-build.py && edge-lab-noindex.py`，**仅**生成内部警告首页、插件隐私说明、robots、noindex headers 和 Pages Functions `/api/apply/*` 路由白名单；不在实验域名发布完整 HHBA 主页、招聘目录、管理员页面或其他 API。**原 HHBA Pages 仍使用完整既有构建，不受改动。**
 - **数据库仅绑定现有 Preview PNVS D1**，未引用生产 D1 ID；其他 D1/R2 不配置，避免访问正式简历/指标/支付。
 - 新项目只设置本次配对所需的独立随机 Secret（配对 pepper、AES-256-GCM 密钥），无支付宝、短信、DeepSeek 秘钥；付款和付费任务默认关闭。**不要将 Secret 明文写入文档、代码、CI、日志或截图。**
 - 固定开发扩展 Origin 使用 `chrome-extension://fjkcpgikachmfhajlghgekeicgbdagej`，仅为**测试**；源于 `tests/fixtures/edge-lab-public-key.b64` 的公钥，私钥从未保存或发布；不等于 Microsoft Edge Add-ons 审核后的正式商店 ID。
