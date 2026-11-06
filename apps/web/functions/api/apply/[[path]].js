@@ -111,7 +111,7 @@ export async function onRequest({request,env}){
     return wrap(claim.ok?json(claim):err(claim.error,claim.status));
    }catch{return wrap(err('PROFILE_TRANSFER_UNAVAILABLE',503))}
   }
-  if(method==='GET'&&path==='/extension/wallet'){
+  if(method==='POST'&&path==='/extension/wallet'){
    try{
     const user=await getUserByPhone(db,ext.phone);
     if(user?.role!=='candidate')return wrap(err('CANDIDATE_REQUIRED',403));
