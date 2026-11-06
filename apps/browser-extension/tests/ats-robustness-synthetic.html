@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>HHBA 复杂招聘网申合成表单 · 不属于任何真实企业</title>
+<style>
+body{font:15px/1.5 Arial,"Microsoft YaHei",sans-serif;max-width:800px;margin:25px auto}
+label{display:block;margin:10px 0}
+input,select,textarea{margin:4px;padding:6px;min-height:20px}
+[hidden]{display:none!important}
+</style></head><body>
+<h1>HHBA ATS 复杂场景 · 合成测试专用</h1>
+<p>该页面只用于自动化浏览器测试，不代表任何招聘平台或真实企业。</p>
+<form id="candidate" onsubmit="window.submitCount++; return false">
+<label for="name">姓名</label><input id="name" name="candidateName" autocomplete="name">
+<label for="email">电子邮箱</label><input id="email" type="email" autocomplete="email">
+<label for="phone">手机号</label><input id="phone" type="tel" autocomplete="tel">
+<label for="education">最高学历</label><select id="education" name="education">
+<option value="">请选择</option><option value="bachelor">本科</option><option value="nonfull">非全日制本科</option><option value="master">硕士</option>
+</select>
+<label for="date">毕业日期</label><input id="date" type="date" name="graduation">
+<label for="month">入学年月</label><input id="month" type="month" name="enrollment">
+<label for="summary">个人简介</label><textarea id="summary" name="summary"></textarea>
+<label for="major-short">所学专业（2 字限制）</label><input id="major-short" name="major" maxlength="2">
+<label for="age">年龄（数字控件，不应自动填写）</label><input id="age" type="number" name="age">
+<label for="salary">期望薪资（数字控件）</label><input id="salary" type="range" name="salary">
+<label for="date-time">面试时间（复杂时间控件）</label><input id="date-time" type="datetime-local" name="interview">
+<label for="verify">短信验证码</label><input id="verify" name="otp" autocomplete="one-time-code">
+<label for="otp-unlabeled">验证码类 autocomplete（无明显标签）</label><input id="otp-unlabeled" name="opaque_slot" autocomplete="one-time-code">
+<label for="password">密码</label><input id="password" type="password" name="password">
+<label for="identity">身份证号码</label><input id="identity" type="text" name="document_identity">
+<label for="existing">电子邮箱</label><input id="existing" type="email" name="backup_email" value="existing@example.invalid">
+<label for="read-only">姓名</label><input id="read-only" name="readonly" readonly>
+<label for="disabled">毕业院校</label><input id="disabled" name="disabled" disabled>
+<label for="mutable">毕业院校</label><input id="mutable" name="school">
+<label for="mutable-options">最高学历</label><select id="mutable-options" name="education2">
+<option value="">请选择</option><option value="b">本科</option><option value="m">硕士</option>
+</select>
+<label for="promoted">所学专业</label><input id="promoted" name="major_bak">
+<div class="ant-form-item"><label>最高学历 · 动态下拉</label>
+<div class="ant-select" role="combobox"><input id="dynamic" role="combobox" name="dynamic_select"></div></div>
+<div hidden><label for="hidden-form">姓名</label><input id="hidden-form" name="secret"></div>
+<input id="system-hidden" type="hidden" name="system-secret">
+<input id="file" type="file" name="resume">
+<button id="submit" type="submit">仅用于模拟检测，绝不可自动提交</button>
+</form>
+<iframe id="frame" srcdoc="<form><label>姓名<input id='iframe-name' name='person'></label></form>"></iframe>
+<script>
+window.formEvents=[];
+window.submitCount=0;
+document.querySelectorAll('input,select,textarea').forEach(el=>{
+ el.addEventListener('input',()=>window.formEvents.push('input:'+el.id));
+ el.addEventListener('change',()=>window.formEvents.push('change:'+el.id));
+});
+</script>
+</body></html>
