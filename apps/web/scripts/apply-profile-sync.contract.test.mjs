@@ -68,7 +68,7 @@ test('prepared profile stored as ciphertext and may be claimed once by same pair
  const db=dbMock();
  const issued=await prepareProfileTransfer(db,env,phoneA,input,now);
  assert.equal(issued.ok,true);
- assert.equal(issued.fieldsWithValue,7);
+ assert.equal(issued.fieldsWithValue,8);
  assert.equal(issued.expiresAt,new Date(now+300000).toISOString());
  const persisted=db.snapshot();
  assert.ok(!persisted.cipher_hex.includes('示例候选人'));
