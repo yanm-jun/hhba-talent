@@ -18,7 +18,7 @@ export type WinterJob={
 };
 export const WINTER_2027_JOBS:ReadonlyArray<WinterJob>=[
 {
-  id: "haier-qd-vision-algorithm-intern-20261104",
+  id:"haier-qd-vision-algorithm-intern-20261104",
   company: "海尔集团",
   english: "Haier Group",
   title: "视觉算法实习生（工业智能柔性技术方向）",
@@ -62,7 +62,7 @@ export const WINTER_2027_JOBS:ReadonlyArray<WinterJob>=[
   reviewWarning: "这是企业官网发布的日常实习岗位；2027年寒假是否接受到岗尚未得到雇主确认。不要据此宣传「已开放2027寒假招聘」。"
 },
 {
-  id: "hisense-qd-hr-intern-j44475",
+  id:"hisense-qd-hr-intern-j44475",
   company: "海信集团",
   english: "Hisense Group",
   title: "人力资源管理实习生（J44475）",
@@ -106,7 +106,7 @@ export const WINTER_2027_JOBS:ReadonlyArray<WinterJob>=[
   reviewWarning: "这是一条独立实习岗位，不是寒假专项招聘公告。若2027寒假无法满足企业到岗要求，不应认定为可投递的寒假机会。"
 },
 {
-  id: "boe-bj-2027-software-intern-j54754",
+  id:"boe-bj-2027-software-intern-j54754",
   company: "京东方",
   english: "BOE Technology Group",
   title: "2027实习生·软件开发实习生（J54754）",
