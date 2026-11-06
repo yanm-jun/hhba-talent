@@ -4,6 +4,8 @@ on:
     branches: [main]
     paths:
       - 'apps/web/scripts/edge-lab-live-smoke.py'
+      - 'apps/web/workers/apply-edge-lab-live-network-probe.js'
+      - 'apps/web/scripts/apply-edge-live-network-probe.contract.test.mjs'
       - 'apps/web/scripts/edge-lab-noindex.py'
       - 'apps/web/scripts/edge-lab-minimal-build.py'
       - 'apps/web/workers/apply-profile-transfer-janitor.js'
@@ -31,6 +33,11 @@ jobs:
       - name: Check scheduled privacy cleanup code contract
         working-directory: apps/web
         run: node --test scripts/apply-profile-janitor.contract.test.mjs
+      - name: Check scheduled one-shot live network probe before isolated deployment
+        working-directory: apps/web
+        run: |
+          node --check workers/apply-edge-lab-live-network-probe.js
+          node --test scripts/apply-edge-live-network-probe.contract.test.mjs
       - name: Verify lab build exposes only the intended static files and apply routes
         working-directory: apps/web
         run: |
