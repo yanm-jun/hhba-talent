@@ -254,6 +254,36 @@ $("pair-disconnect").addEventListener("click",async()=>{
 void refreshAccount();
 
 
+// Explicit one-use profile import. No raw PDF/DOCX bytes leave the website.
+// A previously paired HHBA device is restricted to the same authenticated
+// account; import into this extension's local profile only after a user click.
+$("profile-sync-claim").addEventListener("click",async()=>{
+ if(!$("profile-sync-consent").checked)return status("请先确认本次结构化资料同步授权。",true);
+ const button=$("profile-sync-claim");
+ if(button.disabled)return;
+ button.disabled=true;
+ try{
+  const device=await savedDeviceSession();
+  if(!device)throw Error("请先完成 HHBA 账户连接。");
+  const original=await chrome.storage.local.get(STORAGE);
+  if(Object.values(normalizeProfile(original[STORAGE])).some(Boolean)&&
+   !confirm("领取后将替换插件中当前保存的本地求职档案。确定继续吗？"))return;
+  const data=await accountApi(fetch,"/profile/claim",device);
+  const checked=validateProfile(data.profile);
+  await storeProfile(checked);
+  lastScan=null;lastPlan=[];$("plan").replaceChildren();
+  $("fill").classList.add("hidden");
+  toggle("profile");
+  status("已同步 "+Object.values(checked).filter(Boolean).length+" 项已确认资料到本机。请再核对后使用。");
+ }catch(e){
+  const raw=e?.message||"资料同步暂不可用";
+  status(raw.includes("PROFILE_TRANSFER_NOT_READY")?"网站端尚未准备同步资料，或已过期/领取，请重新生成。":raw,true);
+ }finally{
+  $("profile-sync-consent").checked=false;
+  button.disabled=false;
+ }
+});
+
 // User-triggered navigation only. No website login token or resume content is
 // transferred to the extension merely by opening the user's HHBA workspace.
 $("open-hhba-account").addEventListener("click",()=>{
