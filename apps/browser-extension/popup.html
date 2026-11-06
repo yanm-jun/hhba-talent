@@ -1,0 +1,11 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HHBA 智能网申助手</title><link rel="stylesheet" href="popup.css"></head>
+<body><main class="app"><header><div class="brand"><span class="brand-icon">H</span><div><strong>HHBA 智能网申助手</strong><small>认真准备一次，轻松申请更多机会。</small></div></div><span class="version">内测 V0.2</span></header>
+<nav aria-label="功能切换"><button id="tab-fill" class="tab active" data-view="fill" aria-selected="true">当前网页</button><button id="tab-profile" class="tab" data-view="profile" aria-selected="false">我的求职档案</button></nav>
+<section id="view-fill" class="view"><div id="site" class="site">请打开企业官方招聘申请表。</div><div class="pricing"><strong>¥0.30 <small>/ 完整网申任务</small></strong><span>正式版目标定价 · 当前内测不收费</span></div><div class="intro"><strong>填写由你决定</strong><p>仅识别当前页面，不自动投递、不上传附件。未知或敏感字段会留给你亲自处理。</p></div>
+<div class="actions"><button id="scan" class="primary">识别当前表单</button><button id="undo" class="secondary">撤销本次填写</button><button id="sidepanel" class="secondary" type="button">在侧边栏查看</button></div>
+<div id="counts" class="counts hidden"></div><div id="plan" class="plan" aria-live="polite"></div>
+<button id="fill" class="primary hidden">确认并填写已勾选项目</button><div id="results" class="results" aria-live="polite"></div></section>
+<section id="view-profile" class="view hidden"><p class="help">资料只保存在这个浏览器扩展中，不会自动同步到招聘网站。填写前务必核对真实性。</p>
+<form id="profile-form"><div id="profile-fields"></div><div class="actions"><button type="submit" class="primary">保存求职档案</button><button type="button" class="danger" id="clear">清除本地档案</button></div></form>
+<div class="actions"><label class="filepick">导入 HHBA 档案<input id="import" type="file" accept=".json,application/json"></label><button class="secondary" id="export">导出档案</button></div><p class="help">支持 HHBA JSON 档案文件。PDF/DOCX 请先通过可用的简历解析服务转换并确认，当前插件不假装已经解析。</p></section>
+<p id="status" class="status" role="status" aria-live="polite"></p><footer>仅辅助填写 · 最终核对与提交由本人完成</footer></main><script type="module" src="popup.js"></script></body></html>
