@@ -7,7 +7,7 @@ import {countryOptions} from '../services/jobSearchFacets.mjs';
 import {safeOfficialJobUrl} from '../services/liveRecruitment';
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,type PrivateResume} from '../services/privateResumes';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
+import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,checkMatchProviderConnection,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const educationNames:Record<string,string>={HIGH_SCHOOL:'高中',ASSOCIATE:'专科',BACHELOR:'本科',MASTER:'硕士',PHD:'博士'};
@@ -74,6 +74,8 @@ export function CandidateMatchPage({user}:{user:User|null}){
  const [options,setOptions]=useState<MatchOptions>({country:'',remote_only:false,role_hint:'',limit:10});
  const [working,setWorking]=useState(false);
  const [error,setError]=useState('');
+ const [providerCheckBusy,setProviderCheckBusy]=useState(false);
+ const [providerCheckMessage,setProviderCheckMessage]=useState('');
  const [result,setResult]=useState<MatchResponse|null>(null);
  const controller=useRef<AbortController|null>(null);
  useEffect(()=>{
@@ -137,7 +139,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
  }
  async function run(){
   if((!file&&!savedId)||!consent||working||previewBusy||availability!=='ready'||!getRealAuthToken())return;
-  setWorking(true);setError('');setResult(null);
+  setWorking(true);setError('');setProviderCheckMessage('');setResult(null);
   const abort=new AbortController();
   controller.current=abort;
   try{
@@ -232,7 +234,20 @@ export function CandidateMatchPage({user}:{user:User|null}){
           <span>我同意 HHBA 提取简历文本，尽可能隐藏邮箱、电话等直接标识信息后，将文本发送给第三方 DeepSeek 进行能力分析。自动脱敏可能不完整，我已自行检查简历是否包含不愿提供的信息。原始简历不保存到本 AI 匹配服务，也不会自动发布或投递。</span>
         </label>
         <p className="hhba-ai-notice"><ShieldCheck size={15}/> 本功能仅供已登录的求职者使用。简历原件在当前浏览器读取，最多取前 2 万字文字分析；分析需单独同意，结果仅在本次页面中展示，不会自动公开或向企业投递。</p>
-        {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
+        {error&&<div>
+          <p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>
+          {availability==='ready'&&getRealAuthToken()&&
+           <div className="hhba-ai-review-tools">
+            <button type="button" disabled={providerCheckBusy||working}
+             onClick={()=>{setProviderCheckBusy(true);setProviderCheckMessage('');
+              void checkMatchProviderConnection().then(setProviderCheckMessage)
+               .catch(e=>setProviderCheckMessage(e instanceof Error?e.message:'检测失败，请稍后重试。'))
+               .finally(()=>setProviderCheckBusy(false));}}>
+              {providerCheckBusy?'正在检查 AI 服务…':'检测 AI 密钥及余额（不消耗匹配次数）'}
+            </button>
+            {providerCheckMessage&&<p role="status">{providerCheckMessage}</p>}
+           </div>}
+        </div>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
           disabled={(!file&&!savedId)||!consent||working||previewBusy||(previewLoaded&&previewText.replace(/\s/g,'').length<30)||availability!=='ready'||!getRealAuthToken()}>
           {working?<><LoaderCircle className="spin" size={18}/> 正在提取简历并匹配岗位…</>:

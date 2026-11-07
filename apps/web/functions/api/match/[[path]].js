@@ -146,6 +146,34 @@ export async function onRequest({request,env}){
   return json({kind:KIND,enabled:active&&await quotaReady(env),
    formats:['pdf','docx'],per_account_daily_limit:2,global_daily_limit:60});
  }
+
+ // Preview-only diagnostic: candidate authentication, no tokens or resume sent,
+ // no model-generation cost or quota deduction. Never reveal balance amounts.
+ if(tail==='/provider-check'&&request.method==='GET'){
+  if(env.HHBA_AUTH_ROLLOUT!=='preview'||!enabled(env))return fail('NOT_FOUND',404);
+  try{
+   const session=await sessionOfBearer(env.HHBA_PNVS_AUTH_DB,request,Date.now());
+   if(!session)return fail('SESSION_INVALID',401);
+   const user=await getUserByPhone(env.HHBA_PNVS_AUTH_DB,session.phone);
+   if(!user||user.role!=='candidate')return fail('FORBIDDEN',403);
+  }catch{return fail('SESSION_INVALID',401);}
+  let provider;
+  try{
+   provider=await fetch('https://api.deepseek.com/user/balance',{
+    method:'GET',redirect:'error',cache:'no-store',signal:AbortSignal.timeout(15000),
+    headers:{Authorization:'Bearer '+env.HHBA_MATCH_DEEPSEEK_KEY,Accept:'application/json'}
+   });
+  }catch(e){
+   return fail(e?.name==='TimeoutError'||e?.name==='AbortError'?
+    'AI_PROVIDER_TIMEOUT':'AI_PROVIDER_NETWORK_ERROR',502);
+  }
+  if(!provider.ok)return fail(providerStatusCode(provider.status).matchCode,502);
+  let balance;
+  try{balance=await provider.json();}catch{return fail('AI_PROVIDER_RESPONSE_INVALID',502);}
+  if(balance?.is_available===false)return fail('AI_PROVIDER_BALANCE_INSUFFICIENT',502);
+  if(balance?.is_available!==true)return fail('AI_PROVIDER_RESPONSE_INVALID',502);
+  return json({ok:true,status:'READY',check:'PROVIDER_BALANCE_AVAILABLE'});
+ }
  if(tail!=='/resume'||request.method!=='POST')return fail('NOT_FOUND',404);
  if(request.headers.get('Origin')!==url.origin||
     request.headers.get('Sec-Fetch-Site')==='cross-site')return fail('ORIGIN_REQUIRED',403);

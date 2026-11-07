@@ -121,3 +121,23 @@ export async function submitResumeForMatching(
  const extracted=await extractResumeTextLocally(file,signal);
  return submitExtractedResumeText(extracted,opts,consent,signal,resumeId);
 }
+
+/** Preview-only free balance/key check, authenticated candidate, no resume content. */
+export async function checkMatchProviderConnection(signal?:AbortSignal):Promise<string>{
+ const token=session();
+ let response;
+ try{
+  response=await fetch(API+'/provider-check',{
+   method:'GET',credentials:'same-origin',cache:'no-store',signal,
+   headers:{Authorization:'Bearer '+token}
+  });
+ }catch(e){
+  if((e as Error)?.name==='AbortError')throw e;
+  throw new MatchError(503,'AI 服务连接检测失败，请稍后重试。');
+ }
+ const data=await response.json().catch(()=>({})) as {ok?:boolean;status?:string;error?:string};
+ if(!response.ok)throw new MatchError(response.status,
+  errorMap[data.error||'']||'AI 服务检测暂时不可用。');
+ if(data.ok!==true||data.status!=='READY')throw new MatchError(502,'AI 服务检测返回异常结果。');
+ return 'AI 密钥验证成功、余额可用。没有发送简历，也没有消耗匹配次数。';
+}

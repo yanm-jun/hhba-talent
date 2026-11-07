@@ -150,7 +150,7 @@ test('provider errors return no false recommendation and keep budget reserved',a
  try{
   const response=await onRequest({request:h.request(),env:h.env});
   assert.equal(response.status,502);
-  assert.equal((await response.json()).error,'AI_PROVIDER_UNAVAILABLE');
+  assert.equal((await response.json()).error,'AI_PROVIDER_UPSTREAM_ERROR');
   assert.equal(h.ledger.length,1);
  }finally{restore();}
 });
@@ -234,4 +234,53 @@ test('provider timeout and throttling have safe separate codes, retain quota for
    assert.equal(h.ledger.length,1);
   }finally{globalThis.fetch=old;}
  }
+});
+
+
+test('Preview authenticated provider diagnostic checks key and balance without quota or PII',async()=>{
+ const h=setup(),old=globalThis.fetch;
+ h.env.HHBA_AUTH_ROLLOUT='preview';
+ let calls=0;
+ globalThis.fetch=async (url,opts)=>{
+  calls++;
+  assert.equal(String(url),'https://api.deepseek.com/user/balance');
+  assert.equal(opts.method,'GET');
+  return new Response(JSON.stringify({is_available:true,balance_infos:[{total_balance:'22.22'}]}),
+   {status:200,headers:{'Content-Type':'application/json'}});
+ };
+ try{
+  const unauthed=await onRequest({request:new Request(origin+'/api/match/provider-check'),env:h.env});
+  assert.equal(unauthed.status,401);
+  const req=new Request(origin+'/api/match/provider-check',
+   {headers:{Authorization:'Bearer synthetic-client-token'}});
+  const response=await onRequest({request:req,env:h.env});
+  assert.equal(response.status,200);
+  const raw=await response.text();
+  assert.match(raw,/PROVIDER_BALANCE_AVAILABLE/);
+  assert.doesNotMatch(raw,/22\.22/);
+  assert.equal(calls,1);
+  assert.equal(h.ledger.length,0);
+ }finally{globalThis.fetch=old;}
+});
+test('Preview provider diagnostic reports 401 key and empty balance but not secrets',async()=>{
+ const h=setup(),old=globalThis.fetch;
+ h.env.HHBA_AUTH_ROLLOUT='preview';
+ const req=()=>new Request(origin+'/api/match/provider-check',
+  {headers:{Authorization:'Bearer synthetic-client-token'}});
+ try{
+  globalThis.fetch=async()=>new Response('RAW_SECRET_PROVIDER_MESSAGE',{status:401});
+  const auth=await onRequest({request:req(),env:h.env});
+  assert.equal(auth.status,502);
+  const raw=await auth.text();
+  assert.match(raw,/AI_PROVIDER_KEY_REJECTED/);
+  assert.doesNotMatch(raw,/RAW_SECRET_PROVIDER_MESSAGE/);
+  globalThis.fetch=async()=>new Response(JSON.stringify({is_available:false}),
+   {status:200,headers:{'content-type':'application/json'}});
+  const balance=await onRequest({request:req(),env:h.env});
+  assert.equal((await balance.json()).error,'AI_PROVIDER_BALANCE_INSUFFICIENT');
+  assert.equal(h.ledger.length,0);
+  const prod=setup();prod.env.HHBA_AUTH_ROLLOUT='production';
+  const disabled=await onRequest({request:req(),env:prod.env});
+  assert.equal(disabled.status,404);
+ }finally{globalThis.fetch=old;}
 });
