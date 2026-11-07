@@ -206,7 +206,14 @@
  }
  function safeJobLink(){
   const u=new URL(location.href);
-  return u.protocol==='https:'?u.origin+u.pathname:null; // discard query/hash/token
+  if(u.protocol!=='https:')return null;
+  const allowed=new Set(['gh_jid','jobid','job_id','positionid','reqid','requisitionid','id','job','jid']);
+  const qs=new URLSearchParams();
+  for(const [k,v] of u.searchParams){
+   if(allowed.has(k.toLowerCase())&&/^[a-z0-9_-]{1,110}$/i.test(v)&&qs.size<4)
+    qs.append(k.toLowerCase(),v);
+  }
+  return u.origin+u.pathname+(qs.size?'?'+qs.toString():''); // reject auth/query tokens
  }
  function resultCheck(){
   return {ok:true,evidenceKind:findSuccessSignal(),applicationUrl:safeJobLink(),
