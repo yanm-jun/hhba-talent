@@ -10,6 +10,8 @@ import {useSharedMajorSelection} from './CompanyMajorJobs';
 import {getSavedMajor,majorName,majorMatchLabel,matchRoleToMajor} from '../services/majorJobMatching';
 import { majorById } from '../services/domesticMajors';
 import { SaveJobButton } from './SaveJobButton';
+import {applyAccountAvailable,listMyApplications,type ApplicationRecord} from '../services/applyCredits';
+import {jobApplicationDisplay,applicationDisplayLabel,type ApplicationDisplayState} from '../services/applicationStatus';
 import { JobResultPagination } from './JobResultPagination';
 import {JOBS_PER_PAGE,batchOffsetForPage,sliceJobsForPage,pageCount} from '../services/jobPaging.mjs';
 import { trackEvent } from '../services/engagement';
@@ -69,7 +71,7 @@ function useLanguage() {
   function change(value:Language) {setLang(value);try{sessionStorage.setItem('hhba.jobs.language',value);}catch{}}
   return {lang,change};
 }
-function JobCard({job,lang,asOf,majorSlug=''}:{job:LiveJob,lang:Language,asOf:string,majorSlug?:string}){
+function JobCard({job,lang,asOf,majorSlug='',applicationState}:{job:LiveJob,lang:Language,asOf:string,majorSlug?:string,applicationState?:ApplicationDisplayState}){
   const source=safeOfficialJobUrl(job);
   const profile=companyProfileForJob(job);
   const companyRoute=companyPageRouteForJob(job);
@@ -102,6 +104,9 @@ function JobCard({job,lang,asOf,majorSlug=''}:{job:LiveJob,lang:Language,asOf:st
         <span>{job.recruitmentType?typeLabel[job.recruitmentType]?.[lang]||job.recruitmentType:(lang==='zh'?'招聘类型待核实':'Type unverified')}</span>
         {job.remote===true&&<span>{lang==='zh'?'远程':'Remote'}</span>}
         <span className="unified-job-list-status">{status}</span>
+         {applicationState&&<span className={'hhba-application-market-label '+applicationState}
+          title={applicationState==='unrecorded'?'该账号未记录此岗位的投递，可能已通过其他渠道申请':applicationState==='possible'?'企业和岗位相同，但申请链接不同，需本人核实':'记录仅反映本人或页面显示，不保证企业已收到'}>
+          {applicationDisplayLabel(applicationState,lang)}</span>}
       </div>
     </div>
     <div className="unified-job-list-action">
@@ -164,6 +169,14 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
   const [snapshot,setSnapshot]=useState<LivePage|null>(null);
   const [error,setError]=useState('');
   const [loading,setLoading]=useState(true);
+  const [myApplications,setMyApplications]=useState<ApplicationRecord[]|null>(null);
+  useEffect(()=>{
+   if(!user?.account_types?.includes('candidate')||!applyAccountAvailable){setMyApplications(null);return}
+   let active=true;setMyApplications(null);
+   listMyApplications().then(items=>{if(active)setMyApplications(items)})
+     .catch(()=>{if(active)setMyApplications(null)});
+   return()=>{active=false};
+  },[user?.id]);
   const [retry,setRetry]=useState(0);
   const aiOrigin=useMemo(officialDiscoveryOrigin,[]);
   const [aiAvailable,setAiAvailable]=useState(false);
@@ -369,7 +382,10 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       </p>}
     {loading?<p className="unified-job-state" role="status">{lang==='zh'?'正在读取真实岗位…':'Loading jobs…'}</p>:
       error?<div className="unified-job-state" role="alert">{lang==='zh'?error:'Jobs temporarily unavailable. Please retry.'}<button type="button" onClick={()=>setRetry(x=>x+1)}><RefreshCcw size={15}/> {lang==='zh'?'重试':'Retry'}</button></div>:
-      shown.length?<div className="unified-job-grid unified-role-list" aria-label={selectedMajor?'专业相关的真实岗位':'招聘岗位'}>{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated} majorSlug={selectedMajor}/>)}</div>:
+      shown.length?<div className="unified-job-grid unified-role-list" aria-label={selectedMajor?'专业相关的真实岗位':'招聘岗位'}>{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated}
+         majorSlug={selectedMajor}
+         applicationState={myApplications?(job.marketGroup?.variants.length&&job.marketGroup.variants.length>1?
+           'possible':jobApplicationDisplay(job,myApplications)):undefined}/>)}</div>:
         <div className="unified-job-state">{selectedMajor?(lang==='zh'?'当前没有符合该专业及其他筛选条件的已收录岗位。可尝试调整城市、招聘类型，或主动勾选“专业要求未披露的岗位”进行核验。':'No recorded roles meet this major and your other filters. Try adjusting your criteria.'):domesticOnly?(lang==='zh'?'当前没有符合条件的历史岗位。':'No matching archived jobs.'):v2SearchMatched?(lang==='zh'?'以上已找到匹配的 V2 企业及其岗位方向；当前正式岗位列表未有其他近期核验结果。':'The V2 employer and its archived role directions are shown above; no additional recently verified jobs match.'):lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
     <div className="unified-job-footer">
       <span>{snapshot?.sourceTotal!==undefined&&snapshot.sourceTotal!==snapshot.total?
