@@ -40,7 +40,7 @@ function MatchedJobCard({item,order}:{item:MatchedJob;order:number}){
     <div><span className="hhba-ai-job-rank">推荐 {order}</span>
       <h3>{item.title_zh||item.title}</h3>
       {item.title_zh&&<p className="hhba-ai-original-title">{item.title}</p>}
-      <p className="hhba-ai-job-meta">{item.company} · {item.location||'地点未披露'}
+      <p className="hhba-ai-job-meta">{item.source_type==='HHBA站内岗位'?'HHBA 站内岗位 · ':''}{item.company} · {item.location||'地点未披露'}
        {item.remote?' · 官方标记远程':''}</p>
     </div>
     <div className="hhba-ai-score"><strong>{item.reference_score}</strong><small>参考相关度</small></div>
