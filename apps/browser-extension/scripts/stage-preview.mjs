@@ -6,7 +6,7 @@ import {generateKeyPairSync,createHash} from 'node:crypto';
 import {resolve,dirname,join,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const sourceRoot=resolve(dirname(fileURLToPath(import.meta.url)),'..');
-const assets=['popup.css','content.js','core.mjs',
+const assets=['popup.css','content.js','core.mjs','application-history.mjs',
  'icons/icon16.png','icons/icon32.png','icons/icon48.png','icons/icon128.png'];
 export function checkedPreviewOrigin(urlText){
  const url=new URL(urlText);
