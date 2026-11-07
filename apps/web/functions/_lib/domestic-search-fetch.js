@@ -61,6 +61,8 @@ export function extractOfficialJob(searchResult,document,now=new Date()){
  if(!source||!document||typeof document.content!=='string')return null;
  const content=document.content.replace(/\r/g,'').replace(/\u0000/g,'').slice(0,100000);
  if(content.length<170||!HAS_DUTIES.test(content)||!HAS_REQUIREMENTS.test(content)||CLOSED.test(content))return null;
+ // Refuse contradictory foreign and mainland location signals in the job heading.
+ if(OUTSIDE.test(content.slice(0,350)))return null;
  const lines=content.split('\n').map(t=>t.replace(/^\s*#{1,6}\s*/,'').trim()).filter(Boolean);
  // Require a position-specific title in the fetched official page, not a
  // search snippet. An indexed listing or generic landing page is insufficient.
