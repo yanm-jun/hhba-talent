@@ -214,7 +214,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
         <p className="hhba-ai-aside-footnote">相关度分数只是搜索排序参考，不是获得面试、录用或签证的概率。任何“未披露”条件都需要官网确认。</p>
       </aside>
     </div>
-    {result&&<CandidateMatchResultDialog result={result} onClose={()=>setResult(null)}/>}
+    {result&&<CandidateMatchResultDialog result={result} roleHint={options.role_hint} onClose={()=>setResult(null)}/>}
      <div className="hhba-ai-footer"><Link to="/candidate/jobs">不上传简历，直接搜索公开岗位 <ArrowRight size={15}/></Link></div>
   </section>
  </Shell>;
