@@ -7,6 +7,7 @@ import {reconcileOrder,closeUnpaidOrder} from '../../_lib/apply-payment-reconcil
 import {aiConfigured,validateAISuggestionRequest,suggestSafeFields,validateAIKeyMapRequest,suggestAIFieldKeys} from '../../_lib/apply-ai-suggest.js';
 import {pairingConfigured,validExtensionOrigin,extensionCors,createPairCode,claimPairCode,extensionSession,revokeExtensions} from '../../_lib/apply-extension-pairing.js';
 import {syncKeyConfigured,prepareProfileTransfer,claimProfileTransfer,revokeProfileTransfer} from '../../_lib/apply-profile-sync.js';
+import {saveApplication,listApplications,deleteApplication} from '../../_lib/apply-application-history.js';
 
 const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
  'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'
@@ -110,6 +111,22 @@ export async function onRequest({request,env}){
     const claim=await claimProfileTransfer(db,env,ext.phone);
     return wrap(claim.ok?json(claim):err(claim.error,claim.status));
    }catch{return wrap(err('PROFILE_TRANSFER_UNAVAILABLE',503))}
+  }
+  if(method==='POST'&&path==='/extension/applications/save'){
+   try{
+    const user=await getUserByPhone(db,ext.phone);
+    if(user?.role!=='candidate')return wrap(err('CANDIDATE_REQUIRED',403));
+    const body=await jsonBody(request,1900);
+    const result=await saveApplication(db,ext.phone,body,true);
+    return wrap(result.ok?json(result):err(result.error,result.status));
+   }catch{return wrap(err('APPLICATIONS_UNAVAILABLE',503))}
+  }
+  if(method==='POST'&&path==='/extension/applications/list'){
+   try{
+    const user=await getUserByPhone(db,ext.phone);
+    if(user?.role!=='candidate')return wrap(err('CANDIDATE_REQUIRED',403));
+    return wrap(json(await listApplications(db,ext.phone)));
+   }catch{return wrap(err('APPLICATIONS_UNAVAILABLE',503))}
   }
   if(method==='POST'&&path==='/extension/wallet'){
    try{
@@ -215,6 +232,21 @@ export async function onRequest({request,env}){
    if(!reserved?.success||reserved?.meta?.changes!==1)return err('AI_RATE_LIMITED',429);
    const advice=await suggestSafeFields(env,body);
    return advice.ok?json(advice):err(advice.error,502);
+  }
+  if(method==='GET'&&path==='/applications'){
+   return json(await listApplications(db,phone));
+  }
+  if(method==='POST'&&path==='/applications'){
+   if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
+   const body=await jsonBody(request,1900);
+   const result=await saveApplication(db,phone,body,false);
+   return result.ok?json(result):err(result.error,result.status);
+  }
+  if(method==='POST'&&path==='/applications/delete'){
+   if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
+   const body=await jsonBody(request,128);
+   const result=await deleteApplication(db,phone,body?.id);
+   return result.ok?json(result):err(result.error,result.status);
   }
   if(method==='GET'&&path==='/wallet')return json({ok:true,wallet:await wallet(db,phone)});
   if(method==='GET'&&path==='/orders'){
