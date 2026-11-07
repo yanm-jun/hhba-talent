@@ -88,3 +88,10 @@
 .candidate-match-quick span{display:flex;flex-direction:column;gap:7px}.candidate-match-quick strong{color:#2e6040}.candidate-match-quick small{color:#6d7e73;line-height:1.7}
 .candidate-match-quick a{white-space:nowrap}
 @media(max-width:650px){.home-match-promo,.candidate-match-quick{flex-direction:column;align-items:stretch}.home-match-promo button,.candidate-match-quick a{justify-content:center}.home-match-promo{gap:11px;padding:11px 14px}.home-match-promo + .unified-market{margin-top:26px}}
+
+
+/* Shared resume-vault selector; scoped to the existing AI matching page. */
+.hhba-ai-saved-picker{padding:15px;margin:0 0 16px;border:1px solid #dce8df;border-radius:11px;background:#f6faf7}
+.hhba-ai-saved-picker label{display:block;color:#244936;font-size:14px;font-weight:700;margin-bottom:8px}
+.hhba-ai-saved-picker select{max-width:100%;width:100%;min-height:38px;padding:8px;border:1px solid #cddbd0;border-radius:7px;background:white;color:#234735}
+.hhba-ai-saved-picker p{font-size:12px;color:#526a58;margin:8px 0 0}

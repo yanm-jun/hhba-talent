@@ -5,6 +5,8 @@ import type {User} from '../services/api';
 import {Link} from '../router';
 import {countryOptions} from '../services/jobSearchFacets.mjs';
 import {safeOfficialJobUrl} from '../services/liveRecruitment';
+import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,type PrivateResume} from '../services/privateResumes';
+import {getRealAuthToken} from '../services/realAuth';
 import {matchServiceReady,submitResumeForMatching,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
@@ -58,6 +60,9 @@ function MatchedJobCard({item,order}:{item:MatchedJob;order:number}){
 }
 export function CandidateMatchPage({user}:{user:User|null}){
  const [file,setFile]=useState<File|null>(null);
+ const [savedFiles,setSavedFiles]=useState<PrivateResume[]>([]);
+ const [savedId,setSavedId]=useState('');
+ const [vaultError,setVaultError]=useState('');
  const [drag,setDrag]=useState(false);
  const [consent,setConsent]=useState(false);
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
@@ -71,23 +76,47 @@ export function CandidateMatchPage({user}:{user:User|null}){
   void matchServiceReady(abort.signal).then(ok=>{if(!abort.signal.aborted)setAvailability(ok?'ready':'disabled')});
   return()=>{abort.abort();controller.current?.abort()};
  },[]);
+ useEffect(()=>{
+  let active=true;
+  const reload=()=>{
+   if(!privateResumeAvailable||!user||!getRealAuthToken()){
+    if(active){setSavedFiles([]);setSavedId('');}return;
+   }
+   void listPrivateResumes().then(rows=>{if(active){setSavedFiles(rows);setVaultError('');}})
+    .catch(e=>{if(active){setSavedFiles([]);setVaultError(e instanceof Error?e.message:'私有简历暂时无法读取。');}});
+  };
+  reload();
+  window.addEventListener('hhba:private-resumes-changed',reload);
+  window.addEventListener('hhba:real-auth-changed',reload);
+  return()=>{active=false;window.removeEventListener('hhba:private-resumes-changed',reload);
+   window.removeEventListener('hhba:real-auth-changed',reload);};
+ },[user?.id]);
  function choose(candidate:File|null){
   setError('');setResult(null);
   if(!candidate){setFile(null);return}
   if(!/\.(pdf|docx)$/i.test(candidate.name)||!candidate.size||candidate.size>maxResumeSize){
     setFile(null);setError('请选择不超过 3 MB 的 PDF 或 DOCX 文件。');return;
   }
-  setFile(candidate);
+  setSavedId('');setFile(candidate);
  }
  async function run(){
-  if(!file||!consent||working||availability!=='ready')return;
+  if((!file&&!savedId)||!consent||working||availability!=='ready'||!getRealAuthToken())return;
   setWorking(true);setError('');setResult(null);
   const abort=new AbortController();
   controller.current=abort;
   try{
-   const matched=await submitResumeForMatching(file,options,consent,abort.signal);
+   let selected=file;
+   if(!selected&&savedId){
+    const entry=savedFiles.find(item=>item.id===savedId);
+    if(!entry)throw new MatchError(404,'已保存的简历已改变，请重新选择。');
+    const bytes=await fetchPrivateResumeForLocalReview(entry);
+    if(abort.signal.aborted)throw new DOMException('Cancelled','AbortError');
+    selected=new File([bytes],entry.name,{type:entry.type});
+   }
+   if(!selected)throw new MatchError(400,'请选择简历。');
+   const matched=await submitResumeForMatching(selected,options,consent,abort.signal,savedId||undefined);
    setResult(matched);
-   setFile(null);setConsent(false);
+   setFile(null);setSavedId('');setConsent(false);
   }catch(e){
    if((e as Error)?.name!=='AbortError')setError(e instanceof MatchError?e.message:'智能匹配暂时失败，请稍后再试。');
   }finally{setWorking(false);controller.current=null}
@@ -105,12 +134,23 @@ export function CandidateMatchPage({user}:{user:User|null}){
     {availability==='loading'&&<p className="hhba-ai-service-check"><LoaderCircle size={17} className="spin"/>正在检查平台智能匹配服务…</p>}
     {availability==='disabled'&&<div className="hhba-ai-admin-note" role="status">
        <LockKeyhole size={19}/><div><strong>平台 DeepSeek 服务尚未启用。</strong>
-       <p>这不是要求你自己输入 API Key。管理员只需在 HHBA 的 Railway 服务端配置一次，你就能使用平台提供的分析能力（受平台用量限制）。</p>
+       <p>这不是要求你自己输入 API Key。管理员需在 HHBA 的 Cloudflare 服务端完成专用 API 密钥和额度配置后，你就能使用平台提供的分析能力（受平台用量限制）。</p>
        <button type="button" onClick={()=>{setAvailability('loading');void matchServiceReady().then(ok=>setAvailability(ok?'ready':'disabled'))}}>重新检测服务状态</button>
        </div></div>}
     <div className="hhba-ai-layout">
       <section className="hhba-ai-upload">
         <header><h2><FileUp size={20}/> 1. 上传简历</h2><p>PDF 或 DOCX，最大 3 MB。上传后自动分析，不会自动向企业投递。</p></header>
+        {user&&privateResumeAvailable&&<div className="hhba-ai-saved-picker">
+          <label htmlFor="hhba-ai-existing">使用「我的简历」中已经保存的文件（无需重新上传）</label>
+          <select id="hhba-ai-existing" value={savedId} disabled={working}
+           onChange={e=>{setSavedId(e.target.value);setFile(null);setResult(null);setError('');}}>
+           <option value="">不使用已保存文件，改为下面选择新文件</option>
+           {savedFiles.map(item=><option value={item.id} key={item.id}>{item.name}</option>)}
+          </select>
+          {!savedFiles.length&&<p>还没有保存的简历。可从 <Link to="/candidate/account/resume">我的简历</Link> 上传。</p>}
+          {vaultError&&<p role="status">{vaultError}</p>}
+        </div>}
+        {!getRealAuthToken()&&<p className="hhba-ai-service-check">AI 简历匹配需要先 <Link to="/candidate/login">登录 HHBA 求职账号</Link>。</p>}
         <input id="hhba-ai-resume" className="sr-only" type="file" accept={supportedTypes}
           onChange={(e:ChangeEvent<HTMLInputElement>)=>choose(e.target.files?.[0]||null)}/>
         <label htmlFor="hhba-ai-resume" className={'hhba-ai-drop '+(drag?'dragging':'')}
@@ -118,7 +158,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
           onDragLeave={()=>setDrag(false)}
           onDrop={(e:DragEvent<HTMLLabelElement>)=>{e.preventDefault();setDrag(false);choose(e.dataTransfer.files?.[0]||null)}}>
           <FileText size={26}/>
-          <strong>{file?file.name:'点击选择文件，或将简历拖到这里'}</strong>
+          <strong>{savedId?'已选择私有简历：'+(savedFiles.find(x=>x.id===savedId)?.name||'') :file?file.name:'点击选择文件，或将简历拖到这里'}</strong>
           <span>{file?(file.size/1024/1024).toFixed(2)+' MB · 可以分析':'仅支持可提取文字的 PDF / DOCX；扫描图片暂不支持'}</span>
         </label>
         <header className="hhba-ai-section-title"><h2>2. 选择工作偏好</h2><p>可选项。不填写代表从全部官方岗位中搜索。</p></header>
@@ -139,10 +179,10 @@ export function CandidateMatchPage({user}:{user:User|null}){
           onChange={e=>setConsent(e.target.checked)}/>
           <span>我同意 HHBA 提取简历文本，尽可能隐藏邮箱、电话等直接标识信息后，将文本发送给第三方 DeepSeek 进行能力分析。自动脱敏可能不完整，我已自行检查简历是否包含不愿提供的信息。原始简历不保存到本 AI 匹配服务，也不会自动发布或投递。</span>
         </label>
-        <p className="hhba-ai-notice"><ShieldCheck size={15}/> 此试用功能不与 HHBA 账号自动绑定；每次使用均需自行同意。匹配结果仅在当前页面显示，刷新后不会保留。</p>
+        <p className="hhba-ai-notice"><ShieldCheck size={15}/> 本功能仅供已登录的求职者使用。简历原件在当前浏览器读取，最多取前 2 万字文字分析；分析需单独同意，结果仅在本次页面中展示，不会自动公开或向企业投递。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
-          disabled={!file||!consent||working||availability!=='ready'}>
+          disabled={(!file&&!savedId)||!consent||working||availability!=='ready'||!getRealAuthToken()}>
           {working?<><LoaderCircle className="spin" size={18}/> 正在提取简历并匹配岗位…</>:
            <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
         </button>
