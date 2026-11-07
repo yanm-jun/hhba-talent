@@ -118,3 +118,13 @@ test('Top 10 never repeats company+title just because an ATS job has more locati
  assert.ok(out.matches.find(x=>x.company==='gamma'));
  assert.equal(out.matches.filter(x=>x.company==='acme').length,3);
 });
+
+
+test('free provider diagnostic button is visible before any chargeable resume match',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
+ assert.match(page,/\(error\|\|availability==='ready'\)/);
+ assert.match(page,/检测 AI 密钥及余额（不消耗匹配次数）/);
+ assert.match(page,/checkMatchProviderConnection\(\)/);
+ assert.match(page,/availability==='ready'&&getRealAuthToken\(\)/);
+});

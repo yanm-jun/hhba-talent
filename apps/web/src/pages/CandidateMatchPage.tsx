@@ -234,8 +234,8 @@ export function CandidateMatchPage({user}:{user:User|null}){
           <span>我同意 HHBA 提取简历文本，尽可能隐藏邮箱、电话等直接标识信息后，将文本发送给第三方 DeepSeek 进行能力分析。自动脱敏可能不完整，我已自行检查简历是否包含不愿提供的信息。原始简历不保存到本 AI 匹配服务，也不会自动发布或投递。</span>
         </label>
         <p className="hhba-ai-notice"><ShieldCheck size={15}/> 本功能仅供已登录的求职者使用。简历原件在当前浏览器读取，最多取前 2 万字文字分析；分析需单独同意，结果仅在本次页面中展示，不会自动公开或向企业投递。</p>
-        {error&&<div>
-          <p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>
+        {(error||availability==='ready')&&<div>
+          {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
           {availability==='ready'&&getRealAuthToken()&&
            <div className="hhba-ai-review-tools">
             <button type="button" disabled={providerCheckBusy||working}
