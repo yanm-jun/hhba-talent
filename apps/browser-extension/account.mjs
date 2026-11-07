@@ -1,4 +1,4 @@
-// Explicit, read-only account pairing. No website bearer, cookie or wallet
+// Explicit, narrowly scoped account pairing: read-only wallet and user-authorized record writes. No website bearer, cookie or wallet
 // mutation capability is ever exposed to the browser helper.
 export const HHBA_SITE='https://hhba.work';
 export const HHBA_PERMISSION='https://hhba.work/*';
