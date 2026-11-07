@@ -34,11 +34,16 @@ function setup({role='candidate',open=true,stale=false,hasSecrets=true,allowResu
    },
    async run(){
     if(sql.startsWith('UPDATE hhba_auth_sessions'))return {success:true,meta:{changes:1}};
+    if(sql.startsWith('DELETE FROM hhba_resume_match_requests')){
+     const n=ledger.findIndex(x=>x.id===args[0]&&x.day===args[1]&&x.hash===args[2]);
+     if(n>=0)ledger.splice(n,1);
+     return {success:true,meta:{changes:n>=0?1:0}};
+    }
     if(sql.startsWith('INSERT INTO hhba_resume_match_requests')){
      const day=args[1],hash=args[2];
      if(ledger.filter(x=>x.day===day).length>=60||ledger.filter(x=>x.day===day&&x.hash===hash).length>=2)
       return {success:true,meta:{changes:0}};
-     ledger.push({day,hash});
+     ledger.push({id:args[0],day,hash});
      return {success:true,meta:{changes:1}};
     }
     throw Error('unexpected run statement');
@@ -177,4 +182,56 @@ test('invalid UTF-8 request never touches the AI provider',async()=>{
   assert.equal(h.callCounts.provider,0);
   assert.equal(h.ledger.length,0);
  }finally{restore();}
+});
+
+
+test('wrong DeepSeek key is classified and cannot consume a user trial',async()=>{
+ const h=setup(),original=globalThis.fetch;
+ globalThis.fetch=async()=>{h.callCounts.provider++;return new Response('not authorized',{status:401});};
+ try{
+  const response=await onRequest({request:h.request(),env:h.env});
+  assert.equal(response.status,502);
+  assert.equal((await response.json()).error,'AI_PROVIDER_KEY_REJECTED');
+  assert.equal(h.ledger.length,0);
+  assert.equal(h.callCounts.provider,1);
+ }finally{globalThis.fetch=original;}
+});
+test('insufficient DeepSeek balance is a distinct error and refunds unbilled attempt',async()=>{
+ const h=setup(),original=globalThis.fetch;
+ globalThis.fetch=async()=>new Response('balance',{status:402});
+ try{
+  const response=await onRequest({request:h.request(),env:h.env});
+  assert.equal(response.status,502);
+  assert.equal((await response.json()).error,'AI_PROVIDER_BALANCE_INSUFFICIENT');
+  assert.equal(h.ledger.length,0);
+ }finally{globalThis.fetch=original;}
+});
+test('DeepSeek rejects request settings: safe diagnostic without leaking body',async()=>{
+ const h=setup(),original=globalThis.fetch;
+ globalThis.fetch=async()=>new Response('SECRET_RAW_PROVIDER_BODY',{status:400});
+ try{
+  const response=await onRequest({request:h.request(),env:h.env});
+  assert.equal(response.status,502);
+  const raw=await response.text();
+  assert.match(raw,/AI_PROVIDER_REQUEST_REJECTED/);
+  assert.doesNotMatch(raw,/SECRET_RAW_PROVIDER_BODY/);
+  assert.equal(h.ledger.length,0);
+ }finally{globalThis.fetch=original;}
+});
+test('provider timeout and throttling have safe separate codes, retain quota for uncertain calls',async()=>{
+ const scenarios=[
+  {status:429,code:'AI_PROVIDER_RATE_LIMITED',http:429},
+  {status:503,code:'AI_PROVIDER_UPSTREAM_ERROR',http:502}
+ ];
+ for(const scenario of scenarios){
+  const h=setup(),old=globalThis.fetch;
+  globalThis.fetch=async()=>new Response('PRIVATE_PROVIDER_MESSAGE',{status:scenario.status});
+  try{
+   const response=await onRequest({request:h.request(),env:h.env});
+   assert.equal(response.status,scenario.http);
+   const body=await response.json();
+   assert.equal(body.error,scenario.code);
+   assert.equal(h.ledger.length,1);
+  }finally{globalThis.fetch=old;}
+ }
 });
