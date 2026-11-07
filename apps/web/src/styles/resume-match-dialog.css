@@ -76,3 +76,16 @@
 
 .hhba-match-source-external{color:#8a5c26;font-weight:650}
 .hhba-match-source-internal{color:#3b7353;font-weight:650}
+
+/* Explicit opt-in additional job discovery: no new consent modal or automatic charges. */
+.hhba-match-external-search{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;background:#f7faf8;border:1px solid #dae8df;border-radius:11px;padding:14px 16px}
+.hhba-match-external-search>div{flex:1;min-width:0}
+.hhba-match-external-search strong{display:block;font-size:13px;color:#3a6b4c}
+.hhba-match-external-search p{margin:5px 0 0;font-size:11px;color:#748476;line-height:1.6}
+.hhba-match-external-search button{flex-shrink:0;cursor:pointer;background:#316c4b;border:1px solid #316c4b;color:#fff;border-radius:8px;font-size:12px;padding:11px 13px;font-weight:680}
+.hhba-match-external-search button:disabled{opacity:.55;cursor:default}
+.hhba-match-external-message{font-size:12px;line-height:1.7;color:#557462;margin:9px 1px 5px}
+@media(max-width:620px){
+ .hhba-match-external-search{flex-direction:column;align-items:stretch}
+ .hhba-match-external-search button{width:100%}
+}
