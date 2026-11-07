@@ -97,3 +97,16 @@ test('no source or no relevant external gives zero, never hallucinates padding',
  assert.equal(out.matches.length,0);
  assert.equal(out.counts.selected_internal+out.counts.selected_external,0);
 });
+
+test('external Search is opt-in, Preview-gated, and never sends resume text',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const component=await readFile(new URL('../src/components/CandidateMatchResultDialog.tsx',import.meta.url),'utf8');
+ const service=await readFile(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
+ assert.match(component,/externalAvailable&&<section/,'Search button hidden unless Preview flag is enabled');
+ assert.match(component,/onClick=\{\(\)=>void findMoreDomesticJobs\(\)\}/);
+ assert.match(component,/discoverExternalDomesticJobs\(role,abort.signal\)/);
+ assert.match(component,/fuseDomesticJobRecommendations\(/);
+ assert.match(component,/result.matches,found.candidates,result.profile/);
+ assert.match(service,/body:JSON\.stringify\(\{role_hint:clean,consent_search:true\}\)/);
+ assert.doesNotMatch(service.slice(service.indexOf('export async function discoverExternalDomesticJobs')),/resume_id|text:cleaned|profile:|skills:/);
+});
