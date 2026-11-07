@@ -189,6 +189,7 @@
  // watcher; the applicant may verify the new success page after navigation.
  const APPLICATIONS_STORAGE='hhba.apply.application-local.v1';
  let tracking=null;
+ let storeQueue=Promise.resolve();
  const SUCCESS=/(?:投递成功|申请已提交|提交申请成功|申请提交成功|application (?:submitted|received|successful)|successfully applied|thank you for applying|your application has been (?:submitted|received))/i;
  const NEGATIVE=/(?:提交失败|投递失败|申请失败|验证码错误|网络错误|未提交成功|unsuccessful|failed to submit|please try again)/i;
  const receiptSelectors='[role="status"],[role="alert"],.success,.success-message,.application-success,.submission-success,[data-testid*="success"],h1,h2,h3';
@@ -211,7 +212,11 @@
   return {ok:true,evidenceKind:findSuccessSignal(),applicationUrl:safeJobLink(),
    note:'仅检查可见成功提示，不读取表单答案、截图或完整页面文本。'};
  }
- async function storeAttempt(meta,status,evidenceKind){
+ function storeAttempt(meta,status,evidenceKind){
+  storeQueue=storeQueue.catch(()=>{}).then(()=>storeAttemptQueued(meta,status,evidenceKind));
+  return storeQueue;
+ }
+ async function storeAttemptQueued(meta,status,evidenceKind){
   if(!meta||!safeJobLink())return;
   const old=await chrome.storage.local.get(APPLICATIONS_STORAGE);
   const list=Array.isArray(old[APPLICATIONS_STORAGE])?old[APPLICATIONS_STORAGE]:[];
@@ -230,13 +235,13 @@
   if(company.length<2||position.length<2||data?.consent!==true)
    return {ok:false,error:'请填写企业和岗位并确认本次跟踪授权'};
   const link=safeJobLink();
-  tracking={company,position,applicationUrl:link,created:Date.now(),submitted:false,observer:null};
+  tracking={company,position,applicationUrl:link,created:Date.now(),submitted:false,observer:null,baselineSuccess:findSuccessSignal()};
   // Observe only the next 5 minutes of the current document.
   tracking.observer=new MutationObserver(()=>{
    if(!tracking||!tracking.submitted)return;
    if(Date.now()-tracking.created>300000){tracking.observer?.disconnect();tracking=null;return;}
    const evidence=findSuccessSignal();
-   if(evidence!=='none'){
+   if(evidence!=='none'&&tracking.baselineSuccess==='none'){
     const context=tracking;
     context.observer?.disconnect();tracking=null;
     void storeAttempt(context,'confirmed',evidence).catch(()=>{});
@@ -259,7 +264,7 @@
   queueMicrotask(()=>{
    if(!tracking||!tracking.submitted)return;
    const ev=findSuccessSignal();
-   if(ev!=='none'){
+   if(ev!=='none'&&tracking.baselineSuccess==='none'){
     const context=tracking;context.observer?.disconnect();tracking=null;
     void storeAttempt(context,'confirmed',ev).catch(()=>{});
    }
