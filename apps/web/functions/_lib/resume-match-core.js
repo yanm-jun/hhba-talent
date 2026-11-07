@@ -1,0 +1,122 @@
+// Pure helpers for the HHBA Cloudflare resume-matching service.
+// Never turn a model guess or stale employer posting into a verified job.
+export const MAX_TEXT_LENGTH=20000;
+export function redactForModel(value){
+ if(typeof value!=='string')return '';
+ return value.slice(0,MAX_TEXT_LENGTH)
+  .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,'[邮箱已隐藏]')
+  .replace(/(?<!\d)1[3-9]\d{9}(?!\d)/g,'[手机号已隐藏]')
+  .replace(/(?<![0-9A-Za-z])\d{17}[0-9Xx](?![0-9A-Za-z])/g,'[身份证号已隐藏]')
+  .replace(/\b(?:https?:\/\/)[^\s<>]{3,200}/gi,'[个人网址已隐藏]')
+  .replace(/(?:微信号|微信|QQ号|QQ)\s*[:：]\s*[A-Za-z0-9_-]{5,32}/gi,'[即时通讯账号已隐藏]')
+  .trim();
+}
+export function verifiedProfile(raw,text){
+ if(!raw||typeof raw!=='object')throw Error('AI_PROFILE_INCOMPLETE');
+ const original=String(text||'');
+ const asEvidence=(value)=>{
+  if(typeof value!=='string')return null;
+  const part=value.trim();
+  return part.length>=2&&part.length<=240&&original.toLowerCase().includes(part.toLowerCase())?part:null;
+ };
+ const allowed=['HIGH_SCHOOL','ASSOCIATE','BACHELOR','MASTER','PHD'];
+ const degreeEvidence=asEvidence(raw.education_evidence);
+ const education=degreeEvidence&&allowed.includes(raw.education)?raw.education:null;
+ const yearEvidence=asEvidence(raw.experience_evidence);
+ // Require explicit years-of-work evidence; dates alone cannot substantiate tenure.
+ const duration=yearEvidence&&/(?:\d+(?:\.\d+)?\s*年(?:工作|实习|经验)|(?:工作|实习|经验)\s*\d+(?:\.\d+)?\s*年)/.test(yearEvidence);
+ const years=duration&&Number.isFinite(raw.experience_years)&&raw.experience_years>=0&&raw.experience_years<=50?raw.experience_years:null;
+ const skills=[],seen=new Set();
+ for(const value of Array.isArray(raw.skills)?raw.skills.slice(0,20):[]){
+  const name=typeof value?.name==='string'?value.name.trim().slice(0,60):'';
+  const evidence=asEvidence(value?.evidence);
+  if(!name||!evidence||seen.has(name.toLowerCase())||!evidence.toLowerCase().includes(name.toLowerCase()))continue;
+  skills.push({name,evidence});seen.add(name.toLowerCase());
+ }
+ const roles=[...new Set((Array.isArray(raw.target_roles)?raw.target_roles:[]).filter(x=>typeof x==='string'&&x.trim().length>=2&&x.length<=70).map(x=>x.trim()))].slice(0,6);
+ return {education,education_evidence:education?degreeEvidence:null,
+  experience_years:years,experience_evidence:years===null?null:yearEvidence,
+  skills,target_roles:roles,warnings:[]};
+}
+function safeJobLink(j){
+ if(!j||typeof j!=='object'||!['ashby','greenhouse','lever'].includes(j.platform))return false;
+ if(typeof j.id!=='string'||!/^[A-Za-z0-9_-]{5,180}$/.test(j.id)||typeof j.url!=='string')return false;
+ if(typeof j.title!=='string'||j.title.length<2||j.title.length>220||typeof j.company!=='string'||!j.company.trim())return false;
+ try{
+  const u=new URL(j.url);
+  if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash)return false;
+  if(j.platform==='ashby')return u.hostname==='jobs.ashbyhq.com';
+  if(j.platform==='lever')return u.hostname==='jobs.lever.co'||u.hostname.endsWith('.lever.co');
+  if(j.platform==='greenhouse')return u.hostname==='boards.greenhouse.io'||
+   u.hostname==='job-boards.greenhouse.io'||u.hostname==='boards.eu.greenhouse.io'||
+   u.hostname.endsWith('.greenhouse.io')||u.hostname.endsWith('.greenhouse.com');
+  return false;
+ }catch{return false}
+}
+const aliases=[
+ ['销售','sales','account executive','business development','商务','客户经理'],
+ ['设计','designer','design','ux','ui','视觉','平面','艺术'],
+ ['软件','software','developer','engineer','工程师','开发'],
+ ['产品','product','产品经理','产品运营'],
+ ['数据','data','analytics','analyst','分析'],
+ ['运营','operations','operation','市场','marketing','growth'],
+ ['金融','finance','financial','bank','财务'],
+ ['人力','human resources','recruiting','talent','招聘'],
+ ['教育','education','training','teacher','教学']
+];
+function aliasesOf(t){
+ const words=[t.toLowerCase().trim()];
+ for(const group of aliases){
+  if(group.some(x=>words[0].includes(x.toLowerCase())))words.push(...group.map(x=>x.toLowerCase()));
+ }
+ return words.filter(Boolean);
+}
+export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=Date.now()){
+ if(!snapshot||!Array.isArray(snapshot.jobs)||!Number.isFinite(Date.parse(snapshot.updated))||
+    !audit||audit.summary?.indexed_as_of!==snapshot.updated||
+    !Array.isArray(audit.jobs)||audit.jobs.length!==snapshot.jobs.length||
+    facets?.indexed_as_of!==snapshot.updated||!Array.isArray(facets?.jobs)||
+    audit.summary?.kind!=='HHBA_OFFICIAL_FULL_JOB_JD_AUDIT_V1')
+   throw Error('OFFICIAL_JOB_INDEX_UNAVAILABLE');
+ for(const t of [snapshot.updated,audit.summary.checked_at,facets.verified_at]){
+  const age=now-Date.parse(t||'');
+  if(!Number.isFinite(age)||age< -300000||age>24*3600000)throw Error('OFFICIAL_JOB_INDEX_UNAVAILABLE');
+ }
+ const verified=new Map(audit.jobs.filter(x=>x?.status==='OFFICIAL_JD_AND_REQUIREMENTS_FOUND'&&
+  x.full_original_jd_verified===true&&x.requirements_evidence===true&&typeof x.jd_sha256==='string')
+  .map(x=>[x.job_id,x]));
+ const facts=new Map(facets.jobs.filter(x=>x&&typeof x.id==='string').map(x=>[x.id,x]));
+ const query=[String(opts.role_hint||'').slice(0,80),...profile.target_roles].filter(Boolean);
+ const skillList=profile.skills.map(s=>s.name.toLowerCase());
+ const filtered=[];
+ for(const j of snapshot.jobs){
+  const proof=verified.get(j.id),f=facts.get(j.id);
+  if(!proof||proof.platform!==j.platform||!f||f.original_source_hash!==proof.jd_sha256||
+     !safeJobLink(j)||opts.remote_only&&j.remote!==true)continue;
+  if(opts.country&&String(f.countryCode||'').toUpperCase()!==String(opts.country).toUpperCase())continue;
+  const title=j.title.toLowerCase();
+  const tags=Array.isArray(f.skills)?f.skills.filter(x=>typeof x==='string').map(x=>x.toLowerCase()):[];
+  const roleMatches=query.flatMap(x=>aliasesOf(x)).filter(x=>x.length>=2&&title.includes(x));
+  const skillMatches=skillList.filter(s=>tags.includes(s)||title.includes(s));
+  if(roleMatches.length===0&&skillMatches.length===0)continue;
+  const matched=[],notEvidenced=[],needs=[];
+  if(roleMatches.length)matched.push('岗位名称与目标方向存在文字关联，具体职责仍需核对');
+  for(const item of skillMatches.slice(0,4))matched.push('简历有原文依据的技能：'+item);
+  for(const req of tags.filter(s=>!skillList.includes(s)).slice(0,4))
+   notEvidenced.push('公开职位要求提到 '+req+'，简历没有对应的可核验证据');
+  if(f.education&&f.education!=='UNRESTRICTED')
+   needs.push('岗位学历要求为公开文字保守提取，需核实是否符合：'+f.education);
+  if(Number.isFinite(f.experienceMinYears))
+   needs.push('岗位经验年限线索：'+f.experienceMinYears+' 年，仍以官网原文为准');
+  needs.push('岗位源于最近一次官方 ATS 审核快照，当前是否继续接受申请需打开官网确认');
+  const score=Math.min(85,35+Math.min(30,roleMatches.length*6)+Math.min(20,skillMatches.length*5));
+  filtered.push({id:j.id,company:j.company,title:j.title,title_zh:null,location:j.location||'',
+   official_url:j.url,platform:j.platform,source:j.source||'',remote:j.remote===true,
+   reference_score:score,matched,not_evidenced:notEvidenced,needs_verification:needs,
+   requirements_basis:'与同版官方 JD 审核和搜索特征一致；未对录用概率作预测',
+   source_type:'HHBA站内岗位',rankEvidence:roleMatches.length+skillMatches.length});
+ }
+ filtered.sort((a,b)=>b.reference_score-a.reference_score||b.rankEvidence-a.rankEvidence||a.id.localeCompare(b.id));
+ return {matches:filtered.slice(0,Math.min(10,Math.max(1,Number(opts.limit)||10))).map(({rankEvidence,...j})=>j),
+  matched_official_jobs:filtered.length};
+}
