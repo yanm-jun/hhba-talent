@@ -42,6 +42,6 @@ jobs:
       - name: Real HTTPS Preview smoke (flag on, anonymous requests denied, no charge)
         working-directory: apps/web
         env:
-          HHBA_DOMESTIC_PILOT_PREVIEW: https://0486cdf9.hhba-talent.pages.dev
+          HHBA_DOMESTIC_PILOT_PREVIEW: https://69dffa55.hhba-talent.pages.dev
           HHBA_DOMESTIC_PILOT_EXPECT_ENABLED: '1'
         run: node scripts/domestic-search-preview-http.smoke.mjs
