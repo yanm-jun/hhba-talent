@@ -104,3 +104,11 @@
 .hhba-ai-text-review label{display:block;font-weight:700;font-size:13px;color:#244d38;margin-bottom:7px}
 .hhba-ai-text-review textarea{width:100%;box-sizing:border-box;resize:vertical;border:1px solid #b8d2c2;border-radius:8px;padding:10px;font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;color:#204334;background:white}
 .hhba-ai-text-review small{display:block;color:#5c7264;line-height:1.5;margin-top:6px}
+
+
+.hhba-ai-fields-one{grid-template-columns:minmax(0,1fr)}
+.hhba-ai-mainland-only{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#f7faf8;border:1px solid #e0ece3;border-radius:10px;padding:12px 14px;margin:12px 0}
+.hhba-ai-mainland-only span{font-size:11px;color:#7d8d80}
+.hhba-ai-mainland-only strong{font-size:13px;color:#30674a}
+.hhba-ai-mainland-only small{font-size:11px;color:#7b8c80}
+@media(max-width:580px){.hhba-ai-mainland-only small{width:100%}}
