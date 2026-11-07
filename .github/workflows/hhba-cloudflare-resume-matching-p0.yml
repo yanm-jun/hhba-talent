@@ -27,7 +27,7 @@ jobs:
         run: |
           node --check 'functions/api/match/[[path]].js'
           node --check functions/_lib/resume-match-core.js
-          node --test scripts/resume-match-cloudflare.contract.test.mjs
+          node --test scripts/resume-match-cloudflare.contract.test.mjs scripts/resume-match-endtoend.test.mjs
       - name: TypeScript and Vite bundle
         working-directory: apps/web
         run: npm run build
