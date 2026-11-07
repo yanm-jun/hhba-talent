@@ -81,6 +81,7 @@ function mockedAI(counter,{fail=false}={}){
   assert.equal(String(input),'https://api.deepseek.com/chat/completions');
   const body=JSON.parse(opts.body);
   assert.equal(body.model,'deepseek-flash');
+  assert.equal(opts.redirect,'manual','Cloudflare Workers rejects redirect:error');
   assert.equal(body.thinking.type,'disabled');
   const submitted=body.messages[1].content;
   assert.doesNotMatch(submitted,/13812345678|test\.person@example\.com/);
@@ -245,6 +246,7 @@ test('Preview authenticated provider diagnostic checks key and balance without q
   calls++;
   assert.equal(String(url),'https://api.deepseek.com/user/balance');
   assert.equal(opts.method,'GET');
+  assert.equal(opts.redirect,'manual');
   return new Response(JSON.stringify({is_available:true,balance_infos:[{total_balance:'22.22'}]}),
    {status:200,headers:{'Content-Type':'application/json'}});
  };
@@ -283,4 +285,31 @@ test('Preview provider diagnostic reports 401 key and empty balance but not secr
   const disabled=await onRequest({request:req(),env:prod.env});
   assert.equal(disabled.status,404);
  }finally{globalThis.fetch=old;}
+});
+
+
+test('Workers-compatible fetch options prevent accidental outgoing secret redirects',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const source=await readFile(new URL('../functions/api/match/[[path]].js',import.meta.url),'utf8');
+ assert.doesNotMatch(source,/redirect\s*:\s*['"]error['"]/);
+ assert.equal((source.match(/redirect:'manual'/g)||[]).length,2);
+ const h=setup(),original=globalThis.fetch;
+ globalThis.fetch=async (_url,options)=>{
+  // Cloudflare Workers throws TypeError for redirect:error; fail if regression happens.
+  if(options.redirect==='error')throw new TypeError('Unsupported redirect mode');
+  assert.equal(options.redirect,'manual');
+  return new Response(null,{status:302,headers:{Location:'https://unknown.example/steal'}});
+ };
+ try{
+  const balanceEnv={...h.env,HHBA_AUTH_ROLLOUT:'preview'};
+  const check=new Request(origin+'/api/match/provider-check',{
+   headers:{Authorization:'Bearer synthetic-client-token'}});
+  const response=await onRequest({request:check,env:balanceEnv});
+  assert.equal(response.status,502);
+  assert.equal((await response.json()).error,'AI_PROVIDER_REDIRECT_BLOCKED');
+  assert.equal(h.ledger.length,0,'No quota should be used for free key status check');
+  const match=await onRequest({request:h.request(),env:h.env});
+  assert.equal((await match.json()).error,'AI_PROVIDER_REDIRECT_BLOCKED');
+  assert.equal(h.ledger.length,0,'Never consume quota for provider redirects');
+ }finally{globalThis.fetch=original;}
 });

@@ -39,6 +39,7 @@ const errorMap:Record<string,string>={
   AI_PROVIDER_REQUEST_REJECTED:'AI 服务请求配置有误，HHBA 正在检查接口兼容性。',
   AI_PROVIDER_UPSTREAM_ERROR:'DeepSeek 服务器暂时异常，请稍后再试。',
   AI_PROVIDER_NETWORK_ERROR:'HHBA 暂时无法连接 DeepSeek，请稍后再试。',
+  AI_PROVIDER_REDIRECT_BLOCKED:'AI 接口发生异常重定向，为保护密钥，已安全终止请求。',
   AI_PROVIDER_TIMEOUT:'AI 请求超时，请稍后再试。',
   AI_PROVIDER_RESPONSE_INVALID:'AI 服务返回了无法识别的数据，请稍后再试。',
   AI_PROFILE_INCOMPLETE:'AI 未能可靠识别简历内容，请完善简历后重试。',

@@ -75,6 +75,8 @@ function providerFailure(code,refundable=false){
  const err=new Error(code);err.matchCode=code;err.refundable=refundable;return err;
 }
 function providerStatusCode(status){
+ // Workers does not support redirect:error. Use manual and explicitly reject 3xx.
+ if(status>=300&&status<400)return providerFailure('AI_PROVIDER_REDIRECT_BLOCKED',true);
  if(status===401||status===403)return providerFailure('AI_PROVIDER_KEY_REJECTED',true);
  if(status===402)return providerFailure('AI_PROVIDER_BALANCE_INSUFFICIENT',true);
  if(status===429)return providerFailure('AI_PROVIDER_RATE_LIMITED');
@@ -116,7 +118,7 @@ async function aiExtract(key,text,roleHint){
  let response;
  try{
   response=await fetch('https://api.deepseek.com/chat/completions',{
-   method:'POST',redirect:'error',signal:AbortSignal.timeout(45000),
+   method:'POST',redirect:'manual',signal:AbortSignal.timeout(45000),
    headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},
    body:JSON.stringify({model:'deepseek-flash',thinking:{type:'disabled'},response_format:{type:'json_object'},
     temperature:0,max_tokens:1400,stream:false,
@@ -160,7 +162,7 @@ export async function onRequest({request,env}){
   let provider;
   try{
    provider=await fetch('https://api.deepseek.com/user/balance',{
-    method:'GET',redirect:'error',cache:'no-store',signal:AbortSignal.timeout(15000),
+    method:'GET',redirect:'manual',cache:'no-store',signal:AbortSignal.timeout(15000),
     headers:{Authorization:'Bearer '+env.HHBA_MATCH_DEEPSEEK_KEY,Accept:'application/json'}
    });
   }catch(e){
