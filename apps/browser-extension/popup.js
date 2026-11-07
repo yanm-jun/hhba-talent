@@ -1,5 +1,6 @@
 import {PROFILE_FIELDS,normalizeProfile,validateProfile,exportProfile,planFields,planAIFieldSuggestions} from "./core.mjs";
 import {HHBA_PERMISSION,EXTENSION_SESSION_KEY,accountApi,cleanPairCode,validDeviceSession} from "./account.mjs";
+import {mergeApplicationRecord} from "./application-history.mjs";
 const $=id=>document.getElementById(id);
 const STORAGE="hhba.apply.profile.v1";
 let profile=normalizeProfile({}),lastScan=null,lastPlan=[],tabId=null;
@@ -327,11 +328,7 @@ async function localApplications(){
 }
 async function saveLocalApplication(record){
  const list=await localApplications();
- const key=x=>[x.company,x.position,x.applicationUrl].join('|').toLocaleLowerCase();
- const k=key(record),prior=list.find(x=>key(x)===k);
- if(prior?.status==='confirmed'&&record.status!=='confirmed')return;
- const next=[{...record,synced:false,recordedAt:new Date().toISOString()},
-  ...list.filter(x=>key(x)!==k)].slice(0,100);
+ const next=mergeApplicationRecord(list,record);
  await chrome.storage.local.set({[APPLICATIONS_STORAGE]:next});
 }
 async function showApplications(){
