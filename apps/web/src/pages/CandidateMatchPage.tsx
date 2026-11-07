@@ -62,6 +62,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
  const [file,setFile]=useState<File|null>(null);
  const [savedFiles,setSavedFiles]=useState<PrivateResume[]>([]);
  const [savedId,setSavedId]=useState('');
+ const deepLinkPending=useRef<string|null>(new URLSearchParams(window.location.search).get('resume'));
  const [previewText,setPreviewText]=useState('');
  const [previewLoaded,setPreviewLoaded]=useState(false);
  const [previewBusy,setPreviewBusy]=useState(false);
@@ -88,7 +89,15 @@ export function CandidateMatchPage({user}:{user:User|null}){
     if(active){setPreviewText('');setPreviewLoaded(false);setConsent(false);}
     if(active){setSavedFiles([]);setSavedId('');}return;
    }
-   void listPrivateResumes().then(rows=>{if(active){setSavedFiles(rows);setVaultError('');}})
+   void listPrivateResumes().then(rows=>{if(active){
+    setSavedFiles(rows);setVaultError('');
+    const requested=deepLinkPending.current;
+    if(requested){
+     deepLinkPending.current=null;
+     if(/^[0-9a-f-]{36}$/.test(requested)&&rows.some(item=>item.id===requested))setSavedId(requested);
+     else setVaultError('指定的简历不在当前账号，请从列表中选择。');
+    }
+   }})
     .catch(e=>{if(active){setSavedFiles([]);setVaultError(e instanceof Error?e.message:'私有简历暂时无法读取。');}});
   };
   reload();

@@ -82,3 +82,39 @@ test('privacy-reviewed empty text never silently falls back to raw resume',async
  assert.match(ui,/setPreviewLoaded\(false\);setConsent\(false\);setSavedId/);
  assert.match(ui,/Once the user has reviewed\/edited text, NEVER fall back/);
 });
+
+
+test('saved R2 resumes offer direct AI navigation without auto-upload or auto-consent',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const vault=await readFile(new URL('../src/components/PrivateResumeVault.tsx',import.meta.url),'utf8');
+ const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
+ assert.match(vault,/candidate\/match\?resume=/);
+ assert.match(page,/deepLinkPending\.current/);
+ assert.match(page,/rows\.some\(item=>item\.id===requested\)/);
+ assert.match(page,/setSavedId\(requested\)/);
+ assert.doesNotMatch(vault,/submitResumeForMatching/);
+});
+test('Top 10 never repeats company+title just because an ATS job has more locations',()=>{
+ const now=Date.now(),at=new Date(now).toISOString();
+ const companies=[['acme','Data Analyst','111','NY'],['acme','Data Analyst','222','SF'],
+  ['acme','Data Scientist','333','NY'],['acme','Data Engineer','444','NY'],
+  ['beta','Data Scientist','555','NY'],['gamma','Data Analyst','666','NY']];
+ const jobs=companies.map(([source,title,id,location])=>({
+  id:'ashby-'+source+'-'+id,source,company:source,title,location,
+  url:'https://jobs.ashbyhq.com/'+source+'/'+id,platform:'ashby',remote:false
+ }));
+ const audit={summary:{kind:'HHBA_OFFICIAL_FULL_JOB_JD_AUDIT_V1',indexed_as_of:at,checked_at:at},
+  jobs:jobs.map(x=>({job_id:x.id,platform:x.platform,status:'OFFICIAL_JD_AND_REQUIREMENTS_FOUND',
+   full_original_jd_verified:true,requirements_evidence:true,jd_sha256:'sha-'+x.id}))};
+ const facets={indexed_as_of:at,verified_at:at,
+  jobs:jobs.map(x=>({id:x.id,skills:['sql'],original_source_hash:'sha-'+x.id}))};
+ const p={skills:[{name:'SQL',evidence:'SQL'}],target_roles:['Data Analyst']};
+ const out=selectAuditedMatches({updated:at,jobs},audit,facets,p,{limit:10},now);
+ const identities=out.matches.map(x=>x.company+'|'+x.title);
+ assert.equal(out.matched_official_jobs,5);
+ assert.equal(new Set(identities).size,identities.length);
+ assert.equal(out.matches.length,5);
+ assert.ok(out.matches.find(x=>x.company==='beta'));
+ assert.ok(out.matches.find(x=>x.company==='gamma'));
+ assert.equal(out.matches.filter(x=>x.company==='acme').length,3);
+});

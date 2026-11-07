@@ -21,3 +21,7 @@ Everything remains off unless `HHBA_MATCH_SERVICE_ENABLED=1`, `HHBA_MATCH_DEEPSE
 5. Only after approval plan separate production migration, secrets, controlled pilot and deploy.
 
 Still incomplete: external online job discovery, comprehensive Chinese domestic jobs matching, live hiring status guarantee, PDF OCR, browser compatibility acceptance, real paid DeepSeek invocation.
+
+## Candidate UX and diversity
+- A saved resume card now has a **direct 'AI 智能匹配' navigation link**. The UUID in the route is only a selector: matching page first verifies it exists in the current authenticated user's R2 listing, and it never submits without separate consent.
+- Top results collapse identical company + job-title entries across locations; first pass promotes at most two distinct roles per employer, then fills other verified distinct roles. Unsupported results are not fabricated to reach ten.

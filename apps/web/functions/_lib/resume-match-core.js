@@ -136,6 +136,31 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
    source_type:'HHBA站内岗位',rankEvidence:roleMatches.length+skillMatches.length});
  }
  filtered.sort((a,b)=>b.reference_score-a.reference_score||b.rankEvidence-a.rankEvidence||a.id.localeCompare(b.id));
- return {matches:filtered.slice(0,Math.min(10,Math.max(1,Number(opts.limit)||10))).map(({rankEvidence,...j})=>j),
-  matched_official_jobs:filtered.length};
+ // A vacancy in multiple cities should not crowd out different companies or roles.
+ // Identity is company + title, not URL; only the highest relevant variant survives.
+ const unique=[],seenRoles=new Set();
+ for(const item of filtered){
+  const key=item.company.trim().toLowerCase()+'|'+item.title.trim().toLowerCase();
+  if(seenRoles.has(key))continue;
+  seenRoles.add(key);unique.push(item);
+ }
+ const limit=Math.min(10,Math.max(1,Number(opts.limit)||10)),selected=[],picked=new Set();
+ const byCompany=new Map();
+ const add=(item)=>{
+  selected.push(item);picked.add(item.id);
+  const company=item.company.trim().toLowerCase();
+  byCompany.set(company,(byCompany.get(company)||0)+1);
+ };
+ // First pass prioritizes distinct employers; second pass fills remaining
+ // positions with other verified roles if the search has a small employer pool.
+ for(const item of unique){
+  if(selected.length>=limit)break;
+  if((byCompany.get(item.company.trim().toLowerCase())||0)>=2)continue;
+  add(item);
+ }
+ if(selected.length<limit)for(const item of unique){
+  if(selected.length>=limit)break;
+  if(!picked.has(item.id))add(item);
+ }
+ return {matches:selected.map(({rankEvidence,...j})=>j),matched_official_jobs:unique.length};
 }
