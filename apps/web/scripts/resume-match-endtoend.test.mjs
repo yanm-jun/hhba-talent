@@ -342,3 +342,24 @@ test('API rejects any country override before charging or model calls',async()=>
   assert.equal(h.callCounts.provider,0);
  }finally{globalThis.fetch=old;}
 });
+
+
+test('audited foreign-only index cannot spend AI quota or produce foreign jobs',async()=>{
+ const h=setup(),oldAsset=h.env.ASSETS.fetch,oldFetch=globalThis.fetch;
+ h.env.ASSETS.fetch=async req=>{
+  const res=await oldAsset(req),path=new URL(req.url).pathname;
+  if(!['/data/jobs.json','/data/job-search-facets.json'].includes(path))return res;
+  const body=await res.json();
+  if(path==='/data/jobs.json')body.jobs[0].location='San Francisco, USA';
+  else body.jobs[0].countryCode='US';
+  return new Response(JSON.stringify(body),{headers:{'content-type':'application/json'}});
+ };
+ globalThis.fetch=async()=>{h.callCounts.provider++;throw Error('Provider must not be used');};
+ try{
+  const response=await onRequest({request:h.request(),env:h.env});
+  assert.equal(response.status,503);
+  assert.equal((await response.json()).error,'NO_VERIFIED_DOMESTIC_JOBS');
+  assert.equal(h.callCounts.provider,0);
+  assert.equal(h.ledger.length,0);
+ }finally{globalThis.fetch=oldFetch;}
+});

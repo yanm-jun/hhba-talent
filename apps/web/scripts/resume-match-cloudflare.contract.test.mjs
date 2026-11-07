@@ -147,3 +147,22 @@ test('even a forged overseas preference cannot force foreign jobs into Top 10',(
  const matched=selectAuditedMatches({jobs,updated:at},audit,facets,profile,{country:'US',limit:10},now);
  assert.deepEqual(matched.matches.map(x=>x.id),['ashby-company-main']);
 });
+
+
+test('results use a focus-managed modal rather than a long inline page',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
+ const dialog=await readFile(new URL('../src/components/CandidateMatchResultDialog.tsx',import.meta.url),'utf8');
+ assert.match(page,/result&&<CandidateMatchResultDialog/);
+ assert.doesNotMatch(page,/hhba-ai-results/);
+ assert.doesNotMatch(page,/不限国家|希望工作的国家|countryOptions/);
+ assert.match(page,/country:'CN'/);
+ assert.match(dialog,/createPortal/);
+ assert.match(dialog,/role="dialog"/);
+ assert.match(dialog,/aria-modal="true"/);
+ assert.match(dialog,/event\.key==='Escape'/);
+ assert.match(dialog,/onMouseDown/);
+ assert.match(dialog,/aria-expanded/);
+ assert.match(dialog,/返回修改/);
+ assert.match(dialog,/document\.body\.style\.overflow='hidden'/);
+});
