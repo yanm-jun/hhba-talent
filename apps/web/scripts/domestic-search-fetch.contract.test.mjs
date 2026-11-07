@@ -42,7 +42,7 @@ test('search intent never forwards user resume contact details or arbitrary text
  }
  const q=buildOfficialQueries('Python 开发');
  assert.equal(q.length,2);
- for(const item of q){assert.ok(item.length<=128);assert.ok(item.includes('Python 开发'));}
+ for(const item of q){assert.ok(item.length<=128);assert.ok(item.includes('Python 开发'));assert.ok(item.startsWith('site:'));assert.ok(!item.includes('.html '));}
 });
 test('official URL parser rejects redirects, tracking, foreign links, deceptive subdomains',()=>{
  assert.equal(safeOfficialJobLocator(te)?.company,'腾讯');
@@ -125,4 +125,25 @@ test('provider redirect is blocked rather than leaking key to the destination ho
   e=>e instanceof ExternalSearchError&&e.code==='SEARCH_PROVIDER_REDIRECT_BLOCKED'
  );
  assert.equal(calls.length,1);
+});
+
+test('a missing official page does not discard already verified candidates',async()=>{
+ const absent='https://careers.tencent.com/jobdesc.html?postId=2097166275703910402';
+ const calls=[],searches=[{url:te},{url:absent},{url:hu}];
+ const fetcher=async(url,opts)=>{
+  calls.push({url,body:JSON.parse(opts.body)});
+  if(url.endsWith('/search'))return Response.json({results:searches});
+  if(JSON.parse(opts.body).url===absent)return Response.json({error:{code:'page_not_found'}},{status:404});
+  return Response.json({content:detail});
+ };
+ const result=await discoverExternalOfficialJobs('Python 开发','fake-key-of-adequate-length',{fetcher});
+ assert.equal(calls.filter(x=>x.url.endsWith('/fetch')).length,3);
+ assert.equal(result.usage.fetch,2);
+ assert.equal(result.candidates.length,2);
+ assert.ok(result.candidates.every(x=>x.application_status==='NEEDS_OFFICIAL_CONFIRMATION'));
+});
+test('official employer homepage is not mistaken for a job detail title',()=>{
+ const markdown=['# 腾讯招聘官网','# 软件开发工程师 深圳',...detail.split('\n').slice(1)].join('\n');
+ const result=extractOfficialJob({url:te},{content:markdown});
+ assert.equal(result.title,'软件开发工程师 深圳');
 });
