@@ -62,3 +62,7 @@
  .hhba-private-resume-details p{padding-left:15px}
 }
 @media(prefers-reduced-motion:reduce){.hhba-private-resumes *{transition:none!important}}
+
+/* AI matching is a navigation link: no implicit file upload or consent. */
+.hhba-private-resume-match{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;border:1px solid #bdd6c6;border-radius:8px;padding:7px 10px;color:#246141;background:#f5fbf7;font-size:12px;text-decoration:none;font-weight:650;min-height:34px}
+.hhba-private-resume-match:hover,.hhba-private-resume-match:focus-visible{background:#e7f3eb;color:#174e32}

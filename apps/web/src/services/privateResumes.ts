@@ -77,3 +77,21 @@ export async function downloadPrivateResume(resume:PrivateResume):Promise<void>{
   document.body.appendChild(a);a.click();a.remove();
  }finally{window.setTimeout(()=>URL.revokeObjectURL(temp),10000);}
 }
+
+/** Read this account's private resume only after the user clicks to analyze it.
+ * The raw PDF/DOCX stays inside the browser until local text extraction.
+ * Never persist the blob, expose it in URLs, or forward it to an AI service.
+ */
+export async function fetchPrivateResumeForLocalReview(resume:PrivateResume):Promise<ArrayBuffer>{
+ if(!/^[0-9a-f-]{36}$/.test(resume.id))throw Error('简历标识无效。');
+ if(!/\.(?:pdf|docx)$/i.test(resume.name)||resume.size<30||resume.size>PRIVATE_RESUME_LIMIT)
+  throw Error('这份简历不符合读取要求，请重新上传。');
+ const res=await request('/'+resume.id+'/download','GET');
+ const claimed=Number(res.headers.get('Content-Length')||0);
+ if(!Number.isFinite(claimed)||claimed<30||claimed>PRIVATE_RESUME_LIMIT)
+  throw Error('私有简历文件大小异常。');
+ const blob=await res.blob();
+ if(blob.size<30||blob.size>PRIVATE_RESUME_LIMIT||blob.size!==claimed)
+  throw Error('简历下载不完整，请重试。');
+ return blob.arrayBuffer();
+}

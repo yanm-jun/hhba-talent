@@ -5,6 +5,7 @@ import {
  deletePrivateResume,downloadPrivateResume,PRIVATE_RESUME_LIMIT,
  type PrivateResume,
 } from '../services/privateResumes';
+import {Link} from '../router';
 import '../styles/private-resumes.css';
 
 export function PrivateResumeVault(){
@@ -110,6 +111,8 @@ export function PrivateResumeVault(){
        <small>{(item.size/1024/1024).toFixed(2)} MB · {item.createdAt.slice(0,10)} 保存</small>
       </div>
       <div className="hhba-private-resume-actions">
+       <Link to={'/candidate/match?resume='+encodeURIComponent(item.id)}
+        className="hhba-private-resume-match" aria-label={'使用 '+item.name+' 进行 AI 智能匹配'}>AI 智能匹配</Link>
        <button type="button" disabled={busy} onClick={()=>void download(item)} aria-label={'下载 '+item.name}>
         <Download size={15}/>{operation===item.id&&busy?'处理中':'下载'}
        </button>
