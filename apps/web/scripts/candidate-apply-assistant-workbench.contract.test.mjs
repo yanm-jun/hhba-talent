@@ -11,7 +11,7 @@ test('personal workbench has exactly four cards, preserves original data and add
  const block=page.split('<div className="hhba-account-stat-grid">')[1]?.split('</div>')[0];
  assert.ok(block);
  assert.equal((block.match(/<Link to=/g)||[]).length,4);
- assert.ok(block.includes('已收藏岗位')&&block.includes('求职申请')&&block.includes('我的简历'));
+ assert.ok(block.includes('已收藏岗位')&&block.includes('求职记录')&&block.includes('我的简历'));
  assert.ok(block.includes('to="/candidate/account/apply-assistant"'));
  assert.ok(block.includes('一键网申'));
  assert.ok(block.includes('¥0.30'));
