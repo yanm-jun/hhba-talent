@@ -155,7 +155,8 @@ export function safeExternalJobApplicationUrl(job:MatchedJob):string|null{
   if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash||u.searchParams.size!==1)return null;
   const specs:Record<string,{company:string;path:string;param:string;pattern:RegExp}>={
    'careers.tencent.com':{company:'腾讯',path:'/jobdesc.html',param:'postId',pattern:/^\d{12,22}$/},
-   'career.huawei.com':{company:'华为',path:'/cn/job-details',param:'advertisementId',pattern:/^\d{1,12}$/}
+   'career.huawei.com':{company:'华为',path:'/cn/job-details',param:'advertisementId',pattern:/^\d{1,12}$/},
+   'zhaopin.meituan.com':{company:'美团',path:'/web/position/detail',param:'jobUnionId',pattern:/^\d{8,14}$/}
   };
   const expected=specs[u.hostname];
   if(!expected||u.pathname!==expected.path||job.company!==expected.company||
