@@ -1,0 +1,29 @@
+name: HHBA Resume AI immutable Preview real HTTP smoke
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/scripts/resume-match-preview-http.smoke.mjs'
+      - '.github/workflows/hhba-resume-match-preview-http-smoke.yml'
+  workflow_dispatch:
+    inputs:
+      preview_url:
+        description: "Immutable successful HHBA preview deployment URL"
+        required: true
+        default: "https://3eadb6aa.hhba-talent.pages.dev/"
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify Preview HTTP routes, fail-closed API, and official JD audit consistency
+        working-directory: apps/web
+        env:
+          HHBA_PREVIEW_URL: ${{ inputs.preview_url || 'https://3eadb6aa.hhba-talent.pages.dev/' }}
+        run: node scripts/resume-match-preview-http.smoke.mjs
