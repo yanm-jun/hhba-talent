@@ -19,6 +19,7 @@ assert.equal(s.status,200,'Cloudflare Pages AI status Function missing');
 jsonResponse(s,'AI status');
 const status=await s.json();
 assert.equal(status.kind,'HHBA_RESUME_MATCH_CLOUDFLARE_V1');
+assert.equal(status.scope,'CN_MAINLAND_ONLY','Preview service must be mainland-only');
 assert.equal(typeof status.enabled,'boolean');
 assert.equal(status.per_account_daily_limit,2);
 assert.equal(status.global_daily_limit,60);
