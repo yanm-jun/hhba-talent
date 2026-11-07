@@ -130,10 +130,11 @@ async function providerPost(url,key,payload,maxBytes,fetcher){
   throw new ExternalSearchError(e?.name==='TimeoutError'?'SEARCH_PROVIDER_TIMEOUT':'SEARCH_PROVIDER_NETWORK');
  }
  if(response.status>=300&&response.status<400)throw new ExternalSearchError('SEARCH_PROVIDER_REDIRECT_BLOCKED');
+ if(url.endsWith('/fetch')&&(response.status===403||response.status===404))
+  throw new ExternalSearchError('SEARCH_FETCH_NOT_AVAILABLE');
  if(response.status===401||response.status===403)throw new ExternalSearchError('SEARCH_PROVIDER_KEY_REJECTED');
  if(response.status===402)throw new ExternalSearchError('SEARCH_PROVIDER_BALANCE_INSUFFICIENT');
  if(response.status===429)throw new ExternalSearchError('SEARCH_PROVIDER_RATE_LIMIT');
- if(url.endsWith('/fetch')&&(response.status===403||response.status===404))throw new ExternalSearchError('SEARCH_FETCH_NOT_AVAILABLE');
  if(!response.ok)throw new ExternalSearchError('SEARCH_PROVIDER_ERROR');
  try{return await readBoundedJson(response,maxBytes);}
  catch{throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');}
