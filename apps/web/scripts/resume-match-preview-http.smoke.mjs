@@ -22,6 +22,8 @@ assert.equal(status.kind,'HHBA_RESUME_MATCH_CLOUDFLARE_V1');
 assert.equal(typeof status.enabled,'boolean');
 assert.equal(status.per_account_daily_limit,2);
 assert.equal(status.global_daily_limit,60);
+if(process.env.HHBA_EXPECT_MATCH_ENABLED==='1')assert.equal(status.enabled,true,
+ 'Pilot Preview must expose enabled=true only when dedicated key, pepper and D1 are correctly bound');
 console.log('MATCH_STATUS_OK',status.enabled?'enabled':'disabled');
 
 const page=await request('/candidate/match');
@@ -37,6 +39,8 @@ console.log('CROSS_SITE_BLOCKED');
 
 const anon=await request('/api/match/resume',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:'{}'});
 assert.ok([401,503].includes(anon.status),'Anonymous requests must fail closed');
+if(process.env.HHBA_EXPECT_MATCH_ENABLED==='1')assert.equal(anon.status,401,
+ 'Enabled pilot must reject unauthenticated requests before any AI invocation');
 jsonResponse(anon,'Unauthorized denial');
 console.log('ANONYMOUS_BLOCKED',anon.status);
 
