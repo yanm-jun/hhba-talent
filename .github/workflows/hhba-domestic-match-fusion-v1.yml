@@ -1,0 +1,35 @@
+name: HHBA Mainland Dual-Source Top10 Fusion V1
+on:
+  pull_request:
+    paths:
+      - 'apps/web/functions/_lib/domestic-match-fusion.js'
+      - 'apps/web/scripts/domestic-match-fusion.contract.test.mjs'
+      - 'apps/web/scripts/domestic-search-fetch.contract.test.mjs'
+      - 'apps/web/functions/_lib/domestic-search-fetch.js'
+      - '.github/workflows/hhba-domestic-match-fusion-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-fusion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install pinned dependencies
+        working-directory: apps/web
+        run: npm ci --ignore-scripts
+      - name: Verify source guards and deterministic ranking
+        working-directory: apps/web
+        run: |
+          node --check functions/_lib/domestic-search-fetch.js
+          node --check functions/_lib/domestic-match-fusion.js
+          node --test scripts/domestic-match-fusion.contract.test.mjs scripts/domestic-search-fetch.contract.test.mjs scripts/domestic-search-fetch.route.test.mjs
+      - name: Check HHBA web production build
+        working-directory: apps/web
+        run: npm run build
