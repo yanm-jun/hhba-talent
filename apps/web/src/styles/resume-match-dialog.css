@@ -1,0 +1,75 @@
+
+/* Independent accessible results dialog; overlay never stretches the upload page. */
+.hhba-match-overlay{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:clamp(8px,2.5vw,28px);background:rgba(11,27,17,.56)}
+.hhba-match-modal{width:min(830px,100%);height:min(740px,calc(100dvh - 36px));max-height:calc(100dvh - 16px);background:#fff;border-radius:17px;box-shadow:0 25px 80px rgba(5,20,10,.22);display:flex;flex-direction:column;overflow:hidden;color:#22352a;outline:none}
+.hhba-match-modal-head{flex-shrink:0;display:flex;justify-content:space-between;gap:18px;padding:22px 26px 18px;border-bottom:1px solid #e7eee9}
+.hhba-match-modal-eyebrow{font-size:11px;font-weight:730;letter-spacing:.07em;color:#518565}
+.hhba-match-modal-head h2{font-size:22px;line-height:1.3;margin:7px 0 6px;letter-spacing:-.025em}
+.hhba-match-modal-head p{font-size:12px;color:#758578;margin:0}
+.hhba-match-modal-close{width:37px;height:37px;display:grid;place-items:center;flex-shrink:0;border:1px solid #e1eae3;border-radius:10px;background:#fff;color:#5b7564;cursor:pointer}
+.hhba-match-modal-close:hover{background:#eef7f0}
+.hhba-match-modal-content{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:20px 26px}
+.hhba-match-profile{border:1px solid #e2ece5;background:#f7faf8;padding:13px 17px;border-radius:12px}
+.hhba-match-profile-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.hhba-match-profile-grid>div{min-width:0;padding:4px 12px;border-right:1px solid #e0eae2}
+.hhba-match-profile-grid>div:first-child{padding-left:0}
+.hhba-match-profile-grid>div:last-child{border-right:0}
+.hhba-match-profile-grid small{display:block;color:#7c8c7f;font-size:11px;margin-bottom:6px}
+.hhba-match-profile-grid strong{display:block;font-size:15px;color:#315f43;overflow-wrap:anywhere}
+.hhba-match-profile-skills{border-top:1px solid #e2e9e3;margin-top:12px;padding-top:11px;display:flex;align-items:start;gap:12px}
+.hhba-match-profile-skills>span{font-size:11px;color:#778a7b;padding-top:6px}
+.hhba-match-profile-skills>div{display:flex;flex-wrap:wrap;gap:5px}
+.hhba-match-profile-skills small{display:inline-block;background:#fff;border:1px solid #dce8df;border-radius:6px;font-size:11px;padding:5px 8px;color:#3e6d50}
+.hhba-match-profile-skills em{font-size:11px;color:#849287}
+.hhba-match-list-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:20px 0 12px}
+.hhba-match-list-title h3{font-size:16px;margin:0}
+.hhba-match-list-title small{font-size:11px;color:#8a968e}
+.hhba-match-job-list{display:flex;flex-direction:column;gap:8px}
+.hhba-match-job{border:1px solid #e5ede6;border-radius:11px;overflow:hidden;background:#fff}
+.hhba-match-job.expanded{border-color:#b7d8c3}
+.hhba-match-job-toggle{width:100%;border:0;background:#fff;cursor:pointer;display:flex;align-items:center;gap:12px;padding:12px 14px;text-align:left;color:inherit}
+.hhba-match-job-toggle:hover{background:#f8fbf9}
+.hhba-match-job-index{width:24px;flex-shrink:0;font-size:12px;font-weight:720;color:#7e9c84}
+.hhba-match-job-primary{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
+.hhba-match-job-primary strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.hhba-match-job-primary small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#839187;font-size:11px}
+.hhba-match-job-score{min-width:65px;display:flex;align-items:flex-end;flex-direction:column;flex-shrink:0}
+.hhba-match-job-score strong{font-size:16px;color:#396c4a}
+.hhba-match-job-score small{font-size:9px;color:#909b92;white-space:nowrap}
+.hhba-match-job-chevron{flex-shrink:0;color:#74907c;transition:transform .15s}
+.hhba-match-job-chevron.open{transform:rotate(180deg)}
+.hhba-match-job-details{padding:12px 16px 16px;border-top:1px solid #e9efe9;background:#fafbfa}
+.hhba-match-job-disclaimer{color:#819085;font-size:11px;margin:0 0 12px}
+.hhba-match-job-evidence{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.hhba-match-evidence{border:1px solid #e8ede8;border-radius:8px;background:#fff;padding:11px;min-width:0}
+.hhba-match-evidence-match{background:#f7fbf8}
+.hhba-match-evidence-gap{background:#fffbf6}
+.hhba-match-evidence h4{display:flex;align-items:center;gap:5px;margin:0 0 9px;font-size:12px;color:#457352}
+.hhba-match-evidence-gap h4{color:#a07946}
+.hhba-match-evidence-note h4{color:#778276}
+.hhba-match-evidence ul{margin:0;padding-left:16px}
+.hhba-match-evidence li,.hhba-match-evidence p{font-size:11px;line-height:1.75;color:#657469;overflow-wrap:anywhere}
+.hhba-match-job-links{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin-top:13px}
+.hhba-match-job-links a{font-size:12px;text-decoration:none;color:#34704d;display:inline-flex;align-items:center;gap:4px}
+.hhba-match-job-links a:last-of-type{background:#316d4d;border-radius:7px;padding:9px 12px;color:#fff}
+.hhba-match-no-jobs{padding:24px;background:#f7faf8;border:1px dashed #cbd9ce;border-radius:11px;font-size:13px}
+.hhba-match-no-jobs p{color:#697e6e;line-height:1.75}
+.hhba-match-no-jobs a{color:#296442;font-weight:670;display:inline-flex;align-items:center;gap:4px}
+.hhba-match-disclaimer{font-size:11px;color:#8b998e;line-height:1.75;margin:17px 0 0}
+.hhba-match-modal-foot{padding:13px 26px;border-top:1px solid #e8eee9;display:flex;justify-content:space-between;gap:10px;flex-shrink:0}
+.hhba-match-modal-foot button{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:690;border-radius:8px;padding:10px 14px;cursor:pointer}
+.hhba-match-return{border:1px solid #dce9df;background:#fff;color:#35664b}
+.hhba-match-done{border:1px solid #326e4c;background:#326e4c;color:#fff}
+.hhba-match-modal button:focus-visible,.hhba-match-modal a:focus-visible{outline:2px solid #4b9f67;outline-offset:2px}
+@media(max-width:620px){
+ .hhba-match-overlay{padding:0;align-items:stretch}
+ .hhba-match-modal{width:100%;height:100dvh;max-height:100dvh;border-radius:0}
+ .hhba-match-modal-head{padding:18px 16px 14px}
+ .hhba-match-modal-head h2{font-size:19px}
+ .hhba-match-modal-content{padding:16px}
+ .hhba-match-profile-grid{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:8px}
+ .hhba-match-profile-grid>div:nth-child(2){border-right:0}
+ .hhba-match-profile-grid>div:last-child{grid-column:1/-1;border-top:1px solid #e1e8e2;padding-top:10px;padding-left:0}
+ .hhba-match-job-evidence{grid-template-columns:1fr}
+ .hhba-match-modal-foot{padding:11px 16px}
+}
