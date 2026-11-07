@@ -184,10 +184,97 @@
   snapshot=[];
   return {ok:true,restored:count};
  }
+ // Opt-in, same-document tracking only. NEVER sends a network request or
+ // clicks the employer's submit button. A full-page navigation cancels the
+ // watcher; the applicant may verify the new success page after navigation.
+ const APPLICATIONS_STORAGE='hhba.apply.application-local.v1';
+ let tracking=null;
+ const SUCCESS=/(?:投递成功|申请已提交|提交申请成功|申请提交成功|application (?:submitted|received|successful)|successfully applied|thank you for applying|your application has been (?:submitted|received))/i;
+ const NEGATIVE=/(?:提交失败|投递失败|申请失败|验证码错误|网络错误|未提交成功|unsuccessful|failed to submit|please try again)/i;
+ const receiptSelectors='[role="status"],[role="alert"],.success,.success-message,.application-success,.submission-success,[data-testid*="success"],h1,h2,h3';
+ function findSuccessSignal(){
+  let inspected=0;
+  for(const el of document.querySelectorAll(receiptSelectors)){
+   if(inspected++>=80)break;
+   if(!visible(el))continue;
+   const value=clean(el.textContent).slice(0,180);
+   if(value&&SUCCESS.test(value)&&!NEGATIVE.test(value))
+    return 'success_notice';
+  }
+  return 'none';
+ }
+ function safeJobLink(){
+  const u=new URL(location.href);
+  return u.protocol==='https:'?u.origin+u.pathname:null; // discard query/hash/token
+ }
+ function resultCheck(){
+  return {ok:true,evidenceKind:findSuccessSignal(),applicationUrl:safeJobLink(),
+   note:'仅检查可见成功提示，不读取表单答案、截图或完整页面文本。'};
+ }
+ async function storeAttempt(meta,status,evidenceKind){
+  if(!meta||!safeJobLink())return;
+  const old=await chrome.storage.local.get(APPLICATIONS_STORAGE);
+  const list=Array.isArray(old[APPLICATIONS_STORAGE])?old[APPLICATIONS_STORAGE]:[];
+  const item={company:meta.company,position:meta.position,applicationUrl:meta.applicationUrl,
+   status,evidenceKind,recordedAt:new Date().toISOString(),synced:false};
+  const key=x=>[x.company,x.position,x.applicationUrl].join('|').toLocaleLowerCase();
+  const prev=list.find(x=>key(x)===key(item));
+  if(prev?.status==='confirmed'&&status!=='confirmed')return;
+  const next=[item,...list.filter(x=>key(x)!==key(item))].slice(0,100);
+  await chrome.storage.local.set({[APPLICATIONS_STORAGE]:next});
+ }
+ function armTrack(data){
+  if(!safeJobLink())return {ok:false,error:'仅允许 HTTPS 招聘申请页面'};
+  if(tracking?.observer)tracking.observer.disconnect();
+  const company=clean(data?.company),position=clean(data?.position);
+  if(company.length<2||position.length<2||data?.consent!==true)
+   return {ok:false,error:'请填写企业和岗位并确认本次跟踪授权'};
+  const link=safeJobLink();
+  tracking={company,position,applicationUrl:link,created:Date.now(),submitted:false,observer:null};
+  // Observe only the next 5 minutes of the current document.
+  tracking.observer=new MutationObserver(()=>{
+   if(!tracking||!tracking.submitted)return;
+   if(Date.now()-tracking.created>300000){tracking.observer?.disconnect();tracking=null;return;}
+   const evidence=findSuccessSignal();
+   if(evidence!=='none'){
+    const context=tracking;
+    context.observer?.disconnect();tracking=null;
+    void storeAttempt(context,'confirmed',evidence).catch(()=>{});
+   }
+  });
+  tracking.observer.observe(document.documentElement,{childList:true,subtree:true,characterData:true});
+  return {ok:true,notice:'已开启当前页面的有限时段跟踪；只观察本人提交后的成功提示。'};
+ }
+ function markSubmission(event){
+  if(!tracking||Date.now()-tracking.created>300000)return;
+  if(!event.isTrusted)return;
+  if(event.type==='click'){
+   const control=event.target?.closest?.('button,input[type="submit"]');
+   if(!control||control.disabled||!(/submit|apply|投递|申请|提交/i).test(
+    [control.textContent,control.getAttribute('aria-label'),control.value].join(' ')))return;
+  }else if(event.type!=='submit')return;
+  tracking.submitted=true;
+  void storeAttempt(tracking,'pending','none').catch(()=>{});
+  // SPA apps may display the success notice without triggering mutations after.
+  queueMicrotask(()=>{
+   if(!tracking||!tracking.submitted)return;
+   const ev=findSuccessSignal();
+   if(ev!=='none'){
+    const context=tracking;context.observer?.disconnect();tracking=null;
+    void storeAttempt(context,'confirmed',ev).catch(()=>{});
+   }
+  });
+ }
+ document.addEventListener('submit',markSubmission,true);
+ document.addEventListener('click',markSubmission,true);
  chrome.runtime.onMessage.addListener((message,_sender,reply)=>{
-  if(!message||typeof message!=="object"||!["HHBA_SCAN","HHBA_FILL","HHBA_UNDO","HHBA_FOCUS"].includes(message.type))return;
+  if(!message||typeof message!=="object"||!["HHBA_SCAN","HHBA_FILL","HHBA_UNDO","HHBA_FOCUS","HHBA_APPLICATION_CHECK","HHBA_TRACK_START"].includes(message.type))return;
   try{
-   const result=message.type==="HHBA_SCAN"?scan():message.type==="HHBA_FILL"?fill(message):message.type==="HHBA_FOCUS"?focus(message):undo();
+   const result=message.type==="HHBA_SCAN"?scan():
+    message.type==="HHBA_FILL"?fill(message):
+    message.type==="HHBA_FOCUS"?focus(message):
+    message.type==="HHBA_APPLICATION_CHECK"?resultCheck():
+    message.type==="HHBA_TRACK_START"?armTrack(message):undo();
    reply(result);
   }catch(e){reply({ok:false,error:e?.message||"网页处理失败"})}
   return true;
