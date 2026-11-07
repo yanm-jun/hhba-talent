@@ -1,0 +1,17 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>HHBA 合成网申测试页</title></head>
+<body><h1>HHBA 测试招聘网申（虚构）</h1><p>本页面只供本地功能测试，不属于任何企业。</p>
+<form id="apply">
+<label>姓名 <input name="fullName" required></label>
+<label>手机号 <input name="mobile" type="tel" required></label>
+<label>邮箱 <input name="email" type="email" required></label>
+<label>毕业院校 <input name="school" required></label>
+<label>专业 <input name="major" required></label>
+<label>最高学历 <input name="degree" required></label>
+<label>身份证号码 <input name="idCard"></label>
+<label>验证码 <input name="captcha"></label>
+<label>开放性问题 <textarea name="motivation"></textarea></label>
+<label>隐私同意 <input type="checkbox" name="agree"></label>
+<button type="submit">提交申请</button>
+</form><output id="submission">未提交</output>
+<script>document.querySelector('form').addEventListener('submit',e=>{e.preventDefault();document.querySelector('output').textContent='已提交';});</script>
+</body></html>
