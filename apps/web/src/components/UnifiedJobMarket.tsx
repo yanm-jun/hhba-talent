@@ -384,8 +384,8 @@ export function UnifiedJobMarket({compact=false,user=null}:{compact?:boolean,use
       error?<div className="unified-job-state" role="alert">{lang==='zh'?error:'Jobs temporarily unavailable. Please retry.'}<button type="button" onClick={()=>setRetry(x=>x+1)}><RefreshCcw size={15}/> {lang==='zh'?'重试':'Retry'}</button></div>:
       shown.length?<div className="unified-job-grid unified-role-list" aria-label={selectedMajor?'专业相关的真实岗位':'招聘岗位'}>{shown.map(job=><JobCard key={job.id} job={job} lang={lang} asOf={snapshot!.updated}
          majorSlug={selectedMajor}
-         applicationState={myApplications?(job.marketGroup?.variants.length&&job.marketGroup.variants.length>1?
-           'possible':jobApplicationDisplay(job,myApplications)):undefined}/>)}</div>:
+         applicationState={myApplications&&!(job.marketGroup?.variants.length&&job.marketGroup.variants.length>1)?
+           jobApplicationDisplay(job,myApplications):undefined}/>)}</div>:
         <div className="unified-job-state">{selectedMajor?(lang==='zh'?'当前没有符合该专业及其他筛选条件的已收录岗位。可尝试调整城市、招聘类型，或主动勾选“专业要求未披露的岗位”进行核验。':'No recorded roles meet this major and your other filters. Try adjusting your criteria.'):domesticOnly?(lang==='zh'?'当前没有符合条件的历史岗位。':'No matching archived jobs.'):v2SearchMatched?(lang==='zh'?'以上已找到匹配的 V2 企业及其岗位方向；当前正式岗位列表未有其他近期核验结果。':'The V2 employer and its archived role directions are shown above; no additional recently verified jobs match.'):lang==='zh'?'当前没有通过近期核验的岗位，请尝试其他筛选条件。':'No recently observed jobs match your filters.'}</div>}
     <div className="unified-job-footer">
       <span>{snapshot?.sourceTotal!==undefined&&snapshot.sourceTotal!==snapshot.total?
