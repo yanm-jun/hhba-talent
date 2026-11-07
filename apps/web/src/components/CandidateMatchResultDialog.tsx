@@ -3,7 +3,7 @@ import {createPortal} from 'react-dom';
 import {ArrowLeft,ArrowRight,CheckCircle2,ChevronDown,FileText,TriangleAlert,X} from 'lucide-react';
 import {Link} from '../router';
 import {safeOfficialJobUrl} from '../services/liveRecruitment';
-import type {MatchResponse,MatchedJob} from '../services/resumeMatch';
+import {safeExternalJobApplicationUrl,type MatchResponse,type MatchedJob} from '../services/resumeMatch';
 import '../styles/resume-match-dialog.css';
 
 const educationNames:Record<string,string>={
@@ -22,7 +22,8 @@ function Evidence({title,items,variant}:{
 function JobRow({item,index,expanded,onToggle}:{
  item:MatchedJob;index:number;expanded:boolean;onToggle:()=>void
 }){
- const verified=safeOfficialJobUrl({
+ const isExternal=item.source_type==='站外官方招聘';
+ const verified=isExternal?safeExternalJobApplicationUrl(item):safeOfficialJobUrl({
   id:item.id,source:item.source,platform:item.platform,company:item.company,
   title:item.title,url:item.official_url,location:item.location,remote:item.remote
  });
@@ -32,20 +33,20 @@ function JobRow({item,index,expanded,onToggle}:{
    <span className="hhba-match-job-index">{String(index).padStart(2,'0')}</span>
    <span className="hhba-match-job-primary">
     <strong>{item.title_zh||item.title}</strong>
-    <small>{item.company} · {item.location||'中国大陆 · 地点待核实'}</small>
+    <small>{item.company} · {item.location||'中国大陆 · 地点待核实'} · <span className={isExternal?'hhba-match-source-external':'hhba-match-source-internal'}>{isExternal?'站外官方 · 待核实开放':'HHBA 站内'}</span></small>
    </span>
    <span className="hhba-match-job-score"><strong>{item.reference_score}</strong><small>参考相关度</small></span>
    <ChevronDown size={17} className={expanded?'hhba-match-job-chevron open':'hhba-match-job-chevron'}/>
   </button>
   {expanded&&<div id={'hhba-match-job-'+index} className="hhba-match-job-details">
-   <p className="hhba-match-job-disclaimer">岗位条件、工作地点及开放状态请以企业官方页面为准；分数不是录用概率。</p>
+   <p className="hhba-match-job-disclaimer">{isExternal?'已读取企业官方职位详情，但是否仍接受申请需打开原站确认。':'已通过 HHBA 官方岗位来源审核，是否仍在招聘以企业官网为准。'} 分数不是录用概率。</p>
    <div className="hhba-match-job-evidence">
     <Evidence title="匹配依据" items={item.matched||[]} variant="match"/>
     <Evidence title="尚待证明" items={item.not_evidenced||[]} variant="gap"/>
     <Evidence title="需要核验" items={item.needs_verification||[]} variant="note"/>
    </div>
    <div className="hhba-match-job-links">
-    <Link to={'/candidate/jobs/'+encodeURIComponent(item.id)}>查看 HHBA 岗位资料</Link>
+    {!isExternal&&<Link to={'/candidate/jobs/'+encodeURIComponent(item.id)}>查看 HHBA 岗位资料</Link>}
     {verified?<a href={verified} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">
       打开企业招聘页 <ArrowRight size={15}/></a>:<span>该岗位没有通过安全验证的外部链接</span>}
    </div>

@@ -13,7 +13,8 @@ export type MatchedJob = {
   official_url:string;platform:string;source:string;remote:boolean;
   reference_score:number;matched:string[];not_evidenced:string[];
   needs_verification:string[];requirements_basis:string;
-  source_type?:'HHBA站内岗位';
+  source_type?:'HHBA站内岗位'|'站外官方招聘';
+  application_status?:'NEEDS_OFFICIAL_CONFIRMATION';checked_at?:string;
 };
 export type MatchResponse = {
   status:'COMPLETE';profile:MatchProfile;matches:MatchedJob[];
@@ -142,4 +143,26 @@ export async function checkMatchProviderConnection(signal?:AbortSignal):Promise<
   errorMap[data.error||'']||'AI 服务检测暂时不可用。');
  if(data.ok!==true||data.status!=='READY')throw new MatchError(502,'AI 服务检测返回异常结果。');
  return 'AI 密钥验证成功、余额可用。没有发送简历，也没有消耗匹配次数。';
+}
+
+/** Safe outbound detail URL for a fetched and independently reviewed mainland
+ * enterprise posting. The frontend never trusts arbitrary URLs from AI.
+ */
+export function safeExternalJobApplicationUrl(job:MatchedJob):string|null{
+ if(job?.source_type!=='站外官方招聘'||job.application_status!=='NEEDS_OFFICIAL_CONFIRMATION')return null;
+ try{
+  const u=new URL(job.official_url);
+  if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash||u.searchParams.size!==1)return null;
+  const specs:Record<string,{company:string;path:string;param:string;pattern:RegExp}>={
+   'careers.tencent.com':{company:'腾讯',path:'/jobdesc.html',param:'postId',pattern:/^\d{12,22}$/},
+   'career.huawei.com':{company:'华为',path:'/cn/job-details',param:'advertisementId',pattern:/^\d{1,12}$/}
+  };
+  const expected=specs[u.hostname];
+  if(!expected||u.pathname!==expected.path||job.company!==expected.company||
+   job.source!==u.hostname||!u.searchParams.has(expected.param))return null;
+  const native=u.searchParams.get(expected.param)||'';
+  if(!expected.pattern.test(native)||job.id!=='external-'+u.hostname.replace(/[^a-zA-Z0-9_-]/g,'-')+'-'+native)
+   return null;
+  return 'https://'+u.hostname+expected.path+'?'+expected.param+'='+native;
+ }catch{return null;}
 }

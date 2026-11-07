@@ -73,3 +73,6 @@
  .hhba-match-job-evidence{grid-template-columns:1fr}
  .hhba-match-modal-foot{padding:11px 16px}
 }
+
+.hhba-match-source-external{color:#8a5c26;font-weight:650}
+.hhba-match-source-internal{color:#3b7353;font-weight:650}
