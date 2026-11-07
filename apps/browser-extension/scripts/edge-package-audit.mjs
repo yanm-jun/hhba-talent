@@ -63,13 +63,14 @@ assert.equal(manifest.side_panel.default_path,'popup.html');
 const html=readFileSync(file('popup.html'),'utf8');
 assert.ok(html.includes('src="popup.js"'));
 assert.ok(!/<script[^>]+src=["']https?:\/\//i.test(html),'remote executable scripts forbidden');
-for(const module of ['popup.js','content.js','core.mjs','account.mjs','popup.css']){
+for(const module of ['popup.js','content.js','core.mjs','account.mjs','application-history.mjs','popup.css']){
  assert.ok(existsSync(file(module)),'missing dependency '+module);
 }
 const popup=readFileSync(file('popup.js'),'utf8');
 const account=readFileSync(file('account.mjs'),'utf8');
 assert.ok(!/chrome\.cookies|chrome\.webRequest|eval\s*\(/.test(popup+account),'unnecessary sensitive runtime access');
 assert.ok(account.includes("https://hhba.work"));
+assert.ok(popup.includes('mergeApplicationRecord'),'ATS receipt merges must be local and bounded');
 assert.ok(popup.includes('profile-sync-consent'),'explicit opt-in to account profile import required');
 assert.ok(popup.includes('ai-consent'),'external AI consent must be visible');
 assert.ok(popup.includes('confirm('),'profile replacement must require confirmation');
