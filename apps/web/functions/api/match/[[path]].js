@@ -42,6 +42,33 @@ async function officialJobs(env,origin){
  ]);
  return {snapshot,audit,facets};
 }
+async function boundedJsonBody(request){
+ const declared=request.headers.get('Content-Length');
+ if(declared!==null&&(!/^\d+$/.test(declared)||Number(declared)>100000))
+  throw Error('BODY_TOO_LARGE');
+ if(!request.body)throw Error('INVALID_JSON_BODY');
+ const reader=request.body.getReader(),chunks=[];let count=0;
+ try{
+  while(true){
+   const next=await reader.read();
+   if(next.done)break;
+   count+=next.value.byteLength;
+   if(count>100000){
+    await reader.cancel();
+    throw Error('BODY_TOO_LARGE');
+   }
+   chunks.push(next.value);
+  }
+ }finally{reader.releaseLock();}
+ const joined=new Uint8Array(count);let offset=0;
+ for(const chunk of chunks){joined.set(chunk,offset);offset+=chunk.byteLength;}
+ let raw;
+ try{raw=new TextDecoder('utf-8',{fatal:true}).decode(joined);}
+ catch{throw Error('INVALID_JSON_BODY');}
+ if(raw.length>50000)throw Error('BODY_TOO_LARGE');
+ try{return JSON.parse(raw);}catch{throw Error('INVALID_JSON_BODY');}
+}
+
 async function reserveBudget(db,identity){
  const now=new Date(),day=now.toISOString().slice(0,10),id=crypto.randomUUID();
  // A single conditional INSERT is atomic under D1 SQLite concurrency.
@@ -105,13 +132,9 @@ export async function onRequest({request,env}){
   const user=await getUserByPhone(db,session.phone);
   if(!user||user.role!=='candidate')return fail('FORBIDDEN',403);
  }catch{return fail('SESSION_INVALID',401);}
- const declared=Number(request.headers.get('Content-Length')||0);
- if(declared>100000)return fail('INVALID_RESUME_TEXT',413);
  let input;
- try{const raw=await request.text();
-  if(raw.length>50000)return fail('INVALID_RESUME_TEXT',413);
-  input=JSON.parse(raw);
- }catch{return fail('INVALID_RESUME_TEXT',400);}
+ try{input=await boundedJsonBody(request);}
+ catch(e){return fail('INVALID_RESUME_TEXT',e?.message==='BODY_TOO_LARGE'?413:400);}
  if(input?.consent!==true)return fail('EXPLICIT_AI_SHARING_CONSENT_REQUIRED',400);
  if(typeof input?.text!=='string'||input.text.length>20000||
     input.text.replace(/\s/g,'').length<30)return fail('INVALID_RESUME_TEXT',400);

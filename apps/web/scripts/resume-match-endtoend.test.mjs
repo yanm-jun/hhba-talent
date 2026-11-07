@@ -149,3 +149,32 @@ test('provider errors return no false recommendation and keep budget reserved',a
   assert.equal(h.ledger.length,1);
  }finally{restore();}
 });
+
+test('chunked JSON above 100 KB is rejected before the asset index and provider',async()=>{
+ const h=setup(),restore=mockedAI(h.callCounts);
+ try{
+  const stream=new ReadableStream({start(ctrl){ctrl.enqueue(new TextEncoder().encode('{"text":"'+ 'Z'.repeat(110000)+'"}'));ctrl.close();}});
+  const req=new Request(origin+'/api/match/resume',{method:'POST',
+   headers:{Origin:origin,Authorization:'Bearer synthetic-client-token','Content-Type':'application/json'},
+   body:stream,duplex:'half'});
+  const response=await onRequest({request:req,env:h.env});
+  assert.equal(response.status,413);
+  assert.equal((await response.json()).error,'INVALID_RESUME_TEXT');
+  assert.equal(h.callCounts.asset,0);
+  assert.equal(h.callCounts.provider,0);
+  assert.equal(h.ledger.length,0);
+ }finally{restore();}
+});
+test('invalid UTF-8 request never touches the AI provider',async()=>{
+ const h=setup(),restore=mockedAI(h.callCounts);
+ try{
+  const stream=new ReadableStream({start(ctrl){ctrl.enqueue(new Uint8Array([255,254,253]));ctrl.close();}});
+  const req=new Request(origin+'/api/match/resume',{method:'POST',
+   headers:{Origin:origin,Authorization:'Bearer synthetic-client-token','Content-Type':'application/json'},
+   body:stream,duplex:'half'});
+  const response=await onRequest({request:req,env:h.env});
+  assert.equal(response.status,400);
+  assert.equal(h.callCounts.provider,0);
+  assert.equal(h.ledger.length,0);
+ }finally{restore();}
+});
