@@ -305,7 +305,7 @@ function safeApplicationLink(raw){
  try{
   const url=new URL(raw);
   if(url.protocol!=='https:'||url.username||url.password)return null;
-  const allowed=new Set(['gh_jid','jobid','job_id','positionid','reqid','requisitionid','id','job','jid']);
+  const allowed=new Set(['gh_jid','jobid','job_id','positionid','reqid','requisitionid']);
   const qs=new URLSearchParams();
   for(const [k,v] of url.searchParams){
    if(allowed.has(k.toLowerCase())&&/^[a-z0-9_-]{1,110}$/i.test(v)&&qs.size<4)
