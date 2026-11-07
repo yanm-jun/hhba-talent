@@ -56,7 +56,8 @@ function mockProvider(counter){
   assert.equal(opts.headers.Authorization,'Bearer fake-key-of-adequate-length');
   assert.equal(String(url),'https://api.deepseek.com/v1/tools/search');
   const body=JSON.parse(opts.body);
-  assert.match(body.query,/^site:/);
+  assert.match(body.query,/site:(?:careers\.tencent\.com|zhaopin\.meituan\.com|career\.huawei\.com)/);
+  assert.doesNotMatch(body.query,/site:[^\s]+(?:evil|example|google)/);
   assert.doesNotMatch(JSON.stringify(body),/13800000000|fake-token|person@example\.com/);
   counter.search++;
   return Response.json({results:[]});
