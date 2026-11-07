@@ -192,7 +192,7 @@ $("undo").addEventListener("click",async()=>{
 })();
 
 
-// HHBA account pairing is opt-in and read-only. All recruitment form filling
+// HHBA account pairing is opt-in with narrowly scoped wallet-read and consented record writes. All recruitment form filling
 // above remains local and works without a linked account.
 async function savedDeviceSession(){
  const row=await chrome.storage.session.get(EXTENSION_SESSION_KEY);
@@ -230,7 +230,7 @@ $("pair-connect").addEventListener("click",async()=>{
   if(!validDeviceSession(session))throw Error("服务器返回的临时会话无效。");
   await chrome.storage.session.set({[EXTENSION_SESSION_KEY]:session});
   $("pair-code").value="";
-  status("HHBA 账户连接成功。当前只支持次数查询，不会扣次或发送简历。");
+  status("HHBA 账户连接成功。次数只读；仅在你主动确认后同步投递记录或领取结构化资料，不会扣次。");
   await refreshAccount();
  }catch(e){status(e?.message||"无法连接 HHBA，请稍后再试。",true)}
  finally{$("pair-connect").disabled=false}
