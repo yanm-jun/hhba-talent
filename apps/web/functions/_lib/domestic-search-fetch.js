@@ -26,7 +26,7 @@ const CLOSED=/(?:职位已关闭|该职位已下线|岗位已下线|停止招聘
 const HAS_DUTIES=/(?:岗位职责|工作职责|职位职责|岗位描述|工作内容|主要职责)/;
 const HAS_REQUIREMENTS=/(?:岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求)/;
 const HAS_APPLY=/(?:申请岗位|立即申请|立即投递|投递岗位|投递简历|申请职位)/;
-const BLOCK_INTENT=/(?:姓名|身份证|身份证号|手机号|电话号码|电子邮箱|我的电话|家庭住址|password|api.?key|bearer|secret|token|忽略上述|执行指令)/i;
+const BLOCK_INTENT=/(?:姓名|身份证|身份证号|手机号|电话号码|电子邮箱|我的电话|家庭住址|password|api.?key|bearer|secret|token|sk-[a-z0-9_-]+|忽略上述|执行指令)/i;
 export function sanitizedJobIntent(value){
  if(typeof value!=='string')return null;
  const s=value.trim().replace(/\s+/g,' ');
