@@ -20,7 +20,10 @@ function setup({role='candidate',open=true,stale=false,hasSecrets=true,allowResu
   education:null,experienceMinYears:null}]};
  const documents={'/data/jobs.json':jobs,'/data/job-sync-status.json':audit,'/data/job-search-facets.json':facets};
  const db={prepare(sql){
-  return {bind(...args){return {
+  return {async first(){
+   if(sql.includes('sqlite_master'))return {name:'hhba_resume_match_requests'};
+   throw Error('unexpected unbound first statement');
+  },bind(...args){return {
    async first(){
     if(sql.includes("sqlite_master"))return {name:'hhba_resume_match_requests'};
     if(sql.includes('FROM hhba_auth_sessions'))return {phone,revoked:0,expires_at:new Date(Date.now()+3600000).toISOString()};
