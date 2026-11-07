@@ -19,9 +19,17 @@ export function verifiedProfile(raw,text){
   const part=value.trim();
   return part.length>=2&&part.length<=240&&original.toLowerCase().includes(part.toLowerCase())?part:null;
  };
- const allowed=['HIGH_SCHOOL','ASSOCIATE','BACHELOR','MASTER','PHD'];
  const degreeEvidence=asEvidence(raw.education_evidence);
- const education=degreeEvidence&&allowed.includes(raw.education)?raw.education:null;
+ // A real snippet alone is not evidence for an *arbitrary* degree level.
+ const degrees={
+  HIGH_SCHOOL:/(?:高中|high[\s-]?school)/i,
+  ASSOCIATE:/(?:大专|专科|associate(?:'s)?(?:\s+degree)?)/i,
+  BACHELOR:/(?:本科|学士|bachelor(?:'s)?|B\.?\s?Sc\.?\b|B\.?\s?A\.?\b)/i,
+  MASTER:/(?:硕士|master(?:'s)?|M\.?\s?Sc\.?\b|\bMBA\b)/i,
+  PHD:/(?:博士|Ph\.?\s?D\.?\b|doctorate)/i,
+ };
+ const education=degreeEvidence&&typeof raw.education==='string'&&
+  degrees[raw.education]?.test(degreeEvidence)?raw.education:null;
  const yearEvidence=asEvidence(raw.experience_evidence);
  // Require explicit years-of-work evidence; dates alone cannot substantiate tenure.
  const stated=yearEvidence?.match(/(?:工作|实习|经验)\s*(\d+(?:\.\d+)?)\s*年|(\d+(?:\.\d+)?)\s*年(?:工作|实习|经验)/);
@@ -46,11 +54,21 @@ function safeJobLink(j){
  try{
   const u=new URL(j.url);
   if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash)return false;
-  if(j.platform==='ashby')return u.hostname==='jobs.ashbyhq.com';
-  if(j.platform==='lever')return u.hostname==='jobs.lever.co'||u.hostname.endsWith('.lever.co');
-  if(j.platform==='greenhouse')return u.hostname==='boards.greenhouse.io'||
-   u.hostname==='job-boards.greenhouse.io'||u.hostname==='boards.eu.greenhouse.io'||
-   u.hostname.endsWith('.greenhouse.io')||u.hostname.endsWith('.greenhouse.com');
+  if(typeof j.source!=='string'||!/^[A-Za-z0-9_-]{1,100}$/.test(j.source))return false;
+  const prefix=j.platform+'-'+j.source+'-';
+  if(!j.id.startsWith(prefix))return false;
+  const nativeId=j.id.slice(prefix.length),segments=u.pathname.split('/').filter(Boolean);
+  if(!nativeId||nativeId.length>110)return false;
+  if(j.platform==='ashby')return u.hostname==='jobs.ashbyhq.com'&&
+   segments[0]===j.source&&segments[1]===nativeId;
+  if(j.platform==='lever')return (u.hostname==='jobs.lever.co'||u.hostname.endsWith('.lever.co'))&&
+   segments[0]===j.source&&segments[1]===nativeId;
+  if(j.platform==='greenhouse'){
+   const official=u.hostname==='boards.greenhouse.io'||
+    u.hostname==='job-boards.greenhouse.io'||u.hostname==='boards.eu.greenhouse.io'||
+    u.hostname.endsWith('.greenhouse.io')||u.hostname.endsWith('.greenhouse.com');
+   return official&&(segments.includes(nativeId)||[...u.searchParams.values()].includes(nativeId));
+  }
   return false;
  }catch{return false}
 }

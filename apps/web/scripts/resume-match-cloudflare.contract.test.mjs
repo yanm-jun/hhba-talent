@@ -49,3 +49,27 @@ test('Cloudflare service is disabled by default and rejects cross-site uploads',
  assert.equal((await onRequest({request:request('https://evil.example'),env:{}})).status,403);
  assert.equal((await onRequest({request:request(origin),env:{}})).status,503);
 });
+
+
+test('rejects degree-level mismatch even when evidence is a real excerpt',()=>{
+ const text='学历：本科，2019-2023 本科毕业。工作经历：市场营销';
+ const bad=verifiedProfile({education:'MASTER',education_evidence:'学历：本科',
+  experience_years:null,experience_evidence:null,skills:[],target_roles:[]},text);
+ const good=verifiedProfile({education:'BACHELOR',education_evidence:'学历：本科',
+  experience_years:null,experience_evidence:null,skills:[],target_roles:[]},text);
+ assert.equal(bad.education,null);
+ assert.equal(good.education,'BACHELOR');
+});
+test('incorrect employer board identity cannot be recommended',()=>{
+ const now=Date.now(),iso=new Date(now).toISOString();
+ const job={id:'ashby-acme-abcdef',company:'Acme',title:'Python Developer',
+  location:'Remote',url:'https://jobs.ashbyhq.com/other-board/abcdef',
+  platform:'ashby',source:'acme',remote:true};
+ const audit={summary:{kind:'HHBA_OFFICIAL_FULL_JOB_JD_AUDIT_V1',indexed_as_of:iso,checked_at:iso},
+  jobs:[{job_id:job.id,platform:job.platform,status:'OFFICIAL_JD_AND_REQUIREMENTS_FOUND',
+    full_original_jd_verified:true,requirements_evidence:true,jd_sha256:'hash'}]};
+ const facets={indexed_as_of:iso,verified_at:iso,
+  jobs:[{id:job.id,countryCode:'US',skills:['python'],original_source_hash:'hash'}]};
+ const profile={target_roles:['Python Developer'],skills:[{name:'Python',evidence:'Python'}]};
+ assert.equal(selectAuditedMatches({jobs:[job],updated:iso},audit,facets,profile,{limit:10},now).matches.length,0);
+});
