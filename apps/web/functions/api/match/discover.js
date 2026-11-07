@@ -7,7 +7,10 @@ const respond=(x,status=200)=>new Response(JSON.stringify(x),{status,headers:{
 }});
 const fail=(code,status=400)=>respond({ok:false,error:code},status);
 function enabled(env){
- return env?.HHBA_AUTH_ROLLOUT==='preview'&&env.HHBA_MATCH_SERVICE_ENABLED==='1'&&
+ // Preview uses the existing test-auth rollout; production requires an
+ // independent explicit environment marker so existing login is unaffected.
+ return (env?.HHBA_AUTH_ROLLOUT==='preview'||env?.HHBA_MATCH_RUNTIME_MODE==='production')&&
+  env.HHBA_MATCH_SERVICE_ENABLED==='1'&&
   env.HHBA_MATCH_EXTERNAL_SEARCH_ENABLED==='1'&&
   typeof env.HHBA_MATCH_DEEPSEEK_KEY==='string'&&env.HHBA_MATCH_DEEPSEEK_KEY.length>=16&&
   typeof env.HHBA_MATCH_LIMIT_PEPPER==='string'&&env.HHBA_MATCH_LIMIT_PEPPER.length>=24&&

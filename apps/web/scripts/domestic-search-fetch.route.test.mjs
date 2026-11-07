@@ -115,3 +115,20 @@ test('personal quota caps paid Search even after repeated submissions',async()=>
   assert.equal(h.callCount.search,4);
  }finally{restore();}
 });
+
+test('production search supports explicit production-only mode without changing live auth rollout',async()=>{
+ const h=setup();
+ delete h.env.HHBA_AUTH_ROLLOUT;
+ assert.equal((await (await onRequestGet({env:h.env})).json()).enabled,false);
+ h.env.HHBA_MATCH_RUNTIME_MODE='production';
+ assert.equal((await (await onRequestGet({env:h.env})).json()).enabled,true);
+ h.env.HHBA_MATCH_SERVICE_ENABLED='0';
+ assert.equal((await (await onRequestGet({env:h.env})).json()).enabled,false);
+ h.env.HHBA_MATCH_SERVICE_ENABLED='1';
+ h.env.HHBA_MATCH_EXTERNAL_SEARCH_ENABLED='0';
+ assert.equal((await (await onRequestGet({env:h.env})).json()).enabled,false);
+ delete h.env.HHBA_MATCH_EXTERNAL_SEARCH_ENABLED;
+ assert.equal((await (await onRequestGet({env:h.env})).json()).enabled,false);
+ assert.equal(h.ledger.length,0);
+ assert.equal(h.callCount.search,0);
+});
