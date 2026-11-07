@@ -257,3 +257,11 @@ a.unified-company-brand:focus-visible,.unified-detail-company-link:focus-visible
  .unified-job-footer .unified-job-browse-links{margin-left:0}
 }
 @media(prefers-reduced-motion:reduce){.unified-role-list .unified-job-card{transition:none}}
+
+/* Per-user application evidence is distinct from the employer's vacancy status. */
+.hhba-application-market-label{display:inline-flex;align-items:center;border-radius:20px;padding:2px 8px;
+ font-size:11px;line-height:1.6;color:#2d6044;background:#e9f5ed;border:1px solid #cce1d4;white-space:nowrap}
+.hhba-application-market-label.pending{background:#fff5df;border-color:#f0dfba;color:#785a25}
+.hhba-application-market-label.manual{background:#eef0f3;border-color:#d9dfe4;color:#53616d}
+.hhba-application-market-label.possible{background:#f4f2ff;border-color:#ddd6f8;color:#64518a}
+.hhba-application-market-label.unrecorded{background:#f5f7f5;border-color:#e1e6e1;color:#65746a}
