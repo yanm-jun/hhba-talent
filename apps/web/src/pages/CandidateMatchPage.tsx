@@ -63,6 +63,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
  const [savedFiles,setSavedFiles]=useState<PrivateResume[]>([]);
  const [savedId,setSavedId]=useState('');
  const [previewText,setPreviewText]=useState('');
+ const [previewLoaded,setPreviewLoaded]=useState(false);
  const [previewBusy,setPreviewBusy]=useState(false);
  const previewController=useRef<AbortController|null>(null);
  const [vaultError,setVaultError]=useState('');
@@ -84,7 +85,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
   const reload=()=>{
    if(!privateResumeAvailable||!user||!getRealAuthToken()){
     previewController.current?.abort();
-    if(active){setPreviewText('');setConsent(false);}
+    if(active){setPreviewText('');setPreviewLoaded(false);setConsent(false);}
     if(active){setSavedFiles([]);setSavedId('');}return;
    }
    void listPrivateResumes().then(rows=>{if(active){setSavedFiles(rows);setVaultError('');}})
@@ -97,7 +98,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
    window.removeEventListener('hhba:real-auth-changed',reload);};
  },[user?.id]);
  function choose(candidate:File|null){
-  previewController.current?.abort();setPreviewText('');setConsent(false);
+  previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);
   setError('');setResult(null);
   if(!candidate){setFile(null);return}
   if(!/\.(pdf|docx)$/i.test(candidate.name)||!candidate.size||candidate.size>maxResumeSize){
@@ -107,7 +108,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
  }
  async function preview(){
   if((!file&&!savedId)||working||previewBusy)return;
-  setPreviewBusy(true);setError('');setPreviewText('');
+  setPreviewBusy(true);setError('');setPreviewText('');setPreviewLoaded(false);
   const abort=new AbortController();previewController.current=abort;
   try{
    let selected=file;
@@ -120,7 +121,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
    }
    if(!selected)throw new MatchError(400,'请先选择简历。');
    const text=await extractResumeTextLocally(selected,abort.signal);
-   if(!abort.signal.aborted)setPreviewText(text);
+   if(!abort.signal.aborted){setPreviewText(text);setPreviewLoaded(true);}
   }catch(e){
    if((e as Error)?.name!=='AbortError')setError(e instanceof Error?e.message:'无法读取简历文字。');
   }finally{setPreviewBusy(false);previewController.current=null;}
@@ -132,7 +133,8 @@ export function CandidateMatchPage({user}:{user:User|null}){
   controller.current=abort;
   try{
    let matched:MatchResponse;
-   if(previewText){
+   if(previewLoaded){
+    // Once the user has reviewed/edited text, NEVER fall back to re-reading the unedited file.
     matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,savedId||undefined);
    }else{
     let selected=file;
@@ -147,7 +149,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
     matched=await submitResumeForMatching(selected,options,consent,abort.signal,savedId||undefined);
    }
    setResult(matched);
-   setFile(null);setSavedId('');setPreviewText('');setConsent(false);
+   setFile(null);setSavedId('');setPreviewText('');setPreviewLoaded(false);setConsent(false);
   }catch(e){
    if((e as Error)?.name!=='AbortError')setError(e instanceof MatchError?e.message:'智能匹配暂时失败，请稍后再试。');
   }finally{setWorking(false);controller.current=null}
@@ -174,7 +176,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
         {user&&privateResumeAvailable&&<div className="hhba-ai-saved-picker">
           <label htmlFor="hhba-ai-existing">使用「我的简历」中已经保存的文件（无需重新上传）</label>
           <select id="hhba-ai-existing" value={savedId} disabled={working}
-           onChange={e=>{previewController.current?.abort();setPreviewText('');setConsent(false);setSavedId(e.target.value);setFile(null);setResult(null);setError('');}}>
+           onChange={e=>{previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setConsent(false);setSavedId(e.target.value);setFile(null);setResult(null);setError('');}}>
            <option value="">不使用已保存文件，改为下面选择新文件</option>
            {savedFiles.map(item=><option value={item.id} key={item.id}>{item.name}</option>)}
           </select>
@@ -195,11 +197,11 @@ export function CandidateMatchPage({user}:{user:User|null}){
         <div className="hhba-ai-review-tools">
          <button type="button" disabled={(!file&&!savedId)||working||previewBusy}
           onClick={()=>void preview()}>{previewBusy?'正在本地提取文字…':'可选：预览并编辑 AI 将接收的简历文字'}</button>
-         {previewText&&<div className="hhba-ai-text-review">
+         {previewLoaded&&<div className="hhba-ai-text-review">
           <label htmlFor="hhba-ai-text-preview">本地文字预览（最多 20,000 字，可删去不想分享的内容）</label>
           <textarea id="hhba-ai-text-preview" rows={6} maxLength={20000} value={previewText}
            disabled={working} onChange={e=>{setPreviewText(e.target.value);setConsent(false);}}/>
-          <small>已尝试隐藏电话、邮箱、身份证号等常见标识。仍可能包含姓名、详细经历等个人信息，请检查。原始简历不发送给 AI，只有这段文字在获得授权后提交。</small>
+          <small>已尝试隐藏电话、邮箱、身份证号等常见标识。仍可能包含姓名、详细经历等个人信息，请检查。只有上方保留的文字会被发送；清空后将禁止提交，绝不会自动恢复原文件内容。</small>
          </div>}
         </div>
         <header className="hhba-ai-section-title"><h2>2. 选择工作偏好</h2><p>可选项。不填写代表从全部官方岗位中搜索。</p></header>
@@ -223,7 +225,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
         <p className="hhba-ai-notice"><ShieldCheck size={15}/> 本功能仅供已登录的求职者使用。简历原件在当前浏览器读取，最多取前 2 万字文字分析；分析需单独同意，结果仅在本次页面中展示，不会自动公开或向企业投递。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
-          disabled={(!file&&!savedId)||!consent||working||previewBusy||availability!=='ready'||!getRealAuthToken()}>
+          disabled={(!file&&!savedId)||!consent||working||previewBusy||(previewLoaded&&previewText.replace(/\s/g,'').length<30)||availability!=='ready'||!getRealAuthToken()}>
           {working?<><LoaderCircle className="spin" size={18}/> 正在提取简历并匹配岗位…</>:
            <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
         </button>

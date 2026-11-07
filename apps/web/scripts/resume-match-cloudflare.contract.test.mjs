@@ -73,3 +73,12 @@ test('incorrect employer board identity cannot be recommended',()=>{
  const profile={target_roles:['Python Developer'],skills:[{name:'Python',evidence:'Python'}]};
  assert.equal(selectAuditedMatches({jobs:[job],updated:iso},audit,facets,profile,{limit:10},now).matches.length,0);
 });
+
+test('privacy-reviewed empty text never silently falls back to raw resume',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const ui=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
+ assert.match(ui,/if\(previewLoaded\)/);
+ assert.match(ui,/previewLoaded&&previewText\.replace\(\/\\s\/g,''\)\.length<30/);
+ assert.match(ui,/setPreviewLoaded\(false\);setConsent\(false\);setSavedId/);
+ assert.match(ui,/Once the user has reviewed\/edited text, NEVER fall back/);
+});
