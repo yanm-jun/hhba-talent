@@ -1,6 +1,6 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HHBA 智能网申助手</title><link rel="stylesheet" href="popup.css"></head>
 <body><main class="app"><header><div class="brand"><span class="brand-icon">H</span><div><strong>HHBA 智能网申助手</strong><small>认真准备一次，轻松申请更多机会。</small></div></div><span class="version">内测 V0.5</span></header>
-<nav aria-label="功能切换"><button id="tab-fill" class="tab active" data-view="fill" aria-selected="true">当前网页</button><button id="tab-profile" class="tab" data-view="profile" aria-selected="false">我的求职档案</button><button id="tab-account" class="tab" data-view="account" aria-selected="false">连接账户</button></nav>
+<nav aria-label="功能切换"><button id="tab-fill" class="tab active" data-view="fill" aria-selected="true">当前网页</button><button id="tab-profile" class="tab" data-view="profile" aria-selected="false">我的求职档案</button><button id="tab-account" class="tab" data-view="account" aria-selected="false">连接账户</button><button id="tab-applications" class="tab" data-view="applications" aria-selected="false">投递记录</button></nav>
 <section id="view-fill" class="view"><div id="site" class="site">请打开企业官方招聘申请表。</div><div class="pricing"><strong>¥0.30 <small>/ 完整网申任务</small></strong><span>正式版目标定价 · 当前内测不收费</span></div><div class="intro"><strong>填写由你决定</strong><p>仅识别当前页面，不自动投递、不上传附件。未知或敏感字段会留给你亲自处理。</p></div>
 <p class="quickfill-disclaimer">一键预填仅修改可安全识别的普通字段，仍需你检查。不处理验证码、隐私声明或最终投递；本地预填无需联网或扣次。</p>
 <div class="ai-assist-panel">
@@ -27,4 +27,17 @@
  <div class="actions"><button id="pair-connect" class="primary" type="button">授权并连接 HHBA</button><button id="pair-refresh" class="secondary" type="button">刷新次数</button><button id="pair-disconnect" class="secondary" type="button">断开连接</button></div>
  <p class="help">连接码只能使用一次，有效期 5 分钟。需单独授权插件访问 hhba.work；登录会话只保存在插件临时存储，最长 12 小时。当前功能尚未上线，请勿输入网站密码。</p>
  </section>
+<section id="view-applications" class="view hidden">
+ <div class="intro"><strong>我的投递记录</strong><p>填写完成不代表投递成功。只有本人提交后的页面成功提示才会记为“页面提示已投递”；没有可靠提示则保留待确认。</p></div>
+ <label class="field">企业名称<input id="application-company" type="text" maxlength="100" placeholder="例如：企业官方招聘名称" autocomplete="off"></label>
+ <label class="field">岗位名称<input id="application-position" type="text" maxlength="100" placeholder="例如：产品运营实习生" autocomplete="off"></label>
+ <label class="ai-consent"><input id="application-consent" type="checkbox">我同意仅在本次主动操作的招聘网页观察提交及可见成功提示，并将企业、岗位、申请链接及记录状态保存在插件本地；不抓取表单答案或自动提交。</label>
+ <div class="actions"><button id="application-watch" type="button" class="primary">开始跟踪本次投递</button><button id="application-check" type="button" class="secondary">核验当前页面并记录</button></div>
+ <p class="help">开始跟踪后，仅对当前页面本人实际点击提交的行为作本地记录；同页出现成功提示可自动更新。若官网跳转到新页面，请使用“核验当前页面并记录”。不代表企业最终收到简历。</p>
+ <div class="actions"><button id="application-refresh" type="button" class="secondary">刷新本地记录</button><button id="application-sync" type="button" class="secondary">同步未上传记录到 HHBA</button></div>
+ <p class="help">同步需要先连接 HHBA 账户，并由你点击确认。没有记录的岗位仅显示“未记录投递”，不能推断实际从未申请。</p>
+ <div id="application-counts" class="counts"></div>
+ <div id="application-records" class="results" aria-live="polite"></div>
+ <p><a href="https://hhba.work/candidate/account/applications" target="_blank" rel="noopener noreferrer">在 HHBA 网站查看完整求职记录</a></p>
+</section>
  <p id="status" class="status" role="status" aria-live="polite"></p><footer>仅辅助填写 · 最终核对与提交由本人完成</footer></main><script type="module" src="popup.js"></script></body></html>
