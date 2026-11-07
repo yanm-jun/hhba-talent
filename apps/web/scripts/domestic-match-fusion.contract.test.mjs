@@ -44,7 +44,7 @@ test('relevant official external posting competes with internal without becoming
 test('same company same role across sources or cities appears once, with higher score winning',()=>{
  const external=domesticOutside();
  const result=fuseDomesticJobRecommendations([
-  domesticInside('original',85,'腾讯','软件开发工程师','深圳'),
+  domesticInside('original',92,'腾讯','软件开发工程师','深圳'),
   domesticInside('othercity',84,'腾讯','软件开发工程师','上海')],
  [external],profile,{role_hint:'软件开发工程师'},now);
  assert.equal(result.matches.length,1);
