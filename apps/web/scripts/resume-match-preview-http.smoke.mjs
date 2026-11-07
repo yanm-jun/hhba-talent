@@ -25,6 +25,13 @@ assert.equal(status.global_daily_limit,60);
 if(process.env.HHBA_EXPECT_MATCH_ENABLED==='1')assert.equal(status.enabled,true,
  'Pilot Preview must expose enabled=true only when dedicated key, pepper and D1 are correctly bound');
 console.log('MATCH_STATUS_OK',status.enabled?'enabled':'disabled');
+const diagnostic=await request('/api/match/provider-check');
+assert.equal(diagnostic.status,401,'Unauthenticated provider balance checks must be denied');
+jsonResponse(diagnostic,'Provider diagnostic access denial');
+const denied=await diagnostic.json();
+assert.equal(denied.error,'SESSION_INVALID');
+console.log('PROVIDER_CHECK_REQUIRES_LOGIN');
+
 
 const page=await request('/candidate/match');
 assert.equal(page.status,200,'Direct candidate route must serve HTML');
