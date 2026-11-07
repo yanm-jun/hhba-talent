@@ -69,13 +69,16 @@ assert.equal(facets.indexed_as_of,jobs.updated);
 assert.equal(audit.jobs?.length,jobs.jobs.length);
 assert.equal(facets.jobs?.length,jobs.jobs.length);
 console.log('OFFICIAL_AUDIT_MATCHED',jobs.jobs.length);
-const {selectAuditedMatches}=await import('../functions/_lib/resume-match-core.js');
+const {selectAuditedMatches,countVerifiedMainlandJobs}=await import('../functions/_lib/resume-match-core.js');
 const profile={education:null,experience_years:null,
  skills:[{name:'Python',evidence:'Python'}],target_roles:['software engineer']};
 const selected=selectAuditedMatches(jobs,audit,facets,profile,
- {country:'',remote_only:false,role_hint:'software engineer',limit:10},Date.now());
-assert.ok(selected.matched_official_jobs>0,'Actual official jobs should yield some verifiable relevant matches');
-assert.ok(selected.matches.length>0&&selected.matches.length<=10);
+ {country:'CN',remote_only:false,role_hint:'software engineer',limit:10},Date.now());
+const mainlandCount=countVerifiedMainlandJobs(jobs,audit,facets);
+assert.ok(Number.isInteger(mainlandCount)&&mainlandCount>=0);
+assert.ok(selected.matches.length<=10);
+assert.ok(selected.matched_official_jobs<=mainlandCount);
+console.log('DOMESTIC_VERIFIED_JOBS_COUNT',mainlandCount);
 assert.equal(new Set(selected.matches.map(x=>x.company.toLowerCase()+'|'+x.title.toLowerCase())).size,
  selected.matches.length,'Same employer+title must not repeat in Top 10');
 for(const job of selected.matches){

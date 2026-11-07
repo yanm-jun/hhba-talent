@@ -8,7 +8,7 @@ function setup({role='candidate',open=true,stale=false,hasSecrets=true,allowResu
  const iso=new Date().toISOString(),callCounts={provider:0,asset:0};
  const id='11111111-1111-4111-8111-111111111111';
  const phone='13800000000',ledger=[];
- const job={id:'ashby-acme-a1b2c3d4',company:'Acme Inc',title:'Python Data Analyst',location:'Singapore',
+ const job={id:'ashby-acme-a1b2c3d4',company:'Acme Inc',title:'Python Data Analyst',location:'Shanghai, China',
   url:'https://jobs.ashbyhq.com/acme/a1b2c3d4',source:'acme',platform:'ashby',remote:true};
  const auditRow={job_id:job.id,platform:job.platform,status:'OFFICIAL_JD_AND_REQUIREMENTS_FOUND',
   full_original_jd_verified:true,requirements_evidence:true,jd_sha256:'testhash'};
@@ -16,7 +16,7 @@ function setup({role='candidate',open=true,stale=false,hasSecrets=true,allowResu
  const audit={summary:{kind:'HHBA_OFFICIAL_FULL_JOB_JD_AUDIT_V1',indexed_as_of:jobs.updated,
   checked_at:iso},jobs:[auditRow]};
  const facets={indexed_as_of:jobs.updated,verified_at:iso,jobs:[{
-  id:job.id,original_source_hash:'testhash',countryCode:'SG',skills:['python'],
+  id:job.id,original_source_hash:'testhash',countryCode:'CN',cityKey:'shanghai',skills:['python'],
   education:null,experienceMinYears:null}]};
  const documents={'/data/jobs.json':jobs,'/data/job-sync-status.json':audit,'/data/job-search-facets.json':facets};
  const db={prepare(sql){
@@ -66,7 +66,7 @@ function setup({role='candidate',open=true,stale=false,hasSecrets=true,allowResu
  const text='姓名：测试用户，手机 13812345678，邮箱 test.person@example.com。技能：Python。目标职位 Data Analyst。';
  function request({agree=true,resume=id,options={},textValue=text,targetOrigin=origin}={}){
   const body=JSON.stringify({resume_id:resume,text:textValue,consent:agree,
-   options:{country:'SG',remote_only:false,role_hint:'Data Analyst',limit:10,...options}});
+   options:{country:'CN',remote_only:false,role_hint:'Data Analyst',limit:10,...options}});
   return new Request(origin+'/api/match/resume',{method:'POST',
    headers:{Origin:targetOrigin,Authorization:'Bearer synthetic-client-token',
     'Content-Type':'application/json'},body});
@@ -312,4 +312,33 @@ test('Workers-compatible fetch options prevent accidental outgoing secret redire
   assert.equal((await match.json()).error,'AI_PROVIDER_REDIRECT_BLOCKED');
   assert.equal(h.ledger.length,0,'Never consume quota for provider redirects');
  }finally{globalThis.fetch=original;}
+});
+
+
+test('foreign-only job index blocks AI use and consumes no quota',async()=>{
+ const h=setup(),old=globalThis.fetch;
+ h.env.ASSETS.fetch=async req=>{
+  const path=new URL(req.url).pathname;
+  const at=new Date().toISOString();
+  if(path==='/data/jobs.json')return new Response(JSON.stringify({updated:at,jobs:[]}),
+   {headers:{'content-type':'application/json'}});
+  return new Response('{}',{headers:{'content-type':'application/json'}});
+ };
+ try{
+  const res=await onRequest({request:h.request(),env:h.env});
+  assert.equal(res.status,503);
+  assert.equal((await res.json()).error,'OFFICIAL_JOB_INDEX_UNAVAILABLE');
+  assert.equal(h.ledger.length,0);
+ }finally{globalThis.fetch=old;}
+});
+test('API rejects any country override before charging or model calls',async()=>{
+ const h=setup(),old=globalThis.fetch;
+ try{
+  for(const country of ['US','SG','']){
+   const res=await onRequest({request:h.request({options:{country}}),env:h.env});
+   assert.equal(res.status,400);
+  }
+  assert.equal(h.ledger.length,0);
+  assert.equal(h.callCounts.provider,0);
+ }finally{globalThis.fetch=old;}
 });

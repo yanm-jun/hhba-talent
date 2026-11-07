@@ -23,7 +23,7 @@ test('AI cannot invent degrees, skills, work years or target roles',()=>{
 test('only same-snapshot audit, exact JD hash and secure official ATS can rank',()=>{
  const iso=new Date().toISOString();
  const good={id:'ashby-example-123456',company:'Example',title:'Python Data Analyst',
-  location:'Singapore',url:'https://jobs.ashbyhq.com/example/123456',
+  location:'Shanghai, China',url:'https://jobs.ashbyhq.com/example/123456',
   platform:'ashby',source:'example',remote:false};
  const bad={...good,id:'ashby-bad-12345',url:'https://attacker.example/offer'};
  const snapshot={updated:iso,jobs:[good,bad]};
@@ -31,10 +31,10 @@ test('only same-snapshot audit, exact JD hash and secure official ATS can rank',
   jobs:[good,bad].map((j,i)=>({job_id:j.id,platform:j.platform,status:'OFFICIAL_JD_AND_REQUIREMENTS_FOUND',
    full_original_jd_verified:true,requirements_evidence:true,jd_sha256:String(i)}))};
  const facets={indexed_as_of:iso,verified_at:iso,
-  jobs:[{id:good.id,countryCode:'SG',skills:['python'],original_source_hash:'0'},
-    {id:bad.id,countryCode:'SG',skills:['python'],original_source_hash:'1'}]};
+  jobs:[{id:good.id,countryCode:'CN',cityKey:'shanghai',skills:['python'],original_source_hash:'0'},
+    {id:bad.id,countryCode:'CN',cityKey:'shanghai',skills:['python'],original_source_hash:'1'}]};
  const profile={skills:[{name:'Python',evidence:'Python'}],target_roles:['Data Analyst']};
- const out=selectAuditedMatches(snapshot,audit,facets,profile,{limit:10,country:'SG'});
+ const out=selectAuditedMatches(snapshot,audit,facets,profile,{limit:10,country:'CN'});
  assert.equal(out.matches.length,1);
  assert.equal(out.matches[0].id,good.id);
  assert.ok(out.matches[0].reference_score<100);
@@ -63,13 +63,13 @@ test('rejects degree-level mismatch even when evidence is a real excerpt',()=>{
 test('incorrect employer board identity cannot be recommended',()=>{
  const now=Date.now(),iso=new Date(now).toISOString();
  const job={id:'ashby-acme-abcdef',company:'Acme',title:'Python Developer',
-  location:'Remote',url:'https://jobs.ashbyhq.com/other-board/abcdef',
+  location:'Shanghai, China',url:'https://jobs.ashbyhq.com/other-board/abcdef',
   platform:'ashby',source:'acme',remote:true};
  const audit={summary:{kind:'HHBA_OFFICIAL_FULL_JOB_JD_AUDIT_V1',indexed_as_of:iso,checked_at:iso},
   jobs:[{job_id:job.id,platform:job.platform,status:'OFFICIAL_JD_AND_REQUIREMENTS_FOUND',
     full_original_jd_verified:true,requirements_evidence:true,jd_sha256:'hash'}]};
  const facets={indexed_as_of:iso,verified_at:iso,
-  jobs:[{id:job.id,countryCode:'US',skills:['python'],original_source_hash:'hash'}]};
+  jobs:[{id:job.id,countryCode:'CN',cityKey:'shanghai',skills:['python'],original_source_hash:'hash'}]};
  const profile={target_roles:['Python Developer'],skills:[{name:'Python',evidence:'Python'}]};
  assert.equal(selectAuditedMatches({jobs:[job],updated:iso},audit,facets,profile,{limit:10},now).matches.length,0);
 });
@@ -96,9 +96,9 @@ test('saved R2 resumes offer direct AI navigation without auto-upload or auto-co
 });
 test('Top 10 never repeats company+title just because an ATS job has more locations',()=>{
  const now=Date.now(),at=new Date(now).toISOString();
- const companies=[['acme','Data Analyst','111','NY'],['acme','Data Analyst','222','SF'],
-  ['acme','Data Scientist','333','NY'],['acme','Data Engineer','444','NY'],
-  ['beta','Data Scientist','555','NY'],['gamma','Data Analyst','666','NY']];
+ const companies=[['acme','Data Analyst','111','Shanghai, China'],['acme','Data Analyst','222','Beijing, China'],
+  ['acme','Data Scientist','333','Shanghai, China'],['acme','Data Engineer','444','Shanghai, China'],
+  ['beta','Data Scientist','555','Shanghai, China'],['gamma','Data Analyst','666','Shanghai, China']];
  const jobs=companies.map(([source,title,id,location])=>({
   id:'ashby-'+source+'-'+id,source,company:source,title,location,
   url:'https://jobs.ashbyhq.com/'+source+'/'+id,platform:'ashby',remote:false
@@ -127,4 +127,23 @@ test('free provider diagnostic button is visible before any chargeable resume ma
  assert.match(page,/检测 AI 密钥及余额（不消耗匹配次数）/);
  assert.match(page,/checkMatchProviderConnection\(\)/);
  assert.match(page,/availability==='ready'&&getRealAuthToken\(\)/);
+});
+
+test('even a forged overseas preference cannot force foreign jobs into Top 10',()=>{
+ const now=Date.now(),at=new Date(now).toISOString();
+ const rows=[['main','Shanghai, China','CN'],['us','San Francisco, USA','US'],
+  ['hk','Hong Kong, China','CN'],['tw','Taipei, Taiwan','CN'],
+  ['remote','Remote, China','CN']];
+ const jobs=rows.map(([id,location])=>({id:'ashby-company-'+id,company:'Company',
+  title:'Data Analyst',location,url:'https://jobs.ashbyhq.com/company/'+id,
+  source:'company',platform:'ashby'}));
+ const audit={summary:{kind:'HHBA_OFFICIAL_FULL_JOB_JD_AUDIT_V1',indexed_as_of:at,checked_at:at},
+  jobs:jobs.map(j=>({job_id:j.id,platform:'ashby',status:'OFFICIAL_JD_AND_REQUIREMENTS_FOUND',
+   full_original_jd_verified:true,requirements_evidence:true,jd_sha256:j.id}))};
+ const facets={indexed_as_of:at,verified_at:at,
+  jobs:rows.map(([id,,countryCode])=>({id:'ashby-company-'+id,countryCode,
+   original_source_hash:'ashby-company-'+id,skills:['sql']}))};
+ const profile={skills:[{name:'SQL',evidence:'SQL'}],target_roles:['Data Analyst']};
+ const matched=selectAuditedMatches({jobs,updated:at},audit,facets,profile,{country:'US',limit:10},now);
+ assert.deepEqual(matched.matches.map(x=>x.id),['ashby-company-main']);
 });
