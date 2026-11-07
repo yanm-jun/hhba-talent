@@ -9,7 +9,7 @@ const canonical=(raw:string)=>{
   const u=new URL(raw);
   if(u.protocol!=='https:')return null;
   const qs=new URLSearchParams();
-  for(const [k,v] of u.searchParams)if(['gh_jid','jobid','job_id','positionid','reqid','id'].includes(k.toLowerCase())
+  for(const [k,v] of u.searchParams)if(['gh_jid','jobid','job_id','positionid','reqid'].includes(k.toLowerCase())
    &&/^[A-Za-z0-9_-]{1,110}$/.test(v))qs.set(k.toLowerCase(),v);
   return u.origin+u.pathname+(qs.size?'?'+qs.toString():'');
  }catch{return null}
