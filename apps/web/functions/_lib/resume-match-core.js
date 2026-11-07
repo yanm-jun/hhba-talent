@@ -72,6 +72,26 @@ function safeJobLink(j){
   return false;
  }catch{return false}
 }
+// Country label alone is not proof of Mainland China employment.
+const excludedChineseRegions=/(香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macao|macau|taiwan|taipei|kaohsiung)/i;
+const mainlandCities=/(北京|上海|天津|重庆|深圳|广州|杭州|南京|苏州|成都|武汉|西安|青岛|宁波|无锡|合肥|郑州|长沙|厦门|福州|济南|大连|沈阳|哈尔滨|长春|石家庄|昆明|贵阳|南宁|海口|珠海|佛山|东莞|烟台|潍坊|临沂|济宁|菏泽|聊城|威海|泰安|德州|枣庄|滨州|日照|东营|beijing|shanghai|tianjin|chongqing|shenzhen|guangzhou|hangzhou|nanjing|suzhou|chengdu|wuhan|xian|qingdao|ningbo|wuxi|hefei|zhengzhou|changsha|xiamen|fuzhou|jinan|dalian|shenyang|harbin|changchun|shijiazhuang|kunming|guiyang|nanning|haikou|zhuhai|foshan|dongguan)/i;
+export function isVerifiedMainlandLocation(job,fact){
+ if(!job||!fact||String(fact.countryCode||'').toUpperCase()!=='CN')return false;
+ const location=String(job.location||'');
+ return !excludedChineseRegions.test(location)&&mainlandCities.test(location);
+}
+export function countVerifiedMainlandJobs(snapshot,audit,facets){
+ if(!Array.isArray(snapshot?.jobs)||!Array.isArray(audit?.jobs)||!Array.isArray(facets?.jobs))return 0;
+ const proofs=new Map(audit.jobs.filter(x=>x?.status==='OFFICIAL_JD_AND_REQUIREMENTS_FOUND'&&
+  x.full_original_jd_verified===true&&x.requirements_evidence===true&&typeof x.jd_sha256==='string').map(x=>[x.job_id,x]));
+ const facts=new Map(facets.jobs.filter(x=>x?.id).map(x=>[x.id,x]));
+ return snapshot.jobs.filter(j=>{
+  const p=proofs.get(j.id),f=facts.get(j.id);
+  return p&&p.platform===j.platform&&f&&f.original_source_hash===p.jd_sha256&&
+   isVerifiedMainlandLocation(j,f)&&safeJobLink(j);
+ }).length;
+}
+
 const aliases=[
  ['销售','sales','account executive','business development','商务','客户经理'],
  ['设计','designer','design','ux','ui','视觉','平面','艺术'],
@@ -111,8 +131,9 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
  for(const j of snapshot.jobs){
   const proof=verified.get(j.id),f=facts.get(j.id);
   if(!proof||proof.platform!==j.platform||!f||f.original_source_hash!==proof.jd_sha256||
-     !safeJobLink(j)||opts.remote_only&&j.remote!==true)continue;
-  if(opts.country&&String(f.countryCode||'').toUpperCase()!==String(opts.country).toUpperCase())continue;
+     !safeJobLink(j)||!isVerifiedMainlandLocation(j,f))continue;
+  // Client preferences cannot override the mainland-only rule.
+  if(opts.remote_only&&j.remote!==true)continue;
   const title=j.title.toLowerCase();
   const tags=Array.isArray(f.skills)?f.skills.filter(x=>typeof x==='string').map(x=>x.toLowerCase()):[];
   const roleMatches=query.flatMap(x=>aliasesOf(x)).filter(x=>x.length>=2&&title.includes(x));
@@ -127,7 +148,7 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
    needs.push('岗位学历要求为公开文字保守提取，需核实是否符合：'+f.education);
   if(Number.isFinite(f.experienceMinYears))
    needs.push('岗位经验年限线索：'+f.experienceMinYears+' 年，仍以官网原文为准');
-  needs.push('岗位源于最近一次官方 ATS 审核快照，当前是否继续接受申请需打开官网确认');
+  needs.push('中国大陆岗位来自官方 ATS 审核快照；是否仍接受申请需到官网确认');
   const score=Math.min(85,35+Math.min(30,roleMatches.length*6)+Math.min(20,skillMatches.length*5));
   filtered.push({id:j.id,company:j.company,title:j.title,title_zh:null,location:j.location||'',
    official_url:j.url,platform:j.platform,source:j.source||'',remote:j.remote===true,
