@@ -37,6 +37,10 @@ const errors:Record<string,string>={
  INVALID_PROFILE_SYNC_REQUEST:'请检查并确认简历资料内容和本次同步授权。',
  RESUME_NOT_FOUND:'该简历不属于当前账号或已被删除。',
 
+ INVALID_APPLICATION:'企业、岗位、链接或投递状态不正确。',
+ INVALID_APPLICATION_ID:'投递记录编号不正确。',
+ APPLICATION_LIMIT:'最多保存200条投递记录，请先整理已有记录。',
+ APPLICATIONS_UNAVAILABLE:'投递记录暂不可用，请稍后重试。',
  APPLY_SERVICE_UNAVAILABLE:'次数服务暂不可用，请稍后再试。',
 };
 async function request<T>(path:string,method='GET',body?:unknown,publicRoute=false):Promise<T>{
@@ -79,3 +83,17 @@ export const prepareApplyProfileSync=(resumeId:string,profile:Record<string,stri
  });
 };
 export const revokeApplyProfileSync=()=>request<{ok:true}>('/profile-transfer/revoke','POST');
+
+export type ApplicationRecord={
+ id:string;company:string;position:string;applicationUrl:string;
+ status:'pending'|'confirmed'|'manual';source:'edge'|'manual';
+ evidenceKind:'none'|'success_notice'|'receipt_marker'|'self_report';
+ recordedAt:string;updatedAt:string
+};
+export const listMyApplications=()=>request<{ok:true;items:ApplicationRecord[]}>('/applications')
+ .then(x=>x.items);
+export const saveManualApplication=(entry:{company:string;position:string;applicationUrl:string;status:'pending'|'manual'})=>
+ request<{ok:true;record:ApplicationRecord}>('/applications','POST',{
+  ...entry,evidenceKind:entry.status==='manual'?'self_report':'none'
+ }).then(x=>x.record);
+export const deleteMyApplication=(id:string)=>request<{ok:true;deleted:boolean}>('/applications/delete','POST',{id});
