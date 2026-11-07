@@ -154,8 +154,11 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
   }
  }
  const jobs=[];
+ let fetchAttempts=0;
  for(const candidate of possible.values()){
-  if(usage.fetch>=FETCH_LIMIT)break;
+  // Limit actual outbound Fetch attempts, not just successful/charged calls.
+  if(fetchAttempts>=FETCH_LIMIT)break;
+  fetchAttempts++;
   const fetched=await providerPost('https://api.deepseek.com/v1/tools/fetch',key,
    {url:candidate.url},500000,fetcher);
   if(typeof fetched?.content!=='string')throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');

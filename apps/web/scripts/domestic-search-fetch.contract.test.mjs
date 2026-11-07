@@ -102,3 +102,27 @@ test('provider errors only return safe codes and never raw response contents',as
   e=>e instanceof ExternalSearchError&&e.code==='SEARCH_PROVIDER_KEY_REJECTED'
  );
 });
+
+test('empty Fetch responses cannot bypass three-attempt per-search budget',async()=>{
+ const links=Array.from({length:6},(_,i)=>({
+  url:'https://careers.tencent.com/jobdesc.html?postId='+String(2097166275703910400n+BigInt(i))
+ }));
+ const {calls,fetcher}=providerMock({searches:[links,links]});
+ const result=await discoverExternalOfficialJobs('Python 开发','fake-key-of-adequate-length',{fetcher});
+ assert.equal(calls.filter(x=>x.url.endsWith('/search')).length,2);
+ assert.equal(calls.filter(x=>x.url.endsWith('/fetch')).length,3);
+ assert.equal(result.usage.fetch,0);
+ assert.deepEqual(result.candidates,[]);
+});
+test('provider redirect is blocked rather than leaking key to the destination host',async()=>{
+ const old=globalThis.fetch,calls=[];
+ const fake=async(url,opts)=>{
+  calls.push(String(url));assert.equal(opts.redirect,'manual');
+  return new Response(null,{status:302,headers:{Location:'https://attacker.example/steal'}});
+ };
+ await assert.rejects(
+  discoverExternalOfficialJobs('Python 开发','fake-key-of-adequate-length',{fetcher:fake}),
+  e=>e instanceof ExternalSearchError&&e.code==='SEARCH_PROVIDER_REDIRECT_BLOCKED'
+ );
+ assert.equal(calls.length,1);
+});
