@@ -1,0 +1,19 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>HHBA 合成测试招聘申请</title></head>
+<body><h1>示例招聘申请</h1><p>仅用于测试，不代表任何真实企业。</p>
+<form id="apply-form">
+<label>候选人联系电话<input id="personal" value="SENSITIVE-DO-NOT-STORE" readonly></label>
+<button id="submit" type="submit">提交申请</button></form>
+<div id="message"></div>
+<script>
+const mode=location.pathname.split('/').pop();
+if(mode==='preexisting')document.querySelector('#message').innerHTML='<div role="status">申请提交成功（旧页面已有）</div>';
+document.querySelector('#apply-form').addEventListener('submit',event=>{
+ event.preventDefault();window.submitCount=(window.submitCount||0)+1;
+ if(mode==='success')setTimeout(()=>{
+  document.querySelector('#message').innerHTML='<div role="status">申请提交成功！</div>';
+ },80);
+ if(mode==='negative')setTimeout(()=>{
+  document.querySelector('#message').innerHTML='<div role="status">申请提交失败，请重试</div>';
+ },80);
+});
+</script></body></html>

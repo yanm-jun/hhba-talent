@@ -6,6 +6,8 @@ import {APPLY_PACKAGES,packagePriceFen,alipayConfigured,alipayCredentialsConfigu
 import {reconcileOrder,closeUnpaidOrder} from '../../_lib/apply-payment-reconciliation.js';
 import {aiConfigured,validateAISuggestionRequest,suggestSafeFields,validateAIKeyMapRequest,suggestAIFieldKeys} from '../../_lib/apply-ai-suggest.js';
 import {pairingConfigured,validExtensionOrigin,extensionCors,createPairCode,claimPairCode,extensionSession,revokeExtensions} from '../../_lib/apply-extension-pairing.js';
+import {syncKeyConfigured,prepareProfileTransfer,claimProfileTransfer,revokeProfileTransfer} from '../../_lib/apply-profile-sync.js';
+import {saveApplication,listApplications,deleteApplication} from '../../_lib/apply-application-history.js';
 
 const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{
  'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'
@@ -73,7 +75,7 @@ export async function onRequest({request,env}){
  const method=request.method;
  if(method==='GET'&&path==='/config')
   return json({ok:true,packages:APPLY_PACKAGES.map(uses=>({uses,amountFen:packagePriceFen(uses)})),
-   paymentEnabled:alipayConfigured(env),tasksEnabled:tasksConfigured(env),pairingEnabled:pairingConfigured(env)});
+   paymentEnabled:alipayConfigured(env),tasksEnabled:tasksConfigured(env),pairingEnabled:pairingConfigured(env),profileSyncEnabled:pairingConfigured(env)&&syncKeyConfigured(env)});
  const db=env.HHBA_PNVS_AUTH_DB;
  if(!db)return err('ACCOUNT_DATABASE_NOT_CONNECTED',503);
  // Extension requests have a completely separate, narrow bearer credential;
@@ -100,7 +102,33 @@ export async function onRequest({request,env}){
   try{ext=await extensionSession(db,env,request)}
   catch{return wrap(err('EXTENSION_SESSION_UNAVAILABLE',503))}
   if(!ext)return wrap(err('EXTENSION_SESSION_INVALID',401));
-  if(method==='GET'&&path==='/extension/wallet'){
+  if(method==='POST'&&path==='/extension/profile/claim'){
+   // Separate extension session, same verified account and fixed extension origin.
+   if(!syncKeyConfigured(env))return wrap(err('PROFILE_TRANSFER_NOT_CONFIGURED',503));
+   try{
+    const user=await getUserByPhone(db,ext.phone);
+    if(user?.role!=='candidate')return wrap(err('CANDIDATE_REQUIRED',403));
+    const claim=await claimProfileTransfer(db,env,ext.phone);
+    return wrap(claim.ok?json(claim):err(claim.error,claim.status));
+   }catch{return wrap(err('PROFILE_TRANSFER_UNAVAILABLE',503))}
+  }
+  if(method==='POST'&&path==='/extension/applications/save'){
+   try{
+    const user=await getUserByPhone(db,ext.phone);
+    if(user?.role!=='candidate')return wrap(err('CANDIDATE_REQUIRED',403));
+    const body=await jsonBody(request,1900);
+    const result=await saveApplication(db,ext.phone,body,true);
+    return wrap(result.ok?json(result):err(result.error,result.status));
+   }catch{return wrap(err('APPLICATIONS_UNAVAILABLE',503))}
+  }
+  if(method==='POST'&&path==='/extension/applications/list'){
+   try{
+    const user=await getUserByPhone(db,ext.phone);
+    if(user?.role!=='candidate')return wrap(err('CANDIDATE_REQUIRED',403));
+    return wrap(json(await listApplications(db,ext.phone)));
+   }catch{return wrap(err('APPLICATIONS_UNAVAILABLE',503))}
+  }
+  if(method==='POST'&&path==='/extension/wallet'){
    try{
     const user=await getUserByPhone(db,ext.phone);
     if(user?.role!=='candidate')return wrap(err('CANDIDATE_REQUIRED',403));
@@ -157,6 +185,23 @@ export async function onRequest({request,env}){
     .bind(phone,now).first();
    return json({ok:true,connectedDevices:Number(total?.n||0)});
   }
+  if(method==='POST'&&path==='/profile-transfer/prepare'){
+   if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
+   if(!pairingConfigured(env))return err('PAIRING_NOT_ENABLED',503);
+   const body=await jsonBody(request,22000);
+   if(!body)return err('INVALID_PROFILE_SYNC_REQUEST',400);
+   try{
+    const result=await prepareProfileTransfer(db,env,phone,body);
+    return result.ok?json(result):err(result.error,result.status);
+   }catch{return err('PROFILE_TRANSFER_UNAVAILABLE',503)}
+  }
+  if(method==='POST'&&path==='/profile-transfer/revoke'){
+   if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
+   try{
+    const result=await revokeProfileTransfer(db,phone);
+    return result.ok?json(result):err('PROFILE_TRANSFER_UNAVAILABLE',503);
+   }catch{return err('PROFILE_TRANSFER_UNAVAILABLE',503)}
+  }
   if(method==='POST'&&path==='/pair/start'){
    if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
    if(!pairingConfigured(env))return err('PAIRING_NOT_ENABLED',503);
@@ -167,6 +212,10 @@ export async function onRequest({request,env}){
    if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
    if(!pairingConfigured(env))return err('PAIRING_NOT_ENABLED',503);
    await revokeExtensions(db,phone);
+   // Old installations without migration 0014 must still be able to revoke
+   // every extension session. Without an active device the pending ciphertext
+   // is not claimable; fail-closed sync endpoints require migration 0014.
+   try{await revokeProfileTransfer(db,phone)}catch{}
    return json({ok:true,connectedDevices:0});
   }
   if(method==='POST'&&path==='/ai/suggest'){
@@ -183,6 +232,21 @@ export async function onRequest({request,env}){
    if(!reserved?.success||reserved?.meta?.changes!==1)return err('AI_RATE_LIMITED',429);
    const advice=await suggestSafeFields(env,body);
    return advice.ok?json(advice):err(advice.error,502);
+  }
+  if(method==='GET'&&path==='/applications'){
+   return json(await listApplications(db,phone));
+  }
+  if(method==='POST'&&path==='/applications'){
+   if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
+   const body=await jsonBody(request,1900);
+   const result=await saveApplication(db,phone,body,false);
+   return result.ok?json(result):err(result.error,result.status);
+  }
+  if(method==='POST'&&path==='/applications/delete'){
+   if(!sameOrigin(request))return err('ORIGIN_REQUIRED',403);
+   const body=await jsonBody(request,128);
+   const result=await deleteApplication(db,phone,body?.id);
+   return result.ok?json(result):err(result.error,result.status);
   }
   if(method==='GET'&&path==='/wallet')return json({ok:true,wallet:await wallet(db,phone)});
   if(method==='GET'&&path==='/orders'){

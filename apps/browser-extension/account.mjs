@@ -1,4 +1,4 @@
-// Explicit, read-only account pairing. No website bearer, cookie or wallet
+// Explicit, narrowly scoped account pairing: read-only wallet and user-authorized record writes. No website bearer, cookie or wallet
 // mutation capability is ever exposed to the browser helper.
 export const HHBA_SITE='https://hhba.work';
 export const HHBA_PERMISSION='https://hhba.work/*';
@@ -13,7 +13,7 @@ export function validDeviceSession(v,now=Date.now()){
  typeof v.expiresAt==='string'&&Date.parse(v.expiresAt)>now;
 }
 export async function accountApi(fetchFn,path,token,body){
- if(!['/claim','/wallet','/disconnect','/ai/map'].includes(path))throw Error('此插件没有操作该接口的权限');
+ if(!['/claim','/wallet','/disconnect','/ai/map','/profile/claim','/applications/save','/applications/list'].includes(path))throw Error('此插件没有操作该接口的权限');
  if(path!=='/claim'&&!validDeviceSession(token))throw Error('连接已失效，请重新连接');
  let payload=path==='/claim'?{code:cleanPairCode(body?.code)}:undefined;
  if(path==='/claim'&&!payload.code)throw Error('请输入正确的12位连接码');
@@ -25,8 +25,15 @@ export async function accountApi(fetchFn,path,token,body){
    fields:body.fields.map(f=>({id:f.id,label:f.label,kind:f.kind}))};
   if(JSON.stringify(payload).length>6000)throw Error('页面字段过多，请缩小分析范围');
  }
+ if(path==='/applications/save'){
+  if(!body||typeof body!=='object')throw Error('缺少投递记录');
+  // Explicit fields only, never forward scraped HTML, screenshots or form values.
+  payload={company:body.company,position:body.position,applicationUrl:body.applicationUrl,
+   status:body.status,evidenceKind:body.evidenceKind};
+  if(JSON.stringify(payload).length>1600)throw Error('投递记录信息过长');
+ }
  const response=await fetchFn(HHBA_EXTENSION_API+path,{
-  method:path==='/wallet'?'GET':'POST',credentials:'omit',cache:'no-store',redirect:'error',
+  method:'POST',credentials:'omit',cache:'no-store',redirect:'error',
   headers:{...(payload?{'Content-Type':'application/json'}:{}),
    ...(token?.token&&path!=='/claim'?{Authorization:'Bearer '+token.token}:{})},
   ...(payload?{body:JSON.stringify(payload)}:{})

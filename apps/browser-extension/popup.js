@@ -1,5 +1,6 @@
 import {PROFILE_FIELDS,normalizeProfile,validateProfile,exportProfile,planFields,planAIFieldSuggestions} from "./core.mjs";
 import {HHBA_PERMISSION,EXTENSION_SESSION_KEY,accountApi,cleanPairCode,validDeviceSession} from "./account.mjs";
+import {mergeApplicationRecord} from "./application-history.mjs";
 const $=id=>document.getElementById(id);
 const STORAGE="hhba.apply.profile.v1";
 let profile=normalizeProfile({}),lastScan=null,lastPlan=[],tabId=null;
@@ -192,7 +193,7 @@ $("undo").addEventListener("click",async()=>{
 })();
 
 
-// HHBA account pairing is opt-in and read-only. All recruitment form filling
+// HHBA account pairing is opt-in with narrowly scoped wallet-read and consented record writes. All recruitment form filling
 // above remains local and works without a linked account.
 async function savedDeviceSession(){
  const row=await chrome.storage.session.get(EXTENSION_SESSION_KEY);
@@ -230,7 +231,7 @@ $("pair-connect").addEventListener("click",async()=>{
   if(!validDeviceSession(session))throw Error("服务器返回的临时会话无效。");
   await chrome.storage.session.set({[EXTENSION_SESSION_KEY]:session});
   $("pair-code").value="";
-  status("HHBA 账户连接成功。当前只支持次数查询，不会扣次或发送简历。");
+  status("HHBA 账户连接成功。次数只读；仅在你主动确认后同步投递记录或领取结构化资料，不会扣次。");
   await refreshAccount();
  }catch(e){status(e?.message||"无法连接 HHBA，请稍后再试。",true)}
  finally{$("pair-connect").disabled=false}
@@ -252,3 +253,171 @@ $("pair-disconnect").addEventListener("click",async()=>{
  }
 });
 void refreshAccount();
+
+
+// Explicit one-use profile import. No raw PDF/DOCX bytes leave the website.
+// A previously paired HHBA device is restricted to the same authenticated
+// account; import into this extension's local profile only after a user click.
+$("profile-sync-claim").addEventListener("click",async()=>{
+ if(!$("profile-sync-consent").checked)return status("请先确认本次结构化资料同步授权。",true);
+ const button=$("profile-sync-claim");
+ if(button.disabled)return;
+ button.disabled=true;
+ try{
+  const device=await savedDeviceSession();
+  if(!device)throw Error("请先完成 HHBA 账户连接。");
+  const original=await chrome.storage.local.get(STORAGE);
+  if(Object.values(normalizeProfile(original[STORAGE])).some(Boolean)&&
+   !confirm("领取后将替换插件中当前保存的本地求职档案。确定继续吗？"))return;
+  const data=await accountApi(fetch,"/profile/claim",device);
+  const checked=validateProfile(data.profile);
+  await storeProfile(checked);
+  lastScan=null;lastPlan=[];$("plan").replaceChildren();
+  $("fill").classList.add("hidden");
+  toggle("profile");
+  status("已同步 "+Object.values(checked).filter(Boolean).length+" 项已确认资料到本机。请再核对后使用。");
+ }catch(e){
+  const raw=e?.message||"资料同步暂不可用";
+  status(raw.includes("PROFILE_TRANSFER_NOT_READY")?"网站端尚未准备同步资料，或已过期/领取，请重新生成。":raw,true);
+ }finally{
+  $("profile-sync-consent").checked=false;
+  button.disabled=false;
+ }
+});
+
+// User-triggered navigation only. No website login token or resume content is
+// transferred to the extension merely by opening the user's HHBA workspace.
+$("open-hhba-account").addEventListener("click",()=>{
+ chrome.tabs.create({url:"https://hhba.work/candidate/account/apply-assistant"});
+});
+$("open-hhba-resume").addEventListener("click",()=>{
+ chrome.tabs.create({url:"https://hhba.work/candidate/account/resume"});
+});
+
+
+// Applicant-initiated application history: automatic *local* capture after a
+// user arms one current-page watcher, with explicit review before cloud sync.
+// No email/IMAP, broad host access, auto-submit or profile data sent here.
+const APPLICATIONS_STORAGE='hhba.apply.application-local.v1';
+function cleanApplicationText(value){
+ return typeof value==='string'?value.trim().replace(/\s+/g,' ').slice(0,100):'';
+}
+function safeApplicationLink(raw){
+ try{
+  const url=new URL(raw);
+  if(url.protocol!=='https:'||url.username||url.password)return null;
+  const allowed=new Set(['gh_jid','jobid','job_id','positionid','reqid','requisitionid']);
+  const qs=new URLSearchParams();
+  for(const [k,v] of url.searchParams){
+   if(allowed.has(k.toLowerCase())&&/^[a-z0-9_-]{1,110}$/i.test(v)&&qs.size<4)
+    qs.append(k.toLowerCase(),v);
+  }
+  return url.origin+url.pathname+(qs.size?'?'+qs.toString():''); // no session tokens
+ }catch{return null}
+}
+function applicationDraft(){
+ const company=cleanApplicationText($("application-company").value);
+ const position=cleanApplicationText($("application-position").value);
+ if(company.length<2||position.length<2)throw Error('请填写至少两个字的企业与岗位名称');
+ if(!$("application-consent").checked)throw Error('请先勾选本次投递记录授权');
+ return {company,position};
+}
+async function localApplications(){
+ const v=await chrome.storage.local.get(APPLICATIONS_STORAGE);
+ return Array.isArray(v[APPLICATIONS_STORAGE])?v[APPLICATIONS_STORAGE]:[];
+}
+async function saveLocalApplication(record){
+ const list=await localApplications();
+ const next=mergeApplicationRecord(list,record);
+ await chrome.storage.local.set({[APPLICATIONS_STORAGE]:next});
+}
+async function showApplications(){
+ const records=await localApplications();
+ const confirmed=records.filter(x=>x.status==='confirmed').length;
+ const pending=records.filter(x=>x.status!=='confirmed').length;
+ const upload=records.filter(x=>x.synced===true).length;
+ $("application-counts").replaceChildren();
+ for(const [n,label] of [[confirmed,'页面提示成功'],[pending,'待确认'],[upload,'已同步']]){
+  const span=el('span'),strong=el('strong','',String(n)),small=el('small','',label);
+  span.append(strong,small);$("application-counts").append(span);
+ }
+ $("application-records").replaceChildren();
+ if(!records.length){
+  $("application-records").append(el('p','help','尚无本地记录。仅在用户主动跟踪或核验后记录。'));
+  return;
+ }
+ for(const item of records.slice(0,40)){
+  const row=el('div','result '+(item.status==='confirmed'?'success':'warning'));
+  const heading=el('strong','',item.company+' · '+item.position);
+  const detail=el('small','',(item.status==='confirmed'?'页面观察到成功提示':'待确认是否完成投递')+
+   ' · '+(item.synced?'已同步':'尚未同步')+' · '+(item.recordedAt||'').slice(0,16).replace('T',' '));
+  const link=el('small','',safeApplicationLink(item.applicationUrl)||'申请链接不可用');
+  row.append(heading,el('div','',detail.textContent),el('div','',link.textContent));
+  $("application-records").append(row);
+ }
+}
+$("tab-applications").addEventListener('click',()=>void showApplications());
+$("application-clear").addEventListener('click',async()=>{
+ if(!confirm('确定删除本机全部投递记录吗？已同步至 HHBA 的记录不会一起删除，请在网站分别管理。'))return;
+ try{
+  await chrome.storage.local.remove(APPLICATIONS_STORAGE);
+  await showApplications();status('本机投递记录已清空。');
+ }catch(e){status(e?.message||'无法清除记录',true)}
+});
+$("application-refresh").addEventListener('click',async()=>{
+ try{await showApplications();status('已刷新本地投递记录。')}
+ catch(e){status(e?.message||'无法读取本地记录',true)}
+});
+$("application-watch").addEventListener('click',async()=>{
+ const button=$("application-watch");if(button.disabled)return;
+ button.disabled=true;
+ try{
+  const draft=applicationDraft();
+  const result=await ask('HHBA_TRACK_START',{...draft,consent:true});
+  if(!result?.ok)throw Error(result?.error||'此招聘网页暂时无法跟踪');
+  status('已开始观察当前网页。请本人完成提交；如跳转到新页面，返回此处核验。');
+ }catch(e){status(e?.message||'无法开始跟踪',true)}
+ finally{button.disabled=false}
+});
+$("application-check").addEventListener('click',async()=>{
+ const button=$("application-check");if(button.disabled)return;
+ button.disabled=true;
+ try{
+  const draft=applicationDraft();
+  const check=await ask('HHBA_APPLICATION_CHECK');
+  if(!check?.ok)throw Error(check?.error||'无法检查当前网页');
+  const url=safeApplicationLink(check.applicationUrl);
+  if(!url)throw Error('仅能记录 HTTPS 招聘网页');
+  const confirmed=check.evidenceKind==='success_notice';
+  await saveLocalApplication({...draft,applicationUrl:url,status:confirmed?'confirmed':'pending',
+   evidenceKind:confirmed?'success_notice':'none'});
+  await showApplications();
+  status(confirmed?'记录了页面可见的投递成功提示；这不保证企业已收到。':'没有找到可靠成功提示，已保留待确认记录。');
+ }catch(e){status(e?.message||'记录失败',true)}
+ finally{button.disabled=false}
+});
+$("application-sync").addEventListener('click',async()=>{
+ const button=$("application-sync");if(button.disabled)return;
+ button.disabled=true;
+ try{
+  const device=await savedDeviceSession();
+  if(!device)throw Error('请先连接 HHBA 账号。');
+  const list=await localApplications();
+  const pending=list.filter(x=>!x.synced);
+  if(!pending.length){status('没有尚未同步的投递记录。');return;}
+  if(!confirm('确定将 '+pending.length+' 条本机投递记录同步至当前连接的 HHBA 账号？请确认这是你自己的账号。'))return;
+  let count=0;
+  for(const item of pending){
+   await accountApi(fetch,'/applications/save',device,item);
+   // Avoid losing concurrent watcher updates: replace only the matching
+   // version of each record after a server acknowledgment.
+   const latest=await localApplications();
+   const revised=latest.map(x=>x.company===item.company&&x.position===item.position&&
+    x.applicationUrl===item.applicationUrl&&x.recordedAt===item.recordedAt?
+    {...x,synced:true}:x);
+   await chrome.storage.local.set({[APPLICATIONS_STORAGE]:revised});count++;
+  }
+  await showApplications();status('已同步 '+count+' 条投递记录到当前 HHBA 账号。');
+ }catch(e){await showApplications();status(e?.message||'同步中断，未成功部分仍保存在本地',true)}
+ finally{button.disabled=false}
+});

@@ -3,9 +3,13 @@
 (function(){
  if(globalThis.__hhbaApplyAgentInstalled)return;
  globalThis.__hhbaApplyAgentInstalled=true;
- let current=new Map(), scanId="", scanUrl="", snapshot=[];
+ let current=new Map(), scanSignatures=new Map(), scanId="", scanUrl="", snapshot=[];
+ // Only plain applicant text/date inputs are candidates. Other input types
+ // (number, range, color, datetime-local, search, etc.) remain manual.
+ const writeableTypes=new Set(["text","email","tel","date","month"]);
+ const reportOnlyTypes=new Set(["checkbox","radio"]);
  const forbidden=/(password|hidden|submit|reset|button|image|file|search)/i;
- const highRisk=/(身份证|证件|政治面貌|民族|家庭|亲属|紧急联系人|密码|验证码|诚信|背景调查|声明|签名|授权|同意|隐私|婚姻|生育|健康|敏感|薪资|社保|银行卡|护照|人脸|企业名称|工作单位|备注.*声明|captcha|otp|consent|agreement|privacy)/i;
+ const highRisk=/(身份证|证件|政治面貌|民族|家庭|亲属|紧急联系人|密码|验证码|诚信|背景调查|声明|签名|授权|同意|隐私|婚姻|生育|健康|敏感|薪资|社保|银行卡|护照|人脸|企业名称|工作单位|备注.*声明|captcha|otp|one[-_ ]?time[-_ ]?code|security[-_ ]?code|verification[-_ ]?code|consent|agreement|privacy)/i;
  const clean=s=>String(s||"").replace(/[\s\u00a0]+/g," ").trim().slice(0,180);
  const txt=el=>clean(el?.textContent||"");
  function labelOnlyText(label){
@@ -40,8 +44,18 @@
   if(prev&&/LABEL|SPAN|DIV|TH/.test(prev.tagName)&&txt(prev).length<70)return txt(prev);
   return "";
  }
+ function signature(el){
+  // A dynamic ATS may re-purpose the same input without replacing the node.
+  // Never fill a field whose meaning or select options changed after scan.
+  return JSON.stringify({tag:el.tagName,type:(el.getAttribute("type")||"text").toLowerCase(),
+   role:el.getAttribute("role"),name:el.getAttribute("name"),id:el.id,
+   placeholder:el.getAttribute("placeholder"),autocomplete:el.getAttribute("autocomplete"),
+   label:fieldLabel(el),maxlength:el.maxLength,
+   options:el.tagName==="SELECT"?Array.from(el.options).map(x=>[x.value,clean(x.text),x.disabled]):null});
+ }
  function scan(){
   current=new Map();
+  scanSignatures=new Map();
   const fields=[];
   const manualWidgets=[];
   const elements=document.querySelectorAll("input,textarea,select");
@@ -49,6 +63,7 @@
   for(const el of elements){
    const type=(el.getAttribute("type")||"text").toLowerCase();
    if(forbidden.test(type)||!visible(el)||el.readOnly)continue;
+   if(el.tagName==="INPUT"&&!writeableTypes.has(type)&&!reportOnlyTypes.has(type))continue;
    // The visible input of a JS select is NOT a committed HTML text field.
    // Never write directly into Ant/Element/Arco/Semi/ByteDance comboboxes.
    if(el.getAttribute("role")==="combobox"||el.closest(".ant-select,.el-select,.arco-select,.semi-select,.byted-select"))continue;
@@ -63,6 +78,7 @@
    const context=[label,placeholder,name,idAttribute,groupText,el.getAttribute("autocomplete")].join(" ");
    const id="f"+(++pos);
    current.set(id,el);
+   scanSignatures.set(id,signature(el));
    const options=kind==="select"?Array.from(el.options).map(opt=>({text:clean(opt.text),value:opt.value,disabled:opt.disabled})):
     [];
    fields.push({id,kind,type,label,placeholder,name,idAttribute,options,required:el.required,maxLength:el.maxLength,
@@ -105,14 +121,32 @@
    done.add(key);
    if(!el||!el.isConnected||!visible(el)){results.push({id:key,status:"failed",reason:"字段已消失或隐藏"});continue}
    if(el.readOnly||el.disabled){results.push({id:key,status:"skipped",reason:"网页已锁定此字段"});continue}
+   if(scanSignatures.get(key)!==signature(el)){
+    results.push({id:key,status:"skipped",reason:"字段结构或选项已变化，请重新扫描"});continue;
+   }
+   if(el.tagName==="INPUT"&&!writeableTypes.has(el.type)){
+    results.push({id:key,status:"skipped",reason:"此类输入控件需人工处理"});continue;
+   }
+   if(el.getAttribute("role")==="combobox"||el.closest(".ant-select,.el-select,.arco-select,.semi-select,.byted-select")){
+    results.push({id:key,status:"skipped",reason:"动态组件需人工确认"});continue;
+   }
    if(el.value){results.push({id:key,status:"skipped",reason:"原有内容未覆盖"});continue}
-   if(highRisk.test([fieldLabel(el),el.name,el.id,el.placeholder].join(" "))){
+   if(highRisk.test([fieldLabel(el),el.name,el.id,el.placeholder,el.getAttribute("autocomplete")].join(" "))){
     results.push({id:key,status:"skipped",reason:"敏感字段需人工确认"});continue;
    }
    if(el.type==="password"||el.type==="file"||el.type==="checkbox"||el.type==="radio"){
     results.push({id:key,status:"skipped",reason:"不修改需要本人确认的控件"});continue;
    }
    if(typeof step.value!=="string"||step.value.length>12000){results.push({id:key,status:"failed",reason:"字段值无效"});continue}
+   if(el.tagName!=="SELECT"&&el.maxLength>0&&step.value.length>el.maxLength){
+    results.push({id:key,status:"skipped",reason:"内容超出网页字数限制"});continue;
+   }
+   if(el.tagName==="INPUT"&&el.type==="date"&&!/^\d{4}-\d{2}-\d{2}$/.test(step.value)){
+    results.push({id:key,status:"skipped",reason:"日期控件需要 YYYY-MM-DD"});continue;
+   }
+   if(el.tagName==="INPUT"&&el.type==="month"&&!/^\d{4}-\d{2}$/.test(step.value)){
+    results.push({id:key,status:"skipped",reason:"月份控件需要 YYYY-MM"});continue;
+   }
    const old=String(el.value||"");
    try{
     if(el.tagName==="SELECT"){
@@ -150,10 +184,109 @@
   snapshot=[];
   return {ok:true,restored:count};
  }
+ // Opt-in, same-document tracking only. NEVER sends a network request or
+ // clicks the employer's submit button. A full-page navigation cancels the
+ // watcher; the applicant may verify the new success page after navigation.
+ const APPLICATIONS_STORAGE='hhba.apply.application-local.v1';
+ let tracking=null;
+ let storeQueue=Promise.resolve();
+ const SUCCESS=/(?:投递成功|申请已提交|提交申请成功|申请提交成功|application (?:submitted|received|successful)|successfully applied|thank you for applying|your application has been (?:submitted|received))/i;
+ const NEGATIVE=/(?:提交失败|投递失败|申请失败|验证码错误|网络错误|未提交成功|unsuccessful|failed to submit|please try again)/i;
+ const receiptSelectors='[role="status"],[role="alert"],.success,.success-message,.application-success,.submission-success,[data-testid*="success"],h1,h2,h3';
+ function findSuccessSignal(){
+  let inspected=0;
+  for(const el of document.querySelectorAll(receiptSelectors)){
+   if(inspected++>=80)break;
+   if(!visible(el))continue;
+   const value=clean(el.textContent).slice(0,180);
+   if(value&&SUCCESS.test(value)&&!NEGATIVE.test(value))
+    return 'success_notice';
+  }
+  return 'none';
+ }
+ function safeJobLink(){
+  const u=new URL(location.href);
+  if(u.protocol!=='https:')return null;
+  const allowed=new Set(['gh_jid','jobid','job_id','positionid','reqid','requisitionid']);
+  const qs=new URLSearchParams();
+  for(const [k,v] of u.searchParams){
+   if(allowed.has(k.toLowerCase())&&/^[a-z0-9_-]{1,110}$/i.test(v)&&qs.size<4)
+    qs.append(k.toLowerCase(),v);
+  }
+  return u.origin+u.pathname+(qs.size?'?'+qs.toString():''); // reject auth/query tokens
+ }
+ function resultCheck(){
+  return {ok:true,evidenceKind:findSuccessSignal(),applicationUrl:safeJobLink(),
+   note:'仅检查可见成功提示，不读取表单答案、截图或完整页面文本。'};
+ }
+ function storeAttempt(meta,status,evidenceKind){
+  storeQueue=storeQueue.catch(()=>{}).then(()=>storeAttemptQueued(meta,status,evidenceKind));
+  return storeQueue;
+ }
+ async function storeAttemptQueued(meta,status,evidenceKind){
+  if(!meta||!safeJobLink())return;
+  const old=await chrome.storage.local.get(APPLICATIONS_STORAGE);
+  const list=Array.isArray(old[APPLICATIONS_STORAGE])?old[APPLICATIONS_STORAGE]:[];
+  const item={company:meta.company,position:meta.position,applicationUrl:meta.applicationUrl,
+   status,evidenceKind,recordedAt:new Date().toISOString(),synced:false};
+  const key=x=>[x.company,x.position,x.applicationUrl].join('|').toLocaleLowerCase();
+  const prev=list.find(x=>key(x)===key(item));
+  if(prev?.status==='confirmed'&&status!=='confirmed')return;
+  const next=[item,...list.filter(x=>key(x)!==key(item))].slice(0,100);
+  await chrome.storage.local.set({[APPLICATIONS_STORAGE]:next});
+ }
+ function armTrack(data){
+  if(!safeJobLink())return {ok:false,error:'仅允许 HTTPS 招聘申请页面'};
+  if(tracking?.observer)tracking.observer.disconnect();
+  const company=clean(data?.company),position=clean(data?.position);
+  if(company.length<2||position.length<2||data?.consent!==true)
+   return {ok:false,error:'请填写企业和岗位并确认本次跟踪授权'};
+  const link=safeJobLink();
+  tracking={company,position,applicationUrl:link,created:Date.now(),submitted:false,observer:null,baselineSuccess:findSuccessSignal()};
+  // Observe only the next 5 minutes of the current document.
+  tracking.observer=new MutationObserver(()=>{
+   if(!tracking||!tracking.submitted)return;
+   if(Date.now()-tracking.created>300000){tracking.observer?.disconnect();tracking=null;return;}
+   const evidence=findSuccessSignal();
+   if(evidence!=='none'&&tracking.baselineSuccess==='none'){
+    const context=tracking;
+    context.observer?.disconnect();tracking=null;
+    void storeAttempt(context,'confirmed',evidence).catch(()=>{});
+   }
+  });
+  tracking.observer.observe(document.documentElement,{childList:true,subtree:true,characterData:true});
+  return {ok:true,notice:'已开启当前页面的有限时段跟踪；只观察本人提交后的成功提示。'};
+ }
+ function markSubmission(event){
+  if(!tracking||Date.now()-tracking.created>300000)return;
+  if(!event.isTrusted)return;
+  if(event.type==='click'){
+   const control=event.target?.closest?.('button,input[type="submit"]');
+   if(!control||control.disabled||!(/submit|apply|投递|申请|提交/i).test(
+    [control.textContent,control.getAttribute('aria-label'),control.value].join(' ')))return;
+  }else if(event.type!=='submit')return;
+  tracking.submitted=true;
+  void storeAttempt(tracking,'pending','none').catch(()=>{});
+  // SPA apps may display the success notice without triggering mutations after.
+  queueMicrotask(()=>{
+   if(!tracking||!tracking.submitted)return;
+   const ev=findSuccessSignal();
+   if(ev!=='none'&&tracking.baselineSuccess==='none'){
+    const context=tracking;context.observer?.disconnect();tracking=null;
+    void storeAttempt(context,'confirmed',ev).catch(()=>{});
+   }
+  });
+ }
+ document.addEventListener('submit',markSubmission,true);
+ document.addEventListener('click',markSubmission,true);
  chrome.runtime.onMessage.addListener((message,_sender,reply)=>{
-  if(!message||typeof message!=="object"||!["HHBA_SCAN","HHBA_FILL","HHBA_UNDO","HHBA_FOCUS"].includes(message.type))return;
+  if(!message||typeof message!=="object"||!["HHBA_SCAN","HHBA_FILL","HHBA_UNDO","HHBA_FOCUS","HHBA_APPLICATION_CHECK","HHBA_TRACK_START"].includes(message.type))return;
   try{
-   const result=message.type==="HHBA_SCAN"?scan():message.type==="HHBA_FILL"?fill(message):message.type==="HHBA_FOCUS"?focus(message):undo();
+   const result=message.type==="HHBA_SCAN"?scan():
+    message.type==="HHBA_FILL"?fill(message):
+    message.type==="HHBA_FOCUS"?focus(message):
+    message.type==="HHBA_APPLICATION_CHECK"?resultCheck():
+    message.type==="HHBA_TRACK_START"?armTrack(message):undo();
    reply(result);
   }catch(e){reply({ok:false,error:e?.message||"网页处理失败"})}
   return true;
