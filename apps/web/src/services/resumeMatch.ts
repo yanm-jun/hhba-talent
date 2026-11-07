@@ -56,31 +56,45 @@ export async function matchServiceReady(signal?:AbortSignal):Promise<boolean>{
   return data.kind==='HHBA_RESUME_MATCH_CLOUDFLARE_V1'&&data.enabled===true;
  }catch{return false}
 }
-export async function submitResumeForMatching(
- file:File,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string
-):Promise<MatchResponse>{
- if(!consent)throw new MatchError(400,errorMap.EXPLICIT_AI_SHARING_CONSENT_REQUIRED);
+/** Best-effort browser redaction before submitting text to HHBA's server. */
+export function redactResumeTextLocally(text:string):string{
+ return text
+  .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,'[邮箱已隐藏]')
+  .replace(/(?<!\d)1[3-9]\d{9}(?!\d)/g,'[手机号已隐藏]')
+  .replace(/(?<![0-9A-Za-z])\d{17}[0-9Xx](?![0-9A-Za-z])/g,'[身份证号已隐藏]')
+  .replace(/\bhttps?:\/\/[^\s<>]{3,200}/gi,'[个人网址已隐藏]')
+  .replace(/(?:微信号|微信|QQ号|QQ)\s*[:：]\s*[A-Za-z0-9_-]{5,32}/gi,'[即时通讯账号已隐藏]')
+  .trim().slice(0,20000);
+}
+export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Promise<string>{
  if(!/\.(pdf|docx)$/i.test(file.name)||file.size<30||file.size>LIMIT)
   throw new MatchError(413,'请选择 3 MB 以内的 PDF 或 DOCX 简历。');
- const token=session();
- let text='';
  try{
   const buffer=await file.arrayBuffer();
-  if(/\.pdf$/i.test(file.name))text=(await extractPdfText(buffer,{signal})).text;
-  else text=await extractDocxText(buffer);
+  if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
+  const value=/\.pdf$/i.test(file.name)?
+   (await extractPdfText(buffer,{signal})).text:
+   await extractDocxText(buffer);
+  if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
+  const text=redactResumeTextLocally(value);
+  if(text.replace(/\s/g,'').length<30)throw new MatchError(400,errorMap.INVALID_RESUME_TEXT);
+  return text;
  }catch(e){
-  if((e as Error)?.name==='AbortError')throw e;
+  if((e as Error)?.name==='AbortError'||e instanceof MatchError)throw e;
   throw new MatchError(400,(e as Error)?.message||errorMap.INVALID_RESUME_TEXT);
  }
- if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
- // Only extracted text is transmitted. Original R2 file never leaves the browser.
- // Bound length also caps provider token use. The UI states this 20,000-char ceiling.
- text=text.trim().slice(0,20000);
- if(text.replace(/\s/g,'').length<30)throw new MatchError(400,errorMap.INVALID_RESUME_TEXT);
+}
+export async function submitExtractedResumeText(
+ text:string,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string
+):Promise<MatchResponse>{
+ if(!consent)throw new MatchError(400,errorMap.EXPLICIT_AI_SHARING_CONSENT_REQUIRED);
+ const token=session();
+ const cleaned=redactResumeTextLocally(text);
+ if(cleaned.replace(/\s/g,'').length<30)throw new MatchError(400,errorMap.INVALID_RESUME_TEXT);
  const response=await fetch(API+'/resume',{
   method:'POST',credentials:'same-origin',cache:'no-store',signal,
   headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-  body:JSON.stringify({resume_id:resumeId||null,text,consent:true,
+  body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
    options:{country:opts.country,remote_only:opts.remote_only,
     role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10))}})
  }).catch(e=>{if((e as Error)?.name==='AbortError')throw e;
@@ -90,4 +104,12 @@ export async function submitResumeForMatching(
  if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||data.matches.length>10)
   throw new MatchError(502,errorMap.BAD_RESPONSE);
  return data as MatchResponse;
+}
+
+export async function submitResumeForMatching(
+ file:File,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string
+):Promise<MatchResponse>{
+ if(!consent)throw new MatchError(400,errorMap.EXPLICIT_AI_SHARING_CONSENT_REQUIRED);
+ const extracted=await extractResumeTextLocally(file,signal);
+ return submitExtractedResumeText(extracted,opts,consent,signal,resumeId);
 }
