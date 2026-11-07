@@ -360,6 +360,13 @@ async function showApplications(){
  }
 }
 $("tab-applications").addEventListener('click',()=>void showApplications());
+$("application-clear").addEventListener('click',async()=>{
+ if(!confirm('确定删除本机全部投递记录吗？已同步至 HHBA 的记录不会一起删除，请在网站分别管理。'))return;
+ try{
+  await chrome.storage.local.remove(APPLICATIONS_STORAGE);
+  await showApplications();status('本机投递记录已清空。');
+ }catch(e){status(e?.message||'无法清除记录',true)}
+});
 $("application-refresh").addEventListener('click',async()=>{
  try{await showApplications();status('已刷新本地投递记录。')}
  catch(e){status(e?.message||'无法读取本地记录',true)}
