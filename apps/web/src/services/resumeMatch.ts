@@ -32,6 +32,7 @@ const errorMap:Record<string,string>={
   EXPLICIT_AI_SHARING_CONSENT_REQUIRED:'请先确认本次第三方 AI 分析授权。',
   INVALID_RESUME_TEXT:'简历中没有足够可复制的文字，请使用文字版 PDF 或 DOCX。',
   OFFICIAL_JOB_INDEX_UNAVAILABLE:'岗位官方审核数据暂时不可用，请稍后再试。',
+  NO_VERIFIED_DOMESTIC_JOBS:'目前尚无通过最新审核的中国大陆岗位，本次没有调用 AI，也没有扣匹配次数。我们正在补充国内招聘来源。',
   AI_PROVIDER_UNAVAILABLE:'AI 接口出现异常，请稍后再试。',
   AI_PROVIDER_KEY_REJECTED:'AI 服务密钥未通过平台验证，请联系 HHBA 管理员检查配置。',
   AI_PROVIDER_BALANCE_INSUFFICIENT:'AI 平台账户余额不足，请联系 HHBA 管理员充值。',
@@ -104,7 +105,7 @@ export async function submitExtractedResumeText(
   method:'POST',credentials:'same-origin',cache:'no-store',signal,
   headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
   body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
-   options:{country:opts.country,remote_only:opts.remote_only,
+   options:{country:'CN',remote_only:false,
     role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10))}})
  }).catch(e=>{if((e as Error)?.name==='AbortError')throw e;
   throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});
