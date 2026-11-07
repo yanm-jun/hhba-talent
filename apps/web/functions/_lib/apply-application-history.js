@@ -4,7 +4,7 @@ const NAME_MAX=100;
 const RECEIPTS=new Set(['success_notice','receipt_marker']);
 const STATES=new Set(['pending','confirmed','manual']);
 const SOURCES=new Set(['edge','manual']);
-const QUERY_KEYS=new Set(['jobid','job_id','positionid','position_id','reqid','requisitionid','gh_jid','job','jid','id']);
+const QUERY_KEYS=new Set(['jobid','job_id','positionid','position_id','reqid','requisitionid','gh_jid']);
 const iso=()=>new Date().toISOString();
 const text=s=>typeof s==='string'?s.trim().replace(/\s+/g,' ').slice(0,NAME_MAX):'';
 export function normalizeJobUrl(raw){
