@@ -245,7 +245,7 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
     <span>有效期截至 {new Date(pairCode.expiresAt).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}。请勿分享给他人；到期后需重新生成。</span>
    </div>}
    {pairNotice&&<p className="hhba-apply-safety-note" role="status"><ShieldCheck size={15}/>{pairNotice}</p>}
-   <p className="hhba-apply-safety-note"><ShieldCheck size={15}/>只读连接，不会付款、扣次、上传简历或自动投递。待完成扩展安全验收后开放。</p>
+   <p className="hhba-apply-safety-note"><ShieldCheck size={15}/>受限连接不会付款或扣次；投递记录仅在用户授权后同步，绝不代为提交企业申请。待完成扩展安全验收后开放。</p>
   </section>
   <ApplyResumeSync enabled={Boolean(config?.profileSyncEnabled)}/>
   <section className="hhba-apply-history">
