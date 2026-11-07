@@ -1,0 +1,33 @@
+name: HHBA R2 Cloudflare Resume AI Match P0
+on:
+  pull_request:
+    paths:
+      - 'apps/web/**'
+      - 'docs/RESUME_MATCH_R2_CLOUDFLARE_P0_20261107.md'
+      - '.github/workflows/hhba-cloudflare-resume-matching-p0.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install pinned web dependencies
+        working-directory: apps/web
+        run: npm ci --ignore-scripts
+      - name: Contract and API syntax tests
+        working-directory: apps/web
+        run: |
+          node --check 'functions/api/match/[[path]].js'
+          node --check functions/_lib/resume-match-core.js
+          node --test scripts/resume-match-cloudflare.contract.test.mjs
+      - name: TypeScript and Vite bundle
+        working-directory: apps/web
+        run: npm run build

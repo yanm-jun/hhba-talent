@@ -24,8 +24,9 @@ export function verifiedProfile(raw,text){
  const education=degreeEvidence&&allowed.includes(raw.education)?raw.education:null;
  const yearEvidence=asEvidence(raw.experience_evidence);
  // Require explicit years-of-work evidence; dates alone cannot substantiate tenure.
- const duration=yearEvidence&&/(?:\d+(?:\.\d+)?\s*年(?:工作|实习|经验)|(?:工作|实习|经验)\s*\d+(?:\.\d+)?\s*年)/.test(yearEvidence);
- const years=duration&&Number.isFinite(raw.experience_years)&&raw.experience_years>=0&&raw.experience_years<=50?raw.experience_years:null;
+ const stated=yearEvidence?.match(/(?:工作|实习|经验)\s*(\d+(?:\.\d+)?)\s*年|(\d+(?:\.\d+)?)\s*年(?:工作|实习|经验)/);
+ const confirmed=stated?Number(stated[1]||stated[2]):null;
+ const years=confirmed!==null&&Number.isFinite(raw.experience_years)&&raw.experience_years===confirmed&&confirmed>=0&&confirmed<=50?confirmed:null;
  const skills=[],seen=new Set();
  for(const value of Array.isArray(raw.skills)?raw.skills.slice(0,20):[]){
   const name=typeof value?.name==='string'?value.name.trim().slice(0,60):'';
@@ -33,7 +34,7 @@ export function verifiedProfile(raw,text){
   if(!name||!evidence||seen.has(name.toLowerCase())||!evidence.toLowerCase().includes(name.toLowerCase()))continue;
   skills.push({name,evidence});seen.add(name.toLowerCase());
  }
- const roles=[...new Set((Array.isArray(raw.target_roles)?raw.target_roles:[]).filter(x=>typeof x==='string'&&x.trim().length>=2&&x.length<=70).map(x=>x.trim()))].slice(0,6);
+ const roles=[...new Set((Array.isArray(raw.target_roles)?raw.target_roles:[]).filter(x=>typeof x==='string'&&x.trim().length>=2&&x.length<=70).map(x=>x.trim()).filter(x=>original.toLowerCase().includes(x.toLowerCase())))].slice(0,6);
  return {education,education_evidence:education?degreeEvidence:null,
   experience_years:years,experience_evidence:years===null?null:yearEvidence,
   skills,target_roles:roles,warnings:[]};

@@ -140,7 +140,14 @@ export async function onRequest({request,env}){
  const hash=await sha256Hex(env.HHBA_MATCH_LIMIT_PEPPER+':match:'+session.phone);
  let reserved;
  try{reserved=await reserveBudget(db,hash);}catch{return fail('MATCH_DATABASE_NOT_READY',503);}
- if(!reserved)return fail('MATCH_PERSONAL_LIMIT',429);
+ if(!reserved){
+  try{
+   const row=await db.prepare('SELECT COUNT(*) AS n FROM hhba_resume_match_requests WHERE day_utc=?')
+    .bind(new Date().toISOString().slice(0,10)).first();
+   if(Number(row?.n)>=60)return fail('MATCH_GLOBAL_LIMIT',429);
+  }catch{return fail('MATCH_DATABASE_NOT_READY',503);}
+  return fail('MATCH_PERSONAL_LIMIT',429);
+ }
  let profile;
  try{profile=await aiExtract(env.HHBA_MATCH_DEEPSEEK_KEY,cleaned,options.role_hint);}
  catch(e){return fail(e?.message==='AI_PROFILE_INCOMPLETE'?'AI_PROFILE_INCOMPLETE':'AI_PROVIDER_UNAVAILABLE',502);}
