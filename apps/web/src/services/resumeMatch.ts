@@ -166,3 +166,70 @@ export function safeExternalJobApplicationUrl(job:MatchedJob):string|null{
   return 'https://'+u.hostname+expected.path+'?'+expected.param+'='+native;
  }catch{return null;}
 }
+
+export type ExternalOfficialCandidate={
+ id:string;source_type:'站外官方招聘';source_status:'OFFICIAL_DETAIL_FETCHED';
+ application_status:'NEEDS_OFFICIAL_CONFIRMATION';company:string;title:string;
+ location:string;official_url:string;official_domain:string;has_application_cta:boolean;
+ checked_at:string;evidence:{title:string;location:string;requirement:string};
+};
+export type ExternalSearchResult={
+ ok:true;kind:'HHBA_DOMESTIC_DISCOVERY_V1';scope:'CN_MAINLAND_ONLY';
+ candidates:ExternalOfficialCandidate[];candidate_count:number;
+ usage:{search:number;fetch:number};
+ max_search_requests:number;max_fetch_requests:number;disclaimer:string;
+};
+const externalSearchErrors:Record<string,string>={
+ EXTERNAL_SEARCH_NOT_ENABLED:'站外搜索尚未开放，请先使用站内岗位推荐。',
+ EXTERNAL_SEARCH_DB_NOT_READY:'站外搜索额度保护尚未就绪。',
+ SESSION_INVALID:'登录状态失效，请重新登录。',
+ FORBIDDEN:'只有求职者账号可使用站外搜索。',
+ ORIGIN_REQUIRED:'不允许跨站触发搜索。',
+ SEARCH_CONSENT_REQUIRED:'请主动点击站外搜索按钮后发起请求。',
+ INVALID_SEARCH_INTENT:'请先填写具体岗位方向，如“软件开发”或“数据分析”。',
+ EXTERNAL_SEARCH_GLOBAL_LIMIT:'今天的站外岗位搜索预算已用完。',
+ EXTERNAL_SEARCH_PERSONAL_LIMIT:'今天的站外搜索额度已用完。',
+ SEARCH_PROVIDER_KEY_REJECTED:'官方岗位搜索服务密钥验证失败，请联系 HHBA 管理员。',
+ SEARCH_PROVIDER_BALANCE_INSUFFICIENT:'搜索服务账户余额不足，请联系 HHBA 管理员。',
+ SEARCH_PROVIDER_RATE_LIMIT:'官方岗位搜索请求较多，请稍后重试。',
+ SEARCH_PROVIDER_TIMEOUT:'官方岗位搜索超时，请稍后重试。',
+ SEARCH_PROVIDER_NETWORK:'暂时无法连接官方岗位搜索服务。',
+ SEARCH_PROVIDER_REDIRECT_BLOCKED:'岗位搜索服务发生异常重定向，已安全终止。',
+ SEARCH_RESPONSE_INVALID:'官方岗位搜索返回的结果格式不完整。',
+ SEARCH_PROVIDER_ERROR:'官方岗位搜索服务暂时出现错误。'
+};
+export async function externalDomesticSearchReady(signal?:AbortSignal):Promise<boolean>{
+ if(!realAuthReady||!getRealAuthToken())return false;
+ try{
+  const response=await fetch(API+'/discover',{method:'GET',credentials:'same-origin',cache:'no-store',signal});
+  if(!response.ok||!(response.headers.get('content-type')||'').includes('json'))return false;
+  const data=await response.json() as {kind?:string;scope?:string;enabled?:boolean;integrated_into_top10?:boolean};
+  return data.kind==='HHBA_DOMESTIC_DISCOVERY_V1'&&data.scope==='CN_MAINLAND_ONLY'&&data.enabled===true;
+ }catch{return false;}
+}
+/** Called only from an explicit click on the external official-job search action.
+ * Send only the short job title, never the resume text or profile evidence.
+ */
+export async function discoverExternalDomesticJobs(roleHint:string,signal?:AbortSignal):Promise<ExternalSearchResult>{
+ const token=session();
+ const clean=roleHint.trim().slice(0,42);
+ if(clean.length<2||/[@\n\r]|(?:\d[\s-]?){5,}/.test(clean))
+  throw new MatchError(400,externalSearchErrors.INVALID_SEARCH_INTENT);
+ let response:Response;
+ try{
+  response=await fetch(API+'/discover',{
+   method:'POST',credentials:'same-origin',cache:'no-store',signal,
+   headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+   body:JSON.stringify({role_hint:clean,consent_search:true})
+  });
+ }catch(e){
+  if((e as Error)?.name==='AbortError')throw e;
+  throw new MatchError(503,'暂时无法连接 HHBA 站外官方岗位搜索。');
+ }
+ const data=await response.json().catch(()=>({})) as Partial<ExternalSearchResult>&{error?:string};
+ if(!response.ok)throw new MatchError(response.status,externalSearchErrors[data.error||'']||'站外岗位搜索暂不可用。');
+ if(data.ok!==true||data.kind!=='HHBA_DOMESTIC_DISCOVERY_V1'||data.scope!=='CN_MAINLAND_ONLY'||
+  !Array.isArray(data.candidates)||data.candidates.length>3)
+  throw new MatchError(502,'站外岗位搜索数据格式不完整，已丢弃本次结果。');
+ return data as ExternalSearchResult;
+}
