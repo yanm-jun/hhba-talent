@@ -1,7 +1,7 @@
 // Cloudflare Pages: private, same-origin, opt-in AI resume matching.
 // Keep this endpoint disabled until an audited Preview migration and keys exist.
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../../_lib/real-auth.js';
-import {redactForModel,verifiedProfile,selectAuditedMatches} from '../../_lib/resume-match-core.js';
+import {redactForModel,verifiedProfile,selectAuditedMatches,countVerifiedMainlandJobs} from '../../_lib/resume-match-core.js';
 
 const KIND='HHBA_RESUME_MATCH_CLOUDFLARE_V1';
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
@@ -146,7 +146,7 @@ export async function onRequest({request,env}){
  if(tail==='/status'&&request.method==='GET'){
   const active=enabled(env);
   return json({kind:KIND,enabled:active&&await quotaReady(env),
-   formats:['pdf','docx'],per_account_daily_limit:2,global_daily_limit:60});
+   formats:['pdf','docx'],scope:'CN_MAINLAND_ONLY',per_account_daily_limit:2,global_daily_limit:60});
  }
 
  // Preview-only diagnostic: candidate authentication, no tokens or resume sent,
@@ -198,7 +198,8 @@ export async function onRequest({request,env}){
  const options=input.options||{};
  if(typeof options!=='object'||typeof options.role_hint!=='string'||
     options.role_hint.length>80||typeof options.country!=='string'||options.country.length>5||
-    typeof options.remote_only!=='boolean'||!Number.isInteger(options.limit)||options.limit<1||options.limit>10)
+    options.country!=='CN'||options.remote_only!==false||
+    !Number.isInteger(options.limit)||options.limit<1||options.limit>10)
   return fail('INVALID_RESUME_TEXT',400);
  if(input.resume_id!==null&&input.resume_id!==undefined){
   if(typeof input.resume_id!=='string'||! /^[0-9a-f-]{36}$/.test(input.resume_id))
@@ -216,7 +217,10 @@ export async function onRequest({request,env}){
   // Validate all provenance metadata before spending any AI quota.
   selectAuditedMatches(sources.snapshot,sources.audit,sources.facets,
    {skills:[],target_roles:['__probe__']},{limit:1},Date.now());
- }catch{return fail('OFFICIAL_JOB_INDEX_UNAVAILABLE',503);}
+  }catch{return fail('OFFICIAL_JOB_INDEX_UNAVAILABLE',503);}
+ // No provider call and no quota debit if only overseas/archived jobs remain.
+ if(countVerifiedMainlandJobs(sources.snapshot,sources.audit,sources.facets)===0)
+  return fail('NO_VERIFIED_DOMESTIC_JOBS',503);
  const hash=await sha256Hex(env.HHBA_MATCH_LIMIT_PEPPER+':match:'+session.phone);
  let reserved;
  try{reserved=await reserveBudget(db,hash);}catch{return fail('MATCH_DATABASE_NOT_READY',503);}
@@ -244,8 +248,8 @@ export async function onRequest({request,env}){
  const recommended=selectAuditedMatches(sources.snapshot,sources.audit,sources.facets,profile,options,Date.now());
  return json({status:'COMPLETE',profile,matches:recommended.matches,
   matched_official_jobs:recommended.matched_official_jobs,
-  source:'HHBA 站内官方 ATS 审核快照（尚不包含站外实时检索）',
+  source:'中国大陆境内官方 ATS 职位审核快照（尚不包含站外实时检索）',
   scoring:'仅基于有简历文字证据的方向与官方职位特征进行相关性排序；不代表录用概率',
   privacy:'本次脱敏文本仅发送至已授权的 AI 分析服务，原始简历未写入匹配日志或公开数据库',
-  disclaimer:'岗位当前开放状态、签证与申请资格必须以企业官方页面为准。'});
+  disclaimer:'只推荐中国大陆境内职位；当前开放状态、学历与申请资格以企业官网为准。'});
 }
