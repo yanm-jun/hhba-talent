@@ -107,7 +107,7 @@ test('Top 10 never repeats company+title just because an ATS job has more locati
   jobs:jobs.map(x=>({job_id:x.id,platform:x.platform,status:'OFFICIAL_JD_AND_REQUIREMENTS_FOUND',
    full_original_jd_verified:true,requirements_evidence:true,jd_sha256:'sha-'+x.id}))};
  const facets={indexed_as_of:at,verified_at:at,
-  jobs:jobs.map(x=>({id:x.id,skills:['sql'],original_source_hash:'sha-'+x.id}))};
+  jobs:jobs.map(x=>({id:x.id,countryCode:'CN',cityKey:'shanghai',skills:['sql'],original_source_hash:'sha-'+x.id}))};
  const p={skills:[{name:'SQL',evidence:'SQL'}],target_roles:['Data Analyst']};
  const out=selectAuditedMatches({updated:at,jobs},audit,facets,p,{limit:10},now);
  const identities=out.matches.map(x=>x.company+'|'+x.title);
