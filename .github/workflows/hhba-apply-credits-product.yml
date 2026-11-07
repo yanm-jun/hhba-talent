@@ -108,7 +108,7 @@ jobs:
       - name: Package exact reviewed extension sources for store pre-submission testing
         working-directory: apps/browser-extension
         run: |
-          zip -q -j "$RUNNER_TEMP/hhba-edge-extension-p0-review.zip" manifest.json popup.html popup.css popup.js core.mjs content.js account.mjs
+          zip -q -j "$RUNNER_TEMP/hhba-edge-extension-p0-review.zip" manifest.json popup.html popup.css popup.js core.mjs content.js account.mjs application-history.mjs
           zip -q "$RUNNER_TEMP/hhba-edge-extension-p0-review.zip" icons/icon16.png icons/icon32.png icons/icon48.png icons/icon128.png
           unzip -t "$RUNNER_TEMP/hhba-edge-extension-p0-review.zip"
           unzip -l "$RUNNER_TEMP/hhba-edge-extension-p0-review.zip" | grep 'icons/icon128.png'
