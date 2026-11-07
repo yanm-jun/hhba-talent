@@ -15,6 +15,11 @@ on:
       - 'apps/web/functions/_lib/apply-extension-pairing.js'
       - 'apps/web/functions/_lib/apply-profile-sync.js'
       - 'apps/web/d1/0014_apply_profile_sync.sql'
+      - 'apps/web/d1/0015_candidate_application_ledger.sql'
+      - 'apps/web/functions/_lib/apply-application-history.js'
+      - 'apps/web/src/components/ApplicationHistory.tsx'
+      - 'apps/web/src/styles/application-history.css'
+      - 'apps/web/scripts/apply-application-history.contract.test.mjs'
       - 'apps/web/package.json'
       - 'apps/web/package-lock.json'
       - 'apps/web/src/services/pdfProfile.mjs'
@@ -69,10 +74,11 @@ jobs:
           node --check 'functions/_lib/apply-ai-suggest.js'
           node --check 'functions/_lib/apply-extension-pairing.js'
           node --check 'functions/_lib/apply-profile-sync.js'
+          node --check 'functions/_lib/apply-application-history.js'
           node --check 'workers/apply-profile-transfer-janitor.js'
           node --check 'src/services/pdfProfile.mjs'
           node --check 'functions/api/apply/[[path]].js'
-          node --test scripts/apply-credits.contract.test.mjs scripts/apply-payments-v2.contract.test.mjs scripts/apply-ai-v05.contract.test.mjs scripts/apply-pairing.contract.test.mjs scripts/apply-profile-sync.contract.test.mjs scripts/apply-edge-sync-http.contract.test.mjs scripts/apply-pairing-real-flow.contract.test.mjs scripts/apply-profile-janitor.contract.test.mjs scripts/apply-docx-local.contract.test.mjs scripts/apply-pdf-local.contract.test.mjs scripts/candidate-apply-assistant-workbench.contract.test.mjs
+          node --test scripts/apply-credits.contract.test.mjs scripts/apply-payments-v2.contract.test.mjs scripts/apply-ai-v05.contract.test.mjs scripts/apply-pairing.contract.test.mjs scripts/apply-profile-sync.contract.test.mjs scripts/apply-edge-sync-http.contract.test.mjs scripts/apply-pairing-real-flow.contract.test.mjs scripts/apply-application-history.contract.test.mjs scripts/apply-profile-janitor.contract.test.mjs scripts/apply-docx-local.contract.test.mjs scripts/apply-pdf-local.contract.test.mjs scripts/candidate-apply-assistant-workbench.contract.test.mjs
       - name: Verify the additive D1 schema with SQLite
         working-directory: apps/web
         run: python3 scripts/apply_credits_schema_test.py
