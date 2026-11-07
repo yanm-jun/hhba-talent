@@ -1,9 +1,10 @@
 import {useEffect,useRef,useState,type KeyboardEvent} from 'react';
+import {fuseDomesticJobRecommendations} from '../../functions/_lib/domestic-match-fusion.js';
 import {createPortal} from 'react-dom';
 import {ArrowLeft,ArrowRight,CheckCircle2,ChevronDown,FileText,TriangleAlert,X} from 'lucide-react';
 import {Link} from '../router';
 import {safeOfficialJobUrl} from '../services/liveRecruitment';
-import type {MatchResponse,MatchedJob} from '../services/resumeMatch';
+import {safeExternalJobApplicationUrl,externalDomesticSearchReady,discoverExternalDomesticJobs,type MatchResponse,type MatchedJob} from '../services/resumeMatch';
 import '../styles/resume-match-dialog.css';
 
 const educationNames:Record<string,string>={
@@ -22,7 +23,8 @@ function Evidence({title,items,variant}:{
 function JobRow({item,index,expanded,onToggle}:{
  item:MatchedJob;index:number;expanded:boolean;onToggle:()=>void
 }){
- const verified=safeOfficialJobUrl({
+ const isExternal=item.source_type==='站外官方招聘';
+ const verified=isExternal?safeExternalJobApplicationUrl(item):safeOfficialJobUrl({
   id:item.id,source:item.source,platform:item.platform,company:item.company,
   title:item.title,url:item.official_url,location:item.location,remote:item.remote
  });
@@ -32,31 +34,73 @@ function JobRow({item,index,expanded,onToggle}:{
    <span className="hhba-match-job-index">{String(index).padStart(2,'0')}</span>
    <span className="hhba-match-job-primary">
     <strong>{item.title_zh||item.title}</strong>
-    <small>{item.company} · {item.location||'中国大陆 · 地点待核实'}</small>
+    <small>{item.company} · {item.location||'中国大陆 · 地点待核实'} · <span className={isExternal?'hhba-match-source-external':'hhba-match-source-internal'}>{isExternal?'站外官方 · 待核实开放':'HHBA 站内'}</span></small>
    </span>
    <span className="hhba-match-job-score"><strong>{item.reference_score}</strong><small>参考相关度</small></span>
    <ChevronDown size={17} className={expanded?'hhba-match-job-chevron open':'hhba-match-job-chevron'}/>
   </button>
   {expanded&&<div id={'hhba-match-job-'+index} className="hhba-match-job-details">
-   <p className="hhba-match-job-disclaimer">岗位条件、工作地点及开放状态请以企业官方页面为准；分数不是录用概率。</p>
+   <p className="hhba-match-job-disclaimer">{isExternal?'已读取企业官方职位详情，但是否仍接受申请需打开原站确认。':'已通过 HHBA 官方岗位来源审核，是否仍在招聘以企业官网为准。'} 分数不是录用概率。</p>
    <div className="hhba-match-job-evidence">
     <Evidence title="匹配依据" items={item.matched||[]} variant="match"/>
     <Evidence title="尚待证明" items={item.not_evidenced||[]} variant="gap"/>
     <Evidence title="需要核验" items={item.needs_verification||[]} variant="note"/>
    </div>
    <div className="hhba-match-job-links">
-    <Link to={'/candidate/jobs/'+encodeURIComponent(item.id)}>查看 HHBA 岗位资料</Link>
+    {!isExternal&&<Link to={'/candidate/jobs/'+encodeURIComponent(item.id)}>查看 HHBA 岗位资料</Link>}
     {verified?<a href={verified} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">
       打开企业招聘页 <ArrowRight size={15}/></a>:<span>该岗位没有通过安全验证的外部链接</span>}
    </div>
   </div>}
  </article>;
 }
-export function CandidateMatchResultDialog({result,onClose}:{
- result:MatchResponse;onClose:()=>void
+export function CandidateMatchResultDialog({result,onClose,roleHint=''}:{
+ result:MatchResponse;onClose:()=>void;roleHint?:string
 }){
  const dialogRef=useRef<HTMLDivElement|null>(null);
  const [expandedId,setExpandedId]=useState<string|null>(null);
+ const [displayMatches,setDisplayMatches]=useState<MatchedJob[]>(result.matches);
+ const [externalAvailable,setExternalAvailable]=useState(false);
+ const [externalBusy,setExternalBusy]=useState(false);
+ const [externalRequested,setExternalRequested]=useState(false);
+ const [externalMessage,setExternalMessage]=useState('');
+ const externalController=useRef<AbortController|null>(null);
+ useEffect(()=>{
+  const abort=new AbortController();
+  void externalDomesticSearchReady(abort.signal).then(value=>{
+   if(!abort.signal.aborted)setExternalAvailable(value);
+  });
+  return()=>abort.abort();
+ },[]);
+ useEffect(()=>()=>{externalController.current?.abort();},[]);
+ async function findMoreDomesticJobs(){
+  if(externalBusy||externalRequested)return;
+  const role=(roleHint.trim()||result.profile.target_roles[0]||'').slice(0,42);
+  if(!role){setExternalMessage('请返回填写目标岗位方向，例如“数据分析”，再使用站外搜索。');return;}
+  setExternalBusy(true);setExternalMessage('');
+  const abort=new AbortController();
+  externalController.current=abort;
+  try{
+   // This intentional user click authorizes an external official-site search.
+   // Only a short role name is sent; never the resume, skills evidence or PII.
+   const found=await discoverExternalDomesticJobs(role,abort.signal);
+   if(abort.signal.aborted)return;
+   const fused=fuseDomesticJobRecommendations(
+    result.matches,found.candidates,result.profile,{role_hint:role,limit:10}
+   );
+   setDisplayMatches(fused.matches);
+   setExpandedId(null);
+   setExternalRequested(true);
+   setExternalMessage(
+    fused.counts.selected_external?
+     '已合并 '+fused.counts.selected_external+' 条有官方详情来源的站外候选；是否仍接受申请请到企业官网确认。':
+     '本次未找到足够相关、具备岗位原文和官方申请入口的国内站外候选，已保留现有站内结果。'
+   );
+  }catch(e){
+   if((e as Error)?.name!=='AbortError')
+    setExternalMessage(e instanceof Error?e.message:'站外搜索暂时失败，已保留现有站内结果。');
+  }finally{setExternalBusy(false);externalController.current=null;}
+ }
  useEffect(()=>{
   const previous=document.body.style.overflow;
   const trigger=document.activeElement instanceof HTMLElement?document.activeElement:null;
@@ -86,7 +130,7 @@ export function CandidateMatchResultDialog({result,onClose}:{
     <header className="hhba-match-modal-head">
      <div><span className="hhba-match-modal-eyebrow">HHBA · 中国大陆岗位匹配</span>
       <h2 id="hhba-match-dialog-title">能力画像与岗位推荐</h2>
-      <p>已完成分析 · 国内岗位 {result.matches.length} 条 · 仅本次浏览可见</p>
+      <p>已完成分析 · 国内岗位 {displayMatches.length} 条 · 仅本次浏览可见</p>
      </div>
      <button type="button" className="hhba-match-modal-close" aria-label="关闭结果，返回简历匹配" onClick={onClose}>
       <X size={20}/></button>
@@ -103,9 +147,20 @@ export function CandidateMatchResultDialog({result,onClose}:{
         <em>暂未识别出可核验的技能</em>}
       </div></div>
      </section>
+     {externalAvailable&&<section className="hhba-match-external-search" aria-label="站外官方职位补充">
+      <div>
+       <strong>想看看更多国内企业吗？</strong>
+       <p>可主动补充搜索站外企业官方招聘页。只发送岗位方向，不发送姓名、电话或简历内容；每次最多 2 次 Search、3 次 Fetch，搜索次数单独计量。</p>
+      </div>
+      <button type="button" disabled={externalBusy||externalRequested}
+       onClick={()=>void findMoreDomesticJobs()}>
+       {externalBusy?'正在搜索官方职位…':externalRequested?'本次已搜索':'补充站外官方岗位'}
+      </button>
+     </section>}
+     {externalMessage&&<p className="hhba-match-external-message" role="status">{externalMessage}</p>}
      <div className="hhba-match-list-title"><h3>中国大陆岗位推荐</h3><small>点击职位展开详情</small></div>
-     {result.matches.length?
-      <div className="hhba-match-job-list">{result.matches.map((job,i)=>
+     {displayMatches.length?
+      <div className="hhba-match-job-list">{displayMatches.map((job,i)=>
        <JobRow key={job.id} item={job} index={i+1} expanded={expandedId===job.id}
         onToggle={()=>setExpandedId(old=>old===job.id?null:job.id)}/>)}</div>:
       <div className="hhba-match-no-jobs">

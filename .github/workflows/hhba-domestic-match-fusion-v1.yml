@@ -1,0 +1,47 @@
+name: HHBA Mainland Dual-Source Top10 Fusion V1
+on:
+  pull_request:
+    paths:
+      - 'apps/web/functions/_lib/domestic-match-fusion.js'
+      - 'apps/web/scripts/domestic-match-fusion.contract.test.mjs'
+      - 'apps/web/scripts/domestic-search-fetch.contract.test.mjs'
+      - 'apps/web/functions/_lib/domestic-search-fetch.js'
+      - 'apps/web/src/services/resumeMatch.ts'
+      - 'apps/web/src/components/CandidateMatchResultDialog.tsx'
+      - 'apps/web/scripts/domestic-search-preview-http.smoke.mjs'
+      - '.github/workflows/hhba-domestic-match-fusion-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-fusion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install pinned dependencies
+        working-directory: apps/web
+        run: npm ci --ignore-scripts
+      - name: Verify source guards and deterministic ranking
+        working-directory: apps/web
+        run: |
+          node --check functions/_lib/domestic-search-fetch.js
+          node --check functions/_lib/domestic-match-fusion.js
+          node --test scripts/domestic-match-fusion.contract.test.mjs scripts/domestic-search-fetch.contract.test.mjs scripts/domestic-search-fetch.route.test.mjs
+      - name: Check HHBA web production build
+        working-directory: apps/web
+        run: npm run build
+      - name: Real HTTPS Preview smoke (disabled pilot, no charge)
+        working-directory: apps/web
+        run: node scripts/domestic-search-preview-http.smoke.mjs
+      - name: Real HTTPS Preview smoke (flag on, anonymous requests denied, no charge)
+        working-directory: apps/web
+        env:
+          HHBA_DOMESTIC_PILOT_PREVIEW: https://69dffa55.hhba-talent.pages.dev
+          HHBA_DOMESTIC_PILOT_EXPECT_ENABLED: '1'
+        run: node scripts/domestic-search-preview-http.smoke.mjs

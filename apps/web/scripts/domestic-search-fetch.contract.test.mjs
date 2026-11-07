@@ -7,6 +7,7 @@ import {
 
 const hu='https://career.huawei.com/cn/job-details?advertisementId=46651';
 const te='https://careers.tencent.com/jobdesc.html?postId=2097166275703910400';
+const mt='https://zhaopin.meituan.com/web/position/detail?highlightType=social&jobUnionId=4747089400';
 const detail=[
  '# 软件开发工程师 深圳','更新于2026-11-06','岗位职责',
  '负责开发服务端平台、设计数据链路和维护应用。',
@@ -42,16 +43,21 @@ test('search intent never forwards user resume contact details or arbitrary text
  }
  const q=buildOfficialQueries('Python 开发');
  assert.equal(q.length,2);
- for(const item of q){assert.ok(item.length<=128);assert.ok(item.includes('Python 开发'));}
+ for(const item of q){assert.ok(item.length<=128);assert.ok(item.includes('Python 开发'));assert.ok(item.includes('site:'));assert.ok(!item.includes('.html '));}
+ assert.ok(q[0].includes('site:careers.tencent.com OR site:zhaopin.meituan.com'));
 });
 test('official URL parser rejects redirects, tracking, foreign links, deceptive subdomains',()=>{
  assert.equal(safeOfficialJobLocator(te)?.company,'腾讯');
  assert.equal(safeOfficialJobLocator(hu)?.company,'华为');
+ assert.equal(safeOfficialJobLocator(mt)?.company,'美团');
+ assert.equal(safeOfficialJobLocator(mt)?.url,'https://zhaopin.meituan.com/web/position/detail?jobUnionId=4747089400');
  for(const u of ['http://careers.tencent.com/jobdesc.html?postId=2097166275703910400',
   'https://careers.tencent.com.evil.com/jobdesc.html?postId=2097166275703910400',
   'https://careers.tencent.com@evil.example/jobdesc.html?postId=2097166275703910400',
   te+'&utm_source=chat',te+'#foo','https://career.huawei.com/cn/job-details?advertisementId=bad',
   'https://career.huawei.com/cn/social-recruitment-job-list',
+  mt+'&utm_source=other',
+  'https://zhaopin.meituan.com/web/position/detail?jobUnionId=4747089400&highlightType=unapproved',
   'https://careers.tencent.com/jobdesc.html?postId=2097166275703910400&postId=200']){
   assert.equal(safeOfficialJobLocator(u),null,u);
  }
@@ -125,4 +131,46 @@ test('provider redirect is blocked rather than leaking key to the destination ho
   e=>e instanceof ExternalSearchError&&e.code==='SEARCH_PROVIDER_REDIRECT_BLOCKED'
  );
  assert.equal(calls.length,1);
+});
+
+test('a missing official page does not discard already verified candidates',async()=>{
+ const absent='https://careers.tencent.com/jobdesc.html?postId=2097166275703910402';
+ const calls=[],searches=[{url:te},{url:absent},{url:hu}];
+ const fetcher=async(url,opts)=>{
+  calls.push({url,body:JSON.parse(opts.body)});
+  if(url.endsWith('/search'))return Response.json({results:searches});
+  if(JSON.parse(opts.body).url===absent)return Response.json({error:{code:'page_not_found'}},{status:404});
+  return Response.json({content:detail});
+ };
+ const result=await discoverExternalOfficialJobs('Python 开发','fake-key-of-adequate-length',{fetcher});
+ assert.equal(calls.filter(x=>x.url.endsWith('/fetch')).length,3);
+ assert.equal(result.usage.fetch,2);
+ assert.equal(result.candidates.length,2);
+ assert.ok(result.candidates.every(x=>x.application_status==='NEEDS_OFFICIAL_CONFIRMATION'));
+});
+test('official employer homepage is not mistaken for a job detail title',()=>{
+ const markdown=['# 腾讯招聘官网','# 软件开发工程师 深圳',...detail.split('\n').slice(1)].join('\n');
+ const result=extractOfficialJob({url:te},{content:markdown});
+ assert.equal(result.title,'软件开发工程师 深圳');
+});
+
+
+test('verified Meituan job-detail shape is eligible only as open-status-unconfirmed',()=>{
+ const content=[
+  '# 用户体验改善-服务运营岗社招-正式','更新时间：2026/10/22',
+  '工作地点：北京市','部门：核心本地商业-美团平台','工作经验：2年',
+  '岗位职责','通过业务指标、客诉信息和用户反馈分析体验问题，开展产品优化及持续改进工作。',
+  '协助实现用户体验看板、流程梳理、异常定位与跨团队产品改进。',
+  '岗位基本要求','1. 本科及以上学历，有良好的跨团队协作能力和业务数据分析素质。',
+  '2. 熟练使用 SQL、Excel，能够独立完成业务分析、洞察发现、项目推进与信息整理。',
+  '3. 沟通能力强，能推动复杂问题解决，具备 2 年相关工作经验。',
+  '立即投递'
+ ].join('\n');
+ const r=extractOfficialJob({url:mt},{content},new Date('2026-11-08T00:00:00.000Z'));
+ assert.equal(r?.company,'美团');
+ assert.equal(r?.location,'北京');
+ assert.equal(r?.source_status,'OFFICIAL_DETAIL_FETCHED');
+ assert.equal(r?.application_status,'NEEDS_OFFICIAL_CONFIRMATION');
+ assert.equal(r?.official_url,'https://zhaopin.meituan.com/web/position/detail?jobUnionId=4747089400');
+ assert.equal(r?.has_application_cta,true);
 });

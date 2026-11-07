@@ -10,6 +10,8 @@ const OFFICIAL={
   company:'腾讯',path:'/jobdesc.html',idParam:'postId',idPattern:/^\d{12,22}$/},
  'career.huawei.com':{
   company:'华为',path:'/cn/job-details',idParam:'advertisementId',idPattern:/^\d{1,12}$/},
+ 'zhaopin.meituan.com':{
+  company:'美团',path:'/web/position/detail',idParam:'jobUnionId',idPattern:/^\d{8,14}$/},
 };
 const CITY_NAMES=[
  '北京','上海','天津','重庆','深圳','广州','杭州','南京','苏州','成都','武汉','西安',
@@ -24,8 +26,9 @@ const CITY_PATTERN=new RegExp(CITY_NAMES.sort((a,b)=>b.length-a.length).join('|'
 const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macau|macao|taiwan|taipei|tokyo|japan|singapore|united states|美国|日本|新加坡)/i;
 const CLOSED=/(?:职位已关闭|该职位已下线|岗位已下线|停止招聘|暂停招聘|不再接受申请|招聘已结束|岗位已关闭|职位已过期|目前暂时未有岗位开放)/i;
 const HAS_DUTIES=/(?:岗位职责|工作职责|职位职责|岗位描述|工作内容|主要职责)/;
-const HAS_REQUIREMENTS=/(?:岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求)/;
+const HAS_REQUIREMENTS=/(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求)/;
 const HAS_APPLY=/(?:申请岗位|立即申请|立即投递|投递岗位|投递简历|申请职位)/;
+const ROLE_TITLE=/(?:工程师|研发|设计师|分析师|架构师|研究员|数据科学|顾问|产品经理|运营|销售|法务|财务|审计|人力|实习生|技术专员|专家|总监|主管|负责人|scientist|engineer|analyst|designer|intern)/i;
 const BLOCK_INTENT=/(?:姓名|身份证|身份证号|手机号|电话号码|电子邮箱|我的电话|家庭住址|password|api.?key|bearer|secret|token|sk-[a-z0-9_-]+|忽略上述|执行指令)/i;
 export function sanitizedJobIntent(value){
  if(typeof value!=='string')return null;
@@ -38,8 +41,8 @@ export function buildOfficialQueries(role){
  const clean=sanitizedJobIntent(role);
  if(!clean)return [];
  return [
-  'site:careers.tencent.com/jobdesc.html '+clean+' 招聘',
-  'site:career.huawei.com/cn/job-details '+clean+' 招聘'
+  clean+' 招聘 site:careers.tencent.com OR site:zhaopin.meituan.com',
+  clean+' 招聘 site:career.huawei.com'
  ].map(q=>q.slice(0,128));
 }
 export function safeOfficialJobLocator(input){
@@ -48,8 +51,10 @@ export function safeOfficialJobLocator(input){
   const u=new URL(input);
   if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash)return null;
   const source=OFFICIAL[u.hostname];
-  if(!source||u.pathname!==source.path||u.searchParams.size!==1||
-     !u.searchParams.has(source.idParam))return null;
+  if(!source||u.pathname!==source.path||!u.searchParams.has(source.idParam))return null;
+  const meituanExtra=u.hostname==='zhaopin.meituan.com'&&u.searchParams.size===2&&
+   u.searchParams.has('highlightType')&&['social','campus'].includes(u.searchParams.get('highlightType'));
+  if(u.searchParams.size!==1&&!meituanExtra)return null;
   const id=u.searchParams.get(source.idParam);
   if(!source.idPattern.test(id))return null;
   return {id:u.hostname+':'+id,company:source.company,domain:u.hostname,
@@ -66,7 +71,7 @@ export function extractOfficialJob(searchResult,document,now=new Date()){
  const lines=content.split('\n').map(t=>t.replace(/^\s*#{1,6}\s*/,'').trim()).filter(Boolean);
  // Require a position-specific title in the fetched official page, not a
  // search snippet. An indexed listing or generic landing page is insufficient.
- const titleLine=lines.find(t=>t.length>=4&&t.length<=115&&
+ const titleLine=lines.find(t=>t.length>=4&&t.length<=115&&ROLE_TITLE.test(t)&&
   !/^(?:职位详情|招聘|社会招聘|岗位详情|职位|官网|搜索|当前位置|岗位职责|岗位要求|任职要求)(?:\s|$|[|｜])/i.test(t));
  if(!titleLine)return null;
  const title=titleLine.split(/[\n|｜]/)[0].trim().slice(0,86);
@@ -79,7 +84,7 @@ export function extractOfficialJob(searchResult,document,now=new Date()){
  const city=(!OUTSIDE.test(labelled)&&labelled.match(CITY_PATTERN)?.[0])||
   (!OUTSIDE.test(header)&&header.match(CITY_PATTERN)?.[0]);
  if(!city)return null;
- const rq=content.match(/(?:岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求)[：:\s]*([\s\S]{24,900})/);
+ const rq=content.match(/(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求)[：:\s]*([\s\S]{24,900})/);
  const requirement=(rq?.[1]||'').split(/(?:岗位职责|工作地点|申请岗位|事业群介绍|立即投递|相关职位)/)[0]
   .replace(/[\s#*-]+/g,' ').trim().slice(0,260);
  if(requirement.length<25)return null;
@@ -129,6 +134,8 @@ async function providerPost(url,key,payload,maxBytes,fetcher){
   throw new ExternalSearchError(e?.name==='TimeoutError'?'SEARCH_PROVIDER_TIMEOUT':'SEARCH_PROVIDER_NETWORK');
  }
  if(response.status>=300&&response.status<400)throw new ExternalSearchError('SEARCH_PROVIDER_REDIRECT_BLOCKED');
+ if(url.endsWith('/fetch')&&(response.status===403||response.status===404))
+  throw new ExternalSearchError('SEARCH_FETCH_NOT_AVAILABLE');
  if(response.status===401||response.status===403)throw new ExternalSearchError('SEARCH_PROVIDER_KEY_REJECTED');
  if(response.status===402)throw new ExternalSearchError('SEARCH_PROVIDER_BALANCE_INSUFFICIENT');
  if(response.status===429)throw new ExternalSearchError('SEARCH_PROVIDER_RATE_LIMIT');
@@ -159,8 +166,16 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
   // Limit actual outbound Fetch attempts, not just successful/charged calls.
   if(fetchAttempts>=FETCH_LIMIT)break;
   fetchAttempts++;
-  const fetched=await providerPost('https://api.deepseek.com/v1/tools/fetch',key,
-   {url:candidate.url},500000,fetcher);
+  let fetched;
+  try{
+   fetched=await providerPost('https://api.deepseek.com/v1/tools/fetch',key,
+    {url:candidate.url},500000,fetcher);
+  }catch(e){
+   // Individual official pages may disappear, move, or block crawlers. Do not
+   // abort a whole search solely because one known vacancy is inaccessible.
+   if(e instanceof ExternalSearchError&&e.code==='SEARCH_FETCH_NOT_AVAILABLE')continue;
+   throw e;
+  }
   if(typeof fetched?.content!=='string')throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');
   if(fetched.content)usage.fetch++;
   const job=extractOfficialJob(candidate,fetched,now);
