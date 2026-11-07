@@ -132,6 +132,9 @@ jobs:
       - name: Verify real Chromium MV3 Edge Preview account pairing and one-time local import
         working-directory: apps/browser-extension
         run: timeout 95s python3 -u scripts/edge-browser-preview-e2e.py
+      - name: Verify opt-in submission tracking in real Chromium, with no applicant PII
+        working-directory: apps/browser-extension
+        run: timeout 95s python3 -u tests/browser_application_tracking_e2e.py
       - name: Verify synthetic ATS dynamic fields, HTML5 types, OTP, SPA rescan, and undo safety
         working-directory: apps/browser-extension
         run: timeout 90s python3 -u tests/browser_ats_robustness_e2e.py
