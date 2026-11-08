@@ -5,7 +5,7 @@ on:
       - 'apps/web/functions/_lib/domestic-match-fusion.js'
       - 'apps/web/functions/_lib/job-qualification-evidence.js'
       - 'apps/web/functions/_lib/resume-match-core.js'
-      - 'apps/web/functions/api/match/[[path]].js'
+      - 'apps/web/functions/api/match/**'
       - 'apps/web/src/pages/CandidateMatchPage.tsx'
       - 'apps/web/src/styles/resume-match-dialog.css'
       - 'apps/web/scripts/match-v6-tristate-intent.contract.test.mjs'
