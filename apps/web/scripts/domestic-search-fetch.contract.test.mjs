@@ -133,7 +133,8 @@ test('provider redirect is blocked rather than leaking key to the destination ho
   discoverExternalOfficialJobs('Python 开发','fake-key-of-adequate-length',{fetcher:fake}),
   e=>e instanceof ExternalSearchError&&e.code==='SEARCH_PROVIDER_REDIRECT_BLOCKED'
  );
- assert.equal(calls.length,1);
+ assert.ok(calls.length>=1&&calls.length<=2,'At most two guarded concurrent searches start');
+ assert.ok(calls.every(x=>x==='https://api.deepseek.com/v1/tools/search'));
 });
 
 test('a missing official page does not discard already verified candidates',async()=>{
