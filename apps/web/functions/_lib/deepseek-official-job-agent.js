@@ -233,7 +233,7 @@ function extractCompanyClaim(lines,page){
   if(candidate&&(/^(?:加入|来自|招聘单位|用人单位)/u.test(part.trim())||
    /(?:集团|有限公司|科技|股份|公司)$/u.test(candidate)))return candidate;
  }
- const m=title.match(/(?:[-|｜]\s*)([\p{Script=Han}]{2,24}(?:集团|有限公司|科技|招聘|股份|公司))/u);
+ const m=title.match(/(?:[-|｜]\s*)([\p{Script=Han}]{2,24}(?:集团|有限公司|科技|股份|公司))/u);
  const legacy=m?viableEmployerName(m[1].replace(/招聘$/,'')):null;
  return legacy||null;
 }
