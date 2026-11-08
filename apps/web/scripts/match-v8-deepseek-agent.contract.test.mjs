@@ -462,7 +462,11 @@ test('Real DeepSeek audit: general job portals are NOT employer-owned job pages'
   'https://campus.niuqizp.com/job-vl85a5Lz5.html',
   'https://campus.niuqizp.com/job-vsy5aaaLa.html',
   'https://shu.ncss.cn/student/jobs/3S8wCZjbvJCXoS4UYMECnJ/detail.html',
-  'https://www.ncss.cn/student/jobs/MRJ5FvVE96HMoyrsoxpyRR/detail.html'
+  'https://www.ncss.cn/student/jobs/MRJ5FvVE96HMoyrsoxpyRR/detail.html',
+  'https://www.nmbys.cn/job/view/id/812751/mark/imuchuangye',
+  'https://www.risfond.com/Job/263934',
+  'https://ylt.gzrc.com.cn/jobs/53099212.html',
+  'https://m.yingjiesheng.com/job-008-144-268.html'
  ];
  for(const u of rejected)assert.equal(publicJobLink(u),null,u);
  assert.ok(publicJobLink('https://careers.suning.cn/rps-web/position/position_info_new.htm?id=19714'),
