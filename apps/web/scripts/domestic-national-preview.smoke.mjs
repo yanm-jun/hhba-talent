@@ -37,8 +37,12 @@ assert.equal(match.status,200);
 assert.equal(match.json?.kind,'HHBA_RESUME_MATCH_CLOUDFLARE_V1');
 assert.equal(match.json.scope,'CN_MAINLAND_ONLY');
 console.log('EXISTING_PREVIEW_MATCH_STATUS_UNCHANGED');
-const page=await check('/candidate/match');
+// Pages may return a same-origin 308 for its canonical static SPA path.
+const page=await fetch(new URL('/candidate/match',root),{
+ redirect:'follow',signal:AbortSignal.timeout(25000),cache:'no-store'
+});
 assert.equal(page.status,200);
-assert.match(page.raw,/<html|<div id=/i);
+assert.equal(new URL(page.url).origin,root.origin);
+assert.match(await page.text(),/<html|<div id=/i);
 console.log('NATIONAL_PREVIEW_PAGE_HTTP_200');
 console.log('NATIONAL_SEARCH_V2_HTTPS_SMOKE_ALL_PASSED');
