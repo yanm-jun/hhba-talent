@@ -24,6 +24,7 @@ function JobRow({item,index,expanded,onToggle}:{
  item:MatchedJob;index:number;expanded:boolean;onToggle:()=>void
 }){
  const isExternal=item.source_type==='站外官方招聘';
+ const isAtsTenant=isExternal&&item.source_level==='VERIFIED_ATS_TENANT_ONLY';
  const verified=isExternal?safeExternalJobApplicationUrl(item):safeOfficialJobUrl({
   id:item.id,source:item.source,platform:item.platform,company:item.company,
   title:item.title,url:item.official_url,location:item.location,remote:item.remote
@@ -34,13 +35,13 @@ function JobRow({item,index,expanded,onToggle}:{
    <span className="hhba-match-job-index">{String(index).padStart(2,'0')}</span>
    <span className="hhba-match-job-primary">
     <strong>{item.title_zh||item.title}</strong>
-    <small>{item.company} · {item.location||'中国大陆 · 地点待核实'} · <span className={isExternal?'hhba-match-source-external':'hhba-match-source-internal'}>{isExternal?'站外官方 · 待核实开放':'HHBA 站内'}</span></small>
+    <small>{item.company} · {item.location||'中国大陆 · 地点待核实'} · <span className={isExternal?'hhba-match-source-external':'hhba-match-source-internal'}>{isAtsTenant?'站外招聘系统 · 企业及开放状态待核实':isExternal?'站外企业招聘页 · 待核实开放':'HHBA 站内'}</span></small>
    </span>
    <span className="hhba-match-job-score"><strong>{item.reference_score}</strong><small>参考相关度</small></span>
    <ChevronDown size={17} className={expanded?'hhba-match-job-chevron open':'hhba-match-job-chevron'}/>
   </button>
   {expanded&&<div id={'hhba-match-job-'+index} className="hhba-match-job-details">
-   <p className="hhba-match-job-disclaimer">{isExternal?'已读取企业官方职位详情，但是否仍接受申请需打开原站确认。':'已通过 HHBA 官方岗位来源审核，是否仍在招聘以企业官网为准。'} 分数不是录用概率。</p>
+   <p className="hhba-match-job-disclaimer">{isAtsTenant?'已读取招聘系统租户的职位详情；尚未独立核实企业法律主体归属及当前开放状态。':isExternal?'已读取企业招聘域名的职位详情；是否仍接受申请需到官网核实。':'已通过 HHBA 官方岗位来源审核，是否仍在招聘以企业官网为准。'} 分数不是录用概率。</p>
    <div className="hhba-match-job-evidence">
     <Evidence title="匹配依据" items={item.matched||[]} variant="match"/>
     <Evidence title="尚待证明" items={item.not_evidenced||[]} variant="gap"/>
@@ -93,8 +94,8 @@ export function CandidateMatchResultDialog({result,onClose,roleHint=''}:{
    setExternalRequested(true);
    setExternalMessage(
     fused.counts.selected_external?
-     '已合并 '+fused.counts.selected_external+' 条有官方详情来源的站外候选；是否仍接受申请请到企业官网确认。':
-     '本次未找到足够相关、具备岗位原文和官方申请入口的国内站外候选，已保留现有站内结果。'
+     '已合并 '+fused.counts.selected_external+' 条有招聘详情证据的站外候选；企业归属和开放状态请在原招聘页确认。':
+     '本次未找到通过职位正文、来源及工作地点核验的站外候选，已保留现有站内结果。'
    );
   }catch(e){
    if((e as Error)?.name!=='AbortError')
@@ -150,7 +151,7 @@ export function CandidateMatchResultDialog({result,onClose,roleHint=''}:{
      {externalAvailable&&<section className="hhba-match-external-search" aria-label="站外官方职位补充">
       <div>
        <strong>想看看更多国内企业吗？</strong>
-       <p>可主动补充搜索站外企业官方招聘页。只发送岗位方向，不发送姓名、电话或简历内容；每次最多 2 次 Search、3 次 Fetch，搜索次数单独计量。</p>
+       <p>动态搜索国内企业与专业招聘系统，只发送岗位方向，不发送姓名、电话或简历；每次最多 5 次 Search、10 次 Fetch（理论最高 ¥0.075），优先复用 24 小时内的公开结果。</p>
       </div>
       <button type="button" disabled={externalBusy||externalRequested}
        onClick={()=>void findMoreDomesticJobs()}>

@@ -1,3 +1,4 @@
+import {MAINLAND_PLACE_PATTERN} from './mainland-place-index.js';
 // HHBA candidate recommendation fusion V1.
 // Only audited HHBA matches and independently fetched official job details may
 // be ranked. No model-generated employer/job facts or acceptance probabilities.
@@ -6,7 +7,7 @@ import {safeOfficialJobLocator} from './domestic-search-fetch.js';
 export const FUSION_VERSION='HHBA_DOMESTIC_MATCH_FUSION_V1';
 const MAX_RESULTS=10;
 const MAX_EVIDENCE_AGE_MS=24*60*60*1000;
-const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macau|macao|taiwan|taipei|日本|美国|新加坡|singapore|united states|tokyo)/i;
+const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macau|macao|taiwan|taipei|日本|美国|新加坡|singapore|united states|tokyo|canada|australia|united kingdom|uk\b|germany|france|india|indonesia|malaysia|vietnam|thailand|philippines|switzerland|netherlands|ireland|brazil|mexico|south korea|hongkong|海外|境外|加拿大|澳大利亚|英国|德国|法国|印度|泰国|越南|马来西亚|菲律宾|韩国|全球远程|worldwide|global remote|remote global)/i;
 const MAINLAND_CITY=/(?:北京|上海|天津|重庆|深圳|广州|杭州|南京|苏州|成都|武汉|西安|青岛|宁波|无锡|合肥|郑州|长沙|厦门|福州|济南|大连|沈阳|哈尔滨|长春|石家庄|昆明|贵阳|南宁|海口|珠海|佛山|东莞|烟台|潍坊|临沂|济宁|菏泽|聊城|威海|泰安|德州|枣庄|滨州|日照|东营|常州|南通|嘉兴|绍兴|金华|温州|台州|太原|徐州|扬州|保定|唐山|廊坊|兰州|西宁|银川|乌鲁木齐|呼和浩特|包头|柳州|桂林|洛阳|开封|南昌|九江|中山|惠州|beijing|shanghai|shenzhen|guangzhou|hangzhou|chengdu|nanjing|suzhou|wuhan|xian)/i;
 const DEGREE_RANK={HIGH_SCHOOL:1,ASSOCIATE:2,BACHELOR:3,MASTER:4,PHD:5};
 const ROLE_CLUSTERS=[
@@ -25,7 +26,7 @@ function textSafe(value,max=260){
 }
 export function isMainlandWorkCity(value){
  const city=textSafe(value,100);
- return !!city&&!OUTSIDE.test(city)&&MAINLAND_CITY.test(city);
+ return !!city&&!OUTSIDE.test(city)&&(MAINLAND_CITY.test(city)||MAINLAND_PLACE_PATTERN.test(city));
 }
 function canonicalRoleKey(job){
  const city=textSafe(job.location,50);
@@ -70,13 +71,18 @@ function referencedExternal(entry,now){
    entry.application_status!=='NEEDS_OFFICIAL_CONFIRMATION'||entry.has_application_cta!==true)return null;
  const u=safeOfficialJobLocator(entry.official_url);
  if(!u||u.company!==entry.company||u.id!==entry.id)return null;
+ // Do not confuse globally hosted ATS tenants with independently verified
+ // employers; the fetched ATS detail must contain tenant-level evidence.
+ if(u.tenant&&(entry.source_level!=='VERIFIED_ATS_TENANT_ONLY'||
+  entry.evidence?.tenant_verified!==true||
+  entry.evidence?.company_identity!==u.company))return null;
  if(!isMainlandWorkCity(entry.location))return null;
  if(!entry.evidence||entry.evidence.location!==entry.location||
   typeof entry.evidence.title!=='string'||entry.evidence.title.trim()!==entry.title.trim()||
   typeof entry.evidence.requirement!=='string'||entry.evidence.requirement.trim().length<25)return null;
  const timestamp=Date.parse(entry.checked_at||'');
  if(!Number.isFinite(timestamp)||timestamp>now+5*60*1000||now-timestamp>MAX_EVIDENCE_AGE_MS)return null;
- return {official_url:u.url,ageHours:Math.max(0,(now-timestamp)/3600000)};
+ return {official_url:u.url,ageHours:Math.max(0,(now-timestamp)/3600000),sourceLevel:u.source_level};
 }
 function safeProfile(profile){
  return {
@@ -120,10 +126,14 @@ function externalToMatch(entry,profile,options,now){
   source_type:'站外官方招聘',reference_score:score,
   matched,not_evidenced:gaps,
   needs_verification:[
-   '企业官网详情与任职要求已抓取；网页出现申请入口，但当前是否仍接受申请必须到官网确认',
+   proof.sourceLevel==='VERIFIED_ATS_TENANT_ONLY'?
+    '岗位位于专业招聘系统，已核验租户与岗位内容一致；企业的法律主体归属仍需进一步确认':
+    '岗位位于已确认的企业招聘域名；仍需核对企业具体招聘资格',
+   '岗位页面有申请入口，但当前是否仍接受申请必须到原招聘系统确认',
    '抓取时间：'+entry.checked_at+'；公开岗位信息可能变化'
   ],
-  requirements_basis:'站外企业官方详情页面原文，非 AI 猜测职位；没有确认实时开放',
+  requirements_basis:'站外职位详情原文，非 AI 猜测职位；企业归属核验等级与当前开放状态有明确标注',
+  source_level:proof.sourceLevel,
   application_status:'NEEDS_OFFICIAL_CONFIRMATION',checked_at:entry.checked_at,
   candidate_evidence:{role:entry.evidence.title,requirement:requirements.slice(0,260)},
   rankEvidence:rolePoints+haveSkill.length*8,

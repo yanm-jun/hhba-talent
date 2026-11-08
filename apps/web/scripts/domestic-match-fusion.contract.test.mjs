@@ -110,3 +110,18 @@ test('external Search is opt-in, Preview-gated, and never sends resume text',asy
  assert.match(service,/body:JSON\.stringify\(\{role_hint:clean,consent_search:true\}\)/);
  assert.doesNotMatch(service.slice(service.indexOf('export async function discoverExternalDomesticJobs')),/resume_id|text:cleaned|profile:|skills:/);
 });
+
+test('foreign mixed job place cannot sneak into fusion rankings',()=>{
+ for(const value of ['上海 / Canada','深圳 / Australia','北京、香港','Remote worldwide / Shanghai']){
+  assert.equal(isMainlandWorkCity(value),false,value);
+ }
+});
+
+test('prefecture and autonomous prefecture matching uses full 2026 mainland directory',()=>{
+ for(const place of ['喀什地区','新疆喀什地区','云南红河哈尼族彝族自治州','甘肃临夏回族自治州']){
+  assert.equal(isMainlandWorkCity(place),true,place);
+ }
+ for(const place of ['台湾省台北市','香港特别行政区','Canada 温州市']){
+  assert.equal(isMainlandWorkCity(place),false,place);
+ }
+});
