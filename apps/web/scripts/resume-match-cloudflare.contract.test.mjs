@@ -166,3 +166,22 @@ test('results use a focus-managed modal rather than a long inline page',async()=
  assert.match(dialog,/返回修改/);
  assert.match(dialog,/document\.body\.style\.overflow='hidden'/);
 });
+
+test('same-version audited internal job with minimum 7 years is rejected for 3-year applicant',()=>{
+ const at=new Date().toISOString();
+ const job={id:'ashby-domestic-abc12345',company:'国内企业',title:'Python Developer',
+  location:'Shanghai, China',url:'https://jobs.ashbyhq.com/domestic/abc12345',
+  source:'domestic',platform:'ashby',remote:false};
+ const snapshot={updated:at,jobs:[job]};
+ const audit={summary:{kind:'HHBA_OFFICIAL_FULL_JOB_JD_AUDIT_V1',indexed_as_of:at,checked_at:at},
+  jobs:[{job_id:job.id,platform:'ashby',status:'OFFICIAL_JD_AND_REQUIREMENTS_FOUND',
+   full_original_jd_verified:true,requirements_evidence:true,jd_sha256:'sourcehash'}]};
+ const facets={indexed_as_of:at,verified_at:at,jobs:[{id:job.id,countryCode:'CN',
+  original_source_hash:'sourcehash',skills:['python'],experienceMinYears:7,education:'BACHELOR'}]};
+ const three={experience_years:3,education:'BACHELOR',target_roles:['Python Developer'],skills:[{name:'Python'}]};
+ const eight={...three,experience_years:8};
+ assert.equal(selectAuditedMatches(snapshot,audit,facets,three,{limit:10}).matches.length,0);
+ const accepted=selectAuditedMatches(snapshot,audit,facets,eight,{limit:10}).matches;
+ assert.equal(accepted.length,1);
+ assert.equal(accepted[0].experience_requirement,'7年以上');
+});
