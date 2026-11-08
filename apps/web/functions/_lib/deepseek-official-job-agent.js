@@ -47,7 +47,7 @@ const AGGREGATORS=[
  /(?:^|\.)zhaopin\.com$/,/^(?:www\.)?lagou\.com$/,/^(?:www\.)?kanzhun\.com$/,
  // Confirmed in real 2026-11-08 DeepSeek audits: these are job listing
  // aggregators, public campus/employment services, not employer-owned sites.
- /(?:^|\.)adquan\.com$/,/^(?:www\.)?quanzhi\.com$/,/^(?:www\.)?niuqizp\.com$/,
+ /(?:^|\.)adquan\.com$/,/(?:^|\.)quanzhi\.com$/,/(?:^|\.)niuqizp\.com$/,
  /(?:^|\.)ncss\.cn$/,/^(?:zrc-sme\.)?chinasme\.cn$/,
  /(?:^|\.)maimai\.cn$/,/^(?:www\.)?linkedin\.com$/,/^(?:www\.)?indeed\.com$/,
  /(?:^|\.)glassdoor\.com$/,/^(?:www\.)?jobui\.com$/,
