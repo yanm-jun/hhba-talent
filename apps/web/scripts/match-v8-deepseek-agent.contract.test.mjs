@@ -426,3 +426,29 @@ test('Domestic ATS title prefix and 投递此职位 must parse without turning l
   content:('别家公司公开招聘网站，业务产品介绍与团队新闻。').repeat(10)},
   'https://ghzq.com.cn/'),null);
 });
+
+test('Opt-in live public URL diagnostics expose only bounded public link and reason, never JD/resume',async()=>{
+ const url='https://careers.xinghe.cn/jobs/202611080199';
+ let calls=0;
+ const fetcher=async(endpoint,opts)=>{
+  if(endpoint.endsWith('/responses')){
+   calls++;
+   return Response.json({status:'completed',
+    usage:{input_tokens:300,input_tokens_details:{cached_tokens:120},output_tokens:45},
+    output:calls===1?[tool('search_jobs',{query:'内容运营 2026 企业招聘'},'q1')]:[]});
+  }
+  if(endpoint.endsWith('/search'))return Response.json({results:[{
+   url,title:'内容运营 - 星河数字科技',
+   snippet:'工作地点：北京 职位职责 任职资格 立即应聘'
+  }]});
+  if(endpoint.endsWith('/fetch'))return Response.json({title:'内容运营',
+   content:'职位页无可读取正文'});
+  throw Error('UNEXPECTED_ENDPOINT');
+ };
+ const diagnostic=await runDeepSeekOfficialJobAgent('内容运营',key,{fetcher,now,auditPublicEvidence:true});
+ assert.equal(diagnostic.quality_status,'NO_VERIFIED_JOBS');
+ assert.deepEqual(diagnostic.stats.rejected_public_links,[{url,reason:'SHORT_PAGE'}]);
+ assert.equal(JSON.stringify(diagnostic.stats.rejected_public_links).includes('职位页无可读取正文'),false);
+ const ordinary=await runDeepSeekOfficialJobAgent('内容运营',key,{fetcher,now});
+ assert.equal(ordinary.stats.rejected_public_links,undefined);
+});
