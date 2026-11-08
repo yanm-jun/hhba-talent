@@ -247,11 +247,25 @@ export function prioritizeOfficialSearchCandidates(rows,role,maxFetch){
  scored.sort((a,b)=>b.relevance-a.relevance||a.index-b.index);
  const candidates=[],selected=new Set(),byEmployer=new Map();
  const limit=Math.min(8,Math.max(1,Math.trunc(maxFetch)||1));
- for(const row of scored){
-  if(selected.has(row.url)||(byEmployer.get(row.company)||0)>=2)continue;
+ const add=(row)=>{
+  if(!row||selected.has(row.url)||candidates.length>=limit)return false;
   candidates.push(row);selected.add(row.url);
   byEmployer.set(row.company,(byEmployer.get(row.company)||0)+1);
+  return true;
+ };
+ // Reserve one official Fetch opportunity per distinct supported intent
+ // where such a listing exists. Search-result titles are untrusted hints only,
+ // and must still pass exact official JD verification after Fetch.
+ for(const kind of kinds){
   if(candidates.length>=limit)break;
+  const candidate=scored.find(row=>classifyOccupation(row.title)===kind&&
+   !selected.has(row.url)&&(byEmployer.get(row.company)||0)<2);
+  add(candidate);
+ }
+ for(const row of scored){
+  if(candidates.length>=limit)break;
+  if(selected.has(row.url)||(byEmployer.get(row.company)||0)>=2)continue;
+  add(row);
  }
  if(candidates.length<limit)for(const row of scored){
   if(selected.has(row.url))continue;
