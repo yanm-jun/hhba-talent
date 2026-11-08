@@ -6,6 +6,7 @@ import {scoreCandidateFit} from './match-ranking.js';
 import {extractSkillRequirements} from './job-skill-evidence.js';
 import {isMainlandJobLocation} from './mainland-job-location.js';
 import {explainFinalJobScore} from './match-explanation.js';
+import {extractMandatoryProfessionalCredentials,professionalPracticeReview} from './professional-credentials.js';
 
 export const FUSION_VERSION='HHBA_DOMESTIC_MATCH_FUSION_V1';
 const MAX_RESULTS=10;
@@ -103,7 +104,9 @@ function safeProfile(profile){
    .map(x=>textSafe(x,70)).filter(x=>x.length>=2),
   education:DEGREE_RANK[profile?.education]?profile.education:null,
   experience_years:Number.isFinite(profile?.experience_years)&&profile.experience_years>=0&&
-   profile.experience_years<=50?profile.experience_years:null
+   profile.experience_years<=50?profile.experience_years:null,
+  professional_credentials:(Array.isArray(profile?.professional_credentials)?profile.professional_credentials:[])
+   .filter(x=>typeof x==='string'&&/^[A-Z_]{3,40}$/.test(x)).slice(0,12)
  };
 }
 function externalToMatch(entry,profile,options,now){
@@ -124,6 +127,7 @@ function externalToMatch(entry,profile,options,now){
   ...(()=>{const skills=extractSkillRequirements(requirements);return {
    required_skills:skills.required,mandatory_skills:skills.mandatory,
    preferred_skills:skills.preferred,unclassified_skills:skills.unclassified};})(),
+  professional_credential_requirements:extractMandatoryProfessionalCredentials(requirements).mandatory,
   min_experience_years:experience,
   minimum_education:Object.keys(DEGREE_RANK).find(k=>DEGREE_RANK[k]===degree)||null,
   salary:typeof entry.evidence.salary==='string'&&entry.evidence.salary.length<=60?entry.evidence.salary:null,
@@ -164,6 +168,8 @@ export function fuseDomesticJobRecommendations(inside=[],outside=[],rawProfile={
   const rationale=explainFinalJobScore(profile,job,fit);
   return {...job,reference_score:fit.score,score_breakdown:fit.breakdown,
    evidence_quality:fit.evidence_quality,
+   professional_credential_requirements:job.professional_credential_requirements||[],
+   professional_credential_review:professionalPracticeReview(job.title),
    matched:rationale.matched,not_evidenced:rationale.not_evidenced,
    score_reasoning:rationale.score_reasoning,
    ranking_version:fit.ranking_version,rankEvidence:fit.score};
