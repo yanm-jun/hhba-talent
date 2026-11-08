@@ -261,14 +261,14 @@ test('Employer label may be absent, but independent homepage and job-brand proof
  const link=publicJobLink('https://careers.xinghe.cn/jobs/202611080056');
  const content=[
   '# 新媒体运营', '工作地点','北京', '职责描述',
-  '负责社交平台内容管理、创意选题策划及短视频运营。',
-  '配合市场活动制定内容计划，推动新媒体业务增长。',
+  '负责社交平台内容管理、创意选题策划及短视频运营，能够制定季度选题计划并维护完整内容日历。'.repeat(2),
+  '配合市场活动制定内容计划，推动新媒体业务增长，与设计团队沟通并分析各平台内容数据。'.repeat(2),
   '我们希望你具备',
   '本科及以上学历，具备内容编辑能力及社会化媒体运营经验。',
   '能熟练使用办公软件并且熟悉数据分析和内容策划。',
   '立即投递','欢迎来到星河数字科技有限公司招聘'
  ].join('\n');
- const job=readPublicJob(link,{title:'新媒体运营 - 星河数字科技有限公司',content},now);
+ const job=readPublicJob(link,{title:'新媒体运营',content},now);
  assert.equal(job?.company_claim,null);
  assert.equal(job?.location,'北京');
  const home={title:'星河数字科技有限公司',content:
