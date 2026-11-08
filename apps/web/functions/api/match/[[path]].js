@@ -132,7 +132,8 @@ async function autoDiscoveryCandidates(env,db,phone,profile,opts){
   if(reserved?.success!==true||reserved?.meta?.changes!==1)
    return {candidates:[],status:'LIMITED'};
   const data=await discoverExternalOfficialJobs(intent,env.HHBA_MATCH_DEEPSEEK_KEY,{expanded:true});
-  return {candidates:data.candidates,status:'COMPLETE'};
+  return {candidates:data.candidates,
+   status:data.status==='PARTIAL'?'PARTIAL':'COMPLETE'};
  }catch(e){
   // A partial upstream request could have consumed credits, so the reservation
   // is intentionally retained. Never log a query, URL, resume or model content.

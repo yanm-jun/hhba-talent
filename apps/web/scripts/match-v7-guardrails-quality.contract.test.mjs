@@ -232,4 +232,6 @@ test('one failed expanded Search cannot discard verified positions from successf
  assert.equal(result.candidates.length,1);
  assert.equal(result.candidates[0].location,'北京');
  assert.equal(result.usage.search,3);
+ assert.equal(result.status,'PARTIAL');
+ assert.deepEqual(result.failures,{search:1,fetch:0});
 });

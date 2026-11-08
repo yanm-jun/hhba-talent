@@ -288,13 +288,13 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
  // must not discard other paid, successful Search results from this batch.
  // Fail closed only when every Search attempt fails.
  const searchResults=expanded?await Promise.allSettled(queries.slice(0,maxSearch).map(searchOne)):null;
- let successfulSearches=0,lastSearchError=null;
+ let successfulSearches=0,lastSearchError=null,failedSearches=0,failedFetches=0;
  for(let i=0;i<Math.min(maxSearch,queries.length);i++){
   let response;
   if(expanded){
    const attempt=searchResults[i];
    if(attempt.status==='rejected'){
-    lastSearchError=attempt.reason;
+    lastSearchError=attempt.reason;failedSearches++;
     continue;
    }
    response=attempt.value;
@@ -302,7 +302,7 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
   if(!Array.isArray(response?.results)){
    if(!expanded)throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');
    lastSearchError=new ExternalSearchError('SEARCH_RESPONSE_INVALID');
-   continue;
+   failedSearches++;continue;
   }
   successfulSearches++;
   if(response.results.length)usage.search++;
@@ -336,8 +336,13 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
   const fetched=await Promise.allSettled(candidates.map(fetchOne));
   for(const row of fetched){
    if(row.status==='fulfilled'&&row.value)jobs.push(row.value);
-   else if(row.status==='rejected')
+   else if(row.status==='rejected'){
+    failedFetches++;
     console.warn('HHBA_MATCH_OFFICIAL_DETAIL_FAILED');
+   }else if(row.status==='fulfilled'&&row.value===null){
+    // The official Fetch endpoint or page was not available.
+    failedFetches++;
+   }
   }
  }else{
   for(const candidate of candidates){
@@ -357,5 +362,7 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
  return {kind:EXTERNAL_DISCOVERY_VERSION,scope:'CN_MAINLAND_ONLY',
   candidates:[...unique.values()].slice(0,maxFetch),
   candidate_count:unique.size,usage,max_search_requests:maxSearch,max_fetch_requests:maxFetch,
+  status:failedSearches||failedFetches?'PARTIAL':'COMPLETE',
+  failures:{search:failedSearches,fetch:failedFetches},
   disclaimer:'仅核验企业官方网站的岗位详情，不保证仍可投递；不代表录用概率。'};
 }
