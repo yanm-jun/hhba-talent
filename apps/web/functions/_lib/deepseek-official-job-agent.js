@@ -208,7 +208,7 @@ function extractRole(lines,page){
  const dutyAt=lines.findIndex((line,i)=>i<95&&DUTY_HEADER.test(line));
  if(dutyAt>=4){
   const roleRows=lines.slice(Math.max(0,dutyAt-32),dutyAt)
-   .map(line=>line.match(/^(.{4,88}?)\\s+([\\p{Script=Han}]{2,12}(?:市|州)?)$/u))
+   .map(line=>line.match(/^(.{4,88}?)\s+([\p{Script=Han}]{2,12}(?:市|州)?)$/u))
    .filter(m=>m&&roleText(m[1])&&findMainlandCity(m[2]));
   if(roleRows.length===1)return roleRows[0][1].slice(0,95);
  }
