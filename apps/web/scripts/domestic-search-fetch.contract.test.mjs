@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
  sanitizedJobIntent,buildOfficialQueries,safeOfficialJobLocator,
- extractOfficialJob,discoverExternalOfficialJobs,ExternalSearchError
+ extractOfficialJob,discoverExternalOfficialJobs,prioritizeOfficialSearchCandidates,ExternalSearchError
 } from '../functions/_lib/domestic-search-fetch.js';
 
 const hu='https://career.huawei.com/cn/job-details?advertisementId=46651';
