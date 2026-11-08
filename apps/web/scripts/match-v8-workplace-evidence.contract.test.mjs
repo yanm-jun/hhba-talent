@@ -70,7 +70,7 @@ test('Only single JobPosting JSON-LD page location is accepted, not Organization
   jobLocation:{'@type':'Place',address:{'@type':'PostalAddress',addressLocality:'杭州市'}}};
  const where=raw=>extractMainlandWorkplaceFromJob({raw,lines:jdLines([]),role});
  assert.deepEqual(where(wrap(data)),{city:'杭州',evidence_type:'JOBPOSTING_STRUCTURED'});
- assert.equal(where(wrap({...data,title:'财务经理'})).reason,'MISSING_EXPLICIT_WORKPLACE');
+ assert.equal(where(wrap({...data,title:'财务经理'})).reason,'UNRELATED_STRUCTURED_JOB');
  assert.equal(where(wrap({...data,'@type':'Organization'})).reason,'MISSING_EXPLICIT_WORKPLACE');
  assert.equal(where(wrap({...data,jobLocation:[
   {address:{addressLocality:'广州'}},{address:{addressLocality:'上海'}}
@@ -129,4 +129,41 @@ test('Navigation text, several similar role-city entries, or a role and city in 
  twoRoles.splice(5,0,'内容运营经理 上海','产品运营经理 北京');
  assert.equal(readPublicJob(l,{title:'岗位详情 | 企业招聘',
   content:twoRoles.join('\n')},now),null);
+});
+
+test('Single fetched HTML JobPosting can supply work city; conflicting, foreign or expired schemas are rejected',()=>{
+ const url='https://careers.yunhe.cn/jobs/202611080041';
+ const link=publicJobLink(url);
+ const role='内容运营';
+ const body=[
+  '# 内容运营','公司名称：云禾文化有限公司',
+  '岗位职责','负责公众号内容策划、短视频生产、数据分析与运营。'.repeat(5),
+  '任职要求','本科及以上学历，熟悉新媒体内容运营和用户增长。'.repeat(5),
+  '立即申请'
+ ].join('\n');
+ const wrap=data=>'<html><script type="application/ld+json">'+JSON.stringify(data)+
+  '</script><main><h1>内容运营</h1></main></html>';
+ const data={'@context':'https://schema.org','@type':'JobPosting',
+  title:role,jobLocation:{'@type':'Place',address:{'@type':'PostalAddress',
+   addressLocality:'上海市',addressCountry:'CN'}}};
+ const good=readPublicJob(link,{title:role,content:body,html:wrap(data)},now);
+ assert.equal(good?.location,'上海');
+ assert.equal(good?.evidence.location_evidence_type,'JOBPOSTING_STRUCTURED');
+ assert.equal(good?.source_status,'PUBLIC_JOB_UNCONFIRMED');
+ const rejects={};
+ const mismatch=readPublicJob(link,{title:role,
+  content:body.replace('# 内容运营','# 内容运营\n工作地点：北京'),
+  html:wrap(data)},now,rejects);
+ assert.equal(mismatch,null);
+ assert.equal(rejects.AMBIGUOUS_WORKPLACE,1);
+ const overseas=readPublicJob(link,{title:role,content:body,
+  html:wrap({...data,jobLocation:{address:{addressLocality:'上海市',addressCountry:'US'}}})},now,{});
+ assert.equal(overseas,null);
+ const expired=readPublicJob(link,{title:role,content:body,
+  html:wrap({...data,validThrough:'2020-01-01'})},now,{});
+ assert.equal(expired,null);
+ const multi=readPublicJob(link,{title:role,content:body,
+  html:wrap({'@graph':[data,{...data,title:'平面设计',jobLocation:{
+   address:{addressLocality:'北京',addressCountry:'CN'}}}]})},now,{});
+ assert.equal(multi,null);
 });
