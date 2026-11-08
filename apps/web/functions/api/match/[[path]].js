@@ -285,7 +285,8 @@ export async function onRequest({request,env}){
   return fail(code,code==='AI_PROVIDER_RATE_LIMITED'?429:502);
  }
  const recommended=sources?selectAuditedMatches(
-  sources.snapshot,sources.audit,sources.facets,profile,options,Date.now()
+  sources.snapshot,sources.audit,sources.facets,profile,
+  {...options,candidate_pool_limit:60},Date.now()
  ):{matches:[],matched_official_jobs:0};
  const discovered=await autoDiscoveryCandidates(env,db,session.phone,profile,options);
  const merged=fuseDomesticJobRecommendations(
