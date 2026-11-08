@@ -15,7 +15,7 @@ export const DEFAULT_RANKING_WEIGHTS=Object.freeze({
 });
 const DIMENSIONS=Object.keys(DEFAULT_RANKING_WEIGHTS);
 const DEGREE_RANK=Object.freeze({HIGH_SCHOOL:1,ASSOCIATE:2,BACHELOR:3,MASTER:4,PHD:5});
-const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macau|macao|taiwan|taipei|kaohsiung|美国|日本|新加坡|国外|海外|united states|singapore|japan|tokyo|london|remote|远程|境外)/i;
+const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macau|macao|taiwan|taipei|kaohsiung|美国|日本|新加坡|国外|海外|united states|singapore|japan|tokyo|london|san[\s-]?francisco|new[\s-]?york|united kingdom|境外)/i;
 const MAINLAND_CITY=/(?:北京|上海|天津|重庆|深圳|广州|杭州|南京|苏州|成都|武汉|西安|青岛|宁波|无锡|合肥|郑州|长沙|厦门|福州|济南|大连|沈阳|哈尔滨|长春|石家庄|昆明|贵阳|南宁|海口|珠海|佛山|东莞|烟台|潍坊|临沂|济宁|菏泽|聊城|威海|泰安|德州|枣庄|滨州|日照|东营|常州|南通|嘉兴|绍兴|金华|温州|台州|太原|徐州|扬州|保定|唐山|廊坊|兰州|西宁|银川|乌鲁木齐|呼和浩特|包头|柳州|桂林|洛阳|开封|南昌|九江|中山|惠州|beijing|shanghai|tianjin|chongqing|shenzhen|guangzhou|hangzhou|chengdu|nanjing|suzhou|wuhan|xian|qingdao|ningbo|jinan|wuxi|hefei|zhengzhou|changsha|xiamen)/i;
 const ROLE_FAMILIES=[
  ['软件','软件开发','开发工程师','程序员','软件工程师','python开发','java开发','后端','前端','全栈','software developer','software engineer','backend','frontend','fullstack'],
@@ -86,7 +86,8 @@ export function evaluateJobEligibility(profile={},job={}){
 export function scoreCandidateFit(profile={},job={},options={}){
  const gate=evaluateJobEligibility(profile,job);
  if(!gate.eligible)return {eligible:false,reason:gate.reason,score:null,breakdown:null};
- const roles=[typeof options.role_hint==='string'?options.role_hint:'',...Array.isArray(profile.target_roles)?profile.target_roles:[]]
+ const roles=[typeof options.role_hint==='string'?options.role_hint:'',
+  ...(Array.isArray(profile.target_roles)?profile.target_roles:[])]
   .filter(x=>typeof x==='string'&&x.length>=2).slice(0,7);
  const affinity=roleAffinity(job.title,roles);
  const wanted=[...new Set((Array.isArray(job.required_skills)?job.required_skills:[])
