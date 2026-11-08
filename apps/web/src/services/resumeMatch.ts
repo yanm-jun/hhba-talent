@@ -19,6 +19,8 @@ export type MatchedJob = {
   required_skills?:string[];mandatory_skills?:string[];preferred_skills?:string[];unclassified_skills?:string[];
   min_experience_years?:number|null;minimum_education?:string|null;
   score_breakdown?:{role:number;skills:number;experience:number;education:number;location:number};
+  score_reasoning?:string;
+  evidence_quality?:{skills:string;experience:string;education:string};
   ranking_version?:'HHBA_MATCH_RANKING_V2';
 };
 export type MatchResponse = {
