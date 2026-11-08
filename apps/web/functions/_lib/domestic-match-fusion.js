@@ -5,6 +5,7 @@ import {safeOfficialJobLocator} from './domestic-search-fetch.js';
 import {scoreCandidateFit} from './match-ranking.js';
 import {extractSkillRequirements} from './job-skill-evidence.js';
 import {isMainlandJobLocation} from './mainland-job-location.js';
+import {explainFinalJobScore} from './match-explanation.js';
 
 export const FUSION_VERSION='HHBA_DOMESTIC_MATCH_FUSION_V1';
 const MAX_RESULTS=10;
@@ -113,27 +114,13 @@ function externalToMatch(entry,profile,options,now){
  const experience=experienceMinRequirement(requirements);
  if(degree!==null&&(!profile.education||DEGREE_RANK[profile.education]<degree))return null;
  if(experience!==null&&(profile.experience_years===null||profile.experience_years<experience))return null;
- const targets=[textSafe(options?.role_hint,80),...profile.target_roles].filter(Boolean);
- const rolePoints=compatibleRole(entry.title,targets);
- const haveSkill=profile.skills.filter(x=>flat(requirements).includes(flat(x))||
-  flat(entry.title).includes(flat(x)));
- if(rolePoints===0&&haveSkill.length===0)return null;
- // Relevance score is a conservative ranking reference, NEVER chance of hire.
- const skillPoints=Math.min(25,haveSkill.length*8);
- const requirementPoints=degree===null?10:profile.education?15:7;
- const experiencePoints=experience===null?6:profile.experience_years===null?3:10;
- const score=Math.min(90,15+rolePoints+skillPoints+requirementPoints+experiencePoints+8+5);
- const matched=[];
- if(rolePoints)matched.push('岗位名称与目标职业方向相关（以官网岗位职责为准）');
- for(const skill of haveSkill.slice(0,4))matched.push('简历已识别技能与官方任职要求相关：'+skill);
- const gaps=[];
- if(degree!==null&&profile.education===null)gaps.push('岗位存在学历门槛，但简历没有可确认的学历证据');
- if(experience!==null&&profile.experience_years===null)gaps.push('岗位存在经验年限要求，简历尚未证明');
+ // This is only authenticated JD/facet extraction. Legacy keyword matching
+ // must not filter or produce user-visible reasons before the final V2 score.
  return {
   id:'external-'+entry.id.replace(/[^a-zA-Z0-9_-]/g,'-'),company:entry.company,title:entry.title,
   title_zh:entry.title,location:entry.location,official_url:proof.official_url,
   platform:'official-domestic',source:entry.official_domain,remote:false,
-  source_type:'站外官方招聘',reference_score:score,
+  source_type:'站外官方招聘',reference_score:0,
   ...(()=>{const skills=extractSkillRequirements(requirements);return {
    required_skills:skills.required,mandatory_skills:skills.mandatory,
    preferred_skills:skills.preferred,unclassified_skills:skills.unclassified};})(),
@@ -141,7 +128,7 @@ function externalToMatch(entry,profile,options,now){
   minimum_education:Object.keys(DEGREE_RANK).find(k=>DEGREE_RANK[k]===degree)||null,
   salary:typeof entry.evidence.salary==='string'&&entry.evidence.salary.length<=60?entry.evidence.salary:null,
   experience_requirement:experience===null?'经验未注明':experience+'年以上',
-  matched,not_evidenced:gaps,
+  matched:[],not_evidenced:[],
   needs_verification:[
    entry.application_method==='OFFICIAL_DETAIL_LOGIN_REQUIRED'?
     '企业官方招聘详情可打开，但该网页未展示直接申请按钮；可能需要先登录，是否可投递尚待官网确认':
@@ -151,7 +138,7 @@ function externalToMatch(entry,profile,options,now){
   requirements_basis:'站外企业官方详情页面原文，非 AI 猜测职位；没有确认实时开放',
   application_status:'NEEDS_OFFICIAL_CONFIRMATION',checked_at:entry.checked_at,
   candidate_evidence:{role:entry.evidence.title,requirement:requirements.slice(0,260)},
-  rankEvidence:rolePoints+haveSkill.length*8,
+  rankEvidence:0,
   sourceDate:proof.ageHours
  };
 }
@@ -174,7 +161,11 @@ export function fuseDomesticJobRecommendations(inside=[],outside=[],rawProfile={
  const scored=[...internal,...external].map(job=>{
   const fit=scoreCandidateFit(profile,job,options);
   if(!fit.eligible)return null;
+  const rationale=explainFinalJobScore(profile,job,fit);
   return {...job,reference_score:fit.score,score_breakdown:fit.breakdown,
+   evidence_quality:fit.evidence_quality,
+   matched:rationale.matched,not_evidenced:rationale.not_evidenced,
+   score_reasoning:rationale.score_reasoning,
    ranking_version:fit.ranking_version,rankEvidence:fit.score};
  }).filter(Boolean);
  const ranked=scored.sort((a,b)=>b.reference_score-a.reference_score||
