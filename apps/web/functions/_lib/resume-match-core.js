@@ -161,6 +161,10 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
    reference_score:score,matched,not_evidenced:notEvidenced,needs_verification:needs,
    requirements_basis:'与同版官方 JD 审核和搜索特征一致；未对录用概率作预测',
    source_type:'HHBA站内岗位',
+   // Same-JD-hash verified facets only. The ranking module never invents gates.
+   required_skills:tags,
+   min_experience_years:Number.isFinite(f.experienceMinYears)?f.experienceMinYears:null,
+   minimum_education:typeof f.education==='string'?f.education:null,
    salary:typeof j.salary==='string'&&j.salary.length<=60?j.salary:
     typeof f.salary==='string'&&f.salary.length<=60?f.salary:null,
    experience_requirement:Number.isFinite(f.experienceMinYears)&&f.experienceMinYears>=0?
@@ -176,7 +180,11 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
   if(seenRoles.has(key))continue;
   seenRoles.add(key);unique.push(item);
  }
- const limit=Math.min(10,Math.max(1,Number(opts.limit)||10)),selected=[],picked=new Set();
+ // The API still returns Top 10; internal server code may request a wider,
+ // source-verified candidate pool for a fair cross-source V2 reranking.
+ const safePool=Number.isInteger(opts.candidate_pool_limit)&&opts.candidate_pool_limit>=10&&
+  opts.candidate_pool_limit<=60?opts.candidate_pool_limit:null;
+ const limit=safePool||Math.min(10,Math.max(1,Number(opts.limit)||10)),selected=[],picked=new Set();
  const byCompany=new Map();
  const add=(item)=>{
   selected.push(item);picked.add(item.id);
