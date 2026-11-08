@@ -122,6 +122,7 @@ function mockAgent(){
 test('DeepSeek autonomous Search -> Fetch -> corporate verification without any private employer API',async()=>{
  const x=mockAgent();
  const result=await runDeepSeekOfficialJobAgent('内容运营',key,{fetcher:x.fetcher,now});
+ console.log('HHBA_V8_CI_DRYRUN',JSON.stringify({status:result.status,usage:result.usage,stats:result.stats,paths:x.requests.map(v=>v.url.split('api.deepseek.com')[1])}));
  assert.equal(result.kind,'HHBA_V8_PUBLIC_MAINLAND_DISCOVERY_V2');
  assert.equal(result.status,'COMPLETE');
  assert.deepEqual(result.usage,{model:4,search:1,fetch:4});
