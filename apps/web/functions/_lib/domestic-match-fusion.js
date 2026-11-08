@@ -64,7 +64,7 @@ function experienceMinRequirement(text){
  // 至少7年、7-10年工作经验 and 7+ years experience.
  const matches=[
   ...s.matchAll(/(?:至少|不少于|最低(?:要求)?|须有|要求)?\s*(\d{1,2})\s*(?:[-~至]\s*\d{1,2})?\s*年\s*(?:以上|及以上|或以上|起)?\s*(?:(?:相关|实际|全职|工作|行业|项目|岗位|开发|管理|软件|数据)\s*){0,3}(?:经验|经历)/g),
-  ...s.matchAll(/(?:工作|相关|从业|行业|项目|开发)\s*(?:经验|年限)?\s*(?:至少|不少于|最低(?:要求)?)?\s*(\d{1,2})\s*年(?:以上|及以上)?/g),
+  ...s.matchAll(/(?:工作|相关|从业|行业|项目|开发)\s*(?:经验|年限)?[：:\s]*(?:至少|不少于|最低(?:要求)?)?[：:\s]*(\d{1,2})\s*年(?:以上|及以上)?/g),
   ...s.matchAll(/(\d{1,2})\s*\+?\s*years?\s*(?:of\s*)?(?:work|professional|relevant|industry)?\s*experience/gi)
  ].map(m=>Number(m[1])).filter(n=>n>=1&&n<=40);
  return matches.length?Math.max(...matches):null;
