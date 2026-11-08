@@ -114,8 +114,13 @@ function autoDiscoveryEnabled(env){
 }
 async function autoDiscoveryCandidates(env,db,phone,profile,opts){
  if(!autoDiscoveryEnabled(env))return {candidates:[],status:'DISABLED'};
- const intent=[...new Set([opts.role_hint,...profile.target_roles]
-  .map(sanitizedJobIntent).filter(Boolean))].slice(0,3);
+ // Never spend public-job discovery requests on a prior occupation when the
+ // applicant explicitly supplied a different career target (e.g. sales
+ // experience with a content-operations career switch).
+ const stated=[opts.role_hint,...(profile.career_intents||[])].map(sanitizedJobIntent).filter(Boolean);
+ const fallback=stated.length?[]:(profile.demonstrated_roles||profile.target_roles||[])
+  .map(sanitizedJobIntent).filter(Boolean);
+ const intent=[...new Set([...stated,...fallback])].slice(0,3);
  if(!intent.length)return {candidates:[],status:'NO_ROLE'};
  try{
   const table=await db.prepare(

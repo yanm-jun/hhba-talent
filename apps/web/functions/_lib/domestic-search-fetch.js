@@ -82,24 +82,40 @@ export function sanitizedJobIntent(value){
  ];
  return catalog.find(([rule])=>rule.test(s))?.[1]||null;
 }
+// Fixed, server-owned search aliases. They are discovery hints, NEVER
+// evidence of an applicant's skills or of a position's active status.
+const OFFICIAL_QUERY_VARIANTS=Object.freeze({
+ '内容运营':['内容运营','新媒体运营','内容策划','短视频内容运营'],
+ '用户运营':['用户运营','社群运营','用户增长运营','社区运营'],
+ 'Python 开发':['Python 开发','后端开发','软件开发','Python 后端'],
+ '后端开发':['后端开发','服务端开发','软件开发','后端工程师'],
+ '软件开发':['软件开发','软件工程师','研发工程师','软件开发'],
+ '数据分析师':['数据分析师','业务数据分析','商业分析','数据分析师'],
+ '影视剪辑师':['影视剪辑师','视频剪辑','影视后期','短视频剪辑'],
+ '市场营销':['市场营销','品牌营销','市场推广','数字营销']
+});
 export function buildOfficialQueries(role,expanded=false){
  // Up to three evidence-backed Chinese job directions share the SAME fixed
  // provider request budget; no resume text, personal info or arbitrary URLs.
  const intents=[...new Set((Array.isArray(role)?role:[role])
   .map(sanitizedJobIntent).filter(Boolean))].slice(0,3);
  if(!intents.length)return [];
- const clean=intents[0];
+ const clean=intents[0],alternatives=OFFICIAL_QUERY_VARIANTS[clean]||[clean];
  const base=[
   clean+' 招聘 site:careers.tencent.com OR site:zhaopin.meituan.com',
   clean+' 招聘 site:career.huawei.com'
  ];
  if(expanded){
-  // Same four-search budget as before; Baidu adds a fifth independently
-  // authenticated employer, not a model-invented "all China" job directory.
-  base[1]=(intents[1]||clean)+' 招聘 site:career.huawei.com OR site:talent.baidu.com/jobs/detail/SOCIAL/';
+  // Keep the same four bounded Search calls while broadening one stated
+  // occupation using curated aliases, not unverified resume text or a
+  // different previously held profession.
+  const second=intents[1]||alternatives[1]||clean;
+  const third=intents[2]||alternatives[2]||clean;
+  const fourth=intents.length>1?clean:alternatives[3]||clean;
+  base[1]=second+' 招聘 site:career.huawei.com OR site:talent.baidu.com/jobs/detail/SOCIAL/';
   base.push(
-   (intents[2]||clean)+' 工作地点 中国 职位 site:jobs.bytedance.com/experienced/position/',
-   clean+' 工作地点 中国 岗位 site:zhaopin.jd.com/web/job-info-detail'
+   third+' 工作地点 中国 职位 site:jobs.bytedance.com/experienced/position/',
+   fourth+' 工作地点 中国 岗位 site:zhaopin.jd.com/web/job-info-detail'
   );
  }
  return base.map(q=>q.slice(0,128));
@@ -230,47 +246,67 @@ async function providerPost(url,key,payload,maxBytes,fetcher){
  catch{throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');}
 }
 /** Search titles are untrusted discovery hints, never official JD evidence. */
+/** Search-result titles are untrusted. Allocate Fetch to relevant titles
+ * first, with at most two exploratory unknown-title pages; actual job facts
+ * still MUST come from fetched, independently checked official details. */
 export function prioritizeOfficialSearchCandidates(rows,role,maxFetch){
- const roles=(Array.isArray(role)?role:[role]).map(sanitizedJobIntent).filter(Boolean);
+ const roles=[...new Set((Array.isArray(role)?role:[role])
+  .map(sanitizedJobIntent).filter(Boolean))];
  const kinds=new Set(roles.map(classifyOccupation).filter(Boolean));
+ const focusedContent=roles.includes('内容运营');
+ const focusedUserOps=roles.includes('用户运营');
+ const titleFocus=focusedContent?
+  /(?:内容|新媒体|社交媒体|短视频|公众号|文案|content|social[\\s-]?media|editorial)/i:
+  focusedUserOps?/(?:用户|社群|社区|增长|user|community|growth)/i:null;
  const scored=[];
  for(const [index,row] of (Array.isArray(rows)?rows:[]).entries()){
   const locator=safeOfficialJobLocator(row?.url);
   if(!locator)continue;
   const snippet=typeof row?.title==='string'?row.title.slice(0,140):'';
   const kind=classifyOccupation(snippet);
-  const normalized=snippet.toLowerCase().replace(/\s+/g,'');
-  const exact=roles.some(r=>r.length>=4&&normalized.includes(r.toLowerCase().replace(/\s+/g,'')));
-  const relevance=exact?3:kind&&kinds.has(kind)?2:!kind?1:0;
+  const normalized=snippet.toLowerCase().replace(/\\s+/g,'');
+  const exact=roles.some(r=>r.length>=4&&normalized.includes(r.toLowerCase().replace(/\\s+/g,'')));
+  const backendSoftware=kinds.has('backend')&&kind==='software'&&
+   /(?:software[\\s-]+(?:development[\\s-]+)?engineer|software[\\s-]+developer|软件工程师|软件开发工程师)/i.test(snippet)&&
+   !/(?:manager|director|lead|head[\\s-]+of|负责人|总监)/i.test(snippet);
+  // A Search teaser saying "revenue operations", "machine learning", etc.
+  // must not consume a content-operations applicant's official Fetch budget.
+  if(titleFocus&&!titleFocus.test(snippet))continue;
+  if(kind&&kinds.size&&!kinds.has(kind)&&!backendSoftware)continue;
+  const relevance=exact?3:kind&&kinds.has(kind)||backendSoftware?2:!kind?1:0;
+  if(relevance===0)continue;
   scored.push({...row,url:locator.url,company:locator.company,relevance,index});
  }
  scored.sort((a,b)=>b.relevance-a.relevance||a.index-b.index);
  const candidates=[],selected=new Set(),byEmployer=new Map();
  const limit=Math.min(8,Math.max(1,Math.trunc(maxFetch)||1));
+ const knownCount=scored.filter(x=>x.relevance>=2).length;
+ // Preserve limited discovery of a generic official result only when we
+ // cannot see its actual title until fetching the exact JD.
+ const maxUnknown=knownCount?1:2;let unknownCount=0;
  const add=(row)=>{
   if(!row||selected.has(row.url)||candidates.length>=limit)return false;
+  if(row.relevance===1&&unknownCount>=maxUnknown)return false;
   candidates.push(row);selected.add(row.url);
+  if(row.relevance===1)unknownCount++;
   byEmployer.set(row.company,(byEmployer.get(row.company)||0)+1);
   return true;
  };
- // Reserve one official Fetch opportunity per distinct supported intent
- // where such a listing exists. Search-result titles are untrusted hints only,
- // and must still pass exact official JD verification after Fetch.
+ // When multiple occupations were explicitly requested, reserve one verified
+ // detail-fetch slot per recognizable direction before general ranking.
  for(const kind of kinds){
   if(candidates.length>=limit)break;
-  const candidate=scored.find(row=>classifyOccupation(row.title)===kind&&
-   !selected.has(row.url)&&(byEmployer.get(row.company)||0)<2);
-  add(candidate);
+  add(scored.find(row=>classifyOccupation(row.title)===kind&&
+   !selected.has(row.url)&&(byEmployer.get(row.company)||0)<2));
  }
  for(const row of scored){
   if(candidates.length>=limit)break;
-  if(selected.has(row.url)||(byEmployer.get(row.company)||0)>=2)continue;
+  if((byEmployer.get(row.company)||0)>=2)continue;
   add(row);
  }
  if(candidates.length<limit)for(const row of scored){
-  if(selected.has(row.url))continue;
-  candidates.push(row);selected.add(row.url);
   if(candidates.length>=limit)break;
+  add(row);
  }
  return candidates.map(({relevance,index,company,...row})=>row);
 }

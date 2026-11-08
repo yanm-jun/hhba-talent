@@ -256,3 +256,52 @@ test('verified Meituan job-detail shape is eligible only as open-status-unconfir
  assert.equal(r?.official_url,'https://zhaopin.meituan.com/web/position/detail?jobUnionId=4747089400');
  assert.equal(r?.has_application_cta,true);
 });
+
+test('one focused content-operations intent searches multiple safe same-career terms at unchanged cost',()=>{
+ const queries=buildOfficialQueries(['内容运营','用户增长'],true);
+ assert.equal(queries.length,4);
+ assert.ok(queries[0].includes('内容运营'));
+ assert.ok(queries[1].includes('新媒体运营'));
+ assert.ok(queries[2].includes('内容策划'));
+ assert.ok(queries[3].includes('短视频内容运营'));
+ assert.ok(queries.every(x=>x.length<=128));
+ assert.ok(queries.every(x=>!x.includes('销售顾问')&&!x.includes('用户增长')));
+ const software=buildOfficialQueries('Python 开发',true);
+ assert.equal(software.length,4);
+ assert.ok(software.some(x=>x.includes('软件开发')));
+ assert.ok(software.some(x=>x.includes('后端开发')));
+});
+
+test('expanded official Fetch never wastes budget on known off-target roles',async()=>{
+ const first='2097166275703910400';
+ const url=i=>'https://careers.tencent.com/jobdesc.html?postId='+
+  String(BigInt(first)+BigInt(i));
+ const results=[
+  {url:url(1),title:'Machine Learning Engineer'},
+  {url:url(2),title:'Treasury & Payment Analyst'},
+  {url:url(3),title:'Revenue Strategy Operations Manager'},
+  {url:url(4),title:'内容运营'},
+  {url:url(5),title:'新媒体运营'},
+  {url:url(6),title:'内容策划'},
+  {url:url(7),title:'职位详情'}
+ ];
+ const selected=prioritizeOfficialSearchCandidates(results,['内容运营'],8);
+ assert.deepEqual(selected.map(x=>x.url),[url(4),url(5),url(6)]);
+ assert.equal(selected.every(x=>x.url.startsWith('https://careers.tencent.com/')),true);
+ const backend=prioritizeOfficialSearchCandidates([
+  {url:url(8),title:'Product Lead, AI-Native'},
+  {url:url(9),title:'Software Engineer - Backend'},
+  {url:url(10),title:'软件开发工程师'}
+ ],['Python 开发工程师'],8);
+ assert.deepEqual(backend.map(x=>x.url),[url(9),url(10)]);
+});
+
+test('Fetch unknown-title exploration is strictly bounded even with many official results',()=>{
+ const rows=Array.from({length:30},(_,i)=>({
+  url:'https://careers.tencent.com/jobdesc.html?postId='+String(2097166275703910400n+BigInt(i)),
+  title:'职位详情'
+ }));
+ const kept=prioritizeOfficialSearchCandidates(rows,'Python 开发工程师',8);
+ assert.equal(kept.length,2,'do not burn eight Fetch calls on generic headings');
+ assert.ok(kept.every(x=>x.title==='职位详情'));
+});
