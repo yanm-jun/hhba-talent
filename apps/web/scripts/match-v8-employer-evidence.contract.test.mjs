@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {fuseDomesticJobRecommendations} from '../functions/_lib/domestic-match-fusion.js';
 import assert from 'node:assert/strict';
 import {
  publicJobLink,publicCorporatePage,employerLookupQuery,
@@ -101,6 +102,13 @@ test('agent searches public employer site after missing company proof and respec
  assert.equal(x.accounting.billable.search,2);
  assert.equal(x.accounting.billable.fetch,3);
  assert.equal(x.accounting.complete,true);
+ const profile={education:'BACHELOR',experience_years:2,
+  demonstrated_roles:['内容运营'],career_intents:['内容运营'],
+  skills:[{name:'内容运营',evidence:'内容运营'}]};
+ const fused=fuseDomesticJobRecommendations([],x.candidates,profile,{role_hint:'内容运营',limit:10},now);
+ assert.equal(fused.counts.external_reviewed,1);
+ assert.equal(fused.counts.external_eligible,1);
+ assert.equal(fused.matches.length,1);
  assert.equal(queries[1],'星河数字科技有限公司 官方网站 社会招聘');
  assert.equal(requests.filter(x=>x.url.endsWith('/fetch')).length,3);
  assert.ok(x.usage.model<=4&&x.usage.search<=8&&x.usage.fetch<=20);

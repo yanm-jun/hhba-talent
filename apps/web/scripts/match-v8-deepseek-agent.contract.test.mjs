@@ -80,7 +80,7 @@ test('Cross-domain company/job websites require direct careers crosslink',()=>{
  assert.equal(provePublicEmployer(offDomain,{title:'明源文化有限公司',content:siteDocB},siteB),null,
   'An unrelated ATS/job host requires explicit referral to the same job');
  const linked=siteDocB+'\n明源文化有限公司招聘: https://jobs.hr-vendor.com/jobs/1098765';
- assert.equal(provePublicEmployer(offDomain,{title:'明源文化有限公司',content:linked},siteB)?.source_verification,'CORPORATE_BACKLINK');
+ assert.equal(provePublicEmployer(offDomain,{title:'明源文化有限公司',content:linked},siteB)?.source_verification,'CORPORATE_EXACT_JOB_LINK');
 });
 function mockAgent(){
  const requests=[],messages=[];let model=0;

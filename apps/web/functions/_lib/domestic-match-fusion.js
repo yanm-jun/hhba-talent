@@ -104,7 +104,8 @@ function referencedExternal(entry,now){
   // V7 exact known-employer job URLs remain supported.
  }else if(!publicLink||publicLink.id!==entry.id||
   publicLink.hostname!==entry.official_domain||
-  !['CORPORATE_DOMAIN_AND_BRAND','CORPORATE_BACKLINK'].includes(entry.source_verification)||
+  !['CORPORATE_DOMAIN_AND_BRAND','CORPORATE_BACKLINK',
+   'CORPORATE_EXACT_JOB_LINK','CORPORATE_NAMED_BOARD_LINK'].includes(entry.source_verification)||
   typeof entry.company!=='string'||entry.company.length<3||
   typeof entry.employer_site!=='string'||entry.employer_site.length<12)return null;
 

@@ -303,7 +303,10 @@ function companyLinkFromPage(body,jobUrl){
    referenced.add(m[2].replace(/[.,，。;；]+$/,''));
  }
  for(const line of body.split('\n').slice(0,1000)){
-  if(!/(?:招聘|职位|岗位|应聘|人才|加入|职业|careers|jobs|apply|join us)/i.test(line))
+  // The keyword must appear in HUMAN recruitment context, not merely inside
+  // a URL such as jobs.vendor.cn (which would be a false backlink).
+  const prose=line.replace(/https:\/\/[^\s)<>]+/gi,'');
+  if(!/(?:招聘|职位|岗位|应聘|人才|加入|职业|careers|jobs|apply|join us)/i.test(prose))
    continue;
   for(const found of line.matchAll(/https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+){1,5}\/[a-z0-9._~/%?=&-]*/gi))
    referenced.add(found[0].replace(/[.,，。;；]+$/,''));
