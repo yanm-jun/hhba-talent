@@ -37,19 +37,31 @@ export function sanitizedJobIntent(value){
  if(!/^[\p{Script=Han}a-zA-Z0-9+#.\s-]+$/u.test(s))return null;
  return s;
 }
-export function buildOfficialQueries(role){
+export function buildOfficialQueries(role,expanded=false){
  const clean=sanitizedJobIntent(role);
  if(!clean)return [];
- return [
+ const base=[
   clean+' 招聘 site:careers.tencent.com OR site:zhaopin.meituan.com',
   clean+' 招聘 site:career.huawei.com'
- ].map(q=>q.slice(0,128));
+ ];
+ if(expanded)base.push(
+  clean+' 工作地点 中国 职位 site:jobs.bytedance.com/experienced/position/',
+  clean+' 中国 招聘 site:careers.tencent.com OR site:jobs.bytedance.com'
+ );
+ return base.map(q=>q.slice(0,128));
 }
 export function safeOfficialJobLocator(input){
  if(typeof input!=='string'||input.length>1000)return null;
  try{
   const u=new URL(input);
   if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash)return null;
+  // Verified ByteDance China job details, not its global recruiting portal.
+  if(u.hostname==='jobs.bytedance.com'){
+   const id=u.pathname.match(/^\/experienced\/position\/([0-9]{13,22})\/detail$/)?.[1];
+   if(!id||u.searchParams.size!==0)return null;
+   return {id:'jobs.bytedance.com:'+id,company:'字节跳动',domain:u.hostname,
+    url:'https://jobs.bytedance.com/experienced/position/'+id+'/detail'};
+  }
   const source=OFFICIAL[u.hostname];
   if(!source||u.pathname!==source.path||!u.searchParams.has(source.idParam))return null;
   const meituanExtra=u.hostname==='zhaopin.meituan.com'&&u.searchParams.size===2&&
@@ -96,7 +108,8 @@ export function extractOfficialJob(searchResult,document,now=new Date()){
   location:city,official_url:source.url,official_domain:source.domain,
   source_status:'OFFICIAL_DETAIL_FETCHED',application_status:'NEEDS_OFFICIAL_CONFIRMATION',
   has_application_cta:HAS_APPLY.test(content),checked_at:nowIso,
-  evidence:{title:titleLine.slice(0,115),location:city,requirement},
+  evidence:{title:titleLine.slice(0,115),location:city,requirement,
+   salary:(content.match(/(?:月薪|薪资范围|薪资待遇|薪酬)[：:\s]*([\d.]+\s*[-~至]\s*[\d.]+\s*(?:[kK]|万|千|元)(?:\s*\/月)?)/)||[])[1]||null},
  };
 }
 async function readBoundedJson(response,maxBytes){
@@ -143,14 +156,15 @@ async function providerPost(url,key,payload,maxBytes,fetcher){
  try{return await readBoundedJson(response,maxBytes);}
  catch{throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');}
 }
-export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=new Date()}={}){
- const queries=buildOfficialQueries(role);
+export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=new Date(),expanded=false}={}){
+ const queries=buildOfficialQueries(role,expanded);
+ const maxSearch=expanded?4:SEARCH_LIMIT,maxFetch=expanded?8:FETCH_LIMIT;
  if(!queries.length)throw new ExternalSearchError('INVALID_SEARCH_INTENT');
  if(typeof key!=='string'||key.length<16)throw new ExternalSearchError('SEARCH_NOT_ENABLED');
  const possible=new Map(),usage={search:0,fetch:0};
  // Exactly two fixed, public-domain queries; no resume, contact data or
  // user-provided URLs ever leave HHBA's server.
- for(const query of queries.slice(0,SEARCH_LIMIT)){
+ for(const query of queries.slice(0,maxSearch)){
   const response=await providerPost('https://api.deepseek.com/v1/tools/search',key,
    {query,count:6,need_content:false},250000,fetcher);
   if(!Array.isArray(response?.results))throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');
@@ -164,7 +178,7 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
  let fetchAttempts=0;
  for(const candidate of possible.values()){
   // Limit actual outbound Fetch attempts, not just successful/charged calls.
-  if(fetchAttempts>=FETCH_LIMIT)break;
+  if(fetchAttempts>=maxFetch)break;
   fetchAttempts++;
   let fetched;
   try{
@@ -189,7 +203,7 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
   if(!unique.has(signature))unique.set(signature,job);
  }
  return {kind:EXTERNAL_DISCOVERY_VERSION,scope:'CN_MAINLAND_ONLY',
-  candidates:[...unique.values()].slice(0,FETCH_LIMIT),
-  candidate_count:unique.size,usage,max_search_requests:SEARCH_LIMIT,max_fetch_requests:FETCH_LIMIT,
+  candidates:[...unique.values()].slice(0,maxFetch),
+  candidate_count:unique.size,usage,max_search_requests:maxSearch,max_fetch_requests:maxFetch,
   disclaimer:'仅核验企业官方网站的岗位详情，不保证仍可投递；不代表录用概率。'};
 }
