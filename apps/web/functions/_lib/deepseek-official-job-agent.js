@@ -126,7 +126,7 @@ export function publicCorporatePage(value){
 const CLOSED=/(?:岗位已关闭|职位已关闭|停止招聘|不再接受申请|暂停招聘|职位已下线|招聘已结束|职位已过期|岗位已下线|当前职位无法投递|已停止接受投递|no longer accepting applications|job is closed|position has been filled)/i;
 const DUTIES=/(?:岗位职责|工作职责|职位职责|工作内容|职位描述|职责描述|工作描述|responsibilities|what you.ll do)/i;
 const REQUIREMENTS=/(?:任职资格|任职要求|岗位要求|职位要求|资格要求|招聘要求|应聘要求|要求条件|requirements|qualifications)/i;
-const CTA=/(?:立即申请|立即投递|立即应聘|我要应聘|我要投递|我要申请|在线申请|在线投递|一键投递|应聘岗位|应聘职位|申请岗位|申请职位|投递简历|投递岗位|马上申请|申请此职位|投递该职位|申请该岗位|去投递|去申请|apply now|apply for this job|submit application)/i;
+const CTA=/(?:立即申请|立即投递|立即应聘|我要应聘|我要投递|我要申请|在线申请|在线投递|一键投递|应聘岗位|应聘职位|申请岗位|申请职位|投递简历|投递岗位|投递此职位|投递该职位|马上申请|申请此职位|申请此岗位|申请该岗位|去投递|去申请|apply now|apply for this job|submit application)/i;
 function hasApplyEntry(body){
  return CTA.test(body)||/\[(?:投递|应聘|申请)(?:岗位|职位)?\]\(https:\/\/[^)\s]{8,400}\)/i.test(body);
 }
@@ -180,6 +180,11 @@ function extractRole(lines,page){
   if(m&&roleText(m[1]))return m[1].split(/[|｜]/)[0].trim();
  }
  const fromTitle=clean(page?.title||'').replace(/^[-|｜]\s*/,'');
+ const marked=fromTitle.match(/^(?:职位详情|岗位详情|招聘详情)\s*[-–：:|｜]\s*(.{3,100})/iu);
+ if(marked){
+  const detailRole=marked[1].split(/[|｜]/)[0].split(/\s+[-–]\s+/)[0].trim();
+  if(roleText(detailRole))return detailRole.slice(0,95);
+ }
  const candidate=fromTitle.split(/[|｜]/)[0].split(/\s+[-–]\s+/)[0].trim();
  if(roleText(candidate))return candidate.slice(0,95);
  // Only the lead section: never treat the JD's later responsibilities as a title.
