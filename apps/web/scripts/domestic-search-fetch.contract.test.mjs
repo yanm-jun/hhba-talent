@@ -163,6 +163,19 @@ test('Baidu SOCIAL official job UUID is verified; login is NOT verified-open',as
  assert.equal(found.candidates[0].company,'百度');
  assert.equal(found.candidates[0].has_application_cta,false);
 });
+test('three verified job directions use the same four search calls',()=>{
+ const q=buildOfficialQueries(['Python 开发工程师','数据分析师','测试开发工程师'],true);
+ assert.equal(q.length,4);
+ assert.ok(q[0].includes('Python 开发工程师'));
+ assert.ok(q[1].includes('数据分析师'));
+ assert.ok(q[2].includes('测试开发工程师'));
+ assert.ok(q[3].includes('Python 开发工程师'));
+ assert.ok(q.every(x=>x.length<=128));
+ const sanitized=buildOfficialQueries(['数据分析师','姓名：张三','测试开发工程师'],true);
+ assert.equal(sanitized.length,4);
+ assert.ok(sanitized.every(x=>!x.includes('张三')));
+ assert.deepEqual(buildOfficialQueries(['姓名：张三','https://evil.example'],true),[]);
+});
 test('expanded queries add Baidu official details without adding provider calls',()=>{
  const queries=buildOfficialQueries('数据产品经理',true);
  assert.equal(queries.length,4);
