@@ -112,6 +112,13 @@ test('career aspiration is not automatically evidence of professional duties',()
  assert.ok(verified.demonstrated_roles.includes('销售顾问'));
 });
 
+test('mentioning collaboration with a role does not establish occupational experience',()=>{
+ const source='求职意向：产品经理\n工作经历\n2023—2025 某公司\n负责与产品经理沟通，向产品经理提交销售数据，参与客户跟进。';
+ const signals=separateCareerIntentAndExperience(['产品经理'],source);
+ assert.ok(signals.career_intents.includes('产品经理'));
+ assert.equal(signals.demonstrated_roles.includes('产品经理'),false);
+});
+
 test('explicit missing facts stay out of Top10 and are surfaced as actionable review',()=>{
  const inside=[{
   id:'ashby-test-company-job1',company:'测试公司',title:'Python 开发工程师',
