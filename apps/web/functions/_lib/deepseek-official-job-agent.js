@@ -161,7 +161,7 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
   usage.model++;let result;
   try{result=await send('/responses',key,{model:'deepseek-v4-pro',instructions,
    input,tools:TOOLS,tool_choice:turn===0?'required':'auto',
-   reasoning:{effort:'none'},max_output_tokens:1100,stream:false},250000,fetcher,30000);
+   reasoning:{effort:'none'},max_output_tokens:1100,stream:false},fetcher,250000,30000);
   }catch{failures++;break;}
   if(result?.status!=='completed'||!Array.isArray(result.output)){failures++;break;}
   const calls=result.output.filter(v=>v?.type==='function_call'&&typeof v.call_id==='string'&&
@@ -177,7 +177,7 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
     else{
      usage.search++;
      try{
-      const found=await send('/v1/tools/search',key,{query,count:15,need_content:false},250000,fetcher);
+      const found=await send('/v1/tools/search',key,{query,count:15,need_content:false},fetcher,250000);
       const out=[];
       for(const item of (Array.isArray(found.results)?found.results:[]).slice(0,15)){
        const link=safeAgentJobLink(item.url);
@@ -196,7 +196,7 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
     else{
      usage.fetch++;
      try{
-      const doc=await send('/v1/tools/fetch',key,{url:link.url},500000,fetcher);
+      const doc=await send('/v1/tools/fetch',key,{url:link.url},fetcher,500000);
       const job=link.type==='known'?extractOfficialJob({url:link.url},doc,now):
        extractAtsPage(link,doc,now);
       if(!job)reply={status:'JOB_DETAIL_NOT_VERIFIED'};
@@ -219,7 +219,7 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
     else{
      usage.fetch++;
      try{
-      const doc=await send('/v1/tools/fetch',key,{url:site},500000,fetcher);
+      const doc=await send('/v1/tools/fetch',key,{url:site},fetcher,500000);
       const job=verifyAtsBacklink(readJobs.get(link.url),doc,site);
       if(job){approved.set(job.id,job);reply={status:'EMPLOYER_LINK_VERIFIED',
        url:link.url,company:job.company,location:job.location};}
