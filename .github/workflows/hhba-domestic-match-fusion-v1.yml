@@ -9,6 +9,7 @@ on:
       - 'apps/web/functions/_lib/deepseek-job-search-quality.js'
       - 'apps/web/functions/_lib/deepseek-discovery-billing.js'
       - 'apps/web/d1/0019_match_v8_discovery_accounting.sql'
+      - 'apps/web/d1/0020_match_v8_browser_render_accounting.sql'
       - 'apps/web/scripts/match-v8-deepseek-agent.contract.test.mjs'
       - 'apps/web/scripts/match-v8-browser-preview.contract.test.mjs'
       - 'apps/web/scripts/match-v8-search-quality.contract.test.mjs'
