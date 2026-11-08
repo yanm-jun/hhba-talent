@@ -4,6 +4,7 @@ import {deriveDocumentedWorkTenure} from './resume-tenure.js';
 import {scoreCandidateFit} from './match-ranking.js';
 import {isMainlandJobLocation} from './mainland-job-location.js';
 import {groundedCareerDirections} from './resume-role-evidence.js';
+import {extractSelfReportedProfessionalCredentials} from './professional-credentials.js';
 export const MAX_TEXT_LENGTH=20000;
 export function redactForModel(value){
  if(typeof value!=='string')return '';
@@ -59,7 +60,8 @@ export function verifiedProfile(raw,text,now=new Date()){
  const roles=groundedCareerDirections(raw.target_roles,original,{limit:6});
  return {education,education_evidence:education?degreeEvidence:null,
   experience_years:years,experience_evidence:years===null?null:yearsEvidence,
-  skills,target_roles:roles,warnings:[]};
+  skills,target_roles:roles,
+  professional_credentials:extractSelfReportedProfessionalCredentials(original),warnings:[]};
 }
 function safeJobLink(j){
  if(!j||typeof j!=='object'||!['ashby','greenhouse','lever'].includes(j.platform))return false;
