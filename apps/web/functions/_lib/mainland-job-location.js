@@ -25,7 +25,7 @@ export function isMainlandJobLocation(location){
  if(typeof location!=='string'||location.length>140||!location.trim())return false;
  if(overseas.test(location)||uncertain.test(location))return false;
  const segments=location.split(/\s*(?:\/|\||,|，|;|；|、|\b(?:or|and)\b|或者|或|与)\s*/i)
-  .map(x=>x.trim()).filter(Boolean);
+  .map(x=>x.trim()).filter(x=>x&&!/^(?:china|中国|中国大陆|中华人民共和国)$/i.test(x));
  if(!segments.length)return false;
  return segments.every(oneSegmentHasCity);
 }
