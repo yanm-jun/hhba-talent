@@ -1,0 +1,40 @@
+name: HHBA Open National Job Search v2
+on:
+  pull_request:
+    paths:
+      - 'apps/web/functions/_lib/domestic-search-fetch.js'
+      - 'apps/web/functions/_lib/domestic-match-fusion.js'
+      - 'apps/web/functions/api/match/discover.js'
+      - 'apps/web/src/services/resumeMatch.ts'
+      - 'apps/web/src/components/CandidateMatchResultDialog.tsx'
+      - 'apps/web/scripts/domestic-search-fetch*'
+      - 'apps/web/scripts/domestic-match-fusion*'
+      - 'apps/web/d1/0019_external_search_public_cache.sql'
+      - '.github/workflows/hhba-national-open-search-v2.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install pinned dependencies
+        working-directory: apps/web
+        run: npm ci --ignore-scripts
+      - name: Search Fetch API syntax and dynamic source security
+        working-directory: apps/web
+        run: |
+          node --check functions/_lib/domestic-search-fetch.js
+          node --check functions/_lib/domestic-match-fusion.js
+          node --check functions/api/match/discover.js
+          node --test scripts/domestic-search-fetch.contract.test.mjs scripts/domestic-match-fusion.contract.test.mjs scripts/domestic-search-fetch.route.test.mjs
+      - name: Build HHBA web
+        working-directory: apps/web
+        run: npm run build
