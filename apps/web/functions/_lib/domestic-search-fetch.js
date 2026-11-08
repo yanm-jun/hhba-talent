@@ -28,7 +28,7 @@ const CITY_PATTERN=new RegExp(CITY_NAMES.sort((a,b)=>b.length-a.length).join('|'
 const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macau|macao|taiwan|taipei|tokyo|japan|singapore|united states|美国|日本|新加坡)/i;
 const CLOSED=/(?:职位已关闭|该职位已下线|岗位已下线|停止招聘|暂停招聘|不再接受申请|招聘已结束|岗位已关闭|职位已过期|目前暂时未有岗位开放)/i;
 const HAS_DUTIES=/(?:岗位职责|工作职责|职位职责|岗位描述|工作内容|主要职责)/;
-const HAS_REQUIREMENTS=/(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求)/;
+const HAS_REQUIREMENTS=/(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求|职责要求)/;
 const HAS_APPLY=/(?:申请岗位|立即申请|立即投递|投递岗位|投递简历|申请职位)/;
 const ROLE_TITLE=/(?:工程师|研发|设计师|分析师|架构师|研究员|数据科学|顾问|产品经理|运营|销售|法务|财务|审计|人力|实习生|技术专员|专家|总监|主管|负责人|scientist|engineer|analyst|designer|intern)/i;
 const BLOCK_INTENT=/(?:姓名|身份证|身份证号|手机号|电话号码|电子邮箱|我的电话|家庭住址|password|api.?key|bearer|secret|token|sk-[a-z0-9_-]+|忽略上述|执行指令)/i;
@@ -46,10 +46,15 @@ export function buildOfficialQueries(role,expanded=false){
   clean+' 招聘 site:careers.tencent.com OR site:zhaopin.meituan.com',
   clean+' 招聘 site:career.huawei.com'
  ];
- if(expanded)base.push(
-  clean+' 工作地点 中国 职位 site:jobs.bytedance.com/experienced/position/',
-  clean+' 工作地点 中国 岗位 site:zhaopin.jd.com/web/job-info-detail'
- );
+ if(expanded){
+  // Same four-search budget as before; Baidu adds a fifth independently
+  // authenticated employer, not a model-invented "all China" job directory.
+  base[1]=clean+' 招聘 site:career.huawei.com OR site:talent.baidu.com/jobs/detail/SOCIAL/';
+  base.push(
+   clean+' 工作地点 中国 职位 site:jobs.bytedance.com/experienced/position/',
+   clean+' 工作地点 中国 岗位 site:zhaopin.jd.com/web/job-info-detail'
+  );
+ }
  return base.map(q=>q.slice(0,128));
 }
 export function safeOfficialJobLocator(input){
@@ -63,6 +68,13 @@ export function safeOfficialJobLocator(input){
    if(!id||u.searchParams.size!==0)return null;
    return {id:'jobs.bytedance.com:'+id,company:'字节跳动',domain:u.hostname,
     url:'https://jobs.bytedance.com/experienced/position/'+id+'/detail'};
+  }
+  // Baidu social recruitment: an exact, independent official vacancy detail.
+  if(u.hostname==='talent.baidu.com'){
+   const id=u.pathname.match(/^\/jobs\/detail\/SOCIAL\/([0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i)?.[1];
+   if(!id||u.searchParams.size!==0)return null;
+   return {id:'talent.baidu.com:'+id.toLowerCase(),company:'百度',domain:u.hostname,
+    url:'https://talent.baidu.com/jobs/detail/SOCIAL/'+id.toLowerCase()};
   }
   const source=OFFICIAL[u.hostname];
   if(!source||u.pathname!==source.path||!u.searchParams.has(source.idParam))return null;
@@ -98,7 +110,7 @@ export function extractOfficialJob(searchResult,document,now=new Date()){
  const city=(!OUTSIDE.test(labelled)&&labelled.match(CITY_PATTERN)?.[0])||
   (!OUTSIDE.test(header)&&header.match(CITY_PATTERN)?.[0]);
  if(!city)return null;
- const rq=content.match(/(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求)[：:\s]*([\s\S]{24,900})/);
+ const rq=content.match(/(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求|职责要求)[：:\s]*([\s\S]{24,900})/);
  const experienceLabel=(content.match(/(?:工作经验|经验要求|工作年限|经验年限)[：:\s]*([^\n]{1,80})/)||[])[1]||'';
  const requirement=((rq?.[1]||'').split(/(?:岗位职责|工作地点|申请岗位|事业群介绍|立即投递|相关职位)/)[0]+
   (experienceLabel?' 工作经验：'+experienceLabel:''))
@@ -111,7 +123,12 @@ export function extractOfficialJob(searchResult,document,now=new Date()){
   id:source.id,source_type:'站外官方招聘',company:source.company,title,
   location:city,official_url:source.url,official_domain:source.domain,
   source_status:'OFFICIAL_DETAIL_FETCHED',application_status:'NEEDS_OFFICIAL_CONFIRMATION',
+  // Baidu SOCIAL details can be readable without a visible submit button;
+  // never label that as "apply open". The link opens the exact official JD,
+  // and applying may require a separate logged-in action.
   has_application_cta:HAS_APPLY.test(content),checked_at:nowIso,
+  application_method:source.domain==='talent.baidu.com'&&!HAS_APPLY.test(content)?
+   'OFFICIAL_DETAIL_LOGIN_REQUIRED':'DIRECT_CTA_UNVERIFIED',
   evidence:{title:titleLine.slice(0,115),location:city,requirement,
    salary:(content.match(/(?:月薪|薪资范围|薪资待遇|薪酬)[：:\s]*([\d.]+\s*[-~至]\s*[\d.]+\s*(?:[kK]|万|千|元)(?:\s*\/月)?)/)||[])[1]||null},
  };
@@ -181,7 +198,19 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
   }
  }
  const jobs=[];
- const candidates=[...possible.values()].slice(0,maxFetch);
+ const candidates=[],selected=new Set(),byEmployer=new Map();
+ for(const row of possible.values()){
+  const provider=safeOfficialJobLocator(row.url)?.company;
+  if(!provider||selected.has(row.url)||(byEmployer.get(provider)||0)>=2)continue;
+  candidates.push(row);selected.add(row.url);
+  byEmployer.set(provider,(byEmployer.get(provider)||0)+1);
+  if(candidates.length>=maxFetch)break;
+ }
+ if(candidates.length<maxFetch)for(const row of possible.values()){
+  if(selected.has(row.url))continue;
+  candidates.push(row);selected.add(row.url);
+  if(candidates.length>=maxFetch)break;
+ }
  const fetchOne=async(candidate)=>{
   let fetched;
   try{
