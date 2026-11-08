@@ -154,10 +154,10 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
   // Facet values are sourced from the same hash-verified official JD snapshot.
   if(opts.remote_only&&j.remote!==true)continue;
   if(Number.isFinite(f.experienceMinYears)&&f.experienceMinYears>0&&
-     (!Number.isFinite(profile.experience_years)||profile.experience_years<f.experienceMinYears))continue;
+     Number.isFinite(profile.experience_years)&&profile.experience_years<f.experienceMinYears)continue;
   const degreeLevels={HIGH_SCHOOL:1,ASSOCIATE:2,BACHELOR:3,MASTER:4,PHD:5};
   const minDegree=degreeLevels[String(f.education||'').toUpperCase()];
-  if(minDegree&&(!degreeLevels[profile.education]||degreeLevels[profile.education]<minDegree))continue;
+  if(minDegree&&degreeLevels[profile.education]&&degreeLevels[profile.education]<minDegree)continue;
   const title=j.title.toLowerCase();
   const tags=Array.isArray(f.skills)?f.skills.filter(x=>typeof x==='string').map(x=>x.toLowerCase()):[];
   const roleMatches=query.flatMap(x=>aliasesOf(x)).filter(x=>x.length>=2&&title.includes(x));
@@ -197,13 +197,16 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
   // This removes legacy keyword ranking and company/city dedup bias.
   const eligible=filtered.map(job=>{
    const fit=scoreCandidateFit(profile,job,opts);
-   if(!fit.eligible)return null;
+   if(!fit.eligible&&fit.qualification_status!=='NEEDS_INFORMATION')return null;
    const matched=[...job.matched];
-   if(fit.breakdown.role>0&&!matched.some(x=>x.includes('岗位名称')))
+   if(fit.eligible&&fit.breakdown.role>0&&!matched.some(x=>x.includes('岗位名称')))
     matched.push('职位名称与目标岗位方向属于相关职业类别（详情仍以官方职位要求为准）');
-   return {...job,reference_score:fit.score,rankEvidence:fit.score,matched};
+   return {...job,reference_score:fit.score??0,rankEvidence:fit.score??0,
+    qualification_status:fit.qualification_status||'ELIGIBLE',matched};
   }).filter(Boolean);
-  eligible.sort((a,b)=>b.reference_score-a.reference_score||a.id.localeCompare(b.id));
+  eligible.sort((a,b)=>
+   Number(b.qualification_status==='ELIGIBLE')-Number(a.qualification_status==='ELIGIBLE')||
+   b.reference_score-a.reference_score||a.id.localeCompare(b.id));
   return {matches:eligible.slice(0,opts.candidate_pool_limit).map(({rankEvidence,...job})=>job),
    matched_official_jobs:eligible.length};
  }
