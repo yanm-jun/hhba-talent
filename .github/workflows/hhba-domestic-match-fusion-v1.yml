@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - 'apps/web/functions/_lib/domestic-match-fusion.js'
+      - 'apps/web/functions/_lib/match-ranking.js'
+      - 'apps/web/scripts/match-ranking-v2.contract.test.mjs'
       - 'apps/web/scripts/domestic-match-fusion.contract.test.mjs'
       - 'apps/web/scripts/domestic-search-fetch.contract.test.mjs'
       - 'apps/web/functions/_lib/domestic-search-fetch.js'
@@ -32,7 +34,7 @@ jobs:
         run: |
           node --check functions/_lib/domestic-search-fetch.js
           node --check functions/_lib/domestic-match-fusion.js
-          node --test scripts/domestic-match-fusion.contract.test.mjs scripts/domestic-search-fetch.contract.test.mjs scripts/domestic-search-fetch.route.test.mjs
+          node --test scripts/match-ranking-v2.contract.test.mjs scripts/domestic-match-fusion.contract.test.mjs scripts/domestic-search-fetch.contract.test.mjs scripts/domestic-search-fetch.route.test.mjs
       - name: Check HHBA web production build
         working-directory: apps/web
         run: npm run build
