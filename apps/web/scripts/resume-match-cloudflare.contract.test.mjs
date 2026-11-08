@@ -162,8 +162,9 @@ test('results use a focus-managed modal rather than a long inline page',async()=
  assert.match(dialog,/aria-modal="true"/);
  assert.match(dialog,/event\.key==='Escape'/);
  assert.match(dialog,/onMouseDown/);
- assert.match(dialog,/aria-expanded/);
- assert.match(dialog,/返回修改/);
+ assert.match(dialog,/onClick=\{onOpen\}/);
+ assert.match(dialog,/setSelectedId\(null\)/);
+ assert.match(dialog,/返回岗位列表/);
  assert.match(dialog,/document\.body\.style\.overflow='hidden'/);
 });
 
