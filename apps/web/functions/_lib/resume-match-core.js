@@ -1,5 +1,6 @@
 // Pure helpers for the HHBA Cloudflare resume-matching service.
 // Never turn a model guess or stale employer posting into a verified job.
+import {deriveDocumentedWorkTenure} from './resume-tenure.js';
 export const MAX_TEXT_LENGTH=20000;
 export function redactForModel(value){
  if(typeof value!=='string')return '';
@@ -11,7 +12,7 @@ export function redactForModel(value){
   .replace(/(?:微信号|微信|QQ号|QQ)\s*[:：]\s*[A-Za-z0-9_-]{5,32}/gi,'[即时通讯账号已隐藏]')
   .trim();
 }
-export function verifiedProfile(raw,text){
+export function verifiedProfile(raw,text,now=new Date()){
  if(!raw||typeof raw!=='object')throw Error('AI_PROFILE_INCOMPLETE');
  const original=String(text||'');
  const asEvidence=(value)=>{
@@ -34,7 +35,13 @@ export function verifiedProfile(raw,text){
  // Require explicit years-of-work evidence; dates alone cannot substantiate tenure.
  const stated=yearEvidence?.match(/(?:工作|实习|经验)\s*(\d+(?:\.\d+)?)\s*年|(\d+(?:\.\d+)?)\s*年(?:工作|实习|经验)/);
  const confirmed=stated?Number(stated[1]||stated[2]):null;
- const years=confirmed!==null&&Number.isFinite(raw.experience_years)&&raw.experience_years===confirmed&&confirmed>=0&&confirmed<=50?confirmed:null;
+ const statedYears=confirmed!==null&&Number.isFinite(raw.experience_years)&&
+  raw.experience_years===confirmed&&confirmed>=0&&confirmed<=50?confirmed:null;
+ // Fallback only to clear employment timelines, not projects, education or internships.
+ // The model cannot supply or extend these dates: they come from the resume text.
+ const documented=statedYears===null?deriveDocumentedWorkTenure(original,now):null;
+ const years=statedYears??documented?.years??null;
+ const yearsEvidence=statedYears!==null?yearEvidence:documented?.evidence??null;
  const skills=[],seen=new Set();
  for(const value of Array.isArray(raw.skills)?raw.skills.slice(0,20):[]){
   const name=typeof value?.name==='string'?value.name.trim().slice(0,60):'';
@@ -44,7 +51,7 @@ export function verifiedProfile(raw,text){
  }
  const roles=[...new Set((Array.isArray(raw.target_roles)?raw.target_roles:[]).filter(x=>typeof x==='string'&&x.trim().length>=2&&x.length<=70).map(x=>x.trim()).filter(x=>original.toLowerCase().includes(x.toLowerCase())))].slice(0,6);
  return {education,education_evidence:education?degreeEvidence:null,
-  experience_years:years,experience_evidence:years===null?null:yearEvidence,
+  experience_years:years,experience_evidence:years===null?null:yearsEvidence,
   skills,target_roles:roles,warnings:[]};
 }
 function safeJobLink(j){
