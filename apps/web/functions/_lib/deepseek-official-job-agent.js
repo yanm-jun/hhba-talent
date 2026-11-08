@@ -261,8 +261,14 @@ function extractCompanyClaim(lines,page){
   const name=clean(part).replace(/^(?:加入|来自|招聘单位|用人单位)\s*[：:]?\s*/u,'')
    .replace(/\s*(?:招聘|官网|官方网站|社会招聘|校园招聘)\s*$/u,'');
   const candidate=viableEmployerName(name);
+  // Corporate vacancy headings can end with "腾讯招聘" or "华为招聘".
+  // The BRAND must be on the FETCHED JOB PAGE and is not accepted until
+  // a separate corporate homepage or a recruitment backlink corroborates it.
+  const officialRecruitingBrand=/^[\p{Script=Han}]{2,24}招聘$/u.test(part.trim())&&
+   !/^(?:社会|校园|人才|实习|全部|岗位|职位|企业|最新|招聘平台)招聘$/u.test(part.trim());
   if(candidate&&(/^(?:加入|来自|招聘单位|用人单位)/u.test(part.trim())||
-   /(?:集团|有限公司|科技|股份|公司)$/u.test(candidate)))return candidate;
+   /(?:集团|有限公司|科技|股份|公司)$/u.test(candidate)||officialRecruitingBrand))
+   return candidate;
  }
  const m=title.match(/(?:[-|｜]\s*)([\p{Script=Han}]{2,24}(?:集团|有限公司|科技|股份|公司))/u);
  const legacy=m?viableEmployerName(m[1].replace(/招聘$/,'')):null;
