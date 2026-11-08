@@ -1,4 +1,4 @@
-name: HHBA V8 one-shot structured JD & company proof real trial (GitHub OIDC)
+name: HHBA V8 one-shot bounded Fetch postpass + structured JD real trial (GitHub OIDC)
 on:
   push:
     branches:
@@ -10,7 +10,7 @@ permissions:
   contents: read
   id-token: write
 concurrency:
-  group: hhba-v8-structured-jd-one-shot
+  group: hhba-v8-postpass-one-shot
   cancel-in-progress: false
 jobs:
   official-live-search:
@@ -32,14 +32,14 @@ jobs:
                 redirect:'manual',signal:AbortSignal.timeout(10000)});
               if(r.status===200){
                 const j=await r.json();
-                if(j.kind==='HHBA_V8_STRUCTURED_JD_EVAL_20261108_V2'&&
+                if(j.kind==='HHBA_V8_POSTPASS_EVAL_20261108_V3'&&
                    j.status==='PROTECTED_DYNAMIC_EVAL_ONLY'){ready=true;break;}
               }
             }catch{}
             await new Promise(resolve=>setTimeout(resolve,10000));
           }
           assert.ok(ready,'CLOUDFLARE_PREVIEW_NOT_READY');
-          console.log('HHBA_V8_STRUCTURED_PREVIEW_READY');
+          console.log('HHBA_V8_POSTPASS_PREVIEW_READY');
           NODE
       - name: Run one bounded synthetic role through DeepSeek V4 Pro Search and Fetch
         env:
@@ -49,7 +49,7 @@ jobs:
           import assert from 'node:assert/strict';
           const root=process.env.ROOT;
           const u=new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
-          u.searchParams.set('audience','hhba-v8-structured-jd-20261108');
+          u.searchParams.set('audience','hhba-v8-postpass-20261108');
           const identity=await fetch(u,{headers:{Authorization:'bearer '+
             process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN},redirect:'error',
             signal:AbortSignal.timeout(15000)});
@@ -59,19 +59,19 @@ jobs:
           const response=await fetch(root+'/api/match/v8-structured-eval',{
             method:'POST',redirect:'manual',signal:AbortSignal.timeout(300000),
             headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
-            body:JSON.stringify({mode:'structured'})
+            body:JSON.stringify({mode:'postpass'})
           });
           const value=await response.json().catch(()=>({error:'INVALID_REPLY'}));
           if(response.status!==200){
-            console.log('HHBA_V8_STRUCTURED_PROVIDER_ERROR',
+            console.log('HHBA_V8_POSTPASS_PROVIDER_ERROR',
               JSON.stringify({http:response.status,code:value.error||'UNKNOWN'}));
             throw Error('REAL_V8_EVALUATION_FAILED');
           }
-          assert.equal(value.kind,'HHBA_V8_STRUCTURED_JD_EVAL_20261108_V2');
+          assert.equal(value.kind,'HHBA_V8_POSTPASS_EVAL_20261108_V3');
           assert.equal(value.query_scope,'CONTENT_OPERATIONS_MAINLAND');
           assert.equal(value.real_provider,true);
           assert.ok(value.usage.model<=4&&value.usage.search<=8&&value.usage.fetch<=20);
           assert.ok((value.candidates||[]).length<=10);
           assert.ok(value.cost_estimate?.estimated_total_cny>=0);
-          console.log('HHBA_V8_STRUCTURED_REAL_EVIDENCE',JSON.stringify(value));
+          console.log('HHBA_V8_POSTPASS_REAL_EVIDENCE',JSON.stringify(value));
           NODE

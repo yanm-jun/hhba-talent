@@ -1,7 +1,7 @@
 // TEMPORARY ONE-SHOT LIVE V8 TEST. REMOVE ROUTE & WORKFLOW AFTER AUDIT.
 import {runDeepSeekOfficialJobAgent} from '../../_lib/deepseek-official-job-agent.js';
-const VERSION='HHBA_V8_STRUCTURED_JD_EVAL_20261108_V2';
-const AUDIENCE='hhba-v8-structured-jd-20261108';
+const VERSION='HHBA_V8_POSTPASS_EVAL_20261108_V3';
+const AUDIENCE='hhba-v8-postpass-20261108';
 const BRANCH='refs/heads/feature/match-v8-deepseek-dynamic-official-discovery-20261108';
 const WORKFLOW='yanm-jun/hhba-talent/.github/workflows/hhba-v8-structured-live-eval.yml@'+BRANCH;
 const ORIGIN='https://token.actions.githubusercontent.com';
@@ -59,7 +59,7 @@ async function authorized(request){
 }
 
 async function reserveOnce(db){
- const marker='HHBA_V8_STRUCTURED_JD_ONCE_20261108';
+ const marker='HHBA_V8_POSTPASS_ONCE_20261108';
  const stamp=new Date().toISOString();
  const r=await db.prepare(
   'INSERT INTO hhba_resume_match_requests(request_id,day_utc,account_hash,created_at) '+
@@ -83,19 +83,21 @@ export async function onRequestPost({request,env}){
   const body=await request.text();if(body.length>45)throw Error('TOO_LARGE');
   input=JSON.parse(body);
  }catch{return fail('INVALID_TEST_MODE',400);}
- if(input?.mode!=='structured'||Object.keys(input).length!==1)
+ if(input?.mode!=='postpass'||Object.keys(input).length!==1)
   return fail('INVALID_TEST_MODE',400);
  try{
   if(!await reserveOnce(env.HHBA_PNVS_AUTH_DB))return fail('TEST_ALREADY_EXECUTED',409);
   // A single bounded live probe, with a synthetic occupation only.
   // No private resume data is sent to DeepSeek Search / Fetch / model.
   // One-shot reservation above prevents repeated paid requests.
+  // One single call; the server can use at most six extra Fetch requests
+  // against the already observed Search URLs after the model is done.
   const got=await runDeepSeekOfficialJobAgent('内容运营',env.HHBA_MATCH_DEEPSEEK_KEY,
    {targetCount:2});
   const usage=got.usage||{},cost=got.accounting||null;
   if(!cost)throw Error('V8_ACCOUNTING_MISSING');
   const stamp=new Date().toISOString(),day=stamp.slice(0,10);
-  const requestId='HHBA_V8_STRUCTURED_TEST_'+crypto.randomUUID();
+  const requestId='HHBA_V8_POSTPASS_TEST_'+crypto.randomUUID();
   const audit=await env.HHBA_PNVS_AUTH_DB.prepare(
    'INSERT INTO hhba_match_discovery_accounting('+
    'request_id,day_utc,account_hash,model_attempts,search_attempts,fetch_attempts,'+
@@ -103,7 +105,7 @@ export async function onRequestPost({request,env}){
    'model_output_tokens,model_estimated_cny,tools_estimated_cny,total_estimated_cny,'+
    'peak_price_upper_estimate_cny,pricing_basis,estimate_complete,status,created_at)'+
    ' VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
-  ).bind(requestId,day,'HHBA_V8_STRUCTURED_JD_ONCE_20261108',
+  ).bind(requestId,day,'HHBA_V8_POSTPASS_ONCE_20261108',
    cost.attempts.model,cost.attempts.search,cost.attempts.fetch,
    cost.billable.search,cost.billable.fetch,
    cost.tokens.input,cost.tokens.cached_input,cost.tokens.output,

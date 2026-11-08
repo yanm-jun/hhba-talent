@@ -292,3 +292,92 @@ test('Never repair missing Mainland-city evidence or employer identity by model 
  assert.equal(readPublicJob(link,{content:text.replace('# 内容运营','# 内容运营\n工作地点：北京\n工作城市：上海')},now),null);
  assert.equal(readPublicJob(link,{content:text.replace('# 内容运营','# 内容运营\n工作地点：北京').replace('岗位要求','工作要求：待定')},now),null);
 });
+
+test('Header city without explicit location label is accepted only near single job title',()=>{
+ const link=publicJobLink('https://career.xinghe.cn/jobs/202611081188');
+ const job=[
+  '# 内容运营','北京','招聘单位：星河数字科技有限公司',
+  '岗位职责',
+  '负责公众号内容发布、跨部门运营协调、短视频策划和用户互动。'.repeat(4),
+  '任职要求',
+  '本科及以上学历，熟悉内容营销策略和短视频创意，能独立推进内容活动。'.repeat(4),
+  '立即应聘'
+ ].join('\n');
+ const parsed=readPublicJob(link,{title:'内容运营',content:job},now);
+ assert.equal(parsed?.location,'北京');
+ assert.equal(parsed?.has_application_cta,true);
+ const bad=job.replace('\n北京\n','\n行业不限\n').replace('负责公众号内容发布','北京客户项目负责公众号内容发布');
+ assert.equal(readPublicJob(link,{title:'内容运营',content:bad},now),null,
+  'a city only inside duties does not establish actual workplace');
+ const amb=job.replace('\n北京\n','\n北京\n上海\n');
+ assert.equal(readPublicJob(link,{title:'内容运营',content:amb},now),null,
+  'two unlabeled cities in the job header cannot be arbitrarily collapsed');
+});
+test('Model-discovered roles receive bounded autonomous Fetch postpass with no extra model calls',async()=>{
+ const vacancy='https://career.xinghe.cn/jobs/202611081237';
+ const main='https://xinghe.cn/';
+ const jd=[
+  '# 内容运营', '工作地点：北京', '招聘公司：星河数字科技有限公司',
+  '工作职责','负责社交平台内容运营、专题活动策划、内容制作和用户反馈。'.repeat(5),
+  '岗位要求','本科及以上学历，具备内容编辑、新媒体内容策划、项目执行及数据复盘能力。'.repeat(5),
+  '立即应聘'
+ ].join('\n');
+ const homeContent='# 星河数字科技有限公司\n'+('星河数字科技有限公司官方网站，提供产品介绍与公司动态。').repeat(10);
+ const counts={responses:0,search:0,fetch:0};
+ const replies=(x)=>Response.json(x);
+ const toolCall=(name,args,id)=>({type:'function_call',call_id:id,name,arguments:JSON.stringify(args)});
+ const transport=async(url,options)=>{
+  if(url.endsWith('/responses')){
+   counts.responses++;
+   return replies({status:'completed',usage:{input_tokens:300,
+    input_tokens_details:{cached_tokens:20},output_tokens:150},output:
+    counts.responses===1?[toolCall('search_jobs',{query:'内容运营 企业招聘 北京'},'q')]:
+     [{type:'message',role:'assistant',content:[{type:'output_text',text:'已完成检索'}]}]});
+  }
+  if(url.endsWith('/search')){
+   counts.search++;return replies({results:[{url:vacancy,title:'内容运营 - 星河数字科技有限公司'}]});
+  }
+  if(url.endsWith('/fetch')){
+   counts.fetch++;
+   const body=JSON.parse(options.body);
+   if(body.url===vacancy)return replies({title:'内容运营',content:jd});
+   if(body.url===main)return replies({title:'星河数字科技有限公司',content:homeContent});
+   throw Error('Unexpected Fetch URL');
+  }
+  throw Error('Unexpected provider endpoint');
+ };
+ const got=await runDeepSeekOfficialJobAgent('内容运营',key,{fetcher:transport,now,targetCount:1});
+ assert.deepEqual(counts,{responses:2,search:1,fetch:2});
+ assert.deepEqual(got.usage,{model:2,search:1,fetch:2});
+ assert.equal(got.stats.postpass_job_reads,1);
+ assert.equal(got.candidates.length,1);
+ assert.equal(got.candidates[0].company,'星河数字科技有限公司');
+ assert.equal(got.quality_status,'VERIFIED_JOBS_FOUND');
+ assert.equal(got.accounting.complete,true);
+});
+test('Postpass never fetches irrelevant search teaser or bypasses 4/8/20 bounds',async()=>{
+ let responses=0,search=0,fetches=0;
+ const reply=x=>Response.json(x);
+ const producer=async(url)=>{
+  if(url.endsWith('/responses')){
+   responses++;
+   return reply({status:'completed',output:responses===1?[{
+    type:'function_call',call_id:'q',name:'search_jobs',
+    arguments:JSON.stringify({query:'内容运营 招聘 2026'})
+   }]:[{type:'message',role:'assistant',content:[]}]});
+  }
+  if(url.endsWith('/search')){search++;return reply({results:[
+   {url:'https://career.gongsi.cn/jobs/202611081111',title:'财务经理'},
+   {url:'https://career.gongsi.cn/jobs/202611082222',title:'物流销售'}
+  ]});}
+  if(url.endsWith('/fetch')){fetches++;return reply({content:'should not fetch'});}
+  throw Error('Unexpected call');
+ };
+ const outcome=await runDeepSeekOfficialJobAgent('内容运营',key,{fetcher:producer,now});
+ assert.equal(responses,2);
+ assert.equal(search,1);
+ assert.equal(fetches,0);
+ assert.equal(outcome.stats.postpass_job_reads,0);
+ assert.equal(outcome.candidates.length,0);
+ assert.ok(outcome.usage.model<=4&&outcome.usage.search<=8&&outcome.usage.fetch<=20);
+});
