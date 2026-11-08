@@ -70,13 +70,18 @@ function referencedExternal(entry,now){
    entry.application_status!=='NEEDS_OFFICIAL_CONFIRMATION'||entry.has_application_cta!==true)return null;
  const u=safeOfficialJobLocator(entry.official_url);
  if(!u||u.company!==entry.company||u.id!==entry.id)return null;
+ // Do not confuse globally hosted ATS tenants with independently verified
+ // employers; the fetched ATS detail must contain tenant-level evidence.
+ if(u.tenant&&(entry.source_level!=='VERIFIED_ATS_TENANT_ONLY'||
+  entry.evidence?.tenant_verified!==true||
+  entry.evidence?.company_identity!==u.company))return null;
  if(!isMainlandWorkCity(entry.location))return null;
  if(!entry.evidence||entry.evidence.location!==entry.location||
   typeof entry.evidence.title!=='string'||entry.evidence.title.trim()!==entry.title.trim()||
   typeof entry.evidence.requirement!=='string'||entry.evidence.requirement.trim().length<25)return null;
  const timestamp=Date.parse(entry.checked_at||'');
  if(!Number.isFinite(timestamp)||timestamp>now+5*60*1000||now-timestamp>MAX_EVIDENCE_AGE_MS)return null;
- return {official_url:u.url,ageHours:Math.max(0,(now-timestamp)/3600000)};
+ return {official_url:u.url,ageHours:Math.max(0,(now-timestamp)/3600000),sourceLevel:u.source_level};
 }
 function safeProfile(profile){
  return {
@@ -120,10 +125,14 @@ function externalToMatch(entry,profile,options,now){
   source_type:'站外官方招聘',reference_score:score,
   matched,not_evidenced:gaps,
   needs_verification:[
-   '企业官网详情与任职要求已抓取；网页出现申请入口，但当前是否仍接受申请必须到官网确认',
+   proof.sourceLevel==='VERIFIED_ATS_TENANT_ONLY'?
+    '岗位位于专业招聘系统，已核验租户与岗位内容一致；企业的法律主体归属仍需进一步确认':
+    '岗位位于已确认的企业招聘域名；仍需核对企业具体招聘资格',
+   '岗位页面有申请入口，但当前是否仍接受申请必须到原招聘系统确认',
    '抓取时间：'+entry.checked_at+'；公开岗位信息可能变化'
   ],
-  requirements_basis:'站外企业官方详情页面原文，非 AI 猜测职位；没有确认实时开放',
+  requirements_basis:'站外职位详情原文，非 AI 猜测职位；企业归属核验等级与当前开放状态有明确标注',
+  source_level:proof.sourceLevel,
   application_status:'NEEDS_OFFICIAL_CONFIRMATION',checked_at:entry.checked_at,
   candidate_evidence:{role:entry.evidence.title,requirement:requirements.slice(0,260)},
   rankEvidence:rolePoints+haveSkill.length*8,
