@@ -294,6 +294,7 @@ export async function onRequest({request,env}){
  );
  return json({status:'COMPLETE',profile,matches:merged.matches,
   matched_official_jobs:merged.counts.distinct_verified_sources,
+  qualification_reviews:merged.qualification_reviews,
   discovery_status:discovered.status,
   source:'中国大陆境内岗位（官方 ATS 审核与自动检索合并）',
   scoring:'严格筛选已明确的学历、工作年限与工作地点要求后进行参考评分；不代表录用概率',
