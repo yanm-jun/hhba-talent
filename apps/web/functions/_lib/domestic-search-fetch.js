@@ -122,39 +122,36 @@ export function extractOfficialJob(searchResult,document,now=new Date()){
  const source=safeOfficialJobLocator(searchResult?.url);
  if(!source||!document||typeof document.content!=='string')return null;
  const content=document.content.replace(/\r/g,'').replace(/\u0000/g,'').slice(0,100000);
- if(content.length<170||!HAS_DUTIES.test(content)||!HAS_REQUIREMENTS.test(content)||CLOSED.test(content))return null;
- // Refuse contradictory foreign and mainland location signals in the job heading.
+ if(content.length<170||!(HAS_DUTIES.test(content)||ENG_DUTIES.test(content))||
+  !(HAS_REQUIREMENTS.test(content)||ENG_REQUIREMENTS.test(content))||
+  CLOSED.test(content)||ENG_CLOSED.test(content))return null;
  if(OUTSIDE.test(content.slice(0,350)))return null;
- const lines=content.split('\n').map(t=>t.replace(/^\s*#{1,6}\s*/,'').trim()).filter(Boolean);
- // Require a position-specific title in the fetched official page, not a
- // search snippet. An indexed listing or generic landing page is insufficient.
- const titleLine=lines.find(t=>t.length>=4&&t.length<=115&&ROLE_TITLE.test(t)&&
-  !/^(?:职位详情|招聘|社会招聘|岗位详情|职位|官网|搜索|当前位置|岗位职责|岗位要求|任职要求)(?:\s|$|[|｜])/i.test(t));
+ const lines=content.split('\n').map(x=>x.replace(/^\s*#{1,6}\s*/,'').trim()).filter(Boolean);
+ const titleLine=lines.find(x=>x.length>=4&&x.length<=115&&ROLE_TITLE.test(x)&&
+  !/^(?:职位详情|招聘|社会招聘|岗位详情|职位|官网|搜索|当前位置|岗位职责|岗位要求|任职要求)(?:\s|$|[|｜])/i.test(x));
  if(!titleLine)return null;
  const title=titleLine.split(/[\n|｜]/)[0].trim().slice(0,86);
- if(!title||title.length<4||OUTSIDE.test(title))return null;
- // A Mainland city must be evidenced on the fetched page, preferably next
- // to the official "work location" label, otherwise at the document heading.
- const locationSection=content.match(/(?:工作地点|工作城市|工作地|办公地点)[：:\s]*([^\n]{0,65})/);
- const labelled=locationSection?.[1]||'';
- const header=content.slice(0,280);
- const city=(!OUTSIDE.test(labelled)&&labelled.match(CITY_PATTERN)?.[0])||
-  (!OUTSIDE.test(header)&&header.match(CITY_PATTERN)?.[0]);
+ if(!title||OUTSIDE.test(title))return null;
+ const labelled=content.match(/(?:工作地点|工作城市|工作地|办公地点|Location|Work location|Office location)[：:\s]*([^\n]{0,100})/i)?.[1]||'';
+ const city=mainlandCity(labelled)||mainlandCity(content.slice(0,300));
  if(!city)return null;
- const rq=content.match(/(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求)[：:\s]*([\s\S]{24,900})/);
- const requirement=(rq?.[1]||'').split(/(?:岗位职责|工作地点|申请岗位|事业群介绍|立即投递|相关职位)/)[0]
-  .replace(/[\s#*-]+/g,' ').trim().slice(0,260);
+ const rq=content.match(/(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求|Qualifications|Requirements|What you['’]ll need|What we['’]re looking for)[：:\s]*([\s\S]{24,1400})/i);
+ const requirement=(rq?.[1]||'').split(/(?:岗位职责|工作地点|申请岗位|立即投递|相关职位|Responsibilities|Apply now|Apply for this)/i)[0]
+  .replace(/[\s#*-]+/g,' ').trim().slice(0,350);
  if(requirement.length<25)return null;
- // A successful fetch is not a guarantee that applications remain open.
- // Do not set is_open=true, "verified open", or make a hiring probability claim.
- const nowIso=now instanceof Date?now.toISOString():new Date(now).toISOString();
- return {
-  id:source.id,source_type:'站外官方招聘',company:source.company,title,
+ const hasApplicationCta=HAS_APPLY.test(content)||ENG_APPLY.test(content);
+ if(!hasApplicationCta)return null;
+ // A real ATS tenant is not independent legal company verification.
+ // Tenant must occur in the fetched document; source tier remains transparent.
+ if(source.tenant&&!tenantConfirmed(content,source.tenant))return null;
+ const checked=now instanceof Date?now.toISOString():new Date(now).toISOString();
+ return {id:source.id,source_type:'站外官方招聘',company:source.company,title,
   location:city,official_url:source.url,official_domain:source.domain,
+  source_level:source.source_level,source_provider:source.provider,
   source_status:'OFFICIAL_DETAIL_FETCHED',application_status:'NEEDS_OFFICIAL_CONFIRMATION',
-  has_application_cta:HAS_APPLY.test(content),checked_at:nowIso,
-  evidence:{title:titleLine.slice(0,115),location:city,requirement},
- };
+  has_application_cta:hasApplicationCta,checked_at:checked,
+  evidence:{title:titleLine.slice(0,115),location:city,requirement,
+   tenant_verified:!!source.tenant,company_identity:source.company}};
 }
 async function readBoundedJson(response,maxBytes){
  if(!response.body||!(response.headers.get('content-type')||'').toLowerCase().includes('json'))
@@ -204,49 +201,59 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
  const queries=buildOfficialQueries(role);
  if(!queries.length)throw new ExternalSearchError('INVALID_SEARCH_INTENT');
  if(typeof key!=='string'||key.length<16)throw new ExternalSearchError('SEARCH_NOT_ENABLED');
- const possible=new Map(),usage={search:0,fetch:0};
- // Exactly two fixed, public-domain queries; no resume, contact data or
- // user-provided URLs ever leave HHBA's server.
+ const possible=new Map(),usage={search:0,fetch:0},attempts={search:0,fetch:0};
  for(const query of queries.slice(0,SEARCH_LIMIT)){
+  attempts.search++;
   const response=await providerPost('https://api.deepseek.com/v1/tools/search',key,
-   {query,count:6,need_content:false},250000,fetcher);
+   {query,count:15},250000,fetcher);
   if(!Array.isArray(response?.results))throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');
   if(response.results.length)usage.search++;
-  for(const item of response.results.slice(0,6)){
+  for(const item of response.results.slice(0,15)){
    const loc=safeOfficialJobLocator(item?.url);
-   if(loc&&!possible.has(loc.id))possible.set(loc.id,{...item,url:loc.url});
+   if(loc&&!possible.has(loc.id))possible.set(loc.id,{url:loc.url,source:loc});
+  }
+ }
+ // Diversity-first Fetch budget: one official ATS tenant at a time, then
+ // revisit tenants, rather than wasting ten requests on one employer.
+ const groups=new Map();
+ for(const item of possible.values()){
+  const key=item.source.tenant||item.source.company;
+  if(!groups.has(key))groups.set(key,[]);
+  groups.get(key).push(item);
+ }
+ const scheduled=[],queues=[...groups.values()];
+ for(let round=0;round<FETCH_LIMIT&&scheduled.length<FETCH_LIMIT;round++){
+  for(const group of queues){
+   if(group[round])scheduled.push(group[round]);
+   if(scheduled.length>=FETCH_LIMIT)break;
   }
  }
  const jobs=[];
- let fetchAttempts=0;
- for(const candidate of possible.values()){
-  // Limit actual outbound Fetch attempts, not just successful/charged calls.
-  if(fetchAttempts>=FETCH_LIMIT)break;
-  fetchAttempts++;
-  let fetched;
+ for(const candidate of scheduled){
+  if(attempts.fetch>=FETCH_LIMIT)break;
+  attempts.fetch++;
+  let document;
   try{
-   fetched=await providerPost('https://api.deepseek.com/v1/tools/fetch',key,
+   document=await providerPost('https://api.deepseek.com/v1/tools/fetch',key,
     {url:candidate.url},500000,fetcher);
   }catch(e){
-   // Individual official pages may disappear, move, or block crawlers. Do not
-   // abort a whole search solely because one known vacancy is inaccessible.
    if(e instanceof ExternalSearchError&&e.code==='SEARCH_FETCH_NOT_AVAILABLE')continue;
    throw e;
   }
-  if(typeof fetched?.content!=='string')throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');
-  if(fetched.content)usage.fetch++;
-  const job=extractOfficialJob(candidate,fetched,now);
+  if(typeof document?.content!=='string')throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');
+  if(document.content)usage.fetch++;
+  const job=extractOfficialJob(candidate,document,now);
   if(job)jobs.push(job);
  }
- // A company can have many SEO/city copies of the same role: prefer unique
- // employer+position without fabricating a vacancy to reach Top10.
  const unique=new Map();
  for(const job of jobs){
-  const signature=job.company.toLowerCase()+'|'+job.title.toLowerCase();
-  if(!unique.has(signature))unique.set(signature,job);
+  const k=job.company.toLowerCase()+'|'+job.title.toLowerCase().replace(/\s+/g,'');
+  if(!unique.has(k))unique.set(k,job);
  }
  return {kind:EXTERNAL_DISCOVERY_VERSION,scope:'CN_MAINLAND_ONLY',
   candidates:[...unique.values()].slice(0,FETCH_LIMIT),
-  candidate_count:unique.size,usage,max_search_requests:SEARCH_LIMIT,max_fetch_requests:FETCH_LIMIT,
-  disclaimer:'仅核验企业官方网站的岗位详情，不保证仍可投递；不代表录用概率。'};
+  candidate_count:unique.size,usage,attempts,
+  max_search_requests:SEARCH_LIMIT,max_fetch_requests:FETCH_LIMIT,
+  cost_cap_cny:MAX_SEARCH_FETCH_COST_CNY,
+  disclaimer:'企业招聘系统中的租户和职位详情不等于独立验证了企业归属或当前招聘状态；投递前务必前往官方招聘页确认。'};
 }
