@@ -157,3 +157,16 @@ https://github.com/yanm-jun/hhba-talent/actions/runs/42476956268
 测试：`apps/web/scripts/match-v8-employer-evidence.contract.test.mjs` 包括企业名注入防护、跨域精确职位、带公司身份的招聘板链接、拒绝第三方根域/跨企业链接、缺失企业官网时限额自主 Search+Fetch、预算与成本统计。只有所有 CI 通过，才允许进行下一次受控真实 API 质量对照。
 
 **限制**：网页品牌和官方链接关系仍不等于政府工商注册认证、网页存在也不等于当前仍在招聘。生产 `main` 和 `hhba.work` AI 开关保持关闭。
+
+## V8 第五轮真实 DeepSeek API 对照（2026-11-08）
+
+工作流：https://github.com/yanm-jun/hhba-talent/actions/runs/42486104279 。GitHub 初次等待 Cloudflare 预览超时，Cloudflare 构建成功后利用原失败任务重试，并通过一次性 OIDC 身份验证完成真实付费测试；未使用真实简历数据。
+
+- 模型 **4 次**、Search **5 次**、Fetch **6 次**，没有超过 4/8/20 硬限额。
+- 发现 22 条候选单职位 URL；Search 摘要有工作城市提示 8 条、有任职要求提示 21 条、有申请入口提示 2 条。摘要不能替代网页正文核验。
+- `job_details=0`、`verified=0`、`quality_status=NO_VERIFIED_JOBS`。**没有任何职位进入企业官网查证阶段**，所以新增企业官网补充搜索模块本轮实际调用 0 次，不能宣称其真实核验率提升。
+- 网页拒绝分布：`MISSING_EXPLICIT_WORKPLACE=5`、`POSTPASS_FETCH_UNAVAILABLE=1`。其中一次 Fetch 失败，模型返回 `status=PARTIAL`。
+- 实际模型输入 6,616 Token（缓存命中 4,992）、输出 300 Token；Search 有内容 5 次、Fetch 有内容 5 次。**费用估算 ¥0.062107，但 `complete=false`**，因存在失败调用，不能把估算当最终账单或严格上限。
+- 安全结论：新的跨域“企业官网具体职位链接或专属招聘板”的静态、模拟、端到端回归测试通过，但**真实公开网页仍因缺少明确岗位所在地而被拒绝**。不可放松城市字段审查，不得把 Search 摘要内容冒充官网证据，更不得凑满 10 条。
+- 后续优先级：提高搜索返回的**有明确工作地点的官方单职位详情**的覆盖率；对职位网页实际正文中的地点字段做准确的结构化识别和多城市冲突拒绝；有有效详情时再评估企业官网跨域证明。
+- 本轮受保护的临时 `v8-employer-proof-eval.js` 和 `hhba-v8-employer-proof-live-eval.yml` 必须删除，旧带临时接口的 Preview 部署需要等清理版本接替后再删除。主线、生产数据库和 `hhba.work` AI 开关仍维持不变。
