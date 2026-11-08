@@ -36,3 +36,16 @@ export function findMainlandCity(location){
  return [...MAINLAND_CITIES].sort((a,b)=>b.length-a.length).find(c=>text.includes(c))||
   romanized.find(([,p])=>text.includes(p))?.[0]||null;
 }
+
+/**
+ * Eligibility needs to distinguish a proven overseas location from a location
+ * the official job listing did not disclose. UNKNOWN is NOT Mainland-approved.
+ */
+export function classifyMainlandJobLocation(location){
+ if(isMainlandJobLocation(location))return 'MAINLAND_CONFIRMED';
+ if(typeof location!=='string'||!location.trim()||location.length>140)
+  return 'UNKNOWN';
+ const raw=location.trim();
+ if(overseas.test(raw))return 'OUTSIDE_MAINLAND';
+ return 'UNKNOWN';
+}
