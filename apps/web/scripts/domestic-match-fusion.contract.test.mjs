@@ -175,3 +175,24 @@ test('3 years experience never matches a posting requiring at least 7 years',()=
   assert.equal(result.matches.length,0,requirement);
  }
 });
+
+test('Top10 display stays globally score-sorted after diversity fallback',()=>{
+ const strong=['北京','上海','广州','深圳'].map((city,i)=>
+  domesticInside('rank-city-'+i,75,'企业甲','软件开发工程师',city));
+ const weaker={
+  ...domesticInside('rank-alt',55,'企业乙','软件开发工程师','成都'),
+  required_skills:['暂未掌握的业务技能']
+ };
+ const result=fuseDomesticJobRecommendations([...strong,weaker],[],profile,
+  {role_hint:'软件开发工程师',limit:5},now);
+ assert.equal(result.matches.length,5);
+ assert.equal(result.matches.filter(x=>x.company==='企业甲').length,4);
+ assert.equal(result.matches.filter(x=>x.company==='企业乙').length,1);
+ assert.ok(result.matches.find(x=>x.company==='企业甲').reference_score>
+  result.matches.find(x=>x.company==='企业乙').reference_score);
+ for(let i=1;i<result.matches.length;i++){
+  assert.ok(result.matches[i-1].reference_score>=result.matches[i].reference_score,
+   'top list should be displayed in descending reference score order');
+ }
+ assert.equal(result.matches[result.matches.length-1].company,'企业乙');
+});

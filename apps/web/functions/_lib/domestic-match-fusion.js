@@ -245,6 +245,10 @@ export function fuseDomesticJobRecommendations(inside=[],outside=[],rawProfile={
   if(chosen.length>=max)break;
   if(!chosenIds.has(job.id))add(job);
  }
+ // Diversity affects inclusion, not display order. Second-pass employer-cap
+ // relaxation must not place lower-scored roles before higher-scored ones.
+ chosen.sort((a,b)=>b.reference_score-a.reference_score||
+  b.rankEvidence-a.rankEvidence||a.id.localeCompare(b.id));
  return {
   kind:FUSION_VERSION,scope:'CN_MAINLAND_ONLY',
   matches:chosen.map(({rankEvidence,sourceDate,...j})=>j),
