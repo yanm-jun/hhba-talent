@@ -128,26 +128,26 @@ export function extractMainlandWorkplaceFromJob({raw='',lines=[],role=''}={}){
   if(roleAt>=0&&i<roleAt&&!hasInline&&!interpret(v).city)continue;
   labeled.push(v);
  }
+ // Structured data is a SECOND source from the fetched single-job page,
+ // never Search snippets. A conflict with a labeled city rejects the page.
+ const structured=extractedJobPostingLocations(raw,role);
+ if(structured.reason)return {reason:structured.reason};
+ const parsed=structured.values.map(interpret);
+ const failed=parsed.find(x=>!x.city);
+ if(failed)return failed;
+ const structuredCities=[...new Set(parsed.map(x=>x.city))];
+ if(structuredCities.length>1)return {reason:'AMBIGUOUS_WORKPLACE'};
+ const structuredCity=structuredCities[0]||null;
  if(labeled.length){
   const evaluated=labeled.map(interpret);
   const errors=evaluated.find(x=>!x.city);
   if(errors)return errors;
   const cities=[...new Set(evaluated.map(x=>x.city))];
-  return cities.length===1?{city:cities[0],evidence_type:'JOB_LOCATION_FIELD'}:
-   {reason:'AMBIGUOUS_WORKPLACE'};
+  if(cities.length!==1||structuredCity&&cities[0]!==structuredCity)
+   return {reason:'AMBIGUOUS_WORKPLACE'};
+  return {city:cities[0],evidence_type:'JOB_LOCATION_FIELD'};
  }
- // A rendered JobPosting can supplement Markdown, but only for a
- // single title-matching role. Conflicting HTML/Markdown location is unsafe.
- const structured=extractedJobPostingLocations(raw,role);
- if(structured.reason)return {reason:structured.reason};
- if(structured.values.length){
-  const evaluated=structured.values.map(interpret);
-  const failed=evaluated.find(x=>!x.city);
-  if(failed)return failed;
-  const cities=[...new Set(evaluated.map(x=>x.city))];
-  return cities.length===1?{city:cities[0],evidence_type:'JOBPOSTING_STRUCTURED'}:
-   {reason:'AMBIGUOUS_WORKPLACE'};
- }
+ if(structuredCity)return {city:structuredCity,evidence_type:'JOBPOSTING_STRUCTURED'};
  // Standalone city *on or adjacent to this exact job title*, before JD.
  if(roleAt>=0){
   const after=normalized.slice(roleAt+1,Math.min(roleAt+7,scan));
