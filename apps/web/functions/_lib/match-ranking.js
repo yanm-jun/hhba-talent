@@ -9,6 +9,7 @@
  * Feedback-based weights can only be proposed offline from aggregates;
  * the online scorer always uses the fixed, audited baseline for now.
  */
+import {extractSkillRequirements} from './job-skill-evidence.js';
 export const RANKING_VERSION='HHBA_MATCH_RANKING_V2';
 export const DEFAULT_RANKING_WEIGHTS=Object.freeze({
  role:30,skills:30,experience:20,education:10,location:10
@@ -67,29 +68,14 @@ function levelFitness(title,years){
  if(level==='director')return years<5?.4:years<9?.7:1;
  return 1;
 }
-// Only explicit skill names in official JD text can contribute skill evidence.
-const SKILLS=[
- 'Python','SQL','JavaScript','TypeScript','React','Vue','Node.js','Java','C++','C#','Go',
- 'Git','pandas','Excel','Power BI','Tableau','Linux','Docker','Kubernetes','AWS',
- '机器学习','深度学习','数据分析','用户研究','Figma','Photoshop','Illustrator','剪辑',
- '项目管理','沟通能力','财务分析','市场营销'
-];
 const norm=v=>String(v||'').normalize('NFKC').toLowerCase().replace(/[\s\-_.()（）【】[\]]+/g,'').trim();
 const int=v=>Number.isInteger(v)&&v>=0&&v<=50?v:null;
 const tenuredYears=v=>Number.isFinite(v)&&v>=0&&v<=50?v:null;
-function skillPresent(text,skill){
- const s=String(text||'').normalize('NFKC');
- const label=String(skill||'');
- if(!label)return false;
- // Strict ASCII boundaries prevent Java matching JavaScript and Go matching Google.
- if(/^[A-Za-z][A-Za-z0-9 ]*$/.test(label))
-  return new RegExp('(^|[^A-Za-z0-9])'+label.replace(/[-/\\^$*+?.()|[\]{}]/g,'\\$&')+'(?=$|[^A-Za-z0-9])','i').test(s);
- return s.toLowerCase().includes(label.toLowerCase());
-}
 export function inferOfficialSkills(requirements){
- if(typeof requirements!=='string'||requirements.length<25)return [];
- return SKILLS.filter(s=>skillPresent(requirements.slice(0,2400),s)).slice(0,20);
+ const groups=extractSkillRequirements(requirements);
+ return [...new Set([...groups.required,...groups.preferred,...groups.unclassified])].slice(0,20);
 }
+
 export function isMainlandWorkCity(location){
  const city=typeof location==='string'?location.slice(0,120):'';
  return !!city&&!OUTSIDE.test(city)&&MAINLAND_CITY.test(city);
@@ -158,22 +144,36 @@ export function scoreCandidateFit(profile={},job={},options={},serverApprovedPol
  // Explicitly different occupations are not rescued by a generic skill.
  if(occupation&&desired.length&&affinity===0)
   return {eligible:false,reason:'ROLE_DIRECTION_MISMATCH',score:null,breakdown:null};
- const wanted=[...new Set((Array.isArray(job.required_skills)?job.required_skills:[])
-  .filter(x=>typeof x==='string'&&x.length<60).map(x=>x.trim()).filter(Boolean).map(x=>norm(x)))].slice(0,20);
+ const cleanTags=values=>[...new Set((Array.isArray(values)?values:[])
+  .filter(x=>typeof x==='string'&&x.length<60).map(norm).filter(Boolean))].slice(0,20);
+ const wanted=cleanTags(job.required_skills);
+ const preferred=cleanTags(job.preferred_skills).filter(x=>!wanted.includes(x));
+ const unclassified=cleanTags(job.unclassified_skills)
+  .filter(x=>!wanted.includes(x)&&!preferred.includes(x));
  const have=[...new Set((Array.isArray(profile.skills)?profile.skills:[])
-  .map(x=>typeof x==='string'?x:x?.name).filter(x=>typeof x==='string'&&x.length<=60).map(x=>norm(x)).filter(Boolean))];
+  .map(x=>typeof x==='string'?x:x?.name)
+  .filter(x=>typeof x==='string'&&x.length<=60).map(norm).filter(Boolean))];
+ const hit=xs=>xs.filter(x=>have.includes(x)).length;
  const matchedSkills=wanted.filter(x=>have.includes(x));
- if(affinity===0&&matchedSkills.length===0)
+ const matchedPreferred=hit(preferred),matchedUnknown=hit(unclassified);
+ if(affinity===0&&matchedSkills.length+matchedPreferred+matchedUnknown===0)
   return {eligible:false,reason:'NO_MATCH_EVIDENCE',score:null,breakdown:null};
  const approved=approvedPolicy(serverApprovedPolicy);
  const weights=approved?.weights||DEFAULT_RANKING_WEIGHTS;
  const minYears=int(job.min_experience_years),years=tenuredYears(profile.experience_years);
  const levelFactor=levelFitness(job.title,years);
  const role=Math.round(weights.role*affinity*levelFactor);
- // Missing official requirement tags are unknown, not proof of perfect coverage.
- const skills=wanted.length?
-  Math.round(weights.skills*matchedSkills.length/wanted.length):
+ // Only verified mandatory requirements get the main (80%) skill weight.
+ // Preferences are soft bonus (20%); unclassified JD tags get conservative
+ // partial credit, never reclassified as mandatory by model speculation.
+ const requiredPart=wanted.length?
+  Math.round(weights.skills*.8*matchedSkills.length/wanted.length):
+  unclassified.length?Math.round(weights.skills*.35*matchedUnknown/unclassified.length):
   Math.round(weights.skills*8/30);
+ const bonusPart=preferred.length?
+  Math.round(weights.skills*.2*matchedPreferred/preferred.length):
+  wanted.length?Math.round(weights.skills*.2):0;
+ const skills=Math.min(weights.skills,requiredPart+bonusPart);
 
  const experience=minYears===null||minYears===0?Math.round(weights.experience*11/20):
   Math.round(weights.experience*Math.min(1,(16+Math.max(0,years-minYears))/20));
@@ -192,8 +192,10 @@ export function scoreCandidateFit(profile={},job={},options={},serverApprovedPol
  return {eligible:true,reason:null,score,breakdown,score_adjustment:score-rawScore,
   score_cap_applied:score<rawScore,
   role_affinity:affinity,seniority_alignment:levelFactor,
-  matched_skill_count:matchedSkills.length,
-  required_skill_count:wanted.length,ranking_version:RANKING_VERSION,
+  matched_skill_count:matchedSkills.length+matchedPreferred+matchedUnknown,
+  required_skill_count:wanted.length,
+  preferred_skill_count:preferred.length,matched_preferred_skill_count:matchedPreferred,
+  unclassified_skill_count:unclassified.length,ranking_version:RANKING_VERSION,
   weight_policy_version:approved?.version||'baseline'};
 }
 /**
