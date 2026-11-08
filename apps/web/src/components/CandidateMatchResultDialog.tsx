@@ -44,7 +44,7 @@ function officialLink(item:MatchedJob){
  return safeOfficialJobUrl({id:item.id,source:item.source,platform:item.platform,
   company:item.company,title:item.title,url:item.official_url,location:item.location,remote:item.remote});
 }
-function Row({item,index,onOpen}:{item:MatchedJob;index:number;onOpen:()=>void}){
+function Row({item,onOpen}:{item:MatchedJob;onOpen:()=>void}){
  return <button type="button" className="hhba-match-job" onClick={onOpen}
    aria-label={'查看'+item.company+'的'+chineseJobTitle(item)+'岗位详情'}>
   <span className="hhba-match-job-company-mark" aria-hidden="true"><Building2 size={19}/></span>
@@ -130,7 +130,7 @@ export function CandidateMatchResultDialog({result,onClose}:{result:MatchRespons
       </div>
       <div className="hhba-match-list-heading"><strong>推荐岗位 <span>{result.matches.length?('Top '+result.matches.length):'暂无'}</span></strong><small>按参考匹配度排序</small></div>
       {result.matches.length?<div className="hhba-match-job-list">
-       {result.matches.map((job,i)=><Row key={job.id} index={i+1} item={job} onOpen={()=>setSelectedId(job.id)}/>)}
+       {result.matches.map(job=><Row key={job.id} item={job} onOpen={()=>setSelectedId(job.id)}/>)}
       </div>:<div className="hhba-match-empty"><Building2 size={23}/><h3>目前没有通过岗位条件核验的推荐</h3>
        <p>不会用境外岗位、经验要求不符或无法核验的职位凑满十条。您可以返回调整求职方向。</p></div>}
       <p className="hhba-match-disclaimer">仅推荐中国大陆岗位。匹配分数是参考相关度，不是录用成功率；实际招聘状态以企业官网为准。</p>
