@@ -8,7 +8,7 @@
  * model the built-in unbounded web_search capability for this paid workflow.
  */
 import {sanitizedJobIntent} from './domestic-search-fetch.js';
-import {findMainlandCity} from './mainland-job-location.js';
+import {extractMainlandWorkplaceFromJob} from './mainland-job-workplace-evidence.js';
 import {orderPublicJobCandidates,searchEvidenceHints} from './deepseek-job-search-quality.js';
 import {V8_USAGE_LIMITS,emptyV8CostMeter,observeV8ModelUsage,buildV8CostReport} from './deepseek-discovery-billing.js';
 
@@ -180,31 +180,6 @@ function extractRole(lines,page){
  }
  return null;
 }
-function extractMainlandWorkplace(lines){
- let labels=extractLabelField(lines,LOC_LABEL,100);
- // Some corporate job pages place a city on its OWN line directly below
- // the job title, with no "工作地点：" field. Only accept a short, standalone
- // city token in the first few header lines, never a location guessed from
- // paragraphs, company addresses, job duties or the search snippet.
- if(!labels.length){
-  const roleIndex=lines.findIndex((l,i)=>i<10&&ROLE.test(l)&&
-   l.length<=95&&!DUTY_HEADER.test(l)&&!REQUIREMENT_HEADER.test(l));
-  const near=roleIndex>=0?lines.slice(roleIndex+1,Math.min(roleIndex+7,15)):[];
-  labels=near.filter(v=>v.length>=2&&v.length<=14&&
-   !/(?:公司|集团|科技|地区不限|不限地点|不限城市|远程|招聘|工作地点|办公地点|职位|岗位|职责|要求|福利|地址)/.test(v)&&
-   /^[\p{Script=Han}A-Za-z\s·-]{2,14}$/u.test(v)&&!!findMainlandCity(v));
- }
- if(!labels.length)return {reason:'MISSING_EXPLICIT_WORKPLACE'};
- const candidates=[];
- for(const label of labels){
-  if(EXTERNAL.test(label))return {reason:'OVERSEAS_WORKPLACE'};
-  const city=findMainlandCity(label);
-  if(!city)return {reason:'UNKNOWN_MAINLAND_CITY'};
-  candidates.push(city);
- }
- if(new Set(candidates).size>1)return {reason:'AMBIGUOUS_WORKPLACE'};
- return {city:candidates[0]};
-}
 function sections(lines){
  const headings=lines.map((l,i)=>({
   i,duties:DUTY_HEADER.test(l),requirements:REQUIREMENT_HEADER.test(l),
@@ -251,7 +226,7 @@ export function readPublicJob(link,page,now=new Date(),rejections=null){
  const title=extractRole(lines,page);
  if(!title)return rejectJobEvidence(rejections,'MISSING_ROLE_TITLE');
  if(EXTERNAL.test(title))return rejectJobEvidence(rejections,'OVERSEAS_TITLE');
- const place=extractMainlandWorkplace(lines);
+ const place=extractMainlandWorkplaceFromJob({raw:body,lines,role:title});
  if(place.reason)return rejectJobEvidence(rejections,place.reason);
  const sec=sections(lines);
  if(sec.reason)return rejectJobEvidence(rejections,sec.reason);
@@ -263,7 +238,8 @@ export function readPublicJob(link,page,now=new Date(),rejections=null){
   company_claim:claim,title,location:place.city,official_url:link.url,
   official_domain:link.hostname,has_application_cta:true,
   application_status:'NEEDS_OFFICIAL_CONFIRMATION',checked_at:new Date(now).toISOString(),
-  evidence:{title,location:place.city,requirement:sec.requirements,salary:null},
+  evidence:{title,location:place.city,location_evidence_type:place.evidence_type,
+   requirement:sec.requirements,salary:null},
   _job_page_title:t(page.title,180),
   _page_excerpt:t(body.replace(/\s+/g,' '),3400)};
 }

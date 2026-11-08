@@ -170,3 +170,18 @@ https://github.com/yanm-jun/hhba-talent/actions/runs/42476956268
 - 安全结论：新的跨域“企业官网具体职位链接或专属招聘板”的静态、模拟、端到端回归测试通过，但**真实公开网页仍因缺少明确岗位所在地而被拒绝**。不可放松城市字段审查，不得把 Search 摘要内容冒充官网证据，更不得凑满 10 条。
 - 后续优先级：提高搜索返回的**有明确工作地点的官方单职位详情**的覆盖率；对职位网页实际正文中的地点字段做准确的结构化识别和多城市冲突拒绝；有有效详情时再评估企业官网跨域证明。
 - 本轮受保护的临时 `v8-employer-proof-eval.js` 和 `hhba-v8-employer-proof-live-eval.yml` 必须删除，旧带临时接口的 Preview 部署需要等清理版本接替后再删除。主线、生产数据库和 `hhba.work` AI 开关仍维持不变。
+
+## 第六阶段：职位工作城市证据的结构化解析（2026-11-08）
+
+第五轮同一模拟职位“内容运营”真实测试调用 4 模型 / 5 Search / 6 Fetch，发现 22 条 URL 候选，正文完整解析与官网证据核验通过仍均为 0。Fetch 失败原因：`MISSING_EXPLICIT_WORKPLACE=5`、`POSTPASS_FETCH_UNAVAILABLE=1`，费用 ¥0.062107 为估算且 `complete=false`，详见 <https://github.com/yanm-jun/hhba-talent/actions/runs/42486104279>。
+
+**本阶段改动和约束**
+
+- 将地点识别独立为 `apps/web/functions/_lib/mainland-job-workplace-evidence.js`，供 V8 已 Fetch 取得完整单职位页面时使用。支持招聘页常见的 `工作城市`、`岗位所在地`、`工作地址`、`办公地`、`上班地点`、`职位城市` 等明确的岗位字段、Markdown 表格、字段和值分行，以及靠近职位名称的独立城市行。
+- 仅从职位页头部的岗位元数据提取，不能将站点导航的城市筛选项、雇主办公地址、招聘地区宣传、职位职责中出现的地名作为实际岗位工作地点。
+- 能从页面真正携带的 `JobPosting` JSON-LD 中读取 `jobLocation.address.addressLocality`，且职业名称必须匹配；不能读取泛企业 `Organization`、无关岗位或 Search 摘要里的城市。
+- 当同一岗位披露 `北京/上海`、`北京、上海`、境外地点、未定/全国范围或互相冲突的城市时，标记为不确定/不合格，**不能只返回第一个城市**。不因为地名包含县区就猜测地级市。
+- 每条接受的地点记录 `evidence.location_evidence_type`（`JOB_LOCATION_FIELD`、`JOB_HEADER_CITY` 或 `JOBPOSTING_STRUCTURED`），便于下一次合约验收。它只是从网页提取的地点证据类别，不代表职位当前开放。
+- 搜索摘要只能给抓取排序加权，不会提升工作城市的确证级别。学历、经历、证书、技能、真实企业官网及申请入口仍继续单独硬条件审核。
+- 新增 `apps/web/scripts/match-v8-workplace-evidence.contract.test.mjs`，覆盖常见国内岗位地点、结构化职位地点、导航/公司地址误判、多城市/跨境冲突、Search 摘要不得补齐工作地点等反例。
+- 费用控制仍为每次最多 4 次模型、8 次 Search、20 次 Fetch，实际发生量计费；暂不合并 `main`，不启用 `hhba.work` AI。新解析器需完成 CI 和预览验收，方可评估下一次受控真实联网测试。
