@@ -33,7 +33,9 @@ export function verifiedProfile(raw,text,now=new Date()){
   degrees[raw.education]?.test(degreeEvidence)?raw.education:null;
  const yearEvidence=asEvidence(raw.experience_evidence);
  // Require explicit years-of-work evidence; dates alone cannot substantiate tenure.
- const stated=yearEvidence?.match(/(?:工作|实习|经验)\s*(\d+(?:\.\d+)?)\s*年|(\d+(?:\.\d+)?)\s*年(?:工作|实习|经验)/);
+ const stated=yearEvidence&&
+  !/(?:实习|兼职|项目经历|项目经验|在校|internship|part[ -]?time)/i.test(yearEvidence)?
+  yearEvidence.match(/(?:工作经验|全职工作|实际工作|工作)\s*(\d+(?:\.\d+)?)\s*年|(\d+(?:\.\d+)?)\s*年(?:工作经验|全职工作|实际工作|工作)/):null;
  const confirmed=stated?Number(stated[1]||stated[2]):null;
  const statedYears=confirmed!==null&&Number.isFinite(raw.experience_years)&&
   raw.experience_years===confirmed&&confirmed>=0&&confirmed<=50?confirmed:null;
