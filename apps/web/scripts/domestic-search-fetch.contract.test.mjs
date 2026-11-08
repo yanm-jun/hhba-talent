@@ -317,3 +317,14 @@ test('generic verified software-engineering titles are valid Search leads, not P
  const selected=prioritizeOfficialSearchCandidates(rows,'Python 开发',8);
  assert.deepEqual(selected.map(x=>x.url),[uri(5),uri(4)]);
 });
+
+test('real-world closed official pages are excluded despite complete job detail',()=>{
+ const oldDetail=detail.replace('申请岗位','当前职位无法投递');
+ const blocked=extractOfficialJob({url:mt},{title:'岗位详情',content:oldDetail},new Date('2026-11-08T00:00:00Z'));
+ assert.equal(blocked,null,'an official webpage explicitly refusing applications is not a recommendation');
+ for(const phrase of ['暂不可投递','已停止接受投递','当前岗位无法投递']){
+  const page=detail.replace('申请岗位',phrase);
+  assert.equal(extractOfficialJob({url:te},{content:page}),null,phrase);
+ }
+ assert.ok(extractOfficialJob({url:te},{content:detail}), 'real official detail may still be considered unconfirmed');
+});
