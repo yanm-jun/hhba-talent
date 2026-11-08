@@ -58,6 +58,22 @@ test('Company origins and job details are ANY corporate domain, not a 6-employer
   'https://career.xinghe.cn/jobs/12345?jobId=12345&tracker=1'
  ])assert.equal(publicJobLink(bad),null,bad);
 });
+test('Real domestic ATS and human-readable standalone job links are discovered without domain allowlists',()=>{
+ const publicUrls=[
+  'https://www.doodod.com/careers/content-operations/',
+  'https://hr.xiaomi.com/job/view/99',
+  'https://www.hotjob.cn/wt/ghzq/web/index/webPositionN300!getOnePosition?brandCode=1&columnId=2&importPost=0&lanType=1&postIdEnc=a2448f2e426bfc5a&recruitType=2'
+ ];
+ for(const u of publicUrls)assert.ok(publicJobLink(u),u);
+ for(const u of [
+  'https://www.doodod.com/careers/all-jobs/',
+  'https://www.doodod.com/careers/content-operations/?utm_source=advertisement',
+  'https://hr.xiaomi.com/job/view/99?token=private',
+  'https://www.hotjob.cn/wt/ghzq/web/index/webPositionN300!getOnePosition?brandCode=1&postIdEnc=a2448f2e426bfc5a&evil=https%3A%2F%2Fevil.cn',
+  'https://www.hotjob.cn/wt/ghzq/web/index/webPositionN300!getOnePosition?brandCode=1',
+  'https://www.doodod.com/careers/search/'
+ ])assert.equal(publicJobLink(u),null,u);
+});
 test('Candidate only from Fetch job details with mainland city, JD and apply evidence',()=>{
  const l=publicJobLink(a);
  const pending=readPublicJob(l,{content:unknownJD,title:'内容运营 - 星河科技招聘'},now);
