@@ -65,6 +65,14 @@ jobs:
             assert.equal(credential.status,200,'GitHub Actions OIDC token service rejected request');
             const jwt=(await credential.json()).value;
             assert.ok(jwt&&jwt.length>100,'GitHub OIDC JWT is absent');
+            if(mode==='check'){
+              const claims=JSON.parse(Buffer.from(jwt.split('.')[1],'base64url').toString('utf8'));
+              console.log('V7_OIDC_NONSECRET_CLAIMS',JSON.stringify({
+                aud:claims.aud,repository:claims.repository,repository_id:claims.repository_id,
+                ref:claims.ref,workflow_ref:claims.workflow_ref,event_name:claims.event_name,
+                runner_environment:claims.runner_environment
+              }));
+            }
             const res=await fetch(root+'/api/match/v7-eval',{
               method:'POST',redirect:'manual',signal:AbortSignal.timeout(mode==='search'?150000:90000),
               headers:{Authorization:'Bearer '+jwt,'Content-Type':'application/json'},

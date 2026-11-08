@@ -49,7 +49,7 @@ async function authorized(request){
    !Number.isInteger(p.exp)||p.exp<now||p.exp>now+900||
    !Number.isInteger(p.iat)||p.iat>now+60||p.iat<now-900)return false;
   const response=await fetch(ORIGIN+'/.well-known/jwks',{
-   method:'GET',redirect:'error',signal:AbortSignal.timeout(12000),
+   method:'GET',redirect:'manual',signal:AbortSignal.timeout(12000),
    headers:{Accept:'application/json'}
   });
   if(!response.ok)return false;
