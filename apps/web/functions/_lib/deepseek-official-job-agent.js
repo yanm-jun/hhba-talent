@@ -123,7 +123,7 @@ function rejectJobEvidence(tally,code){
 const LI=/(?:^|\n)\s*(?:[-*•·]|\d{1,2}[.、．)])\s+/;
 const DUTY_PHRASE=/(?:负责|参与|协助|制定|推进|组织|实施|搭建|编写|运营|执行|规划|完善|撰写)/;
 const DUTY_HEADER=/^(?:工作|岗位|职位|主要|任职)?(?:职责|工作内容|职责描述|描述|工作任务|日常工作|job responsibilities|responsibilities|what you.ll do)(?:[\s：:]|$)/i;
-const REQUIREMENT_HEADER=/^(?:任职|应聘|岗位|职位|基本|招聘|资格|能力)?(?:资格|要求|条件|需求)|^(?:我们希望你|我们期待你|希望你具备|你需要具备|岗位基本要求|qualification|requirements|what we.re looking for|who you are|what you bring)(?:[\s：:]|$)/i;
+const REQUIREMENT_HEADER=/^(?:任职|应聘|岗位|职位|基本|招聘|资格|能力)?(?:资格|要求|条件|需求)|^(?:我们希望你具备|我们希望你|我们期待你|希望你具备|你需要具备|岗位基本要求|qualification|requirements|what we.re looking for|who you are|what you bring)(?:[\s：:]|$)/i;
 const END_HEADER=/^(?:薪酬|薪资|福利|待遇|职位推荐|相关职位|更多职位|更多岗位|联系我们|如何申请|立即申请|立即投递|申请职位|职位列表|福利待遇|benefits|how to apply|apply now)(?:[\s：:]|$)/i;
 const LOC_LABEL=/^(?:工作地点|工作城市|工作地|办公地点|办公城市|上班地点|岗位地点|工作区域|location|work location)(?:\s*[：:]\s*|\s*[|｜]\s*|\s{1,4}|$)/i;
 const COMPANY_LABEL=/^(?:公司名称|企业名称|招聘单位|用人单位|所属公司|招聘公司|招聘主体|company name|employer)(?:\s*[：:]\s*|\s*[|｜]\s*|\s{1,4}|$)/i;
