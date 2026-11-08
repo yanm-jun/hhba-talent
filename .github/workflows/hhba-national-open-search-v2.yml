@@ -10,6 +10,7 @@ on:
       - 'apps/web/scripts/domestic-search-fetch*'
       - 'apps/web/scripts/domestic-match-fusion*'
       - 'apps/web/d1/0019_external_search_public_cache.sql'
+      - 'apps/web/scripts/domestic-national-preview.smoke.mjs'
       - '.github/workflows/hhba-national-open-search-v2.yml'
   workflow_dispatch:
 permissions:
@@ -38,3 +39,7 @@ jobs:
       - name: Build HHBA web
         working-directory: apps/web
         run: npm run build
+      - name: Immutable Preview HTTPS smoke without provider billing
+        working-directory: apps/web
+        run: node scripts/domestic-national-preview.smoke.mjs
+
