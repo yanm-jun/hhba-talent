@@ -101,6 +101,27 @@ test('two searches and at most three fetches, only official detail URLs survive'
  assert.equal(calls.filter(x=>x.url.endsWith('/search')).length,2);
  assert.equal(calls.filter(x=>x.url.endsWith('/fetch')).length,3);
 });
+test('JD official posting is accepted only with an exact verified single-position URL',()=>{
+ const link='https://zhaopin.jd.com/web/job-info-detail?requementId=227402';
+ const locator=safeOfficialJobLocator(link);
+ assert.equal(locator?.company,'京东');
+ assert.equal(locator?.id,'zhaopin.jd.com:227402');
+ for(const bad of [link+'&page=3','https://zhaopin.jd.com.evil.example/web/job-info-detail?requementId=227402',
+  'https://zhaopin.jd.com/web/job-info-detail?requementId=abc',
+  'https://zhaopin.jd.com/home?requementId=227402']){
+  assert.equal(safeOfficialJobLocator(bad),null,bad);
+ }
+ const jd=['# 测试开发工程师','职位类型：研发类 工作地点：北京市 发布时间：2026-11-02',
+ '岗位描述','岗位职责：开发自动化测试脚本，负责接口与性能测试。',
+ '任职要求','本科及以上学历，具备 3 年软件工程测试开发经验。熟悉 Python 和 SQL，具备跨团队协作能力。',
+ '立即申请'].join('\n');
+ const extracted=extractOfficialJob({url:link},{content:jd},new Date('2026-11-08T00:00:00Z'));
+ assert.equal(extracted?.company,'京东');
+ assert.equal(extracted?.location,'北京');
+ assert.equal(extracted?.has_application_cta,true);
+ assert.equal(extracted?.application_status,'NEEDS_OFFICIAL_CONFIRMATION');
+});
+
 test('provider errors only return safe codes and never raw response contents',async()=>{
  const {fetcher}=providerMock({errorSearch:401});
  await assert.rejects(
