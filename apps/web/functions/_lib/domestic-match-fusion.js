@@ -4,7 +4,7 @@
 import {safeOfficialJobLocator} from './domestic-search-fetch.js';
 import {scoreCandidateFit} from './match-ranking.js';
 import {extractSkillRequirements,extractStructuredSkillConditions} from './job-skill-evidence.js';
-import {isMainlandJobLocation} from './mainland-job-location.js';
+import {isMainlandJobLocation,findMainlandCity} from './mainland-job-location.js';
 import {explainFinalJobScore} from './match-explanation.js';
 import {extractMandatoryProfessionalCredentials,extractStructuredCredentialConditions,professionalPracticeReview} from './professional-credentials.js';
 import {assessJobQualification} from './job-qualification-evidence.js';
@@ -30,10 +30,15 @@ function textSafe(value,max=260){
 }
 export function isMainlandWorkCity(value){return isMainlandJobLocation(value);}
 function canonicalRoleKey(job){
- const city=textSafe(job.location,50);
+ const work=textSafe(job.location,70);
+ const city=/(?:\/|、|,|，|；|;)/.test(work)?
+  flat(work):flat(findMainlandCity(work)||work);
+ const department=flat(textSafe(job.department,70));
  let title=flat(job.title);
- if(city)title=title.replace(flat(city),'');
- return flat(job.company)+'|'+title;
+ if(work)title=title.replace(flat(work),'');
+ // Keep actual same-city duplicates together, without collapsing separate
+ // cities or distinct departments with independently verified job details.
+ return flat(job.company)+'|'+title+'|'+city+'|'+department;
 }
 function compatibleRole(title,targets){
  const name=flat(title);
@@ -130,12 +135,22 @@ function externalToMatch(entry,profile,options,now){
   title_zh:entry.title,location:entry.location,official_url:proof.official_url,
   platform:'official-domestic',source:entry.official_domain,remote:false,
   source_type:'站外官方招聘',reference_score:0,
-  ...(()=>{const skills=extractSkillRequirements(requirements);return {
-   required_skills:skills.required,mandatory_skills:skills.mandatory,
-   preferred_skills:skills.preferred,unclassified_skills:skills.unclassified,
-   skill_conditions:extractStructuredSkillConditions(requirements)};})(),
-  professional_credential_requirements:extractMandatoryProfessionalCredentials(requirements).mandatory,
-  credential_conditions:extractStructuredCredentialConditions(requirements),
+  ...(()=>{
+   const skills=extractSkillRequirements(requirements);
+   const groups=extractStructuredSkillConditions(requirements);
+   const covered=new Set(groups.flatMap(g=>g.values.map(v=>v.toLowerCase())));
+   return {required_skills:skills.required,preferred_skills:skills.preferred,
+    unclassified_skills:skills.unclassified,
+    mandatory_skills:skills.mandatory.filter(v=>!covered.has(v.toLowerCase())),
+    skill_conditions:groups};
+  })(),
+  ...(()=>{
+   const legacy=extractMandatoryProfessionalCredentials(requirements).mandatory;
+   const groups=extractStructuredCredentialConditions(requirements);
+   const covered=new Set(groups.flatMap(g=>g.values));
+   return {professional_credential_requirements:legacy.filter(v=>!covered.has(v)),
+    credential_conditions:groups};
+  })(),
   min_experience_years:experience,
   minimum_education:Object.keys(DEGREE_RANK).find(k=>DEGREE_RANK[k]===degree)||null,
   salary:typeof entry.evidence.salary==='string'&&entry.evidence.salary.length<=60?entry.evidence.salary:null,
