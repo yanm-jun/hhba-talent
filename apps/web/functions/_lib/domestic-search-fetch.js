@@ -40,8 +40,12 @@ export function sanitizedJobIntent(value){
  return s;
 }
 export function buildOfficialQueries(role,expanded=false){
- const clean=sanitizedJobIntent(role);
- if(!clean)return [];
+ // Up to three evidence-backed Chinese job directions share the SAME fixed
+ // provider request budget; no resume text, personal info or arbitrary URLs.
+ const intents=[...new Set((Array.isArray(role)?role:[role])
+  .map(sanitizedJobIntent).filter(Boolean))].slice(0,3);
+ if(!intents.length)return [];
+ const clean=intents[0];
  const base=[
   clean+' 招聘 site:careers.tencent.com OR site:zhaopin.meituan.com',
   clean+' 招聘 site:career.huawei.com'
@@ -49,9 +53,9 @@ export function buildOfficialQueries(role,expanded=false){
  if(expanded){
   // Same four-search budget as before; Baidu adds a fifth independently
   // authenticated employer, not a model-invented "all China" job directory.
-  base[1]=clean+' 招聘 site:career.huawei.com OR site:talent.baidu.com/jobs/detail/SOCIAL/';
+  base[1]=(intents[1]||clean)+' 招聘 site:career.huawei.com OR site:talent.baidu.com/jobs/detail/SOCIAL/';
   base.push(
-   clean+' 工作地点 中国 职位 site:jobs.bytedance.com/experienced/position/',
+   (intents[2]||clean)+' 工作地点 中国 职位 site:jobs.bytedance.com/experienced/position/',
    clean+' 工作地点 中国 岗位 site:zhaopin.jd.com/web/job-info-detail'
   );
  }
