@@ -42,9 +42,12 @@ test('search intent never forwards user resume contact details or arbitrary text
   assert.equal(sanitizedJobIntent(x),null,x);
  }
  const q=buildOfficialQueries('Python 开发');
- assert.equal(q.length,2);
- for(const item of q){assert.ok(item.length<=128);assert.ok(item.includes('Python 开发'));assert.ok(item.includes('site:'));assert.ok(!item.includes('.html '));}
- assert.ok(q[0].includes('site:careers.tencent.com OR site:zhaopin.meituan.com'));
+ assert.equal(q.length,5);
+ for(const item of q){assert.ok(item.length<=128);assert.ok(item.includes('Python 开发'));assert.ok(!item.includes('.html '));}
+ assert.ok(q.some(x=>x.includes('site:jobs.ashbyhq.com')));
+ assert.ok(q.some(x=>x.includes('site:jobs.lever.co')));
+ assert.ok(q.some(x=>x.includes('site:job-boards.greenhouse.io')));
+ assert.ok(q.some(x=>x.includes('site:jobs.smartrecruiters.com')));
 });
 test('official URL parser rejects redirects, tracking, foreign links, deceptive subdomains',()=>{
  assert.equal(safeOfficialJobLocator(te)?.company,'腾讯');
@@ -80,7 +83,7 @@ test('a fetched official detail produces evidence but NEVER a verified-open clai
   assert.equal(extractOfficialJob({url:te},{content}),null);
  }
 });
-test('two searches and at most three fetches, only official detail URLs survive',async()=>{
+test('five searches and bounded Fetches, only credible official details survive',async()=>{
  const trusted={url:te,title:'职位详情',authority:3},other={url:hu,title:'职位详情',authority:3};
  const extra='https://careers.tencent.com/jobdesc.html?postId=2097166275703910401';
  const {fetcher,calls}=providerMock({searches:[
@@ -98,7 +101,7 @@ test('two searches and at most three fetches, only official detail URLs survive'
  assert.equal(res.candidates.length,3);
  assert.ok(res.candidates.every(x=>x.source_type==='站外官方招聘'));
  assert.ok(res.candidates.every(x=>x.application_status==='NEEDS_OFFICIAL_CONFIRMATION'));
- assert.equal(calls.filter(x=>x.url.endsWith('/search')).length,2);
+ assert.equal(calls.filter(x=>x.url.endsWith('/search')).length,5);
  assert.equal(calls.filter(x=>x.url.endsWith('/fetch')).length,3);
 });
 test('provider errors only return safe codes and never raw response contents',async()=>{
@@ -109,14 +112,14 @@ test('provider errors only return safe codes and never raw response contents',as
  );
 });
 
-test('empty Fetch responses cannot bypass three-attempt per-search budget',async()=>{
- const links=Array.from({length:6},(_,i)=>({
+test('empty Fetch responses cannot bypass ten-attempt per-search budget',async()=>{
+ const links=Array.from({length:13},(_,i)=>({
   url:'https://careers.tencent.com/jobdesc.html?postId='+String(2097166275703910400n+BigInt(i))
  }));
  const {calls,fetcher}=providerMock({searches:[links,links]});
  const result=await discoverExternalOfficialJobs('Python 开发','fake-key-of-adequate-length',{fetcher});
- assert.equal(calls.filter(x=>x.url.endsWith('/search')).length,2);
- assert.equal(calls.filter(x=>x.url.endsWith('/fetch')).length,3);
+ assert.equal(calls.filter(x=>x.url.endsWith('/search')).length,5);
+ assert.equal(calls.filter(x=>x.url.endsWith('/fetch')).length,10);
  assert.equal(result.usage.fetch,0);
  assert.deepEqual(result.candidates,[]);
 });
