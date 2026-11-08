@@ -4,6 +4,7 @@
  * resume facts or verified official JD facets passed by the match pipeline.
  * Human-readable reasons do not independently change scores or eligibility.
  */
+import {credentialLabel,professionalPracticeReview} from './professional-credentials.js';
 const DEGREE={HIGH_SCHOOL:'高中',ASSOCIATE:'专科',BACHELOR:'本科',MASTER:'硕士',PHD:'博士'};
 const SHORT_MAX=6;
 const safe=(s,max=55)=>typeof s==='string'?s.slice(0,max).trim():'';
@@ -40,6 +41,14 @@ export function explainFinalJobScore(profile,job,fit){
   matched.push('已核验的'+DEGREE[profile.education]+'学历符合该岗位最低学历要求');
  if(typeof job.location==='string')matched.push('实际工作地点位于中国大陆：'+safe(job.location,55));
  const gaps=[];
+ const credentials=Array.isArray(job.professional_credential_requirements)?
+  job.professional_credential_requirements:[];
+ if(credentials.length)
+  gaps.push('官方任职要求明确列出'+credentials.map(credentialLabel).filter(Boolean).join('、')+
+   '；简历只有自行陈述的证书线索，尚未核验原件、注册状态、有效期和适用范围');
+ else if(professionalPracticeReview(job.title))
+  gaps.push(professionalPracticeReview(job.title).warning+
+   '；当前职位数据未提取到明确证书条件，不等于免除执业资格要求');
  if(fit.skill_evidence_status==='UNCLASSIFIED_JD_SKILLS')
   gaps.push('岗位技能来源只有已审核的技能标签，未明确区分必备和加分项；请以官网原文为准');
  if(fit.skill_evidence_status==='NOT_DISCLOSED')
