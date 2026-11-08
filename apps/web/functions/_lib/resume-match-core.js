@@ -3,6 +3,7 @@
 import {deriveDocumentedWorkTenure} from './resume-tenure.js';
 import {scoreCandidateFit} from './match-ranking.js';
 import {isMainlandJobLocation} from './mainland-job-location.js';
+import {groundedCareerDirections} from './resume-role-evidence.js';
 export const MAX_TEXT_LENGTH=20000;
 export function redactForModel(value){
  if(typeof value!=='string')return '';
@@ -53,7 +54,9 @@ export function verifiedProfile(raw,text,now=new Date()){
   if(!name||!evidence||seen.has(name.toLowerCase())||!evidence.toLowerCase().includes(name.toLowerCase()))continue;
   skills.push({name,evidence});seen.add(name.toLowerCase());
  }
- const roles=[...new Set((Array.isArray(raw.target_roles)?raw.target_roles:[]).filter(x=>typeof x==='string'&&x.trim().length>=2&&x.length<=70).map(x=>x.trim()).filter(x=>original.toLowerCase().includes(x.toLowerCase())))].slice(0,6);
+ // LLM-suggested occupations may be paraphrases of documented job tasks;
+ // validate the underlying actions, rather than requiring a verbatim title.
+ const roles=groundedCareerDirections(raw.target_roles,original,{limit:6});
  return {education,education_evidence:education?degreeEvidence:null,
   experience_years:years,experience_evidence:years===null?null:yearsEvidence,
   skills,target_roles:roles,warnings:[]};
