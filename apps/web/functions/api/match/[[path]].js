@@ -114,9 +114,9 @@ function autoDiscoveryEnabled(env){
 }
 async function autoDiscoveryCandidates(env,db,phone,profile,opts){
  if(!autoDiscoveryEnabled(env))return {candidates:[],status:'DISABLED'};
- const intent=[opts.role_hint,...profile.target_roles]
-  .map(sanitizedJobIntent).find(Boolean);
- if(!intent)return {candidates:[],status:'NO_ROLE'};
+ const intent=[...new Set([opts.role_hint,...profile.target_roles]
+  .map(sanitizedJobIntent).filter(Boolean))].slice(0,3);
+ if(!intent.length)return {candidates:[],status:'NO_ROLE'};
  try{
   const table=await db.prepare(
    "SELECT name FROM sqlite_master WHERE type='table' AND name='hhba_external_search_requests'"
