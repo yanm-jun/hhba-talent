@@ -98,12 +98,19 @@ export function extractMainlandWorkplaceFromJob({raw='',lines=[],role=''}={}){
  const boundary=headerStop(normalized);
  // Only single-job header metadata, NEVER the footer's corporate office.
  const scan=Math.min(boundary,90,normalized.length);
+ const roleAt=normalized.findIndex((x,j)=>j<scan&&role&&
+  (x===role||x.startsWith(role+' |')||x.startsWith(role+' -')||x.startsWith(role+' ')));
  const labeled=[];
  for(let i=0;i<scan;i++){
-  const roleIndex=normalized.findIndex((x,j)=>j<14&&role&&(x===role||x.startsWith(role+' |')||x.startsWith(role+' -')));
-  const genericAfterRole=roleIndex>=0&&i>=roleIndex&&i<=roleIndex+8;
+  const genericAfterRole=roleAt>=0&&i>=roleAt&&i<=roleAt+8;
   const v=readField(normalized,i,genericAfterRole);
-  if(v!==null)labeled.push(v);
+  if(v===null)continue;
+  // A bare "工作地点" menu item before the actual role followed by a
+  // navigation label is not an employer work-city field. Inline and
+  // meaningful next-line values are still validated, including conflicts.
+  const hasInline=/[：:|｜—–-]\s*\S+/u.test(normalized[i]);
+  if(roleAt>=0&&i<roleAt&&!hasInline&&!interpret(v).city)continue;
+  labeled.push(v);
  }
  if(labeled.length){
   const evaluated=labeled.map(interpret);
@@ -123,12 +130,15 @@ export function extractMainlandWorkplaceFromJob({raw='',lines=[],role=''}={}){
   return cities.length===1?{city:cities[0],evidence_type:'JOBPOSTING_STRUCTURED'}:
    {reason:'AMBIGUOUS_WORKPLACE'};
  }
- // Standalone city *adjacent to this job title*, before responsibilities.
- const roleAt=normalized.findIndex((x,i)=>i<14&&role&&
-  (x===role||x.startsWith(role+' |')||x.startsWith(role+' -')));
+ // Standalone city *on or adjacent to this exact job title*, before JD.
  if(roleAt>=0){
   const after=normalized.slice(roleAt+1,Math.min(roleAt+7,scan));
   const cities=[];
+  // A common rendered ATS header: "内容运营经理 上海" (single position).
+  // The city must be a complete city token, not "上海客户" or a nav tag.
+  const inline=normalized[roleAt].slice(role.length).replace(/^[\s｜|—–-]+/u,'').trim();
+  if(inline&&inline.length<=14&&QUOTED_CITY.test(inline)&&
+   citiesInValue(inline).length===1&&findMainlandCity(inline))cities.push(findMainlandCity(inline));
   for(const candidate of after){
    const word=candidate.replace(/^中国大陆[\s｜|—-]*/,'').trim();
    if(word.length>14||!QUOTED_CITY.test(word)||
