@@ -8,25 +8,40 @@ import '../styles/resume-match-dialog.css';
 
 // Chinese labels are presentation-only: never replace or invent the official job title.
 const translatedTitles:[RegExp,string][]=[
- [/^(?:senior\s+)?python\s+(?:developer|engineer)$/i,'Python 开发工程师'],
- [/^(?:senior\s+)?(?:software\s+(?:engineer|developer)|software development engineer)$/i,'软件开发工程师'],
- [/^(?:senior\s+)?(?:data analyst|business data analyst)$/i,'数据分析师'],
- [/^(?:senior\s+)?(?:data engineer)$/i,'数据工程师'],
- [/^(?:senior\s+)?(?:data scientist)$/i,'数据科学家'],
- [/^(?:senior\s+)?(?:front.?end\s+(?:developer|engineer))$/i,'前端开发工程师'],
- [/^(?:senior\s+)?(?:back.?end\s+(?:developer|engineer))$/i,'后端开发工程师'],
- [/^(?:senior\s+)?(?:full.?stack\s+(?:developer|engineer))$/i,'全栈开发工程师'],
- [/^(?:senior\s+)?(?:product manager)$/i,'产品经理'],
- [/^(?:senior\s+)?(?:ui\/ux designer|ux designer)$/i,'用户体验设计师'],
- [/^(?:senior\s+)?(?:business analyst)$/i,'业务分析师'],
- [/^(?:senior\s+)?(?:operations specialist)$/i,'运营专员'],
- [/^(?:senior\s+)?(?:marketing specialist)$/i,'市场营销专员']
+ [/^python\s+(?:developer|engineer)$/i,'Python 开发工程师'],
+ [/^(?:software\s+(?:engineer|developer)|software development engineer)$/i,'软件开发工程师'],
+ [/^(?:data analyst|business data analyst)$/i,'数据分析师'],
+ [/^data engineer$/i,'数据工程师'],
+ [/^data scientist$/i,'数据科学家'],
+ [/^front.?end\s+(?:developer|engineer)$/i,'前端开发工程师'],
+ [/^back.?end\s+(?:developer|engineer)$/i,'后端开发工程师'],
+ [/^full.?stack\s+(?:developer|engineer)$/i,'全栈开发工程师'],
+ [/^product manager$/i,'产品经理'],
+ [/^(?:ui\/ux designer|ux designer)$/i,'用户体验设计师'],
+ [/^business analyst$/i,'业务分析师'],
+ [/^operations specialist$/i,'运营专员'],
+ [/^marketing specialist$/i,'市场营销专员'],
+ [/^devops engineer$/i,'运维开发工程师'],
+ [/^machine learning engineer$/i,'机器学习工程师'],
+ [/^qa engineer$/i,'测试工程师'],
+ [/^test engineer$/i,'测试工程师'],
+ [/^research engineer$/i,'研发工程师'],
+ [/^sales manager$/i,'销售经理'],
+ [/^product designer$/i,'产品设计师'],
+ [/^graphic designer$/i,'平面设计师'],
+ [/^account manager$/i,'客户经理']
 ];
-function chineseJobTitle(item:MatchedJob){
- if(item.title_zh?.trim())return item.title_zh.trim();
+function chineseJobTitle(item:MatchedJob):string|null{
+ const named=item.title_zh?.trim()||'';
+ if(/[\u3400-\u9fff]/u.test(named))return named;
  const original=item.title.trim();
- if(/[\u3400-\u9fff]/.test(original))return original;
- return translatedTitles.find(([rule])=>rule.test(original))?.[1]||original;
+ if(/[\u3400-\u9fff]/u.test(original))return original;
+ const level=/^(senior|staff|principal|junior|lead)\s+/i.exec(original)?.[1]?.toLowerCase();
+ const base=level?original.replace(/^(?:senior|staff|principal|junior|lead)\s+/i,''):original;
+ const chinese=translatedTitles.find(([rule])=>rule.test(base))?.[1]||null;
+ if(!chinese)return null; // Never put untranslated English-only positions into a Chinese shortlist.
+ const prefix:Record<string,string>={senior:'高级',staff:'资深',principal:'首席',junior:'初级',lead:'技术负责人·'};
+ return (level?prefix[level]:'')+chinese;
 }
 const cityNames:Record<string,string>={
  beijing:'北京',shanghai:'上海',shenzhen:'深圳',guangzhou:'广州',
@@ -64,7 +79,8 @@ function Row({item,onOpen}:{item:MatchedJob;onOpen:()=>void}){
 export function CandidateMatchResultDialog({result,onClose}:{result:MatchResponse;onClose:()=>void}){
  const dialogRef=useRef<HTMLDivElement|null>(null);
  const [selectedId,setSelectedId]=useState<string|null>(null);
- const selected=result.matches.find(x=>x.id===selectedId)||null;
+ const visibleMatches=result.matches.filter(job=>chineseJobTitle(job)!==null);
+ const selected=visibleMatches.find(x=>x.id===selectedId)||null;
  useEffect(()=>{
   const previous=document.body.style.overflow;
   const trigger=document.activeElement instanceof HTMLElement?document.activeElement:null;
@@ -128,9 +144,9 @@ export function CandidateMatchResultDialog({result,onClose}:{result:MatchRespons
        <h2 id="hhba-match-dialog-title">根据您的简历，为您匹配合适的工作</h2>
        <p>综合您的学历、工作经验、专业技能与求职方向，筛选中国大陆境内的招聘岗位。</p>
       </div>
-      <div className="hhba-match-list-heading"><strong>推荐岗位 <span>{result.matches.length?('Top '+result.matches.length):'暂无'}</span></strong><small>按参考匹配度排序</small></div>
-      {result.matches.length?<div className="hhba-match-job-list">
-       {result.matches.map(job=><Row key={job.id} item={job} onOpen={()=>setSelectedId(job.id)}/>)}
+      <div className="hhba-match-list-heading"><strong>推荐岗位 <span>{visibleMatches.length?('Top '+visibleMatches.length):'暂无'}</span></strong><small>按参考匹配度排序</small></div>
+      {visibleMatches.length?<div className="hhba-match-job-list">
+       {visibleMatches.map(job=><Row key={job.id} item={job} onOpen={()=>setSelectedId(job.id)}/>)}
       </div>:<div className="hhba-match-empty"><Building2 size={23}/><h3>目前没有通过岗位条件核验的推荐</h3>
        <p>不会用境外岗位、经验要求不符或无法核验的职位凑满十条。您可以返回调整求职方向。</p></div>}
       <p className="hhba-match-disclaimer">仅推荐中国大陆岗位。匹配分数是参考相关度，不是录用成功率；实际招聘状态以企业官网为准。</p>
