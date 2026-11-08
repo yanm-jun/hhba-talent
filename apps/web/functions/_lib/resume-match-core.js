@@ -175,7 +175,9 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
    requirements_basis:'与同版官方 JD 审核和搜索特征一致；未对录用概率作预测',
    source_type:'HHBA站内岗位',
    // Same-JD-hash verified facets only. The ranking module never invents gates.
-   required_skills:tags,
+   // Legacy ATS facets list skills but do NOT mark them must-have.
+   // Absence from resume is not proof that a mandatory JD gate failed.
+   required_skills:[],preferred_skills:[],unclassified_skills:tags,
    min_experience_years:Number.isFinite(f.experienceMinYears)?f.experienceMinYears:null,
    minimum_education:typeof f.education==='string'?f.education:null,
    salary:typeof j.salary==='string'&&j.salary.length<=60?j.salary:
