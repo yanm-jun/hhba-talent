@@ -286,7 +286,7 @@ export async function onRequest({request,env}){
  }
  const recommended=sources?selectAuditedMatches(
   sources.snapshot,sources.audit,sources.facets,profile,
-  {...options,candidate_pool_limit:60},Date.now()
+  {...options,candidate_pool_limit:1200},Date.now()
  ):{matches:[],matched_official_jobs:0};
  const discovered=await autoDiscoveryCandidates(env,db,session.phone,profile,options);
  const merged=fuseDomesticJobRecommendations(
