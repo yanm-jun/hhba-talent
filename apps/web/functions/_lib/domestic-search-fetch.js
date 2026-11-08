@@ -197,15 +197,31 @@ async function providerPost(url,key,payload,maxBytes,fetcher){
  try{return await readBoundedJson(response,maxBytes);}
  catch{throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');}
 }
+// Keep Cloudflare's external connections bounded; parallel work never
+// bypasses the per-request quota. Results retain search ranking order.
+async function mapBounded(items,concurrency,worker){
+ const out=new Array(items.length);let cursor=0;
+ async function run(){
+  while(cursor<items.length){
+   const i=cursor++;
+   out[i]=await worker(items[i]);
+  }
+ }
+ await Promise.all(Array.from({length:Math.min(concurrency,items.length)},run));
+ return out;
+}
+
 export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=new Date()}={}){
  const queries=buildOfficialQueries(role);
  if(!queries.length)throw new ExternalSearchError('INVALID_SEARCH_INTENT');
  if(typeof key!=='string'||key.length<16)throw new ExternalSearchError('SEARCH_NOT_ENABLED');
  const possible=new Map(),usage={search:0,fetch:0},attempts={search:0,fetch:0};
- for(const query of queries.slice(0,SEARCH_LIMIT)){
+ const discovered=await mapBounded(queries.slice(0,SEARCH_LIMIT),2,async query=>{
   attempts.search++;
-  const response=await providerPost('https://api.deepseek.com/v1/tools/search',key,
+  return providerPost('https://api.deepseek.com/v1/tools/search',key,
    {query,count:15},250000,fetcher);
+ });
+ for(const response of discovered){
   if(!Array.isArray(response?.results))throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');
   if(response.results.length)usage.search++;
   for(const item of response.results.slice(0,15)){
@@ -229,20 +245,22 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
   }
  }
  const jobs=[];
- for(const candidate of scheduled){
-  if(attempts.fetch>=FETCH_LIMIT)break;
+ const fetched=await mapBounded(scheduled.slice(0,FETCH_LIMIT),3,async candidate=>{
   attempts.fetch++;
-  let document;
   try{
-   document=await providerPost('https://api.deepseek.com/v1/tools/fetch',key,
+   const document=await providerPost('https://api.deepseek.com/v1/tools/fetch',key,
     {url:candidate.url},500000,fetcher);
+   return {candidate,document};
   }catch(e){
-   if(e instanceof ExternalSearchError&&e.code==='SEARCH_FETCH_NOT_AVAILABLE')continue;
+   if(e instanceof ExternalSearchError&&e.code==='SEARCH_FETCH_NOT_AVAILABLE')return null;
    throw e;
   }
-  if(typeof document?.content!=='string')throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');
-  if(document.content)usage.fetch++;
-  const job=extractOfficialJob(candidate,document,now);
+ });
+ for(const item of fetched){
+  if(!item)continue;
+  if(typeof item.document?.content!=='string')throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');
+  if(item.document.content)usage.fetch++;
+  const job=extractOfficialJob(item.candidate,item.document,now);
   if(job)jobs.push(job);
  }
  const unique=new Map();
