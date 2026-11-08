@@ -43,13 +43,15 @@ test('relevant official external posting competes with internal without becoming
  assert.deepEqual(Object.keys(result.matches[0].score_breakdown),
   ['role','skills','experience','education','location']);
 });
-test('identical company and role deduplicates across cities and sources with V2 score winning',()=>{
+test('identical company and role deduplicates within a city but retains cross-city openings',()=>{
  const external=domesticOutside();
  const result=fuseDomesticJobRecommendations([
   domesticInside('original',92,'腾讯','软件开发工程师','深圳'),
   domesticInside('othercity',84,'腾讯','软件开发工程师','上海')],
  [external],profile,{role_hint:'软件开发工程师'},now);
- assert.equal(result.matches.length,1);
+ assert.equal(result.matches.length,2);
+ assert.ok(result.matches.some(x=>x.location==='上海'));
+ assert.equal(result.matches.filter(x=>x.location==='深圳').length,1);
  assert.equal(result.matches[0].source_type,'站外官方招聘');
  assert.equal(result.matches[0].ranking_version,'HHBA_MATCH_RANKING_V2');
  assert.equal(Object.values(result.matches[0].score_breakdown).reduce((a,b)=>a+b,0),
