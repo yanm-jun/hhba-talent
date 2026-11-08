@@ -166,17 +166,27 @@ export function scoreCandidateFit(profile={},job={},options={},serverApprovedPol
  const minYears=int(job.min_experience_years),years=tenuredYears(profile.experience_years);
  const levelFactor=levelFitness(job.title,years);
  const role=Math.round(weights.role*affinity*levelFactor);
- // Only verified mandatory requirements get the main (80%) skill weight.
- // Preferences are soft bonus (20%); unclassified JD tags get conservative
- // partial credit, never reclassified as mandatory by model speculation.
- const requiredPart=wanted.length?
-  Math.round(weights.skills*.8*matchedSkills.length/wanted.length):
-  unclassified.length?Math.round(weights.skills*.35*matchedUnknown/unclassified.length):
+ // Cross-source calibration: an ATS job with unclassified, same-JD-hash
+ // skill labels should not lose ~19 points versus identical fully documented
+ // requirements. Classification certainty belongs in evidence_quality, NOT
+ // hidden source bonuses/penalties or a fabricated mandatory gate.
+ // Explicit must-haves are still filtered by evaluateJobEligibility.
+ const coreMax=preferred.length?Math.round(weights.skills*.8):weights.skills;
+ const corePoints=wanted.length?
+  Math.round(coreMax*matchedSkills.length/wanted.length):0;
+ const preferredPoints=preferred.length?
+  Math.round((weights.skills-coreMax)*matchedPreferred/preferred.length):0;
+ const unclassifiedPoints=unclassified.length?
+  Math.round(weights.skills*.84*matchedUnknown/unclassified.length):0;
+ const skills=wanted.length?
+  Math.min(weights.skills,corePoints+preferredPoints+
+   (unclassified.length?Math.min(3,Math.round(unclassifiedPoints*.1)):0)):
+  unclassified.length?Math.min(weights.skills,unclassifiedPoints+preferredPoints):
+  preferred.length?Math.round(weights.skills*.30*matchedPreferred/preferred.length):
   Math.round(weights.skills*8/30);
- const bonusPart=preferred.length?
-  Math.round(weights.skills*.2*matchedPreferred/preferred.length):
-  wanted.length?Math.round(weights.skills*.2):0;
- const skills=Math.min(weights.skills,requiredPart+bonusPart);
+ const skillEvidence=wanted.length?'CLASSIFIED_REQUIREMENTS':
+  unclassified.length?'UNCLASSIFIED_JD_SKILLS':
+  preferred.length?'PREFERRED_ONLY':'NOT_DISCLOSED';
 
  const experience=minYears===null||minYears===0?Math.round(weights.experience*11/20):
   Math.round(weights.experience*Math.min(1,(16+Math.max(0,years-minYears))/20));
@@ -195,6 +205,15 @@ export function scoreCandidateFit(profile={},job={},options={},serverApprovedPol
  return {eligible:true,reason:null,score,breakdown,score_adjustment:score-rawScore,
   score_cap_applied:score<rawScore,
   role_affinity:affinity,seniority_alignment:levelFactor,
+  skill_evidence_status:skillEvidence,
+  evidence_quality:{
+   skills:skillEvidence,
+   experience:minYears===null?'NOT_DISCLOSED':'OFFICIAL_REQUIREMENT',
+   education:degree===null?'NOT_DISCLOSED':'OFFICIAL_REQUIREMENT'
+  },
+  matched_required_skills:wanted.filter(s=>have.includes(s)),
+  matched_preferred_skills:preferred.filter(s=>have.includes(s)),
+  matched_unclassified_skills:unclassified.filter(s=>have.includes(s)),
   matched_skill_count:matchedSkills.length+matchedPreferred+matchedUnknown,
   required_skill_count:wanted.length,
   preferred_skill_count:preferred.length,matched_preferred_skill_count:matchedPreferred,
