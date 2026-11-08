@@ -434,7 +434,7 @@ async function requestJson(endpoint,key,body,fetcher,max=260000,timeout=18000){
  const raw=await r.text();if(raw.length>max)throw Error('PROVIDER_RESPONSE_TOO_LARGE');
  try{return JSON.parse(raw);}catch{throw Error('PROVIDER_BAD_JSON');}
 }
-export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=new Date(),targetCount=10,auditPublicEvidence=false}={}){
+export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=new Date(),targetCount=10,auditPublicEvidence=false,browserRenderer=null}={}){
  const intents=[...new Set((Array.isArray(roles)?roles:[roles])
   .map(sanitizedJobIntent).filter(Boolean))].slice(0,2);
  if(!intents.length)throw Error('V8_NO_SAFE_ROLE');
@@ -454,6 +454,35 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
    rejectionLinks.push({url:link.url,reason});
   }
   return job;
+ };
+ // Browser Rendering is a separate, potentially billable service. It is
+ // injected ONLY by the explicit preview feature gate, never by public Search
+ // or by the model. At most two render requests per matching action.
+ let browserAttempts=0,browserRecovered=0,browserFailures=0;
+ const canRender=link=>typeof browserRenderer==='function'&&
+  (/^(?:careers?|hr|jobs|recruit)\\./i.test(link.hostname)||
+   [...sites.values()].some(site=>site.domain===link.domain));
+ const readBestEvidence=async(link,doc)=>{
+  const before={...rejections};
+  const first=traceRead(link,doc);
+  if(first)return first;
+  const reason=Object.keys(rejections).find(k=>rejections[k]>(before[k]||0));
+  if(!['FETCH_NO_TEXT','SHORT_PAGE','MISSING_ROLE_TITLE',
+       'MISSING_EXPLICIT_WORKPLACE','UNKNOWN_MAINLAND_CITY',
+       'MISSING_REQUIREMENTS','SHORT_REQUIREMENTS'].includes(reason)||
+     browserAttempts>=2||!canRender(link))return null;
+  browserAttempts++;
+  try{
+   const rendered=await browserRenderer(link.url);
+   if(!rendered)return null;
+   const recovered=traceRead(link,rendered);
+   if(recovered)browserRecovered++;
+   return recovered;
+  }catch{
+   browserFailures++;
+   rejections.BROWSER_UNAVAILABLE=(rejections.BROWSER_UNAVAILABLE||0)+1;
+   return null;
+  }
  };
  const meter=emptyV8CostMeter();let failures=0,uncertainProviderFailure=false;
  let employerLookups=0,employerLookupResults=0,companyPageReads=0;
@@ -623,7 +652,7 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
      try{
       const doc=await requestJson('/v1/tools/fetch',key,{url:link.url},fetcher,500000);
       if(typeof doc?.content==='string'&&doc.content.length>0)meter.billable_fetch++;
-      const job=traceRead(link,doc);
+      const job=await readBestEvidence(link,doc);
       if(!job)answer={status:'INCOMPLETE_OR_UNREADABLE_JOB'};
       else{
        pages.set(link.url,job);
@@ -682,7 +711,7 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
    try{
     const doc=await requestJson('/v1/tools/fetch',key,{url:link.url},fetcher,500000);
     if(typeof doc?.content==='string'&&doc.content.length>0)meter.billable_fetch++;
-    const job=traceRead(link,doc);
+    const job=await readBestEvidence(link,doc);
     if(!job)continue;
     pages.set(link.url,job);
     const verified=await corroborateJob(job,link);
@@ -696,10 +725,18 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
  return {kind:V8_AGENT_VERSION,scope:'CN_MAINLAND_ONLY',
   status:failures?'PARTIAL':'COMPLETE',
   candidates:[...confirmed.values()].slice(0,desired),usage,limit:V8_BUDGET,
-  accounting:buildV8CostReport(usage,meter,{uncertain_provider_failure:uncertainProviderFailure}),
+  accounting:(()=>{
+   const report=buildV8CostReport(usage,meter,{
+    uncertain_provider_failure:uncertainProviderFailure||browserAttempts>0});
+   return browserAttempts?{...report,
+    // Browser Rendering pricing is external to the DeepSeek estimate.
+    complete:false,browser_attempts:browserAttempts,browser_cost_estimate_cny:null,
+    note:report.note+'；另有浏览器渲染调用，未计入人民币估算费用'}:report;
+  })(),
   quality_status:confirmed.size?'VERIFIED_JOBS_FOUND':'NO_VERIFIED_JOBS',
   stats:{verified:confirmed.size,discovered:observed.size,job_details:pages.size,failures,
    postpass_job_reads:postpassJobReads,
+   browser_render:{attempts:browserAttempts,recovered:browserRecovered,failures:browserFailures},
    employer_proof:{searches:employerLookups,search_candidates:employerLookupResults,
     corporate_page_fetches:companyPageReads},
    search_quality_hints:{
