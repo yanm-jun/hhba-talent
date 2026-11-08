@@ -202,6 +202,12 @@ function sections(lines){
  const prior=lines.slice(Math.max(0,required.i-22),required.i);
  const inferred=prior.filter(x=>DUTY_PHRASE.test(x)&&x.length>=13&&x.length<=180).length>=2;
  if(!responsibility&&!inferred)return {reason:'MISSING_DUTIES'};
+ // An explicit “requirements pending / not published” heading is not a
+ // documented set of eligibility requirements, even if unrelated text follows.
+ const headerRequirement=lines[required.i].replace(REQUIREMENT_HEADER,'')
+  .replace(/^[：:\s\-]+/,'').trim();
+ if(/^(?:待定|暂无|暂未明确|待补充|另行通知|未公布)(?:$|[\s，,。；;])/u.test(headerRequirement))
+  return {reason:'MISSING_REQUIREMENTS'};
  const start=required.i+1;
  let end=Math.min(lines.length,start+48);
  for(let i=start;i<end;i++){
