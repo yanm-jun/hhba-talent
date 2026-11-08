@@ -278,7 +278,7 @@ export function readPublicJob(link,page,now=new Date(),rejections=null){
  const title=extractRole(lines,page);
  if(!title)return rejectJobEvidence(rejections,'MISSING_ROLE_TITLE');
  if(EXTERNAL.test(title))return rejectJobEvidence(rejections,'OVERSEAS_TITLE');
- const place=extractMainlandWorkplaceFromJob({raw:body,lines,role:title});
+ const place=extractMainlandWorkplaceFromJob({raw:typeof page.html==='string'&&page.html.length<=200000?page.html:body,lines,role:title});
  if(place.reason)return rejectJobEvidence(rejections,place.reason);
  const sec=sections(lines);
  if(sec.reason)return rejectJobEvidence(rejections,sec.reason);
