@@ -401,3 +401,28 @@ test('Postpass never fetches irrelevant search teaser or bypasses 4/8/20 bounds'
  assert.equal(outcome.candidates.length,0);
  assert.ok(outcome.usage.model<=4&&outcome.usage.search<=8&&outcome.usage.fetch<=20);
 });
+
+test('Domestic ATS title prefix and 投递此职位 must parse without turning listings into vacancies',()=>{
+ const url='https://www.hotjob.cn/wt/ghzq/web/index/webPositionN300!getOnePosition?brandCode=1&columnId=2&importPost=0&lanType=1&postIdEnc=a2448f2e426bfc5a&recruitType=2';
+ const link=publicJobLink(url);
+ assert.ok(link);
+ const body=[
+  '社会招聘','校园招聘','帮助中心','招聘注册与登录','欢迎访问招聘系统',
+  '首页 > 社会招聘 > 内容运营岗','内容运营岗',
+  '招聘单位：国海证券股份有限公司','工作地点：深圳市',
+  '职位描述',
+  '负责内容运营选题、资讯整理、客户增长和数据分析，持续优化用户体验。'.repeat(6),
+  '任职要求',
+  '硕士及以上学历，具有内容制作、金融信息整理与数据分析能力。'.repeat(6),
+  '投递此职位'
+ ].join('\n');
+ const p=readPublicJob(link,{title:'职位详情 - 内容运营岗',content:body},now);
+ assert.equal(p?.title,'内容运营岗');
+ assert.equal(p?.location,'深圳');
+ assert.equal(p?.company_claim,'国海证券股份有限公司');
+ assert.equal(p?.has_application_cta,true);
+ assert.equal(p?.application_status,'NEEDS_OFFICIAL_CONFIRMATION');
+ assert.equal(provePublicEmployer(p,{title:'其他企业官网',
+  content:('别家公司公开招聘网站，业务产品介绍与团队新闻。').repeat(10)},
+  'https://ghzq.com.cn/'),null);
+});
