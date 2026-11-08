@@ -40,9 +40,9 @@ const OCCUPATIONS=[
 ];
 const TRANSFERABLE=new Map([
  ['backend|software',.88],['frontend|software',.86],
- ['fullstack|backend',.7],['frontend|fullstack',.7],
+ ['backend|fullstack',.7],['frontend|fullstack',.7],
  ['data-analyst|data-scientist',.5],['data-engineer|data-scientist',.45],
- ['backend|data-engineer',.35],['software|data-engineer',.3]
+ ['backend|data-engineer',.35],['data-engineer|software',.3]
 ]);
 export function classifyOccupation(title){
  const value=typeof title==='string'?title.slice(0,140):'';
@@ -153,6 +153,11 @@ export function scoreCandidateFit(profile={},job={},options={},serverApprovedPol
   ...(Array.isArray(profile.target_roles)?profile.target_roles:[])]
   .filter(x=>typeof x==='string'&&x.length>=2).slice(0,7);
  const affinity=roleAffinity(job.title,roles);
+ const occupation=classifyOccupation(job.title);
+ const desired=roles.map(classifyOccupation).filter(Boolean);
+ // Explicitly different occupations are not rescued by a generic skill.
+ if(occupation&&desired.length&&affinity===0)
+  return {eligible:false,reason:'ROLE_DIRECTION_MISMATCH',score:null,breakdown:null};
  const wanted=[...new Set((Array.isArray(job.required_skills)?job.required_skills:[])
   .filter(x=>typeof x==='string'&&x.length<60).map(x=>x.trim()).filter(Boolean).map(x=>norm(x)))].slice(0,20);
  const have=[...new Set((Array.isArray(profile.skills)?profile.skills:[])
@@ -184,7 +189,8 @@ export function scoreCandidateFit(profile={},job={},options={},serverApprovedPol
  // Skill-only candidates with no occupation evidence may be exploratory,
  // but should never outrank a directly relevant role on generic tools alone.
  const score=affinity===0?Math.min(rawScore,55):rawScore;
- return {eligible:true,reason:null,score,breakdown,score_cap_applied:score<rawScore,
+ return {eligible:true,reason:null,score,breakdown,score_adjustment:score-rawScore,
+  score_cap_applied:score<rawScore,
   role_affinity:affinity,seniority_alignment:levelFactor,
   matched_skill_count:matchedSkills.length,
   required_skill_count:wanted.length,ranking_version:RANKING_VERSION,
