@@ -108,7 +108,10 @@ export function publicCorporatePage(value){
  if(!u||u.search||u.hash)return null;
  if(!['/','/cn','/zh','/zh-cn','/zh-CN','/about','/about-us',
   '/career','/careers','/jobs','/join','/join-us','/recruit','/recruitment',
-  '/company','/company/about'].includes(u.pathname))return null;
+  '/company','/company/about','/careers/index','/career/index',
+  '/jobs/index','/about/index','/about/company','/talent','/talents',
+  '/joinus','/join-us/index','/joinus/index','/recruit/index',
+  '/zh-cn/careers','/zh-CN/careers','/cn/careers'].includes(u.pathname))return null;
  return {url:u.href,host:u.hostname,domain:companyDomain(u.hostname)};
 }
 const CLOSED=/(?:岗位已关闭|职位已关闭|停止招聘|不再接受申请|暂停招聘|职位已下线|招聘已结束|职位已过期|岗位已下线|当前职位无法投递|已停止接受投递|no longer accepting applications|job is closed|position has been filled)/i;
@@ -276,34 +279,89 @@ function companyNameFromHomepage(homepage){
  }
  return null;
 }
-export function provePublicEmployer(job,homepage,site){
- if(!job||job.source_status!=='PUBLIC_JOB_UNCONFIRMED'||!site||
-  typeof homepage?.content!=='string'||homepage.content.length<140)return null;
- const link=publicJobLink(job.official_url);
- const corporate=publicCorporatePage(site);
- if(!link||!corporate)return null;
+const LEGAL_SUFFIX=/(?:有限责任公司|股份有限公司|集团有限公司|有限公司|集团|公司)$/u;
+const MAINLAND_PREFIX=/^(?:北京市|上海市|天津市|重庆市|北京市|上海|北京|深圳市|深圳|广州市|广州|杭州市|杭州|成都市|成都|武汉市|武汉|南京市|南京|苏州市|苏州)/u;
+function proofBrand(value){
+ const full=clean(value).replace(/[\s（）()]/g,'').toLowerCase();
+ const core=full.replace(LEGAL_SUFFIX,'').replace(MAINLAND_PREFIX,'');
+ // Require >= 4 meaningful Han/Latin chars for abbreviated-name proof.
+ return {full,core:core.length>=4?core:null};
+}
+function brandMentioned(value,brand){
+ const normalized=clean(value).replace(/[\s（）()]/g,'').toLowerCase();
+ return !!brand?.full&&(normalized.includes(brand.full)||
+  (!!brand.core&&normalized.includes(brand.core)));
+}
+function companyLinkFromPage(body,jobUrl){
+ let job;try{job=new URL(jobUrl);}catch{return null;}
+ if(typeof body!=='string')return null;
+ // A direct reference to the exact individual position is strongest.
+ // Do not accept strings in ordinary prose as a hosted board endorsement.
+ const referenced=new Set();
+ for(const m of body.matchAll(/\[([^\]]{1,100})\]\((https:\/\/[^)\s<>]{8,400})\)/gi)){
+  if(/(?:招聘|职位|岗位|应聘|人才|加入|职业|careers|jobs|apply|join us)/i.test(m[1]))
+   referenced.add(m[2].replace(/[.,，。;；]+$/,''));
+ }
+ for(const line of body.split('\n').slice(0,1000)){
+  if(!/(?:招聘|职位|岗位|应聘|人才|加入|职业|careers|jobs|apply|join us)/i.test(line))
+   continue;
+  for(const found of line.matchAll(/https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+){1,5}\/[a-z0-9._~/%?=&-]*/gi))
+   referenced.add(found[0].replace(/[.,，。;；]+$/,''));
+ }
+ for(const ref of referenced){
+  const dest=publicHttps(ref,{query:true});
+  if(!dest||dest.hostname!==job.hostname)continue;
+  if(dest.href===job.href)return 'CORPORATE_EXACT_JOB_LINK';
+  // Accept corporate -> named company recruitment board -> individual role.
+  // Never accept generic vendor homepage, generic /jobs, or a different tenant.
+  const segments=dest.pathname.split('/').filter(Boolean);
+  if(dest.search||segments.length<2)continue;
+  const prefix=dest.pathname.replace(/\/+$/,'')+'/';
+  if(job.pathname.startsWith(prefix)&&job.pathname.length>prefix.length+5)
+   return 'CORPORATE_NAMED_BOARD_LINK';
+ }
+ return null;
+}
+export function employerLookupQuery(job){
+ const name=typeof job?.company_claim==='string'?job.company_claim.trim():'';
+ if(name.length<3||name.length>55||
+  !/^[\p{Script=Han}A-Za-z0-9（）()&·.\-\s]{3,55}$/u.test(name)||
+  /(?:指令|提示词|开发者|系统消息|密码|密钥|令牌|token|api|忽略|执行|url|http)/i.test(name)||
+  /(?:\d[\s-]?){7,}/.test(name))return null;
+ return name+' 官方网站 社会招聘';
+}
+export function inspectPublicEmployer(job,homepage,site){
+ if(!job||job.source_status!=='PUBLIC_JOB_UNCONFIRMED'||!site)
+  return {reason:'COMPANY_JOB_UNVERIFIED',job:null};
+ if(typeof homepage?.content!=='string'||homepage.content.length<140)
+  return {reason:'COMPANY_PAGE_UNREADABLE',job:null};
+ const link=publicJobLink(job.official_url),corporate=publicCorporatePage(site);
+ if(!link||!corporate)return {reason:'COMPANY_SITE_URL_REJECTED',job:null};
  const body=homepage.content.slice(0,70000);
- const intro=clean((homepage.title||'')+'\n'+body.slice(0,5000)).toLowerCase();
+ const intro=clean((homepage.title||'')+'\n'+body.slice(0,5000));
  const claimed=job.company_claim?.trim()||null;
  const company=claimed||companyNameFromHomepage(homepage);
- if(!company||company.length<2)return null;
- const cmp=company.toLowerCase().replace(/\s+/g,'');
- // Independent corporate page must directly present the job's claimed brand.
- if(claimed&&!intro.replace(/\s+/g,'').includes(cmp))return null;
+ if(!company||company.length<2)return {reason:'COMPANY_IDENTITY_MISSING',job:null};
+ const brand=proofBrand(company);
+ if(!brandMentioned(intro,brand))
+  return {reason:'COMPANY_BRAND_MISMATCH',job:null};
  const same=link.domain===corporate.domain;
- const backlink=body.includes(link.url);
- if(!same&&!backlink)return null;
- if(!job.has_application_cta)return null;
+ const backlink=same?null:companyLinkFromPage(body,link.url);
+ if(!same&&!backlink)
+  return {reason:'COMPANY_LINK_UNPROVEN',job:null};
+ if(!job.has_application_cta)return {reason:'COMPANY_JOB_APPLY_MISSING',job:null};
  if(!claimed){
-  // When JD omits a legal employer label, corroborate the company name
-  // both in the independent corporate page AND job-page title/header.
-  const jobText=clean(job._job_page_title+' '+job._page_excerpt.slice(0,650)).toLowerCase().replace(/\s+/g,'');
-  if(!intro.replace(/\s+/g,'').includes(cmp)||!jobText.includes(cmp))return null;
+  const jobText=clean(job._job_page_title+' '+job._page_excerpt.slice(0,650));
+  if(!brandMentioned(jobText,brand))
+   return {reason:'COMPANY_BRAND_NOT_IN_JOB',job:null};
  }
  const {company_claim,_page_excerpt,_job_page_title,...cleanJob}=job;
- return {...cleanJob,company,source_status:'OFFICIAL_DETAIL_FETCHED',
-  source_verification:same?'CORPORATE_DOMAIN_AND_BRAND':'CORPORATE_BACKLINK',
-  employer_site:corporate.url};
+ return {reason:'VERIFIED',job:{...cleanJob,company,source_status:'OFFICIAL_DETAIL_FETCHED',
+  source_verification:same?'CORPORATE_DOMAIN_AND_BRAND':backlink,
+  employer_site:corporate.url}};
+}
+export function provePublicEmployer(job,homepage,site){
+ return inspectPublicEmployer(job,homepage,site).job;
 }
 async function requestJson(endpoint,key,body,fetcher,max=260000,timeout=18000){
  let r;try{
@@ -330,6 +388,12 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
  const pages=new Map(),confirmed=new Map(),attempted=new Set(),websiteCache=new Map();
  const rejections=Object.create(null);
  const meter=emptyV8CostMeter();let failures=0,uncertainProviderFailure=false;
+ let employerLookups=0,employerLookupResults=0,companyPageReads=0;
+ const employerLookupAttempted=new Set();
+ const recordProofFailure=reason=>{
+  const key=/^COMPANY_[A-Z_]+$/.test(reason)?reason:'COMPANY_PROOF_MISSING';
+  rejections[key]=(rejections[key]||0)+1;
+ };
  const desired=Math.max(1,Math.min(10,Number.isInteger(targetCount)?targetCount:10));
  const roleAliases=[...new Set([...intents,
   ...ALIASES.filter(a=>intents.some(role=>a[1].test(role))).flatMap(a=>a[0])])];
@@ -350,6 +414,83 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
   'Prioritize search result candidates showing evidence hints for city, requirements, duties, and apply entry, but these hints are NOT proof. Only a fetched single-job JD can prove details.',
   'No claim that a public job is currently open merely because a page exists.'
  ].join(' ');
+ async function corroborateJob(job,link){
+  const candidates=new Map();
+  const addSite=value=>{
+   const site=typeof value==='string'?publicCorporatePage(value):value;
+   if(site&&!candidates.has(site.url))candidates.set(site.url,site);
+  };
+  // Prefer pages already surfaced by Search, including cross-domain corporate
+  // career pages. Those still need fetched body corroboration.
+  for(const site of sites.values()){
+   if(site.domain===link.domain)addSite(site);
+  }
+  addSite('https://'+link.domain+'/');
+  let lastReason='COMPANY_PAGE_UNOBSERVED';
+  const visited=new Set();
+  async function tryPages(list,maxPages){
+   let considered=0;
+   for(const site of list){
+    if(considered>=maxPages)break;
+    if(visited.has(site.url))continue;
+    visited.add(site.url);
+    let doc=websiteCache.get(site.url);
+    if(!doc&&usage.fetch>=V8_BUDGET.fetch)break;
+    considered++;
+    try{
+     if(!doc){
+      usage.fetch++;companyPageReads++;
+      doc=await requestJson('/v1/tools/fetch',key,{url:site.url},fetcher,450000);
+      if(typeof doc?.content==='string'&&doc.content.length>0)meter.billable_fetch++;
+      websiteCache.set(site.url,doc);
+     }
+     const checked=inspectPublicEmployer(job,doc,site.url);
+     if(checked.job){sites.set(site.url,site);return checked.job;}
+     lastReason=checked.reason;
+    }catch{
+     failures++;uncertainProviderFailure=true;lastReason='COMPANY_PAGE_UNREADABLE';
+    }
+   }
+   return null;
+  }
+  const first=await tryPages([...candidates.values()],2);
+  if(first)return first;
+
+  // Scoped public Search fallback: only for names extracted from the ALREADY
+  // FETCHED JD, never raw user resume text or instructions from websites.
+  // At most two employer searches per matching operation, within global 8.
+  const query=employerLookupQuery(job);
+  const keyName=query?.slice(0,70);
+  if(query&&usage.search<V8_BUDGET.search&&employerLookups<2&&
+   usage.fetch<V8_BUDGET.fetch&&
+   !employerLookupAttempted.has(keyName)){
+   employerLookupAttempted.add(keyName);employerLookups++;usage.search++;
+   try{
+    const data=await requestJson('/v1/tools/search',key,
+     {query,count:10,need_content:false},fetcher);
+    if(Array.isArray(data?.results)&&data.results.length>0)meter.billable_search++;
+    const brand=proofBrand(job.company_claim);
+    const suggestions=[];
+    for(const result of (Array.isArray(data?.results)?data.results:[]).slice(0,10)){
+     const site=publicCorporatePage(result.url);
+     if(!site||visited.has(site.url))continue;
+     const words=String(result.title||'')+' '+String(result.snippet||'');
+     // Search metadata is a routing hint, never source verification.
+     const relevant=site.domain===link.domain||brandMentioned(words,brand);
+     if(!relevant)continue;
+     suggestions.push({site,score:(site.domain===link.domain?10:0)+
+      (brandMentioned(String(result.title||''),brand)?5:0)+
+      (/招聘|人才|加入我们|careers|join us/i.test(words)?2:0)});
+    }
+    suggestions.sort((a,b)=>b.score-a.score);
+    employerLookupResults+=suggestions.length;
+    const found=await tryPages(suggestions.map(x=>x.site),2);
+    if(found)return found;
+   }catch{failures++;uncertainProviderFailure=true;lastReason='COMPANY_LOOKUP_UNAVAILABLE';}
+  }
+  recordProofFailure(lastReason);
+  return null;
+ }
  for(let turn=0;turn<V8_BUDGET.model;turn++){
   usage.model++;let response;
   try{response=await requestJson('/responses',key,{
@@ -414,32 +555,8 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
       if(!job)answer={status:'INCOMPLETE_OR_UNREADABLE_JOB'};
       else{
        pages.set(link.url,job);
-       let checked=null;
-       // Independently corroborate the fetched JD using a fetched employer
-       // homepage from search; if none was indexed, try that JD's own
-       // registrable domain. Never synthesize a job or call a private ATS API.
-       const observedSite=[...sites.values()].find(v=>v.domain===link.domain);
-       const home=observedSite||publicCorporatePage('https://'+link.domain+'/');
-       if(home&&usage.fetch<V8_BUDGET.fetch){
-        try{
-         let page=websiteCache.get(home.url);
-         if(!page){
-          usage.fetch++;
-          page=await requestJson('/v1/tools/fetch',key,{url:home.url},fetcher,450000);
-          if(typeof page?.content==='string'&&page.content.length>0)meter.billable_fetch++;
-          websiteCache.set(home.url,page);
-         }
-         sites.set(home.url,home);
-         checked=provePublicEmployer(job,page,home.url);
-         if(checked)confirmed.set(checked.id,checked);
-         else rejections.COMPANY_PROOF_MISSING=(rejections.COMPANY_PROOF_MISSING||0)+1;
-        }catch{
-         failures++;uncertainProviderFailure=true;
-         rejections.COMPANY_PAGE_UNREADABLE=(rejections.COMPANY_PAGE_UNREADABLE||0)+1;
-        }
-       }else{
-        rejections.COMPANY_PAGE_UNOBSERVED=(rejections.COMPANY_PAGE_UNOBSERVED||0)+1;
-       }
+       const checked=await corroborateJob(job,link);
+       if(checked)confirmed.set(checked.id,checked);
        answer={status:checked?'PUBLIC_COMPANY_PROOF_PASSED':'FETCHED_UNVERIFIED',
         url:link.url,title:job.title,workplace:job.location,
         company_claim:job.company_claim,
@@ -495,20 +612,8 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
     const job=readPublicJob(link,doc,now,rejections);
     if(!job)continue;
     pages.set(link.url,job);
-    const observedSite=[...sites.values()].find(v=>v.domain===link.domain);
-    const home=observedSite||publicCorporatePage('https://'+link.domain+'/');
-    if(!home){rejections.COMPANY_PAGE_UNOBSERVED=(rejections.COMPANY_PAGE_UNOBSERVED||0)+1;continue;}
-    let siteDoc=websiteCache.get(home.url);
-    if(!siteDoc){
-     if(usage.fetch>=V8_BUDGET.fetch)break;
-     usage.fetch++;
-     siteDoc=await requestJson('/v1/tools/fetch',key,{url:home.url},fetcher,450000);
-     if(typeof siteDoc?.content==='string'&&siteDoc.content.length>0)meter.billable_fetch++;
-     websiteCache.set(home.url,siteDoc);
-    }
-    const verified=provePublicEmployer(job,siteDoc,home.url);
+    const verified=await corroborateJob(job,link);
     if(verified)confirmed.set(verified.id,verified);
-    else rejections.COMPANY_PROOF_MISSING=(rejections.COMPANY_PROOF_MISSING||0)+1;
    }catch{
     failures++;uncertainProviderFailure=true;
     rejections.POSTPASS_FETCH_UNAVAILABLE=(rejections.POSTPASS_FETCH_UNAVAILABLE||0)+1;
@@ -522,6 +627,8 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
   quality_status:confirmed.size?'VERIFIED_JOBS_FOUND':'NO_VERIFIED_JOBS',
   stats:{verified:confirmed.size,discovered:observed.size,job_details:pages.size,failures,
    postpass_job_reads:postpassJobReads,
+   employer_proof:{searches:employerLookups,search_candidates:employerLookupResults,
+    corporate_page_fetches:companyPageReads},
    search_quality_hints:{
     candidate_links:observed.size,
     work_city:[...observed.values()].filter(x=>searchEvidenceHints(x.search_metadata,roleAliases,now).work_city_hint).length,
