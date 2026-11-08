@@ -2,7 +2,8 @@
 // Only audited HHBA matches and independently fetched official job details may
 // be ranked. No model-generated employer/job facts or acceptance probabilities.
 import {safeOfficialJobLocator} from './domestic-search-fetch.js';
-import {scoreCandidateFit,inferOfficialSkills} from './match-ranking.js';
+import {scoreCandidateFit} from './match-ranking.js';
+import {extractSkillRequirements} from './job-skill-evidence.js';
 
 export const FUSION_VERSION='HHBA_DOMESTIC_MATCH_FUSION_V1';
 const MAX_RESULTS=10;
@@ -73,7 +74,10 @@ function experienceMinRequirement(text){
 function referencedExternal(entry,now){
  if(!entry||entry.source_type!=='站外官方招聘'||
    entry.source_status!=='OFFICIAL_DETAIL_FETCHED'||
-   entry.application_status!=='NEEDS_OFFICIAL_CONFIRMATION'||entry.has_application_cta!==true)return null;
+   entry.application_status!=='NEEDS_OFFICIAL_CONFIRMATION')return null;
+ const baiduLogin=entry.company==='百度'&&entry.official_domain==='talent.baidu.com'&&
+  entry.application_method==='OFFICIAL_DETAIL_LOGIN_REQUIRED'&&entry.has_application_cta===false;
+ if(entry.has_application_cta!==true&&!baiduLogin)return null;
  const u=safeOfficialJobLocator(entry.official_url);
  if(!u||u.company!==entry.company||u.id!==entry.id)return null;
  if(!isMainlandWorkCity(entry.location))return null;
@@ -124,14 +128,18 @@ function externalToMatch(entry,profile,options,now){
   title_zh:entry.title,location:entry.location,official_url:proof.official_url,
   platform:'official-domestic',source:entry.official_domain,remote:false,
   source_type:'站外官方招聘',reference_score:score,
-  required_skills:inferOfficialSkills(requirements),
+  ...(()=>{const skills=extractSkillRequirements(requirements);return {
+   required_skills:skills.required,preferred_skills:skills.preferred,
+   unclassified_skills:skills.unclassified};})(),
   min_experience_years:experience,
   minimum_education:Object.keys(DEGREE_RANK).find(k=>DEGREE_RANK[k]===degree)||null,
   salary:typeof entry.evidence.salary==='string'&&entry.evidence.salary.length<=60?entry.evidence.salary:null,
   experience_requirement:experience===null?'经验未注明':experience+'年以上',
   matched,not_evidenced:gaps,
   needs_verification:[
-   '企业官网详情与任职要求已抓取；网页出现申请入口，但当前是否仍接受申请必须到官网确认',
+   entry.application_method==='OFFICIAL_DETAIL_LOGIN_REQUIRED'?
+    '企业官方招聘详情可打开，但该网页未展示直接申请按钮；可能需要先登录，是否可投递尚待官网确认':
+    '企业官网详情与任职要求已抓取；网页出现申请入口，但当前是否仍接受申请必须到官网确认',
    '抓取时间：'+entry.checked_at+'；公开岗位信息可能变化'
   ],
   requirements_basis:'站外企业官方详情页面原文，非 AI 猜测职位；没有确认实时开放',
