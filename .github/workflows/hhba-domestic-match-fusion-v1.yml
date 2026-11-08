@@ -4,6 +4,8 @@ on:
     paths:
       - 'apps/web/functions/_lib/domestic-match-fusion.js'
       - 'apps/web/functions/_lib/match-ranking.js'
+      - 'apps/web/functions/_lib/job-skill-evidence.js'
+      - 'apps/web/scripts/job-skill-evidence.contract.test.mjs'
       - 'apps/web/functions/_lib/resume-tenure.js'
       - 'apps/web/scripts/resume-tenure.contract.test.mjs'
       - 'apps/web/scripts/match-ranking-v2.contract.test.mjs'
@@ -37,8 +39,9 @@ jobs:
           node --check functions/_lib/domestic-search-fetch.js
           node --check functions/_lib/domestic-match-fusion.js
           node --check functions/_lib/match-ranking.js
+          node --check functions/_lib/job-skill-evidence.js
           node --check functions/_lib/resume-tenure.js
-          node --test scripts/resume-tenure.contract.test.mjs scripts/match-ranking-v2.contract.test.mjs scripts/domestic-match-fusion.contract.test.mjs scripts/domestic-search-fetch.contract.test.mjs scripts/domestic-search-fetch.route.test.mjs
+          node --test scripts/job-skill-evidence.contract.test.mjs scripts/resume-tenure.contract.test.mjs scripts/match-ranking-v2.contract.test.mjs scripts/domestic-match-fusion.contract.test.mjs scripts/domestic-search-fetch.contract.test.mjs scripts/domestic-search-fetch.route.test.mjs
       - name: Check HHBA web production build
         working-directory: apps/web
         run: npm run build
