@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
  sanitizedJobIntent,buildOfficialQueries,safeOfficialJobLocator,
- extractOfficialJob,discoverExternalOfficialJobs,ExternalSearchError
+ extractOfficialJob,discoverExternalOfficialJobs,prioritizeOfficialSearchCandidates,ExternalSearchError
 } from '../functions/_lib/domestic-search-fetch.js';
 
 const hu='https://career.huawei.com/cn/job-details?advertisementId=46651';
@@ -255,4 +255,76 @@ test('verified Meituan job-detail shape is eligible only as open-status-unconfir
  assert.equal(r?.application_status,'NEEDS_OFFICIAL_CONFIRMATION');
  assert.equal(r?.official_url,'https://zhaopin.meituan.com/web/position/detail?jobUnionId=4747089400');
  assert.equal(r?.has_application_cta,true);
+});
+
+test('one focused content-operations intent searches multiple safe same-career terms at unchanged cost',()=>{
+ const queries=buildOfficialQueries(['内容运营','用户增长'],true);
+ assert.equal(queries.length,4);
+ assert.ok(queries[0].includes('内容运营'));
+ assert.ok(queries[1].includes('新媒体运营'));
+ assert.ok(queries[2].includes('内容策划'));
+ assert.ok(queries[3].includes('短视频内容运营'));
+ assert.ok(queries.every(x=>x.length<=128));
+ assert.ok(queries.every(x=>!x.includes('销售顾问')&&!x.includes('用户增长')));
+ const software=buildOfficialQueries('Python 开发',true);
+ assert.equal(software.length,4);
+ assert.ok(software.some(x=>x.includes('软件开发')));
+ assert.ok(software.some(x=>x.includes('后端开发')));
+});
+
+test('expanded official Fetch never wastes budget on known off-target roles',async()=>{
+ const first='2097166275703910400';
+ const url=i=>'https://careers.tencent.com/jobdesc.html?postId='+
+  String(BigInt(first)+BigInt(i));
+ const results=[
+  {url:url(1),title:'Machine Learning Engineer'},
+  {url:url(2),title:'Treasury & Payment Analyst'},
+  {url:url(3),title:'Revenue Strategy Operations Manager'},
+  {url:url(4),title:'内容运营'},
+  {url:url(5),title:'新媒体运营'},
+  {url:url(6),title:'内容策划'},
+  {url:url(7),title:'职位详情'}
+ ];
+ const selected=prioritizeOfficialSearchCandidates(results,['内容运营'],8);
+ assert.deepEqual(selected.map(x=>x.url),[url(4),url(5),url(6)]);
+ assert.equal(selected.every(x=>x.url.startsWith('https://careers.tencent.com/')),true);
+ const backend=prioritizeOfficialSearchCandidates([
+  {url:url(8),title:'Product Lead, AI-Native'},
+  {url:url(9),title:'Software Engineer - Backend'},
+  {url:url(10),title:'软件开发工程师'}
+ ],['Python 开发工程师'],8);
+ assert.deepEqual(backend.map(x=>x.url),[url(9),url(10)]);
+});
+
+test('Fetch unknown-title exploration is strictly bounded even with many official results',()=>{
+ const rows=Array.from({length:30},(_,i)=>({
+  url:'https://careers.tencent.com/jobdesc.html?postId='+String(2097166275703910400n+BigInt(i)),
+  title:'职位详情'
+ }));
+ const kept=prioritizeOfficialSearchCandidates(rows,'Python 开发工程师',8);
+ assert.equal(kept.length,2,'do not burn eight Fetch calls on generic headings');
+ assert.ok(kept.every(x=>x.title==='职位详情'));
+});
+
+test('generic verified software-engineering titles are valid Search leads, not Product Leads',()=>{
+ const first=2097166275703910400n;
+ const uri=i=>'https://careers.tencent.com/jobdesc.html?postId='+String(first+BigInt(i));
+ const rows=[
+  {url:uri(3),title:'Product Lead, AI-Native'},
+  {url:uri(4),title:'Software Engineer'},
+  {url:uri(5),title:'Software Engineer - Backend'}
+ ];
+ const selected=prioritizeOfficialSearchCandidates(rows,'Python 开发',8);
+ assert.deepEqual(selected.map(x=>x.url),[uri(5),uri(4)]);
+});
+
+test('real-world closed official pages are excluded despite complete job detail',()=>{
+ const oldDetail=detail.replace('申请岗位','当前职位无法投递');
+ const blocked=extractOfficialJob({url:mt},{title:'岗位详情',content:oldDetail},new Date('2026-11-08T00:00:00Z'));
+ assert.equal(blocked,null,'an official webpage explicitly refusing applications is not a recommendation');
+ for(const phrase of ['暂不可投递','已停止接受投递','当前岗位无法投递']){
+  const page=detail.replace('申请岗位',phrase);
+  assert.equal(extractOfficialJob({url:te},{content:page}),null,phrase);
+ }
+ assert.ok(extractOfficialJob({url:te},{content:detail}), 'real official detail may still be considered unconfirmed');
 });

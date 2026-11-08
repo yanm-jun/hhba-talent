@@ -28,7 +28,9 @@ test('Mainland job verification rejects mixed unknown or overseas work locations
  for(const location of ['北京 / 伦敦','北京 / London','北京 / 巴黎','上海 / Sydney',
   '深圳 / 伦敦','北京 / 未知城市','香港','台湾','Tokyo','中国','Remote, China']){
   assert.equal(isMainlandJobLocation(location),false,location);
-  assert.equal(evaluateJobEligibility(profile,{...job,location}).reason,'NOT_MAINLAND_JOB',location);
+  const expected=['北京 / 未知城市','中国','Remote, China'].includes(location)?
+   'WORK_LOCATION_NOT_EVIDENCED':'NOT_MAINLAND_JOB';
+  assert.equal(evaluateJobEligibility(profile,{...job,location}).reason,expected,location);
  }
  assert.equal(isVerifiedMainlandLocation({location:'三亚'},{countryCode:'CN'}),true);
  assert.equal(isVerifiedMainlandLocation({location:'北京 / 伦敦'},{countryCode:'CN'}),false);

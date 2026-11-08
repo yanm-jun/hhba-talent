@@ -9,6 +9,9 @@ on:
       - 'apps/web/src/pages/CandidateMatchPage.tsx'
       - 'apps/web/src/styles/resume-match-dialog.css'
       - 'apps/web/scripts/match-v6-tristate-intent.contract.test.mjs'
+      - 'apps/web/scripts/match-v7-guardrails-quality.contract.test.mjs'
+      - 'apps/web/scripts/match-v7-preview-live.smoke.mjs'
+      - 'apps/web/functions/_lib/career-transfer-evidence.js'
       - 'apps/web/functions/_lib/match-ranking.js'
       - 'apps/web/functions/_lib/match-explanation.js'
       - 'apps/web/scripts/match-v3-calibration.contract.test.mjs'
@@ -61,10 +64,11 @@ jobs:
           node --check functions/_lib/match-quality-evaluator.js
           node --check functions/_lib/job-skill-evidence.js
           node --check functions/_lib/job-qualification-evidence.js
+          node --check functions/_lib/career-transfer-evidence.js
           node --check functions/_lib/mainland-job-location.js
           node --check functions/_lib/resume-role-evidence.js
           node --check functions/_lib/resume-tenure.js
-          node --test scripts/match-v6-tristate-intent.contract.test.mjs scripts/match-v5-credentials.contract.test.mjs scripts/match-v5-quality-evaluation.contract.test.mjs scripts/match-v4-cross-discipline.contract.test.mjs scripts/match-v3-calibration.contract.test.mjs scripts/match-audit-hardgates.contract.test.mjs scripts/job-skill-evidence.contract.test.mjs scripts/resume-tenure.contract.test.mjs scripts/match-ranking-v2.contract.test.mjs scripts/domestic-match-fusion.contract.test.mjs scripts/domestic-search-fetch.contract.test.mjs scripts/domestic-search-fetch.route.test.mjs
+          node --test scripts/match-v7-guardrails-quality.contract.test.mjs scripts/match-v6-tristate-intent.contract.test.mjs scripts/match-v5-credentials.contract.test.mjs scripts/match-v5-quality-evaluation.contract.test.mjs scripts/match-v4-cross-discipline.contract.test.mjs scripts/match-v3-calibration.contract.test.mjs scripts/match-audit-hardgates.contract.test.mjs scripts/job-skill-evidence.contract.test.mjs scripts/resume-tenure.contract.test.mjs scripts/match-ranking-v2.contract.test.mjs scripts/domestic-match-fusion.contract.test.mjs scripts/domestic-search-fetch.contract.test.mjs scripts/domestic-search-fetch.route.test.mjs
       - name: Check HHBA web production build
         working-directory: apps/web
         run: npm run build
@@ -77,3 +81,8 @@ jobs:
           HHBA_DOMESTIC_PILOT_PREVIEW: https://69dffa55.hhba-talent.pages.dev
           HHBA_DOMESTIC_PILOT_EXPECT_ENABLED: '1'
         run: node scripts/domestic-search-preview-http.smoke.mjs
+      - name: Real V7 branch HTTPS Preview routes and anonymous API guard (no AI spend)
+        working-directory: apps/web
+        env:
+          HHBA_MATCH_V7_PREVIEW: https://feature-match-v7-qualificati.hhba-talent.pages.dev
+        run: node scripts/match-v7-preview-live.smoke.mjs

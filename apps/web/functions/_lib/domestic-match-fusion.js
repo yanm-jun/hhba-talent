@@ -4,10 +4,11 @@
 import {safeOfficialJobLocator} from './domestic-search-fetch.js';
 import {scoreCandidateFit} from './match-ranking.js';
 import {extractSkillRequirements,extractStructuredSkillConditions} from './job-skill-evidence.js';
-import {isMainlandJobLocation} from './mainland-job-location.js';
+import {isMainlandJobLocation,findMainlandCity} from './mainland-job-location.js';
 import {explainFinalJobScore} from './match-explanation.js';
 import {extractMandatoryProfessionalCredentials,extractStructuredCredentialConditions,professionalPracticeReview} from './professional-credentials.js';
 import {assessJobQualification} from './job-qualification-evidence.js';
+import {groundedCareerTransfer} from './career-transfer-evidence.js';
 import {classifyOccupation} from './match-ranking.js';
 
 export const FUSION_VERSION='HHBA_DOMESTIC_MATCH_FUSION_V1';
@@ -30,10 +31,15 @@ function textSafe(value,max=260){
 }
 export function isMainlandWorkCity(value){return isMainlandJobLocation(value);}
 function canonicalRoleKey(job){
- const city=textSafe(job.location,50);
+ const work=textSafe(job.location,70);
+ const city=/(?:\/|、|,|，|；|;)/.test(work)?
+  flat(work):flat(findMainlandCity(work)||work);
+ const department=flat(textSafe(job.department,70));
  let title=flat(job.title);
- if(city)title=title.replace(flat(city),'');
- return flat(job.company)+'|'+title;
+ if(work)title=title.replace(flat(work),'');
+ // Keep actual same-city duplicates together, without collapsing separate
+ // cities or distinct departments with independently verified job details.
+ return flat(job.company)+'|'+title+'|'+city+'|'+department;
 }
 function compatibleRole(title,targets){
  const name=flat(title);
@@ -98,6 +104,25 @@ function referencedExternal(entry,now){
  if(!Number.isFinite(timestamp)||timestamp>now+5*60*1000||now-timestamp>MAX_EVIDENCE_AGE_MS)return null;
  return {official_url:u.url,ageHours:Math.max(0,(now-timestamp)/3600000)};
 }
+function matchesDeclaredDirection(job,profile,options){
+ const requested=[textSafe(options?.role_hint,80),...(profile.career_intents||[])]
+  .filter(x=>typeof x==='string'&&x.trim().length>=2);
+ const kinds=new Set(requested.map(classifyOccupation).filter(Boolean));
+ if(!kinds.size)return true; // no recognized direction: exploratory matching
+ const title=String(job.title||''),kind=classifyOccupation(title);
+ const hint=textSafe(options?.role_hint,80);
+ const focused=hint.trim()?[hint]:requested;
+ const contentFocus=focused.some(x=>/(?:内容运营|内容策划|新媒体|社交媒体|短视频运营|用户增长|内容营销)/i.test(x));
+ if(contentFocus&&!/(?:内容|新媒体|社交媒体|用户增长|增长运营|content|social media|community|growth[\s-]+(?:marketing|operations))/i.test(title))return false;
+ if(kind&&kinds.has(kind))return true;
+ // Backend and general software engineer roles can overlap, but
+ // managerial/field/other occupations should not pad an explicit shortlist.
+ if(kinds.has('backend')&&kind==='software'&&
+  /(?:software[\s-]+(?:development[\s-]+)?engineer|software[\s-]+developer|软件开发|软件工程师|研发工程师)/i.test(title)&&
+  !/(?:manager|负责人|director|lead|head[\s-]+of|principal)/i.test(title))return true;
+ if(kinds.has('software')&&['backend','frontend','fullstack'].includes(kind))return true;
+ return false;
+}
 function safeProfile(profile){
  return {
   skills:(Array.isArray(profile?.skills)?profile.skills:[]).slice(0,12)
@@ -130,12 +155,22 @@ function externalToMatch(entry,profile,options,now){
   title_zh:entry.title,location:entry.location,official_url:proof.official_url,
   platform:'official-domestic',source:entry.official_domain,remote:false,
   source_type:'站外官方招聘',reference_score:0,
-  ...(()=>{const skills=extractSkillRequirements(requirements);return {
-   required_skills:skills.required,mandatory_skills:skills.mandatory,
-   preferred_skills:skills.preferred,unclassified_skills:skills.unclassified,
-   skill_conditions:extractStructuredSkillConditions(requirements)};})(),
-  professional_credential_requirements:extractMandatoryProfessionalCredentials(requirements).mandatory,
-  credential_conditions:extractStructuredCredentialConditions(requirements),
+  ...(()=>{
+   const skills=extractSkillRequirements(requirements);
+   const groups=extractStructuredSkillConditions(requirements);
+   const covered=new Set(groups.filter(g=>g.operator!=='ALL_OF').flatMap(g=>g.values.map(v=>v.toLowerCase())));
+   return {required_skills:skills.required,preferred_skills:skills.preferred,
+    unclassified_skills:skills.unclassified,
+    mandatory_skills:skills.mandatory.filter(v=>!covered.has(v.toLowerCase())),
+    skill_conditions:groups};
+  })(),
+  ...(()=>{
+   const legacy=extractMandatoryProfessionalCredentials(requirements).mandatory;
+   const groups=extractStructuredCredentialConditions(requirements);
+   const covered=new Set(groups.filter(g=>g.operator!=='ALL_OF').flatMap(g=>g.values));
+   return {professional_credential_requirements:legacy.filter(v=>!covered.has(v)),
+    credential_conditions:groups};
+  })(),
   min_experience_years:experience,
   minimum_education:Object.keys(DEGREE_RANK).find(k=>DEGREE_RANK[k]===degree)||null,
   salary:typeof entry.evidence.salary==='string'&&entry.evidence.salary.length<=60?entry.evidence.salary:null,
@@ -174,6 +209,7 @@ export function fuseDomesticJobRecommendations(inside=[],outside=[],rawProfile={
  const desired=[textSafe(options?.role_hint,80),...(profile.career_intents||[]),
   ...(profile.demonstrated_roles||profile.target_roles||[])].filter(Boolean);
  const scored=[...internal,...external].map(job=>{
+  if(!matchesDeclaredDirection(job,profile,options))return null;
   const decision=assessJobQualification(profile,job);
   if(decision.status==='NEEDS_INFORMATION'){
    const kind=classifyOccupation(job.title);
@@ -192,7 +228,11 @@ export function fuseDomesticJobRecommendations(inside=[],outside=[],rawProfile={
   const fit=scoreCandidateFit(profile,job,options);
   if(!fit.eligible)return null;
   const rationale=explainFinalJobScore(profile,job,fit);
-  return {...job,reference_score:fit.score,score_breakdown:fit.breakdown,
+  const transfer=groundedCareerTransfer(rawProfile,job);
+  if(transfer)rationale.not_evidenced.push(
+   '可迁移能力：'+transfer.supporting_skills.join('、')+
+   '；不代表已有该职位的工作经历，仍需核实具体岗位要求');
+  return {...job,career_transfer:transfer,reference_score:fit.score,score_breakdown:fit.breakdown,
    evidence_quality:fit.evidence_quality,
    professional_credential_requirements:job.professional_credential_requirements||[],
    professional_credential_review:professionalPracticeReview(job.title),
@@ -225,6 +265,10 @@ export function fuseDomesticJobRecommendations(inside=[],outside=[],rawProfile={
   if(chosen.length>=max)break;
   if(!chosenIds.has(job.id))add(job);
  }
+ // Diversity affects inclusion, not display order. Second-pass employer-cap
+ // relaxation must not place lower-scored roles before higher-scored ones.
+ chosen.sort((a,b)=>b.reference_score-a.reference_score||
+  b.rankEvidence-a.rankEvidence||a.id.localeCompare(b.id));
  return {
   kind:FUSION_VERSION,scope:'CN_MAINLAND_ONLY',
   matches:chosen.map(({rankEvidence,sourceDate,...j})=>j),

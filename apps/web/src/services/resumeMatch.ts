@@ -22,6 +22,8 @@ export type MatchedJob = {
   min_experience_years?:number|null;minimum_education?:string|null;
   professional_credential_requirements?:string[];
   professional_credential_review?:{kind:string;likely_credential:string;warning:string}|null;
+  career_transfer?:{kind:'EVIDENCED_TRANSFER_DIRECTION_ONLY';label:string;
+   supporting_skills:string[];disclaimer:string}|null;
   score_breakdown?:{role:number;skills:number;experience:number;education:number;location:number};
   score_reasoning?:string;
   evidence_quality?:{skills:string;experience:string;education:string};
@@ -71,7 +73,7 @@ export class MatchError extends Error {
  constructor(public readonly status:number,message:string){super(message);this.name='MatchError'}
 }
 function session(){
- if(!realAuthReady)throw new MatchError(401,'请在 HHBA 正式站登录求职账户。');
+ if(!realAuthReady)throw new MatchError(401,'当前页面尚未启用账户登录，请打开已启用登录的 HHBA 站点。');
  const token=getRealAuthToken();
  if(!token)throw new MatchError(401,'请先登录求职者账号，再使用 AI 匹配。');
  return token;

@@ -29,7 +29,12 @@ const translatedTitles:[RegExp,string][]=[
  [/^sales manager$/i,'销售经理'],
  [/^product designer$/i,'产品设计师'],
  [/^graphic designer$/i,'平面设计师'],
- [/^account manager$/i,'客户经理']
+ [/^account manager$/i,'客户经理'],
+ [/^software engineer[\\s,\\-–—]+backend$/i,'后端软件开发工程师'],
+ [/^software engineer[\\s,\\-–—]+frontend$/i,'前端软件开发工程师'],
+ [/^software engineer[\\s,\\-–—]+fullstack$/i,'全栈软件开发工程师'],
+ [/^software engineer[\\s,\\-–—]+ubuntu commercial computers$/i,'Ubuntu 商用电脑软件开发工程师'],
+ [/^software engineer(?:\\s+(?:i|ii|iii|iv))?$/i,'软件开发工程师']
 ];
 function chineseJobTitle(item:MatchedJob):string|null{
  const named=item.title_zh?.trim()||'';
@@ -51,8 +56,10 @@ const cityNames:Record<string,string>={
 };
 function chineseLocation(location:string){
  if(/[\u3400-\u9fff]/.test(location))return location;
- const key=location.toLowerCase().split(/[\s,\/]+/)[0];
- return cityNames[key]||location;
+ const lower=location.toLowerCase();
+ const selected=Object.entries(cityNames).find(([en])=>
+  new RegExp('(?:^|[^a-z])'+en+'(?:$|[^a-z])').test(lower));
+ return selected?.[1]||'中国大陆（城市见官网）';
 }
 function officialLink(item:MatchedJob){
  if(item.source_type==='站外官方招聘')return safeExternalJobApplicationUrl(item);

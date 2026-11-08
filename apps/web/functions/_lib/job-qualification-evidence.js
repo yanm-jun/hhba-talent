@@ -9,7 +9,7 @@
  * Missing a certificate/skill in a resume is UNKNOWN, not proof of absence.
  * Never treat unstructured employer prose or preferences as a hard gate.
  */
-import {isMainlandJobLocation} from './mainland-job-location.js';
+import {classifyMainlandJobLocation} from './mainland-job-location.js';
 import {credentialLabel} from './professional-credentials.js';
 
 const DEGREE_RANK=Object.freeze({HIGH_SCHOOL:1,ASSOCIATE:2,BACHELOR:3,MASTER:4,PHD:5});
@@ -33,8 +33,12 @@ function groupsOf(source,validKind){
 /** Returns a safe, displayable summary without resume or source excerpts. */
 export function assessJobQualification(profile={},job={}){
  const missing=[],failedConditions=[];
- if(!isMainlandJobLocation(job.location))
-  failedConditions.push(failed('NOT_MAINLAND_JOB','实际工作地点无法确认位于中国大陆'));
+ const locationStatus=classifyMainlandJobLocation(job.location);
+ if(locationStatus==='OUTSIDE_MAINLAND')
+  failedConditions.push(failed('NOT_MAINLAND_JOB','职位明确包含中国大陆以外的工作地点'));
+ else if(locationStatus==='UNKNOWN')
+  missing.push(unknown('WORK_LOCATION_NOT_EVIDENCED',
+   '招聘页面尚未明确中国大陆实际工作城市，需要进一步查询企业官网','location'));
  const years=Number.isFinite(profile.experience_years)&&
   profile.experience_years>=0&&profile.experience_years<=50?profile.experience_years:null;
  const minYears=Number.isInteger(job.min_experience_years)&&
@@ -60,7 +64,9 @@ export function assessJobQualification(profile={},job={}){
  const mandatory=[...new Set((Array.isArray(job.mandatory_skills)?job.mandatory_skills:[])
   .filter(s=>typeof s==='string'&&s.length<60).map(norm).filter(Boolean))];
  const skillGroups=groupsOf(job.skill_conditions,()=>true);
- const covered=new Set(skillGroups.flatMap(g=>g.values.filter(x=>g.operator==='ALL_OF').map(norm)));
+ // Structured clauses supersede overlapping legacy flat lists, including
+ // ANY_OF and AT_LEAST (otherwise a choice silently becomes ALL_OF).
+ const covered=new Set(skillGroups.flatMap(g=>g.values.map(norm)));
  for(const skill of mandatory){
   if(!covered.has(skill)&&!haveSkills.has(skill))
    missing.push(unknown('MANDATORY_SKILL_NOT_EVIDENCED',
@@ -82,7 +88,7 @@ export function assessJobQualification(profile={},job={}){
  const required=[...new Set((Array.isArray(job.professional_credential_requirements)?
   job.professional_credential_requirements:[]).filter(id=>supportedIds.has(id)))];
  const credentialGroups=groupsOf(job.credential_conditions,id=>supportedIds.has(id));
- const grouped=new Set(credentialGroups.filter(g=>g.operator==='ALL_OF').flatMap(g=>g.values));
+ const grouped=new Set(credentialGroups.flatMap(g=>g.values));
  for(const id of required){
   if(!grouped.has(id)&&!held.has(id))
    missing.push(unknown('PROFESSIONAL_CREDENTIAL_NOT_EVIDENCED',

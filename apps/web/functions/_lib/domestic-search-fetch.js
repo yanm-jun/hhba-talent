@@ -18,7 +18,7 @@ const OFFICIAL={
   company:'京东',path:'/web/job-info-detail',idParam:'requementId',idPattern:/^\d{3,12}$/},
 };
 const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macau|macao|taiwan|taipei|tokyo|japan|singapore|united states|美国|日本|新加坡)/i;
-const CLOSED=/(?:职位已关闭|该职位已下线|岗位已下线|停止招聘|暂停招聘|不再接受申请|招聘已结束|岗位已关闭|职位已过期|目前暂时未有岗位开放)/i;
+const CLOSED=/(?:职位已关闭|该职位已下线|岗位已下线|停止招聘|暂停招聘|不再接受申请|招聘已结束|岗位已关闭|职位已过期|目前暂时未有岗位开放|当前职位无法投递|当前岗位无法投递|职位无法投递|暂时无法投递|暂不可投递|已停止接受投递)/i;
 const HAS_DUTIES=/(?:岗位职责|工作职责|职位职责|岗位描述|工作内容|主要职责)/;
 const HAS_REQUIREMENTS=/(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求|职责要求)/;
 const HAS_APPLY=/(?:申请岗位|立即申请|立即投递|投递岗位|投递简历|申请职位)/;
@@ -82,24 +82,40 @@ export function sanitizedJobIntent(value){
  ];
  return catalog.find(([rule])=>rule.test(s))?.[1]||null;
 }
+// Fixed, server-owned search aliases. They are discovery hints, NEVER
+// evidence of an applicant's skills or of a position's active status.
+const OFFICIAL_QUERY_VARIANTS=Object.freeze({
+ '内容运营':['内容运营','新媒体运营','内容策划','短视频内容运营'],
+ '用户运营':['用户运营','社群运营','用户增长运营','社区运营'],
+ 'Python 开发':['Python 开发','后端开发','软件开发','Python 后端'],
+ '后端开发':['后端开发','服务端开发','软件开发','后端工程师'],
+ '软件开发':['软件开发','软件工程师','研发工程师','软件开发'],
+ '数据分析师':['数据分析师','业务数据分析','商业分析','数据分析师'],
+ '影视剪辑师':['影视剪辑师','视频剪辑','影视后期','短视频剪辑'],
+ '市场营销':['市场营销','品牌营销','市场推广','数字营销']
+});
 export function buildOfficialQueries(role,expanded=false){
  // Up to three evidence-backed Chinese job directions share the SAME fixed
  // provider request budget; no resume text, personal info or arbitrary URLs.
  const intents=[...new Set((Array.isArray(role)?role:[role])
   .map(sanitizedJobIntent).filter(Boolean))].slice(0,3);
  if(!intents.length)return [];
- const clean=intents[0];
+ const clean=intents[0],alternatives=OFFICIAL_QUERY_VARIANTS[clean]||[clean];
  const base=[
   clean+' 招聘 site:careers.tencent.com OR site:zhaopin.meituan.com',
   clean+' 招聘 site:career.huawei.com'
  ];
  if(expanded){
-  // Same four-search budget as before; Baidu adds a fifth independently
-  // authenticated employer, not a model-invented "all China" job directory.
-  base[1]=(intents[1]||clean)+' 招聘 site:career.huawei.com OR site:talent.baidu.com/jobs/detail/SOCIAL/';
+  // Keep the same four bounded Search calls while broadening one stated
+  // occupation using curated aliases, not unverified resume text or a
+  // different previously held profession.
+  const second=intents[1]||alternatives[1]||clean;
+  const third=intents[2]||alternatives[2]||clean;
+  const fourth=intents.length>1?clean:alternatives[3]||clean;
+  base[1]=second+' 招聘 site:career.huawei.com OR site:talent.baidu.com/jobs/detail/SOCIAL/';
   base.push(
-   (intents[2]||clean)+' 工作地点 中国 职位 site:jobs.bytedance.com/experienced/position/',
-   clean+' 工作地点 中国 岗位 site:zhaopin.jd.com/web/job-info-detail'
+   third+' 工作地点 中国 职位 site:jobs.bytedance.com/experienced/position/',
+   fourth+' 工作地点 中国 岗位 site:zhaopin.jd.com/web/job-info-detail'
   );
  }
  return base.map(q=>q.slice(0,128));
@@ -230,9 +246,18 @@ async function providerPost(url,key,payload,maxBytes,fetcher){
  catch{throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');}
 }
 /** Search titles are untrusted discovery hints, never official JD evidence. */
+/** Search-result titles are untrusted. Allocate Fetch to relevant titles
+ * first, with at most two exploratory unknown-title pages; actual job facts
+ * still MUST come from fetched, independently checked official details. */
 export function prioritizeOfficialSearchCandidates(rows,role,maxFetch){
- const roles=(Array.isArray(role)?role:[role]).map(sanitizedJobIntent).filter(Boolean);
+ const roles=[...new Set((Array.isArray(role)?role:[role])
+  .map(sanitizedJobIntent).filter(Boolean))];
  const kinds=new Set(roles.map(classifyOccupation).filter(Boolean));
+ const focusedContent=roles.includes('内容运营');
+ const focusedUserOps=roles.includes('用户运营');
+ const titleFocus=focusedContent?
+  /(?:内容|新媒体|社交媒体|短视频|公众号|文案|content|social[\s-]?media|editorial)/i:
+  focusedUserOps?/(?:用户|社群|社区|增长|user|community|growth)/i:null;
  const scored=[];
  for(const [index,row] of (Array.isArray(rows)?rows:[]).entries()){
   const locator=safeOfficialJobLocator(row?.url);
@@ -241,22 +266,47 @@ export function prioritizeOfficialSearchCandidates(rows,role,maxFetch){
   const kind=classifyOccupation(snippet);
   const normalized=snippet.toLowerCase().replace(/\s+/g,'');
   const exact=roles.some(r=>r.length>=4&&normalized.includes(r.toLowerCase().replace(/\s+/g,'')));
-  const relevance=exact?3:kind&&kinds.has(kind)?2:!kind?1:0;
+  const backendSoftware=kinds.has('backend')&&kind==='software'&&
+   /(?:software[\s-]+(?:development[\s-]+)?engineer|software[\s-]+developer|软件工程师|软件开发工程师)/i.test(snippet)&&
+   !/(?:manager|director|lead|head[\s-]+of|负责人|总监)/i.test(snippet);
+  // A Search teaser saying "revenue operations", "machine learning", etc.
+  // must not consume a content-operations applicant's official Fetch budget.
+  if(titleFocus&&!titleFocus.test(snippet))continue;
+  if(kind&&kinds.size&&!kinds.has(kind)&&!backendSoftware)continue;
+  const relevance=exact?3:kind&&kinds.has(kind)||backendSoftware?2:!kind?1:0;
+  if(relevance===0)continue;
   scored.push({...row,url:locator.url,company:locator.company,relevance,index});
  }
  scored.sort((a,b)=>b.relevance-a.relevance||a.index-b.index);
  const candidates=[],selected=new Set(),byEmployer=new Map();
  const limit=Math.min(8,Math.max(1,Math.trunc(maxFetch)||1));
- for(const row of scored){
-  if(selected.has(row.url)||(byEmployer.get(row.company)||0)>=2)continue;
+ const knownCount=scored.filter(x=>x.relevance>=2).length;
+ // Preserve limited discovery of a generic official result only when we
+ // cannot see its actual title until fetching the exact JD.
+ const maxUnknown=knownCount?1:2;let unknownCount=0;
+ const add=(row)=>{
+  if(!row||selected.has(row.url)||candidates.length>=limit)return false;
+  if(row.relevance===1&&unknownCount>=maxUnknown)return false;
   candidates.push(row);selected.add(row.url);
+  if(row.relevance===1)unknownCount++;
   byEmployer.set(row.company,(byEmployer.get(row.company)||0)+1);
+  return true;
+ };
+ // When multiple occupations were explicitly requested, reserve one verified
+ // detail-fetch slot per recognizable direction before general ranking.
+ for(const kind of kinds){
   if(candidates.length>=limit)break;
+  add(scored.find(row=>classifyOccupation(row.title)===kind&&
+   !selected.has(row.url)&&(byEmployer.get(row.company)||0)<2));
+ }
+ for(const row of scored){
+  if(candidates.length>=limit)break;
+  if((byEmployer.get(row.company)||0)>=2)continue;
+  add(row);
  }
  if(candidates.length<limit)for(const row of scored){
-  if(selected.has(row.url))continue;
-  candidates.push(row);selected.add(row.url);
   if(candidates.length>=limit)break;
+  add(row);
  }
  return candidates.map(({relevance,index,company,...row})=>row);
 }
@@ -270,16 +320,36 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
  // twelve sequential provider timeouts; the legacy small pilot stays unchanged.
  const searchOne=(query)=>providerPost('https://api.deepseek.com/v1/tools/search',key,
   {query,count:expanded?12:6,need_content:false},250000,fetcher);
- const searchResults=expanded?await Promise.all(queries.slice(0,maxSearch).map(searchOne)):null;
+ // Expanded discovery tolerates partial provider outages. A failed Search
+ // must not discard other paid, successful Search results from this batch.
+ // Fail closed only when every Search attempt fails.
+ const searchResults=expanded?await Promise.allSettled(queries.slice(0,maxSearch).map(searchOne)):null;
+ let successfulSearches=0,lastSearchError=null,failedSearches=0,failedFetches=0;
  for(let i=0;i<Math.min(maxSearch,queries.length);i++){
-  const response=expanded?searchResults[i]:await searchOne(queries[i]);
-  if(!Array.isArray(response?.results))throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');
+  let response;
+  if(expanded){
+   const attempt=searchResults[i];
+   if(attempt.status==='rejected'){
+    lastSearchError=attempt.reason;failedSearches++;
+    continue;
+   }
+   response=attempt.value;
+  }else response=await searchOne(queries[i]);
+  if(!Array.isArray(response?.results)){
+   if(!expanded)throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');
+   lastSearchError=new ExternalSearchError('SEARCH_RESPONSE_INVALID');
+   failedSearches++;continue;
+  }
+  successfulSearches++;
   if(response.results.length)usage.search++;
   for(const item of response.results.slice(0,expanded?12:6)){
    const loc=safeOfficialJobLocator(item?.url);
    if(loc&&!possible.has(loc.id))possible.set(loc.id,{...item,url:loc.url});
   }
  }
+ if(expanded&&successfulSearches===0)
+  throw lastSearchError instanceof ExternalSearchError?lastSearchError:
+   new ExternalSearchError('SEARCH_PROVIDER_ERROR');
  const jobs=[];
  const candidates=expanded?
   prioritizeOfficialSearchCandidates([...possible.values()],role,maxFetch):
@@ -302,8 +372,13 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
   const fetched=await Promise.allSettled(candidates.map(fetchOne));
   for(const row of fetched){
    if(row.status==='fulfilled'&&row.value)jobs.push(row.value);
-   else if(row.status==='rejected')
+   else if(row.status==='rejected'){
+    failedFetches++;
     console.warn('HHBA_MATCH_OFFICIAL_DETAIL_FAILED');
+   }else if(row.status==='fulfilled'&&row.value===null){
+    // The official Fetch endpoint or page was not available.
+    failedFetches++;
+   }
   }
  }else{
   for(const candidate of candidates){
@@ -311,15 +386,19 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
    if(job)jobs.push(job);
   }
  }
- // A company can have many SEO/city copies of the same role: prefer unique
- // employer+position without fabricating a vacancy to reach Top10.
+ // Keep independently fetched official vacancies in different Mainland
+ // cities; only collapse same-employer, same-title, same-city copies.
+ // The downstream fusion already makes city part of its canonical role key.
  const unique=new Map();
  for(const job of jobs){
-  const signature=job.company.toLowerCase()+'|'+job.title.toLowerCase();
+  const signature=[job.company,job.title,job.location]
+   .map(value=>String(value||'').normalize('NFKC').trim().toLowerCase()).join('|');
   if(!unique.has(signature))unique.set(signature,job);
  }
  return {kind:EXTERNAL_DISCOVERY_VERSION,scope:'CN_MAINLAND_ONLY',
   candidates:[...unique.values()].slice(0,maxFetch),
   candidate_count:unique.size,usage,max_search_requests:maxSearch,max_fetch_requests:maxFetch,
+  status:failedSearches||failedFetches?'PARTIAL':'COMPLETE',
+  failures:{search:failedSearches,fetch:failedFetches},
   disclaimer:'仅核验企业官方网站的岗位详情，不保证仍可投递；不代表录用概率。'};
 }

@@ -43,13 +43,15 @@ test('relevant official external posting competes with internal without becoming
  assert.deepEqual(Object.keys(result.matches[0].score_breakdown),
   ['role','skills','experience','education','location']);
 });
-test('identical company and role deduplicates across cities and sources with V2 score winning',()=>{
+test('identical company and role deduplicates within a city but retains cross-city openings',()=>{
  const external=domesticOutside();
  const result=fuseDomesticJobRecommendations([
   domesticInside('original',92,'腾讯','软件开发工程师','深圳'),
   domesticInside('othercity',84,'腾讯','软件开发工程师','上海')],
  [external],profile,{role_hint:'软件开发工程师'},now);
- assert.equal(result.matches.length,1);
+ assert.equal(result.matches.length,2);
+ assert.ok(result.matches.some(x=>x.location==='上海'));
+ assert.equal(result.matches.filter(x=>x.location==='深圳').length,1);
  assert.equal(result.matches[0].source_type,'站外官方招聘');
  assert.equal(result.matches[0].ranking_version,'HHBA_MATCH_RANKING_V2');
  assert.equal(Object.values(result.matches[0].score_breakdown).reduce((a,b)=>a+b,0),
@@ -78,13 +80,13 @@ test('hard education and experience mismatches block false high scores',()=>{
  const result=fuseDomesticJobRecommendations([],jobs,profile,{role_hint:'软件开发工程师'},now);
  assert.equal(result.matches.length,0);
 });
-test('skill-only matching is grounded by fetched requirement wording',()=>{
+test('unknown occupation cannot override a different explicit goal through shared tools',()=>{
  const result=fuseDomesticJobRecommendations([],
  [domesticOutside('2097166275703910403',{title:'工程平台支持',evidence:{
   title:'工程平台支持',location:'深圳',requirement:'使用 Python 与 SQL 管理数据库、解决平台问题，至少本科及以上，具备排障经验。'}})],
  profile,{role_hint:'金融分析师'},now);
- assert.equal(result.matches.length,1);
- assert.ok(result.matches[0].matched.some(x=>x.includes('Python')));
+ assert.equal(result.matches.length,0);
+ assert.equal(result.counts.selected_external,0);
 });
 test('no forced 10, keeps distinct employers and caps at ten in a large mixed pool',()=>{
  const inside=[];
@@ -172,4 +174,25 @@ test('3 years experience never matches a posting requiring at least 7 years',()=
   const result=fuseDomesticJobRecommendations([],[row],profile,{role_hint:'软件开发工程师'},now);
   assert.equal(result.matches.length,0,requirement);
  }
+});
+
+test('Top10 display stays globally score-sorted after diversity fallback',()=>{
+ const strong=['北京','上海','广州','深圳'].map((city,i)=>
+  domesticInside('rank-city-'+i,75,'企业甲','软件开发工程师',city));
+ const weaker={
+  ...domesticInside('rank-alt',55,'企业乙','软件开发工程师','成都'),
+  required_skills:['暂未掌握的业务技能']
+ };
+ const result=fuseDomesticJobRecommendations([...strong,weaker],[],profile,
+  {role_hint:'软件开发工程师',limit:5},now);
+ assert.equal(result.matches.length,5);
+ assert.equal(result.matches.filter(x=>x.company==='企业甲').length,4);
+ assert.equal(result.matches.filter(x=>x.company==='企业乙').length,1);
+ assert.ok(result.matches.find(x=>x.company==='企业甲').reference_score>
+  result.matches.find(x=>x.company==='企业乙').reference_score);
+ for(let i=1;i<result.matches.length;i++){
+  assert.ok(result.matches[i-1].reference_score>=result.matches[i].reference_score,
+   'top list should be displayed in descending reference score order');
+ }
+ assert.equal(result.matches[result.matches.length-1].company,'企业乙');
 });
