@@ -12,6 +12,8 @@ const OFFICIAL={
   company:'华为',path:'/cn/job-details',idParam:'advertisementId',idPattern:/^\d{1,12}$/},
  'zhaopin.meituan.com':{
   company:'美团',path:'/web/position/detail',idParam:'jobUnionId',idPattern:/^\d{8,14}$/},
+ 'zhaopin.jd.com':{
+  company:'京东',path:'/web/job-info-detail',idParam:'requementId',idPattern:/^\d{3,12}$/},
 };
 const CITY_NAMES=[
  '北京','上海','天津','重庆','深圳','广州','杭州','南京','苏州','成都','武汉','西安',
@@ -46,7 +48,7 @@ export function buildOfficialQueries(role,expanded=false){
  ];
  if(expanded)base.push(
   clean+' 工作地点 中国 职位 site:jobs.bytedance.com/experienced/position/',
-  clean+' 中国 招聘 site:careers.tencent.com OR site:jobs.bytedance.com'
+  clean+' 工作地点 中国 岗位 site:zhaopin.jd.com/web/job-info-detail'
  );
  return base.map(q=>q.slice(0,128));
 }
