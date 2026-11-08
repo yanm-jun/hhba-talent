@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
  RANKING_VERSION,DEFAULT_RANKING_WEIGHTS,isMainlandWorkCity,
- inferOfficialSkills,evaluateJobEligibility,scoreCandidateFit,
+ inferOfficialSkills,evaluateJobEligibility,scoreCandidateFit,classifyOccupation,classifySeniority,
  proposeFeedbackWeightUpdate
 } from '../functions/_lib/match-ranking.js';
 
@@ -67,13 +67,63 @@ test('missing job skills are not assumed to be a perfect skills match',()=>{
 
 test('skill overlap provides evidence; unrelated roles without skill overlap do not qualify',()=>{
  const dataRole={...role,title:'数据分析师',required_skills:['Python','SQL']};
- const oneSkill=scoreCandidateFit({...profile,skills:[{name:'Python'}]},dataRole);
- const both=scoreCandidateFit(profile,dataRole);
+ const analyst={...profile,target_roles:['数据分析师']};
+ const oneSkill=scoreCandidateFit({...analyst,skills:[{name:'Python'}]},dataRole);
+ const both=scoreCandidateFit(analyst,dataRole);
  assert.equal(oneSkill.eligible,true);
  assert.ok(both.score>oneSkill.score);
  const unrelated=scoreCandidateFit(profile,{...role,title:'高级会计师',required_skills:['会计资格证']});
  assert.equal(unrelated.eligible,false);
  assert.equal(unrelated.reason,'NO_MATCH_EVIDENCE');
+});
+
+test('Python software developers are not treated as QA or data analysts by shared tools',()=>{
+ assert.equal(classifyOccupation('Python 开发工程师'),'backend');
+ assert.equal(classifyOccupation('高级测试开发工程师'),'qa');
+ assert.equal(classifyOccupation('数据分析师'),'data-analyst');
+ assert.equal(classifyOccupation('数据开发工程师'),'data-engineer');
+ assert.equal(classifyOccupation('运维开发工程师'),'devops');
+ const applicant={...profile,skills:[{name:'Python'},{name:'SQL'}]};
+ for(const job of [
+  {...role,title:'测试开发工程师'},
+  {...role,title:'高级数据分析师'},
+  {...role,title:'数据科学家'},
+  {...role,title:'运维开发工程师'}
+ ]){
+  const result=scoreCandidateFit(applicant,job);
+  assert.equal(result.eligible,false,job.title);
+  assert.equal(result.reason,'ROLE_DIRECTION_MISMATCH',job.title);
+ }
+ const good=scoreCandidateFit(applicant,role);
+ assert.equal(good.eligible,true);
+ assert.ok(good.score>80);
+});
+
+test('seniority is a soft signal, not an invented hard minimum experience',()=>{
+ assert.equal(classifySeniority('资深 Python 开发工程师'),'senior');
+ assert.equal(classifySeniority('技术负责人 Python 开发'),'lead');
+ assert.equal(classifySeniority('软件开发实习生'),'intern');
+ const early=scoreCandidateFit(profile,{...role,title:'资深 Python 开发工程师',min_experience_years:null});
+ const normal=scoreCandidateFit(profile,{...role,min_experience_years:null});
+ assert.equal(early.eligible,true);
+ assert.ok(early.score<normal.score);
+ const high=scoreCandidateFit({...profile,experience_years:12},{...role,title:'初级 Python 开发工程师'});
+ const mid=scoreCandidateFit({...profile,experience_years:12},role);
+ assert.ok(high.score<mid.score);
+});
+test('fractional professional tenure is supported without rounding up qualifications',()=>{
+ assert.equal(evaluateJobEligibility({...profile,experience_years:2.9},role).reason,'EXPERIENCE_NOT_MET');
+ assert.equal(evaluateJobEligibility({...profile,experience_years:3.2},role).eligible,true);
+ const fit=scoreCandidateFit({...profile,experience_years:3.2},role);
+ assert.equal(fit.eligible,true);
+});
+test('unknown-role skill-only results carry a transparent low-confidence score cap',()=>{
+ const result=scoreCandidateFit(profile,{...role,title:'工程平台支持'});
+ assert.equal(result.eligible,true);
+ assert.ok(result.score<=55);
+ assert.equal(result.score,result.breakdown.role+result.breakdown.skills+
+  result.breakdown.experience+result.breakdown.education+result.breakdown.location+
+  result.score_adjustment);
 });
 
 test('scoring is source-neutral and deterministic for identical verified job facts',()=>{
