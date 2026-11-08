@@ -2,6 +2,7 @@
 // Only audited HHBA matches and independently fetched official job details may
 // be ranked. No model-generated employer/job facts or acceptance probabilities.
 import {safeOfficialJobLocator} from './domestic-search-fetch.js';
+import {scoreCandidateFit,inferOfficialSkills} from './match-ranking.js';
 
 export const FUSION_VERSION='HHBA_DOMESTIC_MATCH_FUSION_V1';
 const MAX_RESULTS=10;
@@ -123,6 +124,9 @@ function externalToMatch(entry,profile,options,now){
   title_zh:entry.title,location:entry.location,official_url:proof.official_url,
   platform:'official-domestic',source:entry.official_domain,remote:false,
   source_type:'站外官方招聘',reference_score:score,
+  required_skills:inferOfficialSkills(requirements),
+  min_experience_years:experience,
+  minimum_education:Object.keys(DEGREE_RANK).find(k=>DEGREE_RANK[k]===degree)||null,
   salary:typeof entry.evidence.salary==='string'&&entry.evidence.salary.length<=60?entry.evidence.salary:null,
   experience_requirement:experience===null?'经验未注明':experience+'年以上',
   matched,not_evidenced:gaps,
@@ -151,8 +155,15 @@ export function fuseDomesticJobRecommendations(inside=[],outside=[],rawProfile={
   .map(internalToMatch).filter(Boolean);
  const external=(Array.isArray(outside)?outside:[]).slice(0,25)
   .map(j=>externalToMatch(j,profile,options,when)).filter(Boolean);
- const ranked=[...internal,...external].sort((a,b)=>b.reference_score-a.reference_score||
-  (a.source_type==='HHBA站内岗位'?-1:1)||
+ // Source-neutral V2 score applies ONLY after the official-source checks above.
+ // Hard experience, education and China Mainland location gates take priority.
+ const scored=[...internal,...external].map(job=>{
+  const fit=scoreCandidateFit(profile,job,options);
+  if(!fit.eligible)return null;
+  return {...job,reference_score:fit.score,score_breakdown:fit.breakdown,
+   ranking_version:fit.ranking_version,rankEvidence:fit.score};
+ }).filter(Boolean);
+ const ranked=scored.sort((a,b)=>b.reference_score-a.reference_score||
   b.rankEvidence-a.rankEvidence||a.id.localeCompare(b.id));
  const unique=[],uniqueKeys=new Set();
  for(const job of ranked){
