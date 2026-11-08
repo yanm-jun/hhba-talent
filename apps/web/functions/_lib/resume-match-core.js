@@ -1,6 +1,7 @@
 // Pure helpers for the HHBA Cloudflare resume-matching service.
 // Never turn a model guess or stale employer posting into a verified job.
 import {deriveDocumentedWorkTenure} from './resume-tenure.js';
+import {scoreCandidateFit} from './match-ranking.js';
 export const MAX_TEXT_LENGTH=20000;
 export function redactForModel(value){
  if(typeof value!=='string')return '';
@@ -134,6 +135,8 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
   x.full_original_jd_verified===true&&x.requirements_evidence===true&&typeof x.jd_sha256==='string')
   .map(x=>[x.job_id,x]));
  const facts=new Map(facets.jobs.filter(x=>x&&typeof x.id==='string').map(x=>[x.id,x]));
+ const candidatePool=Number.isInteger(opts.candidate_pool_limit)&&
+  opts.candidate_pool_limit>=10&&opts.candidate_pool_limit<=1200;
  const query=[String(opts.role_hint||'').slice(0,80),...profile.target_roles].filter(Boolean);
  const skillList=profile.skills.map(s=>s.name.toLowerCase());
  const filtered=[];
@@ -153,7 +156,8 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
   const tags=Array.isArray(f.skills)?f.skills.filter(x=>typeof x==='string').map(x=>x.toLowerCase()):[];
   const roleMatches=query.flatMap(x=>aliasesOf(x)).filter(x=>x.length>=2&&title.includes(x));
   const skillMatches=skillList.filter(s=>tags.includes(s)||title.includes(s));
-  if(roleMatches.length===0&&skillMatches.length===0)continue;
+  // V2 pool must not be prematurely filtered by legacy keyword aliases.
+  if(!candidatePool&&roleMatches.length===0&&skillMatches.length===0)continue;
   const matched=[],notEvidenced=[],needs=[];
   if(roleMatches.length)matched.push('岗位名称与目标方向存在文字关联，具体职责仍需核对');
   for(const item of skillMatches.slice(0,4))matched.push('简历有原文依据的技能：'+item);
@@ -180,6 +184,21 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
     (f.experienceMinYears===0?'经验不限':f.experienceMinYears+'年以上'):'经验未注明',
    rankEvidence:roleMatches.length+skillMatches.length});
  }
+ if(candidatePool){
+  // All verified jobs pass the V2 semantic gate before any Top-N cutoff.
+  // This removes legacy keyword ranking and company/city dedup bias.
+  const eligible=filtered.map(job=>{
+   const fit=scoreCandidateFit(profile,job,opts);
+   if(!fit.eligible)return null;
+   const matched=[...job.matched];
+   if(fit.breakdown.role>0&&!matched.some(x=>x.includes('岗位名称')))
+    matched.push('职位名称与目标岗位方向属于相关职业类别（详情仍以官方职位要求为准）');
+   return {...job,reference_score:fit.score,rankEvidence:fit.score,matched};
+  }).filter(Boolean);
+  eligible.sort((a,b)=>b.reference_score-a.reference_score||a.id.localeCompare(b.id));
+  return {matches:eligible.slice(0,opts.candidate_pool_limit).map(({rankEvidence,...job})=>job),
+   matched_official_jobs:eligible.length};
+ }
  filtered.sort((a,b)=>b.reference_score-a.reference_score||b.rankEvidence-a.rankEvidence||a.id.localeCompare(b.id));
  // A vacancy in multiple cities should not crowd out different companies or roles.
  // Identity is company + title, not URL; only the highest relevant variant survives.
@@ -191,9 +210,7 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
  }
  // The API still returns Top 10; internal server code may request a wider,
  // source-verified candidate pool for a fair cross-source V2 reranking.
- const safePool=Number.isInteger(opts.candidate_pool_limit)&&opts.candidate_pool_limit>=10&&
-  opts.candidate_pool_limit<=60?opts.candidate_pool_limit:null;
- const limit=safePool||Math.min(10,Math.max(1,Number(opts.limit)||10)),selected=[],picked=new Set();
+ const limit=Math.min(10,Math.max(1,Number(opts.limit)||10)),selected=[],picked=new Set();
  const byCompany=new Map();
  const add=(item)=>{
   selected.push(item);picked.add(item.id);
