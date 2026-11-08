@@ -22,6 +22,8 @@ export type MatchedJob = {
   min_experience_years?:number|null;minimum_education?:string|null;
   professional_credential_requirements?:string[];
   professional_credential_review?:{kind:string;likely_credential:string;warning:string}|null;
+  career_transfer?:{kind:'EVIDENCED_TRANSFER_DIRECTION_ONLY';label:string;
+   supporting_skills:string[];disclaimer:string}|null;
   score_breakdown?:{role:number;skills:number;experience:number;education:number;location:number};
   score_reasoning?:string;
   evidence_quality?:{skills:string;experience:string;education:string};
