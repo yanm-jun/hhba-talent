@@ -19,7 +19,8 @@ export function previewJobBrowserRenderer(env,{fetcher=fetch}={}){
   if(parsed.protocol!=='https:'||parsed.username||parsed.password||
      parsed.port||parsed.hash||parsed.hostname.includes('xn--')||
      !/^[a-z0-9-]+(?:\.[a-z0-9-]+){1,5}$/i.test(parsed.hostname)||
-     /^(?:localhost|127\.|10\.|192\.168\.)/i.test(parsed.hostname))
+     /^\d+(?:\.\d+){3}$/u.test(parsed.hostname)||
+     parsed.hostname.split('.').some(x=>/^(?:localhost|local|internal|test|invalid|example)$/i.test(x)))
    throw Error('BROWSER_BAD_URL');
   let reply;
   try{
