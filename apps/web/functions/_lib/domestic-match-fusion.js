@@ -8,6 +8,7 @@ import {isMainlandJobLocation,findMainlandCity} from './mainland-job-location.js
 import {explainFinalJobScore} from './match-explanation.js';
 import {extractMandatoryProfessionalCredentials,extractStructuredCredentialConditions,professionalPracticeReview} from './professional-credentials.js';
 import {assessJobQualification} from './job-qualification-evidence.js';
+import {groundedCareerTransfer} from './career-transfer-evidence.js';
 import {classifyOccupation} from './match-ranking.js';
 
 export const FUSION_VERSION='HHBA_DOMESTIC_MATCH_FUSION_V1';
@@ -207,7 +208,11 @@ export function fuseDomesticJobRecommendations(inside=[],outside=[],rawProfile={
   const fit=scoreCandidateFit(profile,job,options);
   if(!fit.eligible)return null;
   const rationale=explainFinalJobScore(profile,job,fit);
-  return {...job,reference_score:fit.score,score_breakdown:fit.breakdown,
+  const transfer=groundedCareerTransfer(profile,job);
+  if(transfer)rationale.not_evidenced.push(
+   '可迁移能力：'+transfer.supporting_skills.join('、')+
+   '；不代表已有该职位的工作经历，仍需核实具体岗位要求');
+  return {...job,career_transfer:transfer,reference_score:fit.score,score_breakdown:fit.breakdown,
    evidence_quality:fit.evidence_quality,
    professional_credential_requirements:job.professional_credential_requirements||[],
    professional_credential_review:professionalPracticeReview(job.title),
