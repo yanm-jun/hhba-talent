@@ -114,3 +114,25 @@ test('Bounded postpass prefers evidence-rich public search hit and does not fetc
  assert.equal(out.stats.search_quality_hints.apply,1);
  assert.equal(out.accounting.complete,false,'no mock model token usage should be treated as incomplete billing');
 });
+
+test('Public corporate-site Search hint advances same-domain vacancy without certifying it',()=>{
+ const make=(domain,city,score)=>({
+  url:'https://careers.'+domain+'/jobs/202611080155',domain,
+  search_metadata:{title:'内容运营 - 企业岗位',url:'https://careers.'+domain+'/jobs/202611080155',
+   snippet:'岗位职责：负责内容运营，任职要求：本科，工作地点：'+city,
+   rerank_score:score}
+ });
+ const unknown=make('other.cn','北京',3);
+ const siteDiscovered=make('enterprise.cn','济南',0);
+ const base=orderPublicJobCandidates([unknown,siteDiscovered],['内容运营'],{now});
+ const ranked=orderPublicJobCandidates([unknown,siteDiscovered],['内容运营'],{
+  now,corporateSiteDomains:['enterprise.cn']});
+ assert.equal(base[0].domain,'other.cn');
+ assert.equal(ranked[0].domain,'enterprise.cn');
+ assert.equal(ranked[0].source_hint,'CORPORATE_SITE_SEEN');
+ assert.equal(ranked[0].rank.hint_only,true);
+ assert.equal(ranked[1].source_hint,'UNCONFIRMED');
+ // An unrelated corporate website is not a reason to boost or accept a job.
+ assert.equal(orderPublicJobCandidates([unknown,siteDiscovered],['内容运营'],{
+  now,corporateSiteDomains:['unrelated.cn']})[0].domain,'other.cn');
+});
