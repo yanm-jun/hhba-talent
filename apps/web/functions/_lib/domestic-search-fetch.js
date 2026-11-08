@@ -127,7 +127,8 @@ export function extractOfficialJob(searchResult,document,now=new Date()){
   // never label that as "apply open". The link opens the exact official JD,
   // and applying may require a separate logged-in action.
   has_application_cta:HAS_APPLY.test(content),checked_at:nowIso,
-  application_method:source.domain==='talent.baidu.com'&&!HAS_APPLY.test(content)?
+  application_method:source.domain==='talent.baidu.com'&&!HAS_APPLY.test(content)&&
+   /(?:登录|登录\/注册|sign in)/i.test(content)?
    'OFFICIAL_DETAIL_LOGIN_REQUIRED':'DIRECT_CTA_UNVERIFIED',
   evidence:{title:titleLine.slice(0,115),location:city,requirement,
    salary:(content.match(/(?:月薪|薪资范围|薪资待遇|薪酬)[：:\s]*([\d.]+\s*[-~至]\s*[\d.]+\s*(?:[kK]|万|千|元)(?:\s*\/月)?)/)||[])[1]||null},
