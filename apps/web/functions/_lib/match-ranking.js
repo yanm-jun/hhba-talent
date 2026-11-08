@@ -17,18 +17,56 @@ const DIMENSIONS=Object.keys(DEFAULT_RANKING_WEIGHTS);
 const DEGREE_RANK=Object.freeze({HIGH_SCHOOL:1,ASSOCIATE:2,BACHELOR:3,MASTER:4,PHD:5});
 const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macau|macao|taiwan|taipei|kaohsiung|美国|日本|新加坡|国外|海外|united states|singapore|japan|tokyo|london|san[\s-]?francisco|new[\s-]?york|united kingdom|境外)/i;
 const MAINLAND_CITY=/(?:北京|上海|天津|重庆|深圳|广州|杭州|南京|苏州|成都|武汉|西安|青岛|宁波|无锡|合肥|郑州|长沙|厦门|福州|济南|大连|沈阳|哈尔滨|长春|石家庄|昆明|贵阳|南宁|海口|珠海|佛山|东莞|烟台|潍坊|临沂|济宁|菏泽|聊城|威海|泰安|德州|枣庄|滨州|日照|东营|常州|南通|嘉兴|绍兴|金华|温州|台州|太原|徐州|扬州|保定|唐山|廊坊|兰州|西宁|银川|乌鲁木齐|呼和浩特|包头|柳州|桂林|洛阳|开封|南昌|九江|中山|惠州|beijing|shanghai|tianjin|chongqing|shenzhen|guangzhou|hangzhou|chengdu|nanjing|suzhou|wuhan|xian|qingdao|ningbo|jinan|wuxi|hefei|zhengzhou|changsha|xiamen)/i;
-const ROLE_FAMILIES=[
- ['软件','软件开发','开发工程师','程序员','软件工程师','python开发','java开发','后端','前端','全栈','software developer','software engineer','backend','frontend','fullstack'],
- ['数据','数据分析','数据工程','数据科学','商业分析','business analyst','data analyst','data engineer','data scientist','business intelligence'],
- ['产品','产品经理','product manager','product owner'],
- ['设计','视觉','平面','交互','ui设计','ux设计','designer','graphic design','product design'],
- ['运营','新媒体','内容运营','用户运营','operations','marketing','growth'],
- ['销售','商务','客户经理','销售顾问','sales','account executive','business development'],
- ['财务','会计','审计','金融','accountant','finance','audit'],
- ['教育','教师','教研','teacher','education'],
- ['测试','质量保障','自动化测试','qa','sdet','test engineer'],
- ['招聘','人力','人事','hr','recruiting','human resources']
+// Match the *occupation* before matching labels such as "engineer" or "开发".
+const OCCUPATIONS=[
+ ['qa',/(?:测试开发|自动化测试|软件测试|测试工程师|质量保障|质量测试|sdet|quality assurance|qa engineer|test engineer)/i],
+ ['devops',/(?:运维|平台运维|devops|site reliability|\bsre\b|系统管理员)/i],
+ ['cybersecurity',/(?:安全工程师|网络安全|信息安全|security engineer|cyber security)/i],
+ ['frontend',/(?:前端|front[\s-]?end|react开发|vue开发)/i],
+ ['backend',/(?:后端|back[\s-]?end|python\s*(?:开发|工程师)|java\s*(?:开发|工程师)|golang\s*(?:开发|工程师)|服务端)/i],
+ ['fullstack',/(?:全栈|full[\s-]?stack)/i],
+ ['data-engineer',/(?:数据工程|数据开发|大数据开发|数据仓库|etl开发|data engineer|data developer)/i],
+ ['data-scientist',/(?:数据科学|机器学习工程师|深度学习工程师|算法工程师|data scientist|machine learning engineer)/i],
+ ['data-analyst',/(?:数据分析|商业分析|业务分析|business analyst|data analyst|business intelligence analyst|\bbi分析)/i],
+ ['product',/(?:产品经理|产品专员|product manager|product owner)/i],
+ ['ux',/(?:交互设计|用户体验设计|ux designer|ui\/ux|product designer)/i],
+ ['graphic-design',/(?:视觉设计|平面设计|品牌设计|graphic designer|visual designer)/i],
+ ['operations',/(?:运营|内容策划|新媒体|growth operations|operations specialist)/i],
+ ['sales',/(?:销售|客户经理|商务拓展|sales|business development|account executive)/i],
+ ['finance',/(?:财务|会计|审计|金融分析|accountant|finance|audit)/i],
+ ['hr',/(?:人力资源|人事|招聘专员|human resources|recruiter)/i],
+ ['education',/(?:教师|教研|教育培训|teacher|tutor)/i],
+ ['software',/(?:软件开发|研发工程师|软件工程师|程序员|开发工程师|software engineer|software developer|software development engineer)/i]
 ];
+const TRANSFERABLE=new Map([
+ ['backend|software',.88],['frontend|software',.86],
+ ['fullstack|backend',.7],['frontend|fullstack',.7],
+ ['data-analyst|data-scientist',.5],['data-engineer|data-scientist',.45],
+ ['backend|data-engineer',.35],['software|data-engineer',.3]
+]);
+export function classifyOccupation(title){
+ const value=typeof title==='string'?title.slice(0,140):'';
+ return OCCUPATIONS.find(([,re])=>re.test(value))?.[0]||null;
+}
+export function classifySeniority(title){
+ const name=String(title||'').toLowerCase();
+ if(/(?:实习|intern(?:ship)?)/i.test(name))return 'intern';
+ if(/(?:首席|总监|副总裁|director|vp\b|head of|chief)/i.test(name))return 'director';
+ if(/(?:负责人|组长|主管|技术负责人|\blead\b|team leader)/i.test(name))return 'lead';
+ if(/(?:高级|资深|专家|\bsenior\b|\bstaff\b|\bprincipal\b)/i.test(name))return 'senior';
+ if(/(?:初级|助理|应届|校招|\bjunior\b|graduate|entry[\s-]?level)/i.test(name))return 'junior';
+ return 'unspecified';
+}
+function levelFitness(title,years){
+ const level=classifySeniority(title);
+ if(years===null)return level==='unspecified'?1:.78;
+ if(level==='intern')return years>=2?.35:.85;
+ if(level==='junior')return years>=8?.5:years>=5?.72:1;
+ if(level==='senior')return years<2?.55:years<4?.82:1;
+ if(level==='lead')return years<3?.55:years<6?.75:1;
+ if(level==='director')return years<5?.4:years<9?.7:1;
+ return 1;
+}
 // Only explicit skill names in official JD text can contribute skill evidence.
 const SKILLS=[
  'Python','SQL','JavaScript','TypeScript','React','Vue','Node.js','Java','C++','C#','Go',
@@ -38,6 +76,7 @@ const SKILLS=[
 ];
 const norm=v=>String(v||'').normalize('NFKC').toLowerCase().replace(/[\s\-_.()（）【】[\]]+/g,'').trim();
 const int=v=>Number.isInteger(v)&&v>=0&&v<=50?v:null;
+const tenuredYears=v=>Number.isFinite(v)&&v>=0&&v<=50?v:null;
 function skillPresent(text,skill){
  const s=String(text||'').normalize('NFKC');
  const label=String(skill||'');
@@ -56,16 +95,27 @@ export function isMainlandWorkCity(location){
  return !!city&&!OUTSIDE.test(city)&&MAINLAND_CITY.test(city);
 }
 function roleAffinity(title,roles){
- const t=norm(title);
+ const t=norm(title),kind=classifyOccupation(title);
  if(!t||!roles.length)return 0;
  let best=0;
  for(const role of roles){
-  const r=norm(role);
+  const r=norm(role),wanted=classifyOccupation(role);
   if(r.length<2)continue;
-  if(t===r)best=Math.max(best,1);
-  else if((r.length>=4&&t.includes(r))||(t.length>=4&&r.includes(t)))best=Math.max(best,.92);
-  else if(ROLE_FAMILIES.some(g=>g.some(alias=>r.includes(norm(alias)))&&g.some(alias=>t.includes(norm(alias)))))
-   best=Math.max(best,.72);
+  // Never let a shared "engineer / 开发 / Python" substring turn QA into
+  // a backend-development match (or data analytics into software engineering).
+  if(kind&&wanted&&kind!==wanted){
+   const key=[kind,wanted].sort().join('|');
+   best=Math.max(best,TRANSFERABLE.get(key)||0);
+   continue;
+  }
+  if(t===r){best=Math.max(best,1);continue;}
+  if((r.length>=4&&t.includes(r))||(t.length>=4&&r.includes(t))){
+   best=Math.max(best,.92);continue;
+  }
+  if(kind&&wanted&&kind===wanted){best=Math.max(best,.85);continue;}
+  // Unknown headings may have genuine shared title words. Avoid short
+  // generic "开发 / 工程师 / 经理" substrings as a relevance signal.
+  if(!kind&&!wanted&&r.length>=5&&t.includes(r))best=Math.max(best,.5);
  }
  return best;
 }
@@ -75,7 +125,7 @@ function minDegree(value){
 }
 export function evaluateJobEligibility(profile={},job={}){
  if(!isMainlandWorkCity(job.location))return {eligible:false,reason:'NOT_MAINLAND_JOB'};
- const years=int(profile.experience_years),minYears=int(job.min_experience_years);
+ const years=tenuredYears(profile.experience_years),minYears=int(job.min_experience_years);
  if(minYears!==null&&minYears>0&&(years===null||years<minYears))
   return {eligible:false,reason:'EXPERIENCE_NOT_MET'};
  const education=minDegree(job.minimum_education);
@@ -112,12 +162,14 @@ export function scoreCandidateFit(profile={},job={},options={},serverApprovedPol
   return {eligible:false,reason:'NO_MATCH_EVIDENCE',score:null,breakdown:null};
  const approved=approvedPolicy(serverApprovedPolicy);
  const weights=approved?.weights||DEFAULT_RANKING_WEIGHTS;
- const role=Math.round(weights.role*affinity);
+ const minYears=int(job.min_experience_years),years=tenuredYears(profile.experience_years);
+ const levelFactor=levelFitness(job.title,years);
+ const role=Math.round(weights.role*affinity*levelFactor);
  // Missing official requirement tags are unknown, not proof of perfect coverage.
  const skills=wanted.length?
   Math.round(weights.skills*matchedSkills.length/wanted.length):
   Math.round(weights.skills*8/30);
- const minYears=int(job.min_experience_years),years=int(profile.experience_years);
+
  const experience=minYears===null||minYears===0?Math.round(weights.experience*11/20):
   Math.round(weights.experience*Math.min(1,(16+Math.max(0,years-minYears))/20));
  const degree=minDegree(job.minimum_education);
@@ -128,8 +180,13 @@ export function scoreCandidateFit(profile={},job={},options={},serverApprovedPol
   !cityPref.some(city=>norm(job.location).includes(norm(city)))?
   Math.round(weights.location*.6):weights.location;
  const breakdown={role,skills,experience,education,location};
- const score=Object.values(breakdown).reduce((a,b)=>a+b,0);
- return {eligible:true,reason:null,score,breakdown,matched_skill_count:matchedSkills.length,
+ const rawScore=Object.values(breakdown).reduce((a,b)=>a+b,0);
+ // Skill-only candidates with no occupation evidence may be exploratory,
+ // but should never outrank a directly relevant role on generic tools alone.
+ const score=affinity===0?Math.min(rawScore,55):rawScore;
+ return {eligible:true,reason:null,score,breakdown,score_cap_applied:score<rawScore,
+  role_affinity:affinity,seniority_alignment:levelFactor,
+  matched_skill_count:matchedSkills.length,
   required_skill_count:wanted.length,ranking_version:RANKING_VERSION,
   weight_policy_version:approved?.version||'baseline'};
 }
