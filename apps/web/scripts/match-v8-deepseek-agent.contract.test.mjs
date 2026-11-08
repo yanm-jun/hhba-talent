@@ -125,6 +125,7 @@ test('DeepSeek autonomous Search -> Fetch -> corporate verification without any 
  const x=mockAgent();
  const result=await runDeepSeekOfficialJobAgent('内容运营',key,{fetcher:x.fetcher,now});
  assert.equal(result.kind,'HHBA_V8_PUBLIC_MAINLAND_DISCOVERY_V2');
+ assert.equal(result.quality_status,'VERIFIED_JOBS_FOUND');
  assert.equal(result.status,'COMPLETE');
  assert.deepEqual(result.usage,{model:4,search:1,fetch:4});
  assert.deepEqual(result.accounting.attempts,result.usage);
@@ -212,4 +213,19 @@ test('Public Fetch hard ceiling is twenty, independent of model tool-call volume
  assert.equal(result.candidates.length,0,'never recommend when JD lacks eligibility evidence');
  assert.equal(result.accounting.complete,true);
  assert.equal(result.usage.model,4);
+});
+
+test('Diagnostic rejection reasons are finite labels, never raw company or user data',()=>{
+ const x={};
+ const link=publicJobLink('https://career.xinghe.cn/jobs/202611080001');
+ assert.equal(readPublicJob(link,{content:'short'},now,x),null);
+ assert.equal(x.SHORT_PAGE,1);
+ const brokenJD=[
+ '# 内容运营','公司名称：星河数字科技有限公司','工作地点：北京',
+ '岗位要求','本科及以上，熟悉新媒体编辑和内容平台运营。'.repeat(8),
+ '立即投递'
+ ].join('\n');
+ assert.equal(readPublicJob(link,{content:brokenJD},now,x),null);
+ assert.equal(x.MISSING_DUTIES,1);
+ assert.deepEqual(Object.keys(x).sort(),['MISSING_DUTIES','SHORT_PAGE']);
 });

@@ -52,3 +52,19 @@ V8 是基于 V7 PR #298 的堆叠草稿 PR #299。不得提前合并 main，不�
 ### 验证
 
 `node --test apps/web/scripts/match-v8-deepseek-agent.contract.test.mjs apps/web/scripts/match-v8-discovery-cost.contract.test.mjs`（在 `apps/web` 工作目录时使用 `scripts/...`）覆盖 8/20 上限、低于上限的实际使用费、复用/早停、强条件匹配和 D1 迁移。
+
+## 真实 DeepSeek V4 Pro 联网验收——2026-11-08
+
+测试：仅使用**虚构的求职方向“内容运营”**，经 GitHub Actions OIDC 验证后从 Cloudflare Preview 的保密 API Key 发起一次完整真实请求；不发送真实个人简历。结果参见：
+https://github.com/yanm-jun/hhba-talent/actions/runs/42476956268
+
+- 一次真实会话：**4 模型响应、3 Search、4 Fetch**；硬上限分别 4/8/20，未达到 8/20 上限。模型在 4 次调用额度用尽时结束。
+- Search 发现 **12 条**通过程序 URL 初筛的单职位候选链接；4 次 Fetch 返回可计费内容。
+- **经完整职位正文解析：0 条；独立官网证据核验：0 条；实际符合条件进入推荐：0 条。** 工作流 API 返回 `COMPLETE` 只代表调用过程没有接口错误，绝不能理解为成功推荐；现在新增独立 `quality_status` 标识 `NO_VERIFIED_JOBS`。
+- 服务端返回的 usage：input 5528 Token（其中 cached 3456）、output 428 Token；Search 成功返回 3 次，Fetch 成功返回 4 次。
+- 按当日 DeepSeek 官方人民币价格估算：Search/Fetch ¥0.035，模型 ¥0.01562，**总计 ¥0.05062**，高峰费率上界估算 ¥0.066241。**这不是服务商实际扣款账单。**
+- 已核对**独立 Preview D1**的 `hhba_match_discovery_accounting` 记录：调用、Token 和费用与 GitHub 运行日志一致；未使用生产 D1。
+- 实验成功证明了：**不依赖企业私有 API，DeepSeek V4 Pro 能运行完整的搜索→抓取工具循环，并能按实际使用量计费记录。**
+- 实验尚未证明：公开招聘页面的内容解析、独立企业身份链接核验、符合岗位资格的推荐输出；不得把 12 条搜索链接称作 12 条真实在招岗位。
+- **后续整改优先级**：进一步按阶段统计 `FETCH_NO_TEXT`、`MISSING_DUTIES`、`MISSING_REQUIREMENTS`、`MISSING_EXPLICIT_WORKPLACE`、`MISSING_COMPANY_LABEL` 等拒绝原因，在不放松真实性与学历经验硬门槛前提下改进解析；之后再做第二轮真实 API 对照。
+- 临时的 `/api/match/v8-live-eval` 和 OIDC 工作流**必须在分支合并前撤除**，清理付费测试相关 Preview 部署。生产主线和 AI 开关保持不变。

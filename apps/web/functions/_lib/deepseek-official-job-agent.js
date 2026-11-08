@@ -116,10 +116,17 @@ const REQUIREMENTS=/(?:任职资格|任职要求|岗位要求|职位要求|资�
 const CTA=/(?:立即申请|立即投递|申请岗位|申请职位|投递简历|投递岗位|马上申请|申请此职位|投递该职位|apply now|apply for this job|submit application)/i;
 const ROLE=/(?:工程师|研发|开发|运营|设计|分析|产品|销售|编导|剪辑|采购|人力|招聘|财务|会计|审计|市场|教师|编辑|实习|助理|专员|顾问|客服|engineer|developer|analyst|designer|operations|marketing)/i;
 function clean(v){return String(v||'').replace(/[\u0000-\u001f]/g,' ').replace(/\s+/g,' ').trim();}
-export function readPublicJob(link,page,now=new Date()){
- if(!link||typeof page?.content!=='string')return null;
+function rejectJobEvidence(tally,code){
+ if(tally&&typeof tally==='object')tally[code]=(tally[code]||0)+1;
+ return null;
+}
+export function readPublicJob(link,page,now=new Date(),rejections=null){
+ if(!link||typeof page?.content!=='string')return rejectJobEvidence(rejections,'FETCH_NO_TEXT');
  const text=page.content.slice(0,100000).replace(/\u0000/g,'');
- if(text.length<190||CLOSED.test(text)||!DUTIES.test(text)||!REQUIREMENTS.test(text))return null;
+ if(text.length<190)return rejectJobEvidence(rejections,'SHORT_PAGE');
+ if(CLOSED.test(text))return rejectJobEvidence(rejections,'CLOSED');
+ if(!DUTIES.test(text))return rejectJobEvidence(rejections,'MISSING_DUTIES');
+ if(!REQUIREMENTS.test(text))return rejectJobEvidence(rejections,'MISSING_REQUIREMENTS');
  const lines=text.split('\n').map(l=>l.replace(/^\s*#{1,6}\s*/,'').trim()).filter(Boolean);
  const dutiesAt=lines.findIndex(s=>DUTIES.test(s));
  const header=lines.slice(0,dutiesAt<0?12:Math.min(dutiesAt,18));
@@ -130,21 +137,23 @@ export function readPublicJob(link,page,now=new Date()){
   if(head.length<=110&&ROLE.test(head))title=head;
  }
  title=title?.split(/[|｜]/)[0]?.trim().slice(0,95);
- if(!title||EXTERNAL.test(title))return null;
+ if(!title)return rejectJobEvidence(rejections,'MISSING_ROLE_TITLE');
+ if(EXTERNAL.test(title))return rejectJobEvidence(rejections,'OVERSEAS_TITLE');
  // Only job header-labelled work city counts. A JD describing international
  // customers or travel destinations does not prove actual workplace.
  const loc=(text.match(/(?:工作地点|工作城市|办公地点|工作地|工作区域|上班地点|work location|location)[：:\s-]{1,10}([^\n]{2,95})/i)||[])[1]||'';
- if(!loc||EXTERNAL.test(loc))return null;
+ if(!loc)return rejectJobEvidence(rejections,'MISSING_EXPLICIT_WORKPLACE');
+ if(EXTERNAL.test(loc))return rejectJobEvidence(rejections,'OVERSEAS_WORKPLACE');
  const city=findMainlandCity(loc);
- if(!city)return null;
+ if(!city)return rejectJobEvidence(rejections,'UNKNOWN_MAINLAND_CITY');
  const after=text.split(REQUIREMENTS)[1]||'';
  const requirements=clean(after.split(/(?:岗位职责|工作职责|申请岗位|相关职位|立即投递|立即申请|投递简历|职位列表|其他岗位|更多职位|联系我们|apply now)/i)[0]).slice(0,4500);
- if(requirements.length<28)return null;
+ if(requirements.length<28)return rejectJobEvidence(rejections,'SHORT_REQUIREMENTS');
  const company=(text.match(/(?:公司名称|企业名称|招聘单位|用人单位|所属公司|招聘公司)[：:\s]{1,8}([^\n]{2,70})/)||[])[1]||'';
  // Company is a claim in the job page, never inferred from arbitrary URL
  // or taken directly from an AI-generated answer.
  const name=clean(company).replace(/[｜|].*$/,'').slice(0,65);
- if(name.length<3||!/[a-z\p{Script=Han}]{2}/iu.test(name))return null;
+ if(name.length<3||!/[a-z\p{Script=Han}]{2}/iu.test(name))return rejectJobEvidence(rejections,'MISSING_COMPANY_LABEL');
  return {id:link.id,source_type:'站外官方招聘',source_status:'PUBLIC_JOB_UNCONFIRMED',
   company_claim:name,title,location:city,official_url:link.url,
   official_domain:link.hostname,has_application_cta:CTA.test(text),
@@ -200,6 +209,7 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
  if(typeof key!=='string'||key.length<16)throw Error('V8_KEY_MISSING');
  const usage={model:0,search:0,fetch:0},observed=new Map(),sites=new Map();
  const pages=new Map(),confirmed=new Map(),attempted=new Set(),websiteCache=new Map();
+ const rejections=Object.create(null);
  const meter=emptyV8CostMeter();let failures=0,uncertainProviderFailure=false;
  const desired=Math.max(1,Math.min(10,Number.isInteger(targetCount)?targetCount:10));
  const conversation=[{role:'user',content:
@@ -266,7 +276,7 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
      try{
       const doc=await requestJson('/v1/tools/fetch',key,{url:link.url},fetcher,500000);
       if(typeof doc?.content==='string'&&doc.content.length>0)meter.billable_fetch++;
-      const job=readPublicJob(link,doc,now);
+      const job=readPublicJob(link,doc,now,rejections);
       if(!job)answer={status:'INCOMPLETE_OR_UNREADABLE_JOB'};
       else{
        pages.set(link.url,job);
@@ -309,6 +319,8 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
   status:failures?'PARTIAL':'COMPLETE',
   candidates:[...confirmed.values()].slice(0,desired),usage,limit:V8_BUDGET,
   accounting:buildV8CostReport(usage,meter,{uncertain_provider_failure:uncertainProviderFailure}),
-  stats:{verified:confirmed.size,discovered:observed.size,job_details:pages.size,failures},
+  quality_status:confirmed.size?'VERIFIED_JOBS_FOUND':'NO_VERIFIED_JOBS',
+  stats:{verified:confirmed.size,discovered:observed.size,job_details:pages.size,failures,
+   fetch_rejection_counts:rejections},
   disclaimer:'中国大陆公开招聘详情：有公司网站佐证但不保证实时开放；网页无法读取或验证时不作为正式推荐。'};
 }
