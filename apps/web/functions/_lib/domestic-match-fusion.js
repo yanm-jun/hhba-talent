@@ -4,12 +4,11 @@
 import {safeOfficialJobLocator} from './domestic-search-fetch.js';
 import {scoreCandidateFit} from './match-ranking.js';
 import {extractSkillRequirements} from './job-skill-evidence.js';
+import {isMainlandJobLocation} from './mainland-job-location.js';
 
 export const FUSION_VERSION='HHBA_DOMESTIC_MATCH_FUSION_V1';
 const MAX_RESULTS=10;
 const MAX_EVIDENCE_AGE_MS=24*60*60*1000;
-const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macau|macao|taiwan|taipei|日本|美国|新加坡|singapore|united states|tokyo)/i;
-const MAINLAND_CITY=/(?:北京|上海|天津|重庆|深圳|广州|杭州|南京|苏州|成都|武汉|西安|青岛|宁波|无锡|合肥|郑州|长沙|厦门|福州|济南|大连|沈阳|哈尔滨|长春|石家庄|昆明|贵阳|南宁|海口|珠海|佛山|东莞|烟台|潍坊|临沂|济宁|菏泽|聊城|威海|泰安|德州|枣庄|滨州|日照|东营|常州|南通|嘉兴|绍兴|金华|温州|台州|太原|徐州|扬州|保定|唐山|廊坊|兰州|西宁|银川|乌鲁木齐|呼和浩特|包头|柳州|桂林|洛阳|开封|南昌|九江|中山|惠州|beijing|shanghai|shenzhen|guangzhou|hangzhou|chengdu|nanjing|suzhou|wuhan|xian)/i;
 const DEGREE_RANK={HIGH_SCHOOL:1,ASSOCIATE:2,BACHELOR:3,MASTER:4,PHD:5};
 const ROLE_CLUSTERS=[
  ['软件','开发','工程师','software','developer','engineer','backend','后端','python','java','golang','前端','frontend'],
@@ -25,10 +24,7 @@ const flat=(s)=>String(s||'').trim().toLowerCase().replace(/[\s\-_.()（）【�
 function textSafe(value,max=260){
  return typeof value==='string'?value.slice(0,max):'';
 }
-export function isMainlandWorkCity(value){
- const city=textSafe(value,100);
- return !!city&&!OUTSIDE.test(city)&&MAINLAND_CITY.test(city);
-}
+export function isMainlandWorkCity(value){return isMainlandJobLocation(value);}
 function canonicalRoleKey(job){
  const city=textSafe(job.location,50);
  let title=flat(job.title);
