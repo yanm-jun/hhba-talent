@@ -162,11 +162,13 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
  if(!queries.length)throw new ExternalSearchError('INVALID_SEARCH_INTENT');
  if(typeof key!=='string'||key.length<16)throw new ExternalSearchError('SEARCH_NOT_ENABLED');
  const possible=new Map(),usage={search:0,fetch:0};
- // Exactly two fixed, public-domain queries; no resume, contact data or
- // user-provided URLs ever leave HHBA's server.
- for(const query of queries.slice(0,maxSearch)){
-  const response=await providerPost('https://api.deepseek.com/v1/tools/search',key,
-   {query,count:6,need_content:false},250000,fetcher);
+ // Parallelize the expanded, one-click discovery so the user does not wait for
+ // twelve sequential provider timeouts; the legacy small pilot stays unchanged.
+ const searchOne=(query)=>providerPost('https://api.deepseek.com/v1/tools/search',key,
+  {query,count:6,need_content:false},250000,fetcher);
+ const searchResults=expanded?await Promise.all(queries.slice(0,maxSearch).map(searchOne)):null;
+ for(let i=0;i<Math.min(maxSearch,queries.length);i++){
+  const response=expanded?searchResults[i]:await searchOne(queries[i]);
   if(!Array.isArray(response?.results))throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');
   if(response.results.length)usage.search++;
   for(const item of response.results.slice(0,6)){
@@ -175,25 +177,33 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
   }
  }
  const jobs=[];
- let fetchAttempts=0;
- for(const candidate of possible.values()){
-  // Limit actual outbound Fetch attempts, not just successful/charged calls.
-  if(fetchAttempts>=maxFetch)break;
-  fetchAttempts++;
+ const candidates=[...possible.values()].slice(0,maxFetch);
+ const fetchOne=async(candidate)=>{
   let fetched;
   try{
    fetched=await providerPost('https://api.deepseek.com/v1/tools/fetch',key,
     {url:candidate.url},500000,fetcher);
   }catch(e){
-   // Individual official pages may disappear, move, or block crawlers. Do not
-   // abort a whole search solely because one known vacancy is inaccessible.
-   if(e instanceof ExternalSearchError&&e.code==='SEARCH_FETCH_NOT_AVAILABLE')continue;
+   if(e instanceof ExternalSearchError&&e.code==='SEARCH_FETCH_NOT_AVAILABLE')return null;
    throw e;
   }
   if(typeof fetched?.content!=='string')throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');
   if(fetched.content)usage.fetch++;
-  const job=extractOfficialJob(candidate,fetched,now);
-  if(job)jobs.push(job);
+  return extractOfficialJob(candidate,fetched,now);
+ };
+ if(expanded){
+  // Eight independent official pages at most, each bounded to 16 seconds.
+  const fetched=await Promise.allSettled(candidates.map(fetchOne));
+  for(const row of fetched){
+   if(row.status==='fulfilled'&&row.value)jobs.push(row.value);
+   else if(row.status==='rejected')
+    console.warn('HHBA_MATCH_OFFICIAL_DETAIL_FAILED');
+  }
+ }else{
+  for(const candidate of candidates){
+   const job=await fetchOne(candidate);
+   if(job)jobs.push(job);
+  }
  }
  // A company can have many SEO/city copies of the same role: prefer unique
  // employer+position without fabricating a vacancy to reach Top10.
