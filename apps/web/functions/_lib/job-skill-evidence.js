@@ -62,7 +62,7 @@ export function extractStructuredSkillConditions(text){
   const skills=CATALOG.filter(s=>hasSkill(raw,s));
   if(!skills.length)continue;
   const alternative=/(?:或者|或|二选一|任选|任一|之一|至少(?:一项|一种|一门)|其中(?:一项|一种)|\bor\b)/i.test(raw);
-  const countMatch=raw.match(/(?:至少|任选|任意)(\d{1,2}|[两二三四五六七八])(?:项|种|门)/);
+  const countMatch=raw.match(/(?:至少|任选|任意)(?:熟练)?(?:掌握|具备|使用)?\s*(\d{1,2}|[两二三四五六七八])(?:项|种|门)/);
   const zh={两:2,二:2,三:3,四:4,五:5,六:6,七:7,八:8};
   const n=countMatch?(Number(countMatch[1])||zh[countMatch[1]]):null;
   const operator=n&&n>1?'AT_LEAST':alternative?'ANY_OF':'ALL_OF';
