@@ -54,8 +54,13 @@ export function extractSkillRequirements(text){
  */
 export function extractStructuredSkillConditions(text){
  if(typeof text!=='string'||text.length<12)return [];
+ // Preserve an enumerated multi-skill sentence ("Python、Java，任选一种")
+ // while separating genuinely new requirement/pref clauses ("，熟悉 Linux").
+ // A comma alone cannot be treated as a semantic condition boundary.
  const clauses=text.slice(0,5500).normalize('NFKC')
-  .split(/[\n。；;，,]+/).map(s=>s.trim()).filter(Boolean);
+  .split(/[\n。；;]+/)
+  .flatMap(line=>line.split(/[，,](?=\s*(?:必须|必备|必需|硬性要求|强制要求|应|须|需要|要求|熟悉|了解|使用|精通|负责|优先|加分|[A-Za-z+#.]{2,30}\s*(?:经验|能力)?(?:者)?优先))/i))
+  .map(s=>s.trim()).filter(Boolean);
  const groups=[],seen=new Set();
  for(const raw of clauses){
   if(!STRICT_MANDATORY.test(raw)||OPTIONAL.test(raw))continue;
