@@ -144,11 +144,11 @@ export function extractOfficialJob(searchResult,document,now=new Date()){
  const city=findMainlandCity(locationProof);
  if(!isMainlandJobLocation(locationProof))return null;
  if(!city)return null;
- const rq=content.match(/(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求|职责要求)[：:\s]*([\s\S]{24,900})/);
+ const rq=content.match(/(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求|职责要求)[：:\s]*([\s\S]{24,6000})/);
  const experienceLabel=(content.match(/(?:工作经验|经验要求|工作年限|经验年限)[：:\s]*([^\n]{1,80})/)||[])[1]||'';
  const requirement=((rq?.[1]||'').split(/(?:岗位职责|工作地点|申请岗位|事业群介绍|立即投递|相关职位)/)[0]+
   (experienceLabel?' 工作经验：'+experienceLabel:''))
-  .replace(/[\s#*-]+/g,' ').trim().slice(0,1000);
+  .replace(/[\s#*-]+/g,' ').trim().slice(0,5500);
  if(requirement.length<25)return null;
  // A successful fetch is not a guarantee that applications remain open.
  // Do not set is_open=true, "verified open", or make a hiring probability claim.
