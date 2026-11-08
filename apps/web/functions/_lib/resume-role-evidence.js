@@ -69,7 +69,9 @@ export function separateCareerIntentAndExperience(proposed,source){
  const intentLines=originalLines.filter(line=>INTENT_LINE.test(line)&&line.length<=220);
  // Intent lines cannot establish prior occupation experience.
  const experienceText=originalLines.filter(line=>!INTENT_LINE.test(line)).join('\n');
- const demonstrated=groundedCareerDirections(proposed,experienceText,{limit:6});
+ // Mere mention of a job title (e.g. '协助产品经理') is NOT evidence of
+ // having performed that occupation; require task-action evidence instead.
+ const demonstrated=groundedCareerDirections([],experienceText,{limit:6});
  const intents=[];
  for(const line of intentLines){
   const cleaned=line.replace(/^[^：:]{0,35}[：:]/,'').trim();
