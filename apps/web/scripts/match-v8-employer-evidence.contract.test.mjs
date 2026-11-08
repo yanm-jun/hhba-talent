@@ -206,3 +206,30 @@ test('Branded job page title can identify employer, but homepage alone cannot',(
   content:('求职招聘平台。独到科技有限公司，招聘信息和岗位大全。').repeat(8)},
   'https://www.doodod.com/'),null);
 });
+
+test('Real-world careers layout: navigation above job title and separate Beijing district still require independent employer proof',()=>{
+ const link=publicJobLink('https://www.doodod.com/careers/content-operations/');
+ const body=[
+  '# 最新产品与服务','- 行业案例','- 解决方案','- 加入我们','- 返回职位列表',
+  '# 内容运营','负责公司公众号与短视频内容传播并评估运营效果。',
+  '[投递简历](https://www.doodod.com/careers/apply/)',
+  '工作地点','北京 · 海淀区','工作经验','1年以上','学历要求','本科及以上',
+  '岗位职责','## 你将负责',
+  '负责企业内容选题策划、公众号编辑、账号运营与分析复盘。'.repeat(5),
+  '任职要求','## 我们希望你',
+  '本科及以上学历，具有至少一年新媒体内容运营相关工作经历。'.repeat(5),
+  '立即申请'
+ ].join('\n');
+ const job=readPublicJob(link,{
+  title:'内容运营｜加入独到科技｜DOODOD 独到科技',content:body
+ },now);
+ assert.equal(job?.company_claim,'独到科技');
+ assert.equal(job?.location,'北京');
+ assert.equal(job?.evidence.location_evidence_type,'JOB_LOCATION_FIELD');
+ const homepage={title:'独到科技 - 企业介绍',
+  content:'# 独到科技\n'+('独到科技（北京）有限公司独立官方网站，介绍企业团队、产品及加入我们。').repeat(8)};
+ assert.equal(provePublicEmployer(job,homepage,'https://www.doodod.com/')?.source_verification,
+  'CORPORATE_DOMAIN_AND_BRAND');
+ const noCompany={...job,company_claim:null};
+ assert.equal(provePublicEmployer(noCompany,homepage,'https://www.doodod.com/'),null);
+});
