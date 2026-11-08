@@ -589,7 +589,8 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
        }
       }
       const ordered=orderPublicJobCandidates(
-       jobs.map(x=>observed.get(x.url)),roleAliases,{maxPerDomain:2,limit:12,now});
+       jobs.map(x=>observed.get(x.url)),roleAliases,{maxPerDomain:2,limit:12,now,
+        corporateSiteDomains:[...sites.values()].map(x=>x.domain)});
       answer={status:'SEARCHED',jobs:ordered.map(x=>{
        const hints=searchEvidenceHints(x.search_metadata,roleAliases,now);
        return {url:x.url,title:x.search_title,
@@ -660,7 +661,8 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
  if(confirmed.size<desired&&usage.fetch<V8_BUDGET.fetch){
   const ranked=orderPublicJobCandidates(
    [...observed.values()].filter(x=>!attempted.has(x.url)),roleAliases,
-   {maxPerDomain:2,limit:6,now});
+   {maxPerDomain:2,limit:6,now,
+    corporateSiteDomains:[...sites.values()].map(x=>x.domain)});
   for(const link of ranked){
    if(postpassJobReads>=6||confirmed.size>=desired||usage.fetch>=V8_BUDGET.fetch)break;
    attempted.add(link.url);postpassJobReads++;usage.fetch++;
