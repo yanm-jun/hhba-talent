@@ -177,3 +177,74 @@ test('verified Meituan job-detail shape is eligible only as open-status-unconfir
  assert.equal(r?.official_url,'https://zhaopin.meituan.com/web/position/detail?jobUnionId=4747089400');
  assert.equal(r?.has_application_cta,true);
 });
+
+test('dynamic ATS tenants across many employers have bounded canonical URLs',()=>{
+ const links=[
+  'https://job-boards.greenhouse.io/openai/jobs/1234567',
+  'https://boards.greenhouse.io/acmeco/jobs/2345678',
+  'https://jobs.ashbyhq.com/helloworld/11111111-2222-3333-4444-555555555555',
+  'https://jobs.lever.co/anotherco/11111111-2222-3333-4444-555555555555',
+  'https://jobs.smartrecruiters.com/newcompany/12345678-engineering'
+ ];
+ for(const link of links){
+  const x=safeOfficialJobLocator(link);
+  assert.ok(x,link);
+  assert.equal(x.source_level,'VERIFIED_ATS_TENANT_ONLY');
+  assert.ok(x.tenant.length>=3);
+ }
+ for(const link of [
+  'https://evil.example.com/company/jobs/1234567',
+  'https://job-boards.greenhouse.io.evil.com/openai/jobs/1234567',
+  'http://job-boards.greenhouse.io/openai/jobs/1234567',
+  'https://boards.greenhouse.io/login/jobs/1234567',
+  'https://jobs.ashbyhq.com/openai/abc?redirect=https://evil.com',
+  'https://jobs.lever.co/openai/11111111-2222-3333-4444-555555555555?next=http://evil.com'
+ ])assert.equal(safeOfficialJobLocator(link),null,link);
+});
+test('ATS evidence requires tenant in fetched details and mainland city, never verified-open',()=>{
+ const link='https://job-boards.greenhouse.io/openai/jobs/1234567';
+ const detail=[
+  '# Data Engineer','Company: OpenAI','Location: Shanghai, China',
+  'Responsibilities','Build and operate reliable production pipelines with data models.',
+  'Qualifications','Strong SQL and Python experience and knowledge of cloud platforms.',
+  'Must be comfortable with data quality practices and cross-team engineering collaboration.',
+  'Apply for this job'
+ ].join('\n');
+ const x=extractOfficialJob({url:link},{content:detail},new Date('2026-11-08T00:00:00Z'));
+ assert.equal(x?.company,'openai');
+ assert.equal(x?.location,'上海');
+ assert.equal(x?.source_level,'VERIFIED_ATS_TENANT_ONLY');
+ assert.equal(x?.evidence.tenant_verified,true);
+ assert.equal(x?.application_status,'NEEDS_OFFICIAL_CONFIRMATION');
+ assert.equal(extractOfficialJob({url:link},{content:detail.replace('OpenAI','UnknownCorp')}),null);
+ assert.equal(extractOfficialJob({url:link},{content:detail.replace('Shanghai, China','Singapore')}),null);
+ assert.equal(extractOfficialJob({url:link},{content:detail.replace('Apply for this job','')}),null);
+});
+test('national search fetches at most 10 distinct ATS tenants, no added model calls',async()=>{
+ const urls=Array.from({length:16},(_,i)=>
+  'https://job-boards.greenhouse.io/company'+String(i+1)+'/jobs/'+String(1234567+i));
+ const calls=[];
+ const fetcher=async(url,opt)=>{
+  const payload=JSON.parse(opt.body);
+  calls.push({url,payload});
+  if(String(url).endsWith('/search'))return Response.json({results:urls.map(url=>({url}))});
+  const job=safeOfficialJobLocator(payload.url);
+  const detail=[
+   '# Data Engineer','Company: '+job.company,'Location: Beijing, China',
+   'Responsibilities','Build and operate enterprise data systems with security and reliability.',
+   'Qualifications','Use Python SQL and backend development with proven communication skills.',
+   'Can implement data pipelines and review their quality across teams.',
+   'Apply for this job'
+  ].join('\n');
+  return Response.json({title:'Data Engineer',content:detail});
+ };
+ const result=await discoverExternalOfficialJobs('数据工程师','fake-key-of-adequate-length',{fetcher});
+ assert.equal(calls.filter(x=>x.url.endsWith('/search')).length,5);
+ assert.equal(calls.filter(x=>x.url.endsWith('/fetch')).length,10);
+ assert.equal(result.attempts.search,5);
+ assert.equal(result.attempts.fetch,10);
+ assert.equal(result.usage.fetch,10);
+ assert.equal(result.cost_cap_cny,0.075);
+ assert.equal(result.candidates.length,10);
+ assert.equal(new Set(result.candidates.map(x=>x.company)).size,10);
+});
