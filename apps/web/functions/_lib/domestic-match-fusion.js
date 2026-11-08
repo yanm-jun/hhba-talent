@@ -60,9 +60,14 @@ function degreeMinRequirement(text){
 }
 function experienceMinRequirement(text){
  const s=textSafe(text,1200);
- const match=s.match(/([1-9]|1[0-9]|20)\s*年(?:及以上|以上|以上的|相关)?(?:工作|项目|行业|岗位)?(?:经验|经历)/)||
-  s.match(/(?:至少|不少于|最低)\s*([1-9]|1[0-9]|20)\s*年(?:工作|项目|相关)?(?:经验|经历)/);
- return match?Number(match[1]):null;
+ // Explicit requirements only. Match variants such as 7年以上工作经验,
+ // 至少7年、7-10年工作经验 and 7+ years experience.
+ const matches=[
+  ...s.matchAll(/(?:至少|不少于|最低(?:要求)?|须有|要求)?\s*(\d{1,2})\s*(?:[-~至]\s*\d{1,2})?\s*年\s*(?:以上|及以上|或以上|起)?\s*(?:(?:相关|实际|全职|工作|行业|项目|岗位|开发|管理|软件|数据)\s*){0,3}(?:经验|经历)/g),
+  ...s.matchAll(/(?:工作|相关|从业|行业|项目|开发)\s*(?:经验|年限)?\s*(?:至少|不少于|最低(?:要求)?)?\s*(\d{1,2})\s*年(?:以上|及以上)?/g),
+  ...s.matchAll(/(\d{1,2})\s*\+?\s*years?\s*(?:of\s*)?(?:work|professional|relevant|industry)?\s*experience/gi)
+ ].map(m=>Number(m[1])).filter(n=>n>=1&&n<=40);
+ return matches.length?Math.max(...matches):null;
 }
 function referencedExternal(entry,now){
  if(!entry||entry.source_type!=='站外官方招聘'||
@@ -95,8 +100,8 @@ function externalToMatch(entry,profile,options,now){
  const requirements=entry.evidence.requirement;
  const degree=degreeMinRequirement(requirements);
  const experience=experienceMinRequirement(requirements);
- if(degree!==null&&profile.education!==null&&DEGREE_RANK[profile.education]<degree)return null;
- if(experience!==null&&profile.experience_years!==null&&profile.experience_years<experience)return null;
+ if(degree!==null&&(!profile.education||DEGREE_RANK[profile.education]<degree))return null;
+ if(experience!==null&&(profile.experience_years===null||profile.experience_years<experience))return null;
  const targets=[textSafe(options?.role_hint,80),...profile.target_roles].filter(Boolean);
  const rolePoints=compatibleRole(entry.title,targets);
  const haveSkill=profile.skills.filter(x=>flat(requirements).includes(flat(x))||
@@ -118,6 +123,8 @@ function externalToMatch(entry,profile,options,now){
   title_zh:entry.title,location:entry.location,official_url:proof.official_url,
   platform:'official-domestic',source:entry.official_domain,remote:false,
   source_type:'站外官方招聘',reference_score:score,
+  salary:typeof entry.evidence.salary==='string'&&entry.evidence.salary.length<=60?entry.evidence.salary:null,
+  experience_requirement:experience===null?'经验未注明':experience+'年以上',
   matched,not_evidenced:gaps,
   needs_verification:[
    '企业官网详情与任职要求已抓取；网页出现申请入口，但当前是否仍接受申请必须到官网确认',
