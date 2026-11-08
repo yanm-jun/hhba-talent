@@ -151,7 +151,7 @@ const REQUIREMENT_HEADER=/^(?:任职|应聘|岗位|职位|工作|职业|基本|�
 const END_HEADER=/^(?:薪酬|薪资|福利|待遇|职位推荐|相关职位|更多职位|更多岗位|联系我们|如何申请|立即申请|立即投递|申请职位|职位列表|福利待遇|benefits|how to apply|apply now)(?:[\s：:]|$)/i;
 const LOC_LABEL=/^(?:工作地点|工作城市|工作地|办公地点|办公城市|上班地点|岗位地点|工作区域|location|work location)(?:\s*[：:]\s*|\s*[|｜]\s*|\s{1,4}|$)/i;
 const COMPANY_LABEL=/^(?:公司名称|企业名称|招聘单位|用人单位|所属公司|招聘公司|招聘主体|company name|employer)(?:\s*[：:]\s*|\s*[|｜]\s*|\s{1,4}|$)/i;
-const BOILER=/^(?:首页|关于我们|加入我们|岗位|招聘|职位详情|招聘信息|查看更多|列表|岗位搜索|简历投递|返回|导航|工作地点|任职资格|职位要求|岗位职责|职位描述|职位名称|岗位名称|公司名称|职位列表|搜索|全部职位|查看职位|工作内容|社会招聘|校园招聘|应届生招聘|工作城市|招聘岗位|申请岗位)$/i;
+const BOILER=/^(?:首页|关于我们|加入我们|岗位|招聘|产品和服务|生活在腾讯|查看工作岗位|慎防招聘诈骗|职位详情|招聘信息|查看更多|列表|岗位搜索|简历投递|返回|导航|工作地点|任职资格|职位要求|岗位职责|职位描述|职位名称|岗位名称|公司名称|职位列表|搜索|全部职位|查看职位|工作内容|社会招聘|校园招聘|应届生招聘|工作城市|招聘岗位|申请岗位)$/i;
 function markdownLines(raw){
  return String(raw||'').split('\n').slice(0,1000).map(line=>
   line.replace(/^\s*#{1,6}\s*/,'')
@@ -191,7 +191,8 @@ function extractRole(lines,page){
  const marked=fromTitle.match(/^(?:职位详情|岗位详情|招聘详情)\s*[-–：:|｜]\s*(.{3,100})/iu);
  if(marked){
   const detailRole=marked[1].split(/[|｜]/)[0].split(/\s+[-–]\s+/)[0].trim();
-  if(roleText(detailRole))return detailRole.slice(0,95);
+  if(roleText(detailRole)&&!/(?:官网|招聘|社会招聘|校园招聘|人才招聘)$/u.test(detailRole))
+   return detailRole.slice(0,95);
  }
  const candidate=fromTitle.split(/[|｜]/)[0].split(/\s+[-–]\s+/)[0].trim();
  if(roleText(candidate))return candidate.slice(0,95);
