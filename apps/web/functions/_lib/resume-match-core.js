@@ -132,8 +132,14 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
   const proof=verified.get(j.id),f=facts.get(j.id);
   if(!proof||proof.platform!==j.platform||!f||f.original_source_hash!==proof.jd_sha256||
      !safeJobLink(j)||!isVerifiedMainlandLocation(j,f))continue;
-  // Client preferences cannot override the mainland-only rule.
+  // Work-location and eligibility gates must run BEFORE relevance scoring.
+  // Facet values are sourced from the same hash-verified official JD snapshot.
   if(opts.remote_only&&j.remote!==true)continue;
+  if(Number.isFinite(f.experienceMinYears)&&f.experienceMinYears>0&&
+     (!Number.isFinite(profile.experience_years)||profile.experience_years<f.experienceMinYears))continue;
+  const degreeLevels={HIGH_SCHOOL:1,ASSOCIATE:2,BACHELOR:3,MASTER:4,PHD:5};
+  const minDegree=degreeLevels[String(f.education||'').toUpperCase()];
+  if(minDegree&&(!degreeLevels[profile.education]||degreeLevels[profile.education]<minDegree))continue;
   const title=j.title.toLowerCase();
   const tags=Array.isArray(f.skills)?f.skills.filter(x=>typeof x==='string').map(x=>x.toLowerCase()):[];
   const roleMatches=query.flatMap(x=>aliasesOf(x)).filter(x=>x.length>=2&&title.includes(x));
@@ -154,7 +160,12 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
    official_url:j.url,platform:j.platform,source:j.source||'',remote:j.remote===true,
    reference_score:score,matched,not_evidenced:notEvidenced,needs_verification:needs,
    requirements_basis:'与同版官方 JD 审核和搜索特征一致；未对录用概率作预测',
-   source_type:'HHBA站内岗位',rankEvidence:roleMatches.length+skillMatches.length});
+   source_type:'HHBA站内岗位',
+   salary:typeof j.salary==='string'&&j.salary.length<=60?j.salary:
+    typeof f.salary==='string'&&f.salary.length<=60?f.salary:null,
+   experience_requirement:Number.isFinite(f.experienceMinYears)&&f.experienceMinYears>=0?
+    (f.experienceMinYears===0?'经验不限':f.experienceMinYears+'年以上'):'经验未注明',
+   rankEvidence:roleMatches.length+skillMatches.length});
  }
  filtered.sort((a,b)=>b.reference_score-a.reference_score||b.rankEvidence-a.rankEvidence||a.id.localeCompare(b.id));
  // A vacancy in multiple cities should not crowd out different companies or roles.
