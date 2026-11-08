@@ -179,3 +179,30 @@ test('Company-owned homepage remains acceptable with actual legal employer ident
   content:('# 星河数字科技有限公司\n这里介绍星河数字科技有限公司的业务与团队。').repeat(7)};
  assert.equal(provePublicEmployer(job,site,'https://xinghe.cn/')?.company,'星河数字科技有限公司');
 });
+
+test('Branded job page title can identify employer, but homepage alone cannot',()=>{
+ const url='https://www.doodod.com/careers/content-operations/';
+ const goodJD=[
+  '# 内容运营','工作地点：北京','岗位职责',
+  '负责公众号选题、短视频内容运营、数据复盘和客户案例撰写。'.repeat(6),
+  '工作要求','本科及以上学历，掌握内容策划、用户增长和新媒体渠道运营。'.repeat(6),
+  '立即申请'
+ ].join('\n');
+ const job=readPublicJob(publicJobLink(url),{
+  title:'内容运营｜加入独到科技｜DOODOD 独到科技',content:goodJD
+ },now);
+ assert.equal(job?.company_claim,'独到科技');
+ assert.equal(job?.location,'北京');
+ const page={title:'独到科技 - 公司官网',
+  content:'# 独到科技\n'+('北京独到科技有限公司专注企业AI软件研发，团队介绍和产品服务。').repeat(8)};
+ assert.equal(provePublicEmployer(job,page,'https://www.doodod.com/')?.company,'独到科技');
+ const unbranded=readPublicJob(publicJobLink(url),{
+  title:'内容运营 - 社会招聘',content:goodJD
+ },now);
+ assert.equal(unbranded?.company_claim,null);
+ assert.equal(inspectPublicEmployer(unbranded,page,'https://www.doodod.com/').reason,
+  'COMPANY_CLAIM_NOT_ON_JOB');
+ assert.equal(provePublicEmployer(job,{title:'招聘职位搜索门户',
+  content:('求职招聘平台。独到科技有限公司，招聘信息和岗位大全。').repeat(8)},
+  'https://www.doodod.com/'),null);
+});
