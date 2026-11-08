@@ -16,7 +16,8 @@ export type MatchedJob = {
   source_type?:'HHBA站内岗位'|'站外官方招聘';
   application_status?:'NEEDS_OFFICIAL_CONFIRMATION';checked_at?:string;
   salary?:string|null;experience_requirement?:string|null;
-  required_skills?:string[];min_experience_years?:number|null;minimum_education?:string|null;
+  required_skills?:string[];preferred_skills?:string[];unclassified_skills?:string[];
+  min_experience_years?:number|null;minimum_education?:string|null;
   score_breakdown?:{role:number;skills:number;experience:number;education:number;location:number};
   ranking_version?:'HHBA_MATCH_RANKING_V2';
 };
@@ -169,6 +170,12 @@ export function safeExternalJobApplicationUrl(job:MatchedJob):string|null{
     job.source==='jobs.bytedance.com'&&job.id==='external-jobs-bytedance-com-'+id?
     'https://jobs.bytedance.com/experienced/position/'+id+'/detail':null;
   }
+  if(u.hostname==='talent.baidu.com'){
+   const id=u.pathname.match(/^\/jobs\/detail\/SOCIAL\/([0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i)?.[1]?.toLowerCase();
+   return id&&u.searchParams.size===0&&job.company==='百度'&&
+    job.source==='talent.baidu.com'&&job.id==='external-talent-baidu-com-'+id?
+    'https://talent.baidu.com/jobs/detail/SOCIAL/'+id:null;
+  }
   if(u.searchParams.size!==1)return null;
   const expected=specs[u.hostname];
   if(!expected||u.pathname!==expected.path||job.company!==expected.company||
@@ -184,6 +191,7 @@ export type ExternalOfficialCandidate={
  id:string;source_type:'站外官方招聘';source_status:'OFFICIAL_DETAIL_FETCHED';
  application_status:'NEEDS_OFFICIAL_CONFIRMATION';company:string;title:string;
  location:string;official_url:string;official_domain:string;has_application_cta:boolean;
+ application_method?:'OFFICIAL_DETAIL_LOGIN_REQUIRED'|'DIRECT_CTA_UNVERIFIED';
  checked_at:string;evidence:{title:string;location:string;requirement:string;salary?:string|null};
 };
 export type ExternalSearchResult={
