@@ -1,3 +1,4 @@
+import {MAINLAND_PLACE_PATTERN} from './mainland-place-index.js';
 // HHBA candidate recommendation fusion V1.
 // Only audited HHBA matches and independently fetched official job details may
 // be ranked. No model-generated employer/job facts or acceptance probabilities.
@@ -25,7 +26,7 @@ function textSafe(value,max=260){
 }
 export function isMainlandWorkCity(value){
  const city=textSafe(value,100);
- return !!city&&!OUTSIDE.test(city)&&MAINLAND_CITY.test(city);
+ return !!city&&!OUTSIDE.test(city)&&(MAINLAND_CITY.test(city)||MAINLAND_PLACE_PATTERN.test(city));
 }
 function canonicalRoleKey(job){
  const city=textSafe(job.location,50);

@@ -263,3 +263,15 @@ test('mixed mainland and foreign job location is rejected without guesswork',()=
  assert.equal(extractOfficialJob({url:x},{content:doc.replace('Canada','Australia')}),null);
  assert.equal(extractOfficialJob({url:x},{content:doc.replace('Shanghai, Canada','上海、香港')}),null);
 });
+
+test('national prefecture directory accepts inland prefectures beyond old shortlist',()=>{
+ const u='https://careers.tencent.com/jobdesc.html?postId=2097166275703910400';
+ const long=[
+  '# 软件开发工程师','岗位职责','维护城市数据服务与业务平台，持续改进产品质量。',
+  '岗位要求','熟练使用 Python 和 SQL，具备软件工程经验与协作能力。',
+  '理解分布式开发和数据系统应用，能与产品和业务团队共同完成工作。',
+  '工作地点：喀什地区','立即投递'
+ ].join('\n');
+ const result=extractOfficialJob({url:u},{content:long});
+ assert.equal(result?.location,'喀什地区');
+});
