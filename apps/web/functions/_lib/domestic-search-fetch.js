@@ -2,8 +2,10 @@
 // This module NEVER accepts a resume or arbitrary URL from an applicant.
 // Search is discovery, not proof that applications are currently open.
 export const EXTERNAL_DISCOVERY_VERSION='HHBA_DOMESTIC_DISCOVERY_V1';
-export const SEARCH_LIMIT=2;
-export const FETCH_LIMIT=3;
+export const SEARCH_LIMIT=5;
+export const FETCH_LIMIT=10;
+export const MAX_SEARCH_FETCH_COST_CNY=0.075;
+export const CACHE_TTL_MS=24*60*60*1000;
 
 const OFFICIAL={
  'careers.tencent.com':{
@@ -13,6 +15,43 @@ const OFFICIAL={
  'zhaopin.meituan.com':{
   company:'美团',path:'/web/position/detail',idParam:'jobUnionId',idPattern:/^\d{8,14}$/},
 };
+// Dynamic ATS tenants: not a fixed employer list. Host controls are strict,
+// and company identity remains "ATS tenant only" until separately certified.
+const ATS=[
+ {domain:'jobs.ashbyhq.com',provider:'ashby',path:/^\/([a-z0-9][a-z0-9-]{1,55})\/([a-f0-9]{8}-[a-f0-9-]{27,40})\/?$/i},
+ {domain:'jobs.lever.co',provider:'lever',path:/^\/([a-z0-9][a-z0-9-]{1,55})\/([a-f0-9]{8}-[a-f0-9-]{27,40})\/?$/i},
+ {domain:'job-boards.greenhouse.io',provider:'greenhouse',path:/^\/([a-z0-9][a-z0-9-]{1,55})\/jobs\/(\d{5,14})\/?$/i},
+ {domain:'boards.greenhouse.io',provider:'greenhouse',path:/^\/([a-z0-9][a-z0-9-]{1,55})\/jobs\/(\d{5,14})\/?$/i},
+ {domain:'jobs.smartrecruiters.com',provider:'smartrecruiters',path:/^\/([a-z0-9][a-z0-9-]{1,55})\/(\d{7,16}(?:-[a-z0-9-]{2,90})?)\/?$/i}
+];
+const RESERVED_TENANTS=new Set(['login','signin','register','company','jobs','job','careers','candidate','app','privacy','admin','test','example']);
+const ENGLISH_CITY={
+ beijing:'北京',shanghai:'上海',shenzhen:'深圳',guangzhou:'广州',hangzhou:'杭州',
+ chengdu:'成都',wuhan:'武汉',nanjing:'南京',suzhou:'苏州',xian:'西安',
+ 'xi\'an':'西安',qingdao:'青岛',ningbo:'宁波',tianjin:'天津',chongqing:'重庆',
+ xiamen:'厦门',fuzhou:'福州',hefei:'合肥',changsha:'长沙',kunming:'昆明',
+ dalian:'大连',jinan:'济南',zhengzhou:'郑州',wuxi:'无锡',dongguan:'东莞',
+ zhuhai:'珠海',foshan:'佛山',nanning:'南宁',haikou:'海口'
+};
+const ENGLISH_CITY_PATTERN=new RegExp(
+ '\\b('+Object.keys(ENGLISH_CITY).sort((a,b)=>b.length-a.length).join('|')+')\\b','i');
+const ENG_DUTIES=/(?:responsibilities|what you['’]ll do|job description|about the role)/i;
+const ENG_REQUIREMENTS=/(?:qualifications|requirements|what you['’]ll need|what we['’]re looking for)/i;
+const ENG_APPLY=/(?:apply for this job|apply now|submit application|apply to this job)/i;
+const ENG_CLOSED=/(?:no longer accepting applications|this job is closed|position has been filled|job is no longer available)/i;
+function mainlandCity(text){
+ const str=String(text||'').slice(0,100);
+ if(OUTSIDE.test(str))return null;
+ const c=str.match(CITY_PATTERN)?.[0];
+ if(c)return c;
+ const english=str.match(ENGLISH_CITY_PATTERN)?.[0]?.toLowerCase();
+ return english?ENGLISH_CITY[english]:null;
+}
+function tenantConfirmed(content,tenant){
+ const expected=tenant.toLowerCase().replace(/[^a-z0-9]/g,'');
+ return expected.length>=3&&content.slice(0,2600).toLowerCase().replace(/[^a-z0-9]/g,'').includes(expected);
+}
+
 const CITY_NAMES=[
  '北京','上海','天津','重庆','深圳','广州','杭州','南京','苏州','成都','武汉','西安',
  '青岛','宁波','无锡','合肥','郑州','长沙','厦门','福州','济南','大连','沈阳','哈尔滨',
@@ -41,25 +80,43 @@ export function buildOfficialQueries(role){
  const clean=sanitizedJobIntent(role);
  if(!clean)return [];
  return [
-  clean+' 招聘 site:careers.tencent.com OR site:zhaopin.meituan.com',
-  clean+' 招聘 site:career.huawei.com'
+  clean+' 中国大陆 招聘 官方岗位 2026',
+  clean+' Shanghai Beijing Shenzhen China site:jobs.ashbyhq.com',
+  clean+' 上海 北京 中国 招聘 site:jobs.lever.co',
+  clean+' 中国 招聘 site:job-boards.greenhouse.io OR site:boards.greenhouse.io',
+  clean+' 国内招聘 site:jobs.smartrecruiters.com OR site:career.huawei.com OR site:careers.tencent.com OR site:zhaopin.meituan.com'
  ].map(q=>q.slice(0,128));
 }
 export function safeOfficialJobLocator(input){
- if(typeof input!=='string'||input.length>1000)return null;
+ if(typeof input!=='string'||input.length>1500)return null;
  try{
   const u=new URL(input);
   if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash)return null;
-  const source=OFFICIAL[u.hostname];
-  if(!source||u.pathname!==source.path||!u.searchParams.has(source.idParam))return null;
-  const meituanExtra=u.hostname==='zhaopin.meituan.com'&&u.searchParams.size===2&&
-   u.searchParams.has('highlightType')&&['social','campus'].includes(u.searchParams.get('highlightType'));
-  if(u.searchParams.size!==1&&!meituanExtra)return null;
-  const id=u.searchParams.get(source.idParam);
-  if(!source.idPattern.test(id))return null;
-  return {id:u.hostname+':'+id,company:source.company,domain:u.hostname,
-   url:'https://'+u.hostname+source.path+'?'+source.idParam+'='+id};
- }catch{return null}
+  const fixed=OFFICIAL[u.hostname];
+  if(fixed){
+   if(u.pathname!==fixed.path||!u.searchParams.has(fixed.idParam))return null;
+   const meituanExtra=u.hostname==='zhaopin.meituan.com'&&u.searchParams.size===2&&
+    u.searchParams.has('highlightType')&&['social','campus'].includes(u.searchParams.get('highlightType'));
+   if(u.searchParams.size!==1&&!meituanExtra)return null;
+   const id=u.searchParams.get(fixed.idParam);
+   if(!fixed.idPattern.test(id))return null;
+   return {id:u.hostname+':'+id,company:fixed.company,domain:u.hostname,
+    provider:'employer',source_level:'VERIFIED_EMPLOYER_DOMAIN',
+    url:'https://'+u.hostname+fixed.path+'?'+fixed.idParam+'='+id};
+  }
+  const ats=ATS.find(p=>p.domain===u.hostname);
+  if(!ats)return null;
+  for(const k of u.searchParams.keys())
+   if(!['utm_source','utm_medium','gh_src','lever-source','source'].includes(k))return null;
+  if(u.searchParams.size>3)return null;
+  const m=u.pathname.match(ats.path);
+  if(!m)return null;
+  const tenant=m[1].toLowerCase(),id=m[2].toLowerCase();
+  if(RESERVED_TENANTS.has(tenant))return null;
+  const url='https://'+u.hostname+u.pathname.replace(/\/$/,'');
+  return {id:u.hostname+':'+tenant+':'+id,company:tenant,domain:u.hostname,
+   tenant,provider:ats.provider,source_level:'VERIFIED_ATS_TENANT_ONLY',url};
+ }catch{return null;}
 }
 export function extractOfficialJob(searchResult,document,now=new Date()){
  const source=safeOfficialJobLocator(searchResult?.url);
