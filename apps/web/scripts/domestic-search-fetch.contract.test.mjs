@@ -112,7 +112,7 @@ test('JD official posting is accepted only with an exact verified single-positio
   assert.equal(safeOfficialJobLocator(bad),null,bad);
  }
  const jd=['# 测试开发工程师','职位类型：研发类 工作地点：北京市 发布时间：2026-11-02',
- '岗位描述','岗位职责：开发自动化测试脚本，负责接口与性能测试。',
+ '岗位描述','岗位职责：开发自动化测试脚本，负责接口与性能测试；负责设计质量保障策略，构建自动化测试平台，参与研发需求评审、回归测试、线上稳定性监控、测试计划制定及跨团队协作，并针对质量指标持续优化开发流程。',
  '任职要求','本科及以上学历，具备 3 年软件工程测试开发经验。熟悉 Python 和 SQL，具备跨团队协作能力。',
  '立即申请'].join('\n');
  const extracted=extractOfficialJob({url:link},{content:jd},new Date('2026-11-08T00:00:00Z'));
