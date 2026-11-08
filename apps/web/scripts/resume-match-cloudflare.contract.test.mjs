@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {redactForModel,verifiedProfile,selectAuditedMatches} from '../functions/_lib/resume-match-core.js';
+import {fuseDomesticJobRecommendations} from '../functions/_lib/domestic-match-fusion.js';
 import {onRequest} from '../functions/api/match/[[path]].js';
 
 test('contact identifiers removed while employment dates survive',()=>{
@@ -41,6 +42,36 @@ test('only same-snapshot audit, exact JD hash and secure official ATS can rank',
  assert.throws(()=>selectAuditedMatches({...snapshot,updated:'2020-01-01'},audit,facets,profile),
    /OFFICIAL_JOB_INDEX_UNAVAILABLE/);
 });
+test('V2 scores the full validated candidate pool before selecting Top 10',()=>{
+ const time=Date.now(),iso=new Date(time).toISOString(),jobs=[],audited=[],facts=[];
+ for(let i=0;i<72;i++){
+  const source='precision'+i,id='ashby-'+source+'-role'+i,hash='hash'+i;
+  jobs.push({id,company:'示例企业'+i,title:'Python 开发工程师',
+   location:'上海',url:'https://jobs.ashbyhq.com/'+source+'/role'+i,
+   platform:'ashby',source,remote:false});
+  audited.push({job_id:id,platform:'ashby',status:'OFFICIAL_JD_AND_REQUIREMENTS_FOUND',
+   full_original_jd_verified:true,requirements_evidence:true,jd_sha256:hash});
+  facts.push({id,countryCode:'CN',skills:['python','sql'],experienceMinYears:2,
+   education:'BACHELOR',original_source_hash:hash});
+ }
+ const snapshot={updated:iso,jobs};
+ const audit={summary:{kind:'HHBA_OFFICIAL_FULL_JOB_JD_AUDIT_V1',
+  indexed_as_of:iso,checked_at:iso},jobs:audited};
+ const facets={indexed_as_of:iso,verified_at:iso,jobs:facts};
+ const candidate={skills:[{name:'Python'},{name:'SQL'}],experience_years:3,
+  education:'BACHELOR',target_roles:['Python 开发工程师']};
+ const old=selectAuditedMatches(snapshot,audit,facets,candidate,{limit:10},time);
+ assert.equal(old.matches.length,10,'legacy response contract stays Top 10');
+ const pool=selectAuditedMatches(snapshot,audit,facets,candidate,
+  {role_hint:'Python 开发工程师',candidate_pool_limit:1200},time);
+ assert.equal(pool.matches.length,72,'no premature 60-item cutoff');
+ const final=fuseDomesticJobRecommendations(pool.matches,[],candidate,
+  {role_hint:'Python 开发工程师',limit:10},time);
+ assert.equal(final.matches.length,10);
+ assert.equal(new Set(final.matches.map(x=>x.company)).size,10);
+ assert.ok(final.matches.every(x=>x.ranking_version==='HHBA_MATCH_RANKING_V2'));
+});
+
 test('Cloudflare service is disabled by default and rejects cross-site uploads',async()=>{
  const status=await onRequest({request:new Request('https://hhba.work/api/match/status'),env:{}});
  assert.equal((await status.json()).enabled,false);
