@@ -180,7 +180,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
-          <span>我同意 HHBA 提取简历文本，尽可能隐藏邮箱、电话等直接标识信息后，将文本发送给第三方 DeepSeek 进行能力分析。自动脱敏可能不完整，我已自行检查简历是否包含不愿提供的信息。原始简历不保存到本 AI 匹配服务，也不会自动发布或投递。</span>
+          <span>我同意 HHBA 提取简历文本，尽可能隐藏邮箱、电话等直接标识后，发送给 DeepSeek 分析能力和匹配岗位；平台还会仅使用岗位方向联网搜索中国大陆公开招聘信息，不向搜索接口传送姓名、电话或简历原文。脱敏可能不完整，请自行检查；不会公开简历或自动投递。</span>
         </label>
         <p className="hhba-ai-notice"><ShieldCheck size={15}/> 本功能仅供已登录的求职者使用。简历原件在当前浏览器读取，最多取前 2 万字文字分析；分析需单独同意，结果仅在本次页面中展示，不会自动公开或向企业投递。</p>
         {(error||availability==='ready')&&<div>
@@ -202,7 +202,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
           {working?<><LoaderCircle className="spin" size={18}/> 正在提取简历并匹配岗位…</>:
            <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
         </button>
-        {working&&<p className="hhba-ai-processing" role="status">后台正在识别简历与核验岗位要求。请保持页面打开，不会在未完成前显示虚构结果。</p>}
+        {working&&<p className="hhba-ai-processing" role="status">正在分析简历、搜索国内公开职位并核验岗位要求。请保持页面打开，完成后将自动展示推荐。</p>}
       </section>
       <aside className="hhba-ai-aside">
         <div className="hhba-ai-aside-card"><h3>我们会怎样匹配？</h3>
@@ -214,7 +214,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
         <p className="hhba-ai-aside-footnote">相关度分数只是搜索排序参考，不是获得面试、录用或签证的概率。任何“未披露”条件都需要官网确认。</p>
       </aside>
     </div>
-    {result&&<CandidateMatchResultDialog result={result} roleHint={options.role_hint} onClose={()=>setResult(null)}/>}
+    {result&&<CandidateMatchResultDialog result={result} onClose={()=>setResult(null)}/>}
      <div className="hhba-ai-footer"><Link to="/candidate/jobs">不上传简历，直接搜索公开岗位 <ArrowRight size={15}/></Link></div>
   </section>
  </Shell>;

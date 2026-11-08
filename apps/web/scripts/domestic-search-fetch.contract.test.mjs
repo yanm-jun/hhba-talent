@@ -101,6 +101,88 @@ test('two searches and at most three fetches, only official detail URLs survive'
  assert.equal(calls.filter(x=>x.url.endsWith('/search')).length,2);
  assert.equal(calls.filter(x=>x.url.endsWith('/fetch')).length,3);
 });
+test('JD official posting is accepted only with an exact verified single-position URL',()=>{
+ const link='https://zhaopin.jd.com/web/job-info-detail?requementId=227402';
+ const locator=safeOfficialJobLocator(link);
+ assert.equal(locator?.company,'京东');
+ assert.equal(locator?.id,'zhaopin.jd.com:227402');
+ for(const bad of [link+'&page=3','https://zhaopin.jd.com.evil.example/web/job-info-detail?requementId=227402',
+  'https://zhaopin.jd.com/web/job-info-detail?requementId=abc',
+  'https://zhaopin.jd.com/home?requementId=227402']){
+  assert.equal(safeOfficialJobLocator(bad),null,bad);
+ }
+ const jd=['# 测试开发工程师','职位类型：研发类 工作地点：北京市 发布时间：2026-11-02',
+ '岗位描述','岗位职责：开发自动化测试脚本，负责接口与性能测试；负责设计质量保障策略，构建自动化测试平台，参与研发需求评审、回归测试、线上稳定性监控、测试计划制定及跨团队协作，并针对质量指标持续优化开发流程。',
+ '任职要求','本科及以上学历，具备 3 年软件工程测试开发经验。熟悉 Python 和 SQL，具备跨团队协作能力。',
+ '立即申请'].join('\n');
+ const extracted=extractOfficialJob({url:link},{content:jd},new Date('2026-11-08T00:00:00Z'));
+ assert.equal(extracted?.company,'京东');
+ assert.equal(extracted?.location,'北京');
+ assert.equal(extracted?.has_application_cta,true);
+ assert.equal(extracted?.application_status,'NEEDS_OFFICIAL_CONFIRMATION');
+});
+
+test('Baidu SOCIAL official job UUID is verified; login is NOT verified-open',async()=>{
+ const social='https://talent.baidu.com/jobs/detail/SOCIAL/bd46ce5b-f5ae-4e97-9e25-80b851e30f12';
+ const loc=safeOfficialJobLocator(social);
+ assert.equal(loc?.company,'百度');
+ assert.equal(loc?.id,'talent.baidu.com:bd46ce5b-f5ae-4e97-9e25-80b851e30f12');
+ for(const bad of [
+  social+'?utm_source=x',social+'#fragment',
+  social.replace('/SOCIAL/','/INTERN/'),
+  social.replace('talent.baidu.com/','talent.baidu.com.attacker.example/'),
+  'https://talent.baidu.com/jobs/',
+  'http://talent.baidu.com/jobs/detail/SOCIAL/bd46ce5b-f5ae-4e97-9e25-80b851e30f12'
+ ])assert.equal(safeOfficialJobLocator(bad),null,bad);
+ const jd=[
+  '# 数据产品经理（J86847）','登录','MEG','MEG北京市产品1人2026-07-21',
+  '工作职责：','负责百度搜索业务数据产品的规划、设计、开发、上线等全流程，并进行业务需求分析；',
+  '与研发团队协作推动数据产品持续改进、优化用户体验、负责需求评审及质量交付。',
+  '职责要求：','任职资格：本科及以上学历，具备1年以上数据产品相关经验，能够独立完成数据产品设计。',
+  '熟悉数据产品开发流程，了解 SQL 和 Python，有 Spark 经验者优先，具备跨团队合作意识。'
+ ].join('\n');
+ const fetched=extractOfficialJob({url:social},{content:jd},new Date('2026-11-08T00:00:00Z'));
+ assert.equal(fetched?.company,'百度');
+ assert.equal(fetched?.location,'北京');
+ assert.equal(fetched?.has_application_cta,false);
+ assert.equal(fetched?.application_method,'OFFICIAL_DETAIL_LOGIN_REQUIRED');
+ assert.equal(fetched?.application_status,'NEEDS_OFFICIAL_CONFIRMATION');
+ assert.ok(fetched?.evidence.requirement.includes('1年以上数据产品相关经验'));
+ const noLogin=extractOfficialJob({url:social},{content:jd.replace('登录','')},new Date('2026-11-08T00:00:00Z'));
+ assert.equal(noLogin?.application_method,'DIRECT_CTA_UNVERIFIED');
+ assert.equal(noLogin?.has_application_cta,false);
+ const {fetcher,calls}=providerMock({
+  searches:[[],[{url:social}],[],[]],
+  documents:{[social]:{content:jd}}
+ });
+ const found=await discoverExternalOfficialJobs('数据产品经理','fake-key-of-adequate-length',
+  {fetcher,expanded:true,now:new Date('2026-11-08T00:00:00Z')});
+ assert.equal(calls.filter(x=>x.url.endsWith('/search')).length,4);
+ assert.ok(calls.filter(x=>x.url.endsWith('/search')).every(x=>!JSON.stringify(x.body).includes('resume')));
+ assert.equal(found.candidates.length,1);
+ assert.equal(found.candidates[0].company,'百度');
+ assert.equal(found.candidates[0].has_application_cta,false);
+});
+test('three verified job directions use the same four search calls',()=>{
+ const q=buildOfficialQueries(['Python 开发工程师','数据分析师','测试开发工程师'],true);
+ assert.equal(q.length,4);
+ assert.ok(q[0].includes('Python 开发'));
+ assert.ok(q[1].includes('数据分析师'));
+ assert.ok(q[2].includes('测试开发'));
+ assert.ok(q[3].includes('Python 开发'));
+ assert.ok(q.every(x=>x.length<=128));
+ const sanitized=buildOfficialQueries(['数据分析师','姓名：张三','测试开发工程师'],true);
+ assert.equal(sanitized.length,4);
+ assert.ok(sanitized.every(x=>!x.includes('张三')));
+ assert.deepEqual(buildOfficialQueries(['姓名：张三','https://evil.example'],true),[]);
+});
+test('expanded queries add Baidu official details without adding provider calls',()=>{
+ const queries=buildOfficialQueries('数据产品经理',true);
+ assert.equal(queries.length,4);
+ assert.ok(queries.some(x=>x.includes('site:talent.baidu.com/jobs/detail/SOCIAL/')));
+ assert.ok(queries.every(x=>x.length<=128));
+});
+
 test('provider errors only return safe codes and never raw response contents',async()=>{
  const {fetcher}=providerMock({errorSearch:401});
  await assert.rejects(

@@ -6,7 +6,8 @@ import {extractPdfText} from './pdfProfile.mjs';
 export type MatchProfile = {
   education:string|null;education_evidence:string|null;
   experience_years:number|null;experience_evidence:string|null;
-  skills:{name:string;evidence:string}[];target_roles:string[];warnings:string[];
+  skills:{name:string;evidence:string}[];target_roles:string[];
+  professional_credentials?:string[];warnings:string[];
 };
 export type MatchedJob = {
   id:string;company:string;title:string;title_zh?:string|null;location:string;
@@ -15,6 +16,15 @@ export type MatchedJob = {
   needs_verification:string[];requirements_basis:string;
   source_type?:'HHBA站内岗位'|'站外官方招聘';
   application_status?:'NEEDS_OFFICIAL_CONFIRMATION';checked_at?:string;
+  salary?:string|null;experience_requirement?:string|null;
+  required_skills?:string[];mandatory_skills?:string[];preferred_skills?:string[];unclassified_skills?:string[];
+  min_experience_years?:number|null;minimum_education?:string|null;
+  professional_credential_requirements?:string[];
+  professional_credential_review?:{kind:string;likely_credential:string;warning:string}|null;
+  score_breakdown?:{role:number;skills:number;experience:number;education:number;location:number};
+  score_reasoning?:string;
+  evidence_quality?:{skills:string;experience:string;education:string};
+  ranking_version?:'HHBA_MATCH_RANKING_V2';
 };
 export type MatchResponse = {
   status:'COMPLETE';profile:MatchProfile;matches:MatchedJob[];
@@ -152,12 +162,26 @@ export function safeExternalJobApplicationUrl(job:MatchedJob):string|null{
  if(job?.source_type!=='站外官方招聘'||job.application_status!=='NEEDS_OFFICIAL_CONFIRMATION')return null;
  try{
   const u=new URL(job.official_url);
-  if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash||u.searchParams.size!==1)return null;
+  if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash)return null;
   const specs:Record<string,{company:string;path:string;param:string;pattern:RegExp}>={
    'careers.tencent.com':{company:'腾讯',path:'/jobdesc.html',param:'postId',pattern:/^\d{12,22}$/},
    'career.huawei.com':{company:'华为',path:'/cn/job-details',param:'advertisementId',pattern:/^\d{1,12}$/},
-   'zhaopin.meituan.com':{company:'美团',path:'/web/position/detail',param:'jobUnionId',pattern:/^\d{8,14}$/}
+   'zhaopin.meituan.com':{company:'美团',path:'/web/position/detail',param:'jobUnionId',pattern:/^\d{8,14}$/},
+   'zhaopin.jd.com':{company:'京东',path:'/web/job-info-detail',param:'requementId',pattern:/^\d{3,12}$/}
   };
+  if(u.hostname==='jobs.bytedance.com'){
+   const id=u.pathname.match(/^\/experienced\/position\/([0-9]{13,22})\/detail$/)?.[1];
+   return u.searchParams.size===0&&id&&job.company==='字节跳动'&&
+    job.source==='jobs.bytedance.com'&&job.id==='external-jobs-bytedance-com-'+id?
+    'https://jobs.bytedance.com/experienced/position/'+id+'/detail':null;
+  }
+  if(u.hostname==='talent.baidu.com'){
+   const id=u.pathname.match(/^\/jobs\/detail\/SOCIAL\/([0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i)?.[1]?.toLowerCase();
+   return id&&u.searchParams.size===0&&job.company==='百度'&&
+    job.source==='talent.baidu.com'&&job.id==='external-talent-baidu-com-'+id?
+    'https://talent.baidu.com/jobs/detail/SOCIAL/'+id:null;
+  }
+  if(u.searchParams.size!==1)return null;
   const expected=specs[u.hostname];
   if(!expected||u.pathname!==expected.path||job.company!==expected.company||
    job.source!==u.hostname||!u.searchParams.has(expected.param))return null;
@@ -172,7 +196,8 @@ export type ExternalOfficialCandidate={
  id:string;source_type:'站外官方招聘';source_status:'OFFICIAL_DETAIL_FETCHED';
  application_status:'NEEDS_OFFICIAL_CONFIRMATION';company:string;title:string;
  location:string;official_url:string;official_domain:string;has_application_cta:boolean;
- checked_at:string;evidence:{title:string;location:string;requirement:string};
+ application_method?:'OFFICIAL_DETAIL_LOGIN_REQUIRED'|'DIRECT_CTA_UNVERIFIED';
+ checked_at:string;evidence:{title:string;location:string;requirement:string;salary?:string|null};
 };
 export type ExternalSearchResult={
  ok:true;kind:'HHBA_DOMESTIC_DISCOVERY_V1';scope:'CN_MAINLAND_ONLY';

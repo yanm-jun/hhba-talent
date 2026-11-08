@@ -39,16 +39,21 @@ test('relevant official external posting competes with internal without becoming
  assert.ok(result.matches[0].needs_verification.some(x=>x.includes('仍接受申请')));
  assert.equal(result.counts.selected_external,1);
  assert.equal(result.counts.selected_internal,1);
- assert.ok(result.matches[0].reference_score<=90);
+ assert.ok(result.matches[0].reference_score<=100);
+ assert.deepEqual(Object.keys(result.matches[0].score_breakdown),
+  ['role','skills','experience','education','location']);
 });
-test('same company same role across sources or cities appears once, with higher score winning',()=>{
+test('identical company and role deduplicates across cities and sources with V2 score winning',()=>{
  const external=domesticOutside();
  const result=fuseDomesticJobRecommendations([
   domesticInside('original',92,'腾讯','软件开发工程师','深圳'),
   domesticInside('othercity',84,'腾讯','软件开发工程师','上海')],
  [external],profile,{role_hint:'软件开发工程师'},now);
  assert.equal(result.matches.length,1);
- assert.equal(result.matches[0].id,'ashby-verified-original');
+ assert.equal(result.matches[0].source_type,'站外官方招聘');
+ assert.equal(result.matches[0].ranking_version,'HHBA_MATCH_RANKING_V2');
+ assert.equal(Object.values(result.matches[0].score_breakdown).reduce((a,b)=>a+b,0),
+  result.matches[0].reference_score);
 });
 test('foreign, stale, nonofficial and inactive external jobs are rejected before scoring',()=>{
  const rows=[
@@ -84,7 +89,8 @@ test('skill-only matching is grounded by fetched requirement wording',()=>{
 test('no forced 10, keeps distinct employers and caps at ten in a large mixed pool',()=>{
  const inside=[];
  for(let i=0;i<12;i++)inside.push(domesticInside(String(i),65+i,'企业'+String(i%5),'数据分析师'+String(i),'上海'));
- const result=fuseDomesticJobRecommendations(inside,[],profile,{limit:10},now);
+ const result=fuseDomesticJobRecommendations(inside,[],
+  {...profile,target_roles:['数据分析师']},{limit:10},now);
  assert.equal(result.matches.length,10);
  const counts={};
  for(const r of result.matches)counts[r.company]=(counts[r.company]||0)+1;
@@ -92,21 +98,78 @@ test('no forced 10, keeps distinct employers and caps at ten in a large mixed po
  const small=fuseDomesticJobRecommendations([domesticInside()],[],profile,{},now);
  assert.equal(small.matches.length,1);
 });
+test('official Baidu social detail with login but no CTA may be recommended only as unconfirmed',()=>{
+ const id='bd46ce5b-f5ae-4e97-9e25-80b851e30f12';
+ const title='数据产品经理（J86847）';
+ const outside={
+  id:'talent.baidu.com:'+id,source_type:'站外官方招聘',source_status:'OFFICIAL_DETAIL_FETCHED',
+  company:'百度',title,location:'北京',official_url:'https://talent.baidu.com/jobs/detail/SOCIAL/'+id,
+  official_domain:'talent.baidu.com',application_status:'NEEDS_OFFICIAL_CONFIRMATION',
+  has_application_cta:false,application_method:'OFFICIAL_DETAIL_LOGIN_REQUIRED',
+  checked_at:'2026-11-08T00:00:00Z',
+  evidence:{title,location:'北京',requirement:
+   '本科及以上学历，1年以上数据产品相关经验。熟练掌握 Python、SQL，沟通能力较强。'}
+ };
+ const applicant={education:'BACHELOR',experience_years:2,
+  target_roles:['数据产品经理'],skills:[{name:'Python'},{name:'SQL'}]};
+ const result=fuseDomesticJobRecommendations([],[outside],applicant,
+  {role_hint:'数据产品经理'},now);
+ assert.equal(result.matches.length,1);
+ assert.equal(result.matches[0].company,'百度');
+ assert.ok(result.matches[0].needs_verification.some(x=>x.includes('登录')));
+ assert.equal(result.matches[0].application_status,'NEEDS_OFFICIAL_CONFIRMATION');
+ const noYears=fuseDomesticJobRecommendations([],[outside],{...applicant,experience_years:0},
+  {role_hint:'数据产品经理'},now);
+ assert.equal(noYears.matches.length,0,'1年以上 explicit minimum must be respected');
+ const noLogin=fuseDomesticJobRecommendations([],[{...outside,application_method:undefined}],applicant,
+  {role_hint:'数据产品经理'},now);
+ assert.equal(noLogin.matches.length,0,'no CTA and no login evidence must not pass');
+});
+
+test('industry-specific official minimum years cannot be bypassed by strong skill overlap',()=>{
+ const title='软件开发工程师';
+ const row=domesticOutside('2097166275703910403',{evidence:{title,location:'深圳',
+  requirement:'岗位要求：5年以上工业行业相关软件开发经验，熟练掌握 Python、SQL，可承担平台开发任务。'}});
+ const insufficient=fuseDomesticJobRecommendations([],[row],profile,{role_hint:'软件开发工程师'},now);
+ assert.equal(insufficient.matches.length,0);
+ const qualified=fuseDomesticJobRecommendations([],[row],{...profile,experience_years:5},
+  {role_hint:'软件开发工程师'},now);
+ assert.equal(qualified.matches.length,1);
+});
+
 test('no source or no relevant external gives zero, never hallucinates padding',()=>{
  const out=fuseDomesticJobRecommendations([],[],profile,{limit:10},now);
  assert.equal(out.matches.length,0);
  assert.equal(out.counts.selected_internal+out.counts.selected_external,0);
 });
 
-test('external Search is opt-in, Preview-gated, and never sends resume text',async()=>{
+test('automatic search is server-side and the modal has no extra search toggle',async()=>{
  const {readFile}=await import('node:fs/promises');
  const component=await readFile(new URL('../src/components/CandidateMatchResultDialog.tsx',import.meta.url),'utf8');
- const service=await readFile(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
- assert.match(component,/externalAvailable&&<section/,'Search button hidden unless Preview flag is enabled');
- assert.match(component,/onClick=\{\(\)=>void findMoreDomesticJobs\(\)\}/);
- assert.match(component,/discoverExternalDomesticJobs\(role,abort.signal\)/);
- assert.match(component,/fuseDomesticJobRecommendations\(/);
- assert.match(component,/result.matches,found.candidates,result.profile/);
- assert.match(service,/body:JSON\.stringify\(\{role_hint:clean,consent_search:true\}\)/);
- assert.doesNotMatch(service.slice(service.indexOf('export async function discoverExternalDomesticJobs')),/resume_id|text:cleaned|profile:|skills:/);
+ const api=await readFile(new URL('../functions/api/match/[[path]].js',import.meta.url),'utf8');
+ assert.match(component,/根据您的简历，为您匹配合适的工作/);
+ assert.match(component,/item\.salary\|\|'薪资未公布'/);
+ assert.match(component,/item\.experience_requirement\|\|'经验未注明'/);
+ assert.doesNotMatch(component,/想看看更多国内企业吗|本次已搜索|补充站外官方岗位/);
+ assert.doesNotMatch(component,/HHBA 站内|站外官方 · 待核实开放|Search.*Fetch/);
+ assert.match(api,/autoDiscoveryCandidates\(env,db,session\.phone,profile,options\)/);
+ assert.match(api,/fuseDomesticJobRecommendations\(/);
+ assert.match(api,/discoverExternalOfficialJobs\(intent,env\.HHBA_MATCH_DEEPSEEK_KEY,\{expanded:true\}\)/);
+ // Only a sanitized job direction goes to external search, not the resume text.
+ assert.doesNotMatch(api.slice(api.indexOf('async function autoDiscoveryCandidates'),api.indexOf('async function aiExtract')),/cleaned|input\.text|resume_id/);
+});
+
+test('3 years experience never matches a posting requiring at least 7 years',()=>{
+ for(const requirement of [
+  '岗位要求：具有 7 年以上软件开发经验，精通 Python 和 SQL，能完成系统研发工作。',
+  '资格要求：至少7年工作经验，熟悉 Python 数据处理、接口开发与数据库技术。',
+  '职位要求：需有7-10年相关工作经验，熟悉 Python、SQL 及企业级开发流程。',
+  '要求 7+ years of work experience, Python SQL software engineering.'
+ ]){
+  const row=domesticOutside('2097166275703910403',{
+   evidence:{title:'软件开发工程师',location:'深圳',requirement}
+  });
+  const result=fuseDomesticJobRecommendations([],[row],profile,{role_hint:'软件开发工程师'},now);
+  assert.equal(result.matches.length,0,requirement);
+ }
 });

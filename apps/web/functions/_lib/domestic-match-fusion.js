@@ -2,12 +2,15 @@
 // Only audited HHBA matches and independently fetched official job details may
 // be ranked. No model-generated employer/job facts or acceptance probabilities.
 import {safeOfficialJobLocator} from './domestic-search-fetch.js';
+import {scoreCandidateFit} from './match-ranking.js';
+import {extractSkillRequirements} from './job-skill-evidence.js';
+import {isMainlandJobLocation} from './mainland-job-location.js';
+import {explainFinalJobScore} from './match-explanation.js';
+import {extractMandatoryProfessionalCredentials,professionalPracticeReview} from './professional-credentials.js';
 
 export const FUSION_VERSION='HHBA_DOMESTIC_MATCH_FUSION_V1';
 const MAX_RESULTS=10;
 const MAX_EVIDENCE_AGE_MS=24*60*60*1000;
-const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macau|macao|taiwan|taipei|日本|美国|新加坡|singapore|united states|tokyo)/i;
-const MAINLAND_CITY=/(?:北京|上海|天津|重庆|深圳|广州|杭州|南京|苏州|成都|武汉|西安|青岛|宁波|无锡|合肥|郑州|长沙|厦门|福州|济南|大连|沈阳|哈尔滨|长春|石家庄|昆明|贵阳|南宁|海口|珠海|佛山|东莞|烟台|潍坊|临沂|济宁|菏泽|聊城|威海|泰安|德州|枣庄|滨州|日照|东营|常州|南通|嘉兴|绍兴|金华|温州|台州|太原|徐州|扬州|保定|唐山|廊坊|兰州|西宁|银川|乌鲁木齐|呼和浩特|包头|柳州|桂林|洛阳|开封|南昌|九江|中山|惠州|beijing|shanghai|shenzhen|guangzhou|hangzhou|chengdu|nanjing|suzhou|wuhan|xian)/i;
 const DEGREE_RANK={HIGH_SCHOOL:1,ASSOCIATE:2,BACHELOR:3,MASTER:4,PHD:5};
 const ROLE_CLUSTERS=[
  ['软件','开发','工程师','software','developer','engineer','backend','后端','python','java','golang','前端','frontend'],
@@ -23,10 +26,7 @@ const flat=(s)=>String(s||'').trim().toLowerCase().replace(/[\s\-_.()（）【�
 function textSafe(value,max=260){
  return typeof value==='string'?value.slice(0,max):'';
 }
-export function isMainlandWorkCity(value){
- const city=textSafe(value,100);
- return !!city&&!OUTSIDE.test(city)&&MAINLAND_CITY.test(city);
-}
+export function isMainlandWorkCity(value){return isMainlandJobLocation(value);}
 function canonicalRoleKey(job){
  const city=textSafe(job.location,50);
  let title=flat(job.title);
@@ -51,23 +51,41 @@ function compatibleRole(title,targets){
  return best;
 }
 function degreeMinRequirement(text){
- const s=textSafe(text,1200);
- if(/(?:博士|phd)(?:学历|学位|研究生)?(?:及以上|以上|或以上|至少)/i.test(s))return 5;
- if(/(?:硕士|master)(?:学历|学位|研究生)?(?:及以上|以上|或以上|至少)/i.test(s))return 4;
- if(/(?:本科|学士|bachelor)(?:学历|学位)?(?:及以上|以上|或以上|至少)/i.test(s))return 3;
- if(/(?:大专|专科)(?:学历|学位)?(?:及以上|以上|或以上|至少)/i.test(s))return 2;
- return null;
+ const s=textSafe(text,6000);
+ // Prefer minimum explicit entry qualifications, NOT "硕士优先".
+ // The input is only the official job requirements section.
+ const ranks=[];
+ for(const clause of s.split(/[，,；;\n。]+/)){
+  if(/(?:优先|加分|更佳|preferred|nice.to.have|不限学历|学历不限)/i.test(clause))continue;
+  const isRequirement=/(?:及以上|以上|或以上|学历|学位|最低|至少|要求|须|需|本科毕业|硕士研究生)/i.test(clause);
+  if(!isRequirement)continue;
+  if(/(?:博士|phd|doctorate)(?:研究生|学历|学位)?/i.test(clause))ranks.push(5);
+  else if(/(?:硕士|研究生|master(?:'s)?)(?:研究生|学历|学位)?/i.test(clause))ranks.push(4);
+  else if(/(?:本科|学士|bachelor(?:'s)?)(?:学历|学位)?/i.test(clause))ranks.push(3);
+  else if(/(?:大专|专科|associate(?:'s)?)(?:学历|学位)?/i.test(clause))ranks.push(2);
+ }
+ return ranks.length?Math.min(...ranks):null;
 }
 function experienceMinRequirement(text){
- const s=textSafe(text,1200);
- const match=s.match(/([1-9]|1[0-9]|20)\s*年(?:及以上|以上|以上的|相关)?(?:工作|项目|行业|岗位)?(?:经验|经历)/)||
-  s.match(/(?:至少|不少于|最低)\s*([1-9]|1[0-9]|20)\s*年(?:工作|项目|相关)?(?:经验|经历)/);
- return match?Number(match[1]):null;
+ const s=textSafe(text,6000);
+ // Explicit requirements only. Match variants such as 7年以上工作经验,
+ // 至少7年、7-10年工作经验 and 7+ years experience.
+ const matches=[
+  // E.g. "5年以上工业行业销售经验" / "1年以上数据产品相关经验".
+  ...s.matchAll(/(\d{1,2})\s*年(?:以上|及以上|或以上|起)\s*[^。；;\n]{0,32}?(?:经验|经历)/g),
+  ...s.matchAll(/(?:至少|不少于|最低(?:要求)?|须有|要求)?\s*(\d{1,2})\s*(?:[-~至]\s*\d{1,2})?\s*年\s*(?:以上|及以上|或以上|起)?\s*(?:(?:相关|实际|全职|工作|行业|项目|岗位|开发|管理|软件|数据)\s*){0,3}(?:经验|经历)/g),
+  ...s.matchAll(/(?:工作|相关|从业|行业|项目|开发)\s*(?:经验|年限)?[：:\s]*(?:至少|不少于|最低(?:要求)?)?[：:\s]*(\d{1,2})\s*年(?:以上|及以上)?/g),
+  ...s.matchAll(/(\d{1,2})\s*\+?\s*years?\s*(?:of\s*)?(?:work|professional|relevant|industry)?\s*experience/gi)
+ ].map(m=>Number(m[1])).filter(n=>n>=1&&n<=40);
+ return matches.length?Math.max(...matches):null;
 }
 function referencedExternal(entry,now){
  if(!entry||entry.source_type!=='站外官方招聘'||
    entry.source_status!=='OFFICIAL_DETAIL_FETCHED'||
-   entry.application_status!=='NEEDS_OFFICIAL_CONFIRMATION'||entry.has_application_cta!==true)return null;
+   entry.application_status!=='NEEDS_OFFICIAL_CONFIRMATION')return null;
+ const baiduLogin=entry.company==='百度'&&entry.official_domain==='talent.baidu.com'&&
+  entry.application_method==='OFFICIAL_DETAIL_LOGIN_REQUIRED'&&entry.has_application_cta===false;
+ if(entry.has_application_cta!==true&&!baiduLogin)return null;
  const u=safeOfficialJobLocator(entry.official_url);
  if(!u||u.company!==entry.company||u.id!==entry.id)return null;
  if(!isMainlandWorkCity(entry.location))return null;
@@ -86,7 +104,9 @@ function safeProfile(profile){
    .map(x=>textSafe(x,70)).filter(x=>x.length>=2),
   education:DEGREE_RANK[profile?.education]?profile.education:null,
   experience_years:Number.isFinite(profile?.experience_years)&&profile.experience_years>=0&&
-   profile.experience_years<=50?profile.experience_years:null
+   profile.experience_years<=50?profile.experience_years:null,
+  professional_credentials:(Array.isArray(profile?.professional_credentials)?profile.professional_credentials:[])
+   .filter(x=>typeof x==='string'&&/^[A-Z_]{3,40}$/.test(x)).slice(0,12)
  };
 }
 function externalToMatch(entry,profile,options,now){
@@ -95,38 +115,34 @@ function externalToMatch(entry,profile,options,now){
  const requirements=entry.evidence.requirement;
  const degree=degreeMinRequirement(requirements);
  const experience=experienceMinRequirement(requirements);
- if(degree!==null&&profile.education!==null&&DEGREE_RANK[profile.education]<degree)return null;
- if(experience!==null&&profile.experience_years!==null&&profile.experience_years<experience)return null;
- const targets=[textSafe(options?.role_hint,80),...profile.target_roles].filter(Boolean);
- const rolePoints=compatibleRole(entry.title,targets);
- const haveSkill=profile.skills.filter(x=>flat(requirements).includes(flat(x))||
-  flat(entry.title).includes(flat(x)));
- if(rolePoints===0&&haveSkill.length===0)return null;
- // Relevance score is a conservative ranking reference, NEVER chance of hire.
- const skillPoints=Math.min(25,haveSkill.length*8);
- const requirementPoints=degree===null?10:profile.education?15:7;
- const experiencePoints=experience===null?6:profile.experience_years===null?3:10;
- const score=Math.min(90,15+rolePoints+skillPoints+requirementPoints+experiencePoints+8+5);
- const matched=[];
- if(rolePoints)matched.push('岗位名称与目标职业方向相关（以官网岗位职责为准）');
- for(const skill of haveSkill.slice(0,4))matched.push('简历已识别技能与官方任职要求相关：'+skill);
- const gaps=[];
- if(degree!==null&&profile.education===null)gaps.push('岗位存在学历门槛，但简历没有可确认的学历证据');
- if(experience!==null&&profile.experience_years===null)gaps.push('岗位存在经验年限要求，简历尚未证明');
+ if(degree!==null&&(!profile.education||DEGREE_RANK[profile.education]<degree))return null;
+ if(experience!==null&&(profile.experience_years===null||profile.experience_years<experience))return null;
+ // This is only authenticated JD/facet extraction. Legacy keyword matching
+ // must not filter or produce user-visible reasons before the final V2 score.
  return {
   id:'external-'+entry.id.replace(/[^a-zA-Z0-9_-]/g,'-'),company:entry.company,title:entry.title,
   title_zh:entry.title,location:entry.location,official_url:proof.official_url,
   platform:'official-domestic',source:entry.official_domain,remote:false,
-  source_type:'站外官方招聘',reference_score:score,
-  matched,not_evidenced:gaps,
+  source_type:'站外官方招聘',reference_score:0,
+  ...(()=>{const skills=extractSkillRequirements(requirements);return {
+   required_skills:skills.required,mandatory_skills:skills.mandatory,
+   preferred_skills:skills.preferred,unclassified_skills:skills.unclassified};})(),
+  professional_credential_requirements:extractMandatoryProfessionalCredentials(requirements).mandatory,
+  min_experience_years:experience,
+  minimum_education:Object.keys(DEGREE_RANK).find(k=>DEGREE_RANK[k]===degree)||null,
+  salary:typeof entry.evidence.salary==='string'&&entry.evidence.salary.length<=60?entry.evidence.salary:null,
+  experience_requirement:experience===null?'经验未注明':experience+'年以上',
+  matched:[],not_evidenced:[],
   needs_verification:[
-   '企业官网详情与任职要求已抓取；网页出现申请入口，但当前是否仍接受申请必须到官网确认',
+   entry.application_method==='OFFICIAL_DETAIL_LOGIN_REQUIRED'?
+    '企业官方招聘详情可打开，但该网页未展示直接申请按钮；可能需要先登录，是否可投递尚待官网确认':
+    '企业官网详情与任职要求已抓取；网页出现申请入口，但当前是否仍接受申请必须到官网确认',
    '抓取时间：'+entry.checked_at+'；公开岗位信息可能变化'
   ],
   requirements_basis:'站外企业官方详情页面原文，非 AI 猜测职位；没有确认实时开放',
   application_status:'NEEDS_OFFICIAL_CONFIRMATION',checked_at:entry.checked_at,
   candidate_evidence:{role:entry.evidence.title,requirement:requirements.slice(0,260)},
-  rankEvidence:rolePoints+haveSkill.length*8,
+  rankEvidence:0,
   sourceDate:proof.ageHours
  };
 }
@@ -140,12 +156,25 @@ export function fuseDomesticJobRecommendations(inside=[],outside=[],rawProfile={
  const when=now instanceof Date?now.getTime():Number(now);
  if(!Number.isFinite(when))throw Error('MATCH_FUSION_INVALID_TIME');
  const profile=safeProfile(rawProfile);
- const internal=(Array.isArray(inside)?inside:[]).slice(0,250)
+ const internal=(Array.isArray(inside)?inside:[]).slice(0,1200)
   .map(internalToMatch).filter(Boolean);
  const external=(Array.isArray(outside)?outside:[]).slice(0,25)
   .map(j=>externalToMatch(j,profile,options,when)).filter(Boolean);
- const ranked=[...internal,...external].sort((a,b)=>b.reference_score-a.reference_score||
-  (a.source_type==='HHBA站内岗位'?-1:1)||
+ // Source-neutral V2 score applies ONLY after the official-source checks above.
+ // Hard experience, education and China Mainland location gates take priority.
+ const scored=[...internal,...external].map(job=>{
+  const fit=scoreCandidateFit(profile,job,options);
+  if(!fit.eligible)return null;
+  const rationale=explainFinalJobScore(profile,job,fit);
+  return {...job,reference_score:fit.score,score_breakdown:fit.breakdown,
+   evidence_quality:fit.evidence_quality,
+   professional_credential_requirements:job.professional_credential_requirements||[],
+   professional_credential_review:professionalPracticeReview(job.title),
+   matched:rationale.matched,not_evidenced:rationale.not_evidenced,
+   score_reasoning:rationale.score_reasoning,
+   ranking_version:fit.ranking_version,rankEvidence:fit.score};
+ }).filter(Boolean);
+ const ranked=scored.sort((a,b)=>b.reference_score-a.reference_score||
   b.rankEvidence-a.rankEvidence||a.id.localeCompare(b.id));
  const unique=[],uniqueKeys=new Set();
  for(const job of ranked){

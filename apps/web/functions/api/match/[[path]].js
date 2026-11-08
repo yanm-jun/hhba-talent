@@ -2,6 +2,8 @@
 // Keep this endpoint disabled until an audited Preview migration and keys exist.
 import {sessionOfBearer,getUserByPhone,sha256Hex} from '../../_lib/real-auth.js';
 import {redactForModel,verifiedProfile,selectAuditedMatches,countVerifiedMainlandJobs} from '../../_lib/resume-match-core.js';
+import {fuseDomesticJobRecommendations} from '../../_lib/domestic-match-fusion.js';
+import {discoverExternalOfficialJobs,sanitizedJobIntent} from '../../_lib/domestic-search-fetch.js';
 
 const KIND='HHBA_RESUME_MATCH_CLOUDFLARE_V1';
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
@@ -103,6 +105,40 @@ async function reserveBudget(db,identity){
   '(SELECT COUNT(*) FROM hhba_resume_match_requests WHERE day_utc=? AND account_hash=?)<2'
  ).bind(id,day,identity,now.toISOString(),day,day,identity).run();
  return reserved?.success===true&&reserved?.meta?.changes===1?{id,day}:null;
+}
+// One user-authorized matching action includes optional role-only public job
+// discovery. Never forward the resume text, name or contact details to Search.
+function autoDiscoveryEnabled(env){
+ return env.HHBA_MATCH_EXTERNAL_SEARCH_ENABLED==='1'&&
+  (env.HHBA_AUTH_ROLLOUT==='preview'||env.HHBA_MATCH_RUNTIME_MODE==='production');
+}
+async function autoDiscoveryCandidates(env,db,phone,profile,opts){
+ if(!autoDiscoveryEnabled(env))return {candidates:[],status:'DISABLED'};
+ const intent=[...new Set([opts.role_hint,...profile.target_roles]
+  .map(sanitizedJobIntent).filter(Boolean))].slice(0,3);
+ if(!intent.length)return {candidates:[],status:'NO_ROLE'};
+ try{
+  const table=await db.prepare(
+   "SELECT name FROM sqlite_master WHERE type='table' AND name='hhba_external_search_requests'"
+  ).first();
+  if(table?.name!=='hhba_external_search_requests')return {candidates:[],status:'NOT_READY'};
+  const day=new Date().toISOString().slice(0,10),id=crypto.randomUUID();
+  const hash=await sha256Hex(env.HHBA_MATCH_LIMIT_PEPPER+':search:'+phone);
+  const reserved=await db.prepare(
+   'INSERT INTO hhba_external_search_requests(request_id,day_utc,account_hash,created_at) SELECT ?,?,?,? WHERE '+
+   '(SELECT COUNT(*) FROM hhba_external_search_requests WHERE day_utc=?)<12 AND '+
+   '(SELECT COUNT(*) FROM hhba_external_search_requests WHERE day_utc=? AND account_hash=?)<2'
+  ).bind(id,day,hash,new Date().toISOString(),day,day,hash).run();
+  if(reserved?.success!==true||reserved?.meta?.changes!==1)
+   return {candidates:[],status:'LIMITED'};
+  const data=await discoverExternalOfficialJobs(intent,env.HHBA_MATCH_DEEPSEEK_KEY,{expanded:true});
+  return {candidates:data.candidates,status:'COMPLETE'};
+ }catch(e){
+  // A partial upstream request could have consumed credits, so the reservation
+  // is intentionally retained. Never log a query, URL, resume or model content.
+  console.warn('HHBA_MATCH_DISCOVERY_FAILURE',typeof e?.code==='string'?e.code:'UNAVAILABLE');
+  return {candidates:[],status:'UNAVAILABLE'};
+ }
 }
 async function aiExtract(key,text,roleHint){
  const instruction=[
@@ -213,14 +249,17 @@ export async function onRequest({request,env}){
  const cleaned=redactForModel(input.text);
  if(cleaned.replace(/\s/g,'').length<30)return fail('INVALID_RESUME_TEXT',400);
  let sources;
- try{sources=await officialJobs(env,url.origin);
-  // Validate all provenance metadata before spending any AI quota.
+ try{
+  sources=await officialJobs(env,url.origin);
+  // Reject stale or inconsistent legacy ATS evidence before it can rank.
   selectAuditedMatches(sources.snapshot,sources.audit,sources.facets,
    {skills:[],target_roles:['__probe__']},{limit:1},Date.now());
-  }catch{return fail('OFFICIAL_JOB_INDEX_UNAVAILABLE',503);}
- // No provider call and no quota debit if only overseas/archived jobs remain.
- if(countVerifiedMainlandJobs(sources.snapshot,sources.audit,sources.facets)===0)
-  return fail('NO_VERIFIED_DOMESTIC_JOBS',503);
+ }catch{
+  if(!autoDiscoveryEnabled(env))return fail('OFFICIAL_JOB_INDEX_UNAVAILABLE',503);
+  sources=null; // Search may still return verifiable domestic official details.
+ }
+ if(sources&&countVerifiedMainlandJobs(sources.snapshot,sources.audit,sources.facets)===0&&
+    !autoDiscoveryEnabled(env))return fail('NO_VERIFIED_DOMESTIC_JOBS',503);
  const hash=await sha256Hex(env.HHBA_MATCH_LIMIT_PEPPER+':match:'+session.phone);
  let reserved;
  try{reserved=await reserveBudget(db,hash);}catch{return fail('MATCH_DATABASE_NOT_READY',503);}
@@ -245,11 +284,19 @@ export async function onRequest({request,env}){
   console.warn('HHBA_MATCH_PROVIDER_FAILURE',code);
   return fail(code,code==='AI_PROVIDER_RATE_LIMITED'?429:502);
  }
- const recommended=selectAuditedMatches(sources.snapshot,sources.audit,sources.facets,profile,options,Date.now());
- return json({status:'COMPLETE',profile,matches:recommended.matches,
-  matched_official_jobs:recommended.matched_official_jobs,
-  source:'中国大陆境内官方 ATS 职位审核快照（尚不包含站外实时检索）',
-  scoring:'仅基于有简历文字证据的方向与官方职位特征进行相关性排序；不代表录用概率',
-  privacy:'本次脱敏文本仅发送至已授权的 AI 分析服务，原始简历未写入匹配日志或公开数据库',
-  disclaimer:'只推荐中国大陆境内职位；当前开放状态、学历与申请资格以企业官网为准。'});
+ const recommended=sources?selectAuditedMatches(
+  sources.snapshot,sources.audit,sources.facets,profile,
+  {...options,candidate_pool_limit:1200},Date.now()
+ ):{matches:[],matched_official_jobs:0};
+ const discovered=await autoDiscoveryCandidates(env,db,session.phone,profile,options);
+ const merged=fuseDomesticJobRecommendations(
+  recommended.matches,discovered.candidates,profile,options,Date.now()
+ );
+ return json({status:'COMPLETE',profile,matches:merged.matches,
+  matched_official_jobs:merged.counts.distinct_verified_sources,
+  discovery_status:discovered.status,
+  source:'中国大陆境内岗位（官方 ATS 审核与自动检索合并）',
+  scoring:'严格筛选已明确的学历、工作年限与工作地点要求后进行参考评分；不代表录用概率',
+  privacy:'本次脱敏简历文本仅用于已授权的 AI 分析；联网招聘搜索只传岗位方向，不发送姓名、电话或简历',
+  disclaimer:'只推荐中国大陆境内职位；当前招聘状态、薪资与申请资格以企业官网为准。'});
 }

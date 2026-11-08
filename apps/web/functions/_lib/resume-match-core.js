@@ -1,5 +1,10 @@
 // Pure helpers for the HHBA Cloudflare resume-matching service.
 // Never turn a model guess or stale employer posting into a verified job.
+import {deriveDocumentedWorkTenure} from './resume-tenure.js';
+import {scoreCandidateFit} from './match-ranking.js';
+import {isMainlandJobLocation} from './mainland-job-location.js';
+import {groundedCareerDirections} from './resume-role-evidence.js';
+import {extractSelfReportedProfessionalCredentials} from './professional-credentials.js';
 export const MAX_TEXT_LENGTH=20000;
 export function redactForModel(value){
  if(typeof value!=='string')return '';
@@ -11,7 +16,7 @@ export function redactForModel(value){
   .replace(/(?:微信号|微信|QQ号|QQ)\s*[:：]\s*[A-Za-z0-9_-]{5,32}/gi,'[即时通讯账号已隐藏]')
   .trim();
 }
-export function verifiedProfile(raw,text){
+export function verifiedProfile(raw,text,now=new Date()){
  if(!raw||typeof raw!=='object')throw Error('AI_PROFILE_INCOMPLETE');
  const original=String(text||'');
  const asEvidence=(value)=>{
@@ -32,9 +37,17 @@ export function verifiedProfile(raw,text){
   degrees[raw.education]?.test(degreeEvidence)?raw.education:null;
  const yearEvidence=asEvidence(raw.experience_evidence);
  // Require explicit years-of-work evidence; dates alone cannot substantiate tenure.
- const stated=yearEvidence?.match(/(?:工作|实习|经验)\s*(\d+(?:\.\d+)?)\s*年|(\d+(?:\.\d+)?)\s*年(?:工作|实习|经验)/);
+ const stated=yearEvidence&&
+  !/(?:实习|兼职|项目经历|项目经验|在校|internship|part[ -]?time)/i.test(yearEvidence)?
+  yearEvidence.match(/(?:工作经验|全职工作|实际工作|工作)\s*(\d+(?:\.\d+)?)\s*年|(\d+(?:\.\d+)?)\s*年(?:工作经验|全职工作|实际工作|工作)/):null;
  const confirmed=stated?Number(stated[1]||stated[2]):null;
- const years=confirmed!==null&&Number.isFinite(raw.experience_years)&&raw.experience_years===confirmed&&confirmed>=0&&confirmed<=50?confirmed:null;
+ const statedYears=confirmed!==null&&Number.isFinite(raw.experience_years)&&
+  raw.experience_years===confirmed&&confirmed>=0&&confirmed<=50?confirmed:null;
+ // Fallback only to clear employment timelines, not projects, education or internships.
+ // The model cannot supply or extend these dates: they come from the resume text.
+ const documented=statedYears===null?deriveDocumentedWorkTenure(original,now):null;
+ const years=statedYears??documented?.years??null;
+ const yearsEvidence=statedYears!==null?yearEvidence:documented?.evidence??null;
  const skills=[],seen=new Set();
  for(const value of Array.isArray(raw.skills)?raw.skills.slice(0,20):[]){
   const name=typeof value?.name==='string'?value.name.trim().slice(0,60):'';
@@ -42,10 +55,13 @@ export function verifiedProfile(raw,text){
   if(!name||!evidence||seen.has(name.toLowerCase())||!evidence.toLowerCase().includes(name.toLowerCase()))continue;
   skills.push({name,evidence});seen.add(name.toLowerCase());
  }
- const roles=[...new Set((Array.isArray(raw.target_roles)?raw.target_roles:[]).filter(x=>typeof x==='string'&&x.trim().length>=2&&x.length<=70).map(x=>x.trim()).filter(x=>original.toLowerCase().includes(x.toLowerCase())))].slice(0,6);
+ // LLM-suggested occupations may be paraphrases of documented job tasks;
+ // validate the underlying actions, rather than requiring a verbatim title.
+ const roles=groundedCareerDirections(raw.target_roles,original,{limit:6});
  return {education,education_evidence:education?degreeEvidence:null,
-  experience_years:years,experience_evidence:years===null?null:yearEvidence,
-  skills,target_roles:roles,warnings:[]};
+  experience_years:years,experience_evidence:years===null?null:yearsEvidence,
+  skills,target_roles:roles,
+  professional_credentials:extractSelfReportedProfessionalCredentials(original),warnings:[]};
 }
 function safeJobLink(j){
  if(!j||typeof j!=='object'||!['ashby','greenhouse','lever'].includes(j.platform))return false;
@@ -73,12 +89,10 @@ function safeJobLink(j){
  }catch{return false}
 }
 // Country label alone is not proof of Mainland China employment.
-const excludedChineseRegions=/(香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macao|macau|taiwan|taipei|kaohsiung)/i;
-const mainlandCities=/(北京|上海|天津|重庆|深圳|广州|杭州|南京|苏州|成都|武汉|西安|青岛|宁波|无锡|合肥|郑州|长沙|厦门|福州|济南|大连|沈阳|哈尔滨|长春|石家庄|昆明|贵阳|南宁|海口|珠海|佛山|东莞|烟台|潍坊|临沂|济宁|菏泽|聊城|威海|泰安|德州|枣庄|滨州|日照|东营|beijing|shanghai|tianjin|chongqing|shenzhen|guangzhou|hangzhou|nanjing|suzhou|chengdu|wuhan|xian|qingdao|ningbo|wuxi|hefei|zhengzhou|changsha|xiamen|fuzhou|jinan|dalian|shenyang|harbin|changchun|shijiazhuang|kunming|guiyang|nanning|haikou|zhuhai|foshan|dongguan)/i;
 export function isVerifiedMainlandLocation(job,fact){
  if(!job||!fact||String(fact.countryCode||'').toUpperCase()!=='CN')return false;
  const location=String(job.location||'');
- return !excludedChineseRegions.test(location)&&mainlandCities.test(location);
+ return isMainlandJobLocation(location);
 }
 export function countVerifiedMainlandJobs(snapshot,audit,facets){
  if(!Array.isArray(snapshot?.jobs)||!Array.isArray(audit?.jobs)||!Array.isArray(facets?.jobs))return 0;
@@ -125,6 +139,8 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
   x.full_original_jd_verified===true&&x.requirements_evidence===true&&typeof x.jd_sha256==='string')
   .map(x=>[x.job_id,x]));
  const facts=new Map(facets.jobs.filter(x=>x&&typeof x.id==='string').map(x=>[x.id,x]));
+ const candidatePool=Number.isInteger(opts.candidate_pool_limit)&&
+  opts.candidate_pool_limit>=10&&opts.candidate_pool_limit<=1200;
  const query=[String(opts.role_hint||'').slice(0,80),...profile.target_roles].filter(Boolean);
  const skillList=profile.skills.map(s=>s.name.toLowerCase());
  const filtered=[];
@@ -132,13 +148,20 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
   const proof=verified.get(j.id),f=facts.get(j.id);
   if(!proof||proof.platform!==j.platform||!f||f.original_source_hash!==proof.jd_sha256||
      !safeJobLink(j)||!isVerifiedMainlandLocation(j,f))continue;
-  // Client preferences cannot override the mainland-only rule.
+  // Work-location and eligibility gates must run BEFORE relevance scoring.
+  // Facet values are sourced from the same hash-verified official JD snapshot.
   if(opts.remote_only&&j.remote!==true)continue;
+  if(Number.isFinite(f.experienceMinYears)&&f.experienceMinYears>0&&
+     (!Number.isFinite(profile.experience_years)||profile.experience_years<f.experienceMinYears))continue;
+  const degreeLevels={HIGH_SCHOOL:1,ASSOCIATE:2,BACHELOR:3,MASTER:4,PHD:5};
+  const minDegree=degreeLevels[String(f.education||'').toUpperCase()];
+  if(minDegree&&(!degreeLevels[profile.education]||degreeLevels[profile.education]<minDegree))continue;
   const title=j.title.toLowerCase();
   const tags=Array.isArray(f.skills)?f.skills.filter(x=>typeof x==='string').map(x=>x.toLowerCase()):[];
   const roleMatches=query.flatMap(x=>aliasesOf(x)).filter(x=>x.length>=2&&title.includes(x));
   const skillMatches=skillList.filter(s=>tags.includes(s)||title.includes(s));
-  if(roleMatches.length===0&&skillMatches.length===0)continue;
+  // V2 pool must not be prematurely filtered by legacy keyword aliases.
+  if(!candidatePool&&roleMatches.length===0&&skillMatches.length===0)continue;
   const matched=[],notEvidenced=[],needs=[];
   if(roleMatches.length)matched.push('岗位名称与目标方向存在文字关联，具体职责仍需核对');
   for(const item of skillMatches.slice(0,4))matched.push('简历有原文依据的技能：'+item);
@@ -154,7 +177,33 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
    official_url:j.url,platform:j.platform,source:j.source||'',remote:j.remote===true,
    reference_score:score,matched,not_evidenced:notEvidenced,needs_verification:needs,
    requirements_basis:'与同版官方 JD 审核和搜索特征一致；未对录用概率作预测',
-   source_type:'HHBA站内岗位',rankEvidence:roleMatches.length+skillMatches.length});
+   source_type:'HHBA站内岗位',
+   // Same-JD-hash verified facets only. The ranking module never invents gates.
+   // Legacy ATS facets list skills but do NOT mark them must-have.
+   // Absence from resume is not proof that a mandatory JD gate failed.
+   required_skills:[],mandatory_skills:[],preferred_skills:[],unclassified_skills:tags,
+   min_experience_years:Number.isFinite(f.experienceMinYears)?f.experienceMinYears:null,
+   minimum_education:typeof f.education==='string'?f.education:null,
+   salary:typeof j.salary==='string'&&j.salary.length<=60?j.salary:
+    typeof f.salary==='string'&&f.salary.length<=60?f.salary:null,
+   experience_requirement:Number.isFinite(f.experienceMinYears)&&f.experienceMinYears>=0?
+    (f.experienceMinYears===0?'经验不限':f.experienceMinYears+'年以上'):'经验未注明',
+   rankEvidence:roleMatches.length+skillMatches.length});
+ }
+ if(candidatePool){
+  // All verified jobs pass the V2 semantic gate before any Top-N cutoff.
+  // This removes legacy keyword ranking and company/city dedup bias.
+  const eligible=filtered.map(job=>{
+   const fit=scoreCandidateFit(profile,job,opts);
+   if(!fit.eligible)return null;
+   const matched=[...job.matched];
+   if(fit.breakdown.role>0&&!matched.some(x=>x.includes('岗位名称')))
+    matched.push('职位名称与目标岗位方向属于相关职业类别（详情仍以官方职位要求为准）');
+   return {...job,reference_score:fit.score,rankEvidence:fit.score,matched};
+  }).filter(Boolean);
+  eligible.sort((a,b)=>b.reference_score-a.reference_score||a.id.localeCompare(b.id));
+  return {matches:eligible.slice(0,opts.candidate_pool_limit).map(({rankEvidence,...job})=>job),
+   matched_official_jobs:eligible.length};
  }
  filtered.sort((a,b)=>b.reference_score-a.reference_score||b.rankEvidence-a.rankEvidence||a.id.localeCompare(b.id));
  // A vacancy in multiple cities should not crowd out different companies or roles.
@@ -165,6 +214,8 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
   if(seenRoles.has(key))continue;
   seenRoles.add(key);unique.push(item);
  }
+ // The API still returns Top 10; internal server code may request a wider,
+ // source-verified candidate pool for a fair cross-source V2 reranking.
  const limit=Math.min(10,Math.max(1,Number(opts.limit)||10)),selected=[],picked=new Set();
  const byCompany=new Map();
  const add=(item)=>{
