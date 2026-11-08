@@ -273,7 +273,11 @@ test('Employer label may be absent, but independent homepage and job-brand proof
  assert.equal(job?.location,'北京');
  const home={title:'星河数字科技有限公司',content:
   ('# 星河数字科技有限公司\n欢迎查看星河数字科技有限公司官方网站及招聘信息。').repeat(6)};
- assert.equal(provePublicEmployer(job,home,'https://xinghe.cn/')?.company,'星河数字科技有限公司');
+ assert.equal(provePublicEmployer(job,home,'https://xinghe.cn/'),null,
+  'A homepage brand alone cannot prove which employer owns the vacancy');
+ const branded=readPublicJob(link,{title:'新媒体运营 - 星河数字科技有限公司',content},now);
+ assert.equal(branded?.company_claim,'星河数字科技有限公司');
+ assert.equal(provePublicEmployer(branded,home,'https://xinghe.cn/')?.company,'星河数字科技有限公司');
  const impostor={title:'其他集团',content:('# 其他集团\n其他集团公司招聘信息').repeat(8)};
  assert.equal(provePublicEmployer(job,impostor,'https://xinghe.cn/'),null);
 });

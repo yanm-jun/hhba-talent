@@ -209,7 +209,7 @@ function extractCompanyClaim(lines,page){
  const names=extractLabelField(lines,COMPANY_LABEL,100);
  if(names.length){
   const name=clean(names[0]).replace(/[|｜].*$/,'').slice(0,65);
-  return name.length>=3&&/[a-z\p{Script=Han}]{2}/iu.test(name)?name:null;
+  return name.length>=2&&/[a-z\p{Script=Han}]{2}/iu.test(name)?name:null;
  }
  // Company text is often embedded in the job header, not "公司名称：".
  const title=clean(page?.title||'');
@@ -243,17 +243,33 @@ export function readPublicJob(link,page,now=new Date(),rejections=null){
   _job_page_title:t(page.title,180),
   _page_excerpt:t(body.replace(/\s+/g,' '),3400)};
 }
+const DIRECTORY_NAV=/(?:全国\s*[\[【(（]?\s*切换|切换城市|城市选择|城市切换|职位搜索|找工作|找人才|求职招聘|招聘平台|招聘信息网|招聘网站|人才信息网|岗位大全|海量职位|最新招聘信息|附近工作|职位推荐|招聘资讯|简历模板|免费发布职位)/i;
+const LEGAL_EMPLOYER_NAME=/(?:有限责任公司|股份有限公司|集团有限公司|有限公司|股份公司|集团|公司|(?:co\.?,?\s*ltd|limited|inc\.?|llc))$/iu;
+function viableEmployerName(value){
+ const name=clean(value).replace(/(?:官方网站|官方主页|官网|招聘网站|加入我们|社会招聘|校园招聘|人才招聘|招聘|首页|Welcome| Careers)$/i,'').trim();
+ if(name.length<2||name.length>65||DIRECTORY_NAV.test(name)||
+  /[\[\]【】<>]|(?:切换|全国|全部职位|城市导航)/.test(name)||
+  !/^[\p{Script=Han}\p{Script=Latin}0-9（）()&·.\-\s,]+$/u.test(name))return null;
+ return name;
+}
 function companyNameFromHomepage(homepage){
- const title=clean(homepage?.title||'').split(/[|｜]/)[0].replace(/(?:官方网站|官方主页|官网|招聘网站|加入我们|社会招聘|校园招聘|人才招聘|招聘|首页|Welcome| Careers)$/i,'').trim();
- if(title.length>=2&&title.length<=65&&/[a-z\p{Script=Han}]{2}/iu.test(title)&&
-  !/^(?:首页|招聘|企业|官网|职位|社会招聘|校园招聘|人才招聘)$/i.test(title))return title;
+ const title=viableEmployerName(clean(homepage?.title||'').split(/[|｜]/)[0]);
+ if(title&&LEGAL_EMPLOYER_NAME.test(title))return title;
  const first=markdownLines(homepage?.content||'').slice(0,12);
  for(const line of first){
-  const found=line.replace(/(?:官方网站|官方主页|招聘|首页|欢迎来到|关于我们)/g,'').trim();
-  if(found.length>=2&&found.length<=65&&/[a-z\p{Script=Han}]{2}/iu.test(found)&&
-   !/^(?:首页|招聘|企业|职位|官网|欢迎您)$/i.test(found))return found;
+  const match=viableEmployerName(line.split(/[|｜]/)[0].replace(/^(?:公司名称|企业名称|关于我们)[：:\s]*/,''));
+  if(match&&LEGAL_EMPLOYER_NAME.test(match))return match;
  }
+ // If the independent corporate page does not reveal a real employer
+ // identity, a generic careers/portal title must never become "company".
  return null;
+}
+function homepageClaimsEmployer(homepage,company){
+ const title=clean(homepage?.title||'');
+ const first=markdownLines(homepage?.content||'').slice(0,12);
+ const candidate=[title,...first.slice(0,8)].filter(x=>!DIRECTORY_NAV.test(x));
+ const brand=proofBrand(company);
+ return candidate.some(x=>brandMentioned(x,brand));
 }
 const LEGAL_SUFFIX=/(?:有限责任公司|股份有限公司|集团有限公司|有限公司|集团|公司)$/u;
 const MAINLAND_PREFIX=/^(?:北京市|上海市|天津市|重庆市|北京市|上海|北京|深圳市|深圳|广州市|广州|杭州市|杭州|成都市|成都|武汉市|武汉|南京市|南京|苏州市|苏州)/u;
@@ -303,8 +319,8 @@ function companyLinkFromPage(body,jobUrl){
 }
 export function employerLookupQuery(job){
  const name=typeof job?.company_claim==='string'?job.company_claim.trim():'';
- if(name.length<3||name.length>55||
-  !/^[\p{Script=Han}A-Za-z0-9（）()&·.\-\s]{3,55}$/u.test(name)||
+ if(name.length<2||name.length>55||
+  !/^[\p{Script=Han}A-Za-z0-9（）()&·.\-\s]{2,55}$/u.test(name)||
   /(?:指令|提示词|开发者|系统消息|密码|密钥|令牌|token|api|忽略|执行|url|http)/i.test(name)||
   /(?:\d[\s-]?){7,}/.test(name))return null;
  return name+' 官方网站 社会招聘';
@@ -319,10 +335,18 @@ export function inspectPublicEmployer(job,homepage,site){
  const body=homepage.content.slice(0,70000);
  const intro=clean((homepage.title||'')+'\n'+body.slice(0,5000));
  const claimed=job.company_claim?.trim()||null;
- const company=claimed||companyNameFromHomepage(homepage);
- if(!company||company.length<2)return {reason:'COMPANY_IDENTITY_MISSING',job:null};
- const brand=proofBrand(company);
- if(!brandMentioned(intro,brand))
+ // A portal's own brand/navigation cannot establish which legal employer
+ // owns a third-party vacancy. Require the employer to be named in the
+ // FETCHED job document (explicit field or page title), not just on homepage.
+ if(!claimed)return {reason:'COMPANY_CLAIM_NOT_ON_JOB',job:null};
+ const company=claimed;
+ if(!viableEmployerName(company))
+  return {reason:'COMPANY_IDENTITY_MISSING',job:null};
+ // A recruiting directory can mention thousands of real companies in page
+ // copy, but that never makes its domain their employer-owned website.
+ if(DIRECTORY_NAV.test(String(homepage.title||'')))
+  return {reason:'COMPANY_PORTAL_NOT_EMPLOYER',job:null};
+ if(!homepageClaimsEmployer(homepage,company))
   return {reason:'COMPANY_BRAND_MISMATCH',job:null};
  const same=link.domain===corporate.domain;
  const backlink=same?null:companyLinkFromPage(body,link.url);

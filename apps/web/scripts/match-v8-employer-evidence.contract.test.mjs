@@ -143,3 +143,39 @@ test('agent never admits company-mismatched careers pages even with search resul
  assert.equal(got.stats.employer_proof.searches,1);
  assert.equal(got.stats.fetch_rejection_counts.COMPANY_LINK_UNPROVEN,1);
 });
+
+test('Regression: navigation text 全国 [切换] on a public job board is NOT employer proof',()=>{
+ const publicJob=publicJobLink('https://www.lbzhipin.com/jobs/220921.html');
+ assert.ok(publicJob,'a candidate URL can be searched without proving employer');
+ const page=[
+  '# 内容运营','工作地点：洛阳市','职位描述',
+  '负责内容选题、短视频运营、用户沟通与新媒体文章编写。'.repeat(5),
+  '任职要求','本科及以上学历，熟悉社交媒体内容策划和内容编辑流程。'.repeat(5),
+  '立即投递','全国 [切换]','求职招聘 首页 海量职位'
+ ].join('\n');
+ const fetched=readPublicJob(publicJob,{title:'内容运营',content:page},now);
+ assert.equal(fetched?.company_claim,null);
+ assert.equal(fetched?.location,'洛阳');
+ const portal={
+  title:'全国 [切换]',
+  content:('# 全国 [切换]\n工作搜索与职位筛选，求职者可浏览公司招聘信息。\n').repeat(8)
+ };
+ assert.equal(inspectPublicEmployer(fetched,portal,'https://lbzhipin.com/').job,null);
+ assert.equal(inspectPublicEmployer(fetched,portal,'https://lbzhipin.com/').reason,
+  'COMPANY_CLAIM_NOT_ON_JOB');
+ // Even an explicit employer named in an aggregator's job posting does NOT
+ // turn the aggregator homepage into the employer's own website.
+ const claimed={...fetched,company_claim:'星河数字科技有限公司'};
+ const listing={title:'全国 [切换]',content:
+  ('全国 [切换] 查找工作与附近职位。星河数字科技有限公司 内容运营招聘信息。').repeat(7)};
+ assert.equal(inspectPublicEmployer(claimed,listing,'https://lbzhipin.com/').reason,
+  'COMPANY_PORTAL_NOT_EMPLOYER');
+ assert.equal(provePublicEmployer(claimed,listing,'https://lbzhipin.com/'),null);
+});
+test('Company-owned homepage remains acceptable with actual legal employer identity',()=>{
+ const job=readPublicJob(publicJobLink('https://careers.xinghe.cn/jobs/202611081299'),
+  {title:'内容运营',content:JD},now);
+ const site={title:'星河数字科技有限公司 官方网站',
+  content:('# 星河数字科技有限公司\n这里介绍星河数字科技有限公司的业务与团队。').repeat(7)};
+ assert.equal(provePublicEmployer(job,site,'https://xinghe.cn/')?.company,'星河数字科技有限公司');
+});
