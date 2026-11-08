@@ -5,6 +5,7 @@ import {redactForModel,verifiedProfile,selectAuditedMatches,countVerifiedMainlan
 import {fuseDomesticJobRecommendations} from '../../_lib/domestic-match-fusion.js';
 import {discoverExternalOfficialJobs,sanitizedJobIntent} from '../../_lib/domestic-search-fetch.js';
 import {runDeepSeekOfficialJobAgent} from '../../_lib/deepseek-official-job-agent.js';
+import {previewJobBrowserRenderer} from '../../_lib/cf-job-browser-preview.js';
 
 const KIND='HHBA_RESUME_MATCH_CLOUDFLARE_V1';
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
@@ -150,7 +151,7 @@ async function autoDiscoveryCandidates(env,db,phone,profile,opts){
   // one-click Search quota. The model only receives sanitized role names.
   const data=v8?
    await runDeepSeekOfficialJobAgent(intent,env.HHBA_MATCH_DEEPSEEK_KEY,
-    {targetCount:opts.limit}):
+    {targetCount:opts.limit,browserRenderer:previewJobBrowserRenderer(env)}):
    await discoverExternalOfficialJobs(intent,env.HHBA_MATCH_DEEPSEEK_KEY,{expanded:true});
   if(v8){
    const cost=data.accounting;
