@@ -8,7 +8,7 @@ const CATALOG=Object.freeze([
  '项目管理','沟通能力','财务分析','市场营销'
 ]);
 const PREFERRED=/(?:优先(?:考虑|录用)?|加分|更佳|更好|bonus|nice[\s-]?to[\s-]?have|preferred|a plus|加分项)/i;
-const REQUIRED=/(?:必须|必需|须(?:具备|熟练|掌握|会)|要求|精通|熟练|掌握|熟悉|需要|应当|具备|能够|使用|应用|具有|proficient|must|required|experience with|familiar with)/i;
+const REQUIRED=/(?:必须|必备|必需|硬性要求|强制要求|须(?:具备|熟练|掌握|会)|要求|精通|熟练|掌握|熟悉|需要|应当|具备|能够|使用|应用|具有|proficient|must|required|experience with|familiar with)/i;
 const STRICT_MANDATORY=/(?:必须|必备|必需|硬性要求|强制要求|mandatory|must(?:\s+have)?|strictly\s+required)/i;
 const OPTIONAL=/(?:不要求|无需|不必|无须|不需要|不是必须|非必备|not required|not necessary|not mandatory)/i;
 const ALTERNATIVE=/(?:至少(?:一项|一种|一门)|其中(?:一项|一种)|之一|任意一种|二选一|\sor\s|或者|或\s*(?:java|python|sql|go|c\+\+|linux))/i;
