@@ -26,7 +26,11 @@ export function explainFinalJobScore(profile,job,fit){
   '/30，经验 '+b.experience+'/20，学历 '+b.education+'/10，地点 '+b.location+'/10'+
   (fit.score_adjustment<0?'；职业方向证据不足，综合分已限制上限':'');
  const matched=[summary];
- if(b.role>0)matched.push('岗位名称与简历的求职方向存在明确或可迁移的职业关联');
+ if(b.role>0){
+  if(fit.career_alignment?.transition)
+   matched.push('岗位符合您表达的求职意向；目前的职责证据更偏向其他方向，属于跨方向尝试');
+  else matched.push('岗位方向与简历记录的职责或求职目标相关');
+ }
  const skillNames=unique([
   ...(fit.matched_required_skills||[]),
   ...(fit.matched_preferred_skills||[]),
