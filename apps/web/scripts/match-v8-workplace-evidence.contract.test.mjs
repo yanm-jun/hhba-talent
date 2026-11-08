@@ -104,8 +104,9 @@ test('Rendered Tencent-style single role and same-line Mainland city survive lon
   '本科及以上学历，三年以上内容运营经验，熟悉传播策略和平台合作流程。'.repeat(5),
   '申请岗位'
  ];
- const out=readPublicJob(l,{title:'岗位详情 | 腾讯招聘',content:lines.join('\n')},now);
- assert.equal(out?.title,'在研UE5策略竞技游戏-内容运营经理');
+ const rejects={};
+ const out=readPublicJob(l,{title:'岗位详情 | 腾讯招聘',content:lines.join('\n')},now,rejects);
+ assert.equal(out?.title,'在研UE5策略竞技游戏-内容运营经理',JSON.stringify(rejects));
  assert.equal(out?.location,'上海');
  assert.equal(out?.evidence.location_evidence_type,'JOB_HEADER_CITY');
  assert.equal(out?.has_application_cta,true);
