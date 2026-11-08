@@ -104,6 +104,15 @@ export function extractAtsPage(link,doc,now=new Date()){
 export function verifyAtsBacklink(job,doc,homepage){
  if(job?.source_status!=='ATS_NEEDS_EMPLOYER_PROOF'||!homepage||
   typeof doc?.content!=='string'||doc.content.length<120)return null;
+ // An arbitrary similarly named website could spoof a backlink. Require
+ // the official-looking site's registered label to match the ATS tenant.
+ // Nonmatching corporate-domain/brand combinations remain unverified.
+ let host;
+ try{host=new URL(homepage).hostname.replace(/^www\./,'');}catch{return null;}
+ const parts=host.split('.');
+ const primary=parts.at(-1)==='cn'&&['com','net','org'].includes(parts.at(-2))?
+  parts.at(-3):parts.at(-2);
+ if(!primary||primary.replace(/-/g,'')!==job.tenant.replace(/-/g,''))return null;
  const h=job.official_domain.replace(/\./g,'\\.');
  const re=new RegExp('https?:\\/\\/'+h+'\\/'+job.tenant+'(?:\\/|\\s|\\)|\\]|"|$)','i');
  const text=doc.content.slice(0,60000);

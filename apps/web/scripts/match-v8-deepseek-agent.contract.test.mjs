@@ -103,6 +103,8 @@ test('hosted ATS body requires JD, Mainland city and independent employer backli
  assert.equal(verifyAtsBacklink(pending,{content:website},site)?.company,'星河公司');
  assert.equal(verifyAtsBacklink(pending,{content:website.replace(ats,'https://example.org/')},site),null);
  assert.equal(verifyAtsBacklink(pending,{content:website.replaceAll('星河公司','伪造公司')},site),null);
+ assert.equal(verifyAtsBacklink(pending,{content:website},'https://www.evil.cn/'),null,
+  'a fake external domain with a forged backlink must not authenticate a tenant');
  assert.equal(extractAtsPage(link,{content:atsJD.replace('Location: 上海','Location: Tokyo 日本')},at),null);
  assert.equal(extractAtsPage(link,{content:atsJD.replace('Apply for this job','职位已关闭')},at),null);
 });

@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - 'apps/web/functions/_lib/domestic-match-fusion.js'
+      - 'apps/web/functions/_lib/deepseek-official-job-agent.js'
+      - 'apps/web/scripts/match-v8-deepseek-agent.contract.test.mjs'
       - 'apps/web/functions/_lib/job-qualification-evidence.js'
       - 'apps/web/functions/_lib/resume-match-core.js'
       - 'apps/web/functions/api/match/**'
@@ -56,6 +58,7 @@ jobs:
       - name: Verify source guards and deterministic ranking
         working-directory: apps/web
         run: |
+          node --check functions/_lib/deepseek-official-job-agent.js
           node --check functions/_lib/domestic-search-fetch.js
           node --check functions/_lib/domestic-match-fusion.js
           node --check functions/_lib/match-ranking.js
@@ -68,7 +71,7 @@ jobs:
           node --check functions/_lib/mainland-job-location.js
           node --check functions/_lib/resume-role-evidence.js
           node --check functions/_lib/resume-tenure.js
-          node --test scripts/match-v7-guardrails-quality.contract.test.mjs scripts/match-v6-tristate-intent.contract.test.mjs scripts/match-v5-credentials.contract.test.mjs scripts/match-v5-quality-evaluation.contract.test.mjs scripts/match-v4-cross-discipline.contract.test.mjs scripts/match-v3-calibration.contract.test.mjs scripts/match-audit-hardgates.contract.test.mjs scripts/job-skill-evidence.contract.test.mjs scripts/resume-tenure.contract.test.mjs scripts/match-ranking-v2.contract.test.mjs scripts/domestic-match-fusion.contract.test.mjs scripts/domestic-search-fetch.contract.test.mjs scripts/domestic-search-fetch.route.test.mjs
+          node --test scripts/match-v8-deepseek-agent.contract.test.mjs scripts/match-v7-guardrails-quality.contract.test.mjs scripts/match-v6-tristate-intent.contract.test.mjs scripts/match-v5-credentials.contract.test.mjs scripts/match-v5-quality-evaluation.contract.test.mjs scripts/match-v4-cross-discipline.contract.test.mjs scripts/match-v3-calibration.contract.test.mjs scripts/match-audit-hardgates.contract.test.mjs scripts/job-skill-evidence.contract.test.mjs scripts/resume-tenure.contract.test.mjs scripts/match-ranking-v2.contract.test.mjs scripts/domestic-match-fusion.contract.test.mjs scripts/domestic-search-fetch.contract.test.mjs scripts/domestic-search-fetch.route.test.mjs
       - name: Check HHBA web production build
         working-directory: apps/web
         run: npm run build
