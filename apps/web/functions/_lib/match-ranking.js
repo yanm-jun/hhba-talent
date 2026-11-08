@@ -11,6 +11,7 @@
  */
 import {extractSkillRequirements} from './job-skill-evidence.js';
 import {isMainlandJobLocation} from './mainland-job-location.js';
+import {credentialLabel} from './professional-credentials.js';
 export const RANKING_VERSION='HHBA_MATCH_RANKING_V2';
 export const DEFAULT_RANKING_WEIGHTS=Object.freeze({
  role:30,skills:30,experience:20,education:10,location:10
@@ -150,6 +151,12 @@ export function evaluateJobEligibility(profile={},job={}){
   .map(s=>norm(typeof s==='string'?s:s?.name)).filter(Boolean));
  if(mandatory.some(s=>typeof s==='string'&&!proven.has(norm(s))))
   return {eligible:false,reason:'MANDATORY_SKILL_NOT_EVIDENCED'};
+ const requiredCredentials=Array.isArray(job.professional_credential_requirements)?
+  job.professional_credential_requirements:[];
+ const statedCredentials=new Set(Array.isArray(profile.professional_credentials)?
+  profile.professional_credentials:[]);
+ if(requiredCredentials.some(id=>credentialLabel(id)&&!statedCredentials.has(id)))
+  return {eligible:false,reason:'PROFESSIONAL_CREDENTIAL_NOT_EVIDENCED'};
  return {eligible:true,reason:null};
 }
 // The fourth argument is SERVER-SUPPLIED after a human-approved experiment.
