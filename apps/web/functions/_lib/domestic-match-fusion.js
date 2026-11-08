@@ -127,8 +127,8 @@ function externalToMatch(entry,profile,options,now){
   platform:'official-domestic',source:entry.official_domain,remote:false,
   source_type:'站外官方招聘',reference_score:score,
   ...(()=>{const skills=extractSkillRequirements(requirements);return {
-   required_skills:skills.required,preferred_skills:skills.preferred,
-   unclassified_skills:skills.unclassified};})(),
+   required_skills:skills.required,mandatory_skills:skills.mandatory,
+   preferred_skills:skills.preferred,unclassified_skills:skills.unclassified};})(),
   min_experience_years:experience,
   minimum_education:Object.keys(DEGREE_RANK).find(k=>DEGREE_RANK[k]===degree)||null,
   salary:typeof entry.evidence.salary==='string'&&entry.evidence.salary.length<=60?entry.evidence.salary:null,
