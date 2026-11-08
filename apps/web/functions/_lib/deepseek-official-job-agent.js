@@ -414,7 +414,7 @@ async function requestJson(endpoint,key,body,fetcher,max=260000,timeout=18000){
  const raw=await r.text();if(raw.length>max)throw Error('PROVIDER_RESPONSE_TOO_LARGE');
  try{return JSON.parse(raw);}catch{throw Error('PROVIDER_BAD_JSON');}
 }
-export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=new Date(),targetCount=10}={}){
+export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=new Date(),targetCount=10,auditPublicEvidence=false}={}){
  const intents=[...new Set((Array.isArray(roles)?roles:[roles])
   .map(sanitizedJobIntent).filter(Boolean))].slice(0,2);
  if(!intents.length)throw Error('V8_NO_SAFE_ROLE');
@@ -422,6 +422,19 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
  const usage={model:0,search:0,fetch:0},observed=new Map(),sites=new Map();
  const pages=new Map(),confirmed=new Map(),attempted=new Set(),websiteCache=new Map();
  const rejections=Object.create(null);
+ // This diagnostic is opt-in for protected, one-shot synthetic-role acceptance:
+ // public verified-search URLs and finite rejection codes only, NO page body,
+ // search snippet, user resume, or query text. Never persist to D1.
+ const rejectionLinks=[];
+ const traceRead=(link,doc)=>{
+  const snapshot={...rejections};
+  const job=readPublicJob(link,doc,now,rejections);
+  if(auditPublicEvidence&&!job&&rejectionLinks.length<16){
+   const reason=Object.keys(rejections).find(x=>rejections[x]>(snapshot[x]||0))||'UNCLASSIFIED';
+   rejectionLinks.push({url:link.url,reason});
+  }
+  return job;
+ };
  const meter=emptyV8CostMeter();let failures=0,uncertainProviderFailure=false;
  let employerLookups=0,employerLookupResults=0,companyPageReads=0;
  const employerLookupAttempted=new Set();
@@ -586,7 +599,7 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
      try{
       const doc=await requestJson('/v1/tools/fetch',key,{url:link.url},fetcher,500000);
       if(typeof doc?.content==='string'&&doc.content.length>0)meter.billable_fetch++;
-      const job=readPublicJob(link,doc,now,rejections);
+      const job=traceRead(link,doc);
       if(!job)answer={status:'INCOMPLETE_OR_UNREADABLE_JOB'};
       else{
        pages.set(link.url,job);
@@ -644,7 +657,7 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
    try{
     const doc=await requestJson('/v1/tools/fetch',key,{url:link.url},fetcher,500000);
     if(typeof doc?.content==='string'&&doc.content.length>0)meter.billable_fetch++;
-    const job=readPublicJob(link,doc,now,rejections);
+    const job=traceRead(link,doc);
     if(!job)continue;
     pages.set(link.url,job);
     const verified=await corroborateJob(job,link);
@@ -670,6 +683,7 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
     requirements:[...observed.values()].filter(x=>searchEvidenceHints(x.search_metadata,roleAliases,now).requirements_hint).length,
     apply:[...observed.values()].filter(x=>searchEvidenceHints(x.search_metadata,roleAliases,now).apply_hint).length
    },
-   fetch_rejection_counts:rejections},
+   fetch_rejection_counts:rejections,
+   ...(auditPublicEvidence?{rejected_public_links:rejectionLinks}: {})},
   disclaimer:'中国大陆公开招聘详情：有公司网站佐证但不保证实时开放；网页无法读取或验证时不作为正式推荐。'};
 }
