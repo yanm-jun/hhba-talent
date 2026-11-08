@@ -98,15 +98,33 @@ test('no source or no relevant external gives zero, never hallucinates padding',
  assert.equal(out.counts.selected_internal+out.counts.selected_external,0);
 });
 
-test('external Search is opt-in, Preview-gated, and never sends resume text',async()=>{
+test('automatic search is server-side and the modal has no extra search toggle',async()=>{
  const {readFile}=await import('node:fs/promises');
  const component=await readFile(new URL('../src/components/CandidateMatchResultDialog.tsx',import.meta.url),'utf8');
- const service=await readFile(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
- assert.match(component,/externalAvailable&&<section/,'Search button hidden unless Preview flag is enabled');
- assert.match(component,/onClick=\{\(\)=>void findMoreDomesticJobs\(\)\}/);
- assert.match(component,/discoverExternalDomesticJobs\(role,abort.signal\)/);
- assert.match(component,/fuseDomesticJobRecommendations\(/);
- assert.match(component,/result.matches,found.candidates,result.profile/);
- assert.match(service,/body:JSON\.stringify\(\{role_hint:clean,consent_search:true\}\)/);
- assert.doesNotMatch(service.slice(service.indexOf('export async function discoverExternalDomesticJobs')),/resume_id|text:cleaned|profile:|skills:/);
+ const api=await readFile(new URL('../functions/api/match/[[path]].js',import.meta.url),'utf8');
+ assert.match(component,/根据您的简历，为您匹配合适的工作/);
+ assert.match(component,/item\.salary\|\|'薪资未公布'/);
+ assert.match(component,/item\.experience_requirement\|\|'经验未注明'/);
+ assert.doesNotMatch(component,/想看看更多国内企业吗|本次已搜索|补充站外官方岗位/);
+ assert.doesNotMatch(component,/HHBA 站内|站外官方 · 待核实开放|Search.*Fetch/);
+ assert.match(api,/autoDiscoveryCandidates\(env,db,session\.phone,profile,options\)/);
+ assert.match(api,/fuseDomesticJobRecommendations\(/);
+ assert.match(api,/discoverExternalOfficialJobs\(intent,env\.HHBA_MATCH_DEEPSEEK_KEY,\{expanded:true\}\)/);
+ // Only a sanitized job direction goes to external search, not the resume text.
+ assert.doesNotMatch(api.slice(api.indexOf('async function autoDiscoveryCandidates'),api.indexOf('async function aiExtract')),/cleaned|input\.text|resume_id/);
+});
+
+test('3 years experience never matches a posting requiring at least 7 years',()=>{
+ for(const requirement of [
+  '岗位要求：具有 7 年以上软件开发经验，精通 Python 和 SQL，能完成系统研发工作。',
+  '资格要求：至少7年工作经验，熟悉 Python 数据处理、接口开发与数据库技术。',
+  '职位要求：需有7-10年相关工作经验，熟悉 Python、SQL 及企业级开发流程。',
+  '要求 7+ years of work experience, Python SQL software engineering.'
+ ]){
+  const row=domesticOutside('2097166275703910403',{
+   evidence:{title:'软件开发工程师',location:'深圳',requirement}
+  });
+  const result=fuseDomesticJobRecommendations([],[row],profile,{role_hint:'软件开发工程师'},now);
+  assert.equal(result.matches.length,0,requirement);
+ }
 });
