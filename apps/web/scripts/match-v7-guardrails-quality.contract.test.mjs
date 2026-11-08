@@ -185,7 +185,7 @@ test('fetched same-company role preserves two verified work cities without dupli
   '岗位要求',
   '本科及以上学历，熟练使用 Python、SQL 与常见数据库，理解软件工程方法，能够独立开发、分析故障并维护技术文档，有良好的团队沟通意识。',
   '申请岗位'
- ].join('\\n');
+ ].join('\n');
  let searches=0,fetches=0;
  const fetcher=async(url,options)=>{
   if(String(url).endsWith('/search')){
@@ -224,7 +224,7 @@ test('one failed expanded Search cannot discard verified positions from successf
    '岗位要求',
    '熟练掌握 Python 和 SQL，本科及以上学历，熟悉数据库与企业软件工程流程，具备良好的沟通和问题解决能力。',
    '立即投递'
-  ].join('\\n')});
+  ].join('\n')});
  };
  const result=await discoverExternalOfficialJobs('Python 开发','synthetic-testing-only-key',
   {fetcher,expanded:true,now:new Date('2026-11-08T00:00:00Z')});
