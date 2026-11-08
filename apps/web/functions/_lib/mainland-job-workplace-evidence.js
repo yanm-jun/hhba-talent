@@ -65,33 +65,49 @@ function readField(lines,i,allowGeneric){
   return null;
  return next.slice(0,140);
 }
-function extractedJobPostingLocations(raw,role){
- const found=[];
- const scripts=[...String(raw||'').slice(0,120000).matchAll(
-  /<script[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)].slice(0,6);
+function extractedJobPostingLocations(raw,role,now=new Date()){
+ const found=[];let count=0,matching=0,reason=null;
+ const scripts=[...String(raw||'').slice(0,200000).matchAll(
+  /<script[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)].slice(0,8);
+ const validCountry=value=>{
+  if(!value)return true; // legacy schemas sometimes omit addressCountry
+  const name=typeof value==='string'?value:value?.name||value?.['@id']||'';
+  return /^(?:CN|CHN|中国|中国大陆|中华人民共和国|China|People.s Republic of China)$/i.test(String(name).trim());
+ };
  function walk(value,depth=0){
-  if(depth>3||!value||typeof value!=='object')return;
-  if(Array.isArray(value)){for(const v of value.slice(0,12))walk(v,depth+1);return;}
+  if(depth>4||!value||typeof value!=='object')return;
+  if(Array.isArray(value)){for(const v of value.slice(0,16))walk(v,depth+1);return;}
   const types=Array.isArray(value['@type'])?value['@type']:[value['@type']];
   if(types.some(t=>typeof t==='string'&&t.toLowerCase()==='jobposting')){
+   count++;
    const title=safe(value.title,140);
-   // If the structured job is a different named role, never borrow its city.
-   if(!title||!role||title.includes(role)||role.includes(title)){
-    const locs=Array.isArray(value.jobLocation)?value.jobLocation:[value.jobLocation];
-    for(const loc of locs.slice(0,10)){
-     const addr=loc?.address;
-     const city=typeof addr==='object'?addr?.addressLocality:null;
-     if(typeof city==='string')found.push(city);
-    }
+   // Never borrow location from a nameless or differently named listing.
+   if(!title||!role||!(title.includes(role)||role.includes(title)))return;
+   matching++;
+   if(/TELECOMMUTE/i.test(String(value.jobLocationType||''))){reason='UNKNOWN_MAINLAND_CITY';return;}
+   const end=value.validThrough?Date.parse(value.validThrough):NaN;
+   if(Number.isFinite(end)&&end<new Date(now).getTime()){
+    reason='CLOSED';return;
+   }
+   const locs=Array.isArray(value.jobLocation)?value.jobLocation:[value.jobLocation];
+   for(const loc of locs.slice(0,10)){
+    const addr=loc?.address;
+    if(!addr||typeof addr!=='object')continue;
+    if(!validCountry(addr.addressCountry)){reason='OVERSEAS_WORKPLACE';return;}
+    const city=addr.addressLocality||addr.addressRegion;
+    if(typeof city==='string')found.push(city);
    }
   }
   if(value['@graph'])walk(value['@graph'],depth+1);
  }
  for(const m of scripts){
-  if(m[1].length>20000)continue;
+  if(m[1].length>25000)continue;
   try{walk(JSON.parse(m[1]));}catch{}
  }
- return found;
+ if(count>1)return {values:[],reason:'MULTIPLE_STRUCTURED_JOBS'};
+ if(reason)return {values:[],reason};
+ if(count&&matching!==1)return {values:[],reason:'UNRELATED_STRUCTURED_JOB'};
+ return {values:found,reason:null};
 }
 export function extractMainlandWorkplaceFromJob({raw='',lines=[],role=''}={}){
  const normalized=(Array.isArray(lines)?lines:[]).map(normalizeLine).filter(Boolean);
@@ -120,10 +136,12 @@ export function extractMainlandWorkplaceFromJob({raw='',lines=[],role=''}={}){
   return cities.length===1?{city:cities[0],evidence_type:'JOB_LOCATION_FIELD'}:
    {reason:'AMBIGUOUS_WORKPLACE'};
  }
- // JobPosting schema must actually be on this fetched single job detail.
+ // A rendered JobPosting can supplement Markdown, but only for a
+ // single title-matching role. Conflicting HTML/Markdown location is unsafe.
  const structured=extractedJobPostingLocations(raw,role);
- if(structured.length){
-  const evaluated=structured.map(interpret);
+ if(structured.reason)return {reason:structured.reason};
+ if(structured.values.length){
+  const evaluated=structured.values.map(interpret);
   const failed=evaluated.find(x=>!x.city);
   if(failed)return failed;
   const cities=[...new Set(evaluated.map(x=>x.city))];
