@@ -4,14 +4,17 @@ import {onRequestGet,onRequestPost} from '../functions/api/match/discover.js';
 
 const origin='https://preview.hhba.example';
 function setup({active=true,role='candidate',migrated=true}={}){
- const ledger=[],callCount={search:0,fetch:0},phone='13800000000';
+ const ledger=[],cache=new Map(),callCount={search:0,fetch:0},phone='13800000000';
  const db={prepare(sql){return {
   async first(){
-   if(sql.includes('sqlite_master'))return migrated?{name:'hhba_external_search_requests'}:null;
+   if(sql.includes('sqlite_master'))return migrated?{name:sql.includes('hhba_external_search_cache')?'hhba_external_search_cache':'hhba_external_search_requests'}:null;
    throw Error('Unknown unbound first '+sql);
   },
   bind(...args){return {
    async first(){
+    if(sql.includes('FROM hhba_external_search_cache')){
+     const row=cache.get(args[0]);return row&&row.expires_at>args[1]?row:null;
+    }
     if(sql.includes('FROM hhba_auth_sessions'))return {phone,revoked:0,
      expires_at:new Date(Date.now()+3600000).toISOString()};
     if(sql.includes('FROM hhba_auth_users'))return {phone,role};
@@ -20,6 +23,10 @@ function setup({active=true,role='candidate',migrated=true}={}){
    },
    async run(){
     if(sql.startsWith('UPDATE hhba_auth_sessions'))return {success:true,meta:{changes:1}};
+    if(sql.startsWith('INSERT OR REPLACE INTO hhba_external_search_cache')){
+     cache.set(args[0],{payload_json:args[1],checked_at:args[2],expires_at:args[3]});
+     return {success:true,meta:{changes:1}};
+    }
     if(sql.startsWith('INSERT INTO hhba_external_search_requests')){
      const day=args[1],hash=args[2];
      if(ledger.filter(x=>x.day===day).length>=12||
@@ -46,7 +53,7 @@ function setup({active=true,role='candidate',migrated=true}={}){
     ...(token?{Authorization:'Bearer fake-token'}:{})},
    body:JSON.stringify(payload||{role_hint,consent_search:consent})});
  }
- return {env,ledger,callCount,request};
+ return {env,ledger,cache,callCount,request};
 }
 function mockProvider(counter){
  const original=globalThis.fetch;
@@ -56,7 +63,7 @@ function mockProvider(counter){
   assert.equal(opts.headers.Authorization,'Bearer fake-key-of-adequate-length');
   assert.equal(String(url),'https://api.deepseek.com/v1/tools/search');
   const body=JSON.parse(opts.body);
-  assert.match(body.query,/site:(?:careers\.tencent\.com|zhaopin\.meituan\.com|career\.huawei\.com)/);
+  assert.ok(body.query.includes('site:')||body.query.includes('中国大陆 招聘'),body.query);
   assert.doesNotMatch(body.query,/site:[^\s]+(?:evil|example|google)/);
   assert.doesNotMatch(JSON.stringify(body),/13800000000|fake-token|person@example\.com/);
   counter.search++;
@@ -97,25 +104,39 @@ test('role-only candidate discovery is separate from matching quota',async()=>{
   assert.equal(value.kind,'HHBA_DOMESTIC_DISCOVERY_V1');
   assert.deepEqual(value.candidates,[]);
   assert.deepEqual(value.usage,{search:0,fetch:0});
-  assert.equal(h.callCount.search,2);
+  assert.equal(h.callCount.search,5);
   assert.equal(h.ledger.length,1);
   assert.equal(h.ledger[0].hash.includes('13800000000'),false);
   assert.doesNotMatch(JSON.stringify(value),/fake-key|13800000000/);
  }finally{restore();}
 });
-test('personal quota caps paid Search even after repeated submissions',async()=>{
+test('public 24h cache returns identical abstract role with no extra provider calls or charges',async()=>{
  const h=setup(),restore=mockProvider(h.callCount);
  try{
-  assert.equal((await onRequestPost({request:h.request(),env:h.env})).status,200);
-  assert.equal((await onRequestPost({request:h.request(),env:h.env})).status,200);
-  const denied=await onRequestPost({request:h.request(),env:h.env});
-  assert.equal(denied.status,429);
-  assert.equal((await denied.json()).error,'EXTERNAL_SEARCH_PERSONAL_LIMIT');
-  assert.equal(h.ledger.length,2);
-  assert.equal(h.callCount.search,4);
+  const first=await (await onRequestPost({request:h.request(),env:h.env})).json();
+  const second=await (await onRequestPost({request:h.request(),env:h.env})).json();
+  assert.equal(first.cache_hit,false);
+  assert.equal(second.cache_hit,true);
+  assert.deepEqual(second.usage,{search:0,fetch:0});
+  assert.deepEqual(second.attempts,{search:0,fetch:0});
+  assert.equal(h.callCount.search,5);
+  assert.equal(h.ledger.length,1);
+  assert.equal(h.cache.size,1);
+  assert.doesNotMatch(JSON.stringify([...h.cache.values()]),/13800000000|Python 软件开发|fake-key/);
  }finally{restore();}
 });
-
+test('different roles still respect two-per-day search quota',async()=>{
+ const h=setup(),restore=mockProvider(h.callCount);
+ try{
+  assert.equal((await onRequestPost({request:h.request({role_hint:'软件开发工程师'}),env:h.env})).status,200);
+  assert.equal((await onRequestPost({request:h.request({role_hint:'数据分析师'}),env:h.env})).status,200);
+  const blocked=await onRequestPost({request:h.request({role_hint:'视觉设计师'}),env:h.env});
+  assert.equal(blocked.status,429);
+  assert.equal((await blocked.json()).error,'EXTERNAL_SEARCH_PERSONAL_LIMIT');
+  assert.equal(h.ledger.length,2);
+  assert.equal(h.callCount.search,10);
+ }finally{restore();}
+});
 test('production search supports explicit production-only mode without changing live auth rollout',async()=>{
  const h=setup();
  delete h.env.HHBA_AUTH_ROLLOUT;
@@ -131,4 +152,15 @@ test('production search supports explicit production-only mode without changing 
  assert.equal((await (await onRequestGet({env:h.env})).json()).enabled,false);
  assert.equal(h.ledger.length,0);
  assert.equal(h.callCount.search,0);
+});
+
+test('status advertises maximum 5 Search + 10 Fetch and 24-hour cache',async()=>{
+ const h=setup();
+ const status=await (await onRequestGet({env:h.env})).json();
+ assert.equal(status.enabled,true);
+ assert.equal(status.max_search_requests,5);
+ assert.equal(status.max_fetch_requests,10);
+ assert.equal(status.theoretical_search_fetch_cost_cap_cny,0.075);
+ assert.equal(status.cache_ttl_hours,24);
+ assert.equal(status.integrated_into_top10,true);
 });
