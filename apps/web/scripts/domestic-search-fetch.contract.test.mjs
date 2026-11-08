@@ -305,3 +305,15 @@ test('Fetch unknown-title exploration is strictly bounded even with many officia
  assert.equal(kept.length,2,'do not burn eight Fetch calls on generic headings');
  assert.ok(kept.every(x=>x.title==='职位详情'));
 });
+
+test('generic verified software-engineering titles are valid Search leads, not Product Leads',()=>{
+ const first=2097166275703910400n;
+ const uri=i=>'https://careers.tencent.com/jobdesc.html?postId='+String(first+BigInt(i));
+ const rows=[
+  {url:uri(3),title:'Product Lead, AI-Native'},
+  {url:uri(4),title:'Software Engineer'},
+  {url:uri(5),title:'Software Engineer - Backend'}
+ ];
+ const selected=prioritizeOfficialSearchCandidates(rows,'Python 开发',8);
+ assert.deepEqual(selected.map(x=>x.url),[uri(5),uri(4)]);
+});

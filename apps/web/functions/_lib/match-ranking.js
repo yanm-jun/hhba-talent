@@ -56,7 +56,7 @@ const OCCUPATIONS=[
  ['administration',/(?:行政专员|行政助理|行政管理|办公室主任|office administrator)/i],
  ['food-science',/(?:食品研发|食品质量|食品工程|食品检测|food technologist)/i],
  ['chemical',/(?:化工工艺|化工工程师|化学工程师|材料工程师|chemical engineer|materials engineer)/i],
- ['product',/(?:产品经理|产品专员|product manager|product owner)/i],
+ ['product',/(?:产品经理|产品专员|product manager|product owner|product[\s-]?lead)/i],
  ['ux',/(?:交互设计|用户体验设计|ux designer|ui\/ux|product designer)/i],
  ['graphic-design',/(?:视觉设计|平面设计|品牌设计|graphic designer|visual designer)/i],
  ['operations',/(?:运营|内容策划|新媒体|growth operations|operations specialist)/i],

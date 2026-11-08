@@ -256,7 +256,7 @@ export function prioritizeOfficialSearchCandidates(rows,role,maxFetch){
  const focusedContent=roles.includes('内容运营');
  const focusedUserOps=roles.includes('用户运营');
  const titleFocus=focusedContent?
-  /(?:内容|新媒体|社交媒体|短视频|公众号|文案|content|social[\\s-]?media|editorial)/i:
+  /(?:内容|新媒体|社交媒体|短视频|公众号|文案|content|social[\s-]?media|editorial)/i:
   focusedUserOps?/(?:用户|社群|社区|增长|user|community|growth)/i:null;
  const scored=[];
  for(const [index,row] of (Array.isArray(rows)?rows:[]).entries()){
@@ -264,11 +264,11 @@ export function prioritizeOfficialSearchCandidates(rows,role,maxFetch){
   if(!locator)continue;
   const snippet=typeof row?.title==='string'?row.title.slice(0,140):'';
   const kind=classifyOccupation(snippet);
-  const normalized=snippet.toLowerCase().replace(/\\s+/g,'');
-  const exact=roles.some(r=>r.length>=4&&normalized.includes(r.toLowerCase().replace(/\\s+/g,'')));
+  const normalized=snippet.toLowerCase().replace(/\s+/g,'');
+  const exact=roles.some(r=>r.length>=4&&normalized.includes(r.toLowerCase().replace(/\s+/g,'')));
   const backendSoftware=kinds.has('backend')&&kind==='software'&&
-   /(?:software[\\s-]+(?:development[\\s-]+)?engineer|software[\\s-]+developer|软件工程师|软件开发工程师)/i.test(snippet)&&
-   !/(?:manager|director|lead|head[\\s-]+of|负责人|总监)/i.test(snippet);
+   /(?:software[\s-]+(?:development[\s-]+)?engineer|software[\s-]+developer|软件工程师|软件开发工程师)/i.test(snippet)&&
+   !/(?:manager|director|lead|head[\s-]+of|负责人|总监)/i.test(snippet);
   // A Search teaser saying "revenue operations", "machine learning", etc.
   // must not consume a content-operations applicant's official Fetch budget.
   if(titleFocus&&!titleFocus.test(snippet))continue;
