@@ -15,6 +15,7 @@ export type MatchedJob = {
   needs_verification:string[];requirements_basis:string;
   source_type?:'HHBA站内岗位'|'站外官方招聘';
   application_status?:'NEEDS_OFFICIAL_CONFIRMATION';checked_at?:string;
+  source_level?:'VERIFIED_EMPLOYER_DOMAIN'|'VERIFIED_ATS_TENANT_ONLY';
 };
 export type MatchResponse = {
   status:'COMPLETE';profile:MatchProfile;matches:MatchedJob[];
@@ -149,22 +150,42 @@ export async function checkMatchProviderConnection(signal?:AbortSignal):Promise<
  * enterprise posting. The frontend never trusts arbitrary URLs from AI.
  */
 export function safeExternalJobApplicationUrl(job:MatchedJob):string|null{
- if(job?.source_type!=='站外官方招聘'||job.application_status!=='NEEDS_OFFICIAL_CONFIRMATION')return null;
+ if(job?.source_type!=='站外官方招聘'||
+  job.application_status!=='NEEDS_OFFICIAL_CONFIRMATION')return null;
  try{
   const u=new URL(job.official_url);
-  if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash||u.searchParams.size!==1)return null;
-  const specs:Record<string,{company:string;path:string;param:string;pattern:RegExp}>={
+  if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash||
+   u.searchParams.size>1||job.source!==u.hostname)return null;
+  const fixed:Record<string,{company:string;path:string;param:string;pattern:RegExp}>={
    'careers.tencent.com':{company:'腾讯',path:'/jobdesc.html',param:'postId',pattern:/^\d{12,22}$/},
    'career.huawei.com':{company:'华为',path:'/cn/job-details',param:'advertisementId',pattern:/^\d{1,12}$/},
    'zhaopin.meituan.com':{company:'美团',path:'/web/position/detail',param:'jobUnionId',pattern:/^\d{8,14}$/}
   };
-  const expected=specs[u.hostname];
-  if(!expected||u.pathname!==expected.path||job.company!==expected.company||
-   job.source!==u.hostname||!u.searchParams.has(expected.param))return null;
-  const native=u.searchParams.get(expected.param)||'';
-  if(!expected.pattern.test(native)||job.id!=='external-'+u.hostname.replace(/[^a-zA-Z0-9_-]/g,'-')+'-'+native)
+  let canonical:string|null=null,originalId:string|null=null;
+  const r=fixed[u.hostname];
+  if(r){
+   const code=u.searchParams.get(r.param)||'';
+   if(u.pathname!==r.path||u.searchParams.size!==1||!r.pattern.test(code)||
+    job.company!==r.company)return null;
+   originalId=u.hostname+':'+code;
+   canonical='https://'+u.hostname+u.pathname+'?'+r.param+'='+code;
+  }else{
+   const ats:Record<string,RegExp>={
+    'jobs.ashbyhq.com':/^\/([a-z0-9][a-z0-9-]{1,55})\/([a-f0-9]{8}-[a-f0-9-]{27,40})$/i,
+    'jobs.lever.co':/^\/([a-z0-9][a-z0-9-]{1,55})\/([a-f0-9]{8}-[a-f0-9-]{27,40})$/i,
+    'job-boards.greenhouse.io':/^\/([a-z0-9][a-z0-9-]{1,55})\/jobs\/(\d{5,14})$/i,
+    'boards.greenhouse.io':/^\/([a-z0-9][a-z0-9-]{1,55})\/jobs\/(\d{5,14})$/i,
+    'jobs.smartrecruiters.com':/^\/([a-z0-9][a-z0-9-]{1,55})\/(\d{7,16}(?:-[a-z0-9-]{2,90})?)$/i
+   };
+   const rule=ats[u.hostname],match=rule?.exec(u.pathname);
+   if(!match||u.searchParams.size!==0||job.source_level!=='VERIFIED_ATS_TENANT_ONLY'||
+    job.company!==match[1].toLowerCase())return null;
+   originalId=u.hostname+':'+match[1].toLowerCase()+':'+match[2].toLowerCase();
+   canonical='https://'+u.hostname+u.pathname;
+  }
+  if(!originalId||job.id!=='external-'+originalId.replace(/[^a-zA-Z0-9_-]/g,'-'))
    return null;
-  return 'https://'+u.hostname+expected.path+'?'+expected.param+'='+native;
+  return canonical;
  }catch{return null;}
 }
 
@@ -172,13 +193,15 @@ export type ExternalOfficialCandidate={
  id:string;source_type:'站外官方招聘';source_status:'OFFICIAL_DETAIL_FETCHED';
  application_status:'NEEDS_OFFICIAL_CONFIRMATION';company:string;title:string;
  location:string;official_url:string;official_domain:string;has_application_cta:boolean;
- checked_at:string;evidence:{title:string;location:string;requirement:string};
+ checked_at:string;source_level?:'VERIFIED_EMPLOYER_DOMAIN'|'VERIFIED_ATS_TENANT_ONLY';
+ source_provider?:string;evidence:{title:string;location:string;requirement:string;tenant_verified?:boolean;company_identity?:string};
 };
 export type ExternalSearchResult={
  ok:true;kind:'HHBA_DOMESTIC_DISCOVERY_V1';scope:'CN_MAINLAND_ONLY';
  candidates:ExternalOfficialCandidate[];candidate_count:number;
- usage:{search:number;fetch:number};
- max_search_requests:number;max_fetch_requests:number;disclaimer:string;
+ usage:{search:number;fetch:number};attempts?:{search:number;fetch:number};
+ max_search_requests:number;max_fetch_requests:number;cost_cap_cny?:number;
+ cache_hit?:boolean;disclaimer:string;
 };
 const externalSearchErrors:Record<string,string>={
  EXTERNAL_SEARCH_NOT_ENABLED:'站外搜索尚未开放，请先使用站内岗位推荐。',
@@ -230,7 +253,7 @@ export async function discoverExternalDomesticJobs(roleHint:string,signal?:Abort
  const data=await response.json().catch(()=>({})) as Partial<ExternalSearchResult>&{error?:string};
  if(!response.ok)throw new MatchError(response.status,externalSearchErrors[data.error||'']||'站外岗位搜索暂不可用。');
  if(data.ok!==true||data.kind!=='HHBA_DOMESTIC_DISCOVERY_V1'||data.scope!=='CN_MAINLAND_ONLY'||
-  !Array.isArray(data.candidates)||data.candidates.length>3)
+  !Array.isArray(data.candidates)||data.candidates.length>10)
   throw new MatchError(502,'站外岗位搜索数据格式不完整，已丢弃本次结果。');
  return data as ExternalSearchResult;
 }
