@@ -208,7 +208,7 @@ export function fuseDomesticJobRecommendations(inside=[],outside=[],rawProfile={
   const fit=scoreCandidateFit(profile,job,options);
   if(!fit.eligible)return null;
   const rationale=explainFinalJobScore(profile,job,fit);
-  const transfer=groundedCareerTransfer(profile,job);
+  const transfer=groundedCareerTransfer(rawProfile,job);
   if(transfer)rationale.not_evidenced.push(
    '可迁移能力：'+transfer.supporting_skills.join('、')+
    '；不代表已有该职位的工作经历，仍需核实具体岗位要求');
