@@ -74,3 +74,23 @@ export function professionalPracticeReview(title){
 export function credentialLabel(code){
  return DEFINITIONS.find(item=>item.id===code)?.name||null;
 }
+
+/**
+ * Alternatives remain alternatives. A stated professional certificate is
+ * never equated with current registration or verified certificate validity.
+ */
+export function extractStructuredCredentialConditions(officialRequirements){
+ const output=[],seen=new Set();
+ for(const clause of clauses(officialRequirements)){
+  const types=marked(clause);
+  if(!types.length||!REQUIRED.test(clause)||OPTIONAL.test(clause))continue;
+  const alternative=types.length>1&&
+   /(?:或者|或|二选一|任选|任一|之一|至少一种|至少一项|\beither\b|\bor\b)/i.test(clause);
+  const key=(alternative?'ANY_OF':'ALL_OF')+'|'+types.map(x=>x.id).join('|');
+  if(seen.has(key))continue;
+  seen.add(key);
+  output.push({operator:alternative?'ANY_OF':'ALL_OF',
+   values:types.map(x=>x.id),certainty:'EXPLICIT',evidence:clause.slice(0,300)});
+ }
+ return output.slice(0,12);
+}
