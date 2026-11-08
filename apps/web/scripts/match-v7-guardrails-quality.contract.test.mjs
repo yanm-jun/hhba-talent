@@ -10,6 +10,7 @@ import {prioritizeOfficialSearchCandidates,discoverExternalOfficialJobs} from '.
 import {fuseDomesticJobRecommendations} from '../functions/_lib/domestic-match-fusion.js';
 import {summarizeRankedRelevance} from '../functions/_lib/match-quality-evaluator.js';
 import {groundedCareerTransfer} from '../functions/_lib/career-transfer-evidence.js';
+import {separateCareerIntentAndExperience} from '../functions/_lib/resume-role-evidence.js';
 
 const applicant={education:'BACHELOR',experience_years:4,
  target_roles:['Python 开发工程师'],skills:[{name:'Java'}]};
@@ -234,4 +235,45 @@ test('one failed expanded Search cannot discard verified positions from successf
  assert.equal(result.usage.search,3);
  assert.equal(result.status,'PARTIAL');
  assert.deepEqual(result.failures,{search:1,fetch:0});
+});
+
+test('live sample: negative employment disclaimer never becomes demonstrated experience',()=>{
+ const resume=[
+  '学历：市场营销本科。',
+  '2022年7月至2025年7月，全职担任汽车销售顾问，累计全职工作3年。',
+  '负责客户咨询、销售数据分析、线下营销活动执行和项目管理。',
+  '技能：项目管理、数据分析、Excel、客户沟通。',
+  '求职意向：内容运营，愿意转岗，从事内容策划与用户增长相关工作。',
+  '未担任过内容运营岗位，没有声称有内容运营任职经验。'
+ ].join('\n');
+ const data=separateCareerIntentAndExperience(['内容运营','数据分析师'],resume);
+ assert.deepEqual(data.demonstrated_roles,['销售顾问']);
+ assert.ok(data.career_intents.includes('内容运营'));
+});
+
+test('live sample: switch to content work excludes machine learning and finance roles',()=>{
+ const p={education:'BACHELOR',experience_years:3,
+  skills:[{name:'数据分析',evidence:'数据分析'},{name:'项目管理',evidence:'项目管理'}],
+  career_intents:['内容运营'],demonstrated_roles:['销售顾问'],
+  target_roles:['内容运营','销售顾问']};
+ const out=fuseDomesticJobRecommendations([
+  internal('ai','Machine Learning Engineer - Recommendations & Personalization','深圳'),
+  internal('treasury','Treasury & Payment Analyst','深圳'),
+  internal('content','内容运营专员','北京')
+ ],[],p,{role_hint:'内容运营',limit:10},at);
+ assert.deepEqual(out.matches.map(j=>j.title),['内容运营专员']);
+});
+
+test('live sample: backend intent rejects Product Lead, revenue operations and IoT field jobs',()=>{
+ const p={education:'BACHELOR',experience_years:3,
+  skills:[{name:'Python',evidence:'Python'},{name:'SQL',evidence:'SQL'}],
+  target_roles:['Python 开发工程师'],career_intents:['Python 开发工程师'],
+  demonstrated_roles:['Python 开发工程师']};
+ const out=fuseDomesticJobRecommendations([
+  internal('backend','Software Engineer - Backend','北京'),
+  internal('product','Product Lead, AI-Native (Special Projects)','深圳'),
+  internal('revenue','Manager, Revenue Strategy Operations, CN','上海'),
+  internal('field','IoT Field Engineer - China & Region','深圳')
+ ],[],p,{role_hint:'Python 开发工程师',limit:10},at);
+ assert.deepEqual(out.matches.map(j=>j.title),['Software Engineer - Backend']);
 });

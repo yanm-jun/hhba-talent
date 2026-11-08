@@ -80,13 +80,13 @@ test('hard education and experience mismatches block false high scores',()=>{
  const result=fuseDomesticJobRecommendations([],jobs,profile,{role_hint:'软件开发工程师'},now);
  assert.equal(result.matches.length,0);
 });
-test('skill-only matching is grounded by fetched requirement wording',()=>{
+test('unknown occupation cannot override a different explicit goal through shared tools',()=>{
  const result=fuseDomesticJobRecommendations([],
  [domesticOutside('2097166275703910403',{title:'工程平台支持',evidence:{
   title:'工程平台支持',location:'深圳',requirement:'使用 Python 与 SQL 管理数据库、解决平台问题，至少本科及以上，具备排障经验。'}})],
  profile,{role_hint:'金融分析师'},now);
- assert.equal(result.matches.length,1);
- assert.ok(result.matches[0].matched.some(x=>x.includes('Python')));
+ assert.equal(result.matches.length,0);
+ assert.equal(result.counts.selected_external,0);
 });
 test('no forced 10, keeps distinct employers and caps at ten in a large mixed pool',()=>{
  const inside=[];

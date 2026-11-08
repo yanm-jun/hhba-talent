@@ -62,16 +62,30 @@ export function groundedCareerDirections(proposed,source,{limit=6}={}){
 }
 
 const INTENT_LINE=/(?:求职意向|应聘岗位|目标岗位|目标职位|期望职位|期望岗位|意向职位|职业目标|未来希望|希望从事|希望转岗|计划转行|想从事)/i;
+const NEGATED_EXPERIENCE=/(?:未(?:曾|经)?(?:担任|任职|从事|做过)|没有(?:做过|担任|从事|任职)|从未(?:担任|任职|从事)|不具备[^。]{0,30}经历|尚未(?:担任|从事))/i;
+function explicitHeldOccupations(lines){
+ const prior=lines.filter(line=>/(?:担任|任职|从事|岗位[：:]|职位[：:])/i.test(line)&&
+  !NEGATED_EXPERIENCE.test(line));
+ if(!prior.length)return [];
+ const direct=CANDIDATE_DIRECTIONS.filter(row=>prior.some(line=>contains(line,row.canonical)))
+  .map(row=>row.canonical);
+ // Job titles actually held are stronger than skills used in another career.
+ return [...new Set(direct)].slice(0,6);
+}
 const OCCUPATION_WORD=/(?:开发|工程师|经理|顾问|分析师|设计师|教师|老师|编导|剪辑|销售|运营|护士|医生|律师|会计|审计|翻译|法务|外贸|技师|产品|研发)/i;
 export function separateCareerIntentAndExperience(proposed,source){
  const raw=typeof source==='string'?source.slice(0,20000):'';
  const originalLines=raw.replace(/\r/g,'').split('\n');
  const intentLines=originalLines.filter(line=>INTENT_LINE.test(line)&&line.length<=220);
  // Intent lines cannot establish prior occupation experience.
- const experienceText=originalLines.filter(line=>!INTENT_LINE.test(line)).join('\n');
- // Mere mention of a job title (e.g. '协助产品经理') is NOT evidence of
- // having performed that occupation; require task-action evidence instead.
- const demonstrated=groundedCareerDirections([],experienceText,{limit:6});
+ const experienceLines=originalLines.filter(line=>!INTENT_LINE.test(line)&&
+  !NEGATED_EXPERIENCE.test(line));
+ const experienceText=experienceLines.join('\n');
+ // Prefer employment titles, not incidental analysis or content terms
+ // contained in a sales applicant's documented activities.
+ const explicit=explicitHeldOccupations(experienceLines);
+ const demonstrated=explicit.length?explicit:
+  groundedCareerDirections([],experienceText,{limit:6});
  const intents=[];
  for(const line of intentLines){
   const cleaned=line.replace(/^[^：:]{0,35}[：:]/,'').trim();
