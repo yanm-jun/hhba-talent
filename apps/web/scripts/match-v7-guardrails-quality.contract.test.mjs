@@ -9,6 +9,7 @@ import {
 import {prioritizeOfficialSearchCandidates} from '../functions/_lib/domestic-search-fetch.js';
 import {fuseDomesticJobRecommendations} from '../functions/_lib/domestic-match-fusion.js';
 import {summarizeRankedRelevance} from '../functions/_lib/match-quality-evaluator.js';
+import {groundedCareerTransfer} from '../functions/_lib/career-transfer-evidence.js';
 
 const applicant={education:'BACHELOR',experience_years:4,
  target_roles:['Python 开发工程师'],skills:[{name:'Java'}]};
@@ -150,4 +151,23 @@ test('offline relevance metrics compute NDCG, precision and candidate recall aga
  assert.throws(()=>summarizeRankedRelevance([
   {group:'X',relevance_grades:{good:5},candidate_ids:['good'],recommended_ids:['good']}
  ]),/RANKING_INVALID_GRADE/);
+});
+
+
+test('career transfer needs both intended target and two documented, relevant skills',()=>{
+ const profile={
+  career_intents:['内容运营'],demonstrated_roles:['销售顾问'],
+  skills:[{name:'项目管理',evidence:'组织线下客户活动'},
+   {name:'数据分析',evidence:'分析客户转化和订单数据'}]
+ };
+ const suggestion=groundedCareerTransfer(profile,{title:'内容运营'});
+ assert.equal(suggestion.kind,'EVIDENCED_TRANSFER_DIRECTION_ONLY');
+ assert.deepEqual(suggestion.supporting_skills,['项目管理','数据分析']);
+ assert.match(suggestion.disclaimer,/不代表具有目标岗位任职经历/);
+ assert.equal(groundedCareerTransfer({...profile,skills:[{name:'项目管理',evidence:'负责活动'}]},
+  {title:'内容运营'}),null);
+ assert.equal(groundedCareerTransfer({...profile,career_intents:[]},{title:'内容运营'}),null);
+ assert.equal(groundedCareerTransfer({...profile,demonstrated_roles:['内容运营']},{title:'内容运营'}),null);
+ assert.equal(groundedCareerTransfer({...profile,skills:[{name:'项目管理',evidence:''},{name:'数据分析',evidence:''}]},
+  {title:'内容运营'}),null);
 });
