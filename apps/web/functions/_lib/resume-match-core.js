@@ -2,6 +2,7 @@
 // Never turn a model guess or stale employer posting into a verified job.
 import {deriveDocumentedWorkTenure} from './resume-tenure.js';
 import {scoreCandidateFit} from './match-ranking.js';
+import {isMainlandJobLocation} from './mainland-job-location.js';
 export const MAX_TEXT_LENGTH=20000;
 export function redactForModel(value){
  if(typeof value!=='string')return '';
@@ -83,12 +84,10 @@ function safeJobLink(j){
  }catch{return false}
 }
 // Country label alone is not proof of Mainland China employment.
-const excludedChineseRegions=/(香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macao|macau|taiwan|taipei|kaohsiung)/i;
-const mainlandCities=/(北京|上海|天津|重庆|深圳|广州|杭州|南京|苏州|成都|武汉|西安|青岛|宁波|无锡|合肥|郑州|长沙|厦门|福州|济南|大连|沈阳|哈尔滨|长春|石家庄|昆明|贵阳|南宁|海口|珠海|佛山|东莞|烟台|潍坊|临沂|济宁|菏泽|聊城|威海|泰安|德州|枣庄|滨州|日照|东营|beijing|shanghai|tianjin|chongqing|shenzhen|guangzhou|hangzhou|nanjing|suzhou|chengdu|wuhan|xian|qingdao|ningbo|wuxi|hefei|zhengzhou|changsha|xiamen|fuzhou|jinan|dalian|shenyang|harbin|changchun|shijiazhuang|kunming|guiyang|nanning|haikou|zhuhai|foshan|dongguan)/i;
 export function isVerifiedMainlandLocation(job,fact){
  if(!job||!fact||String(fact.countryCode||'').toUpperCase()!=='CN')return false;
  const location=String(job.location||'');
- return !excludedChineseRegions.test(location)&&mainlandCities.test(location);
+ return isMainlandJobLocation(location);
 }
 export function countVerifiedMainlandJobs(snapshot,audit,facets){
  if(!Array.isArray(snapshot?.jobs)||!Array.isArray(audit?.jobs)||!Array.isArray(facets?.jobs))return 0;
