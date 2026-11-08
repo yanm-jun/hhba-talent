@@ -22,7 +22,7 @@
 
 ## 服务端硬限制
 
-每次最多 4 次 Responses / 4 次 Search / 8 次 Fetch。按用户每日 Search 限额及原有 AI 用户/全站每日配额执行。由于 DeepSeek 忽略 `max_tool_calls`，本实现没有开放内置服务端 web_search，而是由 HHBA 服务端执行每一个付费 Search/Fetch，并拒绝模型额外请求。
+每次 **最多 4 次 Responses / 8 次 Search / 20 次 Fetch**；一旦达到请求的已核验岗位数量就提前结束，不要求耗尽预算。按用户每日 Search 限额及原有 AI 用户/全站每日配额执行。由于 DeepSeek 忽略 `max_tool_calls`，本实现没有开放内置服务端 web_search，而是由 HHBA 服务端执行每一个付费 Search/Fetch，并拒绝模型额外请求。
 
 开关 `HHBA_MATCH_V8_DEEPSEEK_AGENT_ENABLED=1` 且现有 Preview `HHBA_MATCH_SERVICE_ENABLED=1`、`HHBA_MATCH_EXTERNAL_SEARCH_ENABLED=1` 才可能走此路径。正式站两个主开关继续关闭，V8 标志缺省关闭。
 
@@ -37,3 +37,18 @@
 之前的 V8 海外 ATS 专用分支逻辑已替换为不依赖招聘管理系统供应商的公网页面发现和证据核验。六家原官方招聘源在 V7 仍可通过相应已有链路继续工作；**不需要新企业的私有 API**。
 
 V8 是基于 V7 PR #298 的堆叠草稿 PR #299。不得提前合并 main，不得提前开放 hhba.work 的 AI 收费入口。
+
+## 2026-11-08 用户确认：V8 配额和按实际使用量记录
+
+- 最多 **4 次模型 Responses API**；0 到 4 次均合法，读取到足够的可交叉验证岗位提前停止。
+- 最多 **8 次 Search**；这是服务器强制的请求上限，不是必须执行 8 次。
+- 最多 **20 次 Fetch**；重复公司的相同官网主页可以复用本次请求内缓存，不能重复付费读取。
+- 所有学历、经验、强制证书、必要技能和中国大陆工作城市限制仍由 V7 独立硬条件审核，不能因参考评分高而放行。
+- 新增 `apps/web/functions/_lib/deepseek-discovery-billing.js`：分别记录实际尝试的模型/Search/Fetch 数量、成功返回结果的 Search/Fetch 数量、模型返回的 `input_tokens` / `cached_tokens` / `output_tokens`；按 DeepSeek 公布的当期人民币单价估算费用。
+- DeepSeek 2026-11-08 官方公开费率快照：Search 和 Fetch 每次成功返回结果 0.005 元，V4 Pro 模型高峰输入缓存命中 0.30 元/百万、未命中 9 元/百万、输出 27 元/百万；非高峰分别 0.15、4.5、13.5 元/百万。中国法定节假日费率与实际最终结算以 DeepSeek 账单为准；提供高峰费率上界估算，不冒充真实发票。
+- 使用新 D1 迁移 `apps/web/d1/0019_match_v8_discovery_accounting.sql` 记录**每个实际匹配动作**的匿名账户哈希、请求 ID、每日时间、调用数量、可计费成功调用数量、Token、人民币估计费用、费用是否完整。不保存简历、关键词、招聘 URL、个人信息。部署/启用预览 V8 前必须先创建这张表，后端在表缺失时拒绝产生新的 V8 付费调用。
+- 仅 `HHBA_MATCH_V8_DEEPSEEK_AGENT_ENABLED=1` 触发新费用记录；未获用户验收前正式站两个主开关继续关闭，不合并 `main`。
+
+### 验证
+
+`node --test apps/web/scripts/match-v8-deepseek-agent.contract.test.mjs apps/web/scripts/match-v8-discovery-cost.contract.test.mjs`（在 `apps/web` 工作目录时使用 `scripts/...`）覆盖 8/20 上限、低于上限的实际使用费、复用/早停、强条件匹配和 D1 迁移。

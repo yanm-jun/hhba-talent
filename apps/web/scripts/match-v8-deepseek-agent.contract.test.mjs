@@ -27,7 +27,9 @@ const bJD=[
 const siteDoc='# 星河数字科技有限公司 - 官网\n'+'欢迎访问星河数字科技有限公司官方主页。我们面向公众发布产品信息与职业机会。'.repeat(6);
 const siteDocB='# 明源文化有限公司 官方网站\n'+'明源文化有限公司网站欢迎访客查阅公司情况。'.repeat(10)+'\n[招聘岗位]('+b+')';
 const tool=(name,args,call_id)=>({type:'function_call',name,arguments:JSON.stringify(args),call_id});
-const reply=(value)=>Response.json(value);
+const reply=(value)=>Response.json(value?.status==='completed'?{
+ ...value,usage:{input_tokens:1200,input_tokens_details:{cached_tokens:400},output_tokens:180}
+}:value);
 test('Safe role search is dynamic but will not send resumes or irrelevant jobs',()=>{
  assert.equal(safeAgentQuery('内容运营 2026 社会招聘 北京',['内容运营']),'内容运营 2026 社会招聘 北京');
  assert.equal(safeAgentQuery('新媒体运营 上海 企业官网',['内容运营']),'新媒体运营 上海 企业官网');
@@ -125,6 +127,12 @@ test('DeepSeek autonomous Search -> Fetch -> corporate verification without any 
  assert.equal(result.kind,'HHBA_V8_PUBLIC_MAINLAND_DISCOVERY_V2');
  assert.equal(result.status,'COMPLETE');
  assert.deepEqual(result.usage,{model:4,search:1,fetch:4});
+ assert.deepEqual(result.accounting.attempts,result.usage);
+ assert.deepEqual(result.accounting.billable,{search:1,fetch:4});
+ assert.deepEqual(result.accounting.tokens,{input:4800,cached_input:1600,output:720});
+ assert.equal(result.accounting.complete,true);
+ assert.equal(result.accounting.estimated_total_cny,0.04936);
+ assert.equal(result.accounting.peak_price_upper_estimate_cny,0.07372);
  assert.equal(result.candidates.length,2);
  assert.deepEqual(new Set(result.candidates.map(j=>j.company)),new Set(['星河数字科技有限公司','明源文化有限公司']));
  assert.ok(result.candidates.every(j=>j.source_status==='OFFICIAL_DETAIL_FETCHED'));
@@ -156,7 +164,7 @@ test('Hard budget cannot be bypassed with parallel hallucinated tool calls',asyn
   throw Error('Unexpected request');
  };
  const result=await runDeepSeekOfficialJobAgent('内容运营',key,{fetcher});
- assert.equal(usage.search,4);
+ assert.equal(usage.search,8);
  assert.equal(usage.fetch,0);
  assert.ok(usage.model<=V8_BUDGET.model);
  assert.deepEqual(result.candidates,[]);
@@ -169,4 +177,39 @@ test('Model-proposed fake URL and offline provider produce no recommended jobs',
  assert.deepEqual(a.candidates,[]);
  const b=await runDeepSeekOfficialJobAgent('内容运营',key,{fetcher:async()=>{throw Error('network down')}});
  assert.equal(b.status,'PARTIAL');assert.deepEqual(b.candidates,[]);
+});
+
+test('Stop model inference early once target number of independently verified jobs is reached',async()=>{
+ const x=mockAgent();
+ const result=await runDeepSeekOfficialJobAgent('内容运营',key,{fetcher:x.fetcher,now,targetCount:1});
+ assert.equal(result.candidates.length,1);
+ assert.deepEqual(result.usage,{model:3,search:1,fetch:3});
+ assert.equal(result.accounting.billable.fetch,3);
+ assert.equal(result.accounting.complete,true);
+ assert.ok(result.accounting.estimated_total_cny>0);
+});
+test('Public Fetch hard ceiling is twenty, independent of model tool-call volume',async()=>{
+ const jobs=Array.from({length:20},(_,i)=>
+  'https://career.gongsi.cn/jobs/'+String(202611080000+i));
+ let turn=0,attempts=0;
+ const fetcher=async(url)=>{
+  if(url.endsWith('/responses')){
+   turn++;
+   const calls=turn===1?[tool('search_jobs',{query:'内容运营 2026 企业招聘'},'s')]:
+    turn===2?jobs.slice(0,14).map((v,i)=>tool('read_job',{url:v},'r'+i)):
+    turn===3?jobs.slice(14).map((v,i)=>tool('read_job',{url:v},'r'+(i+14))):[];
+   return reply({status:'completed',output:calls});
+  }
+  if(url.endsWith('/search'))return reply({results:jobs.map(url=>({url,title:'内容运营'}))});
+  if(url.endsWith('/fetch')){attempts++;return reply({content:'公开招聘详细正文无法提取，但 Fetch 返回了可读取文本。'});}
+  throw Error('unexpected API');
+ };
+ const result=await runDeepSeekOfficialJobAgent('内容运营',key,{fetcher,now});
+ assert.equal(attempts,20);
+ assert.equal(result.usage.fetch,20);
+ assert.equal(result.accounting.billable.fetch,20);
+ assert.equal(result.accounting.billable.search,1);
+ assert.equal(result.candidates.length,0,'never recommend when JD lacks eligibility evidence');
+ assert.equal(result.accounting.complete,true);
+ assert.equal(result.usage.model,4);
 });

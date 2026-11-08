@@ -128,6 +128,15 @@ async function autoDiscoveryCandidates(env,db,phone,profile,opts){
    "SELECT name FROM sqlite_master WHERE type='table' AND name='hhba_external_search_requests'"
   ).first();
   if(table?.name!=='hhba_external_search_requests')return {candidates:[],status:'NOT_READY'};
+  const v8=env.HHBA_MATCH_V8_DEEPSEEK_AGENT_ENABLED==='1';
+  // Never spend for a V8 experiment until cost auditing is writable.
+  if(v8){
+   const accountingTable=await db.prepare(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='hhba_match_discovery_accounting'"
+   ).first();
+   if(accountingTable?.name!=='hhba_match_discovery_accounting')
+    return {candidates:[],status:'ACCOUNTING_NOT_READY'};
+  }
   const day=new Date().toISOString().slice(0,10),id=crypto.randomUUID();
   const hash=await sha256Hex(env.HHBA_MATCH_LIMIT_PEPPER+':search:'+phone);
   const reserved=await db.prepare(
@@ -139,10 +148,33 @@ async function autoDiscoveryCandidates(env,db,phone,profile,opts){
    return {candidates:[],status:'LIMITED'};
   // V8 is explicit opt-in and inherits the existing authenticated user's
   // one-click Search quota. The model only receives sanitized role names.
-  const data=env.HHBA_MATCH_V8_DEEPSEEK_AGENT_ENABLED==='1'?
-   await runDeepSeekOfficialJobAgent(intent,env.HHBA_MATCH_DEEPSEEK_KEY):
+  const data=v8?
+   await runDeepSeekOfficialJobAgent(intent,env.HHBA_MATCH_DEEPSEEK_KEY,
+    {targetCount:opts.limit}):
    await discoverExternalOfficialJobs(intent,env.HHBA_MATCH_DEEPSEEK_KEY,{expanded:true});
-  return {candidates:data.candidates,
+  if(v8){
+   const cost=data.accounting;
+   if(!cost)throw Error('ACCOUNTING_MISSING');
+   // Only usage counts and a dated estimate: never store employer URLs,
+   // search keywords, resume text, personal names or phone numbers in D1.
+   const record=await db.prepare(
+    'INSERT INTO hhba_match_discovery_accounting('+
+    'request_id,day_utc,account_hash,model_attempts,search_attempts,fetch_attempts,'+
+    'billable_search,billable_fetch,model_input_tokens,model_cached_input_tokens,'+
+    'model_output_tokens,model_estimated_cny,tools_estimated_cny,total_estimated_cny,'+
+    'peak_price_upper_estimate_cny,pricing_basis,estimate_complete,status,created_at)'+
+    ' VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+   ).bind(id,day,hash,
+    cost.attempts.model,cost.attempts.search,cost.attempts.fetch,
+    cost.billable.search,cost.billable.fetch,
+    cost.tokens.input,cost.tokens.cached_input,cost.tokens.output,
+    cost.model_estimated_cny,cost.search_fetch_estimated_cny,cost.estimated_total_cny,
+    cost.peak_price_upper_estimate_cny,cost.basis,cost.complete?1:0,
+    data.status==='PARTIAL'?'PARTIAL':'COMPLETE',new Date().toISOString()).run();
+   if(record?.success!==true||record?.meta?.changes!==1)
+    throw Error('COST_LOG_FAILED');
+  }
+  return {candidates:data.candidates,usage:v8?data.usage:null,accounting:v8?data.accounting:null,
    status:data.status==='PARTIAL'?'PARTIAL':'COMPLETE'};
  }catch(e){
   // A partial upstream request could have consumed credits, so the reservation
@@ -307,6 +339,8 @@ export async function onRequest({request,env}){
   matched_official_jobs:merged.counts.distinct_verified_sources,
   qualification_reviews:merged.qualification_reviews,
   discovery_status:discovered.status,
+  discovery_usage:discovered.usage||null,
+  discovery_cost_estimate:discovered.accounting||null,
   source:'中国大陆境内真实岗位（站内审计与 DeepSeek 公开网页检索）',
   scoring:'严格筛选已明确的学历、工作年限与工作地点要求后进行参考评分；不代表录用概率',
   privacy:'本次脱敏简历文本仅用于已授权的 AI 分析；联网招聘搜索只传岗位方向，不发送姓名、电话或简历',
