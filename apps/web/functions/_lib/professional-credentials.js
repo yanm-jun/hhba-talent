@@ -81,7 +81,12 @@ export function credentialLabel(code){
  */
 export function extractStructuredCredentialConditions(officialRequirements){
  const output=[],seen=new Set();
- for(const clause of clauses(officialRequirements)){
+ // Preserve "A、B，任选一种" as a single requirement, while new
+ // comma-separated sentences with their own requirement marker are split.
+ const structuredClauses=clean(officialRequirements).split(/[\n。；;]+/)
+  .flatMap(s=>s.split(/[，,](?=\s*(?:必须|必备|必需|硬性要求|强制要求|须|需|要求|优先|不要求|无需|不必|持证|具备|入职后))/))
+  .map(s=>s.trim()).filter(Boolean);
+ for(const clause of structuredClauses){
   const types=marked(clause);
   if(!types.length||!REQUIRED.test(clause)||OPTIONAL.test(clause))continue;
   const alternative=types.length>1&&
