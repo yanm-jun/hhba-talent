@@ -98,6 +98,45 @@ test('no forced 10, keeps distinct employers and caps at ten in a large mixed po
  const small=fuseDomesticJobRecommendations([domesticInside()],[],profile,{},now);
  assert.equal(small.matches.length,1);
 });
+test('official Baidu social detail with login but no CTA may be recommended only as unconfirmed',()=>{
+ const id='bd46ce5b-f5ae-4e97-9e25-80b851e30f12';
+ const title='数据产品经理（J86847）';
+ const outside={
+  id:'talent.baidu.com:'+id,source_type:'站外官方招聘',source_status:'OFFICIAL_DETAIL_FETCHED',
+  company:'百度',title,location:'北京',official_url:'https://talent.baidu.com/jobs/detail/SOCIAL/'+id,
+  official_domain:'talent.baidu.com',application_status:'NEEDS_OFFICIAL_CONFIRMATION',
+  has_application_cta:false,application_method:'OFFICIAL_DETAIL_LOGIN_REQUIRED',
+  checked_at:'2026-11-08T00:00:00Z',
+  evidence:{title,location:'北京',requirement:
+   '本科及以上学历，1年以上数据产品相关经验。熟练掌握 Python、SQL，沟通能力较强。'}
+ };
+ const applicant={education:'BACHELOR',experience_years:2,
+  target_roles:['数据产品经理'],skills:[{name:'Python'},{name:'SQL'}]};
+ const result=fuseDomesticJobRecommendations([],[outside],applicant,
+  {role_hint:'数据产品经理'},now);
+ assert.equal(result.matches.length,1);
+ assert.equal(result.matches[0].company,'百度');
+ assert.ok(result.matches[0].needs_verification.some(x=>x.includes('登录')));
+ assert.equal(result.matches[0].application_status,'NEEDS_OFFICIAL_CONFIRMATION');
+ const noYears=fuseDomesticJobRecommendations([],[outside],{...applicant,experience_years:0},
+  {role_hint:'数据产品经理'},now);
+ assert.equal(noYears.matches.length,0,'1年以上 explicit minimum must be respected');
+ const noLogin=fuseDomesticJobRecommendations([],[{...outside,application_method:undefined}],applicant,
+  {role_hint:'数据产品经理'},now);
+ assert.equal(noLogin.matches.length,0,'no CTA and no login evidence must not pass');
+});
+
+test('industry-specific official minimum years cannot be bypassed by strong skill overlap',()=>{
+ const title='软件开发工程师';
+ const row=domesticOutside('2097166275703910403',{evidence:{title,location:'深圳',
+  requirement:'岗位要求：5年以上工业行业相关软件开发经验，熟练掌握 Python、SQL，可承担平台开发任务。'}});
+ const insufficient=fuseDomesticJobRecommendations([],[row],profile,{role_hint:'软件开发工程师'},now);
+ assert.equal(insufficient.matches.length,0);
+ const qualified=fuseDomesticJobRecommendations([],[row],{...profile,experience_years:5},
+  {role_hint:'软件开发工程师'},now);
+ assert.equal(qualified.matches.length,1);
+});
+
 test('no source or no relevant external gives zero, never hallucinates padding',()=>{
  const out=fuseDomesticJobRecommendations([],[],profile,{limit:10},now);
  assert.equal(out.matches.length,0);
