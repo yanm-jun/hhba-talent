@@ -2,7 +2,7 @@
 // Never interpret education/project/internship dates as verified full-time work.
 const WORK_HEADING=/^\s*(?:#{1,5}\s*)?(?:\d{1,2}[.、]\s*)?(?:工作经历|工作履历|任职经历|职业经历|职业履历|professional experience|employment history|work experience)(?=\s|[:：]|$)/i;
 const SECTION_END=/^\s*(?:#{1,5}\s*)?(?:\d{1,2}[.、]\s*)?(?:教育经历|教育背景|学习经历|项目经历|项目经验|实习经历|专业技能|技能清单|资格证书|获奖|在校经历|个人评价|自我评价|个人信息|education|projects|internships|skills|certificates)(?=\s|[:：]|$)/i;
-const DATE_RANGE=/(?<sy>20\d{2})\s*(?:[./-]\s*|年\s*)(?<sm>0?[1-9]|1[0-2])\s*月?\s*(?:—|–|-|~|～|至|到)\s*(?:(?<ey>20\d{2})\s*(?:[./-]\s*|年\s*)(?<em>0?[1-9]|1[0-2])\s*月?|(?<present>至今|现在|目前|present|current))/gi;
+const DATE_RANGE=/(?<sy>20\d{2})\s*(?:[./-]\s*|年\s*)(?<sm>1[0-2]|0?[1-9])\s*月?\s*(?:—|–|-|~|～|至|到)\s*(?:(?<ey>20\d{2})\s*(?:[./-]\s*|年\s*)(?<em>1[0-2]|0?[1-9])\s*月?(?!\d)|(?<present>至今|现在|目前|present|current))/gi;
 const EMPLOYER_OR_ROLE=/(?:公司|集团|企业|科技|银行|事务所|研究院|工作室|工程师|开发|分析师|产品经理|运营|设计师|销售|顾问|教师|主管|总监|architect|developer|engineer|analyst|designer|manager)/i;
 const NON_FULL_TIME=/(?:实习|兼职|志愿|学生会|学生组织|在校|intern(?:ship)?|part[\s-]?time|volunteer)/i;
 const toMonth=(y,m)=>Number(y)*12+Number(m)-1;
@@ -18,7 +18,12 @@ export function deriveDocumentedWorkTenure(source,now=new Date()){
   if(WORK_HEADING.test(line))inWork=true;
   else if(SECTION_END.test(line))inWork=false;
   if(!inWork)continue;
-  const near=[lines[i],lines[i+1]||'',lines[i+2]||''].join(' ').slice(0,340);
+  const nearLines=[lines[i]];
+  for(let next=i+1;next<Math.min(lines.length,i+3);next++){
+   if(WORK_HEADING.test(lines[next])||SECTION_END.test(lines[next]))break;
+   nearLines.push(lines[next]);
+  }
+  const near=nearLines.join(' ').slice(0,340);
   for(const match of line.matchAll(DATE_RANGE)){
    const g=match.groups;
    if(!g)continue;
