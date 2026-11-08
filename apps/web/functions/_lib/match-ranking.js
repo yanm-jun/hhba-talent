@@ -113,6 +113,13 @@ export function evaluateJobEligibility(profile={},job={}){
  const education=minDegree(job.minimum_education);
  if(education&&(!DEGREE_RANK[profile.education]||DEGREE_RANK[profile.education]<DEGREE_RANK[education]))
   return {eligible:false,reason:'DEGREE_NOT_MET'};
+ // High-confidence mandatory skills from verified JD clauses are a gate.
+ // An absent resume mention means unproven, not proof of incompetence.
+ const mandatory=Array.isArray(job.mandatory_skills)?job.mandatory_skills:[];
+ const proven=new Set((Array.isArray(profile.skills)?profile.skills:[])
+  .map(s=>norm(typeof s==='string'?s:s?.name)).filter(Boolean));
+ if(mandatory.some(s=>typeof s==='string'&&!proven.has(norm(s))))
+  return {eligible:false,reason:'MANDATORY_SKILL_NOT_EVIDENCED'};
  return {eligible:true,reason:null};
 }
 // The fourth argument is SERVER-SUPPLIED after a human-approved experiment.
