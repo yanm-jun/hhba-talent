@@ -39,16 +39,21 @@ test('relevant official external posting competes with internal without becoming
  assert.ok(result.matches[0].needs_verification.some(x=>x.includes('仍接受申请')));
  assert.equal(result.counts.selected_external,1);
  assert.equal(result.counts.selected_internal,1);
- assert.ok(result.matches[0].reference_score<=90);
+ assert.ok(result.matches[0].reference_score<=100);
+ assert.deepEqual(Object.keys(result.matches[0].score_breakdown),
+  ['role','skills','experience','education','location']);
 });
-test('same company same role across sources or cities appears once, with higher score winning',()=>{
+test('identical company and role deduplicates across cities and sources with V2 score winning',()=>{
  const external=domesticOutside();
  const result=fuseDomesticJobRecommendations([
   domesticInside('original',92,'腾讯','软件开发工程师','深圳'),
   domesticInside('othercity',84,'腾讯','软件开发工程师','上海')],
  [external],profile,{role_hint:'软件开发工程师'},now);
  assert.equal(result.matches.length,1);
- assert.equal(result.matches[0].id,'ashby-verified-original');
+ assert.equal(result.matches[0].source_type,'站外官方招聘');
+ assert.equal(result.matches[0].ranking_version,'HHBA_MATCH_RANKING_V2');
+ assert.equal(Object.values(result.matches[0].score_breakdown).reduce((a,b)=>a+b,0),
+  result.matches[0].reference_score);
 });
 test('foreign, stale, nonofficial and inactive external jobs are rejected before scoring',()=>{
  const rows=[
@@ -84,7 +89,8 @@ test('skill-only matching is grounded by fetched requirement wording',()=>{
 test('no forced 10, keeps distinct employers and caps at ten in a large mixed pool',()=>{
  const inside=[];
  for(let i=0;i<12;i++)inside.push(domesticInside(String(i),65+i,'企业'+String(i%5),'数据分析师'+String(i),'上海'));
- const result=fuseDomesticJobRecommendations(inside,[],profile,{limit:10},now);
+ const result=fuseDomesticJobRecommendations(inside,[],
+  {...profile,target_roles:['数据分析师']},{limit:10},now);
  assert.equal(result.matches.length,10);
  const counts={};
  for(const r of result.matches)counts[r.company]=(counts[r.company]||0)+1;
