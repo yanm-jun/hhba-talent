@@ -157,7 +157,8 @@ export function safeExternalJobApplicationUrl(job:MatchedJob):string|null{
   const specs:Record<string,{company:string;path:string;param:string;pattern:RegExp}>={
    'careers.tencent.com':{company:'腾讯',path:'/jobdesc.html',param:'postId',pattern:/^\d{12,22}$/},
    'career.huawei.com':{company:'华为',path:'/cn/job-details',param:'advertisementId',pattern:/^\d{1,12}$/},
-   'zhaopin.meituan.com':{company:'美团',path:'/web/position/detail',param:'jobUnionId',pattern:/^\d{8,14}$/}
+   'zhaopin.meituan.com':{company:'美团',path:'/web/position/detail',param:'jobUnionId',pattern:/^\d{8,14}$/},
+   'zhaopin.jd.com':{company:'京东',path:'/web/job-info-detail',param:'requementId',pattern:/^\d{3,12}$/}
   };
   if(u.hostname==='jobs.bytedance.com'){
    const id=u.pathname.match(/^\/experienced\/position\/([0-9]{13,22})\/detail$/)?.[1];
