@@ -69,7 +69,11 @@ test('unclassified skills are weak relevance signals, not full mandatory credit'
  const unknown=scoreCandidateFit(resume,{...job,required_skills:[],
   unclassified_skills:['Python','SQL']});
  assert.ok(explicit.breakdown.skills>unknown.breakdown.skills);
- assert.ok(unknown.breakdown.skills<=11);
+ // The same verified technology overlap no longer receives a 19-point
+ // penalty merely because ATS facets lack mandatory/preferred labels.
+ assert.ok(unknown.breakdown.skills>=24);
+ assert.ok(explicit.breakdown.skills-unknown.breakdown.skills<=6);
+ assert.equal(unknown.skill_evidence_status,'UNCLASSIFIED_JD_SKILLS');
  assert.equal(unknown.required_skill_count,0);
 });
 test('a strong job match with no published skills remains eligible but not perfect',()=>{
