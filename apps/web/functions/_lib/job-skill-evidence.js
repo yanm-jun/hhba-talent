@@ -21,7 +21,7 @@ function hasSkill(clause,skill){
 export function extractSkillRequirements(text){
  if(typeof text!=='string'||text.length<25)
   return {required:[],mandatory:[],preferred:[],unclassified:[],evidence_available:false};
- const source=text.slice(0,2600).normalize('NFKC');
+ const source=text.slice(0,5500).normalize('NFKC');
  // Split into clauses so a later "优先" does not turn preceding mandatory
  // competencies into preferences. Keep commas/Chinese enumeration together.
  const clauses=source.split(/[\n；;。，,]+/).map(s=>s.trim()).filter(Boolean);
