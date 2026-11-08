@@ -130,6 +130,7 @@ async function autoDiscoveryCandidates(env,db,phone,profile,opts){
   ).first();
   if(table?.name!=='hhba_external_search_requests')return {candidates:[],status:'NOT_READY'};
   const v8=env.HHBA_MATCH_V8_DEEPSEEK_AGENT_ENABLED==='1';
+  const browserRenderer=v8?previewJobBrowserRenderer(env):null;
   // Never spend for a V8 experiment until cost auditing is writable.
   if(v8){
    const accountingTable=await db.prepare(
@@ -137,6 +138,15 @@ async function autoDiscoveryCandidates(env,db,phone,profile,opts){
    ).first();
    if(accountingTable?.name!=='hhba_match_discovery_accounting')
     return {candidates:[],status:'ACCOUNTING_NOT_READY'};
+  }
+  // Browser Rendering is separately billable, so refuse the entire paid
+  // experiment if its anonymous call-count table was not migrated first.
+  if(browserRenderer){
+   const schema=await db.prepare(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='hhba_match_browser_render_accounting'"
+   ).first();
+   if(schema?.name!=='hhba_match_browser_render_accounting')
+    return {candidates:[],status:'BROWSER_ACCOUNTING_NOT_READY'};
   }
   const day=new Date().toISOString().slice(0,10),id=crypto.randomUUID();
   const hash=await sha256Hex(env.HHBA_MATCH_LIMIT_PEPPER+':search:'+phone);
@@ -151,7 +161,7 @@ async function autoDiscoveryCandidates(env,db,phone,profile,opts){
   // one-click Search quota. The model only receives sanitized role names.
   const data=v8?
    await runDeepSeekOfficialJobAgent(intent,env.HHBA_MATCH_DEEPSEEK_KEY,
-    {targetCount:opts.limit,browserRenderer:previewJobBrowserRenderer(env)}):
+    {targetCount:opts.limit,browserRenderer}):
    await discoverExternalOfficialJobs(intent,env.HHBA_MATCH_DEEPSEEK_KEY,{expanded:true});
   if(v8){
    const cost=data.accounting;
@@ -174,6 +184,19 @@ async function autoDiscoveryCandidates(env,db,phone,profile,opts){
     data.status==='PARTIAL'?'PARTIAL':'COMPLETE',new Date().toISOString()).run();
    if(record?.success!==true||record?.meta?.changes!==1)
     throw Error('COST_LOG_FAILED');
+   if(browserRenderer){
+    const x=data.stats?.browser_render||{};
+    const attempts=Math.max(0,Math.min(2,Number(x.attempts)||0));
+    const recovered=Math.max(0,Math.min(attempts,Number(x.recovered)||0));
+    const errors=Math.max(0,Math.min(attempts,Number(x.failures)||0));
+    const audited=await db.prepare(
+     'INSERT INTO hhba_match_browser_render_accounting('+
+     'request_id,day_utc,account_hash,render_attempts,render_recovered,'+
+     'render_failures,browser_fee_estimate_complete,created_at) VALUES(?,?,?,?,?,?,?,?)'
+    ).bind(id,day,hash,attempts,recovered,errors,0,new Date().toISOString()).run();
+    if(audited?.success!==true||audited?.meta?.changes!==1)
+     throw Error('BROWSER_COST_LOG_FAILED');
+   }
   }
   return {candidates:data.candidates,usage:v8?data.usage:null,accounting:v8?data.accounting:null,
    status:data.status==='PARTIAL'?'PARTIAL':'COMPLETE'};
