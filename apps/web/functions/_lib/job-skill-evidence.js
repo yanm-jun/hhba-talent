@@ -12,7 +12,7 @@ const REQUIRED=/(?:必须|必需|须(?:具备|熟练|掌握|会)|要求|精通|�
 const OPTIONAL=/(?:不要求|无需|不必|无须|不需要|not required|not necessary)/i;
 const ALTERNATIVE=/(?:至少(?:一项|一种|一门)|其中(?:一项|一种)|之一|任意一种|二选一|\sor\s|或者|或\s*(?:java|python|sql|go|c\+\+|linux))/i;
 function hasSkill(clause,skill){
- const escaped=skill.replace(/[+?.()]/g,'\\const escaped=skill.replace(/[-/\\^$*+?.()|[\]{}]/g,'\\$&');');
+ const escaped=skill.replace(/[+?.()]/g,'\\$&');
  if(/^[A-Za-z][A-Za-z0-9 ]*$/.test(skill))
   return new RegExp('(^|[^A-Za-z0-9])'+escaped+'(?=$|[^A-Za-z0-9])','i').test(clause);
  return new RegExp(escaped,'i').test(clause);
