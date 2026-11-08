@@ -198,7 +198,7 @@ function extractRole(lines,page){
  if(roleText(candidate))return candidate.slice(0,95);
  // Only the lead section: never treat the JD's later responsibilities as a title.
  for(const l of lines.slice(0,12)){
-  if(roleText(l)&&!DUTY_HEADER.test(l)&&!REQUIREMENT_HEADER.test(l)&&
+  if(!/^title\s*:/i.test(l)&&roleText(l)&&!DUTY_HEADER.test(l)&&!REQUIREMENT_HEADER.test(l)&&
     !l.includes('。')&&!l.includes('；'))return l.split(/[|｜]/)[0].slice(0,95);
  }
  // Rendered domestic ATS pages may put the *single actual vacancy* after
