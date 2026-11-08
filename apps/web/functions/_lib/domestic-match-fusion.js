@@ -151,7 +151,7 @@ export function fuseDomesticJobRecommendations(inside=[],outside=[],rawProfile={
  const when=now instanceof Date?now.getTime():Number(now);
  if(!Number.isFinite(when))throw Error('MATCH_FUSION_INVALID_TIME');
  const profile=safeProfile(rawProfile);
- const internal=(Array.isArray(inside)?inside:[]).slice(0,250)
+ const internal=(Array.isArray(inside)?inside:[]).slice(0,1200)
   .map(internalToMatch).filter(Boolean);
  const external=(Array.isArray(outside)?outside:[]).slice(0,25)
   .map(j=>externalToMatch(j,profile,options,when)).filter(Boolean);
