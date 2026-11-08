@@ -34,7 +34,12 @@ export function extractMandatoryProfessionalCredentials(officialRequirements){
  for(const text of clauses(officialRequirements)){
   const ids=marked(text);
   if(!ids.length)continue;
-  const target=OPTIONAL.test(text)?optional:REQUIRED.test(text)?required:uncertain;
+  // Alternative accepted credentials are NOT cumulative obligations.
+  // Never require BOTH a practice license and a different qualification
+  // just because an official JD says "A 或 B / 任意一种".
+  const alternatives=ids.length>1&&/(?:或者|或|二选一|任选|任一|之一|至少一种|至少一项|\beither\b|\bor\b)/i.test(text);
+  const target=OPTIONAL.test(text)?optional:
+   alternatives?uncertain:REQUIRED.test(text)?required:uncertain;
   for(const item of ids)target.add(item.id);
  }
  for(const id of required){optional.delete(id);uncertain.delete(id);}
