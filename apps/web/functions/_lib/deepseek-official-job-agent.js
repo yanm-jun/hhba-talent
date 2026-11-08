@@ -149,7 +149,7 @@ export function readPublicJob(link,page,now=new Date()){
   official_domain:link.hostname,has_application_cta:CTA.test(text),
   application_status:'NEEDS_OFFICIAL_CONFIRMATION',checked_at:new Date(now).toISOString(),
   evidence:{title,location:city,requirement:requirements,salary:null},
-  _page_excerpt:short(text.replace(/\s+/g,' '),3400)};
+  _page_excerpt:t(text.replace(/\s+/g,' '),3400)};
 }
 export function provePublicEmployer(job,homepage,site){
  if(!job||job.source_status!=='PUBLIC_JOB_UNCONFIRMED'||!site||
