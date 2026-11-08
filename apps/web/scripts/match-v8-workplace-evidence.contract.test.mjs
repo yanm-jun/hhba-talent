@@ -109,6 +109,7 @@ test('Rendered Tencent-style single role and same-line Mainland city survive lon
  assert.equal(out?.title,'在研UE5策略竞技游戏-内容运营经理',JSON.stringify(rejects));
  assert.equal(out?.location,'上海');
  assert.equal(out?.evidence.location_evidence_type,'JOB_HEADER_CITY');
+ assert.equal(out?.company_claim,'腾讯');
  assert.equal(out?.has_application_cta,true);
  // A rendering recovery is still NOT verified without separate company proof.
  assert.equal(out?.source_status,'PUBLIC_JOB_UNCONFIRMED');
