@@ -85,3 +85,47 @@ test('Search snippets and job URL city strings do not become job work location',
  const rawJobLink=publicJobLink('https://career.gongsi.cn/jobs/202611080994');
  assert.equal(readPublicJob(rawJobLink,{title:'北京内容运营专员',content:body},now),null);
 });
+
+test('Rendered Tencent-style single role and same-line Mainland city survive long navigation',()=>{
+ const url='https://careers.tencent.com/jobdesc.html?postId=2094968965272092672';
+ const l=publicJobLink(url);
+ assert.ok(l);
+ const lines=[
+  '---','title: "岗位详情 | 腾讯招聘"','---','登录','社会招聘','校园招聘',
+  '生活在腾讯','产品和服务','工作地点','查看工作岗位','慎防招聘诈骗',
+  '我们提醒您，近期新加坡出现招聘诈骗活动，请勿轻信仿冒企业人员的申请指令。',
+  '其他招聘信息请访问官方页面。',
+  '在研UE5策略竞技游戏-内容运营经理 上海',
+  '分享岗位','复制链接','收藏','IEG','点击了解更多BG信息',
+  '产品 三年以上工作经验 更新于2026年09月09日',
+  '岗位职责',
+  '负责对接内容平台与创作者，制定直播运营方案，推动内容规模化传播。'.repeat(4),
+  '岗位要求',
+  '本科及以上学历，三年以上内容运营经验，熟悉传播策略和平台合作流程。'.repeat(5),
+  '申请岗位'
+ ];
+ const out=readPublicJob(l,{title:'岗位详情 | 腾讯招聘',content:lines.join('\n')},now);
+ assert.equal(out?.title,'在研UE5策略竞技游戏-内容运营经理');
+ assert.equal(out?.location,'上海');
+ assert.equal(out?.evidence.location_evidence_type,'JOB_HEADER_CITY');
+ assert.equal(out?.has_application_cta,true);
+ // A rendering recovery is still NOT verified without separate company proof.
+ assert.equal(out?.source_status,'PUBLIC_JOB_UNCONFIRMED');
+});
+test('Navigation text, several similar role-city entries, or a role and city in duties must not prove location',()=>{
+ const url='https://careers.examplecompany.cn/jobs/202611081244';
+ const l=publicJobLink(url);
+ const base=[
+  '岗位详情 | 企业招聘','生活在腾讯','产品和服务','工作地点','查看工作岗位',
+  '岗位职责','负责上海地区的内容运营和项目推进。'.repeat(5),
+  '岗位要求','本科及以上学历，熟悉内容策划和运营分析。'.repeat(5),
+  '申请岗位'
+ ];
+ const withNoJob=readPublicJob(l,{title:'岗位详情 | 企业招聘',
+  content:base.join('\n')},now);
+ assert.equal(withNoJob,null);
+ const twoRoles=[...base];
+ twoRoles.splice(5,0,'内容运营经理 上海','产品运营经理 北京');
+ assert.equal(readPublicJob(l,{title:'岗位详情 | 企业招聘',
+  content:twoRoles.join('\n')},now),null);
+});
