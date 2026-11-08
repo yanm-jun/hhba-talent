@@ -6,7 +6,7 @@ on:
     paths:
       - '.github/workflows/hhba-v7-oidc-live-eval.yml'
       - 'apps/web/functions/api/match/v7-eval.js'
-      - 'apps/web/functions/api/match/[[path]].js'
+      - 'apps/web/functions/api/match/**'
 permissions:
   contents: read
   id-token: write
