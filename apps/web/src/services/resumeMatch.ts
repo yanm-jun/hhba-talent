@@ -16,7 +16,7 @@ export type MatchedJob = {
   source_type?:'HHBA站内岗位'|'站外官方招聘';
   application_status?:'NEEDS_OFFICIAL_CONFIRMATION';checked_at?:string;
   salary?:string|null;experience_requirement?:string|null;
-  required_skills?:string[];preferred_skills?:string[];unclassified_skills?:string[];
+  required_skills?:string[];mandatory_skills?:string[];preferred_skills?:string[];unclassified_skills?:string[];
   min_experience_years?:number|null;minimum_education?:string|null;
   score_breakdown?:{role:number;skills:number;experience:number;education:number;location:number};
   ranking_version?:'HHBA_MATCH_RANKING_V2';
