@@ -10,6 +10,7 @@ on:
       - 'apps/web/src/styles/resume-match-dialog.css'
       - 'apps/web/scripts/match-v6-tristate-intent.contract.test.mjs'
       - 'apps/web/scripts/match-v7-guardrails-quality.contract.test.mjs'
+      - 'apps/web/functions/_lib/career-transfer-evidence.js'
       - 'apps/web/functions/_lib/match-ranking.js'
       - 'apps/web/functions/_lib/match-explanation.js'
       - 'apps/web/scripts/match-v3-calibration.contract.test.mjs'
@@ -62,6 +63,7 @@ jobs:
           node --check functions/_lib/match-quality-evaluator.js
           node --check functions/_lib/job-skill-evidence.js
           node --check functions/_lib/job-qualification-evidence.js
+          node --check functions/_lib/career-transfer-evidence.js
           node --check functions/_lib/mainland-job-location.js
           node --check functions/_lib/resume-role-evidence.js
           node --check functions/_lib/resume-tenure.js
