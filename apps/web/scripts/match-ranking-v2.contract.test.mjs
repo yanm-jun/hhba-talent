@@ -74,7 +74,7 @@ test('skill overlap provides evidence; unrelated roles without skill overlap do 
  assert.ok(both.score>oneSkill.score);
  const unrelated=scoreCandidateFit(profile,{...role,title:'高级会计师',required_skills:['会计资格证']});
  assert.equal(unrelated.eligible,false);
- assert.equal(unrelated.reason,'NO_MATCH_EVIDENCE');
+ assert.equal(unrelated.reason,'ROLE_DIRECTION_MISMATCH');
 });
 
 test('Python software developers are not treated as QA or data analysts by shared tools',()=>{
