@@ -29,7 +29,16 @@ async function request(path,init={}){
 }
 
 for(const route of ['/','/candidate/match']){
- const response=await request(route);
+ let response=await request(route);
+ if(response.status===308&&route!=='/'){
+  // Cloudflare Pages may canonicalize a directory-backed SPA route by
+  // appending a trailing slash. Follow ONLY the same-origin canonical route.
+  const redirect=new URL(response.headers.get('location')||'',root);
+  assert.equal(redirect.origin,root.origin,'preview redirect must stay same-origin');
+  assert.equal(redirect.pathname,route+'/','only canonical trailing slash is allowed');
+  assert.equal(redirect.search,'');
+  response=await request(redirect.pathname);
+ }
  assert.equal(response.status,200,route+' should serve the SPA');
  const type=response.headers.get('content-type')||'';
  assert.ok(type.includes('text/html'),route+' must return HTML');
