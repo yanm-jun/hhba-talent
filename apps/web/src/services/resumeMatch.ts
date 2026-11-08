@@ -153,7 +153,7 @@ export function safeExternalJobApplicationUrl(job:MatchedJob):string|null{
  if(job?.source_type!=='站外官方招聘'||job.application_status!=='NEEDS_OFFICIAL_CONFIRMATION')return null;
  try{
   const u=new URL(job.official_url);
-  if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash||u.searchParams.size!==1)return null;
+  if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash)return null;
   const specs:Record<string,{company:string;path:string;param:string;pattern:RegExp}>={
    'careers.tencent.com':{company:'腾讯',path:'/jobdesc.html',param:'postId',pattern:/^\d{12,22}$/},
    'career.huawei.com':{company:'华为',path:'/cn/job-details',param:'advertisementId',pattern:/^\d{1,12}$/},
@@ -165,6 +165,7 @@ export function safeExternalJobApplicationUrl(job:MatchedJob):string|null{
     job.source==='jobs.bytedance.com'&&job.id==='external-jobs-bytedance-com-'+id?
     'https://jobs.bytedance.com/experienced/position/'+id+'/detail':null;
   }
+  if(u.searchParams.size!==1)return null;
   const expected=specs[u.hostname];
   if(!expected||u.pathname!==expected.path||job.company!==expected.company||
    job.source!==u.hostname||!u.searchParams.has(expected.param))return null;
