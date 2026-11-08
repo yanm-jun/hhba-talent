@@ -75,7 +75,8 @@ function publicHttps(value,{query=false,max=420}={}){
   if(query&&([...u.searchParams].some(([k,v])=>{
    const identity=/^(?:id|jobid|job_id|positionId|postId|postIdEnc|reqId|requisitionId|jobUnionId|advertisementId|requementId|recruitId|jobCode|jobnumber)$/i.test(k);
    const selector=atsDetail&&/^(?:brandCode|columnId|recruitType|lanType|importPost)$/i.test(k);
-   return !(identity||selector)||!/^[a-z0-9-]{identity?3:1,58}$/i.test(v);
+   const allowedValue=identity?/^[a-z0-9-]{3,58}$/i:/^[a-z0-9-]{1,58}$/i;
+   return !(identity||selector)||!allowedValue.test(v);
   })||u.searchParams.size>(atsDetail?8:2)))return null;
   return u;
  }catch{return null;}
