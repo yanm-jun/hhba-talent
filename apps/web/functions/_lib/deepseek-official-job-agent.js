@@ -120,69 +120,173 @@ function rejectJobEvidence(tally,code){
  if(tally&&typeof tally==='object')tally[code]=(tally[code]||0)+1;
  return null;
 }
+const LI=/(?:^|\n)\s*(?:[-*•·]|\d{1,2}[.、．)])\s+/;
+const DUTY_PHRASE=/(?:负责|参与|协助|制定|推进|组织|实施|搭建|编写|运营|执行|规划|完善|撰写)/;
+const DUTY_HEADER=/^(?:工作|岗位|职位|主要|任职)?(?:职责|工作内容|职责描述|描述|工作任务|日常工作|job responsibilities|responsibilities|what you.ll do)(?:[\s：:]|$)/i;
+const REQUIREMENT_HEADER=/^(?:任职|应聘|岗位|职位|基本|招聘|资格|能力)?(?:资格|要求|条件|需求)|^(?:我们希望你|我们期待你|希望你具备|你需要具备|岗位基本要求|qualification|requirements|what we.re looking for|who you are|what you bring)(?:[\s：:]|$)/i;
+const END_HEADER=/^(?:薪酬|薪资|福利|待遇|职位推荐|相关职位|更多职位|更多岗位|联系我们|如何申请|立即申请|立即投递|申请职位|职位列表|福利待遇|benefits|how to apply|apply now)(?:[\s：:]|$)/i;
+const LOC_LABEL=/^(?:工作地点|工作城市|工作地|办公地点|办公城市|上班地点|岗位地点|工作区域|location|work location)(?:\s*[：:]\s*|\s*[|｜]\s*|\s{1,4}|$)/i;
+const COMPANY_LABEL=/^(?:公司名称|企业名称|招聘单位|用人单位|所属公司|招聘公司|招聘主体|company name|employer)(?:\s*[：:]\s*|\s*[|｜]\s*|\s{1,4}|$)/i;
+const BOILER=/^(?:首页|关于我们|加入我们|岗位|招聘|职位详情|招聘信息|查看更多|列表|岗位搜索|简历投递|返回|导航|工作地点|任职资格|职位要求|岗位职责|职位描述|职位名称|岗位名称|公司名称|职位列表|搜索|全部职位|查看职位|工作内容|社会招聘|校园招聘|应届生招聘|工作城市|招聘岗位|申请岗位)$/i;
+function markdownLines(raw){
+ return String(raw||'').split('\n').slice(0,1000).map(line=>
+  line.replace(/^\s*#{1,6}\s*/,'')
+   .replace(/\*\*/g,'').replace(/^\s*(?:>\s*)+/,'')
+   .replace(/\[([^\]]{1,160})\]\([^)]*\)/g,'$1')
+   .replace(/^\s*(?:[-*•·]|\d{1,2}[.、．)])\s*/,'')
+   .replace(/^\s*\|\s*/,'').replace(/\s*\|\s*$/,'')
+   .trim()).filter(Boolean);
+}
+function labelValue(lines,i,re){
+ const line=lines[i]||'';
+ const matched=line.match(re);
+ if(!matched)return null;
+ const rest=line.slice(matched[0].length).replace(/^[：:\s|｜-]+/,'').trim();
+ if(rest)return rest.slice(0,110);
+ const next=lines[i+1]||'';
+ return next&&!/^(?:岗位职责|任职要求|职位要求|公司名称|职位描述|职位列表|工作内容)/.test(next)?
+  next.slice(0,110):null;
+}
+function extractLabelField(lines,re,maxScan=100){
+ const values=[];
+ for(let i=0;i<Math.min(lines.length,maxScan);i++){
+  const v=labelValue(lines,i,re);
+  if(v&&v.length<=110&&!values.includes(v))values.push(v);
+ }
+ return values;
+}
+function extractRole(lines,page){
+ const roleText=x=>x.length>=3&&x.length<=95&&ROLE.test(x)&&!BOILER.test(x)&&
+  !/^(?:职位详情|招聘信息|岗位职责|职位描述|任职要求|应聘要求|工作地点|工作内容|招聘公告|岗位列表)/.test(x);
+ // Explicit fields have priority; tables can put label in a cell.
+ for(let i=0;i<Math.min(lines.length,48);i++){
+  const m=lines[i].match(/^(?:岗位名称|职位名称|职位|招聘岗位|job title|position)\s*[：:|｜]\s*(.{3,100})/i);
+  if(m&&roleText(m[1]))return m[1].split(/[|｜]/)[0].trim();
+ }
+ const fromTitle=clean(page?.title||'').replace(/^[-|｜]\s*/,'');
+ const candidate=fromTitle.split(/[|｜]/)[0].split(/\s+[-–]\s+/)[0].trim();
+ if(roleText(candidate))return candidate.slice(0,95);
+ // Only the lead section: never treat the JD's later responsibilities as a title.
+ for(const l of lines.slice(0,12)){
+  if(roleText(l)&&!DUTY_HEADER.test(l)&&!REQUIREMENT_HEADER.test(l)&&
+    !l.includes('。')&&!l.includes('；'))return l.split(/[|｜]/)[0].slice(0,95);
+ }
+ return null;
+}
+function extractMainlandWorkplace(lines){
+ const labels=extractLabelField(lines,LOC_LABEL,100);
+ if(!labels.length)return {reason:'MISSING_EXPLICIT_WORKPLACE'};
+ // Explicit, conflicting city fields or any overseas location are not acceptable.
+ const candidates=[];
+ for(const label of labels){
+  if(EXTERNAL.test(label))return {reason:'OVERSEAS_WORKPLACE'};
+  const city=findMainlandCity(label);
+  if(!city)return {reason:'UNKNOWN_MAINLAND_CITY'};
+  candidates.push(city);
+ }
+ if(new Set(candidates).size>1)return {reason:'AMBIGUOUS_WORKPLACE'};
+ return {city:candidates[0]};
+}
+function sections(lines){
+ const headings=lines.map((l,i)=>({
+  i,duties:DUTY_HEADER.test(l),requirements:REQUIREMENT_HEADER.test(l),
+  end:END_HEADER.test(l),header:/^(?:#{1,6}|\*\*)/.test(l)
+ }));
+ const required=headings.find(h=>h.requirements&&h.i<Math.min(lines.length,220));
+ if(!required)return {reason:'MISSING_REQUIREMENTS'};
+ const responsibility=headings.find(h=>h.duties&&h.i<required.i);
+ // Some Chinese sites list numbered responsibilities without the heading
+ // "岗位职责". Require at least two distinct explicit action statements.
+ const prior=lines.slice(Math.max(0,required.i-22),required.i);
+ const inferred=prior.filter(x=>DUTY_PHRASE.test(x)&&x.length>=13&&x.length<=180).length>=2;
+ if(!responsibility&&!inferred)return {reason:'MISSING_DUTIES'};
+ const start=required.i+1;
+ let end=Math.min(lines.length,start+48);
+ for(let i=start;i<end;i++){
+  if(DUTY_HEADER.test(lines[i])||END_HEADER.test(lines[i])||
+   (REQUIREMENT_HEADER.test(lines[i])&&i>start)) {end=i;break;}
+ }
+ let requirements=[lines[required.i].replace(REQUIREMENT_HEADER,'').replace(/^[：:\s\-]+/,'').trim(),
+  ...lines.slice(start,end)].filter(Boolean).join(' ');
+ requirements=clean(requirements).slice(0,4500);
+ if(requirements.length<28)return {reason:'SHORT_REQUIREMENTS'};
+ return {requirements};
+}
+function extractCompanyClaim(lines,page){
+ const names=extractLabelField(lines,COMPANY_LABEL,100);
+ if(names.length){
+  const name=clean(names[0]).replace(/[|｜].*$/,'').slice(0,65);
+  return name.length>=3&&/[a-z\p{Script=Han}]{2}/iu.test(name)?name:null;
+ }
+ // Company text is often embedded in the job header, not "公司名称：".
+ const title=clean(page?.title||'');
+ const m=title.match(/(?:[-|｜]\s*)([\p{Script=Han}]{2,24}(?:集团|有限公司|科技|招聘|股份|公司))/u);
+ return m?m[1].replace(/招聘$/,''):null;
+}
 export function readPublicJob(link,page,now=new Date(),rejections=null){
  if(!link||typeof page?.content!=='string')return rejectJobEvidence(rejections,'FETCH_NO_TEXT');
- const text=page.content.slice(0,100000).replace(/\u0000/g,'');
- if(text.length<190)return rejectJobEvidence(rejections,'SHORT_PAGE');
- if(CLOSED.test(text))return rejectJobEvidence(rejections,'CLOSED');
- if(!DUTIES.test(text))return rejectJobEvidence(rejections,'MISSING_DUTIES');
- if(!REQUIREMENTS.test(text))return rejectJobEvidence(rejections,'MISSING_REQUIREMENTS');
- const lines=text.split('\n').map(l=>l.replace(/^\s*#{1,6}\s*/,'').trim()).filter(Boolean);
- const dutiesAt=lines.findIndex(s=>DUTIES.test(s));
- const header=lines.slice(0,dutiesAt<0?12:Math.min(dutiesAt,18));
- let title=header.find(l=>l.length>=4&&l.length<=110&&ROLE.test(l)&&
-  !/^(?:职位详情|招聘信息|岗位职责|职位描述|任职要求|职位要求|应聘要求|工作地点|工作内容|招聘公告|岗位列表)/.test(l));
- if(!title){
-  const head=clean(page.title);
-  if(head.length<=110&&ROLE.test(head))title=head;
- }
- title=title?.split(/[|｜]/)[0]?.trim().slice(0,95);
+ const body=page.content.slice(0,100000).replace(/\u0000/g,'');
+ if(body.length<190)return rejectJobEvidence(rejections,'SHORT_PAGE');
+ if(CLOSED.test(body))return rejectJobEvidence(rejections,'CLOSED');
+ const lines=markdownLines(body);
+ if(!lines.length)return rejectJobEvidence(rejections,'FETCH_NO_TEXT');
+ const title=extractRole(lines,page);
  if(!title)return rejectJobEvidence(rejections,'MISSING_ROLE_TITLE');
  if(EXTERNAL.test(title))return rejectJobEvidence(rejections,'OVERSEAS_TITLE');
- // Only job header-labelled work city counts. A JD describing international
- // customers or travel destinations does not prove actual workplace.
- const loc=(text.match(/(?:工作地点|工作城市|办公地点|工作地|工作区域|上班地点|work location|location)[：:\s-]{1,10}([^\n]{2,95})/i)||[])[1]||'';
- if(!loc)return rejectJobEvidence(rejections,'MISSING_EXPLICIT_WORKPLACE');
- if(EXTERNAL.test(loc))return rejectJobEvidence(rejections,'OVERSEAS_WORKPLACE');
- const city=findMainlandCity(loc);
- if(!city)return rejectJobEvidence(rejections,'UNKNOWN_MAINLAND_CITY');
- const after=text.split(REQUIREMENTS)[1]||'';
- const requirements=clean(after.split(/(?:岗位职责|工作职责|申请岗位|相关职位|立即投递|立即申请|投递简历|职位列表|其他岗位|更多职位|联系我们|apply now)/i)[0]).slice(0,4500);
- if(requirements.length<28)return rejectJobEvidence(rejections,'SHORT_REQUIREMENTS');
- const company=(text.match(/(?:公司名称|企业名称|招聘单位|用人单位|所属公司|招聘公司)[：:\s]{1,8}([^\n]{2,70})/)||[])[1]||'';
- // Company is a claim in the job page, never inferred from arbitrary URL
- // or taken directly from an AI-generated answer.
- const name=clean(company).replace(/[｜|].*$/,'').slice(0,65);
- if(name.length<3||!/[a-z\p{Script=Han}]{2}/iu.test(name))return rejectJobEvidence(rejections,'MISSING_COMPANY_LABEL');
+ const place=extractMainlandWorkplace(lines);
+ if(place.reason)return rejectJobEvidence(rejections,place.reason);
+ const sec=sections(lines);
+ if(sec.reason)return rejectJobEvidence(rejections,sec.reason);
+ const claim=extractCompanyClaim(lines,page);
+ // Do not reject missing "公司名称：" yet: the employer must be independently
+ // evidenced by fetched corporate branding in provePublicEmployer().
+ if(!CTA.test(body))return rejectJobEvidence(rejections,'MISSING_APPLY_ENTRY');
  return {id:link.id,source_type:'站外官方招聘',source_status:'PUBLIC_JOB_UNCONFIRMED',
-  company_claim:name,title,location:city,official_url:link.url,
-  official_domain:link.hostname,has_application_cta:CTA.test(text),
+  company_claim:claim,title,location:place.city,official_url:link.url,
+  official_domain:link.hostname,has_application_cta:true,
   application_status:'NEEDS_OFFICIAL_CONFIRMATION',checked_at:new Date(now).toISOString(),
-  evidence:{title,location:city,requirement:requirements,salary:null},
-  _page_excerpt:t(text.replace(/\s+/g,' '),3400)};
+  evidence:{title,location:place.city,requirement:sec.requirements,salary:null},
+  _job_page_title:t(page.title,180),
+  _page_excerpt:t(body.replace(/\s+/g,' '),3400)};
+}
+function companyNameFromHomepage(homepage){
+ const title=clean(homepage?.title||'').split(/[|｜]/)[0].replace(/(?:官方网站|官方主页|官网|招聘网站|加入我们|社会招聘|校园招聘|人才招聘|招聘|首页|Welcome| Careers)$/i,'').trim();
+ if(title.length>=2&&title.length<=65&&/[a-z\p{Script=Han}]{2}/iu.test(title)&&
+  !/^(?:首页|招聘|企业|官网|职位|社会招聘|校园招聘|人才招聘)$/i.test(title))return title;
+ const first=markdownLines(homepage?.content||'').slice(0,12);
+ for(const line of first){
+  const found=line.replace(/(?:官方网站|官方主页|招聘|首页|欢迎来到|关于我们)/g,'').trim();
+  if(found.length>=2&&found.length<=65&&/[a-z\p{Script=Han}]{2}/iu.test(found)&&
+   !/^(?:首页|招聘|企业|职位|官网|欢迎您)$/i.test(found))return found;
+ }
+ return null;
 }
 export function provePublicEmployer(job,homepage,site){
  if(!job||job.source_status!=='PUBLIC_JOB_UNCONFIRMED'||!site||
   typeof homepage?.content!=='string'||homepage.content.length<140)return null;
- const body=homepage.content.slice(0,70000);
- const prefix=(homepage.title||'')+'\n'+body.slice(0,5000);
- const brand=job.company_claim.toLowerCase().replace(/\s+/g,'');
- const brandCore=brand.replace(/(?:有限公司|股份有限公司|有限责任公司|集团|科技|网络|中国|公司|控股|技术|信息)/g,'');
- // Short abbreviated brands can be ambiguous. Require at least 3 meaningful
- // characters in corporate page branding (not just model's assertion).
- if(brandCore.length<2||!prefix.toLowerCase().replace(/\s+/g,'').includes(brand))return null;
  const link=publicJobLink(job.official_url);
  const corporate=publicCorporatePage(site);
  if(!link||!corporate)return null;
- // Same registrable domain, with independent fetched branding, provides
- // public-origin corroboration. For different domains demand exact backlinks.
+ const body=homepage.content.slice(0,70000);
+ const intro=clean((homepage.title||'')+'\n'+body.slice(0,5000)).toLowerCase();
+ const claimed=job.company_claim?.trim()||null;
+ const company=claimed||companyNameFromHomepage(homepage);
+ if(!company||company.length<2)return null;
+ const cmp=company.toLowerCase().replace(/\s+/g,'');
+ // Independent corporate page must directly present the job's claimed brand.
+ if(claimed&&!intro.replace(/\s+/g,'').includes(cmp))return null;
  const same=link.domain===corporate.domain;
- const backlink=body.includes(link.url)||
-  (body.includes(link.hostname)&&/招聘|加入我们|社会招聘|校园招聘|careers|jobs|职位/.test(body));
+ const backlink=body.includes(link.url);
  if(!same&&!backlink)return null;
  if(!job.has_application_cta)return null;
- const {company_claim,_page_excerpt,...cleanJob}=job;
- return {...cleanJob,company:company_claim,source_status:'OFFICIAL_DETAIL_FETCHED',
+ if(!claimed){
+  // When JD omits a legal employer label, corroborate the company name
+  // both in the independent corporate page AND job-page title/header.
+  const jobText=clean(job._job_page_title+' '+job._page_excerpt.slice(0,650)).toLowerCase().replace(/\s+/g,'');
+  if(!intro.replace(/\s+/g,'').includes(cmp)||!jobText.includes(cmp))return null;
+ }
+ const {company_claim,_page_excerpt,_job_page_title,...cleanJob}=job;
+ return {...cleanJob,company,source_status:'OFFICIAL_DETAIL_FETCHED',
   source_verification:same?'CORPORATE_DOMAIN_AND_BRAND':'CORPORATE_BACKLINK',
   employer_site:corporate.url};
 }
@@ -280,9 +384,37 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
       if(!job)answer={status:'INCOMPLETE_OR_UNREADABLE_JOB'};
       else{
        pages.set(link.url,job);
-       answer={status:'FETCHED_UNVERIFIED',url:link.url,title:job.title,
-        workplace:job.location,company_claim:job.company_claim,
-        has_application_cta:job.has_application_cta,excerpt:job._page_excerpt.slice(0,1500)};
+       let checked=null;
+       // Independently corroborate the fetched JD using a fetched employer
+       // homepage from search; if none was indexed, try that JD's own
+       // registrable domain. Never synthesize a job or call a private ATS API.
+       const observedSite=[...sites.values()].find(v=>v.domain===link.domain);
+       const home=observedSite||publicCorporatePage('https://'+link.domain+'/');
+       if(home&&usage.fetch<V8_BUDGET.fetch){
+        try{
+         let page=websiteCache.get(home.url);
+         if(!page){
+          usage.fetch++;
+          page=await requestJson('/v1/tools/fetch',key,{url:home.url},fetcher,450000);
+          if(typeof page?.content==='string'&&page.content.length>0)meter.billable_fetch++;
+          websiteCache.set(home.url,page);
+         }
+         sites.set(home.url,home);
+         checked=provePublicEmployer(job,page,home.url);
+         if(checked)confirmed.set(checked.id,checked);
+         else rejections.COMPANY_PROOF_MISSING=(rejections.COMPANY_PROOF_MISSING||0)+1;
+        }catch{
+         failures++;uncertainProviderFailure=true;
+         rejections.COMPANY_PAGE_UNREADABLE=(rejections.COMPANY_PAGE_UNREADABLE||0)+1;
+        }
+       }else{
+        rejections.COMPANY_PAGE_UNOBSERVED=(rejections.COMPANY_PAGE_UNOBSERVED||0)+1;
+       }
+       answer={status:checked?'PUBLIC_COMPANY_PROOF_PASSED':'FETCHED_UNVERIFIED',
+        url:link.url,title:job.title,workplace:job.location,
+        company_claim:job.company_claim,
+        requirements_excerpt:t(job.evidence.requirement,180),
+        has_application_cta:job.has_application_cta};
       }
      }catch{failures++;uncertainProviderFailure=true;answer={status:'FETCH_UNAVAILABLE'};}
     }

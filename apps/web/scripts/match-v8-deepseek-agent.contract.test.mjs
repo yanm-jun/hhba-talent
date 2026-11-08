@@ -184,8 +184,8 @@ test('Stop model inference early once target number of independently verified jo
  const x=mockAgent();
  const result=await runDeepSeekOfficialJobAgent('内容运营',key,{fetcher:x.fetcher,now,targetCount:1});
  assert.equal(result.candidates.length,1);
- assert.deepEqual(result.usage,{model:3,search:1,fetch:3});
- assert.equal(result.accounting.billable.fetch,3);
+ assert.deepEqual(result.usage,{model:2,search:1,fetch:2});
+ assert.equal(result.accounting.billable.fetch,2);
  assert.equal(result.accounting.complete,true);
  assert.ok(result.accounting.estimated_total_cny>0);
 });
@@ -228,4 +228,67 @@ test('Diagnostic rejection reasons are finite labels, never raw company or user 
  assert.equal(readPublicJob(link,{content:brokenJD},now,x),null);
  assert.equal(x.MISSING_DUTIES,1);
  assert.deepEqual(Object.keys(x).sort(),['MISSING_DUTIES','SHORT_PAGE']);
+});
+
+test('Realistic Markdown table + numbered Chinese JD paragraphs are parsed with hard facts',()=>{
+ const jobUrl='https://careers.yunhe.cn/jobs/202611080031';
+ const companySite='https://yunhe.cn/';
+ const fetched=[
+  '# 内容运营专员 | 云禾文化有限公司',
+  '| 工作地点 | 上海 |',
+  '| 招聘单位 | 云禾文化有限公司 |',
+  '职责描述',
+  '1. 负责图文内容选题、用户沟通，组织公众号及社区活动。',
+  '2. 参与内容增长分析，协助改进工作流程和数据复盘。',
+  '岗位要求',
+  '1. 本科及以上学历，新闻传播、广告或相关专业。',
+  '2. 具备内容运营经验，熟悉数据分析及主流社交媒体平台。',
+  '[申请职位](https://careers.yunhe.cn/jobs/202611080031)'
+ ].join('\n');
+ const link=publicJobLink(jobUrl),reasons={};
+ const parsed=readPublicJob(link,{title:'内容运营专员 | 云禾文化有限公司',content:fetched},now,reasons);
+ assert.equal(parsed?.title,'内容运营专员');
+ assert.equal(parsed?.location,'上海');
+ assert.equal(parsed?.company_claim,'云禾文化有限公司');
+ assert.match(parsed?.evidence.requirement||'',/本科及以上学历/);
+ assert.equal(parsed?.has_application_cta,true);
+ const home={title:'云禾文化有限公司 官网',content:
+  ('# 云禾文化有限公司\n云禾文化有限公司公司介绍、人才招聘、主营业务。').repeat(5)};
+ assert.equal(provePublicEmployer(parsed,home,companySite)?.company,'云禾文化有限公司');
+ assert.deepEqual(reasons,{});
+});
+test('Employer label may be absent, but independent homepage and job-brand proof remain mandatory',()=>{
+ const link=publicJobLink('https://careers.xinghe.cn/jobs/202611080056');
+ const content=[
+  '# 新媒体运营', '工作地点','北京', '职责描述',
+  '负责社交平台内容管理、创意选题策划及短视频运营。',
+  '配合市场活动制定内容计划，推动新媒体业务增长。',
+  '我们希望你具备',
+  '本科及以上学历，具备内容编辑能力及社会化媒体运营经验。',
+  '能熟练使用办公软件并且熟悉数据分析和内容策划。',
+  '立即投递','欢迎来到星河数字科技有限公司招聘'
+ ].join('\n');
+ const job=readPublicJob(link,{title:'新媒体运营 - 星河数字科技有限公司',content},now);
+ assert.equal(job?.company_claim,null);
+ assert.equal(job?.location,'北京');
+ const home={title:'星河数字科技有限公司',content:
+  ('# 星河数字科技有限公司\n欢迎查看星河数字科技有限公司官方网站及招聘信息。').repeat(6)};
+ assert.equal(provePublicEmployer(job,home,'https://xinghe.cn/')?.company,'星河数字科技有限公司');
+ const impostor={title:'其他集团',content:('# 其他集团\n其他集团公司招聘信息').repeat(8)};
+ assert.equal(provePublicEmployer(job,impostor,'https://xinghe.cn/'),null);
+});
+test('Never repair missing Mainland-city evidence or employer identity by model guessing',()=>{
+ const link=publicJobLink('https://careers.xinghe.cn/jobs/202611080077');
+ const text=[
+ '# 内容运营','公司名称：星河数字科技有限公司',
+ '职责描述','负责新媒体传播及用户互动，分析内容运营效果。'.repeat(4),
+ '岗位要求','本科学历，熟练掌握图文编辑和短视频制作软件。'.repeat(4),
+ '立即投递'
+ ].join('\n');
+ const why={};
+ assert.equal(readPublicJob(link,{content:text},now,why),null);
+ assert.equal(why.MISSING_EXPLICIT_WORKPLACE,1);
+ assert.equal(readPublicJob(link,{content:text.replace('# 内容运营','# 内容运营\n工作地点：新加坡')},now),null);
+ assert.equal(readPublicJob(link,{content:text.replace('# 内容运营','# 内容运营\n工作地点：北京\n工作城市：上海')},now),null);
+ assert.equal(readPublicJob(link,{content:text.replace('# 内容运营','# 内容运营\n工作地点：北京').replace('岗位要求','工作要求：待定')},now),null);
 });
