@@ -6,7 +6,8 @@ import {extractPdfText} from './pdfProfile.mjs';
 export type MatchProfile = {
   education:string|null;education_evidence:string|null;
   experience_years:number|null;experience_evidence:string|null;
-  skills:{name:string;evidence:string}[];target_roles:string[];warnings:string[];
+  skills:{name:string;evidence:string}[];target_roles:string[];
+  professional_credentials?:string[];warnings:string[];
 };
 export type MatchedJob = {
   id:string;company:string;title:string;title_zh?:string|null;location:string;
@@ -18,6 +19,8 @@ export type MatchedJob = {
   salary?:string|null;experience_requirement?:string|null;
   required_skills?:string[];mandatory_skills?:string[];preferred_skills?:string[];unclassified_skills?:string[];
   min_experience_years?:number|null;minimum_education?:string|null;
+  professional_credential_requirements?:string[];
+  professional_credential_review?:{kind:string;likely_credential:string;warning:string}|null;
   score_breakdown?:{role:number;skills:number;experience:number;education:number;location:number};
   score_reasoning?:string;
   evidence_quality?:{skills:string;experience:string;education:string};
