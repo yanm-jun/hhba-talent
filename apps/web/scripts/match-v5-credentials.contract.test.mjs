@@ -60,6 +60,16 @@ test('official preferred or not-yet-required certificates cannot trigger a manda
  assert.deepEqual(plain.unclassified,['NURSE_PRACTICE']);
 });
 
+test('alternative acceptable professional certificates never become two cumulative hard gates',()=>{
+ const a=extractMandatoryProfessionalCredentials(
+  '任职要求：必须持有护士执业证书或护士执业资格证书其中一种，具备护理能力。');
+ assert.deepEqual(a.mandatory,[]);
+ assert.deepEqual(a.unclassified,['NURSE_PRACTICE','NURSE_QUALIFICATION']);
+ const b=extractMandatoryProfessionalCredentials(
+  '岗位要求：须同时持有医师资格证书和医师执业证书，能承担临床工作。');
+ assert.deepEqual(b.mandatory,['DOCTOR_PRACTICE','DOCTOR_QUALIFICATION']);
+});
+
 test('resume evidence is explicitly self-reported, without validity or registration claims',()=>{
  const text='个人资格\n已取得护士执业证书；持有医师资格证书；现持教师资格证。';
  assert.deepEqual(extractSelfReportedProfessionalCredentials(text),
