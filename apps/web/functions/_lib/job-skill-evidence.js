@@ -23,7 +23,9 @@ export function extractSkillRequirements(text){
  const source=text.slice(0,2600).normalize('NFKC');
  // Split into clauses so a later "优先" does not turn preceding mandatory
  // competencies into preferences. Keep commas/Chinese enumeration together.
- const clauses=source.split(/[\n；;。]+/).map(s=>s.trim()).filter(Boolean);
+ const clauses=source.split(/[\n；;。]+).flatMap(s=>
+  /(?:优先|加分|preferred|must|无需|不要求|但是|但)/i.test(s)?
+   s.split(/[，,]+/):[s]).map(s=>s.trim()).filter(Boolean);
  const required=new Set(),preferred=new Set(),unclassified=new Set();
  for(const raw of clauses){
   const clause=raw.slice(0,450);
