@@ -50,14 +50,26 @@ export function searchEvidenceHints(result,roles,now=new Date()){
   hint_only:true
  });
 }
-export function orderPublicJobCandidates(candidates,roleAliases,{maxPerDomain=2,limit=6,now=new Date()}={}){
+export function orderPublicJobCandidates(candidates,roleAliases,{
+ maxPerDomain=2,limit=6,now=new Date(),corporateSiteDomains=[]
+}={}){
+ // These are ONLY independent public Search discoveries of corporate-site
+ // entry URLs. They are a pre-Fetch routing hint, NOT employer verification.
+ const siteHints=new Set((Array.isArray(corporateSiteDomains)?corporateSiteDomains:[])
+  .filter(x=>typeof x==='string'&&x.length<130).map(x=>x.toLowerCase()));
  if(!Array.isArray(candidates))return [];
  const ranked=candidates.map((c,index)=>({
   ...c,rank:searchEvidenceHints(c.search_metadata||{title:c.search_title||'',url:c.url},
    roleAliases,now),index
  })).filter(x=>(x.rank.role_in_title||x.rank.role_in_summary)&&
   !x.rank.listing_warning)
-  .sort((a,b)=>b.rank.score-a.rank.score||a.index-b.index);
+  .map(x=>({...x,
+   // Public company page from Search plus a detail page on the same registered
+   // domain is a useful prioritization hint; no hard gate or proof is weakened.
+   source_hint:siteHints.has(String(x.domain||'').toLowerCase())?'CORPORATE_SITE_SEEN':'UNCONFIRMED',
+   source_hint_bonus:siteHints.has(String(x.domain||'').toLowerCase())?24:0
+  }))
+  .sort((a,b)=>(b.rank.score+b.source_hint_bonus)-(a.rank.score+a.source_hint_bonus)||a.index-b.index);
  // Two passes ensure diversity without letting a single enterprise consume
  // the entire six-page postpass if alternatives are available.
  const chosen=[],counts=new Map(),seen=new Set();
