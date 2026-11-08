@@ -307,7 +307,7 @@ export async function onRequest({request,env}){
   matched_official_jobs:merged.counts.distinct_verified_sources,
   qualification_reviews:merged.qualification_reviews,
   discovery_status:discovered.status,
-  source:'中国大陆境内岗位（官方 ATS 审核与自动检索合并）',
+  source:'中国大陆境内真实岗位（站内审计与 DeepSeek 公开网页检索）',
   scoring:'严格筛选已明确的学历、工作年限与工作地点要求后进行参考评分；不代表录用概率',
   privacy:'本次脱敏简历文本仅用于已授权的 AI 分析；联网招聘搜索只传岗位方向，不发送姓名、电话或简历',
   disclaimer:'只推荐中国大陆境内职位；当前招聘状态、薪资与申请资格以企业官网为准。'});
