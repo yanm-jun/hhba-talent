@@ -1,6 +1,7 @@
 // DeepSeek Search / Fetch adapter for verified Mainland China job discovery.
 // This module NEVER accepts a resume or arbitrary URL from an applicant.
 // Search is discovery, not proof that applications are currently open.
+import {findMainlandCity,isMainlandJobLocation} from './mainland-job-location.js';
 export const EXTERNAL_DISCOVERY_VERSION='HHBA_DOMESTIC_DISCOVERY_V1';
 export const SEARCH_LIMIT=2;
 export const FETCH_LIMIT=3;
@@ -15,16 +16,6 @@ const OFFICIAL={
  'zhaopin.jd.com':{
   company:'京东',path:'/web/job-info-detail',idParam:'requementId',idPattern:/^\d{3,12}$/},
 };
-const CITY_NAMES=[
- '北京','上海','天津','重庆','深圳','广州','杭州','南京','苏州','成都','武汉','西安',
- '青岛','宁波','无锡','合肥','郑州','长沙','厦门','福州','济南','大连','沈阳','哈尔滨',
- '长春','石家庄','昆明','贵阳','南宁','海口','珠海','佛山','东莞','烟台','潍坊','临沂',
- '济宁','菏泽','聊城','威海','泰安','德州','枣庄','滨州','日照','东营','常州','南通',
- '嘉兴','绍兴','金华','温州','台州','太原','徐州','扬州','保定','唐山','廊坊','兰州',
- '西宁','银川','乌鲁木齐','呼和浩特','包头','柳州','桂林','洛阳','开封','南昌','九江',
- '珠海','中山','惠州'
-];
-const CITY_PATTERN=new RegExp(CITY_NAMES.sort((a,b)=>b.length-a.length).join('|'));
 const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macau|macao|taiwan|taipei|tokyo|japan|singapore|united states|美国|日本|新加坡)/i;
 const CLOSED=/(?:职位已关闭|该职位已下线|岗位已下线|停止招聘|暂停招聘|不再接受申请|招聘已结束|岗位已关闭|职位已过期|目前暂时未有岗位开放)/i;
 const HAS_DUTIES=/(?:岗位职责|工作职责|职位职责|岗位描述|工作内容|主要职责)/;
@@ -37,7 +28,43 @@ export function sanitizedJobIntent(value){
  const s=value.trim().replace(/\s+/g,' ');
  if(s.length<2||s.length>42||BLOCK_INTENT.test(s)||/https?:|www\.|@|(?:\d[\s-]?){5,}/i.test(s))return null;
  if(!/^[\p{Script=Han}a-zA-Z0-9+#.\s-]+$/u.test(s))return null;
- return s;
+ // Search only canonical occupation words. Never send unstructured model
+ // output, people, employers or arbitrary resume phrases to Search/Fetch.
+ const catalog=[
+  [/\bpython\b.*(?:开发|工程师)/i,'Python 开发'],
+  [/\bjava\b.*(?:开发|工程师|后端)/i,'Java 开发'],
+  [/(?:软件开发工程师|软件开发|软件工程师|程序员)/i,'软件开发'],
+  [/(?:后端开发|服务端开发|后端工程师|backend)/i,'后端开发'],
+  [/(?:前端开发|前端工程师|frontend)/i,'前端开发'],
+  [/(?:测试开发|自动化测试|软件测试|测试工程师|qa engineer)/i,'测试开发'],
+  [/(?:数据分析师|数据分析|商业分析师)/i,'数据分析师'],
+  [/(?:数据开发|数据工程师|数据工程|大数据工程)/i,'数据工程师'],
+  [/(?:机器学习|算法工程师|人工智能工程师|ai engineer)/i,'算法工程师'],
+  [/(?:产品经理|产品专员|产品策划)/i,'产品经理'],
+  [/(?:视觉设计|平面设计|品牌设计|graphic designer)/i,'视觉设计师'],
+  [/(?:ui设计|ux设计|交互设计|用户体验)/i,'交互设计师'],
+  [/(?:工业设计|结构设计|机械设计|机械工程师)/i,'机械设计工程师'],
+  [/(?:电气工程|自动化工程师)/i,'电气工程师'],
+  [/(?:土木工程|建筑工程|施工管理)/i,'土木工程师'],
+  [/(?:内容运营|新媒体运营|内容策划)/i,'内容运营'],
+  [/(?:用户运营|社群运营)/i,'用户运营'],
+  [/(?:市场营销|品牌营销|市场推广)/i,'市场营销'],
+  [/(?:销售顾问|销售经理|汽车销售|销售代表|商务拓展|客户经理)/i,'销售顾问'],
+  [/(?:财务分析|会计师|会计|审计师|审计|出纳)/i,'财务会计'],
+  [/(?:人力资源|人事专员|招聘专员|人力招聘)/i,'人力资源'],
+  [/(?:行政管理|行政专员|行政助理)/i,'行政专员'],
+  [/(?:法务|法律顾问|律师)/i,'法务专员'],
+  [/(?:教师|老师|教研|教育培训)/i,'教师'],
+  [/(?:医生|护士|医学检验)/i,'医疗岗位'],
+  [/(?:物流管理|供应链|采购专员|采购经理)/i,'供应链管理'],
+  [/(?:影视制作|视频剪辑|视频编辑|后期制作)/i,'影视剪辑'],
+  [/(?:舞蹈编导|舞蹈演员|编导|导演)/i,'舞蹈编导'],
+  [/(?:翻译|外贸业务|国际贸易)/i,'外贸业务'],
+  [/(?:客服专员|客户服务|售后服务)/i,'客服专员'],
+  [/(?:软件运维|系统运维|devops|运维工程师)/i,'运维工程师'],
+  [/(?:网络安全|信息安全|安全工程师)/i,'网络安全工程师']
+ ];
+ return catalog.find(([rule])=>rule.test(s))?.[1]||null;
 }
 export function buildOfficialQueries(role,expanded=false){
  // Up to three evidence-backed Chinese job directions share the SAME fixed
@@ -111,8 +138,11 @@ export function extractOfficialJob(searchResult,document,now=new Date()){
  const locationSection=content.match(/(?:工作地点|工作城市|工作地|办公地点)[：:\s]*([^\n]{0,65})/);
  const labelled=locationSection?.[1]||'';
  const header=content.slice(0,280);
- const city=(!OUTSIDE.test(labelled)&&labelled.match(CITY_PATTERN)?.[0])||
-  (!OUTSIDE.test(header)&&header.match(CITY_PATTERN)?.[0]);
+ // A labelled work-location field takes precedence; never fall back to
+ // a company header when a contradictory/overseas location is present.
+ const locationProof=labelled.trim()?labelled:lines.slice(0,3).join(' ');
+ const city=findMainlandCity(locationProof);
+ if(!isMainlandJobLocation(locationProof))return null;
  if(!city)return null;
  const rq=content.match(/(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求|职责要求)[：:\s]*([\s\S]{24,900})/);
  const experienceLabel=(content.match(/(?:工作经验|经验要求|工作年限|经验年限)[：:\s]*([^\n]{1,80})/)||[])[1]||'';
