@@ -1,0 +1,36 @@
+name: HHBA V8 DeepSeek-led official job agent (preview)
+on:
+  pull_request:
+    paths:
+      - 'apps/web/functions/_lib/deepseek-official-job-agent.js'
+      - 'apps/web/functions/_lib/domestic-match-fusion.js'
+      - 'apps/web/functions/api/match/[[path]].js'
+      - 'apps/web/scripts/match-v8-deepseek-agent.contract.test.mjs'
+      - '.github/workflows/hhba-match-v8-deepseek-agent-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install pinned dependencies
+        working-directory: apps/web
+        run: npm ci --ignore-scripts
+      - name: V8 syntax and mocked DeepSeek autonomous search
+        working-directory: apps/web
+        run: |
+          node --check functions/_lib/deepseek-official-job-agent.js
+          node --check functions/_lib/domestic-match-fusion.js
+          node --check 'functions/api/match/[[path]].js'
+          node --test scripts/match-v8-deepseek-agent.contract.test.mjs scripts/domestic-match-fusion.contract.test.mjs scripts/match-v7-guardrails-quality.contract.test.mjs
+      - name: Build production-safe web bundle
+        working-directory: apps/web
+        run: npm run build

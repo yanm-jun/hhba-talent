@@ -4,6 +4,7 @@ import {sessionOfBearer,getUserByPhone,sha256Hex} from '../../_lib/real-auth.js'
 import {redactForModel,verifiedProfile,selectAuditedMatches,countVerifiedMainlandJobs} from '../../_lib/resume-match-core.js';
 import {fuseDomesticJobRecommendations} from '../../_lib/domestic-match-fusion.js';
 import {discoverExternalOfficialJobs,sanitizedJobIntent} from '../../_lib/domestic-search-fetch.js';
+import {runDeepSeekOfficialJobAgent} from '../../_lib/deepseek-official-job-agent.js';
 
 const KIND='HHBA_RESUME_MATCH_CLOUDFLARE_V1';
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
@@ -136,7 +137,11 @@ async function autoDiscoveryCandidates(env,db,phone,profile,opts){
   ).bind(id,day,hash,new Date().toISOString(),day,day,hash).run();
   if(reserved?.success!==true||reserved?.meta?.changes!==1)
    return {candidates:[],status:'LIMITED'};
-  const data=await discoverExternalOfficialJobs(intent,env.HHBA_MATCH_DEEPSEEK_KEY,{expanded:true});
+  // V8 is explicit opt-in and inherits the existing authenticated user's
+  // one-click Search quota. The model only receives sanitized role names.
+  const data=env.HHBA_MATCH_V8_DEEPSEEK_AGENT_ENABLED==='1'?
+   await runDeepSeekOfficialJobAgent(intent,env.HHBA_MATCH_DEEPSEEK_KEY):
+   await discoverExternalOfficialJobs(intent,env.HHBA_MATCH_DEEPSEEK_KEY,{expanded:true});
   return {candidates:data.candidates,
    status:data.status==='PARTIAL'?'PARTIAL':'COMPLETE'};
  }catch(e){

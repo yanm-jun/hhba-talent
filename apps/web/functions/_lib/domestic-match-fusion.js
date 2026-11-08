@@ -2,6 +2,7 @@
 // Only audited HHBA matches and independently fetched official job details may
 // be ranked. No model-generated employer/job facts or acceptance probabilities.
 import {safeOfficialJobLocator} from './domestic-search-fetch.js';
+import {safeAgentJobLink} from './deepseek-official-job-agent.js';
 import {scoreCandidateFit} from './match-ranking.js';
 import {extractSkillRequirements,extractStructuredSkillConditions} from './job-skill-evidence.js';
 import {isMainlandJobLocation,findMainlandCity} from './mainland-job-location.js';
@@ -94,15 +95,25 @@ function referencedExternal(entry,now){
  const baiduLogin=entry.company==='百度'&&entry.official_domain==='talent.baidu.com'&&
   entry.application_method==='OFFICIAL_DETAIL_LOGIN_REQUIRED'&&entry.has_application_cta===false;
  if(entry.has_application_cta!==true&&!baiduLogin)return null;
+ // A hosted ATS vacancy may represent a previously unseen employer, but
+ // admission requires a fetched exact JD AND an independently fetched
+ // corporate website backlink to that precise ATS tenant. No AI assertion.
  const u=safeOfficialJobLocator(entry.official_url);
- if(!u||u.company!==entry.company||u.id!==entry.id)return null;
+ const hosted=u?null:safeAgentJobLink(entry.official_url);
+ if(u){
+  if(u.company!==entry.company||u.id!==entry.id)return null;
+ }else if(!hosted||hosted.type!=='ats'||hosted.id!==entry.id||
+  hosted.domain!==entry.official_domain||
+  entry.source_verification!=='EMPLOYER_SITE_BACKLINK_VERIFIED'||
+  typeof entry.company!=='string'||entry.company.length<2||
+  typeof entry.employer_site!=='string')return null;
  if(!isMainlandWorkCity(entry.location))return null;
  if(!entry.evidence||entry.evidence.location!==entry.location||
   typeof entry.evidence.title!=='string'||entry.evidence.title.trim()!==entry.title.trim()||
   typeof entry.evidence.requirement!=='string'||entry.evidence.requirement.trim().length<25)return null;
  const timestamp=Date.parse(entry.checked_at||'');
  if(!Number.isFinite(timestamp)||timestamp>now+5*60*1000||now-timestamp>MAX_EVIDENCE_AGE_MS)return null;
- return {official_url:u.url,ageHours:Math.max(0,(now-timestamp)/3600000)};
+ return {official_url:u?.url||hosted.url,ageHours:Math.max(0,(now-timestamp)/3600000)};
 }
 function matchesDeclaredDirection(job,profile,options){
  const requested=[textSafe(options?.role_hint,80),...(profile.career_intents||[])]
