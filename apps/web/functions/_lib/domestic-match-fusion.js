@@ -3,10 +3,12 @@
 // be ranked. No model-generated employer/job facts or acceptance probabilities.
 import {safeOfficialJobLocator} from './domestic-search-fetch.js';
 import {scoreCandidateFit} from './match-ranking.js';
-import {extractSkillRequirements} from './job-skill-evidence.js';
+import {extractSkillRequirements,extractStructuredSkillConditions} from './job-skill-evidence.js';
 import {isMainlandJobLocation} from './mainland-job-location.js';
 import {explainFinalJobScore} from './match-explanation.js';
-import {extractMandatoryProfessionalCredentials,professionalPracticeReview} from './professional-credentials.js';
+import {extractMandatoryProfessionalCredentials,extractStructuredCredentialConditions,professionalPracticeReview} from './professional-credentials.js';
+import {assessJobQualification} from './job-qualification-evidence.js';
+import {classifyOccupation} from './match-ranking.js';
 
 export const FUSION_VERSION='HHBA_DOMESTIC_MATCH_FUSION_V1';
 const MAX_RESULTS=10;
@@ -102,6 +104,10 @@ function safeProfile(profile){
    .map(x=>textSafe(x?.name,48)).filter(x=>x.length>=2),
   target_roles:(Array.isArray(profile?.target_roles)?profile.target_roles:[]).slice(0,6)
    .map(x=>textSafe(x,70)).filter(x=>x.length>=2),
+  career_intents:(Array.isArray(profile?.career_intents)?profile.career_intents:[]).slice(0,6)
+   .map(x=>textSafe(x,70)).filter(x=>x.length>=2),
+  demonstrated_roles:Array.isArray(profile?.demonstrated_roles)?
+   profile.demonstrated_roles.slice(0,6).map(x=>textSafe(x,70)).filter(x=>x.length>=2):undefined,
   education:DEGREE_RANK[profile?.education]?profile.education:null,
   experience_years:Number.isFinite(profile?.experience_years)&&profile.experience_years>=0&&
    profile.experience_years<=50?profile.experience_years:null,
@@ -115,8 +121,8 @@ function externalToMatch(entry,profile,options,now){
  const requirements=entry.evidence.requirement;
  const degree=degreeMinRequirement(requirements);
  const experience=experienceMinRequirement(requirements);
- if(degree!==null&&(!profile.education||DEGREE_RANK[profile.education]<degree))return null;
- if(experience!==null&&(profile.experience_years===null||profile.experience_years<experience))return null;
+ // Do not prematurely delete candidates for missing resume details:
+ // the shared tri-state qualifier will separately offer a safe follow-up.
  // This is only authenticated JD/facet extraction. Legacy keyword matching
  // must not filter or produce user-visible reasons before the final V2 score.
  return {
@@ -126,8 +132,10 @@ function externalToMatch(entry,profile,options,now){
   source_type:'站外官方招聘',reference_score:0,
   ...(()=>{const skills=extractSkillRequirements(requirements);return {
    required_skills:skills.required,mandatory_skills:skills.mandatory,
-   preferred_skills:skills.preferred,unclassified_skills:skills.unclassified};})(),
+   preferred_skills:skills.preferred,unclassified_skills:skills.unclassified,
+   skill_conditions:extractStructuredSkillConditions(requirements)};})(),
   professional_credential_requirements:extractMandatoryProfessionalCredentials(requirements).mandatory,
+  credential_conditions:extractStructuredCredentialConditions(requirements),
   min_experience_years:experience,
   minimum_education:Object.keys(DEGREE_RANK).find(k=>DEGREE_RANK[k]===degree)||null,
   salary:typeof entry.evidence.salary==='string'&&entry.evidence.salary.length<=60?entry.evidence.salary:null,
@@ -160,9 +168,27 @@ export function fuseDomesticJobRecommendations(inside=[],outside=[],rawProfile={
   .map(internalToMatch).filter(Boolean);
  const external=(Array.isArray(outside)?outside:[]).slice(0,25)
   .map(j=>externalToMatch(j,profile,options,when)).filter(Boolean);
- // Source-neutral V2 score applies ONLY after the official-source checks above.
- // Hard experience, education and China Mainland location gates take priority.
+ // Only definitely eligible official roles appear in Top10.
+ // Incomplete evidence is made actionable without presenting a job as a match.
+ const qualificationReviews=[],reviewKeys=new Set();
+ const desired=[textSafe(options?.role_hint,80),...(profile.career_intents||[]),
+  ...(profile.demonstrated_roles||profile.target_roles||[])].filter(Boolean);
  const scored=[...internal,...external].map(job=>{
+  const decision=assessJobQualification(profile,job);
+  if(decision.status==='NEEDS_INFORMATION'){
+   const kind=classifyOccupation(job.title);
+   const related=desired.some(x=>x.toLowerCase()===String(job.title).toLowerCase()||
+    (kind&&classifyOccupation(x)===kind));
+   const key=canonicalRoleKey(job);
+   if(related&&!reviewKeys.has(key)&&qualificationReviews.length<5){
+    reviewKeys.add(key);
+    qualificationReviews.push({id:job.id,company:job.company,title:job.title,
+     location:job.location,source_type:job.source_type,status:'NEEDS_INFORMATION',
+     missing:decision.missing.map(x=>({code:x.code,label:x.label,field:x.field}))});
+   }
+   return null;
+  }
+  if(decision.status==='INELIGIBLE')return null;
   const fit=scoreCandidateFit(profile,job,options);
   if(!fit.eligible)return null;
   const rationale=explainFinalJobScore(profile,job,fit);
@@ -202,6 +228,8 @@ export function fuseDomesticJobRecommendations(inside=[],outside=[],rawProfile={
  return {
   kind:FUSION_VERSION,scope:'CN_MAINLAND_ONLY',
   matches:chosen.map(({rankEvidence,sourceDate,...j})=>j),
+  qualification_reviews:qualificationReviews,
+  qualification_review_count:qualificationReviews.length,
   counts:{
    internal_eligible:internal.length,external_reviewed:Array.isArray(outside)?outside.length:0,
    external_eligible:external.length,distinct_verified_sources:unique.length,
