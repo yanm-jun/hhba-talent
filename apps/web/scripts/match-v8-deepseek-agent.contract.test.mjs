@@ -452,3 +452,19 @@ test('Opt-in live public URL diagnostics expose only bounded public link and rea
  const ordinary=await runDeepSeekOfficialJobAgent('内容运营',key,{fetcher,now});
  assert.equal(ordinary.stats.rejected_public_links,undefined);
 });
+
+test('Real DeepSeek audit: general job portals are NOT employer-owned job pages',()=>{
+ const rejected=[
+  'https://www.adquan.com/job/27529',
+  'https://zrc-sme.chinasme.cn/job/69ad72323e67084e25d59746',
+  'https://www.quanzhi.com/job/6aed8044d18cbdfa17daca82',
+  'https://www.quanzhi.com/job/6a04cf095e5710182924c8e0',
+  'https://campus.niuqizp.com/job-vl85a5Lz5.html',
+  'https://campus.niuqizp.com/job-vsy5aaaLa.html',
+  'https://shu.ncss.cn/student/jobs/3S8wCZjbvJCXoS4UYMECnJ/detail.html',
+  'https://www.ncss.cn/student/jobs/MRJ5FvVE96HMoyrsoxpyRR/detail.html'
+ ];
+ for(const u of rejected)assert.equal(publicJobLink(u),null,u);
+ assert.ok(publicJobLink('https://careers.suning.cn/rps-web/position/position_info_new.htm?id=19714'),
+  'a real enterprise-owned careers domain must remain eligible for Fetch before independent JD screening');
+});
