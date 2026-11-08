@@ -139,7 +139,7 @@ function externalToMatch(entry,profile,options,now){
   ...(()=>{
    const skills=extractSkillRequirements(requirements);
    const groups=extractStructuredSkillConditions(requirements);
-   const covered=new Set(groups.flatMap(g=>g.values.map(v=>v.toLowerCase())));
+   const covered=new Set(groups.filter(g=>g.operator!=='ALL_OF').flatMap(g=>g.values.map(v=>v.toLowerCase())));
    return {required_skills:skills.required,preferred_skills:skills.preferred,
     unclassified_skills:skills.unclassified,
     mandatory_skills:skills.mandatory.filter(v=>!covered.has(v.toLowerCase())),
@@ -148,7 +148,7 @@ function externalToMatch(entry,profile,options,now){
   ...(()=>{
    const legacy=extractMandatoryProfessionalCredentials(requirements).mandatory;
    const groups=extractStructuredCredentialConditions(requirements);
-   const covered=new Set(groups.flatMap(g=>g.values));
+   const covered=new Set(groups.filter(g=>g.operator!=='ALL_OF').flatMap(g=>g.values));
    return {professional_credential_requirements:legacy.filter(v=>!covered.has(v)),
     credential_conditions:groups};
   })(),
