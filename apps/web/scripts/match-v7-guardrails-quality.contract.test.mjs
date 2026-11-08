@@ -51,7 +51,7 @@ test('explicit separate mandatory requirements remain required despite one-of ch
  const missing=assessJobQualification(applicant,{...job,
   mandatory_skills:extractSkillRequirements(jd).mandatory,skill_conditions:groups});
  assert.equal(missing.status,'NEEDS_INFORMATION');
- assert.ok(missing.missing.some(x=>x.label.includes('sql')));
+ assert.ok(missing.missing.some(x=>x.label.toLowerCase().includes('sql')));
  const full=assessJobQualification({...applicant,skills:[{name:'Java'},{name:'SQL'}]},
   {...job,mandatory_skills:extractSkillRequirements(jd).mandatory,skill_conditions:groups});
  assert.equal(full.status,'ELIGIBLE');
@@ -119,7 +119,7 @@ test('two independently verified departments within the same city are not accide
 });
 
 test('official Fetch budget covers distinct occupation intents before duplicate employer results',()=>{
- const url=i=>'https://careers.tencent.com/jobdesc.html?postId='+String(2097166275703910400+i);
+ const url=i=>'https://careers.tencent.com/jobdesc.html?postId='+String(2097166275703910400n+BigInt(i));
  const rows=[
   ...Array.from({length:8},(_,i)=>({url:url(i),title:'Python 后端开发工程师'})),
   {url:url(8),title:'影视剪辑师'},
