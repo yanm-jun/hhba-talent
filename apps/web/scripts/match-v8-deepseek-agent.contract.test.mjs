@@ -111,6 +111,7 @@ test('hosted ATS body requires JD, Mainland city and independent employer backli
 test('V8 4-step autonomous function-tool run uses external evidence only, zero resumes',async()=>{
  const provider=syntheticAgent();
  const got=await runDeepSeekOfficialJobAgent('内容运营',key,{fetcher:provider.fetcher,now:at});
+ console.log('HHBA_V8_DEBUG',JSON.stringify({status:got.status,usage:got.usage,stats:got.stats,endpoints:provider.records.map(r=>r.endpoint.replace('https://api.deepseek.com',''))}));
  assert.equal(got.status,'COMPLETE');
  assert.equal(got.kind,'HHBA_V8_DEEPSEEK_OFFICIAL_JOB_AGENT_PILOT');
  assert.deepEqual(got.usage,{model:4,search:1,fetch:3});
