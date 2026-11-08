@@ -137,12 +137,13 @@ export function extractOfficialJob(searchResult,document,now=new Date()){
  // to the official "work location" label, otherwise at the document heading.
  const locationSection=content.match(/(?:工作地点|工作城市|工作地|办公地点)[：:\s]*([^\n]{0,65})/);
  const labelled=locationSection?.[1]||'';
- const header=content.slice(0,280);
- // A labelled work-location field takes precedence; never fall back to
- // a company header when a contradictory/overseas location is present.
- const locationProof=labelled.trim()?labelled:header;
- const city=findMainlandCity(locationProof);
- if(!isMainlandJobLocation(locationProof))return null;
+ // When official details omit a labelled city, inspect only the heading
+ // and metadata lines BEFORE job duties, not the entire JD body (which can
+ // mention other cities or overseas clients unrelated to work location).
+ const dutiesAt=lines.findIndex(t=>HAS_DUTIES.test(t));
+ const headerLines=lines.slice(0,dutiesAt<0?4:Math.min(dutiesAt,8));
+ const city=labelled.trim()?findMainlandCity(labelled):
+  headerLines.map(findMainlandCity).find(Boolean)||null;
  if(!city)return null;
  const rq=content.match(/(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求|职责要求)[：:\s]*([\s\S]{24,6000})/);
  const experienceLabel=(content.match(/(?:工作经验|经验要求|工作年限|经验年限)[：:\s]*([^\n]{1,80})/)||[])[1]||'';
