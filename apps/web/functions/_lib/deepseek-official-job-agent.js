@@ -68,10 +68,15 @@ function publicHttps(value,{query=false,max=420}={}){
    !/\.(?:com|cn|net|org|com\.cn|net\.cn|org\.cn|edu\.cn)$/.test(host))return null;
   if(u.pathname.length>220||/%2f|%5c|%00|\.\./i.test(u.pathname))return null;
   if(!query&&u.search)return null;
-  if(query&&[...u.searchParams].some(([k,v])=>
-   !/^(?:id|jobid|job_id|jobId|positionId|postId|reqId|requisitionId|jobUnionId|advertisementId|requementId|recruitId|jobCode|job_id|jobnumber)$/i.test(k)||
-   !/^[a-z0-9-]{3,58}$/i.test(v))||
-   u.searchParams.size>2)return null;
+  // A number of domestic ATS platforms publish single-position pages with
+  // several non-tracking selectors (e.g. postIdEnc + brandCode). Permit only
+  // their bounded structural selectors, not arbitrary query strings.
+  const atsDetail=/\/web\/index\/webPosition[^/]*getOnePosition$/i.test(u.pathname);
+  if(query&&([...u.searchParams].some(([k,v])=>{
+   const identity=/^(?:id|jobid|job_id|positionId|postId|postIdEnc|reqId|requisitionId|jobUnionId|advertisementId|requementId|recruitId|jobCode|jobnumber)$/i.test(k);
+   const selector=atsDetail&&/^(?:brandCode|columnId|recruitType|lanType|importPost)$/i.test(k);
+   return !(identity||selector)||!/^[a-z0-9-]{identity?3:1,58}$/i.test(v);
+  })||u.searchParams.size>(atsDetail?8:2)))return null;
   return u;
  }catch{return null;}
 }
@@ -88,13 +93,16 @@ const ID_HINT=/(?:job|position|post|requisition|req|advertisement|recruit|requem
 export function publicJobLink(value){
  const u=publicHttps(value,{query:true});
  if(!u)return null;
- const path=decodeURIComponent(u.pathname);
- // Job listing roots and search pages are NOT exact employer positions.
- if(/^\/?$/.test(path)||/\/(?:list|search|index|category|all-jobs|openings)\/?$/i.test(path))return null;
+ let path;try{path=decodeURIComponent(u.pathname);}catch{return null;}
+ // Search/list roots can NEVER be standalone vacancy evidence.
+ if(/^\/?$/.test(path)||/\/(?:list|search|index|category|all-jobs|openings|all-positions|job-list)\/?$/i.test(path))return null;
+ const atsDetail=/\/web\/index\/webPosition[^/]*getOnePosition$/i.test(path)&&u.searchParams.has('postIdEnc');
+ const seoDetail=/(?:^|\/)(?:careers?|jobs?|positions?|vacancies)\/[a-z][a-z0-9]{1,50}(?:-[a-z0-9]{2,40})+\/?$/i.test(path);
+ const numericDetail=/(?:^|\/)job\/view\/[0-9]{2,12}\/?$/i.test(path);
  const id=(u.searchParams.size&&[...u.searchParams.keys()].some(k=>ID_HINT.test(k)))||
   /\/(?:job|jobs|position|positions|recruit|career|careers|detail|jobdesc)[\/_-][a-z0-9-]{4,}$/i.test(path)||
   /(?:job|position|post|req)[a-z_-]*[\/=_-][a-z0-9-]{4,}/i.test(path);
- if(!id||!JOB_URL.test(path))return null;
+ if(!(atsDetail||seoDetail||numericDetail||(id&&JOB_URL.test(path))))return null;
  u.searchParams.sort();
  return {url:u.href,hostname:u.hostname,domain:companyDomain(u.hostname),
   id:'public:'+u.hostname+':'+hashUrl(u.href)};
@@ -130,7 +138,7 @@ function rejectJobEvidence(tally,code){
 const LI=/(?:^|\n)\s*(?:[-*•·]|\d{1,2}[.、．)])\s+/;
 const DUTY_PHRASE=/(?:负责|参与|协助|制定|推进|组织|实施|搭建|编写|运营|执行|规划|完善|撰写)/;
 const DUTY_HEADER=/^(?:工作|岗位|职位|主要|任职)?(?:职责|工作内容|职责描述|描述|工作任务|日常工作|job responsibilities|responsibilities|what you.ll do)(?:[\s：:]|$)/i;
-const REQUIREMENT_HEADER=/^(?:任职|应聘|岗位|职位|基本|招聘|资格|能力)?(?:资格|要求|条件|需求)|^(?:我们希望你具备|我们希望你|我们期待你|希望你具备|你需要具备|岗位基本要求|qualification|requirements|what we.re looking for|who you are|what you bring)(?:[\s：:]|$)/i;
+const REQUIREMENT_HEADER=/^(?:任职|应聘|岗位|职位|工作|职业|基本|招聘|资格|能力)?(?:资格|要求|条件|需求)|^(?:我们希望你具备|我们希望你|我们期待你|希望你具备|你需要具备|岗位基本要求|qualification|requirements|what we.re looking for|who you are|what you bring)(?:[\s：:]|$)/i;
 const END_HEADER=/^(?:薪酬|薪资|福利|待遇|职位推荐|相关职位|更多职位|更多岗位|联系我们|如何申请|立即申请|立即投递|申请职位|职位列表|福利待遇|benefits|how to apply|apply now)(?:[\s：:]|$)/i;
 const LOC_LABEL=/^(?:工作地点|工作城市|工作地|办公地点|办公城市|上班地点|岗位地点|工作区域|location|work location)(?:\s*[：:]\s*|\s*[|｜]\s*|\s{1,4}|$)/i;
 const COMPANY_LABEL=/^(?:公司名称|企业名称|招聘单位|用人单位|所属公司|招聘公司|招聘主体|company name|employer)(?:\s*[：:]\s*|\s*[|｜]\s*|\s{1,4}|$)/i;
@@ -213,8 +221,20 @@ function extractCompanyClaim(lines,page){
  }
  // Company text is often embedded in the job header, not "公司名称：".
  const title=clean(page?.title||'');
+ // Some real corporate vacancies brand their job title as
+ // “内容运营｜加入独到科技｜...”, not “公司名称：XXX”.
+ // This is still evidence from the FETCHED JOB PAGE, never from a
+ // Search snippet or the corporate homepage alone.
+ for(const part of title.split(/[|｜]/).slice(1,4)){
+  const name=clean(part).replace(/^(?:加入|来自|招聘单位|用人单位)\s*[：:]?\s*/u,'')
+   .replace(/\s*(?:招聘|官网|官方网站|社会招聘|校园招聘)\s*$/u,'');
+  const candidate=viableEmployerName(name);
+  if(candidate&&(/^(?:加入|来自|招聘单位|用人单位)/u.test(part.trim())||
+   /(?:集团|有限公司|科技|股份|公司)$/u.test(candidate)))return candidate;
+ }
  const m=title.match(/(?:[-|｜]\s*)([\p{Script=Han}]{2,24}(?:集团|有限公司|科技|招聘|股份|公司))/u);
- return m?m[1].replace(/招聘$/,''):null;
+ const legacy=m?viableEmployerName(m[1].replace(/招聘$/,'')):null;
+ return legacy||null;
 }
 export function readPublicJob(link,page,now=new Date(),rejections=null){
  if(!link||typeof page?.content!=='string')return rejectJobEvidence(rejections,'FETCH_NO_TEXT');
