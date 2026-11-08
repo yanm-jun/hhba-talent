@@ -2,6 +2,7 @@
 // This module NEVER accepts a resume or arbitrary URL from an applicant.
 // Search is discovery, not proof that applications are currently open.
 import {findMainlandCity,isMainlandJobLocation} from './mainland-job-location.js';
+import {classifyOccupation} from './match-ranking.js';
 export const EXTERNAL_DISCOVERY_VERSION='HHBA_DOMESTIC_DISCOVERY_V1';
 export const SEARCH_LIMIT=2;
 export const FETCH_LIMIT=3;
@@ -213,6 +214,37 @@ async function providerPost(url,key,payload,maxBytes,fetcher){
  try{return await readBoundedJson(response,maxBytes);}
  catch{throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');}
 }
+/** Search titles are untrusted discovery hints, never official JD evidence. */
+export function prioritizeOfficialSearchCandidates(rows,role,maxFetch){
+ const roles=(Array.isArray(role)?role:[role]).map(sanitizedJobIntent).filter(Boolean);
+ const kinds=new Set(roles.map(classifyOccupation).filter(Boolean));
+ const scored=[];
+ for(const [index,row] of (Array.isArray(rows)?rows:[]).entries()){
+  const locator=safeOfficialJobLocator(row?.url);
+  if(!locator)continue;
+  const snippet=typeof row?.title==='string'?row.title.slice(0,140):'';
+  const kind=classifyOccupation(snippet);
+  const normalized=snippet.toLowerCase().replace(/\s+/g,'');
+  const exact=roles.some(r=>r.length>=4&&normalized.includes(r.toLowerCase().replace(/\s+/g,'')));
+  const relevance=exact?3:kind&&kinds.has(kind)?2:!kind?1:0;
+  scored.push({...row,url:locator.url,company:locator.company,relevance,index});
+ }
+ scored.sort((a,b)=>b.relevance-a.relevance||a.index-b.index);
+ const candidates=[],selected=new Set(),byEmployer=new Map();
+ const limit=Math.min(8,Math.max(1,Math.trunc(maxFetch)||1));
+ for(const row of scored){
+  if(selected.has(row.url)||(byEmployer.get(row.company)||0)>=2)continue;
+  candidates.push(row);selected.add(row.url);
+  byEmployer.set(row.company,(byEmployer.get(row.company)||0)+1);
+  if(candidates.length>=limit)break;
+ }
+ if(candidates.length<limit)for(const row of scored){
+  if(selected.has(row.url))continue;
+  candidates.push(row);selected.add(row.url);
+  if(candidates.length>=limit)break;
+ }
+ return candidates.map(({relevance,index,company,...row})=>row);
+}
 export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=new Date(),expanded=false}={}){
  const queries=buildOfficialQueries(role,expanded);
  const maxSearch=expanded?4:SEARCH_LIMIT,maxFetch=expanded?8:FETCH_LIMIT;
@@ -222,31 +254,21 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
  // Parallelize the expanded, one-click discovery so the user does not wait for
  // twelve sequential provider timeouts; the legacy small pilot stays unchanged.
  const searchOne=(query)=>providerPost('https://api.deepseek.com/v1/tools/search',key,
-  {query,count:6,need_content:false},250000,fetcher);
+  {query,count:expanded?12:6,need_content:false},250000,fetcher);
  const searchResults=expanded?await Promise.all(queries.slice(0,maxSearch).map(searchOne)):null;
  for(let i=0;i<Math.min(maxSearch,queries.length);i++){
   const response=expanded?searchResults[i]:await searchOne(queries[i]);
   if(!Array.isArray(response?.results))throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');
   if(response.results.length)usage.search++;
-  for(const item of response.results.slice(0,6)){
+  for(const item of response.results.slice(0,expanded?12:6)){
    const loc=safeOfficialJobLocator(item?.url);
    if(loc&&!possible.has(loc.id))possible.set(loc.id,{...item,url:loc.url});
   }
  }
  const jobs=[];
- const candidates=[],selected=new Set(),byEmployer=new Map();
- for(const row of possible.values()){
-  const provider=safeOfficialJobLocator(row.url)?.company;
-  if(!provider||selected.has(row.url)||(byEmployer.get(provider)||0)>=2)continue;
-  candidates.push(row);selected.add(row.url);
-  byEmployer.set(provider,(byEmployer.get(provider)||0)+1);
-  if(candidates.length>=maxFetch)break;
- }
- if(candidates.length<maxFetch)for(const row of possible.values()){
-  if(selected.has(row.url))continue;
-  candidates.push(row);selected.add(row.url);
-  if(candidates.length>=maxFetch)break;
- }
+ const candidates=expanded?
+  prioritizeOfficialSearchCandidates([...possible.values()],role,maxFetch):
+  [...possible.values()].slice(0,maxFetch);
  const fetchOne=async(candidate)=>{
   let fetched;
   try{
