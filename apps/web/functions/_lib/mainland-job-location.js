@@ -24,7 +24,7 @@ function oneSegmentHasCity(raw){
 export function isMainlandJobLocation(location){
  if(typeof location!=='string'||location.length>140||!location.trim())return false;
  if(overseas.test(location)||uncertain.test(location))return false;
- const segments=location.split(/\s*(?:\/|\\|\||,|，|;|；|、|\b(?:or|and)\b|或者|或|与|和)\s*/i)
+ const segments=location.split(/\s*(?:\/|\||,|，|;|；|、|\b(?:or|and)\b|或者|或|与)\s*/i)
   .map(x=>x.trim()).filter(Boolean);
  if(!segments.length)return false;
  return segments.every(oneSegmentHasCity);
