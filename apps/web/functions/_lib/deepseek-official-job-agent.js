@@ -460,7 +460,7 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
  // or by the model. At most two render requests per matching action.
  let browserAttempts=0,browserRecovered=0,browserFailures=0;
  const canRender=link=>typeof browserRenderer==='function'&&
-  (/^(?:careers?|hr|jobs|recruit)\\./i.test(link.hostname)||
+  (/^(?:careers?|hr|jobs|recruit)\./i.test(link.hostname)||
    [...sites.values()].some(site=>site.domain===link.domain));
  const readBestEvidence=async(link,doc)=>{
   const before={...rejections};
