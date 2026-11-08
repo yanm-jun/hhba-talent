@@ -172,7 +172,7 @@ test('verified Meituan job-detail shape is eligible only as open-status-unconfir
  ].join('\n');
  const r=extractOfficialJob({url:mt},{content},new Date('2026-11-08T00:00:00.000Z'));
  assert.equal(r?.company,'美团');
- assert.equal(r?.location,'北京');
+ assert.equal(r?.location,'北京市');
  assert.equal(r?.source_status,'OFFICIAL_DETAIL_FETCHED');
  assert.equal(r?.application_status,'NEEDS_OFFICIAL_CONFIRMATION');
  assert.equal(r?.official_url,'https://zhaopin.meituan.com/web/position/detail?jobUnionId=4747089400');
@@ -270,6 +270,8 @@ test('national prefecture directory accepts inland prefectures beyond old shortl
   '# 软件开发工程师','岗位职责','维护城市数据服务与业务平台，持续改进产品质量。',
   '岗位要求','熟练使用 Python 和 SQL，具备软件工程经验与协作能力。',
   '理解分布式开发和数据系统应用，能与产品和业务团队共同完成工作。',
+  '能够独立推进软件平台的架构设计、系统优化、复杂故障诊断与日常运维工作。',
+  '熟悉开发生命周期管理、持续集成、代码审查及技术文档建设，有团队协作经验。',
   '工作地点：喀什地区','立即投递'
  ].join('\n');
  const result=extractOfficialJob({url:u},{content:long});
