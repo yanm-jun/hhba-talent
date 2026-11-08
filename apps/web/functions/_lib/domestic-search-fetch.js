@@ -62,7 +62,7 @@ const CITY_NAMES=[
  '珠海','中山','惠州'
 ];
 const CITY_PATTERN=new RegExp(CITY_NAMES.sort((a,b)=>b.length-a.length).join('|'));
-const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macau|macao|taiwan|taipei|tokyo|japan|singapore|united states|美国|日本|新加坡|canada|australia|united kingdom|uk\b|germany|france|india|indonesia|malaysia|vietnam|thailand|philippines|switzerland|netherlands|ireland|brazil|mexico|south korea|hongkong|海外|境外|加拿大|澳大利亚|英国|德国|法国|印度|泰国|越南|马来西亚|菲律宾|韩国|全球远程)/i;
+const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macau|macao|taiwan|taipei|tokyo|japan|singapore|united states|美国|日本|新加坡|canada|australia|united kingdom|uk\b|germany|france|india|indonesia|malaysia|vietnam|thailand|philippines|switzerland|netherlands|ireland|brazil|mexico|south korea|hongkong|海外|境外|加拿大|澳大利亚|英国|德国|法国|印度|泰国|越南|马来西亚|菲律宾|韩国|全球远程|worldwide|global remote|remote global)/i;
 const CLOSED=/(?:职位已关闭|该职位已下线|岗位已下线|停止招聘|暂停招聘|不再接受申请|招聘已结束|岗位已关闭|职位已过期|目前暂时未有岗位开放)/i;
 const HAS_DUTIES=/(?:岗位职责|工作职责|职位职责|岗位描述|工作内容|主要职责)/;
 const HAS_REQUIREMENTS=/(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求)/;
