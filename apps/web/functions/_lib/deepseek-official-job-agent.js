@@ -9,6 +9,7 @@
  */
 import {sanitizedJobIntent} from './domestic-search-fetch.js';
 import {extractMainlandWorkplaceFromJob} from './mainland-job-workplace-evidence.js';
+import {findMainlandCity} from './mainland-job-location.js';
 import {orderPublicJobCandidates,searchEvidenceHints} from './deepseek-job-search-quality.js';
 import {V8_USAGE_LIMITS,emptyV8CostMeter,observeV8ModelUsage,buildV8CostReport} from './deepseek-discovery-billing.js';
 
@@ -198,6 +199,17 @@ function extractRole(lines,page){
  for(const l of lines.slice(0,12)){
   if(roleText(l)&&!DUTY_HEADER.test(l)&&!REQUIREMENT_HEADER.test(l)&&
     !l.includes('。')&&!l.includes('；'))return l.split(/[|｜]/)[0].slice(0,95);
+ }
+ // Rendered domestic ATS pages may put the *single actual vacancy* after
+ // navigation and anti-fraud notices: "内容运营经理 上海" immediately before
+ // the JD. Only a UNIQUE role+mainland-city header BEFORE responsibilities
+ // may recover the role; ordinary menu/listing rows never become evidence.
+ const dutyAt=lines.findIndex((line,i)=>i<95&&DUTY_HEADER.test(line));
+ if(dutyAt>=4){
+  const roleRows=lines.slice(Math.max(0,dutyAt-32),dutyAt)
+   .map(line=>line.match(/^(.{4,88}?)\\s+([\\p{Script=Han}]{2,12}(?:市|州)?)$/u))
+   .filter(m=>m&&roleText(m[1])&&findMainlandCity(m[2]));
+  if(roleRows.length===1)return roleRows[0][1].slice(0,95);
  }
  return null;
 }
