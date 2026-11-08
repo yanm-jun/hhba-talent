@@ -6,7 +6,7 @@ import {extractSkillRequirements,extractStructuredSkillConditions} from '../func
 import {
  extractMandatoryProfessionalCredentials,extractStructuredCredentialConditions
 } from '../functions/_lib/professional-credentials.js';
-import {prioritizeOfficialSearchCandidates} from '../functions/_lib/domestic-search-fetch.js';
+import {prioritizeOfficialSearchCandidates,discoverExternalOfficialJobs} from '../functions/_lib/domestic-search-fetch.js';
 import {fuseDomesticJobRecommendations} from '../functions/_lib/domestic-match-fusion.js';
 import {summarizeRankedRelevance} from '../functions/_lib/match-quality-evaluator.js';
 import {groundedCareerTransfer} from '../functions/_lib/career-transfer-evidence.js';
@@ -170,4 +170,66 @@ test('career transfer needs both intended target and two documented, relevant sk
  assert.equal(groundedCareerTransfer({...profile,demonstrated_roles:['内容运营']},{title:'内容运营'}),null);
  assert.equal(groundedCareerTransfer({...profile,skills:[{name:'项目管理',evidence:''},{name:'数据分析',evidence:''}]},
   {title:'内容运营'}),null);
+});
+
+test('fetched same-company role preserves two verified work cities without duplicate SEO copies',async()=>{
+ const ids=['2097166275703910401','2097166275703910402','2097166275703910403'];
+ const urls=ids.map(id=>'https://careers.tencent.com/jobdesc.html?postId='+id);
+ const cities=['北京','上海','北京'];
+ const detail=city=>[
+  '# Python 开发工程师',
+  '社会招聘',
+  '工作地点：'+city,
+  '岗位职责',
+  '负责开发后端服务、分析业务需求、维护稳定可靠的数据平台和业务接口，保障系统监控、测试、持续交付与跨团队协作。',
+  '岗位要求',
+  '本科及以上学历，熟练使用 Python、SQL 与常见数据库，理解软件工程方法，能够独立开发、分析故障并维护技术文档，有良好的团队沟通意识。',
+  '申请岗位'
+ ].join('\\n');
+ let searches=0,fetches=0;
+ const fetcher=async(url,options)=>{
+  if(String(url).endsWith('/search')){
+   searches++;
+   return Response.json({results:urls.map(u=>({url:u,title:'Python 开发工程师'}))});
+  }
+  assert.ok(String(url).endsWith('/fetch'));
+  fetches++;
+  const target=JSON.parse(options.body).url;
+  const index=urls.indexOf(target);
+  assert.notEqual(index,-1);
+  return Response.json({title:'官方招聘详情',content:detail(cities[index])});
+ };
+ const found=await discoverExternalOfficialJobs('Python 开发','synthetic-testing-only-key',
+  {fetcher,expanded:true,now:new Date('2026-11-08T00:00:00Z')});
+ assert.equal(searches,4);
+ assert.equal(fetches,3);
+ assert.equal(found.candidate_count,2);
+ assert.deepEqual(new Set(found.candidates.map(j=>j.location)),new Set(['北京','上海']));
+ assert.ok(found.candidates.every(j=>j.application_status==='NEEDS_OFFICIAL_CONFIRMATION'));
+});
+
+test('one failed expanded Search cannot discard verified positions from successful Searches',async()=>{
+ const url='https://careers.tencent.com/jobdesc.html?postId=2097166275703910408';
+ let calls=0;
+ const fetcher=async(endpoint,options)=>{
+  if(String(endpoint).endsWith('/search')){
+   calls++;
+   if(calls===1)return new Response('{}',{status:503});
+   return Response.json({results:[{url,title:'Python 开发工程师'}]});
+  }
+  assert.ok(String(endpoint).endsWith('/fetch'));
+  return Response.json({title:'官方岗位',content:[
+   '# Python 开发工程师','工作地点：北京','岗位职责',
+   '负责业务系统服务端研发、数据分析、需求讨论、自动化测试和代码质量维护，协同多个团队解决线上可靠性问题。',
+   '岗位要求',
+   '熟练掌握 Python 和 SQL，本科及以上学历，熟悉数据库与企业软件工程流程，具备良好的沟通和问题解决能力。',
+   '立即投递'
+  ].join('\\n')});
+ };
+ const result=await discoverExternalOfficialJobs('Python 开发','synthetic-testing-only-key',
+  {fetcher,expanded:true,now:new Date('2026-11-08T00:00:00Z')});
+ assert.equal(calls,4);
+ assert.equal(result.candidates.length,1);
+ assert.equal(result.candidates[0].location,'北京');
+ assert.equal(result.usage.search,3);
 });

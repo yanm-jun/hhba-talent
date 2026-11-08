@@ -284,16 +284,36 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
  // twelve sequential provider timeouts; the legacy small pilot stays unchanged.
  const searchOne=(query)=>providerPost('https://api.deepseek.com/v1/tools/search',key,
   {query,count:expanded?12:6,need_content:false},250000,fetcher);
- const searchResults=expanded?await Promise.all(queries.slice(0,maxSearch).map(searchOne)):null;
+ // Expanded discovery tolerates partial provider outages. A failed Search
+ // must not discard other paid, successful Search results from this batch.
+ // Fail closed only when every Search attempt fails.
+ const searchResults=expanded?await Promise.allSettled(queries.slice(0,maxSearch).map(searchOne)):null;
+ let successfulSearches=0,lastSearchError=null;
  for(let i=0;i<Math.min(maxSearch,queries.length);i++){
-  const response=expanded?searchResults[i]:await searchOne(queries[i]);
-  if(!Array.isArray(response?.results))throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');
+  let response;
+  if(expanded){
+   const attempt=searchResults[i];
+   if(attempt.status==='rejected'){
+    lastSearchError=attempt.reason;
+    continue;
+   }
+   response=attempt.value;
+  }else response=await searchOne(queries[i]);
+  if(!Array.isArray(response?.results)){
+   if(!expanded)throw new ExternalSearchError('SEARCH_RESPONSE_INVALID');
+   lastSearchError=new ExternalSearchError('SEARCH_RESPONSE_INVALID');
+   continue;
+  }
+  successfulSearches++;
   if(response.results.length)usage.search++;
   for(const item of response.results.slice(0,expanded?12:6)){
    const loc=safeOfficialJobLocator(item?.url);
    if(loc&&!possible.has(loc.id))possible.set(loc.id,{...item,url:loc.url});
   }
  }
+ if(expanded&&successfulSearches===0)
+  throw lastSearchError instanceof ExternalSearchError?lastSearchError:
+   new ExternalSearchError('SEARCH_PROVIDER_ERROR');
  const jobs=[];
  const candidates=expanded?
   prioritizeOfficialSearchCandidates([...possible.values()],role,maxFetch):
@@ -325,11 +345,13 @@ export async function discoverExternalOfficialJobs(role,key,{fetcher=fetch,now=n
    if(job)jobs.push(job);
   }
  }
- // A company can have many SEO/city copies of the same role: prefer unique
- // employer+position without fabricating a vacancy to reach Top10.
+ // Keep independently fetched official vacancies in different Mainland
+ // cities; only collapse same-employer, same-title, same-city copies.
+ // The downstream fusion already makes city part of its canonical role key.
  const unique=new Map();
  for(const job of jobs){
-  const signature=job.company.toLowerCase()+'|'+job.title.toLowerCase();
+  const signature=[job.company,job.title,job.location]
+   .map(value=>String(value||'').normalize('NFKC').trim().toLowerCase()).join('|');
   if(!unique.has(signature))unique.set(signature,job);
  }
  return {kind:EXTERNAL_DISCOVERY_VERSION,scope:'CN_MAINLAND_ONLY',
