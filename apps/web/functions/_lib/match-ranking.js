@@ -83,7 +83,20 @@ export function evaluateJobEligibility(profile={},job={}){
   return {eligible:false,reason:'DEGREE_NOT_MET'};
  return {eligible:true,reason:null};
 }
-export function scoreCandidateFit(profile={},job={},options={}){
+// The fourth argument is SERVER-SUPPLIED after a human-approved experiment.
+// Never forward browser options as a weight policy.
+function approvedPolicy(policy){
+ if(!policy||policy.status!=='APPROVED'||typeof policy.version!=='string'||
+  !/^hhba-ranking-v[2-9][0-9-]{0,30}$/.test(policy.version))return null;
+ const input=policy.weights;
+ if(!input||typeof input!=='object'||Array.isArray(input)||
+  Object.keys(input).length!==DIMENSIONS.length)return null;
+ if(DIMENSIONS.some(k=>!Number.isInteger(input[k])||
+  Math.abs(input[k]-DEFAULT_RANKING_WEIGHTS[k])>3))return null;
+ if(DIMENSIONS.reduce((sum,k)=>sum+input[k],0)!==100)return null;
+ return {weights:Object.fromEntries(DIMENSIONS.map(k=>[k,input[k]])),version:policy.version};
+}
+export function scoreCandidateFit(profile={},job={},options={},serverApprovedPolicy=null){
  const gate=evaluateJobEligibility(profile,job);
  if(!gate.eligible)return {eligible:false,reason:gate.reason,score:null,breakdown:null};
  const roles=[typeof options.role_hint==='string'?options.role_hint:'',
@@ -97,24 +110,28 @@ export function scoreCandidateFit(profile={},job={},options={}){
  const matchedSkills=wanted.filter(x=>have.includes(x));
  if(affinity===0&&matchedSkills.length===0)
   return {eligible:false,reason:'NO_MATCH_EVIDENCE',score:null,breakdown:null};
- const role=Math.round(DEFAULT_RANKING_WEIGHTS.role*affinity);
+ const approved=approvedPolicy(serverApprovedPolicy);
+ const weights=approved?.weights||DEFAULT_RANKING_WEIGHTS;
+ const role=Math.round(weights.role*affinity);
  // Missing official requirement tags are unknown, not proof of perfect coverage.
  const skills=wanted.length?
-  Math.round(DEFAULT_RANKING_WEIGHTS.skills*matchedSkills.length/wanted.length):
-  Math.min(8,DEFAULT_RANKING_WEIGHTS.skills);
+  Math.round(weights.skills*matchedSkills.length/wanted.length):
+  Math.round(weights.skills*8/30);
  const minYears=int(job.min_experience_years),years=int(profile.experience_years);
- const experience=minYears===null||minYears===0?11:
-  Math.min(DEFAULT_RANKING_WEIGHTS.experience,16+Math.max(0,years-minYears));
+ const experience=minYears===null||minYears===0?Math.round(weights.experience*11/20):
+  Math.round(weights.experience*Math.min(1,(16+Math.max(0,years-minYears))/20));
  const degree=minDegree(job.minimum_education);
- const education=degree?DEFAULT_RANKING_WEIGHTS.education:6;
+ const education=degree?weights.education:Math.round(weights.education*.6);
  const cityPref=(Array.isArray(options.preferred_cities)?options.preferred_cities:[])
   .filter(x=>typeof x==='string'&&x.length>=2&&x.length<40);
  const location=cityPref.length&&
-  !cityPref.some(city=>norm(job.location).includes(norm(city)))?6:DEFAULT_RANKING_WEIGHTS.location;
+  !cityPref.some(city=>norm(job.location).includes(norm(city)))?
+  Math.round(weights.location*.6):weights.location;
  const breakdown={role,skills,experience,education,location};
  const score=Object.values(breakdown).reduce((a,b)=>a+b,0);
  return {eligible:true,reason:null,score,breakdown,matched_skill_count:matchedSkills.length,
-  required_skill_count:wanted.length,ranking_version:RANKING_VERSION};
+  required_skill_count:wanted.length,ranking_version:RANKING_VERSION,
+  weight_policy_version:approved?.version||'baseline'};
 }
 /**
  * Future offline-learning hook: proposed weights from aggregate experiment
