@@ -249,3 +249,17 @@ test('national search fetches at most 10 distinct ATS tenants, no added model ca
  assert.equal(result.candidates.length,10);
  assert.equal(new Set(result.candidates.map(x=>x.company)).size,10);
 });
+
+test('mixed mainland and foreign job location is rejected without guesswork',()=>{
+ const x='https://job-boards.greenhouse.io/openai/jobs/1234567';
+ const doc=[
+  '# Data Engineer','Company: OpenAI','Location: Shanghai, Canada',
+  'Responsibilities','Operate reliable data pipelines and enterprise data systems.',
+  'Qualifications','Excellent Python, SQL, data analysis and collaborative engineering skills.',
+  'Comfortable with end-to-end data governance and production issue handling.',
+  'Apply for this job'
+ ].join('\n');
+ assert.equal(extractOfficialJob({url:x},{content:doc}),null);
+ assert.equal(extractOfficialJob({url:x},{content:doc.replace('Canada','Australia')}),null);
+ assert.equal(extractOfficialJob({url:x},{content:doc.replace('Shanghai, Canada','上海、香港')}),null);
+});

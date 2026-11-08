@@ -6,7 +6,7 @@ import {safeOfficialJobLocator} from './domestic-search-fetch.js';
 export const FUSION_VERSION='HHBA_DOMESTIC_MATCH_FUSION_V1';
 const MAX_RESULTS=10;
 const MAX_EVIDENCE_AGE_MS=24*60*60*1000;
-const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macau|macao|taiwan|taipei|日本|美国|新加坡|singapore|united states|tokyo)/i;
+const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|hong[\s-]?kong|macau|macao|taiwan|taipei|日本|美国|新加坡|singapore|united states|tokyo|canada|australia|united kingdom|uk\b|germany|france|india|indonesia|malaysia|vietnam|thailand|philippines|switzerland|netherlands|ireland|brazil|mexico|south korea|hongkong|海外|境外|加拿大|澳大利亚|英国|德国|法国|印度|泰国|越南|马来西亚|菲律宾|韩国|全球远程)/i;
 const MAINLAND_CITY=/(?:北京|上海|天津|重庆|深圳|广州|杭州|南京|苏州|成都|武汉|西安|青岛|宁波|无锡|合肥|郑州|长沙|厦门|福州|济南|大连|沈阳|哈尔滨|长春|石家庄|昆明|贵阳|南宁|海口|珠海|佛山|东莞|烟台|潍坊|临沂|济宁|菏泽|聊城|威海|泰安|德州|枣庄|滨州|日照|东营|常州|南通|嘉兴|绍兴|金华|温州|台州|太原|徐州|扬州|保定|唐山|廊坊|兰州|西宁|银川|乌鲁木齐|呼和浩特|包头|柳州|桂林|洛阳|开封|南昌|九江|中山|惠州|beijing|shanghai|shenzhen|guangzhou|hangzhou|chengdu|nanjing|suzhou|wuhan|xian)/i;
 const DEGREE_RANK={HIGH_SCHOOL:1,ASSOCIATE:2,BACHELOR:3,MASTER:4,PHD:5};
 const ROLE_CLUSTERS=[

@@ -110,3 +110,9 @@ test('external Search is opt-in, Preview-gated, and never sends resume text',asy
  assert.match(service,/body:JSON\.stringify\(\{role_hint:clean,consent_search:true\}\)/);
  assert.doesNotMatch(service.slice(service.indexOf('export async function discoverExternalDomesticJobs')),/resume_id|text:cleaned|profile:|skills:/);
 });
+
+test('foreign mixed job place cannot sneak into fusion rankings',()=>{
+ for(const value of ['上海 / Canada','深圳 / Australia','北京、香港','Remote worldwide / Shanghai']){
+  assert.equal(isMainlandWorkCity(value),false,value);
+ }
+});
