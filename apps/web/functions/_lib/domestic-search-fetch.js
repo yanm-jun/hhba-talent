@@ -140,7 +140,7 @@ export function extractOfficialJob(searchResult,document,now=new Date()){
  const header=content.slice(0,280);
  // A labelled work-location field takes precedence; never fall back to
  // a company header when a contradictory/overseas location is present.
- const locationProof=labelled.trim()?labelled:lines.slice(0,3).join(' ');
+ const locationProof=labelled.trim()?labelled:header;
  const city=findMainlandCity(locationProof);
  if(!isMainlandJobLocation(locationProof))return null;
  if(!city)return null;
