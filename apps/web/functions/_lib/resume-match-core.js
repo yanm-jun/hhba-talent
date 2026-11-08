@@ -176,7 +176,7 @@ export function selectAuditedMatches(snapshot,audit,facets,profile,opts={},now=D
    // Same-JD-hash verified facets only. The ranking module never invents gates.
    // Legacy ATS facets list skills but do NOT mark them must-have.
    // Absence from resume is not proof that a mandatory JD gate failed.
-   required_skills:[],preferred_skills:[],unclassified_skills:tags,
+   required_skills:[],mandatory_skills:[],preferred_skills:[],unclassified_skills:tags,
    min_experience_years:Number.isFinite(f.experienceMinYears)?f.experienceMinYears:null,
    minimum_education:typeof f.education==='string'?f.education:null,
    salary:typeof j.salary==='string'&&j.salary.length<=60?j.salary:
