@@ -49,15 +49,23 @@ function compatibleRole(title,targets){
  return best;
 }
 function degreeMinRequirement(text){
- const s=textSafe(text,1200);
- if(/(?:博士|phd)(?:学历|学位|研究生)?(?:及以上|以上|或以上|至少)/i.test(s))return 5;
- if(/(?:硕士|master)(?:学历|学位|研究生)?(?:及以上|以上|或以上|至少)/i.test(s))return 4;
- if(/(?:本科|学士|bachelor)(?:学历|学位)?(?:及以上|以上|或以上|至少)/i.test(s))return 3;
- if(/(?:大专|专科)(?:学历|学位)?(?:及以上|以上|或以上|至少)/i.test(s))return 2;
- return null;
+ const s=textSafe(text,6000);
+ // Prefer minimum explicit entry qualifications, NOT "硕士优先".
+ // The input is only the official job requirements section.
+ const ranks=[];
+ for(const clause of s.split(/[，,；;\n。]+/)){
+  if(/(?:优先|加分|更佳|preferred|nice.to.have|不限学历|学历不限)/i.test(clause))continue;
+  const isRequirement=/(?:及以上|以上|或以上|学历|学位|最低|至少|要求|须|需|本科毕业|硕士研究生)/i.test(clause);
+  if(!isRequirement)continue;
+  if(/(?:博士|phd|doctorate)(?:研究生|学历|学位)?/i.test(clause))ranks.push(5);
+  else if(/(?:硕士|研究生|master(?:'s)?)(?:研究生|学历|学位)?/i.test(clause))ranks.push(4);
+  else if(/(?:本科|学士|bachelor(?:'s)?)(?:学历|学位)?/i.test(clause))ranks.push(3);
+  else if(/(?:大专|专科|associate(?:'s)?)(?:学历|学位)?/i.test(clause))ranks.push(2);
+ }
+ return ranks.length?Math.min(...ranks):null;
 }
 function experienceMinRequirement(text){
- const s=textSafe(text,1200);
+ const s=textSafe(text,6000);
  // Explicit requirements only. Match variants such as 7年以上工作经验,
  // 至少7年、7-10年工作经验 and 7+ years experience.
  const matches=[
