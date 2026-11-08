@@ -124,6 +124,24 @@ test('offline feedback only proposes bounded weights after sufficient reviewed a
  assert.equal(proposeFeedbackWeightUpdate({...aggregate,comparative_lifts:{role:100}}).status,'INVALID_AGGREGATE');
 });
 
+test('future approved weight versions require server-side review and remain bounded',()=>{
+ const metrics={distinct_users:250,verified_outcomes:900,
+  comparative_lifts:{role:.5,skills:-.5,experience:0,education:0,location:0}};
+ const proposal=proposeFeedbackWeightUpdate(metrics);
+ const applicant={...profile,skills:[{name:'Python'}],experience_years:3};
+ const baseline=scoreCandidateFit(applicant,role);
+ const unapproved=scoreCandidateFit(applicant,role,{},{...proposal,version:'hhba-ranking-v2-1'});
+ assert.deepEqual(unapproved,baseline,'Offline proposal must not activate itself');
+ const approved={status:'APPROVED',version:'hhba-ranking-v2-1',weights:proposal.weights};
+ const result=scoreCandidateFit(applicant,role,{},approved);
+ assert.equal(result.weight_policy_version,'hhba-ranking-v2-1');
+ assert.notEqual(result.score,baseline.score,'Human-approved policy may change soft ordering');
+ assert.equal(scoreCandidateFit(applicant,{...role,min_experience_years:7},{},approved).reason,
+  'EXPERIENCE_NOT_MET');
+ const invalid={...approved,weights:{...approved.weights,role:100}};
+ assert.deepEqual(scoreCandidateFit(applicant,role,{},invalid),baseline);
+});
+
 test('no resume, account identifier, or applicant action is required to rank',()=>{
  const job={...role};
  const clean={education:profile.education,experience_years:3,
