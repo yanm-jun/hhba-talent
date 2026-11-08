@@ -15,6 +15,7 @@ export type MatchedJob = {
   needs_verification:string[];requirements_basis:string;
   source_type?:'HHBA站内岗位'|'站外官方招聘';
   application_status?:'NEEDS_OFFICIAL_CONFIRMATION';checked_at?:string;
+  salary?:string|null;experience_requirement?:string|null;
 };
 export type MatchResponse = {
   status:'COMPLETE';profile:MatchProfile;matches:MatchedJob[];
@@ -158,6 +159,12 @@ export function safeExternalJobApplicationUrl(job:MatchedJob):string|null{
    'career.huawei.com':{company:'华为',path:'/cn/job-details',param:'advertisementId',pattern:/^\d{1,12}$/},
    'zhaopin.meituan.com':{company:'美团',path:'/web/position/detail',param:'jobUnionId',pattern:/^\d{8,14}$/}
   };
+  if(u.hostname==='jobs.bytedance.com'){
+   const id=u.pathname.match(/^\/experienced\/position\/([0-9]{13,22})\/detail$/)?.[1];
+   return u.searchParams.size===0&&id&&job.company==='字节跳动'&&
+    job.source==='jobs.bytedance.com'&&job.id==='external-jobs-bytedance-com-'+id?
+    'https://jobs.bytedance.com/experienced/position/'+id+'/detail':null;
+  }
   const expected=specs[u.hostname];
   if(!expected||u.pathname!==expected.path||job.company!==expected.company||
    job.source!==u.hostname||!u.searchParams.has(expected.param))return null;
@@ -172,7 +179,7 @@ export type ExternalOfficialCandidate={
  id:string;source_type:'站外官方招聘';source_status:'OFFICIAL_DETAIL_FETCHED';
  application_status:'NEEDS_OFFICIAL_CONFIRMATION';company:string;title:string;
  location:string;official_url:string;official_domain:string;has_application_cta:boolean;
- checked_at:string;evidence:{title:string;location:string;requirement:string};
+ checked_at:string;evidence:{title:string;location:string;requirement:string;salary?:string|null};
 };
 export type ExternalSearchResult={
  ok:true;kind:'HHBA_DOMESTIC_DISCOVERY_V1';scope:'CN_MAINLAND_ONLY';
