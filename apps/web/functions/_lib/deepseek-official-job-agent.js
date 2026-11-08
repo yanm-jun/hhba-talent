@@ -259,7 +259,7 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
     else{
      attempted.add(link.url);usage.fetch++;
      try{
-      const doc=await requestJson('/v1/tools/fetch',key,{url:link.url},500000,fetcher);
+      const doc=await requestJson('/v1/tools/fetch',key,{url:link.url},fetcher,500000);
       const job=readPublicJob(link,doc,now);
       if(!job)answer={status:'INCOMPLETE_OR_UNREADABLE_JOB'};
       else{
@@ -278,7 +278,7 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
     else{
      usage.fetch++;
      try{
-      const doc=await requestJson('/v1/tools/fetch',key,{url:site.url},450000,fetcher);
+      const doc=await requestJson('/v1/tools/fetch',key,{url:site.url},fetcher,450000);
       const job=provePublicEmployer(pages.get(link.url),doc,site.url);
       if(job){confirmed.set(job.id,job);answer={status:'PUBLIC_COMPANY_PROOF_PASSED',
        url:link.url,company:job.company,title:job.title,workplace:job.location};}
