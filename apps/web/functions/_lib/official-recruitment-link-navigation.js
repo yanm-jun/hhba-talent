@@ -114,30 +114,37 @@ export async function discoverOfficialRecruitmentLinks(role,key,{
    }
   }
  }
- const candidates=[...sites.values()].sort((a,b)=>companyPageScore(b,b.meta)-companyPageScore(a,a.meta));
- // Discovery may contain job detail links but not its source homepage. Those
- // are only routing hints; the independent first-party career source MUST be fetched.
+ // Only synthesize a first-party landing URL when Search did not already
+ // discover a real corporate careers page for that registered domain.
+ // Avoid spending the Fetch budget on speculative /careers paths ahead of
+ // genuine search-discovered corporate pages.
+ const observedDomains=new Set([...sites.values()].map(x=>x.domain));
  for(const job of jobs.values()){
+  if(observedDomains.has(job.domain))continue;
   for(const path of ['/', '/careers']){
    const url='https://'+job.hostname+path,site=publicCorporatePage(url);
    if(site&&!sites.has(site.url)&&sites.size<65&&job.domain!== 'feishu.cn'&&job.domain!=='hotjob.cn'){
-    sites.set(site.url,{...site,meta:{title:job.title_hint}});
+    sites.set(site.url,{...site,meta:{title:job.title_hint},derived:true});
    }
   }
  }
- const ranked=[...sites.values()].sort((a,b)=>companyPageScore(b,b.meta)-companyPageScore(a,a.meta));
- const trusted=[],seenHost=new Set();
+ const ranked=[...sites.values()].sort((a,b)=>
+  (companyPageScore(b,b.meta)-(b.derived?11:0))-
+  (companyPageScore(a,a.meta)-(a.derived?11:0)));
+ const trusted=[],successfulDomains=new Set(),attemptsByDomain=new Map();
  for(const site of ranked){
   if(trusted.length>=6||usage.fetch>=LINK_DISCOVERY_LIMITS.fetch)break;
-  // Diversify among employers rather than spending entire budget on one firm.
-  if(seenHost.has(site.domain))continue;
-  seenHost.add(site.domain);
+  // At most two public-source attempts per company, only one successful
+  // source. Failed speculative paths must not exclude the real homepage.
+  if(successfulDomains.has(site.domain)||(attemptsByDomain.get(site.domain)||0)>=2)continue;
+  attemptsByDomain.set(site.domain,(attemptsByDomain.get(site.domain)||0)+1);
   usage.fetch++;
   const response=await provider(key,'fetch',{url:site.url},fetcher,17000);
   if(!response||typeof response.content!=='string')continue;
   if(response.content.length)meter.billable_fetch++;
   const found=brand(response,site);
   if(!found)continue;
+  successfulDomains.add(site.domain);
   trusted.push(found);
  }
  const options=[];
