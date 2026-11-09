@@ -1,0 +1,83 @@
+name: HHBA V9 protected one-shot live official recruitment link acceptance
+on:
+  push:
+    branches:
+      - feature/match-v8-deepseek-dynamic-official-discovery-20261108
+    paths:
+      - '.github/workflows/hhba-v9-live-link-acceptance.yml'
+      - 'apps/web/functions/api/match/v9-live-acceptance.js'
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: hhba-v9-live-link-20261109-one-shot
+  cancel-in-progress: false
+jobs:
+  official-live-search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate OIDC guarded route syntax
+        run: node --check apps/web/functions/api/match/v9-live-acceptance.js
+      - name: Await current Cloudflare Preview test route
+        env:
+          ROOT: https://feature-match-v8-deepseek-dy.hhba-talent.pages.dev
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const root=process.env.ROOT;
+          assert.equal(new URL(root).hostname,'feature-match-v8-deepseek-dy.hhba-talent.pages.dev');
+          let ready=false;
+          for(let i=0;i<50;i++){
+            try{
+              const r=await fetch(root+'/api/match/v9-live-acceptance',{
+                redirect:'manual',signal:AbortSignal.timeout(10000)});
+              if(r.status===200){
+                const j=await r.json();
+                if(j.kind==='HHBA_V9_LINK_NAV_REAL_ACCEPTANCE_20261109'&&
+                   j.status==='PROTECTED_PREVIEW_ONLY'){ready=true;break;}
+              }
+            }catch{}
+            await new Promise(resolve=>setTimeout(resolve,9000));
+          }
+          assert.ok(ready,'V9_CLOUDFLARE_PREVIEW_NOT_READY');
+          console.log('HHBA_V9_LINK_NAV_PREVIEW_READY');
+          NODE
+      - name: Single paid DeepSeek Search and Fetch acceptance, zero user PII
+        env:
+          ROOT: https://feature-match-v8-deepseek-dy.hhba-talent.pages.dev
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const audience='hhba-v9-live-link-20261109-1';
+          const identityUrl=new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
+          identityUrl.searchParams.set('audience',audience);
+          const identity=await fetch(identityUrl,{
+            headers:{Authorization:'bearer '+process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN},
+            redirect:'error',signal:AbortSignal.timeout(15000)});
+          assert.equal(identity.status,200,'NO_GITHUB_OIDC_IDENTITY');
+          const token=(await identity.json()).value;
+          assert.ok(token&&token.length>100);
+          const r=await fetch(process.env.ROOT+'/api/match/v9-live-acceptance',{
+            method:'POST',redirect:'manual',signal:AbortSignal.timeout(250000),
+            headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+            body:JSON.stringify({mode:'discover'})
+          });
+          const data=await r.json().catch(()=>({error:'UNREADABLE_REPLY'}));
+          if(r.status!==200){
+            console.log('HHBA_V9_LIVE_FAILURE',JSON.stringify({
+              http:r.status,error:data.error||'UNKNOWN'}));
+            throw Error('OFFICIAL_LINK_DISCOVERY_TEST_FAILED');
+          }
+          assert.equal(data.kind,'HHBA_V9_LINK_NAV_REAL_ACCEPTANCE_20261109');
+          assert.equal(data.real_provider,true);
+          assert.equal(data.accounted,true);
+          assert.equal(data.usage.model,0);
+          assert.ok(data.usage.search<=3&&data.usage.fetch<=6);
+          assert.ok(data.opportunities.length<=10);
+          console.log('HHBA_V9_REAL_LINKS',JSON.stringify(data));
+          NODE
