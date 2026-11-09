@@ -62,7 +62,9 @@ const errorMap:Record<string,string>={
   MATCH_GLOBAL_LIMIT:'平台今天的 AI 体验额度已用完。',
   BAD_RESPONSE:'匹配结果格式不完整，请稍后重试。',
   AI_WEB_SEARCH_NOT_USED:'DeepSeek 本次没有执行联网搜索，未展示未经搜索证实的岗位，请重试。',
-  AI_RESPONSE_INVALID:'DeepSeek 返回结果格式异常，请重试。'
+  AI_RESPONSE_INVALID:'DeepSeek 返回结果格式异常，请重试。',
+  AI_PROVIDER_INCOMPLETE:'DeepSeek 搜索未能完成，没有返回不完整的岗位结果。',
+  AI_PROVIDER_RESPONSE_INVALID:'DeepSeek 输出中断或格式异常，暂不展示不完整推荐。'
 };
 export class MatchError extends Error {
  constructor(public readonly status:number,message:string){super(message);this.name='MatchError'}
@@ -110,8 +112,54 @@ export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Pr
   throw new MatchError(400,(e as Error)?.message||errorMap.INVALID_RESUME_TEXT);
  }
 }
+export type NativeMatchProgress='preparing'|'connected'|'searching'|'writing';
+async function consumeNativeMatchStream(
+ response:Response,onProgress?:(stage:NativeMatchProgress)=>void
+):Promise<MatchResponse>{
+ if(!response.body)throw new MatchError(502,'智能匹配连接没有返回可读取的结果。');
+ const decoder=new TextDecoder(),reader=response.body.getReader();
+ let buffer='',complete:MatchResponse|null=null;
+ function parseEvent(chunk:string){
+  const event=chunk.split('\n').find(line=>line.startsWith('event:'))?.slice(6).trim();
+  const data=chunk.split('\n').filter(line=>line.startsWith('data:'))
+   .map(line=>line.slice(5).trimStart()).join('\n');
+  if(!event||!data)return;
+  let value:any;try{value=JSON.parse(data)}catch{return}
+  if(event==='progress'){
+   const stage=value?.stage;
+   if(['preparing','connected','searching','writing'].includes(stage))
+    onProgress?.(stage as NativeMatchProgress);
+  }else if(event==='failure'){
+   const code=String(value?.error||'AI_PROVIDER_UNAVAILABLE');
+   throw new MatchError(502,errorMap[code]||'智能匹配服务暂时不可用。');
+  }else if(event==='complete'){
+   complete=value as MatchResponse;
+  }
+ }
+ try{
+  while(true){
+   const {value,done}=await reader.read();
+   if(done)break;
+   buffer+=decoder.decode(value,{stream:true}).replace(/\r/g,'');
+   if(buffer.length>320000)throw new MatchError(502,'结果数据异常，已停止处理。');
+   let stop;
+   while((stop=buffer.indexOf('\n\n'))>=0){
+    const event=buffer.slice(0,stop);buffer=buffer.slice(stop+2);
+    parseEvent(event);
+   }
+  }
+  if(buffer.trim())parseEvent(buffer);
+ }catch(e){
+  if(e instanceof MatchError||(e as Error)?.name==='AbortError')throw e;
+  throw new MatchError(503,'智能匹配连接中断，未收到完整推荐。');
+ }finally{reader.releaseLock();}
+ if(!complete)throw new MatchError(502,'智能匹配未返回完整结果，请稍后重试。');
+ return complete;
+}
+
 export async function submitExtractedResumeText(
- text:string,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string
+ text:string,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string,
+ onProgress?:(stage:NativeMatchProgress)=>void
 ):Promise<MatchResponse>{
  if(!consent)throw new MatchError(400,errorMap.EXPLICIT_AI_SHARING_CONSENT_REQUIRED);
  const token=session();
@@ -119,25 +167,29 @@ export async function submitExtractedResumeText(
  if(cleaned.replace(/\s/g,'').length<30)throw new MatchError(400,errorMap.INVALID_RESUME_TEXT);
  const response=await fetch(API+'/resume',{
   method:'POST',credentials:'same-origin',cache:'no-store',signal,
-  headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+  headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
   body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,
    options:{country:'CN',remote_only:false,
     role_hint:opts.role_hint,limit:Math.min(10,Math.max(1,opts.limit||10))}})
  }).catch(e=>{if((e as Error)?.name==='AbortError')throw e;
   throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});
- const data=await response.json().catch(()=>({})) as Partial<MatchResponse>&{error?:string};
- if(!response.ok)throw new MatchError(response.status,errorMap[data.error||'']||'智能匹配服务暂时不可用。');
+ const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');
+ if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。');
+ const data=isStream?await consumeNativeMatchStream(response,onProgress):
+  await response.json().catch(()=>({})) as Partial<MatchResponse>&{error?:string};
+ if(!response.ok)throw new MatchError(response.status,errorMap[(data as {error?:string}).error||'']||'智能匹配服务暂时不可用。');
  if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||data.matches.length>10)
   throw new MatchError(502,errorMap.BAD_RESPONSE);
  return data as MatchResponse;
 }
 
 export async function submitResumeForMatching(
- file:File,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string
+ file:File,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string,
+ onProgress?:(stage:NativeMatchProgress)=>void
 ):Promise<MatchResponse>{
  if(!consent)throw new MatchError(400,errorMap.EXPLICIT_AI_SHARING_CONSENT_REQUIRED);
  const extracted=await extractResumeTextLocally(file,signal);
- return submitExtractedResumeText(extracted,opts,consent,signal,resumeId);
+ return submitExtractedResumeText(extracted,opts,consent,signal,resumeId,onProgress);
 }
 
 /** Preview-only free balance/key check, authenticated candidate, no resume content. */
