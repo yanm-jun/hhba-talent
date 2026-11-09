@@ -12,7 +12,7 @@ const css=read('src/styles/site-search.css');
 test('search is visible in public, candidate and employer navigation',()=>{
  assert.equal((shell.match(/<HeaderSiteSearch\/>/g)||[]).length,3);
  assert.match(shell,/role="search"/);
- assert.match(shell,/aria-label="搜索 HHBA 站内所有公开内容"/);
+ assert.match(shell,/aria-label="搜索汇方职场 HHBA 站内所有公开内容"/);
  assert.match(shell,/navigate\('\/search'/);
  assert.match(css,/\.hhba-header-site-search/);
  assert.match(css,/@media\(max-width:680px\)/);
