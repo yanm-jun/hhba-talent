@@ -137,7 +137,7 @@ function activity(ms){
 }
 function heatBase(t){return 111000+302000*activity(t)}
 function activeBase(t){return 1750+12900*activity(t)}
-function heatNoise(t){return 1400*smoothNoise(t/890,11)+1200*smoothNoise(t/4600,32)+1900*smoothNoise(t/26000,43)}
+function heatNoise(t){return 580*smoothNoise(t/1800,11)+690*smoothNoise(t/6500,32)+1700*smoothNoise(t/26000,43)}
 function activeNoise(t){return 95*smoothNoise(t/2200,21)+145*smoothNoise(t/14500,27)}
 function share(c,mode){let weights=mode==='workday'?wday:wend,sum=weights.reduce((a,v)=>a+v,0),prior=weights.slice(0,c.hour).reduce((a,v)=>a+v,0);
  return (prior+weights[c.hour]*(c.minute/60+c.second/3600))/sum}
