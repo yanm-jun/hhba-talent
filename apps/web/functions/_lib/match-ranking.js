@@ -21,6 +21,10 @@ const DIMENSIONS=Object.keys(DEFAULT_RANKING_WEIGHTS);
 const DEGREE_RANK=Object.freeze({HIGH_SCHOOL:1,ASSOCIATE:2,BACHELOR:3,MASTER:4,PHD:5});
 // Match the *occupation* before matching labels such as "engineer" or "开发".
 const OCCUPATIONS=[
+ ['government-affairs',/(?:政府关系|政府事务|政企关系|公共事务|政策研究|政策申报|政府项目申报|government relations|government affairs|public affairs)/i],
+ ['content-operations',/(?:内容运营|内容策划|新媒体运营|社媒运营|短视频运营|社区内容运营|content operations|content marketing)/i],
+ ['regional-operations',/(?:区域运营|终端运营|门店运营|销售运营|门店督导|区域督导|经销商运营|渠道运营|regional operations|sales operations)/i],
+ ['project-operations',/(?:项目运营|项目管理|项目统筹|项目经理|PMO|project manager|project operations)/i],
  ['qa',/(?:测试开发|自动化测试|软件测试|测试工程师|质量保障|质量测试|sdet|quality assurance|qa engineer|test engineer)/i],
  ['devops',/(?:运维|平台运维|devops|site reliability|\bsre\b|系统管理员)/i],
  ['cybersecurity',/(?:安全工程师|网络安全|信息安全|security engineer|cyber security)/i],
