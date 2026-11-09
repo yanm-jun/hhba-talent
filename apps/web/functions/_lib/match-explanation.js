@@ -77,7 +77,7 @@ export function explainFinalJobScore(profile,job,fit){
 export function whyThisJob(profile={},job={},fit={}){
  const reasons=[],gaps=[];
  const roles=(Array.isArray(profile.demonstrated_roles)?
-   profile.demonstrated_roles:profile.target_roles||[])
+   profile.demonstrated_roles:[])
   .filter(x=>typeof x==='string').slice(0,6);
  const wishes=(Array.isArray(profile.career_intents)?profile.career_intents:[])
   .filter(x=>typeof x==='string').slice(0,6);
