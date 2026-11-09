@@ -149,10 +149,10 @@ test('automatic search is server-side and the modal has no extra search toggle',
  const {readFile}=await import('node:fs/promises');
  const component=await readFile(new URL('../src/components/CandidateMatchResultDialog.tsx',import.meta.url),'utf8');
  const api=await readFile(new URL('../functions/api/match/[[path]].js',import.meta.url),'utf8');
- assert.match(component,/找到相关企业，直接去官网查看/);
+ assert.match(component,/找到相关招聘入口，直接查看/);
  assert.match(component,/safeOfficialNavigationUrl\(item\)/);
- assert.match(component,/招聘入口不代表职位符合资格/);
- assert.match(component,/直达官网/);
+ assert.match(component,/导航链接不计入资格匹配分数/);
+ assert.match(component,/打开招聘页/);
  assert.match(component,/item\.salary\|\|'薪资未公布'/);
  assert.match(component,/item\.experience_requirement\|\|'经验未注明'/);
  assert.doesNotMatch(component,/想看看更多国内企业吗|本次已搜索|补充站外官方岗位/);
