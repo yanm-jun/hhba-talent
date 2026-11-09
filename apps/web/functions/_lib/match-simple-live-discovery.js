@@ -111,15 +111,18 @@ const PLACE_LABEL=/(?:工作地点|工作城市|工作地|工作地址|办公地
 export function mainlandWorkplaceEvidence(text){
  const input=typeof text==='string'?text.slice(0,14000):'';
  let labeled=false;
+ const cities=[];
  for(const match of input.matchAll(PLACE_LABEL)){
   labeled=true;
   const raw=match[1].split(/[。]/)[0].trim().replace(/\s*(?:岗位职责|任职要求|职位描述|资格要求).*$/,'');
   if(OUTSIDE.test(raw)||/(?:海外|境外|国外|全球|待定|remote worldwide|anywhere)/i.test(raw))
    return {city:null,foreign:true,labeled:true};
   const city=findMainlandCity(raw);
-  if(city)return {city,foreign:false,labeled:true};
+  // An explicit but unrecognized work location is NOT Mainland evidence.
+  if(!city)return {city:null,foreign:false,labeled:true};
+  cities.push(city);
  }
- return {city:null,foreign:false,labeled};
+ return {city:cities[0]||null,foreign:false,labeled};
 }
 function fetchedEvidence(candidate,page){
  const content=typeof page?.content==='string'?page.content.replace(/\r/g,'').slice(0,60000):'';
