@@ -233,3 +233,32 @@ test('Real-world careers layout: navigation above job title and separate Beijing
  const noCompany={...job,company_claim:null};
  assert.equal(provePublicEmployer(noCompany,homepage,'https://www.doodod.com/'),null);
 });
+
+test('Shared Feishu ATS tenant is a public JD but never an employer-owned homepage',()=>{
+ const url='https://anker-in.jobs.feishu.cn/index/position/7418141743487945014/detail';
+ const link=publicJobLink(url);
+ assert.ok(link,'a tenant-specific page can be discovered without employer API');
+ assert.equal(link.domain,'feishu.cn');
+ assert.equal(publicCorporatePage('https://anker-in.jobs.feishu.cn/'),null);
+ assert.equal(publicCorporatePage('https://www.hotjob.cn/'),null);
+ const jd=[
+  '# 内容运营','招聘单位：安克创新科技股份有限公司','工作地点：深圳',
+  '岗位职责','负责内容传播策划、创作者对接、数字活动执行与运营数据分析。'.repeat(5),
+  '任职要求','本科及以上学历，熟悉国内社交媒体内容运营及项目管理。'.repeat(5),
+  '立即申请'
+ ].join('\n');
+ const job=readPublicJob(link,{title:'内容运营 - 安克创新科技股份有限公司',content:jd},now);
+ assert.equal(job?.location,'深圳');
+ assert.equal(job?.source_status,'PUBLIC_JOB_UNCONFIRMED');
+ const corporate='https://www.anker.com/';
+ const siteBody='# 安克创新科技股份有限公司\n'+
+  ('安克创新科技股份有限公司官方品牌介绍、业务与人才招聘。').repeat(7);
+ const page={title:'安克创新科技股份有限公司 官网',content:siteBody};
+ assert.equal(inspectPublicEmployer(job,page,corporate).reason,'COMPANY_LINK_UNPROVEN',
+  'a brand mention without an official tenant backlink is insufficient');
+ const backed={...page,content:siteBody+'\n[官方招聘职位]('+url+')'};
+ const result=inspectPublicEmployer(job,backed,corporate);
+ assert.equal(result.reason,'VERIFIED');
+ assert.equal(result.job?.source_verification,'CORPORATE_EXACT_JOB_LINK');
+ assert.equal(result.job?.company,'安克创新科技股份有限公司');
+});
