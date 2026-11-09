@@ -7,6 +7,7 @@ import {discoverExternalOfficialJobs,sanitizedJobIntent} from '../../_lib/domest
 import {runDeepSeekOfficialJobAgent} from '../../_lib/deepseek-official-job-agent.js';
 import {previewJobBrowserRenderer} from '../../_lib/cf-job-browser-preview.js';
 import {createTrustedEmployerSourceCache} from '../../_lib/trusted-employer-source-cache.js';
+import {discoverOfficialRecruitmentLinks} from '../../_lib/official-recruitment-link-navigation.js';
 
 const KIND='HHBA_RESUME_MATCH_CLOUDFLARE_V1';
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
@@ -130,9 +131,13 @@ async function autoDiscoveryCandidates(env,db,phone,profile,opts){
    "SELECT name FROM sqlite_master WHERE type='table' AND name='hhba_external_search_requests'"
   ).first();
   if(table?.name!=='hhba_external_search_requests')return {candidates:[],status:'NOT_READY'};
-  const v8=env.HHBA_MATCH_V8_DEEPSEEK_AGENT_ENABLED==='1';
-  const browserRenderer=v8?previewJobBrowserRenderer(env):null;
-  const sourceCacheRequested=v8&&env.HHBA_AUTH_ROLLOUT==='preview'&&
+  // Explicit opt-in link-first pilot. Do not replace production or V8
+  // verified-vacancy ranking until its distinct success criteria are met.
+  const linkMode=env.HHBA_AUTH_ROLLOUT==='preview'&&
+   env.HHBA_MATCH_LINK_NAV_ENABLED==='1';
+  const v8=linkMode||env.HHBA_MATCH_V8_DEEPSEEK_AGENT_ENABLED==='1';
+  const browserRenderer=v8&&!linkMode?previewJobBrowserRenderer(env):null;
+  const sourceCacheRequested=v8&&!linkMode&&env.HHBA_AUTH_ROLLOUT==='preview'&&
    env.HHBA_MATCH_V8_SOURCE_CACHE_ENABLED==='1';
   // Never spend for a V8 experiment until cost auditing is writable.
   if(v8){
@@ -170,8 +175,10 @@ async function autoDiscoveryCandidates(env,db,phone,profile,opts){
    return {candidates:[],status:'LIMITED'};
   // V8 is explicit opt-in and inherits the existing authenticated user's
   // one-click Search quota. The model only receives sanitized role names.
-  const data=v8?
-   await runDeepSeekOfficialJobAgent(intent,env.HHBA_MATCH_DEEPSEEK_KEY,
+  const data=linkMode?
+   await discoverOfficialRecruitmentLinks(intent,env.HHBA_MATCH_DEEPSEEK_KEY,
+    {limit:opts.limit}):
+   v8?await runDeepSeekOfficialJobAgent(intent,env.HHBA_MATCH_DEEPSEEK_KEY,
     {targetCount:opts.limit,browserRenderer,trustedSourceCache}):
    await discoverExternalOfficialJobs(intent,env.HHBA_MATCH_DEEPSEEK_KEY,{expanded:true});
   if(v8){
@@ -209,7 +216,10 @@ async function autoDiscoveryCandidates(env,db,phone,profile,opts){
      throw Error('BROWSER_COST_LOG_FAILED');
    }
   }
-  return {candidates:data.candidates,usage:v8?data.usage:null,accounting:v8?data.accounting:null,
+  return {candidates:linkMode?[]:data.candidates,
+   opportunities:linkMode?data.opportunities:[],
+   quality_status:linkMode?data.quality_status:null,
+   usage:v8?data.usage:null,accounting:v8?data.accounting:null,
    status:data.status==='PARTIAL'?'PARTIAL':'COMPLETE'};
  }catch(e){
   // A partial upstream request could have consumed credits, so the reservation
@@ -373,11 +383,13 @@ export async function onRequest({request,env}){
  return json({status:'COMPLETE',profile,matches:merged.matches,
   matched_official_jobs:merged.counts.distinct_verified_sources,
   qualification_reviews:merged.qualification_reviews,
+  opportunities:discovered.opportunities||[],
+  opportunity_quality_status:discovered.quality_status||null,
   discovery_status:discovered.status,
   discovery_usage:discovered.usage||null,
   discovery_cost_estimate:discovered.accounting||null,
-  source:'中国大陆境内真实岗位（站内审计与 DeepSeek 公开网页检索）',
-  scoring:'严格筛选已明确的学历、工作年限与工作地点要求后进行参考评分；不代表录用概率',
+  source:'站内已核验岗位 + 公开企业招聘链接导航（导航链接不等于职位资格已核验）',
+  scoring:'仅对已核验岗位做资格审核与参考排序；招聘入口不计算录用成功率或匹配分数',
   privacy:'本次脱敏简历文本仅用于已授权的 AI 分析；联网招聘搜索只传岗位方向，不发送姓名、电话或简历',
-  disclaimer:'只推荐中国大陆境内职位；当前招聘状态、薪资与申请资格以企业官网为准。'});
+  disclaimer:'已核验岗位限中国大陆；官方招聘入口需在企业官网选择中国大陆岗位，具体城市、职位要求及开放状态由用户核实。'});
 }
