@@ -22,7 +22,7 @@ const CLOSED=/(?:职位已关闭|该职位已下线|岗位已下线|停止招聘
 const HAS_DUTIES=/(?:岗位职责|工作职责|职位职责|岗位描述|工作内容|主要职责)/;
 const HAS_REQUIREMENTS=/(?:岗位基本要求|岗位要求|任职要求|任职资格|职位要求|资格要求|应聘要求|职责要求)/;
 const HAS_APPLY=/(?:申请岗位|立即申请|立即投递|投递岗位|投递简历|申请职位)/;
-const ROLE_TITLE=/(?:工程师|研发|设计师|分析师|架构师|研究员|数据科学|顾问|产品经理|运营|销售|法务|财务|审计|人力|实习生|技术专员|专家|总监|主管|负责人|scientist|engineer|analyst|designer|intern)/i;
+const ROLE_TITLE=/(?:工程师|研发|设计师|分析师|架构师|研究员|数据科学|顾问|产品经理|运营|销售|法务|财务|审计|人力|政府事务|政府关系|公共事务|政策研究|项目申报|项目经理|实习生|技术专员|专家|总监|主管|负责人|scientist|engineer|analyst|designer|intern)/i;
 const BLOCK_INTENT=/(?:姓名|身份证|身份证号|手机号|电话号码|电子邮箱|我的电话|家庭住址|password|api.?key|bearer|secret|token|sk-[a-z0-9_-]+|忽略上述|执行指令)/i;
 export function sanitizedJobIntent(value){
  if(typeof value!=='string')return null;
@@ -50,6 +50,11 @@ export function sanitizedJobIntent(value){
   [/(?:电气工程|自动化工程师)/i,'电气工程师'],
   [/(?:建筑设计|建筑师|建筑规划)/i,'建筑设计师'],
   [/(?:土木工程|建筑工程|施工管理)/i,'土木工程师'],
+  [/(?:政府关系|政府事务|政企关系|政企事务|公共事务|government affairs|government relations)/i,'政府关系'],
+  [/(?:政策研究|产业政策|政策事务)/i,'政策研究'],
+  [/(?:政府项目申报|政策申报|项目申报专员)/i,'项目申报'],
+  [/(?:区域运营|门店运营|终端运营|销售运营|门店督导|区域督导|渠道运营|经销商运营)/i,'区域运营'],
+  [/(?:项目运营|项目管理|项目经理|项目统筹)/i,'项目运营'],
   [/(?:内容运营|新媒体运营|内容策划)/i,'内容运营'],
   [/(?:用户运营|社群运营)/i,'用户运营'],
   [/(?:市场营销|品牌营销|市场推广)/i,'市场营销'],
@@ -85,6 +90,11 @@ export function sanitizedJobIntent(value){
 // Fixed, server-owned search aliases. They are discovery hints, NEVER
 // evidence of an applicant's skills or of a position's active status.
 const OFFICIAL_QUERY_VARIANTS=Object.freeze({
+ '政府关系':['政府关系','政府事务','公共事务','政企关系'],
+ '政策研究':['政策研究','产业政策','政府政策研究'],
+ '项目申报':['项目申报','政策申报','政府项目申报'],
+ '区域运营':['区域运营','终端运营','门店运营','销售运营'],
+ '项目运营':['项目运营','项目管理','项目统筹'],
  '内容运营':['内容运营','新媒体运营','内容策划','短视频内容运营'],
  '用户运营':['用户运营','社群运营','用户增长运营','社区运营'],
  'Python 开发':['Python 开发','后端开发','软件开发','Python 后端'],
