@@ -78,6 +78,7 @@ function Row({item,onOpen}:{item:MatchedJob;onOpen:()=>void}){
     <span><Wallet size={13}/>{item.salary||'薪资未公布'}</span>
     <span><BriefcaseBusiness size={13}/>{item.experience_requirement||'经验未注明'}</span>
    </span>
+   {item.why_recommended?.summary&&<span className="hhba-match-job-why"><strong>为什么推荐：</strong>{item.why_recommended.summary}</span>}
   </span>
   <span className="hhba-match-job-score"><strong>{item.reference_score}<small>分</small></strong><span>参考匹配度</span></span>
   <ArrowUpRight className="hhba-match-job-arrow" size={17} aria-hidden="true"/>
@@ -97,6 +98,7 @@ function OfficialLinkRow({item,url}:{item:OfficialNavigationOpportunity;url:stri
     <span>{item.workplace}</span>
     <span>资格及在招状态待官网确认</span>
    </span>
+   {item.why_suggested&&<span className="hhba-match-job-why"><strong>推荐理由：</strong>{item.why_suggested}</span>}
   </span>
   <span className="hhba-match-navigation-action">打开招聘页</span>
   <ArrowUpRight className="hhba-match-job-arrow" size={17} aria-hidden="true"/>
@@ -155,11 +157,12 @@ export function CandidateMatchResultDialog({result,onClose}:{result:MatchRespons
        <span><BriefcaseBusiness size={15}/>{selected.experience_requirement||'经验未注明'}</span>
       </div>
       <section className="hhba-match-detail-section"><h3>为什么推荐给您</h3>
-       {selected.matched?.length?<ul>{selected.matched.map((reason,i)=><li key={i}><CheckCircle2 size={15}/>{reason}</li>)}</ul>:
-        <p>该岗位与您的求职方向有关，具体职责请参考企业招聘原文。</p>}
+       {selected.why_recommended?.evidence?.length?<ul>{selected.why_recommended.evidence.map((reason,i)=><li key={i}><CheckCircle2 size={15}/>{reason}</li>)}</ul>:
+        selected.matched?.length?<ul>{selected.matched.slice(0,3).map((reason,i)=><li key={i}><CheckCircle2 size={15}/>{reason}</li>)}</ul>:
+        <p>简历与岗位的具体契合证据不足，请参考企业职位原文。</p>}
       </section>
-      {Boolean(selected.not_evidenced?.length)&&<section className="hhba-match-detail-section">
-       <h3>需要进一步确认的条件</h3><ul>{selected.not_evidenced.map((gap,i)=><li key={i}>{gap}</li>)}</ul>
+      {Boolean(selected.why_recommended?.to_check?.length||selected.not_evidenced?.length)&&<section className="hhba-match-detail-section">
+       <h3>仍需核实</h3><ul>{(selected.why_recommended?.to_check?.length?selected.why_recommended.to_check:selected.not_evidenced||[]).slice(0,2).map((gap,i)=><li key={i}>{gap}</li>)}</ul>
       </section>}
       <section className="hhba-match-detail-section"><h3>岗位要求与投递</h3>
        <p>请在企业官方页面核实完整任职要求、薪资及最新招聘状态，匹配分数不代表录用概率。</p>
@@ -170,9 +173,14 @@ export function CandidateMatchResultDialog({result,onClose}:{result:MatchRespons
      </>:<>
       <div className="hhba-match-intro">
        <span className="hhba-match-eyebrow">招聘机会 · 官方链接直达</span>
-       <h2 id="hhba-match-dialog-title">找到相关招聘入口，直接查看</h2>
-       <p>优先展示与你的求职方向相关的企业招聘页面和岗位直达链接，可能跳转至企业使用的第三方招聘系统。公开链接不是资格审核结果，请在对应页面核实。</p>
+       <h2 id="hhba-match-dialog-title">根据你的简历，看看为什么推荐这些岗位</h2>
+       <p>优先展示匹配岗位及简历中的对应优势；找到相关招聘入口，直接查看。具体岗位、招聘状态和资格条件仍以企业官网为准。</p>
       </div>
+      {visibleMatches.length>0&&
+       <div className="hhba-match-list-heading hhba-match-verified-heading"><strong>为你匹配的岗位 <span>{visibleMatches.length} 个</span></strong><small>按参考相关度排序</small></div>}
+      {visibleMatches.length>0&&<div className="hhba-match-job-list">
+       {visibleMatches.map(job=><Row key={job.id} item={job} onOpen={()=>setSelectedId(job.id)}/>)}
+      </div>}
       {officialLinks.length>0&&<>
        <div className="hhba-match-list-heading"><strong>企业招聘链接 <span>{officialLinks.length} 个</span></strong><small>打开招聘官网或招聘系统</small></div>
        <div className="hhba-match-job-list" aria-label="企业官方招聘链接">
@@ -180,11 +188,6 @@ export function CandidateMatchResultDialog({result,onClose}:{result:MatchRespons
        </div>
        <p className="hhba-match-link-notice">这些公开链接仅用于招聘导航。即使页面已成功读取，也不代表企业身份、岗位在招、工作城市或个人资格均已独立核实。请在企业招聘页面自行确认中国大陆工作地点及申请条件。</p>
       </>}
-      {visibleMatches.length>0&&
-       <div className="hhba-match-list-heading hhba-match-verified-heading"><strong>已核验岗位 <span>{visibleMatches.length} 个</span></strong><small>按参考相关度排序</small></div>}
-      {visibleMatches.length>0&&<div className="hhba-match-job-list">
-       {visibleMatches.map(job=><Row key={job.id} item={job} onOpen={()=>setSelectedId(job.id)}/>)}
-      </div>}
       {!officialLinks.length&&!visibleMatches.length&&<div className="hhba-match-empty"><Building2 size={23}/><h3>暂未找到可核验的企业招聘入口</h3>
        <p>不会用招聘聚合站、境外工作或未经确认的链接凑满十条。你可以修改岗位方向再次查找。</p></div>}
       {Boolean(result.qualification_reviews?.length)&&<section className="hhba-match-review" aria-label="需要补充资料的岗位">
