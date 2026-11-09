@@ -33,3 +33,4 @@ jobs:
         run: |
           node --test apps/web/scripts/home-hover-drawer.contract.test.mjs
           node --experimental-strip-types --test apps/web/scripts/home-live-metrics.runtime.test.mjs
+          (cd apps/web && node --test scripts/home-people-banner.contract.test.mjs scripts/home-open-letter.contract.test.mjs)
