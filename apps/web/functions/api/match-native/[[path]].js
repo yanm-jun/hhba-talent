@@ -125,7 +125,7 @@ function nativeResponsePayload(result){
  };
 }
 
-export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetch,onProgress=()=>{},onPartial=()=>{},direction='direct'}={}){
+export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetch,onProgress=()=>{},onPartial=()=>{},direction='direct',signal=null}={}){
  const start=Date.now();
  const body={
   model:'deepseek-v4-pro',
@@ -144,7 +144,7 @@ export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetc
  let response;
  try{
   response=await fetcher('https://api.deepseek.com/responses',{
-   method:'POST',redirect:'manual',signal:AbortSignal.timeout(65000),
+   method:'POST',redirect:'manual',signal:signal?AbortSignal.any([signal,AbortSignal.timeout(65000)]):AbortSignal.timeout(65000),
    headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
    body:JSON.stringify(body)
   });
@@ -198,45 +198,69 @@ export function combineNativeBatches(groups,limit=10){
  }
  return jobs;
 }
-export async function runNativeDualMatch(key,text,roleHint,limit=10,{fetcher=fetch,onProgress=()=>{},onPartial=()=>{}}={}){
+// Return early when ten genuine Mainland posting objects have streamed,
+// or finish with verified partial results at the UX deadline. Never wait for
+// a stalled second provider call after the user's valid jobs are available.
+export async function runNativeDualMatch(key,text,roleHint,limit=10,{
+ fetcher=fetch,onProgress=()=>{},onPartial=()=>{},timeBudgetMs=42000
+}={}){
  const start=Date.now();
  const counts=limit<=5?[limit]:[Math.min(6,Math.ceil(limit/2)+1),Math.min(6,Math.ceil(limit/2)+1)];
  const directions=counts.length===1?['direct']:['direct','adjacent'];
- const snapshots=counts.map(()=>[]),lastResults=counts.map(()=>null);
- let emitted='';
+ const snapshots=counts.map(()=>[]),lastResults=counts.map(()=>null),controller=new AbortController();
+ let emitted='',resolveEnough,settledCount=0;
+ const enough=new Promise(resolve=>{resolveEnough=resolve;});
  const emit=()=>{
+  if(controller.signal.aborted)return;
   const combined=combineNativeBatches(snapshots,limit);
   const signature=combined.map(x=>x.company+'|'+x.title+'|'+x.recommendation_reason).join('^');
   if(signature!==emitted&&combined.length){
    emitted=signature;onPartial(combined);
   }
+  if(combined.length>=limit)resolveEnough();
  };
- const jobs=counts.map((count,index)=>runNativeJobMatch(key,text,roleHint,count,{
-  fetcher,direction:directions[index],
-  onProgress:stage=>onProgress(stage),
+ const tasks=counts.map((count,index)=>runNativeJobMatch(key,text,roleHint,count,{
+  fetcher,direction:directions[index],signal:controller.signal,
+  onProgress:stage=>{if(!controller.signal.aborted)onProgress(stage);},
   onPartial:partial=>{
-   snapshots[index]=partial;
-   emit();
+   if(!controller.signal.aborted){snapshots[index]=partial;emit();}
   }
  }).then(result=>{
-  lastResults[index]=result;
-  snapshots[index]=result.matches;
-  emit();
+  if(!controller.signal.aborted){lastResults[index]=result;snapshots[index]=result.matches;emit();}
   return result;
- }));
- const outcomes=await Promise.allSettled(jobs);
+ }).finally(()=>{settledCount++;}));
+ const allSettled=Promise.allSettled(tasks);
+ let timer;
+ const deadline=new Promise(resolve=>{
+  timer=setTimeout(()=>resolve({kind:'deadline'}),Math.min(60000,Math.max(50,timeBudgetMs)));
+ });
+ const completed=allSettled.then(outcomes=>({kind:'settled',outcomes}));
+ const winner=await Promise.race([completed,deadline,enough.then(()=>({kind:'enough'}))]);
+ clearTimeout(timer);
+ const early=winner.kind!=='settled';
+ // Cancels the costly DeepSeek search still running in the losing branch.
+ // allSettled absorbs the resulting rejections, preventing unhandled errors.
+ if(early)controller.abort();
  const combined=combineNativeBatches(snapshots,limit);
- const success=outcomes.filter(x=>x.status==='fulfilled');
- const errors=outcomes.filter(x=>x.status==='rejected');
- if(!success.length&&!combined.length)throw errors[0]?.reason||new Error('AI_PROVIDER_UNAVAILABLE');
- const duration=Date.now()-start;
- return {matches:combined,diagnostic:{
+ const results=winner.kind==='settled'?winner.outcomes:[];
+ const success=results.filter(x=>x.status==='fulfilled');
+ const errors=results.filter(x=>x.status==='rejected');
+ if(!combined.length&&!success.length){
+  if(winner.kind==='deadline'){
+   const err=new Error('AI_PROVIDER_SLOW');err.code=err.message;throw err;
+  }
+  throw errors[0]?.reason||new Error('AI_PROVIDER_UNAVAILABLE');
+ }
+ const interrupted=winner.kind==='deadline'||(winner.kind==='enough'&&settledCount<counts.length);
+ const incomplete=(combined.length<limit)&&(interrupted||errors.length>0);
+ return {matches:combined,incomplete,diagnostic:{
   model:'deepseek-v4-pro',searches:lastResults.reduce((n,x)=>n+(x?.diagnostic?.searches||0),0),
   page_reads:lastResults.reduce((n,x)=>n+(x?.diagnostic?.page_reads||0),0),
   provider_items:lastResults.reduce((n,x)=>n+(x?.diagnostic?.provider_items||0),0),
   visible_jobs:combined.length,discarded:lastResults.reduce((n,x)=>n+(x?.diagnostic?.discarded||0),0),
-  elapsed_ms:duration,parallel_requests:counts.length,failed_requests:errors.length
- },incomplete:errors.length>0};
+  elapsed_ms:Date.now()-start,parallel_requests:counts.length,
+  failed_requests:errors.length,finished_early:early,deadline_reached:winner.kind==='deadline'
+ }};
 }
 
 export async function onRequest({request,env}){
