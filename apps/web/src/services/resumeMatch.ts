@@ -171,7 +171,8 @@ export function safeExternalJobApplicationUrl(job:MatchedJob):string|null{
    typeof job.source==='string'&&u.hostname.toLowerCase()===job.source.toLowerCase()&&
    job.official_url.length<=1500&&
    /(?:job|jobs|position|career|recruit|talent|campus|hiring|vacanc|advertisement|detail|post|offer|opportunit)/i.test(u.pathname+' '+u.hostname)){
-   if(/(?:^|\.)(?:google|bing|baidu|zhihu|weibo|douyin|xiaohongshu|linkedin|indeed|glassdoor|zhipin|51job|liepin|lagou|jobui|kanzhun|github|csdn)\.(?:com|cn|org|net|io)$/i.test(u.hostname))return null;
+   if(/(?:^|\.)(?:zhihu|weibo|douyin|xiaohongshu|linkedin|indeed|glassdoor|zhipin|51job|liepin|lagou|jobui|kanzhun|github|csdn)\.(?:com|cn|org|net|io)$/i.test(u.hostname))return null;
+   if(['google.com','www.google.com','bing.com','www.bing.com','baidu.com','www.baidu.com','m.baidu.com'].includes(u.hostname.toLowerCase()))return null;
    if([...u.searchParams.keys()].some(k=>/(?:password|access_token|auth|session|redirect_uri)/i.test(k)))return null;
    return u.href;
   }
