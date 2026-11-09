@@ -147,7 +147,7 @@ test('generic job listings must not be passed off as direct individual apply pag
 });
 
 test('actual regional sales supervisor CV remains brand-supervisor intent, not product manager',()=>{
- const resume='工作职位：上汽集团（MG 名爵）区域门店督导/终端运营；驻店八个月辅导经销商经营改善，DCC管理与销售顾问培训。意向岗位：品牌督导。意向城市：上海。';
+ const resume='工作职位：某汽车企业区域门店督导及终端运营；负责经销商经营改善、客户管理与人员培训。意向岗位：品牌督导。意向城市：上海。';
  const roles=simpleJobDirections('品牌督导',{target_roles:['品牌督导']},resume);
  assert.equal(roles[0],'品牌督导');
  const queries=simpleJobQueries(roles,['上海']);
