@@ -283,3 +283,65 @@ test('duplicate company and title across cities do not consume two Top10 slots',
  const third={...first,company:'另一家公司',official_url:'https://careers.bar.cn/jobs/role-003'};
  assert.deepEqual(combineNativeBatches([[first],[second,third]],10).map(x=>x.company),['某公司','另一家公司']);
 });
+
+
+test('a stalled second DeepSeek request cannot block completed real job cards for 65 seconds',async()=>{
+ let calls=0,aborted=false;
+ const one={...answer.jobs[0],company:'真实测试企业'};
+ const fetcher=async(_url,options)=>{
+  calls++;
+  if(calls===1)return new Response(JSON.stringify(deepseek([one])),{status:200});
+  return new Promise((resolve,reject)=>{
+   options.signal.addEventListener('abort',()=>{
+    aborted=true;const e=new Error('abort');e.name='AbortError';reject(e);
+   },{once:true});
+  });
+ };
+ const shown=[];
+ const start=Date.now();
+ const result=await runNativeDualMatch('synthetic-secret-not-real','上海区域督导工作经验',
+  '品牌督导',10,{fetcher,timeBudgetMs:60,onPartial:x=>shown.push(x.length)});
+ assert.equal(calls,2);
+ assert.ok(Date.now()-start<1800,'one stalled search must never gate returned jobs');
+ assert.deepEqual(shown,[1]);
+ assert.equal(result.matches.length,1);
+ assert.equal(result.incomplete,true);
+ assert.equal(result.diagnostic.finished_early,true);
+ assert.equal(result.diagnostic.deadline_reached,true);
+ assert.equal(aborted,true);
+});
+test('when ten distinct job objects have streamed, stop waiting for final provider events',async()=>{
+ let cancelled=0;
+ const jobsFor=i=>Array.from({length:5},(_,j)=>({
+  company:'企业'+i+'-'+j,title:'区域督导'+i+'-'+j,location:'上海',
+  url:'https://careers.enterprisechina.com/jobs/region-'+i+'-'+j+'-2026',
+  reason:'有经销商经营与培训方面可对应岗位的真实工作经历，需要确认行业招聘要求。'
+ }));
+ let count=0;
+ const fetcher=async(_url,options)=>{
+  const i=count++;
+  const output='{"jobs":'+JSON.stringify(jobsFor(i))+']';
+  const events=[
+   {type:'response.created',response:{status:'in_progress'}},
+   {type:'response.web_search_call.completed'},
+   {type:'response.output_text.delta',delta:output}
+  ].map(x=>'event: '+x.type+'\ndata: '+JSON.stringify(x)+'\n\n').join('');
+  return new Response(new ReadableStream({
+   start(controller){
+    controller.enqueue(new TextEncoder().encode(events));
+    options.signal.addEventListener('abort',()=>{
+     cancelled++;controller.close();
+    },{once:true});
+   }
+  }),{status:200,headers:{'Content-Type':'text/event-stream'}});
+ };
+ const snapshots=[];
+ const result=await runNativeDualMatch('synthetic-secret-not-real','上海品牌督导工作经历',
+  '品牌督导',10,{fetcher,timeBudgetMs:1000,onPartial:jobs=>snapshots.push(jobs.length)});
+ assert.equal(result.matches.length,10);
+ assert.equal(count,2);
+ assert.equal(cancelled,2);
+ assert.equal(result.incomplete,false);
+ assert.ok(snapshots.includes(10));
+ assert.equal(result.diagnostic.finished_early,true);
+});
