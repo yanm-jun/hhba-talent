@@ -170,3 +170,29 @@ test('Single fetched HTML JobPosting can supply work city; conflicting, foreign 
    address:{addressLocality:'北京',addressCountry:'CN'}}}]})},now,{});
  assert.equal(multi,null);
 });
+
+test('Employer single-position metadata uses fulltime header city but never employer office or related jobs',()=>{
+ const url='https://www.shlab.org.cn/joinus/detail/7683111551720704299?location=CT_125&mode=social';
+ const info=[
+  '# 产品运营主管（科研生态运营/内容运营）- 科研产品平台部',
+  '产品规划中心｜全职｜科研通道｜上海',
+  '2026-11-04','岗位职责',
+  '负责合作机构和科研用户的内容平台建设及科研生态运营。'.repeat(5),
+  '任职要求','本科及以上学历，熟悉科研用户及互联网产品运营工作。'.repeat(5),
+  '立即申请'
+ ].join('\n');
+ const job=readPublicJob(publicJobLink(url),
+  {title:'岗位详情 | 上海人工智能实验室',content:info},now);
+ assert.equal(job?.location,'上海');
+ assert.equal(job?.evidence.location_evidence_type,'JOB_HEADER_CITY');
+ const falsePage=info.replace('产品规划中心｜全职｜科研通道｜上海',
+  '上海人工智能实验室总部地址：上海');
+ assert.equal(readPublicJob(publicJobLink(url),
+  {title:'岗位详情 | 上海人工智能实验室',content:falsePage},now,{}),null);
+ const conflict=info.replace('产品规划中心｜全职｜科研通道｜上海',
+  '产品规划中心｜全职｜科研通道｜上海\n岗位城市：北京');
+ const reject={};
+ assert.equal(readPublicJob(publicJobLink(url),
+  {title:'岗位详情 | 上海人工智能实验室',content:conflict},now,reject),null);
+ assert.equal(reject.AMBIGUOUS_WORKPLACE,1);
+});
