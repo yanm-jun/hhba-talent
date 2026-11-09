@@ -42,7 +42,7 @@ export function EmployerAidApplicationPage({user}:{user:User|null}){
  const eligible=proofs.filter(x=>x.category==='business_integrity'&&x.status==='verified'&&x.security_status==='clean');
  return <Shell user={user}><main className="ac-page">
    <Link to="/employer/aid" className="ac-back"><ArrowLeft size={15}/> 返回 HHBA 企业发展帮扶</Link>
-   <div className="ac-heading"><p>HHBA · 企业发展帮扶 / 模块 11</p><h1>让真正善待员工的企业，获得更多机会。</h1><p>企业可以提出帮扶申请，由平台独立核验公开信誉、员工关怀与实际业务交付能力。申请成功不等于审批通过；审批通过也不保证获得订单。</p></div>
+   <div className="ac-heading"><p>汇方职场 · HHBA · 企业发展帮扶 / 模块 11</p><h1>让真正善待员工的企业，获得更多机会。</h1><p>企业可以提出帮扶申请，由平台独立核验公开信誉、员工关怀与实际业务交付能力。申请成功不等于审批通过；审批通过也不保证获得订单。</p></div>
    <Notice>公开评分和员工善待是资格依据之一，仍必须经过经营交付材料及人工审批。当前不开放付费买分、买推荐资格或自动通过。</Notice>
    {!aidCommercialApiReady&&<div className="ac-gate" role="status"><LockKeyhole size={22}/><div><strong>真实企业帮扶申请尚未开放</strong><p>当前为功能预览；尚未接入可信企业账户、正式帮扶资格政策和安全审批服务。请不要上传合同、员工工资或商业秘密。</p></div></div>}
    {aidCommercialApiReady&&<div className="ac-org"><Building2 size={19}/><label>当前企业 <select value={org} onChange={e=>setOrg(e.target.value)}><option value="">请选择企业</option>{organizations.map(x=><option key={x.id} value={x.id}>{x.legal_name}</option>)}</select></label></div>}
@@ -80,7 +80,7 @@ export function EmployerCommercialPage({user}:{user:User|null}){
  },[selected]);
  return <Shell user={user}><main className="ac-page">
    <Link to="/employer/aid/apply" className="ac-back"><ArrowLeft size={15}/> 返回帮扶申请</Link>
-   <div className="ac-heading"><p>HHBA · 商业协作跟进 / 模块 12</p><h1>客户引荐与真实商业合作记录</h1><p>把每一次被允许的介绍、双方合作意向与洽谈进展记录清楚。只有独立审核真实订单凭证后，才可显示已核实订单。</p></div>
+   <div className="ac-heading"><p>汇方职场 · HHBA · 商业协作跟进 / 模块 12</p><h1>客户引荐与真实商业合作记录</h1><p>把每一次被允许的介绍、双方合作意向与洽谈进展记录清楚。只有独立审核真实订单凭证后，才可显示已核实订单。</p></div>
    <Notice>这不是一个独立交易商城，也不收集或公开客户联系人名单。买方信息采用受限内部编号；引荐、谈判和实际成交有严格区分。</Notice>
    {!aidCommercialApiReady&&<div className="ac-gate" role="status"><LockKeyhole size={22}/><div><strong>真实客户引荐后台尚未开放</strong><p>当前没有真实客户线索或订单。平台需要完成客户知情同意、企业帮扶资格和独立核实后才能进行商业对接。</p></div></div>}
    {aidCommercialApiReady&&<div className="ac-org"><Building2 size={18}/><label>当前企业 <select value={selected} onChange={e=>setSelected(e.target.value)}><option value="">选择企业</option>{organizations.map(x=><option key={x.id} value={x.id}>{x.legal_name}</option>)}</select></label></div>}
@@ -115,7 +115,7 @@ export function AdminAidCommercialPage({user}:{user:User|null}){
  };
  return <Shell user={user}><main className="ac-page">
   <Link className="ac-back" to="/admin/employer-publication"><ArrowLeft size={15}/> 返回企业评分发布审核</Link>
-  <div className="ac-heading"><p>HHBA · 内部审批 / 模块 11–12</p><h1>帮扶审批与客户对接运营台</h1>
+  <div className="ac-heading"><p>汇方职场 · HHBA · 内部审批 / 模块 11–12</p><h1>帮扶审批与客户对接运营台</h1>
    <p>企业帮扶资格、客户同意和订单证明分别由独立权限审核。记录客户接触并不代表平台承诺成交，也不会因为企业高分自动生成订单。</p></div>
   {!enabled&&<div className="ac-gate" role="status"><LockKeyhole size={22}/><div><strong>真实帮扶审批与客户对接暂未开放</strong><p>静态预览中所有审批、客户引荐及订单核验均被禁用，不会产生任何虚构成交数据。</p></div></div>}
   {error&&<p className="ac-error" role="alert">{error}</p>}{notice&&<p className="ac-success" role="status">{notice}</p>}

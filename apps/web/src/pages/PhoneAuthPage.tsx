@@ -224,9 +224,9 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
         <div className="hhba-phone-card">
           <div className="hhba-auth-page-logo"><BrandMark variant="icon" size="hero" /></div>
           <div className="hhba-phone-heading">
-            <span className="hhba-phone-kicker">{candidate ? '求职者账户' : '招聘方账户'}</span>
+            <span className="hhba-phone-kicker">汇方职场 · {candidate ? '求职者账户' : '招聘方账户'}</span>
             <h1 id="hhba-phone-title">{mode === 'login' ? '欢迎回来' : '创建你的账户'}</h1>
-            <p>{mode === 'login' ? realPasswordLogin ? '使用注册称呼和密码登录，继续你在 HHBA 的旅程。' : '使用手机号登录，继续你在 HHBA 的旅程。' : '只需几步，即可开启你的 HHBA 账户。'}</p>
+            <p>{mode === 'login' ? realPasswordLogin ? '使用注册称呼和密码登录，继续你在汇方职场 HHBA 的旅程。' : '使用手机号登录，继续你在汇方职场 HHBA 的旅程。' : '只需几步，即可开启你的汇方职场 HHBA 账户。'}</p>
           </div>
           <div className="hhba-phone-identity">
             <span className="hhba-phone-identity-icon" aria-hidden="true">{candidate ? <UserRound size={17} /> : <Building2 size={17} />}</span>
@@ -326,7 +326,7 @@ export function PhoneAuthPage({ user, onUser, accountType, initialMode }: Props)
           <span aria-hidden="true">·</span>
           <Link to={candidate ? '/candidate/jobs' : '/employer/start'}>{candidate ? '先看看招聘市场' : '了解企业服务'} <ArrowRight size={14} /></Link>
         </div>
-        <div className="hhba-phone-footer"><LockKeyhole size={13} /> HHBA · 让劳动更有尊严，让商业更有温度</div>
+        <div className="hhba-phone-footer"><LockKeyhole size={13} /> 汇方职场 · HHBA · 让劳动更有尊严，让商业更有温度</div>
       </section>
     </Shell>
   );

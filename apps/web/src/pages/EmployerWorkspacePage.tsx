@@ -59,7 +59,7 @@ export function EmployerWorkspacePage({user}:{user:User|null}){
  }
  if(!user&&employerApiReady){navigate('/recruiter/login?next='+encodeURIComponent('/employer/workspace'));return null}
  return <Shell user={user}><main className="employer-workspace">
-  <div className="employer-ws-top"><span className="page-kicker">HHBA 企业招聘工作台</span><h1>发布真实岗位，寻找已授权的人才。</h1>
+  <div className="employer-ws-top"><span className="page-kicker">汇方职场 HHBA 企业招聘工作台</span><h1>发布真实岗位，寻找已授权的人才。</h1>
    <p>先完成企业主体和招聘经办人认证。岗位需经平台审核才会对外发布，人才搜索只返回明确同意企业检索的候选人。</p></div>
   {!employerApiReady&&<section className="employer-ws-offline" role="status"><ShieldCheck size={20}/><div><strong>企业功能预览版 · 暂未连接正式业务服务器</strong><p>现在可以查看企业认证、岗位发布、人才检索的页面结构；真实提交、人工审核和授权人才数据查询尚未开放。不会生成模拟数据。</p></div></section>}
   <div className="employer-ws-company"><Building2 size={20}/><label>当前企业

@@ -26,7 +26,7 @@ test('letter is manually opened on homepage, or explicitly opened from a shared 
 });
 test('accessible non-blocking envelope, full letter, exit and share controls', () => {
   for (const word of ['role="dialog"','aria-modal="true"','aria-labelledby="hhba-letter-title"','data-letter-open','data-letter-close',
-    '拆开这封信','暂不阅读，进入首页','读完了，进入 HHBA','分享这封信','复制链接','navigator.share','navigator.clipboard.writeText',
+    '拆开这封信','暂不阅读，进入首页','读完了，进入汇方职场 HHBA','分享这封信','复制链接','navigator.share','navigator.clipboard.writeText',
     'Escape','Tab','document.body.style.overflow','createPortal']) assert.ok(modal.includes(word), 'Missing '+word);
   assert.match(css, /prefers-reduced-motion:reduce/);
   assert.match(css, /@media\(max-width:560px\)/);

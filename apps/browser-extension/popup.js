@@ -35,7 +35,7 @@ $("clear").addEventListener("click",async()=>{
 $("export").addEventListener("click",()=>{
  try{
   const raw=captureProfile();const blob=new Blob([exportProfile(raw)],{type:"application/json"});
-  const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="HHBA-求职档案.json";a.click();
+  const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="汇方职场-HHBA-求职档案.json";a.click();
   setTimeout(()=>URL.revokeObjectURL(url),1500);status("已导出档案，请妥善保管文件。");
  }catch(err){status(err.message,true)}
 });

@@ -122,7 +122,7 @@ export function ApplyAssistantProduct({userId}:{userId:string|number|undefined})
   <div className="hhba-apply-breadcrumb"><Link to="/candidate/account">个人工作台</Link><ChevronRight size={13}/>一键网申</div>
   <div className="hhba-apply-hero">
    <div className="hhba-apply-hero-copy">
-    <span className="hhba-apply-kicker"><Sparkles size={14}/> HHBA AI APPLY ASSISTANT</span>
+    <span className="hhba-apply-kicker"><Sparkles size={14}/> 汇方职场 · HHBA AI APPLY ASSISTANT</span>
     <h2>网申，不必再<br/>重复填写。</h2>
     <p>让 AI 理解招聘表单和你的求职资料，帮助完成反复的信息录入。重要信息由你核对，正式申请由你确认。</p>
     <div className="hhba-apply-tags"><span><CheckCircle2 size={14}/>智能识别表单</span><span><CheckCircle2 size={14}/>逐项自动填写</span><span><CheckCircle2 size={14}/>人工最终确认</span></div>

@@ -44,6 +44,6 @@ export const HHBA_PUBLIC_LETTER: PublicLetterPart[] = [
   {kind:'emphasis',text:'从人民中来，到人民中去。'},
   {text:'感谢你愿意读完这封信。'},
   {text:'也感谢每一个认真生活的人。'},
-  {kind:'signature',text:'HHBA 团队 敬上'},
+  {kind:'signature',text:'汇方职场 HHBA 团队 敬上'},
   {kind:'signature',text:'2026年10月'},
 ];

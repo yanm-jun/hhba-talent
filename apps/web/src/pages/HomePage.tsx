@@ -25,7 +25,7 @@ export function HomePage({user}:{user:User|null}){
   <HomeLiveDrawer/>
   <section className="home-hero hhba-public-hero">
    <div className="hhba-public-hero-logo"><BrandMark variant="icon" size="hero"/></div>
-   <p className="hhba-public-eyebrow">HHBA · HUMAN CAPABILITY NETWORK</p>
+   <p className="hhba-public-eyebrow"><span className="hhba-public-brand-cn">汇方职场</span><span>HHBA · HUMAN CAPABILITY NETWORK</span></p>
    <h1>让机会与人才，找到彼此。</h1>
    <p>你来到这里，是为了什么？</p>
    <button type="button" className="hhba-letter-revisit" onClick={()=>window.dispatchEvent(new Event('hhba:open-letter'))}><span aria-hidden="true">✉</span> 读一封来自 HHBA 的信</button>
@@ -53,7 +53,7 @@ export function HomePage({user}:{user:User|null}){
    <Link to="/talent-service" style={{display:'inline-flex',alignItems:'center',gap:7,color:'#28674d',fontSize:13,fontWeight:700,textDecoration:'none'}}>了解人才服务 <ArrowUpRight size={15}/></Link>
   </section>
   <HomeCompanyMarquee/>
-  <footer className="hhba-brand-home-footer"><BrandMark variant="signature" size="small"/><p>Human Capability Network · HHBA</p></footer>
+  <footer className="hhba-brand-home-footer"><BrandMark variant="signature" size="small"/><p>汇方职场 · Human Capability Network · HHBA</p></footer>
   <HomeOpenLetter autoOpen={false}/>
   <WinterInternshipPopup/>
  </Shell>;

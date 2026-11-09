@@ -8,12 +8,12 @@ import '../styles/data-use.css';
 export function DataUsePage({user}:{user:User|null}){
  return <Shell user={user}>
   <article className="hhba-data-use" aria-labelledby="hhba-data-use-heading">
-   <span className="hhba-data-use-kicker">HHBA · 数据透明</span>
+   <span className="hhba-data-use-kicker">汇方职场 · HHBA · 数据透明</span>
    <h1 id="hhba-data-use-heading">运营数据使用说明</h1>
    <p className="hhba-data-use-lead">我们希望网站正常使用时不反复打断你，同时如实说明平台记录了哪些运营数据、哪些数据没有采集。</p>
    <section>
     <h2>不关联访客身份的运营事件</h2>
-    <p>为了解页面和服务的实际使用情况，HHBA 对公开页面访问、岗位浏览、岗位搜索操作及前往官方招聘链接的点击进行次数汇总。每条记录包含 UTC 日期、事件类型和写入时间；服务端为每次事件生成不可复用的随机记录值，仅用于事件行区分。</p>
+    <p>为了解页面和服务的实际使用情况，汇方职场（HHBA）对公开页面访问、岗位浏览、岗位搜索操作及前往官方招聘链接的点击进行次数汇总。每条记录包含 UTC 日期、事件类型和写入时间；服务端为每次事件生成不可复用的随机记录值，仅用于事件行区分。</p>
     <p>此类事件不会写入手机号、登录账号、简历、搜索词、具体网页路径或岗位编号；不为访问统计设置访客 Cookie，也不会使用跨次访问的固定访客标识。浏览器的 DNT/GPC 隐私偏好和此前明确拒绝统计的选择会继续受到尊重。</p>
     <p>这些是实际发生的<strong>事件次数</strong>，不是去重访客人数。平台不会用 PV 推算 UV、DAU、WAU、MAU 或账号留存率。</p>
    </section>

@@ -46,7 +46,7 @@ export function CompanyDirectoryPage({user}:{user:User|null}){
  return <Shell user={user}><section className="company-profile company-directory">
   <nav className="company-profile-top">
    <Link to="/candidate/jobs"><ArrowLeft size={15}/>返回招聘市场</Link>
-   <span className="company-directory-counter">HHBA · COMPANIES</span>
+   <span className="company-directory-counter">汇方职场 · HHBA · COMPANIES</span>
   </nav>
   <header className="company-directory-header">
    <h1>企业资料库</h1>

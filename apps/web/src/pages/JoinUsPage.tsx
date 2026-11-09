@@ -220,7 +220,7 @@ function BrandManifesto() {
   return <section ref={sectionRef} className="join-manifesto-section" id="join-manifesto" aria-labelledby="join-manifesto-title">
     <div className="join-manifesto-inner">
       <header className="join-manifesto-intro" data-manifesto-reveal>
-        <p className="join-manifesto-eyebrow">A NOTE FROM HHBA'S FOUNDER</p>
+        <p className="join-manifesto-eyebrow">汇方职场 · A NOTE FROM HHBA'S FOUNDER</p>
         <h2 id="join-manifesto-title">让劳动更有尊严，让商业更有温度</h2>
       </header>
       <article className="join-manifesto-copy" aria-label="HHBA 品牌宣言全文">
@@ -234,7 +234,7 @@ function BrandManifesto() {
       </article>
       <footer className="join-manifesto-signoff" data-manifesto-reveal>
         <span className="join-manifesto-rule" aria-hidden="true" />
-        <p className="join-manifesto-identity">HHBA — Human Capability Network</p>
+        <p className="join-manifesto-identity">汇方职场 · HHBA — Human Capability Network</p>
         <p className="join-manifesto-tagline">让机会与人才，找到彼此。</p>
         <p className="join-manifesto-founder-label">创办者 · 闫明骏</p>
         <img className="join-manifesto-signature"
@@ -341,7 +341,7 @@ export function JoinUsPage({ user }: { user: User | null }) {
     <div className="join-page">
       <section className="join-hero" aria-labelledby="join-title">
         <div className="join-hero-main">
-          <p className="join-kicker"><span className="join-kicker-dot" aria-hidden="true"/> HHBA · 早期核心团队招募</p>
+          <p className="join-kicker"><span className="join-kicker-dot" aria-hidden="true"/> 汇方职场 · HHBA · 早期核心团队招募</p>
           <h1 id="join-title">我们不只想帮人找到好工作。<br /><span>我们还想创造一家值得工作的公司。</span></h1>
           <p className="join-hero-desc">从尊重劳动者开始，从认真建设产品开始。我们正在寻找相信长期价值、愿意共同创造、也希望分享成果的同行者。</p>
           <div className="join-hero-actions">
@@ -519,7 +519,7 @@ export function JoinUsPage({ user }: { user: User | null }) {
           </form>}
         </div>
       </section>
-      <footer className="join-footer"><strong>HHBA.</strong><span>让机会与人才，找到彼此。也让真正的建设者，共同分享未来。</span></footer>
+      <footer className="join-footer"><strong>HHBA. · 汇方职场</strong><span>让机会与人才，找到彼此。也让真正的建设者，共同分享未来。</span></footer>
     </div>
   </Shell>;
 }

@@ -125,7 +125,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
     <nav className="hhba-ai-breadcrumb"><Link to="/candidate"><ArrowLeft size={15}/> 我要应聘</Link>
      <span>/</span><strong>简历智能匹配</strong></nav>
     <div className="hhba-ai-hero">
-      <div className="hhba-ai-kicker"><BriefcaseBusiness size={16}/> HHBA · AI JOB MATCH</div>
+      <div className="hhba-ai-kicker"><BriefcaseBusiness size={16}/> 汇方职场 · HHBA · AI JOB MATCH</div>
       <h1>上传简历，匹配中国大陆岗位。</h1>
       <p>根据学历、经历与技能匹配中国大陆的核验职位；结果在独立弹窗中精简展示，可随时关闭返回修改。</p>
       <div className="hhba-ai-headline-tags"><span>仅中国大陆</span><span>无须自备 API Key</span><span>可返回修改</span></div>

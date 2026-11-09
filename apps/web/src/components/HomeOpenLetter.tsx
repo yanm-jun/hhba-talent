@@ -99,9 +99,9 @@ export function HomeOpenLetter({autoOpen = true}:{autoOpen?:boolean} = {}) {
       <style>{`@font-face{font-family:"HHBA People Xingshu";src:url("${fontUrl}") format("woff2");font-style:normal;font-weight:400;font-display:swap}`}</style>
       <div className="hhba-letter-panel" role="dialog" aria-modal="true" aria-labelledby="hhba-letter-title">
         {stage === 'envelope' ? (
-          <section className="hhba-letter-intro" aria-label="来自 HHBA 的一封信">
+          <section className="hhba-letter-intro" aria-label="来自汇方职场 HHBA 的一封信">
             <button className="hhba-letter-close" onClick={dismiss} type="button" aria-label="关闭公开信，进入首页" data-letter-close><X size={20}/></button>
-            <p className="hhba-letter-kicker">HHBA · A LETTER TO EVERYONE</p>
+            <p className="hhba-letter-kicker">汇方职场 · HHBA · A LETTER TO EVERYONE</p>
             <p className="hhba-letter-eyebrow">你收到一封信</p>
             <button type="button" className="hhba-letter-envelope" onClick={()=>setStage('letter')} data-letter-open aria-label="拆开这封信">
               <span className="hhba-letter-envelope-paper" aria-hidden="true"/>
@@ -120,9 +120,9 @@ export function HomeOpenLetter({autoOpen = true}:{autoOpen?:boolean} = {}) {
             <p className="hhba-letter-feedback" role="status" aria-live="polite">{feedback}</p>
           </section>
         ) : (
-          <section className="hhba-letter-paper" aria-label="HHBA 完整公开信">
+          <section className="hhba-letter-paper" aria-label="汇方职场 HHBA 完整公开信">
             <header className="hhba-letter-paper-head">
-              <span>HHBA · A LETTER TO EVERYONE</span>
+              <span>汇方职场 · HHBA · A LETTER TO EVERYONE</span>
               <button type="button" data-letter-close onClick={dismiss} className="hhba-letter-close" aria-label="关闭公开信，进入首页"><X size={20}/></button>
             </header>
             <div className="hhba-letter-paper-title">
@@ -137,7 +137,7 @@ export function HomeOpenLetter({autoOpen = true}:{autoOpen?:boolean} = {}) {
             <footer className="hhba-letter-paper-footer">
               <button type="button" className="hhba-letter-outline" onClick={share}><Share2 size={16}/> 分享这封信</button>
               <button type="button" className="hhba-letter-copy" onClick={copyLink}><Copy size={15}/> 复制链接</button>
-              <button type="button" className="hhba-letter-primary" onClick={dismiss}>读完了，进入 HHBA <ArrowRight size={17}/></button>
+              <button type="button" className="hhba-letter-primary" onClick={dismiss}>读完了，进入汇方职场 HHBA <ArrowRight size={17}/></button>
             </footer>
             <p className="hhba-letter-paper-status" role="status" aria-live="polite">{feedback}</p>
           </section>

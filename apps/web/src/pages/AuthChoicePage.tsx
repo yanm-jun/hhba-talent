@@ -13,7 +13,7 @@ export function AuthChoicePage(){
    <div className="hhba-role-frame">
     <div className="hhba-auth-page-logo"><BrandMark variant="icon" size="hero"/></div>
     <div className="hhba-role-intro">
-     <h1 id="role-auth-title">欢迎来到 HHBA</h1>
+     <h1 id="role-auth-title">欢迎来到汇方职场 HHBA</h1>
      <p>选择你的使用身份，我们将带你进入相应的账户。</p>
     </div>
     <div className="hhba-role-options">
@@ -32,7 +32,7 @@ export function AuthChoicePage(){
     <div className="hhba-role-divider"><span>或</span></div>
     <Link className="hhba-role-browse" to="/candidate/jobs">暂不登录，浏览招聘市场 <ArrowRight size={15}/></Link>
    </div>
-   <p className="hhba-role-footer">HHBA · 让劳动更有尊严，让商业更有温度</p>
+   <p className="hhba-role-footer">汇方职场 · HHBA · 让劳动更有尊严，让商业更有温度</p>
   </section>
  </Shell>;
 }

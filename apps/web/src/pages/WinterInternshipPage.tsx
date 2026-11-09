@@ -69,7 +69,7 @@ function WinterDetail({user,id}:{user:User|null;id:string}){
  return <Shell user={user}>
   <main className="hhba-winter-page hhba-winter-detail" data-winter-page="detail">
    <Link className="hhba-winter-back" to="/winter-internship"><ArrowLeft size={16}/> 返回寒假实习岗位列表</Link>
-   <p className="hhba-winter-eyebrow">HHBA · 2027 WINTER INTERNSHIP</p>
+   <p className="hhba-winter-eyebrow">汇方职场 · HHBA · 2027 WINTER INTERNSHIP</p>
    <div className="hhba-winter-detail-panel"><div>
     <span className="hhba-winter-source-tag"><ShieldCheck size={14}/> {verificationLabel(p)}</span>
     <h1>{p.title}</h1><p className="hhba-winter-detail-company">{p.company} · {p.english}</p>
@@ -119,7 +119,7 @@ function WinterJobDetail({user,job}:{user:User|null;job:WinterJob}){
  const url=winterJobSafeUrl(job);
  return <Shell user={user}><main className="hhba-winter-page hhba-winter-detail" data-winter-page="job-detail">
   <Link className="hhba-winter-back" to="/winter-internship"><ArrowLeft size={16}/> 返回寒假实习岗位列表</Link>
-  <p className="hhba-winter-eyebrow">HHBA · 2027 WINTER INTERNSHIP · JOB DETAIL</p>
+  <p className="hhba-winter-eyebrow">汇方职场 · HHBA · 2027 WINTER INTERNSHIP · JOB DETAIL</p>
   <div className="hhba-winter-detail-panel"><div>
    <span className="hhba-winter-source-tag"><ShieldCheck size={14}/>{winterJobStatusLabel(job)}</span>
    <h1>{job.title}</h1><p className="hhba-winter-detail-company">{job.company} · {job.english}</p>
@@ -195,7 +195,7 @@ export function WinterInternshipPage({user,slug}:{user:User|null;slug?:string}){
  }
  return <Shell user={user}><main className="hhba-winter-page hhba-winter-job-first" data-winter-page="directory">
   <section className="hhba-winter-job-hero">
-   <div><p className="hhba-winter-eyebrow">HHBA · 2027 WINTER INTERNSHIP</p>
+   <div><p className="hhba-winter-eyebrow">汇方职场 · HHBA · 2027 WINTER INTERNSHIP</p>
     <h1>寒假实习 · 直接找岗位</h1>
     <p>先看真实企业发布的具体岗位，再了解职位要求、时间和申请入口。</p>
    </div>

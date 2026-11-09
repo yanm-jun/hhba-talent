@@ -17,7 +17,7 @@ export function OfficialRecruitmentContinuePage({user}:{user:User|null}){
  return <Shell user={user}>
   <section className="hhba-outbound-gate">
    <div className="hhba-outbound-heading"><ShieldCheck size={27}/>
-    <p>HHBA · 招聘渠道访问</p><h1>继续访问企业官方招聘页面</h1>
+    <p>汇方职场 · HHBA · 招聘渠道访问</p><h1>继续访问企业官方招聘页面</h1>
     <span>您浏览过的企业与岗位信息仍然保留；仅在前往企业外部招聘系统前核对账户状态。</span>
    </div>
    <div className="hhba-outbound-panel">

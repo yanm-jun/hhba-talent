@@ -65,7 +65,7 @@ export function ResumeMatchPage({user}:{user:User|null}){
  return <Shell user={user}>
   <section className="resume-match-page">
    <nav className="resume-match-breadcrumb"><Link to="/candidate"><ArrowLeft size={15}/> 我要应聘</Link><span>/</span><strong>AI 简历岗位匹配</strong></nav>
-   <div className="resume-match-kicker"><SearchCheck size={17}/> HHBA · 岗位智能匹配</div>
+   <div className="resume-match-kicker"><SearchCheck size={17}/> 汇方职场 · HHBA · 岗位智能匹配</div>
    <h1>上传简历，找到真正适合你的官方职位。</h1>
    <p className="resume-match-intro">分析你的学历、工作经历与技能，结合 Greenhouse、Ashby、Lever 官方在招岗位，列出符合的条件、简历尚未证明的技能，以及需要向企业确认的要求。</p>
    <div className="resume-match-benefits">
