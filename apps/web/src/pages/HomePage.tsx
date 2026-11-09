@@ -7,6 +7,7 @@ import { HomePeopleBanner } from '../components/HomePeopleBanner';
 import { WinterInternshipPopup } from '../components/WinterInternshipPopup';
 import { HomeOpenLetter } from '../components/HomeOpenLetter';
 import { BrandMark } from '../components/BrandMark';
+import { HomeLiveDrawer } from '../components/HomeLiveDrawer';
 import type { User } from '../services/api';
 
 function EntryCard({kind,title,body,footer}:{kind:'candidate'|'employer';title:string;body:string;footer:string}){
@@ -22,6 +23,7 @@ function EntryCard({kind,title,body,footer}:{kind:'candidate'|'employer';title:s
 
 export function HomePage({user}:{user:User|null}){
  return <Shell user={user}>
+  <HomeLiveDrawer/>
   <section className="home-hero hhba-public-hero">
    <div className="hhba-public-hero-logo"><BrandMark variant="icon" size="hero"/></div>
    <p className="hhba-public-eyebrow">HHBA · HUMAN CAPABILITY NETWORK</p>

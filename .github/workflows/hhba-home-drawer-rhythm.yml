@@ -1,0 +1,29 @@
+name: HHBA Home Drawer Rhythm Acceptance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/components/HomeLiveDrawer.tsx'
+      - 'apps/web/src/components/homeLiveMetricsPreview.ts'
+      - 'apps/web/src/styles/home-live-drawer.css'
+      - 'apps/web/src/pages/HomePage.tsx'
+      - 'apps/web/scripts/home-*.test.mjs'
+      - '.github/workflows/hhba-home-drawer-rhythm.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify homepage hover panel and uninterrupted Beijing-time counts
+        run: |
+          node --test apps/web/scripts/home-hover-drawer.contract.test.mjs
+          node --experimental-strip-types --test apps/web/scripts/home-live-metrics.runtime.test.mjs
