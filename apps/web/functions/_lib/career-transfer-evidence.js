@@ -8,6 +8,8 @@ import {classifyOccupation} from './match-ranking.js';
 
 const PATHS=Object.freeze([
  {from:'sales',to:'operations',signals:['项目管理','数据分析','市场营销','沟通能力'],label:'客户与业务运营'},
+ {from:'sales',to:'content-operations',signals:['项目管理','数据分析','市场营销','沟通能力'],label:'内容与用户运营转型'},
+ {from:'marketing',to:'content-operations',signals:['项目管理','数据分析','市场营销'],label:'内容与增长运营'},
  {from:'sales',to:'marketing',signals:['数据分析','市场营销','项目管理'],label:'市场业务推广'},
  {from:'marketing',to:'operations',signals:['项目管理','数据分析','市场营销'],label:'内容与增长运营'},
  {from:'logistics',to:'supply-chain',signals:['Excel','数据分析','项目管理'],label:'采购与供应链协同'},
