@@ -5,6 +5,7 @@
 import {safeJobDetailLink,decodeSearchText} from './deepseek-native-match.js';
 import {isMainlandJobLocation} from './mainland-job-location.js';
 import {classifyJobAvailability,isRecommendationEligible,normalizeMatchScore,sortByMatchScore} from './match-job-quality.js';
+import {supplementalQueries,mergeCandidateHits,combineRecommended} from './match-search-growth.js';
 
 const BASE='https://api.deepseek.com';
 const foreign=/(?:香港|澳门|澳門|台湾|臺灣|日本|东京|大阪|新加坡|美国|英国|越南|海外|境外|驻外|overseas|hong kong|tokyo|singapore|remote overseas)/i;
@@ -72,9 +73,10 @@ async function providerJson(fetcher,key,path,body,timeoutMs,signal){
  try{return await response.json();}catch{throw codeError('AI_SEARCH_RESPONSE_INVALID');}
 }
 export async function searchPublicJobs(key,text,roleHint,{
- fetcher=fetch,signal=null,onProgress=()=>{},queryTimeoutMs=14000
+ fetcher=fetch,signal=null,onProgress=()=>{},queryTimeoutMs=14000,
+ queriesOverride=null,maxHits=28
 }={}){
- const start=Date.now(),queries=searchQueries(text,roleHint),errors=[];
+ const start=Date.now(),queries=queriesOverride||searchQueries(text,roleHint),errors=[];
  onProgress('searching');
  const responses=await Promise.all(queries.map(async query=>{
   try{
@@ -84,7 +86,7 @@ export async function searchPublicJobs(key,text,roleHint,{
    return data;
   }catch(e){errors.push(e.code||'AI_PROVIDER_UNAVAILABLE');return {results:[]};}
  }));
- const hits=normalizeHits(responses,28);
+ const hits=normalizeHits(responses,maxHits);
  if(!hits.length)throw codeError(errors.includes('AI_PROVIDER_KEY_REJECTED')?'AI_PROVIDER_KEY_REJECTED':
   errors.includes('AI_PROVIDER_BALANCE_INSUFFICIENT')?'AI_PROVIDER_BALANCE_INSUFFICIENT':
   errors.includes('AI_PROVIDER_RATE_LIMITED')?'AI_PROVIDER_RATE_LIMITED':
@@ -92,7 +94,8 @@ export async function searchPublicJobs(key,text,roleHint,{
   errors.length===queries.length?'AI_SEARCH_UNAVAILABLE':'AI_SEARCH_NO_DETAIL_JOBS');
  return {hits,diagnostic:{search_ms:Date.now()-start,queries:queries.length,
   successful_searches:queries.length-errors.length,raw_results:responses.reduce((a,x)=>a+x.results.length,0),
-  candidate_links:hits.length,search_failures:errors.length}};
+  candidate_links:hits.length,search_failures:errors.length,
+  rejected_links:responses.reduce((a,x)=>a+x.results.length,0)-hits.length}};
 }
 export async function enrichCandidateDetails(key,hits,{
  fetcher=fetch,signal=null,onProgress=()=>{},maxFetch=8,fetchTimeoutMs=3200
@@ -181,10 +184,10 @@ function outputFromResponse(data){
   (v.content||[]).filter(c=>c?.type==='output_text').map(c=>c.text||'')).join('');
 }
 export async function reasonAboutJobs(key,resume,hits,limit,{
- fetcher=fetch,signal=null,onProgress=()=>{},onPartial=()=>{},modelTimeoutMs=37000
+ fetcher=fetch,signal=null,onProgress=()=>{},onPartial=()=>{},modelTimeoutMs=37000,shortlistOnly=false
 }={}){
  const start=Date.now();onProgress('writing');
- const cards=hits.slice(0,24).map(h=>({
+ const cards=hits.slice(0,32).map(h=>({
   id:h.id,title:h.title,url:h.url,description:(h.content||h.summary||h.snippet).slice(0,800),
   availability:h.availability?.status||'UNKNOWN',
   availability_note:h.availability?.evidence||'投递状态待确认'
@@ -195,13 +198,13 @@ export async function reasonAboutJobs(key,resume,hits,limit,{
   '若搜索结果没有明确工作地点或职位内容，只能不选该条。不要猜城市、公司或岗位硬性要求；不可虚构学历或经历。',
   '优先选择网页有明确招聘开放证据的岗位；UNKNOWN不能写成可投递，CLOSED_LISTED和POSSIBLY_CLOSED不得推荐。尽可能返回十个真实职位，不为凑数捏造。',
   '为每条岗位给出0～100整数的「简历适配分」match_score，依据已有简历和招聘内容评估岗位方向、工作经验、技能与城市偏好，不代表录用概率。分数需有独立的score_basis（至少30字）解释具体加分与不足；证据不充分时match_score填null、score_basis为空。',
-  '每个为什么推荐的理由写120～180字，结合简历的真实经历成果与职位内容、岗位职责映射、必要的差距提示；避免套话，不能保证录用。',
-  '输出 JSON 对象，结构：{"jobs":[{"id":"候选id，如j1","company":"岗位原网页中企业","title":"岗位","location":"中国大陆实际工作城市","match_score":85,"score_basis":"根据真实经历和明确职位要求的简明评分解释","reason":"120-180字的真实解释","job_basis":"网页明确的岗位职责要点","salary":""}]}。',
+  shortlistOnly?'先快速生成岗位名单，理由仅写45～70字，详细分析将由下一阶段补充。请优先列满符合条件的候选，避免在首轮输出中消耗太多文字。':'每个为什么推荐的理由写120～180字，结合简历的真实经历成果与职位内容、岗位职责映射、必要的差距提示；避免套话，不能保证录用。',
+  '输出 JSON 对象，结构：{"jobs":[{"id":"候选id，如j1","company":"岗位原网页中企业","title":"岗位","location":"中国大陆实际工作城市","match_score":85,"score_basis":"岗位与简历实际技能或职责吻合的证据，至少25字","reason":"初步推荐理由，后续补充详细说明","job_basis":"网页明确的岗位职责要点","salary":""}]}。',
   '优先把最有把握的一条完整对象尽早输出，后续逐条补齐。不得在JSON以外输出文字。'
  ].join('\n');
  const payload={
   model:'deepseek-v4-pro',reasoning:{effort:'none'},
-  text:{format:{type:'json_object'}},max_output_tokens:5600,stream:true,
+  text:{format:{type:'json_object'}},max_output_tokens:shortlistOnly?3500:5600,stream:true,
   instructions,
   input:'脱敏简历：\n'+String(resume).slice(0,10000)+'\n可选真实职位：\n'+JSON.stringify(cards)
  };
@@ -255,22 +258,139 @@ export async function reasonAboutJobs(key,resume,hits,limit,{
   }else if(!partial.length)throw e;
  }finally{try{reader.releaseLock()}catch{}}
  const finalJobs=final?.status==='completed'?selectedJobs(outputFromResponse(final),hits,limit):[];
- const matches=finalJobs.length?finalJobs:partial;
+ const matches=finalJobs.length>=partial.length?finalJobs:partial;
  if(!matches.length)throw codeError('AI_MATCH_NO_VALID_JOBS');
+ const providerRows=closedRows(final?.status==='completed'?outputFromResponse(final):text).length;
  return {matches,incomplete:final?.status!=='completed'||matches.length<limit,
-  model_ms:Date.now()-start};
+  model_ms:Date.now()-start,provider_rows:providerRows,candidates_considered:cards.length};
+}
+// Expand the shortlist in two small parallel requests. The first-ranked jobs
+// were already sent to the browser; slow prose generation never hides them.
+export async function expandDetailedReasons(key,resume,matches,hits,{
+ fetcher=fetch,signal=null,onPartial=()=>{},onProgress=()=>{},detailTimeoutMs=20000
+}={}){
+ if(!matches.length)return {matches,expanded:0,detail_ms:0,detail_failures:0};
+ const started=Date.now(),lookup=new Map(hits.map(h=>[h.url,h]));
+ const jobs=[...matches],groups=[];
+ for(let i=0;i<jobs.length;i+=5)groups.push(jobs.slice(i,i+5));
+ let expanded=0,detail_failures=0;
+ onProgress('writing');
+ await Promise.all(groups.map(async group=>{
+  const description=group.map(j=>{
+   const hit=lookup.get(j.official_url);
+   return {id:j.id,title:j.title,company:j.company,location:j.location,
+    score:j.match_score,score_basis:j.score_basis,
+    summary:String(hit?.content||hit?.summary||'').slice(0,650),
+    initial_reason:String(j.recommendation_reason||'').slice(0,210)};
+  });
+  const prompt=[
+   '你只负责补充 HHBA 已有岗位的推荐理由。岗位公司、职位、城市、分数已经确定，不得更改、增删岗位或编造任职条件。',
+   '对每条候选撰写120～180字中文具体理由：简历中的真实相关经历和成果、与此职位明确职责的对应、可能的经验差距。',
+   '不要输出URL、额外岗位或成功率预测。没有具体职责证据时明确说明不确定。输出JSON：{"jobs":[{"id":"原有id","reason":"具体理由"}]}。'
+  ].join('\n');
+  try{
+   const timeout=AbortSignal.timeout(detailTimeoutMs);
+   const combined=signal?AbortSignal.any([signal,timeout]):timeout;
+   const response=await fetcher(BASE+'/responses',{method:'POST',redirect:'manual',signal:combined,
+    headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
+    body:JSON.stringify({model:'deepseek-v4-pro',reasoning:{effort:'none'},
+     text:{format:{type:'json_object'}},max_output_tokens:2200,stream:false,
+     instructions:prompt,input:'脱敏简历：\n'+String(resume).slice(0,7000)+
+      '\n已选真实岗位：\n'+JSON.stringify(description)})
+   });
+   if(!response.ok)throw codeError('AI_MATCH_REASON_UNAVAILABLE');
+   const data=await response.json(),raw=outputFromResponse(data);
+   let source;
+   try{source=JSON.parse(raw)}catch{source={jobs:closedRows(raw)}}
+   const updates=new Map((source?.jobs||[]).filter(v=>v&&typeof v.id==='string'&&typeof v.reason==='string')
+    .map(v=>[v.id,clean(v.reason,650)]));
+   let changed=false;
+   for(const job of group){
+    const reason=updates.get(job.id);
+    if(!reason||reason.length<75)continue;
+    const target=jobs.find(x=>x.id===job.id);
+    if(!target)continue;
+    target.recommendation_reason=reason;target.matched=[reason];
+    target.reason_detail_complete=true;expanded++;changed=true;
+   }
+   if(changed&&!signal?.aborted)onPartial([...jobs]);
+  }catch{detail_failures++;}
+ }));
+ return {matches:jobs,expanded,detail_ms:Date.now()-started,detail_failures};
 }
 export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  const start=Date.now(),onProgress=opts.onProgress||(()=>{}),onPartial=opts.onPartial||(()=>{});
  const search=await searchPublicJobs(key,resume,roleHint,opts);
  const enriched=await enrichCandidateDetails(key,search.hits,opts);
- const ranked=await reasonAboutJobs(key,resume,enriched.hits,limit,{...opts,onProgress,onPartial});
- return {matches:ranked.matches,incomplete:ranked.incomplete,
-  diagnostic:{model:'deepseek-v4-pro',searches:search.diagnostic.successful_searches,
-   page_reads:enriched.fetches,provider_items:search.diagnostic.raw_results,
-   visible_jobs:ranked.matches.length,discarded:search.diagnostic.candidate_links-ranked.matches.length,
-   elapsed_ms:Date.now()-start,search_ms:search.diagnostic.search_ms,
-   fetch_ms:enriched.fetch_ms,model_ms:ranked.model_ms,
-   candidate_links:search.diagnostic.candidate_links,
-   excluded_closed:enriched.excluded_closed,checked_pages:enriched.fetches,mode:'search-first'}};
+ let pool=enriched.hits;
+ let visible=[],firstModelMs=0,secondModelMs=0,firstRows=0,secondRows=0;
+ let additionalQueries=0,additionalCandidates=0,additionalFiltered=0,additionalFetches=0;
+ const show=jobs=>{visible=jobs;onPartial(jobs);};
+ // Short first pass: return the ranked shortlist, scoring and brief explanations
+ // before any further search or the full prose pass.
+ const first=await reasonAboutJobs(key,resume,pool,limit,{
+  ...opts,shortlistOnly:true,modelTimeoutMs:opts.modelTimeoutMs??26000,
+  onProgress,onPartial:show
+ });
+ firstModelMs=first.model_ms;firstRows=first.provider_rows;
+ visible=combineRecommended(visible,first.matches,limit);
+ show(visible);
+ // Search another two complementary directions ONLY if there is room. Existing
+ // results remain on screen; no repeat resume upload or fictitious fill-ins.
+ if(visible.length<limit&&opts.supplementalLimit!==0){
+  const queries=supplementalQueries(resume,roleHint,searchQueries(resume,roleHint))
+   .slice(0,opts.supplementalLimit??2);
+  if(queries.length){
+   try{
+    const supplemental=await searchPublicJobs(key,resume,roleHint,{
+     ...opts,queriesOverride:queries,maxHits:28,queryTimeoutMs:opts.supplementalTimeoutMs??9000
+    });
+    additionalQueries=queries.length;
+    additionalCandidates=supplemental.hits.length;
+    additionalFiltered=supplemental.diagnostic.rejected_links;
+    const earlier=new Set(pool.map(h=>h.url));
+    const combined=mergeCandidateHits(pool,supplemental.hits,48);
+    const fresh=combined.filter(h=>!earlier.has(h.url));
+    // Only four extra Fetch calls, all parallel. Keep the initial searchable list.
+    const checked=await enrichCandidateDetails(key,fresh,{...opts,maxFetch:4,fetchTimeoutMs:2400});
+    additionalFetches=checked.fetches;pool=mergeCandidateHits(pool,checked.hits,48);
+    const unselected=pool.filter(h=>!visible.some(j=>j.official_url===h.url));
+    if(unselected.length){
+     const extra=await reasonAboutJobs(key,resume,unselected,limit-visible.length,{
+      ...opts,shortlistOnly:true,modelTimeoutMs:opts.supplementalModelTimeoutMs??18000,
+      onProgress,onPartial:jobs=>show(combineRecommended(visible,jobs,limit))
+     });
+     secondModelMs=extra.model_ms;secondRows=extra.provider_rows;
+     visible=combineRecommended(visible,extra.matches,limit);show(visible);
+    }
+   }catch(e){
+    // Initial valid shortlist must survive an optional search error. Log only code.
+    console.warn('HHBA_MATCH_SUPPLEMENT_FAILED',String(e?.code||'UNKNOWN'));
+   }
+  }
+ }
+ const detail=opts.expandDetailed===false?{matches:visible,expanded:0,detail_ms:0,detail_failures:0}:
+  await expandDetailedReasons(key,resume,visible,pool,{...opts,onProgress,onPartial:show});
+ visible=detail.matches;
+ return {matches:visible,incomplete:visible.length<limit,diagnostic:{
+  model:'deepseek-v4-pro',searches:search.diagnostic.successful_searches+additionalQueries,
+  page_reads:enriched.fetches+additionalFetches,
+  provider_items:search.diagnostic.raw_results,
+  visible_jobs:visible.length,
+  discarded:Math.max(0,search.diagnostic.candidate_links-visible.length),
+  elapsed_ms:Date.now()-start,search_ms:search.diagnostic.search_ms,
+  fetch_ms:enriched.fetch_ms,model_ms:firstModelMs+secondModelMs+detail.detail_ms,
+  candidate_links:search.diagnostic.candidate_links,excluded_closed:enriched.excluded_closed,
+  checked_pages:enriched.fetches+additionalFetches,mode:'search-first-staged',
+  primary_raw_hits:search.diagnostic.raw_results,
+  primary_filtered_links:search.diagnostic.rejected_links,
+  primary_candidates:search.diagnostic.candidate_links,
+  initial_eligible:enriched.hits.length,
+  initial_closed:enriched.excluded_closed,
+  initial_model_rows:firstRows,initial_visible:first.matches.length,
+  supplement_queries:additionalQueries,supplement_found:additionalCandidates,
+  supplement_filtered_links:additionalFiltered,supplement_model_rows:secondRows,
+  final_shortlisted:visible.length,details_expanded:detail.expanded,
+  details_failed_batches:detail.detail_failures,detail_ms:detail.detail_ms
+ }};
 }
