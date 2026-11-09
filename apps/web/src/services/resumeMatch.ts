@@ -56,7 +56,14 @@ const errorMap:Record<string,string>={
   AI_PROVIDER_NETWORK_ERROR:'HHBA 暂时无法连接 DeepSeek，请稍后再试。',
   AI_PROVIDER_REDIRECT_BLOCKED:'AI 接口发生异常重定向，为保护密钥，已安全终止请求。',
   AI_PROVIDER_TIMEOUT:'DeepSeek 接口等待超时，尚未取得完整结果。',
-  AI_PROVIDER_SLOW:'DeepSeek 搜索在等待上限内没有生成可展示的国内职位；本次没有编造补充结果。',
+  AI_PROVIDER_SLOW:'DeepSeek 请求超时且没有发现可展示岗位。',
+  AI_SEARCH_TIMEOUT:'DeepSeek Search 搜索服务超时。',
+  AI_SEARCH_UNAVAILABLE:'DeepSeek Search 暂时不可用，未调用推荐模型。',
+  AI_SEARCH_NO_DETAIL_JOBS:'搜索已完成，但未找到符合要求的具体岗位页面；没有编造职位。',
+  AI_SEARCH_API_REJECTED:'DeepSeek Search API 拒绝了请求，请检查账号权限或接口配置。',
+  AI_SEARCH_RESPONSE_INVALID:'DeepSeek Search 返回格式异常，请检查接口兼容性。',
+  AI_MATCH_REASON_TIMEOUT:'候选岗位已检索，但推荐理由生成超时；请稍后再试。',
+  AI_MATCH_NO_VALID_JOBS:'已搜索候选职位，但模型没有生成满足国内地点条件的有效岗位。',
   AI_PROVIDER_RESPONSE_INVALID:'DeepSeek 输出中断或格式异常，暂不展示不完整推荐。',
   AI_PROFILE_INCOMPLETE:'AI 未能可靠识别简历内容，请完善简历后重试。',
   MATCH_PERSONAL_LIMIT:'今天的个人免费体验次数已达上限。',
@@ -112,7 +119,7 @@ export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Pr
   throw new MatchError(400,(e as Error)?.message||errorMap.INVALID_RESUME_TEXT);
  }
 }
-export type NativeMatchProgress='preparing'|'connected'|'searching'|'writing'|'waiting';
+export type NativeMatchProgress='preparing'|'connected'|'searching'|'reading'|'writing'|'waiting';
 async function consumeNativeMatchStream(
  response:Response,onProgress?:(stage:NativeMatchProgress)=>void,
  onPartial?:(jobs:MatchedJob[])=>void
@@ -128,7 +135,7 @@ async function consumeNativeMatchStream(
   let value:any;try{value=JSON.parse(data)}catch{return}
   if(event==='progress'){
    const stage=value?.stage;
-   if(['preparing','connected','searching','writing','waiting'].includes(stage))
+   if(['preparing','connected','searching','reading','writing','waiting'].includes(stage))
     onProgress?.(stage as NativeMatchProgress);
   }else if(event==='partial'){
    if(Array.isArray(value?.matches)&&value.matches.length>0&&value.matches.length<=10)
@@ -138,7 +145,7 @@ async function consumeNativeMatchStream(
    const stage=String(value?.phase||'preparing');
    const elapsed=Number(value?.elapsed_ms||0);
    const names:Record<string,string>={
-    preparing:'连接 DeepSeek',connected:'准备联网搜索',searching:'搜索岗位',writing:'整理职位结果'
+    preparing:'连接 DeepSeek',connected:'准备联网搜索',searching:'DeepSeek Search 检索职位',reading:'读取岗位详情',writing:'生成匹配理由'
    };
    const elapsedNote=Number.isFinite(elapsed)&&elapsed>=1000?
     '（'+Math.round(elapsed/1000)+'秒，阶段：'+(names[stage]||'模型处理')+'）':'';
