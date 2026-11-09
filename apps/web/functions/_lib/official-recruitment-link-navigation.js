@@ -15,13 +15,34 @@ const FOREIGN=/(?:香港|澳门|澳門|台湾|臺灣|日本|新加坡|海外岗�
 const text=(v,n=170)=>typeof v==='string'?v.slice(0,n).replace(/[\u0000-\u001f]+/g,' ').trim():'';
 const ROOT_JOB=/\/(?:careers?|jobs?|joinus|join-us|recruit(?:ment)?|positions?|talent)(?:\/|$)/i;
 
+const RECRUIT_PATH=/(?:career|recruit|job|position|campus|social|join|talent|intern|universit|opportunit)/i;
+// A concrete employer recruiting *landing* subpage is a legitimate navigation
+// destination. It is not a vacancy and does not prove job eligibility.
+function publicRecruitmentEntry(value){
+ const official=publicCorporatePage(value);
+ if(official)return official;
+ try{
+  const u=new URL(value);
+  if(u.protocol!=='https:'||u.search||u.hash||u.username||u.password||u.port)return null;
+  const home=publicCorporatePage(u.origin+'/');
+  if(!home||publicJobLink(u.href))return null;
+  const parts=u.pathname.split('/').filter(Boolean);
+  if(!parts.length||parts.length>4||u.pathname.length>120||
+   !/^\/[a-z0-9/_-]+(?:\.html)?\/?$/i.test(u.pathname)||
+   !parts.some(p=>RECRUIT_PATH.test(p))||
+   parts.some(p=>/^\d{3,}$/.test(p)))return null;
+  return {...home,url:u.href};
+ }catch{return null;}
+}
+
+
 function brand(page,site){
  const title=text(page?.title,160),body=String(page?.content||'').slice(0,25000);
  if(!title||body.length<160)return null;
  const shortTitle=title.split(/[|｜]/).map(x=>x.trim());
  const heads=body.split('\n').slice(0,14).map(x=>x.replace(/^#+\s*/, '').trim());
  const candidates=[...shortTitle,...heads].map(x=>x.replace(
-  /(?:\s*[-—·]\s*)?(?:社会招聘|校园招聘|人才招聘|招聘官网|官方网站|加入我们|公司官网|企业官网|招聘|careers?|jobs?|home|首页)$/i,'').trim())
+  /(?:\s*[.·｜|\-—]\s*)?(?:招聘门户|企业招聘平台|社会招聘|校园招聘|人才招聘|招聘官网|官方网站|加入我们|公司官网|企业官网|招聘|careers?|jobs?|home|首页)$/i,'').trim())
   .filter(x=>x.length>=2&&x.length<=48&&
    /^[\p{Script=Han}\p{Script=Latin}\d（）()&·.\- \s]+$/u.test(x)&&
    !DIRECTORY.test(x)&&!FOREIGN.test(x));
@@ -76,10 +97,11 @@ function companyPageScore(site,metadata){
  const careerPath=ROOT_JOB.test(path);
  return (careerHost?9:0)+(careerPath?5:0)+
   (RECRUIT.test(text(metadata?.title,150))?2:0)+
+  (RECRUIT_PATH.test(path)&&!careerPath?4:0)+
   (site.url.endsWith('/')?1:0);
 }
 function validOfficialLink(url,kind){
- return kind==='JOB_DETAIL'?publicJobLink(url):publicCorporatePage(url);
+ return kind==='JOB_DETAIL'?publicJobLink(url):publicRecruitmentEntry(url);
 }
 export async function discoverOfficialRecruitmentLinks(role,key,{
  fetcher=fetch,now=new Date(),limit=10
@@ -112,10 +134,15 @@ export async function discoverOfficialRecruitmentLinks(role,key,{
   for(const row of result.results.slice(0,12)){
    if(!row||typeof row.url!=='string')continue;
    const snippet=text(row.title,160)+' '+text(row.snippet,400);
-   const corporate=publicCorporatePage(row.url);
-   if(corporate&&!FOREIGN.test(snippet)){
+   const corporate=publicRecruitmentEntry(row.url);
+   if(corporate&&!FOREIGN.test(snippet)&&!DIRECTORY.test(snippet)){
     const meta={title:text(row.title,160),snippet:text(row.snippet,400)};
     if(!sites.has(corporate.url))sites.set(corporate.url,{...corporate,meta,role:searchedRole});
+    // A navigable recruiting subpage is preferred; its own same-host root
+    // is a second chance if the subpage Fetch is unavailable.
+    const homepage=publicCorporatePage(new URL(corporate.url).origin+'/');
+    if(homepage&&homepage.url!==corporate.url&&!sites.has(homepage.url)&&sites.size<65)
+     sites.set(homepage.url,{...homepage,meta,role:searchedRole,derived:true});
    }
    // Search engines commonly return a real employer's recruiting subpage
    // (e.g. /website/campus.html or /jobopportunity.html), not its root URL.
