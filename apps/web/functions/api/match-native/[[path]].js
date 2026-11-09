@@ -69,7 +69,7 @@ export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetc
  };
  let response;
  try{
-  response=await fetcher('https://api.deepseek.com/v1/responses',{
+  response=await fetcher('https://api.deepseek.com/responses',{
    method:'POST',redirect:'manual',signal:AbortSignal.timeout(55000),
    headers:{Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'},
    body:JSON.stringify(body)
