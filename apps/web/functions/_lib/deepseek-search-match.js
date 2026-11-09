@@ -325,6 +325,7 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  let pool=enriched.hits;
  let visible=[],firstModelMs=0,secondModelMs=0,firstRows=0,secondRows=0;
  let additionalQueries=0,additionalCandidates=0,additionalFiltered=0,additionalFetches=0;
+ let supplementalFailed=0,supplementSearchMs=0;
  const show=jobs=>{visible=jobs;onPartial(jobs);};
  // Short first pass: return the ranked shortlist, scoring and brief explanations
  // before any further search or the full prose pass.
@@ -341,11 +342,12 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
   const queries=supplementalQueries(resume,roleHint,searchQueries(resume,roleHint))
    .slice(0,opts.supplementalLimit??2);
   if(queries.length){
+   additionalQueries=queries.length;
    try{
     const supplemental=await searchPublicJobs(key,resume,roleHint,{
      ...opts,queriesOverride:queries,maxHits:28,queryTimeoutMs:opts.supplementalTimeoutMs??9000
     });
-    additionalQueries=queries.length;
+    supplementSearchMs=supplemental.diagnostic.search_ms;
     additionalCandidates=supplemental.hits.length;
     additionalFiltered=supplemental.diagnostic.rejected_links;
     const earlier=new Set(pool.map(h=>h.url));
@@ -364,6 +366,7 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
      visible=combineRecommended(visible,extra.matches,limit);show(visible);
     }
    }catch(e){
+    supplementalFailed=1;
     // Initial valid shortlist must survive an optional search error. Log only code.
     console.warn('HHBA_MATCH_SUPPLEMENT_FAILED',String(e?.code||'UNKNOWN'));
    }
@@ -372,7 +375,7 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
  const detail=opts.expandDetailed===false?{matches:visible,expanded:0,detail_ms:0,detail_failures:0}:
   await expandDetailedReasons(key,resume,visible,pool,{...opts,onProgress,onPartial:show});
  visible=detail.matches;
- return {matches:visible,incomplete:visible.length<limit,diagnostic:{
+ return {matches:visible,incomplete:visible.length<limit||detail.detail_failures>0,diagnostic:{
   model:'deepseek-v4-pro',searches:search.diagnostic.successful_searches+additionalQueries,
   page_reads:enriched.fetches+additionalFetches,
   provider_items:search.diagnostic.raw_results,
@@ -388,7 +391,8 @@ export async function runSearchFirstMatch(key,resume,roleHint,limit=10,opts={}){
   initial_eligible:enriched.hits.length,
   initial_closed:enriched.excluded_closed,
   initial_model_rows:firstRows,initial_visible:first.matches.length,
-  supplement_queries:additionalQueries,supplement_found:additionalCandidates,
+  supplement_queries:additionalQueries,supplement_search_ms:supplementSearchMs,
+  supplement_failed:supplementalFailed,supplement_found:additionalCandidates,
   supplement_filtered_links:additionalFiltered,supplement_model_rows:secondRows,
   final_shortlisted:visible.length,details_expanded:detail.expanded,
   details_failed_batches:detail.detail_failures,detail_ms:detail.detail_ms
