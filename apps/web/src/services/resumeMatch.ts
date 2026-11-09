@@ -111,7 +111,7 @@ export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Pr
   throw new MatchError(400,(e as Error)?.message||errorMap.INVALID_RESUME_TEXT);
  }
 }
-export type NativeMatchProgress='preparing'|'connected'|'searching'|'writing';
+export type NativeMatchProgress='preparing'|'connected'|'searching'|'writing'|'waiting';
 async function consumeNativeMatchStream(
  response:Response,onProgress?:(stage:NativeMatchProgress)=>void
 ):Promise<MatchResponse>{
@@ -126,7 +126,7 @@ async function consumeNativeMatchStream(
   let value:any;try{value=JSON.parse(data)}catch{return}
   if(event==='progress'){
    const stage=value?.stage;
-   if(['preparing','connected','searching','writing'].includes(stage))
+   if(['preparing','connected','searching','writing','waiting'].includes(stage))
     onProgress?.(stage as NativeMatchProgress);
   }else if(event==='failure'){
    const code=String(value?.error||'AI_PROVIDER_UNAVAILABLE');
