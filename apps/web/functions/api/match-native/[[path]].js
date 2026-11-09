@@ -18,11 +18,11 @@ const enabled=env=>env.HHBA_MATCH_SERVICE_ENABLED==='1'&&
 const prompt=[
  '你是 HHBA 求职助手。自己使用 web_search 联网检索实际招聘岗位、判断适合程度、推荐并解释。',
  '只找中国大陆工作地点（不含港澳台/海外/中外混合工作），允许外资公司在华招聘。',
- '按简历目标城市、方向、经历优先搜索，也考虑合理转岗；尽量提供10条不同企业及职位；不足如实输出。',
+ '按简历目标城市、方向、经历优先搜索，也考虑合理转岗。本轮只需按用户指定数量找不同企业和职位；不足如实输出。',
  '必须是公开搜索得到的单个招聘职位详情/投递 HTTPS URL，不能猜链接或用列表主页代替。',
  '每条写针对简历真实项目/工作经历的简明推荐理由；岗位是否在招以实际页面为准。不泄露简历隐私。',
- '为了尽快返回：最多进行1至2轮联网搜索；不必逐页读取十个网页，优先使用搜索结果里明确的职位详情直链与工作城市。没有证据的内容不编造。',
- '先写最确定的岗位，逐条输出完整 JSON 对象，不要等全部搜索完成后才开始写。每条推荐理由控制在45至75字。',
+ '自主联网搜索、必要时阅读详情。优先选择有明确职位详情网址和实际国内工作城市的职位，不要为凑数量编造链接或任职要求。',
+ '先输出有充分依据的岗位。每条「为什么推荐」写成约120至180个汉字的具体分析，至少说明：①简历中哪段具体经历、成果或技能能证明能力；②这些能力如何对应搜索到的岗位职责；③如有转岗或经验差距，指出真实的注意事项。不能只写「很匹配」「经验对口」的套话，不能杜撰经历、岗位要求或录用把握。',
  '尽快完成，不要冗长说明。只返回 JSON，无 markdown：',
  '{"jobs":[{"company":"公司","title":"岗位","location":"实际工作城市","salary":"有则写薪资否则空","reason":"简历依据及匹配理由","url":"具体职位详情链接"}]}'
 ].join('\n');
@@ -121,11 +121,11 @@ function nativeResponsePayload(result){
   source:'DeepSeek V4 Pro 自主联网搜索',
   scoring:'AI 根据简历和招聘信息推荐；不代表录用概率',
   privacy:'本次授权仅向 DeepSeek 发送脱敏简历文字，不存储原始简历。',
-  disclaimer:'仅中国大陆工作城市；职位开放状态、薪资、要求以原招聘网页为准。'
+  disclaimer:(result.incomplete?'其中一组联网搜索未完成，已显示找到的职位；':'')+'仅中国大陆工作城市；职位开放状态、薪资、要求以原招聘网页为准。'
  };
 }
 
-export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetch,onProgress=()=>{},onPartial=()=>{}}={}){
+export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetch,onProgress=()=>{},onPartial=()=>{},direction='direct'}={}){
  const start=Date.now();
  const body={
   model:'deepseek-v4-pro',
@@ -133,10 +133,12 @@ export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetc
   tools:[{type:'web_search'}],
   tool_choice:'required',
   text:{format:{type:'json_object'}},
-  max_output_tokens:2300,
+  max_output_tokens:3600,
   stream:true,
   instructions:prompt,
   input:'请自行联网搜索真实职位，再给出推荐，不用先让我确认。\n'+
+   '本轮只找 '+limit+' 个职位，避免复制同类岗位。'+(direction==='adjacent'?
+   '优先发掘简历能力可迁移的相邻职位，和直接原岗位不同，但必须说明转岗逻辑。':'优先推荐与简历工作经历和求职目标最直接对应的职位。')+'\n'+
    '目标岗位补充：'+String(roleHint||'').slice(0,80)+'\n\n求职者简历（已遮盖联系方式）：\n'+text.slice(0,9000)
  };
  let response;
@@ -179,6 +181,64 @@ export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetc
   discarded:parsed.rejected,elapsed_ms:Date.now()-start
  }};
 }
+// Two independent DeepSeek web searches run concurrently. Each model stays
+// autonomous: the server only merges, deduplicates and enforces existing
+// Mainland/HTTPS safety checks, without maintaining its own external job index.
+export function combineNativeBatches(groups,limit=10){
+ const seen=new Set(),jobs=[];
+ for(const group of groups){
+  for(const job of group||[]){
+   const key=(job.company+'|'+(job.title_zh||job.title)).toLowerCase().replace(/\s+/g,'');
+   const url=job.official_url;
+   if(seen.has(key)||seen.has(url))continue;
+   seen.add(key);seen.add(url);
+   jobs.push({...job,id:'native-batch-'+jobs.length+'-'+new URL(url).hostname.replace(/[^a-z0-9]/ig,'-')});
+   if(jobs.length>=limit)return jobs;
+  }
+ }
+ return jobs;
+}
+export async function runNativeDualMatch(key,text,roleHint,limit=10,{fetcher=fetch,onProgress=()=>{},onPartial=()=>{}}={}){
+ const start=Date.now();
+ const counts=limit<=5?[limit]:[Math.min(6,Math.ceil(limit/2)+1),Math.min(6,Math.ceil(limit/2)+1)];
+ const directions=counts.length===1?['direct']:['direct','adjacent'];
+ const snapshots=counts.map(()=>[]),lastResults=counts.map(()=>null);
+ let emitted='';
+ const emit=()=>{
+  const combined=combineNativeBatches(snapshots,limit);
+  const signature=combined.map(x=>x.company+'|'+x.title+'|'+x.recommendation_reason).join('^');
+  if(signature!==emitted&&combined.length){
+   emitted=signature;onPartial(combined);
+  }
+ };
+ const jobs=counts.map((count,index)=>runNativeJobMatch(key,text,roleHint,count,{
+  fetcher,direction:directions[index],
+  onProgress:stage=>onProgress(stage),
+  onPartial:partial=>{
+   snapshots[index]=partial;
+   emit();
+  }
+ }).then(result=>{
+  lastResults[index]=result;
+  snapshots[index]=result.matches;
+  emit();
+  return result;
+ }));
+ const outcomes=await Promise.allSettled(jobs);
+ const combined=combineNativeBatches(snapshots,limit);
+ const success=outcomes.filter(x=>x.status==='fulfilled');
+ const errors=outcomes.filter(x=>x.status==='rejected');
+ if(!success.length&&!combined.length)throw errors[0]?.reason||new Error('AI_PROVIDER_UNAVAILABLE');
+ const duration=Date.now()-start;
+ return {matches:combined,diagnostic:{
+  model:'deepseek-v4-pro',searches:lastResults.reduce((n,x)=>n+(x?.diagnostic?.searches||0),0),
+  page_reads:lastResults.reduce((n,x)=>n+(x?.diagnostic?.page_reads||0),0),
+  provider_items:lastResults.reduce((n,x)=>n+(x?.diagnostic?.provider_items||0),0),
+  visible_jobs:combined.length,discarded:lastResults.reduce((n,x)=>n+(x?.diagnostic?.discarded||0),0),
+  elapsed_ms:duration,parallel_requests:counts.length,failed_requests:errors.length
+ },incomplete:errors.length>0};
+}
+
 export async function onRequest({request,env}){
  const url=new URL(request.url);
  const tail=url.pathname.slice('/api/match-native'.length).replace(/\/$/,'')||'/';
@@ -235,7 +295,7 @@ export async function onRequest({request,env}){
       if(!ended)send('progress',{stage:'waiting'});
      },12000);
      try{
-      const result=await runNativeJobMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
+      const result=await runNativeDualMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
        options.role_hint,options.limit,{onProgress:stage=>{
         phase=stage;send('progress',{stage});
        },onPartial:matches=>send('partial',{matches})});
