@@ -7,7 +7,7 @@ import {publicCorporatePage,publicJobLink} from
 
 const key='synthetic-test-key-nothing-personal';
 const now=new Date('2026-11-09T06:00:00Z');
-function makeProvider({results=[],pages={},errorSearch=false}={}){
+function makeProvider({results=[],pages={},errorSearch=false,byRole=null}={}){
  const calls=[];
  const fetcher=async(url,options)=>{
   assert.equal(options.headers.Authorization,'Bearer '+key);
@@ -15,7 +15,8 @@ function makeProvider({results=[],pages={},errorSearch=false}={}){
   calls.push({endpoint:url.endsWith('/search')?'search':'fetch',body});
   if(url.endsWith('/search')){
    if(errorSearch)return Response.json({error:'OFFLINE'},{status:503});
-   return Response.json({results});
+   const selected=byRole?Object.entries(byRole).find(([role])=>body.query.includes(role))?.[1]||[]:results;
+   return Response.json({results:selected});
   }
   if(url.endsWith('/fetch')){
    if(!Object.hasOwn(pages,body.url))return Response.json({error:'NOT_FOUND'},{status:404});
@@ -120,4 +121,37 @@ test('Only normalized role queries are sent; no resume text, name, email or API 
  }
  assert.equal((await discoverOfficialRecruitmentLinks('test@example.com',key,{
   fetcher:mock.fetcher,now})).status,'NOT_READY');
+});
+
+test('All three career intents get a fair Search and company Fetch opportunity',async()=>{
+ const tencent='https://careers.tencent.com/';
+ const job='https://careers.tencent.com/jobdesc.html?postId=2094968965272092672';
+ const xinghe='https://www.xinghe.cn/careers';
+ const horizon='https://www.horizon.cn/careers';
+ const mock=makeProvider({byRole:{
+  '内容运营':[
+   {url:job,title:'内容运营 - 腾讯招聘',snippet:'中国 社会招聘'},
+   {url:tencent,title:'腾讯招聘',snippet:'企业招聘'}
+  ],
+  '软件开发':[{url:xinghe,title:'星河科技官方招聘',snippet:'软件开发'}],
+  '数据分析师':[{url:horizon,title:'地平线科技官方招聘',snippet:'数据分析'}]
+ },pages:{
+  [tencent]:homepage('腾讯'),
+  [xinghe]:homepage('星河数字科技有限公司'),
+  [horizon]:homepage('地平线科技有限公司')
+ }});
+ const result=await discoverOfficialRecruitmentLinks(
+  ['内容运营','软件开发','数据分析师'],key,{fetcher:mock.fetcher,now});
+ const searches=mock.calls.filter(x=>x.endpoint==='search');
+ assert.equal(searches.length,3);
+ for(const role of ['内容运营','软件开发','数据分析师'])
+  assert.ok(searches.some(s=>s.body.query.includes(role)),role+' not searched');
+ assert.equal(result.usage.model,0);
+ assert.ok(result.usage.fetch<=6);
+ assert.deepEqual(new Set(result.opportunities.map(x=>x.role)),
+  new Set(['内容运营','软件开发','数据分析师']));
+ assert.ok(result.opportunities.some(x=>
+  x.kind==='JOB_DETAIL'&&x.url===job&&x.role==='内容运营'));
+ assert.ok(result.opportunities.every(x=>
+  x.qualification_status==='NOT_CHECKED'&&x.hiring_status==='UNCONFIRMED'));
 });
