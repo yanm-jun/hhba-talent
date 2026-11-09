@@ -24,7 +24,7 @@ test('preview drawer is right side, hover/click accessible, and never rearranges
   assert.ok(drawer.includes('onMouseEnter'));
   assert.ok(drawer.includes('onMouseLeave'));
   assert.ok(drawer.includes('aria-expanded={open}'));
-  assert.ok(drawer.includes('onClick={() => { cancelClose(); setOpen(value => !value); }}'));
+  assert.ok(drawer.includes('onClick={() => { cancelClose(); setOpen(true); }}'));
   assert.ok(drawer.includes("event.key === 'Escape'"));
 });
 
