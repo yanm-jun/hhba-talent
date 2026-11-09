@@ -91,8 +91,10 @@ test('Rendered Tencent-style single role and same-line Mainland city survive lon
  const l=publicJobLink(url);
  assert.ok(l);
  const lines=[
-  '---','title: "岗位详情 | 腾讯招聘"','---','登录','社会招聘','校园招聘',
-  '生活在腾讯','产品和服务','工作地点','查看工作岗位','慎防招聘诈骗',
+  '---','title: "岗位详情 | 腾讯招聘"','---','登录',
+  '- [社会招聘](<javascript:void(0)>)','- [校园招聘](<javascript:void(0)>)',
+  '- [生活在腾讯](<javascript:void(0)>)','- [产品和服务](<javascript:void(0)>)',
+  '- [工作地点](<javascript:void(0)>)','查看工作岗位','慎防招聘诈骗',
   '我们提醒您，近期新加坡出现招聘诈骗活动，请勿轻信仿冒企业人员的申请指令。',
   '其他招聘信息请访问官方页面。',
   '在研UE5策略竞技游戏-内容运营经理 上海',
