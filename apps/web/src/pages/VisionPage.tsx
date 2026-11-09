@@ -64,12 +64,12 @@ export function VisionPage({ user }: { user: User | null }) {
   return <Shell user={user}><div className="join-page hhba-vision-page">
     <nav className="join-vision-navigation" aria-label="品牌理念页面导航">
       <Link to="/join" className="join-vision-back"><ArrowLeft size={16} aria-hidden="true"/> 返回加入我们</Link>
-      <span>HHBA · 我们的愿景</span>
+      <span>汇方职场 · HHBA · 我们的愿景</span>
     </nav>
     <section className="join-vision" id="vision" ref={sectionRef} aria-labelledby="join-values-title">
     <header className="join-vision-opening" data-vision-reveal>
       <div className="hhba-vision-brand-intro"><BrandMark variant="icon" size="large"/></div>
-      <p className="join-vision-eyebrow">OUR VISION · HHBA</p>
+      <p className="join-vision-eyebrow">OUR VISION · HHBA · 汇方职场</p>
       <h2 id="join-values-title">
         <span>我们相信，</span>
         <span>一个更好的商业社会，</span>

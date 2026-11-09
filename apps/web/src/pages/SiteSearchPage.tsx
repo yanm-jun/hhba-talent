@@ -74,8 +74,8 @@ export function SiteSearchPage({user}:{user:User|null}){
  function choose(k:Category){setCategory(k);setPage(1)}
  return <Shell user={user}>
   <section className="hhba-site-search-page" aria-labelledby="hhba-global-search-title">
-   <p className="hhba-site-search-eyebrow">HHBA · ONE SEARCH, ALL PUBLIC CONTENT</p>
-   <h1 id="hhba-global-search-title">搜索 HHBA</h1>
+   <p className="hhba-site-search-eyebrow">汇方职场 · HHBA · ONE SEARCH, ALL PUBLIC CONTENT</p>
+   <h1 id="hhba-global-search-title">搜索汇方职场</h1>
    <p className="hhba-site-search-intro">一个入口找到站内岗位、企业档案、人才政策、人才安居和留学资料。</p>
    <form role="search" className="hhba-site-search-main" onSubmit={submit}>
     <Search aria-hidden="true" size={22}/>
@@ -117,7 +117,7 @@ export function SiteSearchPage({user}:{user:User|null}){
       <Link to={'/candidate/jobs?q='+encodeURIComponent(query)}>查看全部岗位 <ArrowRight size={14}/></Link>
     </div>}
    </>}
-   <p className="hhba-site-search-disclaimer"><ShieldCheck size={15}/> 仅搜索 HHBA 站内公开资料，不搜索用户简历、私人收藏、账号信息或内部管理数据。岗位开放状态、人才政策时效与留学申请要求请以官方来源为准。</p>
+   <p className="hhba-site-search-disclaimer"><ShieldCheck size={15}/> 仅搜索汇方职场 HHBA 站内公开资料，不搜索用户简历、私人收藏、账号信息或内部管理数据。岗位开放状态、人才政策时效与留学申请要求请以官方来源为准。</p>
   </section>
  </Shell>
 }

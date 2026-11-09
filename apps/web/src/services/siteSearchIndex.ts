@@ -25,7 +25,7 @@ export const SITE_SEARCH_TABS:ReadonlyArray<{kind:'all'|SiteSearchKind;label:str
  {kind:'study',label:'留学机会'}, {kind:'page',label:'站内页面'}
 ];
 const staticPages:SiteSearchRecord[]=[
- {id:'home',kind:'page',title:'HHBA 首页',description:'了解 HHBA 的使命、服务与求职入口',path:'/',tags:['首页','平台','HHBA']},
+ {id:'home',kind:'page',title:'汇方职场 HHBA 首页',description:'了解汇方职场 HHBA 的使命、服务与求职入口',path:'/',tags:['首页','平台','HHBA','汇方职场','汇方']},
  {id:'winter-season',kind:'page',title:'2027 寒假实习季',description:'HHBA 寒假实习官方项目、企业和实习申请入口',path:'/winter-internship',tags:['寒假','实习','冬季实习','冬季','2027','企业','招聘']},
  {id:'job-market',kind:'page',title:'招聘市场',description:'搜索岗位、筛选专业、城市与招聘类别',path:'/candidate/jobs',tags:['工作','职位','岗位','校招','社招','实习','招聘']},
  {id:'employers',kind:'page',title:'企业发现',description:'查找 HHBA 已收录的企业档案及招聘渠道',path:'/companies/discover',tags:['公司','企业','行业','招聘']},
@@ -35,9 +35,9 @@ const staticPages:SiteSearchRecord[]=[
  {id:'match',kind:'page',title:'简历智能匹配',description:'在私人简历空间分析岗位匹配度（需用户授权）',path:'/candidate/match',tags:['简历','AI','岗位推荐','匹配']},
  {id:'bookmarks',kind:'page',title:'我的收藏',description:'登录后查看个人收藏的招聘岗位',path:'/candidate/saved',tags:['收藏','求职','个人中心']},
  {id:'join',kind:'page',title:'加入我们',description:'了解 HHBA 团队及加入方式',path:'/join',tags:['团队','加入','合作']},
- {id:'vision',kind:'page',title:'HHBA 理念',description:'让劳动更有尊严，让商业更有温度',path:'/vision',tags:['理念','使命','价值']},
+ {id:'vision',kind:'page',title:'汇方职场 HHBA 理念',description:'让劳动更有尊严，让商业更有温度',path:'/vision',tags:['理念','使命','价值']},
  {id:'employer',kind:'page',title:'企业服务与治理',description:'了解招聘服务、企业责任与治理机制',path:'/employer/start',tags:['企业','雇主','责任','认证','治理']},
- {id:'login',kind:'page',title:'登录与注册',description:'进入 HHBA 求职者或企业账号',path:'/auth',tags:['注册','登录','账户']}
+ {id:'login',kind:'page',title:'登录与注册',description:'进入汇方职场 HHBA 求职者或企业账号',path:'/auth',tags:['注册','登录','账户']}
 ];
 let cached:SiteSearchRecord[]|null=null;
 const validPath=(path:string)=>path.startsWith('/')&&!path.startsWith('//')&&!/[\\\r\n]/.test(path);

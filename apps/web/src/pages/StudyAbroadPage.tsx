@@ -15,7 +15,7 @@ const goals=[
  {id:'work' as const,title:'留学后就业',copy:'结合课程与工作政策，考虑更长远的发展。',icon:BriefcaseBusiness}
 ];
 function StudyFooter(){
- return <footer className="hhba-study-footer"><BrandMark variant="signature" size="small"/><p>让机会与人才，找到彼此。 · 留学机会 / 人才政策 / 招聘市场</p></footer>;
+ return <footer className="hhba-study-footer"><BrandMark variant="signature" size="small"/><p>汇方职场 · 让机会与人才，找到彼此。 · 留学机会 / 人才政策 / 招聘市场</p></footer>;
 }
 function StudyDetail({user,direction}:{user:User|null;direction:StudyDirection}){
  const country=studyCountry(direction.country);
@@ -79,7 +79,7 @@ export function StudyAbroadPage({user,slug}:{user:User|null;slug?:string}){
  return <Shell user={user}>
   <div className="hhba-study" data-hhba-study="home">
    <section className="hhba-study-hero">
-    <p className="hhba-study-eyebrow"><Globe2 size={14}/> HHBA · GLOBAL STUDY OPPORTUNITIES</p>
+    <p className="hhba-study-eyebrow"><Globe2 size={14}/> 汇方职场 · HHBA · GLOBAL STUDY OPPORTUNITIES</p>
     <h1>让留学机会，不再遥不可及。</h1>
     <p className="hhba-study-hero-lead">不只是寻找一所大学，更是找到一条适合自己的未来之路。<br/>按预算、专业与发展目标，发现属于你的海外升学方向。</p>
     <form className="hhba-study-search" role="search" onSubmit={e=>{e.preventDefault();setQuery(draft.trim());goUniversities();}}>

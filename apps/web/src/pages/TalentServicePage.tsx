@@ -46,7 +46,7 @@ export function TalentServicePage({user}:{user:User|null}){
  const previewHomes=apartmentIds.map(id=>TALENT_HOUSING_RECORDS.find(h=>h.id===id)).filter(h=>h!==undefined);
  const failImage=(name:string)=>setBadImages(list=>list.includes(name)?list:[...list,name]);
  return <Shell user={user}><div className="hhba-talent-layout">
-  <header className="htl-header"><strong>HHBA <span>· 人才服务</span></strong><small>全国城市人才服务平台</small></header>
+  <header className="htl-header"><strong>HHBA <span>· 汇方职场 · 人才服务</span></strong><small>全国城市人才服务平台</small></header>
   <div className="htl-main">
    <section className="htl-intro"><h1>选择一座城市，发现更多可能</h1><p>人才政策、安居保障、生活补贴、申请办理，一站式了解。</p>
     <div className="htl-search">
@@ -112,7 +112,7 @@ export function TalentServicePage({user}:{user:User|null}){
     <button type="button" onClick={()=>navigate('/talent-service/match/'+encodeURIComponent(matchCity),{talentMatchDraft:{city:matchCity,education:({'专科':'college','本科':'bachelor','硕士':'master','博士':'doctor'} as Record<string,string>)[degree]||'unknown',grad}})}>查询相关政策 <ArrowRight size={14}/></button></div>}
    </section>
   </div>
-  <footer className="htl-footer"><span>HHBA · 让劳动更有尊严，让商业更有温度</span><span>页面布局 · <Link to="/talent-service/city/北京">城市独立服务页</Link></span></footer>
+  <footer className="htl-footer"><span>汇方职场 · HHBA · 让劳动更有尊严，让商业更有温度</span><span>页面布局 · <Link to="/talent-service/city/北京">城市独立服务页</Link></span></footer>
   <p className="htl-note"><ShieldCheck size={13}/> 城市图片来源可在对应城市档案核对；公寓实景未经核验不冒用示意图，政策以政府最新公告为准。</p>
  </div></Shell>;
 }
