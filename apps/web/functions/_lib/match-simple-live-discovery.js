@@ -5,7 +5,7 @@ import {findMainlandCity,isMainlandJobLocation} from './mainland-job-location.js
 const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|东京|大阪|纽约|伦敦|旧金山|硅谷|悉尼|墨尔本|首尔|巴黎|柏林|温哥华|多伦多|曼谷|日本|新加坡|美国|英国|加拿大|澳大利亚|德国|法国|印度|越南|海外|境外|hong[\s-]?kong|macau|taiwan|singapore|tokyo|london|new[\s-]?york|san[\s-]?francisco|sydney|melbourne|seoul|berlin|paris|united states|remote worldwide)/i;
 const CLOSED=/(?:职位已关闭|职位已下线|岗位已下线|已停止招聘|停止招聘|招聘已结束|不再接受申请|no longer accepting|position closed)/i;
 const NOISE=/(?:新闻|攻略|面经|求职指南|职位列表|岗位列表|招聘信息汇总|薪资报告|招聘会|论坛|百科|校园招聘官网|招聘首页)/i;
-const JOB=/((?:ai\s*)?(?:产品经理|产品专员|产品运营|需求分析师|业务分析师|数据分析师|运营(?:经理|专员)?|设计师|研发工程师|软件工程师|工程师|销售(?:经理|顾问)?|客户经理|项目经理|人力资源|市场营销|管培生|实习生|顾问|岗位|职位))|(?:product\s+(?:manager|owner|specialist)|business\s+analyst|data\s+analyst|software\s+engineer|operations\s+(?:manager|specialist)|designer|internship)/i;
+const JOB=/((?:ai\s*)?(?:品牌督导|区域督导|市场督导|渠道督导|销售督导|终端督导|门店督导|运营督导|零售督导|经销商管理|经销商运营|终端运营|门店运营|区域运营|渠道运营|销售运营|区域经理|门店经理|产品经理|产品专员|产品运营|需求分析师|业务分析师|数据分析师|运营(?:经理|专员)?|设计师|研发工程师|软件工程师|工程师|销售(?:经理|顾问)?|客户经理|项目经理|人力资源|市场营销|管培生|实习生|顾问|岗位|职位))|(?:product\s+(?:manager|owner|specialist)|business\s+analyst|data\s+analyst|software\s+engineer|operations\s+(?:manager|specialist)|designer|internship)/i;
 const BAD_DOMAIN=/(?:^|\.)(?:so|sogou|zhihu|weibo|douyin|xiaohongshu|bilibili|reddit|youtube|facebook|twitter|x|linkedin|indeed|glassdoor|zhipin|51job|liepin|lagou|jobui|kanzhun|job5156|juejin|csdn|github|medium|wikipedia)\.(?:com|cn|org|net|io)$/i;
 const JOB_PATH=/(?:job|jobs|position|career|recruit|talent|campus|hiring|vacanc|advertisement|detail|post|offer|opportunit)/i;
 const ID_QUERY=/(?:jobid|job_id|jobcode|postid|positionid|position_id|jobunionid|requementid|advertisementid|id)/i;
@@ -48,6 +48,9 @@ function roleTerms(value){
   [/数据分析|business analyst/i,'数据分析师'],
   [/前端|react|vue/i,'前端开发'],
   [/软件|后端|编程|开发工程师|python|java/i,'软件开发'],
+  [/品牌督导|品牌.*督导/i,'品牌督导'],
+  [/(?:区域|渠道|市场|销售|终端|门店|零售|运营).*督导|督导/i,'区域督导'],
+  [/经销商|门店管理|终端运营|连锁经营|区域运营/i,'终端运营'],
   [/运营|增长|渠道/i,'产品运营'],
   [/市场|营销|品牌/i,'市场营销'],
   [/销售|商务|客户经理/i,'销售经理'],
@@ -66,7 +69,8 @@ export function simpleJobDirections(roleHint,profile,resumeText){
   const text=clean(resumeText,15000);
   if(/ai.{0,15}(?:agent|产品)|(?:agent|大模型).{0,12}(?:设计|产品)/i.test(text))out.push('AI产品经理');
   if(/(?:产品需求|产品原型|prd|产品规划|需求文档)/i.test(text))out.push('产品经理');
-  if(/(?:区域督导|运营|销售线索)/i.test(text))out.push('运营');
+  if(/(?:品牌督导|经销商经营|区域门店督导|终端运营|驻店辅导|DCC 管理)/i.test(text))out.push('品牌督导');
+  if(/(?:区域督导|门店运营|经销商管理|运营|销售线索)/i.test(text))out.push('区域督导');
   if(/(?:视觉设计|交互设计|ui设计)/i.test(text))out.push('设计师');
   if(/(?:研发|软件开发|代码编写)/i.test(text))out.push('软件开发');
  }
@@ -87,7 +91,7 @@ function candidateFromSearch(item){
  const url=safePublicJobUrl(item?.url);
  if(!url)return null;
  const title=clean(item?.title,180),snippet=clean(item?.summary||item?.snippet,650);
- if(!title||(NOISE.test(title)&&!/(?:产品经理|运营专员|数据分析师|工程师|设计师|销售经理|管培生|intern|product manager)/i.test(title)))return null;
+ if(!title||(NOISE.test(title)&&!/(?:督导|终端运营|门店运营|经销商|区域经理|渠道经理|产品经理|运营专员|数据分析师|工程师|设计师|销售经理|管培生|intern|product manager)/i.test(title)))return null;
  if(!JOB.test(title+' '+snippet))return null;
  // Search is only a discovery hint, not proof of title, location or vacancy state.
  return {url,search_title:title,summary:snippet};
@@ -243,6 +247,8 @@ export function rankSimpleShortlist(internal,outside,directions,preferredCities=
   const direct=roles.some(r=>title.includes(r)||r.includes(title));
   const related=roles.some(r=>r.includes('产品')&&title.includes('产品')||
    r.includes('运营')&&title.includes('运营')||
+   r.includes('督导')&&/(督导|门店运营|终端运营|渠道运营|经销商)/.test(title)||
+   r.includes('终端')&&/(终端|门店|渠道|经销商)/.test(title)||
    r.includes('销售')&&title.includes('销售')||
    r.includes('设计')&&title.includes('设计')||
    r.includes('开发')&&/研发|开发|软件/.test(title));
