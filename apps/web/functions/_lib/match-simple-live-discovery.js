@@ -1,6 +1,6 @@
 // HHBA minimal live job discovery: public Search -> specific job URLs -> Fetch.
 // Search data is untrusted. Neither AI nor Search snippets can claim a job is open.
-import {MAINLAND_CITIES,isMainlandJobLocation} from './mainland-job-location.js';
+import {findMainlandCity,isMainlandJobLocation} from './mainland-job-location.js';
 
 const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|日本|新加坡|美国|英国|海外|境外|hong[\s-]?kong|macau|taiwan|singapore|tokyo|london|united states|remote worldwide)/i;
 const CLOSED=/(?:职位已关闭|职位已下线|岗位已下线|已停止招聘|停止招聘|招聘已结束|不再接受申请|no longer accepting|position closed)/i;
@@ -100,29 +100,32 @@ function companyFrom(pageTitle,searchTitle,hostname){
  const host=hostname.replace(/^(?:www|job|jobs|careers?|recruit|zhaopin|talent)\./,'').split('.')[0];
  return clean(host,50)||'招聘企业';
 }
-function extractCity(text){
- const source=typeof text==='string'?text.slice(0,14000):'';
- const cityFrom=part=>{
-  if(typeof part!=='string'||OUTSIDE.test(part))return null;
-  return MAINLAND_CITIES.find(city=>part.includes(city))||null;
- };
- for(const match of source.matchAll(/(?:工作地点|工作城市|工作地|办公地点|办公城市|work location|location)\s*[：:\-]?\s*([^\n,，；;|｜]{2,80})/gi)){
-  const city=cityFrom(match[1]);if(city)return city;
+const PLACE_LABEL=/(?:工作地点|工作城市|工作地|工作地址|办公地点|办公城市|任职地点|职位地点|工作所在地|base location|work location|location)\s*[：:\-]?\s*([^\n\r|｜]{2,110})/gi;
+export function mainlandWorkplaceEvidence(text){
+ const input=typeof text==='string'?text.slice(0,14000):'';
+ let labeled=false;
+ for(const match of input.matchAll(PLACE_LABEL)){
+  labeled=true;
+  const raw=match[1].split(/[。；;（(]/)[0].trim().replace(/\s*(?:岗位职责|任职要求|职位描述|资格要求).*$/,'');
+  if(OUTSIDE.test(raw)||/(?:海外|境外|国外|全球|待定|remote worldwide|anywhere)/i.test(raw))
+   return {city:null,foreign:true,labeled:true};
+  const city=findMainlandCity(raw);
+  if(city)return {city,foreign:false,labeled:true};
  }
- // Search snippets and rendered headings sometimes omit an explicit label.
- for(const part of source.slice(0,900).split(/[\n,，；;|｜]/)){
-  const city=cityFrom(part);if(city)return city;
- }
- return null;
+ return {city:null,foreign:false,labeled};
 }
 function fetchedEvidence(candidate,page){
  const content=typeof page?.content==='string'?page.content.replace(/\r/g,'').slice(0,60000):'';
  const full=clean(page?.title,150)+'\n'+content;
  const title=deriveTitle(content,clean(page?.title)||candidate.search_title);
- const location=extractCity(content)||extractCity(candidate.search_title+' '+candidate.summary);
- if(!location||OUTSIDE.test((candidate.search_title+' '+full.slice(0,1500))))return null;
- if(CLOSED.test(full.slice(0,15000)))return null;
- if(!JOB.test(title))return null;
+ const pageLocation=mainlandWorkplaceEvidence(content);
+ const snippetLocation=mainlandWorkplaceEvidence(candidate.summary);
+ if(pageLocation.foreign||(pageLocation.labeled&&!pageLocation.city)||snippetLocation.foreign)return null;
+ const location=pageLocation.city||(!pageLocation.labeled?snippetLocation.city:null);
+ if(!location||!isMainlandJobLocation(location))return null;
+ if(CLOSED.test(full.slice(0,15000))||!JOB.test(title)||
+    /(?:驻外|赴海外|海外岗位|境外工作)/i.test(title))return null;
+ if(!/(?:岗位职责|工作职责|岗位要求|任职要求|工作内容|职位描述|岗位描述|主要职责|responsibilities|qualifications|job description)/i.test(content))return null;
  const lines=content.split('\n').map(l=>l.trim()).filter(Boolean);
  const excerpt=lines.find(l=>l.length>=20&&l.length<=260&&
     /(?:岗位职责|任职要求|工作内容|负责|需求|沟通|协作|设计|能力|经验|管理|产品|分析|开发|运营|学历)/.test(l))
@@ -179,13 +182,16 @@ export async function discoverSimpleJobs(key,directions,preferredCities=[],{fetc
   const fact=page?fetchedEvidence(item,page):null;
   // Search-only results remain usable ONLY when a concrete Mainland work city
   // is visible; label them unverified, never as a confirmed open vacancy.
-  const city=extractCity(item.search_title+'\n'+item.summary);
-  const fallback=city&&!OUTSIDE.test(item.search_title+' '+item.summary)?{
+  const hint=mainlandWorkplaceEvidence(item.summary);
+  const city=hint.foreign?null:hint.city;
+  const fallback=city&&!OUTSIDE.test(item.search_title)&&
+   !/(?:驻外|赴海外|海外岗位|境外工作)/i.test(item.search_title)?{
    company:companyFrom('',item.search_title,new URL(item.url).hostname),
    title:deriveTitle('',item.search_title),location:city,requirement:'',
    source_status:'SEARCH_RESULT_ONLY'}:null;
-  const row=fact||fallback;
-  if(!row||!isMainlandJobLocation(row.location)||!JOB.test(row.title))continue;
+  const row=fact||(!page?fallback:null);
+  if(!row||!isMainlandJobLocation(row.location)||!JOB.test(row.title)||
+   /(?:驻外|赴海外|海外岗位|境外工作)/i.test(row.title))continue;
   const k=[row.company,row.title,row.location].map(normalize).join('|');
   if(seen.has(k))continue;seen.add(k);
   jobs.push({
@@ -215,7 +221,10 @@ export async function discoverSimpleJobs(key,directions,preferredCities=[],{fetc
 export function rankSimpleShortlist(internal,outside,directions,preferredCities=[],limit=10){
  const roles=[...new Set((Array.isArray(directions)?directions:[]).map(normalize).filter(Boolean))];
  const cityPrefs=(Array.isArray(preferredCities)?preferredCities:[]).map(normalize);
- const scored=[...(Array.isArray(internal)?internal:[]),...(Array.isArray(outside)?outside:[])].map(job=>{
+ const scored=[...(Array.isArray(internal)?internal:[]),...(Array.isArray(outside)?outside:[])]
+  .filter(job=>job&&isMainlandJobLocation(job.location)&&
+   !/(?:驻外|赴海外|海外岗位|境外工作)/i.test(job.title||''))
+  .map(job=>{
   const title=normalize(job.title),company=normalize(job.company),loc=normalize(job.location);
   const direct=roles.some(r=>title.includes(r)||r.includes(title));
   const related=roles.some(r=>r.includes('产品')&&title.includes('产品')||
