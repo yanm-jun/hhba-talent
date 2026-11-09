@@ -90,6 +90,10 @@ test('job workplace must be China Mainland; multi-location listings with foreign
  assert.equal(mainlandWorkplaceEvidence('工作地点：北京、东京').city,null);
  assert.equal(mainlandWorkplaceEvidence('工作地点：北京、东京').foreign,true);
  assert.equal(mainlandWorkplaceEvidence('工作地点：上海/纽约').city,null);
+ assert.equal(mainlandWorkplaceEvidence('工作地点：上海\n工作地点：东京').city,null);
+ assert.equal(mainlandWorkplaceEvidence('工作地点：上海\n工作地点：东京').foreign,true);
+ assert.equal(mainlandWorkplaceEvidence('工作地点：上海\n工作地点：加拿大多伦多').city,null);
+
  assert.equal(mainlandWorkplaceEvidence('工作地点：东京\n公司总部：北京').city,null);
  assert.equal(mainlandWorkplaceEvidence('企业在北京有总部和员工，主营AI产品').city,null);
  assert.equal(mainlandWorkplaceEvidence('工作地点：上海。公司总部在美国').city,'上海');
