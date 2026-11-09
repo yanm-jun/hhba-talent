@@ -5,7 +5,7 @@ import type {MatchResponse} from '../services/resumeMatch';
 import '../styles/resume-match-dialog.css';
 
 // The model researches and ranks; the UI never re-ranks or hides English job titles.
-export function CandidateMatchNativeDialog({result,onClose}:{result:MatchResponse;onClose:()=>void}){
+export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=''}:{result:Pick<MatchResponse,'matches'>;onClose:()=>void;pending?:boolean;notice?:string}){
  const ref=useRef<HTMLDivElement|null>(null);
  useEffect(()=>{
   const overflow=document.body.style.overflow;
@@ -41,9 +41,10 @@ export function CandidateMatchNativeDialog({result,onClose}:{result:MatchRespons
     <div className="hhba-match-modal-content">
      <div className="hhba-match-intro">
       <span className="hhba-match-eyebrow"><Search size={14} style={{verticalAlign:'-2px',marginRight:5}}/> AI 自主联网找工作</span>
-      <h2 id="hhba-native-title">根据你的简历，为你找到 {result.matches.length} 个岗位</h2>
-      <p>只展示中国大陆工作岗位。以下是 DeepSeek 自主搜索并解释的推荐结果。</p>
+      <h2 id="hhba-native-title">根据你的简历，已找到 {result.matches.length} 个岗位{pending?'（继续搜索中）':''}</h2>
+      <p>只展示中国大陆工作岗位。{pending?'结果正在陆续生成，下方岗位可先查看。':'以下是 DeepSeek 自主搜索并解释的推荐结果。'}</p>
      </div>
+     {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
      {result.matches.length?
       <div className="hhba-native-list">
        {result.matches.map((job,i)=>(
