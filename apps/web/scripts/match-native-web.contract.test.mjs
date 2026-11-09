@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {safeJobDetailLink,parseJobAnswer,wasWebSearched,outputText} from '../functions/_lib/deepseek-native-match.js';
+import {safeJobDetailLink,parseJobAnswer,wasWebSearched,outputText,partialJobMatchesFromText} from '../functions/_lib/deepseek-native-match.js';
 import {runNativeJobMatch,onRequest} from '../functions/api/match-native/[[path]].js';
 const posting='https://careers.examplecorp.com/jobs/brand-supervisor-2026';
 const answer={jobs:[
@@ -187,4 +187,47 @@ test('authenticated HHBA route streams progress and final Top10 without blocking
   assert.doesNotMatch(stream,/东京/);
   assert.equal(calls,1);
  }finally{globalThis.fetch=realFetch}
+});
+
+test('streaming JSON returns Mainland jobs as soon as each full object is written',async()=>{
+ const all=JSON.stringify({jobs:answer.jobs});
+ const boundary=all.indexOf('},{"company"');
+ assert.ok(boundary>0);
+ const first=partialJobMatchesFromText(all.slice(0,boundary+1));
+ assert.equal(first.length,1);
+ assert.equal(first[0].location,'上海');
+ assert.equal(first[0].official_url,posting);
+ const end=partialJobMatchesFromText(all,10);
+ assert.equal(end.length,2,'overseas, mixed-location and duplicate posts never appear even temporarily');
+ const noClosing=partialJobMatchesFromText('{"jobs":[{"company":"深圳示例","title":"销售经理"');
+ assert.equal(noClosing.length,0);
+});
+test('native SSE forwards validated partial jobs before terminal response',async()=>{
+ const body=JSON.stringify({jobs:answer.jobs.slice(0,2)});
+ const mid=body.indexOf('},{"company"')+1;
+ const payload=[
+  {type:'response.created',response:{status:'in_progress'}},
+  {type:'response.web_search_call.completed'},
+  {type:'response.output_text.delta',delta:body.slice(0,mid)},
+  {type:'response.output_text.delta',delta:body.slice(mid)},
+  {type:'response.completed',response:deepseek(answer.jobs)}
+ ].map(x=>'event: '+x.type+'\ndata: '+JSON.stringify(x)+'\n\n').join('');
+ const seen=[];
+ const out=await runNativeJobMatch('synthetic-secret-not-real','国内品牌督导', '品牌督导',10,{
+  fetcher:async()=>new Response(payload,{status:200,headers:{'Content-Type':'text/event-stream'}}),
+  onPartial:matches=>seen.push(matches.map(j=>j.location).join(','))
+ });
+ assert.deepEqual(seen,['上海','上海,广州']);
+ assert.equal(out.matches.length,2);
+});
+test('frontend shows partial results without pretending network completion',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const svc=await readFile(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
+ const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
+ const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
+ assert.match(svc,/event==='partial'/);
+ assert.match(svc,/onPartial\?\./);
+ assert.match(page,/result\|\|partialJobs\.length>0/);
+ assert.match(page,/setPartialJobs/);
+ assert.match(dialog,/pending\?'（继续搜索中）'/);
 });
