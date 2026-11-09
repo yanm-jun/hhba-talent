@@ -58,7 +58,7 @@ test('Link-first result: official job direct and careers entry, no JD or fabrica
  assert.ok(mock.calls.filter(x=>x.endpoint==='fetch').every(x=>
   [source,another].includes(x.body.url)));
  assert.equal(result.usage.model,0);
- assert.ok(result.usage.search<=3&&result.usage.fetch<=6);
+ assert.ok(result.usage.search<=LINK_DISCOVERY_LIMITS.search&&result.usage.fetch<=LINK_DISCOVERY_LIMITS.fetch);
  assert.equal(result.accounting.billable.fetch,2);
 });
 test('Shared Feishu ATS job is exposed only when the FETCHED corporate page links to that exact tenant',async()=>{
@@ -100,7 +100,7 @@ test('Search-only, foreign or third-party links do not become verified careers e
  const result=await discoverOfficialRecruitmentLinks('内容运营',key,{fetcher:mock.fetcher,now});
  assert.equal(result.opportunities.length,0);
  assert.equal(result.quality_status,'NO_VERIFIED_OFFICIAL_LINKS');
- assert.ok(mock.calls.filter(c=>c.endpoint==='fetch').length<=6);
+ assert.ok(mock.calls.filter(c=>c.endpoint==='fetch').length<=LINK_DISCOVERY_LIMITS.fetch);
 });
 test('Provider failure does not invent company links, cost is bounded',async()=>{
  const mock=makeProvider({errorSearch:true});
@@ -108,8 +108,8 @@ test('Provider failure does not invent company links, cost is bounded',async()=>
  assert.equal(result.status,'PARTIAL');
  assert.equal(result.opportunities.length,0);
  assert.equal(result.accounting.complete,false);
- assert.deepEqual(result.usage,{model:0,search:3,fetch:0});
- assert.equal(LINK_DISCOVERY_LIMITS.fetch,6);
+ assert.deepEqual(result.usage,{model:0,search:6,fetch:0});
+ assert.equal(LINK_DISCOVERY_LIMITS.fetch,12);
 });
 test('Only normalized role queries are sent; no resume text, name, email or API key in payload',async()=>{
  const mock=makeProvider({results:[]});
@@ -143,11 +143,11 @@ test('All three career intents get a fair Search and company Fetch opportunity',
  const result=await discoverOfficialRecruitmentLinks(
   ['内容运营','软件开发','数据分析师'],key,{fetcher:mock.fetcher,now});
  const searches=mock.calls.filter(x=>x.endpoint==='search');
- assert.equal(searches.length,3);
+ assert.equal(searches.length,6);
  for(const role of ['内容运营','软件开发','数据分析师'])
   assert.ok(searches.some(s=>s.body.query.includes(role)),role+' not searched');
  assert.equal(result.usage.model,0);
- assert.ok(result.usage.fetch<=6);
+ assert.ok(result.usage.fetch<=LINK_DISCOVERY_LIMITS.fetch);
  assert.deepEqual(new Set(result.opportunities.map(x=>x.role)),
   new Set(['内容运营','软件开发','数据分析师']));
  assert.ok(result.opportunities.some(x=>
@@ -188,7 +188,7 @@ test('Realistic Tencent, Xiaomi, Anker career subpages reveal only fetched same-
  assert.ok(links.every(x=>x.qualification_status==='NOT_CHECKED'));
  assert.ok(!result.opportunities.some(x=>sourceLinks.includes(x.url)));
  assert.ok(!result.opportunities.some(x=>x.url.includes('jobspam')||x.url.includes('zhipin.com')));
- assert.ok(mock.calls.filter(x=>x.endpoint==='fetch').length<=6);
+ assert.ok(mock.calls.filter(x=>x.endpoint==='fetch').length<=LINK_DISCOVERY_LIMITS.fetch);
 });
 
 test('Direct employer recruitment subpages are fetched and kept as useful navigation links',async()=>{
@@ -206,7 +206,7 @@ test('Direct employer recruitment subpages are fetched and kept as useful naviga
  assert.deepEqual(new Set(r.opportunities.map(x=>x.url)),
   new Set(paths.map(x=>x[0])));
  assert.ok(r.opportunities.every(x=>x.kind==='CAREERS_ENTRY'&&x.reference_score===undefined));
- assert.ok(mock.calls.filter(x=>x.endpoint==='fetch').length<=6);
+ assert.ok(mock.calls.filter(x=>x.endpoint==='fetch').length<=LINK_DISCOVERY_LIMITS.fetch);
 });
 test('Real title format strips recruiting portal boilerplate from employer names',async()=>{
  const url='https://hr.game.163.com/';
