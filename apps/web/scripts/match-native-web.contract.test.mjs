@@ -55,6 +55,7 @@ test('one provider POST does the Search + explanations together and returns no s
  assert.equal(calls[0].url,'https://api.deepseek.com/responses');
  assert.equal(calls[0].body.model,'deepseek-v4-pro');
  assert.deepEqual(calls[0].body.tools,[{type:'web_search'}]);
+ assert.equal(calls[0].body.tool_choice,'required');
  assert.equal(calls[0].body.text.format.type,'json_object');
  assert.equal(calls[0].body.reasoning.effort,'none');
  assert.equal(r.matches.length,2);
