@@ -1,6 +1,6 @@
 // HHBA minimal live job discovery: public Search -> specific job URLs -> Fetch.
 // Search data is untrusted. Neither AI nor Search snippets can claim a job is open.
-import {findMainlandCity,isMainlandJobLocation} from './mainland-job-location.js';
+import {MAINLAND_CITIES,isMainlandJobLocation} from './mainland-job-location.js';
 
 const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|日本|新加坡|美国|英国|海外|境外|hong[\s-]?kong|macau|taiwan|singapore|tokyo|london|united states|remote worldwide)/i;
 const CLOSED=/(?:职位已关闭|职位已下线|岗位已下线|已停止招聘|停止招聘|招聘已结束|不再接受申请|no longer accepting|position closed)/i;
@@ -102,12 +102,16 @@ function companyFrom(pageTitle,searchTitle,hostname){
 }
 function extractCity(text){
  const source=typeof text==='string'?text.slice(0,14000):'';
+ const cityFrom=part=>{
+  if(typeof part!=='string'||OUTSIDE.test(part))return null;
+  return MAINLAND_CITIES.find(city=>part.includes(city))||null;
+ };
  for(const match of source.matchAll(/(?:工作地点|工作城市|工作地|办公地点|办公城市|work location|location)\s*[：:\-]?\s*([^\n,，；;|｜]{2,80})/gi)){
-  const city=findMainlandCity(match[1].slice(0,120));if(city)return city;
+  const city=cityFrom(match[1]);if(city)return city;
  }
  // Search snippets and rendered headings sometimes omit an explicit label.
  for(const part of source.slice(0,900).split(/[\n,，；;|｜]/)){
-  const city=findMainlandCity(part.slice(0,120));if(city)return city;
+  const city=cityFrom(part);if(city)return city;
  }
  return null;
 }
