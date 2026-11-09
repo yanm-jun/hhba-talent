@@ -12,17 +12,17 @@ import '../styles/talent-home-v4-final.css';
 const featured=['杭州','深圳','青岛'];
 const hot=['北京','上海','杭州','深圳','济南','青岛'];
 const apartmentIds=['hz-xiyue','sz-young'];
-// Licensed documentary photography for the two talent housing teaser cards.
+// Self-hosted licensed documentary photos for the two talent housing teaser cards.
 // These are environment illustrations, NOT verified photos of the named housing supply.
 // Sources: Marc Wieland, Unsplash (t8kYx7Xvy0U); Zhen Yao, Unsplash (nTRM7DuDh6Y).
 const housingPhotoById:Record<string,{src:string;alt:string;note:string;credit:string}>={
  'hz-xiyue':{
-  src:'https://images.unsplash.com/photo-1776348065025-acc32a51f53c?auto=format&fit=crop&w=1100&q=78',
+  src:import.meta.env.BASE_URL+'images/talent-housing-hangzhou-scene.webp',
   alt:'明亮的公寓卧室与学习空间摄影，非西投·西悦公寓的已核验实景',
   note:'公寓居住场景示意 · 非项目实景',credit:'Marc Wieland / Unsplash'
  },
  'sz-young':{
-  src:'https://images.unsplash.com/photo-1750087324468-a0eac0419a99?auto=format&fit=crop&w=1100&q=78',
+  src:import.meta.env.BASE_URL+'images/talent-housing-shenzhen-scene.webp',
   alt:'深圳住宅建筑摄影，非青年人才住房政策所指的具体配租房源',
   note:'深圳住宅实拍 · 非指定配租房源',credit:'Zhen Yao / Unsplash'
  }
@@ -111,7 +111,7 @@ export function TalentServicePage({user}:{user:User|null}){
      const hasPhoto=!!photo&&!badHousingImages.includes(h.id);
      return <Link key={h.id} to={talentHousingUrl(h.id)} className="htl-housing-card">
       <div className="htl-housing-photo">{hasPhoto?<>
-       <img src={photo.src} alt={photo.alt} title={'图片：'+photo.credit+' · 非指定项目实景'} loading="lazy" decoding="async" referrerPolicy="no-referrer"
+       <img src={photo.src} alt={photo.alt} title={'图片：'+photo.credit+' · 非指定项目实景'} loading="lazy" decoding="async"
         onError={()=>setBadHousingImages(list=>list.includes(h.id)?list:[...list,h.id])}/>
        <span className="htl-housing-photo-note">{photo.note}</span>
       </>:<><Building2 size={36} strokeWidth={1.4}/><span>项目实景待官方核验</span></>}</div>
