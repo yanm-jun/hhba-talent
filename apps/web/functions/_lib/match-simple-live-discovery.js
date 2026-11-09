@@ -174,7 +174,11 @@ export async function discoverSimpleJobs(key,directions,preferredCities=[],{fetc
   const candidate=candidateFromSearch(item);
   if(candidate&&!pool.has(candidate.url))pool.set(candidate.url,candidate);
  }
- const candidates=[...pool.values()].slice(0,12);
+ const candidates=[...pool.values()]
+  .filter(item=>!mainlandWorkplaceEvidence(item.summary).foreign)
+  .sort((a,b)=>Number(Boolean(mainlandWorkplaceEvidence(b.summary).city))-
+                Number(Boolean(mainlandWorkplaceEvidence(a.summary).city)))
+  .slice(0,16);
  const fetched=[];
  for(let i=0;i<candidates.length;i+=4){
   const chunk=await Promise.allSettled(candidates.slice(i,i+4).map(row=>
@@ -191,8 +195,8 @@ export async function discoverSimpleJobs(key,directions,preferredCities=[],{fetc
   // is visible; label them unverified, never as a confirmed open vacancy.
   const hint=mainlandWorkplaceEvidence(item.summary);
   const city=hint.foreign?null:hint.city;
-  const fallback=city&&!OUTSIDE.test(item.search_title)&&
-   !/(?:驻外|赴海外|海外岗位|境外工作)/i.test(item.search_title)?{
+  const fallback=city&&
+   !/(?:驻外|赴海外|海外岗位|境外工作|work abroad|relocation to)/i.test(item.search_title)?{
    company:companyFrom('',item.search_title,new URL(item.url).hostname),
    title:deriveTitle('',item.search_title),location:city,requirement:'',
    source_status:'SEARCH_RESULT_ONLY'}:null;
