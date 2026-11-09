@@ -136,14 +136,14 @@ test('frontend fetches one native SSE stream and maps stages without restarting 
  assert.match(svc,/event==='complete'/);
  assert.match(svc,/event==='failure'/);
  assert.match(page,/setStage/);
- assert.match(page,/DeepSeek 正在搜索中国大陆的真实岗位/);
+ assert.match(page,/DeepSeek Search 正在寻找中国大陆具体招聘岗位/);
 });
 
 
 test('authenticated route streams Search-first stages and final linked jobs',async()=>{
  const realFetch=globalThis.fetch;
  const {searchQueries}=await import('../functions/_lib/deepseek-search-match.js');
- const queryCount=searchQueries('上海经销商运营培训，DCC管理，AI产品设计。','品牌督导').length;
+ const queryCount=searchQueries('上海经销商运营培训，DCC管理，AI产品设计，还管理团队和渠道经营分析能力。','品牌督导').length;
  let calls=[];
  globalThis.fetch=async (url,options)=>{
   calls.push(url);
@@ -180,7 +180,7 @@ test('authenticated route streams Search-first stages and final linked jobs',asy
   method:'POST',headers:{Origin:'https://hhba.example',
    Authorization:'Bearer synthetic-client-token',
    Accept:'text/event-stream','Content-Type':'application/json'},
-  body:JSON.stringify({text:'上海经销商运营培训，DCC管理，AI产品设计。',
+  body:JSON.stringify({text:'上海经销商运营培训，DCC管理，AI产品设计，还管理团队和渠道经营分析能力。',
    consent:true,options:{country:'CN',remote_only:false,role_hint:'品牌督导',limit:10}})
  });
  try{
