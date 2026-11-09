@@ -1,5 +1,5 @@
-// HHBA V4 Pro single-call experience:
-// resume -> DeepSeek Responses API + native web_search -> Top10 reasons and links.
+// HHBA V4 Pro native-web experience:
+// resume -> two parallel DeepSeek Responses searches -> up to Top10 with richer reasons.
 // No internal job index, no ATS whitelists, no separate search/fetch passes, no self scoring.
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
@@ -322,7 +322,7 @@ export async function onRequest({request,env}){
  }
 
  try{
-  const result=await runNativeJobMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
+  const result=await runNativeDualMatch(env.HHBA_MATCH_DEEPSEEK_KEY,redacted,
    options.role_hint,options.limit);
   console.info('HHBA_MATCH_NATIVE_RESULT',JSON.stringify(result.diagnostic));
   return json(nativeResponsePayload(result));
