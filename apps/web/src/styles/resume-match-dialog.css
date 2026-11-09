@@ -74,3 +74,20 @@
  .hhba-match-modal-foot{padding:12px 17px}
 }
 @media(prefers-reduced-motion:reduce){.hhba-match-job{transition:none}}
+
+
+/* Minimal DeepSeek V4 Pro results: directly readable in one scrollable list. */
+.hhba-native-list{display:grid;gap:12px}
+.hhba-native-job{border:1px solid #e4ebe5;border-radius:13px;padding:18px;background:#fff}
+.hhba-native-top{display:flex;gap:14px;align-items:flex-start}
+.hhba-native-num{flex:0 0 auto;width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:#edf5ee;color:#36764c;font-size:13px;font-weight:800}
+.hhba-native-heading{min-width:0;flex:1}
+.hhba-native-heading>strong{display:block;font-size:13px;color:#43564a}
+.hhba-native-heading h3{font-size:17px;color:#1a3323;line-height:1.35;margin:6px 0}
+.hhba-native-meta{display:flex;flex-wrap:wrap;gap:16px;color:#748479;font-size:12px}
+.hhba-native-meta>span{display:inline-flex;align-items:center;gap:4px}
+.hhba-native-reason{margin:15px 0 12px;font-size:13px;line-height:1.75;color:#4b5f50}
+.hhba-native-reason strong{color:#214e31}
+.hhba-native-apply{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:650;text-decoration:none;color:#267045}
+.hhba-native-apply:hover{text-decoration:underline}
+@media(max-width:640px){.hhba-native-job{padding:14px}.hhba-native-heading h3{font-size:15px}.hhba-native-top{gap:10px}}
