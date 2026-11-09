@@ -121,8 +121,8 @@ function baseActive(ms:number):number {
   return 1750+12900*activity(ms);
 }
 function heatNoise(ms:number):number {
-  return 1400*smoothNoise(ms/890,11)+1200*smoothNoise(ms/4600,32)+
-    1900*smoothNoise(ms/26000,43);
+  return 580*smoothNoise(ms/1800,11)+690*smoothNoise(ms/6500,32)+
+    1700*smoothNoise(ms/26000,43);
 }
 function activeNoise(ms:number):number {
   return 95*smoothNoise(ms/2200,21)+145*smoothNoise(ms/14500,27);
