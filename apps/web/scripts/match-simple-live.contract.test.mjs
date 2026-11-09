@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
- safePublicJobUrl,simpleJobDirections,simpleJobQueries,discoverSimpleJobs,rankSimpleShortlist
+ safePublicJobUrl,simpleJobDirections,simpleJobQueries,discoverSimpleJobs,rankSimpleShortlist,mainlandWorkplaceEvidence
 } from '../functions/_lib/match-simple-live-discovery.js';
 
 const url='https://careers.examplecorp.com/jobs/ai-product-2026-001';
@@ -83,4 +83,61 @@ test('deduplicated result list does not drop English-titled jobs',async()=>{
  const src=await readFile(new URL('../src/components/CandidateMatchResultDialog.tsx',import.meta.url),'utf8');
  assert.match(src,/if\(!chinese\)return original/);
  assert.match(src,/result\.matches\.filter\(job=>Boolean\(job\.title/);
+});
+
+
+test('job workplace must be China Mainland; multi-location listings with foreign workplace are rejected',()=>{
+ assert.equal(mainlandWorkplaceEvidence('工作地点：北京、东京').city,null);
+ assert.equal(mainlandWorkplaceEvidence('工作地点：北京、东京').foreign,true);
+ assert.equal(mainlandWorkplaceEvidence('工作地点：上海/纽约').city,null);
+ assert.equal(mainlandWorkplaceEvidence('工作地点：东京\n公司总部：北京').city,null);
+ assert.equal(mainlandWorkplaceEvidence('企业在北京有总部和员工，主营AI产品').city,null);
+ assert.equal(mainlandWorkplaceEvidence('工作地点：上海。公司总部在美国').city,'上海');
+ assert.equal(mainlandWorkplaceEvidence('工作地点：济南。AI 产品需求分析').city,'济南');
+});
+test('Mainland-only filter applies even to pre-existing internal job index',()=>{
+ const inside=[
+  {id:'foreign',company:'海外公司',title:'AI产品经理',location:'东京',reference_score:99},
+  {id:'mixed',company:'企业甲',title:'产品经理',location:'上海 / 香港',reference_score:95},
+  {id:'unknown',company:'企业乙',title:'运营专员',location:'全球远程',reference_score:90},
+  {id:'domestic',company:'外资企业',title:'AI产品经理',location:'上海',reference_score:70},
+  {id:'travel',company:'企业丙',title:'海外驻外销售经理',location:'广州',reference_score:97}
+ ];
+ const out=rankSimpleShortlist(inside,[],['AI产品经理'],[],10);
+ assert.deepEqual(out.map(x=>x.id),['domestic']);
+});
+test('foreign office mentioned in job text does not exclude foreign-owned company recruiting in Mainland',async()=>{
+ const mock=async(target,options)=>{
+  const body=JSON.parse(options.body);
+  if(target.endsWith('/search'))return new Response(JSON.stringify({results:[{
+   url,title:'AI产品经理 | US-based Acme China',
+   summary:'工作地点：上海。国际公司在华招聘AI产品经理。'
+  }]}),{status:200});
+  return new Response(JSON.stringify({title:'AI产品经理 | Acme China',content:[
+   '# AI产品经理','工作地点：上海','岗位职责：负责AI产品需求、交互原型与版本验收。',
+   '任职要求：良好的产品思维，公司总部位于美国。'
+  ].join('\n')}),{status:200});
+ };
+ const out=await discoverSimpleJobs('demo-fake-key-123456789',['AI产品经理'],[],{fetcher:mock});
+ assert.equal(out.jobs.length,1);
+ assert.equal(out.jobs[0].location,'上海');
+});
+test('foreign workplaces in fetched job override any misleading domestic Search snippet',async()=>{
+ const mock=async(target,options)=>{
+  if(target.endsWith('/search'))return new Response(JSON.stringify({results:[{
+   url,title:'AI产品经理 | 招聘企业',summary:'工作地点：上海。招聘AI产品经理。'
+  }]}),{status:200});
+  return new Response(JSON.stringify({title:'AI产品经理',content:[
+   '# AI产品经理','工作地点：东京 / 上海',
+   '公司总部在北京；岗位职责：产品策划与设计。','任职要求：相关项目经验。'
+  ].join('\n')}),{status:200});
+ };
+ const out=await discoverSimpleJobs('demo-fake-key-123456789',['AI产品经理'],[],{fetcher:mock});
+ assert.equal(out.jobs.length,0,'domestic location from snippet must not override mixed international job location');
+});
+test('generic job listings must not be passed off as direct individual apply pages',()=>{
+ assert.equal(safePublicJobUrl('https://careers.examplecorp.com/jobs'),null);
+ assert.equal(safePublicJobUrl('https://careers.examplecorp.com/jobs/detail'),null);
+ assert.equal(safePublicJobUrl('https://careers.examplecorp.com/careers'),null);
+ assert.equal(safePublicJobUrl('https://careers.examplecorp.com/jobs/ai-product-2026-001'),url);
 });
