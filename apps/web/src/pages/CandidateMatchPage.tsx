@@ -28,7 +28,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
  const [options,setOptions]=useState<MatchOptions>({country:'CN',remote_only:false,role_hint:'',limit:10});
  const [working,setWorking]=useState(false);
   const [partialJobs,setPartialJobs]=useState<MatchedJob[]>([]);
-  const [stage,setStage]=useState<'preparing'|'connected'|'searching'|'writing'|'waiting'>('preparing');
+  const [stage,setStage]=useState<'preparing'|'connected'|'searching'|'reading'|'writing'|'waiting'>('preparing');
  const [error,setError]=useState('');
 
  const [result,setResult]=useState<MatchResponse|null>(null);
@@ -128,8 +128,8 @@ export function CandidateMatchPage({user}:{user:User|null}){
     <div className="hhba-ai-hero">
       <div className="hhba-ai-kicker"><BriefcaseBusiness size={16}/> 汇方职场 · HHBA · AI JOB MATCH</div>
       <h1>上传简历，匹配中国大陆岗位。</h1>
-      <p>DeepSeek V4 Pro 自主联网寻找中国大陆的工作岗位，直接提供推荐理由和投递链接。</p>
-      <div className="hhba-ai-headline-tags"><span>中国大陆工作岗位</span><span>V4 Pro 自主联网</span><span>无需自备 Key</span></div>
+      <p>DeepSeek Search 搜索真实招聘页面，V4 Pro 阅读简历并解释岗位适配原因。</p>
+      <div className="hhba-ai-headline-tags"><span>中国大陆工作岗位</span><span>Search 检索 · V4 Pro 匹配</span><span>无需自备 Key</span></div>
     </div>
     {availability==='loading'&&<p className="hhba-ai-service-check"><LoaderCircle size={17} className="spin"/>正在检查平台智能匹配服务…</p>}
     {availability==='disabled'&&<div className="hhba-ai-admin-note" role="status">
@@ -181,7 +181,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
-          <span>我同意 HHBA 提取简历文本，尽可能隐藏联系方式后，发送给 DeepSeek V4 Pro，由其自主联网搜索中国大陆招聘岗位并生成推荐。脱敏可能不完整，可先预览编辑；不会公开简历或自动投递。</span>
+          <span>我同意 HHBA 提取简历文本，尽可能隐藏联系方式后，发送给 DeepSeek V4 Pro，由 Search 接口搜索中国大陆公开招聘页面，再由 V4 Pro 生成岗位推荐。脱敏可能不完整，可先预览编辑；不会公开简历或自动投递。</span>
         </label>
         <p className="hhba-ai-notice"><ShieldCheck size={15}/> 本功能仅供已登录的求职者使用。简历原件在当前浏览器读取，最多取前 2 万字文字分析；分析需单独同意，结果仅在本次页面中展示，不会自动公开或向企业投递。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
@@ -190,11 +190,11 @@ export function CandidateMatchPage({user}:{user:User|null}){
           {working?<><LoaderCircle className="spin" size={18}/> 正在提取简历并匹配岗位…</>:
            <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
         </button>
-        {working&&<p className="hhba-ai-processing" role="status">{stage==='preparing'?'正在安全提交简历并启动 DeepSeek…':stage==='connected'?'DeepSeek 已连接，正在准备联网搜索…':stage==='searching'?'DeepSeek 正在搜索中国大陆的真实岗位…':stage==='waiting'?'DeepSeek 仍在处理，连接保持正常…':'搜索已执行，正在整理推荐理由和职位链接…'}</p>}
+        {working&&<p className="hhba-ai-processing" role="status">{stage==='preparing'?'正在安全提交简历并启动 DeepSeek…':stage==='connected'?'DeepSeek 已连接，正在准备联网搜索…':stage==='searching'?'DeepSeek Search 正在寻找中国大陆具体招聘岗位…':stage==='reading'?'正在读取部分候选岗位描述…':stage==='waiting'?'DeepSeek 仍在处理，连接保持正常…':'候选岗位已找到，V4 Pro 正在分析简历并撰写推荐理由…'}</p>}
       </section>
       <aside className="hhba-ai-aside">
         <div className="hhba-ai-aside-card"><h3>只需三步</h3>
-           <ol><li>上传简历</li><li>DeepSeek V4 Pro 自主联网搜索并判断</li>
+           <ol><li>上传简历</li><li>DeepSeek Search 查找岗位，V4 Pro 判断适配程度</li>
              <li>直接查看 Top 10 推荐理由与岗位链接</li></ol>
          </div>
          <p className="hhba-ai-aside-footnote">工作地点仅限中国大陆；招聘状态请以岗位原始网页为准。</p>
