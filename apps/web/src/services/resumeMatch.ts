@@ -17,6 +17,7 @@ export type MatchedJob = {
   needs_verification:string[];requirements_basis:string;
   source_type?:'HHBA站内岗位'|'站外官方招聘';
   application_status?:'NEEDS_OFFICIAL_CONFIRMATION';checked_at?:string;
+  source_status?:'OFFICIAL_DETAIL_FETCHED'|'SEARCH_RESULT_ONLY';
   salary?:string|null;experience_requirement?:string|null;
   required_skills?:string[];mandatory_skills?:string[];preferred_skills?:string[];unclassified_skills?:string[];
   min_experience_years?:number|null;minimum_education?:string|null;
@@ -58,6 +59,7 @@ const errorMap:Record<string,string>={
   AI_PROFILE_INCOMPLETE:'AI 未能可靠识别简历内容，请完善简历后重试。',
   MATCH_PERSONAL_LIMIT:'今天的个人免费体验次数已达上限。',
   MATCH_GLOBAL_LIMIT:'平台今天的 AI 体验额度已用完。',
+  JOB_SEARCH_UNAVAILABLE:'联网岗位搜索暂时失败，并不代表你没有适合的工作。请稍后再试。',
   BAD_RESPONSE:'匹配结果格式不完整，请稍后重试。'
 };
 export class MatchError extends Error {
@@ -164,6 +166,15 @@ export function safeExternalJobApplicationUrl(job:MatchedJob):string|null{
  try{
   const u=new URL(job.official_url);
   if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash)return null;
+  if(job.id.startsWith('external-simple-')&&
+   (job.source_status==='OFFICIAL_DETAIL_FETCHED'||job.source_status==='SEARCH_RESULT_ONLY')&&
+   typeof job.source==='string'&&u.hostname.toLowerCase()===job.source.toLowerCase()&&
+   job.official_url.length<=1500&&
+   /(?:job|jobs|position|career|recruit|talent|campus|hiring|vacanc|advertisement|detail|post|offer|opportunit)/i.test(u.pathname+' '+u.hostname)){
+   if(/(?:^|\.)(?:google|bing|baidu|zhihu|weibo|douyin|xiaohongshu|linkedin|indeed|glassdoor|zhipin|51job|liepin|lagou|jobui|kanzhun|github|csdn)\.(?:com|cn|org|net|io)$/i.test(u.hostname))return null;
+   if([...u.searchParams.keys()].some(k=>/(?:password|access_token|auth|session|redirect_uri)/i.test(k)))return null;
+   return u.href;
+  }
   const specs:Record<string,{company:string;path:string;param:string;pattern:RegExp}>={
    'careers.tencent.com':{company:'腾讯',path:'/jobdesc.html',param:'postId',pattern:/^\d{12,22}$/},
    'career.huawei.com':{company:'华为',path:'/cn/job-details',param:'advertisementId',pattern:/^\d{1,12}$/},
