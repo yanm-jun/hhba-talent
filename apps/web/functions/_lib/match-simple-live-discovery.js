@@ -24,8 +24,15 @@ export function safePublicJobUrl(raw){
   if(/\/(?:search|list|filter|browse|login|signup|register)(?:\/|$)/i.test(u.pathname)&&
      !/(?:job|position|career)/i.test(u.pathname))return null;
   if(u.pathname==='/'&&!JOB_PATH.test(host))return null;
-  const detail=JOB_PATH.test(u.pathname)||[...u.searchParams.keys()].some(k=>ID_QUERY.test(k))||
-   (JOB_PATH.test(host)&&/\/[a-z0-9_-]{7,}/i.test(u.pathname));
+  const segments=u.pathname.split('/').filter(Boolean);
+  const last=segments[segments.length-1]||'';
+  const idQuery=[...u.searchParams.entries()].some(([k,v])=>ID_QUERY.test(k)&&v.length>=4);
+  const detailPath=segments.length>=2&&JOB_PATH.test(u.pathname)&&
+   (last.length>=5&&!/^(?:job|jobs|career|careers|recruit|talent|campus|position|positions|detail|index|list|search|apply)$/i.test(last)||
+    segments.some(v=>/^[0-9]{9,}$/.test(v)));
+  const atsPath=/(?:^|\.)(?:jobs\.ashbyhq\.com|jobs\.lever\.co|boards\.greenhouse\.io|apply\.workable\.com)$/.test(host)&&
+   segments.length>=2&&last.length>=6;
+  const detail=idQuery||detailPath||atsPath;
   if(!detail)return null;
   if([...u.searchParams.keys()].some(k=>/(?:password|access_token|auth|session|redirect_uri)/i.test(k)))return null;
   return u.href;
@@ -106,7 +113,7 @@ export function mainlandWorkplaceEvidence(text){
  let labeled=false;
  for(const match of input.matchAll(PLACE_LABEL)){
   labeled=true;
-  const raw=match[1].split(/[。；;（(]/)[0].trim().replace(/\s*(?:岗位职责|任职要求|职位描述|资格要求).*$/,'');
+  const raw=match[1].split(/[。]/)[0].trim().replace(/\s*(?:岗位职责|任职要求|职位描述|资格要求).*$/,'');
   if(OUTSIDE.test(raw)||/(?:海外|境外|国外|全球|待定|remote worldwide|anywhere)/i.test(raw))
    return {city:null,foreign:true,labeled:true};
   const city=findMainlandCity(raw);
