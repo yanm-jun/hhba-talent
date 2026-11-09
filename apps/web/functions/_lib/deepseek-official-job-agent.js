@@ -53,6 +53,7 @@ const AGGREGATORS=[
  // Additional empirically observed cross-company portals in the 3rd live run.
  /(?:^|\.)nmbys\.cn$/,/^(?:www\.)?risfond\.com$/,
  /(?:^|\.)gzrc\.com\.cn$/ ,/(?:^|\.)yingjiesheng\.com$/,
+ /(?:^|\.)job5156\.com$/,
  /(?:^|\.)maimai\.cn$/,/^(?:www\.)?linkedin\.com$/,/^(?:www\.)?indeed\.com$/,
  /(?:^|\.)glassdoor\.com$/,/^(?:www\.)?jobui\.com$/,
  /(?:^|\.)xiaohongshu\.com$/,/^(?:www\.)?weibo\.com$/,
@@ -86,11 +87,16 @@ function publicHttps(value,{query=false,max=420}={}){
   // several non-tracking selectors (e.g. postIdEnc + brandCode). Permit only
   // their bounded structural selectors, not arbitrary query strings.
   const atsDetail=/\/web\/index\/webPosition[^/]*getOnePosition$/i.test(u.pathname);
+  // Some publicly readable single-job detail pages carry bounded tab context
+  // selectors. They are routing metadata, never location evidence.
+  const detailWithContext=/\/joinus\/detail\/[0-9]{12,25}\/?$/i.test(u.pathname);
   if(query&&([...u.searchParams].some(([k,v])=>{
    const identity=/^(?:id|jobid|job_id|positionId|postId|postIdEnc|reqId|requisitionId|jobUnionId|advertisementId|requementId|recruitId|jobCode|jobnumber)$/i.test(k);
    const selector=atsDetail&&/^(?:brandCode|columnId|recruitType|lanType|importPost)$/i.test(k);
+   const context=detailWithContext&&((k==='mode'&&/^(?:social|campus)$/i.test(v))||
+     (k==='location'&&/^CT_[0-9]{1,7}$/i.test(v)));
    const allowedValue=identity?/^[a-z0-9-]{3,58}$/i:/^[a-z0-9-]{1,58}$/i;
-   return !(identity||selector)||!allowedValue.test(v);
+   return !(identity||selector||context)||!context&&!allowedValue.test(v);
   })||u.searchParams.size>(atsDetail?8:2)))return null;
   return u;
  }catch{return null;}
@@ -109,6 +115,8 @@ export function publicJobLink(value){
  const u=publicHttps(value,{query:true});
  if(!u)return null;
  let path;try{path=decodeURIComponent(u.pathname);}catch{return null;}
+ // University third-party employment forwarding is not university hiring.
+ if(/\.edu\.cn$/i.test(u.hostname)&&/\/job\/view\/id\/[0-9]{3,}/i.test(path))return null;
  // Search/list roots can NEVER be standalone vacancy evidence.
  if(/^\/?$/.test(path)||/\/(?:list|search|index|category|all-jobs|openings|all-positions|job-list)\/?$/i.test(path))return null;
  const atsDetail=/\/web\/index\/webPosition[^/]*getOnePosition$/i.test(path)&&u.searchParams.has('postIdEnc');
