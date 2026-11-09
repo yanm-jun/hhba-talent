@@ -223,6 +223,7 @@ test('missing verified resume evidence does not become invented strengths',()=>{
  const reason=result.matches[0].why_recommended;
  assert.ok(reason.summary.length>10);
  assert.doesNotMatch(reason.evidence.join('；'),/本科学历|硕士学历|\d+年工作|Python/);
+ assert.doesNotMatch(reason.evidence.join('；'),/记录的「软件开发工程师」经历/);
 });
 test('job-card and detail prioritize specific personal reasons',async()=>{
  const {readFile}=await import('node:fs/promises');
