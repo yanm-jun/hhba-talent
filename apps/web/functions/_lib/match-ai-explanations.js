@@ -3,11 +3,16 @@
 const clean=(value,limit=140)=>typeof value==='string'?value.trim().slice(0,limit):'';
 const matchText=(haystack,needle)=>needle.length>=6&&haystack.toLocaleLowerCase().includes(needle.toLocaleLowerCase());
 const noUnsupportedPromises=/(?:保证(?:录用|面试|入职)|一定(?:录用|入职)|100%|必然(?:通过|成功)|免(?:笔试|面试))/i;
-const shortFallback=(job)=>{
+const shortFallback=(job,resume)=>{
  const evidence=Array.isArray(job.matched)?job.matched.filter(x=>typeof x==='string'&&!x.startsWith('匹配参考分 ')):[];
+ const excerpt=String(resume||'').split(/[\n。；;]/).map(x=>x.trim())
+  .find(x=>x.length>=12&&x.length<=180&&/(?:项目|负责|设计|开发|运营|产品|分析|管理|品牌|客户)/.test(x)&&
+   !/(?:姓名|手机号|邮箱|身份证|家庭住址)/.test(x));
+ if(excerpt)return '你的简历提到「'+excerpt.slice(0,70)+'」，与「'+String(job.title||'该职位').slice(0,60)+
+  '」的职业方向可能有关。请对照招聘页面的实际职责与任职条件判断是否投递。';
  return evidence.find(x=>x.startsWith('简历有对应技能证据：'))||
-  evidence.find(x=>x.startsWith('岗位名称与'))||
-  '职位方向与简历中的相关经历可能有关，建议结合官网任职要求判断是否申请。';
+  evidence.find(x=>x.startsWith('岗位名称与'))||evidence[0]||
+  '职位方向与简历中的相关经历可能有关，建议结合原始招聘页面核对要求。';
 };
 const officialEvidence=(job)=>[
  clean(job?.candidate_evidence?.requirement,260),
@@ -28,7 +33,7 @@ export function attachGroundedRecommendationReasons(matches,raw,revisedResume){
     matchText(revisedResume,resumeQuote)&&jobEvidence.some(s=>matchText(s,jobQuote))){
    return {...job,recommendation_reason:explanation};
   }
-  return {...job,recommendation_reason:shortFallback(job)};
+  return {...job,recommendation_reason:shortFallback(job,revisedResume)};
  });
 }
 export async function explainRecommendedJobsWithDeepSeek(key,resumeText,matches,{fetcher=fetch}={}){
