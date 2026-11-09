@@ -184,7 +184,7 @@ test('native Top10 is in a focus-managed single dialog with reasons and direct U
  const {readFile}=await import('node:fs/promises');
  const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
  const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
- assert.match(page,/result&&<CandidateMatchNativeDialog/);
+ assert.match(page,/result\|\|partialJobs\.length>0/);
  assert.doesNotMatch(page,/hhba-ai-results/);
  assert.match(page,/country:'CN'/);
  assert.match(dialog,/createPortal/);
