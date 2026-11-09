@@ -5,6 +5,7 @@ import {redactForModel,verifiedProfile,selectAuditedMatches,countVerifiedMainlan
 import {fuseDomesticJobRecommendations} from '../../_lib/domestic-match-fusion.js';
 import {discoverExternalOfficialJobs,sanitizedJobIntent} from '../../_lib/domestic-search-fetch.js';
 import {explainRecommendedJobsWithDeepSeek} from '../../_lib/match-ai-explanations.js';
+import {findMainlandCity} from '../../_lib/mainland-job-location.js';
 
 const KIND='HHBA_RESUME_MATCH_CLOUDFLARE_V1';
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
@@ -285,13 +286,19 @@ export async function onRequest({request,env}){
   console.warn('HHBA_MATCH_PROVIDER_FAILURE',code);
   return fail(code,code==='AI_PROVIDER_RATE_LIMITED'?429:502);
  }
+ // Respect cities explicitly listed as preferences in the resume; never infer
+ // a destination from schools, employers or arbitrary city mentions.
+ const preference=cleaned.match(/(?:意向城市|期望城市|求职城市|目标城市|期望工作地点)\\s*[:：]\\s*([^\\r\\n，,；;]{2,65})/);
+ const preferredCities=preference?[...new Set(preference[1].split(/[、/|]/)
+  .map(value=>findMainlandCity(value.trim())).filter(Boolean))].slice(0,5):[];
+ const matchOptions={...options,preferred_cities:preferredCities};
  const recommended=sources?selectAuditedMatches(
   sources.snapshot,sources.audit,sources.facets,profile,
-  {...options,candidate_pool_limit:1200},Date.now()
+  {...matchOptions,candidate_pool_limit:1200},Date.now()
  ):{matches:[],matched_official_jobs:0};
  const discovered=await autoDiscoveryCandidates(env,db,session.phone,profile,options);
  const merged=fuseDomesticJobRecommendations(
-  recommended.matches,discovered.candidates,profile,options,Date.now()
+  recommended.matches,discovered.candidates,profile,matchOptions,Date.now()
  );
  // DeepSeek writes only the grounded explanation, never job links or eligibility.
  // Even if this optional second call fails, retain the verified shortlist.
