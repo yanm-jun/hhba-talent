@@ -5,6 +5,7 @@ import {scoreCandidateFit} from './match-ranking.js';
 import {isMainlandJobLocation} from './mainland-job-location.js';
 import {separateCareerIntentAndExperience} from './resume-role-evidence.js';
 import {extractSelfReportedProfessionalCredentials} from './professional-credentials.js';
+import {verifiedWorkEvidence} from './resume-work-evidence.js';
 export const MAX_TEXT_LENGTH=20000;
 export function redactForModel(value){
  if(typeof value!=='string')return '';
@@ -60,7 +61,8 @@ export function verifiedProfile(raw,text,now=new Date()){
  const roleEvidence=separateCareerIntentAndExperience(raw.target_roles,original);
  return {education,education_evidence:education?degreeEvidence:null,
   experience_years:years,experience_evidence:years===null?null:yearsEvidence,
-  skills,target_roles:roleEvidence.target_roles,
+  skills,work_evidence:verifiedWorkEvidence(raw.work_evidence,original),
+  target_roles:roleEvidence.target_roles,
   career_intents:roleEvidence.career_intents,
   demonstrated_roles:roleEvidence.demonstrated_roles,
   professional_credentials:extractSelfReportedProfessionalCredentials(original),warnings:[]};
