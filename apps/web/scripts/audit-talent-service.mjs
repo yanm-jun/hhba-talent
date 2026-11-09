@@ -77,6 +77,17 @@ for(const entry of ["'housing' as const","'policies' as const","'benefits' as co
 assert.ok(landing.includes("const featured=['杭州','深圳','青岛']"),'Preserve approved three prominent city images');
 assert.ok(landing.includes("const apartmentIds=['hz-xiyue','sz-young']"),'Housing preview must use existing named records');
 assert.ok(landing.includes('项目实景待官方核验'),'Do not pass stock apartment interiors as real listings');
+assert.ok(landing.includes('公寓居住场景示意 · 非项目实景'),'Housing teaser must disclaim unverified property photography');
+assert.ok(landing.includes('深圳住宅实拍 · 非指定配租房源'),'Citywide housing program photo must not imply specific official property availability');
+for(const filename of ['talent-housing-hangzhou-scene.webp','talent-housing-shenzhen-scene.webp']){
+ const bytes=readFileSync(new URL('../public/images/'+filename,root));
+ assert.equal(bytes.toString('ascii',0,4),'RIFF',filename+' must have a valid WebP RIFF header');
+ assert.equal(bytes.toString('ascii',8,12),'WEBP',filename+' must contain a WebP image');
+ assert.equal(bytes.readUInt32LE(4)+8,bytes.byteLength,filename+' must not be truncated');
+ assert.ok(bytes.byteLength>=10000 && bytes.byteLength<500000,filename+' must be optimized and nonempty');
+ assert.ok(landing.includes("images/"+filename),'Housing teaser must use local bundled photo: '+filename);
+}
+
 assert.ok(landing.includes('htl-match-panel'),'Keep the bottom matching entry point without false eligibility claims');
 
 const matchEngine=readFileSync(new URL('data/talentMatchEngine.ts',root),'utf8');

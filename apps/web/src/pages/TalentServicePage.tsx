@@ -12,6 +12,22 @@ import '../styles/talent-home-v4-final.css';
 const featured=['杭州','深圳','青岛'];
 const hot=['北京','上海','杭州','深圳','济南','青岛'];
 const apartmentIds=['hz-xiyue','sz-young'];
+// Self-hosted licensed documentary photos for the two talent housing teaser cards.
+// These are environment illustrations, NOT verified photos of the named housing supply.
+// Sources: Marc Wieland, Unsplash (t8kYx7Xvy0U); Zhen Yao, Unsplash (nTRM7DuDh6Y).
+const housingPhotoById:Record<string,{src:string;alt:string;note:string;credit:string}>={
+ 'hz-xiyue':{
+  src:import.meta.env.BASE_URL+'images/talent-housing-hangzhou-scene.webp',
+  alt:'明亮的公寓卧室与学习空间摄影，非西投·西悦公寓的已核验实景',
+  note:'公寓居住场景示意 · 非项目实景',credit:'Marc Wieland / Unsplash'
+ },
+ 'sz-young':{
+  src:import.meta.env.BASE_URL+'images/talent-housing-shenzhen-scene.webp',
+  alt:'深圳住宅建筑摄影，非青年人才住房政策所指的具体配租房源',
+  note:'深圳住宅实拍 · 非指定配租房源',credit:'Zhen Yao / Unsplash'
+ }
+};
+
 const policyIds=['hz-grad-living','qd-graduate-house','sz-youth-rent-subsidy'];
 export function TalentServicePage({user}:{user:User|null}){
  const [city,setCity]=useState('北京'),[chosen,setChosen]=useState(false),[keyword,setKeyword]=useState('');
@@ -20,6 +36,7 @@ export function TalentServicePage({user}:{user:User|null}){
  const [searchNotice,setSearchNotice]=useState('');
  const [degree,setDegree]=useState('本科'),[grad,setGrad]=useState('unknown'),[matchCity,setMatchCity]=useState('北京');
  const [badImages,setBadImages]=useState<string[]>([]);
+ const [badHousingImages,setBadHousingImages]=useState<string[]>([]);
  const parsed=parseTalentCityQuery(keyword,city);
  const suggestions=suggestTalentCities(keyword);
  const choose=(name:string)=>{setCity(name);setChosen(true);setCityOpen(false);setSuggestOpen(false);setSearchNotice('')};
@@ -89,10 +106,18 @@ export function TalentServicePage({user}:{user:User|null}){
    <div className="htl-divider"/>
    <section className="htl-section" aria-labelledby="htl-housing-title">
     <div className="htl-heading"><h2 id="htl-housing-title">人才公寓推荐</h2><button type="button" onClick={()=>navigate(talentListUrl('housing',city))}>更多项目 ›</button></div>
-    <div className="htl-housing-grid">{previewHomes.map(h=><Link key={h.id} to={talentHousingUrl(h.id)} className="htl-housing-card">
-     <div className="htl-housing-photo"><Building2 size={36} strokeWidth={1.4}/><span>项目实景待官方核验</span></div>
-     <div className="htl-housing-caption"><strong>{h.title}</strong><small>{h.kind==='program'?'住房政策入口 · 具体项目与房源请核验':h.district+' · 查看官方项目与配租说明'}</small></div>
-    </Link>)}</div>
+    <div className="htl-housing-grid">{previewHomes.map(h=>{
+     const photo=housingPhotoById[h.id];
+     const hasPhoto=!!photo&&!badHousingImages.includes(h.id);
+     return <Link key={h.id} to={talentHousingUrl(h.id)} className="htl-housing-card">
+      <div className="htl-housing-photo">{hasPhoto?<>
+       <img src={photo.src} alt={photo.alt} title={'图片：'+photo.credit+' · 非指定项目实景'} loading="lazy" decoding="async"
+        onError={()=>setBadHousingImages(list=>list.includes(h.id)?list:[...list,h.id])}/>
+       <span className="htl-housing-photo-note">{photo.note}</span>
+      </>:<><Building2 size={36} strokeWidth={1.4}/><span>项目实景待官方核验</span></>}</div>
+      <div className="htl-housing-caption"><strong>{h.title}</strong><small>{h.kind==='program'?'住房政策入口 · 具体项目与房源请核验':h.district+' · 查看官方项目与配租说明'}</small></div>
+     </Link>;
+    })}</div>
    </section>
    <div className="htl-divider"/>
    <section className="htl-section" aria-labelledby="htl-policy-title">

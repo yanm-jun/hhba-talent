@@ -22,3 +22,13 @@
 
 /* V4.5 national-city search error notice, preserving six-block homepage composition. */
 .htl-search-notice{margin:7px 0 0!important;font-size:11px!important;color:#a56b2e!important;line-height:1.6!important}
+
+
+/* Licensed housing-related photographs, marked as illustrative imagery.
+   Do not represent these as photos of a specific verified project. */
+.htl-housing-photo{position:relative;overflow:hidden;isolation:isolate}
+.htl-housing-photo img{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;transition:transform .24s ease}
+.htl-housing-card:nth-child(2) .htl-housing-photo img{object-position:center 40%}
+.htl-housing-card:hover .htl-housing-photo img{transform:scale(1.025)}
+.htl-housing-photo-note{position:absolute;z-index:1;bottom:11px;left:12px;max-width:calc(100% - 24px);padding:5px 10px;background:rgba(20,35,53,.67);color:#fff;border-radius:6px;font-size:11px;letter-spacing:.01em;line-height:1.5;backdrop-filter:blur(6px)}
+@media(prefers-reduced-motion:reduce){.htl-housing-photo img{transition:none}}
