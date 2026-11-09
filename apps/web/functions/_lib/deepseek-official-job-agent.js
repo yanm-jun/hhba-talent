@@ -722,6 +722,35 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
   if(confirmed.size>=desired)break;
   if(usage.search>=V8_BUDGET.search&&usage.fetch>=V8_BUDGET.fetch)break;
  }
+ // If all model calls are exhausted, one source-agnostic search may
+ // rescue recall using specific evidence terms. Never increase the 8-search
+ // ceiling or treat its snippets as actual verified jobs.
+ let evidenceRescueSearches=0,evidenceRescueCandidates=0;
+ if(!confirmed.size&&usage.model===V8_BUDGET.model&&
+    observed.size>=4&&usage.search<V8_BUDGET.search&&
+    usage.fetch<=V8_BUDGET.fetch-2){
+  const query=safeAgentQuery(intents[0]+' '+now.getUTCFullYear()+
+   ' 企业官网 职位详情 工作地点 任职要求 立即申请',intents);
+  if(query){
+   usage.search++;evidenceRescueSearches++;
+   try{
+    const result=await requestJson('/v1/tools/search',key,
+     {query,count:20,need_content:false},fetcher);
+    if(Array.isArray(result?.results)&&result.results.length)meter.billable_search++;
+    for(const row of (Array.isArray(result?.results)?result.results:[]).slice(0,20)){
+     const link=publicJobLink(row.url),corp=publicCorporatePage(row.url);
+     if(link&&!observed.has(link.url)){
+      observed.set(link.url,{...link,search_title:t(row.title,110),
+       search_metadata:{title:t(row.title,180),url:link.url,
+        snippet:t(row.snippet,800),summary:t(row.summary,1100),
+        authority:row.authority,rerank_score:row.rerank_score,date:row.date}});
+      evidenceRescueCandidates++;
+     }else if(corp&&!sites.has(corp.url))sites.set(corp.url,corp);
+    }
+   }catch{failures++;uncertainProviderFailure=true;
+    rejections.RESCUE_SEARCH_UNAVAILABLE=(rejections.RESCUE_SEARCH_UNAVAILABLE||0)+1;}
+  }
+ }
  // A model may use all four Responses while leaving many searchable vacancy
  // links unread. Complete a SMALL, deterministic shortlist from its own Search
  // discoveries without further model calls. These are real Fetch requests,
@@ -763,6 +792,8 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
   quality_status:confirmed.size?'VERIFIED_JOBS_FOUND':'NO_VERIFIED_JOBS',
   stats:{verified:confirmed.size,discovered:observed.size,job_details:pages.size,failures,
    postpass_job_reads:postpassJobReads,
+   evidence_rescue_searches:evidenceRescueSearches,
+   evidence_rescue_candidates:evidenceRescueCandidates,
    browser_render:{attempts:browserAttempts,recovered:browserRecovered,failures:browserFailures},
    employer_proof:{searches:employerLookups,search_candidates:employerLookupResults,
     corporate_page_fetches:companyPageReads},
