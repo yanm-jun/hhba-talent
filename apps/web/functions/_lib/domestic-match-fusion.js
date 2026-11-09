@@ -6,7 +6,7 @@ import {publicJobLink} from './deepseek-official-job-agent.js';
 import {scoreCandidateFit} from './match-ranking.js';
 import {extractSkillRequirements,extractStructuredSkillConditions} from './job-skill-evidence.js';
 import {isMainlandJobLocation,findMainlandCity} from './mainland-job-location.js';
-import {explainFinalJobScore} from './match-explanation.js';
+import {explainFinalJobScore,whyThisJob} from './match-explanation.js';
 import {extractMandatoryProfessionalCredentials,extractStructuredCredentialConditions,professionalPracticeReview} from './professional-credentials.js';
 import {assessJobQualification} from './job-qualification-evidence.js';
 import {groundedCareerTransfer} from './career-transfer-evidence.js';
@@ -241,6 +241,7 @@ export function fuseDomesticJobRecommendations(inside=[],outside=[],rawProfile={
   const fit=scoreCandidateFit(profile,job,options);
   if(!fit.eligible)return null;
   const rationale=explainFinalJobScore(profile,job,fit);
+  const personalized=whyThisJob(rawProfile,job,fit);
   const transfer=groundedCareerTransfer(rawProfile,job);
   if(transfer)rationale.not_evidenced.push(
    '可迁移能力：'+transfer.supporting_skills.join('、')+
@@ -250,6 +251,7 @@ export function fuseDomesticJobRecommendations(inside=[],outside=[],rawProfile={
    professional_credential_requirements:job.professional_credential_requirements||[],
    professional_credential_review:professionalPracticeReview(job.title),
    matched:rationale.matched,not_evidenced:rationale.not_evidenced,
+   why_recommended:personalized,
    score_reasoning:rationale.score_reasoning,
    ranking_version:fit.ranking_version,rankEvidence:fit.score};
  }).filter(Boolean);
