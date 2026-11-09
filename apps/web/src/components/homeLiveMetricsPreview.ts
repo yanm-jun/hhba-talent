@@ -156,7 +156,6 @@ function period(hour:number):string {
 }
 export function previewMetricsAt(epochMs:number):LivePreviewMetrics {
   const now=beijingParts(epochMs);
-  const elapsed=Math.max(0,epochMs-PREVIEW_ANCHOR_MS);
   // A deterministic timestamp, not client-local random state. All visitors
   // observing the same moment see the same review illustration.
   const heat=clamp(Math.round(
