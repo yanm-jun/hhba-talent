@@ -179,7 +179,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
-          <span>我同意 HHBA 尽可能隐藏联系方式后，将简历文字发送给 DeepSeek V4 Pro，由其自主联网搜索中国大陆招聘岗位并生成推荐。脱敏可能不完整，可先预览编辑；不会公开简历或自动投递。</span>
+          <span>我同意 HHBA 提取简历文本，尽可能隐藏联系方式后，发送给 DeepSeek V4 Pro，由其自主联网搜索中国大陆招聘岗位并生成推荐。脱敏可能不完整，可先预览编辑；不会公开简历或自动投递。</span>
         </label>
         <p className="hhba-ai-notice"><ShieldCheck size={15}/> 本功能仅供已登录的求职者使用。简历原件在当前浏览器读取，最多取前 2 万字文字分析；分析需单独同意，结果仅在本次页面中展示，不会自动公开或向企业投递。</p>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
