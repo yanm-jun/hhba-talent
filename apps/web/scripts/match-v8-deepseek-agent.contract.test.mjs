@@ -472,3 +472,21 @@ test('Real DeepSeek audit: general job portals are NOT employer-owned job pages'
  assert.ok(publicJobLink('https://careers.suning.cn/rps-web/position/position_info_new.htm?id=19714'),
   'a real enterprise-owned careers domain must remain eligible for Fetch before independent JD screening');
 });
+
+test('2026 corporate single-job context links survive strict routing without open API access',()=>{
+ const url='https://www.shlab.org.cn/joinus/detail/7683111551720704299?location=CT_125&mode=social';
+ const link=publicJobLink(url);
+ assert.ok(link,'public real single-job employer URL with bounded context selectors');
+ assert.equal(link.domain,'shlab.org.cn');
+ assert.ok(publicCorporatePage('https://www.shlab.org.cn/joinus'));
+ for(const bad of [
+  'https://www.shlab.org.cn/joinus/detail/7683111551720704299?location=CT_125&mode=social&redirect=evil',
+  'https://www.shlab.org.cn/joinus/detail/7683111551720704299?location=global&mode=social',
+  'https://www.shlab.org.cn/joinus/detail/7683111551720704299?location=CT_125&mode=debug',
+  'https://www.shlab.org.cn/joinus/detail/7683111551720704299?location=CT_125&mode=social&mode=social',
+  'https://www.shlab.org.cn/joinus/detail/7683111551720704299?location=CT_125&mode=social&callback=alert'
+ ])assert.equal(publicJobLink(bad),null,bad);
+ assert.equal(publicJobLink('https://jxdxsjy.jx.edu.cn/job/view/id/231102/from_type/2/from_id/64689'),null);
+ assert.equal(publicJobLink('https://www.job5156.com/dongguan/job_1kc5_Zwaw2yuQ4jrTSZRFA'),null);
+ assert.ok(publicJobLink('https://hr.xiaomi.com/job/view/99'));
+});
