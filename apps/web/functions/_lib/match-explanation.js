@@ -67,3 +67,72 @@ export function explainFinalJobScore(profile,job,fit){
   gaps.push('职位职业方向的证据有限，匹配分已设置上限');
  return {matched,not_evidenced:gaps,score_reasoning:summary};
 }
+
+
+/**
+ * A compact, applicant-specific explanation for the shortlist.
+ * Use facts from the verified profile and authenticated job facets only.
+ * Career preferences are interests, never represented as past work.
+ */
+export function whyThisJob(profile={},job={},fit={}){
+ const reasons=[],gaps=[];
+ const roles=(Array.isArray(profile.demonstrated_roles)?
+   profile.demonstrated_roles:profile.target_roles||[])
+  .filter(x=>typeof x==='string').slice(0,6);
+ const wishes=(Array.isArray(profile.career_intents)?profile.career_intents:[])
+  .filter(x=>typeof x==='string').slice(0,6);
+ const title=safe(job.title,75);
+ const normTitle=norm(title);
+ const demonstrated=roles.find(x=>normTitle.includes(norm(x))||norm(x).includes(normTitle)&&normTitle.length>=4);
+ const interested=wishes.find(x=>normTitle.includes(norm(x))||norm(x).includes(normTitle)&&normTitle.length>=4);
+ if(demonstrated)reasons.push('简历记录的「'+safe(demonstrated,32)+'」经历，与该岗位方向直接相关');
+ else if(interested)reasons.push('你希望从事「'+safe(interested,32)+'」，这一岗位符合求职方向；这不代表已经具有相同岗位经历');
+ else if(fit.breakdown?.role>0)reasons.push('岗位方向与你简历体现的能力或职业目标存在关联');
+ const skills=[...(fit.matched_required_skills||[]),
+  ...(fit.matched_preferred_skills||[]),...(fit.matched_unclassified_skills||[])]
+  .map(x=>norm(x)).filter(Boolean);
+ const has=new Set(skills);
+ const used=new Set();
+ const skillNames=[];
+ for(const x of Array.isArray(profile.skills)?profile.skills:[]){
+  const name=safe(typeof x==='string'?x:x?.name,40),key=norm(name);
+  if(!key||!has.has(key)||used.has(key))continue;
+  used.add(key);skillNames.push(name);
+  if(skillNames.length>=3)break;
+ }
+ if(skillNames.length)reasons.push('你的简历明确记录「'+skillNames.join('、')+'」，与岗位公开技能要求对应');
+ const education=DEGREE[profile.education],minimum=DEGREE[job.minimum_education];
+ if(education&&minimum&&fit.breakdown?.education>0)
+  reasons.push('简历记录'+education+'学历，达到岗位已明确的'+minimum+'最低学历要求');
+ if(Number.isFinite(job.min_experience_years)&&job.min_experience_years>0&&
+  Number.isFinite(profile.experience_years)&&profile.experience_years>=job.min_experience_years)
+  reasons.push('简历可确认的工作年限为'+profile.experience_years+
+   '年，达到岗位明确的'+job.min_experience_years+'年最低要求；行业经历仍需官网核对');
+ if(!reasons.length){
+  if(Array.isArray(profile.target_roles)&&profile.target_roles.length)
+   reasons.push('此岗位与你的目标职业方向有关，但尚无足够简历证据可进一步确认契合点');
+  else reasons.push('已找到相关岗位；简历可核实的契合证据有限，建议查看官方任职条件');
+ }
+ if(!skillNames.length)gaps.push('尚未从简历和岗位要求中确认明确对应的技能');
+ if(!minimum)gaps.push('公开资料未明确最低学历，需以企业职位页为准');
+ if(job.application_status==='NEEDS_OFFICIAL_CONFIRMATION')
+  gaps.push('当前是否开放投递仍需在企业招聘页确认');
+ return {
+  summary:reasons[0],
+  evidence:reasons.slice(0,3),
+  to_check:gaps.slice(0,2)
+ };
+}
+
+/** Recruitment entry links have no confirmed JD: explain the career lead, not a job fit. */
+export function whyThisCareerEntry(profile={},item={}){
+ const role=safe(item.role,60);
+ const stated=(Array.isArray(profile.career_intents)?profile.career_intents:[])
+  .filter(x=>typeof x==='string').slice(0,6);
+ const hinted=(Array.isArray(profile.target_roles)?profile.target_roles:[])
+  .filter(x=>typeof x==='string').slice(0,6);
+ const focused=[...stated,...hinted].some(x=>norm(x)===norm(role));
+ return focused?
+  '根据你的求职方向「'+role+'」找到这家企业的招聘渠道；具体岗位及适配条件需要打开官网确认':
+  '找到与你的职业方向「'+role+'」相关的招聘入口；尚未核实具体岗位要求';
+}
