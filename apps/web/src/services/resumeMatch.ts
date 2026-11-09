@@ -26,6 +26,7 @@ export type MatchedJob = {
    supporting_skills:string[];disclaimer:string}|null;
   score_breakdown?:{role:number;skills:number;experience:number;education:number;location:number};
   score_reasoning?:string;
+  why_recommended?:{summary:string;evidence:string[];to_check:string[]};
   evidence_quality?:{skills:string;experience:string;education:string};
   ranking_version?:'HHBA_MATCH_RANKING_V2';
 };
@@ -36,6 +37,7 @@ export type OfficialNavigationOpportunity = {
  source_evidence:'FIRST_PARTY_CAREERS_PAGE_READ'|'CORPORATE_EXACT_JOB_LINK'|'CORPORATE_NAMED_BOARD_LINK';
  source_url:string;workplace:string;
  qualification_status:'NOT_CHECKED';hiring_status:'UNCONFIRMED';label:string;
+ why_suggested?:string;
 };
 export function safeOfficialNavigationUrl(item:OfficialNavigationOpportunity):string|null{
  try{
