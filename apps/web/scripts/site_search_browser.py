@@ -23,7 +23,7 @@ with sync_playwright() as p:
     errors = []
     page.on("pageerror", lambda e: errors.append(str(e)))
     page.goto(BASE, wait_until="domcontentloaded", timeout=60000)
-    header = page.get_by_role("searchbox", name="搜索 HHBA 站内所有公开内容")
+    header = page.get_by_role("searchbox", name="搜索汇方职场 HHBA 站内所有公开内容")
     header.wait_for(timeout=60000)
     # Winter campaign owns first visit. The older public letter remains manual.
     winter=page.get_by_role("button", name="关闭寒假实习广告")
@@ -35,7 +35,7 @@ with sync_playwright() as p:
 
     header.fill("新西兰留学")
     page.get_by_role("button", name="提交全站搜索").click()
-    page.get_by_role("heading", name="搜索 HHBA").wait_for(timeout=60000)
+    page.get_by_role("heading", name="搜索汇方职场").wait_for(timeout=60000)
     page.get_by_role("heading", name="新西兰留学机会").first.wait_for(timeout=60000)
     assert "q=" in page.url and "/search" in page.url, page.url
     page.screenshot(path="/tmp/hhba-global-search-results.png")
@@ -55,7 +55,7 @@ with sync_playwright() as p:
 
     # A source-backed public policy must also be discoverable.
     page.goto(BASE+"search?q="+quote("济南"), wait_until="domcontentloaded")
-    page.get_by_role("heading", name="搜索 HHBA").wait_for(timeout=60000)
+    page.get_by_role("heading", name="搜索汇方职场").wait_for(timeout=60000)
     page.get_by_role("button", name="人才政策", exact=True).click()
     assert page.locator(".hhba-site-search-result").count() > 0, "city policy search returned no records"
 
