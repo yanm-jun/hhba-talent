@@ -33,6 +33,13 @@
 .hhba-match-job-score>span{font-size:10px;color:#92a095;white-space:nowrap}
 .hhba-match-job-arrow{flex-shrink:0;color:#a8b9aa}
 .hhba-match-job:hover .hhba-match-job-arrow{color:#3b8858}
+/* Link-first V8: distinct from verified, scored vacancies; no invented score. */
+.hhba-match-navigation-row{text-decoration:none;align-items:center}
+.hhba-match-navigation-action{flex-shrink:0;font-size:11px;font-weight:750;color:#287347;border:1px solid #d5e5d9;border-radius:100px;padding:7px 11px;background:#f5faf6}
+.hhba-match-link-notice{font-size:11px;line-height:1.8;color:#7c8c80;margin:11px 0 20px}
+.hhba-match-verified-heading{margin-top:23px}
+@media(max-width:640px){.hhba-match-navigation-action{font-size:10px;padding:6px 8px}}
+
 .hhba-match-disclaimer{margin:21px 0 0;color:#9aa69c;font-size:11px;line-height:1.7}
 .hhba-match-modal-foot{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px 30px;border-top:1px solid #edf1ed}
 .hhba-match-modal-foot>span{font-size:11px;letter-spacing:.01em;color:#a5afa8}
