@@ -29,6 +29,37 @@ export type MatchedJob = {
   evidence_quality?:{skills:string;experience:string;education:string};
   ranking_version?:'HHBA_MATCH_RANKING_V2';
 };
+/** Navigation suggestions are NOT verified jobs, scores or eligibility claims. */
+export type OfficialNavigationOpportunity = {
+ kind:'JOB_DETAIL'|'CAREERS_ENTRY';
+ url:string;company:string;title:string;role:string;
+ source_evidence:'FIRST_PARTY_CAREERS_PAGE_READ'|'CORPORATE_EXACT_JOB_LINK'|'CORPORATE_NAMED_BOARD_LINK';
+ source_url:string;workplace:string;
+ qualification_status:'NOT_CHECKED';hiring_status:'UNCONFIRMED';label:string;
+};
+export function safeOfficialNavigationUrl(item:OfficialNavigationOpportunity):string|null{
+ try{
+  const u=new URL(item.url),root=new URL(item.source_url);
+  const valid=(x:URL)=>x.protocol==='https:'&&!x.username&&!x.password&&!x.port&&!x.hash&&
+   /^[a-z0-9-]+(?:\.[a-z0-9-]+){1,5}$/.test(x.hostname)&&
+   !x.hostname.includes('xn--')&&!/^(?:\d+\.){3}\d+$/.test(x.hostname)&&
+   !/(?:^|\.)(?:localhost|invalid|example|test)$/.test(x.hostname);
+  if(!valid(u)||!valid(root)||!item.company.trim()||
+     item.qualification_status!=='NOT_CHECKED'||item.hiring_status!=='UNCONFIRMED')return null;
+  if(/(?:^|\.)(?:zhipin\.com|51job\.com|liepin\.com|zhaopin\.com|lagou\.com|yingjiesheng\.com|ncss\.cn)$/.test(u.hostname))return null;
+  if(item.kind==='CAREERS_ENTRY'){
+   if(u.href!==root.href||u.search||
+     !/^(?:\/|\/cn|\/zh|\/zh-cn|\/about|\/about-us|\/career|\/careers|\/jobs|\/join|\/join-us|\/recruit|\/recruitment|\/company|\/company\/about|\/careers\/index|\/career\/index|\/jobs\/index|\/about\/index|\/about\/company|\/talent|\/talents|\/joinus|\/join-us\/index|\/joinus\/index|\/recruit\/index|\/zh-cn\/careers|\/cn\/careers)$/.test(u.pathname.toLowerCase()))return null;
+  }else if(item.kind==='JOB_DETAIL'){
+   if(!/(?:\/(?:job|jobs|position|positions|recruit|recruitment|career|careers|vacancy|detail)[\/._-]|jobdesc|job-details|jobinfo|position-detail|post-detail)/i.test(u.pathname))return null;
+   if(item.source_evidence==='FIRST_PARTY_CAREERS_PAGE_READ'){
+    const base=(h:string)=>h.split('.').slice(-2).join('.');
+    if(base(u.hostname)!==base(root.hostname))return null;
+   }
+  }else return null;
+  return u.href;
+ }catch{return null;}
+}
 export type QualificationReview = {
   id:string;company:string;title:string;location:string;
   source_type:'HHBA站内岗位'|'站外官方招聘';
@@ -39,6 +70,8 @@ export type MatchResponse = {
   status:'COMPLETE';profile:MatchProfile;matches:MatchedJob[];
   matched_official_jobs:number;source:string;scoring:string;privacy:string;disclaimer:string;
   qualification_reviews?:QualificationReview[];
+  opportunities?:OfficialNavigationOpportunity[];
+  opportunity_quality_status?:string|null;
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number};
 const API='/api/match';
@@ -132,7 +165,8 @@ export async function submitExtractedResumeText(
   throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});
  const data=await response.json().catch(()=>({})) as Partial<MatchResponse>&{error?:string};
  if(!response.ok)throw new MatchError(response.status,errorMap[data.error||'']||'智能匹配服务暂时不可用。');
- if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||data.matches.length>10)
+ if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||data.matches.length>10||
+  data.opportunities&&(!Array.isArray(data.opportunities)||data.opportunities.length>10))
   throw new MatchError(502,errorMap.BAD_RESPONSE);
  return data as MatchResponse;
 }
