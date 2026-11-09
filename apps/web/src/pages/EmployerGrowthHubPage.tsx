@@ -31,7 +31,7 @@ function entryRoute(user: User | null) {
 export function EmployerStartPage({ user }: { user: User | null }) {
  return <Shell user={user}><main className="eh-entry hhba-employer-intro">
   <div className="hhba-employer-intro-hero">
-   <p className="eh-kicker">HHBA · ENTERPRISE SERVICES</p>
+   <p className="eh-kicker">汇方职场 · HHBA · ENTERPRISE SERVICES</p>
    <h1>让招聘更透明，让企业更值得信赖。</h1>
    <p className="eh-lead">从企业招聘与授权人才搜索，到员工反馈、信誉核验和发展帮扶。
      先了解平台服务，再决定是否入驻；不需要进入首页就提交认证材料。</p>
@@ -210,7 +210,7 @@ export function EmployerGrowthHubPage({ user, view }: { user: User | null; view:
       <div className="eh-sidebar-foot"><ShieldCheck size={17}/><span>评分不可购买，员工隐私受保护</span></div>
     </aside>
     <main className="eh-main">
-      <div className="eh-main-head"><div><p className="eh-kicker">HHBA 企业服务</p><h1>{view==='dashboard'?'企业招聘概览':view==='growth'?'企业成长档案':view==='aid'?'HHBA 企业发展帮扶':'企业公开档案'}</h1><p>{view==='dashboard'?'先做好招聘，再让真正善待员工的企业得到更多关注。':view==='growth'?'真实表现经核验后，才能转化为公开、可解释的企业评分。':view==='aid'?'把平台支持给予负责任、具备实际交付能力的企业。':'求职者和员工能够看到什么，以及为什么能看到。'}</p></div>{!publicPage&&<Link className="eh-header-cta" to="/employer/workspace"><FilePlus2 size={16}/> 招聘管理</Link>}</div>
+      <div className="eh-main-head"><div><p className="eh-kicker">汇方职场 · HHBA 企业服务</p><h1>{view==='dashboard'?'企业招聘概览':view==='growth'?'企业成长档案':view==='aid'?'HHBA 企业发展帮扶':'企业公开档案'}</h1><p>{view==='dashboard'?'先做好招聘，再让真正善待员工的企业得到更多关注。':view==='growth'?'真实表现经核验后，才能转化为公开、可解释的企业评分。':view==='aid'?'把平台支持给予负责任、具备实际交付能力的企业。':'求职者和员工能够看到什么，以及为什么能看到。'}</p></div>{!publicPage&&<Link className="eh-header-cta" to="/employer/workspace"><FilePlus2 size={16}/> 招聘管理</Link>}</div>
       {demo&&<div className="eh-status"><ShieldCheck size={18}/><span><strong>静态预览模式</strong>：未连接企业账户 API。所有业务指标只显示未接入状态，不模拟简历、评分、认证结果或订单。</span></div>}
       {error&&<p className="eh-error" role="alert">{error}</p>}
       {!publicPage&&!demo&&<div className="eh-company-picker"><Building2 size={18}/><label>当前企业 <select value={oid} onChange={e=>{setOid(e.target.value);setJobs([])}} disabled={loading}><option value="">请选择企业</option>{organizations.map(o=><option key={o.id} value={o.id}>{o.legal_name}</option>)}</select></label><span>{!org?'暂无企业':approved?'组织已审核':'企业认证待审核'}</span><Link to="/recruiter/onboarding">管理企业身份 <ArrowUpRight size={13}/></Link></div>}

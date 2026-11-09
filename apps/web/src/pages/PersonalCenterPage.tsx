@@ -137,7 +137,7 @@ export function PersonalCenterPage({user,onlySaved=false,section='overview',onLo
   <nav className="hhba-personal-trail"><Link to="/">首页</Link><span>/</span><Link to="/candidate">求职中心</Link><span>/</span><strong>{sectionTitle}</strong></nav>
   <header className="hhba-account-header">
    <div className="hhba-account-avatar"><UserRound size={28}/></div>
-   <div className="hhba-account-identity"><span className="hhba-account-eyebrow">MY CAREER SPACE</span>
+   <div className="hhba-account-identity"><span className="hhba-account-eyebrow">汇方职场 · MY CAREER SPACE</span>
     <h1>{displayName}，欢迎回来</h1><p>{account?.headline||'把每一份职业机会都整理好，找到更适合自己的方向。'}</p>
     <span className="hhba-account-chip">真实求职者账户 · {account?'资料已连接':profileLoading?'读取中':'资料连接待确认'}</span>
    </div>

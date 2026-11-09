@@ -85,7 +85,7 @@ export function CandidateJobsPage({user}:{user:User|null}) {
  const total=response?.total||0;
  return <Shell user={user}><section className="hhba-jobs-page">
    <Trail/>
-   <header className="hhba-jobs-hero"><span className="page-kicker">HHBA · 统一招聘市场</span><h1>搜索国内外企业官方岗位</h1><p>国内外岗位统一搜索，不拆分中国与全球岗位库。校园招聘、社会招聘和实习可选筛选；岗位状态是历史记录，并非实时可投递承诺。</p>
+   <header className="hhba-jobs-hero"><span className="page-kicker">汇方职场 · HHBA · 统一招聘市场</span><h1>搜索国内外企业官方岗位</h1><p>国内外岗位统一搜索，不拆分中国与全球岗位库。校园招聘、社会招聘和实习可选筛选；岗位状态是历史记录，并非实时可投递承诺。</p>
    </header>
    <JobFilterPanel value={filters} onChange={updateFilters}/>
    <div className="hhba-jobs-count"><h2>企业官方岗位记录</h2><span>{loading?'读取中…':error?'连接不可用':total+' 条官方列表与历史记录'}</span></div>
