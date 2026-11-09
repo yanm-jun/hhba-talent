@@ -61,6 +61,12 @@ const AGGREGATORS=[
  /(?:^|\.)github\.io$/,/\.pages\.dev$/,/\.workers\.dev$/,
  /(?:^|\.)vercel\.app$/,/\.netlify\.app$/
 ];
+// Shared public ATS vendors publish employer-specific hiring tenants, but
+// their own homepage is NOT the legal employer's corporate website.
+// Keep individual job URLs discoverable; require an independent employer
+// website linking to the same tenant or the exact vacancy.
+export const SHARED_ATS_DOMAINS=Object.freeze(['feishu.cn','hotjob.cn']);
+const isSharedAtsDomain=d=>SHARED_ATS_DOMAINS.includes(String(d||'').toLowerCase());
 const RESERVED=/^(?:localhost|local|internal|test|example|invalid)$/;
 function publicHttps(value,{query=false,max=420}={}){
  if(typeof value!=='string'||value.length>max)return null;
@@ -122,7 +128,7 @@ function hashUrl(text){
 }
 export function publicCorporatePage(value){
  const u=publicHttps(value);
- if(!u||u.search||u.hash)return null;
+ if(!u||u.search||u.hash||isSharedAtsDomain(companyDomain(u.hostname)))return null;
  if(!['/','/cn','/zh','/zh-cn','/zh-CN','/about','/about-us',
   '/career','/careers','/jobs','/join','/join-us','/recruit','/recruitment',
   '/company','/company/about','/careers/index','/career/index',
@@ -472,6 +478,8 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
  let browserAttempts=0,browserRecovered=0,browserFailures=0;
  const canRender=link=>typeof browserRenderer==='function'&&
   (/^(?:careers?|hr|jobs|recruit)\./i.test(link.hostname)||
+   /^[a-z0-9-]{3,48}\.jobs\.feishu\.cn$/i.test(link.hostname)&&
+     /^\/index\/position\/[0-9]{10,22}\/detail$/i.test(new URL(link.url).pathname)||
    [...sites.values()].some(site=>site.domain===link.domain));
  const readBestEvidence=async(link,doc)=>{
   const before={...rejections};
