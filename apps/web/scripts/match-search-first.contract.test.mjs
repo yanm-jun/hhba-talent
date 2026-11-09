@@ -83,10 +83,12 @@ test('V4 Pro reasons only about Search results; no tools are passed to model',as
  let called=0;
  const hits=normalizeHits([searchResults]);
  const text=JSON.stringify(resultRows(['j1','j2']));
+ const cut=text.indexOf('},{')+1;
+ assert.ok(cut>1);
  const eventStream=[
  {type:'response.created'},
- {type:'response.output_text.delta',delta:text.slice(0,Math.floor(text.length/2))},
- {type:'response.output_text.delta',delta:text.slice(Math.floor(text.length/2))},
+ {type:'response.output_text.delta',delta:text.slice(0,cut)},
+ {type:'response.output_text.delta',delta:text.slice(cut)},
  {type:'response.completed',response:response(resultRows(['j1','j2']))}
  ].map(e=>'event: '+e.type+'\ndata: '+JSON.stringify(e)+'\n\n').join('');
  const partial=[];
