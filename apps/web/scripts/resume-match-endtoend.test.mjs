@@ -41,7 +41,7 @@ function setup({role='candidate',open=true,stale=false,hasSecrets=true,allowResu
     }
     if(sql.startsWith('INSERT INTO hhba_resume_match_requests')){
      const day=args[1],hash=args[2];
-     if(ledger.filter(x=>x.day===day).length>=60||ledger.filter(x=>x.day===day&&x.hash===hash).length>=2)
+     if(ledger.filter(x=>x.day===day).length>=240||ledger.filter(x=>x.day===day&&x.hash===hash).length>=8)
       return {success:true,meta:{changes:0}};
      ledger.push({id:args[0],day,hash});
      return {success:true,meta:{changes:1}};
@@ -135,16 +135,16 @@ test('stale official evidence and disabled config fail closed and never spend',a
   assert.equal(stale.callCounts.provider,0);
  }finally{restore();}
 });
-test('quota rejects the third account request with no provider invocation',async()=>{
+test('quota rejects the ninth account request without a ninth provider invocation',async()=>{
  const h=setup(),restore=mockedAI(h.callCounts);
  try{
-  assert.equal((await onRequest({request:h.request(),env:h.env})).status,200);
-  assert.equal((await onRequest({request:h.request(),env:h.env})).status,200);
-  const third=await onRequest({request:h.request(),env:h.env});
-  assert.equal(third.status,429);
-  assert.equal((await third.json()).error,'MATCH_PERSONAL_LIMIT');
-  assert.equal(h.ledger.length,2);
-  assert.equal(h.callCounts.provider,4,'two successful matches, two explanation calls');
+  for(let i=0;i<8;i++)assert.equal(
+   (await onRequest({request:h.request(),env:h.env})).status,200);
+  const ninth=await onRequest({request:h.request(),env:h.env});
+  assert.equal(ninth.status,429);
+  assert.equal((await ninth.json()).error,'MATCH_PERSONAL_LIMIT');
+  assert.equal(h.ledger.length,8);
+  assert.equal(h.callCounts.provider,16,'eight successful matches, eight explanation calls');
  }finally{restore();}
 });
 test('provider errors return no false recommendation and keep budget reserved',async()=>{
