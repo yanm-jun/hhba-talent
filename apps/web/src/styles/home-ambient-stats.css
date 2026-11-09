@@ -1,0 +1,29 @@
+/* Only the two desktop whitespace columns are occupied in this branch-only preview. */
+.hhba-experience-public:has(>.hhba-home-ambient){position:relative}
+.hhba-home-ambient{position:absolute;top:0;left:0;right:0;height:0;pointer-events:none;z-index:2}
+.hhba-home-ambient-left,.hhba-home-ambient-right{
+  position:absolute;box-sizing:border-box;
+  width:clamp(232px,calc((100vw - 710px)/2 - 50px),340px);
+  color:#203849;border:1px solid #e1ece6;border-radius:17px;
+  background:linear-gradient(155deg,rgba(255,255,255,.91),rgba(242,249,245,.74));
+  box-shadow:0 13px 38px rgba(39,72,65,.045);
+}
+.hhba-home-ambient-left{top:181px;left:clamp(16px,2.15vw,36px);padding:28px 27px 21px}
+.hhba-home-ambient-right{top:137px;right:clamp(16px,2.15vw,36px);padding:25px 24px 21px}
+.hhba-stats-caption{display:flex;align-items:center;gap:9px;font-size:11px;font-weight:750;letter-spacing:.045em;color:#3b8d69}
+.hhba-live-pulse{width:7px;height:7px;flex:none;border-radius:50%;background:#36a76a;box-shadow:0 0 0 4px rgba(54,167,106,.12);animation:hhba-stats-pulse 2.6s ease-in-out infinite}
+.hhba-home-ambient-left h2{display:flex;align-items:center;gap:9px;font-size:16px;line-height:1.5;margin:29px 0 6px;font-weight:760;letter-spacing:.01em}
+.hhba-home-ambient-left h2 svg{color:#397e65}
+.hhba-home-heat-number{display:block;white-space:nowrap;font-size:clamp(31px,2.7vw,43px);font-variant-numeric:tabular-nums;line-height:1.22;font-weight:780;letter-spacing:-1.6px;color:#203b38;transition:color .2s ease}
+.hhba-home-heat-bars{height:58px;display:flex;align-items:flex-end;gap:4px;margin:21px 0 17px}
+.hhba-home-heat-bars i{display:block;flex:1;border-radius:5px 5px 2px 2px;min-width:3px;background:linear-gradient(0deg,rgba(49,142,100,.17),rgba(49,142,100,.57));transition:height .75s cubic-bezier(.2,.75,.32,1)}
+.hhba-stats-period{display:flex;align-items:center;gap:6px;font-size:12px;color:#627e76}
+.hhba-stats-disclosure{font-size:10px!important;line-height:1.55!important;color:#94a5a0!important;margin:14px 0 0!important;text-align:left!important}
+.hhba-home-ambient-right .hhba-stats-caption{margin-bottom:15px}
+.hhba-home-mini-stat{display:flex;gap:13px;align-items:center;min-height:91px;border-top:1px solid #e7efeb}
+.hhba-mini-icon{display:inline-flex;align-items:center;justify-content:center;width:37px;height:37px;flex:none;background:#edf5f0;color:#39816a;border-radius:11px}
+.hhba-home-mini-stat p{font-size:12px;line-height:1.5;color:#667d7b;margin:0 0 4px}
+.hhba-home-mini-stat strong{display:block;white-space:nowrap;font-size:25px;font-weight:790;color:#233d39;letter-spacing:-.7px;line-height:1.2;font-variant-numeric:tabular-nums}
+@keyframes hhba-stats-pulse{50%{box-shadow:0 0 0 7px rgba(54,167,106,.04)}}
+@media(max-width:1399px){.hhba-home-ambient{display:none}}
+@media(prefers-reduced-motion:reduce){.hhba-live-pulse{animation:none}.hhba-home-heat-bars i{transition:none}}
