@@ -171,7 +171,7 @@ export function HomeLiveDrawer() {
     }}>
     <button type="button" className="hhba-rail-trigger" aria-expanded={open}
       aria-controls="hhba-home-stats-drawer" aria-label={open ? '收起平台动态' : '展开平台动态'}
-      onClick={() => { cancelClose(); setOpen(value => !value); }}>
+      onClick={() => { cancelClose(); setOpen(true); }}>
       <span className="hhba-rail-dot" aria-hidden="true"/>
       <span className="hhba-rail-title">平台动态</span>
       <ChevronLeft size={15} className="hhba-rail-arrow" aria-hidden="true"/>
