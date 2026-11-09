@@ -36,7 +36,7 @@ const translatedTitles:[RegExp,string][]=[
  [/^graphic designer$/i,'平面设计师'],
  [/^account manager$/i,'客户经理']
 ];
-function chineseJobTitle(item:MatchedJob):string|null{
+function chineseJobTitle(item:MatchedJob):string{
  const named=item.title_zh?.trim()||'';
  if(/[\u3400-\u9fff]/u.test(named))return named;
  const original=item.title.trim();
@@ -44,7 +44,7 @@ function chineseJobTitle(item:MatchedJob):string|null{
  const level=/^(senior|staff|principal|junior|lead)\s+/i.exec(original)?.[1]?.toLowerCase();
  const base=level?original.replace(/^(?:senior|staff|principal|junior|lead)\s+/i,''):original;
  const chinese=translatedTitles.find(([rule])=>rule.test(base))?.[1]||null;
- if(!chinese)return null; // Never put untranslated English-only positions into a Chinese shortlist.
+ if(!chinese)return original; // Do not hide genuine English-titled jobs.
  const prefix:Record<string,string>={senior:'高级',staff:'资深',principal:'首席',junior:'初级',lead:'技术负责人·'};
  return (level?prefix[level]:'')+chinese;
 }
@@ -85,7 +85,7 @@ function Row({item,onOpen}:{item:MatchedJob;onOpen:()=>void}){
   <div className="hhba-match-job-recommendation">
    <p><strong>推荐理由：</strong>{item.recommendation_reason||item.matched?.find(x=>!x.startsWith('匹配参考分 '))||'岗位方向与简历中的部分经历相关，请核对任职要求。'}</p>
    {link?<a href={link} target="_blank" rel="noopener noreferrer"
-      data-hhba-recruitment-outbound="true">直接查看官方岗位 <ArrowUpRight size={14}/></a>:
+      data-hhba-recruitment-outbound="true">{item.source_status==='SEARCH_RESULT_ONLY'?'查看招聘链接（待核实）':'直接查看招聘岗位'} <ArrowUpRight size={14}/></a>:
      <span>官方岗位链接暂不可用</span>}
   </div>
  </div>;
@@ -93,7 +93,7 @@ function Row({item,onOpen}:{item:MatchedJob;onOpen:()=>void}){
 export function CandidateMatchResultDialog({result,onClose}:{result:MatchResponse;onClose:()=>void}){
  const dialogRef=useRef<HTMLDivElement|null>(null);
  const [selectedId,setSelectedId]=useState<string|null>(null);
- const visibleMatches=result.matches.filter(job=>chineseJobTitle(job)!==null);
+ const visibleMatches=result.matches.filter(job=>Boolean(job.title?.trim()));
  const selected=visibleMatches.find(x=>x.id===selectedId)||null;
  useEffect(()=>{
   const previous=document.body.style.overflow;
@@ -148,7 +148,7 @@ export function CandidateMatchResultDialog({result,onClose}:{result:MatchRespons
       </section>}
       <section className="hhba-match-detail-section"><h3>岗位要求与投递</h3>
        <p>请在企业官方页面核实完整任职要求、薪资及最新招聘状态，匹配分数不代表录用概率。</p>
-       {link?<a className="hhba-match-detail-apply" href={link} rel="noopener noreferrer" target="_blank" data-hhba-recruitment-outbound="true">查看企业官方岗位 <ArrowUpRight size={16}/></a>:
+       {link?<a className="hhba-match-detail-apply" href={link} rel="noopener noreferrer" target="_blank" data-hhba-recruitment-outbound="true">查看招聘岗位原始链接 <ArrowUpRight size={16}/></a>:
         selected.source_type!=='站外官方招聘'?<Link className="hhba-match-detail-apply" to={'/candidate/jobs/'+encodeURIComponent(selected.id)}>查看岗位资料 <ArrowUpRight size={16}/></Link>:
         <p className="hhba-match-detail-unavailable">暂未取得安全可用的官方投递入口。</p>}
       </section>
@@ -156,13 +156,13 @@ export function CandidateMatchResultDialog({result,onClose}:{result:MatchRespons
       <div className="hhba-match-intro">
        <span className="hhba-match-eyebrow">为您精选的岗位机会</span>
        <h2 id="hhba-match-dialog-title">根据您的简历，为您匹配合适的工作</h2>
-       <p>综合您的学历、工作经验、专业技能与求职方向，筛选中国大陆境内的招聘岗位。</p>
+       <p>根据你的简历和岗位方向，搜索并推荐中国大陆招聘信息，直接提供推荐理由和职位链接。</p>
       </div>
       <div className="hhba-match-list-heading"><strong>推荐岗位 <span>{visibleMatches.length?('Top '+visibleMatches.length):'暂无'}</span></strong><small>按参考匹配度排序</small></div>
       {visibleMatches.length?<div className="hhba-match-job-list">
        {visibleMatches.map(job=><Row key={job.id} item={job} onOpen={()=>setSelectedId(job.id)}/>)}
-      </div>:<div className="hhba-match-empty"><Building2 size={23}/><h3>目前没有通过岗位条件核验的推荐</h3>
-       <p>不会用境外岗位、经验要求不符或无法核验的职位凑满十条。您可以返回调整求职方向。</p></div>}
+      </div>:<div className="hhba-match-empty"><Building2 size={23}/><h3>本轮没有找到可展示的岗位</h3>
+       <p>这不代表你没有合适工作。可以调整岗位方向后再搜索；招聘链接与开放状态请在原始页面确认。</p></div>}
       <p className="hhba-match-disclaimer">仅推荐中国大陆岗位。匹配分数是参考相关度，不是录用成功率；实际招聘状态以企业官网为准。</p>
      </>}
     </div>
