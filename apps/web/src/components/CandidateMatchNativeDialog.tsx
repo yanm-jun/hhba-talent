@@ -32,7 +32,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
     <header className="hhba-match-modal-head">
      <div className="hhba-match-modal-brand">
       <span className="hhba-match-modal-symbol"><BriefcaseBusiness size={19}/></span>
-      <div><strong>汇方职场 · HHBA</strong><small>DeepSeek V4 Pro 智能岗位推荐</small></div>
+      <div><strong>汇方职场 · HHBA</strong><small>DeepSeek Search + V4 Pro 智能岗位推荐</small></div>
      </div>
      <button type="button" className="hhba-match-modal-close" onClick={onClose} aria-label="关闭推荐">
       <X size={19}/>
@@ -40,9 +40,9 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
     </header>
     <div className="hhba-match-modal-content">
      <div className="hhba-match-intro">
-      <span className="hhba-match-eyebrow"><Search size={14} style={{verticalAlign:'-2px',marginRight:5}}/> AI 自主联网找工作</span>
+      <span className="hhba-match-eyebrow"><Search size={14} style={{verticalAlign:'-2px',marginRight:5}}/> AI 搜索真实岗位并匹配简历</span>
       <h2 id="hhba-native-title">根据你的简历，已找到 {result.matches.length} 个岗位{pending?'（继续搜索中）':''}</h2>
-      <p>只展示中国大陆工作岗位。{pending?'结果正在陆续生成，下方岗位可先查看。':'以下是 DeepSeek 自主搜索并解释的推荐结果。'}</p>
+      <p>只展示中国大陆工作岗位。{pending?'结果正在陆续生成，下方岗位可先查看。':'以下岗位网址来自 DeepSeek Search 结果，推荐原因由 V4 Pro 根据简历生成。'}</p>
      </div>
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
      {result.matches.length?
