@@ -7,6 +7,7 @@
     "dev": "vite --host 127.0.0.1",
     "prebuild": "node scripts/prepare-saveable-job-index.mjs",
     "build": "tsc -b && vite build",
+    "test:brand": "node --test scripts/huifang-brand-identity.contract.test.mjs",
     "preview": "vite preview --host 127.0.0.1"
   },
   "engines": {

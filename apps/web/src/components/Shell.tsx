@@ -29,11 +29,11 @@ function TalentPolicyNavLink({active}:{active:boolean}){
 }
 function HeaderSiteSearch(){
  const [value,setValue]=useState('');
- return <form className="hhba-header-site-search" role="search" aria-label="HHBA 全站搜索"
+ return <form className="hhba-header-site-search" role="search" aria-label="汇方职场 HHBA 全站搜索"
    onSubmit={event=>{event.preventDefault();navigate('/search'+(value.trim()?'?q='+encodeURIComponent(value.trim().slice(0,100)):''));}}>
    <Search aria-hidden="true" size={16}/>
    <input type="search" name="q" value={value} maxLength={100} onChange={event=>setValue(event.target.value)}
-     aria-label="搜索 HHBA 站内所有公开内容" placeholder="搜索 HHBA 全站…" />
+     aria-label="搜索汇方职场 HHBA 站内所有公开内容" placeholder="搜索汇方职场全站…" />
    <button type="submit" aria-label="提交全站搜索"><ArrowRight size={15}/></button>
  </form>;
 }
