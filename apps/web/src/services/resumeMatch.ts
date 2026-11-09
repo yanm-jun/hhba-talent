@@ -22,6 +22,7 @@ export type MatchedJob = {
   professional_credential_requirements?:string[];
   professional_credential_review?:{kind:string;likely_credential:string;warning:string}|null;
   score_breakdown?:{role:number;skills:number;experience:number;education:number;location:number};
+  recommendation_reason?:string;source_status?:'MODEL_SEARCH_REPORTED';
   score_reasoning?:string;
   evidence_quality?:{skills:string;experience:string;education:string};
   ranking_version?:'HHBA_MATCH_RANKING_V2';
@@ -29,9 +30,10 @@ export type MatchedJob = {
 export type MatchResponse = {
   status:'COMPLETE';profile:MatchProfile;matches:MatchedJob[];
   matched_official_jobs:number;source:string;scoring:string;privacy:string;disclaimer:string;
+  native_search?:{model:string;searches:number;page_reads:number;provider_items:number;visible_jobs:number;discarded:number;elapsed_ms:number};
 };
 export type MatchOptions = {country:string;remote_only:boolean;role_hint:string;limit:number};
-const API='/api/match';
+const API='/api/match-native';
 const LIMIT=3*1024*1024;
 const errorMap:Record<string,string>={
   MATCH_NOT_ENABLED:'智能匹配服务尚未开放，请稍后再试。',
@@ -57,7 +59,9 @@ const errorMap:Record<string,string>={
   AI_PROFILE_INCOMPLETE:'AI 未能可靠识别简历内容，请完善简历后重试。',
   MATCH_PERSONAL_LIMIT:'今天的个人免费体验次数已达上限。',
   MATCH_GLOBAL_LIMIT:'平台今天的 AI 体验额度已用完。',
-  BAD_RESPONSE:'匹配结果格式不完整，请稍后重试。'
+  BAD_RESPONSE:'匹配结果格式不完整，请稍后重试。',
+  AI_WEB_SEARCH_NOT_USED:'DeepSeek 本次没有执行联网搜索，未展示未经搜索证实的岗位，请重试。',
+  AI_RESPONSE_INVALID:'DeepSeek 返回结果格式异常，请重试。'
 };
 export class MatchError extends Error {
  constructor(public readonly status:number,message:string){super(message);this.name='MatchError'}
@@ -74,7 +78,7 @@ export async function matchServiceReady(signal?:AbortSignal):Promise<boolean>{
   const response=await fetch(API+'/status',{method:'GET',credentials:'same-origin',cache:'no-store',signal});
   if(!response.ok||!(response.headers.get('content-type')||'').includes('json'))return false;
   const data=await response.json() as {kind?:string;enabled?:boolean};
-  return data.kind==='HHBA_RESUME_MATCH_CLOUDFLARE_V1'&&data.enabled===true;
+  return data.kind==='HHBA_NATIVE_WEB_MATCH_V1'&&data.enabled===true;
  }catch{return false}
 }
 /** Best-effort browser redaction before submitting text to HHBA's server. */
