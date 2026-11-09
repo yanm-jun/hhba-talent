@@ -205,3 +205,45 @@ export async function discoverSimpleJobs(key,directions,preferredCities=[],{fetc
   candidates:jobs.length,failed_searches:failures.length},
   status:jobs.length?'COMPLETE':failures.length?'PARTIAL':'NO_RESULTS'};
 }
+
+
+export function rankSimpleShortlist(internal,outside,directions,preferredCities=[],limit=10){
+ const roles=[...new Set((Array.isArray(directions)?directions:[]).map(normalize).filter(Boolean))];
+ const cityPrefs=(Array.isArray(preferredCities)?preferredCities:[]).map(normalize);
+ const scored=[...(Array.isArray(internal)?internal:[]),...(Array.isArray(outside)?outside:[])].map(job=>{
+  const title=normalize(job.title),company=normalize(job.company),loc=normalize(job.location);
+  const direct=roles.some(r=>title.includes(r)||r.includes(title));
+  const related=roles.some(r=>r.includes('产品')&&title.includes('产品')||
+   r.includes('运营')&&title.includes('运营')||
+   r.includes('销售')&&title.includes('销售')||
+   r.includes('设计')&&title.includes('设计')||
+   r.includes('开发')&&/研发|开发|软件/.test(title));
+  const place=cityPrefs.length&&cityPrefs.some(c=>loc.includes(c));
+  const fetched=job.source_status==='OFFICIAL_DETAIL_FETCHED';
+  const base=typeof job.reference_score==='number'?Math.min(82,Math.max(42,job.reference_score)):50;
+  const score=Math.max(base,50+(direct?24:related?15:0)+(place?9:0)+(fetched?9:0));
+  const reason=direct?'职位名称与你的目标岗位方向直接相关':
+   related?'与你希望发展的职业方向有联系':'你的简历经历和职位要求仍需要进一步对照';
+  return {...job,reference_score:Math.min(96,score),
+   matched:(Array.isArray(job.matched)&&job.matched.length?job.matched:[reason])};
+ }).sort((a,b)=>b.reference_score-a.reference_score||
+  (a.source_status==='OFFICIAL_DETAIL_FETCHED'?-1:1)||
+  a.id.localeCompare(b.id));
+ const unique=[],seen=new Set(),counts=new Map();
+ for(const job of scored){
+  const key=[job.company,job.title,job.location].map(normalize).join('|');
+  if(seen.has(key))continue;seen.add(key);
+  unique.push(job);
+ }
+ const result=[];
+ for(const pass of [true,false]){
+  for(const job of unique){
+   if(result.length>=limit)break;
+   if(result.some(x=>x.id===job.id))continue;
+   const company=normalize(job.company);
+   if(pass&&(counts.get(company)||0)>=2)continue;
+   result.push(job);counts.set(company,(counts.get(company)||0)+1);
+  }
+ }
+ return result;
+}
