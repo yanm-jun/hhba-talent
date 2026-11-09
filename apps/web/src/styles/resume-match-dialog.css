@@ -91,3 +91,18 @@
 .hhba-native-apply{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:650;text-decoration:none;color:#267045}
 .hhba-native-apply:hover{text-decoration:underline}
 @media(max-width:640px){.hhba-native-job{padding:14px}.hhba-native-heading h3{font-size:15px}.hhba-native-top{gap:10px}}
+
+/* Native Search-first cards: restrained application evidence and resume-fit score. */
+.hhba-native-score{min-width:92px;flex:0 0 92px;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.hhba-native-score strong{font-size:25px;font-weight:780;letter-spacing:-.035em;line-height:1.1;color:#237047;font-variant-numeric:tabular-nums}
+.hhba-native-score strong small{font-size:11px;color:#88988d;letter-spacing:0}
+.hhba-native-score span{font-size:11px;color:#738578}
+.hhba-native-score strong.hhba-native-score-na{color:#95a299}
+.hhba-native-score-basis{margin:12px 0 0;padding:9px 12px;background:#f5f9f6;border-radius:8px;color:#566d5b;font-size:12px;line-height:1.7}
+.hhba-native-score-basis strong{color:#246445}
+.hhba-native-availability{display:flex;flex-wrap:wrap;align-items:center;column-gap:8px;row-gap:4px;margin-top:9px}
+.hhba-native-availability>span{display:inline-block;font-size:11px;line-height:1.5;padding:3px 8px;border-radius:7px;font-weight:650}
+.hhba-native-state-open{color:#236b41;background:#ebf5ee}
+.hhba-native-state-unknown{color:#87633c;background:#fbf4e8}
+.hhba-native-availability small{font-size:11px;line-height:1.5;color:#77877c}
+@media(max-width:640px){.hhba-native-score{min-width:65px;flex-basis:65px}.hhba-native-score strong{font-size:20px}.hhba-native-score-basis{font-size:12px}}
