@@ -27,11 +27,12 @@ jobs:
         run: |
           node --check 'functions/api/match/[[path]].js'
           node --check functions/_lib/resume-match-core.js
+          node --check functions/_lib/match-ai-explanations.js
           node --check functions/_lib/resume-tenure.js
           node --check functions/_lib/mainland-job-location.js
           node --check functions/_lib/resume-role-evidence.js
           node --check functions/_lib/professional-credentials.js
-          node --test scripts/match-v5-credentials.contract.test.mjs scripts/match-audit-hardgates.contract.test.mjs scripts/resume-tenure.contract.test.mjs scripts/resume-match-cloudflare.contract.test.mjs scripts/resume-match-endtoend.test.mjs
+          node --test scripts/match-v5-credentials.contract.test.mjs scripts/match-audit-hardgates.contract.test.mjs scripts/resume-tenure.contract.test.mjs scripts/resume-match-cloudflare.contract.test.mjs scripts/resume-match-endtoend.test.mjs scripts/match-ai-explanations.contract.test.mjs
       - name: TypeScript and Vite bundle
         working-directory: apps/web
         run: npm run build
