@@ -260,7 +260,7 @@ test('5 shortlisted roles are shown before supplemental search, then 10 roles an
    return new Response(JSON.stringify({results:extra?allResults.slice(5):allResults.slice(0,5)}),{status:200});
   }
   if(url.endsWith('/v1/tools/fetch')){
-   return new Response(JSON.stringify({content:'岗位信息：实际工作地上海，进行产品协调与团队沟通，公开招聘信息没有显示职位已关闭。'.repeat(4)}),{status:200});
+   return new Response(JSON.stringify({content:'岗位详情：实际工作地上海，团队协作、产品方案实施、客户需求分析和项目交付均为岗位职责。'.repeat(4)}),{status:200});
   }
   if(url.endsWith('/responses')){
    if(payload.stream===false){
