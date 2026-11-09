@@ -173,3 +173,55 @@ test('Public Feishu ATS job may render, but only verified employer backlink esta
  assert.equal(got.accounting.complete,false,'browser usage has separate unpriced cost');
  assert.ok(models<=4&&searches<=8&&fetches<=20);
 });
+
+test('Genuine employer recruiting homepage can be Browser Run corroborated after DeepSeek corporate Fetch failure',async()=>{
+ const url='https://careers.tencent.com/jobdesc.html?postId=2100785142443454464';
+ const corporate='https://careers.tencent.com/';
+ const md=[
+  '# 内容运营','工作地点：上海','岗位职责',
+  '负责官方内容运营、直播活动策划和传播项目管理。'.repeat(5),
+  '岗位要求','本科及以上学历，熟悉内容渠道、运营数据分析和项目协作。'.repeat(5),
+  '申请岗位'
+ ].join('\n');
+ let model=0,search=0,fetch=0;
+ const renderUrls=[];
+ const mock=async(endpoint,opt)=>{
+  const data=JSON.parse(opt.body);
+  if(endpoint.endsWith('/responses')){
+   model++;return Response.json({status:'completed',
+    usage:{input_tokens:150,input_tokens_details:{cached_tokens:30},output_tokens:90},
+    output:model===1?[tool('search_jobs',{query:'内容运营 企业官网 上海 任职要求'},'s1')]:
+      model===2?[tool('read_job',{url},'r1')]:[]});
+  }
+  if(endpoint.endsWith('/search')){
+   search++;return Response.json({results:[
+    {url,title:'内容运营 | 腾讯招聘',snippet:'岗位职责、工作城市与任职要求，详见职位详情'}
+   ]});
+  }
+  if(endpoint.endsWith('/fetch')){
+   fetch++;if(data.url===url)return Response.json({title:'岗位详情 | 腾讯招聘',
+    content:md.replace('工作地点：上海','工作地点：待定')});
+   if(data.url===corporate)throw Error('SYNTHETIC_DEEPSEEK_FETCH_UNAVAILABLE');
+   throw Error('Unanticipated corporate site '+data.url);
+  }
+  throw Error('Unexpected provider request');
+ };
+ const rendered=async target=>{
+  renderUrls.push(target);
+  if(target===url)return {title:'岗位详情 | 腾讯招聘',content:md};
+  if(target===corporate)return {title:'腾讯招聘',
+   content:('# 腾讯招聘\n欢迎来到腾讯官方招聘网站，职位查询及企业信息。').repeat(8)};
+  throw Error('Browser must only read company-owned HTTPS');
+ };
+ const got=await runDeepSeekOfficialJobAgent('内容运营',key,{
+  fetcher:mock,now,targetCount:1,browserRenderer:rendered});
+ assert.equal(got.quality_status,'VERIFIED_JOBS_FOUND');
+ assert.equal(got.candidates[0].company,'腾讯');
+ assert.equal(got.candidates[0].location,'上海');
+ assert.equal(got.candidates[0].employer_site,corporate);
+ assert.equal(got.candidates[0].source_verification,'CORPORATE_DOMAIN_AND_BRAND');
+ assert.deepEqual(renderUrls,[url,corporate]);
+ assert.deepEqual(got.stats.browser_render,{attempts:2,recovered:2,failures:0});
+ assert.equal(got.accounting.complete,false);
+ assert.ok(got.usage.model<=4&&got.usage.search<=8&&got.usage.fetch<=20);
+});
