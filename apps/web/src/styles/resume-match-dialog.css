@@ -90,3 +90,9 @@
  .hhba-match-modal-foot{padding:12px 17px}
 }
 @media(prefers-reduced-motion:reduce){.hhba-match-job{transition:none}}
+
+/* Why this role: concise, text-first explanation on every shortlist row. */
+.hhba-match-job-why{display:block;margin-top:5px;font-size:12px;line-height:1.65;color:#4b6355;white-space:normal;overflow-wrap:anywhere}
+.hhba-match-job-why strong{color:#246944;font-weight:750}
+.hhba-match-navigation-row .hhba-match-job-why{color:#657769}
+@media(max-width:640px){.hhba-match-job-why{font-size:11px;line-height:1.6}}
