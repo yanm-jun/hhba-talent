@@ -27,7 +27,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
  const [options,setOptions]=useState<MatchOptions>({country:'CN',remote_only:false,role_hint:'',limit:10});
  const [working,setWorking]=useState(false);
-  const [stage,setStage]=useState<'preparing'|'connected'|'searching'|'writing'>('preparing');
+  const [stage,setStage]=useState<'preparing'|'connected'|'searching'|'writing'|'waiting'>('preparing');
  const [error,setError]=useState('');
 
  const [result,setResult]=useState<MatchResponse|null>(null);
@@ -189,7 +189,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
           {working?<><LoaderCircle className="spin" size={18}/> 正在提取简历并匹配岗位…</>:
            <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
         </button>
-        {working&&<p className="hhba-ai-processing" role="status">{stage==='preparing'?'正在安全提交简历并启动 DeepSeek…':stage==='connected'?'DeepSeek 已连接，正在准备联网搜索…':stage==='searching'?'DeepSeek 正在搜索中国大陆的真实岗位…':'搜索已执行，正在整理推荐理由和职位链接…'}</p>}
+        {working&&<p className="hhba-ai-processing" role="status">{stage==='preparing'?'正在安全提交简历并启动 DeepSeek…':stage==='connected'?'DeepSeek 已连接，正在准备联网搜索…':stage==='searching'?'DeepSeek 正在搜索中国大陆的真实岗位…':stage==='waiting'?'DeepSeek 仍在处理，连接保持正常…':'搜索已执行，正在整理推荐理由和职位链接…'}</p>}
       </section>
       <aside className="hhba-ai-aside">
         <div className="hhba-ai-aside-card"><h3>只需三步</h3>
