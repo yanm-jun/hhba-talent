@@ -6,7 +6,7 @@ import {Link} from '../router';
 import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDialog';
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,type PrivateResume} from '../services/privateResumes';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchOptions,MatchError} from '../services/resumeMatch';
+import {matchServiceReady,submitResumeForMatching,submitExtractedResumeText,extractResumeTextLocally,type MatchResponse,type MatchedJob,type MatchOptions,MatchError} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
 const supportedTypes='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -27,6 +27,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
  const [options,setOptions]=useState<MatchOptions>({country:'CN',remote_only:false,role_hint:'',limit:10});
  const [working,setWorking]=useState(false);
+  const [partialJobs,setPartialJobs]=useState<MatchedJob[]>([]);
   const [stage,setStage]=useState<'preparing'|'connected'|'searching'|'writing'|'waiting'>('preparing');
  const [error,setError]=useState('');
 
@@ -93,14 +94,14 @@ export function CandidateMatchPage({user}:{user:User|null}){
  }
  async function run(){
   if((!file&&!savedId)||!consent||working||previewBusy||availability!=='ready'||!getRealAuthToken())return;
-  setWorking(true);setStage('preparing');setError('');setResult(null);
+  setWorking(true);setStage('preparing');setError('');setResult(null);setPartialJobs([]);
   const abort=new AbortController();
   controller.current=abort;
   try{
    let matched:MatchResponse;
    if(previewLoaded){
     // Once the user has reviewed/edited text, NEVER fall back to re-reading the unedited file.
-    matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,savedId||undefined,setStage);
+    matched=await submitExtractedResumeText(previewText,options,consent,abort.signal,savedId||undefined,setStage,setPartialJobs);
    }else{
     let selected=file;
     if(!selected&&savedId){
@@ -111,9 +112,9 @@ export function CandidateMatchPage({user}:{user:User|null}){
      selected=new File([bytes],entry.name,{type:entry.type});
     }
     if(!selected)throw new MatchError(400,'请选择简历。');
-    matched=await submitResumeForMatching(selected,options,consent,abort.signal,savedId||undefined,setStage);
+    matched=await submitResumeForMatching(selected,options,consent,abort.signal,savedId||undefined,setStage,setPartialJobs);
    }
-   setResult(matched);
+   setResult(matched);setPartialJobs([]);
    // Keep selected file for return-to-edit. No automatic re-analysis.
    setConsent(false);
   }catch(e){
@@ -199,7 +200,10 @@ export function CandidateMatchPage({user}:{user:User|null}){
          <p className="hhba-ai-aside-footnote">工作地点仅限中国大陆；招聘状态请以岗位原始网页为准。</p>
       </aside>
     </div>
-    {result&&<CandidateMatchNativeDialog result={result} onClose={()=>setResult(null)}/>}
+    {(result||partialJobs.length>0)&&<CandidateMatchNativeDialog
+      result={result||{matches:partialJobs}}
+      pending={working&&!result} notice={working?'':error}
+      onClose={()=>{if(working)controller.current?.abort();setPartialJobs([]);setResult(null);setWorking(false);}}/>}
      <div className="hhba-ai-footer"><Link to="/candidate/jobs">不上传简历，直接搜索公开岗位 <ArrowRight size={15}/></Link></div>
   </section>
  </Shell>;
