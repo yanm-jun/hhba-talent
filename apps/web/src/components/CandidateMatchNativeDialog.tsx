@@ -4,7 +4,7 @@ import {ArrowUpRight,BriefcaseBusiness,MapPin,Wallet,X,Search} from 'lucide-reac
 import type {MatchResponse} from '../services/resumeMatch';
 import '../styles/resume-match-dialog.css';
 
-// The model researches and ranks; the UI never re-ranks or hides English job titles.
+// Search-first evidence governs links; server scores and ranks. Never present a score as an offer probability.
 export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=''}:{result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,'disclaimer'>>;onClose:()=>void;pending?:boolean;notice?:string}){
  const ref=useRef<HTMLDivElement|null>(null);
  useEffect(()=>{
@@ -42,7 +42,7 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
      <div className="hhba-match-intro">
       <span className="hhba-match-eyebrow"><Search size={14} style={{verticalAlign:'-2px',marginRight:5}}/> AI 搜索真实岗位并匹配简历</span>
       <h2 id="hhba-native-title">根据你的简历，已找到 {result.matches.length} 个岗位{pending?'（继续搜索中）':''}</h2>
-      <p>只展示中国大陆工作岗位。{pending?'结果正在陆续生成，下方岗位可先查看。':'以下岗位网址来自 DeepSeek Search 结果，推荐原因由 V4 Pro 根据简历生成。'}</p>
+      <p>适配分仅供比较，不是录用概率。只展示中国大陆工作岗位。{pending?'结果正在陆续生成，下方岗位可先查看。':'以下岗位网址来自 DeepSeek Search 结果，推荐原因由 V4 Pro 根据简历生成。'}</p>
      </div>
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice} 已显示本次收到的岗位；请核对招聘原始页面。</p>}
      {result.matches.length?
@@ -56,12 +56,26 @@ export function CandidateMatchNativeDialog({result,onClose,pending=false,notice=
            <h3>{job.title_zh||job.title}</h3>
            <div className="hhba-native-meta"><span><MapPin size={13}/>{job.location}</span>
             {job.salary&&<span><Wallet size={13}/>{job.salary}</span>}</div>
+           <div className="hhba-native-availability" role="note">
+            <span className={job.availability_status==='OPEN_LISTED'?'hhba-native-state-open':'hhba-native-state-unknown'}>
+             {job.availability_status==='OPEN_LISTED'?'网页显示在招 · 仍需确认':'投递状态未确认'}
+            </span>
+            <small>{job.availability_status==='OPEN_LISTED'?
+             '页面文本提示开放申请，是否可提交仍以招聘官网为准':'链接来自搜索结果，可能已过期或需要登录；请打开官网确认'}</small>
+           </div>
+          </div>
+          <div className="hhba-native-score" aria-label={Number.isInteger(job.match_score)?'简历适配分 '+job.match_score+' 分':'适配分证据不足'}>
+           {Number.isInteger(job.match_score)?
+            <><strong>{job.match_score}<small>/100</small></strong><span>简历适配分</span></>:
+            <><strong className="hhba-native-score-na">—</strong><span>待补充证据</span></>}
           </div>
          </div>
+         {job.score_basis&&Number.isInteger(job.match_score)&&
+          <p className="hhba-native-score-basis"><strong>评分依据：</strong>{job.score_basis}</p>}
          <p className="hhba-native-reason"><strong>为什么推荐：</strong>
           {(job.recommendation_reason||job.matched?.[0]||'请结合简历和招聘详情自行判断。').replace(/([②③])/g,'\n$1')}</p>
          <a className="hhba-native-apply" href={job.official_url} target="_blank" rel="noopener noreferrer"
-          data-hhba-recruitment-outbound="true">查看岗位原始链接 <ArrowUpRight size={15}/></a>
+          data-hhba-recruitment-outbound="true">查看招聘原始页面并确认能否投递 <ArrowUpRight size={15}/></a>
         </article>
        ))}
       </div>:
