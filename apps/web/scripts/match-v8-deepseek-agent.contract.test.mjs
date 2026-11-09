@@ -490,3 +490,61 @@ test('2026 corporate single-job context links survive strict routing without ope
  assert.equal(publicJobLink('https://www.job5156.com/dongguan/job_1kc5_Zwaw2yuQ4jrTSZRFA'),null);
  assert.ok(publicJobLink('https://hr.xiaomi.com/job/view/99'));
 });
+
+test('Four model turns can use exactly one extra evidence-shaped Search without losing all hard checks',async()=>{
+ let models=0,searches=0,fetches=0;
+ const role='内容运营';
+ const corpURL='https://www.doodod.com/';
+ const roleURL='https://www.doodod.com/careers/content-operations/';
+ const poor=['tianmo.cn','shunya.cn','lanhuo.cn','tuzhi.cn'].map((domain,i)=>({
+  url:'https://careers.'+domain+'/jobs/content-work-00'+i,
+  title:'社会招聘内容岗位',snippet:'内容运营机会，详情请查看招聘官网'
+ }));
+ const fetchedJD=[
+  '# 内容运营','工作地点','北京 · 海淀区','岗位职责',
+  '负责公众号内容编辑、短视频策划、账号运营和营销传播。'.repeat(5),
+  '任职要求','本科及以上学历，熟悉内容策划、渠道营销和数据复盘。'.repeat(5),
+  '立即申请'
+ ].join('\n');
+ const mock=async(endpoint,opts)=>{
+  const body=JSON.parse(opts.body);
+  if(endpoint.endsWith('/responses')){
+   models++;
+   return Response.json({status:'completed',
+    usage:{input_tokens:100,input_tokens_details:{cached_tokens:30},output_tokens:35},
+    output:[tool('search_jobs',{query:role+' 职位详情 任职要求 '+models},'s'+models)]});
+  }
+  if(endpoint.endsWith('/search')){
+   searches++;
+   if(searches<=4)return Response.json({results:poor});
+   assert.match(body.query,/企业官网 职位详情 工作地点 任职要求 立即申请/);
+   assert.equal(body.query.includes('独到科技'),false);
+   return Response.json({results:[
+    {url:roleURL,title:'内容运营｜加入独到科技',
+     snippet:'工作地点：北京 任职要求：本科 岗位职责 立即申请'},
+    {url:corpURL,title:'独到科技官网',snippet:'独到科技官方网站'}
+   ]});
+  }
+  if(endpoint.endsWith('/fetch')){
+   fetches++;
+   if(body.url===roleURL)return Response.json({
+    title:'内容运营｜加入独到科技｜DOODOD 独到科技',content:fetchedJD});
+   if(body.url===corpURL)return Response.json({
+    title:'独到科技',content:('# 独到科技官网\n独到科技独立企业官方网站，业务介绍和团队招聘。').repeat(8)});
+   throw Error('unexpected low-quality job fetch '+body.url);
+  }
+  throw Error('unexpected URL');
+ };
+ const result=await runDeepSeekOfficialJobAgent(role,key,{fetcher:mock,now,targetCount:1});
+ assert.equal(result.stats.evidence_rescue_searches,1);
+ assert.equal(result.stats.evidence_rescue_candidates,1);
+ assert.equal(result.stats.verified,1);
+ assert.equal(result.candidates[0].location,'北京');
+ assert.equal(result.candidates[0].company,'独到科技');
+ assert.equal(result.candidates[0].source_verification,'CORPORATE_DOMAIN_AND_BRAND');
+ assert.equal(models,4);
+ assert.equal(searches,5);
+ assert.equal(fetches,2);
+ assert.ok(result.usage.model<=4&&result.usage.search<=8&&result.usage.fetch<=20);
+ assert.equal(result.accounting.complete,true);
+});
