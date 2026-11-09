@@ -42,7 +42,7 @@ export function WinterInternshipPopup(){
    <div className="hhba-winter-modal" role="dialog" aria-modal="true" aria-labelledby="hhba-winter-modal-title" ref={dialogRef}>
     <button type="button" className="hhba-winter-modal-close" data-winter-close aria-label="关闭寒假实习广告" onClick={close}><X size={21}/></button>
     <div className="hhba-winter-modal-copy">
-     <div className="hhba-winter-brand"><span className="hhba-winter-brand-dot">HHBA.</span><span>2027 WINTER INTERNSHIP</span></div>
+     <div className="hhba-winter-brand"><span className="hhba-winter-brand-dot">HHBA.</span><span>汇方职场 · 2027 WINTER INTERNSHIP</span></div>
      <div className="hhba-winter-year"><Sparkles size={18}/> 2027 寒假专场</div>
      <h2 id="hhba-winter-modal-title">寒假实习季<span>抢先一步</span></h2>
      <p className="hhba-winter-modal-subtitle">这个寒假，提前遇见未来。</p>
