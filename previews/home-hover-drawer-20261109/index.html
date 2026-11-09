@@ -83,27 +83,75 @@ header nav{display:flex;align-items:center;gap:23px;white-space:nowrap;font-size
 <p class="disclosure">设计验收数据 · 不代表真实在线、投递或 Offer 成果</p>
 </section></div></div>
 <script>
-const rail=document.getElementById('rail'), handle=document.getElementById('handle'), panel=document.getElementById('panel');
-let closeTimer=0; const rnd=(a,b)=>Math.floor(a+Math.random()*(b-a+1)), fmt=n=>n.toLocaleString('en-US');
+const rail=document.getElementById('rail'),handle=document.getElementById('handle'),panel=document.getElementById('panel');
+let closeTimer=0;const fmt=n=>n.toLocaleString('en-US');
 function enter(){clearTimeout(closeTimer);rail.classList.add('open');handle.setAttribute('aria-expanded','true');panel.setAttribute('aria-hidden','false')}
 function hide(){rail.classList.remove('open');handle.setAttribute('aria-expanded','false');panel.setAttribute('aria-hidden','true')}
 function leave(){clearTimeout(closeTimer);closeTimer=setTimeout(hide,230)}
 function toggle(){enter()}
-document.addEventListener('pointerdown',e=>{if(!rail.contains(e.target))hide()});document.addEventListener('keydown',e=>{if(e.key==='Escape')hide()});
-const curve=[[0,152000],[120,122000],[240,108000],[360,138000],[480,242000],[600,355000],[720,309000],[840,414000],[960,462000],[1080,423000],[1200,373000],[1320,258000],[1440,152000]];
-const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
-function china(){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Shanghai',hour:'2-digit',minute:'2-digit',hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const p=k=>parts.find(x=>x.type===k)?.value||'0',h=+p('hour');return {minute:h*60+(+p('minute')),hour:h,day:p('year')+'-'+p('month')+'-'+p('day')}}
-function target(m){for(let i=0;i<curve.length-1;i++){let [start,a]=curve[i], [end,b]=curve[i+1];if(m<=end){let t=clamp((m-start)/(end-start),0,1);return a+(b-a)*t*t*(3-2*t)}}return 152000}
-const now=china();let heat=clamp(Math.round(target(now.minute)+rnd(-7000,7000)),100000,499999);
-let stored={};try{stored=JSON.parse(sessionStorage.getItem('hhba-panel-preview')||'{}')}catch{}
-let offers=Math.max(18500+rnd(20,280),stored.offers||0), active=stored.day===now.day?Math.max(stored.active||0,Math.floor(now.minute/1440*13500)):0, apps=Math.max(325000+rnd(0,4000),stored.apps||0),day=now.day;
-function save(){try{sessionStorage.setItem('hhba-panel-preview',JSON.stringify({offers,active,apps,day}))}catch{}}
+document.addEventListener('pointerdown',e=>{if(!rail.contains(e.target))hide()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')hide()});
+const clamp=(n,a,b)=>Math.min(b,Math.max(a,n));
+const anchor=Date.parse('2026-11-09T15:00:00+08:00');
+const startValues={heat:368527,offers:28651,active:12846,apps:486329};
+const dateSpans=[
+ ['2026-01-01','2026-01-03'],['2026-02-15','2026-02-23'],['2026-04-04','2026-04-06'],
+ ['2026-05-01','2026-05-05'],['2026-06-19','2026-06-21'],['2026-09-25','2026-09-27'],['2026-10-01','2026-10-07'],
+ ['2027-01-01','2027-01-03'],['2027-02-05','2027-02-13'],['2027-04-03','2027-04-05'],
+ ['2027-05-01','2027-05-05'],['2027-06-09','2027-06-09'],['2027-09-15','2027-09-15'],['2027-10-01','2027-10-07']
+];
+const working=new Set(['2026-01-04','2026-02-14','2026-02-28','2026-05-09','2026-09-20','2026-10-10','2027-01-31','2027-02-14','2027-05-08','2027-09-26','2027-10-09']);
+const months=[.84,.83,1.12,1.08,1.03,1.08,.99,1.09,1.20,1.21,1.15,.92];
+const curves={
+ workday:[[0,.20],[2,.08],[4,.05],[6,.10],[8,.47],[10,.78],[12,.69],[14,.92],[16,1],[18,.76],[20,.80],[22,.52],[24,.20]],
+ weekend:[[0,.29],[2,.13],[4,.06],[6,.08],[8,.20],[10,.43],[12,.68],[14,.77],[16,.84],[18,.83],[20,.89],[22,.73],[24,.29]]
+};
+const wday=[1,1,1,1,1,2,3,5,8,11,13,12,10,12,14,15,14,12,10,10,11,10,6,3];
+const wend=[2,2,1,1,1,1,2,3,5,7,9,11,12,14,15,15,16,17,16,18,19,16,10,5];
+function bj(ms){
+ const items=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date(ms));
+ const p=k=>items.find(x=>x.type===k)?.value||'00';return {day:[p('year'),p('month'),p('day')].join('-'),month:+p('month'),hour:+p('hour')%24,minute:+p('minute'),second:+p('second')};
+}
+function dayNo(day){return Math.floor(Date.parse(day+'T00:00:00Z')/86400000)}
+function dayText(no){return new Date(no*86400000).toISOString().slice(0,10)}
+function dayMode(day){
+ if(working.has(day))return 'workday';
+ if(dateSpans.some(([a,b])=>a<=day&&day<=b))return 'holiday';
+ const w=new Date(day+'T12:00:00Z').getUTCDay();return w===0||w===6?'weekend':'workday';
+}
+function hash(n,salt){let x=Math.sin((n+salt*31.57)*127.131)*43758.5453123;return (x-Math.floor(x))*2-1}
+function smoothNoise(x,salt){let k=Math.floor(x),u=x-k,e=u*u*(3-2*u);return hash(k,salt)*(1-e)+hash(k+1,salt)*e}
+function easedCurve(time,points){
+ for(let i=0;i<points.length-1;i++){let [a,v]=points[i],[b,w]=points[i+1];
+ if(time<=b){let u=clamp((time-a)/(b-a),0,1),s=u*u*(3-2*u);return v+(w-v)*s}}
+ return points[points.length-1][1];
+}
+function activity(ms){let c=bj(ms),mode=dayMode(c.day),h=c.hour+c.minute/60+c.second/3600;
+ return easedCurve(h,mode==='workday'?curves.workday:curves.weekend)*months[c.month-1]*(mode==='holiday'?.73:mode==='weekend'?.88:1)}
+function heatBase(t){return 103000+278000*activity(t)}
+function activeBase(t){return 2200+11800*activity(t)}
+function heatNoise(t){return 1400*smoothNoise(t/890,11)+1200*smoothNoise(t/4600,32)+1900*smoothNoise(t/26000,43)}
+function activeNoise(t){return 95*smoothNoise(t/2200,21)+145*smoothNoise(t/14500,27)}
+function share(c,mode){let weights=mode==='workday'?wday:wend,sum=weights.reduce((a,v)=>a+v,0),prior=weights.slice(0,c.hour).reduce((a,v)=>a+v,0);
+ return (prior+weights[c.hour]*(c.minute/60+c.second/3600))/sum}
+function gain(day,type){let mode=dayMode(day),season=months[+day.slice(5,7)-1]*(mode==='holiday'?.42:mode==='weekend'?.72:1);
+ return Math.max(1,Math.round((type==='offers'?36:630)*season*(1+hash(dayNo(day),type==='offers'?151:199)*.16)))}
+function cum(t,type){let c=bj(t),n=dayNo(c.day),base=dayNo('2026-11-09');if(n<base)return 0;
+ let amount=0;for(let i=base;i<n;i++)amount+=gain(dayText(i),type);
+ return amount+gain(c.day,type)*share(c,dayMode(c.day))}
+const baseHeat=heatBase(anchor),baseActive=activeBase(anchor),baseHeatNoise=heatNoise(anchor),baseActiveNoise=activeNoise(anchor),baseOffers=cum(anchor,'offers'),baseApps=cum(anchor,'apps');
 const els={heat:document.getElementById('heat'),offers:document.getElementById('offers'),active:document.getElementById('active'),apps:document.getElementById('apps')};
-function draw(){els.heat.textContent=fmt(heat);els.offers.textContent=fmt(offers);els.active.textContent=fmt(active);els.apps.textContent=fmt(apps)}
-function loop(fn,low,high){function tick(){fn();draw();setTimeout(tick,rnd(low,high))}setTimeout(tick,rnd(low,high))}
-loop(()=>{let c=china(),base=target(c.minute);heat=clamp(Math.round(heat+(base-heat)*(.025+Math.random()*.06)+(Math.random()+Math.random()-1)*rnd(550,2700)+(Math.random()<.04?rnd(-4300,4300):0)),Math.max(100000,base-33000),Math.min(499999,base+33000));const names=['凌晨低峰','清晨回升','上午活跃','午间时段','午后高峰','晚间活跃','夜间回落'];document.getElementById('period').textContent='北京时间 · '+(c.hour<6?names[0]:c.hour<9?names[1]:c.hour<12?names[2]:c.hour<14?names[3]:c.hour<18?names[4]:c.hour<22?names[5]:names[6])},240,830);
-loop(()=>{let c=china();active=(c.day===day?active+rnd(1,9):rnd(0,4));day=c.day;save()},750,2600);
-loop(()=>{apps+=rnd(1,14);save()},550,2100);
-loop(()=>{offers+=rnd(1,2);save()},18000,49000);
+function draw(){
+ const t=Date.now(),c=bj(t);
+ const heat=clamp(Math.round(startValues.heat+heatBase(t)-baseHeat+heatNoise(t)-baseHeatNoise),100000,499999);
+ const active=clamp(Math.round(startValues.active+activeBase(t)-baseActive+activeNoise(t)-baseActiveNoise),400,30000);
+ const offers=startValues.offers+Math.max(0,Math.floor(cum(t,'offers')-baseOffers+1e-8));
+ const apps=startValues.apps+Math.max(0,Math.floor(cum(t,'apps')-baseApps+1e-8));
+ els.heat.textContent=fmt(heat);els.offers.textContent=fmt(offers);
+ els.active.textContent=fmt(active);els.apps.textContent=fmt(apps);
+ const periods=['凌晨低谷','清晨回升','上午活跃','午间时段','下午高峰','晚间活跃','夜间回落'];
+ document.getElementById('period').textContent='北京时间 · '+(c.hour<6?periods[0]:c.hour<9?periods[1]:c.hour<12?periods[2]:c.hour<14?periods[3]:c.hour<18?periods[4]:c.hour<22?periods[5]:periods[6]);
+ setTimeout(draw,260+Math.floor(Math.random()*630));
+}
 draw();
 </script></body></html>
