@@ -108,7 +108,8 @@ test('synthetic logged-in candidate gets grounded live snapshot match',async()=>
   assert.equal(data.profile.skills[0].name,'Python');
   assert.ok(!JSON.stringify(data).includes('13812345678'));
   assert.equal(h.ledger.length,1);
-  assert.equal(h.callCounts.provider,1);
+  assert.equal(h.callCounts.provider,2,'one resume analysis and one batched explanation');
+  assert.ok(typeof data.matches[0].recommendation_reason==='string');
  }finally{restore();}
 });
 test('consent, cross-origin, wrong owner and blocked role stop before provider',async()=>{
@@ -143,7 +144,7 @@ test('quota rejects the third account request with no provider invocation',async
   assert.equal(third.status,429);
   assert.equal((await third.json()).error,'MATCH_PERSONAL_LIMIT');
   assert.equal(h.ledger.length,2);
-  assert.equal(h.callCounts.provider,2);
+  assert.equal(h.callCounts.provider,4,'two successful matches, two explanation calls');
  }finally{restore();}
 });
 test('provider errors return no false recommendation and keep budget reserved',async()=>{
