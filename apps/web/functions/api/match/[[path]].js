@@ -307,16 +307,18 @@ export async function onRequest({request,env}){
   ['SEARCH_PROVIDER_ERROR','SEARCH_NETWORK_ERROR','SEARCH_TIMEOUT',
    'SEARCH_KEY_REJECTED','SEARCH_BALANCE_INSUFFICIENT','SEARCH_RATE_LIMIT',
    'SEARCH_REQUEST_REJECTED','SEARCH_BAD_RESPONSE','SEARCH_DAILY_LIMIT',
+   'PARTIAL',
    'SEARCH_DATABASE_NOT_READY'].includes(discovered.status))
   return fail('JOB_SEARCH_UNAVAILABLE',502);
  const explained=await explainRecommendedJobsWithDeepSeek(
   env.HHBA_MATCH_DEEPSEEK_KEY,cleaned,shortlist
  );
  return json({status:'COMPLETE',profile,matches:explained,
-  matched_official_jobs:explained.length,
+  matched_official_jobs:explained.filter(j=>j.source_type==='HHBA站内岗位'||
+   j.source_status==='OFFICIAL_DETAIL_FETCHED').length,
   discovery_status:discovered.status,discovery_meta:discovered.meta,
-  source:'中国大陆境内岗位（官方 ATS 审核与自动检索合并）',
-  scoring:'严格筛选已明确的学历、工作年限与工作地点要求后进行参考评分；不代表录用概率',
+  source:'中国大陆公开招聘：HHBA站内岗位与 DeepSeek 联网检索结果',
+  scoring:'根据简历经历、目标方向和城市偏好排序；匹配分数不代表录用概率',
   privacy:'本次脱敏简历文本仅用于已授权的 AI 分析；联网招聘搜索只传岗位方向，不发送姓名、电话或简历',
-  disclaimer:'只推荐中国大陆境内职位；当前招聘状态、薪资与申请资格以企业官网为准。'});
+  disclaimer:'岗位来源于公开招聘页面，部分链接未成功读取详情；招聘状态、工作地点与申请资格请以原始招聘页面为准。'});
 }
