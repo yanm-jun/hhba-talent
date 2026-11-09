@@ -7,7 +7,7 @@
  * functional cards and panels, with a static, viewport-filling treatment.
  * Vite rewrites this relative asset URL for both Pages and root-domain builds.
  */
-html {
+html:root {
   min-height: 100%;
   background-color: #f8fbff;
   background-image: url("./assets/hhba-global-background.webp");
