@@ -121,7 +121,7 @@ test('V4 Pro search receives SSE events and safely assembles the completed resul
   });
  assert.equal(calls.length,1);
  assert.equal(calls[0].stream,true);
- assert.equal(calls[0].max_output_tokens,2600);
+ assert.equal(calls[0].max_output_tokens,2300);
  assert.equal(out.matches.length,2);
  assert.ok(progress.includes('searching'));
  assert.ok(progress.includes('writing'));
