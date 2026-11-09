@@ -65,7 +65,7 @@ test('Top 10 UI exposes each safe official link independently of detail navigati
  const src=await readFile(new URL('../src/components/CandidateMatchResultDialog.tsx',import.meta.url),'utf8');
  assert.match(src,/recommendation_reason/);
  assert.match(src,/href=\{link\}/);
- assert.match(src,/直接查看官方岗位/);
+ assert.match(src,/直接查看招聘岗位/);
  assert.match(src,/data-hhba-recruitment-outbound/);
  assert.match(src,/onClick=\{onOpen\}/);
  const backend=await readFile(new URL('../functions/api/match/[[path]].js',import.meta.url),'utf8');
