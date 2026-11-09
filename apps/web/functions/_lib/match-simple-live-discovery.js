@@ -2,7 +2,7 @@
 // Search data is untrusted. Neither AI nor Search snippets can claim a job is open.
 import {findMainlandCity,isMainlandJobLocation} from './mainland-job-location.js';
 
-const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|日本|新加坡|美国|英国|海外|境外|hong[\s-]?kong|macau|taiwan|singapore|tokyo|london|united states|remote worldwide)/i;
+const OUTSIDE=/(?:香港|澳门|澳門|台湾|臺灣|东京|大阪|纽约|伦敦|旧金山|硅谷|悉尼|墨尔本|首尔|巴黎|柏林|温哥华|多伦多|曼谷|日本|新加坡|美国|英国|加拿大|澳大利亚|德国|法国|印度|越南|海外|境外|hong[\s-]?kong|macau|taiwan|singapore|tokyo|london|new[\s-]?york|san[\s-]?francisco|sydney|melbourne|seoul|berlin|paris|united states|remote worldwide)/i;
 const CLOSED=/(?:职位已关闭|职位已下线|岗位已下线|已停止招聘|停止招聘|招聘已结束|不再接受申请|no longer accepting|position closed)/i;
 const NOISE=/(?:新闻|攻略|面经|求职指南|职位列表|岗位列表|招聘信息汇总|薪资报告|招聘会|论坛|百科|校园招聘官网|招聘首页)/i;
 const JOB=/((?:ai\s*)?(?:产品经理|产品专员|产品运营|需求分析师|业务分析师|数据分析师|运营(?:经理|专员)?|设计师|研发工程师|软件工程师|工程师|销售(?:经理|顾问)?|客户经理|项目经理|人力资源|市场营销|管培生|实习生|顾问|岗位|职位))|(?:product\s+(?:manager|owner|specialist)|business\s+analyst|data\s+analyst|software\s+engineer|operations\s+(?:manager|specialist)|designer|internship)/i;
