@@ -1,7 +1,7 @@
 // Collect concrete, verbatim career evidence from a redacted resume.
 // These are proof excerpts for explanations, not a way to infer credentials.
 const ACTION=/(?:负责|参与|协助|推动|完成|统筹|组织|制定|搭建|建设|优化|执行|撰写|申报|协调|推进|分析|管理|开发|设计|培训|制作|核验|复盘|落地|带教|实施|led|managed|created|built|improved|coordinated|delivered)/i;
-const PERSONAL=/(?:1[3-9]\d{9}|[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|身份证|个人电话|微信号|忽略以上指令)/i;
+const PERSONAL=/(?:1[3-9]\d{9}|[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|身份证|个人电话|微信号|忽略以上指令|\[(?:手机号|邮箱|身份证号|即时通讯账号)已隐藏\])/i;
 const BAD_LINE=/^(?:姓名|性别|年龄|学历|意向岗位|求职意向|期望薪资|工作时间|联系电话|手机号|邮箱|学校|籍贯|婚姻|政治面貌)[：:]/i;
 const norm=s=>String(s||'').normalize('NFKC').toLowerCase().replace(/[\s_.()（）【】\-]+/g,'');
 const safe=s=>typeof s==='string'?s.trim():'';
