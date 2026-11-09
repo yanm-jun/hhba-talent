@@ -138,3 +138,53 @@ test('frontend fetches one native SSE stream and maps stages without restarting 
  assert.match(page,/setStage/);
  assert.match(page,/DeepSeek 正在搜索中国大陆的真实岗位/);
 });
+
+
+test('authenticated HHBA route streams progress and final Top10 without blocking until DeepSeek finishes',async()=>{
+ const realFetch=globalThis.fetch;
+ let calls=0;
+ globalThis.fetch=async (_url,options)=>{
+  calls++;
+  const fixture=deepseek(answer.jobs);
+  const body=[
+   {type:'response.created',response:{status:'in_progress'}},
+   {type:'response.web_search_call.searching'},
+   {type:'response.web_search_call.completed'},
+   {type:'response.completed',response:fixture}
+  ].map(x=>'event: '+x.type+'\ndata: '+JSON.stringify(x)+'\n\n').join('');
+  return new Response(body,{status:200,headers:{'Content-Type':'text/event-stream'}});
+ };
+ const db={prepare(sql){
+  return {bind(){return {
+   async first(){
+    if(sql.includes('hhba_auth_sessions'))return {phone:'13800000000',revoked:0,
+     expires_at:new Date(Date.now()+3600000).toISOString()};
+    if(sql.includes('hhba_auth_users'))return {role:'candidate',phone:'13800000000'};
+    throw Error('unexpected database read');
+   },
+   async run(){return {success:true}}
+  }}};
+ }};
+ const env={HHBA_MATCH_SERVICE_ENABLED:'1',
+  HHBA_MATCH_DEEPSEEK_KEY:'synthetic-secret-not-real',
+  HHBA_PNVS_AUTH_DB:db};
+ const request=new Request('https://hhba.example/api/match-native/resume',{
+  method:'POST',headers:{Origin:'https://hhba.example',
+   Authorization:'Bearer synthetic-client-token',
+   Accept:'text/event-stream','Content-Type':'application/json'},
+  body:JSON.stringify({text:'上海品牌督导。负责经销商运营、销售培训、DCC客户管理和门店改善。',
+   consent:true,options:{country:'CN',remote_only:false,role_hint:'品牌督导',limit:10}})
+ });
+ try{
+  const response=await onRequest({request,env});
+  assert.equal(response.status,200);
+  assert.match(response.headers.get('content-type'),/text\/event-stream/);
+  const stream=await response.text();
+  assert.match(stream,/event: progress/);
+  assert.match(stream,/event: complete/);
+  assert.doesNotMatch(stream,/event: failure/);
+  assert.match(stream,/示例汽车中国/);
+  assert.doesNotMatch(stream,/东京/);
+  assert.equal(calls,1);
+ }finally{globalThis.fetch=realFetch}
+});
