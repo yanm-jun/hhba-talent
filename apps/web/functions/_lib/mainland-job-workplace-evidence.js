@@ -138,12 +138,37 @@ export function extractMainlandWorkplaceFromJob({raw='',lines=[],role=''}={}){
  const structuredCities=[...new Set(parsed.map(x=>x.city))];
  if(structuredCities.length>1)return {reason:'AMBIGUOUS_WORKPLACE'};
  const structuredCity=structuredCities[0]||null;
+ // Never let a labeled work city contradict the SAME vacancy's standalone
+ // role header. Both are independently parsed from the fetched document.
+ const workHeaderCities=[];
+ if(roleAt>=0){
+  const inline=normalized[roleAt].slice(role.length).replace(/^[\s｜|—–-]+/u,'').trim();
+  if(inline&&inline.length<=14&&QUOTED_CITY.test(inline)&&
+    citiesInValue(inline).length===1&&findMainlandCity(inline))
+   workHeaderCities.push(findMainlandCity(inline));
+  const near=normalized.slice(roleAt+1,Math.min(roleAt+7,scan));
+  for(const line of near){
+   const parts=line.split(/[｜|]/).map(x=>x.trim()).filter(Boolean);
+   if(parts.length>=3&&parts.length<=6&&line.length<105&&
+     parts.some(x=>/^(?:全职|兼职|实习|社会招聘|校园招聘|正式|社招|校招)$/u.test(x))){
+    const city=parts.at(-1);
+    if(city&&city.length<=14&&QUOTED_CITY.test(city)&&
+      citiesInValue(city).length===1&&findMainlandCity(city))
+     workHeaderCities.push(findMainlandCity(city));
+   }
+  }
+ }
+ const uniqueHeaderCities=[...new Set(workHeaderCities)];
+ if(uniqueHeaderCities.length>1||
+   structuredCity&&uniqueHeaderCities.length&&uniqueHeaderCities[0]!==structuredCity)
+  return {reason:'AMBIGUOUS_WORKPLACE'};
  if(labeled.length){
   const evaluated=labeled.map(interpret);
   const errors=evaluated.find(x=>!x.city);
   if(errors)return errors;
   const cities=[...new Set(evaluated.map(x=>x.city))];
-  if(cities.length!==1||structuredCity&&cities[0]!==structuredCity)
+  if(cities.length!==1||structuredCity&&cities[0]!==structuredCity||
+    uniqueHeaderCities.length&&cities[0]!==uniqueHeaderCities[0])
    return {reason:'AMBIGUOUS_WORKPLACE'};
   return {city:cities[0],evidence_type:'JOB_LOCATION_FIELD'};
  }
