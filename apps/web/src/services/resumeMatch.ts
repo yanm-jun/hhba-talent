@@ -196,7 +196,8 @@ export async function submitExtractedResumeText(
 
 export async function submitResumeForMatching(
  file:File,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string,
- onProgress?:(stage:NativeMatchProgress)=>void
+ onProgress?:(stage:NativeMatchProgress)=>void,
+ onPartial?:(jobs:MatchedJob[])=>void
 ):Promise<MatchResponse>{
  if(!consent)throw new MatchError(400,errorMap.EXPLICIT_AI_SHARING_CONSENT_REQUIRED);
  const extracted=await extractResumeTextLocally(file,signal);
