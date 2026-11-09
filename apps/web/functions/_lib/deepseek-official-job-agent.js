@@ -156,6 +156,11 @@ function markdownLines(raw){
  return String(raw||'').split('\n').slice(0,1000).map(line=>
   line.replace(/^\s*#{1,6}\s*/,'')
    .replace(/\*\*/g,'').replace(/^\s*(?:>\s*)+/,'')
+   // JS navigation links such as [社会招聘](<javascript:void(0)>) include
+   // nested parentheses. Unwrap them before generic Markdown links, or a
+   // dangling ">)" can be falsely mistaken for a vacancy title.
+   .replace(/\[([^\]]{1,160})\]\(<javascript:void\(0\)>\)/gi,'$1')
+   .replace(/\[([^\]]{1,160})\]\(javascript:void\(0\)\)/gi,'$1')
    .replace(/\[([^\]]{1,160})\]\([^)]*\)/g,'$1')
    .replace(/^\s*(?:[-*•·]|\d{1,2}[.、．)])\s*/,'')
    .replace(/^\s*\|\s*/,'').replace(/\s*\|\s*$/,'')
