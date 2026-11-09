@@ -126,8 +126,8 @@ export function CandidateMatchPage({user}:{user:User|null}){
      <span>/</span><strong>简历智能匹配</strong></nav>
     <div className="hhba-ai-hero">
       <div className="hhba-ai-kicker"><BriefcaseBusiness size={16}/> HHBA · AI JOB MATCH</div>
-      <h1>上传简历，匹配中国大陆岗位。</h1>
-      <p>根据学历、经历与技能匹配中国大陆的核验职位；结果在独立弹窗中精简展示，可随时关闭返回修改。</p>
+      <h1>上传简历，找到相关企业招聘入口。</h1>
+      <p>根据你的求职方向查找企业官方招聘网站和具体职位链接，点击直接进入企业官网；能独立核验资格的岗位会另外展示。</p>
       <div className="hhba-ai-headline-tags"><span>仅中国大陆</span><span>无须自备 API Key</span><span>可返回修改</span></div>
     </div>
     {availability==='loading'&&<p className="hhba-ai-service-check"><LoaderCircle size={17} className="spin"/>正在检查平台智能匹配服务…</p>}
@@ -171,7 +171,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
          </div>}
         </div>
         <header className="hhba-ai-section-title"><h2>2. 选择工作方向</h2>
-          <p>匹配范围固定为中国大陆；目标是您的求职意向，不会被当成已有工作经验或专业资格。</p></header>
+          <p>优先找中国大陆就业机会。只有企业招聘入口时，请在官网自行筛选工作城市和岗位要求。</p></header>
         <div className="hhba-ai-mainland-only"><span>工作区域</span><strong>中国大陆</strong><small>不推荐港澳台或境外岗位</small></div>
         <div className="hhba-ai-fields hhba-ai-fields-one">
          <label>目标岗位方向<input value={options.role_hint} maxLength={80} placeholder="例如：软件开发、数据分析、销售、视觉设计"
@@ -180,7 +180,7 @@ export function CandidateMatchPage({user}:{user:User|null}){
         <header className="hhba-ai-section-title"><h2>3. 确认 AI 分析与隐私</h2></header>
         <label className="hhba-ai-consent"><input type="checkbox" checked={consent}
           onChange={e=>setConsent(e.target.checked)}/>
-          <span>我同意 HHBA 提取简历文本，尽可能隐藏邮箱、电话等直接标识后，发送给 DeepSeek 分析能力和匹配岗位；平台还会仅使用岗位方向联网搜索中国大陆公开招聘信息，不向搜索接口传送姓名、电话或简历原文。脱敏可能不完整，请自行检查；不会公开简历或自动投递。</span>
+          <span>我同意 HHBA 提取简历文本，尽可能隐藏邮箱、电话等直接标识后发送给 DeepSeek 分析求职方向；平台仅用岗位方向联网查找公开企业招聘链接，不向搜索接口发送姓名、电话或简历原文。脱敏可能不完整，请自行检查；不会公开简历或自动投递。</span>
         </label>
         <p className="hhba-ai-notice"><ShieldCheck size={15}/> 本功能仅供已登录的求职者使用。简历原件在当前浏览器读取，最多取前 2 万字文字分析；分析需单独同意，结果仅在本次页面中展示，不会自动公开或向企业投递。</p>
         {(error||availability==='ready')&&<div>
@@ -199,19 +199,19 @@ export function CandidateMatchPage({user}:{user:User|null}){
         </div>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
           disabled={(!file&&!savedId)||!consent||working||previewBusy||(previewLoaded&&previewText.replace(/\s/g,'').length<30)||availability!=='ready'||!getRealAuthToken()}>
-          {working?<><LoaderCircle className="spin" size={18}/> 正在提取简历并匹配岗位…</>:
-           <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
+          {working?<><LoaderCircle className="spin" size={18}/> 正在寻找官方招聘入口…</>:
+           <><BriefcaseBusiness size={17}/> AI 查找企业招聘机会 <ArrowRight size={17}/></>}
         </button>
-        {working&&<p className="hhba-ai-processing" role="status">正在分析简历、搜索国内公开职位并核验岗位要求。请保持页面打开，完成后将自动展示推荐。</p>}
+        {working&&<p className="hhba-ai-processing" role="status">正在识别求职方向并查找企业官方招聘入口。打开招聘链接后请在官网核对具体职位要求。</p>}
       </section>
       <aside className="hhba-ai-aside">
-        <div className="hhba-ai-aside-card"><h3>我们会怎样匹配？</h3>
-          <ol><li>解析你的学历、技能、经验和目标方向</li>
-            <li>读取当前官方岗位和核验过的任职要求</li>
-            <li>按真实岗位条件排序并说明依据</li>
-            <li>由你自行判断和前往企业官网投递</li></ol>
+        <div className="hhba-ai-aside-card"><h3>怎样找到企业招聘机会？</h3>
+          <ol><li>从简历与所选岗位识别求职方向</li>
+            <li>搜索企业官网和公开招聘入口</li>
+            <li>筛出来源可靠、可前往查看的链接</li>
+            <li>直接打开官网，确认职位与资格后自行投递</li></ol>
         </div>
-        <p className="hhba-ai-aside-footnote">相关度分数只是搜索排序参考，不是获得面试、录用或签证的概率。任何“未披露”条件都需要官网确认。</p>
+        <p className="hhba-ai-aside-footnote">企业招聘入口不等于有符合你资格的在招职位。工作城市、学历经验和投递状态均需在官网确认；只有已经核验过的具体岗位才计算参考相关度。</p>
       </aside>
     </div>
     {result&&<CandidateMatchResultDialog result={result} onClose={()=>setResult(null)}/>}
