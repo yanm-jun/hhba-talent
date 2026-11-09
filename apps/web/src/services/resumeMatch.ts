@@ -7,6 +7,7 @@ export type MatchProfile = {
   education:string|null;education_evidence:string|null;
   experience_years:number|null;experience_evidence:string|null;
   skills:{name:string;evidence:string}[];target_roles:string[];
+  work_evidence?:string[]; // exact, redacted resume excerpts for personal fit reasons
   career_intents?:string[];demonstrated_roles?:string[];
   professional_credentials?:string[];warnings:string[];
 };
