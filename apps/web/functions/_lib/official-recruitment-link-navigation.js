@@ -4,7 +4,7 @@
 // may sponsor an outbound recommendation. No resume text leaves the match API.
 import {sanitizedJobIntent} from './domestic-search-fetch.js';
 import {publicCorporatePage,publicJobLink,companyLinkFromPage} from './deepseek-official-job-agent.js';
-import {emptyV8CostMeter,observeV8ModelUsage,buildV8CostReport} from './deepseek-discovery-billing.js';
+import {emptyV8CostMeter,buildV8CostReport} from './deepseek-discovery-billing.js';
 
 export const LINK_DISCOVERY_VERSION='HHBA_OFFICIAL_LINK_NAVIGATION_V1';
 export const LINK_DISCOVERY_LIMITS=Object.freeze({model:0,search:3,fetch:6,results:10});
@@ -34,8 +34,10 @@ function brand(page,site){
    !/(?:加入我们|招聘|人才招聘|社会招聘|岗位招聘|careers?|join our team)/i.test(body.slice(0,4000)))return null;
  // Never claim independently verified employer legal identity from search.
  // The fetched page's masthead is only evidence of a self-branded site.
- const cleaned=candidates[0];
- if(/^(?:招聘|社会招聘|人才招聘|校园招聘|职位列表|加入我们|welcome|careers?|jobs?)$/i.test(cleaned))return null;
+ const cleaned=candidates.find(x=>
+  !/^(?:招聘|社会招聘|人才招聘|校园招聘|职位详情|职位列表|公司介绍|公司概况|加入我们|welcome|home|careers?|jobs?|recruitment)$/i.test(x)&&
+  body.slice(0,7000).toLowerCase().includes(x.toLowerCase()));
+ if(!cleaned)return null;
  return {name:cleaned,content:body,site_url:site.url,host:site.host,domain:site.domain};
 }
 function titleRelated(value,role){
@@ -93,10 +95,12 @@ export async function discoverOfficialRecruitmentLinks(role,key,{
  });
  if(!intent||typeof key!=='string'||key.length<16)return empty('NOT_READY');
  const searches=queryPlan(intent),sites=new Map(),jobs=new Map(),errors=[];
- // No extra model calls. Search queries contain ONLY the normalized occupation.
- for(const query of searches){
-  usage.search++;
-  const result=await provider(key,'search',{query,count:12,need_content:false},fetcher);
+ // Parallel public Search shortens latency without raising the three-call
+ // ceiling. This endpoint has no model calls, no resume text, no hidden retry.
+ const searched=await Promise.all(searches.map(query=>
+  provider(key,'search',{query,count:12,need_content:false},fetcher)));
+ usage.search=searched.length;
+ for(const result of searched){
   if(!result||!Array.isArray(result.results)){errors.push('SEARCH_UNAVAILABLE');continue}
   if(result.results.length)meter.billable_search++;
   for(const row of result.results.slice(0,12)){
