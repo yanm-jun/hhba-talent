@@ -113,7 +113,8 @@ export async function extractResumeTextLocally(file:File,signal?:AbortSignal):Pr
 }
 export type NativeMatchProgress='preparing'|'connected'|'searching'|'writing'|'waiting';
 async function consumeNativeMatchStream(
- response:Response,onProgress?:(stage:NativeMatchProgress)=>void
+ response:Response,onProgress?:(stage:NativeMatchProgress)=>void,
+ onPartial?:(jobs:MatchedJob[])=>void
 ):Promise<MatchResponse>{
  if(!response.body)throw new MatchError(502,'智能匹配连接没有返回可读取的结果。');
  const decoder=new TextDecoder(),reader=response.body.getReader();
@@ -128,9 +129,19 @@ async function consumeNativeMatchStream(
    const stage=value?.stage;
    if(['preparing','connected','searching','writing','waiting'].includes(stage))
     onProgress?.(stage as NativeMatchProgress);
+  }else if(event==='partial'){
+   if(Array.isArray(value?.matches)&&value.matches.length>0&&value.matches.length<=10)
+    onPartial?.(value.matches as MatchedJob[]);
   }else if(event==='failure'){
    const code=String(value?.error||'AI_PROVIDER_UNAVAILABLE');
-   throw new MatchError(502,errorMap[code]||'智能匹配服务暂时不可用。');
+   const stage=String(value?.phase||'preparing');
+   const elapsed=Number(value?.elapsed_ms||0);
+   const names:Record<string,string>={
+    preparing:'连接 DeepSeek',connected:'准备联网搜索',searching:'搜索岗位',writing:'整理职位结果'
+   };
+   const elapsedNote=Number.isFinite(elapsed)&&elapsed>=1000?
+    '（'+Math.round(elapsed/1000)+'秒，阶段：'+(names[stage]||'模型处理')+'）':'';
+   throw new MatchError(502,(errorMap[code]||'智能匹配服务暂时不可用。')+elapsedNote);
   }else if(event==='complete'){
    complete=value as MatchResponse;
   }
@@ -158,7 +169,8 @@ async function consumeNativeMatchStream(
 
 export async function submitExtractedResumeText(
  text:string,opts:MatchOptions,consent:boolean,signal?:AbortSignal,resumeId?:string,
- onProgress?:(stage:NativeMatchProgress)=>void
+ onProgress?:(stage:NativeMatchProgress)=>void,
+ onPartial?:(jobs:MatchedJob[])=>void
 ):Promise<MatchResponse>{
  if(!consent)throw new MatchError(400,errorMap.EXPLICIT_AI_SHARING_CONSENT_REQUIRED);
  const token=session();
@@ -174,7 +186,7 @@ export async function submitExtractedResumeText(
   throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。');});
  const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');
  if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。');
- const data=isStream?await consumeNativeMatchStream(response,onProgress):
+ const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial):
   await response.json().catch(()=>({})) as Partial<MatchResponse>&{error?:string};
  if(!response.ok)throw new MatchError(response.status,errorMap[(data as {error?:string}).error||'']||'智能匹配服务暂时不可用。');
  if(data.status!=='COMPLETE'||!data.profile||!Array.isArray(data.matches)||data.matches.length>10)
@@ -188,7 +200,7 @@ export async function submitResumeForMatching(
 ):Promise<MatchResponse>{
  if(!consent)throw new MatchError(400,errorMap.EXPLICIT_AI_SHARING_CONSENT_REQUIRED);
  const extracted=await extractResumeTextLocally(file,signal);
- return submitExtractedResumeText(extracted,opts,consent,signal,resumeId,onProgress);
+ return submitExtractedResumeText(extracted,opts,consent,signal,resumeId,onProgress,onPartial);
 }
 
 /** Preview-only free balance/key check, authenticated candidate, no resume content. */
