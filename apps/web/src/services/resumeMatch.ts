@@ -13,6 +13,7 @@ export type MatchedJob = {
   id:string;company:string;title:string;title_zh?:string|null;location:string;
   official_url:string;platform:string;source:string;remote:boolean;
   reference_score:number;matched:string[];not_evidenced:string[];
+  recommendation_reason?:string;
   needs_verification:string[];requirements_basis:string;
   source_type?:'HHBA站内岗位'|'站外官方招聘';
   application_status?:'NEEDS_OFFICIAL_CONFIRMATION';checked_at?:string;
