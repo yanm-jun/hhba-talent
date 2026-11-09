@@ -9,6 +9,7 @@ import {previewJobBrowserRenderer} from '../../_lib/cf-job-browser-preview.js';
 import {createTrustedEmployerSourceCache} from '../../_lib/trusted-employer-source-cache.js';
 import {discoverOfficialRecruitmentLinks} from '../../_lib/official-recruitment-link-navigation.js';
 import {whyThisCareerEntry} from '../../_lib/match-explanation.js';
+import {enrichMatchReasonsWithAI} from '../../_lib/match-rationale-ai.js';
 
 const KIND='HHBA_RESUME_MATCH_CLOUDFLARE_V1';
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
@@ -382,7 +383,12 @@ export async function onRequest({request,env}){
  const merged=fuseDomesticJobRecommendations(
   recommended.matches,discovered.candidates,profile,options,Date.now()
  );
- return json({status:'COMPLETE',profile,matches:merged.matches,
+ // Once per authorized request, explain final ranked jobs from validated,
+ // short resume excerpts. Any model failure preserves grounded local reasons.
+ const explained=await enrichMatchReasonsWithAI(
+  merged.matches,profile,env.HHBA_MATCH_DEEPSEEK_KEY
+ );
+ return json({status:'COMPLETE',profile,matches:explained,
   matched_official_jobs:merged.counts.distinct_verified_sources,
   qualification_reviews:merged.qualification_reviews,
   opportunities:(discovered.opportunities||[]).map(opportunity=>({
