@@ -49,8 +49,14 @@ export function safeOfficialNavigationUrl(item:OfficialNavigationOpportunity):st
   if(/(?:^|\.)(?:zhipin\.com|51job\.com|liepin\.com|zhaopin\.com|lagou\.com|yingjiesheng\.com|ncss\.cn)$/.test(u.hostname))return null;
   if(item.kind==='CAREERS_ENTRY'){
    if(/(?:^|\.)(?:feishu\.cn|hotjob\.cn)$/.test(u.hostname))return null;
-   if(u.href!==root.href||u.search||
-     !/^(?:\/|\/cn|\/zh|\/zh-cn|\/about|\/about-us|\/career|\/careers|\/jobs|\/join|\/join-us|\/recruit|\/recruitment|\/company|\/company\/about|\/careers\/index|\/career\/index|\/jobs\/index|\/about\/index|\/about\/company|\/talent|\/talents|\/joinus|\/join-us\/index|\/joinus\/index|\/recruit\/index|\/zh-cn\/careers|\/cn\/careers)$/.test(u.pathname.toLowerCase()))return null;
+   const path=u.pathname.toLowerCase();
+   const existing=/^(?:\/|\/cn|\/zh|\/zh-cn|\/about|\/about-us|\/career|\/careers|\/jobs|\/join|\/join-us|\/recruit|\/recruitment|\/company|\/company\/about|\/careers\/index|\/career\/index|\/jobs\/index|\/about\/index|\/about\/company|\/talent|\/talents|\/joinus|\/join-us\/index|\/joinus\/index|\/recruit\/index|\/zh-cn\/careers|\/cn\/careers)$/.test(path);
+   const parts=path.split('/').filter(Boolean);
+   const boundedRecruitPage=path.length<=120&&parts.length>0&&parts.length<=4&&
+    /^\/[a-z0-9/_-]+(?:\.html)?\/?$/i.test(path)&&
+    parts.some(x=>/(?:career|recruit|job|position|campus|social|join|talent|intern|universit|opportunit)/.test(x))&&
+    !parts.some(x=>/^\d{3,}$/.test(x));
+   if(u.href!==root.href||u.search||!(existing||boundedRecruitPage))return null;
   }else if(item.kind==='JOB_DETAIL'){
    if(!/(?:\/(?:job|jobs|position|positions|recruit|recruitment|career|careers|vacancy|detail)[\/._-]|jobdesc|job-details|jobinfo|position-detail|post-detail)/i.test(u.pathname))return null;
    if(item.source_evidence==='FIRST_PARTY_CAREERS_PAGE_READ'){
