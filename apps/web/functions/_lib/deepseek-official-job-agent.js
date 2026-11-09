@@ -554,8 +554,11 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
   }
   // The actual careers subdomain may be independently readable even when
   // its corporate apex domain cannot be fetched.
-  addSite('https://'+link.hostname+'/');
+  // The apex may already work for most enterprise domains; avoid
+  // charging an extra Fetch for a careers-subdomain homepage unnecessarily.
+  // On failure, the second attempt checks the source recruiting subdomain.
   addSite('https://'+link.domain+'/');
+  addSite('https://'+link.hostname+'/');
   let lastReason='COMPANY_PAGE_UNOBSERVED';
   const visited=new Set();
   // A missing employer homepage is a distinct fetch limitation, not proof
@@ -563,7 +566,10 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
   // for a same-corporate-domain homepage; never use a shared ATS homepage.
   async function renderCorporateOnFailure(site){
    if(typeof browserRenderer!=='function'||browserAttempts>=2||
-      site.domain!==link.domain||isSharedAtsDomain(site.domain))return null;
+      site.domain!==link.domain||isSharedAtsDomain(site.domain)||
+      // Prefer a recruitment-subdomain browser proof if the bare apex
+      // was not fetched. This also prevents wasting the second render.
+      (site.host!==link.hostname&&link.hostname!==link.domain))return null;
    browserAttempts++;
    try{
     const rendered=await browserRenderer(site.url);
