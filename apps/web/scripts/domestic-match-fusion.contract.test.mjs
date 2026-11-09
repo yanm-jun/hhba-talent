@@ -199,3 +199,36 @@ test('Top10 display stays globally score-sorted after diversity fallback',()=>{
  }
  assert.equal(result.matches[result.matches.length-1].company,'企业乙');
 });
+
+test('shortlist explains WHY using applicant skills, role evidence and explicit JD requirements',()=>{
+ const result=fuseDomesticJobRecommendations([],[domesticOutside()],{
+  ...profile,
+  education_evidence:'本科',
+  demonstrated_roles:['软件开发工程师'],
+  skills:[{name:'Python',evidence:'使用 Python 开发过业务程序'}]
+ },{role_hint:'软件开发工程师'},now);
+ assert.equal(result.matches.length,1);
+ const reason=result.matches[0].why_recommended;
+ assert.ok(reason&&reason.evidence.length>0);
+ assert.match(reason.evidence.join('；'),/软件开发工程师|Python/);
+ assert.ok(reason.evidence.every(x=>!x.includes('录用概率')&&!x.includes('一定录用')));
+ assert.ok(reason.to_check.every(x=>x.length<140));
+});
+test('missing verified resume evidence does not become invented strengths',()=>{
+ const result=fuseDomesticJobRecommendations([domesticInside()],[],{
+  education:null,experience_years:null,skills:[],
+  target_roles:['软件开发工程师'],career_intents:['软件开发工程师']
+ },{role_hint:'软件开发工程师'},now);
+ assert.equal(result.matches.length,1);
+ const reason=result.matches[0].why_recommended;
+ assert.ok(reason.summary.length>10);
+ assert.doesNotMatch(reason.evidence.join('；'),/本科学历|硕士学历|\d+年工作|Python/);
+});
+test('job-card and detail prioritize specific personal reasons',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const ui=await readFile(new URL('../src/components/CandidateMatchResultDialog.tsx',import.meta.url),'utf8');
+ assert.match(ui,/为什么推荐：/);
+ assert.match(ui,/why_recommended\.summary/);
+ assert.match(ui,/why_recommended\.evidence/);
+ assert.match(ui,/item\.why_suggested/);
+});
