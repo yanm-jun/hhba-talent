@@ -7,6 +7,6 @@ export function BrandMark({variant='lockup',size='nav',className=''}:{
 }) {
  return <span className={['hhba-brand-mark','hhba-brand-'+variant,'hhba-brand-'+size,className].filter(Boolean).join(' ')}>
   <img src={hhbaLogoUrl} alt={variant==='icon'?'HHBA 品牌标志':''} width={64} height={64} decoding="async"/>
-  {variant!=='icon'&&<span className="hhba-brand-text"><strong>HHBA<span className="hhba-brand-dot">.</span></strong>{variant==='signature'&&<small>让劳动更有尊严，让商业更有温度</small>}</span>}
+  {variant!=='icon'&&<span className="hhba-brand-text"><strong>HHBA<span className="hhba-brand-dot">.</span></strong><span className="hhba-brand-zh">汇方职场</span>{variant==='signature'&&<small>让劳动更有尊严，让商业更有温度</small>}</span>}
  </span>;
 }

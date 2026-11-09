@@ -66,10 +66,10 @@ export function HomeLiveDrawer() {
       <span className="hhba-rail-title">平台动态</span>
       <ChevronLeft size={15} className="hhba-rail-arrow" aria-hidden="true"/>
     </button>
-    <section id="hhba-home-stats-drawer" className="hhba-stats-slideout" aria-label="HHBA 平台动态设计预览"
+    <section id="hhba-home-stats-drawer" className="hhba-stats-slideout" aria-label="汇方职场 HHBA 平台动态设计预览"
       aria-hidden={!open} inert={!open}>
       <div className="hhba-slideout-heading">
-        <div><span className="hhba-slideout-eyebrow">HHBA · HUMAN CAPABILITY NETWORK</span>
+        <div><span className="hhba-slideout-eyebrow">HHBA · HUMAN CAPABILITY NETWORK · 汇方职场</span>
           <h2>机会正在发生</h2></div>
         <button type="button" className="hhba-slideout-close" aria-label="关闭平台动态"
           onClick={() => setOpen(false)}><X size={16}/></button>
