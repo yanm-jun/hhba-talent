@@ -120,3 +120,56 @@ test('Closed vacancy never triggers browser rescue to reopen a known-expired job
  assert.equal(got.stats.browser_render.attempts,0);
  assert.equal(renders,0);
 });
+
+test('Public Feishu ATS job may render, but only verified employer backlink establishes official status',async()=>{
+ const ats='https://anker-in.jobs.feishu.cn/index/position/7418141743487945014/detail';
+ const site='https://www.anker.com/';
+ const corp='安克创新科技股份有限公司';
+ const full=[
+  '# 内容运营','招聘单位：'+corp,'工作地点：深圳',
+  '岗位职责','负责企业新媒体内容策划、品牌传播及视频号账号运营。'.repeat(5),
+  '任职要求','本科及以上学历，熟悉内容运营与渠道项目协作。'.repeat(5),
+  '立即申请'
+ ].join('\n');
+ let models=0,searches=0,renderCount=0,fetches=0;
+ const source=async(uri,opts)=>{
+  const data=JSON.parse(opts.body);
+  if(uri.endsWith('/responses')){
+   models++;return Response.json({status:'completed',
+    usage:{input_tokens:310,input_tokens_details:{cached_tokens:50},output_tokens:65},
+    output:models===1?[tool('search_jobs',{query:'内容运营 深圳 企业官方招聘'},'s1')]:[]});
+  }
+  if(uri.endsWith('/search')){
+   searches++;
+   return Response.json({results:searches===1?[{
+    url:ats,title:'内容运营 - '+corp,snippet:'岗位职责、任职资格、工作地点请见招聘详情'
+   }]:[{
+    url:site,title:corp+' 官方网站',snippet:corp+' 招聘职位与公司介绍'
+   }]});
+  }
+  if(uri.endsWith('/fetch')){
+   fetches++;
+   if(data.url===ats)return Response.json({title:'内容运营 - '+corp,
+    content:full.replace('工作地点：深圳','工作地点：待定')});
+   if(data.url===site)return Response.json({title:corp,
+    content:('# '+corp+'\n'+corp+' 官网人才招聘与企业信息。').repeat(5)+
+      '\n[人才招聘职位]('+ats+')'});
+  }
+  throw Error('UNEXPECTED_MOCK_REQUEST');
+ };
+ const got=await runDeepSeekOfficialJobAgent('内容运营',key,{
+  fetcher:source,now,targetCount:1,
+  browserRenderer:async url=>{
+   assert.equal(url,ats);renderCount++;
+   return {title:'内容运营 - '+corp,content:full};
+  }
+ });
+ assert.equal(got.stats.verified,1);
+ assert.equal(got.candidates[0]?.company,corp);
+ assert.equal(got.candidates[0]?.location,'深圳');
+ assert.equal(got.candidates[0]?.source_verification,'CORPORATE_EXACT_JOB_LINK');
+ assert.equal(renderCount,1);
+ assert.deepEqual(got.stats.browser_render,{attempts:1,recovered:1,failures:0});
+ assert.equal(got.accounting.complete,false,'browser usage has separate unpriced cost');
+ assert.ok(models<=4&&searches<=8&&fetches<=20);
+});
