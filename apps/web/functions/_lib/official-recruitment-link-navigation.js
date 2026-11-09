@@ -111,10 +111,30 @@ export async function discoverOfficialRecruitmentLinks(role,key,{
   if(result.results.length)meter.billable_search++;
   for(const row of result.results.slice(0,12)){
    if(!row||typeof row.url!=='string')continue;
+   const snippet=text(row.title,160)+' '+text(row.snippet,400);
    const corporate=publicCorporatePage(row.url);
-   if(corporate&&!FOREIGN.test(text(row.title,160)+' '+text(row.snippet,400))){
+   if(corporate&&!FOREIGN.test(snippet)){
     const meta={title:text(row.title,160),snippet:text(row.snippet,400)};
     if(!sites.has(corporate.url))sites.set(corporate.url,{...corporate,meta,role:searchedRole});
+   }
+   // Search engines commonly return a real employer's recruiting subpage
+   // (e.g. /website/campus.html or /jobopportunity.html), not its root URL.
+   // Such a result is ONLY an untrusted hint to FETCH the same-host homepage.
+   // Never display the discovered URL or claim provenance until that source
+   // was actually fetched and self-identifies as an employer recruiting page.
+   if(!corporate&&!FOREIGN.test(snippet)&&RECRUIT.test(snippet)){
+    try{
+     const candidate=new URL(row.url);
+     const hiringPath=/(?:career|recruit|job|position|campus|social|join|talent|intern|university|opportunit)/i
+      .test(candidate.pathname);
+     const hiringHost=/^(?:careers?|jobs?|hr|zhaopin|recruit|join)\./i.test(candidate.hostname);
+     if(hiringPath||hiringHost){
+      const root=publicCorporatePage(candidate.origin+'/');
+      if(root&&!sites.has(root.url)&&sites.size<65)
+       sites.set(root.url,{...root,meta:{title:text(row.title,160)},
+        role:searchedRole,derived:true});
+     }
+    }catch{}
    }
    const job=publicJobLink(row.url);
    if(job&&titleRelated(row.title,searchedRole)&&
@@ -139,8 +159,8 @@ export async function discoverOfficialRecruitmentLinks(role,key,{
   }
  }
  const ranked=[...sites.values()].sort((a,b)=>
-  (companyPageScore(b,b.meta)-(b.derived?11:0))-
-  (companyPageScore(a,a.meta)-(a.derived?11:0)));
+  (companyPageScore(b,b.meta)-(b.derived?4:0))-
+  (companyPageScore(a,a.meta)-(a.derived?4:0)));
  // Round-robin the fetched company pages across distinct career intents.
  // Otherwise the first search's 12 leads can consume all six Fetch slots.
  const buckets=new Map(intents.map(x=>[x,[]]));
