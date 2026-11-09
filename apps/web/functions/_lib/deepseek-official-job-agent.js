@@ -383,14 +383,14 @@ function companyLinkFromPage(body,jobUrl){
  for(const ref of referenced){
   const dest=publicHttps(ref,{query:true});
   if(!dest||dest.hostname!==job.hostname)continue;
-  if(dest.href===job.href)return 'CORPORATE_EXACT_JOB_LINK';
+  if(dest.href===job.href)return {method:'CORPORATE_EXACT_JOB_LINK',scope:dest.href};
   // Accept corporate -> named company recruitment board -> individual role.
   // Never accept generic vendor homepage, generic /jobs, or a different tenant.
   const segments=dest.pathname.split('/').filter(Boolean);
   if(dest.search||segments.length<2)continue;
   const prefix=dest.pathname.replace(/\/+$/,'')+'/';
   if(job.pathname.startsWith(prefix)&&job.pathname.length>prefix.length+5)
-   return 'CORPORATE_NAMED_BOARD_LINK';
+   return {method:'CORPORATE_NAMED_BOARD_LINK',scope:dest.href};
  }
  return null;
 }
@@ -437,8 +437,9 @@ export function inspectPublicEmployer(job,homepage,site){
  }
  const {company_claim,_page_excerpt,_job_page_title,...cleanJob}=job;
  return {reason:'VERIFIED',job:{...cleanJob,company,source_status:'OFFICIAL_DETAIL_FETCHED',
-  source_verification:same?'CORPORATE_DOMAIN_AND_BRAND':backlink,
-  employer_site:corporate.url}};
+  source_verification:same?'CORPORATE_DOMAIN_AND_BRAND':backlink.method,
+  employer_site:corporate.url},
+  cache_scope:same?'https://'+link.hostname+'/':backlink.scope};
 }
 export function provePublicEmployer(job,homepage,site){
  return inspectPublicEmployer(job,homepage,site).job;
