@@ -56,15 +56,14 @@ const errorMap:Record<string,string>={
   AI_PROVIDER_NETWORK_ERROR:'HHBA 暂时无法连接 DeepSeek，请稍后再试。',
   AI_PROVIDER_REDIRECT_BLOCKED:'AI 接口发生异常重定向，为保护密钥，已安全终止请求。',
   AI_PROVIDER_TIMEOUT:'AI 请求超时，请稍后再试。',
-  AI_PROVIDER_RESPONSE_INVALID:'AI 服务返回了无法识别的数据，请稍后再试。',
+  AI_PROVIDER_RESPONSE_INVALID:'DeepSeek 输出中断或格式异常，暂不展示不完整推荐。',
   AI_PROFILE_INCOMPLETE:'AI 未能可靠识别简历内容，请完善简历后重试。',
   MATCH_PERSONAL_LIMIT:'今天的个人免费体验次数已达上限。',
   MATCH_GLOBAL_LIMIT:'平台今天的 AI 体验额度已用完。',
   BAD_RESPONSE:'匹配结果格式不完整，请稍后重试。',
   AI_WEB_SEARCH_NOT_USED:'DeepSeek 本次没有执行联网搜索，未展示未经搜索证实的岗位，请重试。',
   AI_RESPONSE_INVALID:'DeepSeek 返回结果格式异常，请重试。',
-  AI_PROVIDER_INCOMPLETE:'DeepSeek 搜索未能完成，没有返回不完整的岗位结果。',
-  AI_PROVIDER_RESPONSE_INVALID:'DeepSeek 输出中断或格式异常，暂不展示不完整推荐。'
+  AI_PROVIDER_INCOMPLETE:'DeepSeek 搜索未能完成，没有返回不完整的岗位结果。'
 };
 export class MatchError extends Error {
  constructor(public readonly status:number,message:string){super(message);this.name='MatchError'}
