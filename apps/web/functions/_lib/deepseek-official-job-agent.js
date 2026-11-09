@@ -460,7 +460,7 @@ async function requestJson(endpoint,key,body,fetcher,max=260000,timeout=18000){
  const raw=await r.text();if(raw.length>max)throw Error('PROVIDER_RESPONSE_TOO_LARGE');
  try{return JSON.parse(raw);}catch{throw Error('PROVIDER_BAD_JSON');}
 }
-export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=new Date(),targetCount=10,auditPublicEvidence=false,browserRenderer=null}={}){
+export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=new Date(),targetCount=10,auditPublicEvidence=false,browserRenderer=null,trustedSourceCache=null}={}){
  const intents=[...new Set((Array.isArray(roles)?roles:[roles])
   .map(sanitizedJobIntent).filter(Boolean))].slice(0,2);
  if(!intents.length)throw Error('V8_NO_SAFE_ROLE');
@@ -514,6 +514,13 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
  };
  const meter=emptyV8CostMeter();let failures=0,uncertainProviderFailure=false;
  let employerLookups=0,employerLookupResults=0,companyPageReads=0;
+ let trustedSourceHits=0,trustedSourceMisses=0,trustedSourceWrites=0;
+ async function rememberTrustedSource(checked,unverifiedJob){
+  if(!trustedSourceCache||!checked?.job)return;
+  try{
+   if(await trustedSourceCache.remember(checked,unverifiedJob))trustedSourceWrites++;
+  }catch{ /* Cache writes cannot invalidate a truly verified job. */ }
+ }
  const employerLookupAttempted=new Set();
  const recordProofFailure=reason=>{
   const key=/^COMPANY_[A-Z_]+$/.test(reason)?reason:'COMPANY_PROOF_MISSING';
@@ -543,6 +550,14 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
   'No claim that a public job is currently open merely because a page exists.'
  ].join(' ');
  async function corroborateJob(job,link){
+  // Every vacancy is freshly fetched and independently screened first.
+  // Reuse only the recent employer-to-source attestation, NOT job details.
+  if(trustedSourceCache){
+   let prior=null;
+   try{prior=await trustedSourceCache.lookup(job);}catch{}
+   if(prior){trustedSourceHits++;return prior;}
+   trustedSourceMisses++;
+  }
   const candidates=new Map();
   const addSite=value=>{
    const site=typeof value==='string'?publicCorporatePage(value):value;
@@ -596,6 +611,7 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
       browserRecovered++;
       websiteCache.set(target.url,rendered);
       sites.set(target.url,target);
+      await rememberTrustedSource(checked,job);
       return checked.job;
      }
      lastReason=checked.reason;
@@ -623,7 +639,11 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
       websiteCache.set(site.url,doc);
      }
      const checked=inspectPublicEmployer(job,doc,site.url);
-     if(checked.job){sites.set(site.url,site);return checked.job;}
+     if(checked.job){
+      sites.set(site.url,site);
+      await rememberTrustedSource(checked,job);
+      return checked.job;
+     }
      lastReason=checked.reason;
      // Do not override an explicit brand mismatch or unproven backlink.
      if(checked.reason==='COMPANY_PAGE_UNREADABLE'||
@@ -770,9 +790,14 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
        if(typeof doc?.content==='string'&&doc.content.length>0)meter.billable_fetch++;
        websiteCache.set(site.url,doc);
       }
-      const job=provePublicEmployer(pages.get(link.url),doc,site.url);
-      if(job){confirmed.set(job.id,job);answer={status:'PUBLIC_COMPANY_PROOF_PASSED',
-       url:link.url,company:job.company,title:job.title,workplace:job.location};}
+      const unverified=pages.get(link.url);
+      const inspected=inspectPublicEmployer(unverified,doc,site.url);
+      const job=inspected.job;
+      if(job){
+       await rememberTrustedSource(inspected,unverified);
+       confirmed.set(job.id,job);answer={status:'PUBLIC_COMPANY_PROOF_PASSED',
+        url:link.url,company:job.company,title:job.title,workplace:job.location};
+      }
       else answer={status:'NO_INDEPENDENT_EMPLOYER_PROOF'};
      }catch{failures++;uncertainProviderFailure=true;answer={status:'CORPORATE_FETCH_UNAVAILABLE'};}
     }
@@ -858,6 +883,8 @@ export async function runDeepSeekOfficialJobAgent(roles,key,{fetcher=fetch,now=n
    evidence_rescue_searches:evidenceRescueSearches,
    evidence_rescue_candidates:evidenceRescueCandidates,
    browser_render:{attempts:browserAttempts,recovered:browserRecovered,failures:browserFailures},
+   trusted_source_cache:{hits:trustedSourceHits,misses:trustedSourceMisses,
+    writes:trustedSourceWrites},
    employer_proof:{searches:employerLookups,search_candidates:employerLookupResults,
     corporate_page_fetches:companyPageReads},
    search_quality_hints:{
