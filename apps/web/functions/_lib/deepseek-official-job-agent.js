@@ -361,7 +361,7 @@ function brandMentioned(value,brand){
  return !!brand?.full&&(normalized.includes(brand.full)||
   (!!brand.core&&normalized.includes(brand.core)));
 }
-function companyLinkFromPage(body,jobUrl){
+export function companyLinkFromPage(body,jobUrl){
  let job;try{job=new URL(jobUrl);}catch{return null;}
  if(typeof body!=='string')return null;
  // A direct reference to the exact individual position is strongest.
