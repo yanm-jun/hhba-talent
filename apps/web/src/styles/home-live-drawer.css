@@ -6,46 +6,46 @@ z-index:55;pointer-events:none;font-family:inherit}
 .hhba-hover-rail button{font:inherit;cursor:pointer}
 .hhba-rail-trigger{position:absolute;right:0;top:0;display:flex;flex-direction:column;
 align-items:center;justify-content:center;gap:13px;width:42px;height:151px;padding:11px 8px;
-border:1px solid #d7e8dd;border-right:0;background:#f2f8f4;
-border-radius:13px 0 0 13px;box-shadow:-5px 7px 22px rgba(23,63,48,.055);
-color:#285e49;pointer-events:auto;outline-offset:3px;transition:background .2s,border-color .2s}
-.hhba-rail-trigger:hover,.hhba-rail-trigger:focus-visible,.hhba-hover-rail.is-open .hhba-rail-trigger{background:#e6f3eb;border-color:#bddcc9}
+border:1px solid #d4e5fb;border-right:0;background:#edf5ff;
+border-radius:13px 0 0 13px;box-shadow:-5px 7px 22px rgba(35,85,160,.075);
+color:#1c6dbd;pointer-events:auto;outline-offset:3px;transition:background .2s,border-color .2s}
+.hhba-rail-trigger:hover,.hhba-rail-trigger:focus-visible,.hhba-hover-rail.is-open .hhba-rail-trigger{background:#e6f1ff;border-color:#bdd5f6}
 .hhba-rail-title{font-size:12px;font-weight:760;letter-spacing:2px;writing-mode:vertical-rl;text-orientation:upright;white-space:nowrap}
-.hhba-rail-dot{display:block;width:7px;height:7px;border-radius:50%;background:#23a164;
-box-shadow:0 0 0 4px rgba(35,161,100,.13);animation:hhba-rail-pulse 2.5s ease-in-out infinite}
+.hhba-rail-dot{display:block;width:7px;height:7px;border-radius:50%;background:#f49c28;
+box-shadow:0 0 0 4px rgba(244,156,40,.18);animation:hhba-rail-pulse 2.5s ease-in-out infinite}
 .hhba-rail-arrow{transition:transform .25s ease;transform:rotate(0deg)}
 .hhba-hover-rail.is-open .hhba-rail-arrow{transform:rotate(180deg)}
 .hhba-stats-slideout{position:absolute;top:0;right:44px;width:var(--rail-width);
-box-sizing:border-box;border:1px solid #dfeae4;border-radius:17px;
-background:rgba(255,255,255,.985);box-shadow:0 15px 48px rgba(34,61,53,.13);
+box-sizing:border-box;border:1px solid #dae7f8;border-radius:17px;
+background:rgba(255,255,255,.985);box-shadow:0 15px 48px rgba(28,68,129,.14);
 padding:21px 23px 16px;pointer-events:none;opacity:0;visibility:hidden;
 transform:translateX(24px) scale(.97);transform-origin:right top;
 transition:transform .29s cubic-bezier(.2,.76,.28,1),opacity .24s ease,visibility .24s}
 .hhba-hover-rail.is-open .hhba-stats-slideout{transform:translateX(0) scale(1);
 opacity:1;visibility:visible;pointer-events:auto}
 .hhba-slideout-heading{display:flex;align-items:start;justify-content:space-between;gap:12px}
-.hhba-slideout-eyebrow{font-size:9px;color:#658779;letter-spacing:.055em;font-weight:700}
+.hhba-slideout-eyebrow{font-size:9px;color:#417fca;letter-spacing:.055em;font-weight:700}
 .hhba-slideout-heading h2{margin:6px 0 12px;font-size:18px;line-height:1.35;
-color:#203a35;font-weight:780;letter-spacing:-.3px}
+color:#203d62;font-weight:780;letter-spacing:-.3px}
 .hhba-slideout-close{width:27px;height:27px;display:flex;align-items:center;justify-content:center;
-background:#f5f8f6;border:0;border-radius:8px;color:#557467}
-.hhba-drawer-primary{margin:8px 0 8px;padding:14px 15px 13px;border:1px solid #e0ece4;
-background:linear-gradient(125deg,#f4f9f5,#f9fcfa);border-radius:12px}
-.hhba-primary-label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:770;color:#2e7355}
-.hhba-primary-live{display:flex;gap:4px;align-items:center;margin-left:auto;font-size:9px;letter-spacing:.5px;color:#389667}
-.hhba-primary-live i{width:5px;height:5px;border-radius:50%;background:#38ae78}
+background:#f1f5fb;border:0;border-radius:8px;color:#597b9e}
+.hhba-drawer-primary{margin:8px 0 8px;padding:14px 15px 13px;border:1px solid #d9e6fa;
+background:linear-gradient(124deg,#ecf4ff 0%,#f9fbff 65%,#fff6e9 100%);border-radius:12px}
+.hhba-primary-label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:770;color:#186ec6}
+.hhba-primary-live{display:flex;gap:4px;align-items:center;margin-left:auto;font-size:9px;letter-spacing:.5px;color:#b66b07}
+.hhba-primary-live i{width:5px;height:5px;border-radius:50%;background:#f6a52c}
 .hhba-primary-number{display:block;white-space:nowrap;font-size:clamp(27px,2.7vw,37px);
-letter-spacing:-1px;line-height:1.35;font-weight:800;color:#1f3d34;font-variant-numeric:tabular-nums;margin:9px 0 5px}
-.hhba-primary-context{display:inline-flex;align-items:center;gap:5px;color:#7d9289;font-size:10px}
+letter-spacing:-1px;line-height:1.35;font-weight:800;color:#1555a3;font-variant-numeric:tabular-nums;margin:9px 0 5px}
+.hhba-primary-context{display:inline-flex;align-items:center;gap:5px;color:#7186a5;font-size:10px}
 .hhba-drawer-secondary{margin:8px 0 0}
-.hhba-drawer-metric{display:flex;align-items:center;gap:12px;border-bottom:1px solid #edf2ef;padding:10px 0}
+.hhba-drawer-metric{display:flex;align-items:center;gap:12px;border-bottom:1px solid #e5edf9;padding:10px 0}
 .hhba-metric-symbol{display:flex;align-items:center;justify-content:center;flex:none;
-width:33px;height:33px;border-radius:10px;background:#edf5f0;color:#3e8867}
-.hhba-metric-copy{display:flex;flex-direction:column;gap:3px;font-size:11px;color:#70847a}
-.hhba-metric-copy strong{font-size:21px;line-height:1.15;color:#233e35;font-weight:760;
+width:33px;height:33px;border-radius:10px;background:#eef5ff;color:#2a77c8}
+.hhba-metric-copy{display:flex;flex-direction:column;gap:3px;font-size:11px;color:#6c809a}
+.hhba-metric-copy strong{font-size:21px;line-height:1.15;color:#223f65;font-weight:760;
 letter-spacing:-.5px;font-variant-numeric:tabular-nums}
-.hhba-stats-review-note{margin-top:13px;font-size:10px;line-height:1.5;color:#8b9a92}
-@keyframes hhba-rail-pulse{50%{box-shadow:0 0 0 7px rgba(35,161,100,.035)}}
+.hhba-stats-review-note{margin-top:13px;font-size:10px;line-height:1.5;color:#8799af}
+@keyframes hhba-rail-pulse{50%{box-shadow:0 0 0 7px rgba(244,156,40,.035)}}
 @media(max-width:1250px){.hhba-hover-rail{--rail-width:min(320px,calc(100vw - 65px));position:fixed;top:auto;bottom:28px;height:345px}
 .hhba-rail-trigger{top:auto;bottom:0}.hhba-stats-slideout{top:auto;bottom:0}}
 @media(max-width:560px){.hhba-hover-rail{--rail-width:min(300px,calc(100vw - 59px));bottom:15px}
@@ -53,3 +53,13 @@ letter-spacing:-.5px;font-variant-numeric:tabular-nums}
 .hhba-primary-number{font-size:31px}}
 @media(prefers-reduced-motion:reduce){.hhba-rail-dot{animation:none}
 .hhba-rail-arrow,.hhba-stats-slideout{transition:none}}
+
+/* Logo palette: HHBA electric blue and warm orange; no other homepage styling affected. */
+.hhba-stats-slideout::before{content:'';position:absolute;left:23px;right:23px;top:0;height:3px;border-radius:0 0 4px 4px;background:linear-gradient(90deg,#1979ed 0%,#4f9df4 51%,#f7a22c 52%,#f29420 100%)}
+.hhba-rail-trigger{border-left:2px solid #2e83eb}
+.hhba-drawer-primary{position:relative;overflow:hidden}
+.hhba-drawer-primary::after{content:'';position:absolute;right:-15px;top:-30px;width:85px;height:85px;border-radius:50%;background:radial-gradient(circle,rgba(247,162,44,.12),transparent 72%);pointer-events:none}
+.hhba-drawer-metric:first-child .hhba-metric-symbol{background:#fff1df;color:#d57d0c}
+.hhba-drawer-metric:nth-child(2) .hhba-metric-symbol{background:#eaf3ff;color:#2476c8}
+.hhba-drawer-metric:nth-child(3) .hhba-metric-symbol{background:#fff4e6;color:#d58a25}
+.hhba-drawer-metric:first-child .hhba-metric-copy strong{color:#b86d13}
