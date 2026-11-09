@@ -8,6 +8,7 @@ import {runDeepSeekOfficialJobAgent} from '../../_lib/deepseek-official-job-agen
 import {previewJobBrowserRenderer} from '../../_lib/cf-job-browser-preview.js';
 import {createTrustedEmployerSourceCache} from '../../_lib/trusted-employer-source-cache.js';
 import {discoverOfficialRecruitmentLinks} from '../../_lib/official-recruitment-link-navigation.js';
+import {whyThisCareerEntry} from '../../_lib/match-explanation.js';
 
 const KIND='HHBA_RESUME_MATCH_CLOUDFLARE_V1';
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
@@ -383,7 +384,9 @@ export async function onRequest({request,env}){
  return json({status:'COMPLETE',profile,matches:merged.matches,
   matched_official_jobs:merged.counts.distinct_verified_sources,
   qualification_reviews:merged.qualification_reviews,
-  opportunities:discovered.opportunities||[],
+  opportunities:(discovered.opportunities||[]).map(opportunity=>({
+   ...opportunity,why_suggested:whyThisCareerEntry(profile,opportunity)
+  })),
   opportunity_quality_status:discovered.quality_status||null,
   discovery_status:discovered.status,
   discovery_usage:discovered.usage||null,
