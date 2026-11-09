@@ -52,7 +52,7 @@ test('one provider POST does the Search + explanations together and returns no s
  };
  const r=await runNativeJobMatch('synthetic-secret-not-real','上海品牌督导。负责经销商管理。','品牌督导',10,{fetcher});
  assert.equal(calls.length,1);
- assert.equal(calls[0].url,'https://api.deepseek.com/v1/responses');
+ assert.equal(calls[0].url,'https://api.deepseek.com/responses');
  assert.equal(calls[0].body.model,'deepseek-v4-pro');
  assert.deepEqual(calls[0].body.tools,[{type:'web_search'}]);
  assert.equal(calls[0].body.text.format.type,'json_object');
