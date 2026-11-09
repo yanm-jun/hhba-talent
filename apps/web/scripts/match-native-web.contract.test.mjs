@@ -94,3 +94,47 @@ test('new upload UI uses native endpoint and native results, not legacy multi-st
  assert.match(page,/CandidateMatchNativeDialog/);
  assert.doesNotMatch(page,/CandidateMatchResultDialog/);
 });
+
+
+test('V4 Pro search receives SSE events and safely assembles the completed result',async()=>{
+ const fixture=deepseek(answer.jobs),progress=[],calls=[];
+ const providerEvents=[
+  {type:'response.created',response:{status:'in_progress'}},
+  {type:'response.web_search_call.searching'},
+  {type:'response.web_search_call.completed'},
+  {type:'response.completed',response:fixture}
+ ];
+ const all=providerEvents.map(e=>'event: '+e.type+'\ndata: '+JSON.stringify(e)+'\n\n').join('');
+ const bytes=new TextEncoder().encode(all);
+ const fetcher=async(_url,options)=>{
+  calls.push(JSON.parse(options.body));
+  return new Response(new ReadableStream({
+   start(controller){
+    for(let i=0;i<bytes.length;i+=39)controller.enqueue(bytes.slice(i,i+39));
+    controller.close();
+   }
+  }),{status:200,headers:{'Content-Type':'text/event-stream; charset=utf-8'}});
+ };
+ const out=await runNativeJobMatch('synthetic-secret-not-real',
+  '上海品牌督导，负责经销商运营、销售漏斗和培训。','品牌督导',10,{
+   fetcher,onProgress:stage=>progress.push(stage)
+  });
+ assert.equal(calls.length,1);
+ assert.equal(calls[0].stream,true);
+ assert.equal(calls[0].max_output_tokens,2600);
+ assert.equal(out.matches.length,2);
+ assert.ok(progress.includes('searching'));
+ assert.ok(progress.includes('writing'));
+ assert.equal(out.diagnostic.searches,2);
+});
+test('frontend fetches one native SSE stream and maps stages without restarting model',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const svc=await readFile(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
+ const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
+ assert.match(svc,/'Accept':'text\/event-stream'/);
+ assert.match(svc,/consumeNativeMatchStream/);
+ assert.match(svc,/event==='complete'/);
+ assert.match(svc,/event==='failure'/);
+ assert.match(page,/setStage/);
+ assert.match(page,/DeepSeek 正在搜索中国大陆的真实岗位/);
+});
