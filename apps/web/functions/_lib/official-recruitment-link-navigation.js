@@ -84,7 +84,8 @@ function validOfficialLink(url,kind){
 export async function discoverOfficialRecruitmentLinks(role,key,{
  fetcher=fetch,now=new Date(),limit=10
 }={}){
- const intent=[...new Set((Array.isArray(role)?role:[role]).map(sanitizedJobIntent).filter(Boolean))][0];
+ const intents=[...new Set((Array.isArray(role)?role:[role]).map(sanitizedJobIntent).filter(Boolean))].slice(0,3);
+ const intent=intents[0];
  const desired=Math.max(1,Math.min(10,Number.isInteger(limit)?limit:10));
  const usage={model:0,search:0,fetch:0},meter=emptyV8CostMeter();
  const empty=(status)=>({
@@ -94,13 +95,18 @@ export async function discoverOfficialRecruitmentLinks(role,key,{
   stats:{searched_links:0,verified_sources:0,job_direct:0,career_entries:0}
  });
  if(!intent||typeof key!=='string'||key.length<16)return empty('NOT_READY');
- const searches=queryPlan(intent),sites=new Map(),jobs=new Map(),errors=[];
+ const searches=Array.from({length:3},(_,i)=>{
+  const selected=intents[i%intents.length];
+  return {role:selected,query:queryPlan(selected)[i]};
+ });
+ const sites=new Map(),jobs=new Map(),errors=[];
  // Parallel public Search shortens latency without raising the three-call
  // ceiling. This endpoint has no model calls, no resume text, no hidden retry.
- const searched=await Promise.all(searches.map(query=>
+ const searched=await Promise.all(searches.map(({query})=>
   provider(key,'search',{query,count:12,need_content:false},fetcher)));
  usage.search=searched.length;
- for(const result of searched){
+ for(let searchIndex=0;searchIndex<searched.length;searchIndex++){
+  const result=searched[searchIndex],searchedRole=searches[searchIndex].role;
   if(!result||!Array.isArray(result.results)){errors.push('SEARCH_UNAVAILABLE');continue}
   if(result.results.length)meter.billable_search++;
   for(const row of result.results.slice(0,12)){
@@ -108,13 +114,13 @@ export async function discoverOfficialRecruitmentLinks(role,key,{
    const corporate=publicCorporatePage(row.url);
    if(corporate&&!FOREIGN.test(text(row.title,160)+' '+text(row.snippet,400))){
     const meta={title:text(row.title,160),snippet:text(row.snippet,400)};
-    if(!sites.has(corporate.url))sites.set(corporate.url,{...corporate,meta});
+    if(!sites.has(corporate.url))sites.set(corporate.url,{...corporate,meta,role:searchedRole});
    }
    const job=publicJobLink(row.url);
-   if(job&&titleRelated(row.title,intent)&&
+   if(job&&titleRelated(row.title,searchedRole)&&
     !FOREIGN.test(text(row.title,160)+' '+text(row.snippet,400))&&
     !CLOSED.test(text(row.title,160)+' '+text(row.snippet,400))){
-    jobs.set(job.url,{...job,title_hint:text(row.title,160)});
+    jobs.set(job.url,{...job,title_hint:text(row.title,160),role:searchedRole});
    }
   }
  }
@@ -128,15 +134,26 @@ export async function discoverOfficialRecruitmentLinks(role,key,{
   for(const path of ['/', '/careers']){
    const url='https://'+job.hostname+path,site=publicCorporatePage(url);
    if(site&&!sites.has(site.url)&&sites.size<65&&job.domain!== 'feishu.cn'&&job.domain!=='hotjob.cn'){
-    sites.set(site.url,{...site,meta:{title:job.title_hint},derived:true});
+    sites.set(site.url,{...site,meta:{title:job.title_hint},role:job.role,derived:true});
    }
   }
  }
  const ranked=[...sites.values()].sort((a,b)=>
   (companyPageScore(b,b.meta)-(b.derived?11:0))-
   (companyPageScore(a,a.meta)-(a.derived?11:0)));
+ // Round-robin the fetched company pages across distinct career intents.
+ // Otherwise the first search's 12 leads can consume all six Fetch slots.
+ const buckets=new Map(intents.map(x=>[x,[]]));
+ for(const site of ranked)buckets.get(site.role||intent).push(site);
+ const fairRanked=[];
+ while(fairRanked.length<ranked.length){
+  for(const r of intents){
+   const next=buckets.get(r).shift();
+   if(next)fairRanked.push(next);
+  }
+ }
  const trusted=[],successfulDomains=new Set(),attemptsByDomain=new Map();
- for(const site of ranked){
+ for(const site of fairRanked){
   if(trusted.length>=6||usage.fetch>=LINK_DISCOVERY_LIMITS.fetch)break;
   // At most two public-source attempts per company, only one successful
   // source. Failed speculative paths must not exclude the real homepage.
@@ -149,7 +166,7 @@ export async function discoverOfficialRecruitmentLinks(role,key,{
   const found=brand(response,site);
   if(!found)continue;
   successfulDomains.add(site.domain);
-  trusted.push(found);
+  trusted.push({...found,role:site.role||intent});
  }
  const options=[];
  for(const site of trusted){
@@ -162,7 +179,7 @@ export async function discoverOfficialRecruitmentLinks(role,key,{
    if(!validOfficialLink(job.url,'JOB_DETAIL'))continue;
    options.push({
     kind:'JOB_DETAIL',url:job.url,company:site.name,
-    title:job.title_hint||'相关岗位详情',role:intent,
+    title:job.title_hint||'相关岗位详情',role:job.role||site.role||intent,
     source_evidence:'FIRST_PARTY_CAREERS_PAGE_READ',
     source_url:site.site_url,workplace:'以企业官网为准',
     qualification_status:'NOT_CHECKED',hiring_status:'UNCONFIRMED',
@@ -177,7 +194,7 @@ export async function discoverOfficialRecruitmentLinks(role,key,{
    if(!backlink)continue;
    options.push({
     kind:'JOB_DETAIL',url:job.url,company:site.name,
-    title:job.title_hint||'相关岗位详情',role:intent,
+    title:job.title_hint||'相关岗位详情',role:job.role||site.role||intent,
     source_evidence:backlink.method,source_url:site.site_url,
     workplace:'以企业官网为准',qualification_status:'NOT_CHECKED',
     hiring_status:'UNCONFIRMED',label:'企业招聘系统职位链接（待确认）'
@@ -185,7 +202,7 @@ export async function discoverOfficialRecruitmentLinks(role,key,{
   }
   options.push({
    kind:'CAREERS_ENTRY',url:site.site_url,company:site.name,
-   title:'官方招聘入口',role:intent,
+   title:'官方招聘入口',role:site.role||intent,
    source_evidence:'FIRST_PARTY_CAREERS_PAGE_READ',
    source_url:site.site_url,workplace:'中国大陆岗位需在官网筛选',
    qualification_status:'NOT_CHECKED',hiring_status:'UNCONFIRMED',
