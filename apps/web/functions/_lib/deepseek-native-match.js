@@ -67,3 +67,38 @@ export function parseJobAnswer(response,limit=10){
  }
  return {matches,received:rows.length,rejected:rows.length-matches.length};
 }
+
+
+// Only extract fully closed JSON objects from a streamed {"jobs":[...]} response.
+// Reuses the exact same Mainland/HTTPS checks as the final parser.
+export function partialJobMatchesFromText(text,limit=10){
+ if(typeof text!=='string'||text.length>50000)return [];
+ const key=text.search(/"jobs"\s*:/),array=key>=0?text.indexOf('[',key):-1;
+ if(array<0)return [];
+ let inString=false,escaped=false,depth=0,start=-1;
+ const rows=[];
+ for(let i=array+1;i<text.length;i++){
+  const ch=text[i];
+  if(inString){
+   if(escaped)escaped=false;
+   else if(ch==='\\')escaped=true;
+   else if(ch==='"')inString=false;
+   continue;
+  }
+  if(ch==='"'){inString=true;continue;}
+  if(ch==='{'){if(depth===0)start=i;depth++;continue;}
+  if(ch==='}'&&depth>0){
+   depth--;
+   if(depth===0&&start>=0){
+    try{rows.push(JSON.parse(text.slice(start,i+1)))}catch{}
+    start=-1;
+    if(rows.length>=14)break;
+   }
+  }
+ }
+ if(!rows.length)return [];
+ const synthetic={output:[{type:'message',content:[
+  {type:'output_text',text:JSON.stringify({jobs:rows})}
+ ]}]};
+ return parseJobAnswer(synthetic,limit).matches;
+}
