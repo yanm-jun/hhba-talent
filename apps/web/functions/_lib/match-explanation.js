@@ -117,9 +117,18 @@ export function whyThisJob(profile={},job={},fit={}){
  if(!minimum)gaps.push('公开资料未明确最低学历，需以企业职位页为准');
  if(job.application_status==='NEEDS_OFFICIAL_CONFIRMATION')
   gaps.push('当前是否开放投递仍需在企业招聘页确认');
+ // A shortlist card has room for one line: lead with verifiable,
+ // specific fit evidence before generic direction similarity.
+ const ordered=[...reasons].sort((a,b)=>{
+  const importance=v=>v.startsWith('你的简历明确记录')?4:
+   v.startsWith('简历记录的「')?3:
+   v.startsWith('简历记录')?2:
+   v.startsWith('你希望从事')?1:0;
+  return importance(b)-importance(a);
+ });
  return {
-  summary:reasons[0],
-  evidence:reasons.slice(0,3),
+  summary:ordered[0],
+  evidence:ordered.slice(0,3),
   to_check:gaps.slice(0,2)
  };
 }
