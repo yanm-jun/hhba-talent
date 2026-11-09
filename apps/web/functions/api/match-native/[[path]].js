@@ -59,7 +59,7 @@ export async function runNativeJobMatch(key,text,roleHint,limit=10,{fetcher=fetc
   model:'deepseek-v4-pro',
   reasoning:{effort:'none'},
   tools:[{type:'web_search'}],
-  tool_choice:'auto',
+  tool_choice:'required',
   text:{format:{type:'json_object'}},
   max_output_tokens:5000,
   stream:false,
