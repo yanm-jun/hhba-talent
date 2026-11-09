@@ -6,6 +6,7 @@ import {fuseDomesticJobRecommendations} from '../../_lib/domestic-match-fusion.j
 import {discoverExternalOfficialJobs,sanitizedJobIntent} from '../../_lib/domestic-search-fetch.js';
 import {runDeepSeekOfficialJobAgent} from '../../_lib/deepseek-official-job-agent.js';
 import {previewJobBrowserRenderer} from '../../_lib/cf-job-browser-preview.js';
+import {createTrustedEmployerSourceCache} from '../../_lib/trusted-employer-source-cache.js';
 
 const KIND='HHBA_RESUME_MATCH_CLOUDFLARE_V1';
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{
@@ -131,6 +132,8 @@ async function autoDiscoveryCandidates(env,db,phone,profile,opts){
   if(table?.name!=='hhba_external_search_requests')return {candidates:[],status:'NOT_READY'};
   const v8=env.HHBA_MATCH_V8_DEEPSEEK_AGENT_ENABLED==='1';
   const browserRenderer=v8?previewJobBrowserRenderer(env):null;
+  const sourceCacheRequested=v8&&env.HHBA_AUTH_ROLLOUT==='preview'&&
+   env.HHBA_MATCH_V8_SOURCE_CACHE_ENABLED==='1';
   // Never spend for a V8 experiment until cost auditing is writable.
   if(v8){
    const accountingTable=await db.prepare(
@@ -148,6 +151,14 @@ async function autoDiscoveryCandidates(env,db,phone,profile,opts){
    if(schema?.name!=='hhba_match_browser_render_accounting')
     return {candidates:[],status:'BROWSER_ACCOUNTING_NOT_READY'};
   }
+  if(sourceCacheRequested){
+   const schema=await db.prepare(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='hhba_match_trusted_employer_sources'"
+   ).first();
+   if(schema?.name!=='hhba_match_trusted_employer_sources')
+    return {candidates:[],status:'SOURCE_CACHE_NOT_READY'};
+  }
+  const trustedSourceCache=sourceCacheRequested?createTrustedEmployerSourceCache(db):null;
   const day=new Date().toISOString().slice(0,10),id=crypto.randomUUID();
   const hash=await sha256Hex(env.HHBA_MATCH_LIMIT_PEPPER+':search:'+phone);
   const reserved=await db.prepare(
@@ -161,7 +172,7 @@ async function autoDiscoveryCandidates(env,db,phone,profile,opts){
   // one-click Search quota. The model only receives sanitized role names.
   const data=v8?
    await runDeepSeekOfficialJobAgent(intent,env.HHBA_MATCH_DEEPSEEK_KEY,
-    {targetCount:opts.limit,browserRenderer}):
+    {targetCount:opts.limit,browserRenderer,trustedSourceCache}):
    await discoverExternalOfficialJobs(intent,env.HHBA_MATCH_DEEPSEEK_KEY,{expanded:true});
   if(v8){
    const cost=data.accounting;
