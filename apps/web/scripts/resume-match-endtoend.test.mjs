@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {onRequest} from '../functions/api/match/[[path]].js';
 const origin='https://hhba.example';
-function setup({role='candidate',open=true,stale=false,hasSecrets=true,allowResume=true}={}){
+function setup({role='candidate',open=true,stale=false,hasSecrets=true,allowResume=true,liveSearch=false}={}){
  const iso=new Date().toISOString(),callCounts={provider:0,asset:0};
  const id='11111111-1111-4111-8111-111111111111';
  const phone='13800000000',ledger=[];
@@ -21,11 +21,11 @@ function setup({role='candidate',open=true,stale=false,hasSecrets=true,allowResu
  const documents={'/data/jobs.json':jobs,'/data/job-sync-status.json':audit,'/data/job-search-facets.json':facets};
  const db={prepare(sql){
   return {async first(){
-   if(sql.includes('sqlite_master'))return {name:'hhba_resume_match_requests'};
+   if(sql.includes('sqlite_master'))return {name:sql.includes('hhba_external_search_requests')?'hhba_external_search_requests':'hhba_resume_match_requests'};
    throw Error('unexpected unbound first statement');
   },bind(...args){return {
    async first(){
-    if(sql.includes("sqlite_master"))return {name:'hhba_resume_match_requests'};
+    if(sql.includes("sqlite_master"))return {name:sql.includes('hhba_external_search_requests')?'hhba_external_search_requests':'hhba_resume_match_requests'};
     if(sql.includes('FROM hhba_auth_sessions'))return {phone,revoked:0,expires_at:new Date(Date.now()+3600000).toISOString()};
     if(sql.includes('FROM hhba_auth_users'))return {phone,role};
     if(sql.includes('FROM hhba_candidate_resumes'))return allowResume?{id}:null;
@@ -39,6 +39,7 @@ function setup({role='candidate',open=true,stale=false,hasSecrets=true,allowResu
      if(n>=0)ledger.splice(n,1);
      return {success:true,meta:{changes:n>=0?1:0}};
     }
+    if(sql.startsWith('INSERT INTO hhba_external_search_requests'))return {success:true,meta:{changes:1}};
     if(sql.startsWith('INSERT INTO hhba_resume_match_requests')){
      const day=args[1],hash=args[2];
      if(ledger.filter(x=>x.day===day).length>=240||ledger.filter(x=>x.day===day&&x.hash===hash).length>=8)
@@ -52,6 +53,8 @@ function setup({role='candidate',open=true,stale=false,hasSecrets=true,allowResu
  }};
  const env={
   HHBA_MATCH_SERVICE_ENABLED:open?'1':'0',
+  HHBA_MATCH_EXTERNAL_SEARCH_ENABLED:liveSearch?'1':'0',
+  HHBA_AUTH_ROLLOUT:liveSearch?'preview':'disabled',
   HHBA_MATCH_DEEPSEEK_KEY:hasSecrets?'synthetic-secret-0123456789':undefined,
   HHBA_MATCH_LIMIT_PEPPER:hasSecrets?'synthetic-pepper-with-32-chars-123456789':undefined,
   HHBA_PNVS_AUTH_DB:db,
@@ -78,6 +81,19 @@ function mockedAI(counter,{fail=false}={}){
  const original=globalThis.fetch;
  globalThis.fetch=async (input,opts)=>{
   counter.provider++;
+  if(String(input)==='https://api.deepseek.com/v1/tools/search'){
+   return new Response(JSON.stringify({results:[{
+    title:'AI产品经理 - 示例科技',
+    url:'https://careers.examplecorp.com/jobs/ai-product-2026-001',
+    summary:'工作地点：济南。岗位职责：AI 产品设计、任务流程与项目验收。'
+   }]}),{status:200,headers:{'Content-Type':'application/json'}});
+  }
+  if(String(input)==='https://api.deepseek.com/v1/tools/fetch'){
+   return new Response(JSON.stringify({
+    title:'AI产品经理 | 示例科技',
+    content:'# AI产品经理\n工作地点：济南\n岗位职责：负责 AI Agent 产品需求、原型设计、测试与上线验收。\n任职要求：本科及以上学历。'
+   }),{status:200,headers:{'Content-Type':'application/json'}});
+  }
   assert.equal(String(input),'https://api.deepseek.com/chat/completions');
   const body=JSON.parse(opts.body);
   assert.equal(body.model,'deepseek-flash');
@@ -363,4 +379,25 @@ test('audited foreign-only index cannot spend AI quota or produce foreign jobs',
   assert.equal(h.callCounts.provider,0);
   assert.equal(h.ledger.length,0);
  }finally{globalThis.fetch=oldFetch;}
+});
+
+
+test('one user action discovers a new company and returns job link and reason',async()=>{
+ const h=setup({liveSearch:true}),restore=mockedAI(h.callCounts);
+ try{
+  const response=await onRequest({request:h.request({
+   options:{role_hint:'AI产品经理'},
+   textValue:'我负责 HHBA AI Agent 产品的需求分析、原型设计、工作流搭建、测试验收和产品上线，正在寻找 AI 产品经理职位。'
+  }),env:h.env});
+  assert.equal(response.status,200);
+  const body=await response.json();
+  assert.equal(body.status,'COMPLETE');
+  const found=body.matches.find(job=>job.source_type==='站外官方招聘');
+  assert.ok(found,'searched external company should appear directly in Top10');
+  assert.equal(found.official_url,'https://careers.examplecorp.com/jobs/ai-product-2026-001');
+  assert.equal(found.location,'济南');
+  assert.ok(found.recommendation_reason.length>5);
+  assert.ok(h.callCounts.provider>=4);
+  assert.equal(body.discovery_status,'COMPLETE');
+ }finally{restore();}
 });
