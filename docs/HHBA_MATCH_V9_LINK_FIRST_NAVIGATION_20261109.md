@@ -41,3 +41,25 @@
 - 开发分支中的这次改动**不修改生产环境变量、Cloudflare 密钥、D1 用户数据、支付或正式站**，也不提高成本上限。需要 PR 自动化成功、预览可打开和真实招聘渠道人工抽查后才可以请求合并。
 
 **仍然未完成的外部验收：** 未通过真实 DeepSeek 查询拿到至少 3 家互不重复、可打开且来源可信的企业招聘入口。自动化模拟测试无法证明真实在招职位，禁止宣称“正式上线”或将这种链接写成“已通过资格审核”。
+
+## V9.2 · 中国大陆真实招聘入口来源回溯与受限验收（2026-11-09）
+
+### 代码与自动回归
+- 修复 Search 返回企业非标准招聘路径时被整体丢弃的问题。针对带招聘标记的搜索结果，允许**同一主机名**的根招聘主页成为待 Fetch 候选；仅当真实 Fetch 读取网页并识别招聘用途后才输出链接。不会把子页面自动当作已核验岗位，不跳转到不同主机，不允许已知招聘聚合平台。合成回归覆盖：
+  - 腾讯 `https://careers.tencent.com/jobopportunity.html` → `https://careers.tencent.com/`
+  - 小米 `https://hr.xiaomi.com/website/campus.html` → `https://hr.xiaomi.com/`
+  - 安克创新 `https://career.anker.com.cn/universities/recruitment/` → `https://career.anker.com.cn/`
+- 增加聚合站假招聘页面负例。保留最多 3 Search / 6 Fetch / 0 额外模型预算，职业方向轮询和前端未核验状态展示均不变。
+- 最新 GitHub Actions [#42571363286](https://github.com/yanm-jun/hhba-talent/actions/runs/42571363286)：**203/203 回归通过，前端生产构建通过，现有 HTTPS Preview 安全烟测通过**；两组相关 CI 亦通过。
+
+### 公开来源人工基线（非程序真实联网成绩）
+- 腾讯招聘 `https://careers.tencent.com/`，公开社会招聘说明 `https://careers.tencent.com/jobopportunity.html`
+- 小米招聘 `https://hr.xiaomi.com/`，公开校招 `https://hr.xiaomi.com/website/campus.html`
+- 安克创新招聘 `https://career.anker.com.cn/`，公开招聘项目 `https://career.anker.com.cn/universities/recruitment/`
+
+这三家企业招聘入口的网页能够通过独立公开检索找到，**不能据此证明 V9 的 DeepSeek Search/Fetch 已真实返回三家**，也不能证明具体职位仍在招或符合任意用户简历。
+
+### 真实服务端验收受阻
+- 一次性 GitHub OIDC 授权、D1 重复执行保护的测试工作流 [#42571358731](https://github.com/yanm-jun/hhba-talent/actions/runs/42571358731) 在等待 Cloudflare Preview 时超出等待窗口：预览部署 `186e07f0-dac5-4148-8a81-73b8b63ab57e` 停留 `build/active`，未进入 deploy。 
+- 工作流未执行付费的 DeepSeek Search/Fetch 步骤；本轮无真实服务端搜索结果，不得报告成功或支出数据。一次性测试 workflow 和临时 Function 均已**从开发分支删除**。此前的 Cloudflare Preview 构建可能在清理提交之前排队，仍应核查最新分支部署确认临时 API 不在当前预览发布版本中。
+- 新功能保留 **Draft PR #299**，尚未进入 `main` 或正式站 `hhba.work`；发布门槛保持：至少 3 家真实不同企业的招聘入口通过完整 DeepSeek→Fetch→来源复查及点击验收，且安全与费用可核对。正式生产 AI/收费开关不作更改。
