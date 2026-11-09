@@ -7,7 +7,7 @@ import {publicCorporatePage,publicJobLink,companyLinkFromPage} from './deepseek-
 import {emptyV8CostMeter,buildV8CostReport} from './deepseek-discovery-billing.js';
 
 export const LINK_DISCOVERY_VERSION='HHBA_OFFICIAL_LINK_NAVIGATION_V1';
-export const LINK_DISCOVERY_LIMITS=Object.freeze({model:0,search:3,fetch:6,results:10});
+export const LINK_DISCOVERY_LIMITS=Object.freeze({model:0,search:6,fetch:12,results:10});
 const CLOSED=/(?:职位已关闭|岗位已下线|不再招聘|停止招聘|暂停招聘|招聘已结束|no longer accepting applications|job is closed)/i;
 const DIRECTORY=/(?:求职招聘平台|招聘信息网|招聘网站|人才招聘网|找工作|附近工作|海量职位|求职招聘|简历模板|全职招聘平台|招聘聚合|职位聚合|招聘资讯)/i;
 const RECRUIT=/(?:招聘|加入我们|人才招聘|职位|岗位|社会招聘|校园招聘|career|careers|join us|join our team|recruitment|jobs|positions)/i;
@@ -69,9 +69,12 @@ function titleRelated(value,role){
 }
 function queryPlan(role){
  return [
-  role+' 中国大陆 社会招聘 企业官方招聘官网',
-  role+' 企业招聘 岗位详情 官方网站',
-  role+' 官方招聘入口 加入我们 中国'
+  role+' 中国大陆 企业招聘 具体岗位 详情',
+  role+' 官方招聘 岗位详情 职位编号',
+  role+' 社会招聘 具体职位 在线申请 官网',
+  role+' 招聘 职位详情 site:careers.tencent.com',
+  role+' 招聘 职位详情 site:jobs.bytedance.com',
+  role+' 招聘 具体岗位 site:job.xiaohongshu.com'
  ];
 }
 async function provider(key,path,payload,fetcher,timeout=17000){
@@ -117,7 +120,7 @@ export async function discoverOfficialRecruitmentLinks(role,key,{
   stats:{searched_links:0,verified_sources:0,job_direct:0,career_entries:0}
  });
  if(!intent||typeof key!=='string'||key.length<16)return empty('NOT_READY');
- const searches=Array.from({length:3},(_,i)=>{
+ const searches=Array.from({length:LINK_DISCOVERY_LIMITS.search},(_,i)=>{
   const selected=intents[i%intents.length];
   return {role:selected,query:queryPlan(selected)[i]};
  });
@@ -200,20 +203,33 @@ export async function discoverOfficialRecruitmentLinks(role,key,{
   }
  }
  const trusted=[],successfulDomains=new Set(),attemptsByDomain=new Map();
- for(const site of fairRanked){
-  if(trusted.length>=6||usage.fetch>=LINK_DISCOVERY_LIMITS.fetch)break;
-  // At most two public-source attempts per company, only one successful
-  // source. Failed speculative paths must not exclude the real homepage.
-  if(successfulDomains.has(site.domain)||(attemptsByDomain.get(site.domain)||0)>=2)continue;
-  attemptsByDomain.set(site.domain,(attemptsByDomain.get(site.domain)||0)+1);
-  usage.fetch++;
-  const response=await provider(key,'fetch',{url:site.url},fetcher,17000);
-  if(!response||typeof response.content!=='string')continue;
-  if(response.content.length)meter.billable_fetch++;
-  const found=brand(response,site);
-  if(!found)continue;
-  successfulDomains.add(site.domain);
-  trusted.push({...found,role:site.role||intent});
+ let nextSite=0;
+ // Up to three public-page reads concurrently. This keeps a larger search
+ // budget from turning a single user action into a long serial wait.
+ while(nextSite<fairRanked.length&&usage.fetch<LINK_DISCOVERY_LIMITS.fetch&&trusted.length<10){
+  const batch=[],activeDomains=new Set();
+  while(nextSite<fairRanked.length&&batch.length<3&&
+   usage.fetch+batch.length<LINK_DISCOVERY_LIMITS.fetch){
+   const site=fairRanked[nextSite++];
+   if(successfulDomains.has(site.domain)||activeDomains.has(site.domain)||
+    (attemptsByDomain.get(site.domain)||0)>=2)continue;
+   activeDomains.add(site.domain);
+   attemptsByDomain.set(site.domain,(attemptsByDomain.get(site.domain)||0)+1);
+   batch.push(site);
+  }
+  if(!batch.length)continue;
+  usage.fetch+=batch.length;
+  const fetched=await Promise.all(batch.map(site=>
+   provider(key,'fetch',{url:site.url},fetcher,17000)));
+  for(let i=0;i<batch.length;i++){
+   const site=batch[i],response=fetched[i];
+   if(!response||typeof response.content!=='string')continue;
+   if(response.content.length)meter.billable_fetch++;
+   const found=brand(response,site);
+   if(!found||successfulDomains.has(site.domain))continue;
+   successfulDomains.add(site.domain);
+   trusted.push({...found,role:site.role||intent});
+  }
  }
  const options=[];
  for(const site of trusted){
